@@ -625,7 +625,7 @@ int CtvtGame_Main(CommTvtWork *sys, CtvtGame *game) {
     switch (game->state) {
     case CTVT_GAME_STATE_FADE_OUT_EXIT:
         CommTvt_GetCamera(sys);
-        GFL_WipeSet(0, 0, 0, 0, 6, 1, heapId);
+        GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, 0, 6, 1, heapId);
         game->state = CTVT_GAME_STATE_EXIT;
         break;
     case CTVT_GAME_STATE_EXIT:
@@ -636,7 +636,7 @@ int CtvtGame_Main(CommTvtWork *sys, CtvtGame *game) {
     case CTVT_GAME_STATE_START_CAMERA:
         game->camTask = CtvtGameCam_StartTask(game->cam, heapId);
         game->state = CTVT_GAME_STATE_CAMERA;
-        GFL_WipeSet(0, 1, 1, 0, 6, 1, heapId);
+        GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_IN, WIPE_TYPE_FADE_IN, 0, 6, 1, heapId);
         break;
     case CTVT_GAME_STATE_CAMERA:
         if (GFL_WipeIsFinished() == TRUE) {
@@ -657,7 +657,7 @@ int CtvtGame_Main(CommTvtWork *sys, CtvtGame *game) {
         break;
     case CTVT_GAME_STATE_FADE_OUT_CAMERA:
         game->state = CTVT_GAME_STATE_FREE_CAMERA;
-        GFL_WipeSet(0, 0, 0, 0, 6, 1, heapId);
+        GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, 0, 6, 1, heapId);
         break;
     case CTVT_GAME_STATE_FREE_CAMERA:
         CtvtGameCam_EndTask(game->camTask);
@@ -1155,7 +1155,7 @@ static BOOL CtvtGame_UpdatePlay(CommTvtWork *sys, CtvtGame *game) {
         }
         GFL_SndBGMPlay(SEQ_ME_LCG_01, SND_CHANNEL_MASK_ALL);
         game->playState = CTVT_GAME_PLAY_FADE_IN;
-        GFL_WipeSet(0, 1, 1, 0, 6, 1, game->heapId);
+        GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_IN, WIPE_TYPE_FADE_IN, 0, 6, 1, game->heapId);
         break;
     case CTVT_GAME_PLAY_FADE_IN:
         if (GFL_WipeIsFinished() == TRUE) {
@@ -1165,7 +1165,7 @@ static BOOL CtvtGame_UpdatePlay(CommTvtWork *sys, CtvtGame *game) {
         break;
     case CTVT_GAME_PLAY_INTRO:
         if (CtvtGame_UpdateIntro(sys, game)) {
-            GFL_WipeSet(0, 0, 0, 0, 6, 1, game->heapId);
+            GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, 0, 6, 1, game->heapId);
             GFL_SndBGMStopImmediate();
             game->playState = CTVT_GAME_PLAY_WAIT_INTRO_FADE_OUT;
         }
@@ -1200,8 +1200,8 @@ static BOOL CtvtGame_UpdatePlay(CommTvtWork *sys, CtvtGame *game) {
         if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), 23, 32) == TRUE) {
             game->playState = CTVT_GAME_PLAY_WAIT_FADE_IN;
             GFL_SndBGMPlay(SEQ_BGM_LCG_01, SND_CHANNEL_MASK_ALL);
-            GFL_BGSysMoveBG(4, 3, 0);
-            GFL_WipeSet(0, 1, 1, 0, 6, 1, game->heapId);
+            GFL_BGSysMoveBG(4, BG_MOVE_SET_Y, 0);
+            GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_IN, WIPE_TYPE_FADE_IN, 0, 6, 1, game->heapId);
         }
         break;
     case CTVT_GAME_PLAY_WAIT_FADE_IN:
@@ -1270,7 +1270,7 @@ static BOOL CtvtGame_UpdatePlay(CommTvtWork *sys, CtvtGame *game) {
         }
         break;
     case CTVT_GAME_PLAY_FADE_OUT:
-        GFL_WipeSet(3, 0, 0, 0, 6, 1, game->heapId);
+        GFL_WipeSet(WIPE_MODE_MAIN, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, 0, 6, 1, game->heapId);
         game->playState = CTVT_GAME_PLAY_WAIT_FADE_OUT;
         break;
     case CTVT_GAME_PLAY_WAIT_FADE_OUT:
@@ -1283,7 +1283,7 @@ static BOOL CtvtGame_UpdatePlay(CommTvtWork *sys, CtvtGame *game) {
         game->playState = CTVT_GAME_PLAY_FADE_IN_RESULTS;
         break;
     case CTVT_GAME_PLAY_FADE_IN_RESULTS:
-        GFL_WipeSet(3, 1, 1, 0, 6, 1, game->heapId);
+        GFL_WipeSet(WIPE_MODE_MAIN, WIPE_TYPE_FADE_IN, WIPE_TYPE_FADE_IN, 0, 6, 1, game->heapId);
         game->playState = CTVT_GAME_PLAY_WAIT_FADE_IN_RESULTS;
         break;
     case CTVT_GAME_PLAY_WAIT_FADE_IN_RESULTS:
@@ -1316,7 +1316,7 @@ static BOOL CtvtGame_UpdatePlay(CommTvtWork *sys, CtvtGame *game) {
         game->playState = CTVT_GAME_PLAY_REPLAY_MENU;
         break;
     case CTVT_GAME_PLAY_FADE_OUT_MENU:
-        GFL_WipeSet(0, 0, 0, 0, 6, 1, game->heapId);
+        GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, 0, 6, 1, game->heapId);
         game->playState = CTVT_GAME_PLAY_WAIT_FADE_OUT_MENU;
         break;
     case CTVT_GAME_PLAY_WAIT_FADE_OUT_MENU:
@@ -1820,7 +1820,7 @@ static BOOL CtvtGame_UpdateIntro(CommTvtWork *sys, CtvtGame *game) {
         game->paletteFrame++;
         if (game->paletteFrame % 5 == 0) {
             game->paletteFrame = 0;
-            GFL_BGSysMoveBG(4, 4, 1);
+            GFL_BGSysMoveBG(4, BG_MOVE_DOWN, 1);
         }
         break;
     case CTVT_GAME_TYPE_BALLOONS:

@@ -45,16 +45,18 @@ struct FieldAppCallInput {
 };
 
 // The apps of FIELD_PROC_LINK_LIST, by index
-#define FIELD_APP_POKELIST 0
-#define FIELD_APP_ZUKAN 1
-#define FIELD_APP_BAG 2
-#define FIELD_APP_TRAINER_CARD 3
-#define FIELD_APP_SAVE 4
-#define FIELD_APP_CONFIG 5
-#define FIELD_APP_INF_DUNGEON_RETIRE 6
-#define FIELD_APP_POKESTATUS 7
-#define FIELD_APP_MAIL 10
-#define FIELD_APP_SHINKA_DEMO 11
+enum {
+    FIELD_APP_POKELIST,
+    FIELD_APP_ZUKAN,
+    FIELD_APP_BAG,
+    FIELD_APP_TRAINER_CARD,
+    FIELD_APP_SAVE,
+    FIELD_APP_CONFIG,
+    FIELD_APP_INF_DUNGEON_RETIRE,
+    FIELD_APP_POKESTATUS,
+    FIELD_APP_MAIL = 10,
+    FIELD_APP_SHINKA_DEMO,
+};
 
 // The results of an app: 4 opens nextApp, the others are event types for EventFieldAppCall_ConvAppResultToEventType
 #define FIELD_APP_RESULT_NEXT 4

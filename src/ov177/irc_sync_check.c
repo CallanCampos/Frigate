@@ -397,10 +397,10 @@ static BOOL IrcSyncCheck_Init(GameProc *proc, u32 *state, void *param, void *wor
     BmpWin_DrawFrame(wk->messageWindow.window, 0, (u16)wk->graphic.bg.frameChars, 6);
     IrcSyncCheckWindow_InitWithColor(&wk->titleWindow, 7, 6, 3, 20, 5, 8, 1, TRUE, HEAP_ID);
     IrcSyncCheckWindow_PrintMsgCentered(&wk->titleWindow, &wk->text, BtlMain3_Text_SyncCheck);
-    GFL_BGSysScaleBGReq(7, 3, 0x1000);
-    GFL_BGSysScaleBGReq(7, 6, 0x1000);
-    GFL_BGSysAdjustBGOriginReq(7, 9, 0x80);
-    GFL_BGSysAdjustBGOriginReq(7, 12, 0x28);
+    GFL_BGSysScaleBGReq(7, BG_SCALE_SET_X, 0x1000);
+    GFL_BGSysScaleBGReq(7, BG_SCALE_SET_Y, 0x1000);
+    GFL_BGSysAdjustBGOriginReq(7, BG_CENTER_SET_X, 0x80);
+    GFL_BGSysAdjustBGOriginReq(7, BG_CENTER_SET_Y, 0x28);
     IrcSyncTrace_Clear(&wk->traceA);
     IrcSyncTrace_Clear(&wk->traceB);
     IrcSyncCheckSparkles_Init(&wk->sparkles, &wk->graphic, 0, 1, 0, 1);

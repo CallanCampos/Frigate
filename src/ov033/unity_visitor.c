@@ -36,7 +36,7 @@ void func_ov033_0217aa50(UnityTowerSurveySave *survey, UnityTowerFloor *output, 
     output->value = value;
     output->count = 0;
     for (index = 0; index < 20; index++) {
-        if ((u8)UnityTower_GetVisitorParam(survey, index, 6) == 0) {
+        if ((u8)UnityTower_GetVisitorParam(survey, index, UNITY_TOWER_VISITOR_PARAM_VALID) == 0) {
             continue;
         }
         visitor = UnityTower_GetVisitor(survey, index);
@@ -89,7 +89,7 @@ u32 func_ov033_0217aad8(WordSet *wordSet, GameSystem *gsys, UnityTowerFloor *sav
     LoadUnityTowerVisitorWordSet(wordSet, gameData, visitorIndex);
     visitor = UnityTower_GetVisitor(surveySave, visitorIndex);
     gender = getTrainerGender(visitor);
-    province = UnityTower_GetVisitorParam(surveySave, visitorIndex, 4);
+    province = UnityTower_GetVisitorParam(surveySave, visitorIndex, UNITY_TOWER_VISITOR_PARAM_UNK26_0);
     id = getIDAsUInt(visitor);
     if (CountryHasProvinces(GameData_GetUnityTowerSave(gameData)->floor) != 0) {
         hasProvince = 1;
@@ -137,15 +137,17 @@ void LoadUnityTowerVisitorWordSet(WordSet *wordSet, GameData *gameData, u32 inde
         loadCountryAreaToStrbuf(wordSet, 1, country, UnityTowerVisitor_GetProvince(visitor));
     }
     copyVarForText(wordSet, 3, GetGameDataPlayerInfo(gameData));
-    WordSet_LoadSpeciesName(wordSet, 5, (u16)UnityTower_GetVisitorParam(survey, index, 0));
+    WordSet_LoadSpeciesName(wordSet, 5,
+                            (u16)UnityTower_GetVisitorParam(survey, index, UNITY_TOWER_VISITOR_PARAM_SENT_SPECIES));
     loadHobbyNameToStrbuf(wordSet, 6, getPlayerSurveys(survey));
     copyVarForText(wordSet, 7, visitor);
-    value = UnityTower_GetVisitorParam(survey, index, 3);
+    value = UnityTower_GetVisitorParam(survey, index, UNITY_TOWER_VISITOR_PARAM_COUNTRY_COUNT);
     if (value == 0) {
         value = 1;
     }
     WordSetNumber(wordSet, 8, value, 3, 0, 1);
-    WordSet_LoadSpeciesName(wordSet, 9, (u16)UnityTower_GetVisitorParam(survey, index, 1));
-    hobby = UnityTower_GetVisitorParam(survey, index, 2);
+    WordSet_LoadSpeciesName(wordSet, 9,
+                            (u16)UnityTower_GetVisitorParam(survey, index, UNITY_TOWER_VISITOR_PARAM_RECEIVED_SPECIES));
+    hobby = UnityTower_GetVisitorParam(survey, index, UNITY_TOWER_VISITOR_PARAM_HOBBY);
     loadHobbyNameToStrbuf(wordSet, 10, hobby);
 }

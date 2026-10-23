@@ -44,8 +44,10 @@ enum {
 };
 
 // PaletteFade_GetColor's choice of buffer
-#define PALFADE_FADED 0
-#define PALFADE_UNFADED 1
+enum {
+    PALFADE_FADED,
+    PALFADE_UNFADED,
+};
 
 PaletteFade *PaletteFade_Create(u32 heapId);
 void PaletteFade_Free(PaletteFade *fade);

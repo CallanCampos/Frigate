@@ -672,7 +672,7 @@ static void func_ov194_021bfa48(PokemonTradeWork *wk) {
 }
 
 static void func_ov194_021bfa7c(PokemonTradeWork *wk) {
-    GFL_WipeSet(0, 0, 0, 0, 6, 1, wk->heapId);
+    GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, 0, 6, 1, wk->heapId);
     wk->timer = 0;
     wk->unk11F7 = 0;
     PokemonTrade_SetState(wk, func_ov194_021bfac4);

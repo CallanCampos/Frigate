@@ -55,6 +55,7 @@
 #include "gfl/arc.h"
 #include "gfl/blact.h"
 #include "gfl/bmpwin.h"
+#include "gfl/calctool.h"
 #include "gfl/clact.h"
 #include "gfl/g3d.h"
 #include "gfl/graphics.h"
@@ -458,7 +459,7 @@ u32 FieldRoutine_MapSpawnFinish(GameSystem *gsys, Field *field) {
 
 u32 FieldRoutine_Run(GameSystem *gsys, Field *field) {
     if (GSYS_GetNowEvent(field->gameSystem) == NULL) {
-        FieldStatus_SetBusyFlag(GameData_GetFieldStatus(field->gameData), FALSE);
+        FieldStatus_SetBusyFlag(GameData_GetFieldStatus(field->gameData), FLD_STATUS_BUSY_NONE);
     }
     if (GameData_CheckEventsPaused(field->gameData)) {
         return 0;
@@ -846,7 +847,7 @@ void FieldG2D_SetLCDConfig(void) {
 void FieldG2D_Prepare3DSurface(Field *field) {
     MtxFx22 mtx;
 
-    MAT2_SetScaleRot(&mtx, 0, FX32_ONE, FX32_ONE, 0);
+    MAT2_SetScaleRot(&mtx, 0, FX32_ONE, FX32_ONE, MAT2_ROT_IDX);
     G2_SetBG2Affine(&mtx, 0, 0, 0, 0);
     GFL_BGSysSet3DBGPriority(3);
     func_ov036_02187760(field->msgBGSys);
@@ -855,7 +856,7 @@ void FieldG2D_Prepare3DSurface(Field *field) {
 void func_ov036_02180630(Field *field) {
     MtxFx22 mtx;
 
-    MAT2_SetScaleRot(&mtx, 0, FX32_ONE, FX32_ONE, 0);
+    MAT2_SetScaleRot(&mtx, 0, FX32_ONE, FX32_ONE, MAT2_ROT_IDX);
     G2_SetBG2Affine(&mtx, 0, 0, 0, 0);
     GFL_BGSysSet3DBGPriority(3);
     func_ov036_0218776c(field->msgBGSys);

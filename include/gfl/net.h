@@ -91,9 +91,11 @@ typedef struct {
 #define GFL_NET_MACHINE_MAX 8
 
 // The kinds of connection: Wi-Fi through DWC, and the others through the wireless or infrared devices
-#define GFL_NET_TYPE_WIFI 1
-#define GFL_NET_TYPE_WIFI_LOBBY 2
-#define GFL_NET_TYPE_WIFI_GTS 6
+enum {
+    GFL_NET_TYPE_WIFI = 1,
+    GFL_NET_TYPE_WIFI_LOBBY,
+    GFL_NET_TYPE_WIFI_GTS = 6,
+};
 
 // What the network device does, wireless or Wi-Fi; the code calls each through GFLNetSys
 typedef BOOL (*GFLNetRecvFunc)(u16 netId, u8 *data, u16 size);

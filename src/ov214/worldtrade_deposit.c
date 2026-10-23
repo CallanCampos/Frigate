@@ -181,7 +181,7 @@ int WorldTrade_Deposit_Init(WorldTradeWork *wk, int seq) {
     Deposit_BgGraphicSet(wk);
     Deposit_BmpWinInit(wk);
     Deposit_SetCellActor(wk);
-    GFL_WipeSet(3, 1, 1, 0, 6, 1, HEAPID_WORLDTRADE);
+    GFL_WipeSet(WIPE_MODE_MAIN, WIPE_TYPE_FADE_IN, WIPE_TYPE_FADE_IN, 0, 6, 1, HEAPID_WORLDTRADE);
     WorldTrade_WifiIconAdd(wk);
 
     WorldTrade_PokeWantPrint(wk->msgManager, wk->monsNameManager, wk->wordSet, &wk->infoWin[0], 0, SEARCH_GENDER_ANY,
@@ -532,7 +532,7 @@ static int Deposit_SubSeqPokeNameSelectWait(WorldTradeWork *wk) {
     default:
         wk->want.characterNo = ret;
         personal = PML_PersonalLoad(ret, 0, HEAPID_WORLDTRADE);
-        sexSelection = PML_PersonalGetParam(personal, 20);
+        sexSelection = PML_PersonalGetParam(personal, PERSONAL_SEX_RATIO);
         PML_PersonalFree(personal);
         wk->dw->sexSelection = sexSelection;
         if (WorldTrade_SexSelectionCheck(&wk->want, wk->dw->sexSelection)) {
@@ -654,10 +654,10 @@ static int Deposit_SubSeqDepositOkYesNoWait(WorldTradeWork *wk) {
 
 static int Deposit_SubSeqEnd(WorldTradeWork *wk) {
     if (wk->subNextProcess == WORLDTRADE_ENTER) {
-        GFL_WipeSet(0, 0, 0, 0, 6, 1, HEAPID_WORLDTRADE);
+        GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, 0, 6, 1, HEAPID_WORLDTRADE);
         wk->subOutFlag = 1;
     } else {
-        GFL_WipeSet(3, 0, 0, 0, 6, 1, HEAPID_WORLDTRADE);
+        GFL_WipeSet(WIPE_MODE_MAIN, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, 0, 6, 1, HEAPID_WORLDTRADE);
     }
     wk->subprocessSeq = DEPOSIT_SEQ_START;
     return WT_SEQ_FADEOUT;

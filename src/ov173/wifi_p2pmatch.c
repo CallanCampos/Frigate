@@ -6647,7 +6647,7 @@ static void WifiP2PMatch_ViewDrawButtons(WIFIP2PMATCH_WORK *wk) {
     for (i = 0; i < WIFIP2PMATCH_VIEW_FRIEND_NUM; i++) {
         friendNo = wk->view.page * WIFIP2PMATCH_VIEW_FRIEND_NUM + i + 1;
         if (wk->view.friendState[friendNo - 1] != 0) {
-            if (WifiList_GetFriendParam(wk->wifiList, friendNo - 1, 9) == 0) {
+            if (WifiList_GetFriendParam(wk->wifiList, friendNo - 1, WIFI_LIST_FRIEND_GENDER) == 0) {
                 type = WIFIP2PMATCH_VIEW_BUTTON_MALE;
             } else {
                 type = WIFIP2PMATCH_VIEW_BUTTON_FEMALE;
@@ -6745,7 +6745,7 @@ static void WifiP2PMatch_ViewSetFriendNameWord(WIFIP2PMATCH_WORK *wk, int friend
     u32 sex;
 
     if (friendIndex != -1) {
-        sex = WifiList_GetFriendParam(wk->wifiList, friendIndex, 9);
+        sex = WifiList_GetFriendParam(wk->wifiList, friendIndex, WIFI_LIST_FRIEND_GENDER);
         WifiList_LoadFriendName(wk->wifiList, friendIndex, wk->expStrBuf);
         GFL_WordSetSetStrbuf(wk->view.wordSet, 0, wk->expStrBuf, sex, 1, 2);
     }
@@ -7079,7 +7079,7 @@ static BOOL WifiP2PMatch_ProcMain(GameProc *proc, u32 *state, void *param, void 
         if (func != NULL) {
             *state = func(wk, *state);
             if (*state == 2) {
-                GFL_WipeSet(0, 0, 0, 0, 6, 1, WIFIP2PMATCH_HEAP);
+                GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, 0, 6, 1, WIFIP2PMATCH_HEAP);
                 return TRUE;
             }
         }

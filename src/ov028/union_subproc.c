@@ -41,16 +41,14 @@
 #include "system/game_event.h"
 #include "system/game_system.h"
 
-// What a command does, and the activity that this machine is in while it does: UNION_ACTIVITY_NONE leaves it as it is
-#define UNION_ACTIVITY_NONE 0x1b
-
 // What a command's handler gets: the GameSystem, the UnionSystem, the Field, the command's argument, the event that
 // runs it, a place for an event to run before the next call, and the step, which starts at 0. It returns whether it is
 // done
 typedef BOOL (*UnionCommandFunc)(GameSystem *gsys, UnionSystem *unisys, Field *field, void *arg, GameEvent *event,
                                  GameEvent **next, u8 *step);
 
-// A row of the command table
+// A row of the command table: what a command does, and the activity that this machine is in while it does:
+// UNION_ACTIVITY_NONE leaves it as it is
 typedef struct {
     UnionCommandFunc func;
     u8 startActivity;

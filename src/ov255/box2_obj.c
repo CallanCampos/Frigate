@@ -1050,7 +1050,8 @@ void Box2Obj_PutTypeIcons(Box2AppWork *app, Box2PokeInfo *info) {
 static void LoadItemIconPalette(Box2AppWork *app) {
     ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_ITEMGRA, HEAPID_BOX2_APP);
 
-    app->palRes[3] = ClActSys_LoadPltt(arc, GetItemGraphicsDatID(0, 2), CLACT_VRAM_MAIN, 0x1a0, HEAPID_BOX2_APP);
+    app->palRes[3] =
+        ClActSys_LoadPltt(arc, GetItemGraphicsDatID(0, ITEM_FILE_ICON_PLTT), CLACT_VRAM_MAIN, 0x1a0, HEAPID_BOX2_APP);
     GFL_ArcToolFree(arc);
 }
 
@@ -1059,10 +1060,12 @@ void Box2Obj_SetItemIcon(Box2AppWork *app, u16 item) {
     NNSG2dPaletteData *pal;
     void *buf;
 
-    buf = GFL_G2DIOReadOBJNCGR(PML_ItemGetIconArcID(), GetItemGraphicsDatID(item, 1), FALSE, &chr, HEAPID_BOX2_APP);
+    buf = GFL_G2DIOReadOBJNCGR(PML_ItemGetIconArcID(), GetItemGraphicsDatID(item, ITEM_FILE_ICON_CHAR), FALSE, &chr,
+                               HEAPID_BOX2_APP);
     ClActSys_ReplaceCharData(ClActor_GetCharIdx(app->actors[BOX2_ACTOR_ITEM_ICON]), chr);
     GFL_HeapFree(buf);
-    buf = GFL_G2DIOReadNCLR(PML_ItemGetIconArcID(), GetItemGraphicsDatID(item, 2), &pal, HEAPID_BOX2_APP);
+    buf = GFL_G2DIOReadNCLR(PML_ItemGetIconArcID(), GetItemGraphicsDatID(item, ITEM_FILE_ICON_PLTT), &pal,
+                            HEAPID_BOX2_APP);
     ClActSys_ReplacePlttData(ClActor_GetPlttIdx(app->actors[BOX2_ACTOR_ITEM_ICON]), pal, 1);
     GFL_HeapFree(buf);
 }

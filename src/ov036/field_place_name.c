@@ -178,7 +178,7 @@ PlaceName *FieldPlaceName_Create(GameSystem *gsys, HeapID heapId, void *msgBGSys
     func_ov036_021b53f4(wk, 0);
     func_ov036_021b55ec(wk);
     func_ov036_021b5434(wk);
-    GFL_BGSysCreateBG(3, &sPlaceNameBGSetup, 0);
+    GFL_BGSysCreateBG(3, &sPlaceNameBGSetup, BGMODE_TEXT);
     if (isGameVerWhite2()) {
         func_ov036_021b51e0(wk, 4);
         func_ov036_021b5230(wk, 3);

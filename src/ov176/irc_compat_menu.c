@@ -335,10 +335,10 @@ static BOOL IrcCompatMenu_Init(GameProc *proc, u32 *state, void *param, void *wo
     IrcCompatMenuWindow_PrintMsg(&wk->messageWindow, &wk->text, BtlMain4_Text_TapMenuTouchScreen, 0, 0);
     IrcCompatMenuWindow_InitWithColor(&wk->titleWindow, 7, 6, 3, 20, 5, 8, 1, TRUE, HEAP_ID);
     IrcCompatMenuWindow_PrintMsgCentered(&wk->titleWindow, &wk->text, BtlMain4_Text_FeelingCheck);
-    GFL_BGSysScaleBGReq(7, 3, 0x1000);
-    GFL_BGSysScaleBGReq(7, 6, 0x1000);
-    GFL_BGSysAdjustBGOriginReq(7, 9, 0x80);
-    GFL_BGSysAdjustBGOriginReq(7, 12, 0x28);
+    GFL_BGSysScaleBGReq(7, BG_SCALE_SET_X, 0x1000);
+    GFL_BGSysScaleBGReq(7, BG_SCALE_SET_Y, 0x1000);
+    GFL_BGSysAdjustBGOriginReq(7, BG_CENTER_SET_X, 0x80);
+    GFL_BGSysAdjustBGOriginReq(7, BG_CENTER_SET_Y, 0x28);
     IrcCompatMenuScroll_Init(&wk->scroll, HEAP_ID);
     if (wk->param->gsys != NULL) {
         save = GameData_GetSaveControl(GSYS_GetGameData(wk->param->gsys));

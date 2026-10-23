@@ -10,8 +10,11 @@
 // The mail screen's callers' interface (overlay 215's mailtool.c): the params that the field app call allocates for the
 // mail screens, and reads the result of. The names are ours, guessed
 
-#define MAIL_PARAM_MODE_VIEW 0
-#define MAIL_PARAM_MODE_WRITE 1
+// MailParam's mode: the mail is shown, or written
+enum {
+    MAIL_PARAM_MODE_VIEW,
+    MAIL_PARAM_MODE_WRITE,
+};
 
 // The parameter of the mail screen (mailsys.c's MailSys_ProcInit and the others): the mail to show or to write
 typedef struct MailParam {

@@ -79,7 +79,7 @@ void setupBySrcData(BattleMon *mon, PartyPkm *src, BOOL readHP, BOOL readAbility
         mon->ability = PokeParty_GetParam(src, PKM_PARAM_ABILITY, NULL);
     }
     mon->form = PokeParty_GetParam(src, PKM_PARAM_FORM, NULL);
-    mon->weight = PML_PersonalGetParamSingle(mon->core.species, mon->form, 0x26);
+    mon->weight = PML_PersonalGetParamSingle(mon->core.species, mon->form, PERSONAL_WEIGHT);
     if (mon->weight < 1) {
         mon->weight = 1;
     }

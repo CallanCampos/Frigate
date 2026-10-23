@@ -346,12 +346,12 @@ BOOL PokeList_Main(PokeListWork *wk) {
         }
         break;
     case 20:
-        GFL_WipeSet(0, 0, 0, 0, 6, 1, wk->heapId);
+        GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, 0, 6, 1, wk->heapId);
         wk->state = 21;
         break;
     case 19:
         if (wk->pressedButton == NULL || ClActor_IsAnimActive(wk->pressedButton) == FALSE) {
-            GFL_WipeSet(0, 0, 0, 0, 6, 1, wk->heapId);
+            GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, 0, 6, 1, wk->heapId);
             wk->state = 21;
         }
         break;

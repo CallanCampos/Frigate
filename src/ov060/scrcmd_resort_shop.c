@@ -1294,9 +1294,10 @@ static void ResortShop_LoadCursorResources(ResortShopWork *wk) {
 }
 
 static void ResortShop_LoadItemIconResources(ResortShopWork *wk) {
-    wk->res[2].palette =
-        ClActSys_LoadPlttRange(wk->iconArc, GetItemGraphicsDatID(ITEM_MASTER_BALL, 2), 0, 64, 0, 1, wk->heapId);
-    wk->res[2].chars = ClActSys_LoadChars(wk->iconArc, GetItemGraphicsDatID(ITEM_MASTER_BALL, 1), 0, 0, wk->heapId);
+    wk->res[2].palette = ClActSys_LoadPlttRange(
+        wk->iconArc, GetItemGraphicsDatID(ITEM_MASTER_BALL, ITEM_FILE_ICON_PLTT), 0, 64, 0, 1, wk->heapId);
+    wk->res[2].chars =
+        ClActSys_LoadChars(wk->iconArc, GetItemGraphicsDatID(ITEM_MASTER_BALL, ITEM_FILE_ICON_CHAR), 0, 0, wk->heapId);
     wk->res[2].cellAnims = ClActSys_LoadCellAnims(wk->iconArc, 1, 0, wk->heapId);
 }
 
@@ -1308,8 +1309,9 @@ static void ResortShop_ShowItemIcon(ResortShopWork *wk, u16 item) {
     void *ncgr;
 
     if (item <= ITEM_REVEAL_GLASS) {
-        nclr = GFL_G2DIOReadNCLRArc(wk->iconArc, GetItemGraphicsDatID(item, 2), &palette, wk->heapId);
-        ncgr = GFL_G2DIOReadOBJNCGRArc(wk->iconArc, GetItemGraphicsDatID(item, 1), FALSE, &character, wk->heapId);
+        nclr = GFL_G2DIOReadNCLRArc(wk->iconArc, GetItemGraphicsDatID(item, ITEM_FILE_ICON_PLTT), &palette, wk->heapId);
+        ncgr = GFL_G2DIOReadOBJNCGRArc(wk->iconArc, GetItemGraphicsDatID(item, ITEM_FILE_ICON_CHAR), FALSE, &character,
+                                       wk->heapId);
         ClActSys_ReplacePlttData(wk->res[2].palette, palette, 1);
         ClActSys_ReplaceCharData(wk->res[2].chars, character);
         GFL_HeapFree(nclr);

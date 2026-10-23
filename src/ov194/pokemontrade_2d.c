@@ -260,9 +260,9 @@ void func_ov194_021c2ef0(PokemonTradeWork *wk, int side, int page) {
 
     GFL_G2DIOLoadNSCRSync(arc, screens[page], 4, 0, CHAR_POS(wk->bg5Chars), 0, FALSE, wk->heapId);
     if (side) {
-        GFL_BGSysMoveBG(4, 0, 128);
+        GFL_BGSysMoveBG(4, BG_MOVE_SET_X, 128);
     } else {
-        GFL_BGSysMoveBG(4, 0, 0);
+        GFL_BGSysMoveBG(4, BG_MOVE_SET_X, 0);
     }
     ClActor_SetVisible(wk->actors[2], FALSE);
     GFL_ArcToolFree(arc);
@@ -271,7 +271,7 @@ void func_ov194_021c2ef0(PokemonTradeWork *wk, int side, int page) {
 
 void func_ov194_021c2f78(PokemonTradeWork *wk) {
     GFL_BGSysSetBGEnabled(4, FALSE);
-    GFL_BGSysMoveBG(4, 0, 0);
+    GFL_BGSysMoveBG(4, BG_MOVE_SET_X, 0);
     func_ov194_021c5504(wk);
     GFL_BGSysClearScr(4);
     GFL_BGSysQueueScrLoad(4);

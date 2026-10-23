@@ -1503,8 +1503,8 @@ static void ConfigPanelScroll_Move(ConfigPanelScroll *scroll, int dy, int min, i
 
     y += dy;
     y = MATH_CLAMP(y, min, max);
-    GFL_BGSysMoveBGReq(scroll->textBg, 3, y + 20);
-    GFL_BGSysMoveBGReq(scroll->rowsBg, 3, y);
+    GFL_BGSysMoveBGReq(scroll->textBg, BG_MOVE_SET_Y, y + 20);
+    GFL_BGSysMoveBGReq(scroll->rowsBg, BG_MOVE_SET_Y, y);
 
     scroll->y -= dy;
     scroll->y = MATH_CLAMP(scroll->y, 16 - max, 16 - min);

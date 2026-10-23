@@ -205,7 +205,7 @@ int PStatus_Main(PStatusWork *wk) {
         if (wk->isRedrawing == TRUE) {
             PStatus_UpdateRedraw(wk);
         } else {
-            GFL_WipeSet(0, 1, 1, 0, 6, 1, wk->heapId);
+            GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_IN, WIPE_TYPE_FADE_IN, 0, 6, 1, wk->heapId);
             wk->seq = PSTA_SEQ_WAIT_FADE_IN;
         }
         break;
@@ -217,7 +217,7 @@ int PStatus_Main(PStatusWork *wk) {
     case PSTA_SEQ_EXIT:
         if (wk->pressedButton == NULL || ClActor_IsAnimActive(wk->pressedButton) == FALSE ||
             wk->param->forceExit == TRUE) {
-            GFL_WipeSet(0, 0, 0, 0, 6, 1, wk->heapId);
+            GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, 0, 6, 1, wk->heapId);
             wk->seq = PSTA_SEQ_WAIT_FADE_OUT;
         }
         break;

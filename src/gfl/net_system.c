@@ -11,8 +11,6 @@
 // Packets between the machines: a header with a CRC, the size, the connected machines, flags and a sequence number,
 // then commands from the send queue. Each machine's received commands go through a ring buffer to their handlers
 
-#define GFL_NET_MACHINE_MAX 8
-
 // The packet header
 #define PACKET_HEADER_SIZE 7
 #define PACKET_CRC_LO 0

@@ -11,8 +11,10 @@
 // and LoadSingleCellSpindaGraphicsByBoxData
 
 // Which side of a Pokémon a sprite shows; anything but the front is the back
-#define POKEGRA_DIR_FRONT 0
-#define POKEGRA_DIR_BACK 1
+enum {
+    POKEGRA_DIR_FRONT,
+    POKEGRA_DIR_BACK,
+};
 
 // The files of a Pokémon's sprite in GetPokemonGraphicsARCID's archive. Each takes the species, its form and sex,
 // whether it is shiny, the direction (POKEGRA_DIR_*) and whether it is an egg. A form or sex without files of its own

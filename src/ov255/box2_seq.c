@@ -6193,14 +6193,14 @@ static int Box2Seq_Goto(Box2SysWork *syswk, int seq) {
 
 // Wipes out, then goes to nextSeq
 int Box2Seq_WipeOut(Box2SysWork *syswk, int nextSeq) {
-    GFL_WipeSet(0, 1, 1, 0, 6, 1, HEAPID_BOX2_APP);
+    GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_IN, WIPE_TYPE_FADE_IN, 0, 6, 1, HEAPID_BOX2_APP);
     syswk->app->wipeSeq = nextSeq;
     return BOX2SEQ_WIPE;
 }
 
 // Wipes in, then goes to nextSeq
 static int Box2Seq_WipeIn(Box2SysWork *syswk, int nextSeq) {
-    GFL_WipeSet(0, 0, 0, 0, 6, 1, HEAPID_BOX2_APP);
+    GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, 0, 6, 1, HEAPID_BOX2_APP);
     syswk->app->wipeSeq = nextSeq;
     return BOX2SEQ_WIPE;
 }

@@ -179,11 +179,11 @@ void ZukanCommon_InitCriteria(PokeDexSave *pokedex, ZukanSearchCriteria *criteri
 }
 
 void ZukanCommon_WipeIn(HeapID heapId) {
-    GFL_WipeSet(0, 1, 1, 0, 6, 1, heapId);
+    GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_IN, WIPE_TYPE_FADE_IN, 0, 6, 1, heapId);
 }
 
 void ZukanCommon_WipeOut(HeapID heapId) {
-    GFL_WipeSet(0, 0, 0, 0, 6, 1, heapId);
+    GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, 0, 6, 1, heapId);
 }
 
 void ZukanCommon_ScrollBGs(u8 bg1, u8 bg2, int *timer) {

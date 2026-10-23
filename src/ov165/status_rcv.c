@@ -30,7 +30,7 @@ BOOL StatusRcv_CanUseItem(PartyPkm *pkm, u16 item, u16 pos, u32 heapId) {
     s32 noLimit;
     s32 effort;
 
-    data = PML_ItemReadDataFile(item, 0, heapId);
+    data = PML_ItemReadDataFile(item, ITEM_FILE_DATA, heapId);
     if (PML_ItemGetParam(data, 14) != 1) {
         GFL_HeapFree(data);
         return FALSE;
@@ -242,7 +242,7 @@ BOOL StatusRcv_UseItem(PartyPkm *pkm, u16 item, u16 pos, u16 zoneId, u32 heapId)
     s32 friendship;
     s32 effort;
 
-    data = PML_ItemReadDataFile(item, 0, heapId);
+    data = PML_ItemReadDataFile(item, ITEM_FILE_DATA, heapId);
     if (PML_ItemGetParam(data, 14) != 1) {
         GFL_HeapFree(data);
         return changed;

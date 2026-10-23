@@ -10,10 +10,12 @@
 // (https://github.com/ds-pokemon-hacking/swan, GPL-3.0), though the file is not part of GFL
 
 // The capture banks, 0 to 3 for VRAM banks A to D
-#define SCREENTEX_BANK_A 0
-#define SCREENTEX_BANK_B 1
-#define SCREENTEX_BANK_C 2
-#define SCREENTEX_BANK_D 3
+enum {
+    SCREENTEX_BANK_A,
+    SCREENTEX_BANK_B,
+    SCREENTEX_BANK_C,
+    SCREENTEX_BANK_D,
+};
 
 // A texture resource of one 256x192 direct color texture, at the capture bank in the texture VRAM
 void *GFL_G3DScreenTexCreate(HeapID heapId, u32 bank);

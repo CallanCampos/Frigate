@@ -5258,14 +5258,14 @@ static BOOL BattleClient_ScMoveMsg(BtlClient *client, s32 *seq, const u32 *args)
 
 static s32 BattleClient_GetMoveAnimType(BtlClient *client, u16 move, u8 pos) {
     if (move != 0xae) {
-        return PML_MoveGetParam(move, 0x1b);
+        return PML_MoveGetParam(move, MOVE_PARAM_TARGET);
     } else {
         BattleMon *mon = PokeCon_GetPosMonInner(client->pokeCon, pos);
 
         if (mon != NULL) {
             return BtlCalc_GetCurseTarget(mon);
         }
-        return PML_MoveGetParam(move, 0x1b);
+        return PML_MoveGetParam(move, MOVE_PARAM_TARGET);
     }
 }
 
@@ -5399,7 +5399,7 @@ static BOOL BattleClient_ScConfusionDamage(BtlClient *client, s32 *seq, const u3
     case 0:
         if (!BattleClient_IsChapterSkipping(client)) {
             pos = MonIDToBattlePos(client->mainModule, client->pokeCon, args[0]);
-            BtlvCore_StartMoveEffect(client->viewCore, pos, pos, 1, PML_MoveGetParam(1, 0x1b), 0, 0);
+            BtlvCore_StartMoveEffect(client->viewCore, pos, pos, 1, PML_MoveGetParam(1, MOVE_PARAM_TARGET), 0, 0);
         }
         (*seq)++;
         break;

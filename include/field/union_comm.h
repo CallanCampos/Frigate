@@ -166,12 +166,14 @@ typedef struct {
 
 // What a line of the chat says: the player's sentence, or that it entered the Union Room, or what the player wants to
 // do
-#define UNION_CHAT_KIND_SENTENCE 0
-#define UNION_CHAT_KIND_ENTERED 1
-#define UNION_CHAT_KIND_BATTLE 2
-#define UNION_CHAT_KIND_TRADE 3
-#define UNION_CHAT_KIND_DRAW 4
-#define UNION_CHAT_KIND_SPIN_TRADE 5
+enum {
+    UNION_CHAT_KIND_SENTENCE,
+    UNION_CHAT_KIND_ENTERED,
+    UNION_CHAT_KIND_BATTLE,
+    UNION_CHAT_KIND_TRADE,
+    UNION_CHAT_KIND_DRAW,
+    UNION_CHAT_KIND_SPIN_TRADE,
+};
 
 #define UNION_VISITOR_MAX 30
 

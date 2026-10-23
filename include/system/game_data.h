@@ -7,8 +7,10 @@
 #include "struct_decls.h"
 
 // The city of the player's version, which a key from Unova Link can switch
-#define CITY_BLACK_CITY 0
-#define CITY_WHITE_FOREST 1
+enum {
+    CITY_BLACK_CITY,
+    CITY_WHITE_FOREST,
+};
 
 // What GameData_MakeBoxPkm makes a Pokémon from
 struct BoxPkmCreateParams {

@@ -443,7 +443,7 @@ BOOL BSubwayCmd_Tool(VM *vm, FieldScriptEnv *env) {
         u16 index = BSubway_GetZonePlayMode(field);
         const VecFx32 *pos = &sWarpPositions[index];
 
-        CreateZoneChangeData(&spawn, sWarpZones[index], 4, pos->x, pos->y, pos->z);
+        CreateZoneChangeData(&spawn, sWarpZones[index], WARP_DIR_RIGHT, pos->x, pos->y, pos->z);
         GameData_SetNextZone(gameData, &spawn);
         EventWork_FlagSet(eventWork, FLAG_BSUBWAY_ON_TRAIN);
         break;
@@ -518,7 +518,7 @@ BOOL BSubwayCmd_Tool(VM *vm, FieldScriptEnv *env) {
             ZoneSpawnInfo spawn;
             const VecFx32 *pos = &sWarpPositions[mode];
 
-            CreateZoneChangeData(&spawn, sWarpZones[mode], 4, pos->x, pos->y, pos->z);
+            CreateZoneChangeData(&spawn, sWarpZones[mode], WARP_DIR_RIGHT, pos->x, pos->y, pos->z);
             GameData_SetNextZone(gameData, &spawn);
             EventWork_FlagSet(eventWork, FLAG_BSUBWAY_ON_TRAIN);
         }

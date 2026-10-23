@@ -7,30 +7,33 @@
 
 // Species data
 
-#define PERSONAL_TYPE_1 6
-#define PERSONAL_TYPE_2 7
-#define PERSONAL_ABILITY_1 26
-#define PERSONAL_ABILITY_2 27
-#define PERSONAL_ABILITY_HIDDEN 28
-#define PERSONAL_SEX_RATIO 20
-#define PERSONAL_HATCH_CYCLES 21
-#define PERSONAL_FRIENDSHIP 22
-#define PERSONAL_GROWTH_RATE 23
-// The offset of the forms' sprites (not from swan)
-#define PERSONAL_FORM_SPRITE_OFFSET 31
-#define PERSONAL_FORM_COUNT 32
-// Whether the forms only change the palette, as Arceus's do (not from swan)
-// Whether the sprite may be flipped
-#define PERSONAL_SPRITE_FLIP 34
-#define PERSONAL_PALETTE_FORMS 35
-// Not from swan: a flag that keeps the summary screen's sprite from bouncing, and the weight
-#define PERSONAL_NO_BOUNCE 16
-#define PERSONAL_WEIGHT 38
-// Not from swan: the first of the four words of TM and HM flags, the free move tutors' flags, and the first of the
-// four words of the paid move tutors' flags
-#define PERSONAL_MACHINES_1 39
-#define PERSONAL_TUTORS 43
-#define PERSONAL_TUTOR_PAID_1 44
+// The fields that PML_PersonalGetParam reads, by number; only those the code shows are named
+enum {
+    PERSONAL_TYPE_1 = 6,
+    PERSONAL_TYPE_2,
+    // Not from swan: a flag that keeps the summary screen's sprite from bouncing
+    PERSONAL_NO_BOUNCE = 16,
+    PERSONAL_SEX_RATIO = 20,
+    PERSONAL_HATCH_CYCLES,
+    PERSONAL_FRIENDSHIP,
+    PERSONAL_GROWTH_RATE,
+    PERSONAL_ABILITY_1 = 26,
+    PERSONAL_ABILITY_2,
+    PERSONAL_ABILITY_HIDDEN,
+    // The offset of the forms' sprites (not from swan)
+    PERSONAL_FORM_SPRITE_OFFSET = 31,
+    PERSONAL_FORM_COUNT,
+    // Whether the sprite may be flipped
+    PERSONAL_SPRITE_FLIP = 34,
+    // Whether the forms only change the palette, as Arceus's do (not from swan)
+    PERSONAL_PALETTE_FORMS,
+    // Not from swan: the weight, the first of the four words of TM and HM flags, the free move tutors' flags, and the
+    // first of the four words of the paid move tutors' flags
+    PERSONAL_WEIGHT = 38,
+    PERSONAL_MACHINES_1,
+    PERSONAL_TUTORS = 43,
+    PERSONAL_TUTOR_PAID_1,
+};
 
 // A species' data, the files of ARCID_PERSONAL. PML_PersonalGetParam reads its fields by number
 typedef struct {

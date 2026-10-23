@@ -2653,8 +2653,8 @@ static BOOL BtlvEffvm_CmdEnd(VM *vm, void *env) {
         }
         GFL_BGSysSetBGPriority(3, 0);
         wk->bgMoved = FALSE;
-        GFL_BGSysMoveBG(3, 0, wk->bgX);
-        GFL_BGSysMoveBG(3, 3, wk->bgY);
+        GFL_BGSysMoveBG(3, BG_MOVE_SET_X, wk->bgX);
+        GFL_BGSysMoveBG(3, BG_MOVE_SET_Y, wk->bgY);
     }
     if (wk->alphaBlend) {
         G2x_SetBlendAlpha_(0x4000050, 2, 0x3d, 0x1f, 7);

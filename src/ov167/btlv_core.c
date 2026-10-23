@@ -393,7 +393,7 @@ BOOL BtlvCore_CmdCaptureDemo(BtlvCore *core, s32 *seq, void *work) {
         break;
     case 6:
         if (BtlvCore_WaitMsg(core) && BtlvScd_IsIdle(core->scd)) {
-            BtlvScu_StartMoveEffect(core->scu, 0, 1, 0x21, PML_MoveGetParam(0x21, 0x1b), 0, 0);
+            BtlvScu_StartMoveEffect(core->scu, 0, 1, 0x21, PML_MoveGetParam(0x21, MOVE_PARAM_TARGET), 0, 0);
             (*seq)++;
         }
         break;
@@ -414,7 +414,7 @@ BOOL BtlvCore_CmdCaptureDemo(BtlvCore *core, s32 *seq, void *work) {
         break;
     case 9:
         if (BtlvCore_WaitMsg(core)) {
-            BtlvScu_StartMoveEffect(core->scu, 1, 0, 0x2d, PML_MoveGetParam(0x2d, 0x1b), 0, 0);
+            BtlvScu_StartMoveEffect(core->scu, 1, 0, 0x2d, PML_MoveGetParam(0x2d, MOVE_PARAM_TARGET), 0, 0);
             (*seq)++;
         }
         break;

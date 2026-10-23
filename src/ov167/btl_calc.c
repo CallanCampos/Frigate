@@ -651,7 +651,7 @@ u32 BtlCalc_GetCurseTarget(BattleMon *mon) {
 u8 DecideMoveTargetAuto(BtlMainModule *mainModule, BtlPokeCon *pokeCon, BattleMon *mon, u16 move) {
     u32 battleStyle = BtlSetup_GetBattleStyle(mainModule);
     u8 pos = MonIDToBattlePos(mainModule, pokeCon, GetMonID(mon));
-    u32 target = PML_MoveGetParam(move, 0x1b);
+    u32 target = PML_MoveGetParam(move, MOVE_PARAM_TARGET);
     u8 monIds[6];
     u8 count;
 

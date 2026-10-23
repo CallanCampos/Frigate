@@ -404,9 +404,9 @@ void BtlvScu_Setup(BtlvScu *scu) {
     u32 frameChar;
     u16 black;
 
-    GFL_BGSysCreateBG(1, &sMsgBGSetup, 0);
-    GFL_BGSysCreateBG(2, &sAbilityBG2Setup, 0);
-    GFL_BGSysCreateBG(3, &sAbilityBG3Setup, 0);
+    GFL_BGSysCreateBG(1, &sMsgBGSetup, BGMODE_TEXT);
+    GFL_BGSysCreateBG(2, &sAbilityBG2Setup, BGMODE_TEXT);
+    GFL_BGSysCreateBG(3, &sAbilityBG3Setup, BGMODE_TEXT);
     PaletteFade_LoadNCLREx(BtlvEffect_GetPaletteFade(), 11, 0x165, scu->heapId, 0, 0x20, 0, 0);
     PaletteFade_LoadNCLREx(BtlvEffect_GetPaletteFade(), 11, 0x1e4, scu->heapId, 0, 0x60, 0x10, 0x10);
     black = 0;

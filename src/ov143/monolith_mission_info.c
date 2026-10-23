@@ -229,8 +229,8 @@ static void MonolithMissionInfo_Setup(MonolithScreenParam *screen, MonolithMissi
 }
 
 static void MonolithMissionInfo_CreateBGs(void) {
-    GFL_BGSysCreateBG(MONOLITH_MISSION_INFO_BG_TEXT, &sMonolithMissionInfoBGSetups[0], 0);
-    GFL_BGSysCreateBG(MONOLITH_MISSION_INFO_BG, &sMonolithMissionInfoBGSetups[1], 0);
+    GFL_BGSysCreateBG(MONOLITH_MISSION_INFO_BG_TEXT, &sMonolithMissionInfoBGSetups[0], BGMODE_TEXT);
+    GFL_BGSysCreateBG(MONOLITH_MISSION_INFO_BG, &sMonolithMissionInfoBGSetups[1], BGMODE_TEXT);
     GFL_BGSysFillScrArea(MONOLITH_MISSION_INFO_BG_TEXT, 0, 0, 0, 32, 32, 17);
     GFL_BGSysFillScrArea(MONOLITH_MISSION_INFO_BG, 0, 0, 0, 32, 32, 17);
 }

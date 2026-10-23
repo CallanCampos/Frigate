@@ -620,8 +620,9 @@ static void ItemMenuDisp_ShowSelIcon(ItemMenuWork *work, u32 item) {
         ItemMenuDisp_FreeSelIcon(work);
     }
     arc = GFL_ArcSysCreateFileHandle(ARCID_ITEMGRA, work->heapId);
-    work->selIconPlt = ClActSys_LoadPlttRange(arc, GetItemGraphicsDatID(item, 2), 1, 0, 0, 1, work->heapId);
-    work->selIconChr = ClActSys_LoadChars(arc, GetItemGraphicsDatID(item, 1), FALSE, 1, work->heapId);
+    work->selIconPlt =
+        ClActSys_LoadPlttRange(arc, GetItemGraphicsDatID(item, ITEM_FILE_ICON_PLTT), 1, 0, 0, 1, work->heapId);
+    work->selIconChr = ClActSys_LoadChars(arc, GetItemGraphicsDatID(item, ITEM_FILE_ICON_CHAR), FALSE, 1, work->heapId);
     GFL_ArcToolFree(arc);
     setup.x = 132;
     setup.y = 80;

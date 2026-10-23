@@ -59,8 +59,11 @@ void *KeySystemData_GetMemoryLink(KeySystemData *a0);
 void KeySystemData_Init(void *a0);
 void KeyInfoSave_Copy(KeyInfoSave *dest, const KeyInfoSave *src);
 
-#define GAME_DIFFICULTY_EASY 0
-#define GAME_DIFFICULTY_NORMAL 1
-#define GAME_DIFFICULTY_CHALLENGE 2
+// The difficulties, which GetGameDifficulty returns
+enum {
+    GAME_DIFFICULTY_EASY,
+    GAME_DIFFICULTY_NORMAL,
+    GAME_DIFFICULTY_CHALLENGE,
+};
 
 #endif // POKEBW2_SAVE_KEY_INFO_H

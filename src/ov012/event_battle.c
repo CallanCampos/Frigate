@@ -400,7 +400,7 @@ static GameEventReturnCode EventBattleCall_Callback(GameEvent *event, u32 *state
         (*state)++;
         break;
     case 3:
-        FieldStatus_SetBusyFlag(GameData_GetFieldStatus(gameData), TRUE);
+        FieldStatus_SetBusyFlag(GameData_GetFieldStatus(gameData), FLD_STATUS_BUSY_BATTLE);
         CommPlayerSupport_Init(GameData_GetCommPlayerSupport(gameData));
         GSYS_QueueProcAsEvent(event, OVERLAY_ID(167), &data_ov167_021d6ce0, wk->setup);
         (*state)++;
@@ -418,7 +418,7 @@ static GameEventReturnCode EventBattleCall_Callback(GameEvent *event, u32 *state
 
         GFL_OvlLoad(OVERLAY_ID(337));
         DSProt_Init();
-        FieldStatus_SetBusyFlag(GameData_GetFieldStatus(gameData), FALSE);
+        FieldStatus_SetBusyFlag(GameData_GetFieldStatus(gameData), FLD_STATUS_BUSY_NONE);
         CommPlayerSupport_EndBattle(GameData_GetCommPlayerSupport(gameData));
         index = OS_GetVBlankCount() & 1;
         data_ov337_02182440 = index;

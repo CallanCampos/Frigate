@@ -168,10 +168,12 @@ void BlActScene_Draw(BlActScene *scene, G3DCamera *camera, G3DLight *lights);
 #define BLACT_NONE 0xffff
 
 // An animation's step: show a face for wait frames, or, when face is one of these, a command with arg
-#define BLACT_ANIM_CMD_GOTO 0x3ffc
-#define BLACT_ANIM_CMD_LOOP 0x3ffd
-#define BLACT_ANIM_CMD_CHANGE 0x3ffe
-#define BLACT_ANIM_CMD_END 0x3fff
+enum {
+    BLACT_ANIM_CMD_GOTO = 0x3ffc,
+    BLACT_ANIM_CMD_LOOP,
+    BLACT_ANIM_CMD_CHANGE,
+    BLACT_ANIM_CMD_END,
+};
 
 typedef struct {
     u16 face : 14;

@@ -283,7 +283,7 @@ static void MonolithTop_UpdateReturnButton(MonolithTopWork *mtw) {
 }
 
 static void MonolithTop_CreateBG(void) {
-    GFL_BGSysCreateBG(MONOLITH_TOP_BG, &sMonolithTopBGSetup, 0);
+    GFL_BGSysCreateBG(MONOLITH_TOP_BG, &sMonolithTopBGSetup, BGMODE_TEXT);
     GFL_BGSysFillScrArea(MONOLITH_TOP_BG, 0, 0, 0, 32, 32, 17);
     GFL_BGSysSetBGEnabled(MONOLITH_TOP_BG, FALSE);
 }

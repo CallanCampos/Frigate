@@ -703,9 +703,9 @@ static void MonolithMission_FreeFestival(MonolithScreenParam *screen, MonolithMi
 }
 
 static void MonolithMission_CreateBGs(void) {
-    GFL_BGSysCreateBG(MONOLITH_MISSION_BG_TEXT, &sMonolithMissionBGSetups[0], 0);
-    GFL_BGSysCreateBG(MONOLITH_MISSION_BG_FRAME, &sMonolithMissionBGSetups[1], 0);
-    GFL_BGSysCreateBG(MONOLITH_MISSION_BG_LIST, &sMonolithMissionBGSetups[2], 0);
+    GFL_BGSysCreateBG(MONOLITH_MISSION_BG_TEXT, &sMonolithMissionBGSetups[0], BGMODE_TEXT);
+    GFL_BGSysCreateBG(MONOLITH_MISSION_BG_FRAME, &sMonolithMissionBGSetups[1], BGMODE_TEXT);
+    GFL_BGSysCreateBG(MONOLITH_MISSION_BG_LIST, &sMonolithMissionBGSetups[2], BGMODE_TEXT);
     GFL_BGSysFillScrArea(MONOLITH_MISSION_BG_TEXT, 0, 0, 0, 32, 32, 17);
     GFL_BGSysFillScrArea(MONOLITH_MISSION_BG_FRAME, 0, 0, 0, 32, 32, 17);
     GFL_BGSysFillScrArea(MONOLITH_MISSION_BG_LIST, 0, 0, 0, 32, 32, 17);

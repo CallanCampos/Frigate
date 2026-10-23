@@ -388,9 +388,9 @@ int CtvtTalk_Main(CommTvtWork *sys, CtvtTalk *talk) {
     switch (talk->state) {
     case TALK_STATE_FADE_IN:
         if (func_ov257_021aaa74(sys) == TRUE) {
-            GFL_WipeSet(0, 1, 1, 0, 6, 1, heapId);
+            GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_IN, WIPE_TYPE_FADE_IN, 0, 6, 1, heapId);
         } else {
-            GFL_WipeSet(4, 1, 1, 0, 6, 1, heapId);
+            GFL_WipeSet(WIPE_MODE_SUB, WIPE_TYPE_FADE_IN, WIPE_TYPE_FADE_IN, 0, 6, 1, heapId);
         }
         talk->state = TALK_STATE_WAIT_FADE_IN;
         break;
@@ -400,7 +400,7 @@ int CtvtTalk_Main(CommTvtWork *sys, CtvtTalk *talk) {
         }
         break;
     case TALK_STATE_FADE_OUT_TO_GAME:
-        GFL_WipeSet(4, 0, 0, 0, 6, 1, heapId);
+        GFL_WipeSet(WIPE_MODE_SUB, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, 0, 6, 1, heapId);
         func_ov257_021aaa78(sys, FALSE);
         talk->state = TALK_STATE_WAIT_FADE_OUT;
         break;
@@ -414,7 +414,7 @@ int CtvtTalk_Main(CommTvtWork *sys, CtvtTalk *talk) {
         if (talk->waitSound && CtvtCamera_IsSoundDone(sys, camera) != TRUE) {
             break;
         }
-        GFL_WipeSet(0, 0, 0, 0, 6, 1, heapId);
+        GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, 0, 6, 1, heapId);
         func_ov257_021aaa78(sys, TRUE);
         talk->state = TALK_STATE_WAIT_FADE_OUT;
         break;

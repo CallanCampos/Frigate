@@ -1113,7 +1113,7 @@ void HandlerReckless(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *
 
     if (BattleEventVar_GetValue(3) == monId) {
         move = BattleEventVar_GetValue(0x12);
-        if (PML_MoveGetParam(move, 0x1e) || move == 0x1a || move == 0x88) {
+        if (PML_MoveGetParam(move, MOVE_PARAM_RECOIL) || move == 0x1a || move == 0x88) {
             BattleEventVar_MulValue(0x31, FX32_CONST(1.2));
         }
     }
@@ -4007,12 +4007,12 @@ BOOL IsAffectedBySheerForce(u16 move) {
     s32 stage;
 
     quality = PML_MoveGetQuality(move);
-    if (PML_MoveGetParam(move, 10) != 0) {
+    if (PML_MoveGetParam(move, MOVE_PARAM_FLINCH_CHANCE) != 0) {
         return TRUE;
     }
     switch (quality) {
     case 4:
-        if (PML_MoveGetParam(move, 0xb) == 8) {
+        if (PML_MoveGetParam(move, MOVE_PARAM_CONDITION) == 8) {
             return FALSE;
         }
     case 6:

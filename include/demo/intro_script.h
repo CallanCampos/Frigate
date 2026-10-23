@@ -132,12 +132,16 @@ enum {
 #define INTRO_COND_PLAYER_IS_MALE 0
 
 // INTRO_CMD_SET_WORD's sources
-#define INTRO_WORD_PLAYER_NAME 0
-#define INTRO_WORD_RIVAL_NAME 1
+enum {
+    INTRO_WORD_PLAYER_NAME,
+    INTRO_WORD_RIVAL_NAME,
+};
 
 // The sprites of intro_mcss.c
-#define INTRO_SPRITE_PROFESSOR 0
-#define INTRO_SPRITE_POKEMON 1
+enum {
+    INTRO_SPRITE_PROFESSOR,
+    INTRO_SPRITE_POKEMON,
+};
 
 const IntroCmdEntry *IntroScript_Get(u32 script);
 

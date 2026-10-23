@@ -686,7 +686,7 @@ void ActionOrder_Sort(ActionOrderEntry *order, u32 count) {
 u8 ServerEvent_GetMovePriority(BtlServerFlow *flow, u16 move, BattleMon *mon) {
     u8 priority;
 
-    priority = PML_MoveGetParam(move, 6) + 7;
+    priority = PML_MoveGetParam(move, MOVE_PARAM_PRIORITY) + 7;
     BattleEventVar_Push(0x6d1);
     BattleEventVar_SetConstValue(3, GetMonID(mon));
     BattleEventVar_SetConstValue(0x12, move);
@@ -3597,7 +3597,7 @@ void ServerControl_DamageDrain(BtlServerFlow *flow, BtlFlowMoveParam *param, Bat
                                u32 damage) {
     if (PML_MoveGetQuality(param->move) == 8) {
         if (ServerControl_DrainCore(flow, attacker, target,
-                                    MultiplyValueByRatio(damage, PML_MoveGetParam(param->move, 0x19)))) {
+                                    MultiplyValueByRatio(damage, PML_MoveGetParam(param->move, MOVE_PARAM_DRAIN)))) {
             ServerDisplay_SkyDropTargetAppear(flow, target, 0x383);
         }
     }
@@ -3830,9 +3830,9 @@ u32 ServerEvent_CheckMoveAddCondition(BtlServerFlow *flow, u16 move, BattleMon *
     u8 chance;
     u8 failed;
 
-    condition = PML_MoveGetParam(move, 0xb);
+    condition = PML_MoveGetParam(move, MOVE_PARAM_CONDITION);
     param = PML_MoveGetConditionParam(move);
-    chance = PML_MoveGetParam(move, 0xc);
+    chance = PML_MoveGetParam(move, MOVE_PARAM_CONDITION_CHANCE);
     BtlCalc_MakeMoveCondition(param, attacker, &result);
     BattleEventVar_Push(0x1d8c);
     BattleEventVar_SetConstValue(4, GetMonID(target));
@@ -3871,7 +3871,7 @@ void ServerControl_SimpleCondition(BtlServerFlow *flow, u16 move, BattleMon *mon
     BOOL success;
     BattleMon *target;
 
-    condition = PML_MoveGetParam(move, 0xb);
+    condition = PML_MoveGetParam(move, MOVE_PARAM_CONDITION);
     param = PML_MoveGetConditionParam(move);
     success = FALSE;
     if (BtlMonSet_GetCount(targets)) {
@@ -4169,7 +4169,7 @@ BOOL ServerEvent_RollStatDropEffectChance(BtlServerFlow *flow, BtlFlowMoveParam 
                                           BattleMon *target) {
     BOOL hit;
     u8 failed;
-    u8 chance = PML_MoveGetParam(param->move, 0x12);
+    u8 chance = PML_MoveGetParam(param->move, MOVE_PARAM_STAT_CHANGE_CHANCE);
 
     BattleEventVar_Push(0x1fde);
     BattleEventVar_SetConstValue(3, GetMonID(attacker));
@@ -4343,7 +4343,7 @@ void ServerControl_StatChangeAndCondition(BtlServerFlow *flow, const BtlFlowMove
     BattleCondition value;
     BattleMon *target;
 
-    condition = PML_MoveGetParam(param->move, 0xb);
+    condition = PML_MoveGetParam(param->move, MOVE_PARAM_CONDITION);
     conditionParam = PML_MoveGetConditionParam(param->move);
     BtlCalc_MakeMoveCondition(conditionParam, mon, &value);
     BtlMonSet_ResetIndex(targets);
@@ -6218,7 +6218,7 @@ void ServerEvent_GetMoveParam(BtlServerFlow *flow, u16 move, BattleMon *mon, Btl
     BattleEventVar_SetRewriteOnceValue(0x16, PML_MoveGetType(move));
     BattleEventVar_SetValue(0x1c, GetPokeType(mon));
     BattleEventVar_SetValue(0x1a, PML_MoveGetCategory(move));
-    BattleEventVar_SetValue(0x1b, PML_MoveGetParam(move, 0x1b));
+    BattleEventVar_SetValue(0x1b, PML_MoveGetParam(move, MOVE_PARAM_TARGET));
     BattleEventVar_SetRewriteOnceValue(0x4b, FALSE);
     BattleEvent_CallHandlers(flow, 0x28);
     param->move = move;
@@ -6412,7 +6412,7 @@ u32 ServerEvent_GetMoveAccuracy(BtlServerFlow *flow, BattleMon *mon, BattleMon *
     u32 accuracy;
     u32 ratio;
 
-    accuracy = PML_MoveGetParam(param->move, 4);
+    accuracy = PML_MoveGetParam(param->move, MOVE_PARAM_ACCURACY);
     BattleEventVar_Push(0x2e4e);
     BattleEventVar_SetConstValue(3, GetMonID(mon));
     BattleEventVar_SetConstValue(4, GetMonID(target));
@@ -6455,7 +6455,7 @@ BOOL ServerEvent_CheckOHKOHit(BtlServerFlow *flow, BattleMon *attacker, BattleMo
     if (IsGuaranteedHit(flow, attacker, target)) {
         result = TRUE;
     } else {
-        accuracy = PML_MoveGetParam(move, 4);
+        accuracy = PML_MoveGetParam(move, MOVE_PARAM_ACCURACY);
         accuracy += attackerLevel - targetLevel;
         if (BattleRandom(100) < accuracy) {
             result = TRUE;
@@ -6493,7 +6493,7 @@ BOOL ServerEvent_CheckCritical(BtlServerFlow *flow, BattleMon *attacker, BattleM
     BOOL critical;
     s32 value;
 
-    stage = PML_MoveGetParam(move, 7);
+    stage = PML_MoveGetParam(move, MOVE_PARAM_CRIT_STAGE);
     stage += BattleMon_GetCritStage(attacker);
     BattleEventVar_Push(0x2ecf);
     BattleEventVar_SetConstValue(4, GetMonID(target));
@@ -6531,13 +6531,13 @@ s32 ServerEvent_CalcRecoil(BtlServerFlow *flow, BattleMon *mon, u16 move, s32 da
 
     monId = GetMonID(mon);
     // A share of the damage dealt, or of the user's max HP
-    ratio = PML_MoveGetParam(move, 0x1e);
+    ratio = PML_MoveGetParam(move, MOVE_PARAM_RECOIL);
     kind = 0;
     *forced = FALSE;
     if (ratio != 0) {
         kind = 1;
     } else {
-        ratio = PML_MoveGetParam(move, 0x1f);
+        ratio = PML_MoveGetParam(move, MOVE_PARAM_HP_COST);
         if (ratio != 0) {
             kind = 2;
         }
@@ -6762,7 +6762,7 @@ BOOL ServerEvent_CheckMultihitHits(BtlServerFlow *flow, BattleMon *mon, u16 move
     u8 maxHits;
     u32 hits;
 
-    maxHits = PML_MoveGetParam(move, 8);
+    maxHits = PML_MoveGetParam(move, MOVE_PARAM_HIT_MAX);
     hitWork->unk01 = 0;
     hitWork->unk05 = 3;
     if (maxHits > 1) {
@@ -6949,7 +6949,7 @@ u32 ServerEvent_GetFlinchChance(BtlServerFlow *flow, u16 move, BattleMon *attack
     u32 bonus;
     u32 chance;
 
-    chance = PML_MoveGetParam(move, 0xa);
+    chance = PML_MoveGetParam(move, MOVE_PARAM_FLINCH_CHANCE);
     BattleEventVar_Push(0x31be);
     BattleEventVar_SetConstValue(3, GetMonID(attacker));
     BattleEventVar_SetConstValue(0x25, chance);
@@ -7093,7 +7093,7 @@ u32 ServerEvent_CalcMoveHealAmount(BtlServerFlow *flow, u16 move, BattleMon *mon
     u32 maxHP;
     u32 amount;
 
-    ratio = PML_MoveGetParam(move, 0x1a);
+    ratio = PML_MoveGetParam(move, MOVE_PARAM_HEAL);
     BattleEventVar_Push(0x32bd);
     BattleEventVar_SetConstValue(2, GetMonID(mon));
     BattleEventVar_SetValue(0x35, 0);

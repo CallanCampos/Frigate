@@ -134,7 +134,7 @@ void SetTeleportZoneDiscover(GameData *gameData, s32 respawnZoneId) {
 }
 
 void CreateRespawnZoneChangeData(ZoneSpawnInfo *spawn, u16 zoneId, u32 unused, u16 x, u16 z) {
-    CreateZoneChangeData(spawn, zoneId, 1, x << 16, 0, z << 16);
+    CreateZoneChangeData(spawn, zoneId, WARP_DIR_UP, x << 16, 0, z << 16);
 }
 
 u32 GetActualRespawnZoneIdx(u32 index) {

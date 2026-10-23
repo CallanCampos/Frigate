@@ -1541,9 +1541,10 @@ static void CygnusIcon_Load(CygnusIcon *icon, ClActUnit *unit, CygnusData *data,
         ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_ITEMGRA, heapId);
         u32 number = CygnusData_GetItemNumber(data, index - CygnusData_CountPokemon(data));
 
-        icon->palette = ClActSys_LoadPlttRange(arc, GetItemGraphicsDatID(id, 2), x, (number + 7) * 0x20, 0, 1, heapId);
+        icon->palette = ClActSys_LoadPlttRange(arc, GetItemGraphicsDatID(id, ITEM_FILE_ICON_PLTT), x,
+                                               (number + 7) * 0x20, 0, 1, heapId);
         icon->cellAnims = ClActSys_LoadCellAnims(arc, 1, x, heapId);
-        icon->chars = ClActSys_LoadChars(arc, GetItemGraphicsDatID(id, 1), x, x, heapId);
+        icon->chars = ClActSys_LoadChars(arc, GetItemGraphicsDatID(id, ITEM_FILE_ICON_CHAR), x, x, heapId);
         GFL_ArcToolFree(arc);
         x = 4;
         y = 8;

@@ -19,17 +19,24 @@ typedef void (*BmpMenuListPrintCallback)(BmpMenuList *list, s32 value, u8 y);
 
 // BmpMenuList_Update's results when nothing was chosen and when the menu was cancelled, and the value of a label: an
 // option printed at labelX that the cursor skips
-#define BMPMENULIST_NULL (-1)
-#define BMPMENULIST_CANCEL (-2)
-#define BMPMENULIST_LABEL (-3)
+enum {
+    BMPMENULIST_NULL = -1,
+    BMPMENULIST_CANCEL = -2,
+    BMPMENULIST_LABEL = -3,
+};
 
 // The keys that move the cursor a page
-#define BMPMENULIST_SKIP_NONE 0
-#define BMPMENULIST_SKIP_LR_KEY 1
-#define BMPMENULIST_SKIP_LR_BUTTON 2
+enum {
+    BMPMENULIST_SKIP_NONE,
+    BMPMENULIST_SKIP_LR_KEY,
+    BMPMENULIST_SKIP_LR_BUTTON,
+};
 
-#define BMPMENULIST_CURSOR_SHOW 0
-#define BMPMENULIST_CURSOR_HIDE 1
+// The header's cursorDisplay: whether the cursor is drawn. 2 and 3 hide it too
+enum {
+    BMPMENULIST_CURSOR_SHOW,
+    BMPMENULIST_CURSOR_HIDE,
+};
 
 typedef struct {
     ListMenuOption *options;

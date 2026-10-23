@@ -1885,7 +1885,7 @@ static void ItemMenu_GetItemActions(ItemMenuWork *work, u8 *actions) {
     u8 fieldPocket;
 
     if (slot != NULL && slot->item != ITEM_NONE) {
-        data = PML_ItemReadDataFile(slot->item, 0, work->heapId);
+        data = PML_ItemReadDataFile(slot->item, ITEM_FILE_DATA, work->heapId);
         fieldPocket = PML_ItemGetParam(data, ITEM_PARAM_FIELD_POCKET);
         ItemMenu_SetUseAction(work, data, slot, actions);
         if (ItemMenu_CanUseInMode(work, fieldPocket) == FALSE && actions[0] != 2) {
@@ -2098,7 +2098,7 @@ static void ItemMenu_VBlank(TCB *tcb, void *data) {
 // Fades the bag in
 static void ItemMenu_StateFadeIn(ItemMenuWork *work) {
     if (PrintQueue_IsEmpty(work->printQueue)) {
-        GFL_WipeSet(0, 1, 1, 0, 6, 1, work->heapId);
+        GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_IN, WIPE_TYPE_FADE_IN, 0, 6, 1, work->heapId);
         GFL_SndSEPlay(SEQ_SE_SYS_90);
         ItemMenu_SetState(work, ItemMenu_StateWaitFadeIn);
     }
@@ -2231,7 +2231,7 @@ static BOOL ItemMenuProc_Main(GameProc *proc, u32 *state, void *param, void *dat
     ItemMenuWork *work = data;
 
     if (work->state == NULL) {
-        GFL_WipeSet(0, 0, 0, 0, 6, 1, work->heapId);
+        GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, 0, 6, 1, work->heapId);
         return TRUE;
     }
     work->drawnScroll = work->scroll;

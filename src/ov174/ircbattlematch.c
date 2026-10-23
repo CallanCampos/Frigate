@@ -394,7 +394,7 @@ static void IrcBattleMatch_DimBackground(IrcBattleMatch *work, BOOL dim) {
 }
 
 static void IrcBattleMatch_StartWipeOut(IrcBattleMatch *work) {
-    GFL_WipeSet(0, 0, 0, 0, 6, 1, work->heapId);
+    GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, 0, 6, 1, work->heapId);
     IrcBattleMatch_SetState(work, IrcBattleMatch_StateWaitWipe);
 }
 
@@ -1732,7 +1732,7 @@ static BOOL IrcBattleMatch_Main(GameProc *proc, u32 *state, void *param, void *w
     if (work->taskWin1 != NULL) {
         AppTaskMenuWin_Update(work->taskWin1);
     }
-    GFL_BGSysMoveBG(4, 3, work->scrollY);
+    GFL_BGSysMoveBG(4, BG_MOVE_SET_Y, work->scrollY);
     work->scrollY--;
     ClActSys_Draw();
     PrintQueue_Main(work->printQueue);

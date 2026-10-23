@@ -683,7 +683,7 @@ BOOL ResortCmd_ShortenEggSteps(VM *vm, FieldScriptEnv *env) {
     species = PokeParty_GetParam(pkm, PKM_PARAM_SPECIES, NULL);
     form = PokeParty_GetParam(pkm, PKM_PARAM_FORM, NULL);
     personal = PML_PersonalLoad(species, form, Field_GetHeapID(field));
-    cycles = PML_PersonalGetParam(personal, 21);
+    cycles = PML_PersonalGetParam(personal, PERSONAL_HATCH_CYCLES);
     PML_PersonalFree(personal);
     if (PokeParty_GetParam(pkm, PKM_PARAM_IS_EGG, NULL) == TRUE) {
         int steps = PokeParty_GetParam(pkm, PKM_PARAM_HAPPINESS, NULL);

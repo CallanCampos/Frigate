@@ -37,6 +37,7 @@
 #include "system/bmp_winframe.h"
 #include "system/game_data.h"
 #include "system/printsys.h"
+#include "system/season.h"
 #include "system/wordset.h"
 #include "text/system/btl_server_flow_title.h"
 
@@ -53,8 +54,6 @@
 // The event flags that show the water and fishing habitats
 #define FLAG_HABITAT_WATER 0x987
 #define FLAG_HABITAT_FISHING 0x985
-
-#define SEASON_COUNT 4
 
 #define NO_PLACE 0xff
 
