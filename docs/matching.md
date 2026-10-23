@@ -1295,12 +1295,11 @@ Same code, other `sp` offsets or frame size.
   `pos` first; each of these spellings matches them but is only a second path to the field. What matches them is
   an alignment on their task structs' `work` member (Loops: "Where a member's alignment is written").
 - A bit tested in an `if`'s condition and set in its body, `if (ready & 1 << i) { mask |= 1 << i; }`, is a common
-  subexpression built ahead of the condition's load (`movs r0, #1` first, the load's address in `r1`). The original
-  loads first (`ldr r0, [sp]; ldrb r1, [r4, r0]; movs r0, #1; lsls r0, r5`) when the two shifts differ in
-  signedness, and still reuses the test's register for the body: `comm_entry_menu.c`'s `CommEntryMenu_UpdateLeader`
-  sets `mask |= 1U << i`. A test of another mask before a call in the same loop keeps its own `1 << i` when it is a
-  `static inline` with a `u32` parameter (`CommEntryMenu_IsChecked`); written in the loop, MWCC keeps one shift across
-  the call for both tests and spills the mask instead.
+  subexpression built ahead of the condition's load (`movs r0, #1` first, the load's address in `r1`). Where the
+  original loads first and keeps a separate shift for each test across a call, ask first whether the function reads
+  an aligned object (Loops: "An explicit alignment"): `comm_entry_menu.c`'s `CommEntryMenu_UpdateLeader` was taken
+  for a case of `1U << i`, a `u32` inline for the other mask's test and a `for (;;)` with a `break`, all of which
+  went once its message table was aligned, the plain `1 << i` tests and loop then matching.
 - A loaded field is reused into an `if`'s body but not past the join after it: a field loaded before an `if`, even
   one whose arms store nothing to memory, is loaded again after it, with the static's literal, where a straight run
   of stores to the struct's other members keeps the first load. A value the original never reloads after a branchy
@@ -3115,6 +3114,10 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `BtlvInput_DrawMoveTiles` is the same: the 0/1 loop test it kept goes, and a plain `i < 4` matches with the attribute
   on its type-palette table, which only it reads, and whose address allows nothing above 4. The attribute on any other
   object it reads matches as well.
+  Overlay 36's `comm_entry_menu.c` is another: with `sCommEntryMessages` aligned (at `0x021d2588`, `0x021d25bc` in
+  White 2, which allows nothing above 4), `CommEntryMenu_UpdateLeader` is a plain loop entered at its test, and
+  the table's five other readers match with it indexed where it is read, where a getter inline was needed
+  before.
   NitroSystem's 2.0/sp2 does the same: `snd_arc_stream.c`'s `NNS_SndArcStrmInit` enters both its init loops at the
   test and indexes its arrays with a multiply on each pass only with `sDecodeBufferArea`, which it reads, aligned (4 to
   16 give the same code and fit the buffer's address, 32 does not). There a `u8` array with `ATTRIBUTE_ALIGN(4)` gets

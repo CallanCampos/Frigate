@@ -521,7 +521,7 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 | `fieldmap.c` | `0x0217f73c`–`0x021814dc` | 125 | complete | string at `0x021d4b20` |
 | `fieldmap_event.c` | `0x021814dc`–`0x0218304c` | 55 | complete | descriptive |
 | `field_buildmodel.c` | `0x0218304c`–`0x02184244` | 85 | complete | string at `0x021d4b2c` |
-| `field_g3d_mapper.c` | `0x02184244`–`0x021856a0` | 57 | partial | string at `0x021d4b4c` |
+| `field_g3d_mapper.c` | `0x02184244`–`0x021856a0` | 57 | complete | string at `0x021d4b4c` |
 | `field_camera.c` | `0x021856a0`–`0x02186ed0` | 84 | complete | string at `0x021d4b88` |
 | `field_camera_anime.c` | `0x02186ed0`–`0x021876d0` | 34 | complete | string at `0x021d4b98` |
 | `field_msgbg.c` | `0x021876d0`–`0x0218a7f8` | 177 | partial | string at `0x021d4bb0` |
@@ -561,7 +561,7 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 | `fieldmap_ctrl_hybrid.c` | `0x0219e430`–`0x0219e9d0` | 13 | complete | string at `0x021d4f44` |
 | `field_ground_anime.c` | `0x0219e9d0`–`0x0219f178` | 32 | complete | string at `0x021d4f5c` |
 | `event_entrance_effect.c` | `0x0219f178`–`0x0219fa10` | 25 | complete | descriptive |
-| `field_menu.c` | `0x0219fa10`–`0x021a0a1c` | 27 | partial | string at `0x021d4f74` |
+| `field_menu.c` | `0x0219fa10`–`0x021a0a1c` | 27 | complete | string at `0x021d4f74` |
 | `enc_pokeset.c` | `0x021a0a1c`–`0x021a1640` | 27 | complete | descriptive |
 | `field_encount.c` | `0x021a1640`–`0x021a1fdc` | 20 | complete | string at `0x021d4f84` |
 | `effect_encount.c` | `0x021a1fdc`–`0x021a29d0` | 30 | complete | string at `0x021d4f94` |
@@ -599,7 +599,7 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 | `scrcmd_fld_battle.c` | `0x021aea40`–`0x021aedf4` | 9 | complete | string at `0x021d5204` |
 | `scrcmd_pokemon_misc.c` | `0x021aedf4`–`0x021afa2c` | 27 | complete | descriptive |
 | `scrcmd_pokemon_fld.c` | `0x021afa2c`–`0x021afcd4` | 4 | complete | string at `0x021d5218` |
-| `scrcmd_misc.c` | `0x021afcd4`–`0x021b0228` | 16 | partial | descriptive |
+| `scrcmd_misc.c` | `0x021afcd4`–`0x021b0228` | 16 | complete | descriptive |
 | `field_rail.c` | `0x021b0228`–`0x021b2404` | 107 | partial | string at `0x021d5238` |
 | `field_rail_func.c` | `0x021b2404`–`0x021b3a3c` | 30 | complete | descriptive |
 | `rail_attr.c` | `0x021b3a3c`–`0x021b3bac` | 13 | complete | string at `0x021d525c` |
@@ -643,7 +643,7 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 | `fldeff_iaigiri.c` | `0x021c2ddc`–`0x021c3180` | 13 | complete | string at `0x021d55c0` |
 | `party_select_list.c` | `0x021c3180`–`0x021c3c34` | 30 | complete | string at `0x021d55f8` |
 | `field_bbd_color.c` | `0x021c3c34`–`0x021c3d9c` | 6 | complete | string at `0x021d5620` |
-| `comm_entry_menu.c` | `0x021c3d9c`–`0x021c5d7c` | 75 | partial | string at `0x021d5634` |
+| `comm_entry_menu.c` | `0x021c3d9c`–`0x021c5d7c` | 75 | complete | string at `0x021d5634` |
 | `enceff.c` | `0x021c5d7c`–`0x021c649c` | 21 | complete | string at `0x021d5648` |
 | `fldeff_btrain.c` | `0x021c649c`–`0x021c66e8` | 11 | complete | string at `0x021d5654` |
 | `fldeff_hide.c` | `0x021c66e8`–`0x021c6934` | 11 | complete | string at `0x021d5664` |
