@@ -1973,7 +1973,7 @@ static void MysteryAlbum_LoadIcon(MysteryAlbum *album, MysteryCardRes *res, Heap
     NNSG2dCharacterData *chars;
     ClActorPos pos;
     u16 *pltt;
-    u32 dst;
+    uptr dst;
     int i;
 
     buf = GFL_G2DIOReadNCLRArc(arc, MysteryCard_GetIconPaletteFile(&album->card), &pal, album->heapId);

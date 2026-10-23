@@ -610,7 +610,7 @@ static void MicTestMic_Init(MicTestMic *mic, u32 heapId, MICCallback callback, v
     MI_CpuFill8(buffer, 0, bufferSize);
     mic->buffer = buffer;
     mic->param.type = MIC_SAMPLING_TYPE_8BIT;
-    mic->param.buffer = (void *)(((u32)buffer + 0x1f) & ~0x1f);
+    mic->param.buffer = (void *)(((uptr)buffer + 0x1f) & ~0x1f);
     mic->param.rate = MIC_SAMPLING_RATE_8180;
     mic->param.loop_enable = TRUE;
     // Less the 32 bytes that aligning the start may skip

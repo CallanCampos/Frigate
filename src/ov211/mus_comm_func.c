@@ -1095,8 +1095,8 @@ static void MusComm_RecvSoundChunk(int netId, int size, const void *data, void *
 
         // The three sizes, then the three parts
         comm->ov210->sound[0] = sizes + 3;
-        comm->ov210->sound[1] = (void *)((u32)(comm->ov210->soundData + 3) + sizes[0]);
-        comm->ov210->sound[2] = (void *)((u32)(comm->ov210->soundData + 3) + sizes[0] + sizes[1]);
+        comm->ov210->sound[1] = (void *)((uptr)(comm->ov210->soundData + 3) + sizes[0]);
+        comm->ov210->sound[2] = (void *)((uptr)(comm->ov210->soundData + 3) + sizes[0] + sizes[1]);
     }
 }
 
