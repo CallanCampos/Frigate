@@ -29,9 +29,9 @@ as an automatic first step of unrelated feature work. Review the pending sync in
 The publishing job runs trusted git/gh logic from Frigate's base, disables Git hooks, and never executes incoming
 build scripts with its write token. The usual PR workflows perform compilation and host tests on separate hosted
 runners with read-only permissions. The dedicated App token allows PR CI to start automatically, without the
-default token's workflow-approval restriction. Human code review and local ROM verification remain required. No ROMs or game
-assets are uploaded. A failed proposal is visible as a failed Actions run; inspect its error and use the local path
-below. No issue or comment is posted upstream. New proposals wait until the current sync PR is merged or closed.
+default token's workflow-approval restriction. Human code review and local ROM verification remain required. No ROMs
+or game assets are uploaded. A failed proposal is visible as a failed Actions run; inspect its error and use the local
+path below. No issue or comment is posted upstream. New proposals wait until the current sync PR is merged or closed.
 
 ### Set up the dedicated sync App
 
@@ -103,9 +103,10 @@ port/tools/sync_upstream.sh --branch codex/upstream-sync-manual
 
 The tool fetches Frigate and upstream, merges them without rewriting history, runs local validation, then publishes
 only the topic branch and opens a PR. It refuses `--branch main`. When you are repairing an existing pending sync,
-check out that branch and pass its exact name. Do not start a second sync while one is pending. A locally prepared sync still requires the owner's explicit human review before merge, even when owner credentials
-created its PR. Automation must not treat it as ordinary owner-authored feature work and merge it under the solo
-exception without that review. Prefer an App-authored proposal so GitHub can record the owner's approval.
+check out that branch and pass its exact name. Do not start a second sync while one is pending. A locally prepared
+sync still requires the owner's explicit human review before merge, even when owner credentials created its PR.
+Automation must not treat it as ordinary owner-authored feature work and merge it under the solo exception without
+that review. Prefer an App-authored proposal so GitHub can record the owner's approval.
 
 Useful options:
 
@@ -124,6 +125,24 @@ Never force-push. If `main` advances, merge it into the topic, rerun validation 
 is superseded, close it and let a new bounded proposal be prepared. Preserve the real upstream parents; do not
 squash, rebase, copy files wholesale or reset Frigate to upstream.
 
+### A sync merge carries only the sync
+
+The merge commit holds upstream's changes and the resolutions they force: its conflicts resolved, the port's
+adaptations reapplied where upstream moved them ([game-changes.md](game-changes.md)), and the native fixes without
+which the merged tree doesn't build or pass its tests. Nothing else goes into it: no documents, tools, features or
+review follow-ups of Frigate's own, which a reviewer could then find only by diffing the merge against both parents
+(`90ad973b12` changed 40 port files: its native fixes, and beside them a contribution policy, ADR 0017, a review
+record, templates and rewritten guides). Such work goes in commits of its own after the merge, or in a separate PR,
+with messages that say what each does. The sync's PR and its STATUS.md entry say which upstream change forced each
+native fix in the merge.
+
+### Records are added to
+
+STATUS.md's entries, the review records (`REVIEW-*.md`) and accepted ADRs keep what they said when they were written.
+A change that finds one wrong, or finishes what one left pending, adds a new entry (or an ADR's status line) that
+says so; it never edits the old text. The only edit to a past STATUS.md entry is filling its `PORT_SHA`, as
+[STATUS.md](STATUS.md#how-to-add-an-entry) says; typos and broken links may be fixed.
+
 ## Conflicts and stopped syncs
 
 - **Merge conflict (local exit 3):** inspect every conflict. Use upstream's new structure, then reapply the port's
@@ -141,4 +160,5 @@ squash, rebase, copy files wholesale or reset Frigate to upstream.
 - **Build/test failure:** fix only the port's change or hold the PR. Do not edit decomp configs or expected SHA1s to
   force a pass. A failure reproduced on upstream itself is a blocker recorded here, never a port report upstream.
 
-Every merge message retains `Upstream-Commit: FULL_SHA`. Record verified syncs and validation limits in STATUS.md.
+Every merge message retains `Upstream-Commit: FULL_SHA`. Record each merged sync, with its verification and its
+limits, in a new STATUS.md entry.
