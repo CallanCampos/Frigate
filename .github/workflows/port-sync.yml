@@ -1,5 +1,5 @@
 # Proposes a bounded merge of the decomp into Frigate; game/build code never runs
-# with the publishing token. PR workflows run after human approval, and a local
+# with the publishing token. App-created PRs start ordinary CI, and a local
 # maintainer verifies both ROM SHA1s plus the native host tests before merge.
 name: Frigate upstream sync
 on:
@@ -16,22 +16,43 @@ jobs:
     runs-on: ubuntu-26.04
     timeout-minutes: 15
     permissions:
-      contents: write
-      pull-requests: write
-      statuses: write
+      contents: read
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           ref: main
           fetch-depth: 0
           persist-credentials: false
-      - name: Prepare upstream PR using trusted main helper
+      - name: Require the dedicated sync App installation
         env:
-          GH_TOKEN: ${{ github.token }}
+          APP_ID: ${{ vars.FRIGATE_SYNC_APP_ID }}
+          APP_PRIVATE_KEY: ${{ secrets.FRIGATE_SYNC_APP_PRIVATE_KEY }}
         run: |
           set -euo pipefail
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          if [ -z "$APP_ID" ] || [ -z "$APP_PRIVATE_KEY" ]; then
+            echo '::error::Configure FRIGATE_SYNC_APP_ID and FRIGATE_SYNC_APP_PRIVATE_KEY for the dedicated GitHub App installed only on CallanCampos/Frigate (Contents and Pull requests write). See port/docs/SYNC.md. No default-token fallback is allowed.'
+            exit 1
+          fi
+      - name: Create a narrowly scoped publishing token
+        id: sync-token
+        uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3.3.0
+        with:
+          app-id: ${{ vars.FRIGATE_SYNC_APP_ID }}
+          private-key: ${{ secrets.FRIGATE_SYNC_APP_PRIVATE_KEY }}
+          owner: CallanCampos
+          repositories: Frigate
+          permission-contents: write
+          permission-pull-requests: write
+          skip-token-revoke: false
+      - name: Prepare upstream PR using trusted main helper
+        env:
+          GH_TOKEN: ${{ steps.sync-token.outputs.token }}
+          APP_SLUG: ${{ steps.sync-token.outputs.app-slug }}
+        run: |
+          set -euo pipefail
+          bot_id=$(gh api "users/${APP_SLUG}%5Bbot%5D" --jq .id)
+          git config user.name "${APP_SLUG}[bot]"
+          git config user.email "${bot_id}+${APP_SLUG}[bot]@users.noreply.github.com"
           # The helper is loaded before it merges, and invokes only git and gh.
           # Never execute a build, hook or helper from the incoming merged tree.
           git config core.hooksPath /dev/null

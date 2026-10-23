@@ -26,6 +26,26 @@ level that doesn't exist yet says "not yet"; no field is left out.
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
 
+## 2026-10-22: automatic sync PR CI and dedicated App
+
+- **Upstream:** `fc478a9ee5`; no new decomp sync or game change.
+- **Port:** `PORT_SHA`, automatic-PR-CI implementation based on reviewed main `a3df47254b`.
+- **ROM:** exact-head T0 validation remains required before merge; results belong on the required local status.
+- **Host build:** both game versions remain required by local verification; no host code changed.
+- **Tests:** 14 isolated Git/shell/config fixtures pass, including App scope and absence of status/approval calls.
+  Sync workflow actionlint and diff checks pass. T2/T3/T6 belong to final local verification; T4/T7 not run for this
+  infrastructure change; existing public T5 coverage is unchanged.
+- **Tiers / trap stubs / 64-bit warnings:** unchanged source; no remeasurement.
+- **Work done:** a repository-scoped, permission-reduced, revoked App token replaces default-token sync publishing
+  so PR CI can start automatically. The live fork policy is `first_time_contributors_new_to_github`. The live
+  review rule disables last-push approval to avoid the sole owner's update/review deadlock, retaining stale-review
+  dismissal, owner code review, required checks and local verification. App setup stays in [SYNC.md](SYNC.md); App `5435198` is installed only on Frigate, with its two write scopes
+  verified and a trial token revoked. Its variable/secret are configured and default-token PR creation/approval is off.
+- **Next:** finish App registration/installation and secret setup, apply/read back the review-rule change, validate
+  and merge this PR, then disable default Actions create/approve-PR permission and test one bounded sync proposal.
+- **Blockers:** App registration/installation and live App publishing are not complete. Automatic CI does not remove
+  explicit owner approval before contributor/sync PR merges. The solo owner-authored review exception remains.
+
 ## 2026-10-22: protected main and reviewed sync proposals
 
 - **Upstream:** `fc478a9ee5`; this change imports no new decomp code.

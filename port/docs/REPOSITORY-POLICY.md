@@ -11,13 +11,19 @@ Two active rulesets apply to `refs/heads/main`:
 | Rule | Enforcement |
 | --- | --- |
 | [PRs, validation and history](https://github.com/CallanCampos/Frigate/rules/25687796) | No bypass actors. PR required; no force pushes or deletion; conversations resolved; branch up to date; required checks; merge commits only. |
-| [Maintainer review](https://github.com/CallanCampos/Frigate/rules/25687797) | One approval, CODEOWNER review, stale approvals dismissed, approval after the last push. Only CallanCampos has a PR-only review bypass. |
+| [Maintainer review](https://github.com/CallanCampos/Frigate/rules/25687797) | One approval, CODEOWNER review, stale approvals dismissed; the owner can review after updating a bot/contributor branch. Only CallanCampos has a PR-only review bypass. |
 
 The review-only exception is necessary while CallanCampos is the only maintainer: GitHub prohibits approving one's
-own PR. Use it for owner-authored PRs; contributor and bot sync PRs should receive an explicit owner approval. GitHub
+own PR. Use it for owner-authored feature/fix PRs; contributors and upstream syncs require explicit human owner
+review before merge, including locally prepared syncs created with owner credentials. GitHub
 cannot limit that exception to owner-authored PRs, so this remains an owner responsibility. It cannot bypass the
 other ruleset. Bots, Actions, deploy keys and other contributors have no bypass. Remove the exception when a second
 trusted maintainer can review owner-authored work. CODEOWNERS names the owner for all paths, including itself.
+
+`require_last_push_approval` is false in the reviewed settings payload. Requiring someone other than the last
+pusher would prevent the sole owner from approving a bot-authored sync after merging a main update into its
+branch. Stale approvals are still dismissed by new pushes, so the owner must inspect and approve the new head.
+This setting has been applied and read back; changing the JSON alone does not change the live rule.
 
 Required checks (names are a compatibility interface):
 
@@ -38,14 +44,26 @@ new head must be validated again.
 
 ## Actions settings
 
-The default workflow token remains read-only. External contributors' workflows all require maintainer approval;
-inspect workflow and code changes before allowing a run. Public PR jobs use hosted runners without ROM secrets.
-Port checkouts do not persist credentials, and port Actions are pinned to full commit SHAs.
+The default workflow token remains read-only. The live fork policy is
+`first_time_contributors_new_to_github`, GitHub's least restrictive available approval option: approval is required
+for first-time contributors with new GitHub accounts. Established contributors' PR CI can run automatically.
+If GitHub does request a run approval, inspect the proposed code and workflow changes before granting it.
+Public PR jobs use hosted runners without ROM or App secrets. Port checkouts do not persist credentials, and
+port Actions are pinned to full commit SHAs. Automatic CI never substitutes for the owner's human code review:
+contributor and sync PRs require explicit owner approval before merge.
 
-GitHub's combined **Allow GitHub Actions to create and approve pull requests** setting is enabled because the sync
-bot needs to create PRs. The bot has no approval step and cannot approve its own PR; CODEOWNER review and the required
-checks still apply. No PAT or GitHub App private key was added. With the current GitHub behavior, PR events created
-with `GITHUB_TOKEN` produce approval-required workflow runs; approve those before expecting required checks to pass.
+The replacement scheduled publisher uses a dedicated GitHub App to start ordinary PR CI automatically, while
+retaining owner review and local ROM verification. Its narrow installation/token scopes, secret names and setup
+are documented once in [SYNC.md](SYNC.md#set-up-the-dedicated-sync-app). It cannot post the required local status,
+approve PRs, merge, or bypass rules through this workflow. No PAT is used.
+
+The dedicated **Frigate Upstream Sync** App (ID `5435198`, installation `174325863`) is installed on Frigate alone.
+Its Contents/Pull requests write and automatic Metadata read scopes, empty webhook subscription list and selected
+repository scope were verified through App authentication. The key is a repository Actions secret; a trial
+installation token was revoked after verification. GitHub's combined **Allow GitHub Actions to create and approve
+pull requests** setting is disabled (`can_approve_pull_request_reviews: false`). The App uses its own installation
+token and does not need this default-token permission. Missing App setup fails with instructions instead of silently
+falling back to the default token.
 
 The inherited `build.yml` stays disabled because it requires upstream's private ROM credential. `compile.yml` and
 `standards.yml` stay active and unchanged. Upstream workflow imports are handled locally and reviewed explicitly.

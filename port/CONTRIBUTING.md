@@ -64,8 +64,11 @@ verification; contributors take updates from Frigate's `main`. The maintainer ch
 Every change reaches `main` through a PR, including maintainer work and upstream syncs. Main rejects force pushes
 and deletion. Required checks are **Compile src/ and lib/**, **Code standards**, **Frigate CI** (all supported host
 and sanitizer jobs plus sync-tool tests), and **Frigate local verification**. The branch must include the latest
-`main`; new commits require fresh checks and review. A maintainer approves external contributors' CI runs only
-following inspection of the code and workflow changes. CI uses hosted runners and needs no ROM or repository secrets.
+`main`; new commits require fresh checks and review. Public CI runs automatically for established contributors;
+GitHub may require run approval for first-time contributors with new GitHub accounts. A maintainer inspects code
+and workflow changes before granting a requested run approval. CI uses hosted runners and needs no ROM or App
+secrets. Sync PRs use a dedicated App so their CI also starts automatically; [SYNC.md](docs/SYNC.md) covers setup.
+An automatic or approved CI run does not approve the proposed code.
 
 After reviewing the code, the maintainer checks out the PR head in a separate prepared worktree and runs:
 
@@ -78,7 +81,7 @@ This runs both ROM builds and native tests and records success for the tested co
 credentials to set this status. A passing status is not a substitute for reviewing portability changes, incomplete
 functions' matching evidence, or relevant gameplay regressions.
 
-The owner reviews contributor and bot sync PRs. As the sole maintainer cannot approve their own PR, an owner-only
+The owner explicitly reviews and approves contributor and bot sync PRs before merge. As the sole maintainer cannot approve their own PR, an owner-only
 exception can bypass review approval through a PR. It cannot bypass CI, the PR requirement, unresolved review threads,
 or history protection. Use it only for owner-authored work; no bot or contributor has bypass access.
 [Repository policy](docs/REPOSITORY-POLICY.md) records the settings and how to audit them.

@@ -115,7 +115,9 @@ The no-upstream-posts and reference rules below still apply to every contributor
   merge updates from `origin/main` and repeat verification when the base changes. Required CI and local verification
   must pass before merge. The sole owner may bypass only the separate review rule for owner-authored PRs; there is
   no bypass for the PR, CI, conversation-resolution, deletion or force-push rules. Contributor and bot sync PRs get
-  the owner's review. See [repository policy](docs/REPOSITORY-POLICY.md).
+  explicit owner approval before merge. Automatic CI does not approve code. The least restrictive fork CI policy
+  only requires run approval for first-time contributors with new GitHub accounts; inspect code/workflows if GitHub
+  requests that run approval. See [repository policy](docs/REPOSITORY-POLICY.md).
 - **Never here:** overlay claims, matching, new decomp source files, config changes (`add_source_file.py`,
   `mark_complete.py`, `rename_symbol.py`, `config_fixes.py`), and edits to `docs/nonmatching-functions.md` or
   `docs/matching.md`. The `decomp-file`, `match-function`, `finish-file` and `record-lesson` skills and the root
@@ -128,8 +130,12 @@ The no-upstream-posts and reference rules below still apply to every contributor
 ## Staying in sync ([docs/SYNC.md](docs/SYNC.md))
 
 - **Syncs are reviewed PRs.** The hourly `port-sync` Action proposes one bounded upstream merge on a topic branch.
-  It never pushes `main`, auto-merges, or updates a pending PR. Review the proposed changes, approve the PR's CI runs,
-  then verify its exact head locally with `port/tools/sync_upstream.sh --verify-pr NUMBER` before approving and merging.
+  It never pushes `main`, auto-merges, or updates a pending PR. Its App-authenticated proposals start PR CI
+  automatically. Review the proposed changes and verify its exact head locally with
+  `port/tools/sync_upstream.sh --verify-pr NUMBER` before approving and merging.
+- **App setup is separate from code review.** [SYNC.md](docs/SYNC.md#set-up-the-dedicated-sync-app) owns the App setup
+  procedure. Missing setup must fail visibly. Keep the default Actions token's combined create/approve-PR permission
+  disabled. Never give the App a review/check bypass or local verification authority.
 - **Start work from Frigate's reviewed `origin/main`.** Check the pending sync PR separately; do not automatically
   import unreviewed upstream changes into feature work. The local `port/tools/sync_upstream.sh` is a dedicated sync
   operation that validates and publishes a topic PR, never a pre-task direct publisher.

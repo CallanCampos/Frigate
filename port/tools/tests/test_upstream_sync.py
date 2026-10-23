@@ -4,6 +4,7 @@ Exercises preservation of native port changes and the upstream history/reference
 boundaries implemented by port/tools/upstream_sync.py.
 """
 import importlib.util
+import json
 import os
 from pathlib import Path
 import subprocess
@@ -122,10 +123,42 @@ class SyncTests(GitFixture):
 
     def test_publish_uses_topic_only_without_force(self):
         branch = sync.PREFIX + 'fixture'
-        with patch.object(sync, 'git', return_value='a' * 40), patch.object(sync, 'pending', return_value=[]), patch.object(sync, 'status') as status, patch.object(sync, 'gh', return_value='created'), patch.object(sync, 'run', return_value='CallanCampos'), patch.object(sync.subprocess, 'run') as commands:
+        with patch.object(sync, 'git', return_value='a' * 40), patch.object(sync, 'pending', return_value=[]), patch.object(sync, 'gh', return_value='created'), patch.object(sync, 'run', return_value='CallanCampos'), patch.object(sync.subprocess, 'run') as commands:
             sync.publish(branch)
             commands.assert_called_once_with(['git', 'push', 'origin', 'HEAD:refs/heads/' + branch], check=True)
-            status.assert_called_once_with('a' * 40, 'pending')
+
+    def test_app_publisher_never_requests_status_or_user_privileges(self):
+        with patch.dict(os.environ, {'GITHUB_ACTIONS': 'true'}), patch.object(sync, 'git'), patch.object(sync, 'pending', return_value=[]), patch.object(sync, 'gh', return_value='created') as gh, patch.object(sync, 'run', side_effect=AssertionError('unexpected API call')), patch.object(sync.subprocess, 'run'):
+            sync.publish(sync.PREFIX + 'app-fixture')
+            create = gh.call_args.args
+            self.assertEqual(create[:2], ('pr', 'create'))
+            self.assertIn('--reviewer', create)
+            self.assertNotIn('--approve', create)
+
+    def test_workflow_uses_repository_scoped_revoked_app_token(self):
+        workflow = (MODULE.parents[2] / '.github/workflows/port-sync.yml').read_text()
+        token_inputs = workflow.split('id: sync-token', 1)[1].split('      - name:', 1)[0]
+        self.assertIn('owner: CallanCampos', token_inputs)
+        self.assertIn('repositories: Frigate', token_inputs)
+        self.assertIn('permission-contents: write', token_inputs)
+        self.assertIn('permission-pull-requests: write', token_inputs)
+        self.assertEqual(token_inputs.count('permission-'), 2)
+        self.assertIn('skip-token-revoke: false', token_inputs)
+        self.assertIn('No default-token fallback is allowed.', workflow)
+        self.assertNotIn('github.token', workflow)
+        publishing = workflow.split('name: Prepare upstream PR using trusted main helper', 1)[1]
+        self.assertIn('GH_TOKEN: ${{ steps.sync-token.outputs.token }}', publishing)
+        self.assertNotIn('secrets.', publishing)
+        self.assertNotIn('statuses:', workflow)
+
+    def test_review_rule_keeps_human_review_without_solo_push_deadlock(self):
+        rules = json.loads((MODULE.parents[2] / 'port/tools/reviews-ruleset.json').read_text())
+        review = next(rule['parameters'] for rule in rules['rules'] if rule['type'] == 'pull_request')
+        self.assertFalse(review['require_last_push_approval'])
+        self.assertTrue(review['dismiss_stale_reviews_on_push'])
+        self.assertTrue(review['require_code_owner_review'])
+        self.assertEqual(review['required_approving_review_count'], 1)
+        self.assertEqual(rules['bypass_actors'], [{'actor_id': 145432210, 'actor_type': 'User', 'bypass_mode': 'pull_request'}])
 
     def test_open_sync_is_frozen(self):
         with patch.object(sync, 'pending', return_value=[{'url': 'pending'}]), patch.object(sync, 'git') as git:
