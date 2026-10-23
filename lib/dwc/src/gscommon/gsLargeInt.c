@@ -609,7 +609,9 @@ static gsi_bool gsiLargeIntInverseMod(const gsLargeInt_t *modulus, gsi_u32 *resu
     gsi_u64 y = 1;
 
     for (i = 2; i <= 32; i++) {
-        if (x < ((modulus->mData[0] * y) & (2 * x - 1))) {
+        gsi_u64 product = modulus->mData[0] * y;
+        product &= 2 * x - 1;
+        if (x < product) {
             y += x;
         }
         x <<= 1;

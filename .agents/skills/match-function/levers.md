@@ -7,6 +7,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 ## Registers swapped
 
+- A 64-bit product's masked high word in the wrong register: calculate the product, then mask it with `&=`
+  (`gsiLargeIntInverseMod`). (matching.md: "64-bit product calculated before it is masked")
+
 - Saved-result lifetimes and widespread register differences in a nested check runner: recover its semantic
   inline boundaries and probe per-source `-ipa file`, including loader-owned constructor data.
   (matching.md: "Nested inline boundaries and file-level interprocedural analysis")

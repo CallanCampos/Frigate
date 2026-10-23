@@ -298,6 +298,10 @@ Same instructions, registers swapped.
 - A product assigned to a variable of its own goes to a new register, with its operand copied there first
   (`mov r2, r1; mul r2, r0`), while a product used in place multiplies into the operand's register. The Join Avenue
   shop's arrow is placed with `row = ...; y = row * rowHeight; pos.y = y + 22;`.
+- DWC's `gsiLargeIntInverseMod` needs its 64-bit product calculated before it is masked:
+  `gsi_u64 product = modulus->mData[0] * y; product &= 2 * x - 1;`. The comparison then uses `product`.
+  With the multiplication and mask in the comparison, the high-word `and` copies the mask into its destination;
+  the separate product update copies the product's high word instead, as the original does under `dsi/1.2`.
 - Two stores of the same constant share a register when chained, and not when written as two initializers.
   `second = first = TRUE;` stores `first` first. `nearXZ = FALSE; nearY = FALSE;` in that order loads the zero twice,
   while the other order shares it. A longer chain also stores from the right: NitroSystem G3D's `maya.c` zeroes nine
