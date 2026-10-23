@@ -251,7 +251,11 @@ Same instructions, registers swapped.
   `unkE` with `i`'s zero, and keeps its own for `count` in `r5`, only as `for (i = 0, count = 0; i < 4; i++)`; with
   `count = 0;` before `for (i = 0; ...)` the stores take `count`'s. `btl_server_flow.c`'s `ActionOrder_Build`
   likewise stores `clientId`'s zero before building `count`'s in `r7` only as
-  `for (clientId = 0, count = 0; clientId < 4; clientId++)`.
+  `for (clientId = 0, count = 0; clientId < 4; clientId++)`. Two mirrored blocks can need their flags set in
+  different places: `field_rail.c`'s `RailUnit_MoveOnLine` matches only with the backward block's
+  `outsideWidth = FALSE;` between its first and second `GetLineContinueInDirection` lookups, while the forward
+  block sets it before all three. Set before the first lookup, the function is 0x89a against the original's
+  0x888, and initialized at its declaration, 0x890.
 - Moving code into a `static inline` helper can swap two registers when the instructions stay the same. In the same
   function, a loop counter and a copy of 0 traded `r1` and `r2` in its two closing loops until the loops and the
   stores after them became `ClearRecvBuffers()`, the setup counterpart of `FreeRecvBuffers`, which frees those
@@ -2125,6 +2129,12 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   declared in an inner block opened there: the forms page's `BOOL hasSex[3] = { FALSE, FALSE, FALSE };` follows the
   Pokédex reads in a block around the rest of the gathering, and `BOOL seenRare[2] = { FALSE, FALSE };` sits in the
   loop over the forms.
+  The stores stay when nothing reads the local, the shape of a leftover the original kept:
+  `entrance_camera.c`'s `EntranceCamera_ConfigureDefaultDeparture` zeroes 12 stack bytes that nothing reads after
+  its first `FieldCamera_GetAnimationCoords`, `VecFx32 unused = { 0, 0, 0 };` in the block that reads the
+  destination's coordinates. `VEC_Set` or member stores to such a local are dropped as dead, and declared at the
+  top of the function or of the enclosing `if` it is zeroed before the calls (86 and 127 bytes differ).
+  `sta_acting.c`'s `StaActing_InitObj` zeroes its leftover first, at the top.
 - A switch of three cases can compile to a compare chain that tests them in value order. When the original tests 1,
   then 2, then 0, the source is an `if`/`else if` chain in that order: `scrcmd_msg.c`'s `SystemMsgWin_Open`.
 - A struct member set from a C99 compound literal, `request.pos = (VecFx32){ 0, 0, 0 };`, builds the literal in a

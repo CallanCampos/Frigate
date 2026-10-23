@@ -34,8 +34,8 @@ struct EntranceCamera {
     FieldCameraAnimationController *controller;
     EntranceCameraParam param;
     BOOL configured;
-    BOOL unk68;
-    BOOL unk6c;
+    BOOL hasDepartureAnimation;
+    BOOL hasArrivalAnimation;
 };
 
 // The data of the events that play the entrance when the player goes out of a zone and into one
@@ -639,18 +639,18 @@ void EntranceCamera_ConfigureDefaultDeparture(EntranceCamera *camera) {
     switch (dir) {
     case DIR_LEFT:
     case DIR_RIGHT:
-        camera->unk68 = 1;
-        camera->unk6c = 0;
+        camera->hasDepartureAnimation = TRUE;
+        camera->hasArrivalAnimation = FALSE;
         break;
     case DIR_UP:
     case DIR_DOWN:
-        camera->unk68 = 0;
-        camera->unk6c = 0;
+        camera->hasDepartureAnimation = FALSE;
+        camera->hasArrivalAnimation = FALSE;
         break;
     }
-    if (camera->unk68 != 0) {
-        animation->unk4C = 0;
-        animation->unk48 = 0;
+    if (camera->hasDepartureAnimation) {
+        animation->unk4C = FALSE;
+        animation->unk48 = FALSE;
         if (func_ov036_021b7f50(camera)) {
             func_ov036_0219f178(camera->field, &pos);
         } else {
@@ -658,19 +658,26 @@ void EntranceCamera_ConfigureDefaultDeparture(EntranceCamera *camera) {
         }
         FieldCameraAnimationController_PrepareCamera(camera->controller);
         FieldCamera_GetAnimationCoords(camera->camera, &animation->src);
-        FieldCamera_GetAnimationCoords(camera->camera, dst);
-        switch (dir) {
-        case DIR_UP:
-            dst->distance = 0x2d << 14;
-            break;
-        case DIR_DOWN:
-            break;
-        case DIR_LEFT:
-            dst->yaw = 0xa09;
-            break;
-        case DIR_RIGHT:
-            dst->yaw = 0xf5f7;
-            break;
+        {
+            // Leftovers of the original: this vector is zeroed and never read, pos is fetched and never read, and the
+            // field camera fetched at the top is discarded. The ROM zeroes the vector here, after the start's
+            // coordinates, so it is declared in the block of the destination's coordinates.
+            VecFx32 unused = { 0, 0, 0 };
+
+            FieldCamera_GetAnimationCoords(camera->camera, dst);
+            switch (dir) {
+            case DIR_UP:
+                dst->distance = FX32_CONST(180);
+                break;
+            case DIR_DOWN:
+                break;
+            case DIR_LEFT:
+                dst->yaw = 0xa09;
+                break;
+            case DIR_RIGHT:
+                dst->yaw = 0xf5f7;
+                break;
+            }
         }
         switch (dir) {
         case DIR_UP:
@@ -703,17 +710,17 @@ void EntranceCamera_ConfigureDefaultArrival(EntranceCamera *camera) {
     case DIR_DOWN:
     case DIR_LEFT:
     case DIR_RIGHT:
-        camera->unk68 = 0;
-        camera->unk6c = 1;
+        camera->hasDepartureAnimation = FALSE;
+        camera->hasArrivalAnimation = TRUE;
         break;
     case DIR_UP:
-        camera->unk68 = 0;
-        camera->unk6c = 0;
+        camera->hasDepartureAnimation = FALSE;
+        camera->hasArrivalAnimation = FALSE;
         break;
     }
-    if (camera->unk6c != 0) {
-        animation->unk4C = 0;
-        animation->unk48 = 0;
+    if (camera->hasArrivalAnimation) {
+        animation->unk4C = FALSE;
+        animation->unk48 = FALSE;
         if (func_ov036_021b7f50(camera)) {
             func_ov036_0219f178(camera->field, &pos);
         } else {
@@ -742,7 +749,7 @@ void EntranceCamera_ConfigureDefaultArrival(EntranceCamera *camera) {
         case DIR_UP:
             break;
         case DIR_DOWN:
-            animation->src.distance = 0x2d << 14;
+            animation->src.distance = FX32_CONST(180);
             break;
         case DIR_LEFT:
             animation->src.yaw = 0xf5f7;
@@ -752,7 +759,7 @@ void EntranceCamera_ConfigureDefaultArrival(EntranceCamera *camera) {
             break;
         }
         FieldCamera_GetAnimationCoords(camera->camera, dst);
-        if (camera->unk6c != 0) {
+        if (camera->hasArrivalAnimation) {
             FieldCameraAnimationController_CommitSrcCoords(camera->controller);
         }
     }
@@ -763,36 +770,34 @@ void EntranceCamera_ConfigureFileDeparture(EntranceCamera *camera) {
     FieldCameraCoords *dst = &animation->dst;
     FieldPlayer *player;
     VecFx32 pos;
+    EntranceCameraFile file;
 
     EntranceCamera_GetFieldCamera(camera);
-    {
-        EntranceCameraFile file;
-
-        player = Field_GetPlayer(camera->field);
-        FieldPlayer_GetFaceDir(player);
-        EntranceCamera_ReadFile(&file, EntranceCamera_GetTransitionType(camera));
-        animation->unk4C = file.unk4C;
-        animation->unk48 = file.unk48;
-        camera->unk68 = file.unk68;
-        camera->unk6c = file.unk6c;
-        if (camera->unk68 != 0) {
-            if (func_ov036_021b7f50(camera)) {
-                func_ov036_0219f178(camera->field, &pos);
-            } else {
-                FieldPlayer_GetWPos(player, &pos);
-            }
-            FieldCameraAnimationController_PrepareCamera(camera->controller);
-            FieldCamera_GetAnimationCoords(camera->camera, &animation->src);
-            animation->frames = file.frames;
-            dst->pitch = file.pitch;
-            dst->yaw = file.yaw;
-            dst->distance = file.distance << 12;
-            VEC_Set(&dst->offset, file.offset[0] << 12, file.offset[1] << 12, file.offset[2] << 12);
-            if (file.useTarget != 0) {
-                VEC_Set(&dst->target, file.target[0] << 12, file.target[1] << 12, file.target[2] << 12);
-            } else {
-                dst->target = pos;
-            }
+    player = Field_GetPlayer(camera->field);
+    FieldPlayer_GetFaceDir(player);
+    EntranceCamera_ReadFile(&file, EntranceCamera_GetTransitionType(camera));
+    animation->unk4C = file.unk4C;
+    animation->unk48 = file.unk48;
+    camera->hasDepartureAnimation = file.hasDepartureAnimation;
+    camera->hasArrivalAnimation = file.hasArrivalAnimation;
+    if (camera->hasDepartureAnimation) {
+        if (func_ov036_021b7f50(camera)) {
+            func_ov036_0219f178(camera->field, &pos);
+        } else {
+            FieldPlayer_GetWPos(player, &pos);
+        }
+        FieldCameraAnimationController_PrepareCamera(camera->controller);
+        FieldCamera_GetAnimationCoords(camera->camera, &animation->src);
+        animation->frames = file.frames;
+        dst->pitch = file.pitch;
+        dst->yaw = file.yaw;
+        dst->distance = file.distance << FX32_SHIFT;
+        VEC_Set(&dst->offset, file.offset[0] << FX32_SHIFT, file.offset[1] << FX32_SHIFT, file.offset[2] << FX32_SHIFT);
+        if (file.useTarget) {
+            VEC_Set(&dst->target, file.target[0] << FX32_SHIFT, file.target[1] << FX32_SHIFT,
+                    file.target[2] << FX32_SHIFT);
+        } else {
+            dst->target = pos;
         }
     }
 }
@@ -804,41 +809,39 @@ void EntranceCamera_ConfigureFileArrival(EntranceCamera *camera) {
     FieldCamera *fieldCamera = EntranceCamera_GetFieldCamera(camera);
     FieldPlayer *player;
     VecFx32 pos;
+    EntranceCameraFile file;
 
-    {
-        EntranceCameraFile file;
-
-        player = Field_GetPlayer(camera->field);
-        FieldPlayer_GetFaceDir(player);
-        EntranceCamera_ReadFile(&file, EntranceCamera_GetTransitionType(camera));
-        animation->unk4C = file.unk4C;
-        animation->unk48 = file.unk48;
-        camera->unk68 = file.unk68;
-        camera->unk6c = file.unk6c;
-        if (camera->unk6c != 0) {
-            if (func_ov036_021b7f50(camera)) {
-                func_ov036_0219f178(camera->field, &pos);
-            } else {
-                FieldPlayer_GetWPos(player, &pos);
-            }
-            if (animation->unk48 != 0 && func_ov036_021b7f50(camera)) {
-                FieldCamera_ChangeRefPos(fieldCamera, &pos);
-            }
-            FieldCameraAnimationController_PrepareCamera(camera->controller);
-            FieldCamera_GetAnimationCoords(camera->camera, dst);
-            animation->frames = file.frames;
-            src->pitch = file.pitch;
-            src->yaw = file.yaw;
-            src->distance = file.distance << 12;
-            VEC_Set(&src->offset, file.offset[0] << 12, file.offset[1] << 12, file.offset[2] << 12);
-            if (file.useTarget != 0) {
-                VEC_Set(&src->target, file.target[0] << 12, file.target[1] << 12, file.target[2] << 12);
-            } else {
-                src->target = pos;
-            }
-            if (camera->unk6c != 0) {
-                FieldCameraAnimationController_CommitSrcCoords(camera->controller);
-            }
+    player = Field_GetPlayer(camera->field);
+    FieldPlayer_GetFaceDir(player);
+    EntranceCamera_ReadFile(&file, EntranceCamera_GetTransitionType(camera));
+    animation->unk4C = file.unk4C;
+    animation->unk48 = file.unk48;
+    camera->hasDepartureAnimation = file.hasDepartureAnimation;
+    camera->hasArrivalAnimation = file.hasArrivalAnimation;
+    if (camera->hasArrivalAnimation) {
+        if (func_ov036_021b7f50(camera)) {
+            func_ov036_0219f178(camera->field, &pos);
+        } else {
+            FieldPlayer_GetWPos(player, &pos);
+        }
+        if (animation->unk48 && func_ov036_021b7f50(camera)) {
+            FieldCamera_ChangeRefPos(fieldCamera, &pos);
+        }
+        FieldCameraAnimationController_PrepareCamera(camera->controller);
+        FieldCamera_GetAnimationCoords(camera->camera, dst);
+        animation->frames = file.frames;
+        src->pitch = file.pitch;
+        src->yaw = file.yaw;
+        src->distance = file.distance << FX32_SHIFT;
+        VEC_Set(&src->offset, file.offset[0] << FX32_SHIFT, file.offset[1] << FX32_SHIFT, file.offset[2] << FX32_SHIFT);
+        if (file.useTarget) {
+            VEC_Set(&src->target, file.target[0] << FX32_SHIFT, file.target[1] << FX32_SHIFT,
+                    file.target[2] << FX32_SHIFT);
+        } else {
+            src->target = pos;
+        }
+        if (camera->hasArrivalAnimation) {
+            FieldCameraAnimationController_CommitSrcCoords(camera->controller);
         }
     }
 }
@@ -883,7 +886,7 @@ BOOL func_ov036_021b7f50(EntranceCamera *camera) {
 
 BOOL func_ov036_021b7f64(EntranceCamera *camera) {
     if (EntranceCamera_GetParam(camera)->isArrival == 0) {
-        return camera->unk68;
+        return camera->hasDepartureAnimation;
     }
-    return camera->unk6c;
+    return camera->hasArrivalAnimation;
 }

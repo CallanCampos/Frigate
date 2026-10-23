@@ -531,6 +531,7 @@ src/ov036/place_name_letter.c:
     .data       start:0x021d53c8 end:0x021d5404
 
 src/ov036/entrance_camera.c:
+    complete
     .text       start:0x021b7374 end:0x021b7fb4
     .rodata     start:0x021d1278 end:0x021d12a8
     .data       start:0x021d5404 end:0x021d5418

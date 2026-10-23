@@ -29,8 +29,8 @@ typedef struct {
     s32 target[3];
     s32 offset[3];
     u32 frames;
-    BOOL unk68;
-    BOOL unk6c;
+    BOOL hasDepartureAnimation;
+    BOOL hasArrivalAnimation;
     BOOL unk48;
     BOOL unk4C;
 } EntranceCameraFile;
@@ -59,7 +59,7 @@ void EntranceCamera_Destroy(EntranceCamera *camera);
 void EntranceCamera_Configure(EntranceCamera *camera, const EntranceCameraParam *param);
 void EntranceCamera_StartAnimation(EntranceCamera *camera);
 void EntranceCamera_FinishCamera(EntranceCamera *camera);
-// The selected arrival or departure configuration flag
+// Whether the configured arrival or departure has an animation
 BOOL func_ov036_021b7ae0(EntranceCamera *camera);
 // Whether the configured animation has a duration of zero frames
 BOOL EntranceCamera_HasZeroFrames(EntranceCamera *camera);
