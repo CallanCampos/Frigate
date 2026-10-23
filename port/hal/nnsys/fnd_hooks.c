@@ -24,17 +24,19 @@
 // allocated in the expanded and frame heaps, which hold nearly all of the game's memory: the GFL heaps and everything
 // in them, and the sound heap. A heap's memory is poisoned when it is created, a block is made addressable when it is
 // allocated, for the bytes the DS would give it (the size asked for, rounded up to 4), and poisoned again when it is
-// freed, and a destroyed heap's memory goes back to its owner. So an access past a block's end, into FND's block heads
-// or free memory, or to a block after it was freed, is an ASan report naming the game's code. FND itself
-// (lib/nnsys/src/fnd's heaps) is compiled without ASan, as a C library's malloc is, so that it can write its own heads
-// and free lists (port/cmake/nnsys.cmake defines PORT_POISON_HEAPS here then). Unit heaps, which the game doesn't
-// create, are left alone. Where the game reads past a block as the DS does, and uses what it read (the copyright
-// screen's characters, src/gfl/arc_util.c), port_heap_ds_read_begin and port_heap_ds_read_end, at the end of this file
-// (declared in port/include/port_host.h), let that one read reach what follows the block, then poison again what was
-// poisoned there. In every build, port_heap_ds_read_begin first checks that the read stays in the game's memory: in
-// one of the expanded and frame heaps alive (which the wrappers of their creation and destruction keep a list of), or
-// else in the main arena they are carved from (port/hal/os/os_arena.c); a read that reaches outside both stops the
-// program with a message, rather than read, and unpoison, memory that isn't the game's.
+// freed, and a destroyed heap's memory goes back to its owner; the host memory of a root heap that the game made in its
+// own memory has none, and port/hal/gfl/heap_policy.c poisons it until the next heap there. So an access past a block's
+// end, into FND's block heads or free memory, or to a block after it was freed, is an ASan report naming the game's
+// code. FND itself (lib/nnsys/src/fnd's heaps) is compiled without ASan, as a C library's malloc is, so that it can
+// write its own heads and free lists (port/cmake/nnsys.cmake defines PORT_POISON_HEAPS here then). Unit heaps, which
+// the game doesn't create, are left alone. Where the game reads past a block as the DS does, and uses what it read (the
+// copyright screen's characters, src/gfl/arc_util.c), port_heap_ds_read_begin and port_heap_ds_read_end, at the end of
+// this file (declared in port/include/port_host.h), let that one read reach what follows the block, then poison again
+// what was poisoned there. In every build, port_heap_ds_read_begin first checks that the read stays in the game's
+// memory: in one of the expanded and frame heaps alive (which the wrappers of their creation and destruction keep a
+// list of), or else in the main arena they are carved from (port/hal/os/os_arena.c); a read that reaches outside both
+// stops the program with a message, rather than read, and unpoison, memory that isn't the game's.
+#include "hal/gfl/heap_policy.h"
 #include "hal/nnsys/reloc.h"
 #include "hal/os/port_os.h"
 #include "nnsys/fnd.h"
@@ -109,9 +111,13 @@ static void *UnpoisonBlock(void *block, u32 size) {
     return block;
 }
 
-// A destroyed heap's memory, heads included, is its owner's again: a block of another heap or the arena it came from
-static void UnpoisonDestroyedHeap(void *heap, void *end) {
-    UNPOISON(heap, (size_t)((u8 *)end - (u8 *)heap));
+// A destroyed heap's memory, heads included, is its owner's again: a block of another heap or the arena it came from.
+// Host memory kept for a root heap the game made in its own memory has no owner until the next heap there, and
+// heap_policy.c keeps it poisoned until then
+static void ReturnDestroyedHeap(void *heap, void *end) {
+    if (!port_heap_root_memory_release(heap)) {
+        UNPOISON(heap, (size_t)((u8 *)end - (u8 *)heap));
+    }
 }
 
 // The expanded and frame heaps alive, each from its common head, where its memory starts, to its end
@@ -212,7 +218,7 @@ void NNS_FndDestroyExpHeap(NNSFndHeapHandle heap) {
     RemoveLiveHeap(heap);
     port_sdk_NNS_FndDestroyExpHeap(heap);
     ReleaseBetween(heap, end);
-    UnpoisonDestroyedHeap(heap, end);
+    ReturnDestroyedHeap(heap, end);
 }
 
 u32 NNS_FndResizeForMBlockExpHeap(NNSFndHeapHandle heap, void *memBlock, u32 size) {
@@ -245,7 +251,7 @@ void NNS_FndDestroyFrmHeap(NNSFndHeapHandle heap) {
     RemoveLiveHeap(heap);
     port_sdk_NNS_FndDestroyFrmHeap(heap);
     ReleaseBetween(heap, end);
-    UnpoisonDestroyedHeap(heap, end);
+    ReturnDestroyedHeap(heap, end);
 }
 
 // What a frame heap frees is what it held before and no longer holds: the bottom shrinks to a lower low, the top to a

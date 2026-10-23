@@ -78,7 +78,7 @@ What becomes easier, what becomes harder, what must be watched, and what would m
 | [0015](0015-universal-macos-app-for-macos-11.md) | A universal macOS app for macOS 11, with the pinned SDL3 linked statically | D11, §7 | accepted |
 | [0016](0016-3d-frame-in-bands-on-worker-threads.md) | The 3D frame drawn in bands on worker threads, the game on one | §4.6, §7 phase 5 | accepted |
 | [0017](0017-external-contributions.md) | External contributions through forks and pull requests | D1, D10, §9 | accepted |
-| [0021](0021-root-heaps-in-the-games-own-memory-from-host-memory.md) | Root heaps in the game's own memory get host memory | D5, §4.5, §4.8 | accepted |
+| [0021](0021-root-heaps-in-the-games-own-memory-from-host-memory.md) | Root heaps in the game's own memory get host memory | D5, §4.5, §4.8 | proposed |
 
 ## Decisions waiting for an ADR
 

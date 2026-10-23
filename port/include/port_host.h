@@ -93,8 +93,9 @@ unsigned int port_heap_size(unsigned int index, unsigned int size, int root);
 
 // The memory a root heap that the game creates in memory of its own gets on the host in place of that memory
 // (src/gfl/heapsys.c's GFL_HeapAddRoot; port/hal/gfl/heap_policy.c, ADR 0021): port_heap_size's root size for the
-// caller's size, zeroed when first made and the same at every later creation in the caller's memory. The index and
-// size are u32
+// caller's size, zeroed when first made and the same at every later creation in the caller's memory, with what the
+// last heap left in it until the caller's overlay loads again and zeroes it (port/hal/gfl/heap_policy.h). The index
+// and size are u32
 void *port_heap_root_memory(unsigned int index, void *memory, unsigned int size);
 
 // The work a particle system's SPL manager allocates from on a host (src/gfl/particle.c), in place of the caller's

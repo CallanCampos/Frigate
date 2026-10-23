@@ -164,6 +164,13 @@ if(PORT_VERSION STREQUAL "b2_us")
     port_test_labels(replay_new_game route)
 endif()
 
+# check_screens.py, the checker of the replays' screens (port/tests/replay/test_check_screens.py): its tables, the 3d
+# column that leaves a screen with the field's 3D to the oracle's comparison, and whole runs of a stand-in program
+add_test(NAME replay_check_screens
+    COMMAND "${CMAKE_COMMAND}" -E env PYTHONDONTWRITEBYTECODE=1 "${PORT_PYTHON}"
+        "${CMAKE_CURRENT_SOURCE_DIR}/tests/replay/test_check_screens.py")
+set_tests_properties(replay_check_screens PROPERTIES TIMEOUT 120)
+
 # New Game on into the field and the house (T3): the first save's input file (port/tests/oracle), which the oracle
 # plays to make that save, from power-on through NEW GAME, the intro and the opening's flight into Aspertia City, the
 # first scripts in front of the player's house and inside it, to the player's room and the field menu's SAVE, 18,800

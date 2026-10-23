@@ -1,13 +1,15 @@
 # 0021: Root heaps in the game's own memory get host memory
 
-- **Status:** accepted
+- **Status:** proposed
 - **Date:** 2026-10-23
 - **Plan:** D5, §4.5 (heaps), §4.8 (rule 7: buffers sized for 4-byte pointers are sized from the real structs)
 - **Upstream:** `0a12a2bd3e` (merge of PR #480)
-- **Note (2026-10-23):** accepted by the session that made the change, the field-entry track of the plan of
-  2026-10-23, not by the developer in person, on the developer's standing instruction to carry the plan forward, as
-  ADRs 0013 to 0016 were; the developer is told in the pull request that brings it. Numbers 0019 and 0020 are held for
-  that plan's pointer-cast guard and one program for both versions, which were planned with this one.
+- **Note (2026-10-23):** proposed by the session that made the change, the field-entry track of the plan of
+  2026-10-23, in the pull request that brings it. ADRs 0013 to 0016 were accepted at their tracks' merges by the
+  sessions that merged them; under protected `main` ([ADR 0018](0018-protected-main-and-sync-prs.md)) only the
+  developer merges, so this one stays proposed until the developer reviews and merges that pull request, which accepts
+  it, and the next change to this file sets the status line to accepted. Numbers 0019 and 0020 are held for that
+  plan's pointer-cast guard and one program for both versions, which were planned with this one.
 
 ## Context
 
@@ -39,12 +41,21 @@ and ran the 28,600 frames of the Route 19 route from the starter save, through a
   and any that upstream's C adds later.
 - **The size is `port_heap_size`'s for a root**, four times the DS's (`--heap-scale-root` overrides it), as for the
   arena's roots. The field's root gets 256 KiB, the trade screen's 192 KiB, the extra heap `0xfc00` bytes.
-- **The memory is kept for the caller's memory.** `port_heap_root_memory` (`port/hal/gfl/heap_policy.c`, declared in
-  `port/include/port_host.h`) makes it with `calloc` the first time a root heap is made in a given place, zeroed as
-  `.bss` is, and returns the same memory every later time a root heap is made there. Each caller's memory is a static,
-  or a block that is never freed. The game makes its heap there again at every use: the field's at every map load. So
-  this keeps the DS's model, one block of memory reused, with what the last heap left in it. Up to eight places are
-  kept; a ninth, or a larger size than the kept memory's for the same place, stops the program with a message.
+- **The memory is kept for the caller's memory, and follows its life.** `port_heap_root_memory`
+  (`port/hal/gfl/heap_policy.c`, declared in `port/include/port_host.h`) makes it with `calloc` the first time a root
+  heap is made in a given place, zeroed as `.bss` is, and returns the same memory every later time a root heap is made
+  there. Each caller's memory is a static, or a block that is never freed, and the game makes its heap there again at
+  every use: the field's at every map load. On the DS the static keeps what the last heap left in it until its
+  overlay loads again, when the SDK clears the overlay's `.bss`; the kept memory does the same. The host's
+  `FS_ClearOverlayImage` (`port/hal/fs/fs_overlay.c`) zeroes the kept memory of a place in the overlay's zeroed
+  statics with `port_heap_root_memory_reset` (`port/hal/gfl/heap_policy.h`), where it clears the statics themselves.
+  Up to eight places are kept; a ninth, or a larger size than the kept memory's for the same place, stops the program
+  with a message.
+- **Between two heaps the kept memory has no owner.** A destroyed heap's memory goes back to its owner, a block of
+  another heap or the arena, which the FND hooks (`port/hal/nnsys/fnd_hooks.c`) make addressable again in the
+  sanitized build. Kept memory has none: the hooks ask `port_heap_root_memory_release`, which poisons it under
+  AddressSanitizer until the next heap there, so that a use of the old heap's memory after it is deleted (as the field
+  closes for a change of map) is a report, as it would be in the arena.
 - **The caller's own memory stays as it is, unused on the host:** the static array, or the OS heap's block.
 
 ## Alternatives
@@ -70,9 +81,10 @@ and ran the 28,600 frames of the Route 19 route from the starter save, through a
   did.
 - About 500 KiB of host memory stays allocated for the program's life, once each heap has been made.
 - AddressSanitizer sees each block as an allocation of its own. The FND hooks poison its free memory while its heap is
-  alive and unpoison it when the heap is destroyed, as for any heap.
-- The DS clears `g_FieldHeapMemory` when overlay 36 loads again (the host's overlay reset does the same to the array).
-  The kept block is never cleared. A read of heap memory that the game never wrote could therefore see other bytes on
-  the host than on the DS; that would be a game bug, and the sanitized build would not see it.
+  alive, as for any heap, and `heap_policy.c` poisons all of it between two heaps.
+- The kept memory matches the DS's static at every point the game can see: zeroed at first, holding what the last heap
+  left across the field's changes of map, and zeroed again when overlay 36 (or 194) loads again. No heap is alive in
+  the static then, since the code that deletes it is the overlay's own (`FieldmapProc_Exit`, the trade screen's exit).
+  GFL's extra heap's block is in no overlay, and is never cleared, as on the DS.
 - Revisit if a caller's memory turns out to be shorter-lived than a static, if a caller reads its heap's memory
   through its own pointer (none does today), or if a heap here needs more than the root factor gives it.
