@@ -1,7 +1,7 @@
 <!-- Records how external contributors submit Frigate platform changes while preserving decomp sync boundaries. -->
 # 0017: External contributions through forks and pull requests
 
-- **Status:** accepted
+- **Status:** accepted; amended by [0018](0018-protected-main-and-sync-prs.md) (PR-only publication and protection)
 - **Date:** 2026-10-21
 - **Plan:** D1, D10, §9; amends ADR 0002's solo-project scope
 - **Upstream:** `83515e20ce`

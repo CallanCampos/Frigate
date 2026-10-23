@@ -86,10 +86,10 @@ the game each piece touches, for the modders who come later.
   [ADR 0002](docs/adr/0002-solo-project-no-upstream-posts.md)).
 - **Port work is open to contributors.** Human contributors, Claude Code and explicitly authorized Codex sessions
   follow this file and [CONTRIBUTING.md](CONTRIBUTING.md). Root agent instructions describe the decomp; for port work,
-  these rules take precedence. External contributors use personal forks and topic PRs to Frigate's `main`, not the
-  maintainer direct-publishing loop ([ADR 0017](docs/adr/0017-external-contributions.md)).
+  these rules take precedence. External contributors use personal forks and topic PRs to Frigate's `main`. Maintainers and automation also
+  publish only topic branches and PRs ([ADR 0018](docs/adr/0018-protected-main-and-sync-prs.md)).
 - **Port files live in `port/`**, plus files upstream doesn't have: `.github/workflows/port-*.yml` and
-  `.github/README.md`, `.github/CONTRIBUTING.md`, `.github/PULL_REQUEST_TEMPLATE/port.md` and
+  `.github/README.md`, `.github/CONTRIBUTING.md`, `.github/CODEOWNERS`, `.github/PULL_REQUEST_TEMPLATE/port.md` and
   `.github/ISSUE_TEMPLATE/port_*.yml`. Never edit an upstream file for the port's own setup (root `CLAUDE.md`, `AGENTS.md`,
   `README.md`, `CONTRIBUTING.md`, `.gitignore`, `.claude/`, `.agents/`, `.codex/`, upstream's `.github/` templates and
   workflows, `docs/`, `tools/`, `config/`, `configure.py`): every sync would conflict.
@@ -110,9 +110,12 @@ The no-upstream-posts and reference rules below still apply to every contributor
   that touches only `port/`: it proves the last sync and every change outside `port/` left the DS build alone (T0).
 - **The code rules apply to any edit in `src/`, `lib/` or `include/`**: natural C, names, `docs/code-standards.md`,
   clang-format 23.1.1. `post_edit.py` and CI's Standards workflow check those paths; they don't look at `port/`.
-- **For maintainer sessions, publish every commit** means: `git fetch origin && git merge origin/main` (the port's own `main`, which other port
-  sessions and the hourly sync push to), the ROM build with both SHA1s, the host build and the pre-push tests that
-  exist, then `git push origin HEAD:main`. A rejected push is fetched, merged, rebuilt and pushed again.
+- **Publish every commit through a PR.** Fetch `origin/main`, create a feature branch, and push that branch to
+  Frigate (maintainers) or a personal fork (contributors). Never push `HEAD:main`. Open a PR targeting Frigate `main`;
+  merge updates from `origin/main` and repeat verification when the base changes. Required CI and local verification
+  must pass before merge. The sole owner may bypass only the separate review rule for owner-authored PRs; there is
+  no bypass for the PR, CI, conversation-resolution, deletion or force-push rules. Contributor and bot sync PRs get
+  the owner's review. See [repository policy](docs/REPOSITORY-POLICY.md).
 - **Never here:** overlay claims, matching, new decomp source files, config changes (`add_source_file.py`,
   `mark_complete.py`, `rename_symbol.py`, `config_fixes.py`), and edits to `docs/nonmatching-functions.md` or
   `docs/matching.md`. The `decomp-file`, `match-function`, `finish-file` and `record-lesson` skills and the root
@@ -124,40 +127,33 @@ The no-upstream-posts and reference rules below still apply to every contributor
 
 ## Staying in sync ([docs/SYNC.md](docs/SYNC.md))
 
-- **`main` also moves every hour.** The `port-sync` Action (`.github/workflows/port-sync.yml`) merges upstream's
-  `main` when the merge is clean and every C file still compiles for both versions. CI has no ROMs, so those merges
-  are not SHA1-checked: the T0 run after a session's `git merge origin/main` is what verifies them. A conflict, a
-  compile failure, a change to upstream's workflows, a rewrite of its history or, while this repository is public,
-  commits whose messages reference issues (the `references` outcome) leaves `main` alone and opens an `upstream-sync`
-  issue.
-- **Each maintainer session starts with `port/tools/sync_upstream.sh`.** It merges upstream on top of what the Action merged,
-  builds both ROMs and checks both SHA1s, builds and tests the host side once `port/CMakeLists.txt` exists, and pushes
-  only when all of that passes. Upstream lands 150–250 commits a day, so sync before each task and at least daily.
-- **When the script stops**, SYNC.md says what to do. Exit 3 is a merge conflict: resolve it (a file with a row in
-  [game-changes.md](docs/game-changes.md) takes upstream's version with the port's change reapplied) and run the
-  script again. Exit 4 means upstream rewrote its history: stop and ask the user before `--allow-rewrite`. Exit 5
-  means the push would carry commits whose messages reference issues while this repository is public
-  ([below](#upstream-doesnt-know-about-the-port)): stop and ask the user before `--allow-references`. If the script
-  says it couldn't read the repository's visibility, which it then treats as public, check `gh auth status`, fix the
-  login and run the script again before asking. An upstream `main` that fails `ninja` on its own is never fixed or
-  reported from here: record it as a blocker in STATUS.md, tell the user, and ask how to go on meanwhile.
-- After a sync that changes upstream's workflows, check with `gh workflow list --all -R CallanCampos/Frigate`
-  that `build.yml` is still off. Why the repository works this way is
-  [ADR 0001](docs/adr/0001-repository-and-upstream-sync.md).
+- **Syncs are reviewed PRs.** The hourly `port-sync` Action proposes one bounded upstream merge on a topic branch.
+  It never pushes `main`, auto-merges, or updates a pending PR. Review the proposed changes, approve the PR's CI runs,
+  then verify its exact head locally with `port/tools/sync_upstream.sh --verify-pr NUMBER` before approving and merging.
+- **Start work from Frigate's reviewed `origin/main`.** Check the pending sync PR separately; do not automatically
+  import unreviewed upstream changes into feature work. The local `port/tools/sync_upstream.sh` is a dedicated sync
+  operation that validates and publishes a topic PR, never a pre-task direct publisher.
+- **Preserve port changes.** Use real upstream merges, keep the `Upstream-Commit` trailer, and check
+  [game-changes.md](docs/game-changes.md). Resolve conflicts by taking upstream's updated structure and reapplying
+  the documented port adaptation. Both ROMs and host tests must pass after resolution.
+- **Stops stay visible.** Conflicts, history rewrites, cross-repository references and upstream workflow changes
+  require local inspection. Only the user authorizes `--allow-rewrite` or `--allow-references`. Never silently
+  resolve conflicts or modify decomp configs to get a sync through. Check that upstream's ROM-dependent `build.yml`
+  stays disabled after workflow imports; Compile and Standards remain enabled.
 
 ## The iteration loop (PLAN.md §8)
 
-1. **Sync** maintainer checkouts with `port/tools/sync_upstream.sh`, as above, then regenerate source lists and stubs.
-   External contributors update from Frigate's `main` instead.
+1. **Update** from Frigate's reviewed `main`, then regenerate source lists and stubs. Handle upstream sync PRs
+   separately as above.
 2. **Pick** the earliest unmet exit criterion of the current phase (STATUS.md names it) that the decomp allows.
 3. **Build it in small commits**, each passing the pre-push tests. Large subsystems (renderer, sound driver,
    scheduler) go to subagents in their own worktrees, one writer per set of files.
 4. **Verify** with the replay and oracle tests, and run the app and look at screenshots for anything visual.
 5. **Record**, in the same commit as the work: a [STATUS.md](docs/STATUS.md) entry after each session sync and each
-   finished task (the Action's merges get none), an [ADR](docs/adr/README.md) for each non-obvious choice, a row in
+   finished task (a proposed PR gets no completed-sync entry), an [ADR](docs/adr/README.md) for each non-obvious choice, a row in
    [game-changes.md](docs/game-changes.md) for every change outside `port/`, and lessons in `port/docs/lessons.md`
    (created with the first one), never in `docs/matching.md` or the skills.
-6. **Publish** to `origin` as above.
+6. **Publish** a topic branch and PR as above; merge only after required validation and review.
 
 ## Changes outside port/ (PLAN.md §4.1, §4.8)
 
@@ -270,8 +266,7 @@ The independent-upstream boundary of PLAN.md D10 and [ADR 0002](docs/adr/0002-so
 - **Upstream's own commit messages can reference issues** (`OWNER/REPO#N`, or an issue, pull request or discussion
   URL), and pushing such a commit can record a "referenced" event, naming this repository, on that issue. So the sync
   stops before pushing commits whose messages reference issues, whatever the repository's visibility (a private
-  repository's references still show, without their details): `sync_upstream.sh` exits 5 and the Action reports
-  `references`. Stop and ask the user; only the user decides to run `--allow-references`
+  repository's references still show, without their details): `sync_upstream.sh` exits 5 and the Action fails with a reference error. Stop and ask the user; only the user decides to run `--allow-references`
   ([SYNC.md](docs/SYNC.md#commit-messages-that-name-other-repositories)).
 - **The root `CLAUDE.md`'s overlay rules and the decomp skills never run in this clone.** Its "Claim an overlay" and
   "Record overlay progress" rules and the `decomp-file`, `finish-file` and `match-function` skills post claims and

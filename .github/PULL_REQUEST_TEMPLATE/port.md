@@ -20,3 +20,6 @@ For visual changes, describe the comparison and hashes; do not upload captured g
 - [ ] The change follows port/CONTRIBUTING.md and documents any portability change to game files.
 - [ ] No ROMs, extracted game assets or saves are included.
 - [ ] Remaining work and verification gaps are described above.
+
+- [ ] Required CI and `Frigate local verification` pass on the final head (maintainer completes verification).
+- [ ] Sync PRs retain merge history and document any port-conflict resolution against `port/docs/game-changes.md`.

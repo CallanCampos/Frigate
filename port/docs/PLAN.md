@@ -80,22 +80,17 @@ alternatives are in [ADR 0001](adr/0001-repository-and-upstream-sync.md).
 name, and the decision is otherwise unchanged.
 
 - **Port files.** All port code is in `port/`. The only other port files are ones upstream doesn't have:
-  `.github/workflows/port-sync.yml` (and later `port-*.yml` workflows) and `.github/README.md`, which GitHub shows as
+  `.github/workflows/port-*.yml`, `.github/CODEOWNERS`, the port contribution templates and `.github/README.md`, which GitHub shows as
   the landing page in place of upstream's `README.md`. The port never edits an upstream file for its own setup (the
   root `CLAUDE.md`, `AGENTS.md`, `README.md`, `CONTRIBUTING.md`, `.claude/`, upstream's workflows), since every
   merge would conflict there. Upstream's `build.yml`, which fetches the ROMs with a key the port repository doesn't
   have, is turned off there with `gh workflow disable` rather than edited.
-- **Staying current.** Upstream landed 150–250 commits a day from 10-13 to 10-16. Two mechanisms keep the port on
-  top of it, both described in [SYNC.md](SYNC.md):
-  1. An hourly GitHub Action (`port-sync.yml`) merges upstream `main` into the port's `main` when the merge is clean
-     and every C file still compiles for both versions. CI has no ROMs, so it can't check the SHA1s. A conflict, a
-     compile failure, an upstream workflow change (which the Action's token can't push), game files that differ from
-     upstream, a rewrite of upstream's history, commits whose messages name issues in other repositories while this
-     repository is public (§9), or a refused push leaves `main` as it was and opens or updates an `upstream-sync`
-     issue for the local sync to resolve.
-  2. Every port session starts with the local sync, [`port/tools/sync_upstream.sh`](../tools/sync_upstream.sh),
-     which merges upstream and verifies the merge with the ROM build and both SHA1s before anything is pushed
-     (§8 step 1).
+- **Staying current.** The hourly Action proposes one bounded upstream merge PR, preserving full upstream history
+  and port adaptations. It leaves a pending PR unchanged. The owner reviews imported changes, approves public PR CI,
+  and validates both ROM SHA1s and native tests on the exact PR head before merge. The local sync opens topic PRs
+  too; no sync pushes `main`. Contributors and maintainer feature work start from Frigate's reviewed `main`.
+  [SYNC.md](SYNC.md) gives the procedures; [ADR 0018](adr/0018-protected-main-and-sync-prs.md) supersedes direct sync
+  publishing and defines the two rulesets that protect `main`.
 - **Game code stays the decomp's.** Changes outside `port/` are limited to: (1) portability fixes that compile to the
   same bytes under MWCC; (2) hook macros that compile to nothing in the ROM build; (3) rare `#ifdef PLATFORM_PC`
   blocks. Each is listed in `port/docs/game-changes.md`. Shipwright's lesson is that an edited snapshot of a decomp
@@ -390,7 +385,7 @@ Testing is how we know the port is the game. Each level runs automatically, from
 
 | Level | What | When |
 | --- | --- | --- |
-| T0 | ROM build: both SHA1s match, so port changes and upstream merges never alter the DS build | every commit a session makes and every local sync; the Action's hourly merges are checked by the next session's sync (CI has no ROMs; it compiles every C file for both versions instead) |
+| T0 | ROM build: both SHA1s match, so port changes and upstream merges never alter the DS build | before every PR merge, including each upstream sync; the exact-head local verification status supplements ROM-free public CI |
 | T1 | Host build (macOS from phase 0; Linux and Windows from phase 5); the 64-bit warning count only goes down | every commit |
 | T2 | Unit tests: LZ, NitroFS and VFS, save CRC and slot choice, divider and sqrt bit-exactness, scheduler order, geometry engine maths, 2D renderer golden images from captured display state, SSEQ sequencer against recorded channel state | every commit |
 | T3 | Replay tests: recorded input played on the port with a virtual clock; frame hashes and game-state checkpoints against stored goldens | every commit (short), nightly (long) |
@@ -485,10 +480,8 @@ Each phase ends when its exit criteria pass on macOS. Phases overlap where the d
 
 Sessions working toward this plan follow one loop, so progress is measurable and nothing regresses:
 
-1. **Sync.** Run [`port/tools/sync_upstream.sh`](../tools/sync_upstream.sh) ([SYNC.md](SYNC.md)): it merges
-   upstream `main` into the port's `main` (on top of whatever the hourly Action already merged), runs the ROM build
-   and checks both SHA1s, builds and tests the host side once `port/CMakeLists.txt` exists, and pushes. A sync that
-   doesn't build both ROMs is never pushed. Then regenerate source lists and stubs, and record the decomp tiers,
+1. **Update from reviewed main.** Fetch Frigate's `main` and branch from it. Review the pending upstream sync as
+   a separate PR using [SYNC.md](SYNC.md). Then regenerate source lists and stubs, and record the decomp tiers,
    trap-stub count, 64-bit warning count and test results in `port/docs/STATUS.md`.
 2. **Pick the next task:** the earliest unmet exit criterion of the current phase that the decomp's state allows. A
    task blocked on missing C waits for upstream (or is offered to the decomp session); it is never worked around with
@@ -498,7 +491,8 @@ Sessions working toward this plan follow one loop, so progress is measurable and
 4. **Verify** with the replay and oracle tests, and by running the app and looking at screenshots for anything visual.
 5. **Record:** the status log, an architecture decision record for each non-obvious choice, every game-code change in
    `port/docs/game-changes.md`, and lessons in the port's docs.
-6. **Publish** to the port repository; never push to upstream, and never post anything about the port there (D10).
+6. **Publish** a topic branch and PR to the port repository. Merge only with required checks and review; never push
+   to upstream, and never post anything about the port there (D10).
 
 ## 9. Working with the decomp
 
@@ -507,8 +501,8 @@ Sessions working toward this plan follow one loop, so progress is measurable and
   `CallanCampos/pokebw2`) through fork PRs, under the root `CLAUDE.md`. It reaches the port only by sync. Port work is
   done in the port clone `/Users/cjcampos/dev/decomp/pokebw2-native`, which keeps that folder for now (a fresh clone's
   is `Frigate`), with `origin` = `CallanCampos/Frigate` and `upstream` = `fuddlesworth/pokebw2`, and in its
-  `.claude/worktrees`, under `port/CLAUDE.md`. In the port clone the root `CLAUDE.md`'s "push origin HEAD:main"
-  publishes to the port repository.
+  `.claude/worktrees`, under `port/CLAUDE.md`. In the port clone, port/CLAUDE.md overrides the root's
+  direct-publishing instruction: every change uses a topic PR.
 - **What the port needs from the decomp, in order:** overlay 36's C and data (mariano54, #83), including the
   818-pointer tables of `fldmmdl_blact.c`; overlay 12's event-script command tables as C data (674 pointers); the
   four ITCM ClAct renderers (no issue or owner yet: a decomp session can write them in the decomp checkout as ordinary
@@ -525,7 +519,7 @@ Sessions working toward this plan follow one loop, so progress is measurable and
   as a bare `#N`, and port issues, pull requests and comments should too: no `OWNER/REPO#N` and no issue, pull request
   or discussion URL of any repository, a third party's included. A third-party issue is named by its title. Whatever the
   repository's visibility, both syncs also stop before pushing commits whose messages reference issues
-  (`sync_upstream.sh` exit 5, the Action's `references` outcome), and only the user decides to push them with
+  (`sync_upstream.sh` exit 5, the Action's reference error), and only the user decides to push them with
   `--allow-references`.
 - **Port findings stay here:** when the oracle shows that unlinked C behaves differently from the ROM, the finding goes
   in `port/docs/decomp-findings.md`. You decide whether a decomp session fixes it, as ordinary decomp work.
@@ -543,7 +537,7 @@ Sessions working toward this plan follow one loop, so progress is measurable and
 | Widescreen needs scene-by-scene work | field first, following a proven design; margins filled elsewhere |
 | SDL_GPU limits and the untagged SDL_shadercross | pinned commit, offline shader compilation, sokol_gfx as fallback |
 | Gatekeeper friction without notarization (D11) | ad-hoc signed builds with "Open Anyway" instructions, and building from source documented as the first-class path |
-| Upstream churn (renames, file moves) | generated source lists and bindings, hourly merges, a ROM-verified sync at the start of every session |
+| Upstream churn (renames, file moves) | generated source lists and bindings, bounded sync PRs, ROM verification before each merge |
 
 ## 11. Decisions for you
 

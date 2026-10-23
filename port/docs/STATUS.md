@@ -26,6 +26,27 @@ level that doesn't exist yet says "not yet"; no field is left out.
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
 
+## 2026-10-22: protected main and reviewed sync proposals
+
+- **Upstream:** `fc478a9ee5`; this change imports no new decomp code.
+- **Port:** `PORT_SHA`, the contribution/sync hardening PR based on `9453d79234`.
+- **ROM:** T0 validation is required before this PR merges; the exact result is recorded by its required
+  `Frigate local verification` status. No ROM/game source changed in this PR.
+- **Host build:** both versions are required by the new exact-head verifier; the public CI gate also covers the
+  existing nine native/distribution/sanitizer jobs. Results are recorded on this PR before merge.
+- **Tests:** 11 isolated Git/shell sync fixtures pass, including preservation of port changes, conflicts, reference
+  and rewrite stops, frozen proposals, failed verification and changed remote heads. Shell syntax and both workflows'
+  actionlint/ShellCheck checks pass (actionlint's outdated Ubuntu 26.04 label inventory excluded). T2/T3/T6 run in
+  local verification; public T5 coverage remains. Optional T4 and T7 were not run for infrastructure changes.
+- **Tiers / trap stubs / 64-bit warnings:** unchanged game and native sources; no progress remeasurement.
+- **Work done:** [ADR 0018](adr/0018-protected-main-and-sync-prs.md), two live main rulesets, PR-only sync publishers,
+  explicit CI and ROM verification gates, CODEOWNERS and current contributor/maintainer procedures. The owner is the
+  sole collaborator; the only bypass is owner PR review, never required validation or history protection.
+- **Next:** merge the validated infrastructure PR and re-enable the replacement scheduled sync; future upstream
+  proposals wait for owner review. Gameplay work resumes at the field-entry blocker below.
+- **Blockers:** account-wide app/token grants could not be enumerated with the available maintainer OAuth credential.
+  No gameplay blocker was changed by this work.
+
 ## 2026-10-21: contribution-policy source traceability
 
 - **Upstream:** `fc478a9ee5`; no new sync.

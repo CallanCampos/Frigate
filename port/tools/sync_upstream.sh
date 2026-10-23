@@ -1,53 +1,13 @@
 #!/usr/bin/env bash
-# Merges the decomp's main (fuddlesworth/pokebw2) into the port's main, verifies the result with both ROMs and
-# publishes it. Port sessions run this first in every iteration (port/docs/PLAN.md, section 8, step 1). It is also the
-# fallback when the hourly port-sync Action can't finish a sync: see port/docs/SYNC.md.
-#
-# Usage: port/tools/sync_upstream.sh [options]
-#
-#   --branch NAME        the port branch to sync and publish, default main. The checkout can be on NAME or, in a
-#                        worktree, on a branch of its own: HEAD is brought up to origin/NAME and pushed to NAME.
-#   --no-build           merge only: no ROM build, no host build, and nothing pushed (an unbuilt merge is never
-#                        published)
-#   --no-push            leave the result unpublished
-#   --metrics            also run port/tools/progress/run_all.sh into build/port-metrics
-#   --abort-on-conflict  abort a conflicting merge instead of leaving it in progress
-#   --allow-rewrite      merge although upstream rewrote its history (decide first, see SYNC.md)
-#   --allow-references   merge and push although commit messages name issues, pull requests or discussions in other
-#                        repositories (the user decides first, see SYNC.md)
-#   -h, --help           show this text
-#
-# What it does:
-#   1. Goes to the top of the clone. Requires origin to be CallanCampos/Frigate (https://github.com/... or
-#      git@github.com:..., with or without .git; not the decomp or its fork CallanCampos/pokebw2). A clone made before
-#      the repository's rename on 2026-10-18 still has its old name in origin's URL, which is refused too, with the
-#      command that fixes it: git remote set-url, or git config --replace-all when origin has several URLs of that
-#      kind. Also requires upstream to be fuddlesworth/pokebw2 (added when missing), no merge in progress and no
-#      changes to tracked files. It never stashes. It sets upstream's push URL to DISABLED-port-never-pushes-upstream
-#      when it is anything else, as bootstrap_checkout.sh does, so that a push there fails while fetching still works.
-#   2. Fetches both and brings HEAD up to origin/NAME: a fast-forward, or a merge when HEAD has commits of its own,
-#      which are then published too.
-#   3. Merges upstream/main with the message "Merge upstream fuddlesworth/pokebw2@<short>" and an
-#      "Upstream-Commit: <sha>" trailer, as the Action does. A conflict stops the script with the merge in progress:
-#      resolve the files, `git add` them, `git commit --no-edit --cleanup=strip`, and run the script again. A rewrite
-#      of upstream's history (the last merged upstream commit no longer on upstream main) stops it before any merge.
-#      So does a commit that the push would add whose message names an issue, pull request or discussion in another
-#      repository (OWNER/REPO#N or its github.com URL), whatever the port repository's visibility: GitHub could show a
-#      reference from this repository on that item's timeline, without its details while the repository is private.
-#      Only the commits' short SHAs are printed.
-#      Messages with a closing keyword and a bare issue number ("fixes #3") only get a warning: on main they close
-#      the port's own issue with that number.
-#   4. Runs `python3 configure.py b2_us w2_us` and `ninja` (once more when ninja exits 139, wibo's intermittent
-#      crash). ninja checks every module and both SHA1s; the script then checks both ROM files against b2_us.sha1
-#      and w2_us.sha1 itself, so that a build with nothing to do also proves them.
-#   5. When port/CMakeLists.txt exists: configures, builds and tests the host build in build/port.
-#   6. Pushes HEAD to origin/NAME, only after steps 4 and 5 passed. When the push is refused because NAME moved,
-#      fetches, merges again, rebuilds only what the new commits change, and retries, three attempts in all. It never
-#      force-pushes.
-#   7. Prints a summary block for port/docs/STATUS.md, which names any upstream workflow files the push changes.
-#
-# Exit status: 0 done, 1 failed, 2 bad usage or an origin that isn't the port repository, 3 merge conflict, 4 upstream
-# history rewritten, 5 commit messages name issues in other repositories.
+# Merges upstream's game decomp into a bounded Frigate topic branch, checks both ROM
+# SHA1s and host tests, then opens a PR for CallanCampos review. Never pushes main.
+# Usage: port/tools/sync_upstream.sh [--branch codex/upstream-sync-NAME] [--no-build]
+#        [--no-push] [--metrics] [--abort-on-conflict] [--allow-rewrite] [--allow-references]
+# --verify-pr NUMBER verifies the checked-out exact PR head and records local verification.
+# --branch selects the topic destination (default: current sync branch or a fresh one).
+# --no-build implies --no-push; --no-push leaves the merge for local inspection.
+# Rewrite and reference overrides require the user's explicit decision (SYNC.md).
+# Exit status: 0 done, 1 failed, 2 invalid origin/destination, 3 conflict, 4 rewrite, 5 references.
 set -euo pipefail
 
 PORT_REPO=CallanCampos/Frigate
@@ -69,9 +29,10 @@ REFERENCE_URL='github\.com/[^/[:space:]]+/[^/[:space:]]+/(issues|pull|discussion
 # A closing keyword with an issue of the same repository ("fixes #3", "Closes: GH-3")
 CLOSING='(^|[^[:alnum:]_])(close[sd]?|fix(e[sd])?|resolve[sd]?):?[[:space:]]+(#|GH-)[0-9]+'
 
-branch=main
+branch=""
 build=1
 push=1
+verify_pr=""
 metrics=0
 abort_on_conflict=0
 allow_rewrite=0
@@ -103,6 +64,13 @@ while [ $# -gt 0 ]; do
             branch=${1#--branch=}
             shift
             ;;
+        --verify-pr)
+            [ $# -ge 2 ] || die 2 "--verify-pr needs a PR number"
+            verify_pr=$2
+            case "$verify_pr" in '' | *[!0-9]*) die 2 "invalid PR number" ;; esac
+            push=0
+            shift 2
+            ;;
         --no-build) build=0; push=0; shift ;;
         --no-push) push=0; shift ;;
         --metrics) metrics=1; shift ;;
@@ -113,12 +81,16 @@ while [ $# -gt 0 ]; do
         *) usage >&2; die 2 "unknown option: $1" ;;
     esac
 done
-[ -n "$branch" ] || die 2 "--branch needs a branch name"
+if [ -n "$branch" ]; then
+    case "$branch" in codex/upstream-sync-*) ;; *) die 2 "destination must start with codex/upstream-sync-; main is forbidden" ;; esac
+    git check-ref-format --branch "$branch" >/dev/null || die 2 "invalid topic branch"
+fi
 
+[ -z "$verify_pr" ] || [ "$build" = 1 ] || die 2 "--verify-pr requires builds"
 root=$(git rev-parse --show-toplevel 2>/dev/null) || die 1 "run this inside the port clone"
 cd "$root"
 
-origin_ref=refs/remotes/origin/$branch
+origin_ref=refs/remotes/origin/main
 upstream_ref=refs/remotes/upstream/$UPSTREAM_BRANCH
 
 is_upstream_url() {
@@ -194,8 +166,7 @@ check_origin_url() {
 
 # Every URL configured for origin, for fetching and pushing, must be the port repository: the reference check below
 # asks GitHub about that repository, and a push anywhere else (the decomp, or the fork CallanCampos/pokebw2, which is in
-# upstream's fork network) would publish the port there. The URLs are checked as configured; url.*.insteadOf
-# rewrites in the git configuration are not looked at.
+# upstream's fork network) would publish the port there. Effective URLs are checked too, after Git URL rewrites.
 git config --get remote.origin.url >/dev/null 2>&1 ||
     die 2 "there is no origin remote; it must be $PORT_REPO (https://github.com/$PORT_REPO.git)"
 for origin_key in url pushurl; do
@@ -208,9 +179,13 @@ for origin_key in url pushurl; do
 $origin_urls
 EOF
 done
+# Validate effective destinations too: insteadOf/pushInsteadOf must not redirect publication.
+for origin_url in $(git remote get-url --all origin) $(git remote get-url --push --all origin); do
+    is_port_url "$origin_url" || die 2 "effective origin URL is not the canonical port: $origin_url"
+done
 if upstream_urls=$(git remote get-url --all upstream 2>/dev/null); then
     while IFS= read -r upstream_url; do
-        is_upstream_url "$upstream_url" || die 1 "the upstream remote is $upstream_url, not $UPSTREAM_REPO"
+        is_github_url "$upstream_url" "$UPSTREAM_REPO" || die 1 "the upstream remote is $upstream_url, not $UPSTREAM_REPO"
     done <<EOF
 $upstream_urls
 EOF
@@ -228,11 +203,24 @@ if git rev-parse -q --verify MERGE_HEAD >/dev/null; then
     die 1 "a merge is in progress. Resolve it and run 'git commit --no-edit --cleanup=strip' (or" \
         "'git merge --abort'), then run this again."
 fi
-if ! git diff --quiet || ! git diff --cached --quiet; then
+if ! git diff --quiet || ! git diff --cached --quiet || [ -n "$(git ls-files --others --exclude-standard)" ]; then
     die 1 "tracked files have changes. Commit them or set them aside first (not with a bare git stash: the stash" \
         "is shared with other sessions)."
 fi
 current=$(git symbolic-ref --quiet --short HEAD) || die 1 "HEAD is detached; check out a branch first"
+if [ -z "$branch" ]; then
+    case "$current" in
+        codex/upstream-sync-*) branch=$current ;;
+        *) branch=codex/upstream-sync-$(date -u +%Y%m%d%H%M%S)-$(git rev-parse --short HEAD) ;;
+    esac
+fi
+# Freeze the publishing helper before incoming commits can change its contents.
+publish_helper=$(mktemp "${TMPDIR:-/tmp}/frigate-sync.XXXXXX")
+cp port/tools/upstream_sync.py "$publish_helper"
+if [ -z "$verify_pr" ] && [ "$current" != "$branch" ]; then
+    git checkout -b "$branch" || die 2 "topic exists; check it out explicitly first"
+    current=$branch
+fi
 
 # Results for the summary, printed on exit
 sync_date=$(date '+%Y-%m-%d')
@@ -298,7 +286,7 @@ trap summary EXIT
 # --- 2 and 3. Merges -------------------------------------------------------------------------------------------------
 
 fetch_all() {
-    git fetch --no-tags origin "+refs/heads/$branch:$origin_ref" || die 1 "could not fetch $branch from origin"
+    git fetch --no-tags origin "+refs/heads/main:$origin_ref" || die 1 "could not fetch $branch from origin"
     git fetch --no-tags upstream "+refs/heads/$UPSTREAM_BRANCH:$upstream_ref" ||
         die 1 "could not fetch $UPSTREAM_BRANCH from upstream"
 }
@@ -343,13 +331,7 @@ update_from_origin() {
 # The upstream commit that the newest sync merge recorded in its Upstream-Commit trailer, or the merge base when no
 # sync merge has one yet
 last_upstream() {
-    local message sha
-    message=$(git log --merges -E --grep='^Upstream-Commit: [0-9a-f]{40}$' -n 1 --format=%B HEAD)
-    sha=$(printf '%s\n' "$message" | sed -n 's/^Upstream-Commit: \([0-9a-f]\{40\}\)$/\1/p' | tail -n 1)
-    if [ -z "$sha" ]; then
-        sha=$(git merge-base HEAD "$upstream_ref")
-    fi
-    printf '%s\n' "$sha"
+    "$PYTHON" "$publish_helper" --last-upstream "$upstream_ref"
 }
 
 own_merge=""
@@ -423,7 +405,14 @@ merge_upstream() {
     merged_count=$((merged_count + count))
 }
 
-say "Fetching origin/$branch and upstream/$UPSTREAM_BRANCH"
+verified_head=$(git rev-parse HEAD)
+if [ -n "$verify_pr" ]; then
+    pr_head=$(gh pr view "$verify_pr" --repo "$PORT_REPO" --json headRefOid --jq .headRefOid)
+    [ "$pr_head" = "$verified_head" ] || die 1 "check out the exact PR head before verification"
+    gh api --method POST "repos/$PORT_REPO/statuses/$verified_head" -f state=pending \
+        -f 'context=Frigate local verification' -f 'description=Local ROM and host verification running'
+else
+say "Fetching origin/main and upstream/$UPSTREAM_BRANCH"
 fetch_all
 summary_ready=1
 if [ "$current" != "$branch" ]; then
@@ -436,6 +425,9 @@ if [ "$local_commits" -gt 0 ]; then
     say "$local_commits commits are not on origin/$branch yet:"
     git log --oneline --first-parent -n 20 "$origin_ref..HEAD"
 fi
+
+fi
+verified_head=$(git rev-parse HEAD)
 
 # --- 4 and 5. Builds -------------------------------------------------------------------------------------------------
 
@@ -520,26 +512,23 @@ rom_build() {
 
 host_built=""
 host_build() {
-    if [ ! -f port/CMakeLists.txt ]; then
-        host_result="not yet (no port/CMakeLists.txt)"
-        tests_result="not yet"
-        return 0
-    fi
-    command -v cmake >/dev/null 2>&1 || die 1 "port/CMakeLists.txt exists but cmake is not installed"
+    local version directory
+    [ -f port/CMakeLists.txt ] || die 1 "host verification requires port/CMakeLists.txt"
+    command -v cmake >/dev/null 2>&1 || die 1 "cmake is not installed"
     host_result="FAILED"
-    say "Host build in build/port"
-    # A new build directory uses Ninja, which the ROM build needs anyway, so that the asm oracle can read its flags; an
-    # existing one keeps its generator, which CMake won't change
-    if [ -f build/port/CMakeCache.txt ]; then
-        cmake -S port -B build/port || die 1 "cmake could not configure port/"
-    else
-        cmake -S port -B build/port -G Ninja || die 1 "cmake could not configure port/"
-    fi
-    cmake --build build/port --parallel || die 1 "the host build failed"
-    host_result="built (build/port)"
     tests_result="FAILED"
-    ctest --test-dir build/port --output-on-failure || die 1 "host tests failed"
-    tests_result="passed"
+    for version in b2_us w2_us; do
+        directory=build/port-verify-$version
+        say "Host verification for $version in $directory"
+        # Fresh canonical cache prevents local report-only/recovery overrides from weakening gates.
+        cmake --fresh -S port -B "$directory" -G Ninja \
+            -DCMAKE_BUILD_TYPE=RelWithDebInfo -DPORT_VERSION="$version" \
+            -DPORT_SANITIZE_RECOVER=OFF -DPORT_FRAME_TIME_REPORT_ONLY=OFF || die 1 "host configure failed: $version"
+        cmake --build "$directory" --parallel || die 1 "host build failed: $version"
+        ctest --test-dir "$directory" --output-on-failure --no-tests=error || die 1 "host tests failed: $version"
+    done
+    host_result="built b2_us and w2_us (build/port-verify-*)"
+    tests_result="passed for b2_us and w2_us"
     host_built=$(git rev-parse 'HEAD^{tree}')
 }
 
@@ -548,62 +537,29 @@ if [ "$build" = 1 ]; then
     host_build
 fi
 
-# --- 6. Push ---------------------------------------------------------------------------------------------------------
-
-# The upstream workflow files that the push would change. A new one is enabled in the port repository once pushed, and
-# one that needs upstream's secrets then fails there on every push.
-note_workflow_changes() {
-    workflow_changes=$(git diff --name-only "$origin_ref" HEAD -- .github/workflows \
-        ':(exclude).github/workflows/port-*' | paste -sd ' ' -)
-}
-note_workflow_changes
-
-# After a refused push: brings in what origin/NAME and upstream gained since. When the only unpublished commit is the
-# sync merge made above, it is dropped and made again on the new origin/NAME, which keeps one merge per sync.
-resync() {
-    if [ -n "$own_merge" ] && [ "$(git rev-parse HEAD)" = "$own_merge" ] &&
-        git merge-base --is-ancestor "$own_merge_parent" "$origin_ref"; then
-        git reset --quiet --keep "$origin_ref"
-        own_merge=""
-        merged_count=0
-    else
-        update_from_origin
-    fi
-    merge_upstream
-    if [ "$build" = 1 ]; then
-        if [ "$(rom_fingerprint)" != "$rom_built" ]; then
-            rom_build
-        fi
-        if [ -f port/CMakeLists.txt ] && [ "$(git rev-parse 'HEAD^{tree}')" != "$host_built" ]; then
-            host_build
-        fi
-    fi
-}
-
-if [ "$push" = 1 ]; then
-    if [ "$(git rev-parse HEAD)" = "$(git rev-parse "$origin_ref")" ]; then
-        push_result="nothing new to push"
-    else
-        attempt=1
-        while :; do
-            refused_at=$(git rev-parse "$origin_ref")
-            if git push origin "HEAD:$branch"; then
-                push_result="pushed to origin/$branch"
-                break
-            fi
-            [ "$attempt" -lt 3 ] || die 1 "origin/$branch kept moving; gave up after 3 attempts"
-            attempt=$((attempt + 1))
-            fetch_all
-            if [ "$(git rev-parse "$origin_ref")" = "$refused_at" ]; then
-                push_result="FAILED"
-                die 1 "the push was refused although origin/$branch didn't move; git's message is above"
-            fi
-            say "origin/$branch moved; merging again (attempt $attempt of 3)"
-            resync
-            note_workflow_changes
-        done
-    fi
+# --- 6. Publish only the exact verified topic head, then request review --------
+[ "$(git rev-parse HEAD)" = "$verified_head" ] || die 1 "HEAD changed during verification"
+if [ -n "$verify_pr" ]; then
+    git diff --quiet && git diff --cached --quiet && [ -z "$(git ls-files --others --exclude-standard)" ] || die 1 "build changed source files"
+    pr_head=$(gh pr view "$verify_pr" --repo "$PORT_REPO" --json headRefOid --jq .headRefOid)
+    [ "$pr_head" = "$verified_head" ] || die 1 "PR head changed during verification; rerun on new head"
+    gh api --method POST "repos/$PORT_REPO/statuses/$verified_head" -f state=success \
+        -f 'context=Frigate local verification' \
+        -f 'description=Both ROM SHA1s and host build/tests verified locally'
+    rm -f "$publish_helper"
+    exit 0
 fi
+workflow_changes=$(git diff --name-only "$origin_ref" HEAD -- .github/workflows | paste -sd ' ' -)
+if [ "$push" = 1 ]; then
+    git diff --quiet && git diff --cached --quiet && [ -z "$(git ls-files --others --exclude-standard)" ] || die 1 "build changed source files; refusing publication"
+    "$PYTHON" "$publish_helper" --publish "$branch" || die 1 "topic publication/PR failed"
+    [ "$(git rev-parse HEAD)" = "$verified_head" ] || die 1 "HEAD changed during publication"
+    gh api --method POST "repos/$PORT_REPO/statuses/$verified_head" -f state=success \
+        -f 'context=Frigate local verification' \
+        -f 'description=Both ROM SHA1s and host build/tests verified locally'
+    push_result="topic PR published for review: $branch"
+fi
+rm -f "$publish_helper"
 
 # --- Metrics ---------------------------------------------------------------------------------------------------------
 
