@@ -397,8 +397,14 @@ u32 NNS_FndGetAllocatableSizeForExpHeapEx(NNSFndHeapHandle heap, int alignment) 
     bestSkip = 0xFFFFFFFF;
     for (block = GetExpHeapHeadPtrFromHandle(heap)->mbFreeList.head; block != NULL; block = block->pMBHeadNext) {
         void *data = GetMemPtrForMBlock(block);
+#ifdef PLATFORM_PC
+        // A free block can cross a 4 GiB address boundary; compare its native addresses before taking byte counts.
+        uptr aligned = (NNSiGetUIntPtr(data) + (alignment - 1)) & ~(alignment - 1);
+        uptr end = NNSiGetUIntPtr(data) + block->blockSize;
+#else
         u32 aligned = (NNSiGetUIntPtr(data) + (alignment - 1)) & ~(alignment - 1);
         u32 end = NNSiGetUIntPtr(data) + block->blockSize;
+#endif
 
         if (aligned < end) {
             u32 room = end - aligned;
