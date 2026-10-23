@@ -658,6 +658,13 @@ Same instructions, registers swapped.
   A pool word that differs between the versions by a table row is a table indexed by the version:
   `sUnk7db4[VERSION_BLACK2 - GAME_VERSION][value]` in the same file folds to the table's address in Black 2 and
   to the address + 0x10 in White 2. Check the pool words of both versions before linking a file.
+- MWCC's back end, not its optimizer, shares a constant that several register operands use within an extended basic
+  block (a run of blocks after the first with one predecessor each). A call's argument, a stored value and a
+  multiply's operand all count, of any integer type; an immediate operand (`adds #12`, `cmp #12`) does not. A label
+  with two or more predecessors starts a new block, and no optimizer pragma short of `optimization_level 0` stops
+  the sharing. `scrcmd_msg.c`'s `ActorMsgWin_CalcAttachmentOffsetDynamic` keeps its divisor 12 in `r6` across
+  `_u32_div_f` for the table's 12-byte stride, where the original builds it twice. Only a variable MWCC doesn't
+  propagate into, an enum-typed local set before the calls, gives the original's code.
 - Whether a zero stored to two fields keeps a saved register can depend on whether the two stores are adjacent.
   `plist_sys.c`'s `PokeList_DoMenuItem` builds its zero with the max HP call's `NULL` (`movs r2, #0; movs r7, #0`)
   and stores `r7` for `wk->pkm = NULL` and `wk->showShortcutButtons = FALSE`, spilling the max HP to `sp+4`, only
@@ -2332,7 +2339,11 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   stores, and ahead of them with `int index` (or `u32`), which matches once the stores are in the original's order.
 
 - A store written before a read through a `const` pointer parameter can move above another store; dropping the
-  `const` keeps the source order (app_taskmenu.c's `AppTaskMenu_Create`).
+  `const` keeps the source order (app_taskmenu.c's `AppTaskMenu_Create`). `field_rail.c`'s `RailUnit_SetDataCore`
+  loads `data->tileWidth` before building `onLine`'s value, as the original does, only from
+  `unit->handle = data; unit->onLine = RAIL_COMPONENT_NONE; unit->tileWidth = data->tileWidth;` with
+  `const RailDataHandle *data`. Four of the file's readers of the same data need the `const` to match. Neither
+  the `const` nor the order alone gives it: 6 and 14 bytes off.
 - A range test `subs; subs; cmp; bhi` is an unsigned difference in the source, `x - left <= right - left` on `u32`
   values; MWCC doesn't fold `x >= left && x <= right` into it (`AppTaskMenuWin_IsTouched`).
 - Two range tests joined by a bitwise `&` each build a 0/1 (`cmp; bhs; movs rN, #1; b; movs rN, #0`) and combine them

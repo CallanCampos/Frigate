@@ -600,7 +600,7 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 | `scrcmd_pokemon_misc.c` | `0x021aedf4`–`0x021afa2c` | 27 | complete | descriptive |
 | `scrcmd_pokemon_fld.c` | `0x021afa2c`–`0x021afcd4` | 4 | complete | string at `0x021d5218` |
 | `scrcmd_misc.c` | `0x021afcd4`–`0x021b0228` | 16 | complete | descriptive |
-| `field_rail.c` | `0x021b0228`–`0x021b2404` | 107 | partial | string at `0x021d5238` |
+| `field_rail.c` | `0x021b0228`–`0x021b2404` | 107 | complete | string at `0x021d5238` |
 | `field_rail_func.c` | `0x021b2404`–`0x021b3a3c` | 30 | complete | descriptive |
 | `rail_attr.c` | `0x021b3a3c`–`0x021b3bac` | 13 | complete | string at `0x021d525c` |
 | `field_nogrid_mapper.c` | `0x021b3bac`–`0x021b3e50` | 18 | complete | string at `0x021d5268` |

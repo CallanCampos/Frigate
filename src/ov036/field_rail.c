@@ -15,26 +15,26 @@
 #include "nitro/mi.h"
 
 static BOOL func_ov036_021b09fc(RailUnit *unit);
-static RailLine *GetLineContinueInDirection(const RailPoint *point, u32 dir, RailDataHandle *data,
+static RailLine *GetLineContinueInDirection(const RailPoint *point, u32 dir, const RailDataHandle *data,
                                             RailDisabledLines *disabled, BOOL checkDisabled);
 static u32 RailUnit_TryEnterLine(RailUnit *unit, RailLine *line, u32 dir, s32 front, s32 side, s32 length, s32 width);
 static void RailUnit_SetLineInfo(RailUnit *unit, RailLine *line, u32 dir, s32 front, s32 side, s32 length, s32 width);
-static BOOL RailLine_IsPointA(RailDataHandle *data, RailLine *line, RailPoint *point);
-static BOOL RailLine_IsPointB(RailDataHandle *data, RailLine *line, RailPoint *point);
-static void SetupLineWidthForLineChange(RailDataHandle *data, const RailLine *line, s32 *outNext, s32 *outCur,
+static BOOL RailLine_IsPointA(const RailDataHandle *data, RailLine *line, RailPoint *point);
+static BOOL RailLine_IsPointB(const RailDataHandle *data, RailLine *line, RailPoint *point);
+static void SetupLineWidthForLineChange(const RailDataHandle *data, const RailLine *line, s32 *outNext, s32 *outCur,
                                         RailDisabledLines *disabled, fx32 tileWidth);
 static void RailDataHandle_Clear(RailDataHandle *data);
 static void RailDataHandle_Copy(RailDataHandle *data, RailDataHandle *src);
-static RailPoint *GetRailPoint(RailDataHandle *data, u32 id);
-static RailLine *GetRailLine(RailDataHandle *data, u32 id);
-static RailCamera *GetRailCamera(RailDataHandle *data, u32 id);
-static RailCurve *GetRailCurve(RailDataHandle *data, u32 id);
-static RailCameraFunc GetRailCameraCurveFunc(RailDataHandle *data, u32 id);
-static RailToWorldFunc GetHandler1CurveFunc(RailDataHandle *data, u32 id);
-static WorldToRailFunc GetHandler2CurveFunc(RailDataHandle *data, u32 id);
+static RailPoint *GetRailPoint(const RailDataHandle *data, u32 id);
+static RailLine *GetRailLine(const RailDataHandle *data, u32 id);
+static RailCamera *GetRailCamera(const RailDataHandle *data, u32 id);
+static RailCurve *GetRailCurve(const RailDataHandle *data, u32 id);
+static RailCameraFunc GetRailCameraCurveFunc(const RailDataHandle *data, u32 id);
+static RailToWorldFunc GetHandler1CurveFunc(const RailDataHandle *data, u32 id);
+static WorldToRailFunc GetHandler2CurveFunc(const RailDataHandle *data, u32 id);
 static u32 RailUnit_MoveOnLine(RailUnit *unit, u32 dir, s32 step);
-static void RailUnit_SetDataCore(RailUnit *unit, RailDataHandle *data, FieldRailSystem *rail);
-static void RailUnit_SetData(RailUnit *unit, RailDataHandle *data);
+static void RailUnit_SetDataCore(RailUnit *unit, const RailDataHandle *data, FieldRailSystem *rail);
+static void RailUnit_SetData(RailUnit *unit, const RailDataHandle *data);
 static u32 RailUnit_GetState(RailUnit *unit);
 static BOOL func_ov036_021b1b60(RailUnit *unit);
 static RailCamera *GetRailCameraByHandlerImpl(RailUnit *unit);
@@ -52,17 +52,17 @@ static void RailDisabledLines_Add(RailDisabledLines *disabled, u16 lineId);
 static void RailDisabledLines_Remove(RailDisabledLines *disabled, u16 lineId);
 static BOOL RailDisabledLines_Contains(RailDisabledLines *disabled, u16 lineId);
 static BOOL RailDisabledLines_ContainsLine(RailDisabledLines *disabled, RailLine *line, const RailDataHandle *data);
-static RailLine *GetRailLineIfEnabled(RailDisabledLines *disabled, RailDataHandle *data, u32 lineId);
+static RailLine *GetRailLineIfEnabled(RailDisabledLines *disabled, const RailDataHandle *data, u32 lineId);
 static void RailUnit_ApplyLineStep(RailDisabledLines *disabled, RailUnit *unit, s32 frontStep, s32 sideStep, u32 dir);
 static BOOL RailDisabledLines_AllowsPosition(RailDisabledLines *disabled, RailLine *line, s32 front, s32 side,
-                                             RailDataHandle *data, fx32 tileWidth);
-static u32 RailPoint_GetLineDirection(RailPoint *point, RailLine *line, RailDataHandle *data);
-static BOOL RailLine_CheckEndpointDirections(RailLine *line, RailDataHandle *data);
-static BOOL RailPoint_CheckConnections(RailPoint *point, RailDataHandle *data);
+                                             const RailDataHandle *data, fx32 tileWidth);
+static u32 RailPoint_GetLineDirection(RailPoint *point, RailLine *line, const RailDataHandle *data);
+static BOOL RailLine_CheckEndpointDirections(RailLine *line, const RailDataHandle *data);
+static BOOL RailPoint_CheckConnections(RailPoint *point, const RailDataHandle *data);
 static void func_ov036_021b211c(const char *prefix, VecFx32 *pos, const char *suffix);
 static void func_ov036_021b2120(const char *prefix, RailPoint *point, const char *suffix);
 static void func_ov036_021b2130(RailUnit *unit);
-static int func_ov036_021b2184(RailDataHandle *data, RailPoint *point);
+static int func_ov036_021b2184(const RailDataHandle *data, RailPoint *point);
 static int func_ov036_021b21b0(const RailDataHandle *data, RailLine *line);
 static BOOL func_ov036_021b21dc(const VecFx32 *a, const VecFx32 *b, const VecFx32 *p3, const VecFx32 *p4,
                                 const VecFx32 *p5, VecFx32 *out);
@@ -754,7 +754,7 @@ void func_ov036_021b0e38(RailUnit *unit, u16 a1, u16 a2, u16 a3) {
     unit->prevCalcPos = unit->calcPos;
 }
 
-static RailLine *GetLineContinueInDirection(const RailPoint *point, u32 dir, RailDataHandle *data,
+static RailLine *GetLineContinueInDirection(const RailPoint *point, u32 dir, const RailDataHandle *data,
                                             RailDisabledLines *disabled, BOOL checkDisabled) {
     s32 i;
 
@@ -826,21 +826,21 @@ static void RailUnit_SetLineInfo(RailUnit *unit, RailLine *line, u32 dir, s32 fr
     unit->width = width;
 }
 
-static BOOL RailLine_IsPointA(RailDataHandle *data, RailLine *line, RailPoint *point) {
+static BOOL RailLine_IsPointA(const RailDataHandle *data, RailLine *line, RailPoint *point) {
     if (GetRailPoint(data, line->pointA) == point) {
         return TRUE;
     }
     return FALSE;
 }
 
-static BOOL RailLine_IsPointB(RailDataHandle *data, RailLine *line, RailPoint *point) {
+static BOOL RailLine_IsPointB(const RailDataHandle *data, RailLine *line, RailPoint *point) {
     if (GetRailPoint(data, line->pointB) == point) {
         return TRUE;
     }
     return FALSE;
 }
 
-static void SetupLineWidthForLineChange(RailDataHandle *data, const RailLine *line, s32 *outNext, s32 *outCur,
+static void SetupLineWidthForLineChange(const RailDataHandle *data, const RailLine *line, s32 *outNext, s32 *outCur,
                                         RailDisabledLines *disabled, fx32 tileWidth) {
     RailPoint *point;
     s32 nextWidth;
@@ -901,7 +901,7 @@ static void RailDataHandle_Copy(RailDataHandle *data, RailDataHandle *src) {
     MI_CpuCopy8(src, data, sizeof(RailDataHandle));
 }
 
-static RailPoint *GetRailPoint(RailDataHandle *data, u32 id) {
+static RailPoint *GetRailPoint(const RailDataHandle *data, u32 id) {
     if (data->pointCount > id) {
         return &data->points[id];
     }
@@ -911,7 +911,7 @@ static RailPoint *GetRailPoint(RailDataHandle *data, u32 id) {
     return data->points;
 }
 
-static RailLine *GetRailLine(RailDataHandle *data, u32 id) {
+static RailLine *GetRailLine(const RailDataHandle *data, u32 id) {
     if (data->lineCount > id) {
         return &data->lines[id];
     }
@@ -923,7 +923,7 @@ static RailLine *GetRailLine(RailDataHandle *data, u32 id) {
 
 static const RailCamera DEFAULT_RAIL_CAMERA = { RAIL_ID_NONE };
 
-static RailCamera *GetRailCamera(RailDataHandle *data, u32 id) {
+static RailCamera *GetRailCamera(const RailDataHandle *data, u32 id) {
     if (data->cameraCount > id) {
         return &data->cameras[id];
     }
@@ -935,7 +935,7 @@ static RailCamera *GetRailCamera(RailDataHandle *data, u32 id) {
 
 static const RailCurve DEFAULT_RAIL_CURVE = { RAIL_ID_NONE, { 0xff, 0, 0 } };
 
-static RailCurve *GetRailCurve(RailDataHandle *data, u32 id) {
+static RailCurve *GetRailCurve(const RailDataHandle *data, u32 id) {
     if (data->curveCount > id) {
         return &data->curves[id];
     }
@@ -945,7 +945,7 @@ static RailCurve *GetRailCurve(RailDataHandle *data, u32 id) {
     return (RailCurve *)&DEFAULT_RAIL_CURVE;
 }
 
-static RailCameraFunc GetRailCameraCurveFunc(RailDataHandle *data, u32 id) {
+static RailCameraFunc GetRailCameraCurveFunc(const RailDataHandle *data, u32 id) {
     if (data->camFuncCount > id) {
         return data->camFuncs[id];
     }
@@ -955,7 +955,7 @@ static RailCameraFunc GetRailCameraCurveFunc(RailDataHandle *data, u32 id) {
     return data->camFuncs[0];
 }
 
-static RailToWorldFunc GetHandler1CurveFunc(RailDataHandle *data, u32 id) {
+static RailToWorldFunc GetHandler1CurveFunc(const RailDataHandle *data, u32 id) {
     if (data->railToWorldCount > id) {
         return data->railToWorldFuncs[id];
     }
@@ -965,7 +965,7 @@ static RailToWorldFunc GetHandler1CurveFunc(RailDataHandle *data, u32 id) {
     return data->railToWorldFuncs[0];
 }
 
-static WorldToRailFunc GetHandler2CurveFunc(RailDataHandle *data, u32 id) {
+static WorldToRailFunc GetHandler2CurveFunc(const RailDataHandle *data, u32 id) {
     if (data->worldToRailCount > id) {
         return data->worldToRailFuncs[id];
     }
@@ -1274,10 +1274,10 @@ static u32 RailUnit_MoveOnLine(RailUnit *unit, u32 dir, s32 step) {
     return RAIL_DIR_NONE;
 }
 
-static void RailUnit_SetDataCore(RailUnit *unit, RailDataHandle *data, FieldRailSystem *rail) {
+static void RailUnit_SetDataCore(RailUnit *unit, const RailDataHandle *data, FieldRailSystem *rail) {
     unit->handle = data;
-    unit->tileWidth = data->tileWidth;
     unit->onLine = RAIL_COMPONENT_NONE;
+    unit->tileWidth = data->tileWidth;
     unit->lastMoveSpeedIndex = RAIL_SPEED_1;
     unit->direction = RAIL_DIR_NONE;
     unit->movePending = 0;
@@ -1291,7 +1291,7 @@ static void RailUnit_SetDataCore(RailUnit *unit, RailDataHandle *data, FieldRail
     unit->positionInitialized = 0;
 }
 
-static void RailUnit_SetData(RailUnit *unit, RailDataHandle *data) {
+static void RailUnit_SetData(RailUnit *unit, const RailDataHandle *data) {
     RailUnit_SetDataCore(unit, data, unit->rail);
 }
 
@@ -1514,7 +1514,7 @@ static BOOL RailDisabledLines_ContainsLine(RailDisabledLines *disabled, RailLine
     return RailDisabledLines_Contains(disabled, index);
 }
 
-static RailLine *GetRailLineIfEnabled(RailDisabledLines *disabled, RailDataHandle *data, u32 lineId) {
+static RailLine *GetRailLineIfEnabled(RailDisabledLines *disabled, const RailDataHandle *data, u32 lineId) {
     if (RailDisabledLines_Contains(disabled, lineId) == 0) {
         return GetRailLine(data, lineId);
     } else {
@@ -1557,7 +1557,7 @@ static void RailUnit_ApplyLineStep(RailDisabledLines *disabled, RailUnit *unit, 
 
 // Only disabled lines impose these junction bounds; enabled lines pass this check.
 static BOOL RailDisabledLines_AllowsPosition(RailDisabledLines *disabled, RailLine *line, s32 front, s32 side,
-                                             RailDataHandle *data, fx32 tileWidth) {
+                                             const RailDataHandle *data, fx32 tileWidth) {
     s32 nextWidth;
     s32 curWidth;
 
@@ -1571,7 +1571,7 @@ static BOOL RailDisabledLines_AllowsPosition(RailDisabledLines *disabled, RailLi
     return TRUE;
 }
 
-static u32 RailPoint_GetLineDirection(RailPoint *point, RailLine *line, RailDataHandle *data) {
+static u32 RailPoint_GetLineDirection(RailPoint *point, RailLine *line, const RailDataHandle *data) {
     int i;
 
     for (i = 0; i < RAIL_POINT_LINE_MAX; i++) {
@@ -1582,7 +1582,7 @@ static u32 RailPoint_GetLineDirection(RailPoint *point, RailLine *line, RailData
     return RAIL_DIR_NONE;
 }
 
-static BOOL RailLine_CheckEndpointDirections(RailLine *line, RailDataHandle *data) {
+static BOOL RailLine_CheckEndpointDirections(RailLine *line, const RailDataHandle *data) {
     RailPoint *pointA;
     RailPoint *pointB;
     u32 dirA;
@@ -1610,7 +1610,7 @@ static BOOL RailLine_CheckEndpointDirections(RailLine *line, RailDataHandle *dat
     return FALSE;
 }
 
-static BOOL RailPoint_CheckConnections(RailPoint *point, RailDataHandle *data) {
+static BOOL RailPoint_CheckConnections(RailPoint *point, const RailDataHandle *data) {
     s32 i;
 
     for (i = 0; i < RAIL_POINT_LINE_MAX; i++) {
@@ -1660,7 +1660,7 @@ static void func_ov036_021b2130(RailUnit *unit) {
     }
 }
 
-static int func_ov036_021b2184(RailDataHandle *data, RailPoint *point) {
+static int func_ov036_021b2184(const RailDataHandle *data, RailPoint *point) {
     int i;
 
     for (i = 0; i < data->pointCount; i++) {

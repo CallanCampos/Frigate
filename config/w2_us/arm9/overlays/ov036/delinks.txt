@@ -491,6 +491,7 @@ src/ov036/scrcmd_pokemon_fld.c:
     .data       start:0x021d5258 end:0x021d5270
 
 src/ov036/field_rail.c:
+    complete
     .text       start:0x021b0260 end:0x021b243c
     .rodata     start:0x021d0fcc end:0x021d1020
     .data       start:0x021d5270 end:0x021d529c
