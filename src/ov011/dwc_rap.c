@@ -694,85 +694,92 @@ static u32 DWCRap_HandleError(void) {
     int code;
     DWCErrorType type;
     DWCError error;
-    u32 result = 0;
+    u32 result;
+    u32 errorResult = 0;
 
     error = DWC_GetLastErrorEx(&code, &type);
-    if (error != 0) {
-        if (_dWork->eventFunc != NULL && _dWork->eventFunc(_dWork->eventWork, code, type, error) == 1) {
-            return 0;
+    // With no error, the result is set in the GameSpy shutdown's block of the switch, as BW1's version (another
+    // decomp) jumps to it
+    if (error == 0) {
+        goto noError;
+    }
+    if (_dWork->eventFunc != NULL && _dWork->eventFunc(_dWork->eventWork, code, type, error) == 1) {
+        return errorResult;
+    }
+    if (_dWork->errorFunc != NULL) {
+        _dWork->errorFunc(_dWork->errorWork, code, type, error);
+    }
+    errorResult = code;
+    if (code == 0 || type == DWC_ETYPE_LIGHT) {
+        errorResult = error;
+    }
+    result = errorResult;
+    switch (type) {
+    case DWC_ETYPE_LIGHT:
+        DWC_ClearError();
+        if (_dWork != NULL && _dWork->state == DWCRAP_STATE_ERROR) {
+            DWCRap_SetState(DWCRAP_STATE_READY);
         }
-        if (_dWork->errorFunc != NULL) {
-            _dWork->errorFunc(_dWork->errorWork, code, type, error);
+        break;
+    case DWC_ETYPE_SHOW_ERROR:
+        if (code <= -40000 && code >= -41999) {
+            Gdb_Shutdown();
         }
-        result = code;
-        if (code == 0 || type == DWC_ETYPE_LIGHT) {
-            result = error;
+        if (_dWork != NULL && _dWork->state == DWCRAP_STATE_ERROR) {
+            DWCRap_SetState(DWCRAP_STATE_READY);
         }
-        switch (type) {
-        case DWC_ETYPE_LIGHT:
-            DWC_ClearError();
-            if (_dWork != NULL && _dWork->state == DWCRAP_STATE_ERROR) {
-                DWCRap_SetState(DWCRAP_STATE_READY);
-            }
-            break;
-        case DWC_ETYPE_SHOW_ERROR:
-            if (code <= -40000 && code >= -41999) {
-                Gdb_Shutdown();
-            }
-            if (_dWork != NULL && _dWork->state == DWCRAP_STATE_ERROR) {
-                DWCRap_SetState(DWCRAP_STATE_READY);
-            }
-            break;
-        case DWC_ETYPE_SHUTDOWN_GHTTP:
-            if (code <= -40000 && code >= -41999) {
-                Gdb_Shutdown();
-            }
-            break;
-        case DWC_ETYPE_SHUTDOWN_ND:
-            DWC_NdCleanupAsync();
-            break;
-        case DWC_ETYPE_SHUTDOWN_FM:
-        case DWC_ETYPE_DISCONNECT:
-            if (_dWork != NULL) {
-                switch (_dWork->state) {
-                case DWCRAP_STATE_LOGIN:
-                case DWCRAP_STATE_READY:
-                case DWCRAP_STATE_MATCHING:
-                case DWCRAP_STATE_MATCH_CANCEL:
-                case DWCRAP_STATE_CONNECTED:
-                case DWCRAP_STATE_CONNECTED_IDLE:
-                case DWCRAP_STATE_MATCH_ENDED:
-                case DWCRAP_STATE_ERROR:
-                case DWCRAP_STATE_CLOSED:
-                case DWCRAP_STATE_ENDING:
-                case DWCRAP_STATE_ENDED:
-                    if (_dWork->friendsMatchActive == 1) {
-                        DWC_ShutdownFriendsMatch();
-                        _dWork->friendsMatchActive = 0;
-                    }
-                    // fall through
-                case DWCRAP_STATE_INIT:
-                case DWCRAP_STATE_INET:
-                case DWCRAP_STATE_LOGIN_WAIT:
-                    DWC_CleanupInet();
-                    break;
-                default:
-                    break;
+        break;
+    case DWC_ETYPE_SHUTDOWN_GHTTP:
+        if (code <= -40000 && code >= -41999) {
+            Gdb_Shutdown();
+        noError:
+            result = errorResult;
+        }
+        break;
+    case DWC_ETYPE_SHUTDOWN_ND:
+        DWC_NdCleanupAsync();
+        break;
+    case DWC_ETYPE_SHUTDOWN_FM:
+    case DWC_ETYPE_DISCONNECT:
+        if (_dWork != NULL) {
+            switch (_dWork->state) {
+            case DWCRAP_STATE_LOGIN:
+            case DWCRAP_STATE_READY:
+            case DWCRAP_STATE_MATCHING:
+            case DWCRAP_STATE_MATCH_CANCEL:
+            case DWCRAP_STATE_CONNECTED:
+            case DWCRAP_STATE_CONNECTED_IDLE:
+            case DWCRAP_STATE_MATCH_ENDED:
+            case DWCRAP_STATE_ERROR:
+            case DWCRAP_STATE_CLOSED:
+            case DWCRAP_STATE_ENDING:
+            case DWCRAP_STATE_ENDED:
+                if (_dWork->friendsMatchActive == 1) {
+                    DWC_ShutdownFriendsMatch();
+                    _dWork->friendsMatchActive = 0;
                 }
-                if (_dWork != NULL) {
-                    DWCRap_SetState(DWCRAP_STATE_SERVER_ERROR);
-                }
+                // fall through
+            case DWCRAP_STATE_INIT:
+            case DWCRAP_STATE_INET:
+            case DWCRAP_STATE_LOGIN_WAIT:
+                DWC_CleanupInet();
+                break;
+            default:
+                break;
             }
-            break;
-        case DWC_ETYPE_FATAL:
-            if (_dWork != NULL) {
-                DWCRap_SetState(DWCRAP_STATE_KICKED);
-                if (_dWork->kickFunc != NULL) {
-                    _dWork->kickFunc(-code);
-                }
-            }
-            break;
         }
+        if (_dWork != NULL) {
+            DWCRap_SetState(DWCRAP_STATE_SERVER_ERROR);
+        }
+        break;
+    case DWC_ETYPE_FATAL:
+        if (_dWork != NULL) {
+            DWCRap_SetState(DWCRAP_STATE_KICKED);
+            if (_dWork->kickFunc != NULL) {
+                _dWork->kickFunc(-code);
+            }
+        }
+        break;
     }
     if (_dWork->unk79E != 0) {
         result = 0x3ee;

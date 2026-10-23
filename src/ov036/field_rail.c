@@ -1327,10 +1327,13 @@ static u32 RailUnit_MoveOnLine(RailUnit *unit, u32 dir, s32 step) {
     return RAIL_DIR_NONE;
 }
 
+// The component tag goes through a local of the enum's type, as in BW1's version (another decomp)
 static void RailUnit_SetDataCore(RailUnit *unit, RailDataHandle *data, FieldRailSystem *rail) {
+    RailComponentKind onLine = RAIL_COMPONENT_NONE;
+
     unit->handle = data;
     unit->tileWidth = data->tileWidth;
-    unit->onLine = RAIL_COMPONENT_NONE;
+    unit->onLine = onLine;
     unit->lastMoveSpeedIndex = RAIL_SPEED_1;
     unit->direction = RAIL_DIR_NONE;
     unit->movePending = 0;
