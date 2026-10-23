@@ -19,16 +19,19 @@ saves the oracle makes (`oracle_saves`). The oracle counts game frames with the 
 (`build/<version>/arm9.o.xMAP`), so those tests need `python3 configure.py && ninja` to have run: without it they fail
 at once ("counts game frames, which need --counter") rather than skip. A skipped test says so in ctest's summary.
 
-Three labels pick tests by what they need: `route`, the tests whose program runs the game from power-on on the player's
+Four labels pick tests by what they need: `route`, the tests whose program runs the game from power-on on the player's
 ROM (the replays, the oracle's sequences and the port's checks of their hashes, the test launcher's routes,
 `integrate_launch_never_asked`, the `frame_times_*` routes, and the smoke test, which passes without a ROM too, stopping
 where the program looks for one); `oracle`, the tests that need the melonDS oracle or the saves it makes; and `timing`,
 the tests that hold the host's time to a limit, which a slow or loaded machine can fail: the `frame_times_*` routes,
 whose scenes' frames must stay within a budget in an optimized build
 ([../cmake/frame_times.cmake](../cmake/frame_times.cmake)), and the renderers' timing gates, which exist only with
-`PORT_G3D_TIMING_GATE` or `PORT_GFX_TIMING_GATE`. So
-`ctest -L route -LE oracle` runs the routes that need no oracle, `ctest -LE route` the rest, and `ctest -LE timing`
-leaves out the timing; ctest adds the fixtures they need (`oracle_saves`, the replays' `*_clean`). A test gets its
+`PORT_G3D_TIMING_GATE` or `PORT_GFX_TIMING_GATE`; and `static`, the tests that read the game's C rather than run it:
+the pointer cast guard, `game_ptrcasts`, which compiles the game's C again with the cast warnings on and holds what it
+finds to a baseline ([../docs/SYNC.md](../docs/SYNC.md#when-the-pointer-cast-guard-fails)), and its own test,
+`game_ptrcasts_tool` ([game/](game/test_check_ptrcasts.py)). So `ctest -L route -LE oracle` runs the routes that need
+no oracle, `ctest -LE route` the rest, `ctest -LE timing` leaves out the timing, and `ctest -L static` runs the guard
+alone; ctest adds the fixtures they need (`oracle_saves`, the replays' `*_clean`). A test gets its
 labels where it is defined, with `port_test_labels(TEST LABEL...)` ([../CMakeLists.txt](../CMakeLists.txt)): a new test
 that runs the game from power-on gets `route` in the fragment that adds it, and `oracle` too when it needs the oracle or
 its saves.
@@ -48,6 +51,7 @@ report whatever ending it wants. The routes are that build's T5 runs.
 | [fx/](fx) | The decomp's libfx C as the host compiles it | 3D maths | `fx_libfx` |
 | [g3d/](g3d) | The geometry engine and the CPU 3D renderer, against values worked out by hand from GBATEK, in one band of lines and in three; the renderer in 2 to 8 bands against one, on random scenes (`g3d_scene.h`, the timing's); the program glue against fakes, the last picture kept among them; timing | Every 3D scene | `g3d_*` |
 | [gfx/](gfx) | The CPU 2D renderer and display capture, against pixels worked out by hand; timing | Every 2D screen, capture | `gfx_*` |
+| [game/](game) | The pointer cast guard ([../tools/check_ptrcasts.py](../tools/check_ptrcasts.py)) on a small tree the test makes with the build's compiler: new findings fail with their sites and the ways out, `--update` and the classes, counts above the baseline, renames, the narrowing and callback kinds, the headers' host variants, a file that doesn't compile (`test_check_ptrcasts.py`). The guard itself runs as `game_ptrcasts` on the game's C | Every part of the game: the casts that would cut an address on a host | `game_ptrcasts_tool`, `game_ptrcasts` |
 | [gx/](gx) | VRAM banks in every backend, every VRAM setting of the SDK through the real `gx_vramcnt.c`, the loads, the FIFO | Where every picture's data lives | `gx_*` |
 | [hal/](hal) | The C versions of the SDK's assembly on known vectors; the card slot's SPI bus and its infrared chip against melonDS's and GBATEK's behaviour (`test_card_spi.c`) | as `asm_oracle`; the genuine-card check and the infrared library | `hal_mi`, `hal_fx`, `hal_card_spi_*`, `hal_wstring` |
 | [host/](host) | The host's system (`port/hal/host`) the same on every host: a trap placeholder touched stops the program with its name and status 70, a crash is reported with a backtrace, both on a fiber too with the C library's code making the access, and so is a fiber's guard touched; a division by zero, an illegal instruction and a breakpoint, on the host's stack and on a fiber, and `__builtin_trap` on the host's stack, are reported the same way (on macOS with the function that crashed named), and each ends the program by the signal or exception its report names; the watchdog goes off and can be kicked, the static data holds the program's statics, and directories, a folder and an argument whose names aren't ASCII, the environment and private file mappings | Traps where the game reaches data with no C yet; crash reports; the watchdog; the PXI bus's pointers | `host_*` |

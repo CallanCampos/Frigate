@@ -50,6 +50,7 @@ records keep what was decided or found at the time, and are added to, not rewrit
 | [adr/0015](adr/0015-universal-macos-app-for-macos-11.md) | A universal macOS app for macOS 11, with the pinned SDL3 linked statically |
 | [adr/0017](adr/0017-external-contributions.md) | External contributions through forks and PRs, with maintainer sync and ROM verification |
 | [adr/0018](adr/0018-protected-main-and-sync-prs.md) | Protected main and reviewed upstream syncs |
+| [adr/0019](adr/0019-pointer-cast-guard-against-a-classified-baseline.md) | The pointer cast guard: the game's casts that cut an address, held to a classified baseline |
 | [RESEARCH.md](RESEARCH.md) | The research of 2026-10-16 behind the plan, summarized |
 | [research/README.md](research/README.md) | The full research reports, with what each covers |
 | [research/decomp-progress.md](research/decomp-progress.md) | The decomp's C coverage per module, data and pointer coverage, pace, claims |
@@ -80,7 +81,7 @@ Each directory of `port/` has a guide to its files: what each does, the part of 
 | [../tests/asm_oracle/README.md](../tests/asm_oracle/README.md) | The differential tests of the SDK's assembly in C against the ROM's code |
 | [../tools/README.md](../tools/README.md) | The generators, the sync, the packaging, the oracle, the measurement scripts |
 | [../tools/oracle/README.md](../tools/oracle/README.md) | The melonDS oracle: building and running it, input files, run directories, comparing, saves, the sound, the launch checks of the field menu's apps, known differences |
-| [../tools/compile-probe/README.md](../tools/compile-probe/README.md) | The host-compiler probe: 64-bit warnings and struct layouts |
+| [../tools/compile-probe/README.md](../tools/compile-probe/README.md) | The host-compiler probe: 64-bit warnings and struct layouts (the 64-bit metric is the pointer cast guard's, [SYNC.md](SYNC.md#when-the-pointer-cast-guard-fails)) |
 | [../assets/README.md](../assets/README.md) | Files that aren't code |
 | [../assets/branding/README.md](../assets/branding/README.md) | Frigate's logo and app icons: the files, colours, how the build uses them, how to change them, the license |
 | [../spikes/README.md](../spikes/README.md) | Phase 0's frozen experiments and where their live code is: [os-fibers](../spikes/os-fibers/README.md), [overlay-sections](../spikes/overlay-sections/README.md), [vram-alias](../spikes/vram-alias/README.md) |

@@ -1,0 +1,299 @@
+# The pointer cast guard's baseline (port/tools/check_ptrcasts.py, the ctest test game_ptrcasts, port/docs/SYNC.md).
+# A row per finding of the game's C on a 64-bit host: the file, the function that holds it, the kind (ptr-to-int,
+# int-to-ptr, narrow, fn-cast), the types "to <- from" as spelled, the number of sites, the class and a one-line reason.
+# real: a truncation not fixed yet, its group in the note (the row goes when its uptr fix lands, with its row in
+# port/docs/game-changes.md); harmless: it never cuts an address the game uses; handled: the platform layer makes the
+# value right; unreachable: the host never runs it. check_ptrcasts.py --update rewrites the counts, keeping the classes.
+file	function	kind	types	count	class	note
+lib/dwc/src/gdb/gdb.c	Gdb_Cancel	ptr-to-int	int <- SAKERequest	2	real	R23: Wi-Fi libraries: socket and HTTP handles as int, work carved through u32, WCM notices (phase 7)
+lib/dwc/src/gdb/gdb.c	Gdb_Cancel	ptr-to-int	int <- const char *	2	real	R23: Wi-Fi libraries: socket and HTTP handles as int, work carved through u32, WCM notices (phase 7)
+lib/dwc/src/gp/gpiBuddy.c	gpiDeleteBuddy	int-to-ptr	void * <- int	2	harmless	an int carried in a void * and back (a buddy's index in a darray)
+lib/dwc/src/gp/gpiBuddy.c	gpiFixBuddyIndices	ptr-to-int	int <- void *	1	harmless	an int carried in a void * and back (a buddy's index in a darray)
+lib/dwc/src/nhttp/d_nhttp.c	NHTTPAddHeaderField	int-to-ptr	NHttpConnection * <- int	1	real	R23: Wi-Fi libraries: socket and HTTP handles as int, work carved through u32, WCM notices (phase 7)
+lib/dwc/src/nhttp/d_nhttp.c	NHTTPAddPostDataAscii	int-to-ptr	NHttpConnection * <- int	1	real	R23: Wi-Fi libraries: socket and HTTP handles as int, work carved through u32, WCM notices (phase 7)
+lib/dwc/src/nhttp/d_nhttp.c	NHTTPGetHeaderAll	int-to-ptr	NHttpConnection * <- int	1	real	R23: Wi-Fi libraries: socket and HTTP handles as int, work carved through u32, WCM notices (phase 7)
+lib/dwc/src/nhttp/d_nhttp.c	NHTTPGetHeaderField	int-to-ptr	NHttpConnection * <- int	1	real	R23: Wi-Fi libraries: socket and HTTP handles as int, work carved through u32, WCM notices (phase 7)
+lib/dwc/src/nhttp/d_nhttp.c	NHTTPGetResultCode	int-to-ptr	NHttpConnection * <- int	1	real	R23: Wi-Fi libraries: socket and HTTP handles as int, work carved through u32, WCM notices (phase 7)
+lib/dwc/src/nhttp/d_nhttp.c	NHTTPSetBasicAuthorization	int-to-ptr	NHttpConnection * <- int	1	real	R23: Wi-Fi libraries: socket and HTTP handles as int, work carved through u32, WCM notices (phase 7)
+lib/dwc/src/nhttp/d_nhttp.c	NHTTPSetPostDataRaw	int-to-ptr	NHttpConnection * <- int	1	real	R23: Wi-Fi libraries: socket and HTTP handles as int, work carved through u32, WCM notices (phase 7)
+lib/dwc/src/nhttp/d_nhttp.c	NHTTPSetRootCA	int-to-ptr	NHttpConnection * <- int	1	real	R23: Wi-Fi libraries: socket and HTTP handles as int, work carved through u32, WCM notices (phase 7)
+lib/dwc/src/nhttp/d_nhttp.c	NHTTPSetVerifyOption	int-to-ptr	NHttpConnection * <- int	1	real	R23: Wi-Fi libraries: socket and HTTP handles as int, work carved through u32, WCM notices (phase 7)
+lib/dwc/src/nhttp/d_nhttp_common.c	NHTTPi_BufferFullCallback	ptr-to-int	int <- NHttpConnection *	1	real	R23: Wi-Fi libraries: socket and HTTP handles as int, work carved through u32, WCM notices (phase 7)
+lib/dwc/src/nhttp/d_nhttp_common.c	NHTTPi_CompleteCallback	ptr-to-int	int <- NHttpConnection *	1	real	R23: Wi-Fi libraries: socket and HTTP handles as int, work carved through u32, WCM notices (phase 7)
+lib/dwc/src/nhttp/d_nhttp_common.c	NHTTPi_PostSendCallback	ptr-to-int	int <- NHttpConnection *	1	real	R23: Wi-Fi libraries: socket and HTTP handles as int, work carved through u32, WCM notices (phase 7)
+lib/dwc/src/nhttp/d_nhttp_common.c	NHTTPi_ReceivedCallback	ptr-to-int	int <- NHttpConnection *	1	real	R23: Wi-Fi libraries: socket and HTTP handles as int, work carved through u32, WCM notices (phase 7)
+lib/dwc/src/nhttp/d_nhttp_private.c	NHTTPCancelConnection	int-to-ptr	NHttpConnection * <- int	1	real	R23: Wi-Fi libraries: socket and HTTP handles as int, work carved through u32, WCM notices (phase 7)
+lib/dwc/src/nhttp/d_nhttp_private.c	NHTTPCreateConnection	ptr-to-int	int <- NHttpConnection *	1	real	R23: Wi-Fi libraries: socket and HTTP handles as int, work carved through u32, WCM notices (phase 7)
+lib/dwc/src/nhttp/d_nhttp_private.c	NHTTPDestroyConnection	int-to-ptr	NHttpConnection * <- int	1	real	R23: Wi-Fi libraries: socket and HTTP handles as int, work carved through u32, WCM notices (phase 7)
+lib/dwc/src/nhttp/d_nhttp_private.c	NHTTPGetBodyBuffer	int-to-ptr	NHttpConnection * <- int	1	real	R23: Wi-Fi libraries: socket and HTTP handles as int, work carved through u32, WCM notices (phase 7)
+lib/dwc/src/nhttp/d_nhttp_private.c	NHTTPGetConnectionError	int-to-ptr	NHttpConnection * <- int	1	real	R23: Wi-Fi libraries: socket and HTTP handles as int, work carved through u32, WCM notices (phase 7)
+lib/dwc/src/nhttp/d_nhttp_private.c	NHTTPGetConnectionState	int-to-ptr	NHttpConnection * <- int	1	real	R23: Wi-Fi libraries: socket and HTTP handles as int, work carved through u32, WCM notices (phase 7)
+lib/dwc/src/nhttp/d_nhttp_private.c	NHTTPGetProgress	int-to-ptr	NHttpConnection * <- int	1	real	R23: Wi-Fi libraries: socket and HTTP handles as int, work carved through u32, WCM notices (phase 7)
+lib/dwc/src/nhttp/d_nhttp_private.c	NHTTPGetUserParam	int-to-ptr	NHttpConnection * <- int	1	real	R23: Wi-Fi libraries: socket and HTTP handles as int, work carved through u32, WCM notices (phase 7)
+lib/dwc/src/nhttp/d_nhttp_private.c	NHTTPStartConnection	int-to-ptr	NHttpConnection * <- int	1	real	R23: Wi-Fi libraries: socket and HTTP handles as int, work carved through u32, WCM notices (phase 7)
+lib/dwc/src/nhttp/d_nhttp_private.c	NHTTPi_WaitForConnection	ptr-to-int	int <- NHttpConnection *	2	real	R23: Wi-Fi libraries: socket and HTTP handles as int, work carved through u32, WCM notices (phase 7)
+lib/dwc/src/vct/vct.c	VCT_Init	ptr-to-int	int <- void *	1	harmless	an alignment or low-bit test: the low bits are the host address's
+lib/dwcutil/src/dwc_wcm.c	APC_Init	narrow	s32 <- sptr	1	harmless	a difference of two addresses in one block (the BSS description buffer's end and start)
+lib/dwcutilui/src/dwc_util_rom_resource.c	DWCUtilRomResource_ReadArchive	int-to-ptr	const void * <- u32	1	handled	a 32-bit cartridge offset carried in CARD_ReadRomAsync's const void *, which CARDi_ReadRom (port/hal/card/card_rom.c) takes back as an offset
+lib/nitro/include/nitro/card.h	CARD_ReadBackup	ptr-to-int	u32 <- void *	1	handled	port/hal/card/card_backup_calls.h redirects the three inline calls (port/hal/card/card_backup_host.c)
+lib/nitro/include/nitro/card.h	CARD_ReadBackupAsync	ptr-to-int	u32 <- void *	1	handled	port/hal/card/card_backup_calls.h redirects the three inline calls (port/hal/card/card_backup_host.c)
+lib/nitro/include/nitro/card.h	CARD_WriteAndVerifyBackupAsync	ptr-to-int	u32 <- const void *	1	handled	port/hal/card/card_backup_calls.h redirects the three inline calls (port/hal/card/card_backup_host.c)
+lib/nitro/include/nitro/gx.h	GXi_DmaCopy16	ptr-to-int	u32 <- const void *	1	harmless	an alignment or low-bit test: the low bits are the host address's
+lib/nitro/include/nitro/gx.h	GXi_DmaCopy16	ptr-to-int	u32 <- void *	1	harmless	an alignment or low-bit test: the low bits are the host address's
+lib/nitro/src/card/card_request.c	CARDi_Request	ptr-to-int	u32 <- CARDiCommandArg *	1	handled	the card's ARM7 checks the word against cardi_common's block (port/hal/card/backup.c)
+lib/nitro/src/fs/fs_rom.c	FSi_ReadRomCallback	int-to-ptr	const void * <- u32	1	handled	a 32-bit cartridge offset carried in CARD_ReadRomAsync's const void *, which CARDi_ReadRom (port/hal/card/card_rom.c) takes back as an offset
+lib/nitro/src/gx/gx_load2d.c	GX_BeginLoadBGExtPltt	narrow	u32 <- uintptr_t	3	real	R13: GX's extended palette destinations in static u32 (GX_LoadBGExtPltt, GX_LoadOBJExtPltt)
+lib/nitro/src/gx/gx_load2d.c	GX_BeginLoadOBJExtPltt	narrow	u32 <- uintptr_t	2	real	R13: GX's extended palette destinations in static u32 (GX_LoadBGExtPltt, GX_LoadOBJExtPltt)
+lib/nitro/src/gx/gx_load2d.c	GX_LoadBGExtPltt	int-to-ptr	void * <- u32	1	real	R13: GX's extended palette destinations in static u32 (GX_LoadBGExtPltt, GX_LoadOBJExtPltt)
+lib/nitro/src/gx/gx_load2d.c	GX_LoadOBJExtPltt	int-to-ptr	void * <- u32	1	real	R13: GX's extended palette destinations in static u32 (GX_LoadBGExtPltt, GX_LoadOBJExtPltt)
+lib/nitro/src/mb/mb_segment.c	MB_ReadSegment	ptr-to-int	u32 <- void (*)(void)	1	real	R24: local wireless (WM) and Download Play (MB) (phase 7)
+lib/nitro/src/mb/mb_segment.c	MB_ReadSegment	ptr-to-int	u32 <- void *	1	real	R24: local wireless (WM) and Download Play (MB) (phase 7)
+lib/nitro/src/mb/mb_segment.c	MBi_ReadSegmentHeader	int-to-ptr	const void * <- u32	1	real	R24: local wireless (WM) and Download Play (MB) (phase 7)
+lib/nitro/src/mb/mb_segment.c	MBi_ReadSegmentHeader	int-to-ptr	void * <- u32	2	real	R24: local wireless (WM) and Download Play (MB) (phase 7)
+lib/nitro/src/mb/mb_wm.c	MB_Init	int-to-ptr	MBiParam * <- u32	1	real	R24: local wireless (WM) and Download Play (MB) (phase 7)
+lib/nitro/src/mb/mb_wm.c	MB_Init	ptr-to-int	u32 <- MBiParam *	1	real	R24: local wireless (WM) and Download Play (MB) (phase 7)
+lib/nitro/src/mb/mb_wm.c	MB_Init	ptr-to-int	u32 <- void *	1	real	R24: local wireless (WM) and Download Play (MB) (phase 7)
+lib/nitro/src/mb/mb_wm.c	MBi_StartParentCore	ptr-to-int	u32 <- MB_CommCommonWork *	1	real	R24: local wireless (WM) and Download Play (MB) (phase 7)
+lib/nitro/src/snd/snd_work.c	ToArm9	ptr-to-int	u32 <- const SNDDriverChannel *	1	handled	port/hal/snd7/snd7.c writes DS-style addresses in the driver's copy, so the offset is exact
+lib/nitro/src/wm/wm_sync.c	WM_ReadMPData	int-to-ptr	WMMpRecvData * <- u32	1	real	R24: local wireless (WM) and Download Play (MB) (phase 7)
+lib/nitro/src/wm/wm_sync.c	WM_ReadMPData	ptr-to-int	u32 <- WMMpRecvData *	1	real	R24: local wireless (WM) and Download Play (MB) (phase 7)
+lib/nitro/src/wm/wm_system.c	WMi_SendCommand	ptr-to-int	u32 <- WMCommandBuf *	1	real	R24: local wireless (WM) and Download Play (MB) (phase 7)
+lib/nitro/src/wm/wm_system.c	WMi_SendCommandDirect	ptr-to-int	u32 <- WMCommandBuf *	1	real	R24: local wireless (WM) and Download Play (MB) (phase 7)
+lib/nitro/src/wm/wm_system.c	WmInitCore	ptr-to-int	u32 <- void *	3	real	R24: WM's buffer checks test the cut address against the DS's VRAM, so one host buffer in 256 is refused, with an alignment test (phase 7)
+lib/nitro/src/wm/wm_system.c	WmReceiveFifo	int-to-ptr	WMCallback * <- u32	1	real	R24: local wireless (WM) and Download Play (MB) (phase 7)
+lib/nitrowifi/src/cps/cps.c	calc_checksum_do	int-to-ptr	u32 * <- u32	1	real	R23: Wi-Fi libraries: socket and HTTP handles as int, work carved through u32, WCM notices (phase 7)
+lib/nitrowifi/src/cps/cps.c	calc_checksum_do	ptr-to-int	u32 <- u32 *	1	real	R23: Wi-Fi libraries: socket and HTTP handles as int, work carved through u32, WCM notices (phase 7)
+lib/nitrowifi/src/cps/cps.c	calc_checksum_do	ptr-to-int	u32 <- void *	1	harmless	an alignment test: the low bits are the host address's
+lib/nitrowifi/src/cps/cps.c	no_need_inq	ptr-to-int	BOOL <- u8 *	1	harmless	(BOOL) of an ARP cache entry, a null test: false only for a static entry whose address's low 32 bits are 0, at a 4 GiB boundary of the program's static data
+lib/nitrowifi/src/cps/cps.c	process_icmp_reply	ptr-to-int	u32 <- OSThread *	1	harmless	a thread pointer's low 16 bits used as an ICMP echo id, compared with the reply's
+lib/nitrowifi/src/cps/cps.c	send_ping	ptr-to-int	u32 <- OSThread *	1	harmless	a thread pointer's low 16 bits used as an ICMP echo id, compared with the reply's
+lib/nitrowifi/src/soc/soc.c	SOC_Fcntl	int-to-ptr	SOCLSocket * <- int	1	real	R23: Wi-Fi libraries: socket and HTTP handles as int, work carved through u32, WCM notices (phase 7)
+lib/nitrowifi/src/soc/socl_bind.c	SOCL_Bind	int-to-ptr	SOCLSocket * <- int	1	real	R23: Wi-Fi libraries: socket and HTTP handles as int, work carved through u32, WCM notices (phase 7)
+lib/nitrowifi/src/soc/socl_bind.c	SOCL_Connect	int-to-ptr	SOCLSocket * <- int	1	real	R23: Wi-Fi libraries: socket and HTTP handles as int, work carved through u32, WCM notices (phase 7)
+lib/nitrowifi/src/soc/socl_cleanup.c	SOCL_CloseAll	ptr-to-int	int <- SOCLSocket *	3	real	R23: Wi-Fi libraries: socket and HTTP handles as int, work carved through u32, WCM notices (phase 7)
+lib/nitrowifi/src/soc/socl_close.c	SOCL_Close	int-to-ptr	SOCLSocket * <- int	1	real	R23: Wi-Fi libraries: socket and HTTP handles as int, work carved through u32, WCM notices (phase 7)
+lib/nitrowifi/src/soc/socl_close.c	SOCL_IsClosed	int-to-ptr	SOCLSocket * <- int	2	real	R23: Wi-Fi libraries: socket and HTTP handles as int, work carved through u32, WCM notices (phase 7)
+lib/nitrowifi/src/soc/socl_close.c	SOCL_IsNotClosing	int-to-ptr	SOCLSocket * <- int	1	real	R23: Wi-Fi libraries: socket and HTTP handles as int, work carved through u32, WCM notices (phase 7)
+lib/nitrowifi/src/soc/socl_command.c	SOCLi_CommandPacketHandler	int-to-ptr	OSMessage <- int	1	harmless	an int carried in a void * and back (a command packet's result)
+lib/nitrowifi/src/soc/socl_command.c	SOCLi_ExecCommandPacket	int-to-ptr	OSMessage <- int	1	harmless	an int carried in a void * and back (a command packet's result)
+lib/nitrowifi/src/soc/socl_command.c	SOCLi_ExecCommandPacket	ptr-to-int	int <- OSMessage	1	harmless	an int carried in a void * and back (a command packet's result)
+lib/nitrowifi/src/soc/socl_create.c	SOCL_CreateSocket	ptr-to-int	int <- SOCLSocket *	1	real	R23: Wi-Fi libraries: socket and HTTP handles as int, work carved through u32, WCM notices (phase 7)
+lib/nitrowifi/src/soc/socl_create.c	SOCLi_InitSocket	int-to-ptr	SOCLSocket * <- int	1	real	R23: Wi-Fi libraries: socket and HTTP handles as int, work carved through u32, WCM notices (phase 7)
+lib/nitrowifi/src/soc/socl_internal.h	SOCL_GetHostPort	int-to-ptr	SOCLSocket * <- int	1	real	R23: Wi-Fi libraries: socket and HTTP handles as int, work carved through u32, WCM notices (phase 7)
+lib/nitrowifi/src/soc/socl_list.c	SOCL_SocketIsInvalid	ptr-to-int	int <- const SOCLSocket *	1	real	R23: Wi-Fi libraries: socket and HTTP handles as int, work carved through u32, WCM notices (phase 7)
+lib/nitrowifi/src/soc/socl_poll.c	SOCL_GetStatus	int-to-ptr	SOCLSocket * <- int	1	real	R23: Wi-Fi libraries: socket and HTTP handles as int, work carved through u32, WCM notices (phase 7)
+lib/nitrowifi/src/soc/socl_read.c	SOCL_ReadFrom	int-to-ptr	SOCLSocket * <- int	1	real	R23: Wi-Fi libraries: socket and HTTP handles as int, work carved through u32, WCM notices (phase 7)
+lib/nitrowifi/src/soc/socl_shutdown.c	SOCL_Shutdown	int-to-ptr	SOCLSocket * <- int	1	real	R23: Wi-Fi libraries: socket and HTTP handles as int, work carved through u32, WCM notices (phase 7)
+lib/nitrowifi/src/soc/socl_ssl.c	SOCL_EnableSsl	int-to-ptr	SOCLSocket * <- int	1	real	R23: Wi-Fi libraries: socket and HTTP handles as int, work carved through u32, WCM notices (phase 7)
+lib/nitrowifi/src/soc/socl_write.c	SOCL_WriteTo	int-to-ptr	SOCLSocket * <- int	1	real	R23: Wi-Fi libraries: socket and HTTP handles as int, work carved through u32, WCM notices (phase 7)
+lib/nitrowifi/src/wcm/wcm.c	WCM_NotifyResult	int-to-ptr	void * <- u32	1	real	R23: Wi-Fi libraries: socket and HTTP handles as int, work carved through u32, WCM notices (phase 7)
+lib/nitrowifi/src/wcm/wcm.c	WCM_NotifyResult	ptr-to-int	s32 <- void *	1	real	R23: Wi-Fi libraries: socket and HTTP handles as int, work carved through u32, WCM notices (phase 7)
+lib/nitrowifi/src/wcm/wcm.c	WcmWmcbScanEx	ptr-to-int	s32 <- WMBssDesc *	1	real	R23: Wi-Fi libraries: socket and HTTP handles as int, work carved through u32, WCM notices (phase 7)
+lib/nitrowifi/src/wcm/wcm_dsi.c	func_0276a3d4	ptr-to-int	s32 <- NWMBssDesc *	1	unreachable	the DSi's wireless (WCM's mode 2, through NWM): the host runs as a retail DS (OS_IsRunOnTwl is FALSE)
+lib/nnsys/include/nnsys/fnd.h	NNS_FndGetMemBlockSizeForUnitHeap	ptr-to-int	u32 <- NNSFndHeapHandle	1	unreachable	the unit-heap allocator: nothing calls NNS_FndInitAllocatorForUnitHeap
+lib/nnsys/src/fnd/allocator.c	AllocatorAllocForSDKHeap	ptr-to-int	int <- void *	1	harmless	an int carried in a void * and back (the OS heap's handle)
+lib/nnsys/src/fnd/allocator.c	AllocatorFreeForSDKHeap	ptr-to-int	int <- void *	1	harmless	an int carried in a void * and back (the OS heap's handle)
+lib/nnsys/src/fnd/expheap.c	NNS_FndGetAllocatableSizeForExpHeapEx	narrow	u32 <- uptr	2	harmless	differences within one free block; the comparison before them is of the native addresses (its PLATFORM_PC branch, port/docs/game-changes.md)
+lib/nnsys/src/fnd/heapcommoni.h	GetOffsetFromPtr	narrow	u32 <- uptr	1	harmless	a difference of two addresses in one block (BytesBetween)
+lib/nnsys/src/g2d/g2d_Animation.c	GetCurrentFrameIdx_	ptr-to-int	u32 <- NNSG2dAnimFrameData *	1	harmless	a difference of two addresses in one block (an animation's frames)
+lib/nnsys/src/g2d/g2d_Animation.c	GetCurrentFrameIdx_	ptr-to-int	u32 <- const NNSG2dAnimFrame *	1	harmless	a difference of two addresses in one block (an animation's frames)
+lib/nnsys/src/g2d/g2d_Load.c	NNSi_G2dUnpackUserExCellAttrBank	int-to-ptr	void * <- u32	2	handled	renamed port_sdk_* and replaced by port/hal/nnsys/g2d_load.c (port/cmake/nnsys.cmake)
+lib/nnsys/src/g2d/g2d_Load.c	NNSi_G2dUnpackUserExCellAttrBank	ptr-to-int	u32 <- NNSG2dUserExCellAttr *	1	handled	renamed port_sdk_* and replaced by port/hal/nnsys/g2d_load.c (port/cmake/nnsys.cmake)
+lib/nnsys/src/g2d/g2d_Load.c	NNSi_G2dUnpackUserExCellAttrBank	ptr-to-int	u32 <- NNSG2dUserExCellAttrBank *	2	handled	renamed port_sdk_* and replaced by port/hal/nnsys/g2d_load.c (port/cmake/nnsys.cmake)
+lib/nnsys/src/g2d/g2d_Load.c	NNSi_G2dUnpackUserExCellAttrBank	ptr-to-int	u32 <- u32 *	1	handled	renamed port_sdk_* and replaced by port/hal/nnsys/g2d_load.c (port/cmake/nnsys.cmake)
+lib/nnsys/src/g2d/g2d_NAN_load.c	NNS_G2dUnpackNAN	int-to-ptr	void * <- u32	10	handled	renamed port_sdk_* and replaced by port/hal/nnsys/g2d_load.c (port/cmake/nnsys.cmake)
+lib/nnsys/src/g2d/g2d_NAN_load.c	NNS_G2dUnpackNAN	ptr-to-int	u32 <- NNSG2dAnimBankData *	4	handled	renamed port_sdk_* and replaced by port/hal/nnsys/g2d_load.c (port/cmake/nnsys.cmake)
+lib/nnsys/src/g2d/g2d_NAN_load.c	NNS_G2dUnpackNAN	ptr-to-int	u32 <- NNSG2dAnimFrameData *	2	handled	renamed port_sdk_* and replaced by port/hal/nnsys/g2d_load.c (port/cmake/nnsys.cmake)
+lib/nnsys/src/g2d/g2d_NAN_load.c	NNS_G2dUnpackNAN	ptr-to-int	u32 <- NNSG2dAnimSequenceData *	1	handled	renamed port_sdk_* and replaced by port/hal/nnsys/g2d_load.c (port/cmake/nnsys.cmake)
+lib/nnsys/src/g2d/g2d_NAN_load.c	NNS_G2dUnpackNAN	ptr-to-int	u32 <- NNSG2dUserExAnimAttrBank *	4	handled	renamed port_sdk_* and replaced by port/hal/nnsys/g2d_load.c (port/cmake/nnsys.cmake)
+lib/nnsys/src/g2d/g2d_NAN_load.c	NNS_G2dUnpackNAN	ptr-to-int	u32 <- NNSG2dUserExAnimFrameAttr *	1	handled	renamed port_sdk_* and replaced by port/hal/nnsys/g2d_load.c (port/cmake/nnsys.cmake)
+lib/nnsys/src/g2d/g2d_NAN_load.c	NNS_G2dUnpackNAN	ptr-to-int	u32 <- NNSG2dUserExAnimSequenceAttr *	1	handled	renamed port_sdk_* and replaced by port/hal/nnsys/g2d_load.c (port/cmake/nnsys.cmake)
+lib/nnsys/src/g2d/g2d_NAN_load.c	NNS_G2dUnpackNAN	ptr-to-int	u32 <- u32 *	2	handled	renamed port_sdk_* and replaced by port/hal/nnsys/g2d_load.c (port/cmake/nnsys.cmake)
+lib/nnsys/src/g2d/g2d_NAN_load.c	NNS_G2dUnpackNAN	ptr-to-int	u32 <- void *	3	handled	renamed port_sdk_* and replaced by port/hal/nnsys/g2d_load.c (port/cmake/nnsys.cmake)
+lib/nnsys/src/g2d/g2d_NCE_load.c	NNS_G2dUnpackNCE	int-to-ptr	void * <- u32	5	handled	renamed port_sdk_* and replaced by port/hal/nnsys/g2d_load.c (port/cmake/nnsys.cmake)
+lib/nnsys/src/g2d/g2d_NCE_load.c	NNS_G2dUnpackNCE	ptr-to-int	u32 <- NNSG2dCellData *	1	handled	renamed port_sdk_* and replaced by port/hal/nnsys/g2d_load.c (port/cmake/nnsys.cmake)
+lib/nnsys/src/g2d/g2d_NCE_load.c	NNS_G2dUnpackNCE	ptr-to-int	u32 <- NNSG2dCellDataBank *	3	handled	renamed port_sdk_* and replaced by port/hal/nnsys/g2d_load.c (port/cmake/nnsys.cmake)
+lib/nnsys/src/g2d/g2d_NCE_load.c	NNS_G2dUnpackNCE	ptr-to-int	u32 <- NNSG2dCellOAMAttrData *	1	handled	renamed port_sdk_* and replaced by port/hal/nnsys/g2d_load.c (port/cmake/nnsys.cmake)
+lib/nnsys/src/g2d/g2d_NCE_load.c	NNS_G2dUnpackNCE	ptr-to-int	u32 <- NNSG2dCellVramTransferData *	1	handled	renamed port_sdk_* and replaced by port/hal/nnsys/g2d_load.c (port/cmake/nnsys.cmake)
+lib/nnsys/src/g2d/g2d_NCE_load.c	NNS_G2dUnpackNCE	ptr-to-int	u32 <- NNSG2dVramTransferData *	2	handled	renamed port_sdk_* and replaced by port/hal/nnsys/g2d_load.c (port/cmake/nnsys.cmake)
+lib/nnsys/src/g2d/g2d_NCE_load.c	NNS_G2dUnpackNCE	ptr-to-int	u32 <- void *	2	handled	renamed port_sdk_* and replaced by port/hal/nnsys/g2d_load.c (port/cmake/nnsys.cmake)
+lib/nnsys/src/g2d/g2d_NCG_load.c	NNS_G2dUnpackBGNCG	int-to-ptr	void * <- u32	1	handled	renamed port_sdk_* and replaced by port/hal/nnsys/g2d_load.c (port/cmake/nnsys.cmake)
+lib/nnsys/src/g2d/g2d_NCG_load.c	NNS_G2dUnpackBGNCG	ptr-to-int	u32 <- NNSG2dCharacterData *	1	handled	renamed port_sdk_* and replaced by port/hal/nnsys/g2d_load.c (port/cmake/nnsys.cmake)
+lib/nnsys/src/g2d/g2d_NCG_load.c	NNS_G2dUnpackBGNCG	ptr-to-int	u32 <- void *	1	handled	renamed port_sdk_* and replaced by port/hal/nnsys/g2d_load.c (port/cmake/nnsys.cmake)
+lib/nnsys/src/g2d/g2d_NCG_load.c	NNS_G2dUnpackNCG	int-to-ptr	void * <- u32	1	handled	renamed port_sdk_* and replaced by port/hal/nnsys/g2d_load.c (port/cmake/nnsys.cmake)
+lib/nnsys/src/g2d/g2d_NCG_load.c	NNS_G2dUnpackNCG	ptr-to-int	u32 <- NNSG2dCharacterData *	1	handled	renamed port_sdk_* and replaced by port/hal/nnsys/g2d_load.c (port/cmake/nnsys.cmake)
+lib/nnsys/src/g2d/g2d_NCG_load.c	NNS_G2dUnpackNCG	ptr-to-int	u32 <- void *	1	handled	renamed port_sdk_* and replaced by port/hal/nnsys/g2d_load.c (port/cmake/nnsys.cmake)
+lib/nnsys/src/g2d/g2d_NCL_load.c	NNS_G2dUnpackNCL	int-to-ptr	void * <- u32	1	handled	renamed port_sdk_* and replaced by port/hal/nnsys/g2d_load.c (port/cmake/nnsys.cmake)
+lib/nnsys/src/g2d/g2d_NCL_load.c	NNS_G2dUnpackNCL	ptr-to-int	u32 <- NNSG2dPaletteData *	1	handled	renamed port_sdk_* and replaced by port/hal/nnsys/g2d_load.c (port/cmake/nnsys.cmake)
+lib/nnsys/src/g2d/g2d_NCL_load.c	NNS_G2dUnpackNCL	ptr-to-int	u32 <- void *	1	handled	renamed port_sdk_* and replaced by port/hal/nnsys/g2d_load.c (port/cmake/nnsys.cmake)
+lib/nnsys/src/g2d/g2d_NCL_load.c	NNSi_G2dUnpackNCLCmpInfo	int-to-ptr	void * <- u32	1	handled	renamed port_sdk_* and replaced by port/hal/nnsys/g2d_load.c (port/cmake/nnsys.cmake)
+lib/nnsys/src/g2d/g2d_NCL_load.c	NNSi_G2dUnpackNCLCmpInfo	ptr-to-int	u32 <- NNSG2dPaletteCompressInfo *	1	handled	renamed port_sdk_* and replaced by port/hal/nnsys/g2d_load.c (port/cmake/nnsys.cmake)
+lib/nnsys/src/g2d/g2d_NCL_load.c	NNSi_G2dUnpackNCLCmpInfo	ptr-to-int	u32 <- void *	1	handled	renamed port_sdk_* and replaced by port/hal/nnsys/g2d_load.c (port/cmake/nnsys.cmake)
+lib/nnsys/src/g2d/g2d_NFT_load.c	NNSi_G2dUnpackNFT	int-to-ptr	void * <- u32	5	handled	renamed port_sdk_* and replaced by port/hal/nnsys/g2d_load.c (port/cmake/nnsys.cmake)
+lib/nnsys/src/g2d/g2d_NFT_load.c	NNSi_G2dUnpackNFT	ptr-to-int	u32 <- NNSG2dBinaryFileHeader *	5	handled	renamed port_sdk_* and replaced by port/hal/nnsys/g2d_load.c (port/cmake/nnsys.cmake)
+lib/nnsys/src/g2d/g2d_NFT_load.c	NNSi_G2dUnpackNFT	ptr-to-int	u32 <- NNSG2dFontCodeMap *	1	handled	renamed port_sdk_* and replaced by port/hal/nnsys/g2d_load.c (port/cmake/nnsys.cmake)
+lib/nnsys/src/g2d/g2d_NFT_load.c	NNSi_G2dUnpackNFT	ptr-to-int	u32 <- NNSG2dFontGlyph *	1	handled	renamed port_sdk_* and replaced by port/hal/nnsys/g2d_load.c (port/cmake/nnsys.cmake)
+lib/nnsys/src/g2d/g2d_NFT_load.c	NNSi_G2dUnpackNFT	ptr-to-int	u32 <- NNSG2dFontWidth *	1	handled	renamed port_sdk_* and replaced by port/hal/nnsys/g2d_load.c (port/cmake/nnsys.cmake)
+lib/nnsys/src/g2d/g2d_NFT_load.c	NNSi_G2dUnpackNFT	ptr-to-int	u32 <- struct NNSG2dFontCodeMap *	1	handled	renamed port_sdk_* and replaced by port/hal/nnsys/g2d_load.c (port/cmake/nnsys.cmake)
+lib/nnsys/src/g2d/g2d_NFT_load.c	NNSi_G2dUnpackNFT	ptr-to-int	u32 <- struct NNSG2dFontWidth *	1	handled	renamed port_sdk_* and replaced by port/hal/nnsys/g2d_load.c (port/cmake/nnsys.cmake)
+lib/nnsys/src/g2d/g2d_NMC_load.c	NNS_G2dUnpackNMC	int-to-ptr	void * <- u32	4	handled	renamed port_sdk_* and replaced by port/hal/nnsys/g2d_load.c (port/cmake/nnsys.cmake)
+lib/nnsys/src/g2d/g2d_NMC_load.c	NNS_G2dUnpackNMC	ptr-to-int	u32 <- NNSG2dMultiCellData *	1	handled	renamed port_sdk_* and replaced by port/hal/nnsys/g2d_load.c (port/cmake/nnsys.cmake)
+lib/nnsys/src/g2d/g2d_NMC_load.c	NNS_G2dUnpackNMC	ptr-to-int	u32 <- NNSG2dMultiCellDataBank *	3	handled	renamed port_sdk_* and replaced by port/hal/nnsys/g2d_load.c (port/cmake/nnsys.cmake)
+lib/nnsys/src/g2d/g2d_NMC_load.c	NNS_G2dUnpackNMC	ptr-to-int	u32 <- NNSG2dMultiCellHierarchyData *	2	handled	renamed port_sdk_* and replaced by port/hal/nnsys/g2d_load.c (port/cmake/nnsys.cmake)
+lib/nnsys/src/g2d/g2d_NMC_load.c	NNS_G2dUnpackNMC	ptr-to-int	u32 <- void *	1	handled	renamed port_sdk_* and replaced by port/hal/nnsys/g2d_load.c (port/cmake/nnsys.cmake)
+lib/nnsys/src/snd/snd_arc_loader.c	BankDisposeCallback	narrow	u32 <- uptr	1	harmless	the dispose callback's data2 is a file ID
+lib/nnsys/src/snd/snd_arc_loader.c	SeqDisposeCallback	narrow	u32 <- uptr	1	harmless	the dispose callback's data2 is a file ID
+lib/nnsys/src/snd/snd_arc_loader.c	WaveArcDisposeCallback	narrow	u32 <- uptr	1	harmless	the dispose callback's data2 is a file ID
+lib/nnsys/src/snd/snd_arc_loader.c	WaveArcTableDisposeCallback	narrow	u32 <- uptr	1	harmless	the dispose callback's data2 is a file ID
+lib/twl/src/camera/camera_api.c	func_02700230	ptr-to-int	int <- void *	1	unreachable	TWL-only code: the host runs as a retail DS (OS_IsRunOnTwl is FALSE)
+lib/twl/src/card/card_rom_twl.c	CARDi_ReadSecureRomWithDMA	ptr-to-int	u32 <- void *	1	unreachable	TWL-only code: the host runs as a retail DS (OS_IsRunOnTwl is FALSE)
+lib/twl/src/dsp/dsp_audio.c	func_027060b4	ptr-to-int	u32 <- const void *	1	unreachable	TWL-only code: the host runs as a retail DS (OS_IsRunOnTwl is FALSE)
+lib/twl/src/dsp/dsp_pipe.c	DSP_LoadPipe	int-to-ptr	DSPPipe (*)[2] <- u32	1	unreachable	TWL-only code: the host runs as a retail DS (OS_IsRunOnTwl is FALSE)
+lib/twl/src/dsp/dsp_pipe.c	DSP_LoadPipe	ptr-to-int	u32 <- DSPPipe *	1	unreachable	TWL-only code: the host runs as a retail DS (OS_IsRunOnTwl is FALSE)
+lib/twl/src/dsp/dsp_pipe.c	func_0270633c	ptr-to-int	u32 <- u8 *	1	unreachable	TWL-only code: the host runs as a retail DS (OS_IsRunOnTwl is FALSE)
+lib/twl/src/dsp/dsp_pipe.c	func_02706694	ptr-to-int	u32 <- const u8 *	1	unreachable	TWL-only code: the host runs as a retail DS (OS_IsRunOnTwl is FALSE)
+lib/twl/src/dsp/dsp_pipe.c	func_027067b4	int-to-ptr	void * <- u32	1	unreachable	TWL-only code: the host runs as a retail DS (OS_IsRunOnTwl is FALSE)
+lib/twl/src/dsp/dsp_pipe.c	func_02706b60	int-to-ptr	OSMessage <- int	1	unreachable	TWL-only code: the host runs as a retail DS (OS_IsRunOnTwl is FALSE)
+lib/twl/src/dsp/dsp_process.c	DSPi_GetWramAddress	int-to-ptr	u8 * <- u32	1	unreachable	TWL-only code: the host runs as a retail DS (OS_IsRunOnTwl is FALSE)
+lib/twl/src/dsp/dsp_process.c	func_02705acc	int-to-ptr	void * <- u32	2	unreachable	TWL-only code: the host runs as a retail DS (OS_IsRunOnTwl is FALSE)
+lib/twl/src/fatfs/fatfs_api.c	func_027040b4	ptr-to-int	u32 <- FatfsRequest *	1	unreachable	TWL-only code: the host runs as a retail DS (OS_IsRunOnTwl is FALSE)
+lib/twl/src/mi/mi_ndma.c	MIi_NDmaAsync_withConfig_Dev	ptr-to-int	u32 <- const void *	1	unreachable	TWL-only code: the host runs as a retail DS (OS_IsRunOnTwl is FALSE)
+lib/twl/src/mi/mi_ndma.c	MIi_NDmaAsync_withConfig_Dev	ptr-to-int	u32 <- void *	1	unreachable	TWL-only code: the host runs as a retail DS (OS_IsRunOnTwl is FALSE)
+lib/twl/src/mi/mi_ndma.c	MIi_NDma_withConfig_Dev	ptr-to-int	u32 <- const void *	1	unreachable	TWL-only code: the host runs as a retail DS (OS_IsRunOnTwl is FALSE)
+lib/twl/src/mi/mi_ndma.c	MIi_NDma_withConfig_Dev	ptr-to-int	u32 <- void *	1	unreachable	TWL-only code: the host runs as a retail DS (OS_IsRunOnTwl is FALSE)
+lib/twl/src/mi/mi_ndma.c	MIi_StartCardNDma	ptr-to-int	u32 <- const void *	1	unreachable	TWL-only code: the host runs as a retail DS (OS_IsRunOnTwl is FALSE)
+lib/twl/src/mi/mi_ndma.c	MIi_StartCardNDma	ptr-to-int	u32 <- void *	1	unreachable	TWL-only code: the host runs as a retail DS (OS_IsRunOnTwl is FALSE)
+lib/twl/src/mi/mi_ndma_gxcommand.c	MI_SendNDmaGXCommandAsync	ptr-to-int	u32 <- const void *	1	unreachable	TWL-only code: the host runs as a retail DS (OS_IsRunOnTwl is FALSE)
+lib/twl/src/mi/mi_ndma_gxcommand.c	MIi_NDmaFIFOCallback	int-to-ptr	const void * <- u32	1	unreachable	TWL-only code: the host runs as a retail DS (OS_IsRunOnTwl is FALSE)
+lib/twl/src/mic/mic_twl.c	MICEXi_StartLimitedSamplingAsync	ptr-to-int	u32 <- void *	1	unreachable	TWL-only code: the host runs as a retail DS (OS_IsRunOnTwl is FALSE)
+lib/twl/src/mic/mic_twl.c	func_02703f7c	ptr-to-int	u32 <- void *	2	unreachable	TWL-only code: the host runs as a retail DS (OS_IsRunOnTwl is FALSE)
+lib/twl/src/nwm/nwm.c	NWMi_SendCommand	ptr-to-int	u32 <- NWMCmdBuf *	1	unreachable	TWL-only code: the host runs as a retail DS (OS_IsRunOnTwl is FALSE)
+lib/twl/src/nwm/nwm.c	func_02703b24	ptr-to-int	u32 <- NWMCmdBuf *	1	unreachable	TWL-only code: the host runs as a retail DS (OS_IsRunOnTwl is FALSE)
+lib/twl/src/nwm/nwm_events.c	func_02702740	int-to-ptr	NWMEvent * <- u32	1	unreachable	TWL-only code: the host runs as a retail DS (OS_IsRunOnTwl is FALSE)
+lib/twl/src/os/os_arena_twl.c	OSi_InitArenaExTwl	narrow	u32 <- uintptr_t	1	unreachable	TWL-only code: the host runs as a retail DS (OS_IsRunOnTwl is FALSE)
+lib/twl/src/photo_sign.c	PhotoSign_InitRandom	ptr-to-int	u32 <- MATHRandContext32 *	2	unreachable	TWL-only code: the host runs as a retail DS (OS_IsRunOnTwl is FALSE)
+lib/twl/src/photo_sign_client.c	PhotoSign_FifoCallback	int-to-ptr	OSMessage <- u32	1	unreachable	TWL-only code: the host runs as a retail DS (OS_IsRunOnTwl is FALSE)
+lib/twl/src/photo_sign_client.c	PhotoSign_WaitResult	ptr-to-int	int <- OSMessage	1	unreachable	TWL-only code: the host runs as a retail DS (OS_IsRunOnTwl is FALSE)
+lib/twl/src/photo_sign_util.c	PhotoSign_InvalidateCache	int-to-ptr	void * <- u32	1	unreachable	TWL-only code: the host runs as a retail DS (OS_IsRunOnTwl is FALSE)
+lib/twl/src/photo_sign_util.c	PhotoSign_InvalidateCache	ptr-to-int	u32 <- void *	2	unreachable	TWL-only code: the host runs as a retail DS (OS_IsRunOnTwl is FALSE)
+lib/twl/src/ssp_exifdec.c	SSP_ExifDecode	ptr-to-int	u32 <- u8 *	2	unreachable	TWL-only code: the host runs as a retail DS (OS_IsRunOnTwl is FALSE)
+src/gfl/arc_tool.c	GFL_ArcSysInitArcHandle	int-to-ptr	void * <- u32	1	unreachable	the in-memory archive table: sArcSys.inMemory is never set
+src/gfl/bg_sys.c	GFL_BGSysTransferUncomp	ptr-to-int	u32 <- const void *	1	harmless	an alignment or low-bit test: the low bits are the host address's
+src/gfl/bg_sys.c	GFL_BGSysTransferUncomp	ptr-to-int	u32 <- void *	1	harmless	an alignment or low-bit test: the low bits are the host address's
+src/gfl/bmp.c	GFL_BitmapCopyArea_IDX4_VRAM	ptr-to-int	u32 <- u16 *	2	harmless	an alignment or low-bit test: the low bits are the host address's
+src/gfl/bmp.c	GFL_BitmapCopyArea_IDX8_VRAM	ptr-to-int	u32 <- u8 *	2	harmless	an alignment or low-bit test: the low bits are the host address's
+src/gfl/bmp.c	GFL_BitmapFillArea_IDX4_VRAM	ptr-to-int	u32 <- u16 *	1	harmless	an alignment or low-bit test: the low bits are the host address's
+src/gfl/dma_vblank.c	DMAVBlank_WriteChannelControl	int-to-ptr	vu32 * <- int	1	unreachable	a DS register's literal address (0x040000b8), written only for a VBlank DMA channel that nothing sets up
+src/gfl/g3d_util.c	G3DMgr_ReadResource	int-to-ptr	const char * <- u32	2	unreachable	the FS-path scene resources: no setup table uses the FS types
+src/gfl/gf_overlay.c	GFL_OvlGetMemoryRange	ptr-to-int	u32 <- u8 *	1	handled	port/hal/fs/fs_overlay.c puts the DS's 32-bit overlay address in ramAddress
+src/gfl/gf_overlay.c	GFL_OvlGetMemoryRegion	ptr-to-int	u32 <- u8 *	1	handled	port/hal/fs/fs_overlay.c puts the DS's 32-bit overlay address in ramAddress
+src/gfl/heapsys.c	GFL_HeapGetSize	ptr-to-int	u32 <- NNSiFndHeapHead *	1	harmless	a difference of two addresses in one block (a heap block's head and data)
+src/gfl/heapsys.c	GFL_HeapGetSize	ptr-to-int	u32 <- void *	1	harmless	a difference of two addresses in one block (a heap block's head and data)
+src/gfl/net_state.c	NetState_ConnectMac	ptr-to-int	u32 <- u8 *	1	harmless	an alignment or low-bit test: the low bits are the host address's
+src/ov011/net_devwifi.c	NetDevWifi_Start	int-to-ptr	DWCFriendData * <- int	1	real	R22: Wi-Fi game code: DWC user and friend data as int, login buffers, callbacks in u32 fields (phase 7)
+src/ov011/net_devwifi.c	NetDevWifi_Start	int-to-ptr	void * <- int	1	real	R22: Wi-Fi game code: DWC user and friend data as int, login buffers, callbacks in u32 fields (phase 7)
+src/ov011/net_devwifi.c	NetDevWifi_Unk4C	int-to-ptr	const char * <- int	1	real	R22: Wi-Fi game code: DWC user and friend data as int, login buffers, callbacks in u32 fields (phase 7)
+src/ov012/g3d_text_draw.c	G3DTextDraw_CreateResource	int-to-ptr	const void * <- u32	1	real	R04: G3DTextDraw_CreateResource takes its palette pointer as u32 (the field-move cut-in's name)
+src/ov012/game_beacon_set.c	GameBeacon_BroadcastPhrase	ptr-to-int	u32 <- StrBuf *	1	real	R15: the Funfest beacon mission's StrBuf * in a u32 value
+src/ov012/scrcmd_download_data.c	s02B7_MemoryLinkAddMusicalProps	int-to-ptr	const u8 * <- u32	1	real	R16: the Memory Link getter (MemoryLinkSave_GetValue) returns pointers as u32
+src/ov012/script_plugin.c	GetCurrentScrPluginCmdCount	ptr-to-int	u32 <- FieldScriptCommand	1	harmless	a compare with the sentinel (u32)-1
+src/ov023/event_pokewood.c	EventPokewood_InitTitleParam	ptr-to-int	u32 <- PartyPkm *	1	real	R17: Pokestar Studios' Pokewood_GetLoadedMovieField takes a PartyPkm * as u32 a1
+src/ov028/union_comm.c	UnionComm_SetSelf	int-to-ptr	UnionBeaconEntry * <- u32	4	real	R21: the Union Room's UnionComm_SetSelf u32 value and menu values (phase 7)
+src/ov034/union_msg.c	UnionMsg_UpdateRuleMenu	int-to-ptr	const ListMenuRow * <- u32	1	real	R21: the Union Room's UnionComm_SetSelf u32 value and menu values (phase 7)
+src/ov034/union_msg.c	UnionMsg_UpdateRuleMenu	ptr-to-int	u32 <- const ListMenuRow *	2	real	R21: the Union Room's UnionComm_SetSelf u32 value and menu values (phase 7)
+src/ov034/union_oneself.c	UnionOneself_CheckParentEntry	ptr-to-int	u32 <- UnionBeaconEntry *	2	real	R21: the Union Room's UnionComm_SetSelf u32 value and menu values (phase 7)
+src/ov034/union_oneself.c	UnionOneself_StepAskRun	ptr-to-int	u32 <- UnionBeaconEntry *	1	real	R21: the Union Room's UnionComm_SetSelf u32 value and menu values (phase 7)
+src/ov034/union_oneself.c	UnionOneself_StepAskedRun	ptr-to-int	u32 <- UnionBeaconEntry *	1	real	R21: the Union Room's UnionComm_SetSelf u32 value and menu values (phase 7)
+src/ov034/union_oneself.c	UnionOneself_StepIdleRun	ptr-to-int	u32 <- UnionBeaconEntry *	2	real	R21: the Union Room's UnionComm_SetSelf u32 value and menu values (phase 7)
+src/ov034/union_oneself.c	UnionOneself_StepRecruitRun	ptr-to-int	u32 <- UnionBeaconEntry *	1	real	R21: the Union Room's UnionComm_SetSelf u32 value and menu values (phase 7)
+src/ov036/event_name_entry.c	JoinAvenueNameEntry_Callback	ptr-to-int	u32 <- const u16 *	4	real	R05: Join Avenue's getters and setters carry name and message pointers as u32
+src/ov036/event_name_entry.c	JoinAvenueNameEntry_Callback	ptr-to-int	u32 <- u16 *	1	real	R05: Join Avenue's getters and setters carry name and message pointers as u32
+src/ov036/field_place_name.c	func_ov036_021b5660	int-to-ptr	const u16 * <- u32	1	real	R05: Join Avenue's getters and setters carry name and message pointers as u32
+src/ov036/fld3d_ci.c	EventFieldEffectCutinSub_DrawStrToTexture	ptr-to-int	u32 <- u16 *	1	real	R04: G3DTextDraw_CreateResource takes its palette pointer as u32 (the field-move cut-in's name)
+src/ov036/scrcmd_pokemon_fld.c	func_ov036_021afa2c	ptr-to-int	u32 <- MailData *	1	real	R03: (u32) of a pointer passed as PokeParty_SetParam's uptr value (the Day Care's egg, the mail of the Reshiram and Zekrom swap)
+src/ov036/shortcut_menu.c	OnListCursor	int-to-ptr	ShortcutMenuList * <- s32	1	real	R02: BmpMenuList_GetParam returns the list's work pointer and callbacks as s32 (the Y button's shortcut menu)
+src/ov036/shortcut_menu.c	RedrawHighlight	int-to-ptr	ShortcutMenuList * <- s32	1	real	R02: BmpMenuList_GetParam returns the list's work pointer and callbacks as s32 (the Y button's shortcut menu)
+src/ov036/sodateya.c	createEggPkm	ptr-to-int	u32 <- StrBuf *	2	real	R03: (u32) of a pointer passed as PokeParty_SetParam's uptr value (the Day Care's egg, the mail of the Reshiram and Zekrom swap)
+src/ov084/beacon_view_setup.c	BeaconView_CreateEvent	ptr-to-int	u32 <- AppTaskMenuWin *	6	real	R14: the C-Gear passersby log's and Funfest view's wait events carry an AppTaskMenuWin * in a u32 param
+src/ov084/beacon_view_setup.c	BeaconView_WaitMenuButton	int-to-ptr	AppTaskMenuWin * <- u32	1	real	R14: the C-Gear passersby log's and Funfest view's wait events carry an AppTaskMenuWin * in a u32 param
+src/ov085/fmission_view_setup.c	FMissionViewSetup_CallMenuButton	int-to-ptr	AppTaskMenuWin * <- u32	1	real	R14: the C-Gear passersby log's and Funfest view's wait events carry an AppTaskMenuWin * in a u32 param
+src/ov085/fmission_view_setup.c	FMissionViewSetup_CheckEvent	ptr-to-int	u32 <- AppTaskMenuWin *	4	real	R14: the C-Gear passersby log's and Funfest view's wait events carry an AppTaskMenuWin * in a u32 param
+src/ov087/report.c	Report_PrintWindows	int-to-ptr	const u16 * <- u32	1	real	R05: Join Avenue's getters and setters carry name and message pointers as u32
+src/ov137/resort_sys.c	ResortEntry_Fill	ptr-to-int	u32 <- const u16 *	4	real	R05: Join Avenue's getters and setters carry name and message pointers as u32
+src/ov137/resort_sys.c	ResortEntry_Setup	ptr-to-int	u32 <- const u16 *	1	real	R05: Join Avenue's getters and setters carry name and message pointers as u32
+src/ov137/resort_sys.c	ResortEntry_Setup	ptr-to-int	u32 <- u16 *	2	real	R05: Join Avenue's getters and setters carry name and message pointers as u32
+src/ov144/townmap.c	TownMapInfo_Draw	int-to-ptr	const u16 * <- u32	1	real	R05: Join Avenue's getters and setters carry name and message pointers as u32
+src/ov144/townmap.c	TownMapPlaceName_Main	int-to-ptr	const u16 * <- u32	1	real	R05: Join Avenue's getters and setters carry name and message pointers as u32
+src/ov162/game_start.c	Continue_Main	ptr-to-int	u32 <- void *	3	harmless	an int carried in a void * and back (Continue's task parameter)
+src/ov162/startmenu.c	StartMenu_InitWindows	int-to-ptr	const u16 * <- u32	1	real	R05: Join Avenue's getters and setters carry name and message pointers as u32
+src/ov165/plist_sys.c	PokeList_Main	ptr-to-int	u32 <- PokeListParam *	1	harmless	the callee ignores the parameter (NetSync_StartTiming, src/ov164/net_sync.c)
+src/ov166/event_battle_return.c	EventBattleReturn_Main	ptr-to-int	u32 <- BoxSaveAccessor *	1	real	R08: NameEntryParam's unkC and unk10 (the box message's StrBuf *, the box data) are u32
+src/ov166/event_battle_return.c	EventBattleReturn_Main	ptr-to-int	u32 <- StrBuf *	1	real	R08: NameEntryParam's unkC and unk10 (the box message's StrBuf *, the box data) are u32
+src/ov167/btl_server_flow.c	ServerEvent_AddMoveConditionString	ptr-to-int	s32 <- BattleHandlerString *	1	real	R06: battle event variable 0x3f keeps a BattleHandlerString * in s32 values[]
+src/ov167/btl_server_flow.c	ServerEvent_CheckNoEffect	ptr-to-int	s32 <- BattleHandlerString *	1	real	R06: battle event variable 0x3f keeps a BattleHandlerString * in s32 values[]
+src/ov167/btl_server_flow.c	ServerEvent_DecideSpecialMoveCondition	ptr-to-int	s32 <- BattleHandlerString *	1	real	R06: battle event variable 0x3f keeps a BattleHandlerString * in s32 values[]
+src/ov167/btl_server_flow.c	ServerEvent_SetMoveMessage	ptr-to-int	s32 <- BattleHandlerString *	1	real	R06: battle event variable 0x3f keeps a BattleHandlerString * in s32 values[]
+src/ov167/move_handlers.c	HandlerBideTextSet	int-to-ptr	BattleHandlerString * <- u32	1	real	R06: battle event variable 0x3f keeps a BattleHandlerString * in s32 values[]
+src/ov167/move_handlers.c	HandlerBindTextSet	int-to-ptr	BattleHandlerString * <- u32	1	real	R06: battle event variable 0x3f keeps a BattleHandlerString * in s32 values[]
+src/ov167/move_handlers.c	HandlerMetronomeTextSet	int-to-ptr	BattleHandlerString * <- u32	1	real	R06: battle event variable 0x3f keeps a BattleHandlerString * in s32 values[]
+src/ov167/move_handlers.c	HandlerNaturePowerTextSet	int-to-ptr	BattleHandlerString * <- u32	1	real	R06: battle event variable 0x3f keeps a BattleHandlerString * in s32 values[]
+src/ov167/move_handlers.c	HandlerSuckerPunch	int-to-ptr	BattleHandlerString * <- u32	1	real	R06: battle event variable 0x3f keeps a BattleHandlerString * in s32 values[]
+src/ov167/move_handlers.c	HandlerTelekinesis	int-to-ptr	BattleHandlerString * <- u32	1	real	R06: battle event variable 0x3f keeps a BattleHandlerString * in s32 values[]
+src/ov168/btlv_mcss.c	BtlvMcss_OnAnimationEnd	narrow	s32 <- uptr	1	harmless	the animation callback's uptr parameter is an entry index here
+src/ov169/pos_handlers.c	PosEventAdd	ptr-to-int	BOOL <- BattleEventItem *	1	harmless	(BOOL)item, a null test of an item of the battle's static event pool: false only for an item whose address's low 32 bits are 0, at a 4 GiB boundary of the program's static data
+src/ov169/side_handlers.c	HandlerSideQuickGuard	int-to-ptr	BattleHandlerString * <- u32	1	real	R06: battle event variable 0x3f keeps a BattleHandlerString * in s32 values[]
+src/ov169/side_handlers.c	HandlerSideWideGuard	int-to-ptr	BattleHandlerString * <- u32	1	real	R06: battle event variable 0x3f keeps a BattleHandlerString * in s32 values[]
+src/ov173/wifi_p2pmatch.c	WifiP2PMatch_GetFriendData	ptr-to-int	int <- DWCFriendData *	1	real	R22: Wi-Fi game code: DWC user and friend data as int, login buffers, callbacks in u32 fields (phase 7)
+src/ov173/wifi_p2pmatch.c	WifiP2PMatch_GetUserData	ptr-to-int	int <- DWCUserData *	1	real	R22: Wi-Fi game code: DWC user and friend data as int, login buffers, callbacks in u32 fields (phase 7)
+src/ov190/wifilogin.c	WifiLogin_GetFriendData	ptr-to-int	int <- DWCFriendData *	1	real	R22: Wi-Fi game code: DWC user and friend data as int, login buffers, callbacks in u32 fields (phase 7)
+src/ov190/wifilogin.c	WifiLogin_GetUserData	ptr-to-int	int <- DWCUserData *	1	real	R22: Wi-Fi game code: DWC user and friend data as int, login buffers, callbacks in u32 fields (phase 7)
+src/ov194/pokemontrade_save.c	func_ov194_021bf868	ptr-to-int	u32 <- PartyPkm *	1	real	R09: CheckEvolveSpecies' u32 a3 is the trade partner's PartyPkm *
+src/ov195/gtsnego_proc.c	GtsNego_OnRecvPerson	ptr-to-int	u32 <- u16 *	1	real	R05: Join Avenue's getters and setters carry name and message pointers as u32
+src/ov197/mystery.c	Mystery_CreateList	int-to-ptr	StrBuf * <- u32	2	real	R11: the Mystery Gift list's setup.items[] (u32) keeps StrBuf *
+src/ov197/mystery.c	Mystery_CreateList	ptr-to-int	u32 <- StrBuf *	1	real	R11: the Mystery Gift list's setup.items[] (u32) keeps StrBuf *
+src/ov197/mystery_album.c	MysteryAlbum_LoadIcon	int-to-ptr	void * <- u32	1	real	R12: the Mystery Gift album's palette address through u32 (u32 dst += HW_OBJ_PLTT)
+src/ov197/mystery_util.c	MysteryList_Create	int-to-ptr	StrBuf * <- u32	1	real	R11: the Mystery Gift list's setup.items[] (u32) keeps StrBuf *
+src/ov210/musical_system.c	MusicalSystem_LoadProgramData	int-to-ptr	void * <- u32	2	real	R18: the Musical's sound data pointers through u32
+src/ov210/musical_system.c	MusicalSystem_LoadProgramData	ptr-to-int	u32 <- void *	2	real	R18: the Musical's sound data pointers through u32
+src/ov211/mus_comm_func.c	MusComm_RecvSoundChunk	int-to-ptr	void * <- u32	2	real	R18: the Musical's sound data pointers through u32
+src/ov211/mus_comm_func.c	MusComm_RecvSoundChunk	ptr-to-int	u32 <- u32 *	2	real	R18: the Musical's sound data pointers through u32
+src/ov214/worldtrade_demo.c	WorldTrade_Demo_Main	ptr-to-int	u32 <- PartyPkm *	2	real	R09: CheckEvolveSpecies' u32 a3 is the trade partner's PartyPkm *
+src/ov214/worldtrade_enter.c	Enter_WifiConnectionLogout	ptr-to-int	u32 <- WorldTradeWork *	1	real	R22: Wi-Fi game code: DWC user and friend data as int, login buffers, callbacks in u32 fields (phase 7)
+src/ov214/worldtrade_enter.c	Enter_WifiConnectionLogout	ptr-to-int	u32 <- int (*)(void *, void *)	1	real	R22: Wi-Fi game code: DWC user and friend data as int, login buffers, callbacks in u32 fields (phase 7)
+src/ov253/mictest.c	MicTestMic_Init	int-to-ptr	void * <- u32	1	real	R19: the mic's buffer aligned through u32 (Chatot's cry, the mic test)
+src/ov253/mictest.c	MicTestMic_Init	ptr-to-int	u32 <- u8 *	1	real	R19: the mic's buffer aligned through u32 (Chatot's cry, the mic test)
+src/ov260/wifibattlematch_net.c	WifiBattleMatchNet_OnPersonReceived	ptr-to-int	u32 <- const u16 *	1	real	R05: Join Avenue's getters and setters carry name and message pointers as u32
+src/ov271/br_net.c	BrNet_Init	int-to-ptr	void * <- u32	1	real	R22: Wi-Fi game code: DWC user and friend data as int, login buffers, callbacks in u32 fields (phase 7)
+src/ov280/namein.c	NameEntryTalk_Start	int-to-ptr	const StrBuf * <- u32	1	real	R08: NameEntryParam's unkC and unk10 (the box message's StrBuf *, the box data) are u32
+src/ov280/namein.c	NameEntryTalk_Start	int-to-ptr	void * <- u32	1	real	R08: NameEntryParam's unkC and unk10 (the box message's StrBuf *, the box data) are u32
+src/ov323/pkwd_selectscreen.c	PkwdSelectScreen_LoadMovies	ptr-to-int	u32 <- PartyPkm *	2	real	R17: Pokestar Studios' Pokewood_GetLoadedMovieField takes a PartyPkm * as u32 a1
+src/ov326/t_download_save.c	TDownloadSave_LoadReceived	int-to-ptr	TDownloadTournament * <- u32	1	real	R22: Wi-Fi game code: DWC user and friend data as int, login buffers, callbacks in u32 fields (phase 7)
+src/ov327/wbt_download_sys.c	WbtDownload_SetupTournaments	ptr-to-int	u32 <- void *	1	real	R22: Wi-Fi game code: DWC user and friend data as int, login buffers, callbacks in u32 fields (phase 7)
+src/ov330/event_pdc_return.c	EventPdcReturn_Main	ptr-to-int	u32 <- BoxSaveAccessor *	1	real	R08: NameEntryParam's unkC and unk10 (the box message's StrBuf *, the box data) are u32
+src/ov330/event_pdc_return.c	EventPdcReturn_Main	ptr-to-int	u32 <- StrBuf *	1	real	R08: NameEntryParam's unkC and unk10 (the box message's StrBuf *, the box data) are u32
+src/system/battle_video_proc.c	BattleVideo_Main	ptr-to-int	u32 <- u8 *	1	real	R22: Wi-Fi game code: DWC user and friend data as int, login buffers, callbacks in u32 fields (phase 7)
+src/system/bmp_menulist.c	BmpMenuList_GetParam	ptr-to-int	s32 <- BmpMenuListCursorCallback	1	real	R02: BmpMenuList_GetParam returns the list's work pointer and callbacks as s32 (the Y button's shortcut menu)
+src/system/bmp_menulist.c	BmpMenuList_GetParam	ptr-to-int	s32 <- BmpMenuListPrintCallback	1	real	R02: BmpMenuList_GetParam returns the list's work pointer and callbacks as s32 (the Y button's shortcut menu)
+src/system/bmp_menulist.c	BmpMenuList_GetParam	ptr-to-int	s32 <- void *	1	real	R02: BmpMenuList_GetParam returns the list's work pointer and callbacks as s32 (the Y button's shortcut menu)
+src/system/dwc_friend.c	DWCFriend_UpdateFriendData	int-to-ptr	DWCFriendData * <- int	1	real	R22: Wi-Fi game code: DWC user and friend data as int, login buffers, callbacks in u32 fields (phase 7)
+src/system/dwc_friend.c	findFriendData	int-to-ptr	DWCFriendData * <- int	1	real	R22: Wi-Fi game code: DWC user and friend data as int, login buffers, callbacks in u32 fields (phase 7)
+src/system/dwc_friend.c	findFriendData	int-to-ptr	DWCUserData * <- int	1	real	R22: Wi-Fi game code: DWC user and friend data as int, login buffers, callbacks in u32 fields (phase 7)
+src/system/game_beacon.c	GameBeaconSendSlot_SetMissionEx	int-to-ptr	const StrBuf * <- u32	1	real	R15: the Funfest beacon mission's StrBuf * in a u32 value
+src/system/memory_link_savedata.c	MemoryLinkSave_GetValue	ptr-to-int	u32 <- MemoryLinkSave *	1	real	R16: the Memory Link getter (MemoryLinkSave_GetValue) returns pointers as u32
+src/system/memory_link_savedata.c	MemoryLinkSave_GetValue	ptr-to-int	u32 <- u8 *	1	real	R16: the Memory Link getter (MemoryLinkSave_GetValue) returns pointers as u32
+src/system/poke_tool.c	PML_PkmSetParamCore	narrow	int <- uptr	6	harmless	the setter's uptr value is an integer for these parameters
+src/system/poke_tool.c	PML_PkmSetParamCore	narrow	u32 <- uptr	11	harmless	the setter's uptr value is an integer for these parameters
+src/system/poke_tool.c	PokeParty_SetParamCore	narrow	u32 <- uptr	1	harmless	the setter's uptr value is an integer for these parameters
+src/system/pokewood_rec.c	Pokewood_GetLoadedMovieField	int-to-ptr	PartyPkm * <- u32	1	real	R17: Pokestar Studios' Pokewood_GetLoadedMovieField takes a PartyPkm * as u32 a1
+src/system/printsys.c	PrintQueue_Main	ptr-to-int	u32 <- TextRenderer *	1	harmless	a difference of two addresses in one block
+src/system/printsys.c	PrintQueue_Main	ptr-to-int	u32 <- u8 *	1	harmless	a difference of two addresses in one block
+src/system/resonance_resort_data.c	JoinAvenueData_FillMessage1	int-to-ptr	void * <- u32	1	real	R05: Join Avenue's getters and setters carry name and message pointers as u32
+src/system/resonance_resort_data.c	JoinAvenueData_FillMessage2	int-to-ptr	void * <- u32	1	real	R05: Join Avenue's getters and setters carry name and message pointers as u32
+src/system/resonance_resort_data.c	JoinAvenueEntry_SetParam	int-to-ptr	void * <- u32	4	real	R05: Join Avenue's getters and setters carry name and message pointers as u32
+src/system/resonance_resort_data.c	JoinAvenueInfo_SetParam	int-to-ptr	const u16 * <- u32	2	real	R05: Join Avenue's getters and setters carry name and message pointers as u32
+src/system/resonance_resort_data.c	JoinAvenuePerson_SetParam	int-to-ptr	void * <- u32	4	real	R05: Join Avenue's getters and setters carry name and message pointers as u32
+src/system/resonance_resort_data.c	JoinAvenue_GetParam	ptr-to-int	u32 <- u16 *	2	real	R05: Join Avenue's getters and setters carry name and message pointers as u32
+src/system/resonance_resort_data.c	joinAveTextHandler	ptr-to-int	u32 <- const JoinAvenueMessage *	2	real	R05: Join Avenue's getters and setters carry name and message pointers as u32
+src/system/shinka_check.c	CheckEvolveSpecies	int-to-ptr	PartyPkm * <- u32	3	real	R09: CheckEvolveSpecies' u32 a3 is the trade partner's PartyPkm *
+src/system/snd_mic.c	SndMic_GetAlignedBuffer	int-to-ptr	void * <- u32	1	real	R19: the mic's buffer aligned through u32 (Chatot's cry, the mic test)
+src/system/snd_mic.c	SndMic_GetAlignedBuffer	ptr-to-int	u32 <- void *	1	real	R19: the mic's buffer aligned through u32 (Chatot's cry, the mic test)

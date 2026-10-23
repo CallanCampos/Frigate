@@ -3,6 +3,44 @@
 What port work taught that isn't obvious from the code, newest first. A lesson about MWCC or the decomp's own
 workflow goes in the decomp checkout instead; this file is the port's ([CLAUDE.md](../CLAUDE.md), the iteration loop).
 
+## 2026-10-23: the pointer cast guard, restarted on main
+
+- **A warning count says how it counted.** STATUS.md's libraries' 235 to 231 and PR 7's 218 measured the same
+  warnings two ways: STATUS.md's audit counted instances, a private header's site once for each file that includes it,
+  on macOS; PR 7's 218 counted distinct sites, on Linux (its description: 452 to 379 distinct, the game's 234 to 161).
+  Both reran the host build's commands with its `-isystem` kept, so the casts in the SDK's public headers' inline
+  functions (`gx.h`, `card.h`, `fnd.h`) never showed. On main the audit's way gives the game 161 and the libraries 231
+  again; distinct sites, 161 and 196. A figure in STATUS.md names its tool and its way of counting, and the tool is
+  committed: the guard's `--report` line now.
+- **The host build's decomp headers are system headers.** `port_decomp_env` passes the decomp's include directories
+  with `-isystem`, which silences every warning in them; a check that reruns the build's commands has to turn them into
+  `-I` to see the headers' code, as `check_ptrcasts.py` does, and then maps a host variant of a header
+  (`gen/hwinclude`) back to the header it was made from.
+- **Not every rename upstream passes as one.** The guard pairs a vanished row with a new one only when the kind and
+  two of file, function and types agree and the pair is the only one: two functions of one file renamed with the same
+  kind and types (`allocator.c`'s `SystemHeapAllocator_Malloc` and `_Free`, CPS's ping and its reply, battle's two
+  messages in variable 0x3f) can't be told apart, and a row whose function and types both changed (`mb_wm.c`'s)
+  doesn't match. Of the 29 new rows on main, 8 were old findings under new names. Regenerating the baseline from the
+  old one with `--update` keeps the classes of the rest, and a script that sets the new rows' classes by file and
+  function keeps the work reviewable.
+- **clang's spelling of a type is the guard's key, so check it on two compilers.** Apple clang 21 and Homebrew's
+  clang 23 give the same keys on main (a configure-only build directory with
+  `-DCMAKE_C_COMPILER=/opt/homebrew/opt/llvm/bin/clang` is enough: the guard needs only the compile database), but
+  clang 23 calls a pointer difference `__ptrdiff_t` where Apple clang says `long`, and a `const uptr` read from a const
+  table is spelled with its qualifier, which a set of names misses until the qualifiers are stripped.
+- **Only `u32` to `uptr` keeps MWCC's tokens.** `uptr` and `sptr` are `u32` and `s32` for MWCC, so retyping a `u32` or
+  an `s32` leaves every file's preprocessed text as it was, which `check_mwcc_neutral.py` proves for every file that
+  includes the header at once. An `int` made `sptr` becomes `s32`, the same type but another token: the check then
+  lists every file that includes the header, and the proof is ninja's SHA1s for the complete ones and
+  `compiler_probe.py` before and after, in both versions, for the incomplete ones (learned on the stopped
+  `port-64bit-sweep` branch).
+- **A getter that returns pointers and numbers alike is retyped whole, with every function its pointer type
+  reaches.** On the stopped branch, Join Avenue's four getters and four setters shared overlay 137's function types,
+  so all of them had to return or take a `uptr`, even those that only give numbers: a callback that returns a `u32`
+  through a pointer typed to return a `uptr` leaves the high half undefined on arm64. Its callers keep their numbers
+  in 32-bit locals; the guard doesn't count a call's result narrowed as it is stored, and flags any caller that makes
+  a pointer of the cut value.
+
 ## 2026-10-19: the merge of the performance and hygiene tracks, after review
 
 - **An ADR's note says who accepted it.** ADRs 0013 to 0016 were accepted at their tracks' merges by the sessions that
