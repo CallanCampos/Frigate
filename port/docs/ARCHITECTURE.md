@@ -228,7 +228,8 @@ The decisions behind them are architecture decision records ([adr/](adr/README.m
   draw only the bands of its frame, which make the same picture however many draw it
   ([ADR 0016](adr/0016-3d-frame-in-bands-on-worker-threads.md)).
 - **Plain-C interfaces**: `port/gfx`, `port/audio` and `port/app` never include the decomp's headers, except Frigate's
-  test launcher (`port/app/launcher.c`, the `port_launcher` library), which is test-only and goes when overlay 36 has C
+  test launcher (`port/app/launcher.c`, the `port_launcher` library), which is test-only, steps aside now that
+  overlay 36's field has C, and goes at its retirement
   ([ADR 0012](adr/0012-test-launcher-for-the-field-menus-apps.md)); a platform-layer header they use says
   "Plain C types only".
 - **The controls**: gamepads by position, one pad at a time

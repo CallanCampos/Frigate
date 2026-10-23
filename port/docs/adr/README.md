@@ -92,6 +92,6 @@ changes. Each deserves an ADR when the work it governs starts, or sooner if some
 | D2 | Our own platform layer, not libntr | phase 0 |
 | D4 | Languages, compiler and libraries | phase 0 |
 | D5 | 64-bit native build | phase 0 |
-| D6 | One executable for both versions | phase 5 |
+| D6 | One executable for both versions | phase 5; 0020 is reserved for it |
 | D7 | DS-compatible saves with a sidecar file | phase 1 |
 | D9 | Mods as a first-class design | phase 0 (hook macros), phase 6 (the rest) |

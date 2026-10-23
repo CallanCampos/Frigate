@@ -140,8 +140,8 @@ native fix in the merge.
 
 STATUS.md's entries, the review records (`REVIEW-*.md`) and accepted ADRs keep what they said when they were written.
 A change that finds one wrong, or finishes what one left pending, adds a new entry (or an ADR's status line) that
-says so; it never edits the old text. The only edit to a past STATUS.md entry is filling its `PORT_SHA`, as
-[STATUS.md](STATUS.md#how-to-add-an-entry) says; typos and broken links may be fixed.
+says so; it never edits the old text. The only edits a past record gets are a typo or a broken link fixed, and in a
+STATUS.md entry its `PORT_SHA` filled in, as [STATUS.md](STATUS.md#how-to-add-an-entry) says.
 
 ## Conflicts and stopped syncs
 

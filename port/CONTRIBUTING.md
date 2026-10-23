@@ -99,7 +99,8 @@ work belong to the separate decomp project, following its contribution rules; th
 
 Records are added to, never rewritten: [STATUS.md](docs/STATUS.md)'s entries, the review records and accepted
 [ADRs](docs/adr/README.md) keep what they said at the time. A correction or an update is a new entry, or an ADR's
-status line, that says what changed ([SYNC.md](docs/SYNC.md#records-are-added-to)).
+status line, that says what changed. The only edits a past record gets are a typo or a broken link fixed, and in a
+STATUS.md entry its `PORT_SHA` filled in ([SYNC.md](docs/SYNC.md#records-are-added-to)).
 
 Open a [port bug report](https://github.com/CallanCampos/Frigate/issues/new?template=port_bug.yml) with the commit,
 build command, OS/architecture, reproduction steps and a short relevant log. Feature requests should explain the
