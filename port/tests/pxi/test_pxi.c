@@ -161,7 +161,7 @@ static void TestBusReadyTags(void) {
     CHECK(OS_GetSystemWork()->pxiHandleChecker[PXI_PROC_ARM9] == 0);
 }
 
-static void LoggingCallback(u32 tag, u32 data, BOOL err) {
+static void LoggingCallback(PXIFifoTag tag, u32 data, BOOL err) {
     Log("ARM9 tag %u data %#x err %d", tag, data, err);
 }
 

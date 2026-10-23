@@ -80,7 +80,7 @@ static struct {
     u64 due;
 } sMic;
 
-static void MicCommonCallback(u32 tag, u32 data, BOOL err);
+static void MicCommonCallback(PXIFifoTag tag, u32 data, BOOL err);
 static BOOL MicStartAutoSampling(void *buffer, u32 size, u32 rate, u8 type);
 static BOOL MicStopAutoSampling(void);
 static void MicGetResultCallback(MICResult result, void *arg);
@@ -219,7 +219,7 @@ MICWork *MICi_GetSysWork(void) {
 }
 
 // NitroSDK's MicCommonCallback: the ARM7's words with the microphone's tag
-static void MicCommonCallback(u32 tag, u32 data, BOOL err) {
+static void MicCommonCallback(PXIFifoTag tag, u32 data, BOOL err) {
     MICCallback callback;
     MICResult result;
     u16 command;

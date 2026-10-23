@@ -33,7 +33,7 @@
 static u16 rtcInitialized;
 static RTCWork rtcWork;
 
-static void RtcCommonCallback(u32 tag, u32 data, BOOL err);
+static void RtcCommonCallback(PXIFifoTag tag, u32 data, BOOL err);
 
 // NitroSDK's RtcBCD2HEX: the number that the digits of a BCD number make, or 0 when a nibble is not a digit
 static u32 RtcBCD2HEX(u32 bcd) {
@@ -170,7 +170,7 @@ static void ReadTime(RTCTime *time) {
 
 // NitroSDK's RtcCommonCallback for the commands that the game has: the ARM7's answer, with the command in bits 8 to 14
 // and the result in the low byte, or the alarm interrupt, which isn't an answer
-static void RtcCommonCallback(u32 tag, u32 data, BOOL err) {
+static void RtcCommonCallback(PXIFifoTag tag, u32 data, BOOL err) {
     int result;
     u32 command;
     u8 pxiResult;
