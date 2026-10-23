@@ -9,7 +9,6 @@
 // and the time played while a pass power ran. The ROM has no string for the file, so the name is a guess.
 // Block 0x35.
 
-#define SAVE_BLOCK_HIGH_LINK 0x35
 #define HIGH_LINK_LEVEL_MAX 999
 
 // The play time, in seconds, when the count of HighLinkSave_CountPlaySeconds started
@@ -34,12 +33,12 @@ void setupProbabilityTable(PassPowerLevel *levels) {
     probabilityLoop((SurveyProbabilityState *)levels);
 }
 
-u16 PassPowerLevel_GetWhite(void *levels) {
-    return ((PassPowerLevel *)levels)->level1;
+u16 PassPowerLevel_GetWhite(PassPowerLevel *levels) {
+    return levels->level1;
 }
 
-u16 PassPowerLevel_GetBlack(void *levels) {
-    return ((PassPowerLevel *)levels)->level2;
+u16 PassPowerLevel_GetBlack(PassPowerLevel *levels) {
+    return levels->level2;
 }
 
 // Adds to the White level, up to 999, and returns how much was added

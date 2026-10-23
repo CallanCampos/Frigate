@@ -2,6 +2,7 @@
 #include "battle/btl_calc.h"
 #include "battle/btl_main.h"
 #include "battle/btl_pokeparam.h"
+#include "battle/btl_result.h"
 #include "battle/btl_setup.h"
 #include "battle/btl_tables.h"
 #include "battle/trainer_data.h"
@@ -777,9 +778,9 @@ u32 BtlClientIDList_GetEscapeResult(BtlClientIDList *list, u8 clientId, u32 valu
     }
     if (hasAlly && hasOpponent) {
         if (value <= 1) {
-            return 3;
+            return BTL_RESULT_FLEE;
         }
-        return 2;
+        return BTL_RESULT_DRAW;
     }
-    return hasAlly ? 3 : 4;
+    return hasAlly ? BTL_RESULT_FLEE : BTL_RESULT_FLEE_FOE;
 }

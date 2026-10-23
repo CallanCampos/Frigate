@@ -279,31 +279,31 @@ MONOLITH_POWER_SELECT_PROC_FUNCTIONS kind:data(any) addr:0x021a00f0
 data_ov143_021a00bc kind:data(any) addr:0x021a00fc
 sMonolithPowerBGSetups kind:data(any) addr:0x021a0114
 MONOLITH_POWER_INFO_PROC_FUNCTIONS kind:data(any) addr:0x021a0174
-data_ov143_021a0140 kind:data(any) addr:0x021a0180
-data_ov143_021a0160 kind:data(any) addr:0x021a01a0
+sMonolithPowerInfoBGSetupText kind:data(any) addr:0x021a0180
+sMonolithPowerInfoBGSetup kind:data(any) addr:0x021a01a0
 MONOLITH_MISSION_UNUSED_FLAGS kind:data(any) addr:0x021a01c0
-data_ov143_021a0184 kind:data(any) addr:0x021a01c4
-data_ov143_021a018c kind:data(any) addr:0x021a01cc
-data_ov143_021a019c kind:data(any) addr:0x021a01dc
-data_ov143_021a01ae kind:data(any) addr:0x021a01ee
+sMonolithMissionTouchRects kind:data(any) addr:0x021a01c4
+sMonolithMissionLevelRects kind:data(any) addr:0x021a01cc
+sMonolithMissionCode kind:data(any) addr:0x021a01dc
+sMonolithMissionLevelRanges kind:data(any) addr:0x021a01ee
 data_ov143_021a01b0 kind:data(any) addr:0x021a01f0
-data_ov143_021a01c2 kind:data(any) addr:0x021a0202
+sMonolithMissionLevelButtons kind:data(any) addr:0x021a0202
 data_ov143_021a01d0 kind:data(any) addr:0x021a0210 ambiguous
 data_ov143_021a0214_w2_us kind:data(any) addr:0x021a0214 ambiguous
 MONOLITH_MISSION_SELECT_PROC_FUNCTIONS kind:data(any) addr:0x021a0224
 data_ov143_021a01f0 kind:data(any) addr:0x021a0230
-data_ov143_021a0208 kind:data(any) addr:0x021a0248
+sMonolithMissionBGSetups kind:data(any) addr:0x021a0248
 data_ov143_021a0228 kind:data(any) addr:0x021a0268
 data_ov143_021a023c kind:data(any) addr:0x021a027c ambiguous
 data_ov143_021a0248 kind:data(any) addr:0x021a0288
-data_ov143_021a0268 kind:data(any) addr:0x021a02a8
-data_ov143_021a0340 kind:data(any) addr:0x021a0380
-data_ov143_021a034a kind:data(any) addr:0x021a038a
+sMonolithMissionIcons kind:data(any) addr:0x021a02a8
+sMonolithMissionInfoTargetMsgs kind:data(any) addr:0x021a0380
+sMonolithMissionInfoWindows kind:data(any) addr:0x021a038a
 MONOLITH_MISSION_INFO_PROC_FUNCTIONS kind:data(any) addr:0x021a03c8
-data_ov143_021a0394 kind:data(any) addr:0x021a03d4
+sMonolithMissionInfoBGSetups kind:data(any) addr:0x021a03d4
 data_ov143_021a039c kind:data(any) addr:0x021a03dc ambiguous
 data_ov143_021a03b4 kind:data(any) addr:0x021a03f4
-data_ov143_021a03d4 kind:data(any) addr:0x021a0414
+sMonolithMissionInfoTexts kind:data(any) addr:0x021a0414
 data_ov143_021a03d8 kind:data(any) addr:0x021a0418
 data_ov143_021a0420 kind:data(any) addr:0x021a0460
 data_ov143_021a0424 kind:data(any) addr:0x021a0464

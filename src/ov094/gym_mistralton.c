@@ -4,6 +4,7 @@
 #include "field/event_mapchange.h"
 #include "field/event_trainer_eye.h"
 #include "field/field.h"
+#include "field/field_acmd.h"
 #include "field/field_actor.h"
 #include "field/field_camera.h"
 #include "field/field_exp_obj.h"
@@ -45,11 +46,13 @@
 #define GRID_COLUMNS 23
 // What a cell of the grid is: where the player is stopped, where the first step is, where the cannon is, and where the
 // player is held up
-#define GRID_FREE 0
-#define GRID_WALL 1
-#define GRID_START 2
-#define GRID_CANNON 3
-#define GRID_PLATFORM 4
+enum {
+    GRID_FREE,
+    GRID_WALL,
+    GRID_START,
+    GRID_CANNON,
+    GRID_PLATFORM,
+};
 
 // The frames in the gym at which the stage becomes 1 and 2
 #define STAGE_1_FRAMES 0x3c
@@ -58,11 +61,6 @@
 #define ANM_SPEED_CENTER_STEP 0x260
 #define ANM_SPEED_FAN_STEP 0x300
 #define FAN_PITCH_STEP 0x10
-
-// The acmds that the ride sets on the player's actor: face a direction, jump and turn on the spot
-#define ACMD_FACE_DIR 0
-#define ACMD_JUMP 0x4b
-#define ACMD_FACE_DIR_BASE 0x24
 
 #define FORME_RIDING 5
 
@@ -576,7 +574,7 @@ static GameEventReturnCode MistraltonTravelEvent_Run(GameEvent *event, u32 *stat
     switch (*state) {
     case 0:
         if (FldAct_CheckAcmdEnd(data->actor)) {
-            FldAct_SetAcmd(data->actor, ACMD_JUMP);
+            FldAct_SetAcmd(data->actor, ACMD_GYOE);
             GFL_SndSEPlay(SEQ_SE_GYM_H07);
             *state = 1;
         }
@@ -590,7 +588,7 @@ static GameEventReturnCode MistraltonTravelEvent_Run(GameEvent *event, u32 *stat
     case 2:
         if (FldAct_CheckAcmdEnd(data->actor)) {
             dir = (s32)FieldPlayer_GetFaceDir(data->player) % 4;
-            FldAct_SetAcmd(data->actor, ACMD_FACE_DIR_BASE + dir);
+            FldAct_SetAcmd(data->actor, ACMD_STAY_WALK_4F + dir);
             data->turns++;
             if (data->turns >= 4) {
                 *state = 3;
@@ -628,7 +626,7 @@ static GameEventReturnCode MistraltonTravelEvent_Run(GameEvent *event, u32 *stat
         if (FldAct_CheckAcmdEnd(data->actor)) {
             dir = FieldPlayer_GetFaceDir(data->player) + 1;
             dir = dir % 4;
-            FldAct_SetAcmd(data->actor, ACMD_FACE_DIR + dir);
+            FldAct_SetAcmd(data->actor, ACMD_FACE + dir);
         }
         if (FieldTaskManager_GetActiveTaskCount(Field_GetTaskManager(data->field)) <= 1) {
             if (!data->blocked) {
@@ -653,7 +651,7 @@ static GameEventReturnCode MistraltonTravelEvent_Run(GameEvent *event, u32 *stat
         if (FldAct_CheckAcmdEnd(data->actor)) {
             dir = FieldPlayer_GetFaceDir(data->player) + 1;
             dir = dir % 4;
-            FldAct_SetAcmd(data->actor, ACMD_FACE_DIR + dir);
+            FldAct_SetAcmd(data->actor, ACMD_FACE + dir);
         }
         if (data->timer >= sEndFrames[1]) {
             ready = TRUE;
@@ -707,7 +705,7 @@ static GameEventReturnCode MistraltonBumpEvent_Run(GameEvent *event, u32 *state,
     switch (*state) {
     case 0:
         if (FldAct_CheckAcmdEnd(data->actor)) {
-            FldAct_SetAcmd(data->actor, ACMD_JUMP);
+            FldAct_SetAcmd(data->actor, ACMD_GYOE);
             GFL_SndSEPlay(SEQ_SE_GYM_H07);
             *state = 1;
         }
@@ -787,7 +785,7 @@ static GameEventReturnCode MistraltonCannonEvent_Run(GameEvent *event, u32 *stat
         break;
     case 1:
         if (FldAct_CheckAcmdEnd(data->actor)) {
-            FldAct_SetAcmd(data->actor, ACMD_JUMP);
+            FldAct_SetAcmd(data->actor, ACMD_GYOE);
             GFL_SndSEPlay(SEQ_SE_GYM_H07);
             *state = 2;
         }
@@ -821,7 +819,7 @@ static GameEventReturnCode MistraltonCannonEvent_Run(GameEvent *event, u32 *stat
         if (FldAct_CheckAcmdEnd(data->actor)) {
             u16 dir = (s32)FieldPlayer_GetFaceDir(data->player) % 4;
 
-            FldAct_SetAcmd(data->actor, ACMD_FACE_DIR_BASE + dir);
+            FldAct_SetAcmd(data->actor, ACMD_STAY_WALK_4F + dir);
             data->turns++;
             if (FieldTaskManager_IsIdle(Field_GetTaskManager(data->field)) && data->turns >= 4) {
                 *state = 6;
@@ -982,7 +980,7 @@ static GameEventReturnCode MistraltonTriggerEvent_Run(GameEvent *event, u32 *sta
             u16 dir = GetActorFaceDir(data->actor) + 1;
 
             dir = dir % 4;
-            FldAct_SetAcmd(data->actor, ACMD_FACE_DIR + dir);
+            FldAct_SetAcmd(data->actor, ACMD_FACE + dir);
         }
         if (FieldTaskManager_GetActiveTaskCount(Field_GetTaskManager(data->field)) <= 1) {
             GFL_SndPlayerStop(GFL_SndSeqGetPlayerIndex(SEQ_SE_GYM_H01));

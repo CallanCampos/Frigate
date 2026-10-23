@@ -109,14 +109,14 @@ BOOL ManualExplain_Main(ManualExplain *explain) {
         if (explain->state == STATE_IDLE) {
             u32 touched = ManualTouchBar_GetTouched(explain->common->touchBar);
 
-            if (touched != -1) {
+            if (touched != TOUCHBAR_ICON_NONE) {
                 explain->state = STATE_TOUCH_BAR;
-                if (touched == MANUAL_TOUCHBAR_ICON_PREV) {
+                if (touched == TOUCHBAR_ICON_LEFT) {
                     if (explain->page != 0) {
                         explain->page--;
                         explain->pageChanged = TRUE;
                     }
-                } else if (touched == MANUAL_TOUCHBAR_ICON_NEXT) {
+                } else if (touched == TOUCHBAR_ICON_RIGHT) {
                     if (explain->page < explain->param->pageCount - 1) {
                         explain->page++;
                         explain->pageChanged = TRUE;
@@ -129,15 +129,15 @@ BOOL ManualExplain_Main(ManualExplain *explain) {
         } else {
             u32 decided = ManualTouchBar_GetDecided(explain->common->touchBar);
 
-            if (decided != -1) {
+            if (decided != TOUCHBAR_ICON_NONE) {
                 switch (decided) {
-                case MANUAL_TOUCHBAR_ICON_RETURN:
+                case TOUCHBAR_ICON_RETURN:
                     explain->param->result = 0;
                     explain->state = STATE_END;
                     explain->endTimer = 1;
                     break;
-                case MANUAL_TOUCHBAR_ICON_PREV:
-                case MANUAL_TOUCHBAR_ICON_NEXT:
+                case TOUCHBAR_ICON_LEFT:
+                case TOUCHBAR_ICON_RIGHT:
                     explain->state = STATE_IDLE;
                     if (explain->pageChanged) {
                         ManualTouchBar_SetPage(explain->common->touchBar, explain->param->pageCount, explain->page);

@@ -11,8 +11,6 @@
 // player's birthday and the date. The ROM has no string for the file or name for the block, so the name is a
 // guess. Block 0x2c.
 
-#define SAVE_BLOCK_TRAINER_LOG 0x2c
-
 TrainerLogSave *TrainerLogSave_Get(SaveControl *save) {
     return SaveControl_GetBlockPtr(save, SAVE_BLOCK_TRAINER_LOG);
 }

@@ -8,6 +8,7 @@
 #include "battle/btl_poke_select.h"
 #include "battle/btl_pokeparam.h"
 #include "battle/btl_rec.h"
+#include "battle/btl_result.h"
 #include "battle/btl_server.h"
 #include "battle/btl_server_cmd.h"
 #include "battle/btl_setup.h"
@@ -754,21 +755,29 @@ static const u8 data_ov167_021d6eb4[5] = { 0, 0, 0, 1, 2 };
 
 // 0x021d7070: the commands that the clients handle (also used by the other ranges' handlers)
 static const BtlClientCmdEntry sCmdProcTable[15] = {
-    { 1, 1, { BattleClient_SetupView, NULL, BattleClient_RecPlaySetupView } },
-    { 2, 0, { BattleClient_PlayerSelectRotation, BattleClient_AISelectRotation, BattleClient_RecPlaySelectRotation } },
-    { 3, 0, { BattleClient_PlayerSelectAction, AISelectAction, RecPlaySelectAction } },
-    { 7, 0, { BattleClient_PlayerConfirmUseNextPoke, NULL, NULL } },
-    { 5, 0, { BattleClient_PlayerSelectChangePokeFainted, AISelectChangePoke, BattleClient_RecPlaySelectChangePoke } },
-    { 6, 0, { BattleClient_PlayerSelectChangePokeMidTurn, AISelectChangePoke, BattleClient_RecPlaySelectChangePoke } },
-    { 4, 0, { BattleClient_PlayerConfirmShiftSwitch, NULL, BattleClient_RecPlaySelectChangePoke } },
-    { 8, 0, { BattleClient_ServerCmdLoop, NULL, BattleClient_RecPlayServerCmdLoop } },
-    { 10, 0, { BattleClient_StoreRecordData, NULL, NULL } },
-    { 11, 1, { BattleClient_ExitTrainerBattle, NULL, BattleClient_RecPlayExitTrainerBattle } },
-    { 12, 1, { BattleClient_ExitFacilityBattle, NULL, BattleClient_RecPlayExitFacilityBattle } },
-    { 14, 1, { BattleClient_ExitWildBattleWin, NULL, NULL } },
-    { 15, 1, { BattleClient_ExitWildBattleLose, NULL, NULL } },
-    { 13, 1, { BattleClient_ExitCommBattle, NULL, BattleClient_RecPlayExitCommBattle } },
-    { 16, 1, { BattleClient_ShowTimeUpMsg, NULL, NULL } },
+    { BTL_ACMD_SETUP_VIEW, 1, { BattleClient_SetupView, NULL, BattleClient_RecPlaySetupView } },
+    { BTL_ACMD_SELECT_ROTATION,
+      0,
+      { BattleClient_PlayerSelectRotation, BattleClient_AISelectRotation, BattleClient_RecPlaySelectRotation } },
+    { BTL_ACMD_SELECT_ACTION, 0, { BattleClient_PlayerSelectAction, AISelectAction, RecPlaySelectAction } },
+    { BTL_ACMD_CONFIRM_NEXT_POKE, 0, { BattleClient_PlayerConfirmUseNextPoke, NULL, NULL } },
+    { BTL_ACMD_SELECT_CHANGE_FAINTED,
+      0,
+      { BattleClient_PlayerSelectChangePokeFainted, AISelectChangePoke, BattleClient_RecPlaySelectChangePoke } },
+    { BTL_ACMD_SELECT_CHANGE_MID_TURN,
+      0,
+      { BattleClient_PlayerSelectChangePokeMidTurn, AISelectChangePoke, BattleClient_RecPlaySelectChangePoke } },
+    { BTL_ACMD_CONFIRM_SHIFT_SWITCH,
+      0,
+      { BattleClient_PlayerConfirmShiftSwitch, NULL, BattleClient_RecPlaySelectChangePoke } },
+    { BTL_ACMD_SERVER_CMD, 0, { BattleClient_ServerCmdLoop, NULL, BattleClient_RecPlayServerCmdLoop } },
+    { BTL_ACMD_STORE_RECORD, 0, { BattleClient_StoreRecordData, NULL, NULL } },
+    { BTL_ACMD_EXIT_TRAINER, 1, { BattleClient_ExitTrainerBattle, NULL, BattleClient_RecPlayExitTrainerBattle } },
+    { BTL_ACMD_EXIT_FACILITY, 1, { BattleClient_ExitFacilityBattle, NULL, BattleClient_RecPlayExitFacilityBattle } },
+    { BTL_ACMD_EXIT_WILD_WIN, 1, { BattleClient_ExitWildBattleWin, NULL, NULL } },
+    { BTL_ACMD_EXIT_WILD_LOSE, 1, { BattleClient_ExitWildBattleLose, NULL, NULL } },
+    { BTL_ACMD_EXIT_COMM, 1, { BattleClient_ExitCommBattle, NULL, BattleClient_RecPlayExitCommBattle } },
+    { BTL_ACMD_TIME_UP, 1, { BattleClient_ShowTimeUpMsg, NULL, NULL } },
 };
 
 // The studio's next step for each state, by the event that happened
@@ -1004,7 +1013,7 @@ static BOOL BattleClient_MainProcNormal(BtlClient *client) {
             return FALSE;
         }
         BattleClient_SetDummyReturnData(client);
-        if (cmd == 9) {
+        if (cmd == BTL_ACMD_QUIT) {
             const BtlClientIDList *list;
 
             BtlAdapter_GetRecvData(client->adapter, (const void **)&list);
@@ -2166,7 +2175,7 @@ static BOOL Studio_ShowResult(BtlClient *client) {
     case STUDIO_RESULT_SEQ_INIT:
         setup = GetBattleSetupParam(client->mainModule);
         rules = GetStudioRules(client->mainModule);
-        if (GetBattleResultForClient(client) == 1) {
+        if (GetBattleResultForClient(client) == BTL_RESULT_VICTORY) {
             client->turnCount = 100;
         } else {
             client->turnCount = 101;
@@ -2240,7 +2249,7 @@ static BOOL RecPlaySelectActionCore(BtlClient *client, s32 *seq, BOOL arg2) {
         }
         client->returnData = action;
         client->returnDataSize = count * 4;
-        if (action->bits.action == 8) {
+        if (action->bits.action == BATTLE_ACTION_REC_TIMEOUT) {
             RecPlayer_SetDataEnd(&client->recPlayer);
             if (client->viewCore != NULL) {
                 Btlv_StringParam_Setup(&client->strParam, 1, 0xb7);
@@ -2251,7 +2260,7 @@ static BOOL RecPlaySelectActionCore(BtlClient *client, s32 *seq, BOOL arg2) {
                 client->recTimeUp = TRUE;
                 return TRUE;
             }
-        } else if (action->bits.action == 9) {
+        } else if (action->bits.action == BATTLE_ACTION_REC_ERROR) {
             client->recCanceled = TRUE;
             RecPlayer_SetDataEnd(&client->recPlayer);
             if (client->viewCore != NULL) {
@@ -2263,7 +2272,7 @@ static BOOL RecPlaySelectActionCore(BtlClient *client, s32 *seq, BOOL arg2) {
                 return TRUE;
             }
         } else {
-            if (action->bits.action == 1 && action->bits.target >= 6) {
+            if (action->bits.action == BATTLE_ACTION_FIGHT && action->bits.target >= 6) {
                 client->actions[0].bits.move = action->bits.move;
             }
             *seq = REC_SELECT_SEQ_STUDIO;
@@ -2441,7 +2450,7 @@ static BOOL BattleClient_ActionSelectRoot(BtlClient *client, s32 *seq) {
             return FALSE;
         }
         switch (BtlvCore_WaitCommandSelect(client->viewCore)) {
-        case 3:
+        case BTLV_COMMAND_POKEMON:
             if (CheckCondition(client->procMon, 0x21)) {
                 BtlvCore_ResetScreen(client->viewCore);
                 *seq = ROOT_SEQ_BLOCKED_RESET_SCREEN;
@@ -2450,11 +2459,11 @@ static BOOL BattleClient_ActionSelectRoot(BtlClient *client, s32 *seq) {
                 BattleClient_SetSelActProc(client, BattleClient_ActionSwitchPokemon);
             }
             break;
-        case 1:
+        case BTLV_COMMAND_FIGHT:
             shooterWork_SetCost(client, client->procActionIdx, 0);
             BattleClient_SetSelActProc(client, BattleClient_ActionSelectFight);
             break;
-        case 2:
+        case BTLV_COMMAND_BAG:
             if (CheckCondition(client->procMon, 0x21)) {
                 *seq = ROOT_SEQ_BLOCKED_RESET_SCREEN;
             } else if (client->bagMode == 1 && !func_ov167_0219db08(client->mainModule)) {
@@ -2466,7 +2475,7 @@ static BOOL BattleClient_ActionSelectRoot(BtlClient *client, s32 *seq) {
                 BattleClient_SetSelActProc(client, BattleClient_ActionSelectItem);
             }
             break;
-        case 4:
+        case BTLV_COMMAND_RUN:
             if (client->procActionIdx == client->firstActionIdx) {
                 if (CheckCondition(client->procMon, 0x21) && GetRunMode(client->mainModule) != 2) {
                     *seq = ROOT_SEQ_BLOCKED_RESET_SCREEN;
@@ -2481,10 +2490,10 @@ static BOOL BattleClient_ActionSelectRoot(BtlClient *client, s32 *seq) {
                             client, PokeCon_GetClientPartyMon(client->pokeCon, client->clientId, client->procActionIdx),
                             NULL)) {
                         client->shooterEnergy += shooterWork_GetCost(client, client->procActionIdx);
-                        if (BattleAction_GetAction(&client->actions[client->procActionIdx]) == 3) {
+                        if (BattleAction_GetAction(&client->actions[client->procActionIdx]) == BATTLE_ACTION_CHANGE) {
                             PokeSelect_Pop(&client->pokeSelect);
                         }
-                        if (BattleAction_GetAction(&client->actions[client->procActionIdx]) == 2) {
+                        if (BattleAction_GetAction(&client->actions[client->procActionIdx]) == BATTLE_ACTION_ITEM) {
                             selItemWork_Restore(client, client->procActionIdx);
                         }
                         BattleClient_SetSelActProc(client, BattleClient_ActionSelectRoot);
@@ -2725,9 +2734,9 @@ static BOOL BattleClient_ActionSelectFight(BtlClient *client, s32 *seq) {
             return FALSE;
         }
         result = BtlvCore_WaitTargetSelect(client->viewCore);
-        if (result == 1) {
+        if (result == BTLV_TARGET_SELECT_CHOSEN) {
             BattleClient_SetSelActProc(client, BattleClient_ActionSelectAutoRest);
-        } else if (result == 2) {
+        } else if (result == BTLV_TARGET_SELECT_BACK) {
             *seq = FIGHT_SEQ_START_MOVE_SELECT;
         }
         break;
@@ -4379,13 +4388,13 @@ static BOOL BattleClient_ExitCommBattle(BtlClient *client, s32 *seq) {
         isMulti = IsMultiMode(client->mainModule);
         SetBattleResult(client->mainModule, result);
         switch (result) {
-        case 1:
+        case BTL_RESULT_VICTORY:
             msg = isMulti ? 0x31 : 0x30;
             break;
-        case 0:
+        case BTL_RESULT_DEFEAT:
             msg = isMulti ? 0x33 : 0x32;
             break;
-        case 2:
+        case BTL_RESULT_DRAW:
             msg = isMulti ? 0x35 : 0x34;
             break;
         default:
@@ -4433,12 +4442,12 @@ static u32 GetBattleResultForClient(BtlClient *client) {
     switch (data[1]) {
     case 0:
         if (!IsAllyClientID(data[0], client->clientId)) {
-            return 1;
+            return BTL_RESULT_VICTORY;
         }
         break;
     case 1:
         if (!IsAllyClientID(data[0], client->clientId)) {
-            return 0;
+            return BTL_RESULT_DEFEAT;
         }
         break;
     }
@@ -4464,7 +4473,7 @@ static BOOL BattleClient_ExitTrainerBattle(BtlClient *client, s32 *seq) {
     switch (*seq) {
     case EXIT_TRAINER_SEQ_INIT:
         if (GetStudioMode(client->mainModule) == 0) {
-            if (GetBattleResultForClient(client) == 1) {
+            if (GetBattleResultForClient(client) == BTL_RESULT_VICTORY) {
                 BtlvEffect_PlayBgm(GetWinBGM(client->mainModule));
                 name1 = GetPlayerOpponentClientID(client->mainModule, 0);
                 name2 = GetPlayerOpponentClientID(client->mainModule, 1);
@@ -4653,10 +4662,10 @@ static BOOL BattleClient_ExitFacilityBattle(BtlClient *client, s32 *seq) {
         }
         result = GetBattleResultForClient(client);
         SetBattleResult(client->mainModule, result);
-        if (result == 1) {
+        if (result == BTL_RESULT_VICTORY) {
             BtlvEffect_PlayBgm(GetWinBGM(client->mainModule));
         }
-        if (result <= 1) {
+        if (result <= BTL_RESULT_VICTORY) {
             BtlvEffect_SetTrainer(
                 GetClientTrainerClass(client->mainModule, GetPlayerOpponentClientID(client->mainModule, 0)), 9, 0, 0,
                 0);
@@ -6982,7 +6991,7 @@ static void RecPlayer_Update(BtlClient *client, BtlClientRecPlayer *recPlayer) {
                 BOOL changed = FALSE;
 
                 switch (input) {
-                case 2:
+                case BTLV_RECORDER_QUIT:
                     recPlayer->result = REC_PLAYER_RESULT_QUIT;
                     BtlvCore_StartFadeOut(client->viewCore);
                     recPlayer->quitStarted = TRUE;
@@ -6996,14 +7005,14 @@ static void RecPlayer_Update(BtlClient *client, BtlClientRecPlayer *recPlayer) {
                     BtlvEffect_ReleaseVoices();
                     SkipExitBGMFadeOut(client->mainModule);
                     break;
-                case 0:
+                case BTLV_RECORDER_PREV:
                     if (recPlayer->skipTarget > 1) {
                         recPlayer->skipTarget--;
                         changed = TRUE;
                     }
                     recPlayer->quitTimer = 45;
                     break;
-                case 1:
+                case BTLV_RECORDER_NEXT:
                     if (recPlayer->skipTarget < recPlayer->maxChapter) {
                         recPlayer->skipTarget++;
                         changed = TRUE;

@@ -54,18 +54,22 @@ typedef union {
 // The slots of the save's downloaded tournaments; slot 0 is none
 typedef enum { WBT_DOWNLOAD_SLOT_FIRST = 1, WBT_DOWNLOAD_SLOT_END = 4 } WbtDownloadSlot;
 
-#define WBT_STATUS_UNUSED 0
-#define WBT_STATUS_CANDIDATE 1
-#define WBT_STATUS_PICKED 2
+enum {
+    WBT_STATUS_UNUSED,
+    WBT_STATUS_CANDIDATE,
+    WBT_STATUS_PICKED,
+};
 
 // Any, for the count of Trainers the player has beaten
 #define WBT_ANY 2
 
-#define WBT_KIND_TABLE 0
-// The first of four kinds that stand for a Trainer of the downloaded tournament
-#define WBT_KIND_CAST_FIRST 0xf1
-#define WBT_KIND_CAST_LAST 0xf4
-#define WBT_KIND_PLAYER 0xff
+enum {
+    WBT_KIND_TABLE,
+    // The first of four kinds that stand for a Trainer of the downloaded tournament
+    WBT_KIND_CAST_FIRST = 0xf1,
+    WBT_KIND_CAST_LAST = 0xf4,
+    WBT_KIND_PLAYER = 0xff,
+};
 
 static WbtMakeMatch *WbtMakeMatch_Create(HeapID heapId, void *record, const WbtMatchParam *param);
 static void WbtMakeMatch_Free(WbtMakeMatch *m);

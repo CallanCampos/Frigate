@@ -83,12 +83,6 @@ enum {
     CURSOR_POS_NUM,
 };
 
-// The sub-process modes of the screens it goes to and comes from
-#define SEARCH_MODE_FROM_TITLE 13
-#define SEARCH_MODE_PARTNER_RETURN 15
-#define PARTNER_MODE_FROM_SEARCH 16
-#define ENTER_MODE_DISCONNECT 21
-
 // The text color of the conditions and of the labels
 #define SEARCH_INFO_COLOR 0x3c40
 #define SEARCH_LABEL_COLOR 0x440
@@ -243,7 +237,7 @@ int WorldTrade_Search_Init(WorldTradeWork *wk, int seq) {
                             SEARCH_INFO_COLOR, &wk->print);
 
     wk->vfunc2 = Search_SlideScreenVFunc;
-    if (wk->subProcessMode == SEARCH_MODE_FROM_TITLE) {
+    if (wk->subProcessMode == WT_MODE_SEARCH_FROM_TITLE) {
         GFL_WipeSet(3, 1, 1, 0, 6, 1, HEAPID_WORLDTRADE);
     }
     wk->subprocessSeq = SEARCH_SEQ_START;
@@ -541,7 +535,7 @@ static int Search_SubSeqStart(WorldTradeWork *wk) {
         ClActor_SetVisible(wk->cursorAct, TRUE);
     }
 
-    if (wk->subProcessMode == SEARCH_MODE_PARTNER_RETURN) {
+    if (wk->subProcessMode == WT_MODE_SEARCH_PARTNER_RETURN) {
         if (wk->searchResult != 0) {
             Search_SubSeqMessagePrint(wk, 0x26, 0, 0, 0xf0f);
         } else {
@@ -899,7 +893,7 @@ static int Search_SubSeqErrorDisconnectMessage1(WorldTradeWork *wk) {
 static int Search_SubSeqErrorDisconnectMessage2(WorldTradeWork *wk) {
     Search_SubSeqMessagePrint(wk, 0xac, 4, 0, 0xf0f);
     WorldTrade_SetNextSeq(wk, SEARCH_SEQ_MES_WAIT_KEY, SEARCH_SEQ_END_TO_ENTER);
-    WorldTrade_SubProcessChange(wk, WORLDTRADE_ENTER, ENTER_MODE_DISCONNECT);
+    WorldTrade_SubProcessChange(wk, WORLDTRADE_ENTER, WT_MODE_RELOGIN);
     GFL_SndSEPlay(SEQ_SE_BEEP);
     return WT_SEQ_MAIN;
 }
@@ -1223,7 +1217,7 @@ static int Search_SubSeqExchangeScreen1(WorldTradeWork *wk) {
         wk->drawOffset = -16;
         if (wk->subLcdTouchOK) {
             wk->subprocessSeq = SEARCH_SEQ_END;
-            WorldTrade_SubProcessChange(wk, WORLDTRADE_PARTNER, PARTNER_MODE_FROM_SEARCH);
+            WorldTrade_SubProcessChange(wk, WORLDTRADE_PARTNER, WT_MODE_PARTNER_FROM_SEARCH);
             wk->touchTrainerPos = 0;
         }
         ClActor_SetVisible(wk->promptDsAct, FALSE);

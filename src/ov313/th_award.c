@@ -41,10 +41,12 @@
 #define BG_TEXT 3
 #define BG_SUB_C_GEAR 4
 
-#define WINDOW_COUNT 4
-#define WINDOW_BATTLE_KIND 1
-#define WINDOW_POINTS 2
-#define WINDOW_RANK 3
+enum {
+    WINDOW_BATTLE_KIND = 1,
+    WINDOW_POINTS,
+    WINDOW_RANK,
+    WINDOW_COUNT,
+};
 
 #define ICON_COUNT 4
 #define RANK_COUNT 7

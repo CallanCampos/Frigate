@@ -278,7 +278,7 @@ static void MBParent_Init(MBParentWork *wk) {
     MBParent_DrawTopScreen(wk);
     if (wk->startMenu == FALSE) {
         wk->trainerGameInfo = getTrainerGameInfoAddress(GameData_GetSaveControl(wk->param->gameData));
-        TrainerGameInfo_SetPalParkResult(wk->trainerGameInfo, 4);
+        TrainerGameInfo_SetPalParkResult(wk->trainerGameInfo, PAL_PARK_RESULT_CANCELED);
     } else {
         wk->trainerGameInfo = NULL;
         sScrollFrames = 0;
@@ -329,7 +329,7 @@ static BOOL MBParent_Main(MBParentWork *wk) {
             GameData_CancelSave(wk->param->gameData);
         }
         wk->state = MB_PARENT_STATE_WIPE_OUT;
-        MBParent_SetPalParkResult(wk, 3);
+        MBParent_SetPalParkResult(wk, PAL_PARK_RESULT_ERROR);
     }
     switch (wk->state) {
     case MB_PARENT_STATE_WIPE_IN:
@@ -379,11 +379,11 @@ static BOOL MBParent_Main(MBParentWork *wk) {
         break;
     case MB_PARENT_STATE_ASK_ANSWER: {
         int answer = MBUtilMsg_UpdateConfirm(wk->msg);
-        if (answer == 1) {
+        if (answer == MB_UTIL_MSG_YES) {
             wk->state = MB_PARENT_STATE_SETUP_DOWNLOAD;
             MBUtilMsg_ClearWindow(wk->msg);
             MBUtilMsg_ForgetConfirm(wk->msg);
-        } else if (answer == 2) {
+        } else if (answer == MB_UTIL_MSG_NO) {
             wk->state = MB_PARENT_STATE_WIPE_OUT;
         }
         break;
@@ -421,7 +421,7 @@ static BOOL MBParent_Main(MBParentWork *wk) {
     case MB_PARENT_STATE_WAIT_CHILD:
         wk->waitConnectFrames++;
         if (wk->waitConnectFrames >= 1800) {
-            MBParent_SetPalParkResult(wk, 3);
+            MBParent_SetPalParkResult(wk, PAL_PARK_RESULT_ERROR);
             wk->state = MB_PARENT_STATE_TIMEOUT;
         } else if (MBComm_IsConnected(wk->comm) == TRUE) {
             wk->parentInfo.textSpeed = TextSpeed_GetCurrentWait();
@@ -459,12 +459,12 @@ static BOOL MBParent_Main(MBParentWork *wk) {
         wk->state = MB_PARENT_STATE_WAIT_CHILD_REQUEST;
         break;
     case MB_PARENT_STATE_WAIT_CHILD_REQUEST:
-        if (MBComm_GetState(wk->comm) == 10) {
-            MBParent_SetPalParkResult(wk, 3);
+        if (MBComm_GetState(wk->comm) == MB_COMM_STATE_ERROR_1) {
+            MBParent_SetPalParkResult(wk, PAL_PARK_RESULT_ERROR);
             MBUtilMsg_Print(wk->msg, 8, TextSpeed_GetCurrentWait());
             MBComm_StartDisconnect(wk->comm);
             wk->state = MB_PARENT_STATE_WAIT_END;
-        } else if (MBComm_GetState(wk->comm) == 2) {
+        } else if (MBComm_GetState(wk->comm) == MB_COMM_STATE_REQUEST_PROGRAM) {
             if (wk->childRomSent == FALSE) {
                 wk->childRomSent = TRUE;
                 MBComm_SendProgram(wk->comm, wk->childRom, wk->childRomSize);
@@ -474,32 +474,32 @@ static BOOL MBParent_Main(MBParentWork *wk) {
         }
         break;
     case MB_PARENT_STATE_SEND_PROGRAM:
-        if (MBComm_GetState(wk->comm) == 3) {
+        if (MBComm_GetState(wk->comm) == MB_COMM_STATE_SELECT_POKEMON) {
             MBUtilMsg_Print(wk->msg, 3, TextSpeed_GetCurrentWait());
             wk->state = MB_PARENT_STATE_WAIT_PROGRAM_SENT;
-        } else if (MBComm_GetState(wk->comm) == 13) {
-            MBParent_SetPalParkResult(wk, 4);
+        } else if (MBComm_GetState(wk->comm) == MB_COMM_STATE_CANCELED) {
+            MBParent_SetPalParkResult(wk, PAL_PARK_RESULT_CANCELED);
             MBUtilMsg_Print(wk->msg, 8, TextSpeed_GetCurrentWait());
             MBComm_StartDisconnect(wk->comm);
             wk->state = MB_PARENT_STATE_WAIT_END;
         }
         // fallthrough
     case MB_PARENT_STATE_WAIT_PROGRAM_SENT:
-        if (MBComm_GetState(wk->comm) == 4) {
+        if (MBComm_GetState(wk->comm) == MB_COMM_STATE_TRANSFER) {
             MBComm_ClearPokemon(wk->comm);
             MBUtilMsg_Print(wk->msg, 4, TextSpeed_GetCurrentWait());
             wk->state = MB_PARENT_STATE_WAIT_POKEMON;
         }
         break;
     case MB_PARENT_STATE_WAIT_POKEMON:
-        if (MBComm_GetState(wk->comm) == 5) {
+        if (MBComm_GetState(wk->comm) == MB_COMM_STATE_POKEMON_SENT) {
             RecordAddOne(GameData_GetRecords(wk->param->gameData), 0x78);
             wk->transferCount++;
             wk->state = MB_PARENT_STATE_ACK_POKEMON;
-        } else if (MBComm_GetState(wk->comm) == 8) {
+        } else if (MBComm_GetState(wk->comm) == MB_COMM_STATE_NO_POKEMON) {
             RecordAddOne(GameData_GetRecords(wk->param->gameData), 0x78);
             wk->transferCount++;
-            MBParent_SetPalParkResult(wk, 2);
+            MBParent_SetPalParkResult(wk, PAL_PARK_RESULT_NONE_TRANSFERRED);
             wk->state = MB_PARENT_STATE_SEND_BOX_SPACE;
         }
         break;
@@ -510,11 +510,11 @@ static BOOL MBParent_Main(MBParentWork *wk) {
         break;
     case MB_PARENT_STATE_WAIT_ACK:
         if (MBComm_IsAcked(wk->comm) == TRUE || wk->startMenu == TRUE) {
-            if (MBComm_GetState(wk->comm) == 6) {
+            if (MBComm_GetState(wk->comm) == MB_COMM_STATE_WAIT_SAVE) {
                 wk->state = MB_PARENT_STATE_STORE_POKEMON;
-            } else if (MBComm_GetState(wk->comm) == 10) {
+            } else if (MBComm_GetState(wk->comm) == MB_COMM_STATE_ERROR_1) {
                 if (wk->startMenu == FALSE) {
-                    MBParent_SetPalParkResult(wk, 3);
+                    MBParent_SetPalParkResult(wk, PAL_PARK_RESULT_ERROR);
                     MBUtilMsg_Print(wk->msg, 8, TextSpeed_GetCurrentWait());
                     MBComm_StartDisconnect(wk->comm);
                     wk->state = MB_PARENT_STATE_WAIT_END;
@@ -556,12 +556,13 @@ static BOOL MBParent_Main(MBParentWork *wk) {
         }
         break;
     case MB_PARENT_STATE_WAIT_CHILD_NEXT:
-        if (MBComm_GetState(wk->comm) == 2) {
+        if (MBComm_GetState(wk->comm) == MB_COMM_STATE_REQUEST_PROGRAM) {
             MBComm_ResetCommands(wk->comm);
             wk->state = MB_PARENT_STATE_WAIT_CHILD_REQUEST;
-        } else if (MBComm_GetState(wk->comm) == 9 || MBComm_GetState(wk->comm) == 10) {
-            if (MBComm_GetState(wk->comm) == 10) {
-                MBParent_SetPalParkResult(wk, 3);
+        } else if (MBComm_GetState(wk->comm) == MB_COMM_STATE_FINISHED ||
+                   MBComm_GetState(wk->comm) == MB_COMM_STATE_ERROR_1) {
+            if (MBComm_GetState(wk->comm) == MB_COMM_STATE_ERROR_1) {
+                MBParent_SetPalParkResult(wk, PAL_PARK_RESULT_ERROR);
             }
             MBUtilMsg_Print(wk->msg, 8, TextSpeed_GetCurrentWait());
             wk->state = MB_PARENT_STATE_SEND_END;
@@ -1097,12 +1098,12 @@ static void MBParent_UpdateEntry(MBParentWork *wk) {
         } else {
             answer = MBUtilMsg_UpdateConfirm(wk->msg);
         }
-        if (answer == 1) {
+        if (answer == MB_UTIL_MSG_YES) {
             GFL_ASSERT_MSG(MBP_GetState() == MBP_STATE_ENTRY, "state is not[MBP_STATE_ENTRY][%d]!!!\n", MBP_GetState());
-            MBParent_SetPalParkResult(wk, 4);
+            MBParent_SetPalParkResult(wk, PAL_PARK_RESULT_CANCELED);
             MBP_Cancel();
             wk->cancelSeq = MB_PARENT_CANCEL_SEQ_CANCELLED;
-        } else if (answer == 2) {
+        } else if (answer == MB_UTIL_MSG_NO) {
             PlayerInfo *playerInfo = GetGameDataPlayerInfo(wk->param->gameData);
 
             if (wk->startMenu == FALSE) {
@@ -1143,29 +1144,33 @@ static void MBParent_SetPalParkResult(MBParentWork *wk, u8 result) {
         BOOL set = FALSE;
 
         switch (result) {
-        case 0:
-            if (current != 1 && current != 3 && current != 5) {
+        case PAL_PARK_RESULT_TRANSFERRED:
+            if (current != PAL_PARK_RESULT_HIGH_SCORE && current != PAL_PARK_RESULT_ERROR &&
+                current != PAL_PARK_RESULT_ERROR_AFTER_TRANSFER) {
                 set = TRUE;
             }
             break;
-        case 1:
-            if (current != 3 && current != 5) {
+        case PAL_PARK_RESULT_HIGH_SCORE:
+            if (current != PAL_PARK_RESULT_ERROR && current != PAL_PARK_RESULT_ERROR_AFTER_TRANSFER) {
                 set = TRUE;
             }
             break;
-        case 2:
-            if (current != 0 && current != 1 && current != 3 && current != 5) {
+        case PAL_PARK_RESULT_NONE_TRANSFERRED:
+            if (current != PAL_PARK_RESULT_TRANSFERRED && current != PAL_PARK_RESULT_HIGH_SCORE &&
+                current != PAL_PARK_RESULT_ERROR && current != PAL_PARK_RESULT_ERROR_AFTER_TRANSFER) {
                 set = TRUE;
             }
             break;
-        case 3:
+        case PAL_PARK_RESULT_ERROR:
             set = TRUE;
             if (wk->receivedCount != 0) {
-                result = 5;
+                result = PAL_PARK_RESULT_ERROR_AFTER_TRANSFER;
             }
             break;
-        case 4:
-            if (current != 2 && current != 0 && current != 1 && current != 3 && current != 5) {
+        case PAL_PARK_RESULT_CANCELED:
+            if (current != PAL_PARK_RESULT_NONE_TRANSFERRED && current != PAL_PARK_RESULT_TRANSFERRED &&
+                current != PAL_PARK_RESULT_HIGH_SCORE && current != PAL_PARK_RESULT_ERROR &&
+                current != PAL_PARK_RESULT_ERROR_AFTER_TRANSFER) {
                 set = TRUE;
             }
             break;
@@ -1208,11 +1213,11 @@ static void MBParent_ReceivePokemon(MBParentWork *wk) {
 
         if (highScore < score) {
             TrainerGameInfo_SetPalParkHighScore(wk->trainerGameInfo, score);
-            MBParent_SetPalParkResult(wk, 1);
+            MBParent_SetPalParkResult(wk, PAL_PARK_RESULT_HIGH_SCORE);
         } else if (count == 0) {
-            MBParent_SetPalParkResult(wk, 2);
+            MBParent_SetPalParkResult(wk, PAL_PARK_RESULT_NONE_TRANSFERRED);
         } else {
-            MBParent_SetPalParkResult(wk, 0);
+            MBParent_SetPalParkResult(wk, PAL_PARK_RESULT_TRANSFERRED);
         }
         if (wk->highScore < score) {
             wk->highScore = score;
@@ -1319,13 +1324,13 @@ static void MBParent_UpdateTransfer(MBParentWork *wk) {
 static void MBParent_UpdateResult(MBParentWork *wk) {
     switch (wk->resultSeq) {
     case MB_PARENT_RESULT_SEQ_WAIT_RESULT:
-        if (MBComm_GetState(wk->comm) == 10 || MBComm_GetState(wk->comm) == 12) {
+        if (MBComm_GetState(wk->comm) == MB_COMM_STATE_ERROR_1 || MBComm_GetState(wk->comm) == MB_COMM_STATE_ERROR_3) {
             MBUtilMsg_Print(wk->msg, 0x29, TextSpeed_GetCurrentWait());
             MBUtilMsg_ShowWindow(wk->msg, 1);
             MBComm_StartDisconnect(wk->comm);
             wk->state = MB_PARENT_STATE_SEND_END;
         }
-        if (MBComm_GetState(wk->comm) == 11) {
+        if (MBComm_GetState(wk->comm) == MB_COMM_STATE_ERROR_2) {
             MBUtilMsg_Print(wk->msg, 0x2c, TextSpeed_GetCurrentWait());
             MBUtilMsg_ShowWindow(wk->msg, 1);
             MBComm_StartDisconnect(wk->comm);
@@ -1361,7 +1366,7 @@ static void MBParent_UpdateResult(MBParentWork *wk) {
         break;
     case MB_PARENT_RESULT_SEQ_RECEIVE_ANSWER:
         wk->answer = MBUtilMsg_UpdateConfirm(wk->msg);
-        if (wk->answer == 1) {
+        if (wk->answer == MB_UTIL_MSG_YES) {
             u16 count = MBComm_GetResultCount(wk->comm);
             u16 space = BoxSaveAccessor_CountEmptySlots(GameData_GetBoxSaveAccessor(wk->param->gameData));
 
@@ -1373,7 +1378,7 @@ static void MBParent_UpdateResult(MBParentWork *wk) {
                 wk->boxFull = FALSE;
                 wk->resultSeq = MB_PARENT_RESULT_SEQ_PRINT_MORE;
             }
-        } else if (wk->answer == 2) {
+        } else if (wk->answer == MB_UTIL_MSG_NO) {
             wk->resultSeq = MB_PARENT_RESULT_SEQ_SEND_ANSWER;
         }
         break;
@@ -1417,14 +1422,14 @@ static void MBParent_UpdateResult(MBParentWork *wk) {
     case MB_PARENT_RESULT_SEQ_FLAG1_ANSWER: {
         int answer = MBUtilMsg_UpdateConfirm(wk->msg);
 
-        if (answer == 1) {
+        if (answer == MB_UTIL_MSG_YES) {
             if (MBComm_GetResultFlag2(wk->comm) == TRUE) {
                 MBUtilMsg_Print(wk->msg, 0x1b, TextSpeed_GetCurrentWait());
                 wk->resultSeq = MB_PARENT_RESULT_SEQ_ASK_FLAG2;
             } else {
                 wk->resultSeq = MB_PARENT_RESULT_SEQ_SEND_ANSWER;
             }
-        } else if (answer == 2) {
+        } else if (answer == MB_UTIL_MSG_NO) {
             wk->resultSeq = MB_PARENT_RESULT_SEQ_PRINT_CONFIRM;
         }
         break;
@@ -1438,9 +1443,9 @@ static void MBParent_UpdateResult(MBParentWork *wk) {
     case MB_PARENT_RESULT_SEQ_FLAG2_ANSWER: {
         int answer = MBUtilMsg_UpdateConfirm(wk->msg);
 
-        if (answer == 1) {
+        if (answer == MB_UTIL_MSG_YES) {
             wk->resultSeq = MB_PARENT_RESULT_SEQ_SEND_ANSWER;
-        } else if (answer == 2) {
+        } else if (answer == MB_UTIL_MSG_NO) {
             wk->resultSeq = MB_PARENT_RESULT_SEQ_PRINT_CONFIRM;
         }
         break;
@@ -1458,10 +1463,10 @@ static void MBParent_UpdateResult(MBParentWork *wk) {
     case MB_PARENT_RESULT_SEQ_CONFIRM_ANSWER: {
         int answer = MBUtilMsg_UpdateConfirm(wk->msg);
 
-        if (answer == 1) {
-            wk->answer = 2;
+        if (answer == MB_UTIL_MSG_YES) {
+            wk->answer = MB_UTIL_MSG_NO;
             wk->resultSeq = MB_PARENT_RESULT_SEQ_SEND_ANSWER;
-        } else if (answer == 2) {
+        } else if (answer == MB_UTIL_MSG_NO) {
             wk->resultSeq = MB_PARENT_RESULT_SEQ_PRINT_FLAG1;
         }
         break;
@@ -1469,23 +1474,23 @@ static void MBParent_UpdateResult(MBParentWork *wk) {
     case MB_PARENT_RESULT_SEQ_SEND_ANSWER: {
         u32 reply;
 
-        if (wk->answer == 1) {
+        if (wk->answer == MB_UTIL_MSG_YES) {
             if (wk->boxFull == TRUE) {
-                reply = 2;
+                reply = MB_COMM_ANSWER_BOX_FULL;
             } else {
-                reply = 0;
+                reply = MB_COMM_ANSWER_ACCEPT;
             }
         } else {
-            reply = 1;
+            reply = MB_COMM_ANSWER_DECLINE;
         }
         if (MBComm_SendCommand(wk->comm, MB_COMM_CMD_ANSWER, reply) == TRUE) {
-            if (reply == 0) {
+            if (reply == MB_COMM_ANSWER_ACCEPT) {
                 wk->resultSeq = MB_PARENT_RESULT_SEQ_RECEIVE_POKEMON;
                 MBUtilMsg_ClearWindow(wk->msg);
                 MBUtilMsg_SetWindow(wk->msg, 1);
                 MBUtilMsg_PrintAtOnce(wk->msg, 0x19);
                 MBUtilMsg_SetShowWaitIcon(wk->msg, 1);
-            } else if (reply == 2) {
+            } else if (reply == MB_COMM_ANSWER_BOX_FULL) {
                 wk->resultSeq = MB_PARENT_RESULT_SEQ_PRINT_BOX_FULL;
             } else {
                 wk->resultSeq = MB_PARENT_RESULT_SEQ_WAIT_ITEM_INFO;
@@ -1555,14 +1560,14 @@ static void MBParent_UpdateResult(MBParentWork *wk) {
     case MB_PARENT_RESULT_SEQ_ITEM_ANSWER: {
         int answer = MBUtilMsg_UpdateConfirm(wk->msg);
 
-        if (answer == 1 || answer == 2) {
+        if (answer == MB_UTIL_MSG_YES || answer == MB_UTIL_MSG_NO) {
             // The bag is fetched here as for the gift below, but not used
             BagSave *bag = GameData_GetBag(wk->param->gameData);
             PlayerInfo *playerInfo = GetGameDataPlayerInfo(wk->param->gameData);
             TrainerCardSave *trainerCard = getTrainerCardDataBlkAddress(wk->param->gameData);
 
-            if (answer == 1 && isOneShotDRObtained(trainerCard, 0, playerInfo) == TRUE) {
-                wk->answer = 2;
+            if (answer == MB_UTIL_MSG_YES && isOneShotDRObtained(trainerCard, 0, playerInfo) == TRUE) {
+                wk->answer = MB_UTIL_MSG_NO;
                 wk->resultSeq = MB_PARENT_RESULT_SEQ_WAIT_ITEM_OWNED_MSG;
                 MBUtilMsg_ClearWindow(wk->msg);
                 MBUtilMsg_SetWindow(wk->msg, 1);
@@ -1583,7 +1588,7 @@ static void MBParent_UpdateResult(MBParentWork *wk) {
     case MB_PARENT_RESULT_SEQ_SEND_ITEM_ANSWER: {
         BOOL accept = TRUE;
 
-        if (wk->answer != 1) {
+        if (wk->answer != MB_UTIL_MSG_YES) {
             accept = FALSE;
         }
         if (MBComm_SendCommand(wk->comm, MB_COMM_CMD_ITEM_ANSWER, accept) == TRUE) {

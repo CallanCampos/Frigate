@@ -300,13 +300,13 @@ u32 FieldRoutine_MapLoad(GameSystem *gsys, Field *field) {
         field->noGridMapper =
             FieldNoGridMapper_Create(field->heapId, field->cameraSystem, field->sceneArea, field->sceneAreaLoader);
         field->palaceSys = FieldPalaceSys_Create(field->heapId, gsys, field, field->zoneId);
-        FieldColorPostFX_Set(field->colorPostFX, FieldPalaceSys_GetLuminanceTable(field->palaceSys),
+        FieldColorPostFX_Set(&field->colorPostFX, FieldPalaceSys_GetLuminanceTable(field->palaceSys),
                              IsZoneFlashbackMemoryPostFX(field->zoneId));
         propSystem = FieldG3DMapper_GetBMSystem(field->g3DMapper);
         SetupLoadZoneMapTypeData(field->zoneId, field->areaData, &field->mapperConfig,
                                  GetMapMatrixSystem(field->gameData));
-        FieldPropSystem_LoadArea(propSystem, field->zoneId, field->areaData, field->colorPostFX);
-        FieldG3DObjSystem_SetColorPostFX(field->g3DObjSystem, field->colorPostFX);
+        FieldPropSystem_LoadArea(propSystem, field->zoneId, field->areaData, &field->colorPostFX);
+        FieldG3DObjSystem_SetColorPostFX(field->g3DObjSystem, &field->colorPostFX);
         Field_LoadWFBC(gameData, field, field->zoneId);
         Field_LoadJoinAvenue(gameData, field, field->zoneId);
         break;
@@ -316,7 +316,7 @@ u32 FieldRoutine_MapLoad(GameSystem *gsys, Field *field) {
 
         SetupZoneWarpArrivalGrid(&field->playerZoneState, field->zoneId, 0, 0, 0, field->playerPos.x,
                                  field->playerPos.y, field->playerPos.z);
-        FieldG3DMapper_CreateMap(field->g3DMapper, &field->mapperConfig, field->colorPostFX);
+        FieldG3DMapper_CreateMap(field->g3DMapper, &field->mapperConfig, &field->colorPostFX);
         railId = GetRailIDForZone(field->zoneId);
         if (railId != 0xffffffff) {
             FieldNoGridMapper_LoadByHeader(field->noGridMapper, railId, field->heapId);
@@ -690,7 +690,7 @@ NoGridMapper *Field_GetNoGridMapper(Field *field) {
     return field->noGridMapper;
 }
 
-void *Field_GetLightSystem(Field *field) {
+FieldLight *Field_GetLightSystem(Field *field) {
     return field->lightSystem;
 }
 
@@ -698,11 +698,11 @@ FieldFog *Field_GetFog(Field *field) {
     return field->fog;
 }
 
-void *Field_GetFogCtrl(Field *field) {
+FieldFogCtrl *Field_GetFogCtrl(Field *field) {
     return field->fogCtrl;
 }
 
-void *Field_GetWeatherSystem(Field *field) {
+FieldWeather *Field_GetWeatherSystem(Field *field) {
     return field->weatherSystem;
 }
 
@@ -722,11 +722,11 @@ u16 Field_GetHeapID(Field *field) {
     return field->heapId;
 }
 
-void *Field_GetEffectBlAct(Field *field) {
+BlActSys *Field_GetEffectBlAct(Field *field) {
     return field->effectBlAct;
 }
 
-void *Field_GetWildEffectBlAct(Field *field) {
+BlActSys *Field_GetWildEffectBlAct(Field *field) {
     return field->wildEffectBlAct;
 }
 
@@ -758,11 +758,11 @@ FieldSubscreen *Field_GetSubscreen(Field *field) {
     return field->subscreen;
 }
 
-void *Field_GetFieldEffects(Field *field) {
+FieldEffects *Field_GetFieldEffects(Field *field) {
     return field->fieldEffects;
 }
 
-void *Field_GetG3DObjSys(Field *field) {
+FieldG3DObjSystem *Field_GetG3DObjSys(Field *field) {
     return field->g3DObjSystem;
 }
 
@@ -790,7 +790,7 @@ PlaceName *Field_GetPlaceName(Field *field) {
     return field->placeName;
 }
 
-void *Field_GetFesGimmick(Field *field) {
+FesGimmick *Field_GetFesGimmick(Field *field) {
     return field->fesGimmick;
 }
 
@@ -1022,7 +1022,7 @@ void Field_InitActorSystem(Field *field) {
 
     field->actorSystem = actorSystem;
     FldActSys_AttachField(actorSystem, field->heapId, gameData, field, field->g3DMapper, field->noGridMapper,
-                          field->colorPostFX);
+                          &field->colorPostFX);
     FldActSys_InitBlAct(field->actorSystem, field->actorBlAct, 0x20);
     FldActSys_LoadCachedBlact(field->actorSystem);
     FldActSys_LoadStaticBlact(
@@ -1385,7 +1385,7 @@ void Field_SetRenderMode(Field *field, u32 mode) {
     field->renderMode = mode;
 }
 
-void *Field_Get3DCi(Field *field) {
+Fld3DCi *Field_Get3DCi(Field *field) {
     return field->g3dCi;
 }
 
@@ -1393,7 +1393,7 @@ EncEff *Field_GetEncEff(Field *field) {
     return field->encEff;
 }
 
-void *Field_GetSkillMapEff(Field *field) {
+FieldSkillMapEff *Field_GetSkillMapEff(Field *field) {
     return field->skillMapEff;
 }
 
@@ -1445,8 +1445,8 @@ FieldLensFlare *Field_GetLensFlare(Field *field) {
     return field->lensFlare;
 }
 
-void *Field_GetColorPostFX(Field *field) {
-    return field->colorPostFX;
+FieldColorPostFX *Field_GetColorPostFX(Field *field) {
+    return &field->colorPostFX;
 }
 
 fx32 Field_GetActorYOffset(Field *field) {

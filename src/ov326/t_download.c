@@ -57,8 +57,10 @@
 #define T_DOWNLOAD_FLAG_LIST_PRINTED 0x1000000
 
 // How a button was pressed
-#define T_DOWNLOAD_INPUT_KEY 1
-#define T_DOWNLOAD_INPUT_TOUCH 2
+enum {
+    T_DOWNLOAD_INPUT_KEY = 1,
+    T_DOWNLOAD_INPUT_TOUCH,
+};
 
 static BOOL TDownload_Init(GameProc *proc, u32 *state, void *param, void *work);
 static BOOL TDownload_Exit(GameProc *proc, u32 *state, void *param, void *work);

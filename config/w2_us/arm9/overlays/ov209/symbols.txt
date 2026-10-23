@@ -380,8 +380,8 @@ MUS_SHOT_INFO_RETURN_RECT kind:data(any) addr:0x021c2d60
 MUS_SHOT_INFO_BG4_SETUP kind:data(any) addr:0x021c2d68
 MUS_SHOT_INFO_BG6_SETUP kind:data(any) addr:0x021c2d88
 MUS_SHOT_INFO_BG7_SETUP kind:data(any) addr:0x021c2da8
-MUS_ITEM_DRAW_UNUSED_0 kind:data(any) addr:0x021c2dc8
-MUS_ITEM_DRAW_UNUSED_1 kind:data(any) addr:0x021c2dcc
+MUS_ITEM_DRAW_UNUSED_1 kind:data(any) addr:0x021c2dc8
+MUS_ITEM_DRAW_UNUSED_0 kind:data(any) addr:0x021c2dcc
 MUS_ITEM_DRAW_SHOW kind:data(any) addr:0x021c2dd0
 MUSICAL_MCSS_ORTHO_TARGET kind:data(any) addr:0x021c2dd4
 MUSICAL_MCSS_ORTHO_POS kind:data(any) addr:0x021c2de0

@@ -6,6 +6,7 @@
 #include "gfl/heap.h"
 #include "gfl/overlay.h"
 #include "gfl/proc.h"
+#include "nitro/fx.h"
 #include "struct_decls.h"
 
 // The Spin Trade of the Union Room, overlay 216, in which up to five players spin their Eggs on a disc and take the
@@ -193,16 +194,41 @@ BOOL Guru2Receipt_Exit(GameProc *proc, u32 *state, void *param, void *work);
 void Guru2Receipt_SetSeq(Guru2ReceiptWork *g2r, int seq, u8 netId);
 void Guru2Receipt_SetSeqOnJoin(Guru2ReceiptWork *g2r, int seq, u8 netId);
 
+// GURU2_NET_CMD_8: what the parent sends each frame of the game
+typedef struct {
+    fx32 discAngle;
+    // How high the Eggs have jumped
+    fx32 jumpY;
+    // In degrees
+    u16 eggAngles[GURU2_MEMBER_MAX];
+    u16 timeUp;
+} Guru2GameData;
+
+// GURU2_NET_CMD_12: where everything stopped, in degrees
+typedef struct {
+    u16 discAngle;
+    // The net IDs whose Egg stopped on a bonus area
+    u16 bonusBits;
+    // By position
+    u16 eggAngles[6];
+} Guru2ResultData;
+
+// GURU2_NET_CMD_9: a member's position around the disc
+typedef struct {
+    u16 position;
+    u16 netId;
+} Guru2PositionData;
+
 // guru2_main.c, the screen with the disc
 BOOL Guru2Main_Init(GameProc *proc, u32 *state, void *param, void *work);
 BOOL Guru2Main_Main(GameProc *proc, u32 *state, void *param, void *work);
 BOOL Guru2Main_Exit(GameProc *proc, u32 *state, void *param, void *work);
 // What the net commands 7 to 12 call with their data
 void Guru2Main_OnButton(Guru2MainWork *g2m, u32 value);
-void Guru2Main_OnGameData(Guru2MainWork *g2m, const void *data);
-void Guru2Main_OnPosition(Guru2MainWork *g2m, const void *data);
+void Guru2Main_OnGameData(Guru2MainWork *g2m, const Guru2GameData *data);
+void Guru2Main_OnPosition(Guru2MainWork *g2m, const Guru2PositionData *position);
 void Guru2Main_OnPlayerCount(Guru2MainWork *g2m, u32 value);
 void Guru2Main_OnPartyIndex(Guru2MainWork *g2m, int netId, u32 value);
-void Guru2Main_OnResult(Guru2MainWork *g2m, const void *data);
+void Guru2Main_OnResult(Guru2MainWork *g2m, const Guru2ResultData *data);
 
 #endif // POKEBW2_APP_GURU2_H

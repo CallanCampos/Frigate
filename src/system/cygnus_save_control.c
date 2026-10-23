@@ -66,7 +66,7 @@ void DreamRadar_EraseSaveData(HeapID heapId) {
     GFL_HeapFree(data);
 }
 
-void *DreamRadar_GetSaveData(void *buffer) {
+CygnusSaveData *DreamRadar_GetSaveData(void *buffer) {
     return &sCardData;
 }
 

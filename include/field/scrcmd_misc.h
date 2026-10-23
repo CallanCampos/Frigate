@@ -8,6 +8,15 @@
 #include "struct_decls.h"
 #include "system/vm.h"
 
+// A floor of an elevator: its name, and where it goes. A script's table of them follows s01C1_ElevatorSetTablePtr
+struct ElevatorFloor {
+    u16 messageId;
+    u16 zoneId;
+    u16 x;
+    u16 y;
+    u16 z;
+};
+
 BOOL s0134_CasteliaRushInit(VM *vm, FieldScriptEnv *env);
 BOOL func_ov036_021afcfc(VM *vm, FieldScriptEnv *env);
 BOOL func_ov036_021afd9c(VM *vm, FieldScriptEnv *env);

@@ -38,18 +38,6 @@
 #define RESORT_SHOP_KIND_COUNT 8
 #define RESORT_PERSON_COUNT 8
 
-// The fields of the info that JoinAvenue_GetParam reads and JoinAvenueInfo_SetParam sets: the avenue's rank, and the
-// popularity points toward the next rank
-#define RESORT_INFO_RANK 2
-#define RESORT_INFO_POPULARITY 3
-
-// The values of the ResortWork that the visits use: the group of the day's visits and their count, then a flag for
-// each of the eight people who has had a visit
-#define RESORT_WORK_GROUP 9
-#define RESORT_WORK_VISITS 10
-#define RESORT_WORK_MET_FIRST 11
-#define RESORT_WORK_MET_LAST 18
-
 // The base of the messages of the page of a ranking in SCRIPT_TEXT_GLOBAL_10685
 #define RESORT_MSG_RANK_PAGE 2173
 
@@ -496,7 +484,7 @@ u16 ResortSys_GetScriptValue(u32 query, ResortSys *sys, ResortPersonData *data, 
         }
     }
     case 102: {
-        u16 rank = JoinAvenue_GetParam(info, RESORT_INFO_RANK, NULL);
+        u16 rank = JoinAvenue_GetParam(info, JOIN_AVE_INFO_RANK, NULL);
 
         if (rank >= ResortBinary_GetLastRangeEnd(ranks)) {
             return ResortSys_PickByGender(gender, 148, 165);
@@ -876,7 +864,7 @@ u32 ResortSys_AddPopularity(ResortSys *sys, GameData *gameData, u32 points, u16 
     JoinAvenueInfo *info = ResortSys_GetInfo(sys);
     ResortBinary *ranks = ResortSys_GetRanks(sys);
     BOOL newTexts = FALSE;
-    u32 popularity = JoinAvenue_GetParam(info, RESORT_INFO_POPULARITY, NULL);
+    u32 popularity = JoinAvenue_GetParam(info, JOIN_AVE_INFO_POPULARITY, NULL);
     u32 required;
     u32 range;
     u32 nextRange;
@@ -884,7 +872,7 @@ u32 ResortSys_AddPopularity(ResortSys *sys, GameData *gameData, u32 points, u16 
     u32 shop;
     BOOL newShop;
 
-    *rank = JoinAvenue_GetParam(info, RESORT_INFO_RANK, NULL);
+    *rank = JoinAvenue_GetParam(info, JOIN_AVE_INFO_RANK, NULL);
     if (*rank >= ResortBinary_GetLastRangeEnd(ranks)) {
         return 2;
     }
@@ -892,13 +880,13 @@ u32 ResortSys_AddPopularity(ResortSys *sys, GameData *gameData, u32 points, u16 
     range = ResortBinary_FindRange(ranks, *rank);
     required = ResortBinary_Get(ranks, range, 5);
     if (popularity + points < required) {
-        JoinAvenueInfo_SetParam(info, RESORT_INFO_POPULARITY, popularity + points);
+        JoinAvenueInfo_SetParam(info, JOIN_AVE_INFO_POPULARITY, popularity + points);
         return 0;
     }
 
     (*rank)++;
-    JoinAvenueInfo_SetParam(info, RESORT_INFO_RANK, *rank);
-    JoinAvenueInfo_SetParam(info, RESORT_INFO_POPULARITY, 0);
+    JoinAvenueInfo_SetParam(info, JOIN_AVE_INFO_RANK, *rank);
+    JoinAvenueInfo_SetParam(info, JOIN_AVE_INFO_POPULARITY, 0);
     nextRange = ResortBinary_FindRange(ranks, *rank);
     oldMessage = ResortBinary_Get(ranks, range, 6);
     shop = ResortSys_GetUnlockForRank(sys, gameData, *rank);
@@ -1197,11 +1185,11 @@ void ResortSys_SetScriptWord(u32 type, u32 who, u16 index, u32 wordIndex, Resort
         break;
     }
     case 11:
-        WordSetNumber(wordSet, wordIndex, JoinAvenue_GetParam(info, RESORT_INFO_RANK, NULL), 4, NUM_PAD_NONE, TRUE);
+        WordSetNumber(wordSet, wordIndex, JoinAvenue_GetParam(info, JOIN_AVE_INFO_RANK, NULL), 4, NUM_PAD_NONE, TRUE);
         break;
     case 12: {
         u32 message = ResortBinary_Get(
-            ranks, ResortBinary_FindRange(ranks, JoinAvenue_GetParam(info, RESORT_INFO_RANK, NULL)), 6);
+            ranks, ResortBinary_FindRange(ranks, JoinAvenue_GetParam(info, JOIN_AVE_INFO_RANK, NULL)), 6);
         MsgData *msgData =
             GFL_MsgSysLoadData(FALSE, ARCID_SCRIPT_MESSAGE, SCRIPT_TEXT_GLOBAL_10685, HEAPID_TAIL(heapId));
         StrBuf *buf = GFL_MsgDataLoadStrbufNew(msgData, message);
@@ -1212,8 +1200,8 @@ void ResortSys_SetScriptWord(u32 type, u32 who, u16 index, u32 wordIndex, Resort
         break;
     }
     case 13: {
-        u32 rank = JoinAvenue_GetParam(info, RESORT_INFO_RANK, NULL);
-        u32 popularity = JoinAvenue_GetParam(info, RESORT_INFO_POPULARITY, NULL);
+        u32 rank = JoinAvenue_GetParam(info, JOIN_AVE_INFO_RANK, NULL);
+        u32 popularity = JoinAvenue_GetParam(info, JOIN_AVE_INFO_POPULARITY, NULL);
         s32 remaining = ResortBinary_Get(ranks, ResortBinary_FindRange(ranks, rank), 5) - popularity;
 
         if (remaining < 0) {
@@ -1252,7 +1240,7 @@ static u32 ResortSys_RollTier(ResortPersonData *data, ResortSys *sys) {
     ResortBinary *ranks = ResortSys_GetRanks(sys);
     JoinAvenueInfo *info = ResortSys_GetInfo(sys);
     u32 total = 0;
-    u32 range = ResortBinary_FindRange(ranks, JoinAvenue_GetParam(info, RESORT_INFO_RANK, NULL));
+    u32 range = ResortBinary_FindRange(ranks, JoinAvenue_GetParam(info, JOIN_AVE_INFO_RANK, NULL));
     u32 roll = ResortData_Roll(data, 2, 100);
     s32 tier;
 
@@ -1297,7 +1285,7 @@ static BOOL ResortSys_IsTypeAvailable(ResortSys *sys, ResortBinary *table, u16 r
         info = ResortSys_GetInfo(sys);
         shops = ResortSys_GetShopOpenings(sys);
         available = FALSE;
-        rank = JoinAvenue_GetParam(info, RESORT_INFO_RANK, NULL);
+        rank = JoinAvenue_GetParam(info, JOIN_AVE_INFO_RANK, NULL);
         if (rank >= ResortBinary_Get(shops, unlock - 1, 4)) {
             available = TRUE;
         }
@@ -2298,7 +2286,7 @@ BOOL ResortSys_HasShopKind(ResortSys *sys, GameData *gameData, u32 a2) {
     }
 
     trainerIdMod = getTrainerID(GetGameDataPlayerInfo(gameData)) % 7;
-    rank = JoinAvenue_GetParam(info, RESORT_INFO_RANK, NULL);
+    rank = JoinAvenue_GetParam(info, JOIN_AVE_INFO_RANK, NULL);
     if (rank >= 13) {
         return 1;
     }

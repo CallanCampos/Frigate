@@ -3,5 +3,5 @@ FestSparklePlace_PickPlaces kind:function(thumb,size=0x114) addr:0x0216f968
 FestSparklePlace_PickSpecies kind:function(thumb,size=0x54) addr:0x0216fa7c
 FestSparklePlace_IsLastZoneUsed kind:function(thumb,size=0x38) addr:0x0216fad0
 FestSparklePlace_AddZone kind:function(thumb,size=0x90) addr:0x0216fb08
-data_ov024_0216fb98 kind:data(any) addr:0x0216fb98
-data_ov024_0216fbd0 kind:data(any) addr:0x0216fbd0
+sSparkleCounts kind:data(any) addr:0x0216fb98
+sSpecies kind:data(any) addr:0x0216fbd0

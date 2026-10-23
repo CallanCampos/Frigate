@@ -5,8 +5,6 @@
 #include "app/wifibattlematch.h"
 #include "gfl/heap.h"
 #include "gfl/proc.h"
-#include "save/player_info.h"
-#include "system/pms_data.h"
 
 // Overlay 260's wifibattlematch_link.c, wifibattlematch_link_random.c and wifibattlematch_link_competition.c (all
 // descriptive names: the ROM names only the next file, wifibattlematch_net.c): the link of the Wi-Fi battle
@@ -28,46 +26,12 @@ enum {
     WIFIBATTLEMATCH_LINK_ACTION_RELOGIN,
 };
 
-// A player as the two machines exchange it: the info, what the records and the tournament say, and the team picked
-// with the signature that the check of the Pokémon made
+// What the link writes to the server after a battle: overlay 290's report, and the word that
+// WifiBattleMatchLinkParam.unk28 points to
 typedef struct {
-    PlayerInfo info;
-    u8 unk20[8];
-    u32 record1;
-    u32 record2;
-    u32 unk30;
-    u32 unk34;
-    PMSData sentence;
-    u32 entryField2;
-    u32 unk44;
-    s32 gsid;
-    u32 unk4C;
-    u32 checksum;
-    u8 signature[0x80];
-    u8 partyData[];
-} WifiBattleMatchLinkPlayer;
-
-// What overlay 290 reports of a battle: the other player's team and the player's own
-typedef struct {
-    u32 data[20];
-} WifiBattleMatchLinkReport;
-
-typedef struct {
-    WifiBattleMatchLinkReport report;
+    WifiBattleMatchReport report;
     u32 unk50;
 } WifiBattleMatchLinkReportBuf;
-
-// What the battle left
-typedef struct {
-    u32 result;
-    u32 battleStyle;
-    u8 unk8;
-    u8 unk9;
-    u8 unkA;
-    u32 unkC;
-    u32 unk10;
-    u32 unk14;
-} WifiBattleMatchLinkBattleResult;
 
 // What the server says of the player's account: the Game Sync ID in the first word, and in the bytes after it the
 // state of the competition and whether the Game Sync ID is registered
@@ -108,18 +72,18 @@ typedef struct {
 // What overlay 290 gives the link
 typedef struct {
     u32 mode;
-    // What the link leaves for overlay 290 to do next
+    // What the link leaves for overlay 290 to do next, a WIFIBATTLEMATCH_LINK_ACTION_* or 4
     u32 action;
     WifiBattleMatchParam *param;
     u32 result;
     void *record;
-    WifiBattleMatchLinkPlayer *player;
-    WifiBattleMatchLinkPlayer *otherPlayer;
+    WifiBattleMatchPlayer *player;
+    WifiBattleMatchPlayer *otherPlayer;
     void *unk1C;
     u32 *unk20;
-    WifiBattleMatchLinkReport *report;
+    WifiBattleMatchReport *report;
     u32 *unk28;
-    WifiBattleMatchLinkBattleResult *battleResult;
+    WifiBattleMatchBattleResult *battleResult;
     WifiBattleMatchLinkAccount *account;
     WifiBattleMatchLinkRanking *unk34;
     WifiBattleMatchLinkRatings *ratings;

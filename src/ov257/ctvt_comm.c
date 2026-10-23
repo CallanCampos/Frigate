@@ -50,7 +50,6 @@ enum {
 };
 
 #define CTVT_COMM_SEND_ALL 0xff
-#define CTVT_COMM_NONE 0xff
 
 // The steps of the connection
 enum {

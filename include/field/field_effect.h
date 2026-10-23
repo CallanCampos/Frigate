@@ -4,13 +4,14 @@
 // Function names from swan (https://github.com/ds-pokemon-hacking/swan, GPL-3.0)
 
 #include "types.h"
+#include "gfl/blact.h"
 #include "gfl/heap.h"
 #include "gfl/tcb.h"
 #include "nitro/fx.h"
 #include "struct_decls.h"
 
-void *Field_GetEffectBlAct(Field *field);
-void *Field_GetWildEffectBlAct(Field *field);
+BlActSys *Field_GetEffectBlAct(Field *field);
+BlActSys *Field_GetWildEffectBlAct(Field *field);
 // The saving icon, and showing, hiding and freeing it
 void *func_ov036_021c6cc8(HeapID heapId, Field *field);
 void func_ov036_021c6d14(FieldSaveAnime *effect);

@@ -52,13 +52,6 @@
 // What a person's adventure gives as species for an egg
 #define JOIN_AVE_SPECIES_EGG 650
 
-// JOIN_AVE_PARAM_STATUS: how a person last came, replacing one whose stay was over, into an empty place, or as a merge
-// that changed the trainer type or not
-#define JOIN_AVE_STATUS_NEW 1
-#define JOIN_AVE_STATUS_ADDED 2
-#define JOIN_AVE_STATUS_CHANGED 3
-#define JOIN_AVE_STATUS_UPDATED 4
-
 // How long a person with JoinAvenueShopChoice.unk0 set stays, in seconds (sStayDurations has the others)
 #define JOIN_AVE_STAY_SHORT (3 * 60 * 60)
 
@@ -1108,7 +1101,7 @@ void JoinAvenuePerson_SetParam(JoinAvenuePerson *person, JoinAvenuePersonParam p
         break;
     case JOIN_AVE_PARAM_STATUS:
         // Keeps the lowest status set since it was cleared
-        if (person->status == 0) {
+        if (person->status == JOIN_AVE_STATUS_NONE) {
             person->status = value;
         } else if (person->status > value) {
             person->status = value;

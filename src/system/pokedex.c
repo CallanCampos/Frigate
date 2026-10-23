@@ -14,8 +14,6 @@
 // shows, and the languages of the entries. The ROM has no string for the file, so the name is a guess. The names
 // are swan's where there is one. Block 0x36.
 
-#define SAVE_BLOCK_POKEDEX 0x36
-
 #define NATIONAL_DEX_COMPLETE 636
 #define UNOVA_DEX_COMPLETE 297
 // A species that isn't in the regional Pokédex, in its table

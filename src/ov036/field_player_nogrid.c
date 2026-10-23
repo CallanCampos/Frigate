@@ -6,8 +6,10 @@
 #include "constants/sound.h"
 #include "field/event_data.h"
 #include "field/field.h"
+#include "field/field_acmd.h"
 #include "field/field_actor.h"
 #include "field/field_map.h"
+#include "field/field_player.h"
 #include "field/field_player_core.h"
 #include "field/field_player_nogrid.h"
 #include "field/field_rail.h"
@@ -20,18 +22,22 @@
 #include "system/game_system.h"
 
 // What the player is doing, which the next command depends on
-#define NOGRID_STATE_IDLE 0
-#define NOGRID_STATE_MOVE 1
-#define NOGRID_STATE_TURN 2
-#define NOGRID_STATE_BRAKE 3
+enum {
+    NOGRID_STATE_IDLE,
+    NOGRID_STATE_MOVE,
+    NOGRID_STATE_TURN,
+    NOGRID_STATE_BRAKE,
+};
 
 // What the player does next
-#define NOGRID_COMMAND_NONE 0
-#define NOGRID_COMMAND_IDLE 1
-#define NOGRID_COMMAND_MOVE 2
-#define NOGRID_COMMAND_TURN 3
-#define NOGRID_COMMAND_BRAKE 4
-#define NOGRID_COMMAND_JUMP 5
+enum {
+    NOGRID_COMMAND_NONE,
+    NOGRID_COMMAND_IDLE,
+    NOGRID_COMMAND_MOVE,
+    NOGRID_COMMAND_TURN,
+    NOGRID_COMMAND_BRAKE,
+    NOGRID_COMMAND_JUMP,
+};
 
 #define NOGRID_FLAG_SLIDING 0x1
 #define NOGRID_FLAG_SLIDE_END_SPOT 0x2
@@ -42,16 +48,6 @@
 #define NOGRID_FLAG_SLIDE_PENDING 0x40
 
 #define NOGRID_MOVE_CODE 0x45 // Guessed name: the player rail movement callback set.
-
-#define ACMD_FACE 0x0
-#define ACMD_WALK_8F 0x8
-#define ACMD_WALK_8F_DASH 0xc
-#define ACMD_WALK_4F 0x10
-#define ACMD_WALK_2F 0x14
-#define ACMD_STAY_WALK_16F 0x1c
-#define ACMD_STAY_WALK_2F 0x28
-#define ACMD_JUMP_2 0x38
-#define ACMD_DASH 0x58
 
 typedef struct {
     u8 active;
@@ -318,7 +314,7 @@ void func_ov036_0219d060(FieldPlayerNoGrid *nogrid) {
         FldAct_FreeAcmd(actor);
         CheckSetActorFaceDir(actor, dir);
         FldAct_SetDrawStatus(actor, 0);
-        FieldPlayerCore_SetMoveStatus(nogrid->core, 0);
+        FieldPlayerCore_SetMoveStatus(nogrid->core, PLAYER_MOVE_STATUS_NONE);
     }
 }
 
@@ -539,7 +535,7 @@ static void func_ov036_0219d514(FieldPlayerNoGrid *nogrid, FieldActor *actor, u3
     }
     FldAct_SetAcmd(actor, GetAcmdForDir(dir, ACMD_FACE));
     nogrid->state = NOGRID_STATE_IDLE;
-    FieldPlayerCore_SetMoveStatus(nogrid->core, 0);
+    FieldPlayerCore_SetMoveStatus(nogrid->core, PLAYER_MOVE_STATUS_NONE);
 }
 
 static void func_ov036_0219d54c(FieldPlayerNoGrid *nogrid, FieldActor *actor, u32 pressedKeys, u32 heldKeys, u16 dir,
@@ -551,25 +547,25 @@ static void func_ov036_0219d54c(FieldPlayerNoGrid *nogrid, FieldActor *actor, u3
     } else if (heldKeys & PAD_BUTTON_B) {
         acmd = ACMD_DASH;
     } else {
-        acmd = ACMD_WALK_8F_DASH;
+        acmd = ACMD_WALK_8F;
     }
     FldAct_SetAcmd(actor, GetAcmdForDir(dir, acmd));
     nogrid->state = NOGRID_STATE_MOVE;
-    FieldPlayerCore_SetMoveStatus(nogrid->core, 1);
+    FieldPlayerCore_SetMoveStatus(nogrid->core, PLAYER_MOVE_STATUS_MOVE);
 }
 
 static void func_ov036_0219d584(FieldPlayerNoGrid *nogrid, FieldActor *actor, u32 pressedKeys, u32 heldKeys, u16 dir,
                                 BOOL a5) {
     FldAct_SetAcmd(actor, GetAcmdForDir(dir, ACMD_STAY_WALK_2F));
     nogrid->state = NOGRID_STATE_TURN;
-    FieldPlayerCore_SetMoveStatus(nogrid->core, 2);
+    FieldPlayerCore_SetMoveStatus(nogrid->core, PLAYER_MOVE_STATUS_TURN);
 }
 
 static void func_ov036_0219d5a8(FieldPlayerNoGrid *nogrid, FieldActor *actor, u32 pressedKeys, u32 heldKeys, u16 dir,
                                 BOOL a5) {
     FldAct_SetAcmd(actor, GetAcmdForDir(dir, ACMD_STAY_WALK_16F));
     nogrid->state = NOGRID_STATE_BRAKE;
-    FieldPlayerCore_SetMoveStatus(nogrid->core, 0);
+    FieldPlayerCore_SetMoveStatus(nogrid->core, PLAYER_MOVE_STATUS_NONE);
     if (!func_ov036_0219e2dc(nogrid, dir)) {
         GFL_SndSEPlay(SEQ_SE_WALL_HIT);
     }
@@ -579,7 +575,7 @@ static void func_ov036_0219d5e4(FieldPlayerNoGrid *nogrid, FieldActor *actor, u3
                                 BOOL a5) {
     FldAct_SetAcmd(actor, GetAcmdForDir(dir, ACMD_JUMP_2));
     nogrid->state = NOGRID_STATE_MOVE;
-    FieldPlayerCore_SetMoveStatus(nogrid->core, 1);
+    FieldPlayerCore_SetMoveStatus(nogrid->core, PLAYER_MOVE_STATUS_MOVE);
 }
 
 static void func_ov036_0219d608(FieldPlayerNoGrid *nogrid, u32 command, u32 pressedKeys, u32 heldKeys, u16 dir,
@@ -727,28 +723,28 @@ static void func_ov036_0219d8ec(FieldPlayerNoGrid *nogrid, FieldActor *actor, u3
     }
     FldAct_SetAcmd(actor, GetAcmdForDir(dir, ACMD_FACE));
     nogrid->state = NOGRID_STATE_IDLE;
-    FieldPlayerCore_SetMoveStatus(nogrid->core, 0);
+    FieldPlayerCore_SetMoveStatus(nogrid->core, PLAYER_MOVE_STATUS_NONE);
 }
 
 static void func_ov036_0219d924(FieldPlayerNoGrid *nogrid, FieldActor *actor, u32 pressedKeys, u32 heldKeys, u16 dir,
                                 BOOL a5) {
     FldAct_SetAcmd(actor, GetAcmdForDir(dir, ACMD_WALK_2F));
     nogrid->state = NOGRID_STATE_MOVE;
-    FieldPlayerCore_SetMoveStatus(nogrid->core, 1);
+    FieldPlayerCore_SetMoveStatus(nogrid->core, PLAYER_MOVE_STATUS_MOVE);
 }
 
 static void func_ov036_0219d948(FieldPlayerNoGrid *nogrid, FieldActor *actor, u32 pressedKeys, u32 heldKeys, u16 dir,
                                 BOOL a5) {
     FldAct_SetAcmd(actor, GetAcmdForDir(dir, ACMD_STAY_WALK_2F));
     nogrid->state = NOGRID_STATE_TURN;
-    FieldPlayerCore_SetMoveStatus(nogrid->core, 2);
+    FieldPlayerCore_SetMoveStatus(nogrid->core, PLAYER_MOVE_STATUS_TURN);
 }
 
 static void func_ov036_0219d96c(FieldPlayerNoGrid *nogrid, FieldActor *actor, u32 pressedKeys, u32 heldKeys, u16 dir,
                                 BOOL a5) {
     FldAct_SetAcmd(actor, GetAcmdForDir(dir, ACMD_STAY_WALK_16F));
     nogrid->state = NOGRID_STATE_BRAKE;
-    FieldPlayerCore_SetMoveStatus(nogrid->core, 0);
+    FieldPlayerCore_SetMoveStatus(nogrid->core, PLAYER_MOVE_STATUS_NONE);
     if (!func_ov036_0219e2dc(nogrid, dir)) {
         GFL_SndSEPlay(SEQ_SE_WALL_HIT);
     }
@@ -758,7 +754,7 @@ static void func_ov036_0219d9a8(FieldPlayerNoGrid *nogrid, FieldActor *actor, u3
                                 BOOL a5) {
     FldAct_SetAcmd(actor, GetAcmdForDir(dir, ACMD_JUMP_2));
     nogrid->state = NOGRID_STATE_MOVE;
-    FieldPlayerCore_SetMoveStatus(nogrid->core, 1);
+    FieldPlayerCore_SetMoveStatus(nogrid->core, PLAYER_MOVE_STATUS_MOVE);
 }
 
 static void func_ov036_0219d9cc(FieldPlayerNoGrid *nogrid, u32 command, u32 pressedKeys, u32 heldKeys, u16 dir,
@@ -795,7 +791,7 @@ static void func_ov036_0219da60(FieldPlayerNoGrid *nogrid, FieldActor *actor, u3
     }
     FldAct_SetAcmd(actor, GetAcmdForDir(dir, ACMD_FACE));
     nogrid->state = NOGRID_STATE_IDLE;
-    FieldPlayerCore_SetMoveStatus(nogrid->core, 0);
+    FieldPlayerCore_SetMoveStatus(nogrid->core, PLAYER_MOVE_STATUS_NONE);
 }
 
 static void func_ov036_0219da98(FieldPlayerNoGrid *nogrid, FieldActor *actor, u32 pressedKeys, u32 heldKeys, u16 dir,
@@ -809,21 +805,21 @@ static void func_ov036_0219da98(FieldPlayerNoGrid *nogrid, FieldActor *actor, u3
     }
     FldAct_SetAcmd(actor, GetAcmdForDir(dir, acmd));
     nogrid->state = NOGRID_STATE_MOVE;
-    FieldPlayerCore_SetMoveStatus(nogrid->core, 1);
+    FieldPlayerCore_SetMoveStatus(nogrid->core, PLAYER_MOVE_STATUS_MOVE);
 }
 
 static void func_ov036_0219dac4(FieldPlayerNoGrid *nogrid, FieldActor *actor, u32 pressedKeys, u32 heldKeys, u16 dir,
                                 BOOL a5) {
     FldAct_SetAcmd(actor, GetAcmdForDir(dir, ACMD_STAY_WALK_2F));
     nogrid->state = NOGRID_STATE_TURN;
-    FieldPlayerCore_SetMoveStatus(nogrid->core, 2);
+    FieldPlayerCore_SetMoveStatus(nogrid->core, PLAYER_MOVE_STATUS_TURN);
 }
 
 static void func_ov036_0219dae8(FieldPlayerNoGrid *nogrid, FieldActor *actor, u32 pressedKeys, u32 heldKeys, u16 dir,
                                 BOOL a5) {
     FldAct_SetAcmd(actor, GetAcmdForDir(dir, ACMD_STAY_WALK_16F));
     nogrid->state = NOGRID_STATE_BRAKE;
-    FieldPlayerCore_SetMoveStatus(nogrid->core, 0);
+    FieldPlayerCore_SetMoveStatus(nogrid->core, PLAYER_MOVE_STATUS_NONE);
     if (!func_ov036_0219e2dc(nogrid, dir)) {
         GFL_SndSEPlay(SEQ_SE_WALL_HIT);
     }
@@ -1046,7 +1042,7 @@ static void func_ov036_0219dee0(FieldPlayerNoGrid *nogrid) {
     if (func_ov036_0219dd68(nogrid, NOGRID_FLAG_SLIDING)) {
         func_ov036_0219dd84(nogrid);
         func_ov036_0219dd90(nogrid);
-        FieldPlayerCore_SetMoveStatus(nogrid->core, 0);
+        FieldPlayerCore_SetMoveStatus(nogrid->core, PLAYER_MOVE_STATUS_NONE);
     }
     if (func_ov036_0219dd68(nogrid, NOGRID_FLAG_SLIDE_A | NOGRID_FLAG_SLIDE_B)) {
         func_ov036_0219ddc0(nogrid);
@@ -1078,7 +1074,7 @@ static u16 func_ov036_0219df78(FieldPlayerNoGrid *nogrid, u16 dir, u32 a2) {
     FldAct_SetAcmd(actor, GetAcmdForDir(motionDir, ACMD_WALK_4F));
     SetActorFlag(actor, 0x18);
     nogrid->state = NOGRID_STATE_MOVE;
-    FieldPlayerCore_SetMoveStatus(nogrid->core, 1);
+    FieldPlayerCore_SetMoveStatus(nogrid->core, PLAYER_MOVE_STATUS_MOVE);
     return motionDir;
 }
 
@@ -1096,7 +1092,7 @@ static u16 func_ov036_0219dfe4(FieldPlayerNoGrid *nogrid, u16 dir, u32 a2) {
     FldAct_SetAcmd(actor, GetAcmdForDir(motionDir, ACMD_WALK_4F));
     SetActorFlag(actor, 0x18);
     nogrid->state = NOGRID_STATE_MOVE;
-    FieldPlayerCore_SetMoveStatus(nogrid->core, 1);
+    FieldPlayerCore_SetMoveStatus(nogrid->core, PLAYER_MOVE_STATUS_MOVE);
     return motionDir;
 }
 
@@ -1114,7 +1110,7 @@ static u16 func_ov036_0219e048(FieldPlayerNoGrid *nogrid, u16 dir, u32 a2) {
     FldAct_SetAcmd(actor, GetAcmdForDir(motionDir, ACMD_WALK_4F));
     SetActorFlag(actor, 0x18);
     nogrid->state = NOGRID_STATE_MOVE;
-    FieldPlayerCore_SetMoveStatus(nogrid->core, 1);
+    FieldPlayerCore_SetMoveStatus(nogrid->core, PLAYER_MOVE_STATUS_MOVE);
     return motionDir;
 }
 
@@ -1149,8 +1145,8 @@ static u16 func_ov036_0219e110(FieldPlayerNoGrid *nogrid, u16 dir, u32 a2) {
     result = func_ov036_0219e2bc(&nogrid->slide, dir);
     if (func_ov036_0219e2d4(&nogrid->slide)) {
         SetActorFlag(nogrid->actor, 0x18);
-        FldAct_SetAcmd(nogrid->actor, GetAcmdForDir(result, ACMD_WALK_8F));
-        FieldPlayerCore_SetMoveStatus(nogrid->core, 1);
+        FldAct_SetAcmd(nogrid->actor, GetAcmdForDir(result, ACMD_WALK_16F));
+        FieldPlayerCore_SetMoveStatus(nogrid->core, PLAYER_MOVE_STATUS_MOVE);
         result = DIR_NONE;
     } else {
         ClearActorFlag(nogrid->actor, 0x18);

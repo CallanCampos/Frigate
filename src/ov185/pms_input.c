@@ -23,8 +23,10 @@
 // from the words of an initial, in a window of words, with the keys or the touch screen. The names are ours, guessed
 
 // Where the input is driven from
-#define KEY_MODE_KEY 0
-#define KEY_MODE_TOUCH 1
+enum {
+    KEY_MODE_KEY,
+    KEY_MODE_TOUCH,
+};
 
 // What the cursor on the buttons is on
 enum {
@@ -33,10 +35,12 @@ enum {
 };
 
 // The categories' cursor's places besides a category: the search, erase and back buttons, and no place
-#define CATEGORY_POS_SEARCH 0xfc
-#define CATEGORY_POS_ERASE 0xfd
-#define CATEGORY_POS_BACK 0xfe
-#define CATEGORY_POS_NONE 0xff
+enum {
+    CATEGORY_POS_SEARCH = 0xfc,
+    CATEGORY_POS_ERASE,
+    CATEGORY_POS_BACK,
+    CATEGORY_POS_NONE,
+};
 
 // The word groups, and the sentence types the input offers
 #define GROUP_COUNT 12
