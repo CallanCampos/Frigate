@@ -724,7 +724,8 @@ static void func_ov194_021c3904(PokemonTradeWork *wk, BoxSaveAccessor *boxes, in
             slot += box * 30;
             ClActor_GetSurfacePos(wk->icons[index][i], &screenPos, CLACT_VRAM_SUB);
             if (async == TRUE && screenPos.x >= -16 && screenPos.x <= 272) {
-                if (!NNS_GfdRegisterNewVramTransferTask(35, proxy.vramLocation.baseAddrOfVram[NNS_G2D_VRAM_TYPE_2DSUB],
+                if (!NNS_GfdRegisterNewVramTransferTask(NNS_GFD_DST_2D_OBJ_CHAR_SUB,
+                                                        proxy.vramLocation.baseAddrOfVram[NNS_G2D_VRAM_TYPE_2DSUB],
                                                         wk->iconCharData + slot * 0x200, 0x200)) {
                     MI_CpuCopy8(
                         wk->iconCharData + slot * 0x200,
@@ -1115,7 +1116,7 @@ static void func_ov194_021c4324(void) {
     G3X_AntiAlias(TRUE);
     G3X_AlphaBlend(TRUE);
     G3X_EdgeMarking(FALSE);
-    G3X_SetFog(TRUE, 0, 0, 0);
+    G3X_SetFog(TRUE, GX_FOGBLEND_COLOR_ALPHA, GX_FOGSLOPE_0x8000, 0);
     G3X_SetClearColor(GX_RGB(0, 0, 0), 0, 0x7fff, 63, FALSE);
     G3_ViewPort(0, 0, 255, 191);
     for (i = 0; i < NELEMS(sLights); i++) {

@@ -180,7 +180,7 @@ static void PdcMain_InitGraphics(HeapID heapId) {
     G3X_AlphaBlend(TRUE);
     G3X_EdgeMarking(FALSE);
     G3X_AntiAlias(TRUE);
-    G3X_SetFog(FALSE, 0, 0, 0);
+    G3X_SetFog(FALSE, GX_FOGBLEND_COLOR_ALPHA, GX_FOGSLOPE_0x8000, 0);
     G2_SetBG0Priority(1);
     ClActSys_Create(&sClActSysSetup, &sVRAMConfig, heapId);
     GFL_BGSysSet3DBGPriority(1);

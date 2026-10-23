@@ -1499,7 +1499,7 @@ void GameData_UpdateJoinAvenueForZone(GameData *gameData, u16 zoneId) {
                     JoinAvenuePerson *person = JoinAvenuePersonList_Get(lists[i], j);
 
                     if (!JoinAvenuePerson_IsEmpty(person)) {
-                        JoinAvenuePerson_SetParam(person, 0x26, 0);
+                        JoinAvenuePerson_SetParam(person, JOIN_AVE_PARAM_UNK_38, 0);
                     }
                 }
             }

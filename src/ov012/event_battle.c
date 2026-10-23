@@ -515,7 +515,7 @@ static GameEventReturnCode EventBattleCall_Callback(GameEvent *event, u32 *state
 
 // The kind of beacon for the trainer: 0 for some classes, 1 for others and 2 for the rest
 static u32 EventBattleCall_GetTrainerBeaconKind(u16 trainerId) {
-    u16 trainerClass = TrainerData_GetParam(trainerId, 1);
+    u16 trainerClass = TrainerData_GetParam(trainerId, TRAINER_PARAM_CLASS);
     u32 group = GetTrainerClassBGMGroupId(trainerClass);
     u32 i;
 

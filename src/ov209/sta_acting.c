@@ -809,7 +809,7 @@ static void StaActing_UpdatePalette(StaActing *stage) {
                                        (u8)((stage->paletteBase[i] & GX_RGB_B_MASK) >> GX_RGB_B_SHIFT) +
                                            (s8)((stage->paletteDiffB[i] * ratio) >> FX32_SHIFT));
     }
-    NNS_GfdRegisterNewVramTransferTask(31, 0, stage->paletteWork, 0x20);
+    NNS_GfdRegisterNewVramTransferTask(NNS_GFD_DST_2D_BG_PLTT_SUB, 0, stage->paletteWork, 0x20);
 }
 
 static void StaActing_InitMessage(StaActing *stage) {

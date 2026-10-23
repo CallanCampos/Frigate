@@ -285,7 +285,7 @@ void loadTrainerTypeText(WordSet *wordSet, u32 index, u8 trainerType) {
 }
 
 void loadTrainerTypeToStrbuf(WordSet *wordSet, u32 index, u32 trainerId) {
-    loadTrainerTypeText(wordSet, index, TrainerData_GetParam(trainerId, 1));
+    loadTrainerTypeText(wordSet, index, TrainerData_GetParam(trainerId, TRAINER_PARAM_CLASS));
 }
 
 void loadTrainerTypeWithArticleToStrbuf(WordSet *wordSet, u32 index, u8 trainerType) {

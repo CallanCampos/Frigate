@@ -439,7 +439,7 @@ GameEventReturnCode setupScreenForEnterBuilding(GameEvent *event, u32 *state, vo
         config = gEnterBuildingLCDConfig;
         GFL_BGSysSetLCDConfig(&config);
         reg_G2_BG2CNT = (reg_G2_BG2CNT & 0x43) | 0x4084;
-        GX_SetBankForBG(8);
+        GX_SetBankForBG(GX_VRAM_BG_128_D);
         GFL_BGSysSetBGPriority(2, 0);
         GFL_BGSysSetBGEnabled(2, TRUE);
         setBuildingEnterVBlankCallback();
@@ -472,7 +472,7 @@ GameEventReturnCode func_ov036_021b8e10(GameEvent *event, u32 *state, void *data
         GX_SetBankForLCDC(8);
         MIi_CpuClearFast(0, (void *)0x6800000, 0x20000);
         GX_DisableBankForLCDC();
-        GX_SetBankForBG(8);
+        GX_SetBankForBG(GX_VRAM_BG_128_D);
         resetBuildingEnterVBlankCallback();
         (*state)++;
         break;

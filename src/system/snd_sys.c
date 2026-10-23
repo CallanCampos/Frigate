@@ -317,7 +317,7 @@ static void GFL_SndBGMSetChannelMask(u32 channelMask) {
 
     NNS_SndPlayerSetTrackMute(GFL_SndBGMStack_GetHandle(), SND_CHANNEL_MASK_ALL, FALSE);
     if (muted != 0) {
-        NNS_SndPlayerSetTrackMuteEx(GFL_SndBGMStack_GetHandle(), muted, 1);
+        NNS_SndPlayerSetTrackMuteEx(GFL_SndBGMStack_GetHandle(), muted, NNS_SND_SEQ_MUTE_NO_STOP);
     }
 }
 

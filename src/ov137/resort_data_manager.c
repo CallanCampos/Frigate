@@ -155,8 +155,8 @@ void ResortSlots_Fill(ResortSlots *slots) {
         if (ResortData_IsEmpty(data)) {
             continue;
         }
-        slot = ResortData_GetParam(data, 0, NULL);
-        dataRow = ResortData_GetParam(data, 1, NULL);
+        slot = ResortData_GetParam(data, JOIN_AVE_PARAM_SLOT, NULL);
+        dataRow = ResortData_GetParam(data, JOIN_AVE_PARAM_ROW, NULL);
         if (dataRow < 1 || dataRow >= RESORT_SLOT_ROWS) {
             continue;
         }
@@ -270,7 +270,9 @@ u32 ResortData_Roll(ResortPersonData *data, u32 a1, u32 a2) {
 }
 
 u32 ResortData_RollPair(ResortPersonData *data, ResortPersonData *other, u32 a2, u32 a3) {
-    return JoinAvenue_RandomFromSeed(ResortData_GetParam(data, 7, NULL) + ResortData_GetParam(other, 7, NULL), a2, a3);
+    return JoinAvenue_RandomFromSeed(ResortData_GetParam(data, JOIN_AVE_PARAM_SEED, NULL) +
+                                         ResortData_GetParam(other, JOIN_AVE_PARAM_SEED, NULL),
+                                     a2, a3);
 }
 
 ResortPersonData **ResortDatas_Create(const ResortSysSetup *setup, HeapID heapId) {

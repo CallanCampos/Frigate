@@ -877,7 +877,7 @@ void FieldG3D_InitCallback(void) {
     G3X_AntiAlias(TRUE);
     G3X_AlphaTest(FALSE, 0);
     G3X_AlphaBlend(TRUE);
-    G3X_SetFog(FALSE, 0, 5, 0xe00);
+    G3X_SetFog(FALSE, GX_FOGBLEND_COLOR_ALPHA, GX_FOGSLOPE_0x0400, 0xe00);
     G3X_SetFogColor(GX_RGB(31, 31, 31), 0);
     G3X_SetFogTable(FIELD_DEFAULT_FOG_TABLE);
     G3X_SetClearColor(GX_RGB(0, 0, 0), 31, 0x7fff, 0, FALSE);

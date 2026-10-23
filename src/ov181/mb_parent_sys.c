@@ -446,7 +446,7 @@ static BOOL MBParent_Main(MBParentWork *wk) {
         FS_InitFile(&file);
         result = FS_OpenFile(&file, path);
         GFL_ASSERT(result);
-        FS_SeekFile(&file, 0, 0);
+        FS_SeekFile(&file, 0, FS_SEEK_SET);
         wk->childRomSize = FS_GetLength(&file);
         wk->childRom = GFL_HeapAllocate(wk->heapId, wk->childRomSize, TRUE, "mb_parent_sys.c", 665);
         FS_ReadFile(&file, wk->childRom, wk->childRomSize);
