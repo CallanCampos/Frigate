@@ -186,7 +186,6 @@ static void DWCi_Http_Thread(void *arg) {
     DWCHttpBuffer *response = &http->rep;
     int timeout = http->param.timeout;
     char *request;
-    int sent;
     int room;
     int size;
     u8 *data;
@@ -219,8 +218,8 @@ static void DWCi_Http_Thread(void *arg) {
         return;
     }
     request = http->req.buffer;
-    sent = CPS_SocWrite((u8 *)request, strlen(request));
-    if (sent <= 0) {
+    length = CPS_SocWrite((u8 *)request, strlen(request));
+    if ((s32)length <= 0) {
         http->error = 5;
         goto cleanup;
     }
