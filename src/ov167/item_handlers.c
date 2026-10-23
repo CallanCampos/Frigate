@@ -878,7 +878,7 @@ static BOOL CommonConditionCodeMatch(BtlServerFlow *flow, u8 monId, u32 conditio
     mon = GetBattleMon(flow, monId);
     switch (condition) {
     case 0x25:
-        if (GetBattleMonStatus(mon) != 0 || CheckCondition(mon, 6)) {
+        if (GetBattleMonStatus(mon) != 0 || CheckCondition(mon, CONDITION_CONFUSION)) {
             return TRUE;
         }
         break;
@@ -1862,7 +1862,7 @@ static void HandlerMicleBerryUse(BattleEventItem *item, BtlServerFlow *flow, u8 
         mon = GetBattleMon(flow, monId);
         param = BattleHandler_PushWork(flow, 0xc, monId);
         param->targetIndex = monId;
-        param->condition = 0x22;
+        param->condition = CONDITION_MICLE_BERRY;
         param->value = MakeConditionParamPermanent(0x78);
         BattleHandler_StrSetup(&param->string, 2, 0x404);
         BattleHandler_AddArg(&param->string, monId);
@@ -2470,7 +2470,7 @@ static void HandlerChoiceItemCommonMoveLock(BattleEventItem *item, BtlServerFlow
         if (move != MOVE_STRUGGLE) {
             param = BattleHandler_PushWork(flow, 0xc, monId);
             param->targetIndex = monId;
-            param->condition = 0x1b;
+            param->condition = CONDITION_CHOICE_LOCK;
             param->value = MakeConditionParamPermanent(move);
             param->overwrite = 2;
             BattleHandler_PopWork(flow, param);
@@ -2484,7 +2484,7 @@ static void HandlerChoiceItemCommonItemChange(BattleEventItem *item, BtlServerFl
 
     if (BattleEventVar_GetValue(2) == monId) {
         param = BattleHandler_PushWork(flow, 0xb, monId);
-        param->condition = 0x1b;
+        param->condition = CONDITION_CHOICE_LOCK;
         param->monIds[0] = monId;
         param->count = 1;
         param->useString = 1;
@@ -2854,7 +2854,7 @@ static void HandlerDestinyKnot(BattleEventItem *item, BtlServerFlow *flow, u8 mo
         if (attackerId != 0x1f) {
             param = BattleHandler_PushWork(flow, 0xc, monId);
             param->targetIndex = attackerId;
-            param->condition = 7;
+            param->condition = CONDITION_ATTRACT;
             param->value = MakeConditionDependPoke(monId);
             param->noMessage = 1;
             BattleHandler_StrSetup(&param->string, 2, 0x14a);
@@ -3278,7 +3278,7 @@ static void HandlerLightBallUseTemp(BattleEventItem *item, BtlServerFlow *flow, 
         attackerId = BattleEventVar_GetValue(3);
         param = BattleHandler_PushWork(flow, 0xc, attackerId);
         param->targetIndex = monId;
-        param->condition = 1;
+        param->condition = CONDITION_PARALYSIS;
         param->value = BtlCalc_MakeStatusCondition(1);
         BattleHandler_PopWork(flow, param);
     }
@@ -3299,7 +3299,7 @@ static void HandlerToxicOrb(BattleEventItem *item, BtlServerFlow *flow, u8 monId
 
     if (BattleEventVar_GetValue(2) == monId) {
         param = BattleHandler_PushWork(flow, 0xc, monId);
-        param->condition = 5;
+        param->condition = CONDITION_POISON;
         param->value = MakeConditionBadlyPoisoned();
         param->showFail = 0;
         param->targetIndex = monId;
@@ -3318,7 +3318,7 @@ static void HandlerToxicOrbUseTemp(BattleEventItem *item, BtlServerFlow *flow, u
         attackerId = BattleEventVar_GetValue(3);
         param = BattleHandler_PushWork(flow, 0xc, attackerId);
         param->targetIndex = monId;
-        param->condition = 5;
+        param->condition = CONDITION_POISON;
         param->value = MakeConditionBadlyPoisoned();
         BattleHandler_PopWork(flow, param);
     }
@@ -3339,7 +3339,7 @@ static void HandlerFlameOrb(BattleEventItem *item, BtlServerFlow *flow, u8 monId
 
     if (BattleEventVar_GetValue(2) == monId) {
         param = BattleHandler_PushWork(flow, 0xc, monId);
-        param->condition = 4;
+        param->condition = CONDITION_BURN;
         param->value = BtlCalc_MakeStatusCondition(4);
         param->showFail = 0;
         param->targetIndex = monId;
@@ -3359,7 +3359,7 @@ static void HandlerFlameOrbUseTemp(BattleEventItem *item, BtlServerFlow *flow, u
         attackerId = BattleEventVar_GetValue(3);
         param = BattleHandler_PushWork(flow, 0xc, attackerId);
         param->targetIndex = monId;
-        param->condition = 4;
+        param->condition = CONDITION_BURN;
         param->value = BtlCalc_MakeStatusCondition(4);
         BattleHandler_PopWork(flow, param);
     }
@@ -3517,7 +3517,7 @@ static void HandlerPoisonBarbUseTemp(BattleEventItem *item, BtlServerFlow *flow,
         attackerId = BattleEventVar_GetValue(3);
         param = BattleHandler_PushWork(flow, 0xc, attackerId);
         param->targetIndex = monId;
-        param->condition = 5;
+        param->condition = CONDITION_POISON;
         param->value = BtlCalc_MakeStatusCondition(5);
         BattleHandler_PopWork(flow, param);
     }

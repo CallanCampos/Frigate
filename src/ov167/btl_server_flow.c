@@ -24,6 +24,7 @@
 #include "battle/pos_handlers.h"
 #include "battle/side_handlers.h"
 #include "constants/abilities.h"
+#include "constants/battle.h"
 #include "constants/moves.h"
 #include "constants/tr_ai.h"
 #include "constants/types.h"
@@ -484,11 +485,11 @@ void ServerControl_Rotation(BtlServerFlow *flow, u8 clientId, u8 slot) {
         }
         if (!IsFainted(inMon)) {
             if (IsFieldEffectActive(2)) {
-                if (CheckCondition(inMon, 0x20)) {
-                    ServerControl_CureCondition(flow, inMon, 0x20, 0);
+                if (CheckCondition(inMon, CONDITION_TELEKINESIS)) {
+                    ServerControl_CureCondition(flow, inMon, CONDITION_TELEKINESIS, 0);
                 }
-                if (CheckCondition(inMon, 0x1e)) {
-                    ServerControl_CureCondition(flow, inMon, 0x1e, 0);
+                if (CheckCondition(inMon, CONDITION_MAGNET_RISE)) {
+                    ServerControl_CureCondition(flow, inMon, CONDITION_MAGNET_RISE, 0);
                 }
             }
             AbilityEvent_ItemRotationWake(inMon);
@@ -850,7 +851,7 @@ u32 ActionOrder_Proc(BtlServerFlow *flow, ActionOrderEntry *entry) {
         entry->done = TRUE;
         if ((flow->unk14 != 5 || action.bits.action == BATTLE_ACTION_ESCAPE) && !IsFainted(mon) &&
             (action.bits.action == BATTLE_ACTION_ROTATION || DoesBattleMonExist(&flow->posPoke, GetMonID(mon)))) {
-            if (CheckCondition(mon, 0x21) &&
+            if (CheckCondition(mon, CONDITION_SKY_DROP) &&
                 (action.bits.action != BATTLE_ACTION_ESCAPE || GetRunMode(flow->mainModule) != 2)) {
                 if (GetConditionCount(mon, 3)) {
                     ServerControl_SetMonCounter(flow, mon, 3, 0);
@@ -962,7 +963,7 @@ u32 ServerControl_CheckObedience(BtlServerFlow *flow, BattleMon *mon) {
                 if ((u16)BattleRandom(level + maxLevel + 1) < maxLevel) {
                     return 0;
                 }
-                if (CheckCondition(mon, 2)) {
+                if (CheckCondition(mon, CONDITION_SLEEP)) {
                     return 4;
                 }
                 rand = BattleRandom(256);
@@ -1555,8 +1556,8 @@ void ServerControl_SwitchOutConfirm(BtlServerFlow *flow, BattleMon *mon) {
 u16 GetEncoreReplacementMove(BattleMon *mon, BattleAction *action) {
     u16 move;
 
-    if (CheckCondition(mon, 0x17) && action->bits.move != 0xa5) {
-        move = Condition_GetParam(GetConditionContinuationParam(mon, 0x17));
+    if (CheckCondition(mon, CONDITION_ENCORE) && action->bits.move != 0xa5) {
+        move = Condition_GetParam(GetConditionContinuationParam(mon, CONDITION_ENCORE));
         if (move != action->bits.move && BattleMon_GetPPOfMove(mon, move)) {
             return move;
         }
@@ -1594,8 +1595,8 @@ void ServerControl_Fight(BtlServerFlow *flow, BattleMon *mon, BattleAction *acti
     target = action->bits.target;
     usedMove = FALSE;
     work.result = 0;
-    cond19 = CheckCondition(mon, 0x19);
-    cond1a = CheckCondition(mon, 0x1a);
+    cond19 = CheckCondition(mon, CONDITION_MOVE_LOCK);
+    cond1a = CheckCondition(mon, CONDITION_CHARGE);
     MoveEvent_AddItem(mon, move, key);
     ServerControl_MoveSeqStart(flow, mon, move);
     do {
@@ -1654,8 +1655,8 @@ void ServerControl_Fight(BtlServerFlow *flow, BattleMon *mon, BattleAction *acti
             ServerDisplay_MoveMessage(flow, mon, actualMove);
         }
         flow->unk1F78 = actualMove;
-        if (CheckCondition(mon, 0x22)) {
-            ServerControl_CureCondition(flow, mon, 0x22, 0);
+        if (CheckCondition(mon, CONDITION_MICLE_BERRY)) {
+            ServerControl_CureCondition(flow, mon, CONDITION_MICLE_BERRY, 0);
             BattleMon_SetTurnFlag(mon, 0xe);
         }
         if (ServerControl_CheckMoveFailLate(flow, mon, actualMove)) {
@@ -1703,7 +1704,7 @@ BOOL ServerControl_CheckDelegateMoveFail(BtlServerFlow *flow, BattleMon *mon, Bt
 
     move = param->move;
     condition = 0;
-    if (CheckCondition(mon, 0xf) && getMoveFlag(move, 0xc)) {
+    if (CheckCondition(mon, CONDITION_HEAL_BLOCK) && getMoveFlag(move, 0xc)) {
         condition = 0xd;
     } else if (IsFieldEffectActive(2) && getMoveFlag(move, 9)) {
         condition = 0x14;
@@ -1769,7 +1770,7 @@ void ServerControl_StealMove(BtlServerFlow *flow, BattleMon *attacker, u16 move,
         PopState(&flow->actionState, state, 0xe9a);
         ServerEvent_GetMoveParam(flow, move, mon, flow->unk1AB0);
         CollectMoveTargets(flow, mon, flow->unk4AC->targets[0], flow->unk1AB0, flow->unk864);
-        if (CheckCondition(mon, 0xf) && getMoveFlag(move, 0xc)) {
+        if (CheckCondition(mon, CONDITION_HEAL_BLOCK) && getMoveFlag(move, 0xc)) {
             ServerDisplay_MoveFailMessage(flow, mon, move, 0xd);
             return;
         }
@@ -2265,11 +2266,11 @@ BOOL IsGuaranteedHit(BtlServerFlow *flow, BattleMon *attacker, BattleMon *defend
         GetBattleMonStat(defender, 0x11) == 0x63) {
         return TRUE;
     }
-    if (CheckCondition(attacker, 0x1c)) {
+    if (CheckCondition(attacker, CONDITION_ALWAYS_HIT)) {
         return TRUE;
     }
-    if (CheckCondition(attacker, 0x1d)) {
-        lockedId = GetDisabledMove(attacker, 0x1d);
+    if (CheckCondition(attacker, CONDITION_LOCK_ON)) {
+        lockedId = GetDisabledMove(attacker, CONDITION_LOCK_ON);
         if (lockedId == GetMonID(defender)) {
             return TRUE;
         }
@@ -2446,7 +2447,7 @@ BOOL ServerEvent_CheckHit(BtlServerFlow *flow, BattleMon *mon, BattleMon *target
     if (ServerEvent_CheckAlwaysHit(flow, mon, target, param->move)) {
         return TRUE;
     }
-    if (CheckCondition(target, 0x20)) {
+    if (CheckCondition(target, CONDITION_TELEKINESIS)) {
         return TRUE;
     }
     base = ServerEvent_GetMoveAccuracy(flow, mon, target, param);
@@ -2462,7 +2463,7 @@ BOOL ServerEvent_CheckHit(BtlServerFlow *flow, BattleMon *mon, BattleMon *target
     accuracy = BattleEventVar_GetValue(0x27);
     evasion = BattleEventVar_GetValue(0x28);
     ignore = BattleEventVar_GetValue(0x4b);
-    if ((CheckCondition(target, 0x11) && evasion > 6) || ignore) {
+    if ((CheckCondition(target, CONDITION_FORESIGHT) && evasion > 6) || ignore) {
         evasion = 6;
     }
     if (GetTurnFlag(mon, 0xe)) {
@@ -2500,7 +2501,7 @@ u32 ServerControl_CheckChargeTurn(BtlServerFlow *flow, BattleMon *mon, void *tar
     u32 state;
     u32 result;
 
-    if (!CheckCondition(mon, 0x1a)) {
+    if (!CheckCondition(mon, CONDITION_CHARGE)) {
         u8 pos = MonIDToBattlePos(flow->mainModule, flow->pokeCon, GetMonID(mon));
         if (ServerEvent_CheckChargeFail(flow, mon, targets)) {
             ServerDisplay_MoveFailed(flow, mon, move);
@@ -2563,8 +2564,8 @@ BOOL ServerControl_StartChargeTurn(BtlServerFlow *flow, BattleMon *mon, u8 pos, 
 
 void ServerControl_ClearChargeState(BtlServerFlow *flow, BattleMon *mon) {
     u32 flag;
-    if (CheckCondition(mon, 0x1a)) {
-        ServerControl_CureCondition(flow, mon, 0x1a, 0);
+    if (CheckCondition(mon, CONDITION_CHARGE)) {
+        ServerControl_CureCondition(flow, mon, CONDITION_CHARGE, 0);
         BattleMon_SetTurnFlag(mon, 0xb);
     }
     while ((flag = BattleMon_GetSemiInvulnFlag(mon)) != 0x10) {
@@ -2597,8 +2598,8 @@ void ServerControl_SkyDropCheckRelease(BtlServerFlow *flow, BattleMon *mon, BOOL
 
     if (targetId != 0x1f) {
         BattleMon *target = GetPokeParam(flow->pokeCon, targetId);
-        if (CheckCondition(target, 0x21)) {
-            ServerControl_CureCondition(flow, target, 0x21, 0);
+        if (CheckCondition(target, CONDITION_SKY_DROP)) {
+            ServerControl_CureCondition(flow, target, CONDITION_SKY_DROP, 0);
             scPut_ResetContFlag(flow, target, 3);
             if (DoesBattleMonExist(&flow->posPoke, targetId)) {
                 BtlServerCmdQueue_Put(flow->queue, SC_SET_MON_VISIBLE, targetId, 0);
@@ -2657,14 +2658,14 @@ BOOL ServerControl_CheckMoveFail(BtlServerFlow *flow, BattleMon *mon, u16 move, 
             cause = 6;
             break;
         }
-        if (CheckCondition(mon, 0xd) && move != 0xa5) {
-            BattleConditionCont cont = GetConditionContinuationParam(mon, 0xd);
+        if (CheckCondition(mon, CONDITION_DISABLE) && move != 0xa5) {
+            BattleConditionCont cont = GetConditionContinuationParam(mon, CONDITION_DISABLE);
             if (move == Condition_GetParam(cont)) {
                 cause = 9;
                 break;
             }
         }
-        if (CheckCondition(mon, 0xf) && getMoveFlag(move, 0xc)) {
+        if (CheckCondition(mon, CONDITION_HEAL_BLOCK) && getMoveFlag(move, 0xc)) {
             cause = 0xd;
             break;
         }
@@ -2673,18 +2674,18 @@ BOOL ServerControl_CheckMoveFail(BtlServerFlow *flow, BattleMon *mon, u16 move, 
             break;
         }
         if (move != 0xa5) {
-            if (CheckCondition(mon, 0x17)) {
+            if (CheckCondition(mon, CONDITION_ENCORE)) {
                 u16 prev = GetPreviousMoveUsed(mon);
                 if (prev != 0xa5 && prev != move) {
                     cause = 0x11;
                     break;
                 }
             }
-            if (CheckCondition(mon, 0x19) && move != GetPreviousMoveID(mon)) {
+            if (CheckCondition(mon, CONDITION_MOVE_LOCK) && move != GetPreviousMoveID(mon)) {
                 cause = 0x11;
                 break;
             }
-            if (CheckCondition(mon, 0xb) && !PML_MoveIsDamaging(move)) {
+            if (CheckCondition(mon, CONDITION_TAUNT) && !PML_MoveIsDamaging(move)) {
                 cause = 0xa;
                 break;
             }
@@ -2763,9 +2764,9 @@ BOOL ServerControl_CheckConfusion(BtlServerFlow *flow, BattleMon *mon) {
         BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_STD, 0xbc, GetMonID(mon), SC_MSG_ARG_END);
         return TRUE;
     }
-    if (CheckCondition(mon, 6)) {
+    if (CheckCondition(mon, CONDITION_CONFUSION)) {
         if (BattleMon_TickConfusion(mon)) {
-            ServerControl_CureCondition(flow, mon, 6, 0);
+            ServerControl_CureCondition(flow, mon, CONDITION_CONFUSION, 0);
             BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_SET, 0x15f, GetMonID(mon), SC_MSG_ARG_END);
             return FALSE;
         }
@@ -2776,7 +2777,7 @@ BOOL ServerControl_CheckConfusion(BtlServerFlow *flow, BattleMon *mon) {
 }
 
 BOOL ServerControl_CheckAttract(BtlServerFlow *flow, BattleMon *mon) {
-    if (CheckCondition(mon, 7)) {
+    if (CheckCondition(mon, CONDITION_ATTRACT)) {
         ServerDisplay_InLove(flow, mon);
         if (RollEffectChance(0x32)) {
             return TRUE;
@@ -2895,7 +2896,7 @@ void ServerDisplay_MoveFailMessage(BtlServerFlow *flow, BattleMon *mon, u16 move
         BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_SET, 0x43e, monId, move, SC_MSG_ARG_END);
         break;
     case 0x16:
-        if (CheckCondition(mon, 2)) {
+        if (CheckCondition(mon, CONDITION_SLEEP)) {
             BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_STD, 0xc2, monId, SC_MSG_ARG_END);
         } else {
             u8 index = BattleRandom(4);
@@ -4403,7 +4404,7 @@ BOOL ServerControl_RecoverHPCheckFail(BtlServerFlow *flow, BattleMon *mon) {
 }
 
 BOOL ServerControl_RecoverHPCheckFailSpecial(BtlServerFlow *flow, BattleMon *mon, BOOL showMessage) {
-    if (CheckCondition(mon, 0xf)) {
+    if (CheckCondition(mon, CONDITION_HEAL_BLOCK)) {
         if (showMessage) {
             BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_SET, 0x377, GetMonID(mon), SC_MSG_ARG_END);
             flow->unk78A_5 = 1;
@@ -4570,7 +4571,7 @@ BOOL ServerControl_ForceSwitchCore(BtlServerFlow *flow, BattleMon *attacker, Bat
     if (IsFainted(target)) {
         return FALSE;
     }
-    if (CheckCondition(target, 0x21)) {
+    if (CheckCondition(target, CONDITION_SKY_DROP)) {
         return FALSE;
     }
     if (BtlFlow_GetSkyDropTarget(target) != 0x1f) {
@@ -4832,7 +4833,7 @@ void ServerControl_SkillSwap(BtlServerFlow *flow, BattleMon *mon, void *targets)
             ServerEvent_ChangeAbilityAfter(flow, targetId);
             PopState(&flow->actionState, state2, 0x23d7);
         }
-        if (!CheckCondition(mon, 0x10)) {
+        if (!CheckCondition(mon, CONDITION_GASTRO_ACID)) {
             if (ability == 0x67) {
                 ServerControl_CheckItemReaction(flow, mon, 0);
             }
@@ -4840,7 +4841,7 @@ void ServerControl_SkillSwap(BtlServerFlow *flow, BattleMon *mon, void *targets)
                 ServerControl_UnnerveAction(flow, mon);
             }
         }
-        if (!CheckCondition(target, 0x10)) {
+        if (!CheckCondition(target, CONDITION_GASTRO_ACID)) {
             if (targetAbility == 0x67) {
                 ServerControl_CheckItemReaction(flow, target, 0);
             }
@@ -5585,8 +5586,8 @@ BOOL ServerControl_HideTurnCancel(BtlServerFlow *flow, BattleMon *mon, u32 flag)
     if (GetAdditionalConditionFlag(mon, flag)) {
         u8 monId = GetMonID(mon);
         scPut_ResetContFlag(flow, mon, flag);
-        if (CheckCondition(mon, 0x1a)) {
-            ServerControl_CureCondition(flow, mon, 0x1a, 0);
+        if (CheckCondition(mon, CONDITION_CHARGE)) {
+            ServerControl_CureCondition(flow, mon, CONDITION_CHARGE, 0);
         }
         BtlServerCmdQueue_Put(flow->queue, SC_SET_MON_VISIBLE, monId, 0);
         ActionOrder_ForceDone(flow, monId);
@@ -5616,7 +5617,7 @@ void ServerDisplay_Confused(BtlServerFlow *flow, BattleMon *mon) {
 }
 
 void ServerDisplay_InLove(BtlServerFlow *flow, BattleMon *mon) {
-    u8 move = GetDisabledMove(mon, 7);
+    u8 move = GetDisabledMove(mon, CONDITION_ATTRACT);
     ServerDisplay_AddEffectAtPosition(flow, mon, 0x25c);
     BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_SET, 0x14d, GetMonID(mon), move, SC_MSG_ARG_END);
 }
@@ -5690,7 +5691,7 @@ s32 ConvertConditionCode(BattleMon *mon, s32 *condition) {
             result = status;
             *condition = 6;
         } else {
-            if (CheckCondition(mon, 6)) {
+            if (CheckCondition(mon, CONDITION_CONFUSION)) {
                 result = 6;
             }
             *condition = 0;
@@ -8662,7 +8663,7 @@ u8 BattleHandler_AbilityChange(BtlServerFlow *handler, BattleHandlerAbilityChang
         if (param->popup) {
             BtlServerCmdQueue_Put(handler->queue, SC_ABILITY_POPUP_OUT, (u8)param->monIndex);
         }
-        if (!CheckCondition(mon, 16)) {
+        if (!CheckCondition(mon, CONDITION_GASTRO_ACID)) {
             if (oldAbility == 0x67) {
                 ServerControl_CheckItemReaction(handler, mon, 0);
             }
@@ -8911,7 +8912,7 @@ u8 BattleHandler_BatonPass(BtlServerFlow *handler, BattleHandlerBatonPassParam *
 
     source = GetPokeParam(handler->pokeCon, param->sourceMonIndex);
     target = GetPokeParam(handler->pokeCon, param->targetMonIndex);
-    if (CheckCondition(source, 16)) {
+    if (CheckCondition(source, CONDITION_GASTRO_ACID)) {
         ServerEvent_GastroAcidConfirmed(handler, target);
     }
     CopyBatonPassParams(target, source);
@@ -9103,12 +9104,12 @@ u8 BattleHandler_GravityCheck(BtlServerFlow *handler, BattleHandlerGravityCheckP
         if (ServerEvent_CheckFloating(handler, mon, 1)) {
             changed = TRUE;
         }
-        if (CheckCondition(mon, 0x1e)) {
-            ServerControl_CureCondition(handler, mon, 0x1e, 0);
+        if (CheckCondition(mon, CONDITION_MAGNET_RISE)) {
+            ServerControl_CureCondition(handler, mon, CONDITION_MAGNET_RISE, 0);
             changed = TRUE;
         }
-        if (CheckCondition(mon, 0x20)) {
-            ServerControl_CureCondition(handler, mon, 0x20, 0);
+        if (CheckCondition(mon, CONDITION_TELEKINESIS)) {
+            ServerControl_CureCondition(handler, mon, CONDITION_TELEKINESIS, 0);
             changed = TRUE;
         }
         if (changed) {

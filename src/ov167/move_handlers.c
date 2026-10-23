@@ -16,6 +16,7 @@
 #include "battle/btl_wazarec.h"
 #include "battle/handler_common.h"
 #include "battle/side_handlers.h"
+#include "constants/battle.h"
 #include "constants/moves.h"
 #include "constants/species.h"
 #include "gfl/std.h"
@@ -1409,8 +1410,8 @@ static void HandlerFollowMeBaitTarget(BattleEventItem *item, BtlServerFlow *flow
     if (BtlServerFlow_GetBattleStyle(flow) != 0 && BtlServerFlow_GetBattleStyle(flow) != 3) {
         attackerId = BattleEventVar_GetValue(3);
         mon = GetBattleMon(flow, monId);
-        if (!IsAllyMonID(monId, attackerId) && BattleEventVar_GetValue(0x12) != 0x1fb && !CheckCondition(mon, 0x21) &&
-            !IsMonSwitchingOut(flow)) {
+        if (!IsAllyMonID(monId, attackerId) && BattleEventVar_GetValue(0x12) != 0x1fb &&
+            !CheckCondition(mon, CONDITION_SKY_DROP) && !IsMonSwitchingOut(flow)) {
             move = BattleEventVar_GetValue(0x12);
             if (!BtlServerFlow_IsTargetOutOfRange(flow, attackerId, monId, move)) {
                 BattleEventVar_RewriteValue(4, monId);
@@ -1466,7 +1467,7 @@ static void HandlerSpiderWeb(BattleEventItem *item, BtlServerFlow *flow, u8 monI
         if (!CheckCondition(GetBattleMon(flow, targetId), 0x16)) {
             param = BattleHandler_PushWork(flow, 0xc, monId);
             param->targetIndex = targetId;
-            param->condition = 0x16;
+            param->condition = CONDITION_MEAN_LOOK;
             param->value = BtlCalc_MakePokeCondition(monId);
             BattleHandler_StrSetup(&param->string, 2, 0x368);
             BattleHandler_AddArg(&param->string, targetId);
@@ -2472,7 +2473,7 @@ static void HandlerSnoreCheck2(BattleEventItem *item, BtlServerFlow *flow, u8 mo
         mon = GetBattleMon(flow, monId);
         if (BattleEventVar_GetValue(0x22) == 2) {
             BattleEventVar_RewriteValue(0x22, 0);
-        } else if (!CheckCondition(mon, 2)) {
+        } else if (!CheckCondition(mon, CONDITION_SLEEP)) {
             BattleEventVar_RewriteValue(0x22, 0x1a);
         }
     }
@@ -2800,7 +2801,7 @@ static void HandlerAquaRing(BattleEventItem *item, BtlServerFlow *flow, u8 monId
 
     if (BattleEventVar_GetValue(3) == monId && !CheckCondition(GetBattleMon(flow, monId), 0x23)) {
         param = BattleHandler_PushWork(flow, 0xc, monId);
-        param->condition = 0x23;
+        param->condition = CONDITION_AQUA_RING;
         param->value = MakeConditionPermanent();
         param->targetIndex = monId;
         BattleHandler_StrSetup(&param->string, 2, 0x259);
@@ -2827,7 +2828,7 @@ static void HandlerThrash(BattleEventItem *item, BtlServerFlow *flow, u8 monId, 
     if (BattleEventVar_GetValue(2) == monId && !CheckCondition(GetBattleMon(flow, monId), 0x19) && work[6] == 0) {
         turns = BattleRandom(2) + 2;
         param = BattleHandler_PushWork(flow, 0xc, monId);
-        param->condition = 0x19;
+        param->condition = CONDITION_MOVE_LOCK;
         param->value = AddTurnCondition(turns, BattleEventItem_GetSubID(item));
         param->showFail = 0;
         param->targetIndex = monId;
@@ -2882,9 +2883,9 @@ static void HandlerThrashTurnCheck(BattleEventItem *item, BtlServerFlow *flow, u
 
     if (BattleEventVar_GetValue(2) == monId) {
         mon = GetBattleMon(flow, monId);
-        if (CheckCondition(mon, 2)) {
+        if (CheckCondition(mon, CONDITION_SLEEP)) {
             param = BattleHandler_PushWork(flow, 0xb, monId);
-            param->condition = 0x19;
+            param->condition = CONDITION_MOVE_LOCK;
             param->count = 1;
             param->monIds[0] = monId;
             BattleHandler_PopWork(flow, param);
@@ -2952,7 +2953,7 @@ static void HandlerUproarEnd(BattleEventItem *item, BtlServerFlow *flow, u8 monI
 
     if (BattleEventVar_GetValue(2) == monId && BattleEventVar_GetValue(0x51) == 0) {
         param = BattleHandler_PushWork(flow, 0xb, monId);
-        param->condition = 0x19;
+        param->condition = CONDITION_MOVE_LOCK;
         param->count = 1;
         param->monIds[0] = monId;
         BattleHandler_PopWork(flow, param);
@@ -2966,7 +2967,7 @@ static void HandlerUproarUnlock(BattleEventItem *item, BtlServerFlow *flow, u8 m
     if (BattleEventVar_GetValue(2) == monId && work[6] != 0) {
         mon = GetBattleMon(flow, monId);
         if (!IsFainted(mon)) {
-            if (!CheckCondition(mon, 0x19)) {
+            if (!CheckCondition(mon, CONDITION_MOVE_LOCK)) {
                 param = BattleHandler_PushWork(flow, 4, monId);
                 BattleHandler_StrSetup(&param->string, 2, 0x2ce);
                 BattleHandler_AddArg(&param->string, monId);
@@ -3017,9 +3018,9 @@ static void HandlerRolloutStart(BattleEventItem *item, BtlServerFlow *flow, u8 m
 
     if (BattleEventVar_GetValue(2) == monId) {
         mon = GetBattleMon(flow, monId);
-        if (!CheckCondition(mon, 0x19) && !CheckCondition(mon, 2) && work[6] == 0) {
+        if (!CheckCondition(mon, CONDITION_MOVE_LOCK) && !CheckCondition(mon, CONDITION_SLEEP) && work[6] == 0) {
             param = BattleHandler_PushWork(flow, 0xc, monId);
-            param->condition = 0x19;
+            param->condition = CONDITION_MOVE_LOCK;
             param->value = AddTurnCondition(5, BattleEventItem_GetSubID(item));
             param->showFail = 0;
             param->targetIndex = monId;
@@ -3049,7 +3050,7 @@ static void HandlerRolloutUnlock(BattleEventItem *item, BtlServerFlow *flow, u8 
     param = BattleHandler_PushWork(flow, 0xb, monId);
     param->monIds[0] = monId;
     param->count = 1;
-    param->condition = 0x19;
+    param->condition = CONDITION_MOVE_LOCK;
     BattleHandler_PopWork(flow, param);
     work[6] = 0;
     RemoveHandlerForce(monId, BattleEventItem_GetSubID(item));
@@ -3357,7 +3358,7 @@ static void HandlerWakeUpSlapPower(BattleEventItem *item, BtlServerFlow *flow, u
 
     if (BattleEventVar_GetValue(3) == monId) {
         target = GetBattleMon(flow, BattleEventVar_GetValue(4));
-        if (!IsSubstituteActive(target) && CheckCondition(target, 2)) {
+        if (!IsSubstituteActive(target) && CheckCondition(target, CONDITION_SLEEP)) {
             MultiplyBasePower(2);
         }
     }
@@ -3373,7 +3374,7 @@ static void HandlerWakeUpSlapSleepCure(BattleEventItem *item, BtlServerFlow *flo
             param = BattleHandler_PushWork(flow, 0xb, monId);
             param->monIds[0] = targetId;
             param->count = 1;
-            param->condition = 2;
+            param->condition = CONDITION_SLEEP;
             BattleHandler_PopWork(flow, param);
         }
     }
@@ -3394,7 +3395,7 @@ static void HandlerSmellingSaltsPower(BattleEventItem *item, BtlServerFlow *flow
 
     if (BattleEventVar_GetValue(3) == monId) {
         target = GetBattleMon(flow, BattleEventVar_GetValue(4));
-        if (!IsSubstituteActive(target) && CheckCondition(target, 1)) {
+        if (!IsSubstituteActive(target) && CheckCondition(target, CONDITION_PARALYSIS)) {
             MultiplyBasePower(2);
         }
     }
@@ -3410,7 +3411,7 @@ static void HandlerSmellingSaltsParaCure(BattleEventItem *item, BtlServerFlow *f
             param = BattleHandler_PushWork(flow, 0xb, monId);
             param->monIds[0] = targetId;
             param->count = 1;
-            param->condition = 1;
+            param->condition = CONDITION_PARALYSIS;
             BattleHandler_PopWork(flow, param);
         }
     }
@@ -4465,7 +4466,7 @@ static void HandlerBide(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s3
         switch (work[0]) {
         case 0:
             param = BattleHandler_PushWork(flow, 0xc, monId);
-            param->condition = 0x19;
+            param->condition = CONDITION_MOVE_LOCK;
             param->value = MakeConditionParamPermanent(BattleEventItem_GetSubID(item));
             param->targetIndex = monId;
             BattleHandler_PopWork(flow, param);
@@ -4583,7 +4584,7 @@ static void BideEnd(BtlServerFlow *flow, u8 monId, s32 *work) {
 
     if (work[6] != 0) {
         param = BattleHandler_PushWork(flow, 0xb, monId);
-        param->condition = 0x19;
+        param->condition = CONDITION_MOVE_LOCK;
         param->count = 1;
         param->monIds[0] = monId;
         param->useString = 1;
@@ -4902,11 +4903,11 @@ static void HandlerRestCheckFail(BattleEventItem *item, BtlServerFlow *flow, u8 
 
     if (BattleEventVar_GetValue(2) == monId && BattleEventVar_GetValue(0x22) == 0) {
         mon = GetBattleMon(flow, monId);
-        if (CheckCondition(mon, 2)) {
+        if (CheckCondition(mon, CONDITION_SLEEP)) {
             BattleEventVar_RewriteValue(0x22, 0x1a);
             return;
         }
-        if (CheckCondition(mon, 0xf)) {
+        if (CheckCondition(mon, CONDITION_HEAL_BLOCK)) {
             BattleEventVar_RewriteValue(0x22, 0xd);
             return;
         }
@@ -5053,12 +5054,13 @@ static void HandlerEncore(BattleEventItem *item, BtlServerFlow *flow, u8 monId, 
         targetId = BattleEventVar_GetValue(6);
         target = GetBattleMon(flow, targetId);
         move = GetPreviousMoveUsed(target);
-        if (!CheckCondition(target, 0x17) && !IsEncoreExcludedMove(move) && BattleMon_GetPPOfMove(target, move)) {
+        if (!CheckCondition(target, CONDITION_ENCORE) && !IsEncoreExcludedMove(move) &&
+            BattleMon_GetPPOfMove(target, move)) {
             if (GetTurnFlag(target, 1)) {
                 turns++;
             }
             param = BattleHandler_PushWork(flow, 0xc, monId);
-            param->condition = 0x17;
+            param->condition = CONDITION_ENCORE;
             param->value = AddTurnCondition(turns, move);
             param->targetIndex = targetId;
             param->showFail = 0;
@@ -5087,12 +5089,12 @@ static void HandlerTaunt(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s
     if (BattleEventVar_GetValue(3) == monId) {
         targetId = BattleEventVar_GetValue(6);
         target = GetBattleMon(flow, targetId);
-        if (!CheckCondition(target, 0xb)) {
+        if (!CheckCondition(target, CONDITION_TAUNT)) {
             if (GetTurnFlag(target, 1)) {
                 turns++;
             }
             param = BattleHandler_PushWork(flow, 0xc, monId);
-            param->condition = 0xb;
+            param->condition = CONDITION_TAUNT;
             param->value = BtlCalc_MakeTurnCondition(turns);
             param->targetIndex = targetId;
             BattleHandler_PopWork(flow, param);
@@ -5118,7 +5120,7 @@ static void HandlerTorment(BattleEventItem *item, BtlServerFlow *flow, u8 monId,
         targetId = BattleEventVar_GetValue(6);
         if (!CheckCondition(GetBattleMon(flow, targetId), 0xc)) {
             param = BattleHandler_PushWork(flow, 0xc, monId);
-            param->condition = 0xc;
+            param->condition = CONDITION_TORMENT;
             param->value = MakeConditionPermanent();
             param->targetIndex = targetId;
             BattleHandler_PopWork(flow, param);
@@ -5145,7 +5147,7 @@ static void HandlerDisable(BattleEventItem *item, BtlServerFlow *flow, u8 monId,
     if (BattleEventVar_GetValue(3) == monId) {
         targetId = BattleEventVar_GetValue(6);
         target = GetBattleMon(flow, targetId);
-        if (!CheckCondition(target, 0xd)) {
+        if (!CheckCondition(target, CONDITION_DISABLE)) {
             move = GetPreviousMoveUsed(target);
             if (move != 0 && move != 0xa5 && MoveIsUsable(target, move)) {
                 turns = 4;
@@ -5153,7 +5155,7 @@ static void HandlerDisable(BattleEventItem *item, BtlServerFlow *flow, u8 monId,
                     turns++;
                 }
                 param = BattleHandler_PushWork(flow, 0xc, monId);
-                param->condition = 0xd;
+                param->condition = CONDITION_DISABLE;
                 param->value = AddTurnCondition(turns, move);
                 param->targetIndex = targetId;
                 BattleHandler_PopWork(flow, param);
@@ -5246,7 +5248,7 @@ static void CommonCureAllyMonStatus(BattleEventItem *item, BtlServerFlow *flow, 
             for (i = 0; i < count; i++) {
                 param->monIds[i] = monIds[i];
             }
-            param->condition = 0x24;
+            param->condition = CONDITION_ANY_STATUS;
             BattleHandler_PopWork(flow, param);
         }
     }
@@ -5699,7 +5701,7 @@ static void HandlerLockOn(BattleEventItem *item, BtlServerFlow *flow, u8 monId, 
         targetId = BattleEventVar_GetValue(6);
         param = BattleHandler_PushWork(flow, 0xc, monId);
         param->targetIndex = monId;
-        param->condition = 0x1d;
+        param->condition = CONDITION_LOCK_ON;
         param->value = MakeConditionDependPokeTurns(targetId, 2);
         BattleHandler_StrSetup(&param->string, 2, 0x28b);
         BattleHandler_AddArg(&param->string, monId);
@@ -6066,7 +6068,7 @@ static void HandlerGastroAcid(BattleEventItem *item, BtlServerFlow *flow, u8 mon
         targetId = BattleEventVar_GetValue(6);
         param = BattleHandler_PushWork(flow, 0xc, monId);
         param->targetIndex = targetId;
-        param->condition = 0x10;
+        param->condition = CONDITION_GASTRO_ACID;
         param->value = MakeConditionPermanent();
         BattleHandler_StrSetup(&param->string, 2, 0x235);
         BattleHandler_AddArg(&param->string, targetId);
@@ -6156,14 +6158,14 @@ static void HandlerRapidSpin(BattleEventItem *item, BtlServerFlow *flow, u8 monI
 
     if (BattleEventVar_GetValue(3) == monId) {
         mon = GetBattleMon(flow, monId);
-        if (CheckCondition(mon, 0x12)) {
+        if (CheckCondition(mon, CONDITION_LEECH_SEED)) {
             cure = BattleHandler_PushWork(flow, 0xb, monId);
             cure->count = 1;
             cure->monIds[0] = monId;
             cure->condition = 0x12;
             BattleHandler_PopWork(flow, cure);
         }
-        if (CheckCondition(mon, 8)) {
+        if (CheckCondition(mon, CONDITION_BIND)) {
             cure = BattleHandler_PushWork(flow, 0xb, monId);
             cure->count = 1;
             cure->monIds[0] = monId;
@@ -6246,7 +6248,7 @@ static void HandlerTeleportCheckFail(BattleEventItem *item, BtlServerFlow *flow,
         BattleEventVar_RewriteValue(0x22, 0x1a);
     }
     mon = GetBattleMon(flow, monId);
-    if (CheckCondition(mon, 8) && CheckCondition(mon, 0x16)) {
+    if (CheckCondition(mon, CONDITION_BIND) && CheckCondition(mon, CONDITION_MEAN_LOOK)) {
         BattleEventVar_RewriteValue(0x22, 0x1a);
     }
 }
@@ -6365,7 +6367,7 @@ static void HandlerMagnetRiseCheckFail(BattleEventItem *item, BtlServerFlow *flo
 
     if (BattleEventVar_GetValue(2) == monId) {
         mon = GetBattleMon(flow, monId);
-        if (CheckCondition(mon, 0x15) || CheckCondition(mon, 0x1f)) {
+        if (CheckCondition(mon, CONDITION_INGRAIN) || CheckCondition(mon, CONDITION_SMACK_DOWN)) {
             BattleEventVar_RewriteValue(0x22, 0x1a);
         }
     }
@@ -6377,7 +6379,7 @@ static void HandlerMagnetRise(BattleEventItem *item, BtlServerFlow *flow, u8 mon
     if (BattleEventVar_GetValue(3) == monId) {
         param = BattleHandler_PushWork(flow, 0xc, monId);
         param->targetIndex = monId;
-        param->condition = 0x1e;
+        param->condition = CONDITION_MAGNET_RISE;
         param->value = SetConditionTurns(5);
         BattleHandler_StrSetup(&param->string, 2, 0x292);
         BattleHandler_AddArg(&param->string, monId);
@@ -7074,7 +7076,7 @@ static void HandlerRoost(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s
         param = BattleHandler_PushWork(flow, 0xc, monId);
         param->targetIndex = monId;
         param->noMessage = 1;
-        param->condition = 0x18;
+        param->condition = CONDITION_ROOST;
         param->value = AddTurnCondition(1, 2);
         SetConditionFlag(&param->value, 1);
         BattleHandler_PopWork(flow, param);
@@ -7297,7 +7299,7 @@ static void HandlerSleepTalk(BattleEventItem *item, BtlServerFlow *flow, u8 monI
 
     if (BattleEventVar_GetValue(2) == monId) {
         mon = GetBattleMon(flow, monId);
-        if (CheckCondition(mon, 2)) {
+        if (CheckCondition(mon, CONDITION_SLEEP)) {
             numMoves = GetBattleMonMoveCount(mon);
             for (i = 0, count = 0; i < numMoves; i++) {
                 move = MoveGetID(mon, i);
@@ -7871,17 +7873,17 @@ static void HandlerSmackDown(BattleEventItem *item, BtlServerFlow *flow, u8 monI
         target = GetBattleMon(flow, targetId);
         grounded = FALSE;
         if (!BtlServerFlow_IsInSkyDrop(flow, targetId)) {
-            if (BtlServerFlow_IsFloating(flow, targetId) && !CheckCondition(target, 0x21)) {
+            if (BtlServerFlow_IsFloating(flow, targetId) && !CheckCondition(target, CONDITION_SKY_DROP)) {
                 param = BattleHandler_PushWork(flow, 0xc, monId);
                 param->targetIndex = targetId;
-                param->condition = 0x1f;
+                param->condition = CONDITION_SMACK_DOWN;
                 param->value = MakeConditionPermanent();
                 BattleHandler_StrSetup(&param->string, 2, 0x468);
                 BattleHandler_AddArg(&param->string, targetId);
                 BattleHandler_PopWork(flow, param);
                 grounded = TRUE;
 
-                if (CheckCondition(target, 0x1e)) {
+                if (CheckCondition(target, CONDITION_MAGNET_RISE)) {
                     cure = BattleHandler_PushWork(flow, 0xb, monId);
                     cure->count = 1;
                     cure->monIds[0] = targetId;
@@ -7889,7 +7891,7 @@ static void HandlerSmackDown(BattleEventItem *item, BtlServerFlow *flow, u8 monI
                     cure->condition = 0x1e;
                     BattleHandler_PopWork(flow, cure);
                 }
-                if (CheckCondition(target, 0x20)) {
+                if (CheckCondition(target, CONDITION_TELEKINESIS)) {
                     cure = BattleHandler_PushWork(flow, 0xb, monId);
                     cure->count = 1;
                     cure->monIds[0] = targetId;
@@ -8409,8 +8411,8 @@ static void HandlerTelekinesisCheckFail(BattleEventItem *item, BtlServerFlow *fl
         targetId = BattleEventVar_GetValue(4);
         target = GetBattleMon(flow, targetId);
         species = GetBattleMonSpecies(target);
-        if (species == SPECIES_DIGLETT || species == SPECIES_DUGTRIO || CheckCondition(target, 0x1f) ||
-            CheckCondition(target, 0x15)) {
+        if (species == SPECIES_DIGLETT || species == SPECIES_DUGTRIO || CheckCondition(target, CONDITION_SMACK_DOWN) ||
+            CheckCondition(target, CONDITION_INGRAIN)) {
             BattleEventVar_RewriteValue(0x40, 1);
         }
     }

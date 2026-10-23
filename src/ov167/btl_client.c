@@ -2451,7 +2451,7 @@ static BOOL BattleClient_ActionSelectRoot(BtlClient *client, s32 *seq) {
         }
         switch (BtlvCore_WaitCommandSelect(client->viewCore)) {
         case BTLV_COMMAND_POKEMON:
-            if (CheckCondition(client->procMon, 0x21)) {
+            if (CheckCondition(client->procMon, CONDITION_SKY_DROP)) {
                 BtlvCore_ResetScreen(client->viewCore);
                 *seq = ROOT_SEQ_BLOCKED_RESET_SCREEN;
             } else {
@@ -2464,7 +2464,7 @@ static BOOL BattleClient_ActionSelectRoot(BtlClient *client, s32 *seq) {
             BattleClient_SetSelActProc(client, BattleClient_ActionSelectFight);
             break;
         case BTLV_COMMAND_BAG:
-            if (CheckCondition(client->procMon, 0x21)) {
+            if (CheckCondition(client->procMon, CONDITION_SKY_DROP)) {
                 *seq = ROOT_SEQ_BLOCKED_RESET_SCREEN;
             } else if (client->bagMode == 1 && !func_ov167_0219db08(client->mainModule)) {
                 BtlvCore_ResetScreen(client->viewCore);
@@ -2477,7 +2477,7 @@ static BOOL BattleClient_ActionSelectRoot(BtlClient *client, s32 *seq) {
             break;
         case BTLV_COMMAND_RUN:
             if (client->procActionIdx == client->firstActionIdx) {
-                if (CheckCondition(client->procMon, 0x21) && GetRunMode(client->mainModule) != 2) {
+                if (CheckCondition(client->procMon, CONDITION_SKY_DROP) && GetRunMode(client->mainModule) != 2) {
                     *seq = ROOT_SEQ_BLOCKED_RESET_SCREEN;
                 } else {
                     shooterWork_SetCost(client, client->procActionIdx, 0);
@@ -3177,8 +3177,8 @@ static BOOL AutoSelectAction(BtlClient *client, BattleMon *mon, BattleAction *ac
         }
         return TRUE;
     }
-    if (CheckCondition(mon, 25)) {
-        BattleConditionCont cont = GetConditionContinuationParam(mon, 25);
+    if (CheckCondition(mon, CONDITION_MOVE_LOCK)) {
+        BattleConditionCont cont = GetConditionContinuationParam(mon, CONDITION_MOVE_LOCK);
         u16 move = Condition_GetParam(cont);
         u8 target = GetPrevTargetPos(mon);
         if (action != NULL) {
@@ -3186,7 +3186,7 @@ static BOOL AutoSelectAction(BtlClient *client, BattleMon *mon, BattleAction *ac
         }
         return TRUE;
     }
-    if (CheckCondition(mon, 26)) {
+    if (CheckCondition(mon, CONDITION_CHARGE)) {
         u16 move = GetPreviousMoveID(mon);
         u8 target = GetPrevTargetPos(mon);
         BattleMon_FindMoveSlot(mon, move);
@@ -3224,8 +3224,8 @@ static BOOL IsUnselectableMove(BtlClient *client, BattleMon *mon, u16 move, Btlv
     if (move == MOVE_STRUGGLE) {
         return FALSE;
     }
-    if (CanMonUseHeldItem(client, mon) && CheckCondition(mon, 27)) {
-        u16 lockedMove = Condition_GetParam(GetConditionContinuationParam(mon, 27));
+    if (CanMonUseHeldItem(client, mon) && CheckCondition(mon, CONDITION_CHOICE_LOCK)) {
+        u16 lockedMove = Condition_GetParam(GetConditionContinuationParam(mon, CONDITION_CHOICE_LOCK));
         if (MoveIsUsable(mon, lockedMove) && lockedMove != move) {
             if (param != NULL) {
                 Btlv_StringParam_Setup(param, 1, 0x63);
@@ -3235,8 +3235,8 @@ static BOOL IsUnselectableMove(BtlClient *client, BattleMon *mon, u16 move, Btlv
             return TRUE;
         }
     }
-    if (CheckCondition(mon, 23)) {
-        BattleConditionCont cont = GetConditionContinuationParam(mon, 23);
+    if (CheckCondition(mon, CONDITION_ENCORE)) {
+        BattleConditionCont cont = GetConditionContinuationParam(mon, CONDITION_ENCORE);
         u16 encoreMove = Condition_GetParam(cont);
         if (move != encoreMove) {
             if (param != NULL) {
@@ -3416,7 +3416,7 @@ static BOOL IsMonTrappedByArenaTrap(BtlClient *client, BattleMon *mon) {
     if (CheckFieldEffect(client->field, FIELD_CONDITION_GRAVITY)) {
         return TRUE;
     }
-    if (CheckCondition(mon, 31)) {
+    if (CheckCondition(mon, CONDITION_SMACK_DOWN)) {
         return TRUE;
     }
     if (CheckCondition(mon, CONDITION_INGRAIN)) {
@@ -3431,10 +3431,10 @@ static BOOL IsMonTrappedByArenaTrap(BtlClient *client, BattleMon *mon) {
     if (DoesMonHaveType(mon, TYPE_FLYING)) {
         return FALSE;
     }
-    if (CheckCondition(mon, 30)) {
+    if (CheckCondition(mon, CONDITION_MAGNET_RISE)) {
         return FALSE;
     }
-    if (CheckCondition(mon, 32)) {
+    if (CheckCondition(mon, CONDITION_TELEKINESIS)) {
         return FALSE;
     }
     if (canUseItem && GetBattleMonHeldItem(mon) == ITEM_AIR_BALLOON) {
@@ -3597,8 +3597,8 @@ static BOOL ShouldSwitchIfNoEffectiveMoves(BtlClient *client, BattleMon *mon, Ba
 }
 
 static BOOL ShouldSwitchIfChoicedIntoIneffectiveMove(BtlClient *client, BattleMon *mon, BattleMon *target) {
-    if (CheckCondition(mon, 27)) {
-        BattleConditionCont cont = GetConditionContinuationParam(mon, 27);
+    if (CheckCondition(mon, CONDITION_CHOICE_LOCK)) {
+        BattleConditionCont cont = GetConditionContinuationParam(mon, CONDITION_CHOICE_LOCK);
         u16 move = Condition_GetParam(cont);
         if (move != 0) {
             BOOL isDamaging = PML_MoveIsDamaging(move);
@@ -3881,8 +3881,8 @@ static BOOL AISelectAction(BtlClient *client, s32 *seq) {
                 client->procAction++;
             }
         }
-        if (CheckCondition(client->procMon, 25)) {
-            move = Condition_GetParam(GetConditionContinuationParam(client->procMon, 25));
+        if (CheckCondition(client->procMon, CONDITION_MOVE_LOCK)) {
+            move = Condition_GetParam(GetConditionContinuationParam(client->procMon, CONDITION_MOVE_LOCK));
             BattleAction_SetFightParam(client->procAction, move,
                                        DecideMoveTargetAutoForClient(client->mainModule, client->pokeCon,
                                                                      client->procMon, move, &client->aiRand));
@@ -6819,7 +6819,7 @@ static u16 AICheckItemUse(BtlClient *client, BattleMon *mon, BattleParty *party)
     u8 numMons = GetNumMonsInParty(party);
     u32 i;
 
-    if (CheckCondition(mon, 0x13)) {
+    if (CheckCondition(mon, CONDITION_EMBARGO)) {
         return 0;
     }
     for (i = 0; i < 4; i++) {

@@ -146,5 +146,28 @@
 #define CONDITION_PERISH_SONG 20
 #define CONDITION_INGRAIN 21
 #define CONDITION_MEAN_LOOK 22
+#define CONDITION_ENCORE 23
+// Roost: the Pokemon loses its Flying type for the turn
+#define CONDITION_ROOST 24
+// A move that repeats over several turns, as Thrash, Uproar, Rollout and Bide
+#define CONDITION_MOVE_LOCK 25
+// The turn a two-turn move charges
+#define CONDITION_CHARGE 26
+// A Choice item's lock on the first move used
+#define CONDITION_CHOICE_LOCK 27
+// Every move of the Pokemon hits
+#define CONDITION_ALWAYS_HIT 28
+// Lock-On and Mind Reader: the Pokemon's moves hit the one target
+#define CONDITION_LOCK_ON 29
+#define CONDITION_MAGNET_RISE 30
+// Smack Down: the Pokemon is grounded
+#define CONDITION_SMACK_DOWN 31
+#define CONDITION_TELEKINESIS 32
+#define CONDITION_SKY_DROP 33
+// The Micle Berry's accuracy boost for the next move
+#define CONDITION_MICLE_BERRY 34
+#define CONDITION_AQUA_RING 35
+// Any major status condition, which Natural Cure, Shed Skin and Hydration cure
+#define CONDITION_ANY_STATUS 36
 
 #endif // POKEBW2_CONSTANTS_BATTLE_H

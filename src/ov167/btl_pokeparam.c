@@ -7,6 +7,7 @@
 #include "battle/btl_pokeparam.h"
 #include "battle/condition_effects.h"
 #include "constants/abilities.h"
+#include "constants/battle.h"
 #include "constants/items.h"
 #include "constants/pokemon.h"
 #include "constants/species.h"
@@ -514,7 +515,7 @@ void splitTypeCore(BattleMon *mon, u8 *type1, u8 *type2) {
     BOOL condition;
     u8 type;
 
-    condition = CheckCondition(mon, 0x18);
+    condition = CheckCondition(mon, CONDITION_ROOST);
     type = mon->type1;
     if (type == 2 && condition) {
         *type1 = 0x11;
@@ -691,7 +692,7 @@ u32 GetBattleMonStat(const BattleMon *mon, u32 stat) {
     case 21:
         return mon->core.unk1a;
     case 17:
-        if (CheckCondition(mon, 0x10)) {
+        if (CheckCondition(mon, CONDITION_GASTRO_ACID)) {
             return 0;
         }
     case 16:
@@ -1156,7 +1157,7 @@ BOOL BattleMon_TickCondition(BattleMon *mon, u32 index, BattleCondition *prev, B
 
 // Whether the Pokémon has an ability and it is not suppressed
 static inline BOOL CheckEffectiveAbility(BattleMon *mon, u16 ability) {
-    if (CheckCondition(mon, 0x10)) {
+    if (CheckCondition(mon, CONDITION_GASTRO_ACID)) {
         return FALSE;
     }
     if (mon->ability == ability) {
@@ -1290,7 +1291,7 @@ u32 BattleMon_GetResidualDamage(BattleMon *mon, u32 index) {
         case 4:
             return DivideMaxHPZeroCheck(mon, 8);
         case 9:
-            if (CheckCondition(mon, 2)) {
+            if (CheckCondition(mon, CONDITION_SLEEP)) {
                 return DivideMaxHPZeroCheck(mon, 4);
             }
             break;

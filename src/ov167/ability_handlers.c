@@ -13,6 +13,7 @@
 #include "battle/btl_tables.h"
 #include "battle/handler_common.h"
 #include "constants/abilities.h"
+#include "constants/battle.h"
 #include "constants/items.h"
 #include "pml/item.h"
 #include "pml/waza.h"
@@ -1798,7 +1799,7 @@ void HandlerHydration(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 
             if (GetBattleMonStatus(mon)) {
                 BattleHandler_PushRun(flow, 2, monId);
                 param = BattleHandler_PushWork(flow, 0xb, monId);
-                param->condition = 0x24;
+                param->condition = CONDITION_ANY_STATUS;
                 param->monIds[0] = monId;
                 param->count = 1;
                 param->unk25 = 1;
@@ -1829,7 +1830,7 @@ void HandlerShedSkin(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *
                 param = BattleHandler_PushWork(flow, 0xb, monId);
                 param->popup = 1;
                 param->unk25 = 1;
-                param->condition = 0x24;
+                param->condition = CONDITION_ANY_STATUS;
                 param->monIds[0] = monId;
                 param->count = 1;
                 BattleHandler_PopWork(flow, param);
@@ -2302,7 +2303,7 @@ void HandlerNaturalCure(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s3
 
     if (BattleEventVar_GetValue(2) == monId) {
         param = BattleHandler_PushWork(flow, 0xb, monId);
-        param->condition = 0x24;
+        param->condition = CONDITION_ANY_STATUS;
         param->count = 1;
         param->monIds[0] = monId;
         param->useString = 1;
@@ -3115,7 +3116,7 @@ void HandlerBadDreams(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 
         count = HandlerGetAlivePartyCount(flow, BtlServerFlow_GetMonBattlePos(flow, monId) | 0x100, mons);
         for (i = 0; i < count; i++) {
             mon = GetBattleMon(flow, mons[i]);
-            if (CheckCondition(mon, 2)) {
+            if (CheckCondition(mon, CONDITION_SLEEP)) {
                 if (!popup) {
                     popup = TRUE;
                     BattleHandler_PushRun(flow, 2, monId);
@@ -3896,7 +3897,7 @@ void HandlerCursedBody(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32
         !BtlServerFlow_CheckMatchup(flow)) {
         attackerId = BattleEventVar_GetValue(3);
         attacker = GetBattleMon(flow, attackerId);
-        if (!CheckCondition(attacker, 0xd)) {
+        if (!CheckCondition(attacker, CONDITION_DISABLE)) {
             move = BattleEventVar_GetValue(0x14);
             if (move != 0 && move != 0xa5 && !IsDelayedAttackMove(move) && AbilityEvent_RollEffectChance(flow, 30)) {
                 turns = 4;
@@ -3904,7 +3905,7 @@ void HandlerCursedBody(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32
                     turns++;
                 }
                 param = BattleHandler_PushWork(flow, 0xc, monId);
-                param->condition = 0xd;
+                param->condition = CONDITION_DISABLE;
                 param->value = AddTurnCondition(turns, move);
                 param->targetIndex = attackerId;
                 param->popup = 1;
@@ -4131,7 +4132,7 @@ void HandlerHealer(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *wo
                 param->unk25 = 1;
                 param->count = 1;
                 param->monIds[0] = mons[i];
-                param->condition = 0x24;
+                param->condition = CONDITION_ANY_STATUS;
                 BattleHandler_PopWork(flow, param);
             }
         }
@@ -4307,7 +4308,7 @@ void HandlerPoisonTouch(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s3
         param = BattleHandler_PushWork(flow, 0xc, monId);
         param->popup = 1;
         param->targetIndex = BattleEventVar_GetValue(4);
-        param->condition = 5;
+        param->condition = CONDITION_POISON;
         param->value = BtlCalc_MakeStatusCondition(5);
         BattleHandler_StrSetup(&param->string, 2, 0x1d8);
         BattleHandler_AddArg(&param->string, param->targetIndex);
