@@ -20,7 +20,7 @@ typedef struct {
     u8 removed[4];
 } FesMissionZone;
 
-// The work of a type 5 mission, kept by the festival (LinkFestival_GetEntries)
+// The work of a type 5 mission, kept by the festival (LinkFestival_GetMissionWork)
 typedef struct {
     LinkFestival *festival;
     u16 zoneId;
@@ -73,9 +73,8 @@ struct FesGimmick {
     u32 unk38;
     // The sparkles of a mission of type 4, which overlay 71 shows
     FieldEffectTask *sparkles;
-    // The mission's work in the festival's entries, by the mission's kind: a FesMissionWork, a FestSparkleWork or
-    // the hollows' RivalEntry list
-    void *work;
+    // The mission's work, which the festival keeps
+    FestMissionWork *work;
     FesMissionQuiz quiz;
 };
 

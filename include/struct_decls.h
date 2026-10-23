@@ -81,6 +81,7 @@ typedef struct DeliveryBeaconWork DeliveryBeaconWork;
 typedef struct DeliveryIrcWork DeliveryIrcWork;
 typedef struct FaceUpWork FaceUpWork;
 typedef struct FesGimmick FesGimmick;
+typedef union FestMissionWork FestMissionWork;
 typedef struct FieldColorPostFX FieldColorPostFX;
 typedef struct FieldFMissionInfo FieldFMissionInfo;
 typedef struct FieldSaveAnime FieldSaveAnime;

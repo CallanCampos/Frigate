@@ -50,9 +50,8 @@ static const FestSparkleSpecies sSpecies[17][6] = {
     { { 169, 16 }, { 170, 17 }, { 171, 17 }, { 172, 17 }, { 173, 17 }, { 174, 16 } },
 };
 
-void FestSparklePlace_OnZoneEnter(RivalEntry *entry, GameSystem *gsys, LinkFestival *festival,
+void FestSparklePlace_OnZoneEnter(FestSparkleWork *work, GameSystem *gsys, LinkFestival *festival,
                                   FestMissionConfig *mission, u16 zoneId) {
-    FestSparkleWork *work = (FestSparkleWork *)entry;
     MATHRandContext32 rand;
 
     work->zoneId = zoneId;

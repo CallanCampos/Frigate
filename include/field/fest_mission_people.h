@@ -23,7 +23,7 @@ ArcTool *LinkFestival_GetArchive(LinkFestival *festival);
 int GetZoneEncIDHighest3Bits(u16 zoneId);
 
 // On entering a zone: picks the places of the mission's people, then creates them
-void FesMissionPeople_OnZoneEnter(RivalEntry *entry, GameSystem *gsys, LinkFestival *festival,
+void FesMissionPeople_OnZoneEnter(FesMissionWork *work, GameSystem *gsys, LinkFestival *festival,
                                   FestMissionConfig *mission, u16 zoneId);
 // Reads the species the mission's quiz or people use from the festival's archive into the work
 void FesMissionPeople_LoadSpecies(FesGimmick *gimmick, FesMissionWork *work);

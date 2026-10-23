@@ -200,9 +200,8 @@ static const FesMissionShopItem sShopItems[5][16] = {
       { ITEM_GOOEY_MULCH, 1000 } },
 };
 
-void FesMissionPeople_OnZoneEnter(RivalEntry *entry, GameSystem *gsys, LinkFestival *festival,
+void FesMissionPeople_OnZoneEnter(FesMissionWork *work, GameSystem *gsys, LinkFestival *festival,
                                   FestMissionConfig *mission, u16 zoneId) {
-    FesMissionWork *work = (FesMissionWork *)entry;
     MATHRandContext32 rand;
 
     work->placeCount = 0;

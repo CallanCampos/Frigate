@@ -29,7 +29,7 @@ static const FesMissionHollowPerson data_ov026_0216fa50[] = {
 
 void FesMissionHollow_Setup(FesGimmick *gimmick) {
     FestMissionConfig *mission = GetFestMissionCfg(gimmick->festival);
-    RivalEntry *entries = LinkFestival_GetEntries(gimmick->festival);
+    RivalEntry *entries = LinkFestival_GetMissionWork(gimmick->festival)->hollows;
     MATHRandContext32 rand;
     u8 hollows[20];
     int i;

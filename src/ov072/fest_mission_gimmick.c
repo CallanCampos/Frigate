@@ -123,7 +123,7 @@ void FesMissionGimmick_MakePokemonQuiz(FesGimmick *gimmick, u16 *count, u16 *ans
     u16 picked[10];
     u8 order[10];
     FesMissionQuiz *quiz = &gimmick->quiz;
-    FesMissionWork *work = gimmick->work;
+    FesMissionWork *work = &gimmick->work->people;
     u32 max;
     const u16 *species;
     u8 total;

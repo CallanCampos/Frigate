@@ -2,6 +2,8 @@
 #define POKEBW2_FIELD_FESTIVAL_H
 
 #include "types.h"
+#include "field/fest_mission_gimmick.h"
+#include "field/fest_mission_sparkle.h"
 #include "field/rival_select.h"
 #include "gfl/heap.h"
 #include "nitro/fx.h"
@@ -47,6 +49,14 @@ typedef struct {
     u16 total;
 } LinkFestivalRanking;
 
+// The current mission's work, which the festival keeps and each kind of mission uses as its own: the hollows'
+// rivals, the people's places and actors, or the sparkles' places
+union FestMissionWork {
+    RivalEntry hollows[224];
+    FesMissionWork people;
+    FestSparkleWork sparkle;
+};
+
 // The Funfest's work, which the game system holds (GSYS_GetLinkFestival)
 struct LinkFestival {
     GameSystem *gsys;
@@ -86,8 +96,7 @@ struct LinkFestival {
     FestMissionLog log;
     FestMissionPassPowers passPowers;
     FestMissionOffers offers;
-    // What LinkFestival_GetEntries (field/rival_select.h) gives
-    RivalEntry entries[224];
+    FestMissionWork missionWork;
 };
 
 // A mission taken from a beacon (FestMissionEntry_Clear, FestMissionConfig_FromBeacon, LinkFestival_UpdateMember)
@@ -176,5 +185,7 @@ void FesGimmick_BindActorSystem(FesGimmick *gimmick, MMSys *actorSystem);
 void FesGimmick_BindPlayer(FesGimmick *gimmick, FieldEffects *effects, FieldPlayer *player);
 void func_ov036_021b65d4(FesGimmick *gimmick);
 void func_ov036_021b6660(FesGimmick *gimmick);
+
+FestMissionWork *LinkFestival_GetMissionWork(LinkFestival *festival);
 
 #endif // POKEBW2_FIELD_FESTIVAL_H

@@ -244,8 +244,8 @@ BOOL LinkFestival_IsNewZoneFromOutside(LinkFestival *festival, u16 zoneId) {
     return FALSE;
 }
 
-RivalEntry *LinkFestival_GetEntries(LinkFestival *festival) {
-    return festival->entries;
+FestMissionWork *LinkFestival_GetMissionWork(LinkFestival *festival) {
+    return &festival->missionWork;
 }
 
 int LinkFestival_GetTotalScore(LinkFestival *festival) {
@@ -462,7 +462,7 @@ static void ClearLinkFestivalData(LinkFestival *festival) {
     festival->secondsGained = 0;
     festival->lastTotal = 0;
     festival->zoneId = 0xffff;
-    MI_CpuFill8(festival->entries, 0, sizeof(festival->entries));
+    MI_CpuFill8(festival->missionWork.hollows, 0, sizeof(festival->missionWork.hollows));
     festival->bestChanged = FALSE;
     FestMissionLog_Clear(&festival->log);
     FestMissionLog_Clear(&festival->viewLog);

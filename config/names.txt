@@ -1050,7 +1050,7 @@
 . 0x02014838 LinkFestival_GetSecondsGained
 . 0x0201483c LinkFestival_ClearSecondsGained
 . 0x02014844 LinkFestival_IsNewZoneFromOutside
-. 0x02014864 LinkFestival_GetEntries
+. 0x02014864 LinkFestival_GetMissionWork
 . 0x02014870 LinkFestival_GetTotalScore
 . 0x020148a8 LinkFestival_IsTargetReached
 . 0x020148cc LinkFestival_IsMissionOver
