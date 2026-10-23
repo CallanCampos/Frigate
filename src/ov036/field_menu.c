@@ -4,6 +4,7 @@
 // Additional helper and table names are our descriptive guesses.
 #include "types.h"
 #include "constants/arc.h"
+#include "constants/directions.h"
 #include "constants/flags.h"
 #include "constants/sound.h"
 #include "constants/text_banks.h"
@@ -41,10 +42,30 @@
 #include "system/wipe.h"
 #include "text/system/load_field_menu_texts.h"
 
-// The item that leaves a slot empty
-#define FIELD_MENU_ITEM_NONE 7
-// The slot of the button at the bottom
+// The slots of the items, x + y * 2 for the cursor's column and row, and the return button at the bottom
 #define FIELD_MENU_SLOT_BOTTOM 6
+#define FIELD_MENU_SLOT_COUNT 7
+
+// The moves of FIELD_MENU_CURSOR_MOVES from the return button up to the second or the third row, keeping the column
+#define FIELD_MENU_MOVE_TO_ROW_1 0xfe
+#define FIELD_MENU_MOVE_TO_ROW_2 0xff
+
+// The menu's states: scroll in, wait for the names to print, wait for the wipe, take input, wait for the return
+// button's animation, act on the choice, wait for the cursor's animation, report the menu closed or the item chosen,
+// scroll out, and done
+enum {
+    FIELD_MENU_STATE_SCROLL_IN,
+    FIELD_MENU_STATE_PRINT,
+    FIELD_MENU_STATE_WAIT_WIPE,
+    FIELD_MENU_STATE_INPUT,
+    FIELD_MENU_STATE_WAIT_RETURN_BUTTON,
+    FIELD_MENU_STATE_DECIDE,
+    FIELD_MENU_STATE_WAIT_CURSOR,
+    FIELD_MENU_STATE_CLOSED,
+    FIELD_MENU_STATE_SELECTED,
+    FIELD_MENU_STATE_SCROLL_OUT,
+    FIELD_MENU_STATE_DONE,
+};
 
 // An item of the menu
 typedef struct {
@@ -65,7 +86,7 @@ struct FieldMenu {
     Field *field;
     FieldSubscreen *subscreen;
     u32 state;
-    void *msgBGSys;
+    FieldMsgBG *msgBGSys;
     EventWork *eventWork;
     PlayerInfo *playerInfo;
     u16 zoneId;
@@ -79,7 +100,7 @@ struct FieldMenu {
     // Whether the keys move the cursor, rather than the touch screen
     BOOL keyMode;
     u32 selectedItemId;
-    FieldMenuItem items[7];
+    FieldMenuItem items[FIELD_MENU_SLOT_COUNT];
     FieldMenuItem *curItem;
     s16 scrollY;
     BOOL scrollDirty;
@@ -133,7 +154,7 @@ static inline GXRgb FieldMenu_InterpolateCursorColor(const FieldMenuCursorColor 
 static void FieldMenu_RestoreSubscreenOnCancel(FieldMenu *menu);
 static void FieldMenu_EnableBGs(void);
 static void FieldMenu_ScrollActors(FieldMenu *menu);
-static void FieldMenu_LoadResources(FieldMenu *menu, ArcTool *arc, u8 menuType, void *msgBGSys);
+static void FieldMenu_LoadResources(FieldMenu *menu, ArcTool *arc, u8 menuType, FieldMsgBG *msgBGSys);
 static int FieldMenu_CountItems(u8 menuType);
 static void LoadFieldMenuTexts(FieldMenu *menu, ArcTool *arc, u8 menuType);
 static void FieldMenu_PulseCursorTCB(TCB *tcb, void *data);
@@ -151,24 +172,24 @@ static void FieldMenu_FlushItem(FieldMenu *menu, FieldMenuItem *item);
 static void FieldMenu_LoadBottomBar(HeapID heapId, u32 bg);
 
 // Where each slot's name window is, in tiles
-static const u8 FIELD_MENU_NAME_WINDOW_POSITIONS[7][2] = {
+static const u8 FIELD_MENU_NAME_WINDOW_POSITIONS[FIELD_MENU_SLOT_COUNT][2] = {
     { 6, 4 }, { 22, 4 }, { 6, 10 }, { 22, 10 }, { 6, 16 }, { 22, 16 }, { 13, 21 },
 };
 
 // The cursor's column and row of each slot
-static const u8 FIELD_MENU_SLOT_COORDINATES[7][2] = {
+static const u8 FIELD_MENU_SLOT_COORDINATES[FIELD_MENU_SLOT_COUNT][2] = {
     { 0, 0 }, { 1, 0 }, { 0, 1 }, { 1, 1 }, { 0, 2 }, { 1, 2 }, { 0, 3 },
 };
 
 // The message of each item's name
-static const u16 FIELD_MENU_NAME_MESSAGES[9] = { LoadFieldMenuTexts_Text_Empty_3, LoadFieldMenuTexts_Text_Pokemon,
-                                                 LoadFieldMenuTexts_Text_Pokedex, LoadFieldMenuTexts_Text_Bag,
-                                                 LoadFieldMenuTexts_Text_Empty_2, LoadFieldMenuTexts_Text_Save,
-                                                 LoadFieldMenuTexts_Text_Options, LoadFieldMenuTexts_Text_Empty_5,
-                                                 LoadFieldMenuTexts_Text_Retire };
+static const u16 FIELD_MENU_NAME_MESSAGES[FIELD_MENU_ITEM_MAX] = {
+    LoadFieldMenuTexts_Text_Empty_3, LoadFieldMenuTexts_Text_Pokemon, LoadFieldMenuTexts_Text_Pokedex,
+    LoadFieldMenuTexts_Text_Bag,     LoadFieldMenuTexts_Text_Empty_2, LoadFieldMenuTexts_Text_Save,
+    LoadFieldMenuTexts_Text_Options, LoadFieldMenuTexts_Text_Empty_5, LoadFieldMenuTexts_Text_Retire
+};
 
 // The screen of each kind of menu
-static const u32 FIELD_MENU_SCREEN_FILES[7] = { 0x12, 0x14, 0x14, 0x13, 0x14, 0x14, 0x12 };
+static const u32 FIELD_MENU_SCREEN_FILES[FIELD_MENU_TYPE_MAX] = { 0x12, 0x14, 0x14, 0x13, 0x14, 0x14, 0x12 };
 
 // The two colors of the cursor, each fading between its first and second endpoint.
 static const FieldMenuCursorColor sCursorColorEndpoints[2][2] = {
@@ -176,18 +197,28 @@ static const FieldMenuCursorColor sCursorColorEndpoints[2][2] = {
     { { 0, 25, 18 }, { 31, 31, 31 } },
 };
 
-// Where the cursor moves from each slot, up, down, left and right, for menus of four, five and six items. 0xfe
-// and 0xff are the bottom button's rows, 6 none
+// Where the cursor moves from each slot, by DIR_ direction, for menus of four, five and six items: the slot it moves
+// to, the same one for none, or a FIELD_MENU_MOVE_ to a row. 6 is the return button
 // clang-format off
 static const u8 FIELD_MENU_CURSOR_MOVES[3][8][4] = {
-    {{0, 2, 0, 1}, {1, 3, 0, 1}, {0, 2, 2, 3}, {1, 3, 2, 3}, {6, 6, 6, 6}, {6, 6, 6, 6}, {0xfe, 6, 6, 6}, {0xfe, 6, 6, 6}},
-    {{0, 2, 0, 1}, {1, 3, 0, 1}, {0, 4, 2, 3}, {1, 3, 2, 3}, {2, 4, 4, 4}, {6, 6, 6, 6}, {4, 6, 6, 6}, {4, 6, 6, 6}},
-    {{0, 2, 0, 1}, {1, 3, 0, 1}, {0, 4, 2, 3}, {1, 5, 2, 3}, {2, 4, 4, 5}, {3, 5, 4, 5}, {0xff, 6, 6, 6}, {0xff, 6, 6, 6}},
+    {
+        {0, 2, 0, 1}, {1, 3, 0, 1}, {0, 2, 2, 3}, {1, 3, 2, 3}, {6, 6, 6, 6}, {6, 6, 6, 6},
+        {FIELD_MENU_MOVE_TO_ROW_1, 6, 6, 6}, {FIELD_MENU_MOVE_TO_ROW_1, 6, 6, 6},
+    },
+    {
+        {0, 2, 0, 1}, {1, 3, 0, 1}, {0, 4, 2, 3}, {1, 3, 2, 3}, {2, 4, 4, 4}, {6, 6, 6, 6},
+        {4, 6, 6, 6}, {4, 6, 6, 6},
+    },
+    {
+        {0, 2, 0, 1}, {1, 3, 0, 1}, {0, 4, 2, 3}, {1, 5, 2, 3}, {2, 4, 4, 5}, {3, 5, 4, 5},
+        {FIELD_MENU_MOVE_TO_ROW_2, 6, 6, 6}, {FIELD_MENU_MOVE_TO_ROW_2, 6, 6, 6},
+    },
 };
 
 // clang-format on
 
-// The characters, cells and animations of each item's icon
+// The characters, cells and animations of each item's icon, then the female player's Bag's and Pokédex's and the
+// retire item's, which LoadFieldMenuTexts picks
 static const u32 FIELD_MENU_ICON_FILES[11][3] = {
     { 0x0f, 0x1f, 0x2a }, { 0x09, 0x19, 0x24 }, { 0x0d, 0x1d, 0x28 }, { 0x07, 0x17, 0x22 },
     { 0x0c, 0x1c, 0x27 }, { 0x0a, 0x1a, 0x25 }, { 0x06, 0x16, 0x21 }, { 0x09, 0x19, 0x24 },
@@ -195,10 +226,38 @@ static const u32 FIELD_MENU_ICON_FILES[11][3] = {
 };
 
 // The items of each kind of menu, the last one at the bottom button
-static const u32 FIELD_MENU_ITEMS[7][7] = {
-    { 1, 2, 3, 4, 5, 6, 0 }, { 1, 2, 3, 4, 6, 7, 0 }, { 1, 3, 4, 5, 6, 7, 0 }, { 3, 4, 5, 6, 7, 7, 0 },
-    { 1, 2, 3, 4, 6, 7, 0 }, { 1, 2, 3, 4, 6, 7, 0 }, { 1, 2, 4, 5, 6, 8, 0 },
+// clang-format off
+static const u32 FIELD_MENU_ITEMS[FIELD_MENU_TYPE_MAX][FIELD_MENU_SLOT_COUNT] = {
+    [FIELD_MENU_TYPE_NORMAL] = {
+        FIELD_MENU_ITEM_POKEMON, FIELD_MENU_ITEM_POKEDEX, FIELD_MENU_ITEM_BAG, FIELD_MENU_ITEM_TRAINER_CARD,
+        FIELD_MENU_ITEM_SAVE, FIELD_MENU_ITEM_OPTIONS, FIELD_MENU_ITEM_RETURN,
+    },
+    [FIELD_MENU_TYPE_UNION_ROOM] = {
+        FIELD_MENU_ITEM_POKEMON, FIELD_MENU_ITEM_POKEDEX, FIELD_MENU_ITEM_BAG, FIELD_MENU_ITEM_TRAINER_CARD,
+        FIELD_MENU_ITEM_OPTIONS, FIELD_MENU_ITEM_NONE, FIELD_MENU_ITEM_RETURN,
+    },
+    [FIELD_MENU_TYPE_NO_POKEDEX] = {
+        FIELD_MENU_ITEM_POKEMON, FIELD_MENU_ITEM_BAG, FIELD_MENU_ITEM_TRAINER_CARD, FIELD_MENU_ITEM_SAVE,
+        FIELD_MENU_ITEM_OPTIONS, FIELD_MENU_ITEM_NONE, FIELD_MENU_ITEM_RETURN,
+    },
+    [FIELD_MENU_TYPE_NO_POKEMON] = {
+        FIELD_MENU_ITEM_BAG, FIELD_MENU_ITEM_TRAINER_CARD, FIELD_MENU_ITEM_SAVE, FIELD_MENU_ITEM_OPTIONS,
+        FIELD_MENU_ITEM_NONE, FIELD_MENU_ITEM_NONE, FIELD_MENU_ITEM_RETURN,
+    },
+    [FIELD_MENU_TYPE_ROYAL_UNOVA] = {
+        FIELD_MENU_ITEM_POKEMON, FIELD_MENU_ITEM_POKEDEX, FIELD_MENU_ITEM_BAG, FIELD_MENU_ITEM_TRAINER_CARD,
+        FIELD_MENU_ITEM_OPTIONS, FIELD_MENU_ITEM_NONE, FIELD_MENU_ITEM_RETURN,
+    },
+    [FIELD_MENU_TYPE_FORCE_SEASON_SYNC] = {
+        FIELD_MENU_ITEM_POKEMON, FIELD_MENU_ITEM_POKEDEX, FIELD_MENU_ITEM_BAG, FIELD_MENU_ITEM_TRAINER_CARD,
+        FIELD_MENU_ITEM_OPTIONS, FIELD_MENU_ITEM_NONE, FIELD_MENU_ITEM_RETURN,
+    },
+    [FIELD_MENU_TYPE_INF_DUNGEON] = {
+        FIELD_MENU_ITEM_POKEMON, FIELD_MENU_ITEM_POKEDEX, FIELD_MENU_ITEM_TRAINER_CARD, FIELD_MENU_ITEM_SAVE,
+        FIELD_MENU_ITEM_OPTIONS, FIELD_MENU_ITEM_RETIRE, FIELD_MENU_ITEM_RETURN,
+    },
 };
+// clang-format on
 
 FieldMenu *FieldMenu_Create(HeapID heapId, HeapID tmpHeapId, FieldSubscreen *subscreen, Field *field, BOOL open) {
     FieldMenu *menu = GFL_HeapAllocate(heapId, sizeof(FieldMenu), FALSE, "field_menu.c", 323);
@@ -211,7 +270,7 @@ FieldMenu *FieldMenu_Create(HeapID heapId, HeapID tmpHeapId, FieldSubscreen *sub
     menu->tmpHeapId = tmpHeapId;
     menu->field = field;
     menu->subscreen = subscreen;
-    menu->state = 1;
+    menu->state = FIELD_MENU_STATE_PRINT;
     menu->zoneId = PlayerState_GetZoneID(GSYS_GetPlayerState(gsys));
     menu->eventWork = GameData_GetEventWork(gameData);
     menu->playerInfo = GetGameDataPlayerInfo(gameData);
@@ -259,7 +318,7 @@ static void FieldMenu_RestoreSubscreenOnCancel(FieldMenu *menu) {
 void FieldMenu_Free(FieldMenu *menu) {
     u8 i;
 
-    for (i = 0; i < 7; i++) {
+    for (i = 0; i < FIELD_MENU_SLOT_COUNT; i++) {
         FieldMenu_FreeItem(menu, &menu->items[i]);
     }
     FieldMenu_RestoreSubscreenOnCancel(menu);
@@ -293,27 +352,27 @@ static void FieldMenu_EnableBGs(void) {
 
 void FieldMenu_Update(FieldMenu *menu) {
     switch (menu->state) {
-    case 1:
+    case FIELD_MENU_STATE_PRINT:
         if (PrintQueue_IsEmpty(menu->printQueue) == TRUE) {
             u8 i;
 
             func_ov036_02198884(menu->subscreen, menu->tmpHeapId);
-            for (i = 0; i < 7; i++) {
+            for (i = 0; i < FIELD_MENU_SLOT_COUNT; i++) {
                 FieldMenu_FlushItem(menu, &menu->items[i]);
             }
             if (menu->scrollY != 0) {
                 GFL_SndSEPlay(SEQ_SE_OPEN1);
-                menu->state = 0;
+                menu->state = FIELD_MENU_STATE_SCROLL_IN;
             } else {
-                menu->state = 2;
+                menu->state = FIELD_MENU_STATE_WAIT_WIPE;
                 FieldMenu_EnableBGs();
             }
         }
         break;
-    case 0:
+    case FIELD_MENU_STATE_SCROLL_IN:
         if (menu->scrollY < 0x40) {
             menu->scrollY = 0;
-            menu->state = 3;
+            menu->state = FIELD_MENU_STATE_INPUT;
             FieldMenu_EnableBGs();
         } else {
             menu->scrollY -= 0x40;
@@ -321,29 +380,29 @@ void FieldMenu_Update(FieldMenu *menu) {
         }
         menu->scrollDirty = TRUE;
         break;
-    case 2:
+    case FIELD_MENU_STATE_WAIT_WIPE:
         if (GFL_WipeIsFinished() == TRUE) {
             func_ov036_02198884(menu->subscreen, menu->tmpHeapId);
-            menu->state = 3;
+            menu->state = FIELD_MENU_STATE_INPUT;
         }
         break;
-    case 3:
+    case FIELD_MENU_STATE_INPUT:
         FieldMenu_UpdateKeys(menu);
         FieldMenu_UpdateTouch(menu);
         FieldMenu_UpdateCursor(menu);
         break;
-    case 4:
+    case FIELD_MENU_STATE_WAIT_RETURN_BUTTON:
         if (!ClActor_IsAnimActive(menu->returnButton)) {
-            menu->state = 5;
+            menu->state = FIELD_MENU_STATE_DECIDE;
             GFL_BGSysSetBGEnabled(5, TRUE);
             GFL_BGSysSetBGEnabled(6, TRUE);
             GFL_BGSysSetBGEnabled(7, TRUE);
             GFL_BGSysSetBGEnabled(4, TRUE);
         }
         break;
-    case 5:
+    case FIELD_MENU_STATE_DECIDE:
         if (menu->cancel == TRUE || menu->cursorY == 3) {
-            menu->state = 9;
+            menu->state = FIELD_MENU_STATE_SCROLL_OUT;
             GFL_SndSEPlay(SEQ_SE_CLOSE1);
             GFL_BGSysSetBGEnabled(4, FALSE);
             GFL_BGSysSetBGEnabled(5, TRUE);
@@ -355,30 +414,30 @@ void FieldMenu_Update(FieldMenu *menu) {
             FieldMenu_SetCursorPosition(menu, menu->curItem->cursorX, menu->curItem->cursorY);
             ClActor_SetSequence(menu->cursor, 1);
             ClActor_SetVisible(menu->cursor, TRUE);
-            menu->state = 6;
+            menu->state = FIELD_MENU_STATE_WAIT_CURSOR;
             GFL_SndSEPlay(SEQ_SE_DECIDE1);
         } else {
-            menu->state = 8;
+            menu->state = FIELD_MENU_STATE_SELECTED;
         }
         break;
-    case 6:
+    case FIELD_MENU_STATE_WAIT_CURSOR:
         menu->decideFrames++;
         if (!ClActor_IsAnimActive(menu->cursor)) {
-            menu->state = 8;
+            menu->state = FIELD_MENU_STATE_SELECTED;
         }
         break;
-    case 7:
-        FieldSubscreen_SaveReturnSubscreen(menu->subscreen, 4);
-        menu->state = 10;
+    case FIELD_MENU_STATE_CLOSED:
+        FieldSubscreen_SaveReturnSubscreen(menu->subscreen, FIELD_MENU_RESULT_CANCELLED);
+        menu->state = FIELD_MENU_STATE_DONE;
         break;
-    case 8:
-        FieldSubscreen_SaveReturnSubscreen(menu->subscreen, 3);
-        menu->state = 10;
+    case FIELD_MENU_STATE_SELECTED:
+        FieldSubscreen_SaveReturnSubscreen(menu->subscreen, FIELD_MENU_RESULT_SELECTED);
+        menu->state = FIELD_MENU_STATE_DONE;
         break;
-    case 9:
+    case FIELD_MENU_STATE_SCROLL_OUT:
         if (menu->scrollY + 0x40 > 0xc0) {
             menu->scrollY = 0xc0;
-            menu->state = 7;
+            menu->state = FIELD_MENU_STATE_CLOSED;
         } else {
             menu->scrollY += 0x40;
             FieldMenu_ScrollActors(menu);
@@ -399,7 +458,7 @@ static void FieldMenu_ScrollActors(FieldMenu *menu) {
     scroll.x = 0;
     scroll.y = -menu->scrollY;
     ClActRenderer_SetSurfacePos(menu->renderer, 0, &scroll);
-    for (i = 0; i < 7; i++) {
+    for (i = 0; i < FIELD_MENU_SLOT_COUNT; i++) {
         if (menu->items[i].icon != NULL && menu->items[i].itemId != FIELD_MENU_ITEM_NONE) {
             ClActor_GetSurfacePos(menu->items[i].icon, &iconPos, 0);
             if (iconPos.y < 0xd0) {
@@ -425,7 +484,7 @@ void FieldMenu_UpdateScroll(FieldMenu *menu) {
     }
 }
 
-static void FieldMenu_LoadResources(FieldMenu *menu, ArcTool *arc, u8 menuType, void *msgBGSys) {
+static void FieldMenu_LoadResources(FieldMenu *menu, ArcTool *arc, u8 menuType, FieldMsgBG *msgBGSys) {
     static const BGSetup sFieldMenuBG6Setup = { 0, 0, 0x1000, 0, 2, 0, 0xc, 0, 0x5800, 0, 1, 0, 0 };
     static const BGSetup sFieldMenuBG7Setup = { 0, 0, 0x800, 0, 1, 0, 0xa, 0, 0x5800, 0, 3, 0, 0 };
     // An unused background setup retained in the menu's resources.
@@ -502,20 +561,20 @@ void FieldMenu_LoadBar(HeapID heapId, BOOL hideBg4) {
 }
 
 u8 FieldMenu_GetMenuType(GameData *gameData, EventWork *eventWork, u32 zoneId) {
-    u8 type = 0;
+    u8 type = FIELD_MENU_TYPE_NORMAL;
 
     if (GetZoneIsUnionRoom(zoneId) || IsZone150Or151(zoneId)) {
-        type = 1;
+        type = FIELD_MENU_TYPE_UNION_ROOM;
     } else if (IsZoneRoyalUnova(zoneId)) {
-        type = 4;
+        type = FIELD_MENU_TYPE_ROYAL_UNOVA;
     } else if (GameData_IsForceSeasonSync(gameData)) {
-        type = 5;
+        type = FIELD_MENU_TYPE_FORCE_SEASON_SYNC;
     } else if (!EventWork_FlagGet(eventWork, EVENT_FLAG_0x0961)) {
-        type = 3;
+        type = FIELD_MENU_TYPE_NO_POKEMON;
     } else if (!EventWork_FlagGet(eventWork, EVENT_FLAG_0x0962)) {
-        type = 2;
+        type = FIELD_MENU_TYPE_NO_POKEDEX;
     } else if (IsZoneBlackTowerOrWhiteTreehollow(zoneId)) {
-        type = 6;
+        type = FIELD_MENU_TYPE_INF_DUNGEON;
     }
     return type;
 }
@@ -525,7 +584,7 @@ static int FieldMenu_CountItems(u8 menuType) {
     int i = 0;
     int count = 0;
 
-    for (; FIELD_MENU_ITEMS[menuType][i] != 0; i++) {
+    for (; FIELD_MENU_ITEMS[menuType][i] != FIELD_MENU_ITEM_RETURN; i++) {
         if (FIELD_MENU_ITEMS[menuType][i] != FIELD_MENU_ITEM_NONE) {
             count++;
         }
@@ -540,14 +599,14 @@ static void LoadFieldMenuTexts(FieldMenu *menu, ArcTool *arc, u8 menuType) {
     const u32 *items;
     u8 i;
 
-    for (i = 0; i < 7; i++) {
+    for (i = 0; i < FIELD_MENU_SLOT_COUNT; i++) {
         menu->items[i].active = FALSE;
     }
     items = FIELD_MENU_ITEMS[menuType];
-    for (i = 0; i < 7; i++) {
+    for (i = 0; i < FIELD_MENU_SLOT_COUNT; i++) {
         u32 itemId = items[i];
 
-        if (itemId == 4) {
+        if (itemId == FIELD_MENU_ITEM_TRAINER_CARD) {
             setup.name = GFL_StrBufCreate(16, menu->tmpHeapId);
             if (!PlayerInfo_IsNameEmpty(menu->playerInfo)) {
                 GFL_StrBufLoadString(setup.name, GetPlayerName(menu->playerInfo));
@@ -570,17 +629,17 @@ static void LoadFieldMenuTexts(FieldMenu *menu, ArcTool *arc, u8 menuType) {
             setup.charFile = FIELD_MENU_ICON_FILES[itemId][0];
             setup.cellFile = FIELD_MENU_ICON_FILES[itemId][1];
             setup.animFile = FIELD_MENU_ICON_FILES[itemId][2];
-            if (itemId == 3 && getTrainerGender(menu->playerInfo) == 1) {
+            if (itemId == FIELD_MENU_ITEM_BAG && getTrainerGender(menu->playerInfo) == GENDER_FEMALE) {
                 setup.charFile = 8;
                 setup.cellFile = 0x18;
                 setup.animFile = 0x23;
             }
-            if (itemId == 2 && getTrainerGender(menu->playerInfo) == 1) {
+            if (itemId == FIELD_MENU_ITEM_POKEDEX && getTrainerGender(menu->playerInfo) == GENDER_FEMALE) {
                 setup.charFile = 0xe;
                 setup.cellFile = 0x1e;
                 setup.animFile = 0x29;
             }
-            if (itemId == 8) {
+            if (itemId == FIELD_MENU_ITEM_RETIRE) {
                 setup.charFile = 0xb;
                 setup.cellFile = 0x1b;
                 setup.animFile = 0x26;
@@ -630,7 +689,7 @@ static void FieldMenu_SetOpeningScroll(FieldMenu *menu) {
 
 u32 FieldMenu_GetSelectedItem(FieldMenu *menu) {
     if (menu->curItem == NULL) {
-        return 0;
+        return FIELD_MENU_ITEM_RETURN;
     }
     return menu->curItem->itemId;
 }
@@ -638,7 +697,7 @@ u32 FieldMenu_GetSelectedItem(FieldMenu *menu) {
 void FieldMenu_SetCursorItem(FieldMenu *menu, u32 itemId) {
     u8 i;
 
-    for (i = 0; i < 7; i++) {
+    for (i = 0; i < FIELD_MENU_SLOT_COUNT; i++) {
         if (menu->items[i].active == TRUE && itemId == menu->items[i].itemId) {
             FieldMenuItem *item;
 
@@ -661,11 +720,11 @@ static BOOL FieldMenu_MoveCursor(FieldMenu *menu, u32 dir) {
     u8 next = FIELD_MENU_CURSOR_MOVES[FieldMenu_CountItems(menu->menuType) - 4][slot][dir];
 
     if (slot != next) {
-        if (next == 0xff) {
+        if (next == FIELD_MENU_MOVE_TO_ROW_2) {
             menu->cursorY = 2;
             return TRUE;
         }
-        if (next == 0xfe) {
+        if (next == FIELD_MENU_MOVE_TO_ROW_1) {
             menu->cursorY = 1;
             return TRUE;
         }
@@ -695,28 +754,28 @@ static void FieldMenu_UpdateKeys(FieldMenu *menu) {
         return;
     }
     if (repeat & PAD_KEY_UP) {
-        if (FieldMenu_MoveCursor(menu, 0)) {
+        if (FieldMenu_MoveCursor(menu, DIR_UP)) {
             menu->cursorDirty = TRUE;
             GFL_SndSEPlay(SEQ_SE_SELECT1);
         }
         return;
     }
     if (repeat & PAD_KEY_DOWN) {
-        if (FieldMenu_MoveCursor(menu, 1)) {
+        if (FieldMenu_MoveCursor(menu, DIR_DOWN)) {
             menu->cursorDirty = TRUE;
             GFL_SndSEPlay(SEQ_SE_SELECT1);
         }
         return;
     }
     if (repeat & PAD_KEY_LEFT) {
-        if (FieldMenu_MoveCursor(menu, 2)) {
+        if (FieldMenu_MoveCursor(menu, DIR_LEFT)) {
             menu->cursorDirty = TRUE;
             GFL_SndSEPlay(SEQ_SE_SELECT1);
         }
         return;
     }
     if (repeat & PAD_KEY_RIGHT) {
-        if (FieldMenu_MoveCursor(menu, 3)) {
+        if (FieldMenu_MoveCursor(menu, DIR_RIGHT)) {
             menu->cursorDirty = TRUE;
             GFL_SndSEPlay(SEQ_SE_SELECT1);
         }
@@ -769,11 +828,11 @@ static void FieldMenu_SetCursorPosition(FieldMenu *menu, u8 x, u8 y) {
 static void FieldMenu_SelectOrCancel(FieldMenu *menu, BOOL cancel) {
     if (cancel == TRUE) {
         menu->cancel = TRUE;
-        menu->state = 4;
+        menu->state = FIELD_MENU_STATE_WAIT_RETURN_BUTTON;
         ClActor_SetSequence(menu->returnButton, 8);
     } else {
         menu->cancel = FALSE;
-        menu->state = 5;
+        menu->state = FIELD_MENU_STATE_DECIDE;
         menu->selectedItemId = menu->items[FieldMenu_GetSlot(menu->cursorX, menu->cursorY)].itemId;
     }
 }

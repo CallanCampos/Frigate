@@ -16,6 +16,7 @@
 #include "field/field_script.h"
 #include "field/player_state.h"
 #include "field/scrcmd_msg.h"
+#include "field/talkmsgwin.h"
 #include "gfl/g3d.h"
 #include "gfl/key.h"
 #include "gfl/msg.h"
@@ -38,6 +39,10 @@
 
 // The message file of the running script, for setupFormattedTextBuffer and LoadFieldScriptMessage
 #define SCRIPT_MSG_FILE 0x400
+
+// The rows of the system and info windows at the top and the bottom of the screen
+#define MSG_WIN_ROW_TOP 1
+#define MSG_WIN_ROW_BOTTOM 0x13
 
 static StrBuf *setupFormattedTextBuffer(FieldScriptEnv *env, StrBuf *dest, u32 fileNo, u32 msgId);
 static StrBuf *LoadFieldScriptMessage(FieldScriptEnv *env, u32 fileNo, u32 msgId);
@@ -64,13 +69,13 @@ static const VecFx32 ACTOR_MSGWIN_ORIGIN_OFFSET_TABLE[2][4] = {
 
 // clang-format on
 
-// Opens the system message window at the top (1) or the bottom (2) of the screen, or for 0 away from the balloon
-// over an actor
+// Opens the system message window at the top or the bottom of the screen, or for MSG_WIN_POS_AUTO on the side of the
+// balloon over an actor
 static void SystemMsgWin_Open(FieldScriptEnv *env, u8 pos) {
     ScriptFieldWork *fieldWork;
     MsgData *msgData;
-    void *window;
-    u32 row = 1;
+    FieldMsgWin *window;
+    u32 row = MSG_WIN_ROW_TOP;
 
     if (FieldScriptSubEvent_IsRegistered(1)) {
         func_ov036_02188660(getMapDisplayInfoPtr(env));
@@ -78,35 +83,36 @@ static void SystemMsgWin_Open(FieldScriptEnv *env, u8 pos) {
     }
     fieldWork = ScriptWork_GetFieldWork(FieldScriptEnv_GetScriptWork(env));
     msgData = GetFieldScriptMsgData(env);
-    if (pos == 1) {
+    if (pos == MSG_WIN_POS_TOP) {
         // The top, as row says
-    } else if (pos == 2) {
-        row = 0x13;
-    } else if (pos == 0) {
+    } else if (pos == MSG_WIN_POS_BOTTOM) {
+        row = MSG_WIN_ROW_BOTTOM;
+    } else if (pos == MSG_WIN_POS_AUTO) {
         switch (ActorMsgWin_GetPosActual(env)) {
-        case 1:
-        case 3:
-        case 5:
-            pos = 1;
+        case MSG_WIN_POS_TOP:
+        case MSG_WIN_POS_TOP_LEFT:
+        case MSG_WIN_POS_TOP_RIGHT:
+            pos = MSG_WIN_POS_TOP;
             break;
-        case 2:
-        case 4:
-        case 6:
-            row = 0x13;
-            pos = 2;
+        case MSG_WIN_POS_BOTTOM:
+        case MSG_WIN_POS_BOTTOM_LEFT:
+        case MSG_WIN_POS_BOTTOM_RIGHT:
+            row = MSG_WIN_ROW_BOTTOM;
+            pos = MSG_WIN_POS_BOTTOM;
             break;
+        // A position past the balloons', at the bottom as any other
         case 7:
-            row = 0x13;
-            pos = 2;
+            row = MSG_WIN_ROW_BOTTOM;
+            pos = MSG_WIN_POS_BOTTOM;
             break;
         default:
-            row = 0x13;
-            pos = 2;
+            row = MSG_WIN_ROW_BOTTOM;
+            pos = MSG_WIN_POS_BOTTOM;
             break;
         }
     } else {
-        row = 0x13;
-        pos = 2;
+        row = MSG_WIN_ROW_BOTTOM;
+        pos = MSG_WIN_POS_BOTTOM;
     }
     window = func_ov036_02188498(fieldWork->msgBGSys, msgData, row);
     ActorMsgWin_SetPosActual(env, pos);
@@ -151,7 +157,7 @@ BOOL s0034_SystemMsg(VM *vm, FieldScriptEnv *env) {
 BOOL s0035_SystemMsgAsync(VM *vm, FieldScriptEnv *env) {
     StrBuf *strbuf = ScriptWork_GetMainStrBuf(FieldScriptEnv_GetScriptWork(env));
     u16 msgId = ScriptReadAny(vm, env);
-    void *window;
+    FieldMsgWin *window;
 
     SystemMsgWin_Open(env, VM_Read16(vm));
     LoadFieldScriptMessage(env, SCRIPT_MSG_FILE, msgId);
@@ -199,8 +205,8 @@ BOOL s0040_MoneyWinDisp(VM *vm, FieldScriptEnv *env) {
     GameData *gameData = GSYS_GetGameData(gsys);
     GameData_GetPlayerState(gameData);
     Field *field = GSYS_GetField(gsys);
-    void *msgBGSys = Field_GetMsgBGSys(field);
-    void *moneyWin = Field_GetMoneyWin(field);
+    FieldMsgBG *msgBGSys = Field_GetMsgBGSys(field);
+    MoneyWin *moneyWin = Field_GetMoneyWin(field);
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     WordSet *wordSet = ScriptWork_GetWordSet(work);
     StrBuf *text = ScriptWork_GetAltStrBuf(work);
@@ -228,7 +234,7 @@ BOOL s0042_MoneyWinUpdate(VM *vm, FieldScriptEnv *env) {
     GameData *gameData = GSYS_GetGameData(gsys);
     GameData_GetPlayerState(gameData);
     Field *field = GSYS_GetField(gsys);
-    void *moneyWin = Field_GetMoneyWin(field);
+    MoneyWin *moneyWin = Field_GetMoneyWin(field);
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     WordSet *wordSet = ScriptWork_GetWordSet(work);
     StrBuf *text = ScriptWork_GetAltStrBuf(work);
@@ -248,7 +254,7 @@ BOOL s0042_MoneyWinUpdate(VM *vm, FieldScriptEnv *env) {
 
 BOOL s0041_MoneyWinClose(VM *vm, FieldScriptEnv *env) {
     Field *field = GSYS_GetField(FieldScriptEnv_GetGameSystem(env));
-    void *moneyWin = Field_GetMoneyWin(field);
+    MoneyWin *moneyWin = Field_GetMoneyWin(field);
 
     if (moneyWin != NULL) {
         func_ov036_02187c1c(moneyWin);
@@ -329,23 +335,23 @@ static void ActorMsgWin_GetAttachmentOffset(const VecFx32 *pos, VecFx32 *offset,
     u32 half = 0;
 
     switch (winPos) {
-    case 3:
+    case MSG_WIN_POS_TOP_LEFT:
         column = 1;
         break;
-    case 4:
+    case MSG_WIN_POS_BOTTOM_LEFT:
         column = 1;
         half = 1;
         break;
-    case 5:
+    case MSG_WIN_POS_TOP_RIGHT:
         column = 2;
         break;
-    case 6:
+    case MSG_WIN_POS_BOTTOM_RIGHT:
         column = 2;
         half = 1;
         break;
-    case 0:
-    case 1:
-    case 2:
+    case MSG_WIN_POS_AUTO:
+    case MSG_WIN_POS_TOP:
+    case MSG_WIN_POS_BOTTOM:
         ActorMsgWin_CalcAttachmentOffsetDynamic(pos, offset, g3dCamera, camera);
         ActorMsgWin_MulVecInvCamRot(offset, g3dCamera);
         return;
@@ -358,41 +364,42 @@ void func_ov036_021a8bec(const VecFx32 *pos, VecFx32 *offset, G3DCamera *g3dCame
     ActorMsgWin_GetAttachmentOffset(pos, offset, g3dCamera, camera, winPos);
 }
 
-void func_ov036_021a8c00(u32 winPos, u32 *a1, u32 *a2) {
-    *a1 = 0;
-    *a2 = 0;
+// The balloon (ACTOR_MSG_WIN_) and the side of its tail (TALKMSG_WIN_TAIL_) of a position
+void func_ov036_021a8c00(u32 winPos, u32 *type, u32 *tail) {
+    *type = ACTOR_MSG_WIN_TOP;
+    *tail = TALKMSG_WIN_TAIL_NONE;
     switch (winPos) {
-    case 3:
-        *a2 = 7;
+    case MSG_WIN_POS_TOP_LEFT:
+        *tail = TALKMSG_WIN_TAIL_BOTTOM_LEFT;
         break;
-    case 4:
-        *a1 = 1;
-        *a2 = 5;
+    case MSG_WIN_POS_BOTTOM_LEFT:
+        *type = ACTOR_MSG_WIN_BOTTOM;
+        *tail = TALKMSG_WIN_TAIL_TOP_LEFT;
         break;
-    case 5:
-        *a2 = 8;
+    case MSG_WIN_POS_TOP_RIGHT:
+        *tail = TALKMSG_WIN_TAIL_BOTTOM_RIGHT;
         break;
-    case 6:
-        *a1 = 1;
-        *a2 = 6;
+    case MSG_WIN_POS_BOTTOM_RIGHT:
+        *type = ACTOR_MSG_WIN_BOTTOM;
+        *tail = TALKMSG_WIN_TAIL_TOP_RIGHT;
         break;
-    case 2:
-        *a1 = 1;
+    case MSG_WIN_POS_BOTTOM:
+        *type = ACTOR_MSG_WIN_BOTTOM;
         break;
-    case 0:
-        *a1 = 1;
-        *a2 = 2;
+    case MSG_WIN_POS_AUTO:
+        *type = ACTOR_MSG_WIN_BOTTOM;
+        *tail = TALKMSG_WIN_TAIL_BOTTOM;
         break;
     }
 }
 
 u8 ActorMsgWin_CalcWinPosAuto(FieldActor *player, const VecFx32 *pos) {
     VecFx32 playerPos;
-    u8 winPos = 2;
+    u8 winPos = MSG_WIN_POS_BOTTOM;
 
     CopyActorWPos(player, &playerPos);
     if (pos->z < playerPos.z) {
-        winPos = 1;
+        winPos = MSG_WIN_POS_TOP;
     }
     return winPos;
 }
@@ -421,9 +428,9 @@ static void ActorMsgWin_CloseImmediate(FieldScriptEnv *env) {
     }
 }
 
-static void ActorMsgWin_CreateWindow(FieldScriptEnv *env, void *msgBGSys, u32 a2, const VecFx32 *pos, StrBuf *strbuf,
-                                     u32 a5, u32 a6) {
-    setMapDisplayInfoPtr(env, ActorMsgWin_CheckAndCreate(msgBGSys, a2, pos, strbuf, a5, a6));
+static void ActorMsgWin_CreateWindow(FieldScriptEnv *env, FieldMsgBG *msgBGSys, u32 type, const VecFx32 *pos,
+                                     StrBuf *strbuf, u32 frameType, u32 tail) {
+    setMapDisplayInfoPtr(env, ActorMsgWin_CheckAndCreate(msgBGSys, type, pos, strbuf, frameType, tail));
     FieldScriptSubEvent_Register(2);
 }
 
@@ -453,8 +460,8 @@ static void ActorMsgWin_CalcAttachmentPos(FieldScriptEnv *env, BOOL force) {
     }
 }
 
-// Shows strbuf in a balloon over the actor, at pos, or where CalcWinPosAuto puts it for 0
-static BOOL SetupActorMessageWindow(FieldScriptEnv *env, StrBuf *strbuf, u16 actorId, u16 pos, u32 a4) {
+// Shows strbuf in a balloon over the actor, at pos, or where CalcWinPosAuto puts it for MSG_WIN_POS_AUTO
+static BOOL SetupActorMessageWindow(FieldScriptEnv *env, StrBuf *strbuf, u16 actorId, u16 pos, u32 frameType) {
     u16 winPos = pos;
     ScriptFieldWork *fieldWork = ScriptWork_GetFieldWork(FieldScriptEnv_GetScriptWork(env));
     MMSys *mmSys = GetScrEnvMMdlSys(env);
@@ -462,8 +469,8 @@ static BOOL SetupActorMessageWindow(FieldScriptEnv *env, StrBuf *strbuf, u16 act
     FieldActor *actor = FindFieldActor(mmSys, actorId);
     ScriptActorWork *actorWork;
     VecFx32 actorPos;
-    u32 winX;
-    u32 winY;
+    u32 type;
+    u32 tail;
 
     if (actor == NULL) {
         return FALSE;
@@ -474,29 +481,29 @@ static BOOL SetupActorMessageWindow(FieldScriptEnv *env, StrBuf *strbuf, u16 act
         actorWork = GetFieldScriptActorWk(env);
         MI_CpuFill8(actorWork, 0, sizeof(ScriptActorWork));
         actorWork->actorId = actorId;
-        if (pos == 0) {
+        if (pos == MSG_WIN_POS_AUTO) {
             CopyActorWPos(actor, &actorPos);
             winPos = ActorMsgWin_CalcWinPosAuto(player, &actorPos);
         }
-        func_ov036_021a8c00(winPos, &winX, &winY);
-        actorWork->winX = winX;
+        func_ov036_021a8c00(winPos, &type, &tail);
+        actorWork->winX = type;
         ActorMsgWin_SetPosActual(env, winPos);
         ActorMsgWin_SetPos(env, pos);
         ActorMsgWin_CalcAttachmentPos(env, TRUE);
-        ActorMsgWin_CreateWindow(env, fieldWork->msgBGSys, winX, &actorWork->pos, strbuf, a4, winY);
+        ActorMsgWin_CreateWindow(env, fieldWork->msgBGSys, type, &actorWork->pos, strbuf, frameType, tail);
     }
     return TRUE;
 }
 
 static BOOL ScriptNative_ActorMsgWinWait(VM *vm, void *env) {
-    void *msgWin = getMapDisplayInfoPtr(env);
+    ActorMsgWin *msgWin = getMapDisplayInfoPtr(env);
 
     ActorMsgWin_CalcAttachmentPos(env, FALSE);
     return func_ov036_02188884(msgWin) == TRUE;
 }
 
-BOOL func_ov036_021a8eb4(VM *vm, FieldScriptEnv *env, StrBuf *message, u16 actorId, u16 pos, u32 a5) {
-    if (SetupActorMessageWindow(env, message, actorId, pos, a5) == TRUE) {
+BOOL func_ov036_021a8eb4(VM *vm, FieldScriptEnv *env, StrBuf *message, u16 actorId, u16 pos, u32 frameType) {
+    if (SetupActorMessageWindow(env, message, actorId, pos, frameType) == TRUE) {
         VM_SetNativeCallback(vm, ScriptNative_ActorMsgWinWait);
         return TRUE;
     }
@@ -504,8 +511,8 @@ BOOL func_ov036_021a8eb4(VM *vm, FieldScriptEnv *env, StrBuf *message, u16 actor
 }
 
 static BOOL CallFieldActorMessageDisp(VM *vm, FieldScriptEnv *env, u16 fileNo, u16 msgId, u16 actorId, u16 pos,
-                                      u32 a6) {
-    if (SetupActorMessageWindow(env, LoadFieldScriptMessage(env, fileNo, msgId), actorId, pos, a6) == TRUE) {
+                                      u32 frameType) {
+    if (SetupActorMessageWindow(env, LoadFieldScriptMessage(env, fileNo, msgId), actorId, pos, frameType) == TRUE) {
         VM_SetNativeCallback(vm, ScriptNative_ActorMsgWinWait);
         return TRUE;
     }
@@ -517,9 +524,9 @@ BOOL s003C_ActorMsg(VM *vm, FieldScriptEnv *env) {
     u16 msgId = ScriptReadAny(vm, env);
     u16 actorId = ScriptReadAny(vm, env);
     u16 pos = ScriptReadAny(vm, env);
-    u16 a6 = ScriptReadAny(vm, env);
+    u16 frameType = ScriptReadAny(vm, env);
 
-    return CallFieldActorMessageDisp(vm, env, fileNo, msgId, actorId, pos, a6);
+    return CallFieldActorMessageDisp(vm, env, fileNo, msgId, actorId, pos, frameType);
 }
 
 BOOL s003D_ParentActorMsg(VM *vm, FieldScriptEnv *env) {
@@ -527,12 +534,12 @@ BOOL s003D_ParentActorMsg(VM *vm, FieldScriptEnv *env) {
     u16 fileNo = ScriptReadAny(vm, env);
     u16 msgId = ScriptReadAny(vm, env);
     u16 pos = ScriptReadAny(vm, env);
-    u16 a6 = ScriptReadAny(vm, env);
+    u16 frameType = ScriptReadAny(vm, env);
 
     if (actor == NULL) {
         return TRUE;
     }
-    return CallFieldActorMessageDisp(vm, env, fileNo, msgId, (u8)GetActorUID(actor), pos, a6);
+    return CallFieldActorMessageDisp(vm, env, fileNo, msgId, (u8)GetActorUID(actor), pos, frameType);
 }
 
 // Shows the first or the second message
@@ -543,12 +550,12 @@ static BOOL CallFieldActorMessageDispSelect(VM *vm, FieldScriptEnv *env, u8 seco
     u16 secondMsgId = ScriptReadAny(vm, env);
     u16 actorId = ScriptReadAny(vm, env);
     u16 pos = ScriptReadAny(vm, env);
-    u16 a6 = ScriptReadAny(vm, env);
+    u16 frameType = ScriptReadAny(vm, env);
 
     if (second) {
         msgId = secondMsgId;
     }
-    return CallFieldActorMessageDisp(vm, env, SCRIPT_MSG_FILE, msgId, actorId, pos, a6);
+    return CallFieldActorMessageDisp(vm, env, SCRIPT_MSG_FILE, msgId, actorId, pos, frameType);
 }
 
 BOOL s0278_FunfestDispSalesmanMessage(VM *vm, FieldScriptEnv *env) {
@@ -560,7 +567,7 @@ BOOL s0278_FunfestDispSalesmanMessage(VM *vm, FieldScriptEnv *env) {
     u16 pos = ScriptReadAny(vm, env);
 
     msgId += (u16)(count * step);
-    return CallFieldActorMessageDisp(vm, env, SCRIPT_MSG_FILE, msgId, actorId, pos, 0);
+    return CallFieldActorMessageDisp(vm, env, SCRIPT_MSG_FILE, msgId, actorId, pos, TALKMSG_WIN_FRAME_NORMAL);
 }
 
 BOOL s0048_ActorMsgGendered(VM *vm, FieldScriptEnv *env) {
@@ -601,7 +608,7 @@ BOOL s0087_TrainerSayMessage(VM *vm, FieldScriptEnv *env) {
     FieldActor *playerActor;
     VecFx32 actorPos;
     u8 winPos;
-    u16 winX;
+    u16 type;
 
     if (scriptId == 0x29f9) {
         trainerId += 0x500;
@@ -614,7 +621,7 @@ BOOL s0087_TrainerSayMessage(VM *vm, FieldScriptEnv *env) {
         actorId = 0xff;
     }
     actorWork = GetFieldScriptActorWk(env);
-    winX = 0;
+    type = ACTOR_MSG_WIN_TOP;
     MI_CpuFill8(actorWork, 0, sizeof(ScriptActorWork));
     actorWork->actorId = actorId;
     player = Field_GetPlayer(fieldWork->field);
@@ -622,12 +629,13 @@ BOOL s0087_TrainerSayMessage(VM *vm, FieldScriptEnv *env) {
     playerActor = FieldPlayer_GetActor(player);
     CopyActorWPos(FindFieldActor(mmSys, actorWork->actorId), &actorPos);
     winPos = ActorMsgWin_CalcWinPosAuto(playerActor, &actorPos);
-    if (winPos != 1) {
-        winX = 1;
+    if (winPos != MSG_WIN_POS_TOP) {
+        type = ACTOR_MSG_WIN_BOTTOM;
     }
-    actorWork->winX = winX;
+    actorWork->winX = type;
     ActorMsgWin_CalcAttachmentPos(env, TRUE);
-    ActorMsgWin_CreateWindow(env, fieldWork->msgBGSys, winX, &actorWork->pos, strbuf, 0, 0);
+    ActorMsgWin_CreateWindow(env, fieldWork->msgBGSys, type, &actorWork->pos, strbuf, TALKMSG_WIN_FRAME_NORMAL,
+                             TALKMSG_WIN_TAIL_NONE);
     ActorMsgWin_SetPosActual(env, winPos);
     VM_SetNativeCallback(vm, ScriptNative_ActorMsgWinWait);
     return TRUE;
@@ -640,27 +648,29 @@ static BOOL ScriptNative_InfoMsgWinWait(VM *vm, void *env) {
     return FALSE;
 }
 
-static BOOL displayText(VM *vm, FieldScriptEnv *env, u32 a2) {
+static BOOL displayText(VM *vm, FieldScriptEnv *env, u32 frameType) {
     ScriptWork_GetFieldWork(FieldScriptEnv_GetScriptWork(env));
     u16 msgId = ScriptReadAny(vm, env);
-    u8 a4 = VM_Read8(vm);
+    u8 pos = VM_Read8(vm);
 
-    return loadMsgBox(vm, env, LoadFieldScriptMessage(env, SCRIPT_MSG_FILE, msgId), a2, a4);
+    return loadMsgBox(vm, env, LoadFieldScriptMessage(env, SCRIPT_MSG_FILE, msgId), frameType, pos);
 }
 
-BOOL loadMsgBox(VM *vm, FieldScriptEnv *env, StrBuf *message, u32 a3, u8 a4) {
+// Shows message in the info window at the top (MSG_WIN_POS_TOP) or the bottom of the screen, framed in a
+// TALKMSG_WIN_FRAME_ style
+BOOL loadMsgBox(VM *vm, FieldScriptEnv *env, StrBuf *message, u32 frameType, u8 pos) {
     ScriptFieldWork *fieldWork = ScriptWork_GetFieldWork(FieldScriptEnv_GetScriptWork(env));
-    void *window;
-    u16 row = 1;
+    InfoMsgWin *window;
+    u16 row = MSG_WIN_ROW_TOP;
 
-    if (a4 != 1) {
-        row = 0x13;
+    if (pos != MSG_WIN_POS_TOP) {
+        row = MSG_WIN_ROW_BOTTOM;
     }
     if (FieldScriptSubEvent_IsRegistered(3)) {
         window = getMapDisplayInfoPtr(env);
         func_ov036_02188ae8(window);
     } else {
-        window = func_ov036_02188a54(fieldWork->msgBGSys, 0, a3, 1, row, 0x1e, 4);
+        window = func_ov036_02188a54(fieldWork->msgBGSys, NULL, frameType, 1, row, 0x1e, 4);
         setMapDisplayInfoPtr(env, window);
     }
     func_ov036_02188ba4(window, 8, 0, message);
@@ -678,11 +688,11 @@ static void InfoMsgWin_Close(FieldScriptEnv *env) {
 }
 
 BOOL s0038_InfoMsg(VM *vm, FieldScriptEnv *env) {
-    return displayText(vm, env, 0);
+    return displayText(vm, env, TALKMSG_WIN_FRAME_NORMAL);
 }
 
 BOOL s004A_ScreamMsg(VM *vm, FieldScriptEnv *env) {
-    return displayText(vm, env, 1);
+    return displayText(vm, env, TALKMSG_WIN_FRAME_SPIKY);
 }
 
 BOOL s0039_InfoMsgClose(VM *vm, FieldScriptEnv *env) {
@@ -836,7 +846,7 @@ BOOL s0045_CheckerMsg(VM *vm, FieldScriptEnv *env) {
     ScriptFieldWork *fieldWork = ScriptWork_GetFieldWork(work);
     u16 width = CheckerMsgWin_CalcWidth(fieldWork->msgBGSys, strbuf, 4);
     u16 height = CheckerMsgWin_CalcHeight(fieldWork->msgBGSys, strbuf, 4);
-    void *window = CheckerMsgWin_Create(fieldWork->msgBGSys, type, x, y, width, height);
+    CheckerMsgWin *window = CheckerMsgWin_Create(fieldWork->msgBGSys, type, x, y, width, height);
 
     setMapDisplayInfoPtr(env, window);
     CheckerMsgWin_PrintStrBuf(window, 4, 4, strbuf);

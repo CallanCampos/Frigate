@@ -70,7 +70,7 @@ static BOOL func_ov036_021b21dc(const VecFx32 *a, const VecFx32 *b, const VecFx3
                                 const VecFx32 *p5, VecFx32 *out);
 
 // The step lengths of the speed indices
-static u8 sPendingSteps[] = { 1, 2, 4, 8, 16 };
+static u8 sPendingSteps[RAIL_SPEED_MAX] = { 1, 2, 4, 8, 16 };
 
 FieldRailSystem *FieldRailSystem_Create(HeapID heapId, u32 unitCount, FieldCamera *camera) {
     u32 i;
@@ -177,13 +177,13 @@ BOOL FieldRailSystem_UpdateCamera(FieldRailSystem *rail, BOOL force) {
     switch (unit->onLine) {
     case RAIL_COMPONENT_POINT:
         cameraId = unit->component.point->cameraId;
-        if (cameraId != 0xffff) {
+        if (cameraId != RAIL_ID_NONE) {
             func = GetRailCameraCurveFunc(unit->handle, GetRailCamera(unit->handle, cameraId)->funcId);
         }
         break;
     case RAIL_COMPONENT_LINE:
         cameraId = unit->component.line->cameraId;
-        if (cameraId != 0xffff) {
+        if (cameraId != RAIL_ID_NONE) {
             func = GetRailCameraCurveFunc(unit->handle, GetRailCamera(unit->handle, cameraId)->funcId);
         }
         break;
@@ -286,7 +286,7 @@ void FieldRailSystem_NormalizePos(FieldRailSystem *rail, RailDataHandle *data, u
 
 BOOL func_ov036_021b0644(FieldRailSystem *rail, const RailPosition *pos, u32 arg, VecFx32 *calcPos) {
     RailUnit_SetRailPos(rail->playerUnit, pos);
-    RailUnit_RequestMove(rail->playerUnit, 4, arg);
+    RailUnit_RequestMove(rail->playerUnit, RAIL_SPEED_16, arg);
     RailUnit_UpdateMove(rail->playerUnit);
     RailUnit_GetCalcPos(rail->playerUnit, calcPos);
     if (GFL_STD_MemCmp(pos, &rail->playerUnit->railPos, sizeof(RailPosition)) == 0) {
@@ -299,7 +299,7 @@ BOOL func_ov036_021b068c(FieldRailSystem *rail, const RailPosition *railPos, u32
     RailPosition start = *railPos;
 
     RailUnit_SetRailPos(rail->playerUnit, railPos);
-    RailUnit_RequestMove(rail->playerUnit, 4, railDir);
+    RailUnit_RequestMove(rail->playerUnit, RAIL_SPEED_16, railDir);
     RailUnit_UpdateMove(rail->playerUnit);
     RailUnit_GetRailPos(rail->playerUnit, next);
     if (GFL_STD_MemCmp(&start, next, sizeof(RailPosition)) == 0) {
@@ -331,13 +331,13 @@ void FieldRailSystem_SetPlayerPos(FieldRailSystem *rail, const RailPosition *pos
     switch (unit->onLine) {
     case RAIL_COMPONENT_POINT:
         cameraId = unit->component.point->cameraId;
-        if (cameraId != 0xffff) {
+        if (cameraId != RAIL_ID_NONE) {
             func = GetRailCameraCurveFunc(unit->handle, GetRailCamera(unit->handle, cameraId)->funcId);
         }
         break;
     case RAIL_COMPONENT_LINE:
         cameraId = unit->component.line->cameraId;
-        if (cameraId != 0xffff) {
+        if (cameraId != RAIL_ID_NONE) {
             func = GetRailCameraCurveFunc(unit->handle, GetRailCamera(unit->handle, cameraId)->funcId);
         }
         break;
@@ -421,10 +421,10 @@ void RailUnit_SetRailPos(RailUnit *unit, const RailPosition *pos) {
         point = &unit->handle->points[pos->componentId];
         unit->component.point = point;
         unit->width = point->widths[0];
-        for (i = 0; i < 4; i++) {
+        for (i = 0; i < RAIL_POINT_LINE_MAX; i++) {
             u32 lineId = unit->component.point->lineIds[i];
 
-            if (lineId != 0xffff && line == NULL) {
+            if (lineId != RAIL_ID_NONE && line == NULL) {
                 line = &unit->handle->lines[lineId];
                 if (line->pointA == pos->componentId) {
                     front = 0;
@@ -452,7 +452,7 @@ void RailUnit_SetRailPos(RailUnit *unit, const RailPosition *pos) {
     length = GetLineTileLengthWorldSpace(line, unit->tileWidth, unit->handle);
     width = GetLerpedLineWidthByLineYPos(line, front, length, unit->handle);
     RailUnit_SetLineInfo(unit, line, dir, front, side, length, width);
-    unit->lastMoveSpeedIndex = 1;
+    unit->lastMoveSpeedIndex = RAIL_SPEED_2;
     unit->direction = dir;
     unit->positionInitialized = 1;
     func_ov036_021b1bac(unit, &unit->calcPos);
@@ -534,7 +534,7 @@ void RailUnit_UpdateMove(RailUnit *unit) {
     if (unit->rail->loaded == 0 || unit->positionInitialized == 0 || !func_ov036_021b1b60(unit)) {
         return;
     }
-    resultDir = 0;
+    resultDir = RAIL_DIR_NONE;
     unit->unk34 = 0;
     if (unit->movePending == 0) {
         return;
@@ -546,7 +546,7 @@ void RailUnit_UpdateMove(RailUnit *unit) {
     if (onLine == RAIL_COMPONENT_LINE) {
         resultDir = RailUnit_MoveOnLine(unit, dir, step);
     }
-    if (resultDir != 0) {
+    if (resultDir != RAIL_DIR_NONE) {
         unit->direction = resultDir;
         unit->lastMoveSpeedIndex = unit->pendingSpeedIndex;
         unit->unk34 = 1;
@@ -555,7 +555,7 @@ void RailUnit_UpdateMove(RailUnit *unit) {
     if (onLine != unit->onLine) {
         func_ov036_021b2130(unit);
     }
-    if (unit->moveProgress < 16 && resultDir != 0) {
+    if (unit->moveProgress < 16 && resultDir != RAIL_DIR_NONE) {
         return;
     }
     unit->movePending = 0;
@@ -762,9 +762,9 @@ void func_ov036_021b0e38(RailUnit *unit, u16 a1, u16 a2, u16 a3) {
 static RailLine *GetLineContinueInDirection(RailPoint *point, u32 dir, RailDataHandle *data,
                                             RailDisabledLines *disabled, BOOL checkDisabled) {
     s32 i;
-    u32(*ids)[4] = &point->lineIds;
+    u32(*ids)[RAIL_POINT_LINE_MAX] = &point->lineIds;
 
-    for (i = 0; i < 4; i++) {
+    for (i = 0; i < RAIL_POINT_LINE_MAX; i++) {
         if (dir == point->dirs[i]) {
             if (checkDisabled) {
                 return GetRailLineIfEnabled(disabled, data, (*ids)[i]);
@@ -780,10 +780,10 @@ static u32 RailUnit_TryEnterLine(RailUnit *unit, RailLine *line, u32 dir, s32 fr
     RailPoint *point;
 
     if (!RailDisabledLines_AllowsPosition(unit->disabled, line, front, side, unit->handle, unit->tileWidth)) {
-        return 0;
+        return RAIL_DIR_NONE;
     }
     if ((side < 0 ? -side : side) > width) {
-        return 0;
+        return RAIL_DIR_NONE;
     }
     if ((front >= length || front < 0)) {
         if (front >= length) {
@@ -796,7 +796,7 @@ static u32 RailUnit_TryEnterLine(RailUnit *unit, RailLine *line, u32 dir, s32 fr
         }
         if (next == NULL) {
             if (front > length) {
-                return 0;
+                return RAIL_DIR_NONE;
             }
         } else {
             line = next;
@@ -810,10 +810,10 @@ static u32 RailUnit_TryEnterLine(RailUnit *unit, RailLine *line, u32 dir, s32 fr
                 width = GetLerpedLineWidthByLineYPos(line, front, length, unit->handle);
             }
             if (front >= length) {
-                return 0;
+                return RAIL_DIR_NONE;
             }
             if ((side < 0 ? -side : side) > width) {
-                return 0;
+                return RAIL_DIR_NONE;
             }
         }
     }
@@ -911,7 +911,7 @@ static RailPoint *GetRailPoint(RailDataHandle *data, u32 id) {
     if (data->pointCount > id) {
         return &data->points[id];
     }
-    if (id == 0xffff) {
+    if (id == RAIL_ID_NONE) {
         return NULL;
     }
     return data->points;
@@ -921,31 +921,31 @@ static RailLine *GetRailLine(RailDataHandle *data, u32 id) {
     if (data->lineCount > id) {
         return &data->lines[id];
     }
-    if (id == 0xffff) {
+    if (id == RAIL_ID_NONE) {
         return NULL;
     }
     return data->lines;
 }
 
-static const RailCamera DEFAULT_RAIL_CAMERA = { 0xffff };
+static const RailCamera DEFAULT_RAIL_CAMERA = { RAIL_ID_NONE };
 
 static RailCamera *GetRailCamera(RailDataHandle *data, u32 id) {
     if (data->cameraCount > id) {
         return &data->cameras[id];
     }
-    if (id == 0xffff) {
+    if (id == RAIL_ID_NONE) {
         return NULL;
     }
     return (RailCamera *)&DEFAULT_RAIL_CAMERA;
 }
 
-static const RailCurve DEFAULT_RAIL_CURVE = { 0xffff, { 0xff, 0, 0 } };
+static const RailCurve DEFAULT_RAIL_CURVE = { RAIL_ID_NONE, { 0xff, 0, 0 } };
 
 static RailCurve *GetRailCurve(RailDataHandle *data, u32 id) {
     if (data->curveCount > id) {
         return &data->curves[id];
     }
-    if (id == 0xffff) {
+    if (id == RAIL_ID_NONE) {
         return NULL;
     }
     return (RailCurve *)&DEFAULT_RAIL_CURVE;
@@ -955,7 +955,7 @@ static RailCameraFunc GetRailCameraCurveFunc(RailDataHandle *data, u32 id) {
     if (data->camFuncCount > id) {
         return data->camFuncs[id];
     }
-    if (id == 0xffff) {
+    if (id == RAIL_ID_NONE) {
         return NULL;
     }
     return data->camFuncs[0];
@@ -965,7 +965,7 @@ static RailToWorldFunc GetHandler1CurveFunc(RailDataHandle *data, u32 id) {
     if (data->railToWorldCount > id) {
         return data->railToWorldFuncs[id];
     }
-    if (id == 0xffff) {
+    if (id == RAIL_ID_NONE) {
         return NULL;
     }
     return data->railToWorldFuncs[0];
@@ -975,13 +975,13 @@ static WorldToRailFunc GetHandler2CurveFunc(RailDataHandle *data, u32 id) {
     if (data->worldToRailCount > id) {
         return data->worldToRailFuncs[id];
     }
-    if (id == 0xffff) {
+    if (id == RAIL_ID_NONE) {
         return NULL;
     }
     return data->worldToRailFuncs[0];
 }
 
-// step uses sixteenths of a tile; the result is dir (1 up, 2 right, 3 down, 4 left) or 0.
+// step uses sixteenths of a tile; the result is dir or RAIL_DIR_NONE.
 static inline u32 RailUnit_MoveForward(RailUnit *unit, u32 dir, s32 step) {
     RailLine *line = unit->component.line;
     s32 length = unit->length;
@@ -1017,7 +1017,7 @@ static inline u32 RailUnit_MoveForward(RailUnit *unit, u32 dir, s32 step) {
         s32 nextLength = GetLineTileLengthWorldSpace(next0, unit->tileWidth, unit->handle);
         width = GetLerpedLineWidthByLineYPos(next0, unit->front - length, nextLength, unit->handle);
         resultDir = RailUnit_TryEnterLine(unit, next0, dir, unit->front - length, unit->side, nextLength, width);
-        if (resultDir != 0) {
+        if (resultDir != RAIL_DIR_NONE) {
             return resultDir;
         }
     }
@@ -1027,7 +1027,7 @@ static inline u32 RailUnit_MoveForward(RailUnit *unit, u32 dir, s32 step) {
             s32 nextLength = GetLineTileLengthWorldSpace(next1, unit->tileWidth, unit->handle);
             width = GetLerpedLineWidthByLineYPos(next1, -unit->side, nextLength, unit->handle);
             resultDir = RailUnit_TryEnterLine(unit, next1, dir, -unit->side, unit->front - length, nextLength, width);
-            if (resultDir != 0) {
+            if (resultDir != RAIL_DIR_NONE) {
                 return resultDir;
             }
         } else if (RailLine_IsPointB(unit->handle, next1, point)) {
@@ -1036,7 +1036,7 @@ static inline u32 RailUnit_MoveForward(RailUnit *unit, u32 dir, s32 step) {
             width = GetLerpedLineWidthByLineYPos(next1, nextLength + unit->side, nextLength, unit->handle);
             resultDir = RailUnit_TryEnterLine(unit, next1, dir, nextLength + unit->side, -(unit->front - length),
                                               nextLength, width);
-            if (resultDir != 0) {
+            if (resultDir != RAIL_DIR_NONE) {
                 return resultDir;
             }
         }
@@ -1047,7 +1047,7 @@ static inline u32 RailUnit_MoveForward(RailUnit *unit, u32 dir, s32 step) {
             s32 nextLength = GetLineTileLengthWorldSpace(next2, unit->tileWidth, unit->handle);
             width = GetLerpedLineWidthByLineYPos(next2, unit->side, nextLength, unit->handle);
             resultDir = RailUnit_TryEnterLine(unit, next2, dir, unit->side, -(unit->front - length), nextLength, width);
-            if (resultDir != 0) {
+            if (resultDir != RAIL_DIR_NONE) {
                 return resultDir;
             }
         } else if (RailLine_IsPointB(unit->handle, next2, point)) {
@@ -1056,7 +1056,7 @@ static inline u32 RailUnit_MoveForward(RailUnit *unit, u32 dir, s32 step) {
             width = GetLerpedLineWidthByLineYPos(next2, nextLength - unit->side, nextLength, unit->handle);
             resultDir = RailUnit_TryEnterLine(unit, next2, dir, nextLength - unit->side, unit->front - length,
                                               nextLength, width);
-            if (resultDir != 0) {
+            if (resultDir != RAIL_DIR_NONE) {
                 return resultDir;
             }
         }
@@ -1066,7 +1066,7 @@ static inline u32 RailUnit_MoveForward(RailUnit *unit, u32 dir, s32 step) {
             return dir;
         }
         unit->front -= step;
-        return 0;
+        return RAIL_DIR_NONE;
     }
     return RailUnit_ClampSideToLineWidth(unit, line, length, dir);
 }
@@ -1114,7 +1114,7 @@ static inline u32 RailUnit_MoveBackward(RailUnit *unit, u32 dir, s32 step) {
             absOffset = -absOffset;
         }
         resultDir = RailUnit_TryEnterLine(unit, next2, dir, nextLength - absOffset, unit->side, nextLength, width);
-        if (resultDir != 0) {
+        if (resultDir != RAIL_DIR_NONE) {
             return resultDir;
         }
     }
@@ -1124,7 +1124,7 @@ static inline u32 RailUnit_MoveBackward(RailUnit *unit, u32 dir, s32 step) {
             s32 nextLength = GetLineTileLengthWorldSpace(next0, unit->tileWidth, unit->handle);
             width = GetLerpedLineWidthByLineYPos(next0, -unit->side, nextLength, unit->handle);
             resultDir = RailUnit_TryEnterLine(unit, next0, dir, -unit->side, unit->front, nextLength, width);
-            if (resultDir != 0) {
+            if (resultDir != RAIL_DIR_NONE) {
                 return resultDir;
             }
         } else if (RailLine_IsPointB(unit->handle, next0, point)) {
@@ -1133,7 +1133,7 @@ static inline u32 RailUnit_MoveBackward(RailUnit *unit, u32 dir, s32 step) {
             width = GetLerpedLineWidthByLineYPos(next0, nextLength + unit->side, nextLength, unit->handle);
             resultDir =
                 RailUnit_TryEnterLine(unit, next0, dir, nextLength + unit->side, -unit->front, nextLength, width);
-            if (resultDir != 0) {
+            if (resultDir != RAIL_DIR_NONE) {
                 return resultDir;
             }
         }
@@ -1144,7 +1144,7 @@ static inline u32 RailUnit_MoveBackward(RailUnit *unit, u32 dir, s32 step) {
             s32 nextLength = GetLineTileLengthWorldSpace(next1, unit->tileWidth, unit->handle);
             width = GetLerpedLineWidthByLineYPos(next1, unit->side, nextLength, unit->handle);
             resultDir = RailUnit_TryEnterLine(unit, next1, dir, unit->side, -unit->front, nextLength, width);
-            if (resultDir != 0) {
+            if (resultDir != RAIL_DIR_NONE) {
                 return resultDir;
             }
         }
@@ -1154,7 +1154,7 @@ static inline u32 RailUnit_MoveBackward(RailUnit *unit, u32 dir, s32 step) {
             width = GetLerpedLineWidthByLineYPos(next1, nextLength - unit->side, nextLength, unit->handle);
             resultDir =
                 RailUnit_TryEnterLine(unit, next1, dir, nextLength - unit->side, unit->front, nextLength, width);
-            if (resultDir != 0) {
+            if (resultDir != RAIL_DIR_NONE) {
                 return resultDir;
             }
         }
@@ -1163,7 +1163,7 @@ static inline u32 RailUnit_MoveBackward(RailUnit *unit, u32 dir, s32 step) {
         return RailUnit_ClampSideToLineWidth(unit, line, length, dir);
     }
     unit->front += step;
-    return 0;
+    return RAIL_DIR_NONE;
 }
 
 static inline u32 RailUnit_MoveRight(RailUnit *unit, u32 dir, s32 step) {
@@ -1184,7 +1184,7 @@ static inline u32 RailUnit_MoveRight(RailUnit *unit, u32 dir, s32 step) {
                 s32 nextLength = GetLineTileLengthWorldSpace(next0, unit->tileWidth, unit->handle);
                 width = GetLerpedLineWidthByLineYPos(next0, unit->side, nextLength, unit->handle);
                 resultDir = RailUnit_TryEnterLine(unit, next0, dir, unit->side, -unit->front, nextLength, width);
-                if (resultDir != 0) {
+                if (resultDir != RAIL_DIR_NONE) {
                     return resultDir;
                 }
             }
@@ -1194,7 +1194,7 @@ static inline u32 RailUnit_MoveRight(RailUnit *unit, u32 dir, s32 step) {
                 width = GetLerpedLineWidthByLineYPos(next0, nextLength - unit->side, nextLength, unit->handle);
                 resultDir =
                     RailUnit_TryEnterLine(unit, next0, dir, nextLength - unit->side, unit->front, nextLength, width);
-                if (resultDir != 0) {
+                if (resultDir != RAIL_DIR_NONE) {
                     return resultDir;
                 }
             }
@@ -1208,7 +1208,7 @@ static inline u32 RailUnit_MoveRight(RailUnit *unit, u32 dir, s32 step) {
                 width = GetLerpedLineWidthByLineYPos(next0, unit->side, nextLength, unit->handle);
                 resultDir =
                     RailUnit_TryEnterLine(unit, next0, dir, unit->side, length - unit->front, nextLength, width);
-                if (resultDir != 0) {
+                if (resultDir != RAIL_DIR_NONE) {
                     return resultDir;
                 }
             }
@@ -1218,7 +1218,7 @@ static inline u32 RailUnit_MoveRight(RailUnit *unit, u32 dir, s32 step) {
                 width = GetLerpedLineWidthByLineYPos(next0, nextLength - unit->side, nextLength, unit->handle);
                 resultDir = RailUnit_TryEnterLine(unit, next0, dir, nextLength - unit->side, -(length - unit->front),
                                                   nextLength, width);
-                if (resultDir != 0) {
+                if (resultDir != RAIL_DIR_NONE) {
                     return resultDir;
                 }
             }
@@ -1257,7 +1257,7 @@ static inline u32 RailUnit_MoveLeft(RailUnit *unit, u32 dir, s32 step) {
                     absOffset = -absOffset;
                 }
                 resultDir = RailUnit_TryEnterLine(unit, next0, dir, absOffset, unit->front, nextLength, width);
-                if (resultDir != 0) {
+                if (resultDir != RAIL_DIR_NONE) {
                     return resultDir;
                 }
             }
@@ -1275,7 +1275,7 @@ static inline u32 RailUnit_MoveLeft(RailUnit *unit, u32 dir, s32 step) {
                 }
                 resultDir =
                     RailUnit_TryEnterLine(unit, next0, dir, nextLength - absOffset, -unit->front, nextLength, width);
-                if (resultDir != 0) {
+                if (resultDir != RAIL_DIR_NONE) {
                     return resultDir;
                 }
             }
@@ -1297,7 +1297,7 @@ static inline u32 RailUnit_MoveLeft(RailUnit *unit, u32 dir, s32 step) {
                 }
                 resultDir =
                     RailUnit_TryEnterLine(unit, next0, dir, absOffset, -(length - unit->front), nextLength, width);
-                if (resultDir != 0) {
+                if (resultDir != RAIL_DIR_NONE) {
                     return resultDir;
                 }
             }
@@ -1315,7 +1315,7 @@ static inline u32 RailUnit_MoveLeft(RailUnit *unit, u32 dir, s32 step) {
                 }
                 resultDir = RailUnit_TryEnterLine(unit, next0, dir, nextLength - absOffset, length - unit->front,
                                                   nextLength, width);
-                if (resultDir != 0) {
+                if (resultDir != RAIL_DIR_NONE) {
                     return resultDir;
                 }
             }
@@ -1338,21 +1338,21 @@ static u32 RailUnit_MoveOnLine(RailUnit *unit, u32 dir, s32 step) {
     } else if (dir == RailDirection_TurnLeft(line->dir)) {
         return RailUnit_MoveLeft(unit, dir, step);
     }
-    return 0;
+    return RAIL_DIR_NONE;
 }
 
 static void RailUnit_SetDataCore(RailUnit *unit, RailDataHandle *data, FieldRailSystem *rail) {
     unit->handle = data;
     unit->tileWidth = data->tileWidth;
     unit->onLine = RAIL_COMPONENT_NONE;
-    unit->lastMoveSpeedIndex = 0;
-    unit->direction = 0;
+    unit->lastMoveSpeedIndex = RAIL_SPEED_1;
+    unit->direction = RAIL_DIR_NONE;
     unit->movePending = 0;
     unit->rail = rail;
     unit->component.point = NULL;
     unit->front = 0;
     unit->side = 0;
-    unit->dir = 0;
+    unit->dir = RAIL_DIR_NONE;
     unit->disabled = &rail->disabledLines;
     unit->nextCached = 0;
     unit->positionInitialized = 0;
@@ -1426,11 +1426,11 @@ static s32 GetLerpedLineWidthByLineYPos(const RailLine *line, s32 y, s32 length,
 
     widthB = -1;
     widthA = widthB;
-    for (i = 0; i < 4; i++) {
-        if (pointA->lineIds[i] != 0xffff && line == &data->lines[pointA->lineIds[i]]) {
+    for (i = 0; i < RAIL_POINT_LINE_MAX; i++) {
+        if (pointA->lineIds[i] != RAIL_ID_NONE && line == &data->lines[pointA->lineIds[i]]) {
             widthA = pointA->widths[i];
         }
-        if (pointB->lineIds[i] != 0xffff && line == &data->lines[pointB->lineIds[i]]) {
+        if (pointB->lineIds[i] != RAIL_ID_NONE && line == &data->lines[pointB->lineIds[i]]) {
             widthB = pointB->widths[i];
         }
     }
@@ -1474,9 +1474,9 @@ static BOOL func_ov036_021b1d1c(FieldRailSystem *rail, RailPosition *pos, u32 di
     s32 i;
 
     RailUnit_SetRailPos(rail->playerUnit, pos);
-    RailUnit_RequestMove(rail->playerUnit, 4, dir);
+    RailUnit_RequestMove(rail->playerUnit, RAIL_SPEED_16, dir);
     RailUnit_UpdateMove(rail->playerUnit);
-    RailUnit_RequestMove(rail->playerUnit, 0, dir);
+    RailUnit_RequestMove(rail->playerUnit, RAIL_SPEED_1, dir);
     for (i = 0; i < 16; i++) {
         if (extra == i) {
             RailUnit_GetCalcPos(rail->playerUnit, out);
@@ -1491,59 +1491,59 @@ static BOOL func_ov036_021b1d1c(FieldRailSystem *rail, RailPosition *pos, u32 di
 
 static u32 RailDirection_GetOpposite(u32 dir) {
     switch (dir) {
-    case 1:
-        return 3;
-    case 3:
-        return 1;
-    case 4:
-        return 2;
-    case 2:
-        return 4;
+    case RAIL_DIR_UP:
+        return RAIL_DIR_DOWN;
+    case RAIL_DIR_DOWN:
+        return RAIL_DIR_UP;
+    case RAIL_DIR_LEFT:
+        return RAIL_DIR_RIGHT;
+    case RAIL_DIR_RIGHT:
+        return RAIL_DIR_LEFT;
     }
-    return 0;
+    return RAIL_DIR_NONE;
 }
 
 static u32 RailDirection_TurnRight(u32 dir) {
     switch (dir) {
-    case 1:
-        return 2;
-    case 3:
-        return 4;
-    case 4:
-        return 1;
-    case 2:
-        return 3;
+    case RAIL_DIR_UP:
+        return RAIL_DIR_RIGHT;
+    case RAIL_DIR_DOWN:
+        return RAIL_DIR_LEFT;
+    case RAIL_DIR_LEFT:
+        return RAIL_DIR_UP;
+    case RAIL_DIR_RIGHT:
+        return RAIL_DIR_DOWN;
     }
-    return 0;
+    return RAIL_DIR_NONE;
 }
 
 static u32 RailDirection_TurnLeft(u32 dir) {
     switch (dir) {
-    case 1:
-        return 4;
-    case 3:
-        return 2;
-    case 4:
-        return 3;
-    case 2:
-        return 1;
+    case RAIL_DIR_UP:
+        return RAIL_DIR_LEFT;
+    case RAIL_DIR_DOWN:
+        return RAIL_DIR_RIGHT;
+    case RAIL_DIR_LEFT:
+        return RAIL_DIR_DOWN;
+    case RAIL_DIR_RIGHT:
+        return RAIL_DIR_UP;
     }
-    return 0;
+    return RAIL_DIR_NONE;
 }
 
 static void RailDisabledLines_Clear(RailDisabledLines *disabled) {
     s32 i;
 
-    for (i = 0; i < 18; i++) {
-        disabled->lineIds[i] = 0xffff;
+    for (i = 0; i < RAIL_DISABLED_LINE_MAX; i++) {
+        disabled->lineIds[i] = RAIL_ID_NONE;
     }
 }
 
 static void RailDisabledLines_Add(RailDisabledLines *disabled, u16 lineId) {
     s32 i;
 
-    for (i = 0; i < 18; i++) {
-        if (disabled->lineIds[i] == 0xffff) {
+    for (i = 0; i < RAIL_DISABLED_LINE_MAX; i++) {
+        if (disabled->lineIds[i] == RAIL_ID_NONE) {
             disabled->lineIds[i] = lineId;
             return;
         }
@@ -1553,9 +1553,9 @@ static void RailDisabledLines_Add(RailDisabledLines *disabled, u16 lineId) {
 static void RailDisabledLines_Remove(RailDisabledLines *disabled, u16 lineId) {
     s32 i;
 
-    for (i = 0; i < 18; i++) {
+    for (i = 0; i < RAIL_DISABLED_LINE_MAX; i++) {
         if (disabled->lineIds[i] == lineId) {
-            disabled->lineIds[i] = 0xffff;
+            disabled->lineIds[i] = RAIL_ID_NONE;
             return;
         }
     }
@@ -1564,7 +1564,7 @@ static void RailDisabledLines_Remove(RailDisabledLines *disabled, u16 lineId) {
 static BOOL RailDisabledLines_Contains(RailDisabledLines *disabled, u16 lineId) {
     s32 i;
 
-    for (i = 0; i < 18; i++) {
+    for (i = 0; i < RAIL_DISABLED_LINE_MAX; i++) {
         if (disabled->lineIds[i] == lineId) {
             return TRUE;
         }
@@ -1650,12 +1650,12 @@ static BOOL RailDisabledLines_AllowsPosition(RailDisabledLines *disabled, RailLi
 static u32 RailPoint_GetLineDirection(RailPoint *point, RailLine *line, RailDataHandle *data) {
     int i;
 
-    for (i = 0; i < 4; i++) {
+    for (i = 0; i < RAIL_POINT_LINE_MAX; i++) {
         if (GetRailLine(data, point->lineIds[i]) == line) {
             return point->dirs[i];
         }
     }
-    return 0;
+    return RAIL_DIR_NONE;
 }
 
 static BOOL RailLine_CheckEndpointDirections(RailLine *line, RailDataHandle *data) {
@@ -1664,20 +1664,20 @@ static BOOL RailLine_CheckEndpointDirections(RailLine *line, RailDataHandle *dat
     u32 dirA;
     u32 dirB;
 
-    if (line->pointA == 0xffff || line->pointB == 0xffff) {
+    if (line->pointA == RAIL_ID_NONE || line->pointB == RAIL_ID_NONE) {
         return FALSE;
     }
     pointA = GetRailPoint(data, line->pointA);
     pointB = GetRailPoint(data, line->pointB);
     dirA = RailPoint_GetLineDirection(pointA, line, data);
-    if (dirA == 0) {
+    if (dirA == RAIL_DIR_NONE) {
         return FALSE;
     }
     if (dirA != line->dir) {
         return FALSE;
     }
     dirB = RailPoint_GetLineDirection(pointB, line, data);
-    if (dirB == 0) {
+    if (dirB == RAIL_DIR_NONE) {
         return FALSE;
     }
     if (dirB == RailDirection_GetOpposite(line->dir)) {
@@ -1689,11 +1689,11 @@ static BOOL RailLine_CheckEndpointDirections(RailLine *line, RailDataHandle *dat
 static BOOL RailPoint_CheckConnections(RailPoint *point, RailDataHandle *data) {
     s32 i;
 
-    for (i = 0; i < 4; i++) {
-        if ((point->dirs[i] == 0) != (point->lineIds[i] == 0xffff)) {
+    for (i = 0; i < RAIL_POINT_LINE_MAX; i++) {
+        if ((point->dirs[i] == RAIL_DIR_NONE) != (point->lineIds[i] == RAIL_ID_NONE)) {
             return FALSE;
         }
-        if (point->lineIds[i] != 0xffff) {
+        if (point->lineIds[i] != RAIL_ID_NONE) {
             RailLine *line = GetRailLine(data, point->lineIds[i]);
             RailPoint *pointA = GetRailPoint(data, line->pointA);
             RailPoint *pointB = GetRailPoint(data, line->pointB);
@@ -1702,7 +1702,7 @@ static BOOL RailPoint_CheckConnections(RailPoint *point, RailDataHandle *data) {
             if (pointA != point && pointB != point) {
                 return FALSE;
             }
-            if (point->dirs[i] != 0) {
+            if (point->dirs[i] != RAIL_DIR_NONE) {
                 for (j = i + 1; j < 4; j++) {
                     if (point->dirs[i] == RailDirection_GetOpposite(point->dirs[j]) &&
                         line->dir != GetRailLine(data, point->lineIds[j])->dir) {
