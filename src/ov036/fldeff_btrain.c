@@ -100,7 +100,7 @@ static void func_ov036_021c6534(FieldEffectBTrain *effect) {
 }
 
 // A train of the given kind, which starts at pos
-void *func_ov036_021c6574(void *effects, u32 trainIdx, const VecFx32 *pos) {
+FieldEffectTask *func_ov036_021c6574(FieldEffects *effects, u32 trainIdx, const VecFx32 *pos) {
     BTrainTaskParams params;
 
     params.effect = FieldEffects_GetHandleData(effects, 13);
@@ -110,10 +110,10 @@ void *func_ov036_021c6574(void *effects, u32 trainIdx, const VecFx32 *pos) {
 }
 
 // Plays the animation anmIdx from its start
-void func_ov036_021c65a8(void *obj, u16 anmIdx) {
-    if (obj != NULL) {
+void func_ov036_021c65a8(FieldEffectTask *task, u16 anmIdx) {
+    if (task != NULL) {
         int i;
-        BTrainTask *trainTask = func_ov036_021a3afc(obj);
+        BTrainTask *trainTask = func_ov036_021a3afc(task);
 
         for (i = 0; i < BTRAIN_ANM_COUNT; i++) {
             GFL_G3DActorResetAnmFrame(trainTask->actor, i);
@@ -128,9 +128,9 @@ void func_ov036_021c65a8(void *obj, u16 anmIdx) {
     }
 }
 
-void func_ov036_021c65e8(void *obj, u16 hidden) {
-    if (obj != NULL) {
-        BTrainTask *trainTask = func_ov036_021a3afc(obj);
+void func_ov036_021c65e8(FieldEffectTask *task, u16 hidden) {
+    if (task != NULL) {
+        BTrainTask *trainTask = func_ov036_021a3afc(task);
 
         trainTask->hidden = hidden;
     }

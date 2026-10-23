@@ -141,7 +141,7 @@ static void FieldFMissionInfo_ScoreHighlightTask(TCBEx *task, void *data);
 static void FieldFMissionInfo_UpdateTimeHighlight(FieldFMissionInfo *info);
 static void FieldFMissionInfo_TimeHighlightTask(TCBEx *task, void *data);
 
-void *FieldFMissionInfo_Create(GameSystem *gsys, HeapID heapId) {
+FieldFMissionInfo *FieldFMissionInfo_Create(GameSystem *gsys, HeapID heapId) {
     FieldFMissionInfo *info = GFL_HeapAllocate(heapId, sizeof(FieldFMissionInfo), TRUE, "field_fmission_info.c", 192);
 
     info->arc = GFL_ArcSysCreateFileHandle(ARCID_FIELD_FMISSION_INFO, heapId);

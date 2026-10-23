@@ -35,7 +35,7 @@ void FieldPlayer_UpdateRailMovement(FieldPlayer *player, u32 pressedKeys, u32 he
 void func_ov036_0219ace8(FieldPlayer *player, const void *pos);
 void func_ov036_0219acf4(FieldPlayer *player);
 BOOL func_ov036_0219ad00(FieldPlayer *player);
-void *func_ov036_0219ad0c(FieldPlayer *player);
+RailUnit *func_ov036_0219ad0c(FieldPlayer *player);
 u32 FieldPlayer_GetTileTypeInDir(FieldPlayer *player, u16 direction);
 FieldActor *FieldPlayer_GetActorInFront(FieldPlayer *player);
 FieldActor *FieldPlayer_GetActorInFrontEx(FieldPlayer *player, fx32 maxHeightDiff);

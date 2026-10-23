@@ -161,8 +161,8 @@ u32 FieldPropSystem_ConvResIDToIndex(const FieldPropSystem *system, u32 resId);
 void *FieldPropResBundle_GetResInfo(FieldPropResBundle *bundle, u32 index);
 void *FieldPropResBundle_GetModelData(FieldPropResBundle *bundle, u32 index);
 void *FieldPropResAnmHeader_GetAnmData(FieldPropResAnmHeader *header, u32 index);
-void *FieldPropSystem_FindResInfo(FieldPropSystem *system, u32 resId);
-void *FieldPropSystem_GetResInfo(FieldPropSystem *system, u32 index);
+FieldPropResInfo *FieldPropSystem_FindResInfo(FieldPropSystem *system, u32 resId);
+FieldPropResInfo *FieldPropSystem_GetResInfo(FieldPropSystem *system, u32 index);
 FieldPropResBank *FieldPropSystem_GetResBank(FieldPropSystem *system);
 FieldPropSystem *FieldPropSystem_Create(HeapID heapId, FieldG3DMapper *mapper, u16 season);
 // Loads the props of the area, and recolors their textures with the field's color post-FX

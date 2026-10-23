@@ -380,7 +380,7 @@ u16 GFL_G3DSceneGetNodeActorCount(G3DManager *manager, u16 scene) {
     return manager->scenes[scene].actorCount;
 }
 
-void *GFL_G3DMgrGetResource(G3DManager *manager, u16 resource) {
+G3DResource *GFL_G3DMgrGetResource(G3DManager *manager, u16 resource) {
     return manager->resources[resource];
 }
 

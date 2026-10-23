@@ -242,7 +242,7 @@ JoinAvenuePersonList *ResortSys_GetList2(ResortSys *sys) {
     return sys->setup.list2;
 }
 
-void *ResortSys_GetEntries(ResortSys *sys) {
+JoinAvenueEntryList *ResortSys_GetEntries(ResortSys *sys) {
     return sys->setup.entries;
 }
 

@@ -10,16 +10,14 @@
 #include "system/game_system.h"
 #include "system/wordset.h"
 
-void UpdateScriptFieldWk(void *fieldWork, GameSystem *gsys) {
+void UpdateScriptFieldWk(ScriptFieldWork *fieldWork, GameSystem *gsys) {
     Field *field;
-    void **ptr;
 
     field = GSYS_GetField(gsys);
-    MIi_CpuClear32(0, fieldWork, 8);
-    ptr = fieldWork;
-    ptr[1] = field;
+    MIi_CpuClear32(0, fieldWork, sizeof(ScriptFieldWork));
+    fieldWork->field = field;
     if (field != NULL) {
-        ptr[0] = Field_GetMsgBGSys(field);
+        fieldWork->msgBGSys = Field_GetMsgBGSys(field);
     }
 }
 
@@ -49,7 +47,7 @@ ScriptWork *ScriptWork_Create(HeapID heapId, GameSystem *gsys, GameEvent *event,
         work->altStrBuf = NULL;
     }
     work->subwork = InitScriptSubwork(work, heapId);
-    UpdateScriptFieldWk(work->fieldWork, gsys);
+    UpdateScriptFieldWk(&work->fieldWork, gsys);
     if (work->reducedFeatureLevel == 0) {
         FieldScriptSubEvent_ResetAll();
     }
@@ -79,12 +77,12 @@ GameSystem *ScriptWork_GetGameSystem(ScriptWork *work) {
     return work->gsys;
 }
 
-void *ScriptWork_GetFieldWork(ScriptWork *work) {
-    UpdateScriptFieldWk(work->fieldWork, work->gsys);
-    return work->fieldWork;
+ScriptFieldWork *ScriptWork_GetFieldWork(ScriptWork *work) {
+    UpdateScriptFieldWk(&work->fieldWork, work->gsys);
+    return &work->fieldWork;
 }
 
-void *ScriptWork_GetSubwork(ScriptWork *work) {
+ScriptSubwork *ScriptWork_GetSubwork(ScriptWork *work) {
     return work->subwork;
 }
 
@@ -100,12 +98,12 @@ StrBuf *ScriptWork_GetAltStrBuf(ScriptWork *work) {
     return work->altStrBuf;
 }
 
-void ScriptWork_SetSignFont(ScriptWork *work, void *value) {
-    work->unk38 = value;
+void ScriptWork_SetSignFont(ScriptWork *work, Font *font) {
+    work->signFont = font;
 }
 
-void *ScriptWork_GetSignFont(ScriptWork *work) {
-    return work->unk38;
+Font *ScriptWork_GetSignFont(ScriptWork *work) {
+    return work->signFont;
 }
 
 u8 *ScriptWork_GetSEBitMask(ScriptWork *work) {
@@ -211,14 +209,14 @@ FieldActorAnmProc *ScriptWork_GetActorAnmProc(ScriptWork *work) {
     return work->actorAnmProc;
 }
 
-void ScriptWork_SetStadiumTrainers(ScriptWork *work, void *trainers) {
+void ScriptWork_SetStadiumTrainers(ScriptWork *work, StadiumTrainerEntry *trainers) {
     work->stadiumTrainers = trainers;
 }
 
-void *ScriptWork_GetStadiumTrainers(ScriptWork *work) {
+StadiumTrainerEntry *ScriptWork_GetStadiumTrainers(ScriptWork *work) {
     return work->stadiumTrainers;
 }
 
-void *ScriptWork_GetTrainerState(ScriptWork *work, int index) {
-    return work->trainerState[index];
+TrainerClashSlot *ScriptWork_GetTrainerState(ScriptWork *work, int index) {
+    return &work->trainerState[index];
 }

@@ -144,7 +144,7 @@ static void ResortPerson_Recreate(ResortPerson *person, const ResortPersonSetup 
     ResortPerson_CreateActor(person, setup);
 }
 
-void *ResortPerson_GetShop(ResortPerson *person) {
+JoinAvenueShop *ResortPerson_GetShop(ResortPerson *person) {
     return JoinAvenuePerson_GetShop(ResortData_GetPerson(person->data));
 }
 

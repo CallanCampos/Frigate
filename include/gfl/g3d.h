@@ -166,13 +166,13 @@ NNSGfdTexKey GFL_G3DResGetTexVRAMHandle(G3DResource *resource);
 NNSGfdPlttKey GFL_G3DResGetPltVRAMHandle(G3DResource *resource);
 void *GFL_G3DResGetTexImageData(G3DResource *resource);
 void *GFL_G3DResGetTexPaletteData(G3DResource *resource);
-void *GFL_G3DResGetResData(G3DResource *resource);
+NNSG3dResFileHeader *GFL_G3DResGetResData(G3DResource *resource);
 void GFL_G3DResFree(G3DResource *resource);
 G3DModel *GFL_G3DMdlCreate(G3DResource *resource, u32 modelId, G3DResource *texture);
 void GFL_G3DMdlFree(G3DModel *model);
-void *GFL_G3DMdlGetMdlResource(G3DModel *model);
-void *GFL_G3DMdlGetTexResource(G3DModel *model);
-void *GFL_G3DAnmCreate(G3DModel *model, G3DResource *resource, u32 a2);
+G3DResource *GFL_G3DMdlGetMdlResource(G3DModel *model);
+G3DResource *GFL_G3DMdlGetTexResource(G3DModel *model);
+G3DAnimation *GFL_G3DAnmCreate(G3DModel *model, G3DResource *resource, u32 a2);
 void GFL_G3DAnmFree(G3DAnimation *animation);
 NNSG3dAnmObj *GFL_G3DAnmGetRenderObj(G3DAnimation *animation);
 G3DActor *GFL_G3DActorCreate(G3DModel *model, void **animations, int count);
@@ -228,9 +228,8 @@ void GFL_G3DSysResetGeometryCounter(void);
 G3DModel *GFL_G3DActorGetMdl(G3DActor *actor);
 u16 GFL_G3DActorGetAnmCount(G3DActor *actor);
 BOOL GFL_G3DActorBindAnm(G3DActor *actor, u16 anmIdx);
-void *GFL_G3DActorGetAnm(G3DActor *actor, u16 index);
+G3DAnimation *GFL_G3DActorGetAnm(G3DActor *actor, u16 index);
 NNSG3dRenderObj *GFL_G3DMdlGetEngineModel(G3DModel *model);
-void *GFL_G3DMdlGetTexResource(G3DModel *model);
 
 G3DManager *GFL_G3DMgrCreate(u16 resourceLimit, u16 actorLimit, HeapID heapId);
 void GFL_G3DMgrFree(G3DManager *manager);
@@ -241,7 +240,7 @@ u16 GFL_G3DMgrNewSceneFastEx(G3DManager *manager, const G3DSceneSetup *setup, Ar
 void GFL_G3DMgrDeleteScene(G3DManager *manager, u16 scene);
 u16 GFL_G3DMgrGetSceneResCount(G3DManager *manager, u16 scene);
 u16 GFL_G3DSceneGetNodeActorCount(G3DManager *manager, u16 scene);
-void *GFL_G3DMgrGetResource(G3DManager *manager, u16 resource);
+G3DResource *GFL_G3DMgrGetResource(G3DManager *manager, u16 resource);
 // The index of an actor, which GFL_G3DMgrGetActor takes. A scene's actors have consecutive indices
 G3DActor *GFL_G3DMgrGetActor(G3DManager *manager, u16 actor);
 u16 GFL_G3DMgrGetSceneFirstActorIdx(G3DManager *manager, u16 scene);

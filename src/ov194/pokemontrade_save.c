@@ -376,7 +376,7 @@ static void func_ov194_021bf0c4(PokemonTradeWork *wk) {
 static BOOL func_ov194_021bf1ec(PokemonTradeWork *wk, PokeParty *party, int slot) {
     int chatots = 0;
     int count, i;
-    void *chatter = getChatterDataAddress(wk->gameData);
+    PerapVoice *chatter = getChatterDataAddress(wk->gameData);
     if (!doesChatotExist(chatter)) {
         return FALSE;
     }

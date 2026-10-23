@@ -133,7 +133,8 @@ typedef struct {
     u16 move;
 } RegulationExtraRule;
 
-// The rules of a regulation as text: the message data and, for each of the six rules, its name and its value
+// The rules of a regulation as text (PokeRegulation_CreatePrintMsg): the message data and, for each of the six rules,
+// its name and its value. The Union Room's system keeps one in alloc.rpm
 struct RegulationPrintMsg {
     MsgData *msgData;
     StrBuf *rule[6];
@@ -163,7 +164,8 @@ Regulation *PokeRegulation_LoadNew(u32 fileId, HeapID heapId);
 void PokeRegulation_Load(u32 fileId, Regulation *regulation);
 // The regulation's rules as text (a RegulationPrintMsg). launcher is used when the regulation leaves the Wonder
 // Launcher to the players
-void *PokeRegulation_CreatePrintMsg(Regulation *regulation, WordSet *wordset, HeapID heapId, BOOL launcher);
+RegulationPrintMsg *PokeRegulation_CreatePrintMsg(Regulation *regulation, WordSet *wordset, HeapID heapId,
+                                                  BOOL launcher);
 void PokeRegulation_FreePrintMsg(RegulationPrintMsg *printMsg);
 // Picks Pokémon of a party that the regulation allows, by their slots from 1, and returns whether it found a team
 BOOL PokeRegulation_PickTeam(Regulation *regulation, PokeParty *party, u8 *picked);

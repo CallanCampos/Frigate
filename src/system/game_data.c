@@ -82,7 +82,7 @@ struct GameData {
     ZoneSpawnInfo *escapeRopeSpawn;
     ZoneSpawnInfo entralinkParentSpawn;
     // The battle bag's cursor memory (save/bag.h)
-    void *bagCursor;
+    BagCursor *bagCursor;
     BagSave *bag;
     PokeParty *party;
     Config *config;
@@ -366,7 +366,7 @@ u16 GetReturnLocationIdx(GameData *gameData) {
     return respawnLocation;
 }
 
-void *GameData_GetBagCursor(GameData *gameData) {
+BagCursor *GameData_GetBagCursor(GameData *gameData) {
     return gameData->bagCursor;
 }
 
@@ -667,7 +667,7 @@ BOOL GameData_IsShortcutRegistered(GameData *gameData, u32 item) {
     return ShortcutSave_IsRegistered(SaveControl_GetShortcutSave(GameData_GetSaveControl_(gameData)), item);
 }
 
-void *GameData_GetShortcutMenuPos(GameData *gameData) {
+ShortcutMenuPos *GameData_GetShortcutMenuPos(GameData *gameData) {
     return &gameData->shortcutMenuPos;
 }
 
@@ -840,7 +840,7 @@ BSubwayScoreData *GameData_GetBSubwayScoreData(GameData *gameData) {
     return SaveControl_GetBlockPtr(gameData->saveControl, SAVE_BLOCK_BSUBWAY_SCORE);
 }
 
-void *GameData_GetBSubwayWifiData(GameData *gameData) {
+BSubwayWifiData *GameData_GetBSubwayWifiData(GameData *gameData) {
     return SaveControl_GetBlockPtr(gameData->saveControl, SAVE_BLOCK_BSUBWAY_3A);
 }
 
@@ -872,11 +872,11 @@ TrialHouseWork **GetTrialHouseWkPPtr(GameData *gameData) {
     return &gameData->trialHouseWork;
 }
 
-void *getTimeSigSaveBlock(GameData *gameData) {
+TimeSigSave *getTimeSigSaveBlock(GameData *gameData) {
     return getTimeSigBlkAddress(gameData->saveControl);
 }
 
-void *GameData_GetHallOfFameTeam(GameData *gameData) {
+HallOfFameTeam *GameData_GetHallOfFameTeam(GameData *gameData) {
     return SaveControl_GetBlockPtr(gameData->saveControl, SAVE_BLOCK_40);
 }
 
@@ -904,7 +904,7 @@ PokewoodSystem **GameData_GetPokewoodSystemPtr(GameData *gameData) {
     return &gameData->pokewoodSystem;
 }
 
-void *getChatterDataAddress(GameData *gameData) {
+PerapVoice *getChatterDataAddress(GameData *gameData) {
     return getChatterBlockAddress(gameData->saveControl);
 }
 
@@ -928,7 +928,7 @@ FieldFollowWk *GetFieldFollowerCfg(GameData *gameData) {
     return gameData->followWk;
 }
 
-void *GetTradedPokemonBlock(GameData *gameData) {
+TradedPokemonSave *GetTradedPokemonBlock(GameData *gameData) {
     return SaveControl_GetBlockPtr(gameData->saveControl, SAVE_BLOCK_TRADED_POKEMON);
 }
 

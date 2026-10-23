@@ -23,12 +23,12 @@ typedef struct {
     u16 objCode;
 } ActorG3DEntry;
 
-typedef struct {
+struct ActorG3DSystem {
     MMSys *system;
     FieldG3DObjSystem *objSystem;
     u16 count;
     ActorG3DEntry *entries;
-} ActorG3DSystem;
+};
 
 // What an animation command with a wait keeps in the actor's work
 typedef struct {
@@ -76,7 +76,7 @@ static void RailActorAcmd_InitJump(FieldActor *actor, u32 dir, u32 speed, u32 ti
 // The direction an actor on the rails faces, by the sixteenth of a turn from the camera angle to its way along the rail
 static const u8 FACE_DIRS_BY_ANGLE[16] = { 1, 3, 3, 3, 3, 3, 3, 0, 0, 2, 2, 2, 2, 2, 2, 1 };
 
-void FieldActorG3DSystem_Create(MMSys *system, void *g3dObjSystem) {
+void FieldActorG3DSystem_Create(MMSys *system, FieldG3DObjSystem *g3dObjSystem) {
     HeapID heapId = FldActSys_GetFieldHeapID(system);
     ActorG3DSystem *sys = GFL_HeapAllocate(heapId, sizeof(ActorG3DSystem), TRUE, "fldmmdl_g3dobj.c", 72);
 

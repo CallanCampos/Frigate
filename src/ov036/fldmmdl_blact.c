@@ -304,7 +304,7 @@ static u16 FldActSys_AddBlActWithPalette(MMSys *system, VecFx32 *pos, u32 sizeId
     u16 actor = FldActSys_AddBlActDefault(system, pos, sizeIdx, ctrlType, mat);
 
     if (palMat != BLACT_NONE) {
-        BlActSys_ShareActorPltt(((FieldBlAct *)FldActSys_GetFieldBlAct(system))->sys, actor, palMat);
+        BlActSys_ShareActorPltt(FldActSys_GetFieldBlAct(system)->sys, actor, palMat);
     }
     return actor;
 }

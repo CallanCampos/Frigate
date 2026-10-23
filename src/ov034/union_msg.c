@@ -872,7 +872,7 @@ void UnionMsg_CreateRulesWindow(UnionSystem *unisys, Field *field, u32 okMask, u
     }
 
     for (i = 0; i < 6; i++) {
-        RegulationRulesText *rpm;
+        RegulationPrintMsg *rpm;
         u16 color;
 
         if (okMask & (1 << i)) {

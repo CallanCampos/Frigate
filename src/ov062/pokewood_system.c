@@ -114,7 +114,7 @@ u16 PokewoodSystem_GetSaveSlot(PokewoodSystem *sys) {
     return sys->unkDA;
 }
 
-void *PokewoodSystem_GetPokewoodBlk(PokewoodSystem *sys) {
+PokewoodBlock *PokewoodSystem_GetPokewoodBlk(PokewoodSystem *sys) {
     return sys->pokewoodBlk;
 }
 

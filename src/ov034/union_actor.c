@@ -252,7 +252,7 @@ static BOOL UnionOneself_ShowFocus(UnionSystem *unisys, UnionBeaconEntry *entry)
         if (slot != NULL && entry->beacon.members[i].used == 1 &&
             GFL_STD_MemCmp(entry->beacon.members[i].mac, unisys->situ.mac78, 6) == 0) {
             if (GSYS_CheckField(unisys->param->gsys) == TRUE) {
-                void *effWork = func_ov036_0218051c(GSYS_GetField(unisys->param->gsys));
+                UnionEffect *effWork = func_ov036_0218051c(GSYS_GetField(unisys->param->gsys));
 
                 if (effWork != NULL) {
                     u16 id = UnionOneself_GetActorId(entry, slot);
@@ -276,7 +276,7 @@ void UnionOneself_UpdateActors(UnionSystem *unisys, GameData *gameData, Field *f
     BOOL focus = FALSE;
     RivalDataSave *rival;
     WifiList *wifiList;
-    void *effWork;
+    UnionEffect *effWork;
     MMSys *mmsys;
     UnionBeaconEntry *entry;
 
@@ -373,7 +373,7 @@ static BOOL UnionOneself_UpdateTimeout(UnionSystem *unisys, UnionBeaconEntry *en
 void UnionOneself_UpdateMarks(UnionSystem *unisys, GameData *gameData, Field *field) {
     RivalDataSave *rival = getHollow_RivalData(GameData_GetSaveControl(gameData));
     WifiList *wifiList = GameData_GetWifiList(gameData);
-    void *effWork = func_ov036_0218051c(field);
+    UnionEffect *effWork = func_ov036_0218051c(field);
     UnionBeaconEntry *entry = unisys->found;
     int i;
 

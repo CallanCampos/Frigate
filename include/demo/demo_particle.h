@@ -2,6 +2,7 @@
 #define POKEBW2_DEMO_DEMO_PARTICLE_H
 
 #include "types.h"
+#include "gfl/particle.h"
 
 // The particles of the evolution and egg hatching demos (ov284 and ov307). Each overlay has its own copy of the
 // functions over this layout, which emit particles at set frames through the particle system of gfl/particle.h
@@ -19,7 +20,7 @@ typedef struct {
 // A particle system with its resource
 typedef struct {
     u8 buffer[DEMO_PARTICLE_BUFFER_SIZE];
-    void *system;
+    ParticleSystem *system;
     u8 resourceCount;
 } DemoParticleUnit;
 

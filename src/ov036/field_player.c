@@ -541,7 +541,7 @@ BOOL func_ov036_0219ad00(FieldPlayer *player) {
     return func_ov036_0219d018(player->nogrid);
 }
 
-void *func_ov036_0219ad0c(FieldPlayer *player) {
+RailUnit *func_ov036_0219ad0c(FieldPlayer *player) {
     return func_ov036_0219d05c(player->nogrid);
 }
 

@@ -217,7 +217,7 @@ void EventFieldAppCall_ConvAppResultToEventType(u32 result, u32 *eventType) {
 void FieldAppCall_ClearBagFreeSpaceFilter(FieldAppCallWork *work) {
     GameSystem *gsys = work->input->gameSystem;
     GameData *gameData = GSYS_GetGameData(gsys);
-    void *data = GameData_GetBagCursor(gameData);
+    BagCursor *data = GameData_GetBagCursor(gameData);
 
     BagCursor_SetFreeSpaceFilter(data, 0);
 }

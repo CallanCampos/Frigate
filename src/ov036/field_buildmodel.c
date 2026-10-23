@@ -130,12 +130,12 @@ void FieldPropSystem_LoadArea(FieldPropSystem *system, u16 zoneId, AreaData *are
     FieldPropSystem_InstantiateResources(system, &system->resBank);
 }
 
-void *FieldPropSystem_FindResInfo(FieldPropSystem *system, u32 resId) {
+FieldPropResInfo *FieldPropSystem_FindResInfo(FieldPropSystem *system, u32 resId) {
     u32 index = FieldPropSystem_ConvResIDToIndex(system, resId);
     return FieldPropResBundle_GetResInfo(system->resBundle, index);
 }
 
-void *FieldPropSystem_GetResInfo(FieldPropSystem *system, u32 index) {
+FieldPropResInfo *FieldPropSystem_GetResInfo(FieldPropSystem *system, u32 index) {
     return FieldPropResBundle_GetResInfo(system->resBundle, index);
 }
 

@@ -71,12 +71,12 @@ struct LinkFestival {
     u16 lastTotal;
     ArcTool *archive;
     // File 0 of the archive: every mission's FestMissionHeader (field/fest_mission_data.h)
-    void *headers;
+    FestMissionHeader *headers;
     FestMissionConfig config;
     // The two parts of config
     FestMissionInfo *info;
-    // The FestMissionHeader at the start of config
-    void *missionHeader;
+    // config's FestMissionHeader
+    FestMissionHeader *missionHeader;
     FestMissionRecord records[LINK_FESTIVAL_RECORD_COUNT];
     // The current mission
     FestMissionRecord current;
@@ -130,9 +130,9 @@ u16 LinkFestival_GetScore(LinkFestival *festival);
 // The mission's seconds left
 u16 LinkFestival_GetSecondsLeft(LinkFestival *festival);
 void LinkFestival_GetRanking(LinkFestival *festival, LinkFestivalRanking *ranking);
-void *LinkFestival_GetLog(LinkFestival *festival);
-void *LinkFestival_GetViewLog(LinkFestival *festival);
-void *LinkFestival_GetPassPowers(LinkFestival *festival);
+FestMissionLog *LinkFestival_GetLog(LinkFestival *festival);
+FestMissionLog *LinkFestival_GetViewLog(LinkFestival *festival);
+FestMissionPassPowers *LinkFestival_GetPassPowers(LinkFestival *festival);
 // Copies a mission's FestMissionHeader to dest
 void FetchFestMissionCfgGimmickID(LinkFestival *festival, u8 index, FestMissionHeader *dest);
 void LinkFestival_StartMission(LinkFestival *festival, void *mission, u8 joined);
@@ -166,7 +166,7 @@ void FestMissionEntry_Clear(FestMissionEntry *entry);
 int LinkFestival_UpdateMember(LinkFestival *festival, FestMissionEntry *entry, u32 *out);
 void LinkFestival_StartTimer(LinkFestival *festival, u32 arg1);
 u32 GetTrainerCardTextMSGID(u32 type);
-void *FieldFMissionInfo_Create(GameSystem *gsys, HeapID heapId);
+FieldFMissionInfo *FieldFMissionInfo_Create(GameSystem *gsys, HeapID heapId);
 void FieldFMissionInfo_Free(FieldFMissionInfo *work);
 void FieldFMissionInfo_Update(FieldFMissionInfo *work);
 void FieldFMissionInfo_UpdateDisplay(FieldFMissionInfo *work);

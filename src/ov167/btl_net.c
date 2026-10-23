@@ -503,7 +503,7 @@ BOOL BtlNet_IsTrainerReceived(void) {
     return FALSE;
 }
 
-void *BtlNet_GetTrainer(void) {
+BtlCommTrainerData *BtlNet_GetTrainer(void) {
     return sWork->tempBuffer;
 }
 

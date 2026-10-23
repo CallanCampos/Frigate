@@ -207,10 +207,10 @@ struct UnionSystem {
     // The names of these six are the ROM's, from overlay 34's asserts
     WordSet *wordset;
     MsgData *msgdata;
-    void *fld_msgwin_stream;
+    InfoMsgWin *fld_msgwin_stream;
     ListMenuUI *fldmenu_func;
-    void *fldmenu_yesno_func;
-    void *fldmsgwin;
+    ListMenuUI *fldmenu_yesno_func;
+    InfoMsgWin *fldmsgwin;
     u32 unk281C;
     StrBuf *msgbuf; // the message, and with its words set
     StrBuf *fmtbuf;
@@ -232,8 +232,9 @@ struct UnionSystem {
     struct {
         UnionApp *uniapp;
         Regulation *regulation;
-        void *rpm; // the regulation's rules printed, from PokeRegulation_CreatePrintMsg (the name is the ROM's)
-        void *partySelect;
+        RegulationPrintMsg
+            *rpm; // the regulation's rules printed, from PokeRegulation_CreatePrintMsg (the name is the ROM's)
+        PartySelectList *partySelect;
         PokeParty *boxParty; // the Battle Box as a party
         TrainerCardParam *cardParam;
         TrainerCardData *my_card;

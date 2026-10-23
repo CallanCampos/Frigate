@@ -170,7 +170,7 @@ struct GameBeaconSystem {
     // Whether the beacon is sent to Black 2 and White 2 only
     BOOL b2w2Only;
     StrBuf *nameBuf;
-    void *avenueWork;
+    JoinAvenueVisitor *avenueWork;
 };
 
 extern GameBeaconSystem *GameBeaconSys;

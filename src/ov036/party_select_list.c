@@ -108,7 +108,8 @@ static const ListMenuRequest sPartySelectRequest = {
     .height = 6,
 };
 
-void *func_ov036_021c3180(Field *field, PokeParty *temoti, PokeParty *bbox, u8 partyOk, u32 bboxOk, HeapID heapId) {
+PartySelectList *func_ov036_021c3180(Field *field, PokeParty *temoti, PokeParty *bbox, u8 partyOk, u32 bboxOk,
+                                     HeapID heapId) {
     PartySelectList *psl;
 
     // clang-format off

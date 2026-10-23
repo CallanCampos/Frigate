@@ -139,8 +139,8 @@ void FMissionLogFApp_EndMission(LinkFestival *festival, FMissionAppResult *resul
         FestRecords_AddCompleted(funfest);
         if (!festival->info->unk0_30) {
             FestRecords_UpdateMissionLevel(funfest, (u8)festival->info->index, festival->info->level + 1);
-            if (((FestMissionHeader *)festival->missionHeader)->unk02 != 0) {
-                EventWork_FlagSet(eventWork, ((FestMissionHeader *)festival->missionHeader)->unk02);
+            if (festival->missionHeader->unk02 != 0) {
+                EventWork_FlagSet(eventWork, festival->missionHeader->unk02);
             }
         }
         score = festival->config.missionId;

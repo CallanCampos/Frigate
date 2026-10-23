@@ -357,7 +357,7 @@ GameEvent *EventCaptureDemo_Create(GameSystem *gsys, Field *field, HeapID heapId
 
 GameEvent *LoadTradedPokemonBattleStats(GameSystem *gsys, Field *field, u32 a2, u32 a3, u32 trainerId, u32 a5,
                                         u32 flags, u32 index) {
-    void *block = GetTradedPokemonBlock(GSYS_GetGameData(gsys));
+    TradedPokemonSave *block = GetTradedPokemonBlock(GSYS_GetGameData(gsys));
     GameEvent *event = EventTrainerBattleCall_Create(gsys, field, a2, a3, trainerId, a5, flags);
 
     if (TradedPokemonSave_IsTraded(block, index)) {

@@ -67,7 +67,7 @@ BOOL s0198_FieldSubscreenChange(VM *vm, FieldScriptEnv *env) {
 
 BOOL s0199_FieldSubscreenReturn(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
-    FieldSubscreen *subscreen = Field_GetSubscreen(((ScriptFieldWork *)ScriptWork_GetFieldWork(work))->field);
+    FieldSubscreen *subscreen = Field_GetSubscreen(ScriptWork_GetFieldWork(work)->field);
     GameEvent *event = GameEvent_Create(FieldScriptEnv_GetGameSystem(env), NULL, EventFieldSubscreenChange_Callback,
                                         sizeof(EventFieldSubscreenChange));
     EventFieldSubscreenChange *change = GameEvent_GetData(event);

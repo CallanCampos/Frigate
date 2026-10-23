@@ -126,7 +126,7 @@ BOOL UnionEff_IsFriendBeacon(WifiList *wifiList, const UnionBeacon *beacon) {
     return FALSE;
 }
 
-void *UnionEff_Create(HeapID heapId) {
+UnionEffect *UnionEff_Create(HeapID heapId) {
     UnionEffect *eff = GFL_HeapAllocate(heapId, sizeof(UnionEffect), TRUE, "union_eff.c", 142);
 
     UnionEff_LoadFocus(&eff->focus, heapId);

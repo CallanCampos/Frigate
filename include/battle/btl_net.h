@@ -4,6 +4,7 @@
 // Overlay 167's link battle functions, which exchange the clients' data before a link battle starts
 
 #include "types.h"
+#include "battle/btl_setup.h"
 #include "gfl/heap.h"
 #include "gfl/net_command.h"
 #include "struct_decls.h"
@@ -35,7 +36,8 @@ BOOL BtlNet_ArePlayerInfosReceived(void);
 PlayerInfo *BtlNet_GetPlayerInfo(u8 clientId);
 BOOL BtlNet_SendTrainer(BtlSetupTrainer *trainer);
 BOOL BtlNet_IsTrainerReceived(void);
-void *BtlNet_GetTrainer(void);
+// The trainer that arrived, until BtlNet_FreeTrainer
+BtlCommTrainerData *BtlNet_GetTrainer(void);
 void BtlNet_FreeTrainer(void);
 void BtlNet_EndTrainerExchange(void);
 void BtlNet_StartTiming(u8 id);

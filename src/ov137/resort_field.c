@@ -42,7 +42,7 @@ typedef BOOL (*ResortWatchCallback)(void *context, void *person, u32 a2, u32 eve
 typedef struct {
     JoinAvenuePersonList *list;
     JoinAvenuePersonList *list2;
-    void *entries;
+    JoinAvenueEntryList *entries;
     void *context;
     ResortWatchCallback callback;
     u32 interval;
@@ -54,7 +54,7 @@ typedef struct {
     ResortWatchSetup setup;
     JoinAvenuePersonList *list;
     JoinAvenuePersonList *list2;
-    void *entries;
+    JoinAvenueEntryList *entries;
     u32 timer;
     BOOL changed;
 } ResortWatch;
@@ -350,7 +350,7 @@ void ResortField_Setup(Field *field) {
     FieldExpObjSystem *expObj;
     BOOL bubblesEnabled;
     u32 i;
-    void *entries;
+    JoinAvenueEntryList *entries;
 
     heapId = Field_GetHeapID(field);
     gameData = GSYS_GetGameData(Field_GetGameSystem(field));
@@ -396,7 +396,7 @@ void ResortField_Setup(Field *field) {
     block = getHollow_RivalBlk(GameData_GetSaveControl(gameData));
     entries = ResortSys_GetEntries(work->sys);
     for (i = 0; i < JoinAvenueEntryList_GetCount(entries); i++) {
-        void *entry = JoinAvenueEntryList_Get(entries, i);
+        JoinAvenueEntry *entry = JoinAvenueEntryList_Get(entries, i);
         if (!JoinAvenueEntry_IsEmpty(entry) &&
             (u16)JoinAvenueEntry_GetParam(entry, JOIN_AVE_PARAM_TRAINER_TYPE, NULL) == 223) {
             HollowRivalSave_SetValue(block, 2, 15);
@@ -542,7 +542,7 @@ static void ResortWatch_CheckEntries(ResortWatch *watch) {
     if (watch->changed) {
         u32 i;
         for (i = 0; i < JoinAvenueEntryList_GetCount(watch->entries); i++) {
-            void *entry = JoinAvenueEntryList_Get(watch->entries, i);
+            JoinAvenueEntry *entry = JoinAvenueEntryList_Get(watch->entries, i);
             if (!JoinAvenueEntry_IsEmpty(entry)) {
                 watch->setup.callback(watch->setup.context, entry, 1, 2);
             }
@@ -1899,12 +1899,12 @@ static void ResortField_AddSpecialEntry(ResortSys *sys, GameData *gameData, Heap
     BOOL add = FALSE;
 
     if (EventWork_FlagGet(eventWork, 2400) && JoinAvenue_GetParam(info, 24, NULL) == 0) {
-        void *entries = ResortSys_GetEntries(sys);
+        JoinAvenueEntryList *entries = ResortSys_GetEntries(sys);
         u32 i;
 
         add = TRUE;
         for (i = 0; i < JoinAvenueEntryList_GetCount(entries); i++) {
-            void *entry = JoinAvenueEntryList_Get(entries, i);
+            JoinAvenueEntry *entry = JoinAvenueEntryList_Get(entries, i);
             if (!JoinAvenueEntry_IsEmpty(entry) &&
                 JoinAvenueEntry_GetParam(entry, JOIN_AVE_PARAM_SHOP_KIND, NULL) == 5) {
                 add = FALSE;

@@ -36,12 +36,12 @@ FieldMsgBG *Field_GetMsgBGSys(Field *field);
 BOOL Field_IsEventRunning(Field *field);
 u32 Field_GetRenderMode(Field *field);
 void Field_SetRenderMode(Field *field, u32 mode);
-void *Field_GetSceneArea(Field *field);
+FieldSceneArea *Field_GetSceneArea(Field *field);
 void Field_SetFadeFlag(Field *field, BOOL flag);
 u16 Field_GetDayPeriod(Field *field);
 BOOL Field_GetSeasonBannerOverdrawFlag(Field *field);
 void Field_SetEffectRunningFlag(Field *field, BOOL flag);
-void *Field_GetNDemoDataHandle(Field *field);
+FaceUpWork **Field_GetNDemoDataHandle(Field *field);
 void Field_SetCasteliaRush(Field *field, CasteliaRush *rush);
 CasteliaRush *Field_GetCasteliaRush(Field *field);
 FieldColorPostFX *Field_GetColorPostFX(Field *field);
@@ -70,13 +70,13 @@ GameEvent *JoinAvenueNameEntry_Create(u16 target, GameSystem *gsys, u16 *result,
 GameEvent *func_ov036_021aebf0(GameSystem *gsys, u32 a1, Regulation *regulation, u16 *result, HeapID heapId);
 u32 func_ov036_021aece0(GameSystem *gsys, u32 a1, Regulation *regulation, HeapID heapId);
 // The screen that picks the party or the Battle Box for a battle, whether it is done, and the choice
-void *func_ov036_021c3180(Field *field, PokeParty *party, PokeParty *battleBoxParty, u8 partyOk, u32 battleBoxOk,
-                          HeapID heapId);
+PartySelectList *func_ov036_021c3180(Field *field, PokeParty *party, PokeParty *battleBoxParty, u8 partyOk,
+                                     u32 battleBoxOk, HeapID heapId);
 BOOL func_ov036_021c3278(PartySelectList *select);
 int func_ov036_021c3218(PartySelectList *select, u32 *a1);
-void *func_ov036_021c6574(void *effects, u32 a1, const VecFx32 *pos);
-void func_ov036_021c65a8(void *obj, u16 a1);
-void func_ov036_021c65e8(void *obj, u16 a1);
+FieldEffectTask *func_ov036_021c6574(FieldEffects *effects, u32 a1, const VecFx32 *pos);
+void func_ov036_021c65a8(FieldEffectTask *task, u16 a1);
+void func_ov036_021c65e8(FieldEffectTask *task, u16 a1);
 void FieldPlayer_SetWPos(FieldPlayer *player, const VecFx32 *pos);
 void FieldPlayer_SetDirection(FieldPlayer *player, u16 dir);
 void FieldFadeTCB_Start(GameSystem *gsys, Field *field, u32 a2, u32 a3, u32 a4);
@@ -155,7 +155,7 @@ void Field_RequestClose(Field *field);
 BOOL Field_CheckMapLoadFinished(Field *field);
 void FieldRenderPhase2_FieldEffect(Field *field);
 void FieldRenderPhase2_EncountEffect(Field *field);
-void *FieldG2D_GetDispControl(Field *field);
+FieldDispControl *FieldG2D_GetDispControl(Field *field);
 FieldEffects *Field_GetFieldEffects(Field *field);
 FieldG3DObjSystem *Field_GetG3DObjSys(Field *field);
 u32 GetZoneFogIndex(u16 zoneId);

@@ -39,7 +39,7 @@ LinkFestival *CreateLinkFestival(HeapID heapId, GameSystem *gsys) {
     festival->headers = FestMissionData_LoadHeaders(festival->archive, heapId);
     ClearFesMissionCfg(&festival->config);
     festival->info = (FestMissionInfo *)&festival->config;
-    festival->missionHeader = &festival->config.type;
+    festival->missionHeader = &festival->config.header;
     festival->best = LinkFestivalBest_Create(heapId);
     ClearLinkFestivalData(festival);
     festival->beaconInterval = 600;
@@ -147,15 +147,15 @@ void LinkFestival_GetRanking(LinkFestival *festival, LinkFestivalRanking *rankin
     }
 }
 
-void *LinkFestival_GetLog(LinkFestival *festival) {
+FestMissionLog *LinkFestival_GetLog(LinkFestival *festival) {
     return &festival->log;
 }
 
-void *LinkFestival_GetViewLog(LinkFestival *festival) {
+FestMissionLog *LinkFestival_GetViewLog(LinkFestival *festival) {
     return &festival->viewLog;
 }
 
-void *LinkFestival_GetPassPowers(LinkFestival *festival) {
+FestMissionPassPowers *LinkFestival_GetPassPowers(LinkFestival *festival) {
     return &festival->passPowers;
 }
 

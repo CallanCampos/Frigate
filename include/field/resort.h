@@ -26,7 +26,7 @@ typedef struct {
     // A second list, or NULL
     JoinAvenuePersonList *list2;
     // The twelve entries of JoinAvenueEntryList_Get
-    void *entries;
+    JoinAvenueEntryList *entries;
     JoinAvenueInfo *info;
 } ResortSysSetup;
 
@@ -96,7 +96,7 @@ ResortNPC *ResortField0_GetNPC(Field *field);
 JoinAvenuePerson *ResortPerson_GetJoinAvenuePerson(ResortPerson *person);
 void ResortPerson_UpdateObjCode(ResortPerson *person);
 void ResortPerson_SetTalking(ResortPerson *person, u32 value);
-void *ResortPerson_GetShop(ResortPerson *person);
+JoinAvenueShop *ResortPerson_GetShop(ResortPerson *person);
 // Moves the person's actor to where its type puts it
 void ResortPerson_MoveToHome(ResortPerson *person);
 void ResortPerson_GetFacingPos(ResortPerson *person, u16 *x, u16 *z, u16 *dir);
@@ -194,7 +194,7 @@ ResortSlots *ResortSys_GetSlots(ResortSys *sys);
 JoinAvenueOccupants *ResortSys_GetOccupants(ResortSys *sys);
 JoinAvenuePersonList *ResortSys_GetList(ResortSys *sys);
 JoinAvenuePersonList *ResortSys_GetList2(ResortSys *sys);
-void *ResortSys_GetEntries(ResortSys *sys);
+JoinAvenueEntryList *ResortSys_GetEntries(ResortSys *sys);
 JoinAvenueInfo *ResortSys_GetInfo(ResortSys *sys);
 ResortWork *ResortSys_GetWork(ResortSys *sys);
 // The answer to a question of the scripts: a message of SCRIPT_TEXT_GLOBAL_10685 for the person, or a number

@@ -117,7 +117,7 @@ void FieldChunk_UnbindArc(FieldChunk *chunk) {
     }
 }
 
-void FieldChunk_BindMapTextures(FieldChunk *chunk, void *textures) {
+void FieldChunk_BindMapTextures(FieldChunk *chunk, G3DResource *textures) {
     chunk->mapTextures = textures;
 }
 
@@ -229,7 +229,7 @@ void FieldChunk_UnbindModel(FieldChunk *chunk) {
     GFL_G3DResBindData(chunk->modelRsc, 1, NULL);
 }
 
-void *FieldChunk_GetModelResource(FieldChunk *chunk) {
+G3DResource *FieldChunk_GetModelResource(FieldChunk *chunk) {
     return chunk->modelRsc;
 }
 
@@ -237,12 +237,12 @@ void FieldChunk_FreeTexRsc(FieldChunk *chunk) {
     GFL_G3DResBindData(chunk->texRsc, 2, NULL);
 }
 
-void *FieldChunk_GetUsedTexRsc(FieldChunk *chunk) {
+G3DResource *FieldChunk_GetUsedTexRsc(FieldChunk *chunk) {
     return FieldChunk_GetUsedTexRscCore(chunk);
 }
 
 void FieldChunk_SetupModel(FieldChunk *chunk) {
-    void *texture = FieldChunk_GetUsedTexRscCore(chunk);
+    G3DResource *texture = FieldChunk_GetUsedTexRscCore(chunk);
     FieldChunk_LinkMdlTex(chunk->model, chunk->modelRsc, texture);
 }
 
@@ -418,9 +418,9 @@ static inline NNSG3dResMdl *FieldChunk_GetFirstMdl(const NNSG3dResMdlSet *mdlSet
     return NULL;
 }
 
-void FieldChunk_LinkMdlTex(NNSG3dRenderObj *model, void *resource, void *texture) {
-    void *mdlFile = GFL_G3DResGetResData(resource);
-    void *texFile = GFL_G3DResGetResData(texture);
+void FieldChunk_LinkMdlTex(NNSG3dRenderObj *model, G3DResource *resource, G3DResource *texture) {
+    NNSG3dResFileHeader *mdlFile = GFL_G3DResGetResData(resource);
+    NNSG3dResFileHeader *texFile = GFL_G3DResGetResData(texture);
     NNSG3dResTex *tex = NULL;
     NNSG3dResMdl *mdl = FieldChunk_GetFirstMdl(NNS_G3dGetMdlSet(mdlFile));
 
@@ -474,7 +474,7 @@ s32 FieldChunk_CheckBBox(const GXBoxTestParam *box) {
     return in;
 }
 
-void *FieldChunk_GetUsedTexRscCore(FieldChunk *chunk) {
+G3DResource *FieldChunk_GetUsedTexRscCore(FieldChunk *chunk) {
     if (GFL_G3DResGetResData(chunk->texRsc) == NULL && chunk->mapTextures != NULL) {
         return chunk->mapTextures;
     }

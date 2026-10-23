@@ -18,8 +18,8 @@ struct FishingEventWork {
     s16 gridZ;
     u16 unk26;
     u32 playerExState;
-    void *effect2C;
-    void *effect30;
+    FieldEffectTask *effect2C;
+    FieldEffectTask *effect30;
     VecFx32 playerPos;
     VecFx32 fishingPos;
     u8 unk4C[12];

@@ -46,7 +46,7 @@ struct PokewoodSystem {
     u16 *resultVar;
     u16 unkD8;
     u16 unkDA;
-    void *pokewoodBlk;
+    PokewoodBlock *pokewoodBlk;
     PokewoodRecord record;
     u32 unkF4;
     u8 unkF8[8];
@@ -66,7 +66,7 @@ void PokewoodSystem_SetMovie(PokewoodSystem *sys, int movie);
 u16 PokewoodSystem_GetMovie(PokewoodSystem *sys);
 void PokewoodSystem_SetSaveSlot(PokewoodSystem *sys, u16 value);
 u16 PokewoodSystem_GetSaveSlot(PokewoodSystem *sys);
-void *PokewoodSystem_GetPokewoodBlk(PokewoodSystem *sys);
+PokewoodBlock *PokewoodSystem_GetPokewoodBlk(PokewoodSystem *sys);
 void PokewoodSystem_CopyCast(PokewoodSystem *sys, GameData *gameData, PokeParty *party);
 void PokewoodSystem_SetResultFlag(PokewoodSystem *sys, GameData *gameData, u32 movie, u32 result);
 void Pokewood_CheckMedals(GameData *gameData);
