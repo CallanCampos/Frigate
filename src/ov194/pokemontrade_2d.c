@@ -728,13 +728,13 @@ static void func_ov194_021c3904(PokemonTradeWork *wk, BoxSaveAccessor *boxes, in
                                                         wk->iconCharData + slot * 0x200, 0x200)) {
                     MI_CpuCopy8(
                         wk->iconCharData + slot * 0x200,
-                        (void *)((u32)G2S_GetOBJCharPtr() + ImageProxy_GetLocation(&proxy, NNS_G2D_VRAM_TYPE_2DSUB)),
+                        (void *)((uptr)G2S_GetOBJCharPtr() + ImageProxy_GetLocation(&proxy, NNS_G2D_VRAM_TYPE_2DSUB)),
                         0x200);
                 }
             } else {
                 MI_CpuCopy8(
                     wk->iconCharData + slot * 0x200,
-                    (void *)((u32)G2S_GetOBJCharPtr() + ImageProxy_GetLocation(&proxy, NNS_G2D_VRAM_TYPE_2DSUB)),
+                    (void *)((uptr)G2S_GetOBJCharPtr() + ImageProxy_GetLocation(&proxy, NNS_G2D_VRAM_TYPE_2DSUB)),
                     0x200);
             }
             func_ov194_021c38d4(wk, column, i, pkm, isParty, index);
@@ -2288,21 +2288,21 @@ void func_ov194_021c5fe4(PokemonTradeWork *wk, BOOL dim) {
 
 // Sets the planes of the main screen shown, in the next V-blank
 void func_ov194_021c5ff4(PokemonTradeWork *wk, int planes) {
-    GFL_TCBMgrAddTask(GFL_VBlankGetTCBMgr(), func_ov194_021c6024, (void *)planes, 10);
+    GFL_TCBMgrAddTask(GFL_VBlankGetTCBMgr(), func_ov194_021c6024, (void *)(uptr)planes, 10);
 }
 
 // Sets the planes of the sub screen shown, in the next V-blank
 void func_ov194_021c600c(PokemonTradeWork *wk, int planes) {
-    GFL_TCBMgrAddTask(GFL_VBlankGetTCBMgr(), func_ov194_021c6038, (void *)planes, 10);
+    GFL_TCBMgrAddTask(GFL_VBlankGetTCBMgr(), func_ov194_021c6038, (void *)(uptr)planes, 10);
 }
 
 static void func_ov194_021c6024(TCB *tcb, void *data) {
-    GFL_BGSysSetEnabledBGsA((int)data);
+    GFL_BGSysSetEnabledBGsA((int)(uptr)data);
     GFL_TCBRemove(tcb);
 }
 
 static void func_ov194_021c6038(TCB *tcb, void *data) {
-    GFL_BGSysSetEnabledBGsB((int)data);
+    GFL_BGSysSetEnabledBGsB((int)(uptr)data);
     GFL_TCBRemove(tcb);
 }
 
