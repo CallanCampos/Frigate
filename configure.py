@@ -24,7 +24,6 @@ from pathlib import Path
 
 ROOT = Path(__file__).parent.resolve()
 sys.path.insert(0, str(ROOT))
-from tools.build.object_aliases import label_aliases  # noqa: E402
 from tools.data.gen_constants import ordered_files  # noqa: E402
 from tools.data.graphics_archive import GRAPHICS, directory_archive  # noqa: E402
 from tools.text.pms_words import CATEGORIES as PMS_WORD_CATEGORIES  # noqa: E402
@@ -566,24 +565,15 @@ def add_version(n: Writer, version: str, dsd: Path, bugfix: bool, shift: int) ->
     as_defines = " ".join(f"-D{define}" for define in version_defines)
     objects = []
     compiled = []
-    # A function's second names, kept as labels in the configs, which the compiled object gets added, see
-    # tools/build/object_aliases.py
-    aliases = label_aliases(arm9_config.parent)
     for f in files:
         source = Path(f["name"])
         if source.suffix in (".c", ".cpp") and source.exists():
             obj = build_dir / source.with_suffix(".o")
             settings = source_compiler(source)
             rule = f"mwcc_{LIBRARY_COMPILERS.index(settings.compiler)}" if settings.is_library else "mwcc"
-            source_aliases = aliases.get(source.as_posix())
-            compiler_obj = obj.with_suffix(".unaliased.o") if source_aliases else obj
-            variables = {"defines": defines, "dep": compiler_obj.with_suffix(".d")}
+            variables = {"defines": defines, "dep": obj.with_suffix(".d")}
             variables["flags"] = " ".join(settings.flags)
-            n.build([compiler_obj], rule, [source], variables=variables, order_only=["constants_headers"])
-            if source_aliases:
-                n.build([obj], "object_aliases", [compiler_obj], implicit=["tools/build/object_aliases.py"],
-                        variables={"aliases": " ".join(f"{label}={function}"
-                                                       for label, function in sorted(source_aliases.items()))})
+            n.build([obj], rule, [source], variables=variables, order_only=["constants_headers"])
             compiled.append(obj)
         elif source.suffix == ".s" and source.exists():
             obj = build_dir / source.with_suffix(".o")
@@ -796,7 +786,6 @@ def main():
         lib_mwasm = tools_dir / "mwccarm" / compiler / "mwasmarm.exe"
         n.rule(f"mwasm_{i}", f"mkdir -p $$(dirname $out) && $wine {shlex.quote(str(lib_mwasm))} $flags -o $out $in",
                "Assembling $in")
-    n.rule("object_aliases", "$python tools/build/object_aliases.py $in $out $aliases", "Adding labels to $out")
     n.rule("lcf_symbols", "$python tools/build/lcf_symbols.py $in $out", "Adding NitroSDK's symbols to $out")
     n.rule("shift_lcf", "$python tools/build/shift_lcf.py $in $out $amount", "Shifting $in")
     n.rule("ltd_objects", "$python tools/build/ltd_objects.py $in $out", "Grouping the LTD autoload's objects in $out")

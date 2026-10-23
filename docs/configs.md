@@ -59,8 +59,10 @@ It also removes relocations and symbols that are not real (`remove-reloc`, `remo
 second name with `add-label`. MWCC calls the runtime's 64-bit multiply `_ll_mul` for signed values and `_ull_mul` for
 unsigned ones, while the game has one copy of it, so `_ll_mul` is a label on `_ull_mul`. `remove-label` drops a label
 again once its function takes the name, as the runtime's functions did when they took its names over swan's. A delinked
-object defines the label, and when the function's file is complete, `tools/build/object_aliases.py` adds the label to the
-compiled object, which can't define two names for one `asm` function (`docs/matching.md`). `add-data`
+object defines the label, but a compiled C file defines one name per function, so a label that code calls at a C
+function's start makes the link fail with the label undefined once the file is complete: the label is either a wrong
+target (`ReshZekSave_Init`'s call was such a label until its overlay 12 target, `CityState_Init`, was found) or a
+routine of a library written in assembly, whose `.s` file defines both (`docs/matching.md`). `add-data`
 adds an object that nothing references, such as a global constant that the compiler folds into the code but still emits,
 so that the object before it does not seem to run on over it.
 
