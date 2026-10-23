@@ -110,22 +110,22 @@ BOOL PassPower_IsBW1Compatible(int passPower);
 // The bit of a special pass power in the two bytes of HighLinkSave_GetSpecialFlags, or 0xff
 u8 PassPower_GetSPowerBaseID(int passPower);
 // Starts a pass power, bought with Pass Orbs when paid is set. It ends the pass power of the opposite effect
-void PassPower_Activate(u32 passPower, const void *data, BOOL paid);
+void PassPower_Activate(u32 passPower, const PassPowerData *data, BOOL paid);
 // The pass power that runs with the effect of the given one, and with a given effect, or PASS_POWER_NONE
-u32 PassPower_GetUsedIDByPassPower(u32 passPower, void *data);
+u32 PassPower_GetUsedIDByPassPower(u32 passPower, PassPowerData *data);
 u32 PassPower_GetUsedIDByEffect(int effect);
 // The time an effect has left, at least 1 while it runs
 u32 PassPower_GetRemainingSeconds(int effect);
 // A pass power whose time is up, or PASS_POWER_NONE. It runs on until it is ended
 u32 PassPower_GetDepletedID(void);
 // Ends the pass power that runs with the effect of the given one
-void PassPower_Deactivate(u32 passPower, void *data);
+void PassPower_Deactivate(u32 passPower, PassPowerData *data);
 // The pass powers' table, read from its archive
 void *PassPowerData_Create(HeapID heapId);
 void PassPowerData_Free(void *data);
 // A pass power's effect and its price in Pass Orbs, from the table of PassPowerData_Create
-u8 PassPowerData_GetEffect(void *data, u32 passPower);
-u16 PassPowerData_GetPrice(void *data, u32 passPower);
+u8 PassPowerData_GetEffect(PassPowerData *data, u32 passPower);
+u16 PassPowerData_GetPrice(PassPowerData *data, u32 passPower);
 // The pass powers on wild encounters: the encounter rate, the rolls for a shiny and the row of the slots' odds
 u32 PassPower_ApplyEncounter(u32 rate);
 // An egg's steps, and the friendship a Pokémon gains

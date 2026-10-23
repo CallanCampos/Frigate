@@ -354,8 +354,8 @@ void *TournamentBlock_GetEntry(TournamentBlock *tournament, u32 index) {
     return &tournament->entries[index];
 }
 
-void TournamentBlock_SetEntry(TournamentBlock *tournament, u32 index, const void *entry) {
-    tournament->entries[index] = *(const TournamentEntry *)entry;
+void TournamentBlock_SetEntry(TournamentBlock *tournament, u32 index, const TournamentEntry *entry) {
+    tournament->entries[index] = *entry;
 }
 
 void TournamentTeam_Clear(void *record) {
