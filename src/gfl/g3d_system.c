@@ -398,12 +398,12 @@ void GFL_G3DResFree(G3DResource *res) {
     }
 }
 
-void *GFL_G3DResGetResData(void *resource) {
-    return ((G3DResource *)resource)->data;
+void *GFL_G3DResGetResData(G3DResource *resource) {
+    return resource->data;
 }
 
-BOOL GFL_G3DResCheckType(void *resource, u32 type) {
-    u16 resType = ((G3DResource *)resource)->type;
+BOOL GFL_G3DResCheckType(G3DResource *resource, u32 type) {
+    u16 resType = resource->type;
 
     switch (type) {
     case G3D_RES_CHECK_NONE:
@@ -432,8 +432,8 @@ static void GFL_G3DResTrimTexData(G3DResource *resource) {
     GFL_HeapResize(data, (u8 *)tex + tex->texInfo.ofsTex - (u8 *)data);
 }
 
-BOOL GFL_G3DResUploadTexData(void *resource) {
-    NNSG3dResFileHeader *data = ((G3DResource *)resource)->data;
+BOOL GFL_G3DResUploadTexData(G3DResource *resource) {
+    NNSG3dResFileHeader *data = resource->data;
     NNSG3dResTex *tex = NNS_G3dGetTex(data);
     NNSGfdTexKey texKey;
     NNSGfdTexKey tex4x4Key;
@@ -456,7 +456,7 @@ BOOL GFL_G3DResUploadTexData(void *resource) {
     return FALSE;
 }
 
-BOOL GFL_G3DResUploadAndReleaseTexData(void *resource) {
+BOOL GFL_G3DResUploadAndReleaseTexData(G3DResource *resource) {
     if (!GFL_G3DResUploadTexData(resource)) {
         return FALSE;
     }
@@ -464,8 +464,8 @@ BOOL GFL_G3DResUploadAndReleaseTexData(void *resource) {
     return TRUE;
 }
 
-BOOL GFL_G3DResFreeTexData(void *resource) {
-    NNSG3dResTex *tex = NNS_G3dGetTex(((G3DResource *)resource)->data);
+BOOL GFL_G3DResFreeTexData(G3DResource *resource) {
+    NNSG3dResTex *tex = NNS_G3dGetTex(resource->data);
     NNSGfdTexKey texKey;
     NNSGfdTexKey tex4x4Key;
     BOOL texLoaded = FALSE;
@@ -490,8 +490,8 @@ BOOL GFL_G3DResFreeTexData(void *resource) {
     return TRUE;
 }
 
-BOOL GFL_G3DResSetupTexData(void *resource) {
-    NNSG3dResTex *tex = NNS_G3dGetTex(((G3DResource *)resource)->data);
+BOOL GFL_G3DResSetupTexData(G3DResource *resource) {
+    NNSG3dResTex *tex = NNS_G3dGetTex(resource->data);
     NNSGfdTexKey texKey;
     NNSGfdTexKey tex4x4Key;
     NNSGfdPlttKey pltKey;
@@ -510,8 +510,8 @@ BOOL GFL_G3DResSetupTexData(void *resource) {
     return FALSE;
 }
 
-BOOL GFL_G3DResUploadTexDataCore(void *resource) {
-    NNSG3dResFileHeader *data = ((G3DResource *)resource)->data;
+BOOL GFL_G3DResUploadTexDataCore(G3DResource *resource) {
+    NNSG3dResFileHeader *data = resource->data;
     NNSG3dResTex *tex = NNS_G3dGetTex(data);
 
     if (tex != NULL) {
@@ -523,8 +523,8 @@ BOOL GFL_G3DResUploadTexDataCore(void *resource) {
     return FALSE;
 }
 
-NNSG3dResTex *GFL_G3DResGetTexData(void *resource) {
-    return NNS_G3dGetTex(((G3DResource *)resource)->data);
+NNSG3dResTex *GFL_G3DResGetTexData(G3DResource *resource) {
+    return NNS_G3dGetTex(resource->data);
 }
 
 static BOOL GFL_G3DResAllocTexMem(NNSG3dResTex *tex, NNSGfdTexKey *texKey, NNSGfdTexKey *tex4x4Key) {
@@ -563,8 +563,8 @@ static BOOL GFL_G3DResAllocPltMem(NNSG3dResTex *tex, NNSGfdPlttKey *pltKey) {
     return TRUE;
 }
 
-BOOL GFL_G3DResIsTexUploadDone(void *resource) {
-    NNSG3dResTex *tex = NNS_G3dGetTex(((G3DResource *)resource)->data);
+BOOL GFL_G3DResIsTexUploadDone(G3DResource *resource) {
+    NNSG3dResTex *tex = NNS_G3dGetTex(resource->data);
 
     if ((tex->texInfo.flag & NNS_G3D_RESTEX_LOADED) || (tex->tex4x4Info.flag & NNS_G3D_RESTEX_LOADED) ||
         (tex->plttInfo.flag & NNS_G3D_RESPLTT_LOADED)) {
@@ -573,8 +573,8 @@ BOOL GFL_G3DResIsTexUploadDone(void *resource) {
     return FALSE;
 }
 
-NNSGfdTexKey GFL_G3DResGetTexVRAMHandle(void *resource) {
-    NNSG3dResTex *tex = NNS_G3dGetTex(((G3DResource *)resource)->data);
+NNSGfdTexKey GFL_G3DResGetTexVRAMHandle(G3DResource *resource) {
+    NNSG3dResTex *tex = NNS_G3dGetTex(resource->data);
 
     if (tex->texInfo.flag & NNS_G3D_RESTEX_LOADED) {
         return tex->texInfo.vramKey;
@@ -585,8 +585,8 @@ NNSGfdTexKey GFL_G3DResGetTexVRAMHandle(void *resource) {
     return 0;
 }
 
-NNSGfdPlttKey GFL_G3DResGetPltVRAMHandle(void *resource) {
-    NNSG3dResTex *tex = NNS_G3dGetTex(((G3DResource *)resource)->data);
+NNSGfdPlttKey GFL_G3DResGetPltVRAMHandle(G3DResource *resource) {
+    NNSG3dResTex *tex = NNS_G3dGetTex(resource->data);
 
     if (tex->plttInfo.flag & NNS_G3D_RESPLTT_LOADED) {
         return tex->plttInfo.vramKey;
@@ -594,13 +594,13 @@ NNSGfdPlttKey GFL_G3DResGetPltVRAMHandle(void *resource) {
     return 0;
 }
 
-void *GFL_G3DResGetTexImageData(void *resource) {
+void *GFL_G3DResGetTexImageData(G3DResource *resource) {
     NNSG3dResTex *tex = GFL_G3DResGetTexData(resource);
 
     return (u8 *)tex + tex->texInfo.ofsTex;
 }
 
-void *GFL_G3DResGetTexPaletteData(void *resource) {
+void *GFL_G3DResGetTexPaletteData(G3DResource *resource) {
     NNSG3dResTex *tex = GFL_G3DResGetTexData(resource);
 
     return (u8 *)tex + tex->plttInfo.ofsPlttData;
@@ -619,14 +619,14 @@ static inline NNSG3dResMdl *GFL_G3DGetMdlByIdx(const NNSG3dResMdlSet *mdlSet, u3
     return NULL;
 }
 
-G3DModel *GFL_G3DMdlCreate(void *resource, u32 modelId, void *texture) {
+G3DModel *GFL_G3DMdlCreate(G3DResource *resource, u32 modelId, G3DResource *texture) {
     NNSG3dResMdl *mdl;
     NNSG3dResTex *tex = NULL;
     G3DModel *model;
 
-    mdl = GFL_G3DGetMdlByIdx(NNS_G3dGetMdlSet(((G3DResource *)resource)->data), modelId);
+    mdl = GFL_G3DGetMdlByIdx(NNS_G3dGetMdlSet(resource->data), modelId);
     if (texture != NULL) {
-        tex = NNS_G3dGetTex(((G3DResource *)texture)->data);
+        tex = NNS_G3dGetTex(texture->data);
     }
     model = GFL_HeapAllocate(g_G3DSystem.sys->heapId, sizeof(G3DModel), FALSE, "g3d_system.c", 1544);
     model->magic = G3D_MDL_MAGIC;
@@ -661,7 +661,7 @@ NNSG3dRenderObj *GFL_G3DMdlGetEngineModel(G3DModel *model) {
     return model->renderObj;
 }
 
-void *GFL_G3DAnmCreate(G3DModel *model, void *resource, u32 anmIdx) {
+void *GFL_G3DAnmCreate(G3DModel *model, G3DResource *resource, u32 anmIdx) {
     G3DAnimation *animation =
         GFL_HeapAllocate(g_G3DSystem.sys->heapId, sizeof(G3DAnimation), FALSE, "g3d_system.c", 1746);
     NNSG3dResTex *tex = NULL;
@@ -670,7 +670,7 @@ void *GFL_G3DAnmCreate(G3DModel *model, void *resource, u32 anmIdx) {
     void *data;
 
     animation->magic = G3D_ANM_MAGIC;
-    data = ((G3DResource *)resource)->data;
+    data = resource->data;
     animation->resource = resource;
     anm = NNS_G3dGetAnmByIdx(data, anmIdx);
     mdl = model->renderObj->resMdl;
@@ -690,8 +690,8 @@ void GFL_G3DAnmFree(G3DAnimation *animation) {
     }
 }
 
-NNSG3dAnmObj *GFL_G3DAnmGetRenderObj(void *anm) {
-    return ((G3DAnimation *)anm)->anmObj;
+NNSG3dAnmObj *GFL_G3DAnmGetRenderObj(G3DAnimation *animation) {
+    return animation->anmObj;
 }
 
 G3DActor *GFL_G3DActorCreate(G3DModel *model, void **animations, int count) {
