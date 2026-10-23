@@ -172,13 +172,14 @@ target, across files, as main's do: `card_hash.c`'s six calls of `OS_DisableInte
 `mi_ndma.c`, `mi_ndma_gxcommand.c`, `mi_sharedWram_twl.c` and `pm_twl.c` call too, so the tool leaves the objects of
 `lib/twl/` with main's.
 
-DS Protect's `dsprot_detect.c` also retains eight legacy ARM-to-Thumb veneers. The normal
-ARM946E linker replaces those calls with BLX and drops 96 bytes. When the compiled file is linked,
-`tools/build/restore_dsprot_veneers.py` runs a private ARMv4T prelink using the current real object
-list and effective LCF. It retains only this file's generated instructions, gives their pointers
+DS Protect's `dsprot_detect.c` (overlay 165) and `dsprot_detect_multi.c` (overlay 337) also retain legacy
+ARM-to-Thumb veneers, eight and sixteen. The normal ARM946E linker replaces those calls with BLX and drops 96 and
+192 bytes. When a compiled copy is linked, `tools/build/restore_dsprot_veneers.py` runs a private ARMv4T prelink
+using the current real object list and effective LCF, once per file, each run reading the object list the previous
+one wrote. It retains only that file's generated instructions, gives their pointers
 ABS32 relocations to the actual Thumb SDK symbols, and redirects the compiler's call relocations
-to generated local symbols. The normal ARM946E final link uses that derived object; objdiff uses
-the unchanged compiler object. No source-function bytes, sizes or data are replaced.
+to generated local symbols. The normal ARM946E final link uses the derived objects; objdiff uses
+the unchanged compiler objects. No source-function bytes, sizes or data are replaced.
 
 This is a representation of genuine linker-generated code, of a library that was linked apart from the game: no
 setting of the game's link gives these veneers alone. Compiling `dsprot_detect.c` for `v4t`, `arm7tdmi` or `v5t`
@@ -188,7 +189,7 @@ others, for the overlay's Thumb calls of ARM code; and a `-partial` link of the 
 doesn't know that its targets are Thumb. DS Protect's object evidently came already linked against the SDK as
 ARMv4T code, as a vendor's library can, and the prelink reproduces that. The helper has no ROM input or fixed game
 addresses. It discovers addresses on every prelink, including `--shift` builds, and requires
-contiguous generated fragments, real Thumb mappings and eight veneers. Unsupported ELF metadata,
+contiguous generated fragments, real Thumb mappings and each file's count of veneers. Unsupported ELF metadata,
 unexpected layouts and linker diagnostics fail with an error. Modified code that changes these
 invariants needs a new layout audit; do not change the count merely to bypass the check.
 

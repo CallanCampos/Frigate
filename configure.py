@@ -580,25 +580,33 @@ def add_version(n: Writer, version: str, dsd: Path, bugfix: bool, shift: int) ->
     n.build([grouped_objects], "ltd_objects", [objects_file, lcf_file],
             implicit=["tools/build/ltd_objects.py"])
 
-    # Keep DS Protect's legacy interworking glue separate from its compiler object.
-    # Objdiff still uses the compiler output; only the final link uses the derived one.
+    # Keep DS Protect's legacy interworking glue separate from its compiler objects, one derived object per copy of
+    # the flashcart test, each step reading the previous step's object list.
+    # Objdiff still uses the compiler output; only the final link uses the derived ones.
     link_objects = objects
     link_response = grouped_objects
-    dsprot_path = build_dir / "lib/dsprot/src/dsprot_detect.o"
-    dsprot_object = next((obj for obj in objects if Path(obj) == dsprot_path), None)
-    if dsprot_object is not None:
-        veneer_dir = build_dir / "interworking"
-        veneer_object = veneer_dir / "dsprot_detect.o"
-        link_response = veneer_dir / "objects.txt"
-        veneer_inputs = {"objects": grouped_objects, "lcf": link_lcf,
+    veneer_implicit = []
+    for source, veneer_dir, section, count in (
+            ("lib/dsprot/src/dsprot_detect.o", build_dir / "interworking", "OV165", 8),
+            ("lib/dsprot/src/dsprot_detect_multi.o", build_dir / "interworking" / "ov337", "OV337", 16)):
+        dsprot_path = build_dir / source
+        dsprot_object = next((obj for obj in objects if Path(obj) == dsprot_path), None)
+        if dsprot_object is None:
+            continue
+        veneer_object = veneer_dir / dsprot_path.name
+        veneer_response = veneer_dir / "objects.txt"
+        veneer_inputs = {"objects": link_response, "lcf": link_lcf,
                          "source_object": dsprot_object, "veneer_object": veneer_object,
-                         "response": link_response, "scratch": veneer_dir / "prelink"}
-        n.build([veneer_object, link_response], "dsprot_veneers", objects,
-                implicit=[link_lcf, grouped_objects, "tools/build/restore_dsprot_veneers.py",
+                         "response": veneer_response, "scratch": veneer_dir / "prelink",
+                         "section": section, "count": count}
+        n.build([veneer_object, veneer_response], "dsprot_veneers", objects,
+                implicit=[link_lcf, link_response, *veneer_implicit, "tools/build/restore_dsprot_veneers.py",
                           ROOT / "tools/mwccarm" / MWLD_VERSION / "mwldarm.exe"],
                 variables={key: shlex.quote(str(value)).replace("$", "$$")
                            for key, value in veneer_inputs.items()})
-        link_objects = [str(veneer_object) if obj == dsprot_object else obj for obj in objects]
+        veneer_implicit = [veneer_object, veneer_response]
+        link_response = veneer_response
+        link_objects = [str(veneer_object) if obj == dsprot_object else obj for obj in link_objects]
 
     arm9_o = build_dir / "arm9.o"
     n.build([arm9_o], "mwld", link_objects, implicit=[link_lcf, link_response],
@@ -790,7 +798,7 @@ def main():
            "--objects $objects --lcf $lcf --source-object $source_object "
            "--output-object $veneer_object --output-response $response --scratch $scratch "
            f"--runner $wine --linker {veneer_linker} --link-flags {veneer_flags} "
-           "--section OV165 --expected-count 8",
+           "--section $section --expected-count $count",
            "Generating DS Protect interworking veneers for $veneer_object")
     # Scripts go through the C preprocessor, so that they can include the constant headers
     n.rule("as", f"{shlex.quote(clang)} --target=armv5te-none-eabi -x assembler-with-cpp -c $as_includes $defines "
