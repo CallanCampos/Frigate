@@ -678,7 +678,7 @@ BOOL Field_ToggleCycling(Field *field) {
     return changed;
 }
 
-void *Field_GetMsgBGSys(Field *field) {
+FieldMsgBG *Field_GetMsgBGSys(Field *field) {
     return field->msgBGSys;
 }
 
@@ -814,11 +814,11 @@ void Field_SetPlayerPosPtr(Field *field, VecFx32 *position) {
     field->playerPosPtr = position;
 }
 
-void *Field_GetMoneyWin(Field *field) {
+MoneyWin *Field_GetMoneyWin(Field *field) {
     return field->moneyWin;
 }
 
-void Field_SetMoneyWin(Field *field, void *moneyWin) {
+void Field_SetMoneyWin(Field *field, MoneyWin *moneyWin) {
     field->moneyWin = moneyWin;
 }
 

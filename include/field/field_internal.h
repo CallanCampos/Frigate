@@ -25,8 +25,8 @@ struct Field {
     void *fogCtrl;
     void *weatherSystem;
     FieldSubscreen *subscreen;
-    void *msgBGSys;
-    void *moneyWin;
+    FieldMsgBG *msgBGSys;
+    MoneyWin *moneyWin;
     PlaceName *placeName;
     void *unk34;
     void *fesGimmick;

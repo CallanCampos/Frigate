@@ -368,7 +368,7 @@ BOOL FieldScript_VMExists(ScriptWork *work, u8 index);
 void FieldScript_Run(GameSystem *gsys, ScriptWork *work, u16 scriptId, u32 featureLevel);
 // What ScriptWork_GetFieldWork returns: the field's message BG system and the field, or NULLs outside the field
 typedef struct {
-    void *msgBGSys;
+    FieldMsgBG *msgBGSys;
     Field *field;
 } ScriptFieldWork;
 
@@ -411,8 +411,6 @@ void ScriptWork_RestoreVarCopy(ScriptWork *work, void *copy);
 u16 *ScriptWork_GetLocalWork(ScriptWork *work, u16 id);
 WordSet *ScriptWork_GetWordSet(ScriptWork *work);
 MMSys *GetScrEnvMMdlSys(FieldScriptEnv *env);
-// Adds an entry to the script's list menu
-void AddItemToListMenu(FieldScriptEnv *env, u32 a1, u32 message, u32 value, StrBuf *a4, StrBuf *a5);
 
 // Overlay 36: show a message, and have the script wait for it
 BOOL func_ov036_021a8eb4(VM *vm, FieldScriptEnv *env, StrBuf *message, u16 actorId, u16 pos, u32 a5);

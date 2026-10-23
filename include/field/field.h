@@ -31,7 +31,7 @@ void func_ov036_0219ad30(FieldPlayer *player, u16 dir, RailPosition *pos);
 // The player's object code for a sex, in a form or an extra state
 u16 FieldPlayer_GetObjCodeByForme(u32 sex, u32 forme);
 u16 FieldPlayer_GetObjCodeByExState(u32 sex, u32 exState);
-void *Field_GetMsgBGSys(Field *field);
+FieldMsgBG *Field_GetMsgBGSys(Field *field);
 BOOL Field_IsEventRunning(Field *field);
 u32 Field_GetRenderMode(Field *field);
 void Field_SetRenderMode(Field *field, u32 mode);
@@ -46,8 +46,8 @@ CasteliaRush *Field_GetCasteliaRush(Field *field);
 void *Field_GetColorPostFX(Field *field);
 void Field_SetPlayerPosPtr(Field *field, VecFx32 *position);
 // The money window that the scripts show on the field's message BG
-void *Field_GetMoneyWin(Field *field);
-void Field_SetMoneyWin(Field *field, void *moneyWin);
+MoneyWin *Field_GetMoneyWin(Field *field);
+void Field_SetMoneyWin(Field *field, MoneyWin *moneyWin);
 // Recolors a texture resource with the field's color post-FX
 void FieldColorPostFX_Apply(void *postFx, void *texture);
 fx32 Field_GetActorYOffset(Field *field);
