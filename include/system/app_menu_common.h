@@ -13,13 +13,15 @@
 // for each of the three OBJ VRAM mappings (32, 64 and 128 KB), picked by `mapping`.
 
 // The status icons, as AppMenuCommon_GetStatusIcon returns them
-#define APP_STATUS_ICON_PARALYSIS 1
-#define APP_STATUS_ICON_FREEZE 2
-#define APP_STATUS_ICON_SLEEP 3
-#define APP_STATUS_ICON_POISON 4
-#define APP_STATUS_ICON_BURN 5
-#define APP_STATUS_ICON_FAINTED 6
-#define APP_STATUS_ICON_NONE 8
+enum {
+    APP_STATUS_ICON_PARALYSIS = 1,
+    APP_STATUS_ICON_FREEZE,
+    APP_STATUS_ICON_SLEEP,
+    APP_STATUS_ICON_POISON,
+    APP_STATUS_ICON_BURN,
+    APP_STATUS_ICON_FAINTED,
+    APP_STATUS_ICON_NONE = 8,
+};
 
 BOOL func_0202d7d8(void);
 void func_0202d7dc(void);

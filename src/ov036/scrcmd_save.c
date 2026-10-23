@@ -20,7 +20,7 @@
 
 typedef struct {
     GameSystem *gsys;
-    void *saveIcon;
+    FieldSaveAnime *saveIcon;
     // Set to whether the save succeeded
     u16 *result;
     BOOL pokewood;

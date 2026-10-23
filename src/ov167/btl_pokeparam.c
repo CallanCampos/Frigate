@@ -7,6 +7,7 @@
 #include "battle/btl_pokeparam.h"
 #include "battle/condition_effects.h"
 #include "constants/abilities.h"
+#include "constants/battle.h"
 #include "constants/items.h"
 #include "constants/pokemon.h"
 #include "constants/species.h"
@@ -39,7 +40,7 @@ BattleMon *BattleMon_Create(PartyPkm *src, u8 monId, HeapID heapId) {
     mon->core.baseForm = PokeParty_GetParam(src, PKM_PARAM_FORM, NULL);
     mon->core.baseAbility = PokeParty_GetParam(src, PKM_PARAM_ABILITY, NULL);
     mon->core.level = PokeParty_GetParam(src, PKM_PARAM_LEVEL, NULL);
-    mon->core.unk1a = PML_PersonalGetParamSingle(mon->core.species, mon->core.baseForm, 1);
+    mon->core.unk1a = PML_PersonalGetParamSingle(mon->core.species, mon->core.baseForm, PERSONAL_BASE_ATTACK);
     setupBySrcData(mon, src, TRUE, TRUE);
     mon->moveCount = GetNumMoves(mon, src, TRUE);
     mon->unk143 = 0;
@@ -78,7 +79,7 @@ void setupBySrcData(BattleMon *mon, PartyPkm *src, BOOL readHP, BOOL readAbility
         mon->ability = PokeParty_GetParam(src, PKM_PARAM_ABILITY, NULL);
     }
     mon->form = PokeParty_GetParam(src, PKM_PARAM_FORM, NULL);
-    mon->weight = PML_PersonalGetParamSingle(mon->core.species, mon->form, 0x26);
+    mon->weight = PML_PersonalGetParamSingle(mon->core.species, mon->form, PERSONAL_WEIGHT);
     if (mon->weight < 1) {
         mon->weight = 1;
     }
@@ -514,7 +515,7 @@ void splitTypeCore(BattleMon *mon, u8 *type1, u8 *type2) {
     BOOL condition;
     u8 type;
 
-    condition = CheckCondition(mon, 0x18);
+    condition = CheckCondition(mon, CONDITION_ROOST);
     type = mon->type1;
     if (type == 2 && condition) {
         *type1 = 0x11;
@@ -584,14 +585,14 @@ PartyPkm *BattleMon_GetViewSrcData(const BattleMon *mon) {
 
 u32 BattleMon_ApplyWonderRoom(const BattleMon *mon, u32 stat) {
     switch (stat) {
-    case 9:
+    case BATTLEMON_DEFENSE:
         if (IsFieldEffectActive(6)) {
-            stat = 11;
+            stat = BATTLEMON_SP_DEFENSE;
         }
         break;
-    case 11:
+    case BATTLEMON_SP_DEFENSE:
         if (IsFieldEffectActive(6)) {
-            stat = 9;
+            stat = BATTLEMON_DEFENSE;
         }
         break;
     }
@@ -601,19 +602,19 @@ u32 BattleMon_ApplyWonderRoom(const BattleMon *mon, u32 stat) {
 s32 RawBattleMonStat(const BattleMon *mon, u32 stat) {
     stat = BattleMon_ApplyWonderRoom(mon, stat);
     switch (stat) {
-    case 8:
+    case BATTLEMON_ATTACK:
         return mon->attack;
-    case 9:
+    case BATTLEMON_DEFENSE:
         return mon->defense;
-    case 10:
+    case BATTLEMON_SP_ATTACK:
         return mon->spAttack;
-    case 11:
+    case BATTLEMON_SP_DEFENSE:
         return mon->spDefense;
-    case 12:
+    case BATTLEMON_SPEED:
         return mon->speed;
-    case 6:
+    case BATTLEMON_ACCURACY_STAGE:
         return 6;
-    case 7:
+    case BATTLEMON_EVASION_STAGE:
         return 6;
     default:
         return GetBattleMonStat(mon, stat);
@@ -635,19 +636,19 @@ void BattleMon_GetSrcStats(BattleMon *mon, BattleMonLevelUp *stats) {
 
 void SetBaseStatus(BattleMon *mon, u32 stat, u16 value) {
     switch (BattleMon_ApplyWonderRoom(mon, stat)) {
-    case 8:
+    case BATTLEMON_ATTACK:
         mon->attack = value;
         break;
-    case 9:
+    case BATTLEMON_DEFENSE:
         mon->defense = value;
         break;
-    case 10:
+    case BATTLEMON_SP_ATTACK:
         mon->spAttack = value;
         break;
-    case 11:
+    case BATTLEMON_SP_DEFENSE:
         mon->spDefense = value;
         break;
-    case 12:
+    case BATTLEMON_SPEED:
         mon->speed = value;
         break;
     }
@@ -656,49 +657,49 @@ void SetBaseStatus(BattleMon *mon, u32 stat, u16 value) {
 u32 GetBattleMonStat(const BattleMon *mon, u32 stat) {
     stat = BattleMon_ApplyWonderRoom(mon, stat);
     switch (stat) {
-    case 8:
+    case BATTLEMON_ATTACK:
         return GetBoostFromStatStage(RawBattleMonStat(mon, stat), mon->statStages.attack);
-    case 9:
+    case BATTLEMON_DEFENSE:
         return GetBoostFromStatStage(RawBattleMonStat(mon, stat), mon->statStages.defense);
-    case 10:
+    case BATTLEMON_SP_ATTACK:
         return GetBoostFromStatStage(RawBattleMonStat(mon, stat), mon->statStages.spAttack);
-    case 11:
+    case BATTLEMON_SP_DEFENSE:
         return GetBoostFromStatStage(RawBattleMonStat(mon, stat), mon->statStages.spDefense);
-    case 12:
+    case BATTLEMON_SPEED:
         return GetBoostFromStatStage(RawBattleMonStat(mon, stat), mon->statStages.speed);
-    case 1:
+    case BATTLEMON_ATTACK_STAGE:
         return mon->statStages.attack;
-    case 2:
+    case BATTLEMON_DEFENSE_STAGE:
         return mon->statStages.defense;
-    case 3:
+    case BATTLEMON_SP_ATTACK_STAGE:
         return mon->statStages.spAttack;
-    case 4:
+    case BATTLEMON_SP_DEFENSE_STAGE:
         return mon->statStages.spDefense;
-    case 5:
+    case BATTLEMON_SPEED_STAGE:
         return mon->statStages.speed;
-    case 6:
+    case BATTLEMON_ACCURACY_STAGE:
         return mon->statStages.accuracy;
-    case 7:
+    case BATTLEMON_EVASION_STAGE:
         return mon->statStages.evasion;
-    case 15:
+    case BATTLEMON_LEVEL:
         return mon->core.level;
-    case 18:
+    case BATTLEMON_GENDER:
         return mon->sex;
-    case 13:
+    case BATTLEMON_HP:
         return mon->core.hp;
-    case 14:
+    case BATTLEMON_MAX_HP:
         return mon->core.maxHP;
     case 21:
         return mon->core.unk1a;
-    case 17:
-        if (CheckCondition(mon, 0x10)) {
+    case BATTLEMON_EFFECTIVE_ABILITY:
+        if (CheckCondition(mon, CONDITION_GASTRO_ACID)) {
             return 0;
         }
-    case 16:
+    case BATTLEMON_ABILITY:
         return mon->ability;
-    case 19:
+    case BATTLEMON_FORM:
         return mon->form;
-    case 20:
+    case BATTLEMON_EXP:
         return mon->core.exp;
     default:
         return 0;
@@ -710,22 +711,22 @@ u32 CritAtkDefLevel(BattleMon *mon, u32 stat) {
 
     useRaw = FALSE;
     switch (BattleMon_ApplyWonderRoom(mon, stat)) {
-    case 8:
+    case BATTLEMON_ATTACK:
         if (mon->statStages.attack < 6) {
             useRaw = TRUE;
         }
         break;
-    case 10:
+    case BATTLEMON_SP_ATTACK:
         if (mon->statStages.spAttack < 6) {
             useRaw = TRUE;
         }
         break;
-    case 9:
+    case BATTLEMON_DEFENSE:
         if (mon->statStages.defense > 6) {
             useRaw = TRUE;
         }
         break;
-    case 11:
+    case BATTLEMON_SP_DEFENSE:
         if (mon->statStages.spDefense > 6) {
             useRaw = TRUE;
         }
@@ -746,14 +747,14 @@ void SetItem(BattleMon *mon, u16 item) {
 }
 
 BOOL IsMonFullHP(BattleMon *mon) {
-    if (GetBattleMonStat(mon, 13) == GetBattleMonStat(mon, 14)) {
+    if (GetBattleMonStat(mon, BATTLEMON_HP) == GetBattleMonStat(mon, BATTLEMON_MAX_HP)) {
         return TRUE;
     }
     return FALSE;
 }
 
 BOOL IsFainted(const BattleMon *mon) {
-    if (GetBattleMonStat(mon, 13) == 0) {
+    if (GetBattleMonStat(mon, BATTLEMON_HP) == 0) {
         return TRUE;
     }
     return FALSE;
@@ -1156,7 +1157,7 @@ BOOL BattleMon_TickCondition(BattleMon *mon, u32 index, BattleCondition *prev, B
 
 // Whether the Pokémon has an ability and it is not suppressed
 static inline BOOL CheckEffectiveAbility(BattleMon *mon, u16 ability) {
-    if (CheckCondition(mon, 0x10)) {
+    if (CheckCondition(mon, CONDITION_GASTRO_ACID)) {
         return FALSE;
     }
     if (mon->ability == ability) {
@@ -1290,7 +1291,7 @@ u32 BattleMon_GetResidualDamage(BattleMon *mon, u32 index) {
         case 4:
             return DivideMaxHPZeroCheck(mon, 8);
         case 9:
-            if (CheckCondition(mon, 2)) {
+            if (CheckCondition(mon, CONDITION_SLEEP)) {
                 return DivideMaxHPZeroCheck(mon, 4);
             }
             break;
@@ -1401,8 +1402,8 @@ void CopyBatonPassParams(BattleMon *target, BattleMon *source) {
     }
     if (GetAdditionalConditionFlag(source, 10)) {
         BattleMon_SetConditionFlag(target, 10);
-        attack = RawBattleMonStat(target, 8);
-        defense = RawBattleMonStat(target, 9);
+        attack = RawBattleMonStat(target, BATTLEMON_ATTACK);
+        defense = RawBattleMonStat(target, BATTLEMON_DEFENSE);
         SetBaseStatus(target, 8, defense);
         SetBaseStatus(target, 9, attack);
     }

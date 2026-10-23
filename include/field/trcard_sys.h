@@ -112,8 +112,17 @@ typedef struct {
     u32 next;
     // 1 when the medals screen asked to return to the field
     u32 result;
+    // A TRCARD_START_*, or -1
     s32 appParam;
 } TrainerCardParam;
+
+// What the trainer card starts on: the card as it was last left, its front, its back, or the badges
+enum {
+    TRCARD_START_DEFAULT,
+    TRCARD_START_FRONT,
+    TRCARD_START_BACK,
+    TRCARD_START_BADGES,
+};
 
 void TrainerCardData_FillExtras(TrainerCardData *data, GameData *gameData, HeapID heapId);
 // isSnapshot is TRUE for a card that is sent away, with the play time copied

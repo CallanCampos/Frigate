@@ -56,10 +56,10 @@ struct ReportWork {
     // Set once the player has continued a paused message
     u32 continued;
     AppTaskMenuItem items[2];
-    void *menuRes;
-    void *menu;
+    AppTaskMenuRes *menuRes;
+    AppTaskMenu *menu;
     WaitIcon *waitIcon;
-    void *effect;
+    FieldSaveAnime *effect;
     u32 timer;
 };
 

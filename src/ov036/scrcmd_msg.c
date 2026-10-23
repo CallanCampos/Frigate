@@ -276,7 +276,6 @@ static void ActorMsgWin_CalcAttachmentOffsetDynamic(const VecFx32 *pos, VecFx32 
     int y;
     u32 tileX;
     u32 column;
-    u32 half;
 
     GFL_G3DCameraFlush(g3dCamera);
     GFL_G3DCameraGetLookatTarget(g3dCamera, &target);
@@ -302,10 +301,10 @@ static void ActorMsgWin_CalcAttachmentOffsetDynamic(const VecFx32 *pos, VecFx32 
     } else {
         column = 3;
     }
-    // The screen's 24 rows, in two halves of 12
-    half = (u32)y / 8 / 12;
-    if (column < 4 && half < 2) {
-        *offset = ACTOR_MSGWIN_ORIGIN_OFFSET_TABLE[half][column];
+    // y becomes the half of the screen, in rows of 12 tiles
+    y = (u32)y / 8 / 12;
+    if (column < 4 && (u32)y < 2) {
+        *offset = ACTOR_MSGWIN_ORIGIN_OFFSET_TABLE[y][column];
     } else {
         VecFx32 zero = { 0, 0, 0 };
 

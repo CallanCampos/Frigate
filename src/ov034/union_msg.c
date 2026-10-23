@@ -656,7 +656,7 @@ BOOL UnionMsg_UpdateYesNo(UnionSystem *unisys, BOOL *yes) {
 
 static void UnionMsg_CreateMenu(UnionSystem *unisys, Field *field, const ListMenuRow *rows, u32 count,
                                 ListMenuRequest *request) {
-    void *msgBGSys = Field_GetMsgBGSys(field);
+    FieldMsgBG *msgBGSys = Field_GetMsgBGSys(field);
 
     if (unisys->fldmenu_func == NULL) {
         ListMenuOption *options = func_ov036_02187f0c(rows, count, unisys->msgdata, UNION_HEAPID);
@@ -830,7 +830,7 @@ u32 UnionMsg_UpdateRuleMenu(UnionSystem *unisys, BOOL *picked, u8 *ruleSel, BOOL
 
 void UnionMsg_CreateInfoWindow(UnionSystem *unisys, Field *field) {
     if (unisys->fldmsgwin == NULL) {
-        void *msgBGSys = Field_GetMsgBGSys(field);
+        FieldMsgBG *msgBGSys = Field_GetMsgBGSys(field);
 
         unisys->fldmsgwin = func_ov036_02188a54(msgBGSys, unisys->msgdata, 0, 1, 1, 0x1e, 2);
         func_ov036_02188b18(unisys->fldmsgwin, 0, 0, UnionMsg_Text_BattleFormatMultiBattle);
@@ -846,7 +846,7 @@ void UnionMsg_FreeInfoWindow(UnionSystem *unisys) {
 
 // Opens the window that lists the regulation's rules, each in the color of whether the party meets it
 void UnionMsg_CreateRulesWindow(UnionSystem *unisys, Field *field, u32 okMask, u32 battleType, u32 mode) {
-    void *msgBGSys = Field_GetMsgBGSys(field);
+    FieldMsgBG *msgBGSys = Field_GetMsgBGSys(field);
     BOOL isMulti;
     int i;
 
@@ -872,7 +872,7 @@ void UnionMsg_CreateRulesWindow(UnionSystem *unisys, Field *field, u32 okMask, u
     }
 
     for (i = 0; i < 6; i++) {
-        RegulationRulesText *rpm;
+        RegulationPrintMsg *rpm;
         u16 color;
 
         if (okMask & (1 << i)) {

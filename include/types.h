@@ -20,6 +20,9 @@ typedef volatile s32 vs32;
 typedef float f32;
 typedef double f64;
 
+// An address held as an integer, which a native port widens to the size of a pointer
+typedef u32 uptr;
+
 typedef int BOOL;
 #define TRUE 1
 #define FALSE 0

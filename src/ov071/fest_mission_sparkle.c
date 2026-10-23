@@ -3,6 +3,7 @@
 #include "types.h"
 #include "field/fest_mission_gimmick.h"
 #include "field/fest_mission_sparkle.h"
+#include "field/festival.h"
 #include "field/field.h"
 #include "field/field_actor.h"
 #include "field/field_effect.h"
@@ -48,7 +49,7 @@ BOOL FestSparkle_End(FesGimmick *gimmick, FestSparkleWork *work) {
 }
 
 GameEvent *FestSparkle_CheckPickUpGrid(FesGimmick *gimmick, const VecFx32 *position) {
-    FestSparkleWork *work = gimmick->work;
+    FestSparkleWork *work = &gimmick->work->sparkle;
     int i;
     ZoneBGEntity *place;
 
@@ -63,7 +64,7 @@ GameEvent *FestSparkle_CheckPickUpGrid(FesGimmick *gimmick, const VecFx32 *posit
 }
 
 GameEvent *FestSparkle_CheckPickUpRail(FesGimmick *gimmick, const RailPosition *position) {
-    FestSparkleWork *work = gimmick->work;
+    FestSparkleWork *work = &gimmick->work->sparkle;
     int i;
     ZoneBGEntity *place;
 
@@ -80,7 +81,7 @@ GameEvent *FestSparkle_CheckPickUpRail(FesGimmick *gimmick, const RailPosition *
 
 BOOL FestSparkle_IsOnTile(FesGimmick *gimmick, u16 x, u16 z, fx32 height) {
     int i;
-    FestSparkleWork *work = gimmick->work;
+    FestSparkleWork *work = &gimmick->work->sparkle;
     FestSparkleZone *zone;
     ZoneBGEntity *place;
     RailPosition railPos;

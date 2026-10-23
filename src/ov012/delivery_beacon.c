@@ -84,7 +84,7 @@ static GFLNetInitData data_ov012_0216e034 = {
     0x10,
     1,
     0,
-    0,
+    GFL_NET_TYPE_WIRELESS,
     1,
     5,
     {0x2c, 1, 0, 0},

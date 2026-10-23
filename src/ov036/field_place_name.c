@@ -162,7 +162,7 @@ BOOL isGameVerWhite2(void) {
     return FALSE;
 }
 
-PlaceName *FieldPlaceName_Create(GameSystem *gsys, HeapID heapId, void *msgBGSys) {
+PlaceName *FieldPlaceName_Create(GameSystem *gsys, HeapID heapId, FieldMsgBG *msgBGSys) {
     PlaceName *wk = FieldPlaceName_Alloc(heapId);
     func_ov036_021b59d4(wk, gsys);
     func_ov036_021b5ae8(wk);
@@ -178,7 +178,7 @@ PlaceName *FieldPlaceName_Create(GameSystem *gsys, HeapID heapId, void *msgBGSys
     func_ov036_021b53f4(wk, 0);
     func_ov036_021b55ec(wk);
     func_ov036_021b5434(wk);
-    GFL_BGSysCreateBG(3, &sPlaceNameBGSetup, 0);
+    GFL_BGSysCreateBG(3, &sPlaceNameBGSetup, BGMODE_TEXT);
     if (isGameVerWhite2()) {
         func_ov036_021b51e0(wk, 4);
         func_ov036_021b5230(wk, 3);
@@ -593,9 +593,9 @@ void func_ov036_021b5660(PlaceName *wk) {
         return;
     }
     if (IsZoneJoinAvenue(zoneId)) {
-        GFL_StrBufLoadString(
-            wk->name, (const u16 *)JoinAvenue_GetParam(
-                          JoinAvenue_GetInfo(SaveControl_GetJoinAvenue(GameData_GetSaveControl(wk->gameData))), 0, 0));
+        GFL_StrBufLoadString(wk->name, (const u16 *)JoinAvenue_GetParam(JoinAvenue_GetInfo(SaveControl_GetJoinAvenue(
+                                                                            GameData_GetSaveControl(wk->gameData))),
+                                                                        JOIN_AVE_INFO_NAME, 0));
     } else {
         GFL_MsgDataLoadStrbuf(wk->msgData, nameId, wk->name);
     }

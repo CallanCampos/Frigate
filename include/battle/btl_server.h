@@ -73,7 +73,7 @@ struct BtlServer {
 BtlServer *BattleServer_Create(BtlMainModule *mainModule, const MATHRandContext32 *rand, BtlPokeCon *pokeCon, u32 a3,
                                HeapID heapId);
 void BattleServer_AttachClient(BtlServer *server, BtlAdapter *adapter, u8 clientId, u8 numCoverPos);
-void BattleServer_AttachNetClient(BtlServer *server, u32 mode, void *netHandle, u8 clientId, u8 numCoverPos);
+void BattleServer_AttachNetClient(BtlServer *server, u32 mode, NetHandle *netHandle, u8 clientId, u8 numCoverPos);
 void BattleServer_AttachCmdCheckClient(BtlServer *server, u8 clientId, u8 numCoverPos);
 void BattleServer_Start(BtlServer *server);
 void BattleServer_Delete(BtlServer *server);

@@ -524,7 +524,7 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 | `field_g3d_mapper.c` | `0x02184244`–`0x021856a0` | 57 | complete | string at `0x021d4b4c` |
 | `field_camera.c` | `0x021856a0`–`0x02186ed0` | 84 | complete | string at `0x021d4b88` |
 | `field_camera_anime.c` | `0x02186ed0`–`0x021876d0` | 34 | complete | string at `0x021d4b98` |
-| `field_msgbg.c` | `0x021876d0`–`0x0218a7f8` | 177 | partial | string at `0x021d4bb0` |
+| `field_msgbg.c` | `0x021876d0`–`0x0218a7f8` | 177 | complete | string at `0x021d4bb0` |
 | `field_map_chunk_wb.c` | `0x0218a7f8`–`0x0218a8f8` | 2 | complete | descriptive |
 | `field_map_chunk_gc.c` | `0x0218a8f8`–`0x0218aa7c` | 3 | complete | descriptive |
 | `field_map_chunk_ng.c` | `0x0218aa7c`–`0x0218ab60` | 2 | complete | descriptive |
@@ -585,7 +585,7 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 | `scrcmd_word.c` | `0x021a7724`–`0x021a7eb8` | 36 | complete | descriptive |
 | `scrcmd_mapchange.c` | `0x021a7eb8`–`0x021a82bc` | 9 | complete | descriptive |
 | `scrcmd_menu.c` | `0x021a82bc`–`0x021a861c` | 11 | complete | descriptive |
-| `scrcmd_msg.c` | `0x021a861c`–`0x021a98c4` | 65 | partial | descriptive |
+| `scrcmd_msg.c` | `0x021a861c`–`0x021a98c4` | 65 | complete | descriptive |
 | `scrcmd_fldmmdl.c` | `0x021a98c4`–`0x021aad44` | 50 | complete | string at `0x021d514c` |
 | `scrcmd_gym.c` | `0x021aad44`–`0x021ab218` | 28 | complete | descriptive |
 | `scrcmd_fade.c` | `0x021ab218`–`0x021ab73c` | 18 | complete | descriptive |
@@ -1852,7 +1852,7 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 | `dwc_util_sub_screen.c` | `0x021b8154`–`0x021b8834` | 18 | complete | descriptive |
 | `dwc_util_usb_scan.c` | `0x021b8834`–`0x021b8cf0` | 8 | partial | descriptive |
 | `dwc_util_dialog.c` | `0x021b8cf0`–`0x021b93e8` | 15 | complete | descriptive |
-| `download_play.c` | `0x021b93e8`–`0x021b9bbc` | 19 | partial | descriptive |
+| `download_play.c` | `0x021b93e8`–`0x021b9bbc` | 19 | complete | descriptive |
 | `dwc_util_rom_resource.c` | `0x021bb18c`–`0x021bb480` | 9 | complete | descriptive |
 | `dwc_util_oam.c` | `0x021bb480`–`0x021bb8dc` | 11 | partial | descriptive |
 | `dwc_util_cell.c` | `0x021bb8dc`–`0x021bba6c` | 10 | complete | descriptive |

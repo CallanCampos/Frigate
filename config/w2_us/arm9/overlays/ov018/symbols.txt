@@ -1,4 +1,4 @@
 EventResearchRadar_Callback kind:function(thumb,size=0xa8) addr:0x0216e6a0
 EventResearchRadar_Create kind:function(thumb,size=0x3c) addr:0x0216e748
-data_ov018_0216e760 kind:data(any) addr:0x0216e7a0
+sFile kind:data(any) addr:0x0216e7a0
 data_ov018_0216e771 kind:data(any) addr:0x0216e7b1 ambiguous

@@ -13,13 +13,16 @@
 
 // What the Pokédex ends the opening with: B, X or the end of the opening. The Pokédex tells by the result whether to
 // go on
-#define ZUKAN_OPEN_RESULT_BACK 0
-#define ZUKAN_OPEN_RESULT_CLOSE 1
-#define ZUKAN_OPEN_RESULT_DONE 2
+enum {
+    ZUKAN_OPEN_RESULT_BACK,
+    ZUKAN_OPEN_RESULT_CLOSE,
+    ZUKAN_OPEN_RESULT_DONE,
+};
 
 typedef struct {
     GameData *gameData;
     PlayerInfo *playerInfo;
+    // A ZUKAN_OPEN_RESULT_*
     u32 result;
 } ZukanOpenParam;
 

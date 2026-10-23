@@ -44,7 +44,7 @@ enum {
 typedef struct {
     WarpSequence *warp;
     FieldSound *fieldSound;
-    void *camera;
+    EntranceCamera *camera;
     EntranceCameraParam cameraParam;
     u16 timer;
     u8 dir;

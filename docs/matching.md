@@ -719,7 +719,10 @@ Same instructions, registers swapped.
   runs again on each pass when the array is declared in a loop's body (`dwcutil_ac.c`'s `CheckAccessPoint`). A constant
   the retail game fixes but the code still tests or passes as a variable is held in an enum-typed local, which MWCC
   does not fold (`FieldScript_LoadData`'s source, `CallTrialHouseBattle`'s battle type,
-  `s01D6_MoveReminderCallMoveSelect`'s mode).
+  `s01D6_MoveReminderCallMoveSelect`'s mode). An offset that adds zero is such a constant too: `field_msgbg.c`'s
+  `CheckerMsgWin_LoadFrameTile` keeps a zero register, shifts it by five and adds it to the tile data before the tile's
+  own offset, which `CheckerFrameTile first = CHECKER_FRAME_TOP_LEFT;` added as `first * BGSYS_TILE_SIZE_16` gives,
+  next to the style parameter that no longer picks a block of tiles.
 - An RC4 key schedule's swap written through one temporary, `temp = table[j]; table[j] = table[i]; table[i] =
   temp;`, and its sum grouped `(table[i] + (j + key[k])) & 0xff`, which gives `add r4, r5, r4` where the flat
   `j + key[k] + table[i]` swaps the operands, are what DS Protect's `DSProt_Rc4InitMulti` needed. The same library's
@@ -927,13 +930,12 @@ Same code, other `sp` offsets or frame size.
   `static inline MysteryCardView_LoadIcon` that declares `arc` itself. A call's result held in a local before it
   is passed on (`date = MysteryCard_GetDateBitmap(card); GFL_BitmapCopy(date, ...)`) also moves the next
   argument's common subexpressions after the call, where the nested call computes them before it.
-- `RailUnit_MoveOnLine` allocates its cached line and length differently when its four directional inlines read
-  them from `unit` at entry instead of receiving caller snapshots as parameters. Both versions then consume the
-  original's total 0x80 stack bytes: six pushed words plus 0x68, against five plus 0x6c in the ROM. The forward
-  path keeps length in `r7`; the other three still spill it. The call-labelled aligned difference falls from
-  608 to 348 rows, but the function grows from 0x890 to 0x894 against 0x888, so it remains partial. This is evidence
-  for allocation changing with snapshot ownership, not proof of original inline boundaries. Moving the reads
-  crosses only scalar direction helpers; every snapshot still precedes calls that can change the unit.
+- Four `static inline` handlers called from one dispatcher do not allocate like the same code written as the arms of
+  one function: `field_rail.c`'s `RailUnit_MoveOnLine` matches only with the line and length read once at the top
+  and each direction's code in its own `if` arm, with the arm's points and lines declared in the arm and each
+  candidate line's length and width in the block that uses them. As four inlines it was 0x894 against 0x888 with
+  over 300 aligned rows, whatever the snapshots' ownership. The width compared with `MATH_ABS(unit->side)` is an
+  `s32` local of its block; held in the `u32` direction local it gives `blo` for `blt`.
 - A constant held in a stack slot and loaded at each use, where ours builds it with `movs` and keeps a copy in a
   saved register, can be an inlined helper's parameter passed that constant: MWCC sets the parameter as a copy of
   a register holding the value and spills it, then loads the value from its slot where the code needs it. Overlay
@@ -2080,6 +2082,15 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   gets: overlay 209's `MusPokeDraw_CellCallback` keeps `kind - 7` in `r4` and multiplies a copy in `r1`, as the
   original does, only with `MusPokeDrawEquipNo pos = kind - MUS_POKE_DRAW_CELL_EQUIP;` and `poke->equips[pos]`
   indexed in place; an `int`, `u32` or `s32` local gives the reverse.
+- A value that the original carries through a function as an enum, where ours has an integer type, is typed so at
+  every step, the callee's parameter and the field included; one integer step keeps ours. `btl_server_cmd.c`'s
+  `BtlServerCmdQueue_Put` reads its command back from its stack slot (`va_start` takes its address) for the encoder
+  call, and keeps the format byte in `r2`, only with `event` a `BtlServerCmd` (our name) both in its own parameters
+  and in those of `PutCmdArgs`, the static function it passes it to; either one alone is 4 bytes long. Overlay 332's
+  `CygnusData_GetEntry` stores an entry's type and then its id, as written (`*type = data->entries[index].type;
+  *id = data->entries[index].id;`), only with the entry's `type` field and the `type` out-parameter both a
+  `CygnusEntryType` (our name); with either one a `u32` the same source is 4 bytes short, and no order of the
+  statements stores the type first.
 - A result tested with no narrowing after the call, but narrowed after arithmetic on it (`(u8)(weather - 2) <= 2`),
   comes from a function that returns `u8`. `HandlerSolarBeamPower` matches only with `GetWeather` returning `u8`, and
   so do the getters it calls, down to the field's `u8` weather, for their own definitions to keep matching.
@@ -2681,6 +2692,10 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   whose next statement is that test, came back only with a statement ending the outer then-arm that emits nothing
   but keeps its block, `heard = received;` between two flags that share a register, which only shapes code there
   (its row).
+- A field set to a different constant at the end of each arm of an `if`/`else` is cross-jumped at its store: each
+  arm loads the base and builds its constant in the same registers, and the first ends in `b` to the other's `str`.
+  `dwc_rap.c`'s `DWCRap_Connect` stores `_dWork->matchType` so after each arm's call; a local set in each arm and
+  stored once after the join gives another frame and other registers (8 bytes long).
 - A load that both arms of an `if`/`else` begin with is hoisted above the branch, between the test and the `beq`.
   When the original loads it first in each arm, after the branch, one arm began with another statement that the
   scheduler then moved below the load: `bmp.c`'s `GFL_BitmapCopyArea_IDX8_VRAM` writes `destPixel--;` before
@@ -3291,6 +3306,12 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
       _pDLWork->error = error;                              ...
                                                             }
                                                             _pDLWork->error = result;
+- A case whose jump-table entry points at the `b` that ends the case before it (where an empty case goes straight to the
+  switch's end) held a debug print compiled out to `(void)0`, the statement a print macro leaves in a release build.
+  Under 2.0/sp2 that statement survives until the blocks are made and keeps the case apart, where `;` and `{}` are
+  removed first. `dwc_aoss_ap.c`'s `AOSSi_WLANConnect` gives the scan alarm's case its entry with `(void)0;` (31 bytes
+  to 30), and the function's empty loop over the SSID is another print compiled out; the scan function itself puts the
+  connection's alarm among the events it ignores, with no case of its own.
 - An empty `if` whose condition has three or more `&&` operands is not removed with the other empty statements: its
   branches become blocks and go only later, so it splits the code around it for CSE and register allocation and
   emits nothing. Two operands, `(void)(a && b && c)` and `if (TRUE)` are removed first; a discarded ternary
@@ -3633,6 +3654,19 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   global that nothing reads gets a section of its own among the strings. The string literals of such initializers
   each get a section of their own, laid out by size after the shared section, and their equal sizes don't follow
   `rodata_order.py`'s model: two pairs stay swapped in every order of the tables tried.
+- The string literals of a data initializer take part in the size sort: each is listed as the initializer is read,
+  in its order and just before the object it initializes, and `rodata_order.py`'s `heapsort` then places them, each
+  in a section of its own (fitted on 30 random files and on the six orders of `download_play.c`'s tables). A
+  tentative `.bss` definition is listed after everything else, and a `const` scalar whose address code takes comes
+  after that, wherever it is defined: `wifibattlematch_net.c`'s `sCmd2402Data` reorders every 4-byte tie. Overlay
+  182's `download_play.c` matches with its callback names, state names and child bitmaps as three tables in that
+  order. The bitmap table is all zeros, which goes to `.bss` unless `#pragma explicit_zero_data on` covers it; in
+  `.data` it is the shared section's smallest object, which the ROM sorts between two 24-byte strings. The pragma
+  covers that table alone: over the whole file, `DownloadPlay_Init`'s zeroed compound literal becomes a `.rodata`
+  template that the ROM doesn't have.
+- A function-local `const` scalar with an initializer, `static` or not, is emitted in `.rodata` even when every read
+  of it folds (`const u32 n = 11;` gives a 4-byte `_ZZ...E1n_0`), while a file-scope `static const` scalar that code
+  only reads is dropped.
 - Static data is sorted by size. MWCC lists each object of a section when it is declared, a local struct initializer
   when its function is, and heapsorts the list by size starting from the last object declared. Equal sizes come out
   in no declared order: palanm.c's three 4-byte weights declared R, G, B lie G, R, B (`rodata_order.py --permute`

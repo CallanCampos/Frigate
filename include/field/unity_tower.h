@@ -43,19 +43,24 @@ typedef struct {
 #define UNITY_TOWER_VISITOR_MAX 20
 
 // What UnityTower_GetVisitorParam gives of a visitor
-#define UNITY_TOWER_VISITOR_PARAM_SENT_SPECIES 0
-#define UNITY_TOWER_VISITOR_PARAM_RECEIVED_SPECIES 1
-#define UNITY_TOWER_VISITOR_PARAM_HOBBY 2
-#define UNITY_TOWER_VISITOR_PARAM_COUNTRY_COUNT 3
-#define UNITY_TOWER_VISITOR_PARAM_UNK26_0 4
-#define UNITY_TOWER_VISITOR_PARAM_SCRIPT_FLAG 5
-#define UNITY_TOWER_VISITOR_PARAM_VALID 6
+enum {
+    UNITY_TOWER_VISITOR_PARAM_SENT_SPECIES,
+    UNITY_TOWER_VISITOR_PARAM_RECEIVED_SPECIES,
+    UNITY_TOWER_VISITOR_PARAM_HOBBY,
+    UNITY_TOWER_VISITOR_PARAM_COUNTRY_COUNT,
+    UNITY_TOWER_VISITOR_PARAM_UNK26_0,
+    UNITY_TOWER_VISITOR_PARAM_SCRIPT_FLAG,
+    UNITY_TOWER_VISITOR_PARAM_VALID,
+};
 
 // The two bits the survey keeps per region of a country
-#define UNITY_TOWER_REGION_NONE 0
-#define UNITY_TOWER_REGION_TODAY 1
-#define UNITY_TOWER_REGION_BEFORE 2
-#define UNITY_TOWER_REGION_OWN 3
+enum {
+    UNITY_TOWER_REGION_NONE,
+    UNITY_TOWER_REGION_TODAY,
+    UNITY_TOWER_REGION_BEFORE,
+    UNITY_TOWER_REGION_OWN,
+};
+
 // 64 regions of each country from 1 on, two bits each
 #define UNITY_TOWER_REGION_BYTES (255 * 16)
 
@@ -102,8 +107,8 @@ u8 getPlayerSurveys(UnityTowerSurveySave *save);
 u32 UnityTower_GetVisitorParam(UnityTowerSurveySave *save, u32 index, u32 param);
 // Sets a visitor's UNITY_TOWER_VISITOR_PARAM_UNK26_0, SCRIPT_FLAG or VALID
 void UnityTower_SetVisitorParam(UnityTowerSurveySave *save, int index, u32 param, u32 value);
-// A visitor, whose PlayerInfo comes first, or NULL out of range
-void *UnityTower_GetVisitor(UnityTowerSurveySave *save, int index);
+// A visitor's PlayerInfo, or NULL out of range
+PlayerInfo *UnityTower_GetVisitor(UnityTowerSurveySave *save, int index);
 UnityTowerVisitor *UnityTower_GetVisitors(UnityTowerSurveySave *save);
 // Records the country met, returning whether it is a new one
 BOOL UnityTower_MarkCountryMet(UnityTowerSurveySave *save, u32 country);

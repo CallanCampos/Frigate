@@ -1,6 +1,6 @@
 # pokebw2 Codex project guidance
 
-Read `CLAUDE.md` first: its Rules (both ROMs byte for byte, natural C only, claiming an overlay, publishing every
+Read `CLAUDE.md` first: its Rules (both ROMs byte for byte with no compiler warnings, natural C only, claiming an overlay, publishing every
 commit) apply to Codex sessions too, and it points to the README, `CONTRIBUTING.md` and `docs/`, which are the source
 of truth.
 

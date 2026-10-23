@@ -109,7 +109,8 @@ static void PokemonTradeDemoUp_StateRun(PokemonTradeWork *wk) {
         PokemonTradeDemo_ShowActor(wk);
     }
     if (wk->timer == PokemonTradeDemo_Frames(266)) {
-        GFL_WipeSet(0, 0, 0, 0x7fff, PokemonTradeDemo_Frames(20), 1, wk->heapId);
+        GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, 0x7fff, PokemonTradeDemo_Frames(20), 1,
+                    wk->heapId);
     }
     if (wk->timer == PokemonTradeDemo_Frames(301) - 2) {
         if (wk->mcssMoves[0] != NULL) {
@@ -259,16 +260,20 @@ static void PokemonTradeDemoUp_StateRun(PokemonTradeWork *wk) {
         MCSS_StartFade(wk->mcss[3], 0, 0, 0, 0x7fff);
     }
     if (wk->timer == PokemonTradeDemo_Frames(651)) {
-        GFL_WipeSet(0, 0, 0, 0x7fff, PokemonTradeDemo_Frames(10), 1, wk->heapId);
+        GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, 0x7fff, PokemonTradeDemo_Frames(10), 1,
+                    wk->heapId);
     }
     if (wk->timer == PokemonTradeDemo_Frames(693)) {
-        GFL_WipeSet(0, 1, 1, 0x7fff, PokemonTradeDemo_Frames(25), 1, wk->heapId);
+        GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_IN, WIPE_TYPE_FADE_IN, 0x7fff, PokemonTradeDemo_Frames(25), 1,
+                    wk->heapId);
     }
     if (wk->timer == PokemonTradeDemo_Frames(896)) {
-        GFL_WipeSet(0, 0, 0, 0x7fff, PokemonTradeDemo_Frames(30), 1, wk->heapId);
+        GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, 0x7fff, PokemonTradeDemo_Frames(30), 1,
+                    wk->heapId);
     }
     if (wk->timer == PokemonTradeDemo_Frames(970)) {
-        GFL_WipeSet(0, 1, 1, 0x7fff, PokemonTradeDemo_Frames(30), 1, wk->heapId);
+        GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_IN, WIPE_TYPE_FADE_IN, 0x7fff, PokemonTradeDemo_Frames(30), 1,
+                    wk->heapId);
     }
     if (wk->timer == PokemonTradeDemo_Frames(1217)) {
         GFL_HeapFree(wk->mcssMoves[0]);

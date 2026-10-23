@@ -20,7 +20,7 @@
 
 struct FlyEventWork {
     GameSystem *gsys;
-    void *bind;
+    const VecFx32 *bind;
     u32 zoneId;
     ZoneSpawnInfo spawn;
     // The field effects of flying off and of landing, by the player's sex

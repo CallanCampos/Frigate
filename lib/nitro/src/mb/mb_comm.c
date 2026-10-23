@@ -235,11 +235,13 @@ static void MBi_CommParentRecvDataPerChild(const WMMpRecvData *recv, u16 aid) {
 
     switch (frame.type) {
     case MB_COMM_TYPE_CHILD_FILEREQ:
-        if (request == NULL) {
-            return;
+        if (!request) {
+            break;
         }
         if (state == MB_COMM_PSTATE_CONNECTED) {
-            MBCommRequestData req;
+            // Declared 4-aligned, as Black 1's version of this function has it: MWCC lays out the frame differently
+            // for an explicitly aligned local, and the ROM's frame is that layout
+            MBCommRequestData req ATTRIBUTE_ALIGN(4);
 
             MI_CpuCopy8(request, &req, MB_COMM_REQ_DATA_SIZE);
             pPwork->childggid[aid - 1] = req.ggid;
@@ -265,7 +267,7 @@ static void MBi_CommParentRecvDataPerChild(const WMMpRecvData *recv, u16 aid) {
                 if (count >= pPwork->fileinfo[file].registry->maxPlayerNum) {
                     pPwork->req2child[aid - 1] = 0;
                     MBi_CommChangeParentState(aid, MB_COMM_PSTATE_MEMBER_FULL, NULL);
-                    return;
+                    break;
                 }
             }
 
@@ -452,14 +454,10 @@ static void MBi_ReloadCache(MBiTaskInfo *task) {
 
 // Sends the next block of a file to the children that are downloading it
 static int MBi_CommParentSendBlock(void) {
-    MB_BlockInfo source;
-    MBiTaskInfo *task;
-    u32 offsetInSegment;
     MBCommParentBlockHeader frame;
-    u32 tableOffset;
-    MBiCacheList *cache;
     u8 *out;
     u8 i;
+    MB_BlockInfo source;
 
     if (pPwork->file_num == 0) {
         return MB_SENDFUNC_STATE_ERR;
@@ -482,38 +480,42 @@ static int MBi_CommParentSendBlock(void) {
     frame.fid = pPwork->cur_fileid;
     frame.seqno = pPwork->fileinfo[pPwork->cur_fileid].sendCursor;
     out = MBi_MakeParentSendBuffer(&frame, mbc->sendbuf);
-    offsetInSegment = source.offset - pPwork->fileinfo[pPwork->cur_fileid].layout.seg_src_offset[source.segment_no];
-    tableOffset = pPwork->fileinfo[pPwork->cur_fileid].segmentRomOffsets[source.segment_no];
-    cache = pPwork->fileinfo[pPwork->cur_fileid].cache;
-    if (!MBi_ReadFromCache(cache, offsetInSegment + tableOffset, out, source.size)) {
-        task = &pPwork->cur_task;
-        if (!MBi_IsTaskBusy(task)) {
-            if (cache->lifetime != 0) {
-                cache->lifetime--;
-            } else {
-                MBiCacheInfo *entries = cache->list;
-                MBiCacheInfo *oldest = NULL;
-                int n;
+    {
+        u32 romOffset = source.offset - pPwork->fileinfo[pPwork->cur_fileid].layout.seg_src_offset[source.segment_no] +
+                        pPwork->fileinfo[pPwork->cur_fileid].segmentRomOffsets[source.segment_no];
+        MBiCacheList *const cache = pPwork->fileinfo[pPwork->cur_fileid].cache;
 
-                for (n = 0; n < MB_CACHE_INFO_MAX; n++) {
-                    MBiCacheInfo *candidate = &entries[n];
+        if (!MBi_ReadFromCache(cache, romOffset, out, source.size)) {
+            MBiTaskInfo *const task = &pPwork->cur_task;
 
-                    if (candidate->state == MB_CACHE_STATE_READY && (oldest == NULL || oldest->src > candidate->src)) {
-                        oldest = candidate;
+            if (!MBi_IsTaskBusy(task)) {
+                if (cache->lifetime != 0) {
+                    --cache->lifetime;
+                } else {
+                    MBiCacheInfo *entries = cache->list;
+                    MBiCacheInfo *oldest = NULL;
+                    int n;
+
+                    for (n = 0; n < MB_CACHE_INFO_MAX; ++n) {
+                        if (entries[n].state == MB_CACHE_STATE_READY) {
+                            if (oldest == NULL || oldest->src > entries[n].src) {
+                                oldest = &entries[n];
+                            }
+                        }
                     }
+                    if (oldest == NULL) {
+                        OS_Terminate();
+                    }
+                    cache->lifetime = 2;
+                    oldest->state = MB_CACHE_STATE_BUSY;
+                    oldest->src = romOffset & ~0x1f;
+                    task->arg0 = oldest;
+                    task->arg1 = cache;
+                    MBi_SetTask(task, MBi_ReloadCache, NULL, 4);
                 }
-                if (oldest == NULL) {
-                    OS_Terminate();
-                }
-                cache->lifetime = 2;
-                oldest->state = MB_CACHE_STATE_BUSY;
-                oldest->src = (offsetInSegment + tableOffset) & ~0x1f;
-                task->arg0 = oldest;
-                task->arg1 = cache;
-                MBi_SetTask(task, MBi_ReloadCache, NULL, 4);
             }
+            return MB_SENDFUNC_STATE_ERR;
         }
-        return MB_SENDFUNC_STATE_ERR;
     }
     return MBi_BlockHeaderEnd(source.size + 6, pPwork->fileinfo[pPwork->cur_fileid].downloadMask, mbc->sendbuf);
 }

@@ -181,7 +181,7 @@ void InfoWin_Update(void) {
             sInfoWin->wifiIcon = 0;
         }
     } else if (netInit != NULL) {
-        if (netInit->bNetType == 3) {
+        if (netInit->bNetType == GFL_NET_TYPE_IRC) {
             if (InfoWin_IsFlagSet(INFOWIN_WIRELESS_ON) == FALSE) {
                 sInfoWin->flags = sInfoWin->flags | INFOWIN_DRAW_WIRELESS;
                 sInfoWin->flags = sInfoWin->flags | INFOWIN_WIRELESS_ON;
@@ -190,7 +190,8 @@ void InfoWin_Update(void) {
             sInfoWin->flags = sInfoWin->flags | INFOWIN_DRAW_WIRELESS;
             sInfoWin->flags = sInfoWin->flags & (0xffff ^ INFOWIN_WIRELESS_ON);
         }
-        if (netInit->bNetType == 0 || netInit->bNetType == 4 || netInit->bNetType == 5) {
+        if (netInit->bNetType == GFL_NET_TYPE_WIRELESS || netInit->bNetType == GFL_NET_TYPE_IRC_WIRELESS ||
+            netInit->bNetType == GFL_NET_TYPE_WIRELESS_LISTEN) {
             if (InfoWin_IsFlagSet(INFOWIN_SIGNAL_ON) == FALSE) {
                 sInfoWin->flags = sInfoWin->flags | INFOWIN_DRAW_SIGNAL;
                 sInfoWin->flags = sInfoWin->flags | INFOWIN_SIGNAL_ON;

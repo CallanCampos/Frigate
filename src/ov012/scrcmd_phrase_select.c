@@ -18,7 +18,7 @@ typedef struct {
     u16 *result;
     u16 *result2;
     u16 *decided;
-    void *pms;
+    PMSIParam *pms;
     // Which of the C-Gear's phrases the select starts from and keeps, when it does
     u32 cgearIndex;
     BOOL useCGear;
@@ -90,7 +90,7 @@ BOOL s01DA_CallPhraseSelect(VM *vm, FieldScriptEnv *env) {
 
 static GameEventReturnCode EventPhraseSelect_Callback(GameEvent *event, u32 *state, void *data_) {
     PhraseSelectEvent *data = GameEvent_GetData(event);
-    void *pms = data->pms;
+    PMSIParam *pms = data->pms;
     u16 words[2];
     PMSData sentence;
 

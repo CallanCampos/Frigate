@@ -20,14 +20,14 @@ typedef struct {
 
 typedef struct {
     G3DActor *actor;
-    void *anms[4];
+    G3DAnimation *anms[4];
     G3DModel *mdl;
 } FesKiraObj;
 
 typedef struct {
     FieldEffects *effects;
-    void *mdlRes;
-    void *anmRes[4];
+    G3DResource *mdlRes;
+    G3DResource *anmRes[4];
     FesKiraObj obj;
     FesKiraSpec spec;
 } FieldEffectFesKira;
@@ -50,7 +50,7 @@ typedef struct {
     FesKira kiras[FES_KIRA_MAX];
 } FesKiraTask;
 
-static void *func_ov036_021a5a34(FieldEffects *effects, HeapID heapId);
+static FieldEffectFesKira *func_ov036_021a5a34(FieldEffects *effects, HeapID heapId);
 static void func_ov036_021a5a58(FieldEffectFesKira *effect);
 static void func_ov036_021a5a90(FesKiraObj *obj, FieldEffectFesKira *effect);
 static void func_ov036_021a5afc(FesKiraObj *obj, FieldEffectFesKira *effect);
@@ -83,7 +83,7 @@ void func_ov036_021a5a20(FieldEffects *effects, void *data) {
     GFL_HeapFree(data);
 }
 
-static void *func_ov036_021a5a34(FieldEffects *effects, HeapID heapId) {
+static FieldEffectFesKira *func_ov036_021a5a34(FieldEffects *effects, HeapID heapId) {
     FieldEffectFesKira *effect = GFL_HeapAllocate(heapId, sizeof(FieldEffectFesKira), TRUE, "fldeff_fes_kira.c", 179);
 
     effect->effects = effects;

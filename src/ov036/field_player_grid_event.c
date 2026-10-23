@@ -291,7 +291,7 @@ static GameEventReturnCode EventStrengthRockPush_Callback(GameEvent *event, u32 
     return GAMEEVENT_CONTINUE;
 }
 
-void *FieldSurfTCB_Create(FieldPlayer *player, u32 direction, u32 tileType, HeapID heapId) {
+TCB *FieldSurfTCB_Create(FieldPlayer *player, u32 direction, u32 tileType, HeapID heapId) {
     SurfTCB *surf = GFL_HeapAllocate(HEAPID_TAIL(heapId), sizeof(SurfTCB), TRUE, "field_player_grid_event.c", 486);
 
     surf->field = FieldPlayer_GetField(player);
@@ -304,13 +304,13 @@ void *FieldSurfTCB_Create(FieldPlayer *player, u32 direction, u32 tileType, Heap
     return GFL_TCBMgrAddTask(Field_GetTCBMgr(surf->field), FieldSurfTCB_Callback, surf, 0);
 }
 
-BOOL FieldSurfTCB_CheckEnd(void *tcb) {
+BOOL FieldSurfTCB_CheckEnd(TCB *tcb) {
     SurfTCB *surf = GFL_TCBGetData(tcb);
 
     return surf->finished;
 }
 
-void FieldSurfTCB_Free(void *tcb) {
+void FieldSurfTCB_Free(TCB *tcb) {
     GFL_HeapFree(GFL_TCBGetData(tcb));
     GFL_TCBRemove(tcb);
 }
@@ -391,7 +391,7 @@ static void FieldSurfTCB_Callback(TCB *tcb, void *work) {
     }
 }
 
-void *FieldWaterfallTCB_Create(FieldPlayer *player, u32 direction, u32 param, HeapID heapId) {
+TCB *FieldWaterfallTCB_Create(FieldPlayer *player, u32 direction, u32 param, HeapID heapId) {
     WaterfallTCB *waterfall =
         GFL_HeapAllocate(HEAPID_TAIL(heapId), sizeof(WaterfallTCB), TRUE, "field_player_grid_event.c", 691);
     FieldActor *actor;
@@ -414,13 +414,13 @@ void *FieldWaterfallTCB_Create(FieldPlayer *player, u32 direction, u32 param, He
     return GFL_TCBMgrAddTask(Field_GetTCBMgr(waterfall->field), FieldWaterfallTCB_Callback, waterfall, 0);
 }
 
-BOOL FieldWaterfallTCB_CheckEnd(void *tcb) {
+BOOL FieldWaterfallTCB_CheckEnd(TCB *tcb) {
     WaterfallTCB *waterfall = GFL_TCBGetData(tcb);
 
     return waterfall->finished;
 }
 
-void FieldWaterfallTCB_Free(void *tcb) {
+void FieldWaterfallTCB_Free(TCB *tcb) {
     GFL_HeapFree(GFL_TCBGetData(tcb));
     GFL_TCBRemove(tcb);
 }

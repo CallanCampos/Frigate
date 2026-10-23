@@ -167,7 +167,7 @@ void EventFieldTrade_DebugLogPkm(PartyPkm *pkm) {
     PokeParty_GetParam(pkm, 0x95, NULL);
 }
 
-void func_ov033_0217a864(void *param) {
+void func_ov033_0217a864(FieldTradeOfferData *param) {
 }
 
 GameEventReturnCode EventFieldTrade_Callback(GameEvent *event, u32 *state, void *data) {

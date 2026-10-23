@@ -13,6 +13,7 @@
 #include "nitro/gx.h"
 #include "system/game_data.h"
 #include "system/game_system.h"
+#include "system/season.h"
 
 // The gimmick of zone 427 (the constant says Aspertia City), which overlay 36's gimmick table loads: four models, one
 // for each season, each with two animations, and a picture on BG 3 that script plugin 14 asks for. The file name is a
@@ -28,7 +29,6 @@
 #else
 #define GIMMICK_BG_NCLR 5
 #endif
-#define SEASON_COUNT 4
 
 typedef struct {
     FieldExpObjSystem *expObj;
@@ -152,7 +152,7 @@ static void AspertiaCity_LoadBG(GimmickWork *work) {
                           GX_BG_AREAOVER_XLU,
                           FALSE };
 
-        GFL_BGSysCreateBG(GIMMICK_BG, &setup, 0);
+        GFL_BGSysCreateBG(GIMMICK_BG, &setup, BGMODE_TEXT);
     }
     arc = GFL_ArcSysCreateFileHandle(ARCID_GIMMICK, HEAPID_TAIL(heapId));
     GFL_G2DIOLoadArcNCLRDefault(arc, GIMMICK_BG_NCLR, 0, 0, 0, heapId);

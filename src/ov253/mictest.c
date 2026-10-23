@@ -342,7 +342,7 @@ static void MicTest_SeqWipeIn(MicTestSeq *seq, u32 *state) {
 
     switch (*state) {
     case 0:
-        GFL_WipeSet(0, 1, 1, 0, 6, 1, wk->heapId);
+        GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_IN, WIPE_TYPE_FADE_IN, 0, 6, 1, wk->heapId);
         *state = 1;
         break;
     case 1:
@@ -406,7 +406,7 @@ static void MicTest_SeqWipeOut(MicTestSeq *seq, u32 *state) {
 
     switch (*state) {
     case 0:
-        GFL_WipeSet(0, 0, 0, 0, 6, 1, wk->heapId);
+        GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, 0, 6, 1, wk->heapId);
         *state = 1;
         break;
     case 1:

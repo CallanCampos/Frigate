@@ -27,9 +27,9 @@ enum {
 };
 
 struct ResortNPC {
-    void *table;
+    ResortBinary *table;
     u32 unk4;
-    void *texts;
+    ResortBinary *texts;
     ResortNPCSetup setup;
     BOOL eventRunning;
     u32 count;
@@ -107,7 +107,7 @@ u16 ResortNPC_GetTextEntry(ResortNPC *npc, u32 row, u32 column) {
 static void ResortNPC_CreateActors(ResortNPC *npc) {
     u32 i;
     for (i = 0; i < ResortBinary_GetRowCount(npc->table); i++) {
-        u16 rank = JoinAvenue_GetParam(npc->setup.info, 2, 0);
+        u16 rank = JoinAvenue_GetParam(npc->setup.info, JOIN_AVE_INFO_RANK, 0);
         u32 minRank = ResortBinary_Get(npc->table, i, RESORT_NPC_COL_RANK);
         u32 zone = ResortBinary_Get(npc->table, i, RESORT_NPC_COL_ZONE);
         FieldActor *actor = FindFieldActor(npc->setup.mmSys, i + RESORT_NPC_UID_FIRST);

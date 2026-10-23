@@ -840,7 +840,7 @@ typedef struct {
 static const u8 sAIItemMaxMons[4] = { 6, 4, 2, 1 };
 // The points a movie scores for its star's fame
 // The messages of an escape, by its kind
-BtlClient *BattleClient_Create(BtlMainModule *mainModule, BtlPokeCon *pokeCon, u8 commMode, void *netHandle,
+BtlClient *BattleClient_Create(BtlMainModule *mainModule, BtlPokeCon *pokeCon, u8 commMode, NetHandle *netHandle,
                                u16 clientId, u16 numCoverPos, u8 isAI, u32 arg7, BOOL recPlay, MATHRandContext32 *rand,
                                HeapID heapId) {
     BtlClient *client = GFL_HeapAllocate(heapId, sizeof(BtlClient), TRUE, "btl_client.c", 0x281);
@@ -1262,7 +1262,7 @@ static void BattleClient_SaveFrontMonHp(BtlClient *client) {
     BattleMon *mon = BattleClient_GetSingleBattleFrontMon(client);
 
     if (mon != NULL) {
-        client->savedHp = GetBattleMonStat(mon, 13);
+        client->savedHp = GetBattleMonStat(mon, BATTLEMON_HP);
     }
 }
 
@@ -1270,7 +1270,7 @@ static u32 BattleClient_GetFrontMonHpLossRatio(BtlClient *client) {
     BattleMon *mon = BattleClient_GetSingleBattleFrontMon(client);
 
     if (mon != NULL) {
-        u32 hp = GetBattleMonStat(mon, 13);
+        u32 hp = GetBattleMonStat(mon, BATTLEMON_HP);
 
         if (hp >= client->savedHp) {
             return 0;
@@ -1714,13 +1714,13 @@ static void Studio_SaveChoice(BtlClient *client, s32 scene, u32 value) {
 static u32 Studio_GetEnding(BtlClient *client) {
     BtlSetup *setup = GetBattleSetup(client->mainModule);
 
-    return setup->unk124;
+    return setup->studioEnding;
 }
 
 static void Studio_SetEnding(BtlClient *client, u32 value) {
     BtlSetup *setup = GetBattleSetup(client->mainModule);
 
-    setup->unk124 = value;
+    setup->studioEnding = value;
 }
 
 static void Studio_DecideEnding(BtlClient *client, const BtlScriptedRules *rules, s32 scene) {
@@ -2451,7 +2451,7 @@ static BOOL BattleClient_ActionSelectRoot(BtlClient *client, s32 *seq) {
         }
         switch (BtlvCore_WaitCommandSelect(client->viewCore)) {
         case BTLV_COMMAND_POKEMON:
-            if (CheckCondition(client->procMon, 0x21)) {
+            if (CheckCondition(client->procMon, CONDITION_SKY_DROP)) {
                 BtlvCore_ResetScreen(client->viewCore);
                 *seq = ROOT_SEQ_BLOCKED_RESET_SCREEN;
             } else {
@@ -2464,7 +2464,7 @@ static BOOL BattleClient_ActionSelectRoot(BtlClient *client, s32 *seq) {
             BattleClient_SetSelActProc(client, BattleClient_ActionSelectFight);
             break;
         case BTLV_COMMAND_BAG:
-            if (CheckCondition(client->procMon, 0x21)) {
+            if (CheckCondition(client->procMon, CONDITION_SKY_DROP)) {
                 *seq = ROOT_SEQ_BLOCKED_RESET_SCREEN;
             } else if (client->bagMode == 1 && !func_ov167_0219db08(client->mainModule)) {
                 BtlvCore_ResetScreen(client->viewCore);
@@ -2477,7 +2477,7 @@ static BOOL BattleClient_ActionSelectRoot(BtlClient *client, s32 *seq) {
             break;
         case BTLV_COMMAND_RUN:
             if (client->procActionIdx == client->firstActionIdx) {
-                if (CheckCondition(client->procMon, 0x21) && GetRunMode(client->mainModule) != 2) {
+                if (CheckCondition(client->procMon, CONDITION_SKY_DROP) && GetRunMode(client->mainModule) != 2) {
                     *seq = ROOT_SEQ_BLOCKED_RESET_SCREEN;
                 } else {
                     shooterWork_SetCost(client, client->procActionIdx, 0);
@@ -3177,8 +3177,8 @@ static BOOL AutoSelectAction(BtlClient *client, BattleMon *mon, BattleAction *ac
         }
         return TRUE;
     }
-    if (CheckCondition(mon, 25)) {
-        BattleConditionCont cont = GetConditionContinuationParam(mon, 25);
+    if (CheckCondition(mon, CONDITION_MOVE_LOCK)) {
+        BattleConditionCont cont = GetConditionContinuationParam(mon, CONDITION_MOVE_LOCK);
         u16 move = Condition_GetParam(cont);
         u8 target = GetPrevTargetPos(mon);
         if (action != NULL) {
@@ -3186,7 +3186,7 @@ static BOOL AutoSelectAction(BtlClient *client, BattleMon *mon, BattleAction *ac
         }
         return TRUE;
     }
-    if (CheckCondition(mon, 26)) {
+    if (CheckCondition(mon, CONDITION_CHARGE)) {
         u16 move = GetPreviousMoveID(mon);
         u8 target = GetPrevTargetPos(mon);
         BattleMon_FindMoveSlot(mon, move);
@@ -3224,8 +3224,8 @@ static BOOL IsUnselectableMove(BtlClient *client, BattleMon *mon, u16 move, Btlv
     if (move == MOVE_STRUGGLE) {
         return FALSE;
     }
-    if (CanMonUseHeldItem(client, mon) && CheckCondition(mon, 27)) {
-        u16 lockedMove = Condition_GetParam(GetConditionContinuationParam(mon, 27));
+    if (CanMonUseHeldItem(client, mon) && CheckCondition(mon, CONDITION_CHOICE_LOCK)) {
+        u16 lockedMove = Condition_GetParam(GetConditionContinuationParam(mon, CONDITION_CHOICE_LOCK));
         if (MoveIsUsable(mon, lockedMove) && lockedMove != move) {
             if (param != NULL) {
                 Btlv_StringParam_Setup(param, 1, 0x63);
@@ -3235,8 +3235,8 @@ static BOOL IsUnselectableMove(BtlClient *client, BattleMon *mon, u16 move, Btlv
             return TRUE;
         }
     }
-    if (CheckCondition(mon, 23)) {
-        BattleConditionCont cont = GetConditionContinuationParam(mon, 23);
+    if (CheckCondition(mon, CONDITION_ENCORE)) {
+        BattleConditionCont cont = GetConditionContinuationParam(mon, CONDITION_ENCORE);
         u16 encoreMove = Condition_GetParam(cont);
         if (move != encoreMove) {
             if (param != NULL) {
@@ -3326,7 +3326,7 @@ static BOOL CanMonUseHeldItem(BtlClient *client, BattleMon *mon) {
     if (CheckCondition(mon, CONDITION_EMBARGO)) {
         return FALSE;
     }
-    if (GetBattleMonStat(mon, 0x11) != ABILITY_KLUTZ) {
+    if (GetBattleMonStat(mon, BATTLEMON_EFFECTIVE_ABILITY) != ABILITY_KLUTZ) {
         return TRUE;
     }
     return FALSE;
@@ -3354,7 +3354,7 @@ static u32 CheckEscapeBlocked(BtlClient *client, u8 *trapMonId, u16 *trapAbility
             if (CanMonUseHeldItem(client, mon) && GetBattleMonHeldItem(mon) == ITEM_SMOKE_BALL) {
                 return TRAP_NONE;
             }
-            if (GetBattleMonStat(mon, 0x11) == ABILITY_RUN_AWAY) {
+            if (GetBattleMonStat(mon, BATTLEMON_EFFECTIVE_ABILITY) == ABILITY_RUN_AWAY) {
                 return TRAP_NONE;
             }
         }
@@ -3376,7 +3376,7 @@ static u32 IsMonTrapped(BtlClient *client, BattleMon *mon, u8 *trapMonId, u16 *t
     u8 i;
     for (i = 0; i < count; i++) {
         BattleMon *opponent = GetPokeParam(client->pokeCon, monIds[i]);
-        u16 ability = GetBattleMonStat(opponent, 0x11);
+        u16 ability = GetBattleMonStat(opponent, BATTLEMON_EFFECTIVE_ABILITY);
         // The ID is read and dropped here, likely left from a removed debug print
         GetMonID(opponent);
         if (ability == ABILITY_SHADOW_TAG && DoesMonHaveShadowTag(client, mon)) {
@@ -3405,7 +3405,7 @@ static u32 IsMonTrapped(BtlClient *client, BattleMon *mon, u8 *trapMonId, u16 *t
 }
 
 static BOOL DoesMonHaveShadowTag(BtlClient *client, BattleMon *mon) {
-    if (GetBattleMonStat(mon, 0x11) != ABILITY_SHADOW_TAG) {
+    if (GetBattleMonStat(mon, BATTLEMON_EFFECTIVE_ABILITY) != ABILITY_SHADOW_TAG) {
         return TRUE;
     }
     return FALSE;
@@ -3416,7 +3416,7 @@ static BOOL IsMonTrappedByArenaTrap(BtlClient *client, BattleMon *mon) {
     if (CheckFieldEffect(client->field, FIELD_CONDITION_GRAVITY)) {
         return TRUE;
     }
-    if (CheckCondition(mon, 31)) {
+    if (CheckCondition(mon, CONDITION_SMACK_DOWN)) {
         return TRUE;
     }
     if (CheckCondition(mon, CONDITION_INGRAIN)) {
@@ -3425,16 +3425,16 @@ static BOOL IsMonTrappedByArenaTrap(BtlClient *client, BattleMon *mon) {
     if (canUseItem && GetBattleMonHeldItem(mon) == ITEM_IRON_BALL) {
         return TRUE;
     }
-    if (GetBattleMonStat(mon, 0x11) == ABILITY_LEVITATE) {
+    if (GetBattleMonStat(mon, BATTLEMON_EFFECTIVE_ABILITY) == ABILITY_LEVITATE) {
         return FALSE;
     }
     if (DoesMonHaveType(mon, TYPE_FLYING)) {
         return FALSE;
     }
-    if (CheckCondition(mon, 30)) {
+    if (CheckCondition(mon, CONDITION_MAGNET_RISE)) {
         return FALSE;
     }
-    if (CheckCondition(mon, 32)) {
+    if (CheckCondition(mon, CONDITION_TELEKINESIS)) {
         return FALSE;
     }
     if (canUseItem && GetBattleMonHeldItem(mon) == ITEM_AIR_BALLOON) {
@@ -3559,7 +3559,7 @@ static BOOL ShouldSwitchIfWonderGuard(BtlClient *client, BattleMon *mon, BattleM
     if (BtlSetup_GetBattleStyle(client->mainModule) != BTL_STYLE_SINGLE) {
         return FALSE;
     }
-    if (GetBattleMonStat(target, 0x11) == ABILITY_WONDER_GUARD &&
+    if (GetBattleMonStat(target, BATTLEMON_EFFECTIVE_ABILITY) == ABILITY_WONDER_GUARD &&
         !DoesMonHaveSuperEffectiveMove(client, mon, target, TYPE_EFFECTIVENESS_DOUBLE) &&
         CheckIfMonToSwitchToWithSEMove(client, target, TYPE_EFFECTIVENESS_DOUBLE) &&
         MATH_Rand32(&client->aiRand, 3) < 2) {
@@ -3597,8 +3597,8 @@ static BOOL ShouldSwitchIfNoEffectiveMoves(BtlClient *client, BattleMon *mon, Ba
 }
 
 static BOOL ShouldSwitchIfChoicedIntoIneffectiveMove(BtlClient *client, BattleMon *mon, BattleMon *target) {
-    if (CheckCondition(mon, 27)) {
-        BattleConditionCont cont = GetConditionContinuationParam(mon, 27);
+    if (CheckCondition(mon, CONDITION_CHOICE_LOCK)) {
+        BattleConditionCont cont = GetConditionContinuationParam(mon, CONDITION_CHOICE_LOCK);
         u16 move = Condition_GetParam(cont);
         if (move != 0) {
             BOOL isDamaging = PML_MoveIsDamaging(move);
@@ -3661,7 +3661,7 @@ static BOOL ShouldSwitchIfAsleepWithNaturalCure(BtlClient *client, BattleMon *mo
     BattleMonDamageRecord record;
     u8 found;
 
-    if (GetBattleMonStat(mon, 0x11) == ABILITY_NATURAL_CURE &&
+    if (GetBattleMonStat(mon, BATTLEMON_EFFECTIVE_ABILITY) == ABILITY_NATURAL_CURE &&
         (CheckCondition(mon, CONDITION_SLEEP) || CheckCondition(mon, CONDITION_FREEZE)) &&
         GetHPRatio(mon) >= FX32_CONST(50)) {
         if (GetDamageReceived(mon, 1, 0, &record)) {
@@ -3729,7 +3729,7 @@ static BOOL CheckMonsForTypeAbsorbingAbility(BtlClient *client, u16 ability, u8 
     for (i = GetNumMonsOnField(BtlSetup_GetBattleStyle(client->mainModule), client->numCoverPos); i < numMons; i++) {
         if (!IsAISwitchReserved(client, i)) {
             BattleMon *candidate = GetBattleMonFromParty(client->party, i);
-            if (!IsFainted(candidate) && ability == GetBattleMonStat(candidate, 0x11)) {
+            if (!IsFainted(candidate) && ability == GetBattleMonStat(candidate, BATTLEMON_EFFECTIVE_ABILITY)) {
                 *slot = i;
                 return TRUE;
             }
@@ -3881,8 +3881,8 @@ static BOOL AISelectAction(BtlClient *client, s32 *seq) {
                 client->procAction++;
             }
         }
-        if (CheckCondition(client->procMon, 25)) {
-            move = Condition_GetParam(GetConditionContinuationParam(client->procMon, 25));
+        if (CheckCondition(client->procMon, CONDITION_MOVE_LOCK)) {
+            move = Condition_GetParam(GetConditionContinuationParam(client->procMon, CONDITION_MOVE_LOCK));
             BattleAction_SetFightParam(client->procAction, move,
                                        DecideMoveTargetAutoForClient(client->mainModule, client->pokeCon,
                                                                      client->procMon, move, &client->aiRand));
@@ -4618,7 +4618,7 @@ static BOOL BattleClient_ExitTrainerBattle(BtlClient *client, s32 *seq) {
     case EXIT_TRAINER_SEQ_STUDIO_SCENE:
         if (Studio_PlayScene(client)) {
             setup = GetBattleSetup(client->mainModule);
-            setup->unk130 = StudioScore_CalcTotal(client, &client->studio.score);
+            setup->studioScore = StudioScore_CalcTotal(client, &client->studio.score);
             return TRUE;
         }
         break;
@@ -4630,7 +4630,7 @@ static BOOL BattleClient_ExitTrainerBattle(BtlClient *client, s32 *seq) {
                 Studio_FindScene(rules, &client->studio, client->turnCount, func_ov167_0219c9e0(client->mainModule));
             Studio_ScoreEndScene(client, rules, score);
             Studio_DecideEnding(client, rules, score);
-            setup->unk130 = StudioScore_CalcTotal(client, &client->studio.score);
+            setup->studioScore = StudioScore_CalcTotal(client, &client->studio.score);
             return TRUE;
         }
         break;
@@ -5258,14 +5258,14 @@ static BOOL BattleClient_ScMoveMsg(BtlClient *client, s32 *seq, const u32 *args)
 
 static s32 BattleClient_GetMoveAnimType(BtlClient *client, u16 move, u8 pos) {
     if (move != 0xae) {
-        return PML_MoveGetParam(move, 0x1b);
+        return PML_MoveGetParam(move, MOVE_PARAM_TARGET);
     } else {
         BattleMon *mon = PokeCon_GetPosMonInner(client->pokeCon, pos);
 
         if (mon != NULL) {
             return BtlCalc_GetCurseTarget(mon);
         }
-        return PML_MoveGetParam(move, 0x1b);
+        return PML_MoveGetParam(move, MOVE_PARAM_TARGET);
     }
 }
 
@@ -5399,7 +5399,7 @@ static BOOL BattleClient_ScConfusionDamage(BtlClient *client, s32 *seq, const u3
     case 0:
         if (!BattleClient_IsChapterSkipping(client)) {
             pos = MonIDToBattlePos(client->mainModule, client->pokeCon, args[0]);
-            BtlvCore_StartMoveEffect(client->viewCore, pos, pos, 1, PML_MoveGetParam(1, 0x1b), 0, 0);
+            BtlvCore_StartMoveEffect(client->viewCore, pos, pos, 1, PML_MoveGetParam(1, MOVE_PARAM_TARGET), 0, 0);
         }
         (*seq)++;
         break;
@@ -6819,7 +6819,7 @@ static u16 AICheckItemUse(BtlClient *client, BattleMon *mon, BattleParty *party)
     u8 numMons = GetNumMonsInParty(party);
     u32 i;
 
-    if (CheckCondition(mon, 0x13)) {
+    if (CheckCondition(mon, CONDITION_EMBARGO)) {
         return 0;
     }
     for (i = 0; i < 4; i++) {
@@ -6830,7 +6830,7 @@ static u16 AICheckItemUse(BtlClient *client, BattleMon *mon, BattleParty *party)
             BOOL use = FALSE;
 
             if (ItemGetParam(client->aiItems[i], 0x29)) {
-                if (GetBattleMonStat(mon, 0xd) > DivideMaxHp(mon, 4)) {
+                if (GetBattleMonStat(mon, BATTLEMON_HP) > DivideMaxHp(mon, 4)) {
                     continue;
                 }
                 use = TRUE;
@@ -7231,11 +7231,11 @@ static void Studio_UpdateAudience(BtlClient *client) {
 static void Studio_PlayEndingBgm(BtlMainModule *mainModule) {
     BtlSetup *setup = GetBattleSetupParam(mainModule);
 
-    if (setup->unk124 == 0) {
+    if (setup->studioEnding == 0) {
         BtlvEffect_PlayBgm(func_ov167_0219bf08(mainModule));
-    } else if (setup->unk124 == 1) {
+    } else if (setup->studioEnding == 1) {
         BtlvEffect_PlayBgm(GetWinBGM(mainModule));
-    } else if (setup->unk124 == 2) {
+    } else if (setup->studioEnding == 2) {
         BtlvEffect_PlayBgm(func_ov167_0219bf14(mainModule));
     }
 }

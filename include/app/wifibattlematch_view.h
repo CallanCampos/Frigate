@@ -5,6 +5,7 @@
 #include "gfl/clact.h"
 #include "gfl/heap.h"
 #include "save/player_info.h"
+#include "save/tournament_block.h"
 #include "struct_decls.h"
 #include "system/printsys.h"
 
@@ -87,11 +88,12 @@ void WifiBattleMatchRankCard_Free(WifiBattleMatchCard *card);
 WifiBattleMatchCard *WifiBattleMatchWifiCard_Create(const WifiBattleMatchWifiCardInfo *info, u32 ratio,
                                                     PlayerInfo *playerInfo, ClActUnit *unit, WifiBattleMatchRes *res,
                                                     Font *font, PrintQueue *printQueue, MsgData *msgData,
-                                                    WordSet *wordSet, void *records, BOOL main, HeapID heapId);
+                                                    WordSet *wordSet, TournamentTeam *records, BOOL main,
+                                                    HeapID heapId);
 WifiBattleMatchCard *WifiBattleMatchLiveCard_Create(const WifiBattleMatchLiveCardInfo *info, PlayerInfo *playerInfo,
                                                     ClActUnit *unit, WifiBattleMatchRes *res, Font *font,
                                                     PrintQueue *printQueue, MsgData *msgData, WordSet *wordSet,
-                                                    void *records, BOOL main, HeapID heapId);
+                                                    TournamentTeam *records, BOOL main, HeapID heapId);
 void WifiBattleMatchWifiCard_Free(WifiBattleMatchCard *card);
 void WifiBattleMatchLiveCard_Free(WifiBattleMatchCard *card);
 // Shows a page of the card: its Pokémon, then two other pages that hide them

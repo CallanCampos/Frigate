@@ -10,7 +10,7 @@
 #include "battle/btl_handler.h"
 #include "struct_decls.h"
 
-u8 CollectMoveTargets(BtlServerFlow *flow, BattleMon *mon, u8 target, BtlFlowMoveParam *param, void *targets);
+u8 CollectMoveTargets(BtlServerFlow *flow, BattleMon *mon, u8 target, BtlFlowMoveParam *param, BtlMonSet *targets);
 void AddExpAndEVs(BtlServerFlow *flow, BattleParty *party, BattleMon *defeated, BtlFlowExpEntry *entries);
 u8 UseBagItem(BtlServerFlow *flow, BattleMon *mon, u16 item, u8 param, u8 slot);
 s32 CheckScriptedBattleRules(BtlMainModule *mainModule, BtlPokeCon *pokeCon);

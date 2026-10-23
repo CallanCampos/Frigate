@@ -175,7 +175,7 @@ BOOL s027F_FunfestGetPokemonQuizBogusSpecies(VM *vm, FieldScriptEnv *env) {
 
 BOOL func_ov033_021772c8(VM *vm, FieldScriptEnv *env) {
     u16 *result;
-    void *missionCfg;
+    FestMissionConfig *missionCfg;
 
     result = ScriptReadVar(vm, env);
     missionCfg = GetFestMissionCfg(GSYS_GetLinkFestival(FieldScriptEnv_GetGameSystem(env)));

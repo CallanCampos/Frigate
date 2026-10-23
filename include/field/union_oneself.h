@@ -71,9 +71,11 @@ enum {
 #define UNION_STEP_FOR_ACTIVITY(activity) ((activity) + 11)
 
 // The activities that this file names; the others are a number of the menu
-#define UNION_ACTIVITY_TRADE 0x18
-#define UNION_ACTIVITY_EGG_TRADE 0x19
-#define UNION_ACTIVITY_NONE 0x1b
+enum {
+    UNION_ACTIVITY_TRADE = 0x18,
+    UNION_ACTIVITY_EGG_TRADE,
+    UNION_ACTIVITY_NONE = 0x1b,
+};
 
 void UnionOneself_CheckEntries(UnionSystem *unisys);
 GameEvent *UnionOneself_CreateCommandEvent(GameSystem *gsys, Field *field);

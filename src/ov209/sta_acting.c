@@ -1308,7 +1308,7 @@ void StaActing_SetScrollTarget(StaActing *stage, u16 target) {
     stage->scrollTarget = target;
 }
 
-void *StaActing_GetItemData(StaActing *stage) {
+MusItemData *StaActing_GetItemData(StaActing *stage) {
     return MusItemDraw_GetItemData(stage->itemDraw);
 }
 

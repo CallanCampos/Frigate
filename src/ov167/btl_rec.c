@@ -220,7 +220,7 @@ void *BtlRecTool_MakeTurnChunk(BtlRecTool *tool, u32 *size, BOOL chapter) {
     return tool->data;
 }
 
-void BtlRecTool_AddClientActions(BtlRecTool *tool, u8 clientId, const void *actions, u8 count) {
+void BtlRecTool_AddClientActions(BtlRecTool *tool, u8 clientId, const BattleAction *actions, u8 count) {
     if (tool->size == 0) {
         tool->type = 1;
         tool->size = 2;
@@ -267,7 +267,7 @@ void BtlRecTool_SetData(BtlRecTool *tool, const void *data, u32 size) {
     tool->overflow = 0;
 }
 
-BOOL BtlRecTool_ReadClientActions(BtlRecTool *tool, u32 *pos, u8 *clientId, u8 *count, void *actions) {
+BOOL BtlRecTool_ReadClientActions(BtlRecTool *tool, u32 *pos, u8 *clientId, u8 *count, BattleAction *actions) {
     if (*pos == 0) {
         *pos = 2;
     }

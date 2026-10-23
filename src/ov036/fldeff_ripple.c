@@ -78,7 +78,7 @@ static void FieldEffectRipple_FreeMaterial(FieldEffectRipple *ripple) {
 }
 
 // Start a ripple at the actor's feet, further back if big, and at its first tile if atInit
-void func_ov036_021be828(void *effects, FieldActor *actor, u32 big, u32 atInit) {
+void func_ov036_021be828(FieldEffects *effects, FieldActor *actor, u32 big, u32 atInit) {
     VecFx32 pos;
     RippleTaskParams params;
     GridPos gpos;

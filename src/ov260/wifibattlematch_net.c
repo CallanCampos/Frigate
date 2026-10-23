@@ -286,7 +286,7 @@ typedef struct {
 #endif
 
 struct WifiBattleMatchNet {
-    void *unk0;
+    DWCUserData *unk0;
     WifiList *wifiList;
     GameData *gameData;
     s32 profileId;
@@ -2268,7 +2268,7 @@ u32 WifiBattleMatchNet_GetRecordId(WifiBattleMatchNet *p_wk) {
     return p_wk->p_data->sake_recordID;
 }
 
-BOOL WifiBattleMatchNet_SendPlayerInfo(WifiBattleMatchNet *p_wk, const void *data) {
+BOOL WifiBattleMatchNet_SendPlayerInfo(WifiBattleMatchNet *p_wk, const WifiBattleMatchPlayer *data) {
     BOOL toServer = GFL_NetGetHandleNetId(NetHandle_GetOwn()) == 0;
     NetHandle *handle = NetHandle_GetOwn();
 
@@ -2304,13 +2304,13 @@ BOOL WifiBattleMatchNet_TakeParty(WifiBattleMatchNet *p_wk, PokeParty *party) {
     return flag;
 }
 
-BOOL WifiBattleMatchNet_SendValue4(WifiBattleMatchNet *p_wk, const void *data) {
+BOOL WifiBattleMatchNet_SendValue4(WifiBattleMatchNet *p_wk, const u32 *data) {
     BOOL toServer = GFL_NetGetHandleNetId(NetHandle_GetOwn()) == 0;
 
     return GFL_NetSendCommandToMachine(NetHandle_GetOwn(), toServer, WBM_NET_CMD_VALUE4, 4, data, TRUE, TRUE, TRUE);
 }
 
-BOOL WifiBattleMatchNet_TakeValue4(WifiBattleMatchNet *p_wk, void *out) {
+BOOL WifiBattleMatchNet_TakeValue4(WifiBattleMatchNet *p_wk, u32 *out) {
     u32 flag = p_wk->flag148;
 
     if (flag != 0) {
@@ -2523,7 +2523,7 @@ static u32 WifiBattleMatchNet_GetHttpResultMessage(u32 result) {
     }
 }
 
-void WifiBattleMatchNet_GetDownload(WifiBattleMatchNet *p_wk, void *dest) {
+void WifiBattleMatchNet_GetDownload(WifiBattleMatchNet *p_wk, TournamentEntry *dest) {
     MI_CpuCopy8(&p_wk->downloadBuffer, dest, sizeof(p_wk->downloadBuffer));
 }
 

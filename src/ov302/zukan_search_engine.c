@@ -169,8 +169,8 @@ BOOL ZukanSearchEngine_Step(ZukanSearchEngine *engine, HeapID heapId, u16 *count
                 PML_PersonalFree(engine->personal);
             }
             engine->personal = PML_PersonalLoad(species, form, heapId);
-            type1 = PML_PersonalGetParam(engine->personal, 6);
-            type2 = PML_PersonalGetParam(engine->personal, 7);
+            type1 = PML_PersonalGetParam(engine->personal, PERSONAL_TYPE_1);
+            type2 = PML_PersonalGetParam(engine->personal, PERSONAL_TYPE_2);
             if (engine->criteria->type1 != CRITERIA_ANY && engine->criteria->type2 != CRITERIA_ANY) {
                 if (!((type1 == engine->criteria->type1 && type2 == engine->criteria->type2) ||
                       (type1 == engine->criteria->type2 && type2 == engine->criteria->type1))) {
@@ -189,7 +189,7 @@ BOOL ZukanSearchEngine_Step(ZukanSearchEngine *engine, HeapID heapId, u16 *count
                 }
             }
             if (engine->criteria->color != CRITERIA_ANY) {
-                u8 color = PML_PersonalGetParam(engine->personal, 0x21);
+                u8 color = PML_PersonalGetParam(engine->personal, PERSONAL_COLOR);
 
                 if (color != engine->criteria->color) {
                     engine->excluded[i] = 1;

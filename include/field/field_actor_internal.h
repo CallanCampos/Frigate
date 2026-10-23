@@ -126,8 +126,8 @@ struct MMSys {
     FieldActor *actorHeap;
     void *tcbMgrHeap;
     TCBManager *tcbMgr;
-    void *fieldBlAct;
-    void *actorG3DSystem;
+    FieldBlAct *fieldBlAct;
+    ActorG3DSystem *actorG3DSystem;
     StrengthRockSave *mmodelSave;
     GameData *gameData;
     FieldG3DMapper *g3dMapper;

@@ -239,15 +239,15 @@ sKindPalettes kind:data(any) addr:0x021be31e
 data_ov197_021be2ec kind:data(any) addr:0x021be32c
 MYSTERY_GIFT_PROC_FUNCTIONS kind:data(any) addr:0x021be368 ambiguous
 data_ov197_021be334 kind:data(any) addr:0x021be374
-data_ov197_021be364 kind:data(any) addr:0x021be3a4
-data_ov197_021be370 kind:data(any) addr:0x021be3b0
-data_ov197_021be37c kind:data(any) addr:0x021be3bc
-data_ov197_021be388 kind:data(any) addr:0x021be3c8
-data_ov197_021be398 kind:data(any) addr:0x021be3d8
-data_ov197_021be3b4 kind:data(any) addr:0x021be3f4
-data_ov197_021be3d4 kind:data(any) addr:0x021be414
-data_ov197_021be3f4 kind:data(any) addr:0x021be434
-data_ov197_021be424 kind:data(any) addr:0x021be464
+sCameraPosition kind:data(any) addr:0x021be3a4
+sCameraTarget kind:data(any) addr:0x021be3b0
+sCameraUpVector kind:data(any) addr:0x021be3bc
+sLCDConfig kind:data(any) addr:0x021be3c8
+sClActSetup kind:data(any) addr:0x021be3d8
+sSurfaceSetups kind:data(any) addr:0x021be3f4
+sLights kind:data(any) addr:0x021be414
+sVRAMConfig kind:data(any) addr:0x021be434
+sBGSetups kind:data(any) addr:0x021be464
 sYesNoWindow kind:data(any) addr:0x021be598
 sListCursorPositions kind:data(any) addr:0x021be59c
 data_ov197_021be560 kind:data(any) addr:0x021be5a0
@@ -268,7 +268,7 @@ sShakePositions kind:data(any) addr:0x021be77c
 data_ov197_021be794 kind:data(any) addr:0x021be7d4
 data_ov197_021be80c kind:data(any) addr:0x021be84c
 sHexDigits kind:data(any) addr:0x021be8c4
-data_ov197_021be8b4 kind:data(any) addr:0x021be8f4
+sNetInit kind:data(any) addr:0x021be8f4
 data_ov197_021be924 kind:data(any) addr:0x021be964
 data_ov197_021be980 kind:data(any) addr:0x021be9c0
 data_ov197_021be98c kind:data(any) addr:0x021be9cc
@@ -279,4 +279,4 @@ data_ov197_021be9d0 kind:data(any) addr:0x021bea10
 data_ov197_021be9d8 kind:data(any) addr:0x021bea18
 data_ov197_021be9ec kind:data(any) addr:0x021bea2c
 data_ov197_021be9f8 kind:data(any) addr:0x021bea38
-data_ov197_021bea00 kind:bss addr:0x021bea40
+sNdState kind:bss addr:0x021bea40

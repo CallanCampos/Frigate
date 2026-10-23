@@ -90,20 +90,20 @@ sBurstSizes kind:data(any) addr:0x021efff0
 sAnimations1D kind:data(any) addr:0x021efffa
 data_ov092_021f0001_w2_us kind:data(any) addr:0x021f0001 ambiguous
 sFollowerObjects kind:data(any) addr:0x021f0008
-data_ov092_021effd8 kind:data(any) addr:0x021f0018
+sSceneSetup kind:data(any) addr:0x021f0018
 sBurstAreas kind:data(any) addr:0x021f0028
 data_ov092_021effec kind:data(any) addr:0x021f002c
 data_ov092_021efff0 kind:data(any) addr:0x021f0030
 data_ov092_021efff4 kind:data(any) addr:0x021f0034
-data_ov092_021f0008 kind:data(any) addr:0x021f0048
+sFogTable kind:data(any) addr:0x021f0048
 sEffectSetups kind:data(any) addr:0x021f0068
 data_ov092_021f0086_w2_us kind:data(any) addr:0x021f0086 ambiguous
 sFogStages kind:data(any) addr:0x021f0088
 sModelSetups kind:data(any) addr:0x021f00b8
 sStageObjectSetups kind:data(any) addr:0x021f00e8
 data_ov092_021f0105_w2_us kind:data(any) addr:0x021f0105 ambiguous
-data_ov092_021f0134 kind:data(any) addr:0x021f0174
+sActors kind:data(any) addr:0x021f0174
 data_ov092_021f0140 kind:data(any) addr:0x021f0180
 data_ov092_021f021e_w2_us kind:data(any) addr:0x021f021e ambiguous
-data_ov092_021f0294 kind:data(any) addr:0x021f02d4
+sResources kind:data(any) addr:0x021f02d4
 data_ov092_021f0440 kind:data(any) addr:0x021f0480

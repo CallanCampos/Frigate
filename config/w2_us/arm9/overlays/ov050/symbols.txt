@@ -78,10 +78,10 @@ sTable7040 kind:data(any) addr:0x021e7080
 sTable7054 kind:data(any) addr:0x021e7094
 sTable706c kind:data(any) addr:0x021e70ac
 sWarpZones kind:data(any) addr:0x021e70d0
-data_ov050_021e70b4 kind:data(any) addr:0x021e70f4
-data_ov050_021e70dc kind:data(any) addr:0x021e711c
+sActorPositions kind:data(any) addr:0x021e70f4
+sStages kind:data(any) addr:0x021e711c
 sWarpPositions kind:data(any) addr:0x021e7174
-data_ov050_021e71a0 kind:data(any) addr:0x021e71e0
+sActors kind:data(any) addr:0x021e71e0
 data_ov050_021e7264 kind:data(any) addr:0x021e72a4 ambiguous
 data_ov050_021e742d kind:data(any) addr:0x021e746d ambiguous
 data_ov050_021e74cd kind:data(any) addr:0x021e750d ambiguous

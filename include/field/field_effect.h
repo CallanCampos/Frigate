@@ -13,7 +13,7 @@
 BlActSys *Field_GetEffectBlAct(Field *field);
 BlActSys *Field_GetWildEffectBlAct(Field *field);
 // The saving icon, and showing, hiding and freeing it
-void *func_ov036_021c6cc8(HeapID heapId, Field *field);
+FieldSaveAnime *func_ov036_021c6cc8(HeapID heapId, Field *field);
 void func_ov036_021c6d14(FieldSaveAnime *effect);
 void func_ov036_021c6d3c(FieldSaveAnime *effect);
 void func_ov036_021c6cf8(FieldSaveAnime *effect);
@@ -59,11 +59,11 @@ void func_ov036_021a40ac(FieldEffects *effects, FieldActor *actor, BOOL animate,
 // fldeff_footmark.c: the marks an actor leaves, by kind: footprints in sand (0) and snow (2), the tracks of actors
 // whose footprint type is 2 in sand (1) and snow (3), and tracks in deep sand (4). Tracks turn with the actor
 void func_ov036_021b47c8(FieldActor *actor, FieldEffects *effects, u32 kind);
-void func_ov036_021b49ac(MMSys *system, FieldActor *actor, void *effects, u32 kind);
-void func_ov036_021be828(void *effects, FieldActor *actor, u32 arg2, u32 arg3);
-void func_ov036_021bea3c(void *effects, FieldActor *actor);
-void func_ov036_021c289c(FieldActor *actor, void *effects);
-void func_ov036_021c94e0(void *effects, FieldActor *actor);
+void func_ov036_021b49ac(MMSys *system, FieldActor *actor, FieldEffects *effects, u32 kind);
+void func_ov036_021be828(FieldEffects *effects, FieldActor *actor, u32 arg2, u32 arg3);
+void func_ov036_021bea3c(FieldEffects *effects, FieldActor *actor);
+void func_ov036_021c289c(FieldActor *actor, FieldEffects *effects);
+void func_ov036_021c94e0(FieldEffects *effects, FieldActor *actor);
 
 // field_effect.c: the effects a map has loaded, by ID, and the tasks that play them
 enum {
@@ -125,7 +125,7 @@ void func_ov036_021a3ad4(FieldEffectTask *task, VecFx32 *pos);
 void func_ov036_021a3ae8(FieldEffectTask *task, const VecFx32 *pos);
 void *func_ov036_021a3afc(FieldEffectTask *task);
 void FieldEffects_SetLuminanceTable(FieldEffects *effects, const u8 *table);
-void FieldEffects_ApplyLuminanceTable(FieldEffects *effects, void *resource);
+void FieldEffects_ApplyLuminanceTable(FieldEffects *effects, G3DResource *resource);
 
 // fldeff_namipoke.c: the Pokémon an actor surfs on, facing dir at pos, and how it follows the actor (0: it doesn't, 1:
 // it bobs under the actor, 2: the actor's offset is left alone), which can change; and whether its wake shows

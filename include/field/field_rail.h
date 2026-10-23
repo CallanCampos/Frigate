@@ -114,11 +114,11 @@ struct RailDisabledLines {
 };
 
 // RailUnit's component tag; a unit has no component before placement
-enum {
+typedef enum {
     RAIL_COMPONENT_POINT,
     RAIL_COMPONENT_LINE,
     RAIL_COMPONENT_NONE,
-};
+} RailComponentKind;
 
 // Something that moves along the rails: the point it is at, or the line, with its position along the line (front)
 // and across it (side), in sixteenths of a tile

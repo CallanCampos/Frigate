@@ -60,7 +60,7 @@ struct BtlvEffvm {
     s32 particleIds[16];           // 0x04c  each particle system's file, -1 for none
     u32 emitterCounts[16];         // 0x08c  each particle resource's count of emitters
     s32 clactIndexes[4];           // 0x0cc  -1 for none
-    int attacker;                  // 0x0dc  a position, 0xff for none
+    int attacker;                  // 0x0dc  a position, or BTLV_MCSS_POS_NONE
     int defender;                  // 0x0e0
     u32 callAttackers[16];         // 0x0e4  the call stack, by callDepth
     u32 callDefenders[16];         // 0x124
@@ -874,7 +874,7 @@ static BOOL BtlvEffvm_CmdCameraMovePreset(VM *vm, void *env) {
         case 2:
         case 3:
             posType = wk->defender;
-            if (posType == 0xff) {
+            if (posType == BTLV_MCSS_POS_NONE) {
                 posType = (wk->attacker & 1) ^ 1;
             }
             break;
@@ -883,7 +883,7 @@ static BOOL BtlvEffvm_CmdCameraMovePreset(VM *vm, void *env) {
         case 9:
         case 13:
             posType = wk->defender;
-            if (posType != 0xff) {
+            if (posType != BTLV_MCSS_POS_NONE) {
                 break;
             }
             // fallthrough
@@ -2653,8 +2653,8 @@ static BOOL BtlvEffvm_CmdEnd(VM *vm, void *env) {
         }
         GFL_BGSysSetBGPriority(3, 0);
         wk->bgMoved = FALSE;
-        GFL_BGSysMoveBG(3, 0, wk->bgX);
-        GFL_BGSysMoveBG(3, 3, wk->bgY);
+        GFL_BGSysMoveBG(3, BG_MOVE_SET_X, wk->bgX);
+        GFL_BGSysMoveBG(3, BG_MOVE_SET_Y, wk->bgY);
     }
     if (wk->alphaBlend) {
         G2x_SetBlendAlpha_(0x4000050, 2, 0x3d, 0x1f, 7);
@@ -2886,7 +2886,7 @@ static int BtlvEffvm_GetTargetPositions(BtlvEffvm *wk, int code, int *positions)
         break;
     case 14:
         positions[0] = wk->attacker;
-        if (positions[0] == 0xff) {
+        if (positions[0] == BTLV_MCSS_POS_NONE) {
             if (BtlvEffect_CheckExist(0) == TRUE) {
                 positions[0] = 0;
             } else if (BtlvEffect_CheckExist(2) == TRUE) {
@@ -2907,12 +2907,12 @@ static int BtlvEffvm_GetTargetPositions(BtlvEffvm *wk, int code, int *positions)
         if (wk->attacker > 1) {
             positions[0] = wk->attacker ^ 2;
         } else {
-            positions[0] = 0xff;
+            positions[0] = BTLV_MCSS_POS_NONE;
         }
         break;
     case 16:
         positions[0] = wk->defender;
-        if (positions[0] != 0xff) {
+        if (positions[0] != BTLV_MCSS_POS_NONE) {
             break;
         }
         rule = BtlvEffect_GetBattleStyle();
@@ -3018,7 +3018,7 @@ static int BtlvEffvm_GetTargetPositions(BtlvEffvm *wk, int code, int *positions)
         if (wk->defender > 1) {
             positions[0] = wk->defender ^ 2;
         } else {
-            positions[0] = 0xff;
+            positions[0] = BTLV_MCSS_POS_NONE;
         }
         break;
     case 18:
@@ -3045,11 +3045,11 @@ static int BtlvEffvm_GetTargetPositions(BtlvEffvm *wk, int code, int *positions)
         }
         break;
     }
-    if (positions[0] != 0xff && positions[0] < 8) {
+    if (positions[0] != BTLV_MCSS_POS_NONE && positions[0] < 8) {
         if (BtlvEffect_CheckExist(positions[0]) == TRUE) {
             positions[0] = BtlvEffvm_CheckPosition(wk, positions[0]);
         } else {
-            positions[0] = 0xff;
+            positions[0] = BTLV_MCSS_POS_NONE;
             count = 0;
         }
     }
@@ -3063,7 +3063,7 @@ static int BtlvEffvm_GetDefenderPositions(BtlvEffvm *wk, int code, int *position
     BtlvMcssPos pos;
 
     positions[0] = wk->defender;
-    if (positions[0] == 0xff) {
+    if (positions[0] == BTLV_MCSS_POS_NONE) {
         rule = BtlvEffect_GetBattleStyle();
         count = 0;
         if (rule == 0 || rule == 3) {
@@ -3189,7 +3189,7 @@ static int BtlvEffvm_GetTargetPosition(VM *vm, int code) {
         break;
     case 14:
         pos = wk->attacker;
-        if (pos == 0xff) {
+        if (pos == BTLV_MCSS_POS_NONE) {
             if (BtlvEffect_CheckExist(2) == TRUE) {
                 return 2;
             }
@@ -3206,12 +3206,12 @@ static int BtlvEffvm_GetTargetPosition(VM *vm, int code) {
         if (wk->attacker > 1) {
             pos = wk->attacker ^ 2;
         } else {
-            pos = 0xff;
+            pos = BTLV_MCSS_POS_NONE;
         }
         break;
     case 16:
         pos = wk->defender;
-        if (pos == 0xff) {
+        if (pos == BTLV_MCSS_POS_NONE) {
             if (wk->attacker & 1) {
                 if (BtlvEffect_CheckExist(2) == TRUE) {
                     return 2;
@@ -3240,7 +3240,7 @@ static int BtlvEffvm_GetTargetPosition(VM *vm, int code) {
         if (wk->defender > 1) {
             pos = wk->defender ^ 2;
         } else {
-            pos = 0xff;
+            pos = BTLV_MCSS_POS_NONE;
         }
         break;
     }
@@ -3253,7 +3253,7 @@ static int BtlvEffvm_CheckPosition(BtlvEffvm *wk, int pos) {
             pos ^= 1;
         }
     } else {
-        pos = 0xff;
+        pos = BTLV_MCSS_POS_NONE;
     }
     return pos;
 }
@@ -3272,7 +3272,7 @@ static int BtlvEffvm_GetDefenderForEmitter(VM *vm, int *pos) {
     int ret = BtlvEffect_GetBattleStyle();
 
     *pos = wk->defender;
-    if (*pos == 0xff) {
+    if (*pos == BTLV_MCSS_POS_NONE) {
         if (ret == 0 || ret == 3 || wk->isEffect == TRUE) {
             *pos = wk->attacker ^ 1;
         } else {
@@ -4330,7 +4330,7 @@ static void BtlvEffvm_WindowTask(TCB *tcb, void *data) {
                 break;
             }
             G2_SetWnd0Position(work->winH >> 8, work->winV >> 8, work->winH & 0xff, work->winV & 0xff);
-            if ((u8)work->winH == 0xff) {
+            if ((u8)work->winH == BTLV_MCSS_POS_NONE) {
                 G2_SetWnd1Position(1, work->winV >> 8, 256, work->winV & 0xff);
             } else {
                 G2_SetWnd1Position(0, 0, 0, 0);
@@ -4415,7 +4415,7 @@ static void BtlvEffvm_PalAnimTask(TCB *tcb, void *data) {
 
     switch (work->state) {
     case 0:
-        work->timer = 0xff;
+        work->timer = BTLV_MCSS_POS_NONE;
         work->state++;
     case 1:
         if (work->timer < work->durations[work->index] - 2) {

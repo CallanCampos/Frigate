@@ -226,13 +226,13 @@ static BOOL TrainerCardSys_ExitView(GameProc *proc, u32 *state, void *param, voi
 
 static u32 TrainerCardSys_SeqStart(TrainerCardSysWork *wk, TrainerCardParam *param) {
     switch (param->appParam) {
-    case 0:
+    case TRCARD_START_DEFAULT:
         break;
-    case 1:
+    case TRCARD_START_FRONT:
         return TRCARD_SEQ_CARD;
-    case 2:
+    case TRCARD_START_BACK:
         return TRCARD_SEQ_CARD;
-    case 3:
+    case TRCARD_START_BADGES:
         return TRCARD_SEQ_OTHER;
     }
     return TRCARD_SEQ_CARD;
@@ -272,7 +272,7 @@ static u32 TrainerCardSys_SeqGreeting(TrainerCardSysWork *wk) {
 }
 
 static u32 TrainerCardSys_SeqGreetingWait(TrainerCardSysWork *wk) {
-    void *cgear;
+    CGearSave *cgear;
 
     if (!TrainerCardSys_UpdateProcMgr(&wk->procMgr)) {
         return TRCARD_SEQ_GREETING_WAIT;
@@ -342,7 +342,7 @@ void TrainerCardData_FillExtras(TrainerCardData *data, GameData *gameData, HeapI
     }
     data->pwtWins = wins;
     data->unk688 = RecordGet(records, 0x83);
-    JoinAvenue_GetParam(avenue, 0, data->avenueName);
+    JoinAvenue_GetParam(avenue, JOIN_AVE_INFO_NAME, data->avenueName);
     data->unk68A = RecordGet(records, 0x7f);
     data->unk684 = FestRecords_GetCompleted(unk);
     eventWork = GameData_GetEventWork(gameData);
@@ -416,12 +416,12 @@ void TrainerCardData_Fill(TrainerCardData *data, GameData *gameData, BOOL isSnap
     RTCTime time;
     u8 passPowerFlags[2];
     SaveControl *save = GameData_GetSaveControl(gameData);
-    void *timeSig = getTimeSigBlkAddress(save);
+    TimeSigSave *timeSig = getTimeSigBlkAddress(save);
     PlayerInfo *playerInfo = GetGameDataPlayerInfo(gameData);
     TrainerCardSave *card = getTrainerCardDataBlkAddress(gameData);
     AdventureTime *adventureTime = getSaveAdventureTimeBlock(save);
     GameRecords *records = getTrainerCardInfoBlkAddress(save);
-    void *cgear = CGearPhrases_GetBlock(save);
+    CGearSave *cgear = CGearPhrases_GetBlock(save);
     PokeDexSave *pokedex = GameData_GetPokedex(gameData);
     HighLinkSave *highLink;
     PassPowerData *passPowerData;

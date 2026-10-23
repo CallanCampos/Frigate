@@ -7,6 +7,7 @@
 #include "battle/btl_setup.h"
 #include "gfl/heap.h"
 #include "gfl/proc.h"
+#include "save/bsubway_save.h"
 #include "save/player_info.h"
 #include "struct_decls.h"
 #include "system/pms.h"
@@ -128,7 +129,7 @@ struct BSubwayScrWork {
     GameData *gameData;
     BSubwayPlayData *unk70;
     BSubwayScoreData *unk74;
-    void *unk78;
+    BSubwayWifiData *unk78;
     // Each member's chosen party slot plus 1
     u8 memberChoices[6];
     u16 unk82;
@@ -158,7 +159,7 @@ struct BSubwayScrWork {
     PlayerInfo partner;
     u8 unk74C[0x58];
     IrcBattleMatchParam ircMatchParam;
-    void *allocatedBuffer;
+    PokeParty *allocatedBuffer;
     BtlSetup *btlSetup;
     Ov306Param ov306Param;
     u16 unk7EC;

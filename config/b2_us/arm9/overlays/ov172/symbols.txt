@@ -42,12 +42,12 @@ data_ov172_0219a548 kind:data(any) addr:0x0219a548
 sButtonFlags kind:data(any) addr:0x0219a550
 sButtonFlashRows kind:data(any) addr:0x0219a558
 sButtonSet kind:data(any) addr:0x0219a560
-data_ov172_0219a56c kind:data(any) addr:0x0219a56c
-data_ov172_0219a578 kind:data(any) addr:0x0219a578
+sButtonRects kind:data(any) addr:0x0219a56c
+sLCDConfig kind:data(any) addr:0x0219a578
 sKeyStops kind:data(any) addr:0x0219a588
-data_ov172_0219a5a0 kind:data(any) addr:0x0219a5a0
-data_ov172_0219a5bc kind:data(any) addr:0x0219a5bc
-data_ov172_0219a5ec kind:data(any) addr:0x0219a5ec
+sClActSysSetup kind:data(any) addr:0x0219a5a0
+sVRAMConfig kind:data(any) addr:0x0219a5bc
+sMsgBGSetup kind:data(any) addr:0x0219a5ec
 data_ov172_0219a620 kind:data(any) addr:0x0219a620
 data_ov172_0219a628 kind:data(any) addr:0x0219a628
 data_ov172_0219a634 kind:data(any) addr:0x0219a634

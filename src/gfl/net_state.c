@@ -469,7 +469,7 @@ void NetState_StartChangeover(int a0, void (*callback)(void *work), int a2) {
 
     GFL_NetGetSys();
     NetState_InitChangeoverMode(0, a2, NULL);
-    if (ini->bNetType == 3 || ini->bNetType == 4) {
+    if (ini->bNetType == GFL_NET_TYPE_IRC || ini->bNetType == GFL_NET_TYPE_IRC_WIRELESS) {
         NetSystem_StartInfrared(0);
         _pNetState->connectCallback = callback;
         NetState_SetFuncLine(_pNetState, NetState_IrcConnect, MATH_Rand32(&_pNetState->rand, 30), 956);
@@ -539,7 +539,7 @@ static void NetState_ExitIfAlone(NetState *state) {
     GFLNetInitData *ini = GFL_NetGetInitData();
     GFLNetSys *sys = GFL_NetGetSys();
 
-    if (ini->bNetType == 3 || ini->bNetType == 4) {
+    if (ini->bNetType == GFL_NET_TYPE_IRC || ini->bNetType == GFL_NET_TYPE_IRC_WIRELESS) {
         if (!sys->pDevTable->isLinked()) {
             GFL_NetExit(0);
         }

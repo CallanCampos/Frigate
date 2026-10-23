@@ -17,7 +17,7 @@ struct SweetScentScreenWork {
     u8 alpha;
     u8 step;
     u8 timer;
-    void *displayControl;
+    FieldDispControl *displayControl;
 };
 
 struct SweetScentPalette {

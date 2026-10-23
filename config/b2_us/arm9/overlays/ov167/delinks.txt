@@ -33,6 +33,7 @@ src/ov167/btl_handler_work.c:
     .rodata     start:0x021d6dd8 end:0x021d6e50
 
 src/ov167/btl_server_cmd.c:
+    complete
     .text       start:0x021b0a1c end:0x021b1674
     .rodata     start:0x021d6e50 end:0x021d6eb0
     .data       start:0x021daeb0 end:0x021daf60

@@ -142,9 +142,11 @@ enum {
 #define SCROLL_HEIGHT 512
 
 // Palettes of the items' screens
-#define ITEM_PALETTE_NORMAL 1
-#define ITEM_PALETTE_SELECTED 2
-#define ITEM_PALETTE_BLINK 3
+enum {
+    ITEM_PALETTE_NORMAL = 1,
+    ITEM_PALETTE_SELECTED,
+    ITEM_PALETTE_BLINK,
+};
 
 typedef struct {
     u16 screenFile;
@@ -196,7 +198,7 @@ typedef struct {
     u16 *itemScreens[ITEM_COUNT];
     // Makes a screen for each item from the window with its name, which BG 1 shows
     BGWinFrame *textScreens;
-    void *unk16C;
+    BlinkPalAnm *unk16C;
     u8 items[ITEM_COUNT];
     u8 cursor;
     u8 selection;
@@ -1136,7 +1138,7 @@ static void StartMenu_InitWindows(StartMenuWork *wk) {
     if (joinAvenue) {
         joinAvenueInfo = JoinAvenue_GetInfo(SaveControl_GetJoinAvenue(wk->save));
         name = GFL_StrBufCreate(64, HEAPID_STARTMENU);
-        GFL_StrBufLoadString(name, (const u16 *)JoinAvenue_GetParam(joinAvenueInfo, 0, 0));
+        GFL_StrBufLoadString(name, (const u16 *)JoinAvenue_GetParam(joinAvenueInfo, JOIN_AVE_INFO_NAME, 0));
         GFL_WordSetSetStrbuf(wk->wordSet, 0, name, 2, 1, 2);
         GFL_StrBufFree(name);
     }

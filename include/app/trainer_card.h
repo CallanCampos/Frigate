@@ -26,11 +26,6 @@
 // The heap of the trainer card screen and of the badge case
 #define HEAPID_TRAINER_CARD_SCREEN 0x27
 
-// The Y button's shortcuts of the card's front, its back and the badge case
-#define SHORTCUT_TRAINER_CARD_FRONT 24
-#define SHORTCUT_TRAINER_CARD_BACK 25
-#define SHORTCUT_TRAINER_CARD_BADGES 26
-
 // The signature: 192x64 pixels, one bit each in the save and one byte each while it is edited
 #define TRCARD_SIGN_WIDTH 192
 #define TRCARD_SIGN_HEIGHT 64
