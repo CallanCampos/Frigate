@@ -59,8 +59,8 @@ main and exit functions); what it draws, its backgrounds, windows, sprites and t
 in battle is another overlay's: `src/ov286/b_bag_main.c` and the other `b_bag_*.c` files there. To change what the bag
 shows, change those files' C: which items a pocket lists, in what order, which message each line uses. The words
 themselves are the ROM's message data, which a C change can pick between but not rewrite until the layered file system
-exists. The bag opens from the field. Current field entry is blocked by heap capacity; `--launch bag` steps aside
-because the field process table now has C ([below](#reaching-the-field-menus-apps)).
+exists. The bag opens from the field's menu, now that the field opens; `--launch bag` steps aside because the field
+process table has C ([below](#reaching-the-field-menus-apps)).
 
 ## Reaching the field menu's apps
 

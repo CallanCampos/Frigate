@@ -5,8 +5,9 @@ ROM running on [melonDS](https://melonds.kuribo64.net)'s emulation core, headles
 file, writing both screens and named memory at chosen frames, and the sound: the mixer's output sample by sample and
 the ARM7 sound driver's state after each run of its thread. `compare.py` compares the screens and memory with the
 port's, `sound.py` the sound ([Sound](#sound)). It also makes the saves the tests start from ([Saves](#saves)), and
-holds the field menu's apps, which Frigate opens through its test launcher while the field has no C, to its own route
-through the field menu ([The launch checks](#the-launch-checks)).
+held the field menu's apps, which Frigate opened through its test launcher while the field had no C, to its own route
+through the field menu ([The launch checks](#the-launch-checks)); the field opens now, and those checks wait to be
+retired.
 
 It is a **test tool only**. It is never linked into or shipped with Frigate
 ([PLAN.md §1](../../docs/PLAN.md#1-goal-and-what-native-means)): it is a CMake project of its own, built only on
@@ -741,6 +742,10 @@ Each sequence is two ctest tests:
   and the samples to the bit (wherever the loudest point's hash is, within two frames). Skipped (77) without the ROM.
 
 ## The launch checks
+
+Since the field opened (2026-10-23, [STATUS.md](../../docs/STATUS.md)), the launcher steps aside, as it was made to,
+and these checks fail on its notice: the plan of 2026-10-23 retires them next (its track A-2). This section describes
+them as they ran.
 
 The field menu's apps against melonDS while the port has no field ([ADR 0012](../../docs/adr/0012-test-launcher-for-the-field-menus-apps.md)):
 the oracle opens each app from the field menu, where the port's continued game stops on overlay 36's trap; the port

@@ -614,8 +614,8 @@ def command_save(args) -> int:
 
 # The port's save on the oracle (README.md, "Saves"), the way from the port to melonDS. Both programs play first_save's
 # input file, which starts with New Game as new_game.pbwinput plays it: the port past New Game's formatting of the
-# blank backup, up to the field's first script, which has no C yet; the oracle to the same moment, since the DS reaches
-# each screen later. Then the title sequence's input file boots each program's save on the oracle
+# blank backup, to frame 10,600, before the field's first load (frame 10,759); the oracle to the same moment, since the
+# DS reaches each screen later. Then the title sequence's input file boots each program's save on the oracle
 PORT_SAVE_INPUT = "first_save"
 PORT_SAVE_PORT_FRAMES = 10600
 PORT_SAVE_ORACLE_FRAMES = 13000
@@ -1223,9 +1223,10 @@ def command_sound_check(args) -> int:
 
 
 # Frigate's test launcher's checks (README.md, "The launch checks"; ADR 0012). The oracle opens the field menu's apps
-# from the field; the port, whose field (overlay 36) has no C, plays the same input file with --launch, which opens each
-# app at the count it opens on the oracle. A route's table keeps the oracle's hashes of its labelled screens; its app
-# rows are the ones the port must show
+# from the field; the port, whose field (overlay 36) had no C when they were made, plays the same input file with
+# --launch, which opens each app at the count it opens on the oracle. A route's table keeps the oracle's hashes of its
+# labelled screens; its app rows are the ones the port must show. Now that the field opens, the launcher steps aside
+# (LAUNCH_STEPS_ASIDE) and the checks fail until they are retired
 LAUNCH_INPUT = os.path.join("port", "tests", "oracle", "launch_{name}_{version}.pbwinput")
 LAUNCH_SCREENS = os.path.join("port", "tests", "oracle", "launch_{name}_{version}.screens.tsv")
 LAUNCH_COLUMNS = ["label", "oracle_frame", "count", "game_frame", "top_3d", "bottom_3d", "top", "bottom", "where"]

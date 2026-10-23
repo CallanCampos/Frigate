@@ -3,6 +3,29 @@
 What port work taught that isn't obvious from the code, newest first. A lesson about MWCC or the decomp's own
 workflow goes in the decomp checkout instead; this file is the port's ([CLAUDE.md](../CLAUDE.md), the iteration loop).
 
+## 2026-10-23: the field's entry, after review
+
+- **Host memory that stands in for the game's follows the life of what it stands for.** The first version of the
+  kept memory for a root heap ([ADR 0021](adr/0021-root-heaps-in-the-games-own-memory-from-host-memory.md)) kept what
+  each heap left in it for the program's life, and ASan saw it addressable between two heaps. The DS's static is
+  cleared whenever its overlay loads again, and between two heaps nothing owns it. So the host's overlay load zeroes
+  the kept memory where it clears the static, and the heap's destruction poisons it: list what happens to the original
+  memory (a load, a free, a reset) and give the stand-in each of those events.
+- **Release only what was handed out.** That poisoning first released the kept memory when any heap whose memory lay
+  in it was destroyed, and the field's weather, place names and scene area are heaps inside its root: their deletion
+  poisoned the live root's heads. The sanitized house replay showed it at once (24 use-after-poison reports in the
+  live roots' heads, GFL's extra heap's at boot and the field's as it closed, and a run that stopped at frame 17,718),
+  where the unit test had checked the wrong rule. Match the one heap that was given the memory, and test a child heap
+  inside it.
+- **Under protected `main`, an ADR a session writes is proposed.** ADRs 0013 to 0016 were accepted by the sessions
+  that merged their tracks; a session now only opens the pull request, and the developer's merge accepts the ADR. Its
+  status says proposed until then, and its note says so.
+- **A change's guides are every guide that names what it changed.** The review found four rows the field's entry
+  missed: a fragment's tests in [../cmake/README.md](../cmake/README.md), a module's tests column in
+  [../hal/README.md](../hal/README.md), a hook in [../include/README.md](../include/README.md)'s list, and the front
+  doors' "where it stands", which still said the field was blocked. Before committing, search the guides and the front
+  doors for the module's, the test's and the hook's names, and for what the change makes untrue.
+
 ## 2026-10-23: the field's entry
 
 - **A size hook covers only the paths that go through it.** `PORT_HEAP_SIZE` scaled every heap made from the arena
