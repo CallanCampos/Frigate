@@ -1710,7 +1710,7 @@ WCM_Essid_Any kind:data(any) addr:0x02185024
 sNintendoOui kind:data(any) addr:0x02185044
 sWpaOui kind:data(any) addr:0x02185048
 sWmmOui kind:data(any) addr:0x0218504c
-data_ov011_02185014 kind:data(any) addr:0x02185054
+sMatchWeights kind:data(any) addr:0x02185054
 data_ov011_0218502c kind:data(any) addr:0x0218506c
 data_ov011_0218503c kind:data(any) addr:0x0218507c
 defaultEncoding kind:data(any) addr:0x02185090
@@ -1799,7 +1799,7 @@ data_ov011_021857bc kind:data(any) addr:0x021857fc
 data_ov011_021857c0 kind:data(any) addr:0x02185800
 data_ov011_021857c4 kind:data(any) addr:0x02185804
 data_ov011_021857cc kind:data(any) addr:0x0218580c
-data_ov011_021857d0 kind:data(any) addr:0x02185810
+sMatchChance kind:data(any) addr:0x02185810
 data_ov011_021857d8 kind:data(any) addr:0x02185818
 data_ov011_021857e0 kind:data(any) addr:0x02185820
 data_ov011_021857ec kind:data(any) addr:0x0218582c
@@ -2713,12 +2713,12 @@ data_ov011_0218dfe0 kind:bss addr:0x0218e020
 data_ov011_0218dfe8 kind:bss addr:0x0218e028
 data_ov011_0218e000 kind:bss addr:0x0218e040
 data_ov011_0218e014 kind:bss addr:0x0218e054
-data_ov011_0218e018 kind:bss addr:0x0218e058
-data_ov011_0218e020 kind:bss addr:0x0218e060
-data_ov011_0218e040 kind:bss addr:0x0218e080
-data_ov011_0218e0c0 kind:bss addr:0x0218e100
-data_ov011_0218e1c0 kind:bss addr:0x0218e200
-data_ov011_0218e1e0 kind:bss addr:0x0218e220
+sMatchRoot kind:bss addr:0x0218e058
+sNetIds kind:bss addr:0x0218e060
+sConnections kind:bss addr:0x0218e080
+sConnectionInfos kind:bss addr:0x0218e100
+sMatchState kind:bss addr:0x0218e200
+sKeys kind:bss addr:0x0218e220
 data_ov011_0218e1e1 kind:bss addr:0x0218e221
 data_ov011_0218e1e2 kind:bss addr:0x0218e222
 data_ov011_0218e1e4 kind:bss addr:0x0218e224
