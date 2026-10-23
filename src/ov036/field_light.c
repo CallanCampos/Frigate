@@ -81,11 +81,6 @@ struct FieldLight {
     s32 daySeconds;
 };
 
-struct FieldColorPostFX {
-    const u8 *lut;
-    BOOL vintage;
-};
-
 static void FieldLight_LoadData(FieldLight *light, u32 lightsId);
 static void FieldLight_LoadDataCore(FieldLight *light, u32 arcId, u32 fileId);
 static void func_ov036_02197c00(FieldLight *light);
@@ -453,16 +448,12 @@ static BOOL FieldLightFlashInfo_IsRunning(const FieldLightFlashInfo *info) {
     return FALSE;
 }
 
-void FieldColorPostFX_Set(void *postFx, void *luminanceTable, BOOL flashback) {
-    FieldColorPostFX *fx = postFx;
-
+void FieldColorPostFX_Set(FieldColorPostFX *fx, const u8 *luminanceTable, BOOL flashback) {
     fx->lut = luminanceTable;
     fx->vintage = flashback;
 }
 
-void FieldColorPostFX_Apply(void *postFx, void *texture) {
-    FieldColorPostFX *fx = postFx;
-
+void FieldColorPostFX_Apply(FieldColorPostFX *fx, G3DResource *texture) {
     if (fx && texture) {
         if (GFL_G3DResCheckType(texture, G3D_RES_CHECK_TEX)) {
             NNSG3dResTex *tex = NNS_G3dGetTex(GFL_G3DResGetResData(texture));

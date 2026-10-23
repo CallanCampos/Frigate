@@ -186,7 +186,7 @@ BOOL ResortCmd_GetValue(VM *vm, FieldScriptEnv *env) {
     }
     case 16: {
         u32 a = ResortPerson_GetParam(person, JOIN_AVE_PARAM_RANK, NULL);
-        u32 b = JoinAvenue_GetParam(info, 2, 0);
+        u32 b = JoinAvenue_GetParam(info, JOIN_AVE_INFO_RANK, 0);
 
         if (a == 0) {
             *var = 2;
@@ -333,13 +333,16 @@ BOOL ResortCmd_GetValue(VM *vm, FieldScriptEnv *env) {
         break;
     }
     case 61:
-        *var = ResortBinary_Get(table, ResortBinary_FindRange(table, JoinAvenue_GetParam(info, 2, 0)), 11);
+        *var = ResortBinary_Get(table, ResortBinary_FindRange(table, JoinAvenue_GetParam(info, JOIN_AVE_INFO_RANK, 0)),
+                                11);
         break;
     case 62:
         *var = JoinAvenue_GetParam(info, 14, 0);
         break;
     case 63:
-        *var = ResortBinary_Get(table, ResortBinary_FindRange(table, JoinAvenue_GetParam(info, 2, 0)), 6) - 1753;
+        *var = ResortBinary_Get(table, ResortBinary_FindRange(table, JoinAvenue_GetParam(info, JOIN_AVE_INFO_RANK, 0)),
+                                6) -
+               1753;
         break;
     case 64:
         *var = JoinAvenueOccupants_CountPeople(occupants);
@@ -886,7 +889,7 @@ BOOL ResortCmd_Visit(VM *vm, FieldScriptEnv *env) {
     switch (mode) {
     case 0: {
         ResortPersonData *other = ResortDatas_Get(unk30, 0, a2);
-        u16 unk = ResortWork_Get(ResortSys_GetWork(sys), 10);
+        u16 unk = ResortWork_Get(ResortSys_GetWork(sys), RESORT_WORK_VISITS);
         u32 score;
         u32 value;
         u32 limit;
@@ -925,7 +928,7 @@ BOOL ResortCmd_Visit(VM *vm, FieldScriptEnv *env) {
         return FALSE;
     }
     case 1:
-        *var = (a2 * (((u16)ResortWork_Get(unk38, 10) + 1) * (FX32_ONE / 4) + FX32_ONE)) >> FX32_SHIFT;
+        *var = (a2 * (((u16)ResortWork_Get(unk38, RESORT_WORK_VISITS) + 1) * (FX32_ONE / 4) + FX32_ONE)) >> FX32_SHIFT;
         break;
     case 2:
         *var = ResortData_Roll(data, 26, 100) < 85 ? TRUE : FALSE;
@@ -972,7 +975,7 @@ BOOL ResortCmd_CheckRank100Unlock(VM *vm, FieldScriptEnv *env) {
     info = ResortSys_GetInfo(sys);
     var = ScriptReadVar(vm, env);
     *var = FALSE;
-    if (JoinAvenue_GetParam(info, 2, 0) >= 100) {
+    if (JoinAvenue_GetParam(info, JOIN_AVE_INFO_RANK, 0) >= 100) {
         u32 result = ResortSys_GetUnlockForRank(sys, gameData, 100);
 
         if (result != 0 && result != 8) {

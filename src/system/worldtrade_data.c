@@ -7,8 +7,6 @@
 // The Global Trade Station's save block, which keeps the Pokémon the player deposited. The ROM has no string for
 // the file, so the name is a guess (swan's SaveControl_GetWorldTradeData). Block 0x2e.
 
-#define SAVE_BLOCK_WORLDTRADE 0x2e
-
 WorldTradeData *SaveControl_GetWorldTradeData(SaveControl *save) {
     return SaveControl_GetBlockPtr(save, SAVE_BLOCK_WORLDTRADE);
 }

@@ -108,7 +108,7 @@ void FieldPropSystem_DrawAllHandles(FieldPropSystem *system) {
     }
 }
 
-void FieldPropSystem_LoadArea(FieldPropSystem *system, u16 zoneId, AreaData *area, void *postFx) {
+void FieldPropSystem_LoadArea(FieldPropSystem *system, u16 zoneId, AreaData *area, FieldColorPostFX *postFx) {
     u32 bundleId = AreaData_GetPropBundleID(area);
     u32 bundleArcId;
     u32 textureArcId;
@@ -317,7 +317,7 @@ void *FieldPropResAnmHeader_GetAnmData(FieldPropResAnmHeader *header, u32 index)
     return (u8 *)header + header->animationIds[index];
 }
 
-void FieldPropSystem_LoadTextures(FieldPropSystem *system, u16 arcId, u32 fileId, void *postFx) {
+void FieldPropSystem_LoadTextures(FieldPropSystem *system, u16 arcId, u32 fileId, FieldColorPostFX *postFx) {
     system->textureResource = GFL_G3DSysReadArcSysResource(arcId, fileId);
     if (postFx != NULL) {
         FieldColorPostFX_Apply(postFx, system->textureResource);
@@ -382,7 +382,7 @@ u8 FieldPropRTCState_GetPlayAnmIndex(FieldPropRTCState *state) {
     return state->playAnmIndex;
 }
 
-void FieldPropSystem_InitResources(FieldPropSystem *system, void *postFx) {
+void FieldPropSystem_InitResources(FieldPropSystem *system, FieldColorPostFX *postFx) {
     u32 count = system->resInfoCount;
     u8 i;
 
@@ -451,7 +451,8 @@ void FieldPropSystem_FreeResInstances(FieldPropSystem *system, FieldPropResBank 
     }
 }
 
-void FieldPropSystem_InitResource(FieldPropSystem *system, FieldPropResource *resource, u32 index, void *postFx) {
+void FieldPropSystem_InitResource(FieldPropSystem *system, FieldPropResource *resource, u32 index,
+                                  FieldColorPostFX *postFx) {
     FieldPropResAnmHeader *header;
     s32 count;
     s32 i;

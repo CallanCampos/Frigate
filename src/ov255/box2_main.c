@@ -2723,7 +2723,7 @@ int Box2Main_NameInCall(Box2SysWork *syswk) {
 
     work->name = GFL_StrBufCreate(20, HEAPID_BOX2);
     loadBoxNameToStrbuf(syswk->param->boxes, syswk->tray, work->name);
-    work->param = setupNameEntry(HEAPID_BOX2, 2, 0, 0, 8, work->name, gameInfo);
+    work->param = setupNameEntry(HEAPID_BOX2, NAME_ENTRY_BOX, 0, 0, 8, work->name, gameInfo);
     work->param->unk2C = 1;
     QueueGameProc(syswk->procManager, OVERLAY_ID(280), &NAME_ENTRY_PROC_FUNCTIONS, work->param);
     syswk->subProcWork = work;

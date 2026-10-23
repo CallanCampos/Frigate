@@ -9,8 +9,6 @@
 // which cygnus_save_control.c reads and writes. The ROM has no string for the file, so the name is a guess; the
 // function names are swan's except getNextSeed's callers. Block 0x48.
 
-#define SAVE_BLOCK_DREAM_RADAR 0x48
-
 static u64 getNextSeed(u64 seed);
 
 u32 getDreamRadarSaveSize(void) {
@@ -84,8 +82,7 @@ void CygnusSaveData_Store(CygnusSaveData *cygnus, u32 seed, u32 received) {
     cygnus->headerCrc = getCRC16(cygnus, offsetof(CygnusSaveData, headerCrc));
 }
 
-u32 CygnusSaveData_Load(void *data, u32 seed, u32 *words) {
-    CygnusSaveData *cygnus = data;
+u32 CygnusSaveData_Load(CygnusSaveData *cygnus, u32 seed, u32 *words) {
     u32 i = 0;
     u32 mask = getNextSeed(seed) >> 32;
     u32 result = ValidateDreamRadarSave(cygnus);

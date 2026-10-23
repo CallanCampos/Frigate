@@ -18,7 +18,7 @@ data_ov100_021ef105 kind:data(any) addr:0x021ef145 ambiguous
 data_ov100_021ef108 kind:data(any) addr:0x021ef148
 data_ov100_021ef118 kind:data(any) addr:0x021ef158
 data_ov100_021ef128 kind:data(any) addr:0x021ef168
-data_ov100_021ef14c kind:data(any) addr:0x021ef18c
+sVolumeIndicesRoom1 kind:data(any) addr:0x021ef18c
 data_ov100_021ef211 kind:data(any) addr:0x021ef251 ambiguous
 data_ov100_021ef231 kind:data(any) addr:0x021ef271 ambiguous
 data_ov100_021ef289 kind:data(any) addr:0x021ef2c9 ambiguous
@@ -31,5 +31,5 @@ data_ov100_021ef379 kind:data(any) addr:0x021ef3b9 ambiguous
 data_ov100_021ef395 kind:data(any) addr:0x021ef3d5 ambiguous
 data_ov100_021ef39d kind:data(any) addr:0x021ef3dd ambiguous
 data_ov100_021ef3b5 kind:data(any) addr:0x021ef3f5 ambiguous
-data_ov100_021ef4ac kind:data(any) addr:0x021ef4ec
+sVolumeIndicesRoom2 kind:data(any) addr:0x021ef4ec
 data_ov100_021ef77c kind:data(any) addr:0x021ef7bc ambiguous

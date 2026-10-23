@@ -9,15 +9,15 @@ GymIcirrus_ShowSwitchState kind:function(thumb,size=0x6e) addr:0x021eef38
 GymIcirrus_IsSwitchFlipped kind:function(thumb,size=0x10) addr:0x021eefa8
 GymIcirrus_SwitchAnimEvent kind:function(thumb,size=0xae) addr:0x021eefb8
 GymIcirrus_FlipSwitchEvent kind:function(thumb,size=0xce) addr:0x021ef068
-data_ov098_021ef0f8 kind:data(any) addr:0x021ef138
-data_ov098_021ef100 kind:data(any) addr:0x021ef140
+sModelAAnimations kind:data(any) addr:0x021ef138
+sModelBAnimations kind:data(any) addr:0x021ef140
 data_ov098_021ef105 kind:data(any) addr:0x021ef145 ambiguous
-data_ov098_021ef108 kind:data(any) addr:0x021ef148
+sMovingAnimations kind:data(any) addr:0x021ef148
 data_ov098_021ef110 kind:data(any) addr:0x021ef150
-data_ov098_021ef120 kind:data(any) addr:0x021ef160
+sPlacePreconditions kind:data(any) addr:0x021ef160
 data_ov098_021ef122 kind:data(any) addr:0x021ef162
-data_ov098_021ef140 kind:data(any) addr:0x021ef180
-data_ov098_021ef164 kind:data(any) addr:0x021ef1a4
+sFirstPositions kind:data(any) addr:0x021ef180
+sSecondPositions kind:data(any) addr:0x021ef1a4
 data_ov098_021ef188 kind:data(any) addr:0x021ef1c8
 data_ov098_021ef1e8 kind:data(any) addr:0x021ef228
 data_ov098_021ef211 kind:data(any) addr:0x021ef251 ambiguous

@@ -16,10 +16,12 @@
 
 // The archive of the effects' models and animations
 #define UNION_EFF_ARC_ID 0x58
-#define UNION_EFF_FOCUS_NSBMD 0x14
-#define UNION_EFF_FOCUS_NSBCA 0x15
-#define UNION_EFF_MARK_TOMO_NSBMD 0x16
-#define UNION_EFF_MARK_ASONDA_NSBMD 0x17
+enum {
+    UNION_EFF_FOCUS_NSBMD = 0x14,
+    UNION_EFF_FOCUS_NSBCA,
+    UNION_EFF_MARK_TOMO_NSBMD,
+    UNION_EFF_MARK_ASONDA_NSBMD,
+};
 
 #define FOCUS_SLOT_MAX 1
 #define MARK_SLOT_MAX 10

@@ -372,7 +372,7 @@ static void MonolithMissionInfo_DrawValue(MonolithWork *wk, MonolithMissionInfoW
 // Draws the player's records of the mission, if it has been played
 static void MonolithMissionInfo_DrawRecords(MonolithScreenParam *screen, MonolithMissionInfoWork *miw, int mission) {
     BOOL unplayed = FALSE;
-    void *records = FestRecords_GetFromSave(GameData_GetSaveControl(GSYS_GetGameData(screen->param->gsys)));
+    FunfestSave *records = FestRecords_GetFromSave(GameData_GetSaveControl(GSYS_GetGameData(screen->param->gsys)));
     FestMission data;
     MonolithMissionInfoRecord record;
     StrBuf *str;

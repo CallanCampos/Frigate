@@ -85,13 +85,6 @@ enum {
     MENU_YES_NO,
 };
 
-// The touch bar's icons that the screen uses
-enum {
-    ICON_RETURN = 1,
-    ICON_PAGE_LEFT = 4,
-    ICON_PAGE_RIGHT = 5,
-};
-
 enum {
     STATE_FADE_IN,
     STATE_WAIT_FADE_IN,
@@ -616,9 +609,9 @@ static TouchBar *PkwdSelectScreen_CreateTouchBar(PkwdSelectScreenWork *wk, ClAct
     GFL_ArcToolFree(arc);
     {
         TouchBarItem items[3] = {
-            { ICON_PAGE_LEFT, { 168, 168 } },
-            { ICON_PAGE_RIGHT, { 200, 168 } },
-            { ICON_RETURN, { 232, 168 } },
+            { TOUCHBAR_ICON_LEFT, { 168, 168 } },
+            { TOUCHBAR_ICON_RIGHT, { 200, 168 } },
+            { TOUCHBAR_ICON_RETURN, { 232, 168 } },
         };
         TouchBarSetup setup;
 
@@ -1176,12 +1169,12 @@ static BOOL PkwdSelectScreen_Input(PkwdSelectScreenWork *wk) {
         BlinkPalAnm_StartBlink(wk->blinks[wk->cursor]);
         TouchBar_SetActive(wk->touchBar, FALSE);
         wk->state = STATE_WAIT_BLINK;
-    } else if (TouchBar_GetDecided(wk->touchBar) == ICON_RETURN) {
+    } else if (TouchBar_GetDecided(wk->touchBar) == TOUCHBAR_ICON_RETURN) {
         TouchBar_SetActive(wk->touchBar, FALSE);
         wk->state = STATE_FADE_OUT;
         *wk->param->result = PKWD_SELECTSCREEN_CANCEL;
-    } else if (TouchBar_GetDecided(wk->touchBar) == ICON_PAGE_LEFT ||
-               TouchBar_GetDecided(wk->touchBar) == ICON_PAGE_RIGHT) {
+    } else if (TouchBar_GetDecided(wk->touchBar) == TOUCHBAR_ICON_LEFT ||
+               TouchBar_GetDecided(wk->touchBar) == TOUCHBAR_ICON_RIGHT) {
         wk->page ^= 1;
         wk->cursor = PkwdSelectScreen_GetLastCursor(wk);
         PkwdSelectScreen_PrintScreens(wk);
@@ -1340,7 +1333,7 @@ static BOOL PkwdSelectScreen_OpenDetails(PkwdSelectScreenWork *wk) {
 
 // Closes the details when the return button is picked
 static BOOL PkwdSelectScreen_Details(PkwdSelectScreenWork *wk) {
-    if (TouchBar_GetDecided(wk->touchBar) == ICON_RETURN) {
+    if (TouchBar_GetDecided(wk->touchBar) == TOUCHBAR_ICON_RETURN) {
         BmpWin_ClearFrame(wk->windows[WINDOW_DETAILS].window, 2);
         BmpWin_ClearScreenNow(wk->windows[WINDOW_DETAILS].window);
         BmpWin_Free(wk->windows[WINDOW_DETAILS].window);
@@ -1356,6 +1349,6 @@ static void PkwdSelectScreen_ShowPageIcons(PkwdSelectScreenWork *wk, BOOL visibl
     if (!wk->sorted[PAGE_SIZE]->loaded) {
         visible = FALSE;
     }
-    TouchBar_SetIconVisible(wk->touchBar, ICON_PAGE_LEFT, visible);
-    TouchBar_SetIconVisible(wk->touchBar, ICON_PAGE_RIGHT, visible);
+    TouchBar_SetIconVisible(wk->touchBar, TOUCHBAR_ICON_LEFT, visible);
+    TouchBar_SetIconVisible(wk->touchBar, TOUCHBAR_ICON_RIGHT, visible);
 }

@@ -29,12 +29,6 @@
 // What the Professor says in a call on the Xtransceiver, named after the ROM's "local_tvt_person_doctor.c": how a
 // Pokémon of the party evolves, and how the Pokédex is coming along
 
-// The ways to evolve that have a message for what they need
-#define EVOLUTION_TRADE_ITEM 6
-#define EVOLUTION_ITEM 8
-#define EVOLUTION_LEVEL_ITEM 20
-#define EVOLUTION_LEVEL_MOVE 21
-
 struct LocalTvtDoctor {
     int step;
     u32 timer;
@@ -373,16 +367,16 @@ static u16 LocalTvtDoctor_GetEvolutionMsg(ArcTool *evolutionFile, u16 species) {
     method = getEvolutionInfoParam(evolutionFile, species, 0, 0);
     param = getEvolutionInfoParam(evolutionFile, species, 0, 1);
     switch (method) {
-    case EVOLUTION_TRADE_ITEM:
+    case EVO_METHOD_TRADE_WITH_ITEM:
         LocalTvtDoctor_FindEvolutionMsg(sLocalTvtTradeItemMsgs, NELEMS(sLocalTvtTradeItemMsgs), param, &messageId);
         break;
-    case EVOLUTION_ITEM:
+    case EVO_METHOD_ITEM:
         LocalTvtDoctor_FindEvolutionMsg(sLocalTvtItemMsgs, NELEMS(sLocalTvtItemMsgs), param, &messageId);
         break;
-    case EVOLUTION_LEVEL_ITEM:
+    case EVO_METHOD_HELD_ITEM_NIGHT:
         LocalTvtDoctor_FindEvolutionMsg(sLocalTvtLevelItemMsgs, NELEMS(sLocalTvtLevelItemMsgs), param, &messageId);
         break;
-    case EVOLUTION_LEVEL_MOVE:
+    case EVO_METHOD_KNOWS_MOVE:
         LocalTvtDoctor_FindEvolutionMsg(sLocalTvtLevelMoveMsgs, NELEMS(sLocalTvtLevelMoveMsgs), param, &messageId);
         break;
     default:

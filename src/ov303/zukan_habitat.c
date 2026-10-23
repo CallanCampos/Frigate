@@ -127,14 +127,6 @@ enum {
     CURSOR_TOUCH_COUNT = CURSOR_TOUCH_ICON + TOUCH_ICON_COUNT,
 };
 
-// An area of the habitat list: the flag that shows it, its zone and its file
-typedef struct {
-    u16 flag;
-    u16 zone;
-    u8 file;
-    u8 padding;
-} ZukanHabitatTableEntry;
-
 typedef struct {
     BOOL finished;
     u32 seq;

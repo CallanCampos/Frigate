@@ -2,6 +2,7 @@
 #include "app/pkwd_record_monitor.h"
 #include "app/pkwd_record_monitor_graphic.h"
 #include "app/ui/frame_list.h"
+#include "app/ui/print_msg.h"
 #include "app/ui/ui_scene.h"
 #include "constants/arc.h"
 #include "constants/sound.h"
@@ -134,12 +135,6 @@ enum {
     MOVIE_MESSAGE_GROSS,
     MOVIE_MESSAGE_PLAYER,
     MOVIE_MESSAGE_COUNT,
-};
-
-enum {
-    ALIGN_LEFT,
-    ALIGN_RIGHT,
-    ALIGN_CENTER,
 };
 
 // The states of the screen
@@ -558,7 +553,7 @@ static const FrameListTouch sPkwdRecordMonitorListTouch[] = {
 
 // The list, which is given its callbacks, the work and the movies when it is created
 static const FrameListSetup sPkwdRecordMonitorListSetup = {
-    { 6, 0xff, 2, 0, 28, LIST_ROW_HEIGHT / 8, 2, 0, 26, 3, 0, { 24, 12, 8, 6, 4, 3 }, 1, 8, 0 },
+    { 6, FRAMELIST_BG_NONE, 2, 0, 28, LIST_ROW_HEIGHT / 8, 2, 0, 26, 3, 0, { 24, 12, 8, 6, 4, 3 }, 1, 8, 0 },
     LIST_ROWS,
     4,
     0,
@@ -1200,10 +1195,10 @@ static u16 PkwdRecordMonitor_GetAlignedX(PkwdRecordMonitorWork *wk, StrBuf *strb
     u32 spacing = 0;
     u32 x = 0;
 
-    if (align == ALIGN_RIGHT) {
+    if (align == PRINT_ALIGN_RIGHT) {
         x = GFL_BitmapGetWidth(BmpWin_GetBitmap(wk->windows[window].window));
         x -= GFL_FontGetBlockWidth(strbuf, font, spacing);
-    } else if (align == ALIGN_CENTER) {
+    } else if (align == PRINT_ALIGN_CENTER) {
         x = GFL_BitmapGetWidth(BmpWin_GetBitmap(wk->windows[window].window)) / 2;
         x -= GFL_FontGetBlockWidth(strbuf, font, spacing) / 2;
     }
@@ -1247,9 +1242,9 @@ static void PkwdRecordMonitor_PrintLabels(PkwdRecordMonitorWork *wk, u32 screen,
         window = labels[i].window;
         strbuf = GFL_MsgDataLoadStrbufNew(wk->msgData, sPkwdRecordMonitorLabelMessages[message]);
         if (message == 0) {
-            PkwdRecordMonitor_Print(wk, screen, window, 0, 0, strbuf, ALIGN_CENTER, PRINT_COLOR(1, 2, 0));
+            PkwdRecordMonitor_Print(wk, screen, window, 0, 0, strbuf, PRINT_ALIGN_CENTER, PRINT_COLOR(1, 2, 0));
         } else {
-            PkwdRecordMonitor_Print(wk, screen, window, 0, 0, strbuf, ALIGN_LEFT, PRINT_COLOR(1, 2, 0));
+            PkwdRecordMonitor_Print(wk, screen, window, 0, 0, strbuf, PRINT_ALIGN_LEFT, PRINT_COLOR(1, 2, 0));
         }
         GFL_StrBufFree(strbuf);
     }
@@ -1487,12 +1482,13 @@ static void PkwdRecordMonitor_PrintMovie(PkwdRecordMonitorWork *wk, BOOL movieOn
         copyVarForText(wk->wordSet, 1, wk->param->playerInfo);
         GFL_WordSetFormatStrbuf(wk->wordSet, strbuf, format);
         GFL_StrBufFree(format);
-        PkwdRecordMonitor_Print(wk, SCREEN_MAIN, WINDOW_PLAYER, 0, 0, strbuf, ALIGN_RIGHT, PRINT_COLOR(13, 10, 11));
+        PkwdRecordMonitor_Print(wk, SCREEN_MAIN, WINDOW_PLAYER, 0, 0, strbuf, PRINT_ALIGN_RIGHT,
+                                PRINT_COLOR(13, 10, 11));
         GFL_StrBufFree(strbuf);
     }
     record = PokewoodSave_GetRecord(wk->param->save, movie);
     strbuf = GFL_MsgDataLoadStrbufNew(wk->msgData, movie + sPkwdRecordMonitorMovieMessages[MOVIE_MESSAGE_TITLE]);
-    PkwdRecordMonitor_Print(wk, SCREEN_MAIN, WINDOW_TITLE, 0, 0, strbuf, ALIGN_LEFT, PRINT_COLOR(13, 10, 11));
+    PkwdRecordMonitor_Print(wk, SCREEN_MAIN, WINDOW_TITLE, 0, 0, strbuf, PRINT_ALIGN_LEFT, PRINT_COLOR(13, 10, 11));
     GFL_StrBufFree(strbuf);
     if (getTrainerGender(wk->param->playerInfo) == 0) {
         message = movie + sPkwdRecordMonitorMovieMessages[MOVIE_MESSAGE_TAGLINE_BOY];
@@ -1506,7 +1502,7 @@ static void PkwdRecordMonitor_PrintMovie(PkwdRecordMonitorWork *wk, BOOL movieOn
     copyVarForText(wk->wordSet, 1, wk->param->playerInfo);
     GFL_WordSetFormatStrbuf(wk->wordSet, strbuf, format);
     GFL_StrBufFree(format);
-    PkwdRecordMonitor_Print(wk, SCREEN_MAIN, WINDOW_TAGLINE, 0, 0, strbuf, ALIGN_LEFT, PRINT_COLOR(13, 10, 11));
+    PkwdRecordMonitor_Print(wk, SCREEN_MAIN, WINDOW_TAGLINE, 0, 0, strbuf, PRINT_ALIGN_LEFT, PRINT_COLOR(13, 10, 11));
     GFL_StrBufFree(strbuf);
     format = GFL_MsgDataLoadStrbufNew(wk->msgData, sPkwdRecordMonitorMovieMessages[MOVIE_MESSAGE_GROSS]);
     strbuf = GFL_StrBufCreate(0x80, wk->heapId);
@@ -1527,7 +1523,7 @@ static void PkwdRecordMonitor_PrintMovie(PkwdRecordMonitorWork *wk, BOOL movieOn
     WordSetNumber(wk->wordSet, 2, score, 4, 0, TRUE);
     GFL_WordSetFormatStrbuf(wk->wordSet, strbuf, format);
     GFL_StrBufFree(format);
-    PkwdRecordMonitor_Print(wk, SCREEN_MAIN, WINDOW_GROSS, 0, 0, strbuf, ALIGN_RIGHT, PRINT_COLOR(13, 10, 11));
+    PkwdRecordMonitor_Print(wk, SCREEN_MAIN, WINDOW_GROSS, 0, 0, strbuf, PRINT_ALIGN_RIGHT, PRINT_COLOR(13, 10, 11));
     GFL_StrBufFree(strbuf);
 }
 
@@ -1784,27 +1780,27 @@ static u32 PkwdRecordMonitor_HandleListResult(PkwdRecordMonitorWork *wk, u32 res
     case 6:
         action = ACTION_DECIDE;
         break;
-    case -7:
-    case -5:
+    case FRAMELIST_PAGE_UP:
+    case FRAMELIST_CURSOR_TOP:
         wk->flags |= FLAG_PAGE_UP;
         action = ACTION_MOVE;
         break;
-    case -6:
-    case -4:
+    case FRAMELIST_PAGE_DOWN:
+    case FRAMELIST_CURSOR_BOTTOM:
         wk->flags |= FLAG_PAGE_DOWN;
         action = ACTION_MOVE;
         break;
-    case -3:
-    case -2:
+    case FRAMELIST_JUMP_TOP:
+    case FRAMELIST_JUMP_BOTTOM:
         action = ACTION_MOVE;
         jumped = TRUE;
         break;
-    case -11:
-    case -10:
-    case -9:
+    case FRAMELIST_CURSOR_MOVE:
+    case FRAMELIST_SCROLL:
+    case FRAMELIST_BAR:
         action = ACTION_MOVE;
         break;
-    case -12:
+    case FRAMELIST_CURSOR_SHOWN:
         action = ACTION_DECIDE_TOUCH;
         break;
     }

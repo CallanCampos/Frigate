@@ -13,7 +13,7 @@
 
 void PokemonTrade_CreateTouchBar(PokemonTradeWork *wk) {
     TouchBarItem items[] = {
-        { 1, { 232, 168 } },
+        { TOUCHBAR_ICON_RETURN, { 232, 168 } },
         { TOUCHBAR_ICON_CUSTOM, { 28, 168 } },
         { TOUCHBAR_ICON_CUSTOM + 1, { 204, 168 } },
         { TOUCHBAR_ICON_CUSTOM + 2, { 48, 168 } },

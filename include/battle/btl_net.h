@@ -48,9 +48,9 @@ void BtlNet_ResetReplies(void);
 BOOL BtlNet_IsServerCmdReceived(void);
 u16 BtlNet_GetServerCmd(void **data);
 BOOL BtlNet_SendReply(void *data, u32 size);
-void *BtlNet_CreatePartyPacket(u32 size, HeapID heapId);
-void BtlNet_FreePartyPacket(void *data);
-void BtlNet_SetPartyPacket(void *data, PokeParty *party, u8 clientId);
+BtlNetPartyPacket *BtlNet_CreatePartyPacket(u32 size, HeapID heapId);
+void BtlNet_FreePartyPacket(BtlNetPartyPacket *packet);
+void BtlNet_SetPartyPacket(BtlNetPartyPacket *packet, PokeParty *party, u8 clientId);
 
 // The link battle's commands, registered from 0x100 by the events that start one
 extern const NetCommand data_ov167_021d7448[9];

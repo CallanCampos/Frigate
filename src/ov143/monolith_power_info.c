@@ -282,8 +282,8 @@ static void MonolithPowerInfo_DrawDescription(MonolithScreenParam *screen, Monol
             show = TRUE;
         }
         if (show == TRUE) {
-            WordSetNumber(wk->wordSet, 0, ((PassPowerData *)wk->passPowerData)[passPower].unk02, 4, 0, TRUE);
-            info = GFL_MsgDataLoadStrbufNew(wk->msgPowerInfo, ((PassPowerData *)wk->passPowerData)[passPower].info);
+            WordSetNumber(wk->wordSet, 0, wk->passPowerData[passPower].unk02, 4, 0, TRUE);
+            info = GFL_MsgDataLoadStrbufNew(wk->msgPowerInfo, wk->passPowerData[passPower].info);
             format = GFL_MsgDataLoadStrbufNew(wk->msgMonolith, 41);
             str = GFL_StrBufCreate(64, HEAPID_MONOLITH);
             GFL_WordSetFormatStrbuf(wk->wordSet, str, format);
@@ -294,11 +294,11 @@ static void MonolithPowerInfo_DrawDescription(MonolithScreenParam *screen, Monol
             GFL_StrBufFree(str);
         } else {
             levels = MonolithTool_GetLevels(screen);
-            if (((PassPowerData *)wk->passPowerData)[passPower].level1 > levels->level1) {
-                level = ((PassPowerData *)wk->passPowerData)[passPower].level1;
+            if (wk->passPowerData[passPower].level1 > levels->level1) {
+                level = wk->passPowerData[passPower].level1;
                 msgId = 42;
             } else {
-                level = ((PassPowerData *)wk->passPowerData)[passPower].level2;
+                level = wk->passPowerData[passPower].level2;
                 msgId = 43;
             }
             WordSetNumber(wk->wordSet, 0, level, 3, 0, TRUE);

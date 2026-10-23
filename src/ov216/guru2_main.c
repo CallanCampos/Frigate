@@ -177,31 +177,6 @@ enum {
     SEQ_RESULT_END,
 };
 
-// GURU2_NET_CMD_8: what the parent sends each frame of the game
-typedef struct {
-    fx32 discAngle;
-    // How high the Eggs have jumped
-    fx32 jumpY;
-    // In degrees
-    u16 eggAngles[GURU2_MEMBER_MAX];
-    u16 timeUp;
-} Guru2GameData;
-
-// GURU2_NET_CMD_12: where everything stopped, in degrees
-typedef struct {
-    u16 discAngle;
-    // The net IDs whose Egg stopped on a bonus area
-    u16 bonusBits;
-    // By position
-    u16 eggAngles[6];
-} Guru2ResultData;
-
-// GURU2_NET_CMD_9: a member's position around the disc
-typedef struct {
-    u16 position;
-    u16 netId;
-} Guru2PositionData;
-
 typedef struct {
     BOOL active;
     BOOL visible;
@@ -3187,9 +3162,9 @@ void Guru2Main_OnButton(Guru2MainWork *g2m, u32 value) {
 }
 
 // GURU2_NET_CMD_8: the parent's Guru2GameData
-void Guru2Main_OnGameData(Guru2MainWork *g2m, const void *data) {
+void Guru2Main_OnGameData(Guru2MainWork *g2m, const Guru2GameData *data) {
     g2m->gameDataReceived = TRUE;
-    g2m->gameData = *(const Guru2GameData *)data;
+    g2m->gameData = *data;
 }
 
 static void *Guru2Main_InitSeqWork(Guru2MainWork *g2m, u32 size) {
@@ -3233,9 +3208,7 @@ static int Guru2Main_CountChildren(Guru2MainWork *g2m) {
 }
 
 // GURU2_NET_CMD_9: a member's position
-void Guru2Main_OnPosition(Guru2MainWork *g2m, const void *data) {
-    const Guru2PositionData *position = data;
-
+void Guru2Main_OnPosition(Guru2MainWork *g2m, const Guru2PositionData *position) {
     g2m->positions[position->position] = *position;
     if (position->netId == NetSystem_GetNetId()) {
         g2m->position = position->position;
@@ -3285,8 +3258,8 @@ void Guru2Main_OnPartyIndex(Guru2MainWork *g2m, int netId, u32 value) {
 }
 
 // GURU2_NET_CMD_12: the parent's Guru2ResultData
-void Guru2Main_OnResult(Guru2MainWork *g2m, const void *data) {
-    g2m->result = *(const Guru2ResultData *)data;
+void Guru2Main_OnResult(Guru2MainWork *g2m, const Guru2ResultData *data) {
+    g2m->result = *data;
     g2m->resultReceived = TRUE;
 }
 

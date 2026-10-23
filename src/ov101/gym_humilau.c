@@ -3,6 +3,7 @@
 #include "constants/directions.h"
 #include "constants/sound.h"
 #include "field/field.h"
+#include "field/field_acmd.h"
 #include "field/field_actor.h"
 #include "field/field_camera.h"
 #include "field/field_exp_obj.h"
@@ -43,8 +44,10 @@
 #define ACTOR_LEADER_WAVES 22
 
 // The platforms' models' animations: 0 floats, looping; 1 tilts the platform under the player's step
-#define ANM_FLOAT 0
-#define ANM_TILT 1
+enum {
+    ANM_FLOAT,
+    ANM_TILT,
+};
 
 // The platforms float this far below the ground
 #define PLATFORM_Y FX32_CONST(-4)
@@ -55,9 +58,6 @@
 // The ride whose lane runs back down to the gym's entrance; once it has been ridden, the platforms that were never
 // moved start at the second set of positions
 #define RIDE_SHORTCUT 3
-
-// The player's hop in place before a ride, one per direction
-#define ACMD_HOP_FIRST 0x38
 
 // Where the player stands: on the platform of the last ride, on the one next to it, or on neither
 enum {
@@ -526,7 +526,7 @@ static GameEventReturnCode GymHumilau_RideEventCallback(GameEvent *event, u32 *s
         if (IsAllActorAcmdFinished(FieldPlayer_GetActor(ev->player))) {
             u32 dir = FieldPlayer_GetFaceDir(ev->player);
 
-            FldAct_SetAcmd(FieldPlayer_GetActor(ev->player), dir + ACMD_HOP_FIRST);
+            FldAct_SetAcmd(FieldPlayer_GetActor(ev->player), dir + ACMD_JUMP_2);
             ev->wait = 15;
             *state = 2;
         }
@@ -1144,7 +1144,7 @@ static void GymHumilau_PlayStopSplash(HumilauGymRideEvent *ev, u16 platform, BOO
 
 // Which platform a grid square is on, from the areas: each platform has two, the first ones the platform of the ride
 static int GymHumilau_GetStanding(HumilauGymWork *work, int x, int z) {
-    void *areas = func_ov036_02184590(Field_GetG3DMapper(work->field));
+    HeightExList *areas = func_ov036_02184590(Field_GetG3DMapper(work->field));
     BOOL onRidePlatform = FALSE;
     BOOL onNextPlatform = FALSE;
     int i;
@@ -1168,7 +1168,7 @@ static int GymHumilau_GetStanding(HumilauGymWork *work, int x, int z) {
 }
 
 static void GymHumilau_ClearAreas(HumilauGymWork *work) {
-    void *areas = func_ov036_02184590(Field_GetG3DMapper(work->field));
+    HeightExList *areas = func_ov036_02184590(Field_GetG3DMapper(work->field));
     int count = func_ov036_021ba684(areas);
     int i;
 
@@ -1181,7 +1181,7 @@ static void GymHumilau_ClearAreas(HumilauGymWork *work) {
 
 // The areas of a platform, a cross of a column and a row of three squares
 static void GymHumilau_AddRideAreas(HumilauGymWork *work, u8 ride) {
-    void *areas = func_ov036_02184590(Field_GetG3DMapper(work->field));
+    HeightExList *areas = func_ov036_02184590(Field_GetG3DMapper(work->field));
     int x, z;
 
     GymHumilau_GetRidePlatformPos(ride, &x, &z);
@@ -1190,7 +1190,7 @@ static void GymHumilau_AddRideAreas(HumilauGymWork *work, u8 ride) {
 }
 
 static void GymHumilau_AddPlatformAreas(HumilauGymWork *work, u16 platform) {
-    void *areas = func_ov036_02184590(Field_GetG3DMapper(work->field));
+    HeightExList *areas = func_ov036_02184590(Field_GetG3DMapper(work->field));
     SRTMatrix *matrix = FieldExpObj_GetActorMatrixPtr(work->expObj, 0, platform);
     int x = FX_Whole(matrix->translation.x - FX32_CONST(8)) / 16;
     int z = FX_Whole(matrix->translation.z - FX32_CONST(8)) / 16;

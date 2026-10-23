@@ -26,9 +26,9 @@ typedef struct EncounterModelWork {
     // Whether the effect added bank D to the texture banks
     BOOL addedTexBank;
     u32 renderMode;
-    void *modelRes;
+    G3DResource *modelRes;
     void *screenTex;
-    void *animRes;
+    G3DResource *animRes;
     G3DModel *model;
     void *anim;
     G3DActor *actor;

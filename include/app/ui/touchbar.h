@@ -9,9 +9,21 @@
 typedef struct TouchBar TouchBar;
 typedef struct TouchBarIcon TouchBarIcon;
 
-// An icon of the bar: one of the bar's own, or from TOUCHBAR_ICON_CUSTOM on, one drawn from the caller's
-// resources and animations. Pressing the key does what touching it does
-#define TOUCHBAR_ICON_CUSTOM 7
+// An icon of the bar: one of the bar's own, by the key that does what touching it does (X, B, the four directions of
+// the + Control Pad and Y), or from TOUCHBAR_ICON_CUSTOM on, one drawn from the caller's resources and animations.
+// TouchBar_GetDecided and TouchBar_GetTouched return TOUCHBAR_ICON_NONE when there is none
+enum {
+    TOUCHBAR_ICON_NONE = -1,
+    TOUCHBAR_ICON_CLOSE,
+    TOUCHBAR_ICON_RETURN,
+    TOUCHBAR_ICON_DOWN,
+    TOUCHBAR_ICON_UP,
+    TOUCHBAR_ICON_LEFT,
+    TOUCHBAR_ICON_RIGHT,
+    // The one that toggles between two states
+    TOUCHBAR_ICON_CHECK,
+    TOUCHBAR_ICON_CUSTOM,
+};
 
 typedef struct {
     s32 icon;
@@ -66,9 +78,9 @@ struct TouchBar {
 TouchBar *TouchBar_Create(TouchBarSetup *setup, HeapID heapId);
 void TouchBar_Free(TouchBar *bar);
 void TouchBar_Main(TouchBar *bar);
-// The icon whose touch animation has ended, or -1 when none
+// The icon whose touch animation has ended, or TOUCHBAR_ICON_NONE
 int TouchBar_GetDecided(TouchBar *bar);
-// The icon being touched, or -1 when none
+// The icon being touched, or TOUCHBAR_ICON_NONE
 u32 TouchBar_GetTouched(TouchBar *bar);
 // Whether an icon is being touched
 BOOL TouchBar_IsTouching(TouchBar *bar);

@@ -8,8 +8,6 @@
 // its floors, the Trainers defeated, the floor and room reached) and the key information of the Key System. The ROM
 // has no string for the file, so the name is descriptive. Block 0x45.
 
-#define SAVE_BLOCK_KEY_DATA 0x45
-
 u32 KeyDataSave_GetSize(void) {
     return sizeof(KeyDataSave);
 }

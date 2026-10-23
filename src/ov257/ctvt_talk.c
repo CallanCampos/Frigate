@@ -333,7 +333,7 @@ void CtvtTalk_Enter(CommTvtWork *sys, CtvtTalk *talk) {
     talk->message = GFL_StrBufCreate(109, heapId);
     talk->expanded = GFL_StrBufCreate(109, heapId);
     talker = CtvtComm_GetTalker(sys, CommTvt_GetComm(sys));
-    if (talker != 0xff) {
+    if (talker != CTVT_COMM_NONE) {
         func_ov257_021aad74(sys, talker);
         talk->voiceIconState = VOICE_ICON_BUSY;
     }
@@ -456,7 +456,7 @@ int CtvtTalk_Main(CommTvtWork *sys, CtvtTalk *talk) {
         talker = CtvtComm_GetTalker(sys, comm);
         self = CtvtComm_GetSelfNetId(sys, comm);
         if (CtvtTalk_IsTalkButtonTouched(sys, talk, TRUE) == TRUE || (GCTX_HIDGetHeldKeys() & CTVT_TALK_KEYS)) {
-            if (talker == 0xff) {
+            if (talker == CTVT_COMM_NONE) {
                 break;
             }
             if (talker == self) {
@@ -890,7 +890,7 @@ static void CtvtTalk_UpdateMain(CommTvtWork *sys, CtvtTalk *talk) {
         u8 self = CtvtComm_GetSelfNetId(sys, comm);
         u8 talker = CtvtComm_GetTalker(sys, comm);
 
-        if (talker != 0xff) {
+        if (talker != CTVT_COMM_NONE) {
             if (talker == self) {
                 if (talk->requestCooldown != 0) {
                     talk->requestCooldown--;

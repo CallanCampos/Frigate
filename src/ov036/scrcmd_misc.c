@@ -35,15 +35,6 @@
 // The world position of a tile
 #define GRID_TO_FX32(n) ((n) * FX32_CONST(16))
 
-// A floor of an elevator: its name, and where it goes
-typedef struct {
-    u16 messageId;
-    u16 zoneId;
-    u16 x;
-    u16 y;
-    u16 z;
-} ElevatorFloor;
-
 // The groups bought by the collectors, identified by their price lists and script dialogue.
 // The last three table slots also use the gourmet price list.
 enum {
@@ -166,7 +157,7 @@ static u32 ElevatorTable_CountEntries(ElevatorFloor *table) {
 BOOL s01C1_ElevatorSetTablePtr(VM *vm, FieldScriptEnv *env) {
     s32 offset = VM_Read32(vm);
 
-    FieldScriptEnv_SetElevatorTable(env, (void *)(vm->pc + offset));
+    FieldScriptEnv_SetElevatorTable(env, (ElevatorFloor *)(vm->pc + offset));
     return FALSE;
 }
 

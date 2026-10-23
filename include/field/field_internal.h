@@ -4,7 +4,10 @@
 #include "field/field.h"
 #include "field/field_controller.h"
 #include "field/field_g3d_mapper.h"
+#include "field/field_palace.h"
+#include "field/field_scene_area.h"
 #include "field/zone.h"
+#include "gfl/blact.h"
 
 // The gimmick work of Field_AllocGimmickWorkBlock, password 0xffffffff for none
 typedef struct {
@@ -20,37 +23,37 @@ struct Field {
     GameData *gameData;
     AreaData *areaData;
     FieldCamera *cameraSystem;
-    void *lightSystem;
+    FieldLight *lightSystem;
     FieldFog *fog;
-    void *fogCtrl;
-    void *weatherSystem;
+    FieldFogCtrl *fogCtrl;
+    FieldWeather *weatherSystem;
     FieldSubscreen *subscreen;
     FieldMsgBG *msgBGSys;
     MoneyWin *moneyWin;
     PlaceName *placeName;
     void *unk34;
-    void *fesGimmick;
+    FesGimmick *fesGimmick;
     FieldExpObjSystem *expObjSystem;
     MMSys *actorSystem;
     NoGridMapper *noGridMapper;
-    void *sceneArea;
-    void *sceneAreaLoader;
+    FieldSceneArea *sceneArea;
+    FieldSceneAreaLoader *sceneAreaLoader;
     FieldG3DMapper *g3DMapper;
     u32 unk54;
     FieldG3DMapperConfig mapperConfig;
     FieldPlayer *player;
     EncountSystem *encountSystem;
-    void *fieldEffects;
+    FieldEffects *fieldEffects;
     void *unkA0;
-    void *palaceSys;
-    u8 colorPostFX[0x8];
-    void *skillMapEff;
-    void *g3dCamera;
-    void *g3dLights;
+    FieldPalaceSys *palaceSys;
+    FieldColorPostFX colorPostFX;
+    FieldSkillMapEff *skillMapEff;
+    G3DCamera *g3dCamera;
+    G3DLight *g3dLights;
     void *asyncActorMatLoadTCB;
-    void *actorBlAct;
-    void *effectBlAct;
-    void *wildEffectBlAct;
+    BlActSys *actorBlAct;
+    BlActSys *effectBlAct;
+    BlActSys *wildEffectBlAct;
     FieldAsyncProcManager *asyncProcManager;
     // 1 when the map is loaded, 2 when closing
     u32 routineState;
@@ -71,11 +74,11 @@ struct Field {
     TCBManager *tcbManager;
     void *tcbManagerHeap;
     FieldGimmickWorkBlock gimmickWork;
-    void *particleSystem;
-    void *g3dCi;
+    FieldParticle *particleSystem;
+    Fld3DCi *g3dCi;
     DayCare *dayCare;
     u32 renderMode;
-    void *g3DObjSystem;
+    FieldG3DObjSystem *g3DObjSystem;
     FieldTaskManager *taskManager;
     BOOL fadeFlag;
     EncEff *encEff;

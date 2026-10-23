@@ -13,7 +13,6 @@
 // passerby survey's messages, and its accessors. The ROM has no string for the file, so the name is a guess.
 // Block 0x20.
 
-#define SAVE_BLOCK_CGEAR 0x20
 #define CGEAR_NAME_LENGTH 9
 
 static u32 getNameSize(void);

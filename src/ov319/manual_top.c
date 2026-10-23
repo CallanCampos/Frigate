@@ -97,18 +97,18 @@ BOOL ManualTop_Main(ManualTop *top) {
     if (top->state == STATE_IDLE || top->state == STATE_TOUCH_BAR) {
         ManualTouchBar_Main(top->common->touchBar);
         if (top->state == STATE_IDLE) {
-            if (ManualTouchBar_GetTouched(top->common->touchBar) != -1) {
+            if (ManualTouchBar_GetTouched(top->common->touchBar) != TOUCHBAR_ICON_NONE) {
                 top->state = STATE_TOUCH_BAR;
             }
         } else {
             u32 decided = ManualTouchBar_GetDecided(top->common->touchBar);
 
-            if (decided != -1) {
+            if (decided != TOUCHBAR_ICON_NONE) {
                 switch (decided) {
-                case MANUAL_TOUCHBAR_ICON_RETURN:
+                case TOUCHBAR_ICON_RETURN:
                     top->param->result = MANUAL_TOP_RESULT_RETURN;
                     break;
-                case MANUAL_TOUCHBAR_ICON_CLOSE:
+                case TOUCHBAR_ICON_CLOSE:
                     top->param->result = MANUAL_TOP_RESULT_CLOSE;
                     break;
                 }

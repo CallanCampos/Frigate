@@ -756,7 +756,7 @@ static void CommTvt_UpdateNames(CommTvtWork *sys) {
     if (copied == TRUE) {
         u8 talker = CtvtComm_GetTalker(sys, sys->comm);
 
-        if (talker != 0xff) {
+        if (talker != CTVT_COMM_NONE) {
             func_ov257_021aad74(sys, talker);
         }
     }

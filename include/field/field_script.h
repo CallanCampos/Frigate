@@ -7,6 +7,7 @@
 #include "gfl/str.h"
 #include "struct_decls.h"
 #include "system/game_event.h"
+#include "system/time_icon.h"
 
 // Fields accessed by the field script work helpers; the remaining storage is not yet identified.
 struct ScriptWork {
@@ -59,7 +60,8 @@ typedef struct {
 // What actorWork holds: the actor that a message balloon is over, and where the balloon goes
 typedef struct {
     u16 actorId;
-    u16 winX;
+    // An ACTOR_MSG_WIN_ type
+    u16 winType;
     // The actor's position plus offset
     VecFx32 pos;
     VecFx32 actorPos;
@@ -76,12 +78,12 @@ struct ScriptSubwork {
     ScriptListMenu listMenu;
     u8 actorWork[0x28];
     void *mapDisplayInfo;
-    void *specialMessageIcon;
+    WaitIcon *specialMessageIcon;
     u8 actorMsgPosActual;
     u8 actorMsgPos;
     u16 waitCounter;
     u32 nowPkmVoice;
-    void *elevatorTable;
+    ElevatorFloor *elevatorTable;
 };
 
 struct FieldScriptEnvArgs {
@@ -141,8 +143,8 @@ MsgData *GetFieldScriptMsgData(FieldScriptEnv *env);
 u16 GetFieldScriptMsgFileNo(FieldScriptEnv *env);
 void setMapDisplayInfoPtr(FieldScriptEnv *env, void *info);
 void *getMapDisplayInfoPtr(FieldScriptEnv *env);
-void SetSpecialMessageIconPtr(FieldScriptEnv *env, void *icon);
-void *GetSpecialMessageIconPtr(FieldScriptEnv *env);
+void SetSpecialMessageIconPtr(FieldScriptEnv *env, WaitIcon *icon);
+WaitIcon *GetSpecialMessageIconPtr(FieldScriptEnv *env);
 void *GetFieldScriptActorWk(FieldScriptEnv *env);
 u8 ActorMsgWin_GetPosActual(FieldScriptEnv *env);
 void ActorMsgWin_SetPosActual(FieldScriptEnv *env, u8 pos);
@@ -386,8 +388,8 @@ void FieldScriptEnv_SetWaitCounter(FieldScriptEnv *env, u16 frames);
 BOOL FieldScriptEnv_UpdateWaitCounter(FieldScriptEnv *env);
 u32 GetScrEnvNowPkmVoice(FieldScriptEnv *env);
 void SetScrEnvNowPkmVoice(FieldScriptEnv *env, u32 voice);
-void *FieldScriptEnv_GetElevatorTable(FieldScriptEnv *env);
-void FieldScriptEnv_SetElevatorTable(FieldScriptEnv *env, void *table);
+ElevatorFloor *FieldScriptEnv_GetElevatorTable(FieldScriptEnv *env);
+void FieldScriptEnv_SetElevatorTable(FieldScriptEnv *env, ElevatorFloor *table);
 void SetFieldScriptEnvMsgData(FieldScriptEnv *env, u32 arcId, u32 fileNo);
 void FieldScriptEnv_Save(FieldScriptEnv *env);
 void FieldScriptEnv_Restore(FieldScriptEnv *env);
@@ -411,9 +413,5 @@ void ScriptWork_RestoreVarCopy(ScriptWork *work, void *copy);
 u16 *ScriptWork_GetLocalWork(ScriptWork *work, u16 id);
 WordSet *ScriptWork_GetWordSet(ScriptWork *work);
 MMSys *GetScrEnvMMdlSys(FieldScriptEnv *env);
-
-// Overlay 36: show a message, and have the script wait for it
-BOOL func_ov036_021a8eb4(VM *vm, FieldScriptEnv *env, StrBuf *message, u16 actorId, u16 pos, u32 a5);
-BOOL loadMsgBox(VM *vm, FieldScriptEnv *env, StrBuf *message, u32 a3, u8 a4);
 
 #endif // POKEBW2_FIELD_FIELD_SCRIPT_H

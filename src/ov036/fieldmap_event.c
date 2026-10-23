@@ -23,6 +23,7 @@
 #include "field/event_wild_battle.h"
 #include "field/festival.h"
 #include "field/field.h"
+#include "field/field_acmd.h"
 #include "field/field_actor.h"
 #include "field/field_daycare.h"
 #include "field/field_effect.h"
@@ -108,26 +109,6 @@
 #define GIMMICK_CHARGESTONE_CAVE 13
 #define GIMMICK_HUMILAU_GYM 38
 #define GIMMICK_ROLLER_COASTER 48
-
-// What FieldPlayer_GetMoveObserveStatus says of the player's last action command: none, one that has started, one
-// that goes on, and one that has just ended
-#define OBSERVE_NONE 0
-#define OBSERVE_START 1
-#define OBSERVE_MOVING 2
-#define OBSERVE_END 3
-
-// What FieldPlayer_GetMoveStatus says the player does, as the grid's player sets it: stands (or brakes against a wall),
-// moves to the next tile, or turns on the spot
-#define MOVE_STATUS_NONE 0
-#define MOVE_STATUS_MOVE 1
-#define MOVE_STATUS_TURN 2
-
-// The action commands of the dash and the dash up a slope, which come in one per direction, and of the two jumps that
-// the player makes off the water
-#define ACMD_DASH 0x58
-#define ACMD_DASH_UPHILL 0xa3
-#define ACMD_JUMP_1 0x34
-#define ACMD_JUMP_2 0x38
 
 // A grid tile's side, in world units and in fx32
 #define GRID_UNITS 16
@@ -389,7 +370,7 @@ static GameEvent *FieldEventProvider_Grid_CheckForEvent(GameSystem *gsys, Field 
             }
         }
     }
-    if (wk.observeStatus == OBSERVE_END || wk.observeStatus == OBSERVE_NONE) {
+    if (wk.observeStatus == PLAYER_OBSERVE_END || wk.observeStatus == PLAYER_OBSERVE_NONE) {
         event = CheckSurfExitEvent(&wk, gsys, field);
         if (event != NULL) {
             return event;
@@ -701,7 +682,7 @@ static void FieldEventProvider_InitCheckData(FieldInteractWk *wk, GameSystem *gs
     wk->pos = GetMModelWPosPtr(actor);
     wk->reserveScript = FieldStatus_GetReserveScript(GameData_GetFieldStatus(wk->gameData));
     wk->tileType = FieldPlayer_GetTileTypeUnder(wk->player);
-    if (wk->observeStatus == OBSERVE_END || wk->observeStatus == OBSERVE_NONE) {
+    if (wk->observeStatus == PLAYER_OBSERVE_END || wk->observeStatus == PLAYER_OBSERVE_NONE) {
         wk->canAct = TRUE;
         wk->aPressed = (wk->pressed & PAD_BUTTON_A) != 0;
         wk->xPressed = (wk->pressed & PAD_BUTTON_X) != 0;
@@ -720,16 +701,16 @@ static void FieldEventProvider_InitCheckData(FieldInteractWk *wk, GameSystem *gs
     wk->stepped = FALSE;
     wk->verticalOnly = FALSE;
     wk->stepStarted = FALSE;
-    if (wk->moveStatus == MOVE_STATUS_MOVE) {
-        wk->stepped = wk->observeStatus == OBSERVE_END;
-        wk->stepStarted = wk->observeStatus == OBSERVE_START;
+    if (wk->moveStatus == PLAYER_MOVE_STATUS_MOVE) {
+        wk->stepped = wk->observeStatus == PLAYER_OBSERVE_END;
+        wk->stepStarted = wk->observeStatus == PLAYER_OBSERVE_START;
     }
     if (FieldPlayer_GetVerticalMoveOnlyFlag(wk->player)) {
         wk->verticalOnly = TRUE;
     }
-    wk->walking = wk->observeStatus == OBSERVE_END;
+    wk->walking = wk->observeStatus == PLAYER_OBSERVE_END;
     wk->turning = FALSE;
-    if (wk->observeStatus != OBSERVE_END && wk->moveStatus == MOVE_STATUS_TURN) {
+    if (wk->observeStatus != PLAYER_OBSERVE_END && wk->moveStatus == PLAYER_MOVE_STATUS_TURN) {
         wk->turning = TRUE;
     }
     if ((wk->faceDir == DIR_UP && (wk->held & PAD_KEY_UP)) || (wk->faceDir == DIR_DOWN && (wk->held & PAD_KEY_DOWN)) ||
@@ -849,7 +830,9 @@ static GameEvent *CheckDirChangeTriggerScrEvent(FieldInteractWk *wk) {
     if (dir == PLAYER_DIR_NONE) {
         return NULL;
     }
-    return (observeStatus == OBSERVE_START || observeStatus == OBSERVE_MOVING) ? NULL : CheckTriggerScrEvent(wk, dir);
+    return (observeStatus == PLAYER_OBSERVE_START || observeStatus == PLAYER_OBSERVE_MOVING)
+               ? NULL
+               : CheckTriggerScrEvent(wk, dir);
 }
 
 static GameEvent *CheckQuicksandEvent(FieldInteractWk *wk) {
@@ -904,7 +887,7 @@ static GameEvent *CheckPerStepEvents(FieldInteractWk *wk, Field *field, RailPosi
         updateFollowerModel(gameData);
     }
     if (wk->stepped || wk->verticalOnly) {
-        void *gimmick;
+        FesGimmick *gimmick;
 
         event = CheckPhenomenonEvent(field, gsys, gameData);
         if (event != NULL) {
@@ -1357,7 +1340,7 @@ static GameEvent *CheckRailDiveEvent(FieldInteractWk *wk, GameSystem *gsys, Fiel
     FieldActor *actor = FieldPlayer_GetActor(player);
     u16 dir = FieldPlayer_GetMoveDirByKey(player, wk->held);
 
-    if (dir == DIR_DOWN && (wk->observeStatus == OBSERVE_NONE || wk->observeStatus == OBSERVE_END)) {
+    if (dir == DIR_DOWN && (wk->observeStatus == PLAYER_OBSERVE_NONE || wk->observeStatus == PLAYER_OBSERVE_END)) {
         if (func_ov036_021b3b3c(GetTileClass(wk->tileType)) && (func_ov036_021956e8(actor, dir) & 3) != 0) {
             return func_ov033_0217a0f4(gsys, field, dir);
         }

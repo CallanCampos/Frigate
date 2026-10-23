@@ -20,15 +20,6 @@
 // The Global Trade Station's trade demo, and the evolution demo of a Pokémon that evolves by the trade. The names are
 // ours, guessed
 
-// How the demo was reached, the screen's mode
-#define DEMO_MODE_UPLOAD 7
-#define DEMO_MODE_DOWNLOAD 8
-#define DEMO_MODE_EXCHANGE 9
-#define DEMO_MODE_DOWNLOAD_EX 10
-
-// The upload screen's mode that saves the evolved Pokémon
-#define UPLOAD_MODE_POKEMON_EVO_SAVE 12
-
 static PartyPkm *Demo_GetTradePokemon(WorldTradeWork *wk, int mode);
 static void Demo_StoreTradedPokemon(WorldTradeWork *wk);
 
@@ -46,12 +37,12 @@ int WorldTrade_Demo_Init(WorldTradeWork *wk, int seq) {
     param->myStatus = wk->param->mystatus;
 
     switch (wk->subProcessMode) {
-    case DEMO_MODE_UPLOAD:
+    case WT_MODE_UPLOAD:
         param->recvPkm = param->sendPkm = WorldTradeData_GetPkmPtr(wk->param->worldtrade_data);
         param->partnerStatus = wk->partnerStatus = WorldTrade_MakePartnerStatus(&wk->uploadPokemonData);
         procs = &data_ov194_021c6400;
         break;
-    case DEMO_MODE_DOWNLOAD:
+    case WT_MODE_DOWNLOAD:
         if (wk->uploadPokemonData.isTrade) {
             param->recvPkm = (PartyPkm *)wk->uploadPokemonData.postData;
         } else {
@@ -61,7 +52,7 @@ int WorldTrade_Demo_Init(WorldTradeWork *wk, int seq) {
         param->partnerStatus = wk->partnerStatus = WorldTrade_MakePartnerStatus(&wk->uploadPokemonData);
         procs = &data_ov194_021c63b8;
         break;
-    case DEMO_MODE_DOWNLOAD_EX:
+    case WT_MODE_DOWNLOAD_EX:
         param->recvPkm = wk->uploadPokemonData.isTrade ? (PartyPkm *)wk->uploadPokemonData.postData
                                                        : WorldTradeData_GetPkmPtr(wk->param->worldtrade_data);
         WorldTradeData_GetPkm(wk->param->worldtrade_data, wk->sentPokemon);
@@ -69,7 +60,7 @@ int WorldTrade_Demo_Init(WorldTradeWork *wk, int seq) {
         param->partnerStatus = wk->partnerStatus = WorldTrade_MakePartnerStatus(&wk->uploadPokemonData);
         procs = &data_ov194_021c63d0;
         break;
-    case DEMO_MODE_EXCHANGE:
+    case WT_MODE_EXCHANGE:
         copyPartyPkm(wk->demoPokemon, wk->sentPokemon);
         param->sendPkm = wk->demoPokemon;
         param->recvPkm = (PartyPkm *)wk->downloadPokemonData[wk->touchTrainerPos].postData;
@@ -97,7 +88,7 @@ int WorldTrade_Demo_Main(WorldTradeWork *wk, int seq) {
         if (wk->procResult) {
             break;
         }
-        if (wk->subProcessMode == DEMO_MODE_EXCHANGE) {
+        if (wk->subProcessMode == WT_MODE_EXCHANGE) {
             PartyPkm *pkm;
             u32 species;
             u32 method;
@@ -131,7 +122,7 @@ int WorldTrade_Demo_Main(WorldTradeWork *wk, int seq) {
                 WorldTrade_SubProcessChange(wk, WORLDTRADE_TITLE, 0);
                 ret = WT_SEQ_FADEOUT;
             }
-        } else if (wk->subProcessMode == DEMO_MODE_DOWNLOAD || wk->subProcessMode == DEMO_MODE_DOWNLOAD_EX) {
+        } else if (wk->subProcessMode == WT_MODE_DOWNLOAD || wk->subProcessMode == WT_MODE_DOWNLOAD_EX) {
             PartyPkm *pkm;
             PartyPkm *sent;
             u32 species;
@@ -202,7 +193,7 @@ int WorldTrade_Demo_Main(WorldTradeWork *wk, int seq) {
         Demo_StoreTradedPokemon(wk);
         GX_SetVisibleWnd(GX_WNDMASK_NONE);
         GFL_OvlLoad(OVERLAY_APP_UI);
-        WorldTrade_SubProcessChange(wk, WORLDTRADE_UPLOAD, UPLOAD_MODE_POKEMON_EVO_SAVE);
+        WorldTrade_SubProcessChange(wk, WORLDTRADE_UPLOAD, WT_MODE_POKEMON_EVO_SAVE);
         ret = WT_SEQ_FADEOUT;
         break;
     }
@@ -242,13 +233,13 @@ PlayerInfo *WorldTrade_MakePartnerStatus(Dpw_Tr_Data *dtd) {
 }
 
 static PartyPkm *Demo_GetTradePokemon(WorldTradeWork *wk, int mode) {
-    if (mode == DEMO_MODE_EXCHANGE) {
+    if (mode == WT_MODE_EXCHANGE) {
         return (PartyPkm *)wk->downloadPokemonData[wk->touchTrainerPos].postData;
     }
-    if (mode == DEMO_MODE_DOWNLOAD_EX) {
+    if (mode == WT_MODE_DOWNLOAD_EX) {
         return (PartyPkm *)wk->uploadPokemonData.postData;
     }
-    if (mode == DEMO_MODE_DOWNLOAD) {
+    if (mode == WT_MODE_DOWNLOAD) {
         return (PartyPkm *)wk->uploadPokemonData.postData;
     }
     // "The mode passed is wrong"

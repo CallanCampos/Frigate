@@ -36,9 +36,11 @@ enum {
 };
 
 // The resources of TouchBarGfx::res
-#define TOUCHBAR_RES_PALETTE 0
-#define TOUCHBAR_RES_CHARS 1
-#define TOUCHBAR_RES_CELL_ANIMS 2
+enum {
+    TOUCHBAR_RES_PALETTE,
+    TOUCHBAR_RES_CHARS,
+    TOUCHBAR_RES_CELL_ANIMS,
+};
 
 // An icon of the bar's own, by icon number
 typedef struct {
@@ -151,14 +153,14 @@ int TouchBar_GetDecided(TouchBar *bar) {
     if (bar->state == TOUCHBAR_STATE_DONE && bar->selected != -1) {
         return TouchBarIcon_GetId(&bar->icons[bar->selected]);
     }
-    return -1;
+    return TOUCHBAR_ICON_NONE;
 }
 
 u32 TouchBar_GetTouched(TouchBar *bar) {
     if (bar->state == TOUCHBAR_STATE_TOUCHED && bar->selected != -1) {
         return TouchBarIcon_GetId(&bar->icons[bar->selected]);
     }
-    return -1;
+    return TOUCHBAR_ICON_NONE;
 }
 
 BOOL TouchBar_IsTouching(TouchBar *bar) {

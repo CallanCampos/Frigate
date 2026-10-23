@@ -30,9 +30,9 @@ BlackTowerCmd_IsTargetSlot kind:function(thumb,size=0x58) addr:0x021e5fe4
 BlackTowerCmd_GetNpcScriptByResult kind:function(thumb,size=0x6a) addr:0x021e603c
 BlackTowerCmd_HasEarnedMoney kind:function(thumb,size=0x4c) addr:0x021e60a8
 BlackTowerCmd_TakeEarnedMoney kind:function(thumb,size=0x8c) addr:0x021e60f4
-data_ov061_021e6180 kind:data(any) addr:0x021e6180
+sUnkPairs kind:data(any) addr:0x021e6180
 data_ov061_021e619d kind:data(any) addr:0x021e619d ambiguous
-data_ov061_021e61d8 kind:data(any) addr:0x021e61d8
+sUnkPairs17 kind:data(any) addr:0x021e61d8
 data_ov061_021e61d9 kind:data(any) addr:0x021e61d9 ambiguous
 BLACK_TOWER_SCRIPT_COMMANDS kind:data(any) addr:0x021e6230
 data_ov061_021e62a9 kind:data(any) addr:0x021e62a9 ambiguous

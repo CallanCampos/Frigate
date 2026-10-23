@@ -130,8 +130,8 @@ data_ov139_0219cda8 kind:data(any) addr:0x0219cde8
 data_ov139_0219cdb0 kind:data(any) addr:0x0219cdf0
 data_ov139_0219cdbc kind:data(any) addr:0x0219cdfc
 data_ov139_0219cdbe kind:data(any) addr:0x0219cdfe
-data_ov139_0219cde4 kind:data(any) addr:0x0219ce24
-data_ov139_0219cdea kind:data(any) addr:0x0219ce2a
+sFlickRows kind:data(any) addr:0x0219ce24
+sFlickDistances kind:data(any) addr:0x0219ce2a
 data_ov139_0219ce20 kind:data(any) addr:0x0219ce60
 data_ov139_0219ce2c kind:data(any) addr:0x0219ce6c
 data_ov139_0219ce38 kind:data(any) addr:0x0219ce78

@@ -6,8 +6,6 @@
 // The state of the zone's gimmick and its save block. The ROM has no string for the file, so the name is a guess
 // (swan's GimmickSave_Init). Block 0x30.
 
-#define SAVE_BLOCK_GIMMICK 0x30
-
 u32 GimmickSave_GetBlockSize(void) {
     return sizeof(GimmickState);
 }

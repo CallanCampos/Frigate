@@ -15,6 +15,15 @@
 #define ZUKAN_SEASON_COUNT 4
 #define ZUKAN_HABITAT_TYPE_COUNT 3
 
+// An area of the habitat list, a table that zukan_common.c and zukan_habitat.c each hold a copy of: the flag that
+// shows it, its zone and its file
+typedef struct {
+    u16 flag;
+    u16 zone;
+    u8 file;
+    u8 padding;
+} ZukanHabitatTableEntry;
+
 // The habitats that the player has reached: the first is always true, and the others are flags of the story. An area
 // is shown if one of the conditions that it names is true
 typedef struct {

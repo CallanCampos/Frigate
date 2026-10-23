@@ -28,13 +28,6 @@
 #define FLAG_CONDITION_1 EVENT_FLAG_0x0987
 #define FLAG_CONDITION_2 EVENT_FLAG_0x0985
 
-typedef struct {
-    u16 flag;
-    u16 zone;
-    u8 file;
-    u8 unused;
-} ZukanHabitatTableEntry;
-
 static BOOL ZukanCommon_IsInHabitat(PokeDexSave *pokedex, const ZukanHabitatFileEntry *entry, u8 type, u8 season,
                                     u32 bySeason);
 static void ZukanCommon_GetHabitatStates(u32 *states, const ZukanHabitatFile *file, PokeDexSave *pokedex);

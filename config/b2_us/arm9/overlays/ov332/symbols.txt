@@ -425,8 +425,8 @@ data_ov332_021c8ef6 kind:data(any) addr:0x021c8ef6
 data_ov332_021c8f0a kind:data(any) addr:0x021c8f0a
 sKeyEnabledMsgs kind:data(any) addr:0x021c8f14
 data_ov332_021c8f28 kind:data(any) addr:0x021c8f28
-data_ov332_021c8f32 kind:data(any) addr:0x021c8f32
-data_ov332_021c8f46 kind:data(any) addr:0x021c8f46
+sSendKeyNameMsgs kind:data(any) addr:0x021c8f32
+sHeldKeyNameMsgs kind:data(any) addr:0x021c8f46
 sTextSetup kind:data(any) addr:0x021c8f5c
 sMenuSceneFuncs kind:data(any) addr:0x021c8f64
 sConnectSceneFuncs kind:data(any) addr:0x021c8f74

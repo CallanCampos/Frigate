@@ -292,7 +292,7 @@ static const FrameListTouch sTDownloadListTouchNoScroll[] = {
 };
 
 static const FrameListSetup sTDownloadListSetup = {
-    { 2, 0xff, 1, 3, 0x1c, 3, 2, 0, 0x1c, 3, 2, { 0x18, 0xc, 8, 6, 4, 3 }, 2, 0x10 },
+    { 2, FRAMELIST_BG_NONE, 1, 3, 0x1c, 3, 2, 0, 0x1c, 3, 2, { 0x18, 0xc, 8, 6, 4, 3 }, 2, 0x10 },
     7,
     2,
     0,
@@ -958,22 +958,22 @@ int TDownloadUtil_ListResult(TDownloadWork *wk, u32 result) {
     case 5:
         handled = 2;
         break;
-    case -7:
-    case -5:
+    case FRAMELIST_PAGE_UP:
+    case FRAMELIST_CURSOR_TOP:
         TDownloadUtil_PressButton(wk, T_DOWNLOAD_BUTTON_UP, 0);
         handled = 3;
         break;
-    case -6:
-    case -4:
+    case FRAMELIST_PAGE_DOWN:
+    case FRAMELIST_CURSOR_BOTTOM:
         TDownloadUtil_PressButton(wk, T_DOWNLOAD_BUTTON_DOWN, 0);
         handled = 3;
         break;
-    case -3:
-    case -2:
+    case FRAMELIST_JUMP_TOP:
+    case FRAMELIST_JUMP_BOTTOM:
         handled = 4;
         break;
-    case -11:
-    case -10:
+    case FRAMELIST_CURSOR_MOVE:
+    case FRAMELIST_SCROLL:
         handled = 1;
         break;
     }

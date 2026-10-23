@@ -212,15 +212,15 @@ u32 BeaconDetailSub_Input(BeaconDetailWork *work) {
         work->param->unk0A = TRUE;
         return BEACON_DETAIL_SEQ_FADE_OUT;
     }
-    if (touched == BEACON_DETAIL_ICON_RETURN) {
+    if (touched == TOUCHBAR_ICON_RETURN) {
         work->param->unk0A = FALSE;
         return BEACON_DETAIL_SEQ_FADE_OUT;
     }
-    if (touched == BEACON_DETAIL_ICON_PREV && work->index != 0) {
+    if (touched == TOUCHBAR_ICON_UP && work->index != 0) {
         BeaconDetailSub_TurnPage(work, PAGE_PREV);
         return BEACON_DETAIL_SEQ_WAIT;
     }
-    if (touched == BEACON_DETAIL_ICON_NEXT && work->index < work->count - 1) {
+    if (touched == TOUCHBAR_ICON_DOWN && work->index < work->count - 1) {
         BeaconDetailSub_TurnPage(work, PAGE_NEXT);
         return BEACON_DETAIL_SEQ_WAIT;
     }
@@ -278,16 +278,16 @@ static void BeaconDetailSub_LoadPalette(const void *src, u32 dest, u16 offset, u
 
 // The arrows are active when the log has a beacon that way
 static void BeaconDetailSub_UpdateTouchBar(BeaconDetailWork *work) {
-    TouchBar_SetIconActive(work->touchBar, BEACON_DETAIL_ICON_RETURN, TRUE);
+    TouchBar_SetIconActive(work->touchBar, TOUCHBAR_ICON_RETURN, TRUE);
     if (work->index != 0) {
-        TouchBar_SetIconActive(work->touchBar, BEACON_DETAIL_ICON_PREV, TRUE);
+        TouchBar_SetIconActive(work->touchBar, TOUCHBAR_ICON_UP, TRUE);
     } else {
-        TouchBar_SetIconActive(work->touchBar, BEACON_DETAIL_ICON_PREV, FALSE);
+        TouchBar_SetIconActive(work->touchBar, TOUCHBAR_ICON_UP, FALSE);
     }
     if (work->index < work->count - 1) {
-        TouchBar_SetIconActive(work->touchBar, BEACON_DETAIL_ICON_NEXT, TRUE);
+        TouchBar_SetIconActive(work->touchBar, TOUCHBAR_ICON_DOWN, TRUE);
     } else {
-        TouchBar_SetIconActive(work->touchBar, BEACON_DETAIL_ICON_NEXT, FALSE);
+        TouchBar_SetIconActive(work->touchBar, TOUCHBAR_ICON_DOWN, FALSE);
     }
 }
 
@@ -717,12 +717,12 @@ static void BeaconDetailSub_StartPageTask(BeaconDetailWork *work, u8 direction, 
     page->direction = direction;
     if (direction == PAGE_NEXT) {
         page->index = work->index + 1;
-        TouchBar_SetIconActive(work->touchBar, BEACON_DETAIL_ICON_PREV, FALSE);
+        TouchBar_SetIconActive(work->touchBar, TOUCHBAR_ICON_UP, FALSE);
     } else {
         page->index = work->index - 1;
-        TouchBar_SetIconActive(work->touchBar, BEACON_DETAIL_ICON_NEXT, FALSE);
+        TouchBar_SetIconActive(work->touchBar, TOUCHBAR_ICON_DOWN, FALSE);
     }
-    TouchBar_SetIconActive(work->touchBar, BEACON_DETAIL_ICON_RETURN, FALSE);
+    TouchBar_SetIconActive(work->touchBar, TOUCHBAR_ICON_RETURN, FALSE);
     GameBeaconInfoTable_RingGet(work->infoTable, work->beacon, &work->time, work->logIndices[page->index]);
     BeaconDetailSub_DrawPanel(work, work->beacon, work->time, work->page ^ 1);
     BeaconDetailSub_SetPanelVisible(work, work->page ^ 1, FALSE);
@@ -735,7 +735,7 @@ static void BeaconDetailSub_PageTask(TCBEx *task, void *data) {
     BeaconDetailPageTask *page = data;
 
     // The arrow's animation ends before the panels slide
-    if (!page->decided && TouchBar_GetDecided(page->work->touchBar) != -1) {
+    if (!page->decided && TouchBar_GetDecided(page->work->touchBar) != TOUCHBAR_ICON_NONE) {
         page->decided = TRUE;
     }
     if (!PrintQueue_IsEmpty(page->work->printQueue)) {
