@@ -124,17 +124,9 @@ typedef struct {
 
 // The same for overlay 323
 typedef struct {
-    PlayerInfo *playerInfo;
-    SaveControl *saveControl;
-    u16 *var;
-    PokewoodSave *save;
-    u32 unk10;
-} PokewoodMenuParam;
-
-typedef struct {
     GameSystem *gsys;
     Field *field;
-    PokewoodMenuParam param;
+    PkwdSelectScreenParam param;
 } PokewoodMenuEvent;
 
 // The same for the record monitor, overlay 325
@@ -852,7 +844,7 @@ GameEvent *EventPokewood_CreateMenuEvent(GameSystem *gsys, void *args) {
     MI_CpuFill8(wk, 0, sizeof(PokewoodMenuEvent));
     wk->gsys = gsys;
     wk->field = field;
-    wk->param = *(PokewoodMenuParam *)args;
+    wk->param = *(PkwdSelectScreenParam *)args;
     return event;
 }
 
@@ -867,8 +859,8 @@ static GameEventReturnCode EventPokewood_RunMenu(GameEvent *event, u32 *state, v
         *state = 1;
         break;
     case 1:
-        if (wk->param.var != NULL && *wk->param.var == 8) {
-            *wk->param.var = 8;
+        if (wk->param.result != NULL && *wk->param.result == PKWD_SELECTSCREEN_CANCEL) {
+            *wk->param.result = PKWD_SELECTSCREEN_CANCEL;
         } else {
             GSYS_GetGameData(wk->gsys);
         }
