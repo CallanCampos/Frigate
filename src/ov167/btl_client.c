@@ -2450,7 +2450,7 @@ static BOOL BattleClient_ActionSelectRoot(BtlClient *client, s32 *seq) {
             return FALSE;
         }
         switch (BtlvCore_WaitCommandSelect(client->viewCore)) {
-        case 3:
+        case BTLV_COMMAND_POKEMON:
             if (CheckCondition(client->procMon, 0x21)) {
                 BtlvCore_ResetScreen(client->viewCore);
                 *seq = ROOT_SEQ_BLOCKED_RESET_SCREEN;
@@ -2459,11 +2459,11 @@ static BOOL BattleClient_ActionSelectRoot(BtlClient *client, s32 *seq) {
                 BattleClient_SetSelActProc(client, BattleClient_ActionSwitchPokemon);
             }
             break;
-        case 1:
+        case BTLV_COMMAND_FIGHT:
             shooterWork_SetCost(client, client->procActionIdx, 0);
             BattleClient_SetSelActProc(client, BattleClient_ActionSelectFight);
             break;
-        case 2:
+        case BTLV_COMMAND_BAG:
             if (CheckCondition(client->procMon, 0x21)) {
                 *seq = ROOT_SEQ_BLOCKED_RESET_SCREEN;
             } else if (client->bagMode == 1 && !func_ov167_0219db08(client->mainModule)) {
@@ -2475,7 +2475,7 @@ static BOOL BattleClient_ActionSelectRoot(BtlClient *client, s32 *seq) {
                 BattleClient_SetSelActProc(client, BattleClient_ActionSelectItem);
             }
             break;
-        case 4:
+        case BTLV_COMMAND_RUN:
             if (client->procActionIdx == client->firstActionIdx) {
                 if (CheckCondition(client->procMon, 0x21) && GetRunMode(client->mainModule) != 2) {
                     *seq = ROOT_SEQ_BLOCKED_RESET_SCREEN;
@@ -2734,9 +2734,9 @@ static BOOL BattleClient_ActionSelectFight(BtlClient *client, s32 *seq) {
             return FALSE;
         }
         result = BtlvCore_WaitTargetSelect(client->viewCore);
-        if (result == 1) {
+        if (result == BTLV_TARGET_SELECT_CHOSEN) {
             BattleClient_SetSelActProc(client, BattleClient_ActionSelectAutoRest);
-        } else if (result == 2) {
+        } else if (result == BTLV_TARGET_SELECT_BACK) {
             *seq = FIGHT_SEQ_START_MOVE_SELECT;
         }
         break;
@@ -6991,7 +6991,7 @@ static void RecPlayer_Update(BtlClient *client, BtlClientRecPlayer *recPlayer) {
                 BOOL changed = FALSE;
 
                 switch (input) {
-                case 2:
+                case BTLV_RECORDER_QUIT:
                     recPlayer->result = REC_PLAYER_RESULT_QUIT;
                     BtlvCore_StartFadeOut(client->viewCore);
                     recPlayer->quitStarted = TRUE;
@@ -7005,14 +7005,14 @@ static void RecPlayer_Update(BtlClient *client, BtlClientRecPlayer *recPlayer) {
                     BtlvEffect_ReleaseVoices();
                     SkipExitBGMFadeOut(client->mainModule);
                     break;
-                case 0:
+                case BTLV_RECORDER_PREV:
                     if (recPlayer->skipTarget > 1) {
                         recPlayer->skipTarget--;
                         changed = TRUE;
                     }
                     recPlayer->quitTimer = 45;
                     break;
-                case 1:
+                case BTLV_RECORDER_NEXT:
                     if (recPlayer->skipTarget < recPlayer->maxChapter) {
                         recPlayer->skipTarget++;
                         changed = TRUE;
