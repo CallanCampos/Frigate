@@ -592,6 +592,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - MWCC doesn't propagate constants into enum-typed variables: a loop that checks its bound before the first pass, or
   a sum that adds a counter known to be 0, has an enum counter. `scReportSetPlayerData` keeps its known-zero error
   test with the real `SCResult` type. (matching.md: "enum type")
+- A constant kept in a saved register across a call for a later register use, where the original builds it again:
+  the back end shares a constant within an extended basic block, and only a join or a variable it doesn't
+  propagate into (an enum-typed one) stops it; no pragma or integer type does. (matching.md: "shares a constant")
 - A constant kept in a callee-saved register for calls, then reduced at run time before a field store
   (`subs r6, #0x20; str r6, [r5, #8]`), where ours folds it: assign the field, then update it in place,
   `p->size = size; p->size -= 0x20;`. (matching.md: "reduced at run time before a field store")

@@ -251,7 +251,11 @@ Same instructions, registers swapped.
   `unkE` with `i`'s zero, and keeps its own for `count` in `r5`, only as `for (i = 0, count = 0; i < 4; i++)`; with
   `count = 0;` before `for (i = 0; ...)` the stores take `count`'s. `btl_server_flow.c`'s `ActionOrder_Build`
   likewise stores `clientId`'s zero before building `count`'s in `r7` only as
-  `for (clientId = 0, count = 0; clientId < 4; clientId++)`.
+  `for (clientId = 0, count = 0; clientId < 4; clientId++)`. Two mirrored blocks can need their flags set in
+  different places: `field_rail.c`'s `RailUnit_MoveOnLine` matches only with the backward block's
+  `outsideWidth = FALSE;` between its first and second `GetLineContinueInDirection` lookups, while the forward
+  block sets it before all three. Set before the first lookup, the function is 0x89a against the original's
+  0x888, and initialized at its declaration, 0x890.
 - Moving code into a `static inline` helper can swap two registers when the instructions stay the same. In the same
   function, a loop counter and a copy of 0 traded `r1` and `r2` in its two closing loops until the loops and the
   stores after them became `ClearRecvBuffers()`, the setup counterpart of `FreeRecvBuffers`, which frees those
@@ -654,6 +658,13 @@ Same instructions, registers swapped.
   A pool word that differs between the versions by a table row is a table indexed by the version:
   `sUnk7db4[VERSION_BLACK2 - GAME_VERSION][value]` in the same file folds to the table's address in Black 2 and
   to the address + 0x10 in White 2. Check the pool words of both versions before linking a file.
+- MWCC's back end, not its optimizer, shares a constant that several register operands use within an extended basic
+  block (a run of blocks after the first with one predecessor each). A call's argument, a stored value and a
+  multiply's operand all count, of any integer type; an immediate operand (`adds #12`, `cmp #12`) does not. A label
+  with two or more predecessors starts a new block, and no optimizer pragma short of `optimization_level 0` stops
+  the sharing. `scrcmd_msg.c`'s `ActorMsgWin_CalcAttachmentOffsetDynamic` keeps its divisor 12 in `r6` across
+  `_u32_div_f` for the table's 12-byte stride, where the original builds it twice. Only a variable MWCC doesn't
+  propagate into, an enum-typed local set before the calls, gives the original's code.
 - Whether a zero stored to two fields keeps a saved register can depend on whether the two stores are adjacent.
   `plist_sys.c`'s `PokeList_DoMenuItem` builds its zero with the max HP call's `NULL` (`movs r2, #0; movs r7, #0`)
   and stores `r7` for `wk->pkm = NULL` and `wk->showShortcutButtons = FALSE`, spilling the max HP to `sp+4`, only
@@ -1297,12 +1308,11 @@ Same code, other `sp` offsets or frame size.
   `pos` first; each of these spellings matches them but is only a second path to the field. What matches them is
   an alignment on their task structs' `work` member (Loops: "Where a member's alignment is written").
 - A bit tested in an `if`'s condition and set in its body, `if (ready & 1 << i) { mask |= 1 << i; }`, is a common
-  subexpression built ahead of the condition's load (`movs r0, #1` first, the load's address in `r1`). The original
-  loads first (`ldr r0, [sp]; ldrb r1, [r4, r0]; movs r0, #1; lsls r0, r5`) when the two shifts differ in
-  signedness, and still reuses the test's register for the body: `comm_entry_menu.c`'s `CommEntryMenu_UpdateLeader`
-  sets `mask |= 1U << i`. A test of another mask before a call in the same loop keeps its own `1 << i` when it is a
-  `static inline` with a `u32` parameter (`CommEntryMenu_IsChecked`); written in the loop, MWCC keeps one shift across
-  the call for both tests and spills the mask instead.
+  subexpression built ahead of the condition's load (`movs r0, #1` first, the load's address in `r1`). Where the
+  original loads first and keeps a separate shift for each test across a call, ask first whether the function reads
+  an aligned object (Loops: "An explicit alignment"): `comm_entry_menu.c`'s `CommEntryMenu_UpdateLeader` was taken
+  for a case of `1U << i`, a `u32` inline for the other mask's test and a `for (;;)` with a `break`, all of which
+  went once its message table was aligned, the plain `1 << i` tests and loop then matching.
 - A loaded field is reused into an `if`'s body but not past the join after it: a field loaded before an `if`, even
   one whose arms store nothing to memory, is loaded again after it, with the static's literal, where a straight run
   of stores to the struct's other members keeps the first load. A value the original never reloads after a branchy
@@ -2137,6 +2147,12 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   declared in an inner block opened there: the forms page's `BOOL hasSex[3] = { FALSE, FALSE, FALSE };` follows the
   Pokédex reads in a block around the rest of the gathering, and `BOOL seenRare[2] = { FALSE, FALSE };` sits in the
   loop over the forms.
+  The stores stay when nothing reads the local, the shape of a leftover the original kept:
+  `entrance_camera.c`'s `EntranceCamera_ConfigureDefaultDeparture` zeroes 12 stack bytes that nothing reads after
+  its first `FieldCamera_GetAnimationCoords`, `VecFx32 unused = { 0, 0, 0 };` in the block that reads the
+  destination's coordinates. `VEC_Set` or member stores to such a local are dropped as dead, and declared at the
+  top of the function or of the enclosing `if` it is zeroed before the calls (86 and 127 bytes differ).
+  `sta_acting.c`'s `StaActing_InitObj` zeroes its leftover first, at the top.
 - A switch of three cases can compile to a compare chain that tests them in value order. When the original tests 1,
   then 2, then 0, the source is an `if`/`else if` chain in that order: `scrcmd_msg.c`'s `SystemMsgWin_Open`.
 - A struct member set from a C99 compound literal, `request.pos = (VecFx32){ 0, 0, 0 };`, builds the literal in a
@@ -2334,7 +2350,11 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   stores, and ahead of them with `int index` (or `u32`), which matches once the stores are in the original's order.
 
 - A store written before a read through a `const` pointer parameter can move above another store; dropping the
-  `const` keeps the source order (app_taskmenu.c's `AppTaskMenu_Create`).
+  `const` keeps the source order (app_taskmenu.c's `AppTaskMenu_Create`). `field_rail.c`'s `RailUnit_SetDataCore`
+  loads `data->tileWidth` before building `onLine`'s value, as the original does, only from
+  `unit->handle = data; unit->onLine = RAIL_COMPONENT_NONE; unit->tileWidth = data->tileWidth;` with
+  `const RailDataHandle *data`. Four of the file's readers of the same data need the `const` to match. Neither
+  the `const` nor the order alone gives it: 6 and 14 bytes off.
 - A range test `subs; subs; cmp; bhi` is an unsigned difference in the source, `x - left <= right - left` on `u32`
   values; MWCC doesn't fold `x >= left && x <= right` into it (`AppTaskMenuWin_IsTouched`).
 - Two range tests joined by a bitwise `&` each build a 0/1 (`cmp; bhs; movs rN, #1; b; movs rN, #0`) and combine them
@@ -3130,6 +3150,10 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `BtlvInput_DrawMoveTiles` is the same: the 0/1 loop test it kept goes, and a plain `i < 4` matches with the attribute
   on its type-palette table, which only it reads, and whose address allows nothing above 4. The attribute on any other
   object it reads matches as well.
+  Overlay 36's `comm_entry_menu.c` is another: with `sCommEntryMessages` aligned (at `0x021d2588`, `0x021d25bc` in
+  White 2, which allows nothing above 4), `CommEntryMenu_UpdateLeader` is a plain loop entered at its test, and
+  the table's five other readers match with it indexed where it is read, where a getter inline was needed
+  before.
   NitroSystem's 2.0/sp2 does the same: `snd_arc_stream.c`'s `NNS_SndArcStrmInit` enters both its init loops at the
   test and indexes its arrays with a multiply on each pass only with `sDecodeBufferArea`, which it reads, aligned (4 to
   16 give the same code and fit the buffer's address, 32 does not). There a `u8` array with `ATTRIBUTE_ALIGN(4)` gets

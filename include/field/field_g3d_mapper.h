@@ -46,7 +46,8 @@ typedef struct {
 
 struct FieldG3DMapperConfig {
     fx32 chunkSpan;
-    u32 unk04;
+    // The height of a layer of the matrix (our name)
+    fx32 layerHeight;
     u16 chunkLoadDiameterX;
     u16 chunkLoadDiameterZ;
     u32 locatorGenType;
@@ -84,7 +85,8 @@ typedef struct {
 struct FieldG3DMapper {
     HeapID heapId;
     fx32 chunkSpan;
-    u32 unk08;
+    // The height of a layer of the matrix (our name)
+    fx32 layerHeight;
     u32 locatorGenType;
     u32 chunkArcId;
     u16 matrixWidth;
@@ -109,7 +111,8 @@ struct FieldG3DMapper {
     u8 chunkSizeCapPassingChunkEndIdx;
     u8 nowDrawScanline;
     u16 unk4E;
-    u32 unk50;
+    // The VBlank count at the chunks' last loader update (our name)
+    u32 loaderUpdateVBlank;
     VecFx32 chunkBasePos;
     G3DResource *mapTextures;
     FieldPropSystem *propSystem;
