@@ -1,3 +1,4 @@
+#include "gfl/backup_system.h"
 #include "system/game_data.h"
 #include "types.h"
 #include "constants/directions.h"
@@ -66,11 +67,6 @@
 // The respawn locations of Black City and White Forest
 #define RETURN_LOCATION_BLACK_CITY 15
 #define RETURN_LOCATION_WHITE_FOREST 16
-
-#define SAVE_STATUS_NEW 1
-// What the stepwise save returns once it ends
-#define SAVE_RESULT_OK 2
-#define SAVE_RESULT_NG 3
 
 #define SLEEP_BLOCK_SAVE 0x80
 #define SOFT_RESET_BLOCK_SAVE 0x2
@@ -683,7 +679,7 @@ static void GameData_LoadBackup(GameData *gameData) {
     PlayerSave *playerSave;
     WifiList *wifiList;
 
-    if (SaveControl_GetStatus(gameData->saveControl) == SAVE_STATUS_NEW) {
+    if (SaveControl_GetStatus(gameData->saveControl) == TRUE) {
         return;
     }
 

@@ -454,7 +454,7 @@ static void NewGame_EraseOutsideKeys(SaveControl *save) {
 static void NewGame_ImportOutsideData(SaveControl *save) {
     void *work;
 
-    if (SaveControl_GetStatus(save) == 1 && !SaveControl_IsDataAlreadyPresent(save)) {
+    if (SaveControl_GetStatus(save) == TRUE && !SaveControl_IsDataAlreadyPresent(save)) {
         GFL_OvlLoad(OVERLAY_ID(331));
         work = SaveOutside_Load(HEAPID_USER);
         if (SaveOutside_IsGiftsLoaded(work)) {
