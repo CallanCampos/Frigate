@@ -982,369 +982,358 @@ static WorldToRailFunc GetHandler2CurveFunc(RailDataHandle *data, u32 id) {
 }
 
 // step uses sixteenths of a tile; the result is dir or RAIL_DIR_NONE.
-static inline u32 RailUnit_MoveForward(RailUnit *unit, u32 dir, s32 step) {
-    RailLine *line = unit->component.line;
-    s32 length = unit->length;
-    RailLine *next0;
-    RailPoint *point;
-    RailLine *next1;
-    RailLine *next2;
-    BOOL outsideWidth;
-    s32 width;
+static u32 RailUnit_MoveOnLine(RailUnit *unit, u32 dir, s32 step) {
+    s32 length;
+    RailLine *line;
     u32 resultDir;
-    s32 absOffset;
 
-    point = GetRailPoint(unit->handle, line->pointB);
-    outsideWidth = FALSE;
-    next0 = GetLineContinueInDirection(point, dir, unit->handle, unit->disabled, 0);
-    next1 = GetLineContinueInDirection(point, RailDirection_TurnLeft(dir), unit->handle, unit->disabled, 0);
-    next2 = GetLineContinueInDirection(point, RailDirection_TurnRight(dir), unit->handle, unit->disabled, 0);
-    RailUnit_ApplyLineStep(unit->disabled, unit, step, 0, dir);
-    if (unit->front < length) {
-        width = GetLerpedLineWidthByLineYPos(line, unit->front, length, unit->handle);
-        absOffset = unit->side;
-        if (absOffset < 0) {
-            absOffset = -absOffset;
-        }
-        if (width < absOffset) {
+    line = unit->component.line;
+    length = unit->length;
+    if (dir == line->dir) {
+        RailPoint *point;
+        RailLine *next0;
+        RailLine *next1;
+        RailLine *next2;
+        BOOL outsideWidth;
+
+        point = GetRailPoint(unit->handle, line->pointB);
+        outsideWidth = FALSE;
+        next0 = GetLineContinueInDirection(point, dir, unit->handle, unit->disabled, 0);
+        next1 = GetLineContinueInDirection(point, RailDirection_TurnLeft(dir), unit->handle, unit->disabled, 0);
+        next2 = GetLineContinueInDirection(point, RailDirection_TurnRight(dir), unit->handle, unit->disabled, 0);
+        RailUnit_ApplyLineStep(unit->disabled, unit, step, 0, dir);
+        if (unit->front < length) {
+            s32 width = GetLerpedLineWidthByLineYPos(line, unit->front, length, unit->handle);
+
+            if (width >= MATH_ABS(unit->side)) {
+                return dir;
+            }
             outsideWidth = TRUE;
-        } else {
-            return dir;
         }
-    }
-    if (next0 != NULL && !outsideWidth) {
-        RailPoint_CheckConnections(point, unit->handle);
-        s32 nextLength = GetLineTileLengthWorldSpace(next0, unit->tileWidth, unit->handle);
-        width = GetLerpedLineWidthByLineYPos(next0, unit->front - length, nextLength, unit->handle);
-        resultDir = RailUnit_TryEnterLine(unit, next0, dir, unit->front - length, unit->side, nextLength, width);
-        if (resultDir != RAIL_DIR_NONE) {
-            return resultDir;
-        }
-    }
-    if (next1 != NULL && unit->side <= 0) {
-        if (RailLine_IsPointA(unit->handle, next1, point)) {
+        if (next0 != NULL && !outsideWidth) {
+            s32 nextLength;
+            s32 width;
+
             RailPoint_CheckConnections(point, unit->handle);
-            s32 nextLength = GetLineTileLengthWorldSpace(next1, unit->tileWidth, unit->handle);
-            width = GetLerpedLineWidthByLineYPos(next1, -unit->side, nextLength, unit->handle);
-            resultDir = RailUnit_TryEnterLine(unit, next1, dir, -unit->side, unit->front - length, nextLength, width);
-            if (resultDir != RAIL_DIR_NONE) {
-                return resultDir;
-            }
-        } else if (RailLine_IsPointB(unit->handle, next1, point)) {
-            RailPoint_CheckConnections(point, unit->handle);
-            s32 nextLength = GetLineTileLengthWorldSpace(next1, unit->tileWidth, unit->handle);
-            width = GetLerpedLineWidthByLineYPos(next1, nextLength + unit->side, nextLength, unit->handle);
-            resultDir = RailUnit_TryEnterLine(unit, next1, dir, nextLength + unit->side, -(unit->front - length),
-                                              nextLength, width);
+            nextLength = GetLineTileLengthWorldSpace(next0, unit->tileWidth, unit->handle);
+            width = GetLerpedLineWidthByLineYPos(next0, unit->front - length, nextLength, unit->handle);
+            resultDir = RailUnit_TryEnterLine(unit, next0, dir, unit->front - length, unit->side, nextLength, width);
             if (resultDir != RAIL_DIR_NONE) {
                 return resultDir;
             }
         }
-    }
-    if (next2 != NULL && unit->side >= 0) {
-        if (RailLine_IsPointA(unit->handle, next2, point)) {
-            RailPoint_CheckConnections(point, unit->handle);
-            s32 nextLength = GetLineTileLengthWorldSpace(next2, unit->tileWidth, unit->handle);
-            width = GetLerpedLineWidthByLineYPos(next2, unit->side, nextLength, unit->handle);
-            resultDir = RailUnit_TryEnterLine(unit, next2, dir, unit->side, -(unit->front - length), nextLength, width);
-            if (resultDir != RAIL_DIR_NONE) {
-                return resultDir;
-            }
-        } else if (RailLine_IsPointB(unit->handle, next2, point)) {
-            RailPoint_CheckConnections(point, unit->handle);
-            s32 nextLength = GetLineTileLengthWorldSpace(next2, unit->tileWidth, unit->handle);
-            width = GetLerpedLineWidthByLineYPos(next2, nextLength - unit->side, nextLength, unit->handle);
-            resultDir = RailUnit_TryEnterLine(unit, next2, dir, nextLength - unit->side, unit->front - length,
-                                              nextLength, width);
-            if (resultDir != RAIL_DIR_NONE) {
-                return resultDir;
+        if (next1 != NULL && unit->side <= 0) {
+            if (RailLine_IsPointA(unit->handle, next1, point)) {
+                s32 nextLength;
+                s32 width;
+
+                RailPoint_CheckConnections(point, unit->handle);
+                nextLength = GetLineTileLengthWorldSpace(next1, unit->tileWidth, unit->handle);
+                width = GetLerpedLineWidthByLineYPos(next1, -unit->side, nextLength, unit->handle);
+                resultDir =
+                    RailUnit_TryEnterLine(unit, next1, dir, -unit->side, unit->front - length, nextLength, width);
+                if (resultDir != RAIL_DIR_NONE) {
+                    return resultDir;
+                }
+            } else if (RailLine_IsPointB(unit->handle, next1, point)) {
+                s32 nextLength;
+                s32 width;
+
+                RailPoint_CheckConnections(point, unit->handle);
+                nextLength = GetLineTileLengthWorldSpace(next1, unit->tileWidth, unit->handle);
+                width = GetLerpedLineWidthByLineYPos(next1, nextLength + unit->side, nextLength, unit->handle);
+                resultDir = RailUnit_TryEnterLine(unit, next1, dir, nextLength + unit->side, -(unit->front - length),
+                                                  nextLength, width);
+                if (resultDir != RAIL_DIR_NONE) {
+                    return resultDir;
+                }
             }
         }
-    }
-    if (!outsideWidth) {
+        if (next2 != NULL && unit->side >= 0) {
+            if (RailLine_IsPointA(unit->handle, next2, point)) {
+                s32 nextLength;
+                s32 width;
+
+                RailPoint_CheckConnections(point, unit->handle);
+                nextLength = GetLineTileLengthWorldSpace(next2, unit->tileWidth, unit->handle);
+                width = GetLerpedLineWidthByLineYPos(next2, unit->side, nextLength, unit->handle);
+                resultDir =
+                    RailUnit_TryEnterLine(unit, next2, dir, unit->side, -(unit->front - length), nextLength, width);
+                if (resultDir != RAIL_DIR_NONE) {
+                    return resultDir;
+                }
+            } else if (RailLine_IsPointB(unit->handle, next2, point)) {
+                s32 nextLength;
+                s32 width;
+
+                RailPoint_CheckConnections(point, unit->handle);
+                nextLength = GetLineTileLengthWorldSpace(next2, unit->tileWidth, unit->handle);
+                width = GetLerpedLineWidthByLineYPos(next2, nextLength - unit->side, nextLength, unit->handle);
+                resultDir = RailUnit_TryEnterLine(unit, next2, dir, nextLength - unit->side, unit->front - length,
+                                                  nextLength, width);
+                if (resultDir != RAIL_DIR_NONE) {
+                    return resultDir;
+                }
+            }
+        }
+        if (outsideWidth) {
+            return RailUnit_ClampSideToLineWidth(unit, line, length, dir);
+        }
         if (unit->front <= length) {
             return dir;
         }
         unit->front -= step;
         return RAIL_DIR_NONE;
-    }
-    return RailUnit_ClampSideToLineWidth(unit, line, length, dir);
-}
-
-static inline u32 RailUnit_MoveBackward(RailUnit *unit, u32 dir, s32 step) {
-    RailLine *line = unit->component.line;
-    s32 length = unit->length;
-    RailPoint *point;
-    RailLine *next0;
-    RailLine *next1;
-    RailLine *next2;
-    BOOL outsideWidth;
-    s32 width;
-    u32 resultDir;
-    s32 absOffset;
-
-    point = GetRailPoint(unit->handle, line->pointA);
-    outsideWidth = FALSE;
-    next0 = GetLineContinueInDirection(point, RailDirection_TurnRight(dir), unit->handle, unit->disabled, 0);
-    next1 = GetLineContinueInDirection(point, RailDirection_TurnLeft(dir), unit->handle, unit->disabled, 0);
-    next2 = GetLineContinueInDirection(point, dir, unit->handle, unit->disabled, 0);
-    RailUnit_ApplyLineStep(unit->disabled, unit, -step, 0, dir);
-    if (unit->front >= 0) {
-        width = GetLerpedLineWidthByLineYPos(line, unit->front, length, unit->handle);
-        absOffset = unit->side;
-        if (absOffset < 0) {
-            absOffset = -absOffset;
-        }
-        if (width < absOffset) {
-            outsideWidth = TRUE;
-        } else {
-            return dir;
-        }
-    }
-    if (next2 != NULL && !outsideWidth) {
-        RailPoint_CheckConnections(point, unit->handle);
-        s32 nextLength = GetLineTileLengthWorldSpace(next2, unit->tileWidth, unit->handle);
-        absOffset = unit->front;
-        if (absOffset < 0) {
-            absOffset = -absOffset;
-        }
-        width = GetLerpedLineWidthByLineYPos(next2, nextLength - absOffset, nextLength, unit->handle);
-        absOffset = unit->front;
-        if (absOffset < 0) {
-            absOffset = -absOffset;
-        }
-        resultDir = RailUnit_TryEnterLine(unit, next2, dir, nextLength - absOffset, unit->side, nextLength, width);
-        if (resultDir != RAIL_DIR_NONE) {
-            return resultDir;
-        }
-    }
-    if (next0 != NULL && unit->side <= 0) {
-        if (RailLine_IsPointA(unit->handle, next0, point)) {
-            RailPoint_CheckConnections(point, unit->handle);
-            s32 nextLength = GetLineTileLengthWorldSpace(next0, unit->tileWidth, unit->handle);
-            width = GetLerpedLineWidthByLineYPos(next0, -unit->side, nextLength, unit->handle);
-            resultDir = RailUnit_TryEnterLine(unit, next0, dir, -unit->side, unit->front, nextLength, width);
-            if (resultDir != RAIL_DIR_NONE) {
-                return resultDir;
-            }
-        } else if (RailLine_IsPointB(unit->handle, next0, point)) {
-            RailPoint_CheckConnections(point, unit->handle);
-            s32 nextLength = GetLineTileLengthWorldSpace(next0, unit->tileWidth, unit->handle);
-            width = GetLerpedLineWidthByLineYPos(next0, nextLength + unit->side, nextLength, unit->handle);
-            resultDir =
-                RailUnit_TryEnterLine(unit, next0, dir, nextLength + unit->side, -unit->front, nextLength, width);
-            if (resultDir != RAIL_DIR_NONE) {
-                return resultDir;
-            }
-        }
-    }
-    if (next1 != NULL && unit->side >= 0) {
-        if (RailLine_IsPointA(unit->handle, next1, point)) {
-            RailPoint_CheckConnections(point, unit->handle);
-            s32 nextLength = GetLineTileLengthWorldSpace(next1, unit->tileWidth, unit->handle);
-            width = GetLerpedLineWidthByLineYPos(next1, unit->side, nextLength, unit->handle);
-            resultDir = RailUnit_TryEnterLine(unit, next1, dir, unit->side, -unit->front, nextLength, width);
-            if (resultDir != RAIL_DIR_NONE) {
-                return resultDir;
-            }
-        }
-        if (RailLine_IsPointB(unit->handle, next1, point)) {
-            RailPoint_CheckConnections(point, unit->handle);
-            s32 nextLength = GetLineTileLengthWorldSpace(next1, unit->tileWidth, unit->handle);
-            width = GetLerpedLineWidthByLineYPos(next1, nextLength - unit->side, nextLength, unit->handle);
-            resultDir =
-                RailUnit_TryEnterLine(unit, next1, dir, nextLength - unit->side, unit->front, nextLength, width);
-            if (resultDir != RAIL_DIR_NONE) {
-                return resultDir;
-            }
-        }
-    }
-    if (outsideWidth) {
-        return RailUnit_ClampSideToLineWidth(unit, line, length, dir);
-    }
-    unit->front += step;
-    return RAIL_DIR_NONE;
-}
-
-static inline u32 RailUnit_MoveRight(RailUnit *unit, u32 dir, s32 step) {
-    RailLine *line = unit->component.line;
-    s32 length = unit->length;
-    RailPoint *point;
-    RailLine *next0;
-    s32 width;
-    u32 resultDir;
-
-    RailUnit_ApplyLineStep(unit->disabled, unit, 0, step, dir);
-    if (unit->side > 0 && unit->side % 16 == 0) {
-        point = GetRailPoint(unit->handle, line->pointA);
-        next0 = GetLineContinueInDirection(point, dir, unit->handle, unit->disabled, 0);
-        if (next0 != NULL) {
-            if (RailLine_IsPointA(unit->handle, next0, point)) {
-                RailPoint_CheckConnections(point, unit->handle);
-                s32 nextLength = GetLineTileLengthWorldSpace(next0, unit->tileWidth, unit->handle);
-                width = GetLerpedLineWidthByLineYPos(next0, unit->side, nextLength, unit->handle);
-                resultDir = RailUnit_TryEnterLine(unit, next0, dir, unit->side, -unit->front, nextLength, width);
-                if (resultDir != RAIL_DIR_NONE) {
-                    return resultDir;
-                }
-            }
-            if (RailLine_IsPointB(unit->handle, next0, point)) {
-                RailPoint_CheckConnections(point, unit->handle);
-                s32 nextLength = GetLineTileLengthWorldSpace(next0, unit->tileWidth, unit->handle);
-                width = GetLerpedLineWidthByLineYPos(next0, nextLength - unit->side, nextLength, unit->handle);
-                resultDir =
-                    RailUnit_TryEnterLine(unit, next0, dir, nextLength - unit->side, unit->front, nextLength, width);
-                if (resultDir != RAIL_DIR_NONE) {
-                    return resultDir;
-                }
-            }
-        }
-        point = GetRailPoint(unit->handle, line->pointB);
-        next0 = GetLineContinueInDirection(point, dir, unit->handle, unit->disabled, 0);
-        if (next0 != NULL) {
-            if (RailLine_IsPointA(unit->handle, next0, point)) {
-                RailPoint_CheckConnections(point, unit->handle);
-                s32 nextLength = GetLineTileLengthWorldSpace(next0, unit->tileWidth, unit->handle);
-                width = GetLerpedLineWidthByLineYPos(next0, unit->side, nextLength, unit->handle);
-                resultDir =
-                    RailUnit_TryEnterLine(unit, next0, dir, unit->side, length - unit->front, nextLength, width);
-                if (resultDir != RAIL_DIR_NONE) {
-                    return resultDir;
-                }
-            }
-            if (RailLine_IsPointB(unit->handle, next0, point)) {
-                RailPoint_CheckConnections(point, unit->handle);
-                s32 nextLength = GetLineTileLengthWorldSpace(next0, unit->tileWidth, unit->handle);
-                width = GetLerpedLineWidthByLineYPos(next0, nextLength - unit->side, nextLength, unit->handle);
-                resultDir = RailUnit_TryEnterLine(unit, next0, dir, nextLength - unit->side, -(length - unit->front),
-                                                  nextLength, width);
-                if (resultDir != RAIL_DIR_NONE) {
-                    return resultDir;
-                }
-            }
-        }
-    }
-    if (unit->side > 0 && unit->side <= unit->width) {
-        return RailUnit_ClampSideToLineWidth(unit, line, length, dir);
-    }
-    return dir;
-}
-
-static inline u32 RailUnit_MoveLeft(RailUnit *unit, u32 dir, s32 step) {
-    RailLine *line = unit->component.line;
-    s32 length = unit->length;
-    RailPoint *point;
-    RailLine *next0;
-    s32 width;
-    u32 resultDir;
-    s32 absOffset;
-
-    RailUnit_ApplyLineStep(unit->disabled, unit, 0, -step, dir);
-    if (unit->side < 0 && MATH_ABS(unit->side) % 16 == 0) {
-        point = GetRailPoint(unit->handle, line->pointA);
-        next0 = GetLineContinueInDirection(point, dir, unit->handle, unit->disabled, 0);
-        if (next0 != NULL) {
-            if (RailLine_IsPointA(unit->handle, next0, point)) {
-                RailPoint_CheckConnections(point, unit->handle);
-                s32 nextLength = GetLineTileLengthWorldSpace(next0, unit->tileWidth, unit->handle);
-                absOffset = unit->side;
-                if (absOffset < 0) {
-                    absOffset = -absOffset;
-                }
-                width = GetLerpedLineWidthByLineYPos(next0, absOffset, nextLength, unit->handle);
-                absOffset = unit->side;
-                if (absOffset < 0) {
-                    absOffset = -absOffset;
-                }
-                resultDir = RailUnit_TryEnterLine(unit, next0, dir, absOffset, unit->front, nextLength, width);
-                if (resultDir != RAIL_DIR_NONE) {
-                    return resultDir;
-                }
-            }
-            if (RailLine_IsPointB(unit->handle, next0, point)) {
-                RailPoint_CheckConnections(point, unit->handle);
-                s32 nextLength = GetLineTileLengthWorldSpace(next0, unit->tileWidth, unit->handle);
-                absOffset = unit->side;
-                if (absOffset < 0) {
-                    absOffset = -absOffset;
-                }
-                width = GetLerpedLineWidthByLineYPos(next0, nextLength - absOffset, nextLength, unit->handle);
-                absOffset = unit->side;
-                if (absOffset < 0) {
-                    absOffset = -absOffset;
-                }
-                resultDir =
-                    RailUnit_TryEnterLine(unit, next0, dir, nextLength - absOffset, -unit->front, nextLength, width);
-                if (resultDir != RAIL_DIR_NONE) {
-                    return resultDir;
-                }
-            }
-        }
-        point = GetRailPoint(unit->handle, line->pointB);
-        next0 = GetLineContinueInDirection(point, dir, unit->handle, unit->disabled, 0);
-        if (next0 != NULL) {
-            if (RailLine_IsPointA(unit->handle, next0, point)) {
-                RailPoint_CheckConnections(point, unit->handle);
-                s32 nextLength = GetLineTileLengthWorldSpace(next0, unit->tileWidth, unit->handle);
-                absOffset = unit->side;
-                if (absOffset < 0) {
-                    absOffset = -absOffset;
-                }
-                width = GetLerpedLineWidthByLineYPos(next0, absOffset, nextLength, unit->handle);
-                absOffset = unit->side;
-                if (absOffset < 0) {
-                    absOffset = -absOffset;
-                }
-                resultDir =
-                    RailUnit_TryEnterLine(unit, next0, dir, absOffset, -(length - unit->front), nextLength, width);
-                if (resultDir != RAIL_DIR_NONE) {
-                    return resultDir;
-                }
-            }
-            if (RailLine_IsPointB(unit->handle, next0, point)) {
-                RailPoint_CheckConnections(point, unit->handle);
-                s32 nextLength = GetLineTileLengthWorldSpace(next0, unit->tileWidth, unit->handle);
-                absOffset = unit->side;
-                if (absOffset < 0) {
-                    absOffset = -absOffset;
-                }
-                width = GetLerpedLineWidthByLineYPos(next0, nextLength - absOffset, nextLength, unit->handle);
-                absOffset = unit->side;
-                if (absOffset < 0) {
-                    absOffset = -absOffset;
-                }
-                resultDir = RailUnit_TryEnterLine(unit, next0, dir, nextLength - absOffset, length - unit->front,
-                                                  nextLength, width);
-                if (resultDir != RAIL_DIR_NONE) {
-                    return resultDir;
-                }
-            }
-        }
-    }
-    if (unit->side < 0 && MATH_ABS(unit->side) <= unit->width) {
-        return RailUnit_ClampSideToLineWidth(unit, line, length, dir);
-    }
-    return dir;
-}
-
-static u32 RailUnit_MoveOnLine(RailUnit *unit, u32 dir, s32 step) {
-    RailLine *line = unit->component.line;
-    if (dir == line->dir) {
-        return RailUnit_MoveForward(unit, dir, step);
     } else if (dir == RailDirection_GetOpposite(line->dir)) {
-        return RailUnit_MoveBackward(unit, dir, step);
+        RailPoint *point;
+        RailLine *next0;
+        RailLine *next1;
+        RailLine *next2;
+        BOOL outsideWidth;
+
+        point = GetRailPoint(unit->handle, line->pointA);
+        resultDir = RailDirection_TurnRight(dir);
+        outsideWidth = FALSE;
+        next0 = GetLineContinueInDirection(point, resultDir, unit->handle, unit->disabled, 0);
+        next1 = GetLineContinueInDirection(point, RailDirection_TurnLeft(dir), unit->handle, unit->disabled, 0);
+        next2 = GetLineContinueInDirection(point, dir, unit->handle, unit->disabled, 0);
+        RailUnit_ApplyLineStep(unit->disabled, unit, -step, 0, dir);
+        if (unit->front >= 0) {
+            s32 width = GetLerpedLineWidthByLineYPos(line, unit->front, length, unit->handle);
+
+            if (width >= MATH_ABS(unit->side)) {
+                return dir;
+            }
+            outsideWidth = TRUE;
+        }
+        if (next2 != NULL && !outsideWidth) {
+            s32 nextLength;
+            s32 width;
+
+            RailPoint_CheckConnections(point, unit->handle);
+            nextLength = GetLineTileLengthWorldSpace(next2, unit->tileWidth, unit->handle);
+            width = GetLerpedLineWidthByLineYPos(next2, nextLength - MATH_ABS(unit->front), nextLength, unit->handle);
+            resultDir = RailUnit_TryEnterLine(unit, next2, dir, nextLength - MATH_ABS(unit->front), unit->side,
+                                              nextLength, width);
+            if (resultDir != RAIL_DIR_NONE) {
+                return resultDir;
+            }
+        }
+        if (next0 != NULL && unit->side <= 0) {
+            if (RailLine_IsPointA(unit->handle, next0, point)) {
+                s32 nextLength;
+                s32 width;
+
+                RailPoint_CheckConnections(point, unit->handle);
+                nextLength = GetLineTileLengthWorldSpace(next0, unit->tileWidth, unit->handle);
+                width = GetLerpedLineWidthByLineYPos(next0, -unit->side, nextLength, unit->handle);
+                resultDir = RailUnit_TryEnterLine(unit, next0, dir, -unit->side, unit->front, nextLength, width);
+                if (resultDir != RAIL_DIR_NONE) {
+                    return resultDir;
+                }
+            } else if (RailLine_IsPointB(unit->handle, next0, point)) {
+                s32 nextLength;
+                s32 width;
+
+                RailPoint_CheckConnections(point, unit->handle);
+                nextLength = GetLineTileLengthWorldSpace(next0, unit->tileWidth, unit->handle);
+                width = GetLerpedLineWidthByLineYPos(next0, nextLength + unit->side, nextLength, unit->handle);
+                resultDir =
+                    RailUnit_TryEnterLine(unit, next0, dir, nextLength + unit->side, -unit->front, nextLength, width);
+                if (resultDir != RAIL_DIR_NONE) {
+                    return resultDir;
+                }
+            }
+        }
+        if (next1 != NULL && unit->side >= 0) {
+            if (RailLine_IsPointA(unit->handle, next1, point)) {
+                s32 nextLength;
+                s32 width;
+
+                RailPoint_CheckConnections(point, unit->handle);
+                nextLength = GetLineTileLengthWorldSpace(next1, unit->tileWidth, unit->handle);
+                width = GetLerpedLineWidthByLineYPos(next1, unit->side, nextLength, unit->handle);
+                resultDir = RailUnit_TryEnterLine(unit, next1, dir, unit->side, -unit->front, nextLength, width);
+                if (resultDir != RAIL_DIR_NONE) {
+                    return resultDir;
+                }
+            }
+            if (RailLine_IsPointB(unit->handle, next1, point)) {
+                s32 nextLength;
+                s32 width;
+
+                RailPoint_CheckConnections(point, unit->handle);
+                nextLength = GetLineTileLengthWorldSpace(next1, unit->tileWidth, unit->handle);
+                width = GetLerpedLineWidthByLineYPos(next1, nextLength - unit->side, nextLength, unit->handle);
+                resultDir =
+                    RailUnit_TryEnterLine(unit, next1, dir, nextLength - unit->side, unit->front, nextLength, width);
+                if (resultDir != RAIL_DIR_NONE) {
+                    return resultDir;
+                }
+            }
+        }
+        if (outsideWidth) {
+            return RailUnit_ClampSideToLineWidth(unit, line, length, dir);
+        }
+        unit->front += step;
+        return RAIL_DIR_NONE;
     } else if (dir == RailDirection_TurnRight(line->dir)) {
-        return RailUnit_MoveRight(unit, dir, step);
+        RailUnit_ApplyLineStep(unit->disabled, unit, 0, step, dir);
+        if (unit->side > 0 && unit->side % 16 == 0) {
+            RailPoint *point;
+            RailLine *next;
+            RailPoint *farPoint;
+            RailLine *farNext;
+
+            point = GetRailPoint(unit->handle, line->pointA);
+            next = GetLineContinueInDirection(point, dir, unit->handle, unit->disabled, 0);
+            if (next != NULL) {
+                if (RailLine_IsPointA(unit->handle, next, point)) {
+                    s32 nextLength;
+                    s32 width;
+
+                    RailPoint_CheckConnections(point, unit->handle);
+                    nextLength = GetLineTileLengthWorldSpace(next, unit->tileWidth, unit->handle);
+                    width = GetLerpedLineWidthByLineYPos(next, unit->side, nextLength, unit->handle);
+                    resultDir = RailUnit_TryEnterLine(unit, next, dir, unit->side, -unit->front, nextLength, width);
+                    if (resultDir != RAIL_DIR_NONE) {
+                        return resultDir;
+                    }
+                }
+                if (RailLine_IsPointB(unit->handle, next, point)) {
+                    s32 nextLength;
+                    s32 width;
+
+                    RailPoint_CheckConnections(point, unit->handle);
+                    nextLength = GetLineTileLengthWorldSpace(next, unit->tileWidth, unit->handle);
+                    width = GetLerpedLineWidthByLineYPos(next, nextLength - unit->side, nextLength, unit->handle);
+                    resultDir =
+                        RailUnit_TryEnterLine(unit, next, dir, nextLength - unit->side, unit->front, nextLength, width);
+                    if (resultDir != RAIL_DIR_NONE) {
+                        return resultDir;
+                    }
+                }
+            }
+            farPoint = GetRailPoint(unit->handle, line->pointB);
+            farNext = GetLineContinueInDirection(farPoint, dir, unit->handle, unit->disabled, 0);
+            if (farNext != NULL) {
+                if (RailLine_IsPointA(unit->handle, farNext, farPoint)) {
+                    s32 nextLength;
+                    s32 width;
+
+                    RailPoint_CheckConnections(farPoint, unit->handle);
+                    nextLength = GetLineTileLengthWorldSpace(farNext, unit->tileWidth, unit->handle);
+                    width = GetLerpedLineWidthByLineYPos(farNext, unit->side, nextLength, unit->handle);
+                    resultDir =
+                        RailUnit_TryEnterLine(unit, farNext, dir, unit->side, length - unit->front, nextLength, width);
+                    if (resultDir != RAIL_DIR_NONE) {
+                        return resultDir;
+                    }
+                }
+                if (RailLine_IsPointB(unit->handle, farNext, farPoint)) {
+                    s32 nextLength;
+                    s32 width;
+
+                    RailPoint_CheckConnections(farPoint, unit->handle);
+                    nextLength = GetLineTileLengthWorldSpace(farNext, unit->tileWidth, unit->handle);
+                    width = GetLerpedLineWidthByLineYPos(farNext, nextLength - unit->side, nextLength, unit->handle);
+                    resultDir = RailUnit_TryEnterLine(unit, farNext, dir, nextLength - unit->side,
+                                                      -(length - unit->front), nextLength, width);
+                    if (resultDir != RAIL_DIR_NONE) {
+                        return resultDir;
+                    }
+                }
+            }
+        }
+        if (unit->side > 0 && unit->side <= unit->width) {
+            return RailUnit_ClampSideToLineWidth(unit, line, length, dir);
+        }
+        return dir;
     } else if (dir == RailDirection_TurnLeft(line->dir)) {
-        return RailUnit_MoveLeft(unit, dir, step);
+        RailUnit_ApplyLineStep(unit->disabled, unit, 0, -step, dir);
+        if (unit->side < 0 && MATH_ABS(unit->side) % 16 == 0) {
+            RailPoint *point;
+            RailLine *next;
+            RailPoint *farPoint;
+            RailLine *farNext;
+            s32 farLength;
+            s32 nextLength;
+
+            point = GetRailPoint(unit->handle, line->pointA);
+            next = GetLineContinueInDirection(point, dir, unit->handle, unit->disabled, 0);
+            if (next != NULL) {
+                if (RailLine_IsPointA(unit->handle, next, point)) {
+                    s32 width;
+
+                    RailPoint_CheckConnections(point, unit->handle);
+                    nextLength = GetLineTileLengthWorldSpace(next, unit->tileWidth, unit->handle);
+                    width = GetLerpedLineWidthByLineYPos(next, MATH_ABS(unit->side), nextLength, unit->handle);
+                    resultDir =
+                        RailUnit_TryEnterLine(unit, next, dir, MATH_ABS(unit->side), unit->front, nextLength, width);
+                    if (resultDir != RAIL_DIR_NONE) {
+                        return resultDir;
+                    }
+                }
+                if (RailLine_IsPointB(unit->handle, next, point)) {
+                    s32 bLength;
+                    s32 width;
+
+                    RailPoint_CheckConnections(point, unit->handle);
+                    bLength = GetLineTileLengthWorldSpace(next, unit->tileWidth, unit->handle);
+                    width = GetLerpedLineWidthByLineYPos(next, bLength - MATH_ABS(unit->side), bLength, unit->handle);
+                    resultDir = RailUnit_TryEnterLine(unit, next, dir, bLength - MATH_ABS(unit->side), -unit->front,
+                                                      bLength, width);
+                    if (resultDir != RAIL_DIR_NONE) {
+                        return resultDir;
+                    }
+                }
+            }
+            farPoint = GetRailPoint(unit->handle, line->pointB);
+            farNext = GetLineContinueInDirection(farPoint, dir, unit->handle, unit->disabled, 0);
+            if (farNext != NULL) {
+                if (RailLine_IsPointA(unit->handle, farNext, farPoint)) {
+                    s32 width;
+
+                    RailPoint_CheckConnections(farPoint, unit->handle);
+                    farLength = GetLineTileLengthWorldSpace(farNext, unit->tileWidth, unit->handle);
+                    width = GetLerpedLineWidthByLineYPos(farNext, MATH_ABS(unit->side), farLength, unit->handle);
+                    resultDir = RailUnit_TryEnterLine(unit, farNext, dir, MATH_ABS(unit->side), -(length - unit->front),
+                                                      farLength, width);
+                    if (resultDir != RAIL_DIR_NONE) {
+                        return resultDir;
+                    }
+                }
+                if (RailLine_IsPointB(unit->handle, farNext, farPoint)) {
+                    s32 bLength;
+                    s32 width;
+
+                    RailPoint_CheckConnections(farPoint, unit->handle);
+                    bLength = GetLineTileLengthWorldSpace(farNext, unit->tileWidth, unit->handle);
+                    width =
+                        GetLerpedLineWidthByLineYPos(farNext, bLength - MATH_ABS(unit->side), bLength, unit->handle);
+                    resultDir = RailUnit_TryEnterLine(unit, farNext, dir, bLength - MATH_ABS(unit->side),
+                                                      length - unit->front, bLength, width);
+                    if (resultDir != RAIL_DIR_NONE) {
+                        return resultDir;
+                    }
+                }
+            }
+        }
+        if (unit->side < 0 && MATH_ABS(unit->side) <= unit->width) {
+            return RailUnit_ClampSideToLineWidth(unit, line, length, dir);
+        }
+        return dir;
     }
     return RAIL_DIR_NONE;
 }
 
+// The component tag goes through a local of the enum's type, as in BW1's version (another decomp)
 static void RailUnit_SetDataCore(RailUnit *unit, RailDataHandle *data, FieldRailSystem *rail) {
+    RailComponentKind onLine = RAIL_COMPONENT_NONE;
+
     unit->handle = data;
     unit->tileWidth = data->tileWidth;
-    unit->onLine = RAIL_COMPONENT_NONE;
+    unit->onLine = onLine;
     unit->lastMoveSpeedIndex = RAIL_SPEED_1;
     unit->direction = RAIL_DIR_NONE;
     unit->movePending = 0;

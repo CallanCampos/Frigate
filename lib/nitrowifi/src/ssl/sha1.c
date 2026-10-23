@@ -11,13 +11,20 @@
 
 #define SHA1_F1(b, c, d) (((b) & ((c) ^ (d))) ^ (d))
 #define SHA1_F2(b, c, d) ((b) ^ (c) ^ (d))
-#define SHA1_F3(b, c, d) (((b) & (c)) | ((d) & ((b) | (c))))
+#define SHA1_F3(b, c, d) (((b) & ((c) | (d))) | ((c) & (d)))
 #define SHA1_F4(b, c, d) ((b) ^ (c) ^ (d))
 
 #define SHA1_K1 0x5a827999
 #define SHA1_K2 0x6ed9eba1
 #define SHA1_K3 0x8f1bbcdc
 #define SHA1_K4 0xca62c1d6
+
+// One round, with the five words' roles rotated by the caller rather than moved
+#define SHA1_ROUND(a, b, c, d, e, f, x, k)                                                                             \
+    do {                                                                                                               \
+        e += SHA1_ROL(a, 5) + f(b, c, d) + (x) + (k);                                                                  \
+        b = SHA1_ROL(b, 30);                                                                                           \
+    } while (0)
 
 // The first byte of a pad run is 0x80; the rest are the zero-initialized tail
 static u8 sSha1Padding[SHA1_BLOCK_SIZE] = { 0x80 };
@@ -62,62 +69,59 @@ static void CPSi_sha1_block(CPSSha1Ctx *context, const u8 *block) {
     u32 w[16];
     u32 a, b, c, d, e;
     int t;
-
-    long_from_char(w, block, SHA1_BLOCK_SIZE);
+    int i;
 
     a = context->state[0];
     b = context->state[1];
     c = context->state[2];
     d = context->state[3];
     e = context->state[4];
+    long_from_char(w, block, SHA1_BLOCK_SIZE);
 
-    for (t = 0; t < 16; t++) {
-        u32 temp = e + SHA1_F1(b, c, d) + w[t] + SHA1_K1 + SHA1_ROL(a, 5);
-        e = d;
-        d = c;
-        c = SHA1_ROL(b, 30);
-        b = a;
-        a = temp;
+    t = 0;
+    for (i = 0; i < 3; i++) {
+        SHA1_ROUND(a, b, c, d, e, SHA1_F1, w[t + 0], SHA1_K1);
+        SHA1_ROUND(e, a, b, c, d, SHA1_F1, w[t + 1], SHA1_K1);
+        SHA1_ROUND(d, e, a, b, c, SHA1_F1, w[t + 2], SHA1_K1);
+        SHA1_ROUND(c, d, e, a, b, SHA1_F1, w[t + 3], SHA1_K1);
+        SHA1_ROUND(b, c, d, e, a, SHA1_F1, w[t + 4], SHA1_K1);
+        t += 5;
+    }
+    SHA1_ROUND(a, b, c, d, e, SHA1_F1, w[15], SHA1_K1);
+    SHA1_ROUND(e, a, b, c, d, SHA1_F1, R(0, w), SHA1_K1);
+    SHA1_ROUND(d, e, a, b, c, SHA1_F1, R(1, w), SHA1_K1);
+    SHA1_ROUND(c, d, e, a, b, SHA1_F1, R(2, w), SHA1_K1);
+    SHA1_ROUND(b, c, d, e, a, SHA1_F1, R(3, w), SHA1_K1);
+
+    t = 4;
+    for (i = 0; i < 4; i++) {
+        SHA1_ROUND(a, b, c, d, e, SHA1_F2, R(t, w), SHA1_K2);
+        SHA1_ROUND(e, a, b, c, d, SHA1_F2, R(t + 1, w), SHA1_K2);
+        t = (t + 2) & 0xf;
+        SHA1_ROUND(d, e, a, b, c, SHA1_F2, R(t, w), SHA1_K2);
+        SHA1_ROUND(c, d, e, a, b, SHA1_F2, R(t + 1, w), SHA1_K2);
+        SHA1_ROUND(b, c, d, e, a, SHA1_F2, R(t + 2, w), SHA1_K2);
+        t += 3;
     }
 
-    for (t = 16; t < 20; t++) {
-        u32 term = R(t & 0xf, w);
-        u32 temp = e + SHA1_F1(b, c, d) + term + SHA1_K1 + SHA1_ROL(a, 5);
-        e = d;
-        d = c;
-        c = SHA1_ROL(b, 30);
-        b = a;
-        a = temp;
+    for (i = 0; i < 4; i++) {
+        SHA1_ROUND(a, b, c, d, e, SHA1_F3, R(t, w), SHA1_K3);
+        SHA1_ROUND(e, a, b, c, d, SHA1_F3, R(t + 1, w), SHA1_K3);
+        SHA1_ROUND(d, e, a, b, c, SHA1_F3, R(t + 2, w), SHA1_K3);
+        t = (t + 3) & 0xf;
+        SHA1_ROUND(c, d, e, a, b, SHA1_F3, R(t, w), SHA1_K3);
+        SHA1_ROUND(b, c, d, e, a, SHA1_F3, R(t + 1, w), SHA1_K3);
+        t += 2;
     }
 
-    for (t = 20; t < 40; t++) {
-        u32 term = R(t & 0xf, w);
-        u32 temp = e + SHA1_F2(b, c, d) + term + SHA1_K2 + SHA1_ROL(a, 5);
-        e = d;
-        d = c;
-        c = SHA1_ROL(b, 30);
-        b = a;
-        a = temp;
-    }
-
-    for (t = 40; t < 60; t++) {
-        u32 term = R(t & 0xf, w);
-        u32 temp = e + SHA1_F3(b, c, d) + term + SHA1_K3 + SHA1_ROL(a, 5);
-        e = d;
-        d = c;
-        c = SHA1_ROL(b, 30);
-        b = a;
-        a = temp;
-    }
-
-    for (t = 60; t < 80; t++) {
-        u32 term = R(t & 0xf, w);
-        u32 temp = e + SHA1_F4(b, c, d) + term + SHA1_K4 + SHA1_ROL(a, 5);
-        e = d;
-        d = c;
-        c = SHA1_ROL(b, 30);
-        b = a;
-        a = temp;
+    for (i = 0; i < 4; i++) {
+        SHA1_ROUND(a, b, c, d, e, SHA1_F4, R(t, w), SHA1_K4);
+        SHA1_ROUND(e, a, b, c, d, SHA1_F4, R(t + 1, w), SHA1_K4);
+        SHA1_ROUND(d, e, a, b, c, SHA1_F4, R(t + 2, w), SHA1_K4);
+        SHA1_ROUND(c, d, e, a, b, SHA1_F4, R(t + 3, w), SHA1_K4);
+        t = (t + 4) & 0xf;
+        SHA1_ROUND(b, c, d, e, a, SHA1_F4, R(t, w), SHA1_K4);
+        t += 1;
     }
 
     context->state[0] += a;
@@ -137,13 +141,12 @@ void CPSi_sha1_init(CPSSha1Ctx *context) {
 }
 
 void CPSi_sha1_calc(CPSSha1Ctx *context, const u8 *data, u32 len) {
-    u32 index = (context->count[1] >> 3) & 0x3f;
-    u32 bits = len << 3;
+    u32 index;
     u32 space;
     u32 i;
 
-    context->count[1] += bits;
-    if (context->count[1] < bits) {
+    index = (context->count[1] >> 3) & 0x3f;
+    if ((context->count[1] += len << 3) < (len << 3)) {
         context->count[0]++;
     }
     context->count[0] += len >> 29;
@@ -151,11 +154,11 @@ void CPSi_sha1_calc(CPSSha1Ctx *context, const u8 *data, u32 len) {
     space = SHA1_BLOCK_SIZE - index;
     if (len >= space) {
         MI_CpuCopy8(data, &context->buffer[index], space);
+        index = 0;
         CPSi_sha1_block(context, context->buffer);
         for (i = space; i + 0x3f < len; i += SHA1_BLOCK_SIZE) {
             CPSi_sha1_block(context, data + i);
         }
-        index = 0;
     } else {
         i = 0;
     }

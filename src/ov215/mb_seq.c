@@ -543,13 +543,13 @@ static u32 MailBox_StateBackToList(MailBoxWork *work) {
 }
 
 static u32 MailBox_StartWipeIn(MailBoxWork *work, u32 nextState) {
-    GFL_WipeSet(0, 1, 1, 0, 6, 1, HEAPID_MAILBOX_VIEW);
+    GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_IN, WIPE_TYPE_FADE_IN, 0, 6, 1, HEAPID_MAILBOX_VIEW);
     work->view->wipeNextState = nextState;
     return MAILBOX_STATE_WAIT_WIPE;
 }
 
 static u32 MailBox_StartWipeOut(MailBoxWork *work, u32 nextState) {
-    GFL_WipeSet(0, 0, 0, 0, 6, 1, HEAPID_MAILBOX_VIEW);
+    GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, 0, 6, 1, HEAPID_MAILBOX_VIEW);
     work->view->wipeNextState = nextState;
     return MAILBOX_STATE_WAIT_WIPE;
 }

@@ -171,8 +171,13 @@ def is_complete(module: str, source: Path) -> bool:
 
 
 def is_static(source: Path, name: str) -> bool:
-    """Whether a source file defines a name as static, such as `static const u16 sTable[] = {...}`."""
-    return re.search(rf"^\s*static\b[^;{{(]*\b{re.escape(name)}\b", source.read_text(), re.MULTILINE) is not None
+    """Whether a source file defines a name as static, such as `static const u16 sTable[] = {...}`, an array of
+    function pointers such as `static u32 (*const sFuncs[])(Work *wk)`, or `static struct { ... } sState;`."""
+    text = source.read_text()
+    name = re.escape(name)
+    return (re.search(rf"^\s*static\b[^;{{(]*\b{name}\b", text, re.MULTILINE) is not None
+            or re.search(rf"^\s*static\b[^;{{(=]*\(\s*\*\s*(?:const\s+)?{name}\b", text, re.MULTILINE) is not None
+            or re.search(rf"^\s*static\s+struct\b[^;{{]*\{{[^}}]*\}}\s*{name}\b", text, re.MULTILINE) is not None)
 
 
 def static_elsewhere(module: str, addr: int, name: str, source: Path) -> bool:
@@ -213,9 +218,10 @@ def rename(old: str, new: str, pairs, names: list, module: str | None = None) ->
         sys.exit(f"{old} names several symbols ({places}): give --module")
     module, addr = found[0]
     # Statics in different files can share a name, including one whose symbol still has its default name. A static is
-    # only visible in its own file, so only that file is rewritten; rewriting everywhere would rename the others too
+    # only visible in its own file, so only that file is rewritten; rewriting everywhere would rename the others too.
+    # The file may already define the static by the new name, when the config catches up with the C
     only = owning_source(module, addr)
-    if only is not None and not (only.exists() and is_static(only, old)):
+    if only is not None and not (only.exists() and (is_static(only, old) or is_static(only, new))):
         only = None
 
     # For the same reason a static may take a name that only other files' statics have. The other versions' holders

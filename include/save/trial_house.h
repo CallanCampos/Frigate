@@ -39,7 +39,7 @@ BOOL BattleExamination_IsSingle(BattleExaminationSave *extraSave);
 u32 BattleExamination_GetNumber(BattleExaminationSave *saveBuffer);
 // The Trainer of a recorded battle, 0 to 4
 BSubwayTrainer *BattleExamination_GetTrainer(BattleExaminationSave *save, u32 index);
-void BattleExamination_Load(GameData *gameData, void *saveBuffer, HeapID heapId);
+void BattleExamination_Load(GameData *gameData, BattleExaminationSave *saveBuffer, HeapID heapId);
 // The block's size and its initial state (trial_house_savedata.c)
 u32 TrialHouseSave_GetSize(void);
 void TrialHouseSave_Init(TrialHouseSave *save);

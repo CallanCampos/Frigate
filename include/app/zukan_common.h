@@ -137,10 +137,10 @@ void ZukanCommon_ScrollBGs(u8 bg1, u8 bg2, int *timer);
 ClActor *ZukanCommon_CreateActor(ClActUnit *unit, const ZukanActorTemplate *template, HeapID heapId);
 // The species of the habitat that the player chose, for the season and the kind of habitat that it shows. Returns
 // their number
-u32 ZukanCommon_LoadHabitatSpecies(PokeDexSave *pokedex, void *habitat, u16 **list, HeapID heapId);
+u32 ZukanCommon_LoadHabitatSpecies(PokeDexSave *pokedex, ZukanHabitatSave *habitat, u16 **list, HeapID heapId);
 // Builds the list of the areas that the habitat screen shows, or if current only the one that the habitat is on
-void ZukanCommon_BuildHabitatList(void *habitat, ZukanHabitatListParam *param, BOOL current);
-void ZukanCommon_BuildHabitatSummary(void *habitat, ZukanHabitatSummaryParam *param);
+void ZukanCommon_BuildHabitatList(ZukanHabitatSave *habitat, ZukanHabitatListParam *param, BOOL current);
+void ZukanCommon_BuildHabitatSummary(ZukanHabitatSave *habitat, ZukanHabitatSummaryParam *param);
 // The habitat map's pulsing glow: starts it, and steps its phase and what it sets the blend to
 void ZukanCommon_StartGlow(u16 *phase, int *ev);
 void ZukanCommon_StepGlow(u16 *phase, int *ev);

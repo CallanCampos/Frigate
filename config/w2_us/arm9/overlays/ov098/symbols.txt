@@ -13,12 +13,12 @@ sModelAAnimations kind:data(any) addr:0x021ef138
 sModelBAnimations kind:data(any) addr:0x021ef140
 data_ov098_021ef105 kind:data(any) addr:0x021ef145 ambiguous
 sMovingAnimations kind:data(any) addr:0x021ef148
-data_ov098_021ef110 kind:data(any) addr:0x021ef150
+sSceneSetup kind:data(any) addr:0x021ef150
 sPlacePreconditions kind:data(any) addr:0x021ef160
 data_ov098_021ef122 kind:data(any) addr:0x021ef162
 sFirstPositions kind:data(any) addr:0x021ef180
 sSecondPositions kind:data(any) addr:0x021ef1a4
-data_ov098_021ef188 kind:data(any) addr:0x021ef1c8
-data_ov098_021ef1e8 kind:data(any) addr:0x021ef228
+sActors kind:data(any) addr:0x021ef1c8
+sResources kind:data(any) addr:0x021ef228
 data_ov098_021ef211 kind:data(any) addr:0x021ef251 ambiguous
 data_ov098_021ef231 kind:data(any) addr:0x021ef271 ambiguous

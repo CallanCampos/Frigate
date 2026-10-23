@@ -13,7 +13,7 @@ typedef struct {
     FieldScriptEnv *env;
     // Set to whether the player chose no
     u16 *result;
-    void *window;
+    ListMenuUI *window;
 } YesNoEvent;
 
 typedef struct {

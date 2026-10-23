@@ -77,10 +77,10 @@ static const SurveyQuestion data_ov012_0216dad0[] = {
 
 // clang-format on
 
-static BOOL Survey_AreAnswersAtThreshold(void *survey, u16 question);
+static BOOL Survey_AreAnswersAtThreshold(SurveySave *survey, u16 question);
 static BOOL Survey_HasRunLongEnough(SaveControl *save);
 static BOOL Survey_AreAllAnswersCounted(SaveControl *save);
-static BOOL Survey_AreAnswersAtMax(void *survey, u16 question);
+static BOOL Survey_AreAnswersAtMax(SurveySave *survey, u16 question);
 
 u32 Survey_GetQuestionType(u16 question) {
     return data_ov012_0216dad0[question].type;
@@ -105,7 +105,7 @@ int Survey_GetQuestionHours(u8 question) {
 }
 
 u16 Survey_GetCurrentState(SaveControl *save) {
-    void *survey = SurveySave_Get(save);
+    SurveySave *survey = SurveySave_Get(save);
     u16 question = TrainerGameInfo_GetSurveyQuestion(getTrainerCardData_wrapper(save));
     u8 type = Survey_GetQuestionType(question);
 
@@ -146,7 +146,7 @@ BOOL Survey_IsCurrentDone(GameData *gameData) {
 }
 
 u16 Survey_GetQuestionState(SaveControl *save, u8 question) {
-    void *survey = SurveySave_Get(save);
+    SurveySave *survey = SurveySave_Get(save);
     u8 type;
 
     getTrainerCardData_wrapper(save);
@@ -183,7 +183,7 @@ u16 detectLengthSinceLastSession(SaveControl *save) {
     return time.hour;
 }
 
-u32 Survey_GetAnswerCount(void *survey, u8 answer) {
+u32 Survey_GetAnswerCount(SurveySave *survey, u8 answer) {
     u32 count = SurveySave_GetTodayCount(survey, answer) + SurveySave_GetTotalCount(survey, answer);
 
     if (count > SURVEY_COUNT_MAX) {
@@ -192,7 +192,7 @@ u32 Survey_GetAnswerCount(void *survey, u8 answer) {
     return count;
 }
 
-static BOOL Survey_AreAnswersAtThreshold(void *survey, u16 question) {
+static BOOL Survey_AreAnswersAtThreshold(SurveySave *survey, u16 question) {
     u8 answers[3];
     u8 count;
     u32 threshold;
@@ -235,7 +235,7 @@ static BOOL Survey_AreAllAnswersCounted(SaveControl *save) {
     return TRUE;
 }
 
-static BOOL Survey_AreAnswersAtMax(void *survey, u16 question) {
+static BOOL Survey_AreAnswersAtMax(SurveySave *survey, u16 question) {
     u8 answers[3];
     u8 count;
     int i;

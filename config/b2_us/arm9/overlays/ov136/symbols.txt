@@ -11,9 +11,9 @@ PokewoodPoster_GetPlttAddr kind:function(thumb,size=0xe) addr:0x021eeea4
 PokewoodPoster_MakeResName kind:function(thumb,size=0x32) addr:0x021eeeb4
 PokewoodPoster_FindTexAddr kind:function(thumb,size=0x36) addr:0x021eeee8
 PokewoodPoster_FindPlttAddr kind:function(thumb,size=0x3a) addr:0x021eef20
-data_ov136_021eef60 kind:data(any) addr:0x021eef60
-data_ov136_021eef6c kind:data(any) addr:0x021eef6c
-data_ov136_021eef7c kind:data(any) addr:0x021eef7c
+sResources kind:data(any) addr:0x021eef60
+sSceneSetup kind:data(any) addr:0x021eef6c
+sActors kind:data(any) addr:0x021eef7c
 data_ov136_021eef85 kind:data(any) addr:0x021eef85 ambiguous
 data_ov136_021eef8c kind:data(any) addr:0x021eef8c
 data_ov136_021eefa0 kind:data(any) addr:0x021eefa0

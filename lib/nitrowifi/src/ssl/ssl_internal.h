@@ -11,9 +11,9 @@
 extern const char SSLi_Signature[];
 
 // The C library's string functions the main module links, under their own names (ssl.c's certificate and session
-// matching and biginteger.c need them; MI_CpuCopy8, with the source first, and MI_CpuFill8 cover the rest). They are
-// not taken from <string.h>, whose declarations make MWCC treat strcmp and strlen as the library's own, which changes
-// the registers around their calls (docs/matching.md, "a header named `string.h`")
+// matching and biginteger.c need them; MI_CpuCopy8, with the source first, and MI_CpuFill8 cover the rest). ssl.c
+// includes <string.h> before this header, whose declarations make MWCC treat them as the library's own, as its code
+// needs (docs/matching.md, "a header named `string.h`"); biginteger.c takes these alone
 void *memmove(void *dest, const void *src, u32 size);
 int memcmp(const void *a, const void *b, u32 size);
 int strcmp(const char *a, const char *b);
@@ -74,6 +74,6 @@ void CPSi_big_from_char(u16 *dst, const u8 *src, int nbytes, int n);
 // n is the source digit count passed by callers; the original implementation does not use it.
 // Converts little-endian digits to nbytes big-endian bytes. Callers must supply ceil(nbytes/2) actual readable
 // source digits and nbytes writable output bytes; the ignored n argument does not validate either extent.
-void CPSi_char_from_big(u8 *dst, const u16 *src, int nbytes, int n);
+void CPSi_char_from_big(u8 *dst, u16 *src, int nbytes, int n);
 
 #endif // POKEBW2_NITROWIFI_SSL_INTERNAL_H

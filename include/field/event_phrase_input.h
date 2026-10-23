@@ -11,7 +11,7 @@ struct EventPhraseInputData {
     GameSystem *gsys;
     GameData *gameData;
     TrainerGameInfoSave *trainerInfo;
-    void *saveBlock;
+    u16 *saveBlock;
     PlayerInfo *playerInfo;
     Field *field;
     BeaconStatus *unk18;

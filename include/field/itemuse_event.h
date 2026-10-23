@@ -10,7 +10,18 @@
 #include "system/game_event.h"
 
 void PlayerActionPerms_Create(PlayerActionPerms *perms, GameSystem *gsys, Field *field);
-// Runs one of the field's common events, such as the bike or the Escape Rope
+// The field's common events, by their place in FIELD_COMMON_EVENTS
+enum {
+    FIELD_COMMON_EVENT_CYCLING,
+    FIELD_COMMON_EVENT_ENTRALINK,
+    FIELD_COMMON_EVENT_ESCAPE_ROPE,
+    FIELD_COMMON_EVENT_SWEET_SCENT,
+    FIELD_COMMON_EVENT_FISHING,
+    FIELD_COMMON_EVENT_DOWSING,
+    FIELD_COMMON_EVENT_COUNT,
+};
+
+// Runs one of the field's common events, a FIELD_COMMON_EVENT_*
 GameEvent *CallFieldCommonEventFunc(u32 id, GameSystem *gsys, Field *field);
 GameEvent *EventFieldToggleCycling_Create(Field *field, GameSystem *gsys);
 GameEvent *EventEntralinkWarpIn_CreateDefault(Field *field, GameSystem *gsys);

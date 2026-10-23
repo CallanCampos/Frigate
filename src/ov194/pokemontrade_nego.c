@@ -494,7 +494,7 @@ static void func_ov194_021bc7f8(PokemonTradeWork *wk) {
         wk->menu = NULL;
         switch (choice) {
         case 0:
-            GFL_WipeSet(3, 0, 0, 0, 6, 1, wk->heapId);
+            GFL_WipeSet(WIPE_MODE_MAIN, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, 0, 6, 1, wk->heapId);
             PokemonTrade_SetState(wk, func_ov194_021bd2c0);
             break;
         case 1:
@@ -835,7 +835,7 @@ static void func_ov194_021bd06c(PokemonTradeWork *wk) {
         func_ov194_021bbe30(wk);
         PokemonTrade_SetState(wk, func_ov194_021bd7cc);
         func_ov194_021b76e0(wk);
-        GFL_WipeSet(3, 1, 1, 0, 6, 1, wk->heapId);
+        GFL_WipeSet(WIPE_MODE_MAIN, WIPE_TYPE_FADE_IN, WIPE_TYPE_FADE_IN, 0, 6, 1, wk->heapId);
     }
 }
 
@@ -857,7 +857,7 @@ static void func_ov194_021bd190(PokemonTradeWork *wk) {
     }
     TouchBar_Main(wk->touchBar);
     if (TouchBar_GetDecided(wk->touchBar) == TOUCHBAR_ICON_RETURN) {
-        GFL_WipeSet(3, 0, 0, 0, 6, 1, wk->heapId);
+        GFL_WipeSet(WIPE_MODE_MAIN, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, 0, 6, 1, wk->heapId);
         PokemonTrade_SetState(wk, func_ov194_021bd06c);
         return;
     }
@@ -904,7 +904,7 @@ static void func_ov194_021bd2c0(PokemonTradeWork *wk) {
             func_ov194_021c5244(wk, side, slot);
         }
         func_ov194_021bd97c(wk);
-        GFL_WipeSet(3, 1, 1, 0, 6, 1, wk->heapId);
+        GFL_WipeSet(WIPE_MODE_MAIN, WIPE_TYPE_FADE_IN, WIPE_TYPE_FADE_IN, 0, 6, 1, wk->heapId);
         func_ov194_021b76e0(wk);
         func_ov194_021bbe30(wk);
         PokemonTrade_SetState(wk, func_ov194_021bd190);
@@ -922,7 +922,7 @@ static void func_ov194_021bd36c(PokemonTradeWork *wk) {
             PokemonTrade_SetState(wk, func_ov194_021bced4);
             break;
         case 1:
-            GFL_WipeSet(3, 0, 0, 0, 6, 1, wk->heapId);
+            GFL_WipeSet(WIPE_MODE_MAIN, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, 0, 6, 1, wk->heapId);
             TouchBar_SetIconActive(wk->touchBar, TOUCHBAR_ICON_RETURN, FALSE);
             PokemonTrade_SetState(wk, func_ov194_021bd2c0);
             break;
@@ -1020,7 +1020,7 @@ static void func_ov194_021bd5c8(PokemonTradeWork *wk) {
 static void func_ov194_021bd668(PokemonTradeWork *wk) {
     NetHandle_GetOwn();
     if (func_ov194_021c00b0(wk) && func_ov194_021bbee4(wk) && wk->timer >= 120) {
-        GFL_WipeSet(0, 0, 0, 0, 6, 1, wk->heapId);
+        GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, 0, 6, 1, wk->heapId);
         PokemonTrade_SetState(wk, func_ov194_021bd5c8);
     }
 }
@@ -1173,7 +1173,7 @@ static void func_ov194_021bda48(PokemonTradeWork *wk) {
     wk->unk108C = 0;
     wk->unk1084 = 1;
     func_ov194_021c5994(wk);
-    GFL_WipeSet(0, 1, 1, 0, 6, 1, wk->heapId);
+    GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_IN, WIPE_TYPE_FADE_IN, 0, 6, 1, wk->heapId);
     PokemonTrade_SetState(wk, func_ov194_021bd9f4);
 }
 
@@ -1185,7 +1185,7 @@ static void func_ov194_021bdb00(PokemonTradeWork *wk) {
 
 static void func_ov194_021bdb1c(PokemonTradeWork *wk) {
     if (!PokemonTrade_IsNetwork(wk) || wk->unk1060 != 0) {
-        GFL_WipeSet(0, 0, 0, 0, 6, 1, wk->heapId);
+        GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, 0, 6, 1, wk->heapId);
         PokemonTrade_SetState(wk, func_ov194_021bdb00);
     }
 }
@@ -1366,7 +1366,7 @@ static void func_ov194_021bdf10(PokemonTradeWork *wk) {
 }
 
 static void func_ov194_021bdf70(PokemonTradeWork *wk) {
-    GFL_WipeSet(4, 0, 0, 0, 6, 1, wk->heapId);
+    GFL_WipeSet(WIPE_MODE_SUB, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, 0, 6, 1, wk->heapId);
     if (wk->type == 2) {
         DWCRap_SetMic(TRUE);
     }

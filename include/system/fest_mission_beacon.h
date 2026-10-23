@@ -34,6 +34,17 @@ enum {
     LOG_KIND_JOIN,
     LOG_KIND_MEET,
     LOG_KIND_PASS_POWER = 15,
+    // Pokémon defeated and caught, the targets of the missions of kind 1 and of MISSION_FLAGS
+    LOG_KIND_KIND1_DEFEATED = 19,
+    LOG_KIND_KIND1_CAUGHT,
+    LOG_KIND_FLAGS_DEFEATED,
+    LOG_KIND_FLAGS_CAUGHT,
+    // An item found, MISSION_SPARKLE's target
+    LOG_KIND_SPARKLE_FOUND,
+    // The bell rung, the first of MISSION_HOLLOW's targets, which the mission's target counts from
+    LOG_KIND_RANG_BELL,
+    // A lost child helped, the first of MISSION_PEOPLE's targets, which the mission's target counts from
+    LOG_KIND_HELPED_LOST_CHILD = 30,
     LOG_KIND_TEXT = 45,
     LOG_KIND_MAX,
 };

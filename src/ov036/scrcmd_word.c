@@ -337,7 +337,7 @@ BOOL s029B_WordSetLoadJoinAvenueName(VM *vm, FieldScriptEnv *env) {
     HeapID heapId = FieldScriptEnv_GetHeapID(env);
     u8 index = VM_Read8(vm);
 
-    JoinAvenue_GetParam(info, 0, name);
+    JoinAvenue_GetParam(info, JOIN_AVE_INFO_NAME, name);
     strBuf = GFL_StrBufCreate(21, heapId);
     GFL_StrBufLoadString(strBuf, name);
     GFL_WordSetSetStrbuf(wordSet, index, strBuf, 2, 1, 2);

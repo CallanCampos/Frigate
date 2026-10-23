@@ -56,7 +56,7 @@ int WifiBattleMatchNet_GetWifiCupFieldCount(void) {
     return sizeof(sWifiCupFieldNames) / sizeof(sWifiCupFieldNames[0]);
 }
 
-const char *WifiBattleMatchNet_GetArenaFieldName(int field) {
+const char *WifiBattleMatchNet_GetArenaFieldName(WifiBattleMatchNetArenaField field) {
     if (field <= 0) {
         return "";
     }

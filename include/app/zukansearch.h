@@ -10,15 +10,18 @@
 // zukansearch.c is a guess after zknsearch_main.c. The names are ours
 
 // What the search returns in ZukanSearchParam's result
-#define ZUKAN_SEARCH_RESULT_FOUND 0
-#define ZUKAN_SEARCH_RESULT_CANCEL 1
-#define ZUKAN_SEARCH_RESULT_CLOSE 2
+enum {
+    ZUKAN_SEARCH_RESULT_FOUND,
+    ZUKAN_SEARCH_RESULT_CANCEL,
+    ZUKAN_SEARCH_RESULT_CLOSE,
+};
 
 // What the search is given, 0x18 bytes: the criteria it edits, and the species it found
 typedef struct {
     GameData *gameData;
     PokeDexSave *pokedex;
     ZukanSearchCriteria *criteria;
+    // A ZUKAN_SEARCH_RESULT_*
     int result;
     u16 *list;
     u16 count;

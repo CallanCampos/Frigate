@@ -3,6 +3,7 @@
 
 #include "types.h"
 #include "gfl/heap.h"
+#include "save/battle_rec.h"
 #include "save/musical_savedata.h"
 #include "save/save_control.h"
 #include "struct_decls.h"
@@ -33,7 +34,7 @@ typedef union {
     struct {
         union {
             // The musical photo upload, request 0, sends the photo
-            void *data;
+            MusicalShot *data;
             // The species whose musical photos request 1 downloads
             u16 species;
             // The arguments of request 4
@@ -89,7 +90,7 @@ BOOL BrNet_GetDownloadMusicalShot(BrNet *net, BrMusicalShotRecv **tbl, int tblMa
 // Once the video's upload is finished, TRUE and the video's number
 BOOL BrNet_GetUploadVideoNumber(BrNet *net, u64 *number);
 // Once a video is downloaded, TRUE, a pointer to it and the value that goes with it
-BOOL BrNet_GetDownloadVideo(BrNet *net, void **video, u32 *value);
+BOOL BrNet_GetDownloadVideo(BrNet *net, BattleRecVideo **video, u32 *value);
 // Once a list of videos is downloaded, TRUE with up to listMax of its entries in list and their number in num. The
 // three are for the three lists the Battle Recorder can ask for
 BOOL BrNet_GetDownloadVideoListA(BrNet *net, void *list, int listMax, int *num);

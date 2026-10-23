@@ -110,14 +110,14 @@ struct ResortShopWork {
     u16 listShown;
     ResortShopUpdateFunc update;
     ResortPeople *people;
-    void *npc;
+    ResortNPC *npc;
     ResortSys *sys;
-    void *shops;
+    ResortShopData *shops;
     const u16 *row;
-    void *table;
-    void *flags;
+    ResortBinary *table;
+    JoinAvenueShop *flags;
     JoinAvenueOccupants *occupants;
-    void *datas;
+    ResortPersonData **datas;
     ResortPerson *person;
     JoinAvenueInfo *info;
     u16 *vars[5];
@@ -338,7 +338,7 @@ static void ResortShop_PrintMessageInFrame(ResortShopWork *wk, u32 msgId);
 static void ResortShop_PrintEntryMessage(ResortShopWork *wk, u32 msgId, ResortShopEntry *entry);
 static void ResortShop_ClearListScreen(u32 which);
 static ResortPeople *ResortShop_GetPeople(Field *field);
-static void *ResortShop_GetNPC(Field *field);
+static ResortNPC *ResortShop_GetNPC(Field *field);
 static void ResortShop_CreateItemList(GameSystem *gsys, ResortShopWork *wk, u8 mode, u8 subMode);
 static void ResortShop_DestroyItemList(GameSystem *gsys, ResortShopWork *wk, u8 mode, u8 subMode);
 static void ResortShop_ItemCursorCallback(BmpMenuList *list, s32 value, u8 a2);
@@ -373,7 +373,7 @@ BOOL ResortShopCmd_Open(VM *vm, FieldScriptEnv *env) {
     GameData *gameData = GSYS_GetGameData(gsys);
     Field *field = GSYS_GetField(gsys);
     void **ptr = ScriptWork_GetUserHeapPtr(FieldScriptEnv_GetScriptWork(env));
-    void *msgBGSys = Field_GetMsgBGSys(field);
+    FieldMsgBG *msgBGSys = Field_GetMsgBGSys(field);
     ResortSys *sys = ResortSys_Get(field);
     ResortShop *shop = GFL_HeapAllocate(HEAPID_GAMEEVENT, sizeof(ResortShop), TRUE, "scrcmd_resort_shop.c", 375);
 
@@ -399,7 +399,7 @@ BOOL ResortShopCmd_Open(VM *vm, FieldScriptEnv *env) {
     shop->work.npc = ResortShop_GetNPC(field);
     shop->gsys = gsys;
     shop->work.person = ResortSys_GetScriptPerson(env, shop->work.people);
-    if (JoinAvenue_GetParam(shop->work.info, 13, 0) != 0) {
+    if (JoinAvenue_GetParam(shop->work.info, JOIN_AVE_INFO_UNLOCKED_6, 0) != 0) {
         shop->work.unk300 = TRUE;
     } else {
         shop->work.unk300 = FALSE;
@@ -1294,9 +1294,10 @@ static void ResortShop_LoadCursorResources(ResortShopWork *wk) {
 }
 
 static void ResortShop_LoadItemIconResources(ResortShopWork *wk) {
-    wk->res[2].palette =
-        ClActSys_LoadPlttRange(wk->iconArc, GetItemGraphicsDatID(ITEM_MASTER_BALL, 2), 0, 64, 0, 1, wk->heapId);
-    wk->res[2].chars = ClActSys_LoadChars(wk->iconArc, GetItemGraphicsDatID(ITEM_MASTER_BALL, 1), 0, 0, wk->heapId);
+    wk->res[2].palette = ClActSys_LoadPlttRange(
+        wk->iconArc, GetItemGraphicsDatID(ITEM_MASTER_BALL, ITEM_FILE_ICON_PLTT), 0, 64, 0, 1, wk->heapId);
+    wk->res[2].chars =
+        ClActSys_LoadChars(wk->iconArc, GetItemGraphicsDatID(ITEM_MASTER_BALL, ITEM_FILE_ICON_CHAR), 0, 0, wk->heapId);
     wk->res[2].cellAnims = ClActSys_LoadCellAnims(wk->iconArc, 1, 0, wk->heapId);
 }
 
@@ -1308,8 +1309,9 @@ static void ResortShop_ShowItemIcon(ResortShopWork *wk, u16 item) {
     void *ncgr;
 
     if (item <= ITEM_REVEAL_GLASS) {
-        nclr = GFL_G2DIOReadNCLRArc(wk->iconArc, GetItemGraphicsDatID(item, 2), &palette, wk->heapId);
-        ncgr = GFL_G2DIOReadOBJNCGRArc(wk->iconArc, GetItemGraphicsDatID(item, 1), FALSE, &character, wk->heapId);
+        nclr = GFL_G2DIOReadNCLRArc(wk->iconArc, GetItemGraphicsDatID(item, ITEM_FILE_ICON_PLTT), &palette, wk->heapId);
+        ncgr = GFL_G2DIOReadOBJNCGRArc(wk->iconArc, GetItemGraphicsDatID(item, ITEM_FILE_ICON_CHAR), FALSE, &character,
+                                       wk->heapId);
         ClActSys_ReplacePlttData(wk->res[2].palette, palette, 1);
         ClActSys_ReplaceCharData(wk->res[2].chars, character);
         GFL_HeapFree(nclr);
@@ -1641,7 +1643,7 @@ static ResortPeople *ResortShop_GetPeople(Field *field) {
     return people;
 }
 
-static void *ResortShop_GetNPC(Field *field) {
+static ResortNPC *ResortShop_GetNPC(Field *field) {
     void *npc = NULL;
 
     if (Field_CheckGimmickWorkPassword(field, 0)) {
@@ -1942,7 +1944,7 @@ static u32 ResortShop_GetDiscountedPrice(ResortShopWork *wk, u32 price) {
     } else {
         rate = FX32_ONE;
     }
-    rank = JoinAvenue_GetParam(wk->info, 2, 0);
+    rank = JoinAvenue_GetParam(wk->info, JOIN_AVE_INFO_RANK, 0);
     if (rank > 40) {
         rank = 40;
     }

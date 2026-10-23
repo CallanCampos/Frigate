@@ -52,14 +52,6 @@ static const u16 UNOVA_DEX_COMPLETION_EXCLUSIONS[] = {
     SPECIES_VICTINI,
 };
 
-static const PokeDexEvaluation data_0208f814[] = {
-    { 39, 1311 }, { 99, 1312 }, { 159, 1313 }, { 229, 1314 }, { 296, 1315 }, { 0, 1316 },
-};
-
-static const PokeDexEvaluation data_0208f82c[] = {
-    { 159, 1311 }, { 349, 1312 }, { 449, 1313 }, { 549, 1314 }, { 635, 1315 }, { 0, 1316 },
-};
-
 // clang-format off
 static const u16 NATIONAL_DEX_COMPLETION_EXCLUSIONS[] = {
     SPECIES_MEW,     SPECIES_CELEBI,  SPECIES_JIRACHI, SPECIES_DEOXYS,   SPECIES_PHIONE,
@@ -68,21 +60,6 @@ static const u16 NATIONAL_DEX_COMPLETION_EXCLUSIONS[] = {
 };
 
 // clang-format on
-
-static const PokeDexEvaluation data_0208f85e[] = {
-    { 14, 4 },   { 29, 5 },   { 44, 6 },   { 64, 7 },   { 84, 8 },   { 104, 9 },  { 134, 10 }, { 164, 11 },
-    { 194, 12 }, { 224, 13 }, { 244, 14 }, { 264, 15 }, { 284, 16 }, { 296, 17 }, { 0, 17 },
-};
-
-static const PokeDexEvaluation data_0208f89a[] = {
-    { 14, 19 },  { 29, 20 },  { 44, 21 },  { 64, 22 },  { 84, 23 },  { 104, 24 }, { 134, 25 }, { 164, 26 },
-    { 194, 27 }, { 224, 28 }, { 244, 29 }, { 264, 30 }, { 284, 31 }, { 296, 32 }, { 0, 32 },
-};
-
-static const PokeDexEvaluation data_0208f8d8[] = {
-    { 49, 44 },  { 104, 45 }, { 164, 46 }, { 229, 47 }, { 289, 48 }, { 344, 49 }, { 394, 50 }, { 444, 51 }, { 494, 52 },
-    { 529, 53 }, { 559, 54 }, { 579, 55 }, { 599, 56 }, { 614, 57 }, { 629, 58 }, { 635, 59 }, { 0, 59 },
-};
 
 // clang-format off
 static const PokeDexFormEntry pokemonFormList[] = {
@@ -100,6 +77,10 @@ static inline void SetBit(u8 *bits, u16 index) {
     bits[index >> 3] |= (u8)(1 << (index & 7));
 }
 
+static inline void ClearBit(u8 *bits, u16 index) {
+    bits[index >> 3] &= (u8)((1 << (index & 7)) ^ 0xff);
+}
+
 static inline BOOL CheckBit(const u8 *bits, u16 index) {
     if (bits[index >> 3] & (1 << (index & 7))) {
         return TRUE;
@@ -112,6 +93,11 @@ static inline void SetSpeciesBit(u8 *bits, u16 species) {
     u16 bit = species - 1;
 
     bits[bit >> 3] |= (u8)(1 << (bit & 7));
+}
+
+static inline void ClearSpeciesBit(u8 *bits, u16 species) {
+    species--;
+    bits[species >> 3] &= (u8)((1 << (species & 7)) ^ 0xff);
 }
 
 static inline BOOL CheckSpeciesBit(const u8 *bits, u16 species) {
@@ -331,36 +317,27 @@ u16 PokeDex_GetLastSpecies(PokeDexSave *pokedex) {
     return pokedex->lastSpecies;
 }
 
+// Each shown list is passed through a cast to its own type, as BW1's version (another decomp) passes it
 void addToDex(PokeDexSave *pokedex, u16 species, u32 sex, BOOL rare, u32 form) {
-    int index = 0;
-    u32 i = 0;
+    u32 i;
     u32 j;
-    u8 *shown;
-    u16 bit;
-    u32 byte;
-    u32 flag;
-    u8 mask;
+    u32 index;
 
+    index = 0;
+    i = 0;
     do {
         if (species == pokemonFormList[i].species) {
-            u32 count = pokemonFormList[i].count;
-            u8 *normalForms = pokedex->shownForms;
-            u8 *rareForms = pokedex->shownForms + POKEDEX_FORM_BYTES;
-
-            for (j = 0; j < count; j++) {
-                u16 formBit = index + j;
-                u8 formMask = (1 << (formBit & 7)) ^ 0xff;
-
-                normalForms[formBit >> 3] &= formMask;
-                rareForms[formBit >> 3] &= formMask;
+            for (j = 0; j < pokemonFormList[i].count; j++) {
+                ClearBit((u8 *)pokedex->shownForms, index + j);
+                ClearBit((u8 *)(pokedex->shownForms + POKEDEX_FORM_BYTES), index + j);
             }
-            if (form >= count) {
+            if (form >= pokemonFormList[i].count) {
                 form = 0;
             }
             if (rare == TRUE) {
-                SetBit(pokedex->shownForms + POKEDEX_FORM_BYTES, index + form);
+                SetBit((u8 *)(pokedex->shownForms + POKEDEX_FORM_BYTES), index + form);
             } else {
-                SetBit(pokedex->shownForms, index + form);
+                SetBit((u8 *)pokedex->shownForms, index + form);
             }
             break;
         }
@@ -368,31 +345,26 @@ void addToDex(PokeDexSave *pokedex, u16 species, u32 sex, BOOL rare, u32 form) {
         i++;
     } while (pokemonFormList[i].species != 0);
 
-    bit = species - 1;
-    shown = pokedex->shown;
-    byte = bit >> 3;
-    flag = 1 << (bit & 7);
-    mask = flag ^ 0xff;
     for (i = 0; i < POKEDEX_KIND_COUNT; i++) {
-        shown[i * POKEDEX_SPECIES_BYTES + byte] &= mask;
+        ClearSpeciesBit((u8 *)(pokedex->shown + i * POKEDEX_SPECIES_BYTES), species);
     }
     if (sex == GENDER_MALE) {
         if (rare == TRUE) {
-            pokedex->shown[POKEDEX_KIND_RARE_MALE * POKEDEX_SPECIES_BYTES + byte] |= (u8)flag;
+            SetSpeciesBit((u8 *)(pokedex->shown + POKEDEX_KIND_RARE_MALE * POKEDEX_SPECIES_BYTES), species);
         } else {
-            pokedex->shown[POKEDEX_KIND_MALE * POKEDEX_SPECIES_BYTES + byte] |= (u8)flag;
+            SetSpeciesBit((u8 *)(pokedex->shown + POKEDEX_KIND_MALE * POKEDEX_SPECIES_BYTES), species);
         }
     } else if (sex == GENDER_FEMALE) {
         if (rare == TRUE) {
-            pokedex->shown[POKEDEX_KIND_RARE_FEMALE * POKEDEX_SPECIES_BYTES + byte] |= (u8)flag;
+            SetSpeciesBit((u8 *)(pokedex->shown + POKEDEX_KIND_RARE_FEMALE * POKEDEX_SPECIES_BYTES), species);
         } else {
-            pokedex->shown[POKEDEX_KIND_FEMALE * POKEDEX_SPECIES_BYTES + byte] |= (u8)flag;
+            SetSpeciesBit((u8 *)(pokedex->shown + POKEDEX_KIND_FEMALE * POKEDEX_SPECIES_BYTES), species);
         }
     } else {
         if (rare == TRUE) {
-            pokedex->shown[POKEDEX_KIND_RARE_MALE * POKEDEX_SPECIES_BYTES + byte] |= (u8)flag;
+            SetSpeciesBit((u8 *)(pokedex->shown + POKEDEX_KIND_RARE_MALE * POKEDEX_SPECIES_BYTES), species);
         } else {
-            pokedex->shown[POKEDEX_KIND_MALE * POKEDEX_SPECIES_BYTES + byte] |= (u8)flag;
+            SetSpeciesBit((u8 *)(pokedex->shown + POKEDEX_KIND_MALE * POKEDEX_SPECIES_BYTES), species);
         }
     }
 }
@@ -747,6 +719,26 @@ static u16 PokeDex_LookupEvaluation(const PokeDexEvaluation *table, int count) {
 }
 
 void PokeDex_GetEvaluationParams(PokeDexSave *pokedex, u16 mode, HeapID heapId, u16 *message, u16 *count, u16 *unk) {
+    static const PokeDexEvaluation unovaUnks[] = {
+        { 39, 1311 }, { 99, 1312 }, { 159, 1313 }, { 229, 1314 }, { 296, 1315 }, { 0, 1316 },
+    };
+    static const PokeDexEvaluation nationalUnks[] = {
+        { 159, 1311 }, { 349, 1312 }, { 449, 1313 }, { 549, 1314 }, { 635, 1315 }, { 0, 1316 },
+    };
+    static const PokeDexEvaluation unovaSeenMessages[] = {
+        { 14, 4 },   { 29, 5 },   { 44, 6 },   { 64, 7 },   { 84, 8 },   { 104, 9 },  { 134, 10 }, { 164, 11 },
+        { 194, 12 }, { 224, 13 }, { 244, 14 }, { 264, 15 }, { 284, 16 }, { 296, 17 }, { 0, 17 },
+    };
+    static const PokeDexEvaluation unovaCaughtMessages[] = {
+        { 14, 19 },  { 29, 20 },  { 44, 21 },  { 64, 22 },  { 84, 23 },  { 104, 24 }, { 134, 25 }, { 164, 26 },
+        { 194, 27 }, { 224, 28 }, { 244, 29 }, { 264, 30 }, { 284, 31 }, { 296, 32 }, { 0, 32 },
+    };
+    static const PokeDexEvaluation nationalCaughtMessages[] = {
+        { 49, 44 },  { 104, 45 }, { 164, 46 }, { 229, 47 }, { 289, 48 }, { 344, 49 },
+        { 394, 50 }, { 444, 51 }, { 494, 52 }, { 529, 53 }, { 559, 54 }, { 579, 55 },
+        { 599, 56 }, { 614, 57 }, { 629, 58 }, { 635, 59 }, { 0, 59 },
+    };
+
     PokeDex_IsNationalObtained(pokedex);
     *message = 5;
     *count = 0;
@@ -759,8 +751,8 @@ void PokeDex_GetEvaluationParams(PokeDexSave *pokedex, u16 mode, HeapID heapId, 
             *unk = 1316;
             return;
         }
-        *message = PokeDex_LookupEvaluation(data_0208f89a, *count);
-        *unk = PokeDex_LookupEvaluation(data_0208f814, PokeDex_GetCaughtNoUnovaPermissive(pokedex, heapId));
+        *message = PokeDex_LookupEvaluation(unovaCaughtMessages, *count);
+        *unk = PokeDex_LookupEvaluation(unovaUnks, PokeDex_GetCaughtNoUnovaPermissive(pokedex, heapId));
         break;
     case POKEDEX_EVALUATION_REGIONAL_SEEN:
         *count = PokeDex_GetSeenNoUnova(pokedex, heapId);
@@ -769,8 +761,8 @@ void PokeDex_GetEvaluationParams(PokeDexSave *pokedex, u16 mode, HeapID heapId, 
             *unk = 1316;
             return;
         }
-        *message = PokeDex_LookupEvaluation(data_0208f85e, *count);
-        *unk = PokeDex_LookupEvaluation(data_0208f814, PokeDex_GetSeenNoUnovaPermissive(pokedex, heapId));
+        *message = PokeDex_LookupEvaluation(unovaSeenMessages, *count);
+        *unk = PokeDex_LookupEvaluation(unovaUnks, PokeDex_GetSeenNoUnovaPermissive(pokedex, heapId));
         break;
     case POKEDEX_EVALUATION_NATIONAL_CAUGHT:
         *count = PokeDex_GetCaughtNo(pokedex, heapId);
@@ -779,8 +771,8 @@ void PokeDex_GetEvaluationParams(PokeDexSave *pokedex, u16 mode, HeapID heapId, 
             *unk = 1316;
             return;
         }
-        *message = PokeDex_LookupEvaluation(data_0208f8d8, *count);
-        *unk = PokeDex_LookupEvaluation(data_0208f82c, PokeDex_GetCaughtNoPermissive(pokedex));
+        *message = PokeDex_LookupEvaluation(nationalCaughtMessages, *count);
+        *unk = PokeDex_LookupEvaluation(nationalUnks, PokeDex_GetCaughtNoPermissive(pokedex));
         break;
     }
 }

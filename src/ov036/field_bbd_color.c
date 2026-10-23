@@ -32,7 +32,7 @@ static const u16 UNDELLA_BAY_DIVE_WARPS[4][4] = {
     { ZONE_UNDELLA_BAY, 0x320, 0x133, ZONE_ABYSSAL_RUINS_4 },
 };
 
-void *FldActMatColorPreset_Create(HeapID heapId) {
+FldActMatColorPreset *FldActMatColorPreset_Create(HeapID heapId) {
     FldActMatColorPreset *preset =
         GFL_HeapAllocate(heapId, sizeof(FldActMatColorPreset), TRUE, "field_bbd_color.c", 91);
 

@@ -51,7 +51,7 @@ BOOL s014B_FieldClose(VM *vm, FieldScriptEnv *env) {
 }
 
 void CreateScrCmdOverlayProcess(VM *vm, FieldScriptEnv *env, s32 overlayId, const GameProcFunctions *functions,
-                                void *resource, void (*cleanup)(ScriptOverlayWork *), void *data) {
+                                void *resource, void (*cleanup)(ScriptOverlayWork *), BagScriptResult *data) {
     GameSystem *gsys;
     ScriptWork *scriptWork;
     void **heapPtr;
@@ -145,9 +145,9 @@ void CallMailbox_ReadResult(void *arg) {
     MailboxProcessData *mailbox = work->resource;
 
     if (mailbox->result == 1) {
-        *(u16 *)work->data = TRUE;
+        *work->data = TRUE;
     } else {
-        *(u16 *)work->data = FALSE;
+        *work->data = FALSE;
     }
     GFL_HeapFree(work->resource);
 }
@@ -190,7 +190,7 @@ void MoveReminder_ReadResult(void *arg) {
         result = TRUE;
         break;
     }
-    *(u16 *)work->data = result;
+    *work->data = result;
     GFL_HeapFree(((MoveReminderProcessData *)work->resource)->moves);
     MoveReminderProcessData_Free(work->resource);
 }

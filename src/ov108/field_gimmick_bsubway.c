@@ -33,7 +33,7 @@ typedef struct {
 } BSubwayGimmickWork;
 
 typedef struct {
-    void *effect;
+    FieldEffectTask *effect;
 } TrainWork;
 
 typedef struct {
@@ -155,7 +155,7 @@ void FieldGimmickBSubway_StartTrainEffect(Field *field, u32 a1, const VecFx32 *p
     train->effect = func_ov036_021c6574(Field_GetFieldEffects(field), a1, pos);
 }
 
-void *FieldGimmickBSubway_GetTrainEffect(Field *field) {
+FieldEffectTask *FieldGimmickBSubway_GetTrainEffect(Field *field) {
     u16 heapId;
     GimmickState *state;
     u32 index;

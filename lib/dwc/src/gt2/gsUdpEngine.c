@@ -1,5 +1,8 @@
-#include "dwc/gsUdpEngine.h"
+#include <string.h>
+// Before dwc/ext.h: MWCC copies the 16-byte headers in place, as the ROM does, only when <string.h> declares memcpy
+// first
 #include "dwc/ext.h"
+#include "dwc/gsUdpEngine.h"
 #include "dwc/gt2Main.h"
 #include "dwc/gt2Utility.h"
 
@@ -192,8 +195,8 @@ static void gsUdpConnectedRoutingCB(GT2Connection addr, GT2Result rawResult, GT2
     (void)message;
     (void)length;
     switch (rawResult) {
-    case 0:
-        reason = 0;
+    case 7:
+        reason = 7;
         break;
     case 2:
         reason = 2;
@@ -201,15 +204,15 @@ static void gsUdpConnectedRoutingCB(GT2Connection addr, GT2Result rawResult, GT2
     case 6:
         reason = 6;
         break;
-    case 7:
-        reason = 7;
+    case 0:
+        reason = 0;
         break;
     default:
         reason = 0xd;
         break;
     }
 
-    if (reason == 2) {
+    if (rawResult == 2) {
         connKey.mAddr = gt2GetRemoteIP(addr);
         connKey.mPort = (gsi_u16)gt2GetRemotePort(addr);
         index = ArraySearch(engine->mRemotePeers, &connKey, gsUdpRemotePeerCompare, 0, gsi_false);
@@ -232,7 +235,7 @@ static void gsUdpConnectedRoutingCB(GT2Connection addr, GT2Result rawResult, GT2
             if (pending->mConnected != NULL) {
                 gsDebugFormat(GSIDebugCat_Common, GSIDebugType_Network, GSIDebugLevel_Comment,
                               "[Udp Engine] Passing connect result to message handler\n");
-                pending->mConnected(gt2GetRemoteIP(addr), gt2GetRemotePort(addr), reason, rawResult == 2,
+                pending->mConnected(gt2GetRemoteIP(addr), gt2GetRemotePort(addr), reason, (rawResult == 2) ? 1 : 0,
                                     pending->mUserData);
             }
             ArrayDeleteAt(pending->mPendingConnections, index);
@@ -244,7 +247,7 @@ static void gsUdpConnectedRoutingCB(GT2Connection addr, GT2Result rawResult, GT2
         if (engine->mAppConnected != NULL) {
             gsDebugFormat(GSIDebugCat_Common, GSIDebugType_Network, GSIDebugLevel_Comment,
                           "[Udp Engine] Passing connect result to app\n");
-            engine->mAppConnected(gt2GetRemoteIP(addr), gt2GetRemotePort(addr), reason, rawResult == 2,
+            engine->mAppConnected(gt2GetRemoteIP(addr), gt2GetRemotePort(addr), reason, (rawResult == 2) ? 1 : 0,
                                   engine->mAppUserData);
         }
         engine->mAppPendingConnections--;
@@ -267,14 +270,14 @@ static void gsUdpPingRoutingCB(GT2Connection addr, int latencyMs) {
         GSUdpMsgHandler *pending = (GSUdpMsgHandler *)ArrayNth(engine->mMsgHandlers, i);
         if (pending->mPingReply != NULL) {
             gsDebugFormat(GSIDebugCat_Common, GSIDebugType_Network, GSIDebugLevel_Comment,
-                          "[Udp Engine] Passing to message handler\n");
+                          "[Udp Engine] Passed to message handler\n");
             pending->mPingReply(gt2GetRemoteIP(addr), gt2GetRemotePort(addr), latencyMs, pending->mUserData);
             return;
         }
     }
 
     if (engine->mAppPingReply != NULL) {
-        gsDebugFormat(GSIDebugCat_Common, GSIDebugType_Network, GSIDebugLevel_Comment, "[Udp Engine] Passing to app\n");
+        gsDebugFormat(GSIDebugCat_Common, GSIDebugType_Network, GSIDebugLevel_Comment, "[Udp Engine] Passed to app\n");
         engine->mAppPingReply(gt2GetRemoteIP(addr), gt2GetRemotePort(addr), latencyMs, engine->mAppUserData);
     }
 }
@@ -283,24 +286,16 @@ static void gsUdpPingRoutingCB(GT2Connection addr, int latencyMs) {
 // that connect's own handler, otherwise the app
 static void gsUdpReceivedRoutingCB(GT2Connection addr, GT2Byte *data, int len, GT2Bool reliable) {
     GSUdpEngineObject *engine = gsUdpEngineGetEngine();
-    char buf[0x18];
     GSUdpMsgHandler key;
+    char buf[0x18];
     int index;
-    const gsi_u8 *src;
-    gsi_u8 *dest;
-    gsi_u32 n;
 
     gsDebugFormat(GSIDebugCat_Common, GSIDebugType_Network, GSIDebugLevel_Comment,
                   "[Udp Engine] Received data from %s\n",
                   gt2AddressToString(gt2GetRemoteIP(addr), gt2GetRemotePort(addr), buf));
 
     if (len >= 0x10) {
-        src = (const gsi_u8 *)data;
-        dest = key.mHeader;
-        n = 0x10;
-        do {
-            *dest++ = *src++;
-        } while (--n != 0);
+        memcpy(key.mHeader, data, GS_UDP_MSG_HEADER_LEN);
         index = ArraySearch(engine->mMsgHandlers, &key, gsUdpMsgHandlerCompare2, 0, gsi_false);
         if (index != -1) {
             GSUdpMsgHandler *pending = (GSUdpMsgHandler *)ArrayNth(engine->mMsgHandlers, index);
@@ -322,50 +317,37 @@ static void gsUdpReceivedRoutingCB(GT2Connection addr, GT2Byte *data, int len, G
 
 // Handles a datagram offered by the lower socket's unknown-message path; returns whether the app handled it
 static GT2Bool gsUdpUnrecognizedMsgCB(GT2Socket unused, unsigned int ip, unsigned short port, GT2Byte *data, int len) {
-    GSUdpEngineObject *engine = gsUdpEngineGetEngine();
     char buf[0x18];
-    gsi_bool handled;
+    GSUdpEngineObject *engine = gsUdpEngineGetEngine();
 
     (void)unused;
-    if (engine->mAppUnknownMessage == NULL) {
+    if (engine->mAppUnknownMessage != NULL) {
+        gsDebugFormat(GSIDebugCat_Common, GSIDebugType_Network, GSIDebugLevel_Comment,
+                      "[Udp Engine] Unknown message from %s, passing to app\n", gt2AddressToString(ip, port, buf));
+        if (engine->mAppUnknownMessage(ip, port, data, len, engine->mAppUserData) != 0) {
+            return gsi_true;
+        }
         return gsi_false;
     }
-
-    handled = gsi_false;
-    gsDebugFormat(GSIDebugCat_Common, GSIDebugType_Network, GSIDebugLevel_Comment,
-                  "[Udp Engine] Unknown message from %s, passing to app\n", gt2AddressToString(ip, port, buf));
-    if (engine->mAppUnknownMessage(ip, port, data, len, engine->mAppUserData) != 0) {
-        handled = gsi_true;
-    }
-    return handled;
+    return gsi_false;
 }
 
 // The lower socket's incoming-attempt callback; auto-accepts when the first 16 data bytes match a pending
 // connect's init message, otherwise asks the app whether to accept it
 static void gsUdpConnAttemptCB(GT2Socket unused, GT2Connection handle, unsigned int ip, unsigned short port,
                                int elapsedMilliseconds, GT2Byte *data, int len) {
-    GSUdpEngineObject *engine = gsUdpEngineGetEngine();
-    char buf[0x18];
-    GSUdpRemotePeer newConnection;
-    GT2ConnectionCallbacks table;
     int index;
     GSUdpMsgHandler key;
-    const gsi_u8 *src;
-    gsi_u8 *dest;
-    gsi_u32 n;
+    GSUdpRemotePeer newConnection;
+    GSUdpEngineObject *engine = gsUdpEngineGetEngine();
+    char buf[0x18];
+    GT2ConnectionCallbacks table;
 
     (void)unused;
     gsDebugFormat(GSIDebugCat_Common, GSIDebugType_Network, GSIDebugLevel_Comment,
                   "[Udp Engine] Connection attempt from %s\n", gt2AddressToString(ip, port, buf));
-
     if (len >= 0x10) {
-        src = (const gsi_u8 *)data;
-        dest = key.mInitialMsg;
-        n = 0x10;
-        do {
-            *dest++ = *src++;
-        } while (--n != 0);
-
+        memcpy(key.mInitialMsg, data, GS_UDP_MSG_HEADER_LEN);
         newConnection.mAddr = ip;
         newConnection.mPort = port;
         newConnection.mConnection = handle;
@@ -373,17 +355,15 @@ static void gsUdpConnAttemptCB(GT2Socket unused, GT2Connection handle, unsigned 
         index = ArraySearch(engine->mMsgHandlers, &key, gsUdpMsgHandlerCompare, 0, gsi_false);
         if (index != -1) {
             table.closed = gsUdpClosedRoutingCB;
-            table.received = gsUdpReceivedRoutingCB;
-            table.ping = gsUdpPingRoutingCB;
             table.connected = gsUdpConnectedRoutingCB;
-            gt2Accept(handle, &table);
-
+            table.ping = gsUdpPingRoutingCB;
+            table.received = gsUdpReceivedRoutingCB;
+            gt2Accept(newConnection.mConnection, &table);
             gsDebugFormat(GSIDebugCat_Common, GSIDebugType_Network, GSIDebugLevel_Comment,
                           "[Udp Engine] Connection attempt auto-accepted for message handler\n");
             return;
         }
     }
-
     if (engine->mAppConnAttempt != NULL) {
         gsDebugFormat(GSIDebugCat_Common, GSIDebugType_Network, GSIDebugLevel_Comment,
                       "[Udp Engine] Connection attempt from %s, asking app to accept/reject\n",
@@ -391,7 +371,6 @@ static void gsUdpConnAttemptCB(GT2Socket unused, GT2Connection handle, unsigned 
         engine->mAppConnAttempt(ip, port, elapsedMilliseconds, data, len, engine->mAppUserData);
         return;
     }
-
     gt2Reject(handle, 0, 0);
     ArrayRemoveAt(engine->mRemotePeers, ArrayLength(engine->mRemotePeers) - 1);
 }
@@ -491,17 +470,12 @@ GSUdpErrorCode gsUdpEngineGetPeerState(unsigned int ip, unsigned short port, GSU
 // Reuses a known connection or starts one through the lower layer, then associates it with a pending init message
 GSUdpErrorCode gsUdpEngineStartTalkingToPeer(unsigned int ip, unsigned short port,
                                              char initMessage[GS_UDP_MSG_HEADER_LEN], int timeoutMs) {
-    GSUdpEngineObject *engine = gsUdpEngineGetEngine();
     char buf[0x18];
     GSUdpRemotePeer key;
-    GSUdpRemotePeer *conn;
-    GT2ConnectionCallbacks table;
     GSUdpMsgHandler pendingKey;
-    const gsi_u8 *src;
-    gsi_u8 *dest;
-    gsi_u32 n;
+    GSUdpEngineObject *engine = gsUdpEngineGetEngine();
+    GT2ConnectionCallbacks table;
     int index;
-    int state;
 
     if (engine->mInitialized == 0) {
         gsDebugFormat(GSIDebugCat_Common, GSIDebugType_Network, GSIDebugLevel_Debug,
@@ -513,56 +487,48 @@ GSUdpErrorCode gsUdpEngineStartTalkingToPeer(unsigned int ip, unsigned short por
                       "[Udp Engine] Invalid parameter(s), check ip, port");
         return 0xa;
     }
-
     key.mAddr = ip;
     key.mPort = port;
     index = ArraySearch(engine->mRemotePeers, &key, gsUdpRemotePeerCompare, 0, gsi_false);
     if (index != -1) {
-        conn = (GSUdpRemotePeer *)ArrayNth(engine->mRemotePeers, index);
-        state = gt2GetConnectionState(conn->mConnection);
+        GSUdpRemotePeer *conn = (GSUdpRemotePeer *)ArrayNth(engine->mRemotePeers, index);
+        int state = gt2GetConnectionState(conn->mConnection);
+
         if (state == 1) {
             gsDebugFormat(GSIDebugCat_Common, GSIDebugType_Network, GSIDebugLevel_Debug,
                           "[Udp Engine] Engine is already talking to remote address\n");
             return 5;
         }
-        if (state != 0) {
-            return 0;
+        if (state == 0) {
+            GSUdpMsgHandler *pending;
+
+            memcpy(pendingKey.mInitialMsg, initMessage, GS_UDP_MSG_HEADER_LEN);
+            index = ArraySearch(engine->mMsgHandlers, &pendingKey, gsUdpMsgHandlerCompare, 0, gsi_false);
+            if (index != -1) {
+                pending = (GSUdpMsgHandler *)ArrayNth(engine->mMsgHandlers, index);
+                ArrayAppend(pending->mPendingConnections, conn);
+            }
         }
-
-        src = (const gsi_u8 *)initMessage;
-        dest = pendingKey.mInitialMsg;
-        n = 0x10;
-        do {
-            *dest++ = *src++;
-        } while (--n != 0);
-        index = ArraySearch(engine->mMsgHandlers, &pendingKey, gsUdpMsgHandlerCompare, 0, gsi_false);
-        if (index == -1) {
-            return 0;
-        }
-        ArrayAppend(((GSUdpMsgHandler *)ArrayNth(engine->mMsgHandlers, index))->mPendingConnections, conn);
-        return 0;
-    }
-
-    gt2AddressToString(ip, port, buf);
-    table.closed = gsUdpClosedRoutingCB;
-    table.received = gsUdpReceivedRoutingCB;
-    table.ping = gsUdpPingRoutingCB;
-    table.connected = gsUdpConnectedRoutingCB;
-    gt2Connect(engine->mSocket, &key.mConnection, buf, initMessage, 0x10, timeoutMs, &table, 0);
-
-    ArrayAppend(engine->mRemotePeers, &key);
-    src = (const gsi_u8 *)initMessage;
-    dest = pendingKey.mInitialMsg;
-    n = 0x10;
-    do {
-        *dest++ = *src++;
-    } while (--n != 0);
-    index = ArraySearch(engine->mMsgHandlers, &pendingKey, gsUdpMsgHandlerCompare, 0, gsi_false);
-    if (index != -1) {
-        conn = (GSUdpRemotePeer *)ArrayNth(engine->mRemotePeers, ArrayLength(engine->mRemotePeers) - 1);
-        ArrayAppend(((GSUdpMsgHandler *)ArrayNth(engine->mMsgHandlers, index))->mPendingConnections, &conn);
     } else {
-        engine->mAppPendingConnections++;
+        GSUdpMsgHandler *pending;
+        GSUdpRemotePeer *conn;
+
+        gt2AddressToString(ip, port, buf);
+        table.closed = gsUdpClosedRoutingCB;
+        table.connected = gsUdpConnectedRoutingCB;
+        table.ping = gsUdpPingRoutingCB;
+        table.received = gsUdpReceivedRoutingCB;
+        gt2Connect(engine->mSocket, &key.mConnection, buf, initMessage, 0x10, timeoutMs, &table, 0);
+        ArrayAppend(engine->mRemotePeers, &key);
+        memcpy(pendingKey.mInitialMsg, initMessage, GS_UDP_MSG_HEADER_LEN);
+        index = ArraySearch(engine->mMsgHandlers, &pendingKey, gsUdpMsgHandlerCompare, 0, gsi_false);
+        if (index != -1) {
+            conn = (GSUdpRemotePeer *)ArrayNth(engine->mRemotePeers, ArrayLength(engine->mRemotePeers) - 1);
+            pending = (GSUdpMsgHandler *)ArrayNth(engine->mMsgHandlers, index);
+            ArrayAppend(pending->mPendingConnections, &conn);
+        } else {
+            engine->mAppPendingConnections++;
+        }
     }
     return 0;
 }
@@ -570,49 +536,47 @@ GSUdpErrorCode gsUdpEngineStartTalkingToPeer(unsigned int ip, unsigned short por
 // Sends a message to the connection of an address, with a 16-byte header prepended
 GSUdpErrorCode gsUdpEngineSendMessage(unsigned int ip, unsigned short port, char header[GS_UDP_MSG_HEADER_LEN],
                                       unsigned char *message, unsigned int size, gsi_bool reliable) {
-    GSUdpEngineObject *engine = gsUdpEngineGetEngine();
-    GSUdpRemotePeer key;
-    char buf[0x18];
-    GSUdpRemotePeer *conn;
-    void *packet;
-    int index;
-    int maxSize;
+    GSUdpEngineObject *engine;
     int total;
-    const gsi_u8 *src;
-    gsi_u8 *dest;
-    int n;
+    int index;
+    GSUdpRemotePeer key;
+    GSUdpRemotePeer *conn;
+    unsigned char *packet;
+    int result;
+    char buf[22];
 
+    engine = gsUdpEngineGetEngine();
     if (engine->mInitialized == 0) {
         gsDebugFormat(GSIDebugCat_Common, GSIDebugType_Network, GSIDebugLevel_Debug,
                       "[Udp Engine] Engine not initialized\n");
         return 3;
     }
-
-    total = (((const char *)header)[0] != 0) ? size + 0x10 : size;
-
+    if (header[0]) {
+        total = size + 0x10;
+    } else {
+        total = size;
+    }
     key.mAddr = ip;
     key.mPort = port;
     index = ArraySearch(engine->mRemotePeers, &key, gsUdpRemotePeerCompare, 0, gsi_false);
     if (index == -1) {
-        // BUG: The formatted address is computed but the format string has no %s to print it
+        gt2AddressToString(ip, port, buf);
+        // BUG: The formatted address is passed but the format string has no %s to print it
 #ifdef BUGFIX
         gsDebugFormat(GSIDebugCat_Common, GSIDebugType_Network, GSIDebugLevel_WarmError,
-                      "[Udp Engine] address not found for sending message: %s\n", gt2AddressToString(ip, port, buf));
+                      "[Udp Engine] address not found for sending message: %s\n", buf);
 #else
         gsDebugFormat(GSIDebugCat_Common, GSIDebugType_Network, GSIDebugLevel_WarmError,
-                      "[Udp Engine] address not found for sending message\n", gt2AddressToString(ip, port, buf));
+                      "[Udp Engine] address not found for sending message\n", buf);
 #endif
         return 4;
     }
-
     conn = (GSUdpRemotePeer *)ArrayNth(engine->mRemotePeers, index);
-    maxSize = gt2GetOutgoingBufferSize(conn->mConnection);
-    if (total > maxSize && reliable != 0) {
+    if (total > gt2GetOutgoingBufferSize(conn->mConnection) && reliable) {
         gsDebugFormat(GSIDebugCat_Common, GSIDebugType_Network, GSIDebugLevel_WarmError,
                       "[Udp Engine] Message Size too large, dropping message\n");
         return 0xc;
     }
-
     // BUG: An empty header allocates only size bytes, but the copies always write size + 0x10 bytes.
 #ifdef BUGFIX
     // Reserve capacity for both copies while preserving the original transmitted length.
@@ -620,16 +584,14 @@ GSUdpErrorCode gsUdpEngineSendMessage(unsigned int ip, unsigned short port, char
 #else
     packet = gsimalloc(total);
 #endif
-    src = (const gsi_u8 *)header;
-    dest = (gsi_u8 *)packet;
-    n = 0x10;
-    do {
-        *dest++ = *src++;
-    } while (--n != 0);
-    memcpy((gsi_u8 *)packet + 0x10, message, size);
-    index = gt2Send(conn->mConnection, packet, total, reliable);
+    memcpy(packet, header, GS_UDP_MSG_HEADER_LEN);
+    memcpy(packet + 0x10, message, size);
+    result = gt2Send(conn->mConnection, packet, total, reliable);
     gsifree(packet);
-    return (index != 0) ? 8 : 0;
+    if (result != 0) {
+        return 8;
+    }
+    return 0;
 }
 
 // Stops the engine's socket without freeing it
@@ -678,12 +640,8 @@ GSUdpErrorCode gsUdpEngineAddMsgHandler(char initMessage[GS_UDP_MSG_HEADER_LEN],
                                         gsUdpErrorCallback onEvent, gsUdpConnConnectedCallback onAttemptResult,
                                         gsUdpConnClosedCallback onClosed, gsUdpConnPingCallback onPing,
                                         gsUdpConnReceivedDataCallback onReceived, void *userData) {
-    GSUdpEngineObject *engine = gsUdpEngineGetEngine();
     GSUdpMsgHandler pending;
-    void *attempts;
-    const gsi_u8 *src;
-    gsi_u8 *dest;
-    int n;
+    GSUdpEngineObject *engine = gsUdpEngineGetEngine();
 
     if (engine->mInitialized == 0) {
         gsDebugFormat(GSIDebugCat_Common, GSIDebugType_Network, GSIDebugLevel_Debug,
@@ -699,33 +657,19 @@ GSUdpErrorCode gsUdpEngineAddMsgHandler(char initMessage[GS_UDP_MSG_HEADER_LEN],
         gsDebugFormat(GSIDebugCat_Common, GSIDebugType_Network, GSIDebugLevel_Debug, "[Udp Engine] Invalid header\n");
         return 0xa;
     }
-
-    src = (const gsi_u8 *)initMessage;
-    dest = pending.mInitialMsg;
-    n = 0x10;
-    do {
-        *dest++ = *src++;
-    } while (--n != 0);
-    src = (const gsi_u8 *)header;
-    dest = pending.mHeader;
-    n = 0x10;
-    do {
-        *dest++ = *src++;
-    } while (--n != 0);
-
-    attempts = ArrayNew(4, 1, NULL);
-    if (attempts == NULL) {
+    pending.mClosed = onClosed;
+    pending.mConnected = onAttemptResult;
+    pending.mPingReply = onPing;
+    pending.mReceived = onReceived;
+    pending.mNetworkError = onEvent;
+    memcpy(pending.mInitialMsg, initMessage, GS_UDP_MSG_HEADER_LEN);
+    memcpy(pending.mHeader, header, GS_UDP_MSG_HEADER_LEN);
+    pending.mPendingConnections = ArrayNew(4, 1, NULL);
+    if (pending.mPendingConnections == NULL) {
         gsDebugFormat(GSIDebugCat_Common, GSIDebugType_Memory, GSIDebugLevel_HotError,
                       "[Udp Engine] No more memory!!!\n");
         return 1;
     }
-
-    pending.mPendingConnections = attempts;
-    pending.mClosed = onClosed;
-    pending.mPingReply = onPing;
-    pending.mReceived = onReceived;
-    pending.mConnected = onAttemptResult;
-    pending.mNetworkError = onEvent;
     pending.mUserData = userData;
     ArrayAppend(engine->mMsgHandlers, &pending);
     return 0;
@@ -735,9 +679,6 @@ GSUdpErrorCode gsUdpEngineAddMsgHandler(char initMessage[GS_UDP_MSG_HEADER_LEN],
 GSUdpErrorCode gsUdpEngineRemoveMsgHandler(char header[GS_UDP_MSG_HEADER_LEN]) {
     GSUdpEngineObject *engine = gsUdpEngineGetEngine();
     GSUdpMsgHandler key;
-    const gsi_u8 *src;
-    gsi_u8 *dest;
-    gsi_u32 n;
     int index;
 
     if (engine->mInitialized == 0) {
@@ -747,16 +688,11 @@ GSUdpErrorCode gsUdpEngineRemoveMsgHandler(char header[GS_UDP_MSG_HEADER_LEN]) {
     }
     if (header == NULL || header[0] == 0) {
         gsDebugFormat(GSIDebugCat_Common, GSIDebugType_Network, GSIDebugLevel_Debug,
-                      "[Udp Engine] Invalid or empty header\n");
+                      "[Udp Engine] invalid or empty header\n");
         return 0xa;
     }
 
-    src = (const gsi_u8 *)header;
-    dest = key.mHeader;
-    n = 0x10;
-    do {
-        *dest++ = *src++;
-    } while (--n != 0);
+    memcpy(key.mHeader, header, GS_UDP_MSG_HEADER_LEN);
 
     index = ArraySearch(engine->mMsgHandlers, &key, gsUdpMsgHandlerCompare2, 0, gsi_false);
     if (index != -1) {

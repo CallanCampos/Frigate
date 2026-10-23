@@ -19,10 +19,10 @@ CGearPowerOnOff_IsYesNoFinished kind:function(thumb,size=0xc) addr:0x021ead4c
 CGearPowerOnOff_SeqPowerOn kind:function(thumb,size=0x11c) addr:0x021ead58
 CGearPowerOnOff_SeqPowerOff kind:function(thumb,size=0xe0) addr:0x021eae74
 CGearPowerOnOff_SeqNoWireless kind:function(thumb,size=0x80) addr:0x021eaf54
-data_ov088_021eaf94 kind:data(any) addr:0x021eafd4
-data_ov088_021eaf9c kind:data(any) addr:0x021eafdc
-data_ov088_021eafbc kind:data(any) addr:0x021eaffc
-data_ov088_021eafdc kind:data(any) addr:0x021eb01c
+sPaletteFileIds kind:data(any) addr:0x021eafd4
+sBG5Setup kind:data(any) addr:0x021eafdc
+sBG6Setup kind:data(any) addr:0x021eaffc
+sBG4Setup kind:data(any) addr:0x021eb01c
 sSeqFuncs kind:data(any) addr:0x021eb040
 sYesNoInit kind:data(any) addr:0x021eb04c
 sYesNoItems kind:data(any) addr:0x021eb060

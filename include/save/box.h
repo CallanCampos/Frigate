@@ -11,6 +11,11 @@
 // assertions of box_savedata.c keep
 #define BOX_MAX_TRAY 24
 #define BOX_MAX_POS 30
+
+// A box's block: its Pokémon
+typedef struct {
+    BoxPkm pkm[BOX_MAX_POS];
+} BoxTraySave;
 #define BOX_NAME_LENGTH 20
 // The box that is open, where a function takes a box
 #define BOXDAT_TRAYNUM_CURRENT 0xffffffff
@@ -63,7 +68,7 @@ void BoxSaveAccessor_Free(BoxSaveAccessor *boxes);
 // A box's block: its size, its init and its pointer
 void initFullBox(void *tray);
 u32 getSizeofBox(void);
-void *BoxSaveAccessor_GetBox(BoxSaveAccessor *boxes, u32 box);
+BoxTraySave *BoxSaveAccessor_GetBox(BoxSaveAccessor *boxes, u32 box);
 
 // The battle box, save block 0x31: one box of six Pokémon, its name and its flags
 #define BATTLE_BOX_COUNT 1

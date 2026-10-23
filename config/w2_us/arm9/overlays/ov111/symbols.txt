@@ -22,15 +22,15 @@ sModel6Animations kind:data(any) addr:0x021ef180
 sModel4Animations kind:data(any) addr:0x021ef184
 sModel7Animations kind:data(any) addr:0x021ef18c
 sModel8Animations kind:data(any) addr:0x021ef194
-data_ov111_021ef15c kind:data(any) addr:0x021ef19c
-data_ov111_021ef16c kind:data(any) addr:0x021ef1ac
+sSceneSetup kind:data(any) addr:0x021ef19c
+sAnimationCounts kind:data(any) addr:0x021ef1ac
 data_ov111_021ef1a0 kind:data(any) addr:0x021ef1e0
-data_ov111_021ef1f4 kind:data(any) addr:0x021ef234
+sActors kind:data(any) addr:0x021ef234
 data_ov111_021ef211 kind:data(any) addr:0x021ef251 ambiguous
 data_ov111_021ef231 kind:data(any) addr:0x021ef271 ambiguous
 data_ov111_021ef289 kind:data(any) addr:0x021ef2c9 ambiguous
 data_ov111_021ef29d kind:data(any) addr:0x021ef2dd ambiguous
-data_ov111_021ef2c4 kind:data(any) addr:0x021ef304
+sResources kind:data(any) addr:0x021ef304
 data_ov111_021ef2e1 kind:data(any) addr:0x021ef321 ambiguous
 data_ov111_021ef335 kind:data(any) addr:0x021ef375 ambiguous
 data_ov111_021ef361 kind:data(any) addr:0x021ef3a1 ambiguous

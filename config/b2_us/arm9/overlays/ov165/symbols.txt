@@ -289,7 +289,7 @@ data_ov165_021a4b88 kind:data(any) addr:0x021a4b88
 data_ov165_021a4bb0 kind:data(any) addr:0x021a4bb0
 sPlateScreenPos kind:data(any) addr:0x021a4be0
 data_ov165_021a4be1 kind:data(any) addr:0x021a4be1
-data_ov165_021a4be4 kind:data(any) addr:0x021a4be4
+sPlatePos kind:data(any) addr:0x021a4be4
 data_ov165_021a4be5 kind:data(any) addr:0x021a4be5
 data_ov165_021a4bf0 kind:data(any) addr:0x021a4bf0
 sItemNames kind:data(any) addr:0x021a4bfc

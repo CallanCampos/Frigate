@@ -128,7 +128,7 @@ static const ZukanStateFunc sZukanStates[STATE_EXIT] = {
 static BOOL Zukan_Init(GameProc *proc, u32 *state, void *param, void *work) {
     ZukanWork *wk;
     ZukanParam *zukanParam = param;
-    void *habitat;
+    ZukanHabitatSave *habitat;
 
     GFL_HeapCreateChild(HEAPID_USER, HEAPID_ZUKAN, 0x10000);
     wk = GFL_ProcInitSubsystem(proc, sizeof(ZukanWork), HEAPID_ZUKAN);
@@ -435,7 +435,7 @@ static u32 Zukan_StateAfterDetail(ZukanWork *work) {
 }
 
 static u32 Zukan_StateHabitat(ZukanWork *work) {
-    void *habitat = SaveControl_GetZukanHabitatSave(GameData_GetSaveControl(work->param->gameData));
+    ZukanHabitatSave *habitat = SaveControl_GetZukanHabitatSave(GameData_GetSaveControl(work->param->gameData));
     ZukanHabitatListParam *habitatList;
 
     work->subParam = GFL_HeapAllocate(HEAPID_ZUKAN, sizeof(ZukanHabitatListParam), FALSE, "zukan.c", 751);
@@ -474,7 +474,7 @@ static u32 Zukan_StateAfterHabitat(ZukanWork *work) {
         work->fromHabitat = 0;
         break;
     case HABITAT_RESULT_AREA: {
-        void *habitat = SaveControl_GetZukanHabitatSave(GameData_GetSaveControl(work->param->gameData));
+        ZukanHabitatSave *habitat = SaveControl_GetZukanHabitatSave(GameData_GetSaveControl(work->param->gameData));
 
         next = STATE_DETAIL;
         work->page = ZUKAN_DETAIL_PAGE_INFO;
@@ -494,7 +494,7 @@ static u32 Zukan_StateAfterHabitat(ZukanWork *work) {
 }
 
 static u32 Zukan_StateAwards(ZukanWork *work) {
-    void *habitat = SaveControl_GetZukanHabitatSave(GameData_GetSaveControl(work->param->gameData));
+    ZukanHabitatSave *habitat = SaveControl_GetZukanHabitatSave(GameData_GetSaveControl(work->param->gameData));
     ZukanHabitatSummaryParam *summary;
 
     work->subParam = GFL_HeapAllocate(HEAPID_ZUKAN, sizeof(ZukanHabitatSummaryParam), FALSE, "zukan.c", 860);
@@ -522,7 +522,7 @@ static u32 Zukan_StateAfterAwards(ZukanWork *work) {
         work->param->result = 0;
         break;
     case AWARDS_RESULT_HABITATS: {
-        void *habitat = SaveControl_GetZukanHabitatSave(GameData_GetSaveControl(work->param->gameData));
+        ZukanHabitatSave *habitat = SaveControl_GetZukanHabitatSave(GameData_GetSaveControl(work->param->gameData));
 
         ZukanHabitatSave_SetSeason(habitat, Season_GetRealTime());
         ZukanHabitatSave_SetType(habitat, 0);

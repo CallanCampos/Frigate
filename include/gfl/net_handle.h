@@ -57,8 +57,8 @@ struct NetHandle {
 // The machine with a handle, or GFL_NET_NETID_SERVER
 int NetHandle_GetNetId(NetHandle *handle);
 // Create and free the handles; the argument is not used
-void NetHandle_InitAll(void *sys);
-void NetHandle_FreeAll(void *sys);
+void NetHandle_InitAll(GFLNetSys *sys);
+void NetHandle_FreeAll(GFLNetSys *sys);
 NetHandle *NetHandle_Get(int netId);
 // This machine's handle
 NetHandle *NetHandle_GetOwn(void);

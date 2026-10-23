@@ -11,12 +11,12 @@
 #include "system/pmsi_param.h"
 
 // The C-Gear's phrases, which the save keeps
-void *getCGearDataBlkAddress(SaveControl *save);
+CGearSave *getCGearDataBlkAddress(SaveControl *save);
 void CGearPhrases_Init(PMSData *phrases);
-void CGearPhrases_Get(void *cgear, u32 index, PMSData *sentence);
-void CGearPhrases_Set(PMSData *cgear, u32 index, const PMSData *sentence);
+void CGearPhrases_Get(CGearSave *cgear, u32 index, PMSData *sentence);
+void CGearPhrases_Set(CGearSave *cgear, u32 index, const PMSData *sentence);
 // The same block, through the C-Gear's own accessor
-void *CGearPhrases_GetBlock(SaveControl *save);
+CGearSave *CGearPhrases_GetBlock(SaveControl *save);
 
 // Overlay 185, the phrase select
 extern const GameProcFunctions PMS_INPUT_PROC_FUNCTIONS;

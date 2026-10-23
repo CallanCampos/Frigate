@@ -158,8 +158,8 @@ static BOOL MonolithStatus_Exit(GameProc *proc, u32 *state, void *param, void *w
 }
 
 static void MonolithStatus_CreateBGs(MonolithStatusWork *sw) {
-    GFL_BGSysCreateBG(MONOLITH_STATUS_BG_TEXT, &sMonolithStatusBGSetupText, 0);
-    GFL_BGSysCreateBG(MONOLITH_STATUS_BG, &sMonolithStatusBGSetup, 0);
+    GFL_BGSysCreateBG(MONOLITH_STATUS_BG_TEXT, &sMonolithStatusBGSetupText, BGMODE_TEXT);
+    GFL_BGSysCreateBG(MONOLITH_STATUS_BG, &sMonolithStatusBGSetup, BGMODE_TEXT);
     GFL_BGSysFillScrArea(MONOLITH_STATUS_BG_TEXT, 0, 0, 0, 32, 32, 17);
     GFL_BGSysFillScrArea(MONOLITH_STATUS_BG, 0, 0, 0, 32, 32, 17);
 }

@@ -4,8 +4,8 @@ PassingVehicles_PlayPassSound kind:function(thumb,size=0x4c) addr:0x021eed3c
 PassingVehicles_Update kind:function(thumb,size=0x158) addr:0x021eed88
 PassingVehicles_PlaceAll kind:function(thumb,size=0x28) addr:0x021eeee0
 PassingVehicles_PlaceVehicle kind:function(thumb,size=0x120) addr:0x021eef08
-data_ov128_021eefe8 kind:data(any) addr:0x021ef028
+sResources kind:data(any) addr:0x021ef028
 data_ov128_021ef011 kind:data(any) addr:0x021ef051 ambiguous
-data_ov128_021ef030 kind:data(any) addr:0x021ef070
-data_ov128_021ef100 kind:data(any) addr:0x021ef140
+sActors kind:data(any) addr:0x021ef070
+sSceneSetup kind:data(any) addr:0x021ef140
 data_ov128_021ef105 kind:data(any) addr:0x021ef145 ambiguous

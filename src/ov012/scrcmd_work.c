@@ -29,7 +29,7 @@ ScriptSubwork *InitScriptSubwork(ScriptWork *work, HeapID heapId) {
     return subwork;
 }
 
-void FreeScriptSubwork(void *subwork) {
+void FreeScriptSubwork(ScriptSubwork *subwork) {
     GFL_HeapFree(subwork);
 }
 
@@ -85,8 +85,8 @@ ScriptWork *FieldScriptEnv_GetScriptWork(FieldScriptEnv *env) {
     return env->subwork->work;
 }
 
-void *FieldScriptEnv_GetMsgBGSys(FieldScriptEnv *env) {
-    return *(void **)ScriptWork_GetFieldWork(FieldScriptEnv_GetScriptWork(env));
+FieldMsgBG *FieldScriptEnv_GetMsgBGSys(FieldScriptEnv *env) {
+    return ScriptWork_GetFieldWork(FieldScriptEnv_GetScriptWork(env))->msgBGSys;
 }
 
 MsgData *GetFieldScriptMsgData(FieldScriptEnv *env) {
@@ -113,15 +113,15 @@ WaitIcon *GetSpecialMessageIconPtr(FieldScriptEnv *env) {
     return env->subwork->specialMessageIcon;
 }
 
-void *GetFieldScriptActorWk(FieldScriptEnv *env) {
-    return env->subwork->actorWork;
+ScriptActorWork *GetFieldScriptActorWk(FieldScriptEnv *env) {
+    return &env->subwork->actorWork;
 }
 
-void FieldScriptEnv_SetPlayerGridEventTCB(FieldScriptEnv *env, void *task) {
+void FieldScriptEnv_SetPlayerGridEventTCB(FieldScriptEnv *env, TCB *task) {
     env->subwork->playerGridEventTCB = task;
 }
 
-void *FieldScriptEnv_GetPlayerGridEventTCB(FieldScriptEnv *env) {
+TCB *FieldScriptEnv_GetPlayerGridEventTCB(FieldScriptEnv *env) {
     return env->subwork->playerGridEventTCB;
 }
 
@@ -264,7 +264,7 @@ void FieldScriptEnv_ShowListMenu(FieldScriptEnv *env) {
     u32 width;
     ScriptListMenu *menu = &env->subwork->listMenu;
     ListMenuRequest request = sListMenuRequest;
-    void *msgBGSys = FieldScriptEnv_GetMsgBGSys(env);
+    FieldMsgBG *msgBGSys = FieldScriptEnv_GetMsgBGSys(env);
     u32 count;
     u32 rows;
     BOOL scrolls;
@@ -336,7 +336,7 @@ void ListMenu_ShowDescription(BmpMenuList *list, s32 value, u8 a2) {
     u16 index = 0;
     FieldScriptEnv *env = BmpMenuList_GetWork(list);
     ScriptListMenu *menu = &env->subwork->listMenu;
-    void *window;
+    FieldMsgWin *window;
 
     BmpMenuList_GetCursorIndex(list, &index);
     if (menu->descriptions[index] == NULL) {

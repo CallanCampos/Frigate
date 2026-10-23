@@ -102,7 +102,7 @@ static void WifiMcr_PcAnmExit(WIFI_MATCHROOM *wk, MCR_PCANM *anm);
 static void WifiMcr_PcAnmMain(WIFI_MATCHROOM *wk, MCR_PCANM *anm);
 static void WifiMcr_PcAnmFreeMain(MCR_PCANM *anm);
 static void WifiMcr_PcAnmUseMain(MCR_PCANM *anm);
-static const void *WifiMcr_PcAnmColorGet(const MCR_PCANM *anm, u32 color);
+static const u16 *WifiMcr_PcAnmColorGet(const MCR_PCANM *anm, u32 color);
 static void WifiMcr_PcAnmUseEnd(MCR_PCANM *anm);
 static void WifiMcr_PcAnmNextReq(MCR_PCANM *anm);
 static void WifiMcr_PcAnmUseStart(MCR_PCANM *anm, u8 pcNo);
@@ -1020,7 +1020,7 @@ static void WifiMcr_PcAnmUseMain(MCR_PCANM *anm) {
     }
 }
 
-static const void *WifiMcr_PcAnmColorGet(const MCR_PCANM *anm, u32 color) {
+static const u16 *WifiMcr_PcAnmColorGet(const MCR_PCANM *anm, u32 color) {
     const u16 *colors = anm->palette->pRawData;
 
     return &colors[color + 1];

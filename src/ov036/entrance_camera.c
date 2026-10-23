@@ -3,6 +3,7 @@
 // Names from swan (https://github.com/ds-pokemon-hacking/swan, GPL-3.0).
 // Additional camera API, struct member, helper and table names are our descriptive guesses.
 #include "types.h"
+#include "constants/arc.h"
 #include "constants/directions.h"
 #include "constants/sound.h"
 #include "field/entrance_camera.h"
@@ -658,7 +659,12 @@ void EntranceCamera_ConfigureDefaultDeparture(EntranceCamera *camera) {
         }
         FieldCameraAnimationController_PrepareCamera(camera->controller);
         FieldCamera_GetAnimationCoords(camera->camera, &animation->src);
-        FieldCamera_GetAnimationCoords(camera->camera, dst);
+        {
+            // Never read: a leftover whose zeroing the compiler keeps
+            VecFx32 unused = { 0, 0, 0 };
+
+            FieldCamera_GetAnimationCoords(camera->camera, dst);
+        }
         switch (dir) {
         case DIR_UP:
             dst->distance = 0x2d << 14;
@@ -844,7 +850,7 @@ void EntranceCamera_ConfigureFileArrival(EntranceCamera *camera) {
 }
 
 void EntranceCamera_ReadFile(EntranceCameraFile *dest, u32 index) {
-    GFL_ArcSysRead(dest, 0xb1, index - 7);
+    GFL_ArcSysRead(dest, ARCID_ENTRANCE_CAMERA, index - 7);
 }
 
 void FieldCamera_ChangeRefPos(FieldCamera *camera, const VecFx32 *target) {

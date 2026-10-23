@@ -144,7 +144,7 @@ BOOL CommPlayer_GetMyStatus(CommPlayerSys *cps, CommPlayerStatus *status) {
     }
     state = GameData_GetPlayerState(gameData);
     exState = FieldPlayerState_GetExState(state);
-    if (FieldStatus_GetBusyFlag(GameData_GetFieldStatus(gameData)) == 2) {
+    if (FieldStatus_GetBusyFlag(GameData_GetFieldStatus(gameData)) == FLD_STATUS_BUSY_LOADING) {
         dir = last->dir;
         pos = last->pos;
         busy = TRUE;

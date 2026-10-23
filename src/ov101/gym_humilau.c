@@ -142,7 +142,7 @@ typedef struct {
     u16 hitLength;
     s16 wait;
     FieldCamera *camera;
-    void *cameraBind;
+    const VecFx32 *cameraBind;
 } HumilauGymRideEvent;
 
 static void GymHumilau_SetupObjects(HumilauGymWork *work);

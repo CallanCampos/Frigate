@@ -1205,7 +1205,7 @@ data_ov182_021bffae kind:data(any) addr:0x021bffee
 data_ov182_021bffb8 kind:data(any) addr:0x021bfff8
 data_ov182_021c0001_w2_us kind:data(any) addr:0x021c0001 ambiguous
 sButtonRows kind:data(any) addr:0x021c0010
-sOptionMenuButtonRects kind:data(any) addr:0x021c0018
+sButtonRects kind:data(any) addr:0x021c0018
 data_ov182_021c001c_w2_us kind:data(any) addr:0x021c001c ambiguous
 sCursorRects kind:data(any) addr:0x021c0030
 data_ov182_021bfff2 kind:data(any) addr:0x021c0032
@@ -1481,7 +1481,7 @@ data_ov182_021c1498 kind:data(any) addr:0x021c14d8
 data_ov182_021c14ac kind:data(any) addr:0x021c14ec
 data_ov182_021c14c4 kind:data(any) addr:0x021c1504
 data_ov182_021c14dc kind:data(any) addr:0x021c151c
-data_ov182_021c14f4 kind:data(any) addr:0x021c1534
+DownloadPlay_ChildBmps kind:data(any) addr:0x021c1534
 data_ov182_021c1568 kind:data(any) addr:0x021c15a8
 data_ov182_021c1580 kind:data(any) addr:0x021c15c0
 data_ov182_021c159c kind:data(any) addr:0x021c15dc
@@ -1619,7 +1619,7 @@ sOverlayScreen kind:bss addr:0x021c40b4
 sLinkIcon kind:bss addr:0x021c40b8
 sKeyboard kind:bss addr:0x021c40bc
 sMenu kind:bss addr:0x021c40c0
-sAossSession kind:bss addr:0x021c40c4
+sAoss kind:bss addr:0x021c40c4
 data_ov182_021c4088 kind:bss addr:0x021c40c8
 sMain kind:bss addr:0x021c40cc
 sMsgWork kind:bss addr:0x021c40ec

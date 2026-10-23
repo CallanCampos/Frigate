@@ -19,7 +19,7 @@ typedef struct {
 #define GFL_NET_CMD_BASE_COUNT 0x11
 
 // The tables are NetCommand arrays
-void NetCommand_Init(int base, const void *list, int listNum, void *work, HeapID unused);
+void NetCommand_Init(int base, const NetCommand *list, int listNum, void *work, HeapID unused);
 void NetCommand_Exit(void);
 void NetCommand_AddTable(int base, const void *list, int listNum, void *work);
 void NetCommand_RemoveTable(int base);

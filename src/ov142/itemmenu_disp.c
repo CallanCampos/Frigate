@@ -620,8 +620,9 @@ static void ItemMenuDisp_ShowSelIcon(ItemMenuWork *work, u32 item) {
         ItemMenuDisp_FreeSelIcon(work);
     }
     arc = GFL_ArcSysCreateFileHandle(ARCID_ITEMGRA, work->heapId);
-    work->selIconPlt = ClActSys_LoadPlttRange(arc, GetItemGraphicsDatID(item, 2), 1, 0, 0, 1, work->heapId);
-    work->selIconChr = ClActSys_LoadChars(arc, GetItemGraphicsDatID(item, 1), FALSE, 1, work->heapId);
+    work->selIconPlt =
+        ClActSys_LoadPlttRange(arc, GetItemGraphicsDatID(item, ITEM_FILE_ICON_PLTT), 1, 0, 0, 1, work->heapId);
+    work->selIconChr = ClActSys_LoadChars(arc, GetItemGraphicsDatID(item, ITEM_FILE_ICON_CHAR), FALSE, 1, work->heapId);
     GFL_ArcToolFree(arc);
     setup.x = 132;
     setup.y = 80;
@@ -1335,17 +1336,17 @@ void ItemMenuDisp_DrawQuantity(ItemMenuWork *work, s32 quantity) {
 u32 ItemMenuDisp_GetPocketShortcut(s32 pocket) {
     switch (pocket) {
     case BAG_POCKET_ITEMS:
-        return 12;
+        return SHORTCUT_BAG_ITEMS;
     case BAG_POCKET_BERRIES:
-        return 15;
+        return SHORTCUT_BAG_BERRIES;
     case BAG_POCKET_MEDICINE:
-        return 13;
+        return SHORTCUT_BAG_MEDICINE;
     case BAG_POCKET_TMS_HMS:
-        return 14;
+        return SHORTCUT_BAG_TMS_HMS;
     case BAG_POCKET_KEY_ITEMS:
-        return 16;
+        return SHORTCUT_BAG_KEY_ITEMS;
     case BAG_POCKET_FREE_SPACE:
-        return 17;
+        return SHORTCUT_BAG_FREE_SPACE;
     }
 }
 

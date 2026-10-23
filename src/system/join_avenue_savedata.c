@@ -104,7 +104,7 @@ void JoinAvenue_ResetAddStep(JoinAvenueSave *joinAvenue) {
 }
 
 // The same as JoinAvenue_Add over two calls, FALSE until the result is out
-BOOL JoinAvenue_AddStepwise(JoinAvenueSave *joinAvenue, GameData *gameData, void *work, u32 a3, u32 *out) {
+BOOL JoinAvenue_AddStepwise(JoinAvenueSave *joinAvenue, GameData *gameData, JoinAvenueVisitor *work, u32 a3, u32 *out) {
     u32 result;
 
     switch (sAddStep) {

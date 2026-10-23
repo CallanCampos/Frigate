@@ -53,7 +53,7 @@ BOOL LiveBattleMatchIrc_SendReady(LiveBattleMatchIrc *irc, const u32 *flag);
 // If the other machine's 4 bytes came, copies them to *flag and returns TRUE
 BOOL LiveBattleMatchIrc_TakeReady(LiveBattleMatchIrc *irc, u32 *flag);
 // Starts receiving the competition data of a Download Station into buffer (0x160 bytes)
-void LiveBattleMatchIrc_StartDelivery(LiveBattleMatchIrc *irc, void *buffer);
+void LiveBattleMatchIrc_StartDelivery(LiveBattleMatchIrc *irc, TournamentEntry *buffer);
 // Steps the delivery: 0 while it goes on, then 1 if the data came, 3 if there was none, 2 otherwise
 int LiveBattleMatchIrc_StepDelivery(LiveBattleMatchIrc *irc);
 // Resets the steps of LiveBattleMatchIrc_StepDeliveryEnd

@@ -903,14 +903,15 @@ static void DWCUtilAddressSettings_DrawAddress(const u8 *address, int row) {
 
 // Moves the marks and the setup's icon to the rows' places from the scroll, and has the BGs follow at the next VBlank
 static void setOffset(void) {
-    int top = FX_DivS32(sAddressSettings.scroll, ADDRESS_ROW_HEIGHT);
-    int y = 0x34 - FX_ModS32(sAddressSettings.scroll, ADDRESS_ROW_HEIGHT);
-    int i;
+    int top;
+    int y;
+    int markY;
     int x;
     int oamY;
-    int markY;
-    GXOamAttr *oam;
+    int i;
 
+    top = FX_DivS32(sAddressSettings.scroll, ADDRESS_ROW_HEIGHT);
+    y = 0x34 - FX_ModS32(sAddressSettings.scroll, ADDRESS_ROW_HEIGHT);
     if (sAddressSettings.work->setupIcon != NULL) {
         if (top == 0) {
             x = 0x26;
@@ -919,24 +920,21 @@ static void setOffset(void) {
         }
         DWCUtilOam_SetPosition(sAddressSettings.work->setupIcon, x, y);
     }
-    markY = y;
-    for (i = 0; i < 5; i++) {
-        oam = sAddressSettings.work->marks[i];
-        DWCUtilOam_GetPosition(oam, &x, &oamY);
-        DWCUtilOam_SetPosition(oam, x, markY);
-        markY += ADDRESS_ROW_HEIGHT;
+    for (i = 0, markY = y; i < 5; i++, markY += ADDRESS_ROW_HEIGHT) {
+        G2_GetOBJPosition(sAddressSettings.work->marks[i], (u32 *)&x, (u32 *)&oamY);
+        DWCUtilOam_SetPosition(sAddressSettings.work->marks[i], x, markY);
     }
     if (top <= ADDRESS_ROW_AUTO_ADDRESS) {
-        oam = sAddressSettings.work->marks[5];
-        DWCUtilOam_GetPosition(oam, &x, &oamY);
-        DWCUtilOam_SetPosition(oam, x, y + (ADDRESS_ROW_AUTO_ADDRESS - top) * ADDRESS_ROW_HEIGHT);
+        G2_GetOBJPosition(sAddressSettings.work->marks[5], (u32 *)&x, (u32 *)&oamY);
+        DWCUtilOam_SetPosition(sAddressSettings.work->marks[5], x,
+                               y + (ADDRESS_ROW_AUTO_ADDRESS - top) * ADDRESS_ROW_HEIGHT);
     } else {
         DWCUtilOam_SetPosition(sAddressSettings.work->marks[5], 0x100, 0);
     }
     if (top >= ADDRESS_ROW_AUTO_ADDRESS && top <= ADDRESS_ROW_AUTO_DNS) {
-        oam = sAddressSettings.work->marks[6];
-        DWCUtilOam_GetPosition(oam, &x, &oamY);
-        DWCUtilOam_SetPosition(oam, x, y + (ADDRESS_ROW_AUTO_DNS - top) * ADDRESS_ROW_HEIGHT);
+        G2_GetOBJPosition(sAddressSettings.work->marks[6], (u32 *)&x, (u32 *)&oamY);
+        DWCUtilOam_SetPosition(sAddressSettings.work->marks[6], x,
+                               y + (ADDRESS_ROW_AUTO_DNS - top) * ADDRESS_ROW_HEIGHT);
     } else {
         DWCUtilOam_SetPosition(sAddressSettings.work->marks[6], 0x100, 0);
     }

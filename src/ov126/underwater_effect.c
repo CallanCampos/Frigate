@@ -6,9 +6,9 @@
 #include "gfl/heap.h"
 
 struct UnderwaterEffectWork {
-    void *resources[7];
+    G3DResource *resources[7];
     G3DModel *models[3];
-    void *animations[4];
+    G3DAnimation *animations[4];
     G3DActor *actors[3];
 };
 

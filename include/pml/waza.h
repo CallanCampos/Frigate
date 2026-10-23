@@ -7,38 +7,40 @@
 // Move data
 
 // What PML_MoveGetParam reads. Type, category, power and effect are swan's names
-#define MOVE_PARAM_TYPE 0
-#define MOVE_PARAM_QUALITY 1
-#define MOVE_PARAM_CATEGORY 2
-#define MOVE_PARAM_POWER 3
-// 100 for a move that never misses
-#define MOVE_PARAM_ACCURACY 4
-#define MOVE_PARAM_PP 5
-#define MOVE_PARAM_PRIORITY 6
-// 0 for a move that always lands a critical hit
-#define MOVE_PARAM_CRIT_STAGE 7
-#define MOVE_PARAM_HIT_MAX 8
-#define MOVE_PARAM_HIT_MIN 9
-#define MOVE_PARAM_FLINCH_CHANCE 10
-// The condition the move inflicts, its chance, and how long it lasts
-#define MOVE_PARAM_CONDITION 11
-#define MOVE_PARAM_CONDITION_CHANCE 12
-#define MOVE_PARAM_CONDITION_DURATION 13
-#define MOVE_PARAM_CONDITION_MIN_TURNS 14
-#define MOVE_PARAM_CONDITION_MAX_TURNS 15
-// The first stat the move changes, by how many stages, and its chance. 19 to 24 are meant for the second and third,
-// but read the wrong entries
-#define MOVE_PARAM_STAT_CHANGE_STAT 16
-#define MOVE_PARAM_STAT_CHANGE_STAGE 17
-#define MOVE_PARAM_STAT_CHANGE_CHANCE 18
-// The share of the damage that the user recovers, and the share of its HP
-#define MOVE_PARAM_DRAIN 25
-#define MOVE_PARAM_HEAL 26
-#define MOVE_PARAM_TARGET 27
-#define MOVE_PARAM_EFFECT 28
-// The share of the damage that the user takes, and the share of its HP that it loses
-#define MOVE_PARAM_RECOIL 30
-#define MOVE_PARAM_HP_COST 31
+enum {
+    MOVE_PARAM_TYPE,
+    MOVE_PARAM_QUALITY,
+    MOVE_PARAM_CATEGORY,
+    MOVE_PARAM_POWER,
+    // 100 for a move that never misses
+    MOVE_PARAM_ACCURACY,
+    MOVE_PARAM_PP,
+    MOVE_PARAM_PRIORITY,
+    // 0 for a move that always lands a critical hit
+    MOVE_PARAM_CRIT_STAGE,
+    MOVE_PARAM_HIT_MAX,
+    MOVE_PARAM_HIT_MIN,
+    MOVE_PARAM_FLINCH_CHANCE,
+    // The condition the move inflicts, its chance, and how long it lasts
+    MOVE_PARAM_CONDITION,
+    MOVE_PARAM_CONDITION_CHANCE,
+    MOVE_PARAM_CONDITION_DURATION,
+    MOVE_PARAM_CONDITION_MIN_TURNS,
+    MOVE_PARAM_CONDITION_MAX_TURNS,
+    // The first stat the move changes, by how many stages, and its chance. 19 to 24 are meant for the second and
+    // third, but read the wrong entries
+    MOVE_PARAM_STAT_CHANGE_STAT,
+    MOVE_PARAM_STAT_CHANGE_STAGE,
+    MOVE_PARAM_STAT_CHANGE_CHANCE,
+    // The share of the damage that the user recovers, and the share of its HP
+    MOVE_PARAM_DRAIN = 25,
+    MOVE_PARAM_HEAL,
+    MOVE_PARAM_TARGET,
+    MOVE_PARAM_EFFECT,
+    // The share of the damage that the user takes, and the share of its HP that it loses
+    MOVE_PARAM_RECOIL = 30,
+    MOVE_PARAM_HP_COST,
+};
 
 // How long the condition a move inflicts lasts, by its type
 typedef struct {

@@ -14,10 +14,12 @@
 typedef struct ZukanNickname ZukanNickname;
 
 // What the player answered
-#define ZUKAN_NICKNAME_NO 0
-#define ZUKAN_NICKNAME_YES 1
-// Not yet
-#define ZUKAN_NICKNAME_UNANSWERED 2
+enum {
+    ZUKAN_NICKNAME_NO,
+    ZUKAN_NICKNAME_YES,
+    // Not yet
+    ZUKAN_NICKNAME_UNANSWERED,
+};
 
 // boxMessage is the message about the box (see ZukanTorokuParam), or NULL for none
 ZukanNickname *ZukanNickname_Create(HeapID heapId, PartyPkm *pkm, StrBuf *boxMessage, BoxSaveAccessor *boxes, u32 box,
@@ -27,6 +29,7 @@ void ZukanNickname_Free(ZukanNickname *nickname);
 BOOL ZukanNickname_Update(ZukanNickname *nickname);
 // Draws the window and starts the question
 void ZukanNickname_Start(ZukanNickname *nickname);
+// A ZUKAN_NICKNAME_*
 u32 ZukanNickname_GetAnswer(ZukanNickname *nickname);
 
 #endif // POKEBW2_APP_ZUKAN_NICKNAME_H

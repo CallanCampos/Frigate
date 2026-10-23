@@ -808,12 +808,10 @@ static void FMissionApp_PrintText(FMissionApp *work, int text, int window, int x
 
     if (text == TEXT_RESULT) {
         strbuf = GFL_StrBufCreate(256, work->heapId);
-        FestMission_GetResultMessage(work->missionText, strbuf, (const FestMission *)work->param->missionConfig,
-                                     work->heapId);
+        FestMission_GetResultMessage(work->missionText, strbuf, work->param->missionConfig, work->heapId);
     } else if (text == TEXT_MISSION) {
         strbuf = GFL_StrBufCreate(128, work->heapId);
-        FestMission_GetMessage(work->missionText, strbuf, (const FestMission *)work->param->missionConfig,
-                               work->heapId);
+        FestMission_GetMessage(work->missionText, strbuf, work->param->missionConfig, work->heapId);
     } else if (text == TEXT_GOAL) {
         u32 unit = work->missions[index].params.unk05;
 

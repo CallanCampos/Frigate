@@ -10,14 +10,14 @@ GimmickLeagueLift_IsArrivalModelDone kind:function(thumb,size=0x32) addr:0x021ee
 GimmickLeagueLift_LoadScene kind:function(thumb,size=0x54) addr:0x021eee3c
 GimmickLeagueLift_DummyInit kind:function(thumb,size=0x2) addr:0x021eee90
 GimmickLeagueLift_DummyEnd kind:function(thumb,size=0x2) addr:0x021eee94
-data_ov106_021eee58 kind:data(any) addr:0x021eee98
-data_ov106_021eee5c kind:data(any) addr:0x021eee9c
+sAnimations01 kind:data(any) addr:0x021eee98
+sAnimations03 kind:data(any) addr:0x021eee9c
 data_ov106_021eee61 kind:data(any) addr:0x021eeea1 ambiguous
-data_ov106_021eee64 kind:data(any) addr:0x021eeea4
-data_ov106_021eee74 kind:data(any) addr:0x021eeeb4
+sSceneSetup kind:data(any) addr:0x021eeea4
+sActorPositions kind:data(any) addr:0x021eeeb4
 data_ov106_021eee81 kind:data(any) addr:0x021eeec1 ambiguous
-data_ov106_021eee8c kind:data(any) addr:0x021eeecc
+sActors kind:data(any) addr:0x021eeecc
 data_ov106_021eee9d kind:data(any) addr:0x021eeedd ambiguous
-data_ov106_021eeeac kind:data(any) addr:0x021eeeec
+sResources kind:data(any) addr:0x021eeeec
 data_ov106_021eeec0 kind:data(any) addr:0x021eef00 ambiguous
 data_ov106_021eeec9 kind:data(any) addr:0x021eef09 ambiguous

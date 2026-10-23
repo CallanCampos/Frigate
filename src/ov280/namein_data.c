@@ -14,14 +14,14 @@
 #define NARC_NAMEIN_WORD_TABLE_0 5
 #define NARC_NAMEIN_CONV_TABLE 8
 
-static void *NameinData_LoadKeyboard(u32 index, HeapID heapId);
+static NameinKeyboard *NameinData_LoadKeyboard(u32 index, HeapID heapId);
 static void NameinData_FreeKeyboard(NameinKeyboard *keyboard);
 static u16 NameinData_WordTableCount(const NameinWordTable *table);
 static BOOL NameinData_WordMatches(const u16 *word, const u16 *str);
 static u16 NameinData_ConvTableCount(const NameinConvTable *table);
 static u16 NameinData_ConvTableGet(const NameinConvTable *table, u16 row, u16 column);
 
-static void *NameinData_LoadKeyboard(u32 index, HeapID heapId) {
+static NameinKeyboard *NameinData_LoadKeyboard(u32 index, HeapID heapId) {
     return GFL_ArcSysReadHeapNewLZ(ARCID_NAMEIN, NARC_NAMEIN_KEYBOARD_0 + index, FALSE, heapId);
 }
 

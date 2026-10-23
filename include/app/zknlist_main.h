@@ -18,9 +18,6 @@
 // Not from swan: the list's heap
 #define HEAPID_ZUKAN_LIST 0x6b
 
-// The shortcut of the Pokédex that the Y button registers
-#define SHORTCUT_POKEDEX_LIST 18
-
 // How many species the list can hold, and the rows it shows
 #define ZKNLIST_SPECIES_COUNT 649
 #define ZKNLIST_ROW_COUNT 7

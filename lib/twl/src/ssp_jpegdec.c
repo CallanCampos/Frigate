@@ -921,112 +921,106 @@ static int func_ov257_021abd84(u8 *data, int *pos, int tbl) {
 // IJG's sample_range_limit: the samples 0 to 255 clamped, reached with offsets from -256 to 639
 #define SAMPLE_RANGE_LIMIT (&sRangeLimit[0x100])
 
-// The RGB555 color of a pixel from its Y and the Cb and Cr at index c of the MCU, as IJG's ycc_rgb_convert, opaque
-static inline int YccToRgb555(int y, int c) {
-    const u8 *rangeLimit = SAMPLE_RANGE_LIMIT;
-    int cr = sCr[c];
-    int r = rangeLimit[y + sCrRTab[cr]] & 0xf8;
-    int cb = sCb[c];
-    int b = rangeLimit[y + sCbBTab[cb]] & 0xf8;
-    int g = rangeLimit[y + ((sCbGTab[cb] + sCrGTab[cr]) >> 16)] & 0xf8;
-    return (b << 7) | (g << 2) | (r >> 3) | 0x8000;
-}
-
-// Converts the decoded MCU at (x, y) into RGB555 pixels of dest, a bitmap width pixels wide, clipped to height
+// Converts the decoded MCU at (x, y) into RGB555 pixels of dest, a bitmap width pixels wide, clipped to height. Each
+// pixel's color is IJG's ycc_rgb_convert, opaque, written out in every case; c holds the index of the pixel's Cb and
+// Cr, then its red, then its color, as BW1's decompilation (aletheia's jpegdec.c) has it and as the ROM's registers
+// need
 static void func_ov257_021ac018(u8 *dest, int x, int y, int width, int height) {
-    int h, v, i, j;
-    int k;
-    int p;
-    int c;
-    int color;
+    int p, i, j, h, v, k, c;
+    int g, b, cr, cb;
+    const u8 *rangeLimit = SAMPLE_RANGE_LIMIT;
 
-    switch (sHSamp + sVSamp * 2) {
+    switch (sVSamp * 2 + sHSamp) {
     case 3:
-        k = 0;
-        for (j = 0; j < 8; j++) {
+        for (j = k = 0; j < 8; j++) {
             if (y + j >= height) {
-                return;
+                break;
             }
-            p = ((y + j) * width + x) * 2;
-            for (i = 0; i < 8; i++) {
+            p = 2 * (width * (y + j) + x);
+            for (i = 0; i < 8; i++, k++, p += 2) {
                 if (x + i >= width) {
                     break;
                 }
-                color = YccToRgb555(sY[0][k], k);
-                dest[p] = color;
-                dest[p + 1] = color >> 8;
-                p += 2;
-
-                k++;
+                cr = sCr[k];
+                cb = sCb[k];
+                c = rangeLimit[sY[0][k] + sCrRTab[cr]] & 0xf8;
+                g = rangeLimit[sY[0][k] + ((sCbGTab[cb] + sCrGTab[cr]) >> 16)] & 0xf8;
+                b = rangeLimit[sY[0][k] + sCbBTab[cb]] & 0xf8;
+                c = (c >> 3) | (g << 2) | (b << 7) | 0x8000;
+                dest[p] = c;
+                dest[p + 1] = c >> 8;
             }
         }
         break;
     case 4:
-        k = 0;
-        for (h = 0; h < sHSamp; h++) {
+        for (h = k = 0; h < sHSamp; h++) {
             for (j = 0; j < 8; j++) {
                 if (y + j >= height) {
                     break;
                 }
-                p = ((y + j) * width + x + h * 8) * 2;
-                for (i = 0; i < 8; i++) {
-                    if (x + h * 8 + i >= width) {
+                p = 2 * (width * (y + j) + x + h * 8);
+                for (i = 0; i < 8; i++, k++, p += 2) {
+                    if (i + (x + h * 8) >= width) {
                         break;
                     }
                     c = (i >> 1) + h * 4 + j * 8;
-                    color = YccToRgb555(sY[0][k], c);
-                    dest[p] = color;
-                    dest[p + 1] = color >> 8;
-                    p += 2;
-
-                    k++;
+                    cr = sCr[c];
+                    cb = sCb[c];
+                    c = rangeLimit[sY[0][k] + sCrRTab[cr]] & 0xf8;
+                    g = rangeLimit[sY[0][k] + ((sCbGTab[cb] + sCrGTab[cr]) >> 16)] & 0xf8;
+                    b = rangeLimit[sY[0][k] + sCbBTab[cb]] & 0xf8;
+                    c = (c >> 3) | (g << 2) | (b << 7) | 0x8000;
+                    dest[p] = c;
+                    dest[p + 1] = c >> 8;
                 }
             }
         }
         break;
     case 5:
-        k = 0;
-        for (v = 0; v < sVSamp; v++) {
+        for (v = k = 0; v < sVSamp; v++) {
             for (j = 0; j < 8; j++) {
-                if (y + v * 8 + j >= height) {
+                if (j + (y + v * 8) >= height) {
                     break;
                 }
-                p = ((y + v * 8 + j) * width + x) * 2;
-                for (i = 0; i < 8; i++) {
+                p = 2 * (width * (j + (y + v * 8)) + x);
+                for (i = 0; i < 8; i++, k++, p += 2) {
                     if (x + i >= width) {
                         break;
                     }
                     c = i + (j >> 1) * 8 + v * 32;
-                    color = YccToRgb555(sY[0][k], c);
-                    dest[p] = color;
-                    dest[p + 1] = color >> 8;
-                    p += 2;
-
-                    k++;
+                    cr = sCr[c];
+                    cb = sCb[c];
+                    c = rangeLimit[sY[0][k] + sCrRTab[cr]] & 0xf8;
+                    g = rangeLimit[sY[0][k] + ((sCbGTab[cb] + sCrGTab[cr]) >> 16)] & 0xf8;
+                    b = rangeLimit[sY[0][k] + sCbBTab[cb]] & 0xf8;
+                    c = (c >> 3) | (g << 2) | (b << 7) | 0x8000;
+                    dest[p] = c;
+                    dest[p + 1] = c >> 8;
                 }
             }
         }
         break;
     case 6:
-        k = 0;
-        for (v = 0; v < sVSamp; v++) {
+        for (v = k = 0; v < sVSamp; v++) {
             for (h = 0; h < sHSamp; h++) {
                 for (j = 0; j < 8; j++) {
-                    if (y + v * 8 + j >= height) {
+                    if (j + (y + v * 8) >= height) {
                         break;
                     }
-                    p = ((y + v * 8 + j) * width + x + h * 8) * 2;
-                    for (i = 0; i < 8; i++) {
-                        if (x + h * 8 + i >= width) {
+                    p = 2 * (width * (j + (y + v * 8)) + x + h * 8);
+                    for (i = 0; i < 8; i++, k++, p += 2) {
+                        if (i + (x + h * 8) >= width) {
                             break;
                         }
                         c = (i >> 1) + h * 4 + (j >> 1) * 8 + v * 32;
-                        color = YccToRgb555(sY[0][k], c);
-                        dest[p] = color;
-                        dest[p + 1] = color >> 8;
-                        p += 2;
-
-                        k++;
+                        cr = sCr[c];
+                        cb = sCb[c];
+                        c = rangeLimit[sY[0][k] + sCrRTab[cr]] & 0xf8;
+                        g = rangeLimit[sY[0][k] + ((sCbGTab[cb] + sCrGTab[cr]) >> 16)] & 0xf8;
+                        b = rangeLimit[sY[0][k] + sCbBTab[cb]] & 0xf8;
+                        c = (c >> 3) | (g << 2) | (b << 7) | 0x8000;
+                        dest[p] = c;
+                        dest[p + 1] = c >> 8;
                     }
                 }
             }

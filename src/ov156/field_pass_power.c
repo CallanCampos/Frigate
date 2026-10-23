@@ -44,10 +44,10 @@ typedef struct {
     GameSystem *gsys;
     GameData *gameData;
     Field *field;
-    void *msgBGSys;
-    void *listWindow;
+    FieldMsgBG *msgBGSys;
+    MoneyWin *listWindow;
     MMSys *actorSystem;
-    void *msgWindow;
+    FieldMsgWin *msgWindow;
     u32 unk24;
     MsgData *msgData;
     WordSet *wordSet;

@@ -226,11 +226,11 @@ BOOL FieldCamera_SupportsDelay(FieldCamera *camera);
 void FieldCamera_FinishDelay(FieldCamera *camera);
 BOOL FieldCamera_IsDelayActive(FieldCamera *camera);
 // What the camera follows
-void *FieldCamera_GetBind(FieldCamera *camera);
+const VecFx32 *FieldCamera_GetBind(FieldCamera *camera);
 void FieldCamera_SetBind(FieldCamera *camera, const VecFx32 *bind);
 // What the camera follows on a rail map
 void FieldCamera_SetRefBind(FieldCamera *camera, const VecFx32 *bind);
-void *FieldCamera_GetRefBind(FieldCamera *camera);
+const VecFx32 *FieldCamera_GetRefBind(FieldCamera *camera);
 // The event camera's animations: start, animate to a target or back over frames, and end
 void FieldCamera_EVCameraInit(FieldCamera *camera);
 void FieldCameraAnm_EnsureInitDone(FieldCamera *camera);

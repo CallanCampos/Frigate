@@ -131,7 +131,7 @@ typedef struct {
     FieldCamera *camera;
     s32 state;
     FieldCameraShakeSetup setup;
-    VecFx32 *bind;
+    const VecFx32 *bind;
 } FieldCameraShakeTask;
 
 static void FieldTaskManager_SetTask(FieldTaskManager *mgr, u8 index, FieldTask *task, FieldTask *parent);

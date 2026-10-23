@@ -115,8 +115,10 @@ struct MailSysWork {
 };
 
 // The phases: the mail only shown, and the mail written
-#define MAIL_PHASE_VIEW 0
-#define MAIL_PHASE_WRITE 1
+enum {
+    MAIL_PHASE_VIEW,
+    MAIL_PHASE_WRITE,
+};
 
 // The mail screen's proc, which the field app call runs. It runs the screen of the mail as a child proc
 extern const GameProcFunctions MAILSYS_PROC_FUNCTIONS;

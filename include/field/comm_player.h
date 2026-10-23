@@ -28,7 +28,7 @@ typedef struct {
     // Set while the actor is taken down for the field to close
     u8 hidden : 1;
     u8 exState : 4;
-    void *actor;
+    FieldEffectTask *actor;
 } CommPlayer;
 
 // The player's own state as it was last sent
