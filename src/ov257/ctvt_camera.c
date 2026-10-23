@@ -195,7 +195,7 @@ void CtvtCamera_Draw(CommTvtWork *sys, CtvtCamera *work) {
     int width;
     u32 size;
     int row;
-    u32 src;
+    uptr src;
     u16 height;
 
     CommTvt_GetMode(sys);
@@ -302,22 +302,22 @@ void CtvtCamera_Draw(CommTvtWork *sys, CtvtCamera *work) {
                 }
                 if (CtvtComm_HasMemberCamera(sys, comm, i) == TRUE && !canPlayerExchangePhotos()) {
                     size = width * height * 2;
-                    src = (u32)work->screen + pos * size;
+                    src = (uptr)work->screen + pos * size;
                     DC_FlushRange((void *)src, size);
                 } else if (zoomed == FALSE) {
                     if (displayMode == CTDM_DOUBLE) {
-                        src = (u32)work->noCameraPicture;
+                        src = (uptr)work->noCameraPicture;
                         DC_FlushRange((void *)src, 0xc000);
                     } else {
-                        src = (u32)work->noCameraPicture + 0x3000;
+                        src = (uptr)work->noCameraPicture + 0x3000;
                         DC_FlushRange((void *)src, 0x6000);
                     }
                 } else {
                     if (displayMode == CTDM_DOUBLE) {
-                        src = (u32)work->noCameraPictureZoomed;
+                        src = (uptr)work->noCameraPictureZoomed;
                         DC_FlushRange((void *)src, 0x3000);
                     } else {
-                        src = (u32)work->noCameraPictureZoomed + 0xc00;
+                        src = (uptr)work->noCameraPictureZoomed + 0xc00;
                         DC_FlushRange((void *)src, 0x1800);
                     }
                 }
@@ -395,8 +395,8 @@ static void CtvtCamera_OnFrame(void *frame, void *data) {
     if (func_ov257_021aab5c(sys) == FALSE) {
         func_ov257_021aab60(sys, TRUE);
         for (y = 0; y < height; y++) {
-            MIi_CpuCopy32((void *)((u32)work->frameCopy + (top + y) * 256 + left * 2),
-                          (void *)((u32)work->screen + pos * (width * height * 2) + width * y * 2), width * 2);
+            MIi_CpuCopy32((void *)((uptr)work->frameCopy + (top + y) * 256 + left * 2),
+                          (void *)((uptr)work->screen + pos * (width * height * 2) + width * y * 2), width * 2);
         }
         func_ov257_021aab60(sys, FALSE);
         work->dirtyMask |= 1 << self;
