@@ -23,8 +23,6 @@
 #define POKE_VOICE_DEFAULT_SPEED 25825
 #define POKE_VOICE_PAN_CENTER 64
 #define POKE_VOICE_VOLUME_MAX 127
-// NitroSystem's NNS_SND_WAVE_FORMAT_PCM8
-#define POKE_VOICE_WAVE_FORMAT 0
 // The volume of a Chatot's recording, whose sample rate is its count of samples
 #define CHATTER_VOLUME 120
 // The archive with each cry's data
@@ -315,7 +313,7 @@ static BOOL PokeVoice_StartPlaybackCore(PokeVoiceEntry *entry) {
     if (entry->handle == NULL) {
         return FALSE;
     }
-    if (!NNS_SndWaveOutStart(entry->handle, POKE_VOICE_WAVE_FORMAT, entry->samples, FALSE, 0, entry->size,
+    if (!NNS_SndWaveOutStart(entry->handle, NNS_SND_WAVE_FORMAT_PCM8, entry->samples, FALSE, 0, entry->size,
                              entry->sampleRate, PokeVoice_CalcVolume(entry->volume), entry->speed, entry->pan)) {
         return FALSE;
     }
@@ -331,7 +329,7 @@ static BOOL PokeVoice_StartPlaybackCore(PokeVoiceEntry *entry) {
         if (volume > POKE_VOICE_VOLUME_MAX) {
             volume = POKE_VOICE_VOLUME_MAX;
         }
-        if (!NNS_SndWaveOutStart(entry->chorusHandle, POKE_VOICE_WAVE_FORMAT, entry->samples, FALSE, 0, entry->size,
+        if (!NNS_SndWaveOutStart(entry->chorusHandle, NNS_SND_WAVE_FORMAT_PCM8, entry->samples, FALSE, 0, entry->size,
                                  entry->sampleRate, PokeVoice_CalcVolume(volume), entry->speed + entry->chorusSpeed,
                                  entry->pan)) {
             return FALSE;

@@ -22,13 +22,17 @@
 // names are descriptive guesses
 
 // The commands of the link: the other player's id, a reply to it, and the count. They go after the base 0xd00
-#define CMD_ID 0xd00
-#define CMD_ID_REPLY 0xd01
-#define CMD_COUNT 0xd02
+enum {
+    CMD_ID = 0xd00,
+    CMD_ID_REPLY,
+    CMD_COUNT,
+};
 // And those of the profile exchange, after the base 0x1000
-#define CMD_SELECTION 0x1000
-#define CMD_PING 0x1001
-#define CMD_PROFILE 0x1003
+enum {
+    CMD_SELECTION = 0x1000,
+    CMD_PING,
+    CMD_PROFILE = 0x1003,
+};
 
 // What is exchanged besides the profiles: a selection of two numbers, and a ping
 typedef struct {

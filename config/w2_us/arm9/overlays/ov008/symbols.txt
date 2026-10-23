@@ -8,6 +8,6 @@ EventWifiClub_Init kind:function(thumb,size=0xf0) addr:0x0214fda4
 EventWifiClub_Create kind:function(thumb,size=0x28) addr:0x0214fe94
 EventWifiClub_CreateFromArgs kind:function(thumb,size=0xc) addr:0x0214febc
 data_ov008_0214fe88 kind:data(any) addr:0x0214fec8
-data_ov008_0214fea0 kind:data(any) addr:0x0214fee0
+sWifiClubModes kind:data(any) addr:0x0214fee0
 data_ov008_0214fea2 kind:data(any) addr:0x0214fee2
 data_ov008_0214fee0 kind:data(any) addr:0x0214ff20

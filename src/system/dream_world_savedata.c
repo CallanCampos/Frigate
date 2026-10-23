@@ -8,8 +8,6 @@
 // and the state of the Game Sync. The ROM has no string for the file, so the name is a guess (swan's
 // DreamWorldSave and getDreamWorldStuffAddress). Block 0x23.
 
-#define SAVE_BLOCK_DREAM_WORLD 0x23
-
 // Year 0xda, January 1st, Sunday, which no real sync date can be
 #define DREAM_WORLD_SYNC_DATE_NONE 0xda010100
 

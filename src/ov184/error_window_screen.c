@@ -6,6 +6,7 @@
 #include "gfl/fade.h"
 #include "gfl/gx_layers.h"
 #include "gfl/heap.h"
+#include "gfl/net.h"
 #include "gfl/std.h"
 #include "gfl/ui.h"
 #include "nitro/gx.h"
@@ -15,11 +16,6 @@
 // A screen with the window of save_error.c's graphics on BG2 of the main screen and no text, faded in from white and
 // shown until the game is reset. Nothing in the game loads the overlay, so it may be a leftover. The file's name and
 // all the names are ours, guessed from what it shows: the ROM has no string for it
-
-// The files of the window's graphics in ARCID_ERROR_WINDOW_GRA (save_error.c's)
-#define ERROR_WINDOW_GRA_PLTT 0
-#define ERROR_WINDOW_GRA_CHAR 1
-#define ERROR_WINDOW_GRA_SCRN 2
 
 // The BG the window is drawn on
 #define WINDOW_BG 2

@@ -255,9 +255,8 @@ static BOOL EventBattleReturn_Main(GameProc *proc, u32 *state, void *param, void
                 nickname = TRUE;
             }
             if (nickname) {
-                wk->nameEntry =
-                    pokemonNameEntry(wk->heapId, wk->pkm, 10, NULL, (u32)wk->boxMessage, (u32)boxes, wk->box,
-                                     getTrainerGameInfoAddress(GameData_GetSaveControl(prm->gameData)));
+                wk->nameEntry = pokemonNameEntry(wk->heapId, wk->pkm, 10, NULL, wk->boxMessage, boxes, wk->box,
+                                                 getTrainerGameInfoAddress(GameData_GetSaveControl(prm->gameData)));
                 QueueGameProc(wk->procManager, OVERLAY_ID(280), &NAME_ENTRY_PROC_FUNCTIONS, wk->nameEntry);
                 (*state)++;
             } else {

@@ -19,6 +19,7 @@
 #include "field/field_camera.h"
 #include "field/field_event.h"
 #include "field/field_msgbg.h"
+#include "field/scrcmd_msg.h"
 #include "gfl/heap.h"
 #include "gfl/key.h"
 #include "gfl/msg.h"

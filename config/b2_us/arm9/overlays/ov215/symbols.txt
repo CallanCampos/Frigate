@@ -207,7 +207,7 @@ data_ov215_021ab279 kind:data(any) addr:0x021ab279 ambiguous
 data_ov215_021ab294 kind:data(any) addr:0x021ab294
 data_ov215_021ab2b4 kind:data(any) addr:0x021ab2b4
 data_ov215_021ab2c9 kind:data(any) addr:0x021ab2c9 ambiguous
-data_ov215_021ab2d4 kind:data(any) addr:0x021ab2d4
+sWindowTemplates kind:data(any) addr:0x021ab2d4
 data_ov215_021ab2f9 kind:data(any) addr:0x021ab2f9 ambiguous
 data_ov215_021ab329 kind:data(any) addr:0x021ab329 ambiguous
 data_ov215_021ab359 kind:data(any) addr:0x021ab359 ambiguous
@@ -217,22 +217,22 @@ data_ov215_021ab3e9 kind:data(any) addr:0x021ab3e9 ambiguous
 data_ov215_021ab419 kind:data(any) addr:0x021ab419 ambiguous
 data_ov215_021ab449 kind:data(any) addr:0x021ab449 ambiguous
 data_ov215_021ab454 kind:data(any) addr:0x021ab454
-data_ov215_021ab470 kind:data(any) addr:0x021ab470
+sActorTemplates kind:data(any) addr:0x021ab470
 data_ov215_021ab479 kind:data(any) addr:0x021ab479 ambiguous
 data_ov215_021ab489 kind:data(any) addr:0x021ab489 ambiguous
 data_ov215_021ab499 kind:data(any) addr:0x021ab499 ambiguous
 data_ov215_021ab50d kind:data(any) addr:0x021ab50d ambiguous
-data_ov215_021ab610 kind:data(any) addr:0x021ab610
-data_ov215_021ab61c kind:data(any) addr:0x021ab61c
+sMailSysProc kind:data(any) addr:0x021ab610
+sYesNoFuncs kind:data(any) addr:0x021ab61c
 data_ov215_021ab620 kind:data(any) addr:0x021ab620
-data_ov215_021ab62c kind:data(any) addr:0x021ab62c
+sChildProcs kind:data(any) addr:0x021ab62c
 data_ov215_021ab630 kind:data(any) addr:0x021ab630
 data_ov215_021ab634 kind:data(any) addr:0x021ab634
 data_ov215_021ab65c kind:data(any) addr:0x021ab65c
-data_ov215_021ab6c8 kind:data(any) addr:0x021ab6c8
-data_ov215_021ab6d0 kind:data(any) addr:0x021ab6d0
+sReturnRects kind:data(any) addr:0x021ab6c8
+sCursorCallbacks kind:data(any) addr:0x021ab6d0
 data_ov215_021ab6e0 kind:data(any) addr:0x021ab6e0
-data_ov215_021ab6f4 kind:data(any) addr:0x021ab6f4
+sCursorData kind:data(any) addr:0x021ab6f4
 data_ov215_021ab73d kind:data(any) addr:0x021ab73d ambiguous
 data_ov215_021ab769 kind:data(any) addr:0x021ab769 ambiguous
 data_ov215_021ab780 kind:data(any) addr:0x021ab780

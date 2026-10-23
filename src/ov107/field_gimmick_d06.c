@@ -2,6 +2,7 @@
 #include "constants/sound.h"
 #include "constants/zones.h"
 #include "field/field.h"
+#include "field/field_acmd.h"
 #include "field/field_actor.h"
 #include "field/field_effect.h"
 #include "field/field_gimmick_d06.h"
@@ -19,12 +20,6 @@
 #define STONE_COUNT 12
 #define MARK_COUNT 14
 #define EFFECT_ID 10
-
-// The action commands that the pushes use
-#define ACMD_WALK_16F 0x8
-#define ACMD_WALK_8F 0xc
-#define ACMD_WALK_4F 0x10
-#define ACMD_STAY_WALK_16F 0x1c
 
 // How far a stone can go in a push
 #define MAX_PUSH_STEPS 0x20

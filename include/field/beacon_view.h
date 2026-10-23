@@ -14,6 +14,7 @@
 #include "gfl/tcb.h"
 #include "gfl/tcbl.h"
 #include "nnsys/g2d.h"
+#include "save/high_link.h"
 #include "struct_decls.h"
 #include "system/app_keycursor.h"
 #include "system/bmp_oam.h"
@@ -162,7 +163,7 @@ typedef struct BeaconViewWork {
     LinkFestival *festival;
     FestMissionConfig *missionConfig;
     FestivalText *festText;
-    void *passPowerData;
+    PassPowerData *passPowerData;
     // The Pass Power the player has set to give
     u32 passPower;
     u32 trainerId;

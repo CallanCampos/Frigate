@@ -95,7 +95,7 @@ POKE_NET_SSL_SetAuthCallback kind:function(arm,size=0x14) addr:0x021b7a00
 POKE_NET_SSL_SetCaInfo kind:function(arm,size=0x1c) addr:0x021b7a14
 POKE_NET_SSL_StartConnection kind:function(arm,size=0x48) addr:0x021b7a30
 POKE_NET_SSL_EndConnection kind:function(arm,size=0x24) addr:0x021b7a78
-data_ov201_021b7a5c kind:data(any) addr:0x021b7a9c
+BattleModeBitTbl kind:data(any) addr:0x021b7a9c
 data_ov201_021b7a5e kind:data(any) addr:0x021b7a9e
 data_ov201_021b7aac kind:data(any) addr:0x021b7aec
 data_ov201_021b7ae0 kind:data(any) addr:0x021b7b20

@@ -54,10 +54,12 @@ enum {
 };
 
 // The numbers the machines synchronize on
-#define MUS_COMM_TIMING_DATA 0x40
-#define MUS_COMM_TIMING_START 0x41
-#define MUS_COMM_TIMING_PROGRAM 0x42
-#define MUS_COMM_TIMING_BOOT 0x46
+enum {
+    MUS_COMM_TIMING_DATA = 0x40,
+    MUS_COMM_TIMING_START,
+    MUS_COMM_TIMING_PROGRAM,
+    MUS_COMM_TIMING_BOOT = 0x46,
+};
 
 // The communication's states
 enum {

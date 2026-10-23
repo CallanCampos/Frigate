@@ -30,7 +30,7 @@ data_ov120_021ef36c kind:data(any) addr:0x021ef36c
 data_ov120_021ef36d kind:data(any) addr:0x021ef36d ambiguous
 data_ov120_021ef374 kind:data(any) addr:0x021ef374
 data_ov120_021ef379 kind:data(any) addr:0x021ef379 ambiguous
-data_ov120_021ef37c kind:data(any) addr:0x021ef37c
+sModel2And3Animations kind:data(any) addr:0x021ef37c
 data_ov120_021ef388 kind:data(any) addr:0x021ef388
 data_ov120_021ef395 kind:data(any) addr:0x021ef395 ambiguous
 data_ov120_021ef398 kind:data(any) addr:0x021ef398

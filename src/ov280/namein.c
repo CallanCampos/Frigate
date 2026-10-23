@@ -236,7 +236,7 @@ typedef struct NameBox {
     StrBuf *buf;
     BmpWin *window;
     ClActor *slots[NAME_SLOT_COUNT];
-    NameinWordTable *words[3];
+    NameinWordTable *words[NAMEIN_WORD_TABLE_MAX];
     NameinConvTable *conv;
 } NameBox;
 
@@ -909,7 +909,7 @@ static void NameBox_Init(NameBox *box, StrBuf *name, u8 maxLength, Font *font, P
     box->printWindow = box->window;
     box->printing = FALSE;
     box->buf = GFL_StrBufCreate(14, heapId);
-    for (i = 0; i < 3; i++) {
+    for (i = 0; i < NAMEIN_WORD_TABLE_MAX; i++) {
         box->words[i] = NameinData_LoadWordTable(i, heapId);
     }
     box->conv = NameinData_LoadConvTable(heapId);
@@ -953,7 +953,7 @@ static void NameBox_Free(NameBox *box) {
     int i;
 
     NameinData_FreeConvTable(box->conv);
-    for (i = 0; i < 3; i++) {
+    for (i = 0; i < NAMEIN_WORD_TABLE_MAX; i++) {
         NameinData_FreeWordTable(box->words[i]);
     }
     GFL_StrBufFree(box->buf);
@@ -1077,11 +1077,11 @@ static BOOL NameBox_Compose(NameBox *box, int which) {
     int i;
 
     switch (which) {
-    case 0:
-        table = box->words[0];
+    case NAMEIN_WORD_TABLE_DAKUTEN:
+        table = box->words[NAMEIN_WORD_TABLE_DAKUTEN];
         break;
-    case 1:
-        table = box->words[1];
+    case NAMEIN_WORD_TABLE_HANDAKUTEN:
+        table = box->words[NAMEIN_WORD_TABLE_HANDAKUTEN];
         break;
     default:
         return FALSE;
@@ -1204,7 +1204,7 @@ static BOOL NameBox_ComposeAll(NameBox *box, int set) {
         lookup = NameinWordTable_GetForm1;
     }
     for (i = 0; i < box->pendingLength; i++) {
-        index = NameinWordTable_Find(box->words[2], &box->pending[i]);
+        index = NameinWordTable_Find(box->words[NAMEIN_WORD_TABLE_COMPOSE], &box->pending[i]);
         if (index != 0xffff) {
             for (j = 0; j < i; j++) {
                 NameBox_AddChar(box, box->pending[j]);
@@ -1212,15 +1212,15 @@ static BOOL NameBox_ComposeAll(NameBox *box, int set) {
             for (j = 0; j < i; j++) {
                 NameBox_DeleteChar(box);
             }
-            if (lookup(box->words[2], index, chars, 4, &count)) {
+            if (lookup(box->words[NAMEIN_WORD_TABLE_COMPOSE], index, chars, 4, &count)) {
                 for (i = 0; i < count; i++) {
                     NameBox_AddChar(box, chars[i]);
                 }
-                NameinWordTable_GetForm0(box->words[2], index, chars, 4, &count);
+                NameinWordTable_GetForm0(box->words[NAMEIN_WORD_TABLE_COMPOSE], index, chars, 4, &count);
                 for (i = 0; i < count; i++) {
                     NameBox_DeleteChar(box);
                 }
-                NameinWordTable_GetForm3(box->words[2], index, chars, 4, &count);
+                NameinWordTable_GetForm3(box->words[NAMEIN_WORD_TABLE_COMPOSE], index, chars, 4, &count);
                 for (i = 0; i < count; i++) {
                     box->pending[box->pendingLength] = chars[i];
                     box->pendingLength++;
@@ -2751,13 +2751,13 @@ static void NameEntryTalk_Start(NameEntryTalk *talk, NameEntryMessage *message, 
         GFL_WordSetSetStrbuf(wordSet, 0, name, 0, 0, 0);
         GFL_StrBufFree(name);
     }
-    loadBoxNameForDisplay(wordSet, 1, (void *)param->unk10, param->unk14);
+    loadBoxNameForDisplay(wordSet, 1, param->unk10, param->unk14);
     if (talk->stream != NULL) {
         PrintStream_Delete(talk->stream);
     }
     GFL_BitmapFill(BmpWin_GetBitmap(message->window), message->fillColor);
     GFL_StrBufClear(message->buf);
-    GFL_WordSetFormatStrbuf(wordSet, message->buf, (const StrBuf *)param->unkC);
+    GFL_WordSetFormatStrbuf(wordSet, message->buf, param->unkC);
     talk->stream = PrintStream_Create(message->window, 0, 0, message->buf, message->font, TextSpeed_GetCurrentWait(),
                                       talk->tcbManager, 2, heapId, message->fillColor);
     talk->frame = 0;
@@ -3393,7 +3393,7 @@ static void NameEntryTask_Input(NameEntryTask *task, u32 *state, NameEntryWork *
         break;
     case KEY_RESULT_DAKUTEN:
         success = TRUE;
-        if (!NameBox_Compose(&work->box, 0)) {
+        if (!NameBox_Compose(&work->box, NAMEIN_WORD_TABLE_DAKUTEN)) {
             success = FALSE;
         }
         if (success) {
@@ -3404,7 +3404,7 @@ static void NameEntryTask_Input(NameEntryTask *task, u32 *state, NameEntryWork *
         break;
     case KEY_RESULT_HANDAKUTEN:
         success = TRUE;
-        if (!NameBox_Compose(&work->box, 1)) {
+        if (!NameBox_Compose(&work->box, NAMEIN_WORD_TABLE_HANDAKUTEN)) {
             success = FALSE;
         }
         if (success) {
@@ -3463,7 +3463,7 @@ static void NameEntryTask_Input(NameEntryTask *task, u32 *state, NameEntryWork *
             }
             GFL_SndSEPlay(SEQ_SE_DECIDE2);
             NameEntry_CheckChanged(work);
-            if (work->param->mode == NAME_ENTRY_POKEMON && work->param->unkC != 0) {
+            if (work->param->mode == NAME_ENTRY_POKEMON && work->param->unkC != NULL) {
                 NameEntryTalk_Start(&work->talk, &work->message, work->param, HEAPID_NAMEIN);
                 NameEntryTask_SetFunc(task, NameEntryTask_Talk);
             } else {

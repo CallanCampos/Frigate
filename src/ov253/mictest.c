@@ -43,10 +43,12 @@
 #define WINDOW_COUNT 3
 #define ACTOR_COUNT 7
 #define NOTE_COUNT 3
-// The first of the actors that are notes
-#define ACTOR_NOTE_FIRST 4
-#define ACTOR_BACK_BUTTON 3
-#define ACTOR_CENTER 2
+enum {
+    ACTOR_CENTER = 2,
+    ACTOR_BACK_BUTTON,
+    // The first of the actors that are notes
+    ACTOR_NOTE_FIRST,
+};
 
 // The frames between the notes that a sound sends up
 #define NOTE_INTERVAL 10

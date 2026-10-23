@@ -32,7 +32,7 @@ typedef struct {
 
 // The field's work, 0x7c bytes
 struct BtlvField {
-    void *res;                  // 0x00  the model and its textures
+    G3DResource *res;           // 0x00  the model and its textures
     s32 anmCount;               // 0x04
     BtlvFieldAnm *anmParams;    // 0x08
     void **anmRes;              // 0x0c

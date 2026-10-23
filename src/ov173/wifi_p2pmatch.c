@@ -94,14 +94,6 @@ enum {
     WIFIP2PMATCH_STATUS_PLAYING,
 };
 
-// The game modes of a status (WIFI_STATUS_GetGameMode) that have a name here. The eight battles follow
-// WIFIP2PMATCH_GAMEMODE_BATTLE, by battle mode and rule
-#define WIFIP2PMATCH_GAMEMODE_VCHAT 4
-#define WIFIP2PMATCH_GAMEMODE_TVT 5
-#define WIFIP2PMATCH_GAMEMODE_TRADE 6
-#define WIFIP2PMATCH_GAMEMODE_BATTLE 7
-#define WIFIP2PMATCH_GAMEMODE_MAX 15
-
 // The timing number both sides wait for before the state they agreed on
 #define WIFIP2PMATCH_TIMING_SEQ 0x1b
 
@@ -1390,7 +1382,7 @@ const u16 WIFIP2PMATCH_UNK_100 = 100;
 // The detail page's touch bar, with the return button
 static void WifiP2PMatch_CreateTouchBar(WIFIP2PMATCH_WORK *wk, HeapID heapId) {
     TouchBarItem items[] = {
-        { 1, { 232, 168 } },
+        { TOUCHBAR_ICON_RETURN, { 232, 168 } },
     };
     TouchBarSetup setup;
 
@@ -1405,7 +1397,7 @@ static void WifiP2PMatch_CreateTouchBar(WIFIP2PMATCH_WORK *wk, HeapID heapId) {
         setup.objPalette = 12;
         setup.vramType = 2;
         wk->touchBar = TouchBar_Create(&setup, heapId);
-        TouchBar_SetIconKey(wk->touchBar, 1, 0);
+        TouchBar_SetIconKey(wk->touchBar, TOUCHBAR_ICON_RETURN, 0);
     }
 }
 
@@ -3251,7 +3243,7 @@ static int WifiP2PMatch_StateGameStart(WIFIP2PMATCH_WORK *wk, int seq) {
     u16 gameMode = WifiP2PMatch_GetGameMode(wk, wk->myStatus);
 
     switch (gameMode) {
-    case 4:
+    case WIFIP2PMATCH_GAMEMODE_VCHAT:
         GFL_NetGetInitData();
         WifiP2PMatch_StartVChat(wk);
         WifiP2PMatch_BgmVolumeFadeStart(wk, 0);
@@ -3259,10 +3251,10 @@ static int WifiP2PMatch_StateGameStart(WIFIP2PMATCH_WORK *wk, int seq) {
         wk->unk1355 = 0;
         wk->seq = WIFIP2PMATCH_SEQ_VCHAT_START;
         return seq;
-    case 5:
+    case WIFIP2PMATCH_GAMEMODE_TVT:
         wk->endSeq = gameMode;
         return 2;
-    case 6:
+    case WIFIP2PMATCH_GAMEMODE_TRADE:
         WifiP2PMatch_StartVChat(wk);
         wk->endSeq = gameMode;
         return 2;
@@ -3405,21 +3397,21 @@ static u32 WifiP2PMatch_GetGameMode(WIFIP2PMATCH_WORK *wk, const WIFI_STATUS *st
 // Whether a game mode is one of the battles
 static BOOL WifiP2PMatch_IsBattleGameMode(u32 gameMode) {
     switch (gameMode) {
-    case 7:
-    case 8:
-    case 9:
-    case 10:
-    case 11:
-    case 12:
-    case 13:
-    case 14:
+    case WIFIP2PMATCH_GAMEMODE_BATTLE:
+    case WIFIP2PMATCH_GAMEMODE_BATTLE + 1:
+    case WIFIP2PMATCH_GAMEMODE_BATTLE + 2:
+    case WIFIP2PMATCH_GAMEMODE_BATTLE + 3:
+    case WIFIP2PMATCH_GAMEMODE_BATTLE + 4:
+    case WIFIP2PMATCH_GAMEMODE_BATTLE + 5:
+    case WIFIP2PMATCH_GAMEMODE_BATTLE + 6:
+    case WIFIP2PMATCH_GAMEMODE_BATTLE + 7:
         return TRUE;
     }
     return FALSE;
 }
 
 static BOOL WifiP2PMatch_IsPlayGameMode(int gameMode) {
-    if (gameMode < 15 && gameMode > 3) {
+    if (gameMode < WIFIP2PMATCH_GAMEMODE_MAX && gameMode > 3) {
         return TRUE;
     }
     return FALSE;
@@ -6480,7 +6472,7 @@ static BOOL WifiP2PMatch_ViewDetailCloseInput(WIFIP2PMATCH_WORK *wk) {
     }
     if (wk->touchBar != NULL) {
         TouchBar_Main(wk->touchBar);
-        if (TouchBar_GetDecided(wk->touchBar) == 1) {
+        if (TouchBar_GetDecided(wk->touchBar) == TOUCHBAR_ICON_RETURN) {
             return TRUE;
         }
     }
@@ -7064,7 +7056,7 @@ static BOOL WifiP2PMatch_ProcMain(GameProc *proc, u32 *state, void *param, void 
 
     if (GFL_NetIsInitialized()) {
         switch (DWCRapCommon_CheckError(1, 1)) {
-        case 4:
+        case DWCRAP_RESULT_TIMEOUT:
             // The partner was lost: back to the room
             WifiP2PMatch_ClosePartyMenu(wk);
             WifiP2PMatch_FreeWindows(wk);
@@ -7075,7 +7067,7 @@ static BOOL WifiP2PMatch_ProcMain(GameProc *proc, u32 *state, void *param, void 
             wk->timer = 20;
             wk->seq = WIFIP2PMATCH_SEQ_DISCONNECT_WAIT;
             return FALSE;
-        case 2:
+        case DWCRAP_RESULT_FAILED:
             Wipe_SetScreenCovered(0, 0);
             Wipe_SetScreenCovered(1, 0);
             wk->endSeq = 1;

@@ -2,6 +2,7 @@
 #define POKEBW2_SAVE_WBT_SAVE_H
 
 #include "types.h"
+#include "save/extra_block_savedata.h"
 #include "struct_decls.h"
 
 // The Pokémon World Tournament's save data, from GameData_GetWbtSave. It counts to 9999 for each of 29 tournaments
@@ -21,7 +22,7 @@ struct WbtSave {
 };
 
 // WbtSave_Init, which clears it, is declared in save/trial_house.h, whose block it is part of
-void *TrialHouseSave_GetWbtSave(SaveControl *save);
+WbtSave *TrialHouseSave_GetWbtSave(SaveControl *save);
 u16 WbtSave_GetCount(WbtSave *save, u32 tournament);
 void WbtSave_IncrementCount(WbtSave *save, u32 tournament);
 // Sets the count of a tournament's slot, and a bit of the table of Trainers beaten
@@ -30,6 +31,6 @@ BOOL WbtSave_IsTrainerBeaten(WbtSave *wbt, int trainer);
 void WbtSave_SetTrainerBeaten(WbtSave *save, int trainer);
 u16 WbtSave_GetSlot(WbtSave *save, u8 index);
 // Whether the checksum of a downloaded tournament's extra save block holds
-BOOL WbtDownloadData_IsCRCValid(void *data);
+BOOL WbtDownloadData_IsCRCValid(WbtDownloadData *download);
 
 #endif // POKEBW2_SAVE_WBT_SAVE_H

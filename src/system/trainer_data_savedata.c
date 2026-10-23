@@ -7,8 +7,6 @@
 // The save block with the options, the player's info and the play time. The ROM has no string for the file, so the
 // name is a guess. Block 0x1b.
 
-#define SAVE_BLOCK_TRAINER_DATA 0x1b
-
 u32 getSizeofTrainerData(void) {
     return sizeof(TrainerDataSave);
 }

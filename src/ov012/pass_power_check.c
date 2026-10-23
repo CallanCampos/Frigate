@@ -10,16 +10,11 @@ typedef enum {
     PASS_POWER_ID_FIRST,
     PASS_POWER_ID_COUNT = PASS_POWER_COUNT,
 } PassPowerId;
-#define PASS_POWER_UNLOCKED 0
-#define PASS_POWER_NEAR 1
-#define PASS_POWER_LOCKED 2
 // The levels a pass power needs, or one of these
 #define PASS_POWER_LEVEL_NONE 0xff
 #define PASS_POWER_SPECIAL 0xfe
 
-u32 CheckPassPowerUnlocked(void *data, int index, void *levels, u8 *flags) {
-    PassPowerData *table = data;
-    PassPowerLevel *have = levels;
+u32 CheckPassPowerUnlocked(PassPowerData *table, int index, PassPowerLevel *have, u8 *flags) {
     int level1 = table[index].level1;
     u32 bit;
     u32 unlocked;
@@ -56,7 +51,7 @@ u32 CheckPassPowerUnlocked(void *data, int index, void *levels, u8 *flags) {
     return PASS_POWER_LOCKED;
 }
 
-u32 GetUnlockedPassPowerCount(void *data, void *levels, u8 *flags) {
+u32 GetUnlockedPassPowerCount(PassPowerData *data, PassPowerLevel *levels, u8 *flags) {
     PassPowerId i;
     u32 count = 0;
 

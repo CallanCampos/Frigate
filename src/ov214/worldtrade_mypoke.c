@@ -49,9 +49,6 @@ enum {
 // How many windows of information the screen has
 #define MYPOKE_INFOWIN_NUM 14
 
-// The upload screen's mode that takes the Pokémon back
-#define UPLOAD_MODE_DOWNLOAD 8
-
 typedef struct {
     int x;
     int y;
@@ -353,7 +350,7 @@ static int MyPoke_SubSeqYesNoSelect(WorldTradeWork *wk) {
         WorldTrade_TouchWinYesNoDel(wk);
         wk->subprocessSeq = MYPOKE_SEQ_END;
         wk->subOutFlag = 1;
-        WorldTrade_SubProcessChange(wk, WORLDTRADE_UPLOAD, UPLOAD_MODE_DOWNLOAD);
+        WorldTrade_SubProcessChange(wk, WORLDTRADE_UPLOAD, WT_MODE_DOWNLOAD);
         MyPoke_WantPokePrintReWrite(wk);
     } else if (ret == 2) {
         WorldTrade_TouchWinYesNoDel(wk);

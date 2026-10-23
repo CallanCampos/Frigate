@@ -25,14 +25,11 @@
 // until it is reset. The file's name is a guess, from swan's names: the ROM has no string for it
 
 // The messages of the errors, in MSG_FILE_SAVE_ERROR
-#define SAVE_ERROR_READ 0
-#define SAVE_ERROR_NO_RESPONSE 1
-#define SAVE_ERROR_WRITE 2
-
-// The files of the window's graphics in ARCID_ERROR_WINDOW_GRA
-#define SAVE_ERROR_GRA_PLTT 0
-#define SAVE_ERROR_GRA_CHAR 1
-#define SAVE_ERROR_GRA_SCRN 2
+enum {
+    SAVE_ERROR_READ,
+    SAVE_ERROR_NO_RESPONSE,
+    SAVE_ERROR_WRITE,
+};
 
 // The message file of the errors in ARCID_SYSTEM_MESSAGE
 #define MSG_FILE_SAVE_ERROR TEXT_BANK_SAVE_ERROR
@@ -111,21 +108,21 @@ static void displayLightBlueErrorWindow(void) {
 
     MIi_CpuClear32(0, G2_GetBG1CharPtr(), 0x4000);
 
-    file = GFL_ArcSysReadHeapNewLZ(ARCID_ERROR_WINDOW_GRA, SAVE_ERROR_GRA_CHAR, FALSE, HEAPID_SAVEDATA);
+    file = GFL_ArcSysReadHeapNewLZ(ARCID_ERROR_WINDOW_GRA, ERROR_WINDOW_GRA_CHAR, FALSE, HEAPID_SAVEDATA);
     if (NNS_G2dGetUnpackedBGCharacterData(file, &chars)) {
         DC_FlushRange(chars->pRawData, chars->szByte);
         MI_CpuCopy16(chars->pRawData, G2_GetBG1CharPtr(), chars->szByte);
     }
     GFL_HeapFree(file);
 
-    file = GFL_ArcSysReadHeapNewLZ(ARCID_ERROR_WINDOW_GRA, SAVE_ERROR_GRA_SCRN, FALSE, HEAPID_SAVEDATA);
+    file = GFL_ArcSysReadHeapNewLZ(ARCID_ERROR_WINDOW_GRA, ERROR_WINDOW_GRA_SCRN, FALSE, HEAPID_SAVEDATA);
     if (NNS_G2dGetUnpackedScreenData(file, &screen)) {
         DC_FlushRange(screen->rawData, screen->szByte);
         MI_CpuCopy16(screen->rawData, G2_GetBG1ScrPtr(), screen->szByte);
     }
     GFL_HeapFree(file);
 
-    file = GFL_ArcSysReadHeapNewLZ(ARCID_ERROR_WINDOW_GRA, SAVE_ERROR_GRA_PLTT, FALSE, HEAPID_SAVEDATA);
+    file = GFL_ArcSysReadHeapNewLZ(ARCID_ERROR_WINDOW_GRA, ERROR_WINDOW_GRA_PLTT, FALSE, HEAPID_SAVEDATA);
     NNS_G2dGetUnpackedPaletteCompressInfo(file, &compressInfo);
     if (NNS_G2dGetUnpackedPaletteData(file, &palette)) {
         DC_FlushRange(palette->pRawData, 0x20);

@@ -1,4 +1,5 @@
 #include "types.h"
+#include "field/fest_mission_gimmick.h"
 #include "field/fest_mission_hollow.h"
 #include "field/field.h"
 #include "field/field_actor.h"
@@ -9,17 +10,17 @@
 #include "system/area_data.h"
 #include "system/game_data.h"
 
-RivalEntry *RivalSelect_GetEntry(RivalSelectContext *context, u32 id) {
-    RivalEntry *entries = LinkFestival_GetEntries(context->entryOwner);
-    return &entries[RivalSelect_FindEntryIndex(context, id)];
+RivalEntry *RivalSelect_GetEntry(FesGimmick *gimmick, u32 id) {
+    RivalEntry *entries = LinkFestival_GetEntries(gimmick->festival);
+    return &entries[RivalSelect_FindEntryIndex(gimmick, id)];
 }
 
-void RivalSelect_SelectOtherRandom(RivalSelectContext *context, u32 id) {
+void RivalSelect_SelectOtherRandom(FesGimmick *gimmick, u32 id) {
     u8 choices[10];
     int i;
-    u8 current = RivalSelect_FindEntryIndex(context, id);
+    u8 current = RivalSelect_FindEntryIndex(gimmick, id);
     u8 count = 0;
-    RivalEntry *entries = LinkFestival_GetEntries(context->entryOwner);
+    RivalEntry *entries = LinkFestival_GetEntries(gimmick->festival);
     u8 choice;
 
     if (current == 10) {
@@ -36,21 +37,21 @@ void RivalSelect_SelectOtherRandom(RivalSelectContext *context, u32 id) {
     entries[choice].selected = 1;
 }
 
-BOOL RivalSelect_RemoveHollowActorIfMission(RivalSelectContext *context) {
-    if (FesMissionHollow_IsActive(context)) {
-        RivalSelect_RemoveHollowActor(context);
+BOOL RivalSelect_RemoveHollowActorIfMission(FesGimmick *gimmick) {
+    if (FesMissionHollow_IsActive(gimmick)) {
+        RivalSelect_RemoveHollowActor(gimmick);
     }
     return FALSE;
 }
 
-BOOL RivalSelect_RemoveHollowActor(RivalSelectContext *context) {
+BOOL RivalSelect_RemoveHollowActor(FesGimmick *gimmick) {
     u8 rival;
     FieldActor *actor;
 
-    if (func_02018fa8(ZoneData_GetAreaID(Field_GetPlayerStateZoneID(context->field))) == TRUE) {
-        rival = getHollowNum(getHollow_RivalData(GameData_GetSaveControl(context->gameData)));
-        if (RivalSelect_IsSelectedAndActive(context, rival) == TRUE) {
-            actor = FindFieldActor(context->actors, 0xe0);
+    if (func_02018fa8(ZoneData_GetAreaID(Field_GetPlayerStateZoneID(gimmick->field))) == TRUE) {
+        rival = getHollowNum(getHollow_RivalData(GameData_GetSaveControl(gimmick->gameData)));
+        if (RivalSelect_IsSelectedAndActive(gimmick, rival) == TRUE) {
+            actor = FindFieldActor(gimmick->actors, 0xe0);
             if (actor != NULL) {
                 DeleteActor(actor);
                 return TRUE;
@@ -60,8 +61,8 @@ BOOL RivalSelect_RemoveHollowActor(RivalSelectContext *context) {
     return FALSE;
 }
 
-BOOL RivalSelect_IsSelectedAndActive(RivalSelectContext *context, u32 id) {
-    RivalEntry *entries = LinkFestival_GetEntries(context->entryOwner);
+BOOL RivalSelect_IsSelectedAndActive(FesGimmick *gimmick, u32 id) {
+    RivalEntry *entries = LinkFestival_GetEntries(gimmick->festival);
     int i;
     for (i = 0; i < 10; i++) {
         if (entries[i].id == id && entries[i].selected == 1 && entries[i].active != 0) {
@@ -71,8 +72,8 @@ BOOL RivalSelect_IsSelectedAndActive(RivalSelectContext *context, u32 id) {
     return FALSE;
 }
 
-void RivalSelect_SetActive(RivalSelectContext *context, u32 id) {
-    RivalEntry *entries = LinkFestival_GetEntries(context->entryOwner);
+void RivalSelect_SetActive(FesGimmick *gimmick, u32 id) {
+    RivalEntry *entries = LinkFestival_GetEntries(gimmick->festival);
     int i;
     for (i = 0; i < 10; i++) {
         if (entries[i].id == id) {
@@ -81,8 +82,8 @@ void RivalSelect_SetActive(RivalSelectContext *context, u32 id) {
     }
 }
 
-u8 RivalSelect_FindEntryIndex(RivalSelectContext *context, u32 id) {
-    RivalEntry *entries = LinkFestival_GetEntries(context->entryOwner);
+u8 RivalSelect_FindEntryIndex(FesGimmick *gimmick, u32 id) {
+    RivalEntry *entries = LinkFestival_GetEntries(gimmick->festival);
     int i;
     for (i = 0; i < 10; i++) {
         if (entries[i].id == id) {

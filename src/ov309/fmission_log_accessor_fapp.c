@@ -129,7 +129,7 @@ void FMissionLogFApp_EndMission(LinkFestival *festival, FMissionAppResult *resul
         BOOL second;
         fx32 sum;
         u16 gained;
-        void *levels;
+        PassPowerLevel *levels;
         fx32 rate;
         FestMissionInfo *info;
         u32 points;

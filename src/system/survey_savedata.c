@@ -7,7 +7,6 @@
 // before today, the player's own answers and the questions being surveyed. The ROM has no string for the file, so the
 // name is descriptive. Block 0x3d.
 
-#define SAVE_BLOCK_SURVEY 0x3d
 #define SURVEY_TODAY_COUNT_MAX 9999
 #define SURVEY_TODAY_ANSWER_MAX 99
 #define SURVEY_TOTAL_COUNT_MAX 999999

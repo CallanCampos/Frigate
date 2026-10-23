@@ -93,9 +93,9 @@ static void BeaconDetail_UpdatePMSDraw(BeaconDetailWork *work);
 static const u8 sBeaconDetailWindowWidths[] = { 19, 19, 19, 11 };
 
 static const TouchBarItem sBeaconDetailTouchBarItems[] = {
-    { BEACON_DETAIL_ICON_RETURN, { 232, 168 } },
-    { BEACON_DETAIL_ICON_NEXT, { 200, 168 } },
-    { BEACON_DETAIL_ICON_PREV, { 168, 168 } },
+    { TOUCHBAR_ICON_RETURN, { 232, 168 } },
+    { TOUCHBAR_ICON_DOWN, { 200, 168 } },
+    { TOUCHBAR_ICON_UP, { 168, 168 } },
 };
 
 static BOOL BeaconDetail_Init(GameProc *proc, u32 *state, void *param, void *data) {
@@ -225,7 +225,7 @@ static u32 BeaconDetail_SeqFadeOut(BeaconDetailWork *work) {
         // The return button's animation ends first, unless the game itself ends the screen
         if (!work->param->unk0A) {
             BeaconDetail_UpdateTouchBar(work->touchBar);
-            if (TouchBar_GetDecided(work->touchBar) != BEACON_DETAIL_ICON_RETURN) {
+            if (TouchBar_GetDecided(work->touchBar) != TOUCHBAR_ICON_RETURN) {
                 break;
             }
         }

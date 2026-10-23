@@ -150,7 +150,7 @@ struct BtlMainModule {
     PokeParty *unk2B8;
     BtlField *field;
     PartyPkm *unk2C0;
-    void *unk2C4;
+    BtlNetPartyPacket *unk2C4;
     BtlRecReader recReader;
     void *unk3E0[4];
     MATHRandContext32 rand;

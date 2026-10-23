@@ -8,7 +8,7 @@ data_ov105_021eee2c kind:data(any) addr:0x021eee6c
 data_ov105_021eee30 kind:data(any) addr:0x021eee70
 data_ov105_021eee34 kind:data(any) addr:0x021eee74
 data_ov105_021eee3c kind:data(any) addr:0x021eee7c
-data_ov105_021eee44 kind:data(any) addr:0x021eee84
+sAnimations08 kind:data(any) addr:0x021eee84
 data_ov105_021eee4c kind:data(any) addr:0x021eee8c
 data_ov105_021eee4d kind:data(any) addr:0x021eee8d ambiguous
 data_ov105_021eee54 kind:data(any) addr:0x021eee94

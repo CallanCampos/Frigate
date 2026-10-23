@@ -6,20 +6,6 @@
 // The Y button's shortcuts: the shortcut menu's position, which GameData keeps, and the shortcuts of the key items. A
 // guessed name, our names
 
-// The shortcuts of key items
-#define SHORTCUT_BICYCLE 0
-#define SHORTCUT_TOWN_MAP 1
-#define SHORTCUT_VS_RECORDER 2
-#define SHORTCUT_PAL_PAD 3
-#define SHORTCUT_SUPER_ROD 4
-#define SHORTCUT_DOWSING_MCHN 5
-#define SHORTCUT_GRACIDEA 6
-#define SHORTCUT_DNA_SPLICERS_FUSE 7
-#define SHORTCUT_DNA_SPLICERS_SEPARATE 8
-#define SHORTCUT_XTRANSCEIVER 28
-#define SHORTCUT_MEDAL_BOX 29
-#define SHORTCUT_REVEAL_GLASS 33
-
 typedef struct {
     u16 item : 10;
     u16 shortcut : 6;
