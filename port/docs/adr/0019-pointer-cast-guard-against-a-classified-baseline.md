@@ -70,12 +70,14 @@ a merge.
   game-changes.md), and the two null tests of cut pointers (`PosEventAdd`, CPS's `no_need_inq`) test static data, not
   the arena. A comparison of cut addresses that could straddle 4 GiB is a `real` row.
 
-The groups of real rows when the guard was added, 213 sites in all:
+The groups of real rows when the guard was added, on `main` after the sync of upstream `b62c655bfa` and PR 14,
+182 sites in all (on `8ca29313d1`, where the baseline was first regenerated, they were 213: PR 14 fixed most of Join
+Avenue's, and upstream typed the box name entry's parameters, group R08):
 
 | Group | What | Sites |
 | --- | --- | --- |
-| R02–R05 | The field: the Y button's shortcut menu, the Day Care's egg and mail, the field-move cut-in's palette, Join Avenue's names and messages (which the Continue, Save and Town Map screens read too) | 45 |
-| R06, R08 | Battle: the handlers' message in event variable 0x3f, the box name entry after a battle | 18 |
+| R02–R05 | The field: the Y button's shortcut menu, the Day Care's egg and mail, the field-move cut-in's palette, the Join Avenue names that two callers still cut and overlay 137's function types that PR 14's `uptr` getters and setters are cast to | 20 |
+| R06 | Battle: the handlers' message in event variable 0x3f | 12 |
 | R09, R11–R19 | Menus and apps: evolution by trade, Mystery Gift, GX's extended palettes, the C-Gear and Funfest views, Memory Link, Pokéstar Studios, the Musical, the mic | 51 |
 | R21–R24 | Wireless and Wi-Fi (phase 7): the Union Room, DWC's game code, the Wi-Fi libraries, local wireless and Download Play | 99 |
 

@@ -46,7 +46,9 @@ workflow goes in the decomp checkout instead; this file is the port's ([CLAUDE.m
   so all of them had to return or take a `uptr`, even those that only give numbers: a callback that returns a `u32`
   through a pointer typed to return a `uptr` leaves the high half undefined on arm64. Its callers keep their numbers
   in 32-bit locals; the guard doesn't count a call's result narrowed as it is stored, and flags any caller that makes
-  a pointer of the cut value.
+  a pointer of the cut value. PR 14 retyped the getters and setters on `main` but not overlay 137's
+  `ResortPersonGetParamFunc` and `ResortPersonSetParamFunc` they are cast to, nor two callers that cut a name with
+  `(u32)` before the setter; the guard's first run after it merged found all of them (R05's `fn-cast` rows).
 
 ## 2026-10-19: the merge of the performance and hygiene tracks, after review
 
