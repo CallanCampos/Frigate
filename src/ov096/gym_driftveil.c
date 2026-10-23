@@ -38,16 +38,18 @@
 
 // The actors of the scene: the pads' tile models, the switches, the elevators, the freight elevator in its two forms,
 // and the models that show the player and the rider on it
-#define ACTOR_SWITCH 0x29
-#define ACTOR_ELEVATOR 0x4d
-#define ACTOR_FREIGHT_RIDER 0x51
-#define ACTOR_FREIGHT 0x52
-#define ACTOR_PLAYER_ELEVATOR_MALE 0x53
-#define ACTOR_PLAYER_ELEVATOR_FEMALE 0x54
-#define ACTOR_PLAYER_FREIGHT_MALE 0x55
-#define ACTOR_PLAYER_FREIGHT_FEMALE 0x56
-#define ACTOR_RIDER 0x57
-#define ACTOR_COUNT 88
+enum {
+    ACTOR_SWITCH = 0x29,
+    ACTOR_ELEVATOR = 0x4d,
+    ACTOR_FREIGHT_RIDER = 0x51,
+    ACTOR_FREIGHT,
+    ACTOR_PLAYER_ELEVATOR_MALE,
+    ACTOR_PLAYER_ELEVATOR_FEMALE,
+    ACTOR_PLAYER_FREIGHT_MALE,
+    ACTOR_PLAYER_FREIGHT_FEMALE,
+    ACTOR_RIDER,
+    ACTOR_COUNT,
+};
 
 // The switch that the player presses to ride up, which the first visit marks as pressed
 #define SWITCH_ELEVATOR 0x1e

@@ -60,10 +60,12 @@
 // the view for another screen. Named by the ROM's "beacon_view_setup.c"; the functions' names are ours
 
 // What the event waits for before it hands over
-#define EVENT_WAIT_BUTTON 0
-#define EVENT_WAIT_TASKS 1
-#define EVENT_WAIT_MENU_BUTTON 2
-#define EVENT_WAIT_MEDAL 3
+enum {
+    EVENT_WAIT_BUTTON,
+    EVENT_WAIT_TASKS,
+    EVENT_WAIT_MENU_BUTTON,
+    EVENT_WAIT_MEDAL,
+};
 
 typedef struct {
     u32 seq;

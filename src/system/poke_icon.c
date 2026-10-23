@@ -16,15 +16,17 @@
 
 // The archive starts with the palette, a second palette that the PC boxes load, and the animations and cells for each
 // OBJ mapping; then come two files for each icon, the second for the female where there is one
-#define POKEICON_FILE_PALETTE 0
-#define POKEICON_FILE_PALETTE_ALT 1
-#define POKEICON_FILE_ANIM_32K 2
-#define POKEICON_FILE_CELL_32K 3
-#define POKEICON_FILE_ANIM_64K 4
-#define POKEICON_FILE_CELL_64K 5
-#define POKEICON_FILE_ANIM_128K 6
-#define POKEICON_FILE_CELL_128K 7
-#define POKEICON_FILE_ICONS 8
+enum {
+    POKEICON_FILE_PALETTE,
+    POKEICON_FILE_PALETTE_ALT,
+    POKEICON_FILE_ANIM_32K,
+    POKEICON_FILE_CELL_32K,
+    POKEICON_FILE_ANIM_64K,
+    POKEICON_FILE_CELL_64K,
+    POKEICON_FILE_ANIM_128K,
+    POKEICON_FILE_CELL_128K,
+    POKEICON_FILE_ICONS,
+};
 
 // The icons after the species': the egg, Manaphy's egg, and the forms, in the order of the form sprites
 #define POKEICON_EGG 683

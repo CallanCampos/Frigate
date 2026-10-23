@@ -24,8 +24,11 @@
 
 // The species and the forms' entries that a profile's Pokémon can be
 #define GDS_PROFILE_SPECIES_END 686
-#define GDS_PROFILE_SEX_MALE 0
-#define GDS_PROFILE_SEX_FEMALE 1
+// The sexes of the profile's player
+enum {
+    GDS_PROFILE_SEX_MALE,
+    GDS_PROFILE_SEX_FEMALE,
+};
 #define GDS_PROFILE_UNION_VIEW_MAX 15
 // The sentences an introduction can be: the first five types and their first twenty sentences
 #define GDS_PROFILE_PMS_TYPE_END 5

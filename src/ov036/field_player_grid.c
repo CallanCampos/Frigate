@@ -25,26 +25,30 @@
 // whether the player walks, cycles or surfs, and the command sets the actor's next animation command
 
 // What the player is doing, which the next command depends on
-#define GRID_STATE_IDLE 0
-#define GRID_STATE_MOVE 1
-#define GRID_STATE_TURN 2
-#define GRID_STATE_BRAKE 3
-#define GRID_STATE_CATWALK_BALANCE 4
-#define GRID_STATE_CATWALK_EXIT 5
-#define GRID_STATE_CATWALK_EXIT_WAIT 6
-#define GRID_STATE_FALL 7
+enum {
+    GRID_STATE_IDLE,
+    GRID_STATE_MOVE,
+    GRID_STATE_TURN,
+    GRID_STATE_BRAKE,
+    GRID_STATE_CATWALK_BALANCE,
+    GRID_STATE_CATWALK_EXIT,
+    GRID_STATE_CATWALK_EXIT_WAIT,
+    GRID_STATE_FALL,
+};
 
 // What the player does next
-#define GRID_COMMAND_NONE 0
-#define GRID_COMMAND_IDLE 1
-#define GRID_COMMAND_MOVE 2
-#define GRID_COMMAND_TURN 3
-#define GRID_COMMAND_BRAKE 4
-#define GRID_COMMAND_JUMP 5
-#define GRID_COMMAND_CATWALK_BALANCE 6
-#define GRID_COMMAND_CATWALK_EXIT 7
-#define GRID_COMMAND_CATWALK_EXIT_WAIT 8
-#define GRID_COMMAND_FALL 9
+enum {
+    GRID_COMMAND_NONE,
+    GRID_COMMAND_IDLE,
+    GRID_COMMAND_MOVE,
+    GRID_COMMAND_TURN,
+    GRID_COMMAND_BRAKE,
+    GRID_COMMAND_JUMP,
+    GRID_COMMAND_CATWALK_BALANCE,
+    GRID_COMMAND_CATWALK_EXIT,
+    GRID_COMMAND_CATWALK_EXIT_WAIT,
+    GRID_COMMAND_FALL,
+};
 
 #define GRID_FLAG_CONST_MOVE 0x1
 // The slide ended on this tile, so it doesn't start again until the player moves
@@ -57,13 +61,17 @@
 // What PlayerMoveCollCheckCatwalk adds to ActorRouteCollCheck's result: the tile ahead is a catwalk
 #define COLL_CATWALK 0x100
 
-#define CONST_MOVE_NONE 0
-#define CONST_MOVE_STRAIGHT 1
+enum {
+    CONST_MOVE_NONE,
+    CONST_MOVE_STRAIGHT,
+};
 
 // How a step's sound repeats
-#define SFX_MODE_WALK 0
-#define SFX_MODE_RUN 1
-#define SFX_MODE_BIKE 2
+enum {
+    SFX_MODE_WALK,
+    SFX_MODE_RUN,
+    SFX_MODE_BIKE,
+};
 
 #define SEASON_ANY 4
 

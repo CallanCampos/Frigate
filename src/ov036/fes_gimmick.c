@@ -21,10 +21,12 @@
 #include "system/game_system.h"
 
 // The kinds of mission that run on the field, FestMissionHeader's kind
-#define MISSION_FLAGS 2
-#define MISSION_HOLLOW 3
-#define MISSION_SPARKLE 4
-#define MISSION_PEOPLE 5
+enum {
+    MISSION_FLAGS = 2,
+    MISSION_HOLLOW,
+    MISSION_SPARKLE,
+    MISSION_PEOPLE,
+};
 
 // The event flags that the first kind of mission clears when it ends
 #define FIRST_MISSION_FLAG 0x3a1

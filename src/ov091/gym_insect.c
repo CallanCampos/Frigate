@@ -40,9 +40,11 @@
 #define RIDE_OBJECT_0 8
 
 // The actors of the gym's scene: the two objects, the model around the player on a ride, and an effect
-#define ACTOR_OBJECT_0 0
-#define ACTOR_RIDE 2
-#define ACTOR_EFFECT 3
+enum {
+    ACTOR_OBJECT_0,
+    ACTOR_RIDE = 2,
+    ACTOR_EFFECT,
+};
 #define OBJECT_COUNT 2
 
 typedef struct {

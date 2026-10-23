@@ -10,9 +10,11 @@ typedef enum {
     PASS_POWER_ID_FIRST,
     PASS_POWER_ID_COUNT = PASS_POWER_COUNT,
 } PassPowerId;
-#define PASS_POWER_UNLOCKED 0
-#define PASS_POWER_NEAR 1
-#define PASS_POWER_LOCKED 2
+enum {
+    PASS_POWER_UNLOCKED,
+    PASS_POWER_NEAR,
+    PASS_POWER_LOCKED,
+};
 // The levels a pass power needs, or one of these
 #define PASS_POWER_LEVEL_NONE 0xff
 #define PASS_POWER_SPECIAL 0xfe

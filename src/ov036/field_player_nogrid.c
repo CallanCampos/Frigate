@@ -20,18 +20,22 @@
 #include "system/game_system.h"
 
 // What the player is doing, which the next command depends on
-#define NOGRID_STATE_IDLE 0
-#define NOGRID_STATE_MOVE 1
-#define NOGRID_STATE_TURN 2
-#define NOGRID_STATE_BRAKE 3
+enum {
+    NOGRID_STATE_IDLE,
+    NOGRID_STATE_MOVE,
+    NOGRID_STATE_TURN,
+    NOGRID_STATE_BRAKE,
+};
 
 // What the player does next
-#define NOGRID_COMMAND_NONE 0
-#define NOGRID_COMMAND_IDLE 1
-#define NOGRID_COMMAND_MOVE 2
-#define NOGRID_COMMAND_TURN 3
-#define NOGRID_COMMAND_BRAKE 4
-#define NOGRID_COMMAND_JUMP 5
+enum {
+    NOGRID_COMMAND_NONE,
+    NOGRID_COMMAND_IDLE,
+    NOGRID_COMMAND_MOVE,
+    NOGRID_COMMAND_TURN,
+    NOGRID_COMMAND_BRAKE,
+    NOGRID_COMMAND_JUMP,
+};
 
 #define NOGRID_FLAG_SLIDING 0x1
 #define NOGRID_FLAG_SLIDE_END_SPOT 0x2

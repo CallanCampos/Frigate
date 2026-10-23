@@ -42,8 +42,10 @@
 #define PLATE_COUNT 12
 
 // The statue models' animations: 4 plays while the statues move, 5 holds the pose of the state
-#define ANM_MOVE 4
-#define ANM_STATE 5
+enum {
+    ANM_MOVE = 4,
+    ANM_STATE,
+};
 
 // The tiers of the gym's state, from the entrance up to the Gym Leader
 typedef enum {
@@ -61,10 +63,12 @@ typedef enum {
 } OpelucidGymColumn;
 
 // The directions of a move
-#define DIRECTION_UP 0
-#define DIRECTION_DOWN 1
-#define DIRECTION_LEFT 2
-#define DIRECTION_RIGHT 3
+enum {
+    DIRECTION_UP,
+    DIRECTION_DOWN,
+    DIRECTION_LEFT,
+    DIRECTION_RIGHT,
+};
 
 // What the save keeps of the gym: where the player is, and the frames that the models were left at
 typedef struct {

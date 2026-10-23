@@ -20,8 +20,10 @@
 // FestMissionLog_Add.
 
 // What FestMissionOffers_Find returns for a beacon's mission: an offer's index, or one of these
-#define FEST_MISSION_OFFER_NEW FEST_MISSION_OFFER_MAX
-#define FEST_MISSION_OFFER_REJECT 4
+enum {
+    FEST_MISSION_OFFER_NEW = FEST_MISSION_OFFER_MAX,
+    FEST_MISSION_OFFER_REJECT,
+};
 
 // The notice that the offers set (GameBeaconSys_SetNotice)
 #define GAME_BEACON_NOTICE_MISSION 2

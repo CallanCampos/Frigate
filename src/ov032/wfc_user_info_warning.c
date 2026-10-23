@@ -30,9 +30,11 @@
 #define MSG_USER_INFO_ERASED_DSI 42
 
 // The files of the window's graphics in ARCID_ERROR_WINDOW_GRA (save_error.c's)
-#define ERROR_WINDOW_GRA_PLTT 0
-#define ERROR_WINDOW_GRA_CHAR 1
-#define ERROR_WINDOW_GRA_SCRN 2
+enum {
+    ERROR_WINDOW_GRA_PLTT,
+    ERROR_WINDOW_GRA_CHAR,
+    ERROR_WINDOW_GRA_SCRN,
+};
 
 // The message file of Nintendo Wi-Fi Connection's errors in ARCID_SYSTEM_MESSAGE
 #define MSG_FILE_WIFI_ERROR TEXT_BANK_WIFI_ERROR

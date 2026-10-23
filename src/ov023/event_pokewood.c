@@ -40,8 +40,10 @@
 #include "text/system/event_pass_power_startmenu.h"
 
 // The kinds of movie event, in PokewoodMovieParam's kind
-#define POKEWOOD_KIND_FILM 1
-#define POKEWOOD_KIND_WATCH 2
+enum {
+    POKEWOOD_KIND_FILM = 1,
+    POKEWOOD_KIND_WATCH,
+};
 
 // The slot of the movie that is still in the Pokewood block, the one just filmed
 #define POKEWOOD_BLOCK_SLOT 8
@@ -450,13 +452,13 @@ static BtlSetup *EventPokewood_CreateSetup(PokewoodMovieParam *param, GameSystem
 
     switch (param->kind) {
     case 0:
-    case 1:
+    case POKEWOOD_KIND_FILM:
         setup = EventPokewood_CreateFilmSetup(gsys, field, heapId, param->movie);
         setup->fieldSituation.bgm = SEQ_BGM_PW_FILMING;
         setup->fieldSituation.unk12 = SEQ_BGM_WIN1;
         EventPokewood_LoadIntroText(param, setup, param->movie, POKEWOOD_KIND_FILM, heapId);
         break;
-    case 2:
+    case POKEWOOD_KIND_WATCH:
         setup = EventPokewood_LoadWatchSetup(gsys, field, heapId, param->slot);
         file = GFL_ArcSysReadHeapNew(ARCID_POKEWOOD_MOVIE, setup->unkDF, HEAPID_TAIL(heapId));
         setup->fieldSituation.bgm = file->bgm;

@@ -25,14 +25,18 @@
 // until it is reset. The file's name is a guess, from swan's names: the ROM has no string for it
 
 // The messages of the errors, in MSG_FILE_SAVE_ERROR
-#define SAVE_ERROR_READ 0
-#define SAVE_ERROR_NO_RESPONSE 1
-#define SAVE_ERROR_WRITE 2
+enum {
+    SAVE_ERROR_READ,
+    SAVE_ERROR_NO_RESPONSE,
+    SAVE_ERROR_WRITE,
+};
 
 // The files of the window's graphics in ARCID_ERROR_WINDOW_GRA
-#define SAVE_ERROR_GRA_PLTT 0
-#define SAVE_ERROR_GRA_CHAR 1
-#define SAVE_ERROR_GRA_SCRN 2
+enum {
+    SAVE_ERROR_GRA_PLTT,
+    SAVE_ERROR_GRA_CHAR,
+    SAVE_ERROR_GRA_SCRN,
+};
 
 // The message file of the errors in ARCID_SYSTEM_MESSAGE
 #define MSG_FILE_SAVE_ERROR TEXT_BANK_SAVE_ERROR

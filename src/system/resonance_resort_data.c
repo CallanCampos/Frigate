@@ -54,10 +54,12 @@
 
 // JOIN_AVE_PARAM_STATUS: how a person last came, replacing one whose stay was over, into an empty place, or as a merge
 // that changed the trainer type or not
-#define JOIN_AVE_STATUS_NEW 1
-#define JOIN_AVE_STATUS_ADDED 2
-#define JOIN_AVE_STATUS_CHANGED 3
-#define JOIN_AVE_STATUS_UPDATED 4
+enum {
+    JOIN_AVE_STATUS_NEW = 1,
+    JOIN_AVE_STATUS_ADDED,
+    JOIN_AVE_STATUS_CHANGED,
+    JOIN_AVE_STATUS_UPDATED,
+};
 
 // How long a person with JoinAvenueShopChoice.unk0 set stays, in seconds (sStayDurations has the others)
 #define JOIN_AVE_STAY_SHORT (3 * 60 * 60)

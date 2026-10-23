@@ -111,16 +111,20 @@
 
 // What FieldPlayer_GetMoveObserveStatus says of the player's last action command: none, one that has started, one
 // that goes on, and one that has just ended
-#define OBSERVE_NONE 0
-#define OBSERVE_START 1
-#define OBSERVE_MOVING 2
-#define OBSERVE_END 3
+enum {
+    OBSERVE_NONE,
+    OBSERVE_START,
+    OBSERVE_MOVING,
+    OBSERVE_END,
+};
 
 // What FieldPlayer_GetMoveStatus says the player does, as the grid's player sets it: stands (or brakes against a wall),
 // moves to the next tile, or turns on the spot
-#define MOVE_STATUS_NONE 0
-#define MOVE_STATUS_MOVE 1
-#define MOVE_STATUS_TURN 2
+enum {
+    MOVE_STATUS_NONE,
+    MOVE_STATUS_MOVE,
+    MOVE_STATUS_TURN,
+};
 
 // The action commands of the dash and the dash up a slope, which come in one per direction, and of the two jumps that
 // the player makes off the water

@@ -33,9 +33,11 @@
 // to subscreen 14. The names are ours
 
 // The sequences, by the mode
-#define MODE_POWER_ON 0
-#define MODE_POWER_OFF 1
-#define MODE_NO_WIRELESS 2
+enum {
+    MODE_POWER_ON,
+    MODE_POWER_OFF,
+    MODE_NO_WIRELESS,
+};
 
 // The messages of system message file 25
 #define MSG_ASK_POWER_ON 0

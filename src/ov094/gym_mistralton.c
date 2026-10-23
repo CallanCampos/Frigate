@@ -45,11 +45,13 @@
 #define GRID_COLUMNS 23
 // What a cell of the grid is: where the player is stopped, where the first step is, where the cannon is, and where the
 // player is held up
-#define GRID_FREE 0
-#define GRID_WALL 1
-#define GRID_START 2
-#define GRID_CANNON 3
-#define GRID_PLATFORM 4
+enum {
+    GRID_FREE,
+    GRID_WALL,
+    GRID_START,
+    GRID_CANNON,
+    GRID_PLATFORM,
+};
 
 // The frames in the gym at which the stage becomes 1 and 2
 #define STAGE_1_FRAMES 0x3c
