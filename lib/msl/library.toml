@@ -33,11 +33,13 @@ flags = [
     "-nolink",
     "-msgstyle gcc",
 ]
+# fp_fastI.s, the hand-written runtime, with mwasmarm of the same version: ARMv5TE, like the code that calls it
+asm_flags = ["-proc arm5TE", "-msgstyle gcc"]
 
 # fdlibm is built with inlining off, as if its sources began with #pragma dont_inline on: __kernel_rem_pio2 matches
 # only then (also with -ipa file or #pragma inline_depth(0)); with inlining on the compiler drops two loop guards
 # that the ROM keeps (cmp r8, #0 / blt after the adds that sets m, and cmpgt r0, #0 before z = q[jz]). The other fdlibm
-# files match either way, so they follow it. fp/fp_fastI.c, the soft-float runtime, is hand-written assembly (mrs and
+# files match either way, so they follow it. fp/fp_fastI.s, the soft-float runtime, is hand-written assembly (mrs and
 # msr on the flags, several entry points per routine), not C.
 # These runtime files carry the original compiler-generated exception indices in ARM9 rodata.
 [file_flags]

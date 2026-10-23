@@ -1,17 +1,20 @@
 #!/usr/bin/env python3
 """Give a compiled object's functions the second names that the configs record as labels.
 
-    object_aliases.py build/b2_us/lib/msl/src/fp/fp_fastI.unaliased.o build/b2_us/lib/msl/src/fp/fp_fastI.o \\
-        _ll_mul=_ull_mul ...
+    object_aliases.py build/b2_us/lib/nitrowifi/src/wcm/wcm.unaliased.o build/b2_us/lib/nitrowifi/src/wcm/wcm.o \\
+        ReshZekSave_UnresolvedInitTarget=WcmGetLinkLevel
 
-A runtime routine of MSL's can have two names that the code calls, such as `_ull_mul` and `_ll_mul`, and dsd keeps
-the second as a label at the function's start. A delinked object
-defines both; an object that MWCC compiles from an `asm` function defines one, since MWCC's ARM assembler takes no
-`entry` and ignores an alias attribute or pragma. The linker can't give the other either: a symbol that its script
-assigns has no ARM or Thumb type, so a Thumb `bl` to it stays a `bl` where an ARM routine needs a `blx`. So this adds
-each label to the object's symbol table as a copy of its function's symbol, with the same section, value and type,
-which the linker treats like any function. Its size is 0, as a label's, since mwldarm refuses a section whose symbols'
-sizes add up to more than the section. configure.py runs this for every file that has such a label.
+A function can have a second name that other code calls, which dsd keeps as a label at the function's start. A
+delinked object defines both; an object that MWCC compiles defines one, since MWCC ignores an alias attribute or
+pragma and its ARM assembler takes no `entry`. (A library written in assembly gives its routines both names itself,
+as MSL's fp_fastI.s does with mwasmarm.) The one such label left is ReshZekSave_UnresolvedInitTarget, which main's
+ReshZekSave_Init calls at an address of the overlay region whose function is still unknown.
+
+The linker can't give the second name either: a symbol that its script assigns has no ARM or Thumb type, so a Thumb
+`bl` to it stays a `bl` where an ARM routine needs a `blx`. So this adds each label to the object's symbol table as a
+copy of its function's symbol, with the same section, value and type, which the linker treats like any function. Its
+size is 0, as a label's, since mwldarm refuses a section whose symbols' sizes add up to more than the section.
+configure.py runs this for every compiled C file that has such a label.
 """
 import argparse
 import re

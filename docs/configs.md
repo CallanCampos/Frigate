@@ -177,8 +177,13 @@ ABS32 relocations to the actual Thumb SDK symbols, and redirects the compiler's 
 to generated local symbols. The normal ARM946E final link uses that derived object; objdiff uses
 the unchanged compiler object. No source-function bytes, sizes or data are replaced.
 
-This is a representation of genuine linker-generated code; the original architecture settings
-and Nintendo's exact build procedure remain unknown. The helper has no ROM input or fixed game
+This is a representation of genuine linker-generated code, of a library that was linked apart from the game: no
+setting of the game's link gives these veneers alone. Compiling `dsprot_detect.c` for `v4t`, `arm7tdmi` or `v5t`
+(under dsi/1.1p1, dsi/1.2 or 2.0/sp2) emits no veneer and leaves the object's ELF flags as they are, so the linker
+has no per-object architecture to follow; linking the whole program as `v4t` gives these eight and 0x120 bytes of
+others, for the overlay's Thumb calls of ARM code; and a `-partial` link of the object alone gives none, since it
+doesn't know that its targets are Thumb. DS Protect's object evidently came already linked against the SDK as
+ARMv4T code, as a vendor's library can, and the prelink reproduces that. The helper has no ROM input or fixed game
 addresses. It discovers addresses on every prelink, including `--shift` builds, and requires
 contiguous generated fragments, real Thumb mappings and eight veneers. Unsupported ELF metadata,
 unexpected layouts and linker diagnostics fail with an error. Modified code that changes these

@@ -2527,7 +2527,7 @@ lib/msl/src/extras_string.c:
     complete
     .text       start:0x0208c1ac end:0x0208c224
 
-lib/msl/src/fp/fp_fastI.c:
+lib/msl/src/fp/fp_fastI.s:
     complete
     .text       start:0x0208c224 end:0x0208ece0
 

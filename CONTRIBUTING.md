@@ -58,7 +58,8 @@ still linked, and objdiff shows how close it is.
   [Nonmatching functions](docs/nonmatching-functions.md) with both versions' addresses, the difference and what you
   tried. In `lib/` only, a function the SDK, or a library it bundles, wrote in assembly is written as an MWCC `asm`
   function, and assembly the library inlined at several call sites as a `static inline` with an `asm {}` block, each
-  with a comment saying so.
+  with a comment saying so. A library that is hand-written assembly as a whole, whose routines have several entries
+  or names (MSL's runtime, `fp_fastI.s`), is an assembly file, assembled by its compiler version's mwasmarm.
 - **Write the C from the assembly.** Other decompilations, such as pret's pokeplatinum and pokeheartgold and
   ntrtwl's SDK reconstructions, are good references for names and structure. A function may follow another
   decompilation's structure where that is what matches, rewritten in this project's names, types and format, but
