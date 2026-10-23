@@ -127,7 +127,7 @@ void MCSSSys_SetSpindaLoadCallback(MCSSSystem *system, u32 personality) {
 
 static BOOL MCSS_SpindaLoadCallback(const MCSSLoadInfo *info, MCSSLoad *load, u32 personality) {
     if (info->bin == POKEGRA_SPINDA_BIN) {
-        MCSS_DrawSpindaSpots(load->chars->rawData, personality);
+        MCSS_DrawSpindaSpots(load->chars->pRawData, personality);
     }
     return TRUE;
 }

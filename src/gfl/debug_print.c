@@ -18,11 +18,11 @@ void GFL_DebugPrintCreateSurface(void) {
     GX_SetDispSelect(GX_DISP_SELECT_SUB_MAIN);
     GX_SetGraphicsMode(GX_DISPMODE_GRAPHICS, GX_BGMODE_0, GX_BG0_AS_2D);
     G2_BlendNone();
-    GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, 0);
+    GX_SetMasterBrightness(0);
     GX_SetVisibleWnd(GX_WNDMASK_NONE);
     GX_SetVisiblePlane(GX_PLANEMASK_BG0);
-    GX_SetBGScrOffset(0);
-    GX_SetBGCharOffset(0);
+    GX_SetBGScrOffset(GX_BGSCROFFSET_0x00000);
+    GX_SetBGCharOffset(GX_BGCHAROFFSET_0x00000);
     G2_SetBG0Control(GX_BG_SCRSIZE_TEXT_256x256, GX_BG_COLORMODE_16, GX_BG_SCRBASE_0x0000, GX_BG_CHARBASE_0x10000,
                      GX_BG_EXTPLTT_01);
     G2_SetBG0Priority(0);

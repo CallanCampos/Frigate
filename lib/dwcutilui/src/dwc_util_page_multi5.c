@@ -27,12 +27,12 @@ enum {
 
 static BOOL DWCUtilPageMulti5_IsLidClosed(void);
 static void DWCUtilPageMulti5_LoadGraphics(void);
-static void DWCUtilPageMulti5_FadeIn(void);
-static void DWCUtilPageMulti5_WaitFadeIn(void);
+static void procInit(void);
+static void procInit1(void);
 static void DWCUtilPageMulti5_WaitButtons(void);
-static void DWCUtilPageMulti5_Main(void);
+static void procScene(void);
 static void DWCUtilPageMulti5_HandleInput(void);
-static void func_ov182_021b0558(void);
+static void draw(void);
 static void DWCUtilPageMulti5_HandleChoice(void);
 static void DWCUtilPageMulti5_DisableButtons(void);
 static void DWCUtilPageMulti5_FadeOut(void);
@@ -50,13 +50,13 @@ static BOOL DWCUtilPageMulti5_IsLidClosed(void) {
 }
 
 void DWCUtilPageMulti5_Init(void) {
-    DWCUtilMove_Start(DWCUtilPageMulti5_OnMoveEvent);
+    DWCi_MOVlInit(DWCUtilPageMulti5_OnMoveEvent);
     sMoveWaitEnd = MOVE_WAIT_CANCELLED;
     DWCUtilPageMulti5_LoadGraphics();
-    DWCUtilGfxResource_ShowMessage(0x1c);
-    DWCUtilUiEffect_Init(0);
+    DWCi_CMNlMsgDraw(0x1c);
+    DWCi_ANIMElInitEx(0);
     DWCUtilSound_PlaySe(0xb);
-    DWCUtilMain_SetUpdate(DWCUtilPageMulti5_FadeIn);
+    DWCi_ChangeScene(procInit);
 }
 
 static void DWCUtilPageMulti5_LoadGraphics(void) {
@@ -68,48 +68,48 @@ static void DWCUtilPageMulti5_LoadGraphics(void) {
     G2_SetBG2Priority(3);
 }
 
-static void DWCUtilPageMulti5_FadeIn(void) {
-    DWCUtilFade_Start(DWC_UTIL_FADE_FROM_WHITE, 0,
-                      GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ, 8);
-    DWCUtilDisplay_ShowPlanes(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
-    DWCUtilMain_SetUpdate(DWCUtilPageMulti5_WaitFadeIn);
+static void procInit(void) {
+    DWCi_EFFlFade(DWC_UTIL_FADE_FROM_WHITE, 0, GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ,
+                  8);
+    DWCi_GXlInvisible(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
+    DWCi_ChangeScene(procInit1);
 }
 
-static void DWCUtilPageMulti5_WaitFadeIn(void) {
-    if (DWCUtilFade_IsActive(0) == 0) {
-        DWCUtilGfxResource_ShowButtons(1);
-        DWCUtilMain_SetUpdate(DWCUtilPageMulti5_WaitButtons);
+static void procInit1(void) {
+    if (DWCi_EFFlCheck(0) == 0) {
+        DWCi_CMNlButton(1);
+        DWCi_ChangeScene(DWCUtilPageMulti5_WaitButtons);
     }
 }
 
 static void DWCUtilPageMulti5_WaitButtons(void) {
-    if (DWCUtilUiObject_GetState() != -2) {
-        DWCUtilMain_SetUpdate(DWCUtilPageMulti5_Main);
+    if (DWCi_BTNlGet() != -2) {
+        DWCi_ChangeScene(procScene);
     }
 }
 
-static void DWCUtilPageMulti5_Main(void) {
+static void procScene(void) {
     DWCUtilPageMulti5_HandleInput();
-    func_ov182_021b0558();
+    draw();
     DWCUtilPageMulti5_HandleChoice();
 }
 
 static void DWCUtilPageMulti5_HandleInput(void) {
-    if (DWCUtilTouch_IsKeyPressed(2)) {
-        DWCUtilUiObject_SetStateIfIdle(0);
+    if (DWCi_IPTlCheckTrigger(2)) {
+        DWCi_BTNlSet(0);
     } else if (DWCUtilPageMulti5_IsLidClosed()) {
-        DWCUtilUiObject_SetStateIfIdle(0);
+        DWCi_BTNlSet(0);
     }
 }
 
-static void func_ov182_021b0558(void) {
+static void draw(void) {
 }
 
 static void DWCUtilPageMulti5_HandleChoice(void) {
-    if (DWCUtilUiObject_GetState() == 0) {
+    if (DWCi_BTNlGet() == 0) {
         DWCUtilSound_StopSe();
         DWCUtilSound_PlaySe(7);
-        DWCUtilMain_SetUpdate(DWCUtilPageMulti5_DisableButtons);
+        DWCi_ChangeScene(DWCUtilPageMulti5_DisableButtons);
     }
 }
 
@@ -117,56 +117,56 @@ static void DWCUtilPageMulti5_DisableButtons(void) {
     if (sMoveWaitEnd == MOVE_WAIT_CANCELLED) {
         DWCUtilMove_End();
     }
-    DWCUtilUiObject_Disable();
-    DWCUtilFade_StartWait(8);
-    DWCUtilMain_SetUpdate(DWCUtilPageMulti5_FadeOut);
+    DWCi_BTNlDisable();
+    DWCi_EFFlWait(8);
+    DWCi_ChangeScene(DWCUtilPageMulti5_FadeOut);
 }
 
 static void DWCUtilPageMulti5_FadeOut(void) {
-    if (DWCUtilFade_IsActive(1) != 0) {
+    if (DWCi_EFFlCheck(1) != 0) {
         return;
     }
-    if (sMoveWaitEnd == MOVE_WAIT_CANCELLED && !DWCUtilMove_HasEnded()) {
+    if (sMoveWaitEnd == MOVE_WAIT_CANCELLED && !DWCi_MOVlIsEnd()) {
         return;
     }
-    DWCUtilUiObject_Exit();
+    DWCi_BTNlEnd();
     if (sMoveWaitEnd == MOVE_WAIT_CANCELLED) {
-        DWCUtilFade_Start(DWC_UTIL_FADE_TO_WHITE, 1, GX_BLEND_PLANEMASK_BG0, 8);
+        DWCi_EFFlFade(DWC_UTIL_FADE_TO_WHITE, 1, GX_BLEND_PLANEMASK_BG0, 8);
     }
-    DWCUtilFade_Start(DWC_UTIL_FADE_TO_WHITE, 0,
-                      GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ, 8);
-    DWCUtilMain_SetUpdate(DWCUtilPageMulti5_WaitFadeOut);
+    DWCi_EFFlFade(DWC_UTIL_FADE_TO_WHITE, 0, GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ,
+                  8);
+    DWCi_ChangeScene(DWCUtilPageMulti5_WaitFadeOut);
 }
 
 static void DWCUtilPageMulti5_WaitFadeOut(void) {
-    if (DWCUtilFade_IsActive(0) != 0) {
+    if (DWCi_EFFlCheck(0) != 0) {
         return;
     }
-    if (sMoveWaitEnd == MOVE_WAIT_CANCELLED && DWCUtilFade_IsActive(1) != 0) {
+    if (sMoveWaitEnd == MOVE_WAIT_CANCELLED && DWCi_EFFlCheck(1) != 0) {
         return;
     }
-    if (!DWCUtilUiObject_IsIdle()) {
+    if (!DWCi_BTNlIsEnd()) {
         return;
     }
-    if (sMoveWaitEnd == MOVE_WAIT_CANCELLED && !DWCUtilMove_HasEnded()) {
+    if (sMoveWaitEnd == MOVE_WAIT_CANCELLED && !DWCi_MOVlIsEnd()) {
         return;
     }
-    DWCUtilUiEffect_Destroy();
-    DWCUtilText_DestroyScreenBg(0);
+    DWCi_ANIMElEnd();
+    DWCi_FNTlDeleteBgLcd(0);
     if (sMoveWaitEnd == MOVE_WAIT_CANCELLED) {
-        DWCUtilScreen_Stop();
+        DWCi_COMMENTlDelete();
         DWCUtilDisplay_HidePlanes(1, GX_PLANEMASK_BG0);
     }
     DWCUtilDisplay_HidePlanes(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
     if (sMoveWaitEnd == MOVE_WAIT_CANCELLED) {
-        DWCUtilMain_SetLayout(0, 1);
-        DWCUtilMain_SetUpdate(DWCUtilOptionMenu_Init);
+        DWCi_SetParam_(0, 1);
+        DWCi_ChangeScene(DWCUtilOptionMenu_Init);
     } else if (sMoveWaitEnd == MOVE_WAIT_EVENT) {
-        DWCUtilMain_SetLayout(0, 1);
-        DWCUtilMain_SetUpdate(DWCUtilNoticeScreen_Init);
+        DWCi_SetParam_(0, 1);
+        DWCi_ChangeScene(DWCUtilNoticeScreen_Init);
     } else {
-        DWCUtilMain_SetLayout(0, 1);
-        DWCUtilMain_SetUpdate(DWCUtilPageMove_Init);
+        DWCi_SetParam_(0, 1);
+        DWCi_ChangeScene(DWCUtilPageMove_Init);
     }
 }
 
@@ -179,6 +179,6 @@ static void DWCUtilPageMulti5_OnMoveEvent(int event) {
         sMoveWaitEnd = MOVE_WAIT_EVENT;
         DWCUtilSound_PlaySe(0x12);
     }
-    DWCUtilMove_SetCallback(NULL);
-    DWCUtilMain_SetUpdate(DWCUtilPageMulti5_DisableButtons);
+    DWCi_MOVlChangeCallback(NULL);
+    DWCi_ChangeScene(DWCUtilPageMulti5_DisableButtons);
 }

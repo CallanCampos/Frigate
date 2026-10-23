@@ -70,7 +70,7 @@ WRAP_SET(GX_SetBankForTex, GXVRamTex)
 WRAP_SET(GX_SetBankForTexPltt, GXVRamTexPltt)
 WRAP_SET(GX_SetBankForClearImage, GXVRamClearImage)
 WRAP_SET(GX_SetBankForARM7, GXVRamARM7)
-WRAP_SET(GX_SetBankForLCDC, u32)
+WRAP_SET(GX_SetBankForLCDC, int)
 WRAP_SET(GX_SetBankForSubBG, GXVRamSubBG)
 WRAP_SET(GX_SetBankForSubOBJ, GXVRamSubOBJ)
 WRAP_SET(GX_SetBankForSubBGExtPltt, GXVRamSubBGExtPltt)
@@ -102,11 +102,11 @@ WRAP_DISABLE(GX_DisableBankForSubOBJ)
 WRAP_DISABLE(GX_DisableBankForSubBGExtPltt)
 WRAP_DISABLE(GX_DisableBankForSubOBJExtPltt)
 
-WRAP_GET(GX_GetBankForOBJ, u16)
+WRAP_GET(GX_GetBankForOBJ, GXVRamOBJ)
 WRAP_GET(GX_GetBankForOBJExtPltt, u32)
 WRAP_GET(GX_GetBankForTex, u32)
 WRAP_GET(GX_GetBankForLCDC, u32)
-WRAP_GET(GX_GetBankForSubOBJ, u16)
+WRAP_GET(GX_GetBankForSubOBJ, GXVRamSubOBJ)
 WRAP_GET(GX_GetBankForSubOBJExtPltt, u32)
 
 // gx_state.c: every use loses its banks and every VRAMCNT goes to 0, so every bank is in no place
@@ -116,8 +116,8 @@ WRAP_VOID(GX_InitGXState)
 // ARM9 or the ARM7. The host's ARM7 side is host code with memory of its own, so nothing is applied: region 0x03's
 // window stays the ARM9's plain memory whatever WRAMCNT says, where the DS leaves the ARM9 none after MI_Init's
 // MI_WRAM_ARM7_ALL. The register keeps the value for whoever reads it
-void port_sdk_MI_SetWramBank(MIWramBank bank);
+void port_sdk_MI_SetWramBank(MIWram bank);
 
-void MI_SetWramBank(MIWramBank bank) {
+void MI_SetWramBank(MIWram bank) {
     port_sdk_MI_SetWramBank(bank);
 }

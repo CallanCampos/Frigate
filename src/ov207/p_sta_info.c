@@ -141,7 +141,7 @@ void PStaInfo_Draw(PStatusWork *wk, PStaInfoWork *info) {
         GFL_BGSysLoadScrArea(2, 0, 0, 32, 24, info->screens[1].screen->rawData, 0, 0, 32, 32);
     }
     GFL_BGSysQueueScrLoad(2);
-    GFL_BGSysBufferScrDefault(6, info->screens[2].screen->rawData, info->screens[2].screen->size);
+    GFL_BGSysBufferScrDefault(6, info->screens[2].screen->rawData, info->screens[2].screen->szByte);
     GFL_BGSysQueueScrLoad(6);
     GFL_BGSysLoadScrArea(5, 0, 0, 32, 3, info->screens[3].screen->rawData, 0, 0, 32, 32);
     GFL_BGSysQueueScrLoad(5);

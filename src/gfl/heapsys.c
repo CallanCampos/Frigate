@@ -334,7 +334,7 @@ u32 GFL_HeapGetHighestAllocatableSize(HeapID heapId) {
         sHeapMgr.lastResult = HEAP_RESULT_1;
     } else {
         sHeapMgr.lastResult = HEAP_RESULT_OK;
-        return HeapBase_GetHighestAllocatableSize(GFL_HeapGetBase(heapId), 4);
+        return NNS_FndGetAllocatableSizeForExpHeapEx(GFL_HeapGetBase(heapId), 4);
     }
     return 0;
 }

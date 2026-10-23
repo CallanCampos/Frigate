@@ -59,7 +59,7 @@ void *GFL_G3DScreenTexCreate(HeapID heapId, u32 bank) {
     MI_CpuCopy8(CAPTURE_TEX_RESHEADER, file, sizeof(CAPTURE_TEX_RESHEADER));
     GFL_G3DResBindData(resource, 2, file);
     tex = NNS_G3dGetTex(file);
-    size = NNS_G3DResTexGetTexDataSize(tex);
+    size = NNS_G3dTexGetRequiredSize(tex);
     // The texture image slots are the texture banks in order, so the bank's image starts after the banks before it
     texBanks = GX_GetBankForTex();
     switch (bank) {
@@ -92,7 +92,7 @@ void *GFL_G3DScreenTexCreate(HeapID heapId, u32 bank) {
     case SCREENTEX_BANK_A:
         break;
     }
-    NNS_G3DResTexSetGfdKeys(tex, NNS_GfdMakeTexKey(offset, size, FALSE), 0);
+    NNS_G3dTexSetTexKey(tex, NNS_GfdMakeTexKey(offset, size, FALSE), 0);
     return resource;
 }
 

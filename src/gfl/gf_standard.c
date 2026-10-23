@@ -45,8 +45,8 @@ s32 GFL_STD_MemCmp(const void *a, const void *b, u32 size) {
     return 0;
 }
 
-u32 GFL_STD_StrLen(const char *str) {
-    u32 len = 0;
+int GFL_STD_StrLen(const char *str) {
+    int len = 0;
 
     for (;;) {
         if (*(const u8 *)str == '\0') {

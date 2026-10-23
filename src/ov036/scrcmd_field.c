@@ -9,9 +9,6 @@
 #include "field/subscreen.h"
 #include "system/pms_word.h"
 
-// The script's sub event of the subscreen, which FIELD_SCRIPT_SUB_EVENT_FINISH_FUNCS finishes when the script ends
-#define SCRIPT_SUB_EVENT_SUBSCREEN 8
-
 typedef struct {
     FieldSubscreen *subscreen;
     u32 mode;

@@ -28,7 +28,7 @@ void BtlField_Delete(BtlField *field);
 u8 BtlField_GetWeather(BtlField *field);
 void BtlField_SetWeather(BtlField *field, u8 weather, u16 turns);
 void BtlField_ClearWeather(BtlField *field);
-BOOL FieldStatusaddEffectCore(BtlField *field, u32 effect, BattleCondition value, BOOL addEvent);
+BOOL FieldStatusaddEffectCore(BtlField *field, unsigned int effect, BattleCondition value, BOOL addEvent);
 BOOL BtlField_RemoveEffect(BtlField *field, u32 effect);
 BOOL BtlField_AddDependPoke(BtlField *field, u32 effect, u8 monId);
 void BtlField_RemoveDependPoke(BtlField *field, u8 monId);

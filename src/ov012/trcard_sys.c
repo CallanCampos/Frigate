@@ -528,7 +528,7 @@ void TrainerCardData_Fill(TrainerCardData *data, GameData *gameData, BOOL isSnap
     data->canEdit = canEdit;
 }
 
-void *TrainerCardParam_Create(GameData *gameData, HeapID heapId, BOOL canEdit) {
+TrainerCardParam *TrainerCardParam_Create(GameData *gameData, HeapID heapId, BOOL canEdit) {
     TrainerCardParam *param = GFL_HeapAllocate(heapId, sizeof(TrainerCardParam), TRUE, "trcard_sys.c", 975);
 
     MI_CpuFill8(param, 0, sizeof(TrainerCardParam));

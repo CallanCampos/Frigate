@@ -197,9 +197,8 @@ void MI_Copy64B(const void *src, void *dest) {
 }
 
 // MI_CpuFill8: fills size bytes with a byte. The original writes halfwords and words only, since the ARM9 can't write
-// a byte to VRAM, and makes them by ORing value with itself shifted, so bits of value above its low byte reach the
-// halfwords' and words' other bytes: 0x1234 fills a halfword with 0x34 and 0x36, a word with 0x34, 0x36, 0x36, 0x36
-void MI_CpuFill8(void *dest, u32 value, u32 size) {
+// a byte to VRAM, and makes them by ORing the SDK's byte-sized value with itself shifted.
+void MI_CpuFill8(void *dest, u8 value, u32 size) {
     u8 *d = dest;
     u16 halfword;
     u32 word;
@@ -223,7 +222,8 @@ void MI_CpuFill8(void *dest, u32 value, u32 size) {
                 return;
             }
         }
-        word = (value | value << 8) | (value | value << 8) << 16;
+        // The SDK byte argument promotes to signed int; widen before the high-half shift.
+        word = (u32)halfword | (u32)halfword << 16;
         for (; size >= 4; size -= 4) {
             StoreWord(d, word);
             d += 4;
@@ -240,8 +240,8 @@ void MI_CpuFill8(void *dest, u32 value, u32 size) {
 
 // MI_CpuFill: fills size bytes with a byte. Up to 8 bytes are stored one at a time. More are a byte and a halfword as
 // needed to reach a word boundary, then words, then bytes; the original also stores a word to reach an 8-byte boundary
-// and stores words 32 bytes at a time, which store the same words. As in MI_CpuFill8, bits of value above its low byte
-// reach the halfword's and the words' other bytes
+// and stores words 32 bytes at a time, which store the same words. Unlike the byte-sized MI_CpuFill8, bits above its
+// low byte reach the halfword's and the words' other bytes
 void MI_CpuFill(void *dest, u32 value, u32 size) {
     u8 *d = dest;
     u32 word;

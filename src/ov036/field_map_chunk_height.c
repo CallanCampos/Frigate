@@ -38,11 +38,11 @@ typedef struct {
 } MapHeightSplit;
 
 // A terrain section of a chunk file: width * height tiles, then the splits
-typedef struct {
+struct MapHeightData {
     u16 width;
     u16 height;
     MapHeightTile tiles[];
-} MapHeightData;
+};
 
 // clang-format off
 static const fx16 MAP_HEIGHT_SLOPE_TABLE[] = {
@@ -489,11 +489,10 @@ static inline u8 MapHeightTile_GetShape(const MapHeightTile *tile) {
 
 // Writes the plane under pos to a layer of out: its normal, its tile type and the height on it, above baseY. pos is
 // relative to the chunk's center and size is the chunk's width
-void FieldChunkAccessor_GetTerrainCore(MapTerrainSamplerOutput *out, u32 layer, void *terrain, const VecFx32 *pos,
+void FieldChunkAccessor_GetTerrainCore(MapTerrainSamplerOutput *out, u32 layer, MapHeightData *data, const VecFx32 *pos,
                                        fx32 size, fx32 baseY) {
     fx32 offset;
     const fx16 *slopes = MAP_HEIGHT_SLOPE_TABLE;
-    MapHeightData *data = terrain;
     fx32 half = size / 2;
     fx32 z = pos->z + half;
     fx32 x = pos->x + half;
@@ -506,14 +505,14 @@ void FieldChunkAccessor_GetTerrainCore(MapTerrainSamplerOutput *out, u32 layer, 
     fx32 dx;
 
     if (shape == TILE_SHAPE_PLANE) {
-        u32 slope = tile->slope * 3;
+        unsigned int slope = tile->slope * 3;
         u16 offsetId = tile->offset;
 
         VEC_Fx16Set(&out->layers[layer].normal, slopes[slope], slopes[slope + 1], -slopes[slope + 2]);
         offset = MAP_HEIGHT_OFFSET_TABLE[offsetId];
     } else if (shape == TILE_SHAPE_SPLIT) {
         MapHeightSplit *split = (MapHeightSplit *)&data->tiles[data->width * data->height] + tile->offset;
-        u32 slope;
+        unsigned int slope;
         u16 offsetId;
 
         if (tile->diagonal == 0) {

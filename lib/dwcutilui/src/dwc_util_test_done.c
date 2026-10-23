@@ -9,28 +9,28 @@
 #include "dwc_util_sound.h"
 #include "nitro/gx.h"
 
-static void DWCUtilTestDone_LoadGraphics(void);
-static void DWCUtilTestDone_FadeIn(void);
+static void initGraphics(void);
+static void procInit(void);
 static void DWCUtilTestDone_WaitFadeIn(void);
 static void DWCUtilTestDone_Main(void);
-static void func_ov182_021b4c2c(void);
-static void DWCUtilTestDone_FadeOut(void);
-static void DWCUtilTestDone_WaitFadeOut(void);
-static void DWCUtilTestDone_UpdateTimer(void);
+static void draw(void);
+static void endScene(void);
+static void endScene1(void);
+static void wait(void);
 
 // The frames since the message appeared
 static u8 sTestDoneFrames;
 
 void DWCUtilTestDone_Init(void) {
     sTestDoneFrames = 0;
-    DWCUtilTestDone_LoadGraphics();
-    DWCUtilBgOverlay_ShowConnectionSet();
-    DWCUtilGfxResource_ShowMessage(0x26);
+    initGraphics();
+    DWCi_HLlLoadSet();
+    DWCi_CMNlMsgDraw(0x26);
     DWCUtilSound_PlaySe(0x10);
-    DWCUtilMain_SetUpdate(DWCUtilTestDone_FadeIn);
+    DWCi_ChangeScene(procInit);
 }
 
-static void DWCUtilTestDone_LoadGraphics(void) {
+static void initGraphics(void) {
     DWCUtilGfxResource_Load("char/xb4Multi.nsc.l", GX_LoadBG2Scr);
     G2S_SetBG0Priority(3);
     G2S_SetBG1Priority(3);
@@ -39,41 +39,41 @@ static void DWCUtilTestDone_LoadGraphics(void) {
     G2_SetBG2Priority(3);
 }
 
-static void DWCUtilTestDone_FadeIn(void) {
-    DWCUtilFade_Start(DWC_UTIL_FADE_FROM_WHITE, 0,
-                      GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ, 8);
-    DWCUtilDisplay_ShowPlanes(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
-    DWCUtilMain_SetUpdate(DWCUtilTestDone_WaitFadeIn);
+static void procInit(void) {
+    DWCi_EFFlFade(DWC_UTIL_FADE_FROM_WHITE, 0, GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ,
+                  8);
+    DWCi_GXlInvisible(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
+    DWCi_ChangeScene(DWCUtilTestDone_WaitFadeIn);
 }
 
 static void DWCUtilTestDone_WaitFadeIn(void) {
-    if (DWCUtilFade_IsActive(0) == 0) {
-        DWCUtilMain_SetUpdate(DWCUtilTestDone_Main);
+    if (DWCi_EFFlCheck(0) == 0) {
+        DWCi_ChangeScene(DWCUtilTestDone_Main);
     }
 }
 
 static void DWCUtilTestDone_Main(void) {
-    DWCUtilTestDone_UpdateTimer();
-    func_ov182_021b4c2c();
+    wait();
+    draw();
 }
 
-static void func_ov182_021b4c2c(void) {
+static void draw(void) {
 }
 
-static void DWCUtilTestDone_FadeOut(void) {
-    DWCUtilFade_Start(DWC_UTIL_FADE_TO_WHITE, 1, GX_BLEND_PLANEMASK_BG0, 8);
-    DWCUtilFade_Start(DWC_UTIL_FADE_TO_WHITE, 0,
-                      GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ, 8);
-    DWCUtilMain_SetUpdate(DWCUtilTestDone_WaitFadeOut);
+static void endScene(void) {
+    DWCi_EFFlFade(DWC_UTIL_FADE_TO_WHITE, 1, GX_BLEND_PLANEMASK_BG0, 8);
+    DWCi_EFFlFade(DWC_UTIL_FADE_TO_WHITE, 0, GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ,
+                  8);
+    DWCi_ChangeScene(endScene1);
 }
 
-static void DWCUtilTestDone_WaitFadeOut(void) {
+static void endScene1(void) {
     DWCUtilPageMulti4_WaitFadeOutInline();
 }
 
-static void DWCUtilTestDone_UpdateTimer(void) {
+static void wait(void) {
     sTestDoneFrames++;
     if (sTestDoneFrames >= 120) {
-        DWCUtilMain_SetUpdate(DWCUtilTestDone_FadeOut);
+        DWCi_ChangeScene(endScene);
     }
 }

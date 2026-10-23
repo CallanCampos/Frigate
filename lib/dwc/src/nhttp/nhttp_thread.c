@@ -48,13 +48,13 @@ BOOL NHTTPi_CheckHeaderEnd(const char *tail, int count) {
 
 // Puts data in the thread's send buffer, and sends the buffer when it is full. Returns the size of the data, or what
 // the socket library returned if that was not more than 0
-int NHTTPi_SaveBuf(NHttpRequest *request, u8 *sendBuffer, int sock, int *count, const u8 *data, const int size) {
+int saveBuf(NHTTPReq *request, u8 *sendBuffer, int sock, int *count, const u8 *data, const int size) {
     int room;
     int result;
     int rest = size;
 
     while (rest > 0) {
-        if (request->canceled != 0) {
+        if (request->doCancel != 0) {
             return -1;
         }
         room = NHTTP_SEND_BUFFER_SIZE - *count;
@@ -78,7 +78,7 @@ int NHTTPi_SaveBuf(NHttpRequest *request, u8 *sendBuffer, int sock, int *count, 
 
 // Reads one byte at a time up to the end of a line, which is CR LF. Returns the number of bytes, or what the socket
 // returned if that was not more than 0
-static int NHTTPi_SkipLine(NHttpMutexInfo *mutexInfo, NHttpRequest *request, int sock) {
+static int skipLineBuf(NHttpMutexInfo *mutexInfo, NHTTPReq *request, int sock) {
     char tail[2];
     int count;
     int total = 0;
@@ -100,7 +100,7 @@ static int NHTTPi_SkipLine(NHttpMutexInfo *mutexInfo, NHttpRequest *request, int
 
 // Adds the size of what the connection's callback gives for a part of the post data, as it will be sent (a part sent
 // as text is longer when it is encoded). Returns FALSE if the callback can't be called
-static BOOL NHTTPi_GetPostContentlength(NHttpMutexInfo *mutexInfo, NHttpRequest *request, const char *name, int *length,
+static BOOL NHTTPi_GetPostContentlength(NHttpMutexInfo *mutexInfo, NHTTPReq *request, const char *name, int *length,
                                         int mode) {
     int total = 0;
     NHttpConnection *connection = NHTTPi_Request2Connection(mutexInfo, request);
@@ -113,7 +113,7 @@ static BOOL NHTTPi_GetPostContentlength(NHttpMutexInfo *mutexInfo, NHttpRequest 
         int size;
         const char *buffer;
 
-        if (request->canceled != 0) {
+        if (request->doCancel != 0) {
             return FALSE;
         }
         connection->userBufferSize = 0;
@@ -144,8 +144,8 @@ static BOOL NHTTPi_GetPostContentlength(NHttpMutexInfo *mutexInfo, NHttpRequest 
 
 // Sends what the connection's callback gives for a part of the post data. Returns 0 if it all went into the send
 // buffer, 1 if the socket failed, 2 if the server closed it and 3 if the connection is gone or the request canceled
-static int NHTTPi_SendPostData(NHttpMutexInfo *mutexInfo, NHttpRequest *request, u8 *sendBuffer, const char *name,
-                               int sock, int *count, int mode) {
+static int NHTTPi_SendPostData(NHttpMutexInfo *mutexInfo, NHTTPReq *request, u8 *sendBuffer, const char *name, int sock,
+                               int *count, int mode) {
     char encoded[3];
     int total = 0;
     NHttpConnection *connection;
@@ -160,7 +160,7 @@ static int NHTTPi_SendPostData(NHttpMutexInfo *mutexInfo, NHttpRequest *request,
         const char *buffer;
         int result;
 
-        if (request->canceled != 0) {
+        if (request->doCancel != 0) {
             return 3;
         }
         connection->userBufferSize = 0;
@@ -179,7 +179,7 @@ static int NHTTPi_SendPostData(NHttpMutexInfo *mutexInfo, NHttpRequest *request,
         switch (mode) {
         case NHTTP_SEND_RAW:
         case NHTTP_SEND_PART:
-            result = NHTTPi_SaveBuf(request, sendBuffer, sock, count, buffer, size);
+            result = saveBuf(request, sendBuffer, sock, count, buffer, size);
             if (result < 0) {
                 return 1;
             }
@@ -192,8 +192,7 @@ static int NHTTPi_SendPostData(NHttpMutexInfo *mutexInfo, NHttpRequest *request,
 
             for (i = 0; i < size; i++) {
                 NHTTPi_memclr(encoded, 3);
-                result =
-                    NHTTPi_SaveBuf(request, sendBuffer, sock, count, encoded, NHTTPi_encodeUrlChar(encoded, buffer[i]));
+                result = saveBuf(request, sendBuffer, sock, count, encoded, NHTTPi_encodeUrlChar(encoded, buffer[i]));
                 if (result < 0) {
                     return 1;
                 }
@@ -210,7 +209,7 @@ static int NHTTPi_SendPostData(NHttpMutexInfo *mutexInfo, NHttpRequest *request,
 
 // Whether the response has room for what is read, asking the connection's callback for a buffer when it has none or it
 // is full
-static BOOL NHTTPi_BufFull(NHttpMutexInfo *mutexInfo, NHttpResponse *response) {
+static BOOL NHTTPi_BufFull(NHttpMutexInfo *mutexInfo, NHTTPRes *response) {
     BOOL ready = FALSE;
     BOOL full = NHTTPi_isRecvBufFull(response, response->bufferUsed);
 
@@ -237,14 +236,14 @@ static int NHTTPi_SendHeaderData(NHttpThreadWork *work, const void *data, int si
     NHttpRoot *root = NHTTPi_GetSystemInfoP();
     NHttpState *state = NHTTPi_GetBgnEndInfoP(root);
     NHttpThreadInfo *thread = NHTTPi_GetThreadInfoP(root);
-    NHttpRequest *request = NHTTPi_GetReqInfoP(root)->current->request;
+    NHTTPReq *request = NHTTPi_GetReqInfoP(root)->current->req;
     u8 *sendBuffer = thread->sendBuffer;
     int result;
 
     if (size == 0) {
         return 0;
     }
-    result = NHTTPi_SaveBuf(request, sendBuffer, state->socket, &work->sendCount, data, size);
+    result = saveBuf(request, sendBuffer, state->socket, &work->sendCount, data, size);
     if (result < 0) {
         return 1;
     }
@@ -256,7 +255,7 @@ static int NHTTPi_SendHeaderData(NHttpThreadWork *work, const void *data, int si
 
 // Sends the Proxy-Authorization header field if the request has the user and the password of the proxy
 static int NHTTPi_SendProxyAuthorization(NHttpThreadWork *work) {
-    NHttpRequest *request = NHTTPi_GetReqInfoP(NHTTPi_GetSystemInfoP())->current->request;
+    NHTTPReq *request = NHTTPi_GetReqInfoP(NHTTPi_GetSystemInfoP())->current->req;
     int result;
 
     if (request->proxyAuthorizationSize == 0) {
@@ -278,7 +277,7 @@ static int NHTTPi_SendProxyAuthorization(NHttpThreadWork *work) {
 }
 
 static int NHTTPi_SendAuthorization(NHttpThreadWork *work) {
-    NHttpRequest *request = NHTTPi_GetReqInfoP(NHTTPi_GetSystemInfoP())->current->request;
+    NHTTPReq *request = NHTTPi_GetReqInfoP(NHTTPi_GetSystemInfoP())->current->req;
     int result;
 
     if (request->authorizationSize == 0) {
@@ -302,7 +301,7 @@ static int NHTTPi_SendAuthorization(NHttpThreadWork *work) {
 // Sends the request that asks the proxy to connect to the server (CONNECT), for a secure connection
 static int NHTTPi_SendProxyConnectMethod(NHttpThreadWork *work) {
     NHttpRoot *root = NHTTPi_GetSystemInfoP();
-    NHttpRequest *request = NHTTPi_GetReqInfoP(root)->current->request;
+    NHTTPReq *request = NHTTPi_GetReqInfoP(root)->current->req;
     u8 *sendBuffer = NHTTPi_GetThreadInfoP(root)->sendBuffer;
     NHttpState *state = NHTTPi_GetBgnEndInfoP(root);
     char port[8];
@@ -313,7 +312,7 @@ static int NHTTPi_SendProxyConnectMethod(NHttpThreadWork *work) {
     if (result != 0) {
         return result;
     }
-    result = NHTTPi_SendHeaderData(work, request->url + 8, request->hostEnd - 8);
+    result = NHTTPi_SendHeaderData(work, request->pURL + 8, request->hostEnd - 8);
     if (result != 0) {
         return result;
     }
@@ -333,7 +332,7 @@ static int NHTTPi_SendProxyConnectMethod(NHttpThreadWork *work) {
     if (result != 0) {
         return result;
     }
-    result = NHTTPi_SendHeaderData(work, request->url + 8, request->hostEnd - 8);
+    result = NHTTPi_SendHeaderData(work, request->pURL + 8, request->hostEnd - 8);
     if (result != 0) {
         return result;
     }
@@ -380,8 +379,8 @@ static BOOL NHTTPi_RecvProxyConnectHeader(NHttpThreadWork *work) {
     u8 *sendBuffer = NHTTPi_GetThreadInfoP(root)->sendBuffer;
     NHttpState *state = NHTTPi_GetBgnEndInfoP(root);
     NHttpMutexInfo *mutexInfo = NHTTPi_GetMutexInfoP(root);
-    NHttpRequest *request = reqInfo->current->request;
-    NHttpResponse *response = request->response;
+    NHTTPReq *request = reqInfo->current->req;
+    NHTTPRes *response = request->response;
     int count;
     BOOL ok = FALSE;
     int received = 0;
@@ -427,13 +426,13 @@ static BOOL NHTTPi_RecvProxyConnectHeader(NHttpThreadWork *work) {
 
 // Sends the header fields that the request was given, taking each off the list
 static int NHTTPi_SendHeaderList(NHttpThreadWork *work) {
-    NHttpRequest *request = NHTTPi_GetReqInfoP(NHTTPi_GetSystemInfoP())->current->request;
-    NHttpHeader *header = NHTTPi_getHdrFromList(&request->headers);
+    NHTTPReq *request = NHTTPi_GetReqInfoP(NHTTPi_GetSystemInfoP())->current->req;
+    NHTTPi_DATALIST *header = NHTTPi_getHdrFromList(&request->pListHeader);
     int result;
 
     if (header != NULL) {
         do {
-            result = NHTTPi_SendHeaderData(work, header->name, NHTTPi_strlen(header->name));
+            result = NHTTPi_SendHeaderData(work, header->label, NHTTPi_strlen(header->label));
             if (result != 0) {
                 return result;
             }
@@ -450,7 +449,7 @@ static int NHTTPi_SendHeaderList(NHttpThreadWork *work) {
                 return result;
             }
             NHTTPi_free(header);
-            header = NHTTPi_getHdrFromList(&request->headers);
+            header = NHTTPi_getHdrFromList(&request->pListHeader);
         } while (header != NULL);
     }
     return 0;
@@ -460,7 +459,7 @@ static int NHTTPi_SendHeaderList(NHttpThreadWork *work) {
 static int NHTTPi_SendProcPostDataRaw(NHttpThreadWork *work) {
     NHttpRoot *root = NHTTPi_GetSystemInfoP();
     NHttpMutexInfo *mutexInfo = NHTTPi_GetMutexInfoP(root);
-    NHttpRequest *request = NHTTPi_GetReqInfoP(root)->current->request;
+    NHTTPReq *request = NHTTPi_GetReqInfoP(root)->current->req;
     u8 *sendBuffer = NHTTPi_GetThreadInfoP(root)->sendBuffer;
     NHttpState *state = NHTTPi_GetBgnEndInfoP(root);
     int length = 0;
@@ -512,11 +511,11 @@ static int NHTTPi_SendProcPostDataRaw(NHttpThreadWork *work) {
 static int NHTTPi_SendProcPostDataBinary(NHttpThreadWork *work) {
     NHttpRoot *root = NHTTPi_GetSystemInfoP();
     NHttpMutexInfo *mutexInfo = NHTTPi_GetMutexInfoP(root);
-    NHttpRequest *request = NHTTPi_GetReqInfoP(root)->current->request;
+    NHTTPReq *request = NHTTPi_GetReqInfoP(root)->current->req;
     NHttpThreadInfo *thread = NHTTPi_GetThreadInfoP(root);
     NHttpState *state = NHTTPi_GetBgnEndInfoP(root);
     int length = 0;
-    NHttpHeader *part;
+    NHTTPi_DATALIST *part;
     char text[12];
     int textLength;
     int result;
@@ -525,13 +524,13 @@ static int NHTTPi_SendProcPostDataBinary(NHttpThreadWork *work) {
     if (part != NULL) {
         do {
             length += NHTTP_BOUNDARY_SIZE + 2;
-            length += NHTTPi_strlen(part->name) + 41;
-            if (part->binary) {
+            length += NHTTPi_strlen(part->label) + 41;
+            if (part->isBinary) {
                 length += 75;
             }
             length += 2;
             if (part->value == NULL) {
-                if (!NHTTPi_GetPostContentlength(mutexInfo, request, part->name, &length, NHTTP_SEND_PART)) {
+                if (!NHTTPi_GetPostContentlength(mutexInfo, request, part->label, &length, NHTTP_SEND_PART)) {
                     return 3;
                 }
             } else {
@@ -589,7 +588,7 @@ static int NHTTPi_SendProcPostDataBinary(NHttpThreadWork *work) {
             if (result != 0) {
                 return result;
             }
-            result = NHTTPi_SendHeaderData(work, part->name, NHTTPi_strlen(part->name));
+            result = NHTTPi_SendHeaderData(work, part->label, NHTTPi_strlen(part->label));
             if (result != 0) {
                 return result;
             }
@@ -597,7 +596,7 @@ static int NHTTPi_SendProcPostDataBinary(NHttpThreadWork *work) {
             if (result != 0) {
                 return result;
             }
-            if (part->binary) {
+            if (part->isBinary) {
                 result = NHTTPi_SendHeaderData(work, sContentTypeOctetStream, sizeof(sContentTypeOctetStream) - 1);
                 if (result != 0) {
                     return result;
@@ -608,7 +607,7 @@ static int NHTTPi_SendProcPostDataBinary(NHttpThreadWork *work) {
                 return result;
             }
             if (part->value == NULL) {
-                result = NHTTPi_SendPostData(mutexInfo, request, thread->sendBuffer, part->name, state->socket,
+                result = NHTTPi_SendPostData(mutexInfo, request, thread->sendBuffer, part->label, state->socket,
                                              &work->sendCount, NHTTP_SEND_PART);
                 if (result != 0) {
                     return result;
@@ -644,11 +643,11 @@ static int NHTTPi_SendProcPostDataBinary(NHttpThreadWork *work) {
 static int NHTTPi_SendProcPostDataAscii(NHttpThreadWork *work) {
     NHttpRoot *root = NHTTPi_GetSystemInfoP();
     NHttpMutexInfo *mutexInfo = NHTTPi_GetMutexInfoP(root);
-    NHttpRequest *request = NHTTPi_GetReqInfoP(root)->current->request;
+    NHTTPReq *request = NHTTPi_GetReqInfoP(root)->current->req;
     u8 *sendBuffer = NHTTPi_GetThreadInfoP(root)->sendBuffer;
     NHttpState *state = NHTTPi_GetBgnEndInfoP(root);
     int length = 0;
-    NHttpHeader *part;
+    NHTTPi_DATALIST *part;
     char text[12];
     int textLength;
     int result;
@@ -656,9 +655,9 @@ static int NHTTPi_SendProcPostDataAscii(NHttpThreadWork *work) {
     part = request->postData;
     if (part != NULL) {
         do {
-            length = length + NHTTPi_getUrlEncodedSize(part->name) + 1;
+            length = length + NHTTPi_getUrlEncodedSize(part->label) + 1;
             if (part->value == NULL) {
-                if (!NHTTPi_GetPostContentlength(mutexInfo, request, part->name, &length, NHTTP_SEND_ENCODED)) {
+                if (!NHTTPi_GetPostContentlength(mutexInfo, request, part->label, &length, NHTTP_SEND_ENCODED)) {
                     return 3;
                 }
             } else {
@@ -697,8 +696,8 @@ static int NHTTPi_SendProcPostDataAscii(NHttpThreadWork *work) {
         do {
             int i;
 
-            for (i = 0; part->name[i] != 0; i++) {
-                result = NHTTPi_SendHeaderData(work, text, NHTTPi_encodeUrlChar(text, part->name[i]));
+            for (i = 0; part->label[i] != 0; i++) {
+                result = NHTTPi_SendHeaderData(work, text, NHTTPi_encodeUrlChar(text, part->label[i]));
                 if (result != 0) {
                     return result;
                 }
@@ -708,7 +707,7 @@ static int NHTTPi_SendProcPostDataAscii(NHttpThreadWork *work) {
                 return result;
             }
             if (part->value == NULL) {
-                result = NHTTPi_SendPostData(mutexInfo, request, sendBuffer, part->name, state->socket,
+                result = NHTTPi_SendPostData(mutexInfo, request, sendBuffer, part->label, state->socket,
                                              &work->sendCount, NHTTP_SEND_ENCODED);
                 if (result != 0) {
                     return result;
@@ -755,11 +754,11 @@ static void NHTTPi_ThreadReqEnd(NHttpThreadWork *work) {
     NHttpState *state = NHTTPi_GetBgnEndInfoP(root);
     NHttpReqInfo *reqInfo = NHTTPi_GetReqInfoP(root);
     NHttpMutexInfo *mutexInfo = NHTTPi_GetMutexInfoP(root);
-    NHttpRequest *request = reqInfo->current->request;
-    NHttpResponse *response = request->response;
+    NHTTPReq *request = reqInfo->current->req;
+    NHTTPRes *response = request->response;
     NHttpConnection *connection = NHTTPi_Request2Connection(mutexInfo, request);
 
-    if (request->canceled != 0) {
+    if (request->doCancel != 0) {
         work->error = 8;
         work->keepAlive = FALSE;
     }
@@ -803,7 +802,7 @@ static void NHTTPi_ThreadReqEnd(NHttpThreadWork *work) {
 static BOOL NHTTPi_ThreadExecReqQueue(NHttpThreadWork *work) {
     NHttpRoot *root = NHTTPi_GetSystemInfoP();
     NHttpMutexInfo *mutexInfo = NHTTPi_GetMutexInfoP(root);
-    NHttpQueueNode *node;
+    NHTTPi_REQLIST *node;
 
     NHTTPi_lockReqList(mutexInfo);
     node = NHTTPi_getReqFromReqQueue(NHTTPi_GetListInfoP(root));
@@ -825,7 +824,7 @@ static BOOL NHTTPi_ThreadExecReqQueue(NHttpThreadWork *work) {
 
 // Looks the host of the request up, or its proxy, unless it is the host of the last request
 static BOOL NHTTPi_ThreadHostAddrProc(NHttpThreadWork *work) {
-    NHttpRequest *request = NHTTPi_GetReqInfoP(NHTTPi_GetSystemInfoP())->current->request;
+    NHTTPReq *request = NHTTPi_GetReqInfoP(NHTTPi_GetSystemInfoP())->current->req;
     char *host = request->host;
 
     if (request->useProxy) {
@@ -850,7 +849,7 @@ static BOOL NHTTPi_ThreadHostAddrProc(NHttpThreadWork *work) {
     if (request->useProxy) {
         work->port = request->proxyPort;
     }
-    if (work->address != work->prevAddress || work->port != work->prevPort || request->https == 1) {
+    if (work->address != work->prevAddress || work->port != work->prevPort || request->isSSL == 1) {
         work->keepAlive = FALSE;
     }
     work->prevAddress = work->address;
@@ -863,7 +862,7 @@ static BOOL NHTTPi_ThreadConnectProc(NHttpThreadWork *work) {
     NHttpRoot *root = NHTTPi_GetSystemInfoP();
     NHttpState *state = NHTTPi_GetBgnEndInfoP(root);
     NHttpReqInfo *reqInfo = NHTTPi_GetReqInfoP(root);
-    NHttpRequest *request = reqInfo->current->request;
+    NHTTPReq *request = reqInfo->current->req;
     NHttpMutexInfo *mutexInfo = NHTTPi_GetMutexInfoP(root);
 
     if (work->keepAlive == TRUE) {
@@ -887,7 +886,7 @@ static BOOL NHTTPi_ThreadConnectProc(NHttpThreadWork *work) {
         NHTTPi_lockReqList(mutexInfo);
         reqInfo->current->socket = state->socket;
         NHTTPi_unlockReqList(mutexInfo);
-        if (request->canceled != 0) {
+        if (request->doCancel != 0) {
             return FALSE;
         }
         if (NHTTPi_SocConnect(state, mutexInfo, request, state->socket, work->address, work->port) < 0) {
@@ -917,12 +916,12 @@ static int NHTTPi_ThreadProxyProc(NHttpThreadWork *work) {
     NHttpState *state = NHTTPi_GetBgnEndInfoP(root);
     NHttpReqInfo *reqInfo = NHTTPi_GetReqInfoP(root);
     NHttpMutexInfo *mutexInfo = NHTTPi_GetMutexInfoP(root);
-    NHttpRequest *request = reqInfo->current->request;
+    NHTTPReq *request = reqInfo->current->req;
     int result;
 
     work->error = 10;
     work->sendCount = 0;
-    if (request->https && request->useProxy) {
+    if (request->isSSL && request->useProxy) {
         result = NHTTPi_SendProxyConnectMethod(work);
         if (result != 0) {
             return result;
@@ -957,12 +956,12 @@ static int NHTTPi_ThreadProxyProc(NHttpThreadWork *work) {
 // when the server closed the connection
 static int NHTTPi_ThreadSendProc(NHttpThreadWork *work) {
     NHttpRoot *root = NHTTPi_GetSystemInfoP();
-    NHttpRequest *request = NHTTPi_GetReqInfoP(root)->current->request;
+    NHTTPReq *request = NHTTPi_GetReqInfoP(root)->current->req;
     NHttpMutexInfo *mutexInfo = NHTTPi_GetMutexInfoP(root);
     NHttpState *state = NHTTPi_GetBgnEndInfoP(root);
     NHttpConnection *connection = NHTTPi_Request2Connection(mutexInfo, request);
     u8 *sendBuffer = NHTTPi_GetThreadInfoP(root)->sendBuffer;
-    int urlLength = NHTTPi_strlen(request->url);
+    int urlLength = NHTTPi_strlen(request->pURL);
     int result = 0;
     int schemeLength;
 
@@ -985,13 +984,13 @@ static int NHTTPi_ThreadSendProc(NHttpThreadWork *work) {
     if (result != 0) {
         return result;
     }
-    if (request->useProxy && !request->https) {
-        result = NHTTPi_SendHeaderData(work, request->url, urlLength);
+    if (request->useProxy && !request->isSSL) {
+        result = NHTTPi_SendHeaderData(work, request->pURL, urlLength);
         if (result != 0) {
             return result;
         }
     } else if (urlLength > request->pathStart) {
-        result = NHTTPi_SendHeaderData(work, request->url + request->pathStart, urlLength - request->pathStart);
+        result = NHTTPi_SendHeaderData(work, request->pURL + request->pathStart, urlLength - request->pathStart);
         if (result != 0) {
             return result;
         }
@@ -1005,12 +1004,12 @@ static int NHTTPi_ThreadSendProc(NHttpThreadWork *work) {
     if (result != 0) {
         return result;
     }
-    schemeLength = request->https ? 8 : 7;
+    schemeLength = request->isSSL ? 8 : 7;
     result = NHTTPi_SendHeaderData(work, "Host: ", 6);
     if (result != 0) {
         return result;
     }
-    result = NHTTPi_SendHeaderData(work, request->url + schemeLength, request->hostEnd - schemeLength);
+    result = NHTTPi_SendHeaderData(work, request->pURL + schemeLength, request->hostEnd - schemeLength);
     if (result != 0) {
         return result;
     }
@@ -1018,7 +1017,7 @@ static int NHTTPi_ThreadSendProc(NHttpThreadWork *work) {
     if (result != 0) {
         return result;
     }
-    if (request->useProxy && !request->https) {
+    if (request->useProxy && !request->isSSL) {
         result = NHTTPi_SendProxyAuthorization(work);
         if (result != 0) {
             return result;
@@ -1039,12 +1038,12 @@ static int NHTTPi_ThreadSendProc(NHttpThreadWork *work) {
             result = NHTTPi_SendProcPostDataRaw(work);
         } else {
             if (request->postMode == NHTTP_POST_AUTO) {
-                NHttpHeader *part = request->postData;
+                NHTTPi_DATALIST *part = request->postData;
 
                 multipart = FALSE;
                 if (part != NULL) {
                     do {
-                        if (part->binary) {
+                        if (part->isBinary) {
                             multipart = TRUE;
                             break;
                         }
@@ -1099,13 +1098,13 @@ static int NHTTPi_ThreadSendProc(NHttpThreadWork *work) {
 // Reads the header of the answer a byte at a time, up to its end, into the response (its first part and then blocks)
 static BOOL NHTTPi_ThreadRecvHeaderProc(NHttpThreadWork *work) {
     NHttpRoot *root = NHTTPi_GetSystemInfoP();
-    NHttpRequest *request = NHTTPi_GetReqInfoP(root)->current->request;
-    NHttpResponse *response = request->response;
+    NHTTPReq *request = NHTTPi_GetReqInfoP(root)->current->req;
+    NHTTPRes *response = request->response;
     NHttpMutexInfo *mutexInfo = NHTTPi_GetMutexInfoP(root);
     NHttpConnection *connection = NHTTPi_Request2Connection(mutexInfo, request);
     NHttpState *state = NHTTPi_GetBgnEndInfoP(root);
     char tail[4] = { 0, 0, 0, 0 };
-    NHttpHeaderBlock *block;
+    NHTTPi_HDRBUFLIST *block;
 
     if (connection != NULL) {
         connection->stage = NHTTP_STAGE_RECV_HEADER;
@@ -1117,7 +1116,7 @@ static BOOL NHTTPi_ThreadRecvHeaderProc(NHttpThreadWork *work) {
     for (;;) {
         int count;
 
-        if (request->canceled != 0) {
+        if (request->doCancel != 0) {
             return FALSE;
         }
         if (work->recvCount < NHTTP_HEADER_SIZE) {
@@ -1128,10 +1127,10 @@ static BOOL NHTTPi_ThreadRecvHeaderProc(NHttpThreadWork *work) {
 
             if (offset == 0) {
                 if (block != NULL) {
-                    block->next = NHTTPi_alloc(sizeof(NHttpHeaderBlock), 4);
+                    block->next = NHTTPi_alloc(sizeof(NHTTPi_HDRBUFLIST), 4);
                     block = block->next;
                 } else {
-                    block = NHTTPi_alloc(sizeof(NHttpHeaderBlock), 4);
+                    block = NHTTPi_alloc(sizeof(NHTTPi_HDRBUFLIST), 4);
                     response->blocks = block;
                 }
                 if (block == NULL) {
@@ -1140,8 +1139,8 @@ static BOOL NHTTPi_ThreadRecvHeaderProc(NHttpThreadWork *work) {
                 }
                 block->next = NULL;
             }
-            count = NHTTPi_SocRecv(mutexInfo, request, state->socket, block->data + offset, 1, 0);
-            tail[work->recvCount & 3] = block->data[offset];
+            count = NHTTPi_SocRecv(mutexInfo, request, state->socket, block->block + offset, 1, 0);
+            tail[work->recvCount & 3] = block->block[offset];
         }
         if (count <= 0) {
             work->error = 10;
@@ -1164,8 +1163,8 @@ static BOOL NHTTPi_ThreadRecvHeaderProc(NHttpThreadWork *work) {
 // stays open and whether the body is in chunks
 static BOOL NHTTPi_ThreadParseHeaderProc(NHttpThreadWork *work) {
     NHttpRoot *root = NHTTPi_GetSystemInfoP();
-    NHttpRequest *request = NHTTPi_GetReqInfoP(root)->current->request;
-    NHttpResponse *response = request->response;
+    NHTTPReq *request = NHTTPi_GetReqInfoP(root)->current->req;
+    NHTTPRes *response = request->response;
     u8 *sendBuffer = NHTTPi_GetThreadInfoP(root)->sendBuffer;
     int colon;
     int start;
@@ -1216,7 +1215,7 @@ static BOOL NHTTPi_ThreadParseHeaderProc(NHttpThreadWork *work) {
     } else {
         response->contentLength = -1;
     }
-    if (request->https != 0) {
+    if (request->isSSL != 0) {
         work->keepAlive = FALSE;
     } else {
         length = NHTTPi_getHeaderValue(response, "Connection", &start);
@@ -1259,8 +1258,8 @@ static BOOL NHTTPi_ThreadParseHeaderProc(NHttpThreadWork *work) {
 // for another, and a scratch buffer takes what is read if it gives none (the error then says the buffer was too small)
 static BOOL NHTTPi_ThreadRecvBodyProc(NHttpThreadWork *work) {
     NHttpRoot *root = NHTTPi_GetSystemInfoP();
-    NHttpRequest *request = NHTTPi_GetReqInfoP(root)->current->request;
-    NHttpResponse *response = request->response;
+    NHTTPReq *request = NHTTPi_GetReqInfoP(root)->current->req;
+    NHTTPRes *response = request->response;
     NHttpState *state = NHTTPi_GetBgnEndInfoP(root);
     NHttpMutexInfo *mutexInfo = NHTTPi_GetMutexInfoP(root);
     NHttpConnection *connection = NHTTPi_Request2Connection(mutexInfo, request);
@@ -1334,7 +1333,7 @@ static BOOL NHTTPi_ThreadRecvBodyProc(NHttpThreadWork *work) {
                     if (c == ';' || (c == '\n' && ring[(length - 1) & 1] == '\r')) {
                         if (c == '\n') {
                             length--;
-                        } else if (NHTTPi_SkipLine(mutexInfo, request, state->socket) <= 0) {
+                        } else if (skipLineBuf(mutexInfo, request, state->socket) <= 0) {
                             return FALSE;
                         }
                         if (length == 0) {
@@ -1379,7 +1378,7 @@ static BOOL NHTTPi_ThreadRecvBodyProc(NHttpThreadWork *work) {
                         }
                     }
                 } else {
-                    NHTTPi_SkipLine(mutexInfo, request, state->socket);
+                    skipLineBuf(mutexInfo, request, state->socket);
                     work->error = 0;
                     break;
                 }
@@ -1434,7 +1433,7 @@ void NHTTPi_CommThreadProcMain(void) {
                 if (!NHTTPi_ThreadExecReqQueue(&work)) {
                     continue;
                 }
-                if (reqInfo->current->request->canceled != 0) {
+                if (reqInfo->current->req->doCancel != 0) {
                     NHTTPi_ThreadReqEnd(&work);
                     continue;
                 }
@@ -1471,7 +1470,7 @@ void NHTTPi_CommThreadProcMain(void) {
                 NHTTPi_ThreadReqEnd(&work);
                 continue;
             }
-            if (reqInfo->current->request->canceled != 0) {
+            if (reqInfo->current->req->doCancel != 0) {
                 NHTTPi_ThreadReqEnd(&work);
                 continue;
             }

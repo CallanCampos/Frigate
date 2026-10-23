@@ -5,6 +5,7 @@
     .bss        start:0x021a4780 end:0x021a4920 kind:bss align:32
 
 src/ov181/mb_parent_sys.c:
+    complete
     .text       start:0x0219ce80 end:0x0219eec8
     .rodata     start:0x021a4040 end:0x021a41c4
     .data       start:0x021a42a0 end:0x021a43ac
@@ -29,6 +30,7 @@ src/ov181/mb_util_msg.c:
     .data       start:0x021a46b8 end:0x021a46c8
 
 src/ov181/mb_parent_dataconv_sys.c:
+    complete
     .text       start:0x021a039c end:0x021a092c
     .data       start:0x021a46c8 end:0x021a4728
     .bss        start:0x021a47cc end:0x021a47d0

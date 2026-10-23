@@ -1302,7 +1302,7 @@ static void GPowerApp_InitPowers(GPowerApp *work) {
 static void GPowerApp_InitPaletteAnim(GPowerApp *work) {
     NNSG2dPaletteData *palette;
     void *file = GFL_G2DIOReadNCLR(ARCID_GPOWER_APP, 1, &palette, work->heapId);
-    u16 *colors = palette->rawData;
+    u16 *colors = palette->pRawData;
 
     MI_CpuCopy8(&colors[1 * 16], work->paletteFrom, sizeof(work->paletteFrom));
     MI_CpuCopy8(&colors[2 * 16], work->paletteTo, sizeof(work->paletteTo));

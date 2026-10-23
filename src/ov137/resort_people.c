@@ -98,8 +98,8 @@ static ResortPerson *ResortPerson_Create(HeapID heapId, const ResortPersonSetup 
     person->shops = setup->shops;
     person->unk2c = setup->unk18;
     person->type = ResortData_GetType(person->data);
-    a = ResortData_GetParam(person->data, 31, NULL);
-    b = ResortData_GetParam(person->data, 2, NULL);
+    a = ResortData_GetParam(person->data, JOIN_AVE_PARAM_SHOP_KIND, NULL);
+    b = ResortData_GetParam(person->data, JOIN_AVE_PARAM_GENDER, NULL);
     person->row = ResortBinary_FindRow(setup->table, person->type, a, b);
     person->funcs = &sTypes[person->type];
     person->actor = FindFieldActor(person->mmSys, person->index + RESORT_PERSON_UID_FIRST);
@@ -127,7 +127,7 @@ JoinAvenuePerson *ResortPerson_GetJoinAvenuePerson(ResortPerson *person) {
 
 void ResortPerson_UpdateObjCode(ResortPerson *person) {
     FieldActor *actor = ResortPerson_GetActor(person);
-    u16 objCode = ResortData_GetParam(person->data, 3, NULL);
+    u16 objCode = ResortData_GetParam(person->data, JOIN_AVE_PARAM_TRAINER_TYPE, NULL);
 
     FldAct_UpdateBlInfoForNewObjCode(actor, objCode);
 }
@@ -286,19 +286,19 @@ static void ResortPerson_SetupRecordNpc(ResortPerson *person, const ResortPerson
 }
 
 static void ResortPerson_GetRecordPos(ResortPerson *person, u16 *x, u16 *z, u16 *dir) {
-    ResortLayout_GetRecordPlace(ResortData_GetParam(person->data, 31, NULL), x, z, dir);
+    ResortLayout_GetRecordPlace(ResortData_GetParam(person->data, JOIN_AVE_PARAM_SHOP_KIND, NULL), x, z, dir);
 }
 
 static void ResortPerson_CreateActor(ResortPerson *person, const ResortPersonSetup *setup) {
     ZoneNPC npc = sNpcTemplate;
 
-    npc.modelId = (u8)ResortData_GetParam(person->data, 3, NULL);
+    npc.modelId = (u8)ResortData_GetParam(person->data, JOIN_AVE_PARAM_TRAINER_TYPE, NULL);
     npc.scrId = ResortBinary_GetFoundValue(person->row);
     npc.uid = setup->index + RESORT_PERSON_UID_FIRST;
     person->funcs->setupNpc(person, setup, &npc);
     person->actor = CreateNewActorByEntityNoWKOBJCODE(setup->mmSys, &npc, ResortLayout_GetZoneId(setup->zone));
-    ResortPerson_SetParam(person, 0, setup->index);
-    ResortPerson_SetParam(person, 1, setup->zone);
+    ResortPerson_SetParam(person, JOIN_AVE_PARAM_SLOT, setup->index);
+    ResortPerson_SetParam(person, JOIN_AVE_PARAM_ROW, setup->zone);
     person->visible = !IsActorHidden(person->actor);
 }
 
@@ -369,11 +369,11 @@ void ResortPeople_CreateFromDatas(ResortPeople *people) {
             continue;
         }
         create = FALSE;
-        pos = ResortData_GetParam(data, 0, NULL);
+        pos = ResortData_GetParam(data, JOIN_AVE_PARAM_SLOT, NULL);
         if (!ResortSlots_IsEmpty(people->setup.slots, row, pos)) {
             create = TRUE;
         }
-        unk = ResortData_GetParam(data, 31, NULL);
+        unk = ResortData_GetParam(data, JOIN_AVE_PARAM_SHOP_KIND, NULL);
         if (ResortData_GetKind(data) == 4) {
             if (unk == 2 || unk == 3) {
                 create |= TRUE;
@@ -447,13 +447,13 @@ void ResortPeople_ApplyVisibility(ResortPeople *people) {
 }
 
 void ResortPeople_Recreate(ResortPeople *people, ResortPerson *person) {
-    u32 pos = ResortPerson_GetParam(person, 0, NULL);
+    u32 pos = ResortPerson_GetParam(person, JOIN_AVE_PARAM_SLOT, NULL);
     ResortPersonSource source;
     ResortPersonSetup setup;
 
     MI_CpuFill8(&source, 0, sizeof(ResortPersonSource));
     source.data = ResortPerson_GetData(person);
-    source.zone = ResortPerson_GetParam(person, 1, NULL);
+    source.zone = ResortPerson_GetParam(person, JOIN_AVE_PARAM_ROW, NULL);
     ResortPeople_MakeSetup(people, &source, pos, &setup);
     setup.unk20 = ResortPerson_GetAttr(person, 1);
     ResortPerson_Recreate(person, &setup);

@@ -7,24 +7,24 @@
 // The state of the command queue and the packets on their way, which snd_command.c works on, then the mutex and the
 // flag of SND_Init. They are here because the ROM has them before the pool of snd_command.c, whose .bss starts at the
 // next 32-byte boundary, 12 bytes after this one ends. Declared in the reverse of the order they lie in
-SNDCommand *SNDi_Sent[SND_PACKET_MAX + 1];
+SNDCommand *sWaitingCommandListQueue[SND_PXI_FIFO_MESSAGE_BUFSIZE + 1];
 SNDCommandQueue SNDi_Queue;
-static OSMutex sMutex;
+static OSMutex sSndMutex;
 static BOOL sSndInitialized;
 
 void SND_Init(void) {
     if (!sSndInitialized) {
         sSndInitialized = TRUE;
-        OS_InitMutex(&sMutex);
+        OS_InitMutex(&sSndMutex);
         SND_CommandInit();
         SND_AlarmInit();
     }
 }
 
 void SNDi_LockMutex(void) {
-    OS_LockMutex(&sMutex);
+    OS_LockMutex(&sSndMutex);
 }
 
 void SNDi_UnlockMutex(void) {
-    OS_UnlockMutex(&sMutex);
+    OS_UnlockMutex(&sSndMutex);
 }

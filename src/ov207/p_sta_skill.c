@@ -394,7 +394,7 @@ static void PStaSkill_DrawStats(PStatusWork *wk, PStaSkillWork *skill) {
         BmpWin_FlushMap(window);
         GFL_BGSysLoadScr(BmpWin_GetBGIndex(window));
     }
-    GFL_BGSysBufferScrDefault(6, skill->screens[1].screen->rawData, skill->screens[1].screen->size);
+    GFL_BGSysBufferScrDefault(6, skill->screens[1].screen->rawData, skill->screens[1].screen->szByte);
     GFL_BGSysQueueScrLoad(6);
     GFL_BGSysLoadScrArea(5, 0, 0, 32, 3, skill->screens[3].screen->rawData, 0, 0, 32, 32);
     GFL_BGSysQueueScrLoad(5);
@@ -425,8 +425,8 @@ static void PStaSkill_DrawDetail(PStatusWork *wk, PStaSkillWork *skill) {
         BmpWin_FlushMap(window);
         GFL_BGSysLoadScr(BmpWin_GetBGIndex(window));
     }
-    GFL_BGSysLoadScrCore(6, skill->screens[2].screen->rawData, skill->screens[2].screen->size, 0);
-    GFL_BGSysBufferScrDefault(6, skill->screens[2].screen->rawData, skill->screens[2].screen->size);
+    GFL_BGSysLoadScrCore(6, skill->screens[2].screen->rawData, skill->screens[2].screen->szByte, 0);
+    GFL_BGSysBufferScrDefault(6, skill->screens[2].screen->rawData, skill->screens[2].screen->szByte);
     GFL_BGSysQueueScrLoad(6);
     GFL_BGSysLoadScrArea(5, 0, 0, 32, 3, skill->screens[4].screen->rawData, 0, 0, 32, 32);
     GFL_BGSysQueueScrLoad(5);
@@ -550,7 +550,7 @@ static void PStaSkill_PrintMoveDetail(PStatusWork *wk, PStaSkillWork *skill) {
     BoxPkm *pkm = PStatus_GetBoxPkm(wk);
     u8 i;
     u32 move;
-    u32 category;
+    unsigned int category;
     u32 power;
     WordSet *wordSet;
     u32 accuracy;

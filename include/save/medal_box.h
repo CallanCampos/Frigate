@@ -76,13 +76,13 @@ void *MedalBox_GetHabitatList(MedalBox *box);
 // These functions come from a later file than the medal box's, which has no header yet
 void ZukanHabitatSave_Init(void *data);
 void *SaveControl_GetZukanHabitatSave(SaveControl *save);
-void ZukanHabitatSave_SetZone(void *data, u16 zone);
-u16 ZukanHabitatSave_GetZone(void *data);
-void ZukanHabitatSave_SetSeason(void *data, u32 season);
-u8 ZukanHabitatSave_GetSeason(void *data);
-void ZukanHabitatSave_SetType(void *data, u16 type);
-u8 ZukanHabitatSave_GetType(void *data);
+void ZukanHabitatSave_SetZone(ZukanHabitatSave *data, u16 zone);
+u16 ZukanHabitatSave_GetZone(ZukanHabitatSave *data);
+void ZukanHabitatSave_SetSeason(ZukanHabitatSave *data, u32 season);
+u8 ZukanHabitatSave_GetSeason(ZukanHabitatSave *data);
+void ZukanHabitatSave_SetType(ZukanHabitatSave *data, u16 type);
+u8 ZukanHabitatSave_GetType(ZukanHabitatSave *data);
 // What the player has done of a habitat's kind of habitat
-u8 ZukanHabitatSave_GetHabitatField(void *data, u8 habitat, u32 type);
+u8 ZukanHabitatSave_GetHabitatField(ZukanHabitatSave *data, u8 habitat, u32 type);
 
 #endif // POKEBW2_SAVE_MEDAL_BOX_H

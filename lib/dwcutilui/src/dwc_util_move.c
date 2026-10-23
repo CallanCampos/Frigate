@@ -31,51 +31,51 @@ static DownloadPlaySysGame sGame = {
 };
 static DWCUtilMove *sMove;
 
-void DWCUtilMove_Start(DWCUtilMoveCallback callback) {
+void DWCi_MOVlInit(DWCUtilMoveCallback callback) {
     DownloadPlaySysGame game;
 
-    sMove = DWCUtilHeap_AllocClear(sizeof(DWCUtilMove), 32);
+    sMove = DWCi_HEAPlAllocEx(sizeof(DWCUtilMove), 32);
     sMove->callback = callback;
     sMove->pending = FALSE;
     sMove->ended = FALSE;
     game = sGame;
-    game.gameNamep = DWCUtilMsg_Get(gDWCUtilMsg, 0);
-    game.gameIntroductionp = DWCUtilMsg_Get(gDWCUtilMsg, 1);
-    game.maxPlayerNum = func_ov182_021ae058();
+    game.gameNamep = DWCi_MSGlGet(gDWCUtilMsg, 0);
+    game.gameIntroductionp = DWCi_MSGlGet(gDWCUtilMsg, 1);
+    game.maxPlayerNum = kDWCi_Language();
     func_ov182_021ba768(&sMove->context, &game);
     if (!func_ov182_021ba918()) {
         OS_Terminate();
     }
-    sMove->task = DWCUtilTask_Create(0, DWCUtilMove_UpdateTask, NULL, 0x78);
+    sMove->task = DWCi_TSKlForm(0, DWCUtilMove_UpdateTask, NULL, 0x78);
 }
 
 void DWCUtilMove_End(void) {
-    DWCUtilTask_Create(0, DWCUtilMove_EndTask, NULL, 0x78);
+    DWCi_TSKlForm(0, DWCUtilMove_EndTask, NULL, 0x78);
 }
 
 static void DWCUtilMove_EndTask(DWCUtilTask *task, void *arg) {
     if (func_ov182_021ba81c()) {
         sMove->ended = TRUE;
-        DWCUtilTask_QueueRemoval(0, task);
+        DWCi_TSKlDelete(0, task);
     }
 }
 
-BOOL DWCUtilMove_HasEnded(void) {
+BOOL DWCi_MOVlIsEnd(void) {
     if (sMove == NULL) {
         return TRUE;
     }
     return FALSE;
 }
 
-void DWCUtilMove_SetCallback(DWCUtilMoveCallback callback) {
+void DWCi_MOVlChangeCallback(DWCUtilMoveCallback callback) {
     sMove->callback = callback;
 }
 
-void DWCUtilMove_StartSending(void) {
+void DWCi_MOVlAdmitChild(void) {
     func_ov182_021ba950();
 }
 
-const MBUserInfo *DWCUtilMove_GetChildUser(void) {
+const MBUserInfo *DWCi_MOVlGetChild(void) {
     return &sMove->user;
 }
 
@@ -147,8 +147,8 @@ static void DWCUtilMove_UpdateTask(DWCUtilTask *task, void *arg) {
         sMove->pending = TRUE;
         return;
     case DOWNLOAD_PLAY_SYS_STATE_ENDED:
-        DWCUtilTask_QueueRemoval(0, task);
-        DWCUtilHeap_FreeAndNull(&sMove);
+        DWCi_TSKlDelete(0, task);
+        DWCi_HEAPlFree_(&sMove);
         return;
     case DOWNLOAD_PLAY_SYS_STATE_READY:
     case DOWNLOAD_PLAY_SYS_STATE_START_WIRELESS:

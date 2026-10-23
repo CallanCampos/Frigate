@@ -73,6 +73,6 @@ void FieldChunkAccessor_WB_GetTerrain(MapTerrainSamplerOutput *out, const void *
                                       fx32 size, fx32 baseY) {
     const WBChunkFile *file = container;
 
-    FieldChunkAccessor_GetTerrainCore(out, 0, (u8 *)file + file->terrainOffset, pos, size, baseY);
+    FieldChunkAccessor_GetTerrainCore(out, 0, (MapHeightData *)((u8 *)file + file->terrainOffset), pos, size, baseY);
     out->layerCount = 1;
 }

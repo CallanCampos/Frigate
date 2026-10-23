@@ -22,9 +22,7 @@ void BattleExamination_Init(BattleExaminationSave *examination) {
     MI_CpuFill8(examination, 0, sizeof(BattleExaminationSave));
 }
 
-BOOL BattleExamination_IsValid(void *saveBuffer) {
-    BattleExaminationSave *examination = saveBuffer;
-
+BOOL BattleExamination_IsValid(BattleExaminationSave *examination) {
     if (examination->crc == getCRC16(examination, offsetof(BattleExaminationSave, crc)) &&
         examination->signature == BATTLE_EXAMINATION_SIGNATURE) {
         return TRUE;
@@ -32,24 +30,18 @@ BOOL BattleExamination_IsValid(void *saveBuffer) {
     return FALSE;
 }
 
-BOOL BattleExamination_IsSingle(void *extraSave) {
-    BattleExaminationSave *examination = extraSave;
-
+BOOL BattleExamination_IsSingle(BattleExaminationSave *examination) {
     if (!(examination->flags & BATTLE_EXAMINATION_DOUBLE)) {
         return TRUE;
     }
     return FALSE;
 }
 
-u32 BattleExamination_GetNumber(void *saveBuffer) {
-    BattleExaminationSave *examination = saveBuffer;
-
+u32 BattleExamination_GetNumber(BattleExaminationSave *examination) {
     return (u16)(examination->flags & BATTLE_EXAMINATION_NUMBER_MASK);
 }
 
-BSubwayTrainer *BattleExamination_GetTrainer(void *save, u32 index) {
-    BattleExaminationSave *examination = save;
-
+BSubwayTrainer *BattleExamination_GetTrainer(BattleExaminationSave *examination, u32 index) {
     if (index < BATTLE_EXAMINATION_TRAINER_COUNT) {
         return &examination->trainers[index];
     }
@@ -73,9 +65,7 @@ void BattleExamination_Load(GameData *gameData, void *saveBuffer, HeapID heapId)
     GFL_HeapFree(buffer);
 }
 
-void BattleExamination_SetUsed(void *extraSave) {
-    BattleExaminationSave *examination = extraSave;
-
+void BattleExamination_SetUsed(BattleExaminationSave *examination) {
     if (examination->crc == getCRC16(examination, offsetof(BattleExaminationSave, crc))) {
         examination->signature = BATTLE_EXAMINATION_SIGNATURE_USED;
         examination->crc = getCRC16(examination, offsetof(BattleExaminationSave, crc));

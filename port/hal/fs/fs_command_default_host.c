@@ -58,15 +58,15 @@ static FSResult FSi_HostWriteMemCallback(FSArchive *arc, const void *buffer, u32
 }
 
 // NitroSDK's FS_LoadArchive, with the host's defaults for the memory's read and write
-BOOL FS_LoadArchive(FSArchive *arc, u32 base, u32 fat, u32 fatSize, u32 fnt, u32 fntSize, FSReadFunc readFunc,
-                    FSWriteFunc writeFunc) {
+BOOL FS_LoadArchive(FSArchive *arc, u32 base, u32 fat, u32 fatSize, u32 fnt, u32 fntSize, FS_ARCHIVE_READ_FUNC readFunc,
+                    FS_ARCHIVE_WRITE_FUNC writeFunc) {
     BOOL result = FSi_DsLoadArchive(arc, base, fat, fatSize, fnt, fntSize, readFunc, writeFunc);
 
     if (readFunc == NULL) {
-        arc->tables.readFunc = FSi_HostReadMemCallback;
+        arc->tables.read_func = FSi_HostReadMemCallback;
     }
     if (writeFunc == NULL) {
-        arc->tables.writeFunc = FSi_HostWriteMemCallback;
+        arc->tables.write_func = FSi_HostWriteMemCallback;
     }
     return result;
 }
@@ -78,5 +78,5 @@ u32 FS_LoadArchiveTables(FSArchive *arc, void *memory, u32 memorySize) {
 
     (void)memory;
     (void)memorySize;
-    return (tables->fatSize + tables->fntSize + 0x3f) & ~0x1f;
+    return (tables->fat_size + tables->fnt_size + 0x3f) & ~0x1f;
 }

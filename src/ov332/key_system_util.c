@@ -557,7 +557,7 @@ KeySystemList *KeySystemList_Create(const KeySystemListSetup *setup, HeapID heap
     list->setup = *setup;
     list->cursor = setup->cursor;
     file = GFL_G2DIOReadNCLR(ARCID_KEY_SYSTEM, 1, &palette, heapId);
-    colors = palette->rawData;
+    colors = palette->pRawData;
     MI_CpuCopy8(&colors[0], list->palettes[0], sizeof(list->palettes[0]));
     MI_CpuCopy8(&colors[16], list->palettes[1], sizeof(list->palettes[1]));
     MI_CpuCopy8(&colors[32], list->palettes[2], sizeof(list->palettes[2]));

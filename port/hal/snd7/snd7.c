@@ -16,7 +16,7 @@
 //     the mixer's samples (one each 1024 cycles, 32,728.5 a second) that fall before it; so the samples and the
 //     driver's state are the same on every run, whenever the host looks;
 //   - a packet's commands run as soon as the ARM9 sends it, and the shared work's count of finished packets
-//     (finishedCommandTag) moves on before PXI_SendWordByFifo returns, as the ARM9's busy waits need
+//     (finishCommandTag) moves on before PXI_SendWordByFifo returns, as the ARM9's busy waits need
 //     (SND_RecvCommandReply, SND_WaitForCommandProc, SND_AllocCommand). The DS runs them at its next run, after that
 //     run's SND_UpdateExChannel; here they run before it. A wake-up word runs a run that isn't periodic at once;
 //   - so the ARM9 finds a packet done as soon as it has sent it, where the DS's finds it waiting until the driver's
@@ -325,7 +325,7 @@ static void RunThread(BOOL doPeriodicProc) {
         sSnd.runMix = (u32)sSnd.samples;
     }
     if (snd7_shared != NULL) {
-        sSnd.runTag = snd7_shared->finishedCommandTag;
+        sSnd.runTag = snd7_shared->finishCommandTag;
     }
     snd7_update_exchannel();
     snd7_seq_main(doPeriodicProc);
@@ -411,14 +411,14 @@ static void Advance(u64 cycles) {
 // SND_ReadDriverInfo: the driver's state in the decomp's SNDDriverInfo. The DS copies its work as it is; the host
 // fills the fields that the ARM9 reads (SND_ReadTrackInfo): the players' tracks, the tracks' parameters with their
 // first 0x24 bytes as the DS has them, and the channels with their links as ARM7 addresses, which SND_ReadTrackInfo
-// turns into offsets in the state from arm7Address. The decomp's state has room for 20 tracks of the driver's 32 (a
+// turns into offsets in the state from workAddress. The decomp's state has room for 20 tracks of the driver's 32 (a
 // guess at its layout): the tracks go into it in the order of the players and their tracks, and those past 20 read as
 // none
 static const SNDDriverChannel *ChannelLink(const SNDDriverInfo *info, const Snd7ExChannel *channel) {
     if (channel == NULL) {
         return NULL;
     }
-    return (const SNDDriverChannel *)(uintptr_t)(info->arm7Address +
+    return (const SNDDriverChannel *)(uintptr_t)(info->workAddress +
                                                  (u32)((uintptr_t)&info->channel[channel->myNo] - (uintptr_t)info));
 }
 
@@ -430,8 +430,8 @@ void snd7_read_driver_info(SNDDriverInfo *info) {
     int j;
 
     memset(info, 0, sizeof(*info));
-    memset(slot, SND_TRACK_INDEX_NONE, sizeof(slot));
-    info->arm7Address = WORK_ADDRESS;
+    memset(slot, SND_INVALID_TRACK_INDEX, sizeof(slot));
+    info->workAddress = WORK_ADDRESS;
     for (i = 0; i < SND7_CHANNEL_NUM; i++) {
         info->channel[i].myNo = (u8)i;
         info->channel[i].next = ChannelLink(info, snd7_work.channel[i].nextLink);
@@ -444,19 +444,19 @@ void snd7_read_driver_info(SNDDriverInfo *info) {
         for (j = 0; j < SND7_PLAYER_TRACK_NUM; j++) {
             u8 trackNo = player->tracks[j];
 
-            info->player[i].trackIndex[j] = SND_TRACK_INDEX_NONE;
+            info->player[i].tracks[j] = SND_INVALID_TRACK_INDEX;
             if (trackNo >= SND7_TRACK_NUM) {
                 continue;
             }
-            if (slot[trackNo] == SND_TRACK_INDEX_NONE && tracks < NELEMS(info->track)) {
+            if (slot[trackNo] == SND_INVALID_TRACK_INDEX && tracks < NELEMS(info->track)) {
                 const Snd7Track *track = &snd7_work.track[trackNo];
-                SNDDriverTrack *infoTrack = &info->track[tracks];
+                SNDTrack *infoTrack = &info->track[tracks];
 
                 memcpy(infoTrack, track, SND7_TRACK_PARAM_SIZE);
-                infoTrack->channel = ChannelLink(info, track->channelList);
+                infoTrack->channel_list = ChannelLink(info, track->channelList);
                 slot[trackNo] = (u8)tracks++;
             }
-            info->player[i].trackIndex[j] = slot[trackNo];
+            info->player[i].tracks[j] = slot[trackNo];
         }
     }
     memcpy(info->unk_11c4, &locked, sizeof(locked));
@@ -687,7 +687,8 @@ static void Execute(const SNDCommand *command) {
     u32 arg2 = command->arg[2];
     u32 arg3 = command->arg[3];
 
-    switch (command->id) {
+    // The ARM7 implements wire commands beyond the ARM9 header's public SNDCommandID subset.
+    switch ((u32)command->id) {
     case COMMAND_START_SEQ:
     case SND_COMMAND_PREPARE_SEQ:
         if (ValidPlayer(arg0)) {
@@ -868,7 +869,7 @@ static void SoundService(u32 tag, u32 data, BOOL err) {
         Execute(command);
     }
     if (snd7_shared != NULL) {
-        snd7_shared->finishedCommandTag++;
+        snd7_shared->finishCommandTag++;
     }
     // The alarms the packet started or stopped
     ScheduleAlarm();
@@ -882,7 +883,7 @@ BOOL snd7_holds_packet(u32 tag) {
         return FALSE;
     }
     Advance(port_os_cycles());
-    return (s32)(tag - sSnd.runTag) > 0 && (s32)(snd7_shared->finishedCommandTag - tag) >= 0;
+    return (s32)(tag - sSnd.runTag) > 0 && (s32)(snd7_shared->finishCommandTag - tag) >= 0;
 }
 
 // The driver's start at the cycle: SND_Init's (SND_CommandInit's shared work) and SndThread's (the channels, players,

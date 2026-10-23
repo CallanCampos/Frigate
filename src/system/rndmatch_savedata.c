@@ -9,23 +9,19 @@
 #define RNDMATCH_FIELD_MAX 3
 #define RNDMATCH_VALUE_MAX 0xffff
 
-typedef struct {
+struct RndMatchData {
     u16 values[RNDMATCH_TYPE_MAX][RNDMATCH_FIELD_MAX];
-} RndMatchData;
+};
 
 void RndMatchData_Init(void *results) {
     MI_CpuFill8(results, 0, sizeof(RndMatchData));
 }
 
-u16 RndMatchData_GetParam(void *results, u32 index, u32 field) {
-    RndMatchData *data = results;
-
+u16 RndMatchData_GetParam(RndMatchData *data, u32 index, u32 field) {
     return data->values[index][field];
 }
 
-void RndMatchData_SetParam(void *results, u32 index, u32 field, s32 value) {
-    RndMatchData *data = results;
-
+void RndMatchData_SetParam(RndMatchData *data, u32 index, u32 field, s32 value) {
     if (value > RNDMATCH_VALUE_MAX) {
         value = RNDMATCH_VALUE_MAX;
     } else if (value < 0) {
@@ -34,9 +30,7 @@ void RndMatchData_SetParam(void *results, u32 index, u32 field, s32 value) {
     data->values[index][field] = value;
 }
 
-void RndMatchData_IncParam(void *results, u32 index, u32 field) {
-    RndMatchData *data = results;
-
+void RndMatchData_IncParam(RndMatchData *data, u32 index, u32 field) {
     if (data->values[index][field] < RNDMATCH_VALUE_MAX) {
         data->values[index][field]++;
     }

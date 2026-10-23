@@ -4,223 +4,222 @@
 #include "dwc/gsPlatformUtil.h"
 #include <stdlib.h>
 
-// GameSpy's core (gsCore.c). The ROM names neither the file nor its functions; both are the later SDK's, but for
-// gsiCoreAtExit, a name of ours
+// GameSpy's core (gsCore.c). The ROM names neither the file nor its functions; both are the later SDK's
 
 // The core: how many users started it, whether its lock was made, whether it started and whether it shuts down, the
 // lock of its list and the list of its tasks
-typedef struct GSCore {
-    s32 refCount;
+typedef struct GSCoreMgr {
+    gsi_u32 mRefCount;
     // The flags are volatile because another thread sets them while gsCoreInitialize waits for them
-    volatile BOOL critSecCreated;
-    volatile BOOL isStaticInitComplete;
-    volatile BOOL isShuttingDown;
-    GSICriticalSection queueCrit;
-    DArray *taskArray;
-} GSCore;
+    volatile gsi_bool critSecCreated;
+    volatile gsi_bool mIsStaticInitComplete;
+    volatile gsi_bool mIsShuttingDown;
+    GSICriticalSection mQueueCrit;
+    DArray mTaskArray;
+} GSCoreMgr;
 
-static GSCore *gsiGetStaticCore(void);
-static void gsiCoreAtExit(void);
-static void gsiCoreTaskDispatchCallback(GSTask *task, int result);
-static int gsiCoreRunTask(GSTask *task);
+static GSCoreMgr *gsiGetStaticCore(void);
+static void gsiCoreAtExitShutdown(void);
+static void gsiCoreTaskDispatchCallback(GSTask *task, GSTaskResult result);
+static GSTaskResult gsCoreTaskThink(GSTask *task);
 
-static GSCore sCore;
+static GSCoreMgr gStaticCore;
 
-static GSCore *gsiGetStaticCore(void) {
-    return &sCore;
+static GSCoreMgr *gsiGetStaticCore(void) {
+    return &gStaticCore;
 }
 
-static void gsiCoreAtExit(void) {
-    gsiDeleteCriticalSection(&gsiGetStaticCore()->queueCrit);
+static void gsiCoreAtExitShutdown(void) {
+    gsiDeleteCriticalSection(&gsiGetStaticCore()->mQueueCrit);
 }
 
 void gsCoreInitialize(void) {
-    GSCore *core = gsiGetStaticCore();
+    GSCoreMgr *core = gsiGetStaticCore();
 
-    while (core->isShuttingDown) {
+    while (core->mIsShuttingDown) {
         msleep(100);
     }
-    if (gsiInterlockedIncrement(&core->refCount) == 1) {
+    if (gsiInterlockedIncrement(&core->mRefCount) == 1) {
         if (!core->critSecCreated) {
-            gsiInitializeCriticalSection(&core->queueCrit);
-            atexit(gsiCoreAtExit);
-            core->critSecCreated = TRUE;
+            gsiInitializeCriticalSection(&core->mQueueCrit);
+            atexit(gsiCoreAtExitShutdown);
+            core->critSecCreated = gsi_true;
         }
-        gsiEnterCriticalSection(&core->queueCrit);
-        gsiLeaveCriticalSection(&core->queueCrit);
-        while (core->isShuttingDown) {
+        gsiEnterCriticalSection(&core->mQueueCrit);
+        gsiLeaveCriticalSection(&core->mQueueCrit);
+        while (core->mIsShuttingDown) {
             msleep(100);
         }
-        core->taskArray = func_ov011_02171514(sizeof(GSTask *), 10, NULL);
+        core->mTaskArray = ArrayNew(sizeof(GSTask *), 10, NULL);
         ghttpStartup();
-        core->isStaticInitComplete = TRUE;
+        core->mIsStaticInitComplete = gsi_true;
     } else {
         while (!core->critSecCreated) {
             msleep(100);
         }
-        gsiEnterCriticalSection(&core->queueCrit);
-        gsiLeaveCriticalSection(&core->queueCrit);
-        while (!core->isStaticInitComplete) {
+        gsiEnterCriticalSection(&core->mQueueCrit);
+        gsiLeaveCriticalSection(&core->mQueueCrit);
+        while (!core->mIsStaticInitComplete) {
             msleep(100);
         }
     }
 }
 
 // Calls the task's callback once, with its result
-static void gsiCoreTaskDispatchCallback(GSTask *task, int result) {
-    if (task->isCallbackPending) {
-        task->isCallbackPending = FALSE;
-        if (task->callbackFunc != NULL) {
-            task->callbackFunc(task->taskData, result);
+static void gsiCoreTaskDispatchCallback(GSTask *task, GSTaskResult result) {
+    if (task->mIsCallbackPending) {
+        task->mIsCallbackPending = gsi_false;
+        if (task->mCallbackFunc != NULL) {
+            task->mCallbackFunc(task->mTaskData, result);
         }
     }
 }
 
 // Runs a task once: cancels it when it timed out, and calls its callback and frees it once it is done
-static int gsiCoreRunTask(GSTask *task) {
-    GSCore *core = gsiGetStaticCore();
-    int result = 0;
+static GSTaskResult gsCoreTaskThink(GSTask *task) {
+    GSCoreMgr *core = gsiGetStaticCore();
+    GSTaskResult result = GSTaskResult_None;
 
     if (task == NULL) {
-        return 4;
+        return GSTaskResult_Finished;
     }
-    if (task->isRunning && task->thinkFunc != NULL) {
-        result = task->thinkFunc(task->taskData);
+    if (task->mIsRunning && task->mThinkFunc != NULL) {
+        result = task->mThinkFunc(task->mTaskData);
     }
-    if (!task->isCanceled && result == 1) {
-        if (task->timeout != 0) {
-            if (current_time() - task->startTime > task->timeout) {
+    if (!task->mIsCanceled && result == GSTaskResult_InProgress) {
+        if (task->mTimeout != 0) {
+            if (current_time() - task->mStartTime > task->mTimeout) {
                 gsiCoreCancelTask(task);
-                gsiCoreTaskDispatchCallback(task, 3);
+                gsiCoreTaskDispatchCallback(task, GSTaskResult_TimedOut);
             }
         }
-    } else if (result != 1) {
-        BOOL cleanup = TRUE;
+    } else if (result != GSTaskResult_InProgress) {
+        gsi_bool cleanup = gsi_true;
         int count;
         int i;
 
-        if (task->isRunning) {
+        if (task->mIsRunning) {
             gsiCoreTaskDispatchCallback(task, result);
-            task->isRunning = FALSE;
+            task->mIsRunning = gsi_false;
         }
-        if (task->cleanupFunc != NULL) {
-            cleanup = task->cleanupFunc(task->taskData);
+        if (task->mCleanupFunc != NULL) {
+            cleanup = task->mCleanupFunc(task->mTaskData);
         }
         if (cleanup) {
-            gsiEnterCriticalSection(&core->queueCrit);
-            count = func_ov011_02171588(core->taskArray);
+            gsiEnterCriticalSection(&core->mQueueCrit);
+            count = ArrayLength(core->mTaskArray);
             for (i = 0; i < count; i++) {
-                if (*(GSTask **)func_ov011_0217158c(core->taskArray, i) == task) {
-                    func_ov011_02171634(core->taskArray, i);
+                if (*(GSTask **)ArrayNth(core->mTaskArray, i) == task) {
+                    ArrayRemoveAt(core->mTaskArray, i);
                     gsifree(task);
                     break;
                 }
             }
-            gsiLeaveCriticalSection(&core->queueCrit);
-            return 4;
+            gsiLeaveCriticalSection(&core->mQueueCrit);
+            return GSTaskResult_Finished;
         }
     }
-    return 1;
+    return GSTaskResult_InProgress;
 }
 
-void gsCoreThink(u32 timeLimit) {
-    GSCore *core = gsiGetStaticCore();
-    BOOL allDone = TRUE;
+void gsCoreThink(gsi_time timeLimit) {
+    GSCoreMgr *core = gsiGetStaticCore();
+    gsi_bool allDone = gsi_true;
 
-    if (core->isStaticInitComplete) {
-        u32 startTime;
+    if (core->mIsStaticInitComplete) {
+        gsi_time startTime;
         int count;
         int i;
 
-        gsiEnterCriticalSection(&core->queueCrit);
+        gsiEnterCriticalSection(&core->mQueueCrit);
         startTime = current_time();
-        count = func_ov011_02171588(core->taskArray);
+        count = ArrayLength(core->mTaskArray);
         if (count > 0) {
-            allDone = FALSE;
+            allDone = gsi_false;
         }
         for (i = count - 1; i >= 0; i--) {
-            GSTask *task = *(GSTask **)func_ov011_0217158c(core->taskArray, i);
+            GSTask *task = *(GSTask **)ArrayNth(core->mTaskArray, i);
 
-            if (task->autoThink) {
-                gsiCoreRunTask(task);
+            if (task->mAutoThink) {
+                gsCoreTaskThink(task);
             }
             if (timeLimit != 0 && current_time() - startTime > timeLimit) {
                 break;
             }
         }
-        if (core->isShuttingDown && allDone) {
+        if (core->mIsShuttingDown && allDone) {
             ghttpCleanup();
-            if (core->taskArray != NULL) {
-                func_ov011_02171558(core->taskArray);
-                core->taskArray = NULL;
+            if (core->mTaskArray != NULL) {
+                ArrayFree(core->mTaskArray);
+                core->mTaskArray = NULL;
             }
-            core->isShuttingDown = FALSE;
+            core->mIsShuttingDown = gsi_false;
         }
-        gsiLeaveCriticalSection(&core->queueCrit);
+        gsiLeaveCriticalSection(&core->mQueueCrit);
     }
 }
 
 void gsCoreShutdown(void) {
-    GSCore *core = gsiGetStaticCore();
+    GSCoreMgr *core = gsiGetStaticCore();
 
-    if (core->isStaticInitComplete) {
-        gsiEnterCriticalSection(&core->queueCrit);
-        if (gsiInterlockedDecrement(&core->refCount) != 0) {
-            gsiLeaveCriticalSection(&core->queueCrit);
+    if (core->mIsStaticInitComplete) {
+        gsiEnterCriticalSection(&core->mQueueCrit);
+        if (gsiInterlockedDecrement(&core->mRefCount) != 0) {
+            gsiLeaveCriticalSection(&core->mQueueCrit);
             return;
         }
-        core->isShuttingDown = TRUE;
+        core->mIsShuttingDown = gsi_true;
         {
-            int count = func_ov011_02171588(core->taskArray);
+            int count = ArrayLength(core->mTaskArray);
             int i;
 
             for (i = 0; i < count; i++) {
-                gsiCoreCancelTask(*(GSTask **)func_ov011_0217158c(core->taskArray, i));
+                gsiCoreCancelTask(*(GSTask **)ArrayNth(core->mTaskArray, i));
             }
         }
-        gsiLeaveCriticalSection(&core->queueCrit);
+        gsiLeaveCriticalSection(&core->mQueueCrit);
     }
 }
 
-int gsCoreIsShutdown(void) {
-    GSCore *core = gsiGetStaticCore();
+GSCoreValue gsCoreIsShutdown(void) {
+    GSCoreMgr *core = gsiGetStaticCore();
 
-    if (core->isShuttingDown) {
-        return 1;
+    if (core->mIsShuttingDown) {
+        return GSCore_SHUTDOWN_PENDING;
     }
-    if (core->refCount == 0) {
-        return 2;
+    if (core->mRefCount == 0) {
+        return GSCore_SHUTDOWN_COMPLETE;
     }
-    return 0;
+    return GSCore_IN_USE;
 }
 
-void gsiCoreExecuteTask(GSTask *task, u32 timeout) {
-    GSCore *core = gsiGetStaticCore();
+void gsiCoreExecuteTask(GSTask *task, gsi_time timeout) {
+    GSCoreMgr *core = gsiGetStaticCore();
 
-    task->isCallbackPending = TRUE;
-    task->isStarted = TRUE;
-    task->isRunning = TRUE;
-    task->timeout = timeout;
-    task->startTime = current_time();
-    if (task->executeFunc != NULL) {
-        task->executeFunc(task->taskData);
+    task->mIsCallbackPending = gsi_true;
+    task->mIsStarted = gsi_true;
+    task->mIsRunning = gsi_true;
+    task->mTimeout = timeout;
+    task->mStartTime = current_time();
+    if (task->mExecuteFunc != NULL) {
+        task->mExecuteFunc(task->mTaskData);
     }
-    gsiEnterCriticalSection(&core->queueCrit);
-    func_ov011_021715a4(core->taskArray, &task);
-    gsiLeaveCriticalSection(&core->queueCrit);
+    gsiEnterCriticalSection(&core->mQueueCrit);
+    ArrayAppend(core->mTaskArray, &task);
+    gsiLeaveCriticalSection(&core->mQueueCrit);
 }
 
 void gsiCoreCancelTask(GSTask *task) {
-    GSCore *core = gsiGetStaticCore();
+    GSCoreMgr *core = gsiGetStaticCore();
 
-    gsiEnterCriticalSection(&core->queueCrit);
-    if (task->isRunning && !task->isCanceled) {
-        task->isCanceled = TRUE;
-        if (task->cancelFunc != NULL) {
-            task->cancelFunc(task->taskData);
+    gsiEnterCriticalSection(&core->mQueueCrit);
+    if (task->mIsRunning && !task->mIsCanceled) {
+        task->mIsCanceled = gsi_true;
+        if (task->mCancelFunc != NULL) {
+            task->mCancelFunc(task->mTaskData);
         }
     }
-    gsiLeaveCriticalSection(&core->queueCrit);
+    gsiLeaveCriticalSection(&core->mQueueCrit);
 }
 
 GSTask *gsiCoreCreateTask(void) {
@@ -230,6 +229,6 @@ GSTask *gsiCoreCreateTask(void) {
         return NULL;
     }
     memset(task, 0, sizeof(GSTask));
-    task->autoThink = TRUE;
+    task->mAutoThink = gsi_true;
     return task;
 }

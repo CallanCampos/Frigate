@@ -48,7 +48,7 @@ MusItemDrawSys *MusItemDraw_InitSystem(BlActScene *blact, u16 count, HeapID heap
 void MusItemDraw_TermSystem(MusItemDrawSys *sys) {
     int i;
 
-    GfdClearVramTransferQueue();
+    NNS_GfdClearVramTransferManagerTask();
     MusItemData_Free(sys->itemData);
     for (i = 0; i < sys->count; i++) {
         if (sys->items[i].active == TRUE) {
@@ -240,7 +240,8 @@ void MusItemDraw_SetShadowPalette(MusItemDrawSys *sys, MusItemDraw *item, void *
 
         BlActScene_GetMaterialPlttAddr(sys->blact, item->material, &plttAddr);
         BlActScene_GetMaterialPlttKey(sys->blact, item->material, &plttKey);
-        NNS_GfdRegisterNewVramTransferTask(1, plttAddr, sys->shadowPalette, NNS_GfdGetPlttKeySize(plttKey));
+        NNS_GfdRegisterNewVramTransferTask(NNS_GFD_DST_3D_TEX_PLTT, plttAddr, sys->shadowPalette,
+                                           NNS_GfdGetPlttKeySize(plttKey));
         item->shadow = TRUE;
     }
 }

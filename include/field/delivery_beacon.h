@@ -31,15 +31,14 @@ typedef struct {
     u32 dataNum;
 } DeliveryInit;
 
-// The work is passed as void * by the events that use it
-void *DeliveryBeacon_Init(const DeliveryInit *init);
+DeliveryBeaconWork *DeliveryBeacon_Init(const DeliveryInit *init);
 // Starts receiving, unless the network is busy
-BOOL DeliveryBeacon_RecvStart(void *work);
+BOOL DeliveryBeacon_RecvStart(DeliveryBeaconWork *work);
 // Whether any beacon came
-BOOL DeliveryBeacon_IsAnyReceived(void *work);
+BOOL DeliveryBeacon_IsAnyReceived(DeliveryBeaconWork *work);
 // Whether every beacon came, after which the data is decrypted into the buffer
-BOOL DeliveryBeacon_IsReceiveDone(void *work);
-void DeliveryBeacon_Main(void *work);
-void DeliveryBeacon_End(void *work);
+BOOL DeliveryBeacon_IsReceiveDone(DeliveryBeaconWork *work);
+void DeliveryBeacon_Main(DeliveryBeaconWork *work);
+void DeliveryBeacon_End(DeliveryBeaconWork *work);
 
 #endif // POKEBW2_FIELD_DELIVERY_BEACON_H

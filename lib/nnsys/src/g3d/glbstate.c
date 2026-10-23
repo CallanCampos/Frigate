@@ -3,21 +3,20 @@
 
 // NitroSystem's G3D global state: NNS_G3dGlb, with the projection and camera matrices, the lights, the material colors,
 // the viewport and the base transformation that the models are drawn with, how it is sent to the geometry engine, and
-// the inverse matrices made from it. The file is named after NitroSystem's own glbstate.c. The functions keep swan's
-// names, and g3d.h gives NitroSystem's where the code shows them.
-// The command words (cmd0 to cmd4) of NNS_G3dGlb are geometry commands, four to a word, 0x10 for MTX_MODE, 0x16 and
-// 0x17 for MTX_LOAD_4x4 and MTX_LOAD_4x3 and so on, which gx.h has no names for yet. Each is followed in the structure
-// by the words its commands take, so that a flush sends a run of the structure
-// InvertMtx44, NNS_G3DGetInvProjectionMatrix and NNS_G3DPrecalcTempMVMatrix are static because only this file calls
-// them
+// the inverse matrices made from it. The file is named after NitroSystem's own glbstate.c. The names are NitroSystem's,
+// as ntrtwl's reconstruction of NitroSystem has them, and g3d.h notes swan's where they differ. The command words (cmd0
+// to cmd4) of NNS_G3dGlb are geometry commands, four to a word, 0x10 for MTX_MODE, 0x16 and 0x17 for MTX_LOAD_4x4 and
+// MTX_LOAD_4x3 and so on, which gx.h has no names for yet. Each is followed in the structure by the words its commands
+// take, so that a flush sends a run of the structure. mtx_inverse44, NNS_G3dGlbGetInvP and calcSrtCameraMtx_ (swan's
+// NNS_G3DPrecalcTempMVMatrix) are static because only this file calls them
 
 NNSG3dGlb NNS_G3dGlb;
 
-static int InvertMtx44(const MtxFx44 *mtx, MtxFx44 *inv);
-static const MtxFx44 *NNS_G3DGetInvProjectionMatrix(void);
-static void NNS_G3DPrecalcTempMVMatrix(void);
+static int mtx_inverse44(const MtxFx44 *mtx, MtxFx44 *inv);
+static const MtxFx44 *NNS_G3dGlbGetInvP(void);
+static void calcSrtCameraMtx_(void);
 
-void NNS_G3DRenderStateInit(void) {
+void NNS_G3dGlbInit(void) {
     NNS_G3dGlb.cmd0 = 0x17101610; // MTX_MODE, MTX_LOAD_4x4, MTX_MODE, MTX_LOAD_4x3
     NNS_G3dGlb.mtxmode_proj = GX_MTXMODE_PROJECTION;
     NNS_G3dGlb.mtxmode_posvec = GX_MTXMODE_POSITION_VECTOR;
@@ -62,7 +61,7 @@ void NNS_G3DRenderStateInit(void) {
 }
 
 // Sends all of the global state, the structure after its first command word
-void NNS_G3DFlushRenderState(void) {
+void NNS_G3dGlbFlushP(void) {
     const u32 *glb = (const u32 *)&NNS_G3dGlb;
 
     NNS_G3dGeBufferOP_N(glb[0], glb + 1, 62);
@@ -72,7 +71,7 @@ void NNS_G3DFlushRenderState(void) {
 
 // Sends the projection matrix with the camera matrix applied to it, then the rest of the state from cmd1: the position
 // matrix starts as the identity, and gets the base transformation
-void NNS_G3DFlushViewProjection(void) {
+void NNS_G3dGlbFlushVP(void) {
     NNS_G3dGeBufferOP_N(0x1610, &NNS_G3dGlb.mtxmode_proj, 17); // MTX_MODE and MTX_LOAD_4x4
     NNS_G3dGeMultMtx43(&NNS_G3dGlb.cameraMtx);
     NNS_G3dGeMtxMode(GX_MTXMODE_POSITION_VECTOR);
@@ -85,14 +84,14 @@ void NNS_G3DFlushViewProjection(void) {
 // rotation as the matrix that the light vectors are transformed by (the rotation is not in the position matrix), and
 // the state from cmd1. Only the rotation of invBaseRot is set: its translation goes to the position matrix, which the
 // identity right after replaces
-void NNS_G3DFlushModelViewProjection(void) {
+void NNS_G3dGlbFlushWVP(void) {
     MtxFx43 invBaseRot;
 
     NNS_G3dGeBufferOP_N(0x1610, &NNS_G3dGlb.mtxmode_proj, 17); // MTX_MODE and MTX_LOAD_4x4
     NNS_G3dGeMultMtx43(&NNS_G3dGlb.cameraMtx);
     NNS_G3dGeBufferOP_N(0x1b19, (const u32 *)&NNS_G3dGlb.prmBaseMtx, 15); // MTX_MULT_4x3 and MTX_SCALE
     NNS_G3dGeMtxMode(GX_MTXMODE_POSITION_VECTOR);
-    MAT3_Invert(&NNS_G3dGlb.prmBaseRot, &invBaseRot.rt.rot);
+    MTX_Inverse33(&NNS_G3dGlb.prmBaseRot, &invBaseRot.rt.rot);
     NNS_G3dGeLoadMtx43(&invBaseRot);
     NNS_G3dGeBufferOP_N(NNS_G3dGlb.cmd1, (const u32 *)&NNS_G3dGlb.cmd1 + 1, 14);
     NNS_G3dGeIdentity();
@@ -117,23 +116,23 @@ void NNS_G3dGlbSetBaseScale(const VecFx32 *scale) {
     }
 }
 
-void NNS_G3DSetLightVector(int lightID, fx16 x, fx16 y, fx16 z) {
+void NNS_G3dGlbLightVector(GXLightId lightID, fx16 x, fx16 y, fx16 z) {
     NNS_G3dGlb.lightVec[lightID] = GX_PACK_LIGHTVECTOR_PARAM(lightID, x, y, z);
 }
 
-void NNS_G3DSetLightColor(int lightID, GXRgb rgb) {
+void NNS_G3dGlbLightColor(GXLightId lightID, GXRgb rgb) {
     NNS_G3dGlb.lightColor[lightID] = GX_PACK_LIGHTCOLOR_PARAM(lightID, rgb);
 }
 
-void NNS_G3DSetMatDifAmb(GXRgb diffuse, GXRgb ambient, BOOL isSetVtxColor) {
+void NNS_G3dGlbMaterialColorDiffAmb(GXRgb diffuse, GXRgb ambient, BOOL isSetVtxColor) {
     NNS_G3dGlb.prmMatColor0 = GX_PACK_DIFFAMB_PARAM(diffuse, ambient, isSetVtxColor);
 }
 
-void NNS_G3DSetMatSpeEmi(GXRgb specular, GXRgb emission, BOOL isShininess) {
+void NNS_G3dGlbMaterialColorSpecEmi(GXRgb specular, GXRgb emission, BOOL isShininess) {
     NNS_G3dGlb.prmMatColor1 = GX_PACK_SPECEMI_PARAM(specular, emission, isShininess);
 }
 
-const MtxFx43 *NNS_G3DGetInvViewMatrix(void) {
+const MtxFx43 *NNS_G3dGlbGetInvV(void) {
     if (!(NNS_G3dGlb.flag & NNS_G3D_GLB_FLAG_INVCAMERA_UPTODATE)) {
         MTX_Inverse43(&NNS_G3dGlb.cameraMtx, &NNS_G3dGlb.invCameraMtx);
         NNS_G3dGlb.flag |= NNS_G3D_GLB_FLAG_INVCAMERA_UPTODATE;
@@ -144,7 +143,7 @@ const MtxFx43 *NNS_G3DGetInvViewMatrix(void) {
 // Inverts a 4x4 matrix by Gauss-Jordan elimination: tmp is reduced to the identity by row operations, and inv, which
 // starts as the identity, gets the same ones. The pivot of each column is the largest entry at or below the diagonal.
 // Returns -1 when a column has none
-static int InvertMtx44(const MtxFx44 *mtx, MtxFx44 *inv) {
+static int mtx_inverse44(const MtxFx44 *mtx, MtxFx44 *inv) {
     MtxFx44 tmp;
     int col;
     int i;
@@ -202,42 +201,42 @@ static int InvertMtx44(const MtxFx44 *mtx, MtxFx44 *inv) {
     return 0;
 }
 
-static const MtxFx44 *NNS_G3DGetInvProjectionMatrix(void) {
+static const MtxFx44 *NNS_G3dGlbGetInvP(void) {
     if (!(NNS_G3dGlb.flag & NNS_G3D_GLB_FLAG_INVPROJ_UPTODATE)) {
-        InvertMtx44(&NNS_G3dGlb.projMtx, &NNS_G3dGlb.invProjMtx);
+        mtx_inverse44(&NNS_G3dGlb.projMtx, &NNS_G3dGlb.invProjMtx);
         NNS_G3dGlb.flag |= NNS_G3D_GLB_FLAG_INVPROJ_UPTODATE;
     }
     return &NNS_G3dGlb.invProjMtx;
 }
 
 // Applies the base transformation to the view matrix, and inverts the result
-static void NNS_G3DPrecalcTempMVMatrix(void) {
-    MTX_Concat43(&NNS_G3dGlb.prmBaseMtx, &NNS_G3dGlb.cameraMtx, &NNS_G3dGlb.baseCameraMtx);
-    MTX_ScaleApply43(&NNS_G3dGlb.baseCameraMtx, &NNS_G3dGlb.baseCameraMtx, NNS_G3dGlb.prmBaseScale.x,
+static void calcSrtCameraMtx_(void) {
+    MTX_Concat43(&NNS_G3dGlb.prmBaseMtx, &NNS_G3dGlb.cameraMtx, &NNS_G3dGlb.srtCameraMtx);
+    MTX_ScaleApply43(&NNS_G3dGlb.srtCameraMtx, &NNS_G3dGlb.srtCameraMtx, NNS_G3dGlb.prmBaseScale.x,
                      NNS_G3dGlb.prmBaseScale.y, NNS_G3dGlb.prmBaseScale.z);
-    MTX_Inverse43(&NNS_G3dGlb.baseCameraMtx, &NNS_G3dGlb.invBaseCameraMtx);
+    MTX_Inverse43(&NNS_G3dGlb.srtCameraMtx, &NNS_G3dGlb.invSrtCameraMtx);
 }
 
-const MtxFx43 *NNS_G3DGetTempMVMatrix(void) {
+const MtxFx43 *NNS_G3dGlbGetWV(void) {
     if (!(NNS_G3dGlb.flag & NNS_G3D_GLB_FLAG_BASECAMERA_UPTODATE)) {
-        NNS_G3DPrecalcTempMVMatrix();
+        calcSrtCameraMtx_();
         NNS_G3dGlb.flag |= NNS_G3D_GLB_FLAG_BASECAMERA_UPTODATE;
     }
-    return &NNS_G3dGlb.baseCameraMtx;
+    return &NNS_G3dGlb.srtCameraMtx;
 }
 
-const MtxFx43 *NNS_G3DGetTempInvMVMatrix(void) {
+const MtxFx43 *NNS_G3dGlbGetInvWV(void) {
     if (!(NNS_G3dGlb.flag & NNS_G3D_GLB_FLAG_BASECAMERA_UPTODATE)) {
-        NNS_G3DPrecalcTempMVMatrix();
+        calcSrtCameraMtx_();
         NNS_G3dGlb.flag |= NNS_G3D_GLB_FLAG_BASECAMERA_UPTODATE;
     }
-    return &NNS_G3dGlb.invBaseCameraMtx;
+    return &NNS_G3dGlb.invSrtCameraMtx;
 }
 
-const MtxFx44 *NNS_G3DGetInvViewProjectionMatrix(void) {
+const MtxFx44 *NNS_G3dGlbGetInvVP(void) {
     if (!(NNS_G3dGlb.flag & NNS_G3D_GLB_FLAG_INVCAMERAPROJ_UPTODATE)) {
-        const MtxFx43 *invView = NNS_G3DGetInvViewMatrix();
-        const MtxFx44 *invProj = NNS_G3DGetInvProjectionMatrix();
+        const MtxFx43 *invView = NNS_G3dGlbGetInvV();
+        const MtxFx44 *invProj = NNS_G3dGlbGetInvP();
         MtxFx44 invView44;
 
         MTX_Copy43To44_(invView, &invView44);
@@ -247,7 +246,7 @@ const MtxFx44 *NNS_G3DGetInvViewProjectionMatrix(void) {
     return &NNS_G3dGlb.invCameraProjMtx;
 }
 
-void NNS_G3DGetViewport(int *x1, int *y1, int *x2, int *y2) {
+void NNS_G3dGlbGetViewPort(int *x1, int *y1, int *x2, int *y2) {
     if (x1 != NULL) {
         *x1 = NNS_G3dGlb.prmViewPort & 0xff;
     }

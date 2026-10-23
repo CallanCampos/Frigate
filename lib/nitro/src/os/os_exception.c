@@ -11,27 +11,26 @@
 #define HW_EXCP_VECTOR_MAIN_MASK 0xff7fffff
 #define OSi_DEBUGGER_HANDLER_START 0x02600000
 #define OSi_DEBUGGER_HANDLER_END 0x02800000
-#define OSi_EXCEPTION_STACK_TOP 0x02000000
 
 // The registers at the exception: an OSContext, then the first word of the BIOS's frame, a word that nothing sets
 // and the low bit of the stack pointer that the handler was entered with
 typedef struct OSiExContext {
     OSContext context;
-    u32 unk_64;
-    u32 unk_68;
-    u32 spLowBit;
+    u32 cp15;
+    u32 spsr;
+    u32 exinfo;
 } OSiExContext;
 
-typedef void (*OSiExceptionHandler)(OSiExContext *context, void *arg);
+typedef void (*OSExceptionHandler)(OSiExContext *context, void *arg);
 
 static asm void OSi_ExceptionHandler(void);
 static asm void OSi_GetAndDisplayContext(void); // swan's AbortUndefExcHandler
 static asm void OSi_SetExContext(void);         // swan's exceptions_log_regs
 static void OSi_DisplayExContext(void);         // swan's exceptions_call_abort_undef_callback
 
-static OSiExceptionHandler OSi_ExceptionUserHandler; // swan's g_ExcUndefAbortCallback
+static OSExceptionHandler OSi_UserExceptionHandler; // swan's g_ExcUndefAbortCallback
 static u32 OSi_DebuggerHandler;
-static void *OSi_ExceptionUserArg; // swan's g_ExcUndefAbortCallbackData
+static void *OSi_UserExceptionHandlerArg; // swan's g_ExcUndefAbortCallbackData
 // Nothing reads these 32 bytes, which lie between the variables above and the registers' buffer. They are global
 // because MWCC drops a static that nothing reads; the name is ours
 u8 OSi_UnusedExceptionWork[0x20];
@@ -53,7 +52,7 @@ void OS_InitException(void) {
             *(u32 *)((u32)vector & HW_EXCP_VECTOR_MAIN_MASK) = (u32)OSi_ExceptionHandler;
         }
     }
-    OSi_ExceptionUserHandler = NULL;
+    OSi_UserExceptionHandler = NULL;
 }
 
 #pragma thumb off
@@ -67,7 +66,7 @@ static asm void OSi_ExceptionHandler(void) {
     cmp ip, #0
     movne lr, pc
     bxne ip
-    ldr ip, =OSi_EXCEPTION_STACK_TOP
+    ldr ip, =HW_ITCM_END
     stmdb ip!, {r0, r1, r2, r3, sp, lr}
     and r0, sp, #1
     mov sp, ip
@@ -95,7 +94,7 @@ static asm void OSi_ExceptionHandler(void) {
     bx lr
 }
 
-// NitroSDK's OSi_GetAndDisplayContext (a guess): logs the registers and calls the game's handler, keeping r0 (the low
+// NitroSDK's OSi_GetAndDisplayContext: logs the registers and calls the game's handler, keeping r0 (the low
 // bit of the stack pointer) across the two calls
 static asm void OSi_GetAndDisplayContext(void) {
     stmdb sp!, {r0, lr}
@@ -105,7 +104,7 @@ static asm void OSi_GetAndDisplayContext(void) {
     bx lr
 }
 
-// NitroSDK's OSi_SetExContext (a guess): gets the registers of the mode that took the exception into OSi_ExContext,
+// NitroSDK's OSi_SetExContext: gets the registers of the mode that took the exception into OSi_ExContext,
 // from the BIOS's frame at ip, r4 to r11 as they are and the mode's own sp and lr, which it reads by switching to the
 // mode with IRQs off
 static asm void OSi_SetExContext(void) {
@@ -143,11 +142,11 @@ static asm void OSi_SetExContext(void) {
 }
 // clang-format on
 
-// NitroSDK's OSi_DisplayExContext (a guess): calls the game's handler, if it set one, with the registers and its
+// NitroSDK's OSi_DisplayExContext: calls the game's handler, if it set one, with the registers and its
 // argument, in system mode on the current stack and with the protection unit switched on for the call and off after
 // it. The assembly is the SDK's own, in a C function whose prologue and early return the compiler makes
 static void OSi_DisplayExContext(void) {
-    if (OSi_ExceptionUserHandler == NULL) {
+    if (OSi_UserExceptionHandler == NULL) {
         return;
     }
     // clang-format off
@@ -161,9 +160,9 @@ static void OSi_DisplayExContext(void) {
         stmdb sp!, {r1, r2}
         bl OS_EnableProtectionUnit
         ldr r0, =OSi_ExContext
-        ldr r1, =OSi_ExceptionUserArg
+        ldr r1, =OSi_UserExceptionHandlerArg
         ldr r1, [r1, #0]
-        ldr ip, =OSi_ExceptionUserHandler
+        ldr ip, =OSi_UserExceptionHandler
         ldr ip, [ip, #0]
         ldr lr, =@return
         bx ip

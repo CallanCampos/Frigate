@@ -4,17 +4,17 @@
 // and frees only by going back to a state saved before. The game doesn't use its init, which the link left out, so
 // nothing sets size here
 
-// What is allocated: up to lo from the bottom, and down to hi from the top
+// What is allocated: up to loAddr from the bottom, and down to hiAddr from the top
 typedef struct {
-    u32 lo;
-    u32 hi;
-    u32 size;
-} GfdFrmPlttManager;
+    u32 loAddr;
+    u32 hiAddr;
+    u32 szTotal;
+} NNSGfdFrmPlttVramManager;
 
-static GfdFrmPlttManager s_managerState_;
+static NNSGfdFrmPlttVramManager s_managerState_;
 
-static inline BOOL AllocLow(u32 size, BOOL is4pltt, u32 *outAddr) {
-    const u32 lo = s_managerState_.lo;
+static inline BOOL AllocFromLo_(u32 size, BOOL is4pltt, u32 *outAddr) {
+    const u32 lo = s_managerState_.loAddr;
     u32 pad;
     u32 total;
 
@@ -26,21 +26,21 @@ static inline BOOL AllocLow(u32 size, BOOL is4pltt, u32 *outAddr) {
     }
     total = size + pad;
 
-    if (s_managerState_.hi - lo >= total) {
+    if (s_managerState_.hiAddr - lo >= total) {
         const u32 newLo = lo + total;
 
-        if (is4pltt && newLo > GFD_PLTT4_LIMIT) {
+        if (is4pltt && newLo > NNS_GFD_4PLTT_MAX_ADDR) {
             return FALSE;
         }
         *outAddr = lo + pad;
-        s_managerState_.lo += total;
+        s_managerState_.loAddr += total;
         return TRUE;
     }
     return FALSE;
 }
 
-static inline BOOL AllocHigh(u32 size, BOOL is4pltt, u32 *outAddr) {
-    const u32 hi = s_managerState_.hi;
+static inline BOOL AllocFromHi_(u32 size, BOOL is4pltt, u32 *outAddr) {
+    const u32 hi = s_managerState_.hiAddr;
 
     if (hi >= size) {
         const u32 newHi = hi - size;
@@ -53,45 +53,45 @@ static inline BOOL AllocHigh(u32 size, BOOL is4pltt, u32 *outAddr) {
             total = size + (newHi & 15);
         }
 
-        if (hi - s_managerState_.lo >= total) {
-            if (is4pltt && hi > GFD_PLTT4_LIMIT) {
+        if (hi - s_managerState_.loAddr >= total) {
+            if (is4pltt && hi > NNS_GFD_4PLTT_MAX_ADDR) {
                 return FALSE;
             }
-            s_managerState_.hi -= total;
-            *outAddr = s_managerState_.hi;
+            s_managerState_.hiAddr -= total;
+            *outAddr = s_managerState_.hiAddr;
             return TRUE;
         }
     }
     return FALSE;
 }
 
-NNSGfdPlttKey NNS_GfdAllocFrmPlttVram(u32 szByte, BOOL is4pltt, BOOL bAllocFromLo) {
+NNSGfdPlttKey NNS_GfdAllocFrmPlttVram(u32 szByte, BOOL is4pltt, u32 bAllocFromLo) {
     u32 addr = 0;
     BOOL ok;
 
-    szByte = GfdPlttAllocSize(szByte);
-    if (szByte >= GFD_PLTT_ALLOC_LIMIT) {
+    szByte = NNSi_GfdGetPlttKeyRoundupSize(szByte);
+    if (szByte >= NNS_GFD_PLTTSIZE_MAX) {
         return NNS_GFD_ALLOC_ERROR_PLTTKEY;
     }
 
     if (bAllocFromLo == TRUE) {
-        ok = AllocLow(szByte, is4pltt, &addr);
+        ok = AllocFromLo_(szByte, is4pltt, &addr);
     } else {
-        ok = AllocHigh(szByte, is4pltt, &addr);
+        ok = AllocFromHi_(szByte, is4pltt, &addr);
     }
 
     if (ok) {
-        return GfdMakePlttKey(addr, szByte);
+        return NNS_GfdMakePlttKey(addr, szByte);
     }
     return NNS_GFD_ALLOC_ERROR_PLTTKEY;
 }
 
 void NNS_GfdGetFrmPlttVramState(NNSGfdFrmPlttVramState *state) {
-    state->address[0] = s_managerState_.lo;
-    state->address[1] = s_managerState_.hi;
+    state->address[0] = s_managerState_.loAddr;
+    state->address[1] = s_managerState_.hiAddr;
 }
 
 void NNS_GfdSetFrmPlttVramState(const NNSGfdFrmPlttVramState *state) {
-    s_managerState_.lo = state->address[0];
-    s_managerState_.hi = state->address[1];
+    s_managerState_.loAddr = state->address[0];
+    s_managerState_.hiAddr = state->address[1];
 }

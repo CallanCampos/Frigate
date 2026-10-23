@@ -9,7 +9,7 @@
 // sends.
 //
 // The host's PM_Init reaches pm.c's statics, whose names a rename upstream would change: PMi_IsInit, PMi_Work,
-// PMi_ScreensOffCount, PMi_DisplayOffCount and the callback PMi_CommonCallback. It is pm.c's own function, so a change
+// PMi_LCDCount, PMi_DisplayOffCount and the callback PMi_CommonCallback. It is pm.c's own function, so a change
 // to pm.c's PM_Init must be made here too until the file goes.
 #define PM_Init PMi_DsInit
 #include "lib/nitro/src/spi/pm.c"
@@ -32,5 +32,5 @@ void PM_Init(void) {
         SVC_WaitByLoop(100);
     }
     PXI_SetFifoRecvCallback(PXI_FIFO_TAG_PM, PMi_CommonCallback);
-    PMi_ScreensOffCount = PMi_DisplayOffCount = OS_GetVBlankCount();
+    PMi_LCDCount = PMi_DisplayOffCount = OS_GetVBlankCount();
 }

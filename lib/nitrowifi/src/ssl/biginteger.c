@@ -3,25 +3,26 @@
 #include "ssl_internal.h"
 
 // A multi-precision integer is a little-endian array of n u16 digits, every length given explicitly by the caller.
-// No swan name for the object or any of its functions; named for what each does from the asm's shape
+// No swan name for the object or any of its functions; they carry NitroWiFi's own names, as ntrtwl's reconstruction of
+// NitroWiFi has them
 
-static int BigInti_GetLength(const u16 *digits, int n) {
+static int count_digits(const u16 *digits, int n) {
     while (n != 0 && digits[n - 1] == 0) {
         n--;
     }
     return n;
 }
 
-s32 BigInt_GetSign(const u16 *digits, int n) {
+s32 CPSi_big_sign(const u16 *digits, int n) {
     if (digits[n - 1] & 0x8000) {
         return -1;
     }
-    return BigInti_GetLength(digits, n) != 0;
+    return count_digits(digits, n) != 0;
 }
 
-void BigInt_Add(u16 *dst, const u16 *a, const u16 *b, int n) {
-    int lenA = BigInti_GetLength(a, n);
-    int lenB = BigInti_GetLength(b, n);
+void CPSi_big_add(u16 *dst, const u16 *a, const u16 *b, int n) {
+    int lenA = count_digits(a, n);
+    int lenB = count_digits(b, n);
     int len = lenA >= lenB ? lenA : lenB;
     u32 carry;
     int i;
@@ -41,7 +42,7 @@ void BigInt_Add(u16 *dst, const u16 *a, const u16 *b, int n) {
 }
 
 // Adds value into dst/src starting at digit 0, propagating the carry, and copies the rest of src unchanged
-static void BigInti_AddDigit(u16 *dst, const u16 *src, u32 value, int n) {
+static void CPSi_big_add_small(u16 *dst, const u16 *src, u32 value, int n) {
     int i;
 
     for (i = 0; i < n; i++) {
@@ -59,18 +60,18 @@ static void BigInti_AddDigit(u16 *dst, const u16 *src, u32 value, int n) {
     }
 }
 
-void BigInt_Negate(u16 *digits, int n) {
+void CPSi_big_negate(u16 *digits, int n) {
     int i;
 
     for (i = 0; i < n; i++) {
         digits[i] = ~digits[i];
     }
-    BigInti_AddDigit(digits, digits, 1, n);
+    CPSi_big_add_small(digits, digits, 1, n);
 }
 
-void BigInt_Sub(u16 *dst, const u16 *a, const u16 *b, int n) {
-    int lenA = BigInti_GetLength(a, n);
-    int lenB = BigInti_GetLength(b, n);
+void CPSi_big_sub(u16 *dst, const u16 *a, const u16 *b, int n) {
+    int lenA = count_digits(a, n);
+    int lenB = count_digits(b, n);
     int len = lenA >= lenB ? lenA : lenB;
     s32 borrow;
     int i;
@@ -92,7 +93,7 @@ void BigInt_Sub(u16 *dst, const u16 *a, const u16 *b, int n) {
 }
 
 // Subtracts value from src starting at digit 0, propagating the borrow, and copies the rest of src unchanged
-static void BigInti_SubDigit(u16 *dst, const u16 *src, u32 value, int n) {
+static void CPSi_big_sub_small(u16 *dst, const u16 *src, u32 value, int n) {
     int i;
 
     for (i = 0; i < n; i++) {
@@ -110,7 +111,7 @@ static void BigInti_SubDigit(u16 *dst, const u16 *src, u32 value, int n) {
     }
 }
 
-static int BigInti_Compare(const u16 *a, const u16 *b, int n) {
+static int CPSi_big_compare(const u16 *a, const u16 *b, int n) {
     int i;
 
     for (i = n - 1; i >= 0; i--) {
@@ -125,7 +126,7 @@ static int BigInti_Compare(const u16 *a, const u16 *b, int n) {
 }
 
 // Adds value into digits starting at index, propagating the carry, without touching digits below index
-static void BigInti_AddDigitFrom(u16 *digits, u32 value, int index, int n) {
+static void CPSi_big_add_part(u16 *digits, u32 value, int index, int n) {
     while (value != 0 && index < n) {
         value += digits[index];
         digits[index] = (u16)value;
@@ -134,25 +135,25 @@ static void BigInti_AddDigitFrom(u16 *digits, u32 value, int index, int n) {
     }
 }
 
-void BigInt_Mul(u16 *dst, const u16 *a, const u16 *b, int n) {
+void CPSi_big_mult(u16 *dst, const u16 *a, const u16 *b, int n) {
     int lenA, lenB;
     int i;
 
     MI_CpuFill8(dst, 0, n * 2);
-    lenA = BigInti_GetLength(a, n);
-    lenB = BigInti_GetLength(b, n);
+    lenA = count_digits(a, n);
+    lenB = count_digits(b, n);
     for (i = 0; i < lenB; i++) {
         int j = 0;
         int maxJ = n - i;
 
         for (; j < lenA && j < maxJ; j++) {
-            BigInti_AddDigitFrom(dst, (u32)a[j] * b[i], i + j, n);
+            CPSi_big_add_part(dst, (u32)a[j] * b[i], i + j, n);
         }
     }
 }
 
-static void BigInti_MulDigit(u16 *dst, const u16 *src, u32 value, int n) {
-    int len = BigInti_GetLength(src, n);
+static void CPSi_big_mult_small(u16 *dst, const u16 *src, u32 value, int n) {
+    int len = count_digits(src, n);
     u32 carry = 0;
     int i;
 
@@ -167,8 +168,8 @@ static void BigInti_MulDigit(u16 *dst, const u16 *src, u32 value, int n) {
     MI_CpuFill8(dst + i, 0, (n - i) * 2);
 }
 
-static void BigInti_Square(u16 *dst, const u16 *src, int n) {
-    int len = BigInti_GetLength(src, n);
+static void CPSi_big_sqr(u16 *dst, const u16 *src, int n) {
+    int len = count_digits(src, n);
     int doubleLen = len * 2;
     int k;
     int outer;
@@ -199,10 +200,10 @@ static void BigInti_Square(u16 *dst, const u16 *src, int n) {
             u32 product = (u32)src[inner] * src[outer];
 
             if (product <= 0x7fff8000) {
-                BigInti_AddDigitFrom(dst, product * 2, outer + inner, n);
+                CPSi_big_add_part(dst, product * 2, outer + inner, n);
             } else {
-                BigInti_AddDigitFrom(dst, product, outer + inner, n);
-                BigInti_AddDigitFrom(dst, product, outer + inner, n);
+                CPSi_big_add_part(dst, product, outer + inner, n);
+                CPSi_big_add_part(dst, product, outer + inner, n);
             }
         }
     }
@@ -211,11 +212,11 @@ static void BigInti_Square(u16 *dst, const u16 *src, int n) {
 // Divides n-digit operands into optional quotient/remainder outputs. Three n-digit scratch regions follow;
 // when both operands have n significant digits, the original numerator window also reads workBuf[3*n].
 // That extra digit is not initialized here; padded operands avoid this access.
-void BigInt_Div(u16 *quotient, const u16 *dividend, const u16 *divisor, u16 *remainder, int n, u16 *workBuf) {
+void CPSi_big_div(u16 *quotient, const u16 *dividend, const u16 *divisor, u16 *remainder, int n, u16 *workBuf) {
     u16 *qbuf = workBuf + n;
     u16 *rem = qbuf + n;
-    int lenA = BigInti_GetLength(dividend, n);
-    int lenB = BigInti_GetLength(divisor, n);
+    int lenA = count_digits(dividend, n);
+    int lenB = count_digits(divisor, n);
 
     MI_CpuFill8(qbuf, 0, n * 4);
 
@@ -253,13 +254,13 @@ void BigInt_Div(u16 *quotient, const u16 *dividend, const u16 *divisor, u16 *rem
                 }
 
                 for (;;) {
-                    BigInti_MulDigit(workBuf, divisor, digit, n);
-                    if (BigInti_Compare(rem, workBuf, n) >= 0) {
+                    CPSi_big_mult_small(workBuf, divisor, digit, n);
+                    if (CPSi_big_compare(rem, workBuf, n) >= 0) {
                         break;
                     }
                     digit--;
                 }
-                BigInt_Sub(rem, rem, workBuf, n);
+                CPSi_big_sub(rem, rem, workBuf, n);
                 qbuf[0] = (u16)digit;
             }
         }
@@ -273,7 +274,7 @@ void BigInt_Div(u16 *quotient, const u16 *dividend, const u16 *divisor, u16 *rem
     }
 }
 
-void BigInt_ModExp(u16 *dst, const u16 *base, const u16 *exponent, int n, const u16 *modulus) {
+void CPSi_big_power(u16 *dst, const u16 *base, const u16 *exponent, int n, const u16 *modulus) {
     u16 *work = CPSiAlloc(n * 8);
     u16 *temp;
     int expLen;
@@ -288,7 +289,7 @@ void BigInt_ModExp(u16 *dst, const u16 *base, const u16 *exponent, int n, const 
     MI_CpuFill8(dst + 1, 0, (n - 1) * 2);
     dst[0] = 1;
 
-    expLen = BigInti_GetLength(exponent, n);
+    expLen = count_digits(exponent, n);
     bit = (n - expLen) * 16;
     totalBits = n * 16;
 
@@ -302,16 +303,16 @@ void BigInt_ModExp(u16 *dst, const u16 *base, const u16 *exponent, int n, const 
     }
 
     while (bit < totalBits) {
-        BigInti_Square(work, dst, n);
+        CPSi_big_sqr(work, dst, n);
         MI_CpuCopy8(work, dst, n * 2);
         if (modulus != NULL) {
-            BigInt_Div(NULL, dst, modulus, dst, n, temp);
+            CPSi_big_div(NULL, dst, modulus, dst, n, temp);
         }
         if (exponent[n - (bit >> 4) - 1] & (0x8000u >> (bit & 0xf))) {
-            BigInt_Mul(work, dst, base, n);
+            CPSi_big_mult(work, dst, base, n);
             MI_CpuCopy8(work, dst, n * 2);
             if (modulus != NULL) {
-                BigInt_Div(NULL, dst, modulus, dst, n, temp);
+                CPSi_big_div(NULL, dst, modulus, dst, n, temp);
             }
         }
         bit++;
@@ -322,8 +323,8 @@ void BigInt_ModExp(u16 *dst, const u16 *base, const u16 *exponent, int n, const 
 
 // Extended Euclidean coefficient recurrence, normalized with the original modulus at the end.
 // The caller zeroes scratch: six n-digit regions precede nominal 3*n division workspace (9*n total).
-// That partition alone does not establish sufficient headroom for every BigInt_Div input.
-static void BigInti_ModInverse(u16 *result, const u16 *value, const u16 *modulus, int n, u16 *scratch) {
+// That partition alone does not establish sufficient headroom for every CPSi_big_div input.
+static void CPSi_big_modinv(u16 *result, const u16 *value, const u16 *modulus, int n, u16 *scratch) {
     u16 *currentRemainder = scratch;
     u16 *quotient = scratch + n;
     u16 *previousRemainder = scratch + n * 2;
@@ -336,52 +337,52 @@ static void BigInti_ModInverse(u16 *result, const u16 *value, const u16 *modulus
     MI_CpuCopy8(modulus, previousRemainder, n * 2);
     currentCoefficient[0] = 1;
 
-    if (BigInt_GetSign(currentRemainder, n) > 0) {
+    if (CPSi_big_sign(currentRemainder, n) > 0) {
         do {
-            BigInt_Div(quotient, previousRemainder, currentRemainder, temporary, n, divisionWork);
+            CPSi_big_div(quotient, previousRemainder, currentRemainder, temporary, n, divisionWork);
             MI_CpuCopy8(currentRemainder, previousRemainder, n * 2);
             MI_CpuCopy8(temporary, currentRemainder, n * 2);
-            BigInt_Mul(temporary, quotient, currentCoefficient, n);
-            BigInt_Sub(temporary, previousCoefficient, temporary, n);
+            CPSi_big_mult(temporary, quotient, currentCoefficient, n);
+            CPSi_big_sub(temporary, previousCoefficient, temporary, n);
             MI_CpuCopy8(currentCoefficient, previousCoefficient, n * 2);
             MI_CpuCopy8(temporary, currentCoefficient, n * 2);
-        } while (BigInt_GetSign(currentRemainder, n) > 0);
+        } while (CPSi_big_sign(currentRemainder, n) > 0);
     }
 
-    BigInt_Add(previousCoefficient, previousCoefficient, modulus, n);
-    BigInt_Div(NULL, previousCoefficient, modulus, result, n, divisionWork);
+    CPSi_big_add(previousCoefficient, previousCoefficient, modulus, n);
+    CPSi_big_div(NULL, previousCoefficient, modulus, result, n, divisionWork);
 }
 
 // Montgomery reduction with R = 2^(16*modLen) and mu = -modulus^(-1) mod R, as constructed by ModExpFast.
 // After optional squaring/multiplication, q = (acc*mu) mod R makes acc + q*modulus divisible by R.
 // A NULL multiplier performs reduction alone; q and t are scratch. The names describe the recovered roles.
-static void BigInti_ModExpStep(u16 *acc, u16 *scratch, const u16 *multiplier, int n, int modLen, const u16 *modulus,
-                               const u16 *mu, u16 *q, u16 *t) {
+static void CPSi_big_montmult(u16 *acc, u16 *scratch, const u16 *multiplier, int n, int modLen, const u16 *modulus,
+                              const u16 *mu, u16 *q, u16 *t) {
     MI_CpuCopy8(acc, scratch, n * 2);
     if (multiplier == BIGINT_SQUARE) {
-        BigInti_Square(acc, scratch, n);
+        CPSi_big_sqr(acc, scratch, n);
     } else if (multiplier != NULL) {
-        BigInt_Mul(acc, scratch, multiplier, n);
+        CPSi_big_mult(acc, scratch, multiplier, n);
     }
 
-    BigInt_Mul(q, acc, mu, modLen);
+    CPSi_big_mult(q, acc, mu, modLen);
     MI_CpuFill8(q + modLen, 0, (n - modLen) * 2);
-    BigInt_Mul(t, q, modulus, n);
-    BigInt_Add(acc, acc, t, n);
+    CPSi_big_mult(t, q, modulus, n);
+    CPSi_big_add(acc, acc, t, n);
     memmove(acc, acc + modLen, (n - modLen) * 2);
     MI_CpuFill8(acc + (n - modLen), 0, modLen * 2);
 
-    switch (BigInti_Compare(acc, modulus, n)) {
+    switch (CPSi_big_compare(acc, modulus, n)) {
     case 0:
         MI_CpuFill8(acc, 0, n * 2);
         break;
     case 1:
-        BigInt_Sub(acc, acc, modulus, n);
+        CPSi_big_sub(acc, acc, modulus, n);
         break;
     }
 }
 
-void BigInt_ModExpFast(u16 *dst, const u16 *base, const u16 *exponent, int n, const u16 *modulus) {
+void CPSi_big_montpower(u16 *dst, const u16 *base, const u16 *exponent, int n, const u16 *modulus) {
     u16 *work = CPSiAlloc(n * 22);
     u16 *mu;
     u16 *montBase;
@@ -405,32 +406,32 @@ void BigInt_ModExpFast(u16 *dst, const u16 *base, const u16 *exponent, int n, co
     buf5 = buf4 + n;
     workBuf = buf5 + n;
 
-    modLen = BigInti_GetLength(modulus, n);
+    modLen = count_digits(modulus, n);
     work[modLen] = 1;
 
-    BigInti_ModInverse(mu, work, modulus, n, montBase);
-    BigInt_Mul(buf3, work, mu, n);
-    BigInti_SubDigit(mu, buf3, 1, n);
-    BigInt_Div(mu, mu, modulus, NULL, n, workBuf);
+    CPSi_big_modinv(mu, work, modulus, n, montBase);
+    CPSi_big_mult(buf3, work, mu, n);
+    CPSi_big_sub_small(mu, buf3, 1, n);
+    CPSi_big_div(mu, mu, modulus, NULL, n, workBuf);
 
-    BigInt_Mul(montBase, base, work, n);
-    BigInt_Div(NULL, montBase, modulus, montBase, n, workBuf);
+    CPSi_big_mult(montBase, base, work, n);
+    CPSi_big_div(NULL, montBase, modulus, montBase, n, workBuf);
 
-    BigInt_Div(NULL, work, modulus, dst, n, workBuf);
+    CPSi_big_div(NULL, work, modulus, dst, n, workBuf);
 
     totalBits = modLen * 16;
     for (bit = 0; bit < totalBits; bit++) {
-        BigInti_ModExpStep(dst, buf5, BIGINT_SQUARE, n, modLen, modulus, mu, buf3, buf4);
+        CPSi_big_montmult(dst, buf5, BIGINT_SQUARE, n, modLen, modulus, mu, buf3, buf4);
         if (exponent[modLen - (bit >> 4) - 1] & (0x8000u >> (bit & 0xf))) {
-            BigInti_ModExpStep(dst, buf5, montBase, n, modLen, modulus, mu, buf3, buf4);
+            CPSi_big_montmult(dst, buf5, montBase, n, modLen, modulus, mu, buf3, buf4);
         }
     }
-    BigInti_ModExpStep(dst, buf5, NULL, n, modLen, modulus, mu, buf3, buf4);
+    CPSi_big_montmult(dst, buf5, NULL, n, modLen, modulus, mu, buf3, buf4);
 
     CPSiFree(work);
 }
 
-void BigInt_BytesToDigits(u16 *dst, const u8 *src, int nbytes, int n) {
+void CPSi_big_from_char(u16 *dst, const u8 *src, int nbytes, int n) {
     const u8 *p;
 
     MI_CpuFill8(dst, 0, n * 2);
@@ -449,7 +450,7 @@ void BigInt_BytesToDigits(u16 *dst, const u8 *src, int nbytes, int n) {
 }
 
 // The original accepts the source digit count n but overwrites its register before reading it.
-void BigInt_DigitsToBytes(u8 *dst, const u16 *src, int nbytes, int n) {
+void CPSi_char_from_big(u8 *dst, const u16 *src, int nbytes, int n) {
     u8 *p = dst + (nbytes - 1);
 
     (void)n;

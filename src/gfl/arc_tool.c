@@ -30,7 +30,10 @@ struct ArcTool {
 
 typedef struct {
     // The path of each archive, or the start and end of each in memory
-    const void *table;
+    union {
+        const char **paths;
+        const NarcFATBEntry *ranges;
+    } table;
     u32 count;
     BOOL inMemory;
 } ArcSys;
@@ -44,7 +47,7 @@ static void GFL_ArcToolInit(ArcTool *handle);
 static ArcSys sArcSys;
 
 void GFL_ArcSysInit(const char **paths, u32 count) {
-    sArcSys.table = paths;
+    sArcSys.table.paths = paths;
     sArcSys.count = count;
     sArcSys.inMemory = FALSE;
 }
@@ -74,12 +77,12 @@ static void *GFL_ArcSysReadHeapNewImpl(u32 arcId, u32 fileId, HeapID heapId, u32
 static void GFL_ArcSysInitArcHandle(FSFile *file, u32 arcId) {
     FS_InitFile(file);
     if (!sArcSys.inMemory) {
-        FS_OpenFile(file, ((const char **)sArcSys.table)[arcId]);
+        FS_OpenFile(file, sArcSys.table.paths[arcId]);
     } else {
-        u32 size = ((const NarcFATBEntry *)sArcSys.table)[arcId].end;
+        u32 size = sArcSys.table.ranges[arcId].end;
 
-        size -= ((const NarcFATBEntry *)sArcSys.table)[arcId].start;
-        FS_CreateFileFromMemory(file, (const void *)((const NarcFATBEntry *)sArcSys.table)[arcId].start, size);
+        size -= sArcSys.table.ranges[arcId].start;
+        FS_CreateFileFromMemory(file, (void *)sArcSys.table.ranges[arcId].start, size);
     }
 }
 
@@ -174,7 +177,7 @@ ArcTool *GFL_ArcSysCreateFileHandle(u32 arcId, HeapID heapId) {
     return handle;
 }
 
-ArcTool *GFL_ArcSysCreateMemoryHandle(const void *data, u32 size, HeapID heapId) {
+ArcTool *GFL_ArcSysCreateMemoryHandle(void *data, u32 size, HeapID heapId) {
     ArcTool *handle = GFL_HeapAllocate(heapId, sizeof(ArcTool), FALSE, "arc_tool.c", 543);
 
     FS_InitFile(&handle->file);

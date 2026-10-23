@@ -678,7 +678,7 @@ BOOL Field_ToggleCycling(Field *field) {
     return changed;
 }
 
-void *Field_GetMsgBGSys(Field *field) {
+FieldMsgBG *Field_GetMsgBGSys(Field *field) {
     return field->msgBGSys;
 }
 
@@ -814,11 +814,11 @@ void Field_SetPlayerPosPtr(Field *field, VecFx32 *position) {
     field->playerPosPtr = position;
 }
 
-void *Field_GetMoneyWin(Field *field) {
+MoneyWin *Field_GetMoneyWin(Field *field) {
     return field->moneyWin;
 }
 
-void Field_SetMoneyWin(Field *field, void *moneyWin) {
+void Field_SetMoneyWin(Field *field, MoneyWin *moneyWin) {
     field->moneyWin = moneyWin;
 }
 
@@ -877,7 +877,7 @@ void FieldG3D_InitCallback(void) {
     G3X_AntiAlias(TRUE);
     G3X_AlphaTest(FALSE, 0);
     G3X_AlphaBlend(TRUE);
-    G3X_SetFog(FALSE, 0, 5, 0xe00);
+    G3X_SetFog(FALSE, GX_FOGBLEND_COLOR_ALPHA, GX_FOGSLOPE_0x0400, 0xe00);
     G3X_SetFogColor(GX_RGB(31, 31, 31), 0);
     G3X_SetFogTable(FIELD_DEFAULT_FOG_TABLE);
     G3X_SetClearColor(GX_RGB(0, 0, 0), 31, 0x7fff, 0, FALSE);
@@ -1342,7 +1342,7 @@ void FieldRenderPhase2_Fieldmap(Field *field) {
     mtx = saved;
     mtx.m[3][2] += FX_Mul(mtx.m[2][2], field->objectProjectionMatrixOffset);
     NNS_G3dGlbSetProjectionMtx(&mtx);
-    NNS_G3DFlushRenderState();
+    NNS_G3dGlbFlushP();
     NNS_G3dGeFlushBuffer();
     FieldEffects_Draw(field->fieldEffects);
     FieldG3DObjSystem_Draw(field->g3DObjSystem);
@@ -1354,11 +1354,11 @@ void FieldRenderPhase2_Fieldmap(Field *field) {
     mtx = saved;
     mtx.m[3][2] += FX_Mul(mtx.m[2][2], field->objectProjectionMatrixOffset / 2);
     NNS_G3dGlbSetProjectionMtx(&mtx);
-    NNS_G3DFlushRenderState();
+    NNS_G3dGlbFlushP();
     NNS_G3dGeFlushBuffer();
     BlActSys_Draw(field->effectBlAct, field->g3dCamera, field->g3dLights);
     NNS_G3dGlbSetProjectionMtx(&saved);
-    NNS_G3DFlushRenderState();
+    NNS_G3dGlbFlushP();
     FieldAsyncProcManager_Draw(field->asyncProcManager);
     FieldWeather_Draw(field->weatherSystem);
     FieldExpObj_Draw(field->expObjSystem);

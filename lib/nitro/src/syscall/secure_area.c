@@ -12,7 +12,7 @@
 
 // SVC_UnpackBits: BIOS call 0x10 (0x02004064)
 // clang-format off
-asm void SVC_UnpackBits(const void *src, void *dest, const void *param) {
+asm void SVC_UnpackBits(const void *src, void *dest, const MIUnpackBitsParam *param) {
     swi 0x10
     bx lr
 }
@@ -30,7 +30,7 @@ asm void SVC_UncompressLZ8(const void *src, void *dest) {
 
 // SVC_GetCRC16: BIOS call 0x0e (0x0200413a)
 // clang-format off
-asm u16 SVC_GetCRC16(u16 start, const void *data, u32 length) {
+asm u16 SVC_GetCRC16(u32 start, const void *data, u32 length) {
     swi 0xe
     bx lr
 }
@@ -57,7 +57,7 @@ asm void SVC_UncompressRL8(const void *src, void *dest) {
 
 // SVC_UncompressLZ16FromDevice: BIOS call 0x12 (0x0200426e)
 // clang-format off
-asm s32 SVC_UncompressLZ16FromDevice(const void *src, void *dest, const void *param, const void *callbacks) {
+asm s32 SVC_UncompressLZ16FromDevice(const void *src, void *dest, const void *param, const MIReadStreamCallbacks *callbacks) {
     swi 0x12
     bx lr
 }
@@ -94,7 +94,7 @@ asm BOOL SVC_IsMmemExpanded(void) {
 
 // SVC_UncompressHuffmanFromDevice: BIOS call 0x13 (0x02004424)
 // clang-format off
-asm s32 SVC_UncompressHuffmanFromDevice(const void *src, void *dest, u8 *tree, const void *callbacks) {
+asm s32 SVC_UncompressHuffmanFromDevice(const void *src, void *dest, u8 *tree, const MIReadStreamCallbacks *callbacks) {
     swi 0x13
     bx lr
 }
@@ -158,7 +158,7 @@ asm s32 SVC_DivRem(s32 number, s32 denom) {
 
 // SVC_UncompressRL16FromDevice: BIOS call 0x15 (0x02004726)
 // clang-format off
-asm s32 SVC_UncompressRL16FromDevice(const void *src, void *dest, const void *param, const void *callbacks) {
+asm s32 SVC_UncompressRL16FromDevice(const void *src, void *dest, const void *param, const MIReadStreamCallbacks *callbacks) {
     swi 0x15
     bx lr
 }
@@ -178,7 +178,7 @@ asm void SVC_WaitIntr(BOOL clear, u32 irqFlags) {
 
 // SVC_GetCRC16: BIOS call 0x0e (0x0200406a)
 // clang-format off
-asm u16 SVC_GetCRC16(u16 start, const void *data, u32 length) {
+asm u16 SVC_GetCRC16(u32 start, const void *data, u32 length) {
     swi 0xe
     bx lr
 }
@@ -259,7 +259,7 @@ asm u16 SVC_Sqrt(u32 value) {
 
 // SVC_UnpackBits: BIOS call 0x10 (0x02004414)
 // clang-format off
-asm void SVC_UnpackBits(const void *src, void *dest, const void *param) {
+asm void SVC_UnpackBits(const void *src, void *dest, const MIUnpackBitsParam *param) {
     swi 0x10
     bx lr
 }
@@ -278,7 +278,7 @@ asm void SVC_WaitVBlankIntr(void) {
 
 // SVC_UncompressLZ16FromDevice: BIOS call 0x12 (0x020044ea)
 // clang-format off
-asm s32 SVC_UncompressLZ16FromDevice(const void *src, void *dest, const void *param, const void *callbacks) {
+asm s32 SVC_UncompressLZ16FromDevice(const void *src, void *dest, const void *param, const MIReadStreamCallbacks *callbacks) {
     swi 0x12
     bx lr
 }
@@ -297,7 +297,7 @@ asm s32 SVC_DivRem(s32 number, s32 denom) {
 
 // SVC_UncompressRL16FromDevice: BIOS call 0x15 (0x020045ae)
 // clang-format off
-asm s32 SVC_UncompressRL16FromDevice(const void *src, void *dest, const void *param, const void *callbacks) {
+asm s32 SVC_UncompressRL16FromDevice(const void *src, void *dest, const void *param, const MIReadStreamCallbacks *callbacks) {
     swi 0x15
     bx lr
 }
@@ -306,7 +306,7 @@ asm s32 SVC_UncompressRL16FromDevice(const void *src, void *dest, const void *pa
 
 // SVC_UncompressHuffmanFromDevice: BIOS call 0x13 (0x02004632)
 // clang-format off
-asm s32 SVC_UncompressHuffmanFromDevice(const void *src, void *dest, u8 *tree, const void *callbacks) {
+asm s32 SVC_UncompressHuffmanFromDevice(const void *src, void *dest, u8 *tree, const MIReadStreamCallbacks *callbacks) {
     swi 0x13
     bx lr
 }

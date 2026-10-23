@@ -1028,7 +1028,7 @@ static void RollerCoaster_GetTransData(fx32 *value, fx32 frame, const u32 *data,
                 index = frameIndex >> 2;
                 second = index + 1;
             }
-            if (data[0] & NNS_G3D_JNTANM_TINFO_FX16ARR) {
+            if (data[0] & NNS_G3D_JNTANM_TINFO_FX16ARRAY) {
                 const fx16 *array = values;
 
                 v = array[index];
@@ -1051,7 +1051,7 @@ static void RollerCoaster_GetTransData(fx32 *value, fx32 frame, const u32 *data,
 
 average:
     // The frame between two stored values is their average
-    if (data[0] & NNS_G3D_JNTANM_TINFO_FX16ARR) {
+    if (data[0] & NNS_G3D_JNTANM_TINFO_FX16ARRAY) {
         const fx16 *array = values;
 
         *value = (*(array + index) + *(array + index + 1)) >> 1;
@@ -1063,7 +1063,7 @@ average:
     return;
 
 read:
-    if (data[0] & NNS_G3D_JNTANM_TINFO_FX16ARR) {
+    if (data[0] & NNS_G3D_JNTANM_TINFO_FX16ARRAY) {
         *value = ((const fx16 *)values)[index];
     } else {
         *value = ((const fx32 *)values)[index];

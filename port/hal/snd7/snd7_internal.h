@@ -47,7 +47,7 @@
 #define SND7_UPDATE_TICKS 2728u
 #define SND7_FIRST_UPDATE_TICKS 0x10000u
 
-// The decibel volumes the driver works in: SND_DB_MIN (-72.3 dB) is silence
+// The decibel volumes the driver works in: SND_VOLUME_DB_MIN (-72.3 dB) is silence
 #define SND7_VOLUME_DB_MIN (-723)
 
 // The driver's channels (NitroSDK's SNDExChannel, 0x54 bytes on the DS)

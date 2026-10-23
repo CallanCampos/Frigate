@@ -159,7 +159,7 @@ static u8 decWeatherTurns(BtlField *field) {
 }
 
 // Function name from swan.
-BOOL FieldStatusaddEffectCore(BtlField *field, u32 effect, BattleCondition value, BOOL addEvent) {
+BOOL FieldStatusaddEffectCore(BtlField *field, unsigned int effect, BattleCondition value, BOOL addEvent) {
     u32 i;
     u8 monId;
 
@@ -220,8 +220,7 @@ BOOL BtlField_AddDependPoke(BtlField *field, u32 effect, u8 monId) {
 
 // Removes a Pokemon from every effect that depends on it, ending the effects that no other Pokemon keeps up
 void BtlField_RemoveDependPoke(BtlField *field, u8 monId) {
-    // The SDK's u32 is unsigned long, which MWCC indexes with differently than unsigned int
-    unsigned long effect;
+    u32 effect;
     u32 i;
     BOOL found;
 

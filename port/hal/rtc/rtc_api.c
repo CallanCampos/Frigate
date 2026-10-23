@@ -53,7 +53,7 @@ static u32 RtcBCD2HEX(u32 bcd) {
     return result;
 }
 
-static void RtcGetResultCallback(int result, void *arg) {
+static void RtcGetResultCallback(RTCResult result, void *arg) {
     rtcWork.commonResult = result;
 }
 
@@ -67,7 +67,7 @@ static void RtcWaitBusy(void) {
 // The end of the synchronous functions: the result of the asynchronous call that started the command, or the answer's.
 // rtc_api.c stores the call's result in commonResult before it waits, which the answer's callback overwrites when it
 // comes; on the host the answer comes inside the call, before that store, so the call's result is kept apart here
-static int RtcWaitResult(int sent) {
+static RTCResult RtcWaitResult(int sent) {
     if (sent != RTC_RESULT_SUCCESS) {
         rtcWork.commonResult = sent;
         return sent;
@@ -81,9 +81,9 @@ void RTC_Init(void) {
         rtcInitialized = TRUE;
         rtcWork.lock = FALSE;
         rtcWork.callback = NULL;
-        rtcWork.alarmCallback = NULL;
-        rtcWork.data[0] = NULL;
-        rtcWork.data[1] = NULL;
+        rtcWork.interrupt = NULL;
+        rtcWork.buffer[0] = NULL;
+        rtcWork.buffer[1] = NULL;
 
         PXI_Init();
         while (!PXI_IsCallbackReady(PXI_FIFO_TAG_RTC, PXI_PROC_ARM7)) {
@@ -110,10 +110,10 @@ static int RtcStart(u32 sequence, void *data0, void *data1, RTCCallback callback
     if (RtcLock() != RTC_RESULT_SUCCESS) {
         return RTC_RESULT_BUSY;
     }
-    rtcWork.command = sequence;
-    rtcWork.busy = 0;
-    rtcWork.data[0] = data0;
-    rtcWork.data[1] = data1;
+    rtcWork.sequence = sequence;
+    rtcWork.index = 0;
+    rtcWork.buffer[0] = data0;
+    rtcWork.buffer[1] = data1;
     rtcWork.callback = callback;
     rtcWork.callbackArg = arg;
     if (send()) {
@@ -123,27 +123,27 @@ static int RtcStart(u32 sequence, void *data0, void *data1, RTCCallback callback
     return RTC_RESULT_SEND_ERROR;
 }
 
-int RTC_GetDateAsync(RTCDate *date, RTCCallback callback, void *arg) {
+RTCResult RTC_GetDateAsync(RTCDate *date, RTCCallback callback, void *arg) {
     return RtcStart(RTC_SEQ_DATE_GET, date, NULL, callback, arg, RTCi_ReadRawDateAsync);
 }
 
-int RTC_GetDate(RTCDate *date) {
+RTCResult RTC_GetDate(RTCDate *date) {
     return RtcWaitResult(RTC_GetDateAsync(date, RtcGetResultCallback, NULL));
 }
 
-int RTC_GetTimeAsync(RTCTime *time, RTCCallback callback, void *arg) {
+RTCResult RTC_GetTimeAsync(RTCTime *time, RTCCallback callback, void *arg) {
     return RtcStart(RTC_SEQ_TIME_GET, time, NULL, callback, arg, RTCi_ReadRawTimeAsync);
 }
 
-int RTC_GetTime(RTCTime *time) {
+RTCResult RTC_GetTime(RTCTime *time) {
     return RtcWaitResult(RTC_GetTimeAsync(time, RtcGetResultCallback, NULL));
 }
 
-int RTC_GetDateTimeAsync(RTCDate *date, RTCTime *time, RTCCallback callback, void *arg) {
+RTCResult RTC_GetDateTimeAsync(RTCDate *date, RTCTime *time, RTCCallback callback, void *arg) {
     return RtcStart(RTC_SEQ_DATETIME_GET, date, time, callback, arg, RTCi_ReadRawDateTimeAsync);
 }
 
-int RTC_GetDateTime(RTCDate *date, RTCTime *time) {
+RTCResult RTC_GetDateTime(RTCDate *date, RTCTime *time) {
     return RtcWaitResult(RTC_GetDateTimeAsync(date, time, RtcGetResultCallback, NULL));
 }
 
@@ -152,7 +152,7 @@ RTCWork *RTCi_GetSysWork(void) {
 }
 
 static void ReadDate(RTCDate *date) {
-    u32 raw = OS_GetSystemWork()->realTimeClock[0];
+    u32 raw = OS_GetSystemWork()->real_time_clock[0];
 
     date->year = RtcBCD2HEX(RTC_RAW_DATE_YEAR(raw));
     date->month = RtcBCD2HEX(RTC_RAW_DATE_MONTH(raw));
@@ -161,7 +161,7 @@ static void ReadDate(RTCDate *date) {
 }
 
 static void ReadTime(RTCTime *time) {
-    u32 raw = OS_GetSystemWork()->realTimeClock[1];
+    u32 raw = OS_GetSystemWork()->real_time_clock[1];
 
     time->hour = RtcBCD2HEX(RTC_RAW_TIME_HOUR(raw));
     time->minute = RtcBCD2HEX(RTC_RAW_TIME_MINUTE(raw));
@@ -176,7 +176,7 @@ static void RtcCommonCallback(u32 tag, u32 data, BOOL err) {
     u8 pxiResult;
 
     if (err) {
-        rtcWork.busy = 0;
+        rtcWork.index = 0;
         rtcWork.lock = FALSE;
         if (rtcWork.callback != NULL) {
             RTCCallback callback = rtcWork.callback;
@@ -190,25 +190,25 @@ static void RtcCommonCallback(u32 tag, u32 data, BOOL err) {
     command = (data & RTC_PXI_COMMAND_MASK) >> RTC_PXI_COMMAND_SHIFT;
     pxiResult = (u8)data;
     if (command == RTC_PXI_COMMAND_INTERRUPT) {
-        if (rtcWork.alarmCallback != NULL) {
-            rtcWork.alarmCallback();
+        if (rtcWork.interrupt != NULL) {
+            rtcWork.interrupt();
         }
         return;
     }
 
-    rtcWork.busy = 0;
+    rtcWork.index = 0;
     if (pxiResult == RTC_PXI_RESULT_SUCCESS) {
         result = RTC_RESULT_SUCCESS;
-        switch (rtcWork.command) {
+        switch (rtcWork.sequence) {
         case RTC_SEQ_DATE_GET:
-            ReadDate(rtcWork.data[0]);
+            ReadDate(rtcWork.buffer[0]);
             break;
         case RTC_SEQ_TIME_GET:
-            ReadTime(rtcWork.data[0]);
+            ReadTime(rtcWork.buffer[0]);
             break;
         case RTC_SEQ_DATETIME_GET:
-            ReadDate(rtcWork.data[0]);
-            ReadTime(rtcWork.data[1]);
+            ReadDate(rtcWork.buffer[0]);
+            ReadTime(rtcWork.buffer[1]);
             break;
         default:
             result = RTC_RESULT_INVALID_COMMAND;

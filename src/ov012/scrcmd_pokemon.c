@@ -892,7 +892,7 @@ BOOL s010F_PokePartyAddEgg(VM *vm, FieldScriptEnv *env) {
     u16 form;
     PartyPkm *pkm;
     StrBuf *name;
-    void *personal;
+    PersonalData *personal;
     u32 cycles;
 
     FieldScriptEnv_GetGameSystem(env);

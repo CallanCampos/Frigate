@@ -17,13 +17,17 @@
 extern BOOL data_ov257_021b6240;
 
 // TwlSDK's SSP_SetJpegDecoderSignMode, which the game doesn't call, so the link dropped it; it was compiled with the
-// EXIF reader, whose layout of its data shows that its code refers to the mode
-static inline void SSP_SetJpegDecoderSignMode(BOOL signMode) {
-    data_ov257_021b6240 = signMode;
+// EXIF reader, whose layout of its data shows that its code refers to the mode. It returns the previous mode
+static inline BOOL SSP_SetJpegDecoderSignMode(BOOL mode) {
+    BOOL old = data_ov257_021b6240;
+    data_ov257_021b6240 = mode;
+    return old;
 }
 
-// Reads the EXIF data of the APP1 segment at *pos into the EXIF reader's state, and sets *pos to the next segment, or
-// with option bit 0 to the thumbnail. Returns 0 for the thumbnail, 1 for the next segment, 2 on an error
-int func_ov257_021acc20(u8 *data, u32 size, s32 *pos, u32 option);
+// TwlSDK's SSP_ExifDecode (libntr's exifdec.h): reads the EXIF data of the APP1 segment at *cur into the EXIF reader's
+// state, and sets *cur to the next segment, or with option bit 0 to the thumbnail. Returns 0 for the thumbnail, 1 for
+// the next segment, 2 on an error. libntr's option is an int, but ssp_jpegdec.c's calls compile as in the ROM only
+// with the u32 that SSP_StartJpegDecoder takes
+s32 SSP_ExifDecode(u8 *src, u32 src_size, int *cur, u32 option);
 
 #endif // POKEBW2_TWL_SSP_PRIVATE_H

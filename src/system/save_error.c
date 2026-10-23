@@ -78,8 +78,8 @@ static void playSavegameError(u32 message) {
 }
 
 static void displaySavegameError(u32 message) {
-    GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, -16);
-    GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, -16);
+    GX_SetMasterBrightness(-16);
+    GXS_SetMasterBrightness(-16);
     GX_HBlankIntr(FALSE);
     GX_VBlankIntr(FALSE);
     GX_ResetBankForBG();
@@ -98,8 +98,8 @@ static void displaySavegameError(u32 message) {
     *(vu16 *)HW_DB_BG_PLTT = GX_RGB(10, 23, 31);
     displayLightBlueErrorWindow();
     loadDisplayPositionFont(message);
-    GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, 0);
-    GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, 0);
+    GX_SetMasterBrightness(0);
+    GXS_SetMasterBrightness(0);
 }
 
 static void displayLightBlueErrorWindow(void) {
@@ -113,23 +113,23 @@ static void displayLightBlueErrorWindow(void) {
 
     file = GFL_ArcSysReadHeapNewLZ(ARCID_ERROR_WINDOW_GRA, SAVE_ERROR_GRA_CHAR, FALSE, HEAPID_SAVEDATA);
     if (NNS_G2dGetUnpackedBGCharacterData(file, &chars)) {
-        DC_FlushRange(chars->rawData, chars->size);
-        MI_CpuCopy16(chars->rawData, G2_GetBG1CharPtr(), chars->size);
+        DC_FlushRange(chars->pRawData, chars->szByte);
+        MI_CpuCopy16(chars->pRawData, G2_GetBG1CharPtr(), chars->szByte);
     }
     GFL_HeapFree(file);
 
     file = GFL_ArcSysReadHeapNewLZ(ARCID_ERROR_WINDOW_GRA, SAVE_ERROR_GRA_SCRN, FALSE, HEAPID_SAVEDATA);
     if (NNS_G2dGetUnpackedScreenData(file, &screen)) {
-        DC_FlushRange(screen->rawData, screen->size);
-        MI_CpuCopy16(screen->rawData, G2_GetBG1ScrPtr(), screen->size);
+        DC_FlushRange(screen->rawData, screen->szByte);
+        MI_CpuCopy16(screen->rawData, G2_GetBG1ScrPtr(), screen->szByte);
     }
     GFL_HeapFree(file);
 
     file = GFL_ArcSysReadHeapNewLZ(ARCID_ERROR_WINDOW_GRA, SAVE_ERROR_GRA_PLTT, FALSE, HEAPID_SAVEDATA);
     NNS_G2dGetUnpackedPaletteCompressInfo(file, &compressInfo);
     if (NNS_G2dGetUnpackedPaletteData(file, &palette)) {
-        DC_FlushRange(palette->rawData, 0x20);
-        MI_CpuCopy16(palette->rawData, (void *)HW_BG_PLTT, 0x20);
+        DC_FlushRange(palette->pRawData, 0x20);
+        MI_CpuCopy16(palette->pRawData, (void *)HW_BG_PLTT, 0x20);
     }
     GFL_HeapFree(file);
 }

@@ -2,24 +2,24 @@
 #define POKEBW2_MSL_RUNTIME_FP_FASTI_H
 
 // The routines of fp/fp_fastI.c, MSL's floating-point and integer runtime, which MWCC's code calls for arithmetic that
-// the processor has no instruction for. The names are the symbols' (swan's AEABI names, or the runtime's own); the
-// comments give the runtime's name where it differs.
+// the processor has no instruction for. The names are the runtime's own, which the compiler's calls use and pret's
+// pokediamond labels; the comments give swan's name where it differs.
 
 // Double arithmetic
-double __aeabi_dadd(double a, double b); // _dadd
-double doubleSub(double a, double b);    // _dsub
-double _drsb(double a, double b);        // b - a
-double __aeabi_dmul(double a, double b); // _dmul
-double __aeabi_ddiv(double a, double b); // _ddiv
-double _drdiv(double a, double b);       // b / a
+double _dadd(double a, double b);  // swan's __aeabi_dadd
+double _dsub(double a, double b);  // swan's doubleSub
+double _drsb(double a, double b);  // b - a
+double _dmul(double a, double b);  // swan's __aeabi_dmul
+double _ddiv(double a, double b);  // swan's __aeabi_ddiv
+double _drdiv(double a, double b); // b / a
 
 // Double comparison, which leaves its answer in the flags as well
-int __aeabi_dcmpge(double a, double b);   // _dgeq
-int __aeabi_dcmpgt(double a, double b);   // _dgr
-int __aeabi_dcmple(double a, double b);   // _dleq
-int __aeabi_dcmplt(double a, double b);   // _dls
-int __aeabi_dcmpeq(double a, double b);   // _deq
-int doubleIsNotEqual(double a, double b); // _dneq
+int _dgeq(double a, double b); // swan's __aeabi_dcmpge
+int _dgr(double a, double b);  // swan's __aeabi_dcmpgt
+int _dleq(double a, double b); // swan's __aeabi_dcmple
+int _dls(double a, double b);  // swan's __aeabi_dcmplt
+int _deq(double a, double b);  // swan's __aeabi_dcmpeq
+int _dneq(double a, double b); // swan's doubleIsNotEqual
 
 // Float arithmetic
 float _fadd(float a, float b);
@@ -36,28 +36,28 @@ int _fleq(float a, float b);
 int _fls(float a, float b);
 
 // Conversions
-float __aeabi_d2f(double x);         // _d2f
-double __aeabi_f2d(float x);         // _f2d
-double __aeabi_i2d(int x);           // _dflt
-double __aeabi_ui2d(unsigned int x); // _dfltu
-float __aeabi_i2f(int x);            // _fflt
+float _d2f(double x);          // swan's __aeabi_d2f
+double _f2d(float x);          // swan's __aeabi_f2d
+double _dflt(int x);           // swan's __aeabi_i2d
+double _dfltu(unsigned int x); // swan's __aeabi_ui2d
+float _fflt(int x);            // swan's __aeabi_i2f
 float _ffltu(unsigned int x);
 int _ffix(float x);
-unsigned int __aeabi_f2uiz(float x); // _ffixu
-int __aeabi_d2iz(double x);          // _dfix
-unsigned long long __aeabi_d2ulz(double x);
+unsigned int _ffixu(float x);             // swan's __aeabi_f2uiz
+int _dfix(double x);                      // swan's __aeabi_d2iz
+unsigned long long _ll_ufrom_d(double x); // swan's __aeabi_d2ulz
 
 // 64-bit integers
-long long _ull_mul(long long a, long long b);   // _ll_mul
-long long __aeabi_llsl(long long a, int shift); // _ll_shl
+long long _ull_mul(long long a, long long b); // and _ll_mul: the compiler calls it by both
+long long _ll_shl(long long a, int shift);    // swan's __aeabi_llsl
 long long _ll_sdiv(long long a, long long b);
-long long mod64Signed(long long a, long long b);                                 // the signed remainder
-unsigned long long __aeabi_uldivmod(unsigned long long a, unsigned long long b); // _ll_udiv
+long long _ll_mod(long long a, long long b);                             // the signed remainder (swan's mod64Signed)
+unsigned long long _ll_udiv(unsigned long long a, unsigned long long b); // swan's __aeabi_uldivmod
 unsigned long long _ull_mod(unsigned long long a, unsigned long long b);
 
 // 32-bit division
 int _s32_div_f(int a, int b);
-unsigned int __aeabi_uidivmod(unsigned int a, unsigned int b); // _u32_div_f
+unsigned int _u32_div_f(unsigned int a, unsigned int b); // swan's __aeabi_uidivmod
 
 // Others
 void func_0208e130(void); // dead code after _fadd

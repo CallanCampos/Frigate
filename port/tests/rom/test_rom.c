@@ -66,7 +66,7 @@ __attribute__((no_sanitize("address"), noinline)) static BOOL SectionIs(const u8
 extern FieldTerrainAnimatorSetup GND_ANIME_WK;
 extern BattleEventItem *data_ov167_021db1a0[];
 
-// The part of OS_Init that the file system and the card need, in OS_Init's order, then FS_Init and FS_LoadTable as
+// The part of OS_Init that the file system and the card need, in OS_Init's order, then FS_Init and FS_TryLoadTable as
 // SystemInit does them. Returns the table's memory
 static void *StartFileSystem(u32 *tableSize) {
     void *table;
@@ -82,10 +82,10 @@ static void *StartFileSystem(u32 *tableSize) {
     (void)OS_EnableIrq();
     (void)OS_EnableInterrupts();
     FS_Init(1);
-    *tableSize = FS_LoadTable(NULL, 0);
+    *tableSize = FS_TryLoadTable(NULL, 0);
     table = OS_AllocFromArenaLo(OS_ARENA_MAIN, *tableSize, 4);
     Check(table != NULL, "the arena gives the table's memory");
-    Check(FS_LoadTable(table, *tableSize) == *tableSize, "FS_LoadTable takes it");
+    Check(FS_TryLoadTable(table, *tableSize) == *tableSize, "FS_TryLoadTable takes it");
     return table;
 }
 
@@ -98,7 +98,7 @@ static void FileRange(u32 fileId, u32 *start, u32 *end) {
     *end = Read32(rom + fat + fileId * 8 + 4);
 }
 
-// FS_Init and FS_LoadTable, then files by path through the ROM archive, against the ROM's bytes
+// FS_Init and FS_TryLoadTable, then files by path through the ROM archive, against the ROM's bytes
 static void FileSystemMain(void) {
     const u8 *rom;
     u32 tableSize;
@@ -114,7 +114,7 @@ static void FileSystemMain(void) {
     rom = port_rom_data();
     Check(rom != NULL, "the CARD library's initialization opened the ROM");
     Check(tableSize == ((Read32(rom + 0x4c) + Read32(rom + 0x44) + 0x3f) & ~0x1fu),
-          "FS_LoadTable asks for the DS's size: the FAT, the FNT and the alignment");
+          "FS_TryLoadTable asks for the DS's size: the FAT, the FNT and the alignment");
     Check(memcmp((void *)HW_ROM_HEADER_BUF, rom, HW_CARD_ROM_HEADER_SIZE) == 0, "the header is at HW_ROM_HEADER_BUF");
     Check(memcmp((void *)HW_CARD_ROM_HEADER, rom, HW_CARD_ROM_HEADER_SIZE) == 0, "and CARD_Init's copy");
     Check(memcmp(CARDi_GetRomAuthCode(), rom + Read32(rom + 0x80), 0x88) == 0,
@@ -148,12 +148,12 @@ static void FileSystemMain(void) {
     // the block at 0x8000
     FS_InitFile(&file);
     Check(!FS_OpenFile(&file, "a/9/9/9"), "a missing file doesn't open");
-    Check(romfs_fopen_raw(&file, Read32(rom + 0x40), 4), "a raw range of the ROM opens");
+    Check(FS_CreateFileFromRom(&file, Read32(rom + 0x40), 4), "a raw range of the ROM opens");
     Check(FS_ReadFile(&file, header, 4) == 4 && memcmp(header, rom + Read32(rom + 0x40), 4) == 0,
           "with the file name table's first bytes");
     FS_CloseFile(&file);
     FS_InitFile(&file);
-    Check(romfs_fopen_raw(&file, 0x0c, 4), "a raw range of the header opens");
+    Check(FS_CreateFileFromRom(&file, 0x0c, 4), "a raw range of the header opens");
     Check(FS_ReadFile(&file, header, 4) == 4 && memcmp(header, rom + 0x800c, 4) == 0,
           "and reads the block at 0x8000, as a card does");
     FS_CloseFile(&file);
@@ -180,19 +180,19 @@ static void CardReadMain(void) {
     capacity = (u64)0x20000 << (rom[0x14] & 0x1f);
     lockId = (u16)OS_GetLockID();
     CARD_LockRom(lockId);
-    CARDi_ReadRom(1, 0x81ff, buffer, sizeof(buffer), CountCallback, NULL, TRUE);
+    CARDi_ReadRom(1, (const void *)0x81ff, buffer, sizeof(buffer), CountCallback, NULL, TRUE);
     Check(CARDi_TryWaitAsync(), "the card's thread finished the read before the call returned");
     Check(sCallbacks == 1, "its callback ran once");
     Check(memcmp(buffer, rom + 0x81ff, sizeof(buffer)) == 0, "it read the ROM");
 
     // Below 0x8000 each block of 0x200 bytes reads as the block at 0x8000
-    CARDi_ReadRom(1, 0x1f0, buffer, 0x20, NULL, NULL, FALSE);
+    CARDi_ReadRom(1, (const void *)0x1f0, buffer, 0x20, NULL, NULL, FALSE);
     Check(memcmp(buffer, rom + 0x81f0, 0x10) == 0 && memcmp(buffer + 0x10, rom + 0x8000, 0x10) == 0,
           "the header's addresses read the block at 0x8000");
 
     // Past the end: a card of the dump's size wraps to its start, which reads as 0x8000; the rest of a card that a
     // trimmed dump leaves out reads 0xff
-    CARDi_ReadRom(1, (u32)port_rom_size() - 0x10, buffer, 0x20, NULL, NULL, FALSE);
+    CARDi_ReadRom(1, (const void *)(uptr)(port_rom_size() - 0x10), buffer, 0x20, NULL, NULL, FALSE);
     Check(memcmp(buffer, rom + port_rom_size() - 0x10, 0x10) == 0, "a read up to the end of the file");
     if (port_rom_size() == capacity) {
         Check(memcmp(buffer + 0x10, rom + 0x8000, 0x10) == 0, "and on past the card's capacity wraps");

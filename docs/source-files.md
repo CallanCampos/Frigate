@@ -15,7 +15,16 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
   and the file is named for what it does, never for an overlay number.
 - **Status.** "complete" files link their compiled C. "partial" files link the original code until every function
   matches and the data they use is written; `docs/nonmatching-functions.md` lists the functions in C that do not match.
-- The functions outside every file are in the gaps that dsd leaves between them, in original assembly.
+- Functions outside every file remain in the gaps that dsd leaves between them, in original assembly.
+  A gap can also contain linker-generated metadata or alignment fill, as in ITCM below.
+
+ITCM's 15 functions are in five complete source files in both versions, covering `0x01ff8020`-`0x01ff939c`.
+The leading `0x01ff8000`-`0x01ff8020` gap contains the empty static-initializer list's zero terminator
+and alignment fill: each original ROM's autoload entry points its initializer field at `0x01ff8000`,
+and the startup code copies initializer pointers through the first zero. The final four bytes through
+`0x01ff93a0` are zero alignment fill, and ITCM has no BSS. These ranges require no additional source
+registration. Resolving the compiled objects' calls and pool references reproduces each original
+ITCM image byte for byte, including the existing original-SDK assembly routines.
 
 ### Overlay 0
 
@@ -136,9 +145,9 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 | `gsPlatformUtil.c` | `0x0216e250`–`0x0216ea4c` | 25 | complete | descriptive |
 | `gsSoap.c` | `0x0216ea4c`–`0x0216ec58` | 9 | complete | descriptive |
 | `gsStringUtil.c` | `0x0216ec58`–`0x0216eea8` | 7 | complete | descriptive |
-| `gt2.c` | `0x0216eea8`–`0x0216fbf8` | 27 | partial | descriptive |
-| `gsXML.c` | `0x0216fbf8`–`0x021713e0` | 49 | complete | descriptive |
-| `gs_screen_print.c` | `0x021713e0`–`0x021714cc` | 4 | complete | descriptive |
+| `gsUdpEngine.c` | `0x0216eea8`–`0x0216fbe0` | 26 | partial | descriptive |
+| `gsXML.c` | `0x0216fbe0`–`0x021713e0` | 50 | complete | descriptive |
+| `screen.c` | `0x021713e0`–`0x021714cc` | 4 | complete | descriptive |
 | `darray.c` | `0x021714cc`–`0x02171818` | 20 | complete | descriptive |
 | `hashtable.c` | `0x02171818`–`0x021719fc` | 9 | complete | descriptive |
 | `md5c.c` | `0x021719fc`–`0x0217241c` | 10 | complete | descriptive |
@@ -189,7 +198,7 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 | `musical_stage_sys.c` | `0x02151f90`–`0x021522d8` | 9 | complete | string at `0x0216dff4` |
 | `musical_program.c` | `0x021522d8`–`0x0215264c` | 15 | complete | string at `0x0216e008` |
 | `event_colosseum_battle.c` | `0x0215264c`–`0x0215291c` | 3 | complete | descriptive |
-| `delivery_beacon.c` | `0x0215291c`–`0x02152c0c` | 22 | partial | string at `0x0216e0a8` |
+| `delivery_beacon.c` | `0x0215291c`–`0x02152c0c` | 22 | complete | string at `0x0216e0a8` |
 | `delivery_irc.c` | `0x02152c0c`–`0x02153160` | 27 | complete | string at `0x0216e180` |
 | `mystery_gift_pokemon.c` | `0x02153160`–`0x021535dc` | 1 | complete | descriptive |
 | `intrude_work.c` | `0x021535dc`–`0x0215366c` | 12 | complete | descriptive |
@@ -523,7 +532,7 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 | `field_wfbc.c` | `0x0218adac`–`0x0218ae38` | 7 | complete | string at `0x021d4bc0` |
 | `field_comm_actor.c` | `0x0218ae38`–`0x0218b12c` | 12 | complete | string at `0x021d4bd0` |
 | `field_menu_event.c` | `0x0218b12c`–`0x0218b1f8` | 2 | complete | descriptive |
-| `talkmsgwin.c` | `0x0218b1f8`–`0x0218d0e8` | 54 | partial | string at `0x021d4c24` |
+| `talkmsgwin.c` | `0x0218b1f8`–`0x0218d0e8` | 54 | complete | string at `0x021d4c24` |
 | `ircbattlemenu.c` | `0x0218d0e8`–`0x0218ed18` | 65 | complete | string at `0x021d4d24` |
 | `fldmmdl_acmd.c` | `0x0218ed18`–`0x02191228` | 247 | complete | string at `0x021d4d40` |
 | `fldmmdl_movecode.c` | `0x02191228`–`0x021925a4` | 98 | complete | descriptive |
@@ -592,7 +601,7 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 | `scrcmd_pokemon_fld.c` | `0x021afa2c`–`0x021afcd4` | 4 | complete | string at `0x021d5218` |
 | `scrcmd_misc.c` | `0x021afcd4`–`0x021b0228` | 16 | partial | descriptive |
 | `field_rail.c` | `0x021b0228`–`0x021b2404` | 107 | partial | string at `0x021d5238` |
-| `field_rail_func.c` | `0x021b2404`–`0x021b3a3c` | 30 | partial | descriptive |
+| `field_rail_func.c` | `0x021b2404`–`0x021b3a3c` | 30 | complete | descriptive |
 | `rail_attr.c` | `0x021b3a3c`–`0x021b3bac` | 13 | complete | string at `0x021d525c` |
 | `field_nogrid_mapper.c` | `0x021b3bac`–`0x021b3e50` | 18 | complete | string at `0x021d5268` |
 | `fldeff_gyoe.c` | `0x021b3e50`–`0x021b427c` | 15 | complete | string at `0x021d5280` |
@@ -620,7 +629,7 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 | `shortcut_menu.c` | `0x021bedd8`–`0x021bf914` | 24 | complete | string at `0x021d54e0` |
 | `event_name_entry.c` | `0x021bf914`–`0x021bfe88` | 8 | complete | descriptive |
 | `field_g3dobj.c` | `0x021bfe88`–`0x021c05d4` | 30 | complete | string at `0x021d54f0` |
-| `fieldmap_tcb_camera_zoom.c` | `0x021c05d4`–`0x021c0870` | 6 | partial | string at `0x021d5500` |
+| `fieldmap_tcb_camera_zoom.c` | `0x021c05d4`–`0x021c0870` | 6 | complete | string at `0x021d5500` |
 | `field_task.c` | `0x021c0870`–`0x021c0914` | 11 | complete | string at `0x021d551c` |
 | `field_task_manager.c` | `0x021c0914`–`0x021c1bc4` | 52 | complete | string at `0x021d552c` |
 | `field_flash.c` | `0x021c1bc4`–`0x021c1d88` | 18 | complete | string at `0x021d5544` |
@@ -1386,7 +1395,7 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 | `print_msg.c` | `0x0219a2a4`–`0x0219a438` | 3 | complete | descriptive |
 | `msgsearch.c` | `0x0219a438`–`0x0219a584` | 4 | complete | string at `0x0219ce38` |
 | `yesno_menu.c` | `0x0219a584`–`0x0219af1c` | 8 | complete | string at `0x0219ce44` |
-| `frame_list.c` | `0x0219af1c`–`0x0219cd18` | 55 | partial | string at `0x0219ce54` |
+| `frame_list.c` | `0x0219af1c`–`0x0219cd18` | 55 | complete | string at `0x0219ce54` |
 
 ### Overlay 140
 
@@ -1581,10 +1590,10 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 | `plist_battle.c` | `0x021a0d38`–`0x021a1944` | 18 | complete | string at `0x021a4d1c` |
 | `plist_demo.c` | `0x021a1944`–`0x021a23e8` | 21 | complete | string at `0x021a4d2c` |
 | `status_rcv.c` | `0x021a23e8`–`0x021a30f8` | 7 | complete | descriptive |
-| `dsprot_run.c` | `0x021a30f8`–`0x021a33fc` | 6 | partial | descriptive |
+| `dsprot_run.c` | `0x021a30f8`–`0x021a33fc` | 6 | complete | descriptive |
 | `dsprot_stub_check.c` | `0x021a33fc`–`0x021a37b0` | 5 | complete | descriptive |
 | `dsprot_decrypt.c` | `0x021a37b0`–`0x021a3ab0` | 5 | complete | descriptive |
-| `dsprot_detect.c` | `0x021a3ab0`–`0x021a4484` | 14 | partial | descriptive |
+| `dsprot_detect.c` | `0x021a3ab0`–`0x021a4484` | 6 (+8 generated veneers) | complete | descriptive |
 | `dsprot_cipher.c` | `0x021a4484`–`0x021a49dc` | 8 | complete | descriptive |
 
 ### Overlay 166
@@ -1768,11 +1777,11 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `mb_parent_sys.c` | `0x0219ce80`–`0x0219eec8` | 28 | partial | string at `0x021a4354` |
+| `mb_parent_sys.c` | `0x0219ce80`–`0x0219eec8` | 28 | complete | string at `0x021a4354` |
 | `mbp.c` | `0x0219eec8`–`0x0219f580` | 16 | complete | string at `0x021a4650` |
 | `mb_comm_sys.c` | `0x0219f580`–`0x0219fc0c` | 47 | complete | string at `0x021a46a8` |
 | `mb_util_msg.c` | `0x0219fc0c`–`0x021a039c` | 26 | complete | string at `0x021a46b8` |
-| `mb_parent_dataconv_sys.c` | `0x021a039c`–`0x021a092c` | 15 | partial | string at `0x021a46c8` |
+| `mb_parent_dataconv_sys.c` | `0x021a039c`–`0x021a092c` | 15 | complete | string at `0x021a46c8` |
 | `mb_comm.c` | `0x021a092c`–`0x021a1698` | 18 | partial | descriptive |
 | `mb_segment.c` | `0x021a1698`–`0x021a2040` | 11 | complete | descriptive |
 | `mb_gameinfo.c` | `0x021a2040`–`0x021a2638` | 14 | partial | descriptive |
@@ -2332,16 +2341,18 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 | `wifibattlematch_link_competition.c` | `0x021b57dc`–`0x021b8cc8` | 46 | complete | descriptive |
 | `wifibattlematch_net.c` | `0x021b8cc8`–`0x021bc058` | 100 | partial | string at `0x021bff6c` |
 | `wifibattlematch_net_fields.c` | `0x021bc058`–`0x021bc218` | 5 | partial | descriptive |
-| `sake.c` | `0x021bc218`–`0x021bc4fc` | 19 | complete | descriptive |
-| `sake_error.c` | `0x021bc4fc`–`0x021bc7c4` | 3 | complete | descriptive |
-| `sake_post.c` | `0x021bc7c4`–`0x021bc82c` | 2 | complete | descriptive |
-| `sake_storage.c` | `0x021bc82c`–`0x021bcc04` | 11 | complete | descriptive |
-| `sake_records.c` | `0x021bcc04`–`0x021bd43c` | 25 | complete | descriptive |
+| `sakeMain.c` | `0x021bc218`–`0x021bc478` | 16 | complete | descriptive |
+| `sakeRequest.c` | `0x021bc478`–`0x021bc82c` | 8 | complete | descriptive |
+| `sakeRequestModify.c` | `0x021bc82c`–`0x021bcc04` | 11 | complete | descriptive |
+| `sakeRequestRead.c` | `0x021bcc04`–`0x021bd43c` | 25 | complete | descriptive |
 | `dwc_sc.c` | `0x021bd43c`–`0x021bda1c` | 29 | complete | descriptive |
-| `dwc_competition.c` | `0x021bda1c`–`0x021be474` | 45 | complete | descriptive |
-| `dwc_competition_soap.c` | `0x021be474`–`0x021beaa0` | 10 | complete | descriptive |
+| `sciInterface.c` | `0x021bda1c`–`0x021bdbdc` | 7 | complete | descriptive |
+| `sciMain.c` | `0x021bdbdc`–`0x021bde88` | 20 | complete | descriptive |
+| `sciReport.c` | `0x021bde88`–`0x021be340` | 14 | complete | descriptive |
+| `sciSerialize.c` | `0x021be340`–`0x021be474` | 4 | complete | descriptive |
+| `sciWebServices.c` | `0x021be474`–`0x021beaa0` | 10 | complete | descriptive |
 | `gdb.c` | `0x021beaa0`–`0x021bf63c` | 26 | complete | descriptive |
-| `dwc_auth.c` | `0x021bf63c`–`0x021bfcd8` | 8 | partial | descriptive |
+| `AuthService.c` | `0x021bf63c`–`0x021bfcd8` | 8 | partial | descriptive |
 
 ### Overlay 261
 

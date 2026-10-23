@@ -29,8 +29,8 @@
 // snd.h's prototypes were renamed with the functions
 void SND_PrepareSeq(int playerNo, const void *seqBase, u32 seqOffset, const SNDBankData *bank);
 void SND_ReadDriverInfo(SNDDriverInfo *info);
-void SND_SetupChannelPcm(int chNo, int format, const void *dataAddr, int loop, int loopStart, int loopLen, int volume,
-                         int shift, int timer, int pan);
+void SND_SetupChannelPcm(int chNo, SNDWaveFormat format, const void *dataAddr, SNDChannelLoop loop, int loopStart, int loopLen, int volume,
+                         SNDChannelDataShift shift, int timer, int pan);
 void SND_InvalidateSeqData(const void *start, const void *end);
 void SND_InvalidateBankData(const void *start, const void *end);
 void SND_InvalidateWaveData(const void *start, const void *end);
@@ -53,8 +53,8 @@ void SND_ReadDriverInfo(SNDDriverInfo *info) {
 }
 
 // The wave's words: the part before the loop and the loop
-void SND_SetupChannelPcm(int chNo, int format, const void *dataAddr, int loop, int loopStart, int loopLen, int volume,
-                         int shift, int timer, int pan) {
+void SND_SetupChannelPcm(int chNo, SNDWaveFormat format, const void *dataAddr, SNDChannelLoop loop, int loopStart, int loopLen, int volume,
+                         SNDChannelDataShift shift, int timer, int pan) {
     port_pxi_note_pointer(PXI_FIFO_TAG_SOUND, dataAddr, (u32)(loopStart + loopLen) * sizeof(u32));
     SNDi_DsSetupChannelPcm(chNo, format, dataAddr, loop, loopStart, loopLen, volume, shift, timer, pan);
 }

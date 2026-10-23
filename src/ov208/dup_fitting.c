@@ -907,9 +907,9 @@ static void DupFitting_InitItems(DupFittingWork *work) {
         }
         file = GFL_G3DResGetResData(res);
         tex = GFL_G3DResGetTexData(res);
-        NNS_G3DResTexSetPltGfdKey(tex, dimPlttKey);
+        NNS_G3dPlttSetPlttKey(tex, dimPlttKey);
         DC_FlushRange(file, file->fileSize);
-        NNS_G3DResTexUploadPlt(tex, TRUE);
+        NNS_G3dPlttLoad(tex, TRUE);
         work->entries[n].dimMaterial =
             BlActScene_AddMaterialExistTex(work->blact, texKey, dimPlttKey, 0, size, width, height);
         MusItemDraw_FreeTexResource(res);

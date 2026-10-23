@@ -8,21 +8,21 @@
 #define HW_LCD_LINES 263
 
 typedef struct OSiVAlarmQueue {
-    OSVAlarm *head;
-    OSVAlarm *tail;
+    OSiVAlarm *head;
+    OSiVAlarm *tail;
 } OSiVAlarmQueue;
 
-static void OSi_InsertVAlarm(OSVAlarm *alarm);
-static void OSi_AppendVAlarm(OSVAlarm *alarm);
-static void OSi_DetachVAlarm(OSVAlarm *alarm);
-static void OSi_SetNextVAlarm(OSVAlarm *alarm);
+static void OSi_InsertVAlarm(OSiVAlarm *alarm);
+static void OSi_AppendVAlarm(OSiVAlarm *alarm);
+static void OSi_DetachVAlarm(OSiVAlarm *alarm);
+static void OSi_SetNextVAlarm(OSiVAlarm *alarm);
 static void OSi_VAlarmHandler(void);
-static int OSi_CompareVCount(OSVAlarm *alarm, u32 frame, int vcount);
+static int OSi_CompareVCount(OSiVAlarm *alarm, u32 frame, int vcount);
 static u32 OSi_GetVFrame(int vcount);
 
 static u16 OSi_UseVAlarm;
 static u32 OSi_VFrameCount;
-static s32 OSi_PrevVCount;
+static s32 OSi_PreviousVCount;
 static OSiVAlarmQueue OSi_VAlarmQueue;
 
 // NitroSDK's OS_InitVAlarm
@@ -33,20 +33,20 @@ void OS_InitVAlarm(void) {
         OSi_VAlarmQueue.tail = NULL;
         OS_DisableIrqMask(OS_IE_V_COUNT);
         OSi_VFrameCount = 0;
-        OSi_PrevVCount = 0;
+        OSi_PreviousVCount = 0;
     }
 }
 
 // NitroSDK's OSi_InsertVAlarm: puts the alarm in the queue before the first that fires later, or at the end
-static void OSi_InsertVAlarm(OSVAlarm *alarm) {
-    OSVAlarm *next;
-    OSVAlarm *prev;
+static void OSi_InsertVAlarm(OSiVAlarm *alarm) {
+    OSiVAlarm *next;
+    OSiVAlarm *prev;
 
     for (next = OSi_VAlarmQueue.head; next != NULL; next = next->next) {
         if (next->frame < alarm->frame) {
             continue;
         }
-        if (next->frame == alarm->frame && next->vcount <= alarm->vcount) {
+        if (next->frame == alarm->frame && next->fire <= alarm->fire) {
             continue;
         }
         prev = next->prev;
@@ -65,8 +65,8 @@ static void OSi_InsertVAlarm(OSVAlarm *alarm) {
 }
 
 // NitroSDK's OSi_AppendVAlarm: puts the alarm at the end of the queue, and waits for it if the queue was empty
-static void OSi_AppendVAlarm(OSVAlarm *alarm) {
-    OSVAlarm *prev = OSi_VAlarmQueue.tail;
+static void OSi_AppendVAlarm(OSiVAlarm *alarm) {
+    OSiVAlarm *prev = OSi_VAlarmQueue.tail;
 
     alarm->prev = prev;
     alarm->next = NULL;
@@ -80,9 +80,9 @@ static void OSi_AppendVAlarm(OSVAlarm *alarm) {
 }
 
 // NitroSDK's OSi_DetachVAlarm: takes the alarm out of the queue
-static void OSi_DetachVAlarm(OSVAlarm *alarm) {
-    OSVAlarm *prev;
-    OSVAlarm *next;
+static void OSi_DetachVAlarm(OSiVAlarm *alarm) {
+    OSiVAlarm *prev;
+    OSiVAlarm *next;
 
     if (alarm == NULL) {
         return;
@@ -101,16 +101,16 @@ static void OSi_DetachVAlarm(OSVAlarm *alarm) {
     }
 }
 
-void OS_CreateVAlarm(OSVAlarm *alarm) {
+void OS_CreateVAlarm(OSiVAlarm *alarm) {
     alarm->handler = NULL;
     alarm->tag = 0;
-    alarm->unk_20 = 0;
+    alarm->finish = FALSE;
 }
 
 // NitroSDK's OS_SetVAlarm: calls the handler with the argument when the scan reaches the line (vcount), or at most
 // delay lines after it. If the scan has reached that line already in this frame, it waits for the next
-void OS_SetVAlarm(OSVAlarm *alarm, s16 vcount, s16 delay, OSVAlarmHandler handler, void *arg) {
-    u32 enabled = OS_DisableInterrupts();
+void OS_SetVAlarm(OSiVAlarm *alarm, s16 vcount, s16 delay, OSVAlarmHandler handler, void *arg) {
+    OSIntrMode enabled = OS_DisableInterrupts();
     int current;
     u32 frame;
 
@@ -119,8 +119,8 @@ void OS_SetVAlarm(OSVAlarm *alarm, s16 vcount, s16 delay, OSVAlarmHandler handle
     }
     current = GX_GetVCount();
     frame = OSi_GetVFrame(current);
-    alarm->periodic = FALSE;
-    alarm->vcount = vcount;
+    alarm->period = FALSE;
+    alarm->fire = vcount;
     if (vcount <= current) {
         frame++;
     }
@@ -134,24 +134,24 @@ void OS_SetVAlarm(OSVAlarm *alarm, s16 vcount, s16 delay, OSVAlarmHandler handle
 }
 
 // NitroSDK's OSi_SetNextVAlarm: makes the first alarm of the queue the one that the V-count interrupt waits for
-static void OSi_SetNextVAlarm(OSVAlarm *alarm) {
+static void OSi_SetNextVAlarm(OSiVAlarm *alarm) {
     OS_SetIrqFunction(OS_IE_V_COUNT, OSi_VAlarmHandler);
-    GX_SetVCountEqVal(alarm->vcount);
-    reg_GX_DISPSTAT |= REG_GX_DISPSTAT_VCI_MASK;
+    GX_SetVCountEqVal(alarm->fire);
+    reg_GX_DISPSTAT |= REG_GX_DISPSTAT_VQI_MASK;
     OS_EnableIrqMask(OS_IE_V_COUNT);
 }
 
 // NitroSDK's OSi_VAlarmHandler, the V-count interrupt's: runs the alarms that are due in turn, and puts back the
 // periodic ones. An alarm that is too late for its delay is not run, but put back for the next frame
 static void OSi_VAlarmHandler(void) {
-    OSVAlarm *alarm;
+    OSiVAlarm *alarm;
     OSVAlarmHandler handler;
     u32 frame;
     int vcount;
     u16 dispstat;
 
     OS_DisableIrqMask(OS_IE_V_COUNT);
-    reg_GX_DISPSTAT &= ~REG_GX_DISPSTAT_VCI_MASK;
+    reg_GX_DISPSTAT &= ~REG_GX_DISPSTAT_VQI_MASK;
     OS_SetIrqCheckFlag(OS_IE_V_COUNT);
     // The line that the interrupt waited for: its low 8 bits are DISPSTAT's bits 8 to 15 and its ninth is bit 7
     dispstat = reg_GX_DISPSTAT;
@@ -163,11 +163,11 @@ static void OSi_VAlarmHandler(void) {
         case 0:
             // Not yet: wait for its line, unless the scan has reached it by now
             OSi_SetNextVAlarm(alarm);
-            if (alarm->vcount != GX_GetVCount() || alarm->frame != frame) {
+            if (alarm->fire != GX_GetVCount() || alarm->frame != frame) {
                 return;
             }
             OS_DisableIrqMask(OS_IE_V_COUNT);
-            reg_GX_DISPSTAT &= ~REG_GX_DISPSTAT_VCI_MASK;
+            reg_GX_DISPSTAT &= ~REG_GX_DISPSTAT_VQI_MASK;
             OS_ResetRequestIrqMask(OS_IE_V_COUNT);
             // fall through
         case 1:
@@ -177,7 +177,7 @@ static void OSi_VAlarmHandler(void) {
             if (handler != NULL) {
                 handler(alarm->arg);
             }
-            if (alarm->periodic && !alarm->canceled) {
+            if (alarm->period && !alarm->canceled) {
                 alarm->handler = handler;
                 alarm->frame = OSi_VFrameCount + 1;
                 OSi_InsertVAlarm(alarm);
@@ -194,9 +194,9 @@ static void OSi_VAlarmHandler(void) {
 
 // NitroSDK's OSi_CompareVCount: whether the alarm is due: 0 before its line, 1 on it or within its delay after it, 2
 // later
-static int OSi_CompareVCount(OSVAlarm *alarm, u32 frame, int vcount) {
+static int OSi_CompareVCount(OSiVAlarm *alarm, u32 frame, int vcount) {
     s32 frames = frame - alarm->frame;
-    s32 lines = vcount - alarm->vcount;
+    s32 lines = vcount - alarm->fire;
 
     if (frames < 0 || (frames == 0 && lines < 0)) {
         return 0;
@@ -212,12 +212,12 @@ static int OSi_CompareVCount(OSVAlarm *alarm, u32 frame, int vcount) {
 
 // NitroSDK's OSi_GetVFrame: counts the frames, by a V-count lower than the last one; gives the count
 static u32 OSi_GetVFrame(int vcount) {
-    u32 enabled = OS_DisableInterrupts();
+    OSIntrMode enabled = OS_DisableInterrupts();
 
-    if (vcount < OSi_PrevVCount) {
+    if (vcount < OSi_PreviousVCount) {
         OSi_VFrameCount++;
     }
-    OSi_PrevVCount = vcount;
+    OSi_PreviousVCount = vcount;
     OS_RestoreInterrupts(enabled);
     return OSi_VFrameCount;
 }

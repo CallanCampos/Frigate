@@ -4,38 +4,38 @@
 #include "nitro/os.h"
 
 // A cell: the block's neighbors in its list and its size, with the header's 0x20 bytes included
-typedef struct OSAllocCell {
-    struct OSAllocCell *prev;
-    struct OSAllocCell *next;
+typedef struct Cell {
+    struct Cell *prev;
+    struct Cell *next;
     s32 size;
-} OSAllocCell;
+} Cell;
 
-#define OS_ALLOC_HEADER_SIZE 0x20
-#define OS_ALLOC_ALIGNMENT 0x20
+#define HEADERSIZE 0x20
+#define ALIGNMENT 0x20
 // A free cell that would be left with less than this is given out whole
-#define OS_ALLOC_MIN_CELL_SIZE 0x40
-#define OS_ROUND_UP_32(x) (((u32)(x) + OS_ALLOC_ALIGNMENT - 1) & ~(OS_ALLOC_ALIGNMENT - 1))
-#define OS_ROUND_DOWN_32(x) ((u32)(x) & ~(OS_ALLOC_ALIGNMENT - 1))
+#define MINOBJSIZE 0x40
+#define ROUND(x) (((u32)(x) + ALIGNMENT - 1) & ~(ALIGNMENT - 1))
+#define TRUNC(x) ((u32)(x) & ~(ALIGNMENT - 1))
 
 // A heap: its size (negative when the heap does not exist) and its lists
-typedef struct OSHeap {
+typedef struct HeapDesc {
     s32 size;
-    OSAllocCell *free;
-    OSAllocCell *allocated;
-} OSHeap;
+    Cell *free;
+    Cell *allocated;
+} HeapDesc;
 
 // What an arena keeps of its heaps: the current heap, the array of heaps (which follows this) and the memory that is
 // left for them
 typedef struct OSHeapInfo {
-    s32 current;
+    s32 currentHeap;
     s32 numHeaps;
     void *arenaStart;
     void *arenaEnd;
-    OSHeap *heaps;
+    HeapDesc *heapArray;
 } OSHeapInfo;
 
 // The heaps of each arena (NULL until OS_InitAlloc is called for the arena)
-static OSHeapInfo *sHeapInfo[OS_ARENA_MAX]; // swan's g_AllocAreas
+static OSHeapInfo *OSiHeapInfo[OS_ARENA_MAX]; // swan's g_AllocAreas
 
 // The extra heap that OS_CreateExtraHeap made (its number, and the arena it is in): -1 while there is none
 static struct {
@@ -43,12 +43,12 @@ static struct {
     int arena;
 } sExtraHeap = { -1, -1 };
 
-static OSAllocCell *DLAddFront(OSAllocCell *list, OSAllocCell *cell);
-static OSAllocCell *DLExtract(OSAllocCell *list, OSAllocCell *cell);
-static OSAllocCell *DLInsert(OSAllocCell *list, OSAllocCell *cell);
+static Cell *DLAddFront(Cell *list, Cell *cell);
+static Cell *DLExtract(Cell *list, Cell *cell);
+static Cell *DLInsert(Cell *list, Cell *cell);
 
 // NitroSDK's DLAddFront: puts a cell at the front of a list
-static OSAllocCell *DLAddFront(OSAllocCell *list, OSAllocCell *cell) {
+static Cell *DLAddFront(Cell *list, Cell *cell) {
     cell->next = list;
     cell->prev = NULL;
     if (list != NULL) {
@@ -58,7 +58,7 @@ static OSAllocCell *DLAddFront(OSAllocCell *list, OSAllocCell *cell) {
 }
 
 // NitroSDK's DLExtract: takes a cell out of a list
-static OSAllocCell *DLExtract(OSAllocCell *list, OSAllocCell *cell) {
+static Cell *DLExtract(Cell *list, Cell *cell) {
     if (cell->next != NULL) {
         cell->next->prev = cell->prev;
     }
@@ -70,9 +70,9 @@ static OSAllocCell *DLExtract(OSAllocCell *list, OSAllocCell *cell) {
 }
 
 // NitroSDK's DLInsert: puts a cell into a list sorted by address, joining it to the cells next to it when they touch
-static OSAllocCell *DLInsert(OSAllocCell *list, OSAllocCell *cell) {
-    OSAllocCell *prev;
-    OSAllocCell *next;
+static Cell *DLInsert(Cell *list, Cell *cell) {
+    Cell *prev;
+    Cell *next;
 
     for (next = list, prev = NULL; next != NULL; prev = next, next = next->next) {
         if (cell <= next) {
@@ -108,24 +108,24 @@ static OSAllocCell *DLInsert(OSAllocCell *list, OSAllocCell *cell) {
 
 // NitroSDK's OS_AllocFromHeap: gives memory of the size, aligned to 0x20, from the heap (the
 // arena's current one when negative); NULL when the arena has no heaps or no cell is big enough
-void *OS_AllocFromHeap(int arena, int heap, u32 size) {
+void *OS_AllocFromHeap(OSArenaId arena, OSHeapHandle heap, u32 size) {
     OSHeapInfo *info;
-    OSHeap *hp;
-    OSAllocCell *cell;
-    OSAllocCell *rest;
+    HeapDesc *hp;
+    Cell *cell;
+    Cell *rest;
     u32 leftover;
-    u32 irq = OS_DisableInterrupts();
+    OSIntrMode irq = OS_DisableInterrupts();
 
-    info = sHeapInfo[arena];
+    info = OSiHeapInfo[arena];
     if (info == NULL) {
         OS_RestoreInterrupts(irq);
         return NULL;
     }
     if (heap < 0) {
-        heap = info->current;
+        heap = info->currentHeap;
     }
-    hp = &info->heaps[heap];
-    size = OS_ROUND_UP_32(size + OS_ALLOC_HEADER_SIZE);
+    hp = &info->heapArray[heap];
+    size = ROUND(size + HEADERSIZE);
     for (cell = hp->free; cell != NULL; cell = cell->next) {
         if ((s32)size <= cell->size) {
             break;
@@ -136,11 +136,11 @@ void *OS_AllocFromHeap(int arena, int heap, u32 size) {
         return NULL;
     }
     leftover = cell->size - size;
-    if (leftover < OS_ALLOC_MIN_CELL_SIZE) {
+    if (leftover < MINOBJSIZE) {
         hp->free = DLExtract(hp->free, cell);
     } else {
         cell->size = size;
-        rest = (OSAllocCell *)((u8 *)cell + size);
+        rest = (Cell *)((u8 *)cell + size);
         rest->size = leftover;
         rest->prev = cell->prev;
         rest->next = cell->next;
@@ -155,22 +155,22 @@ void *OS_AllocFromHeap(int arena, int heap, u32 size) {
     }
     hp->allocated = DLAddFront(hp->allocated, cell);
     OS_RestoreInterrupts(irq);
-    return (u8 *)cell + OS_ALLOC_HEADER_SIZE;
+    return (u8 *)cell + HEADERSIZE;
 }
 
 // NitroSDK's OS_FreeToHeap: gives memory back to the heap (the arena's current one when negative)
-void OS_FreeToHeap(int arena, int heap, void *ptr) {
+void OS_FreeToHeap(OSArenaId arena, OSHeapHandle heap, void *ptr) {
     OSHeapInfo *info;
-    OSHeap *hp;
-    OSAllocCell *cell;
-    u32 irq = OS_DisableInterrupts();
+    HeapDesc *hp;
+    Cell *cell;
+    OSIntrMode irq = OS_DisableInterrupts();
 
-    info = sHeapInfo[arena];
+    info = OSiHeapInfo[arena];
     if (heap < 0) {
-        heap = info->current;
+        heap = info->currentHeap;
     }
-    hp = &info->heaps[heap];
-    cell = (OSAllocCell *)((u8 *)ptr - OS_ALLOC_HEADER_SIZE);
+    hp = &info->heapArray[heap];
+    cell = (Cell *)((u8 *)ptr - HEADERSIZE);
     hp->allocated = DLExtract(hp->allocated, cell);
     hp->free = DLInsert(hp->free, cell);
     OS_RestoreInterrupts(irq);
@@ -178,25 +178,25 @@ void OS_FreeToHeap(int arena, int heap, void *ptr) {
 
 // NitroSDK's OS_InitAlloc: makes the arena's table of heaps, with room for the number of them, at
 // the start of the memory that it is given, and returns where the memory that is left starts
-void *OS_InitAlloc(int arena, void *start, void *end, int maxHeaps) {
+void *OS_InitAlloc(OSArenaId arena, void *start, void *end, int maxHeaps) {
     OSHeapInfo *info = start;
     u32 heapsSize;
-    u32 irq = OS_DisableInterrupts();
+    OSIntrMode irq = OS_DisableInterrupts();
     int i;
 
-    sHeapInfo[arena] = info;
-    heapsSize = maxHeaps * sizeof(OSHeap);
-    info->heaps = (OSHeap *)((u8 *)info + sizeof(OSHeapInfo));
+    OSiHeapInfo[arena] = info;
+    heapsSize = maxHeaps * sizeof(HeapDesc);
+    info->heapArray = (HeapDesc *)((u8 *)info + sizeof(OSHeapInfo));
     info->numHeaps = maxHeaps;
     for (i = 0; i < info->numHeaps; i++) {
-        OSHeap *hp = &info->heaps[i];
+        HeapDesc *hp = &info->heapArray[i];
 
         hp->size = -1;
         hp->free = hp->allocated = NULL;
     }
-    info->current = -1;
-    info->arenaStart = (void *)OS_ROUND_UP_32((u32)info->heaps + heapsSize);
-    end = (void *)OS_ROUND_DOWN_32(end);
+    info->currentHeap = -1;
+    info->arenaStart = (void *)ROUND((u32)info->heapArray + heapsSize);
+    end = (void *)TRUNC(end);
     info->arenaEnd = end;
     OS_RestoreInterrupts(irq);
     return info->arenaStart;
@@ -204,18 +204,18 @@ void *OS_InitAlloc(int arena, void *start, void *end, int maxHeaps) {
 
 // NitroSDK's OS_CreateHeap: makes a heap of the memory from start to end (rounded in to 0x20), and
 // returns its number, or -1 when the arena has no room for another heap
-int OS_CreateHeap(int arena, void *start, void *end) {
+OSHeapHandle OS_CreateHeap(OSArenaId arena, void *start, void *end) {
     OSHeapInfo *info;
-    OSHeap *hp;
-    OSAllocCell *cell;
+    HeapDesc *hp;
+    Cell *cell;
     int heap;
-    u32 irq = OS_DisableInterrupts();
+    OSIntrMode irq = OS_DisableInterrupts();
 
-    info = sHeapInfo[arena];
-    start = (void *)OS_ROUND_UP_32(start);
-    end = (void *)OS_ROUND_DOWN_32(end);
+    info = OSiHeapInfo[arena];
+    start = (void *)ROUND(start);
+    end = (void *)TRUNC(end);
     for (heap = 0; heap < info->numHeaps; heap++) {
-        hp = &info->heaps[heap];
+        hp = &info->heapArray[heap];
         if (hp->size < 0) {
             hp->size = (u8 *)end - (u8 *)start;
             cell = start;
@@ -234,20 +234,20 @@ int OS_CreateHeap(int arena, void *start, void *end) {
 
 // On a DS, makes a heap of the 16 KB at the start of the main memory (which nothing else uses before the program)
 // once, in the first heap of the arena that is free. Gives the heap's number, or -1
-int OS_CreateExtraHeap(int arena) {
+OSHeapHandle OS_CreateExtraHeap(OSArenaId arena) {
     OSHeapInfo *info;
-    OSHeap *hp;
-    OSAllocCell *cell;
+    HeapDesc *hp;
+    Cell *cell;
     int heap;
-    u32 irq = OS_DisableInterrupts();
+    OSIntrMode irq = OS_DisableInterrupts();
 
-    info = sHeapInfo[arena];
+    info = OSiHeapInfo[arena];
     if (!OS_IsRunOnTwl() && sExtraHeap.heap < 0) {
         for (heap = 0; heap < info->numHeaps; heap++) {
-            hp = &info->heaps[heap];
+            hp = &info->heapArray[heap];
             if (hp->size < 0) {
                 hp->size = 0x4000;
-                cell = (OSAllocCell *)0x02000000;
+                cell = (Cell *)0x02000000;
                 cell->prev = NULL;
                 cell->next = NULL;
                 cell->size = 0x4000;
@@ -265,9 +265,9 @@ int OS_CreateExtraHeap(int arena) {
 }
 
 // The usable size of an allocated block, which MSL's __sys_pointer_size asks for
-u32 OS_ReferentSize(int arena, void *ptr) {
-    u32 irq = OS_DisableInterrupts();
+u32 OS_ReferentSize(OSArenaId arena, void *ptr) {
+    OSIntrMode irq = OS_DisableInterrupts();
 
     OS_RestoreInterrupts(irq);
-    return ((OSAllocCell *)((u8 *)ptr - OS_ALLOC_HEADER_SIZE))->size - OS_ALLOC_HEADER_SIZE;
+    return ((Cell *)((u8 *)ptr - HEADERSIZE))->size - HEADERSIZE;
 }

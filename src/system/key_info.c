@@ -26,9 +26,7 @@ KeyInfoSave *KeySystemData_GetKeyInfo(void *a0) {
     return a0;
 }
 
-void *KeySystemData_GetMemoryLink(void *a0) {
-    KeySystemData *data = a0;
-
+void *KeySystemData_GetMemoryLink(KeySystemData *data) {
     return &data->memoryLink;
 }
 

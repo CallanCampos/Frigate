@@ -21,7 +21,6 @@ typedef struct {
     u32 mask;
 } DeliveryBeaconData;
 
-typedef struct DeliveryBeaconWork DeliveryBeaconWork;
 typedef void (*DeliveryBeaconSeq)(void *work);
 
 struct DeliveryBeaconWork {
@@ -142,7 +141,7 @@ static void DeliveryBeacon_SetSeqWithLine(DeliveryBeaconWork *pWork, DeliveryBea
 static void DeliveryBeacon_SeqIdle(void *work) {
 }
 
-void *DeliveryBeacon_Init(const DeliveryInit *init) {
+DeliveryBeaconWork *DeliveryBeacon_Init(const DeliveryInit *init) {
     DeliveryBeaconWork *pWork =
         GFL_HeapAllocate(init->heapId, sizeof(DeliveryBeaconWork), TRUE, "delivery_beacon.c", 295);
 
@@ -150,11 +149,14 @@ void *DeliveryBeacon_Init(const DeliveryInit *init) {
     return pWork;
 }
 
+// File metadata for failed assertions.
+static char sDeliveryBeaconAssertFileName[] = "";
+
 static void DeliveryBeacon_CheckDataSize(DeliveryBeaconWork *pWork) {
     if (pWork->aInit.data[0].datasize != 0) {
         // The assert's text is the game's, spacing included
         // clang-format off
-        GFL_ASSERT(pWork->aInit.data[0].datasize < (DELIVERY_BEACON_MAX_NUM*DELIVERY_BEACON_ONCE_NUM));
+        GFL_ASSERT_WITH_FILE(sDeliveryBeaconAssertFileName, pWork->aInit.data[0].datasize < (DELIVERY_BEACON_MAX_NUM*DELIVERY_BEACON_ONCE_NUM));
         // clang-format on
     }
 }
@@ -242,9 +244,7 @@ static void DeliveryBeacon_OnNetInit(void *work) {
     DeliveryBeacon_SetSeqWithLine(work, DeliveryBeacon_SeqStartNet, 477);
 }
 
-BOOL DeliveryBeacon_RecvStart(void *work) {
-    DeliveryBeaconWork *pWork = work;
-
+BOOL DeliveryBeacon_RecvStart(DeliveryBeaconWork *pWork) {
     if (GFL_NetIsInitialized()) {
         return FALSE;
     }
@@ -256,8 +256,7 @@ BOOL DeliveryBeacon_RecvStart(void *work) {
     return TRUE;
 }
 
-BOOL DeliveryBeacon_IsAnyReceived(void *work) {
-    DeliveryBeaconWork *pWork = work;
+BOOL DeliveryBeacon_IsAnyReceived(DeliveryBeaconWork *pWork) {
     int i;
 
     for (i = 0; i < DELIVERY_BEACON_MAX_NUM; i++) {
@@ -268,7 +267,7 @@ BOOL DeliveryBeacon_IsAnyReceived(void *work) {
     return FALSE;
 }
 
-BOOL DeliveryBeacon_IsReceiveDone(void *work) {
+BOOL DeliveryBeacon_IsReceiveDone(DeliveryBeaconWork *work) {
     BOOL done = DeliveryBeacon_IsAllReceived(work);
 
     if (done) {
@@ -277,13 +276,11 @@ BOOL DeliveryBeacon_IsReceiveDone(void *work) {
     return done;
 }
 
-void DeliveryBeacon_Main(void *work) {
-    DeliveryBeaconWork *pWork = work;
-
+void DeliveryBeacon_Main(DeliveryBeaconWork *pWork) {
     pWork->seq(pWork);
 }
 
-void DeliveryBeacon_End(void *work) {
+void DeliveryBeacon_End(DeliveryBeaconWork *work) {
     GFL_HeapFree(work);
     GFL_NetExit(NULL);
 }

@@ -544,10 +544,10 @@ static void BeaconView_LoadResources(BeaconViewWork *work, ArcTool *arc) {
     PaletteFade_LoadNCLR(work->paletteFade, 0, 1, work->tmpHeapId, 3, 0x20, 0xe0);
     work->commonPalette.file = GFL_ArcToolReadHeapNew(arc, 4, work->heapId);
     NNS_G2dGetUnpackedPaletteData(work->commonPalette.file, &work->commonPalette.data);
-    work->commonPalette.colors = work->commonPalette.data->rawData;
+    work->commonPalette.colors = work->commonPalette.data->pRawData;
     work->trainerPalette.file = GFL_ArcToolReadHeapNew(trainerArc, 0, work->heapId);
     NNS_G2dGetUnpackedPaletteData(work->trainerPalette.file, &work->trainerPalette.data);
-    work->trainerPalette.colors = work->trainerPalette.data->rawData;
+    work->trainerPalette.colors = work->trainerPalette.data->pRawData;
     for (i = 0; i < BEACON_VIEW_TRAINER_CHARS; i++) {
         work->trainerChars[i].file = GFL_ArcToolReadHeapNew(trainerArc, i + 49, work->heapId);
         NNS_G2dGetUnpackedCharacterData(work->trainerChars[i].file, &work->trainerChars[i].data);

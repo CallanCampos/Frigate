@@ -21,11 +21,11 @@ void G2x_SetBGyAffine_(uptr addr, const MtxFx22 *mtx, int centerX, int centerY, 
 }
 #pragma thumb on
 
-void G2x_SetBlendAlpha_(uptr reg, u32 plane1, u32 plane2, s32 alpha1, s32 alpha2) {
+void G2x_SetBlendAlpha_(uptr reg, int plane1, int plane2, int alpha1, int alpha2) {
     *(vu32 *)reg = (u32)((plane1 | REG_G2_BLDCNT_EFFECT_ALPHA | (plane2 << 8)) | ((alpha1 | (alpha2 << 8)) << 16));
 }
 
-void G2x_SetBlendBrightness_(uptr reg, u32 plane, s32 brightness) {
+void G2x_SetBlendBrightness_(uptr reg, int plane, int brightness) {
     if (brightness < 0) {
         *(vu16 *)reg = (u16)(plane | REG_G2_BLDCNT_EFFECT_DECREASE);
         *(vu16 *)(reg + 4) = (u16)-brightness;
@@ -35,7 +35,7 @@ void G2x_SetBlendBrightness_(uptr reg, u32 plane, s32 brightness) {
     }
 }
 
-void G2x_SetBlendBrightnessExt_(uptr reg, u32 plane1, u32 plane2, s32 alpha1, s32 alpha2, s32 brightness) {
+void G2x_SetBlendBrightnessExt_(uptr reg, int plane1, int plane2, int alpha1, int alpha2, int brightness) {
     *(vu16 *)(reg + 2) = (u16)(alpha1 | (alpha2 << 8));
     if (brightness < 0) {
         *(vu16 *)reg = (u16)(plane1 | REG_G2_BLDCNT_EFFECT_DECREASE | (plane2 << 8));
@@ -46,7 +46,7 @@ void G2x_SetBlendBrightnessExt_(uptr reg, u32 plane1, u32 plane2, s32 alpha1, s3
     }
 }
 
-void G2x_ChangeBlendBrightness_(uptr reg, s32 brightness) {
+void G2x_ChangeBlendBrightness_(uptr reg, int brightness) {
     u16 bldcnt = *(vu16 *)reg;
     if (brightness < 0) {
         if ((bldcnt & REG_G2_BLDCNT_EFFECT_MASK) == REG_G2_BLDCNT_EFFECT_INCREASE) {

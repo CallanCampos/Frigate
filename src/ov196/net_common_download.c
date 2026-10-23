@@ -69,7 +69,7 @@ typedef struct {
 } NetCommonDownloadNdState;
 
 static const void *NetCommonDownload_GetArgs(NetCommonDownload *download);
-static BOOL NetCommonDownload_CanRequest(NetCommonDownload *download, u32 command);
+static BOOL NetCommonDownload_CanRequest(NetCommonDownload *download, unsigned int command);
 static BOOL NetCommonDownload_Idle(NetCommonDownload *download, u32 *state);
 static BOOL NetCommonDownload_DownloadFileList(NetCommonDownload *download, u32 *state);
 static BOOL NetCommonDownload_DownloadFile(NetCommonDownload *download, u32 *state);
@@ -83,7 +83,7 @@ static void NetCommonDownload_FreeSession(NetCommonDownloadSession *session);
 static void NetCommonDownload_Wait(NetCommonDownloadSession *session, u32 *state, u32 nextState);
 static void NetCommonDownload_Cleanup(NetCommonDownloadSession *session, u32 error, u32 *state, u32 nextState,
                                       u32 failState);
-static void NetCommonDownload_OnNdEvent(u32 reason, u32 error, int serverError);
+static void NetCommonDownload_OnNdEvent(DWCNdCallbackReason reason, DWCNdError error, int serverError);
 static BOOL NetCommonDownload_IsZero(const u32 *data, u32 size);
 
 static const u8 sModeCommands[2][5] = {
@@ -569,7 +569,7 @@ static const void *NetCommonDownload_GetArgs(NetCommonDownload *download) {
     return &download->args;
 }
 
-static BOOL NetCommonDownload_CanRequest(NetCommonDownload *download, u32 command) {
+static BOOL NetCommonDownload_CanRequest(NetCommonDownload *download, unsigned int command) {
     u32 kind = NetCommonDownload_GetKind(download);
     BOOL allowed = FALSE;
 
@@ -636,7 +636,7 @@ static void NetCommonDownload_Cleanup(NetCommonDownloadSession *session, u32 err
     }
 }
 
-static void NetCommonDownload_OnNdEvent(u32 reason, u32 error, int serverError) {
+static void NetCommonDownload_OnNdEvent(DWCNdCallbackReason reason, DWCNdError error, int serverError) {
     sNdState.ready = TRUE;
     sNdState.done = TRUE;
     sNdState.error = error;

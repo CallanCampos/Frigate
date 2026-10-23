@@ -107,8 +107,8 @@ static BOOL func_ov182_021b9cc0(void) {
     int result;
 
     func_ov182_021b9be4(WIH_STATE_BUSY);
-    wepMode = gWork.work->unk_13ac(&gWork.work->wepKey);
-    result = WM_SetWEPKey(func_ov182_021b9d04, wepMode, &gWork.work->wepKey);
+    wepMode = gWork.work->unk_13ac(gWork.work->wepKey);
+    result = WM_SetWEPKey(func_ov182_021b9d04, wepMode, gWork.work->wepKey);
     if (result != WM_ERRCODE_OPERATING) {
         func_ov182_021b9c34(result);
         func_ov182_021b9be4(WIH_STATE_ERROR);
@@ -169,7 +169,7 @@ static void func_ov182_021b9d68(void *arg) {
             gWork.logPrint(0x08000000, data_ov182_021c18e0, aid);
         }
         if (gWork.work->sScanFilter != NULL && !gWork.work->sScanFilter(cb)) {
-            int result = WM_Disconnect(NULL, aid);
+            int result = WM_Disconnect(NULL, cb->aid);
 
             if (result != WM_ERRCODE_OPERATING) {
                 func_ov182_021b9c34(result);
@@ -194,7 +194,7 @@ static void func_ov182_021b9d68(void *arg) {
         return;
     }
     if (gWork.logPrint != NULL) {
-        gWork.logPrint(0x08000000, data_ov182_021c1938);
+        gWork.logPrint(0x08000000, data_ov182_021c1938, cb->state);
     }
 }
 
@@ -207,8 +207,8 @@ static BOOL func_ov182_021b9e48(void) {
         return TRUE;
     }
     func_ov182_021b9be4(WIH_STATE_CONNECTED);
-    result = WM_StartMP(func_ov182_021b9eb0, gWork.work->recvBuf, gWork.work->recvBufSize, gWork.work->sendBuf,
-                        gWork.work->sendBufSize, 1);
+    result = WM_StartMP(func_ov182_021b9eb0, (u16 *)gWork.work->recvBuf, gWork.work->recvBufSize,
+                        (u16 *)gWork.work->sendBuf, gWork.work->sendBufSize, 1);
     if (result != WM_ERRCODE_OPERATING) {
         func_ov182_021b9c34(result);
         return FALSE;
@@ -244,7 +244,7 @@ static void func_ov182_021b9eb0(void *arg) {
         } else if (gWork.work->sConnectMode == WIH_CONNECTMODE_DS_PARENT) {
             int result = WM_StartDataSharing(&gWork.work->dataSharing, 13, 7, 0x44, TRUE);
 
-            if (result != 0) {
+            if (result != WM_ERRCODE_SUCCESS) {
                 func_ov182_021b9c34(result);
                 func_ov182_021b9be4(WIH_STATE_ERROR);
                 return;
@@ -255,13 +255,14 @@ static void func_ov182_021b9eb0(void *arg) {
         func_ov182_021b9be4(WIH_STATE_CONNECTED);
         return;
     case WM_STATECODE_MPEND_IND:
-        return;
+        break;
     case WM_STATECODE_MP_IND:
     case WM_STATECODE_MPACK_IND:
+    default:
+        if (gWork.logPrint != NULL) {
+            gWork.logPrint(0x08000000, data_ov182_021c1938, cb->state);
+        }
         break;
-    }
-    if (gWork.logPrint != NULL) {
-        gWork.logPrint(0x08000000, data_ov182_021c1938);
     }
 }
 
@@ -472,8 +473,8 @@ BOOL func_ov182_021ba1a8(void) {
     gWork.work->minBusy = 101;
     func_ov182_021b9be4(WIH_STATE_BUSY);
     result = func_ov182_021ba238(1);
-    if (result == 0x18) {
-        func_ov182_021b9c34(0x18);
+    if (result == WIH_ERRCODE_NOMORE_CHANNEL) {
+        func_ov182_021b9c34(WIH_ERRCODE_NOMORE_CHANNEL);
         func_ov182_021b9be4(WIH_STATE_ERROR);
         return FALSE;
     }
@@ -485,25 +486,25 @@ BOOL func_ov182_021ba1a8(void) {
     return TRUE;
 }
 
-// Measures the next channel that is allowed, from the one given. 0x18 once there are none left
+// Measures the next channel that is allowed, from the one given. WIH_ERRCODE_NOMORE_CHANNEL once there are none left
 static u16 func_ov182_021ba238(u16 channel) {
     u16 allowed = WM_GetAllowedChannel();
 
     if (allowed == 0x8000) {
-        func_ov182_021b9c34(3);
+        func_ov182_021b9c34(WM_ERRCODE_ILLEGAL_STATE);
         func_ov182_021b9be4(WIH_STATE_ERROR);
-        return 3;
+        return WM_ERRCODE_ILLEGAL_STATE;
     }
     if (allowed == 0) {
-        func_ov182_021b9c34(0x16);
+        func_ov182_021b9c34(WIH_ERRCODE_NO_RADIO);
         func_ov182_021b9be4(WIH_STATE_ERROR);
-        return 0x18;
+        return WIH_ERRCODE_NOMORE_CHANNEL;
     }
     if (!((1 << (channel - 1)) & allowed)) {
         do {
             channel++;
             if (channel > 16) {
-                return 0x18;
+                return WIH_ERRCODE_NOMORE_CHANNEL;
             }
         } while (!((1 << (channel - 1)) & allowed));
     }
@@ -532,7 +533,7 @@ static void func_ov182_021ba2a8(void *arg) {
         gWork.work->bestBitmap |= 1 << (channel - 1);
     }
     next = func_ov182_021ba238(channel + 1);
-    if (next == 0x18) {
+    if (next == WIH_ERRCODE_NOMORE_CHANNEL) {
         func_ov182_021b9be4(WIH_STATE_MEASURECHANNEL);
     } else if (next != WM_ERRCODE_OPERATING) {
         func_ov182_021b9be4(WIH_STATE_ERROR);
@@ -592,7 +593,7 @@ BOOL func_ov182_021ba42c(void) {
     gWork.work->unk_48 = 0;
     gWork.work->sAid = 0;
     gWork.work->sBitmap = 1;
-    gWork.work->lastError = 0;
+    gWork.work->lastError = WM_ERRCODE_SUCCESS;
     gWork.work->sParentParam.userGameInfo = NULL;
     gWork.work->sParentParam.userGameInfoLength = 0;
     gWork.work->sScanFilter = NULL;
@@ -606,7 +607,7 @@ BOOL func_ov182_021ba42c(void) {
 static void func_ov182_021ba478(void *arg) {
     WMCallback *cb = arg;
 
-    if (cb->errcode == 8) {
+    if (cb->errcode == WM_ERRCODE_FIFO_ERROR) {
         func_ov182_021b9be4(WIH_STATE_ERROR);
         OS_Terminate();
     }
@@ -688,20 +689,20 @@ void func_ov182_021ba5d0(WHScanFilter filter) {
 
 // WH_GetSharedDataAdr: the data of the machine of the AID, from the last step of the data sharing
 u8 *func_ov182_021ba5dc(u16 netId) {
-    return WM_GetSharedDataAddress(&gWork.work->dataSharing, &gWork.work->dataSet, netId);
+    return (u8 *)WM_GetSharedDataAddress(&gWork.work->dataSharing, &gWork.work->dataSet, netId);
 }
 
 // WH_StepDS: shares the data given, for the machines to read the next step
 BOOL func_ov182_021ba5fc(u8 *data) {
-    int result = WM_StepDataSharing(&gWork.work->dataSharing, data, &gWork.work->dataSet);
+    int result = WM_StepDataSharing(&gWork.work->dataSharing, (const u16 *)data, &gWork.work->dataSet);
 
-    if (result == 7) {
+    if (result == WM_ERRCODE_NO_CHILD) {
         if (gWork.logPrint != NULL) {
             gWork.logPrint(0x08000000, data_ov182_021c1a2c);
         }
         return FALSE;
     }
-    if (result == 5) {
+    if (result == WM_ERRCODE_NO_DATASET) {
         if (gWork.logPrint != NULL) {
             gWork.logPrint(0x08000000, data_ov182_021c1a5c);
         }
@@ -731,7 +732,7 @@ void func_ov182_021ba67c(void) {
         return;
     }
     if (gWork.logPrint != NULL) {
-        gWork.logPrint(0x08000000, data_ov182_021c1ab4);
+        gWork.logPrint(0x08000000, data_ov182_021c1ab4, gWork.work->sysState);
     }
     if (gWork.work->sysState != WIH_STATE_KEYSHARING && gWork.work->sysState != WIH_STATE_DATASHARING &&
         gWork.work->sysState != WIH_STATE_CONNECTED) {

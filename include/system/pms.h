@@ -14,7 +14,7 @@
 void *getCGearDataBlkAddress(SaveControl *save);
 void CGearPhrases_Init(PMSData *phrases);
 void CGearPhrases_Get(void *cgear, u32 index, PMSData *sentence);
-void CGearPhrases_Set(void *cgear, u32 index, const PMSData *sentence);
+void CGearPhrases_Set(PMSData *cgear, u32 index, const PMSData *sentence);
 // The same block, through the C-Gear's own accessor
 void *CGearPhrases_GetBlock(SaveControl *save);
 

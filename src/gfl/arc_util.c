@@ -43,18 +43,18 @@ static u32 GFL_BGSysLoadNCGRStaticCore(void *file, u32 bg, u32 offset, u32 size,
 
     if (NNS_G2dGetUnpackedBGCharacterData(file, &character)) {
         if (size == 0) {
-            size = character->size;
+            size = character->szByte;
         }
 #ifdef PLATFORM_PC
         // A size larger than the file's characters (the copyright screen's 0x8000, src/ov162/boot_screens.c) loads
         // what follows them in the heap too, past the end of the file's block, as on the DS: those tiles show on the
         // bottom screen as the title screen fades in. The host loads the same bytes; the hooks tell the sanitized
         // build that this read past the block is the DS's (port/docs/sanitizers.md)
-        port_heap_ds_read_begin(character->rawData, size);
-        GFL_BGSysLoadChar(bg, character->rawData, size, offset);
+        port_heap_ds_read_begin(character->pRawData, size);
+        GFL_BGSysLoadChar(bg, character->pRawData, size, offset);
         port_heap_ds_read_end();
 #else
-        GFL_BGSysLoadChar(bg, character->rawData, size, offset);
+        GFL_BGSysLoadChar(bg, character->pRawData, size, offset);
 #endif
     }
     GFL_HeapFree(file);
@@ -92,7 +92,7 @@ static u32 GFL_BGSysLoadNCGRDynamicCore(void *file, u32 bg, u32 size) {
         u32 pos;
 
         if (size == 0) {
-            size = character->size;
+            size = character->szByte;
         }
 #ifdef PLATFORM_PC
         // A size larger than the file's characters (the touch bars' 32 * 64 bytes of a file of 4 characters,
@@ -100,14 +100,14 @@ static u32 GFL_BGSysLoadNCGRDynamicCore(void *file, u32 bg, u32 size) {
         // what follows the file in the heap, past the end of its block, into the characters after the file's, which
         // the bar's screen never shows. The host reserves the same characters and copies the file's alone, where the
         // dynamic load puts them on a BG of 16 colors (port/docs/sanitizers.md)
-        if (size > character->size && GFL_BGSysGetBGBytesPerTile(bg) == BGSYS_TILE_SIZE_16) {
+        if (size > character->szByte && GFL_BGSysGetBGBytesPerTile(bg) == BGSYS_TILE_SIZE_16) {
             pos = GFL_BGSysAllocChar(bg, size, FALSE);
-            GFL_BGSysLoadChar(bg, character->rawData, character->size, pos);
+            GFL_BGSysLoadChar(bg, character->pRawData, character->szByte, pos);
         } else {
-            pos = GFL_BGSysLoadCharDynamic(bg, character->rawData, size);
+            pos = GFL_BGSysLoadCharDynamic(bg, character->pRawData, size);
         }
 #else
-        pos = GFL_BGSysLoadCharDynamic(bg, character->rawData, size);
+        pos = GFL_BGSysLoadCharDynamic(bg, character->pRawData, size);
 #endif
         if (pos != (u32)-1) {
             return ((u16)size << 16) | (u16)pos;
@@ -127,10 +127,10 @@ static u32 unpackAndLoadOBJChar(void *file, u32 engine, u32 offset, u32 size) {
 
     if (NNS_G2dGetUnpackedCharacterData(file, &character)) {
         if (size == 0) {
-            size = character->size;
+            size = character->szByte;
         }
-        DC_FlushRange(character->rawData, size);
-        obj_char_lut[engine](character->rawData, offset, size);
+        DC_FlushRange(character->pRawData, size);
+        obj_char_lut[engine](character->pRawData, offset, size);
     }
     GFL_HeapFree(file);
     return size;
@@ -177,7 +177,7 @@ static void GFL_BGSysLoadNSCR(void *file, u32 bg, u32 offset, u32 palOffset, u32
 
     if (NNS_G2dGetUnpackedScreenData(file, &screen)) {
         if (size == 0) {
-            size = screen->size;
+            size = screen->szByte;
         }
         if (palOffset != 0) {
             if (GFL_BGSysGetBGColorPaletteMode(bg) == GX_BG_COLORMODE_16) {
@@ -241,39 +241,39 @@ static void GFL_BGSysLoadNCLR(void *file, u32 type, u32 srcOffset, u32 offset, u
     }
     compressed = NNS_G2dGetUnpackedPaletteCompressInfo(file, &compressInfo);
     if (NNS_G2dGetUnpackedPaletteData(file, &palette)) {
-        palette->rawData = (u8 *)palette->rawData + srcOffset;
+        palette->pRawData = (u8 *)palette->pRawData + srcOffset;
         if (size == 0) {
             if (!compressed) {
-                size = palette->size;
+                size = palette->szByte;
             } else {
-                size = compressInfo->numPalette * (palette->format == GX_TEXFMT_PLTT16 ? 0x20 : 0x200);
+                size = compressInfo->numPalette * (palette->fmt == GX_TEXFMT_PLTT16 ? 0x20 : 0x200);
             }
             size -= srcOffset;
         }
-        DC_FlushRange(palette->rawData, size);
+        DC_FlushRange(palette->pRawData, size);
         switch (type) {
         case PALTYPE_MAIN_BG_EX:
             GX_BeginLoadBGExtPltt();
-            pltt_type_lut[type](palette->rawData, offset, size);
+            pltt_type_lut[type](palette->pRawData, offset, size);
             GX_EndLoadBGExtPltt();
             break;
         case PALTYPE_SUB_BG_EX:
             GXS_BeginLoadBGExtPltt();
-            pltt_type_lut[type](palette->rawData, offset, size);
+            pltt_type_lut[type](palette->pRawData, offset, size);
             GXS_EndLoadBGExtPltt();
             break;
         case PALTYPE_MAIN_OBJ_EX:
             GX_BeginLoadOBJExtPltt();
-            pltt_type_lut[type](palette->rawData, offset, size);
+            pltt_type_lut[type](palette->pRawData, offset, size);
             GX_EndLoadOBJExtPltt();
             break;
         case PALTYPE_SUB_OBJ_EX:
             GXS_BeginLoadOBJExtPltt();
-            pltt_type_lut[type](palette->rawData, offset, size);
+            pltt_type_lut[type](palette->pRawData, offset, size);
             GXS_EndLoadOBJExtPltt();
             break;
         default:
-            pltt_type_lut[type](palette->rawData, offset, size);
+            pltt_type_lut[type](palette->pRawData, offset, size);
             break;
         }
     }

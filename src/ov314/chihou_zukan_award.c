@@ -156,7 +156,7 @@ static BOOL ChihouZukanAward_Init(GameProc *proc, u32 *state, void *param, void 
     GXS_SetVisibleWnd(GX_WNDMASK_NONE);
     GXS_DispOn();
     GFL_BGSysDisableAllB();
-    GXS_SetGraphicsMode(0);
+    GXS_SetGraphicsMode(GX_BGMODE_0);
     GFL_BGSysDisableBGsB();
     for (i = 0; i < NELEMS(sChihouZukanAwardSubBGSetups); i++) {
         GFL_BGSysCreateBG(sChihouZukanAwardSubBGSetups[i].bg, &sChihouZukanAwardSubBGSetups[i].setup,

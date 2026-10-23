@@ -670,8 +670,7 @@ static u32 Input_Head2DecideFunc(WorldTradeInputWork *wk, int decide) {
 
 static u32 Input_WordHead2SelectMain(WorldTradeInputWork *wk, u8 *seeCheck) {
     int pos = wk->listpos;
-    // The SDK's u32 is unsigned long, which MWCC indexes with differently than unsigned int
-    unsigned long hit;
+    u32 hit;
 
     if (pos < 3) {
         wk->listposBackupX = pos;

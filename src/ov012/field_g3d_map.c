@@ -301,7 +301,7 @@ BOOL FieldChunk_RenderMap(FieldChunk *chunk) {
         NNS_G3dGlbSetBaseTrans(&FIELD_CHUNK_TRANSLATION_IDENTITY);
         NNS_G3dGlbSetBaseRot(&FIELD_CHUNK_ROTATION_IDENTITY);
         NNS_G3dGlbSetBaseScale(&FIELD_CHUNK_SCALE_IDENTITY);
-        NNS_G3DFlushRenderState();
+        NNS_G3dGlbFlushP();
         NNS_G3dGeIdentity();
         NNS_G3dGeLoadMtx43(&NNS_G3dGlb.cameraMtx);
         NNS_G3dGeTranslateVec(&chunk->worldPos);
@@ -431,7 +431,7 @@ void FieldChunk_LinkMdlTex(NNSG3dRenderObj *model, void *resource, void *texture
         NNS_G3dBindMdlTex(mdl, tex);
         NNS_G3dBindMdlPltt(mdl, tex);
     }
-    NNS_G3DModelAttachResource(model, mdl);
+    NNS_G3dRenderObjInit(model, mdl);
 }
 
 void FieldChunk_DetachModelResource(NNSG3dRenderObj *model) {

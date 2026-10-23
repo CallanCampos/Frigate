@@ -169,7 +169,7 @@ int WorldTrade_Box_Init(WorldTradeWork *wk, int seq) {
     Box_SetCellActor(wk);
     WorldTrade_SetPartnerExchangePos(wk);
 
-    if (GXx_GetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR) == 0) {
+    if (GXS_GetMasterBrightness() == 0) {
         GFL_WipeSet(3, 1, 1, 0, 6, 1, HEAPID_WORLDTRADE);
     } else {
         GFL_WipeSet(0, 1, 1, 0, 6, 1, HEAPID_WORLDTRADE);
@@ -187,7 +187,7 @@ int WorldTrade_Box_Main(WorldTradeWork *wk, int seq) {
 }
 
 int WorldTrade_Box_End(WorldTradeWork *wk, int seq) {
-    if (GXx_GetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR) != 0) {
+    if (GXS_GetMasterBrightness() != 0) {
         WorldTrade_SetPartnerExchangePosIsReturns(wk);
     }
     Box_DelCellActor(wk);
@@ -1031,7 +1031,7 @@ static void Box_TransPokeIconCharaPal(int species, int form, int sex, int egg, i
     void *file =
         Box_CharDataGetbyHandle(handle, PokeParty_GetIconIndex(species, form, sex, egg), &charData, HEAPID_WORLDTRADE);
 
-    MIi_CpuCopyFast(charData->rawData, pbuf->chars, 0x200);
+    MIi_CpuCopyFast(charData->pRawData, pbuf->chars, 0x200);
     pbuf->charOffset = (no * 16 + 28) * 32;
     pbuf->icon = icon;
     pbuf->palette = PokeIcon_GetPalette(species, form, sex, egg) + 5;

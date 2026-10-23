@@ -91,7 +91,6 @@ struct EventMapChange {
     u16 prevSeason;
     u16 season;
     WarpSequence warp;
-    u32 unk9C;
     BOOL lensFlareStarted;
 };
 
@@ -1374,7 +1373,7 @@ GameEvent *EventMapChangeBlackout_Create(GameSystem *gsys) {
     return event;
 }
 
-u16 ConvWarpDirToAngle(int warpDir) {
+u16 ConvWarpDirToAngle(s32 warpDir) {
     switch (warpDir) {
     default:
     case WARP_DIR_UP:
@@ -1507,7 +1506,7 @@ void GameData_UpdateJoinAvenueForZone(GameData *gameData, u16 zoneId) {
                     JoinAvenuePerson *person = JoinAvenuePersonList_Get(lists[i], j);
 
                     if (!JoinAvenuePerson_IsEmpty(person)) {
-                        JoinAvenuePerson_SetParam(person, 0x26, 0);
+                        JoinAvenuePerson_SetParam(person, JOIN_AVE_PARAM_UNK_38, 0);
                     }
                 }
             }
@@ -1595,7 +1594,7 @@ void Field_SetPlayerHidden(Field *field, BOOL hidden) {
     SetActorHidden(FieldPlayer_GetActor(Field_GetPlayer(field)), hidden);
 }
 
-void GameData_SetGimmickByZone(GameData *gameData, int zoneId) {
+void GameData_SetGimmickByZone(GameData *gameData, s32 zoneId) {
     GimmickState *gimmick = GameData_GetGimmickState(gameData);
     ArcTool *handle;
     u32 i;

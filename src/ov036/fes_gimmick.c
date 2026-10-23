@@ -87,9 +87,7 @@ static void FesGimmick_SetEnabled(FesGimmick *gimmick, BOOL enabled) {
     }
 }
 
-void FesGimmick_BindActorSystem(void *gimmick, MMSys *actorSystem) {
-    FesGimmick *fes = gimmick;
-
+void FesGimmick_BindActorSystem(FesGimmick *fes, MMSys *actorSystem) {
     fes->actors = actorSystem;
     if (getStatusOfFesMission(fes->festival)) {
         if (fes->mission->header.kind == MISSION_PEOPLE) {
@@ -98,18 +96,14 @@ void FesGimmick_BindActorSystem(void *gimmick, MMSys *actorSystem) {
     }
 }
 
-void FesGimmick_BindPlayer(void *gimmick, void *effects, FieldPlayer *player) {
-    FesGimmick *fes = gimmick;
-
+void FesGimmick_BindPlayer(FesGimmick *fes, void *effects, FieldPlayer *player) {
     fes->effects = effects;
     fes->player = player;
     fes->playerActor = FieldPlayer_GetActor(player);
     fes->unk3C = func_ov036_021a5bb4(fes->effects);
 }
 
-void func_ov036_021b65d4(void *gimmick) {
-    FesGimmick *fes = gimmick;
-
+void func_ov036_021b65d4(FesGimmick *fes) {
     if (fes->unk3C != NULL) {
         func_ov036_021a3a70(fes->unk3C);
         fes->unk3C = NULL;
@@ -145,9 +139,7 @@ static void ClearFesEventFlags(FesGimmick *gimmick) {
     }
 }
 
-void func_ov036_021b6660(void *gimmick) {
-    FesGimmick *fes = gimmick;
-
+void func_ov036_021b6660(FesGimmick *fes) {
     if (getStatusOfFesMission(fes->festival)) {
         switch (fes->mission->header.kind) {
         case MISSION_SPARKLE:
@@ -179,9 +171,7 @@ BOOL func_ov036_021b6690(void *gimmick) {
     }
 }
 
-BOOL FesGimmick_IsCurrent(void *gimmick, u32 type) {
-    FesGimmick *fes = gimmick;
-
+BOOL FesGimmick_IsCurrent(FesGimmick *fes, u32 type) {
     if (getStatusOfFesMission(fes->festival)) {
         if (fes->mission->header.kind == type) {
             return TRUE;
@@ -227,8 +217,7 @@ BOOL func_ov036_021b6758(void *gimmick, u16 x, u16 z, fx32 height) {
     return FALSE;
 }
 
-void DeleteFunfestActor(void *gimmick, u16 zoneId, u8 actorIndex) {
-    FesGimmick *fes = gimmick;
+void DeleteFunfestActor(FesGimmick *fes, u16 zoneId, u8 actorIndex) {
     RivalEntry *work = LinkFestival_GetEntries(fes->festival);
 
     if (getStatusOfFesMission(fes->festival)) {

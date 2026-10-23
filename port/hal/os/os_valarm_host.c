@@ -18,7 +18,7 @@
 void port_osi_reset_valarms(void) {
     OSi_UseVAlarm = FALSE;
     OSi_VFrameCount = 0;
-    OSi_PrevVCount = 0;
+    OSi_PreviousVCount = 0;
     OSi_VAlarmQueue.head = NULL;
     OSi_VAlarmQueue.tail = NULL;
 }

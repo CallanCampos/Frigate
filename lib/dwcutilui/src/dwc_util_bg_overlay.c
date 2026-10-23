@@ -23,10 +23,10 @@ static char *sScreenPaths[20] = {
 };
 static void *sOverlayScreen;
 
-void DWCUtilBgOverlay_Init(void) {
-    sOverlayScreen = DWCUtilHeap_AllocClear(DWC_UTIL_BG_OVERLAY_SIZE, 4);
+void DWCi_HLlInit(void) {
+    sOverlayScreen = DWCi_HEAPlAllocEx(DWC_UTIL_BG_OVERLAY_SIZE, 4);
     DWCUtilGfxResource_Load("char/jbBgHl.ncg.l", GX_LoadBG1Char);
-    switch (DWCUtilMain_GetStartScreen()) {
+    switch (DWCi_Entry()) {
     case 0:
         DWCUtilGfxResource_Load(sScreenPaths[0], GX_LoadBG1Scr);
         break;
@@ -36,28 +36,28 @@ void DWCUtilBgOverlay_Init(void) {
     }
 }
 
-void DWCUtilBgOverlay_Exit(void) {
-    DWCUtilHeap_FreeAndNull(&sOverlayScreen);
+void DWCi_HLlEnd(void) {
+    DWCi_HEAPlFree_(&sOverlayScreen);
 }
 
-void DWCUtilBgOverlay_Show(int index) {
-    void *data = DWCUtilRomResource_LoadFile(DWCUtilGfxResource_LocalizePath(sScreenPaths[index]), NULL, 4);
+void DWCi_HLlLoad(int index) {
+    void *data = DWCUtilRomResource_LoadFile(DWCi_Char(sScreenPaths[index]), NULL, 4);
 
     MIi_CpuCopyFast(data, sOverlayScreen, DWC_UTIL_BG_OVERLAY_SIZE);
-    DWCUtilRomResource_FreeFile(data);
-    DWCUtilTask_Create(1, DWCUtilBgOverlay_UploadTask, NULL, 0x78);
+    DWCi_ARClRelease(data);
+    DWCi_TSKlForm(1, DWCUtilBgOverlay_UploadTask, NULL, 0x78);
 }
 
-void DWCUtilBgOverlay_ShowConnectionSet(void) {
-    DWCUtilBgOverlay_Show(DWCUtilWifiSettings_GetEdit()->index + 5);
+void DWCi_HLlLoadSet(void) {
+    DWCi_HLlLoad(DWCUtilWifiSettings_GetEdit()->index + 5);
 }
 
-void DWCUtilBgOverlay_ShowConnectionList(void) {
-    DWCUtilBgOverlay_Show(DWCUtilWifiSettings_GetEdit()->index + 2);
+void DWCi_HLlLoadList(void) {
+    DWCi_HLlLoad(DWCUtilWifiSettings_GetEdit()->index + 2);
 }
 
 static void DWCUtilBgOverlay_UploadTask(DWCUtilTask *task, void *arg) {
     DC_FlushRange(sOverlayScreen, DWC_UTIL_BG_OVERLAY_SIZE);
     GX_LoadBG1Scr(sOverlayScreen, 0, DWC_UTIL_BG_OVERLAY_SIZE);
-    DWCUtilTask_QueueRemoval(1, task);
+    DWCi_TSKlDelete(1, task);
 }

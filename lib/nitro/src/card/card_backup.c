@@ -1,12 +1,14 @@
 // NitroSDK's CARD library, the backup memory: telling which kind it is, and reading and writing it a page at a time.
-// The file name is a guess, from NitroSDK's card_backup.c; the library's middleware signature "[SDK+NINTENDO:BACKUP]"
-// is passed by the first and the fourth function here and nowhere else.
+// The file name is NitroSDK's (card_backup.c, as ntrtwl's reconstruction of NitroSDK has it); the library's middleware
+// signature "[SDK+NINTENDO:BACKUP]" is passed by the first and the fourth function here and nowhere else.
 #include "nitro/card.h"
 #include "nitro/mi.h"
 #include "nitro/os.h"
 
 // The page that the commands move a page of the backup through
 #define CARD_BACKUP_PAGE_SIZE 256
+// NitroSDK's: what every backup command starts with, to keep the signature in the link
+#define SDK_USING_BACKUP() SDK_USING_MIDDLEWARE(cardi_backup_assert)
 
 static void CARDi_RequestStreamCommandCore(CARDiCommon *p);
 static void CARDi_IdentifyBackupCore(CARDBackupType type);
@@ -22,7 +24,7 @@ static void CARDi_RequestStreamCommandCore(CARDiCommon *p) {
     CARDRequestMode reqMode = p->reqMode;
     int reqRetry = p->reqRetry;
     u32 size = CARD_BACKUP_PAGE_SIZE;
-    OSi_ReferSymbol(CARDi_BackupSignature);
+    SDK_USING_BACKUP();
     if (reqType == CARD_REQ_ERASE_SECTOR_BACKUP) {
         size = CARD_GetBackupSectorSize();
     } else if (reqType == CARD_REQ_ERASE_SUBSECTOR_BACKUP) {
@@ -92,32 +94,32 @@ static void CARDi_IdentifyBackupCore(CARDBackupType type) {
     device = type & 0xff;
     vendor = (type >> 16) & 0xff;
     cmd->spec.totalSize = size;
-    cmd->spec.initialStatus = 0xff;
+    cmd->spec.initial_status = 0xff;
     if (device == CARD_BACKUP_TYPE_DEVICE_EEPROM) {
         switch (size) {
         case 0x200:
             cmd->spec.pageSize = 0x10;
             cmd->spec.addrWidth = 1;
             cmd->spec.programPage = 5;
-            cmd->spec.initialStatus = 0xf0;
+            cmd->spec.initial_status = 0xf0;
             break;
         case 0x2000:
             cmd->spec.pageSize = 0x20;
             cmd->spec.addrWidth = 2;
             cmd->spec.programPage = 5;
-            cmd->spec.initialStatus = 0;
+            cmd->spec.initial_status = 0;
             break;
         case 0x10000:
             cmd->spec.pageSize = 0x80;
             cmd->spec.addrWidth = 2;
             cmd->spec.programPage = 10;
-            cmd->spec.initialStatus = 0;
+            cmd->spec.initial_status = 0;
             break;
         case 0x20000:
             cmd->spec.pageSize = 0x100;
             cmd->spec.addrWidth = 3;
             cmd->spec.programPage = 5;
-            cmd->spec.initialStatus = 0;
+            cmd->spec.initial_status = 0;
             break;
         default:
             goto unsupported;
@@ -148,7 +150,7 @@ static void CARDi_IdentifyBackupCore(CARDBackupType type) {
             cmd->spec.eraseSectorTotal = 5000;
             cmd->spec.eraseChip = 10000;
             cmd->spec.eraseChipTotal = 60000;
-            cmd->spec.initialStatus = 0;
+            cmd->spec.initial_status = 0;
             cmd->spec.caps |= CARD_CAPS(CARD_REQ_WRITE_BACKUP);
             cmd->spec.caps |= CARD_CAPS(CARD_REQ_ERASE_PAGE_BACKUP);
             cmd->spec.caps |= CARD_CAPS(CARD_REQ_ERASE_CHIP_BACKUP);
@@ -161,7 +163,7 @@ static void CARDi_IdentifyBackupCore(CARDBackupType type) {
             cmd->spec.eraseSubsectorTotal = 150;
             cmd->spec.eraseChip = 23000;
             cmd->spec.eraseChipTotal = 800000;
-            cmd->spec.initialStatus = 0;
+            cmd->spec.initial_status = 0;
             cmd->spec.subsectSize = 0x1000;
             cmd->spec.caps |= CARD_CAPS(CARD_REQ_ERASE_SUBSECTOR_BACKUP);
             cmd->spec.caps |= CARD_CAPS(CARD_REQ_ERASE_CHIP_BACKUP);
@@ -173,7 +175,7 @@ static void CARDi_IdentifyBackupCore(CARDBackupType type) {
                 cmd->spec.eraseSectorTotal = 3000;
                 cmd->spec.eraseChip = 68000;
                 cmd->spec.eraseChipTotal = 160000;
-                cmd->spec.initialStatus = 0;
+                cmd->spec.initial_status = 0;
                 cmd->spec.caps |= CARD_CAPS(CARD_REQ_ERASE_CHIP_BACKUP);
                 cmd->spec.caps |= CARD_CAPS(CARD_REQ_WRITE_STATUS);
             } else if (vendor == 1) {
@@ -181,7 +183,7 @@ static void CARDi_IdentifyBackupCore(CARDBackupType type) {
                 cmd->spec.eraseSectorTotal = 3000;
                 cmd->spec.eraseChip = 68000;
                 cmd->spec.eraseChipTotal = 160000;
-                cmd->spec.initialStatus = 0x84;
+                cmd->spec.initial_status = 0x84;
                 cmd->spec.caps |= CARD_CAPS(CARD_REQ_ERASE_CHIP_BACKUP);
                 cmd->spec.caps |= CARD_CAPS(CARD_REQ_WRITE_STATUS);
             }
@@ -204,7 +206,7 @@ static void CARDi_IdentifyBackupCore(CARDBackupType type) {
             cmd->spec.pageSize = size;
             cmd->spec.sectSize = size;
             cmd->spec.addrWidth = 2;
-            cmd->spec.initialStatus = 0;
+            cmd->spec.initial_status = 0;
             cmd->spec.caps |= CARD_CAPS(CARD_REQ_READ_BACKUP);
             cmd->spec.caps |= CARD_CAPS(CARD_REQ_PROGRAM_BACKUP);
             cmd->spec.caps |= CARD_CAPS(CARD_REQ_VERIFY_BACKUP);
@@ -229,7 +231,7 @@ static void CARDi_IdentifyBackupTask(CARDiCommon *p) {
 // Begins a backup command: checks that the game may use the card in this way, then waits until the last command is
 // done
 static BOOL CARDi_BeginBackupCommand(u32 permit, MIDmaCallback callback, void *arg) {
-    OSi_ReferSymbol(CARDi_BackupSignature);
+    SDK_USING_BACKUP();
     CARD_CheckEnabled();
     if ((CARDi_GetAccessLevel() & permit) != permit) {
         OS_Terminate();
@@ -273,7 +275,7 @@ BOOL CARD_TryWaitBackupAsync(void) {
 }
 
 void CARD_CancelBackupAsync(void) {
-    u32 irq = OS_DisableInterrupts();
+    OSIntrMode irq = OS_DisableInterrupts();
     cardi_common.flag |= CARD_STAT_CANCEL;
     OS_RestoreInterrupts(irq);
 }

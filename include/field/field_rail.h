@@ -15,12 +15,38 @@
 #include "nitro/fx.h"
 #include "struct_decls.h"
 
-// A point of the rails, where up to four lines meet: each line's ID (0xffff for none), the direction it leaves in and
-// the rail's width there
+// The ID of no point, line, camera or curve, and of a free slot of RailDisabledLines
+#define RAIL_ID_NONE 0xffff
+
+// The lines that meet at a point, and the lines that can be off at once
+#define RAIL_POINT_LINE_MAX 4
+#define RAIL_DISABLED_LINE_MAX 18
+
+// The directions on the rails, which ConvDirToRailDir gives for the actors' directions, clockwise from up
+enum {
+    RAIL_DIR_NONE,
+    RAIL_DIR_UP,
+    RAIL_DIR_RIGHT,
+    RAIL_DIR_DOWN,
+    RAIL_DIR_LEFT,
+};
+
+// The speeds of RailUnit_RequestMove: a step of 1, 2, 4, 8 or 16 sixteenths of a tile a frame
+enum {
+    RAIL_SPEED_1,
+    RAIL_SPEED_2,
+    RAIL_SPEED_4,
+    RAIL_SPEED_8,
+    RAIL_SPEED_16,
+    RAIL_SPEED_MAX,
+};
+
+// A point of the rails, where up to four lines meet: each line's ID (RAIL_ID_NONE for none), the RAIL_DIR_ direction
+// it leaves in and the rail's width there
 struct RailPoint {
-    u32 lineIds[4];
-    u32 dirs[4];
-    s32 widths[4];
+    u32 lineIds[RAIL_POINT_LINE_MAX];
+    u32 dirs[RAIL_POINT_LINE_MAX];
+    s32 widths[RAIL_POINT_LINE_MAX];
     VecFx32 pos;
     u32 cameraId;
     char name[48];
@@ -82,16 +108,16 @@ struct RailDataHandle {
     fx32 tileWidth;
 };
 
-// The lines that are off, 0xffff in a free slot
+// The lines that are off, RAIL_ID_NONE in a free slot
 struct RailDisabledLines {
-    u16 lineIds[18];
+    u16 lineIds[RAIL_DISABLED_LINE_MAX];
 };
 
 // RailUnit's component tag; a unit has no component before placement
 enum {
-    RAIL_COMPONENT_POINT = 0,
-    RAIL_COMPONENT_LINE = 1,
-    RAIL_COMPONENT_NONE = 2,
+    RAIL_COMPONENT_POINT,
+    RAIL_COMPONENT_LINE,
+    RAIL_COMPONENT_NONE,
 };
 
 // Something that moves along the rails: the point it is at, or the line, with its position along the line (front)
@@ -132,7 +158,7 @@ struct RailUnit {
 };
 
 struct FieldRailSystem {
-    u16 heapId;
+    HeapID heapId;
     u16 loaded;
     u16 cameraEnabled;
     RailUnit *units;
@@ -214,7 +240,7 @@ u8 RailUnit_IsMovePending(RailUnit *unit);
 void func_ov036_021b0a04(RailUnit *unit, VecFx16 *dir);
 // The current line's direction; requires a unit placed on a line
 u32 RailUnit_GetLineDirection(RailUnit *unit);
-// Queues a move when idle. speedIndex must be 0..4 and dir a rail direction.
+// Queues a move when idle, at a RAIL_SPEED_ speed in a RAIL_DIR_ direction
 BOOL RailUnit_RequestMove(RailUnit *unit, u32 speedIndex, u32 dir);
 // Attempts the indexed step, ending the request on completion or failure
 void RailUnit_UpdateMove(RailUnit *unit);

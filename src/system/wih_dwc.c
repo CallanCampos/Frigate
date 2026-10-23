@@ -49,7 +49,7 @@ typedef struct {
     u8 unk900[0x100];
 } WifiConfig;
 
-typedef struct {
+struct WihDwcWork {
     WMBssDesc bss[_ALLBEACON_MAX];
     void *parseWork;
     WifiConfig *config;
@@ -62,7 +62,7 @@ typedef struct {
     u16 bestLinkLevel;
     u16 count;
     int timers[AP_TIMER_COUNT];
-} WihDwcWork;
+};
 
 static void scanInfoCallback(const void *beacon, void *work, u16 linkLevel);
 static BOOL isConfiguredAP(WMBssDesc *bss);
@@ -89,9 +89,7 @@ void *WihDwc_Create(int num, HeapID heapId) {
     return work;
 }
 
-void WihDwc_Destroy(void *work) {
-    WihDwcWork *wk = work;
-
+void WihDwc_Destroy(WihDwcWork *wk) {
     GFL_ASSERT(_localWork);
     WH_SetScanInfoCallback(NULL);
     GFL_NetFreeAligned32(wk->parseWork);
@@ -226,7 +224,7 @@ u32 WihDwc_GetStatus(WifiList *wifiList) {
         } else if (isFreeSpot(bss)) {
             _localWork->timers[AP_TIMER_HOTSPOT] = AP_KNOWN_FRAMES;
         } else if (DWCi_BssDescToApInfo(_localWork->parseWork, bss, &apInfo)) {
-            switch (apInfo.apType) {
+            switch (apInfo.aptype) {
             case 0:
             case 1:
             case 2:

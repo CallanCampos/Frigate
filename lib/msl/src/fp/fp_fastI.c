@@ -3,10 +3,11 @@
 // multiplication, shifts and division, and 32-bit division, and sqrt. The library is hand-written assembly, so every
 // routine is an MWCC asm function, in the compiler's pre-UAL syntax (`ldmltia`, `subges`).
 //
-// The names are swan's where he gave one (`__aeabi_dadd`); the runtime's own are in the comments (`_dadd`). A double or
-// a 64-bit value has its low word in the lower register: r0 and r1 for the first operand and the result, r2 and r3 for
-// the second. Floats go in r0 and r1. The routines round to nearest even, deal with denormals, infinities and NaNs (a
-// NaN result is 0x7fffffff, or 0x7fffffffffffffff for a double) and raise no exceptions.
+// The names are the runtime's own, which the compiler's calls use and pret's pokediamond labels (fp_fastI.h gives
+// swan's where they differ); the entries in the middle of routines are static here. A double or a 64-bit value has its
+// low word in the lower register: r0 and r1 for the first operand and the result, r2 and r3 for the second. Floats go
+// in r0 and r1. The routines round to nearest even, deal with denormals, infinities and NaNs (a NaN result is
+// 0x7fffffff, or 0x7fffffffffffffff for a double) and raise no exceptions.
 //
 // An MWCC asm function has one entry, but the runtime enters some routines in the middle and lets others fall into the
 // next. The routines are split at those entries, in the ROM's order: a routine that ends without a return falls into
@@ -15,14 +16,14 @@
 #include <errno.h>
 #include <math.h>
 
-static void dadd_magnitudes(void);
-static void dsub_magnitudes(void);
+static void __dadd_start(void);
+static void __dsub_start(void);
 static void ll_div_body(void);
 static void ll_udiv_core(void);
 static void ull_div_body(void);
-static void u32_div_core(void);
-static void fadd_magnitudes(void);
-static void fsub_magnitudes(void);
+static void _u32_div_not_0_f(void);
+static void __fadd_start(void);
+static void __fsub_start(void);
 
 // clang-format off
 // One step of the unrolled division loops: shifts the next dividend bit into the remainder in r3, subtracts the divisor
@@ -35,14 +36,14 @@ static void fsub_magnitudes(void);
 
 // clang-format on
 
-// _dadd: a + b. Operands of different signs enter dsub_magnitudes with b negated; operands of the same
-// sign fall into dadd_magnitudes.
+// _dadd: a + b. Operands of different signs enter __dsub_start with b negated; operands of the same
+// sign fall into __dadd_start.
 // clang-format off
-asm double __aeabi_dadd(double a, double b) {
+asm double _dadd(double a, double b) {
     stmdb sp!, {r4, lr}
     eors r12, r1, r3
     eormi r3, r3, #0x80000000
-    bmi dsub_magnitudes
+    bmi __dsub_start
 }
 
 // clang-format on
@@ -52,7 +53,7 @@ asm double __aeabi_dadd(double a, double b) {
 // bit on top, b is shifted right by the exponent difference into a sticky bit, and the sum is renormalized
 // and rounded to nearest even. Zero, denormal, infinite and NaN operands leave at the unpacking.
 // clang-format off
-static asm void dadd_magnitudes(void) {
+static asm void __dadd_start(void) {
     // Orders the operands so that a >= b as bit patterns, which is |a| >= |b| for one sign
     subs r12, r0, r2
     sbcs lr, r1, r3
@@ -279,7 +280,7 @@ static asm void dadd_magnitudes(void) {
 
 // clang-format on
 
-// _drsb, the reverse subtraction b - a: swaps the operands and falls into doubleSub.
+// _drsb, the reverse subtraction b - a: swaps the operands and falls into _dsub.
 // clang-format off
 asm double _drsb(double a, double b) {
     eor r1, r1, r3
@@ -292,14 +293,14 @@ asm double _drsb(double a, double b) {
 
 // clang-format on
 
-// _dsub: a - b. Operands of the same sign fall into dsub_magnitudes; those of different signs have b negated
-// and enter dadd_magnitudes.
+// _dsub: a - b. Operands of the same sign fall into __dsub_start; those of different signs have b negated
+// and enter __dadd_start.
 // clang-format off
-asm double doubleSub(double a, double b) {
+asm double _dsub(double a, double b) {
     stmdb sp!, {r4, lr}
     eors r12, r1, r3
     eormi r3, r3, #0x80000000
-    bmi dadd_magnitudes
+    bmi __dadd_start
 }
 
 // clang-format on
@@ -309,8 +310,8 @@ asm double doubleSub(double a, double b) {
 // smaller; cancellation is normalized with clz and a result below the normal range is made a denormal.
 // Equal operands give +0.
 // clang-format off
-static asm void dsub_magnitudes(void) {
-    // Orders the operands by magnitude, as dadd_magnitudes does. When b is the larger the sign of the result flips
+static asm void __dsub_start(void) {
+    // Orders the operands by magnitude, as __dadd_start does. When b is the larger the sign of the result flips
     subs r12, r0, r2
     sbcs lr, r1, r3
     bhs @unpack
@@ -320,7 +321,7 @@ static asm void dsub_magnitudes(void) {
     subs r0, r0, r12
     sbc r1, r1, lr
 @unpack:
-    // Unpacks both operands as dadd_magnitudes does
+    // Unpacks both operands as __dadd_start does
     mov lr, #0x80000000
     mov r12, r1, lsr #20
     orr r1, lr, r1, lsl #11
@@ -581,7 +582,7 @@ static asm void dsub_magnitudes(void) {
 // feeds the sticky bit. Denormal operands are normalized with clz first, and a product below the normal
 // range is shifted down into a denormal with rounding.
 // clang-format off
-asm double __aeabi_dmul(double a, double b) {
+asm double _dmul(double a, double b) {
     // Unpacks a: lr = the sign of the product, r12 = a's exponent, r1:r0 = its mantissa with the integer bit at bit 63
     stmdb sp!, {r4, r5, r6, r7, lr}
     eor lr, r1, r3
@@ -829,7 +830,7 @@ asm double __aeabi_dmul(double a, double b) {
 // _d2f: converts a double to a float, rounding to nearest even. A value too large gives infinity, one too
 // small a float denormal or a signed zero.
 // clang-format off
-asm float __aeabi_d2f(double x) {
+asm float _d2f(double x) {
     // r2 = the sign; r12 = the exponent, rebased from 0x3ff to 0x7f at 0x380
     and r2, r1, #0x80000000
     mov r12, r1, lsr #20
@@ -909,7 +910,7 @@ asm float __aeabi_d2f(double x) {
 
 // _dflt: converts an int to a double.
 // clang-format off
-asm double __aeabi_i2d(int x) {
+asm double _dflt(int x) {
     ands r2, r0, #0x80000000
     rsbmi r0, r0, #0
     cmp r0, #0
@@ -932,7 +933,7 @@ asm double __aeabi_i2d(int x) {
 
 // _dfltu: converts an unsigned int to a double.
 // clang-format off
-asm double __aeabi_ui2d(unsigned int x) {
+asm double _dfltu(unsigned int x) {
     cmp r0, #0
     mov r1, #0
     bxeq lr
@@ -957,7 +958,7 @@ asm double __aeabi_ui2d(unsigned int x) {
 // on, true being hs. Any comparison with a NaN is false. Negative operands compare with the operands
 // swapped, and +0 equals -0.
 // clang-format off
-asm int __aeabi_dcmpge(double a, double b) {
+asm int _dgeq(double a, double b) {
     mov r12, #0x200000
     cmn r12, r1, lsl #1
     bhs @a_inf_or_nan
@@ -1005,9 +1006,9 @@ asm int __aeabi_dcmpge(double a, double b) {
 
 // clang-format on
 
-// _dgr: a > b, true being hi in the flags; see __aeabi_dcmpge.
+// _dgr: a > b, true being hi in the flags; see _dgeq.
 // clang-format off
-asm int __aeabi_dcmpgt(double a, double b) {
+asm int _dgr(double a, double b) {
     mov r12, #0x200000
     cmn r12, r1, lsl #1
     bhs @a_inf_or_nan
@@ -1055,9 +1056,9 @@ asm int __aeabi_dcmpgt(double a, double b) {
 
 // clang-format on
 
-// _dleq: a <= b, true being ls in the flags; see __aeabi_dcmpge.
+// _dleq: a <= b, true being ls in the flags; see _dgeq.
 // clang-format off
-asm int __aeabi_dcmple(double a, double b) {
+asm int _dleq(double a, double b) {
     mov r12, #0x200000
     cmn r12, r1, lsl #1
     bhs @a_inf_or_nan
@@ -1109,9 +1110,9 @@ asm int __aeabi_dcmple(double a, double b) {
 
 // clang-format on
 
-// _dls: a < b, true being lo in the flags; see __aeabi_dcmpge.
+// _dls: a < b, true being lo in the flags; see _dgeq.
 // clang-format off
-asm int __aeabi_dcmplt(double a, double b) {
+asm int _dls(double a, double b) {
     mov r12, #0x200000
     cmn r12, r1, lsl #1
     bhs @a_inf_or_nan
@@ -1161,9 +1162,9 @@ asm int __aeabi_dcmplt(double a, double b) {
 
 // clang-format on
 
-// _deq: a == b, true being eq in the flags; see __aeabi_dcmpge.
+// _deq: a == b, true being eq in the flags; see _dgeq.
 // clang-format off
-asm int __aeabi_dcmpeq(double a, double b) {
+asm int _deq(double a, double b) {
     mov r12, #0x200000
     cmn r12, r1, lsl #1
     bhs @a_inf_or_nan
@@ -1208,9 +1209,9 @@ asm int __aeabi_dcmpeq(double a, double b) {
 
 // clang-format on
 
-// _dneq: a != b, true being ne in the flags; a NaN operand makes it true. See __aeabi_dcmpge.
+// _dneq: a != b, true being ne in the flags; a NaN operand makes it true. See _dgeq.
 // clang-format off
-asm int doubleIsNotEqual(double a, double b) {
+asm int _dneq(double a, double b) {
     mov r12, #0x200000
     cmn r12, r1, lsl #1
     bhs @a_inf_or_nan
@@ -1385,7 +1386,7 @@ asm int _fls(float a, float b) {
 
 // _f2d: converts a float to a double. A float denormal is normalized with clz.
 // clang-format off
-asm double __aeabi_f2d(float x) {
+asm double _f2d(float x) {
     and r2, r0, #0x80000000
     mov r12, r0, lsr #23
     mov r3, r0, lsl #9
@@ -1429,7 +1430,7 @@ asm double __aeabi_f2d(float x) {
 
 // _fflt: converts an int to a float, rounding to nearest even.
 // clang-format off
-asm float __aeabi_i2f(int x) {
+asm float _fflt(int x) {
     ands r2, r0, #0x80000000
     rsbmi r0, r0, #0
     cmp r0, #0
@@ -1482,7 +1483,7 @@ asm float _ffltu(unsigned int x) {
 // 64-bit divisions keep their state in r4: its bit 31 asks for the result to be negated and its bit 0
 // for the remainder rather than the quotient. This one asks for the remainder, and joins ll_div_body.
 // clang-format off
-asm long long mod64Signed(long long a, long long b) {
+asm long long _ll_mod(long long a, long long b) {
     // r4 = the dividend's sign in bit 31, and bit 0 set: the caller wants the remainder
     stmdb sp!, {r4, r5, r6, r7, r11, r12, lr}
     mov r4, r1
@@ -1545,7 +1546,7 @@ static asm void ll_div_body(void) {
 
 // The unsigned 64-bit division, a shift-and-subtract loop: the divisor is aligned to the top bit of the dividend
 // and each step makes one quotient bit with a non-restoring subtraction or addition. r4 selects the
-// remainder or the quotient, and the sign (see mod64Signed). Returns the result in r1:r0.
+// remainder or the quotient, and the sign (see _ll_mod). Returns the result in r1:r0.
 // clang-format off
 static asm void ll_udiv_core(void) {
     // r1:r0 = the dividend and r3:r2 the divisor, both positive; r4 as the entries set it
@@ -1653,7 +1654,7 @@ static asm void ll_udiv_core(void) {
 // The unsigned 64-bit division (MWCC's _ll_udiv), r1:r0 / r3:r2. r4 = 0 asks for the quotient; joins
 // ull_div_body.
 // clang-format off
-asm unsigned long long __aeabi_uldivmod(unsigned long long a, unsigned long long b) {
+asm unsigned long long _ll_udiv(unsigned long long a, unsigned long long b) {
     // r4 = 0: the caller wants the quotient
     stmdb sp!, {r4, r5, r6, r7, r11, r12, lr}
     mov r4, #0
@@ -1673,7 +1674,7 @@ asm unsigned long long _ull_mod(unsigned long long a, unsigned long long b) {
 // clang-format on
 
 // The part of the unsigned 64-bit division and remainder after their entries. A zero divisor returns the
-// dividend; operands whose high words are both zero are divided by u32_div_core, the others by
+// dividend; operands whose high words are both zero are divided by _u32_div_not_0_f, the others by
 // ll_udiv_core.
 // clang-format off
 static asm void ull_div_body(void) {
@@ -1685,7 +1686,7 @@ static asm void ull_div_body(void) {
     orrs r5, r1, r3
     bne ll_udiv_core
     mov r1, r2
-    bl u32_div_core
+    bl _u32_div_not_0_f
     cmp r4, #0
     movne r0, r1
     mov r1, #0
@@ -1712,7 +1713,7 @@ asm long long _ull_mul(long long a, long long b) {
 
 // _ll_shl: shifts r1:r0 left by r2 & 63.
 // clang-format off
-asm long long __aeabi_llsl(long long a, int shift) {
+asm long long _ll_shl(long long a, int shift) {
     ands r2, r2, #0x3f
     bxeq lr
     subs r3, r2, #0x20
@@ -1790,19 +1791,19 @@ asm int _s32_div_f(int a, int b) {
 // clang-format on
 
 // _u32_div_f: the unsigned 32-bit division, r0 / r1: the quotient in r0 and the remainder in r1. A zero
-// divisor returns the dividend and a zero remainder at once; the division is u32_div_core.
+// divisor returns the dividend and a zero remainder at once; the division is _u32_div_not_0_f.
 // clang-format off
-asm unsigned int __aeabi_uidivmod(unsigned int a, unsigned int b) {
+asm unsigned int _u32_div_f(unsigned int a, unsigned int b) {
     cmp r1, #0
     bxeq lr
 }
 
 // clang-format on
 
-// The division of __aeabi_uidivmod once the divisor is known not to be zero, which the 32-bit case of _ll_udiv
+// The division of _u32_div_f once the divisor is known not to be zero, which the 32-bit case of _ll_udiv
 // calls directly: the unrolled loop of _s32_div_f without its sign handling.
 // clang-format off
-static asm void u32_div_core(void) {
+static asm void _u32_div_not_0_f(void) {
     cmp r0, r1
     movlo r1, r0
     movlo r0, #0
@@ -1868,7 +1869,7 @@ asm int _ffix(float x) {
 // _ffixu: converts a float to an unsigned int, truncating. A negative value gives 0 (a negative NaN
 // 0xffffffff) and one too large 0xffffffff.
 // clang-format off
-asm unsigned int __aeabi_f2uiz(float x) {
+asm unsigned int _ffixu(float x) {
     tst r0, #0x80000000
     bne @negative
     mov r1, #0x9e
@@ -1894,7 +1895,7 @@ asm unsigned int __aeabi_f2uiz(float x) {
 // _dfix: converts a double to an int, truncating. A value out of range saturates by its sign, and so does
 // a NaN.
 // clang-format off
-asm int __aeabi_d2iz(double x) {
+asm int _dfix(double x) {
     bic r3, r1, #0x80000000
     // 0x41e is the exponent of 2^31
     ldr r2, =0x41e
@@ -1923,7 +1924,7 @@ asm int __aeabi_d2iz(double x) {
 // Converts a double to an unsigned 64-bit integer, truncating. A negative value gives 0 (a negative NaN
 // all ones) and one too large all ones.
 // clang-format off
-asm unsigned long long __aeabi_d2ulz(double x) {
+asm unsigned long long _ll_ufrom_d(double x) {
     tst r1, #0x80000000
     // 0x43e is the exponent of 2^63
     bne @negative
@@ -2237,13 +2238,13 @@ asm float _fmul(float a, float b) {
 
 // clang-format on
 
-// _fadd: a + b for floats. Operands of different signs enter fsub_magnitudes with b negated; operands of the same
-// sign fall into fadd_magnitudes.
+// _fadd: a + b for floats. Operands of different signs enter __fsub_start with b negated; operands of the same
+// sign fall into __fadd_start.
 // clang-format off
 asm float _fadd(float a, float b) {
     eors r2, r0, r1
     eormi r1, r1, #0x80000000
-    bmi fsub_magnitudes
+    bmi __fsub_start
 }
 
 // clang-format on
@@ -2251,7 +2252,7 @@ asm float _fadd(float a, float b) {
 // Adds two floats of the same sign: the operands are swapped so that |a| >= |b|, b is shifted right into a sticky
 // bit by the exponent difference, and the sum is renormalized and rounded to nearest even.
 // clang-format off
-static asm void fadd_magnitudes(void) {
+static asm void __fadd_start(void) {
     subs r12, r0, r1
     sublo r0, r0, r12
     addlo r1, r1, r12
@@ -2423,13 +2424,13 @@ asm float _frsb(float a, float b) {
 
 // clang-format on
 
-// _fsub: a - b for floats. Operands of the same sign fall into fsub_magnitudes; those of different signs have b
-// negated and enter fadd_magnitudes.
+// _fsub: a - b for floats. Operands of the same sign fall into __fsub_start; those of different signs have b
+// negated and enter __fadd_start.
 // clang-format off
 asm float _fsub(float a, float b) {
     eors r2, r0, r1
     eormi r1, r1, #0x80000000
-    bmi fadd_magnitudes
+    bmi __fadd_start
 }
 
 // clang-format on
@@ -2437,7 +2438,7 @@ asm float _fsub(float a, float b) {
 // Subtracts two floats of the same sign: the smaller magnitude is taken from the larger, swapping the
 // operands and the sign when a is the smaller, and cancellation is normalized with clz.
 // clang-format off
-static asm void fsub_magnitudes(void) {
+static asm void __fsub_start(void) {
     subs r12, r0, r1
     eorlo r12, r12, #0x80000000
     sublo r0, r0, r12
@@ -2914,7 +2915,7 @@ asm double _drdiv(double a, double b) {
 // fixed-point multiply steps refine it into a quotient estimate, and the remainder decides the final
 // rounding.
 // clang-format off
-asm double __aeabi_ddiv(double a, double b) {
+asm double _ddiv(double a, double b) {
     stmdb sp!, {r4, r5, r6, lr}
     ldr lr, =0xffe
     eor r4, r1, r3

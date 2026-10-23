@@ -110,7 +110,7 @@ typedef struct {
     BOOL hadExchangeResult;
     WifiBattleMatchLinkParam *param;
     void *entry;
-    u8 serverEntry[0x160];
+    TournamentEntry serverEntry;
     BOOL hadBattleBox;
 } WifiBattleMatchLinkCompetition;
 

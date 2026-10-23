@@ -92,12 +92,12 @@ void MIC_Init(void) {
         return;
     }
     micInitialized = TRUE;
-    micWork.busy = FALSE;
+    micWork.lock = FALSE;
     micWork.callback = NULL;
     PXI_Init();
     while (!PXI_IsCallbackReady(PXI_FIFO_TAG_MIC, PXI_PROC_ARM7)) {
     }
-    OS_GetSystemWork()->micLastAddress = 0;
+    OS_GetSystemWork()->mic_last_address = 0;
     PXI_SetFifoRecvCallback(PXI_FIFO_TAG_MIC, MicCommonCallback);
 }
 
@@ -115,7 +115,7 @@ MICResult MIC_StartAutoSamplingAsync(const MICAutoParam *param, MICCallback call
     if (param->size == 0) {
         return MIC_RESULT_ILLEGAL_PARAMETER;
     }
-    if (param->rate < MIC_SAMPLING_RATE_MIN) {
+    if (param->rate < MIC_SAMPLING_RATE_LIMIT) {
         return MIC_RESULT_ILLEGAL_PARAMETER;
     }
     switch (param->type) {
@@ -140,24 +140,24 @@ MICResult MIC_StartAutoSamplingAsync(const MICAutoParam *param, MICCallback call
     default:
         return MIC_RESULT_ILLEGAL_PARAMETER;
     }
-    mode = param->loop ? (u8)(type | MIC_PXI_TYPE_LOOP) : (u8)type;
+    mode = param->loop_enable ? (u8)(type | MIC_PXI_TYPE_LOOP) : (u8)type;
 
     enabled = OS_DisableInterrupts();
-    if (micWork.busy) {
+    if (micWork.lock) {
         OS_RestoreInterrupts(enabled);
         return MIC_RESULT_BUSY;
     }
-    micWork.busy = TRUE;
+    micWork.lock = TRUE;
     OS_RestoreInterrupts(enabled);
 
     micWork.callback = callback;
     micWork.callbackArg = arg;
-    micWork.fullCallback = param->fullCallback;
-    micWork.fullArg = param->fullArg;
+    micWork.full = param->full_callback;
+    micWork.fullArg = param->full_arg;
     if (MicStartAutoSampling(param->buffer, param->size, param->rate, mode)) {
         return MIC_RESULT_SUCCESS;
     }
-    micWork.busy = FALSE;
+    micWork.lock = FALSE;
     return MIC_RESULT_SEND_ERROR;
 }
 
@@ -168,11 +168,11 @@ MICResult MIC_StartAutoSampling(const MICAutoParam *param) {
 MICResult MIC_StopAutoSamplingAsync(MICCallback callback, void *arg) {
     u32 enabled = OS_DisableInterrupts();
 
-    if (micWork.busy) {
+    if (micWork.lock) {
         OS_RestoreInterrupts(enabled);
         return MIC_RESULT_BUSY;
     }
-    micWork.busy = TRUE;
+    micWork.lock = TRUE;
     OS_RestoreInterrupts(enabled);
 
     micWork.callback = callback;
@@ -180,7 +180,7 @@ MICResult MIC_StopAutoSamplingAsync(MICCallback callback, void *arg) {
     if (MicStopAutoSampling()) {
         return MIC_RESULT_SUCCESS;
     }
-    micWork.busy = FALSE;
+    micWork.lock = FALSE;
     return MIC_RESULT_SEND_ERROR;
 }
 
@@ -195,21 +195,21 @@ void *MIC_GetLastSamplingAddress(void) {
 
 MICResult MIC_StartLimitedSamplingAsync(const MICAutoParam *param, MICCallback callback, void *arg) {
     if (OSi_IsCodecTwlMode() == TRUE) {
-        return MICEX_StartLimitedSamplingAsync(param, callback, arg);
+        return MICEXi_StartLimitedSamplingAsync(param, callback, arg);
     }
     return MIC_StartAutoSamplingAsync(param, callback, arg);
 }
 
 MICResult MIC_StartLimitedSampling(const MICAutoParam *param) {
     if (OSi_IsCodecTwlMode() == TRUE) {
-        return MICEX_StartLimitedSampling(param);
+        return MICEXi_StartLimitedSampling(param);
     }
     return MIC_StartAutoSampling(param);
 }
 
 MICResult MIC_StopLimitedSampling(void) {
     if (OSi_IsCodecTwlMode() == TRUE) {
-        return MICEX_StopLimitedSampling();
+        return MICEXi_StopLimitedSampling();
     }
     return MIC_StopAutoSampling();
 }
@@ -226,7 +226,7 @@ static void MicCommonCallback(u32 tag, u32 data, BOOL err) {
     u16 status;
 
     if (err) {
-        micWork.busy = FALSE;
+        micWork.lock = FALSE;
         callback = micWork.callback;
         if (callback) {
             micWork.callback = NULL;
@@ -258,18 +258,18 @@ static void MicCommonCallback(u32 tag, u32 data, BOOL err) {
     }
 
     if (command == MIC_PXI_COMMAND_BUFFER_FULL) {
-        if (micWork.fullCallback) {
-            micWork.fullCallback(result, micWork.fullArg);
+        if (micWork.full) {
+            micWork.full(result, micWork.fullArg);
         }
         return;
     }
     if (command == MIC_PXI_COMMAND_SAMPLING_ONCE) {
-        if (micWork.sampleDest) {
-            *micWork.sampleDest = OS_GetSystemWork()->micSampling;
+        if (micWork.dst_buf) {
+            *micWork.dst_buf = OS_GetSystemWork()->mic_sampling_data;
         }
     }
 
-    micWork.busy = FALSE;
+    micWork.lock = FALSE;
     callback = micWork.callback;
     if (callback) {
         micWork.callback = NULL;
@@ -317,12 +317,12 @@ static BOOL MicStopAutoSampling(void) {
 }
 
 static void MicGetResultCallback(MICResult result, void *arg) {
-    micWork.result = result;
+    micWork.commonResult = result;
 }
 
 // NitroSDK's MicWaitBusy, assembly in the SDK: waits for the busy flag that the answer clears, as a modelled busy loop
 static void MicWaitBusy(void) {
-    while (micWork.busy == TRUE) {
+    while (micWork.lock == TRUE) {
         port_os_spin(MIC_WAIT_CYCLES);
     }
 }
@@ -332,11 +332,11 @@ static void MicWaitBusy(void) {
 // answer comes inside the call, before that store, so the call's result is kept apart here
 static MICResult MicWaitResult(MICResult sent) {
     if (sent != MIC_RESULT_SUCCESS) {
-        micWork.result = sent;
+        micWork.commonResult = sent;
         return sent;
     }
     MicWaitBusy();
-    return micWork.result;
+    return micWork.commonResult;
 }
 
 // The ARM7's side
@@ -369,7 +369,7 @@ static u32 WriteSilence(u32 count) {
         written++;
     }
     if (written != 0) {
-        OS_GetSystemWork()->micLastAddress = MIC_SHARED_ADDRESS_BASE + (u32)(sMic.last - sMic.buffer);
+        OS_GetSystemWork()->mic_last_address = MIC_SHARED_ADDRESS_BASE + (u32)(sMic.last - sMic.buffer);
     }
     return written;
 }
@@ -383,7 +383,7 @@ static u32 StartSampling(const PortArm7SpiCommand *command) {
     if (sMic.sampling) {
         return MIC_PXI_RESULT_ILLEGAL_STATUS;
     }
-    if (buffer == NULL || (u32)(uintptr_t)buffer != address || size == 0 || rate < MIC_SAMPLING_RATE_MIN) {
+    if (buffer == NULL || (u32)(uintptr_t)buffer != address || size == 0 || rate < MIC_SAMPLING_RATE_LIMIT) {
         return MIC_PXI_RESULT_INVALID_PARAMETER;
     }
     sMic.sampling = TRUE;
@@ -431,7 +431,7 @@ void port_mic7_start(void) {
     sMic.next = NULL;
     sMic.last = NULL;
     sSentBuffer = NULL;
-    OS_GetSystemWork()->micLastAddress = 0;
+    OS_GetSystemWork()->mic_last_address = 0;
     port_pxi_register_service(PXI_FIFO_TAG_MIC, MicService);
 }
 

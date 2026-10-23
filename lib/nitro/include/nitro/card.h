@@ -15,40 +15,40 @@ typedef struct ROMHeaderLoad {
 } ROMHeaderLoad;
 
 // A range of the ROM image: where it starts, and how long it is
-typedef struct ROMHeaderRegion {
+typedef struct CARDRomRegion {
     u32 offset;
-    u32 size;
-} ROMHeaderRegion;
+    u32 length;
+} CARDRomRegion;
 
 // The ROM header of the running program, which the card puts at the end of main memory. Only the fields that
 // NitroSDK's multiboot library and file system read are named
-typedef struct ROMHeader {
+typedef struct CARDRomHeader {
     u8 unk_00[0x12];
-    u8 unitCode;
-    u8 unk_13;
-    u8 deviceSize; // the card's capacity: 128 KB shifted left by it
+    u8 product_id;
+    u8 device_type;
+    u8 device_size; // the card's capacity: 128 KB shifted left by it
     u8 unk_15[0xb];
-    u32 arm9RomOffset;
-    u32 arm9Entry;
+    u32 main_rom_offset;
+    u32 main_entry_address;
     ROMHeaderLoad arm9;
-    u32 arm7RomOffset;
-    u32 arm7Entry;
+    u32 sub_rom_offset;
+    u32 sub_entry_address;
     ROMHeaderLoad arm7;
-    ROMHeaderRegion fnt;         // the file name table
-    ROMHeaderRegion fat;         // the file allocation table
-    ROMHeaderRegion arm9Overlay; // the table of the ARM9's overlay headers
-    ROMHeaderRegion arm7Overlay; // and the ARM7's
-    u32 normalCommandControl;    // what the card's control register (MCCNT1) gets for the normal commands
+    CARDRomRegion fnt;        // the file name table
+    CARDRomRegion fat;        // the file allocation table
+    CARDRomRegion main_ovt;   // the table of the ARM9's overlay headers
+    CARDRomRegion sub_ovt;    // and the ARM7's
+    u32 normalCommandControl; // what the card's control register (MCCNT1) gets for the normal commands
     u8 unk_64[0x1c];
-    u32 romSize;
+    u32 rom_size;
     u8 unk_84[0xe];
     u16 twlRegionStart; // where the part of the ROM that only the DSi mode reads starts, in units of 0x80000 bytes
     u8 unk_94[0xcc];
-} ROMHeader;
+} CARDRomHeader;
 
 // The ROM header in main memory (card_common.c), the TWL header that the DSi's system puts there, and the copy of 0x88
 // bytes that the card read after the ROM header (card_rom.c)
-const ROMHeader *CARD_GetOwnRomHeader(void); // swan's rom_get_header
+const CARDRomHeader *CARD_GetOwnRomHeader(void); // swan's rom_get_header
 const void *CARD_GetOwnRomHeaderTWL(void);
 const void *CARDi_GetRomAuthCode(void);
 
@@ -108,7 +108,7 @@ typedef int CARDBackupType;
 #define CARD_STAT_INIT_CMD 0x02
 #define CARD_STAT_BUSY 0x04
 #define CARD_STAT_TASK 0x08
-#define CARD_STAT_WAITFOR7ACK 0x20
+#define CARD_STAT_REQ 0x20
 #define CARD_STAT_CANCEL 0x40
 
 // What a game may do with the card: the access level that CARDi_GetAccessLevel gives it, and the part that a command
@@ -140,16 +140,16 @@ typedef struct CARDBackupSpec {
     u32 eraseSubsector;
     u32 eraseSubsectorTotal;
     u32 erasePage;
-    u8 initialStatus;
+    u8 initial_status;
     u32 caps;
-    u8 padding[4];
+    u8 padding2[4];
 } CARDBackupSpec;
 
 // The command block that the ARM7 reads and answers in, 0x60 bytes
 typedef struct CARDiCommandArg {
     CARDResult result;
     CARDBackupType type;
-    u32 unk_08;
+    u32 id;
     u32 src;
     u32 dst;
     u32 len;
@@ -196,10 +196,10 @@ typedef struct CARDTwlRomHeader {
     // 0x1e0: the parts of the DS and the DSi images that TwlSDK's card library checks as it reads them, the tables of
     // the sectors' hashes and of the blocks' hashes (a block hashes the hashes of a run of sectors), a sector's size,
     // and the sectors of a block
-    ROMHeaderRegion digestNtr;
-    ROMHeaderRegion digestTwl;
-    ROMHeaderRegion digestSectorHashes;
-    ROMHeaderRegion digestBlockHashes;
+    CARDRomRegion digestNtr;
+    CARDRomRegion digestTwl;
+    CARDRomRegion digestSectorHashes;
+    CARDRomRegion digestBlockHashes;
     u32 digestSectorSize;
     u32 digestSectorsPerBlock;
     u8 unk_208[0x10c];
@@ -273,7 +273,7 @@ void CARD_CancelBackupAsync(void);
 // What card_common.c and card_task.c give the other files of the library
 void CARD_Init(void); // swan's cart_read_thread_init
 void CARD_CheckEnabled(void);
-const ROMHeader *CARD_GetRomHeader(void);
+const u8 *CARD_GetRomHeader(void);
 void CARD_LockRom(u16 lockId);
 void CARD_UnlockRom(u16 lockId);
 u32 CARDi_GetAccessLevel(void);
@@ -288,12 +288,13 @@ void CARDi_ICInvalidateSmart(void *addr, u32 len, u32 threshold);
 void CARDi_DCInvalidateSmart(void *addr, u32 len, u32 threshold);
 // Called with each word the ARM7 sends with the card's tag, and sends it its commands. CARDi_OnFifoRecv and
 // CARDi_Request
-void CARDi_OnFifoRecv(u32 fifoTag, u32 data, BOOL err);
+void CARDi_OnFifoRecv(PXIFifoTag fifoTag, u32 data, BOOL err);
 BOOL CARDi_Request(CARDiCommon *p, int reqType, int retry);
 
 // The middleware signature of the backup part of the library, "[SDK+NINTENDO:BACKUP]", which lies in the version
-// strings at the start of the program
-extern const char CARDi_BackupSignature[];
+// strings at the start of the program. NitroSDK's cardi_backup_assert, a static of its card_backup.c, is a global here
+// because the string is a file of its own (card_backup_version.c)
+extern const char cardi_backup_assert[];
 
 // What card_rom.c gives card_common.c: the object that holds the ROM's base address, and the setup of the ROM reads
 extern u32 cardi_rom_base;
@@ -316,7 +317,17 @@ typedef struct CARDiRomDmaRead {
 
 // Reads len bytes of the ROM at the offset src into dst, with a DMA channel of the number dma if it can, and calls the
 // callback with the argument once done. Waits for the end unless async
-void CARDi_ReadRom(u32 dma, u32 src, void *dst, u32 len, MIDmaCallback callback, void *arg, BOOL async);
+void CARDi_ReadRom(u32 dma, const void *src, void *dst, u32 len, MIDmaCallback callback, void *arg, BOOL async);
+
+// The SDK's two forms of it, which most callers use
+static inline void CARD_ReadRomAsync(u32 dma, const void *src, void *dst, u32 len, MIDmaCallback callback, void *arg) {
+    CARDi_ReadRom(dma, src, dst, len, callback, arg, TRUE);
+}
+
+static inline void CARD_ReadRom(u32 dma, const void *src, void *dst, u32 len) {
+    CARDi_ReadRom(dma, src, dst, len, NULL, NULL, FALSE);
+}
+
 // NitroSDK's CARDi_ReadRomWithCPU and CARDi_ReadRomWithDMA, which TwlSDK's part of the library in the LTD autoload
 // calls. The first reads len bytes from src into dst and returns len; its first parameter is for the argument of a
 // callback that it has no use for

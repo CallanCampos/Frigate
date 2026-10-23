@@ -97,8 +97,8 @@ asm void MTX_RotY43_(MtxFx43 *mtx, fx32 sin, fx32 cos) {
 // clang-format on
 
 #pragma thumb off
-void MTX_RotAxis43(MtxFx43 *mtx, const VecFx32 *axis, fx16 sin, fx16 cos) {
-    MAT3_RotationAxisAngle(&mtx->rt.rot, axis, sin, cos);
+void MTX_RotAxis43(MtxFx43 *mtx, const VecFx32 *axis, fx32 sin, fx32 cos) {
+    MTX_RotAxis33(&mtx->rt.rot, axis, sin, cos);
     mtx->rt.trans.x = 0;
     mtx->rt.trans.y = 0;
     mtx->rt.trans.z = 0;

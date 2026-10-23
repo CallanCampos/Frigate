@@ -316,7 +316,7 @@ static void CircleGraph_SetCamera(CircleGraph *graph) {
     G3i_LookAt_(&camPos, &camUp, &target, TRUE, NULL);
     G3i_OrthoW_(FX32_ONE, -FX32_ONE, FX32_CONST(-1.333), FX32_CONST(1.333), FX32_CONST(0.1), FX32_CONST(5.0), FX32_ONE,
                 TRUE, NULL);
-    NNS_G3DRenderStateInit();
+    NNS_G3dGlbInit();
     NNS_G3dGlbLookAt(&camPos, &camUp, &target);
     NNS_G3dGlbOrtho(FX32_ONE, -FX32_ONE, FX32_CONST(-1.333), FX32_CONST(1.333), FX32_CONST(0.1), FX32_CONST(5.0));
     NNS_G3dGlbFlush();

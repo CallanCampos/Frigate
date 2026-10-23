@@ -1,4 +1,4 @@
-// NitroSDK libmath's math.c (the file name is a guess): MATH_QSort.
+// NitroSDK libmath's MATH_QSort, which is in the SDK's qsort.c, as ntrtwl's reconstruction of NitroSDK has it.
 // The split from math_crc.c is certain; whether sha1_block.c is a separate file after it is not.
 #include "nitro/math.h"
 

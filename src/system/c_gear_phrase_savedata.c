@@ -30,8 +30,6 @@ void CGearPhrases_Get(void *cgear, u32 index, PMSData *sentence) {
     *sentence = phrases[index];
 }
 
-void CGearPhrases_Set(void *cgear, u32 index, const PMSData *sentence) {
-    PMSData *phrases = cgear;
-
+void CGearPhrases_Set(PMSData *phrases, u32 index, const PMSData *sentence) {
     phrases[index] = *sentence;
 }

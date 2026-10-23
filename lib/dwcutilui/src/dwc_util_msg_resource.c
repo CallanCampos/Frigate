@@ -25,20 +25,20 @@ typedef struct DWCUtilMsgWork {
 
 static DWCUtilMsgWork *sMsgWork;
 
-void DWCUtilMsg_Init(void) {
-    sMsgWork = DWCUtilHeap_AllocClear(sizeof(DWCUtilMsgWork), 4);
-    sMsgWork->freeMsgs = DWCUtilStack_CreateFilled(8, (u8 *)sMsgWork->msgs, sizeof(DWCUtilMsg));
+void DWCi_MSGlInit(void) {
+    sMsgWork = DWCi_HEAPlAllocEx(sizeof(DWCUtilMsgWork), 4);
+    sMsgWork->freeMsgs = DWCi_QUElFormEx(8, (u8 *)sMsgWork->msgs, sizeof(DWCUtilMsg));
 }
 
-void DWCUtilMsg_Exit(void) {
-    DWCUtilHeap_FreeAndNull(&sMsgWork);
+void DWCi_MSGlEnd(void) {
+    DWCi_HEAPlFree_(&sMsgWork);
 }
 
-DWCUtilMsg *DWCUtilMsg_Open(const char *path) {
+DWCUtilMsg *DWCi_MSGlRead(const char *path) {
     u32 size;
     DWCUtilMsgFile *file;
     DWCUtilMsgInfo *info;
-    DWCUtilMsg *msg = DWCUtilStack_Pop(sMsgWork->freeMsgs);
+    DWCUtilMsg *msg = DWCi_QUElPopFront(sMsgWork->freeMsgs);
 
     file = DWCUtilRomResource_LoadFile(path, &size, 4);
     msg->file = file;
@@ -48,16 +48,16 @@ DWCUtilMsg *DWCUtilMsg_Open(const char *path) {
     return msg;
 }
 
-void DWCUtilMsg_Close(DWCUtilMsg *msg) {
-    DWCUtilRomResource_FreeFile(msg->file);
-    DWCUtilStack_Push(sMsgWork->freeMsgs, msg);
+void DWCi_MSGlRelease(DWCUtilMsg *msg) {
+    DWCi_ARClRelease(msg->file);
+    DWCi_QUElPushBack(sMsgWork->freeMsgs, msg);
 }
 
-u16 *DWCUtilMsg_Get(DWCUtilMsg *msg, int index) {
+u16 *DWCi_MSGlGet(DWCUtilMsg *msg, int index) {
     return (u16 *)(msg->text + msg->offsets[(u16)index]);
 }
 
-u16 *DWCUtilMsg_GetWithDigit(DWCUtilMsg *msg, int index, int slot, int value) {
+u16 *DWCi_MSGlGetEx(DWCUtilMsg *msg, int index, int slot, int value) {
     u16 *str = (u16 *)(msg->text + msg->offsets[(u16)index]);
 
     if (slot >= 0) {

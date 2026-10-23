@@ -285,7 +285,7 @@ static void func_ov194_021c1a40(PokemonTradeWork *wk, SRTMatrix *mtx) {
     G3X_AlphaTest(FALSE, 0);
     G3X_AlphaBlend(FALSE);
     G3X_EdgeMarking(FALSE);
-    G3X_SetFog(TRUE, 0, 0, 0);
+    G3X_SetFog(TRUE, GX_FOGBLEND_COLOR_ALPHA, GX_FOGSLOPE_0x8000, 0);
     G3X_SetClearColor(GX_RGB(0, 0, 0), 0, 0x7fff, 63, FALSE);
     G3_ViewPort(0, 0, 255, 191);
     for (i = 0; i < NELEMS(sLights); i++) {
@@ -615,7 +615,7 @@ void func_ov194_021c23a4(PokemonTradeWork *wk, int side, BOOL front, PartyPkm *p
     if (mirror) {
         u16 species = PokeParty_GetParam(pkm, PKM_PARAM_SPECIES, NULL);
         u16 form = PokeParty_GetParam(pkm, PKM_PARAM_FORM, NULL);
-        void *personal = PML_PersonalLoad(species, form, wk->heapId);
+        PersonalData *personal = PML_PersonalLoad(species, form, wk->heapId);
         // The species' flag that its sprite is never mirrored
         u32 noMirror = PML_PersonalGetParam(personal, 34);
 
@@ -826,7 +826,7 @@ static void func_ov194_021c2930(PokemonTradeWork *wk) {
     NNSG2dPaletteData *palette;
     ArcTool *arc = GFL_ArcSysCreateFileHandle(0x75, wk->heapId);
     void *file = GFL_G2DIOReadNCLRArc(arc, 0x48, &palette, wk->heapId);
-    u16 *colors = palette->rawData;
+    u16 *colors = palette->pRawData;
 
     DC_FlushRange(&colors[16], 16 * sizeof(GXRgb));
     MI_CpuMove(&colors[16], &colors[17], 15 * sizeof(GXRgb));

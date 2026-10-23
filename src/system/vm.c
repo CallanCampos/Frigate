@@ -22,7 +22,12 @@ VM *VM_Create(HeapID heapId, const VMInitParam *param) {
     MI_CpuFill8(vm, 0, size);
     vm->param = *param;
     vm->work = (u32 *)(vm + 1);
+#ifdef PLATFORM_PC
+    // The native stack holds return addresses, wider than the VM's numeric work slots.
     vm->stack = (uptr *)(vm->work + param->workSize);
+#else
+    vm->stack = vm->work + param->workSize;
+#endif
     return vm;
 }
 

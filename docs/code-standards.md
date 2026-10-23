@@ -201,7 +201,7 @@ tables laid out by hand, and a `GFL_ASSERT` whose expression has operators, sinc
 a string in the ROM and clang-format's spacing would change it (`GFL_ASSERT((u16)size < (0xffff/2))`).
 
 **Don't:** put a comment between a declaration's specifiers and the rest (`static // Connects ...` above
-`int AossAp_Connect(...)`): clang-format then indents the declaration as a continuation. The comment goes above.
+`int AOSSi_WLANConnect(...)`): clang-format then indents the declaration as a continuation. The comment goes above.
 
 **Checked:** in CI, `clang-format --dry-run --Werror` on the changed files, with the pinned version, and a comment
 right after `static`, `inline`, `extern` or `const` that starts a line.
@@ -220,3 +220,59 @@ The skills in `.claude/skills/` have Codex copies in `.agents/skills/`; a change
 same commit.
 
 **Checked:** in CI, the two trees must be identical.
+
+## 14. The SDK's types, as the SDK has them
+
+`u32` and `s32` are NitroSDK's `unsigned long` and `long`, and its fixed-point constants and conversions are the SDK's
+(`FX32_ONE` is `((fx32)0x00001000L)`, `FX32_CONST` is `FX_F32_TO_FX32`), as ntrtwl's NitroSDK and pret's pokediamond
+have them. Game Freak's code mixes them with plain C types, so a declaration takes the type the original evidently
+had: `u32`/`s32` where it compiles as the SDK's, `int`/`unsigned int` where it compiles as those.
+GameSpy's code, which is cross-platform, uses GameSpy's own types from its `nonport.h` (`lib/dwc/include/dwc/nonport.h`:
+`gsi_u32` is `unsigned int`, `gsi_i32` is `int`, `gsi_bool` is `int`), and DWC's own code the SDK's.
+
+**Don't:** change a typedef or an SDK constant because more functions match with it, or cast to emulate another type.
+A function that matches only under a type the original didn't have isn't faithful.
+
+**Do:** give the declaration that decides it (a local, a parameter, a struct field, a prototype) its original type.
+An enum isn't a stand-in for `unsigned int`: under `-enum int` it is a signed `int`.
+
+**Checked:** by review. `docs/matching.md` ("Game Freak's code mixes the SDK's types") has the lever.
+
+## 15. Constants, parameters and tables with their structure
+
+Game Freak's code names its value sets: a task's sequence numbers, a function's results, the kinds, modes, commands
+and indices that a field or parameter takes are an `enum`, often closed by a count (`..._MAX`), as in pret's Gen 4
+decomps; fixed values, sizes and magic numbers are `#define`s. The SDK's own enums (`GXBGMode`, `GXVRamBG`,
+`NNS_GFD_DST_TYPE`) are the constants of its parameters.
+
+**Do:**
+- write a value set as an `enum` (anonymous, or a typedef where a declaration names it), keeping our names and, where
+  swan has the set, swan's type name;
+- pass the constant, not its number, where a parameter takes an enum's or a set's value;
+- type a parameter as the struct it always points to, not `void *`, unless callers pass several types (a callback's
+  `void *work`, an SDK callback's argument);
+- define a type once, in its owner's header, and use it everywhere, rather than a copy with `unk` fields under another
+  name;
+- write a table whose elements are records as an array of a struct.
+
+**Don't:** change the type a field, parameter or local stores in to the enum unless the original evidently had it:
+under `-enum int` an enum is a signed `int` (section 14), so a `u8` field keeps `u8` and takes the enum's constants.
+
+```c
+/* Wrong, in field_player_grid.c and gfl/g3d.h */
+#define GRID_COMMAND_NONE 0
+#define GRID_COMMAND_IDLE 1
+void GFL_G3DResFree(void *resource); /* whose first line is G3DResource *res = resource; */
+
+/* Right */
+enum {
+    GRID_COMMAND_NONE,
+    GRID_COMMAND_IDLE,
+};
+void GFL_G3DResFree(G3DResource *resource);
+```
+
+**Does not apply when:** a group of `#define`s are bits that combine (a flag set may be an enum with explicit values
+when a field holds the combination), or are generated constant lists (`generated/`).
+
+**Checked:** by review.

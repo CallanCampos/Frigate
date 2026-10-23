@@ -12,6 +12,32 @@
 #include "nitro/fx.h"
 #include "struct_decls.h"
 
+// How the mapper picks the chunks to load (locatorGenType, FieldG3DMapper_GenLocators0 to 3): every chunk of the
+// matrix in layers, the chunks around the player within the matrix, the chunks around the player wrapping around it,
+// and the player's layer of the matrix with the nearer of the layers above and below it
+enum {
+    FIELD_G3D_MAPPER_LOCATORS_ALL,
+    FIELD_G3D_MAPPER_LOCATORS_AROUND,
+    FIELD_G3D_MAPPER_LOCATORS_WRAP,
+    FIELD_G3D_MAPPER_LOCATORS_LAYERS,
+};
+
+// The passes of FieldG3D_RenderFieldmap: the first draws the chunks that fit in the time left in the frame, up to
+// renderPhase1MaxChunkCount, and the second the others and the props
+enum {
+    FIELD_G3D_RENDER_PHASE_1,
+    FIELD_G3D_RENDER_PHASE_2,
+};
+
+// The chunk ID of a locator that places no chunk
+#define FIELD_CHUNK_ID_NONE 0xffffffff
+
+// The terrain layers that FieldG3DMapperTerrain holds
+#define FIELD_G3D_MAPPER_LAYER_MAX 16
+
+// The end of drawnChunkIndices
+#define FIELD_G3D_MAPPER_DRAW_END 0xff
+
 // An archive and a file in it
 typedef struct {
     u32 arcId;
@@ -39,11 +65,11 @@ struct FieldG3DMapperConfig {
 
 // The terrain layers at a position, which the mapper gathers from its chunks
 typedef struct {
-    MapTerrainBuf layers[16];
+    MapTerrainBuf layers[FIELD_G3D_MAPPER_LAYER_MAX];
     u16 layerCount;
 } FieldG3DMapperTerrain;
 
-// Where a chunk goes, chunk ID 0xffffffff for none
+// Where a chunk goes, or FIELD_CHUNK_ID_NONE
 typedef struct {
     u32 chunkId;
     VecFx32 position;
@@ -56,7 +82,7 @@ typedef struct {
 } FieldChunkHandle;
 
 struct FieldG3DMapper {
-    u16 heapId;
+    HeapID heapId;
     fx32 chunkSpan;
     u32 unk08;
     u32 locatorGenType;
@@ -77,7 +103,7 @@ struct FieldG3DMapper {
     u8 drawnChunkCount;
     u8 lastDrawnCount;
     u8 nowDrawnCount;
-    // The chunk handles in drawing order, 0xff after the last
+    // The chunk handles in drawing order, FIELD_G3D_MAPPER_DRAW_END after the last
     u8 *drawnChunkIndices;
     s32 maxConcurrentDrawChunkByteSize;
     u8 chunkSizeCapPassingChunkEndIdx;
@@ -98,6 +124,7 @@ void FieldG3DMapper_Free(FieldG3DMapper *mapper);
 void FieldG3DMapper_UpdateSync(FieldG3DMapper *mapper);
 BOOL FieldG3DMapper_Update(FieldG3DMapper *mapper);
 void FieldG3DMapper_CallAllLoaderUpdate(FieldG3DMapper *mapper);
+// pass is a FIELD_G3D_RENDER_PHASE_
 void FieldG3D_RenderFieldmap(FieldG3DMapper *mapper, void *camera, u32 pass);
 void *func_ov036_02184590(FieldG3DMapper *mapper);
 void FieldG3DMapper_CreateMap(FieldG3DMapper *mapper, const FieldG3DMapperConfig *config, void *colorPostFx);
@@ -131,7 +158,7 @@ FieldTerrainAnimator *FieldG3DMapper_CreateTerrainAnimator(u16 chunkCapacity, vo
 BOOL FieldChunkContext_HasAnimator(FieldChunkContext *context);
 FieldTerrainSRTAnimatorChunkState *FieldChunkContext_GetSRTAnimatorState(FieldChunkContext *context);
 FieldPropSystem *FieldChunkContext_GetPropSystem(FieldChunkContext *context);
-void *FieldChunkContext_GetResortMap(FieldChunkContext *context);
+ResortMapCreateWork *FieldChunkContext_GetResortMap(FieldChunkContext *context);
 u32 FieldChunkContext_GetChunkIndex(FieldChunkContext *context);
 HeapID FieldChunkContext_GetHeapID(FieldChunkContext *context);
 void FieldChunkContext_Init(FieldChunkContext *context, FieldG3DMapper *mapper, u32 chunkIndex, HeapID heapId);

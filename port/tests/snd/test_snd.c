@@ -196,13 +196,13 @@ static void BootDriver(void) {
     ResetSound(FALSE);
     sUpdates = 0;
     memset(&sShared, 0, sizeof(sShared));
-    for (i = 0; i < SND_PLAYER_MAX; i++) {
+    for (i = 0; i < SND_PLAYER_NUM; i++) {
         for (j = 0; j < SND_PLAYER_VARIABLE_MAX; j++) {
-            sShared.player[i].variable[j] = SND_VARIABLE_UNSET;
+            sShared.player[i].variable[j] = SND_DEFAULT_VARIABLE;
         }
     }
     for (i = 0; i < SND_PLAYER_VARIABLE_MAX; i++) {
-        sShared.globalVariable[i] = SND_VARIABLE_UNSET;
+        sShared.globalVariable[i] = SND_DEFAULT_VARIABLE;
     }
     snd7_shared = &sShared;
 }
@@ -1244,7 +1244,7 @@ static void TestSeqVariables(void) {
     CHECK(sShared.player[2].variable[3] >= 10 && sShared.player[2].variable[3] <= 20);
     CHECK(sShared.player[2].variable[4] >= 0 && sShared.player[2].variable[4] <= 100);
     CHECK_EQ(sShared.player[2].variable[5], 1);
-    CHECK_EQ(sShared.player[2].variable[6], SND_VARIABLE_UNSET);
+    CHECK_EQ(sShared.player[2].variable[6], SND_DEFAULT_VARIABLE);
     CHECK_EQ(sShared.globalVariable[0], 0x1234);
     // The random values are SND_CalcRandom's, from the seed: the generator's next two
     snd7_set_random(1);

@@ -343,7 +343,7 @@ static void BeaconDetail_LoadBGs(BeaconDetailWork *work, HeapID heapId) {
     loadBGScrToVramByFileNoReserveNegAlign(townMapArc, 16, 3, 0, 0x800, FALSE, heapId);
     work->versionPalette.file = GFL_ArcToolReadHeapNew(work->arc, 29, work->heapId);
     NNS_G2dGetUnpackedPaletteData(work->versionPalette.file, &work->versionPalette.data);
-    work->versionPalette.raw = work->versionPalette.data->rawData;
+    work->versionPalette.raw = work->versionPalette.data->pRawData;
     GFL_ArcToolFree(townMapArc);
     G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, GX_PLANEMASK_BG1,
                        GX_PLANEMASK_BG1 | GX_PLANEMASK_BG2 | GX_PLANEMASK_BG3 | GX_PLANEMASK_OBJ, 11, 5);
@@ -413,7 +413,7 @@ static void BeaconDetail_LoadObjs(BeaconDetailWork *work, ArcTool *arc) {
     }
     work->unionPalette.file = GFL_ArcToolReadHeapNew(unionArc, 0, work->heapId);
     NNS_G2dGetUnpackedPaletteData(work->unionPalette.file, &work->unionPalette.data);
-    work->unionPalette.raw = work->unionPalette.data->rawData;
+    work->unionPalette.raw = work->unionPalette.data->pRawData;
     for (i = 0; i < BEACON_DETAIL_UNION_VIEW_COUNT; i++) {
         work->unionChars[i].file = GFL_ArcToolReadHeapNew(unionArc, i + 49, work->heapId);
         NNS_G2dGetUnpackedCharacterData(work->unionChars[i].file, &work->unionChars[i].data);

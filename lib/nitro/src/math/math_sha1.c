@@ -17,7 +17,7 @@ static u32 sSHA1Masked;
 static const u8 SHA1_PADDING[12] = { 0x80 };
 
 static void sha1_block_masked(MATHSHA1Context *context);
-static void sha1_zero_fill(MATHSHA1Context *context, u32 value, u32 size);
+static void sha1_zero_fill(MATHSHA1Context *context, u8 value, u32 size);
 static void hmac_generic(void *out, const void *data, u32 dataSize, const void *key, u32 keySize,
                          const MATHHashInfo *info);
 
@@ -36,7 +36,7 @@ static void sha1_block_masked(MATHSHA1Context *context) {
 }
 
 // Fills size bytes of the message with value, as MATH_SHA1Update does the bytes it is given
-static void sha1_zero_fill(MATHSHA1Context *context, u32 value, u32 size) {
+static void sha1_zero_fill(MATHSHA1Context *context, u8 value, u32 size) {
     if (size == 0) {
         return;
     }
@@ -135,7 +135,7 @@ void MATH_SHA1GetHash(MATHSHA1Context *context, void *digest) {
     MI_CpuCopy8(context, digest, 20);
 }
 
-void MATH_CalcSHA1(u8 *digest, const void *data, u32 size) {
+void MATH_CalcSHA1(void *digest, const void *data, u32 size) {
     MATHSHA1Context context;
 
     MATH_SHA1Init(&context);

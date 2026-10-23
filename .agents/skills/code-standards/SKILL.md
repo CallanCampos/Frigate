@@ -27,6 +27,11 @@ The rules, with their wrong and right forms and when they don't apply, are in
 11. **clang-format 23.1.1** on every file changed; `asm`, hand-laid-out tables and `GFL_ASSERT`s with operators guarded.
 12. **Nonmatching rows** in the present tense: what differs now and what was tried, no history.
 13. **The Codex copies** of skills and hooks change with them.
+14. **The SDK's types**: `u32`/`s32` are `long`, the SDK's constants as the SDK has them; a declaration takes the
+    original's type (`int`/`unsigned int` where it compiles so), never a cast or a changed typedef.
+15. **Structure**: a value set (sequence numbers, results, kinds, modes) is an `enum` and its constants are passed,
+    not numbers; a parameter takes the struct it always points to, not `void *`; a type is defined once, in its
+    owner's header; a table of records is an array of a struct. Storage keeps its original type.
 
 Natural C wins over a match: a function that matches only through a workaround keeps the natural C and gets a row,
 and a complete file goes back to partial.

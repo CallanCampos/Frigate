@@ -415,7 +415,7 @@ static void BChoiceMain_Step(BChoiceWork *work) {
 
 static void BChoiceMain_Init(BChoiceWork *work) {
     G2S_BlendNone();
-    GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, -16);
+    GXS_SetMasterBrightness(-16);
     work->tcbManager = GFL_TCBExMgrCreate(work->param->heapId, work->param->heapId, 1, 4);
     work->printQueue = PrintQueue_CreateDefault(work->param->heapId);
     work->positions = GFL_ArcSysReadHeapNew(ARCID_B_CHOICE, FILE_POSITIONS, work->param->heapId);

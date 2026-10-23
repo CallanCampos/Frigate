@@ -21,7 +21,7 @@ static DWCUtilResource *sResource;
 
 static FSResult DWCUtilRomResource_ArchiveProc(FSFile *file, FSCommandType command);
 static FSResult DWCUtilRomResource_ReadArchive(FSArchive *arc, void *buffer, u32 position, u32 length);
-static void DWCUtilRomResource_ReadDone(void *arc);
+static void cbReadRom(void *arc);
 static FSResult DWCUtilRomResource_WriteArchive(FSArchive *arc, const void *buffer, u32 position, u32 length);
 
 void DWCUtilRomResource_Init(void) {
@@ -32,7 +32,7 @@ void DWCUtilRomResource_Init(void) {
     u32 base;
     u32 size;
 
-    sResource = DWCUtilHeap_AllocClear(sizeof(DWCUtilResource), 4);
+    sResource = DWCi_HEAPlAllocEx(sizeof(DWCUtilResource), 4);
     FS_InitFile(&file);
     if (!FS_OpenFile(&file, "rom:/dwc/utility.bin")) {
         OS_Terminate();
@@ -53,23 +53,23 @@ void DWCUtilRomResource_Init(void) {
         OS_Terminate();
     }
     size = FS_LoadArchiveTables(&sResource->archive, NULL, 0);
-    sResource->tables = DWCUtilHeap_AllocClear(size, 4);
+    sResource->tables = DWCi_HEAPlAllocEx(size, 4);
     FS_LoadArchiveTables(&sResource->archive, sResource->tables, size);
-    sResource->openFileStack = DWCUtilStack_CreateFilled(32, (u8 *)sResource->openFiles, sizeof(void *));
+    sResource->openFileStack = DWCi_QUElFormEx(32, (u8 *)sResource->openFiles, sizeof(void *));
     OS_SPrintf(path, "%s:/", sArchiveName);
     FS_ChangeDir(path);
 }
 
-void DWCUtilRomResource_Exit(void) {
+void DWCi_ARClEnd(void) {
     FS_ChangeDir("rom:/");
     FS_UnloadArchiveTables(&sResource->archive);
     FS_UnloadArchive(&sResource->archive);
     FS_ReleaseArchiveName(&sResource->archive);
     OS_ReleaseLockID(sResource->lockId);
     sResource->lockId = 0;
-    DWCUtilHeap_FreeAndNull(&sResource->tables);
+    DWCi_HEAPlFree_(&sResource->tables);
     sResource->tables = NULL;
-    DWCUtilHeap_FreeAndNull(&sResource);
+    DWCi_HEAPlFree_(&sResource);
 }
 
 // The archive's hook: the card is locked while the archive is active, and it can't be written
@@ -89,11 +89,11 @@ static FSResult DWCUtilRomResource_ArchiveProc(FSFile *file, FSCommandType comma
 }
 
 static FSResult DWCUtilRomResource_ReadArchive(FSArchive *arc, void *buffer, u32 position, u32 length) {
-    CARDi_ReadRom((u32)-1, position + FS_GetArchiveBase(arc), buffer, length, DWCUtilRomResource_ReadDone, arc, TRUE);
+    CARD_ReadRomAsync((u32)-1, (const void *)(position + FS_GetArchiveBase(arc)), buffer, length, cbReadRom, arc);
     return FS_RESULT_PROC_ASYNC;
 }
 
-static void DWCUtilRomResource_ReadDone(void *arc) {
+static void cbReadRom(void *arc) {
     FS_NotifyArchiveAsyncEnd(arc, FS_RESULT_SUCCESS);
 }
 
@@ -107,7 +107,7 @@ void *DWCUtilRomResource_LoadFile(const char *path, u32 *size, int align) {
     u32 length;
     int alignment;
 
-    DWCUtilStack_Pop(sResource->openFileStack);
+    DWCi_QUElPopFront(sResource->openFileStack);
     FS_InitFile(&file);
     if (!FS_OpenFile(&file, path)) {
         OS_Terminate();
@@ -117,12 +117,12 @@ void *DWCUtilRomResource_LoadFile(const char *path, u32 *size, int align) {
         *size = length;
     }
     // A compressed file is read to the end of the heap, as it is freed once it is decompressed
-    if (DWCUtilRomResource_EndsWith(path, ".l", 2)) {
+    if (cmpBack(path, ".l", 2)) {
         alignment = -4;
     } else {
         alignment = align;
     }
-    data = DWCUtilHeap_AllocClear(length, alignment);
+    data = DWCi_HEAPlAllocEx(length, alignment);
     FS_ReadFile(&file, data, length);
     FS_CloseFile(&file);
     if (alignment > 0) {
@@ -135,19 +135,19 @@ void *DWCUtilRomResource_LoadFile(const char *path, u32 *size, int align) {
         if (size != NULL) {
             *size = length;
         }
-        out = DWCUtilHeap_AllocClear(length, align);
+        out = DWCi_HEAPlAllocEx(length, align);
         MI_UncompressLZ8(data, out);
-        DWCUtilHeap_FreeAndNull(&data);
+        DWCi_HEAPlFree_(&data);
         return out;
     }
 }
 
-void DWCUtilRomResource_FreeFile(void *data) {
-    DWCUtilHeap_FreeAndNull(&data);
-    DWCUtilStack_Push(sResource->openFileStack, data);
+void DWCi_ARClRelease(void *data) {
+    DWCi_HEAPlFree_(&data);
+    DWCi_QUElPushBack(sResource->openFileStack, data);
 }
 
-BOOL DWCUtilRomResource_EndsWith(const char *str, const char *suffix, int length) {
+BOOL cmpBack(const char *str, const char *suffix, int length) {
     int strLength = strlen(str);
     int suffixLength = strlen(suffix);
 

@@ -244,7 +244,7 @@ CtvtComm *CtvtComm_Create(CommTvtWork *sys, HeapID heapId) {
         }
     }
     comm->jpegWork = allocConfigDSSoftwareFeature(
-        heapId, SSP_GetJpegEncoderBufferSize(128, 192, SSP_JPEG_OUTPUT_YUV422, SSP_JPEG_RGB555), "ctvt_comm.c", 331);
+        heapId, SSP_GetJpegEncoderBufferSize(128, 192, SSP_JPEG_OUTPUT_YUV444, SSP_JPEG_RGB555), "ctvt_comm.c", 331);
     comm->photoRaw = allocConfigDSSoftwareFeature(heapId, CTVT_COMM_PICTURE_SIZE, "ctvt_comm.c", 333);
     comm->photoJpeg = allocConfigDSSoftwareFeature(heapId, CTVT_COMM_PICTURE_SIZE, "ctvt_comm.c", 334);
     comm->pictureBufferMask = 0;
@@ -612,7 +612,7 @@ static void CtvtComm_UpdateTalk(CommTvtWork *sys, CtvtComm *comm) {
                 width = CtvtCamera_GetWidth(sys, camera);
                 jpegSize = SSP_StartJpegEncoder(comm->photoRaw, comm->photoJpeg, size, comm->jpegWork, width,
                                                 CtvtCamera_GetHeight(sys, camera), CTVT_COMM_JPEG_QUALITY,
-                                                SSP_JPEG_OUTPUT_YUV422, SSP_JPEG_RGB555);
+                                                SSP_JPEG_OUTPUT_YUV444, SSP_JPEG_RGB555);
                 if (jpegSize != 0) {
                     NetLdata_StartSend(comm->photoJpeg, jpegSize, comm->photoTargetMask, FALSE);
                     comm->photoReadyMask = 0;

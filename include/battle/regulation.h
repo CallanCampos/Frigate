@@ -134,13 +134,13 @@ typedef struct {
 } RegulationExtraRule;
 
 // The rules of a regulation as text: the message data and, for each of the six rules, its name and its value
-typedef struct {
+struct RegulationPrintMsg {
     MsgData *msgData;
     StrBuf *rule[6];
     StrBuf *value[6];
     // Whether the Wonder Launcher is on
     u8 launcher;
-} RegulationPrintMsg;
+};
 
 // Checks a Pokémon against the regulation and the extra rule, returning the REGULATION_FAIL_* bits, 0 if it may join
 u32 PokeRegulation_CheckPokemonExtraRule(Regulation *regulation, RegulationExtraRule *rule, PartyPkm *pkm);
@@ -164,7 +164,7 @@ void PokeRegulation_Load(u32 fileId, Regulation *regulation);
 // The regulation's rules as text (a RegulationPrintMsg). launcher is used when the regulation leaves the Wonder
 // Launcher to the players
 void *PokeRegulation_CreatePrintMsg(Regulation *regulation, WordSet *wordset, HeapID heapId, BOOL launcher);
-void PokeRegulation_FreePrintMsg(void *printMsg);
+void PokeRegulation_FreePrintMsg(RegulationPrintMsg *printMsg);
 // Picks Pokémon of a party that the regulation allows, by their slots from 1, and returns whether it found a team
 BOOL PokeRegulation_PickTeam(Regulation *regulation, PokeParty *party, u8 *picked);
 // Values out of the parameter's range are ignored

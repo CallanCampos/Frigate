@@ -653,8 +653,7 @@ static void UnionSubdisp_MoveLine(UnionSubdisp *work, u8 from, u8 to, UnionVisit
 
 // Scrolls the lines by delta lines, drawing the ones that come in
 static void UnionSubdisp_ScrollLines(UnionSubdisp *work, UnionVisitorList *list, int offset) {
-    // The SDK's s32 is long, which keeps the first loop's test on the counter and not on offset
-    long from;
+    s32 from;
     int write_pos;
     UnionVisitor *chat;
 
@@ -947,7 +946,7 @@ static BOOL UnionSubdisp_SetLinePalette(UnionSubdisp *work, int line, BOOL touch
 static void UnionSubdisp_UpdateKeyScroll(UnionSubdisp *work, UnionSystem *sys) {
     if (sys != NULL && sys->visitorList.count >= 3) {
         int viewEnd = sys->visitorList.viewEnd;
-        int count = sys->visitorList.count;
+        s32 count = sys->visitorList.count;
         int oldest = count - CHAT_VISIBLE_MAX;
 
         if (oldest < 2) {

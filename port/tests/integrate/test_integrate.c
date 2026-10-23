@@ -115,7 +115,7 @@ static void TestDmaAsync(void) {
     MIi_DmaCopy32Async(1, source, dest, sizeof(dest), CountCallback, (void *)(intptr_t)1, TRUE);
     Check(dest[3] == 4, "the copy is done when the call returns");
     Check(sCallbacks == 1, "with interrupts on, the channel's interrupt calls back before the call returns");
-    Check((reg_OS_IE & (1u << (OS_IE_DMA0_SHIFT + 1))) == 0, "the interrupt is disabled again after the callback");
+    Check((reg_OS_IE & (1u << (REG_OS_IE_D0_SHIFT + 1))) == 0, "the interrupt is disabled again after the callback");
 
     enabled = OS_DisableInterrupts();
     MIi_DmaFill32Async(2, dest, 7, sizeof(dest), CountCallback, (void *)(intptr_t)10, TRUE);

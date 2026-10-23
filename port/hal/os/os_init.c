@@ -67,6 +67,6 @@ static void OSi_InitBody(void) {
 
 // NitroSDK's OSi_ReferSymbol, which the libraries call with their signature strings to keep them in the link: it does
 // nothing
-void OSi_ReferSymbol(const char *signature) {
+void OSi_ReferSymbol(void *signature) {
     (void)signature;
 }

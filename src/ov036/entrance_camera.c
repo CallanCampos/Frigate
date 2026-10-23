@@ -3,6 +3,7 @@
 // Names from swan (https://github.com/ds-pokemon-hacking/swan, GPL-3.0).
 // Additional camera API, struct member, helper and table names are our descriptive guesses.
 #include "types.h"
+#include "constants/directions.h"
 #include "constants/sound.h"
 #include "field/entrance_camera.h"
 #include "field/event_action_call.h"
@@ -37,28 +38,6 @@ struct EntranceCamera {
     BOOL unk6c;
 };
 
-// An entrance camera's file in archive 0xb1: where the camera starts or ends, in whole units
-typedef struct {
-    u32 unk0;
-    u32 pitch;
-    u32 yaw;
-    s32 distance;
-    BOOL useTarget;
-    s32 target[3];
-    s32 offset[3];
-    u32 frames;
-    BOOL unk68;
-    BOOL unk6c;
-    BOOL unk48;
-    BOOL unk4C;
-} EntranceCameraFile;
-
-// The warp sequence, whose tail the entrance events use for the task that walks the player one tile
-typedef struct {
-    WarpSequence warp;
-    FieldAcmdTCB *walkTask;
-} EntranceWarp;
-
 // The data of the events that play the entrance when the player goes out of a zone and into one
 typedef struct {
     u32 unk0;
@@ -69,9 +48,6 @@ typedef struct {
 typedef struct {
     WarpSequence *warp;
 } WarpInData;
-
-void EntranceCamera_ReadFile(void *dest, u32 index);
-void FieldCamera_ChangeRefPos(FieldCamera *camera, const VecFx32 *target);
 
 static void EventWarpSequence_StartWalkTask(WarpSequence *warp);
 static BOOL EventWarpSequence_UpdateTCB(WarpSequence *warp);
@@ -86,34 +62,6 @@ static void EventWarpSequenceIn_FadeInBGM(WarpInData *in);
 static void EventWarpSequenceIn_ChainBGMFadeIn(WarpInData *in, GameEvent *event);
 static void EventWarpSequenceIn_PlayTransition(WarpInData *in, GameEvent *event);
 static void func_ov036_021b7a20(WarpInData *in);
-EntranceCamera *EntranceCamera_Allocate(HeapID heapId);
-void EntranceCamera_Free(void *camera);
-void EntranceCamera_Init(EntranceCamera *camera, Field *field);
-void EntranceCamera_CreateController(EntranceCamera *camera, HeapID heapId);
-void EntranceCamera_FreeController(EntranceCamera *camera);
-void EntranceCamera_ConfigureDefaultDeparture(EntranceCamera *camera);
-void EntranceCamera_ConfigureDefaultArrival(EntranceCamera *camera);
-void EntranceCamera_ConfigureFileDeparture(EntranceCamera *camera);
-void EntranceCamera_ConfigureFileArrival(EntranceCamera *camera);
-FieldCamera *EntranceCamera_GetFieldCamera(EntranceCamera *camera);
-EntranceCameraParam *EntranceCamera_GetParam(EntranceCamera *camera);
-void EntranceCamera_SetParam(EntranceCamera *camera, const EntranceCameraParam *param);
-u32 EntranceCamera_GetTransitionType(EntranceCamera *camera);
-BOOL func_ov036_021b7f40(EntranceCamera *camera);
-BOOL func_ov036_021b7f50(EntranceCamera *camera);
-BOOL func_ov036_021b7f64(EntranceCamera *camera);
-GameEventReturnCode func_ov036_021b73b4(GameEvent *event, u32 *state, void *data);
-GameEventReturnCode func_ov036_021b73f8(GameEvent *event, u32 *state, void *data);
-GameEventReturnCode func_ov036_021b74c8(GameEvent *event, u32 *state, void *data);
-GameEventReturnCode func_ov036_021b7538(GameEvent *event, u32 *state, void *data);
-GameEventReturnCode func_ov036_021b7570(GameEvent *event, u32 *state, void *data);
-GameEventReturnCode func_ov036_021b7604(GameEvent *event, u32 *state, void *data);
-GameEventReturnCode func_ov036_021b77d0(GameEvent *event, u32 *state, void *data);
-GameEventReturnCode func_ov036_021b7810(GameEvent *event, u32 *state, void *data);
-GameEventReturnCode func_ov036_021b7848(GameEvent *event, u32 *state, void *data);
-GameEventReturnCode EventWarpSequence_CallbackSpinDown(GameEvent *event, u32 *state, void *data);
-GameEventReturnCode func_ov036_021b78fc(GameEvent *event, u32 *state, void *data);
-GameEventReturnCode func_ov036_021b793c(GameEvent *event, u32 *state, void *data);
 
 GameEvent *EventWarpSequence_CreateOut(WarpSequence *warp) {
     const GameEventCallback callbacks[] = {
@@ -196,7 +144,7 @@ static void EventWarpSequence_StartWalkTask(WarpSequence *warp) {
     FieldActor *player = FieldPlayer_GetActor(Field_GetPlayer(warp->field));
     FieldActor *pair;
 
-    ((EntranceWarp *)warp)->walkTask = FieldAcmdTCB_CreateWalkOneTile(player, GetActorFaceDir(player));
+    warp->walkTask = FieldAcmdTCB_CreateWalkOneTile(player, GetActorFaceDir(player));
     if (GameData_CheckPairFlag(warp->gameData)) {
         pair = FindFieldActor(mmSys, 0xfe);
         if (pair != NULL) {
@@ -206,13 +154,11 @@ static void EventWarpSequence_StartWalkTask(WarpSequence *warp) {
 }
 
 static BOOL EventWarpSequence_UpdateTCB(WarpSequence *warp) {
-    EntranceWarp *entrance = (EntranceWarp *)warp;
-
-    if (!FieldAcmdTCB_CheckEnded(entrance->walkTask)) {
+    if (!FieldAcmdTCB_CheckEnded(warp->walkTask)) {
         return FALSE;
     }
-    FieldAcmdTCB_Remove(entrance->walkTask);
-    entrance->walkTask = NULL;
+    FieldAcmdTCB_Remove(warp->walkTask);
+    warp->walkTask = NULL;
     return TRUE;
 }
 
@@ -613,19 +559,19 @@ void EntranceCamera_Configure(EntranceCamera *camera, const EntranceCameraParam 
     FieldCameraAnimationController_SetAnimation(camera->controller, &camera->animation);
     if (func_ov036_021b7f40(camera)) {
         switch (param->isArrival) {
-        case 0:
+        case FALSE:
             EntranceCamera_ConfigureFileDeparture(camera);
             break;
-        case 1:
+        case TRUE:
             EntranceCamera_ConfigureFileArrival(camera);
             break;
         }
     } else {
         switch (param->isArrival) {
-        case 0:
+        case FALSE:
             EntranceCamera_ConfigureDefaultDeparture(camera);
             break;
-        case 1:
+        case TRUE:
             EntranceCamera_ConfigureDefaultArrival(camera);
             break;
         }
@@ -658,7 +604,7 @@ EntranceCamera *EntranceCamera_Allocate(HeapID heapId) {
     return GFL_HeapAllocate(heapId, sizeof(EntranceCamera), FALSE, "entrance_camera.c", 298);
 }
 
-void EntranceCamera_Free(void *camera) {
+void EntranceCamera_Free(EntranceCamera *camera) {
     GFL_HeapFree(camera);
 }
 
@@ -691,13 +637,13 @@ void EntranceCamera_ConfigureDefaultDeparture(EntranceCamera *camera) {
     player = Field_GetPlayer(camera->field);
     dir = FieldPlayer_GetFaceDir(player);
     switch (dir) {
-    case 2:
-    case 3:
+    case DIR_LEFT:
+    case DIR_RIGHT:
         camera->unk68 = 1;
         camera->unk6c = 0;
         break;
-    case 0:
-    case 1:
+    case DIR_UP:
+    case DIR_DOWN:
         camera->unk68 = 0;
         camera->unk6c = 0;
         break;
@@ -714,29 +660,29 @@ void EntranceCamera_ConfigureDefaultDeparture(EntranceCamera *camera) {
         FieldCamera_GetAnimationCoords(camera->camera, &animation->src);
         FieldCamera_GetAnimationCoords(camera->camera, dst);
         switch (dir) {
-        case 0:
+        case DIR_UP:
             dst->distance = 0x2d << 14;
             break;
-        case 1:
+        case DIR_DOWN:
             break;
-        case 2:
+        case DIR_LEFT:
             dst->yaw = 0xa09;
             break;
-        case 3:
+        case DIR_RIGHT:
             dst->yaw = 0xf5f7;
             break;
         }
         switch (dir) {
-        case 0:
+        case DIR_UP:
             animation->frames = 0;
             break;
-        case 1:
+        case DIR_DOWN:
             animation->frames = 0;
             break;
-        case 2:
+        case DIR_LEFT:
             animation->frames = 10;
             break;
-        case 3:
+        case DIR_RIGHT:
             animation->frames = 10;
             break;
         }
@@ -754,13 +700,13 @@ void EntranceCamera_ConfigureDefaultArrival(EntranceCamera *camera) {
     player = Field_GetPlayer(camera->field);
     dir = FieldPlayer_GetFaceDir(player);
     switch (dir) {
-    case 1:
-    case 2:
-    case 3:
+    case DIR_DOWN:
+    case DIR_LEFT:
+    case DIR_RIGHT:
         camera->unk68 = 0;
         camera->unk6c = 1;
         break;
-    case 0:
+    case DIR_UP:
         camera->unk68 = 0;
         camera->unk6c = 0;
         break;
@@ -774,16 +720,16 @@ void EntranceCamera_ConfigureDefaultArrival(EntranceCamera *camera) {
             FieldPlayer_GetWPos(player, &pos);
         }
         switch (dir) {
-        case 0:
+        case DIR_UP:
             animation->frames = 0;
             break;
-        case 1:
+        case DIR_DOWN:
             animation->frames = 10;
             break;
-        case 2:
+        case DIR_LEFT:
             animation->frames = 10;
             break;
-        case 3:
+        case DIR_RIGHT:
             animation->frames = 10;
             break;
         }
@@ -793,15 +739,15 @@ void EntranceCamera_ConfigureDefaultArrival(EntranceCamera *camera) {
         FieldCameraAnimationController_PrepareCamera(camera->controller);
         FieldCamera_GetAnimationCoords(camera->camera, &animation->src);
         switch (dir) {
-        case 0:
+        case DIR_UP:
             break;
-        case 1:
+        case DIR_DOWN:
             animation->src.distance = 0x2d << 14;
             break;
-        case 2:
+        case DIR_LEFT:
             animation->src.yaw = 0xf5f7;
             break;
-        case 3:
+        case DIR_RIGHT:
             animation->src.yaw = 0xa09;
             break;
         }
@@ -897,7 +843,7 @@ void EntranceCamera_ConfigureFileArrival(EntranceCamera *camera) {
     }
 }
 
-void EntranceCamera_ReadFile(void *dest, u32 index) {
+void EntranceCamera_ReadFile(EntranceCameraFile *dest, u32 index) {
     GFL_ArcSysRead(dest, 0xb1, index - 7);
 }
 

@@ -6,7 +6,7 @@
 typedef u32 (*DSProtBranchTypeFunc)(u32 instruction);
 typedef u32 (*DSProtNextFunc)(DSProtCipherState *state);
 typedef void (*DSProtInitFunc)(DSProtCipherState *state, const u8 *key, u32 keyLength);
-typedef int (*DSProtCodeFunc)(DSProtCipherState *state, u8 *src, u8 *dest, u32 size);
+typedef s32 (*DSProtCodeFunc)(DSProtCipherState *state, u8 *src, u8 *dest, u32 size);
 
 static const u32 sCipherFunctions[5] = {
     (u32)(DSProt_GetBranchType + 0x2200), (u32)(DSProt_EncryptCode + 0x2200), (u32)(DSProt_DecryptCode + 0x2200),
@@ -79,9 +79,8 @@ u32 DSProt_Rc4Next(DSProtCipherState *state) {
     return state->table[(atI + atJ) & 0xff];
 }
 
-int DSProt_EncryptCode(DSProtCipherState *state, u8 *src, u8 *dest, u32 size) {
-    // The SDK's u32 is unsigned long, which MWCC treats differently from unsigned int when indexing
-    unsigned long i;
+s32 DSProt_EncryptCode(DSProtCipherState *state, u8 *src, u8 *dest, u32 size) {
+    u32 i;
     u8 sum;
 
     sum = 0;
@@ -129,9 +128,8 @@ static inline u32 DSProt_DecryptByte(DSProtCipherState *state, u32 byte) {
     return out;
 }
 
-int DSProt_DecryptCode(DSProtCipherState *state, u8 *src, u8 *dest, u32 size) {
-    // The SDK's u32 is unsigned long, which MWCC treats differently from unsigned int when indexing
-    unsigned long i;
+s32 DSProt_DecryptCode(DSProtCipherState *state, u8 *src, u8 *dest, u32 size) {
+    u32 i;
     u8 sum;
 
     sum = 0;
@@ -169,14 +167,14 @@ int DSProt_DecryptCode(DSProtCipherState *state, u8 *src, u8 *dest, u32 size) {
     return 0;
 }
 
-int DSProt_EncryptCodeWithKey(const u8 *key, u8 *src, u8 *dest, u32 size) {
+s32 DSProt_EncryptCodeWithKey(const u8 *key, u8 *src, u8 *dest, u32 size) {
     DSProtCipherState state;
 
     ((DSProtInitFunc)(sCipherFunctions[4] - 0x2200))(&state, key, 16);
     return ((DSProtCodeFunc)(sCipherFunctions[1] - 0x2200))(&state, src, dest, size) == -1 ? -1 : 0;
 }
 
-int DSProt_DecryptCodeWithKey(const u8 *key, u8 *src, u8 *dest, u32 size) {
+s32 DSProt_DecryptCodeWithKey(const u8 *key, u8 *src, u8 *dest, u32 size) {
     DSProtCipherState state;
 
     ((DSProtInitFunc)(sCipherFunctions[4] - 0x2200))(&state, key, 16);

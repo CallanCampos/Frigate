@@ -9,7 +9,7 @@
 // Starts the actor's slide in a task. stopPlayer is TRUE when the actor is the player, who is braked first and whom the
 // camera follows down
 void *RailSlipdown_Create(GameSystem *gsys, Field *field, FieldActor *actor, BOOL stopPlayer);
-void RailSlipdown_Delete(void *work);
-BOOL RailSlipdown_IsDone(void *work);
+void RailSlipdown_Delete(RailSlipdown *work);
+BOOL RailSlipdown_IsDone(RailSlipdown *work);
 
 #endif // POKEBW2_FIELD_RAIL_SLIPDOWN_H

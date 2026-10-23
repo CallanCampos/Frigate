@@ -1004,8 +1004,8 @@ static void scenario_clear_image(void) {
         GXVRamClearImage banks;
         bool color;
     } settings[] = {
-        { GX_VRAM_CLEARIMAGE_256_AB, true }, { GX_VRAM_CLEARIMAGE_256_CD, true }, { GX_VRAM_CLEARIMAGE_128_A, false },
-        { GX_VRAM_CLEARIMAGE_128_B, false }, { GX_VRAM_CLEARIMAGE_128_C, false }, { GX_VRAM_CLEARIMAGE_128_D, false },
+        { GX_VRAM_CLEARIMAGE_256_AB, true }, { GX_VRAM_CLEARIMAGE_256_CD, true }, { GX_VRAM_CLEARDEPTH_128_A, false },
+        { GX_VRAM_CLEARDEPTH_128_B, false }, { GX_VRAM_CLEARDEPTH_128_C, false }, { GX_VRAM_CLEARDEPTH_128_D, false },
     };
     static uint8_t color[0x20000];
     static uint8_t depth[0x20000];
@@ -1095,7 +1095,7 @@ static void scenario_ext_palettes(void) {
             }
         }
         CHECK(port_vram_slot_generation(PORT_VRAM_VIEW_BGEXT_A, bgSettings[i].first / 2) != before);
-        CHECK((reg_GX_DISPCNT & REG_GX_DISPCNT_BGEXTPLTT_MASK) != 0);
+        CHECK((reg_GX_DISPCNT & REG_GX_DISPCNT_BG_MASK) != 0);
     }
     for (size_t i = 0; i < NELEMS(objSettings); i++) {
         Generations loads;

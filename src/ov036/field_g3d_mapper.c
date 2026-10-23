@@ -39,7 +39,7 @@ FieldG3DMapper *FieldG3DMapper_Create(HeapID heapId, u16 season) {
     mapper->chunkDatIds = NULL;
     mapper->chunkSpan = 0;
     mapper->unk08 = 0;
-    mapper->locatorGenType = 1;
+    mapper->locatorGenType = FIELD_G3D_MAPPER_LOCATORS_AROUND;
     mapper->chunkArcId = 0xffffffff;
     mapper->phase1MaxChunkCount = 0;
     mapper->terrainAnimator = NULL;
@@ -72,17 +72,17 @@ void FieldG3DMapper_UpdateSync(FieldG3DMapper *mapper) {
         FieldChunkLocator_Disable(&mapper->chunkLocators[i]);
     }
     switch (mapper->locatorGenType) {
-    case 0:
+    case FIELD_G3D_MAPPER_LOCATORS_ALL:
         FieldG3DMapper_GenLocators0(mapper, &mapper->playerPos, mapper->chunkLocators);
         break;
-    case 1:
+    case FIELD_G3D_MAPPER_LOCATORS_AROUND:
     default:
         FieldG3DMapper_GenLocators1(mapper, &mapper->playerPos, mapper->chunkLocators);
         break;
-    case 2:
+    case FIELD_G3D_MAPPER_LOCATORS_WRAP:
         FieldG3DMapper_GenLocators2(mapper, &mapper->playerPos, mapper->chunkLocators);
         break;
-    case 3:
+    case FIELD_G3D_MAPPER_LOCATORS_LAYERS:
         FieldG3DMapper_GenLocators3(mapper, &mapper->playerPos, mapper->chunkLocators);
         break;
     }
@@ -109,17 +109,17 @@ BOOL FieldG3DMapper_Update(FieldG3DMapper *mapper) {
         FieldChunkLocator_Disable(&mapper->chunkLocators[i]);
     }
     switch (mapper->locatorGenType) {
-    case 0:
+    case FIELD_G3D_MAPPER_LOCATORS_ALL:
         FieldG3DMapper_GenLocators0(mapper, &mapper->playerPos, mapper->chunkLocators);
         break;
-    case 1:
+    case FIELD_G3D_MAPPER_LOCATORS_AROUND:
     default:
         FieldG3DMapper_GenLocators1(mapper, &mapper->playerPos, mapper->chunkLocators);
         break;
-    case 2:
+    case FIELD_G3D_MAPPER_LOCATORS_WRAP:
         FieldG3DMapper_GenLocators2(mapper, &mapper->playerPos, mapper->chunkLocators);
         break;
-    case 3:
+    case FIELD_G3D_MAPPER_LOCATORS_LAYERS:
         FieldG3DMapper_GenLocators3(mapper, &mapper->playerPos, mapper->chunkLocators);
         break;
     }
@@ -130,7 +130,7 @@ BOOL FieldG3DMapper_Update(FieldG3DMapper *mapper) {
         FieldChunkLoader *loader;
 
         FieldChunk_GetLoaderHandle(mapper->chunkHandles[i].chunk, &loader);
-        if (loader->state == 1) {
+        if (loader->state == FIELD_CHUNK_LOAD_START) {
             loading = TRUE;
         }
         FieldChunk_CallLoaderUpdate(mapper->chunkHandles[i].chunk);
@@ -168,7 +168,7 @@ void FieldG3D_RenderFieldmap(FieldG3DMapper *mapper, void *camera, u32 pass) {
     int i;
     BOOL drawn;
 
-    if (pass == 0 && mapper->phase1MaxChunkCount == 0) {
+    if (pass == FIELD_G3D_RENDER_PHASE_1 && mapper->phase1MaxChunkCount == 0) {
         return;
     }
     for (i = 0; i < mapper->chunkCapacity; i++) {
@@ -185,7 +185,7 @@ void FieldG3D_RenderFieldmap(FieldG3DMapper *mapper, void *camera, u32 pass) {
             }
         }
     }
-    if (pass == 1) {
+    if (pass == FIELD_G3D_RENDER_PHASE_2) {
         FieldPropSystem_DrawAllHandles(mapper->propSystem);
     }
 }
@@ -214,14 +214,14 @@ void FieldG3DMapper_CreateMap(FieldG3DMapper *mapper, const FieldG3DMapperConfig
     mapper->lastDrawnCount = mapper->chunkCapacity;
     mapper->nowDrawnCount = mapper->chunkCapacity;
     switch (config->locatorGenType) {
-    case 0:
+    case FIELD_G3D_MAPPER_LOCATORS_ALL:
         if (config->chunkIdCount > mapper->chunkCapacity) {
-            mapper->locatorGenType = 1;
+            mapper->locatorGenType = FIELD_G3D_MAPPER_LOCATORS_AROUND;
         }
         break;
-    case 3:
+    case FIELD_G3D_MAPPER_LOCATORS_LAYERS:
         if (mapper->matrixWidth * mapper->matrixHeight > mapper->chunkCapacity / 2) {
-            mapper->locatorGenType = 1;
+            mapper->locatorGenType = FIELD_G3D_MAPPER_LOCATORS_AROUND;
         }
         break;
     }
@@ -286,7 +286,7 @@ void FieldG3DMapper_FreeMap(FieldG3DMapper *mapper) {
 
 void FieldG3DMapper_LoadMapTextures(FieldG3DMapper *mapper, const FieldG3DMapperConfig *config, void *colorPostFx) {
     switch (config->isSharedTexResource) {
-    case 1: {
+    case TRUE: {
         const FieldG3DMapperTextureFile *textures = &config->textures;
 
         mapper->mapTextures = GFL_G3DSysReadArcSysResource(textures->arcId, textures->fileId);
@@ -296,7 +296,7 @@ void FieldG3DMapper_LoadMapTextures(FieldG3DMapper *mapper, const FieldG3DMapper
         GFL_G3DResUploadAndReleaseTexData(mapper->mapTextures);
         break;
     }
-    case 0:
+    case FALSE:
         mapper->mapTextures = NULL;
         break;
     }
@@ -371,7 +371,7 @@ void FieldG3DMapper_GenLocators0(FieldG3DMapper *mapper, const VecFx32 *playerPo
 
             y = FX_Mul(layer << FX32_SHIFT, layerHeight);
             if (chunkId >= mapper->chunkIdCount) {
-                chunkId = 0xffffffff;
+                chunkId = FIELD_CHUNK_ID_NONE;
             }
             locator = &locators[chunkId];
             FieldChunkLocator_SetChunkID(locator, chunkId);
@@ -483,8 +483,8 @@ void FieldG3DMapper_GenLocators3(FieldG3DMapper *mapper, const VecFx32 *playerPo
     u32 locatorIndex;
     s32 chunkIndex;
     fx32 layerY;
-    s32 chunkX;
-    s32 chunkZ;
+    int chunkX;
+    int chunkZ;
 
     width = mapper->matrixWidth;
     chunksPerLayer = mapper->matrixWidth * mapper->matrixHeight;
@@ -504,7 +504,7 @@ void FieldG3DMapper_GenLocators3(FieldG3DMapper *mapper, const VecFx32 *playerPo
         chunkZ = chunkIndex / mapper->matrixWidth;
         chunkId = layer * chunksPerLayer + chunkZ * width + chunkX;
         if (chunkId >= mapper->chunkIdCount) {
-            chunkId = 0xffffffff;
+            chunkId = FIELD_CHUNK_ID_NONE;
         }
         FieldChunkLocator_SetChunkID(&locators[locatorIndex], chunkId);
         FieldChunkLocator_SetPos(&locators[locatorIndex], halfSpan + FX_Mul(chunkX << FX32_SHIFT, span), layerY,
@@ -516,7 +516,7 @@ void FieldG3DMapper_GenLocators3(FieldG3DMapper *mapper, const VecFx32 *playerPo
         chunkZ = chunkIndex / mapper->matrixWidth;
         chunkId = (layer + adjacentLayerOffset) * chunksPerLayer + chunkZ * width + chunkX;
         if (chunkId >= mapper->chunkIdCount) {
-            chunkId = 0xffffffff;
+            chunkId = FIELD_CHUNK_ID_NONE;
         }
         FieldChunkLocator_SetChunkID(&locators[locatorIndex], chunkId);
         FieldChunkLocator_SetPos(&locators[locatorIndex], halfSpan + FX_Mul(chunkX << FX32_SHIFT, span), layerY,
@@ -628,7 +628,7 @@ void ClearMapTerrainBuf(MapTerrainBuf *terrain) {
 void ClearMapTerrainSamplerOutput(FieldG3DMapperTerrain *output) {
     int i;
 
-    for (i = 0; i < 16; i++) {
+    for (i = 0; i < FIELD_G3D_MAPPER_LAYER_MAX; i++) {
         ClearMapTerrainBuf(&output->layers[i]);
     }
     output->layerCount = 0;
@@ -665,7 +665,7 @@ BOOL FieldG3DMapper_GetTerrainAll(FieldG3DMapper *mapper, const VecFx32 *positio
                 if (chunkTerrain.layerCount != 0) {
                     u32 j;
 
-                    if (count + chunkTerrain.layerCount >= 16) {
+                    if (count + chunkTerrain.layerCount >= FIELD_G3D_MAPPER_LAYER_MAX) {
                         break;
                     }
                     for (j = 0; j < chunkTerrain.layerCount; j++) {
@@ -748,7 +748,7 @@ BOOL FieldG3DMapper_IsPosOutOfBounds(FieldG3DMapper *mapper, const VecFx32 *posi
     if (mapper->chunkDatIds == NULL) {
         return TRUE;
     }
-    if (mapper->locatorGenType == 2) {
+    if (mapper->locatorGenType == FIELD_G3D_MAPPER_LOCATORS_WRAP) {
         return FALSE;
     }
     maxX = mapper->matrixWidth * mapper->chunkSpan;
@@ -810,7 +810,7 @@ FieldPropSystem *FieldChunkContext_GetPropSystem(FieldChunkContext *context) {
     return context->propSystem;
 }
 
-void *FieldChunkContext_GetResortMap(FieldChunkContext *context) {
+ResortMapCreateWork *FieldChunkContext_GetResortMap(FieldChunkContext *context) {
     return context->resortMap;
 }
 
@@ -856,7 +856,7 @@ FieldTerrainSRTAnimatorChunkState *FieldChunkContext_GetSRTAnimatorStateCore(Fie
 }
 
 void FieldChunkLocator_Disable(FieldChunkLocator *locator) {
-    locator->chunkId = 0xffffffff;
+    locator->chunkId = FIELD_CHUNK_ID_NONE;
     VEC_Set(&locator->position, 0, 0, 0);
 }
 
@@ -865,7 +865,7 @@ void FieldChunkLocator_SetChunkID(FieldChunkLocator *locator, u32 chunkId) {
 }
 
 BOOL FieldChunkLocator_IsActive(FieldChunkLocator *locator) {
-    if (locator->chunkId != 0xffffffff) {
+    if (locator->chunkId != FIELD_CHUNK_ID_NONE) {
         return TRUE;
     }
     return FALSE;
@@ -903,7 +903,7 @@ void func_ov036_0218543c(const FieldG3DMapper *mapper, const VecFx32 *position, 
 
             added++;
             index = count + added - 1;
-            if (index >= 16) {
+            if (index >= FIELD_G3D_MAPPER_LAYER_MAX) {
                 break;
             }
             layer = &output->layers[index];
@@ -919,7 +919,7 @@ void FieldG3DMapper_ResetDrawCalcState(FieldG3DMapper *mapper) {
     s32 elapsed;
     s32 vcount;
 
-    MI_CpuFill8(mapper->drawnChunkIndices, 0xff, mapper->chunkCapacity);
+    MI_CpuFill8(mapper->drawnChunkIndices, FIELD_G3D_MAPPER_DRAW_END, mapper->chunkCapacity);
     mapper->drawnChunkCount = 0;
     mapper->lastDrawnCount = mapper->nowDrawnCount;
     mapper->nowDrawnCount = 0;
@@ -983,7 +983,7 @@ void FieldG3DMapper_CalcRenderPassSplit(FieldG3DMapper *mapper) {
             u8 index = mapper->drawnChunkIndices[i];
             u32 size;
 
-            if (index == 0xff) {
+            if (index == FIELD_G3D_MAPPER_DRAW_END) {
                 break;
             }
             FieldChunk_GetRawDataLength(mapper->chunkHandles[index].chunk, &size);
@@ -999,11 +999,11 @@ void FieldG3DMapper_CalcRenderPassSplit(FieldG3DMapper *mapper) {
 BOOL FieldG3DMapper_CheckChunkDraw(FieldG3DMapper *mapper, u32 order, u32 pass, u32 *index) {
     u8 chunkIndex = mapper->drawnChunkIndices[order];
 
-    if (chunkIndex == 0xff) {
+    if (chunkIndex == FIELD_G3D_MAPPER_DRAW_END) {
         return FALSE;
     }
     *index = chunkIndex;
-    if (pass == 0) {
+    if (pass == FIELD_G3D_RENDER_PHASE_1) {
         if (order < mapper->chunkSizeCapPassingChunkEndIdx) {
             return TRUE;
         }

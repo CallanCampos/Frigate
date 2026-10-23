@@ -379,7 +379,7 @@ LocalTvtMenu *LocalTvtMenu_Create(const LocalTvtMenuSetup *setup, HeapID heapId)
     GFL_BGSysClearCharCore(BG_SUB_WINDOW, 0x20, 0, heapId);
     GFL_BGSysLoadArcNCGRStatic(arc, 122, BG_SUB_WINDOW, 1, 0, FALSE, heapId);
     file = GFL_G2DIOReadNCLRArc(arc, 121, &paletteData, heapId);
-    colors = paletteData->rawData;
+    colors = paletteData->pRawData;
     MI_CpuCopy8(colors, menu->palette, sizeof(menu->palette));
     colors += 16;
     MI_CpuCopy8(colors, menu->paletteSelected, sizeof(menu->paletteSelected));
@@ -604,7 +604,7 @@ LocalTvtPokeSelect *LocalTvtPokeSelect_Create(const LocalTvtPokeSelectSetup *set
     GFL_BGSysSetBGEnabled(BG_SUB_WINDOW, FALSE);
     arc = GFL_ArcSysCreateFileHandle(ARCID_LOCAL_TVT, heapId);
     file = GFL_G2DIOReadNCLRArc(arc, 123, &paletteData, heapId);
-    colors = paletteData->rawData;
+    colors = paletteData->pRawData;
     MI_CpuCopy8(&colors[0], select->palette, sizeof(select->palette));
     MI_CpuCopy8(&colors[16], select->paletteSelected, sizeof(select->paletteSelected));
     MI_CpuCopy8(&colors[32], select->paletteEgg, sizeof(select->paletteEgg));

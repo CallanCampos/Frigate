@@ -39,8 +39,8 @@ static u8 GetEncountIndexForPreferredType(EncountManager *manager, const WildEnc
 static void FieldEncount_CheckApplyHighLevelWilds(const EncountManager *manager, const WildEncSlot *slots,
                                                   WildPkmParam *param);
 static void FieldEncount_GenWildPokeParam(EncountManager *manager, const WildEncSlot *slots, WildPkmParam *param);
-static void FieldEncount_SetRandomHeldItem(PartyPkm *pkm, void *personal, BOOL compoundEyes, BOOL doubleBattle);
-static u32 FieldEncount_GenPID(const EncountManager *manager, void *personal, WildPkmParam *param);
+static void FieldEncount_SetRandomHeldItem(PartyPkm *pkm, PersonalData *personal, BOOL compoundEyes, BOOL doubleBattle);
+static u32 FieldEncount_GenPID(const EncountManager *manager, PersonalData *personal, WildPkmParam *param);
 static int GetEncountSlotByProbability(const u8 *odds, int count);
 static int EncountMakeRnd12(int count);
 static int EncountMakeRnd5T1(int count);
@@ -318,7 +318,7 @@ u8 FieldEncount_RndCheckNPoke(EncountManager *manager, u32 zoneId) {
 }
 
 void FieldEncount_CreateWildPkm(PartyPkm *pkm, const EncountManager *manager, WildPkmParam *param) {
-    void *personal = PML_PersonalLoad(param->species, param->form, 4);
+    PersonalData *personal = PML_PersonalLoad(param->species, param->form, 4);
     u32 rolls = 1;
     u32 pid;
     u32 i;
@@ -636,7 +636,8 @@ static void FieldEncount_GenWildPokeParam(EncountManager *manager, const WildEnc
     FieldEncount_CheckApplyHighLevelWilds(manager, slots, param);
 }
 
-static void FieldEncount_SetRandomHeldItem(PartyPkm *pkm, void *personal, BOOL compoundEyes, BOOL doubleBattle) {
+static void FieldEncount_SetRandomHeldItem(PartyPkm *pkm, PersonalData *personal, BOOL compoundEyes,
+                                           BOOL doubleBattle) {
     u16 items[3];
     const u8 *odds;
     u8 roll;
@@ -662,7 +663,7 @@ static void FieldEncount_SetRandomHeldItem(PartyPkm *pkm, void *personal, BOOL c
     }
 }
 
-static u32 FieldEncount_GenPID(const EncountManager *manager, void *personal, WildPkmParam *param) {
+static u32 FieldEncount_GenPID(const EncountManager *manager, PersonalData *personal, WildPkmParam *param) {
     u32 sex = 2;
     u32 shiny;
     u32 pid;

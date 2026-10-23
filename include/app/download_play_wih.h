@@ -35,6 +35,13 @@ enum {
     WIH_CONNECTMODE_DS_CHILD,
 };
 
+// The helper's own errors, which it keeps as the first error after the manager's (WMErrCode): the wireless has no
+// channel it may use, and no channel is left to measure. Overlay 30's helper reports the same numbers
+enum {
+    WIH_ERRCODE_NO_RADIO = 0x16,
+    WIH_ERRCODE_NOMORE_CHANNEL = 0x18,
+};
+
 // The state names, one per state before WIH_STATE_FATAL, which the state change passes to the work's log
 extern const char *const stateNames[];
 
@@ -63,7 +70,7 @@ typedef void (*WHLogPrint)(u32 level, const char *format, ...);
 // What the scan calls with each child that connects, to say whether it may stay
 typedef BOOL (*WHScanFilter)(void *info);
 // What fills the WEP key of the work and gives the mode to set the wireless to
-typedef u16 (*WHWepKeySetup)(void *key);
+typedef u16 (*WHWepKeySetup)(u16 *key);
 
 // The helper's work, which the DS Download Play parent allocates: DownloadPlayWork's loaderContext is one of these,
 // and the parent's own state fills the gap between the two ends of it
@@ -105,11 +112,11 @@ typedef struct {
     u32 unk_13b0;
     u8 unk_13b4[0xc];
     // The WEP key that unk_13ac fills
-    u8 wepKey[0x20];
+    u16 wepKey[0x10];
     // The data sharing, the set it works in, and the one that the key sharing uses
     WMDataSharingInfo dataSharing;
     WMDataSet dataSet;
-    WMDataSharingInfo keySharing;
+    WMKeySetBuf keySharing;
 } WHWork;
 
 // The helper's work, and what it prints through, which the file's functions reach the helper's work through

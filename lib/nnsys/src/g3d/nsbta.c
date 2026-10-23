@@ -3,8 +3,8 @@
 // NitroSystem's G3D texture SRT animation (NSBTA, the "BTA0" files): the readers of the animation's values, the
 // function that works out a material's texture matrix at a frame, the function that fills in an animation object for
 // one, and the function the object holds. The file is named after NitroSystem's nsbta.c. The two global functions are
-// the ones that anm.c's tables hold; the others are static because only this file calls them. Their names are guesses
-// in NitroSystem's style, ours in config/names.txt
+// the ones that anm.c's tables hold; the others are static because only this file calls them. The names are
+// NitroSystem's, as ntrtwl's reconstruction of NitroSystem has them, except SinCos, which is ours
 
 // A rotation as the animation keeps it: its sine and cosine, which are also read as one word
 typedef union {
@@ -15,25 +15,25 @@ typedef union {
     u32 word;
 } SinCos;
 
-static fx32 getTexSrtData_(const NNSG3dResTexSrtAnm *anm, u32 info, u32 offset, u32 frame);
-static u32 getTexSrtRotData_(const NNSG3dResTexSrtAnm *anm, u32 info, u32 offset, u32 frame);
-static void getTexSrtAnmResult_(const NNSG3dResTexSrtAnm *anm, u32 idx, u32 frame, NNSG3dMatAnmResult *result);
+static fx32 GetTexSRTAnmVectorVal_(const NNSG3dResTexSRTAnm *anm, u32 info, u32 offset, u32 frame);
+static u32 GetTexSRTAnmSinCosVal_(const NNSG3dResTexSRTAnm *anm, u32 info, u32 offset, u32 frame);
+static void GetTexSRTAnm_(const NNSG3dResTexSRTAnm *anm, u32 idx, u32 frame, NNSG3dMatAnmResult *result);
 
 // The value of a scale or translation at a frame, from the words that say how its values are kept. The frames between
 // the stored ones are made from them, up to the last frame that is interpolated. As in the rotation's reader, the two
 // cases between stored values jump to one block at the end, `average`
-static fx32 getTexSrtData_(const NNSG3dResTexSrtAnm *anm, u32 info, u32 offset, u32 frame) {
+static fx32 GetTexSRTAnmVectorVal_(const NNSG3dResTexSRTAnm *anm, u32 info, u32 offset, u32 frame) {
     const u8 *data;
     u32 last;
     u32 idx;
 
-    if (info & NNS_G3D_SRTANM_ELEM_CONST) {
+    if (info & NNS_G3D_TEXSRTANM_ELEM_CONST) {
         return offset;
     }
     data = (const u8 *)anm + offset;
-    if (info & NNS_G3D_SRTANM_ELEM_STEP_MASK) {
-        last = info & NNS_G3D_SRTANM_ELEM_LAST_INTERP_MASK;
-        if (info & NNS_G3D_SRTANM_ELEM_STEP_2) {
+    if (info & NNS_G3D_TEXSRTANM_ELEM_STEP_MASK) {
+        last = info & NNS_G3D_TEXSRTANM_ELEM_LAST_INTERP_MASK;
+        if (info & NNS_G3D_TEXSRTANM_ELEM_STEP_2) {
             if (frame & 1) {
                 if (frame > last) {
                     frame = (last >> 1) + 1;
@@ -63,7 +63,7 @@ static fx32 getTexSrtData_(const NNSG3dResTexSrtAnm *anm, u32 info, u32 offset, 
                         idx = frame >> 2;
                         idxB = idx + 1;
                     }
-                    if (info & NNS_G3D_SRTANM_ELEM_FX16) {
+                    if (info & NNS_G3D_TEXSRTANM_ELEM_FX16) {
                         a = ((const fx16 *)data)[idx];
                         b = ((const fx16 *)data)[idxB];
                     } else {
@@ -81,7 +81,7 @@ static fx32 getTexSrtData_(const NNSG3dResTexSrtAnm *anm, u32 info, u32 offset, 
             }
         }
     }
-    if (info & NNS_G3D_SRTANM_ELEM_FX16) {
+    if (info & NNS_G3D_TEXSRTANM_ELEM_FX16) {
         return ((const fx16 *)data)[frame];
     }
     return ((const fx32 *)data)[frame];
@@ -92,7 +92,7 @@ average:
         fx32 a;
         fx32 b;
 
-        if (info & NNS_G3D_SRTANM_ELEM_FX16) {
+        if (info & NNS_G3D_TEXSRTANM_ELEM_FX16) {
             a = *((const fx16 *)data + idx);
             b = *((const fx16 *)data + idx + 1);
         } else {
@@ -104,19 +104,19 @@ average:
 }
 
 // The same for a rotation, the sine and the cosine as one word, the cosine in the high half. Each is blended by itself
-static u32 getTexSrtRotData_(const NNSG3dResTexSrtAnm *anm, u32 info, u32 offset, u32 frame) {
+static u32 GetTexSRTAnmSinCosVal_(const NNSG3dResTexSRTAnm *anm, u32 info, u32 offset, u32 frame) {
     const SinCos *data;
     const SinCos *a;
     u32 last;
     u32 idx;
 
-    if (info & NNS_G3D_SRTANM_ELEM_CONST) {
+    if (info & NNS_G3D_TEXSRTANM_ELEM_CONST) {
         return offset;
     }
     data = (const SinCos *)((const u8 *)anm + offset);
-    if (info & NNS_G3D_SRTANM_ELEM_STEP_MASK) {
-        last = info & NNS_G3D_SRTANM_ELEM_LAST_INTERP_MASK;
-        if (info & NNS_G3D_SRTANM_ELEM_STEP_2) {
+    if (info & NNS_G3D_TEXSRTANM_ELEM_STEP_MASK) {
+        last = info & NNS_G3D_TEXSRTANM_ELEM_LAST_INTERP_MASK;
+        if (info & NNS_G3D_TEXSRTANM_ELEM_STEP_2) {
             if (frame & 1) {
                 if (frame > last) {
                     frame = (last >> 1) + 1;
@@ -169,11 +169,11 @@ average:
 
 // Sets the texture matrix of a material in a result for the data at idx, at a frame: the scale, rotation and
 // translation are kept only if they are not the identity, which is flagged otherwise
-static void getTexSrtAnmResult_(const NNSG3dResTexSrtAnm *anm, u32 idx, u32 frame, NNSG3dMatAnmResult *result) {
-    const NNSG3dResTexSrtAnmData *data = NNS_G3dGetResDataByIdx(&anm->dict, idx);
+static void GetTexSRTAnm_(const NNSG3dResTexSRTAnm *anm, u32 idx, u32 frame, NNSG3dMatAnmResult *result) {
+    const NNSG3dResDictTexSRTAnmData *data = NNS_G3dGetResDataByIdx(&anm->dict, idx);
     u32 flag = result->flag;
-    fx32 transS = getTexSrtData_(anm, data->transS.info, data->transS.offset, frame);
-    fx32 transT = getTexSrtData_(anm, data->transT.info, data->transT.offset, frame);
+    fx32 transS = GetTexSRTAnmVectorVal_(anm, data->transS.info, data->transS.offset, frame);
+    fx32 transT = GetTexSRTAnmVectorVal_(anm, data->transT.info, data->transT.offset, frame);
     u32 rot;
     fx32 scaleS;
     fx32 scaleT;
@@ -186,7 +186,7 @@ static void getTexSrtAnmResult_(const NNSG3dResTexSrtAnm *anm, u32 idx, u32 fram
         result->transT = transT;
     }
 
-    rot = getTexSrtRotData_(anm, data->rot.info, data->rot.offset, frame);
+    rot = GetTexSRTAnmSinCosVal_(anm, data->rot.info, data->rot.offset, frame);
     if (rot == NNS_G3D_SRTANM_ROT_ZERO) {
         flag |= NNS_G3D_MATANM_RESULTFLAG_TEXMTX_ROTZERO;
     } else {
@@ -195,8 +195,8 @@ static void getTexSrtAnmResult_(const NNSG3dResTexSrtAnm *anm, u32 idx, u32 fram
         flag &= ~NNS_G3D_MATANM_RESULTFLAG_TEXMTX_ROTZERO;
     }
 
-    scaleS = getTexSrtData_(anm, data->scaleS.info, data->scaleS.offset, frame);
-    scaleT = getTexSrtData_(anm, data->scaleT.info, data->scaleT.offset, frame);
+    scaleS = GetTexSRTAnmVectorVal_(anm, data->scaleS.info, data->scaleS.offset, frame);
+    scaleT = GetTexSRTAnmVectorVal_(anm, data->scaleT.info, data->scaleT.offset, frame);
     if (scaleS == FX32_ONE && scaleT == FX32_ONE) {
         flag |= NNS_G3D_MATANM_RESULTFLAG_TEXMTX_SCALEONE;
     } else {
@@ -207,15 +207,15 @@ static void getTexSrtAnmResult_(const NNSG3dResTexSrtAnm *anm, u32 idx, u32 fram
     result->flag = flag;
 }
 
-// Fills in an animation object for a texture SRT animation (NitroSystem's NNSi_G3dAnmObjInitNsBta, as recalled). It
-// applies the animation with NNS_G3dFuncAnmMatNsBta, and maps each material of the model to the data of the animation's
-// material of the same name, which is flagged as existing and holds the data's index
-void NNS_G3DAnimationInit_TA(NNSG3dAnmObj *anmObj, const void *anm, const NNSG3dResMdl *mdl) {
-    const NNSG3dResTexSrtAnm *srtAnm = anm;
+// Fills in an animation object for a texture SRT animation. It applies the animation with
+// NNS_G3dFuncAnmMatNsBtaDefault, and maps each material of the model to the data of the animation's material of the
+// same name, which is flagged as existing and holds the data's index
+void NNSi_G3dAnmObjInitNsBta(NNSG3dAnmObj *anmObj, void *anm, const NNSG3dResMdl *mdl) {
+    const NNSG3dResTexSRTAnm *srtAnm = anm;
     const NNSG3dResMat *mat = NNS_G3dGetMat(mdl);
     u32 i;
 
-    anmObj->funcAnm = (void *)NNS_G3dFuncAnmMatNsBta;
+    anmObj->funcAnm = (void *)NNS_G3dFuncAnmMatNsBtaDefault;
     anmObj->numMapData = mdl->info.numMat;
     MI_CpuClear16(anmObj->mapData, anmObj->numMapData * sizeof(u16));
     for (i = 0; i < srtAnm->dict.numEntry; i++) {
@@ -230,8 +230,8 @@ void NNS_G3DAnimationInit_TA(NNSG3dAnmObj *anmObj, const void *anm, const NNSG3d
 
 // The function of an animation object of a texture SRT animation: the material's texture matrix at the object's frame,
 // with the texture coordinates taken as they are (texture coordinate generation mode one)
-void NNS_G3DAnimationApply_TA(NNSG3dMatAnmResult *result, const NNSG3dAnmObj *anmObj, u32 dataIdx) {
-    getTexSrtAnmResult_(anmObj->resAnm, (u16)dataIdx, anmObj->frame >> FX32_SHIFT, result);
+void NNSi_G3dAnmCalcNsBta(NNSG3dMatAnmResult *result, const NNSG3dAnmObj *anmObj, u32 dataIdx) {
+    GetTexSRTAnm_(anmObj->resAnm, (u16)dataIdx, anmObj->frame >> FX32_SHIFT, result);
     result->prmTexImage = (result->prmTexImage & ~(3 << REG_G3_TEXIMAGE_PARAM_TGEN_SHIFT)) |
                           (GX_TEXGEN_TEXCOORD << REG_G3_TEXIMAGE_PARAM_TGEN_SHIFT);
     result->flag |= NNS_G3D_MATANM_RESULTFLAG_TEXMTX_SET;

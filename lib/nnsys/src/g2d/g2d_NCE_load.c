@@ -1,7 +1,8 @@
 #include "g2di_load.h"
 #include "nnsys/g2d.h"
 
-// NitroSystem's g2d_NCE_load.c: finds the cell bank in a loaded NCER file and turns its offsets into pointers in place
+// NitroSystem's cell bank loader, g2d_NOB_load.c in ntrtwl's reconstruction of NitroSystem, whose header is
+// g2d_NCE_load.h: finds the cell bank in a loaded NCER file and turns its offsets into pointers in place
 
 static void *GetPtrOamArrayHead_(const NNSG2dCellDataBank *bank);
 static void UnPackExtendedData_(NNSG2dUserExDataBlock *blk);
@@ -19,7 +20,7 @@ static void UnPackExtendedData_(NNSG2dUserExDataBlock *blk) {
 }
 
 BOOL NNS_G2dGetUnpackedCellBank(void *file, NNSG2dCellDataBank **cells) {
-    NNSG2dBinaryBlockHeader *blk = NNS_G2dFindBinaryBlock(file, NNS_G2D_BINBLK_SIG_CELLBANK);
+    NNSG2dBinaryBlockHeader *blk = NNS_G2dFindBinaryBlock(file, NNS_G2D_BLKSIG_CELLBANK);
 
     if (blk != NULL) {
         NNS_G2dUnpackNCE((NNSG2dCellDataBank *)(blk + 1));
@@ -44,26 +45,26 @@ void NNS_G2dUnpackNCE(NNSG2dCellDataBank *bank) {
     u16 i;
     void *oamArray;
 
-    NNSi_G2dUnpackOffset(bank->pCellDataArrayHead, bank);
+    NNS_G2D_UNPACK_OFFSET_PTR(bank->pCellDataArrayHead, bank);
     oamArray = GetPtrOamArrayHead_(bank);
     for (i = 0; i < bank->numCells; i++) {
         NNSG2dCellData *cell = (NNSG2dCellData *)NNS_G2dGetCellDataByIdx(bank, i);
 
-        NNSi_G2dUnpackOffset(cell->pOamAttrArray, oamArray);
+        NNS_G2D_UNPACK_OFFSET_PTR(cell->pOamAttrArray, oamArray);
     }
 
     if (bank->pVramTransferData != NULL) {
         NNSG2dVramTransferData *transfer;
 
-        NNSi_G2dUnpackOffset(bank->pVramTransferData, bank);
+        NNS_G2D_UNPACK_OFFSET_PTR(bank->pVramTransferData, bank);
         transfer = bank->pVramTransferData;
-        NNSi_G2dUnpackOffset(transfer->pCellTransferDataArray, transfer);
+        NNS_G2D_UNPACK_OFFSET_PTR(transfer->pCellTransferDataArray, transfer);
         // It stores the pointer back, though the field already holds it
         bank->pVramTransferData = transfer;
     }
 
     if (bank->pExtendedData != NULL) {
-        NNSi_G2dUnpackOffset(bank->pExtendedData, bank);
+        NNS_G2D_UNPACK_OFFSET_PTR(bank->pExtendedData, bank);
         UnPackExtendedData_(bank->pExtendedData);
     }
 }

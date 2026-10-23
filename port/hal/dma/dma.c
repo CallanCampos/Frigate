@@ -24,7 +24,7 @@
 // Requests the channel's interrupt for a callback the SDK entered for it, and takes it if it can be taken now
 static void EndWithInterrupt(u32 dmaNo, MIDmaCallback callback, void *arg) {
     OSi_EnterDmaCallback(dmaNo, callback, arg);
-    port_os_request_irq(1u << (OS_IE_DMA0_SHIFT + dmaNo));
+    port_os_request_irq(1u << (REG_OS_IE_D0_SHIFT + dmaNo));
     port_os_poll_irq();
 }
 

@@ -31,17 +31,17 @@ typedef struct DWCUtilMainMenu {
 static void DWCUtilMainMenu_WaitExitUtility(void);
 static void DWCUtilMainMenu_FadeInUtility(void);
 static void DWCUtilMainMenu_WaitFadeInUtility(void);
-static void DWCUtilMainMenu_LoadGraphics(void);
-static void DWCUtilMainMenu_FadeIn(void);
-static void DWCUtilMainMenu_WaitFadeIn(void);
-static void DWCUtilMainMenu_WaitButtons(void);
-static void DWCUtilMainMenu_Main(void);
-static void DWCUtilMainMenu_HandleInput(void);
-static void func_ov182_021ae990(void);
-static void DWCUtilMainMenu_HandleChoice(void);
+static void initGraphics(void);
+static void procInit(void);
+static void procInit1(void);
+static void procInit2(void);
+static void procScene(void);
+static void input(void);
+static void draw(void);
+static void button(void);
 static void DWCUtilMainMenu_DisableButtons(void);
-static void DWCUtilMainMenu_FadeOut(void);
-static void DWCUtilMainMenu_WaitFadeOut(void);
+static void endScene1(void);
+static void endScene2(void);
 static void DWCUtilMainMenu_MoveCursor(int direction);
 static void DWCUtilMainMenu_HighlightSelection(void);
 
@@ -58,39 +58,39 @@ static char *sMsgPaths[7] = {
 static DWCUtilMainMenu sMainMenu;
 
 void DWCUtilMainMenu_ExitUtility(void) {
-    DWCUtilFade_Start(DWC_UTIL_FADE_TO_WHITE, 1, DWC_UTIL_FADE_PLANES, 0x14);
-    DWCUtilFade_Start(DWC_UTIL_FADE_TO_WHITE, 0, DWC_UTIL_FADE_PLANES, 0x14);
-    DWCUtilMain_SetUpdate(DWCUtilMainMenu_WaitExitUtility);
+    DWCi_EFFlFade(DWC_UTIL_FADE_TO_WHITE, 1, DWC_UTIL_FADE_PLANES, 0x14);
+    DWCi_EFFlFade(DWC_UTIL_FADE_TO_WHITE, 0, DWC_UTIL_FADE_PLANES, 0x14);
+    DWCi_ChangeScene(DWCUtilMainMenu_WaitExitUtility);
 }
 
 static void DWCUtilMainMenu_WaitExitUtility(void) {
-    if (DWCUtilFade_IsActive(1) == 0 && DWCUtilFade_IsActive(0) == 0) {
-        DWCUtilTask_SetActive(0, 0);
-        DWCUtilTask_SetActive(1, 0);
+    if (DWCi_EFFlCheck(1) == 0 && DWCi_EFFlCheck(0) == 0) {
+        DWCi_TSKlOperate(0, 0);
+        DWCi_TSKlOperate(1, 0);
         DWCUtilCell_Unload(1);
         DWCUtilCell_Unload(0);
-        DWCUtilBgOverlay_Exit();
-        DWCUtilButtonSprites_Exit();
-        DWCUtilMsg_Close(gDWCUtilMsg);
-        DWCUtilMsg_Exit();
-        DWCUtilWifiSettings_Exit();
-        DWCUtilMain_Finish();
+        DWCi_HLlEnd();
+        DWCi_FOCUSlEnd();
+        DWCi_MSGlRelease(gDWCUtilMsg);
+        DWCi_MSGlEnd();
+        DWCi_SETTIGNlEnd();
+        DWCi_EndUtility();
     }
 }
 
 void DWCUtilMainMenu_InitUtility(void) {
-    DWCUtilWifiSettings_Init();
-    DWCUtilMsg_Init();
-    DWCUtilButtonSprites_Init();
-    DWCUtilBgOverlay_Init();
-    DWCUtilScreen_Reset();
-    if (DWCUtilMain_GetLanguage() == 1 && DWCUtilMain_HasFlag(2)) {
-        gDWCUtilMsg = DWCUtilMsg_Open("msg/usa.bmg.l");
+    DWCi_SETTIGNlInit();
+    DWCi_MSGlInit();
+    DWCi_FOCUSlInit();
+    DWCi_HLlInit();
+    DWCi_COMMENTlInit();
+    if (DWCi_Language() == 1 && DWCi_Flag(2)) {
+        gDWCUtilMsg = DWCi_MSGlRead("msg/usa.bmg.l");
     } else {
-        gDWCUtilMsg = DWCUtilMsg_Open(sMsgPaths[DWCUtilMain_GetLanguage()]);
+        gDWCUtilMsg = DWCi_MSGlRead(sMsgPaths[DWCi_Language()]);
     }
-    DWCUtilCell_Load(1, DWCUtilGfxResource_LocalizePath("char/jtMain.nce.l"));
-    DWCUtilCell_Load(0, DWCUtilGfxResource_LocalizePath("char/jbMain.nce.l"));
+    DWCUtilCell_Load(1, DWCi_Char("char/jtMain.nce.l"));
+    DWCUtilCell_Load(0, DWCi_Char("char/jbMain.nce.l"));
     DWCUtilGfxResource_Load("char/jtBgMain.ncg.l", GXS_LoadBG1Char);
     DWCUtilGfxResource_Load("char/jtBgMain.ncl.l", GXS_LoadBGPltt);
     DWCUtilGfxResource_Load("char/jtObjMain.ncg.l", GXS_LoadOBJ);
@@ -99,7 +99,7 @@ void DWCUtilMainMenu_InitUtility(void) {
     DWCUtilGfxResource_Load("char/jbBgStep1.ncl.l", GX_LoadBGPltt);
     DWCUtilGfxResource_Load("char/jbObjMain.ncg.l", GX_LoadOBJ);
     DWCUtilGfxResource_Load("char/ybObjMain.ncl.l", GX_LoadOBJPltt);
-    switch (DWCUtilMain_GetStartScreen()) {
+    switch (DWCi_Entry()) {
     case 0:
         DWCUtilGfxResource_Load("char/jtTop.nsc.l", GXS_LoadBG1Scr);
         break;
@@ -110,157 +110,157 @@ void DWCUtilMainMenu_InitUtility(void) {
     G2S_SetBG1Priority(3);
     G2_SetBG1Priority(3);
     G2_SetBG1Priority(3);
-    DWCUtilDisplay_ShowPlanes(1, GX_PLANEMASK_BG1);
-    DWCUtilDisplay_ShowPlanes(0, GX_PLANEMASK_BG1);
-    DWCUtilMain_SetUpdate(DWCUtilMainMenu_FadeInUtility);
+    DWCi_GXlInvisible(1, GX_PLANEMASK_BG1);
+    DWCi_GXlInvisible(0, GX_PLANEMASK_BG1);
+    DWCi_ChangeScene(DWCUtilMainMenu_FadeInUtility);
 }
 
 static void DWCUtilMainMenu_FadeInUtility(void) {
-    DWCUtilFade_Start(DWC_UTIL_FADE_FROM_WHITE, 1, GX_BLEND_PLANEMASK_BG1, 0x14);
-    DWCUtilFade_Start(DWC_UTIL_FADE_FROM_WHITE, 0, GX_BLEND_PLANEMASK_BG1, 0x14);
-    DWCUtilMain_SetUpdate(DWCUtilMainMenu_WaitFadeInUtility);
+    DWCi_EFFlFade(DWC_UTIL_FADE_FROM_WHITE, 1, GX_BLEND_PLANEMASK_BG1, 0x14);
+    DWCi_EFFlFade(DWC_UTIL_FADE_FROM_WHITE, 0, GX_BLEND_PLANEMASK_BG1, 0x14);
+    DWCi_ChangeScene(DWCUtilMainMenu_WaitFadeInUtility);
 }
 
 static void DWCUtilMainMenu_WaitFadeInUtility(void) {
-    if (DWCUtilFade_IsActive(1) == 0 && DWCUtilFade_IsActive(0) == 0) {
-        switch (DWCUtilMain_GetStartScreen()) {
+    if (DWCi_EFFlCheck(1) == 0 && DWCi_EFFlCheck(0) == 0) {
+        switch (DWCi_Entry()) {
         case 0:
-            DWCUtilMain_SetLayout(0, 1);
-            DWCUtilMain_SetUpdate(DWCUtilMainMenu_Init);
+            DWCi_SetParam_(0, 1);
+            DWCi_ChangeScene(DWCi_SceneMenu);
             break;
         case 1:
-            DWCUtilMain_SetLayout(1, 1);
-            DWCUtilMain_SetUpdate(DWCUtilScreenAp_Init);
+            DWCi_SetParam_(1, 1);
+            DWCi_ChangeScene(DWCUtilScreenAp_Init);
             break;
         }
     }
 }
 
-void DWCUtilMainMenu_Init(void) {
-    DWCUtilMainMenu_LoadGraphics();
-    DWCUtilBgOverlay_Show(0);
-    DWCUtilScreen_Start(0x2e, -1, 0);
-    DWCUtilSubScreen_LoadScreen(4);
-    DWCUtilButtonSprites_ShowFour(sCursorRects[sMainMenu.selection][0], sCursorRects[sMainMenu.selection][2],
-                                  sCursorRects[sMainMenu.selection][1], sCursorRects[sMainMenu.selection][3]);
-    DWCUtilMain_SetUpdate(DWCUtilMainMenu_FadeIn);
+void DWCi_SceneMenu(void) {
+    initGraphics();
+    DWCi_HLlLoad(0);
+    DWCi_COMMENTlDispEx(0x2e, -1, 0);
+    DWCi_STEPlChangeScr(4);
+    DWCi_FOCUSlDisp4(sCursorRects[sMainMenu.selection][0], sCursorRects[sMainMenu.selection][2],
+                     sCursorRects[sMainMenu.selection][1], sCursorRects[sMainMenu.selection][3]);
+    DWCi_ChangeScene(procInit);
 }
 
-static void DWCUtilMainMenu_LoadGraphics(void) {
+static void initGraphics(void) {
     char palettePath[] = "char/ybBgStep11.ncl.l";
 
     DWCUtilGfxResource_Load("char/jbBgStep1.ncg.l", GX_LoadBG2Char);
     DWCUtilGfxResource_Load("char/jbBgStep1.ncl.l", GX_LoadBGPltt);
     DWCUtilGfxResource_Load("char/jb2Menu.nsc.l", GX_LoadBG2Scr);
-    sMainMenu.palette = DWCUtilRomResource_LoadFile(DWCUtilGfxResource_LocalizePath(palettePath), NULL, 4);
+    sMainMenu.palette = DWCUtilRomResource_LoadFile(DWCi_Char(palettePath), NULL, 4);
     G2S_SetBG0Priority(3);
     G2S_SetBG1Priority(3);
     G2_SetBG1Priority(3);
     G2_SetBG2Priority(3);
 }
 
-static void DWCUtilMainMenu_FadeIn(void) {
-    DWCUtilFade_Start(DWC_UTIL_FADE_FROM_WHITE, 1, GX_BLEND_PLANEMASK_BG0, 8);
-    DWCUtilFade_Start(DWC_UTIL_FADE_FROM_WHITE, 0, GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ, 8);
-    DWCUtilDisplay_ShowPlanes(1, GX_PLANEMASK_BG0);
-    DWCUtilDisplay_ShowPlanes(0, GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
-    DWCUtilMain_SetUpdate(DWCUtilMainMenu_WaitFadeIn);
+static void procInit(void) {
+    DWCi_EFFlFade(DWC_UTIL_FADE_FROM_WHITE, 1, GX_BLEND_PLANEMASK_BG0, 8);
+    DWCi_EFFlFade(DWC_UTIL_FADE_FROM_WHITE, 0, GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ, 8);
+    DWCi_GXlInvisible(1, GX_PLANEMASK_BG0);
+    DWCi_GXlInvisible(0, GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
+    DWCi_ChangeScene(procInit1);
 }
 
-static void DWCUtilMainMenu_WaitFadeIn(void) {
-    if (DWCUtilFade_IsActive(1) == 0 && DWCUtilFade_IsActive(0) == 0) {
-        DWCUtilGfxResource_ShowButtons(0);
-        DWCUtilMain_SetUpdate(DWCUtilMainMenu_WaitButtons);
+static void procInit1(void) {
+    if (DWCi_EFFlCheck(1) == 0 && DWCi_EFFlCheck(0) == 0) {
+        DWCi_CMNlButton(0);
+        DWCi_ChangeScene(procInit2);
     }
 }
 
-static void DWCUtilMainMenu_WaitButtons(void) {
-    if (DWCUtilUiObject_GetState() != -2) {
-        DWCUtilUiObject_Enable();
-        DWCUtilMain_SetUpdate(DWCUtilMainMenu_Main);
+static void procInit2(void) {
+    if (DWCi_BTNlGet() != -2) {
+        DWCi_BTNlEnable();
+        DWCi_ChangeScene(procScene);
     }
 }
 
-static void DWCUtilMainMenu_Main(void) {
-    DWCUtilMainMenu_HandleInput();
-    func_ov182_021ae990();
-    DWCUtilMainMenu_HandleChoice();
+static void procScene(void) {
+    input();
+    draw();
+    button();
 }
 
-static void DWCUtilMainMenu_HandleInput(void) {
+static void input(void) {
     u32 i;
 
     for (i = 0; i < 2; i++) {
-        if (DWCUtilTouch_IsTriggeredIn(sButtonRects[i])) {
-            DWCUtilUiObject_SetStateIfIdle(1);
+        if (DWCi_TPlCheckTrigger(sButtonRects[i])) {
+            DWCi_BTNlSet(1);
             sMainMenu.selection = i;
-            DWCUtilButtonSprites_ShowFour(sCursorRects[sMainMenu.selection][0], sCursorRects[sMainMenu.selection][2],
-                                          sCursorRects[sMainMenu.selection][1], sCursorRects[sMainMenu.selection][3]);
+            DWCi_FOCUSlDisp4(sCursorRects[sMainMenu.selection][0], sCursorRects[sMainMenu.selection][2],
+                             sCursorRects[sMainMenu.selection][1], sCursorRects[sMainMenu.selection][3]);
             return;
         }
     }
-    if (DWCUtilTouch_IsKeyPressed(1)) {
-        DWCUtilUiObject_SetStateIfIdle(1);
-    } else if (DWCUtilTouch_IsKeyPressed(2)) {
-        DWCUtilUiObject_SetStateIfIdle(0);
-    } else if (DWCUtilTouch_IsKeyRepeated(0x40)) {
+    if (DWCi_IPTlCheckTrigger(1)) {
+        DWCi_BTNlSet(1);
+    } else if (DWCi_IPTlCheckTrigger(2)) {
+        DWCi_BTNlSet(0);
+    } else if (DWCi_IPTlCheckRepeat(0x40)) {
         DWCUtilMainMenu_MoveCursor(1);
-    } else if (DWCUtilTouch_IsKeyRepeated(0x80)) {
+    } else if (DWCi_IPTlCheckRepeat(0x80)) {
         DWCUtilMainMenu_MoveCursor(3);
-    } else if (DWCUtilTouch_IsKeyRepeated(0x20)) {
+    } else if (DWCi_IPTlCheckRepeat(0x20)) {
         DWCUtilMainMenu_MoveCursor(0);
-    } else if (DWCUtilTouch_IsKeyRepeated(0x10)) {
+    } else if (DWCi_IPTlCheckRepeat(0x10)) {
         DWCUtilMainMenu_MoveCursor(2);
     }
 }
 
-static void func_ov182_021ae990(void) {
+static void draw(void) {
 }
 
-static void DWCUtilMainMenu_HandleChoice(void) {
-    switch (DWCUtilUiObject_GetState()) {
+static void button(void) {
+    switch (DWCi_BTNlGet()) {
     case 0:
         DWCUtilSound_PlaySe(7);
-        DWCUtilMain_SetUpdate(DWCUtilMainMenu_ExitUtility);
+        DWCi_ChangeScene(DWCUtilMainMenu_ExitUtility);
         break;
     case 1:
         DWCUtilSound_PlaySe(6);
         DWCUtilMainMenu_HighlightSelection();
-        DWCUtilMain_SetUpdate(DWCUtilMainMenu_DisableButtons);
+        DWCi_ChangeScene(DWCUtilMainMenu_DisableButtons);
         break;
     }
 }
 
 static void DWCUtilMainMenu_DisableButtons(void) {
-    DWCUtilUiObject_Disable();
-    DWCUtilFade_StartWait(8);
-    DWCUtilMain_SetUpdate(DWCUtilMainMenu_FadeOut);
+    DWCi_BTNlDisable();
+    DWCi_EFFlWait(8);
+    DWCi_ChangeScene(endScene1);
 }
 
-static void DWCUtilMainMenu_FadeOut(void) {
-    if (DWCUtilFade_IsActive(1) == 0) {
-        DWCUtilFade_Start(DWC_UTIL_FADE_TO_WHITE, 1, GX_BLEND_PLANEMASK_BG0, 8);
-        DWCUtilFade_Start(DWC_UTIL_FADE_TO_WHITE, 0,
-                          GX_BLEND_PLANEMASK_BG1 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ, 8);
-        DWCUtilMain_SetUpdate(DWCUtilMainMenu_WaitFadeOut);
+static void endScene1(void) {
+    if (DWCi_EFFlCheck(1) == 0) {
+        DWCi_EFFlFade(DWC_UTIL_FADE_TO_WHITE, 1, GX_BLEND_PLANEMASK_BG0, 8);
+        DWCi_EFFlFade(DWC_UTIL_FADE_TO_WHITE, 0,
+                      GX_BLEND_PLANEMASK_BG1 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ, 8);
+        DWCi_ChangeScene(endScene2);
     }
 }
 
-static void DWCUtilMainMenu_WaitFadeOut(void) {
-    if (DWCUtilFade_IsActive(1) == 0 && DWCUtilFade_IsActive(0) == 0) {
-        DWCUtilButtonSprites_Hide();
-        DWCUtilScreen_Stop();
-        DWCUtilRomResource_FreeFile(sMainMenu.palette);
+static void endScene2(void) {
+    if (DWCi_EFFlCheck(1) == 0 && DWCi_EFFlCheck(0) == 0) {
+        DWCi_FOCUSlDelete();
+        DWCi_COMMENTlDelete();
+        DWCi_ARClRelease(sMainMenu.palette);
         DWCUtilDisplay_HidePlanes(1, GX_PLANEMASK_BG0);
         DWCUtilDisplay_HidePlanes(0, GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
         switch (sMainMenu.selection) {
         case 0:
-            DWCUtilMain_SetLayout(1, 0);
-            DWCUtilMain_SetUpdate(DWCUtilScreenAp_Init);
+            DWCi_SetParam_(1, 0);
+            DWCi_ChangeScene(DWCUtilScreenAp_Init);
             break;
         case 1:
-            DWCUtilMain_SetLayout(0, 0);
-            DWCUtilMain_SetUpdate(DWCUtilOptionMenu_Init);
+            DWCi_SetParam_(0, 0);
+            DWCi_ChangeScene(DWCUtilOptionMenu_Init);
             break;
         }
     }
@@ -271,8 +271,8 @@ static void DWCUtilMainMenu_MoveCursor(int direction) {
     if (direction != 1 && direction != 3) {
         sMainMenu.selection ^= 1;
         DWCUtilSound_PlaySe(8);
-        DWCUtilButtonSprites_ShowFour(sCursorRects[sMainMenu.selection][0], sCursorRects[sMainMenu.selection][2],
-                                      sCursorRects[sMainMenu.selection][1], sCursorRects[sMainMenu.selection][3]);
+        DWCi_FOCUSlDisp4(sCursorRects[sMainMenu.selection][0], sCursorRects[sMainMenu.selection][2],
+                         sCursorRects[sMainMenu.selection][1], sCursorRects[sMainMenu.selection][3]);
     }
 }
 
@@ -280,5 +280,5 @@ static void DWCUtilMainMenu_MoveCursor(int direction) {
 static void DWCUtilMainMenu_HighlightSelection(void) {
     u8 rows[2] = { 1, 2 };
 
-    DWCUtilBgBuffer_LoadPaletteRow(sMainMenu.palette, rows[sMainMenu.selection], rows[sMainMenu.selection]);
+    DWCi_SCREENlCopyPalette(sMainMenu.palette, rows[sMainMenu.selection], rows[sMainMenu.selection]);
 }

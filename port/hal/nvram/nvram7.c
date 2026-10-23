@@ -28,7 +28,7 @@
 
 // The user settings keep the DS's layout on the host: the firmware's bytes are copied as they are
 _Static_assert(offsetof(NVRAMConfig, owner) == 0x02, "NVRAMConfig.owner");
-_Static_assert(offsetof(NVRAMConfig, touch) == 0x58, "NVRAMConfig.touch");
+_Static_assert(offsetof(NVRAMConfig, tp) == 0x58, "NVRAMConfig.tp");
 _Static_assert(offsetof(NVRAMConfig, rtcOffset) == 0x68, "NVRAMConfig.rtcOffset");
 _Static_assert(offsetof(NVRAMConfig, unk_70) == 0x70, "NVRAMConfig.unk_70");
 _Static_assert(offsetof(NVRAMConfig, macAddress) == 0x74, "NVRAMConfig.macAddress");
@@ -130,7 +130,7 @@ void port_nvram7_fill_user_info(NVRAMConfig *config) {
         config->owner.comment[i] = i < sSettings.commentLength ? sSettings.comment[i] : 0;
     }
     config->owner.commentLength = sSettings.commentLength;
-    port_tp7_calibration(&config->touch);
+    port_tp7_calibration(&config->tp);
     config->language = sSettings.language & 7;
     config->unk_64_3 = USER_SETTINGS_FLAGS_DONE >> 3;
     config->unk_66 = USER_SETTINGS_DATE_YEAR;

@@ -19,6 +19,6 @@ void port_ctrdg7_start(void) {
     CTRDGModuleInfo *info = CTRDG_MODULE_INFO;
 
     memset(info, 0, sizeof(*info));
-    info->romCheck = CTRDG_EMPTY_ROM_CHECK;
+    info->moduleID = CTRDG_EMPTY_ROM_CHECK;
     port_pxi_register_service(PXI_FIFO_TAG_CTRDG, CtrdgService);
 }

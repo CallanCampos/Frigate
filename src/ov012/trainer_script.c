@@ -38,11 +38,11 @@ BOOL isTrainerScrIdDoublePair2(u32 scriptId) {
 }
 
 BOOL isDoubleBattle(u32 trainerId) {
-    return TrainerData_GetParam(trainerId, 2) == 1;
+    return TrainerData_GetParam(trainerId, TRAINER_PARAM_BATTLE_STYLE) == 1;
 }
 
 u8 getBattleType(u16 trainerId) {
-    return TrainerData_GetParam(trainerId, 2);
+    return TrainerData_GetParam(trainerId, TRAINER_PARAM_BATTLE_STYLE);
 }
 
 BOOL TrainerFlagGet(EventWork *eventWork, u16 trainerId) {

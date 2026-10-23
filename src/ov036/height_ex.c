@@ -25,10 +25,10 @@ typedef struct HeightExEntry {
     s32 flags;
 } HeightExEntry;
 
-typedef struct HeightExList {
+struct HeightExList {
     s32 count;
     HeightExEntry *entries;
-} HeightExList;
+};
 
 GameEventReturnCode func_ov036_021ba6dc(GameEvent *event, u32 *state, void *data);
 u32 func_ov036_021ba684(void *a0);
@@ -67,9 +67,7 @@ void func_ov036_021ba624(u8 index, u32 x, u32 z, u32 width, u32 depth, u32 value
     }
 }
 
-void func_ov036_021ba670(void *listPtr) {
-    HeightExList *list = listPtr;
-
+void func_ov036_021ba670(HeightExList *list) {
     GFL_HeapFree(list->entries);
     GFL_HeapFree(list);
 }
@@ -78,30 +76,22 @@ u32 func_ov036_021ba684(void *a0) {
     return *(u32 *)a0;
 }
 
-BOOL func_ov036_021ba688(s32 x, s32 z, void *listPtr, u8 index) {
-    HeightExList *list = listPtr;
-
+BOOL func_ov036_021ba688(s32 x, s32 z, HeightExList *list, u8 index) {
     if (func_ov036_021ba594(x, z, &list->entries[index])) {
         return TRUE;
     }
     return FALSE;
 }
 
-u32 func_ov036_021ba6a4(u8 index, void *listPtr) {
-    HeightExList *list = listPtr;
-
+u32 func_ov036_021ba6a4(u8 index, HeightExList *list) {
     return list->entries[index].value;
 }
 
-u32 func_ov036_021ba6b0(u8 index, void *listPtr) {
-    HeightExList *list = listPtr;
-
+u32 func_ov036_021ba6b0(u8 index, HeightExList *list) {
     return list->entries[index].flags;
 }
 
-void func_ov036_021ba6bc(u8 index, BOOL inUse, void *listPtr) {
-    HeightExList *list = listPtr;
-
+void func_ov036_021ba6bc(u8 index, BOOL inUse, HeightExList *list) {
     list->entries[index].inUse = inUse;
 }
 

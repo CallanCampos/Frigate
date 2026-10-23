@@ -11,11 +11,11 @@
 // The message file of the utility's language, which the first screen opens (dwc_util_main_menu.c)
 extern DWCUtilMsg *gDWCUtilMsg;
 
-void DWCUtilConnection_Start(void);
-void DWCUtilConnection_Stop(void);
+void DWCi_RAKUlInit(void);
+void DWCi_RAKUlEnd(void);
 // 0 while the test works, 1 and 2 at its two steps, 3 once it connected with a WEP key or none, 4 when it failed, 5
 // when it connected otherwise
-int DWCUtilConnection_GetState(void);
-void DWCUtilConnection_SaveResult(void);
+int DWCi_RAKUlGetState(void);
+void DWCi_RAKUlSetResult(void);
 
 #endif // POKEBW2_DWCUTIL_DWC_UTIL_CONNECTION_H

@@ -53,8 +53,8 @@ void DWCRapCommon_SetSubHeapEx(u32 name, u32 size, u32 minSize, HeapID heapId) {
     pDwcRapWork->headHandleSub =
         NNS_FndCreateExpHeapEx((void *)(((uptr)pDwcRapWork->heapPtrSub + 0x1f) & ~0x1f), size - 0xc0, 0);
     pDwcRapWork->subName = name;
-    NNS_FndSetExpHeapFitMode(pDwcRapWork->headHandleSub, 1);
-    NNS_FndSetExpHeapGroup(pDwcRapWork->headHandleSub, 0xea);
+    NNS_FndSetAllocModeForExpHeap(pDwcRapWork->headHandleSub, 1);
+    NNS_FndSetGroupIDForExpHeap(pDwcRapWork->headHandleSub, 0xea);
     pDwcRapWork->subMinSize = minSize;
 }
 
@@ -87,7 +87,7 @@ void DWCRapCommon_SetSubHeapOwner(HeapID heapId) {
     pDwcRapWork->subHeapId = heapId;
 }
 
-void *DWCRapCommon_Alloc(u32 name, u32 size, int align) {
+void *DWCRapCommon_Alloc(DWCAllocType name, u32 size, int align) {
     void *ptr;
     u32 mask;
 
@@ -110,11 +110,11 @@ void *DWCRapCommon_Alloc(u32 name, u32 size, int align) {
     return ptr;
 }
 
-void DWCRapCommon_Free(u32 name, void *ptr, u32 size) {
+void DWCRapCommon_Free(DWCAllocType name, void *ptr, u32 size) {
     u32 mask;
 
     if (ptr != NULL) {
-        if (NNS_FndGetExpHeapBlockGroup(ptr) == 0xea) {
+        if (NNS_FndGetGroupIDForMBlockExpHeap(ptr) == 0xea) {
             if (pDwcRapWork->headHandleSub != NULL) {
                 mask = OS_DisableInterrupts();
                 NNS_FndFreeToExpHeap(pDwcRapWork->headHandleSub, ptr);

@@ -259,13 +259,13 @@ static BOOL BuildCharacter(G2dBuild *build, const u8 *at, NNSG2dCharacterData *c
     if (!Read(build, at, &file, sizeof(file), "NNSG2dCharacterData")) {
         return FALSE;
     }
-    character->height = file.height;
-    character->width = file.width;
-    character->pixelFormat = file.pixelFormat;
+    character->H = file.height;
+    character->W = file.width;
+    character->pixelFmt = file.pixelFormat;
     character->mappingType = file.mappingType;
-    character->characterFormat = file.characterFormat;
-    character->size = file.size;
-    character->rawData = Rel(at, file.rawData);
+    character->characterFmt = file.characterFormat;
+    character->szByte = file.size;
+    character->pRawData = Rel(at, file.rawData);
     return TRUE;
 }
 
@@ -276,10 +276,10 @@ static BOOL BuildPalette(G2dBuild *build, const u8 *at, NNSG2dPaletteData *palet
     if (!Read(build, at, &file, sizeof(file), "NNSG2dPaletteData")) {
         return FALSE;
     }
-    palette->format = file.format;
-    palette->extendedPalette = file.extendedPalette;
-    palette->size = file.size;
-    palette->rawData = Rel(at, file.rawData);
+    palette->fmt = file.format;
+    palette->bExtendedPlt = file.extendedPalette;
+    palette->szByte = file.size;
+    palette->pRawData = Rel(at, file.rawData);
     return TRUE;
 }
 
@@ -291,8 +291,8 @@ static BOOL BuildPaletteCompressInfo(G2dBuild *build, const u8 *at, NNSG2dPalett
         return FALSE;
     }
     info->numPalette = file.numPalette;
-    info->pad = file.pad;
-    info->paletteIndexTable = Rel(at, file.paletteIndexTable);
+    info->pad16 = file.pad;
+    info->pPlttIdxTbl = Rel(at, file.paletteIndexTable);
     return TRUE;
 }
 
@@ -323,7 +323,7 @@ static BOOL BuildUserExCellAttrBank(G2dBuild *build, const u8 *at, NNSG2dUserExC
 
 // The user extended data of a cell or multi-cell bank, which NNS_G2dUnpackNCE and NNS_G2dUnpackNMC take for cell
 // attributes whatever its ID (UnPackExtendedData_): the header as it is, then the attribute bank
-static BOOL BuildUserExCellAttrBlock(G2dBuild *build, const u8 *at, NNSG2dUserExDataBlock **dest) {
+static BOOL BuildUserExCellAttrBlock(G2dBuild *build, const u8 *at, void **dest) {
     UserExCellAttrBlock *block = Alloc(build, sizeof(UserExCellAttrBlock));
 
     if (!Read(build, at, &block->header, sizeof(block->header), "NNSG2dUserExDataBlock")) {
@@ -416,11 +416,11 @@ static BOOL BuildMultiCellBank(G2dBuild *build, const u8 *at, NNSG2dMultiCellDat
         return FALSE;
     }
     bank->numMultiCellData = file.numMultiCellData;
-    bank->pad = file.pad;
+    bank->pad16 = file.pad;
     bank->pStringBank = Unrelocated(file.pStringBank);
     cellArray = Rel(at, file.pMultiCellDataArray);
     hierarchy = Rel(at, file.pHierarchyDataArray);
-    bank->pHierarchyDataArray = hierarchy;
+    bank->pHierarchyDataArray = (NNSG2dMultiCellHierarchyData *)hierarchy;
 
     cells = Alloc(build, file.numMultiCellData * sizeof(NNSG2dMultiCellData));
     for (u16 i = 0; i < file.numMultiCellData; i++) {
@@ -454,13 +454,13 @@ static NNSG2dAnimFrameData *BuildFrames(G2dBuild *build, const u8 *frames, u16 n
         }
         hostFrames[i].pContent = Rel(animData, frame.pContent);
         hostFrames[i].frames = frame.frames;
-        hostFrames[i].pad = frame.pad;
+        hostFrames[i].pad16 = frame.pad;
     }
     return hostFrames;
 }
 
 // The user extended attributes of an animation bank's sequences and frames, all from the attribute bank
-static BOOL BuildUserExAnimAttrBlock(G2dBuild *build, const u8 *at, NNSG2dUserExDataBlock **dest) {
+static BOOL BuildUserExAnimAttrBlock(G2dBuild *build, const u8 *at, void **dest) {
     UserExAnimAttrBlock *block = Alloc(build, sizeof(UserExAnimAttrBlock));
     const u8 *attrAt = at + sizeof(NNSG2dUserExDataBlock);
     PortG2dFileUserExAnimAttrBank file;
@@ -486,7 +486,7 @@ static BOOL BuildUserExAnimAttrBlock(G2dBuild *build, const u8 *at, NNSG2dUserEx
             return FALSE;
         }
         seqAttrs[i].numFrames = seqAttr.numFrames;
-        seqAttrs[i].pad = seqAttr.pad;
+        seqAttrs[i].pad16 = seqAttr.pad;
         seqAttrs[i].pAttr = Rel(attrAt, seqAttr.pAttr);
         frameAttrArray = Rel(attrAt, seqAttr.pAnmFrmAttrArray);
         frameAttrs = Alloc(build, seqAttr.numFrames * sizeof(NNSG2dUserExAnimFrameAttr));
@@ -532,7 +532,7 @@ static BOOL BuildAnimBank(G2dBuild *build, const u8 *at, NNSG2dAnimBankData *ban
     seqArray = Rel(at, file.pSequenceArrayHead);
     frameArray = Rel(at, file.pFrameArray);
     animData = Rel(at, file.pAnimationData);
-    bank->pAnimationData = animData;
+    bank->pAnimContents = animData;
 
     // The bank's frames, their contents kept as offsets until a sequence reaches them
     frames = Alloc(build, file.numTotalFrames * sizeof(NNSG2dAnimFrameData));
@@ -552,9 +552,9 @@ static BOOL BuildAnimBank(G2dBuild *build, const u8 *at, NNSG2dAnimBankData *ban
         contents[k] = frame.pContent;
         frames[k].pContent = Unrelocated(frame.pContent);
         frames[k].frames = frame.frames;
-        frames[k].pad = frame.pad;
+        frames[k].pad16 = frame.pad;
     }
-    bank->pFrameArray = frames;
+    bank->pFrameArrayHead = frames;
 
     sequences = Alloc(build, file.numSequences * sizeof(NNSG2dAnimSequence));
     for (u16 i = 0; i < file.numSequences; i++) {
@@ -747,7 +747,7 @@ static BOOL BuildFont(G2dBuild *build, const u8 *header, PortG2dFont *font) {
     }
     // The nodes first, so that the pointers can find them whichever block comes first
     blk = header + file.headerSize;
-    for (int i = 0; i < file.numBlocks; i++) {
+    for (int i = 0; i < file.dataBlocks; i++) {
         NNSG2dBinaryBlockHeader blockHeader;
 
         if (!Read(build, blk, &blockHeader, sizeof(blockHeader), "NNSG2dBinaryBlockHeader")) {
@@ -920,7 +920,7 @@ static void *UnpackOrStop(PortRelocKind kind, const void *file, size_t fileSize,
 // g2d_NCG_load.c
 
 BOOL NNS_G2dGetUnpackedCharacterData(void *file, NNSG2dCharacterData **character) {
-    NNSG2dBinaryBlockHeader *blk = NNS_G2dFindBinaryBlock(file, NNS_G2D_BINBLK_SIG_CHARDATA);
+    NNSG2dBinaryBlockHeader *blk = NNS_G2dFindBinaryBlock(file, NNS_G2D_BINBLK_SIG_CHARACTERDATA);
 
     if (blk != NULL) {
         *character = UnpackOrStop(PORT_RELOC_G2D_CHARACTER, file, FileSize(file), blk + 1, __func__);
@@ -935,7 +935,7 @@ void NNS_G2dUnpackNCG(NNSG2dCharacterData *character) {
 }
 
 BOOL NNS_G2dGetUnpackedBGCharacterData(void *file, NNSG2dCharacterData **character) {
-    NNSG2dBinaryBlockHeader *blk = NNS_G2dFindBinaryBlock(file, NNS_G2D_BINBLK_SIG_CHARDATA);
+    NNSG2dBinaryBlockHeader *blk = NNS_G2dFindBinaryBlock(file, NNS_G2D_BINBLK_SIG_CHARACTERDATA);
 
     if (blk != NULL) {
         *character = UnpackOrStop(PORT_RELOC_G2D_CHARACTER, file, FileSize(file), blk + 1, __func__);
@@ -963,7 +963,7 @@ BOOL NNS_G2dGetUnpackedPaletteData(void *file, NNSG2dPaletteData **palette) {
 }
 
 BOOL NNS_G2dGetUnpackedPaletteCompressInfo(void *file, NNSG2dPaletteCompressInfo **info) {
-    NNSG2dBinaryBlockHeader *blk = NNS_G2dFindBinaryBlock(file, NNS_G2D_BINBLK_SIG_PALETTECOMPRESSINFO);
+    NNSG2dBinaryBlockHeader *blk = NNS_G2dFindBinaryBlock(file, NNS_G2D_BINBLK_SIG_PALETTECOMPINFO);
 
     if (blk != NULL) {
         *info = UnpackOrStop(PORT_RELOC_G2D_PALETTE_CMP, file, FileSize(file), blk + 1, __func__);
@@ -984,7 +984,7 @@ void NNS_G2dUnpackNCL(NNSG2dPaletteData *palette) {
 // g2d_NCE_load.c
 
 BOOL NNS_G2dGetUnpackedCellBank(void *file, NNSG2dCellDataBank **cells) {
-    NNSG2dBinaryBlockHeader *blk = NNS_G2dFindBinaryBlock(file, NNS_G2D_BINBLK_SIG_CELLBANK);
+    NNSG2dBinaryBlockHeader *blk = NNS_G2dFindBinaryBlock(file, NNS_G2D_BLKSIG_CELLBANK);
 
     if (blk != NULL) {
         *cells = UnpackOrStop(PORT_RELOC_G2D_CELL_BANK, file, FileSize(file), blk + 1, __func__);
@@ -1001,7 +1001,7 @@ void NNS_G2dUnpackNCE(NNSG2dCellDataBank *bank) {
 // g2d_NMC_load.c
 
 BOOL NNS_G2dGetUnpackedMultiCellBank(void *file, NNSG2dMultiCellDataBank **cells) {
-    NNSG2dBinaryBlockHeader *blk = NNS_G2dFindBinaryBlock(file, NNS_G2D_BINBLK_SIG_MULTICELLBANK);
+    NNSG2dBinaryBlockHeader *blk = NNS_G2dFindBinaryBlock(file, NNS_G2D_BLKSIG_MULTICELLBANK);
 
     if (blk != NULL) {
         *cells = UnpackOrStop(PORT_RELOC_G2D_MULTICELL, file, FileSize(file), blk + 1, __func__);
@@ -1018,7 +1018,7 @@ void NNS_G2dUnpackNMC(NNSG2dMultiCellDataBank *bank) {
 // g2d_NAN_load.c: an NMAR file's bank is an NANR file's, under the same block kind
 
 static BOOL GetUnpackedAnimBank(void *file, NNSG2dAnimBankData **anims, const char *function) {
-    NNSG2dBinaryBlockHeader *blk = NNS_G2dFindBinaryBlock(file, NNS_G2D_BINBLK_SIG_ANIMBANK);
+    NNSG2dBinaryBlockHeader *blk = NNS_G2dFindBinaryBlock(file, NNS_G2D_BLKSIG_ANIMBANK);
 
     if (blk != NULL) {
         *anims = UnpackOrStop(PORT_RELOC_G2D_ANIM_BANK, file, FileSize(file), blk + 1, function);

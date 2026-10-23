@@ -228,7 +228,7 @@ WifiBattleMatchRes *WifiBattleMatchRes_Create(ClActUnit *unit, u32 kind, HeapID 
     res->res[RES_CHARS + CLACT_VRAM_SUB] = ClActSys_LoadChars(arc, 3, FALSE, CLACT_VRAM_SUB, HEAPID_TAIL(heapId));
     res->res[RES_CELLS + CLACT_VRAM_SUB] = ClActSys_LoadCellAnims(arc, 4, 11, HEAPID_TAIL(heapId));
     file = GFL_G2DIOReadNCLRArc(arc, 0, &palette, heapId);
-    rawData = palette->rawData;
+    rawData = palette->pRawData;
     MI_CpuCopy8(rawData, res->colorsA, sizeof(res->colorsA));
     MI_CpuCopy8(rawData + 0x120, res->colorsB, sizeof(res->colorsB));
     GFL_HeapFree(file);
@@ -1035,7 +1035,7 @@ static void WifiBattleMatchView_LiveCardWindows(WifiBattleMatchCard *card, const
 
 static BOOL WifiBattleMatchView_CardFlush(WifiBattleMatchCard *card, PrintQueue *printQueue) {
     BOOL done = TRUE;
-    u32 i;
+    unsigned int i;
 
     for (i = 0; i < card->windowCount; i++) {
         if (card->windows[i] != NULL) {

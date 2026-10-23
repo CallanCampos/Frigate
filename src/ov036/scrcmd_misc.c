@@ -4,6 +4,7 @@
 // .rodata. scrcmd_misc.c is descriptive. Function names from swan (https://github.com/ds-pokemon-hacking/swan,
 // GPL-3.0). Anville train names and collector group names are our descriptive names from the scripts and resources.
 #include "types.h"
+#include "constants/directions.h"
 #include "field/castelia_rush.h"
 #include "field/ev_time.h"
 #include "field/event_mapchange.h"
@@ -22,6 +23,7 @@
 #include "save/trainer_log.h"
 #include "system/game_data.h"
 #include "system/game_system.h"
+#include "system/str_tool.h"
 #include "system/vm.h"
 #include "system/wordset.h"
 
@@ -44,13 +46,19 @@ typedef struct {
 
 // The groups bought by the collectors, identified by their price lists and script dialogue.
 // The last three table slots also use the gourmet price list.
-typedef enum {
-    ITEM_COLLECTOR_GOURMET = 0,
-    ITEM_COLLECTOR_MINERALS = 1,
-    ITEM_COLLECTOR_TREASURES = 2,
-    ITEM_COLLECTOR_RARE_BONES = 3,
-    ITEM_COLLECTOR_MULCH = 4,
-} ItemCollectorGroup;
+enum {
+    ITEM_COLLECTOR_GOURMET,
+    ITEM_COLLECTOR_MINERALS,
+    ITEM_COLLECTOR_TREASURES,
+    ITEM_COLLECTOR_RARE_BONES,
+    ITEM_COLLECTOR_MULCH,
+};
+
+// The Anville trains: the ordinary ones that the last digit of the day picks, then the one of the special dates
+enum {
+    ANVILLE_TRAIN_SPECIAL = 10,
+    ANVILLE_TRAIN_MAX,
+};
 
 // What an item collector pays for an item
 typedef struct {
@@ -82,7 +90,7 @@ static const u16 ANVILLE_SPECIAL_TRAIN_DATES[5] = { 0x0a01, 0x0a0e, 0x0c1e, 0x02
 static const u8 ANVILLE_TRAIN_INDICES_BY_DAY_DIGIT[10] = { 9, 1, 3, 5, 4, 2, 6, 8, 0, 7 };
 
 // The field prop model for each Anville train index; index 0 uses the same model as index 1.
-static const u16 ANVILLE_TRAIN_MODEL_IDS[11] = { 117, 117, 118, 133, 248, 249, 250, 251, 252, 253, 254 };
+static const u16 ANVILLE_TRAIN_MODEL_IDS[ANVILLE_TRAIN_MAX] = { 117, 117, 118, 133, 248, 249, 250, 251, 252, 253, 254 };
 
 BOOL s0134_CasteliaRushInit(VM *vm, FieldScriptEnv *env) {
     ScriptFieldWork *fieldWork = ScriptWork_GetFieldWork(FieldScriptEnv_GetScriptWork(env));
@@ -201,7 +209,7 @@ BOOL s01C2_ElevatorChangeMap(VM *vm, FieldScriptEnv *env) {
         pos.x = GRID_TO_FX32(x);
         pos.y = GRID_TO_FX32(y);
         pos.z = GRID_TO_FX32(z);
-        ScriptWork_CallEvent(work, EventMapChange_CreateGridDefault(gsys, field, zoneId, &pos, 1));
+        ScriptWork_CallEvent(work, EventMapChange_CreateGridDefault(gsys, field, zoneId, &pos, DIR_DOWN));
     }
     return TRUE;
 }
@@ -214,7 +222,7 @@ BOOL s01FC_ItemCollectorGetPrice(VM *vm, FieldScriptEnv *env) {
     ScriptFieldWork *fieldWork = ScriptWork_GetFieldWork(FieldScriptEnv_GetScriptWork(env));
     HeapID heapId = Field_GetHeapID(fieldWork->field);
     u16 item = ScriptReadAny(vm, env);
-    ItemCollectorGroup group = (ItemCollectorGroup)ScriptReadAny(vm, env);
+    u16 group = ScriptReadAny(vm, env);
     u16 *result = ScriptReadVar(vm, env);
 
     prices = GFL_ArcSysReadHeapNewLZGetLen(ARC_ITEM_COLLECTOR, ITEM_COLLECTOR_FILES[group], FALSE, HEAPID_TAIL(heapId),
@@ -241,7 +249,7 @@ BOOL s01FB_ItemCollectorCheckGroup(VM *vm, FieldScriptEnv *env) {
     GameData *gameData = FieldScriptEnv_GetGameData(env);
     ScriptFieldWork *fieldWork = ScriptWork_GetFieldWork(work);
     HeapID heapId = Field_GetHeapID(fieldWork->field);
-    ItemCollectorGroup group = (ItemCollectorGroup)ScriptReadAny(vm, env);
+    u16 group = ScriptReadAny(vm, env);
     u16 *result = ScriptReadVar(vm, env);
 
     bag = GameData_GetBag(gameData);
@@ -267,7 +275,7 @@ BOOL s0236_WordSetLoadItemCollectorPrice(VM *vm, FieldScriptEnv *env) {
     ScriptFieldWork *fieldWork = ScriptWork_GetFieldWork(work);
     HeapID heapId = Field_GetHeapID(fieldWork->field);
     u16 item = ScriptReadAny(vm, env);
-    ItemCollectorGroup group = (ItemCollectorGroup)ScriptReadAny(vm, env);
+    u16 group = ScriptReadAny(vm, env);
     u16 wordIndex = ScriptReadAny(vm, env);
     u16 digits = ScriptReadAny(vm, env);
     WordSet *wordSet = ScriptWork_GetWordSet(work);
@@ -277,7 +285,7 @@ BOOL s0236_WordSetLoadItemCollectorPrice(VM *vm, FieldScriptEnv *env) {
     size /= sizeof(ItemCollectorPrice);
     for (i = 0; i < size; i++) {
         if (item == prices[i].item) {
-            WordSetNumber(wordSet, wordIndex, prices[i].price, digits, 0, TRUE);
+            WordSetNumber(wordSet, wordIndex, prices[i].price, digits, NUM_PAD_NONE, TRUE);
             break;
         }
     }
@@ -293,7 +301,7 @@ BOOL s0237_ItemCollectorSell(VM *vm, FieldScriptEnv *env) {
     ScriptFieldWork *fieldWork = ScriptWork_GetFieldWork(FieldScriptEnv_GetScriptWork(env));
     HeapID heapId = Field_GetHeapID(fieldWork->field);
     u16 item = ScriptReadAny(vm, env);
-    ItemCollectorGroup group = (ItemCollectorGroup)ScriptReadAny(vm, env);
+    u16 group = ScriptReadAny(vm, env);
 
     gameData = FieldScriptEnv_GetGameData(env);
     GameData_GetPlayerState(gameData);
@@ -315,7 +323,7 @@ BOOL s0221_AnvilleTrainGetModelID(VM *vm, FieldScriptEnv *env) {
     u16 index = ScriptReadAny(vm, env);
     u16 *result = ScriptReadVar(vm, env);
 
-    if (index >= 11) {
+    if (index >= ANVILLE_TRAIN_MAX) {
         index = 0;
     }
     *result = ANVILLE_TRAIN_MODEL_IDS[index];
@@ -326,7 +334,7 @@ static BOOL AnvilleTrain_IsSpecialDate(u32 month, u32 day) {
     u32 i;
     u16 date = (month << 8) | day;
 
-    for (i = 0; i < 5; i++) {
+    for (i = 0; i < NELEMS(ANVILLE_SPECIAL_TRAIN_DATES); i++) {
         if (date == ANVILLE_SPECIAL_TRAIN_DATES[i]) {
             return TRUE;
         }
@@ -343,7 +351,7 @@ BOOL s0222_AnvilleTrainGetDailyIndex(VM *vm, FieldScriptEnv *env) {
     u16 value;
 
     if (AnvilleTrain_IsSpecialDate(month, day) == TRUE) {
-        value = 10;
+        value = ANVILLE_TRAIN_SPECIAL;
     } else {
         value = ANVILLE_TRAIN_INDICES_BY_DAY_DIGIT[day % 10];
     }

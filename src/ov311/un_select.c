@@ -348,7 +348,7 @@ static void UnSelect_LoadBG(UnSelectWork *wk, HeapID heapId) {
     for (i = 0; i < UN_SELECT_FLOOR_COUNT; i++) {
         // Each floor is two rows of pixels, four floors to a tile
         int floor = UN_SELECT_FLOOR_COUNT - 1 - i;
-        u8 *chars = i < 50 ? upperChars->rawData : lowerChars->rawData;
+        u8 *chars = i < 50 ? upperChars->pRawData : lowerChars->pRawData;
 
         if (!wk->visited[i]) {
             u8 tile = floor / 4;
@@ -366,9 +366,9 @@ static void UnSelect_LoadBG(UnSelectWork *wk, HeapID heapId) {
             chars[pos + 7] = 0xff;
         }
     }
-    GFL_BGSysLoadChar(7, upperChars->rawData, upperChars->size, 0);
+    GFL_BGSysLoadChar(7, upperChars->pRawData, upperChars->szByte, 0);
     GFL_HeapFree(upperData);
-    GFL_BGSysLoadChar(3, lowerChars->rawData, lowerChars->size, 0);
+    GFL_BGSysLoadChar(3, lowerChars->pRawData, lowerChars->szByte, 0);
     GFL_HeapFree(lowerData);
     GFL_ArcToolFree(arc);
 }
@@ -681,8 +681,8 @@ static UnSelectWork *UnSelect_Setup(GameProc *proc, UnSelectParam *param) {
         wk->visitorFloors[i] =
             param->visitorCountries[i] != 0 ? UnSelect_FindCountry(param->visitorCountries[i]) : UN_SELECT_NO_FLOOR;
     }
-    GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, -16);
-    GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, -16);
+    GX_SetMasterBrightness(-16);
+    GXS_SetMasterBrightness(-16);
     wk->graphic = UnSelectGraphic_Create(0, wk->heapId);
     wk->scene = UIScene_Create(wk->heapId, sUnSelectSteps, UN_SELECT_STEP_COUNT, UN_SELECT_STEP_LIST, wk);
     UnSelect_LoadBG(wk, wk->heapId);

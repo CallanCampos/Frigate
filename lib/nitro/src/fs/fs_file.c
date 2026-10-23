@@ -1,6 +1,6 @@
-// NitroSDK's file system (libfs): the functions of a file, which send its commands to its archive. The file name is a
-// guess from NitroSDK's own layout (fs_file.c); no string in the ROM names it. The functions have NitroSDK's names
-// where they are known.
+// NitroSDK's file system (libfs): the functions of a file, which send its commands to its archive. The file name is
+// NitroSDK's (fs_file.c, as ntrtwl's reconstruction of NitroSDK has it); no string in the ROM names it. The functions
+// have NitroSDK's names where they are known.
 
 #include "nitro/fs.h"
 #include "nitro/os.h"
@@ -18,7 +18,7 @@ void FS_InitFile(FSFile *file) {
 
 // NitroSDK's FS_CancelFile: asks the file's archive to stop the command running on it
 void FS_CancelFile(FSFile *file) {
-    u32 interrupts = OS_DisableInterrupts();
+    OSIntrMode interrupts = OS_DisableInterrupts();
 
     if (FS_IsBusy(file)) {
         file->stat |= FS_FILE_STATUS_CANCEL;
@@ -54,7 +54,7 @@ BOOL FS_ConvertPathToFileID(FSFileID *fileId, const char *path) {
 }
 
 // NitroSDK's FS_OpenFileDirect: opens a file that is a range of an archive's data
-BOOL FS_OpenFileDirect(FSFile *file, FSArchive *archive, u32 start, u32 end, int fileId) {
+BOOL FS_OpenFileDirect(FSFile *file, FSArchive *archive, u32 start, u32 end, u32 fileId) {
     FSOpenFileDirectArgs args;
 
     file->arc = archive;
@@ -141,7 +141,7 @@ u32 FS_GetFilePosition(FSFile *file) {
     return position;
 }
 
-BOOL FS_SeekFile(FSFile *file, s32 offset, int whence) {
+BOOL FS_SeekFile(FSFile *file, s32 offset, FSSeekFileMode whence) {
     FSSeekFileArgs args;
 
     file->argument = &args;

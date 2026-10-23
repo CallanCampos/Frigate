@@ -46,6 +46,14 @@ enum {
     DWCRAP_STATE_ENDED,
 };
 
+// How the match was started, in the work's matchType: with anybody (a query or a key), as the server of a friends'
+// match, or as a friend joining one
+enum {
+    DWCRAP_MATCH_ANYBODY,
+    DWCRAP_MATCH_SERVER,
+    DWCRAP_MATCH_FRIEND,
+};
+
 // The work of the connection, 0x7ac bytes
 typedef struct {
     // The packet that is being sent: its header, and what follows
@@ -130,21 +138,21 @@ static BOOL DWCRap_AttemptCallback(void *param);
 static void DWCRap_MatchFailed(void);
 static BOOL DWCRap_SendAck(const void *data, int size);
 static void DWCRap_FlushAck(void);
-static void DWCRap_LoginCallback(int error);
+static void DWCRap_LoginCallback(DWCError error, int profileId, void *param);
 static void DWCRap_TimeoutCallback(u8 aid, void *param);
-static void DWCRap_UpdateServersCallback(int error);
+static void DWCRap_UpdateServersCallback(DWCError error, BOOL isChanged, void *param);
 static void DWCRap_FriendStatusCallback(int index, u8 status, const char *location, void *param);
 static void DWCRap_DeleteFriendCallback(int deleteIndex, int srcIndex, void *param);
 static void DWCRap_BuddyCallback(int index, void *param);
 static void DWCRap_ResetIdleFrames(void);
 static void DWCRap_SetRecvTimeouts(void);
 static void DWCRap_OnMatched(int index);
-static void DWCRap_MatchedCallback(int error, BOOL cancel, BOOL a2, BOOL a3, int index, void *param);
+static void DWCRap_MatchedCallback(DWCError error, BOOL cancel, BOOL a2, BOOL a3, int index, void *param);
 static int DWCRap_EvalCallback(int index, void *param);
 static void DWCRap_SendCallback(int size, u8 aid, void *param);
 static void DWCRap_SetPeerVctReady(u32 header);
 static void DWCRap_RecvCallback(u8 aid, u8 *data, int size, void *param);
-static void DWCRap_ClosedCallback(int error, BOOL a1, BOOL a2, u8 aid, int index, void *param);
+static void DWCRap_ClosedCallback(DWCError error, BOOL a1, BOOL a2, u8 aid, int index, void *param);
 static u32 DWCRap_HandleError(void);
 static BOOL DWCRap_CanPing(void);
 static BOOL DWCRap_SendIdlePing(int index);
@@ -152,8 +160,8 @@ static u32 DWCRap_Update(void);
 static void DWCRap_VctEndCallback(void);
 static void DWCRap_StartVct(HeapID heapId);
 static void DWCRap_UpdateFriendStatus(void);
-static void DWCRap_AnybodyMatchedCallback(int error, BOOL cancel, BOOL a2, BOOL a3, int index, void *param);
-static void DWCRap_FriendMatchedCallback(int error, BOOL cancel, BOOL a2, BOOL a3, int index, void *param);
+static void DWCRap_AnybodyMatchedCallback(DWCError error, BOOL cancel, BOOL a2, BOOL a3, int index, void *param);
+static void DWCRap_FriendMatchedCallback(DWCError error, BOOL cancel, BOOL a2, BOOL a3, int index, void *param);
 static void DWCRap_ConnectedCallback(int index, void *param);
 static void DWCRap_FreeRecvBuffer(int aid);
 static void DWCRap_AllocRecvBuffer(int aid);
@@ -197,12 +205,12 @@ int DWCRap_Init(void *userData, DWCFriendData *friendList) {
         _dWork->friendStatus[i] = 0;
     }
     if (!DWC_CheckHasProfile(_dWork->userData)) {
-        return 1;
+        return DWCRAP_INIT_NO_PROFILE;
     }
     if (!DWC_CheckValidConsole(_dWork->userData)) {
-        return 2;
+        return DWCRAP_INIT_INVALID_CONSOLE;
     }
-    return 0;
+    return DWCRAP_INIT_OK;
 }
 
 static void DWCRap_Delete(void) {
@@ -334,7 +342,7 @@ BOOL DWCRap_StartMatch(const char *key, int numEntry, BOOL a2, int a3) {
                              DWCRap_AttemptCallback, &_dWork->connectResult, GFL_NetGetWork())) {
         return FALSE;
     }
-    _dWork->matchType = 0;
+    _dWork->matchType = DWCRAP_MATCH_ANYBODY;
     DWC_SetUserSendCallback(DWCRap_SendCallback, 0);
     DWC_SetUserRecvCallback(DWCRap_RecvCallback, 0);
     DWC_SetConnectionClosedCallback(DWCRap_ClosedCallback, 0);
@@ -344,7 +352,7 @@ BOOL DWCRap_StartMatch(const char *key, int numEntry, BOOL a2, int a3) {
     return TRUE;
 }
 
-BOOL DWCRap_StartMatchQuery(const char *query, int numEntry, DWCEvalFunc evalFunc, void *evalWork) {
+BOOL DWCRap_StartMatchQuery(const char *query, int numEntry, DWCEvalPlayerCallback evalFunc, void *evalWork) {
     int i;
 
     GFL_ASSERT(_dWork != NULL);
@@ -361,7 +369,7 @@ BOOL DWCRap_StartMatchQuery(const char *query, int numEntry, DWCEvalFunc evalFun
                              evalFunc, evalWork, NULL, NULL, NULL)) {
         return FALSE;
     }
-    _dWork->matchType = 0;
+    _dWork->matchType = DWCRAP_MATCH_ANYBODY;
     DWC_SetUserSendCallback(DWCRap_SendCallback, 0);
     DWC_SetUserRecvCallback(DWCRap_RecvCallback, 0);
     DWC_SetConnectionClosedCallback(DWCRap_ClosedCallback, 0);
@@ -397,7 +405,8 @@ int DWCRap_Process(int a0) {
         if (a0 != 0) {
             DWCRap_SetState(DWCRAP_STATE_MATCH_CANCEL);
         }
-        if (_dWork->matchType == 2 && _dWork->friendIndex >= 0 && _dWork->friendStatus[_dWork->friendIndex] != 6) {
+        if (_dWork->matchType == DWCRAP_MATCH_FRIEND && _dWork->friendIndex >= 0 &&
+            _dWork->friendStatus[_dWork->friendIndex] != 6) {
             DWCRap_SetState(DWCRAP_STATE_MATCH_FAILED);
         }
         break;
@@ -502,7 +511,7 @@ static void DWCRap_FlushAck(void) {
     }
 }
 
-static void DWCRap_LoginCallback(int error) {
+static void DWCRap_LoginCallback(DWCError error, int profileId, void *param) {
     if (DWC_CheckDirtyFlag(_dWork->userData)) {
         DWC_ClearDirtyFlag(_dWork->userData);
         _dWork->userDataDirty = 1;
@@ -524,7 +533,7 @@ static void DWCRap_TimeoutCallback(u8 aid, void *param) {
     }
 }
 
-static void DWCRap_UpdateServersCallback(int error) {
+static void DWCRap_UpdateServersCallback(DWCError error, BOOL isChanged, void *param) {
     if (error == 0) {
         DWCRap_SetState(DWCRAP_STATE_READY);
     } else {
@@ -580,7 +589,7 @@ static void DWCRap_OnMatched(int index) {
     DWCRap_SetRecvTimeouts();
 }
 
-static void DWCRap_MatchedCallback(int error, BOOL cancel, BOOL a2, BOOL a3, int index, void *param) {
+static void DWCRap_MatchedCallback(DWCError error, BOOL cancel, BOOL a2, BOOL a3, int index, void *param) {
     if (error == 0) {
         if (cancel == 0) {
             DWCRap_OnMatched(index);
@@ -647,7 +656,7 @@ static void DWCRap_RecvCallback(u8 aid, u8 *data, int size, void *param) {
 }
 // clang-format on
 
-static void DWCRap_ClosedCallback(int error, BOOL a1, BOOL a2, u8 aid, int index, void *param) {
+static void DWCRap_ClosedCallback(DWCError error, BOOL a1, BOOL a2, u8 aid, int index, void *param) {
     if (aid < DWCRAP_NETID_MAX) {
         _dWork->sending = 0;
         _dWork->retryCount = 0;
@@ -682,8 +691,8 @@ static void DWCRap_ClosedCallback(int error, BOOL a1, BOOL a2, u8 aid, int index
 // Asks the library about its error and the game's functions what to do about it, and returns the error's kind
 static u32 DWCRap_HandleError(void) {
     int code;
-    int type;
-    int error;
+    DWCErrorType type;
+    DWCError error;
     u32 result = 0;
 
     error = DWC_GetLastErrorEx(&code, &type);
@@ -695,17 +704,17 @@ static u32 DWCRap_HandleError(void) {
             _dWork->errorFunc(_dWork->errorWork, code, type, error);
         }
         result = code;
-        if (code == 0 || type == 1) {
+        if (code == 0 || type == DWC_ETYPE_LIGHT) {
             result = error;
         }
         switch (type) {
-        case 1:
+        case DWC_ETYPE_LIGHT:
             DWC_ClearError();
             if (_dWork != NULL && _dWork->state == DWCRAP_STATE_ERROR) {
                 DWCRap_SetState(DWCRAP_STATE_READY);
             }
             break;
-        case 2:
+        case DWC_ETYPE_SHOW_ERROR:
             if (code <= -40000 && code >= -41999) {
                 Gdb_Shutdown();
             }
@@ -713,16 +722,16 @@ static u32 DWCRap_HandleError(void) {
                 DWCRap_SetState(DWCRAP_STATE_READY);
             }
             break;
-        case 4:
+        case DWC_ETYPE_SHUTDOWN_GHTTP:
             if (code <= -40000 && code >= -41999) {
                 Gdb_Shutdown();
             }
             break;
-        case 5:
+        case DWC_ETYPE_SHUTDOWN_ND:
             DWC_NdCleanupAsync();
             break;
-        case 3:
-        case 6:
+        case DWC_ETYPE_SHUTDOWN_FM:
+        case DWC_ETYPE_DISCONNECT:
             if (_dWork != NULL) {
                 switch (_dWork->state) {
                 case DWCRAP_STATE_LOGIN:
@@ -754,7 +763,7 @@ static u32 DWCRap_HandleError(void) {
                 }
             }
             break;
-        case 7:
+        case DWC_ETYPE_FATAL:
             if (_dWork != NULL) {
                 DWCRap_SetState(DWCRAP_STATE_KICKED);
                 if (_dWork->kickFunc != NULL) {
@@ -1026,19 +1035,19 @@ int DWCRap_GetErrorKind(int code, int type) {
         return 12;
     }
     switch (type) {
-    case 0:
-    case 1:
+    case DWC_ETYPE_NO_ERROR:
+    case DWC_ETYPE_LIGHT:
         return 14;
-    case 2:
-    case 3:
-    case 4:
-    case 5:
-    case 6:
+    case DWC_ETYPE_SHOW_ERROR:
+    case DWC_ETYPE_SHUTDOWN_FM:
+    case DWC_ETYPE_SHUTDOWN_GHTTP:
+    case DWC_ETYPE_SHUTDOWN_ND:
+    case DWC_ETYPE_DISCONNECT:
         return 11;
     default:
         GFL_ASSERT(0);
         break;
-    case 7:
+    case DWC_ETYPE_FATAL:
         return 15;
     }
     return -1;
@@ -1047,7 +1056,7 @@ int DWCRap_GetErrorKind(int code, int type) {
 
 BOOL DWCRap_RequestClose(BOOL a0) {
     int code;
-    int type;
+    DWCErrorType type;
 
     if (DWC_GetLastErrorEx(&code, &type)) {
         DWC_ClearError();
@@ -1166,12 +1175,12 @@ int DWCRap_Connect(int friendIndex, int numEntry, BOOL a2) {
     if (friendIndex < 0) {
         ok = DWC_SetupGameServer(2, entries, DWCRap_AnybodyMatchedCallback, GFL_NetGetWork(), DWCRap_ConnectedCallback,
                                  GFL_NetGetWork(), DWCRap_AttemptCallback, &_dWork->connectResult, GFL_NetGetWork());
-        matchType = 1;
+        matchType = DWCRAP_MATCH_SERVER;
     } else {
         ok = DWC_ConnectToGameServerAsync(2, friendIndex, DWCRap_FriendMatchedCallback, NULL, DWCRap_ConnectedCallback,
                                           GFL_NetGetWork(), DWCRap_AttemptCallback, &_dWork->connectResult,
                                           GFL_NetGetWork());
-        matchType = 2;
+        matchType = DWCRAP_MATCH_FRIEND;
     }
     _dWork->matchType = matchType;
     if (!ok) {
@@ -1201,7 +1210,7 @@ int DWCRap_GetFriendIndex(void) {
     return -1;
 }
 
-static void DWCRap_AnybodyMatchedCallback(int error, BOOL cancel, BOOL a2, BOOL a3, int index, void *param) {
+static void DWCRap_AnybodyMatchedCallback(DWCError error, BOOL cancel, BOOL a2, BOOL a3, int index, void *param) {
     BOOL failed = FALSE;
 
     _dWork->matchingBusy = 0;
@@ -1234,7 +1243,7 @@ static void DWCRap_AnybodyMatchedCallback(int error, BOOL cancel, BOOL a2, BOOL 
     }
 }
 
-static void DWCRap_FriendMatchedCallback(int error, BOOL cancel, BOOL a2, BOOL a3, int index, void *param) {
+static void DWCRap_FriendMatchedCallback(DWCError error, BOOL cancel, BOOL a2, BOOL a3, int index, void *param) {
     _dWork->matchingBusy = 0;
     if (error == 0 && cancel == 0) {
         DWCRap_OnMatched(index);

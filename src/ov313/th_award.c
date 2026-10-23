@@ -214,7 +214,7 @@ static BOOL ThAward_Init(GameProc *proc, u32 *state, void *param, void *work) {
     GXS_SetVisibleWnd(GX_WNDMASK_NONE);
     GXS_DispOn();
     GFL_BGSysDisableAllB();
-    GXS_SetGraphicsMode(0);
+    GXS_SetGraphicsMode(GX_BGMODE_0);
     GFL_BGSysDisableBGsB();
     for (i = 0; i < NELEMS(sThAwardSubBGSetups); i++) {
         GFL_BGSysCreateBG(sThAwardSubBGSetups[i].bg, &sThAwardSubBGSetups[i].setup, sThAwardSubBGSetups[i].mode);

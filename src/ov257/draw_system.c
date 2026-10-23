@@ -253,10 +253,9 @@ static void DrawSystem_DrawLine(DrawSystem *sys, u16 *screen, int x0, int x1, u1
     const DrawPen *penData = &sDrawPens[pen];
     int dx;
     int dy;
-    // The SDK's fx32 and s32 are long, which stores the corner's copies for the loop after the loop's guard
-    long stepX, stepY;
-    long offsetX, offsetY;
-    long i;
+    fx32 stepX, stepY;
+    fx32 offsetX, offsetY;
+    s32 i;
     u8 edgeX, edgeY;
     u8 edges;
     u8 row, col;

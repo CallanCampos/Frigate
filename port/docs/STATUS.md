@@ -2,7 +2,7 @@
 
 Where the port stands, newest entry first. A session adds an entry after each local sync with
 `port/tools/sync_upstream.sh` and each finished task ([PLAN.md §8](PLAN.md#8-how-each-development-iteration-runs)), in
-the same commit as the work it records; the hourly `port-sync` Action's merges get no entry of their own
+the same commit as the work it records; a proposed hourly `port-sync` PR gets no completed-sync entry
 ([SYNC.md](SYNC.md)). The plan of record is [PLAN.md](PLAN.md); every change outside `port/` is in
 [game-changes.md](game-changes.md).
 
@@ -25,6 +25,41 @@ level that doesn't exist yet says "not yet"; no field is left out.
 | Work done | What changed, with ADRs and game changes by number |
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
+
+## 2026-10-22: prepared upstream SDK sync (validation pending)
+
+- **Upstream:** `03674114ea10e60bfd4434366ea5866c90a1dbc6`, a bounded proposal of 108 commits after
+  `fc478a9ee5`. This entry records preparation; the sync has not merged into Frigate main.
+- **Port:** `PORT_SHA`, topic `codex/upstream-sync-resolve`, based on `a3df47254b`.
+- **ROM:** T0 pending; both-version full build is running in `/tmp/frigate-sync-rom.log`. No checksum or decomp
+  configuration was changed to accommodate the port.
+- **Host build:** T1 passes on macOS arm64 for Black 2 (`build/port`) and White 2 (`build/port-w2`), with
+  `/tmp/frigate-sync-host6.log` and `/tmp/frigate-sync-host-w2.log` recording the final builds. Final rebuild and
+  exact-head local attestation remain required before merge.
+- **Tests:** the NNS serialized-layout regression passes. The first Black 2 non-timing suite was interrupted while
+  concurrent builds saturated the machine; four routes expired their 30-second watchdog while hashing the ROM,
+  before game startup. Their serial rerun and both complete non-timing suites remain pending. No gameplay pass is
+  claimed from that interrupted run. Full optional T4, T5 routes and T7 were not run.
+- **Tiers:** per version, a 37,546 functions (+396), b 3,472 (-396), c zero. Code bytes: Black 2 a 3,435,848,
+  White 2 a 3,435,936 (+66,714 each), and b 414,418 (-66,714 each). Excluded veneers remain 2,384; included SDK
+  assembly definitions are 225 (+1). No-build evidence: `/tmp/frigate-sync-progress/{b2_us,w2_us}/functions.tsv`.
+  Source coverage does not establish native gameplay readiness.
+- **Trap stubs:** unchanged: 31 function traps and 22 data placeholders per version in the generated native sources.
+- **64-bit warnings:** final normalized all-TU measurement pending; native compiler warnings remain visible in the
+  build logs.
+- **Work done:** resolved 27 upstream merge conflicts and adopted SDK function, enum, member and prototype names in
+  the HAL and its regression tests. Native `u32`/`s32` remain 32-bit while MWCC keeps upstream's SDK `long` types.
+  Preserved pointer-wide callbacks, address arithmetic, sound handles, native heap extents and DS-layout checks.
+  Retired the obsolete RTC/misc-save long overrides, opaque SOC-option array override and duplicate trainer-card
+  parameter fix because upstream now supplies the correct shared types. Added a native implementation of the newly
+  recovered assembly thread-availability getter; DWC auth callbacks retain the native 32-bit ABI. The host-header
+  generator excludes upstream's new MSL `time.h`, leaving native libc in use. The byte-sized `MI_CpuFill8` follows
+  upstream's new prototype, widens before its high-half shift to avoid signed-promotion overflow, and gains a
+  high-bit byte regression; the separate word-valued `MI_CpuFill` retains its high-bit regression cases.
+- **Next:** finish ROM, MWCC-neutrality and native test verification; present the frozen sync PR for the owner's
+  review before any main merge.
+- **Blockers:** validation pending. No upstream rewrite, cross-repository commit references or workflow commits occur
+  in this proposal. No upstream post was made, and no change to the existing field-entry heap blocker is claimed.
 
 ## 2026-10-22: protected main and reviewed sync proposals
 

@@ -8,27 +8,6 @@
 #include "pml/personal.h"
 #include "pml/poke_party.h"
 
-#define LEARNSET_MAX 26
-#define LEARNSET_END 0xffff
-
-// A move a species learns at a level
-typedef struct {
-    u16 move;
-    u16 level;
-} LearnsetEntry;
-
-static inline BOOL LearnsetEntry_IsEnd(LearnsetEntry entry) {
-    return entry.move == LEARNSET_END && entry.level == LEARNSET_END;
-}
-
-static inline u16 LearnsetEntry_GetMove(LearnsetEntry entry) {
-    return entry.move;
-}
-
-static inline u16 LearnsetEntry_GetLevel(LearnsetEntry entry) {
-    return entry.level;
-}
-
 MoveReminderProcessData *MoveReminderProcessData_Create(HeapID heapId) {
     MoveReminderProcessData *data =
         GFL_HeapAllocate(heapId, sizeof(MoveReminderProcessData), FALSE, "waza_oshie.c", 35);

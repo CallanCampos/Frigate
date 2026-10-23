@@ -255,8 +255,8 @@ static void FieldTerrainSRTAnimatorChunkState_BindCore(FieldTerrainSRTAnimatorCh
         tex = NULL;
     }
     MI_CpuFill8(state->anmObj, 0, FIELD_TERRAIN_SRT_ANMOBJ_SIZE);
-    NNS_G3DAnimationCreate(state->anmObj, state->resAnm, mdl, tex);
-    NNS_G3DAnimationBind(renderObj, state->anmObj);
+    NNS_G3dAnmObjInit(state->anmObj, state->resAnm, mdl, tex);
+    NNS_G3dRenderObjAddAnmObj(renderObj, state->anmObj);
     state->used = TRUE;
 }
 
@@ -380,7 +380,7 @@ static void FieldTerrainTexPatAnimation_Update(FieldTerrainTexPatAnimation *anim
 
             if (value.textureIndex != animation->currentValues[i].textureIndex || animation->isLoaded) {
                 NNS_GfdRegisterNewVramTransferTask(
-                    0, animation->textureDestVRAMAddresses[i],
+                    NNS_GFD_DST_3D_TEX_VRAM, animation->textureDestVRAMAddresses[i],
                     FieldTerrainTexPatAnimation_GetTextureAddress(animation->privateTextures, value.textureIndex),
                     animation->textureSizes[i]);
             }

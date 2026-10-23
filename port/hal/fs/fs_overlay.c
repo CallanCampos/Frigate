@@ -75,7 +75,7 @@ void FSi_InitOverlay(void) {
 
 // NitroSDK's FSi_GetOverlayBinarySize: the size that an overlay's image has in the ROM, without its zeroed data
 u32 FSi_GetOverlayBinarySize(const FSOverlayInfo *info) {
-    if (info->flag & FS_OVERLAY_FLAG_COMPRESS) {
+    if (info->flag & FS_OVERLAY_FLAG_COMP) {
         return info->compressedSize;
     }
     return info->ramSize;
@@ -83,7 +83,7 @@ u32 FSi_GetOverlayBinarySize(const FSOverlayInfo *info) {
 
 // NitroSDK's FS_ClearOverlayImage: the DS invalidates the caches over the overlay's memory and clears its .bss; the
 // host clears the overlay's bss section
-void FS_ClearOverlayImage(const FSOverlayInfo *info) {
+void FS_ClearOverlayImage(FSOverlayInfo *info) {
     port_ovsec_clear_bss(info->id);
 }
 
@@ -123,23 +123,23 @@ BOOL FS_LoadOverlayInfo(FSOverlayInfo *info, MIProcessor target, u32 id) {
             }
         }
     } else {
-        const ROMHeaderRegion *region;
+        const CARDRomRegion *region;
 
         if (target == MI_PROCESSOR_ARM9) {
-            region = &CARD_GetOwnRomHeader()->arm9Overlay;
+            region = &CARD_GetOwnRomHeader()->main_ovt;
         } else {
-            region = &CARD_GetOwnRomHeader()->arm7Overlay;
+            region = &CARD_GetOwnRomHeader()->sub_ovt;
         }
-        if (offset < region->size) {
+        if (offset < region->length) {
             FSFile file;
 
             FS_InitFile(&file);
             // BUG: The end of the table is passed where the function takes a size, so the range of the file runs past
             // the table (only its first 0x20 bytes are read). Kept, as in the decomp's file
 #ifdef BUGFIX
-            if (romfs_fopen_raw(&file, region->offset + offset, region->size - offset)) {
+            if (FS_CreateFileFromRom(&file, region->offset + offset, region->length - offset)) {
 #else
-            if (romfs_fopen_raw(&file, region->offset + offset, region->offset + region->size)) {
+            if (FS_CreateFileFromRom(&file, region->offset + offset, region->offset + region->length)) {
 #endif
                 if (FS_ReadFile(&file, header, FS_OVERLAY_HEADER_SIZE) != FS_OVERLAY_HEADER_SIZE) {
                     FS_CloseFile(&file);
@@ -163,7 +163,7 @@ BOOL FS_LoadOverlayInfo(FSOverlayInfo *info, MIProcessor target, u32 id) {
 // NitroSDK's FS_LoadOverlayImage: where the DS reads the image into the overlay's memory, after clearing its .bss, the
 // host sets the overlay's statics back: its bss section cleared, its data section from the snapshot. The file is
 // opened as the DS opens it, and has to hold the image the DS would read
-BOOL FS_LoadOverlayImage(const FSOverlayInfo *info) {
+BOOL FS_LoadOverlayImage(FSOverlayInfo *info) {
     BOOL result = FALSE;
     FSFile file;
 
@@ -180,16 +180,16 @@ BOOL FS_LoadOverlayImage(const FSOverlayInfo *info) {
 }
 
 // NitroSDK's FS_StartOverlay: nothing to check, expand or initialize on the host (above)
-void FS_StartOverlay(const FSOverlayInfo *info) {
+void FS_StartOverlay(FSOverlayInfo *info) {
     (void)info;
 }
 
 // NitroSDK's FS_EndOverlay: no destructors to call on the host (above)
-void FS_EndOverlay(const FSOverlayInfo *info) {
+void FS_EndOverlay(FSOverlayInfo *info) {
     (void)info;
 }
 
-BOOL FS_UnloadOverlayImage(const FSOverlayInfo *info) {
+BOOL FS_UnloadOverlayImage(FSOverlayInfo *info) {
     FS_EndOverlay(info);
     return TRUE;
 }

@@ -93,8 +93,8 @@ static void TestMatrixStores(void) {
     MTX_Identity22_((MtxFx22 *)buffer.words);
     CheckMatrix("MTX_Identity22_", &buffer, identity22, 4);
     FillBuffer(&buffer);
-    MAT2_Scaling((MtxFx22 *)buffer.words, 0x7fffffff, -5);
-    CheckMatrix("MAT2_Scaling", &buffer, scaling22, 4);
+    MTX_Scale22_((MtxFx22 *)buffer.words, 0x7fffffff, -5);
+    CheckMatrix("MTX_Scale22_", &buffer, scaling22, 4);
     // The sine FX32_MIN negates to itself
     FillBuffer(&buffer);
     MTX_Rot22_((MtxFx22 *)buffer.words, -0x7fffffff - 1, 0xe00);
@@ -104,8 +104,8 @@ static void TestMatrixStores(void) {
     MTX_Identity33_((MtxFx33 *)buffer.words);
     CheckMatrix("MTX_Identity33_", &buffer, identity33, 9);
     FillBuffer(&buffer);
-    MAT3_Scaling((MtxFx33 *)buffer.words, 3, -4, 5);
-    CheckMatrix("MAT3_Scaling", &buffer, scaling33, 9);
+    MTX_Scale33_((MtxFx33 *)buffer.words, 3, -4, 5);
+    CheckMatrix("MTX_Scale33_", &buffer, scaling33, 9);
     // 30 degrees
     FillBuffer(&buffer);
     MTX_RotX33_((MtxFx33 *)buffer.words, 0x800, 0xddb);
@@ -151,8 +151,8 @@ static void TestMatrixCopies(void) {
     }
 
     FillBuffer(&buffer);
-    MAT3_To4x4((const MtxFx33 *)source.words, (MtxFx44 *)buffer.words);
-    CheckMatrix("MAT3_To4x4", &buffer, to4x4, 16);
+    MTX_Copy33To44_((const MtxFx33 *)source.words, (MtxFx44 *)buffer.words);
+    CheckMatrix("MTX_Copy33To44_", &buffer, to4x4, 16);
     FillBuffer(&buffer);
     MTX_Copy43To44_((const MtxFx43 *)source.words, (MtxFx44 *)buffer.words);
     CheckMatrix("MTX_Copy43To44_", &buffer, copy43To44, 16);
@@ -161,8 +161,8 @@ static void TestMatrixCopies(void) {
     CheckMatrix("MTX_Copy44To43_", &buffer, copy44To43, 12);
 
     buffer = source;
-    MAT3_To4x4((const MtxFx33 *)buffer.words, (MtxFx44 *)buffer.words);
-    CheckMatrix("MAT3_To4x4 in place", &buffer, to4x4InPlace, 16);
+    MTX_Copy33To44_((const MtxFx33 *)buffer.words, (MtxFx44 *)buffer.words);
+    CheckMatrix("MTX_Copy33To44_ in place", &buffer, to4x4InPlace, 16);
     buffer = source;
     MTX_Copy43To44_((const MtxFx43 *)buffer.words, (MtxFx44 *)buffer.words);
     CheckMatrix("MTX_Copy43To44_ in place", &buffer, copy43To44InPlace, 16);

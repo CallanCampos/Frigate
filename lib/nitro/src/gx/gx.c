@@ -6,11 +6,12 @@
 #include "nitro/os.h"
 #include "nitro/pm.h"
 
-// Whether the main engine's display is on, and the mode it shows when it is turned on again (swan's names)
-static u16 g_GfxEngineAEnabled = TRUE;
+// Whether the main engine's display is on, and the mode it shows when it is turned on again (swan's
+// g_GfxEngineAEnabled and g_GfxEngineAMode)
+static u16 sIsDispOn = TRUE;
 u32 GXi_DmaId = GX_DEFAULT_DMAID;
 u16 GXi_VRamLockId;
-static u16 g_GfxEngineAMode;
+static u16 sDispMode;
 
 void GX_Init(void) {
     reg_GX_POWCNT |= REG_GX_POWCNT_DSEL_MASK;
@@ -53,7 +54,7 @@ void GX_Init(void) {
     reg_G2S_DB_BG3PD = 0x100;
 }
 
-void GX_SetVCountEqVal(int vcount) {
+void GX_SetVCountEqVal(s32 vcount) {
     reg_GX_DISPSTAT =
         (u16)((reg_GX_DISPSTAT & REG_GX_DISPSTAT_FLAGS_MASK) | ((vcount & 0xff) << 8) | ((vcount & 0x100) >> 1));
 }
@@ -79,61 +80,61 @@ s32 GX_VBlankIntr(BOOL enable) {
 }
 
 BOOL GX_IsDispOn(void) {
-    return g_GfxEngineAEnabled;
+    return sIsDispOn;
 }
 
 void GX_DispOff(void) {
     u32 dispcnt = reg_GX_DISPCNT;
-    g_GfxEngineAEnabled = FALSE;
-    g_GfxEngineAMode = (dispcnt & REG_GX_DISPCNT_MODE_MASK) >> REG_GX_DISPCNT_MODE_SHIFT;
+    sIsDispOn = FALSE;
+    sDispMode = (dispcnt & REG_GX_DISPCNT_MODE_MASK) >> REG_GX_DISPCNT_MODE_SHIFT;
     reg_GX_DISPCNT = dispcnt & ~REG_GX_DISPCNT_MODE_MASK;
     PMi_SetDispOffCount();
 }
 
 void GX_DispOn(void) {
-    g_GfxEngineAEnabled = TRUE;
-    if (g_GfxEngineAMode != 0) {
-        reg_GX_DISPCNT = (reg_GX_DISPCNT & ~REG_GX_DISPCNT_MODE_MASK) | (g_GfxEngineAMode << REG_GX_DISPCNT_MODE_SHIFT);
+    sIsDispOn = TRUE;
+    if (sDispMode != 0) {
+        reg_GX_DISPCNT = (reg_GX_DISPCNT & ~REG_GX_DISPCNT_MODE_MASK) | (sDispMode << REG_GX_DISPCNT_MODE_SHIFT);
     } else {
         reg_GX_DISPCNT |= GX_DISPMODE_GRAPHICS << REG_GX_DISPCNT_MODE_SHIFT;
     }
 }
 
-void GX_SetGraphicsMode(int dispMode, int bgMode, int bg0As3D) {
+void GX_SetGraphicsMode(GXDispMode dispMode, GXBGMode bgMode, GXBG0As bg0As3D) {
     u32 dispcnt = reg_GX_DISPCNT;
-    g_GfxEngineAMode = dispMode;
-    if (!g_GfxEngineAEnabled) {
+    sDispMode = dispMode;
+    if (!sIsDispOn) {
         dispMode = 0;
     }
     reg_GX_DISPCNT = (dispcnt & ~REG_GX_DISPCNT_GRAPHICS_MASK) | (dispMode << REG_GX_DISPCNT_MODE_SHIFT) | bgMode |
                      (bg0As3D << REG_GX_DISPCNT_BG02D3D_SHIFT);
-    if (g_GfxEngineAMode == 0) {
-        g_GfxEngineAEnabled = FALSE;
+    if (sDispMode == 0) {
+        sIsDispOn = FALSE;
     }
 }
 
-void GXS_SetGraphicsMode(int bgMode) {
+void GXS_SetGraphicsMode(GXBGMode bgMode) {
     reg_GXS_DB_DISPCNT = (reg_GXS_DB_DISPCNT & ~REG_GXS_DB_DISPCNT_BGMODE_MASK) | bgMode;
 }
 
-void GXx_SetMasterBrightness_(uptr reg, s32 brightness) {
+void GXx_SetMasterBrightness_(vu16 *reg, int brightness) {
     if (brightness == 0) {
-        *(vu16 *)reg = 0;
+        *reg = 0;
     } else if (brightness > 0) {
-        *(vu16 *)reg = (u16)(REG_GX_MASTER_BRIGHT_MODE_UP | brightness);
+        *reg = (u16)(REG_GX_MASTER_BRIGHT_MODE_UP | brightness);
     } else {
-        *(vu16 *)reg = (u16)(REG_GX_MASTER_BRIGHT_MODE_DOWN | -brightness);
+        *reg = (u16)(REG_GX_MASTER_BRIGHT_MODE_DOWN | -brightness);
     }
 }
 
-s32 GXx_GetMasterBrightness_(uptr reg) {
-    u16 mode = *(vu16 *)reg & REG_GX_MASTER_BRIGHT_MODE_MASK;
+int GXx_GetMasterBrightness_(vu16 *reg) {
+    u16 mode = *reg & REG_GX_MASTER_BRIGHT_E_MOD_MASK;
     if (mode == 0) {
         return 0;
     } else if (mode == REG_GX_MASTER_BRIGHT_MODE_UP) {
-        return *(vu16 *)reg & REG_GX_MASTER_BRIGHT_FACTOR_MASK;
+        return *reg & REG_GX_MASTER_BRIGHT_E_VALUE_MASK;
     } else if (mode == REG_GX_MASTER_BRIGHT_MODE_DOWN) {
-        return -(*(vu16 *)reg & REG_GX_MASTER_BRIGHT_FACTOR_MASK);
+        return -(*reg & REG_GX_MASTER_BRIGHT_E_VALUE_MASK);
     }
     return 0;
 }

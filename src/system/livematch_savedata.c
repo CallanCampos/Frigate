@@ -10,9 +10,7 @@
 
 static void getOpponentMacAddress(LiveMatchData *data, u32 index, u8 *macAddress);
 
-void LiveMatchData_Init(void *results) {
-    LiveMatchData *data = results;
-
+void LiveMatchData_Init(LiveMatchData *data) {
     MI_CpuFill8(data, 0, sizeof(LiveMatchData));
     OS_GetMacAddress(data->macAddress);
 }
@@ -23,8 +21,7 @@ u32 LiveMatchData_GetCount(void *results, u32 index) {
     return data->counts[index];
 }
 
-void LiveMatchData_AddCount(void *results, u32 index, int value) {
-    LiveMatchData *data = results;
+void LiveMatchData_AddCount(LiveMatchData *data, u32 index, int value) {
     int count = data->counts[index] + value;
 
     if (count > LIVEMATCH_COUNT_MAX) {
@@ -39,20 +36,15 @@ static void getOpponentMacAddress(LiveMatchData *data, u32 index, u8 *macAddress
     MI_CpuCopy8(data->opponents[index % LIVEMATCH_OPPONENT_MAX].macAddress, macAddress, BATTLEMATCH_MAC_ADDRESS_SIZE);
 }
 
-void LiveMatchData_SetOpponentMacAddress(void *results, u32 index, const u8 *macAddress) {
-    LiveMatchData *data = results;
-
+void LiveMatchData_SetOpponentMacAddress(LiveMatchData *data, u32 index, const u8 *macAddress) {
     MI_CpuCopy8(macAddress, data->opponents[index % LIVEMATCH_OPPONENT_MAX].macAddress, BATTLEMATCH_MAC_ADDRESS_SIZE);
 }
 
-void LiveMatchData_SetOpponentParam(void *results, u32 index, u32 field, u8 value) {
-    LiveMatchData *data = results;
-
+void LiveMatchData_SetOpponentParam(LiveMatchData *data, u32 index, u32 field, u8 value) {
     data->opponents[index % LIVEMATCH_OPPONENT_MAX].params[field] = value;
 }
 
-BOOL LiveMatchData_HasOpponent(void *results, const u8 *macAddress) {
-    LiveMatchData *data = results;
+BOOL LiveMatchData_HasOpponent(LiveMatchData *data, const u8 *macAddress) {
     u8 opponent[BATTLEMATCH_MAC_ADDRESS_SIZE];
     int i;
     int count = LiveMatchData_GetCount(data, 0);

@@ -4,6 +4,7 @@
 #include "constants/sound.h"
 #include "field/field.h"
 #include "field/field_actor.h"
+#include "field/field_animation_curve.h"
 #include "field/field_camera.h"
 #include "field/field_effect.h"
 #include "field/field_task.h"
@@ -11,7 +12,6 @@
 #include "gfl/fade.h"
 #include "gfl/heap.h"
 #include "gfl/sound.h"
-#include "math.h"
 #include "nitro/fx.h"
 
 #define CAMERA_ANGLE_YAW 0
@@ -505,7 +505,7 @@ static u16 FieldActorSpinTask_CalcSpinDirAcmdSqrt(f32 elapsed, f32 duration, f32
     u16 acmds[4] = { 1, 3, 0, 2 };
     f32 distance = 4.0f * turns;
     f32 rate = distance * distance / duration;
-    f32 value = sqrt(rate * elapsed);
+    f32 value = FieldAnimationCurve_Sqrt(rate, elapsed);
 
     return acmds[(s32)value % 4];
 }

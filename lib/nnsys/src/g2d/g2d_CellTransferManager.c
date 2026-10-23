@@ -4,10 +4,10 @@
 // NitroSystem's g2d_CellTransferManager.c: the cell transfer states, one per cell animation whose characters are
 // transferred to VRAM as each cell is shown. A cell animation asks for its current cell's characters, a renderer marks
 // the engines that drew it, and the update transfers them through the callback for each engine that both asked and
-// drew. The function names are swan's and the SDK's; the file name is a guess from them, as the ROM has no string for
-// it, and the statics and the helpers are named here
+// drew. The names and the file name are NitroSystem's, as ntrtwl's reconstruction of NitroSystem has them; the ROM has
+// no string for the file
 
-static NNSG2dDmaCallBack s_pDmaFunc;
+static VramTransferTaskRegisterFuncPtr s_pTaskRegisterFunc;
 static NNSG2dCellTransferState *s_pCellStateArray;
 static u32 s_numCellState;
 
@@ -49,10 +49,10 @@ void NNSi_G2dInitCellTransferState(u32 handle, u32 dstAddr3D, u32 dstAddr2DMain,
 }
 
 void NNS_G2dInitCellTransferStateManager(NNSG2dCellTransferState *states, u32 numCellState,
-                                         NNSG2dDmaCallBack callback) {
+                                         VramTransferTaskRegisterFuncPtr callback) {
     u32 i;
 
-    s_pDmaFunc = callback;
+    s_pTaskRegisterFunc = callback;
     s_pCellStateArray = states;
     s_numCellState = numCellState;
     for (i = 0; i < numCellState; i++) {
@@ -62,7 +62,7 @@ void NNS_G2dInitCellTransferStateManager(NNSG2dCellTransferState *states, u32 nu
 
 // andand_bool
 // Whether the cell asked for its characters and was drawn by the engine of type
-static inline BOOL IsTransferNeeded_(const NNSG2dCellTransferState *state, NNSG2dVRamType type) {
+static inline BOOL ShouldRegisterAsVramTransferTask_(const NNSG2dCellTransferState *state, NNS_G2D_VRAM_TYPE type) {
     return (state->bTransferRequested & (1 << type)) && (state->bDrawn & (1 << type));
 }
 
@@ -75,14 +75,14 @@ void NNS_G2dUpdateCellTransferStateManager(void) {
         NNS_GFD_DST_2D_OBJ_CHAR_SUB,
     };
     u32 i;
-    NNSG2dVRamType type;
+    NNS_G2D_VRAM_TYPE type;
     NNSG2dCellTransferState *state;
 
     for (i = 0; i < s_numCellState; i++) {
         state = &s_pCellStateArray[i];
         if (state->bActive) {
             for (type = NNS_G2D_VRAM_TYPE_3DMAIN; type < NNS_G2D_VRAM_TYPE_MAX; type++) {
-                if (IsTransferNeeded_(state, type)) {
+                if (ShouldRegisterAsVramTransferTask_(state, type)) {
                     NNS_GFD_DST_TYPE dstType = dstTypes[type];
                     const u8 *pSrc;
 
@@ -91,8 +91,8 @@ void NNS_G2dUpdateCellTransferStateManager(void) {
                     } else {
                         pSrc = state->pSrcNCGR;
                     }
-                    if (s_pDmaFunc(dstType, NNSi_G2dGetVramLocation(&state->dstVramLocation, type),
-                                   (void *)(pSrc + state->srcOffset), state->szByte)) {
+                    if (s_pTaskRegisterFunc(dstType, NNSi_G2dGetVramLocation(&state->dstVramLocation, type),
+                                            (void *)(pSrc + state->srcOffset), state->szByte)) {
                         state->bTransferRequested &= ~(1 << type);
                     }
                 }

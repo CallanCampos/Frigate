@@ -343,7 +343,7 @@ void PlaceName_FreePaletteFile(PlaceName *wk) {
 }
 
 void func_ov036_021b521c(PlaceName *wk) {
-    GFL_BGSysUploadStdPalette(3, wk->paletteData->rawData, 0x20, 0);
+    GFL_BGSysUploadStdPalette(3, wk->paletteData->pRawData, 0x20, 0);
 }
 
 void func_ov036_021b5230(PlaceName *wk, u32 fileId) {
@@ -360,7 +360,7 @@ void PlaceName_FreeCharFile(PlaceName *wk) {
 }
 
 void func_ov036_021b5270(PlaceName *wk) {
-    GFL_BGSysLoadChar(3, wk->charData->rawData, wk->charData->size, 0);
+    GFL_BGSysLoadChar(3, wk->charData->pRawData, wk->charData->szByte, 0);
 }
 
 void func_ov036_021b5284(PlaceName *wk, u32 fileId) {
@@ -377,7 +377,7 @@ void PlaceName_FreeScreenFile(PlaceName *wk) {
 }
 
 void func_ov036_021b52c4(PlaceName *wk) {
-    GFL_BGSysBufferScr(3, wk->screenData->rawData, wk->screenData->size, 0);
+    GFL_BGSysBufferScr(3, wk->screenData->rawData, wk->screenData->szByte, 0);
     GFL_BGSysQueueScrLoad(3);
 }
 

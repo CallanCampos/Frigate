@@ -13,9 +13,9 @@ void OS_GetLowEntropyData(u32 buffer[8]) {
     buffer[1] = (*(const u16 *)&macAddress[4] << 16) ^ (u32)OSi_TickCounter;
     buffer[2] = (OSi_TickCounter >> 32) ^ *(const u32 *)macAddress ^ work->vblankCount;
     buffer[2] ^= reg_G3X_GXSTAT;
-    buffer[3] = work->realTimeClock[0];
-    buffer[4] = work->realTimeClock[1];
-    buffer[5] = (work->micSampling << 16) ^ work->micLastAddress;
+    buffer[3] = work->real_time_clock[0];
+    buffer[4] = work->real_time_clock[1];
+    buffer[5] = (work->mic_sampling_data << 16) ^ work->mic_last_address;
     buffer[6] = (work->touchPanelX << 16) | work->touchPanelY;
-    buffer[7] = reg_PAD_KEYINPUT | *(vu16 *)HW_BUTTON_XY_BUF | (work->unk_398 << 16);
+    buffer[7] = reg_PAD_KEYINPUT | *(vu16 *)HW_BUTTON_XY_BUF | (work->wm_rssi_pool << 16);
 }

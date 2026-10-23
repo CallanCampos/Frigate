@@ -5,7 +5,7 @@
 
 // The Pokédex's habitat list (zukan_habitat_savedata.c, a descriptive name), which the save keeps at the end of the
 // medal box's block. Its clearing, its getter and the functions that the Pokédex calls are declared in
-// save/medal_box.h, where they take the list as a void *
+// save/medal_box.h
 
 #define ZUKAN_HABITAT_SAVE_COUNT 70
 
@@ -24,7 +24,7 @@ typedef struct {
     u8 flag : 1;
 } ZukanHabitatProgress;
 
-typedef struct ZukanHabitatSave {
+struct ZukanHabitatSave {
     u8 unk0[0x4a];
     ZukanHabitatProgress habitats[ZUKAN_HABITAT_SAVE_COUNT];
     // What the list shows: the zone, the season and the kind of habitat
@@ -34,7 +34,7 @@ typedef struct ZukanHabitatSave {
     // Whether the messages of every Pokémon's habitat seen and caught have been shown
     u8 seenMessageShown;
     u8 caughtMessageShown;
-} ZukanHabitatSave; // size: 0x96
+}; // size: 0x96
 
 // A habitat's flag, and setting it
 BOOL ZukanHabitatSave_IsHabitatFlagSet(ZukanHabitatSave *save, u8 habitat);

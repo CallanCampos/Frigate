@@ -67,7 +67,7 @@ void Box2Obj_PutItemIconAtCursor(Box2AppWork *app, u32 pos, u32 mode);
 void Box2Obj_InitItemOutline(Box2AppWork *app);
 void Box2Obj_ShowItemOutline(Box2AppWork *app);
 void Box2Obj_MoveItemOutline(Box2AppWork *app);
-void Box2Obj_SetToolButtons(Box2SysWork *syswk, u32 set, BOOL visible);
+void Box2Obj_SetToolButtons(Box2SysWork *syswk, unsigned int set, BOOL visible);
 void Box2Obj_SetCursorAnim(Box2SysWork *syswk, u32 anim);
 void Box2Obj_ShowCursor(Box2SysWork *syswk, BOOL show);
 void Box2Obj_PutPokeOutline(Box2SysWork *syswk);

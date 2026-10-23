@@ -189,7 +189,7 @@ typedef struct {
     ClActor *cursor;
     s32 choice;
     // The ball whose animation plays
-    s32 ball;
+    int ball;
     // Set when the picked Pokémon reaches the front
     BOOL pokeArrived;
     MsgData *msgData;
@@ -278,7 +278,7 @@ static BOOL PselCamera_IsZoomDone(PselWork *wk);
 static void PselCamera_UpdateZoom(PselWork *wk);
 static void PselCamera_StartDecide(PselWork *wk, s32 ball);
 static void PselCamera_UpdateDecide(PselWork *wk);
-static void PselBall_Select(PselWork *wk, s32 ball);
+static void PselBall_Select(PselWork *wk, int ball);
 static void PselBall_Update(PselWork *wk);
 static void PselPoke_Load(PselWork *wk);
 static void PselPoke_Unload(PselWork *wk);
@@ -711,7 +711,7 @@ static void PselCamera_UpdateDecide(PselWork *wk) {
 }
 
 // Stops the animations of the ball that was picked and starts those of the new one
-static void PselBall_Select(PselWork *wk, s32 ball) {
+static void PselBall_Select(PselWork *wk, int ball) {
     if (wk->ball != PSEL_CHOICE_NONE && wk->ball != ball) {
         G3DActor *actor = GFL_G3DMgrGetActor(wk->g3dMgr, wk->objs[wk->objIdx[wk->ball + 1]].actor);
         u16 count = GFL_G3DActorGetAnmCount(actor);
@@ -1532,10 +1532,10 @@ static void PselPokePal_Load(PselWork *wk) {
         void *dark;
 
         normal = GFL_G2DIOReadNCLRArc(arc, sPselPokeFiles[i].pltt, &palette, wk->heapId);
-        MI_CpuCopy8(palette->rawData, wk->poke[i].palNormal, sizeof(wk->poke[i].palNormal));
+        MI_CpuCopy8(palette->pRawData, wk->poke[i].palNormal, sizeof(wk->poke[i].palNormal));
         GFL_HeapFree(normal);
         dark = GFL_G2DIOReadNCLRArc(arc, sPselPokeFiles[i].plttDark, &palette, wk->heapId);
-        MI_CpuCopy8(palette->rawData, wk->poke[i].palDark, sizeof(wk->poke[i].palDark));
+        MI_CpuCopy8(palette->pRawData, wk->poke[i].palDark, sizeof(wk->poke[i].palDark));
         GFL_HeapFree(dark);
     }
     GFL_ArcToolFree(arc);
@@ -1613,7 +1613,7 @@ static void PselBGPal_Load(PselWork *wk) {
         NNSG2dPaletteData *palette;
         void *file = GFL_G2DIOReadNCLRArc(arc, sPselBGPaletteFiles[i], &palette, wk->heapId);
 
-        MI_CpuCopy8(&((u16 *)palette->rawData)[0x80], wk->bgPal[i], sizeof(wk->bgPal[i]));
+        MI_CpuCopy8(&((u16 *)palette->pRawData)[0x80], wk->bgPal[i], sizeof(wk->bgPal[i]));
         GFL_HeapFree(file);
     }
     GFL_ArcToolFree(arc);

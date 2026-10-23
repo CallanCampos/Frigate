@@ -27,7 +27,7 @@ NitroSDK's code reads a few numbers, such as `SDK_IRQ_STACKSIZE`, as the address
 script defines, so the ROM has them as plain words in the literal pools that load them, with no relocation. dsd's linker
 script defines only `__OVERLAY_COUNT` of them. `config/linker_symbols.toml` gives the others and their values, the same
 in both versions: the stack sizes, which `os_interrupt.c`, `os_thread.c`, `os_arena.c` and the startup code `crt0.c`
-(`Entry`, `func_02004d50` and `func_02004da0`) read, and the start of the DSi's extended main memory arena, which
+(`_start`, `func_02004d50` and `func_02004da0`) read, and the start of the DSi's extended main memory arena, which
 `os_arena.c` reads. `tools/build/lcf_symbols.py` adds them after `__OVERLAY_COUNT` as absolute symbols, in
 `build/<version>/arm9_symbols.lcf`, the linker script that the link (or `--shift`'s padding) takes. Another one goes in
 the config when a file that reads it is written, with its value read from the pool word in both versions.
@@ -57,8 +57,10 @@ records them in `config/fixes.txt`:
 
 It also removes relocations and symbols that are not real (`remove-reloc`, `remove-symbol`), and gives a function a
 second name with `add-label`. MWCC calls the runtime's 64-bit multiply `_ll_mul` for signed values and `_ull_mul` for
-unsigned ones, while the game has one copy of it, so `_ll_mul` is a label on `_ull_mul`. In the same way, `_fflt` (int
-to float) is a label on swan's `__aeabi_i2f`, and `_u32_div_f` (unsigned division) on `__aeabi_uidivmod`. `add-data`
+unsigned ones, while the game has one copy of it, so `_ll_mul` is a label on `_ull_mul`. `remove-label` drops a label
+again once its function takes the name, as the runtime's functions did when they took its names over swan's. A delinked
+object defines the label, and when the function's file is complete, `tools/build/object_aliases.py` adds the label to the
+compiled object, which can't define two names for one `asm` function (`docs/matching.md`). `add-data`
 adds an object that nothing references, such as a global constant that the compiler folds into the code but still emits,
 so that the object before it does not seem to run on over it.
 
@@ -86,8 +88,9 @@ consider every name at the destination, including labels, and use the first over
 An alias therefore cannot hide a reference to a static function.
 
 `section-start` and `section-end` move one end of a registered source file's section, as an object at a boundary
-that turns out to belong to the neighbouring file needs; `add_source_file.py` only adds files. Recording a boundary
-again replaces its earlier record, since fixes replay in address order:
+that turns out to belong to the neighbouring file needs; `add_source_file.py` only adds files. The address may be the
+section's end, which a section's last file reaches, its alignment padding included. Recording a boundary again
+replaces its earlier record, since fixes replay in address order:
 
 ```sh
 .venv/bin/python tools/decomp/config_fixes.py section-end overlays/ov310 src/ov310/research_list.c .rodata 0x021a7028
@@ -161,10 +164,25 @@ this way, while the LCF still places the objects. Before, a file that called the
 `camera_system.c`, couldn't be completed. NitroWiFi's Thumb code in the LTD autoload (`.ltdmain`) gives every call its
 own veneer too, as an overlay does, while dsd lists the module's objects with ARM9 main's: `tools/build/ltd_objects.py`
 moves them to the end of the linker's object list, after `-overlaygroup LTD_AUTOLOAD_0,0` and `-overlay LTD_AUTOLOAD_0`,
-which gives `wcm_dsi.c`'s 56 calls of `WCM_SetState` their 56 veneers. TwlSDK's `.ltdmain` objects share one veneer per
+which gives `wcm_dsi.c`'s 56 calls of `WcmSetPhase` their 56 veneers. TwlSDK's `.ltdmain` objects share one veneer per
 target, across files, as main's do: `card_hash.c`'s six calls of `OS_DisableInterrupts` go through one veneer, which
 `mi_ndma.c`, `mi_ndma_gxcommand.c`, `mi_sharedWram_twl.c` and `pm_twl.c` call too, so the tool leaves the objects of
 `lib/twl/` with main's.
+
+DS Protect's `dsprot_detect.c` also retains eight legacy ARM-to-Thumb veneers. The normal
+ARM946E linker replaces those calls with BLX and drops 96 bytes. When the compiled file is linked,
+`tools/build/restore_dsprot_veneers.py` runs a private ARMv4T prelink using the current real object
+list and effective LCF. It retains only this file's generated instructions, gives their pointers
+ABS32 relocations to the actual Thumb SDK symbols, and redirects the compiler's call relocations
+to generated local symbols. The normal ARM946E final link uses that derived object; objdiff uses
+the unchanged compiler object. No source-function bytes, sizes or data are replaced.
+
+This is a representation of genuine linker-generated code; the original architecture settings
+and Nintendo's exact build procedure remain unknown. The helper has no ROM input or fixed game
+addresses. It discovers addresses on every prelink, including `--shift` builds, and requires
+contiguous generated fragments, real Thumb mappings and eight veneers. Unsupported ELF metadata,
+unexpected layouts and linker diagnostics fail with an error. Modified code that changes these
+invariants needs a new layout audit; do not change the count merely to bypass the check.
 
 ## Shifting
 

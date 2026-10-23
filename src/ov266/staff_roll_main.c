@@ -347,8 +347,8 @@ static u32 StaffRollSeq_Init(StaffRollWork *work) {
     G2_BlendNone();
     G2S_BlendNone();
     GFL_BGSysSetDisplayLayout(GX_DISP_SELECT_MAIN_SUB);
-    GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, FADE_BRIGHTNESS(16));
-    GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, FADE_BRIGHTNESS(16));
+    GX_SetMasterBrightness(FADE_BRIGHTNESS(16));
+    GXS_SetMasterBrightness(FADE_BRIGHTNESS(16));
     work->arc = GFL_ArcSysCreateFileHandle(ARCID_THE_END, HEAPID_STAFF_ROLL);
     StaffRoll_InitVRAM();
     StaffRoll_InitBG();
@@ -383,8 +383,8 @@ static u32 StaffRollSeq_Exit(StaffRollWork *work) {
     StaffRollPicture_Free(&work->picture);
     StaffRoll_FreeClAct(&work->clact);
     StaffRoll_FreeBG();
-    GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, FADE_BRIGHTNESS(16));
-    GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, FADE_BRIGHTNESS(16));
+    GX_SetMasterBrightness(FADE_BRIGHTNESS(16));
+    GXS_SetMasterBrightness(FADE_BRIGHTNESS(16));
     G2_BlendNone();
     G2S_BlendNone();
     GFL_BGSysSetEnabledBGsA(0);
@@ -1098,8 +1098,8 @@ static BOOL StaffRoll_UpdateLogo(StaffRollWork *work) {
     case 0:
         G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG3, GX_BLEND_PLANEMASK_BD, 0, 16);
         GFL_BGSysSetBGEnabledA(GX_PLANEMASK_BG3, TRUE);
-        GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, 0);
-        GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, 0);
+        GX_SetMasterBrightness(0);
+        GXS_SetMasterBrightness(0);
         work->logoFrame = 0;
         work->fadeState++;
         break;
@@ -1209,14 +1209,14 @@ static void StaffRollPicture_Update(StaffRollWork *work, StaffRollPicture *pictu
     case PICTURE_SHOW:
         fileId = StaffRollPicture_GetFileID(picture, PICTURE_FILE_PALETTE, gender);
         if (picture->screens & SCREEN_TOP) {
-            GFL_BGSysLoadScrCore(0, picture->screenData->rawData, picture->screenData->size, 0);
-            GFL_BGSysLoadChar(0, picture->charData->rawData, picture->charData->size, 0);
+            GFL_BGSysLoadScrCore(0, picture->screenData->rawData, picture->screenData->szByte, 0);
+            GFL_BGSysLoadChar(0, picture->charData->pRawData, picture->charData->szByte, 0);
             GFL_G2DIOLoadArcNCLRDefault(arc, fileId, PALTYPE_MAIN_BG_EX, 0, 0, HEAPID_STAFF_ROLL);
             GFL_BGSysSetBGEnabledA(GX_PLANEMASK_BG0, TRUE);
         }
         if (picture->screens & SCREEN_BOTTOM) {
-            GFL_BGSysLoadScrCore(4, picture->screenData->rawData, picture->screenData->size, 0);
-            GFL_BGSysLoadChar(4, picture->charData->rawData, picture->charData->size, 0);
+            GFL_BGSysLoadScrCore(4, picture->screenData->rawData, picture->screenData->szByte, 0);
+            GFL_BGSysLoadChar(4, picture->charData->pRawData, picture->charData->szByte, 0);
             GFL_G2DIOLoadArcNCLRDefault(arc, fileId, PALTYPE_SUB_BG_EX, 0x4000, 0, HEAPID_STAFF_ROLL);
             GFL_BGSysSetBGEnabledB(GX_PLANEMASK_BG0, TRUE);
         }

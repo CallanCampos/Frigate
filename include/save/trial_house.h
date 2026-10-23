@@ -33,11 +33,11 @@ struct TrialHouseSave {
 }; // size: 0xa8
 
 u32 BattleExamination_GetSize(void);
-BOOL BattleExamination_IsValid(void *saveBuffer);
-BOOL BattleExamination_IsSingle(void *extraSave);
-u32 BattleExamination_GetNumber(void *saveBuffer);
+BOOL BattleExamination_IsValid(BattleExaminationSave *saveBuffer);
+BOOL BattleExamination_IsSingle(BattleExaminationSave *extraSave);
+u32 BattleExamination_GetNumber(BattleExaminationSave *saveBuffer);
 // The Trainer of a recorded battle, 0 to 4
-BSubwayTrainer *BattleExamination_GetTrainer(void *save, u32 index);
+BSubwayTrainer *BattleExamination_GetTrainer(BattleExaminationSave *save, u32 index);
 void BattleExamination_Load(GameData *gameData, void *saveBuffer, HeapID heapId);
 // The block's size and its initial state (trial_house_savedata.c)
 u32 TrialHouseSave_GetSize(void);
@@ -45,6 +45,6 @@ void TrialHouseSave_Init(TrialHouseSave *save);
 TrialHouseSave *TrialHouseSave_Get(SaveControl *save);
 // Of a file that is not written yet: clears the data at unk5C
 void WbtSave_Init(void *data);
-void BattleExamination_SetUsed(void *extraSave);
+void BattleExamination_SetUsed(BattleExaminationSave *extraSave);
 
 #endif // POKEBW2_SAVE_TRIAL_HOUSE_H

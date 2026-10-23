@@ -3,15 +3,16 @@
 
 // NitroSystem's sound archive player (NNS_SndArcPlayer): sets the sequence players up from the archive's player info,
 // and starts the archive's sequences on them, loading each sequence and its bank into the heap of the sequence player
-// when they aren't loaded yet. The file name is a guess, and so are the statics' names
+// when they aren't loaded yet. The SDK's file is sndarc_player.c, and the names are NitroSystem's, as ntrtwl's
+// reconstruction of NitroSystem has them
 
 // The number of sound players
 #define NNS_SND_PLAYER_NUM 32
 
 static BOOL StartSeq(NNSSndHandle *handle, int playerNo, int bankNo, int playerPrio, const NNSSndArcSeqInfo *info,
                      int seqNo);
-static BOOL StartSeqArcSeq(NNSSndHandle *handle, int playerNo, int bankNo, int playerPrio,
-                           const NNSSndSeqArcSeqInfo *info, const NNSSndSeqArc *seqArc, int seqArcNo, int index);
+static BOOL StartSeqArc(NNSSndHandle *handle, int playerNo, int bankNo, int playerPrio, const NNSSndSeqArcSeqInfo *info,
+                        const NNSSndSeqArc *seqArc, int seqArcNo, int index);
 
 BOOL NNS_SndArcPlayerSetup(NNSSndHeapHandle heap) {
     const NNSSndArcPlayerInfo *info;
@@ -81,8 +82,8 @@ BOOL NNS_SndArcPlayerStartSeqArc(NNSSndHandle *handle, int seqArcNo, int index) 
     if (seqInfo == NULL) {
         return FALSE;
     }
-    return StartSeqArcSeq(handle, seqInfo->param.playerNo, seqInfo->param.bankNo, seqInfo->param.playerPrio, seqInfo,
-                          seqArc, seqArcNo, index);
+    return StartSeqArc(handle, seqInfo->param.playerNo, seqInfo->param.bankNo, seqInfo->param.playerPrio, seqInfo,
+                       seqArc, seqArcNo, index);
 }
 
 static BOOL StartSeq(NNSSndHandle *handle, int playerNo, int bankNo, int playerPrio, const NNSSndArcSeqInfo *info,
@@ -98,24 +99,24 @@ static BOOL StartSeq(NNSSndHandle *handle, int playerNo, int bankNo, int playerP
     }
     heap = NNSi_SndPlayerAllocHeap(playerNo, seqPlayer);
     if (NNSi_SndArcLoadBank(bankNo, NNS_SND_ARC_LOAD_BANK | NNS_SND_ARC_LOAD_WAVE, heap, FALSE, &bank) !=
-        NNSi_SND_ARC_LOAD_SUCCESS) {
+        NNS_SND_ARC_LOAD_SUCESS) {
         NNSi_SndPlayerFreeSeqPlayer(seqPlayer);
         return FALSE;
     }
-    if (NNSi_SndArcLoadSeq(seqNo, NNS_SND_ARC_LOAD_SEQ, heap, FALSE, &seq) != NNSi_SND_ARC_LOAD_SUCCESS) {
+    if (NNSi_SndArcLoadSeq(seqNo, NNS_SND_ARC_LOAD_SEQ, heap, FALSE, &seq) != NNS_SND_ARC_LOAD_SUCESS) {
         NNSi_SndPlayerFreeSeqPlayer(seqPlayer);
         return FALSE;
     }
     NNSi_SndPlayerStartSeq(seqPlayer, (const u8 *)seq + seq->baseOffset, 0, bank);
     NNS_SndPlayerSetInitialVolume(handle, info->param.volume);
     NNS_SndPlayerSetChannelPriority(handle, info->param.channelPrio);
-    NNSi_SndPlayerSetSeqNo(handle, seqNo);
+    NNS_SndPlayerSetSeqNo(handle, seqNo);
     return TRUE;
 }
 
 // The sequence archive must be loaded; only the bank is loaded here
-static BOOL StartSeqArcSeq(NNSSndHandle *handle, int playerNo, int bankNo, int playerPrio,
-                           const NNSSndSeqArcSeqInfo *info, const NNSSndSeqArc *seqArc, int seqArcNo, int index) {
+static BOOL StartSeqArc(NNSSndHandle *handle, int playerNo, int bankNo, int playerPrio, const NNSSndSeqArcSeqInfo *info,
+                        const NNSSndSeqArc *seqArc, int seqArcNo, int index) {
     NNSSndSeqPlayer *seqPlayer;
     NNSSndHeapHandle heap;
     SNDBankData *bank;
@@ -126,13 +127,13 @@ static BOOL StartSeqArcSeq(NNSSndHandle *handle, int playerNo, int bankNo, int p
     }
     heap = NNSi_SndPlayerAllocHeap(playerNo, seqPlayer);
     if (NNSi_SndArcLoadBank(bankNo, NNS_SND_ARC_LOAD_BANK | NNS_SND_ARC_LOAD_WAVE, heap, FALSE, &bank) !=
-        NNSi_SND_ARC_LOAD_SUCCESS) {
+        NNS_SND_ARC_LOAD_SUCESS) {
         NNSi_SndPlayerFreeSeqPlayer(seqPlayer);
         return FALSE;
     }
     NNSi_SndPlayerStartSeq(seqPlayer, (const u8 *)seqArc + seqArc->baseOffset, info->offset, bank);
     NNS_SndPlayerSetInitialVolume(handle, info->param.volume);
     NNS_SndPlayerSetChannelPriority(handle, info->param.channelPrio);
-    NNSi_SndPlayerSetSeqArcNo(handle, seqArcNo, index);
+    NNS_SndPlayerSetSeqArcNo(handle, seqArcNo, index);
     return TRUE;
 }

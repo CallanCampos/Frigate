@@ -64,7 +64,7 @@ void DpwBt_Process(void) {
     const u8 *answer;
     int size;
     int type;
-    int group;
+    DWCErrorType group;
 
     switch (sDpwBtWork.state) {
     case 2:
@@ -340,7 +340,7 @@ void DpwBt_GetServerState(void) {
 }
 
 void DpwBt_SetProfile(Dpw_Common_Profile *profile, Dpw_Common_ProfileResult *result) {
-    OS_GetMacAddress(profile->unk1C);
+    OS_GetMacAddress(profile->macAddress);
     memcpy(sDpwBtWork.request, profile, 0x64);
     sDpwBtWork.resultData = result;
     Gamestats_Start(sDpwBtServerType, DPW_GAMESTATS_KEY);

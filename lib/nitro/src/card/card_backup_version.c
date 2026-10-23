@@ -10,4 +10,4 @@
                                ".text"                                                                                 \
                                ".text" abs32 RX
 
-__declspec(section "version") const char CARDi_BackupSignature[] = "[SDK+NINTENDO:BACKUP]";
+__declspec(section "version") const char cardi_backup_assert[] = "[SDK+NINTENDO:BACKUP]";

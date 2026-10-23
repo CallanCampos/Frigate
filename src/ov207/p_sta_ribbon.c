@@ -464,7 +464,7 @@ void PStaRibbon_Draw(PStatusWork *wk, PStaRibbonWork *ribbon) {
 
     GFL_BGSysLoadScrArea(2, 0, 0, 32, 24, ribbon->screens[0].screen->rawData, 0, 0, 32, 32);
     GFL_BGSysQueueScrLoad(2);
-    GFL_BGSysBufferScrDefault(6, ribbon->screens[1].screen->rawData, ribbon->screens[1].screen->size);
+    GFL_BGSysBufferScrDefault(6, ribbon->screens[1].screen->rawData, ribbon->screens[1].screen->szByte);
     GFL_BGSysQueueScrLoad(6);
     GFL_BGSysLoadScrArea(5, 0, 0, 32, 3, ribbon->screens[3].screen->rawData, 0, 0, 32, 32);
     GFL_BGSysQueueScrLoad(5);
@@ -551,7 +551,7 @@ static void PStaRibbon_DrawRow(PStatusWork *wk, PStaRibbonWork *ribbon, RibbonRo
     WordSet *wordSet;
 
     if (entry->isValid == TRUE) {
-        src = ribbon->rowChars->rawData;
+        src = ribbon->rowChars->pRawData;
         dst = GFL_BitmapGetPixelData(row->bitmap);
         if (row->entry == ribbon->cursorEntry) {
             src += ROW_CHAR_SIZE;
@@ -696,7 +696,7 @@ static void PStaRibbon_ShowDetail(PStatusWork *wk, PStaRibbonWork *ribbon) {
                                   wk->clResources[PSTA_RES_CELL(11)], &setup, 1, wk->heapId);
     ClActor_SetPalette(ribbon->icon, (u8)Ribbon_GetData(id, RIBBON_DATA_PALETTE), 1);
     ClActor_SetVisible(ribbon->icon, TRUE);
-    GFL_BGSysBufferScrDefault(6, ribbon->screens[2].screen->rawData, ribbon->screens[2].screen->size);
+    GFL_BGSysBufferScrDefault(6, ribbon->screens[2].screen->rawData, ribbon->screens[2].screen->szByte);
     GFL_BGSysQueueScrLoad(6);
     ribbon->isDetailShown = TRUE;
 }
@@ -719,7 +719,7 @@ static void PStaRibbon_HideDetail(PStatusWork *wk, PStaRibbonWork *ribbon) {
         GFL_BGSysFillScrAsync(4, 0);
         GFL_BGSysQueueScrLoad(4);
         ribbon->isDetailShown = FALSE;
-        GFL_BGSysBufferScrDefault(6, ribbon->screens[1].screen->rawData, ribbon->screens[1].screen->size);
+        GFL_BGSysBufferScrDefault(6, ribbon->screens[1].screen->rawData, ribbon->screens[1].screen->szByte);
         GFL_BGSysQueueScrLoad(6);
     }
 }

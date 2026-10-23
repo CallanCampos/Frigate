@@ -296,7 +296,7 @@ static u32 EventPokewood_GetTitleMsgBase(u32 kind, u32 gender) {
 static void EventPokewood_SetupMovieTrainer(u32 movie, u32 kind, BtlSetupTrainer *trainer, PlayerInfo *playerInfo,
                                             HeapID heapId) {
     PokewoodMovieFile *file = GFL_ArcSysReadHeapNew(ARCID_POKEWOOD_MOVIE, movie, HEAPID_TAIL(heapId));
-    u32 gender = getTrainerGender(playerInfo);
+    unsigned int gender = getTrainerGender(playerInfo);
     MsgData *msgData;
     u32 msgBase;
 

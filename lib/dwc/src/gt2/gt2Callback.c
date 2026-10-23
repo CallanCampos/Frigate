@@ -4,30 +4,30 @@
 
 // GameSpy GT2's calls into the app's callbacks (gt2Callback.c)
 
-BOOL gti2SocketErrorCallback(GTI2Socket *socket) {
+GT2Bool gti2SocketErrorCallback(GT2Socket socket) {
     if (socket == NULL) {
-        return TRUE;
+        return gsi_true;
     }
-    if (socket->onSocketError == NULL) {
-        return TRUE;
+    if (socket->socketErrorCallback == NULL) {
+        return gsi_true;
     }
     socket->callbackLevel++;
-    socket->onSocketError(socket);
+    socket->socketErrorCallback(socket);
     socket->callbackLevel--;
     if (socket->close && socket->callbackLevel == 0) {
         gti2CloseSocket(socket);
-        return FALSE;
+        return gsi_false;
     }
-    return TRUE;
+    return gsi_true;
 }
 
-BOOL gti2ConnectAttemptCallback(GTI2Socket *socket, GTI2Connection *connection, u32 ip, u16 port, u32 latency,
-                                const void *message, int length) {
+GT2Bool gti2ConnectAttemptCallback(GT2Socket socket, GT2Connection connection, unsigned int ip, unsigned short port,
+                                   int latency, GT2Byte *message, int length) {
     if (socket == NULL || connection == NULL) {
-        return TRUE;
+        return gsi_true;
     }
-    if (socket->onConnectAttempt == NULL) {
-        return TRUE;
+    if (socket->connectAttemptCallback == NULL) {
+        return gsi_true;
     }
     if (length == 0 || message == NULL) {
         message = NULL;
@@ -35,23 +35,23 @@ BOOL gti2ConnectAttemptCallback(GTI2Socket *socket, GTI2Connection *connection, 
     }
     socket->callbackLevel++;
     connection->callbackLevel++;
-    socket->onConnectAttempt(socket, connection, ip, port, latency, message, length);
+    socket->connectAttemptCallback(socket, connection, ip, port, latency, message, length);
     socket->callbackLevel--;
     connection->callbackLevel--;
     if (socket->close && socket->callbackLevel == 0) {
         gti2CloseSocket(socket);
-        return FALSE;
+        return gsi_false;
     }
-    return TRUE;
+    return gsi_true;
 }
 
-BOOL gti2ConnectedCallback(GTI2Connection *connection, int result, const void *message, int length) {
+GT2Bool gti2ConnectedCallback(GT2Connection connection, GT2Result result, GT2Byte *message, int length) {
     if (connection == NULL) {
-        return TRUE;
+        return gsi_true;
     }
-    connection->result = result;
-    if (connection->callbacks.onConnected == NULL) {
-        return TRUE;
+    connection->connectionResult = result;
+    if (connection->callbacks.connected == NULL) {
+        return gsi_true;
     }
     if (length == 0 || message == NULL) {
         message = NULL;
@@ -59,22 +59,22 @@ BOOL gti2ConnectedCallback(GTI2Connection *connection, int result, const void *m
     }
     connection->callbackLevel++;
     connection->socket->callbackLevel++;
-    connection->callbacks.onConnected(connection, result, message, length);
+    connection->callbacks.connected(connection, result, message, length);
     connection->callbackLevel--;
     connection->socket->callbackLevel--;
     if (connection->socket->close && connection->socket->callbackLevel == 0) {
         gti2CloseSocket(connection->socket);
-        return FALSE;
+        return gsi_false;
     }
-    return TRUE;
+    return gsi_true;
 }
 
-BOOL gti2ReceivedCallback(GTI2Connection *connection, const void *message, int length, BOOL reliable) {
+GT2Bool gti2ReceivedCallback(GT2Connection connection, GT2Byte *message, int length, GT2Bool reliable) {
     if (connection == NULL) {
-        return TRUE;
+        return gsi_true;
     }
-    if (connection->callbacks.onReceived == NULL) {
-        return TRUE;
+    if (connection->callbacks.received == NULL) {
+        return gsi_true;
     }
     if (length == 0 || message == NULL) {
         message = NULL;
@@ -82,63 +82,64 @@ BOOL gti2ReceivedCallback(GTI2Connection *connection, const void *message, int l
     }
     connection->callbackLevel++;
     connection->socket->callbackLevel++;
-    connection->callbacks.onReceived(connection, message, length, reliable);
+    connection->callbacks.received(connection, message, length, reliable);
     connection->callbackLevel--;
     connection->socket->callbackLevel--;
     if (connection->socket->close && connection->socket->callbackLevel == 0) {
         gti2CloseSocket(connection->socket);
-        return FALSE;
+        return gsi_false;
     }
-    return TRUE;
+    return gsi_true;
 }
 
-BOOL gti2ClosedCallback(GTI2Connection *connection, int reason) {
+GT2Bool gti2ClosedCallback(GT2Connection connection, GT2CloseReason reason) {
     if (connection == NULL) {
-        return TRUE;
+        return gsi_true;
     }
-    if (connection->callbacks.onClosed == NULL) {
-        return TRUE;
+    if (connection->callbacks.closed == NULL) {
+        return gsi_true;
     }
     connection->callbackLevel++;
     connection->socket->callbackLevel++;
-    connection->callbacks.onClosed(connection, reason);
+    connection->callbacks.closed(connection, reason);
     connection->callbackLevel--;
     connection->socket->callbackLevel--;
     if (connection->socket->close && connection->socket->callbackLevel == 0) {
         gti2CloseSocket(connection->socket);
-        return FALSE;
+        return gsi_false;
     }
-    return TRUE;
+    return gsi_true;
 }
 
-BOOL gti2PingCallback(GTI2Connection *connection, u32 latency) {
+GT2Bool gti2PingCallback(GT2Connection connection, int latency) {
     if (connection == NULL) {
-        return TRUE;
+        return gsi_true;
     }
-    if (connection->callbacks.onPing == NULL) {
-        return TRUE;
+    if (connection->callbacks.ping == NULL) {
+        return gsi_true;
     }
     connection->callbackLevel++;
     connection->socket->callbackLevel++;
-    connection->callbacks.onPing(connection, latency);
+    connection->callbacks.ping(connection, latency);
     connection->callbackLevel--;
     connection->socket->callbackLevel--;
     if (connection->socket->close && connection->socket->callbackLevel == 0) {
         gti2CloseSocket(connection->socket);
-        return FALSE;
+        return gsi_false;
     }
-    return TRUE;
+    return gsi_true;
 }
 
-BOOL gti2SendFilterCallback(GTI2Connection *connection, int filterId, const void *message, int length, BOOL reliable) {
-    GTI2FilterCallback *filter;
+GT2Bool gti2SendFilterCallback(GT2Connection connection, int filterId, const GT2Byte *message, int length,
+                               GT2Bool reliable) {
+    gt2SendFilterCallback *filter;
 
     if (connection == NULL) {
-        return TRUE;
+        return gsi_true;
     }
-    filter = func_ov011_0217158c(connection->sendFilters, filterId);
+    filter = ArrayNth(connection->sendFilters, filterId);
     if (filter == NULL) {
-        return TRUE;
+        return gsi_true;
     }
     if (length == 0 || message == NULL) {
         message = NULL;
@@ -151,21 +152,21 @@ BOOL gti2SendFilterCallback(GTI2Connection *connection, int filterId, const void
     connection->socket->callbackLevel--;
     if (connection->socket->close && connection->socket->callbackLevel == 0) {
         gti2CloseSocket(connection->socket);
-        return FALSE;
+        return gsi_false;
     }
-    return TRUE;
+    return gsi_true;
 }
 
-BOOL gti2ReceiveFilterCallback(GTI2Connection *connection, int filterId, const void *message, int length,
-                               BOOL reliable) {
-    GTI2FilterCallback *filter;
+GT2Bool gti2ReceiveFilterCallback(GT2Connection connection, int filterId, GT2Byte *message, int length,
+                                  GT2Bool reliable) {
+    gt2ReceiveFilterCallback *filter;
 
     if (connection == NULL) {
-        return TRUE;
+        return gsi_true;
     }
-    filter = func_ov011_0217158c(connection->receiveFilters, filterId);
+    filter = ArrayNth(connection->receiveFilters, filterId);
     if (filter == NULL) {
-        return TRUE;
+        return gsi_true;
     }
     if (length == 0 || message == NULL) {
         message = NULL;
@@ -178,25 +179,25 @@ BOOL gti2ReceiveFilterCallback(GTI2Connection *connection, int filterId, const v
     connection->socket->callbackLevel--;
     if (connection->socket->close && connection->socket->callbackLevel == 0) {
         gti2CloseSocket(connection->socket);
-        return FALSE;
+        return gsi_false;
     }
-    return TRUE;
+    return gsi_true;
 }
 
-BOOL gti2DumpCallback(GTI2Socket *socket, GTI2Connection *connection, u32 ip, u16 port, BOOL reset, const void *message,
-                      int length, BOOL send) {
-    GTI2DumpCallback callback;
+GT2Bool gti2DumpCallback(GT2Socket socket, GT2Connection connection, unsigned int ip, unsigned short port,
+                         GT2Bool reset, const GT2Byte *message, int length, GT2Bool send) {
+    gt2DumpCallback callback;
 
     if (socket == NULL) {
-        return TRUE;
+        return gsi_true;
     }
     if (send) {
-        callback = socket->onSendDump;
+        callback = socket->sendDumpCallback;
     } else {
-        callback = socket->onReceiveDump;
+        callback = socket->receiveDumpCallback;
     }
     if (callback == NULL) {
-        return TRUE;
+        return gsi_true;
     }
     if (length == 0 || message == NULL) {
         message = NULL;
@@ -213,30 +214,30 @@ BOOL gti2DumpCallback(GTI2Socket *socket, GTI2Connection *connection, u32 ip, u1
     }
     if (socket->close && socket->callbackLevel == 0) {
         gti2CloseSocket(socket);
-        return FALSE;
+        return gsi_false;
     }
-    return TRUE;
+    return gsi_true;
 }
 
-BOOL gti2UnrecognizedMessageCallback(GTI2Socket *socket, u32 ip, u16 port, const void *message, int length,
-                                     BOOL *handled) {
-    *handled = FALSE;
+GT2Bool gti2UnrecognizedMessageCallback(GT2Socket socket, unsigned int ip, unsigned short port, GT2Byte *message,
+                                        int length, GT2Bool *handled) {
+    *handled = gsi_false;
     if (socket == NULL) {
-        return TRUE;
+        return gsi_true;
     }
-    if (socket->onUnrecognizedMessage == NULL) {
-        return TRUE;
+    if (socket->unrecognizedMessageCallback == NULL) {
+        return gsi_true;
     }
     if (length == 0 || message == NULL) {
         message = NULL;
         length = 0;
     }
     socket->callbackLevel++;
-    *handled = socket->onUnrecognizedMessage(socket, ip, port, message, length);
+    *handled = socket->unrecognizedMessageCallback(socket, ip, port, message, length);
     socket->callbackLevel--;
     if (socket->close && socket->callbackLevel == 0) {
         gti2CloseSocket(socket);
-        return FALSE;
+        return gsi_false;
     }
-    return TRUE;
+    return gsi_true;
 }

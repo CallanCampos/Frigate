@@ -20,7 +20,7 @@ set(port_nnsys_renamed_expheap NNS_FndCreateExpHeapEx NNS_FndAllocFromExpHeapEx
     NNS_FndDestroyExpHeap NNS_FndResizeForMBlockExpHeap NNS_FndFreeToExpHeap)
 set(port_nnsys_renamed_frameheap NNS_FndCreateFrmHeapEx NNS_FndAllocFromFrmHeapEx
     NNS_FndDestroyFrmHeap NNS_FndFreeToFrmHeap NNS_FndFreeByStateToFrmHeap)
-set(port_nnsys_renamed_unitheap NNS_FndUnitHeapFree)
+set(port_nnsys_renamed_unitheap NNS_FndFreeToUnitHeap)
 set(port_nnsys_renamed_g2d_ncg
     NNS_G2dGetUnpackedCharacterData NNS_G2dUnpackNCG NNS_G2dGetUnpackedBGCharacterData NNS_G2dUnpackBGNCG)
 set(port_nnsys_renamed_g2d_ncl

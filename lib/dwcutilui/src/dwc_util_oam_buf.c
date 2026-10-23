@@ -18,15 +18,15 @@ static DWCUtilOamBuf *sOamBuf;
 
 static void DWCUtilOamBuf_UploadTask(DWCUtilTask *task, void *arg);
 
-void DWCUtilOamBuf_Init(void) {
+void DWCi_OBJlInit(void) {
     int i;
 
-    sOamBuf = DWCUtilHeap_AllocClear(sizeof(DWCUtilOamBuf), 4);
+    sOamBuf = DWCi_HEAPlAllocEx(sizeof(DWCUtilOamBuf), 4);
     MI_CpuFillFast(sOamBuf, GX_OAM_EFFECT_NODISPLAY, sizeof(sOamBuf->oam));
     for (i = 0; i < 2; i++) {
-        sOamBuf->freeOam[i] = DWCUtilStack_CreateFilled(64, (u8 *)sOamBuf->oam[i], sizeof(GXOamAttr));
+        sOamBuf->freeOam[i] = DWCi_QUElFormEx(64, (u8 *)sOamBuf->oam[i], sizeof(GXOamAttr));
     }
-    sOamBuf->task = DWCUtilTask_Create(1, DWCUtilOamBuf_UploadTask, NULL, 200);
+    sOamBuf->task = DWCi_TSKlForm(1, DWCUtilOamBuf_UploadTask, NULL, 200);
 }
 
 static void DWCUtilOamBuf_UploadTask(DWCUtilTask *task, void *arg) {
@@ -35,23 +35,23 @@ static void DWCUtilOamBuf_UploadTask(DWCUtilTask *task, void *arg) {
     GXS_LoadOAM(sOamBuf->oam[1], 0, sizeof(sOamBuf->oam[1]));
 }
 
-void DWCUtilOamBuf_Exit(void) {
-    DWCUtilTask_Remove(1, sOamBuf->task);
-    DWCUtilHeap_FreeAndNull(&sOamBuf);
+void DWCi_OBJlEnd(void) {
+    DWCi_TSKlDeleteEx(1, sOamBuf->task);
+    DWCi_HEAPlFree_(&sOamBuf);
 }
 
-GXOamAttr *DWCUtilOamBuf_Alloc(int screen) {
-    return DWCUtilStack_Pop(sOamBuf->freeOam[screen]);
+GXOamAttr *DWCi_OBJlFormGx(int screen) {
+    return DWCi_QUElPopFront(sOamBuf->freeOam[screen]);
 }
 
-void DWCUtilOamBuf_Free(GXOamAttr *oam) {
+void DWCi_MOV_MBP_GetChildBmp(GXOamAttr *oam) {
     int screen = 0;
 
     G2_SetOBJEffect(oam, GX_OAM_EFFECT_NODISPLAY, 0);
     if (oam >= sOamBuf->oam[1]) {
         screen = 1;
     }
-    DWCUtilStack_Push(sOamBuf->freeOam[screen], oam);
+    DWCi_QUElPushBack(sOamBuf->freeOam[screen], oam);
 }
 
 GXOamAttr *DWCUtilOamBuf_GetEntry(int screen, int index) {

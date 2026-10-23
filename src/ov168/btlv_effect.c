@@ -18,6 +18,8 @@
 #include "battle/btlv_mcss.h"
 #include "battle/btlv_stage.h"
 #include "battle/btlv_timer.h"
+#include "constants/battle.h"
+#include "constants/trainer_classes.h"
 #include "field/field_light_status.h"
 #include "gfl/arc.h"
 #include "gfl/bg_sys.h"
@@ -145,6 +147,19 @@ typedef struct {
     u32 argC; // 0xc
 } BtlvEffectRotateWork;
 
+// The steps of BtlvEffect_UpdateIdleEffect: wait for the time to pass, then play an effect
+enum {
+    IDLE_SEQ_WAIT,
+    IDLE_SEQ_PLAY,
+};
+
+// The steps of a damaged Pokémon's blink: fade it, hide it, show it again
+enum {
+    BLINK_SEQ_FADE,
+    BLINK_SEQ_HIDE,
+    BLINK_SEQ_SHOW,
+};
+
 static u32 BtlvEffect_GetStudioMode(BtlMainModule *mainModule);
 static u32 BtlvEffect_GetStudioParam(BtlMainModule *mainModule);
 static void BtlvEffect_Stop(void);
@@ -260,10 +275,10 @@ void BtlvEffect_Init(BtlvEffectSetup *setup, Font *font, HeapID heapId) {
     sBtlvEffect->effvm = BtlvEffvm_Create(sBtlvEffect->tcbManager, heapId);
     sBtlvEffect->palFade = PaletteFade_Create(heapId);
     PaletteFade_SetTransferAll(sBtlvEffect->palFade, TRUE);
-    PaletteFade_AllocBuffer(sBtlvEffect->palFade, 0, 0x200, heapId);
-    PaletteFade_AllocBuffer(sBtlvEffect->palFade, 1, 0x1e0, heapId);
-    PaletteFade_AllocBuffer(sBtlvEffect->palFade, 2, 0x200, heapId);
-    PaletteFade_AllocBuffer(sBtlvEffect->palFade, 3, 0x1e0, heapId);
+    PaletteFade_AllocBuffer(sBtlvEffect->palFade, PALFADE_BUFFER_MAIN_BG, 0x200, heapId);
+    PaletteFade_AllocBuffer(sBtlvEffect->palFade, PALFADE_BUFFER_SUB_BG, 0x1e0, heapId);
+    PaletteFade_AllocBuffer(sBtlvEffect->palFade, PALFADE_BUFFER_MAIN_OBJ, 0x200, heapId);
+    PaletteFade_AllocBuffer(sBtlvEffect->palFade, PALFADE_BUFFER_SUB_OBJ, 0x1e0, heapId);
     sBtlvEffect->mcss = BtlvMcss_Create(setup->battleStyle, sBtlvEffect->tcbManager, heapId);
     if (BtlvEffect_GetStudioMode(setup->mainModule) == 2) {
         BtlvMcss_SetShadows(sBtlvEffect->mcss, data_ov168_021f3f70[GetStudioMovieId(setup->mainModule)]);
@@ -330,10 +345,10 @@ void BtlvEffect_Exit(void) {
     if (sBtlvEffect != NULL) {
         PokeVoice_FreeMulti();
         BtlvEffect_EndAllTasks();
-        PaletteFade_FreeBuffer(sBtlvEffect->palFade, 0);
-        PaletteFade_FreeBuffer(sBtlvEffect->palFade, 1);
-        PaletteFade_FreeBuffer(sBtlvEffect->palFade, 2);
-        PaletteFade_FreeBuffer(sBtlvEffect->palFade, 3);
+        PaletteFade_FreeBuffer(sBtlvEffect->palFade, PALFADE_BUFFER_MAIN_BG);
+        PaletteFade_FreeBuffer(sBtlvEffect->palFade, PALFADE_BUFFER_SUB_BG);
+        PaletteFade_FreeBuffer(sBtlvEffect->palFade, PALFADE_BUFFER_MAIN_OBJ);
+        PaletteFade_FreeBuffer(sBtlvEffect->palFade, PALFADE_BUFFER_SUB_OBJ);
         PaletteFade_Free(sBtlvEffect->palFade);
         BtlvMcss_Delete(sBtlvEffect->mcss);
         BtlvStage_Delete(sBtlvEffect->stage);
@@ -371,9 +386,9 @@ void BtlvEffect_Main(void) {
         BtlvMcss_Draw(sBtlvEffect->mcss);
         // The game reads the polygon list RAM count before each of these and drops it, likely what is left of a debug
         // print of the counts
-        reg_G3X_RAM_COUNT;
+        reg_G3X_LISTRAM_COUNT;
         Particle_DrawAndUpdateAll();
-        reg_G3X_RAM_COUNT;
+        reg_G3X_LISTRAM_COUNT;
         GFL_G3DSysReqSwapBuffers();
     }
 }
@@ -466,7 +481,7 @@ void BtlvEffect_StartDamage(u32 pos, u16 move) {
     BtlvEffectDamage *damage =
         GFL_HeapAllocate(HEAPID_TAIL(sBtlvEffect->heapId), sizeof(BtlvEffectDamage), FALSE, "btlv_effect.c", 0x30c);
 
-    damage->seq = 0;
+    damage->seq = BLINK_SEQ_FADE;
     damage->pos = pos;
     damage->count = 3;
     damage->wait = 0;
@@ -566,61 +581,61 @@ BOOL BtlvEffect_CheckExist(int pos) {
     return sBtlvEffect->trainers[pos - 8] != -1;
 }
 
-void BtlvEffect_SetTrainer(s32 trainerType, u32 pos, fx32 x, fx32 y, fx32 z) {
+void BtlvEffect_SetTrainer(s32 trainerType, BtlvMcssPos pos, fx32 x, fx32 y, fx32 z) {
     switch (sBtlvEffect->setup.unk2C) {
     case 1:
-        if (trainerType == 0 || trainerType == 1) {
-            trainerType = 0;
+        if (trainerType == TRAINER_CLASS_PKMN_TRAINER_NATE || trainerType == TRAINER_CLASS_PKMN_TRAINER_ROSA) {
+            trainerType = TRAINER_CLASS_PKMN_TRAINER_NATE;
             if (getTrainerGender(GetClientPlayerInfo(sBtlvEffect->setup.mainModule, 0))) {
-                trainerType = 1;
+                trainerType = TRAINER_CLASS_PKMN_TRAINER_ROSA;
             }
         }
         break;
     case 2:
-        if (trainerType == 0 || trainerType == 1) {
+        if (trainerType == TRAINER_CLASS_PKMN_TRAINER_NATE || trainerType == TRAINER_CLASS_PKMN_TRAINER_ROSA) {
             trainerType = GetClientTrainerClass(sBtlvEffect->setup.mainModule, 0);
         }
         break;
     }
     if (!(pos & 1)) {
         switch (trainerType) {
-        case 0:
+        case TRAINER_CLASS_PKMN_TRAINER_NATE:
             if (BtlvEffect_GetUnk2E4()) {
-                trainerType = 0xb4;
+                trainerType = TRAINER_CLASS_PKMN_TRAINER_M_180;
             }
             break;
-        case 1:
+        case TRAINER_CLASS_PKMN_TRAINER_ROSA:
             if (BtlvEffect_GetUnk2E4()) {
-                trainerType = 0xb5;
+                trainerType = TRAINER_CLASS_PKMN_TRAINER_F_181;
             }
             break;
-        case 0xb6:
+        case TRAINER_CLASS_PKMN_TRAINER_M_182:
             if (BtlvEffect_GetUnk2E4()) {
-                trainerType = 0xb8;
+                trainerType = TRAINER_CLASS_PKMN_TRAINER_M_184;
             }
             break;
-        case 0xb7:
+        case TRAINER_CLASS_PKMN_TRAINER_F_183:
             if (BtlvEffect_GetUnk2E4()) {
-                trainerType = 0xb9;
+                trainerType = TRAINER_CLASS_PKMN_TRAINER_F_185;
             }
             break;
         }
     } else {
         switch (trainerType) {
-        case 0:
-        case 1:
+        case TRAINER_CLASS_PKMN_TRAINER_NATE:
+        case TRAINER_CLASS_PKMN_TRAINER_ROSA:
             if (BtlvEffect_GetUnk2E4()) {
-                trainerType += 0xb4;
+                trainerType += TRAINER_CLASS_PKMN_TRAINER_M_180;
             }
             break;
-        case 0xb6:
+        case TRAINER_CLASS_PKMN_TRAINER_M_182:
             if (BtlvEffect_GetUnk2E4()) {
-                trainerType = 0xb8;
+                trainerType = TRAINER_CLASS_PKMN_TRAINER_M_184;
             }
             break;
-        case 0xb7:
+        case TRAINER_CLASS_PKMN_TRAINER_F_183:
             if (BtlvEffect_GetUnk2E4()) {
-                trainerType = 0xb9;
+                trainerType = TRAINER_CLASS_PKMN_TRAINER_F_185;
             }
             break;
         }
@@ -632,7 +647,7 @@ void BtlvEffect_SetTrainer(s32 trainerType, u32 pos, fx32 x, fx32 y, fx32 z) {
     sBtlvEffect->trainers[pos - 8] = pos;
 }
 
-void BtlvEffect_DelTrainer(u32 pos) {
+void BtlvEffect_DelTrainer(BtlvMcssPos pos) {
     if (sBtlvEffect->trainers[pos - 8] != -1) {
         BtlvMcss_Remove(sBtlvEffect->mcss, pos);
         sBtlvEffect->trainers[pos - 8] = -1;
@@ -645,10 +660,10 @@ void BtlvEffect_SetPokeAnimeSpeed(u8 viewPos, fx32 speed) {
 
 void BtlvEffect_AddGauge(BtlMainModule *mainModule, BattleMon *mon, u32 viewPos) {
     switch (sBtlvEffect->setup.battleStyle) {
-    case 2:
+    case BTL_STYLE_TRIPLE:
         BtlvGauge_SetBattleMon(sBtlvEffect->gauge, mainModule, mon, 2, viewPos);
         break;
-    case 3:
+    case BTL_STYLE_ROTATION:
         BtlvGauge_SetBattleMon(sBtlvEffect->gauge, mainModule, mon, 3, viewPos);
         break;
     default:
@@ -659,10 +674,10 @@ void BtlvEffect_AddGauge(BtlMainModule *mainModule, BattleMon *mon, u32 viewPos)
 
 void BtlvEffect_AddGaugeByPkm(PokeDexSave *pokedex, PartyPkm *pkm, u32 viewPos) {
     switch (sBtlvEffect->setup.battleStyle) {
-    case 2:
+    case BTL_STYLE_TRIPLE:
         BtlvGauge_SetPartyPkm(sBtlvEffect->gauge, pokedex, pkm, 2, viewPos);
         break;
-    case 3:
+    case BTL_STYLE_ROTATION:
         BtlvGauge_SetPartyPkm(sBtlvEffect->gauge, pokedex, pkm, 3, viewPos);
         break;
     default:
@@ -739,16 +754,16 @@ BOOL BtlvEffect_IsBallGaugeBusy(u32 side) {
     return BtlvBGauge_IsBusy(sBtlvEffect->ballGauges[side]);
 }
 
-// target: 0 the stage, 1 the field, 2 both, 3 the palettes, 4 all
 void BtlvEffect_StartPaletteFade(u32 target, u8 evy, u8 targetEvy, u8 wait, u16 color) {
-    if (target == 0 || target == 2 || target == 4) {
+    if (target == BTLV_EFFECT_FADE_STAGE || target == BTLV_EFFECT_FADE_STAGE_FIELD || target == BTLV_EFFECT_FADE_ALL) {
         BtlvStage_StartPaletteFade(sBtlvEffect->stage, evy, targetEvy, wait, color);
     }
-    if (target == 1 || target == 2 || target == 4) {
+    if (target == BTLV_EFFECT_FADE_FIELD || target == BTLV_EFFECT_FADE_STAGE_FIELD || target == BTLV_EFFECT_FADE_ALL) {
         BtlvField_StartPaletteFade(sBtlvEffect->field, evy, targetEvy, wait, color);
     }
-    if (target == 3 || target == 4) {
-        PaletteFade_StartFade(sBtlvEffect->palFade, 1, 0xff00, wait, evy, targetEvy, color, sBtlvEffect->tcbManager);
+    if (target == BTLV_EFFECT_FADE_PALETTES || target == BTLV_EFFECT_FADE_ALL) {
+        PaletteFade_StartFade(sBtlvEffect->palFade, 1 << PALFADE_BUFFER_MAIN_BG, 0xff00, wait, evy, targetEvy, color,
+                              sBtlvEffect->tcbManager);
     }
 }
 
@@ -757,13 +772,13 @@ BOOL BtlvEffect_IsPaletteFading(u32 target) {
     BOOL field = FALSE;
     BOOL palette = FALSE;
 
-    if (target == 0 || target == 2 || target == 4) {
+    if (target == BTLV_EFFECT_FADE_STAGE || target == BTLV_EFFECT_FADE_STAGE_FIELD || target == BTLV_EFFECT_FADE_ALL) {
         stage = BtlvStage_IsPaletteFading(sBtlvEffect->stage);
     }
-    if (target == 1 || target == 2 || target == 4) {
+    if (target == BTLV_EFFECT_FADE_FIELD || target == BTLV_EFFECT_FADE_STAGE_FIELD || target == BTLV_EFFECT_FADE_ALL) {
         field = BtlvField_IsPaletteFading(sBtlvEffect->field);
     }
-    if (target == 3 || target == 4) {
+    if (target == BTLV_EFFECT_FADE_PALETTES || target == BTLV_EFFECT_FADE_ALL) {
         palette = PaletteFade_GetActiveMask(sBtlvEffect->palFade) != 0;
     }
     if (stage == TRUE || field == TRUE || palette == TRUE) {
@@ -772,22 +787,21 @@ BOOL BtlvEffect_IsPaletteFading(u32 target) {
     return FALSE;
 }
 
-// target: 0 the stage, 1 the field, 2 BG 3, 3 and 4 the stage's sides
 void BtlvEffect_SetVanish(u32 target, BOOL hide) {
     switch (target) {
-    case 0:
+    case BTLV_EFFECT_VANISH_STAGE:
         BtlvStage_SetVanish(sBtlvEffect->stage, 2, hide);
         break;
-    case 1:
+    case BTLV_EFFECT_VANISH_FIELD:
         BtlvField_SetHidden(sBtlvEffect->field, hide);
         break;
-    case 2:
+    case BTLV_EFFECT_VANISH_BG3:
         GFL_BGSysSetBGEnabled(3, hide ^ 1);
         break;
-    case 3:
+    case BTLV_EFFECT_VANISH_STAGE_SIDE_1ST:
         BtlvStage_SetVanish(sBtlvEffect->stage, 0, hide);
         break;
-    case 4:
+    case BTLV_EFFECT_VANISH_STAGE_SIDE_2ND:
         BtlvStage_SetVanish(sBtlvEffect->stage, 1, hide);
         break;
     }
@@ -817,7 +831,7 @@ void BtlvEffect_SwapPokemon(u8 pos1, u8 pos2) {
     BtlvMcss_SwapPositions(sBtlvEffect->mcss, pos1, pos2);
 }
 
-s32 BtlvEffect_GetTrainerIndex(u32 pos) {
+s32 BtlvEffect_GetTrainerIndex(BtlvMcssPos pos) {
     return sBtlvEffect->trainers[pos - 8];
 }
 
@@ -844,26 +858,26 @@ void BtlvEffect_ZoomCamera(u32 pos, u32 mode, int frames, int wait, int brakeFra
     if (pos & 1) {
         BtlvEffect_GetZoomCameraPosTarget(pos, &camPos, &camTarget);
         switch (mode) {
-        case 0:
+        case BTLV_EFFECT_ZOOM_SET:
             BtlvCamera_SetPosTarget(sBtlvEffect->camera, &camPos, &camTarget);
             break;
-        case 1:
+        case BTLV_EFFECT_ZOOM_MOVE:
             BtlvCamera_MoveTo(sBtlvEffect->camera, &camPos, &camTarget, frames, wait, brakeFrames);
             break;
         }
     } else {
         switch (sBtlvEffect->setup.battleStyle) {
-        case 0:
+        case BTL_STYLE_SINGLE:
             BtlvEffect_Start(0x23f);
             break;
-        case 1:
+        case BTL_STYLE_DOUBLE:
             if (pos == 2) {
                 BtlvEffect_Start(0x240);
             } else {
                 BtlvEffect_Start(0x241);
             }
             break;
-        case 2:
+        case BTL_STYLE_TRIPLE:
             if (pos == 2) {
                 BtlvEffect_Start(0x242);
             } else if (pos == 4) {
@@ -872,7 +886,7 @@ void BtlvEffect_ZoomCamera(u32 pos, u32 mode, int frames, int wait, int brakeFra
                 BtlvEffect_Start(0x243);
             }
             break;
-        case 3:
+        case BTL_STYLE_ROTATION:
             BtlvEffect_Start(0x245);
             break;
         }
@@ -1086,29 +1100,30 @@ void BtlvEffect_EndTaskGroup(u32 group) {
 
 void BtlvEffect_SetIdleEffectMode(u32 mode) {
     sBtlvEffect->idleEffectMode = mode;
-    if (sBtlvEffect->idleEffectMode != 2) {
-        sBtlvEffect->idleEffectSeq = 0;
+    if (sBtlvEffect->idleEffectMode != BTLV_IDLE_EFFECT_COMMAND) {
+        sBtlvEffect->idleEffectSeq = IDLE_SEQ_WAIT;
         sBtlvEffect->idleEffectTimer = 0;
     }
-    if (mode == 3) {
+    if (mode == BTLV_IDLE_EFFECT_WAIT_MSG) {
         BtlvMcss_SaveVanish(sBtlvEffect->mcss);
     }
 }
 
 void BtlvEffect_StopIdleEffect(void) {
     BtlvEffect_Stop();
-    if (sBtlvEffect->idleEffectMode == 3 && BtlSetup_IsBattleType(sBtlvEffect->setup.mainModule, 0x400)) {
+    if (sBtlvEffect->idleEffectMode == BTLV_IDLE_EFFECT_WAIT_MSG &&
+        BtlSetup_IsBattleType(sBtlvEffect->setup.mainModule, 0x400)) {
         BtlvEffect_Start(0x251);
     } else {
         BtlvEffect_Start(0x236);
     }
-    sBtlvEffect->idleEffectMode = 0;
+    sBtlvEffect->idleEffectMode = BTLV_IDLE_EFFECT_OFF;
 }
 
 void BtlvEffect_RestartIdleEffect(u32 mode) {
     BtlvEffect_Stop();
     sBtlvEffect->idleEffectMode = mode;
-    sBtlvEffect->idleEffectSeq = 0;
+    sBtlvEffect->idleEffectSeq = IDLE_SEQ_WAIT;
     sBtlvEffect->idleEffectTimer = 0;
 }
 
@@ -1166,22 +1181,22 @@ static void BtlvEffect_BlinkTask(TCB *tcb, void *data) {
         return;
     }
     switch (work->seq) {
-    case 0:
+    case BLINK_SEQ_FADE:
         if (!work->hidden) {
             BtlvMcss_StartPaletteFade(sBtlvEffect->mcss, work->pos, 16, 16, 0, work->color);
         }
         work->wait = 3;
-        work->seq = 1;
+        work->seq = BLINK_SEQ_HIDE;
         break;
-    case 1:
+    case BLINK_SEQ_HIDE:
         if (!work->hidden) {
             BtlvMcss_SetVanish(sBtlvEffect->mcss, work->pos, TRUE);
         }
         work->wait = 3;
-        work->seq = 2;
+        work->seq = BLINK_SEQ_SHOW;
         break;
-    case 2:
-        work->seq = 0;
+    case BLINK_SEQ_SHOW:
+        work->seq = BLINK_SEQ_FADE;
         if (!work->hidden) {
             BtlvMcss_SetVanish(sBtlvEffect->mcss, work->pos, FALSE);
             BtlvMcss_StartPaletteFade(sBtlvEffect->mcss, work->pos, 0, 0, 0, 0x7fff);
@@ -1195,9 +1210,9 @@ static void BtlvEffect_BlinkTask(TCB *tcb, void *data) {
 }
 
 static void BtlvEffect_DamageTaskEnd(TCB *tcb) {
-    u32 *viewPos = GFL_TCBGetData(tcb);
+    BtlvEffectDamage *work = GFL_TCBGetData(tcb);
 
-    sBtlvEffect->damageTasks &= BtlvEffect_PosBit(*viewPos) ^ 0xffffffff;
+    sBtlvEffect->damageTasks &= BtlvEffect_PosBit(work->pos) ^ 0xffffffff;
 }
 
 static void BtlvEffect_SubstituteTask(TCB *tcb, void *data) {
@@ -1213,7 +1228,7 @@ static void BtlvEffect_SubstituteTask(TCB *tcb, void *data) {
         if (sBtlvEffect->executing) {
             break;
         }
-        if (BtlvMcss_GetFlags(sBtlvEffect->mcss, work->viewPos) & 1) {
+        if (BtlvMcss_GetFlags(sBtlvEffect->mcss, work->viewPos) & BTLV_MCSS_FLAG_UNK0) {
             BtlvEffvm_Start(sBtlvEffect->effvm, work->viewPos, 0xff, 0x264, NULL);
             sBtlvEffect->executing = TRUE;
         }
@@ -1245,7 +1260,7 @@ static void BtlvEffect_SubstituteTask(TCB *tcb, void *data) {
         }
         BtlvEffvm_PlaySEAt(sBtlvEffect->effvm, 0x560, 1, 14, 0, 0, 0, 0, 0);
         BtlvMcss_MoveAlpha(sBtlvEffect->mcss, work->viewPos, 0, 31, 0, 0, 0);
-        if (BtlvMcss_GetFlags(sBtlvEffect->mcss, work->viewPos) & 1) {
+        if (BtlvMcss_GetFlags(sBtlvEffect->mcss, work->viewPos) & BTLV_MCSS_FLAG_UNK0) {
             BtlvEffvm_Start(sBtlvEffect->effvm, work->viewPos, 0xff, 0x265, NULL);
             sBtlvEffect->executing = TRUE;
         }
@@ -1268,9 +1283,9 @@ static void BtlvEffect_SubstituteTask(TCB *tcb, void *data) {
 }
 
 static void BtlvEffect_Unk8TaskEnd(TCB *tcb) {
-    u32 *viewPos = GFL_TCBGetData(tcb);
+    BtlvEffectChange *work = GFL_TCBGetData(tcb);
 
-    sBtlvEffect->unkTasks8 &= BtlvEffect_PosBit(*viewPos) ^ 0xffffffff;
+    sBtlvEffect->unkTasks8 &= BtlvEffect_PosBit(work->viewPos) ^ 0xffffffff;
 }
 
 static void BtlvEffect_RotateTask(TCB *tcb, void *data) {
@@ -1325,28 +1340,30 @@ static void BtlvEffect_UpdateIdleEffect(void) {
     s32 pick;
     u32 effect;
 
-    if (sBtlvEffect->idleEffectMode == 0) {
+    if (sBtlvEffect->idleEffectMode == BTLV_IDLE_EFFECT_OFF) {
         return;
     }
-    if (sBtlvEffect->idleEffectMode != 2 && sBtlvEffect->idleEffectMode != 3 && (keys != 0 || touched)) {
+    if (sBtlvEffect->idleEffectMode != BTLV_IDLE_EFFECT_COMMAND &&
+        sBtlvEffect->idleEffectMode != BTLV_IDLE_EFFECT_WAIT_MSG && (keys != 0 || touched)) {
         BtlvEffect_Stop();
         BtlvEffect_Start(0x252);
-        sBtlvEffect->idleEffectSeq = 0;
+        sBtlvEffect->idleEffectSeq = IDLE_SEQ_WAIT;
         sBtlvEffect->idleEffectTimer = 0;
     }
     switch (sBtlvEffect->idleEffectSeq) {
-    case 0:
+    case IDLE_SEQ_WAIT:
         if (sBtlvEffect->idleEffectTimer < sBtlvEffect->idleEffectWait) {
             sBtlvEffect->idleEffectTimer++;
             return;
         }
-        sBtlvEffect->idleEffectSeq = 1;
+        sBtlvEffect->idleEffectSeq = IDLE_SEQ_PLAY;
         // fallthrough
-    case 1:
+    case IDLE_SEQ_PLAY:
         if (BtlvEffect_IsBusy()) {
             break;
         }
-        if (sBtlvEffect->idleEffectMode == 3 && BtlSetup_IsBattleType(sBtlvEffect->setup.mainModule, 0x400)) {
+        if (sBtlvEffect->idleEffectMode == BTLV_IDLE_EFFECT_WAIT_MSG &&
+            BtlSetup_IsBattleType(sBtlvEffect->setup.mainModule, 0x400)) {
             do {
                 pick = GFL_RandomMTRange(2);
             } while (sBtlvEffect->idleEffectLast == pick);
@@ -1442,13 +1459,13 @@ BOOL BtlvEffTool_Move(BtlvEffToolMove *move, VecFx32 *value) {
     BOOL done = TRUE;
 
     switch (move->type) {
-    case 0:
+    case BTLV_EFFTOOL_MOVE_JUMP:
         value->x = move->end.x;
         value->y = move->end.y;
         value->z = move->end.z;
         break;
-    case 1:
-    case 4:
+    case BTLV_EFFTOOL_MOVE_STEP:
+    case BTLV_EFFTOOL_MOVE_SCROLL:
         if (move->wait == 0) {
             move->wait = move->waitReset;
             BtlvEffTool_Step(&value->x, &move->step.x, &move->end.x, &done);
@@ -1459,8 +1476,8 @@ BOOL BtlvEffTool_Move(BtlvEffToolMove *move, VecFx32 *value) {
             done = FALSE;
         }
         break;
-    case 2:
-    case 3:
+    case BTLV_EFFTOOL_MOVE_SWING:
+    case BTLV_EFFTOOL_MOVE_SHAKE:
         if (move->wait == 0) {
             move->wait = move->waitReset;
             value->x += move->step.x;
@@ -1469,7 +1486,8 @@ BOOL BtlvEffTool_Move(BtlvEffToolMove *move, VecFx32 *value) {
             if (--move->stepTime == 0) {
                 move->count--;
                 move->stepTime = move->stepTimeReset;
-                if (move->type == 2 || (move->type == 3 && (move->count & 1))) {
+                if (move->type == BTLV_EFFTOOL_MOVE_SWING ||
+                    (move->type == BTLV_EFFTOOL_MOVE_SHAKE && (move->count & 1))) {
                     move->step.x *= -1;
                     move->step.y *= -1;
                     move->step.z *= -1;

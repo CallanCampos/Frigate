@@ -422,7 +422,7 @@ BOOL BSubwayCmd_Tool(VM *vm, FieldScriptEnv *env) {
         break;
     }
     case 43: {
-        void *list = BSubwayWifiData_AllocLeaders(data3A, HEAPID_GAMEEVENT);
+        BSubwayWifiLeader *list = BSubwayWifiData_AllocLeaders(data3A, HEAPID_GAMEEVENT);
 
         *retWk = BSubwayWifiLeader_CountList(list);
         GFL_HeapFree(list);
@@ -1129,14 +1129,6 @@ static GameEvent *EventBSubwayMsgWindow_Create(GameSystem *gsys, FieldScriptEnv 
     return event;
 }
 
-typedef struct {
-    u8 unk0[0x20];
-    u8 unk20_0 : 1;
-    u8 female : 1;
-    u8 unk20_2 : 6;
-    u8 unk21;
-} BSubwayRecord;
-
 // Places the subway's passengers: in mode 4 the players of the records in block 0x3a, and otherwise the actors of the
 // stage the player has reached
 static void BSubway_PlacePassengers(BSubwayScrWork *bsw, GameData *gameData, MMSys *mmSys, Field *field) {
@@ -1147,10 +1139,10 @@ static void BSubway_PlacePassengers(BSubwayScrWork *bsw, GameData *gameData, MMS
 
     if (mode == 4) {
         const BSubwayActorPos *pos = sActorPositions;
-        BSubwayRecord *list = BSubwayWifiData_AllocLeaders(
+        BSubwayWifiLeader *list = BSubwayWifiData_AllocLeaders(
             SaveControl_GetBlockPtr(GameData_GetSaveControl(gameData), SAVE_BLOCK_BSUBWAY_3A), HEAPID_GAMEEVENT);
         int count = BSubwayWifiLeader_CountList(list);
-        BSubwayRecord *record;
+        BSubwayWifiLeader *record;
         FieldActor *actor;
         u32 index;
         u16 objCode;

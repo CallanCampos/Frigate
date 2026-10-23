@@ -35,7 +35,7 @@ typedef struct {
     // What each person is told by the mission's target: three values, for the actor's user parameters
     u16 params[4][3];
     FieldActor *actors[4];
-    s32 zoneCount;
+    int zoneCount;
     FesMissionZone zones[6];
     u32 speciesCount;
     u16 species[640];
@@ -54,7 +54,7 @@ typedef struct {
 } FesMissionQuiz;
 
 // Overlay 36's Funfest gimmick, as Field_GetFesGimmick returns it (overlay 73's RivalSelectContext is the same one)
-typedef struct {
+struct FesGimmick {
     GameSystem *gsys;
     GameData *gameData;
     LinkFestival *festival;
@@ -74,7 +74,7 @@ typedef struct {
     void *unk3C;
     FesMissionWork *work;
     FesMissionQuiz quiz;
-} FesGimmick;
+};
 
 // The festival's total, at most 9999
 int LinkFestival_GetTotalScore(LinkFestival *festival);

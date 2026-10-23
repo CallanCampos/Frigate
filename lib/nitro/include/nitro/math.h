@@ -107,8 +107,8 @@ static inline u32 MATH_CountLeadingZeros(u32 x) {
 }
 #else
 // ARM code has the CLZ instruction, which the SDK's inline puts in place: assembly a library inlines at its call sites
-// (libVCT's VCT_SendPending is one), so a static inline with an asm block, as lib/ allows. MWCC defines __thumb only
-// for Thumb code
+// (libVCT's vct_flush_send_buffer is one), so a static inline with an asm block, as lib/ allows. MWCC defines __thumb
+// only for Thumb code
 static inline u32 MATH_CountLeadingZeros(u32 x) {
     asm {
         clz x, x
@@ -125,7 +125,7 @@ void MATH_SHA1Init(MATHSHA1Context *context);
 void MATH_SHA1Update(MATHSHA1Context *context, const void *data, u32 size);
 void MATH_SHA1GetHash(MATHSHA1Context *context, void *digest);
 // The SHA-1 digest of size bytes, through the three above
-void MATH_CalcSHA1(u8 *digest, const void *data, u32 size);
+void MATH_CalcSHA1(void *digest, const void *data, u32 size);
 // HMAC-SHA1 of dataSize bytes under a key; the 20-byte digest is written to digest
 void MATH_CalcHMACSHA1(void *digest, const void *data, u32 dataSize, const void *key, u32 keySize);
 // Chooses whether SHA-1 clears words 6 and 14 of each block, and returns the choice before. The overlays' digest check

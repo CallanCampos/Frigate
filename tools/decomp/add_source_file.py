@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
 """Add a source file to a module's delinks.txt in every version.
 
-Section ranges are given for the primary version. The ranges in the other versions are derived from the version map:
-code ranges through the paired functions, other sections by their offset from the section start, which requires the
-section to have the same size in both versions.
+Section ranges are given for the primary version. The ranges in the other versions are placed through the version map
+by version_addresses.py: each end from its section's edges and the paired functions' starts and ends, and an end
+between two of them only when both agree on its place. So a range may start or end where no function does, among
+padding, filler or data. An end that the map cannot place stops the tool with both candidates; give that range with
+--other-range. Every range is checked against the module's sections and the files already registered in each version
+before any version is written.
 """
 import argparse
-import csv
 import re
 import sys
 from pathlib import Path
@@ -14,58 +16,58 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from tools.decomp.dsd_config import ROOT, config_lock, parse_sections  # noqa: E402
 from tools.decomp.mark_complete import externally_used_statics  # noqa: E402
-
-PRIMARY = "b2_us"
-OTHERS = ["w2_us"]
+from tools.decomp.version_addresses import OTHERS, PRIMARY, ModulePlacer, Unplaced, load_pairs  # noqa: E402
 
 
-def load_function_pairs(path: Path, module: str, other: str) -> dict[int, tuple[int, int]]:
-    """Returns primary function address -> (other address, primary function size) for a module."""
-    pairs = {}
-    with path.open() as f:
-        for row in csv.DictReader(f, delimiter="\t"):
-            if row["module"] == module:
-                pairs[int(row[f"{PRIMARY}_addr"], 16)] = int(row[f"{other}_addr"], 16)
-    return pairs
+def map_range(placer: ModulePlacer, name, start, end) -> tuple[int, int]:
+    """Places a primary section range in the other version, or raises Unplaced."""
+    for address in (start, end):
+        function = placer.function_at(address) if name == ".text" else None
+        if function is not None and function[0] != address:
+            sys.exit(f"{name} {address:#010x} is inside the function at {function[0]:#010x} in {placer.label}")
+    other_start = placer.place(start, name)
+    if name == ".text" and end not in placer.anchors and end != placer.sections[name][1]:
+        # Padding after the range's last paired function, which has the same size in both versions
+        starts = [a for a in placer.function_pairs if start <= a < end]
+        last_end = dict(placer.functions).get(max(starts)) if starts else None
+        if last_end in placer.anchors:
+            return other_start, placer.anchors[last_end] + (end - last_end)
+    return other_start, placer.place(end, name)
 
 
-def function_ends(config: Path) -> dict[int, int]:
-    """Returns the end address of every function in a module, by start address."""
-    ends = {}
-    for line in (config / "symbols.txt").read_text().splitlines():
-        match = re.match(r"^\S+ kind:function\(\w+,size=(0x[0-9a-f]+)[^ ]*\) addr:(0x[0-9a-f]+)", line)
-        if match:
-            start = int(match.group(2), 16)
-            ends[start] = start + int(match.group(1), 16)
-    return ends
+def file_ranges(delinks: Path) -> list[tuple[str, str, int, int]]:
+    """Returns (file, section, start, end) of every file range in a delinks.txt."""
+    ranges = []
+    owner = None
+    for line in delinks.read_text().splitlines():
+        if line and not line[0].isspace() and line.endswith(":"):
+            owner = line[:-1]
+        match = re.match(r"^\s+(\.\w+)\s+start:(0x[0-9a-f]+) end:(0x[0-9a-f]+)$", line)
+        if match and owner:
+            ranges.append((owner, match.group(1), int(match.group(2), 16), int(match.group(3), 16)))
+    return ranges
 
 
-def map_range(name, start, end, module, other, primary_config, other_config, function_pairs):
-    if name == ".text":
-        other_start = function_pairs.get(start)
-        # The end is either the end of the last function, or the start of the next one
-        starts = sorted(a for a in function_pairs if start <= a < end)
-        if other_start is None or not starts:
-            sys.exit(f"{name} {start:#010x}..{end:#010x} does not start at a function in {module}")
-        last = starts[-1]
-        last_end = function_ends(primary_config)[last]
-        other_last = function_pairs[last]
-        other_last_end = function_ends(other_config)[other_last]
-        if end == last_end:
-            return other_start, other_last_end
-        if end > last_end:
-            # Padding after the last function, which has the same size in both versions
-            return other_start, other_last_end + (end - last_end)
-        sys.exit(f"{name} end {end:#010x} is inside the function at {last:#010x}")
+def check_range(delinks: Path, source, name, start, end):
+    """Exits if a range is empty, leaves its module section, or overlaps a file already registered."""
+    sections = parse_sections(delinks)
+    if name not in sections:
+        sys.exit(f"{delinks} has no {name} section")
+    section_start, section_end = sections[name]
+    if not section_start <= start < end <= section_end:
+        sys.exit(f"{name} {start:#010x}..{end:#010x} is empty or outside {section_start:#010x}..{section_end:#010x} "
+                 f"in {delinks}")
+    for owner, owner_section, owner_start, owner_end in file_ranges(delinks):
+        if owner != source and owner_section == name and start < owner_end and owner_start < end:
+            sys.exit(f"{name} {start:#010x}..{end:#010x} overlaps {owner} ({owner_start:#010x}..{owner_end:#010x}) "
+                     f"in {delinks}")
 
-    primary_sections = parse_sections(primary_config / "delinks.txt")
-    other_sections = parse_sections(other_config / "delinks.txt")
-    primary_start, primary_end = primary_sections[name]
-    other_start, other_end = other_sections[name]
-    if primary_end - primary_start != other_end - other_start:
-        sys.exit(f"{name} has different sizes in {PRIMARY} and {other}, add its range to {other} by hand")
-    delta = other_start - primary_start
-    return start + delta, end + delta
+
+def parse_range(text):
+    match = re.match(r"^(\.\w+):(0x[0-9a-fA-F]+)-(0x[0-9a-fA-F]+)$", text)
+    if not match:
+        sys.exit(f"invalid section range {text!r}, expected e.g. .text:0x021e8be0-0x021e8c74")
+    return match.group(1), int(match.group(2), 16), int(match.group(3), 16)
 
 
 def main():
@@ -75,30 +77,59 @@ def main():
     parser.add_argument("sections", nargs="+", help="section ranges in the primary version, e.g. .text:0x021e8be0-0x021e8c74")
     parser.add_argument("--incomplete", action="store_true", help="do not mark the file as complete")
     parser.add_argument("--map", type=Path, default=ROOT / "build" / "version_map.tsv")
+    parser.add_argument(
+        "--other-range",
+        action="append",
+        default=[],
+        metavar="VERSION:RANGE",
+        help="a section's range in another version, for one the version map cannot place, e.g. "
+        "w2_us:.text:0x021e8c00-0x021e8c94",
+    )
     args = parser.parse_args()
 
-    ranges = []
-    for section in args.sections:
-        match = re.match(r"^(\.\w+):(0x[0-9a-fA-F]+)-(0x[0-9a-fA-F]+)$", section)
-        if not match:
-            sys.exit(f"invalid section range {section!r}, expected e.g. .text:0x021e8be0-0x021e8c74")
-        ranges.append((match.group(1), int(match.group(2), 16), int(match.group(3), 16)))
+    ranges = [parse_range(section) for section in args.sections]
+    given = {}
+    for text in args.other_range:
+        version, _, section = text.partition(":")
+        if version not in OTHERS:
+            sys.exit(f"--other-range {text!r}: the version must be one of {', '.join(OTHERS)}")
+        name, start, end = parse_range(section)
+        given[version, name] = (start, end)
 
     entries = {PRIMARY: ranges}
     primary_config = ROOT / "config" / PRIMARY / "arm9" / args.module
+    unplaced = []
     for other in OTHERS:
         other_config = ROOT / "config" / other / "arm9" / args.module
-        function_pairs = load_function_pairs(args.map, args.module, other)
-        entries[other] = [
-            (name, *map_range(name, start, end, args.module, other, primary_config, other_config, function_pairs))
-            for name, start, end in ranges
-        ]
+        function_pairs = load_pairs(args.map, other).get(args.module, {})
+        placer = ModulePlacer.from_configs(args.module, primary_config, other_config, function_pairs)
+        entries[other] = []
+        for name, start, end in ranges:
+            if (other, name) in given:
+                entries[other].append((name, *given[other, name]))
+                continue
+            if name not in placer.sections:
+                sys.exit(f"{args.module} has no {name} section")
+            try:
+                mapped = map_range(placer, name, start, end)
+            except Unplaced as error:
+                unplaced.append(f"{other}: {error}; pass --other-range {other}:{name}:0x...-0x...")
+                continue
+            entries[other].append((name, *mapped))
+    if unplaced:
+        sys.exit("\n".join(unplaced))
+
+    # Every version is checked before any is written, so that a failure leaves them all as they were
+    for version, version_ranges in entries.items():
+        delinks = ROOT / "config" / version / "arm9" / args.module / "delinks.txt"
+        if f"\n{args.source}:\n" in delinks.read_text():
+            sys.exit(f"{args.source} is already in {delinks}")
+        for name, start, end in version_ranges:
+            check_range(delinks, args.source, name, start, end)
 
     for version, version_ranges in entries.items():
         delinks = ROOT / "config" / version / "arm9" / args.module / "delinks.txt"
         text = delinks.read_text()
-        if f"\n{args.source}:\n" in text:
-            sys.exit(f"{args.source} is already in {delinks}")
         lines = [f"{args.source}:"]
         lines += [f"    {name:<11} start:{start:#010x} end:{end:#010x}" for name, start, end in version_ranges]
         delinks.write_text(text.rstrip("\n") + "\n\n" + "\n".join(lines) + "\n")

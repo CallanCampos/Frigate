@@ -13,9 +13,9 @@ void *Field_GetEffectBlAct(Field *field);
 void *Field_GetWildEffectBlAct(Field *field);
 // The saving icon, and showing, hiding and freeing it
 void *func_ov036_021c6cc8(HeapID heapId, Field *field);
-void func_ov036_021c6d14(void *effect);
-void func_ov036_021c6d3c(void *effect);
-void func_ov036_021c6cf8(void *effect);
+void func_ov036_021c6d14(FieldSaveAnime *effect);
+void func_ov036_021c6d3c(FieldSaveAnime *effect);
+void func_ov036_021c6cf8(FieldSaveAnime *effect);
 
 // fldeff_gyoe.c: an emotion bubble over an actor's head, by kind: "!", "?", a music note and "...", which has no
 // sound. playSE plays the bubble's sound. The first function's bubble stays when it is done, until its owner ends it,

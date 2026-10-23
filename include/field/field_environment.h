@@ -11,7 +11,7 @@
 void *Field_GetLightSystem(Field *field);
 void *Field_GetFogCtrl(Field *field);
 void *Field_GetWeatherSystem(Field *field);
-u16 func_ov036_02199220(void *weatherSystem);
+u16 func_ov036_02199220(FieldWeather *weatherSystem);
 u32 Field_GetWeatherForZone(Field *field, u16 zoneId);
 // field_light.c: the field's lights, which follow the time of day
 FieldLight *FieldLight_Create(u32 lightsId, s32 daySeconds, u32 season, FieldFog *fog, G3DLight *lights, HeapID heapId);

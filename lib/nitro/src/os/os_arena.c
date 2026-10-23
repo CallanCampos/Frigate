@@ -28,8 +28,8 @@ static struct {
     BOOL mainExArenaEnabled;
 } sArena; // swan's g_IsUserMemMarkDone
 
-static void *OS_GetInitArenaHi(int arena); // swan's GetUserMemRegionDefaultEnd
-static void *OS_GetInitArenaLo(int arena); // swan's GetUserMemRegionDefaultStart
+static void *OS_GetInitArenaHi(OSArenaId arena); // swan's GetUserMemRegionDefaultEnd
+static void *OS_GetInitArenaLo(OSArenaId arena); // swan's GetUserMemRegionDefaultStart
 
 // NitroSDK's OS_InitArena: sets the limits of the arenas to the ones they start with, once
 void OS_InitArena(void) {
@@ -58,24 +58,24 @@ void OS_InitArenaEx(void) {
     OS_SetArenaHi(OS_ARENA_MAINEX, OS_GetInitArenaHi(OS_ARENA_MAINEX));
     OS_SetArenaLo(OS_ARENA_MAINEX, OS_GetInitArenaLo(OS_ARENA_MAINEX));
     if (!OS_IsRunOnTwl()) {
-        OS_SetProtectionRegion(1, 0x02000000, OS_PROTECTION_SIZE_4MB);
-        OS_SetProtectionRegion(2, 0x027ff000, OS_PROTECTION_SIZE_4KB);
+        OS_SetProtectionRegion(1, 0x02000000, HW_C6_PR_4MB);
+        OS_SetProtectionRegion(2, 0x027ff000, HW_C6_PR_4KB);
     } else {
         OSi_InitArenaExTwl();
     }
 }
 
 // NitroSDK's OS_GetArenaHi and OS_GetArenaLo
-void *OS_GetArenaHi(int arena) {
+void *OS_GetArenaHi(OSArenaId arena) {
     return OSi_GetArenaInfo()->hi[arena];
 }
 
-void *OS_GetArenaLo(int arena) {
+void *OS_GetArenaLo(OSArenaId arena) {
     return OSi_GetArenaInfo()->lo[arena];
 }
 
 // NitroSDK's OS_GetInitArenaHi: where each arena ends before the game moves it
-static void *OS_GetInitArenaHi(int arena) {
+static void *OS_GetInitArenaHi(OSArenaId arena) {
     switch (arena) {
     case OS_ARENA_MAIN:
         if (OS_IsRunOnTwl()) {
@@ -125,7 +125,7 @@ static void *OS_GetInitArenaHi(int arena) {
 }
 
 // NitroSDK's OS_GetInitArenaLo: where each arena begins before the game moves it
-static void *OS_GetInitArenaLo(int arena) {
+static void *OS_GetInitArenaLo(OSArenaId arena) {
     switch (arena) {
     case OS_ARENA_MAIN:
         if (OS_IsRunOnTwl()) {
@@ -164,17 +164,17 @@ static void *OS_GetInitArenaLo(int arena) {
 }
 
 // NitroSDK's OS_SetArenaHi and OS_SetArenaLo
-void OS_SetArenaHi(int arena, void *end) {
+void OS_SetArenaHi(OSArenaId arena, void *end) {
     OSi_GetArenaInfo()->hi[arena] = end;
 }
 
-void OS_SetArenaLo(int arena, void *start) {
+void OS_SetArenaLo(OSArenaId arena, void *start) {
     OSi_GetArenaInfo()->lo[arena] = start;
 }
 
 // NitroSDK's OS_AllocFromArenaLo: takes memory from the start of the arena, NULL when there is not
 // enough
-void *OS_AllocFromArenaLo(int arena, u32 size, u32 alignment) {
+void *OS_AllocFromArenaLo(OSArenaId arena, u32 size, u32 alignment) {
     u32 start = (u32)OS_GetArenaLo(arena);
     u32 end;
 
