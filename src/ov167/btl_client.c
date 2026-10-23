@@ -754,21 +754,29 @@ static const u8 data_ov167_021d6eb4[5] = { 0, 0, 0, 1, 2 };
 
 // 0x021d7070: the commands that the clients handle (also used by the other ranges' handlers)
 static const BtlClientCmdEntry sCmdProcTable[15] = {
-    { 1, 1, { BattleClient_SetupView, NULL, BattleClient_RecPlaySetupView } },
-    { 2, 0, { BattleClient_PlayerSelectRotation, BattleClient_AISelectRotation, BattleClient_RecPlaySelectRotation } },
-    { 3, 0, { BattleClient_PlayerSelectAction, AISelectAction, RecPlaySelectAction } },
-    { 7, 0, { BattleClient_PlayerConfirmUseNextPoke, NULL, NULL } },
-    { 5, 0, { BattleClient_PlayerSelectChangePokeFainted, AISelectChangePoke, BattleClient_RecPlaySelectChangePoke } },
-    { 6, 0, { BattleClient_PlayerSelectChangePokeMidTurn, AISelectChangePoke, BattleClient_RecPlaySelectChangePoke } },
-    { 4, 0, { BattleClient_PlayerConfirmShiftSwitch, NULL, BattleClient_RecPlaySelectChangePoke } },
-    { 8, 0, { BattleClient_ServerCmdLoop, NULL, BattleClient_RecPlayServerCmdLoop } },
-    { 10, 0, { BattleClient_StoreRecordData, NULL, NULL } },
-    { 11, 1, { BattleClient_ExitTrainerBattle, NULL, BattleClient_RecPlayExitTrainerBattle } },
-    { 12, 1, { BattleClient_ExitFacilityBattle, NULL, BattleClient_RecPlayExitFacilityBattle } },
-    { 14, 1, { BattleClient_ExitWildBattleWin, NULL, NULL } },
-    { 15, 1, { BattleClient_ExitWildBattleLose, NULL, NULL } },
-    { 13, 1, { BattleClient_ExitCommBattle, NULL, BattleClient_RecPlayExitCommBattle } },
-    { 16, 1, { BattleClient_ShowTimeUpMsg, NULL, NULL } },
+    { BTL_ACMD_SETUP_VIEW, 1, { BattleClient_SetupView, NULL, BattleClient_RecPlaySetupView } },
+    { BTL_ACMD_SELECT_ROTATION,
+      0,
+      { BattleClient_PlayerSelectRotation, BattleClient_AISelectRotation, BattleClient_RecPlaySelectRotation } },
+    { BTL_ACMD_SELECT_ACTION, 0, { BattleClient_PlayerSelectAction, AISelectAction, RecPlaySelectAction } },
+    { BTL_ACMD_CONFIRM_NEXT_POKE, 0, { BattleClient_PlayerConfirmUseNextPoke, NULL, NULL } },
+    { BTL_ACMD_SELECT_CHANGE_FAINTED,
+      0,
+      { BattleClient_PlayerSelectChangePokeFainted, AISelectChangePoke, BattleClient_RecPlaySelectChangePoke } },
+    { BTL_ACMD_SELECT_CHANGE_MID_TURN,
+      0,
+      { BattleClient_PlayerSelectChangePokeMidTurn, AISelectChangePoke, BattleClient_RecPlaySelectChangePoke } },
+    { BTL_ACMD_CONFIRM_SHIFT_SWITCH,
+      0,
+      { BattleClient_PlayerConfirmShiftSwitch, NULL, BattleClient_RecPlaySelectChangePoke } },
+    { BTL_ACMD_SERVER_CMD, 0, { BattleClient_ServerCmdLoop, NULL, BattleClient_RecPlayServerCmdLoop } },
+    { BTL_ACMD_STORE_RECORD, 0, { BattleClient_StoreRecordData, NULL, NULL } },
+    { BTL_ACMD_EXIT_TRAINER, 1, { BattleClient_ExitTrainerBattle, NULL, BattleClient_RecPlayExitTrainerBattle } },
+    { BTL_ACMD_EXIT_FACILITY, 1, { BattleClient_ExitFacilityBattle, NULL, BattleClient_RecPlayExitFacilityBattle } },
+    { BTL_ACMD_EXIT_WILD_WIN, 1, { BattleClient_ExitWildBattleWin, NULL, NULL } },
+    { BTL_ACMD_EXIT_WILD_LOSE, 1, { BattleClient_ExitWildBattleLose, NULL, NULL } },
+    { BTL_ACMD_EXIT_COMM, 1, { BattleClient_ExitCommBattle, NULL, BattleClient_RecPlayExitCommBattle } },
+    { BTL_ACMD_TIME_UP, 1, { BattleClient_ShowTimeUpMsg, NULL, NULL } },
 };
 
 // The studio's next step for each state, by the event that happened
@@ -1004,7 +1012,7 @@ static BOOL BattleClient_MainProcNormal(BtlClient *client) {
             return FALSE;
         }
         BattleClient_SetDummyReturnData(client);
-        if (cmd == 9) {
+        if (cmd == BTL_ACMD_QUIT) {
             const BtlClientIDList *list;
 
             BtlAdapter_GetRecvData(client->adapter, (const void **)&list);
