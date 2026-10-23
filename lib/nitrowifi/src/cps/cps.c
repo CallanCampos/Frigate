@@ -808,7 +808,11 @@ static void send_ping(u8 *data, u32 len, CPSSoc *soc) {
     icmp[0] = 8;
     icmp[2] = (u32)OS_GetCurrentThread();
     icmp[1] = 0;
-    icmp[3] = soc->local_port = sPingSeq++;
+    u16 sequence = sPingSeq;
+
+    soc->local_port = sequence;
+    sPingSeq = sequence + 1;
+    icmp[3] = sequence;
     CPS_PUT16(&icmp[1], invert_checksum(calc_checksum_do(data, len, calc_checksum_do(icmp, 8, 0))));
     send_ip((u8 *)icmp, 8, data, len, soc->remote_ip, CPS_PROTO_ICMP);
 }
@@ -2361,7 +2365,18 @@ static void set_fixed_ip(void) {
 
 // Whether the address check callback rejects the address DHCP gave
 static inline BOOL CPSi_AddressRejected(void) {
-    return sAddressCheck != NULL && !sAddressCheck();
+    BOOL rejected;
+
+    if (sAddressCheck != NULL) {
+        if (!sAddressCheck()) {
+            rejected = TRUE;
+        } else {
+            rejected = FALSE;
+        }
+    } else {
+        rejected = FALSE;
+    }
+    return rejected;
 }
 
 // scavenger: once a second, runs DHCP and drops what timed out
@@ -2406,7 +2421,10 @@ static void scavenger(void *arg) {
                             CPSNoIpReason = CPS_NOIP_REASON_DHCPDISCOVERY;
                             first = FALSE;
                         }
-                        if (dhcp_discover_server() && dhcp_request_server(&leaseTimer, 0)) {
+                        if (!dhcp_discover_server() || !dhcp_request_server(&leaseTimer, 0)) {
+                            set_fixed_ip();
+                            state = DHCP_STATE_DONE;
+                        } else {
                             if (CPSi_AddressRejected()) {
                                 reset_network_vars(CPS_NOIP_REASON_REJECTED);
                                 set_fixed_ip();
@@ -2418,9 +2436,6 @@ static void scavenger(void *arg) {
                                     state = DHCP_STATE_DONE;
                                 }
                             }
-                        } else {
-                            set_fixed_ip();
-                            state = DHCP_STATE_DONE;
                         }
                         break;
                     case DHCP_STATE_BOUND:
