@@ -78,7 +78,7 @@ static void SystemMsgWin_Open(FieldScriptEnv *env, u8 pos) {
     u32 row = MSG_WIN_ROW_TOP;
 
     if (FieldScriptSubEvent_IsRegistered(SCRIPT_SUB_EVENT_SYSTEM_MSG)) {
-        func_ov036_02188660(&getMapDisplayInfoPtr(env)->system);
+        func_ov036_02188660(getMapDisplayInfoPtr(env));
         return;
     }
     fieldWork = ScriptWork_GetFieldWork(FieldScriptEnv_GetScriptWork(env));
@@ -116,7 +116,7 @@ static void SystemMsgWin_Open(FieldScriptEnv *env, u8 pos) {
     }
     window = func_ov036_02188498(fieldWork->msgBGSys, msgData, row);
     ActorMsgWin_SetPosActual(env, pos);
-    setMapDisplayInfoPtr(env, (ScriptMsgWin *)window);
+    setMapDisplayInfoPtr(env, window);
     FieldScriptSubEvent_Register(SCRIPT_SUB_EVENT_SYSTEM_MSG);
 }
 
@@ -124,7 +124,7 @@ static void SystemMsgWin_Close(FieldScriptEnv *env) {
     WaitIcon *icon;
 
     if (FieldScriptSubEvent_IsRegistered(SCRIPT_SUB_EVENT_SYSTEM_MSG)) {
-        func_ov036_02188504(&getMapDisplayInfoPtr(env)->system);
+        func_ov036_02188504(getMapDisplayInfoPtr(env));
         icon = GetSpecialMessageIconPtr(env);
         if (icon != NULL) {
             WaitIcon_Free(icon);
@@ -136,7 +136,7 @@ static void SystemMsgWin_Close(FieldScriptEnv *env) {
 }
 
 static BOOL ScriptNative_SystemMsgWinWait(VM *vm, void *env) {
-    if (func_ov036_021885bc(&getMapDisplayInfoPtr(env)->system) == TRUE) {
+    if (func_ov036_021885bc(getMapDisplayInfoPtr(env)) == TRUE) {
         return TRUE;
     }
     return FALSE;
@@ -149,7 +149,7 @@ BOOL s0034_SystemMsg(VM *vm, FieldScriptEnv *env) {
 
     SystemMsgWin_Open(env, VM_Read16(vm));
     strbuf = LoadFieldScriptMessage(env, SCRIPT_MSG_FILE, msgId);
-    func_ov036_02188580(&getMapDisplayInfoPtr(env)->system, 0, 0, strbuf);
+    func_ov036_02188580(getMapDisplayInfoPtr(env), 0, 0, strbuf);
     VM_SetNativeCallback(vm, ScriptNative_SystemMsgWinWait);
     return TRUE;
 }
@@ -161,7 +161,7 @@ BOOL s0035_SystemMsgAsync(VM *vm, FieldScriptEnv *env) {
 
     SystemMsgWin_Open(env, VM_Read16(vm));
     LoadFieldScriptMessage(env, SCRIPT_MSG_FILE, msgId);
-    window = &getMapDisplayInfoPtr(env)->system;
+    window = getMapDisplayInfoPtr(env);
     func_ov036_02188660(window);
     func_ov036_02188680(window, 0, 0, strbuf);
     return FALSE;
@@ -182,7 +182,7 @@ BOOL s0037_MsgSetLoadingSpinner(VM *vm, FieldScriptEnv *env) {
         SetSpecialMessageIconPtr(env, NULL);
     }
     if (hide == 0) {
-        window = func_ov036_021886b0(&getMapDisplayInfoPtr(env)->system);
+        window = func_ov036_021886b0(getMapDisplayInfoPtr(env));
         SetSpecialMessageIconPtr(env, WaitIcon_Create(GFL_VBlankGetTCBMgr(), window, 0xf, 0x10, heapId));
     }
     return FALSE;
@@ -405,7 +405,7 @@ u8 ActorMsgWin_CalcWinPosAuto(FieldActor *player, const VecFx32 *pos) {
 }
 
 static BOOL ScriptNative_ActorMsgWinWaitClosed(VM *vm, void *env) {
-    if (func_ov036_021887f4(&getMapDisplayInfoPtr(env)->actor) == TRUE) {
+    if (func_ov036_021887f4(getMapDisplayInfoPtr(env)) == TRUE) {
         setMapDisplayInfoPtr(env, NULL);
         FieldScriptSubEvent_Unregister(SCRIPT_SUB_EVENT_ACTOR_MSG);
         return TRUE;
@@ -415,14 +415,14 @@ static BOOL ScriptNative_ActorMsgWinWaitClosed(VM *vm, void *env) {
 
 static void ActorMsgWin_CloseAsync(VM *vm, FieldScriptEnv *env) {
     if (FieldScriptSubEvent_IsRegistered(SCRIPT_SUB_EVENT_ACTOR_MSG)) {
-        func_ov036_021887d4(&getMapDisplayInfoPtr(env)->actor);
+        func_ov036_021887d4(getMapDisplayInfoPtr(env));
         VM_SetNativeCallback(vm, ScriptNative_ActorMsgWinWaitClosed);
     }
 }
 
 static void ActorMsgWin_CloseImmediate(FieldScriptEnv *env) {
     if (FieldScriptSubEvent_IsRegistered(SCRIPT_SUB_EVENT_ACTOR_MSG)) {
-        func_ov036_02188818(&getMapDisplayInfoPtr(env)->actor);
+        func_ov036_02188818(getMapDisplayInfoPtr(env));
         setMapDisplayInfoPtr(env, NULL);
         FieldScriptSubEvent_Unregister(SCRIPT_SUB_EVENT_ACTOR_MSG);
     }
@@ -430,7 +430,7 @@ static void ActorMsgWin_CloseImmediate(FieldScriptEnv *env) {
 
 static void ActorMsgWin_CreateWindow(FieldScriptEnv *env, FieldMsgBG *msgBGSys, u32 type, const VecFx32 *pos,
                                      StrBuf *strbuf, u32 frameType, u32 tail) {
-    setMapDisplayInfoPtr(env, (ScriptMsgWin *)ActorMsgWin_CheckAndCreate(msgBGSys, type, pos, strbuf, frameType, tail));
+    setMapDisplayInfoPtr(env, ActorMsgWin_CheckAndCreate(msgBGSys, type, pos, strbuf, frameType, tail));
     FieldScriptSubEvent_Register(SCRIPT_SUB_EVENT_ACTOR_MSG);
 }
 
@@ -476,7 +476,7 @@ static BOOL SetupActorMessageWindow(FieldScriptEnv *env, StrBuf *strbuf, u16 act
         return FALSE;
     }
     if (FieldScriptSubEvent_IsRegistered(SCRIPT_SUB_EVENT_ACTOR_MSG)) {
-        func_ov036_02188844(&getMapDisplayInfoPtr(env)->actor, strbuf);
+        func_ov036_02188844(getMapDisplayInfoPtr(env), strbuf);
     } else {
         actorWork = GetFieldScriptActorWk(env);
         MI_CpuFill8(actorWork, 0, sizeof(ScriptActorWork));
@@ -496,7 +496,7 @@ static BOOL SetupActorMessageWindow(FieldScriptEnv *env, StrBuf *strbuf, u16 act
 }
 
 static BOOL ScriptNative_ActorMsgWinWait(VM *vm, void *env) {
-    ActorMsgWin *msgWin = &getMapDisplayInfoPtr(env)->actor;
+    ActorMsgWin *msgWin = getMapDisplayInfoPtr(env);
 
     ActorMsgWin_CalcAttachmentPos(env, FALSE);
     return func_ov036_02188884(msgWin) == TRUE;
@@ -642,7 +642,7 @@ BOOL s0087_TrainerSayMessage(VM *vm, FieldScriptEnv *env) {
 }
 
 static BOOL ScriptNative_InfoMsgWinWait(VM *vm, void *env) {
-    if (func_ov036_02188bdc(&getMapDisplayInfoPtr(env)->info) == TRUE) {
+    if (func_ov036_02188bdc(getMapDisplayInfoPtr(env)) == TRUE) {
         return TRUE;
     }
     return FALSE;
@@ -667,11 +667,11 @@ BOOL loadMsgBox(VM *vm, FieldScriptEnv *env, StrBuf *message, u32 frameType, u8 
         row = MSG_WIN_ROW_BOTTOM;
     }
     if (FieldScriptSubEvent_IsRegistered(SCRIPT_SUB_EVENT_MSG)) {
-        window = &getMapDisplayInfoPtr(env)->info;
+        window = getMapDisplayInfoPtr(env);
         func_ov036_02188ae8(window);
     } else {
         window = func_ov036_02188a54(fieldWork->msgBGSys, NULL, frameType, 1, row, 0x1e, 4);
-        setMapDisplayInfoPtr(env, (ScriptMsgWin *)window);
+        setMapDisplayInfoPtr(env, window);
     }
     func_ov036_02188ba4(window, 8, 0, message);
     FieldScriptSubEvent_Register(SCRIPT_SUB_EVENT_MSG);
@@ -681,7 +681,7 @@ BOOL loadMsgBox(VM *vm, FieldScriptEnv *env, StrBuf *message, u32 frameType, u8 
 
 static void InfoMsgWin_Close(FieldScriptEnv *env) {
     if (FieldScriptSubEvent_IsRegistered(SCRIPT_SUB_EVENT_MSG)) {
-        func_ov036_02188ab0(&getMapDisplayInfoPtr(env)->info);
+        func_ov036_02188ab0(getMapDisplayInfoPtr(env));
         setMapDisplayInfoPtr(env, NULL);
         FieldScriptSubEvent_Unregister(SCRIPT_SUB_EVENT_MSG);
     }
@@ -756,7 +756,7 @@ BOOL func_ov036_021a9478(FinishScriptSubEventsWork *work, u32 *state) {
 static BOOL ScriptNative_SignMsgWinWait(VM *vm, void *env) {
     StrBuf *strbuf = ScriptWork_GetMainStrBuf(FieldScriptEnv_GetScriptWork(env));
 
-    if (func_ov036_02189110(&getMapDisplayInfoPtr(env)->sign, strbuf) == TRUE) {
+    if (func_ov036_02189110(getMapDisplayInfoPtr(env), strbuf) == TRUE) {
         return TRUE;
     }
     return FALSE;
@@ -767,7 +767,7 @@ static void SignMsgWin_Close(FieldScriptEnv *env) {
     Font *font;
 
     if (FieldScriptSubEvent_IsRegistered(SCRIPT_SUB_EVENT_SIGN)) {
-        func_ov036_0218903c(&getMapDisplayInfoPtr(env)->sign);
+        func_ov036_0218903c(getMapDisplayInfoPtr(env));
         font = ScriptWork_GetSignFont(work);
         ScriptWork_SetSignFont(work, NULL);
         if (font != NULL) {
@@ -785,7 +785,7 @@ BOOL s0043_MsgPlaceSign(VM *vm, FieldScriptEnv *env) {
     ScriptFieldWork *fieldWork = ScriptWork_GetFieldWork(work);
     GetFieldScriptMsgData(env);
 
-    setMapDisplayInfoPtr(env, (ScriptMsgWin *)func_ov036_02188f28(fieldWork->msgBGSys, type));
+    setMapDisplayInfoPtr(env, func_ov036_02188f28(fieldWork->msgBGSys, type));
     LoadFieldScriptMessage(env, SCRIPT_MSG_FILE, msgId);
     VM_SetNativeCallback(vm, ScriptNative_SignMsgWinWait);
     FieldScriptSubEvent_Register(SCRIPT_SUB_EVENT_SIGN);
@@ -804,7 +804,7 @@ BOOL func_ov036_021a9554(VM *vm, FieldScriptEnv *env) {
     Font *font = GFL_FontCreate(ARCID_FONT, 4, 0, FALSE, heapId);
 
     ScriptWork_SetSignFont(work, font);
-    setMapDisplayInfoPtr(env, (ScriptMsgWin *)func_ov036_02188f34(fieldWork2->msgBGSys, type, font));
+    setMapDisplayInfoPtr(env, func_ov036_02188f34(fieldWork2->msgBGSys, type, font));
     LoadFieldScriptMessage(env, SCRIPT_MSG_FILE, msgId);
     VM_SetNativeCallback(vm, ScriptNative_SignMsgWinWait);
     FieldScriptSubEvent_Register(SCRIPT_SUB_EVENT_SIGN);
@@ -823,14 +823,14 @@ BOOL func_ov036_021a95ec(FinishScriptSubEventsWork *work, u32 *state) {
 
 static void CheckerMsgWin_Close(FieldScriptEnv *env) {
     if (FieldScriptSubEvent_IsRegistered(SCRIPT_SUB_EVENT_CHECKER_MSG)) {
-        CheckerMsgWin_Free(&getMapDisplayInfoPtr(env)->checker);
+        CheckerMsgWin_Free(getMapDisplayInfoPtr(env));
         setMapDisplayInfoPtr(env, NULL);
         FieldScriptSubEvent_Unregister(SCRIPT_SUB_EVENT_CHECKER_MSG);
     }
 }
 
 static BOOL ScriptNative_CheckerMsgWinWait(VM *vm, void *env) {
-    if (CheckerMsgWin_Update(&getMapDisplayInfoPtr(env)->checker) == TRUE) {
+    if (CheckerMsgWin_Update(getMapDisplayInfoPtr(env)) == TRUE) {
         return TRUE;
     }
     return FALSE;
@@ -848,7 +848,7 @@ BOOL s0045_CheckerMsg(VM *vm, FieldScriptEnv *env) {
     u16 height = CheckerMsgWin_CalcHeight(fieldWork->msgBGSys, strbuf, 4);
     CheckerMsgWin *window = CheckerMsgWin_Create(fieldWork->msgBGSys, type, x, y, width, height);
 
-    setMapDisplayInfoPtr(env, (ScriptMsgWin *)window);
+    setMapDisplayInfoPtr(env, window);
     CheckerMsgWin_PrintStrBuf(window, 4, 4, strbuf);
     VM_SetNativeCallback(vm, ScriptNative_CheckerMsgWinWait);
     FieldScriptSubEvent_Register(SCRIPT_SUB_EVENT_CHECKER_MSG);
@@ -887,18 +887,18 @@ BOOL s003F_MsgWinCloseAll(VM *vm, FieldScriptEnv *env) {
 // Waits for A or B, and skips the open window's printing to the end
 static BOOL ScriptNative_AdvanceMessages(VM *vm, void *env) {
     u32 keys = GCTX_HIDGetPressedKeys();
-    ScriptMsgWin *window = getMapDisplayInfoPtr(env);
+    void *window = getMapDisplayInfoPtr(env);
 
     if (keys & (PAD_BUTTON_A | PAD_BUTTON_B)) {
         GFL_SndSEPlay(SEQ_SE_MESSAGE);
         return TRUE;
     }
     if (FieldScriptSubEvent_IsRegistered(SCRIPT_SUB_EVENT_SYSTEM_MSG)) {
-        func_ov036_02188630(&window->system);
+        func_ov036_02188630(window);
     } else if (FieldScriptSubEvent_IsRegistered(SCRIPT_SUB_EVENT_MSG)) {
-        func_ov036_02188c90(&window->info);
+        func_ov036_02188c90(window);
     } else if (FieldScriptSubEvent_IsRegistered(SCRIPT_SUB_EVENT_ACTOR_MSG)) {
-        func_ov036_021889c8(&window->actor);
+        func_ov036_021889c8(window);
     } else {
         return TRUE;
     }

@@ -47,21 +47,6 @@ struct BtlNetPartyPacket {
     u8 data[];
 };
 
-// What a machine sent in its receive buffer, by the exchange: its party, its Chatot cry or its player info
-typedef union {
-    PokeParty party;
-    PerapVoice chatter;
-    PlayerInfo playerInfo;
-} BtlNetRecvData;
-
-// The buffer of the party packet and trainer exchanges: a party packet as it arrives, or the trainer, which
-// BtlNet_GetPlayerInfo also reads as a player info
-typedef union {
-    BtlNetPartyPacket party;
-    PlayerInfo playerInfo;
-    BtlCommTrainerData trainer;
-} BtlNetTempData;
-
 typedef struct {
     NetHandle *netHandle;
     HeapID heapId;
@@ -82,12 +67,14 @@ typedef struct {
     BtlNetRecvBuffer serverCmd;
     // By net id
     BtlNetRecvBuffer clientReplies[4];
-    // By net id
-    BtlNetRecvData *recvBuffers[4];
+    // By net id, what the machine sent by the exchange: a PokeParty, PerapVoice or PlayerInfo
+    void *recvBuffers[4];
     u32 recvSizes[4];
     // By client id
     PokeParty *parties[4];
-    BtlNetTempData *tempBuffer;
+    // The party packet exchange's BtlNetPartyPacket as it arrives, or the trainer exchange's BtlCommTrainerData, which
+    // BtlNet_GetPlayerInfo also reads as a PlayerInfo
+    void *tempBuffer;
     u32 tempSize;
     union {
         BtlNetVersionPacket version;
@@ -302,7 +289,7 @@ u8 BtlNet_SendParty(PokeParty *party) {
 // Command 0x102's buffer
 static void *GetPartyRecvBuffer(int netId, void *work, int size) {
     sWork->recvBuffers[netId] = GFL_HeapAllocate(HEAPID_TAIL(sWork->heapId), size, TRUE, "btl_net.c", 462);
-    return &sWork->recvBuffers[netId]->party;
+    return sWork->recvBuffers[netId];
 }
 
 // Command 0x102: a party has arrived
@@ -347,7 +334,7 @@ static void *GetChatterRecvBuffer(int netId, void *work, int size) {
         return &sWork->clientReplies[netId];
     }
     sWork->recvBuffers[netId] = GFL_HeapAllocate(HEAPID_TAIL(sWork->heapId), size, TRUE, "btl_net.c", 543);
-    return &sWork->recvBuffers[netId]->chatter;
+    return sWork->recvBuffers[netId];
 }
 
 // Command 0x103: a Chatot cry has arrived
@@ -379,7 +366,7 @@ PerapVoice *BtlNet_GetChatter(u8 clientId) {
     u8 netId = GetClientNetId(clientId);
 
     if (netId != 40 && sWork->recvSizes[netId] != 0) {
-        return &sWork->recvBuffers[netId]->chatter;
+        return sWork->recvBuffers[netId];
     }
     return NULL;
 }
@@ -400,7 +387,7 @@ static void *GetPartyPacketRecvBuffer(int netId, void *work, int size) {
     if (sWork->tempBuffer == NULL) {
         sWork->tempBuffer = GFL_HeapAllocate(HEAPID_TAIL(sWork->heapId), size, TRUE, "btl_net.c", 633);
     }
-    return &sWork->tempBuffer->party;
+    return sWork->tempBuffer;
 }
 
 // Command 0x104: keeps the party for its client
@@ -432,7 +419,7 @@ PokeParty *BtlNet_GetParty(u8 clientId) {
     u32 i;
 
     if (netId != 40) {
-        return &sWork->recvBuffers[netId]->party;
+        return sWork->recvBuffers[netId];
     }
     party = sWork->parties[clientId];
     if (party != NULL) {
@@ -457,7 +444,7 @@ BOOL BtlNet_SendPlayerInfo(PlayerInfo *info) {
 // Command 0x105's buffer
 static void *GetPlayerInfoRecvBuffer(int netId, void *work, int size) {
     sWork->recvBuffers[netId] = GFL_HeapAllocate(HEAPID_TAIL(sWork->heapId), size, TRUE, "btl_net.c", 724);
-    return &sWork->recvBuffers[netId]->playerInfo;
+    return sWork->recvBuffers[netId];
 }
 
 // Command 0x105: a machine's player info has arrived
@@ -482,10 +469,10 @@ PlayerInfo *BtlNet_GetPlayerInfo(u8 clientId) {
     u8 netId = GetClientNetId(clientId);
 
     if (netId != 40) {
-        return &sWork->recvBuffers[netId]->playerInfo;
+        return sWork->recvBuffers[netId];
     }
     if (sWork->tempBuffer != NULL && sWork->tempSize != 0) {
-        return &sWork->tempBuffer->playerInfo;
+        return sWork->tempBuffer;
     }
     return NULL;
 }
@@ -502,7 +489,7 @@ BOOL BtlNet_SendTrainer(BtlSetupTrainer *trainer) {
 // Command 0x106's buffer
 static void *GetTrainerRecvBuffer(int netId, void *work, int size) {
     sWork->tempBuffer = GFL_HeapAllocate(HEAPID_TAIL(sWork->heapId), size, TRUE, "btl_net.c", 798);
-    return &sWork->tempBuffer->trainer;
+    return sWork->tempBuffer;
 }
 
 // Command 0x106: a trainer has arrived
@@ -519,7 +506,7 @@ BOOL BtlNet_IsTrainerReceived(void) {
 }
 
 BtlCommTrainerData *BtlNet_GetTrainer(void) {
-    return &sWork->tempBuffer->trainer;
+    return sWork->tempBuffer;
 }
 
 void BtlNet_FreeTrainer(void) {

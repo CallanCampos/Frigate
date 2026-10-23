@@ -1734,7 +1734,7 @@ static StrBuf *ResortShop_MakePersonDescription(ResortShopWork *wk, JoinAvenuePe
 
 // Makes a person's entry's strings, or remakes them
 static void ResortShop_MakePersonEntry(ResortShopWork *wk, ResortPersonData *data, u32 index, ResortShopEntry *entry) {
-    JoinAvenuePerson *person = &ResortData_GetPerson(data)->person;
+    JoinAvenuePerson *person = ResortData_GetPerson(data);
     u16 flag = JoinAvenueShop_GetField(JoinAvenuePerson_GetShop(person), 0);
     StrBuf *label = GFL_StrBufCreate(64, wk->heapId);
     StrBuf *name = ResortSys_FormatShopText(wk->shops, data, flag, wk->heapId);

@@ -97,11 +97,11 @@ u16 GetFieldScriptMsgFileNo(FieldScriptEnv *env) {
     return env->msgFileNo;
 }
 
-void setMapDisplayInfoPtr(FieldScriptEnv *env, ScriptMsgWin *info) {
+void setMapDisplayInfoPtr(FieldScriptEnv *env, void *info) {
     env->subwork->mapDisplayInfo = info;
 }
 
-ScriptMsgWin *getMapDisplayInfoPtr(FieldScriptEnv *env) {
+void *getMapDisplayInfoPtr(FieldScriptEnv *env) {
     return env->subwork->mapDisplayInfo;
 }
 
@@ -336,7 +336,7 @@ void ListMenu_ShowDescription(BmpMenuList *list, s32 value, u8 a2) {
     u16 index = 0;
     FieldScriptEnv *env = BmpMenuList_GetWork(list);
     ScriptListMenu *menu = &env->subwork->listMenu;
-    void *window;
+    FieldMsgWin *window;
 
     BmpMenuList_GetCursorIndex(list, &index);
     if (menu->descriptions[index] == NULL) {

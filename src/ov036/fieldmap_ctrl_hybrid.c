@@ -69,7 +69,7 @@ void func_ov036_0219e434(FieldmapCtrlHybrid *controller, Field *field) {
 void FieldmapCtrlHybrid_Create(Field *field, VecFx32 *pos, u16 dir) {
     PlayerState *playerState = GameData_GetPlayerState(GSYS_GetGameData(Field_GetGameSystem(field)));
     HeapID heapId = Field_GetHeapID(field);
-    FieldmapCtrl *controller =
+    FieldmapCtrlHybrid *controller =
         GFL_HeapAllocate(heapId, sizeof(FieldmapCtrlHybrid), TRUE, "fieldmap_ctrl_hybrid.c", 189);
     u32 isRail;
     FieldActor *actor;
@@ -78,25 +78,25 @@ void FieldmapCtrlHybrid_Create(Field *field, VecFx32 *pos, u16 dir) {
     RailPosition *railPos;
 
     Field_SetController(field, controller);
-    controller->hybrid.player = Field_GetPlayer(field);
+    controller->player = Field_GetPlayer(field);
     isRail = PlayerState_IsRail(playerState);
-    controller->hybrid.activeType = 2;
-    actor = FieldPlayer_GetActor(controller->hybrid.player);
+    controller->activeType = 2;
+    actor = FieldPlayer_GetActor(controller->player);
     func_ov036_0219634c(actor, &a5, &a6);
     if (isRail == FALSE) {
-        FieldPlayer_InitGrid(controller->hybrid.player, heapId);
-        func_ov036_0219accc(controller->hybrid.player, heapId);
-        FieldPlayer_SetDirection(controller->hybrid.player, dir);
-        func_ov036_0219e8c8(field, &controller->hybrid, isRail, pos, dir, a5, a6);
+        FieldPlayer_InitGrid(controller->player, heapId);
+        func_ov036_0219accc(controller->player, heapId);
+        FieldPlayer_SetDirection(controller->player, dir);
+        func_ov036_0219e8c8(field, controller, isRail, pos, dir, a5, a6);
     } else {
         railPos = PlayerState_GetRailPos(playerState);
-        func_ov036_0219accc(controller->hybrid.player, heapId);
-        FieldPlayer_InitGrid(controller->hybrid.player, heapId);
-        FieldPlayer_SetDirection(controller->hybrid.player, dir);
-        func_ov036_0219e8c8(field, &controller->hybrid, isRail, railPos, dir, a5, a6);
+        func_ov036_0219accc(controller->player, heapId);
+        FieldPlayer_InitGrid(controller->player, heapId);
+        FieldPlayer_SetDirection(controller->player, dir);
+        func_ov036_0219e8c8(field, controller, isRail, railPos, dir, a5, a6);
     }
     Field_SetPlayerPosPtr(field, GetMModelWPosPtr(actor));
-    FieldPlayer_GetWPos(controller->hybrid.player, pos);
+    FieldPlayer_GetWPos(controller->player, pos);
 }
 
 void FieldmapCtrlHybrid_Free(Field *field) {
@@ -104,7 +104,7 @@ void FieldmapCtrlHybrid_Free(Field *field) {
 }
 
 void FieldmapCtrlHybrid_Update(Field *field, VecFx32 *pos) {
-    FieldmapCtrlHybrid *controller = &Field_GetController(field)->hybrid;
+    FieldmapCtrlHybrid *controller = Field_GetController(field);
 
     sUpdateFuncs[controller->activeType](field, controller);
     FieldPlayer_GetWPos(controller->player, pos);

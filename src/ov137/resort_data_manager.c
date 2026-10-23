@@ -13,14 +13,14 @@
 #define RESORT_SLOT_NO_KIND 5
 #define RESORT_SLOT_NO_INDEX 0xff
 
-// The functions of a type of data, called with the data's person, entry or record. The people's functions take a
-// JoinAvenuePerson, so the table casts them
-typedef ResortDataPerson *(*ResortPersonCreateFunc)(HeapID heapId);
-typedef void (*ResortPersonFunc)(ResortDataPerson *person);
-typedef BOOL (*ResortPersonIsEmptyFunc)(ResortDataPerson *person);
-typedef u32 (*ResortPersonGetParamFunc)(ResortDataPerson *person, u32 param, void *buffer);
-typedef void (*ResortPersonSetParamFunc)(ResortDataPerson *person, u32 param, u32 value);
-typedef u32 (*ResortPersonUnk1cFunc)(ResortDataPerson *person, u32 a1, u32 a2);
+// The functions of a type of data, called with the data's person, entry or record (a JoinAvenuePerson,
+// JoinAvenueEntry or JoinAvenueRecord). Each type's functions take their own, so the table casts them
+typedef void *(*ResortPersonCreateFunc)(HeapID heapId);
+typedef void (*ResortPersonFunc)(void *person);
+typedef BOOL (*ResortPersonIsEmptyFunc)(void *person);
+typedef u32 (*ResortPersonGetParamFunc)(void *person, u32 param, void *buffer);
+typedef void (*ResortPersonSetParamFunc)(void *person, u32 param, u32 value);
+typedef u32 (*ResortPersonUnk1cFunc)(void *person, u32 a1, u32 a2);
 
 typedef struct {
     ResortPersonCreateFunc create;
@@ -34,7 +34,8 @@ typedef struct {
 } ResortPersonFuncs;
 
 struct ResortPersonData {
-    ResortDataPerson *person;
+    // A JoinAvenuePerson, JoinAvenueEntry or JoinAvenueRecord, by the type
+    void *person;
     const ResortPersonFuncs *funcs;
     u32 kind;
     u32 index;
@@ -59,7 +60,7 @@ typedef struct {
     u32 count;
 } ResortDataRange;
 
-static void ResortData_Init(ResortPersonData *data, ResortDataPerson *person, u32 kind, u16 index);
+static void ResortData_Init(ResortPersonData *data, void *person, u32 kind, u16 index);
 
 static const u32 sUnk021f55a8[] = { 0, 4, 2, 1 };
 static const u32 sKindsOfScript[] = { 0, 4, 2, 1 };
@@ -213,7 +214,7 @@ u16 ResortData_RaffleShopItem(ResortPersonData *data, ResortBinary *a1, ResortBi
     return 0;
 }
 
-ResortPersonData *ResortData_Create(HeapID heapId, ResortDataPerson *person, u32 kind, u16 index) {
+ResortPersonData *ResortData_Create(HeapID heapId, void *person, u32 kind, u16 index) {
     ResortPersonData *data = GFL_HeapAllocate(heapId, sizeof(ResortPersonData), TRUE, "resort_data_manager.c", 467);
     ResortData_Init(data, person, kind, index);
     return data;
@@ -223,7 +224,7 @@ void ResortData_Free(ResortPersonData *data) {
     GFL_HeapFree(data);
 }
 
-static void ResortData_Init(ResortPersonData *data, ResortDataPerson *person, u32 kind, u16 index) {
+static void ResortData_Init(ResortPersonData *data, void *person, u32 kind, u16 index) {
     data->kind = kind;
     data->index = index;
     data->type = ResortData_GetTypeOfKind(kind);
@@ -249,7 +250,7 @@ void ResortData_SetParam(ResortPersonData *data, JoinAvenuePersonParam param, u3
     data->funcs->setParam(data->person, param, value);
 }
 
-ResortDataPerson *ResortData_GetPerson(ResortPersonData *data) {
+void *ResortData_GetPerson(ResortPersonData *data) {
     return data->person;
 }
 
@@ -283,34 +284,29 @@ ResortPersonData **ResortDatas_Create(const ResortSysSetup *setup, HeapID heapId
     for (i = 0; i < 8; i++) {
         u16 index = i;
 
-        datas[i] = ResortData_Create(heapId, (ResortDataPerson *)JoinAvenueOccupants_GetPerson(setup->occupants, index),
-                                     0, index);
+        datas[i] = ResortData_Create(heapId, JoinAvenueOccupants_GetPerson(setup->occupants, index), 0, index);
     }
     for (i = 8; i < 12; i++) {
         u16 index = i - 8;
 
-        datas[i] = ResortData_Create(heapId, (ResortDataPerson *)JoinAvenueOccupants_GetRecord(setup->occupants, index),
-                                     1, index);
+        datas[i] = ResortData_Create(heapId, JoinAvenueOccupants_GetRecord(setup->occupants, index), 1, index);
     }
     for (i = 12; i < 20; i++) {
         u16 index = i - 12;
 
-        datas[i] =
-            ResortData_Create(heapId, (ResortDataPerson *)JoinAvenuePersonList_Get(setup->list, index), 2, index);
+        datas[i] = ResortData_Create(heapId, JoinAvenuePersonList_Get(setup->list, index), 2, index);
     }
     if (setup->list2 != NULL) {
         for (i = 20; i < 28; i++) {
             u16 index = i - 20;
 
-            datas[i] =
-                ResortData_Create(heapId, (ResortDataPerson *)JoinAvenuePersonList_Get(setup->list2, index), 3, index);
+            datas[i] = ResortData_Create(heapId, JoinAvenuePersonList_Get(setup->list2, index), 3, index);
         }
     }
     for (i = 28; i < 40; i++) {
         u16 index = i - 28;
 
-        datas[i] =
-            ResortData_Create(heapId, (ResortDataPerson *)JoinAvenueEntryList_Get(setup->entries, index), 4, index);
+        datas[i] = ResortData_Create(heapId, JoinAvenueEntryList_Get(setup->entries, index), 4, index);
     }
     return datas;
 }
@@ -351,7 +347,7 @@ ResortPersonData *ResortDatas_NextIter(ResortPersonData **datas, ResortDataIter 
 ResortPersonData *ResortDatas_FindByPerson(ResortPersonData **datas, JoinAvenuePerson *person) {
     int i;
     for (i = 0; i < RESORT_DATA_COUNT; i++) {
-        if (datas[i] != NULL && person == &ResortData_GetPerson(datas[i])->person) {
+        if (datas[i] != NULL && person == ResortData_GetPerson(datas[i])) {
             return datas[i];
         }
     }

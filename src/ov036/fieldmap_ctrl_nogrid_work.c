@@ -14,11 +14,16 @@
 #include "system/game_data.h"
 #include "system/game_system.h"
 
+typedef struct {
+    FieldPlayer *player;
+    u32 unk04;
+} FieldmapCtrlNoGrid;
+
 static void FieldmapCtrlNoGrid_Create(Field *field, VecFx32 *pos, u16 dir);
 static void FieldmapCtrlNoGrid_Free(Field *field);
 static void FieldmapCtrlNoGrid_Update(Field *field, VecFx32 *pos);
 static VecFx32 *FieldmapCtrlNoGrid_GetPos(Field *field);
-static FieldmapCtrl *func_ov036_0219e3c8(Field *field, HeapID heapId);
+static FieldmapCtrlNoGrid *func_ov036_0219e3c8(Field *field, HeapID heapId);
 static void func_ov036_0219e40c(FieldmapCtrlNoGrid *controller);
 static void func_ov036_0219e414(FieldmapCtrlNoGrid *controller);
 
@@ -46,24 +51,24 @@ static void FieldmapCtrlNoGrid_Create(Field *field, VecFx32 *pos, u16 dir) {
 }
 
 static void FieldmapCtrlNoGrid_Free(Field *field) {
-    func_ov036_0219e40c(&Field_GetController(field)->noGrid);
+    func_ov036_0219e40c(Field_GetController(field));
 }
 
 static void FieldmapCtrlNoGrid_Update(Field *field, VecFx32 *pos) {
-    func_ov036_0219e414(&Field_GetController(field)->noGrid);
+    func_ov036_0219e414(Field_GetController(field));
 }
 
 static VecFx32 *FieldmapCtrlNoGrid_GetPos(Field *field) {
     return GetMModelWPosPtr(FieldPlayer_GetActor(Field_GetPlayer(field)));
 }
 
-static FieldmapCtrl *func_ov036_0219e3c8(Field *field, HeapID heapId) {
+static FieldmapCtrlNoGrid *func_ov036_0219e3c8(Field *field, HeapID heapId) {
     NoGridMapper *mapper = Field_GetNoGridMapper(field);
-    FieldmapCtrl *controller =
+    FieldmapCtrlNoGrid *controller =
         GFL_HeapAllocate(heapId, sizeof(FieldmapCtrlNoGrid), TRUE, "fieldmap_ctrl_nogrid_work.c", 62);
     FieldPlayer *player = Field_GetPlayer(field);
 
-    controller->noGrid.player = player;
+    controller->player = player;
     func_ov036_0219accc(player, heapId);
     FieldNoGridMapper_SetCameraParent(mapper, func_ov036_0219ad0c(player));
     return controller;

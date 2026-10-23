@@ -3,7 +3,6 @@
 
 #include "types.h"
 #include "field/field.h"
-#include "field/field_msgbg.h"
 #include "field/stadium_script.h"
 #include "field/trainer_script.h"
 #include "gfl/heap.h"
@@ -78,16 +77,6 @@ typedef struct {
     VecFx32 offset;
 } ScriptActorWork;
 
-// The message window a script has open, which its sub-event says the kind of: the system message window, the info
-// window, the sign, the checker window or the balloon over an actor
-typedef union {
-    FieldMsgWin system;
-    InfoMsgWin info;
-    SignMsgWin sign;
-    CheckerMsgWin checker;
-    ActorMsgWin actor;
-} ScriptMsgWin;
-
 struct ScriptSubwork {
     ScriptWork *work;
     GameSystem *gsys;
@@ -97,7 +86,9 @@ struct ScriptSubwork {
     FieldAcmdTCB *acmdTasks[8];
     ScriptListMenu listMenu;
     ScriptActorWork actorWork;
-    ScriptMsgWin *mapDisplayInfo;
+    // The message window open, which the registered sub-event says the kind of: a FieldMsgWin (the system message
+    // window), InfoMsgWin, SignMsgWin, CheckerMsgWin or ActorMsgWin
+    void *mapDisplayInfo;
     WaitIcon *specialMessageIcon;
     u8 actorMsgPosActual;
     u8 actorMsgPos;
@@ -161,8 +152,9 @@ void ListMenu_ShowDescription(BmpMenuList *list, s32 value, u8 a2);
 FieldMsgBG *FieldScriptEnv_GetMsgBGSys(FieldScriptEnv *env);
 MsgData *GetFieldScriptMsgData(FieldScriptEnv *env);
 u16 GetFieldScriptMsgFileNo(FieldScriptEnv *env);
-void setMapDisplayInfoPtr(FieldScriptEnv *env, ScriptMsgWin *info);
-ScriptMsgWin *getMapDisplayInfoPtr(FieldScriptEnv *env);
+// The script's open message window, a FieldMsgWin, InfoMsgWin, SignMsgWin, CheckerMsgWin or ActorMsgWin
+void setMapDisplayInfoPtr(FieldScriptEnv *env, void *info);
+void *getMapDisplayInfoPtr(FieldScriptEnv *env);
 void SetSpecialMessageIconPtr(FieldScriptEnv *env, WaitIcon *icon);
 WaitIcon *GetSpecialMessageIconPtr(FieldScriptEnv *env);
 ScriptActorWork *GetFieldScriptActorWk(FieldScriptEnv *env);

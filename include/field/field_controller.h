@@ -4,7 +4,6 @@
 // Function names from swan (https://github.com/ds-pokemon-hacking/swan, GPL-3.0)
 
 #include "types.h"
-#include "field/fieldmap_ctrl_hybrid.h"
 #include "nitro/fx.h"
 #include "struct_decls.h"
 
@@ -23,29 +22,9 @@ extern const FieldmapCtrlVTable FIELDMAP_CTRL_GRID;
 extern const FieldmapCtrlVTable FIELDMAP_CTRL_NOGRID;
 extern const FieldmapCtrlVTable FIELDMAP_CTRL_HYBRID;
 
-// The grid maps' controller (fieldmap_ctrl_grid.c)
-typedef struct {
-    u16 heapId;
-    Field *field;
-    u32 unk08;
-    BOOL updateDisable;
-} FieldmapCtrlGrid;
-
-// The rail maps' controller (fieldmap_ctrl_nogrid_work.c)
-typedef struct {
-    FieldPlayer *player;
-    u32 unk04;
-} FieldmapCtrlNoGrid;
-
-// The controller the field keeps, which its kind's create makes and the rest of its kind's functions use as their own
-typedef union {
-    FieldmapCtrlGrid grid;
-    FieldmapCtrlNoGrid noGrid;
-    FieldmapCtrlHybrid hybrid;
-} FieldmapCtrl;
-
-FieldmapCtrl *Field_GetController(Field *field);
-void Field_SetController(Field *field, FieldmapCtrl *controller);
+// The field's controller: a FieldmapCtrlGrid, FieldmapCtrlNoGrid or FieldmapCtrlHybrid, by the kind of map
+void *Field_GetController(Field *field);
+void Field_SetController(Field *field, void *controller);
 u32 Field_GetControllerTypeID(Field *field);
 // Sets whether the grid map's controller stops updating
 void FieldmapCtrlGrid_SetUpdateDisable(Field *field, BOOL disable);
