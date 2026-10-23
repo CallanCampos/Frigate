@@ -6,7 +6,9 @@
 #include "app/wifibattlematch_util.h"
 #include "app/wifibattlematch_view.h"
 #include "gfl/heap.h"
+#include "save/battle_rec.h"
 #include "save/player_info.h"
+#include "save/tournament_block.h"
 #include "struct_decls.h"
 #include "system/pms_data.h"
 
@@ -70,17 +72,8 @@ void LiveBattleMatchFlow_Main(LiveBattleMatchFlow *flow);
 // 0 while the flow runs, then why it ended
 u32 LiveBattleMatchFlow_GetResult(LiveBattleMatchFlow *flow);
 
-// Functions of the save and battle video code that have no header yet
-// Checks the CRC of a tournament entry
-BOOL TournamentEntry_CheckCRC(TournamentEntry *entry);
-// Copies an entry into the block
-void TournamentBlock_SetEntry(TournamentBlock *block, u32 index, const void *entry);
-// Clears an entry of the block's other entries, which are 0x1e bytes
-void TournamentTeam_Clear(void *record);
-// Fills an entry of the block's other entries with the team's species and moves
-void TournamentTeam_SetFromParty(void *record, PokeParty *party);
-// Whether the battle video that is loaded is whole
-BOOL BattleRec_HasVideo(void);
+// Functions of the save and battle video code that have no header yet (the tournament block's are
+// save/tournament_block.h's)
 // The live competition's record: clears it and gives it this console's address, adds to a result by an amount, gets and
 // sets the 6-byte address of a result by its place and a byte after it, and whether an address is among the results
 void LiveMatchData_Init(LiveMatchData *record);
