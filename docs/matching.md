@@ -4054,16 +4054,20 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   (`mov r1, r1, lsl #1`; there is no `lsl` mnemonic). Labels are `@name:`, local to the function; `dcd` emits a word;
   `ldr rX, =value` builds the function's literal pool in first-use order, and `=symbol` gives a relocation. A branch to
   another function's name is a relocation, so a routine that other code enters in the middle is split into one `asm`
-  function per entry, in the ROM's order, each falling into the next (an `asm` function gets no epilogue), as MSL's
-  `fp_fastI.c` is. In a Thumb file, an ARM `asm` function goes between `#pragma thumb off` and `#pragma thumb on`.
+  function per entry, in the ROM's order, each falling into the next (an `asm` function gets no epilogue). In a Thumb
+  file, an ARM `asm` function goes between `#pragma thumb off` and `#pragma thumb on`.
 
 - An `asm` function has one name: the assembler doesn't take `entry` or `.global` (`unknown assembler instruction
-  mnemonic`, in `dsi/1.1p1` and `dsi/1.2`), and MWCC ignores `__attribute__((alias))` and `#pragma alias`. A routine
-  that the ROM reaches under two names, as MSL's runtime routines with swan's `__aeabi_*` names and MWCC's `_dadd`, or
-  `_ull_mul` and `_ll_mul`, which the compiled code calls both, keeps the second as a label in the configs, and
-  `tools/build/object_aliases.py` adds it to the compiled object, with size 0. Not in the linker script: a symbol
-  assigned there has no ARM or Thumb type, so mwldarm links a Thumb `bl` to it unchanged where an ARM routine needs a
-  `blx` (and crashes, `ELF_ARM.c, line 3817`, on one assigned outside a section).
+  mnemonic`, in `dsi/1.1p1` and `dsi/1.2`), and MWCC ignores `__attribute__((alias))` and `#pragma alias`. A library
+  that is hand-written assembly as a whole, whose routines have several entries and second names, is an assembly file
+  that the mwasmarm of its compiler's version assembles (library.toml's `asm_flags`), as MSL's runtime `fp_fastI.s` is,
+  where `_ull_mul` is also `_ll_mul`. Its syntax is the same pre-UAL ARM; `.global`, `.type name, @function` and
+  `.size` make a routine an ARM function that the linker calls with `blx` from Thumb; a second name gets no `.size`,
+  since mwldarm refuses a section whose symbols' sizes add up to more than it; `.word` emits a word; and a literal
+  written `=value` may go into an earlier routine's pool, so each routine writes its own pool with labels and `.word`
+  before its `.size`, as MWCC's `asm` functions place it. Not in the linker script: a symbol assigned there has no ARM
+  or Thumb type, so mwldarm links a Thumb `bl` to it unchanged where an ARM routine needs a `blx` (and crashes,
+  `ELF_ARM.c, line 3817`, on one assigned outside a section).
 
 - An `asm {}` block inside a C function keeps the compiler's prologue, epilogue and addressing around it, which an `asm`
   function can't give: `os_exception.c`'s `OSi_DisplayExContext` tests the handler and returns early in C, then switches

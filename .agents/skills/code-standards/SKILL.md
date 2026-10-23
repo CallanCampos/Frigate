@@ -20,7 +20,8 @@ The rules, with their wrong and right forms and when they don't apply, are in
 5. **Declarations in the owner's header**: no `extern` or another file's prototype in a `.c`. A file's own data is
    defined in it from the ROM's bytes.
 6. **`volatile` only where the hardware or another thread needs it**, proven by a probe, with a comment.
-7. **No `asm` in `src/`.** In `lib/` only for code the SDK wrote in assembly, with a comment, guarded from clang-format.
+7. **No `asm` in `src/`.** In `lib/` only for code the SDK wrote in assembly, with a comment, guarded from clang-format;
+   a library that is assembly as a whole is a `.s` file assembled by mwasmarm (MSL's `fp_fastI.s`).
 8. **Comments explain the code**: no `TODO`, no narration of the matching.
 9. **Names**: swan's, the SDK's in `lib/`, ours through `rename_symbol.py`; no stale `func_`/`data_` names.
 10. **Bugs**: `// BUG:` with an `#ifdef BUGFIX` fix.

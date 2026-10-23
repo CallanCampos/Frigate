@@ -39,7 +39,10 @@ a rule here changes, change it there too.
   a function that the SDK, or a library it bundles, wrote in assembly (an `asm` function in its C file, such as
   NitroSDK's `MTX_Identity43`, the CP15 cache functions or DWC's big-number helpers) is an MWCC `asm` function, said
   to be one in a comment, and assembly the library inlined at several sites (DS Protect's cache flush) is a
-  `static inline` with an `asm {}` block, said to be one in a comment. The user chose both.
+  `static inline` with an `asm {}` block, said to be one in a comment. The user chose both. A library that is
+  hand-written assembly as a whole, whose routines have several entries or names (MSL's runtime, `fp_fastI.s`), is an
+  assembly file assembled by the mwasmarm of its compiler's version (library.toml's `asm_flags`); the user chose this
+  on 2026-10-22.
 - **Bugs:** `// BUG:` plus an `#ifdef BUGFIX` fix, with the original in `#else`.
 - **Keep going.** Continue in file order and commit each file as it is done. Don't end a turn with a menu when the next
   step is obvious. Ask only real decisions, such as placement with no evidence or a change of scope. Answer any message
