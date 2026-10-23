@@ -1,9 +1,6 @@
 #include <string.h>
 // Before dwc/ext.h: MWCC builds the copies of the packets' magic and of the machines' connection user data in place, as
 // the ROM does, only when <string.h> declares strcpy and memcpy
-#include "dwc/match_internal.h"
-
-// Library services used by this control.
 #include "dwc/common.h"
 #include "dwc/dwc.h"
 #include "dwc/ext.h"
@@ -15,6 +12,7 @@
 #include "dwc/gt2Main.h"
 #include "dwc/gt2Utility.h"
 #include "dwc/match.h"
+#include "dwc/match_internal.h"
 #include "dwc/memfunc.h"
 #include "dwc/natneg.h"
 #include "dwc/qr2.h"

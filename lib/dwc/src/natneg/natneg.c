@@ -662,6 +662,8 @@ static void ProcessConnectPacket(NATNegotiator *neg, NatNegPacket *packet, SOCKA
 }
 
 static void ProcessPingPacket(NATNegotiator *neg, NatNegPacket *packet, SOCKADDR_IN *fromAddr) {
+    IN_ADDR senderIp;
+
     gsDebugFormat(GSIDebugCat_NatNeg, GSIDebugType_Network, GSIDebugLevel_Notice,
                   "ProcessPingPacket(cookie=%d): Got ping from: %s:%d (gotmydata: %d, finished: %d)\n", neg->cookie,
                   SOC_InetNtoA(fromAddr->addr), NN_SWAP16(fromAddr->port), packet->Packet.connect.gotyourdata,
@@ -672,8 +674,7 @@ static void ProcessPingPacket(NATNegotiator *neg, NatNegPacket *packet, SOCKADDR
                       neg->cookie);
         return;
     }
-    IN_ADDR senderIp = fromAddr->addr;
-
+    senderIp = fromAddr->addr;
     gsDebugFormat(GSIDebugCat_NatNeg, GSIDebugType_Network, GSIDebugLevel_Notice,
                   "Got ping from: %s:%d (gotmydata: %d, finished: %d)\n", SOC_InetNtoA(senderIp),
                   NN_SWAP16(fromAddr->port), packet->Packet.connect.gotyourdata, packet->Packet.connect.finished);

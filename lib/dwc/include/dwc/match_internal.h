@@ -8,6 +8,7 @@
 
 // The control shared by DWC's friends-match front end (dwc_main.c) and matching core (dwc_match.c), and the internal
 // calls between them. Their separate string pools and groups of file statics identify two original source files.
+
 // What a GT2 connection to another machine keeps as its data: its slot in the table of connections, the machine's aid
 // and its profile ID
 typedef struct MatchConnectionInfo {

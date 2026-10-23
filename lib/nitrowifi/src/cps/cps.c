@@ -804,12 +804,12 @@ static void send_ip(u8 *buf, u32 len, u8 *data, u32 dataLen, CPSInAddr ip, u8 pr
 // send_ping: sends an echo request
 static void send_ping(u8 *data, u32 len, CPSSoc *soc) {
     u16 *icmp = (u16 *)(soc->sndbuf.data + CPS_SNDBUF_HEADER);
+    u16 sequence;
 
     icmp[0] = 8;
     icmp[2] = (u32)OS_GetCurrentThread();
     icmp[1] = 0;
-    u16 sequence = sPingSeq;
-
+    sequence = sPingSeq;
     soc->local_port = sequence;
     sPingSeq = sequence + 1;
     icmp[3] = sequence;
