@@ -174,7 +174,15 @@ static const FrameListCallbacks sScrollListCallbacks = {
 };
 
 static const FrameListSetup sScrollListSetup = {
-    { 0, 0xff, 2, 4, 28, 5, 1, 1, 26, 2, 0, 20, 20, 10, 8, 5, 4, 0, 1, 0 }, 0, 1, 0, 0, 0, sScrollListTouch, NULL, NULL,
+    { 0, FRAMELIST_BG_NONE, 2, 4, 28, 5, 1, 1, 26, 2, 0, 20, 20, 10, 8, 5, 4, 0, 1, 0 },
+    0,
+    1,
+    0,
+    0,
+    0,
+    sScrollListTouch,
+    NULL,
+    NULL,
 };
 
 static const BmpMenuListHeader sMenuListHeader = {
@@ -1042,7 +1050,7 @@ KeySystemScrollList *KeySystemScrollList_Create(const KeySystemScrollListSetup *
 void KeySystemScrollList_Free(KeySystemScrollList *list) {
     FrameList_Free(list->list);
     GFL_StrBufFree(list->str);
-    GFL_BGSysMoveBG(list->setup.bg, 3, 0);
+    GFL_BGSysMoveBG(list->setup.bg, BG_MOVE_SET_Y, 0);
     GFL_HeapFree(list);
 }
 

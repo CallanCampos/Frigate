@@ -253,6 +253,11 @@ static inline void G2_SetOBJPosition(GXOamAttr *oam, int x, int y) {
                   ((x & (GX_OAM_ATTR01_X_MASK >> GX_OAM_ATTR01_X_SHIFT)) << GX_OAM_ATTR01_X_SHIFT);
 }
 
+static inline void G2_GetOBJPosition(const GXOamAttr *oam, u32 *x, u32 *y) {
+    *x = (oam->attr01 & GX_OAM_ATTR01_X_MASK) >> GX_OAM_ATTR01_X_SHIFT;
+    *y = (oam->attr01 & GX_OAM_ATTR01_Y_MASK) >> GX_OAM_ATTR01_Y_SHIFT;
+}
+
 static inline void G2_SetOBJAttr(GXOamAttr *oam, int x, int y, int priority, GXOamMode mode, BOOL mosaic,
                                  GXOamEffect effect, GXOamShape shape, GXOamColorMode color, int charName, int cParam,
                                  int rsParam) {

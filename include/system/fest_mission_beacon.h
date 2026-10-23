@@ -12,19 +12,42 @@
 // A line of the mission's log: what a player did
 typedef struct {
     u16 name[8];
-    // The text of a kind 0x2d
+    // The text of a LOG_KIND_TEXT
     u16 text[9];
     u16 trainerId;
     // Whether the player is the one who started the mission, or this game's player
     u8 own : 1;
     u8 gender : 1;
     u8 look : 6;
-    // 1 and 2: the player started or joined; 3: a player was met; otherwise the beacon's type - 0x3a
+    // A LOG_KIND_*: the beacon's type - 0x3a for the rest
     u8 kind;
     // What the line is about, by FestMission_LogCategories
     u16 value;
     u16 score;
 } FestMissionLogEntry;
+
+// The kinds of a log entry: the player started or joined the mission, a player was met, a Pass Power was used, a
+// player's words
+enum {
+    LOG_KIND_NONE,
+    LOG_KIND_START,
+    LOG_KIND_JOIN,
+    LOG_KIND_MEET,
+    LOG_KIND_PASS_POWER = 15,
+    // Pokémon defeated and caught, the targets of the missions of kind 1 and of MISSION_FLAGS
+    LOG_KIND_KIND1_DEFEATED = 19,
+    LOG_KIND_KIND1_CAUGHT,
+    LOG_KIND_FLAGS_DEFEATED,
+    LOG_KIND_FLAGS_CAUGHT,
+    // An item found, MISSION_SPARKLE's target
+    LOG_KIND_SPARKLE_FOUND,
+    // The bell rung, the first of MISSION_HOLLOW's targets, which the mission's target counts from
+    LOG_KIND_RANG_BELL,
+    // A lost child helped, the first of MISSION_PEOPLE's targets, which the mission's target counts from
+    LOG_KIND_HELPED_LOST_CHILD = 30,
+    LOG_KIND_TEXT = 45,
+    LOG_KIND_MAX,
+};
 
 #define FEST_MISSION_LOG_MAX 30
 

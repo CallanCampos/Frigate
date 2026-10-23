@@ -87,10 +87,12 @@ typedef struct {
     u16 fromColors[16];
 } MysteryActors;
 
-#define ACTOR_CURSOR 0
-#define ACTOR_STARS 1
 #define STAR_COUNT 32
-#define ACTOR_HINT 34
+enum {
+    ACTOR_CURSOR,
+    ACTOR_STARS,
+    ACTOR_HINT = 34,
+};
 
 // The particles of a special gift's effect
 typedef struct {
@@ -1586,9 +1588,11 @@ static void MysteryEffect_Init(MysteryEffect *effect, ClActUnit *unit, const Mys
     case 1:
         pkm = Mystery_CreateGiftPokemon(&recv->gift, HEAPID_TAIL(heapId), gameData);
         arc = MakePokeGraArcHandle(heapId);
-        effect->palette = PokeGra_LoadClActPaletteByBoxData(arc, PokeParty_ToBoxPkm(pkm), 0, 0, 0x1c0, heapId);
-        effect->cellAnims = PokeGra_LoadClActCellAnimsByBoxData(PokeParty_ToBoxPkm(pkm), 0, 2, 0, heapId);
-        effect->chars = PokeGra_LoadClActCharsByBoxData(arc, PokeParty_ToBoxPkm(pkm), 0, 0, heapId);
+        effect->palette =
+            PokeGra_LoadClActPaletteByBoxData(arc, PokeParty_ToBoxPkm(pkm), POKEGRA_DIR_FRONT, 0, 0x1c0, heapId);
+        effect->cellAnims =
+            PokeGra_LoadClActCellAnimsByBoxData(PokeParty_ToBoxPkm(pkm), POKEGRA_DIR_FRONT, 2, 0, heapId);
+        effect->chars = PokeGra_LoadClActCharsByBoxData(arc, PokeParty_ToBoxPkm(pkm), POKEGRA_DIR_FRONT, 0, heapId);
         effect->height = Mystery_GetSpriteBottom(PokeParty_ToBoxPkm(pkm), heapId) - 48;
         effect->height = MATH_CLAMP(effect->height, 0, 48);
         GFL_ArcToolFree(arc);
@@ -1596,11 +1600,11 @@ static void MysteryEffect_Init(MysteryEffect *effect, ClActUnit *unit, const Mys
         break;
     case 2:
         arc = GFL_ArcSysCreateFileHandle(ARCID_ITEMGRA, heapId);
-        effect->palette =
-            ClActSys_LoadPltt(arc, GetItemGraphicsDatID(recv->gift.value, 2), CLACT_VRAM_MAIN, 0x1c0, heapId);
+        effect->palette = ClActSys_LoadPltt(arc, GetItemGraphicsDatID(recv->gift.value, ITEM_FILE_ICON_PLTT),
+                                            CLACT_VRAM_MAIN, 0x1c0, heapId);
         effect->cellAnims = ClActSys_LoadCellAnims(arc, 1, 0, heapId);
-        effect->chars =
-            ClActSys_LoadChars(arc, GetItemGraphicsDatID(recv->gift.value, 1), FALSE, CLACT_VRAM_MAIN, heapId);
+        effect->chars = ClActSys_LoadChars(arc, GetItemGraphicsDatID(recv->gift.value, ITEM_FILE_ICON_CHAR), FALSE,
+                                           CLACT_VRAM_MAIN, heapId);
         GFL_ArcToolFree(arc);
         effect->offsetX = 4;
         effect->height = 8;
@@ -2012,7 +2016,7 @@ static u32 Mystery_GetSpriteBottom(BoxPkm *pkm, HeapID heapId) {
     int y;
     u32 *tile;
 
-    buffer = LoadSingleCellSpindaGraphicsByBoxData(&charData, pkm, 0, HEAPID_TAIL(heapId));
+    buffer = LoadSingleCellSpindaGraphicsByBoxData(&charData, pkm, POKEGRA_DIR_FRONT, HEAPID_TAIL(heapId));
     PokeGra_CellCharsToImage(charData, HEAPID_TAIL(heapId));
     for (row = 11; row >= 0; row--) {
         for (col = 0; col < 12; col++) {

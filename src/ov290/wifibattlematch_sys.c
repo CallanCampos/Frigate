@@ -9,6 +9,7 @@
 #include "app/wifibattlematch.h"
 #include "app/wifibattlematch_battle.h"
 #include "app/wifibattlematch_link.h"
+#include "app/wifibattlematch_net.h"
 #include "app/wifibattlematch_subproc.h"
 #include "battle/battle_proc.h"
 #include "battle/battle_rec_tool.h"
@@ -82,55 +83,6 @@ struct WifiBattleMatchChain {
     u32 procResult;
 };
 
-// A player as the two machines exchange it: the info and the team picked
-typedef struct {
-    PlayerInfo info;
-    u8 unk20[0x24];
-    u32 unk44;
-    u32 unk48;
-    u8 unk4C[0xd4 - 0x4c];
-    u8 partyData[];
-} WifiBattleMatchPlayer;
-
-// What the battle left, for the steps that follow it
-typedef struct {
-    u32 result;
-    u32 battleStyle;
-    u8 unk8;
-    u8 unk9;
-    u8 unkA;
-    // Set when the other player left
-    u32 unkC;
-    u32 unk10;
-    u32 unk14;
-} WifiBattleMatchBattleResult;
-
-// What a battle sends to the ranking: the other player's team, then the player's own
-typedef struct {
-    s32 profileId;
-    u32 unk4;
-    u16 species[6];
-    u8 forms[6];
-    u8 levels[6];
-    u8 genders[6];
-    u16 ownSpecies[6];
-    u8 ownForms[6];
-    u8 ownLevels[6];
-    u8 ownGenders[6];
-    u32 year : 7;
-    u32 month : 4;
-    u32 day : 5;
-    u32 hour : 5;
-    u32 minute : 6;
-    u32 unk : 4;
-    u32 unkFlag : 1;
-    u32 unk48;
-    u8 result;
-    u8 battleType;
-    u8 aliveOwn : 4;
-    u8 aliveOther : 4;
-} WifiBattleMatchReport;
-
 struct WifiBattleMatchSys {
     BOOL ownsGameData;
     WifiBattleMatchParam param;
@@ -151,46 +103,13 @@ struct WifiBattleMatchSys {
     u32 unk1CC;
     WifiBattleMatchReport report;
     BOOL relogin;
-    u8 unk224[8];
-    u8 unk22C[0x54c];
-    u8 unk778[0x5c];
-    u8 unk7D4[0xd4];
+    WifiBattleMatchLinkAccount account;
+    WifiBattleMatchLinkRanking ranking;
+    WifiBattleMatchLinkRatings ratings;
+    WifiBattleMatchNetData unk7D4;
     u32 unk8A8;
     BOOL unk8AC;
 };
-
-// What the infrared steps get
-typedef struct {
-    GameData *gameData;
-    u32 previous;
-    u32 result;
-    WifiBattleMatchPlayer *player;
-    WifiBattleMatchPlayer *otherPlayer;
-    WifiBattleMatchBattleResult *battleResult;
-} WifiBattleMatchChampionshipParam;
-
-// What the Wi-Fi link gets
-typedef struct {
-    u32 mode;
-    // What the link leaves for the chain to do next
-    u32 action;
-    WifiBattleMatchParam *param;
-    u32 result;
-    void *record;
-    WifiBattleMatchPlayer *player;
-    WifiBattleMatchPlayer *otherPlayer;
-    void *unk1C;
-    u32 *unk20;
-    WifiBattleMatchReport *report;
-    void *unk28;
-    WifiBattleMatchBattleResult *battleResult;
-    void *unk30;
-    void *unk34;
-    void *unk38;
-    void *unk3C;
-    BOOL *unk40;
-    u32 unk44;
-} WifiBattleMatchNetParam;
 
 static BOOL WifiBattleMatchSys_Init(GameProc *proc, u32 *state, void *param, void *work);
 static BOOL WifiBattleMatchSys_Main(GameProc *proc, u32 *state, void *param, void *work);
@@ -368,34 +287,34 @@ static BOOL WifiBattleMatchSys_Main(GameProc *proc, u32 *state, void *param, voi
 
 static void *WifiBattleMatchSys_CreateChampionshipParam(WifiBattleMatchChain *chain, HeapID heapId,
                                                         WifiBattleMatchSys *sys) {
-    WifiBattleMatchChampionshipParam *param =
-        GFL_HeapAllocate(heapId, sizeof(WifiBattleMatchChampionshipParam), FALSE, "wifibattlematch_sys.c", 591);
+    BattleChampionshipFlowParam *param =
+        GFL_HeapAllocate(heapId, sizeof(BattleChampionshipFlowParam), FALSE, "wifibattlematch_sys.c", 591);
 
-    MI_CpuFill8(param, 0, sizeof(WifiBattleMatchChampionshipParam));
+    MI_CpuFill8(param, 0, sizeof(BattleChampionshipFlowParam));
     param->gameData = sys->param.gameData;
-    param->player = sys->player;
-    param->otherPlayer = sys->otherPlayer;
-    param->battleResult = &sys->battleResult;
+    param->playerData = sys->player;
+    param->partnerData = sys->otherPlayer;
+    param->matchResult = &sys->battleResult;
     switch (WifiBattleMatchSys_ChainGetPrevious(chain)) {
     case STEP_LOGIN:
     case STEP_LOGOUT:
-        param->previous = 1;
+        param->mode = BATTLE_CHAMPIONSHIP_FLOW_MODE_REWARD;
         break;
     case STEP_REPLAY:
-        param->previous = 6;
+        param->mode = BATTLE_CHAMPIONSHIP_FLOW_MODE_LIVE_MENU;
         break;
     case STEP_BATTLE:
-        param->previous = 4;
+        param->mode = BATTLE_CHAMPIONSHIP_FLOW_MODE_LIVE_AFTER_MATCH;
         break;
     case STEP_RESULT:
-        param->previous = 5;
+        param->mode = BATTLE_CHAMPIONSHIP_FLOW_MODE_LIVE_QUIT;
         break;
     case STEP_CHAMPIONSHIP:
-        param->previous = 0;
+        param->mode = BATTLE_CHAMPIONSHIP_FLOW_MODE_MENU;
         break;
     default:
-        if (sys->battleResult.unkC != 0) {
-            param->previous = 6;
+        if (sys->battleResult.disconnected) {
+            param->mode = BATTLE_CHAMPIONSHIP_FLOW_MODE_LIVE_MENU;
         } else {
             GFL_ASSERT(0);
         }
@@ -408,13 +327,13 @@ static void *WifiBattleMatchSys_CreateChampionshipParam(WifiBattleMatchChain *ch
 }
 
 static BOOL WifiBattleMatchSys_FinishChampionship(WifiBattleMatchChain *chain, void *param, WifiBattleMatchSys *sys) {
-    WifiBattleMatchChampionshipParam *championship = param;
+    BattleChampionshipFlowParam *championship = param;
 
     switch (championship->result) {
-    case 0:
+    case BATTLE_CHAMPIONSHIP_FLOW_RESULT_EXIT:
         WifiBattleMatchSys_ChainEnd(chain);
         break;
-    case 1:
+    case BATTLE_CHAMPIONSHIP_FLOW_RESULT_WIFI:
         sys->mode = 0;
         WifiBattleMatchSys_ChainSetNext(chain, STEP_LOGIN);
         break;
@@ -439,10 +358,10 @@ static BOOL WifiBattleMatchSys_FinishChampionship(WifiBattleMatchChain *chain, v
 }
 
 static void *WifiBattleMatchSys_CreateNetParam(WifiBattleMatchChain *chain, HeapID heapId, WifiBattleMatchSys *sys) {
-    WifiBattleMatchNetParam *param =
-        GFL_HeapAllocate(heapId, sizeof(WifiBattleMatchNetParam), FALSE, "wifibattlematch_sys.c", 704);
+    WifiBattleMatchLinkParam *param =
+        GFL_HeapAllocate(heapId, sizeof(WifiBattleMatchLinkParam), FALSE, "wifibattlematch_sys.c", 704);
 
-    MI_CpuFill8(param, 0, sizeof(WifiBattleMatchNetParam));
+    MI_CpuFill8(param, 0, sizeof(WifiBattleMatchLinkParam));
     param->param = &sys->param;
     param->result = sys->result;
     param->mode = sys->mode - 2;
@@ -451,12 +370,12 @@ static void *WifiBattleMatchSys_CreateNetParam(WifiBattleMatchChain *chain, Heap
     param->unk1C = sys->unk40;
     param->unk20 = &sys->unk1CC;
     param->report = &sys->report;
-    param->unk3C = sys->unk7D4;
+    param->unk3C = &sys->unk7D4;
     param->unk28 = &sys->unk8A8;
     param->battleResult = &sys->battleResult;
-    param->unk30 = sys->unk224;
-    param->unk34 = sys->unk22C;
-    param->unk38 = sys->unk778;
+    param->account = &sys->account;
+    param->unk34 = &sys->ranking;
+    param->ratings = &sys->ratings;
     param->unk40 = &sys->unk8AC;
     param->record = RecordSave_GetRndMatchData(getRecordBlkAddress(GameData_GetSaveControl(sys->param.gameData)));
     if (GFL_SndBGMGetID() != SEQ_BGM_WCS) {
@@ -466,7 +385,7 @@ static void *WifiBattleMatchSys_CreateNetParam(WifiBattleMatchChain *chain, Heap
 }
 
 static BOOL WifiBattleMatchSys_FinishNet(WifiBattleMatchChain *chain, void *param, WifiBattleMatchSys *sys) {
-    WifiBattleMatchNetParam *net = param;
+    WifiBattleMatchLinkParam *net = param;
 
     switch (net->mode) {
     case 0:
@@ -482,20 +401,20 @@ static BOOL WifiBattleMatchSys_FinishNet(WifiBattleMatchChain *chain, void *para
         break;
     }
     switch (net->action) {
-    case 1:
+    case WIFIBATTLEMATCH_LINK_ACTION_TEAM_LIST:
         WifiBattleMatchSys_ChainSetNext(chain, STEP_TEAM_LIST);
         break;
-    case 2:
+    case WIFIBATTLEMATCH_LINK_ACTION_RESULT:
         WifiBattleMatchSys_ChainSetNext(chain, STEP_RESULT);
         break;
-    case 3:
+    case WIFIBATTLEMATCH_LINK_ACTION_RELOGIN:
         sys->relogin = TRUE;
         WifiBattleMatchSys_ChainSetNext(chain, STEP_LOGIN);
         break;
     case 4:
         sys->unk24 = TRUE;
         // fall through
-    case 0:
+    case WIFIBATTLEMATCH_LINK_ACTION_LOGOUT:
         WifiBattleMatchSys_ChainSetNext(chain, STEP_LOGOUT);
         break;
     default:
@@ -569,7 +488,7 @@ static BOOL WifiBattleMatchSys_FinishList(WifiBattleMatchChain *chain, void *par
             WifiBattleMatchSys_ChainSetNext(chain, STEP_TEAM_EXCHANGE);
             break;
         case 2:
-            sys->battleResult.unkC = TRUE;
+            sys->battleResult.disconnected = TRUE;
             WifiBattleMatchSys_ChainSetNext(chain, STEP_CHAMPIONSHIP);
             break;
         }
@@ -598,8 +517,8 @@ static BOOL WifiBattleMatchSys_FinishList(WifiBattleMatchChain *chain, void *par
 static void *WifiBattleMatchSys_CreateBattleParam(WifiBattleMatchChain *chain, HeapID heapId, WifiBattleMatchSys *sys) {
     WifiBattleMatchBattleParam *param;
     Regulation *regulation;
-    void *tournament;
-    void *entry;
+    TournamentBlock *tournament;
+    TournamentEntry *entry;
     BOOL ownsRegulation = FALSE;
     u32 fileId;
     u32 battleType;
@@ -762,20 +681,20 @@ static BOOL WifiBattleMatchSys_FinishBattle(WifiBattleMatchChain *chain, void *p
     BtlSetup *setup = battle->setup;
     u32 result = battle->result;
     Regulation *regulation;
-    void *entry;
+    TournamentEntry *entry;
     u32 value;
     u8 aliveOther;
     u8 aliveOwn;
     u8 hpPercent;
 
     sys->battleResult.battleStyle = setup->battleStyle;
-    sys->battleResult.result = setup->unkA8;
+    sys->battleResult.result = setup->result;
     sys->battleResult.unk10 = setup->unkDD_0;
-    sys->battleResult.result = setup->unkA8;
+    sys->battleResult.result = setup->result;
     WifiBattleMatchSys_CountAlive(battle->setup, &aliveOwn, &aliveOther);
-    sys->battleResult.unkA = aliveOwn;
-    sys->battleResult.unk8 = aliveOther;
-    WifiBattleMatchSys_GetHpPercents(battle->setup, &hpPercent, &sys->battleResult.unk9);
+    sys->battleResult.aliveOwn = aliveOwn;
+    sys->battleResult.aliveOther = aliveOther;
+    WifiBattleMatchSys_GetHpPercents(battle->setup, &hpPercent, &sys->battleResult.otherHpPercent);
     BattleRec_LoadToolOverlay();
     BattleRecTool_StoreSetup(battle->setup);
     BattleRec_UnloadToolOverlay();
@@ -804,7 +723,7 @@ static BOOL WifiBattleMatchSys_FinishBattle(WifiBattleMatchChain *chain, void *p
             WifiBattleMatchSys_ChainSetNext(chain, STEP_CHAMPIONSHIP);
             break;
         case 1:
-            sys->battleResult.unkC = TRUE;
+            sys->battleResult.disconnected = TRUE;
             WifiBattleMatchSys_ChainSetNext(chain, STEP_CHAMPIONSHIP);
             break;
         }
@@ -881,7 +800,7 @@ static void *WifiBattleMatchSys_CreateExchangeParam(WifiBattleMatchChain *chain,
     param->gameData = &sys->param.gameData;
     param->party = sys->party;
     param->otherParty = sys->otherParty;
-    param->unk14 = sys->unk7D4;
+    param->unk14 = &sys->unk7D4;
     param->unk18 = &sys->unk8A8;
     if (sys->mode == 1) {
         param->mode = WIFIBATTLEMATCH_EXCHANGE_IRC;
@@ -902,7 +821,7 @@ static BOOL WifiBattleMatchSys_FinishExchange(WifiBattleMatchChain *chain, void 
             WifiBattleMatchSys_ChainSetNext(chain, STEP_BATTLE);
             break;
         case 2:
-            sys->battleResult.unkC = TRUE;
+            sys->battleResult.disconnected = TRUE;
             WifiBattleMatchSys_ChainSetNext(chain, STEP_CHAMPIONSHIP);
             break;
         }
@@ -1076,7 +995,7 @@ static void WifiBattleMatchSys_BuildReport(WifiBattleMatchReport *report, PokePa
 
     MI_CpuFill8(report, 0, sizeof(WifiBattleMatchReport));
     report->profileId = PlayerInfo_GetProfileId(&otherPlayer->info);
-    report->unk4 = otherPlayer->unk48;
+    report->gsid = otherPlayer->gsid;
     for (i = 0; i < PokeParty_GetPkmCount(otherParty); i++) {
         pkm = PokeParty_GetPkm(otherParty, i);
         if (PokeParty_GetParam(pkm, PKM_PARAM_SPECIES_VALID, NULL)) {
@@ -1103,7 +1022,7 @@ static void WifiBattleMatchSys_BuildReport(WifiBattleMatchReport *report, PokePa
     report->hour = time.hour;
     report->minute = time.minute;
     report->unk48 = unk14;
-    report->result = setup->unkA8;
+    report->result = setup->result;
     WifiBattleMatchSys_CountAlive(setup, &alive[0], &alive[1]);
     report->aliveOwn = alive[0];
     report->aliveOther = alive[1];

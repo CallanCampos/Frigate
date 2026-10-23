@@ -2,6 +2,7 @@
 #include "constants/sound.h"
 #include "constants/vars.h"
 #include "field/field.h"
+#include "field/field_acmd.h"
 #include "field/field_actor.h"
 #include "field/field_camera.h"
 #include "field/field_exp_obj.h"
@@ -38,16 +39,18 @@
 
 // The actors of the scene: the pads' tile models, the switches, the elevators, the freight elevator in its two forms,
 // and the models that show the player and the rider on it
-#define ACTOR_SWITCH 0x29
-#define ACTOR_ELEVATOR 0x4d
-#define ACTOR_FREIGHT_RIDER 0x51
-#define ACTOR_FREIGHT 0x52
-#define ACTOR_PLAYER_ELEVATOR_MALE 0x53
-#define ACTOR_PLAYER_ELEVATOR_FEMALE 0x54
-#define ACTOR_PLAYER_FREIGHT_MALE 0x55
-#define ACTOR_PLAYER_FREIGHT_FEMALE 0x56
-#define ACTOR_RIDER 0x57
-#define ACTOR_COUNT 88
+enum {
+    ACTOR_SWITCH = 0x29,
+    ACTOR_ELEVATOR = 0x4d,
+    ACTOR_FREIGHT_RIDER = 0x51,
+    ACTOR_FREIGHT,
+    ACTOR_PLAYER_ELEVATOR_MALE,
+    ACTOR_PLAYER_ELEVATOR_FEMALE,
+    ACTOR_PLAYER_FREIGHT_MALE,
+    ACTOR_PLAYER_FREIGHT_FEMALE,
+    ACTOR_RIDER,
+    ACTOR_COUNT,
+};
 
 // The switch that the player presses to ride up, which the first visit marks as pressed
 #define SWITCH_ELEVATOR 0x1e
@@ -68,7 +71,6 @@
 // How the pad model's animation runs forward, and backward
 #define PAD_ANM_STEP 0x6500
 
-#define ACMD_WALK_FIRST 0x34
 #define ACTOR_FLAG_NO_COLLISION 0x200
 
 #define PAD_NONE 0xff
@@ -85,7 +87,7 @@ typedef struct {
     // Whether the player has pressed the switch to ride up
     BOOL elevatorSwitchPressed;
     // What the camera followed, while the freight elevator runs
-    void *cameraBind;
+    const VecFx32 *cameraBind;
 } DriftveilGymWork;
 
 // Where the pad slides the player to: how far it goes, which way, and the switch that it lands on
@@ -126,7 +128,7 @@ typedef struct {
     u8 toggle;
     fx32 amplitude;
     FieldCamera *camera;
-    void *bind;
+    const VecFx32 *bind;
     VecFx32 offset;
 } DriftveilGymShake;
 
@@ -503,7 +505,7 @@ static GameEventReturnCode DriftveilGym_SlideEventCallback(GameEvent *event, u32
     case 0:
         if (func_ov036_0219a870(ev->player)) {
             direction = FieldPlayer_GetFaceDir(ev->player);
-            FldAct_SetAcmd(FieldPlayer_GetActor(ev->player), direction + ACMD_WALK_FIRST);
+            FldAct_SetAcmd(FieldPlayer_GetActor(ev->player), direction + ACMD_JUMP_1);
             *state = 1;
         }
         break;
@@ -566,7 +568,7 @@ static GameEventReturnCode DriftveilGym_SlideEventCallback(GameEvent *event, u32
     case 4:
         if (func_ov036_0219a870(ev->player)) {
             direction = FieldPlayer_GetFaceDir(ev->player);
-            FldAct_SetAcmd(FieldPlayer_GetActor(ev->player), direction + ACMD_WALK_FIRST);
+            FldAct_SetAcmd(FieldPlayer_GetActor(ev->player), direction + ACMD_JUMP_1);
             *state = STATE_END;
         }
         break;

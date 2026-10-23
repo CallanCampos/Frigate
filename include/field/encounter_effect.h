@@ -72,14 +72,14 @@ void func_ov036_021c5ebc(EncEff *effect);
 void *EncEff_AllocWorkArea(EncEff *effect, u32 size, HeapID heapId);
 void *EncEff_GetWorkArea(EncEff *effect);
 void *EncEff_GetEventData(EncEff *effect);
-void *Field_Get3DCi(Field *field);
+Fld3DCi *Field_Get3DCi(Field *field);
 void EncEff_CallRenderFunc(EncEff *effect);
 GameEvent *EventFieldEffect_CreatePokeSprite(GameSystem *gsys, Fld3DCi *ci, u8 partySlot);
 GameEvent *EventFieldEffect_CreateAlderFly(GameSystem *gsys, Fld3DCi *ci, u32 actorId);
 // The event of an effect: init makes the effect's event, and render draws it
 GameEvent *EncEffCapture_CreateFlashEvent(GameSystem *gsys, const VecFx32 *pos, GameEvent *(*init)(GameSystem *gsys),
                                           void (*render)(EncEffGrid *grid));
-void EncEffCapture_Draw(void *data);
+void EncEffCapture_Draw(EncEffCaptureWork *work);
 GameEvent *EncEffGrid_CreateEvent(GameSystem *gsys, const EncEffGridParam *param, u32 mode);
 // Clears the screen to the grid's color, then draws the effect with overlay 148
 void EncEffGrid_ClearAndDraw(EncEff *effect);

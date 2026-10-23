@@ -9,28 +9,28 @@ MarineTube_InitModel kind:function(thumb,size=0x86) addr:0x021eefc8
 MarineTube_ShowModel kind:function(thumb,size=0x64) addr:0x021ef050
 MarineTube_SaveFrames kind:function(thumb,size=0x54) addr:0x021ef0b4
 MarineTube_LoadFrames kind:function(thumb,size=0x54) addr:0x021ef108
-data_ov111_021ef11c kind:data(any) addr:0x021ef15c
-data_ov111_021ef120 kind:data(any) addr:0x021ef160
-data_ov111_021ef124 kind:data(any) addr:0x021ef164
-data_ov111_021ef128 kind:data(any) addr:0x021ef168
-data_ov111_021ef12c kind:data(any) addr:0x021ef16c
-data_ov111_021ef130 kind:data(any) addr:0x021ef170
-data_ov111_021ef134 kind:data(any) addr:0x021ef174
-data_ov111_021ef138 kind:data(any) addr:0x021ef178
-data_ov111_021ef13c kind:data(any) addr:0x021ef17c
-data_ov111_021ef140 kind:data(any) addr:0x021ef180
-data_ov111_021ef144 kind:data(any) addr:0x021ef184
-data_ov111_021ef14c kind:data(any) addr:0x021ef18c
-data_ov111_021ef154 kind:data(any) addr:0x021ef194
-data_ov111_021ef15c kind:data(any) addr:0x021ef19c
-data_ov111_021ef16c kind:data(any) addr:0x021ef1ac
+sModel11Animations kind:data(any) addr:0x021ef15c
+sModel5Animations kind:data(any) addr:0x021ef160
+sModel1Animations kind:data(any) addr:0x021ef164
+sModel3Animations kind:data(any) addr:0x021ef168
+sModel2Animations kind:data(any) addr:0x021ef16c
+sModel10Animations kind:data(any) addr:0x021ef170
+sModel9Animations kind:data(any) addr:0x021ef174
+sModel0Animations kind:data(any) addr:0x021ef178
+sModel12Animations kind:data(any) addr:0x021ef17c
+sModel6Animations kind:data(any) addr:0x021ef180
+sModel4Animations kind:data(any) addr:0x021ef184
+sModel7Animations kind:data(any) addr:0x021ef18c
+sModel8Animations kind:data(any) addr:0x021ef194
+sSceneSetup kind:data(any) addr:0x021ef19c
+sAnimationCounts kind:data(any) addr:0x021ef1ac
 data_ov111_021ef1a0 kind:data(any) addr:0x021ef1e0
-data_ov111_021ef1f4 kind:data(any) addr:0x021ef234
+sActors kind:data(any) addr:0x021ef234
 data_ov111_021ef211 kind:data(any) addr:0x021ef251 ambiguous
 data_ov111_021ef231 kind:data(any) addr:0x021ef271 ambiguous
 data_ov111_021ef289 kind:data(any) addr:0x021ef2c9 ambiguous
 data_ov111_021ef29d kind:data(any) addr:0x021ef2dd ambiguous
-data_ov111_021ef2c4 kind:data(any) addr:0x021ef304
+sResources kind:data(any) addr:0x021ef304
 data_ov111_021ef2e1 kind:data(any) addr:0x021ef321 ambiguous
 data_ov111_021ef335 kind:data(any) addr:0x021ef375 ambiguous
 data_ov111_021ef361 kind:data(any) addr:0x021ef3a1 ambiguous

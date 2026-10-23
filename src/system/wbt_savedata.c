@@ -6,8 +6,7 @@
 // The Pokémon World Tournament's part of the Trial House's save block: how often each tournament was won, the
 // Trainers beaten and three slots. The ROM has no string for the file, so the name is descriptive.
 
-void WbtSave_Init(void *data) {
-    WbtSave *wbt = data;
+void WbtSave_Init(WbtSave *wbt) {
     int i;
 
     MI_CpuFill8(wbt, 0, sizeof(WbtSave));
@@ -16,8 +15,8 @@ void WbtSave_Init(void *data) {
     }
 }
 
-void *TrialHouseSave_GetWbtSave(SaveControl *save) {
-    return TrialHouseSave_Get(save)->unk5C;
+WbtSave *TrialHouseSave_GetWbtSave(SaveControl *save) {
+    return &TrialHouseSave_Get(save)->wbt;
 }
 
 u16 WbtSave_GetCount(WbtSave *wbt, u32 tournament) {

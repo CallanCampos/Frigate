@@ -30,18 +30,18 @@ GimmickCaitlin_SetModel34Played kind:function(thumb,size=0x4) addr:0x021ef264
 GimmickCaitlin_GetModel34Played kind:function(thumb,size=0x4) addr:0x021ef268
 GimmickCaitlin_SetModel5Played kind:function(thumb,size=0x4) addr:0x021ef26c
 GimmickCaitlin_GetModel5Played kind:function(thumb,size=0x4) addr:0x021ef270
-data_ov125_021ef234 kind:data(any) addr:0x021ef274
-data_ov125_021ef238 kind:data(any) addr:0x021ef278
-data_ov125_021ef240 kind:data(any) addr:0x021ef280
-data_ov125_021ef248 kind:data(any) addr:0x021ef288
-data_ov125_021ef254 kind:data(any) addr:0x021ef294
-data_ov125_021ef260 kind:data(any) addr:0x021ef2a0
-data_ov125_021ef270 kind:data(any) addr:0x021ef2b0
-data_ov125_021ef284 kind:data(any) addr:0x021ef2c4
+sModel2Animations kind:data(any) addr:0x021ef274
+sModel4Animations kind:data(any) addr:0x021ef278
+sModel5Animations kind:data(any) addr:0x021ef280
+sModel3Animations kind:data(any) addr:0x021ef288
+sModel0Animations kind:data(any) addr:0x021ef294
+sSceneSetup kind:data(any) addr:0x021ef2a0
+sModel1Animations kind:data(any) addr:0x021ef2b0
+sActors kind:data(any) addr:0x021ef2c4
 data_ov125_021ef289 kind:data(any) addr:0x021ef2c9 ambiguous
 data_ov125_021ef29d kind:data(any) addr:0x021ef2dd ambiguous
 data_ov125_021ef2e1 kind:data(any) addr:0x021ef321 ambiguous
-data_ov125_021ef2e4 kind:data(any) addr:0x021ef324
+sResources kind:data(any) addr:0x021ef324
 data_ov125_021ef335 kind:data(any) addr:0x021ef375 ambiguous
 data_ov125_021ef361 kind:data(any) addr:0x021ef3a1 ambiguous
 data_ov125_021ef36d kind:data(any) addr:0x021ef3ad ambiguous

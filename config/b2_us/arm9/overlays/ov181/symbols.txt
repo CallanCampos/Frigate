@@ -218,8 +218,8 @@ MBi_MakeParentSendBuffer kind:function(thumb,size=0x4c) addr:0x021a3ea4
 MBi_SetRecvBufferFromChild kind:function(thumb,size=0xac) addr:0x021a3ef0
 MBi_ReceiveRequestDataPiece kind:function(thumb,size=0x64) addr:0x021a3f9c
 IsGetAllRequestData kind:function(thumb,size=0x40) addr:0x021a4000
-data_ov181_021a4040 kind:data(any) addr:0x021a4040
-data_ov181_021a4048 kind:data(any) addr:0x021a4048
+sCancelButtonRect kind:data(any) addr:0x021a4040
+sLCDConfig kind:data(any) addr:0x021a4048
 data_ov181_021a4058 kind:data(any) addr:0x021a4058
 data_ov181_021a4078 kind:data(any) addr:0x021a4078
 data_ov181_021a4094 kind:data(any) addr:0x021a4094 ambiguous
@@ -229,7 +229,7 @@ data_ov181_021a40d8 kind:data(any) addr:0x021a40d8
 data_ov181_021a40f8 kind:data(any) addr:0x021a40f8
 data_ov181_021a4118 kind:data(any) addr:0x021a4118
 data_ov181_021a4138 kind:data(any) addr:0x021a4138
-data_ov181_021a4158 kind:data(any) addr:0x021a4158
+sVRAMConfig kind:data(any) addr:0x021a4158
 data_ov181_021a4188 kind:data(any) addr:0x021a4188
 sMBCommCommands kind:data(any) addr:0x021a41c4
 data_ov181_021a41e4 kind:data(any) addr:0x021a41e4
@@ -251,7 +251,7 @@ data_ov181_021a434c kind:data(any) addr:0x021a434c
 data_ov181_021a4354 kind:data(any) addr:0x021a4354
 data_ov181_021a4364 kind:data(any) addr:0x021a4364
 data_ov181_021a438c kind:data(any) addr:0x021a438c
-data_ov181_021a43ac kind:data(any) addr:0x021a43ac
+sHeapId kind:data(any) addr:0x021a43ac
 data_ov181_021a4424 kind:data(any) addr:0x021a4424
 data_ov181_021a4434 kind:data(any) addr:0x021a4434
 data_ov181_021a4444 kind:data(any) addr:0x021a4444
@@ -292,16 +292,16 @@ mbi_seg_header kind:data(any) addr:0x021a4730
 data_ov181_021a4734 kind:data(any) addr:0x021a4734
 sWmConfig kind:data(any) addr:0x021a4738
 sParentName kind:data(any) addr:0x021a4750
-data_ov181_021a4780 kind:bss addr:0x021a4780
-data_ov181_021a478c kind:bss addr:0x021a478c
-data_ov181_021a4794 kind:bss addr:0x021a4794
+sScrollWait kind:bss addr:0x021a4780
+sFilebuf kind:bss addr:0x021a478c
+mbpState kind:bss addr:0x021a4794
 data_ov181_021a4796 kind:bss addr:0x021a4796
 data_ov181_021a4798 kind:bss addr:0x021a4798
 data_ov181_021a479a kind:bss addr:0x021a479a
 data_ov181_021a479c kind:bss addr:0x021a479c
 data_ov181_021a479e kind:bss addr:0x021a479e
 data_ov181_021a47a0 kind:bss addr:0x021a47a0
-data_ov181_021a47a8 kind:bss addr:0x021a47a8
+childInfo kind:bss addr:0x021a47a8
 data_ov181_021a47be kind:bss addr:0x021a47be
 data_ov181_021a47bf kind:bss addr:0x021a47bf
 data_ov181_021a47c0 kind:bss addr:0x021a47c0

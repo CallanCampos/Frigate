@@ -10,7 +10,7 @@
 typedef struct {
     MusicalStageParam *param;
     // Overlay 209's stage
-    void *stage;
+    StaActing *stage;
     u32 unk8;
 } MusicalStageWork;
 
@@ -102,7 +102,7 @@ static BOOL MusicalStageProc_Main(GameProc *proc, u32 *state, void *param, void 
     return FALSE;
 }
 
-MusicalStageParam *MusicalStageParam_Create(HeapID heapId, void *comm) {
+MusicalStageParam *MusicalStageParam_Create(HeapID heapId, MusCommWork *comm) {
     MusicalStageParam *param;
     u8 i;
 

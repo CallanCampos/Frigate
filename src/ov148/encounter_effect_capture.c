@@ -53,9 +53,7 @@ GameEvent *EncEffCapture_CreateEvent(GameSystem *gsys, const VecFx32 *pos, GameE
 }
 
 // Sets up the camera and the captured screen's texture, then calls the effect's render function
-void EncEffCapture_Draw(void *data) {
-    EncEffCaptureWork *work = data;
-
+void EncEffCapture_Draw(EncEffCaptureWork *work) {
     G3i_PerspectiveW_(FX_SinIdx(DEG_TO_IDX(20)), FX_CosIdx(DEG_TO_IDX(20)), FX32_ONE * 4 / 3, FX32_ONE,
                       FX32_CONST(1024), FX32_ONE, TRUE, NULL);
     G3X_Reset();

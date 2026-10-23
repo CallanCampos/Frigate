@@ -32,6 +32,33 @@ enum {
     MB_COMM_CMD_CLOSE,
 };
 
+// The states the child tells the parent (MB_COMM_CMD_STATE, MBComm_GetState), named after what the parent does on
+// them: the child asks for the program; runs it while the player picks Pokémon; starts the Poké Transfer game; has
+// sent Pokémon; has the parent's ack and waits for the save; ended the game with none to store (a Pal Park result of
+// PAL_PARK_RESULT_NONE_TRANSFERRED); is done; failed, in one of three ways that the Memory Link tells apart; or was
+// quit while the program was sent (PAL_PARK_RESULT_CANCELED)
+enum {
+    MB_COMM_STATE_REQUEST_PROGRAM = 2,
+    MB_COMM_STATE_SELECT_POKEMON,
+    MB_COMM_STATE_TRANSFER,
+    MB_COMM_STATE_POKEMON_SENT,
+    MB_COMM_STATE_WAIT_SAVE,
+    MB_COMM_STATE_NO_POKEMON = 8,
+    MB_COMM_STATE_FINISHED,
+    MB_COMM_STATE_ERROR_1,
+    MB_COMM_STATE_ERROR_2,
+    MB_COMM_STATE_ERROR_3,
+    MB_COMM_STATE_CANCELED,
+};
+
+// The parent's answer to the Pokémon the child offers (MB_COMM_CMD_ANSWER): it takes them, declines them, or has no
+// room in its boxes
+enum {
+    MB_COMM_ANSWER_ACCEPT,
+    MB_COMM_ANSWER_DECLINE,
+    MB_COMM_ANSWER_BOX_FULL,
+};
+
 // What the parent tells the child about itself
 typedef struct {
     s32 textSpeed;

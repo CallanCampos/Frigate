@@ -4,6 +4,7 @@
 #include "types.h"
 // For the files that call field_msgbg.c through this header: comm_entry_menu.c, field_subscreen.c and fieldmap.c
 #include "field/field_msgbg.h"
+#include "field/height_ex.h"
 #include "gfl/bmpwin.h"
 #include "gfl/g3d.h"
 #include "gfl/heap.h"
@@ -35,44 +36,47 @@ FieldMsgBG *Field_GetMsgBGSys(Field *field);
 BOOL Field_IsEventRunning(Field *field);
 u32 Field_GetRenderMode(Field *field);
 void Field_SetRenderMode(Field *field, u32 mode);
-void *Field_GetSceneArea(Field *field);
+FieldSceneArea *Field_GetSceneArea(Field *field);
 void Field_SetFadeFlag(Field *field, BOOL flag);
 u16 Field_GetDayPeriod(Field *field);
 BOOL Field_GetSeasonBannerOverdrawFlag(Field *field);
 void Field_SetEffectRunningFlag(Field *field, BOOL flag);
-void *Field_GetNDemoDataHandle(Field *field);
+FaceUpWork **Field_GetNDemoDataHandle(Field *field);
 void Field_SetCasteliaRush(Field *field, CasteliaRush *rush);
 CasteliaRush *Field_GetCasteliaRush(Field *field);
-void *Field_GetColorPostFX(Field *field);
+FieldColorPostFX *Field_GetColorPostFX(Field *field);
 void Field_SetPlayerPosPtr(Field *field, VecFx32 *position);
 // The money window that the scripts show on the field's message BG
 MoneyWin *Field_GetMoneyWin(Field *field);
 void Field_SetMoneyWin(Field *field, MoneyWin *moneyWin);
+// The field's color post-FX (field_light.c), which recolors textures as they load: by a luminance table, or to the
+// colors of a flashback
+struct FieldColorPostFX {
+    const u8 *lut;
+    BOOL vintage;
+};
+
 // Recolors a texture resource with the field's color post-FX
-void FieldColorPostFX_Apply(void *postFx, void *texture);
+void FieldColorPostFX_Apply(FieldColorPostFX *postFx, G3DResource *texture);
 fx32 Field_GetActorYOffset(Field *field);
 void FieldPlayer_GetGPos(FieldPlayer *player, s16 *x, s16 *y, s16 *z);
 // A number below 6 that overlay 137 reads from the game data
 u32 TrainerCard_CountStars(GameData *gameData);
 // The grid position in front of the player, facing dir
 void GetPlayerGPosPlusDir(FieldPlayer *player, u16 dir, s16 *x, s16 *y, s16 *z);
-// Where a balloon over an actor goes, from where the player stands, and the offset and window position of each
-u8 ActorMsgWin_CalcWinPosAuto(FieldActor *player, const VecFx32 *pos);
-void func_ov036_021a8bec(const VecFx32 *pos, VecFx32 *offset, G3DCamera *g3dCamera, FieldCamera *camera, u8 winPos);
-void func_ov036_021a8c00(u32 winPos, u32 *a1, u32 *a2);
 GameEvent *JoinAvenueNameEntry_Create(u16 target, GameSystem *gsys, u16 *result, u16 useCurrent);
 // Check the party and the Battle Box against a regulation. func_ov036_021aebf0 returns the event that lets the player
 // choose between them, or NULL when neither can enter
 GameEvent *func_ov036_021aebf0(GameSystem *gsys, u32 a1, Regulation *regulation, u16 *result, HeapID heapId);
 u32 func_ov036_021aece0(GameSystem *gsys, u32 a1, Regulation *regulation, HeapID heapId);
 // The screen that picks the party or the Battle Box for a battle, whether it is done, and the choice
-void *func_ov036_021c3180(Field *field, PokeParty *party, PokeParty *battleBoxParty, u8 partyOk, u32 battleBoxOk,
-                          HeapID heapId);
+PartySelectList *func_ov036_021c3180(Field *field, PokeParty *party, PokeParty *battleBoxParty, u8 partyOk,
+                                     u32 battleBoxOk, HeapID heapId);
 BOOL func_ov036_021c3278(PartySelectList *select);
 int func_ov036_021c3218(PartySelectList *select, u32 *a1);
-void *func_ov036_021c6574(void *effects, u32 a1, const VecFx32 *pos);
-void func_ov036_021c65a8(void *obj, u16 a1);
-void func_ov036_021c65e8(void *obj, u16 a1);
+FieldEffectTask *func_ov036_021c6574(FieldEffects *effects, u32 a1, const VecFx32 *pos);
+void func_ov036_021c65a8(FieldEffectTask *task, u16 a1);
+void func_ov036_021c65e8(FieldEffectTask *task, u16 a1);
 void FieldPlayer_SetWPos(FieldPlayer *player, const VecFx32 *pos);
 void FieldPlayer_SetDirection(FieldPlayer *player, u16 dir);
 void FieldFadeTCB_Start(GameSystem *gsys, Field *field, u32 a2, u32 a3, u32 a4);
@@ -85,21 +89,21 @@ BOOL Field_CheckGimmickWorkPassword(Field *field, u32 password);
 void Field_DeleteGimmickWorkBlock(Field *field, u32 id);
 
 // A list of areas of the map, which the list's entry index sets: a grid rectangle, a value and flags
-void *func_ov036_021ba5d0(u32 count, u8 heapId);
-void func_ov036_021ba624(u8 index, u32 x, u32 z, u32 width, u32 depth, u32 value, u32 flags, void *list);
+HeightExList *func_ov036_021ba5d0(u32 count, u8 heapId);
+void func_ov036_021ba624(u8 index, u32 x, u32 z, u32 width, u32 depth, u32 value, u32 flags, HeightExList *list);
 void func_ov036_021ba670(HeightExList *list);
-u32 func_ov036_021ba684(void *list);
+u32 func_ov036_021ba684(HeightExList *list);
 BOOL func_ov036_021ba688(s32 x, s32 z, HeightExList *list, u8 index);
 u32 func_ov036_021ba6a4(u8 index, HeightExList *list);
 u32 func_ov036_021ba6b0(u8 index, HeightExList *list);
 // Sets whether the entry at index is in use, which func_ov036_021ba624 checks before it fills one in
 void func_ov036_021ba6bc(u8 index, BOOL inUse, HeightExList *list);
 // Overlay 36's field_fade.c: whether a grid position is in the rectangle of an entry of the list
-BOOL func_ov036_021ba594(s32 x, s32 z, const void *entry);
+BOOL func_ov036_021ba594(s32 x, s32 z, const HeightExEntry *entry);
 // The mapper's WFBC work
-void *func_ov036_0218adac(HeapID heapId);
-void func_ov036_0218add0(void *wfbc);
-void func_ov036_0218ade0(void *wfbc, CityState *city, BOOL isOther, HeapID heapId);
+FieldWFBC *func_ov036_0218adac(HeapID heapId);
+void func_ov036_0218add0(FieldWFBC *wfbc);
+void func_ov036_0218ade0(FieldWFBC *wfbc, CityState *city, BOOL isOther, HeapID heapId);
 void FieldSubscreen_ChangeImm(FieldSubscreen *subscreen, u32 mode);
 BOOL FieldTaskManager_IsIdle(FieldTaskManager *taskManager);
 u32 FieldTaskManager_GetActiveTaskCount(FieldTaskManager *taskManager);
@@ -151,9 +155,9 @@ void Field_RequestClose(Field *field);
 BOOL Field_CheckMapLoadFinished(Field *field);
 void FieldRenderPhase2_FieldEffect(Field *field);
 void FieldRenderPhase2_EncountEffect(Field *field);
-void *FieldG2D_GetDispControl(Field *field);
-void *Field_GetFieldEffects(Field *field);
-void *Field_GetG3DObjSys(Field *field);
+FieldDispControl *FieldG2D_GetDispControl(Field *field);
+FieldEffects *Field_GetFieldEffects(Field *field);
+FieldG3DObjSystem *Field_GetG3DObjSys(Field *field);
 u32 GetZoneFogIndex(u16 zoneId);
 u32 ZoneData_GetObjectProjectionMatrixType(u16 zoneId);
 u32 GetObjectProjectionMatrixOffset(u16 zoneId);
@@ -165,7 +169,7 @@ u32 GetZoneMapType2(u16 zoneId);
 void SetupLoadZoneMapTypeData(u16 zoneId, AreaData *area, FieldG3DMapperConfig *config, MapMatrix *matrix);
 const FieldmapCtrlVTable *GetZoneFieldmapCtrlVTable(u16 zoneId);
 u32 GetFieldmapZoneHeapSize(u16 zoneId);
-PlaceName *FieldPlaceName_Create(GameSystem *gsys, HeapID heapId, void *msgBGSys);
+PlaceName *FieldPlaceName_Create(GameSystem *gsys, HeapID heapId, FieldMsgBG *msgBGSys);
 void FieldPlaceName_Free(PlaceName *placeName);
 void func_ov036_021b4ff8(PlaceName *placeName);
 void func_ov036_021b5064(PlaceName *placeName);
@@ -218,6 +222,6 @@ BOOL func_ov036_02180fc0(GameCommSys *comm);
 void FieldRenderPhase1_Fieldmap(Field *field);
 void FieldRenderPhase2_Fieldmap(Field *field);
 fx32 Field_CalcActorYOffset(Field *field);
-void FieldColorPostFX_Set(void *postFx, void *luminanceTable, BOOL flashback);
+void FieldColorPostFX_Set(FieldColorPostFX *postFx, const u8 *luminanceTable, BOOL flashback);
 
 #endif // POKEBW2_FIELD_FIELD_H

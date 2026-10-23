@@ -18,19 +18,21 @@
 #include "system/game_system.h"
 
 // The net commands, from the base 0x1500
-#define COLOSSEUM_CMD_BASE 0x1500
-#define COLOSSEUM_CMD_MEMBER (COLOSSEUM_CMD_BASE + 1)
-#define COLOSSEUM_CMD_CARD (COLOSSEUM_CMD_BASE + 2)
-#define COLOSSEUM_CMD_CHOICE (COLOSSEUM_CMD_BASE + 3)
-#define COLOSSEUM_CMD_UNK4 (COLOSSEUM_CMD_BASE + 4)
-#define COLOSSEUM_CMD_UNK5 (COLOSSEUM_CMD_BASE + 5)
-#define COLOSSEUM_CMD_PARTY (COLOSSEUM_CMD_BASE + 6)
-#define COLOSSEUM_CMD_RESULT (COLOSSEUM_CMD_BASE + 7)
-#define COLOSSEUM_CMD_UNK8 (COLOSSEUM_CMD_BASE + 8)
-#define COLOSSEUM_CMD_UNK9 (COLOSSEUM_CMD_BASE + 9)
-#define COLOSSEUM_CMD_UNKA (COLOSSEUM_CMD_BASE + 10)
-#define COLOSSEUM_CMD_UNKB (COLOSSEUM_CMD_BASE + 11)
-#define COLOSSEUM_CMD_UNKD (COLOSSEUM_CMD_BASE + 13)
+enum {
+    COLOSSEUM_CMD_BASE = 0x1500,
+    COLOSSEUM_CMD_MEMBER,
+    COLOSSEUM_CMD_CARD,
+    COLOSSEUM_CMD_CHOICE,
+    COLOSSEUM_CMD_UNK4,
+    COLOSSEUM_CMD_UNK5,
+    COLOSSEUM_CMD_PARTY,
+    COLOSSEUM_CMD_RESULT,
+    COLOSSEUM_CMD_UNK8,
+    COLOSSEUM_CMD_UNK9,
+    COLOSSEUM_CMD_UNKA,
+    COLOSSEUM_CMD_UNKB,
+    COLOSSEUM_CMD_UNKD = COLOSSEUM_CMD_BASE + 13,
+};
 
 static void *Colosseum_GetRecvBuffer(int netId, void *work, int size);
 static void Colosseum_RecvNone(int netId, int size, const void *data, void *work, NetHandle *handle);
@@ -91,7 +93,7 @@ static void Colosseum_RecvMember(int netId, int size, const void *data, void *wo
     }
 }
 
-BOOL Colosseum_SendMember(const void *member, BOOL toParent) {
+BOOL Colosseum_SendMember(const ColosseumMember *member, BOOL toParent) {
     u32 sendId = 0;
 
     if (toParent != TRUE) {

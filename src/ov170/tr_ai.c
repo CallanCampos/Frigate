@@ -37,9 +37,11 @@
 #define TRAI_STATUS_SUSPENDED 0x10
 
 // TrAIContext.seq
-#define TRAI_SEQ_LOAD_SCRIPT 0
-#define TRAI_SEQ_RUN_SCRIPT 1
-#define TRAI_SEQ_DONE 2
+enum {
+    TRAI_SEQ_LOAD_SCRIPT,
+    TRAI_SEQ_RUN_SCRIPT,
+    TRAI_SEQ_DONE,
+};
 
 // How AIConditionalJump compares a value with the script's value
 enum {
@@ -649,7 +651,7 @@ BOOL TrAI_ChooseMoveAndTarget(VM *vm, TrAIContext *wk) {
     }
     wk->chosenTarget = targets[GFL_RandomMTRange(count)];
     wk->chosenMove = wk->bestMoves[wk->chosenTarget];
-    if (GetMoveData(wk, MoveGetID(wk->attacker, wk->chosenMove), 27) == 1 && !(wk->chosenTarget & 1)) {
+    if (GetMoveData(wk, MoveGetID(wk->attacker, wk->chosenMove), MOVE_PARAM_TARGET) == 1 && !(wk->chosenTarget & 1)) {
         wk->chosenTarget = wk->attackerPos;
     }
     move = MoveGetID(wk->attacker, wk->chosenMove);

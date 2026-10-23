@@ -283,7 +283,7 @@ static void GSYS_Terminate(GameSystem *gsys) {
     GSYS_Free(gsys);
 }
 
-void GSYS_SetEventProvider(GameSystem *gsys, void *provider, void *data) {
+void GSYS_SetEventProvider(GameSystem *gsys, GameEventProvider provider, void *data) {
     gsys->eventProvider = provider;
     gsys->eventProviderData = data;
 }

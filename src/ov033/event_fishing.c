@@ -26,7 +26,7 @@
 #include "system/game_event.h"
 #include "system/game_system.h"
 
-BOOL CreateSurfPos(void *context, Field *field, VecFx32 *position) {
+BOOL CreateSurfPos(GameData *context, Field *field, VecFx32 *position) {
     VecFx32 targetPosition;
     MapTerrainBuf terrain;
     VecFx32 actorPosition;

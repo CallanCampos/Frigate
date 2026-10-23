@@ -33,10 +33,6 @@
 // and the printing of Pokémon names, genders, levels and countries that the other screens share. The names are ours,
 // guessed
 
-// The sub-process modes the screen leaves with
-#define DEPOSIT_MODE_TO_BOX 5
-#define DEPOSIT_MODE_UPLOAD 7
-
 // The number of species and one, the size of the regional Pokédex's table
 #define MONSNO_TABLE_SIZE 650
 
@@ -185,7 +181,7 @@ int WorldTrade_Deposit_Init(WorldTradeWork *wk, int seq) {
     Deposit_BgGraphicSet(wk);
     Deposit_BmpWinInit(wk);
     Deposit_SetCellActor(wk);
-    GFL_WipeSet(3, 1, 1, 0, 6, 1, HEAPID_WORLDTRADE);
+    GFL_WipeSet(WIPE_MODE_MAIN, WIPE_TYPE_FADE_IN, WIPE_TYPE_FADE_IN, 0, 6, 1, HEAPID_WORLDTRADE);
     WorldTrade_WifiIconAdd(wk);
 
     WorldTrade_PokeWantPrint(wk->msgManager, wk->monsNameManager, wk->wordSet, &wk->infoWin[0], 0, SEARCH_GENDER_ANY,
@@ -446,7 +442,7 @@ static int Deposit_SubSeqStart(WorldTradeWork *wk) {
 
 static int Deposit_SubSeqMain(WorldTradeWork *wk) {
     if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_B) {
-        WorldTrade_SubProcessChange(wk, WORLDTRADE_MYBOX, DEPOSIT_MODE_TO_BOX);
+        WorldTrade_SubProcessChange(wk, WORLDTRADE_MYBOX, WT_MODE_DEPOSIT_SELECT);
         wk->subprocessSeq = DEPOSIT_SEQ_END;
     }
     // Overrides the end, so B only changes the screen that comes after the input
@@ -486,7 +482,7 @@ static int Deposit_SubSeqHeadwordSelectWait(WorldTradeWork *wk) {
         BmpWin_ClearFrame(wk->msgWin, 0);
         BmpWin_Free(wk->menuWin[0]);
         BmpWin_Free(wk->menuWin[1]);
-        WorldTrade_SubProcessChange(wk, WORLDTRADE_MYBOX, DEPOSIT_MODE_TO_BOX);
+        WorldTrade_SubProcessChange(wk, WORLDTRADE_MYBOX, WT_MODE_DEPOSIT_SELECT);
         wk->subprocessSeq = DEPOSIT_SEQ_END;
         GFL_SndSEPlay(SEQ_SE_DECIDE1);
         break;
@@ -526,7 +522,7 @@ static int Deposit_SubSeqPokeNameSelectWait(WorldTradeWork *wk) {
     switch (ret) {
     case BMPMENULIST_CANCEL:
         BmpWin_ClearFrame(wk->msgWin, 0);
-        WorldTrade_SubProcessChange(wk, WORLDTRADE_MYBOX, DEPOSIT_MODE_TO_BOX);
+        WorldTrade_SubProcessChange(wk, WORLDTRADE_MYBOX, WT_MODE_DEPOSIT_SELECT);
         wk->subprocessSeq = DEPOSIT_SEQ_END;
         WorldTrade_SelectNameListBackup(&wk->selectListPos, wk->dw->headwordListPos + wk->dw->headwordPos,
                                         wk->dw->nameListPos, wk->dw->namePos);
@@ -536,7 +532,7 @@ static int Deposit_SubSeqPokeNameSelectWait(WorldTradeWork *wk) {
     default:
         wk->want.characterNo = ret;
         personal = PML_PersonalLoad(ret, 0, HEAPID_WORLDTRADE);
-        sexSelection = PML_PersonalGetParam(personal, 20);
+        sexSelection = PML_PersonalGetParam(personal, PERSONAL_SEX_RATIO);
         PML_PersonalFree(personal);
         wk->dw->sexSelection = sexSelection;
         if (WorldTrade_SexSelectionCheck(&wk->want, wk->dw->sexSelection)) {
@@ -644,13 +640,13 @@ static int Deposit_SubSeqDepositOkYesNoWait(WorldTradeWork *wk) {
 
     if (ret == 1) {
         WorldTrade_TouchWinYesNoDel(wk);
-        WorldTrade_SubProcessChange(wk, WORLDTRADE_UPLOAD, DEPOSIT_MODE_UPLOAD);
+        WorldTrade_SubProcessChange(wk, WORLDTRADE_UPLOAD, WT_MODE_UPLOAD);
         wk->subprocessSeq = DEPOSIT_SEQ_END;
         wk->subOutFlag = 1;
         Deposit_DepositPokemonDataMake(&wk->uploadPokemonData, wk);
     } else if (ret == 2) {
         WorldTrade_TouchWinYesNoDel(wk);
-        WorldTrade_SubProcessChange(wk, WORLDTRADE_MYBOX, DEPOSIT_MODE_TO_BOX);
+        WorldTrade_SubProcessChange(wk, WORLDTRADE_MYBOX, WT_MODE_DEPOSIT_SELECT);
         wk->subprocessSeq = DEPOSIT_SEQ_END;
     }
     return WT_SEQ_MAIN;
@@ -658,10 +654,10 @@ static int Deposit_SubSeqDepositOkYesNoWait(WorldTradeWork *wk) {
 
 static int Deposit_SubSeqEnd(WorldTradeWork *wk) {
     if (wk->subNextProcess == WORLDTRADE_ENTER) {
-        GFL_WipeSet(0, 0, 0, 0, 6, 1, HEAPID_WORLDTRADE);
+        GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, 0, 6, 1, HEAPID_WORLDTRADE);
         wk->subOutFlag = 1;
     } else {
-        GFL_WipeSet(3, 0, 0, 0, 6, 1, HEAPID_WORLDTRADE);
+        GFL_WipeSet(WIPE_MODE_MAIN, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, 0, 6, 1, HEAPID_WORLDTRADE);
     }
     wk->subprocessSeq = DEPOSIT_SEQ_START;
     return WT_SEQ_FADEOUT;

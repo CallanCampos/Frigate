@@ -298,7 +298,7 @@ void BtlvGauge_SetBattleMon(BtlvGauge *gauge, BtlMainModule *mainModule, BattleM
 
     MIi_CpuClear16(0, &gauge->entries[index].mon, sizeof(BtlvGaugeMon));
     gauge->entries[index].mon.hp = GetBattleMonStat(mon, BATTLEMON_HP);
-    gauge->entries[index].mon.maxHp = GetBattleMonStat(mon, 14);
+    gauge->entries[index].mon.maxHp = GetBattleMonStat(mon, BATTLEMON_MAX_HP);
     gauge->entries[index].mon.hpAnim = GAUGE_ANIM_START;
     gauge->entries[index].mon.hpDelta = 0;
     gauge->entries[index].mon.level = GetBattleMonStat(mon, BATTLEMON_LEVEL);
@@ -309,7 +309,7 @@ void BtlvGauge_SetBattleMon(BtlvGauge *gauge, BtlMainModule *mainModule, BattleM
         u32 base = PML_UtilGetPkmLvExp(GetBattleMonSpecies(mon), GetBattleMonStat(mon, BATTLEMON_FORM),
                                        GetBattleMonStat(mon, BATTLEMON_LEVEL));
 
-        gauge->entries[index].mon.exp = GetBattleMonStat(mon, 20) - base;
+        gauge->entries[index].mon.exp = GetBattleMonStat(mon, BATTLEMON_EXP) - base;
         gauge->entries[index].mon.expMax =
             PML_UtilGetPkmLvExp(GetBattleMonSpecies(mon), GetBattleMonStat(mon, BATTLEMON_FORM),
                                 GetBattleMonStat(mon, BATTLEMON_LEVEL) + 1) -
@@ -737,7 +737,7 @@ void BtlvGauge_StartLevelUp(BtlvGauge *gauge, BattleMon *mon, int index) {
     s32 exp = gauge->entries[index].mon.expMax - gauge->entries[index].mon.exp;
 
     gauge->entries[index].mon.hp = GetBattleMonStat(mon, BATTLEMON_HP);
-    gauge->entries[index].mon.maxHp = GetBattleMonStat(mon, 14);
+    gauge->entries[index].mon.maxHp = GetBattleMonStat(mon, BATTLEMON_MAX_HP);
     gauge->entries[index].mon.hpAnim = GAUGE_ANIM_START;
     gauge->entries[index].mon.hpDelta = 0;
     gauge->entries[index].mon.level = GetBattleMonStat(mon, BATTLEMON_LEVEL);

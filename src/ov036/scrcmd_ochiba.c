@@ -207,7 +207,7 @@ BOOL func_ov036_021c9a40(VM *vm, FieldScriptEnv *env) {
 }
 
 BOOL func_ov036_021c9a7c(VM *vm, FieldScriptEnv *env) {
-    void *block = GameData_GetWbtSave(FieldScriptEnv_GetGameData(env));
+    WbtSave *block = GameData_GetWbtSave(FieldScriptEnv_GetGameData(env));
     u16 index = ScriptReadAny(vm, env);
     u16 *result = ScriptReadVar(vm, env);
 
@@ -275,8 +275,9 @@ BOOL func_ov036_021c9b88(VM *vm, FieldScriptEnv *env) {
     result = ScriptReadVar(vm, env);
     *result = FALSE;
     index = func_ov033_0217aac4(unityTower, visitor);
-    if (index != 0xff && (u8)UnityTower_GetVisitorParam(
-                             getUnityTower_SurveySaveBlkAddrress(GameData_GetSaveControl(gameData)), index, 5)) {
+    if (index != 0xff &&
+        (u8)UnityTower_GetVisitorParam(getUnityTower_SurveySaveBlkAddrress(GameData_GetSaveControl(gameData)), index,
+                                       UNITY_TOWER_VISITOR_PARAM_SCRIPT_FLAG)) {
         *result = TRUE;
     }
     return FALSE;

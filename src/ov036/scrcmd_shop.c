@@ -58,28 +58,34 @@
 // The command's shop IDs past the Poké Marts', whose items are in file ID + 6 of ARCID_SHOP_ITEMS. The special marts'
 // stock grows with a level that KeyDataSave_GetProgress keeps in the key system's data, its value 0 for 0xf7 to 0xfa
 // and 1 for 0xef to 0xf2
-#define SHOP_ID_SPECIAL_MART_1_FIRST 0xef
-#define SHOP_ID_SPECIAL_MART_1_LAST 0xf2
-#define SHOP_ID_MOVE_TUTOR_NACRENE 0xf3
-#define SHOP_ID_MOVE_TUTOR_HUMILAU 0xf4
-#define SHOP_ID_MOVE_TUTOR_LENTIMAS 0xf5
-#define SHOP_ID_MOVE_TUTOR_DRIFTVEIL 0xf6
-#define SHOP_ID_SPECIAL_MART_0_FIRST 0xf7
-#define SHOP_ID_SPECIAL_MART_0_LAST 0xfa
-#define SHOP_ID_BP_TMS 0xfd
-#define SHOP_ID_BP_ITEMS 0xfe
-// The Poké Mart whose items grow with the badges
-#define SHOP_ID_BADGE_MART 0xff
+enum {
+    SHOP_ID_SPECIAL_MART_1_FIRST = 0xef,
+    SHOP_ID_SPECIAL_MART_1_LAST = 0xf2,
+    SHOP_ID_MOVE_TUTOR_NACRENE,
+    SHOP_ID_MOVE_TUTOR_HUMILAU,
+    SHOP_ID_MOVE_TUTOR_LENTIMAS,
+    SHOP_ID_MOVE_TUTOR_DRIFTVEIL,
+    SHOP_ID_SPECIAL_MART_0_FIRST,
+    SHOP_ID_SPECIAL_MART_0_LAST = 0xfa,
+    SHOP_ID_BP_TMS = 0xfd,
+    SHOP_ID_BP_ITEMS,
+    // The Poké Mart whose items grow with the badges
+    SHOP_ID_BADGE_MART,
+};
 
 // What the menu lists: items, TMs with their numbers and moves, or a move tutor's moves
-#define SHOP_LIST_ITEMS 0
-#define SHOP_LIST_TMS 1
-#define SHOP_LIST_MOVES 2
+enum {
+    SHOP_LIST_ITEMS,
+    SHOP_LIST_TMS,
+    SHOP_LIST_MOVES,
+};
 
 // What the menu sells for: money, Battle Points or a move tutor's shards
-#define SHOP_CURRENCY_MONEY 0
-#define SHOP_CURRENCY_BP 1
-#define SHOP_CURRENCY_SHARDS 2
+enum {
+    SHOP_CURRENCY_MONEY,
+    SHOP_CURRENCY_BP,
+    SHOP_CURRENCY_SHARDS,
+};
 
 // The variables the move tutor's script reads once a move was bought: 0 if no Pokémon was chosen, 2 if the chosen one
 // can learn the move and 1 if it can't, then the move, the slot of the Pokémon that learns it and the price
@@ -322,14 +328,14 @@ static const VecFx32 sCameraTargetOffsets[] = {
 
 // clang-format off
 static const SpecialPokeMartHeader SPECIAL_POKE_MART_HEADERS[] = {
-    { 0xf7, { 26, 27, 28, 29, 30, 31 } },
-    { 0xf8, { 32, 33, 34, 35, 36, 37 } },
-    { 0xf9, { 38, 39, 40, 41, 42, 43 } },
-    { 0xfa, { 44, 45, 46, 47, 48, 49 } },
-    { 0xef, { 50, 51, 52, 53, 54, 55 } },
-    { 0xf0, { 56, 57, 58, 59, 60, 61 } },
-    { 0xf1, { 62, 63, 64, 65, 66, 67 } },
-    { 0xf2, { 68, 69, 70, 71, 72, 73 } },
+    { SHOP_ID_SPECIAL_MART_0_FIRST, { 26, 27, 28, 29, 30, 31 } },
+    { SHOP_ID_SPECIAL_MART_0_FIRST + 1, { 32, 33, 34, 35, 36, 37 } },
+    { SHOP_ID_SPECIAL_MART_0_FIRST + 2, { 38, 39, 40, 41, 42, 43 } },
+    { SHOP_ID_SPECIAL_MART_0_LAST, { 44, 45, 46, 47, 48, 49 } },
+    { SHOP_ID_SPECIAL_MART_1_FIRST, { 50, 51, 52, 53, 54, 55 } },
+    { SHOP_ID_SPECIAL_MART_1_FIRST + 1, { 56, 57, 58, 59, 60, 61 } },
+    { SHOP_ID_SPECIAL_MART_1_FIRST + 2, { 62, 63, 64, 65, 66, 67 } },
+    { SHOP_ID_SPECIAL_MART_1_LAST, { 68, 69, 70, 71, 72, 73 } },
 };
 
 // clang-format on
@@ -518,7 +524,7 @@ BOOL s0149_CallFriendlyShopBuy(VM *vm, FieldScriptEnv *env) {
     GameData *gameData;
     Field *field;
     void **heapPtr;
-    void *msgBGSys;
+    FieldMsgBG *msgBGSys;
     ShopScriptWork *shop;
 
     ScriptReadVar(vm, env);
@@ -546,14 +552,14 @@ BOOL s0149_CallFriendlyShopBuy(VM *vm, FieldScriptEnv *env) {
     case SHOP_ID_BP_TMS:
         shop->shopId = shopId;
         break;
-    case 0xef:
-    case 0xf0:
-    case 0xf1:
-    case 0xf2:
-    case 0xf7:
-    case 0xf8:
-    case 0xf9:
-    case 0xfa:
+    case SHOP_ID_SPECIAL_MART_1_FIRST:
+    case SHOP_ID_SPECIAL_MART_1_FIRST + 1:
+    case SHOP_ID_SPECIAL_MART_1_FIRST + 2:
+    case SHOP_ID_SPECIAL_MART_1_LAST:
+    case SHOP_ID_SPECIAL_MART_0_FIRST:
+    case SHOP_ID_SPECIAL_MART_0_FIRST + 1:
+    case SHOP_ID_SPECIAL_MART_0_FIRST + 2:
+    case SHOP_ID_SPECIAL_MART_0_LAST:
         shop->shopId = shopId;
         break;
     case SHOP_ID_MOVE_TUTOR_NACRENE:
@@ -739,14 +745,14 @@ static void ShopUI_Init(GameSystem *gsys, ShopUIWork *wk, u32 shopId, u32 subId)
         wk->listMode = SHOP_LIST_TMS;
         ShopUI_LoadBPShopItems(wk, 1);
         break;
-    case 0xef:
-    case 0xf0:
-    case 0xf1:
-    case 0xf2:
-    case 0xf7:
-    case 0xf8:
-    case 0xf9:
-    case 0xfa:
+    case SHOP_ID_SPECIAL_MART_1_FIRST:
+    case SHOP_ID_SPECIAL_MART_1_FIRST + 1:
+    case SHOP_ID_SPECIAL_MART_1_FIRST + 2:
+    case SHOP_ID_SPECIAL_MART_1_LAST:
+    case SHOP_ID_SPECIAL_MART_0_FIRST:
+    case SHOP_ID_SPECIAL_MART_0_FIRST + 1:
+    case SHOP_ID_SPECIAL_MART_0_FIRST + 2:
+    case SHOP_ID_SPECIAL_MART_0_LAST:
         ShopUI_LoadSpecialPokeMartItems(wk, shopId);
         break;
     case SHOP_ID_MOVE_TUTOR_NACRENE:
@@ -1218,9 +1224,10 @@ static void ShopUI_CreateCellActors(ShopUIWork *wk) {
 }
 
 static void ShopUI_LoadItemIconResources(ShopUIWork *wk) {
-    wk->res[2].palette =
-        ClActSys_LoadPlttRange(wk->iconArc, GetItemGraphicsDatID(ITEM_MASTER_BALL, 2), 0, 32, 0, 1, wk->heapId);
-    wk->res[2].chars = ClActSys_LoadChars(wk->iconArc, GetItemGraphicsDatID(ITEM_MASTER_BALL, 1), 0, 0, wk->heapId);
+    wk->res[2].palette = ClActSys_LoadPlttRange(
+        wk->iconArc, GetItemGraphicsDatID(ITEM_MASTER_BALL, ITEM_FILE_ICON_PLTT), 0, 32, 0, 1, wk->heapId);
+    wk->res[2].chars =
+        ClActSys_LoadChars(wk->iconArc, GetItemGraphicsDatID(ITEM_MASTER_BALL, ITEM_FILE_ICON_CHAR), 0, 0, wk->heapId);
     wk->res[2].cellAnims = ClActSys_LoadCellAnims(wk->iconArc, 1, 0, wk->heapId);
 }
 
@@ -1232,8 +1239,9 @@ static void ShopUI_LoadItemSprite(ShopUIWork *wk, u16 item) {
     void *ncgr;
 
     if (item <= ITEM_LAST) {
-        nclr = GFL_G2DIOReadNCLRArc(wk->iconArc, GetItemGraphicsDatID(item, 2), &palette, wk->heapId);
-        ncgr = GFL_G2DIOReadOBJNCGRArc(wk->iconArc, GetItemGraphicsDatID(item, 1), FALSE, &character, wk->heapId);
+        nclr = GFL_G2DIOReadNCLRArc(wk->iconArc, GetItemGraphicsDatID(item, ITEM_FILE_ICON_PLTT), &palette, wk->heapId);
+        ncgr = GFL_G2DIOReadOBJNCGRArc(wk->iconArc, GetItemGraphicsDatID(item, ITEM_FILE_ICON_CHAR), FALSE, &character,
+                                       wk->heapId);
         ClActSys_ReplacePlttData(wk->res[2].palette, palette, 1);
         ClActSys_ReplaceCharData(wk->res[2].chars, character);
         GFL_HeapFree(nclr);

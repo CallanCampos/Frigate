@@ -39,10 +39,6 @@
 #define BOX_CURSOR_END_POS 30
 #define BOX_CURSOR_TRAY_POS 31
 
-// The sub-process modes the screen is entered with
-#define BOX_MODE_DEPOSIT_SELECT 5
-#define BOX_MODE_EXCHANGE_SELECT 6
-
 // The box page of the party
 #define BOX_TRAY_PARTY 0xff
 
@@ -170,9 +166,9 @@ int WorldTrade_Box_Init(WorldTradeWork *wk, int seq) {
     WorldTrade_SetPartnerExchangePos(wk);
 
     if (GXS_GetMasterBrightness() == 0) {
-        GFL_WipeSet(3, 1, 1, 0, 6, 1, HEAPID_WORLDTRADE);
+        GFL_WipeSet(WIPE_MODE_MAIN, WIPE_TYPE_FADE_IN, WIPE_TYPE_FADE_IN, 0, 6, 1, HEAPID_WORLDTRADE);
     } else {
-        GFL_WipeSet(0, 1, 1, 0, 6, 1, HEAPID_WORLDTRADE);
+        GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_IN, WIPE_TYPE_FADE_IN, 0, 6, 1, HEAPID_WORLDTRADE);
     }
 
     Box_NowBoxPageInfoGet(wk, wk->boxTrayNo);
@@ -457,7 +453,7 @@ static void Box_BmpWinInit(WorldTradeWork *wk) {
     GFL_BGSysLoadScr(BmpWin_GetBGIndex(win));
     WorldTrade_SysPrint(wk->menuWin[1], wk->endString, 0, 1, 1, 0x3dc4, &wk->print);
 
-    if (wk->subProcessMode == BOX_MODE_DEPOSIT_SELECT) {
+    if (wk->subProcessMode == WT_MODE_DEPOSIT_SELECT) {
         WorldTrade_SubLcdExplainPut(wk, 3);
     } else {
         WorldTrade_SubLcdExplainPut(wk, 1);
@@ -496,9 +492,9 @@ static int Box_SubSeqStart(WorldTradeWork *wk) {
     int msgNo;
 
     if (GFL_WipeIsFinished()) {
-        if (wk->subProcessMode == BOX_MODE_DEPOSIT_SELECT) {
+        if (wk->subProcessMode == WT_MODE_DEPOSIT_SELECT) {
             msgNo = 0x15;
-        } else if (wk->subProcessMode == BOX_MODE_EXCHANGE_SELECT) {
+        } else if (wk->subProcessMode == WT_MODE_EXCHANGE_SELECT) {
             msgNo = 0x11;
         }
         Box_SubSeqMessagePrint(wk, msgNo, 1, 0, 0xf0f, 0);
@@ -598,11 +594,11 @@ static int Box_TouchFunc(WorldTradeWork *wk) {
 }
 
 static void Box_CancelFunc(WorldTradeWork *wk, int mode) {
-    if (mode == BOX_MODE_DEPOSIT_SELECT) {
+    if (mode == WT_MODE_DEPOSIT_SELECT) {
         WorldTrade_SubProcessChange(wk, WORLDTRADE_TITLE, 0);
         wk->subprocessSeq = BOX_SEQ_END;
-    } else if (mode == BOX_MODE_EXCHANGE_SELECT) {
-        WorldTrade_SubProcessChange(wk, WORLDTRADE_PARTNER, 0x11);
+    } else if (mode == WT_MODE_EXCHANGE_SELECT) {
+        WorldTrade_SubProcessChange(wk, WORLDTRADE_PARTNER, WT_MODE_PARTNER_FROM_PARTNER);
         wk->subprocessSeq = BOX_SEQ_END;
     }
 }
@@ -637,16 +633,16 @@ static int Box_SubSeqMain(WorldTradeWork *wk) {
         default:
             wk->boxCursorPos = touch;
             Box_CursorPosPrioritySet(wk->cursorAct, wk->boxCursorPos);
-            if (wk->subProcessMode == BOX_MODE_DEPOSIT_SELECT) {
+            if (wk->subProcessMode == WT_MODE_DEPOSIT_SELECT) {
                 Box_DepositDecideFunc(wk);
-            } else if (wk->subProcessMode == BOX_MODE_EXCHANGE_SELECT) {
+            } else if (wk->subProcessMode == WT_MODE_EXCHANGE_SELECT) {
                 Box_ExchangeDecideFunc(wk);
             }
             break;
         }
     } else {
         Box_CursorControl(wk);
-        if (wk->subProcessMode == BOX_MODE_DEPOSIT_SELECT) {
+        if (wk->subProcessMode == WT_MODE_DEPOSIT_SELECT) {
             if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_B) {
                 ClActor_SetVisible(wk->fingerAct, TRUE);
                 ClActor_RestartAnim(wk->fingerAct);
@@ -655,7 +651,7 @@ static int Box_SubSeqMain(WorldTradeWork *wk) {
             } else if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_A) {
                 Box_DepositDecideFunc(wk);
             }
-        } else if (wk->subProcessMode == BOX_MODE_EXCHANGE_SELECT) {
+        } else if (wk->subProcessMode == WT_MODE_EXCHANGE_SELECT) {
             if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_B) {
                 ClActor_SetVisible(wk->fingerAct, TRUE);
                 ClActor_RestartAnim(wk->fingerAct);
@@ -774,7 +770,7 @@ static int Box_SubSeqSelectWait(WorldTradeWork *wk) {
         ListMenuCore_FreeOptionList(wk->menuList);
         BmpWin_ClearFrame(wk->msgWin, 0);
         wk->subprocessSeq = BOX_SEQ_END;
-        WorldTrade_SubProcessChange(wk, WORLDTRADE_STATUS, BOX_MODE_DEPOSIT_SELECT);
+        WorldTrade_SubProcessChange(wk, WORLDTRADE_STATUS, WT_MODE_DEPOSIT_SELECT);
         break;
     case 2:
         WorldTrade_SelBoxEnd(wk);
@@ -829,7 +825,7 @@ static int Box_SubSeqExchangeSelectWait(WorldTradeWork *wk) {
         WorldTrade_SelBoxEnd(wk);
         ListMenuCore_FreeOptionList(wk->menuList);
         wk->subprocessSeq = BOX_SEQ_END;
-        WorldTrade_SubProcessChange(wk, WORLDTRADE_STATUS, BOX_MODE_EXCHANGE_SELECT);
+        WorldTrade_SubProcessChange(wk, WORLDTRADE_STATUS, WT_MODE_EXCHANGE_SELECT);
         break;
     case 2:
         WorldTrade_SelBoxEnd(wk);
@@ -870,10 +866,10 @@ static int Box_SubSeqExchangeSelectWait(WorldTradeWork *wk) {
 static int Box_SubSeqEnd(WorldTradeWork *wk) {
     if (wk->subNextProcess == WORLDTRADE_ENTER || wk->subNextProcess == WORLDTRADE_STATUS ||
         wk->subNextProcess == WORLDTRADE_PARTNER) {
-        GFL_WipeSet(0, 0, 0, 0, 6, 1, HEAPID_WORLDTRADE);
+        GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, 0, 6, 1, HEAPID_WORLDTRADE);
         wk->subOutFlag = 1;
     } else {
-        GFL_WipeSet(3, 0, 0, 0, 6, 1, HEAPID_WORLDTRADE);
+        GFL_WipeSet(WIPE_MODE_MAIN, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, 0, 6, 1, HEAPID_WORLDTRADE);
     }
     wk->subprocessSeq = BOX_SEQ_START;
     return WT_SEQ_FADEOUT;
@@ -936,7 +932,7 @@ static int Box_ExchangeCheck(WorldTradeWork *wk) {
     wk->depositPkm = WorldTrade_GetPokePtr(wk->param->myparty, wk->param->mybox, wk->boxTrayNo, wk->boxCursorPos);
     wk->subprocessSeq = BOX_SEQ_END;
     wk->subOutFlag = 1;
-    WorldTrade_SubProcessChange(wk, WORLDTRADE_UPLOAD, 9);
+    WorldTrade_SubProcessChange(wk, WORLDTRADE_UPLOAD, WT_MODE_EXCHANGE);
     Box_MakeExchangePokemonData(&wk->uploadPokemonData, wk);
     wk->searchResult = 0;
     return TRUE;
@@ -1150,7 +1146,7 @@ static void Box_NowBoxPageInfoGet(WorldTradeWork *wk, int now) {
 
     GFL_BitmapFill(BmpWin_GetBitmap(wk->subWin), 0);
     WorldTrade_SysPrint(wk->subWin, wk->boxTrayNameString, 0, 5, 1, 0x440, &wk->print);
-    if (wk->subProcessMode == BOX_MODE_EXCHANGE_SELECT) {
+    if (wk->subProcessMode == WT_MODE_EXCHANGE_SELECT) {
         Box_PokeIconPalSet(wk->boxWork, wk->pokeIconAct, &wk->downloadPokemonData[wk->touchTrainerPos].wantSimple,
                            pbuf);
     }

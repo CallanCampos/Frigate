@@ -20,7 +20,7 @@ struct BtlField {
     u32 weather;
     u32 weatherTurns;
     // The effect's event handlers, from overlay 169
-    void *events[FIELD_EFFECT_COUNT];
+    BattleEventItem *events[FIELD_EFFECT_COUNT];
     BattleCondition conditions[FIELD_EFFECT_COUNT];
     u32 turnCounts[FIELD_EFFECT_COUNT];
     // The Pokemon the effect lasts for

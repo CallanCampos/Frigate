@@ -47,8 +47,8 @@ struct LiveBattleMatchFlow {
     Font *font;
     WordSet *wordSet;
     PokeParty *party;
-    void *record;
-    void *entry;
+    LiveMatchData *record;
+    TournamentEntry *entry;
     // The competition data that the infrared delivery brings
     TournamentEntry delivered;
     u32 result;
@@ -82,7 +82,7 @@ static void LiveBattleMatchFlow_PlayerCardDelete(LiveBattleMatchFlow *wk);
 static BOOL LiveBattleMatchFlow_PlayerCardIsReady(LiveBattleMatchFlow *wk);
 static BOOL LiveBattleMatchFlow_PlayerCardIsDone(LiveBattleMatchFlow *wk);
 static void LiveBattleMatchFlow_PlayerCardShow(LiveBattleMatchFlow *wk, u32 a1);
-static void LiveBattleMatchFlow_PartnerCardCreate(LiveBattleMatchFlow *wk, LiveBattleMatchPlayerData *data);
+static void LiveBattleMatchFlow_PartnerCardCreate(LiveBattleMatchFlow *wk, WifiBattleMatchPlayer *data);
 static void LiveBattleMatchFlow_PartnerCardDelete(LiveBattleMatchFlow *wk);
 static BOOL LiveBattleMatchFlow_PartnerCardIsDone(LiveBattleMatchFlow *wk);
 static void LiveBattleMatchFlow_TeamListCreate(LiveBattleMatchFlow *wk);
@@ -90,8 +90,8 @@ static void LiveBattleMatchFlow_TeamListDelete(LiveBattleMatchFlow *wk);
 static BOOL LiveBattleMatchFlow_TeamListIsReady(LiveBattleMatchFlow *wk);
 static BOOL LiveBattleMatchFlow_TeamListIsDone(LiveBattleMatchFlow *wk);
 static void LiveBattleMatchFlow_LoadTeam(LiveBattleMatchFlow *wk, PokeParty *dest);
-static void LiveBattleMatchFlow_FillPlayerData(LiveBattleMatchPlayerData *data, LiveBattleMatchFlow *wk);
-static void LiveBattleMatchFlow_SetEntryField2(LiveBattleMatchPlayerData *data, LiveBattleMatchFlow *wk);
+static void LiveBattleMatchFlow_FillPlayerData(WifiBattleMatchPlayer *data, LiveBattleMatchFlow *wk);
+static void LiveBattleMatchFlow_SetEntryField2(WifiBattleMatchPlayer *data, LiveBattleMatchFlow *wk);
 static u32 LiveBattleMatchFlow_GetResultMessageId(LiveBattleMatchFlow *wk);
 static void LiveBattleMatchFlow_PrintResult(LiveBattleMatchFlow *wk);
 
@@ -384,8 +384,8 @@ static void LiveBattleMatchFlow_StepEntry(WifiBattleMatchTask *task, u32 *seq, v
         LiveBattleMatchFlow_PrintAndWait(wk, task, seq, 10, 2, 31, 23);
         break;
     case 23: {
-        void *block = getTournamentBlockAddress(GameData_GetSaveControl(wk->param.gameData));
-        void *records = TournamentBlock_GetTeam(block, 1);
+        TournamentBlock *block = getTournamentBlockAddress(GameData_GetSaveControl(wk->param.gameData));
+        TournamentTeam *records = TournamentBlock_GetTeam(block, 1);
 
         TournamentEntry_SetField(&wk->delivered, TOURNAMENT_FIELD_UNK15B, 1);
         LiveMatchData_Init(wk->record);
@@ -573,7 +573,7 @@ static void LiveBattleMatchFlow_StepTeam(WifiBattleMatchTask *task, u32 *seq, vo
     case 13: {
         SaveControl *save = GameData_GetSaveControl(wk->param.gameData);
         BattleBoxSave *battleBox = getBattleBox(save);
-        void *records = TournamentBlock_GetTeam(getTournamentBlockAddress(save), 1);
+        TournamentTeam *records = TournamentBlock_GetTeam(getTournamentBlockAddress(save), 1);
         PokeParty *party = convertBoxedPokeSetToParty(battleBox, HEAPID_LIVEBATTLEMATCH_TEAM);
 
         BattleBoxSave_SetFlags(battleBox, 2);
@@ -657,7 +657,7 @@ static void LiveBattleMatchFlow_StepMenu(WifiBattleMatchTask *task, u32 *seq, vo
         break;
     case 4: {
         Regulation *regulation = TournamentEntry_GetRegulation(wk->entry);
-        u32 played = LiveMatchData_GetCount(wk->record, 0);
+        u32 played = LiveMatchData_GetCount(wk->record, LIVEMATCH_COUNT_PLAYED);
 
         if (played >= Regulation_GetParam(regulation, REGULATION_PARAM_MAX_BATTLES)) {
             WifiBattleMatchTask_SetFunc(task, LiveBattleMatchFlow_StepQuit);
@@ -915,8 +915,7 @@ static void LiveBattleMatchFlow_StepLink(WifiBattleMatchTask *task, u32 *seq, vo
         break;
     case 14:
         if (LiveBattleMatchIrc_TakePlayerData(wk->irc, &received)) {
-            MI_CpuCopy8(received, wk->param.partnerData,
-                        PokeParty_GetSaveDataSize() + LIVEBATTLEMATCH_PLAYER_HEADER_SIZE);
+            MI_CpuCopy8(received, wk->param.partnerData, PokeParty_GetSaveDataSize() + sizeof(WifiBattleMatchPlayer));
             *seq = 15;
         }
         break;
@@ -1085,11 +1084,13 @@ static void LiveBattleMatchFlow_StepRecord(WifiBattleMatchTask *task, u32 *seq, 
     case 3: {
         u8 won;
         u8 lost;
-        u8 played = LiveMatchData_GetCount(wk->record, 0);
+        u8 played = LiveMatchData_GetCount(wk->record, LIVEMATCH_COUNT_PLAYED);
 
         LiveMatchData_SetOpponentMacAddress(wk->record, played, wk->param.partnerData->mac);
-        LiveMatchData_SetOpponentParam(wk->record, played, 0, wk->param.matchResult->unk08);
-        LiveMatchData_SetOpponentParam(wk->record, played, 1, wk->param.matchResult->unk09);
+        LiveMatchData_SetOpponentParam(wk->record, played, LIVEMATCH_OPPONENT_PARAM_ALIVE,
+                                       wk->param.matchResult->aliveOther);
+        LiveMatchData_SetOpponentParam(wk->record, played, LIVEMATCH_OPPONENT_PARAM_HP_PERCENT,
+                                       wk->param.matchResult->otherHpPercent);
         won = 0;
         lost = 0;
         switch (wk->param.matchResult->result) {
@@ -1108,9 +1109,9 @@ static void LiveBattleMatchFlow_StepRecord(WifiBattleMatchTask *task, u32 *seq, 
                            wk->param.matchResult->result);
             break;
         }
-        LiveMatchData_AddCount(wk->record, 1, won);
-        LiveMatchData_AddCount(wk->record, 2, lost);
-        LiveMatchData_AddCount(wk->record, 0, 1);
+        LiveMatchData_AddCount(wk->record, LIVEMATCH_COUNT_WON, won);
+        LiveMatchData_AddCount(wk->record, LIVEMATCH_COUNT_LOST, lost);
+        LiveMatchData_AddCount(wk->record, LIVEMATCH_COUNT_PLAYED, 1);
         LiveBattleMatchFlow_PlayerCardCreateWait(wk);
         *seq = 4;
         break;
@@ -1158,7 +1159,7 @@ static void LiveBattleMatchFlow_StepQuit(WifiBattleMatchTask *task, u32 *seq, vo
         break;
     case 1: {
         Regulation *regulation = TournamentEntry_GetRegulation(wk->entry);
-        u32 played = LiveMatchData_GetCount(wk->record, 0);
+        u32 played = LiveMatchData_GetCount(wk->record, LIVEMATCH_COUNT_PLAYED);
 
         if (played >= Regulation_GetParam(regulation, REGULATION_PARAM_MAX_BATTLES)) {
             *seq = 2;
@@ -1372,15 +1373,15 @@ static void LiveBattleMatchFlow_PlayerCardCreate(LiveBattleMatchFlow *wk) {
         SaveControl *save = GameData_GetSaveControl(wk->param.gameData);
         BattleBoxSave *battleBox = getBattleBox(save);
         Regulation *regulation = TournamentEntry_GetRegulation(wk->entry);
-        void *records = TournamentBlock_GetTeam(getTournamentBlockAddress(save), 1);
+        TournamentTeam *records = TournamentBlock_GetTeam(getTournamentBlockAddress(save), 1);
         PlayerInfo *info = GetGameDataPlayerInfo(wk->param.gameData);
         ClActUnit *link = WifiBattleMatchGraphic_GetClActUnit(wk->param.net);
         WifiBattleMatchLiveCardInfo card;
 
         MI_CpuFill8(&card, 0, sizeof(WifiBattleMatchLiveCardInfo));
-        card.unkA0 = LiveMatchData_GetCount(wk->record, 1);
-        card.unkA2 = LiveMatchData_GetCount(wk->record, 2);
-        card.unkA4 = LiveMatchData_GetCount(wk->record, 0);
+        card.unkA0 = LiveMatchData_GetCount(wk->record, LIVEMATCH_COUNT_WON);
+        card.unkA2 = LiveMatchData_GetCount(wk->record, LIVEMATCH_COUNT_LOST);
+        card.unkA4 = LiveMatchData_GetCount(wk->record, LIVEMATCH_COUNT_PLAYED);
         card.unkA6 = Regulation_GetParam(regulation, REGULATION_PARAM_MAX_BATTLES);
         card.look = PlayerInfo_GetUnionView(info);
         MI_CpuCopy8(TournamentEntry_GetCardData(wk->entry), card.data, sizeof(card.data));
@@ -1422,7 +1423,7 @@ static void LiveBattleMatchFlow_PlayerCardShow(LiveBattleMatchFlow *wk, u32 a1) 
     WifiBattleMatchLiveCard_ShowPage(wk->playerCard, a1, wk->msgCard, wk->param.printQueue, wk->param.font, wk->heapId);
 }
 
-static void LiveBattleMatchFlow_PartnerCardCreate(LiveBattleMatchFlow *wk, LiveBattleMatchPlayerData *data) {
+static void LiveBattleMatchFlow_PartnerCardCreate(LiveBattleMatchFlow *wk, WifiBattleMatchPlayer *data) {
     if (wk->partnerCard == NULL) {
         ClActUnit *link = WifiBattleMatchGraphic_GetClActUnit(wk->param.net);
         u32 field11 = TournamentEntry_GetField(wk->entry, TOURNAMENT_FIELD_VARIANT);
@@ -1479,7 +1480,7 @@ static void LiveBattleMatchFlow_LoadTeam(LiveBattleMatchFlow *wk, PokeParty *des
 }
 
 // Fills what is sent to the other player
-static void LiveBattleMatchFlow_FillPlayerData(LiveBattleMatchPlayerData *data, LiveBattleMatchFlow *wk) {
+static void LiveBattleMatchFlow_FillPlayerData(WifiBattleMatchPlayer *data, LiveBattleMatchFlow *wk) {
     GameData *gameData = wk->param.gameData;
     PokeParty *party;
 
@@ -1488,15 +1489,15 @@ static void LiveBattleMatchFlow_FillPlayerData(LiveBattleMatchPlayerData *data, 
     OS_GetMacAddress(data->mac);
     CGearPhrases_Get(CGearPhrases_GetBlock(GameData_GetSaveControl(gameData)), 0, &data->sentence);
     party = convertBoxedPokeSetToParty(getBattleBox(GameData_GetSaveControl(gameData)), HEAPID_LIVEBATTLEMATCH_TEAM);
-    MI_CpuCopy8(party, (u8 *)data + LIVEBATTLEMATCH_PLAYER_HEADER_SIZE, PokeParty_GetSaveDataSize());
+    MI_CpuCopy8(party, data->partyData, PokeParty_GetSaveDataSize());
     GFL_HeapFree(party);
-    data->record1 = LiveMatchData_GetCount(wk->record, 1);
-    data->record2 = LiveMatchData_GetCount(wk->record, 2);
-    data->record0 = LiveMatchData_GetCount(wk->record, 0);
+    data->record1 = LiveMatchData_GetCount(wk->record, LIVEMATCH_COUNT_WON);
+    data->record2 = LiveMatchData_GetCount(wk->record, LIVEMATCH_COUNT_LOST);
+    data->record0 = LiveMatchData_GetCount(wk->record, LIVEMATCH_COUNT_PLAYED);
     data->entryField2 = TournamentEntry_GetField(wk->entry, TOURNAMENT_FIELD_CUP_ID);
 }
 
-static void LiveBattleMatchFlow_SetEntryField2(LiveBattleMatchPlayerData *data, LiveBattleMatchFlow *wk) {
+static void LiveBattleMatchFlow_SetEntryField2(WifiBattleMatchPlayer *data, LiveBattleMatchFlow *wk) {
     data->entryField2 = TournamentEntry_GetField(wk->entry, TOURNAMENT_FIELD_CUP_ID);
 }
 
@@ -1522,14 +1523,14 @@ static u32 LiveBattleMatchFlow_GetResultMessageId(LiveBattleMatchFlow *wk) {
 static void LiveBattleMatchFlow_PrintResult(LiveBattleMatchFlow *wk) {
     StrBuf *format = GFL_MsgDataLoadStrbufNew(wk->msgMain, LiveBattleMatchFlow_GetResultMessageId(wk));
     StrBuf *text = GFL_StrBufCreate(GFL_StrBufGetCharCount(format) + 0x40, wk->heapId);
-    LiveBattleMatchResult *matchResult = wk->param.matchResult;
+    WifiBattleMatchBattleResult *matchResult = wk->param.matchResult;
     PlayerInfo *info = GetGameDataPlayerInfo(wk->param.gameData);
-    LiveBattleMatchPlayerData *partnerData = wk->param.partnerData;
+    WifiBattleMatchPlayer *partnerData = wk->param.partnerData;
 
     copyVarForText(wk->wordSet, 0, info);
     copyVarForText(wk->wordSet, 1, &partnerData->info);
-    WordSetNumber(wk->wordSet, 2, matchResult->unk0A, 1, 0, TRUE);
-    WordSetNumber(wk->wordSet, 3, matchResult->unk08, 1, 0, TRUE);
+    WordSetNumber(wk->wordSet, 2, matchResult->aliveOwn, 1, 0, TRUE);
+    WordSetNumber(wk->wordSet, 3, matchResult->aliveOther, 1, 0, TRUE);
     GFL_WordSetFormatStrbuf(wk->wordSet, text, format);
     WifiBattleMatchMsgBox_PrintStr(wk->param.msgBox, text, TRUE);
     GFL_StrBufFree(text);

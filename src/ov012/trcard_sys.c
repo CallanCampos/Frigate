@@ -226,13 +226,13 @@ static BOOL TrainerCardSys_ExitView(GameProc *proc, u32 *state, void *param, voi
 
 static u32 TrainerCardSys_SeqStart(TrainerCardSysWork *wk, TrainerCardParam *param) {
     switch (param->appParam) {
-    case 0:
+    case TRCARD_START_DEFAULT:
         break;
-    case 1:
+    case TRCARD_START_FRONT:
         return TRCARD_SEQ_CARD;
-    case 2:
+    case TRCARD_START_BACK:
         return TRCARD_SEQ_CARD;
-    case 3:
+    case TRCARD_START_BADGES:
         return TRCARD_SEQ_OTHER;
     }
     return TRCARD_SEQ_CARD;
@@ -272,7 +272,7 @@ static u32 TrainerCardSys_SeqGreeting(TrainerCardSysWork *wk) {
 }
 
 static u32 TrainerCardSys_SeqGreetingWait(TrainerCardSysWork *wk) {
-    void *cgear;
+    CGearSave *cgear;
 
     if (!TrainerCardSys_UpdateProcMgr(&wk->procMgr)) {
         return TRCARD_SEQ_GREETING_WAIT;
@@ -308,10 +308,10 @@ static u32 TrainerCardSys_SeqOtherWait(TrainerCardSysWork *wk) {
 void TrainerCardData_FillExtras(TrainerCardData *data, GameData *gameData, HeapID heapId) {
     SaveControl *save;
     MedalBox *box;
-    void *wbt;
+    WbtSave *wbt;
     JoinAvenueInfo *avenue;
     GameRecords *records;
-    void *unk;
+    FunfestSave *unk;
     EventWork *eventWork;
     u32 wins = 0;
     u32 i;
@@ -342,7 +342,7 @@ void TrainerCardData_FillExtras(TrainerCardData *data, GameData *gameData, HeapI
     }
     data->pwtWins = wins;
     data->unk688 = RecordGet(records, 0x83);
-    JoinAvenue_GetParam(avenue, 0, data->avenueName);
+    JoinAvenue_GetParam(avenue, JOIN_AVE_INFO_NAME, data->avenueName);
     data->unk68A = RecordGet(records, 0x7f);
     data->unk684 = FestRecords_GetCompleted(unk);
     eventWork = GameData_GetEventWork(gameData);
@@ -416,15 +416,15 @@ void TrainerCardData_Fill(TrainerCardData *data, GameData *gameData, BOOL isSnap
     RTCTime time;
     u8 passPowerFlags[2];
     SaveControl *save = GameData_GetSaveControl(gameData);
-    void *timeSig = getTimeSigBlkAddress(save);
+    TimeSigSave *timeSig = getTimeSigBlkAddress(save);
     PlayerInfo *playerInfo = GetGameDataPlayerInfo(gameData);
     TrainerCardSave *card = getTrainerCardDataBlkAddress(gameData);
     AdventureTime *adventureTime = getSaveAdventureTimeBlock(save);
     GameRecords *records = getTrainerCardInfoBlkAddress(save);
-    void *cgear = CGearPhrases_GetBlock(save);
+    CGearSave *cgear = CGearPhrases_GetBlock(save);
     PokeDexSave *pokedex = GameData_GetPokedex(gameData);
     HighLinkSave *highLink;
-    void *passPowerData;
+    PassPowerData *passPowerData;
     u8 i;
     u8 bit;
 
@@ -558,9 +558,9 @@ u32 TrainerCard_CountStars(GameData *gameData) {
     // Read but unused
     BSubwayScoreData *bsubway = GameData_GetBSubwayScoreData(gameData);
     MusicalSave *musical = getMusicalInfoBlkAddress(gameData);
-    void *levels = GameData_GetMyPassPowerLevels(gameData);
+    PassPowerLevel *levels = GameData_GetMyPassPowerLevels(gameData);
     PokewoodSave *pokewood = PokewoodSave_Get(gameData);
-    void *wbt = TrialHouseSave_GetWbtSave(save);
+    WbtSave *wbt = TrialHouseSave_GetWbtSave(save);
 
     if (EventWork_FlagGet(GameData_GetEventWork(gameData), 0x960)) {
         stars++;

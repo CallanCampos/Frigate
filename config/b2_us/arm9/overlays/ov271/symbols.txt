@@ -329,9 +329,9 @@ sc_clsys_init kind:data(any) addr:0x021f7778
 sc_vram_bank kind:data(any) addr:0x021f7794
 sc_vram_bank_musical kind:data(any) addr:0x021f77c4
 sc_bgcnt_data kind:data(any) addr:0x021f77f4
-sc_ball_pos kind:data(any) addr:0x021f7928
-data_ov271_021f7930 kind:data(any) addr:0x021f7930
-data_ov271_021f7940 kind:data(any) addr:0x021f7940
+sc_ball_pos_top kind:data(any) addr:0x021f7928
+sc_ball_pos_center kind:data(any) addr:0x021f7930
+sc_ball_pos_below kind:data(any) addr:0x021f7940
 sc_slide_rect kind:data(any) addr:0x021f7948
 sc_union_plt kind:data(any) addr:0x021f7954
 sc_cursor_pos kind:data(any) addr:0x021f7964

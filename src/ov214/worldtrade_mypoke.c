@@ -49,9 +49,6 @@ enum {
 // How many windows of information the screen has
 #define MYPOKE_INFOWIN_NUM 14
 
-// The upload screen's mode that takes the Pokémon back
-#define UPLOAD_MODE_DOWNLOAD 8
-
 typedef struct {
     int x;
     int y;
@@ -109,7 +106,7 @@ int WorldTrade_MyPoke_Init(WorldTradeWork *wk, int seq) {
                                &wk->print);
     WorldTrade_TransPokeGraphic(pkm);
 
-    GFL_WipeSet(3, 1, 1, 0, 6, 1, HEAPID_WORLDTRADE);
+    GFL_WipeSet(WIPE_MODE_MAIN, WIPE_TYPE_FADE_IN, WIPE_TYPE_FADE_IN, 0, 6, 1, HEAPID_WORLDTRADE);
     wk->subprocessSeq = MYPOKE_SEQ_START;
     wk->subLcdBgKeep = 0;
     return WT_SEQ_FADEIN;
@@ -333,7 +330,7 @@ static int MyPoke_SubSeqMain(WorldTradeWork *wk) {
 }
 
 static int MyPoke_SubSeqEnd(WorldTradeWork *wk) {
-    GFL_WipeSet(3, 0, 0, 0, 6, 1, HEAPID_WORLDTRADE);
+    GFL_WipeSet(WIPE_MODE_MAIN, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, 0, 6, 1, HEAPID_WORLDTRADE);
     wk->subprocessSeq = MYPOKE_SEQ_START;
     return WT_SEQ_FADEOUT;
 }
@@ -353,7 +350,7 @@ static int MyPoke_SubSeqYesNoSelect(WorldTradeWork *wk) {
         WorldTrade_TouchWinYesNoDel(wk);
         wk->subprocessSeq = MYPOKE_SEQ_END;
         wk->subOutFlag = 1;
-        WorldTrade_SubProcessChange(wk, WORLDTRADE_UPLOAD, UPLOAD_MODE_DOWNLOAD);
+        WorldTrade_SubProcessChange(wk, WORLDTRADE_UPLOAD, WT_MODE_DOWNLOAD);
         MyPoke_WantPokePrintReWrite(wk);
     } else if (ret == 2) {
         WorldTrade_TouchWinYesNoDel(wk);
@@ -534,7 +531,8 @@ void WorldTrade_PokeInfoPrint2(MsgData *msgManager, BmpWin **win, u16 *name, Par
 
 void WorldTrade_TransPokeGraphic(PartyPkm *pkm) {
     NNSG2dCharacterData *charData;
-    void *buf = LoadSingleCellSpindaGraphicsByBoxData(&charData, PokeParty_GetBoxPkm(pkm), 0, HEAPID_WORLDTRADE);
+    void *buf = LoadSingleCellSpindaGraphicsByBoxData(&charData, PokeParty_GetBoxPkm(pkm), POKEGRA_DIR_FRONT,
+                                                      HEAPID_WORLDTRADE);
     u32 arcId;
     u32 palette;
 

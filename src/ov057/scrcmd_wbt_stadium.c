@@ -1,6 +1,7 @@
 #include "types.h"
 #include "field/event_wbt.h"
 #include "field/field_script.h"
+#include "field/scrcmd_msg.h"
 #include "field/scrcmd_wbt.h"
 #include "field/wbt.h"
 #include "field/wbt_battle.h"
@@ -129,7 +130,7 @@ BOOL WbtCmd_GetRoundRemaining(VM *vm, FieldScriptEnv *env) {
 
 BOOL WbtCmd_ShowPartyList(VM *vm, FieldScriptEnv *env) {
     WbtSystem *sys = WbtCmd_GetSystem(env);
-    void *work = WbtBattle_CreatePartyList(env, sys);
+    WbtPartyList *work = WbtBattle_CreatePartyList(env, sys);
 
     WbtSystem_SetPartyList(sys, work);
     WbtBattle_ShowPartyList(work);
@@ -137,7 +138,7 @@ BOOL WbtCmd_ShowPartyList(VM *vm, FieldScriptEnv *env) {
 }
 
 BOOL WbtCmd_ClosePartyList(VM *vm, FieldScriptEnv *env) {
-    void *work = WbtSystem_GetPartyList(WbtCmd_GetSystem(env));
+    WbtPartyList *work = WbtSystem_GetPartyList(WbtCmd_GetSystem(env));
 
     WbtBattle_ClosePartyList(work);
     WbtBattle_FreePartyList(work);

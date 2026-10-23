@@ -14,24 +14,14 @@ struct RivalEntry {
     u8 unk6;
 };
 
-struct RivalSelectContext {
-    void *unk0;
-    GameData *gameData;
-    void *entryOwner;
-    u8 padding[0xc];
-    Field *field;
-    MMSys *actors;
-};
-
-RivalEntry *LinkFestival_GetEntries(void *owner);
 u8 getHollowNum(RivalDataSave *save);
 
-RivalEntry *RivalSelect_GetEntry(RivalSelectContext *context, u32 id);
-void RivalSelect_SelectOtherRandom(RivalSelectContext *context, u32 id);
-BOOL RivalSelect_RemoveHollowActorIfMission(RivalSelectContext *context);
-BOOL RivalSelect_RemoveHollowActor(RivalSelectContext *context);
-BOOL RivalSelect_IsSelectedAndActive(RivalSelectContext *context, u32 id);
-void RivalSelect_SetActive(RivalSelectContext *context, u32 id);
-u8 RivalSelect_FindEntryIndex(RivalSelectContext *context, u32 id);
+RivalEntry *RivalSelect_GetEntry(FesGimmick *gimmick, u32 id);
+void RivalSelect_SelectOtherRandom(FesGimmick *gimmick, u32 id);
+BOOL RivalSelect_RemoveHollowActorIfMission(FesGimmick *gimmick);
+BOOL RivalSelect_RemoveHollowActor(FesGimmick *gimmick);
+BOOL RivalSelect_IsSelectedAndActive(FesGimmick *gimmick, u32 id);
+void RivalSelect_SetActive(FesGimmick *gimmick, u32 id);
+u8 RivalSelect_FindEntryIndex(FesGimmick *gimmick, u32 id);
 
 #endif // POKEBW2_FIELD_RIVAL_SELECT_H

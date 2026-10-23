@@ -9,16 +9,16 @@ GymIcirrus_ShowSwitchState kind:function(thumb,size=0x6e) addr:0x021eeef8
 GymIcirrus_IsSwitchFlipped kind:function(thumb,size=0x10) addr:0x021eef68
 GymIcirrus_SwitchAnimEvent kind:function(thumb,size=0xae) addr:0x021eef78
 GymIcirrus_FlipSwitchEvent kind:function(thumb,size=0xce) addr:0x021ef028
-data_ov098_021ef0f8 kind:data(any) addr:0x021ef0f8
-data_ov098_021ef100 kind:data(any) addr:0x021ef100
+sModelAAnimations kind:data(any) addr:0x021ef0f8
+sModelBAnimations kind:data(any) addr:0x021ef100
 data_ov098_021ef105 kind:data(any) addr:0x021ef105 ambiguous
-data_ov098_021ef108 kind:data(any) addr:0x021ef108
-data_ov098_021ef110 kind:data(any) addr:0x021ef110
-data_ov098_021ef120 kind:data(any) addr:0x021ef120
+sMovingAnimations kind:data(any) addr:0x021ef108
+sSceneSetup kind:data(any) addr:0x021ef110
+sPlacePreconditions kind:data(any) addr:0x021ef120
 data_ov098_021ef122 kind:data(any) addr:0x021ef122
-data_ov098_021ef140 kind:data(any) addr:0x021ef140
-data_ov098_021ef164 kind:data(any) addr:0x021ef164
-data_ov098_021ef188 kind:data(any) addr:0x021ef188
-data_ov098_021ef1e8 kind:data(any) addr:0x021ef1e8
+sFirstPositions kind:data(any) addr:0x021ef140
+sSecondPositions kind:data(any) addr:0x021ef164
+sActors kind:data(any) addr:0x021ef188
+sResources kind:data(any) addr:0x021ef1e8
 data_ov098_021ef211 kind:data(any) addr:0x021ef211 ambiguous
 data_ov098_021ef231 kind:data(any) addr:0x021ef231 ambiguous

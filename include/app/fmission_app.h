@@ -30,9 +30,11 @@
 #define ARCID_FMISSION_DATA 289
 
 // What FestivalEventParam's mode is: the running mission, or its result
-#define FMISSION_APP_MODE_MISSION 0
-#define FMISSION_APP_MODE_RESULT 1
-#define FMISSION_APP_MODE_COUNT 2
+enum {
+    FMISSION_APP_MODE_MISSION,
+    FMISSION_APP_MODE_RESULT,
+    FMISSION_APP_MODE_COUNT,
+};
 
 #define FMISSION_APP_WINDOW_COUNT 30
 #define FMISSION_APP_WINDOW_MESSAGE 21
@@ -40,9 +42,11 @@
 
 // The three groups of actors: the upper screen's (the sub engine's), the touch screen's return button, and the mark of
 // the result's new record
-#define FMISSION_APP_ACTOR_UPPER 0
-#define FMISSION_APP_ACTOR_LOWER 1
-#define FMISSION_APP_ACTOR_RECORD 2
+enum {
+    FMISSION_APP_ACTOR_UPPER,
+    FMISSION_APP_ACTOR_LOWER,
+    FMISSION_APP_ACTOR_RECORD,
+};
 
 #define FMISSION_APP_UPPER_ACTOR_COUNT 20
 #define FMISSION_APP_LOWER_ACTOR_COUNT 2
@@ -105,6 +109,7 @@ typedef struct {
     u32 shownScore;
     u32 shownTrainerId;
     int seq;
+    // A FMISSION_APP_MODE_*
     int mode;
     u32 flags;
     // The scrolling log's position, in 1/256 pixels
@@ -121,6 +126,7 @@ typedef struct {
 } FMissionApp;
 
 // fmission_app_draw.c
+// mode is a FMISSION_APP_MODE_*
 void FMissionAppDraw_Init(FMissionApp *work, u32 mode);
 void FMissionAppDraw_Free(FMissionApp *work);
 // Prints a string into a window at x, aligned by a PRINT_ALIGN_*

@@ -736,10 +736,7 @@ static BOOL CommEntryMenu_UpdateLeader(CommEntryMenu *menu) {
     case COMM_ENTRY_LEADER_SEQ_WAIT_CHECK:
         mask = 1 << GFL_NetGetHandleNetId(NetHandle_GetOwn());
 
-        for (i = 0;; i++) {
-            if (i >= COMM_ENTRY_MEMBER_MAX) {
-                break;
-            }
+        for (i = 0; (i < COMM_ENTRY_MEMBER_MAX) ? TRUE : FALSE; i++) {
             if (i != GFL_NetGetHandleNetId(NetHandle_GetOwn()) && CommEntryMenu_IsChecked(menu, i)) {
                 if (GFL_NetIsNegotiated(i) == TRUE) {
                     if (menu->readyMask & 1 << i) {

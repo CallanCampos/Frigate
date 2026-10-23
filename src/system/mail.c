@@ -10,8 +10,6 @@
 
 // The mail: a mailbox of MAIL_COUNT mails, and the mail of one Pokémon. The ROM's string for the file is "mail.c".
 
-#define SAVE_BLOCK_MAIL 0x28
-
 void ResetMailData(MailData *mail) {
     int i;
 
@@ -110,7 +108,7 @@ void MailData_SetMessage(MailData *mail, const PMSData *src, u8 index) {
     }
 }
 
-void *MailBox_GetFromGameData(GameData *gameData) {
+MailData *MailBox_GetFromGameData(GameData *gameData) {
     return SaveControl_GetBlockPtr(GameData_GetSaveControl(gameData), SAVE_BLOCK_MAIL);
 }
 

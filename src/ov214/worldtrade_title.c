@@ -124,16 +124,16 @@ int WorldTrade_Title_Init(WorldTradeWork *wk, int seq) {
     if (wk->openingFlag == 0) {
         // The first visit walks the player into the trade room
         Title_DemoBgSet(wk);
-        GFL_WipeSet(0, 1, 1, 0, 6, 1, HEAPID_WORLDTRADE);
+        GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_IN, WIPE_TYPE_FADE_IN, 0, 6, 1, HEAPID_WORLDTRADE);
         wk->subprocessSeq = TITLE_SEQ_OPENING;
         wk->openingFlag = 1;
         WorldTrade_HeroDemo(wk);
     } else {
         if (wk->subOutFlag == 1 && GXS_GetMasterBrightness() != 0) {
             WorldTrade_SetPartnerExchangePos(wk);
-            GFL_WipeSet(0, 1, 1, 0, 6, 1, HEAPID_WORLDTRADE);
+            GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_IN, WIPE_TYPE_FADE_IN, 0, 6, 1, HEAPID_WORLDTRADE);
         } else {
-            GFL_WipeSet(3, 1, 1, 0, 6, 1, HEAPID_WORLDTRADE);
+            GFL_WipeSet(WIPE_MODE_MAIN, WIPE_TYPE_FADE_IN, WIPE_TYPE_FADE_IN, 0, 6, 1, HEAPID_WORLDTRADE);
         }
         wk->subprocessSeq = TITLE_SEQ_START;
     }
@@ -441,7 +441,7 @@ static int Title_SubSeqOpening(WorldTradeWork *wk) {
         GFL_BGSysSetBGEnabledA(GX_PLANEMASK_BG0, FALSE);
         GFL_BGSysSetBGEnabledA(GX_PLANEMASK_BG1, FALSE);
         GFL_BGSysSetBGEnabledA(GX_PLANEMASK_BG2, FALSE);
-        WorldTrade_SubProcessChange(wk, WORLDTRADE_UPLOAD, 11);
+        WorldTrade_SubProcessChange(wk, WORLDTRADE_UPLOAD, WT_MODE_SERVER_CHECK);
         wk->subReturnProcess = WORLDTRADE_TITLE;
         wk->subprocessSeq = TITLE_SEQ_END;
     }
@@ -454,7 +454,7 @@ static int Title_SubSeqOpeningMessage(WorldTradeWork *wk) {
 }
 
 static int Title_SubSeqOpeningFade(WorldTradeWork *wk) {
-    GFL_WipeSet(3, 1, 1, 0, 6, 1, HEAPID_WORLDTRADE);
+    GFL_WipeSet(WIPE_MODE_MAIN, WIPE_TYPE_FADE_IN, WIPE_TYPE_FADE_IN, 0, 6, 1, HEAPID_WORLDTRADE);
     wk->subprocessSeq = TITLE_SEQ_OPENING_FADE_WAIT;
     return WT_SEQ_MAIN;
 }
@@ -496,11 +496,11 @@ static void Title_DecideFunc(WorldTradeWork *wk, int decide) {
     switch (decide) {
     case TITLE_MENU_DEPOSIT:
         if (wk->depositFlag == 0) {
-            WorldTrade_SubProcessChange(wk, WORLDTRADE_MYBOX, 5);
+            WorldTrade_SubProcessChange(wk, WORLDTRADE_MYBOX, WT_MODE_DEPOSIT_SELECT);
             wk->subprocessSeq = TITLE_SEQ_END;
         } else if (wk->serverWaitTime == 0) {
             // Checks the server, then waits a minute before it may again
-            WorldTrade_SubProcessChange(wk, WORLDTRADE_UPLOAD, 11);
+            WorldTrade_SubProcessChange(wk, WORLDTRADE_UPLOAD, WT_MODE_SERVER_CHECK);
             wk->subReturnProcess = WORLDTRADE_MYPOKE;
             wk->subprocessSeq = TITLE_SEQ_END;
             wk->serverWaitTime = 60 * 60;
@@ -513,7 +513,7 @@ static void Title_DecideFunc(WorldTradeWork *wk, int decide) {
         break;
     case TITLE_MENU_SEARCH:
         wk->subLcdTouchOK = 0;
-        WorldTrade_SubProcessChange(wk, WORLDTRADE_SEARCH, 13);
+        WorldTrade_SubProcessChange(wk, WORLDTRADE_SEARCH, WT_MODE_SEARCH_FROM_TITLE);
         wk->subprocessSeq = TITLE_SEQ_END;
         break;
     case TITLE_MENU_EXIT:
@@ -602,9 +602,9 @@ static int Title_SubSeqEndDemoWait(WorldTradeWork *wk) {
 
 static int Title_SubSeqEnd(WorldTradeWork *wk) {
     if (wk->subNextProcess == WORLDTRADE_ENTER) {
-        GFL_WipeSet(0, 0, 0, 0, 6, 1, HEAPID_WORLDTRADE);
+        GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, 0, 6, 1, HEAPID_WORLDTRADE);
     } else {
-        GFL_WipeSet(3, 0, 0, 0, 6, 1, HEAPID_WORLDTRADE);
+        GFL_WipeSet(WIPE_MODE_MAIN, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, 0, 6, 1, HEAPID_WORLDTRADE);
     }
     wk->subprocessSeq = TITLE_SEQ_OPENING;
     return WT_SEQ_FADEOUT;
@@ -632,7 +632,7 @@ static int Title_SubSeqYesNoSelect(WorldTradeWork *wk) {
         Title_ClearWin(wk->explainWin);
         GFL_BGSysSetBGEnabled(6, FALSE);
         ClActor_SetVisible(wk->promptDsAct, FALSE);
-        WorldTrade_SubProcessChange(wk, WORLDTRADE_ENTER, 20);
+        WorldTrade_SubProcessChange(wk, WORLDTRADE_ENTER, WT_MODE_LOGOUT);
         wk->subprocessSeq = TITLE_SEQ_END_DEMO;
     } else if (ret == 2) {
         WorldTrade_TouchWinYesNoDel(wk);

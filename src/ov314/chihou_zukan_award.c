@@ -40,10 +40,12 @@
 #define BG_MAIN_DIPLOMA 1
 #define BG_SUB_C_GEAR 4
 
-#define WINDOW_COUNT 5
-#define WINDOW_PLAYER_NAME 2
-#define WINDOW_CERTIFIES 3
-#define WINDOW_STAFF 4
+enum {
+    WINDOW_PLAYER_NAME = 2,
+    WINDOW_CERTIFIES,
+    WINDOW_STAFF,
+    WINDOW_COUNT,
+};
 
 // The steps of the process
 enum {

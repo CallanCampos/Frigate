@@ -1,5 +1,6 @@
 #include "types.h"
 #include "constants/language.h"
+#include "constants/pokemon.h"
 #include "constants/text_banks.h"
 #include "constants/version.h"
 #include "field/unity_tower.h"
@@ -24,8 +25,6 @@
 
 // The species and the forms' entries that a profile's Pokémon can be
 #define GDS_PROFILE_SPECIES_END 686
-#define GDS_PROFILE_SEX_MALE 0
-#define GDS_PROFILE_SEX_FEMALE 1
 #define GDS_PROFILE_UNION_VIEW_MAX 15
 // The sentences an introduction can be: the first five types and their first twenty sentences
 #define GDS_PROFILE_PMS_TYPE_END 5
@@ -52,7 +51,7 @@ void GdsProfile_SetFromGameData(GdsProfile *profile, GameData *gameData) {
     PlayerInfo *playerInfo = GetGameDataPlayerInfo(gameData);
     UnityTowerSurveySave *survey = getUnityTower_SurveySaveBlkAddrress(save);
     TrainerGameInfoSave *gameInfo = getTrainerCardDataBlkAddress(gameData);
-    void *sentences = CGearPhrases_GetBlock(save);
+    CGearSave *cgear = CGearPhrases_GetBlock(save);
     OSOwnerInfo ownerInfo;
     int species;
     int form;
@@ -75,7 +74,7 @@ void GdsProfile_SetFromGameData(GdsProfile *profile, GameData *gameData) {
     for (i = 0; i < GDS_PROFILE_INTRODUCTION_LENGTH; i++) {
         profile->introduction.text[i] = GFL_StrBufGetTerminator();
     }
-    CGearPhrases_Get(sentences, 0, &profile->introduction.pms);
+    CGearPhrases_Get(cgear, 0, &profile->introduction.pms);
     profile->birthMonth = ownerInfo.birthday.month;
     profile->unionView = PlayerInfo_GetUnionView(playerInfo);
     profile->version = GAME_VERSION;
@@ -91,8 +90,8 @@ StrBuf *GdsProfile_CreateNameStrBuf(GdsProfile *profile, u32 heapId) {
 }
 
 u32 GdsProfile_GetSex(GdsProfile *profile) {
-    if (profile->sex != GDS_PROFILE_SEX_MALE && profile->sex != GDS_PROFILE_SEX_FEMALE) {
-        return GDS_PROFILE_SEX_MALE;
+    if (profile->sex != GENDER_MALE && profile->sex != GENDER_FEMALE) {
+        return GENDER_MALE;
     }
     return profile->sex;
 }

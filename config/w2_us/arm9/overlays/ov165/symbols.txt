@@ -275,7 +275,7 @@ data_ov165_021a4a1a kind:data(any) addr:0x021a4a5a
 data_ov165_021a4a4c kind:data(any) addr:0x021a4a8c
 data_ov165_021a4a6c kind:data(any) addr:0x021a4aac
 data_ov165_021a4a8c kind:data(any) addr:0x021a4acc
-data_ov165_021a4aac kind:data(any) addr:0x021a4aec
+sBG0Setup kind:data(any) addr:0x021a4aec
 data_ov165_021a4acc kind:data(any) addr:0x021a4b0c
 data_ov165_021a4aec kind:data(any) addr:0x021a4b2c
 data_ov165_021a4b0c kind:data(any) addr:0x021a4b4c
@@ -287,9 +287,9 @@ data_ov165_021a4b64 kind:data(any) addr:0x021a4ba4
 data_ov165_021a4b74 kind:data(any) addr:0x021a4bb4
 data_ov165_021a4b88 kind:data(any) addr:0x021a4bc8
 data_ov165_021a4bb0 kind:data(any) addr:0x021a4bf0
-data_ov165_021a4be0 kind:data(any) addr:0x021a4c20
+sPlateScreenPos kind:data(any) addr:0x021a4c20
 data_ov165_021a4be1 kind:data(any) addr:0x021a4c21
-data_ov165_021a4be4 kind:data(any) addr:0x021a4c24
+sPlatePos kind:data(any) addr:0x021a4c24
 data_ov165_021a4be5 kind:data(any) addr:0x021a4c25
 data_ov165_021a4bf0 kind:data(any) addr:0x021a4c30
 sItemNames kind:data(any) addr:0x021a4c3c

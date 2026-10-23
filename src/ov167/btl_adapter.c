@@ -12,7 +12,7 @@ typedef struct {
 } BtlAdapterCmd;
 
 struct BtlAdapter {
-    void *netHandle;
+    NetHandle *netHandle;
     // The client's reply to the last command, and its size
     void *returnData;
     u32 returnSize;
@@ -47,7 +47,7 @@ void BtlAdapter_InitSystem(u8 commMode) {
 void BtlAdapter_QuitSystem(void) {
 }
 
-BtlAdapter *BtlAdapter_Create(void *netHandle, u8 clientId, BOOL flag, HeapID heapId) {
+BtlAdapter *BtlAdapter_Create(NetHandle *netHandle, u8 clientId, BOOL flag, HeapID heapId) {
     BtlAdapter *adapter = NULL;
 
     if (sAdapters[clientId] == NULL) {

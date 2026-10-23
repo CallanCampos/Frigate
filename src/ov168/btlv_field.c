@@ -32,11 +32,11 @@ typedef struct {
 
 // The field's work, 0x7c bytes
 struct BtlvField {
-    void *res;                  // 0x00  the model and its textures
+    G3DResource *res;           // 0x00  the model and its textures
     s32 anmCount;               // 0x04
     BtlvFieldAnm *anmParams;    // 0x08
-    void **anmRes;              // 0x0c
-    void **anms;                // 0x10
+    G3DResource **anmRes;       // 0x0c
+    G3DAnimation **anms;        // 0x10
     G3DModel *mdl;              // 0x14
     G3DActor *actor;            // 0x18
     SRTMatrix status;           // 0x1c
@@ -105,8 +105,10 @@ BtlvField *BtlvField_Create(BOOL arg0, u8 fieldId, u8 variant, HeapID heapId, u3
     j = 0;
     field->mdl = GFL_G3DMdlCreate(field->res, 0, field->res);
     if (field->anmCount != 0) {
-        field->anmRes = GFL_HeapAllocate(field->heapId, field->anmCount * sizeof(void *), FALSE, "btlv_field.c", 0xc0);
-        field->anms = GFL_HeapAllocate(field->heapId, field->anmCount * sizeof(void *), FALSE, "btlv_field.c", 0xc1);
+        field->anmRes =
+            GFL_HeapAllocate(field->heapId, field->anmCount * sizeof(G3DResource *), FALSE, "btlv_field.c", 0xc0);
+        field->anms =
+            GFL_HeapAllocate(field->heapId, field->anmCount * sizeof(G3DAnimation *), FALSE, "btlv_field.c", 0xc1);
         field->anmParams =
             GFL_HeapAllocate(field->heapId, field->anmCount * sizeof(BtlvFieldAnm), TRUE, "btlv_field.c", 0xc2);
         for (i = 1; i < 4; i++) {
@@ -135,7 +137,7 @@ BtlvField *BtlvField_Create(BOOL arg0, u8 fieldId, u8 variant, HeapID heapId, u3
     MTX_Identity33_(&field->status.rotation);
 
     palSize = NNS_G3dGetTex(GFL_G3DResGetResData(field->res))->plttInfo.sizePltt << 3;
-    field->palFade.resources = GFL_HeapAllocate(field->heapId, sizeof(void *), FALSE, "btlv_field.c", 0xea);
+    field->palFade.resources = GFL_HeapAllocate(field->heapId, sizeof(G3DResource *), FALSE, "btlv_field.c", 0xea);
     field->palFade.palettes = GFL_HeapAllocate(field->heapId, sizeof(void *), FALSE, "btlv_field.c", 0xeb);
     field->palFade.resources[0] = field->res;
     field->palFade.palettes[0] = GFL_HeapAllocate(field->heapId, palSize, FALSE, "btlv_field.c", 0xee);
@@ -187,8 +189,10 @@ void BtlvField_Reload(BtlvField *field, s32 fieldParam) {
     j = 0;
     field->mdl = GFL_G3DMdlCreate(field->res, 0, field->res);
     if (field->anmCount != 0) {
-        field->anmRes = GFL_HeapAllocate(field->heapId, field->anmCount * sizeof(void *), FALSE, "btlv_field.c", 0x1ca);
-        field->anms = GFL_HeapAllocate(field->heapId, field->anmCount * sizeof(void *), FALSE, "btlv_field.c", 0x1cb);
+        field->anmRes =
+            GFL_HeapAllocate(field->heapId, field->anmCount * sizeof(G3DResource *), FALSE, "btlv_field.c", 0x1ca);
+        field->anms =
+            GFL_HeapAllocate(field->heapId, field->anmCount * sizeof(G3DAnimation *), FALSE, "btlv_field.c", 0x1cb);
         field->anmParams =
             GFL_HeapAllocate(field->heapId, field->anmCount * sizeof(BtlvFieldAnm), TRUE, "btlv_field.c", 0x1cc);
         for (i = 1; i < 4; i++) {
@@ -216,7 +220,7 @@ void BtlvField_Reload(BtlvField *field, s32 fieldParam) {
     MTX_Identity33_(&field->status.rotation);
 
     palSize = NNS_G3dGetTex(GFL_G3DResGetResData(field->res))->plttInfo.sizePltt << 3;
-    field->palFade.resources = GFL_HeapAllocate(field->heapId, sizeof(void *), FALSE, "btlv_field.c", 0x1f4);
+    field->palFade.resources = GFL_HeapAllocate(field->heapId, sizeof(G3DResource *), FALSE, "btlv_field.c", 0x1f4);
     field->palFade.palettes = GFL_HeapAllocate(field->heapId, sizeof(void *), FALSE, "btlv_field.c", 0x1f5);
     field->palFade.resources[0] = field->res;
     field->palFade.palettes[0] = GFL_HeapAllocate(field->heapId, palSize, FALSE, "btlv_field.c", 0x1f8);

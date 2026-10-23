@@ -24,13 +24,16 @@ typedef struct {
     // UNOVA_LINK_MODE_*
     u32 mode;
     GameData *gameData;
-    // The key that clearing the game unlocks: the Challenge Key in Black 2 and the Easy Key in White 2
+    // The key to unlock: from the game clear event, the Challenge Key in Black 2 and the Easy Key in White 2, and from
+    // the Key System's script command, the one the script names
     u32 key;
 } UnovaLinkParam;
 
-// Started by the game clear event, or from the start menu without a parameter
-#define UNOVA_LINK_MODE_GAME_CLEAR 0
-#define UNOVA_LINK_MODE_START_MENU 1
+// Started by the game clear event or the Key System's script command, or from the start menu without a parameter
+enum {
+    UNOVA_LINK_MODE_GAME_CLEAR,
+    UNOVA_LINK_MODE_START_MENU,
+};
 
 extern const GameProcFunctions UNOVA_LINK_PROC_FUNCTIONS;
 
@@ -263,10 +266,10 @@ struct KeySystemWork {
     // key_system_flow.c's
     KeySystemKeySelect keySelect;
     // ov331's work, with the other save
-    void *ov331Work;
+    SaveOutside *ov331Work;
     KeyInfoSave *keyInfo;
     // The Memory Link's data in the save
-    void *memoryLink;
+    MemoryLinkSave *memoryLink;
     // The Black or White save linked
     WBSaveData *wbData;
     KeySystemNet *net;

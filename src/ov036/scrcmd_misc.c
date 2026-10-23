@@ -35,15 +35,6 @@
 // The world position of a tile
 #define GRID_TO_FX32(n) ((n) * FX32_CONST(16))
 
-// A floor of an elevator: its name, and where it goes
-typedef struct {
-    u16 messageId;
-    u16 zoneId;
-    u16 x;
-    u16 y;
-    u16 z;
-} ElevatorFloor;
-
 // The groups bought by the collectors, identified by their price lists and script dialogue.
 // The last three table slots also use the gourmet price list.
 enum {
@@ -166,7 +157,7 @@ static u32 ElevatorTable_CountEntries(ElevatorFloor *table) {
 BOOL s01C1_ElevatorSetTablePtr(VM *vm, FieldScriptEnv *env) {
     s32 offset = VM_Read32(vm);
 
-    FieldScriptEnv_SetElevatorTable(env, (void *)(vm->pc + offset));
+    FieldScriptEnv_SetElevatorTable(env, (ElevatorFloor *)(vm->pc + offset));
     return FALSE;
 }
 
@@ -241,17 +232,21 @@ BOOL s01FC_ItemCollectorGetPrice(VM *vm, FieldScriptEnv *env) {
 
 // Whether the player has any item that the item collector of the group buys
 BOOL s01FB_ItemCollectorCheckGroup(VM *vm, FieldScriptEnv *env) {
+    ScriptWork *work;
+    GameData *gameData;
+    BagSave *bag;
+    u32 heapId;
+    u16 group;
+    u16 *result;
+    ItemCollectorPrice *prices;
     u32 size;
     u32 i;
-    ItemCollectorPrice *prices;
-    BagSave *bag;
-    ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
-    GameData *gameData = FieldScriptEnv_GetGameData(env);
-    ScriptFieldWork *fieldWork = ScriptWork_GetFieldWork(work);
-    HeapID heapId = Field_GetHeapID(fieldWork->field);
-    u16 group = ScriptReadAny(vm, env);
-    u16 *result = ScriptReadVar(vm, env);
 
+    work = FieldScriptEnv_GetScriptWork(env);
+    gameData = FieldScriptEnv_GetGameData(env);
+    heapId = Field_GetHeapID(ScriptWork_GetFieldWork(work)->field);
+    group = ScriptReadAny(vm, env);
+    result = ScriptReadVar(vm, env);
     bag = GameData_GetBag(gameData);
     prices = GFL_ArcSysReadHeapNewLZGetLen(ARC_ITEM_COLLECTOR, ITEM_COLLECTOR_FILES[group], FALSE, HEAPID_TAIL(heapId),
                                            &size);

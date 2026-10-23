@@ -46,10 +46,6 @@
 // this one file, since every part is only reached from the process's functions and its .rodata is a single run. It
 // ends with the empty VBlank task that the process adds, just before townmap_grh.c's TownMapGraphic_Create
 
-// A place's parameters that townmap_data.h doesn't name: where a flight to it lands
-#define TOWNMAP_PARAM_WARP_X 13
-#define TOWNMAP_PARAM_WARP_Z 14
-
 // The center of the screen, which the map zooms about
 #define TOWNMAP_CENTER_X 128
 #define TOWNMAP_CENTER_Y 96
@@ -71,11 +67,8 @@
 #define TOWNMAP_PLACES_TOP (-72)
 #define TOWNMAP_PLACES_BOTTOM 96
 
-// What the touch bar's own icons are, and the zoom button, which the bar doesn't know of
-#define TOWNMAP_ICON_CLOSE 0
-#define TOWNMAP_ICON_RETURN 1
+// The zoom button, which the touch bar doesn't know of, as an icon after the bar's own
 #define TOWNMAP_ICON_ZOOM TOUCHBAR_ICON_CUSTOM
-#define TOWNMAP_ICON_NONE 0xffffffff
 
 // The animations of the map's cells
 enum {
@@ -634,11 +627,11 @@ static void TownMap_SeqMain(TownMapSeq *seq, u32 *state, void *data) {
     TownMapPlaceName_Main(&work->placeName);
     TownMapTouch_Main(&work->touch);
     switch (TownMapAppBar_GetDecided(&work->appBar)) {
-    case TOWNMAP_ICON_CLOSE:
+    case TOUCHBAR_ICON_CLOSE:
         work->param->result = TOWNMAP_RESULT_CLOSE;
         TownMapSeq_SetNext(seq, TownMap_SeqFadeOut);
         break;
-    case TOWNMAP_ICON_RETURN:
+    case TOUCHBAR_ICON_RETURN:
         work->param->result = TOWNMAP_RESULT_RETURN;
         TownMapSeq_SetNext(seq, TownMap_SeqFadeOut);
         break;
@@ -705,8 +698,8 @@ static void TownMapAppBar_Init(TownMapAppBar *appBar, u32 mode, ClActUnit *unit,
     {
         TouchBarSetup setup;
         TouchBarItem items[] = {
-            { TOWNMAP_ICON_RETURN, { 232, 168 } },
-            { TOWNMAP_ICON_CLOSE, { 200, 168 } },
+            { TOUCHBAR_ICON_RETURN, { 232, 168 } },
+            { TOUCHBAR_ICON_CLOSE, { 200, 168 } },
         };
 
         MI_CpuFill8(&setup, 0, sizeof(TouchBarSetup));
@@ -733,7 +726,7 @@ static void TownMapAppBar_Free(TownMapAppBar *appBar) {
 
 static void TownMapAppBar_Main(TownMapAppBar *appBar, TownMapMap *map) {
     TouchBar_Main(appBar->bar);
-    appBar->decided = TOWNMAP_ICON_NONE;
+    appBar->decided = TOUCHBAR_ICON_NONE;
     switch (appBar->state) {
     case 0: {
         BOOL pressed = FALSE;
@@ -780,7 +773,7 @@ static void TownMapAppBar_Main(TownMapAppBar *appBar, TownMapMap *map) {
 static u32 TownMapAppBar_GetDecided(TownMapAppBar *appBar) {
     u32 decided = TouchBar_GetDecided(appBar->bar);
 
-    if (decided == TOWNMAP_ICON_NONE) {
+    if (decided == TOUCHBAR_ICON_NONE) {
         decided = appBar->decided;
     }
     return decided;
@@ -1611,8 +1604,8 @@ static void TownMapInfo_Draw(TownMapInfo *info, TownMapPlace *place) {
         landmarks = TRUE;
         zoneId = TownMapPlace_GetParam(place, TOWNMAP_PARAM_ZONE);
         if (IsZoneJoinAvenue(zoneId)) {
-            GFL_StrBufLoadString(info->strbuf, (const u16 *)JoinAvenue_GetParam(avenueInfo, 0, NULL));
-            if (JoinAvenue_GetParam(avenueInfo, 7, NULL)) {
+            GFL_StrBufLoadString(info->strbuf, (const u16 *)JoinAvenue_GetParam(avenueInfo, JOIN_AVE_INFO_NAME, NULL));
+            if (JoinAvenue_GetParam(avenueInfo, JOIN_AVE_INFO_UNOPENED, NULL)) {
                 landmarks = FALSE;
             }
         } else {
@@ -1651,7 +1644,7 @@ static void TownMapInfo_Draw(TownMapInfo *info, TownMapPlace *place) {
                 GameRecords *records = getTrainerCardInfoBlkAddress(save);
                 StrBuf *format;
 
-                rank = JoinAvenue_GetParam(avenueInfo, 2, NULL);
+                rank = JoinAvenue_GetParam(avenueInfo, JOIN_AVE_INFO_RANK, NULL);
                 record7F = RecordGet(records, 0x7f);
                 record80 = RecordGet(records, 0x80);
                 people = JoinAvenuePersonList_CountUsed(persons) + JoinAvenueEntryList_CountUsed(entries);
@@ -1798,7 +1791,7 @@ static void TownMapPlaceName_Main(TownMapPlaceName *placeName) {
                 JoinAvenue_GetInfo(SaveControl_GetJoinAvenue(GameData_GetSaveControl(placeName->gameData)));
             StrBuf *name = GFL_StrBufCreate(128, HEAPID_TOWNMAP);
 
-            GFL_StrBufLoadString(name, (const u16 *)JoinAvenue_GetParam(avenueInfo, 0, NULL));
+            GFL_StrBufLoadString(name, (const u16 *)JoinAvenue_GetParam(avenueInfo, JOIN_AVE_INFO_NAME, NULL));
             TownMapMsgWin_PrintStrBuf(&placeName->msgWin, name, 16, 2);
             GFL_StrBufFree(name);
         } else {

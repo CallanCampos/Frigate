@@ -16,10 +16,10 @@ struct StaActBg {
     u16 scroll;
     u8 unkA[0x12];
     // The model's resource, NULL until a background is loaded
-    void *mdlRes;
-    void *anmRes[3];
+    G3DResource *mdlRes;
+    G3DResource *anmRes[3];
     G3DModel *mdl;
-    void *anms[3];
+    G3DAnimation *anms[3];
     G3DActor *actor;
 };
 

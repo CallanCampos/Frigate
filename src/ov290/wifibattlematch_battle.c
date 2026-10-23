@@ -13,6 +13,7 @@
 #include "battle/battle_proc.h"
 #include "battle/battle_rec_tool.h"
 #include "battle/btl_net.h"
+#include "battle/btl_result.h"
 #include "battle/btl_setup.h"
 #include "battle/regulation.h"
 #include "constants/pokemon.h"
@@ -39,9 +40,6 @@
 
 // The heap of the proc that runs the battle
 #define HEAPID_WIFIBATTLEMATCH_BATTLE 0x58
-
-// GFLNetInitData.bNetType of an infrared connection
-#define NET_TYPE_IRC 3
 
 // The battle proc's work
 typedef struct {
@@ -159,7 +157,7 @@ static BOOL WifiBattleMatchSys_BattleProcMain(GameProc *proc, u32 *state, void *
             *state = 9;
         }
         if (GFL_NetIsInitialized()) {
-            if (GFL_NetGetInitData()->bNetType == NET_TYPE_IRC) {
+            if (GFL_NetGetInitData()->bNetType == GFL_NET_TYPE_IRC) {
                 if (wk->timer++ > 600) {
                     NetCommand_RemoveTable(0x100);
                     wk->commandsSet = FALSE;
@@ -181,7 +179,7 @@ static BOOL WifiBattleMatchSys_BattleProcMain(GameProc *proc, u32 *state, void *
             *state = 11;
         }
         if (GFL_NetIsInitialized()) {
-            if (GFL_NetGetInitData()->bNetType == NET_TYPE_IRC) {
+            if (GFL_NetGetInitData()->bNetType == GFL_NET_TYPE_IRC) {
                 if (wk->timer++ > 600) {
                     *state = 11;
                     wk->timer = 0;
@@ -196,19 +194,19 @@ static BOOL WifiBattleMatchSys_BattleProcMain(GameProc *proc, u32 *state, void *
         } else {
             battle->players->base.unk44 = 4;
         }
-        switch (battle->setup->unkA8) {
-        case 1:
-        case 4:
+        switch (battle->setup->result) {
+        case BTL_RESULT_VICTORY:
+        case BTL_RESULT_FLEE_FOE:
             battle->players->base.result = 0;
             break;
-        case 0:
-        case 3:
+        case BTL_RESULT_DEFEAT:
+        case BTL_RESULT_FLEE:
             battle->players->base.result = 1;
             break;
-        case 2:
+        case BTL_RESULT_DRAW:
             battle->players->base.result = 2;
             break;
-        case 6:
+        case BTL_RESULT_6:
             wk->timer = 0;
             queue = FALSE;
             *state = 15;
@@ -273,7 +271,7 @@ static BOOL WifiBattleMatchSys_BattleProcMain(GameProc *proc, u32 *state, void *
         break;
     }
     if (GFL_NetIsInitialized() && running != TRUE) {
-        if (GFL_NetGetInitData()->bNetType == NET_TYPE_IRC) {
+        if (GFL_NetGetInitData()->bNetType == GFL_NET_TYPE_IRC) {
             if (GFL_NetErrCheck()) {
                 GFL_NetErrMarkShown();
                 battle->result = 1;
@@ -281,15 +279,15 @@ static BOOL WifiBattleMatchSys_BattleProcMain(GameProc *proc, u32 *state, void *
             }
         } else {
             switch (DWCRapCommon_CheckError(TRUE, TRUE)) {
-            case 0:
+            case DWCRAP_RESULT_OK:
                 break;
-            case 1:
-            case 2:
-            case 3:
+            case DWCRAP_RESULT_DISCONNECTED:
+            case DWCRAP_RESULT_FAILED:
+            case DWCRAP_RESULT_NET_ERROR:
             default:
                 battle->result = 2;
                 return TRUE;
-            case 4:
+            case DWCRAP_RESULT_TIMEOUT:
                 battle->result = 3;
                 return TRUE;
             }

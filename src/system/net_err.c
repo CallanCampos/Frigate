@@ -35,12 +35,6 @@
 // whatever the game was showing, which it saves and puts back. A fatal error stops the game on the screen instead.
 // The file's name is the ROM's string, from GFL_HeapAllocate's calls. The names of the functions are swan's
 
-// The files of the window's graphics, for a network error (ARCID_ERROR_WINDOW_GRA) and for a failed assertion
-// (ARCID_ASSERT_WINDOW_GRA)
-#define ERROR_WINDOW_GRA_PLTT 0
-#define ERROR_WINDOW_GRA_CHAR 1
-#define ERROR_WINDOW_GRA_SCRN 2
-
 enum {
     ERROR_WINDOW_NET,
     ERROR_WINDOW_ASSERT,
@@ -479,7 +473,8 @@ BOOL GFL_NetErrShutdown(void) {
         GFL_NetExit(NULL);
         GFL_NetIwFree();
         do {
-            if (init != NULL && (init->bNetType == 0 || init->bNetType == 5)) {
+            if (init != NULL &&
+                (init->bNetType == GFL_NET_TYPE_WIRELESS || init->bNetType == GFL_NET_TYPE_WIRELESS_LISTEN)) {
                 if (WH_GetSystemState() == 10) {
                     return FALSE;
                 }

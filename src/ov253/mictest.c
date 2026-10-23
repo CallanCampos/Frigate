@@ -43,10 +43,12 @@
 #define WINDOW_COUNT 3
 #define ACTOR_COUNT 7
 #define NOTE_COUNT 3
-// The first of the actors that are notes
-#define ACTOR_NOTE_FIRST 4
-#define ACTOR_BACK_BUTTON 3
-#define ACTOR_CENTER 2
+enum {
+    ACTOR_CENTER = 2,
+    ACTOR_BACK_BUTTON,
+    // The first of the actors that are notes
+    ACTOR_NOTE_FIRST,
+};
 
 // The frames between the notes that a sound sends up
 #define NOTE_INTERVAL 10
@@ -340,7 +342,7 @@ static void MicTest_SeqWipeIn(MicTestSeq *seq, u32 *state) {
 
     switch (*state) {
     case 0:
-        GFL_WipeSet(0, 1, 1, 0, 6, 1, wk->heapId);
+        GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_IN, WIPE_TYPE_FADE_IN, 0, 6, 1, wk->heapId);
         *state = 1;
         break;
     case 1:
@@ -404,7 +406,7 @@ static void MicTest_SeqWipeOut(MicTestSeq *seq, u32 *state) {
 
     switch (*state) {
     case 0:
-        GFL_WipeSet(0, 0, 0, 0, 6, 1, wk->heapId);
+        GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, 0, 6, 1, wk->heapId);
         *state = 1;
         break;
     case 1:

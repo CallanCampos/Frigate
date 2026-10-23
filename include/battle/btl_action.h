@@ -4,6 +4,21 @@
 #include "types.h"
 #include "struct_decls.h"
 
+// What a client chose for a Pokémon, a BattleAction's action: nothing, a move, an item, a switch, running, shifting,
+// a rotation, nothing this turn, and the two ends of a recording's playback (time out, a broken record)
+enum {
+    BATTLE_ACTION_NULL,
+    BATTLE_ACTION_FIGHT,
+    BATTLE_ACTION_ITEM,
+    BATTLE_ACTION_CHANGE,
+    BATTLE_ACTION_ESCAPE,
+    BATTLE_ACTION_SHIFT,
+    BATTLE_ACTION_ROTATION,
+    BATTLE_ACTION_SKIP,
+    BATTLE_ACTION_REC_TIMEOUT,
+    BATTLE_ACTION_REC_ERROR,
+};
+
 union BattleAction {
     u32 raw;
     struct {
@@ -34,7 +49,7 @@ union BattleAction {
 
 // The move of a fight action, 0 for any other action
 static inline u16 BattleAction_GetMove(const BattleAction *action) {
-    if (action->bits.action == 1) {
+    if (action->bits.action == BATTLE_ACTION_FIGHT) {
         return action->bits.move;
     }
     return 0;

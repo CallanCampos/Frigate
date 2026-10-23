@@ -65,23 +65,23 @@ WbtBattle_GetBattleMusic kind:function(thumb,size=0x7c) addr:0x021f0764
 WbtBattle_LoadTrainerLine kind:function(thumb,size=0x54) addr:0x021f07e0
 WbtBattle_GetDownloadedLine kind:function(thumb,size=0x84) addr:0x021f0834
 WbtBattle_LoadOpponentLine kind:function(thumb,size=0xda) addr:0x021f08b8
-data_ov134_021f0998 kind:data(any) addr:0x021f0998
-data_ov134_021f09a0 kind:data(any) addr:0x021f09a0
-data_ov134_021f09a4 kind:data(any) addr:0x021f09a4
-data_ov134_021f09ac kind:data(any) addr:0x021f09ac
-data_ov134_021f09b4 kind:data(any) addr:0x021f09b4
-data_ov134_021f09bc kind:data(any) addr:0x021f09bc
-data_ov134_021f09c4 kind:data(any) addr:0x021f09c4
-data_ov134_021f09d0 kind:data(any) addr:0x021f09d0
-data_ov134_021f09dc kind:data(any) addr:0x021f09dc
-data_ov134_021f09e8 kind:data(any) addr:0x021f09e8
+sActor4Anms kind:data(any) addr:0x021f0998
+sActor13Anms kind:data(any) addr:0x021f09a0
+sActor6Anms kind:data(any) addr:0x021f09a4
+sActor2Anms kind:data(any) addr:0x021f09ac
+sActor0Anms kind:data(any) addr:0x021f09b4
+sActor5Anms kind:data(any) addr:0x021f09bc
+sActor11Anms kind:data(any) addr:0x021f09c4
+sActor14Anms kind:data(any) addr:0x021f09d0
+sActor12Anms kind:data(any) addr:0x021f09dc
+sSceneSetup kind:data(any) addr:0x021f09e8
 data_ov134_021f09f8 kind:data(any) addr:0x021f09f8
 data_ov134_021f0a04 kind:data(any) addr:0x021f0a04
 data_ov134_021f0a10 kind:data(any) addr:0x021f0a10
 data_ov134_021f0a1c kind:data(any) addr:0x021f0a1c
 data_ov134_021f0a2c kind:data(any) addr:0x021f0a2c
-data_ov134_021f0a44 kind:data(any) addr:0x021f0a44
-data_ov134_021f0b34 kind:data(any) addr:0x021f0b34
+sActors kind:data(any) addr:0x021f0a44
+sResources kind:data(any) addr:0x021f0b34
 sTrainerLines kind:data(any) addr:0x021f0ccc
 data_ov134_021f0d11 kind:data(any) addr:0x021f0d11 ambiguous
 data_ov134_021f0d73 kind:data(any) addr:0x021f0d73 ambiguous
@@ -92,10 +92,10 @@ data_ov134_021f0e38 kind:data(any) addr:0x021f0e38
 data_ov134_021f0e44 kind:data(any) addr:0x021f0e44
 data_ov134_021f0e50 kind:data(any) addr:0x021f0e50
 data_ov134_021f0e51 kind:data(any) addr:0x021f0e51 ambiguous
-data_ov134_021f0e5c kind:data(any) addr:0x021f0e5c
-data_ov134_021f0e68 kind:data(any) addr:0x021f0e68
-data_ov134_021f0e74 kind:data(any) addr:0x021f0e74
-data_ov134_021f0e80 kind:data(any) addr:0x021f0e80
+sFaceTexNames kind:data(any) addr:0x021f0e5c
+sFacePlttNames kind:data(any) addr:0x021f0e68
+sNameTexNames kind:data(any) addr:0x021f0e74
+sNamePlttNames kind:data(any) addr:0x021f0e80
 data_ov134_021f0e8c kind:data(any) addr:0x021f0e8c
 data_ov134_021f0e9c kind:data(any) addr:0x021f0e9c
 data_ov134_021f0eac kind:data(any) addr:0x021f0eac

@@ -1,5 +1,6 @@
 #include "types.h"
 #include "app/livebattlematch_irc.h"
+#include "app/wifibattlematch.h"
 #include "field/delivery_irc.h"
 #include "field/net_devirc.h"
 #include "gfl/heap.h"
@@ -11,10 +12,12 @@
 #include "system/version.h"
 
 // The commands of the link, the game's command base 0x1f and a number
-#define LIVEBATTLEMATCH_IRC_COMMAND_PLAYER_DATA 0x1f00
-#define LIVEBATTLEMATCH_IRC_COMMAND_PARTY 0x1f01
-#define LIVEBATTLEMATCH_IRC_COMMAND_UNUSED 0x1f02
-#define LIVEBATTLEMATCH_IRC_COMMAND_READY 0x1f03
+enum {
+    LIVEBATTLEMATCH_IRC_COMMAND_PLAYER_DATA = 0x1f00,
+    LIVEBATTLEMATCH_IRC_COMMAND_PARTY,
+    LIVEBATTLEMATCH_IRC_COMMAND_UNUSED,
+    LIVEBATTLEMATCH_IRC_COMMAND_READY,
+};
 #define LIVEBATTLEMATCH_IRC_COMMAND_NUM 4
 
 #define LIVEBATTLEMATCH_IRC_BUFFER_SIZE 0x1000
@@ -85,7 +88,7 @@ static const GFLNetInitData sLiveBattleMatchIrcNetInit = {
     0x10,
     1,
     0,
-    3,
+    GFL_NET_TYPE_IRC,
     1,
     0x1f,
     {0xff, 0xff, 0xff, 0xff},
@@ -231,13 +234,13 @@ BOOL LiveBattleMatchIrc_StepEnd(LiveBattleMatchIrc *irc) {
     return FALSE;
 }
 
-BOOL LiveBattleMatchIrc_SendPlayerData(LiveBattleMatchIrc *irc, void *data) {
+BOOL LiveBattleMatchIrc_SendPlayerData(LiveBattleMatchIrc *irc, WifiBattleMatchPlayer *data) {
     u8 partnerId = GFL_NetGetHandleNetId(NetHandle_GetOwn()) ? 0 : 1;
     NetHandle *handle = NetHandle_GetOwn();
 
     return GFL_NetSendCommandToMachine(handle, partnerId, LIVEBATTLEMATCH_IRC_COMMAND_PLAYER_DATA,
-                                       PokeParty_GetSaveDataSize() + LIVEBATTLEMATCH_PLAYER_HEADER_SIZE, data, TRUE,
-                                       TRUE, TRUE);
+                                       PokeParty_GetSaveDataSize() + sizeof(WifiBattleMatchPlayer), data, TRUE, TRUE,
+                                       TRUE);
 }
 
 BOOL LiveBattleMatchIrc_TakePlayerData(LiveBattleMatchIrc *irc, void **data) {
@@ -285,13 +288,13 @@ BOOL LiveBattleMatchIrc_TakeReady(LiveBattleMatchIrc *irc, u32 *flag) {
     return arrived;
 }
 
-void LiveBattleMatchIrc_StartDelivery(LiveBattleMatchIrc *p_wk, void *buffer) {
+void LiveBattleMatchIrc_StartDelivery(LiveBattleMatchIrc *p_wk, TournamentEntry *buffer) {
     DeliveryIrcInit init;
 
     MI_CpuFill8(&init, 0, sizeof(DeliveryIrcInit));
     init.code = LIVEBATTLEMATCH_IRC_DELIVERY_CODE;
     init.data[0].datasize = LIVEBATTLEMATCH_IRC_DELIVERY_SIZE;
-    init.data[0].pData = buffer;
+    init.data[0].pData = (u8 *)buffer;
     init.unk04 = 0;
     init.heapId = p_wk->heapId;
     init.data[0].region = region;

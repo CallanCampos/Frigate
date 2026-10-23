@@ -39,7 +39,7 @@
 
 // The page of records that ResortCmd_ShowRecords shows, while the script waits
 typedef struct {
-    void *window;
+    MoneyWin *window;
     s16 page;
     u16 state;
     u16 *var;
@@ -53,7 +53,7 @@ static const u16 sUnk7db4[2][8] = {
 
 static ResortPeople *ResortCmd_GetPeople(Field *field);
 static u16 ResortCmd_GetActorUID(FieldScriptEnv *env);
-static void *ResortCmd_GetNPC(Field *field);
+static ResortNPC *ResortCmd_GetNPC(Field *field);
 static int ResortCmd_ApplyEffortChange(int value, int others, int change);
 
 BOOL ResortCmd_StartTalk(VM *vm, FieldScriptEnv *env) {
@@ -109,7 +109,7 @@ BOOL ResortCmd_GetValue(VM *vm, FieldScriptEnv *env) {
         break;
     case 1: {
         JoinAvenueRecord *a = JoinAvenueOccupants_GetEmptyRecord(occupants);
-        u32 b = JoinAvenue_GetParam(info, 12, 0);
+        u32 b = JoinAvenue_GetParam(info, JOIN_AVE_INFO_UNLOCKED_5, 0);
 
         *var = a == NULL && b != 0 ? TRUE : FALSE;
         break;
@@ -126,7 +126,7 @@ BOOL ResortCmd_GetValue(VM *vm, FieldScriptEnv *env) {
         u16 kind1 = ResortShopData_GetShopParam(row1, 0);
         u16 kind2 = ResortShopData_GetShopParam(row2, 0);
         u32 unk25 = ResortPerson_GetParam(person, JOIN_AVE_PARAM_UNK_37, NULL);
-        u32 unk13 = JoinAvenue_GetParam(info, 13, 0);
+        u32 unk13 = JoinAvenue_GetParam(info, JOIN_AVE_INFO_UNLOCKED_6, 0);
 
         if (kind1 == 5 && unk13 == 0) {
             unk25 = 1;
@@ -186,7 +186,7 @@ BOOL ResortCmd_GetValue(VM *vm, FieldScriptEnv *env) {
     }
     case 16: {
         u32 a = ResortPerson_GetParam(person, JOIN_AVE_PARAM_RANK, NULL);
-        u32 b = JoinAvenue_GetParam(info, 2, 0);
+        u32 b = JoinAvenue_GetParam(info, JOIN_AVE_INFO_RANK, 0);
 
         if (a == 0) {
             *var = 2;
@@ -233,10 +233,10 @@ BOOL ResortCmd_GetValue(VM *vm, FieldScriptEnv *env) {
         *var = JoinAvenuePerson_IsEmpty(JoinAvenueOccupants_GetPerson(occupants, which)) == FALSE ? TRUE : FALSE;
         break;
     case 33:
-        *var = JoinAvenue_GetParam(info, 11, 0);
+        *var = JoinAvenue_GetParam(info, JOIN_AVE_INFO_UNLOCKED_4, 0);
         break;
     case 34:
-        *var = JoinAvenue_GetParam(info, 10, 0);
+        *var = JoinAvenue_GetParam(info, JOIN_AVE_INFO_UNLOCKED_3, 0);
         break;
     case 35: {
         u32 value = 0;
@@ -333,13 +333,16 @@ BOOL ResortCmd_GetValue(VM *vm, FieldScriptEnv *env) {
         break;
     }
     case 61:
-        *var = ResortBinary_Get(table, ResortBinary_FindRange(table, JoinAvenue_GetParam(info, 2, 0)), 11);
+        *var = ResortBinary_Get(table, ResortBinary_FindRange(table, JoinAvenue_GetParam(info, JOIN_AVE_INFO_RANK, 0)),
+                                11);
         break;
     case 62:
-        *var = JoinAvenue_GetParam(info, 14, 0);
+        *var = JoinAvenue_GetParam(info, JOIN_AVE_INFO_UNLOCKED_7, 0);
         break;
     case 63:
-        *var = ResortBinary_Get(table, ResortBinary_FindRange(table, JoinAvenue_GetParam(info, 2, 0)), 6) - 1753;
+        *var = ResortBinary_Get(table, ResortBinary_FindRange(table, JoinAvenue_GetParam(info, JOIN_AVE_INFO_RANK, 0)),
+                                6) -
+               1753;
         break;
     case 64:
         *var = JoinAvenueOccupants_CountPeople(occupants);
@@ -680,7 +683,7 @@ BOOL ResortCmd_ShortenEggSteps(VM *vm, FieldScriptEnv *env) {
     species = PokeParty_GetParam(pkm, PKM_PARAM_SPECIES, NULL);
     form = PokeParty_GetParam(pkm, PKM_PARAM_FORM, NULL);
     personal = PML_PersonalLoad(species, form, Field_GetHeapID(field));
-    cycles = PML_PersonalGetParam(personal, 21);
+    cycles = PML_PersonalGetParam(personal, PERSONAL_HATCH_CYCLES);
     PML_PersonalFree(personal);
     if (PokeParty_GetParam(pkm, PKM_PARAM_IS_EGG, NULL) == TRUE) {
         int steps = PokeParty_GetParam(pkm, PKM_PARAM_HAPPINESS, NULL);
@@ -886,7 +889,7 @@ BOOL ResortCmd_Visit(VM *vm, FieldScriptEnv *env) {
     switch (mode) {
     case 0: {
         ResortPersonData *other = ResortDatas_Get(unk30, 0, a2);
-        u16 unk = ResortWork_Get(ResortSys_GetWork(sys), 10);
+        u16 unk = ResortWork_Get(ResortSys_GetWork(sys), RESORT_WORK_VISITS);
         u32 score;
         u32 value;
         u32 limit;
@@ -925,7 +928,7 @@ BOOL ResortCmd_Visit(VM *vm, FieldScriptEnv *env) {
         return FALSE;
     }
     case 1:
-        *var = (a2 * (((u16)ResortWork_Get(unk38, 10) + 1) * (FX32_ONE / 4) + FX32_ONE)) >> FX32_SHIFT;
+        *var = (a2 * (((u16)ResortWork_Get(unk38, RESORT_WORK_VISITS) + 1) * (FX32_ONE / 4) + FX32_ONE)) >> FX32_SHIFT;
         break;
     case 2:
         *var = ResortData_Roll(data, 26, 100) < 85 ? TRUE : FALSE;
@@ -972,11 +975,11 @@ BOOL ResortCmd_CheckRank100Unlock(VM *vm, FieldScriptEnv *env) {
     info = ResortSys_GetInfo(sys);
     var = ScriptReadVar(vm, env);
     *var = FALSE;
-    if (JoinAvenue_GetParam(info, 2, 0) >= 100) {
+    if (JoinAvenue_GetParam(info, JOIN_AVE_INFO_RANK, 0) >= 100) {
         u32 result = ResortSys_GetUnlockForRank(sys, gameData, 100);
 
         if (result != 0 && result != 8) {
-            JoinAvenueInfo_SetParam(info, result + 15, 1);
+            JoinAvenueInfo_SetParam(info, result + JOIN_AVE_INFO_UNLOCK_PENDING_1 - 1, 1);
             *var = TRUE;
         }
     }
@@ -1458,20 +1461,20 @@ BOOL ResortCmd_SetOwnValue(VM *vm, FieldScriptEnv *env) {
         JoinAvenuePerson_SetParam(own, JOIN_AVE_PARAM_SHOP_ID, sUnk7db4[VERSION_BLACK2 - GAME_VERSION][value]);
         break;
     case 17:
-        JoinAvenueInfo_SetParam(info, 5, value);
+        JoinAvenueInfo_SetParam(info, JOIN_AVE_INFO_SEASON, value);
         break;
     case 18:
-        JoinAvenueInfo_SetParam(info, 7, value);
+        JoinAvenueInfo_SetParam(info, JOIN_AVE_INFO_UNOPENED, value);
         if (value == 0) {
             ResortField_RefreshPeople(field);
         }
         break;
     case 21:
-        JoinAvenueInfo_SetParam(info, value + 15, 0);
-        JoinAvenueInfo_SetParam(info, value + 7, 1);
+        JoinAvenueInfo_SetParam(info, value + JOIN_AVE_INFO_UNLOCK_PENDING_1 - 1, 0);
+        JoinAvenueInfo_SetParam(info, value + JOIN_AVE_INFO_UNLOCKED_1 - 1, 1);
         break;
     case 22:
-        JoinAvenueInfo_SetParam(info, 25, value);
+        JoinAvenueInfo_SetParam(info, JOIN_AVE_INFO_UNK_DC_13, value);
         break;
     case 23:
         if (Field_CheckGimmickWorkPassword(field, 1)) {
@@ -1543,13 +1546,13 @@ BOOL ResortCmd_GetOwnValue(VM *vm, FieldScriptEnv *env) {
         *var = ResortSys_GetUnlock(sys, gameData);
         break;
     case 22:
-        *var = JoinAvenue_GetParam(info, 25, 0);
+        *var = JoinAvenue_GetParam(info, JOIN_AVE_INFO_UNK_DC_13, 0);
         break;
     case 25:
-        *var = JoinAvenue_GetParam(info, 13, 0);
+        *var = JoinAvenue_GetParam(info, JOIN_AVE_INFO_UNLOCKED_6, 0);
         break;
     case 17:
-        *var = JoinAvenue_GetParam(info, 5, 0);
+        *var = JoinAvenue_GetParam(info, JOIN_AVE_INFO_SEASON, 0);
         break;
     case 27:
         *var = ResortSys_IsFull(sys);
@@ -1637,7 +1640,7 @@ static BOOL ResortCmd_UpdateRecords(VM *vm, void *data) {
     void **ptr = ScriptWork_GetUserHeapPtr(work);
     HeapID heapId = Field_GetHeapID(field);
     ResortRecordsWork *wk = *ptr;
-    void *msgBGSys = Field_GetMsgBGSys(field);
+    FieldMsgBG *msgBGSys = Field_GetMsgBGSys(field);
     WordSet *wordSet = ScriptWork_GetWordSet(work);
 
     switch (wk->state) {
@@ -1807,7 +1810,7 @@ static u16 ResortCmd_GetActorUID(FieldScriptEnv *env) {
     return GetActorUID(ScriptWork_GetParentActor(FieldScriptEnv_GetScriptWork(env)));
 }
 
-static void *ResortCmd_GetNPC(Field *field) {
+static ResortNPC *ResortCmd_GetNPC(Field *field) {
     void *unk;
 
     if (Field_CheckGimmickWorkPassword(field, 1)) {

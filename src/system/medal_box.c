@@ -7,8 +7,6 @@
 // obtained last and the rank. The Pokédex's habitat list is kept at its end. The ROM has no string for the file, so
 // the name follows swan's function names. Block 0x44.
 
-#define SAVE_BLOCK_MEDAL_BOX 0x44
-
 static MedalInfo *MedalBox_WriteMedal(MedalBox *box, u16 medal);
 static const MedalInfo *MedalBox_ReadMedal(const MedalBox *box, u16 medal);
 static void MedalInfo_SetStatus(MedalInfo *info, u8 status);
@@ -158,6 +156,6 @@ MedalBox *SaveControl_GetMedalBox(SaveControl *save) {
     return SaveControl_GetBlockPtr(save, SAVE_BLOCK_MEDAL_BOX);
 }
 
-void *MedalBox_GetHabitatList(MedalBox *box) {
-    return box->habitatList;
+ZukanHabitatSave *MedalBox_GetHabitatList(MedalBox *box) {
+    return &box->habitatList;
 }

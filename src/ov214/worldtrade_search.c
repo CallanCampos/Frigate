@@ -83,12 +83,6 @@ enum {
     CURSOR_POS_NUM,
 };
 
-// The sub-process modes of the screens it goes to and comes from
-#define SEARCH_MODE_FROM_TITLE 13
-#define SEARCH_MODE_PARTNER_RETURN 15
-#define PARTNER_MODE_FROM_SEARCH 16
-#define ENTER_MODE_DISCONNECT 21
-
 // The text color of the conditions and of the labels
 #define SEARCH_INFO_COLOR 0x3c40
 #define SEARCH_LABEL_COLOR 0x440
@@ -243,8 +237,8 @@ int WorldTrade_Search_Init(WorldTradeWork *wk, int seq) {
                             SEARCH_INFO_COLOR, &wk->print);
 
     wk->vfunc2 = Search_SlideScreenVFunc;
-    if (wk->subProcessMode == SEARCH_MODE_FROM_TITLE) {
-        GFL_WipeSet(3, 1, 1, 0, 6, 1, HEAPID_WORLDTRADE);
+    if (wk->subProcessMode == WT_MODE_SEARCH_FROM_TITLE) {
+        GFL_WipeSet(WIPE_MODE_MAIN, WIPE_TYPE_FADE_IN, WIPE_TYPE_FADE_IN, 0, 6, 1, HEAPID_WORLDTRADE);
     }
     wk->subprocessSeq = SEARCH_SEQ_START;
     return WT_SEQ_FADEIN;
@@ -541,14 +535,14 @@ static int Search_SubSeqStart(WorldTradeWork *wk) {
         ClActor_SetVisible(wk->cursorAct, TRUE);
     }
 
-    if (wk->subProcessMode == SEARCH_MODE_PARTNER_RETURN) {
+    if (wk->subProcessMode == WT_MODE_SEARCH_PARTNER_RETURN) {
         if (wk->searchResult != 0) {
             Search_SubSeqMessagePrint(wk, 0x26, 0, 0, 0xf0f);
         } else {
             Search_SubSeqMessagePrint(wk, 8, 1, 0, 0xf0f);
         }
         if (GX_GetMasterBrightness() == -16) {
-            GFL_WipeSet(0, 1, 1, 0, 16, 1, HEAPID_WORLDTRADE);
+            GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_IN, WIPE_TYPE_FADE_IN, 0, 16, 1, HEAPID_WORLDTRADE);
             wk->subprocessSeq = SEARCH_SEQ_RETURN_SCREEN2;
         } else {
             wk->subprocessSeq = SEARCH_SEQ_MAIN;
@@ -586,7 +580,7 @@ static void Search_DecideFunc(WorldTradeWork *wk, int decide) {
     case CURSOR_POS_SEX:
         if (wk->search.characterNo != 0) {
             personal = PML_PersonalLoad(wk->search.characterNo, 0, HEAPID_WORLDTRADE);
-            sexSelection = PML_PersonalGetParam(personal, 20);
+            sexSelection = PML_PersonalGetParam(personal, PERSONAL_SEX_RATIO);
             PML_PersonalFree(personal);
             wk->dw->sexSelection = sexSelection;
             if (WorldTrade_SexSelectionCheck(&wk->search, wk->dw->sexSelection)) {
@@ -604,7 +598,7 @@ static void Search_DecideFunc(WorldTradeWork *wk, int decide) {
     case CURSOR_POS_VIEW:
         if (wk->searchResult != 0) {
             wk->subprocessSeq = SEARCH_SEQ_EXCHANGE_SCREEN1;
-            GFL_WipeSet(0, 0, 0, 0, 16, 1, HEAPID_WORLDTRADE);
+            GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, 0, 16, 1, HEAPID_WORLDTRADE);
         }
         break;
     case CURSOR_POS_SEARCH:
@@ -631,7 +625,7 @@ static int Search_SubSeqMain(WorldTradeWork *wk) {
         case CURSOR_POS_SEX:
             if (wk->search.characterNo != 0) {
                 personal = PML_PersonalLoad(wk->search.characterNo, 0, HEAPID_WORLDTRADE);
-                sexSelection = PML_PersonalGetParam(personal, 20);
+                sexSelection = PML_PersonalGetParam(personal, PERSONAL_SEX_RATIO);
                 PML_PersonalFree(personal);
                 wk->dw->sexSelection = sexSelection;
                 if (WorldTrade_SexSelectionCheck(&wk->search, wk->dw->sexSelection)) {
@@ -695,7 +689,7 @@ static int Search_SubSeqMain(WorldTradeWork *wk) {
             case CURSOR_POS_SEX:
                 if (wk->search.characterNo != 0) {
                     personal = PML_PersonalLoad(wk->search.characterNo, 0, HEAPID_WORLDTRADE);
-                    sexSelection = PML_PersonalGetParam(personal, 20);
+                    sexSelection = PML_PersonalGetParam(personal, PERSONAL_SEX_RATIO);
                     PML_PersonalFree(personal);
                     wk->dw->sexSelection = sexSelection;
                     if (WorldTrade_SexSelectionCheck(&wk->search, wk->dw->sexSelection)) {
@@ -899,7 +893,7 @@ static int Search_SubSeqErrorDisconnectMessage1(WorldTradeWork *wk) {
 static int Search_SubSeqErrorDisconnectMessage2(WorldTradeWork *wk) {
     Search_SubSeqMessagePrint(wk, 0xac, 4, 0, 0xf0f);
     WorldTrade_SetNextSeq(wk, SEARCH_SEQ_MES_WAIT_KEY, SEARCH_SEQ_END_TO_ENTER);
-    WorldTrade_SubProcessChange(wk, WORLDTRADE_ENTER, ENTER_MODE_DISCONNECT);
+    WorldTrade_SubProcessChange(wk, WORLDTRADE_ENTER, WT_MODE_RELOGIN);
     GFL_SndSEPlay(SEQ_SE_BEEP);
     return WT_SEQ_MAIN;
 }
@@ -976,7 +970,7 @@ static void Search_TouchCursorMove(WorldTradeWork *wk, int touch) {
 
 static int Search_SubSeqEnd(WorldTradeWork *wk) {
     if (wk->drawOffset == 0) {
-        GFL_WipeSet(3, 0, 0, 0, 6, 1, HEAPID_WORLDTRADE);
+        GFL_WipeSet(WIPE_MODE_MAIN, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, 0, 6, 1, HEAPID_WORLDTRADE);
     }
     wk->subprocessSeq = SEARCH_SEQ_START;
     return WT_SEQ_FADEOUT;
@@ -985,7 +979,7 @@ static int Search_SubSeqEnd(WorldTradeWork *wk) {
 static int Search_SubSeqEndToEnter(WorldTradeWork *wk) {
     DpwTr_End();
     WorldTrade_TimeIconDel(wk);
-    GFL_WipeSet(0, 0, 0, 0, 6, 1, HEAPID_WORLDTRADE);
+    GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, 0, 6, 1, HEAPID_WORLDTRADE);
     wk->subprocessSeq = SEARCH_SEQ_START;
     return WT_SEQ_FADEOUT;
 }
@@ -1024,7 +1018,7 @@ static int Search_SubSeqPokenameSelectWait(WorldTradeWork *wk) {
         GFL_BitmapFill(BmpWin_GetBitmap(wk->infoWin[1]), 0);
         WorldTrade_PokeNamePrint(wk->infoWin[1], wk->monsNameManager, ret, 0, 0, SEARCH_INFO_COLOR, &wk->print);
         personal = PML_PersonalLoad(ret, 0, HEAPID_WORLDTRADE);
-        sexSelection = PML_PersonalGetParam(personal, 20);
+        sexSelection = PML_PersonalGetParam(personal, PERSONAL_SEX_RATIO);
         PML_PersonalFree(personal);
         wk->dw->sexSelection = sexSelection;
         WorldTrade_SelectNameListBackup(&wk->selectListPos, wk->dw->headwordListPos + wk->dw->headwordPos,
@@ -1223,7 +1217,7 @@ static int Search_SubSeqExchangeScreen1(WorldTradeWork *wk) {
         wk->drawOffset = -16;
         if (wk->subLcdTouchOK) {
             wk->subprocessSeq = SEARCH_SEQ_END;
-            WorldTrade_SubProcessChange(wk, WORLDTRADE_PARTNER, PARTNER_MODE_FROM_SEARCH);
+            WorldTrade_SubProcessChange(wk, WORLDTRADE_PARTNER, WT_MODE_PARTNER_FROM_SEARCH);
             wk->touchTrainerPos = 0;
         }
         ClActor_SetVisible(wk->promptDsAct, FALSE);
@@ -1244,7 +1238,7 @@ static int Search_SubSeqExchangeMain(WorldTradeWork *wk) {
     int touch;
 
     if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_A) {
-        GFL_WipeSet(0, 0, 0, 0, 16, 1, HEAPID_WORLDTRADE);
+        GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, 0, 16, 1, HEAPID_WORLDTRADE);
     } else {
         touch = WorldTrade_SubLcdObjHitCheck(wk->searchResult);
         if (wk->subLcdTouchOK && touch >= 0) {

@@ -12,7 +12,7 @@
 typedef struct WbtSubscreen WbtSubscreen;
 
 // The first two arguments are unused
-WbtSubscreen *WbtSubscreen_Create(void *saveData, FieldSubscreen *subscreen, GameSystem *gsys);
+WbtSubscreen *WbtSubscreen_Create(CGearSettings *saveData, FieldSubscreen *subscreen, GameSystem *gsys);
 void WbtSubscreen_Update(WbtSubscreen *work);
 void WbtSubscreen_Draw(WbtSubscreen *work);
 void WbtSubscreen_Free(WbtSubscreen *work);

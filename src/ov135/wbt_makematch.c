@@ -54,27 +54,31 @@ typedef union {
 // The slots of the save's downloaded tournaments; slot 0 is none
 typedef enum { WBT_DOWNLOAD_SLOT_FIRST = 1, WBT_DOWNLOAD_SLOT_END = 4 } WbtDownloadSlot;
 
-#define WBT_STATUS_UNUSED 0
-#define WBT_STATUS_CANDIDATE 1
-#define WBT_STATUS_PICKED 2
+enum {
+    WBT_STATUS_UNUSED,
+    WBT_STATUS_CANDIDATE,
+    WBT_STATUS_PICKED,
+};
 
 // Any, for the count of Trainers the player has beaten
 #define WBT_ANY 2
 
-#define WBT_KIND_TABLE 0
-// The first of four kinds that stand for a Trainer of the downloaded tournament
-#define WBT_KIND_CAST_FIRST 0xf1
-#define WBT_KIND_CAST_LAST 0xf4
-#define WBT_KIND_PLAYER 0xff
+enum {
+    WBT_KIND_TABLE,
+    // The first of four kinds that stand for a Trainer of the downloaded tournament
+    WBT_KIND_CAST_FIRST = 0xf1,
+    WBT_KIND_CAST_LAST = 0xf4,
+    WBT_KIND_PLAYER = 0xff,
+};
 
-static WbtMakeMatch *WbtMakeMatch_Create(HeapID heapId, void *record, const WbtMatchParam *param);
+static WbtMakeMatch *WbtMakeMatch_Create(HeapID heapId, WbtSave *record, const WbtMatchParam *param);
 static void WbtMakeMatch_Free(WbtMakeMatch *m);
 static void WbtMakeMatch_GetPicks(WbtMakeMatch *m, WbtBracketEntry *result);
 static u32 WbtMakeMatch_CountCandidates(WbtMakeMatch *m, u32 status, u32 rank, u32 encountered);
 static u32 WbtMakeMatch_FindCandidate(WbtMakeMatch *m, u32 rank, u32 encountered, u8 n);
 static int WbtMakeMatch_PickRank(WbtMakeMatch *m, u32 rank, u8 count);
 static BOOL WbtMakeMatch_IsEligible(const WbtMatchParam *param, WbtTrainer *trainer);
-static void WbtMakeMatch_InitStatus(WbtMakeMatch *m, void *record);
+static void WbtMakeMatch_InitStatus(WbtMakeMatch *m, WbtSave *record);
 static void WbtMakeMatch_PickDownloaded(const WbtUnk18A *slots, WbtMakeMatch *m, WbtBracketEntry *result);
 static void WbtMakeMatch_PickTournament1(WbtMakeMatch *m, WbtBracketEntry *result);
 static void WbtMakeMatch_PickTournament10(WbtMakeMatch *m, WbtBracketEntry *result);
@@ -100,7 +104,7 @@ static void WbtMakeMatch_SetEntrants(WbtSystem *sys, GameData *gameData, WbtBrac
 static BOOL WbtMakeMatch_IsDownloadValid(GameData *gameData, u32 slot);
 static void WbtMakeMatch_ClearDownload(WbtSystem *sys);
 
-static WbtMakeMatch *WbtMakeMatch_Create(HeapID heapId, void *record, const WbtMatchParam *param) {
+static WbtMakeMatch *WbtMakeMatch_Create(HeapID heapId, WbtSave *record, const WbtMatchParam *param) {
     WbtMakeMatch *m = GFL_HeapAllocate(HEAPID_TAIL(heapId), sizeof(WbtMakeMatch), FALSE, "wbt_makematch.c", 71);
 
     m->param = param;
@@ -233,7 +237,7 @@ static BOOL WbtMakeMatch_IsEligible(const WbtMatchParam *param, WbtTrainer *trai
     return FALSE;
 }
 
-static void WbtMakeMatch_InitStatus(WbtMakeMatch *m, void *record) {
+static void WbtMakeMatch_InitStatus(WbtMakeMatch *m, WbtSave *record) {
     int i;
 
     MI_CpuFill8(m->status, WBT_STATUS_UNUSED, m->param->trainerCount);

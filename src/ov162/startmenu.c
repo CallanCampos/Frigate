@@ -99,24 +99,28 @@ enum {
 };
 
 // The windows: one with the name of each item, then these
-#define WINDOW_MESSAGE 9
-#define WINDOW_SAVED_GAME 10
-#define WINDOW_PLAYER_NAME 11
-#define WINDOW_LOCATION 12
-#define WINDOW_TIME 13
-#define WINDOW_POKEDEX 14
-#define WINDOW_BADGES 15
-#define WINDOW_KEY_SYSTEM 16
-// The keys that are set, one per window
-#define WINDOW_KEYS 17
+enum {
+    WINDOW_MESSAGE = 9,
+    WINDOW_SAVED_GAME,
+    WINDOW_PLAYER_NAME,
+    WINDOW_LOCATION,
+    WINDOW_TIME,
+    WINDOW_POKEDEX,
+    WINDOW_BADGES,
+    WINDOW_KEY_SYSTEM,
+    // The keys that are set, one per window
+    WINDOW_KEYS,
+};
 #define WINDOW_COUNT 20
 
 // The cell actors: markers of new items, for the items that TrainerGameInfo_GetStartMenuItemFlags tells about, then
 // these
-#define ACTOR_WFC_SETTINGS 4
-#define ACTOR_PLAYER 5
-// Icons of the keys that are set
-#define ACTOR_KEYS 6
+enum {
+    ACTOR_WFC_SETTINGS = 4,
+    ACTOR_PLAYER,
+    // Icons of the keys that are set
+    ACTOR_KEYS,
+};
 #define ACTOR_COUNT 9
 
 // The graphics of the actors
@@ -138,9 +142,11 @@ enum {
 #define SCROLL_HEIGHT 512
 
 // Palettes of the items' screens
-#define ITEM_PALETTE_NORMAL 1
-#define ITEM_PALETTE_SELECTED 2
-#define ITEM_PALETTE_BLINK 3
+enum {
+    ITEM_PALETTE_NORMAL = 1,
+    ITEM_PALETTE_SELECTED,
+    ITEM_PALETTE_BLINK,
+};
 
 typedef struct {
     u16 screenFile;
@@ -192,7 +198,7 @@ typedef struct {
     u16 *itemScreens[ITEM_COUNT];
     // Makes a screen for each item from the window with its name, which BG 1 shows
     BGWinFrame *textScreens;
-    void *unk16C;
+    BlinkPalAnm *unk16C;
     u8 items[ITEM_COUNT];
     u8 cursor;
     u8 selection;
@@ -1132,7 +1138,7 @@ static void StartMenu_InitWindows(StartMenuWork *wk) {
     if (joinAvenue) {
         joinAvenueInfo = JoinAvenue_GetInfo(SaveControl_GetJoinAvenue(wk->save));
         name = GFL_StrBufCreate(64, HEAPID_STARTMENU);
-        GFL_StrBufLoadString(name, (const u16 *)JoinAvenue_GetParam(joinAvenueInfo, 0, 0));
+        GFL_StrBufLoadString(name, (const u16 *)JoinAvenue_GetParam(joinAvenueInfo, JOIN_AVE_INFO_NAME, 0));
         GFL_WordSetSetStrbuf(wk->wordSet, 0, name, 2, 1, 2);
         GFL_StrBufFree(name);
     }

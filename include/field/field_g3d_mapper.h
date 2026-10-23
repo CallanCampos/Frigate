@@ -111,12 +111,12 @@ struct FieldG3DMapper {
     u16 unk4E;
     u32 unk50;
     VecFx32 chunkBasePos;
-    void *mapTextures;
+    G3DResource *mapTextures;
     FieldPropSystem *propSystem;
     FieldTerrainAnimator *terrainAnimator;
-    void *wfbc;
+    FieldWFBC *wfbc;
     ResortMapCreateWork *resortMap;
-    void *heightEx;
+    HeightExList *heightEx;
 };
 
 FieldG3DMapper *FieldG3DMapper_Create(HeapID heapId, u16 season);
@@ -125,11 +125,13 @@ void FieldG3DMapper_UpdateSync(FieldG3DMapper *mapper);
 BOOL FieldG3DMapper_Update(FieldG3DMapper *mapper);
 void FieldG3DMapper_CallAllLoaderUpdate(FieldG3DMapper *mapper);
 // pass is a FIELD_G3D_RENDER_PHASE_
-void FieldG3D_RenderFieldmap(FieldG3DMapper *mapper, void *camera, u32 pass);
-void *func_ov036_02184590(FieldG3DMapper *mapper);
-void FieldG3DMapper_CreateMap(FieldG3DMapper *mapper, const FieldG3DMapperConfig *config, void *colorPostFx);
+void FieldG3D_RenderFieldmap(FieldG3DMapper *mapper, G3DCamera *camera, u32 pass);
+HeightExList *func_ov036_02184590(FieldG3DMapper *mapper);
+void FieldG3DMapper_CreateMap(FieldG3DMapper *mapper, const FieldG3DMapperConfig *config,
+                              FieldColorPostFX *colorPostFx);
 void FieldG3DMapper_FreeMap(FieldG3DMapper *mapper);
-void FieldG3DMapper_LoadMapTextures(FieldG3DMapper *mapper, const FieldG3DMapperConfig *config, void *colorPostFx);
+void FieldG3DMapper_LoadMapTextures(FieldG3DMapper *mapper, const FieldG3DMapperConfig *config,
+                                    FieldColorPostFX *colorPostFx);
 void FieldG3DMapper_FreeMapTextures(FieldG3DMapper *mapper);
 void FieldG3DMapper_SetPlayerPos(FieldG3DMapper *mapper, const VecFx32 *position);
 u32 FieldG3DMapper_GetBasePosChunkHandleIdx(FieldG3DMapper *mapper);
@@ -153,7 +155,7 @@ void func_ov036_021852e0(FieldG3DMapper *mapper, VecFx32 *out);
 FieldPropSystem *FieldG3DMapper_GetBMSystem(FieldG3DMapper *mapper);
 void func_ov036_021852f4(FieldG3DMapper *mapper, CityState *city, BOOL isOther);
 ResortMapCreateWork *func_ov036_02185304(FieldG3DMapper *mapper);
-FieldTerrainAnimator *FieldG3DMapper_CreateTerrainAnimator(u16 chunkCapacity, void *mapTextures,
+FieldTerrainAnimator *FieldG3DMapper_CreateTerrainAnimator(u16 chunkCapacity, G3DResource *mapTextures,
                                                            const FieldTerrainAnmInfo *anmInfo, u32 heapId);
 BOOL FieldChunkContext_HasAnimator(FieldChunkContext *context);
 FieldTerrainSRTAnimatorChunkState *FieldChunkContext_GetSRTAnimatorState(FieldChunkContext *context);

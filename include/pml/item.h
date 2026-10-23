@@ -14,8 +14,10 @@
 // the tables of TMs, mail, berries and balls
 
 // What an item's work holds
-#define ITEM_WORK_VALUE 0
-#define ITEM_WORK_PARAMS 1
+enum {
+    ITEM_WORK_VALUE,
+    ITEM_WORK_PARAMS,
+};
 
 // The effects of an item used on a Pokémon
 typedef struct {
@@ -164,11 +166,13 @@ enum {
 // The files of an item that GetItemGraphicsDatID and PML_ItemReadDataFile give: its data in ARCID_ITEMINFO, its icon's
 // characters and palette in ARCID_ITEMGRA, and the characters and palette of the icon of the Wonder Launcher's
 // items, in ShooterItem_GetIndex's order
-#define ITEM_FILE_DATA 0
-#define ITEM_FILE_ICON_CHAR 1
-#define ITEM_FILE_ICON_PLTT 2
-#define ITEM_FILE_LIST_ICON_CHAR 3
-#define ITEM_FILE_LIST_ICON_PLTT 4
+enum {
+    ITEM_FILE_DATA,
+    ITEM_FILE_ICON_CHAR,
+    ITEM_FILE_ICON_PLTT,
+    ITEM_FILE_LIST_ICON_CHAR,
+    ITEM_FILE_LIST_ICON_PLTT,
+};
 
 u16 GetItemGraphicsDatID(u16 item, u32 type);
 // ARCID_ITEMGRA, and the files of the item icons' cells and animations in it

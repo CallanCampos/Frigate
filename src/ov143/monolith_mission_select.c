@@ -456,7 +456,7 @@ static BOOL MonolithMission_Main(GameProc *proc, u32 *state, void *param, void *
     u32 pressed;
     int hit;
     BOOL yes;
-    FestMission mission;
+    FestMissionConfig mission;
     u16 picked;
     s16 level;
     u8 bootState;
@@ -703,9 +703,9 @@ static void MonolithMission_FreeFestival(MonolithScreenParam *screen, MonolithMi
 }
 
 static void MonolithMission_CreateBGs(void) {
-    GFL_BGSysCreateBG(MONOLITH_MISSION_BG_TEXT, &sMonolithMissionBGSetups[0], 0);
-    GFL_BGSysCreateBG(MONOLITH_MISSION_BG_FRAME, &sMonolithMissionBGSetups[1], 0);
-    GFL_BGSysCreateBG(MONOLITH_MISSION_BG_LIST, &sMonolithMissionBGSetups[2], 0);
+    GFL_BGSysCreateBG(MONOLITH_MISSION_BG_TEXT, &sMonolithMissionBGSetups[0], BGMODE_TEXT);
+    GFL_BGSysCreateBG(MONOLITH_MISSION_BG_FRAME, &sMonolithMissionBGSetups[1], BGMODE_TEXT);
+    GFL_BGSysCreateBG(MONOLITH_MISSION_BG_LIST, &sMonolithMissionBGSetups[2], BGMODE_TEXT);
     GFL_BGSysFillScrArea(MONOLITH_MISSION_BG_TEXT, 0, 0, 0, 32, 32, 17);
     GFL_BGSysFillScrArea(MONOLITH_MISSION_BG_FRAME, 0, 0, 0, 32, 32, 17);
     GFL_BGSysFillScrArea(MONOLITH_MISSION_BG_LIST, 0, 0, 0, 32, 32, 17);
@@ -856,7 +856,7 @@ static void MonolithMission_FreeList(MonolithMissionWork *mfw) {
 static BOOL MonolithMission_DrawList(MonolithMissionWork *mfw, MonolithWork *wk, int count) {
     int drawn = 0;
     StrBuf *str = GFL_StrBufCreate(37, HEAPID_MONOLITH);
-    FestMission mission;
+    FestMissionConfig mission;
     int i;
 
     for (i = mfw->drawnCount; i < mfw->count; i++) {
@@ -880,7 +880,7 @@ static BOOL MonolithMission_DrawList(MonolithMissionWork *mfw, MonolithWork *wk,
 // Draws the cursor's row again, with its mission at a level
 static void MonolithMission_RedrawRow(MonolithMissionWork *mfw, MonolithWork *wk, int level) {
     StrBuf *str;
-    FestMission mission;
+    FestMissionConfig mission;
 
     GFL_BitmapFill(mfw->listBitmaps[mfw->cursor], 0);
     str = GFL_StrBufCreate(37, HEAPID_MONOLITH);
@@ -1491,7 +1491,7 @@ static BOOL MonolithMission_IsAvailable(MonolithScreenParam *screen, MonolithMis
 
 // Reads a mission's record from the save into the list
 static void MonolithMission_LoadRecord(MonolithScreenParam *screen, MonolithMissionWork *mfw, int index, int id) {
-    void *records = FestRecords_GetFromSave(GameData_GetSaveControl(GSYS_GetGameData(screen->param->gsys)));
+    FunfestSave *records = FestRecords_GetFromSave(GameData_GetSaveControl(GSYS_GetGameData(screen->param->gsys)));
 
     mfw->records[index].clearedLevel = FestRecords_GetMissionLevel(records, id);
     if (FestRecords_IsMissionNew(records, id) == TRUE) {
@@ -1616,7 +1616,7 @@ static void MonolithMission_InitIcons(MonolithMissionWork *mfw, BOOL skip) {
 static void MonolithMission_ShowStartMessage(MonolithScreenParam *screen, MonolithMissionWork *mfw) {
     int level = mfw->level;
     StrBuf *str;
-    FestMission mission;
+    FestMissionConfig mission;
 
     if (mfw->flags & MONOLITH_MISSION_FLAG_CHEAT) {
         level = MONOLITH_MISSION_LEVEL_CHEAT;

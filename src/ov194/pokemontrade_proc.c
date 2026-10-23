@@ -252,13 +252,13 @@ static const NetCommand sNetCommands[] = {
 static u8 sHeapMemory[0xc000];
 
 void func_ov194_021b76e0(PokemonTradeWork *wk) {
-    TouchBar_Reset(wk->touchBar, 1);
-    TouchBar_SetIconVisible(wk->touchBar, 1, TRUE);
-    TouchBar_SetIconActive(wk->touchBar, 1, TRUE);
+    TouchBar_Reset(wk->touchBar, TOUCHBAR_ICON_RETURN);
+    TouchBar_SetIconVisible(wk->touchBar, TOUCHBAR_ICON_RETURN, TRUE);
+    TouchBar_SetIconActive(wk->touchBar, TOUCHBAR_ICON_RETURN, TRUE);
 }
 
 static BOOL func_ov194_021b7708(PokemonTradeWork *wk) {
-    void *save = MailBox_GetFromGameData(wk->gameData);
+    MailData *save = MailBox_GetFromGameData(wk->gameData);
     BOOL ret = FALSE;
     if (MailBox_GetFreeSlot(save, 0) == -1) {
         ret = TRUE;
@@ -758,7 +758,7 @@ static void PokemonTrade_WaitFadeOutToEnd(PokemonTradeWork *wk) {
 }
 
 void PokemonTrade_FadeOutToEnd(PokemonTradeWork *wk) {
-    GFL_WipeSet(0, 0, 0, 0, 6, 1, wk->heapId);
+    GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, 0, 6, 1, wk->heapId);
     PokemonTrade_SetState(wk, PokemonTrade_WaitFadeOutToEnd);
 }
 
@@ -938,7 +938,7 @@ static void func_ov194_021b8570(PokemonTradeWork *wk) {
         func_ov194_021b81c8(wk, 0, PokemonTrade_GetPkm(wk, 0));
         func_ov194_021b81c8(wk, 1, PokemonTrade_GetPkm(wk, 1));
         func_ov194_021b7898(wk);
-        GFL_WipeSet(3, 1, 1, 0, 6, 1, wk->heapId);
+        GFL_WipeSet(WIPE_MODE_MAIN, WIPE_TYPE_FADE_IN, WIPE_TYPE_FADE_IN, 0, 6, 1, wk->heapId);
         PokemonTrade_SetState(wk, func_ov194_021b8838);
     }
 }
@@ -984,11 +984,11 @@ static void func_ov194_021b860c(PokemonTradeWork *wk) {
         func_ov194_021b84e0(wk, wk->cursor, TRUE);
     }
     TouchBar_Main(wk->touchBar);
-    if (TouchBar_GetDecided(wk->touchBar) == 1) {
+    if (TouchBar_GetDecided(wk->touchBar) == TOUCHBAR_ICON_RETURN) {
         done = TRUE;
     }
     if (done) {
-        GFL_WipeSet(3, 0, 0, 0, 6, 1, wk->heapId);
+        GFL_WipeSet(WIPE_MODE_MAIN, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, 0, 6, 1, wk->heapId);
         PokemonTrade_SetState(wk, func_ov194_021b8570);
     }
 }
@@ -998,7 +998,7 @@ static void func_ov194_021b8754(PokemonTradeWork *wk) {
         wk->cursor = 0;
         func_ov194_021c0b6c(wk, PokemonTrade_GetPkm(wk, 0));
         func_ov194_021b7898(wk);
-        GFL_WipeSet(3, 1, 1, 0, 6, 1, wk->heapId);
+        GFL_WipeSet(WIPE_MODE_MAIN, WIPE_TYPE_FADE_IN, WIPE_TYPE_FADE_IN, 0, 6, 1, wk->heapId);
         PokemonTrade_SetState(wk, func_ov194_021b860c);
     }
 }
@@ -1014,7 +1014,7 @@ static void func_ov194_021b87b0(PokemonTradeWork *wk) {
             PokemonTrade_SetState(wk, func_ov194_021b84b0);
             break;
         case 1:
-            GFL_WipeSet(3, 0, 0, 0, 6, 1, wk->heapId);
+            GFL_WipeSet(WIPE_MODE_MAIN, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, 0, 6, 1, wk->heapId);
             PokemonTrade_SetState(wk, func_ov194_021b8754);
             break;
         case 2:
@@ -1040,7 +1040,7 @@ static void func_ov194_021b8894(PokemonTradeWork *wk) {
         u32 items[] = { 4, 3, 5 };
         func_ov194_021c0214(wk, items, NELEMS(items));
         GFL_BGSysSetEnabledBGsA(0x1f);
-        TouchBar_SetIconVisible(wk->touchBar, 1, FALSE);
+        TouchBar_SetIconVisible(wk->touchBar, TOUCHBAR_ICON_RETURN, FALSE);
         PokemonTrade_SetState(wk, func_ov194_021b87b0);
     }
 }
@@ -1154,10 +1154,10 @@ static void func_ov194_021b8b6c(PokemonTradeWork *wk) {
 }
 
 static void func_ov194_021b8bb4(PokemonTradeWork *wk) {
-    TouchBar_SetIconVisible(wk->touchBar, 7, FALSE);
-    TouchBar_SetIconVisible(wk->touchBar, 8, FALSE);
-    TouchBar_SetIconVisible(wk->touchBar, 9, FALSE);
-    TouchBar_SetIconVisible(wk->touchBar, 1, FALSE);
+    TouchBar_SetIconVisible(wk->touchBar, TOUCHBAR_ICON_CUSTOM, FALSE);
+    TouchBar_SetIconVisible(wk->touchBar, TOUCHBAR_ICON_CUSTOM + 1, FALSE);
+    TouchBar_SetIconVisible(wk->touchBar, TOUCHBAR_ICON_CUSTOM + 2, FALSE);
+    TouchBar_SetIconVisible(wk->touchBar, TOUCHBAR_ICON_RETURN, FALSE);
     ClActor_SetVisible(wk->actors[2], FALSE);
     func_ov194_021b79cc(wk);
     PokemonTrade_SetState(wk, func_ov194_021b8b6c);
@@ -1330,10 +1330,10 @@ static void func_ov194_021b9058(PokemonTradeWork *wk) {
             func_ov194_021b79e4(wk);
         }
         TouchBar_Main(wk->touchBar);
-        if (TouchBar_GetTouched(wk->touchBar) == 9 && GCTX_HIDIsUsingTouch()) {
+        if (TouchBar_GetTouched(wk->touchBar) == TOUCHBAR_ICON_CUSTOM + 2 && GCTX_HIDIsUsingTouch()) {
             AppTaskMenu_SetCursorActive(wk->menu, FALSE);
         }
-        if (TouchBar_GetDecided(wk->touchBar) == 9) {
+        if (TouchBar_GetDecided(wk->touchBar) == TOUCHBAR_ICON_CUSTOM + 2) {
             selected = TRUE;
             wk->cursor = 1 - wk->cursor;
         }
@@ -1394,17 +1394,17 @@ static void func_ov194_021b9058(PokemonTradeWork *wk) {
                 wk->selectBox = wk->unkF98;
                 PokemonTrade_SetState(wk, func_ov194_021b8bb4);
                 showCursor = FALSE;
-                TouchBar_SetIconVisible(wk->touchBar, 7, FALSE);
-                TouchBar_SetIconVisible(wk->touchBar, 8, FALSE);
-                TouchBar_SetIconVisible(wk->touchBar, 9, FALSE);
+                TouchBar_SetIconVisible(wk->touchBar, TOUCHBAR_ICON_CUSTOM, FALSE);
+                TouchBar_SetIconVisible(wk->touchBar, TOUCHBAR_ICON_CUSTOM + 1, FALSE);
+                TouchBar_SetIconVisible(wk->touchBar, TOUCHBAR_ICON_CUSTOM + 2, FALSE);
             } else if (func_ov194_021bc04c(wk) && !GCTX_HIDIsUsingTouch()) {
                 wk->selectSlot = wk->unkF94;
                 wk->selectBox = wk->unkF98;
                 PokemonTrade_SetState(wk, func_ov194_021b8fbc);
                 showCursor = FALSE;
-                TouchBar_SetIconVisible(wk->touchBar, 7, FALSE);
-                TouchBar_SetIconVisible(wk->touchBar, 8, FALSE);
-                TouchBar_SetIconVisible(wk->touchBar, 9, FALSE);
+                TouchBar_SetIconVisible(wk->touchBar, TOUCHBAR_ICON_CUSTOM, FALSE);
+                TouchBar_SetIconVisible(wk->touchBar, TOUCHBAR_ICON_CUSTOM + 1, FALSE);
+                TouchBar_SetIconVisible(wk->touchBar, TOUCHBAR_ICON_CUSTOM + 2, FALSE);
             } else {
                 wk->selectSlot = wk->unkF94;
                 wk->selectBox = wk->unkF98;
@@ -1442,9 +1442,9 @@ static const TouchRect sSideButtonRects[] = {
 static void func_ov194_021b9394(PokemonTradeWork *wk) {
     PartyPkm *pkm;
     func_ov194_021be554(wk, 0);
-    TouchBar_SetIconVisible(wk->touchBar, 1, FALSE);
-    TouchBar_SetIconVisible(wk->touchBar, 7, FALSE);
-    TouchBar_SetIconVisible(wk->touchBar, 9, TRUE);
+    TouchBar_SetIconVisible(wk->touchBar, TOUCHBAR_ICON_RETURN, FALSE);
+    TouchBar_SetIconVisible(wk->touchBar, TOUCHBAR_ICON_CUSTOM, FALSE);
+    TouchBar_SetIconVisible(wk->touchBar, TOUCHBAR_ICON_CUSTOM + 2, TRUE);
     {
         u32 items[] = { 2, 5 };
         func_ov194_021c0214(wk, items, NELEMS(items));
@@ -1542,7 +1542,7 @@ static void func_ov194_021b95ec(PokemonTradeWork *wk) {
         func_ov194_021ba7d4(wk);
         func_ov194_021ba84c(wk);
     }
-    GFL_WipeSet(0, 1, 1, 0, 6, 1, wk->heapId);
+    GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_IN, WIPE_TYPE_FADE_IN, 0, 6, 1, wk->heapId);
     GFL_BGSysSetEnabledBGsA(0x1f);
     GFL_BGSysSetEnabledBGsB(0x1e);
 }
@@ -1589,7 +1589,7 @@ static void func_ov194_021b9744(PokemonTradeWork *wk) {
 }
 
 static void func_ov194_021b976c(PokemonTradeWork *wk) {
-    GFL_WipeSet(4, 0, 0, 0, 6, 1, wk->heapId);
+    GFL_WipeSet(WIPE_MODE_SUB, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, 0, 6, 1, wk->heapId);
     PokemonTrade_SetState(wk, func_ov194_021b9744);
 }
 
@@ -1683,7 +1683,7 @@ static void func_ov194_021b99b4(PokemonTradeWork *wk) {
     GFL_BGSysSetEnabledBGsA(0x10);
     GFL_BGSysSetEnabledBGsB(4);
     killBrightnessEitherEngine(0);
-    GFL_WipeSet(4, 1, 1, 0, 6, 1, wk->heapId);
+    GFL_WipeSet(WIPE_MODE_SUB, WIPE_TYPE_FADE_IN, WIPE_TYPE_FADE_IN, 0, 6, 1, wk->heapId);
     PokemonTrade_SetState(wk, func_ov194_021b9974);
 }
 
@@ -1945,7 +1945,7 @@ static void func_ov194_021ba058(PokemonTradeWork *wk) {
             GFL_SndSEPlay(SEQ_SE_BEEP);
         }
         TouchBar_Main(wk->touchBar);
-        if (TouchBar_GetDecided(wk->touchBar) == 1) {
+        if (TouchBar_GetDecided(wk->touchBar) == TOUCHBAR_ICON_RETURN) {
             GFL_BGSysSetEnabledBGsB(0x1a);
             wk->unk800 = 0;
             func_ov194_021c4b88(wk);
@@ -1969,12 +1969,12 @@ static void func_ov194_021ba170(PokemonTradeWork *wk) {
 }
 
 static void func_ov194_021ba1b0(PokemonTradeWork *wk) {
-    TouchBar_SetIconActive(wk->touchBar, 7, FALSE);
+    TouchBar_SetIconActive(wk->touchBar, TOUCHBAR_ICON_CUSTOM, FALSE);
     func_ov194_021be554(wk, 0);
     G2x_SetBlendBrightness_(REG_DB_BLDCNT_ADDR, 10, -8);
     func_ov194_021c5fe4(wk, 1);
     if (func_ov194_021bc098(wk)) {
-        TouchBar_SetIconActive(wk->touchBar, 8, FALSE);
+        TouchBar_SetIconActive(wk->touchBar, TOUCHBAR_ICON_CUSTOM + 1, FALSE);
     }
     PokemonTrade_SetState(wk, func_ov194_021ba170);
 }
@@ -2199,7 +2199,7 @@ static void func_ov194_021ba6ec(PokemonTradeWork *wk) {
 static void func_ov194_021ba708(PokemonTradeWork *wk) {
     func_ov194_021bc0f0(wk, wk->unkF98, wk->unkF94);
     if (!PokemonTrade_IsNetwork(wk) || GFL_NetSendCommand(NetHandle_GetOwn(), TRADE_NET_CMD_UNK6, 0, NULL)) {
-        TouchBar_SetIconVisible(wk->touchBar, 8, FALSE);
+        TouchBar_SetIconVisible(wk->touchBar, TOUCHBAR_ICON_CUSTOM + 1, FALSE);
         wk->selectSlot = -1;
         wk->selectBox = -1;
         wk->heldSlot = -1;
@@ -2240,10 +2240,10 @@ static void func_ov194_021ba7d4(PokemonTradeWork *wk) {
 }
 
 static void func_ov194_021ba84c(PokemonTradeWork *wk) {
-    TouchBar_SetIconVisible(wk->touchBar, 8, FALSE);
-    TouchBar_SetIconVisible(wk->touchBar, 7, TRUE);
-    TouchBar_SetIconActive(wk->touchBar, 7, TRUE);
-    TouchBar_SetIconVisible(wk->touchBar, 9, FALSE);
+    TouchBar_SetIconVisible(wk->touchBar, TOUCHBAR_ICON_CUSTOM + 1, FALSE);
+    TouchBar_SetIconVisible(wk->touchBar, TOUCHBAR_ICON_CUSTOM, TRUE);
+    TouchBar_SetIconActive(wk->touchBar, TOUCHBAR_ICON_CUSTOM, TRUE);
+    TouchBar_SetIconVisible(wk->touchBar, TOUCHBAR_ICON_CUSTOM + 2, FALSE);
     func_ov194_021b76e0(wk);
     ClActor_SetVisible(wk->actors[2], TRUE);
     func_ov194_021c3224(wk);
@@ -2256,11 +2256,11 @@ static void func_ov194_021ba84c(PokemonTradeWork *wk) {
 
 static void func_ov194_021ba8c0(PokemonTradeWork *wk) {
     ClActor_SetVisible(wk->actors[2], TRUE);
-    TouchBar_SetIconVisible(wk->touchBar, 8, func_ov194_021bc098(wk));
-    TouchBar_SetIconActive(wk->touchBar, 8, func_ov194_021bc098(wk));
-    TouchBar_SetIconVisible(wk->touchBar, 7, TRUE);
-    TouchBar_SetIconActive(wk->touchBar, 7, TRUE);
-    TouchBar_SetIconVisible(wk->touchBar, 9, FALSE);
+    TouchBar_SetIconVisible(wk->touchBar, TOUCHBAR_ICON_CUSTOM + 1, func_ov194_021bc098(wk));
+    TouchBar_SetIconActive(wk->touchBar, TOUCHBAR_ICON_CUSTOM + 1, func_ov194_021bc098(wk));
+    TouchBar_SetIconVisible(wk->touchBar, TOUCHBAR_ICON_CUSTOM, TRUE);
+    TouchBar_SetIconActive(wk->touchBar, TOUCHBAR_ICON_CUSTOM, TRUE);
+    TouchBar_SetIconVisible(wk->touchBar, TOUCHBAR_ICON_CUSTOM + 2, FALSE);
     func_ov194_021b76e0(wk);
     func_ov194_021b7898(wk);
 }
@@ -2351,7 +2351,7 @@ static BOOL func_ov194_021bab08(PokemonTradeWork *wk) {
     }
     if (pkm != NULL && PML_PkmGetParam(pkm, PKM_PARAM_SPECIES_VALID, NULL)) {
         GFL_SndSEPlay(SEQ_SE_SELECT4);
-        TouchBar_SetIconVisible(wk->touchBar, 8, FALSE);
+        TouchBar_SetIconVisible(wk->touchBar, TOUCHBAR_ICON_CUSTOM + 1, FALSE);
         func_ov194_021c00fc(wk);
         PokemonTrade_SetState(wk, func_ov194_021b9394);
         return TRUE;
@@ -2484,8 +2484,8 @@ static void func_ov194_021babc4(PokemonTradeWork *wk) {
             wk->selectSlot = wk->heldSlot;
             wk->selectBox = wk->heldBox;
             wk->heldIcon = NULL;
-            TouchBar_SetIconVisible(wk->touchBar, 8, TRUE);
-            TouchBar_SetIconActive(wk->touchBar, 8, TRUE);
+            TouchBar_SetIconVisible(wk->touchBar, TOUCHBAR_ICON_CUSTOM + 1, TRUE);
+            TouchBar_SetIconActive(wk->touchBar, TOUCHBAR_ICON_CUSTOM + 1, TRUE);
             func_ov194_021c5348(wk);
             GFL_SndSEPlay(SEQ_SE_SYS_56);
             PokemonTrade_SetState(wk, func_ov194_021baa90);
@@ -2515,9 +2515,9 @@ static void func_ov194_021babc4(PokemonTradeWork *wk) {
     {
         u32 button = TouchBar_GetTouched(wk->touchBar);
         switch (button) {
-        case 1:
-        case 7:
-        case 8:
+        case TOUCHBAR_ICON_RETURN:
+        case TOUCHBAR_ICON_CUSTOM:
+        case TOUCHBAR_ICON_CUSTOM + 1:
             PokemonTrade_SetState(wk, func_ov194_021bb044);
             break;
         }
@@ -2527,26 +2527,26 @@ static void func_ov194_021babc4(PokemonTradeWork *wk) {
 static void func_ov194_021bb044(PokemonTradeWork *wk) {
     TouchBar_Main(wk->touchBar);
     switch (TouchBar_GetDecided(wk->touchBar)) {
-    case 1:
+    case TOUCHBAR_ICON_RETURN:
         PokemonTrade_SetState(wk, func_ov194_021b9eec);
         break;
-    case 7:
+    case TOUCHBAR_ICON_CUSTOM:
         PokemonTrade_SetState(wk, func_ov194_021ba1b0);
         break;
-    case 8:
+    case TOUCHBAR_ICON_CUSTOM + 1:
         if (PokemonTrade_IsNegoType(wk)) {
             if (func_ov194_021bc098(wk)) {
-                TouchBar_SetIconVisible(wk->touchBar, 7, FALSE);
-                TouchBar_SetIconVisible(wk->touchBar, 8, FALSE);
+                TouchBar_SetIconVisible(wk->touchBar, TOUCHBAR_ICON_CUSTOM, FALSE);
+                TouchBar_SetIconVisible(wk->touchBar, TOUCHBAR_ICON_CUSTOM + 1, FALSE);
                 func_ov194_021b79cc(wk);
                 PokemonTrade_SetState(wk, func_ov194_021be380);
                 return;
             }
-            TouchBar_SetIconVisible(wk->touchBar, 7, TRUE);
-            TouchBar_SetIconVisible(wk->touchBar, 8, FALSE);
+            TouchBar_SetIconVisible(wk->touchBar, TOUCHBAR_ICON_CUSTOM, TRUE);
+            TouchBar_SetIconVisible(wk->touchBar, TOUCHBAR_ICON_CUSTOM + 1, FALSE);
         } else if (wk->selectSlot == -1) {
-            TouchBar_SetIconVisible(wk->touchBar, 7, TRUE);
-            TouchBar_SetIconVisible(wk->touchBar, 8, FALSE);
+            TouchBar_SetIconVisible(wk->touchBar, TOUCHBAR_ICON_CUSTOM, TRUE);
+            TouchBar_SetIconVisible(wk->touchBar, TOUCHBAR_ICON_CUSTOM + 1, FALSE);
         } else {
             PokemonTrade_SetState(wk, func_ov194_021b8bb4);
             return;
@@ -2625,8 +2625,8 @@ static void PokemonTrade_VBlank(TCB *tcb, void *data) {
     PokemonTradeWork *wk = data;
     ClActSys_VBlank();
     if (wk->unk1084) {
-        GFL_BGSysMoveBG(7, 0, wk->unk108C);
-        GFL_BGSysMoveBG(5, 0, wk->unk108C);
+        GFL_BGSysMoveBG(7, BG_MOVE_SET_X, wk->unk108C);
+        GFL_BGSysMoveBG(5, BG_MOVE_SET_X, wk->unk108C);
         wk->unk1084 = 0;
     }
 }

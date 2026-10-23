@@ -111,24 +111,8 @@ static const ManualWindowSetup sManualTouchBarWindows[WINDOW_COUNT] = {
 };
 
 static const ManualTouchBarArrow sManualTouchBarArrows[ARROW_COUNT] = {
-    { { 16, 168, 4, 0, 1 },
-      16,
-      40,
-      168,
-      192,
-      12,
-      PAD_BUTTON_L | PAD_KEY_LEFT,
-      SEQ_SE_SELECT1,
-      MANUAL_TOUCHBAR_ICON_PREV },
-    { { 80, 168, 5, 0, 1 },
-      80,
-      104,
-      168,
-      192,
-      13,
-      PAD_BUTTON_R | PAD_KEY_RIGHT,
-      SEQ_SE_SELECT1,
-      MANUAL_TOUCHBAR_ICON_NEXT },
+    { { 16, 168, 4, 0, 1 }, 16, 40, 168, 192, 12, PAD_BUTTON_L | PAD_KEY_LEFT, SEQ_SE_SELECT1, TOUCHBAR_ICON_LEFT },
+    { { 80, 168, 5, 0, 1 }, 80, 104, 168, 192, 13, PAD_BUTTON_R | PAD_KEY_RIGHT, SEQ_SE_SELECT1, TOUCHBAR_ICON_RIGHT },
 };
 
 ManualTouchBar *ManualTouchBar_Create(ManualCommon *common) {
@@ -160,8 +144,8 @@ void ManualTouchBar_Free(ManualTouchBar *bar) {
 }
 
 void ManualTouchBar_Main(ManualTouchBar *bar) {
-    bar->touched = -1;
-    bar->decided = -1;
+    bar->touched = TOUCHBAR_ICON_NONE;
+    bar->decided = TOUCHBAR_ICON_NONE;
     ManualTouchBar_UpdateWindows(bar);
     if (bar->state == STATE_DECIDED) {
         bar->state = STATE_IDLE;
@@ -172,14 +156,14 @@ void ManualTouchBar_Main(ManualTouchBar *bar) {
         if (bar->state == STATE_IDLE) {
             u32 icon = TouchBar_GetTouched(bar->bar);
 
-            if (icon != -1) {
+            if (icon != TOUCHBAR_ICON_NONE) {
                 bar->state = STATE_ICON_TOUCHED;
                 bar->touched = icon;
             }
         } else {
             u32 icon = TouchBar_GetDecided(bar->bar);
 
-            if (icon != -1) {
+            if (icon != TOUCHBAR_ICON_NONE) {
                 bar->state = STATE_DECIDED;
                 bar->decided = icon;
             }
@@ -205,7 +189,7 @@ void ManualTouchBar_SetMode(ManualTouchBar *bar, u32 mode) {
     if (bar->mode != mode) {
         switch (bar->mode) {
         case MANUAL_TOUCHBAR_MODE_TOP:
-            TouchBar_SetIconVisible(bar->bar, MANUAL_TOUCHBAR_ICON_CLOSE, FALSE);
+            TouchBar_SetIconVisible(bar->bar, TOUCHBAR_ICON_CLOSE, FALSE);
             break;
         case MANUAL_TOUCHBAR_MODE_CATEGORY:
             break;
@@ -222,7 +206,7 @@ void ManualTouchBar_SetMode(ManualTouchBar *bar, u32 mode) {
         ManualTouchBar_Reset(bar);
         switch (bar->mode) {
         case MANUAL_TOUCHBAR_MODE_TOP:
-            TouchBar_SetIconVisible(bar->bar, MANUAL_TOUCHBAR_ICON_CLOSE, TRUE);
+            TouchBar_SetIconVisible(bar->bar, TOUCHBAR_ICON_CLOSE, TRUE);
             ManualTouchBar_ClearText(bar);
             break;
         case MANUAL_TOUCHBAR_MODE_CATEGORY:
@@ -277,8 +261,8 @@ static void ManualTouchBar_VBlank(TCB *tcb, void *data) {
 static void ManualTouchBar_CreateBar(ManualTouchBar *bar) {
     TouchBarSetup setup;
     TouchBarItem items[] = {
-        { MANUAL_TOUCHBAR_ICON_RETURN, { 232, 168 } },
-        { MANUAL_TOUCHBAR_ICON_CLOSE, { 200, 168 } },
+        { TOUCHBAR_ICON_RETURN, { 232, 168 } },
+        { TOUCHBAR_ICON_CLOSE, { 200, 168 } },
     };
 
     MI_CpuFill8(&setup, 0, sizeof(TouchBarSetup));
@@ -290,7 +274,7 @@ static void ManualTouchBar_CreateBar(ManualTouchBar *bar) {
     setup.objPalette = 1;
     setup.vramType = CLACT_VRAM_MAIN;
     bar->bar = TouchBar_Create(&setup, bar->common->heapId);
-    TouchBar_SetIconVisible(bar->bar, MANUAL_TOUCHBAR_ICON_CLOSE, FALSE);
+    TouchBar_SetIconVisible(bar->bar, TOUCHBAR_ICON_CLOSE, FALSE);
 }
 
 static void ManualTouchBar_InitBG(ManualTouchBar *bar) {
@@ -479,8 +463,8 @@ static void ManualTouchBar_UpdateArrows(ManualTouchBar *bar) {
 
 static void ManualTouchBar_Reset(ManualTouchBar *bar) {
     bar->state = STATE_IDLE;
-    bar->touched = -1;
-    bar->decided = -1;
+    bar->touched = TOUCHBAR_ICON_NONE;
+    bar->decided = TOUCHBAR_ICON_NONE;
     bar->arrow = ARROW_NONE;
     bar->arrowState = ARROW_STATE_IDLE;
 }

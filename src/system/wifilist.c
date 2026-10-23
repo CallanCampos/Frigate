@@ -14,9 +14,6 @@
 // players traded with, block 0x1f. The file's name is the ROM's; the function names from swan are marked in
 // wifi_list.h, and moveFriend is ours.
 
-#define SAVE_BLOCK_WIFI_LIST 0x1e
-#define SAVE_BLOCK_PAL_PAD 0x1f
-
 // initWifi unloads the field's overlays 12 and 27 to make room for 29 and dwc_rap's 11 while the user data is made
 #define OVERLAY_DWC_RAP OVERLAY_ID(11)
 

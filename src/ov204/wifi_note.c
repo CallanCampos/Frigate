@@ -145,8 +145,10 @@ enum {
 #define FRIEND_LIST_PAGE_COUNT 4
 #define FRIEND_LIST_PAGE_SIZE 8
 // The cursor's positions after a page's friends
-#define FRIEND_LIST_POS_RETURN 8
-#define FRIEND_LIST_POS_EXIT 9
+enum {
+    FRIEND_LIST_POS_RETURN = 8,
+    FRIEND_LIST_POS_EXIT,
+};
 // The roster draws the page shown and, while it scrolls, the one that comes in from a side
 #define FRIEND_LIST_AREA_COUNT 3
 #define FRIEND_LIST_SCROLL_FRAMES 24
@@ -1585,8 +1587,8 @@ static void WifiNoteModeSelect_ExitDraw(WifiNoteModeSelect *select, WifiNoteData
 static void WifiNoteModeSelect_Show(WifiNoteModeSelect *select, WifiNoteData *data, WifiNoteDraw *draw) {
     WifiNoteDraw_PrintTitle(draw, &draw->title, WifiNote_Text_PalPad);
     WifiNote_LoadScreen(2, select->screen);
-    GFL_BGSysMoveBG(2, 0, 0);
-    GFL_BGSysMoveBG(2, 3, 0);
+    GFL_BGSysMoveBG(2, BG_MOVE_SET_X, 0);
+    GFL_BGSysMoveBG(2, BG_MOVE_SET_Y, 0);
     if (data->touch == FALSE) {
         WifiNoteModeSelect_SetCursor(draw, select->cursor);
     } else {
@@ -2302,8 +2304,8 @@ static BOOL WifiNoteFriendList_Scroll(WifiNoteFriendList *list, WifiNoteData *da
     if (list->scrollDir == FRIEND_LIST_SCROLL_PREV) {
         scroll = -scroll;
     }
-    GFL_BGSysMoveBGReq(2, 0, scroll);
-    GFL_BGSysMoveBGReq(3, 0, scroll);
+    GFL_BGSysMoveBGReq(2, BG_MOVE_SET_X, scroll);
+    GFL_BGSysMoveBGReq(3, BG_MOVE_SET_X, scroll);
     pos.x = sWifiNoteSurfaceSetup.x;
     pos.y = sWifiNoteSurfaceSetup.y;
     pos.x += scroll;
@@ -2321,8 +2323,8 @@ static BOOL WifiNoteFriendList_Scroll(WifiNoteFriendList *list, WifiNoteData *da
 
 static BOOL WifiNoteFriendList_ScrollEnd(WifiNoteFriendList *list, WifiNoteDraw *draw) {
     if (PrintQueue_IsEmpty(draw->queue) == TRUE) {
-        GFL_BGSysMoveBGReq(2, 0, 0);
-        GFL_BGSysMoveBGReq(3, 0, 0);
+        GFL_BGSysMoveBGReq(2, BG_MOVE_SET_X, 0);
+        GFL_BGSysMoveBGReq(3, BG_MOVE_SET_X, 0);
         WifiNote_ShowWindow(list->areas[0].nameWindow->window);
         return TRUE;
     }
@@ -2947,8 +2949,8 @@ static BOOL WifiNoteFriendInfo_Main(WifiNoteFriendInfo *info, WifiNoteData *data
         break;
     case FRIEND_INFO_SEQ_SCROLL_END:
         if (PrintQueue_IsEmpty(draw->queue) == TRUE) {
-            GFL_BGSysMoveBGReq(2, 0, 0);
-            GFL_BGSysMoveBGReq(3, 0, 0);
+            GFL_BGSysMoveBGReq(2, BG_MOVE_SET_X, 0);
+            GFL_BGSysMoveBGReq(3, BG_MOVE_SET_X, 0);
             data->seq = FRIEND_INFO_SEQ_MAIN;
         }
         break;
@@ -3114,7 +3116,7 @@ static BOOL WifiNoteFriendInfo_Scroll(WifiNoteFriendInfo *info, WifiNoteData *da
     if (info->scrollDir == 2) {
         scroll = -scroll;
     }
-    GFL_BGSysMoveBG(3, 0, scroll);
+    GFL_BGSysMoveBG(3, BG_MOVE_SET_X, scroll);
     info->scrollCount++;
     return FALSE;
 }

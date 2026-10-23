@@ -12,7 +12,6 @@
 // random matches and the Wi-Fi competition (rndmatch_savedata.c), and the mark of a match in progress. The ROM has no
 // string for the file, so the name is a guess. Block 0x3b.
 
-#define SAVE_BLOCK_RECORD 0x3b
 // A match in progress is over after an hour
 #define MATCH_TIMEOUT_SECONDS (60 * 60)
 
@@ -24,7 +23,7 @@ u32 RecordSave_GetSize(void) {
 
 void RecordSave_Init(RecordSave *record) {
     LiveMatchData_Init(&record->liveMatch);
-    RndMatchData_Init(record->rndMatch);
+    RndMatchData_Init(&record->rndMatch);
     OS_GetMacAddress(record->macAddress);
 }
 
@@ -36,15 +35,15 @@ RecordSave *getRecordBlkAddress(SaveControl *save) {
     return SaveControl_GetBlockPtr(save, SAVE_BLOCK_RECORD);
 }
 
-void *RecordSave_GetRndMatch(RecordSave *record) {
-    return record->rndMatch;
+RndMatchData *RecordSave_GetRndMatch(RecordSave *record) {
+    return &record->rndMatch;
 }
 
-void *RecordSave_GetRndMatchData(RecordSave *record) {
-    return record->rndMatch;
+RndMatchData *RecordSave_GetRndMatchData(RecordSave *record) {
+    return &record->rndMatch;
 }
 
-void *RecordSave_GetLiveMatch(RecordSave *record) {
+LiveMatchData *RecordSave_GetLiveMatch(RecordSave *record) {
     return &record->liveMatch;
 }
 

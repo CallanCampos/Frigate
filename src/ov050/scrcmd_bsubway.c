@@ -1,5 +1,6 @@
 #include "types.h"
 #include "battle/battle_rec_tool.h"
+#include "battle/btl_result.h"
 #include "battle/btl_setup.h"
 #include "battle/regulation.h"
 #include "field/bsubway_scr.h"
@@ -63,7 +64,7 @@ typedef struct {
 typedef struct {
     FieldScriptEnv *env;
     u16 *var;
-    void *window;
+    ListMenuUI *window;
     u32 message;
 } BSubwayMsgEvent;
 
@@ -136,7 +137,7 @@ static u16 BSubway_GetPlayerObjCode(PlayerInfo *info);
 
 BOOL BSubwayCmd_CreateWork(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
-    void *fieldWork = ScriptWork_GetFieldWork(work);
+    ScriptFieldWork *fieldWork = ScriptWork_GetFieldWork(work);
     GameSystem *gsys = ScriptWork_GetGameSystem(work);
     u16 a1 = VM_Read16(vm);
 
@@ -146,7 +147,7 @@ BOOL BSubwayCmd_CreateWork(VM *vm, FieldScriptEnv *env) {
 
 BOOL BSubwayCmd_ClearWork(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
-    void *fieldWork = ScriptWork_GetFieldWork(work);
+    ScriptFieldWork *fieldWork = ScriptWork_GetFieldWork(work);
 
     func_ov033_0217b468(ScriptWork_GetGameSystem(work));
     return FALSE;
@@ -154,7 +155,7 @@ BOOL BSubwayCmd_ClearWork(VM *vm, FieldScriptEnv *env) {
 
 BOOL BSubwayCmd_FreeWork(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
-    void *fieldWork = ScriptWork_GetFieldWork(work);
+    ScriptFieldWork *fieldWork = ScriptWork_GetFieldWork(work);
     GameSystem *gsys = ScriptWork_GetGameSystem(work);
 
     func_ov033_0217b664(gsys, GameData_GetBSubwayScrWork(GSYS_GetGameData(gsys)));
@@ -165,14 +166,14 @@ BOOL BSubwayCmd_Tool(VM *vm, FieldScriptEnv *env) {
     PartyPkm *pkm;
     BOOL result = FALSE;
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
-    void *fieldWork = ScriptWork_GetFieldWork(work);
+    ScriptFieldWork *fieldWork = ScriptWork_GetFieldWork(work);
     GameSystem *gsys = ScriptWork_GetGameSystem(work);
     GameData *gameData = GSYS_GetGameData(gsys);
     SaveControl *save = GameData_GetSaveControl(gameData);
     EventWork *eventWork = GameData_GetEventWork(gameData);
     BSubwayScrWork *bsw = GameData_GetBSubwayScrWork(gameData);
     BSubwayPlayData *playData = SaveControl_GetBlockPtr(save, SAVE_BLOCK_BSUBWAY_PLAY);
-    u32 mode = BSubwayPlayData_GetData(playData, 0, NULL);
+    u32 mode = BSubwayPlayData_GetData(playData, BSUBWAY_PLAY_MODE, NULL);
     BSubwayScoreData *score = SaveControl_GetBlockPtr(save, SAVE_BLOCK_BSUBWAY_SCORE);
     void *data3A = SaveControl_GetBlockPtr(save, SAVE_BLOCK_BSUBWAY_3A);
     Field *field = GSYS_GetField(gsys);
@@ -262,19 +263,19 @@ BOOL BSubwayCmd_Tool(VM *vm, FieldScriptEnv *env) {
         if (sTable701a[param0] == 11) {
             *retWk = TRUE;
         } else {
-            *retWk = BSubwayScoreData_SetFlag(score, sTable701a[param0], 0);
+            *retWk = BSubwayScoreData_SetFlag(score, sTable701a[param0], BSUBWAY_FLAG_GET);
         }
         break;
     case 15:
         if (sTable701a[param0] != 11) {
-            BSubwayScoreData_SetFlag(score, sTable701a[param0], 1);
+            BSubwayScoreData_SetFlag(score, sTable701a[param0], BSUBWAY_FLAG_SET);
         }
         break;
     case 16:
-        *retWk = BSubwayScoreData_SetFlag(score, 10, 0);
+        *retWk = BSubwayScoreData_SetFlag(score, 10, BSUBWAY_FLAG_GET);
         break;
     case 17:
-        BSubwayScoreData_SetFlag(score, 10, 1);
+        BSubwayScoreData_SetFlag(score, 10, BSUBWAY_FLAG_SET);
         break;
     case 18:
         FieldGimmickBSubway_StartTrainEffect(field, sTable706c[param0], &sTable7054[param1]);
@@ -286,7 +287,7 @@ BOOL BSubwayCmd_Tool(VM *vm, FieldScriptEnv *env) {
         func_ov036_021c65e8(FieldGimmickBSubway_GetTrainEffect(field), param0);
         break;
     case 21:
-        *retWk = BSubwayPlayData_GetData(playData, 0, NULL);
+        *retWk = BSubwayPlayData_GetData(playData, BSUBWAY_PLAY_MODE, NULL);
         break;
     case 22:
         *retWk = FALSE;
@@ -443,20 +444,20 @@ BOOL BSubwayCmd_Tool(VM *vm, FieldScriptEnv *env) {
         u16 index = BSubway_GetZonePlayMode(field);
         const VecFx32 *pos = &sWarpPositions[index];
 
-        CreateZoneChangeData(&spawn, sWarpZones[index], 4, pos->x, pos->y, pos->z);
+        CreateZoneChangeData(&spawn, sWarpZones[index], WARP_DIR_RIGHT, pos->x, pos->y, pos->z);
         GameData_SetNextZone(gameData, &spawn);
         EventWork_FlagSet(eventWork, FLAG_BSUBWAY_ON_TRAIN);
         break;
     }
     case 100:
         if (param0 == 0) {
-            BSubwayScoreData_SetFlag(score, 1, 2);
+            BSubwayScoreData_SetFlag(score, 1, BSUBWAY_FLAG_RESET);
         } else {
-            BSubwayScoreData_SetFlag(score, 1, 1);
+            BSubwayScoreData_SetFlag(score, 1, BSUBWAY_FLAG_SET);
         }
         break;
     case 101:
-        *retWk = BSubwayScoreData_SetFlag(score, 1, 0);
+        *retWk = BSubwayScoreData_SetFlag(score, 1, BSUBWAY_FLAG_GET);
         break;
     case 103:
         args.mode = 0;
@@ -488,11 +489,11 @@ BOOL BSubwayCmd_Tool(VM *vm, FieldScriptEnv *env) {
     case 108: {
         u8 value = param0;
 
-        BSubwayPlayData_SetData(playData, 11, &value);
+        BSubwayPlayData_SetData(playData, BSUBWAY_PLAY_UNK0_10, &value);
         break;
     }
     case 109:
-        *retWk = BSubwayPlayData_GetData(playData, 11, NULL);
+        *retWk = BSubwayPlayData_GetData(playData, BSUBWAY_PLAY_UNK0_10, NULL);
         break;
     case 110:
         *retWk = BSubwayWifiData_HasLeaders(data3A);
@@ -518,13 +519,13 @@ BOOL BSubwayCmd_Tool(VM *vm, FieldScriptEnv *env) {
             ZoneSpawnInfo spawn;
             const VecFx32 *pos = &sWarpPositions[mode];
 
-            CreateZoneChangeData(&spawn, sWarpZones[mode], 4, pos->x, pos->y, pos->z);
+            CreateZoneChangeData(&spawn, sWarpZones[mode], WARP_DIR_RIGHT, pos->x, pos->y, pos->z);
             GameData_SetNextZone(gameData, &spawn);
             EventWork_FlagSet(eventWork, FLAG_BSUBWAY_ON_TRAIN);
         }
         break;
     case 300: {
-        u8 value = BSubwayPlayData_GetData(playData, 10, NULL);
+        u8 value = BSubwayPlayData_GetData(playData, BSUBWAY_PLAY_UNK0_9, NULL);
 
         ScriptWork_CallEvent(work, EventBSubwayPokeSelect_Create(bsw, gsys, value));
         result = TRUE;
@@ -603,7 +604,7 @@ BOOL BSubwayCmd_Tool(VM *vm, FieldScriptEnv *env) {
     case 324: {
         u8 value = param0;
 
-        BSubwayPlayData_SetData(playData, 10, &value);
+        BSubwayPlayData_SetData(playData, BSUBWAY_PLAY_UNK0_9, &value);
         break;
     }
     case 325:
@@ -628,7 +629,7 @@ BOOL BSubwayCmd_Tool(VM *vm, FieldScriptEnv *env) {
     case 332:
         if (bsw->btlSetup == NULL) {
             *retWk = 0;
-        } else if (bsw->btlSetup->unkA8 == 1) {
+        } else if (bsw->btlSetup->result == BTL_RESULT_VICTORY) {
             *retWk = 1;
         } else {
             *retWk = 0;
@@ -675,7 +676,7 @@ BOOL BSubwayCmd_Tool(VM *vm, FieldScriptEnv *env) {
         u32 check;
 
         *retWk = 0;
-        useBattleBox = BSubwayPlayData_GetData(playData, 10, NULL);
+        useBattleBox = BSubwayPlayData_GetData(playData, BSUBWAY_PLAY_UNK0_9, NULL);
         regulation = PokeRegulation_LoadNew(BSubway_GetModeRegulation(mode), HEAPID_GAMEEVENT);
         if (useBattleBox == TRUE) {
             party = convertBoxedPokeSetToParty(getBattleBox(save), HEAPID_GAMEEVENT);
@@ -813,7 +814,7 @@ BOOL BSubwayCmd_Tool(VM *vm, FieldScriptEnv *env) {
         *retWk = bsw->unkC_12;
         break;
     case 356:
-        *retWk = BSubwayPlayData_GetData(playData, 10, NULL);
+        *retWk = BSubwayPlayData_GetData(playData, BSUBWAY_PLAY_UNK0_9, NULL);
         break;
     case 357:
         BSubwayPlayData_IncRound(playData);
@@ -976,12 +977,12 @@ static BOOL ScriptNative_BSubwayTimingWait(VM *vm, void *env) {
 
 static BOOL ScriptNative_BSubwayParentEntryMenuWait(VM *vm, void *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
-    void *fieldWork = ScriptWork_GetFieldWork(work);
+    ScriptFieldWork *fieldWork = ScriptWork_GetFieldWork(work);
     GameData *gameData = GSYS_GetGameData(ScriptWork_GetGameSystem(work));
     SaveControl *save = GameData_GetSaveControl(gameData);
     EventWork *eventWork = GameData_GetEventWork(gameData);
     BSubwayScrWork *bsw = GameData_GetBSubwayScrWork(gameData);
-    u32 mode = BSubwayPlayData_GetData(SaveControl_GetBlockPtr(save, SAVE_BLOCK_BSUBWAY_PLAY), 0, NULL);
+    u32 mode = BSubwayPlayData_GetData(SaveControl_GetBlockPtr(save, SAVE_BLOCK_BSUBWAY_PLAY), BSUBWAY_PLAY_MODE, NULL);
     BSubwayScoreData *score = SaveControl_GetBlockPtr(save, SAVE_BLOCK_BSUBWAY_SCORE);
     u32 answer = CommEntryMenu_Update(bsw->entryMenu);
 
@@ -1006,12 +1007,12 @@ static BOOL ScriptNative_BSubwayParentEntryMenuWait(VM *vm, void *env) {
 
 static BOOL ScriptNative_BSubwayChildEntryMenuWait(VM *vm, void *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
-    void *fieldWork = ScriptWork_GetFieldWork(work);
+    ScriptFieldWork *fieldWork = ScriptWork_GetFieldWork(work);
     GameData *gameData = GSYS_GetGameData(ScriptWork_GetGameSystem(work));
     SaveControl *save = GameData_GetSaveControl(gameData);
     EventWork *eventWork = GameData_GetEventWork(gameData);
     BSubwayScrWork *bsw = GameData_GetBSubwayScrWork(gameData);
-    u32 mode = BSubwayPlayData_GetData(SaveControl_GetBlockPtr(save, SAVE_BLOCK_BSUBWAY_PLAY), 0, NULL);
+    u32 mode = BSubwayPlayData_GetData(SaveControl_GetBlockPtr(save, SAVE_BLOCK_BSUBWAY_PLAY), BSUBWAY_PLAY_MODE, NULL);
     BSubwayScoreData *score = SaveControl_GetBlockPtr(save, SAVE_BLOCK_BSUBWAY_SCORE);
     u32 answer = CommEntryMenu_Update(bsw->entryMenu);
 

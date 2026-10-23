@@ -187,8 +187,8 @@ static BOOL MonolithRecord_Exit(GameProc *proc, u32 *state, void *param, void *w
 }
 
 static void MonolithRecord_CreateBGs(void) {
-    GFL_BGSysCreateBG(MONOLITH_RECORD_BG_TEXT, &sMonolithRecordBGSetups[0], 0);
-    GFL_BGSysCreateBG(MONOLITH_RECORD_BG, &sMonolithRecordBGSetups[1], 0);
+    GFL_BGSysCreateBG(MONOLITH_RECORD_BG_TEXT, &sMonolithRecordBGSetups[0], BGMODE_TEXT);
+    GFL_BGSysCreateBG(MONOLITH_RECORD_BG, &sMonolithRecordBGSetups[1], BGMODE_TEXT);
     GFL_BGSysFillScrArea(MONOLITH_RECORD_BG_TEXT, 0, 0, 0, 32, 32, 17);
     GFL_BGSysFillScrArea(MONOLITH_RECORD_BG, 0, 0, 0, 32, 32, 17);
 }
@@ -242,7 +242,7 @@ static void MonolithRecord_FreeWindows(MonolithRecordWork *rw) {
 }
 
 static void MonolithRecord_Draw(MonolithScreenParam *screen, MonolithWork *wk, MonolithRecordWork *rw) {
-    void *records;
+    FunfestSave *records;
     StrBuf *str;
     StrBuf *expanded;
     u32 value;

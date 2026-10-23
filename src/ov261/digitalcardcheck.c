@@ -106,8 +106,8 @@ BOOL DigitalCardCheck_IsFinished(DigitalCardCheck *check) {
 
 static void DigitalCardCheck_TaskStart(WifiBattleMatchTask *task, u32 *seq, void *work) {
     DigitalCardCheck *check = work;
-    void *entry = TournamentBlock_GetEntry(getTournamentBlockAddress(GameData_GetSaveControl(check->param.gameData)),
-                                           check->param.mode);
+    TournamentEntry *entry = TournamentBlock_GetEntry(
+        getTournamentBlockAddress(GameData_GetSaveControl(check->param.gameData)), check->param.mode);
     u32 field2 = TournamentEntry_GetField(entry, TOURNAMENT_FIELD_CUP_ID);
     u32 cardType = TournamentEntry_GetField(entry, TOURNAMENT_FIELD_UNK15B);
 
@@ -130,7 +130,7 @@ static void DigitalCardCheck_TaskCardType1(WifiBattleMatchTask *task, u32 *seq, 
     DigitalCardCheck *check = work;
     SaveControl *save;
     BattleBoxSave *box;
-    void *entry;
+    TournamentEntry *entry;
     s32 choice;
     int result;
 
@@ -266,7 +266,7 @@ static void DigitalCardCheck_TaskCardType2(WifiBattleMatchTask *task, u32 *seq, 
     DigitalCardCheck *check = work;
     SaveControl *save;
     BattleBoxSave *box;
-    void *entry;
+    TournamentEntry *entry;
     s32 choice;
     int result;
 
@@ -594,9 +594,9 @@ static void DigitalCardCheck_TaskEnd(WifiBattleMatchTask *task, u32 *seq, void *
 
 static void DigitalCardCheck_CreateCard(DigitalCardCheck *check) {
     SaveControl *save;
-    void *tournament;
-    void *entry;
-    void *cardData;
+    TournamentBlock *tournament;
+    TournamentEntry *entry;
+    TournamentTeam *cardData;
     Regulation *regulation;
     RecordSave *record;
     PlayerInfo *playerInfo;
@@ -615,15 +615,15 @@ static void DigitalCardCheck_CreateCard(DigitalCardCheck *check) {
     link = WifiBattleMatchGraphic_GetClActUnit(check->param.net);
     if (check->param.mode == DIGITAL_CARD_CHECK_WIFI) {
         WifiBattleMatchWifiCardInfo info;
-        void *results;
+        RndMatchData *results;
         u32 first;
 
         MI_CpuFill8(&info, 0, sizeof(WifiBattleMatchWifiCardInfo));
         MI_CpuCopy8(TournamentEntry_GetCardData(entry), &info, 0x92);
         results = RecordSave_GetRndMatch(record);
-        info.unkA0 = RndMatchData_GetParam(results, 10, 0);
-        first = RndMatchData_GetParam(results, 10, 1);
-        info.unkA4 = first + RndMatchData_GetParam(results, 10, 2);
+        info.unkA0 = RndMatchData_GetParam(results, RNDMATCH_RECORD_COMPETITION, RNDMATCH_FIELD_RATING);
+        first = RndMatchData_GetParam(results, RNDMATCH_RECORD_COMPETITION, RNDMATCH_FIELD_WIN);
+        info.unkA4 = first + RndMatchData_GetParam(results, RNDMATCH_RECORD_COMPETITION, RNDMATCH_FIELD_LOSE);
         info.look = PlayerInfo_GetUnionView(playerInfo);
         info.startDate = DigitalCardCheck_PackBytes(TournamentEntry_GetField(entry, TOURNAMENT_FIELD_START_YEAR),
                                                     TournamentEntry_GetField(entry, TOURNAMENT_FIELD_START_MONTH),
@@ -637,14 +637,14 @@ static void DigitalCardCheck_CreateCard(DigitalCardCheck *check) {
                                                      1, check->heapId);
     } else {
         WifiBattleMatchLiveCardInfo info;
-        void *results;
+        LiveMatchData *results;
 
         MI_CpuFill8(&info, 0, sizeof(WifiBattleMatchLiveCardInfo));
         MI_CpuCopy8(TournamentEntry_GetCardData(entry), &info, 0x92);
         results = RecordSave_GetLiveMatch(record);
-        info.unkA0 = LiveMatchData_GetCount(results, 1);
-        info.unkA2 = LiveMatchData_GetCount(results, 2);
-        info.unkA4 = LiveMatchData_GetCount(results, 0);
+        info.unkA0 = LiveMatchData_GetCount(results, LIVEMATCH_COUNT_WON);
+        info.unkA2 = LiveMatchData_GetCount(results, LIVEMATCH_COUNT_LOST);
+        info.unkA4 = LiveMatchData_GetCount(results, LIVEMATCH_COUNT_PLAYED);
         info.unkA6 = Regulation_GetParam(regulation, REGULATION_PARAM_MAX_BATTLES);
         info.look = PlayerInfo_GetUnionView(playerInfo);
         info.startDate = DigitalCardCheck_PackBytes(TournamentEntry_GetField(entry, TOURNAMENT_FIELD_START_YEAR),

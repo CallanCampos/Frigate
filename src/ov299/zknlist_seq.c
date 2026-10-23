@@ -174,32 +174,32 @@ static int ZknListSeq_List(ZknListWork *wk) {
     u32 ret = FrameList_Main(wk->frameList);
 
     switch (ret) {
-    case -12:
+    case FRAMELIST_CURSOR_SHOWN:
         break;
-    case -11:
-    case -10:
-    case -9:
-    case -8:
+    case FRAMELIST_CURSOR_MOVE:
+    case FRAMELIST_SCROLL:
+    case FRAMELIST_BAR:
+    case FRAMELIST_DRAG:
         ZknListObj_SetPageButtons(wk, FALSE);
         break;
-    case -7:
+    case FRAMELIST_PAGE_UP:
         ZknListObj_SetAnm(wk, ZKNLIST_OBJ_PAGE_UP, 12);
         wk->buttonId = ZKNLIST_OBJ_PAGE_UP;
         wk->subSeq = 0;
         seq = SEQ_LIST_SCROLL;
         break;
-    case -6:
+    case FRAMELIST_PAGE_DOWN:
         ZknListObj_SetAnm(wk, ZKNLIST_OBJ_PAGE_DOWN, 13);
         wk->buttonId = ZKNLIST_OBJ_PAGE_DOWN;
         wk->subSeq = 0;
         seq = SEQ_LIST_SCROLL;
         break;
-    case -5:
+    case FRAMELIST_CURSOR_TOP:
         return ZknListSeq_SetButtonAnm(wk, ZKNLIST_OBJ_PAGE_UP, 12, seq);
-    case -4:
+    case FRAMELIST_CURSOR_BOTTOM:
         return ZknListSeq_SetButtonAnm(wk, ZKNLIST_OBJ_PAGE_DOWN, 13, seq);
-    case -3:
-    case -2:
+    case FRAMELIST_JUMP_TOP:
+    case FRAMELIST_JUMP_BOTTOM:
         ZknListObj_HideSavedIcons(wk);
         wk->buttonId = BUTTON_NONE;
         wk->subSeq = 1;

@@ -30,11 +30,6 @@
 
 // The pass power whose script gets 16 in place of its effect
 #define PASS_POWER_027 0x27
-// The effects of the pass powers that act at once
-#define PASS_POWER_EFFECT_HP_RESTORE 5
-#define PASS_POWER_EFFECT_PP_RESTORE 6
-// The pass powers in use have one of these effects each
-#define PASS_POWER_EFFECT_COUNT 16
 
 typedef struct {
     u32 unk00;
@@ -49,14 +44,14 @@ typedef struct {
     GameSystem *gsys;
     GameData *gameData;
     Field *field;
-    void *msgBGSys;
-    void *listWindow;
+    FieldMsgBG *msgBGSys;
+    MoneyWin *listWindow;
     MMSys *actorSystem;
-    void *msgWindow;
+    FieldMsgWin *msgWindow;
     u32 unk24;
     MsgData *msgData;
     WordSet *wordSet;
-    void *passPowerData;
+    PassPowerData *passPowerData;
     StrBuf *strbuf;
     StrBuf *formatted;
 } PassPowerListWork;
@@ -75,7 +70,7 @@ GameEvent *EventPassPowerActivate_Create(GameSystem *gsys, void *args) {
     GameEvent *event;
     ScriptWork *work;
     GameData *gameData;
-    void *data;
+    PassPowerData *data;
     u32 passPower;
     u32 effect;
 

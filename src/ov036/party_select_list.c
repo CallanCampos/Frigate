@@ -47,11 +47,11 @@ struct PartySelectList {
     u16 itemCells;
     u16 itemChars;
     WordSet *wordSet;
-    void *msgBGSys;
+    FieldMsgBG *msgBGSys;
     MsgData *msgData;
     ListMenuUI *list;
-    void *infoWin;
-    void *moneyWin;
+    FieldMsgWin *infoWin;
+    MoneyWin *moneyWin;
     Font *font;
     int cursor;
     u8 state;
@@ -108,7 +108,8 @@ static const ListMenuRequest sPartySelectRequest = {
     .height = 6,
 };
 
-void *func_ov036_021c3180(Field *field, PokeParty *temoti, PokeParty *bbox, u8 partyOk, u32 bboxOk, HeapID heapId) {
+PartySelectList *func_ov036_021c3180(Field *field, PokeParty *temoti, PokeParty *bbox, u8 partyOk, u32 bboxOk,
+                                     HeapID heapId) {
     PartySelectList *psl;
 
     // clang-format off
@@ -446,7 +447,7 @@ static void PartySelectList_ShowItemIcons(PartySelectList *psl, u32 mode) {
 }
 
 static void PartySelectList_CreateMessages(PartySelectList *psl) {
-    void *msgBGSys = Field_GetMsgBGSys(psl->field);
+    FieldMsgBG *msgBGSys = Field_GetMsgBGSys(psl->field);
 
     psl->msgData = func_ov036_021879a0(msgBGSys, TEXT_BANK_0104);
     psl->msgBGSys = msgBGSys;

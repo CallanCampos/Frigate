@@ -9,9 +9,9 @@
 // gimmick sets them up when such a mission starts, and it and overlay 73 (rival_select.c) check whether the mission
 // is one. No string names the file; the name is a guess.
 
-// Picks the mission's hollows into the festival's entries (LinkFestival_GetEntries)
-void FesMissionHollow_Setup(RivalSelectContext *context);
+// Picks the mission's hollows into the festival's entries (LinkFestival_GetMissionWork)
+void FesMissionHollow_Setup(FesGimmick *gimmick);
 // Whether the current mission is a hollow mission (target 5 with a person set)
-BOOL FesMissionHollow_IsActive(RivalSelectContext *context);
+BOOL FesMissionHollow_IsActive(FesGimmick *gimmick);
 
 #endif // POKEBW2_FIELD_FEST_MISSION_HOLLOW_H

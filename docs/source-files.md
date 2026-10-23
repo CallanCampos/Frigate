@@ -1853,7 +1853,7 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 | `dwc_util_sub_screen.c` | `0x021b8154`–`0x021b8834` | 18 | complete | descriptive |
 | `dwc_util_usb_scan.c` | `0x021b8834`–`0x021b8cf0` | 8 | partial | descriptive |
 | `dwc_util_dialog.c` | `0x021b8cf0`–`0x021b93e8` | 15 | complete | descriptive |
-| `download_play.c` | `0x021b93e8`–`0x021b9bbc` | 19 | partial | descriptive |
+| `download_play.c` | `0x021b93e8`–`0x021b9bbc` | 19 | complete | descriptive |
 | `dwc_util_rom_resource.c` | `0x021bb18c`–`0x021bb480` | 9 | complete | descriptive |
 | `dwc_util_oam.c` | `0x021bb480`–`0x021bb8dc` | 11 | partial | descriptive |
 | `dwc_util_cell.c` | `0x021bb8dc`–`0x021bba6c` | 10 | complete | descriptive |

@@ -163,7 +163,7 @@ static int DWCRapCommon_Init(HeapID heapId) {
     return result;
 }
 
-void DWCRapCommon_ResetUserData(void *userData) {
+void DWCRapCommon_ResetUserData(DWCUserData *userData) {
     MIi_CpuClearFast(0, userData, 0x40);
     if (!DWC_CheckUserData(userData)) {
         DWC_CreateUserData(userData);
@@ -191,7 +191,7 @@ int DWCRapCommon_CheckError(u32 a0, u32 a1) {
                     DWCRapCommon_ShutdownLibrary();
                     GFL_NetErrShowScreen();
                     GFL_NetErrClear();
-                    return 1;
+                    return DWCRAP_RESULT_DISCONNECTED;
                 }
                 DWC_ClearError();
                 // fall through
@@ -200,13 +200,13 @@ int DWCRapCommon_CheckError(u32 a0, u32 a1) {
             case 5:
                 GFL_NetErrMarkShown();
                 GFL_NetErrRecordWifi(13);
-                return 2;
+                return DWCRAP_RESULT_FAILED;
             case 6:
                 GFL_NetErrMarkShown();
-                return 2;
+                return DWCRAP_RESULT_FAILED;
             case 7:
                 GFL_NetErrShowWifi(15);
-                return 3;
+                return DWCRAP_RESULT_NET_ERROR;
             }
         }
 
@@ -218,30 +218,30 @@ int DWCRapCommon_CheckError(u32 a0, u32 a1) {
                 NetState_WifiDisconnect(TRUE);
                 GFL_NetErrShowScreen();
                 GFL_NetErrClear();
-                return 4;
+                return DWCRAP_RESULT_TIMEOUT;
             }
             NetState_ClearWifiError();
             GFL_NetErrClear();
             NetState_ClearError();
             NetState_WifiDisconnect(TRUE);
-            return 0;
+            return DWCRAP_RESULT_OK;
         }
         if (type == 0x3f2 || type == 0x3f3 || type == 0x3f4 || type == 0x3f6) {
             if (a0 == 0) {
                 DWCRapCommon_ShutdownLibrary();
                 GFL_NetErrShowScreen();
                 GFL_NetErrClear();
-                return 1;
+                return DWCRAP_RESULT_DISCONNECTED;
             }
             GFL_NetErrMarkShown();
             GFL_NetErrRecordWifi(13);
-            return 2;
+            return DWCRAP_RESULT_FAILED;
         }
         if (type == 0x3ee || type == 0x3f7 || type == 0x3f5) {
             GFL_NetErrMarkShown();
             GFL_NetErrRecordWifi(13);
-            return 2;
+            return DWCRAP_RESULT_FAILED;
         }
     }
-    return 0;
+    return DWCRAP_RESULT_OK;
 }

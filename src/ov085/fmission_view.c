@@ -64,12 +64,6 @@ enum {
     SCROLL_NONE = 3,
 };
 
-// The kinds of a log entry that the view tells apart
-#define LOG_KIND_START 1
-#define LOG_KIND_JOIN 2
-#define LOG_KIND_PASS_POWER 15
-#define LOG_KIND_WORDS 45
-
 // Where a panel's parts are, from its corner
 #define PANEL_MARK_X 16
 #define PANEL_MARK_Y 0
@@ -585,7 +579,7 @@ static BOOL FMissionView_AddNewEntry(FMissionView *view) {
         FMissionView_SetButtonState(view, FMISSION_VIEW_BUTTON_ALL, FMISSION_VIEW_BUTTON_STATE_DISABLED);
         kind = FMissionLogEntryFV_GetKind(view->newEntry);
         switch (kind) {
-        case LOG_KIND_WORDS:
+        case LOG_KIND_TEXT:
             se = sFMissionViewWordsSE[FMissionLogEntryFV_GetValue(view->newEntry) % NELEMS(sFMissionViewWordsSE)];
             break;
         case LOG_KIND_JOIN:
@@ -701,7 +695,7 @@ static void FMissionView_PrintMessage(FMissionView *view, StrBuf *strbuf, int *p
 static void FMissionView_DrawMission(FMissionView *view) {
     int x;
 
-    FestMission_GetMessage(view->festText, view->message, (const FestMission *)view->config, view->tmpHeapId);
+    FestMission_GetMessage(view->festText, view->message, view->config, view->tmpHeapId);
     x = (184 - (int)GFL_FontGetBlockWidth(view->message, view->font, 0)) / 2;
     BeaconViewWin_Print(&view->wins[FMISSION_VIEW_WIN_MISSION].win, view->message, (u8)x, 4, 13, PRINT_COLOR(1, 2, 13),
                         NULL, view->printNow);
@@ -828,7 +822,7 @@ static void FMissionView_LoadPanelIcon(FMissionView *view, FMissionViewPanel *pa
 // The animation of the frame of an entry: 2 for a player's words, 1 for what counts, 0 for the rest
 static int FMissionView_GetEntryFrame(FMissionView *view, u32 kind, u32 value) {
     switch (kind) {
-    case LOG_KIND_WORDS:
+    case LOG_KIND_TEXT:
         return 2;
     case LOG_KIND_START:
     case LOG_KIND_JOIN:

@@ -358,17 +358,24 @@ static void PrintQueue_PrintOrDraw(PrintQueue *queue, TextRenderer *renderer, co
     }
 }
 
+// The renderer's address is held as an integer and cast back at each call, as BW1's version (another decomp) holds it
 void GFL_TextRendererDrawToBitmap(GFLBitmap *bitmap, s16 x, s16 y, const StrBuf *strbuf, Font *font) {
+    uptr rendererAddress;
+
     GFL_StrBufGetStringPtr(strbuf);
-    GFL_TextRndBind(&g_TextRenderer, font, bitmap, x, y);
-    GFL_TextRndDrawStrBuf(&g_TextRenderer, strbuf);
+    rendererAddress = (uptr)&g_TextRenderer;
+    GFL_TextRndBind((TextRenderer *)rendererAddress, font, bitmap, x, y);
+    GFL_TextRndDrawStrBuf((TextRenderer *)rendererAddress, strbuf);
 }
 
 void GFL_TextRendererDrawToBitmapEx(GFLBitmap *bitmap, s16 x, s16 y, const StrBuf *strbuf, Font *font, u16 color) {
+    uptr rendererAddress;
+
     GFL_StrBufGetStringPtr(strbuf);
-    GFL_TextRndBind(&g_TextRenderer, font, bitmap, x, y);
-    GFL_TextRndSetDefaultColor(&g_TextRenderer, color);
-    GFL_TextRndDrawStrBuf(&g_TextRenderer, strbuf);
+    rendererAddress = (uptr)&g_TextRenderer;
+    GFL_TextRndBind((TextRenderer *)rendererAddress, font, bitmap, x, y);
+    GFL_TextRndSetDefaultColor((TextRenderer *)rendererAddress, color);
+    GFL_TextRndDrawStrBuf((TextRenderer *)rendererAddress, strbuf);
 }
 
 static void GFL_TextRndBind(TextRenderer *renderer, Font *font, GFLBitmap *bitmap, s16 x, s16 y) {

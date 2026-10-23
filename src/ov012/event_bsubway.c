@@ -19,6 +19,7 @@
 #include "field/field_camera.h"
 #include "field/field_event.h"
 #include "field/field_msgbg.h"
+#include "field/scrcmd_msg.h"
 #include "gfl/heap.h"
 #include "gfl/key.h"
 #include "gfl/msg.h"
@@ -58,7 +59,7 @@ typedef struct {
     GameSystem *gsys;
     u32 unk04;
     VecFx32 pos;
-    void *msgWin;
+    ActorMsgWin *msgWin;
     StrBuf *strbuf;
     u16 actorId;
     u8 unk1E[0xca];
@@ -99,7 +100,7 @@ typedef struct {
     GameSystem *gsys;
     u32 unk04;
     VecFx32 pos;
-    void *msgWin;
+    ActorMsgWin *msgWin;
     StrBuf *strbuf;
 } BSubwayLeaderMsgData;
 
@@ -252,7 +253,7 @@ static GameEventReturnCode EventBSubwayTrainerMsg_Callback(GameEvent *event, u32
 GameEvent *EventBSubwayTrainerMsg_Create(BSubwayScrWork *bsw, GameSystem *gsys, int index, u16 actorId, u8 winPos) {
     GameEvent *event;
     GameData *gameData;
-    void *msgBGSys;
+    FieldMsgBG *msgBGSys;
     Field *field;
     BSubwayTrainerMsgData *data;
     PMSData *message;
@@ -510,7 +511,7 @@ static GameEventReturnCode EventBSubwayLeaderMsg_Callback(GameEvent *event, u32 
 GameEvent *EventBSubwayLeaderMsg_Create(GameSystem *gsys, u16 index, u16 actorId) {
     GameData *gameData = GSYS_GetGameData(gsys);
     Field *field = GSYS_GetField(gsys);
-    void *msgBGSys = Field_GetMsgBGSys(field);
+    FieldMsgBG *msgBGSys = Field_GetMsgBGSys(field);
     GameEvent *event = GameEvent_Create(gsys, NULL, EventBSubwayLeaderMsg_Callback, sizeof(BSubwayLeaderMsgData));
     BSubwayLeaderMsgData *data = GameEvent_GetData(event);
     MMSys *actorSystem;

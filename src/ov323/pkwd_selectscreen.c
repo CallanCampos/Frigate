@@ -85,13 +85,6 @@ enum {
     MENU_YES_NO,
 };
 
-// The touch bar's icons that the screen uses
-enum {
-    ICON_RETURN = 1,
-    ICON_PAGE_LEFT = 4,
-    ICON_PAGE_RIGHT = 5,
-};
-
 enum {
     STATE_FADE_IN,
     STATE_WAIT_FADE_IN,
@@ -616,9 +609,9 @@ static TouchBar *PkwdSelectScreen_CreateTouchBar(PkwdSelectScreenWork *wk, ClAct
     GFL_ArcToolFree(arc);
     {
         TouchBarItem items[3] = {
-            { ICON_PAGE_LEFT, { 168, 168 } },
-            { ICON_PAGE_RIGHT, { 200, 168 } },
-            { ICON_RETURN, { 232, 168 } },
+            { TOUCHBAR_ICON_LEFT, { 168, 168 } },
+            { TOUCHBAR_ICON_RIGHT, { 200, 168 } },
+            { TOUCHBAR_ICON_RETURN, { 232, 168 } },
         };
         TouchBarSetup setup;
 
@@ -837,17 +830,17 @@ static void PkwdSelectScreen_LoadMovies(PkwdSelectScreenWork *wk, PkwdSelectScre
             PartyPkm *pkm = GFL_HeapAllocate(HEAPID_PKWD_SELECTSCREEN, PokeParty_GetPkmRawSize(), FALSE,
                                              "pkwd_selectscreen.c", 1570);
 
-            wk->movies[i].movie = Pokewood_GetLoadedMovieField(0, 0);
-            wk->movies[i].gross = Pokewood_GetLoadedMovieField(12, 0);
-            wk->movies[i].rank = Pokewood_GetLoadedMovieField(1, 0);
-            wk->movies[i].date = Pokewood_GetLoadedMovieField(10, 0);
-            wk->movies[i].time = Pokewood_GetLoadedMovieField(11, 0);
+            wk->movies[i].movie = Pokewood_GetLoadedMovieField(POKEWOOD_BLOCK_FIELD_UNKDF, 0);
+            wk->movies[i].gross = Pokewood_GetLoadedMovieField(POKEWOOD_BLOCK_FIELD_UNK130, 0);
+            wk->movies[i].rank = Pokewood_GetLoadedMovieField(POKEWOOD_BLOCK_FIELD_UNK124, 0);
+            wk->movies[i].date = Pokewood_GetLoadedMovieField(POKEWOOD_BLOCK_FIELD_DATE, 0);
+            wk->movies[i].time = Pokewood_GetLoadedMovieField(POKEWOOD_BLOCK_FIELD_TIME, 0);
             wk->movies[i].watched = func_020111a0(param->save, i);
             for (j = 0; j < CAST_COUNT; j++) {
-                Pokewood_GetLoadedMovieField(2 + j, (u32)pkm);
+                Pokewood_GetLoadedMovieField(POKEWOOD_BLOCK_FIELD_PKM_0 + j, (u32)pkm);
                 wk->movies[i].cast[j] = PokeParty_GetParam(pkm, PKM_PARAM_SPECIES, NULL);
             }
-            Pokewood_GetLoadedMovieField(2, (u32)pkm);
+            Pokewood_GetLoadedMovieField(POKEWOOD_BLOCK_FIELD_PKM_0, (u32)pkm);
             setPartyPokemonSpeciesNameToStrbuf(wk->movies[i].wordSet, 0, pkm);
             GFL_HeapFree(pkm);
         } else {
@@ -1176,12 +1169,12 @@ static BOOL PkwdSelectScreen_Input(PkwdSelectScreenWork *wk) {
         BlinkPalAnm_StartBlink(wk->blinks[wk->cursor]);
         TouchBar_SetActive(wk->touchBar, FALSE);
         wk->state = STATE_WAIT_BLINK;
-    } else if (TouchBar_GetDecided(wk->touchBar) == ICON_RETURN) {
+    } else if (TouchBar_GetDecided(wk->touchBar) == TOUCHBAR_ICON_RETURN) {
         TouchBar_SetActive(wk->touchBar, FALSE);
         wk->state = STATE_FADE_OUT;
         *wk->param->result = PKWD_SELECTSCREEN_CANCEL;
-    } else if (TouchBar_GetDecided(wk->touchBar) == ICON_PAGE_LEFT ||
-               TouchBar_GetDecided(wk->touchBar) == ICON_PAGE_RIGHT) {
+    } else if (TouchBar_GetDecided(wk->touchBar) == TOUCHBAR_ICON_LEFT ||
+               TouchBar_GetDecided(wk->touchBar) == TOUCHBAR_ICON_RIGHT) {
         wk->page ^= 1;
         wk->cursor = PkwdSelectScreen_GetLastCursor(wk);
         PkwdSelectScreen_PrintScreens(wk);
@@ -1340,7 +1333,7 @@ static BOOL PkwdSelectScreen_OpenDetails(PkwdSelectScreenWork *wk) {
 
 // Closes the details when the return button is picked
 static BOOL PkwdSelectScreen_Details(PkwdSelectScreenWork *wk) {
-    if (TouchBar_GetDecided(wk->touchBar) == ICON_RETURN) {
+    if (TouchBar_GetDecided(wk->touchBar) == TOUCHBAR_ICON_RETURN) {
         BmpWin_ClearFrame(wk->windows[WINDOW_DETAILS].window, 2);
         BmpWin_ClearScreenNow(wk->windows[WINDOW_DETAILS].window);
         BmpWin_Free(wk->windows[WINDOW_DETAILS].window);
@@ -1356,6 +1349,6 @@ static void PkwdSelectScreen_ShowPageIcons(PkwdSelectScreenWork *wk, BOOL visibl
     if (!wk->sorted[PAGE_SIZE]->loaded) {
         visible = FALSE;
     }
-    TouchBar_SetIconVisible(wk->touchBar, ICON_PAGE_LEFT, visible);
-    TouchBar_SetIconVisible(wk->touchBar, ICON_PAGE_RIGHT, visible);
+    TouchBar_SetIconVisible(wk->touchBar, TOUCHBAR_ICON_LEFT, visible);
+    TouchBar_SetIconVisible(wk->touchBar, TOUCHBAR_ICON_RIGHT, visible);
 }

@@ -180,7 +180,7 @@ typedef struct {
     BrRes *res;
     BrProcSys *procSys;
     GameData *gameData;
-    void *record;
+    RndMatchData *record;
 } BrRndMatchProcParam;
 
 typedef struct {

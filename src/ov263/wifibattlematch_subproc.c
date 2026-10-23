@@ -21,9 +21,6 @@
 
 #define HEAPID_WIFIBATTLEMATCH_SUBPROC 0x58
 
-// GFLNetInitData.bNetType of an infrared connection
-#define NET_TYPE_IRC 3
-
 typedef struct {
     u32 state;
     PokeParty *party;
@@ -129,7 +126,7 @@ static BOOL WifiBattleMatchList_Main(GameProc *proc, u32 *state, void *param, vo
 
     // A failed connection ends the screens
     if (GFL_NetIsInitialized()) {
-        if (GFL_NetGetInitData()->bNetType == NET_TYPE_IRC) {
+        if (GFL_NetGetInitData()->bNetType == GFL_NET_TYPE_IRC) {
             if (GFL_NetErrCheck()) {
                 GFL_NetErrMarkShown();
                 list->result = 2;
@@ -138,16 +135,16 @@ static BOOL WifiBattleMatchList_Main(GameProc *proc, u32 *state, void *param, vo
             }
         } else {
             switch (DWCRapCommon_CheckError(1, 1)) {
-            case 0:
-            case 3:
+            case DWCRAP_RESULT_OK:
+            case DWCRAP_RESULT_NET_ERROR:
                 break;
-            case 4:
+            case DWCRAP_RESULT_TIMEOUT:
                 list->result = 3;
                 wk->pokeList.unk73 = 1;
                 wk->status.forceExit = TRUE;
                 break;
-            case 1:
-            case 2:
+            case DWCRAP_RESULT_DISCONNECTED:
+            case DWCRAP_RESULT_FAILED:
             default:
                 list->result = 1;
                 wk->pokeList.unk73 = 1;
@@ -348,14 +345,14 @@ static BOOL WifiBattleMatchExchange_MainWifi(WifiBattleMatchExchangeWork *wk, Wi
                                              u32 *state) {
     if (GFL_NetIsInitialized()) {
         switch (DWCRapCommon_CheckError(1, 1)) {
-        case 0:
+        case DWCRAP_RESULT_OK:
             break;
-        case 1:
-        case 4:
+        case DWCRAP_RESULT_DISCONNECTED:
+        case DWCRAP_RESULT_TIMEOUT:
             param->result = 3;
             return TRUE;
-        case 2:
-        case 3:
+        case DWCRAP_RESULT_FAILED:
+        case DWCRAP_RESULT_NET_ERROR:
         default:
             param->result = 1;
             return TRUE;

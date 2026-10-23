@@ -14,6 +14,7 @@
 #include "gfl/tcb.h"
 #include "gfl/tcbl.h"
 #include "nnsys/g2d.h"
+#include "save/high_link.h"
 #include "struct_decls.h"
 #include "system/app_keycursor.h"
 #include "system/bmp_oam.h"
@@ -39,47 +40,59 @@
 #define BEACON_VIEW_ICON_CHARS 12
 
 // The events the view asks the field for (BeaconView_RequestEvent), which BeaconView_CheckEvent creates
-#define BEACON_VIEW_EVENT_NONE 0
-#define BEACON_VIEW_EVENT_MENU 1
-#define BEACON_VIEW_EVENT_MENU_COMM 2
-#define BEACON_VIEW_EVENT_MENU_WIFI 3
-#define BEACON_VIEW_EVENT_DETAIL 4
-#define BEACON_VIEW_EVENT_MEDAL 5
-#define BEACON_VIEW_EVENT_PASS_POWER 6
-#define BEACON_VIEW_EVENT_PASS_POWER_USE 7
-#define BEACON_VIEW_EVENT_PASS_POWER_LIST 8
-#define BEACON_VIEW_EVENT_PASS_POWER_LIST_2 9
-#define BEACON_VIEW_EVENT_GREETING 10
-#define BEACON_VIEW_EVENT_MISSION_START 11
-#define BEACON_VIEW_EVENT_MISSION_MESSAGE 12
-#define BEACON_VIEW_EVENT_MISSION_INFO 13
+enum {
+    BEACON_VIEW_EVENT_NONE,
+    BEACON_VIEW_EVENT_MENU,
+    BEACON_VIEW_EVENT_MENU_COMM,
+    BEACON_VIEW_EVENT_MENU_WIFI,
+    BEACON_VIEW_EVENT_DETAIL,
+    BEACON_VIEW_EVENT_MEDAL,
+    BEACON_VIEW_EVENT_PASS_POWER,
+    BEACON_VIEW_EVENT_PASS_POWER_USE,
+    BEACON_VIEW_EVENT_PASS_POWER_LIST,
+    BEACON_VIEW_EVENT_PASS_POWER_LIST_2,
+    BEACON_VIEW_EVENT_GREETING,
+    BEACON_VIEW_EVENT_MISSION_START,
+    BEACON_VIEW_EVENT_MISSION_MESSAGE,
+    BEACON_VIEW_EVENT_MISSION_INFO,
+};
 
 // The actors of the screen itself
-#define BEACON_VIEW_ACTOR_PASS_POWER 0
-#define BEACON_VIEW_ACTOR_GREETING 1
-#define BEACON_VIEW_ACTOR_THANKS 2
-#define BEACON_VIEW_ACTOR_RETURN 3
-#define BEACON_VIEW_ACTOR_UP 4
-#define BEACON_VIEW_ACTOR_DOWN 5
-#define BEACON_VIEW_ACTOR_BAR 6
-#define BEACON_VIEW_ACTOR_COUNT 9
+enum {
+    BEACON_VIEW_ACTOR_PASS_POWER,
+    BEACON_VIEW_ACTOR_GREETING,
+    BEACON_VIEW_ACTOR_THANKS,
+    BEACON_VIEW_ACTOR_RETURN,
+    BEACON_VIEW_ACTOR_UP,
+    BEACON_VIEW_ACTOR_DOWN,
+    BEACON_VIEW_ACTOR_BAR,
+    BEACON_VIEW_ACTOR_COUNT = 9,
+};
 // The four buttons at once, for BeaconView_SetButtonAnim
 #define BEACON_VIEW_BUTTON_ALL 4
 
-#define BEACON_VIEW_WIN_MESSAGE 0
-#define BEACON_VIEW_WIN_TOTAL 1
-#define BEACON_VIEW_WIN_COUNT 2
+// The screen's windows: the message, and the total
+enum {
+    BEACON_VIEW_WIN_MESSAGE,
+    BEACON_VIEW_WIN_TOTAL,
+    BEACON_VIEW_WIN_COUNT,
+};
 
 // The sets of OAM resources: the screen's own, the trainers' and the icons'
-#define BEACON_VIEW_RES_COMMON 0
-#define BEACON_VIEW_RES_TRAINER 1
-#define BEACON_VIEW_RES_ICON 2
-#define BEACON_VIEW_RES_COUNT 3
+enum {
+    BEACON_VIEW_RES_COMMON,
+    BEACON_VIEW_RES_TRAINER,
+    BEACON_VIEW_RES_ICON,
+    BEACON_VIEW_RES_COUNT,
+};
 
-#define BEACON_VIEW_RES_PALETTE 0
-#define BEACON_VIEW_RES_CHARS 1
-#define BEACON_VIEW_RES_CELLS 2
-#define BEACON_VIEW_RES_KINDS 3
+// The kinds of resource in a set
+enum {
+    BEACON_VIEW_RES_PALETTE,
+    BEACON_VIEW_RES_CHARS,
+    BEACON_VIEW_RES_CELLS,
+    BEACON_VIEW_RES_KINDS,
+};
 
 // The registered resources of one kind
 typedef struct {
@@ -153,7 +166,7 @@ typedef struct BeaconViewWork {
     GameSystem *gsys;
     GameData *gameData;
     Field *field;
-    void *parent;
+    FieldSubscreen *parent;
     FieldDispControl *dispControl;
     TrainerCardSave *trainerCard;
     BagSave *bag;
@@ -162,7 +175,7 @@ typedef struct BeaconViewWork {
     LinkFestival *festival;
     FestMissionConfig *missionConfig;
     FestivalText *festText;
-    void *passPowerData;
+    PassPowerData *passPowerData;
     // The Pass Power the player has set to give
     u32 passPower;
     u32 trainerId;
@@ -260,7 +273,7 @@ typedef struct BeaconViewWork {
 } BeaconViewWork;
 
 // beacon_view_setup.c
-BeaconViewWork *BeaconView_Create(GameSystem *gsys, void *parent);
+BeaconViewWork *BeaconView_Create(GameSystem *gsys, FieldSubscreen *parent);
 void BeaconView_Free(BeaconViewWork *work);
 void BeaconView_RequestEvent(BeaconViewWork *work, u16 request);
 void BeaconView_ClearEventRequest(BeaconViewWork *work);
@@ -268,7 +281,7 @@ void BeaconView_ClearEventRequest(BeaconViewWork *work);
 GameEvent *BeaconView_CreateEvent(BeaconViewWork *work, BOOL enabled);
 
 // beacon_view.c
-BeaconViewWork *BeaconView_Init(GameSystem *gsys, void *parent);
+BeaconViewWork *BeaconView_Init(GameSystem *gsys, FieldSubscreen *parent);
 void BeaconView_Exit(BeaconViewWork *work);
 void BeaconView_Update(BeaconViewWork *work, BOOL active);
 BOOL BeaconView_Draw(BeaconViewWork *work);

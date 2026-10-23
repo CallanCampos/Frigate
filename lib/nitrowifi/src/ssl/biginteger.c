@@ -21,18 +21,23 @@ s32 CPSi_big_sign(const u16 *digits, int n) {
 }
 
 void CPSi_big_add(u16 *dst, const u16 *a, const u16 *b, int n) {
-    int lenA = count_digits(a, n);
-    int lenB = count_digits(b, n);
-    int len = lenA >= lenB ? lenA : lenB;
+    int lenB;
+    int len;
     int i;
-    u32 carry;
+    int carry;
+    u32 sum;
 
+    len = count_digits(a, n);
+    lenB = count_digits(b, n);
+    if (len < lenB) {
+        len = lenB;
+    }
     if (len != n) {
         len++;
     }
     carry = 0;
     for (i = 0; i < len; i++) {
-        u32 sum = a[i] + b[i] + carry;
+        sum = a[i] + b[i] + carry;
         dst[i] = (u16)sum;
         carry = sum >> 16;
     }
@@ -136,17 +141,17 @@ static void CPSi_big_add_part(u16 *digits, u32 value, int index, int n) {
 }
 
 void CPSi_big_mult(u16 *dst, const u16 *a, const u16 *b, int n) {
-    int lenA, lenB;
+    int lenA;
+    int lenB;
     int i;
+    int j;
 
     MI_CpuFill8(dst, 0, n * 2);
     lenA = count_digits(a, n);
     lenB = count_digits(b, n);
     for (i = 0; i < lenB; i++) {
-        int j = 0;
-
-        for (; j < lenA && j < n - i; j++) {
-            CPSi_big_add_part(dst, (u32)a[j] * b[i], i + j, n);
+        for (j = 0; j < lenA && j < n - i; j++) {
+            CPSi_big_add_part(dst, a[j] * b[i], i + j, n);
         }
     }
 }
@@ -157,7 +162,7 @@ static void CPSi_big_mult_small(u16 *dst, const u16 *src, u16 value, int n) {
     int i;
 
     for (i = 0; i < len; i++) {
-        carry += (u32)src[i] * value;
+        carry += src[i] * value;
         dst[i] = (u16)carry;
         carry >>= 16;
     }
@@ -208,66 +213,73 @@ static void CPSi_big_sqr(u16 *dst, const u16 *src, int n) {
     }
 }
 
+// The top one, two or three digits ending at p, or four for get64bits, as a 64-bit value with p's digit at bit 32
+// (bit 48 for get64bits). Black 1's NitroWiFi has them as functions of these names, in ARM assembly; here they are
+// inlined.
+static inline u64 get48bits_1(const u16 *p) {
+    return (u64)p[0] << 32;
+}
+
+static inline u64 get48bits_2(const u16 *p) {
+    return ((u64)p[0] << 32) + ((u64)p[-1] << 16);
+}
+
+static inline u64 get48bits_3(const u16 *p) {
+    return ((u64)p[0] << 32) + ((u64)p[-1] << 16) + (u64)p[-2];
+}
+
+static inline u64 get64bits(const u16 *p) {
+    return ((u64)p[0] << 48) + ((u64)p[-1] << 32) + ((u64)p[-2] << 16) + (u64)p[-3];
+}
+
 // Divides n-digit operands into optional quotient/remainder outputs. Three n-digit scratch regions follow;
 // when both operands have n significant digits, the original numerator window also reads workBuf[3*n].
 // That extra digit is not initialized here; padded operands avoid this access.
 void CPSi_big_div(u16 *quotient, const u16 *dividend, const u16 *divisor, u16 *remainder, int n, u16 *workBuf) {
-    u16 *qbuf = workBuf + n;
-    u16 *rem = qbuf + n;
-    int lenA, lenB;
+    int lenA;
+    int lenB;
+    int pos;
     u64 divisorTop;
+    u32 digit;
+    u16 *qbuf;
+    u16 *rem;
 
+    qbuf = workBuf + n;
+    rem = qbuf + n;
     MI_CpuFill8(qbuf, 0, n * 4);
     lenA = count_digits(dividend, n);
     lenB = count_digits(divisor, n);
-
     if (lenA > 0 && lenB > 0) {
-        int pos = lenB + (n - lenA) - 1;
-
+        pos = lenB + (n - lenA) - 1;
         if (pos >= n) {
             MI_CpuCopy8(dividend, rem, n * 2);
         } else {
-            u16 *top;
-            int span;
-
             MI_CpuCopy8(dividend, qbuf + pos, lenA * 2);
-
             if (lenB > 2) {
-                divisorTop = ((u64) * (divisor + lenB - 1) << 32) + ((u64) * (divisor + lenB - 2) << 16) +
-                             (u64) * (divisor + lenB - 3);
+                divisorTop = get48bits_3(divisor + lenB - 1);
             } else if (lenB > 1) {
-                divisorTop = ((u64) * (divisor + lenB - 1) << 32) + ((u64) * (divisor + lenB - 2) << 16);
+                divisorTop = get48bits_2(divisor + lenB - 1);
             } else {
-                divisorTop = (u64) * (divisor + lenB - 1) << 32;
+                divisorTop = get48bits_1(divisor + lenB - 1);
             }
-
-            span = (2 * n - 1) * 2;
-            top = rem + lenB;
-
             for (; pos < n; pos++) {
-                u64 numerator;
-                u32 digit;
-
-                memmove(qbuf + 1, qbuf, span);
-                numerator = ((u64)top[0] << 48) + ((u64)top[-1] << 32) + ((u64)top[-2] << 16) + (u64)top[-3];
-                digit = (u32)(numerator / divisorTop);
+                memmove(qbuf + 1, qbuf, (n * 2 - 1) * 2);
+                digit = get64bits(rem + lenB) / divisorTop;
                 if (digit > 0xffff) {
                     digit = 0xffff;
                 }
-
                 for (;;) {
-                    CPSi_big_mult_small(workBuf, divisor, digit, n);
+                    CPSi_big_mult_small(workBuf, divisor, (u16)digit, n);
                     if (CPSi_big_compare(rem, workBuf, n) >= 0) {
                         break;
                     }
                     digit--;
                 }
                 CPSi_big_sub(rem, rem, workBuf, n);
-                qbuf[0] = (u16)digit;
+                *qbuf = digit;
             }
         }
     }
-
     if (quotient != NULL) {
         MI_CpuCopy8(qbuf, quotient, n * 2);
     }
@@ -277,49 +289,38 @@ void CPSi_big_div(u16 *quotient, const u16 *dividend, const u16 *divisor, u16 *r
 }
 
 void CPSi_big_power(u16 *dst, const u16 *base, const u16 *exponent, int n, const u16 *modulus) {
-    u16 *work = CPSiAlloc(n * 8);
+    u16 *work;
     u16 *temp;
-    int expLen;
-    unsigned int totalBits;
-    s32 bit;
+    int bit;
 
+    work = CPSiAlloc(n * sizeof(u16) * 4);
     if (work == NULL) {
         return;
     }
     temp = work + n;
-
-    MI_CpuFill8(dst + 1, 0, (n - 1) * 2);
+    MI_CpuFill8(dst + 1, 0, (n - 1) * sizeof(u16));
     dst[0] = 1;
-
-    expLen = count_digits(exponent, n);
-    bit = (n - expLen) * 16;
-    totalBits = n * 16;
-
-    while (bit < totalBits) {
+    for (bit = (n - count_digits(exponent, n)) * 16; bit < n * sizeof(u16) * 8; bit++) {
         if (exponent[n - (bit >> 4) - 1] & (0x8000u >> (bit & 0xf))) {
-            MI_CpuCopy8(base, dst, n * 2);
+            MI_CpuCopy8(base, dst, n * sizeof(u16));
             bit++;
             break;
         }
-        bit++;
     }
-
-    while (bit < totalBits) {
+    for (; bit < n * sizeof(u16) * 8; bit++) {
         CPSi_big_sqr(work, dst, n);
-        MI_CpuCopy8(work, dst, n * 2);
+        MI_CpuCopy8(work, dst, n * sizeof(u16));
         if (modulus != NULL) {
             CPSi_big_div(NULL, dst, modulus, dst, n, temp);
         }
         if (exponent[n - (bit >> 4) - 1] & (0x8000u >> (bit & 0xf))) {
             CPSi_big_mult(work, dst, base, n);
-            MI_CpuCopy8(work, dst, n * 2);
+            MI_CpuCopy8(work, dst, n * sizeof(u16));
             if (modulus != NULL) {
                 CPSi_big_div(NULL, dst, modulus, dst, n, temp);
             }
         }
-        bit++;
     }
-
     CPSiFree(work);
 }
 
@@ -327,30 +328,32 @@ void CPSi_big_power(u16 *dst, const u16 *base, const u16 *exponent, int n, const
 // The caller zeroes scratch: six n-digit regions precede nominal 3*n division workspace (9*n total).
 // That partition alone does not establish sufficient headroom for every CPSi_big_div input.
 static void CPSi_big_modinv(u16 *result, const u16 *value, const u16 *modulus, int n, u16 *scratch) {
-    u16 *currentRemainder = scratch;
-    u16 *quotient = scratch + n;
-    u16 *previousRemainder = quotient + n;
-    u16 *currentCoefficient = previousRemainder + n;
-    u16 *previousCoefficient = currentCoefficient + n;
-    u16 *temporary = previousCoefficient + n;
-    u16 *divisionWork = temporary + n;
+    u16 *quotient;
+    u16 *previousRemainder;
+    u16 *currentCoefficient;
+    u16 *previousCoefficient;
+    u16 *temporary;
+    u16 *divisionWork;
 
-    MI_CpuCopy8(value, currentRemainder, n * 2);
+    quotient = scratch + n;
+    previousRemainder = quotient + n;
+    currentCoefficient = previousRemainder + n;
+    previousCoefficient = currentCoefficient + n;
+    temporary = previousCoefficient + n;
+    divisionWork = temporary + n;
+
+    MI_CpuCopy8(value, scratch, n * 2);
     MI_CpuCopy8(modulus, previousRemainder, n * 2);
     currentCoefficient[0] = 1;
-
-    if (CPSi_big_sign(currentRemainder, n) > 0) {
-        do {
-            CPSi_big_div(quotient, previousRemainder, currentRemainder, temporary, n, divisionWork);
-            MI_CpuCopy8(currentRemainder, previousRemainder, n * 2);
-            MI_CpuCopy8(temporary, currentRemainder, n * 2);
-            CPSi_big_mult(temporary, quotient, currentCoefficient, n);
-            CPSi_big_sub(temporary, previousCoefficient, temporary, n);
-            MI_CpuCopy8(currentCoefficient, previousCoefficient, n * 2);
-            MI_CpuCopy8(temporary, currentCoefficient, n * 2);
-        } while (CPSi_big_sign(currentRemainder, n) > 0);
+    while (CPSi_big_sign(scratch, n) > 0) {
+        CPSi_big_div(quotient, previousRemainder, scratch, temporary, n, divisionWork);
+        MI_CpuCopy8(scratch, previousRemainder, n * 2);
+        MI_CpuCopy8(temporary, scratch, n * 2);
+        CPSi_big_mult(temporary, quotient, currentCoefficient, n);
+        CPSi_big_sub(temporary, previousCoefficient, temporary, n);
+        MI_CpuCopy8(currentCoefficient, previousCoefficient, n * 2);
+        MI_CpuCopy8(temporary, currentCoefficient, n * 2);
     }
-
     CPSi_big_add(previousCoefficient, previousCoefficient, modulus, n);
     CPSi_big_div(NULL, previousCoefficient, modulus, result, n, divisionWork);
 }
@@ -385,85 +388,70 @@ static void CPSi_big_montmult(u16 *acc, u16 *scratch, const u16 *multiplier, int
 }
 
 void CPSi_big_montpower(u16 *dst, const u16 *base, const u16 *exponent, int n, const u16 *modulus) {
-    u16 *work = CPSiAlloc(n * 22);
+    int modLen;
+    int bit;
+    u16 *work;
     u16 *mu;
     u16 *montBase;
     u16 *buf3;
     u16 *buf4;
     u16 *buf5;
     u16 *workBuf;
-    int modLen;
-    u32 totalBits;
-    int bit;
 
+    work = CPSiAlloc(n * 22);
     if (work == NULL) {
         return;
     }
     MI_CpuFill8(work, 0, n * 22);
-
     mu = work + n;
     montBase = mu + n;
     buf3 = montBase + n;
     buf4 = buf3 + n;
     buf5 = buf4 + n;
     workBuf = buf5 + n;
-
     modLen = count_digits(modulus, n);
     work[modLen] = 1;
-
     CPSi_big_modinv(mu, work, modulus, n, montBase);
     CPSi_big_mult(buf3, work, mu, n);
     CPSi_big_sub_small(mu, buf3, 1, n);
     CPSi_big_div(mu, mu, modulus, NULL, n, workBuf);
-
     CPSi_big_mult(montBase, base, work, n);
     CPSi_big_div(NULL, montBase, modulus, montBase, n, workBuf);
-
     CPSi_big_div(NULL, work, modulus, dst, n, workBuf);
-
-    totalBits = modLen * 16;
-    for (bit = 0; bit < totalBits; bit++) {
+    for (bit = 0; bit < modLen * sizeof(u16) * 8; bit++) {
         CPSi_big_montmult(dst, buf5, BIGINT_SQUARE, n, modLen, modulus, mu, buf3, buf4);
         if (exponent[modLen - (bit >> 4) - 1] & (0x8000u >> (bit & 0xf))) {
             CPSi_big_montmult(dst, buf5, montBase, n, modLen, modulus, mu, buf3, buf4);
         }
     }
     CPSi_big_montmult(dst, buf5, NULL, n, modLen, modulus, mu, buf3, buf4);
-
     CPSiFree(work);
 }
 
 void CPSi_big_from_char(u16 *dst, const u8 *src, int nbytes, int n) {
-    const u8 *p;
-
     MI_CpuFill8(dst, 0, n * 2);
-    p = &src[nbytes - 1];
+    src += nbytes - 1;
     while (nbytes > 1) {
-        u16 hi = p[-1];
-        u16 lo = p[0];
-
+        *dst++ = (u16)(src[0] + (src[-1] << 8));
+        src -= 2;
         nbytes -= 2;
-        *dst++ = (u16)((hi << 8) + lo);
-        p -= 2;
     }
     if (nbytes > 0) {
-        *dst = p[0];
+        *dst = *src;
     }
 }
 
 // The original accepts the source digit count n but overwrites its register before reading it.
 void CPSi_char_from_big(u8 *dst, u16 *src, int nbytes, int n) {
+    u8 *hi;
+
     dst += nbytes - 1;
-
-    (void)n;
     while (nbytes > 1) {
-        u8 *hi = dst - 1;
-
+        hi = dst - 1;
         *dst = (u8)*src;
-        nbytes -= 2;
         dst -= 2;
-        *hi = (u8)(*src >> 8);
-        src++;
+        *hi = (u8)(*src++ >> 8);
+        nbytes -= 2;
     }
     if (nbytes > 0) {
         *dst = (u8)*src;

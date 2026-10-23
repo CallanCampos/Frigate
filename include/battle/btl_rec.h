@@ -23,11 +23,11 @@ typedef struct {
 
 void BtlRecTool_Init(BtlRecTool *tool, BOOL chapter);
 void *BtlRecTool_MakeTurnChunk(BtlRecTool *tool, u32 *size, BOOL chapter);
-void BtlRecTool_AddClientActions(BtlRecTool *tool, u8 clientId, const void *actions, u8 count);
+void BtlRecTool_AddClientActions(BtlRecTool *tool, u8 clientId, const BattleAction *actions, u8 count);
 void *BtlRecTool_FinishChunk(BtlRecTool *tool, u8 value, u32 *size);
 void *BtlRecTool_MakeTimeoutChunk(BtlRecTool *tool, u32 *size);
 void BtlRecTool_SetData(BtlRecTool *tool, const void *data, u32 size);
-BOOL BtlRecTool_ReadClientActions(BtlRecTool *tool, u32 *pos, u8 *clientId, u8 *count, void *actions);
+BOOL BtlRecTool_ReadClientActions(BtlRecTool *tool, u32 *pos, u8 *clientId, u8 *count, BattleAction *actions);
 
 // A recording is a stream of chunks, each starting with a header byte: the count in bits 0 to 3, the chunk type in bits
 // 4 to 6 (1 for the clients' actions, 2 for a turn without them, 3 for a timeout) and the start of a chapter in bit 7.

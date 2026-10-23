@@ -19,6 +19,13 @@
 #define SHA1_K3 0x8f1bbcdc
 #define SHA1_K4 0xca62c1d6
 
+// One round, with the five words' roles rotated by the caller rather than moved
+#define SHA1_ROUND(a, b, c, d, e, f, x, k)                                                                             \
+    do {                                                                                                               \
+        e += SHA1_ROL(a, 5) + f(b, c, d) + (x) + (k);                                                                  \
+        b = SHA1_ROL(b, 30);                                                                                           \
+    } while (0)
+
 // The first byte of a pad run is 0x80; the rest are the zero-initialized tail
 static u8 sSha1Padding[SHA1_BLOCK_SIZE] = { 0x80 };
 
@@ -58,65 +65,65 @@ static void long_from_char(u32 *dst, const u8 *src, u32 len) {
     }
 }
 
-#define SHA1_STEP(F, a, b, c, d, e, word, constant)                                                                    \
-    do {                                                                                                               \
-        (e) += SHA1_ROL((a), 5) + F((b), (c), (d)) + (word) + (constant);                                              \
-        (b) = SHA1_ROL((b), 30);                                                                                       \
-    } while (0)
-
 static void CPSi_sha1_block(CPSSha1Ctx *context, const u8 *block) {
     u32 w[16];
-    u32 a = context->state[0];
-    u32 b = context->state[1];
-    u32 c = context->state[2];
-    u32 d = context->state[3];
-    u32 e = context->state[4];
-    int wordIndex;
-    int group;
+    u32 a, b, c, d, e;
+    int t;
+    int i;
 
+    a = context->state[0];
+    b = context->state[1];
+    c = context->state[2];
+    d = context->state[3];
+    e = context->state[4];
     long_from_char(w, block, SHA1_BLOCK_SIZE);
-    wordIndex = 0;
-    for (group = 0; group < 3; group++) {
-        SHA1_STEP(SHA1_F1, a, b, c, d, e, w[wordIndex], SHA1_K1);
-        SHA1_STEP(SHA1_F1, e, a, b, c, d, w[wordIndex + 1], SHA1_K1);
-        SHA1_STEP(SHA1_F1, d, e, a, b, c, w[wordIndex + 2], SHA1_K1);
-        SHA1_STEP(SHA1_F1, c, d, e, a, b, w[wordIndex + 3], SHA1_K1);
-        SHA1_STEP(SHA1_F1, b, c, d, e, a, w[wordIndex + 4], SHA1_K1);
-        wordIndex += 5;
+
+    t = 0;
+    for (i = 0; i < 3; i++) {
+        SHA1_ROUND(a, b, c, d, e, SHA1_F1, w[t + 0], SHA1_K1);
+        SHA1_ROUND(e, a, b, c, d, SHA1_F1, w[t + 1], SHA1_K1);
+        SHA1_ROUND(d, e, a, b, c, SHA1_F1, w[t + 2], SHA1_K1);
+        SHA1_ROUND(c, d, e, a, b, SHA1_F1, w[t + 3], SHA1_K1);
+        SHA1_ROUND(b, c, d, e, a, SHA1_F1, w[t + 4], SHA1_K1);
+        t += 5;
     }
-    SHA1_STEP(SHA1_F1, a, b, c, d, e, w[15], SHA1_K1);
-    SHA1_STEP(SHA1_F1, e, a, b, c, d, R(0, w), SHA1_K1);
-    SHA1_STEP(SHA1_F1, d, e, a, b, c, R(1, w), SHA1_K1);
-    SHA1_STEP(SHA1_F1, c, d, e, a, b, R(2, w), SHA1_K1);
-    SHA1_STEP(SHA1_F1, b, c, d, e, a, R(3, w), SHA1_K1);
-    wordIndex = 4;
-    for (group = 0; group < 4; group++) {
-        SHA1_STEP(SHA1_F2, a, b, c, d, e, R(wordIndex, w), SHA1_K2);
-        SHA1_STEP(SHA1_F2, e, a, b, c, d, R(wordIndex + 1, w), SHA1_K2);
-        wordIndex = (wordIndex + 2) & 15;
-        SHA1_STEP(SHA1_F2, d, e, a, b, c, R(wordIndex, w), SHA1_K2);
-        SHA1_STEP(SHA1_F2, c, d, e, a, b, R(wordIndex + 1, w), SHA1_K2);
-        SHA1_STEP(SHA1_F2, b, c, d, e, a, R(wordIndex + 2, w), SHA1_K2);
-        wordIndex += 3;
+    SHA1_ROUND(a, b, c, d, e, SHA1_F1, w[15], SHA1_K1);
+    SHA1_ROUND(e, a, b, c, d, SHA1_F1, R(0, w), SHA1_K1);
+    SHA1_ROUND(d, e, a, b, c, SHA1_F1, R(1, w), SHA1_K1);
+    SHA1_ROUND(c, d, e, a, b, SHA1_F1, R(2, w), SHA1_K1);
+    SHA1_ROUND(b, c, d, e, a, SHA1_F1, R(3, w), SHA1_K1);
+
+    t = 4;
+    for (i = 0; i < 4; i++) {
+        SHA1_ROUND(a, b, c, d, e, SHA1_F2, R(t, w), SHA1_K2);
+        SHA1_ROUND(e, a, b, c, d, SHA1_F2, R(t + 1, w), SHA1_K2);
+        t = (t + 2) & 0xf;
+        SHA1_ROUND(d, e, a, b, c, SHA1_F2, R(t, w), SHA1_K2);
+        SHA1_ROUND(c, d, e, a, b, SHA1_F2, R(t + 1, w), SHA1_K2);
+        SHA1_ROUND(b, c, d, e, a, SHA1_F2, R(t + 2, w), SHA1_K2);
+        t += 3;
     }
-    for (group = 0; group < 4; group++) {
-        SHA1_STEP(SHA1_F3, a, b, c, d, e, R(wordIndex, w), SHA1_K3);
-        SHA1_STEP(SHA1_F3, e, a, b, c, d, R(wordIndex + 1, w), SHA1_K3);
-        SHA1_STEP(SHA1_F3, d, e, a, b, c, R(wordIndex + 2, w), SHA1_K3);
-        wordIndex = (wordIndex + 3) & 15;
-        SHA1_STEP(SHA1_F3, c, d, e, a, b, R(wordIndex, w), SHA1_K3);
-        SHA1_STEP(SHA1_F3, b, c, d, e, a, R(wordIndex + 1, w), SHA1_K3);
-        wordIndex += 2;
+
+    for (i = 0; i < 4; i++) {
+        SHA1_ROUND(a, b, c, d, e, SHA1_F3, R(t, w), SHA1_K3);
+        SHA1_ROUND(e, a, b, c, d, SHA1_F3, R(t + 1, w), SHA1_K3);
+        SHA1_ROUND(d, e, a, b, c, SHA1_F3, R(t + 2, w), SHA1_K3);
+        t = (t + 3) & 0xf;
+        SHA1_ROUND(c, d, e, a, b, SHA1_F3, R(t, w), SHA1_K3);
+        SHA1_ROUND(b, c, d, e, a, SHA1_F3, R(t + 1, w), SHA1_K3);
+        t += 2;
     }
-    for (group = 0; group < 4; group++) {
-        SHA1_STEP(SHA1_F4, a, b, c, d, e, R(wordIndex, w), SHA1_K4);
-        SHA1_STEP(SHA1_F4, e, a, b, c, d, R(wordIndex + 1, w), SHA1_K4);
-        SHA1_STEP(SHA1_F4, d, e, a, b, c, R(wordIndex + 2, w), SHA1_K4);
-        SHA1_STEP(SHA1_F4, c, d, e, a, b, R(wordIndex + 3, w), SHA1_K4);
-        wordIndex = (wordIndex + 4) & 15;
-        SHA1_STEP(SHA1_F4, b, c, d, e, a, R(wordIndex, w), SHA1_K4);
-        wordIndex++;
+
+    for (i = 0; i < 4; i++) {
+        SHA1_ROUND(a, b, c, d, e, SHA1_F4, R(t, w), SHA1_K4);
+        SHA1_ROUND(e, a, b, c, d, SHA1_F4, R(t + 1, w), SHA1_K4);
+        SHA1_ROUND(d, e, a, b, c, SHA1_F4, R(t + 2, w), SHA1_K4);
+        SHA1_ROUND(c, d, e, a, b, SHA1_F4, R(t + 3, w), SHA1_K4);
+        t = (t + 4) & 0xf;
+        SHA1_ROUND(b, c, d, e, a, SHA1_F4, R(t, w), SHA1_K4);
+        t += 1;
     }
+
     context->state[0] += a;
     context->state[1] += b;
     context->state[2] += c;
@@ -134,13 +141,12 @@ void CPSi_sha1_init(CPSSha1Ctx *context) {
 }
 
 void CPSi_sha1_calc(CPSSha1Ctx *context, const u8 *data, u32 len) {
-    u32 index = (context->count[1] >> 3) & 0x3f;
-    u32 bits = len << 3;
+    u32 index;
     u32 space;
     u32 i;
 
-    context->count[1] += bits;
-    if (context->count[1] < bits) {
+    index = (context->count[1] >> 3) & 0x3f;
+    if ((context->count[1] += len << 3) < (len << 3)) {
         context->count[0]++;
     }
     context->count[0] += len >> 29;

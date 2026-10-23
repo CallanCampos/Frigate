@@ -65,16 +65,22 @@
 #define PLACE_MAX 1024
 
 // The marks: one for each UNITY_TOWER_REGION_* state but none, and the one at the middle of the screen
-#define MARK_CURSOR 4
-#define MARK_COUNT 5
+enum {
+    MARK_CURSOR = 4,
+    MARK_COUNT,
+};
 
-#define BUTTON_VIEW 0
-#define BUTTON_QUIT 1
-#define BUTTON_COUNT 2
+enum {
+    BUTTON_VIEW,
+    BUTTON_QUIT,
+    BUTTON_COUNT,
+};
 
-#define WINDOW_INFO 0
-#define WINDOW_PLACE 3
-#define WINDOW_COUNT 4
+enum {
+    WINDOW_INFO,
+    WINDOW_PLACE = 3,
+    WINDOW_COUNT,
+};
 
 // The frames' characters and palettes
 #define FRAME_MESSAGE_CHAR 4
@@ -246,8 +252,8 @@ typedef struct {
     u32 touchY;
     G3DCamera *camera;
     G3DLight *light;
-    void *earthRes;
-    void *markRes[MARK_COUNT];
+    G3DResource *earthRes;
+    G3DResource *markRes[MARK_COUNT];
     G3DModel *earthModel;
     G3DModel *markModels[MARK_COUNT];
     G3DActor *earthActor;
@@ -1031,9 +1037,9 @@ static void Geonet_LoadBG(GeonetWork *work, ArcTool *arc) {
     GFL_TextRndGetGlobalColors(&work->textColors[0], &work->textColors[1], &work->textColors[2]);
     GFL_TextRndUpdateColorIndexLUT(1, 2, 15);
 
-    GFL_BGSysCreateBG(6, &sGeonetTextBGSetup, 0);
+    GFL_BGSysCreateBG(6, &sGeonetTextBGSetup, BGMODE_TEXT);
     GFL_BGSysClearScr(6);
-    GFL_BGSysCreateBG(7, &sGeonetBackBGSetup, 0);
+    GFL_BGSysCreateBG(7, &sGeonetBackBGSetup, BGMODE_TEXT);
     GFL_BGSysLoadArcNCGRStatic(arc, NARC_GEONET_BG_NCGR, 7, 0, 0, FALSE, work->heapId);
     GFL_G2DIOLoadArcNCLRDefault(arc, NARC_GEONET_BG_NCLR, PALTYPE_SUB_BG, 0, 0x80, work->heapId);
     loadBGScrToVramByFileNoReserveNegAlign(arc, NARC_GEONET_BG_NSCR, 7, 0, 0, FALSE, work->heapId);
@@ -1047,10 +1053,10 @@ static void Geonet_LoadBG(GeonetWork *work, ArcTool *arc) {
     BmpWin_FlushChar(work->windows[WINDOW_INFO].window);
     work->messageState = 0;
 
-    GFL_BGSysCreateBG(2, &sGeonetTextBGSetup, 0);
+    GFL_BGSysCreateBG(2, &sGeonetTextBGSetup, BGMODE_TEXT);
     GFL_BGSysClearScr(2);
     GFL_BGSysSet3DBGPriority(1);
-    GFL_BGSysCreateBG(3, &sGeonetBackBGSetup, 0);
+    GFL_BGSysCreateBG(3, &sGeonetBackBGSetup, BGMODE_TEXT);
     GFL_BGSysLoadArcNCGRStatic(arc, NARC_GEONET_BG_NCGR, 3, 0, 0, FALSE, work->heapId);
     GFL_G2DIOLoadArcNCLRDefault(arc, NARC_GEONET_BG_NCLR, PALTYPE_MAIN_BG, 0, 0x80, work->heapId);
     loadBGScrToVramByFileNoReserveNegAlign(arc, NARC_GEONET_BG_NSCR, 3, 0, 0, FALSE, work->heapId);

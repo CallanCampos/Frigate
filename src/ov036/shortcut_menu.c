@@ -134,7 +134,8 @@ static void SetupMenu(ShortcutMenuList *menu, const ShortcutMenuPos *listPos, Ms
 static void FreeMenu(ShortcutMenuList *menu, ShortcutMenuPos *listPos);
 static GameEventReturnCode ReturnToField_Callback(GameEvent *event, u32 *state, void *data);
 
-void *func_ov036_021bedd8(GameData *gameData, u32 mode, ShortcutMenuPos *listPos, HeapID menuHeapId, HeapID heapId) {
+ShortcutMenuApp *func_ov036_021bedd8(GameData *gameData, u32 mode, ShortcutMenuPos *listPos, HeapID menuHeapId,
+                                     HeapID heapId) {
     ClActorSetup setup;
     ShortcutMenuApp *work;
     ShortcutSave *shortcut;
@@ -620,7 +621,7 @@ static void SetActorsY(ShortcutMenuList *menu, u32 y) {
     }
 }
 
-GameEvent *func_ov036_021bf890(GameSystem *gsys, Field *field, void *param, BOOL transition) {
+GameEvent *func_ov036_021bf890(GameSystem *gsys, Field *field, NameEntryParam *param, BOOL transition) {
     ShortcutMenuReturn *ret;
     GameEvent *event;
 

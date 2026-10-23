@@ -13,7 +13,6 @@
 // passerby survey's messages, and its accessors. The ROM has no string for the file, so the name is a guess.
 // Block 0x20.
 
-#define SAVE_BLOCK_CGEAR 0x20
 #define CGEAR_NAME_LENGTH 9
 
 static u32 getNameSize(void);
@@ -35,16 +34,16 @@ void CGearName_Init(u16 *name) {
     GFL_MsgDataFree(msgData);
 }
 
-void *CGearName_GetFromSave(SaveControl *save) {
+u16 *CGearName_GetFromSave(SaveControl *save) {
     CGearSave *cgear = SaveControl_GetBlockPtr(save, SAVE_BLOCK_CGEAR);
 
     return cgear->name;
 }
 
-void CGearName_Set(void *saveBlock, StrBuf *name) {
-    GFL_StrBufStoreString(name, saveBlock, CGEAR_NAME_LENGTH);
+void CGearName_Set(u16 *dest, StrBuf *name) {
+    GFL_StrBufStoreString(name, dest, CGEAR_NAME_LENGTH);
 }
 
-const u16 *CGearName_Get(void *saveBlock) {
-    return saveBlock;
+const u16 *CGearName_Get(u16 *name) {
+    return name;
 }

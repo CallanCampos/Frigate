@@ -137,16 +137,32 @@ BOOL BtlvCore_ProcTargetSelect(BtlvCore *core, s32 *seq, void *work);
 void BtlvCore_SetMainProc(BtlvCore *core, BtlvMainProc proc);
 void BtlvCore_ClearMainProc(BtlvCore *core);
 BOOL BtlvCore_RunMainProc(BtlvCore *core);
-void BtlvCore_StartCommandSelect(BtlvCore *core, BattleMon *mon, u32 arg2, void *arg3);
+void BtlvCore_StartCommandSelect(BtlvCore *core, BattleMon *mon, u32 arg2, BattleAction *arg3);
 void BtlvCore_StopCommandSelect(BtlvCore *core);
+// What the player picked on the command screen, BTLV_COMMAND_* (NONE while it waits)
+enum {
+    BTLV_COMMAND_NONE,
+    BTLV_COMMAND_FIGHT,
+    BTLV_COMMAND_BAG,
+    BTLV_COMMAND_POKEMON,
+    BTLV_COMMAND_RUN,
+};
+
 u32 BtlvCore_WaitCommandSelect(BtlvCore *core);
-void BtlvCore_StartMoveSelect(BtlvCore *core, BattleMon *mon, void *arg2);
-void BtlvCore_StartRotationSelect(BtlvCore *core, BtlvSelectTargetParam *param, void *arg2);
+void BtlvCore_StartMoveSelect(BtlvCore *core, BattleMon *mon, BattleAction *arg2);
+void BtlvCore_StartRotationSelect(BtlvCore *core, BtlvSelectTargetParam *param, BattleAction *arg2);
 void BtlvCore_ResumeMoveSelect(BtlvCore *core);
 BOOL BtlvCore_ProcWaitSelect(BtlvCore *core, s32 *seq, void *work);
 void BtlvCore_StopMoveSelect(BtlvCore *core);
 BOOL BtlvCore_WaitMoveSelect(BtlvCore *core);
-void BtlvCore_StartTargetSelect(BtlvCore *core, BattleMon *mon, void *arg2);
+void BtlvCore_StartTargetSelect(BtlvCore *core, BattleMon *mon, BattleAction *arg2);
+// Whether the target screen is done: a target chosen, or back to the moves (NONE while it waits)
+enum {
+    BTLV_TARGET_SELECT_NONE,
+    BTLV_TARGET_SELECT_CHOSEN,
+    BTLV_TARGET_SELECT_BACK,
+};
+
 u32 BtlvCore_WaitTargetSelect(BtlvCore *core);
 void BtlvCore_StopTargetSelect(BtlvCore *core);
 void BtlvCore_CancelSelect(BtlvCore *core);
@@ -264,6 +280,13 @@ void BtlvCore_StartFadeIn(BtlvCore *core);
 BOOL BtlvCore_WaitFadeIn(BtlvCore *core);
 void BattleClientCmd_ForceQuitInputNotify(BtlvCore *core);
 BOOL BattleClientCmd_ForceQuitInputWait(BtlvCore *core);
+// The recorder's buttons during a playback: the previous chapter, the next one, and quit
+enum {
+    BTLV_RECORDER_PREV,
+    BTLV_RECORDER_NEXT,
+    BTLV_RECORDER_QUIT,
+};
+
 u32 BtlvCore_CheckRecorderInput(BtlvCore *core);
 void BtlvCore_ShowRecorderChapter(BtlvCore *core, u16 arg1, u16 arg2);
 void func_ov167_021d0a7c(BtlvCore *core, u16 arg1);

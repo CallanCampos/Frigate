@@ -131,8 +131,10 @@ enum {
 };
 
 // The lines of the credits that are not text
-#define CREDITS_SPACE 35
-#define CREDITS_END 36
+enum {
+    CREDITS_SPACE = 35,
+    CREDITS_END,
+};
 
 // How the credits are laid out
 enum {
@@ -2186,7 +2188,7 @@ static void PkwdBriefing_React(PkwdBriefingWork *wk, BtlSetup *setup) {
     u32 result = 0;
 
     if (setup != NULL) {
-        result = setup->unk124;
+        result = setup->studioEnding;
     }
     switch (result) {
     case 0:

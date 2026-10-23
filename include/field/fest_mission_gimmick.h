@@ -20,7 +20,7 @@ typedef struct {
     u8 removed[4];
 } FesMissionZone;
 
-// The work of a type 5 mission, kept by the festival (LinkFestival_GetEntries)
+// The work of a type 5 mission, kept by the festival (LinkFestival_GetMissionWork)
 typedef struct {
     LinkFestival *festival;
     u16 zoneId;
@@ -53,12 +53,12 @@ typedef struct {
     u16 choices[5];
 } FesMissionQuiz;
 
-// Overlay 36's Funfest gimmick, as Field_GetFesGimmick returns it (overlay 73's RivalSelectContext is the same one)
+// Overlay 36's Funfest gimmick, as Field_GetFesGimmick returns it. Overlays 26, 71 and 73 take it too
 struct FesGimmick {
     GameSystem *gsys;
     GameData *gameData;
     LinkFestival *festival;
-    FestMission *mission;
+    FestMissionConfig *mission;
     // Whether overlay 71, 72 or 73 is loaded for the mission, and which
     BOOL overlayLoaded;
     u32 overlayId;
@@ -68,11 +68,13 @@ struct FesGimmick {
     FieldActor *playerActor;
     EventData *eventData;
     EventWork *eventWork;
-    void *effects;
-    void *railSystem;
+    FieldEffects *effects;
+    FieldRailSystem *railSystem;
     u32 unk38;
-    void *unk3C;
-    FesMissionWork *work;
+    // The sparkles of a mission of type 4, which overlay 71 shows
+    FieldEffectTask *sparkles;
+    // The mission's work, which the festival keeps
+    FestMissionWork *work;
     FesMissionQuiz quiz;
 };
 

@@ -37,6 +37,7 @@
 #include "system/bmp_winframe.h"
 #include "system/game_data.h"
 #include "system/printsys.h"
+#include "system/season.h"
 #include "system/wordset.h"
 #include "text/system/btl_server_flow_title.h"
 
@@ -47,14 +48,9 @@
 #define ARCID_POKEICON 7
 #define ARCID_ZUKAN_AREA 176
 
-// The Pokédex's shortcut for the Y button, which the touch bar's check box registers
-#define SHORTCUT_POKEDEX_MAP 21
-
 // The event flags that show the water and fishing habitats
 #define FLAG_HABITAT_WATER 0x987
 #define FLAG_HABITAT_FISHING 0x985
-
-#define SEASON_COUNT 4
 
 #define NO_PLACE 0xff
 
@@ -791,7 +787,7 @@ static void ZukanDetailMap_Command(ZukanDetailProcSys *sys, int *seq, void *para
             ZukanDetailMap_SetState(param, wk, common, MAP_STATE_CLOSE_START);
             break;
         case ZUKAN_DETAIL_CMD_MAP_PLACE: {
-            void *habitatList =
+            ZukanHabitatSave *habitatList =
                 SaveControl_GetZukanHabitatSave(GameData_GetSaveControl(ZukanDetailCommon_GetGameData(common)));
 
             ZukanHabitatSave_SetZone(habitatList, TownMapData_GetParam(wk->townmap, wk->place, TOWNMAP_PARAM_ZONE));
@@ -1733,7 +1729,7 @@ static BOOL ZukanDetailMap_SetHabitatKind(ZukanDetailMapWork *wk, ZukanDetailCom
 
         if (kinds != 0 && ZukanDetailMap_IsPlaceListed(wk, common) == TRUE) {
             GameData *gameData = ZukanDetailCommon_GetGameData(common);
-            void *habitatList = SaveControl_GetZukanHabitatSave(GameData_GetSaveControl(gameData));
+            ZukanHabitatSave *habitatList = SaveControl_GetZukanHabitatSave(GameData_GetSaveControl(gameData));
             EventWork *eventWork = GameData_GetEventWork(gameData);
 
             if (kinds & HABITAT_LAND) {

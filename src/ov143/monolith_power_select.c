@@ -61,9 +61,6 @@ typedef enum {
     MONOLITH_POWER_ID_COUNT = PASS_POWER_COUNT,
 } MonolithPowerId;
 
-// What CheckPassPowerUnlocked returns for a pass power that isn't shown
-#define PASS_POWER_LOCKED 2
-
 // The rows of the list on the screen, each 32 pixels tall
 #define MONOLITH_POWER_ROW_COUNT 7
 #define MONOLITH_POWER_ROW_HEIGHT 32
@@ -579,9 +576,9 @@ static BOOL MonolithPower_Exit(GameProc *proc, u32 *state, void *param, void *wo
 }
 
 static void MonolithPower_CreateBGs(void) {
-    GFL_BGSysCreateBG(MONOLITH_POWER_BG_TEXT, &sMonolithPowerBGSetups[0], 0);
-    GFL_BGSysCreateBG(MONOLITH_POWER_BG_FRAME, &sMonolithPowerBGSetups[1], 0);
-    GFL_BGSysCreateBG(MONOLITH_POWER_BG_LIST, &sMonolithPowerBGSetups[2], 0);
+    GFL_BGSysCreateBG(MONOLITH_POWER_BG_TEXT, &sMonolithPowerBGSetups[0], BGMODE_TEXT);
+    GFL_BGSysCreateBG(MONOLITH_POWER_BG_FRAME, &sMonolithPowerBGSetups[1], BGMODE_TEXT);
+    GFL_BGSysCreateBG(MONOLITH_POWER_BG_LIST, &sMonolithPowerBGSetups[2], BGMODE_TEXT);
     GFL_BGSysFillScrArea(MONOLITH_POWER_BG_TEXT, 0, 0, 0, 32, 32, 17);
     GFL_BGSysFillScrArea(MONOLITH_POWER_BG_FRAME, 0, 0, 0, 32, 32, 17);
     GFL_BGSysFillScrArea(MONOLITH_POWER_BG_LIST, 0, 0, 0, 32, 32, 17);

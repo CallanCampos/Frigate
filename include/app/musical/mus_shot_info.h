@@ -9,7 +9,7 @@
 #include "save/save_control.h"
 #include "struct_decls.h"
 
-MusShotInfo *MusShotInfo_Create(MusicalShot *shot, MusicalSave *save, BOOL askSave, void *comm, HeapID heapId);
+MusShotInfo *MusShotInfo_Create(MusicalShot *shot, MusicalSave *save, BOOL askSave, MusCommWork *comm, HeapID heapId);
 void MusShotInfo_Delete(MusShotInfo *info);
 void MusShotInfo_Main(MusShotInfo *info);
 BOOL MusShotInfo_IsFinished(MusShotInfo *info);

@@ -53,13 +53,13 @@ GimmickPlasmaFrigate_SetSavedVar kind:function(thumb,size=0x6) addr:0x021efce4
 GimmickPlasmaFrigate_GetSavedVar kind:function(thumb,size=0x6) addr:0x021efcec
 GimmickPlasmaFrigate_SetSaved kind:function(thumb,size=0x6) addr:0x021efcf4
 GimmickPlasmaFrigate_GetSaved kind:function(thumb,size=0x4) addr:0x021efcfc
-data_ov117_021efd00 kind:data(any) addr:0x021efd00
-data_ov117_021efd08 kind:data(any) addr:0x021efd08
-data_ov117_021efd10 kind:data(any) addr:0x021efd10
-data_ov117_021efd18 kind:data(any) addr:0x021efd18
-data_ov117_021efd24 kind:data(any) addr:0x021efd24
-data_ov117_021efd30 kind:data(any) addr:0x021efd30
-data_ov117_021efd3c kind:data(any) addr:0x021efd3c
+sGroupAAnimations kind:data(any) addr:0x021efd00
+sSwitchAnimations kind:data(any) addr:0x021efd08
+sAreaValues kind:data(any) addr:0x021efd10
+sPanelAnimations kind:data(any) addr:0x021efd18
+sEffectBAnimations kind:data(any) addr:0x021efd24
+sEffectAAnimations kind:data(any) addr:0x021efd30
+sSceneSetup kind:data(any) addr:0x021efd3c
 data_ov117_021efd4c kind:data(any) addr:0x021efd4c
 data_ov117_021efd5c kind:data(any) addr:0x021efd5c
 data_ov117_021efd74 kind:data(any) addr:0x021efd74
@@ -67,19 +67,19 @@ data_ov117_021efd8c kind:data(any) addr:0x021efd8c
 data_ov117_021efdbc kind:data(any) addr:0x021efdbc
 data_ov117_021efdec kind:data(any) addr:0x021efdec
 data_ov117_021efe00 kind:data(any) addr:0x021efe00 ambiguous
-data_ov117_021efe1c kind:data(any) addr:0x021efe1c
-data_ov117_021efe5c kind:data(any) addr:0x021efe5c
+sAreasOn kind:data(any) addr:0x021efe1c
+sAreasOff kind:data(any) addr:0x021efe5c
 data_ov117_021efe5d kind:data(any) addr:0x021efe5d
 data_ov117_021efe5e kind:data(any) addr:0x021efe5e
 data_ov117_021efe5f kind:data(any) addr:0x021efe5f
-data_ov117_021efe9c kind:data(any) addr:0x021efe9c
+sPanelPairs kind:data(any) addr:0x021efe9c
 data_ov117_021efea0 kind:data(any) addr:0x021efea0
-data_ov117_021eff0c kind:data(any) addr:0x021eff0c
-data_ov117_021effe4 kind:data(any) addr:0x021effe4
+sResources kind:data(any) addr:0x021eff0c
+sPanelPlacements kind:data(any) addr:0x021effe4
 data_ov117_021f0001 kind:data(any) addr:0x021f0001 ambiguous
 data_ov117_021f0086 kind:data(any) addr:0x021f0086 ambiguous
-data_ov117_021f00e4 kind:data(any) addr:0x021f00e4
+sIndicatorPlacements kind:data(any) addr:0x021f00e4
 data_ov117_021f0105 kind:data(any) addr:0x021f0105 ambiguous
-data_ov117_021f0204 kind:data(any) addr:0x021f0204
+sActors kind:data(any) addr:0x021f0204
 data_ov117_021f021e kind:data(any) addr:0x021f021e ambiguous
-data_ov117_021f0580 kind:data(any) addr:0x021f0580
+sPanelIndicators kind:data(any) addr:0x021f0580

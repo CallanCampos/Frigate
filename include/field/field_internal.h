@@ -4,7 +4,10 @@
 #include "field/field.h"
 #include "field/field_controller.h"
 #include "field/field_g3d_mapper.h"
+#include "field/field_palace.h"
+#include "field/field_scene_area.h"
 #include "field/zone.h"
+#include "gfl/blact.h"
 
 // The gimmick work of Field_AllocGimmickWorkBlock, password 0xffffffff for none
 typedef struct {
@@ -20,37 +23,37 @@ struct Field {
     GameData *gameData;
     AreaData *areaData;
     FieldCamera *cameraSystem;
-    void *lightSystem;
+    FieldLight *lightSystem;
     FieldFog *fog;
-    void *fogCtrl;
-    void *weatherSystem;
+    FieldFogCtrl *fogCtrl;
+    FieldWeather *weatherSystem;
     FieldSubscreen *subscreen;
     FieldMsgBG *msgBGSys;
     MoneyWin *moneyWin;
     PlaceName *placeName;
-    void *unk34;
-    void *fesGimmick;
+    FieldFMissionInfo *fmissionInfo;
+    FesGimmick *fesGimmick;
     FieldExpObjSystem *expObjSystem;
     MMSys *actorSystem;
     NoGridMapper *noGridMapper;
-    void *sceneArea;
-    void *sceneAreaLoader;
+    FieldSceneArea *sceneArea;
+    FieldSceneAreaLoader *sceneAreaLoader;
     FieldG3DMapper *g3DMapper;
     u32 unk54;
     FieldG3DMapperConfig mapperConfig;
     FieldPlayer *player;
     EncountSystem *encountSystem;
-    void *fieldEffects;
-    void *unkA0;
-    void *palaceSys;
-    u8 colorPostFX[0x8];
-    void *skillMapEff;
-    void *g3dCamera;
-    void *g3dLights;
-    void *asyncActorMatLoadTCB;
-    void *actorBlAct;
-    void *effectBlAct;
-    void *wildEffectBlAct;
+    FieldEffects *fieldEffects;
+    UnionEffect *unionEffect;
+    FieldPalaceSys *palaceSys;
+    FieldColorPostFX colorPostFX;
+    FieldSkillMapEff *skillMapEff;
+    G3DCamera *g3dCamera;
+    G3DLight *g3dLights;
+    TCB *asyncActorMatLoadTCB;
+    BlActSys *actorBlAct;
+    BlActSys *effectBlAct;
+    BlActSys *wildEffectBlAct;
     FieldAsyncProcManager *asyncProcManager;
     // 1 when the map is loaded, 2 when closing
     u32 routineState;
@@ -67,27 +70,29 @@ struct Field {
     fx32 actorYOffset;
     fx32 objectProjectionMatrixOffset;
     const FieldmapCtrlVTable *ctrlVTable;
+    // The vtable's kind's controller: a FieldmapCtrlGrid, FieldmapCtrlNoGrid or FieldmapCtrlHybrid
     void *controller;
     TCBManager *tcbManager;
     void *tcbManagerHeap;
     FieldGimmickWorkBlock gimmickWork;
-    void *particleSystem;
-    void *g3dCi;
+    FieldParticle *particleSystem;
+    Fld3DCi *g3dCi;
     DayCare *dayCare;
     u32 renderMode;
-    void *g3DObjSystem;
+    FieldG3DObjSystem *g3DObjSystem;
     FieldTaskManager *taskManager;
     BOOL fadeFlag;
     EncEff *encEff;
     BOOL effectRunningFlag;
     BOOL seasonBannerOverdrawFlag;
-    void *nDemoData;
-    void *dispControl;
+    // The face-up of the scenes with N (fld_faceup.c)
+    FaceUpWork *nDemoData;
+    FieldDispControl *dispControl;
     CasteliaRush *casteliaRush;
     FieldLensFlare *lensFlare;
 };
 
-void *func_ov036_0218051c(Field *field);
+UnionEffect *func_ov036_0218051c(Field *field);
 void func_ov036_02180fe4(FieldGimmickWorkBlock *block);
 
 // The memory of the field's heap 0x89, in overlay 36's .bss (which file defines it isn't known yet)

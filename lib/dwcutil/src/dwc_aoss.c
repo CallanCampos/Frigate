@@ -80,12 +80,12 @@ typedef struct tagASTSpktCryptData {
     u8 Data[1];
 } tagASTSpktCryptData;
 
+// A received message: its header (tagASTSpktHeader) and its records, as bytes
 typedef struct AossPacket {
     int sock;
     int length;
     int unk_08;
-    tagASTSpktHeader header;
-    u8 body[AOSS_PACKET_SIZE - sizeof(tagASTSpktHeader)];
+    u8 data[AOSS_PACKET_SIZE];
 } AossPacket;
 
 // What the hello has: two names and a number
@@ -190,7 +190,7 @@ static int RecvMessage(int state, AossPacket *packet, int *errors, const u8 *ids
 static int AstsSetInitRes(int state, AossPacket *packet, int *errors, const u8 *ids);
 static int AstsSetSecureRes(int state, AossPacket *packet, int *errors, const u8 *ids);
 static int AstsRestartRes(int state, AossPacket *packet, int *errors, const u8 *ids);
-static int DecodePacket(tagASTSpktHeader *header);
+static int DecodePacket(u8 *data);
 static int CheckSeqID(int type, const u8 *id);
 static int CheckRecvSeqID(const u8 *expected, u8 *received);
 static int GetProductInfo(const AossItem *items, AossHello *hello);
@@ -198,8 +198,7 @@ static u32 aoss_get_bin(const u8 *data, int length);
 static int GetWEPData(const AossRecord *record, ASTS_DATA_WEP *info);
 static int GetWPAData(const AossRecord *record, ASTS_DATA_AES *info);
 static int GetBssidData(const AossRecord *record, u8 *key);
-static int GetSecurityData(int slot, const AossRecord *record, int length, ASTS_DATA_INFO *slots,
-                           PRODUCT_INFO_AOSS *session);
+static int GetSecurityData(int slot, const u8 *data, int length, ASTS_DATA_INFO *slots, PRODUCT_INFO_AOSS *session);
 static int GetSecurityType(int flags);
 static int SendMessage(int state, const AossEndpoints *endpoints, const u8 *ids, int sock);
 static int AstsSetInitReq(const AossEndpoints *endpoints, const u8 *ids, int sock);
@@ -237,14 +236,16 @@ static int AOSS_Socket(int domain, int type, int protocol);
 static int AOSS_Bind(int sock, SOCSockAddrIn *address, int length);
 static int AOSS_Close(int sock);
 static u32 AOSS_Htonl(u32 value);
-static u32 AOSS_Htons(u16 value);
+static u16 AOSS_Htons(u16 value);
 static u32 AOSS_Ntohl(u32 value);
-static u32 AOSS_Ntohs(u16 value);
+static u16 AOSS_Ntohs(u16 value);
 static u32 AOSS_Strlen(const char *text);
 static u16 AOSS_Rand(void);
 static void AOSS_FD_ZERO(SOCPollFD *fd);
 static void AOSS_FD_SET(int sock, SOCPollFD *fd);
 
+// The scan's retry settings before the caller's are read: unset
+static const RETRY_VAL sDefaultRetry = { -1, -1 };
 static u8 sRecordType[3] = { 9, 8, 0 };
 static struct {
     int socket;
@@ -305,30 +306,31 @@ int AOSSi_Init(AOSS_INFO *param) {
 }
 
 static int AOSS_Init_old(AOSS_INFO *param) {
-    u8 ids[3][8];
-    WLLA_CONNECT_PARAM target;
-    AossEndpoints endpoints;
-    RETRY_VAL scan = { -1, -1 };
+    RETRY_VAL scan = sDefaultRetry;
     RETRY_VAL send = { 0, 0 };
+    s16 timeout;
+    int ret;
     int option = 1;
-    int sends = 0;
+    int sends;
+    int state = 0;
+    int newState;
+    int result;
     SOCSockAddrIn from;
     int fromLength;
     SOCPollFD pollFd;
     AOSS_timeval timeval;
-    SOCSockAddrIn addr;
-    int scanResult;
-    int state = 0;
-    int newState;
-    u32 ip = 0;
-    AossPacket *packet;
-    int sec;
-    int usec;
-    int timeout;
-    int ret;
     s16 i;
+    u8 ids[3][8];
+    int scanResult;
+    WLLA_CONNECT_PARAM target;
+    SOCSockAddrIn addr;
+    u32 ip;
+    AossEndpoints endpoints;
+    AossPacket *packet;
 
-    AOSS_Memset(ids, state, sizeof(ids));
+    sends = 0;
+    ip = 0;
+    AOSS_Memset(ids, 0, sizeof(ids));
     scan.count = param->retryCount_Scan;
     if (scan.count == -1) {
         scan.count = 10;
@@ -408,8 +410,10 @@ static int AOSS_Init_old(AOSS_INFO *param) {
             aoss_release();
             return -1;
         }
-        if (ret == 0 && ((WLLA_LINK_STAT *)sAoss.apInfo)->LinkStat == 1) {
-            break;
+        if (ret == 0) {
+            if (ret != 0 || ((WLLA_LINK_STAT *)sAoss.apInfo)->LinkStat == 1) {
+                break;
+            }
         }
         AOSSi_Sleep(scan.time);
     }
@@ -453,8 +457,6 @@ static int AOSS_Init_old(AOSS_INFO *param) {
         AOSS_Memset(&endpoints, 0, sizeof(endpoints));
         endpoints.client = AOSS_CLIENT_ADDR;
         endpoints.router = AOSS_ROUTER_ADDR;
-        sec = timeout / 1000;
-        usec = timeout % 1000 * 1000;
         while (1) {
             if (state == 1 && sAoss.request.reconnected != 1) {
                 if (sNet.socket != -1) {
@@ -519,8 +521,10 @@ static int AOSS_Init_old(AOSS_INFO *param) {
                         aoss_release();
                         return -1;
                     }
-                    if (ret == 0 && ((WLLA_LINK_STAT *)sAoss.apInfo)->LinkStat == 1) {
-                        break;
+                    if (ret == 0) {
+                        if (ret != 0 || ((WLLA_LINK_STAT *)sAoss.apInfo)->LinkStat == 1) {
+                            break;
+                        }
                     }
                     AOSSi_Sleep(scan.time);
                 }
@@ -570,52 +574,39 @@ static int AOSS_Init_old(AOSS_INFO *param) {
             AOSS_Memset(packet, 0, AOSS_BUFFER_SIZE);
             AOSS_FD_ZERO(&pollFd);
             AOSS_FD_SET(sNet.socket, &pollFd);
-            timeval.tv_sec = sec;
-            timeval.tv_usec = usec;
-            if (AOSS_Select(sNet.socket + 1, &pollFd, NULL, NULL, &timeval) <= 0) {
-                sends++;
-                if (sends > send.count) {
-                    if (state == 0) {
-                        aoss_set_error(0xf);
-                    } else if (state == 1) {
-                        aoss_set_error(0x10);
-                    } else {
-                        aoss_set_error(0x11);
-                    }
-                    ret = -1;
-                    goto done;
-                }
-                AOSSi_Sleep(send.time);
-                continue;
-            }
-            fromLength = 8;
-            packet->sock = sNet.socket;
-            packet->length =
-                AOSS_Ntohs(AOSS_Recvfrom(sNet.socket, &packet->header, AOSS_PACKET_SIZE, 0, &from, &fromLength));
-            newState = RecvMessage(state, packet, &sends, ids[0], sNet.socket);
-            if (newState == 100) {
-                ret = 0;
-                goto done;
-            }
-            if (newState == -1) {
-                ret = -1;
-                goto done;
-            }
-            if (state == newState) {
-                if (sends > send.count) {
-                    if (newState == 0) {
-                        aoss_set_error(0xf);
-                    } else if (newState == 1) {
-                        aoss_set_error(0x10);
-                    } else {
-                        aoss_set_error(0x11);
-                    }
-                    ret = -1;
-                    goto done;
-                }
-                AOSSi_Sleep(send.time);
+            timeval.tv_sec = timeout / 1000;
+            timeval.tv_usec = timeout % 1000 * 1000;
+            if (AOSS_Select(sNet.socket + 1, &pollFd, NULL, NULL, &timeval) > 0) {
                 break;
             }
+            sends++;
+            if (sends > send.count) {
+                if (state == 0) {
+                    aoss_set_error(0xf);
+                } else if (state == 1) {
+                    aoss_set_error(0x10);
+                } else {
+                    aoss_set_error(0x11);
+                }
+                result = -1;
+                goto done;
+            }
+            AOSSi_Sleep(send.time);
+        }
+        fromLength = 8;
+        ret = AOSS_Recvfrom(sNet.socket, packet->data, AOSS_PACKET_SIZE, 0, &from, &fromLength);
+        packet->sock = sNet.socket;
+        packet->length = AOSS_Ntohs(ret);
+        newState = RecvMessage(state, packet, &sends, ids[0], sNet.socket);
+        if (newState == 100) {
+            result = 0;
+            break;
+        }
+        if (newState == -1) {
+            result = -1;
+            break;
+        }
+        if (state != newState) {
             if (newState == 2) {
                 if (sNet.socket != -1) {
                     AOSS_Close(sNet.socket);
@@ -670,8 +661,10 @@ static int AOSS_Init_old(AOSS_INFO *param) {
                         aoss_release();
                         return -1;
                     }
-                    if (ret == 0 && ((WLLA_LINK_STAT *)sAoss.apInfo)->LinkStat == 1) {
-                        break;
+                    if (ret == 0) {
+                        if (ret != 0 || ((WLLA_LINK_STAT *)sAoss.apInfo)->LinkStat == 1) {
+                            break;
+                        }
                     }
                     AOSSi_Sleep(scan.time);
                 }
@@ -710,8 +703,21 @@ static int AOSS_Init_old(AOSS_INFO *param) {
                 }
             }
             state = newState;
+            continue;
+        }
+        state = newState;
+        if (sends > send.count) {
+            if (state == 0) {
+                aoss_set_error(0xf);
+            } else if (state == 1) {
+                aoss_set_error(0x10);
+            } else {
+                aoss_set_error(0x11);
+            }
+            result = -1;
             break;
         }
+        AOSSi_Sleep(send.time);
     }
 
 done:
@@ -724,7 +730,7 @@ done:
         aoss_release();
         return -1;
     }
-    if (ret != 0) {
+    if (result != 0) {
         u8 error;
 
         switch (aoss_get_error()) {
@@ -804,12 +810,17 @@ static int aoss_get_error(void) {
 
 // Copies the keys that the access point sent to the answer, if they are fit
 static int AOSS_seq_data_copy(AOSS_INFO *param) {
-    AOSS_SECURE_INFO *result = &param->secureInfo;
-    ASTS_DATA_AES *tkip = &sApInfo[0].TkipData;
-    ASTS_DATA_WEP *wep104 = &sApInfo[0].WepData_104;
-    ASTS_DATA_WEP *wep40 = &sApInfo[0].WepData_40;
-    ASTS_DATA_AES *aes = &sApInfo[0].AesData;
+    AOSS_SECURE_INFO *result;
+    ASTS_DATA_WEP *wep40;
+    ASTS_DATA_WEP *wep104;
+    ASTS_DATA_AES *tkip;
+    ASTS_DATA_AES *aes;
 
+    result = &param->secureInfo;
+    wep40 = &sApInfo[0].WepData_40;
+    wep104 = &sApInfo[0].WepData_104;
+    tkip = &sApInfo[0].TkipData;
+    aes = &sApInfo[0].AesData;
     if (result == NULL) {
         return -1;
     }
@@ -946,7 +957,7 @@ static int AOSS_StatusExclusion(int mode) {
 }
 
 static int RecvMessage(int state, AossPacket *packet, int *errors, const u8 *ids, int sock) {
-    tagASTSpktHeader *header = &packet->header;
+    tagASTSpktHeader *header = (tagASTSpktHeader *)packet->data;
 
     if (AOSS_Ntohs(header->PktVersion) < 1) {
         (*errors)++;
@@ -956,7 +967,7 @@ static int RecvMessage(int state, AossPacket *packet, int *errors, const u8 *ids
         (*errors)++;
         return state;
     }
-    if (DecodePacket(&packet->header) > 0) {
+    if (DecodePacket(packet->data) > 0) {
         (*errors)++;
         return state;
     }
@@ -983,8 +994,8 @@ static int AstsSetInitRes(int state, AossPacket *packet, int *errors, const u8 *
         (*errors)++;
         return state;
     }
-    header = &packet->header;
-    record = (AossRecord *)packet->body;
+    header = (tagASTSpktHeader *)packet->data;
+    record = (AossRecord *)(packet->data + sizeof(tagASTSpktHeader));
     if (CheckRecvSeqID(ids, header->SeqID) < 0) {
         (*errors)++;
         return state;
@@ -1022,19 +1033,21 @@ static int AstsSetInitRes(int state, AossPacket *packet, int *errors, const u8 *
 }
 
 static int AstsSetSecureRes(int state, AossPacket *packet, int *errors, const u8 *ids) {
-    tagASTSpktHeader *header;
     AossRecord *record;
+    u8 *data;
+    tagASTSpktHeader *header;
 
     if (state != 1) {
         (*errors)++;
         return state;
     }
-    header = &packet->header;
-    record = (AossRecord *)packet->body;
+    header = (tagASTSpktHeader *)packet->data;
+    data = packet->data + sizeof(tagASTSpktHeader);
     if (CheckRecvSeqID(ids + 8, header->SeqID) < 0) {
         (*errors)++;
         return state;
     }
+    record = (AossRecord *)data;
     if (AOSS_Ntohs(record->length) == 0) {
         (*errors)++;
         return state;
@@ -1050,7 +1063,7 @@ static int AstsSetSecureRes(int state, AossPacket *packet, int *errors, const u8
         return -1;
     }
     AOSS_Memset(sApInfo, 0, sizeof(sApInfo));
-    if (GetSecurityData(0, record, AOSS_Ntohs(header->size), sApInfo, &sSession) < 0) {
+    if (GetSecurityData(0, data, AOSS_Ntohs(header->size), sApInfo, &sSession) < 0) {
         (*errors)++;
         return state;
     }
@@ -1068,9 +1081,8 @@ static int AstsRestartRes(int state, AossPacket *packet, int *errors, const u8 *
         (*errors)++;
         return state;
     }
-    tagASTSpktHeader *const header = &packet->header;
-    record = (AossRecord *)packet->body;
-    if (CheckRecvSeqID(ids + 16, header->SeqID) < 0) {
+    record = (AossRecord *)(packet->data + sizeof(tagASTSpktHeader));
+    if (CheckRecvSeqID(ids + 16, ((tagASTSpktHeader *)packet->data)->SeqID) < 0) {
         (*errors)++;
         return state;
     }
@@ -1098,8 +1110,9 @@ static int AstsRestartRes(int state, AossPacket *packet, int *errors, const u8 *
 }
 
 // Checks the id of a message and decrypts its body; 0 if it is fit
-static int DecodePacket(tagASTSpktHeader *header) {
-    tagASTSpktCryptData *body = (tagASTSpktCryptData *)(header + 1);
+static int DecodePacket(u8 *data) {
+    tagASTSpktHeader *header = (tagASTSpktHeader *)data;
+    tagASTSpktCryptData *body = (tagASTSpktCryptData *)(data + sizeof(tagASTSpktHeader));
     u8 id[8];
     u32 length;
     u8 *buffer;
@@ -1373,54 +1386,52 @@ static int GetBssidData(const AossRecord *record, u8 *key) {
 }
 
 // Reads the security settings that the reply of a stage has into slot of slots; 0 if they are fit
-static int GetSecurityData(int slot, const AossRecord *record, int length, ASTS_DATA_INFO *slots,
-                           PRODUCT_INFO_AOSS *session) {
-    u32 found = 0;
-    int result;
-    ASTS_DATA_INFO *ap;
+static int GetSecurityData(int slot, const u8 *data, int length, ASTS_DATA_INFO *slots, PRODUCT_INFO_AOSS *session) {
     const AossRecord *entry;
+    int step;
+    int next;
+    int result;
+    u32 found;
     int size;
 
+    found = 0;
     if (length <= 0) {
         return -2;
     }
     while (1) {
-        int step;
-
-        entry = record;
+        entry = (const AossRecord *)data;
         if (entry->type == sRecordType[slot]) {
             break;
         }
         step = AOSS_Ntohs(entry->length) + 4;
         length -= step;
-        record = (const AossRecord *)((const u8 *)entry + step);
+        data += step;
         if (length <= 0) {
             return -4;
         }
     }
-    record = (const AossRecord *)record->payload.bytes;
+    data += 4;
     size = AOSS_Ntohs(entry->length);
-    ap = &slots[slot];
     do {
-        switch (record->type) {
+        switch (*data) {
         case 3:
-            result = GetWEPData(record, &ap->WepData_40);
+            result = GetWEPData((const AossRecord *)data, &slots[slot].WepData_40);
             found |= AOSS_TYPE_WEP40;
             break;
         case 4:
-            result = GetWEPData(record, &ap->WepData_104);
+            result = GetWEPData((const AossRecord *)data, &slots[slot].WepData_104);
             found |= AOSS_TYPE_WEP104;
             break;
         case 5:
-            result = GetWPAData(record, &ap->TkipData);
+            result = GetWPAData((const AossRecord *)data, &slots[slot].TkipData);
             found |= AOSS_TYPE_TKIP;
             break;
         case 6:
-            result = GetWPAData(record, &ap->AesData);
+            result = GetWPAData((const AossRecord *)data, &slots[slot].AesData);
             found |= AOSS_TYPE_AES;
             break;
         case 10:
-            result = GetBssidData(record, session->ProductInfo[slot + 3]);
+            result = GetBssidData((const AossRecord *)data, session->ProductInfo[slot + 3]);
             break;
         default:
             result = -3;
@@ -1429,12 +1440,9 @@ static int GetSecurityData(int slot, const AossRecord *record, int length, ASTS_
         if (result != 0) {
             return result;
         }
-        {
-            int step = AOSS_Ntohs(record->length) + 4;
-
-            size -= step;
-            record = (const AossRecord *)((const u8 *)record + step);
-        }
+        next = AOSS_Ntohs(((const AossRecord *)data)->length) + 4;
+        size -= next;
+        data += next;
     } while (size > 0);
     sAoss.request.found |= found;
     return 0;
@@ -1901,16 +1909,16 @@ static u32 AOSS_Htonl(u32 value) {
     return ((value >> 24) & 0xff) | ((value >> 8) & 0xff00) | ((value << 8) & 0xff0000) | ((value << 24) & 0xff000000);
 }
 
-static u32 AOSS_Htons(u16 value) {
-    return (u16)(((value >> 8) & 0xff) | ((value << 8) & 0xff00));
+static u16 AOSS_Htons(u16 value) {
+    return ((value >> 8) & 0xff) | ((value << 8) & 0xff00);
 }
 
 static u32 AOSS_Ntohl(u32 value) {
     return ((value >> 24) & 0xff) | ((value >> 8) & 0xff00) | ((value << 8) & 0xff0000) | ((value << 24) & 0xff000000);
 }
 
-static u32 AOSS_Ntohs(u16 value) {
-    return (u16)(((value >> 8) & 0xff) | ((value << 8) & 0xff00));
+static u16 AOSS_Ntohs(u16 value) {
+    return ((value >> 8) & 0xff) | ((value << 8) & 0xff00);
 }
 
 static u32 AOSS_Strlen(const char *text) {

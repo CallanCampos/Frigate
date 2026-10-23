@@ -6,10 +6,10 @@ DriftveilLift_MoveEvent kind:function(thumb,size=0x164) addr:0x021eee80
 DriftveilLift_PlaceAtBottom kind:function(thumb,size=0xc8) addr:0x021eefe4
 DriftveilLift_HasArrived kind:function(thumb,size=0x20) addr:0x021ef0ac
 DriftveilLift_ResetAnm kind:function(thumb,size=0x42) addr:0x021ef0cc
-data_ov097_021ef110 kind:data(any) addr:0x021ef110
-data_ov097_021ef114 kind:data(any) addr:0x021ef114
-data_ov097_021ef118 kind:data(any) addr:0x021ef118
-data_ov097_021ef128 kind:data(any) addr:0x021ef128
-data_ov097_021ef148 kind:data(any) addr:0x021ef148
+sAnimations03 kind:data(any) addr:0x021ef110
+sAnimations01 kind:data(any) addr:0x021ef114
+sSceneSetup kind:data(any) addr:0x021ef118
+sActors kind:data(any) addr:0x021ef128
+sResources kind:data(any) addr:0x021ef148
 data_ov097_021ef178 kind:data(any) addr:0x021ef178
 data_ov097_021ef184 kind:data(any) addr:0x021ef184

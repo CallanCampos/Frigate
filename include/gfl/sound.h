@@ -114,7 +114,7 @@ void GFL_SndStreamFadeStop(u32 frames);
 
 // The save's Chatot recording, which a cry of Chatot plays in place of its own
 typedef struct {
-    void *chatter;
+    PerapVoice *chatter;
 } PokeVoiceChatterInfo;
 
 void PokeVoice_CreateChatterInfo(PokeVoiceChatterInfo *info);
@@ -166,7 +166,7 @@ BOOL SndMic_IsOverLimit(void);
 // 0 once the recording has started
 u32 SndMic_StartRecording(void (*callback)(u32 result, u32 *done), u32 *done);
 // Saves the recording as the Chatot's
-void SndMic_EncodeChatter(void *chatter);
+void SndMic_EncodeChatter(PerapVoice *chatter);
 
 // The BGM info archive: which interactive sound subsystem each BGM uses (ISS_SUBSYSTEM_*), or 0 for none
 BGMInfo *BGMInfo_Create(HeapID heapId);

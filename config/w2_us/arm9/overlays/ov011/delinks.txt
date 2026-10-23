@@ -17,6 +17,7 @@ src/ov011/net_devwifi.c:
     .bss        start:0x0218ba40 end:0x0218ba44
 
 src/ov011/dwc_rap.c:
+    complete
     .text       start:0x02150614 end:0x021520b8
     .rodata     start:0x02185008 end:0x02185014
     .data       start:0x021852fc end:0x021853d4
@@ -110,6 +111,7 @@ lib/nitrowifi/src/ssl/ssl_rc4.c:
     .text       start:0x0215b218 end:0x0215b2b4
 
 lib/nitrowifi/src/ssl/biginteger.c:
+    complete
     .text       start:0x0215b2b4 end:0x0215bc2c
 
 lib/nitrowifi/src/wcm/wcm.c:
@@ -118,6 +120,7 @@ lib/nitrowifi/src/wcm/wcm.c:
     .bss        start:0x0218dfb4 end:0x0218e008
 
 lib/dwc/src/gt2/gsUdpEngine.c:
+    complete
     .text       start:0x0216eee8 end:0x0216fc20
     .data       start:0x0218703c end:0x021874e0
     .bss        start:0x02190968 end:0x021909a4
@@ -222,6 +225,7 @@ lib/dwc/src/gp/gpiProfile.c:
     .data       start:0x021889a4 end:0x02188a14
 
 lib/dwc/src/gp/gpiSearch.c:
+    complete
     .text       start:0x02179874 end:0x0217b63c
     .data       start:0x02188a14 end:0x02188e6c
 

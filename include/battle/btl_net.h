@@ -4,8 +4,10 @@
 // Overlay 167's link battle functions, which exchange the clients' data before a link battle starts
 
 #include "types.h"
+#include "battle/btl_setup.h"
 #include "gfl/heap.h"
 #include "gfl/net_command.h"
+#include "save/chatter.h"
 #include "struct_decls.h"
 
 void BtlNet_Init(NetHandle *netHandle, u16 clientMask, HeapID heapId);
@@ -24,7 +26,7 @@ BOOL BtlNet_ArePartiesReceived(void);
 void BtlNet_BeginChatterExchange(void);
 BOOL BtlNet_SendChatter(void *chatter);
 BOOL BtlNet_AreChattersReceived(void);
-void *BtlNet_GetChatter(u8 clientId);
+PerapVoice *BtlNet_GetChatter(u8 clientId);
 void BtlNet_EndChatterExchange(void);
 BOOL BtlNet_SendPartyPacket(BtlNetPartyPacket *data);
 BOOL BtlNet_IsClientPartyReceived(u8 clientId);
@@ -35,7 +37,8 @@ BOOL BtlNet_ArePlayerInfosReceived(void);
 PlayerInfo *BtlNet_GetPlayerInfo(u8 clientId);
 BOOL BtlNet_SendTrainer(BtlSetupTrainer *trainer);
 BOOL BtlNet_IsTrainerReceived(void);
-void *BtlNet_GetTrainer(void);
+// The trainer that arrived, until BtlNet_FreeTrainer
+BtlCommTrainerData *BtlNet_GetTrainer(void);
 void BtlNet_FreeTrainer(void);
 void BtlNet_EndTrainerExchange(void);
 void BtlNet_StartTiming(u8 id);
@@ -48,9 +51,9 @@ void BtlNet_ResetReplies(void);
 BOOL BtlNet_IsServerCmdReceived(void);
 u16 BtlNet_GetServerCmd(void **data);
 BOOL BtlNet_SendReply(void *data, u32 size);
-void *BtlNet_CreatePartyPacket(u32 size, HeapID heapId);
-void BtlNet_FreePartyPacket(void *data);
-void BtlNet_SetPartyPacket(void *data, PokeParty *party, u8 clientId);
+BtlNetPartyPacket *BtlNet_CreatePartyPacket(u32 size, HeapID heapId);
+void BtlNet_FreePartyPacket(BtlNetPartyPacket *packet);
+void BtlNet_SetPartyPacket(BtlNetPartyPacket *packet, PokeParty *party, u8 clientId);
 
 // The link battle's commands, registered from 0x100 by the events that start one
 extern const NetCommand data_ov167_021d7448[9];

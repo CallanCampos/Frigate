@@ -38,7 +38,7 @@ UnionSubdisp_UpdateKeyScroll kind:function(thumb,size=0x58) addr:0x021eb9e4
 sIconStates kind:data(any) addr:0x021eba3c
 sMessagePos kind:data(any) addr:0x021eba44
 sIconSetup kind:data(any) addr:0x021eba4c
-sFrameBGSetup kind:data(any) addr:0x021eba54
+sBGSetups kind:data(any) addr:0x021eba54
 sLinesBGSetup kind:data(any) addr:0x021eba74
 sTextBGSetup kind:data(any) addr:0x021eba94
 data_ov082_021eba80 kind:data(any) addr:0x021ebac0

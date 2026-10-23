@@ -185,7 +185,7 @@ struct WbtSystem {
     PokeParty *partyC0;
     PokeParty *partyC4;
     u8 unk13C8[4];
-    void *unk13CC;
+    WbtPartyList *partyList;
     u8 unk13D0[4];
     // The texts that the battle shows after winning and after losing
     StrBuf *unk13D4;
@@ -265,8 +265,8 @@ u8 WbtSystem_GetDownloadSlot(WbtSystem *sys);
 void WbtSystem_SetResultVar(WbtSystem *sys, u16 *var);
 u16 *WbtSystem_GetResultVar(WbtSystem *sys);
 void WbtSystem_SetUseBattleBox(WbtSystem *sys, u8 value);
-void WbtSystem_SetPartyList(WbtSystem *sys, void *value);
-void *WbtSystem_GetPartyList(WbtSystem *sys);
+void WbtSystem_SetPartyList(WbtSystem *sys, WbtPartyList *list);
+WbtPartyList *WbtSystem_GetPartyList(WbtSystem *sys);
 void WbtSystem_SetRentalMode(WbtSystem *sys, u32 value);
 WbtEntrant *WbtSystem_GetEntrant(WbtSystem *sys, u32 index);
 WbtEntrant *WbtSystem_GetPlayerEntrant(WbtSystem *sys);
@@ -326,7 +326,7 @@ u8 WbtTool_GetDownloadedTrainerClass(u32 index);
 typedef struct {
     u32 unk0;
     u16 *unk4;
-    void *save;
+    WbtSave *save;
     PlayerInfo *playerInfo;
     // Whether the tournament of each of the save's counts is open
     u8 open[29];

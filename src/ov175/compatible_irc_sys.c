@@ -22,13 +22,17 @@
 // names are descriptive guesses
 
 // The commands of the link: the other player's id, a reply to it, and the count. They go after the base 0xd00
-#define CMD_ID 0xd00
-#define CMD_ID_REPLY 0xd01
-#define CMD_COUNT 0xd02
+enum {
+    CMD_ID = 0xd00,
+    CMD_ID_REPLY,
+    CMD_COUNT,
+};
 // And those of the profile exchange, after the base 0x1000
-#define CMD_SELECTION 0x1000
-#define CMD_PING 0x1001
-#define CMD_PROFILE 0x1003
+enum {
+    CMD_SELECTION = 0x1000,
+    CMD_PING,
+    CMD_PROFILE = 0x1003,
+};
 
 // What is exchanged besides the profiles: a selection of two numbers, and a ping
 typedef struct {
@@ -137,7 +141,7 @@ static const GFLNetInitData sCompatibleIrcSysNetInit = {
     0x10,
     1,
     0,
-    3,
+    GFL_NET_TYPE_IRC,
     1,
     0xd,
     { 0x2c, 1, 0, 0 },
@@ -395,7 +399,7 @@ BOOL CompatibleIrcSys_SendEx(CompatibleIrcSys *sys, u16 command, u32 size, const
     return GFL_NetSendCommandToMachine(NetHandle_GetOwn(), sendId, command, size, data, a5, a6, noCopy);
 }
 
-void CompatibleIrcSys_AddCommands(CompatibleIrcSys *sys, int base, const void *list, int count, void *work) {
+void CompatibleIrcSys_AddCommands(CompatibleIrcSys *sys, int base, const NetCommand *list, int count, void *work) {
     if (!sys->disabled) {
         NetCommand_AddTable(base, list, count, work);
     }

@@ -9,8 +9,6 @@
 // from, which open the tower's floors. The ROM has no string for the file, so the name is a guess (swan's
 // getUnityTower_SurveySaveBlkAddrress). Block 0x1d.
 
-#define SAVE_BLOCK_UNITY_TOWER_SURVEY 0x1d
-
 static void setForeignRegionMet(UnityTowerSurveySave *save, u8 met);
 
 u32 UnityTower_GetSurveySaveSize(void) {
@@ -201,11 +199,11 @@ void UnityTower_SetVisitorParam(UnityTowerSurveySave *save, int index, u32 param
     }
 }
 
-void *UnityTower_GetVisitor(UnityTowerSurveySave *save, int index) {
+PlayerInfo *UnityTower_GetVisitor(UnityTowerSurveySave *save, int index) {
     if (index >= UNITY_TOWER_VISITOR_MAX) {
         return NULL;
     }
-    return &save->visitors[index];
+    return &save->visitors[index].info;
 }
 
 UnityTowerVisitor *UnityTower_GetVisitors(UnityTowerSurveySave *save) {

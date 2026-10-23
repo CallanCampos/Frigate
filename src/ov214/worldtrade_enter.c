@@ -27,12 +27,6 @@
 // logging out, through the Wi-Fi login proc; and the text printing the other screens share. The names are ours,
 // guessed
 
-// The modes that the connection screen is entered with
-#define ENTER_MODE_LOGIN 0x13
-#define ENTER_MODE_LOGOUT 0x14
-// Logging in again after an error
-#define ENTER_MODE_RELOGIN 0x15
-
 // The connection screen's steps
 enum {
     ENTER_START,
@@ -80,8 +74,8 @@ static int Enter_WifiConnectionLogoutWait(WorldTradeWork *wk);
 static int Enter_LoginCallback(void *msgWork, void *data);
 static int Enter_LogoutCallback(void *msgWork, void *data);
 static int Enter_End(WorldTradeWork *wk);
-static int Enter_ServerErrorPrint(WorldTradeWork *wk, void *msgWork);
-static int Enter_ServerErrorWait(WorldTradeWork *wk, void *msgWork);
+static int Enter_ServerErrorPrint(WorldTradeWork *wk, WifiLoginMessage *msgWork);
+static int Enter_ServerErrorWait(WorldTradeWork *wk, WifiLoginMessage *msgWork);
 static void Enter_MessagePrintCore(WorldTradeWork *wk, MsgData *msgManager, int msgNo, int wait, u16 dat, int stream);
 static int Enter_PrintCommonFunc(BmpWin *win, StrBuf *str, int x, int flag, u16 color, int font,
                                  WorldTradePrint *print);
@@ -101,11 +95,11 @@ int WorldTrade_Enter_Init(WorldTradeWork *wk, int seq) {
     GX_SetDispSelect(GX_DISP_SELECT_SUB_MAIN);
 
     switch (wk->subProcessMode) {
-    case ENTER_MODE_LOGIN:
-    case ENTER_MODE_RELOGIN:
+    case WT_MODE_LOGIN:
+    case WT_MODE_RELOGIN:
         wk->subprocessSeq = ENTER_WIFI_LOGIN;
         break;
-    case ENTER_MODE_LOGOUT:
+    case WT_MODE_LOGOUT:
         wk->subprocessSeq = ENTER_WIFI_LOGOUT;
         break;
     }
@@ -333,7 +327,7 @@ static int Enter_WifiConnectionLogin(WorldTradeWork *wk) {
     param->unk20 = Enter_LoginCallback;
     param->unk24 = wk;
     wk->loginSeq = LOGIN_INTERNET_CONNECT;
-    if (wk->subProcessMode == ENTER_MODE_RELOGIN) {
+    if (wk->subProcessMode == WT_MODE_RELOGIN) {
         param->unk14 = 1;
     } else {
         param->unk14 = 0;
@@ -472,7 +466,7 @@ static int Enter_End(WorldTradeWork *wk) {
     return WT_SEQ_FADEOUT;
 }
 
-static int Enter_ServerErrorPrint(WorldTradeWork *wk, void *msgWork) {
+static int Enter_ServerErrorPrint(WorldTradeWork *wk, WifiLoginMessage *msgWork) {
     int msgNo;
 
     switch (wk->connectErrorNo) {
@@ -536,7 +530,7 @@ static int Enter_ServerErrorPrint(WorldTradeWork *wk, void *msgWork) {
     return TRUE;
 }
 
-static int Enter_ServerErrorWait(WorldTradeWork *wk, void *msgWork) {
+static int Enter_ServerErrorWait(WorldTradeWork *wk, WifiLoginMessage *msgWork) {
     switch (wk->localSeq) {
     case 0:
         wk->localSeq++;

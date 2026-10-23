@@ -1354,17 +1354,17 @@ static BOOL Box2Main_PokeMoveCheck(Box2SysWork *syswk, u32 getPos, u32 putPos) {
 
     if (syswk->param->mode == 4) {
         if (syswk->param->unk14 == 1) {
-            syswk->app->moveErr = 5;
+            syswk->app->moveErr = BOX2_MOVE_ERR_BATTLE_BOX_LOCKED;
             return FALSE;
         }
         if (getPos < BOX2_PARTY_POS && putPos >= BOX2_PARTY_POS && putPos < BOX2_BOXLIST_POS &&
             Box2Main_IsEggFree(syswk, getPos, syswk->getTray) == FALSE) {
-            syswk->app->moveErr = 4;
+            syswk->app->moveErr = BOX2_MOVE_ERR_EGG;
             return FALSE;
         }
         if (getPos >= BOX2_PARTY_POS && getPos < BOX2_BOXLIST_POS && putPos < BOX2_PARTY_POS && exists != 0 &&
             Box2Main_IsEggFree(syswk, putPos, syswk->tray) == FALSE) {
-            syswk->app->moveErr = 4;
+            syswk->app->moveErr = BOX2_MOVE_ERR_EGG;
             return FALSE;
         }
     }
@@ -1388,7 +1388,7 @@ static BOOL Box2Main_PokeMoveCheck(Box2SysWork *syswk, u32 getPos, u32 putPos) {
         }
     } else if (putPos >= BOX2_PARTY_POS && exists != 0) {
         if (syswk->moveMode == 2) {
-            syswk->app->moveErr = 7;
+            syswk->app->moveErr = BOX2_MOVE_ERR_GROUP;
             return FALSE;
         }
         if (PML_ItemIsMail(PokeParty_GetParam(PokeParty_GetPkm(syswk->param->party, putPos - BOX2_PARTY_POS),
@@ -1405,11 +1405,11 @@ static BOOL Box2Main_PokeMoveCheck(Box2SysWork *syswk, u32 getPos, u32 putPos) {
 
     if (syswk->moveMode == 2 && putPos < BOX2_BOXLIST_POS) {
         if (Box2Main_RangePutCheck(syswk, syswk->tray, putPos) == FALSE) {
-            syswk->app->moveErr = 7;
+            syswk->app->moveErr = BOX2_MOVE_ERR_GROUP;
             return FALSE;
         }
         if (putPos >= BOX2_PARTY_POS && exists == TRUE) {
-            syswk->app->moveErr = 7;
+            syswk->app->moveErr = BOX2_MOVE_ERR_GROUP;
             return FALSE;
         }
     }
@@ -2723,7 +2723,7 @@ int Box2Main_NameInCall(Box2SysWork *syswk) {
 
     work->name = GFL_StrBufCreate(20, HEAPID_BOX2);
     loadBoxNameToStrbuf(syswk->param->boxes, syswk->tray, work->name);
-    work->param = setupNameEntry(HEAPID_BOX2, 2, 0, 0, 8, work->name, gameInfo);
+    work->param = setupNameEntry(HEAPID_BOX2, NAME_ENTRY_BOX, 0, 0, 8, work->name, gameInfo);
     work->param->unk2C = 1;
     QueueGameProc(syswk->procManager, OVERLAY_ID(280), &NAME_ENTRY_PROC_FUNCTIONS, work->param);
     syswk->subProcWork = work;
@@ -2818,7 +2818,7 @@ BOOL Box2Main_VFuncPokeMoveTouchParty(Box2SysWork *syswk) {
             }
             if (syswk->param->mode == 4 && syswk->param->unk14 == 1) {
                 pos = BOX2_GET_NONE;
-                syswk->app->moveErr = 5;
+                syswk->app->moveErr = BOX2_MOVE_ERR_BATTLE_BOX_LOCKED;
             }
             PokeIconMoveDataMake(syswk, syswk->pos, pos);
             if (Box2Frame_IsMenuIn(syswk->app->bgWinFrame) == FALSE) {
@@ -4813,7 +4813,7 @@ BOOL Box2Main_VFuncRangeMoveTouch(Box2SysWork *syswk) {
             }
             if (syswk->param->mode == 4 && syswk->param->unk14 == 1) {
                 pos = BOX2_GET_NONE;
-                syswk->app->moveErr = 5;
+                syswk->app->moveErr = BOX2_MOVE_ERR_BATTLE_BOX_LOCKED;
             }
             if (PokeIconMoveDataMake(syswk, syswk->pos, pos) == FALSE) {
                 pos = BOX2_GET_NONE;

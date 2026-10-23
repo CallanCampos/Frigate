@@ -8,7 +8,6 @@
 #include "gfl/str.h"
 #include "pml/poke_party.h"
 
-#define NAME_ENTRY_PASSWORD 12
 #define NAME_ENTRY_NAME_LENGTH 11
 
 NameEntryParam *setupNameEntry(HeapID heapId, u32 mode, u32 a2, u32 a3, u32 maxLength, const StrBuf *name,
@@ -22,7 +21,7 @@ NameEntryParam *setupNameEntry(HeapID heapId, u32 mode, u32 a2, u32 a3, u32 maxL
     param->unk6 = a3;
     param->gameInfo = gameInfo;
     param->unk2C = 0;
-    if (mode == NAME_ENTRY_PASSWORD) {
+    if (mode == NAME_ENTRY_GAME_SYNC_ID) {
         param->unk2C = 3;
     }
     param->name = GFL_StrBufCreate(NAME_ENTRY_NAME_LENGTH, heapId);
@@ -55,8 +54,8 @@ NameEntryParam *setupPokemonNameEntry(HeapID heapId, PartyPkm *pkm, u32 maxLengt
     return param;
 }
 
-NameEntryParam *pokemonNameEntry(HeapID heapId, PartyPkm *pkm, u32 maxLength, const StrBuf *name, u32 unkC, u32 unk10,
-                                 u32 unk14, TrainerGameInfoSave *gameInfo) {
+NameEntryParam *pokemonNameEntry(HeapID heapId, PartyPkm *pkm, u32 maxLength, const StrBuf *name, StrBuf *unkC,
+                                 BoxSaveAccessor *unk10, u32 unk14, TrainerGameInfoSave *gameInfo) {
     NameEntryParam *param = setupPokemonNameEntry(heapId, pkm, maxLength, name, gameInfo);
 
     param->unkC = unkC;

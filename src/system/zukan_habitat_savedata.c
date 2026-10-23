@@ -9,7 +9,7 @@
 
 static u32 getSize(void);
 
-void ZukanHabitatSave_Init(void *data) {
+void ZukanHabitatSave_Init(ZukanHabitatSave *data) {
     MI_CpuFill8(data, 0, getSize());
 }
 
@@ -17,7 +17,7 @@ static u32 getSize(void) {
     return sizeof(ZukanHabitatSave);
 }
 
-void *SaveControl_GetZukanHabitatSave(SaveControl *save) {
+ZukanHabitatSave *SaveControl_GetZukanHabitatSave(SaveControl *save) {
     return MedalBox_GetHabitatList(SaveControl_GetMedalBox(save));
 }
 

@@ -60,10 +60,12 @@
 // the view for another screen. Named by the ROM's "beacon_view_setup.c"; the functions' names are ours
 
 // What the event waits for before it hands over
-#define EVENT_WAIT_BUTTON 0
-#define EVENT_WAIT_TASKS 1
-#define EVENT_WAIT_MENU_BUTTON 2
-#define EVENT_WAIT_MEDAL 3
+enum {
+    EVENT_WAIT_BUTTON,
+    EVENT_WAIT_TASKS,
+    EVENT_WAIT_MENU_BUTTON,
+    EVENT_WAIT_MEDAL,
+};
 
 typedef struct {
     u32 seq;
@@ -124,7 +126,7 @@ static void BeaconView_DeleteScreenActors(BeaconViewWork *work);
 static void BeaconView_InitPanel(BeaconViewWork *work, u8 id);
 static void BeaconView_FreePanel(BeaconViewWork *work, u8 id);
 
-BeaconViewWork *BeaconView_Create(GameSystem *gsys, void *parent) {
+BeaconViewWork *BeaconView_Create(GameSystem *gsys, FieldSubscreen *parent) {
     BeaconViewWork *work = GFL_HeapAllocate(HEAPID_FIELD_MENU, sizeof(BeaconViewWork), TRUE, "beacon_view_setup.c", 91);
 
     work->gsys = gsys;
@@ -241,7 +243,7 @@ GameEvent *BeaconView_CreateEvent(BeaconViewWork *work, BOOL enabled) {
         work->unk88 = 0;
         break;
     case BEACON_VIEW_EVENT_GREETING:
-        event = EventPhraseInput_Create(work->gsys, work->field, NULL, 7,
+        event = EventPhraseInput_Create(work->gsys, work->field, NULL, NAME_ENTRY_PASSERBY_MESSAGE,
                                         (u16 *)BeaconStatus_GetGreetingChanged(work->status));
         event = BeaconView_CreateWaitEvent(work, event, EVENT_WAIT_BUTTON, BEACON_VIEW_ACTOR_GREETING);
         break;
@@ -479,10 +481,10 @@ static void BeaconView_InitBG(BeaconViewWork *work, ArcTool *arc) {
         { 0, 0, 0x800, 0, 1, 0, 12, 0, 0x6000, 0, 3, 0, 0 },
     };
 
-    GFL_BGSysCreateBG(4, &sBeaconViewBGSetups[0], 0);
-    GFL_BGSysCreateBG(5, &sBeaconViewBGSetups[1], 0);
-    GFL_BGSysCreateBG(6, &sBeaconViewBGSetups[2], 0);
-    GFL_BGSysCreateBG(7, &sBeaconViewBGSetups[3], 0);
+    GFL_BGSysCreateBG(4, &sBeaconViewBGSetups[0], BGMODE_TEXT);
+    GFL_BGSysCreateBG(5, &sBeaconViewBGSetups[1], BGMODE_TEXT);
+    GFL_BGSysCreateBG(6, &sBeaconViewBGSetups[2], BGMODE_TEXT);
+    GFL_BGSysCreateBG(7, &sBeaconViewBGSetups[3], BGMODE_TEXT);
     MI_CpuClear32((void *)HW_DB_BG_VRAM, 0x20000);
     GXS_SetVisibleWnd(0);
     G2S_BlendNone();

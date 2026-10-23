@@ -32,10 +32,10 @@ BOOL func_ov036_0219a5dc(FieldPlayer *player);
 BOOL FieldPlayer_CheckRunningShoesFlag(FieldPlayer *player);
 void FieldPlayer_UpdateGridMovement(FieldPlayer *player, u32 pressedKeys, u32 heldKeys, u32 flags);
 void FieldPlayer_UpdateRailMovement(FieldPlayer *player, u32 pressedKeys, u32 heldKeys);
-void func_ov036_0219ace8(FieldPlayer *player, const void *pos);
+void func_ov036_0219ace8(FieldPlayer *player, const RailPosition *pos);
 void func_ov036_0219acf4(FieldPlayer *player);
 BOOL func_ov036_0219ad00(FieldPlayer *player);
-void *func_ov036_0219ad0c(FieldPlayer *player);
+RailUnit *func_ov036_0219ad0c(FieldPlayer *player);
 u32 FieldPlayer_GetTileTypeInDir(FieldPlayer *player, u16 direction);
 FieldActor *FieldPlayer_GetActorInFront(FieldPlayer *player);
 FieldActor *FieldPlayer_GetActorInFrontEx(FieldPlayer *player, fx32 maxHeightDiff);
@@ -56,6 +56,23 @@ FieldEffectTask *func_ov036_0219a5c4(FieldPlayer *player);
 void func_ov036_0219a5fc(FieldPlayer *player);
 void FieldPlayer_UpdateActionStatusObserver(FieldPlayer *player);
 Field *FieldPlayer_GetField(FieldPlayer *player);
+// What FieldPlayer_GetMoveObserveStatus says of the player's last action command: none, one that has started, one
+// that goes on, and one that has just ended
+enum {
+    PLAYER_OBSERVE_NONE,
+    PLAYER_OBSERVE_START,
+    PLAYER_OBSERVE_MOVING,
+    PLAYER_OBSERVE_END,
+};
+
+// What FieldPlayer_GetMoveStatus says the player does, as the grid's player sets it: stands (or brakes against a wall),
+// moves to the next tile, or turns on the spot
+enum {
+    PLAYER_MOVE_STATUS_NONE,
+    PLAYER_MOVE_STATUS_MOVE,
+    PLAYER_MOVE_STATUS_TURN,
+};
+
 u32 FieldPlayer_GetMoveStatus(FieldPlayer *player);
 u32 FieldPlayer_GetMoveObserveStatus(FieldPlayer *player);
 GameSystem *FieldPlayer_GetGameSystem(FieldPlayer *player);

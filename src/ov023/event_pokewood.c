@@ -6,6 +6,7 @@
 #include "app/pkwd_count.h"
 #include "battle/battle_proc.h"
 #include "battle/battle_rec_tool.h"
+#include "battle/btl_result.h"
 #include "battle/btl_setup.h"
 #include "constants/arc.h"
 #include "constants/flags.h"
@@ -40,8 +41,10 @@
 #include "text/system/event_pass_power_startmenu.h"
 
 // The kinds of movie event, in PokewoodMovieParam's kind
-#define POKEWOOD_KIND_FILM 1
-#define POKEWOOD_KIND_WATCH 2
+enum {
+    POKEWOOD_KIND_FILM = 1,
+    POKEWOOD_KIND_WATCH,
+};
 
 // The slot of the movie that is still in the Pokewood block, the one just filmed
 #define POKEWOOD_BLOCK_SLOT 8
@@ -122,17 +125,9 @@ typedef struct {
 
 // The same for overlay 323
 typedef struct {
-    PlayerInfo *playerInfo;
-    SaveControl *saveControl;
-    u16 *var;
-    PokewoodSave *save;
-    u32 unk10;
-} PokewoodMenuParam;
-
-typedef struct {
     GameSystem *gsys;
     Field *field;
-    PokewoodMenuParam param;
+    PkwdSelectScreenParam param;
 } PokewoodMenuEvent;
 
 // The same for the record monitor, overlay 325
@@ -385,7 +380,7 @@ static BtlSetup *EventPokewood_LoadDownloadedSetup(GameSystem *gsys, Field *fiel
         BtlSetup_Reset(setup);
         BtlSetup_InitForRecord(setup, gameData, heapId);
         BattleRec_LoadToolOverlay();
-        movie = Pokewood_GetLoadedMovieField(0, 0);
+        movie = Pokewood_GetLoadedMovieField(POKEWOOD_BLOCK_FIELD_UNKDF, 0);
         BattleRecTool_LoadSetup(setup, 1, heapId);
         BattleRec_UnloadToolOverlay();
         EventPokewood_FinishWatchSetup(gameData, setup, movie, heapId);
@@ -450,13 +445,13 @@ static BtlSetup *EventPokewood_CreateSetup(PokewoodMovieParam *param, GameSystem
 
     switch (param->kind) {
     case 0:
-    case 1:
+    case POKEWOOD_KIND_FILM:
         setup = EventPokewood_CreateFilmSetup(gsys, field, heapId, param->movie);
         setup->fieldSituation.bgm = SEQ_BGM_PW_FILMING;
         setup->fieldSituation.unk12 = SEQ_BGM_WIN1;
         EventPokewood_LoadIntroText(param, setup, param->movie, POKEWOOD_KIND_FILM, heapId);
         break;
-    case 2:
+    case POKEWOOD_KIND_WATCH:
         setup = EventPokewood_LoadWatchSetup(gsys, field, heapId, param->slot);
         file = GFL_ArcSysReadHeapNew(ARCID_POKEWOOD_MOVIE, setup->unkDF, HEAPID_TAIL(heapId));
         setup->fieldSituation.bgm = file->bgm;
@@ -501,7 +496,7 @@ static void EventPokewood_InitTitleParam(PokewoodTitleParam *title, BtlSetup *se
     MsgData *msgData;
 
     BattleRec_LoadToolOverlay();
-    Pokewood_GetLoadedMovieField(2, (u32)pkm);
+    Pokewood_GetLoadedMovieField(POKEWOOD_BLOCK_FIELD_PKM_0, (u32)pkm);
     species = PokeParty_GetParam(pkm, PKM_PARAM_SPECIES, NULL);
     msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_SPECIES_NAMES, HEAPID_TAIL(HEAPID_GAMEEVENT));
     GFL_MsgDataLoadStrbuf(msgData, species, name);
@@ -623,13 +618,14 @@ static GameEventReturnCode EventPokewood_RunWatch(GameEvent *event, u32 *state, 
             sys = *GameData_GetPokewoodSystemPtr(gameData);
             var = PokewoodSystem_GetResultVar(sys);
             if (var != NULL) {
-                *var = (wk->setup->unkA8 != 3) ? TRUE : FALSE;
+                *var = (wk->setup->result != BTL_RESULT_FLEE) ? TRUE : FALSE;
                 if (*var != 0) {
-                    PokewoodSystem_SetResultFlag(sys, gameData, wk->setup->unkDF, wk->setup->unk124);
-                    PokewoodSystem_AddGradePoints(gameData, sys, wk->setup->unk124, param->slot);
+                    PokewoodSystem_SetResultFlag(sys, gameData, wk->setup->unkDF, wk->setup->studioEnding);
+                    PokewoodSystem_AddGradePoints(gameData, sys, wk->setup->studioEnding, param->slot);
                     PokewoodSave_SetFlag(save, 5, wk->setup->unkDF);
                     Pokewood_CheckMedals(gameData);
-                    EventPokewood_UnlockMovies(save, gameData, wk->setup->unkDF, wk->setup->unk124, wk->setup->unk130);
+                    EventPokewood_UnlockMovies(save, gameData, wk->setup->unkDF, wk->setup->studioEnding,
+                                               wk->setup->studioScore);
                 }
             }
         }
@@ -652,7 +648,7 @@ static void EventPokewood_LoadSlotInfo(GameData *gameData, HeapID heapId, Pokewo
     BattleRec_LoadToolOverlay();
     for (slot = 0; slot < 8; slot++) {
         if (Pokewood_LoadDownloadedMovie(saveControl, heapId, slot) == 1) {
-            param->slotInfo[slot] = sSlotInfo[Pokewood_GetLoadedMovieField(0, 0)] + 1;
+            param->slotInfo[slot] = sSlotInfo[Pokewood_GetLoadedMovieField(POKEWOOD_BLOCK_FIELD_UNKDF, 0)] + 1;
         } else {
             param->slotInfo[slot] = 0;
         }
@@ -689,7 +685,7 @@ static GameEventReturnCode EventPokewood_RunFilm(GameEvent *event, u32 *state, v
         (*state)++;
         break;
     case 4:
-        if (wk->setup->unkA8 != 3) {
+        if (wk->setup->result != BTL_RESULT_FLEE) {
             EventPokewood_LoadSlotInfo(gameData, param->heapId, param);
             EventPokewood_StoreRecordedSetup(gameData, wk->setup, param->heapId);
         }
@@ -720,7 +716,7 @@ static GameEventReturnCode EventPokewood_RunFilm(GameEvent *event, u32 *state, v
         GameData_GetRecords(gameData);
         var = PokewoodSystem_GetResultVar(sys);
         if (var != NULL) {
-            *var = (wk->setup->unkA8 != 3) ? TRUE : FALSE;
+            *var = (wk->setup->result != BTL_RESULT_FLEE) ? TRUE : FALSE;
         }
         PokewoodSystem_SetRecord(sys, wk->setup, wk->setup->unkDF);
         PokewoodSystem_SetSlotInfo(sys, param->slotInfo);
@@ -850,7 +846,7 @@ GameEvent *EventPokewood_CreateMenuEvent(GameSystem *gsys, void *args) {
     MI_CpuFill8(wk, 0, sizeof(PokewoodMenuEvent));
     wk->gsys = gsys;
     wk->field = field;
-    wk->param = *(PokewoodMenuParam *)args;
+    wk->param = *(PkwdSelectScreenParam *)args;
     return event;
 }
 
@@ -865,8 +861,8 @@ static GameEventReturnCode EventPokewood_RunMenu(GameEvent *event, u32 *state, v
         *state = 1;
         break;
     case 1:
-        if (wk->param.var != NULL && *wk->param.var == 8) {
-            *wk->param.var = 8;
+        if (wk->param.result != NULL && *wk->param.result == PKWD_SELECTSCREEN_CANCEL) {
+            *wk->param.result = PKWD_SELECTSCREEN_CANCEL;
         } else {
             GSYS_GetGameData(wk->gsys);
         }

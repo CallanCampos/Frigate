@@ -18,6 +18,7 @@
 #include "gfl/str.h"
 #include "nitro/gx.h"
 #include "save/save_control.h"
+#include "system/fest_mission.h"
 #include "system/game_data.h"
 #include "system/game_system.h"
 #include "system/printsys.h"
@@ -229,8 +230,8 @@ static void MonolithMissionInfo_Setup(MonolithScreenParam *screen, MonolithMissi
 }
 
 static void MonolithMissionInfo_CreateBGs(void) {
-    GFL_BGSysCreateBG(MONOLITH_MISSION_INFO_BG_TEXT, &sMonolithMissionInfoBGSetups[0], 0);
-    GFL_BGSysCreateBG(MONOLITH_MISSION_INFO_BG, &sMonolithMissionInfoBGSetups[1], 0);
+    GFL_BGSysCreateBG(MONOLITH_MISSION_INFO_BG_TEXT, &sMonolithMissionInfoBGSetups[0], BGMODE_TEXT);
+    GFL_BGSysCreateBG(MONOLITH_MISSION_INFO_BG, &sMonolithMissionInfoBGSetups[1], BGMODE_TEXT);
     GFL_BGSysFillScrArea(MONOLITH_MISSION_INFO_BG_TEXT, 0, 0, 0, 32, 32, 17);
     GFL_BGSysFillScrArea(MONOLITH_MISSION_INFO_BG, 0, 0, 0, 32, 32, 17);
 }
@@ -316,7 +317,7 @@ static void MonolithMissionInfo_DrawTitle(MonolithWork *wk, MonolithMissionInfoW
 
 static void MonolithMissionInfo_DrawDescription(MonolithWork *wk, MonolithMissionInfoWork *miw, int mission,
                                                 int level) {
-    FestMission data;
+    FestMissionConfig data;
     StrBuf *str;
 
     GFL_BitmapFill(BmpWin_GetBitmap(miw->prints[MONOLITH_MISSION_INFO_WINDOW_DESCRIPTION].window), 0);
@@ -372,8 +373,8 @@ static void MonolithMissionInfo_DrawValue(MonolithWork *wk, MonolithMissionInfoW
 // Draws the player's records of the mission, if it has been played
 static void MonolithMissionInfo_DrawRecords(MonolithScreenParam *screen, MonolithMissionInfoWork *miw, int mission) {
     BOOL unplayed = FALSE;
-    void *records = FestRecords_GetFromSave(GameData_GetSaveControl(GSYS_GetGameData(screen->param->gsys)));
-    FestMission data;
+    FunfestSave *records = FestRecords_GetFromSave(GameData_GetSaveControl(GSYS_GetGameData(screen->param->gsys)));
+    FestMissionConfig data;
     MonolithMissionInfoRecord record;
     StrBuf *str;
     StrBuf *format;

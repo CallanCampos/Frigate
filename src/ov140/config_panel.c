@@ -53,8 +53,6 @@
 // quit. The ROM has no name for this file; "config_panel.c" is a guess
 
 #define HEAPID_CONFIG_PANEL 0x1c
-// The options screen's shortcut
-#define SHORTCUT_CONFIG_PANEL 27
 
 #define BG_COUNT 6
 #define BG_BAR 0
@@ -64,30 +62,36 @@
 #define BG_MESSAGE 4
 
 // The windows: the values, the options' names, the title, the explanation and the question
-#define WINDOW_COUNT 19
 #define LABEL_COUNT 16
-#define WINDOW_OPTION 11
-#define WINDOW_TITLE 16
-#define WINDOW_MESSAGE 17
-#define WINDOW_CONFIRM 18
+enum {
+    WINDOW_OPTION = 11,
+    WINDOW_TITLE = 16,
+    WINDOW_MESSAGE,
+    WINDOW_CONFIRM,
+    WINDOW_COUNT,
+};
 
 // The actors: the values' frames from ACTOR_ITEM on
 #define ACTOR_COUNT 14
 #define ACTOR_ITEM 2
 
 // The options and all their values
-#define OPTION_COUNT 5
-#define OPTION_TEXT_SPEED 0
-#define OPTION_BATTLE_SCENE 1
-#define OPTION_BATTLE_STYLE 2
-#define OPTION_SOUND 3
-#define OPTION_SAVE_BEFORE_IR 4
+enum {
+    OPTION_TEXT_SPEED,
+    OPTION_BATTLE_SCENE,
+    OPTION_BATTLE_STYLE,
+    OPTION_SOUND,
+    OPTION_SAVE_BEFORE_IR,
+    OPTION_COUNT,
+};
 #define ITEM_COUNT 11
 
 // The cursor: an option, or one of the buttons
-#define CURSOR_CONFIRM 5
-#define CURSOR_QUIT 6
-#define CURSOR_MAX 6
+enum {
+    CURSOR_CONFIRM = OPTION_COUNT,
+    CURSOR_QUIT,
+    CURSOR_MAX = CURSOR_QUIT,
+};
 
 // The top and bottom of the rows on the screen
 #define ROWS_TOP 24
@@ -141,10 +145,6 @@ enum {
     CONFIRM_YES,
     CONFIRM_NO,
 };
-
-// The touch bar's own icons that the screen uses
-#define TOUCHBAR_ICON_CLOSE 0
-#define TOUCHBAR_ICON_CHECK 6
 
 typedef struct {
     s32 x;
@@ -1501,8 +1501,8 @@ static void ConfigPanelScroll_Move(ConfigPanelScroll *scroll, int dy, int min, i
 
     y += dy;
     y = MATH_CLAMP(y, min, max);
-    GFL_BGSysMoveBGReq(scroll->textBg, 3, y + 20);
-    GFL_BGSysMoveBGReq(scroll->rowsBg, 3, y);
+    GFL_BGSysMoveBGReq(scroll->textBg, BG_MOVE_SET_Y, y + 20);
+    GFL_BGSysMoveBGReq(scroll->rowsBg, BG_MOVE_SET_Y, y);
 
     scroll->y -= dy;
     scroll->y = MATH_CLAMP(scroll->y, 16 - max, 16 - min);

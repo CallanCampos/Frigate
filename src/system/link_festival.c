@@ -20,7 +20,7 @@
 
 // The Funfest's work: the current mission, the players in it and the missions seen. The file's name is the ROM's.
 
-static void SetFesGimmickResidentEnable(FestMissionConfig *config, BOOL enable);
+static void SetFesGimmickResidentEnable(const FestMissionConfig *config, BOOL enable);
 static void LinkFestival_TickMissionBeacon(LinkFestival *festival);
 static void LinkFestivalBest_InitMine(LinkFestival *festival, LinkFestivalBest *best);
 static void ClearLinkFestivalData(LinkFestival *festival);
@@ -38,8 +38,8 @@ LinkFestival *CreateLinkFestival(HeapID heapId, GameSystem *gsys) {
     festival->archive = GFL_ArcSysCreateFileHandle(0x121, heapId);
     festival->headers = FestMissionData_LoadHeaders(festival->archive, heapId);
     ClearFesMissionCfg(&festival->config);
-    festival->info = (FestMissionInfo *)&festival->config;
-    festival->missionHeader = &festival->config.type;
+    festival->info = &festival->config.info;
+    festival->missionHeader = &festival->config.header;
     festival->best = LinkFestivalBest_Create(heapId);
     ClearLinkFestivalData(festival);
     festival->beaconInterval = 600;
@@ -76,7 +76,7 @@ u32 getStatusOfFesMission(LinkFestival *festival) {
     return isFesMissionAvailable(&festival->config);
 }
 
-void *GetFestMissionCfg(LinkFestival *festival) {
+FestMissionConfig *GetFestMissionCfg(LinkFestival *festival) {
     return &festival->config;
 }
 
@@ -84,9 +84,7 @@ ArcTool *LinkFestival_GetArchive(LinkFestival *festival) {
     return festival->archive;
 }
 
-void LinkFestival_FillMissionInfo(LinkFestival *festival, void *mission, u16 value) {
-    FestMissionInfo *info = mission;
-
+void LinkFestival_FillMissionInfo(LinkFestival *festival, FestMissionInfo *info, u16 value) {
     *info = *festival->info;
     info->unkC_0 = value;
     info->seconds = LinkFestival_GetSecondsLeft(festival);
@@ -147,15 +145,15 @@ void LinkFestival_GetRanking(LinkFestival *festival, LinkFestivalRanking *rankin
     }
 }
 
-void *LinkFestival_GetLog(LinkFestival *festival) {
+FestMissionLog *LinkFestival_GetLog(LinkFestival *festival) {
     return &festival->log;
 }
 
-void *LinkFestival_GetViewLog(LinkFestival *festival) {
+FestMissionLog *LinkFestival_GetViewLog(LinkFestival *festival) {
     return &festival->viewLog;
 }
 
-void *LinkFestival_GetPassPowers(LinkFestival *festival) {
+FestMissionPassPowers *LinkFestival_GetPassPowers(LinkFestival *festival) {
     return &festival->passPowers;
 }
 
@@ -166,7 +164,7 @@ void FetchFestMissionCfgGimmickID(LinkFestival *festival, u8 index, FestMissionH
     *header = headers[index];
 }
 
-void LinkFestival_StartMission(LinkFestival *festival, void *mission, u8 joined) {
+void LinkFestival_StartMission(LinkFestival *festival, const FestMissionConfig *mission, u8 joined) {
     ClearLinkFestivalData(festival);
     FestMissionConfig_Start(&festival->config, mission, joined);
     LinkFestival_SetState(festival, 1);
@@ -244,10 +242,8 @@ BOOL LinkFestival_IsNewZoneFromOutside(LinkFestival *festival, u16 zoneId) {
     return FALSE;
 }
 
-RivalEntry *LinkFestival_GetEntries(void *owner) {
-    LinkFestival *festival = owner;
-
-    return festival->entries;
+FestMissionWork *LinkFestival_GetMissionWork(LinkFestival *festival) {
+    return &festival->missionWork;
 }
 
 int LinkFestival_GetTotalScore(LinkFestival *festival) {
@@ -318,23 +314,23 @@ int LinkFestival_GetMemberCount(LinkFestival *festival) {
     return festival->recordCount + 1;
 }
 
-void LinkFestival_AddRecord(LinkFestival *festival, void *mission) {
+void LinkFestival_AddRecord(LinkFestival *festival, FestMissionConfig *config) {
     if (isFesMissionAvailable(&festival->config)) {
         return;
     }
-    if (LinkFestival_HasRecord(festival, mission)) {
+    if (LinkFestival_HasRecord(festival, config)) {
         return;
     }
-    FestMissionRecord_Set(&festival->records[festival->recordIndex], mission);
+    FestMissionRecord_Set(&festival->records[festival->recordIndex], config);
     festival->recordIndex = (festival->recordIndex + 1) % LINK_FESTIVAL_RECORD_COUNT;
     if (festival->recordCount < LINK_FESTIVAL_RECORD_COUNT) {
         festival->recordCount++;
     }
-    FestMissionOffers_Remove(festival, mission);
+    FestMissionOffers_Remove(festival, config);
 }
 
 BOOL LinkFestival_ShouldSkipOffer(LinkFestival *festival, FestMissionConfig *config) {
-    FestMissionInfo *info = (FestMissionInfo *)config;
+    FestMissionInfo *info = &config->info;
 
     if (info->index == 0) {
         return TRUE;
@@ -409,10 +405,10 @@ void LinkFestivalBest_Free(LinkFestivalBest *best) {
 }
 
 // Loads or unloads the overlay of the mission's kind
-static void SetFesGimmickResidentEnable(FestMissionConfig *config, BOOL enable) {
+static void SetFesGimmickResidentEnable(const FestMissionConfig *config, BOOL enable) {
     u32 overlayId;
 
-    switch (config->type) {
+    switch (config->header.kind) {
     case 4:
         overlayId = OVERLAY_ID(24);
         break;
@@ -464,7 +460,7 @@ static void ClearLinkFestivalData(LinkFestival *festival) {
     festival->secondsGained = 0;
     festival->lastTotal = 0;
     festival->zoneId = 0xffff;
-    MI_CpuFill8(festival->entries, 0, sizeof(festival->entries));
+    MI_CpuFill8(festival->missionWork.hollows, 0, sizeof(festival->missionWork.hollows));
     festival->bestChanged = FALSE;
     FestMissionLog_Clear(&festival->log);
     FestMissionLog_Clear(&festival->viewLog);

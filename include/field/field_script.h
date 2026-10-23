@@ -3,10 +3,19 @@
 
 #include "types.h"
 #include "field/field.h"
+#include "field/stadium_script.h"
+#include "field/trainer_script.h"
 #include "gfl/heap.h"
 #include "gfl/str.h"
 #include "struct_decls.h"
 #include "system/game_event.h"
+#include "system/time_icon.h"
+
+// What ScriptWork_GetFieldWork returns: the field's message BG system and the field, or NULLs outside the field
+typedef struct {
+    FieldMsgBG *msgBGSys;
+    Field *field;
+} ScriptFieldWork;
 
 // Fields accessed by the field script work helpers; the remaining storage is not yet identified.
 struct ScriptWork {
@@ -18,23 +27,24 @@ struct ScriptWork {
     u16 unk0E;
     GameSystem *gsys;
     GameEvent *event;
-    u8 fieldWork[8];
+    ScriptFieldWork fieldWork;
     u32 unk20;
     u32 reducedFeatureLevel;
     u32 featureLevel;
     WordSet *wordSet;
     StrBuf *mainStrBuf;
     StrBuf *altStrBuf;
-    void *unk38;
+    // The font of a sign written in another font, which closing the sign frees
+    Font *signFont;
     void *userHeap;
     // A bit per sound effect player that the script waits on
     u8 seBitMask;
     u8 unk41[3];
-    u8 trainerState[2][0x1c];
+    TrainerClashSlot trainerState[2];
     u16 localWork[0x62];
     FieldActorAnmProc *actorAnmProc;
-    void *stadiumTrainers;
-    void *subwork;
+    StadiumTrainerEntry *stadiumTrainers;
+    ScriptSubwork *subwork;
 };
 
 // The list menu of a script, which the script fills with options and then shows
@@ -59,7 +69,8 @@ typedef struct {
 // What actorWork holds: the actor that a message balloon is over, and where the balloon goes
 typedef struct {
     u16 actorId;
-    u16 winX;
+    // An ACTOR_MSG_WIN_ type
+    u16 winType;
     // The actor's position plus offset
     VecFx32 pos;
     VecFx32 actorPos;
@@ -71,17 +82,19 @@ struct ScriptSubwork {
     GameSystem *gsys;
     GameData *gameData;
     MMSys *mmSys;
-    void *playerGridEventTCB;
+    TCB *playerGridEventTCB;
     FieldAcmdTCB *acmdTasks[8];
     ScriptListMenu listMenu;
-    u8 actorWork[0x28];
+    ScriptActorWork actorWork;
+    // The message window open, which the registered sub-event says the kind of: a FieldMsgWin (the system message
+    // window), InfoMsgWin, SignMsgWin, CheckerMsgWin or ActorMsgWin
     void *mapDisplayInfo;
-    void *specialMessageIcon;
+    WaitIcon *specialMessageIcon;
     u8 actorMsgPosActual;
     u8 actorMsgPos;
     u16 waitCounter;
     u32 nowPkmVoice;
-    void *elevatorTable;
+    ElevatorFloor *elevatorTable;
 };
 
 struct FieldScriptEnvArgs {
@@ -107,12 +120,12 @@ struct FieldScriptEnv {
 // The work a field subprocess's callback gets, which the callback frees
 typedef struct {
     void *resource;
-    void *data;
+    u16 *data;
 } ScriptProcCallbackWork;
 
 struct ScriptOverlayWork {
     void *resource;
-    void *data;
+    BagScriptResult *data;
     void (*cleanup)(ScriptOverlayWork *work);
 };
 
@@ -121,7 +134,7 @@ extern const char data_ov012_0216e208[];
 extern const char data_ov012_0216e1b4[];
 
 ScriptSubwork *InitScriptSubwork(ScriptWork *work, HeapID heapId);
-void FreeScriptSubwork(void *subwork);
+void FreeScriptSubwork(ScriptSubwork *subwork);
 FieldScriptEnv *CreateFieldScriptEnv(const FieldScriptEnvArgs *args, HeapID heapId);
 void FreeFieldScriptEnv(FieldScriptEnv *env);
 u32 FieldScriptEnv_IsReducedFeatureLevel(FieldScriptEnv *env);
@@ -136,14 +149,15 @@ void FreeListMenuWork(ScriptListMenu *menu);
 BOOL FieldScriptEnv_UpdateListMenu(FieldScriptEnv *env);
 BOOL FieldScriptEnv_UpdateListMenuEx(FieldScriptEnv *env);
 void ListMenu_ShowDescription(BmpMenuList *list, s32 value, u8 a2);
-void *FieldScriptEnv_GetMsgBGSys(FieldScriptEnv *env);
+FieldMsgBG *FieldScriptEnv_GetMsgBGSys(FieldScriptEnv *env);
 MsgData *GetFieldScriptMsgData(FieldScriptEnv *env);
 u16 GetFieldScriptMsgFileNo(FieldScriptEnv *env);
+// The script's open message window, a FieldMsgWin, InfoMsgWin, SignMsgWin, CheckerMsgWin or ActorMsgWin
 void setMapDisplayInfoPtr(FieldScriptEnv *env, void *info);
 void *getMapDisplayInfoPtr(FieldScriptEnv *env);
-void SetSpecialMessageIconPtr(FieldScriptEnv *env, void *icon);
-void *GetSpecialMessageIconPtr(FieldScriptEnv *env);
-void *GetFieldScriptActorWk(FieldScriptEnv *env);
+void SetSpecialMessageIconPtr(FieldScriptEnv *env, WaitIcon *icon);
+WaitIcon *GetSpecialMessageIconPtr(FieldScriptEnv *env);
+ScriptActorWork *GetFieldScriptActorWk(FieldScriptEnv *env);
 u8 ActorMsgWin_GetPosActual(FieldScriptEnv *env);
 void ActorMsgWin_SetPosActual(FieldScriptEnv *env, u8 pos);
 u8 ActorMsgWin_GetPos(FieldScriptEnv *env);
@@ -340,13 +354,13 @@ u16 FieldScriptEnv_GetZoneID(FieldScriptEnv *env);
 HeapID FieldScriptEnv_GetHeapID(FieldScriptEnv *env);
 u16 GetScriptEnvZoneID(FieldScriptEnv *env);
 ScriptWork *FieldScriptEnv_GetScriptWork(FieldScriptEnv *env);
-void FieldScriptEnv_SetPlayerGridEventTCB(FieldScriptEnv *env, void *task);
-void *FieldScriptEnv_GetPlayerGridEventTCB(FieldScriptEnv *env);
+void FieldScriptEnv_SetPlayerGridEventTCB(FieldScriptEnv *env, TCB *task);
+TCB *FieldScriptEnv_GetPlayerGridEventTCB(FieldScriptEnv *env);
 FieldActorAnmProc *ScriptWork_GetActorAnmProc(ScriptWork *work);
 void ScriptWork_SetActorAnmProc(ScriptWork *work, FieldActorAnmProc *proc);
-void ScriptWork_SetStadiumTrainers(ScriptWork *work, void *trainers);
-void *ScriptWork_GetStadiumTrainers(ScriptWork *work);
-void *ScriptWork_GetTrainerState(ScriptWork *work, int index);
+void ScriptWork_SetStadiumTrainers(ScriptWork *work, StadiumTrainerEntry *trainers);
+StadiumTrainerEntry *ScriptWork_GetStadiumTrainers(ScriptWork *work);
+TrainerClashSlot *ScriptWork_GetTrainerState(ScriptWork *work, int index);
 void FieldScriptSubEvent_ResetAll(void);
 void FieldScriptSubEvent_Register(int id);
 void FieldScriptSubEvent_Unregister(int id);
@@ -366,15 +380,9 @@ ScriptWork *EventScriptCall_Replace(GameEvent *event, u16 scriptId, FieldActor *
 u32 ScriptWork_AddVM(ScriptWork *work, u16 zoneId, u16 scriptId);
 BOOL FieldScript_VMExists(ScriptWork *work, u8 index);
 void FieldScript_Run(GameSystem *gsys, ScriptWork *work, u16 scriptId, u32 featureLevel);
-// What ScriptWork_GetFieldWork returns: the field's message BG system and the field, or NULLs outside the field
-typedef struct {
-    FieldMsgBG *msgBGSys;
-    Field *field;
-} ScriptFieldWork;
-
-void UpdateScriptFieldWk(void *fieldWork, GameSystem *gsys);
-void *ScriptWork_GetFieldWork(ScriptWork *work);
-void *ScriptWork_GetSubwork(ScriptWork *work);
+void UpdateScriptFieldWk(ScriptFieldWork *fieldWork, GameSystem *gsys);
+ScriptFieldWork *ScriptWork_GetFieldWork(ScriptWork *work);
+ScriptSubwork *ScriptWork_GetSubwork(ScriptWork *work);
 u8 *ScriptWork_GetSEBitMask(ScriptWork *work);
 u16 ScriptWork_GetSCRID(ScriptWork *work);
 // A variable of the script (IDs from 0x8000) or saved event work (from 0x4000)
@@ -386,8 +394,8 @@ void FieldScriptEnv_SetWaitCounter(FieldScriptEnv *env, u16 frames);
 BOOL FieldScriptEnv_UpdateWaitCounter(FieldScriptEnv *env);
 u32 GetScrEnvNowPkmVoice(FieldScriptEnv *env);
 void SetScrEnvNowPkmVoice(FieldScriptEnv *env, u32 voice);
-void *FieldScriptEnv_GetElevatorTable(FieldScriptEnv *env);
-void FieldScriptEnv_SetElevatorTable(FieldScriptEnv *env, void *table);
+ElevatorFloor *FieldScriptEnv_GetElevatorTable(FieldScriptEnv *env);
+void FieldScriptEnv_SetElevatorTable(FieldScriptEnv *env, ElevatorFloor *table);
 void SetFieldScriptEnvMsgData(FieldScriptEnv *env, u32 arcId, u32 fileNo);
 void FieldScriptEnv_Save(FieldScriptEnv *env);
 void FieldScriptEnv_Restore(FieldScriptEnv *env);
@@ -398,8 +406,8 @@ BOOL FieldScriptEnv_CheckAcmdQueueRunning(FieldScriptEnv *env);
 GameSystem *ScriptWork_GetGameSystem(ScriptWork *work);
 StrBuf *ScriptWork_GetMainStrBuf(ScriptWork *work);
 StrBuf *ScriptWork_GetAltStrBuf(ScriptWork *work);
-void ScriptWork_SetSignFont(ScriptWork *work, void *value);
-void *ScriptWork_GetSignFont(ScriptWork *work);
+void ScriptWork_SetSignFont(ScriptWork *work, Font *font);
+Font *ScriptWork_GetSignFont(ScriptWork *work);
 FieldActor *ScriptWork_GetParentActor(ScriptWork *work);
 void ScriptWork_SetParentActor(ScriptWork *work, FieldActor *actor);
 // A pointer that a command can keep its own work in while the script waits
@@ -411,9 +419,5 @@ void ScriptWork_RestoreVarCopy(ScriptWork *work, void *copy);
 u16 *ScriptWork_GetLocalWork(ScriptWork *work, u16 id);
 WordSet *ScriptWork_GetWordSet(ScriptWork *work);
 MMSys *GetScrEnvMMdlSys(FieldScriptEnv *env);
-
-// Overlay 36: show a message, and have the script wait for it
-BOOL func_ov036_021a8eb4(VM *vm, FieldScriptEnv *env, StrBuf *message, u16 actorId, u16 pos, u32 a5);
-BOOL loadMsgBox(VM *vm, FieldScriptEnv *env, StrBuf *message, u32 a3, u8 a4);
 
 #endif // POKEBW2_FIELD_FIELD_SCRIPT_H

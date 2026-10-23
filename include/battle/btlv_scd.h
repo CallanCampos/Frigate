@@ -7,6 +7,7 @@
 // are ours; swan has none for this file (its disassembly calls the two empty functions nullsub_34 and nullsub_33)
 
 #include "types.h"
+#include "battle/btlv_input.h"
 #include "gfl/heap.h"
 #include "struct_decls.h"
 
@@ -59,7 +60,7 @@ BOOL BtlvScd_IsTargetChosen(BtlvScd *scd);
 void BtlvScd_CancelProcs(BtlvScd *scd);
 
 // The rotation screen, and its input: the button pressed, if any
-void BtlvScd_ShowRotationScreen(BtlvScd *scd, void *param);
+void BtlvScd_ShowRotationScreen(BtlvScd *scd, BtlvInputRotationParam *param);
 BOOL BtlvScd_PollRotationInput(BtlvScd *scd, u8 *button);
 void BtlvScd_HideRotationScreen(BtlvScd *scd);
 

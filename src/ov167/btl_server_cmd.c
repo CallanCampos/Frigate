@@ -11,7 +11,7 @@ static void PutU24(BtlServerCmdQueue *que, u32 value);
 static u32 ReadU24(BtlServerCmdQueue *que);
 static void PutU32(BtlServerCmdQueue *que, u32 value);
 static u32 ReadU32(BtlServerCmdQueue *que);
-static void PutCmdArgs(BtlServerCmdQueue *que, u32 event, int format, const u32 *args);
+static void PutCmdArgs(BtlServerCmdQueue *que, BtlServerCmd event, int format, const u32 *args);
 static void ReadCmdArgs(BtlServerCmdQueue *que, s32 format, u32 *args);
 static void ReadMsgArgs(BtlServerCmdQueue *que, u8 event, u32 *args);
 
@@ -116,7 +116,7 @@ static inline void PutHalfwords(BtlServerCmdQueue *que, u16 first, u16 second) {
 }
 
 // Writes a command and its arguments, packed as its format says
-static void PutCmdArgs(BtlServerCmdQueue *que, u32 event, int format, const u32 *args) {
+static void PutCmdArgs(BtlServerCmdQueue *que, BtlServerCmd event, int format, const u32 *args) {
     s32 i;
 
     PutU16(que, event);
@@ -519,7 +519,7 @@ static const u8 data_ov167_021d6e50[SC_MAX] = {
 };
 
 // Writes a server command with its arguments, in the widths its format gives them
-void BtlServerCmdQueue_Put(BtlServerCmdQueue *que, u32 event, ...) {
+void BtlServerCmdQueue_Put(BtlServerCmdQueue *que, BtlServerCmd event, ...) {
     va_list list;
     u8 format;
     u32 i;
@@ -536,7 +536,7 @@ void BtlServerCmdQueue_Put(BtlServerCmdQueue *que, u32 event, ...) {
 }
 
 // Function name from swan.
-u16 SCQUE_RESERVE_Pos(BtlServerCmdQueue *que, u32 event) {
+u16 SCQUE_RESERVE_Pos(BtlServerCmdQueue *que, BtlServerCmd event) {
     u8 format = data_ov167_021d6e50[event];
     u8 count = format & 0xf;
     u8 i;
@@ -557,7 +557,7 @@ u16 SCQUE_RESERVE_Pos(BtlServerCmdQueue *que, u32 event) {
 }
 
 // Fills in a command that SCQUE_RESERVE_Pos reserved room for
-void BtlServerCmdQueue_PutReserved(BtlServerCmdQueue *que, u32 reserve, u32 event, ...) {
+void BtlServerCmdQueue_PutReserved(BtlServerCmdQueue *que, u32 reserve, BtlServerCmd event, ...) {
     va_list list;
     u8 format;
     u32 i;

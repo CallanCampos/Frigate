@@ -21,8 +21,8 @@
 
 typedef struct {
     FieldEffects *effects;
-    void *mdlRes;
-    void *anmRes[IAIGIRI_ANM_COUNT];
+    G3DResource *mdlRes;
+    G3DResource *anmRes[IAIGIRI_ANM_COUNT];
     u32 unk14;
     u32 unk18;
 } FieldEffectIaigiri;
@@ -35,7 +35,7 @@ typedef struct {
 typedef struct {
     FieldEffectIaigiri *effect;
     G3DActor *actor;
-    void *anms[IAIGIRI_ANM_COUNT];
+    G3DAnimation *anms[IAIGIRI_ANM_COUNT];
     G3DModel *mdl;
 } IaigiriTask;
 
@@ -240,7 +240,7 @@ BOOL s01DE_PassPowerPopDepletedID(VM *vm, FieldScriptEnv *env) {
 
     *depletedId = PassPower_GetDepletedID();
     if (*depletedId != PASS_POWER_NONE) {
-        void *data = PassPowerData_Create(HEAPID_TAIL(HEAPID_FIELDMAP));
+        PassPowerData *data = PassPowerData_Create(HEAPID_TAIL(HEAPID_FIELDMAP));
 
         PassPower_Deactivate(*depletedId, data);
         PassPowerData_Free(data);

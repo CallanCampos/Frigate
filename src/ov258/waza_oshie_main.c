@@ -52,8 +52,6 @@
 
 #define HEAPID_WAZA_OSHIE 0x4f
 
-#define WINDOW_COUNT 16
-#define ACTOR_COUNT 14
 #define RESOURCE_COUNT 9
 #define TYPE_ICON_COUNT 8
 #define LIST_ROWS 4
@@ -62,38 +60,48 @@
 #define NO_MOVE 0xfffffffe
 
 // The windows
-#define WINDOW_POWER_LABEL 2
-#define WINDOW_ACCURACY_LABEL 3
-#define WINDOW_POWER 4
-#define WINDOW_ACCURACY 5
-#define WINDOW_DESCRIPTION 6
-#define WINDOW_MESSAGE 7
-#define WINDOW_TEACH 9
-#define WINDOW_LIST 11
-#define WINDOW_TITLE 13
-#define WINDOW_KNOWN_MOVES 14
-#define WINDOW_POKEMON 15
+enum {
+    WINDOW_POWER_LABEL = 2,
+    WINDOW_ACCURACY_LABEL,
+    WINDOW_POWER,
+    WINDOW_ACCURACY,
+    WINDOW_DESCRIPTION,
+    WINDOW_MESSAGE,
+    WINDOW_TEACH = 9,
+    WINDOW_LIST = 11,
+    WINDOW_TITLE = 13,
+    WINDOW_KNOWN_MOVES,
+    WINDOW_POKEMON,
+    WINDOW_COUNT,
+};
 
 // The actors
-#define ACTOR_ARROW_DOWN 0
-#define ACTOR_ARROW_UP 1
-#define ACTOR_CURSOR 2
-#define ACTOR_CATEGORY 3
-#define ACTOR_LIST_TYPE 4
-#define ACTOR_KNOWN_TYPE 8
-#define ACTOR_POKEMON 12
-#define ACTOR_RETURN 13
+enum {
+    ACTOR_ARROW_DOWN,
+    ACTOR_ARROW_UP,
+    ACTOR_CURSOR,
+    ACTOR_CATEGORY,
+    ACTOR_LIST_TYPE,
+    ACTOR_KNOWN_TYPE = 8,
+    ACTOR_POKEMON = 12,
+    ACTOR_RETURN,
+    ACTOR_COUNT,
+};
 
 // The cursor's positions: the list's rows, then
-#define POS_ARROW_DOWN 4
-#define POS_ARROW_UP 5
-#define POS_RETURN 6
-#define POS_TEACH 7
-#define POS_QUIT 8
+enum {
+    POS_ARROW_DOWN = 4,
+    POS_ARROW_UP,
+    POS_RETURN,
+    POS_TEACH,
+    POS_QUIT,
+};
 
 // The buttons shown once a move is picked by touch
-#define BUTTON_TEACH 0
-#define BUTTON_QUIT 1
+enum {
+    BUTTON_TEACH,
+    BUTTON_QUIT,
+};
 
 // The sequences of the process
 enum {
@@ -627,7 +635,7 @@ static void WazaOshie_InitBG(void) {
                           0,
                           FALSE };
 
-        GFL_BGSysCreateBG(2, &setup, 0);
+        GFL_BGSysCreateBG(2, &setup, BGMODE_TEXT);
         GFL_BGSysClearScr(2);
     }
     {
@@ -645,7 +653,7 @@ static void WazaOshie_InitBG(void) {
                           0,
                           FALSE };
 
-        GFL_BGSysCreateBG(3, &setup, 0);
+        GFL_BGSysCreateBG(3, &setup, BGMODE_TEXT);
         GFL_BGSysClearScr(3);
     }
     {
@@ -663,7 +671,7 @@ static void WazaOshie_InitBG(void) {
                           0,
                           FALSE };
 
-        GFL_BGSysCreateBG(4, &setup, 0);
+        GFL_BGSysCreateBG(4, &setup, BGMODE_TEXT);
         GFL_BGSysClearScr(4);
     }
     {
@@ -681,7 +689,7 @@ static void WazaOshie_InitBG(void) {
                           0,
                           FALSE };
 
-        GFL_BGSysCreateBG(6, &setup, 0);
+        GFL_BGSysCreateBG(6, &setup, BGMODE_TEXT);
         GFL_BGSysClearScr(6);
     }
     {
@@ -699,7 +707,7 @@ static void WazaOshie_InitBG(void) {
                           0,
                           FALSE };
 
-        GFL_BGSysCreateBG(5, &setup, 0);
+        GFL_BGSysCreateBG(5, &setup, BGMODE_TEXT);
         GFL_BGSysClearScr(5);
     }
     {
@@ -717,7 +725,7 @@ static void WazaOshie_InitBG(void) {
                           0,
                           FALSE };
 
-        GFL_BGSysCreateBG(7, &setup, 0);
+        GFL_BGSysCreateBG(7, &setup, BGMODE_TEXT);
         GFL_BGSysClearScr(7);
     }
     GFL_BGSysSetBGEnabled(2, TRUE);
@@ -1400,10 +1408,12 @@ static void WazaOshie_LoadActorResources(WazaOshieWork *work, ArcTool *arc) {
     pokeArc = MakePokeGraArcHandle(HEAPID_WAZA_OSHIE);
     boxPkm = PokeParty_GetBoxPkm(work->param->pkm);
     wasEncrypted = PML_PkmDecrypt(boxPkm);
-    work->chars[8] = PokeGra_LoadClActCharsByBoxData(pokeArc, boxPkm, 0, CLACT_VRAM_MAIN, HEAPID_WAZA_OSHIE);
-    work->palettes[4] =
-        PokeGra_LoadClActPaletteByBoxData(pokeArc, boxPkm, 0, CLACT_VRAM_MAIN, 4 * 0x20, HEAPID_WAZA_OSHIE);
-    work->cellAnims[5] = PokeGra_LoadClActCellAnimsByBoxData(boxPkm, 0, 1, CLACT_VRAM_MAIN, HEAPID_WAZA_OSHIE);
+    work->chars[8] =
+        PokeGra_LoadClActCharsByBoxData(pokeArc, boxPkm, POKEGRA_DIR_FRONT, CLACT_VRAM_MAIN, HEAPID_WAZA_OSHIE);
+    work->palettes[4] = PokeGra_LoadClActPaletteByBoxData(pokeArc, boxPkm, POKEGRA_DIR_FRONT, CLACT_VRAM_MAIN, 4 * 0x20,
+                                                          HEAPID_WAZA_OSHIE);
+    work->cellAnims[5] =
+        PokeGra_LoadClActCellAnimsByBoxData(boxPkm, POKEGRA_DIR_FRONT, 1, CLACT_VRAM_MAIN, HEAPID_WAZA_OSHIE);
     PML_PkmReEncrypt(boxPkm, wasEncrypted);
     GFL_ArcToolFree(pokeArc);
 }

@@ -8,7 +8,7 @@
 #include "gfl/heap.h"
 #include "struct_decls.h"
 
-void *Field_GetSkillMapEff(Field *field);
+FieldSkillMapEff *Field_GetSkillMapEff(Field *field);
 FieldFlash *FieldSkillMapEff_GetFlash(FieldSkillMapEff *effect);
 FieldSkillMapEff *FieldSkillMapEff_Create(u32 flashPerms, HeapID heapId);
 void FieldSkillMapEff_Free(FieldSkillMapEff *effect);

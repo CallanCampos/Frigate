@@ -61,14 +61,13 @@ enum {
 #endif
 
 // The search's kinds
-#define GTSNEGO_MODE_ANYONE 0
-#define GTSNEGO_MODE_RENDEZVOUS 1
+enum {
+    GTSNEGO_MODE_ANYONE,
+    GTSNEGO_MODE_RENDEZVOUS,
+};
 
 // The level range a rendezvous with anyone of the Pal Pad searches with
 #define GTSNEGO_LEVEL_RENDEZVOUS 4
-
-// The icon of the touch bar that goes back
-#define GTSNEGO_TOUCHBAR_RETURN 1
 
 // The search's matching keys
 enum {
@@ -644,11 +643,11 @@ static void GtsNego_StateStartExchange(GtsNegoWork *wk) {
         }
         if (NetHandle_CountNegotiated() == 2) {
             GtsNegoParam *param = wk->param;
-            void *phrases = CGearPhrases_GetBlock(wk->save);
+            CGearSave *cgear = CGearPhrases_GetBlock(wk->save);
 
             param->unk4[0].unk0 = wk->level;
             param->unk4[0].unk4 = wk->myKind;
-            CGearPhrases_Get(phrases, 0, &wk->send.phrase);
+            CGearPhrases_Get(cgear, 0, &wk->send.phrase);
             wk->send.tradeCount = PalPadFriendList_GetTradeCount(GameData_GetPalPadFriendList(wk->gameData));
             NetHandle_SendTimingPair(NetHandle_GetOwn(), 2, GTSNEGO_TIMING_NO);
             GtsNego_ChangeState(wk, GtsNego_StateSendRequest, 898);
@@ -910,7 +909,7 @@ static void GtsNego_StateSearchMenu(GtsNegoWork *wk) {
         }
     }
     TouchBar_Main(GtsNegoDisp_GetTouchBar(wk->disp));
-    if (TouchBar_GetDecided(GtsNegoDisp_GetTouchBar(wk->disp)) == GTSNEGO_TOUCHBAR_RETURN) {
+    if (TouchBar_GetDecided(GtsNegoDisp_GetTouchBar(wk->disp)) == TOUCHBAR_ICON_RETURN) {
         back = TRUE;
     }
     if (back) {
@@ -1023,7 +1022,7 @@ static void GtsNego_StateWaitFriendConfirm(GtsNegoWork *wk) {
 
         GtsNegoMessage_FreeMenu(wk->menu);
         wk->menu = NULL;
-        TouchBar_SetIconVisible(GtsNegoDisp_GetTouchBar(wk->disp), GTSNEGO_TOUCHBAR_RETURN, TRUE);
+        TouchBar_SetIconVisible(GtsNegoDisp_GetTouchBar(wk->disp), TOUCHBAR_ICON_RETURN, TRUE);
         switch (pos) {
         case 0:
             GtsNegoMessage_Print(wk->msg, GtsnegoProc_Text_SearchingRightPersonTrade);
@@ -1052,7 +1051,7 @@ static void GtsNego_StateWaitFriendConfirm(GtsNegoWork *wk) {
 
 static void GtsNego_StateOpenFriendConfirm(GtsNegoWork *wk) {
     if (GtsNegoMessage_IsDone(wk->msg)) {
-        TouchBar_SetIconVisible(GtsNegoDisp_GetTouchBar(wk->disp), GTSNEGO_TOUCHBAR_RETURN, FALSE);
+        TouchBar_SetIconVisible(GtsNegoDisp_GetTouchBar(wk->disp), TOUCHBAR_ICON_RETURN, FALSE);
         wk->menu = GtsNegoMessage_CreateConfirm(wk->msg, 1);
         GtsNegoDisp_SetDim(wk->disp, TRUE, GTSNEGO_DIM_LIST_MENU);
         GtsNegoDisp_SetKnobAnimating(wk->disp, FALSE);
@@ -1288,7 +1287,7 @@ static void GtsNego_StateFriendList(GtsNegoWork *wk) {
         }
     }
     TouchBar_Main(GtsNegoDisp_GetTouchBar(wk->disp));
-    if (TouchBar_GetDecided(GtsNegoDisp_GetTouchBar(wk->disp)) == GTSNEGO_TOUCHBAR_RETURN) {
+    if (TouchBar_GetDecided(GtsNegoDisp_GetTouchBar(wk->disp)) == TOUCHBAR_ICON_RETURN) {
         GFL_BGSysSetBGEnabled(4, FALSE);
         GFL_BGSysSetBGEnabled(6, FALSE);
         GtsNego_FreeButton(wk);
@@ -1430,7 +1429,7 @@ static void GtsNego_StateWaitExitConfirm(GtsNegoWork *wk) {
             if (!GCTX_HIDIsUsingTouch()) {
                 GtsNegoDisp_SetCursor(wk->disp, NULL, wk->mainCursor);
             }
-            TouchBar_SetIconVisible(GtsNegoDisp_GetTouchBar(wk->disp), GTSNEGO_TOUCHBAR_RETURN, TRUE);
+            TouchBar_SetIconVisible(GtsNegoDisp_GetTouchBar(wk->disp), TOUCHBAR_ICON_RETURN, TRUE);
             GtsNegoDisp_SetDim(wk->disp, FALSE, GTSNEGO_DIM_ALL);
             GtsNego_ChangeState(wk, GtsNego_StateMainMenu, 2353);
             break;
@@ -1440,7 +1439,7 @@ static void GtsNego_StateWaitExitConfirm(GtsNegoWork *wk) {
 
 static void GtsNego_StateOpenExitConfirm(GtsNegoWork *wk) {
     if (GtsNegoMessage_IsDone(wk->msg)) {
-        TouchBar_SetIconVisible(GtsNegoDisp_GetTouchBar(wk->disp), GTSNEGO_TOUCHBAR_RETURN, FALSE);
+        TouchBar_SetIconVisible(GtsNegoDisp_GetTouchBar(wk->disp), TOUCHBAR_ICON_RETURN, FALSE);
         wk->menu = GtsNegoMessage_CreateYesNo(wk->msg, 1);
         GtsNegoDisp_SetDim(wk->disp, TRUE, GTSNEGO_DIM_MAIN_MENU);
         GtsNegoDisp_SetCursor(wk->disp, NULL, GTSNEGO_CURSOR_NONE);
@@ -1486,7 +1485,7 @@ static void GtsNego_StateMainMenu(GtsNegoWork *wk) {
         GtsNegoMessage_UpdateButtons(wk->msg);
     }
     TouchBar_Main(GtsNegoDisp_GetTouchBar(wk->disp));
-    if (TouchBar_GetDecided(GtsNegoDisp_GetTouchBar(wk->disp)) == GTSNEGO_TOUCHBAR_RETURN) {
+    if (TouchBar_GetDecided(GtsNegoDisp_GetTouchBar(wk->disp)) == TOUCHBAR_ICON_RETURN) {
         wk->timer = 1;
         GtsNegoMessage_Print(wk->msg, GtsnegoProc_Text_OkDisconnectFromNintendo);
         if (GCTX_HIDIsUsingTouch() == TRUE) {
@@ -1575,17 +1574,17 @@ static BOOL GtsNegoProc_Main(GameProc *proc, u32 *state, void *param, void *work
     if (GFL_NetIsInitialized()) {
         if (GFL_NetErrCheck()) {
             switch (DWCRapCommon_CheckError(TRUE, TRUE)) {
-            case 1:
-            case 4:
+            case DWCRAP_RESULT_DISCONNECTED:
+            case DWCRAP_RESULT_TIMEOUT:
                 GtsNego_HandleDisconnect(wk);
                 break;
-            case 2:
+            case DWCRAP_RESULT_FAILED:
                 wk->param->result = GTSNEGO_RESULT_RETRY_LOGIN;
                 done = TRUE;
                 Wipe_SetScreenCovered(0, WIPE_COLOR_BLACK);
                 Wipe_SetScreenCovered(1, WIPE_COLOR_BLACK);
                 break;
-            case 3:
+            case DWCRAP_RESULT_NET_ERROR:
                 GFL_NetErrShowFatal();
                 break;
             }

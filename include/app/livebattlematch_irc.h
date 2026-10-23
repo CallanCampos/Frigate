@@ -11,9 +11,6 @@
 // and receives a Wi-Fi Download Station's competition data (the delivery). Its functions are called by
 // livebattlematch_flow.c and, for the team exchange, by overlay 263. None has a name yet
 
-// The data a player sends first is followed by the team: the size of its part before the team
-#define LIVEBATTLEMATCH_PLAYER_HEADER_SIZE 0xd4
-
 // The bit of the competition data's versions (field 1 of a tournament entry, and the mask of the delivery's data) that
 // is this game's: Black 2's is one above White 2's
 #ifdef BLACK2
@@ -43,8 +40,8 @@ BOOL LiveBattleMatchIrc_StepCancel(LiveBattleMatchIrc *irc);
 BOOL LiveBattleMatchIrc_ResetEnd(LiveBattleMatchIrc *irc);
 // Deletes the commands and ends the network, then TRUE once it ended
 BOOL LiveBattleMatchIrc_StepEnd(LiveBattleMatchIrc *irc);
-// Sends the player's data (LIVEBATTLEMATCH_PLAYER_HEADER_SIZE bytes and a team) to the other machine
-BOOL LiveBattleMatchIrc_SendPlayerData(LiveBattleMatchIrc *irc, void *data);
+// Sends the player's data, with the team picked, to the other machine
+BOOL LiveBattleMatchIrc_SendPlayerData(LiveBattleMatchIrc *irc, WifiBattleMatchPlayer *data);
 // If the other machine's data came, sets *data to it and returns TRUE
 BOOL LiveBattleMatchIrc_TakePlayerData(LiveBattleMatchIrc *irc, void **data);
 // Sends the team picked, and then is TRUE once it is sent
@@ -56,7 +53,7 @@ BOOL LiveBattleMatchIrc_SendReady(LiveBattleMatchIrc *irc, const u32 *flag);
 // If the other machine's 4 bytes came, copies them to *flag and returns TRUE
 BOOL LiveBattleMatchIrc_TakeReady(LiveBattleMatchIrc *irc, u32 *flag);
 // Starts receiving the competition data of a Download Station into buffer (0x160 bytes)
-void LiveBattleMatchIrc_StartDelivery(LiveBattleMatchIrc *irc, void *buffer);
+void LiveBattleMatchIrc_StartDelivery(LiveBattleMatchIrc *irc, TournamentEntry *buffer);
 // Steps the delivery: 0 while it goes on, then 1 if the data came, 3 if there was none, 2 otherwise
 int LiveBattleMatchIrc_StepDelivery(LiveBattleMatchIrc *irc);
 // Resets the steps of LiveBattleMatchIrc_StepDeliveryEnd

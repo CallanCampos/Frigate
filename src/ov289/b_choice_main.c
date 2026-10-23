@@ -1,4 +1,5 @@
 #include "types.h"
+#include "app/ui/print_msg.h"
 #include "battle/b_choice_main.h"
 #include "battle/btlv_effect.h"
 #include "constants/arc.h"
@@ -54,9 +55,6 @@
 
 #define TEXT_X 0x70
 #define TEXT_COLOR 0x440
-#define ALIGN_CENTER 2
-#define ALIGN_RIGHT 1
-
 // The states of the choice screen
 enum {
     STEP_INIT = 0,
@@ -434,7 +432,7 @@ static void BChoiceMain_Init(BChoiceWork *work) {
 }
 
 static void BChoiceMain_StartWipe(BChoiceWork *work) {
-    GFL_WipeSet(4, 1, 1, 0, 6, 1, work->param->heapId);
+    GFL_WipeSet(WIPE_MODE_SUB, WIPE_TYPE_FADE_IN, WIPE_TYPE_FADE_IN, 0, 6, 1, work->param->heapId);
 }
 
 static BOOL BChoiceMain_IsWiping(void) {
@@ -693,10 +691,10 @@ static void BChoiceMain_PrintText(BChoiceWork *work, u32 window, int x, int y, S
 }
 
 static u16 BChoiceMain_GetAlignOffset(StrBuf *str, Font *font, u32 align) {
-    if (align == ALIGN_RIGHT) {
+    if (align == PRINT_ALIGN_RIGHT) {
         return GFL_FontGetBlockWidth(str, font, 0);
     }
-    if (align == ALIGN_CENTER) {
+    if (align == PRINT_ALIGN_CENTER) {
         return GFL_FontGetBlockWidth(str, font, 0) >> 1;
     }
     return 0;
@@ -727,7 +725,7 @@ static void BChoiceMain_PrintChoices(BChoiceWork *work) {
 
     for (i = 0; i < work->param->count; i++) {
         if (work->param->strs[i] != NULL) {
-            BChoiceMain_PrintText(work, i, TEXT_X, 0, work->param->strs[i], ALIGN_CENTER, TEXT_COLOR);
+            BChoiceMain_PrintText(work, i, TEXT_X, 0, work->param->strs[i], PRINT_ALIGN_CENTER, TEXT_COLOR);
         }
     }
 }

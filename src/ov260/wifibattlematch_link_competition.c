@@ -109,7 +109,7 @@ typedef struct {
     PokeParty *party;
     BOOL hadExchangeResult;
     WifiBattleMatchLinkParam *param;
-    void *entry;
+    TournamentEntry *entry;
     TournamentEntry serverEntry;
     BOOL hadBattleBox;
 } WifiBattleMatchLinkCompetition;
@@ -146,7 +146,7 @@ static BOOL WifiBattleMatchLink_CompetitionIsCardHidden(WifiBattleMatchLinkCompe
 static void WifiBattleMatchLink_CompetitionShowCard(WifiBattleMatchLinkCompetition *link);
 static void WifiBattleMatchLink_CompetitionSetCardPage(WifiBattleMatchLinkCompetition *link, u32 page);
 static void WifiBattleMatchLink_CompetitionCreatePartnerCard(WifiBattleMatchLinkCompetition *link,
-                                                             WifiBattleMatchLinkPlayer *partner);
+                                                             WifiBattleMatchPlayer *partner);
 static void WifiBattleMatchLink_CompetitionDeletePartnerCard(WifiBattleMatchLinkCompetition *link);
 static BOOL WifiBattleMatchLink_CompetitionIsPartnerCardDone(WifiBattleMatchLinkCompetition *link);
 static void WifiBattleMatchLink_CompetitionCreateTeamList(WifiBattleMatchLinkCompetition *link);
@@ -159,13 +159,13 @@ static s32 WifiBattleMatchLink_CompetitionGetMenuSelection(WifiBattleMatchLinkCo
 static void WifiBattleMatchLink_CompetitionStartSubTask(WifiBattleMatchLinkCompetition *link,
                                                         WifiBattleMatchTaskFunc func);
 static u32 WifiBattleMatchLink_CompetitionUpdateSubTask(WifiBattleMatchLinkCompetition *link);
-static void WifiBattleMatchLink_CompetitionFillBattleBoxParty(WifiBattleMatchLinkPlayer *player,
+static void WifiBattleMatchLink_CompetitionFillBattleBoxParty(WifiBattleMatchPlayer *player,
                                                               WifiBattleMatchLinkCompetition *link);
-static void WifiBattleMatchLink_CompetitionFillPlayer(WifiBattleMatchLinkPlayer *player,
+static void WifiBattleMatchLink_CompetitionFillPlayer(WifiBattleMatchPlayer *player,
                                                       WifiBattleMatchLinkCompetition *link);
-static void WifiBattleMatchLink_CompetitionCopySignature(WifiBattleMatchLinkPlayer *player,
+static void WifiBattleMatchLink_CompetitionCopySignature(WifiBattleMatchPlayer *player,
                                                          WifiBattleMatchNetCheck *signature);
-static BOOL WifiBattleMatchLink_CompetitionCheckSignature(WifiBattleMatchLinkPlayer *player, PokeParty *party,
+static BOOL WifiBattleMatchLink_CompetitionCheckSignature(WifiBattleMatchPlayer *player, PokeParty *party,
                                                           HeapID heapId);
 static BOOL WifiBattleMatchLink_CompetitionCompareParties(PokeParty *party, PokeParty *otherParty);
 static u32 WifiBattleMatchLink_CompetitionUpdateCancel(WifiBattleMatchLinkCompetition *link, BOOL canCancel,
@@ -406,7 +406,7 @@ static void WifiBattleMatchLink_CompetitionTaskAccount(WifiBattleMatchTask *task
 static void WifiBattleMatchLink_CompetitionTaskEntry(WifiBattleMatchTask *task, u32 *seq, void *work) {
     WifiBattleMatchLinkCompetition *link = work;
     WifiBattleMatchLinkParam *param = link->param;
-    void *entry = link->entry;
+    TournamentEntry *entry = link->entry;
     u32 ready;
     s32 selected;
     u32 state;
@@ -815,14 +815,14 @@ static void WifiBattleMatchLink_CompetitionTaskEntry(WifiBattleMatchTask *task, 
     case 43: {
         SaveControl *save = GameData_GetSaveControl(param->param->gameData);
         BattleBoxSave *battleBox = getBattleBox(save);
-        void *previous = TournamentBlock_GetTeam(getTournamentBlockAddress(save), 0);
+        TournamentTeam *previous = TournamentBlock_GetTeam(getTournamentBlockAddress(save), 0);
 
         MI_CpuCopy8(&link->serverEntry, link->entry, sizeof(link->serverEntry));
         BattleBoxSave_ClearFlags(battleBox, 1);
         TournamentEntry_SetField(link->entry, TOURNAMENT_FIELD_UNK15B, 1);
-        RndMatchData_SetParam(param->record, 10, 0, 0);
-        RndMatchData_SetParam(param->record, 10, 1, 0);
-        RndMatchData_SetParam(param->record, 10, 2, 0);
+        RndMatchData_SetParam(param->record, RNDMATCH_RECORD_COMPETITION, RNDMATCH_FIELD_RATING, 0);
+        RndMatchData_SetParam(param->record, RNDMATCH_RECORD_COMPETITION, RNDMATCH_FIELD_WIN, 0);
+        RndMatchData_SetParam(param->record, RNDMATCH_RECORD_COMPETITION, RNDMATCH_FIELD_LOSE, 0);
         TournamentTeam_Clear(previous);
         GameData_StartSave(param->param->gameData);
         *seq = 44;
@@ -871,7 +871,8 @@ static void WifiBattleMatchLink_CompetitionTaskEntry(WifiBattleMatchTask *task, 
         }
         break;
     case 49:
-        if (link->param->unk34->unk10 != RndMatchData_GetParam(param->record, 10, 0)) {
+        if (link->param->unk34->unk10 !=
+            RndMatchData_GetParam(param->record, RNDMATCH_RECORD_COMPETITION, RNDMATCH_FIELD_RATING)) {
             *seq = 50;
         } else {
             *seq = 55;
@@ -914,12 +915,12 @@ static void WifiBattleMatchLink_CompetitionTaskEntry(WifiBattleMatchTask *task, 
 static void WifiBattleMatchLink_CompetitionTaskRegister(WifiBattleMatchTask *task, u32 *seq, void *work) {
     WifiBattleMatchLinkCompetition *link = work;
     WifiBattleMatchLinkParam *param = link->param;
-    WifiBattleMatchLinkPlayer *player;
+    WifiBattleMatchPlayer *player;
     Regulation *regulation;
     PokeParty *party;
     SaveControl *save;
     BattleBoxSave *battleBox;
-    void *previous;
+    TournamentTeam *previous;
     BOOL ready;
     u32 invalid;
     BOOL otherInvalid;
@@ -1345,10 +1346,10 @@ static void WifiBattleMatchLink_CompetitionTaskMatch(WifiBattleMatchTask *task, 
     BOOL matchFound;
     char ownName[8];
     char otherName[8];
-    WifiBattleMatchLinkPlayer *player;
-    WifiBattleMatchLinkPlayer *otherPlayer;
+    WifiBattleMatchPlayer *player;
+    WifiBattleMatchPlayer *otherPlayer;
     PokeParty *party;
-    void *entry;
+    TournamentEntry *entry;
     Regulation *regulation;
     BOOL countIdle = FALSE;
     BOOL canCancel = FALSE;
@@ -1530,7 +1531,7 @@ static void WifiBattleMatchLink_CompetitionTaskMatch(WifiBattleMatchTask *task, 
         break;
     case 14:
         if (WifiBattleMatchNet_TakePlayerInfo(link->net, &received)) {
-            MI_CpuCopy8(received, param->otherPlayer, PokeParty_GetSaveDataSize() + sizeof(WifiBattleMatchLinkPlayer));
+            MI_CpuCopy8(received, param->otherPlayer, PokeParty_GetSaveDataSize() + sizeof(WifiBattleMatchPlayer));
             otherPlayer = param->otherPlayer;
             fixCount = 0;
             noTerminator = TRUE;
@@ -1783,7 +1784,7 @@ static void WifiBattleMatchLink_CompetitionTaskMatch(WifiBattleMatchTask *task, 
         GFL_HeapCreateChild(HEAPID_USER, HEAPID_WIFIBATTLEMATCH_LINK_DWC, 0x60000);
         DWCRapCommon_SetSubHeapEx(HEAPID_DEVICE_ALLOC, 0x60000, 1000, HEAPID_WIFIBATTLEMATCH_LINK_DWC);
         DWCRapCommon_SetSubHeapOwner(HEAPID_WIFIBATTLEMATCH_LINK_DWC);
-        WifiBattleMatchNet_StartReport(link->net, 0, 0, 0, 0, 0);
+        WifiBattleMatchNet_StartReport(link->net, WBM_REPORT_MODE_START, WBM_MATCH_MODE_COMPETITION, 0, NULL, 0);
         link->exchangeResult = 0;
         *seq = 36;
         link->timer = 0;
@@ -2012,8 +2013,8 @@ static void WifiBattleMatchLink_CompetitionTaskResult(WifiBattleMatchTask *task,
         WifiBattleMatchTask_SetReturnSeq(task, 2);
         break;
     case 2:
-        WifiBattleMatchNet_StartReport(link->net, 1, 0, param->param->unk4, &param->battleResult->result,
-                                       param->result == 2);
+        WifiBattleMatchNet_StartReport(link->net, WBM_REPORT_MODE_RESULT, WBM_MATCH_MODE_COMPETITION,
+                                       param->param->unk4, param->battleResult, param->result == 2);
         link->exchangeDone = 0;
         link->exchangeResult = 0;
         *seq = 3;
@@ -2411,7 +2412,7 @@ static void WifiBattleMatchLink_CompetitionTaskRelogin(WifiBattleMatchTask *task
 static void WifiBattleMatchLink_CompetitionTaskCheckPeriod(WifiBattleMatchTask *task, u32 *seq, void *work) {
     WifiBattleMatchLinkCompetition *link = work;
     WifiBattleMatchLinkParam *param = link->param;
-    void *entry;
+    TournamentEntry *entry;
     RTCDate startDate;
     RTCDate endDate;
     RTCDate date;
@@ -2690,7 +2691,7 @@ static void WifiBattleMatchLink_CompetitionTaskUnregister(WifiBattleMatchTask *t
 
 static void WifiBattleMatchLink_CompetitionTaskSignTeam(WifiBattleMatchTask *task, u32 *seq, void *work) {
     WifiBattleMatchLinkCompetition *link = work;
-    WifiBattleMatchLinkPlayer *player = link->param->player;
+    WifiBattleMatchPlayer *player = link->param->player;
     u32 ret;
 
     switch (*seq) {
@@ -2734,8 +2735,8 @@ static void WifiBattleMatchLink_CompetitionCreateCard(WifiBattleMatchLinkCompeti
     WifiBattleMatchWifiCardInfo info;
     PlayerInfo *playerInfo;
     ClActUnit *unit;
-    void *previous;
-    void *entry;
+    TournamentTeam *previous;
+    TournamentEntry *entry;
     u32 first;
 
     if (link->card != NULL) {
@@ -2755,9 +2756,9 @@ static void WifiBattleMatchLink_CompetitionCreateCard(WifiBattleMatchLinkCompeti
                                                  TournamentEntry_GetField(entry, TOURNAMENT_FIELD_END_MONTH),
                                                  TournamentEntry_GetField(entry, TOURNAMENT_FIELD_END_DAY));
     info.look = PlayerInfo_GetUnionView(playerInfo);
-    info.unkA0 = RndMatchData_GetParam(link->param->record, 10, 0);
-    first = RndMatchData_GetParam(link->param->record, 10, 1);
-    info.unkA4 = first + RndMatchData_GetParam(link->param->record, 10, 2);
+    info.unkA0 = RndMatchData_GetParam(link->param->record, RNDMATCH_RECORD_COMPETITION, RNDMATCH_FIELD_RATING);
+    first = RndMatchData_GetParam(link->param->record, RNDMATCH_RECORD_COMPETITION, RNDMATCH_FIELD_WIN);
+    info.unkA4 = first + RndMatchData_GetParam(link->param->record, RNDMATCH_RECORD_COMPETITION, RNDMATCH_FIELD_LOSE);
     info.variant = TournamentEntry_GetField(entry, TOURNAMENT_FIELD_VARIANT);
     if (info.unkA4 == 0 && info.unkA0 == 0) {
         info.unkA0 = 1500;
@@ -2796,15 +2797,14 @@ static void WifiBattleMatchLink_CompetitionSetCardPage(WifiBattleMatchLinkCompet
 }
 
 static void WifiBattleMatchLink_CompetitionCreatePartnerCard(WifiBattleMatchLinkCompetition *link,
-                                                             WifiBattleMatchLinkPlayer *partner) {
+                                                             WifiBattleMatchPlayer *partner) {
     ClActUnit *unit;
 
     if (link->partnerCard == NULL) {
         unit = WifiBattleMatchGraphic_GetClActUnit(link->graphic);
         link->partnerCard = WifiBattleMatchPartnerCard_Create(
-            (const LiveBattleMatchPlayerData *)partner, unit, link->res, link->font, link->printQueue, link->msgData,
-            link->wordSet, 0, 1, TournamentEntry_GetField(link->entry, TOURNAMENT_FIELD_VARIANT),
-            HEAPID_WIFIBATTLEMATCH_LINK);
+            partner, unit, link->res, link->font, link->printQueue, link->msgData, link->wordSet, 0, 1,
+            TournamentEntry_GetField(link->entry, TOURNAMENT_FIELD_VARIANT), HEAPID_WIFIBATTLEMATCH_LINK);
     }
 }
 
@@ -2937,11 +2937,11 @@ static u32 WifiBattleMatchLink_CompetitionUpdateSubTask(WifiBattleMatchLinkCompe
     return SUB_TASK_RUNNING;
 }
 
-static void WifiBattleMatchLink_CompetitionFillBattleBoxParty(WifiBattleMatchLinkPlayer *player,
+static void WifiBattleMatchLink_CompetitionFillBattleBoxParty(WifiBattleMatchPlayer *player,
                                                               WifiBattleMatchLinkCompetition *link) {
     PokeParty *party;
 
-    MI_CpuFill8(player, 0, sizeof(WifiBattleMatchLinkPlayer));
+    MI_CpuFill8(player, 0, sizeof(WifiBattleMatchPlayer));
     party = convertBoxedPokeSetToParty(getBattleBox(GameData_GetSaveControl(link->param->param->gameData)),
                                        HEAPID_WIFIBATTLEMATCH_LINK);
     PokeParty_Init((PokeParty *)player->partyData);
@@ -2950,11 +2950,11 @@ static void WifiBattleMatchLink_CompetitionFillBattleBoxParty(WifiBattleMatchLin
     player->unk44 = 100;
 }
 
-static void WifiBattleMatchLink_CompetitionFillPlayer(WifiBattleMatchLinkPlayer *player,
+static void WifiBattleMatchLink_CompetitionFillPlayer(WifiBattleMatchPlayer *player,
                                                       WifiBattleMatchLinkCompetition *link) {
     SaveControl *save = GameData_GetSaveControl(link->param->param->gameData);
     WifiBattleMatchLinkParam *param;
-    void *entry;
+    TournamentEntry *entry;
 
     PlayerInfo_Copy(GetGameDataPlayerInfo(link->param->param->gameData), &player->info);
     CGearPhrases_Get(CGearPhrases_GetBlock(save), 0, &player->sentence);
@@ -2969,12 +2969,12 @@ static void WifiBattleMatchLink_CompetitionFillPlayer(WifiBattleMatchLinkPlayer 
     player->checksum = CRC16_350bytes(entry);
 }
 
-static void WifiBattleMatchLink_CompetitionCopySignature(WifiBattleMatchLinkPlayer *player,
+static void WifiBattleMatchLink_CompetitionCopySignature(WifiBattleMatchPlayer *player,
                                                          WifiBattleMatchNetCheck *signature) {
     MI_CpuCopy8(signature->signature, player->signature, sizeof(player->signature));
 }
 
-static BOOL WifiBattleMatchLink_CompetitionCheckSignature(WifiBattleMatchLinkPlayer *player, PokeParty *party,
+static BOOL WifiBattleMatchLink_CompetitionCheckSignature(WifiBattleMatchPlayer *player, PokeParty *party,
                                                           HeapID heapId) {
     void *array;
     int i;
@@ -3085,13 +3085,14 @@ static BOOL WifiBattleMatchLink_CompetitionUpdateRecord(WifiBattleMatchLinkCompe
                                                         WifiBattleMatchLinkRanking *ranking) {
     BOOL changed = FALSE;
 
-    if (ranking->unk10 != RndMatchData_GetParam(link->param->record, 10, 0) ||
-        ranking->unk8 != RndMatchData_GetParam(link->param->record, 10, 1) ||
-        ranking->unkC != RndMatchData_GetParam(link->param->record, 10, 2)) {
+    if (ranking->unk10 !=
+            RndMatchData_GetParam(link->param->record, RNDMATCH_RECORD_COMPETITION, RNDMATCH_FIELD_RATING) ||
+        ranking->unk8 != RndMatchData_GetParam(link->param->record, RNDMATCH_RECORD_COMPETITION, RNDMATCH_FIELD_WIN) ||
+        ranking->unkC != RndMatchData_GetParam(link->param->record, RNDMATCH_RECORD_COMPETITION, RNDMATCH_FIELD_LOSE)) {
         changed = TRUE;
     }
-    RndMatchData_SetParam(link->param->record, 10, 0, ranking->unk10);
-    RndMatchData_SetParam(link->param->record, 10, 1, ranking->unk8);
-    RndMatchData_SetParam(link->param->record, 10, 2, ranking->unkC);
+    RndMatchData_SetParam(link->param->record, RNDMATCH_RECORD_COMPETITION, RNDMATCH_FIELD_RATING, ranking->unk10);
+    RndMatchData_SetParam(link->param->record, RNDMATCH_RECORD_COMPETITION, RNDMATCH_FIELD_WIN, ranking->unk8);
+    RndMatchData_SetParam(link->param->record, RNDMATCH_RECORD_COMPETITION, RNDMATCH_FIELD_LOSE, ranking->unkC);
     return changed;
 }

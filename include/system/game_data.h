@@ -3,11 +3,20 @@
 
 #include "types.h"
 #include "gfl/heap.h"
+#include "save/bag.h"
+#include "save/bsubway_save.h"
+#include "save/chatter.h"
+#include "save/hall_of_fame.h"
+#include "save/high_link.h"
+#include "save/traded_pokemon.h"
 #include "struct_decls.h"
+#include "system/shortcut_util.h"
 
 // The city of the player's version, which a key from Unova Link can switch
-#define CITY_BLACK_CITY 0
-#define CITY_WHITE_FOREST 1
+enum {
+    CITY_BLACK_CITY,
+    CITY_WHITE_FOREST,
+};
 
 // What GameData_MakeBoxPkm makes a Pokémon from
 struct BoxPkmCreateParams {
@@ -39,7 +48,7 @@ void GameData_Free(GameData *gameData);
 BOOL GameData_CheckPairFlag(GameData *gameData);
 BagSave *GameData_GetBag(GameData *gameData);
 BGMInfo *GameData_GetBGMInfo(GameData *gameData);
-void *GameData_GetBagCursor(GameData *gameData);
+BagCursor *GameData_GetBagCursor(GameData *gameData);
 BoxSaveAccessor *GameData_GetBoxSaveAccessor(GameData *gameData);
 ZoneSpawnInfo *GameData_GetEntralinkParentSpawnInfo(GameData *gameData);
 ZoneSpawnInfo *GameData_GetEscapeRopeZone(GameData *gameData);
@@ -57,7 +66,7 @@ CityState *GameData_GetMyCityState(GameData *gameData);
 // Adds seconds to the play time
 void GameData_UpdateTime(GameData *gameData, u32 seconds);
 // The levels that unlock the pass powers, which PassPowerLevel_GetWhite and PassPowerLevel_GetBlack read
-void *GameData_GetMyPassPowerLevels(GameData *gameData);
+PassPowerLevel *GameData_GetMyPassPowerLevels(GameData *gameData);
 u16 GameData_GetMyCity(GameData *gameData);
 // The C-Gear power request, which GameData_SaveCGearPowerRequest puts aside
 u8 GameData_GetCGearPowerRequest(GameData *gameData);
@@ -75,12 +84,12 @@ void GameData_CancelSave(GameData *gameData);
 // Starts saving, and runs the save, returning 2 once it ends
 void GameData_StartSave(GameData *gameData);
 int GameData_UpdateSave(GameData *gameData);
-void *getChatterDataAddress(GameData *gameData);
+PerapVoice *getChatterDataAddress(GameData *gameData);
 MusicalSave *getMusicalInfoBlkAddress(GameData *gameData);
 ZoneSpawnInfo *GameData_GetNextZone(GameData *gameData);
 PokeParty *GameData_GetParty(GameData *gameData);
 PlayerState *GameData_GetPlayerState(GameData *gameData);
-void *getTimeSigSaveBlock(GameData *gameData);
+TimeSigSave *getTimeSigSaveBlock(GameData *gameData);
 PlayerState *GameData_GetPlayerStateByNetID(GameData *gameData, s32 index);
 PokeDexSave *GameData_GetPokedex(GameData *gameData);
 PalPadFriendList *GameData_GetPalPadFriendList(GameData *gameData);
@@ -94,11 +103,11 @@ PartyPkm *GameData_MakeBoxPkm(GameData *gameData, BoxPkmCreateParams *params);
 // Whether a full day has passed since the last check
 BOOL checkForMidnight(GameData *gameData);
 SaveControl *GameData_GetSaveControl(GameData *gameData);
-void *GameData_GetShortcutMenuPos(GameData *gameData);
+ShortcutMenuPos *GameData_GetShortcutMenuPos(GameData *gameData);
 // The support another player gave over communication (system/comm_player_support.h)
 CommPlayerSupport *GameData_GetCommPlayerSupport(GameData *gameData);
 // Save block 0x41, the Pokémon traded in game, which save/traded_pokemon.h reads
-void *GetTradedPokemonBlock(GameData *gameData);
+TradedPokemonSave *GetTradedPokemonBlock(GameData *gameData);
 SaveControl *GameData_GetSaveControl_(GameData *gameData);
 BeaconStatus *GameData_GetBeaconStatus(GameData *gameData);
 DreamWorldSave *GameData_GetDreamWorldSave(GameData *gameData);
@@ -151,7 +160,7 @@ u8 GameData_GetPlayerCount(GameData *gameData);
 // The net ID of the player whose beacon is shown
 u8 GameData_GetBeaconNetID(GameData *gameData);
 // The player's Entralink levels, as GameData_GetMyPassPowerLevels returns for the player's own
-void *GameData_GetPassPowerLevels(GameData *gameData, u32 netId);
+PassPowerLevel *GameData_GetPassPowerLevels(GameData *gameData, u32 netId);
 void GameData_SetPlayerCount(GameData *gameData, u32 a1);
 void GameData_SetNetID(GameData *gameData, u32 a1);
 void GameData_SetBeaconNetID(GameData *gameData, u32 a1);
@@ -165,7 +174,7 @@ PokewoodSystem **GameData_GetPokewoodSystemPtr(GameData *gameData);
 // Where the Pokémon World Tournament keeps its WbtSystem while the player is at the tournament
 WbtSystem **GameData_GetWbtSystemPtr(GameData *gameData);
 // The Pokémon World Tournament's save data
-void *GameData_GetWbtSave(GameData *gameData);
+WbtSave *GameData_GetWbtSave(GameData *gameData);
 // The save's play time
 PlayTime *GameData_GetPlayTime(GameData *gameData);
 void GameData_SetJoinAvenueSeason(GameData *gameData, u8 a1);
@@ -178,7 +187,7 @@ void SetNowWeather(GameData *gameData, u8 weather);
 u32 GetNowWeather(GameData *gameData);
 BOOL GameData_CheckEventsPaused(GameData *gameData);
 // The Battle Subway's save data
-void *GameData_GetBSubwayWifiData(GameData *gameData);
+BSubwayWifiData *GameData_GetBSubwayWifiData(GameData *gameData);
 // Where the Trial House work is kept
 TrialHouseWork **GetTrialHouseWkPPtr(GameData *gameData);
 // The follower of field/pair_sys.h
@@ -195,7 +204,7 @@ u8 GameData_GetBattleKeyCursorFlag(GameData *gameData);
 // Sets the option that GameData_IsCGearOn returns
 void GameData_SetCGearOn(GameData *gameData, BOOL flag);
 // Save block 0x40, the Hall of Fame team
-void *GameData_GetHallOfFameTeam(GameData *gameData);
+HallOfFameTeam *GameData_GetHallOfFameTeam(GameData *gameData);
 // Draws three different zones of fifteen that the secret calls can be made from, and whether a zone is one of them
 void GameData_DrawSecretCallZones(GameData *gameData);
 BOOL GameData_IsSecretCallZone(GameData *gameData, u32 value);

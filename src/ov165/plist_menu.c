@@ -24,7 +24,7 @@ struct PokeListMenu {
     u8 count;
     u16 items[POKELIST_MENU_MAX + 1];
     AppTaskMenuItem entries[POKELIST_MENU_MAX];
-    void *taskMenu;
+    AppTaskMenu *taskMenu;
     u32 unk78;
     NNSG2dCharacterData *chars;
     void *charsFile;
@@ -246,9 +246,9 @@ static StrBuf *PokeListMenu_GetItemName(PokeListWork *wk, PokeListMenu *menu, in
 }
 
 // A button of a battle's selection, at a tile of the bottom bar
-void *PokeListMenu_CreateButton(PokeListWork *wk, PokeListMenu *menu, u32 msgId, u8 x, u8 y, BOOL isBack) {
+AppTaskMenuWin *PokeListMenu_CreateButton(PokeListWork *wk, PokeListMenu *menu, u32 msgId, u8 x, u8 y, BOOL isBack) {
     AppTaskMenuItem item;
-    void *button;
+    AppTaskMenuWin *button;
 
     item.str = GFL_MsgDataLoadStrbufNew(wk->msgData, msgId);
     item.color = 0x39e3;
@@ -262,25 +262,25 @@ void *PokeListMenu_CreateButton(PokeListWork *wk, PokeListMenu *menu, u32 msgId,
     return button;
 }
 
-void PokeListMenu_FreeButton(void *button) {
+void PokeListMenu_FreeButton(AppTaskMenuWin *button) {
     if (button != NULL) {
         AppTaskMenuWin_Free(button);
     }
 }
 
-void PokeListMenu_UpdateButton(void *button) {
+void PokeListMenu_UpdateButton(AppTaskMenuWin *button) {
     if (button != NULL) {
         AppTaskMenuWin_Update(button);
     }
 }
 
-void PokeListMenu_SetButtonActive(void *button, BOOL active) {
+void PokeListMenu_SetButtonActive(AppTaskMenuWin *button, BOOL active) {
     if (button != NULL) {
         AppTaskMenuWin_SetActive(button, active);
     }
 }
 
-void PokeListMenu_SetButtonPressed(void *button, BOOL pressed) {
+void PokeListMenu_SetButtonPressed(AppTaskMenuWin *button, BOOL pressed) {
     if (button != NULL) {
         AppTaskMenuWin_SetFlashing(button, pressed);
     }

@@ -3,6 +3,7 @@
 
 #include "types.h"
 #include "app/livebattlematch_flow.h"
+#include "app/wifibattlematch.h"
 #include "gfl/proc.h"
 #include "struct_decls.h"
 
@@ -18,9 +19,9 @@ typedef struct {
     u32 mode;
     // A BATTLE_CHAMPIONSHIP_FLOW_RESULT_*
     u32 result;
-    LiveBattleMatchPlayerData *playerData;
-    LiveBattleMatchPlayerData *partnerData;
-    LiveBattleMatchResult *matchResult;
+    WifiBattleMatchPlayer *playerData;
+    WifiBattleMatchPlayer *partnerData;
+    WifiBattleMatchBattleResult *matchResult;
 } BattleChampionshipFlowParam;
 
 // What the process starts with: the menu, or the reward, or one of the ways into the live competition (the modes

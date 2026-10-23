@@ -13,21 +13,23 @@
 #define RESORT_NPC_UID_END 0xa6
 
 // The columns of the NPCs' table
-#define RESORT_NPC_COL_MODEL 0
-#define RESORT_NPC_COL_ZONE 1
-#define RESORT_NPC_COL_X 2
-#define RESORT_NPC_COL_Z 3
-#define RESORT_NPC_COL_RANK 4
-#define RESORT_NPC_COL_MOVE_CODE 5
-#define RESORT_NPC_COL_AREA_W 6
-#define RESORT_NPC_COL_AREA_H 7
-#define RESORT_NPC_COL_SCRIPT 8
-#define RESORT_NPC_COL_TEXT_ROW 9
+enum {
+    RESORT_NPC_COL_MODEL,
+    RESORT_NPC_COL_ZONE,
+    RESORT_NPC_COL_X,
+    RESORT_NPC_COL_Z,
+    RESORT_NPC_COL_RANK,
+    RESORT_NPC_COL_MOVE_CODE,
+    RESORT_NPC_COL_AREA_W,
+    RESORT_NPC_COL_AREA_H,
+    RESORT_NPC_COL_SCRIPT,
+    RESORT_NPC_COL_TEXT_ROW,
+};
 
 struct ResortNPC {
-    void *table;
+    ResortBinary *table;
     u32 unk4;
-    void *texts;
+    ResortBinary *texts;
     ResortNPCSetup setup;
     BOOL eventRunning;
     u32 count;
@@ -105,7 +107,7 @@ u16 ResortNPC_GetTextEntry(ResortNPC *npc, u32 row, u32 column) {
 static void ResortNPC_CreateActors(ResortNPC *npc) {
     u32 i;
     for (i = 0; i < ResortBinary_GetRowCount(npc->table); i++) {
-        u16 rank = JoinAvenue_GetParam(npc->setup.info, 2, 0);
+        u16 rank = JoinAvenue_GetParam(npc->setup.info, JOIN_AVE_INFO_RANK, 0);
         u32 minRank = ResortBinary_Get(npc->table, i, RESORT_NPC_COL_RANK);
         u32 zone = ResortBinary_Get(npc->table, i, RESORT_NPC_COL_ZONE);
         FieldActor *actor = FindFieldActor(npc->setup.mmSys, i + RESORT_NPC_UID_FIRST);

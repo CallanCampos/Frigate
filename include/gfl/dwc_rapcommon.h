@@ -2,6 +2,7 @@
 #define POKEBW2_GFL_DWC_RAPCOMMON_H
 
 #include "types.h"
+#include "dwc/account.h"
 #include "dwc/memfunc.h"
 #include "gfl/heap.h"
 
@@ -23,8 +24,20 @@ void DWCRapCommon_Free(DWCAllocType name, void *ptr, u32 size);
 void DWCRapCommon_Create(HeapID heapId, u32 size);
 void DWCRapCommon_Delete(void);
 // Clears the user data and creates it if it is not valid
-void DWCRapCommon_ResetUserData(void *userData);
-// A state of the connection from 0 to 4, which callers switch on
+void DWCRapCommon_ResetUserData(DWCUserData *userData);
+// How DWCRapCommon_CheckError found the connection, which WifiBattleMatchNetResult follows: no error, or one it
+// cleared; DWC shut down and the error screen shown (an error with a0 FALSE); the error recorded for the caller to
+// end on; the Wi-Fi error screen shown; and, with a1 TRUE, the connection to the other player lost (error types
+// 0x3f0 and 0x3f1), Wi-Fi disconnected and the error screen shown
+enum {
+    DWCRAP_RESULT_OK,
+    DWCRAP_RESULT_DISCONNECTED,
+    DWCRAP_RESULT_FAILED,
+    DWCRAP_RESULT_NET_ERROR,
+    DWCRAP_RESULT_TIMEOUT,
+};
+
+// Checks the network's error and handles it, returning a DWCRAP_RESULT_*
 int DWCRapCommon_CheckError(u32 a0, u32 a1);
 
 #endif // POKEBW2_GFL_DWC_RAPCOMMON_H

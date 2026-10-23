@@ -415,7 +415,7 @@ void ZknListObj_PutMon(ZknListWork *wk, u16 species) {
 
     // BUG: for the unknown picture the form is whatever the stack holds, since nothing read it from the Pokédex
     personal = PML_PersonalLoad(species, form, HEAPID_ZUKAN_LIST | HEAPID_TAIL_BIT);
-    if (species != SPECIES_NONE && PML_PersonalGetParam(personal, PERSONAL_SPRITE_FLIP) == 0) {
+    if (species != SPECIES_NONE && PML_PersonalGetParam(personal, PERSONAL_NO_FLIP) == 0) {
         ClActor_SetFlip(wk->actors[id], 1, TRUE);
     }
     PML_PersonalFree(personal);

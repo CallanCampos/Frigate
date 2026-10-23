@@ -116,7 +116,7 @@ static void LeagueCenter_LoadBG(GimmickWork *work) {
                           GX_BG_AREAOVER_XLU,
                           FALSE };
 
-        GFL_BGSysCreateBG(GIMMICK_BG, &setup, 0);
+        GFL_BGSysCreateBG(GIMMICK_BG, &setup, BGMODE_TEXT);
     }
     arc = GFL_ArcSysCreateFileHandle(ARCID_GIMMICK, HEAPID_TAIL(heapId));
     GFL_G2DIOLoadArcNCLRDefault(arc, GIMMICK_BG_NCLR, 0, 0, 0, heapId);

@@ -186,11 +186,11 @@ BOOL BrNet_GetUploadVideoNumber(BrNet *net, u64 *number) {
     return isEnd;
 }
 
-BOOL BrNet_GetDownloadVideo(BrNet *net, void **video, u32 *value) {
+BOOL BrNet_GetDownloadVideo(BrNet *net, BattleRecVideo **video, u32 *value) {
     BOOL isEnd = net->downloadVideoEnd;
 
     if (isEnd) {
-        *value = GdsRapResponse_GetBattleVideo(&net->gdsrap, (BattleRecVideo **)video);
+        *value = GdsRapResponse_GetBattleVideo(&net->gdsrap, video);
     }
     return isEnd;
 }
@@ -334,14 +334,14 @@ u32 BrNet_CheckError(BrNet *net) {
 
     ret = TRUE;
     switch (DWCRapCommon_CheckError(TRUE, FALSE)) {
-    case 1:
+    case DWCRAP_RESULT_DISCONNECTED:
         GFL_SndStop();
         return ret;
-    case 2:
+    case DWCRAP_RESULT_FAILED:
         GFL_SndStop();
         net->isFailed = ret;
         return 2;
-    case 3:
+    case DWCRAP_RESULT_NET_ERROR:
         GFL_SndStop();
         GFL_NetErrShowFatal();
         break;

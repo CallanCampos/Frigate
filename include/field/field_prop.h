@@ -73,8 +73,8 @@ struct FieldPropResInfo {
 // A prop's loaded resources, 0x18 bytes. Layout from swan.
 struct FieldPropResource {
     FieldPropResInfo *info;
-    void *model;
-    void *animations[4];
+    G3DResource *model;
+    G3DResource *animations[4];
 };
 
 // A prop placed in a chunk's data. Layout from swan's field_static_prop.h.
@@ -133,7 +133,7 @@ struct FieldPropSystem {
     FieldPropResBank resBank;
     u32 resourceCount;
     FieldPropResource *resources;
-    void *textureResource;
+    G3DResource *textureResource;
     u32 resInstanceCount;
     FieldPropResInstance *resInstances;
     FieldPropHandle *handles[7];
@@ -141,7 +141,7 @@ struct FieldPropSystem {
 };
 
 struct FieldPropResInstance {
-    void *actor;
+    G3DActor *actor;
     FieldPropResource *resource;
     u32 animationState[4];
 };
@@ -161,16 +161,17 @@ u32 FieldPropSystem_ConvResIDToIndex(const FieldPropSystem *system, u32 resId);
 void *FieldPropResBundle_GetResInfo(FieldPropResBundle *bundle, u32 index);
 void *FieldPropResBundle_GetModelData(FieldPropResBundle *bundle, u32 index);
 void *FieldPropResAnmHeader_GetAnmData(FieldPropResAnmHeader *header, u32 index);
-void *FieldPropSystem_FindResInfo(FieldPropSystem *system, u32 resId);
-void *FieldPropSystem_GetResInfo(FieldPropSystem *system, u32 index);
+FieldPropResInfo *FieldPropSystem_FindResInfo(FieldPropSystem *system, u32 resId);
+FieldPropResInfo *FieldPropSystem_GetResInfo(FieldPropSystem *system, u32 index);
 FieldPropResBank *FieldPropSystem_GetResBank(FieldPropSystem *system);
 FieldPropSystem *FieldPropSystem_Create(HeapID heapId, FieldG3DMapper *mapper, u16 season);
 // Loads the props of the area, and recolors their textures with the field's color post-FX
-void FieldPropSystem_LoadArea(FieldPropSystem *system, u16 zoneId, AreaData *area, void *postFx);
-void FieldPropSystem_LoadTextures(FieldPropSystem *system, u16 arcId, u32 fileId, void *postFx);
-void FieldPropSystem_InitResources(FieldPropSystem *system, void *postFx);
+void FieldPropSystem_LoadArea(FieldPropSystem *system, u16 zoneId, AreaData *area, FieldColorPostFX *postFx);
+void FieldPropSystem_LoadTextures(FieldPropSystem *system, u16 arcId, u32 fileId, FieldColorPostFX *postFx);
+void FieldPropSystem_InitResources(FieldPropSystem *system, FieldColorPostFX *postFx);
 void FieldPropSystem_InstantiateResources(FieldPropSystem *system, FieldPropResBank *bank);
-void FieldPropSystem_InitResource(FieldPropSystem *system, FieldPropResource *resource, u32 index, void *postFx);
+void FieldPropSystem_InitResource(FieldPropSystem *system, FieldPropResource *resource, u32 index,
+                                  FieldColorPostFX *postFx);
 void FieldPropResource_Free(FieldPropResource *resource);
 void FieldPropSystem_LoadResBundle(FieldPropSystem *system, u16 arcId, u32 fileId);
 void FieldPropSystem_FreeResBundle(FieldPropSystem *system);

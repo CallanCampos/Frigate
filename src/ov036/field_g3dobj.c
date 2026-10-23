@@ -16,9 +16,9 @@
 // The resources of a model with its textures and animations; state is 1 once the textures are in VRAM and 2 while
 // they wait to be put there
 typedef struct {
-    void *model;
-    void *texture;
-    void *animations[G3DOBJ_ANM_MAX];
+    G3DResource *model;
+    G3DResource *texture;
+    G3DResource *animations[G3DOBJ_ANM_MAX];
     u8 animationCount;
     u8 state;
     u8 pad[2];
@@ -34,7 +34,7 @@ typedef struct {
     u16 modelIndex;
     SRTMatrix transform;
     G3DActor *actor;
-    void *animations[G3DOBJ_ANM_MAX];
+    G3DAnimation *animations[G3DOBJ_ANM_MAX];
 } FieldG3DObj;
 
 struct FieldG3DObjSystem {
@@ -44,12 +44,12 @@ struct FieldG3DObjSystem {
     u16 objCount;
     FieldG3DObjResGroup *resGroups;
     FieldG3DObj *objs;
-    void *colorPostFx;
+    FieldColorPostFX *colorPostFx;
 };
 
 void FieldG3DObjResGroup_SetupTextures(FieldG3DObjResGroup *group);
 void FieldG3DObjResGroup_LoadResources(FieldG3DObjResGroup *group, u16 heapId, FieldG3DObjResRequest *request,
-                                       BOOL setupTextures, void *colorPostFx);
+                                       BOOL setupTextures, FieldColorPostFX *colorPostFx);
 void FieldG3DObjResGroup_Free(FieldG3DObjResGroup *group);
 void FieldG3DObj_Setup(FieldG3DObj *obj, FieldG3DObjResGroup *group, u16 resGroup, u16 modelIndex, u16 heapId,
                        const VecFx32 *position, BOOL initTransform);
@@ -135,12 +135,12 @@ void FieldG3DObjSystem_Draw(FieldG3DObjSystem *system) {
     }
 }
 
-void FieldG3DObjSystem_SetColorPostFX(FieldG3DObjSystem *system, void *colorPostFx) {
+void FieldG3DObjSystem_SetColorPostFX(FieldG3DObjSystem *system, FieldColorPostFX *colorPostFx) {
     system->colorPostFx = colorPostFx;
 }
 
 u16 FieldG3DObjSystem_AddResGroupCore(FieldG3DObjSystem *system, FieldG3DObjResRequest *request, BOOL setupTextures,
-                                      void *colorPostFx) {
+                                      FieldColorPostFX *colorPostFx) {
     u16 i;
     FieldG3DObjResGroup *group = system->resGroups;
 
@@ -314,7 +314,7 @@ void FieldG3DObjResGroup_SetupTextures(FieldG3DObjResGroup *group) {
 }
 
 void FieldG3DObjResGroup_LoadResources(FieldG3DObjResGroup *group, u16 heapId, FieldG3DObjResRequest *request,
-                                       BOOL setupTextures, void *colorPostFx) {
+                                       BOOL setupTextures, FieldColorPostFX *colorPostFx) {
     int i;
 
     if (request->mdlArc != NULL) {
@@ -324,7 +324,7 @@ void FieldG3DObjResGroup_LoadResources(FieldG3DObjResGroup *group, u16 heapId, F
         group->texture = GFL_G3DSysReadArcToolResource(request->texArc, request->texDatID);
     }
     if (colorPostFx != NULL) {
-        void *res = NULL;
+        G3DResource *res = NULL;
 
         if (group->model != NULL) {
             res = group->model;
@@ -380,7 +380,7 @@ void FieldG3DObjResGroup_Free(FieldG3DObjResGroup *group) {
 void FieldG3DObj_Setup(FieldG3DObj *obj, FieldG3DObjResGroup *group, u16 resGroup, u16 modelIndex, u16 heapId,
                        const VecFx32 *position, BOOL initTransform) {
     int i;
-    void *texture = NULL;
+    G3DResource *texture = NULL;
     G3DModel *model;
 
     obj->resGroup = resGroup;

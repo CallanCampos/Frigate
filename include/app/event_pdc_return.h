@@ -12,9 +12,11 @@
 #include "struct_decls.h"
 
 // How the capture ended
-#define PDC_RESULT_CAUGHT 1
-// The Pokémon was seen but not caught
-#define PDC_RESULT_SEEN 2
+enum {
+    PDC_RESULT_CAUGHT = 1,
+    // The Pokémon was seen but not caught
+    PDC_RESULT_SEEN,
+};
 
 typedef struct {
     GameData *gameData;

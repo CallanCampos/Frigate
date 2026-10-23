@@ -54,7 +54,7 @@ void BattleServer_AttachClient(BtlServer *server, BtlAdapter *adapter, u8 client
     ServerClient_SetParty(&server->clients[clientId], party, numCoverPos);
 }
 
-void BattleServer_AttachNetClient(BtlServer *server, u32 mode, void *netHandle, u8 clientId, u8 numCoverPos) {
+void BattleServer_AttachNetClient(BtlServer *server, u32 mode, NetHandle *netHandle, u8 clientId, u8 numCoverPos) {
     BattleParty *party = GetPartyData(server->pokeCon, clientId);
     BtlAdapter *adapter = BtlAdapter_Create(netHandle, clientId, TRUE, server->heapId);
 
@@ -92,7 +92,7 @@ void BattleServer_Delete(BtlServer *server) {
 BOOL BattleServer_Main(BtlServer *server) {
     if (server->state != 2) {
         if (server->proc(server, &server->seq)) {
-            BattleServer_BroadcastCmdData(server, 9, server->clientIdList, sizeof(BtlClientIDList));
+            BattleServer_BroadcastCmdData(server, BTL_ACMD_QUIT, server->clientIdList, sizeof(BtlClientIDList));
             server->state = 2;
         }
     } else if (BattleServer_AllClientsReplied(server)) {
@@ -117,7 +117,7 @@ void BattleServer_SetSelectActionProc(BtlServer *server) {
 BOOL BattleServer_ProcStart(BtlServer *server, int *seq) {
     switch (*seq) {
     case 0:
-        BattleServer_BroadcastCmd(server, 1);
+        BattleServer_BroadcastCmd(server, BTL_ACMD_SETUP_VIEW);
         (*seq)++;
     case 1:
         if (BattleServer_AllClientsReplied(server)) {
@@ -137,7 +137,8 @@ BOOL BattleServer_ProcStart(BtlServer *server, int *seq) {
         }
         break;
     case 3:
-        BattleServer_BroadcastCmdData(server, 8, server->queuePtr->buffer, server->queuePtr->writePtr);
+        BattleServer_BroadcastCmdData(server, BTL_ACMD_SERVER_CMD, server->queuePtr->buffer,
+                                      server->queuePtr->writePtr);
         (*seq)++;
         break;
     case 4:
@@ -154,7 +155,8 @@ BOOL BattleServer_ProcSelectAction(BtlServer *server, int *seq) {
     switch (*seq) {
     case 0:
         if (func_ov167_0219fe24(server->flow)) {
-            BattleServer_BroadcastCmdData(server, 8, server->queuePtr->buffer, server->queuePtr->writePtr);
+            BattleServer_BroadcastCmdData(server, BTL_ACMD_SERVER_CMD, server->queuePtr->buffer,
+                                          server->queuePtr->writePtr);
             (*seq)++;
         } else {
             *seq += 2;
@@ -167,7 +169,7 @@ BOOL BattleServer_ProcSelectAction(BtlServer *server, int *seq) {
         }
         break;
     case 2:
-        BattleServer_BroadcastCmd(server, 3);
+        BattleServer_BroadcastCmd(server, BTL_ACMD_SELECT_ACTION);
         (*seq)++;
         break;
     case 3:
@@ -202,7 +204,8 @@ BOOL BattleServer_ProcSelectAction(BtlServer *server, int *seq) {
         if (GetCommMode(server->mainModule)) {
             func_ov167_0219ef70(&server->clientActions);
         }
-        BattleServer_BroadcastCmdData(server, 8, server->queuePtr->buffer, server->queuePtr->writePtr);
+        BattleServer_BroadcastCmdData(server, BTL_ACMD_SERVER_CMD, server->queuePtr->buffer,
+                                      server->queuePtr->writePtr);
         (*seq)++;
         break;
     case 7:
@@ -254,7 +257,7 @@ BOOL BattleServer_IsActionChapter(BtlServer *server) {
 BOOL BattleServer_ProcAskEscape(BtlServer *server, int *seq) {
     switch (*seq) {
     case 0:
-        BattleServer_BroadcastCmd(server, 7);
+        BattleServer_BroadcastCmd(server, BTL_ACMD_CONFIRM_NEXT_POKE);
         (*seq)++;
         break;
     case 1:
@@ -269,7 +272,8 @@ BOOL BattleServer_ProcAskEscape(BtlServer *server, int *seq) {
                 break;
             }
             server->flowResult = BtlServerFlow_TryEscape(server->flow);
-            BattleServer_BroadcastCmdData(server, 8, server->queuePtr->buffer, server->queuePtr->writePtr);
+            BattleServer_BroadcastCmdData(server, BTL_ACMD_SERVER_CMD, server->queuePtr->buffer,
+                                          server->queuePtr->writePtr);
             (*seq)++;
         }
         break;
@@ -289,14 +293,14 @@ BOOL BattleServer_ProcAskEscape(BtlServer *server, int *seq) {
 BOOL BattleServer_ProcChangePokemonEndTurn(BtlServer *server, int *seq) {
     switch (*seq) {
     case 0:
-        BattleServer_BroadcastCmdData(server, 5, server->posList, server->count);
+        BattleServer_BroadcastCmdData(server, BTL_ACMD_SELECT_CHANGE_FAINTED, server->posList, server->count);
         (*seq)++;
         break;
     case 1:
         if (BattleServer_AllClientsReplied(server)) {
             if (DoesSwitchModeNeedConfirming(server)) {
                 server->switchModeMonId = GetNextEnemyForSwitchMode(server);
-                BattleServer_SendCmdToClient(server, 4, 0, &server->switchModeMonId, 1);
+                BattleServer_SendCmdToClient(server, BTL_ACMD_CONFIRM_SHIFT_SWITCH, 0, &server->switchModeMonId, 1);
             }
             (*seq)++;
         }
@@ -328,7 +332,8 @@ BOOL BattleServer_ProcChangePokemonEndTurn(BtlServer *server, int *seq) {
         (*seq)++;
     case 5:
         server->flowResult = BtlServerFlow_RunFaintSwitch(server->flow, &server->clientActions);
-        BattleServer_BroadcastCmdData(server, 8, server->queuePtr->buffer, server->queuePtr->writePtr);
+        BattleServer_BroadcastCmdData(server, BTL_ACMD_SERVER_CMD, server->queuePtr->buffer,
+                                      server->queuePtr->writePtr);
         (*seq)++;
         break;
     case 6:
@@ -385,7 +390,7 @@ u8 GetNextEnemyForSwitchMode(BtlServer *server) {
     client = &server->clients[1];
     if (IsSwitchModeEnabled(client)) {
         action = BtlAdapter_GetReturnData(client->adapter, NULL);
-        if (BattleAction_GetAction(action) == 3) {
+        if (BattleAction_GetAction(action) == BATTLE_ACTION_CHANGE) {
             slot = action->change.slot;
             return GetMonID(GetClientMonData(server->pokeCon, 1, slot));
         }
@@ -396,7 +401,7 @@ u8 GetNextEnemyForSwitchMode(BtlServer *server) {
 BOOL BattleServer_ProcChangePokemonMidTurn(BtlServer *server, int *seq) {
     switch (*seq) {
     case 0:
-        BattleServer_BroadcastCmdData(server, 6, server->posList, server->count);
+        BattleServer_BroadcastCmdData(server, BTL_ACMD_SELECT_CHANGE_MID_TURN, server->posList, server->count);
         (*seq)++;
         break;
     case 1:
@@ -427,7 +432,8 @@ BOOL BattleServer_ProcChangePokemonMidTurn(BtlServer *server, int *seq) {
     case 4:
         BtlServerCmdQueue_Init(server->queuePtr);
         server->flowResult = BtlServerFlow_RunMidTurnSwitch(server->flow, &server->clientActions);
-        BattleServer_BroadcastCmdData(server, 8, server->queuePtr->buffer, server->queuePtr->writePtr);
+        BattleServer_BroadcastCmdData(server, BTL_ACMD_SERVER_CMD, server->queuePtr->buffer,
+                                      server->queuePtr->writePtr);
         (*seq)++;
         break;
     case 5:
@@ -465,14 +471,14 @@ BOOL BattleServer_ProcTimeUp(BtlServer *server, int *seq) {
         u32 size;
         void *data = BtlRecTool_MakeTimeoutChunk(&server->recTool, &size);
 
-        BattleServer_BroadcastCmdData(server, 10, data, size);
+        BattleServer_BroadcastCmdData(server, BTL_ACMD_STORE_RECORD, data, size);
         (*seq)++;
         break;
     }
     case 1:
         if (BattleServer_AllClientsReplied(server)) {
             BattleServer_FinishCmd(server);
-            BattleServer_BroadcastCmd(server, 0x10);
+            BattleServer_BroadcastCmd(server, BTL_ACMD_TIME_UP);
             (*seq)++;
         }
         break;
@@ -548,7 +554,7 @@ BOOL BattleServer_ProcWaitExit(BtlServer *server, int *seq) {
 BOOL BattleServer_ProcWildWin(BtlServer *server, int *seq) {
     switch (*seq) {
     case 0:
-        BattleServer_BroadcastCmdData(server, 0xe, &server->exitData, sizeof(server->exitData));
+        BattleServer_BroadcastCmdData(server, BTL_ACMD_EXIT_WILD_WIN, &server->exitData, sizeof(server->exitData));
         (*seq)++;
         break;
     case 1:
@@ -567,7 +573,7 @@ BOOL BattleServer_ProcWildWin(BtlServer *server, int *seq) {
 BOOL BattleServer_ProcWildLose(BtlServer *server, int *seq) {
     switch (*seq) {
     case 0:
-        BattleServer_BroadcastCmdData(server, 0xf, &server->exitData, sizeof(server->exitData));
+        BattleServer_BroadcastCmdData(server, BTL_ACMD_EXIT_WILD_LOSE, &server->exitData, sizeof(server->exitData));
         (*seq)++;
         break;
     case 1:
@@ -586,7 +592,7 @@ BOOL BattleServer_ProcWildLose(BtlServer *server, int *seq) {
 BOOL BattleServer_ProcCommEnd(BtlServer *server, int *seq) {
     switch (*seq) {
     case 0:
-        BattleServer_BroadcastCmdData(server, 0xd, &server->exitData, sizeof(server->exitData));
+        BattleServer_BroadcastCmdData(server, BTL_ACMD_EXIT_COMM, &server->exitData, sizeof(server->exitData));
         (*seq)++;
         break;
     case 1:
@@ -604,7 +610,7 @@ BOOL BattleServer_ProcCommEnd(BtlServer *server, int *seq) {
 BOOL BattleServer_ProcTrainerEnd(BtlServer *server, int *seq) {
     switch (*seq) {
     case 0:
-        BattleServer_BroadcastCmdData(server, 0xb, &server->exitData, sizeof(server->exitData));
+        BattleServer_BroadcastCmdData(server, BTL_ACMD_EXIT_TRAINER, &server->exitData, sizeof(server->exitData));
         (*seq)++;
         break;
     case 1:
@@ -623,7 +629,7 @@ BOOL BattleServer_ProcTrainerEnd(BtlServer *server, int *seq) {
 BOOL BattleServer_ProcFacilityEnd(BtlServer *server, int *seq) {
     switch (*seq) {
     case 0:
-        BattleServer_BroadcastCmdData(server, 0xc, &server->exitData, sizeof(server->exitData));
+        BattleServer_BroadcastCmdData(server, BTL_ACMD_EXIT_FACILITY, &server->exitData, sizeof(server->exitData));
         (*seq)++;
         break;
     case 1:
@@ -698,7 +704,7 @@ BOOL BattleServer_SendRecStartChunk(BtlServer *server, BOOL value) {
 
     BtlRecTool_Init(&server->recTool, TRUE);
     data = BtlRecTool_MakeTurnChunk(&server->recTool, &size, value);
-    BattleServer_BroadcastCmdData(server, 10, data, size);
+    BattleServer_BroadcastCmdData(server, BTL_ACMD_STORE_RECORD, data, size);
     return TRUE;
 }
 
@@ -707,7 +713,7 @@ BOOL BattleServer_SendRecActionsChunk(BtlServer *server, u8 value, BOOL flag) {
     void *data = BattleServer_MakeRecActionsChunk(server, value, flag, &size);
 
     if (data != NULL) {
-        BattleServer_BroadcastCmdData(server, 10, data, size);
+        BattleServer_BroadcastCmdData(server, BTL_ACMD_STORE_RECORD, data, size);
         return TRUE;
     }
     return FALSE;

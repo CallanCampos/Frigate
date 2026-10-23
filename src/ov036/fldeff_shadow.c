@@ -17,7 +17,7 @@ typedef struct {
     BlActSys *blact;
     BlActScene *scene;
     u32 matIndex;
-    void *postFx;
+    FieldColorPostFX *postFx;
 } FieldEffectShadow;
 
 // What the task of an actor's shadow starts from
@@ -75,7 +75,7 @@ void FieldEffect_Shadow_Free(FieldEffects *effects, void *data) {
 
 static void func_ov036_021a3b9c(FieldEffectShadow *shadow) {
     BlActMatRequest request;
-    void *texture = GFL_G3DSysReadArcToolResource(FieldEffects_GetArc(shadow->effects), 47);
+    G3DResource *texture = GFL_G3DSysReadArcToolResource(FieldEffects_GetArc(shadow->effects), 47);
 
     FieldColorPostFX_Apply(shadow->postFx, texture);
     request.texResource = texture;

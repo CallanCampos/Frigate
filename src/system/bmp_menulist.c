@@ -60,10 +60,12 @@ static inline u16 RowY(BmpMenuList *list, u16 row) {
 }
 
 // The directions Bitmap_Scroll16 and Bitmap_Scroll256 scroll in
-#define SCROLL_UP 0
-#define SCROLL_DOWN 1
-#define SCROLL_LEFT 2
-#define SCROLL_RIGHT 3
+enum {
+    SCROLL_UP,
+    SCROLL_DOWN,
+    SCROLL_LEFT,
+    SCROLL_RIGHT,
+};
 
 BmpMenuList *BmpMenuList_Create(const BmpMenuListHeader *header, u16 listTop, u16 cursorRow, HeapID heapId) {
     BmpMenuList *list = GFL_HeapAllocate(heapId, sizeof(BmpMenuList), TRUE, "bmp_menulist.c", 107);

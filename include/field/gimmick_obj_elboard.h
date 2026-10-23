@@ -45,7 +45,7 @@ void ElboardMessage_Free(ElboardMessage *message);
 void ElboardMessage_Start(ElboardMessage *message);
 void Elboard_UpdateMessage(Elboard *state, ElboardMessage *message, u32 amount);
 void ElboardMessage_Stop(ElboardMessage *message);
-BOOL GimmickGateZoneData_Load(void *dest, u32 arcId, u32 fileId);
+BOOL GimmickGateZoneData_Load(GimmickGateZoneData *dest, u32 arcId, u32 fileId);
 Elboard *Elboard_Create(ElboardInit *init);
 
 #endif // POKEBW2_FIELD_GIMMICK_OBJ_ELBOARD_H

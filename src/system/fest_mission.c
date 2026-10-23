@@ -3,6 +3,7 @@
 #include "gfl/rtc_cache.h"
 #include "gfl/std.h"
 #include "system/fest_mission.h"
+#include "system/fest_mission_beacon.h"
 #include "system/game_beacon.h"
 
 // A Funfest mission's config: its start, its time, its score and whether something a player did counts for it. The
@@ -117,27 +118,27 @@ BOOL FestMissionConfig_IsTarget(FestMissionConfig *config, u32 kind, u32 value) 
 
     switch (config->header.kind) {
     case 1:
-        if (kind != 0x13 && kind != 0x14) {
+        if (kind != LOG_KIND_KIND1_DEFEATED && kind != LOG_KIND_KIND1_CAUGHT) {
             return FALSE;
         }
         break;
-    case 2:
-        if (kind != 0x15 && kind != 0x16) {
+    case MISSION_FLAGS:
+        if (kind != LOG_KIND_FLAGS_DEFEATED && kind != LOG_KIND_FLAGS_CAUGHT) {
             return FALSE;
         }
         break;
-    case 3:
-        if (kind - 0x18 != config->info.target) {
+    case MISSION_HOLLOW:
+        if (kind - LOG_KIND_RANG_BELL != config->info.target) {
             return FALSE;
         }
         break;
-    case 4:
-        if (kind != 0x17) {
+    case MISSION_SPARKLE:
+        if (kind != LOG_KIND_SPARKLE_FOUND) {
             return FALSE;
         }
         break;
-    case 5:
-        if (kind - 0x1e != config->info.target) {
+    case MISSION_PEOPLE:
+        if (kind - LOG_KIND_HELPED_LOST_CHILD != config->info.target) {
             return FALSE;
         }
         break;
@@ -205,7 +206,7 @@ static BOOL FestMissionConfig_AnyTarget(const FestMissionConfig *config, u32 val
 BOOL FestMissionConfig_FromBeacon(FestMissionConfig *config, const GameBeacon *beacon) {
     ClearFesMissionCfg(config);
     if (GameBeacon_IsMissionType(beacon)) {
-        config->info = *(const FestMissionInfo *)&beacon->payload;
+        config->info = beacon->payload.missionInfo;
         config->missionId = beacon->arg.mission.missionId;
         config->unk1A = beacon->arg.mission.unk;
         config->seed = beacon->missionWord;

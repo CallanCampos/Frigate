@@ -1,5 +1,6 @@
 #include "types.h"
 #include "field/fest_mission_data.h"
+#include "field/fest_mission_gimmick.h"
 #include "field/fest_mission_hollow.h"
 #include "field/festival.h"
 #include "field/rival_select.h"
@@ -12,8 +13,8 @@ typedef struct {
     u8 unk2;
 } FesMissionHollowPerson;
 
-static u16 FesMissionHollow_GetPersonObjCode(RivalSelectContext *context);
-static u8 FesMissionHollow_GetPersonUnk2(RivalSelectContext *context);
+static u16 FesMissionHollow_GetPersonObjCode(FesGimmick *gimmick);
+static u8 FesMissionHollow_GetPersonUnk2(FesGimmick *gimmick);
 static void FesMissionHollow_Shuffle(u8 *list, int count, MATHRandContext32 *rand);
 
 // clang-format off
@@ -26,9 +27,9 @@ static const FesMissionHollowPerson data_ov026_0216fa50[] = {
 
 // clang-format on
 
-void FesMissionHollow_Setup(RivalSelectContext *context) {
-    FestMission *mission = GetFestMissionCfg(context->entryOwner);
-    RivalEntry *entries = LinkFestival_GetEntries(context->entryOwner);
+void FesMissionHollow_Setup(FesGimmick *gimmick) {
+    FestMissionConfig *mission = GetFestMissionCfg(gimmick->festival);
+    RivalEntry *entries = LinkFestival_GetMissionWork(gimmick->festival)->hollows;
     MATHRandContext32 rand;
     u8 hollows[20];
     int i;
@@ -46,8 +47,8 @@ void FesMissionHollow_Setup(RivalSelectContext *context) {
         entry->unk1 = 0;
         entry->selected = 1;
         entry->active = 0;
-        entry->unk4 = FesMissionHollow_GetPersonObjCode(context);
-        entry->unk6 = FesMissionHollow_GetPersonUnk2(context);
+        entry->unk4 = FesMissionHollow_GetPersonObjCode(gimmick);
+        entry->unk6 = FesMissionHollow_GetPersonUnk2(gimmick);
     }
     FesMissionHollow_Shuffle(hollows, 20, &rand);
     for (i = 0; i < 10; i++) {
@@ -59,14 +60,14 @@ void FesMissionHollow_Setup(RivalSelectContext *context) {
     }
 }
 
-static u16 FesMissionHollow_GetPersonObjCode(RivalSelectContext *context) {
-    FestMission *mission = GetFestMissionCfg(context->entryOwner);
-    return data_ov026_0216fa50[mission->unk0_20].unk0;
+static u16 FesMissionHollow_GetPersonObjCode(FesGimmick *gimmick) {
+    FestMissionConfig *mission = GetFestMissionCfg(gimmick->festival);
+    return data_ov026_0216fa50[mission->info.unk0_20].unk0;
 }
 
-static u8 FesMissionHollow_GetPersonUnk2(RivalSelectContext *context) {
-    FestMission *mission = GetFestMissionCfg(context->entryOwner);
-    return data_ov026_0216fa50[mission->unk0_20].unk2;
+static u8 FesMissionHollow_GetPersonUnk2(FesGimmick *gimmick) {
+    FestMissionConfig *mission = GetFestMissionCfg(gimmick->festival);
+    return data_ov026_0216fa50[mission->info.unk0_20].unk2;
 }
 
 // Shuffles the list
@@ -81,9 +82,9 @@ static void FesMissionHollow_Shuffle(u8 *list, int count, MATHRandContext32 *ran
     }
 }
 
-BOOL FesMissionHollow_IsActive(RivalSelectContext *context) {
-    FestMission *mission = GetFestMissionCfg(context->entryOwner);
-    if (mission->target == 5 && mission->unk0_20 != 0) {
+BOOL FesMissionHollow_IsActive(FesGimmick *gimmick) {
+    FestMissionConfig *mission = GetFestMissionCfg(gimmick->festival);
+    if (mission->info.target == 5 && mission->info.unk0_20 != 0) {
         return TRUE;
     }
     return FALSE;

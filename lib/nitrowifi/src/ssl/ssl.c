@@ -1,3 +1,7 @@
+#include <string.h>
+// Before ssl_internal.h: MWCC goes by the first declaration it sees, and only with <string.h>'s does it treat
+// memcmp and strlen as the library's own, loading cert_item's value pointer once ahead of its OID loop as the ROM
+// does
 #include "nitro/mi.h"
 #include "nitro/rtc.h"
 #include "nitrowifi/cps.h"
@@ -100,19 +104,19 @@ static void purge_session(CPSSslConnection *ctx);
 static u32 date2sec(void);
 static u32 enter_computebound(void);
 static void exit_computebound(u32 priority);
-static const CPSCaInfo *get_rootCA(const CPSSslConnection *ctx, const char *name);
+static CPSCaInfo *get_rootCA(const CPSSslConnection *ctx, const char *name);
 static s32 cert_item_len(const u8 **cursor);
 static void make_dn(char *dest, const char *value, int byteCount);
 static u32 parse_time(const u8 *digits, int tag);
-static int cert_item(CPSSslConnection *ctx, const u8 **cursor, int depth, int index, int extra);
+static int cert_item(CPSSslConnection *ctx, const u8 **cursor, int depth, int index, int mode);
 static int auth_cert(CPSSslConnection *ctx);
 static int chars_till_end(const char *host);
 static int compare_fqdn(const char *host, const char *pattern);
 static void rcv_certificate(CPSSslConnection *ctx, const u8 *body);
-static int validate_signature(CPSSslConnection *ctx, const CPSCaInfo *key);
+static int validate_signature(CPSSslConnection *ctx, CPSCaInfo *key);
 static void rcv_server_hello(CPSSslConnection *ctx, u8 *msg);
-static BOOL has_method(const u8 *data, int count, int width, u32 value);
-static u16 select_method(const u8 *data, int count, int width);
+static BOOL has_method(const u8 *data, int count, int width, u16 value);
+static int select_method(const u8 *data, int count, int width);
 static BOOL version_ok(int major, int minor);
 static void client_hello_v2(CPSSslConnection *ctx, u8 *msg);
 static void client_hello(CPSSslConnection *ctx, u8 *msg);
@@ -128,11 +132,11 @@ static void add1_be8(u8 *counterEnd);
 static u32 SSLi_Rc4Crypt(CPSSslConnection *ctx, void *buf, u32 len);
 static u32 make_plaintext(CPSSslConnection *ctx, u8 *hdr);
 static u32 make_ciphertext(CPSSslConnection *ctx, u8 *hdr);
-static int tcp_read_raw_nbytes(u8 *dest, s32 len, CPSSoc *soc);
+static int tcp_read_raw_nbytes(u8 *dest, int len, CPSSoc *soc);
 static void update_digest(CPSSslConnection *ctx, const u8 *data, u32 len);
 static void parse_record_in_buf(CPSSslConnection *ctx, u8 *record);
 static int parse_record(CPSSoc *soc);
-static void set_random(u8 *buf, int len);
+static void set_random(u8 *dest, int len);
 static void send_change_cipher_spec_and_finished(CPSSoc *soc);
 static void send_client_hello(CPSSoc *soc);
 static void send_client_key_exchange(CPSSoc *soc);
@@ -180,32 +184,37 @@ static void find_session_from_IP(CPSSslConnection *ctx, CPSInAddr ip, u16 port) 
 // Stores the connection's current session (id and secret) in the cache, reusing a peer hit, an invalid entry, or the
 // oldest entry
 static void cache_session(CPSSslConnection *ctx, CPSInAddr ip, u16 port) {
-    u32 enabled = OS_DisableInterrupts();
-    u32 now = (u32)(OS_GetTick() >> 16);
-    CPSSslSession *target = &sSessionCache[0];
-    u32 bestAge = 0;
     int i;
+    CPSSslSession *entry;
+    CPSSslSession *target;
+    u32 bestAge;
+    u32 enabled;
+    u32 now;
 
+    enabled = OS_DisableInterrupts();
+    now = (u32)(OS_GetTick() >> 16);
+    bestAge = 0;
+    target = sSessionCache;
     for (i = 0; i < 4; i++) {
-        CPSSslSession *entry = &sSessionCache[i];
+        entry = &sSessionCache[i];
         if (entry->valid && ip != 0 && ip == entry->ip && port != 0 && port == entry->port) {
             target = entry;
             break;
         }
-        if (bestAge != (u32)-1) {
-            if (!entry->valid) {
-                bestAge = (u32)-1;
+        if (bestAge == (u32)-1) {
+            continue;
+        }
+        if (!entry->valid) {
+            bestAge = (u32)-1;
+            target = entry;
+        } else {
+            u32 age = now - entry->time;
+            if (age > bestAge) {
+                bestAge = age;
                 target = entry;
-            } else {
-                u32 age = now - entry->time;
-                if (age > bestAge) {
-                    bestAge = age;
-                    target = entry;
-                }
             }
         }
     }
-
     MI_CpuCopy8(ctx->key_storage.fields.session_id, target->session_id, 0x20);
     MI_CpuCopy8(ctx->secret, target->secret, 0x30);
     target->time = now;
@@ -253,9 +262,12 @@ void CPS_SetSslHandshakePriority(u32 priority) {
 // Applies the configured priority without comparing it to the thread's current priority, returning the old value.
 // An invalid configured value (>= 32) returns UINT32_MAX without calling the thread APIs.
 static u32 enter_computebound(void) {
+    u32 old;
+    OSThread *thread;
+
     if (sConfig.max_priority < 0x20) {
-        OSThread *thread = OS_GetCurrentThread();
-        u32 old = OS_GetThreadPriority(thread);
+        thread = OS_GetCurrentThread();
+        old = OS_GetThreadPriority(thread);
         OS_SetThreadPriority(thread, sConfig.max_priority);
         return old;
     }
@@ -281,15 +293,15 @@ void CPS_SetRootCa(CPSCaInfo **ca, int count) {
 }
 
 // Finds the registered root CA whose distinguished name matches, or NULL
-static const CPSCaInfo *get_rootCA(const CPSSslConnection *ctx, const char *name) {
+static CPSCaInfo *get_rootCA(const CPSSslConnection *ctx, const char *name) {
     int i = 0;
-    CPSCaInfo **params;
+    CPSCaInfo **list;
     int count = ctx->named_param_count;
 
     if (count > 0) {
-        params = ctx->named_params;
+        list = ctx->named_params;
         do {
-            const CPSCaInfo *param = params[i];
+            CPSCaInfo *param = list[i];
             if (strcmp(param->dn, name) == 0) {
                 return param;
             }
@@ -325,8 +337,9 @@ static void make_dn(char *dest, const char *value, int byteCount) {
     char *start = dest;
 
     if (*dest != '\0') {
-        while (*++dest != '\0') {
-        }
+        do {
+            dest++;
+        } while (*dest != '\0');
         // BUG: At length 254, the delimiter leaves the terminator one byte beyond the 256-byte destination.
 #ifdef BUGFIX
         if (dest - start >= 0xfe) {
@@ -346,63 +359,79 @@ static void make_dn(char *dest, const char *value, int byteCount) {
 
 // Packs the calendar date as year:16, month:8, day:8. Time of day is ignored.
 static u32 parse_time(const u8 *digits, int tag) {
-    u32 first = digits[0] * 10 + digits[1] - '0' * 11;
-    u32 year, month, day;
+    u32 year;
+
+    year = digits[0] * 10 + digits[1] - '0' * 11;
     digits += 2;
     if (tag == 23) {
-        if (first < 50) {
-            year = first + 2000;
+        if (year < 50) {
+            year += 2000;
         } else {
-            year = first + 1900;
+            year += 1900;
         }
     } else {
-        year = first * 100 + (digits[0] * 10 + digits[1] - '0' * 11);
+        year = year * 100 + (digits[0] * 10 + digits[1] - '0' * 11);
         digits += 2;
     }
-    month = digits[0] * 10 + digits[1] - '0' * 11;
-    year = (year << 16) + (month << 8);
-    day = digits[2] * 10 + digits[3] - '0' * 11;
-    return year + day;
+    return (year << 16) + ((digits[0] * 10 + digits[1] - '0' * 11) << 8) + (digits[2] * 10 + digits[3] - '0' * 11);
 }
 
 // mode 0 retains the leaf key, mode 1 walks subsequent certificates, and mode 2 extracts
 // a following certificate's public key by reference for the preceding signature check.
 static int cert_item(CPSSslConnection *ctx, const u8 **cursor, int depth, int index, int mode) {
-    const u8 *value = *cursor + 1;
-    int tag = **cursor;
-    s32 len = cert_item_len(&value);
-    const u8 *end;
+    const u8 *value;
+    u8 tag;
+    s32 len;
     int i;
+    const u8 *end;
+
+    value = *cursor;
+    tag = *value++;
+    len = cert_item_len(&value);
     if (len < 0 || len > 2000) {
         return 1;
     }
+
     switch (tag & 31) {
     case 2:
         if (ctx->parsing_rsa_key) {
-            if (index == 0 || index == 1) {
+            if (index == 0) {
                 while (*value == 0) {
                     value++;
                     len--;
                 }
-                if (index == 0) {
-                    if (mode == 0 && len <= 0x100) {
+                switch (mode) {
+                case 0:
+                    if (len <= 0x100) {
                         MI_CpuCopy8(value, ctx->certificate_key.modulus, len);
                         ctx->certificate_key.modulus_len = len;
-                    } else if (mode == 2) {
-                        ctx->chain_key.modulus_len = len;
-                        ctx->chain_key.modulus = (u8 *)value;
                     }
-                } else {
-                    if (mode == 0 && len <= 8) {
+                    break;
+                case 2:
+                    ctx->chain_key.modulus_len = len;
+                    ctx->chain_key.modulus = (u8 *)value;
+                    break;
+                }
+            } else if (index == 1) {
+                while (*value == 0) {
+                    value++;
+                    len--;
+                }
+                switch (mode) {
+                case 0:
+                    if (len <= 8) {
                         MI_CpuCopy8(value, ctx->certificate_key.exponent, len);
                         ctx->certificate_key.exponent_len = len;
-                    } else if (mode == 2) {
-                        ctx->chain_key.exponent_len = len;
-                        ctx->chain_key.exponent = (u8 *)value;
                     }
+                    break;
+                case 2:
+                    ctx->chain_key.exponent_len = len;
+                    ctx->chain_key.exponent = (u8 *)value;
+                    break;
                 }
             }
         }
+        value += len;
         break;
     case 3:
         if (depth == 1 && mode != 2) {
@@ -411,13 +440,13 @@ static int cert_item(CPSSslConnection *ctx, const u8 **cursor, int depth, int in
         }
         if (ctx->parsing_rsa_key) {
             value++;
-            if (cert_item(ctx, &value, depth, 0, mode)) {
+            if (cert_item(ctx, &value, depth, 0, mode) != 0) {
                 return 1;
             }
             ctx->parsing_rsa_key = 0;
-            *cursor = value;
-            return 0;
+            goto done;
         }
+        value += len;
         break;
     case 6:
         for (i = 0; i < 6; i++) {
@@ -425,23 +454,27 @@ static int cert_item(CPSSslConnection *ctx, const u8 **cursor, int depth, int in
                 switch (i) {
                 case 1:
                 case 2:
-                    if (mode == 0)
+                    if (mode == 0) {
                         ctx->public_key_algorithm = i;
+                    }
                     ctx->parsing_rsa_key = i;
                     break;
                 case 3:
                 case 4:
-                    if (mode != 2)
+                    if (mode != 2) {
                         ctx->signature_algorithm = i;
+                    }
                     break;
                 case 5:
-                    if (mode != 2)
+                    if (mode != 2) {
                         ctx->attribute_oid = i;
+                    }
                     break;
                 }
                 break;
             }
         }
+        value += len;
         break;
     case 12:
     case 19:
@@ -452,115 +485,122 @@ static int cert_item(CPSSslConnection *ctx, const u8 **cursor, int depth, int in
                 make_dn(ctx->subject, (const char *)value, len);
                 if (ctx->attribute_oid == 5 && len <= 0x4f) {
                     MI_CpuCopy8(value, ctx->common_name, len);
-                    ctx->common_name[len] = 0;
+                    ctx->common_name[len] = '\0';
                 }
             } else {
                 make_dn(ctx->issuer, (const char *)value, len);
             }
         }
         ctx->attribute_oid = 0;
+        value += len;
         break;
     case 23:
     case 24:
         if (mode != 2) {
             u32 date = parse_time(value, tag & 31);
             if (index == 0) {
-                if (ctx->current_date >= date)
-                    ctx->certificate_date_valid = 1;
+                if (ctx->current_date >= date) {
+                    ctx->certificate_date_valid = TRUE;
+                }
             } else {
-                if (ctx->current_date > date)
-                    ctx->certificate_date_valid = 0;
+                if (ctx->current_date > date) {
+                    ctx->certificate_date_valid = FALSE;
+                }
             }
         }
         value += len;
-        ctx->certificate_phase.parsing_subject = 1;
-        *cursor = value;
-        return 0;
+        ctx->certificate_phase.parsing_subject = TRUE;
+        goto done;
     case 16:
-        if (depth == 0 && index == 0 && mode != 2)
+        if (depth == 0 && index == 0 && mode != 2) {
             ctx->signed_start = value;
-        end = value + len;
-        for (i = 0; value < end; i++) {
-            if (cert_item(ctx, &value, depth + 1, i, mode))
-                return 1;
         }
-        if (depth == 1 && index == 0 && mode != 2)
+        end = value + len;
+        i = 0;
+        while (value < end) {
+            if (cert_item(ctx, &value, depth + 1, i++, mode) != 0) {
+                return 1;
+            }
+        }
+        if (depth == 1 && index == 0 && mode != 2) {
             ctx->signed_end = value;
-        *cursor = value;
-        return 0;
+        }
+        goto done;
     case 17:
         end = value + len;
         while (value < end) {
-            if (cert_item(ctx, &value, depth + 1, 0, mode))
+            if (cert_item(ctx, &value, depth + 1, 0, mode) != 0) {
                 return 1;
+            }
         }
-        *cursor = value;
-        return 0;
+        goto done;
     default:
         if (tag == 0xa0) {
             end = value + len;
             while (value < end) {
-                if (cert_item(ctx, &value, depth + 1, 0, mode))
+                if (cert_item(ctx, &value, depth + 1, 0, mode) != 0) {
                     return 1;
+                }
             }
-            *cursor = value;
-            return 0;
+            goto done;
         }
+        value += len;
         break;
     }
-    *cursor = value + len;
+
+done:
+    *cursor = value;
     return 0;
 }
 
 // Checks the parsed certificate's signature against its signed DER digest, PKCS#1 v1.5 style:
 // decrypted = signature^e mod n, then 0x00 0x01 0xff...
 // 0x00 <digest>
-static int validate_signature(CPSSslConnection *ctx, const CPSCaInfo *key) {
-    int n;
+static int validate_signature(CPSSslConnection *ctx, CPSCaInfo *key) {
     u16 *digits;
-    u16 *sigDigits, *expDigits, *modDigits;
+    u16 *sigDigits;
+    u16 *expDigits;
+    u16 *modDigits;
+    int n;
     u8 *decrypted;
-    u32 priority;
     int status;
+    int i;
+    u32 priority;
 
     if (ctx->certificate_signature == NULL || ctx->certificate_signature_len == 0 || key->exponent == NULL ||
         key->exponent_len == 0 || key->modulus == NULL || key->modulus_len == 0) {
         return 2;
     }
-
-    n = (key->modulus_len * 2) / 2;
+    n = key->modulus_len * 2 / 2;
     digits = CPSiAlloc(n * 8);
     if (digits == NULL) {
         return 2;
     }
-
     sigDigits = digits + n;
     expDigits = sigDigits + n;
     modDigits = expDigits + n;
-    decrypted = (u8 *)sigDigits;
-
     CPSi_big_from_char(sigDigits, ctx->certificate_signature, ctx->certificate_signature_len, n);
     CPSi_big_from_char(expDigits, key->exponent, key->exponent_len, n);
     CPSi_big_from_char(modDigits, key->modulus, key->modulus_len, n);
     priority = enter_computebound();
     CPSi_big_power(digits, sigDigits, expDigits, n, modDigits);
     exit_computebound(priority);
+    decrypted = (u8 *)sigDigits;
     CPSi_char_from_big(decrypted, digits, key->modulus_len, n);
-
     status = 0;
-    if (decrypted[0] == 0 && decrypted[1] == 1) {
-        int pos = 2;
-        for (; pos < key->modulus_len; pos++) {
-            if (decrypted[pos] != 0xff)
+    if (decrypted[0] != 0 || decrypted[1] != 1) {
+        status = 2;
+    } else {
+        for (i = 2; i < key->modulus_len; i++) {
+            if (decrypted[i] != 0xff) {
                 break;
+            }
         }
-        if (pos + 1 >= key->modulus_len || decrypted[pos] != 0 || decrypted[pos + 1] != 0x30 ||
+        if (i + 1 >= key->modulus_len || decrypted[i] != 0 || decrypted[i + 1] != 0x30 ||
             memcmp(ctx->certificate_digest, decrypted + key->modulus_len - ctx->certificate_digest_len,
                    ctx->certificate_digest_len) != 0) {
             status = 2;
         }
-    } else {
-        status = 2;
     }
     CPSiFree(digits);
     return status;
@@ -569,47 +609,44 @@ static int validate_signature(CPSSslConnection *ctx, const CPSCaInfo *key) {
 // Hashes the certificate's signed DER span and checks its signature using the registered issuer key.
 // The handshake snapshot contexts serve as temporary digest storage here; this does not restore a session.
 static int auth_cert(CPSSslConnection *ctx) {
-    int flags = ctx->certificate_date_valid ? 0 : CPS_CERT_OUTOFDATE;
-    const CPSCaInfo *param;
+    int result;
+    CPSCaInfo *param;
+    CPSMd5Ctx *md5;
+    CPSSha1Ctx *sha1;
 
+    result = ctx->certificate_date_valid ? 0 : CPS_CERT_OUTOFDATE;
     if (ctx->public_key_algorithm == -1) {
-        return 4 | flags;
+        return result | 4;
     }
-    {
-        s32 type = ctx->signature_algorithm;
-
-        switch (type) {
-        case 3: {
-            CPSMd5Ctx *hash = &ctx->handshake_md5_snapshot;
-            CPSi_md5_init(hash);
-            CPSi_md5_calc(hash, ctx->signed_start, ctx->signed_end - ctx->signed_start);
-            CPSi_md5_result(hash, ctx->certificate_digest);
-            ctx->certificate_digest_len = 0x10;
-            break;
-        }
-        case 4: {
-            CPSSha1Ctx *hash = &ctx->handshake_sha1_snapshot;
-            CPSi_sha1_init(hash);
-            CPSi_sha1_calc(hash, ctx->signed_start, ctx->signed_end - ctx->signed_start);
-            CPSi_sha1_result(hash, ctx->certificate_digest);
-            ctx->certificate_digest_len = 0x14;
-            break;
-        }
-        default:
-            return 3 | flags;
-        }
+    switch (ctx->signature_algorithm) {
+    case 3:
+        md5 = &ctx->handshake_md5_snapshot;
+        CPSi_md5_init(md5);
+        CPSi_md5_calc(md5, ctx->signed_start, ctx->signed_end - ctx->signed_start);
+        CPSi_md5_result(md5, ctx->certificate_digest);
+        ctx->certificate_digest_len = 0x10;
+        break;
+    case 4:
+        sha1 = &ctx->handshake_sha1_snapshot;
+        CPSi_sha1_init(sha1);
+        CPSi_sha1_calc(sha1, ctx->signed_start, ctx->signed_end - ctx->signed_start);
+        CPSi_sha1_result(sha1, ctx->certificate_digest);
+        ctx->certificate_digest_len = 0x14;
+        break;
+    default:
+        return result | 3;
     }
-
     param = get_rootCA(ctx, ctx->issuer);
     if (param == NULL) {
-        return 1 | flags;
+        return result | 1;
     }
-    return validate_signature(ctx, param) | flags;
+    return result | validate_signature(ctx, param);
 }
 
 // How many bytes until the next '.' or the end of the string
 static int chars_till_end(const char *host) {
     const char *start = host;
+
     while (*host != '.' && *host != '\0') {
         host++;
     }
@@ -619,142 +656,157 @@ static int chars_till_end(const char *host) {
 // Compares the requested hostname with the certificate pattern (the second
 // argument may contain a wildcard). Like strcmp, zero means a match.
 static int compare_fqdn(const char *host, const char *pattern) {
+    int patternLen;
+    int hostLen;
+    char p;
+    char h;
+
     for (;;) {
-        int p = *pattern++;
-        int h = *host++;
-        if (h == p) {
-            if (h == 0)
+        while (p = *pattern++, h = *host++, h == p) {
+            if (h == '\0') {
                 return 0;
-        } else {
-            int hostLen, patternLen;
-            if (p != '*')
-                return 1;
-            host--;
-            hostLen = chars_till_end(host);
-            patternLen = chars_till_end(pattern);
-            if (patternLen > hostLen)
-                return 1;
-            host += hostLen - patternLen;
+            }
         }
+        if (p != '*') {
+            return 1;
+        }
+        host--;
+        hostLen = chars_till_end(host);
+        patternLen = chars_till_end(pattern);
+        if (patternLen > hostLen) {
+            return 1;
+        }
+        host += hostLen - patternLen;
     }
 }
 
 // Processes the Certificate message's BE24-length-prefixed chain. The callback can
 // override validation; continuation depends on the original low-byte result as well.
 static void rcv_certificate(CPSSslConnection *ctx, const u8 *body) {
-    int remaining = (((body[0] << 8) + body[1]) << 8) + body[2];
     RTCDate date;
+    int original;
+    int result;
+    int remaining;
+    int len;
+    const u8 *next;
+    int mode;
+    int index;
+
+    remaining = (((body[0] << 8) + body[1]) << 8) + body[2];
     body += 3;
     ctx->public_key_algorithm = -1;
     RTC_GetDate(&date);
     ctx->current_date = ((date.year + 2000) << 16) + (date.month << 8) + date.day;
-    ctx->subject[0] = 0;
+    mode = 0;
+    index = 0;
+    ctx->subject[0] = '\0';
     ctx->certificate_key.exponent_len = 0;
     ctx->certificate_key.modulus_len = 0;
-    int mode = 0;
-    int index = 0;
     for (;;) {
-        int len = (((body[0] << 8) + body[1]) << 8) + body[2];
-        int result, original;
+        len = (((body[0] << 8) + body[1]) << 8) + body[2];
         body += 3;
         remaining -= len + 3;
         ctx->signature_algorithm = -1;
         ctx->parsing_rsa_key = 0;
         ctx->certificate_phase.parsing_subject = 0;
-        ctx->certificate_date_valid = 0;
-        ctx->subject[0] = 0;
-        ctx->issuer[0] = 0;
-        ctx->common_name[0] = 0;
+        ctx->certificate_date_valid = FALSE;
+        ctx->subject[0] = '\0';
+        ctx->issuer[0] = '\0';
+        ctx->common_name[0] = '\0';
         ctx->certificate = body;
         ctx->certificate_len = len;
-        if (cert_item(ctx, &body, 0, 0, mode) || (u32)ctx->certificate_key.modulus_len < 0x33 ||
+
+        if (cert_item(ctx, &body, 0, 0, mode) != 0 || (u32)ctx->certificate_key.modulus_len < 0x33 ||
             ctx->certificate_key.exponent_len == 0) {
             ctx->state = SSLI_STATE_ERROR;
             return;
         }
         result = auth_cert(ctx);
-        if (index == 0 && ctx->hostname && compare_fqdn(ctx->hostname, ctx->common_name)) {
-            result |= CPS_CERT_BADSERVER;
+        if (index == 0 && ctx->hostname != NULL) {
+            if (compare_fqdn(ctx->hostname, ctx->common_name) != 0) {
+                result |= CPS_CERT_BADSERVER;
+            }
         }
         original = result & CPS_CERT_ERRMASK;
         if (original == 1 && remaining != 0) {
-            const u8 *next = body + 3;
+            next = body + 3;
             ctx->parsing_rsa_key = 0;
-            if (cert_item(ctx, &next, 0, 0, 2)) {
+            if (cert_item(ctx, &next, 0, 0, 2) != 0) {
                 ctx->state = SSLI_STATE_ERROR;
                 return;
             }
             result = (result & ~CPS_CERT_ERRMASK) | validate_signature(ctx, &ctx->chain_key);
         }
-        if (ctx->validate_certificate)
+        if (ctx->validate_certificate != NULL) {
             result = ctx->validate_certificate(result, ctx, index);
+        }
         index++;
-        if (original != 0 && result == 0 && remaining != 0) {
-            mode = 1;
-            continue;
+        if (original == 0 || result != 0 || remaining == 0) {
+            break;
         }
-        if (result == 0) {
-            ctx->state = SSLI_STATE_CERTIFICATE_ACCEPTED;
-            return;
-        }
+        mode = 1;
+    }
+    if (result == 0) {
+        ctx->state = SSLI_STATE_CERTIFICATE_ACCEPTED;
+    } else {
         ctx->state = SSLI_STATE_ERROR;
-        return;
     }
 }
 
 // Handles the ServerHello received by the client: peer random, selected session ID and cipher suite.
 static void rcv_server_hello(CPSSslConnection *ctx, u8 *msg) {
     int sidLen;
-    BOOL wasResumed;
-    BOOL resumed;
-    u8 *cipher;
+    u8 cached;
 
-    MI_CpuCopy8(msg + 2, ctx->server_random, 0x20);
-    sidLen = msg[0x22];
-    wasResumed = ctx->resumed;
-    msg += 0x23;
-    if (wasResumed && sidLen == 0x20 && memcmp(ctx->key_storage.fields.session_id, msg, 0x20) == 0) {
+    msg += 2;
+    MI_CpuCopy8(msg, ctx->server_random, 0x20);
+    msg += 0x20;
+    sidLen = *msg++;
+    cached = ctx->resumed;
+    if (cached && sidLen == 0x20 && memcmp(ctx->key_storage.fields.session_id, msg, 0x20) == 0) {
         ctx->unk_031 = 1;
     } else {
-        if (wasResumed)
+        if (cached) {
             purge_session(ctx);
+        }
         if (sidLen == 0) {
-            resumed = FALSE;
+            ctx->resumed = FALSE;
         } else {
             MI_CpuCopy8(msg, ctx->key_storage.fields.session_id, 0x20);
-            resumed = TRUE;
+            ctx->resumed = TRUE;
         }
-        ctx->resumed = resumed;
         ctx->unk_031 = 0;
     }
-    cipher = msg + sidLen;
-    ctx->cipher_suite = (cipher[0] << 8) + cipher[1];
+    msg += sidLen;
+    ctx->cipher_suite = (msg[0] << 8) + msg[1];
     if (ctx->cipher_suite != 4 && ctx->cipher_suite != 5) {
         ctx->state = SSLI_STATE_ERROR;
-        return;
+    } else {
+        ctx->state = SSLI_STATE_SERVER_HELLO_PARSED;
     }
-    ctx->state = SSLI_STATE_SERVER_HELLO_PARSED;
 }
 
 // Whether value is among the count big-endian values of width bytes each (2 or 3) in data
-static BOOL has_method(const u8 *data, int count, int width, u32 value) {
+static BOOL has_method(const u8 *data, int count, int width, u16 value) {
+    u32 entry;
     int i;
 
-    for (i = 0; i < count; i++, data += width) {
-        u32 entry = (data[0] << 8) + data[1];
+    for (i = 0; i < count; i++) {
+        entry = (data[0] << 8) + data[1];
         if (width == 3) {
             entry = (entry << 8) + data[2];
         }
         if (entry == value) {
             return TRUE;
         }
+        data += width;
     }
     return FALSE;
 }
 
 // Picks the first of this connection's offered cipher suites that the count entries of width bytes each in data
 // also list, or 0
-static u16 select_method(const u8 *data, int count, int width) {
+static int select_method(const u8 *data, int count, int width) {
     u32 i;
 
     for (i = 0; i < 2; i++) {
@@ -774,15 +826,20 @@ static BOOL version_ok(int major, int minor) {
 // Handles the SSLv2-compatible ClientHello: three-byte cipher entries, a session ID and a challenge
 // copied into the client-random storage. The normal SSLv3 ClientHello uses client_hello.
 static void client_hello_v2(CPSSslConnection *ctx, u8 *msg) {
+    int cipherLen;
+    int offset;
+    int sessionLen;
+    int challengeLen;
     u16 cipher;
-    int cipherLen, sessionLen, challengeLen, offset;
 
-    if (!version_ok(msg[0], msg[1]))
+    if (!version_ok(msg[0], msg[1])) {
         return;
+    }
     cipherLen = (msg[2] << 8) + msg[3];
     cipher = select_method(msg + 8, cipherLen / 3, 3);
-    if (cipher == 0)
+    if (cipher == 0) {
         return;
+    }
     ctx->cipher_suite = cipher;
     sessionLen = (msg[4] << 8) + msg[5];
     challengeLen = (msg[6] << 8) + msg[7];
@@ -802,29 +859,26 @@ static void client_hello_v2(CPSSslConnection *ctx, u8 *msg) {
 static void client_hello(CPSSslConnection *ctx, u8 *msg) {
     int sidLen;
     u16 cipher;
-    u8 *cipherList;
 
     if (!version_ok(msg[0], msg[1])) {
         return;
     }
-    MI_CpuCopy8(msg + 2, ctx->client_random, 0x20);
-
-    sidLen = msg[0x22];
-    msg += 0x23;
+    msg += 2;
+    MI_CpuCopy8(msg, ctx->client_random, 0x20);
+    msg += 0x20;
+    sidLen = *msg++;
     if (sidLen != 0x20) {
         ctx->resumed = FALSE;
     } else {
         MI_CpuCopy8(msg, ctx->key_storage.fields.session_id, 0x20);
         find_session_from_id(ctx);
     }
-
-    cipherList = msg + sidLen;
-    cipher = select_method(cipherList + 2, ((cipherList[0] << 8) + cipherList[1]) / 2, 2);
+    msg += sidLen;
+    cipher = select_method(msg + 2, ((msg[0] << 8) + msg[1]) / 2, 2);
     ctx->cipher_suite = cipher;
-    if (cipher == 0) {
-        return;
+    if (cipher != 0) {
+        ctx->state = SSLI_STATE_CLIENT_HELLO_PARSED;
     }
-    ctx->state = SSLI_STATE_CLIENT_HELLO_PARSED;
 }
 
 // Decrypts with both prime/exponent pairs, recombines their results, then reduces by the full modulus.
@@ -887,14 +941,16 @@ static void decrypt_premaster_secret(CPSSslConnection *ctx, u8 *encrypted, void 
 // reusing the handshake hash snapshot slots as scratch since they aren't needed yet this early
 static void create_ms_sub(u8 *out, const u8 *label, CPSSslConnection *ctx) {
     u8 digest[20];
+    CPSSha1Ctx *sha1;
+    CPSMd5Ctx *md5;
 
-    CPSi_sha1_init(&ctx->handshake_sha1_snapshot);
-    CPSi_sha1_calc(&ctx->handshake_sha1_snapshot, label, strlen((const char *)label));
-    CPSi_sha1_calc(&ctx->handshake_sha1_snapshot, ctx->secret, 0x30);
-    CPSi_sha1_calc(&ctx->handshake_sha1_snapshot, ctx->client_random, 0x40);
-    CPSi_sha1_result(&ctx->handshake_sha1_snapshot, digest);
-
-    CPSMd5Ctx *md5 = &ctx->handshake_md5_snapshot;
+    sha1 = &ctx->handshake_sha1_snapshot;
+    CPSi_sha1_init(sha1);
+    CPSi_sha1_calc(sha1, label, strlen((const char *)label));
+    CPSi_sha1_calc(sha1, ctx->secret, 0x30);
+    CPSi_sha1_calc(sha1, ctx->client_random, 0x40);
+    CPSi_sha1_result(sha1, digest);
+    md5 = &ctx->handshake_md5_snapshot;
     CPSi_md5_init(md5);
     CPSi_md5_calc(md5, ctx->secret, 0x30);
     CPSi_md5_calc(md5, digest, 0x14);
@@ -917,48 +973,60 @@ static void create_master_secret(CPSSslConnection *ctx) {
 // MAC/key pointers borrow the needed bytes until the connection is reset. Assign the
 // overlapping write-pointer slots only after generation, then initialize both RC4 contexts.
 static void create_key_block(CPSSslConnection *ctx) {
-    // Handshake cipher selection guarantees suite 4 or 5 here.
-    int macLen = ctx->cipher_suite == 4 ? 0x10 : 0x14;
-    const int keyLen = 0x10;
-    int total = (macLen + keyLen) * 2;
-    u8 *block = ctx->key_storage.key_block;
     int round;
+    int i;
+    u8 seed;
+    u8 digest[20];
+    void *hash;
+    int macLen;
+    int keyLen;
+    int ivLen;
+    int total;
 
-    for (round = 0; round * 0x10 < total; round++) {
-        u8 seed;
-        u8 digest[0x14];
-        int i;
-
-        CPSi_sha1_init(&ctx->handshake_sha1_snapshot);
-        seed = 0x41 + round;
-        for (i = 0; i <= round; i++) {
-            CPSi_sha1_calc(&ctx->handshake_sha1_snapshot, &seed, 1);
+    // Handshake cipher selection guarantees suite 4 or 5 here.
+    switch (ctx->cipher_suite) {
+    case 4:
+        macLen = 16;
+        keyLen = 16;
+        ivLen = 0;
+        break;
+    case 5:
+        macLen = 20;
+        keyLen = 16;
+        ivLen = 0;
+        break;
+    }
+    total = (macLen + keyLen + ivLen) * 2;
+    for (round = 0; round * 16 < total; round++) {
+        hash = &ctx->handshake_sha1_snapshot;
+        CPSi_sha1_init(hash);
+        seed = 'A' + round;
+        for (i = 0; i < round + 1; i++) {
+            CPSi_sha1_calc(hash, &seed, 1);
         }
-        CPSi_sha1_calc(&ctx->handshake_sha1_snapshot, ctx->secret, 0x30);
-        CPSi_sha1_calc(&ctx->handshake_sha1_snapshot, ctx->server_random, 0x20);
-        CPSi_sha1_calc(&ctx->handshake_sha1_snapshot, ctx->client_random, 0x20);
-        CPSi_sha1_result(&ctx->handshake_sha1_snapshot, digest);
-
-        CPSi_md5_init(&ctx->handshake_md5_snapshot);
-        CPSi_md5_calc(&ctx->handshake_md5_snapshot, ctx->secret, 0x30);
-        CPSi_md5_calc(&ctx->handshake_md5_snapshot, digest, 0x14);
-        CPSi_md5_result(&ctx->handshake_md5_snapshot, block + round * 0x10);
+        CPSi_sha1_calc(hash, ctx->secret, 48);
+        CPSi_sha1_calc(hash, ctx->server_random, 32);
+        CPSi_sha1_calc(hash, ctx->client_random, 32);
+        CPSi_sha1_result(hash, digest);
+        hash = &ctx->handshake_md5_snapshot;
+        CPSi_md5_init(hash);
+        CPSi_md5_calc(hash, ctx->secret, 48);
+        CPSi_md5_calc(hash, digest, 20);
+        CPSi_md5_result(hash, ctx->key_storage.key_block + round * 16);
     }
-
     if (ctx->is_server) {
-        ctx->read_mac_secret = block;
-        ctx->read_key = block + macLen * 2;
-        ctx->key_storage.fields.write_mac_secret = block + macLen;
-        ctx->key_storage.fields.write_key = block + macLen * 2 + keyLen;
+        ctx->read_mac_secret = ctx->key_storage.key_block;
+        ctx->read_key = ctx->key_storage.key_block + macLen * 2;
+        ctx->key_storage.fields.write_mac_secret = ctx->key_storage.key_block + macLen;
+        ctx->key_storage.fields.write_key = ctx->key_storage.fields.write_mac_secret + macLen + keyLen;
     } else {
-        ctx->key_storage.fields.write_mac_secret = block;
-        ctx->key_storage.fields.write_key = block + macLen * 2;
-        ctx->read_mac_secret = block + macLen;
-        ctx->read_key = block + macLen * 2 + keyLen;
+        ctx->key_storage.fields.write_mac_secret = ctx->key_storage.key_block;
+        ctx->key_storage.fields.write_key = ctx->key_storage.key_block + macLen * 2;
+        ctx->read_mac_secret = ctx->key_storage.key_block + macLen;
+        ctx->read_key = ctx->read_mac_secret + macLen + keyLen;
     }
-
-    CPSi_rc4_init(&ctx->read_rc4, ctx->read_key, 0x10);
-    CPSi_rc4_init(&ctx->write_rc4, ctx->key_storage.fields.write_key, 0x10);
+    CPSi_rc4_init(&ctx->read_rc4, ctx->read_key, 16);
+    CPSi_rc4_init(&ctx->write_rc4, ctx->key_storage.fields.write_key, 16);
 }
 
 // Finishes a ClientKeyExchange that carried an RSA-encrypted pre-master secret with this connection's own key
@@ -975,49 +1043,47 @@ static void rcv_client_key_exchange(CPSSslConnection *ctx, u8 *msg) {
 // Computes the MD5 half of Finished using the sender label and master secret.
 // This destructively finalizes the running transcript; callers save and restore it.
 static void finished_md5(CPSSslConnection *ctx, u8 *out, int sender) {
-    CPSMd5Ctx *transcript = &ctx->handshake_md5;
     u8 pad[0x30];
+    CPSMd5Ctx *md5 = &ctx->handshake_md5;
 
     // The caller restores the transcript after this destructive computation.
-    if (ctx->is_server ^ sender) {
-        CPSi_md5_calc(transcript, sLabelServer, 4);
+    if ((ctx->is_server ^ sender) != 0) {
+        CPSi_md5_calc(md5, sLabelServer, 4);
     } else {
-        CPSi_md5_calc(transcript, sLabelClient, 4);
+        CPSi_md5_calc(md5, sLabelClient, 4);
     }
-    CPSi_md5_calc(transcript, ctx->secret, 0x30);
+    CPSi_md5_calc(md5, ctx->secret, 0x30);
     MI_CpuFill8(pad, 0x36, 0x30);
-    CPSi_md5_calc(transcript, pad, 0x30);
-    CPSi_md5_result(transcript, out);
-
-    CPSi_md5_init(transcript);
-    CPSi_md5_calc(transcript, ctx->secret, 0x30);
+    CPSi_md5_calc(md5, pad, 0x30);
+    CPSi_md5_result(md5, out);
+    CPSi_md5_init(md5);
+    CPSi_md5_calc(md5, ctx->secret, 0x30);
     MI_CpuFill8(pad, 0x5c, 0x30);
-    CPSi_md5_calc(transcript, pad, 0x30);
-    CPSi_md5_calc(transcript, out, 0x10);
-    CPSi_md5_result(transcript, out);
+    CPSi_md5_calc(md5, pad, 0x30);
+    CPSi_md5_calc(md5, out, 0x10);
+    CPSi_md5_result(md5, out);
 }
 
 // SHA1 half of Finished; also destroys the running transcript until the caller restores it.
 static void finished_sha1(CPSSslConnection *ctx, u8 *out, int sender) {
-    CPSSha1Ctx *transcript = &ctx->handshake_sha1;
     u8 pad[0x28];
+    CPSSha1Ctx *sha1 = &ctx->handshake_sha1;
 
-    if (ctx->is_server ^ sender) {
-        CPSi_sha1_calc(transcript, sLabelServer, 4);
+    if ((ctx->is_server ^ sender) != 0) {
+        CPSi_sha1_calc(sha1, sLabelServer, 4);
     } else {
-        CPSi_sha1_calc(transcript, sLabelClient, 4);
+        CPSi_sha1_calc(sha1, sLabelClient, 4);
     }
-    CPSi_sha1_calc(transcript, ctx->secret, 0x30);
+    CPSi_sha1_calc(sha1, ctx->secret, 0x30);
     MI_CpuFill8(pad, 0x36, 0x28);
-    CPSi_sha1_calc(transcript, pad, 0x28);
-    CPSi_sha1_result(transcript, out);
-
-    CPSi_sha1_init(transcript);
-    CPSi_sha1_calc(transcript, ctx->secret, 0x30);
+    CPSi_sha1_calc(sha1, pad, 0x28);
+    CPSi_sha1_result(sha1, out);
+    CPSi_sha1_init(sha1);
+    CPSi_sha1_calc(sha1, ctx->secret, 0x30);
     MI_CpuFill8(pad, 0x5c, 0x28);
-    CPSi_sha1_calc(transcript, pad, 0x28);
-    CPSi_sha1_calc(transcript, out, 0x14);
-    CPSi_sha1_result(transcript, out);
+    CPSi_sha1_calc(sha1, pad, 0x28);
+    CPSi_sha1_calc(sha1, out, 0x14);
+    CPSi_sha1_result(sha1, out);
 }
 
 // Checks the received Finished with the original fixed sender selector 1, restoring the running
@@ -1025,35 +1091,35 @@ static void finished_sha1(CPSSslConnection *ctx, u8 *out, int sender) {
 static void rcv_finished(CPSSslConnection *ctx, u8 *msg) {
     u8 computed[0x14];
 
-    MI_CpuCopy8(&ctx->handshake_md5, &ctx->handshake_md5_snapshot, sizeof(ctx->handshake_md5));
+    MI_CpuCopy8(&ctx->handshake_md5, &ctx->handshake_md5_snapshot, sizeof(CPSMd5Ctx));
     finished_md5(ctx, computed, 1);
-    MI_CpuCopy8(&ctx->handshake_md5_snapshot, &ctx->handshake_md5, sizeof(ctx->handshake_md5));
+    MI_CpuCopy8(&ctx->handshake_md5_snapshot, &ctx->handshake_md5, sizeof(CPSMd5Ctx));
     if (memcmp(msg, computed, 0x10) != 0) {
         ctx->state = SSLI_STATE_ERROR;
         return;
     }
-
-    MI_CpuCopy8(&ctx->handshake_sha1, &ctx->handshake_sha1_snapshot, sizeof(ctx->handshake_sha1));
+    MI_CpuCopy8(&ctx->handshake_sha1, &ctx->handshake_sha1_snapshot, sizeof(CPSSha1Ctx));
     finished_sha1(ctx, computed, 1);
-    MI_CpuCopy8(&ctx->handshake_sha1_snapshot, &ctx->handshake_sha1, sizeof(ctx->handshake_sha1));
+    MI_CpuCopy8(&ctx->handshake_sha1_snapshot, &ctx->handshake_sha1, sizeof(CPSSha1Ctx));
     if (memcmp(msg + 0x10, computed, 0x14) != 0) {
         ctx->state = SSLI_STATE_ERROR;
-        return;
+    } else {
+        ctx->state = SSLI_STATE_FINISHED_VERIFIED;
     }
-    ctx->state = SSLI_STATE_FINISHED_VERIFIED;
 }
 
 // counterEnd is one past an 8-byte big-endian counter; carry is bounded to those eight bytes.
 static void add1_be8(u8 *counterEnd) {
-    u32 remaining = 8;
+    int i;
+    u8 digit;
 
-    do {
-        u8 value = *--counterEnd + 1;
-        *counterEnd = value;
-        if (value != 0) {
-            break;
+    for (i = 8; i != 0; i--) {
+        digit = *--counterEnd + 1;
+        *counterEnd = digit;
+        if (digit != 0) {
+            return;
         }
-    } while (--remaining != 0);
+    }
 }
 
 // Decrypts received bytes with the read RC4 state and returns len unchanged.
@@ -1066,55 +1132,54 @@ static u32 SSLi_Rc4Crypt(CPSSslConnection *ctx, void *buf, u32 len) {
 // MAC, which this strips off after recomputing it over the shorter content and comparing. Sets ctx->state to an
 // error on a mismatch either way, so the caller doesn't need to check this call's return for that
 static u32 make_plaintext(CPSSslConnection *ctx, u8 *hdr) {
-    u32 len = (u32)SSLi_Rc4Crypt(ctx, hdr + 5, (hdr[3] << 8) + hdr[4]);
-    u8 pad[0x30];
-    u8 mac[0x14];
+    int len;
     int macLen;
+    u8 mac[0x14];
+    u8 pad[0x30];
 
-    if (ctx->cipher_suite == 4) {
-        macLen = 0x10;
-        len -= macLen;
-        hdr[3] = (u8)(len >> 8);
-        hdr[4] = (u8)len;
-
+    len = SSLi_Rc4Crypt(ctx, hdr + 5, (hdr[3] << 8) + hdr[4]);
+    switch (ctx->cipher_suite) {
+    case 4:
+        len -= 0x10;
+        hdr[3] = len >> 8;
+        hdr[4] = len;
         CPSi_md5_init(&ctx->handshake_md5_snapshot);
-        CPSi_md5_calc(&ctx->handshake_md5_snapshot, ctx->read_mac_secret, 0x10);
+        macLen = 0x10;
+        CPSi_md5_calc(&ctx->handshake_md5_snapshot, ctx->read_mac_secret, macLen);
         MI_CpuFill8(pad, 0x36, 0x30);
         CPSi_md5_calc(&ctx->handshake_md5_snapshot, pad, 0x30);
         CPSi_md5_calc(&ctx->handshake_md5_snapshot, ctx->read_seq_num, 8);
         CPSi_md5_calc(&ctx->handshake_md5_snapshot, hdr, 1);
         CPSi_md5_calc(&ctx->handshake_md5_snapshot, hdr + 3, len + 2);
         CPSi_md5_result(&ctx->handshake_md5_snapshot, mac);
-
         CPSi_md5_init(&ctx->handshake_md5_snapshot);
-        CPSi_md5_calc(&ctx->handshake_md5_snapshot, ctx->read_mac_secret, 0x10);
+        CPSi_md5_calc(&ctx->handshake_md5_snapshot, ctx->read_mac_secret, macLen);
         MI_CpuFill8(pad, 0x5c, 0x30);
         CPSi_md5_calc(&ctx->handshake_md5_snapshot, pad, 0x30);
-        CPSi_md5_calc(&ctx->handshake_md5_snapshot, mac, 0x10);
+        CPSi_md5_calc(&ctx->handshake_md5_snapshot, mac, macLen);
         CPSi_md5_result(&ctx->handshake_md5_snapshot, mac);
-    } else {
-        macLen = 0x14;
-        len -= macLen;
-        hdr[3] = (u8)(len >> 8);
-        hdr[4] = (u8)len;
-
+        break;
+    case 5:
+        len -= 0x14;
+        hdr[3] = len >> 8;
+        hdr[4] = len;
         CPSi_sha1_init(&ctx->handshake_sha1_snapshot);
-        CPSi_sha1_calc(&ctx->handshake_sha1_snapshot, ctx->read_mac_secret, 0x14);
+        macLen = 0x14;
+        CPSi_sha1_calc(&ctx->handshake_sha1_snapshot, ctx->read_mac_secret, macLen);
         MI_CpuFill8(pad, 0x36, 0x28);
         CPSi_sha1_calc(&ctx->handshake_sha1_snapshot, pad, 0x28);
         CPSi_sha1_calc(&ctx->handshake_sha1_snapshot, ctx->read_seq_num, 8);
         CPSi_sha1_calc(&ctx->handshake_sha1_snapshot, hdr, 1);
         CPSi_sha1_calc(&ctx->handshake_sha1_snapshot, hdr + 3, len + 2);
         CPSi_sha1_result(&ctx->handshake_sha1_snapshot, mac);
-
         CPSi_sha1_init(&ctx->handshake_sha1_snapshot);
-        CPSi_sha1_calc(&ctx->handshake_sha1_snapshot, ctx->read_mac_secret, 0x14);
+        CPSi_sha1_calc(&ctx->handshake_sha1_snapshot, ctx->read_mac_secret, macLen);
         MI_CpuFill8(pad, 0x5c, 0x28);
         CPSi_sha1_calc(&ctx->handshake_sha1_snapshot, pad, 0x28);
-        CPSi_sha1_calc(&ctx->handshake_sha1_snapshot, mac, 0x14);
+        CPSi_sha1_calc(&ctx->handshake_sha1_snapshot, mac, macLen);
         CPSi_sha1_result(&ctx->handshake_sha1_snapshot, mac);
+        break;
     }
-
     if (memcmp(hdr + 5 + len, mac, macLen) != 0) {
         ctx->state = SSLI_STATE_ERROR;
     }
@@ -1127,60 +1192,70 @@ static u32 make_plaintext(CPSSslConnection *ctx, u8 *hdr) {
 // record header (type, version, length) with the content right after it; returns the header's own size (5)
 // plus the content and MAC's combined length
 static u32 make_ciphertext(CPSSslConnection *ctx, u8 *hdr) {
-    u32 len = (hdr[3] << 8) + hdr[4];
-    u8 *content = hdr + 5;
+    u8 *content;
+    int len;
     u8 pad[0x30];
+    u8 *mac;
 
-    if (ctx->cipher_suite == 4) {
-        CPSi_md5_init(&ctx->handshake_md5_snapshot);
-        CPSi_md5_calc(&ctx->handshake_md5_snapshot, ctx->key_storage.fields.write_mac_secret, 0x10);
+    len = (hdr[3] << 8) + hdr[4];
+    content = hdr + 5;
+    switch (ctx->cipher_suite) {
+    case 4: {
+        CPSMd5Ctx *md5 = &ctx->handshake_md5_snapshot;
+        CPSi_md5_init(md5);
+        CPSi_md5_calc(md5, ctx->key_storage.fields.write_mac_secret, 0x10);
         MI_CpuFill8(pad, 0x36, 0x30);
-        CPSi_md5_calc(&ctx->handshake_md5_snapshot, pad, 0x30);
-        CPSi_md5_calc(&ctx->handshake_md5_snapshot, ctx->write_seq_num, 8);
-        CPSi_md5_calc(&ctx->handshake_md5_snapshot, hdr, 1);
-        CPSi_md5_calc(&ctx->handshake_md5_snapshot, hdr + 3, len + 2);
-        CPSi_md5_result(&ctx->handshake_md5_snapshot, content + len);
-
-        CPSi_md5_init(&ctx->handshake_md5_snapshot);
-        CPSi_md5_calc(&ctx->handshake_md5_snapshot, ctx->key_storage.fields.write_mac_secret, 0x10);
+        CPSi_md5_calc(md5, pad, 0x30);
+        CPSi_md5_calc(md5, ctx->write_seq_num, 8);
+        CPSi_md5_calc(md5, hdr, 1);
+        CPSi_md5_calc(md5, hdr + 3, len + 2);
+        mac = content + len;
+        CPSi_md5_result(md5, mac);
+        CPSi_md5_init(md5);
+        CPSi_md5_calc(md5, ctx->key_storage.fields.write_mac_secret, 0x10);
         MI_CpuFill8(pad, 0x5c, 0x30);
-        CPSi_md5_calc(&ctx->handshake_md5_snapshot, pad, 0x30);
-        CPSi_md5_calc(&ctx->handshake_md5_snapshot, content + len, 0x10);
-        CPSi_md5_result(&ctx->handshake_md5_snapshot, content + len);
+        CPSi_md5_calc(md5, pad, 0x30);
+        CPSi_md5_calc(md5, mac, 0x10);
+        CPSi_md5_result(md5, mac);
         len += 0x10;
-    } else if (ctx->cipher_suite == 5) {
-        CPSi_sha1_init(&ctx->handshake_sha1_snapshot);
-        CPSi_sha1_calc(&ctx->handshake_sha1_snapshot, ctx->key_storage.fields.write_mac_secret, 0x14);
-        MI_CpuFill8(pad, 0x36, 0x28);
-        CPSi_sha1_calc(&ctx->handshake_sha1_snapshot, pad, 0x28);
-        CPSi_sha1_calc(&ctx->handshake_sha1_snapshot, ctx->write_seq_num, 8);
-        CPSi_sha1_calc(&ctx->handshake_sha1_snapshot, hdr, 1);
-        CPSi_sha1_calc(&ctx->handshake_sha1_snapshot, hdr + 3, len + 2);
-        CPSi_sha1_result(&ctx->handshake_sha1_snapshot, content + len);
-
-        CPSi_sha1_init(&ctx->handshake_sha1_snapshot);
-        CPSi_sha1_calc(&ctx->handshake_sha1_snapshot, ctx->key_storage.fields.write_mac_secret, 0x14);
-        MI_CpuFill8(pad, 0x5c, 0x28);
-        CPSi_sha1_calc(&ctx->handshake_sha1_snapshot, pad, 0x28);
-        CPSi_sha1_calc(&ctx->handshake_sha1_snapshot, content + len, 0x14);
-        CPSi_sha1_result(&ctx->handshake_sha1_snapshot, content + len);
-        len += 0x14;
+        break;
     }
-
-    hdr[3] = (u8)(len >> 8);
-    hdr[4] = (u8)len;
-    CPSi_rc4_crypt(&ctx->write_rc4, content, len);
+    case 5: {
+        CPSSha1Ctx *sha1 = &ctx->handshake_sha1_snapshot;
+        CPSi_sha1_init(sha1);
+        CPSi_sha1_calc(sha1, ctx->key_storage.fields.write_mac_secret, 0x14);
+        MI_CpuFill8(pad, 0x36, 0x28);
+        CPSi_sha1_calc(sha1, pad, 0x28);
+        CPSi_sha1_calc(sha1, ctx->write_seq_num, 8);
+        CPSi_sha1_calc(sha1, hdr, 1);
+        CPSi_sha1_calc(sha1, hdr + 3, len + 2);
+        mac = content + len;
+        CPSi_sha1_result(sha1, mac);
+        CPSi_sha1_init(sha1);
+        CPSi_sha1_calc(sha1, ctx->key_storage.fields.write_mac_secret, 0x14);
+        MI_CpuFill8(pad, 0x5c, 0x28);
+        CPSi_sha1_calc(sha1, pad, 0x28);
+        CPSi_sha1_calc(sha1, mac, 0x14);
+        CPSi_sha1_result(sha1, mac);
+        len += 0x14;
+        break;
+    }
+    }
+    hdr[3] = len >> 8;
+    hdr[4] = len;
+    CPSi_rc4_crypt(&ctx->write_rc4, hdr + 5, len);
     add1_be8(ctx->write_seq_num + sizeof(ctx->write_seq_num));
     return len + 5;
 }
 
 // Reads exactly len bytes from the socket's TCP stream into dest, waiting across as many reads as it takes; -1 if
 // the connection ends first
-static int tcp_read_raw_nbytes(u8 *dest, s32 len, CPSSoc *soc) {
-    do {
-        u32 avail;
-        u8 *data = CPSi_TcpReadRaw(&avail, soc);
+static int tcp_read_raw_nbytes(u8 *dest, int len, CPSSoc *soc) {
+    u32 avail;
+    u8 *data;
 
+    do {
+        data = CPSi_TcpReadRaw(&avail, soc);
         if (avail == 0) {
             return -1;
         }
@@ -1204,13 +1279,16 @@ static void update_digest(CPSSslConnection *ctx, const u8 *data, u32 len) {
 // Takes ownership of a complete record. Application data retains the allocation in
 // read_buf; every other path frees it after processing its contents.
 static void parse_record_in_buf(CPSSslConnection *ctx, u8 *record) {
-    int type;
-    u32 remaining;
     u8 *body;
+    u8 type;
+    u32 remaining;
+    int len;
+
     if (ctx->state == SSLI_STATE_ERROR) {
         CPSiFree(record);
         return;
     }
+
     type = record[0];
     remaining = (record[3] << 8) + record[4] + 5;
     if (ctx->read_mac_secret != NULL &&
@@ -1222,20 +1300,23 @@ static void parse_record_in_buf(CPSSslConnection *ctx, u8 *record) {
             return;
         }
     }
+
     body = record + 5;
     remaining -= 5;
+
     switch (type) {
     case 0x14:
-        if (ctx->read_mac_secret != NULL) {
+        if (ctx->read_mac_secret == NULL) {
+            ctx->state = SSLI_STATE_ERROR;
+        } else {
             MI_CpuFill8(ctx->read_seq_num, 0, 8);
             ctx->state = SSLI_STATE_EXPECT_FINISHED;
-        } else {
-            ctx->state = SSLI_STATE_ERROR;
         }
         break;
     case 0x15:
-        if (remaining != 2 || body[0] == 2)
+        if (remaining != 2 || body[0] == 2) {
             ctx->state = SSLI_STATE_ERROR;
+        }
         break;
     case 0x16:
         if (remaining < 4) {
@@ -1251,8 +1332,8 @@ static void parse_record_in_buf(CPSSslConnection *ctx, u8 *record) {
                 break;
             }
 #endif
-            int messageType = body[0];
-            int len = (body[1] << 16) + (body[2] << 8) + body[3];
+            type = body[0];
+            len = (body[1] << 16) + (body[2] << 8) + body[3];
 #ifdef BUGFIX
             if (len > remaining - 4) {
 #else
@@ -1262,43 +1343,49 @@ static void parse_record_in_buf(CPSSslConnection *ctx, u8 *record) {
                 break;
             }
             body += 4;
-            switch (messageType) {
+            switch (type) {
             case 1:
-                if (ctx->is_server && ctx->state == SSLI_STATE_INITIAL)
+                if (ctx->is_server && ctx->state == SSLI_STATE_INITIAL) {
                     client_hello(ctx, body);
-                else
+                } else {
                     ctx->state = SSLI_STATE_ERROR;
+                }
+                break;
+            case 16:
+                if (ctx->is_server) {
+                    rcv_client_key_exchange(ctx, body);
+                } else {
+                    ctx->state = SSLI_STATE_ERROR;
+                }
                 break;
             case 2:
-                if (len >= 0x26 && !ctx->is_server)
+                if (len >= 0x26 && !ctx->is_server) {
                     rcv_server_hello(ctx, body);
-                else
+                } else {
                     ctx->state = SSLI_STATE_ERROR;
+                }
                 break;
             case 11:
                 if (ctx->state == SSLI_STATE_SERVER_HELLO_PARSED && !ctx->is_server) {
                     rcv_certificate(ctx, body);
-                    ctx->certificate_phase.certificate_requested = 0;
-                } else
+                    ctx->certificate_phase.certificate_requested = FALSE;
+                } else {
                     ctx->state = SSLI_STATE_ERROR;
+                }
                 break;
             case 13:
-                if (ctx->state == SSLI_STATE_CERTIFICATE_ACCEPTED && !ctx->is_server)
-                    ctx->certificate_phase.certificate_requested = 1;
-                else
+                if (ctx->state == SSLI_STATE_CERTIFICATE_ACCEPTED && !ctx->is_server) {
+                    ctx->certificate_phase.certificate_requested = TRUE;
+                } else {
                     ctx->state = SSLI_STATE_ERROR;
+                }
                 break;
             case 14:
-                if (!ctx->is_server && ctx->state == SSLI_STATE_CERTIFICATE_ACCEPTED)
+                if (!ctx->is_server && ctx->state == SSLI_STATE_CERTIFICATE_ACCEPTED) {
                     ctx->state = SSLI_STATE_SERVER_HELLO_DONE;
-                else
+                } else {
                     ctx->state = SSLI_STATE_ERROR;
-                break;
-            case 16:
-                if (ctx->is_server)
-                    rcv_client_key_exchange(ctx, body);
-                else
-                    ctx->state = SSLI_STATE_ERROR;
+                }
                 break;
             case 20:
                 rcv_finished(ctx, body);
@@ -1315,14 +1402,15 @@ static void parse_record_in_buf(CPSSslConnection *ctx, u8 *record) {
         } while (remaining != 0 && ctx->state != SSLI_STATE_ERROR);
         break;
     case 0x17:
-        if (ctx->state == SSLI_STATE_APPLICATION_DATA) {
+        if (ctx->state != SSLI_STATE_APPLICATION_DATA) {
+            ctx->state = SSLI_STATE_ERROR;
+        } else {
             ctx->read_buf = record;
             ctx->read_buf_pos = 5;
             ctx->read_buf_len = remaining + 5;
-            ctx->application_record_ready = 1;
+            ctx->application_record_ready = TRUE;
             return;
         }
-        ctx->state = SSLI_STATE_ERROR;
         break;
     default:
         ctx->state = SSLI_STATE_ERROR;
@@ -1334,44 +1422,48 @@ static void parse_record_in_buf(CPSSslConnection *ctx, u8 *record) {
 // Peeks the framing before allocating. The SSLv2-compatible ClientHello form has
 // a two-byte header; standard records retain their five-byte header in the buffer.
 static int parse_record(CPSSoc *soc) {
-    CPSSslConnection *ctx = (CPSSslConnection *)soc->con;
+    u8 *peek;
     u32 len;
-    u8 *peek, *record;
+    u8 *record;
+    CPSSslConnection *ctx = soc->con;
+
     for (;;) {
         peek = CPSi_TcpReadRaw(&len, soc);
-        if (len >= 5)
+        if (len >= 5) {
             break;
+        }
         if (len == 0 || soc->state == 0) {
             ctx->state = SSLI_STATE_ERROR;
             return SSLI_STATE_ERROR;
         }
     }
+
     if (peek[0] == 0x80) {
-        if (!ctx->is_server || ctx->state != 0) {
-            ctx->state = SSLI_STATE_ERROR;
-            return ctx->state;
-        }
-        len = peek[1];
-        // BUG: With a non-NULL zero-byte allocation, the original can read record[0] without a record body.
+        if (ctx->is_server && ctx->state == SSLI_STATE_INITIAL) {
+            len = peek[1];
+            // BUG: With a non-NULL zero-byte allocation, the original can read record[0] without a record body.
 #ifdef BUGFIX
-        if (len == 0) {
-            ctx->state = SSLI_STATE_ERROR;
-            return SSLI_STATE_ERROR;
-        }
+            if (len == 0) {
+                ctx->state = SSLI_STATE_ERROR;
+                return SSLI_STATE_ERROR;
+            }
 #endif
-        CPSi_SocConsumeRaw(2, soc);
-        record = CPSiAlloc(len);
-        if (record == NULL) {
-            ctx->state = SSLI_STATE_ERROR;
-            return SSLI_STATE_ERROR;
-        }
-        if (tcp_read_raw_nbytes(record, len, soc) == 0 && record[0] == 1) {
-            client_hello_v2(ctx, record + 1);
+            CPSi_SocConsumeRaw(2, soc);
+            record = CPSiAlloc(len);
+            if (record == NULL) {
+                ctx->state = SSLI_STATE_ERROR;
+                return SSLI_STATE_ERROR;
+            }
+            if (tcp_read_raw_nbytes(record, len, soc) == 0 && record[0] == 1) {
+                client_hello_v2(ctx, record + 1);
+            } else {
+                ctx->state = SSLI_STATE_ERROR;
+            }
+            update_digest(ctx, record, len);
+            CPSiFree(record);
         } else {
             ctx->state = SSLI_STATE_ERROR;
         }
-        update_digest(ctx, record, len);
-        CPSiFree(record);
     } else {
         len = (peek[3] << 8) + peek[4] + 5;
         if (len > 0x4805) {
@@ -1397,32 +1489,31 @@ static int parse_record(CPSSoc *soc) {
 // CPSiRand32ctx (the stack's own generator) if nothing ever has. sPool is updated (a carry-add of a fresh SHA1 digest
 // of itself) a 20-byte block at a time under the IRQ mask. Only nonzero bytes are returned.
 static void set_random(u8 *dest, int len) {
-    int produced = 0;
-    int pos = 0x14;
+    u32 enabled;
+    CPSSha1Ctx sha1;
     u8 digest[0x14];
+    int produced;
+    int i;
+    int pos;
+    u32 carry;
+    u32 tmp;
 
     if (!sPoolSeeded) {
-        u32 seed = MATH_Rand32(&CPSiRand32ctx, 0);
-        CPS_SslAddRandomSeed(&seed, 4);
+        tmp = MATH_Rand32(&CPSiRand32ctx, 0);
+        CPS_SslAddRandomSeed(&tmp, 4);
     }
-
-    while (produced < len) {
+    pos = 0x14;
+    for (produced = 0; produced < len;) {
         if (pos == 0x14) {
-            CPSSha1Ctx sha1;
-            int i;
-            u32 carry;
-            u32 enabled;
-
             CPSi_sha1_init(&sha1);
             enabled = OS_DisableInterrupts();
             CPSi_sha1_calc(&sha1, sPool, 0x14);
             CPSi_sha1_result_prng(&sha1, digest);
-
             carry = 1;
             for (i = 0x13; i >= 0; i--) {
-                u32 sum = sPool[i] + digest[i] + carry;
-                sPool[i] = (u8)sum;
-                carry = sum >> 8;
+                tmp = sPool[i] + digest[i] + carry;
+                sPool[i] = (u8)tmp;
+                carry = tmp >> 8;
             }
             OS_RestoreInterrupts(enabled);
             pos = 0;
@@ -1518,17 +1609,15 @@ static void send_client_hello(CPSSoc *soc) {
         p[0x22] = 0;
         p += 0x23;
     }
-    p[0] = 0;
-    p[1] = 4;
-    p += 2;
-    for (i = 0; i < 2; i++) {
-        p[0] = sConfig.cipher_suites[i] >> 8;
-        p[1] = sConfig.cipher_suites[i];
-        p += 2;
+    *p++ = 0;
+    *p++ = 4;
+    for (i = 0; i < NELEMS(sConfig.cipher_suites); i++) {
+        *p++ = sConfig.cipher_suites[i] >> 8;
+        *p++ = sConfig.cipher_suites[i];
     }
-    p[0] = 1;
-    p[1] = 0;
-    len = p + 2 - packet - 5;
+    *p++ = 1;
+    *p++ = 0;
+    len = p - packet - 5;
     packet[0] = 0x16;
     packet[1] = 3;
     packet[2] = 0;
@@ -1547,9 +1636,9 @@ static void send_client_hello(CPSSoc *soc) {
 // certificate, then sends and hashes the complete ClientKeyExchange message.
 static void send_client_key_exchange(CPSSoc *soc) {
     CPSSslConnection *ctx = (CPSSslConnection *)soc->con;
+    u16 *digits, *base, *exponent, *modulus;
     int len, n, i;
     u8 *padded, *packet, *out;
-    u16 *digits, *base, *exponent, *modulus;
     u32 priority;
     if (ctx->certificate_phase.certificate_requested)
         CPSi_TcpWrite2Raw((u8 *)sNoCertificateAlert, 7, NULL, 0, soc);
@@ -1613,7 +1702,8 @@ static void send_client_key_exchange(CPSSoc *soc) {
     CPSiFree(padded);
 }
 
-// Requires the server's ChangeCipherSpec and Finished in that order. TRUE reports an unexpected state or an error.
+// Waits for the server's ChangeCipherSpec and Finished, in that order; TRUE if the connection ended first (the
+// Finished check itself sets ctx->state to an error rather than failing this)
 static BOOL mustget_change_cipher_spec_and_finished(CPSSoc *soc) {
     if (parse_record(soc) != SSLI_STATE_EXPECT_FINISHED) {
         return TRUE;
@@ -1769,19 +1859,22 @@ static void try_fill_record(CPSSoc *soc) {
     }
 }
 
-// CPSi_SslGetLength's role: how many bytes CPSi_SslRead would give out right now, or -1 once the connection has
-// closed with nothing left
+// CPSi_SslGetLength's role: how many bytes CPSi_SslRead would give out right now, or -1 when nothing is buffered and
+// the socket is no longer established or the connection has failed
 s32 CPSi_SslGetLength(CPSSoc *soc) {
-    CPSSslConnection *ctx = (CPSSslConnection *)soc->con;
+    CPSSslConnection *ctx;
 
+    ctx = soc->con;
     if (ctx->read_buf == NULL || !ctx->application_record_ready) {
         try_fill_record(soc);
     }
     if (ctx->read_buf != NULL && ctx->application_record_ready) {
-        return (s32)(ctx->read_buf_len - ctx->read_buf_pos);
+        return ctx->read_buf_len - ctx->read_buf_pos;
     }
-    if (ctx->read_buf == NULL && (soc->state != CPS_STT_ESTABLISHED || ctx->state == SSLI_STATE_ERROR)) {
-        return -1;
+    if (ctx->read_buf == NULL) {
+        if (soc->state != CPS_STT_ESTABLISHED || ctx->state == SSLI_STATE_ERROR) {
+            return -1;
+        }
     }
     return 0;
 }
@@ -1791,13 +1884,18 @@ s32 CPSi_SslGetLength(CPSSoc *soc) {
 // after the first, as one write; returns the total bytes sent, which may be less than len+len2 if CPSiAlloc or the
 // connection itself runs out partway
 u32 CPSi_SslWrite2(u8 *data, u32 len, u8 *data2, u32 len2, CPSSoc *soc) {
-    CPSSslConnection *ctx = (CPSSslConnection *)soc->con;
-    int total = len + len2;
-    u32 sent = 0;
+    CPSSslConnection *ctx = soc->con;
+    u8 *buf;
+    int total;
+    u32 first;
     int chunk;
+    u32 second;
+    u32 sent;
+    u32 sentNow;
+
+    total = len + len2;
+    sent = 0;
     do {
-        u8 *buf;
-        u32 first, second, sentNow;
         chunk = total > 0xb4f ? 0xb4f : total;
         buf = CPSiAlloc(chunk + 0x19);
         if (buf == NULL)

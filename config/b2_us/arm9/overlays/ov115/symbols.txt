@@ -8,9 +8,9 @@ LeagueCenter_LoadModel kind:function(thumb,size=0x84) addr:0x021eedd4
 LeagueCenter_FreeScene kind:function(thumb,size=0xc) addr:0x021eee58
 LeagueCenter_StepAnimations kind:function(thumb,size=0xc) addr:0x021eee64
 LeagueCenter_PlayActor kind:function(thumb,size=0x5e) addr:0x021eee70
-data_ov115_021eeed0 kind:data(any) addr:0x021eeed0
-data_ov115_021eeedc kind:data(any) addr:0x021eeedc
-data_ov115_021eeeec kind:data(any) addr:0x021eeeec
-data_ov115_021eeefc kind:data(any) addr:0x021eeefc
+sAnimations kind:data(any) addr:0x021eeed0
+sActors kind:data(any) addr:0x021eeedc
+sSceneSetup kind:data(any) addr:0x021eeeec
+sResources kind:data(any) addr:0x021eeefc
 data_ov115_021eef29 kind:data(any) addr:0x021eef29 ambiguous
 data_ov115_021eef2c kind:data(any) addr:0x021eef2c

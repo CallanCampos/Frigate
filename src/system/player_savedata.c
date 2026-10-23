@@ -9,7 +9,6 @@
 // The save block with the player's place, the places to return to, the follower and the step counters. The ROM has no
 // string for the file, so the name is a guess. Block 0x1c.
 
-#define SAVE_BLOCK_PLAYER 0x1c
 #define STEP_COUNTER_NONE 0xffff
 #define STEP_COUNTER_MAX 9999
 
