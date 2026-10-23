@@ -107,7 +107,7 @@ typedef struct {
 } WifiBattleMatchNetCheck;
 
 // The fields of the arena's table, by the number that WifiBattleMatchNet_GetArenaFieldName gives their names for
-enum {
+typedef enum {
     ARENA_DISCONNECTS_COUNTER = 3,
     ARENA_COMPLETE_MATCHES_COUNTER = 4,
     ARENA_NUM_SINGLE_WIN = 9,
@@ -142,7 +142,7 @@ enum {
     ARENA_NUM_WIFICUP_LOSE = 38,
     ARENA_CHEATS_WIFICUP_COUNTER = 39,
     ARENA_DISCONNECTS_WIFICUP_COUNTER = 40,
-};
+} WifiBattleMatchNetArenaField;
 
 // The kinds of read that WifiBattleMatchNet_StartRead starts: it fills a WifiBattleMatchNetStats, a
 // WifiBattleMatchNetCupStats, a record ID, the team of the Wi-Fi cup and the date of the last login
@@ -280,6 +280,6 @@ const char **WifiBattleMatchNet_GetArenaFieldNames(void);
 int WifiBattleMatchNet_GetArenaFieldCount(void);
 const char **WifiBattleMatchNet_GetWifiCupFieldNames(void);
 int WifiBattleMatchNet_GetWifiCupFieldCount(void);
-const char *WifiBattleMatchNet_GetArenaFieldName(int field);
+const char *WifiBattleMatchNet_GetArenaFieldName(WifiBattleMatchNetArenaField field);
 
 #endif // POKEBW2_APP_WIFIBATTLEMATCH_NET_H

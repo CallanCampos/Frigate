@@ -409,7 +409,7 @@ u16 DownloadPlay_GetState(void) {
     return sWork->state.state;
 }
 
-u16 DownloadPlay_GetChildBmp(int bmpType) {
+u16 DownloadPlay_GetChildBmp(DownloadPlayBmpType bmpType) {
     DownloadPlay_Tables.childBmps[DOWNLOAD_PLAY_BMP_CONNECT] = &sWork->state.connectChildBmp;
     DownloadPlay_Tables.childBmps[DOWNLOAD_PLAY_BMP_REQUEST] = &sWork->state.requestChildBmp;
     DownloadPlay_Tables.childBmps[DOWNLOAD_PLAY_BMP_ENTRY] = &sWork->state.entryChildBmp;

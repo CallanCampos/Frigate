@@ -2070,6 +2070,15 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   gets: overlay 209's `MusPokeDraw_CellCallback` keeps `kind - 7` in `r4` and multiplies a copy in `r1`, as the
   original does, only with `MusPokeDrawEquipNo pos = kind - MUS_POKE_DRAW_CELL_EQUIP;` and `poke->equips[pos]`
   indexed in place; an `int`, `u32` or `s32` local gives the reverse.
+- A value that the original carries through a function as an enum, where ours has an integer type, is typed so at
+  every step, the callee's parameter and the field included; one integer step keeps ours. `btl_server_cmd.c`'s
+  `BtlServerCmdQueue_Put` reads its command back from its stack slot (`va_start` takes its address) for the encoder
+  call, and keeps the format byte in `r2`, only with `event` a `BtlServerCmd` (our name) both in its own parameters
+  and in those of `PutCmdArgs`, the static function it passes it to; either one alone is 4 bytes long. Overlay 332's
+  `CygnusData_GetEntry` stores an entry's type and then its id, as written (`*type = data->entries[index].type;
+  *id = data->entries[index].id;`), only with the entry's `type` field and the `type` out-parameter both a
+  `CygnusEntryType` (our name); with either one a `u32` the same source is 4 bytes short, and no order of the
+  statements stores the type first.
 - A result tested with no narrowing after the call, but narrowed after arithmetic on it (`(u8)(weather - 2) <= 2`),
   comes from a function that returns `u8`. `HandlerSolarBeamPower` matches only with `GetWeather` returning `u8`, and
   so do the getters it calls, down to the field's `u8` weather, for their own definitions to keep matching.
@@ -2661,6 +2670,10 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   whose next statement is that test, came back only with a statement ending the outer then-arm that emits nothing
   but keeps its block, `heard = received;` between two flags that share a register, which only shapes code there
   (its row).
+- A field set to a different constant at the end of each arm of an `if`/`else` is cross-jumped at its store: each
+  arm loads the base and builds its constant in the same registers, and the first ends in `b` to the other's `str`.
+  `dwc_rap.c`'s `DWCRap_Connect` stores `_dWork->matchType` so after each arm's call; a local set in each arm and
+  stored once after the join gives another frame and other registers (8 bytes long).
 - A load that both arms of an `if`/`else` begin with is hoisted above the branch, between the test and the `beq`.
   When the original loads it first in each arm, after the branch, one arm began with another statement that the
   scheduler then moved below the load: `bmp.c`'s `GFL_BitmapCopyArea_IDX8_VRAM` writes `destPixel--;` before

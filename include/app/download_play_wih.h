@@ -10,7 +10,7 @@
 
 // The helper's states (WIH_STATE_*), with overlay 30's helper's numbering: the states this file does not have are
 // kept, because the state it passes on is the number the state callbacks know
-enum {
+typedef enum {
     WIH_STATE_STOP,
     WIH_STATE_IDLE,
     WIH_STATE_SCANNING,
@@ -22,18 +22,18 @@ enum {
     WIH_STATE_CONNECT_FAIL,
     WIH_STATE_ERROR,
     WIH_STATE_FATAL,
-};
+} WIHState;
 
 // How this machine connects (WIH_CONNECTMODE_*), which the parent passes: in the multi-point mode, with the keys
 // shared, or with the data shared. Overlay 30's helper numbers them the same way
-enum {
+typedef enum {
     WIH_CONNECTMODE_MP_PARENT,
     WIH_CONNECTMODE_MP_CHILD,
     WIH_CONNECTMODE_KS_PARENT,
     WIH_CONNECTMODE_KS_CHILD,
     WIH_CONNECTMODE_DS_PARENT,
     WIH_CONNECTMODE_DS_CHILD,
-};
+} WIHConnectMode;
 
 // The helper's own errors, which it keeps as the first error after the manager's (WMErrCode): the wireless has no
 // channel it may use, and no channel is left to measure. Overlay 30's helper reports the same numbers
@@ -79,9 +79,9 @@ typedef struct {
     WMParentParam sParentParam;
     u8 unk_38[8];
     // The state the helper is in (WIH_STATE_*)
-    int sysState;
+    WIHState sysState;
     // How this machine connects (WIH_CONNECTMODE_*)
-    int sConnectMode;
+    WIHConnectMode sConnectMode;
     u32 unk_48;
     // What the scan calls with each child that connects, which nothing in this build sets
     WHScanFilter sScanFilter;

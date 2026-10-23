@@ -45,11 +45,11 @@
 // appears in a flash of light before the rest show up as icons. Named after the ROM's assertion string
 
 // What an entry of the data is
-enum {
+typedef enum {
     CYGNUS_ENTRY_NONE,
     CYGNUS_ENTRY_POKEMON,
     CYGNUS_ENTRY_ITEM,
-};
+} CygnusEntryType;
 
 // What CygnusData_GetState says about the data
 enum {
@@ -213,7 +213,7 @@ enum {
 #define CYGNUS_ICON_TIME 160
 
 typedef struct {
-    u32 type;
+    CygnusEntryType type;
     // The species or the item
     u16 id;
     u8 form;
@@ -319,7 +319,7 @@ static BOOL CygnusData_HasLegend(const CygnusData *data);
 static int CygnusData_FindLegend(const CygnusData *data, u32 n);
 static void CygnusData_Commit(CygnusData *data);
 static BOOL CygnusData_Save(CygnusData *data);
-static BOOL CygnusData_GetEntry(const CygnusData *data, u32 index, u32 *type, u32 *id);
+static BOOL CygnusData_GetEntry(const CygnusData *data, u32 index, CygnusEntryType *type, u32 *id);
 static PartyPkm *CygnusData_CreatePokemon(const CygnusData *data, u32 index, HeapID heapId);
 static BOOL CygnusData_GetItem(const CygnusData *data, u32 index, u16 *item, u8 *quantity);
 static u32 CygnusData_GetItemNumber(const CygnusData *data, u32 n);
@@ -659,7 +659,7 @@ static void CygnusFlow_SeqShowLegend(KeySystemSeq *seq, int *state, void *work) 
     KeySystemWork *wk = work;
     PartyPkm *pkm;
     u32 species;
-    u32 type;
+    CygnusEntryType type;
     StrBuf *str;
 
     switch (*state) {
@@ -1171,10 +1171,10 @@ static BOOL CygnusData_Save(CygnusData *data) {
     return FALSE;
 }
 
-static BOOL CygnusData_GetEntry(const CygnusData *data, u32 index, u32 *type, u32 *id) {
+static BOOL CygnusData_GetEntry(const CygnusData *data, u32 index, CygnusEntryType *type, u32 *id) {
     if (data->entries[index].type != CYGNUS_ENTRY_NONE) {
-        *id = data->entries[index].id;
         *type = data->entries[index].type;
+        *id = data->entries[index].id;
         return TRUE;
     }
     return FALSE;
@@ -1509,7 +1509,7 @@ static void CygnusIcons_Unload(CygnusIcons *icons) {
 }
 
 static void CygnusIcon_Load(CygnusIcon *icon, ClActUnit *unit, CygnusData *data, u16 index, HeapID heapId) {
-    u32 type;
+    CygnusEntryType type;
     u32 id;
     int x = 0;
     s16 y = 0;

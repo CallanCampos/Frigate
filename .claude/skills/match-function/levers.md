@@ -577,6 +577,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
   (matching.md: "The same goes for a returned flag")
 - A local loaded again for a call after tests of it that share one load: the local and the callee's parameter are
   an enum. (matching.md: "tests its stat")
+- A variadic function's named parameter read back from its stack slot for a call where ours keeps it in a register,
+  or two stores through out-parameters in an order ours can't give: the value is an enum at every step, the callee's
+  parameter and the field included. (matching.md: "typed so at every step")
 - A local array's element loaded again after a call: it was read through a pointer to the element, set in the
   loop. (matching.md: "A local array's element is never loaded again")
 - An `ands` with a run-time 0xffff before a `strh`, shared by two stores: a packed-byte expression in two inline
@@ -707,6 +710,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 ## Branches and block layout
 
+- Each arm of an `if`/`else` ending in `ldr base; movs rN, #k; b` to a shared `str`: the field is stored in each
+  arm, not through a local stored after the join. (matching.md: "cross-jumped at its store")
 - An early exit 8 bytes short, or a call's result returned through another layout: give the exit its own call
   and return, or return through a `result` local. (matching.md: "An early exit with its own call")
 - A flag set in several cases and tested at the end to pick a shared block, where the original branches straight to

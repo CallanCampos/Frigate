@@ -22,7 +22,7 @@
 #define DWCRAP_NETID_MAX 2
 
 // The states of the connection, in the work's state
-enum {
+typedef enum {
     DWCRAP_STATE_INIT,
     DWCRAP_STATE_INET,
     DWCRAP_STATE_LOGIN_WAIT,
@@ -44,15 +44,15 @@ enum {
     DWCRAP_STATE_CLOSED,
     DWCRAP_STATE_ENDING,
     DWCRAP_STATE_ENDED,
-};
+} DWCRapState;
 
 // How the match was started, in the work's matchType: with anybody (a query or a key), as the server of a friends'
 // match, or as a friend joining one
-enum {
+typedef enum {
     DWCRAP_MATCH_ANYBODY,
     DWCRAP_MATCH_SERVER,
     DWCRAP_MATCH_FRIEND,
-};
+} DWCRapMatchType;
 
 // The work of the connection, 0x7ac bytes
 typedef struct {
@@ -88,9 +88,9 @@ typedef struct {
     char friendStatusData[DWCRAP_FRIEND_MAX][MYDWC_STATUS_DATA_SIZE_MAX];
     u32 friendCheckIndex;
     int connectResult;
-    int state;
+    DWCRapState state;
     int errorCode;
-    int matchType;
+    DWCRapMatchType matchType;
     int sending;
     int maxPlayers;
     u32 lastConnectBits;
@@ -130,7 +130,7 @@ static DWCRapWork *_dWork;
 
 static const char sQueryFormat[] = "%s = '%s'";
 
-static void DWCRap_SetState(int state);
+static void DWCRap_SetState(DWCRapState state);
 static void DWCRap_Delete(void);
 static u32 DWCRap_UpdateLogin(void);
 static void DWCRap_NewClientCallback(int index, void *param);
@@ -168,7 +168,7 @@ static void DWCRap_AllocRecvBuffer(int aid);
 static void DWCRap_FreeRecvBuffers(void);
 static void DWCRap_FlushPendingErrors(void);
 
-static void DWCRap_SetState(int state) {
+static void DWCRap_SetState(DWCRapState state) {
     _dWork->state = state;
 }
 
@@ -1149,7 +1149,6 @@ u8 DWCRap_GetFriendStatus(int index) {
 int DWCRap_Connect(int friendIndex, int numEntry, BOOL a2) {
     int i;
     int entries = numEntry;
-    int matchType;
     BOOL ok;
 
     if (DWCRap_IsUserDataDirty()) {
@@ -1175,14 +1174,13 @@ int DWCRap_Connect(int friendIndex, int numEntry, BOOL a2) {
     if (friendIndex < 0) {
         ok = DWC_SetupGameServer(2, entries, DWCRap_AnybodyMatchedCallback, GFL_NetGetWork(), DWCRap_ConnectedCallback,
                                  GFL_NetGetWork(), DWCRap_AttemptCallback, &_dWork->connectResult, GFL_NetGetWork());
-        matchType = DWCRAP_MATCH_SERVER;
+        _dWork->matchType = DWCRAP_MATCH_SERVER;
     } else {
         ok = DWC_ConnectToGameServerAsync(2, friendIndex, DWCRap_FriendMatchedCallback, NULL, DWCRap_ConnectedCallback,
                                           GFL_NetGetWork(), DWCRap_AttemptCallback, &_dWork->connectResult,
                                           GFL_NetGetWork());
-        matchType = DWCRAP_MATCH_FRIEND;
+        _dWork->matchType = DWCRAP_MATCH_FRIEND;
     }
-    _dWork->matchType = matchType;
     if (!ok) {
         _dWork->retryCount++;
         if (_dWork->retryCount > 120) {
