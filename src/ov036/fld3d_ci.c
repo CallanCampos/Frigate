@@ -394,7 +394,7 @@ GameEvent *EventFieldEffect_Create(GameSystem *gsys, Fld3DCi *ci, u8 effectId) {
     ci->callback = 0;
     ci->control = 0;
     ci->cameraSel = 0;
-    event = GameEvent_Create(gsys, NULL, EventFieldEffect_Callback, 0x44);
+    event = GameEvent_Create(gsys, NULL, EventFieldEffect_Callback, sizeof(Fld3DCiEvent));
     Fld3DCi_InitEventData(ci, GameEvent_GetData(event));
     return event;
 }
@@ -1434,7 +1434,7 @@ static void EventFieldEffectCutinSub_DrawStrToTexture(PlayerInfo *info, RivalDat
     raw = ci->palette->pRawData;
     raw[1] = color;
     raw[2] = color2;
-    G3DTextDraw_CreateResource(res, texName, (u32)raw, palName, str, (u16)width, 0, 0x440, heapId, &resource);
+    G3DTextDraw_CreateResource(res, texName, (uptr)raw, palName, str, (u16)width, 0, 0x440, heapId, &resource);
     GFL_HeapFree(ci->paletteData);
     GFL_HeapFree(str);
     GFL_MsgDataFree(msgData);
@@ -1452,7 +1452,7 @@ GameEvent *EventFieldEffect_CreateAlderFly(GameSystem *gsys, Fld3DCi *ci, u32 ac
 
 static void EventFieldEffect_DimCaptureColor(void) {
     u32 banks = GX_ResetBankForBG();
-    u16 *vram = (u16 *)0x6860000;
+    u16 *vram = (u16 *)HW_LCDC_VRAM_D;
     int i;
 
     for (i = 0; i < 0xc000; i++) {
