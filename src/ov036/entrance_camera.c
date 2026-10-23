@@ -38,12 +38,6 @@ struct EntranceCamera {
     BOOL unk6c;
 };
 
-// The warp sequence, whose tail the entrance events use for the task that walks the player one tile
-typedef struct {
-    WarpSequence warp;
-    FieldAcmdTCB *walkTask;
-} EntranceWarp;
-
 // The data of the events that play the entrance when the player goes out of a zone and into one
 typedef struct {
     u32 unk0;
@@ -150,7 +144,7 @@ static void EventWarpSequence_StartWalkTask(WarpSequence *warp) {
     FieldActor *player = FieldPlayer_GetActor(Field_GetPlayer(warp->field));
     FieldActor *pair;
 
-    ((EntranceWarp *)warp)->walkTask = FieldAcmdTCB_CreateWalkOneTile(player, GetActorFaceDir(player));
+    warp->walkTask = FieldAcmdTCB_CreateWalkOneTile(player, GetActorFaceDir(player));
     if (GameData_CheckPairFlag(warp->gameData)) {
         pair = FindFieldActor(mmSys, 0xfe);
         if (pair != NULL) {
@@ -160,13 +154,11 @@ static void EventWarpSequence_StartWalkTask(WarpSequence *warp) {
 }
 
 static BOOL EventWarpSequence_UpdateTCB(WarpSequence *warp) {
-    EntranceWarp *entrance = (EntranceWarp *)warp;
-
-    if (!FieldAcmdTCB_CheckEnded(entrance->walkTask)) {
+    if (!FieldAcmdTCB_CheckEnded(warp->walkTask)) {
         return FALSE;
     }
-    FieldAcmdTCB_Remove(entrance->walkTask);
-    entrance->walkTask = NULL;
+    FieldAcmdTCB_Remove(warp->walkTask);
+    warp->walkTask = NULL;
     return TRUE;
 }
 

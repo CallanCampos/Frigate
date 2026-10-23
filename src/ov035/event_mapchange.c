@@ -91,7 +91,6 @@ struct EventMapChange {
     u16 prevSeason;
     u16 season;
     WarpSequence warp;
-    u32 unk9C;
     BOOL lensFlareStarted;
 };
 
