@@ -708,7 +708,10 @@ Same instructions, registers swapped.
   runs again on each pass when the array is declared in a loop's body (`dwcutil_ac.c`'s `CheckAccessPoint`). A constant
   the retail game fixes but the code still tests or passes as a variable is held in an enum-typed local, which MWCC
   does not fold (`FieldScript_LoadData`'s source, `CallTrialHouseBattle`'s battle type,
-  `s01D6_MoveReminderCallMoveSelect`'s mode).
+  `s01D6_MoveReminderCallMoveSelect`'s mode). An offset that adds zero is such a constant too: `field_msgbg.c`'s
+  `CheckerMsgWin_LoadFrameTile` keeps a zero register, shifts it by five and adds it to the tile data before the tile's
+  own offset, which `CheckerFrameTile first = CHECKER_FRAME_TOP_LEFT;` added as `first * BGSYS_TILE_SIZE_16` gives,
+  next to the style parameter that no longer picks a block of tiles.
 - An RC4 key schedule's swap written through one temporary, `temp = table[j]; table[j] = table[i]; table[i] =
   temp;`, and its sum grouped `(table[i] + (j + key[k])) & 0xff`, which gives `add r4, r5, r4` where the flat
   `j + key[k] + table[i]` swaps the operands, are what DS Protect's `DSProt_Rc4InitMulti` needed. The same library's
