@@ -19,7 +19,11 @@ flags = [
     "-msgstyle gcc",
 ]
 
-# The nested inline check runners use file-level interprocedural analysis.
+# The nested inline check runners and flashcart tests use file-level interprocedural analysis, in both copies of
+# each: without it the queue runner's loop keeps the wrapper and the loop count in each other's registers (14 bytes
+# of each runner), and the flashcart test's inline reader is emitted out of line.
 [file_flags]
 "dsprot_run.c" = ["-ipa file"]
+"dsprot_run_multi.c" = ["-ipa file"]
 "dsprot_detect.c" = ["-ipa file"]
+"dsprot_detect_multi.c" = ["-ipa file"]

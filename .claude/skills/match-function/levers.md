@@ -816,9 +816,6 @@ text to `grep -n` there. Entries without a key come from later work and still be
   unsigned and keeps the loop. (matching.md: "loop that runs once")
 - A static's field loaded on each pass of a loop that stores through a pointer, where the original loads it
   once: a local read before the loop. (matching.md: "hoists a static's field load out of a loop")
-- A local struct's address passed to a call in a loop, where the original keeps it in one register: try the order of
-  the independent stores before the loop; a pointer local used only at the call names nothing. (matching.md: "The
-  order of independent stores before a loop")
 - `asr`/`ror` division of a parameter the callers pass as `u8` without conversion: a `u8` parameter copied to an
   `s32` local. (matching.md: "copied to an `s32` local")
 - An address or value an inner loop computes from the outer counter alone is hoisted into the inner preheader.
@@ -1048,7 +1045,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
   32-aligned")
 - A literal of `SYM + bias` with the bias subtracted at run time: element-pointer arithmetic (`arr + 0x880`) puts
   the bias in the addend, byte arithmetic adds it at run time, and the subtraction stays when the result is the base
-  of a variable index. (matching.md: "A bias on a data symbol lands in the literal's addend")
+  of a variable index, or for a scalar read when the address is converted to `s32` rather than `u32`. (matching.md:
+  "A bias on a data symbol lands in the literal's addend")
 - `.bss` runs that are each sorted by size, with the same layout unreachable in one file: the range is several
   files, each with `-ipa file`; and sweep the declaration orders of the statics. (matching.md: "With `-ipa file` the
   order of a file's same-size statics")

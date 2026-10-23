@@ -119,8 +119,8 @@ static inline void DSProt_ReadCardRaw(void *dest, u32 address, s32 size, u8 flag
                 word = *(vu32 *)(base + OFFSET_CARD_DATA);
 
                 if (offset >= 0 && offset < size) {
-                    // The address is an integer sum here, where overlay 337's copy (dsprot_detect_multi.c) adds to a
-                    // u8 pointer: MWCC compiles the two differently, and the ROM's copies differ the same way
+                    // The address is an integer sum, as in overlay 337's copy (dsprot_detect_multi.c): MWCC compiles
+                    // a sum on a u8 pointer differently
                     *(u32 *)((u32)dest + offset) = word;
                 }
                 offset += 4;
