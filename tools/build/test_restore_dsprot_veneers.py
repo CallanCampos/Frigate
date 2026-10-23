@@ -93,6 +93,25 @@ class VeneerInputTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'unsupported response'):
             veneers.response_objects('"detect.o"\n@another-response.txt\n')
 
+    def test_private_prelink_omits_closure_without_changing_normal_flags(self):
+        flags = ['-proc', 'arm946e', '-nodead', '-nostdlib', '-interworking',
+                 '-map', 'closure,unused', '-m', '_start']
+        original = flags.copy()
+        self.assertEqual(veneers.prelink_flags(flags),
+                         ['-proc', 'v4t', '-nodead', '-nostdlib', '-interworking',
+                          '-map', 'unused', '-m', '_start'])
+        self.assertEqual(flags, original)
+
+    def test_private_prelink_rejects_invalid_flags(self):
+        for flags in (None, ['-proc', 1], ['-proc', 'arm946e'],
+                      ['-proc', 'arm946e', '-map'],
+                      ['-proc', 'arm946e', '-map', '-m', '_start'],
+                      ['-proc', 'arm946e', '-map', '-o', 'other.o'],
+                      ['-proc', 'arm946e', '-map', 'unused', '-map', 'closure'],
+                      ['-proc', 'arm946e', '-map', 'unused', '@other-response.txt']):
+            with self.subTest(flags=flags), self.assertRaises(ValueError):
+                veneers.prelink_flags(flags)
+
     def test_memory_paths_are_confined(self):
         good = 'MEMORY {\nOV165 : ORIGIN = 0 > build/arm9_ov165.bin\nSPACE : ORIGIN = AFTER(OV165)\n}\n} > OV165\n'
         self.assertEqual(veneers.memory_outputs(good, self.root), [self.root / 'build/arm9_ov165.bin'])
