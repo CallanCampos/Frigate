@@ -385,6 +385,24 @@ def memory_outputs(text, scratch):
     return outputs
 
 
+def prelink_flags(flags):
+    """Use ARMv4T and a layout map for the private link, preserving the caller's flags."""
+    require(isinstance(flags, list) and all(isinstance(f, str) for f in flags),
+            "--link-flags must be a JSON list of argv strings")
+    # Paths and output flags come solely from the checked inputs in main.
+    require(not any(f in ("-o", "-lcf") or f.startswith("@") for f in flags),
+            "link flags must not supply input/output paths")
+    flags = flags.copy()
+    # MWLD's closure report can contain garbage bytes. read_map needs the layout,
+    # not the closure report; the normal link keeps its original map options.
+    for option, value in (("-proc", "v4t"), ("-map", "unused")):
+        require(flags.count(option) == 1 and flags.index(option) + 1 < len(flags)
+                and not flags[flags.index(option) + 1].startswith("-"),
+                f"link flags must contain exactly one {option} setting")
+        flags[flags.index(option) + 1] = value
+    return flags
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     for name in ("objects", "lcf", "source-object", "output-object", "output-response", "scratch", "linker"):
@@ -397,15 +415,7 @@ def main():
     try:
         require(re.fullmatch(r"OV[0-9]{3}", args.section) and args.expected_count > 0,
                 "expected an OVnnn section and a positive veneer count")
-        flags = json.loads(args.link_flags)
-        require(isinstance(flags, list) and all(isinstance(f, str) for f in flags),
-                "--link-flags must be a JSON list of argv strings")
-        require(flags.count("-proc") == 1 and flags.index("-proc") + 1 < len(flags),
-                "link flags must contain exactly one -proc setting")
-        flags[flags.index("-proc") + 1] = "v4t"
-        # Paths and output flags come solely from the checked inputs below.
-        require(not any(f in ("-o", "-lcf") or f.startswith("@") for f in flags),
-                "link flags must not supply input/output paths")
+        flags = prelink_flags(json.loads(args.link_flags))
         source_text = args.objects.read_text()
         objects = response_objects(source_text)
         matches = [p for p in objects if Path(p).resolve() == args.source_object.resolve()]
