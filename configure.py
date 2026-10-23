@@ -65,7 +65,7 @@ MWCCARM_URL = "https://decomp.aetias.com/files/mwccarm.zip"
 # changes are upstreamed. Its dsi-hybrid branch is released as DSD_VERSION; after a new release, bump it and
 # configure.py replaces tools/dsd.
 DSD_REPO = "https://github.com/fuddlesworth/ds-decomp"
-DSD_VERSION = "v0.12.1-dsi.5"
+DSD_VERSION = "v0.12.1-dsi.6"
 # Release binary of each platform, by (sys.platform, machine)
 DSD_BINARIES = {
     ("linux", "x86_64"): "dsd-linux-x86_64",
@@ -539,12 +539,10 @@ def add_version(n: Writer, version: str, dsd: Path, bugfix: bool, shift: int) ->
     delink_outputs = sorted({f["delink_file"] for f in files})
     n.build(delink_outputs, "delink", dsd_configs, implicit=[extract_dir / "config.yaml"],
             variables={"config": str(arm9_config)})
-    n.build([lcf_file, objects_file], "lcf", dsd_configs, implicit=[extract_dir / "config.yaml"],
-            variables={"config": str(arm9_config)})
-    # NitroSDK's linker symbols, which dsd's linker script doesn't define, see tools/build/lcf_symbols.py
-    link_lcf = build_dir / "arm9_symbols.lcf"
-    n.build([link_lcf], "lcf_symbols", [lcf_file, "config/linker_symbols.toml"],
-            implicit=["tools/build/lcf_symbols.py"])
+    # The linker script also defines NitroSDK's linker symbols, as the SDK's template does, from linker_symbols.toml
+    n.build([lcf_file, objects_file], "lcf", dsd_configs,
+            implicit=[extract_dir / "config.yaml", "config/linker_symbols.toml"], variables={"config": str(arm9_config)})
+    link_lcf = lcf_file
     if shift:
         # Padding in the linker script moves the code and data after it, see tools/build/shift_lcf.py
         shifted_lcf = build_dir / "arm9_shifted.lcf"
@@ -763,7 +761,8 @@ def main():
     n.rule("check_baserom", "echo '$sha1  $in' | sha1sum --quiet -c - && touch $out", "Checking base ROM $in")
     n.rule("extract", "$dsd rom extract --rom $in --output-path $extract_dir", "Extracting $in")
     n.rule("delink", "$dsd delink --config-path $config", "Delinking $config")
-    n.rule("lcf", "$dsd lcf --config-path $config", "Generating linker script for $config")
+    n.rule("lcf", "$dsd lcf --config-path $config --symbols config/linker_symbols.toml",
+           "Generating linker script for $config")
     # mwccarm writes the dependency file next to the object, with Windows paths that fix_depfile.py converts
     n.rule("mwcc", f"mkdir -p $$(dirname $out) && $wine $sjiswrap {shlex.quote(str(mwcc))} $flags "
            "$defines -gccdep -MD $includes -o $out $in && $python tools/build/fix_depfile.py $dep", "Compiling $in",
@@ -780,7 +779,6 @@ def main():
         lib_mwasm = tools_dir / "mwccarm" / compiler / "mwasmarm.exe"
         n.rule(f"mwasm_{i}", f"mkdir -p $$(dirname $out) && $wine {shlex.quote(str(lib_mwasm))} $flags -o $out $in",
                "Assembling $in")
-    n.rule("lcf_symbols", "$python tools/build/lcf_symbols.py $in $out", "Adding NitroSDK's symbols to $out")
     n.rule("shift_lcf", "$python tools/build/shift_lcf.py $in $out $amount", "Shifting $in")
     n.rule("ltd_objects", "$python tools/build/ltd_objects.py $in $out", "Grouping the LTD autoload's objects in $out")
     n.rule("mwld", f"$wine {shlex.quote(str(mwld))} {' '.join(LD_FLAGS)} @$objects $lcf -o $out", "Linking $out")
