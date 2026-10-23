@@ -102,6 +102,7 @@ lib/nitrowifi/src/ssl/md5.c:
     .data       start:0x0218553c end:0x021856bc
 
 lib/nitrowifi/src/ssl/sha1.c:
+    complete
     .text       start:0x0215ab04 end:0x0215b1d8
     .data       start:0x021856bc end:0x021856fc
 
@@ -110,6 +111,7 @@ lib/nitrowifi/src/ssl/ssl_rc4.c:
     .text       start:0x0215b1d8 end:0x0215b274
 
 lib/nitrowifi/src/ssl/biginteger.c:
+    complete
     .text       start:0x0215b274 end:0x0215bbec
 
 lib/nitrowifi/src/wcm/wcm.c:
@@ -223,6 +225,7 @@ lib/dwc/src/gp/gpiProfile.c:
     .data       start:0x02188964 end:0x021889d4
 
 lib/dwc/src/gp/gpiSearch.c:
+    complete
     .text       start:0x02179834 end:0x0217b5fc
     .data       start:0x021889d4 end:0x02188e2c
 
