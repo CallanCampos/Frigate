@@ -17,9 +17,9 @@ GrimsleyRoom_GetGroup0Played kind:function(thumb,size=0x4) addr:0x021ef148
 GrimsleyRoom_SetGroup1Played kind:function(thumb,size=0x4) addr:0x021ef14c
 GrimsleyRoom_GetGroup1Played kind:function(thumb,size=0x4) addr:0x021ef150
 data_ov123_021ef154 kind:data(any) addr:0x021ef154
-data_ov123_021ef15c kind:data(any) addr:0x021ef15c
-data_ov123_021ef164 kind:data(any) addr:0x021ef164
-data_ov123_021ef16c kind:data(any) addr:0x021ef16c
+sGroupLastModels kind:data(any) addr:0x021ef15c
+sGroupFirstModels kind:data(any) addr:0x021ef164
+sGroupModelAnimations kind:data(any) addr:0x021ef16c
 data_ov123_021ef17c kind:data(any) addr:0x021ef17c
 data_ov123_021ef18c kind:data(any) addr:0x021ef18c
 data_ov123_021ef1d4 kind:data(any) addr:0x021ef1d4

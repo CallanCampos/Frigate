@@ -542,7 +542,7 @@ static void PMSSelect_BGDrawPlateEdge(PMSSelectBG *bg, u32 palette) {
 static TouchBar *PMSSelect_CreateTouchBar(PMSSelectWork *wk, ClActUnit *unit, HeapID heapId) {
     TouchBarSetup setup = { 0 };
     TouchBarItem items[] = {
-        { 1, { 232, 168 } },
+        { TOUCHBAR_ICON_RETURN, { 232, 168 } },
     };
     TouchBar *touchBar;
 
@@ -554,7 +554,7 @@ static TouchBar *PMSSelect_CreateTouchBar(PMSSelectWork *wk, ClActUnit *unit, He
     setup.objPalette = 5;
     setup.vramType = CLACT_VRAM_SUB;
     touchBar = TouchBar_Create(&setup, heapId);
-    TouchBar_SetIconBgPriority(touchBar, 1, TRUE);
+    TouchBar_SetIconBgPriority(touchBar, TOUCHBAR_ICON_RETURN, TRUE);
     return touchBar;
 }
 
@@ -964,23 +964,23 @@ static BOOL PMSSelect_SeqSelect(u32 *seq, PMSSelectWork *wk) {
         if (!wk->scrollTouch) {
             GCTX_HIDSetUsingTouch(wk->touchMode ? TRUE : FALSE);
             PMSSelect_UpdateTouchBar(wk->touchBar);
-            if (TouchBar_GetTouched(wk->touchBar) != -1) {
+            if (TouchBar_GetTouched(wk->touchBar) != TOUCHBAR_ICON_NONE) {
                 wk->listActive = FALSE;
             }
             touch = TouchBar_GetDecided(wk->touchBar);
-            if (touch != -1) {
+            if (touch != TOUCHBAR_ICON_NONE) {
                 wk->listActive = TRUE;
             }
             wk->touchMode = GCTX_HIDIsUsingTouch() == TRUE;
         }
-        if (touch != -1) {
+        if (touch != TOUCHBAR_ICON_NONE) {
             switch (touch) {
-            case 1:
+            case TOUCHBAR_ICON_RETURN:
                 wk->param->cancel = TRUE;
                 wk->param->result = NULL;
                 wk->nextSeq = SEQ_FADE_OUT;
                 return TRUE;
-            case 7:
+            case TOUCHBAR_ICON_CUSTOM:
                 break;
             }
         }

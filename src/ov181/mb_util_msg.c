@@ -379,12 +379,11 @@ void MBUtilMsg_FreeMenu(MBUtilMsg *msg) {
     msg->menu = NULL;
 }
 
-// The item picked, from 1, or 0 while the menu waits
 int MBUtilMsg_GetMenuResult(MBUtilMsg *msg) {
     if (AppTaskMenu_IsFlashFinished(msg->menu) == TRUE) {
         return AppTaskMenu_GetCursorPos(msg->menu) + 1;
     }
-    return 0;
+    return MB_UTIL_MSG_WAIT;
 }
 
 void MBUtilMsg_CreateConfirm(MBUtilMsg *msg, u32 unused) {
@@ -400,19 +399,18 @@ void MBUtilMsg_ForgetConfirm(MBUtilMsg *msg) {
     msg->confirm = NULL;
 }
 
-// 1 for yes, 2 for no, 0 while the dialog waits
 int MBUtilMsg_UpdateConfirm(MBUtilMsg *msg) {
     u32 result = ConfirmDialog_Update(msg->confirm);
 
     if (result == 0) {
         msg->confirm = NULL;
-        return 1;
+        return MB_UTIL_MSG_YES;
     }
     if (result == -2) {
         msg->confirm = NULL;
-        return 2;
+        return MB_UTIL_MSG_NO;
     }
-    return 0;
+    return MB_UTIL_MSG_WAIT;
 }
 
 void MBUtilMsg_PrintNoWireless(MBUtilMsg *msg, s32 wait) {

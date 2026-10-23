@@ -2,6 +2,7 @@
 #include "app/pkwd_book.h"
 #include "app/pkwd_book_graphic.h"
 #include "app/ui/frame_list.h"
+#include "app/ui/print_msg.h"
 #include "app/ui/ui_scene.h"
 #include "constants/arc.h"
 #include "constants/pokemon.h"
@@ -132,11 +133,6 @@ enum {
     MSG_TRAINER_CLASSES,
     MSG_COSTARS,
 };
-
-// The ways to align a text on its x
-#define ALIGN_LEFT 0
-#define ALIGN_RIGHT 1
-#define ALIGN_CENTER 2
 
 // The flags of the work
 #define FLAG_WIPE_IN_DONE 0x1
@@ -679,7 +675,7 @@ static const PkwdBookTextActorEntry sPkwdBookTextActors[TEXT_ACTOR_COUNT + 1] = 
 };
 
 static const FrameListSetup sPkwdBookListSetup = {
-    { 6, 0xff, 2, 0, 28, 3, 2, 0, 26, 3, 0, { 24, 12, 8, 6, 4, 3 }, 1, 8, 0 },
+    { 6, FRAMELIST_BG_NONE, 2, 0, 28, 3, 2, 0, 26, 3, 0, { 24, 12, 8, 6, 4, 3 }, 1, 8, 0 },
     LIST_ROWS,
     4,
     0,
@@ -1680,9 +1676,9 @@ static void PkwdBook_PrintText(PkwdBookWork *wk, BOOL isSub, u32 window, s32 x, 
 }
 
 static u16 PkwdBook_GetAlignOffset(const StrBuf *strbuf, Font *font, u32 align) {
-    if (align == ALIGN_RIGHT) {
+    if (align == PRINT_ALIGN_RIGHT) {
         return GFL_FontGetBlockWidth(strbuf, font, 0);
-    } else if (align == ALIGN_CENTER) {
+    } else if (align == PRINT_ALIGN_CENTER) {
         return GFL_FontGetBlockWidth(strbuf, font, 0) / 2;
     }
     return 0;
@@ -1727,7 +1723,7 @@ static void PkwdBook_PrintLabels(PkwdBookWork *wk, BOOL isSub, u32 page) {
         }
         window = labels[i].window;
         msgData = labels[i].msgData;
-        align = ALIGN_LEFT;
+        align = PRINT_ALIGN_LEFT;
         x = 0;
         color = PRINT_COLOR(15, 2, 0);
         if (labels[i].dark == TRUE) {
@@ -1736,7 +1732,7 @@ static void PkwdBook_PrintLabels(PkwdBookWork *wk, BOOL isSub, u32 page) {
         if (!isSub) {
             color = PRINT_COLOR(1, 2, 0);
             if (i == 0) {
-                align = ALIGN_CENTER;
+                align = PRINT_ALIGN_CENTER;
                 x = 112;
             }
         }
@@ -1974,11 +1970,11 @@ static void PkwdBook_PrintMovie(PkwdBookWork *wk, BOOL keepLabels) {
         u16 color;
 
         if (i == 0) {
-            align = ALIGN_CENTER;
+            align = PRINT_ALIGN_CENTER;
             x = 112;
             color = PRINT_COLOR(1, 3, 0);
         } else {
-            align = ALIGN_LEFT;
+            align = PRINT_ALIGN_LEFT;
             x = 0;
             color = PRINT_COLOR(1, 2, 0);
         }
@@ -2113,7 +2109,7 @@ static void PkwdBook_PrintCast(PkwdBookWork *wk, BOOL keepLabels) {
 
         PkwdBook_PrintLabels(wk, TRUE, PAGE_CAST);
         movie = PkwdBook_GetMovie(wk, wk->selected);
-        PkwdBook_PrintText(wk, TRUE, 2, 1, 0, wk->roleNames[movie], ALIGN_LEFT, PRINT_COLOR(1, 2, 0), FALSE);
+        PkwdBook_PrintText(wk, TRUE, 2, 1, 0, wk->roleNames[movie], PRINT_ALIGN_LEFT, PRINT_COLOR(1, 2, 0), FALSE);
         if (gender == 0) {
             costar = GFL_MsgDataLoadStrbufNew(wk->msgData[MSG_COSTARS], movie + EventPassPowerStartmenu_Text_BrycenMan);
         } else {
@@ -2122,7 +2118,7 @@ static void PkwdBook_PrintCast(PkwdBookWork *wk, BOOL keepLabels) {
         }
         buf = GFL_StrBufCreate(16, wk->heapId);
         GFL_StrBufUncompress(buf, costar);
-        PkwdBook_PrintText(wk, TRUE, 3, 1, 0, buf, ALIGN_LEFT, PRINT_COLOR(1, 2, 0), FALSE);
+        PkwdBook_PrintText(wk, TRUE, 3, 1, 0, buf, PRINT_ALIGN_LEFT, PRINT_COLOR(1, 2, 0), FALSE);
         GFL_StrBufFree(buf);
         GFL_StrBufFree(costar);
     }
@@ -2272,7 +2268,7 @@ static void PkwdBook_PrintPokemon(PkwdBookWork *wk, BOOL keepLabels) {
     nameFormat = GFL_MsgDataLoadStrbufNew(wk->msgData[MSG_LINES], sPkwdBookPokemonMessages[0]);
     WordSet_LoadSpeciesName(wk->wordSet, 0, (u16)value);
     GFL_WordSetFormatStrbuf(wk->wordSet, buf, nameFormat);
-    PkwdBook_PrintText(wk, TRUE, 1, 0, 0, buf, ALIGN_LEFT, PRINT_COLOR(1, 2, 0), FALSE);
+    PkwdBook_PrintText(wk, TRUE, 1, 0, 0, buf, PRINT_ALIGN_LEFT, PRINT_COLOR(1, 2, 0), FALSE);
     GFL_StrBufFree(nameFormat);
     sexMessage = 1;
     color = PRINT_COLOR(6, 5, 0);
@@ -2283,20 +2279,20 @@ static void PkwdBook_PrintPokemon(PkwdBookWork *wk, BOOL keepLabels) {
     if (wk->cast[wk->castIdx].sex != 2) {
         StrBuf *mark = GFL_MsgDataLoadStrbufNew(wk->msgData[MSG_LINES], sPkwdBookPokemonMessages[sexMessage]);
 
-        PkwdBook_PrintText(wk, TRUE, 1, 62, 0, mark, ALIGN_LEFT, (u16)color, TRUE);
+        PkwdBook_PrintText(wk, TRUE, 1, 62, 0, mark, PRINT_ALIGN_LEFT, (u16)color, TRUE);
         GFL_StrBufFree(mark);
     }
     value = wk->cast[wk->castIdx].level;
     levelFormat = GFL_MsgDataLoadStrbufNew(wk->msgData[MSG_LINES], sPkwdBookPokemonMessages[3]);
     WordSetNumber(wk->wordSet, 0, value, 3, 0, TRUE);
     GFL_WordSetFormatStrbuf(wk->wordSet, buf, levelFormat);
-    PkwdBook_PrintText(wk, TRUE, 2, 0, 0, buf, ALIGN_LEFT, PRINT_COLOR(1, 2, 0), FALSE);
+    PkwdBook_PrintText(wk, TRUE, 2, 0, 0, buf, PRINT_ALIGN_LEFT, PRINT_COLOR(1, 2, 0), FALSE);
     GFL_StrBufFree(levelFormat);
     value = wk->cast[wk->castIdx].item;
     itemFormat = GFL_MsgDataLoadStrbufNew(wk->msgData[MSG_LINES], sPkwdBookPokemonMessages[4]);
     loadItemNameToStrbuf(wk->wordSet, 0, value);
     GFL_WordSetFormatStrbuf(wk->wordSet, buf, itemFormat);
-    PkwdBook_PrintText(wk, TRUE, 4, 0, 0, buf, ALIGN_LEFT, PRINT_COLOR(1, 2, 0), FALSE);
+    PkwdBook_PrintText(wk, TRUE, 4, 0, 0, buf, PRINT_ALIGN_LEFT, PRINT_COLOR(1, 2, 0), FALSE);
     GFL_StrBufFree(itemFormat);
     for (i = 0; i < MOVE_COUNT; i++) {
         u32 move = wk->cast[wk->castIdx].moves[i];
@@ -2306,7 +2302,7 @@ static void PkwdBook_PrintPokemon(PkwdBookWork *wk, BOOL keepLabels) {
 
             loadMoveNameToStrbuf(wk->wordSet, 0, move);
             GFL_WordSetFormatStrbuf(wk->wordSet, buf, moveFormat);
-            PkwdBook_PrintText(wk, TRUE, i + 5, 0, 0, buf, ALIGN_LEFT, PRINT_COLOR(1, 2, 0), FALSE);
+            PkwdBook_PrintText(wk, TRUE, i + 5, 0, 0, buf, PRINT_ALIGN_LEFT, PRINT_COLOR(1, 2, 0), FALSE);
             GFL_StrBufFree(moveFormat);
         } else {
             PkwdBook_FillWindow(wk, TRUE, i + 5, 0);
@@ -2316,7 +2312,7 @@ static void PkwdBook_PrintPokemon(PkwdBookWork *wk, BOOL keepLabels) {
     abilityFormat = GFL_MsgDataLoadStrbufNew(wk->msgData[MSG_LINES], sPkwdBookPokemonMessages[5]);
     loadAbilityNameToStrbuf(wk->wordSet, 0, value);
     GFL_WordSetFormatStrbuf(wk->wordSet, buf, abilityFormat);
-    PkwdBook_PrintText(wk, TRUE, 10, 0, 0, buf, ALIGN_LEFT, PRINT_COLOR(1, 2, 0), FALSE);
+    PkwdBook_PrintText(wk, TRUE, 10, 0, 0, buf, PRINT_ALIGN_LEFT, PRINT_COLOR(1, 2, 0), FALSE);
     GFL_StrBufFree(abilityFormat);
     GFL_StrBufFree(buf);
 }
@@ -2628,7 +2624,7 @@ static s32 PkwdBook_UpdateList(PkwdBookWork *wk) {
 }
 
 // Acts on what the list returned. Returns 1 when the cursor moved or the list scrolled, 2 when a movie was picked
-// and 3 for the list's -12, else 0
+// and 3 for FRAMELIST_CURSOR_SHOWN, else 0
 static s32 PkwdBook_HandleListResult(PkwdBookWork *wk, u32 result) {
     s32 action = 0;
     BOOL moved = FALSE;
@@ -2643,27 +2639,27 @@ static s32 PkwdBook_HandleListResult(PkwdBookWork *wk, u32 result) {
     case 6:
         action = 2;
         break;
-    case -7:
-    case -5:
+    case FRAMELIST_PAGE_UP:
+    case FRAMELIST_CURSOR_TOP:
         wk->flags |= FLAG_PAGE_UP;
         action = 1;
         break;
-    case -6:
-    case -4:
+    case FRAMELIST_PAGE_DOWN:
+    case FRAMELIST_CURSOR_BOTTOM:
         wk->flags |= FLAG_PAGE_DOWN;
         action = 1;
         break;
-    case -3:
-    case -2:
+    case FRAMELIST_JUMP_TOP:
+    case FRAMELIST_JUMP_BOTTOM:
         action = 1;
         moved = TRUE;
         break;
-    case -9:
-    case -10:
-    case -11:
+    case FRAMELIST_BAR:
+    case FRAMELIST_SCROLL:
+    case FRAMELIST_CURSOR_MOVE:
         action = 1;
         break;
-    case -12:
+    case FRAMELIST_CURSOR_SHOWN:
         action = 3;
         break;
     }

@@ -13,11 +13,13 @@
 // The ROM has no string for the file, so the name is a guess.
 
 // What addFriend does with the place
-#define FRIEND_ADD_NEW 0
-// Replaces the data and the player's info, but keeps the name
-#define FRIEND_ADD_UPDATE 1
-// Only the player's appearance
-#define FRIEND_ADD_VIEW 2
+enum {
+    FRIEND_ADD_NEW,
+    // Replaces the data and the player's info, but keeps the name
+    FRIEND_ADD_UPDATE,
+    // Only the player's appearance
+    FRIEND_ADD_VIEW,
+};
 
 static int compareFriendData(DWCFriendData *friendData, DWCUserData *userData, DWCFriendData *other);
 static int findFriendData(DWCFriendData *friendData, int *index);

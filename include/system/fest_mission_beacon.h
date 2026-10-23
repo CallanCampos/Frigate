@@ -12,19 +12,31 @@
 // A line of the mission's log: what a player did
 typedef struct {
     u16 name[8];
-    // The text of a kind 0x2d
+    // The text of a LOG_KIND_TEXT
     u16 text[9];
     u16 trainerId;
     // Whether the player is the one who started the mission, or this game's player
     u8 own : 1;
     u8 gender : 1;
     u8 look : 6;
-    // 1 and 2: the player started or joined; 3: a player was met; otherwise the beacon's type - 0x3a
+    // A LOG_KIND_*: the beacon's type - 0x3a for the rest
     u8 kind;
     // What the line is about, by FestMission_LogCategories
     u16 value;
     u16 score;
 } FestMissionLogEntry;
+
+// The kinds of a log entry: the player started or joined the mission, a player was met, a Pass Power was used, a
+// player's words
+enum {
+    LOG_KIND_NONE,
+    LOG_KIND_START,
+    LOG_KIND_JOIN,
+    LOG_KIND_MEET,
+    LOG_KIND_PASS_POWER = 15,
+    LOG_KIND_TEXT = 45,
+    LOG_KIND_MAX,
+};
 
 #define FEST_MISSION_LOG_MAX 30
 

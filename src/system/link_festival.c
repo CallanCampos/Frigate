@@ -244,9 +244,7 @@ BOOL LinkFestival_IsNewZoneFromOutside(LinkFestival *festival, u16 zoneId) {
     return FALSE;
 }
 
-RivalEntry *LinkFestival_GetEntries(void *owner) {
-    LinkFestival *festival = owner;
-
+RivalEntry *LinkFestival_GetEntries(LinkFestival *festival) {
     return festival->entries;
 }
 

@@ -112,7 +112,7 @@ data_ov190_021b5274 kind:data(any) addr:0x021b5274
 data_ov190_021b5294 kind:data(any) addr:0x021b5294
 data_ov190_021b52b4 kind:data(any) addr:0x021b52b4
 WIFILOGOUT_PROC_FUNCTIONS kind:data(any) addr:0x021b52bc ambiguous
-data_ov190_021b52e0 kind:data(any) addr:0x021b52e0
+sNetInit kind:data(any) addr:0x021b52e0
 data_ov190_021b5340 kind:data(any) addr:0x021b5340
 data_ov190_021b5350 kind:data(any) addr:0x021b5350
 data_ov190_021b5354 kind:data(any) addr:0x021b5354
@@ -122,4 +122,4 @@ data_ov190_021b53b8 kind:data(any) addr:0x021b53b8
 data_ov190_021b53cc kind:data(any) addr:0x021b53cc
 data_ov190_021b53e0 kind:data(any) addr:0x021b53e0
 data_ov190_021b53e4 kind:data(any) addr:0x021b53e4
-data_ov190_021b5400 kind:bss addr:0x021b5400
+sGameType kind:bss addr:0x021b5400

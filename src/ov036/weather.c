@@ -70,8 +70,8 @@ static WeatherTransitionFunc WEATHER_TRANSITION_FUNCS[2] = {
     func_ov036_02199330,
 };
 
-void *func_ov036_02199004(FieldCamera *camera, void *light, FieldFog *fog, void *fogCtrl, FieldSound *sound, u16 season,
-                          HeapID heapId) {
+FieldWeather *func_ov036_02199004(FieldCamera *camera, void *light, FieldFog *fog, void *fogCtrl, FieldSound *sound,
+                                  u16 season, HeapID heapId) {
     FieldWeather *weather;
     ClActRenderer *renderer;
     s32 i;
@@ -116,8 +116,7 @@ void func_ov036_021990d8(FieldWeather *weather) {
     GFL_HeapFree(weather);
 }
 
-void FieldWeather_Update(void *weatherPtr, HeapID heapId) {
-    FieldWeather *weather = weatherPtr;
+void FieldWeather_Update(FieldWeather *weather, HeapID heapId) {
     s32 i;
 
     WEATHER_TRANSITION_FUNCS[weather->transition](weather, heapId);

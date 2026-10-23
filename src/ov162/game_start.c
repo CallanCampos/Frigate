@@ -230,7 +230,7 @@ static BOOL NewGame_Init(GameProc *proc, u32 *state, void *param, void *work) {
     wk->onlyCGearQuestion = FALSE;
     wk->config = wk->newConfig;
     wk->playerInfo = wk->newPlayerInfo;
-    wk->nameEntryParam = setupNameEntry(1, 0, 0, 0, 7, 0, 0);
+    wk->nameEntryParam = setupNameEntry(1, NAME_ENTRY_PLAYER, 0, 0, 7, 0, 0);
     wk->procManager = CreateGameProcManager(HEAPID_USER);
 
     // The name entry's and the intro's sounds, loaded now so that they play at once
@@ -454,7 +454,7 @@ static void NewGame_EraseOutsideKeys(SaveControl *save) {
 static void NewGame_ImportOutsideData(SaveControl *save) {
     void *work;
 
-    if (SaveControl_GetStatus(save) == 1 && !SaveControl_IsDataAlreadyPresent(save)) {
+    if (SaveControl_GetStatus(save) == TRUE && !SaveControl_IsDataAlreadyPresent(save)) {
         GFL_OvlLoad(OVERLAY_ID(331));
         work = SaveOutside_Load(HEAPID_USER);
         if (SaveOutside_IsGiftsLoaded(work)) {

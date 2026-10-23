@@ -145,8 +145,10 @@ enum {
 #define FRIEND_LIST_PAGE_COUNT 4
 #define FRIEND_LIST_PAGE_SIZE 8
 // The cursor's positions after a page's friends
-#define FRIEND_LIST_POS_RETURN 8
-#define FRIEND_LIST_POS_EXIT 9
+enum {
+    FRIEND_LIST_POS_RETURN = 8,
+    FRIEND_LIST_POS_EXIT,
+};
 // The roster draws the page shown and, while it scrolls, the one that comes in from a side
 #define FRIEND_LIST_AREA_COUNT 3
 #define FRIEND_LIST_SCROLL_FRAMES 24

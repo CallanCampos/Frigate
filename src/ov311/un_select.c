@@ -375,9 +375,9 @@ static void UnSelect_LoadBG(UnSelectWork *wk, HeapID heapId) {
 
 static TouchBar *UnSelect_CreateTouchBar(ClActUnit *unit, HeapID heapId) {
     TouchBarItem items[] = {
-        { 1, { 232, 168 } },
-        { 4, { 16, 168 } },
-        { 5, { 80, 168 } },
+        { TOUCHBAR_ICON_RETURN, { 232, 168 } },
+        { TOUCHBAR_ICON_LEFT, { 16, 168 } },
+        { TOUCHBAR_ICON_RIGHT, { 80, 168 } },
     };
     TouchBarSetup setup;
     TouchBar *touchBar;
@@ -392,8 +392,8 @@ static TouchBar *UnSelect_CreateTouchBar(ClActUnit *unit, HeapID heapId) {
     setup.vramType = CLACT_VRAM_MAIN;
     touchBar = TouchBar_Create(&setup, heapId);
     TouchBar_SetBgPriority(touchBar, 1);
-    TouchBar_SetIconSe(touchBar, 4, 0);
-    TouchBar_SetIconSe(touchBar, 5, 0);
+    TouchBar_SetIconSe(touchBar, TOUCHBAR_ICON_LEFT, 0);
+    TouchBar_SetIconSe(touchBar, TOUCHBAR_ICON_RIGHT, 0);
     return touchBar;
 }
 
@@ -756,17 +756,17 @@ static BOOL UnSelect_ListRun(UIScene *scene, void *param) {
     }
     UnSelect_UpdateTouchBar(wk->touchBar);
     switch (TouchBar_GetDecided(wk->touchBar)) {
-    case -1:
-    case 0:
+    case TOUCHBAR_ICON_NONE:
+    case TOUCHBAR_ICON_CLOSE:
         break;
-    case 1:
+    case TOUCHBAR_ICON_RETURN:
         UnSelect_SetResult(wk, UN_SELECT_RESULT_CANCEL);
         UIScene_SetNext(scene, UI_SCENE_END);
         return TRUE;
-    case 2:
-    case 3:
-    case 4:
-    case 5:
+    case TOUCHBAR_ICON_DOWN:
+    case TOUCHBAR_ICON_UP:
+    case TOUCHBAR_ICON_LEFT:
+    case TOUCHBAR_ICON_RIGHT:
         break;
     }
     return FALSE;

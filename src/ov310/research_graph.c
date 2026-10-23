@@ -97,10 +97,12 @@ enum {
 };
 
 // The units: the actors', the bitmaps' and the percentages'
-#define UNIT_COUNT 4
-#define UNIT_ACTORS 1
-#define UNIT_BMP_OAM 2
-#define UNIT_PERCENTAGES 3
+enum {
+    UNIT_ACTORS = 1,
+    UNIT_BMP_OAM,
+    UNIT_PERCENTAGES,
+    UNIT_COUNT,
+};
 
 // The actors: the arrows on either side of the cursor, and the mark of the player's answer in the graph, with the one
 // that explains it

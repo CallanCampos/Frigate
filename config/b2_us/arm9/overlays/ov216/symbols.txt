@@ -295,10 +295,10 @@ sReceiptProcFunctions kind:data(any) addr:0x021c08dc
 sMainProcFunctions kind:data(any) addr:0x021c08e8
 sGuru2SeqFuncs kind:data(any) addr:0x021c08f4
 sGuru2Commands kind:data(any) addr:0x021c090c
-data_ov216_021c098c kind:data(any) addr:0x021c098c
-data_ov216_021c099c kind:data(any) addr:0x021c099c
+sYesNoSetup kind:data(any) addr:0x021c098c
+sLookPalettes kind:data(any) addr:0x021c099c
 data_ov216_021c09ac kind:data(any) addr:0x021c09ac
-data_ov216_021c09c4 kind:data(any) addr:0x021c09c4
+sActorFiles kind:data(any) addr:0x021c09c4
 data_ov216_021c09e4 kind:data(any) addr:0x021c09e4
 data_ov216_021c0a14 kind:data(any) addr:0x021c0a14
 data_ov216_021c0a24 kind:data(any) addr:0x021c0a24

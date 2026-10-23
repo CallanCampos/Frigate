@@ -10,8 +10,6 @@
 
 // The mail: a mailbox of MAIL_COUNT mails, and the mail of one Pokémon. The ROM's string for the file is "mail.c".
 
-#define SAVE_BLOCK_MAIL 0x28
-
 void ResetMailData(MailData *mail) {
     int i;
 

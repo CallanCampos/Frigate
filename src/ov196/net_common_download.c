@@ -11,8 +11,10 @@
 #include "system/game_data.h"
 
 // The states of a download that wait for the download library
-#define DOWNLOAD_WAIT 100
-#define DOWNLOAD_WAIT_CLEANUP 200
+enum {
+    DOWNLOAD_WAIT = 100,
+    DOWNLOAD_WAIT_CLEANUP = 200,
+};
 // A wait that takes longer than this many frames times out
 #define DOWNLOAD_TIMEOUT 7200
 
@@ -194,17 +196,17 @@ u32 NetCommonDownload_Update(NetCommonDownload *download) {
         }
         if (GFL_NetIsInitialized()) {
             switch (DWCRapCommon_CheckError(TRUE, FALSE)) {
-            case 0:
+            case DWCRAP_RESULT_OK:
                 download->update = NET_COMMON_DOWNLOAD_UPDATE_RUNNING;
                 break;
-            case 1:
+            case DWCRAP_RESULT_DISCONNECTED:
                 download->update = NET_COMMON_DOWNLOAD_UPDATE_ENDED;
                 break;
-            case 2:
+            case DWCRAP_RESULT_FAILED:
                 download->update = NET_COMMON_DOWNLOAD_UPDATE_ERROR;
                 break;
-            case 3:
-            case 4:
+            case DWCRAP_RESULT_NET_ERROR:
+            case DWCRAP_RESULT_TIMEOUT:
                 break;
             }
         }

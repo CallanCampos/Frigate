@@ -44,12 +44,12 @@ struct FieldG3DObjSystem {
     u16 objCount;
     FieldG3DObjResGroup *resGroups;
     FieldG3DObj *objs;
-    void *colorPostFx;
+    FieldColorPostFX *colorPostFx;
 };
 
 void FieldG3DObjResGroup_SetupTextures(FieldG3DObjResGroup *group);
 void FieldG3DObjResGroup_LoadResources(FieldG3DObjResGroup *group, u16 heapId, FieldG3DObjResRequest *request,
-                                       BOOL setupTextures, void *colorPostFx);
+                                       BOOL setupTextures, FieldColorPostFX *colorPostFx);
 void FieldG3DObjResGroup_Free(FieldG3DObjResGroup *group);
 void FieldG3DObj_Setup(FieldG3DObj *obj, FieldG3DObjResGroup *group, u16 resGroup, u16 modelIndex, u16 heapId,
                        const VecFx32 *position, BOOL initTransform);
@@ -135,12 +135,12 @@ void FieldG3DObjSystem_Draw(FieldG3DObjSystem *system) {
     }
 }
 
-void FieldG3DObjSystem_SetColorPostFX(FieldG3DObjSystem *system, void *colorPostFx) {
+void FieldG3DObjSystem_SetColorPostFX(FieldG3DObjSystem *system, FieldColorPostFX *colorPostFx) {
     system->colorPostFx = colorPostFx;
 }
 
 u16 FieldG3DObjSystem_AddResGroupCore(FieldG3DObjSystem *system, FieldG3DObjResRequest *request, BOOL setupTextures,
-                                      void *colorPostFx) {
+                                      FieldColorPostFX *colorPostFx) {
     u16 i;
     FieldG3DObjResGroup *group = system->resGroups;
 
@@ -314,7 +314,7 @@ void FieldG3DObjResGroup_SetupTextures(FieldG3DObjResGroup *group) {
 }
 
 void FieldG3DObjResGroup_LoadResources(FieldG3DObjResGroup *group, u16 heapId, FieldG3DObjResRequest *request,
-                                       BOOL setupTextures, void *colorPostFx) {
+                                       BOOL setupTextures, FieldColorPostFX *colorPostFx) {
     int i;
 
     if (request->mdlArc != NULL) {

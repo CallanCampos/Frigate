@@ -223,15 +223,15 @@ u32 BtlServerFlow_RunFaintSwitch(BtlServerFlow *flow, BtlClientActions *clientAc
         flow->actionOrderCount = ActionOrder_Build(flow, clientActions, flow->actionOrder, 6);
         flow->unk783 = 0;
         for (i = 0; i < flow->actionOrderCount; i++) {
-            if (flow->actionOrder[i].action.change.action == 3 && !flow->actionOrder[i].action.change.unk10 &&
-                !IsFainted(flow->actionOrder[i].mon)) {
+            if (flow->actionOrder[i].action.change.action == BATTLE_ACTION_CHANGE &&
+                !flow->actionOrder[i].action.change.unk10 && !IsFainted(flow->actionOrder[i].mon)) {
                 ServerControl_ChangePokemon(flow, flow->actionOrder[i].mon, flow->actionOrder[i].action.change.slot);
                 flow->actionOrder[i].done = TRUE;
             }
         }
         for (i = 0; i < flow->actionOrderCount; i++) {
-            if (flow->actionOrder[i].action.change.action == 3 && !flow->actionOrder[i].action.change.unk10 &&
-                IsFainted(flow->actionOrder[i].mon)) {
+            if (flow->actionOrder[i].action.change.action == BATTLE_ACTION_CHANGE &&
+                !flow->actionOrder[i].action.change.unk10 && IsFainted(flow->actionOrder[i].mon)) {
                 ServerControl_SwitchInFillSlot(flow, flow->actionOrder[i].clientId,
                                                flow->actionOrder[i].action.change.unk4,
                                                flow->actionOrder[i].action.change.slot, TRUE);
@@ -240,7 +240,8 @@ u32 BtlServerFlow_RunFaintSwitch(BtlServerFlow *flow, BtlClientActions *clientAc
         }
         if (BtlSetup_GetBattleStyle(flow->mainModule) == 3) {
             for (i = 0; i < flow->actionOrderCount; i++) {
-                if (flow->actionOrder[i].action.change.action == 6 && !flow->actionOrder[i].action.change.unk10) {
+                if (flow->actionOrder[i].action.change.action == BATTLE_ACTION_ROTATION &&
+                    !flow->actionOrder[i].action.change.unk10) {
                     ActionOrder_Proc(flow, &flow->actionOrder[i]);
                 }
             }
@@ -369,7 +370,7 @@ BOOL ServerControl_MidTurnSwitchIn(BtlServerFlow *flow, BtlClientActions *client
             count = ClientActions_GetCount(clientActions, clientId);
             for (i = 0; i < count; i++) {
                 action = ClientActions_GetAction(clientActions, clientId, i);
-                if (action.change.action == 3 && !action.change.unk10) {
+                if (action.change.action == BATTLE_ACTION_CHANGE && !action.change.unk10) {
                     ServerControl_SwitchInFillSlot(flow, clientId, action.change.unk4, action.change.slot, TRUE);
                 }
             }
@@ -603,43 +604,44 @@ u8 ActionOrder_Build(BtlServerFlow *flow, BtlClientActions *clientActions, Actio
         entry = &order[i];
         mon = order[i].mon;
         switch (entry->action.bits.action) {
-        case 4:
+        case BATTLE_ACTION_ESCAPE:
             if (BtlSetup_GetBattleType(flow->mainModule) == 0 && entry->clientId == 1) {
                 kind = 0;
             } else {
                 kind = 4;
             }
             break;
-        case 3:
+        case BATTLE_ACTION_CHANGE:
             kind = 3;
             break;
-        case 2:
+        case BATTLE_ACTION_ITEM:
             kind = 2;
             break;
-        case 6:
+        case BATTLE_ACTION_ROTATION:
             kind = 1;
             break;
-        case 7:
+        case BATTLE_ACTION_SKIP:
             kind = 0;
             break;
-        case 5:
+        case BATTLE_ACTION_SHIFT:
             kind = 0;
             break;
-        case 1:
+        case BATTLE_ACTION_FIGHT:
             kind = 0;
             break;
-        case 0:
+        case BATTLE_ACTION_NULL:
             entry->key = ActionOrder_MakeKey(0, 1, 0, 4);
             continue;
         default:
             kind = 0;
             break;
-        case 8:
+        case BATTLE_ACTION_REC_TIMEOUT:
             continue;
         }
-        if (entry->action.bits.action == 1) {
+        if (entry->action.bits.action == BATTLE_ACTION_FIGHT) {
             priority = ServerEvent_GetMovePriority(flow, ActionOrder_GetMove(&order[i]), mon);
-        } else if (entry->action.bits.action == 5 || entry->action.bits.action == 7) {
+        } else if (entry->action.bits.action == BATTLE_ACTION_SHIFT ||
+                   entry->action.bits.action == BATTLE_ACTION_SKIP) {
             priority = 7;
         } else {
             priority = 0;
@@ -652,7 +654,7 @@ u8 ActionOrder_Build(BtlServerFlow *flow, BtlClientActions *clientActions, Actio
     if (!rotated) {
         for (i = 0; i < count; i++) {
             entry = &order[i];
-            if (entry->action.bits.action == 1 || entry->action.bits.action == 5) {
+            if (entry->action.bits.action == BATTLE_ACTION_FIGHT || entry->action.bits.action == BATTLE_ACTION_SHIFT) {
                 state = PushState(&flow->actionState, 0x694);
                 entry->key =
                     (entry->key & 0xffff1fff) | ((ServerEvent_CheckSpecialPriority(flow, entry->mon) & 7) << 13);
@@ -752,7 +754,7 @@ ActionOrderEntry *ActionOrder_SearchByMoveID(BtlServerFlow *flow, u16 moveId, u8
     u32 i;
 
     for (i = start; i < flow->actionOrderCount; i++) {
-        if (!flow->actionOrder[i].done && BattleAction_GetAction(&flow->actionOrder[i].action) == 1 &&
+        if (!flow->actionOrder[i].done && BattleAction_GetAction(&flow->actionOrder[i].action) == BATTLE_ACTION_FIGHT &&
             moveId == BattleAction_GetFightMove(&flow->actionOrder[i].action)) {
             return &flow->actionOrder[i];
         }
@@ -846,9 +848,10 @@ u32 ActionOrder_Proc(BtlServerFlow *flow, ActionOrderEntry *entry) {
         action = entry->action;
         BtlServerFlow_PushFrame(flow);
         entry->done = TRUE;
-        if ((flow->unk14 != 5 || action.bits.action == 4) && !IsFainted(mon) &&
-            (action.bits.action == 6 || DoesBattleMonExist(&flow->posPoke, GetMonID(mon)))) {
-            if (CheckCondition(mon, 0x21) && (action.bits.action != 4 || GetRunMode(flow->mainModule) != 2)) {
+        if ((flow->unk14 != 5 || action.bits.action == BATTLE_ACTION_ESCAPE) && !IsFainted(mon) &&
+            (action.bits.action == BATTLE_ACTION_ROTATION || DoesBattleMonExist(&flow->posPoke, GetMonID(mon)))) {
+            if (CheckCondition(mon, 0x21) &&
+                (action.bits.action != BATTLE_ACTION_ESCAPE || GetRunMode(flow->mainModule) != 2)) {
                 if (GetConditionCount(mon, 3)) {
                     ServerControl_SetMonCounter(flow, mon, 3, 0);
                 }
@@ -856,12 +859,12 @@ u32 ActionOrder_Proc(BtlServerFlow *flow, ActionOrderEntry *entry) {
                 ServerControl_ActionStart(flow, mon, entry->action.bits.action);
                 BattleMon_SetTurnFlag(mon, 0);
                 switch (action.bits.action) {
-                case 6:
+                case BATTLE_ACTION_ROTATION:
                     if (BtlSetup_GetBattleStyle(flow->mainModule) == 3) {
                         ServerControl_Rotation(flow, entry->clientId, action.change.unk4);
                     }
                     break;
-                case 1:
+                case BATTLE_ACTION_FIGHT:
                     if (!flow->unk1FEC[0]) {
                         ServerControl_BeforeFirstFight(flow);
                         flow->unk1FEC[0] = TRUE;
@@ -869,32 +872,32 @@ u32 ActionOrder_Proc(BtlServerFlow *flow, ActionOrderEntry *entry) {
                     flow->unk1F7C = ServerControl_CheckObedience(flow, mon);
                     ServerControl_Fight(flow, mon, &action, entry->key & 0x3fffff);
                     break;
-                case 2:
+                case BATTLE_ACTION_ITEM:
                     if (UseBagItem(flow, mon, action.item.item, action.item.param, action.item.target) == 1 &&
                         ServerControl_EscapeCore(flow, mon, TRUE, TRUE)) {
                         flow->unk14 = 5;
                     }
                     break;
-                case 3:
+                case BATTLE_ACTION_CHANGE:
                     ServerControl_ChangePokemon(flow, mon, action.change.slot);
                     ServerControl_AfterSwitchIn(flow);
                     break;
-                case 4:
+                case BATTLE_ACTION_ESCAPE:
                     if (ServerControl_Escape(flow, mon)) {
                         flow->unk14 = 5;
                     }
                     break;
-                case 8:
+                case BATTLE_ACTION_REC_TIMEOUT:
                     flow->unk14 = 4;
                     break;
-                case 5:
+                case BATTLE_ACTION_SHIFT:
                     ServerControl_TripleShift(flow, mon);
                     break;
-                case 7:
+                case BATTLE_ACTION_SKIP:
                     ServerDisplay_MustRecharge(flow, mon);
                     break;
                 }
-                if (action.bits.action == 1 || action.bits.action == 2) {
+                if (action.bits.action == BATTLE_ACTION_FIGHT || action.bits.action == BATTLE_ACTION_ITEM) {
                     BattleMon_SetTurnFlag(mon, 1);
                     scPut_SetContFlag(flow, mon, 0);
                 }
@@ -994,14 +997,14 @@ BOOL ActionOrder_InterruptProc(BtlServerFlow *flow, u8 monId, u8 targetId) {
 
     entry = ActionOrder_SearchByMonID(flow, monId);
     if (entry != NULL) {
-        if (entry->done && BattleAction_GetAction(&entry->action) == 6) {
+        if (entry->done && BattleAction_GetAction(&entry->action) == BATTLE_ACTION_ROTATION) {
             entry = ActionOrder_SearchNextByMonID(flow, entry, monId);
         }
         if (!entry->done) {
             if (GetEncoreReplacementMove(entry->mon, &entry->action)) {
                 return FALSE;
             }
-            if (BattleAction_GetAction(&entry->action) == 6) {
+            if (BattleAction_GetAction(&entry->action) == BATTLE_ACTION_ROTATION) {
                 return FALSE;
             }
             BattleAction_ChangeFightTargetPos(&entry->action, GetBattlePos(&flow->posPoke, targetId));
@@ -7416,7 +7419,8 @@ BOOL BtlServerFlow_GetPendingAction(BtlServerFlow *flow, u8 monId, BattleAction 
     u32 i;
 
     for (i = 0; i < flow->actionOrderCount; i++) {
-        if (monId == GetMonID(flow->actionOrder[i].mon) && flow->actionOrder[i].action.bits.action != 6) {
+        if (monId == GetMonID(flow->actionOrder[i].mon) &&
+            flow->actionOrder[i].action.bits.action != BATTLE_ACTION_ROTATION) {
             *action = flow->actionOrder[i].action;
             return TRUE;
         }

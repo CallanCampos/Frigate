@@ -519,8 +519,8 @@ static void ResortWatch_CheckLists(ResortWatch *watch) {
     for (i = 0; i < JoinAvenuePersonList_GetCount(watch->list); i++) {
         JoinAvenuePerson *person = JoinAvenuePersonList_Get(watch->list, i);
         u32 value = joinAveTextHandler(person, JOIN_AVE_PARAM_STATUS, NULL);
-        if (!JoinAvenuePerson_IsEmpty(person) && value != 0) {
-            JoinAvenuePerson_SetParam(person, JOIN_AVE_PARAM_STATUS, 0);
+        if (!JoinAvenuePerson_IsEmpty(person) && value != JOIN_AVE_STATUS_NONE) {
+            JoinAvenuePerson_SetParam(person, JOIN_AVE_PARAM_STATUS, JOIN_AVE_STATUS_NONE);
             if (!watch->setup.callback(watch->setup.context, person, 2, value)) {
                 JoinAvenuePerson_SetParam(person, JOIN_AVE_PARAM_STATUS, value);
             }
@@ -529,8 +529,8 @@ static void ResortWatch_CheckLists(ResortWatch *watch) {
     for (j = 0; j < JoinAvenuePersonList_GetCount(watch->list2); j++) {
         JoinAvenuePerson *person = JoinAvenuePersonList_Get(watch->list2, j);
         u32 value = joinAveTextHandler(person, JOIN_AVE_PARAM_STATUS, NULL);
-        if (!JoinAvenuePerson_IsEmpty(person) && value != 0) {
-            JoinAvenuePerson_SetParam(person, JOIN_AVE_PARAM_STATUS, 0);
+        if (!JoinAvenuePerson_IsEmpty(person) && value != JOIN_AVE_STATUS_NONE) {
+            JoinAvenuePerson_SetParam(person, JOIN_AVE_PARAM_STATUS, JOIN_AVE_STATUS_NONE);
             if (!watch->setup.callback(watch->setup.context, person, 2, value)) {
                 JoinAvenuePerson_SetParam(person, JOIN_AVE_PARAM_STATUS, value);
             }

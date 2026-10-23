@@ -14,7 +14,7 @@ struct FestivalEventParam {
     u32 mode;
     LinkFestival *festival;
     FestMissionConfig *missionConfig;
-    void *saveBlock;
+    FunfestSave *saveBlock;
 };
 
 // The Funfest mission screen (fmission_app.c): mode 0 shows the running mission, mode 1 ends it and shows its result

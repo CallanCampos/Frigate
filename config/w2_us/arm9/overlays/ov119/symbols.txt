@@ -16,7 +16,7 @@ PlasmaFrigateLights_ShowSwitchSecondEnd kind:function(thumb,size=0x46) addr:0x02
 PlasmaFrigateLights_PlayLightSecond kind:function(thumb,size=0x14) addr:0x021ef024
 PlasmaFrigateLights_ShowLightSecondEnd kind:function(thumb,size=0x48) addr:0x021ef038
 PlasmaFrigateLights_LoopLightFirst kind:function(thumb,size=0x22) addr:0x021ef080
-data_ov119_021ef058 kind:data(any) addr:0x021ef0a4
+sLightAnimations kind:data(any) addr:0x021ef0a4
 data_ov119_021ef060 kind:data(any) addr:0x021ef0ac
 data_ov119_021ef068 kind:data(any) addr:0x021ef0b4
 data_ov119_021ef078 kind:data(any) addr:0x021ef0c4

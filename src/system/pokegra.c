@@ -18,15 +18,17 @@
 // MakeTrGraArcHandle, LoadSingleCellSpindaGraphicsByBoxData, the data and the constants
 
 // Each species' files in ARCID_POKEGRA: the front's, then the back's, then the normal and the shiny palette
-#define POKEGRA_FILE_SINGLE_CELL_CHARS 0
-#define POKEGRA_FILE_CHARS 2
-#define POKEGRA_FILE_CELLS 4
-#define POKEGRA_FILE_CELL_ANIMS 5
-#define POKEGRA_FILE_MULTI_CELLS 6
-#define POKEGRA_FILE_MULTI_CELL_ANIMS 7
-#define POKEGRA_FILE_BIN 8
-#define POKEGRA_FILE_BACK 9
-#define POKEGRA_FILE_PALETTE 18
+enum {
+    POKEGRA_FILE_SINGLE_CELL_CHARS,
+    POKEGRA_FILE_CHARS = 2,
+    POKEGRA_FILE_CELLS = 4,
+    POKEGRA_FILE_CELL_ANIMS,
+    POKEGRA_FILE_MULTI_CELLS,
+    POKEGRA_FILE_MULTI_CELL_ANIMS,
+    POKEGRA_FILE_BIN,
+    POKEGRA_FILE_BACK,
+    POKEGRA_FILE_PALETTE = 18,
+};
 #define POKEGRA_FILE_COUNT 20
 
 // The sprites after the species': an egg's and a Manaphy egg's, then the forms' with sprites of their own, then the
@@ -39,15 +41,17 @@
 #define POKEGRA_CHARS_SIZE 0x1200
 
 // Each trainer class's files in the trainer sprite archives
-#define TRGRA_FILE_CHARS_1 0
-#define TRGRA_FILE_CHARS_2 1
-#define TRGRA_FILE_CELLS 2
-#define TRGRA_FILE_CELL_ANIMS 3
-#define TRGRA_FILE_MULTI_CELLS 4
-#define TRGRA_FILE_MULTI_CELL_ANIMS 5
-#define TRGRA_FILE_BIN 6
-#define TRGRA_FILE_PALETTE 7
-#define TRGRA_FILE_COUNT 8
+enum {
+    TRGRA_FILE_CHARS_1,
+    TRGRA_FILE_CHARS_2,
+    TRGRA_FILE_CELLS,
+    TRGRA_FILE_CELL_ANIMS,
+    TRGRA_FILE_MULTI_CELLS,
+    TRGRA_FILE_MULTI_CELL_ANIMS,
+    TRGRA_FILE_BIN,
+    TRGRA_FILE_PALETTE,
+    TRGRA_FILE_COUNT,
+};
 
 typedef struct {
     u8 x;

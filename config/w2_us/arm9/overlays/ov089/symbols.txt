@@ -5,18 +5,18 @@ RoomPicker_Find kind:function(thumb,size=0x18) addr:0x021eef4c
 RoomPicker_Get kind:function(thumb,size=0x10) addr:0x021eef64
 RoomPicker_Remove kind:function(thumb,size=0x24) addr:0x021eef74
 RoomPicker_PickOrder kind:function(thumb,size=0xfc) addr:0x021eef98
-data_ov089_021ef054 kind:data(any) addr:0x021ef094
-data_ov089_021ef05a kind:data(any) addr:0x021ef09a
-data_ov089_021ef068 kind:data(any) addr:0x021ef0a8
-data_ov089_021ef070 kind:data(any) addr:0x021ef0b0
-data_ov089_021ef0ac kind:data(any) addr:0x021ef0ec
+sFirstRooms kind:data(any) addr:0x021ef094
+sStarboardRooms kind:data(any) addr:0x021ef09a
+sPortRooms kind:data(any) addr:0x021ef0a8
+sPairs kind:data(any) addr:0x021ef0b0
+sRoomSides kind:data(any) addr:0x021ef0ec
 data_ov089_021ef0f5 kind:data(any) addr:0x021ef135 ambiguous
 data_ov089_021ef105 kind:data(any) addr:0x021ef145 ambiguous
-data_ov089_021ef124 kind:data(any) addr:0x021ef164
-data_ov089_021ef1c4 kind:data(any) addr:0x021ef204
+sTrainers kind:data(any) addr:0x021ef164
+sTrainersAlt kind:data(any) addr:0x021ef204
 data_ov089_021ef211 kind:data(any) addr:0x021ef251 ambiguous
 data_ov089_021ef231 kind:data(any) addr:0x021ef271 ambiguous
-data_ov089_021ef264 kind:data(any) addr:0x021ef2a4
+sPeople kind:data(any) addr:0x021ef2a4
 data_ov089_021ef289 kind:data(any) addr:0x021ef2c9 ambiguous
 data_ov089_021ef29d kind:data(any) addr:0x021ef2dd ambiguous
 data_ov089_021ef2e1 kind:data(any) addr:0x021ef321 ambiguous

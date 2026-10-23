@@ -33,6 +33,9 @@ enum {
     TOWNMAP_PARAM_TYPE = 11,
     // Whether the player can fly there once TOWNMAP_PARAM_ARRIVAL_FLAG is set
     TOWNMAP_PARAM_FLY = 12,
+    // Where a flight to it lands
+    TOWNMAP_PARAM_WARP_X = 13,
+    TOWNMAP_PARAM_WARP_Z = 14,
     // The event flag set when the player first arrives there, or TOWNMAP_NO_FLAG
     TOWNMAP_PARAM_ARRIVAL_FLAG = 15,
     // The event flag or TOWNMAP_FLAG_* that shows it, or TOWNMAP_NO_FLAG

@@ -2,6 +2,7 @@
 #include "constants/arc.h"
 #include "constants/pokemon.h"
 #include "constants/text_banks.h"
+#include "field/battle_facility.h"
 #include "field/bsubway_scr.h"
 #include "field/wbt.h"
 #include "field/wbt_battle.h"
@@ -17,20 +18,10 @@
 #include "pml/poke_party.h"
 #include "text/system/scrcmd_bsubway_wbt_party.h"
 
-// A Pokémon of the Battle Subway's Pokémon arc
-typedef struct {
-    u16 species;
-    u16 moves[4];
-    u8 unkA;
-    u8 unkB;
-    u16 item;
-    u16 form;
-} WbtPartyPkmData;
-
 typedef struct {
     u8 available;
     u16 file;
-    WbtPartyPkmData data;
+    BSubwayPokemonData data;
 } WbtPartyChoice;
 
 typedef struct {

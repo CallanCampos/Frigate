@@ -49,6 +49,15 @@ u16 NameinKeyboard_GetWidth(const NameinKeyboard *keyboard);
 u16 NameinKeyboard_GetHeight(const NameinKeyboard *keyboard);
 u16 NameinKeyboard_GetChar(const NameinKeyboard *keyboard, u16 x, u16 y);
 
+// The word tables: the characters that take a dakuten, those that take a handakuten, and the sequences of characters
+// that compose into one
+enum {
+    NAMEIN_WORD_TABLE_DAKUTEN,
+    NAMEIN_WORD_TABLE_HANDAKUTEN,
+    NAMEIN_WORD_TABLE_COMPOSE,
+    NAMEIN_WORD_TABLE_MAX,
+};
+
 NameinWordTable *NameinData_LoadWordTable(u32 index, HeapID heapId);
 void NameinData_FreeWordTable(NameinWordTable *table);
 // The four spellings of a word, copied to dest with at most n characters. len gets how many characters before the first

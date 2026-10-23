@@ -39,12 +39,12 @@ PdcMsgFade_StartIn kind:function(thumb,size=0x4c) addr:0x0219a498
 PdcMsgFade_Update kind:function(thumb,size=0x98) addr:0x0219a4e4
 PDC_PROC_FUNCTIONS kind:data(any) addr:0x0219a57c
 data_ov172_0219a548 kind:data(any) addr:0x0219a588
-data_ov172_0219a550 kind:data(any) addr:0x0219a590
-data_ov172_0219a558 kind:data(any) addr:0x0219a598
-data_ov172_0219a560 kind:data(any) addr:0x0219a5a0
+sButtonFlags kind:data(any) addr:0x0219a590
+sButtonFlashRows kind:data(any) addr:0x0219a598
+sButtonSet kind:data(any) addr:0x0219a5a0
 data_ov172_0219a56c kind:data(any) addr:0x0219a5ac
 data_ov172_0219a578 kind:data(any) addr:0x0219a5b8
-data_ov172_0219a588 kind:data(any) addr:0x0219a5c8
+sKeyStops kind:data(any) addr:0x0219a5c8
 data_ov172_0219a5a0 kind:data(any) addr:0x0219a5e0
 data_ov172_0219a5bc kind:data(any) addr:0x0219a5fc
 data_ov172_0219a5ec kind:data(any) addr:0x0219a62c

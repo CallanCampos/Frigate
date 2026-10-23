@@ -465,7 +465,7 @@ static BOOL SetupActorMessageWindow(FieldScriptEnv *env, StrBuf *strbuf, u16 act
     u16 winPos = pos;
     ScriptFieldWork *fieldWork = ScriptWork_GetFieldWork(FieldScriptEnv_GetScriptWork(env));
     MMSys *mmSys = GetScrEnvMMdlSys(env);
-    FieldActor *player = FindFieldActor(mmSys, 0xff);
+    FieldActor *player = FindFieldActor(mmSys, ACTOR_UID_PLAYER);
     FieldActor *actor = FindFieldActor(mmSys, actorId);
     ScriptActorWork *actorWork;
     VecFx32 actorPos;
@@ -486,7 +486,7 @@ static BOOL SetupActorMessageWindow(FieldScriptEnv *env, StrBuf *strbuf, u16 act
             winPos = ActorMsgWin_CalcWinPosAuto(player, &actorPos);
         }
         func_ov036_021a8c00(winPos, &type, &tail);
-        actorWork->winX = type;
+        actorWork->winType = type;
         ActorMsgWin_SetPosActual(env, winPos);
         ActorMsgWin_SetPos(env, pos);
         ActorMsgWin_CalcAttachmentPos(env, TRUE);
@@ -618,7 +618,7 @@ BOOL s0087_TrainerSayMessage(VM *vm, FieldScriptEnv *env) {
     }
     TrainerMsg_Load(trainerId, msgType, strbuf, FieldScriptEnv_GetHeapID(env));
     if (FindFieldActor(GetScrEnvMMdlSys(env), actorId) == NULL) {
-        actorId = 0xff;
+        actorId = ACTOR_UID_PLAYER;
     }
     actorWork = GetFieldScriptActorWk(env);
     type = ACTOR_MSG_WIN_TOP;
@@ -632,7 +632,7 @@ BOOL s0087_TrainerSayMessage(VM *vm, FieldScriptEnv *env) {
     if (winPos != MSG_WIN_POS_TOP) {
         type = ACTOR_MSG_WIN_BOTTOM;
     }
-    actorWork->winX = type;
+    actorWork->winType = type;
     ActorMsgWin_CalcAttachmentPos(env, TRUE);
     ActorMsgWin_CreateWindow(env, fieldWork->msgBGSys, type, &actorWork->pos, strbuf, TALKMSG_WIN_FRAME_NORMAL,
                              TALKMSG_WIN_TAIL_NONE);

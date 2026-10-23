@@ -599,7 +599,7 @@ void GtsNegoDisp_HideSearchMenu(GtsNegoDisp *disp) {
 // The touch bar with its return button, its icons in an OBJ palette
 void GtsNegoDisp_CreateTouchBar(GtsNegoDisp *disp, u32 objPalette) {
     TouchBarItem items[] = {
-        { 1, { 232, 168 } },
+        { TOUCHBAR_ICON_RETURN, { 232, 168 } },
     };
     TouchBarSetup setup;
 

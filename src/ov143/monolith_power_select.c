@@ -61,9 +61,6 @@ typedef enum {
     MONOLITH_POWER_ID_COUNT = PASS_POWER_COUNT,
 } MonolithPowerId;
 
-// What CheckPassPowerUnlocked returns for a pass power that isn't shown
-#define PASS_POWER_LOCKED 2
-
 // The rows of the list on the screen, each 32 pixels tall
 #define MONOLITH_POWER_ROW_COUNT 7
 #define MONOLITH_POWER_ROW_HEIGHT 32

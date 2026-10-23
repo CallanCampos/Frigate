@@ -15,23 +15,12 @@
 #include "system/game_event.h"
 #include "system/game_system.h"
 
-typedef struct HeightExEntry {
-    s32 x;
-    s32 z;
-    s32 width;
-    s32 depth;
-    s32 value;
-    BOOL inUse;
-    s32 flags;
-} HeightExEntry;
-
 struct HeightExList {
     s32 count;
     HeightExEntry *entries;
 };
 
 GameEventReturnCode func_ov036_021ba6dc(GameEvent *event, u32 *state, void *data);
-u32 func_ov036_021ba684(void *a0);
 BOOL func_ov036_021ba804(GameProc *proc, u32 *state, void *param, void *work);
 BOOL func_ov036_021ba808(GameProc *proc, u32 *state, void *param, void *work);
 BOOL func_ov036_021ba80c(GameProc *proc, u32 *state, void *param, void *work);
@@ -39,7 +28,7 @@ BOOL func_ov036_021ba80c(GameProc *proc, u32 *state, void *param, void *work);
 const GameProcFunctions data_ov036_021d1760 = { func_ov036_021ba804, func_ov036_021ba808, func_ov036_021ba80c };
 GameEventReturnCode func_ov036_021ba77c(GameEvent *event, u32 *state, void *data);
 
-void *func_ov036_021ba5d0(u32 count, u8 heapId) {
+HeightExList *func_ov036_021ba5d0(u32 count, u8 heapId) {
     u8 i = 0;
     HeightExList *list = GFL_HeapAllocate(heapId, sizeof(HeightExList), FALSE, "height_ex.c", 90);
 
@@ -51,9 +40,7 @@ void *func_ov036_021ba5d0(u32 count, u8 heapId) {
     return list;
 }
 
-void func_ov036_021ba624(u8 index, u32 x, u32 z, u32 width, u32 depth, u32 value, u32 flags, void *listPtr) {
-    HeightExList *list = listPtr;
-
+void func_ov036_021ba624(u8 index, u32 x, u32 z, u32 width, u32 depth, u32 value, u32 flags, HeightExList *list) {
     if (index < list->count) {
         if (list->entries[index].inUse == FALSE) {
             list->entries[index].x = x;
@@ -72,8 +59,8 @@ void func_ov036_021ba670(HeightExList *list) {
     GFL_HeapFree(list);
 }
 
-u32 func_ov036_021ba684(void *a0) {
-    return *(u32 *)a0;
+u32 func_ov036_021ba684(HeightExList *list) {
+    return list->count;
 }
 
 BOOL func_ov036_021ba688(s32 x, s32 z, HeightExList *list, u8 index) {

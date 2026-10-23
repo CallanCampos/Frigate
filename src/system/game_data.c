@@ -14,6 +14,7 @@
 #include "field/player_state.h"
 #include "field/unity_tower.h"
 #include "field/zone.h"
+#include "gfl/backup_system.h"
 #include "gfl/heap.h"
 #include "gfl/random.h"
 #include "gfl/sound.h"
@@ -50,16 +51,6 @@
 // of the save's blocks that the report writes back. Names from swan (https://github.com/ds-pokemon-hacking/swan,
 // GPL-3.0) where the functions have them; the fields' names are ours
 
-#define SAVE_BLOCK_BAG 0x19
-#define SAVE_BLOCK_PARTY 0x1a
-#define SAVE_BLOCK_RECORDS 0x26
-#define SAVE_BLOCK_FIELD_ACTORS 0x29
-#define SAVE_BLOCK_MUSICAL 0x2a
-#define SAVE_BLOCK_EVENT_WORK 0x2d
-#define SAVE_BLOCK_STRENGTH_ROCKS 0x33
-#define SAVE_BLOCK_40 0x40
-#define SAVE_BLOCK_TRADED_POKEMON 0x41
-
 // The players of the game data: the four of a communication, by net ID, then the player's own
 #define GAME_DATA_PLAYER_MAX 5
 #define GAME_DATA_PLAYER_MINE 4
@@ -76,11 +67,6 @@
 // The respawn locations of Black City and White Forest
 #define RETURN_LOCATION_BLACK_CITY 15
 #define RETURN_LOCATION_WHITE_FOREST 16
-
-#define SAVE_STATUS_NEW 1
-// What the stepwise save returns once it ends
-#define SAVE_RESULT_OK 2
-#define SAVE_RESULT_NG 3
 
 #define SLEEP_BLOCK_SAVE 0x80
 #define SOFT_RESET_BLOCK_SAVE 0x2
@@ -287,11 +273,11 @@ PlayerState *GameData_GetPlayerState(GameData *gameData) {
     return &gameData->playerStates[GAME_DATA_PLAYER_MINE];
 }
 
-void *GameData_GetPassPowerLevels(GameData *gameData, u32 netId) {
+PassPowerLevel *GameData_GetPassPowerLevels(GameData *gameData, u32 netId) {
     return &gameData->levels[netId];
 }
 
-void *GameData_GetMyPassPowerLevels(GameData *gameData) {
+PassPowerLevel *GameData_GetMyPassPowerLevels(GameData *gameData) {
     return GameData_GetPassPowerLevels(gameData, GAME_DATA_LEVELS_MINE);
 }
 
@@ -693,7 +679,7 @@ static void GameData_LoadBackup(GameData *gameData) {
     PlayerSave *playerSave;
     WifiList *wifiList;
 
-    if (SaveControl_GetStatus(gameData->saveControl) == SAVE_STATUS_NEW) {
+    if (SaveControl_GetStatus(gameData->saveControl) == TRUE) {
         return;
     }
 
@@ -910,7 +896,7 @@ WbtSystem **GameData_GetWbtSystemPtr(GameData *gameData) {
     return &gameData->wbtSystem;
 }
 
-void *GameData_GetWbtSave(GameData *gameData) {
+WbtSave *GameData_GetWbtSave(GameData *gameData) {
     return TrialHouseSave_GetWbtSave(gameData->saveControl);
 }
 

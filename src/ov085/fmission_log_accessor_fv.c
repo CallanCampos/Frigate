@@ -74,7 +74,7 @@ int FMissionLogFV_PushEntry(FestMissionLog *log, FestMissionLogEntry *entry) {
 BOOL FMissionLogFV_GetEntry(FestMissionLog *log, FestMissionLogEntry *dest, int offset) {
     FestMissionLogEntry *entry = &log->entries[FMissionLogFV_GetIndex(log, offset)];
 
-    if (entry->kind == 0) {
+    if (entry->kind == LOG_KIND_NONE) {
         return FALSE;
     }
     *dest = *entry;

@@ -20,7 +20,7 @@
 BOOL s0279_FunfestBGMReturn(VM *vm, FieldScriptEnv *env) {
     ScriptWork *scriptWork = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
-    void *gimmick = Field_GetFesGimmick(GSYS_GetField(gsys));
+    FesGimmick *gimmick = Field_GetFesGimmick(GSYS_GetField(gsys));
     LinkFestival *festival = GSYS_GetLinkFestival(gsys);
     u32 bgm;
 
@@ -53,7 +53,7 @@ BOOL s0277_FunfestActorDelete(VM *vm, FieldScriptEnv *env) {
     Field *field = GSYS_GetField(gsys);
     u16 zoneId = GetScriptEnvZoneID(env);
     u8 actorIndex = GetActorUID(ScriptWork_GetParentActor(scriptWork)) - 0xec;
-    void *gimmick = Field_GetFesGimmick(field);
+    FesGimmick *gimmick = Field_GetFesGimmick(field);
 
     if (!FesGimmick_IsCurrent(gimmick, 5)) {
         return TRUE;
@@ -65,7 +65,7 @@ BOOL s0277_FunfestActorDelete(VM *vm, FieldScriptEnv *env) {
 BOOL s027A_FunfestGetGenericInfo(VM *vm, FieldScriptEnv *env) {
     ScriptWork *scriptWork = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
-    void *gimmick = Field_GetFesGimmick(GSYS_GetField(gsys));
+    FesGimmick *gimmick = Field_GetFesGimmick(GSYS_GetField(gsys));
     u16 param = ScriptReadAny(vm, env);
     u16 *result = ScriptReadVar(vm, env);
 
@@ -80,7 +80,7 @@ BOOL s027A_FunfestGetGenericInfo(VM *vm, FieldScriptEnv *env) {
 BOOL s027B_FunfestGetItemExchangeInfo(VM *vm, FieldScriptEnv *env) {
     ScriptWork *scriptWork = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
-    void *gimmick = Field_GetFesGimmick(GSYS_GetField(gsys));
+    FesGimmick *gimmick = Field_GetFesGimmick(GSYS_GetField(gsys));
     u16 arg0 = ScriptReadAny(vm, env);
     u16 arg1 = ScriptReadAny(vm, env);
     u16 *out0 = ScriptReadVar(vm, env);
@@ -97,7 +97,7 @@ BOOL s027B_FunfestGetItemExchangeInfo(VM *vm, FieldScriptEnv *env) {
 BOOL s027C_FunfestGetItemSaleInfo(VM *vm, FieldScriptEnv *env) {
     ScriptWork *scriptWork = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
-    void *gimmick = Field_GetFesGimmick(GSYS_GetField(gsys));
+    FesGimmick *gimmick = Field_GetFesGimmick(GSYS_GetField(gsys));
     u16 *out0 = ScriptReadVar(vm, env);
     u16 *out1 = ScriptReadVar(vm, env);
 
@@ -112,7 +112,7 @@ BOOL s027C_FunfestGetItemSaleInfo(VM *vm, FieldScriptEnv *env) {
 
 BOOL s027D_FunfestGetPokemonQuizInfo(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys;
-    void *gimmick;
+    FesGimmick *gimmick;
     u16 *out0;
     u16 *out1;
     u16 *out2;
@@ -135,7 +135,7 @@ BOOL s027D_FunfestGetPokemonQuizInfo(VM *vm, FieldScriptEnv *env) {
 
 BOOL s027E_FunfestGetPokemonQuizSpecies(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys;
-    void *gimmick;
+    FesGimmick *gimmick;
     u16 index;
     u16 *result;
 
@@ -155,7 +155,7 @@ BOOL s027E_FunfestGetPokemonQuizSpecies(VM *vm, FieldScriptEnv *env) {
 
 BOOL s027F_FunfestGetPokemonQuizBogusSpecies(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys;
-    void *gimmick;
+    FesGimmick *gimmick;
     u16 index;
     u16 *result;
 

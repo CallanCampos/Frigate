@@ -10,6 +10,32 @@
 #define ACMD(code, count) (((count) << 16) | (code))
 #define ACMD_END 0xfe
 
+// The action commands, by their index in ACTOR_ACTION_COMMAND_TABLES. Most come in four, one for each direction, from
+// the one for DIR_UP named here (GetAcmdForDir adds the direction). The walks take 32 to 2 frames a tile and the walks
+// on the spot as long (swan's ACMD_WALK*_TABLE and ACMD_TURN*_TABLE); the jumps go 1 and 2 tiles. Our names
+enum {
+    ACMD_FACE = 0x00,
+    ACMD_WALK_32F = 0x04,
+    ACMD_WALK_16F = 0x08,
+    ACMD_WALK_8F = 0x0c,
+    ACMD_WALK_4F = 0x10,
+    ACMD_WALK_2F = 0x14,
+    ACMD_STAY_WALK_32F = 0x18,
+    ACMD_STAY_WALK_16F = 0x1c,
+    ACMD_STAY_WALK_8F = 0x20,
+    ACMD_STAY_WALK_4F = 0x24,
+    ACMD_STAY_WALK_2F = 0x28,
+    ACMD_JUMP_1 = 0x34,
+    ACMD_JUMP_2 = 0x38,
+    // The "!" bubble over the actor (fldeff_gyoe.c's kind 0) with its sound; one command, for no direction
+    ACMD_GYOE = 0x4b,
+    ACMD_WALK_UPHILL_4F = 0x4c,
+    ACMD_DASH = 0x58,
+    ACMD_BIKE_DEEP_SAND = 0x9b,
+    ACMD_DASH_UPHILL = 0xa3,
+    ACMD_WALK_UPHILL_8F = 0xa7,
+};
+
 FieldAcmdTCB *FieldAcmdTCB_Create(FieldActor *actor, const u32 *action);
 FieldAcmdTCB *FieldAcmdTCB_CreateWalkOneTile(FieldActor *actor, u32 direction);
 BOOL FieldAcmdTCB_CheckEnded(FieldAcmdTCB *task);

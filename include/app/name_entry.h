@@ -12,24 +12,26 @@
 
 // What the name entry is for. The mode is also the number of the message that asks for the name (the text bank of
 // namein.c)
-#define NAME_ENTRY_PLAYER 0
-#define NAME_ENTRY_POKEMON 1
-#define NAME_ENTRY_BOX 2
-#define NAME_ENTRY_RIVAL 3
-#define NAME_ENTRY_FRIEND 4
-#define NAME_ENTRY_GREETING 5
-#define NAME_ENTRY_THANKS 6
-#define NAME_ENTRY_PASSERBY_MESSAGE 7
-#define NAME_ENTRY_AVENUE_NAME 8
-#define NAME_ENTRY_AVENUE_TITLE 9
-#define NAME_ENTRY_FAVORITE_PHRASE 10
-// The Plasma Frigate's password
-#define NAME_ENTRY_PLASMA_PASSWORD 11
-#define NAME_ENTRY_GAME_SYNC_ID 12
-#define NAME_ENTRY_IMPRESSED 13
-#define NAME_ENTRY_TRAINER_MESSAGE 14
-#define NAME_ENTRY_HAPPY_MESSAGE 15
-#define NAME_ENTRY_POKEMON_RENAME 16
+enum {
+    NAME_ENTRY_PLAYER,
+    NAME_ENTRY_POKEMON,
+    NAME_ENTRY_BOX,
+    NAME_ENTRY_RIVAL,
+    NAME_ENTRY_FRIEND,
+    NAME_ENTRY_GREETING,
+    NAME_ENTRY_THANKS,
+    NAME_ENTRY_PASSERBY_MESSAGE,
+    NAME_ENTRY_AVENUE_NAME,
+    NAME_ENTRY_AVENUE_TITLE,
+    NAME_ENTRY_FAVORITE_PHRASE,
+    // The Plasma Frigate's password
+    NAME_ENTRY_PLASMA_PASSWORD,
+    NAME_ENTRY_GAME_SYNC_ID,
+    NAME_ENTRY_IMPRESSED,
+    NAME_ENTRY_TRAINER_MESSAGE,
+    NAME_ENTRY_HAPPY_MESSAGE,
+    NAME_ENTRY_POKEMON_RENAME,
+};
 
 typedef struct {
     u32 mode;
@@ -38,10 +40,10 @@ typedef struct {
     // The Pokémon's form, and its sex in the high byte
     u16 unk6;
     PartyPkm *pkm;
-    // A StrBuf (as an integer) that the Pokémon name entry formats and prints once the name is given, if not 0, and the
-    // box data and the number of the box, which it names
-    u32 unkC;
-    u32 unk10;
+    // A StrBuf that the Pokémon name entry formats and prints once the name is given, if not NULL, and the box data and
+    // the number of the box, which it names
+    StrBuf *unkC;
+    void *unk10;
     u32 unk14;
     u32 maxLength;
     // 1 when the name is to be left as it was
@@ -66,8 +68,8 @@ NameEntryParam *setupNameEntry(HeapID heapId, u32 mode, u32 a2, u32 a3, u32 maxL
 // The name entry for a Pokémon's nickname
 NameEntryParam *setupPokemonNameEntry(HeapID heapId, PartyPkm *pkm, u32 maxLength, const StrBuf *name,
                                       TrainerGameInfoSave *gameInfo);
-NameEntryParam *pokemonNameEntry(HeapID heapId, PartyPkm *pkm, u32 maxLength, const StrBuf *name, u32 unkC, u32 unk10,
-                                 u32 unk14, TrainerGameInfoSave *gameInfo);
+NameEntryParam *pokemonNameEntry(HeapID heapId, PartyPkm *pkm, u32 maxLength, const StrBuf *name, StrBuf *unkC,
+                                 void *unk10, u32 unk14, TrainerGameInfoSave *gameInfo);
 void NameEntryParam_Free(NameEntryParam *param);
 // Copies the entered name, and compares it with a string
 void NameEntryParam_GetName(NameEntryParam *param, StrBuf *dest);
