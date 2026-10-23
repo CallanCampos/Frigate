@@ -33,30 +33,37 @@ level that doesn't exist yet says "not yet"; no field is left out.
 - **Port:** `PORT_SHA` on `port-ptrcast-guard`, [PR 17](https://github.com/CallanCampos/Frigate/pull/17), from `main`
   `8ca29313d1`, with `main` merged in three times as it moved while the PR was open (`72749b5a0d`, `bfd5d788b5`,
   `a4648fce71`).
-- **ROM:** `python3 configure.py && ninja` at each commit and after each merge of `main`: both SHA1s match (Black 2
-  `e51e6dfb8`, White 2 `b5d7490be`). The typedef change's proof is in [game-changes.md](game-changes.md):
-  `check_mwcc_neutral.py` 3,556 of 3,556 file and version pairs identical, and `compiler_probe.py --compilers 1.1p1
-  --mismatches` on the 94 incomplete files the same before and after in both versions (273 mismatched functions in
-  each), on `8ca29313d1` and again after each merge of `main`.
+- **ROM:** `python3 configure.py && ninja` at each commit and after each merge of `main`, the review's fixes (which
+  change no game file) included: both SHA1s match (Black 2 `e51e6dfb8`, White 2 `b5d7490be`). The typedef change's
+  proof is in [game-changes.md](game-changes.md): `check_mwcc_neutral.py` 3,556 of 3,556 file and version pairs
+  identical, and `compiler_probe.py --compilers 1.1p1 --mismatches` on the 94 incomplete files the same before and
+  after in both versions (273 mismatched functions in each), on `8ca29313d1` and again after each merge of `main`.
 - **Host build:** macOS arm64, Apple clang 21, RelWithDebInfo, both versions (`build/port`, `build/port-w2`); a
   configure-only tree with Homebrew clang 23 for the guard's keys. CI on PR 17: [run
   40014141292](https://github.com/CallanCampos/Frigate/actions/runs/40014141292) at `0c643cb758`, the last head with
   code, passes every job: the macOS, Linux and Windows host builds, both sanitized builds and the four macOS
   distribution builds; `game_ptrcasts` passes in the macOS and Linux jobs (Apple clang 17 and 21, arm64 and x86_64, and
   Ubuntu's clang 21.1.8) and skips on Windows, as designed. The first run, at `bb2fca07a8`, failed in the Windows job on
-  the guard's own test, which expected findings where the guard skips; `968fc4b556` makes it skip there too.
+  the guard's own test, which expected findings where the guard skips; `968fc4b556` makes it skip there too. CI on the
+  head with the review's fixes is in the PR.
 - **Tests:** full `ctest` on `0c643cb758` with the oracle and the cached saves copied from the verify tree. Black 2: 304
   tests, 293 passed, 1 skipped (`app_universal_slices`), 10 failed, the 10 below that fail on `main` too. White 2: 301
   tests, 290 passed, 1 skipped (`app_universal_slices`), the same 10 failed. `game_ptrcasts` and `game_ptrcasts_tool`
   pass in both versions, and `upstream_sync.py`'s 14 tests pass. Earlier runs on this branch, before the merges of
   `main`, gave the same failures; under a load of 40 to 60 the timing routes `frame_times_title` and
-  `frame_times_new_game` skipped as designed in some of them and passed in the others and alone. T3 is in that run; T4 is its oracle tests; T5 ran in CI's
-  sanitized jobs only; T7 not run.
+  `frame_times_new_game` skipped as designed in some of them and passed in the others and alone. T3 is in that run; T4
+  is its oracle tests; T5 ran in CI's sanitized jobs only; T7 not run. Again after the review's fixes: Black 2, 304
+  tests, 292 passed, 2 skipped (`app_universal_slices`, and `frame_times_title` under a load of about 58, which passed
+  alone), the same 10 failed; White 2, 301 tests, 290 passed, 1 skipped, the same 10 failed.
 - **Tiers:** not remeasured: no C that MWCC compiles changed (the typedefs are host-only).
 - **Trap stubs:** unchanged, 31 functions and 22 data placeholders in each version (`gen/stubs.c`), before and after the
   merges.
-- **64-bit warnings:** the pointer cast guard, now T1's measurement: `check_ptrcasts: 389 sites in 250 keys (real 159,
-  harmless 99, handled 96, unreachable 35)`, the same in both versions and with Apple clang 21 and Homebrew clang 23.
+- **64-bit warnings:** the pointer cast guard, now T1's measurement: `check_ptrcasts: 431 sites in 276 keys (real 152,
+  harmless 101, handled 141, unreachable 37)`, the same in both versions and with Apple clang 21 and Homebrew clang 23.
+  Before the review it was 389 sites in 250 keys (real 159): R13's 7 sites, GX's extended palettes, are `handled`, since
+  `port/cmake/gx.cmake` renames those functions and `port/hal/gx/gx_load2d_extpltt.c` replaces them; the 42 sites more
+  are the 13 decomp files that compile only through `port/hal`'s wrappers (`os_thread.c`, `nvram.c`,
+  `snd_interface.c`), handled, harmless or unreachable, none real.
   The last entry's measure, reproduced with the configured commands and `-isystem` kept: on `8ca29313d1` the game 161
   and the libraries 231 instances, as it said; on this head, after PRs 14, 15 and 16, 99 and 214. PR 7's "libraries'
   218" was the same warnings counted as distinct sites on Linux at its base (its description: 452 to 379 distinct, the
@@ -76,11 +83,19 @@ level that doesn't exist yet says "not yet"; no field is left out.
   scratch copy with these typedefs, passed the guard with the first baseline, its typed `NameEntryParam` removing the
   six R08 rows. PR 14 retyped Join Avenue's getters and setters to `uptr`, and the guard found what it left: overlay
   137's function types still `u32` (8 `fn-cast` sites, real), two callers that still cut a name with `(u32)` (real), and
-  the setters' numbers and one sum (harmless). PR 15 fixed 30 rows and brought no new one.
+  the setters' numbers and one sum (harmless). PR 15 fixed 30 rows and brought no new one. After the PR's review: the
+  guard checks the decomp files that `port/hal`'s wrappers compile by `#include` (`gfl_use.c` and twelve SDK files,
+  which it didn't see), counts nothing in `port/`, first proves on a sample with each set of the build's flags that it
+  reads every kind back (a `-w` had left it passing with nothing found), fails rather than skips where the build can
+  run it (`--require`, from `port/cmake/game.cmake`), and pairs a rename only when the old name is gone, so that a cast
+  fixed in one function can't let a new one in another pass; its own test covers each, and the build's `-Wno-` flags
+  and `-isystem`. R13 is `handled`. ADR 0019 and SYNC.md say what it still can't see: an explicit `(u32)(uptr)p`, a
+  site moved within one key, a count a fix left until `--update`, and a cast under `WHITE2` alone in CI, which builds
+  Black 2 only.
 - **Next:** fix the field's real rows, R02, R04 and R05 (17 sites: the shortcut menu, the field-move cut-in's palette,
   overlay 137's `ResortPerson` function types and the two Join Avenue callers), in a feature PR with their game-changes
   rows, leaving `fld3d_ci.c`'s cut-in palette to the battle-path track, which changes that file. Then battle (R06) and
-  the menus and apps (R09, R11, R13 to R17).
+  the menus and apps (R09, R11, R14 to R17).
 - **Blockers:** none for the guard. As on `main`: the field heap stops CONTINUE and New Game at the field's entry
   (`OS_Terminate` in `FieldmapProc_Init` at frame 3436), so the oracle and launcher tests that reach it fail
   (`oracle_continue`, `oracle_continue_starter`, `oracle_launch_field_menus`, `oracle_launch_party_menus`,

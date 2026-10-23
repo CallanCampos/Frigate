@@ -1,12 +1,17 @@
 #!/usr/bin/env python3
 """The pointer cast guard's own test (port/tools/check_ptrcasts.py, the test game_ptrcasts_tool of
-port/cmake/game.cmake). It touches no game functionality: it builds a small tree of its own under WORKDIR, a src/ and
-lib/ with a few casts and a compile database for CC, and checks what the guard says about it: a new finding fails with
-its site and the two ways out, --update writes rows to classify, a classified baseline passes, a count above the
-baseline fails, a renamed function passes as a rename, a finding gone passes with a note, a narrowed uptr counts where a
-narrowed unsigned long or a getter's result as it is stored doesn't, a function pointer cast that pairs a pointer or a
-uptr with an int counts where one between pointers doesn't, a host variant of a header (gen/hwinclude) is reported as
-the header it was made from, a file that doesn't compile fails, and a build without a compile database skips (77).
+port/cmake/game.cmake). It touches no game functionality: it builds a small tree of its own under WORKDIR, a src/,
+lib/ and port/ with a few casts and a compile database for CC whose commands carry what the host build's do (the four
+-Wno- flags of the cast warnings, the decomp's headers as -isystem), and checks what the guard says about it: a new
+finding fails with its site and the two ways out, --update writes rows to classify, a classified baseline passes, a
+count above the baseline fails, a renamed function, type or file passes as a rename, a cast fixed in one function and
+added in another of the same file doesn't, nor does a type changed to one that still exists, a finding gone passes with
+a note, a narrowed uptr counts where a narrowed unsigned long or a getter's result as it is stored doesn't, a function
+pointer cast that pairs a pointer or a uptr with an int counts where one between pointers doesn't, a header reached
+through -isystem is checked, a host variant of a header (gen/hwinclude) is reported as the header it was made from, a
+decomp file that a port/ wrapper compiles by #include is checked and the wrapper's own code isn't, a flag or a #pragma
+that hides the warnings fails rather than passing with nothing found, a file that doesn't compile fails, and a build
+without a compile database skips (77), or fails with --require.
 
     test_check_ptrcasts.py CC WORKDIR
 
@@ -41,6 +46,17 @@ Task *GiveTask(u32 value) {
 }
 """
 
+# Two functions of one file, for the check that a cast fixed in one can't pass for one added in the other
+PAIR = """
+u32 First(void *work) {{
+    {first}
+}}
+
+u32 Second(void *work) {{
+    {second}
+}}
+"""
+
 failures = []
 
 
@@ -71,9 +87,13 @@ def main() -> int:
     def write(name: str, text: str):
         (work / name).write_text(text)
 
-    def database(*files: str):
+    def database(*files: str, flags: str = ""):
+        # The host build's commands for the game's C: the cast warnings silenced, the decomp's headers -isystem
+        silenced = ("-Wno-pointer-to-int-cast -Wno-int-to-pointer-cast -Wno-void-pointer-to-int-cast "
+                    "-Wno-int-to-void-pointer-cast")
         entries = [{"directory": str(work), "file": f,
-                    "command": f"{cc} -std=gnu99 -I gen/hwinclude -c {f} -o {Path(f).stem}.o"} for f in files]
+                    "command": f"{cc} -std=gnu99 {silenced} -I gen/hwinclude -isystem lib/x/include -I . {flags} "
+                               f"-c {f} -o {Path(f).stem}.o"} for f in files]
         (work / "compile_commands.json").write_text(json.dumps(entries))
 
     def run(*extra: str) -> tuple[int, str]:
@@ -91,9 +111,12 @@ def main() -> int:
             out.append("\t".join(fields))
         baseline.write_text("\n".join(out) + "\n")
 
-    # No compile database: skip
+    # No compile database: skip, or fail where the build says the check can run
     status, output = run()
     check(status == 77, "a build without compile_commands.json skips", output)
+    status, output = run("--require")
+    check(status == 1 and "doesn't skip" in output, "with --require, a build without compile_commands.json fails",
+          output)
 
     # On Windows the guard skips whatever the tree holds: check that it does, and skip the rest
     if os.name == "nt" or sys.platform in ("win32", "cygwin", "msys"):
@@ -142,6 +165,43 @@ def main() -> int:
     status, output = run()
     check(status == 0 and "no longer found" in output and "GiveTask" in output, "a finding gone passes", output)
     run("--update")
+
+    # A cast fixed in one function and another added in a second function that still has its name is not a rename
+    write("src/a.c", TYPES + PAIR.format(first="return (u32)work;", second="return 0;"))
+    run("--update")
+    classify_all("harmless")
+    write("src/a.c", TYPES + PAIR.format(first="return 0;", second="return (u32)work;"))
+    status, output = run()
+    check(status == 1 and "new: src/a.c in Second: ptr-to-int (u32 <- void *)" in output and "renamed" not in output,
+          "a cast fixed in one function can't pass for a new one in another", output)
+
+    # A type renamed passes, with a note; a type changed to one that still exists doesn't
+    write("src/a.c", TYPES + "typedef struct OldWork OldWork;\n\nu32 Keep(OldWork *work) {\n    return (u32)work;\n}\n")
+    run("--update")
+    classify_all("harmless")
+    write("src/a.c", TYPES + "typedef struct NewWork NewWork;\n\nu32 Keep(NewWork *work) {\n    return (u32)work;\n}\n")
+    status, output = run()
+    check(status == 0 and "renamed" in output and "(u32 <- NewWork *)" in output, "a renamed type passes", output)
+    write("src/a.c", TYPES + "typedef struct OldWork OldWork;\ntypedef struct NewWork NewWork;\n\n"
+          "u32 Keep(NewWork *work) {\n    return (u32)work;\n}\n")
+    status, output = run()
+    check(status == 1 and "new: src/a.c in Keep: ptr-to-int (u32 <- NewWork *)" in output,
+          "a type changed to one that still exists isn't a rename", output)
+
+    # A file renamed passes, with a note; the same function in a new file while the old one still names it doesn't
+    write("src/a.c", TYPES + "typedef struct NewWork NewWork;\n\nu32 Keep(NewWork *work) {\n    return (u32)work;\n}\n")
+    run("--update")
+    (work / "src/a.c").rename(work / "src/c.c")
+    database("src/c.c")
+    status, output = run()
+    check(status == 0 and "renamed" in output and "src/c.c in Keep" in output, "a renamed file passes", output)
+    write("src/a.c", TYPES + "u32 Keep(void *work);\n")
+    database("src/a.c", "src/c.c")
+    status, output = run()
+    check(status == 1 and "new: src/c.c in Keep" in output,
+          "a function in a new file while the old file still names it isn't a rename", output)
+    (work / "src/c.c").unlink()
+    database("src/a.c")
 
     # A narrowed uptr counts, a narrowed unsigned long doesn't, nor does a getter's result narrowed as it is stored
     write("src/a.c", TYPES + """
@@ -216,6 +276,38 @@ void CallAll(WorkCallback callback, IntCallback numbers) {
     check(status == 1 and "lib/x/include/x.h in AddressOf: ptr-to-int" in output
           and "lib/x/include/x.h:2  return (unsigned int)p;" in output,
           "a host variant of a header is reported as the header it was made from", output)
+
+    # A header reached through -isystem, as the host build reaches the decomp's, is checked
+    write("lib/x/include/y.h", "static inline unsigned int CutOf(void *p) {\n    return (unsigned int)p;\n}\n")
+    write("src/a.c", "#include <y.h>\n")
+    status, output = run()
+    check(status == 1 and "lib/x/include/y.h in CutOf: ptr-to-int" in output,
+          "a header reached through -isystem is checked", output)
+
+    # A decomp file that a port/ wrapper compiles by #include is checked, as the decomp's; the wrapper's own code isn't
+    (work / "lib/x/src").mkdir(parents=True)
+    (work / "port/hal").mkdir(parents=True)
+    write("lib/x/src/w.c", "unsigned int Wrapped(void *p) {\n    return (unsigned int)p;\n}\n")
+    write("port/hal/w_host.c", '#include "lib/x/src/w.c"\n\nunsigned int HostOnly(void *p) {\n'
+          "    return (unsigned int)p;\n}\n")
+    write("src/a.c", TYPES)
+    database("src/a.c", "port/hal/w_host.c")
+    status, output = run()
+    check(status == 1 and "new: lib/x/src/w.c in Wrapped: ptr-to-int" in output and "HostOnly" not in output,
+          "a wrapped decomp file is checked, and the wrapper's own code isn't", output)
+
+    # A flag or a pragma that hides the warnings fails, rather than passing with nothing found
+    write("src/a.c", FIRST)
+    database("src/a.c", flags="-w")
+    status, output = run()
+    check(status == 1 and "can't see what it checks" in output and "sites in" not in output,
+          "-w in the build's commands fails", output)
+    write("lib/x/include/quiet.h", '#pragma clang diagnostic ignored "-Wvoid-pointer-to-int-cast"\n')
+    database("src/a.c", flags="-include lib/x/include/quiet.h")
+    status, output = run()
+    check(status == 1 and "can't see what it checks" in output and "no ptr-to-int" in output,
+          "a forced include's pragma that hides a kind fails", output)
+    database("src/a.c")
 
     # A file that doesn't compile fails
     write("src/a.c", "int Broken(void) { return }\n")

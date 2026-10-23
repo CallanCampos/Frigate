@@ -4,14 +4,18 @@ or make a pointer of a 32-bit integer, that the committed baseline doesn't list.
 itself: it reads the decomp's C (src/ and lib/), as the host build compiles it, for the casts that fault on a host the
 first time the game runs them (PLAN.md §4.8, port/docs/game-changes.md's Neutral rows).
 
-    check_ptrcasts.py --build-dir B [--baseline FILE] [--update] [--report] [--jobs N] [--diagnostics OUT] [FILE...]
+    check_ptrcasts.py --build-dir B [--baseline FILE] [--update] [--report] [--require] [--jobs N]
+                      [--diagnostics OUT] [FILE...]
 
-It runs each src/ and lib/ command of B's compile_commands.json (the host build exports it) again with the build's own
-compiler, syntax only (-fsyntax-only -ferror-limit=0), with what the host build turns off turned on: the four cast
+It runs each command of B's compile_commands.json (the host build exports it) that compiles the decomp's C again with
+the build's own compiler, syntax only (-fsyntax-only -ferror-limit=0): those of src/ and lib/, and those of the
+platform layer's wrappers that #include a decomp .c file to compile it with their own definitions around it (port/hal's
+*_host.c, such as gfl_use_host.c and os_thread_host.c). It turns on what the host build turns off: the four cast
 warnings that port/CMakeLists.txt silences for the game's C come back, the decomp's include directories are -I rather
 than -isystem so that warnings in its headers show (a host variant of a header, in the build's gen/hwinclude, is
 reported as the header it was made from, ADR 0004), and -Wshorten-64-to-32 and -Wcast-function-type-strict are added.
-What it counts, a site being one place in one file however many files include it:
+It counts what it finds in the decomp's files, not in port/, whose own code the platform layer's review covers. What it
+counts, a site being one place in one file however many files include it:
 
   ptr-to-int  a pointer cast to an integer narrower than a pointer, such as (u32)work;
   int-to-ptr  such an integer cast to a pointer, such as (FieldTask *)a2 of a u32 a2;
@@ -21,7 +25,7 @@ What it counts, a site being one place in one file however many files include it
               pointer cast to long is against PLAN.md §4.8's rule 6. Nor is a call's result narrowed as it is stored:
               a getter that returns a uptr returns numbers and addresses alike (a field by its ID), its callers keep
               the numbers in 32 bits, and one that makes a pointer of the cut value again is flagged there, as
-              int-to-ptr;
+              int-to-ptr. Nor is an explicit cast, such as (u32)(uptr)p, for which clang has no warning;
   fn-cast     a cast between function pointer types that pairs a pointer or a uptr with an integer of 32 bits or
               less, in the return or the same parameter, so a callback would get or give a cut address.
 
@@ -38,12 +42,23 @@ each key its count, its class and a note:
   unreachable  the host never runs it (TWL-only code, a mode nothing sets).
 
 The check fails, status 1, when a key isn't in the baseline, when a key has more sites than the baseline gives it,
-when a baseline row has another class (--update writes "new" for a key it adds, to be classified), or when a file
-fails to compile. A failure lists each site with its file, line, function and source line, and says the two ways out.
-Fewer sites, or a baseline row with none, pass with a note of what --update would change. A key that vanished and a
-new key that agree on the kind and on two of the file, the function and the types, and pair with no other, are the
-same finding renamed upstream (a function named, a file renamed, a struct named): it passes, with the note, when its
-count is no higher.
+when a baseline row has another class (--update writes "new" for a key it adds, to be classified), when a file fails
+to compile, or when it can't see what it checks: before it trusts the build's commands, it compiles a sample with one
+cast of each kind, one of them in a header reached through -isystem, with each distinct set of the build's flags, and
+fails unless it reads every one back (a flag such as -w, a #pragma in a force-included header, or clang's messages
+changing would otherwise leave it finding nothing, and passing). A failure lists each site with its file, line,
+function and source line, and says the two ways out.
+
+The baseline is an upper bound: fewer sites, or a baseline row with none, pass with a note of what --update would
+change, because a sync's rows reach main before its code does (port/docs/SYNC.md). A key that vanished and a new key
+that agree on the kind and on two of the file, the function and the types, and pair with no other, are the same
+finding renamed upstream (a function named, a file renamed, a struct named) when what differs is gone: the old file no
+longer exists or no longer names the function, the old function's name no longer appears in its file, or the old
+types' names no longer appear in the decomp's C (src/, lib/ and include/). Such a pair passes, with the note, when its
+count is no higher; anything else is a vanished key and a new one, so that a cast fixed in one function can't hide a
+new one in another. Its limits: a site moved within one key (one cast fixed, another of the same types added in the
+same function) passes unseen, and so does a later cast that takes up a count a fix left in the baseline until
+--update lowered it.
 
 --update rewrites the baseline to the findings, keeping each kept or renamed row's class and note. --report prints
 one line, the sites by class, which is T1's 64-bit measurement (port/docs/STATUS.md's "64-bit warnings",
@@ -53,11 +68,13 @@ root), for a quick look; the comparison then covers only their own keys, not tho
 
 It exits 77, which ctest reports as a skip, on Windows, when B has no compile_commands.json, when its compiler isn't
 clang, or when the target isn't LP64 (Windows' LLP64, whose long is 32 bits, gives keys of its own and no narrowing;
-the baseline is macOS's and Linux's). The ctest test game_ptrcasts runs it in each host build (port/cmake/game.cmake):
-CI's macOS and Linux host and sanitized jobs on every pull request, the local verification's ctest
-(port/tools/sync_upstream.sh --verify-pr) and the local sync's, so a merge that adds a cast fails before it reaches
-main. Standard library only; it writes nothing but the baseline with --update and OUT with --diagnostics.
-port/docs/SYNC.md says what to do when it fails, on a sync PR too.
+the baseline is macOS's and Linux's). With --require, which port/cmake/game.cmake passes wherever the build can run
+it (clang, LP64, not Windows), each of those fails instead, so that a guard that stopped running can't pass as a skip.
+The ctest test game_ptrcasts runs it in each host build: CI's macOS and Linux host and sanitized jobs on every pull
+request (Black 2), the local verification's ctest in both versions (port/tools/sync_upstream.sh --verify-pr) and the
+local sync's, so a merge that adds a cast fails before it reaches main. Standard library only; it writes nothing but
+its sample in a temporary directory, the baseline with --update and OUT with --diagnostics. port/docs/SYNC.md says
+what to do when it fails, on a sync PR too.
 """
 
 from __future__ import annotations
@@ -69,6 +86,7 @@ import re
 import shlex
 import subprocess
 import sys
+import tempfile
 from collections import Counter, defaultdict
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
@@ -107,9 +125,59 @@ FUNCTION_START = re.compile(r"^[A-Za-z_][\w \t\*]*?\b([A-Za-z_]\w*)\s*\(")
 INITIALIZER = re.compile(r"\b([A-Za-z_]\w*)\s*(?:\[[^\]]*\]\s*)*=")
 DEFINE = re.compile(r"^\s*#\s*define\s+([A-Za-z_]\w*)")
 LABEL = re.compile(r"^[A-Za-z_]\w*:\s*(//.*)?$")
+INCLUDED_C = re.compile(r'^\s*#\s*include\s+[<"]([^>"]+\.c)[>"]', re.MULTILINE)
+IDENTIFIER = re.compile(r"[A-Za-z_]\w*")
+# The words of a type that name no type of the decomp's, which a rename of a type can't be told by
+TYPE_KEYWORDS = {"struct", "union", "enum", "const", "volatile", "restrict", "signed", "unsigned", "char", "short",
+                 "int", "long", "float", "double", "void", "_Bool"}
+
+# The sample that shows the check can see what it checks: one cast of each kind it counts, compiled with each distinct
+# set of the build's flags, and one in a header that the command reaches through -isystem, as the build reaches the
+# decomp's headers
+CANARY_SOURCE = "ptrcasts_canary.c"
+CANARY_HEADER = "ptrcasts_canary.h"
+CANARY_HEADER_TEXT = """\
+// The pointer cast guard's sample header (port/tools/check_ptrcasts.py), reached through -isystem
+static inline unsigned int PtrCastsCanary_HeaderCut(void *work) {
+    return (unsigned int)work;
+}
+"""
+CANARY_TEXT = """\
+// The pointer cast guard's sample (port/tools/check_ptrcasts.py): one cast of each kind it counts
+#include <stdint.h>
+#include <ptrcasts_canary.h>
+
+typedef void (*PtrCastsCanaryNumber)(unsigned int value);
+typedef void (*PtrCastsCanaryWork)(void *work);
+
+unsigned int PtrCastsCanary_Cut(void *work) {
+    return (unsigned int)work;
+}
+
+void *PtrCastsCanary_Make(unsigned int value) {
+    return (void *)value;
+}
+
+unsigned int PtrCastsCanary_Narrow(uintptr_t address) {
+    return address;
+}
+
+PtrCastsCanaryNumber PtrCastsCanary_Callback(PtrCastsCanaryWork callback) {
+    return (PtrCastsCanaryNumber)callback;
+}
+"""
+CANARY_EXPECTED = {(CANARY_SOURCE, "ptr-to-int"), (CANARY_SOURCE, "int-to-ptr"), (CANARY_SOURCE, "narrow"),
+                   (CANARY_SOURCE, "fn-cast"), (CANARY_HEADER, "ptr-to-int")}
+
+# --require: where the build can run the check, each reason to skip is a failure instead
+REQUIRED = False
 
 
 def skip(message: str):
+    if REQUIRED:
+        print(f"check_ptrcasts: failed: {message}; this build can run the check (--require, port/cmake/game.cmake), so "
+              "it doesn't skip")
+        sys.exit(1)
     print(f"check_ptrcasts: skipped: {message}")
     sys.exit(77)
 
@@ -182,12 +250,117 @@ def syntax_command(argv: list[str], source: str) -> list[str]:
                              "-fdiagnostics-print-source-range-info", source]
 
 
+def repository_name(path: Path):
+    """A path as a file of the repository names it, from its root, or None for a file outside it."""
+    try:
+        return path.resolve().relative_to(ROOT).as_posix()
+    except ValueError:
+        return None
+
+
+def include_directories(argv: list[str], directory: str) -> list[Path]:
+    """The directories a command searches for an #include "...", after the including file's own, in clang's order:
+    -iquote, then -I, then -isystem."""
+    found = {"-iquote": [], "-I": [], "-isystem": []}
+    i = 1
+    while i < len(argv):
+        arg = argv[i]
+        for flag in found:
+            if arg == flag and i + 1 < len(argv):
+                found[flag].append(argv[i + 1])
+                i += 1
+                break
+            if arg.startswith(flag) and len(arg) > len(flag):
+                found[flag].append(arg[len(flag):])
+                break
+        i += 1
+    return [Path(directory) / name for names in found.values() for name in names]
+
+
+def wrapped_sources(path: Path, argv: list[str], directory: str) -> list[str]:
+    """The decomp's .c files that a file of the platform layer compiles by #include (port/hal's *_host.c wrappers),
+    as the repository names them."""
+    try:
+        text = path.read_text(errors="replace")
+    except OSError:
+        return []
+    found = []
+    for included in INCLUDED_C.findall(text):
+        for base in (path.parent, *include_directories(argv, directory)):
+            candidate = base / included
+            if candidate.is_file():
+                name = repository_name(candidate)
+                if name and name.startswith(("src/", "lib/")):
+                    found.append(name)
+                break
+    return found
+
+
+def flag_set(command: list[str], build_dir: Path) -> tuple:
+    """A syntax command's flags without what differs from one file to the next and doesn't decide the warnings: the
+    source, the definitions (the port's renames, -DNAME=port_sdk_NAME) and the headers the build generates for one
+    overlay (gen/ovsec), which a forced include of the build directory names."""
+    out = []
+    body = command[:-1]
+    i = 0
+    while i < len(body):
+        arg = body[i]
+        if arg in ("-D", "-U") and i + 1 < len(body):
+            i += 2
+            continue
+        if arg.startswith(("-D", "-U")):
+            i += 1
+            continue
+        if arg == "-include" and i + 1 < len(body):
+            try:
+                Path(body[i + 1]).resolve().relative_to(build_dir.resolve())
+                i += 2
+                continue
+            except ValueError:
+                pass
+        out.append(arg)
+        i += 1
+    return tuple(out)
+
+
+def unseen_kinds(work, build_dir: Path, jobs: int) -> tuple[int, list]:
+    """Compiles the sample (CANARY_TEXT) with each distinct set of the work's flags, the command made as the work's
+    are, with the sample's directory added as -isystem. Returns how many sets there were, and for each set that didn't
+    give every kind of CANARY_EXPECTED back: a file compiled with it, how many are, what was missing, and its errors."""
+    groups = {}
+    for name, argv, source, directory in work:
+        group = groups.setdefault(flag_set(syntax_command(argv, source), build_dir), [name, argv, source, directory, 0])
+        group[4] += 1
+    with tempfile.TemporaryDirectory(prefix="check_ptrcasts-") as temp:
+        sample = Path(temp)
+        (sample / CANARY_SOURCE).write_text(CANARY_TEXT)
+        (sample / CANARY_HEADER).write_text(CANARY_HEADER_TEXT)
+        items = []
+        for name, argv, source, directory, _ in groups.values():
+            command = syntax_command([*argv, "-isystem", str(sample)], source)
+            command[-1] = str(sample / CANARY_SOURCE)
+            items.append((name, command, directory))
+        with ThreadPoolExecutor(max(1, jobs)) as pool:
+            results = list(pool.map(run_file, items))
+    unseen = []
+    for (name, _, _, _, count), (_, _, found, errors) in zip(groups.values(), results):
+        seen = set()
+        for path, _, _, flag, message, _ in found:
+            counted = classify(flag, message)
+            if counted:
+                seen.add((path.name, counted[0]))
+        if CANARY_EXPECTED - seen:
+            unseen.append((name, count, sorted(CANARY_EXPECTED - seen), errors))
+    return len(groups), unseen
+
+
 class Sources:
     """The repository's files as the findings name them, read once: a host variant of a header (gen/hwinclude) is
     named after the header it was made from, one line further up, for the line the generator puts first."""
 
     def __init__(self):
         self.lines: dict[Path, list[str]] = {}
+        self.decomp_names: set[str] | None = None
 
     def read(self, path: Path) -> list[str]:
         if path not in self.lines:
@@ -197,6 +370,22 @@ class Sources:
                 self.lines[path] = []
         return self.lines[path]
 
+    def names(self, name: str) -> set[str]:
+        """The identifiers a repository file has, comments and strings included."""
+        return set(IDENTIFIER.findall("\n".join(self.read(ROOT / name))))
+
+    def names_in_decomp(self) -> set[str]:
+        """The identifiers of the decomp's C, every .c and .h file of src/, lib/ and include/, read once."""
+        if self.decomp_names is None:
+            self.decomp_names = set()
+            for top in ("src", "lib", "include"):
+                for path in (ROOT / top).rglob("*.[ch]"):
+                    try:
+                        self.decomp_names.update(IDENTIFIER.findall(path.read_text(errors="replace")))
+                    except OSError:
+                        continue
+        return self.decomp_names
+
     def locate(self, path: Path, line: int) -> tuple[str, int, str]:
         """The repository-relative name, the line there and the source line of a reported location."""
         text = self.read(path)
@@ -204,11 +393,7 @@ class Sources:
         generated = GENERATED_FROM.match(text[0]) if text else None
         if generated:
             return generated.group(1), line - 1, source
-        try:
-            name = path.resolve().relative_to(ROOT).as_posix()
-        except ValueError:
-            name = path.as_posix()
-        return name, line, source
+        return repository_name(path) or path.as_posix(), line, source
 
     def is_call(self, path: Path, span) -> bool:
         """Whether the source range of a diagnostic's expression is one function call, in parentheses or not."""
@@ -398,16 +583,32 @@ def write_baseline(path: Path, rows: dict):
     path.write_text("\n".join(lines) + "\n")
 
 
-def find_renames(new_keys, vanished_keys, current, baseline):
+def renamed_away(old, new, sources: Sources) -> bool:
+    """Whether the one part of a vanished key that differs from a new key is gone from the tree: the old file no longer
+    exists or no longer names the function, the old function's name no longer appears in its file, or the old types'
+    names no longer appear in the decomp's C. Otherwise the two are one cast fixed and another added, not a rename."""
+    file, function, _, types = old
+    if file != new[0]:
+        if not (ROOT / file).exists():
+            return True
+        return bool(IDENTIFIER.fullmatch(function)) and function not in sources.names(file)
+    if function != new[1]:
+        return bool(IDENTIFIER.fullmatch(function)) and function not in sources.names(file)
+    words = set(IDENTIFIER.findall(types)) - set(IDENTIFIER.findall(new[3])) - TYPE_KEYWORDS
+    return bool(words) and not words & sources.names_in_decomp()
+
+
+def find_renames(new_keys, vanished_keys, current, baseline, sources: Sources):
     """Pairs of a new key and a vanished baseline key that are one finding renamed: the same kind, two of the file,
-    the function and the types the same, and no more sites than before; each side unique."""
+    the function and the types the same, what differs gone from the tree (renamed_away), and no more sites than
+    before; each side unique."""
     candidates = defaultdict(list)
     for new in new_keys:
         for old in vanished_keys:
             if new[2] != old[2]:
                 continue
             same = sum(new[i] == old[i] for i in (0, 1, 3))
-            if same >= 2 and current[new] <= baseline[old]["count"]:
+            if same >= 2 and current[new] <= baseline[old]["count"] and renamed_away(old, new, sources):
                 candidates[new].append(old)
     used = Counter(old for olds in candidates.values() for old in olds)
     return {new: olds[0] for new, olds in candidates.items() if len(olds) == 1 and used[olds[0]] == 1}
@@ -421,12 +622,15 @@ def main() -> int:
     parser.add_argument("--report", action="store_true", help="print the count by class, the port's 64-bit metric")
     parser.add_argument("--jobs", type=int, default=os.cpu_count() or 4)
     parser.add_argument("--diagnostics", type=Path, help="write every finding to this TSV")
+    parser.add_argument("--require", action="store_true",
+                        help="fail where the check would skip: the build can run it (port/cmake/game.cmake)")
     parser.add_argument("--root", type=Path, help=argparse.SUPPRESS)  # another tree than this one, for the tool's test
     parser.add_argument("files", nargs="*", help="only these files of src/ and lib/, from the repository's root")
     args = parser.parse_args()
-    global ROOT
+    global ROOT, REQUIRED
     if args.root:
         ROOT = args.root.resolve()
+    REQUIRED = args.require
 
     if os.name == "nt" or sys.platform in ("win32", "cygwin", "msys"):
         skip("Windows is LLP64: the baseline is macOS's and Linux's, and LLP64's 32-bit long gives other keys and no "
@@ -437,19 +641,22 @@ def main() -> int:
              "port/CMakeLists.txt)")
     entries = json.loads(database.read_text())
     wanted = {f.replace("\\", "/") for f in args.files}
+    # Each command that compiles the decomp's C: its own file's name, its arguments, the file as the command names it
+    # and its directory. A wrapper of the platform layer (port/hal's *_host.c) is one when it #includes a decomp .c
     work = []
     for entry in entries:
+        directory = entry.get("directory", str(args.build_dir))
         path = Path(entry["file"])
         if not path.is_absolute():
-            path = Path(entry.get("directory", ".")) / path
-        try:
-            name = path.resolve().relative_to(ROOT).as_posix()
-        except ValueError:
-            continue
-        if not name.startswith(("src/", "lib/")) or (wanted and name not in wanted):
+            path = Path(directory) / path
+        name = repository_name(path)
+        if name is None:
             continue
         argv = split_command(entry)
-        work.append((name, syntax_command(argv, entry["file"]), entry.get("directory", str(args.build_dir))))
+        compiled = [name] if name.startswith(("src/", "lib/")) else wrapped_sources(path, argv, directory)
+        if not compiled or (wanted and not wanted.intersection(compiled)):
+            continue
+        work.append((name, argv, entry["file"], directory))
     if not work:
         skip("no file of src/ or lib/ in the compile database" + (" matches" if wanted else ""))
 
@@ -463,11 +670,28 @@ def main() -> int:
         skip("the target isn't LP64: the baseline is macOS's and Linux's, and LLP64's 32-bit long gives other keys "
              "and no narrowing (port/docs/SYNC.md)")
 
+    # The sample first: a set of flags that hides a kind would make every finding of it vanish, and pass
+    flag_sets, unseen = unseen_kinds(work, args.build_dir, args.jobs)
+    if unseen:
+        print(f"check_ptrcasts: failed: with {len(unseen)} of the build's {flag_sets} sets of flags, clang's messages\n"
+              "didn't give back every cast of the guard's sample, so the check can't see what it checks. A flag hides\n"
+              "them (-w, or a #pragma in a header the build forces in), a header path the check doesn't turn from\n"
+              "-isystem into -I, or clang's messages changed so that the check no longer reads them:")
+        for name, count, kinds, errors in unseen[:5]:
+            missing = ", ".join(f"{kind} in {file}" for file, kind in kinds)
+            print(f"  the flags of {name} ({count} file(s)): no {missing}")
+            for error in errors[:3]:
+                print(f"    {error}")
+        if len(unseen) > 5:
+            print(f"  and {len(unseen) - 5} more sets of flags")
+        return 1
+
     sources = Sources()
     sites = {}
     failures = []
+    commands = [(name, syntax_command(argv, source), directory) for name, argv, source, directory in work]
     with ThreadPoolExecutor(max(1, args.jobs)) as pool:
-        for name, status, found, errors in pool.map(run_file, work):
+        for name, status, found, errors in pool.map(run_file, commands):
             if status != 0:
                 failures.append((name, errors))
             for path, line, column, flag, message, span in found:
@@ -475,6 +699,8 @@ def main() -> int:
                 if not counted or (counted[0] == "narrow" and sources.is_call(path, span)):
                     continue
                 file, line, text = sources.locate(path, line)
+                if file.startswith("port/"):
+                    continue
                 site = (file, line, column, counted[0], counted[1])
                 if site not in sites:
                     sites[site] = text
@@ -490,7 +716,7 @@ def main() -> int:
         baseline = {key: row for key, row in baseline.items() if key[0] in wanted}
     new_keys = [key for key in current if key not in baseline]
     vanished = [key for key in baseline if key not in current]
-    renames = find_renames(new_keys, vanished, current, baseline)
+    renames = find_renames(new_keys, vanished, current, baseline, sources)
     new_keys = [key for key in new_keys if key not in renames]
     vanished = [key for key in vanished if key not in renames.values()]
     higher = [key for key in current if key in baseline and current[key] > baseline[key]["count"]]

@@ -41,14 +41,40 @@ lib/nitro/include/nitro/gx.h	GXi_DmaCopy16	ptr-to-int	u32 <- const void *	1	harm
 lib/nitro/include/nitro/gx.h	GXi_DmaCopy16	ptr-to-int	u32 <- void *	1	harmless	an alignment or low-bit test: the low bits are the host address's
 lib/nitro/src/card/card_request.c	CARDi_Request	ptr-to-int	u32 <- CARDiCommandArg *	1	handled	the card's ARM7 checks the word against cardi_common's block (port/hal/card/backup.c)
 lib/nitro/src/fs/fs_rom.c	FSi_ReadRomCallback	int-to-ptr	const void * <- u32	1	handled	a 32-bit cartridge offset carried in CARD_ReadRomAsync's const void *, which CARDi_ReadRom (port/hal/card/card_rom.c) takes back as an offset
-lib/nitro/src/gx/gx_load2d.c	GX_BeginLoadBGExtPltt	narrow	u32 <- uintptr_t	3	real	R13: GX's extended palette destinations in static u32 (GX_LoadBGExtPltt, GX_LoadOBJExtPltt)
-lib/nitro/src/gx/gx_load2d.c	GX_BeginLoadOBJExtPltt	narrow	u32 <- uintptr_t	2	real	R13: GX's extended palette destinations in static u32 (GX_LoadBGExtPltt, GX_LoadOBJExtPltt)
-lib/nitro/src/gx/gx_load2d.c	GX_LoadBGExtPltt	int-to-ptr	void * <- u32	1	real	R13: GX's extended palette destinations in static u32 (GX_LoadBGExtPltt, GX_LoadOBJExtPltt)
-lib/nitro/src/gx/gx_load2d.c	GX_LoadOBJExtPltt	int-to-ptr	void * <- u32	1	real	R13: GX's extended palette destinations in static u32 (GX_LoadBGExtPltt, GX_LoadOBJExtPltt)
+lib/nitro/src/gx/gx_load2d.c	GX_BeginLoadBGExtPltt	narrow	u32 <- uintptr_t	3	handled	renamed port_sdk_* and replaced by port/hal/gx/gx_load2d_extpltt.c (port/cmake/gx.cmake)
+lib/nitro/src/gx/gx_load2d.c	GX_BeginLoadOBJExtPltt	narrow	u32 <- uintptr_t	2	handled	renamed port_sdk_* and replaced by port/hal/gx/gx_load2d_extpltt.c (port/cmake/gx.cmake)
+lib/nitro/src/gx/gx_load2d.c	GX_LoadBGExtPltt	int-to-ptr	void * <- u32	1	handled	renamed port_sdk_* and replaced by port/hal/gx/gx_load2d_extpltt.c (port/cmake/gx.cmake)
+lib/nitro/src/gx/gx_load2d.c	GX_LoadOBJExtPltt	int-to-ptr	void * <- u32	1	handled	renamed port_sdk_* and replaced by port/hal/gx/gx_load2d_extpltt.c (port/cmake/gx.cmake)
 lib/nitro/src/mb/mb_segment.c	MB_ReadSegment	ptr-to-int	u32 <- void (*)(void)	1	real	R24: local wireless (WM) and Download Play (MB) (phase 7)
 lib/nitro/src/mb/mb_segment.c	MB_ReadSegment	ptr-to-int	u32 <- void *	1	real	R24: local wireless (WM) and Download Play (MB) (phase 7)
 lib/nitro/src/mb/mb_segment.c	MBi_ReadSegmentHeader	int-to-ptr	const void * <- u32	1	real	R24: local wireless (WM) and Download Play (MB) (phase 7)
 lib/nitro/src/mb/mb_segment.c	MBi_ReadSegmentHeader	int-to-ptr	void * <- u32	2	real	R24: local wireless (WM) and Download Play (MB) (phase 7)
+lib/nitro/src/nvram/nvram.c	NVRAMi_SetAlarm	int-to-ptr	void * <- u32	1	harmless	the PXI result, a u32, carried in the alarm's void * argument and back (func_02079994)
+lib/nitro/src/nvram/nvram.c	SPI_NvramPageWrite	ptr-to-int	u32 <- const void *	2	handled	the buffer's low 32 bits in the PXI words: the host's ARM7 takes the buffer that port/hal/nvram/nvram_host.c notes (port_pxi_note_pointer, nvram7.c)
+lib/nitro/src/nvram/nvram.c	SPI_NvramReadDataBytes	ptr-to-int	u32 <- void *	2	handled	the buffer's low 32 bits in the PXI words: the host's ARM7 takes the buffer that port/hal/nvram/nvram_host.c notes (port_pxi_note_pointer, nvram7.c)
+lib/nitro/src/nvram/nvram.c	SPI_NvramReadStatusRegister	ptr-to-int	u32 <- u8 *	3	handled	the buffer's low 32 bits in the PXI words: the host's ARM7 takes the buffer that port/hal/nvram/nvram_host.c notes (port_pxi_note_pointer, nvram7.c)
+lib/nitro/src/nvram/nvram.c	func_02079994	ptr-to-int	u32 <- void *	1	harmless	the PXI result, a u32, carried in the alarm's void * argument and back (func_02079994)
+lib/nitro/src/os/os_thread.c	OS_CreateThread	int-to-ptr	u32 * <- u32	2	handled	renamed and written again for the host by port/hal/os/os_thread_host.c
+lib/nitro/src/os/os_thread.c	OS_CreateThread	int-to-ptr	void * <- u32	1	handled	renamed and written again for the host by port/hal/os/os_thread_host.c
+lib/nitro/src/os/os_thread.c	OS_CreateThread	ptr-to-int	u32 <- void (*)(void *)	1	handled	renamed and written again for the host by port/hal/os/os_thread_host.c
+lib/nitro/src/os/os_thread.c	OS_CreateThread	ptr-to-int	u32 <- void (*)(void)	1	handled	renamed and written again for the host by port/hal/os/os_thread_host.c
+lib/nitro/src/os/os_thread.c	OS_CreateThread	ptr-to-int	u32 <- void *	4	handled	renamed and written again for the host by port/hal/os/os_thread_host.c
+lib/nitro/src/os/os_thread.c	OS_InitThread	int-to-ptr	u32 * <- u32	2	handled	renamed and written again for the host by port/hal/os/os_thread_host.c
+lib/nitro/src/os/os_thread.c	OS_InitThread	narrow	u32 <- uintptr_t	1	handled	renamed and written again for the host by port/hal/os/os_thread_host.c
+lib/nitro/src/os/os_thread.c	OS_InitThread	narrow	u32 <- uptr	2	handled	renamed and written again for the host by port/hal/os/os_thread_host.c
+lib/nitro/src/os/os_thread.c	OS_InitThread	ptr-to-int	int <- u8 *	3	handled	renamed and written again for the host by port/hal/os/os_thread_host.c
+lib/nitro/src/os/os_thread.c	OS_InitThread	ptr-to-int	u32 <- u8 *	2	handled	renamed and written again for the host by port/hal/os/os_thread_host.c
+lib/nitro/src/os/os_thread.c	OSi_ExitThread_ArgSpecified	ptr-to-int	u32 <- void (*)(void *)	1	unreachable	the exit-stack branch: nothing sets sThreadState.exitStack, and the host's OS_InitContext stops the program if it runs (port/hal/os/core.c)
+lib/nitro/src/os/os_thread.c	OSi_ExitThread_ArgSpecified	ptr-to-int	u32 <- void *	1	unreachable	the exit-stack branch: nothing sets sThreadState.exitStack, and the host's OS_InitContext stops the program if it runs (port/hal/os/core.c)
+lib/nitro/src/os/os_thread.c	OSi_KillThreadWithPriority	ptr-to-int	u32 <- void (*)(void *)	1	handled	reached only from OS_KillThread, which port/hal/os/os_thread_host.c renames and writes again
+lib/nitro/src/os/os_thread.c	OSi_KillThreadWithPriority	ptr-to-int	u32 <- void *	1	handled	reached only from OS_KillThread, which port/hal/os/os_thread_host.c renames and writes again
+lib/nitro/src/snd/snd_interface.c	SND_InvalidateBankData	ptr-to-int	u32 <- const void *	2	handled	port/hal/snd7/snd_interface_host.c notes the pointers for the host's ARM7 before it calls the decomp's (port_pxi_note_pointer, snd7.c)
+lib/nitro/src/snd/snd_interface.c	SND_InvalidateSeqData	ptr-to-int	u32 <- const void *	2	handled	port/hal/snd7/snd_interface_host.c notes the pointers for the host's ARM7 before it calls the decomp's (port_pxi_note_pointer, snd7.c)
+lib/nitro/src/snd/snd_interface.c	SND_InvalidateWaveData	ptr-to-int	u32 <- const void *	2	handled	port/hal/snd7/snd_interface_host.c notes the pointers for the host's ARM7 before it calls the decomp's (port_pxi_note_pointer, snd7.c)
+lib/nitro/src/snd/snd_interface.c	SND_PrepareSeq	ptr-to-int	u32 <- const SNDBankData *	1	handled	port/hal/snd7/snd_interface_host.c notes the pointers for the host's ARM7 before it calls the decomp's (port_pxi_note_pointer, snd7.c)
+lib/nitro/src/snd/snd_interface.c	SND_PrepareSeq	ptr-to-int	u32 <- const void *	1	handled	port/hal/snd7/snd_interface_host.c notes the pointers for the host's ARM7 before it calls the decomp's (port_pxi_note_pointer, snd7.c)
+lib/nitro/src/snd/snd_interface.c	SND_ReadDriverInfo	ptr-to-int	u32 <- SNDDriverInfo *	1	handled	port/hal/snd7/snd_interface_host.c notes the pointers for the host's ARM7 before it calls the decomp's (port_pxi_note_pointer, snd7.c)
+lib/nitro/src/snd/snd_interface.c	SND_SetupChannelPcm	ptr-to-int	u32 <- const void *	1	handled	port/hal/snd7/snd_interface_host.c notes the pointers for the host's ARM7 before it calls the decomp's (port_pxi_note_pointer, snd7.c)
 lib/nitro/src/snd/snd_work.c	ToArm9	ptr-to-int	u32 <- const SNDDriverChannel *	1	handled	port/hal/snd7/snd7.c writes DS-style addresses in the driver's copy, so the offset is exact
 lib/nitro/src/wm/wm_sync.c	WM_ReadMPData	int-to-ptr	WMMpRecvData * <- u32	1	real	R24: local wireless (WM) and Download Play (MB) (phase 7)
 lib/nitro/src/wm/wm_sync.c	WM_ReadMPData	ptr-to-int	u32 <- WMMpRecvData *	1	real	R24: local wireless (WM) and Download Play (MB) (phase 7)

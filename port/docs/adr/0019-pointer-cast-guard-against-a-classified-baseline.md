@@ -6,7 +6,7 @@ test, the pointer cast guard, and why its report is T1's measurement. -->
 - **Date:** 2026-10-23
 - **Plan:** D5 (a 64-bit native build), §4.4 (the 64-bit warnings must only go down), §4.8 (rule 3, `uptr` and
   `sptr`), §6 (T1)
-- **Upstream:** `0a12a2bd3e`
+- **Upstream:** `b62c655bfa`
 - **Note (2026-10-23):** accepted by the session that wrote it, carrying out the developer's plan of 2026-10-23 (its
   track B, which reserved this number), not by the developer in person; the developer is told so in the pull request
   that adds it. The guard was first written as a proposed ADR 0017 on the branch `port-64bit-sweep`, which stopped
@@ -32,10 +32,19 @@ a merge.
 ## Decision
 
 - **A test in every host build, `game_ptrcasts`** ([../../cmake/game.cmake](../../cmake/game.cmake)), runs
-  [../../tools/check_ptrcasts.py](../../tools/check_ptrcasts.py): each `src/` and `lib/` command of the build's
-  `compile_commands.json` again with the build's clang, syntax only, with the cast warnings on, the decomp's headers
-  searched with `-I` rather than `-isystem` (so that the casts in the SDK's inline functions show), and
-  `-Wshorten-64-to-32` and `-Wcast-function-type-strict` added. About a minute on a loaded machine.
+  [../../tools/check_ptrcasts.py](../../tools/check_ptrcasts.py): each command of the build's `compile_commands.json`
+  that compiles the decomp's C again with the build's clang, syntax only, with the cast warnings on, the decomp's
+  headers searched with `-I` rather than `-isystem` (so that the casts in the SDK's inline functions show), and
+  `-Wshorten-64-to-32` and `-Wcast-function-type-strict` added. Those commands are the `src/` and `lib/` files' and
+  those of the platform layer's wrappers that `#include` a decomp `.c` file (`port/hal`'s `*_host.c`: `gfl_use.c`,
+  `os_thread.c`, `nvram.c`, `snd_interface.c` and nine more); it counts what it finds in the decomp's files, not in
+  `port/`. About a minute on a loaded machine.
+- **It checks that it can see before it trusts what it sees.** It first compiles a sample with one cast of each kind,
+  one of them in a header reached through `-isystem`, with each distinct set of the build's flags, and fails unless it
+  reads every one back: otherwise a flag such as `-w`, a `#pragma` in a force-included header, or clang's messages
+  changing would leave it finding nothing, and every baseline row would only be "no longer found". Where the build can
+  run it (clang, a 64-bit target other than Windows, a generator that writes the compile database), the test passes
+  `--require`, so that the guard fails instead of skipping: a skip there would show CI green with no check.
 - **It counts four kinds**: a pointer cast to a narrower integer, such an integer cast to a pointer, a `uptr`, `sptr`,
   `uintptr_t` or `intptr_t` narrowed to 32 bits, and a callback cast pairing a pointer or a `uptr` with a 32-bit
   integer. It leaves out a `long` or `unsigned long` narrowed (the decomp's are numbers, and a pointer cast to `long`
@@ -44,7 +53,10 @@ a merge.
 - **Its findings are held to a committed baseline**,
   [../../tools/ptrcast_baseline.tsv](../../tools/ptrcast_baseline.tsv), keyed by file, enclosing function, kind
   and types, with a count and no line, so that upstream's edits elsewhere in a file leave it alone and a renamed
-  function, file or type passes as the same row. Each row has a class (`real`,
+  function, file or type passes as the same row: a vanished key and a new one pair when they agree on the kind and two
+  of the three, and what differs is gone from the tree (the old function's name from its file, the old file, the old
+  type's name from the decomp's C), so that a cast fixed in one function can't let a new one pass in another. Each row
+  has a class (`real`,
   `harmless`, `handled`, `unreachable`) and a one-line reason. A new key, a higher count, an unclassified row or a file
   that no longer compiles fails, with each site and the two ways out: a `uptr` fix with its row in
   [../game-changes.md](../game-changes.md), or a classified row
@@ -71,16 +83,17 @@ a merge.
   the arena. A comparison of cut addresses that could straddle 4 GiB is a `real` row.
 
 The groups of real rows when the guard was added, on `main` after the sync of upstream `b62c655bfa` and PRs 14 and
-15, 159 sites in all. On `8ca29313d1`, where the baseline was first regenerated, they were 213: PR 14 fixed most of
+15, 152 sites in all. On `8ca29313d1`, where the baseline was first regenerated, they were 206: PR 14 fixed most of
 Join Avenue's (R05), PR 15 the Day Care's egg and mail (R03), the Mystery Gift album's palette (R12), the Musical's
 sound data (R18), the mic's buffer (R19) and parts of local wireless and Wi-Fi, and upstream typed the box name entry's
-parameters (R08).
+parameters (R08). R13, GX's extended palettes, is `handled`: `port/cmake/gx.cmake` renames those four functions and
+`port/hal/gx/gx_load2d_extpltt.c` replaces them, as the G2D loaders' rows are.
 
 | Group | What | Sites |
 | --- | --- | --- |
 | R02, R04, R05 | The field: the Y button's shortcut menu, the field-move cut-in's palette, the Join Avenue names that two callers still cut, and overlay 137's function types that PR 14's `uptr` getters and setters are cast to | 17 |
 | R06 | Battle: the handlers' message in event variable 0x3f | 12 |
-| R09, R11, R13–R17 | Menus and apps: evolution by trade, Mystery Gift's list, GX's extended palettes, the C-Gear and Funfest views, Memory Link, Pokéstar Studios | 38 |
+| R09, R11, R14–R17 | Menus and apps: evolution by trade, Mystery Gift's list, the C-Gear and Funfest views, Memory Link, Pokéstar Studios | 31 |
 | R21–R24 | Wireless and Wi-Fi (phase 7): the Union Room, DWC's game code, the Wi-Fi libraries, local wireless and Download Play | 92 |
 
 ## Alternatives
@@ -90,6 +103,11 @@ parameters (R08).
 - **The audit's count as the gate**: it kept the build's `-isystem`, so a cast in an SDK header's inline function never
   showed; it counted a private header's site once for each file that includes it; it had no classes, so a new real cast
   could hide behind a removed harmless one; and it wasn't committed.
+- **A rename that fails until `--update`**: upstream names functions and types in most syncs, so every one would stop
+  the sync PR for a follow-up PR; a rename passes only when the old name is gone instead.
+- **The baseline as an exact count, failing on fewer sites**: a sync's rows reach `main` in a follow-up PR before the
+  sync's code does ([../SYNC.md](../SYNC.md#when-the-pointer-cast-guard-fails)), and `main` must pass with them, so
+  the baseline is an upper bound and fewer sites pass with a note.
 - **The compile probe** (`port/tools/compile-probe`) as the gate: it doesn't define `PLATFORM_PC`, so the `uptr` fixes
   don't show in its counts, and it takes about 8 minutes.
 - **Keying by line**: every upstream edit above a cast would churn the baseline; by function and types, only a change
@@ -105,8 +123,14 @@ parameters (R08).
 
 - An upstream merge that brings a cast that cuts an address fails CI's macOS and Linux host jobs on the sync PR and
   the local verification's `ctest`; it is fixed or classified in a follow-up PR before the sync merges.
-- Casts the guard can't see stay possible: a pointer stored in a union's integer member, a compound assignment such as
-  `u32 dst += (uptr)p` (its read back is flagged), a pointer cast to `long`, and on Windows anything only LLP64 cuts.
+- Casts the guard can't see stay possible: a pointer stored in a union's integer member; an explicit cast from an
+  integer that carries an address to a narrower one, such as `(u32)(uptr)p` or `(u32)` of a `uptr` value, for which
+  clang has no warning; a compound assignment such as `dst += (uptr)p` on a `u32 dst` (its read back is flagged); a
+  pointer cast to `long`; and on Windows anything only LLP64 cuts. CI builds Black 2 only, so a cast under `WHITE2`
+  alone is caught by the White 2 builds of the local verification and of each session, not by CI.
+- What the key can't tell apart passes: a site moved within one key (a cast fixed and another of the same types added
+  in the same function), and a later cast that takes up a count a fix left in the baseline until `--update` lowered it.
+  A fix runs `--update` in its own PR, so that the baseline shrinks with it.
 - When the developer's one-program build (D6) puts both versions in one build directory, the two versions' tests become
   one, since both give the same findings.
 - Revisit when Windows needs its own baseline, or when phase 7 decides how the Wi-Fi libraries run on a host, which

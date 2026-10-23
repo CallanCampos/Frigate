@@ -5,6 +5,21 @@ workflow goes in the decomp checkout instead; this file is the port's ([CLAUDE.m
 
 ## 2026-10-23: the pointer cast guard, restarted on main
 
+- **A gate that passes when it sees nothing isn't a gate.** The guard's first version passed with every baseline row
+  "no longer found" when a `-w` was added to the commands, and a skip on a host where it should run showed CI green.
+  A check that reads a compiler's messages first proves on a sample that it reads each kind back with the build's own
+  flags, and a test that the build can run fails rather than skips (`--require`).
+- **A row in a function the host build replaces is `handled`, not `real`.** GX's extended palette loaders were classed
+  `real` while `port/cmake/gx.cmake` renames them `port_sdk_*` and `port/hal/gx/gx_load2d_extpltt.c` replaces them.
+  Before classing a row, look for the function in the `port_sdk_*` renames of `port/cmake/*.cmake` and in the
+  `#define`s of `port/hal`'s `*_host.c` wrappers.
+- **The decomp's C isn't only `src/` and `lib/` entries of the compile database.** Thirteen decomp files, `gfl_use.c`
+  and NitroSDK's thread, NVRAM and sound interface among them, compile only through a `port/hal` wrapper that
+  `#include`s them with its own definitions; a check that keeps the database's `src/` and `lib/` entries never sees
+  them. Find them by their wrapper's `#include` of a `.c` file.
+- **A rename is a pair whose old name is gone.** Pairing a vanished row with a new one by two of file, function and
+  types let a new cast in one function pass as the "rename" of a cast fixed in another of the same file; the pair is a
+  rename only when the part that differs no longer exists in the tree.
 - **A test that runs a tool which skips on a host must skip there too.** The guard skips on Windows, and its own test
   expected findings, so CI's Windows job failed on the first push of the guard's PR, a failure that no local run
   could show. A test of a tool checks the tool's skip on that host and skips itself, and the first CI run of a new
@@ -38,10 +53,10 @@ workflow goes in the decomp checkout instead; this file is the port's ([CLAUDE.m
   are stripped.
 - **Only `u32` to `uptr` keeps MWCC's tokens.** `uptr` and `sptr` are `u32` and `s32` for MWCC, so retyping a `u32` or
   an `s32` leaves every file's preprocessed text as it was, which `check_mwcc_neutral.py` proves for every file that
-  includes the header at once. An `int` made `sptr` becomes `s32`, the same type but another token: the check then
-  lists every file that includes the header, and the proof is ninja's SHA1s for the complete ones and
-  `compiler_probe.py` before and after, in both versions, for the incomplete ones (learned on the stopped
-  `port-64bit-sweep` branch).
+  includes the header at once. An `int` made `sptr` becomes `s32`, which MWCC's `types.h` (its `#else`) makes
+  `signed long`: the same size as `int` but another type, so the tokens differ and the code may. The check then lists
+  every file that includes the header, and the proof is ninja's SHA1s for the complete ones and `compiler_probe.py`
+  before and after, in both versions, for the incomplete ones (learned on the stopped `port-64bit-sweep` branch).
 - **A getter that returns pointers and numbers alike is retyped whole, with every function its pointer type
   reaches.** On the stopped branch, Join Avenue's four getters and four setters shared overlay 137's function types,
   so all of them had to return or take a `uptr`, even those that only give numbers: a callback that returns a `u32`

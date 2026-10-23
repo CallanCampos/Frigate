@@ -153,24 +153,30 @@ An upstream merge can bring C that cuts an address to 32 bits on a 64-bit host: 
 API whose parameter is a `u32`, an integer made a pointer with `(FieldTask *)a2`, a `uptr` stored in a `u32`. Under
 MWCC that is the DS's code as it was, so both ROMs still match and nothing in the ROM build notices; on a host the game
 faults the first time it runs it. The test `game_ptrcasts` ([../cmake/game.cmake](../cmake/game.cmake)) catches it in
-every host build's `ctest`: CI's macOS and Linux jobs (host, sanitized and the macOS distribution builds) on every PR,
-sync PRs included, the local verification's `ctest` in both versions (`--verify-pr`), and the local sync's before it
-publishes.
+every host build's `ctest`: CI's macOS and Linux jobs (host, sanitized and the macOS distribution builds, all Black 2)
+on every PR, sync PRs included, the local verification's `ctest` in both versions (`--verify-pr`), and the local sync's
+before it publishes. Where the build can run it (clang, a 64-bit target other than Windows), the test passes
+`--require`, so the guard fails rather than skips.
 
-It runs [../tools/check_ptrcasts.py](../tools/check_ptrcasts.py) on the build: each `src/` and `lib/` command of the
-build's `compile_commands.json` again with the build's clang, syntax only, with the cast warnings the host build
-silences for the game's C turned back on and the decomp's headers searched as ordinary headers, so that their warnings
-show too. It counts four kinds, `ptr-to-int`, `int-to-ptr`, `narrow` (a `uptr`, `sptr`, `uintptr_t` or `intptr_t`
-narrowed to 32 bits, other than a call's result as it is stored: a getter that returns a `uptr` gives numbers and
-addresses alike, and a caller that makes a pointer of the cut value again is flagged there) and `fn-cast` (a callback
-cast that pairs a pointer or a `uptr` with a 32-bit integer), and holds them to
+It runs [../tools/check_ptrcasts.py](../tools/check_ptrcasts.py) on the build: each command of the build's
+`compile_commands.json` that compiles the decomp's C (the `src/` and `lib/` files, and the decomp `.c` files that
+`port/hal`'s wrappers `#include`, such as `gfl_use.c` and `os_thread.c`) again with the build's clang, syntax only, with
+the cast warnings the host build silences for the game's C turned back on and the decomp's headers searched as ordinary
+headers, so that their warnings show too. Before that it compiles a sample with one cast of each kind with each distinct
+set of the build's flags, and fails unless it reads every one back, so that a flag such as `-w` or a change in clang's
+messages can't leave it seeing nothing and passing. It counts four kinds, `ptr-to-int`, `int-to-ptr`, `narrow` (a
+`uptr`, `sptr`, `uintptr_t` or `intptr_t` narrowed to 32 bits, other than a call's result as it is stored: a getter that
+returns a `uptr` gives numbers and addresses alike, and a caller that makes a pointer of the cut value again is flagged
+there) and `fn-cast` (a callback cast that pairs a pointer or a `uptr` with a 32-bit integer), and holds them to
 [../tools/ptrcast_baseline.tsv](../tools/ptrcast_baseline.tsv). The baseline has a row per finding, its file, the
 function that holds it, the kind and the types as the source spells them, with its number of sites, its class and a
 one-line reason: `real` (a truncation not fixed yet, its group in the note), `harmless` (it never cuts an address the
-game uses), `handled` (the platform layer makes the value right) or `unreachable` (the host never runs it). Line
-numbers aren't part of a row, so upstream's edits elsewhere in a file leave the baseline alone, and a row whose
-function, file or types upstream renamed passes as the same row, with a note. Both versions give the same findings,
-and so do Apple clang, Homebrew's clang and Ubuntu's.
+game uses), `handled` (the platform layer makes the value right) or `unreachable` (the host never runs it). Line numbers
+aren't part of a row, so upstream's edits elsewhere in a file leave the baseline alone, and a row whose function, file
+or types upstream renamed passes as the same row, with a note, when the old name is gone: the old function's from its
+file, the old file, or the old type's from the decomp's C. A cast fixed in one function and another added in a function
+that still exists is a new row. Both versions give the same findings, and so do Apple clang, Homebrew's clang and
+Ubuntu's.
 
 When it fails, it prints each new site with its file, line, function and source line. For each:
 
@@ -182,9 +188,10 @@ When it fails, it prints each new site with its file, line, function and source 
    then show as harmless `narrow` rows. `uptr` is `u32` for MWCC, so the proof is
    `port/tools/check_mwcc_neutral.py FILE...` on the changed files and every file that includes a changed header, in
    both versions, which finds their token streams unchanged, and ninja with both SHA1s; the change gets its row in
-   [game-changes.md](game-changes.md). An `int` made `sptr` is `s32` for MWCC, the same type but another token: ninja
-   proves the complete files that differ, and `tools/decomp/compiler_probe.py FILE --compilers 1.1p1` in both versions,
-   before and after, the incomplete ones ([game-changes.md](game-changes.md#proving-a-change-is-mwcc-neutral)).
+   [game-changes.md](game-changes.md). An `int` made `sptr` is `s32` for MWCC, which is `signed long` there (types.h's
+   `#else`): the same size as `int` but another type, so the tokens differ and the code may. ninja proves the
+   complete files that differ, and `tools/decomp/compiler_probe.py FILE --compilers 1.1p1` in both versions, before and
+   after, the incomplete ones ([game-changes.md](game-changes.md#proving-a-change-is-mwcc-neutral)).
 3. **If it can't** (an alignment or low-bit test, a difference of two addresses in one block, an int carried in a
    `void *` and back, code the host never runs), run
    `.venv/bin/python port/tools/check_ptrcasts.py --build-dir build/port --update`, which writes the new rows with the
@@ -193,8 +200,10 @@ When it fails, it prints each new site with its file, line, function and source 
    names its group, until its fix lands.
 
 Then run the check again in both versions (`build/port` and `build/port-w2`) and commit the baseline with the change.
-A count below the baseline's, or a row no longer found, passes with a note of what `--update` would change; run it
-when a fix lands, so that the baseline shrinks with the fixes. A file that no longer compiles fails the check too.
+A count below the baseline's, or a row no longer found, passes with a note of what `--update` would change: the
+baseline is an upper bound, because a sync's rows reach `main` before its code does (below). Run `--update` in the PR
+that lands a fix, so that the baseline shrinks with the fixes; until it does, a later cast with the same key could take
+up the count the fix left. A file that no longer compiles fails the check too.
 
 **On a sync PR, the App's or a local one, the maintainer fixes it in a follow-up feature PR, never by editing the sync
 PR.** The sync's merge commit carries only the sync's own resolutions, and a push to the sync branch would change the
@@ -216,15 +225,19 @@ PR comes first, and the sync runs again after it.
 With `--report` it prints the sites by class in one line, when it was added:
 
 ```text
-check_ptrcasts: 389 sites in 250 keys (real 159, harmless 99, handled 96, unreachable 35), 1667 files, 0 not compiled
+check_ptrcasts: 431 sites in 276 keys (real 152, harmless 101, handled 141, unreachable 37), 1681 files, 0 not compiled
 ```
 
 That line is T1's 64-bit measurement: [STATUS.md](STATUS.md) gives it in each entry's "64-bit warnings", the real
 sites not above the last entry's, and `sync_upstream.sh` prints it in its summary.
 
 It skips (77) on Windows, whose LLP64 (a 32-bit `long`) gives other findings than macOS's and Linux's, without clang,
-and without the compile database. What it doesn't see: a pointer written into a union's integer member, which has no
-cast (`port/tools/compile-probe/scripts/unions.py` lists the unions that mix pointers and integers); a compound
-assignment such as `u32 dst += (uptr)p`, whose read back is flagged instead; a pointer cast to `long` or
-`unsigned long`, which [PLAN.md §4.8](PLAN.md#48-64-bit-and-dual-target-rules)'s rule 6 forbids; and the platform
-layer's own code, whose files are in `port/`.
+and without the compile database; with `--require`, which the build passes where it can run the check, each of those
+fails instead. What it doesn't see: a pointer written into a union's integer member, which has no cast
+(`port/tools/compile-probe/scripts/unions.py` lists the unions that mix pointers and integers); an explicit cast from an
+integer that carries an address to a narrower one, such as `(u32)(uptr)p` or `(u32)` of a `uptr` value, for which
+clang has no warning; a compound assignment such as `dst += (uptr)p` on a `u32 dst`, whose read back is flagged
+instead; a pointer cast to `long` or `unsigned long`, which [PLAN.md §4.8](PLAN.md#48-64-bit-and-dual-target-rules)'s
+rule 6 forbids; a site moved within one key, a cast fixed and another of the same types added in the same function; a
+cast under `WHITE2` alone in CI, which builds Black 2 only (the White 2 builds of `--verify-pr` and of each session
+catch it); and the platform layer's own code, whose files are in `port/`, the wrappers' included.
