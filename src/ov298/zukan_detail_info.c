@@ -32,9 +32,6 @@
 // No language button is pushed, or the entry is in the game's language
 #define LANGUAGE_NONE LANGUAGE_BUTTON_COUNT
 
-// The Pokédex's shortcut for the Y button, which the touch bar's check box registers
-#define SHORTCUT_POKEDEX 20
-
 #define SPECIES_SPINDA 327
 
 enum {
@@ -238,7 +235,7 @@ static BOOL ZukanDetailInfo_Main(ZukanDetailProcSys *sys, int *seq, void *param_
         }
         ZukanDetailTouchbar_SetActive(touchbar, FALSE);
         ZukanDetailTouchbar_SetCheck(
-            touchbar, GameData_IsShortcutRegistered(ZukanDetailCommon_GetGameData(common), SHORTCUT_POKEDEX));
+            touchbar, GameData_IsShortcutRegistered(ZukanDetailCommon_GetGameData(common), SHORTCUT_POKEDEX_INFO));
         if (ZukanDetailHeadbar_GetState(headbar) != ZUKAN_DETAIL_TOUCHBAR_SHOWN) {
             ZukanDetailHeadbar_SetTitle(headbar, 0);
             ZukanDetailHeadbar_Appear(headbar);
@@ -403,7 +400,7 @@ static void ZukanDetailInfo_Command(ZukanDetailProcSys *sys, int *seq, void *par
             ZukanDetailTouchbar_Unlock(touchbar);
             break;
         case ZUKAN_DETAIL_CMD_CHECK:
-            GameData_SetKeyItemRegistration(ZukanDetailCommon_GetGameData(common), SHORTCUT_POKEDEX,
+            GameData_SetKeyItemRegistration(ZukanDetailCommon_GetGameData(common), SHORTCUT_POKEDEX_INFO,
                                             ZukanDetailTouchbar_GetCheck(touchbar));
             ZukanDetailTouchbar_Unlock(touchbar);
             break;

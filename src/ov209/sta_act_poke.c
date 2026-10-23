@@ -18,9 +18,6 @@
 // Overlay 209's sta_act_poke.c: the Pokémon on the stage. Positions are in fixed point pixels, y down, which the
 // sprites and the props get scaled down by 16 and y up
 
-// The personal data's flag that keeps a Pokémon from turning around (not from swan)
-#define PERSONAL_NO_FLIP 34
-
 // The kinds of a prop's effect, as overlay 210's table gives them
 enum {
     STA_ACT_POKE_ITEM_SPIN,

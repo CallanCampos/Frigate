@@ -26,7 +26,7 @@
 typedef struct {
     GameSystem *gsys;
     Field *field;
-    void *select;
+    PartySelectList *select;
     PokeParty *party;
     PokeParty *battleBoxParty;
     u8 partyOk;

@@ -258,7 +258,7 @@ void func_ov194_021b76e0(PokemonTradeWork *wk) {
 }
 
 static BOOL func_ov194_021b7708(PokemonTradeWork *wk) {
-    void *save = MailBox_GetFromGameData(wk->gameData);
+    MailData *save = MailBox_GetFromGameData(wk->gameData);
     BOOL ret = FALSE;
     if (MailBox_GetFreeSlot(save, 0) == -1) {
         ret = TRUE;
@@ -758,7 +758,7 @@ static void PokemonTrade_WaitFadeOutToEnd(PokemonTradeWork *wk) {
 }
 
 void PokemonTrade_FadeOutToEnd(PokemonTradeWork *wk) {
-    GFL_WipeSet(0, 0, 0, 0, 6, 1, wk->heapId);
+    GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, 0, 6, 1, wk->heapId);
     PokemonTrade_SetState(wk, PokemonTrade_WaitFadeOutToEnd);
 }
 
@@ -938,7 +938,7 @@ static void func_ov194_021b8570(PokemonTradeWork *wk) {
         func_ov194_021b81c8(wk, 0, PokemonTrade_GetPkm(wk, 0));
         func_ov194_021b81c8(wk, 1, PokemonTrade_GetPkm(wk, 1));
         func_ov194_021b7898(wk);
-        GFL_WipeSet(3, 1, 1, 0, 6, 1, wk->heapId);
+        GFL_WipeSet(WIPE_MODE_MAIN, WIPE_TYPE_FADE_IN, WIPE_TYPE_FADE_IN, 0, 6, 1, wk->heapId);
         PokemonTrade_SetState(wk, func_ov194_021b8838);
     }
 }
@@ -988,7 +988,7 @@ static void func_ov194_021b860c(PokemonTradeWork *wk) {
         done = TRUE;
     }
     if (done) {
-        GFL_WipeSet(3, 0, 0, 0, 6, 1, wk->heapId);
+        GFL_WipeSet(WIPE_MODE_MAIN, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, 0, 6, 1, wk->heapId);
         PokemonTrade_SetState(wk, func_ov194_021b8570);
     }
 }
@@ -998,7 +998,7 @@ static void func_ov194_021b8754(PokemonTradeWork *wk) {
         wk->cursor = 0;
         func_ov194_021c0b6c(wk, PokemonTrade_GetPkm(wk, 0));
         func_ov194_021b7898(wk);
-        GFL_WipeSet(3, 1, 1, 0, 6, 1, wk->heapId);
+        GFL_WipeSet(WIPE_MODE_MAIN, WIPE_TYPE_FADE_IN, WIPE_TYPE_FADE_IN, 0, 6, 1, wk->heapId);
         PokemonTrade_SetState(wk, func_ov194_021b860c);
     }
 }
@@ -1014,7 +1014,7 @@ static void func_ov194_021b87b0(PokemonTradeWork *wk) {
             PokemonTrade_SetState(wk, func_ov194_021b84b0);
             break;
         case 1:
-            GFL_WipeSet(3, 0, 0, 0, 6, 1, wk->heapId);
+            GFL_WipeSet(WIPE_MODE_MAIN, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, 0, 6, 1, wk->heapId);
             PokemonTrade_SetState(wk, func_ov194_021b8754);
             break;
         case 2:
@@ -1542,7 +1542,7 @@ static void func_ov194_021b95ec(PokemonTradeWork *wk) {
         func_ov194_021ba7d4(wk);
         func_ov194_021ba84c(wk);
     }
-    GFL_WipeSet(0, 1, 1, 0, 6, 1, wk->heapId);
+    GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_IN, WIPE_TYPE_FADE_IN, 0, 6, 1, wk->heapId);
     GFL_BGSysSetEnabledBGsA(0x1f);
     GFL_BGSysSetEnabledBGsB(0x1e);
 }
@@ -1589,7 +1589,7 @@ static void func_ov194_021b9744(PokemonTradeWork *wk) {
 }
 
 static void func_ov194_021b976c(PokemonTradeWork *wk) {
-    GFL_WipeSet(4, 0, 0, 0, 6, 1, wk->heapId);
+    GFL_WipeSet(WIPE_MODE_SUB, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, 0, 6, 1, wk->heapId);
     PokemonTrade_SetState(wk, func_ov194_021b9744);
 }
 
@@ -1683,7 +1683,7 @@ static void func_ov194_021b99b4(PokemonTradeWork *wk) {
     GFL_BGSysSetEnabledBGsA(0x10);
     GFL_BGSysSetEnabledBGsB(4);
     killBrightnessEitherEngine(0);
-    GFL_WipeSet(4, 1, 1, 0, 6, 1, wk->heapId);
+    GFL_WipeSet(WIPE_MODE_SUB, WIPE_TYPE_FADE_IN, WIPE_TYPE_FADE_IN, 0, 6, 1, wk->heapId);
     PokemonTrade_SetState(wk, func_ov194_021b9974);
 }
 
@@ -2625,8 +2625,8 @@ static void PokemonTrade_VBlank(TCB *tcb, void *data) {
     PokemonTradeWork *wk = data;
     ClActSys_VBlank();
     if (wk->unk1084) {
-        GFL_BGSysMoveBG(7, 0, wk->unk108C);
-        GFL_BGSysMoveBG(5, 0, wk->unk108C);
+        GFL_BGSysMoveBG(7, BG_MOVE_SET_X, wk->unk108C);
+        GFL_BGSysMoveBG(5, BG_MOVE_SET_X, wk->unk108C);
         wk->unk1084 = 0;
     }
 }

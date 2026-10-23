@@ -3,8 +3,9 @@
 
 #include "types.h"
 #include "gfl/heap.h"
+#include "struct_decls.h"
 
-typedef struct FieldDispControl {
+struct FieldDispControl {
     u16 requestA;
     u16 requestB;
     u32 alphaA;
@@ -20,7 +21,7 @@ typedef struct FieldDispControl {
     u8 bgEnabled[8];
     u8 brightnessRequest[2];
     s8 brightnessValue[2];
-} FieldDispControl;
+};
 
 extern const char data_ov036_021d56f0[];
 

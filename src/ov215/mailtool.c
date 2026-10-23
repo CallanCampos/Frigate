@@ -9,7 +9,7 @@
 // The mail screens' params (overlay 215's mailtool.c): what the field app call allocates, and reads the result of
 
 MailParam *MailTool_CreateWriteParam(GameData *gameData, u32 a1, u8 partySlot, u32 mailId, u32 heapId) {
-    void *mailBox = MailBox_GetFromGameData(gameData);
+    MailData *mailBox = MailBox_GetFromGameData(gameData);
     MailParam *param = GFL_HeapAllocate(HEAPID_TAIL((HeapID)heapId), sizeof(MailParam), FALSE, "mailtool.c", 67);
 
     MIi_CpuClearFast(0, param, sizeof(MailParam));

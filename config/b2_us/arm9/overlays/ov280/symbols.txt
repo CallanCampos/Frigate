@@ -154,10 +154,10 @@ NAME_ENTRY_SOUND_COUNT kind:data(any) addr:0x021dd93c ambiguous
 NAME_ENTRY_PROC_FUNCTIONS kind:data(any) addr:0x021dd940 ambiguous
 NAME_ENTRY_SOUNDS kind:data(any) addr:0x021dd94c ambiguous
 data_ov280_021dd964 kind:data(any) addr:0x021dd964
-data_ov280_021dd9a4 kind:data(any) addr:0x021dd9a4
-data_ov280_021dd9b4 kind:data(any) addr:0x021dd9b4
-data_ov280_021dd9d0 kind:data(any) addr:0x021dd9d0
-data_ov280_021dda00 kind:data(any) addr:0x021dda00
+sLCDConfig kind:data(any) addr:0x021dd9a4
+sClActSysSetup kind:data(any) addr:0x021dd9b4
+sVRAMConfig kind:data(any) addr:0x021dd9d0
+sBGSetups kind:data(any) addr:0x021dda00
 data_ov280_021ddb80 kind:data(any) addr:0x021ddb80
 data_ov280_021ddb84 kind:data(any) addr:0x021ddb84
 data_ov280_021ddb98 kind:data(any) addr:0x021ddb98

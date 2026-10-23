@@ -12,7 +12,7 @@
 #define BTL_SERVER_CMD_QUE_SIZE 3000
 
 // The server's commands, each named after the client's handler that plays it (btl_client.c's sServerCmdTable)
-enum {
+typedef enum {
     SC_NULL,
     SC_OP_SUBTRACT_HP,
     SC_OP_ADD_HP,
@@ -114,7 +114,7 @@ enum {
     // The room SCQUE_RESERVE_Pos keeps for a command, with its size, which BtlServerCmdQueue_Read skips
     SC_RESERVE,
     SC_MAX,
-};
+} BtlServerCmd;
 
 // What ends a message command's arguments
 #define SC_MSG_ARG_END 0xffff0000
@@ -143,9 +143,9 @@ static inline BOOL BtlServerCmdQueue_IsEmpty(const BtlServerCmdQueue *queue) {
     return queue->readPtr == queue->writePtr;
 }
 
-void BtlServerCmdQueue_Put(BtlServerCmdQueue *que, u32 event, ...);
-u16 SCQUE_RESERVE_Pos(BtlServerCmdQueue *que, u32 event);
-void BtlServerCmdQueue_PutReserved(BtlServerCmdQueue *que, u32 reserve, u32 event, ...);
+void BtlServerCmdQueue_Put(BtlServerCmdQueue *que, BtlServerCmd event, ...);
+u16 SCQUE_RESERVE_Pos(BtlServerCmdQueue *que, BtlServerCmd event);
+void BtlServerCmdQueue_PutReserved(BtlServerCmdQueue *que, u32 reserve, BtlServerCmd event, ...);
 u16 BtlServerCmdQueue_Read(BtlServerCmdQueue *que, u32 *args);
 void BtlServerCmdQueue_PutByte(BtlServerCmdQueue *que, u8 value);
 u8 BtlServerCmdQueue_ReadByte(BtlServerCmdQueue *que);

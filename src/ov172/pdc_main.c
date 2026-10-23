@@ -54,7 +54,7 @@ struct PdcMain {
     s32 timer;
     PdcMainProc proc;
     HeapID heapId;
-    void *bagCursor;
+    BagCursor *bagCursor;
     u8 keyCursorFlag;
 };
 

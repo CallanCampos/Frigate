@@ -19,9 +19,6 @@
 
 #define SAVE_OUTSIDE_MAGIC 0xa10f49ae
 
-// The size of the key system's data: the key information and the Memory Link's
-#define KEY_DATA_SIZE 0x214
-
 enum {
     BLOCK_GIFTS,
     BLOCK_GIFTS_BACKUP,
@@ -53,7 +50,7 @@ typedef struct {
 
 typedef struct {
     SaveOutsideHeader header;
-    u8 data[KEY_DATA_SIZE];
+    KeySystemData data;
 } SaveOutsideKeysBlock;
 
 struct SaveOutside {
@@ -90,7 +87,7 @@ SaveOutside *SaveOutside_Load(HeapID heapId) {
     loaded[BLOCK_KEYS] = BackupSystem_Read(KEYS_ADDR, blocks[BLOCK_KEYS], sizeof(SaveOutsideKeysBlock));
     blocks[BLOCK_GIFTS]->size = sizeof(SaveOutsideGifts);
     blocks[BLOCK_GIFTS_BACKUP]->size = sizeof(SaveOutsideGifts);
-    blocks[BLOCK_KEYS]->size = KEY_DATA_SIZE;
+    blocks[BLOCK_KEYS]->size = sizeof(KeySystemData);
 
     for (i = 0; i < BLOCK_COUNT; i++) {
         if (loaded[i] == TRUE) {
@@ -144,10 +141,10 @@ SaveOutside *SaveOutside_Load(HeapID heapId) {
     work->keysLoaded = FALSE;
     work->keysBroken = FALSE;
     if (loaded[BLOCK_KEYS] == FALSE) {
-        KeySystemData_Init(work->keys.data);
+        KeySystemData_Init(&work->keys.data);
     } else if (broken[BLOCK_KEYS] == TRUE) {
         work->keysBroken = TRUE;
-        KeySystemData_Init(work->keys.data);
+        KeySystemData_Init(&work->keys.data);
     } else {
         work->keysLoaded = TRUE;
     }
@@ -181,7 +178,7 @@ void SaveOutside_StartSave(SaveOutside *work) {
     work->gifts.header.crc = getCRC16(&work->gifts.gifts, sizeof(SaveOutsideGifts));
     work->keys.header.magic = SAVE_OUTSIDE_MAGIC;
     work->keys.header.count++;
-    work->keys.header.crc = getCRC16(work->keys.data, KEY_DATA_SIZE);
+    work->keys.header.crc = getCRC16(&work->keys.data, sizeof(KeySystemData));
     GCTX_HIDBlockSleep(0x80);
     GCTX_HIDBlockSoftReset(2);
 }
@@ -274,8 +271,8 @@ BOOL SaveOutside_IsKeysBroken(SaveOutside *work) {
     return work->keysBroken;
 }
 
-void *SaveOutside_GetKeyData(SaveOutside *work) {
-    return work->keys.data;
+KeySystemData *SaveOutside_GetKeyData(SaveOutside *work) {
+    return &work->keys.data;
 }
 
 void SaveOutside_CopyKeysToSave(SaveOutside *work, SaveControl *save) {

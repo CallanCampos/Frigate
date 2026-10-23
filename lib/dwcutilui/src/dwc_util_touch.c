@@ -79,19 +79,22 @@ void DWCi_IPTlRead(void) {
 }
 
 void readKey(void) {
-    u16 pad = PAD_Read();
-    // Up hides down, and left hides right
-    u16 held = pad & ~((pad & 0x40) << 1) & ~((pad & 0x20) >> 1);
+    u16 *held;
     int i;
+    u16 pad;
 
-    sTouch.input->pressed = (sTouch.input->held ^ held) & held;
-    sTouch.input->released = (sTouch.input->held ^ held) & sTouch.input->held;
-    sTouch.input->held = held;
+    pad = PAD_Read();
+    held = &sTouch.input->held;
+    // Up hides down, and left hides right
+    pad = pad & ~((pad & 0x40) << 1) & ~((pad & 0x20) >> 1);
+    sTouch.input->pressed = (*held ^ pad) & pad;
+    sTouch.input->released = (*held ^ pad) & *held;
+    sTouch.input->held = pad;
     sTouch.input->repeated = sTouch.input->pressed;
     for (i = 0; i < DWC_UTIL_KEY_COUNT; i++) {
         u16 bit = 1 << i;
 
-        if (!(held & bit)) {
+        if (!(pad & bit)) {
             sKeyRepeats[i] = 0;
         } else {
             sKeyRepeats[i]++;

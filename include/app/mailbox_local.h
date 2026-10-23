@@ -102,11 +102,13 @@ enum {
 };
 
 // The messages of the question that follows picking a mail's use
-#define MAILBOX_MESSAGE_ERASE 0
-#define MAILBOX_MESSAGE_ERASED 1
-#define MAILBOX_MESSAGE_ASK_HOLD 2
-#define MAILBOX_MESSAGE_HOLD_DONE 3
-#define MAILBOX_MESSAGE_BAG_FULL 4
+enum {
+    MAILBOX_MESSAGE_ERASE,
+    MAILBOX_MESSAGE_ERASED,
+    MAILBOX_MESSAGE_ASK_HOLD,
+    MAILBOX_MESSAGE_HOLD_DONE,
+    MAILBOX_MESSAGE_BAG_FULL,
+};
 
 typedef struct MailBoxView MailBoxView;
 
@@ -232,6 +234,7 @@ void MailBox_Nop2(MailBoxView *view);
 void MailBox_PrintWhatWouldYouLike(MailBoxWork *work);
 void MailBox_ShowMessageWindow(MailBoxWork *work);
 void MailBox_HideMessageWindow(MailBoxWork *work);
+// message is a MAILBOX_MESSAGE_*
 void MailBox_SetMessage(MailBoxWork *work, u32 message);
 void MailBox_PrintMail(MailBoxWork *work);
 

@@ -54,7 +54,7 @@ u16 GetPokemonFieldOBJCODE(TPokeData *data, u16 species, u16 sex, u16 form) {
     return data->entries[index].objCode;
 }
 
-BOOL IsFieldPokemonSpriteHugeBillboard(void *unused, TPokeData *data, u16 species, u16 sex, u16 form) {
+BOOL IsFieldPokemonSpriteHugeBillboard(GameData *unused, TPokeData *data, u16 species, u16 sex, u16 form) {
     int index = GetFieldPokemonMMdlLUTIndex(data, species, sex, form);
     FieldActorConfig *config = GetIndexOfTPokeObjCode(data, data->entries[index].objCode);
 

@@ -30,7 +30,7 @@ enum {
 };
 
 // Starts the connection with the player's user data and friend list, returning DWCRAP_INIT_*
-int DWCRap_Init(void *userData, DWCFriendData *friendList);
+int DWCRap_Init(DWCUserData *userData, DWCFriendData *friendList);
 // Sets the functions that machines' data goes to: the one called on the parent, and the one on the children
 void DWCRap_SetRecvFuncs(GFLNetRecvFunc parentFunc, GFLNetRecvFunc childFunc);
 // Sets the function asked whether to take a machine in

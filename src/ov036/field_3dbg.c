@@ -15,7 +15,7 @@ typedef struct {
     u8 texParams[6];
     u8 loaded;
     u8 needsUpload;
-    void *resource;
+    G3DResource *resource;
 } Field3DBgTex;
 
 typedef struct {

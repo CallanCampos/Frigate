@@ -2,6 +2,7 @@
 #define POKEBW2_SAVE_ZUKAN_HABITAT_SAVEDATA_H
 
 #include "types.h"
+#include "struct_decls.h"
 
 // The Pokédex's habitat list (zukan_habitat_savedata.c, a descriptive name), which the save keeps at the end of the
 // medal box's block. Its clearing, its getter and the functions that the Pokédex calls are declared in

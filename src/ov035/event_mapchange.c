@@ -475,7 +475,7 @@ GameEventReturnCode EventMapChangeCore_Callback(GameEvent *event, u32 *state, vo
         FieldLensFlare *lensFlare;
         u32 fog;
 
-        FieldStatus_SetBusyFlag(GameData_GetFieldStatus(gameData), 2);
+        FieldStatus_SetBusyFlag(GameData_GetFieldStatus(gameData), FLD_STATUS_BUSY_LOADING);
         lensFlare = Field_GetLensFlare(field);
         fog = GetZoneFogIndexAll(field, wk->spawn.zoneId);
         FieldLensFlare_DecideForZoneTransit(lensFlare, wk->spawn.zoneId, Field_GetPlayerStateZoneID(field), fog);
@@ -1065,7 +1065,7 @@ GameEvent *EventMapChangeQuicksand_Create(GameSystem *gsys, Field *field, const 
     EventMapChange *wk = GameEvent_GetData(event);
 
     InitMapChangeEvent(wk, gsys);
-    CreateZoneChangeData(&wk->spawn, zoneId, 1, pos->x, pos->y, pos->z);
+    CreateZoneChangeData(&wk->spawn, zoneId, WARP_DIR_UP, pos->x, pos->y, pos->z);
     VEC_Set(&wk->unk34, effectPos->x, effectPos->y, effectPos->z);
     wk->unk2C = 0;
     return event;
@@ -1248,7 +1248,7 @@ GameEvent *EventMapChangeWarp_CreateFromEntity(GameSystem *gsys, Field *field, Z
         GameData_SetEscapeRopeZone(gameData, remember);
     }
     GameData_UpdateEscapeRopeZone(gameData, &wk->spawn);
-    FieldStatus_SetBusyFlag(GameData_GetFieldStatus(gameData), 2);
+    FieldStatus_SetBusyFlag(GameData_GetFieldStatus(gameData), FLD_STATUS_BUSY_LOADING);
     return event;
 }
 
@@ -1474,8 +1474,8 @@ void GameData_UpdateJoinAvenueForZone(GameData *gameData, u16 zoneId) {
     }
 
     if (IsZoneJoinAvenue(zoneId)) {
-        u16 param =
-            JoinAvenue_GetParam(JoinAvenue_GetInfo(SaveControl_GetJoinAvenue(GameData_GetSaveControl(gameData))), 5, 0);
+        u16 param = JoinAvenue_GetParam(
+            JoinAvenue_GetInfo(SaveControl_GetJoinAvenue(GameData_GetSaveControl(gameData))), JOIN_AVE_INFO_SEASON, 0);
         GameData_SetJoinAvenueSeason(gameData, param);
         JoinAvenue_RecordActivity(0x18);
     }
@@ -1520,9 +1520,9 @@ void GameData_UpdateFlashStatus(GameData *gameData, u16 zoneId) {
     FieldStatus *status = GameData_GetFieldStatus(gameData);
     u32 flags = GetZoneFlashFlags(zoneId);
 
-    if ((flags & 1) && FieldStatus_CheckFlashUsed(status)) {
-        flags &= ~1;
-        flags |= 2;
+    if ((flags & FLD_FLASH_ALLOW) && FieldStatus_CheckFlashUsed(status)) {
+        flags &= ~FLD_FLASH_ALLOW;
+        flags |= FLD_FLASH_ACTIVE;
     }
     FieldStatus_SetFlashPerms(status, flags);
 }

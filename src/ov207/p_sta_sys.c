@@ -28,9 +28,6 @@
 // The summary screen's core: setting up and tearing down the screens, the main loop, the buttons of the bottom
 // screen, changing the page or the Pokémon behind a mosaic, and printing for the pages. The file's name is a guess
 
-// The shortcut of the info page; the skill and ribbon pages' follow it
-#define SHORTCUT_PSTATUS_INFO 9
-
 // The BG palettes of each screen, in the version's colors
 #ifdef BLACK2
 #define NCLR_MAIN_BG 1
@@ -205,7 +202,7 @@ int PStatus_Main(PStatusWork *wk) {
         if (wk->isRedrawing == TRUE) {
             PStatus_UpdateRedraw(wk);
         } else {
-            GFL_WipeSet(0, 1, 1, 0, 6, 1, wk->heapId);
+            GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_IN, WIPE_TYPE_FADE_IN, 0, 6, 1, wk->heapId);
             wk->seq = PSTA_SEQ_WAIT_FADE_IN;
         }
         break;
@@ -217,7 +214,7 @@ int PStatus_Main(PStatusWork *wk) {
     case PSTA_SEQ_EXIT:
         if (wk->pressedButton == NULL || ClActor_IsAnimActive(wk->pressedButton) == FALSE ||
             wk->param->forceExit == TRUE) {
-            GFL_WipeSet(0, 0, 0, 0, 6, 1, wk->heapId);
+            GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, 0, 6, 1, wk->heapId);
             wk->seq = PSTA_SEQ_WAIT_FADE_OUT;
         }
         break;

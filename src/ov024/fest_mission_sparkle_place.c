@@ -17,9 +17,9 @@ typedef struct {
     u16 weight;
 } FestSparkleSpecies;
 
-static BOOL FestSparklePlace_PickPlaces(GameSystem *gsys, FestSparkleWork *work, FestMission *mission, u16 zoneId,
+static BOOL FestSparklePlace_PickPlaces(GameSystem *gsys, FestSparkleWork *work, FestMissionConfig *mission, u16 zoneId,
                                         MATHRandContext32 *rand);
-static u16 FestSparklePlace_PickSpecies(FestSparkleWork *work, FestMission *mission, MATHRandContext32 *rand);
+static u16 FestSparklePlace_PickSpecies(FestSparkleWork *work, FestMissionConfig *mission, MATHRandContext32 *rand);
 static BOOL FestSparklePlace_IsLastZoneUsed(FestSparkleWork *work);
 static void FestSparklePlace_AddZone(FestSparkleWork *work, u16 zoneId);
 
@@ -50,10 +50,8 @@ static const FestSparkleSpecies sSpecies[17][6] = {
     { { 169, 16 }, { 170, 17 }, { 171, 17 }, { 172, 17 }, { 173, 17 }, { 174, 16 } },
 };
 
-void FestSparklePlace_OnZoneEnter(RivalEntry *entry, GameSystem *gsys, LinkFestival *festival,
-                                  FestMissionConfig *config, u16 zoneId) {
-    FestSparkleWork *work = (FestSparkleWork *)entry;
-    FestMission *mission = (FestMission *)config;
+void FestSparklePlace_OnZoneEnter(FestSparkleWork *work, GameSystem *gsys, LinkFestival *festival,
+                                  FestMissionConfig *mission, u16 zoneId) {
     MATHRandContext32 rand;
 
     work->zoneId = zoneId;
@@ -67,7 +65,7 @@ void FestSparklePlace_OnZoneEnter(RivalEntry *entry, GameSystem *gsys, LinkFesti
     FestSparklePlace_AddZone(work, zoneId);
 }
 
-static BOOL FestSparklePlace_PickPlaces(GameSystem *gsys, FestSparkleWork *work, FestMission *mission, u16 zoneId,
+static BOOL FestSparklePlace_PickPlaces(GameSystem *gsys, FestSparkleWork *work, FestMissionConfig *mission, u16 zoneId,
                                         MATHRandContext32 *rand) {
     int count;
     u32 picked[8];
@@ -97,7 +95,7 @@ static BOOL FestSparklePlace_PickPlaces(GameSystem *gsys, FestSparkleWork *work,
         work->count = 0;
         return FALSE;
     }
-    pattern = (mission->unk8_0 >> (level * 3)) & 7;
+    pattern = (mission->info.unk8_0 >> (level * 3)) & 7;
     work->count = sSparkleCounts[pattern][FestMission_RandExcluding(rand, 8, NULL, 0)];
     if (work->count > work->unk2) {
         work->count = work->unk2;
@@ -113,16 +111,16 @@ static BOOL FestSparklePlace_PickPlaces(GameSystem *gsys, FestSparkleWork *work,
     return TRUE;
 }
 
-static u16 FestSparklePlace_PickSpecies(FestSparkleWork *work, FestMission *mission, MATHRandContext32 *rand) {
+static u16 FestSparklePlace_PickSpecies(FestSparkleWork *work, FestMissionConfig *mission, MATHRandContext32 *rand) {
     const FestSparkleSpecies *set;
     int i;
     u32 total = 0;
     u32 roll;
 
-    if (mission->target >= 17) {
+    if (mission->info.target >= 17) {
         set = sSpecies[0];
     } else {
-        set = sSpecies[mission->target];
+        set = sSpecies[mission->info.target];
     }
     roll = FestMission_RandExcluding(rand, 100000, NULL, 0);
     for (i = 0; i < 6; i++) {

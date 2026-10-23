@@ -8,7 +8,6 @@
 // Overlay 36: the camera areas of a zone, and the loader of their data. Names and layouts from swan
 // (https://github.com/ds-pokemon-hacking/swan, GPL-3.0)
 
-typedef struct FieldSceneArea FieldSceneArea;
 typedef struct CameraArea CameraArea;
 
 typedef BOOL (*CameraAreaCollCheck)(FieldSceneArea *area, const CameraArea *cameraArea, const VecFx32 *pos);

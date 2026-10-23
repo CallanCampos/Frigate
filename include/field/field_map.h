@@ -191,6 +191,6 @@ void FreeLandDataPatch(LandDataPatch *patch);
 void func_ov036_021c2d04(LandDataPatch *patch, LandPatchGrid *map, u32 srcX, u32 srcY, u32 destX, u32 destY, u32 width,
                          u32 height);
 // Adds the patch's buildings at x and y, after the count already added, and returns the new count
-u32 LoadLandDataPatchBuildings(LandDataPatch *patch, void *a1, void *a2, u32 count, u32 x, u32 y);
+u32 LoadLandDataPatchBuildings(LandDataPatch *patch, FieldPropSystem *a1, FieldChunk *a2, u32 count, u32 x, u32 y);
 
 #endif // POKEBW2_FIELD_FIELD_MAP_H

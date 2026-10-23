@@ -25,7 +25,7 @@ typedef struct {
     u16 item;                  // 0x16  out, 0 for none
     u8 cost;                   // 0x18  out, the item's Launcher cost in mode 1, else 0
     u8 done;                   // 0x19
-    void *bagCursor;           // 0x1c  the bag's saved cursor
+    BagCursor *bagCursor;      // 0x1c  the bag's saved cursor
     BOOL quit;                 // 0x20  1 leaves with the fade
     BOOL abort;                // 0x24  1 leaves at once
     u8 ballError;              // 0x28  0, or 1-5: why a Poké Ball can't be thrown
@@ -41,9 +41,10 @@ typedef struct {
 
 // The first of each kind of actor in BBagWork's actors
 enum {
-    BBAG_ACTOR_ITEM = 0,    // 0-5 the page's items, 6 the last used or the chosen item
-    BBAG_ACTOR_COST = 7,    // 8 per item slot: the cost, then 7 gauge pips (mode 1)
-    BBAG_ACTOR_ENERGY = 55, // 8: the energy left and spent
+    BBAG_ACTOR_ITEM = 0,       // 0-5 the page's items
+    BBAG_ACTOR_SHOWN_ITEM = 6, // the last used item on the pockets' page, or the chosen item
+    BBAG_ACTOR_COST = 7,       // 8 per item slot: the cost, then 7 gauge pips (mode 1)
+    BBAG_ACTOR_ENERGY = 55,    // 8: the energy left and spent
     BBAG_ACTOR_MAX = 63,
 };
 

@@ -9,7 +9,7 @@
 struct IntroParticle {
     HeapID heapId;
     IntroGraphic *graphic;
-    void *system;
+    ParticleSystem *system;
     u8 buffer[INTRO_PARTICLE_BUFFER_SIZE];
 };
 

@@ -23,6 +23,7 @@
 #include "system/bmp_winframe.h"
 #include "system/printsys.h"
 #include "system/wordset.h"
+#include "text/system/box2_bmp.h"
 
 // The PC box's windows: the Pokémon's data on the upper screen, the buttons of the frames, the box names and counts on
 // OAM, and the messages. The ROM doesn't name this file; box2_bmp.c is a guess after box2_main.c. None of these
@@ -150,7 +151,8 @@ void Box2Bmp_PrintTitle(Box2SysWork *syswk) {
 
     GFL_BitmapFill(BmpWin_GetBitmap(app->windows[0].window), 0);
     msgData = LoadBoxMsgData();
-    PrintMsg(app, 0, msgData, syswk->param->mode + 38, 0, 8, app->font, BOX2_COLOR_NORMAL);
+    // The titles follow the modes, from Deposit Pokémon on
+    PrintMsg(app, 0, msgData, syswk->param->mode + Box2Bmp_Text_DepositPokemon, 0, 8, app->font, BOX2_COLOR_NORMAL);
     GFL_MsgDataFree(msgData);
     PushWindowScreen(&syswk->app->windows[0]);
 }
@@ -569,48 +571,48 @@ static void PrintBoxMsg(Box2SysWork *syswk, u32 msgId, u32 index) {
 
 void Box2Bmp_PrintContinue(Box2SysWork *syswk, u32 index) {
     if (syswk->param->mode == BOX2_MODE_DREAM_WORLD) {
-        PrintBoxMsg(syswk, 53, index);
+        PrintBoxMsg(syswk, Box2Bmp_Text_SelectAnotherPokemon, index);
     } else {
-        PrintBoxMsg(syswk, 11, index);
+        PrintBoxMsg(syswk, Box2Bmp_Text_ContinueBoxOperations, index);
     }
 }
 
 void Box2Bmp_PrintTakeItem(Box2SysWork *syswk, u32 item, u32 index) {
     loadItemNameToStrbuf(syswk->app->wordSet, 0, item);
-    PrintBoxMsg(syswk, 21, index);
+    PrintBoxMsg(syswk, Box2Bmp_Text_Take, index);
 }
 
 void Box2Bmp_PrintMailCantTake(Box2SysWork *syswk, u32 index) {
-    PrintBoxMsg(syswk, 22, index);
+    PrintBoxMsg(syswk, Box2Bmp_Text_MailCantTakenAway, index);
 }
 
 void Box2Bmp_PrintMailCantMove(Box2SysWork *syswk, u32 index) {
-    PrintBoxMsg(syswk, 44, index);
+    PrintBoxMsg(syswk, Box2Bmp_Text_MailCannotMoved, index);
 }
 
 void Box2Bmp_PrintTookItem(Box2SysWork *syswk, u32 item, u32 index) {
     loadItemNameToStrbuf(syswk->app->wordSet, 0, item);
-    PrintBoxMsg(syswk, 14, index);
+    PrintBoxMsg(syswk, Box2Bmp_Text_Took, index);
 }
 
 void Box2Bmp_PrintBagFull(Box2SysWork *syswk, u32 index) {
-    PrintBoxMsg(syswk, 13, index);
+    PrintBoxMsg(syswk, Box2Bmp_Text_BagFull, index);
 }
 
 void Box2Bmp_PrintGiveItem(Box2SysWork *syswk, u32 item, u32 index) {
     if (item == ITEM_NONE) {
         loadItemNameToStrbuf(syswk->app->wordSet, 0, ITEM_GRISEOUS_ORB);
-        PrintBoxMsg(syswk, 45, index);
+        PrintBoxMsg(syswk, Box2Bmp_Text_CannotHold, index);
     } else if (PML_ItemIsMail(item) == TRUE) {
-        PrintBoxMsg(syswk, 49, index);
+        PrintBoxMsg(syswk, Box2Bmp_Text_CannotHoldMailHere, index);
     } else {
         loadItemNameToStrbuf(syswk->app->wordSet, 0, item);
-        PrintBoxMsg(syswk, 15, index);
+        PrintBoxMsg(syswk, Box2Bmp_Text_NowBeingHeld, index);
     }
 }
 
 void Box2Bmp_PrintTouchMark(Box2SysWork *syswk, u32 index) {
-    PrintBoxMsg(syswk, 33, index);
+    PrintBoxMsg(syswk, Box2Bmp_Text_TouchMark, index);
 }
 
 void Box2Bmp_PrintReleaseMsg(Box2SysWork *syswk, u32 type, u32 index) {
@@ -618,31 +620,31 @@ void Box2Bmp_PrintReleaseMsg(Box2SysWork *syswk, u32 type, u32 index) {
 
     switch (type) {
     case 0:
-        msgId = 2;
+        msgId = Box2Bmp_Text_ReleasePokemon;
         break;
     case 1:
-        msgId = 3;
+        msgId = Box2Bmp_Text_Released;
         loadBoxPokemonNameToStrbuf(syswk->app->wordSet, 0, Box2Main_GetBoxPkm(syswk, syswk->tray, syswk->pos));
         break;
     case 2:
-        msgId = 4;
+        msgId = Box2Bmp_Text_ByeBye;
         loadBoxPokemonNameToStrbuf(syswk->app->wordSet, 0, Box2Main_GetBoxPkm(syswk, syswk->tray, syswk->pos));
         break;
     case 3:
-        msgId = 28;
+        msgId = Box2Bmp_Text_CantReleaseEgg;
         break;
     case 7:
-        msgId = 29;
+        msgId = Box2Bmp_Text_CantReleaseFusedKyurem;
         break;
     case 4:
-        msgId = 30;
+        msgId = Box2Bmp_Text_CameBack;
         loadBoxPokemonNameToStrbuf(syswk->app->wordSet, 0, Box2Main_GetBoxPkm(syswk, syswk->tray, syswk->pos));
         break;
     case 5:
-        msgId = 31;
+        msgId = Box2Bmp_Text_WorriedAbout;
         break;
     case 6:
-        msgId = 6;
+        msgId = Box2Bmp_Text_ThatsLastPokemon;
         break;
     }
     PrintBoxMsg(syswk, msgId, index);
@@ -653,16 +655,16 @@ void Box2Bmp_PrintPrompt(Box2SysWork *syswk, u32 type, u32 index) {
 
     switch (type) {
     case 0:
-        msgId = 7;
+        msgId = Box2Bmp_Text_WhatWant;
         break;
     case 1:
-        msgId = 8;
+        msgId = Box2Bmp_Text_JumpWhichBox;
         break;
     case 2:
-        msgId = 9;
+        msgId = Box2Bmp_Text_PleasePickTheme;
         break;
     case 3:
-        msgId = 10;
+        msgId = Box2Bmp_Text_PickWallpaper;
         break;
     }
     PrintBoxMsg(syswk, msgId, index);
@@ -673,23 +675,23 @@ void Box2Bmp_PrintPokeMoveMsg(Box2SysWork *syswk, u32 pos, u32 type, u32 index) 
 
     switch (type) {
     case 0:
-        msgId = 16;
+        msgId = Box2Bmp_Text_WhichOneWillTake;
         break;
     case 1:
-        msgId = 0;
+        msgId = Box2Bmp_Text_Selected;
         loadBoxPokemonNameToStrbuf(syswk->app->wordSet, 0, Box2Main_GetBoxPkm(syswk, syswk->tray, syswk->pos));
         break;
     case 2:
-        msgId = 5;
+        msgId = Box2Bmp_Text_PartysFull;
         break;
     case 3:
-        msgId = 17;
+        msgId = Box2Bmp_Text_PlaceWhichBox;
         break;
     case 4:
-        msgId = 12;
+        msgId = Box2Bmp_Text_BoxFull;
         break;
     case 5:
-        msgId = 27;
+        msgId = Box2Bmp_Text_PleaseRemoveMail;
         break;
     }
     PrintBoxMsg(syswk, msgId, index);
@@ -700,31 +702,31 @@ void Box2Bmp_PrintItemMsg(Box2SysWork *syswk, u32 type, u32 index) {
 
     switch (type) {
     case 0:
-        msgId = 26;
+        msgId = Box2Bmp_Text_CanHoldItem;
         break;
     case 1:
-        msgId = 23;
+        msgId = Box2Bmp_Text_Selected_2;
         loadItemNameToStrbuf(syswk->app->wordSet, 0, syswk->app->getItem);
         break;
     case 2:
-        msgId = 24;
+        msgId = Box2Bmp_Text_PutAway;
         loadItemNameToStrbuf(syswk->app->wordSet, 0, syswk->app->getItem);
         break;
     case 3:
-        msgId = 25;
+        msgId = Box2Bmp_Text_PlacedBag;
         loadItemNameToStrbuf(syswk->app->wordSet, 0, syswk->app->getItem);
         break;
     case 4:
-        msgId = 22;
+        msgId = Box2Bmp_Text_MailCantTakenAway;
         break;
     case 5:
-        msgId = 32;
+        msgId = Box2Bmp_Text_EggCantHoldItem;
         break;
     case 6:
-        msgId = 13;
+        msgId = Box2Bmp_Text_BagFull;
         break;
     case 7:
-        msgId = 48;
+        msgId = Box2Bmp_Text_MailCannotMoved_2;
         break;
     }
     PrintBoxMsg(syswk, msgId, index);
@@ -734,17 +736,17 @@ void Box2Bmp_PrintDenyMsg(Box2SysWork *syswk, u32 type, u32 index) {
     u32 msgId;
 
     switch (type) {
-    case 2:
-        msgId = 46;
+    case BOX2_MOVE_ERR_MAIL:
+        msgId = Box2Bmp_Text_HasMail;
         break;
-    case 3:
-        msgId = 47;
+    case BOX2_MOVE_ERR_LAST_BATTLER:
+        msgId = Box2Bmp_Text_YoureOutPokemonCan;
         break;
-    case 4:
-        msgId = 50;
+    case BOX2_MOVE_ERR_EGG:
+        msgId = Box2Bmp_Text_EggsCannotSelected;
         break;
-    case 6:
-        msgId = 52;
+    case BOX2_MOVE_ERR_NOT_SLEEPY:
+        msgId = Box2Bmp_Text_PokemonDoesntSeemSleepy;
         break;
     }
     PrintBoxMsg(syswk, msgId, index);
@@ -752,14 +754,14 @@ void Box2Bmp_PrintDenyMsg(Box2SysWork *syswk, u32 type, u32 index) {
 
 void Box2Bmp_PrintTuckIn(Box2SysWork *syswk) {
     loadBoxPokemonNameToStrbuf(syswk->app->wordSet, 0, Box2Main_GetBoxPkm(syswk, syswk->tray, syswk->pos));
-    PrintBoxMsg(syswk, 51, 27);
+    PrintBoxMsg(syswk, Box2Bmp_Text_WillTuckedOk, 27);
 }
 
 void Box2Bmp_PrintBattleBoxLocked(Box2SysWork *syswk, u32 a1) {
     if (a1 == 0) {
-        PrintBoxMsg(syswk, 54, 27);
+        PrintBoxMsg(syswk, Box2Bmp_Text_BattleBoxLockedCannot, 27);
     } else {
-        PrintBoxMsg(syswk, 55, 27);
+        PrintBoxMsg(syswk, Box2Bmp_Text_BattleBoxLockedItems, 27);
     }
 }
 

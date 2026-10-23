@@ -12,14 +12,17 @@
 #define BTL_MONSET_MAX 6
 
 // What a mon of the set has taken, for BtlMonSet.damageKind
-#define BTL_MONSET_NO_DAMAGE 0
-#define BTL_MONSET_HP_DAMAGE 1
-#define BTL_MONSET_SUBSTITUTE_DAMAGE 2
+enum {
+    BTL_MONSET_NO_DAMAGE,
+    BTL_MONSET_HP_DAMAGE,
+    BTL_MONSET_SUBSTITUTE_DAMAGE,
+};
 
 typedef struct BtlMonSet {
     BattleMon *mons[BTL_MONSET_MAX];
     u16 damage[BTL_MONSET_MAX];
     u16 substituteDamage[BTL_MONSET_MAX];
+    // A BTL_MONSET_*_DAMAGE for each mon
     u8 damageKind[BTL_MONSET_MAX];
     u16 speed[BTL_MONSET_MAX];
     u8 count;

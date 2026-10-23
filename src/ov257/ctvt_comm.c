@@ -215,7 +215,7 @@ static const GFLNetInitData sCtvtCommNetInitData = {
     0x10,
     1,
     0,
-    0,
+    GFL_NET_TYPE_WIRELESS,
     1,
     CTVT_COMM_CMD_BASE >> 8,
     { 0x2c, 1, 0, 0 },

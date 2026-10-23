@@ -23,7 +23,7 @@ struct PMSIParam {
     u8 hasNumbers : 1;
     u32 unk4;
     // Save block 0x36, the Pokédex
-    void *pokedex;
+    PokeDexSave *pokedex;
     PMSWordSave *wordSave;
     PMSData sentence;
     u16 words[PMS_SENTENCE_WORD_MAX];
@@ -97,7 +97,7 @@ u32 PMSIParam_GetMode(const PMSIParam *param) {
     return param->mode;
 }
 
-void *PMSIParam_GetPokeDex(const PMSIParam *param) {
+PokeDexSave *PMSIParam_GetPokeDex(const PMSIParam *param) {
     return param->pokedex;
 }
 

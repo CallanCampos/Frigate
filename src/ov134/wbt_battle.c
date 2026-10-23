@@ -37,8 +37,8 @@
 struct WbtPartyList {
     FieldScriptEnv *env;
     WbtSystem *sys;
-    void *window;
-    void *msgBGSys;
+    MoneyWin *window;
+    FieldMsgBG *msgBGSys;
     MsgData *msgData;
     WordSet *wordSet;
     StrBuf *mainStrBuf;
@@ -147,7 +147,7 @@ u8 WbtBattle_GetPick(WbtSystem *sys, u32 index) {
     return sys->unk13C8[index];
 }
 
-void *WbtBattle_CreatePartyList(FieldScriptEnv *env, WbtSystem *sys) {
+WbtPartyList *WbtBattle_CreatePartyList(FieldScriptEnv *env, WbtSystem *sys) {
     ScriptWork *scriptWork = FieldScriptEnv_GetScriptWork(env);
     WbtPartyList *list =
         GFL_HeapAllocate(FieldScriptEnv_GetHeapID(env), sizeof(WbtPartyList), TRUE, "wbt_battle.c", 387);
@@ -195,7 +195,7 @@ void WbtBattle_ClosePartyList(WbtPartyList *list) {
     GFL_BGSysLoadScr(1);
 }
 
-void WbtBattle_FreePartyList(void *work) {
+void WbtBattle_FreePartyList(WbtPartyList *work) {
     GFL_HeapFree(work);
 }
 

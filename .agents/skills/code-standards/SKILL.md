@@ -33,6 +33,11 @@ The rules, with their wrong and right forms and when they don't apply, are in
 15. **Structure**: a value set (sequence numbers, results, kinds, modes) is an `enum` and its constants are passed,
     not numbers; a parameter takes the struct it always points to, not `void *`; a type is defined once, in its
     owner's header; a table of records is an array of a struct. Storage keeps its original type.
+16. **Pointers of one of several types**: never strip a type a pointer evidently has. Inline storage of one of several
+    structs is a `union` (`FestMissionWork`); a pointer to one of several separately allocated structs, or a parameter
+    a kind picks, is `void *` with a comment listing its types, and each use takes a typed local with no cast
+    (`FieldmapCtrlGrid *controller = Field_GetController(field);`); a union of pointers only where the same struct
+    holds the mode field that picks the member.
 
 Natural C wins over a match: a function that matches only through a workaround keeps the natural C and gets a row,
 and a complete file goes back to partial.

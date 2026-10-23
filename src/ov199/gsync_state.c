@@ -142,7 +142,7 @@ struct GSyncWork {
     BoxSaveAccessor *boxes;
     SaveControl *save;
     GameData *gameData;
-    void *musical;
+    MusicalDistWork *musical;
     void *dreamWorldCopy;
     GSyncResult *result;
     void *zukanSkin;

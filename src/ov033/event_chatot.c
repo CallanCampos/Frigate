@@ -213,9 +213,9 @@ void func_ov033_02178ffc(ChatotEventWork *work) {
     pkm = PokeParty_GetBoxPkm(work->pkm);
     arc = MakePokeGraArcHandle(21);
     encrypted = PML_PkmDecrypt(pkm);
-    work->chars = PokeGra_LoadClActCharsByBoxData(arc, pkm, 0, 0, 21);
-    work->palette = PokeGra_LoadClActPaletteByBoxData(arc, pkm, 0, 0, 0xc0, 21);
-    work->cellAnims = PokeGra_LoadClActCellAnimsByBoxData(pkm, 0, 1, 0, 21);
+    work->chars = PokeGra_LoadClActCharsByBoxData(arc, pkm, POKEGRA_DIR_FRONT, 0, 21);
+    work->palette = PokeGra_LoadClActPaletteByBoxData(arc, pkm, POKEGRA_DIR_FRONT, 0, 0xc0, 21);
+    work->cellAnims = PokeGra_LoadClActCellAnimsByBoxData(pkm, POKEGRA_DIR_FRONT, 1, 0, 21);
     PML_PkmReEncrypt(pkm, encrypted);
     GFL_ArcToolFree(arc);
     setup = sSpriteSetup;

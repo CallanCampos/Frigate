@@ -17,16 +17,18 @@
 #define PAL_PAD_TRADE_COUNT_MAX 99999
 
 // What WifiList_GetFriendParam gives and WifiList_SetFriendParam sets of a friend
-#define WIFI_LIST_FRIEND_ID 0
-#define WIFI_LIST_FRIEND_PROFILE_ID 1
-#define WIFI_LIST_FRIEND_WINS 2
-#define WIFI_LIST_FRIEND_LOSSES 3
-#define WIFI_LIST_FRIEND_DRAWS 4
-#define WIFI_LIST_FRIEND_LAST_YEAR 5
-#define WIFI_LIST_FRIEND_LAST_MONTH 6
-#define WIFI_LIST_FRIEND_LAST_DAY 7
-#define WIFI_LIST_FRIEND_TRAINER_VIEW 8
-#define WIFI_LIST_FRIEND_GENDER 9
+enum {
+    WIFI_LIST_FRIEND_ID,
+    WIFI_LIST_FRIEND_PROFILE_ID,
+    WIFI_LIST_FRIEND_WINS,
+    WIFI_LIST_FRIEND_LOSSES,
+    WIFI_LIST_FRIEND_DRAWS,
+    WIFI_LIST_FRIEND_LAST_YEAR,
+    WIFI_LIST_FRIEND_LAST_MONTH,
+    WIFI_LIST_FRIEND_LAST_DAY,
+    WIFI_LIST_FRIEND_TRAINER_VIEW,
+    WIFI_LIST_FRIEND_GENDER,
+};
 
 // A gender of a friend added by friend code, whose trainer the player hasn't met
 #define WIFI_LIST_GENDER_UNKNOWN 2
@@ -97,7 +99,7 @@ void WifiList_CreateExchangeToken(WifiList *wifiList, DWCFriendData *token);
 s32 WifiList_GetMyGSID(WifiList *wifiList);
 // Adds the friend whose 12 bytes of friend data a player gave, with the player's info, to the first free place of the
 // Friend Roster; TRUE if there was one, FALSE if the friend was in it already or it was full. heapId is a scratch heap
-BOOL WifiList_AddFriend(GameData *gameData, PlayerInfo *info, const void *friendData, HeapID heapId);
+BOOL WifiList_AddFriend(GameData *gameData, PlayerInfo *info, const DWCFriendData *friendData, HeapID heapId);
 // Whether the player's DWC user data has a profile and is this console's
 BOOL WifiList_HasValidProfile(WifiList *wifiList);
 WifiList *SaveControl_GetWifiList(SaveControl *save);

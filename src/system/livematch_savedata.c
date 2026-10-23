@@ -15,9 +15,7 @@ void LiveMatchData_Init(LiveMatchData *data) {
     OS_GetMacAddress(data->macAddress);
 }
 
-u32 LiveMatchData_GetCount(void *results, u32 index) {
-    LiveMatchData *data = results;
-
+u32 LiveMatchData_GetCount(LiveMatchData *data, u32 index) {
     return data->counts[index];
 }
 
@@ -47,7 +45,7 @@ void LiveMatchData_SetOpponentParam(LiveMatchData *data, u32 index, u32 field, u
 BOOL LiveMatchData_HasOpponent(LiveMatchData *data, const u8 *macAddress) {
     u8 opponent[BATTLEMATCH_MAC_ADDRESS_SIZE];
     int i;
-    int count = LiveMatchData_GetCount(data, 0);
+    int count = LiveMatchData_GetCount(data, LIVEMATCH_COUNT_PLAYED);
 
     if (count > LIVEMATCH_OPPONENT_MAX) {
         count = LIVEMATCH_OPPONENT_MAX;

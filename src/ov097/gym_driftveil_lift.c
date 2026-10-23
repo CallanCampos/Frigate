@@ -29,7 +29,7 @@ typedef struct {
     fx32 speed;
     BOOL down;
     // The camera's binding, taken off while the lift moves
-    void *cameraBind;
+    const VecFx32 *cameraBind;
     u32 lift;
     // The actor riding along on the second lift, if any
     FieldActor *rider;

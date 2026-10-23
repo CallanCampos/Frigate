@@ -43,12 +43,13 @@ u32 LiveBattleMatchFlow_GetResult(LiveBattleMatchFlow *flow);
 
 // Functions of the save and battle video code that have no header yet (the tournament block's are
 // save/tournament_block.h's)
-// The live competition's record: clears it and gives it this console's address, adds to a result by an amount, gets and
-// sets the 6-byte address of a result by its place and a byte after it, and whether an address is among the results
+// The live competition's record: clears it and gives it this console's address, adds an amount to a count (a
+// LIVEMATCH_COUNT_*), sets the address of an opponent by its place and a byte kept of it (a
+// LIVEMATCH_OPPONENT_PARAM_*), and whether an address is among the opponents
 void LiveMatchData_Init(LiveMatchData *record);
 void LiveMatchData_AddCount(LiveMatchData *record, u32 index, int amount);
 void LiveMatchData_SetOpponentMacAddress(LiveMatchData *record, u32 place, const u8 *mac);
-void LiveMatchData_SetOpponentParam(LiveMatchData *record, u32 place, u32 byte, u8 value);
+void LiveMatchData_SetOpponentParam(LiveMatchData *record, u32 place, u32 param, u8 value);
 BOOL LiveMatchData_HasOpponent(LiveMatchData *record, const u8 *mac);
 
 #endif // POKEBW2_APP_LIVEBATTLEMATCH_FLOW_H

@@ -49,7 +49,7 @@ struct StaActPoke {
     BOOL flip;
     MusPokeDraw *draw;
     u32 shadowActor;
-    void *itemRes[9];
+    G3DResource *itemRes[9];
     MusItemDraw *items[9];
     MusicalPokeEquip *equips[9];
     BOOL showItem[9];

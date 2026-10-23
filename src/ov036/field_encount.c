@@ -33,7 +33,7 @@ static BOOL EncSys_CheckRNGEncounter(EncountSystem *system, EncountState *state,
 static void FieldEncount_SetupNormal(EncountSystem *system, EncountManager *manager, BtlSetup *setup, HeapID heapId,
                                      WildPkmParam *params);
 static void FieldEncount_SetupRoaming(EncountSystem *system, EncountManager *manager, BtlSetup *setup, HeapID heapId,
-                                      void *roamingPkm);
+                                      RoamingPkm *roamingPkm);
 static void FieldEncount_SetupNPoke(EncountSystem *system, EncountManager *manager, BtlSetup *setup, HeapID heapId,
                                     u8 index);
 static void EncountState_SyncToPlayer(EncountState *state, FieldPlayer *player);
@@ -104,7 +104,7 @@ GameEvent *EventWildBattleCall_CreateRandom(EncountSystem *system, u32 mode) {
     BOOL forced = FALSE;
     BtlSetup *setup;
     u8 nIndex = 0xff;
-    void *roamingPkm = NULL;
+    RoamingPkm *roamingPkm = NULL;
     EncountState *state;
     FieldPlayer *player;
 
@@ -361,7 +361,7 @@ static void FieldEncount_SetupNormal(EncountSystem *system, EncountManager *mana
 }
 
 static void FieldEncount_SetupRoaming(EncountSystem *system, EncountManager *manager, BtlSetup *setup, HeapID heapId,
-                                      void *roamingPkm) {
+                                      RoamingPkm *roamingPkm) {
     PokeParty *party = PokeParty_Create(heapId);
     PartyPkm *pkm = GFL_HeapAllocate(HEAPID_TAIL(heapId), PokeParty_GetPkmRawSize(), TRUE, "field_encount.c", 684);
     BtlFieldStatus status;

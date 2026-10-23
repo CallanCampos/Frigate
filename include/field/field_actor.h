@@ -390,7 +390,7 @@ void ConvGXZToVector(s16 x, s16 z, VecFx32 *pos);
 void SpawnAllZoneNPCs(MMSys *mmSys, ZoneNPC *npcs, s32 zoneId, u32 count, EventWork *eventWork);
 
 BOOL FldAct_CheckAcmdEnd(FieldActor *actor);
-void *FldActMatColorPreset_Create(HeapID heapId);
+FldActMatColorPreset *FldActMatColorPreset_Create(HeapID heapId);
 void FldActMatColorPreset_Free(FldActMatColorPreset *preset);
 void FldActMatColorPreset_Load(FldActMatColorPreset *preset, u32 presetId);
 void FldActMatColorPreset_Apply(FldActMatColorPreset *preset, BlActScene *scene);
@@ -405,7 +405,7 @@ void FldActSys_FinishAsyncMatLoadSafe(MMSys *system);
 BOOL FldActSys_IsAsyncLoadPending(MMSys *system);
 void FldActSys_SuspendAllActors(MMSys *system);
 void DeleteAllActors(MMSys *system);
-void FieldActorG3DSystem_Create(MMSys *system, void *g3dObjSystem);
+void FieldActorG3DSystem_Create(MMSys *system, FieldG3DObjSystem *g3dObjSystem);
 void FldActSys_DetachField(MMSys *system);
 void FldActSys_InitDraw(MMSys *system, u16 *cameraAngle);
 void FldActSys_WakeUpAllActors(MMSys *system);
@@ -483,7 +483,7 @@ typedef struct {
     u16 tileFlagsOrigY;
     u16 tileFlags;
     const FieldActorConfig *config;
-    void *effects;
+    FieldEffects *effects;
     u8 season;
 } ActorTerrainEffectParam;
 
@@ -562,10 +562,10 @@ u16 FldActSys_GetTaskPriority(MMSys *system);
 HeapID FldActSys_GetFieldHeapID(MMSys *system);
 TCBManager *GetMMSysTCBMgr(MMSys *system);
 ArcTool *GetMMSysDataArcHandle(MMSys *system);
-void FldActSys_BindFieldBlAct(MMSys *system, void *fieldBlAct);
-void *FldActSys_GetFieldBlAct(MMSys *system);
-void FldActSys_BindActorG3DSystem(MMSys *system, void *actorG3DSystem);
-void *FldActSys_GetActorG3DSystem(MMSys *system);
+void FldActSys_BindFieldBlAct(MMSys *system, FieldBlAct *fieldBlAct);
+FieldBlAct *FldActSys_GetFieldBlAct(MMSys *system);
+void FldActSys_BindActorG3DSystem(MMSys *system, ActorG3DSystem *actorG3DSystem);
+ActorG3DSystem *FldActSys_GetActorG3DSystem(MMSys *system);
 NoGridMapper *FldActSys_GetNoGridMapper(MMSys *system);
 // The camera angle that FldActSys_InitDraw set, or 0
 u16 FldActSys_GetCameraAngle(MMSys *system);
@@ -601,7 +601,7 @@ void SetActorWPosOffset(FieldActor *actor, const VecFx32 *offset);
 void FldAct_GetOuterDrawOffset(FieldActor *actor, VecFx32 *dest);
 void FldAct_SetOuterDrawOffset(FieldActor *actor, const VecFx32 *value);
 void FldAct_GetAttrDrawOffset(FieldActor *actor, VecFx32 *dest);
-void *FldAct_GetFieldBlAct(FieldActor *actor);
+FieldBlAct *FldAct_GetFieldBlAct(FieldActor *actor);
 // The model's position offset of the actor's config
 void CopyActorPosOffset(FieldActor *actor, VecFx32 *offset);
 void FldActSys_SetDrawInited(MMSys *system, BOOL flag);

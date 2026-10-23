@@ -5,7 +5,7 @@
 // download_play_wih.c is the wireless helper of the DS Download Play range of overlay 182: it measures how busy each
 // channel is, one after the other, and keeps the ones that were least busy
 
-static void func_ov182_021b9be4(int state);
+static void func_ov182_021b9be4(WIHState state);
 static void func_ov182_021b9c34(int errcode);
 static BOOL func_ov182_021b9c48(void);
 static void func_ov182_021b9c78(void *arg);
@@ -49,7 +49,7 @@ void func_ov182_021b9bbc(void *loaderContext) {
 
 // Moves to the state given, logging the state it moves from and the one it moves to through the work pointer's log,
 // which nothing in this build sets
-static void func_ov182_021b9be4(int state) {
+static void func_ov182_021b9be4(WIHState state) {
     if (gWork.logPrint != NULL) {
         gWork.logPrint(0x08000000, data_ov182_021c18d4, stateNames[gWork.work->sysState]);
     }
@@ -68,7 +68,7 @@ static void func_ov182_021b9c34(int errcode) {
 
 // The parent's parameter setup: what runs when the wireless mode starts as a parent
 static BOOL func_ov182_021b9c48(void) {
-    int result;
+    WMErrCode result;
 
     func_ov182_021b9be4(WIH_STATE_BUSY);
     result = WM_SetParentParameter(func_ov182_021b9c78, &gWork.work->sParentParam);
@@ -104,10 +104,10 @@ static void func_ov182_021b9c78(void *arg) {
 // Has the parent fill the work's WEP key and sets it, going on to the parent start from its callback
 static BOOL func_ov182_021b9cc0(void) {
     u16 wepMode;
-    int result;
+    WMErrCode result;
 
     func_ov182_021b9be4(WIH_STATE_BUSY);
-    wepMode = gWork.work->unk_13ac(gWork.work->wepKey);
+    wepMode = gWork.work->unk_13ac(gWork.work->wepKey, &gWork.work->sParentParam);
     result = WM_SetWEPKey(func_ov182_021b9d04, wepMode, gWork.work->wepKey);
     if (result != WM_ERRCODE_OPERATING) {
         func_ov182_021b9c34(result);
@@ -133,7 +133,7 @@ static void func_ov182_021b9d04(void *arg) {
 
 // The parent start. A machine that is already connected, sharing data or sharing keys needs no start
 static BOOL func_ov182_021b9d28(void) {
-    int result;
+    WMErrCode result;
 
     if (gWork.work->sysState == WIH_STATE_CONNECTED || gWork.work->sysState == WIH_STATE_DATASHARING ||
         gWork.work->sysState == WIH_STATE_KEYSHARING) {
@@ -169,7 +169,7 @@ static void func_ov182_021b9d68(void *arg) {
             gWork.logPrint(0x08000000, data_ov182_021c18e0, aid);
         }
         if (gWork.work->sScanFilter != NULL && !gWork.work->sScanFilter(cb)) {
-            int result = WM_Disconnect(NULL, cb->aid);
+            WMErrCode result = WM_Disconnect(NULL, cb->aid);
 
             if (result != WM_ERRCODE_OPERATING) {
                 func_ov182_021b9c34(result);
@@ -200,7 +200,7 @@ static void func_ov182_021b9d68(void *arg) {
 
 // The multi-point parent start
 static BOOL func_ov182_021b9e48(void) {
-    int result;
+    WMErrCode result;
 
     if (gWork.work->sysState == WIH_STATE_CONNECTED || gWork.work->sysState == WIH_STATE_DATASHARING ||
         gWork.work->sysState == WIH_STATE_KEYSHARING) {
@@ -242,7 +242,7 @@ static void func_ov182_021b9eb0(void *arg) {
                 return;
             }
         } else if (gWork.work->sConnectMode == WIH_CONNECTMODE_DS_PARENT) {
-            int result = WM_StartDataSharing(&gWork.work->dataSharing, 13, 7, 0x44, TRUE);
+            WMErrCode result = WM_StartDataSharing(&gWork.work->dataSharing, 13, 7, 0x44, TRUE);
 
             if (result != WM_ERRCODE_SUCCESS) {
                 func_ov182_021b9c34(result);
@@ -268,7 +268,7 @@ static void func_ov182_021b9eb0(void *arg) {
 
 // The key sharing start, which this build's parent path has no call for
 static BOOL func_ov182_021b9f80(void) {
-    int result;
+    WMErrCode result;
 
     func_ov182_021b9be4(WIH_STATE_KEYSHARING);
     result = WM_StartKeySharing(&gWork.work->keySharing, 13);
@@ -281,7 +281,7 @@ static BOOL func_ov182_021b9f80(void) {
 
 // The key sharing end
 static BOOL func_ov182_021b9fac(void) {
-    int result = WM_EndKeySharing(&gWork.work->keySharing);
+    WMErrCode result = WM_EndKeySharing(&gWork.work->keySharing);
 
     if (result != WM_ERRCODE_OPERATING) {
         func_ov182_021b9c34(result);
@@ -292,7 +292,7 @@ static BOOL func_ov182_021b9fac(void) {
 
 // The end of the parent mode
 static BOOL func_ov182_021b9fd0(void) {
-    int result;
+    WMErrCode result;
 
     func_ov182_021b9be4(WIH_STATE_BUSY);
     result = WM_EndMP(func_ov182_021b9ff4);
@@ -322,7 +322,7 @@ static void func_ov182_021b9ff4(void *arg) {
 
 // The end of the parent itself
 static BOOL func_ov182_021ba02c(void) {
-    int result = WM_EndParent(func_ov182_021ba048);
+    WMErrCode result = WM_EndParent(func_ov182_021ba048);
 
     if (result != WM_ERRCODE_OPERATING) {
         func_ov182_021b9c34(result);
@@ -344,7 +344,7 @@ static void func_ov182_021ba048(void *arg) {
 
 // The key sharing end, only when the helper is sharing keys
 static BOOL func_ov182_021ba060(void) {
-    int result;
+    WMErrCode result;
 
     if (gWork.work->sysState != WIH_STATE_KEYSHARING) {
         return FALSE;
@@ -360,7 +360,7 @@ static BOOL func_ov182_021ba060(void) {
 
 // The end of the multi-point mode of a child
 static BOOL func_ov182_021ba098(void) {
-    int result;
+    WMErrCode result;
 
     func_ov182_021b9be4(WIH_STATE_BUSY);
     result = WM_EndMP(func_ov182_021ba0bc);
@@ -387,7 +387,7 @@ static void func_ov182_021ba0bc(void *arg) {
 
 // The disconnect of a child
 static BOOL func_ov182_021ba0e0(void) {
-    int result;
+    WMErrCode result;
 
     func_ov182_021b9be4(WIH_STATE_BUSY);
     result = WM_Disconnect(func_ov182_021ba10c, 0);
@@ -412,7 +412,7 @@ static void func_ov182_021ba10c(void *arg) {
 
 // The wireless reset
 static BOOL func_ov182_021ba124(void) {
-    int result;
+    WMErrCode result;
 
     func_ov182_021b9be4(WIH_STATE_BUSY);
     result = WM_Reset(func_ov182_021ba148);
@@ -597,10 +597,12 @@ BOOL func_ov182_021ba42c(void) {
     gWork.work->sParentParam.userGameInfo = NULL;
     gWork.work->sParentParam.userGameInfoLength = 0;
     gWork.work->sScanFilter = NULL;
-    if (func_ov182_021ba48c()) {
+    switch (func_ov182_021ba48c()) {
+    case FALSE:
+        return FALSE;
+    default:
         return TRUE;
     }
-    return FALSE;
 }
 
 // The wireless indication callback: an error that it cannot recover from ends the game
@@ -615,7 +617,7 @@ static void func_ov182_021ba478(void *arg) {
 
 // The wireless start
 static BOOL func_ov182_021ba48c(void) {
-    int result;
+    WMErrCode result;
 
     func_ov182_021b9be4(WIH_STATE_BUSY);
     result = WM_Initialize(gWork.work->wmBuf, func_ov182_021ba4c0, 2);
@@ -630,7 +632,7 @@ static BOOL func_ov182_021ba48c(void) {
 // What the wireless start calls
 static void func_ov182_021ba4c0(void *arg) {
     WMCallback *cb = arg;
-    int result;
+    WMErrCode result;
 
     if (cb->errcode != WM_ERRCODE_SUCCESS) {
         func_ov182_021b9c34(cb->errcode);
@@ -651,7 +653,6 @@ static void func_ov182_021ba4c0(void *arg) {
 BOOL func_ov182_021ba4f8(u16 mode, u16 tgid, u16 channel) {
     if (gWork.work->sysState != WIH_STATE_IDLE) {
         OS_Terminate();
-        return FALSE;
     }
     gWork.work->recvBufSize = 0x180;
     gWork.work->sendBufSize = 0xe0;
@@ -694,7 +695,7 @@ u8 *func_ov182_021ba5dc(u16 netId) {
 
 // WH_StepDS: shares the data given, for the machines to read the next step
 BOOL func_ov182_021ba5fc(u8 *data) {
-    int result = WM_StepDataSharing(&gWork.work->dataSharing, (const u16 *)data, &gWork.work->dataSet);
+    WMErrCode result = WM_StepDataSharing(&gWork.work->dataSharing, (const u16 *)data, &gWork.work->dataSet);
 
     if (result == WM_ERRCODE_NO_CHILD) {
         if (gWork.logPrint != NULL) {

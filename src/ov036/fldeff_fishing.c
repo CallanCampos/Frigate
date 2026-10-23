@@ -8,10 +8,10 @@
 
 typedef struct {
     FieldEffects *effects;
-    void *mdlRes;
-    void *anmRes;
+    G3DResource *mdlRes;
+    G3DResource *anmRes;
     G3DActor *actor;
-    void *anm;
+    G3DAnimation *anm;
     G3DModel *mdl;
 } FieldEffectFishing;
 

@@ -105,7 +105,7 @@ static NetCommandTable _BaseTable = { sBaseCommands, GFL_NET_CMD_BASE_COUNT };
 
 static NetCommandWork *_pCommandWork;
 
-void NetCommand_Init(int base, const void *list, int listNum, void *work, HeapID unused) {
+void NetCommand_Init(int base, const NetCommand *list, int listNum, void *work, HeapID unused) {
     int i;
 
     if (_pCommandWork == NULL) {

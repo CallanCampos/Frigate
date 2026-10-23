@@ -42,10 +42,10 @@
 #define MSG_JOIN_AVENUE_DEFAULT_GREETING 0x776
 #define MSG_JOIN_AVENUE_DEFAULT_MESSAGE1 0x6ea
 #define MSG_JOIN_AVENUE_DEFAULT_MESSAGE2 0x730
-// The system message file of the avenue's default name, and the script message of its default second name
+// The system message file of the avenue's default name, and the script message of its default title
 #define MSG_JOIN_AVENUE_NAMES TEXT_BANK_PLACE_NAMES
 #define MSG_JOIN_AVENUE_DEFAULT_NAME 0x79
-#define MSG_JOIN_AVENUE_DEFAULT_NAME2 0xac
+#define MSG_JOIN_AVENUE_DEFAULT_TITLE 0xac
 
 // Set once the player has entered the Hall of Fame
 #define EVENT_FLAG_HALL_OF_FAME 0x960
@@ -391,7 +391,7 @@ static void JoinAvenueShopChoice_SetFromGameData(JoinAvenueShopChoice *choice, G
     info = JoinAvenue_GetInfo(joinAvenue);
     player = JoinAvenueOccupants_GetPlayerPerson(getAddressOfBeginningOfOccupants(joinAvenue));
     playerInfo = GetGameDataPlayerInfo(gameData);
-    choice->rank = JoinAvenue_GetParam(info, 2, NULL);
+    choice->rank = JoinAvenue_GetParam(info, JOIN_AVE_INFO_RANK, NULL);
     choice->shopId = JoinAvenuePerson_GetShopId(player, playerInfo);
     choice->unk0 = FALSE;
 }
@@ -1577,7 +1577,7 @@ u32 JoinAvenueEntryList_Add(JoinAvenueEntryList *list, JoinAvenueEntry *entry) {
         return 2;
     }
     skipFirst = FALSE;
-    if (JoinAvenue_GetParam(sJoinAvenue.info, 7, NULL)) {
+    if (JoinAvenue_GetParam(sJoinAvenue.info, JOIN_AVE_INFO_UNOPENED, NULL)) {
         kind = JoinAvenueEntry_GetParam(entry, JOIN_AVE_PARAM_SHOP_KIND, NULL);
         if (kind != 2 && kind != 3) {
             skipFirst = TRUE;
@@ -2383,10 +2383,10 @@ void JoinAvenueInfo_Init(JoinAvenueInfo *info) {
 
     MI_CpuFill8(info, 0, sizeof(JoinAvenueInfo));
     info->name[0] = GFL_StrBufGetTerminator();
-    info->name2[0] = GFL_StrBufGetTerminator();
+    info->title[0] = GFL_StrBufGetTerminator();
     info->seed = GFL_RandomLC(0);
     info->rank = 1;
-    info->unkDC_1 = TRUE;
+    info->unopened = TRUE;
     MIi_CpuClear32(0xffffffff, info->visitorIds, sizeof(info->visitorIds));
 
     msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, MSG_JOIN_AVENUE_NAMES, HEAPID_TAIL(HEAPID_SAVEDATA));
@@ -2396,164 +2396,164 @@ void JoinAvenueInfo_Init(JoinAvenueInfo *info) {
     GFL_MsgDataFree(msgData);
 
     msgData = GFL_MsgSysLoadData(FALSE, ARCID_SCRIPT_MESSAGE, MSG_JOIN_AVENUE_DEFAULTS, HEAPID_TAIL(HEAPID_SAVEDATA));
-    str = GFL_MsgDataLoadStrbufNew(msgData, MSG_JOIN_AVENUE_DEFAULT_NAME2);
-    GFL_StrBufStoreString(str, info->name2, NELEMS(info->name2));
+    str = GFL_MsgDataLoadStrbufNew(msgData, MSG_JOIN_AVENUE_DEFAULT_TITLE);
+    GFL_StrBufStoreString(str, info->title, NELEMS(info->title));
     GFL_StrBufFree(str);
     GFL_MsgDataFree(msgData);
 }
 
 u32 JoinAvenue_GetParam(JoinAvenueInfo *info, u32 param, void *buffer) {
     switch (param) {
-    case 0:
+    case JOIN_AVE_INFO_NAME:
         if (buffer != NULL) {
             wcharsncpy(info->name, buffer, NELEMS(info->name));
         }
         return (u32)info->name;
-    case 1:
+    case JOIN_AVE_INFO_TITLE:
         if (buffer != NULL) {
-            wcharsncpy(info->name2, buffer, 11);
+            wcharsncpy(info->title, buffer, 11);
         }
-        return (u32)info->name2;
-    case 2:
+        return (u32)info->title;
+    case JOIN_AVE_INFO_RANK:
         return info->rank;
-    case 3:
-        return info->unkD4;
-    case 4:
+    case JOIN_AVE_INFO_POPULARITY:
+        return info->popularity;
+    case JOIN_AVE_INFO_SEED:
         return info->seed;
-    case 5:
-        return info->unkDA;
-    case 6:
-        return info->unkDC_0;
-    case 7:
-        return info->unkDC_1;
-    case 8:
-        return info->unkDC_2;
-    case 9:
-        return info->unkDC_3;
-    case 10:
-        return info->unkDC_6;
-    case 11:
-        return info->unkDC_4;
-    case 12:
-        return info->unkDC_5;
-    case 13:
-        return info->unkDC_14;
-    case 14:
-        return info->unkDC_16;
-    case 15:
-        return info->unkDC_18;
-    case 16:
-        return info->unkDC_7;
-    case 17:
-        return info->unkDC_8;
-    case 18:
-        return info->unkDC_11;
-    case 19:
-        return info->unkDC_9;
-    case 20:
-        return info->unkDC_10;
-    case 21:
-        return info->unkDC_15;
-    case 22:
-        return info->unkDC_17;
-    case 23:
-        return info->unkDC_19;
-    case 24:
-        return info->unkDC_12;
-    case 25:
+    case JOIN_AVE_INFO_SEASON:
+        return info->season;
+    case JOIN_AVE_INFO_ENTRIES_ADDED:
+        return info->entriesAdded;
+    case JOIN_AVE_INFO_UNOPENED:
+        return info->unopened;
+    case JOIN_AVE_INFO_UNLOCKED_1:
+        return info->unlocked1;
+    case JOIN_AVE_INFO_UNLOCKED_2:
+        return info->unlocked2;
+    case JOIN_AVE_INFO_UNLOCKED_3:
+        return info->unlocked3;
+    case JOIN_AVE_INFO_UNLOCKED_4:
+        return info->unlocked4;
+    case JOIN_AVE_INFO_UNLOCKED_5:
+        return info->unlocked5;
+    case JOIN_AVE_INFO_UNLOCKED_6:
+        return info->unlocked6;
+    case JOIN_AVE_INFO_UNLOCKED_7:
+        return info->unlocked7;
+    case JOIN_AVE_INFO_UNLOCKED_8:
+        return info->unlocked8;
+    case JOIN_AVE_INFO_UNLOCK_PENDING_1:
+        return info->unlockPending1;
+    case JOIN_AVE_INFO_UNLOCK_PENDING_2:
+        return info->unlockPending2;
+    case JOIN_AVE_INFO_UNLOCK_PENDING_3:
+        return info->unlockPending3;
+    case JOIN_AVE_INFO_UNLOCK_PENDING_4:
+        return info->unlockPending4;
+    case JOIN_AVE_INFO_UNLOCK_PENDING_5:
+        return info->unlockPending5;
+    case JOIN_AVE_INFO_UNLOCK_PENDING_6:
+        return info->unlockPending6;
+    case JOIN_AVE_INFO_UNLOCK_PENDING_7:
+        return info->unlockPending7;
+    case JOIN_AVE_INFO_UNLOCK_PENDING_8:
+        return info->unlockPending8;
+    case JOIN_AVE_INFO_SPECIAL_ENTRY_CHECKED:
+        return info->specialEntryChecked;
+    case JOIN_AVE_INFO_UNK_DC_13:
         return info->unkDC_13;
-    case 26:
-        return info->unkE8;
-    case 27:
-        return info->unkEA;
+    case JOIN_AVE_INFO_MAX_LEVEL_DAYS:
+        return info->maxLevelDays;
+    case JOIN_AVE_INFO_MAX_LEVEL_WEEK:
+        return info->maxLevelWeek;
     }
     return 0;
 }
 
 void JoinAvenueInfo_SetParam(JoinAvenueInfo *info, u32 param, u32 value) {
     switch (param) {
-    case 0:
+    case JOIN_AVE_INFO_NAME:
         wcharsncpy((const u16 *)value, info->name, NELEMS(info->name));
         break;
-    case 1:
-        wcharsncpy((const u16 *)value, info->name2, 11);
+    case JOIN_AVE_INFO_TITLE:
+        wcharsncpy((const u16 *)value, info->title, 11);
         break;
-    case 2:
+    case JOIN_AVE_INFO_RANK:
         info->rank = value;
         break;
-    case 3:
-        info->unkD4 = value;
+    case JOIN_AVE_INFO_POPULARITY:
+        info->popularity = value;
         break;
-    case 4:
+    case JOIN_AVE_INFO_SEED:
         break;
-    case 5:
-        info->unkDA = value;
+    case JOIN_AVE_INFO_SEASON:
+        info->season = value;
         break;
-    case 6:
-        info->unkDC_0 = value;
+    case JOIN_AVE_INFO_ENTRIES_ADDED:
+        info->entriesAdded = value;
         break;
-    case 7:
-        info->unkDC_1 = value;
+    case JOIN_AVE_INFO_UNOPENED:
+        info->unopened = value;
         break;
-    case 8:
-        info->unkDC_2 = value;
+    case JOIN_AVE_INFO_UNLOCKED_1:
+        info->unlocked1 = value;
         break;
-    case 9:
-        info->unkDC_3 = value;
+    case JOIN_AVE_INFO_UNLOCKED_2:
+        info->unlocked2 = value;
         break;
-    case 10:
-        info->unkDC_6 = value;
+    case JOIN_AVE_INFO_UNLOCKED_3:
+        info->unlocked3 = value;
         break;
-    case 11:
-        info->unkDC_4 = value;
+    case JOIN_AVE_INFO_UNLOCKED_4:
+        info->unlocked4 = value;
         break;
-    case 12:
-        info->unkDC_5 = value;
+    case JOIN_AVE_INFO_UNLOCKED_5:
+        info->unlocked5 = value;
         break;
-    case 13:
-        info->unkDC_14 = value;
+    case JOIN_AVE_INFO_UNLOCKED_6:
+        info->unlocked6 = value;
         break;
-    case 14:
-        info->unkDC_16 = value;
+    case JOIN_AVE_INFO_UNLOCKED_7:
+        info->unlocked7 = value;
         break;
-    case 15:
-        info->unkDC_18 = value;
+    case JOIN_AVE_INFO_UNLOCKED_8:
+        info->unlocked8 = value;
         break;
-    case 16:
-        info->unkDC_7 = value;
+    case JOIN_AVE_INFO_UNLOCK_PENDING_1:
+        info->unlockPending1 = value;
         break;
-    case 17:
-        info->unkDC_8 = value;
+    case JOIN_AVE_INFO_UNLOCK_PENDING_2:
+        info->unlockPending2 = value;
         break;
-    case 18:
-        info->unkDC_11 = value;
+    case JOIN_AVE_INFO_UNLOCK_PENDING_3:
+        info->unlockPending3 = value;
         break;
-    case 19:
-        info->unkDC_9 = value;
+    case JOIN_AVE_INFO_UNLOCK_PENDING_4:
+        info->unlockPending4 = value;
         break;
-    case 20:
-        info->unkDC_10 = value;
+    case JOIN_AVE_INFO_UNLOCK_PENDING_5:
+        info->unlockPending5 = value;
         break;
-    case 21:
-        info->unkDC_15 = value;
+    case JOIN_AVE_INFO_UNLOCK_PENDING_6:
+        info->unlockPending6 = value;
         break;
-    case 22:
-        info->unkDC_17 = value;
+    case JOIN_AVE_INFO_UNLOCK_PENDING_7:
+        info->unlockPending7 = value;
         break;
-    case 23:
-        info->unkDC_19 = value;
+    case JOIN_AVE_INFO_UNLOCK_PENDING_8:
+        info->unlockPending8 = value;
         break;
-    case 24:
-        info->unkDC_12 = value;
+    case JOIN_AVE_INFO_SPECIAL_ENTRY_CHECKED:
+        info->specialEntryChecked = value;
         break;
-    case 25:
+    case JOIN_AVE_INFO_UNK_DC_13:
         info->unkDC_13 = value;
         break;
-    case 26:
-        info->unkE8 = value;
+    case JOIN_AVE_INFO_MAX_LEVEL_DAYS:
+        info->maxLevelDays = value;
         break;
-    case 27:
-        info->unkEA = value;
+    case JOIN_AVE_INFO_MAX_LEVEL_WEEK:
+        info->maxLevelWeek = value;
         break;
     }
 }
@@ -2564,14 +2564,14 @@ void JoinAvenueInfo_ResetDaily(JoinAvenueInfo *info, BOOL fullDay) {
         info->visitorIdIndex = 0;
         info->visitorIdCount = 0;
         info->seed = gfRand(info->seed);
-        info->unkDC_0 = FALSE;
-        info->unkDC_12 = FALSE;
+        info->entriesAdded = FALSE;
+        info->specialEntryChecked = FALSE;
     }
-    if (info->unkEA != 0) {
-        info->unkE8++;
-        if (info->unkE8 >= 7) {
-            info->unkEA = 0;
-            info->unkE8 = 0;
+    if (info->maxLevelWeek != 0) {
+        info->maxLevelDays++;
+        if (info->maxLevelDays >= 7) {
+            info->maxLevelWeek = 0;
+            info->maxLevelDays = 0;
         }
     }
 }
@@ -2599,7 +2599,7 @@ static BOOL JoinAvenueInfo_HasVisitorId(const JoinAvenueInfo *info, u32 id) {
 }
 
 u32 JoinAvenueInfo_Random(JoinAvenueInfo *info, int count, u32 max) {
-    return JoinAvenue_RandomFromSeed(JoinAvenue_GetParam(info, 4, NULL), count, max);
+    return JoinAvenue_RandomFromSeed(JoinAvenue_GetParam(info, JOIN_AVE_INFO_SEED, NULL), count, max);
 }
 
 void setImportantJABlockAddresses(SaveControl *save) {
@@ -2634,7 +2634,7 @@ static u32 gfRand(u32 seed) {
 
 u16 JoinAvenue_ChooseShop(u16 shopId, u16 trainerId, u16 version, BOOL unk18, JoinAvenueInfo *info,
                           ResortShopData *shops) {
-    u32 unk13 = JoinAvenue_GetParam(info, 13, NULL);
+    u32 unk13 = JoinAvenue_GetParam(info, JOIN_AVE_INFO_UNLOCKED_6, NULL);
     const u16 *shop = ResortShopData_GetShop(shops, shopId);
     u16 level = ResortShopData_GetShopParam(shop, 2);
     u16 kind = ResortShopData_GetShopParam(shop, 0);

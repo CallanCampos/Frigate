@@ -52,7 +52,7 @@ sSwordAnims kind:data(any) addr:0x021efd58
 sActorsA kind:data(any) addr:0x021efd74
 sActorsB kind:data(any) addr:0x021efd94
 sActorsC kind:data(any) addr:0x021efdc4
-data_ov129_021efdf4 kind:data(any) addr:0x021efdf4
+sActorPositions kind:data(any) addr:0x021efdf4
 data_ov129_021efe00 kind:data(any) addr:0x021efe00 ambiguous
 sResourcesA kind:data(any) addr:0x021efe3c
 sActorsD kind:data(any) addr:0x021efe9c

@@ -18,6 +18,7 @@
 #include "battle/pokewood_cutin.h"
 #include "constants/abilities.h"
 #include "constants/arc.h"
+#include "constants/battle.h"
 #include "constants/pokemon.h"
 #include "constants/species.h"
 #include "constants/text_banks.h"
@@ -408,7 +409,7 @@ u8 func_ov167_0219a004(BtlSetup *setup) {
 
 void BtlMain_SetupPlayerAndParties(BtlMainModule *mainModule, BtlSetup *setup) {
     u32 i;
-    void *chatter;
+    PerapVoice *chatter;
     u8 chatterFlags[4];
 
     mainModule->playerClientId = setup->fieldSituation.unk19;
@@ -1199,7 +1200,7 @@ BOOL BtlMain_CommExchangeTrainers(BtlMainModule *mainModule, s32 *state) {
 BOOL BtlMain_CommExchangeChatter(BtlMainModule *mainModule, s32 *state) {
     BtlSetup *setup = mainModule->setup;
     u32 i;
-    void *chatter;
+    PerapVoice *chatter;
 
     if (BtlNet_CheckError()) {
         mainModule->unk473_0 = 1;
@@ -1582,7 +1583,7 @@ BOOL func_ov167_0219bdfc(BtlMainModule *mainModule) {
     return FALSE;
 }
 
-void *GetCommPlayerSupport(BtlMainModule *mainModule) {
+CommPlayerSupport *GetCommPlayerSupport(BtlMainModule *mainModule) {
     if (mainModule->setup->battleType <= 1) {
         return mainModule->setup->unk88;
     }
@@ -2261,7 +2262,7 @@ BagSave *GetBagSave(BtlMainModule *mainModule) {
     return mainModule->setup->bag;
 }
 
-void *GetBagCursor(BtlMainModule *mainModule) {
+BagCursor *GetBagCursor(BtlMainModule *mainModule) {
     return mainModule->setup->unk7C;
 }
 
@@ -2512,7 +2513,7 @@ void PokeCon_CreateClientParty(BtlPokeCon *pokeCon, BtlMainModule *mainModule, u
     eligible = GetPartyPkmnEligibleForBattle(srcParty);
     if (eligible > 0) {
         for (monId = firstMonId, i = 0; i < eligible; monId++) {
-            if (GetBattleMonStat(pokeCon->mons[monId], 0x11) == ABILITY_ILLUSION) {
+            if (GetBattleMonStat(pokeCon->mons[monId], BATTLEMON_EFFECTIVE_ABILITY) == ABILITY_ILLUSION) {
                 SetIllusionDisguise(pokeCon->mons[monId], PokeParty_GetPkm(srcParty, eligible));
             }
             i++;
@@ -2521,7 +2522,8 @@ void PokeCon_CreateClientParty(BtlPokeCon *pokeCon, BtlMainModule *mainModule, u
     if (BtlSetup_GetBattleType(mainModule) == 0 && clientId == 1) {
         for (i = 0; i < count; firstMonId++) {
             mon = pokeCon->mons[firstMonId];
-            if (GetBattleMonSpecies(mon) == SPECIES_ZOROARK && GetBattleMonStat(mon, 0x11) == ABILITY_ILLUSION) {
+            if (GetBattleMonSpecies(mon) == SPECIES_ZOROARK &&
+                GetBattleMonStat(mon, BATTLEMON_EFFECTIVE_ABILITY) == ABILITY_ILLUSION) {
                 party = GetClientSrcParty(mainModule, 0, pokeCon->unkE4);
                 species = 0;
                 partyCount = PokeParty_GetPkmCount(party);
@@ -2543,8 +2545,8 @@ void PokeCon_CreateClientParty(BtlPokeCon *pokeCon, BtlMainModule *mainModule, u
                 }
                 if (species != 0) {
                     if (mainModule->unk2C0 == NULL) {
-                        mainModule->unk2C0 =
-                            PokeParty_NewTempPkm(species, GetBattleMonStat(mon, 0xf), 0, mainModule->heapId);
+                        mainModule->unk2C0 = PokeParty_NewTempPkm(species, GetBattleMonStat(mon, BATTLEMON_LEVEL), 0,
+                                                                  mainModule->heapId);
                     }
                     SetIllusionDisguise(mon, mainModule->unk2C0);
                 }
@@ -2711,7 +2713,7 @@ const BattleMon *GetPokeParamConst(const BtlPokeCon *pokeCon, u8 monId) {
     return pokeCon->mons[monId];
 }
 
-BOOL GetViewPosChatter(BtlMainModule *mainModule, u32 index, void **out) {
+BOOL GetViewPosChatter(BtlMainModule *mainModule, u32 index, PerapVoice **out) {
     u8 clientId = GetClientIDFromPos(mainModule, ViewPosToBattlePos(mainModule, index));
 
     if (mainModule->unk3E0[clientId] != NULL) {
@@ -3024,7 +3026,7 @@ void UpdatePartyIllusionDisguises(BtlMainModule *mainModule, BattleParty *party,
     }
     for (; i < party->count; i++) {
         mon = party->mons[i];
-        if (GetBattleMonStat(mon, 0x11) == ABILITY_ILLUSION) {
+        if (GetBattleMonStat(mon, BATTLEMON_EFFECTIVE_ABILITY) == ABILITY_ILLUSION) {
             if (i < last) {
                 SetIllusionDisguise(mon, GetSrcData(party->mons[last]));
             } else if (BattleMon_GetViewSrcData(mon) != mainModule->unk2C0) {
@@ -3286,7 +3288,7 @@ void AddRecord(BtlMainModule *mainModule, u32 record, u32 value) {
     }
 }
 
-void *func_ov167_0219db00(BtlMainModule *mainModule) {
+u8 *func_ov167_0219db00(BtlMainModule *mainModule) {
     return mainModule->setup->unk90;
 }
 
@@ -3417,8 +3419,8 @@ void BtlMain_StorePartiesToSetup(BtlMainModule *mainModule) {
             for (i = 0; i < monCount; i++) {
                 mon = BattleParty_GetMon(battleParty, i);
                 slot = GetMonID(mon) - firstMonId;
-                hp += GetBattleMonStat(mon, 13);
-                maxHP += GetBattleMonStat(mon, 14);
+                hp += GetBattleMonStat(mon, BATTLEMON_HP);
+                maxHP += GetBattleMonStat(mon, BATTLEMON_MAX_HP);
                 if (IsFainted(mon)) {
                     mainModule->setup->unkE7[index][slot] = 2;
                 } else if (GetBattleMonStatus(mon) != 0) {
@@ -3458,7 +3460,7 @@ u32 BtlMain_DetermineResult(BtlMainModule *mainModule) {
         }
         result = mainModule->result;
     }
-    mainModule->setup->unkA8 = result;
+    mainModule->setup->result = result;
     return result;
 }
 
@@ -3619,7 +3621,7 @@ void BtlMain_StoreResultStats(BtlMainModule *mainModule) {
     setup->unkD6 = BtlServerFlow_GetPlayerNotVeryEffectiveHitCount(flow);
     setup->unkD7 = BtlServerFlow_GetFoeImmuneHitCount(flow);
     setup->unkD8 = BtlServerFlow_GetFoeNotVeryEffectiveHitCount(flow);
-    if (setup->unkA8 == 1) {
+    if (setup->result == BTL_RESULT_VICTORY) {
         setup->unkD9 = 1;
     }
     party = GetPartyData(&mainModule->pokeCons[1], 0);
@@ -3628,7 +3630,7 @@ void BtlMain_StoreResultStats(BtlMainModule *mainModule) {
     for (i = 0; i < count; i++) {
         mon = BattleParty_GetMon(party, i);
         setup->unkDC += BattleMon_GetUsedMoveKindCount(mon);
-        setup->unkD0 += GetBattleMonStat(mon, 13);
+        setup->unkD0 += GetBattleMonStat(mon, BATTLEMON_HP);
     }
     setup->unkDB = count - alive;
     party = GetPartyData(&mainModule->pokeCons[1], 1);
@@ -3679,7 +3681,7 @@ BtlScriptedRules *GetStudioRules(BtlMainModule *mainModule) {
     return mainModule->unk474;
 }
 
-void *func_ov167_0219e3ac(BtlMainModule *mainModule) {
+BtlMainUnk478 *func_ov167_0219e3ac(BtlMainModule *mainModule) {
     if (mainModule->unk478 == NULL) {
         return NULL;
     }
@@ -3690,5 +3692,5 @@ PokewoodCutin *GetPokewoodCutin(BtlMainModule *mainModule) {
     return mainModule->cutin;
 }
 
-void func_ov167_0219e3c8(void *data) {
+void func_ov167_0219e3c8(BtlScriptedRules *data) {
 }

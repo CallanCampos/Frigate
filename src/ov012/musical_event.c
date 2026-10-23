@@ -48,7 +48,7 @@ struct MusicalEventWork {
     GameCommSys *gameComm;
     Ov210Work *ov210;
     // Overlay 211's communication work
-    void *comm;
+    MusCommWork *comm;
     MusicalDressUpParam *dressUp;
     MusicalStageParam *stage;
     MusicalShotParam *shot;

@@ -148,7 +148,8 @@ static inline GXRgb FieldMenu_InterpolateCursorColor(const FieldMenuCursorColor 
     s32 blue = phase * (end->blue - start->blue) / FX32_CONST(2) + start->blue;
     s32 green = phase * (end->green - start->green) / FX32_CONST(2) + start->green;
 
-    return GX_RGB(red, green, blue);
+    // Packed by hand rather than with GX_RGB: the original combines blue and green before red.
+    return (GXRgb)(red | ((blue << 10) | (green << 5)));
 }
 
 static void FieldMenu_RestoreSubscreenOnCancel(FieldMenu *menu);
@@ -495,13 +496,13 @@ static void FieldMenu_LoadResources(FieldMenu *menu, ArcTool *arc, u8 menuType, 
     ClActorSetup setup;
 
     GXS_SetMasterBrightness(-16);
-    GFL_BGSysCreateBG(5, &sFieldMenuBG5Setup, 0);
+    GFL_BGSysCreateBG(5, &sFieldMenuBG5Setup, BGMODE_TEXT);
     GFL_BGSysSetBGEnabled(5, TRUE);
     GFL_BGSysClearScr(5);
-    GFL_BGSysCreateBG(6, &sFieldMenuBG6Setup, 0);
+    GFL_BGSysCreateBG(6, &sFieldMenuBG6Setup, BGMODE_TEXT);
     GFL_BGSysSetBGEnabled(6, TRUE);
     GFL_BGSysClearScr(6);
-    GFL_BGSysCreateBG(7, &sFieldMenuBG7Setup, 0);
+    GFL_BGSysCreateBG(7, &sFieldMenuBG7Setup, BGMODE_TEXT);
     GFL_BGSysSetBGEnabled(7, TRUE);
     GFL_BGSysClearScr(7);
     GFL_BGSysMoveBG(6, BG_MOVE_SET_Y, -5);

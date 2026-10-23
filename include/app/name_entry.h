@@ -43,7 +43,7 @@ typedef struct {
     // A StrBuf that the Pokémon name entry formats and prints once the name is given, if not NULL, and the box data and
     // the number of the box, which it names
     StrBuf *unkC;
-    void *unk10;
+    BoxSaveAccessor *unk10;
     u32 unk14;
     u32 maxLength;
     // 1 when the name is to be left as it was
@@ -56,7 +56,7 @@ typedef struct {
     // 1 to allow more than 4 digits, 2 to skip the check of profane words
     u32 unk2C;
     // The save block that a third preset name, for modes that offer some, is read from
-    void *unk30;
+    u16 *unk30;
     // Set to which preset name (1 to 3) the name that was entered is, if any
     u32 unk34;
 } NameEntryParam;
@@ -69,7 +69,7 @@ NameEntryParam *setupNameEntry(HeapID heapId, u32 mode, u32 a2, u32 a3, u32 maxL
 NameEntryParam *setupPokemonNameEntry(HeapID heapId, PartyPkm *pkm, u32 maxLength, const StrBuf *name,
                                       TrainerGameInfoSave *gameInfo);
 NameEntryParam *pokemonNameEntry(HeapID heapId, PartyPkm *pkm, u32 maxLength, const StrBuf *name, StrBuf *unkC,
-                                 void *unk10, u32 unk14, TrainerGameInfoSave *gameInfo);
+                                 BoxSaveAccessor *unk10, u32 unk14, TrainerGameInfoSave *gameInfo);
 void NameEntryParam_Free(NameEntryParam *param);
 // Copies the entered name, and compares it with a string
 void NameEntryParam_GetName(NameEntryParam *param, StrBuf *dest);

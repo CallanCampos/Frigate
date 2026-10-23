@@ -1604,8 +1604,8 @@ static void TownMapInfo_Draw(TownMapInfo *info, TownMapPlace *place) {
         landmarks = TRUE;
         zoneId = TownMapPlace_GetParam(place, TOWNMAP_PARAM_ZONE);
         if (IsZoneJoinAvenue(zoneId)) {
-            GFL_StrBufLoadString(info->strbuf, (const u16 *)JoinAvenue_GetParam(avenueInfo, 0, NULL));
-            if (JoinAvenue_GetParam(avenueInfo, 7, NULL)) {
+            GFL_StrBufLoadString(info->strbuf, (const u16 *)JoinAvenue_GetParam(avenueInfo, JOIN_AVE_INFO_NAME, NULL));
+            if (JoinAvenue_GetParam(avenueInfo, JOIN_AVE_INFO_UNOPENED, NULL)) {
                 landmarks = FALSE;
             }
         } else {
@@ -1644,7 +1644,7 @@ static void TownMapInfo_Draw(TownMapInfo *info, TownMapPlace *place) {
                 GameRecords *records = getTrainerCardInfoBlkAddress(save);
                 StrBuf *format;
 
-                rank = JoinAvenue_GetParam(avenueInfo, 2, NULL);
+                rank = JoinAvenue_GetParam(avenueInfo, JOIN_AVE_INFO_RANK, NULL);
                 record7F = RecordGet(records, 0x7f);
                 record80 = RecordGet(records, 0x80);
                 people = JoinAvenuePersonList_CountUsed(persons) + JoinAvenueEntryList_CountUsed(entries);
@@ -1791,7 +1791,7 @@ static void TownMapPlaceName_Main(TownMapPlaceName *placeName) {
                 JoinAvenue_GetInfo(SaveControl_GetJoinAvenue(GameData_GetSaveControl(placeName->gameData)));
             StrBuf *name = GFL_StrBufCreate(128, HEAPID_TOWNMAP);
 
-            GFL_StrBufLoadString(name, (const u16 *)JoinAvenue_GetParam(avenueInfo, 0, NULL));
+            GFL_StrBufLoadString(name, (const u16 *)JoinAvenue_GetParam(avenueInfo, JOIN_AVE_INFO_NAME, NULL));
             TownMapMsgWin_PrintStrBuf(&placeName->msgWin, name, 16, 2);
             GFL_StrBufFree(name);
         } else {

@@ -881,7 +881,7 @@ static u32 MysteryCard_GetIconPaletteFile(MysteryCard *card) {
     case 1:
         return PokeIcon_GetPaletteFile();
     case 2:
-        return GetItemGraphicsDatID(MysteryCard_GetGift(card)->value, 2);
+        return GetItemGraphicsDatID(MysteryCard_GetGift(card)->value, ITEM_FILE_ICON_PLTT);
     default:
         return 3;
     }
@@ -906,7 +906,7 @@ static u32 MysteryCard_GetIconCharFile(MysteryCard *card) {
         poke = (MysteryGiftPokemon *)MysteryCard_GetGift(card);
         return PokeParty_GetIconIndex(poke->species, poke->form, poke->gender, poke->isEgg);
     case 2:
-        return GetItemGraphicsDatID(MysteryCard_GetGift(card)->value, 1);
+        return GetItemGraphicsDatID(MysteryCard_GetGift(card)->value, ITEM_FILE_ICON_CHAR);
     default:
         return 12;
     }
@@ -1807,8 +1807,8 @@ MysteryAlbum *MysteryAlbum_CreateReceived(MysteryGift *gift, MysteryCardRes *res
                                           PokeParty_GetParam(pkm, PKM_PARAM_SEX, NULL), PokeParty_IsRare(pkm), 0,
                                           PokeParty_GetParam(pkm, PKM_PARAM_IS_EGG, NULL));
         album->palBuf = GFL_G2DIOReadNCLRArc(arc, palFile, &album->pal, album->heapId);
-        album->charBuf =
-            LoadSingleCellSpindaGraphicsByBoxData(&album->chars, PokeParty_ToBoxPkm(pkm), 0, album->heapId);
+        album->charBuf = LoadSingleCellSpindaGraphicsByBoxData(&album->chars, PokeParty_ToBoxPkm(pkm),
+                                                               POKEGRA_DIR_FRONT, album->heapId);
         GFL_HeapFree(pkm);
         GFL_ArcToolFree(arc);
     }

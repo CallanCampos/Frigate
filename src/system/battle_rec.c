@@ -127,9 +127,8 @@ BattleRecVideo *BattleRec_LoadVideo(SaveControl *save, HeapID heapId, u32 *resul
     return video;
 }
 
-// Whether a slot has a valid video, without keeping it. a2 is the u32 result of BattleRec_LoadToCurrent
-u32 BattleRec_IsSlotValid(SaveControl *save, HeapID a1, void *a2, u32 a3) {
-    u32 *result = a2;
+// Whether a slot has a valid video, without keeping it. result gets the u32 result of BattleRec_LoadToCurrent
+u32 BattleRec_IsSlotValid(SaveControl *save, HeapID a1, u32 *result, u32 a3) {
     BattleRecVideo *video;
     BattleRecBody *body;
 

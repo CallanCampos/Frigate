@@ -23,8 +23,8 @@ typedef struct {
     u16 heapId;
     Field *field;
     MsgData *messages;
-    void *window;
-    void *unk10;
+    MoneyWin *window;
+    MsgBGCursor *unk10;
     WordSet *wordSet;
     StrBuf *first;
     StrBuf *second;

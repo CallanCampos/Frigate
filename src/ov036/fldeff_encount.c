@@ -29,15 +29,15 @@ typedef struct {
 
 typedef struct {
     G3DActor *actor;
-    void *anms[4];
+    G3DAnimation *anms[4];
     G3DModel *mdl;
 } EncountEffectObj;
 
 typedef struct {
     FieldEffects *effects;
     u32 unk04;
-    void *mdlRes[4];
-    void *anmRes[4];
+    G3DResource *mdlRes[4];
+    G3DResource *anmRes[4];
     EncountEffectObj objs[4];
     EncountEffectSpec spec;
 } FieldEffectEncount;
@@ -65,7 +65,7 @@ typedef struct {
     EncountSystem *system;
 } EncountTask;
 
-static void *func_ov036_021a5100(FieldEffects *effects, HeapID heapId, u32 kind);
+static FieldEffectEncount *func_ov036_021a5100(FieldEffects *effects, HeapID heapId, u32 kind);
 static void func_ov036_021a5130(FieldEffectEncount *effect, u32 kind);
 static void EncountEffectObj_Create(EncountEffectObj *obj, FieldEffectEncount *effect, u8 variant);
 static void EncountEffectObj_Free(EncountEffectObj *obj, FieldEffectEncount *effect);
@@ -136,7 +136,7 @@ void func_ov036_021a50ec(FieldEffects *effects, void *data) {
     GFL_HeapFree(data);
 }
 
-static void *func_ov036_021a5100(FieldEffects *effects, HeapID heapId, u32 kind) {
+static FieldEffectEncount *func_ov036_021a5100(FieldEffects *effects, HeapID heapId, u32 kind) {
     FieldEffectEncount *effect = GFL_HeapAllocate(heapId, sizeof(FieldEffectEncount), TRUE, "fldeff_encount.c", 286);
 
     effect->effects = effects;

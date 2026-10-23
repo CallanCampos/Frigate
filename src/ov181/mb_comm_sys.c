@@ -201,7 +201,7 @@ void MBComm_StartNet(MBCommSys *comm) {
         2,
         1,
         1,
-        0,
+        GFL_NET_TYPE_WIRELESS,
         0,
         4,
         { 0x2c, 1, 0, 0 },

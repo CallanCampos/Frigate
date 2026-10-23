@@ -652,19 +652,19 @@ ArcTool *GetMMSysDataArcHandle(MMSys *system) {
     return system->dataArc;
 }
 
-void FldActSys_BindFieldBlAct(MMSys *system, void *fieldBlAct) {
+void FldActSys_BindFieldBlAct(MMSys *system, FieldBlAct *fieldBlAct) {
     system->fieldBlAct = fieldBlAct;
 }
 
-void *FldActSys_GetFieldBlAct(MMSys *system) {
+FieldBlAct *FldActSys_GetFieldBlAct(MMSys *system) {
     return system->fieldBlAct;
 }
 
-void FldActSys_BindActorG3DSystem(MMSys *system, void *actorG3DSystem) {
+void FldActSys_BindActorG3DSystem(MMSys *system, ActorG3DSystem *actorG3DSystem) {
     system->actorG3DSystem = actorG3DSystem;
 }
 
-void *FldActSys_GetActorG3DSystem(MMSys *system) {
+ActorG3DSystem *FldActSys_GetActorG3DSystem(MMSys *system) {
     return system->actorG3DSystem;
 }
 
@@ -1139,7 +1139,7 @@ void FldAct_SetAttrDrawOffset(FieldActor *actor, const VecFx32 *offset) {
     actor->unk68 = *offset;
 }
 
-void *FldAct_GetFieldBlAct(FieldActor *actor) {
+FieldBlAct *FldAct_GetFieldBlAct(FieldActor *actor) {
     return FldActSys_GetFieldBlAct(GetActorMModelSystem(actor));
 }
 

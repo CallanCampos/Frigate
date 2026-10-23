@@ -2,6 +2,7 @@
 #include "constants/items.h"
 #include "gfl/random.h"
 #include "save/bag.h"
+#include "save/cygnus_save_control.h"
 #include "save/dream_world.h"
 #include "save/player_info.h"
 #include "save/save_control.h"
@@ -30,9 +31,9 @@ void InitDreamRadarFlagSave_(GameData *gameData) {
     DreamRadarSave *save = GetDreamRadarSaveBlock(GameData_GetSaveControl(gameData));
 
     // Value 1 gets a random 32-bit number, the others are cleared
-    SetDreamRadarFlag(save, 1, GFL_RandomLC(0));
-    SetDreamRadarFlag(save, 0, 0);
-    SetDreamRadarFlag(save, 2, 0);
+    SetDreamRadarFlag(save, DREAM_RADAR_FLAG_SEED, GFL_RandomLC(0));
+    SetDreamRadarFlag(save, DREAM_RADAR_FLAG_READ, 0);
+    SetDreamRadarFlag(save, DREAM_RADAR_FLAG_RECEIVED, 0);
 }
 
 void InitItemBag(GameData *gameData, u32 heapId) {

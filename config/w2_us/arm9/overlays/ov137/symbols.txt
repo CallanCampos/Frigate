@@ -278,7 +278,7 @@ sWalkerMoveCode kind:data(any) addr:0x021f5398
 sWalkerStates kind:data(any) addr:0x021f53ac
 sSceneAnims kind:data(any) addr:0x021f53c0
 sSceneActors kind:data(any) addr:0x021f53d8
-data_ov137_021f53b4 kind:data(any) addr:0x021f53f8
+sSceneResources kind:data(any) addr:0x021f53f8
 sWalkerPlaces kind:data(any) addr:0x021f5440
 data_ov137_021f5402 kind:data(any) addr:0x021f5446
 data_ov137_021f5404 kind:data(any) addr:0x021f5448
@@ -287,8 +287,8 @@ sTypes kind:data(any) addr:0x021f5598
 sNpcTemplate kind:data(any) addr:0x021f55b8
 sKindsOfScript kind:data(any) addr:0x021f55dc
 sUnk021f55a8 kind:data(any) addr:0x021f55ec
-data_ov137_021f55b8 kind:data(any) addr:0x021f55fc
-data_ov137_021f55cc kind:data(any) addr:0x021f5610
+sKinds kind:data(any) addr:0x021f55fc
+sTypes kind:data(any) addr:0x021f5610
 sRanges kind:data(any) addr:0x021f5624
 data_ov137_021f55e2 kind:data(any) addr:0x021f5626
 sFuncs kind:data(any) addr:0x021f564c

@@ -7,7 +7,7 @@
 #include "field/net_irc.h"
 #include "irc/irc_link.h"
 
-static BOOL NetDevIrc_Init(HeapID heapId, void *sys, BOOL (*callback)(BOOL success), void *work);
+static BOOL NetDevIrc_Init(HeapID heapId, GFLNetSys *sys, BOOL (*callback)(BOOL success), void *work);
 static BOOL NetDevIrc_Begin(void (*callback)(BOOL ok));
 static int NetDevIrc_Update(u16 connectBits);
 static BOOL NetDevIrc_ReturnTrue10(int a0, int a1);
@@ -29,9 +29,9 @@ static int NetDevIrc_GetConnectBits(void);
 static BOOL NetDevIrc_GetUnkCF0(void);
 static void NetDevIrc_StartLink(void);
 static void NetDevIrc_SetTimeoutSlot(int frames);
-static void NetDevIrc_SetPeerFilterSlot(void *filter);
+static void NetDevIrc_SetPeerFilterSlot(GFLNetPeerFilter filter);
 
-static BOOL NetDevIrc_Init(HeapID heapId, void *sys, BOOL (*callback)(BOOL success), void *work) {
+static BOOL NetDevIrc_Init(HeapID heapId, GFLNetSys *sys, BOOL (*callback)(BOOL success), void *work) {
     GFLNetInitData *init = GFL_NetGetInitData();
 
     NetIrc_Init(GFL_NetGetInitData()->unk68.word, init->gameCommandBase);
@@ -140,7 +140,7 @@ static void NetDevIrc_SetTimeoutSlot(int frames) {
     NetDevIrc_SetTimeout(frames);
 }
 
-static void NetDevIrc_SetPeerFilterSlot(void *filter) {
+static void NetDevIrc_SetPeerFilterSlot(GFLNetPeerFilter filter) {
     NetDevIrc_SetPeerFilter(filter);
 }
 

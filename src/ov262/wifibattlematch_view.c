@@ -99,7 +99,7 @@ struct WifiBattleMatchCard {
     u8 itemPaletteSlot;
     // CLACT_VRAM_MAIN or CLACT_VRAM_SUB
     u32 surface;
-    void *records;
+    TournamentTeam *records;
     u16 heapId;
     ClActUnit *unit;
 };
@@ -157,7 +157,8 @@ static void WifiBattleMatchView_LiveCardWindows(WifiBattleMatchCard *card, const
                                                 MsgData *msgData, WordSet *wordSet, HeapID heapId);
 static BOOL WifiBattleMatchView_CardFlush(WifiBattleMatchCard *card, PrintQueue *printQueue);
 static void WifiBattleMatchView_CardFreeWindows(WifiBattleMatchCard *card);
-static void WifiBattleMatchView_CardLoadIcons(WifiBattleMatchCard *card, ClActUnit *unit, void *records, HeapID heapId);
+static void WifiBattleMatchView_CardLoadIcons(WifiBattleMatchCard *card, ClActUnit *unit, TournamentTeam *records,
+                                              HeapID heapId);
 static void WifiBattleMatchView_CardFreeIcons(WifiBattleMatchCard *card);
 static void WifiBattleMatchView_CardLoadBadge(WifiBattleMatchCard *card, u32 look, ClActUnit *unit, HeapID heapId);
 static void WifiBattleMatchView_CardFreeBadge(WifiBattleMatchCard *card);
@@ -408,7 +409,8 @@ void WifiBattleMatchRankCard_Free(WifiBattleMatchCard *card) {
 WifiBattleMatchCard *WifiBattleMatchWifiCard_Create(const WifiBattleMatchWifiCardInfo *info, u32 ratio,
                                                     PlayerInfo *playerInfo, ClActUnit *unit, WifiBattleMatchRes *res,
                                                     Font *font, PrintQueue *printQueue, MsgData *msgData,
-                                                    WordSet *wordSet, void *records, BOOL main, HeapID heapId) {
+                                                    WordSet *wordSet, TournamentTeam *records, BOOL main,
+                                                    HeapID heapId) {
     WifiBattleMatchCard *card =
         GFL_HeapAllocate(heapId, sizeof(WifiBattleMatchCard), FALSE, "wifibattlematch_view.c", 639);
     ClActorPos pos;
@@ -547,7 +549,7 @@ void WifiBattleMatchWifiCard_ShowPage(WifiBattleMatchCard *card, u32 page, MsgDa
 WifiBattleMatchCard *WifiBattleMatchLiveCard_Create(const WifiBattleMatchLiveCardInfo *info, PlayerInfo *playerInfo,
                                                     ClActUnit *unit, WifiBattleMatchRes *res, Font *font,
                                                     PrintQueue *printQueue, MsgData *msgData, WordSet *wordSet,
-                                                    void *records, BOOL main, HeapID heapId) {
+                                                    TournamentTeam *records, BOOL main, HeapID heapId) {
     WifiBattleMatchCard *card =
         GFL_HeapAllocate(heapId, sizeof(WifiBattleMatchCard), FALSE, "wifibattlematch_view.c", 852);
     ClActorPos pos;
@@ -1057,7 +1059,7 @@ static void WifiBattleMatchView_CardFreeWindows(WifiBattleMatchCard *card) {
     }
 }
 
-static void WifiBattleMatchView_CardLoadIcons(WifiBattleMatchCard *card, ClActUnit *unit, void *records,
+static void WifiBattleMatchView_CardLoadIcons(WifiBattleMatchCard *card, ClActUnit *unit, TournamentTeam *records,
                                               HeapID heapId) {
     u8 form;
     u8 gender;
@@ -1073,9 +1075,9 @@ static void WifiBattleMatchView_CardLoadIcons(WifiBattleMatchCard *card, ClActUn
                                             HEAPID_TAIL(heapId));
     card->iconCells = ClActSys_LoadCellAnims(arc, PokeIcon_GetCellFile_Main(), getOBJTileMapping_MainEng(), heapId);
     for (i = 0; i < CARD_PARTY_COUNT; i++) {
-        species = TournamentTeam_GetField(records, 0, i);
-        form = TournamentTeam_GetField(records, 1, i);
-        gender = TournamentTeam_GetField(records, 3, i);
+        species = TournamentTeam_GetField(records, TOURNAMENT_TEAM_SPECIES, i);
+        form = TournamentTeam_GetField(records, TOURNAMENT_TEAM_FORM, i);
+        gender = TournamentTeam_GetField(records, TOURNAMENT_TEAM_GENDER, i);
 
         species = species == 0 ? 1 : species;
         card->iconChars[i] = ClActSys_LoadChars(arc, PokeParty_GetIconIndex(species, form, gender, FALSE), FALSE,
@@ -1096,10 +1098,10 @@ static void WifiBattleMatchView_CardLoadIcons(WifiBattleMatchCard *card, ClActUn
     setup.bgPriority = 1;
     setup.priority = 1;
     for (i = 0; i < CARD_PARTY_COUNT; i++) {
-        species = TournamentTeam_GetField(records, 0, i);
-        form = TournamentTeam_GetField(records, 1, i);
-        gender = TournamentTeam_GetField(records, 3, i);
-        hasItem = TournamentTeam_GetField(records, 2, i);
+        species = TournamentTeam_GetField(records, TOURNAMENT_TEAM_SPECIES, i);
+        form = TournamentTeam_GetField(records, TOURNAMENT_TEAM_FORM, i);
+        gender = TournamentTeam_GetField(records, TOURNAMENT_TEAM_GENDER, i);
+        hasItem = TournamentTeam_GetField(records, TOURNAMENT_TEAM_HAS_ITEM, i);
 
         if (species != 0) {
             setup.x = i * 32 + 288;

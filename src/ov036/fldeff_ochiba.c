@@ -90,7 +90,7 @@ static void func_ov036_021c94cc(FieldEffectOchiba *effect) {
 }
 
 // Leaves under the actor, which face the way it does
-void func_ov036_021c94e0(void *effects, FieldActor *actor) {
+void func_ov036_021c94e0(FieldEffects *effects, FieldActor *actor) {
     VecFx32 pos;
     OchibaTaskParams params;
     fx32 height;

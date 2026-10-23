@@ -74,14 +74,14 @@ sActor5Anms kind:data(any) addr:0x021f09fc
 sActor11Anms kind:data(any) addr:0x021f0a04
 sActor14Anms kind:data(any) addr:0x021f0a10
 sActor12Anms kind:data(any) addr:0x021f0a1c
-data_ov134_021f09e8 kind:data(any) addr:0x021f0a28
+sSceneSetup kind:data(any) addr:0x021f0a28
 data_ov134_021f09f8 kind:data(any) addr:0x021f0a38
 data_ov134_021f0a04 kind:data(any) addr:0x021f0a44
 data_ov134_021f0a10 kind:data(any) addr:0x021f0a50
 data_ov134_021f0a1c kind:data(any) addr:0x021f0a5c
 data_ov134_021f0a2c kind:data(any) addr:0x021f0a6c
-data_ov134_021f0a44 kind:data(any) addr:0x021f0a84
-data_ov134_021f0b34 kind:data(any) addr:0x021f0b74
+sActors kind:data(any) addr:0x021f0a84
+sResources kind:data(any) addr:0x021f0b74
 sTrainerLines kind:data(any) addr:0x021f0d0c
 data_ov134_021f0d11 kind:data(any) addr:0x021f0d51 ambiguous
 data_ov134_021f0d73_w2_us kind:data(any) addr:0x021f0d73 ambiguous

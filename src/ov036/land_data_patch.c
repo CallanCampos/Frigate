@@ -59,7 +59,7 @@ void func_ov036_021c2d04(LandDataPatch *patch, LandPatchGrid *src, u32 srcX, u32
     }
 }
 
-u32 LoadLandDataPatchBuildings(LandDataPatch *patch, void *a1, void *a2, u32 count, u32 x, u32 y) {
+u32 LoadLandDataPatchBuildings(LandDataPatch *patch, FieldPropSystem *a1, FieldChunk *a2, u32 count, u32 x, u32 y) {
     LandPatchBuildings *buildings = GetLandDataPatchBMDataPtr(patch);
     FieldPropSourceInfo *infos = buildings->infos;
     u32 i;

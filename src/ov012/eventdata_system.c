@@ -181,7 +181,7 @@ BOOL SetupZoneWarpArrival(const EventData *eventData, ZoneSpawnInfo *spawn, u16 
     if (warp->destId == 0x100) {
         spawn->changeType = ZONE_SPAWN_CHANGE_TYPE_3;
     } else {
-        spawn->changeType = 2;
+        spawn->changeType = ZONE_SPAWN_CHANGE_TYPE_WARP_ARRIVAL;
     }
     if (warp->isRail == FALSE) {
         GetGridWarpOutPos(warp, posWeightBits, &position);
@@ -436,7 +436,7 @@ u16 GetTriggerSCRIDAtPosRail(EventData *data, EventWork *eventWork, const RailPo
     return 0xffff;
 }
 
-void *GetZoneProxiesAndCount(EventData *data, u32 *restrict count) {
+ZoneBGEntity *GetZoneProxiesAndCount(EventData *data, u32 *restrict count) {
     *count = data->entityCount;
     return data->entities;
 }

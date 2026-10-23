@@ -12,15 +12,15 @@ GimmickGC6_StepAnimations kind:function(thumb,size=0xc) addr:0x021ef0d4
 GimmickGC6_PlayModel kind:function(thumb,size=0x78) addr:0x021ef0e0
 GimmickGC6_StartHover kind:function(thumb,size=0x44) addr:0x021ef158
 GimmickGC6_HoverTask kind:function(thumb,size=0x60) addr:0x021ef19c
-data_ov116_021ef1bc kind:data(any) addr:0x021ef1fc
-data_ov116_021ef1c4 kind:data(any) addr:0x021ef204
-data_ov116_021ef1cc kind:data(any) addr:0x021ef20c
-data_ov116_021ef1d4 kind:data(any) addr:0x021ef214
-data_ov116_021ef1dc kind:data(any) addr:0x021ef21c
-data_ov116_021ef1ec kind:data(any) addr:0x021ef22c
-data_ov116_021ef1fc kind:data(any) addr:0x021ef23c
+sModel1Animations kind:data(any) addr:0x021ef1fc
+sModel3Animations kind:data(any) addr:0x021ef204
+sModel0Animations kind:data(any) addr:0x021ef20c
+sModel2Animations kind:data(any) addr:0x021ef214
+sSceneSetup kind:data(any) addr:0x021ef21c
+sAnimationCounts kind:data(any) addr:0x021ef22c
+sActors kind:data(any) addr:0x021ef23c
 data_ov116_021ef211 kind:data(any) addr:0x021ef251 ambiguous
 data_ov116_021ef231 kind:data(any) addr:0x021ef271 ambiguous
-data_ov116_021ef23c kind:data(any) addr:0x021ef27c
+sResources kind:data(any) addr:0x021ef27c
 data_ov116_021ef289 kind:data(any) addr:0x021ef2c9 ambiguous
 data_ov116_021ef29d kind:data(any) addr:0x021ef2dd ambiguous

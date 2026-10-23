@@ -19,12 +19,9 @@ typedef struct WCMVendorOui {
     u8 bytes[4];
 } WCMVendorOui;
 
-// Vendor OUIs, each followed by a type byte, that WCM_FillApEntry and WCM_FindVendorIE look for among a beacon's
-// vendor-specific information elements: Nintendo's (00:09:BF), and Microsoft's (00:50:F2) WPA (type 1) and WMM
-// (type 2, subtype 0). Defined with their bytes after WCM_Essid_Any, at the end of the file
+// Nintendo's vendor OUI (00:09:BF) and type 0, which WCM_FindVendorIE looks for among a beacon's vendor-specific
+// information elements. Defined with its bytes at the end of the file
 static const WCMVendorOui sNintendoOui;
-static const u8 sWpaOui[4];
-static const u8 sWmmOui[8];
 
 // An access point WCM found during a search, in a doubly linked list off the caller's apBuffer. WCM_PointApList's
 // result points at data, past this header
@@ -71,6 +68,13 @@ typedef struct WCMAnchor {
     WCMWork *work; // 0x04
 } WCMAnchor;
 
+// The "any" BSSID and ESSID that a search takes when the caller gives none
+const u8 WCM_Bssid_Any[] = { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x00, 0x00 };
+const u8 WCM_Essid_Any[] = {
+    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+};
+
 static WCMAnchor sWcmAnchor;
 static WCMCpsifWork sWcmGlobal;
 // The last 16 signal samples, a ring, and the count of samples until it is full, then 16 plus the next index
@@ -92,8 +96,8 @@ static void WcmAppendApList(WCMApList *entry);
 static void *WCM_FindVendorIE(const WMBssDesc *bss);
 static void *WCM_GetInformationElement(const void *frame, u8 tag, const u8 *oui);
 static void WCMi_InitCpsif(void);
-static s32 WCM_AssembleSendFrame(s32 mode, void *dest, const void *header, s32 headerLen, const void *data,
-                                 s32 dataLen);
+static s32 WCM_AssembleSendFrame(s32 mode, void *dest, const void *header, u32 headerLen, const void *data,
+                                 u32 dataLen);
 static BOOL WCM_CompareBytes(const void *a, const void *b, u32 size);
 static BOOL WCM_CompareBssID(const u8 *a, const u8 *b);
 static WMLinkLevel WcmGetLinkLevel(u32 rssi);
@@ -831,12 +835,16 @@ static WCMApList *WcmAllocApList(void) {
 
         if (max > 0) {
             if (max > header->count) {
-                entries = header->entries;
-                for (i = 0; i < max; i++) {
-                    entry = &entries[i];
-                    if (!entry->inUse) {
-                        break;
-                    }
+                i = 0;
+                if (i < max) {
+                    entries = header->entries;
+                    do {
+                        entry = entries + i;
+                        if (!entry->inUse) {
+                            break;
+                        }
+                        i++;
+                    } while (i < max);
                 }
                 if (i < max) {
                     entry->inUse = TRUE;
@@ -948,33 +956,56 @@ static void WcmAppendApList(WCMApList *entry) {
 
 // Copies the descriptor prefix and retains selected IEs in the destination's raw 0x40..0xbf tail.
 void WCM_FillApEntry(const WMBssDesc *source, WMBssDesc *destination) {
-    WCMWork *work = WCMi_GetSystemWork();
-    const u8 *ie = (const u8 *)&source->gameInfo;
-    u8 *output = (u8 *)&destination->gameInfo;
-    u8 total = 0;
+    WCMWork *work;
+    const u8 *ie;
+    u8 *output;
+    u8 total;
     u16 n;
+    u8 tag;
+    u8 len;
 
-    MIi_CpuClearFast(0, destination, sizeof(*destination));
+    work = WCMi_GetSystemWork();
+    MIi_CpuClearFast(0, destination, sizeof(WMBssDesc));
     MIi_CpuCopyFast(source, destination, offsetof(WMBssDesc, gameInfo));
     destination->otherElementCount = 0;
-    destination->length = work->wirelessMode == 1 ? 0x20 : 0x40;
-    for (n = 0; n < source->otherElementCount; n++) {
-        u8 tag = ie[0];
-        u16 ieLen = ie[1] + 2;
-        BOOL retain = tag == 0x32 || tag == 0x2a || tag == 0x2f || tag == 7 || tag == 0x30;
-
-        if (tag == 0xdd) {
-            retain = MI_CpuComp8(ie + 2, sWpaOui, 4) == 0 || MI_CpuComp8(ie + 2, sWmmOui, 5) == 0;
-        }
-        if (retain) {
-            MI_CpuCopy(ie, output, (u8)ieLen);
-            output += ieLen;
-            total += (u8)ieLen;
-            destination->otherElementCount++;
-        }
-        ie += ieLen;
+    if (work->wirelessMode == 1) {
+        destination->length = 0x20;
+    } else {
+        destination->length = 0x40;
     }
-    destination->length += total;
+    total = 0;
+    {
+        // Microsoft's vendor OUI (00:50:F2) with the WPA type 1, and with the WMM type 2 and subtype 0
+        u8 wpaOui[4] = { 0x00, 0x50, 0xf2, 0x01 };
+        u8 wmmOui[5] = { 0x00, 0x50, 0xf2, 0x02, 0x00 };
+
+        ie = (const u8 *)&source->gameInfo;
+        output = (u8 *)&destination->gameInfo;
+        for (n = 0; n < source->otherElementCount; n++) {
+            tag = ie[0];
+            len = ie[1];
+            if (tag == 0x32 || tag == 0x2a || tag == 0x2f || tag == 7 || tag == 0x30) {
+                MI_CpuCopy(ie, output, (u8)(len + 2));
+                output += len + 2;
+                total += (u8)(len + 2);
+                destination->otherElementCount++;
+            } else if (tag == 0xdd) {
+                if (MI_CpuComp8(ie + 2, wpaOui, 4) == 0 || MI_CpuComp8(ie + 2, wmmOui, 5) == 0) {
+                    MI_CpuCopy(ie, output, (u8)(len + 2));
+                    output += len + 2;
+                    total += (u8)(len + 2);
+                    destination->otherElementCount++;
+                }
+            }
+            ie += len + 2;
+        }
+    }
+    // The original adds the elements' length in a branch per mode, the DS one through a 16-bit mask
+    if (work->wirelessMode == 1) {
+        destination->length += (u16)(total & 0xffff);
+    } else {
+        destination->length += total;
+    }
 }
 
 static void *WCM_FindVendorIE(const WMBssDesc *bss) {
@@ -1139,29 +1170,27 @@ void WCM_GetMacAddress(u8 *mac) {
     MI_CpuCopy(sWcmGlobal.ownMac, mac, 6);
 }
 
-static s32 WCM_AssembleSendFrame(s32 mode, void *dest, const void *header, s32 headerLen, const void *data,
-                                 s32 dataLen) {
-    u8 *payload;
-    s32 total = headerLen + dataLen;
+static s32 WCM_AssembleSendFrame(s32 mode, void *dest, const void *header, u32 headerLen, const void *data,
+                                 u32 dataLen) {
+    void *payload;
+    u32 total;
 
+    total = headerLen + dataLen;
     switch (mode) {
     case 1:
     default:
         payload = dest;
         break;
-    case 2: {
-        WCMEthernetHeader *ether = dest;
-        u16 length = (u16)total;
-
-        ether->length = (u16)(((length & 0xff00) >> 8) | ((length & 0x00ff) << 8));
-        payload = (u8 *)dest + sizeof(*ether);
-        total += sizeof(*ether);
+    case 2:
+        // The frame starts with an 802.3 header
+        payload = (WCMEthernetHeader *)dest + 1;
+        ((WCMEthernetHeader *)dest)->length = (u16)((((u16)total & 0xff00U) >> 8) | (((u16)total & 0x00ff) << 8));
+        total += sizeof(WCMEthernetHeader);
         break;
-    }
     }
     MI_CpuCopy(header, payload, headerLen);
     if (data != NULL && dataLen != 0) {
-        MI_CpuCopy(data, payload + headerLen, dataLen);
+        MI_CpuCopy(data, (u8 *)payload + headerLen, dataLen);
     }
     return total;
 }
@@ -2059,12 +2088,4 @@ static void WcmCpsifKACallback(void *ind) {
     completion(status);
 }
 
-// The "any" BSSID and ESSID that a search takes when the caller gives none
-const u8 WCM_Bssid_Any[] = { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x00, 0x00 };
-const u8 WCM_Essid_Any[] = {
-    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-};
 static const WCMVendorOui sNintendoOui = { { 0x00, 0x09, 0xbf, 0x00 } };
-static const u8 sWpaOui[] = { 0x00, 0x50, 0xf2, 0x01 };
-static const u8 sWmmOui[] = { 0x00, 0x50, 0xf2, 0x02, 0x00, 0x00, 0x00, 0x00 };

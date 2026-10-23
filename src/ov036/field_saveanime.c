@@ -51,7 +51,7 @@ static const VecFx32 SAVE_ANIME_UP = { 0, FX32_ONE, 0 };
 
 static const SaveAnimeStep SAVE_ANIME_STEPS[4] = { { 0, 20 }, { 1, 40 }, { 0, 60 }, { 2, 80 } };
 
-void *func_ov036_021c6cc8(HeapID heapId, Field *field) {
+FieldSaveAnime *func_ov036_021c6cc8(HeapID heapId, Field *field) {
     FieldSaveAnime *anime = GFL_HeapAllocate(heapId, sizeof(FieldSaveAnime), TRUE, "field_saveanime.c", 143);
 
     anime->field = field;

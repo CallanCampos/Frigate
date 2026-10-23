@@ -32,8 +32,8 @@ void Regulation_Copy(const Regulation *src, Regulation *dest) {
     MI_CpuCopy8(src, dest, sizeof(Regulation));
 }
 
-Regulation *TournamentEntry_GetRegulation(void *entry) {
-    return entry;
+Regulation *TournamentEntry_GetRegulation(TournamentEntry *entry) {
+    return &entry->regulation;
 }
 
 static void loadBattleTypeTextToStrbuf(Regulation *regulation, StrBuf *strbuf) {
@@ -251,8 +251,7 @@ void *TournamentEntry_GetCardData(TournamentEntry *tournament) {
     return tournament->cardData;
 }
 
-u32 TournamentEntry_GetField(void *entry, u32 field) {
-    TournamentEntry *tournament = entry;
+u32 TournamentEntry_GetField(TournamentEntry *tournament, u32 field) {
     u32 value;
 
     switch (field) {
@@ -296,9 +295,7 @@ u32 TournamentEntry_GetField(void *entry, u32 field) {
     return value;
 }
 
-void TournamentEntry_SetField(void *entry, u32 field, u32 value) {
-    TournamentEntry *tournament = entry;
-
+void TournamentEntry_SetField(TournamentEntry *tournament, u32 field, u32 value) {
     switch (field) {
     case TOURNAMENT_FIELD_VERSION_MASK:
         tournament->versionMask = value;
@@ -346,11 +343,11 @@ BOOL TournamentEntry_CheckCRC(TournamentEntry *tournament) {
     return FALSE;
 }
 
-u16 CRC16_350bytes(const void *entry) {
+u16 CRC16_350bytes(const TournamentEntry *entry) {
     return getCRC16(entry, offsetof(TournamentEntry, crc));
 }
 
-void *TournamentBlock_GetEntry(TournamentBlock *tournament, u32 index) {
+TournamentEntry *TournamentBlock_GetEntry(TournamentBlock *tournament, u32 index) {
     return &tournament->entries[index];
 }
 
@@ -358,17 +355,15 @@ void TournamentBlock_SetEntry(TournamentBlock *tournament, u32 index, const Tour
     tournament->entries[index] = *entry;
 }
 
-void TournamentTeam_Clear(void *record) {
-    MI_CpuFill8(record, 0, sizeof(TournamentTeam));
+void TournamentTeam_Clear(TournamentTeam *team) {
+    MI_CpuFill8(team, 0, sizeof(TournamentTeam));
 }
 
-void *TournamentBlock_GetTeam(TournamentBlock *tournament, u32 index) {
+TournamentTeam *TournamentBlock_GetTeam(TournamentBlock *tournament, u32 index) {
     return &tournament->teams[index];
 }
 
-u32 TournamentTeam_GetField(void *record, u32 field, u8 index) {
-    TournamentTeam *team = record;
-
+u32 TournamentTeam_GetField(TournamentTeam *team, u32 field, u8 index) {
     switch (field) {
     case TOURNAMENT_TEAM_SPECIES:
         return team->species[index];
@@ -399,20 +394,19 @@ static void TournamentTeam_SetField(TournamentTeam *team, u32 field, u8 index, u
     }
 }
 
-void TournamentTeam_SetFromParty(void *record, PokeParty *party) {
+void TournamentTeam_SetFromParty(TournamentTeam *team, PokeParty *party) {
     s32 i;
 
-    TournamentTeam_Clear(record);
+    TournamentTeam_Clear(team);
     for (i = 0; i < PokeParty_GetPkmCount(party); i++) {
         PartyPkm *pkm = PokeParty_GetPkm(party, i);
 
         if (PokeParty_GetParam(pkm, PKM_PARAM_SPECIES_VALID, NULL)) {
-            TournamentTeam_SetField(record, TOURNAMENT_TEAM_SPECIES, i,
-                                    PokeParty_GetParam(pkm, PKM_PARAM_SPECIES, NULL));
-            TournamentTeam_SetField(record, TOURNAMENT_TEAM_FORM, i, PokeParty_GetParam(pkm, PKM_PARAM_FORM, NULL));
-            TournamentTeam_SetField(record, TOURNAMENT_TEAM_HAS_ITEM, i,
+            TournamentTeam_SetField(team, TOURNAMENT_TEAM_SPECIES, i, PokeParty_GetParam(pkm, PKM_PARAM_SPECIES, NULL));
+            TournamentTeam_SetField(team, TOURNAMENT_TEAM_FORM, i, PokeParty_GetParam(pkm, PKM_PARAM_FORM, NULL));
+            TournamentTeam_SetField(team, TOURNAMENT_TEAM_HAS_ITEM, i,
                                     PokeParty_GetParam(pkm, PKM_PARAM_ITEM, NULL) != 0);
-            TournamentTeam_SetField(record, TOURNAMENT_TEAM_GENDER, i, PokeParty_GetParam(pkm, PKM_PARAM_SEX, NULL));
+            TournamentTeam_SetField(team, TOURNAMENT_TEAM_GENDER, i, PokeParty_GetParam(pkm, PKM_PARAM_SEX, NULL));
         }
     }
 }
@@ -421,6 +415,6 @@ void clearTournamentBlock(void *block) {
     MI_CpuFill8(block, 0, sizeof(TournamentBlock));
 }
 
-void *getTournamentBlockAddress(SaveControl *save) {
+TournamentBlock *getTournamentBlockAddress(SaveControl *save) {
     return SaveControl_GetBlockPtr(save, SAVE_BLOCK_TOURNAMENT);
 }
