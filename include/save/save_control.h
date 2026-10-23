@@ -179,7 +179,17 @@ void TrainerGameInfo_AddSurveyCount(TrainerGameInfoSave *info, u8 index, u16 cou
 // Poké Transfer's high score, 28 bits
 u32 TrainerGameInfo_GetPalParkHighScore(TrainerGameInfoSave *info);
 void TrainerGameInfo_SetPalParkHighScore(TrainerGameInfoSave *info, u32 score);
-// How the last Poké Transfer session ended, 4 bits, which the Poké Transfer Lab's scripts react to
+// How the last Poké Transfer session ended, 4 bits, which the Poké Transfer Lab's scripts react to: Pokémon were
+// transferred, with a new high score, or none; the connection failed, before or after some were; or the player quit,
+// which is also the value set when the session starts
+enum {
+    PAL_PARK_RESULT_TRANSFERRED,
+    PAL_PARK_RESULT_HIGH_SCORE,
+    PAL_PARK_RESULT_NONE_TRANSFERRED,
+    PAL_PARK_RESULT_ERROR,
+    PAL_PARK_RESULT_CANCELED,
+    PAL_PARK_RESULT_ERROR_AFTER_TRANSFER,
+};
 u8 TrainerGameInfo_GetPalParkResult(TrainerGameInfoSave *info);
 void TrainerGameInfo_SetPalParkResult(TrainerGameInfoSave *info, u8 result);
 u32 getCash(TrainerGameInfoSave *info);

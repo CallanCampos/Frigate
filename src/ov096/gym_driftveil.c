@@ -2,6 +2,7 @@
 #include "constants/sound.h"
 #include "constants/vars.h"
 #include "field/field.h"
+#include "field/field_acmd.h"
 #include "field/field_actor.h"
 #include "field/field_camera.h"
 #include "field/field_exp_obj.h"
@@ -70,7 +71,6 @@ enum {
 // How the pad model's animation runs forward, and backward
 #define PAD_ANM_STEP 0x6500
 
-#define ACMD_WALK_FIRST 0x34
 #define ACTOR_FLAG_NO_COLLISION 0x200
 
 #define PAD_NONE 0xff
@@ -505,7 +505,7 @@ static GameEventReturnCode DriftveilGym_SlideEventCallback(GameEvent *event, u32
     case 0:
         if (func_ov036_0219a870(ev->player)) {
             direction = FieldPlayer_GetFaceDir(ev->player);
-            FldAct_SetAcmd(FieldPlayer_GetActor(ev->player), direction + ACMD_WALK_FIRST);
+            FldAct_SetAcmd(FieldPlayer_GetActor(ev->player), direction + ACMD_JUMP_1);
             *state = 1;
         }
         break;
@@ -568,7 +568,7 @@ static GameEventReturnCode DriftveilGym_SlideEventCallback(GameEvent *event, u32
     case 4:
         if (func_ov036_0219a870(ev->player)) {
             direction = FieldPlayer_GetFaceDir(ev->player);
-            FldAct_SetAcmd(FieldPlayer_GetActor(ev->player), direction + ACMD_WALK_FIRST);
+            FldAct_SetAcmd(FieldPlayer_GetActor(ev->player), direction + ACMD_JUMP_1);
             *state = STATE_END;
         }
         break;

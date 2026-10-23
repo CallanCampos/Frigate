@@ -28,13 +28,6 @@ enum {
 // The notice that the offers set (GameBeaconSys_SetNotice)
 #define GAME_BEACON_NOTICE_MISSION 2
 
-// The kinds of a log entry that the file tells apart
-#define LOG_KIND_NONE 0
-#define LOG_KIND_START 2
-#define LOG_KIND_MEET 3
-#define LOG_KIND_TEXT 0x2d
-#define LOG_KIND_MAX 0x2e
-
 #define MOVE_COUNT (MOVE_FUSION_BOLT + 1)
 
 typedef BOOL (*FestMissionCheckFunc)(const FestMissionInfo *info);
@@ -387,11 +380,11 @@ static BOOL FestMission_IsKind5TargetInvalid(const FestMissionInfo *info) {
     return FALSE;
 }
 
-// The kind of a log entry: mode 0 is the start of the mission, 1 a player met, and 2 what the beacon's type says
+// The kind of a log entry: mode 0 is a player who joined the mission, 1 a player met, and 2 what the beacon's type says
 static u8 FestMissionLog_GetKind(const GameBeacon *beacon, u32 mode) {
     switch (mode) {
     case 0:
-        return LOG_KIND_START;
+        return LOG_KIND_JOIN;
     case 1:
         return LOG_KIND_MEET;
     default:

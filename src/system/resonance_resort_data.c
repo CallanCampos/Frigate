@@ -1101,7 +1101,7 @@ void JoinAvenuePerson_SetParam(JoinAvenuePerson *person, JoinAvenuePersonParam p
         break;
     case JOIN_AVE_PARAM_STATUS:
         // Keeps the lowest status set since it was cleared
-        if (person->status == 0) {
+        if (person->status == JOIN_AVE_STATUS_NONE) {
             person->status = value;
         } else if (person->status > value) {
             person->status = value;

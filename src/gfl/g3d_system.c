@@ -366,7 +366,7 @@ void GFL_G3DResSetup(void *resource, void *data) {
     res->magic = G3D_RES_MAGIC;
 }
 
-void *GFL_G3DSysReadArcSysResource(u32 arcId, u32 fileId) {
+G3DResource *GFL_G3DSysReadArcSysResource(u32 arcId, u32 fileId) {
     G3DResource *res = GFL_HeapAllocate(g_G3DSystem.sys->heapId, sizeof(G3DResource), FALSE, "g3d_system.c", 692);
 
     GFL_G3DResSetup(res, GFL_ArcSysReadHeapNew(arcId, fileId, g_G3DSystem.sys->heapId));

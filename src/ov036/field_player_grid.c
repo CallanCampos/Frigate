@@ -4,6 +4,7 @@
 #include "constants/sound.h"
 #include "field/event_data.h"
 #include "field/field.h"
+#include "field/field_acmd.h"
 #include "field/field_actor.h"
 #include "field/field_effect.h"
 #include "field/field_map.h"
@@ -74,21 +75,6 @@ enum {
 };
 
 #define SEASON_ANY 4
-
-// The actor's animation commands, as GetAcmdForDir takes them: the command for DIR_UP of each kind. Our names
-#define ACMD_FACE 0x0
-#define ACMD_WALK_8F 0xc
-#define ACMD_WALK_4F 0x10
-#define ACMD_WALK_2F 0x14
-#define ACMD_STAY_WALK_16F 0x1c
-#define ACMD_STAY_WALK_2F 0x24
-#define ACMD_JUMP_1 0x34
-#define ACMD_JUMP_2 0x38
-#define ACMD_WALK_UPHILL_4F 0x4c
-#define ACMD_DASH 0x58
-#define ACMD_BIKE_DEEP_SAND 0x9b
-#define ACMD_DASH_UPHILL 0xa3
-#define ACMD_WALK_UPHILL_8F 0xa7
 
 #define GRID_SIZE FX32_CONST(16)
 #define HEIGHT_TO_GRID(height) ((s16)(((height) >> 4) / FX32_ONE))
@@ -1033,7 +1019,7 @@ static void FieldPlayerGrid_UpdateNormalMove(FieldPlayerGrid *grid, FieldActor *
 }
 
 static void FieldPlayerGrid_UpdateNormalTurn(FieldPlayerGrid *grid, FieldActor *actor, const GridMoveInput *input) {
-    FldAct_SetAcmd(actor, GetAcmdForDir(input->dir, ACMD_STAY_WALK_2F));
+    FldAct_SetAcmd(actor, GetAcmdForDir(input->dir, ACMD_STAY_WALK_4F));
     grid->state = GRID_STATE_TURN;
     FieldPlayerCore_SetMoveStatus(grid->core, PLAYER_MOVE_STATUS_TURN);
 }
@@ -1169,7 +1155,7 @@ static void FieldPlayerGrid_UpdateBikeMove(FieldPlayerGrid *grid, FieldActor *ac
 }
 
 static void FieldPlayerGrid_UpdateBikeTurn(FieldPlayerGrid *grid, FieldActor *actor, const GridMoveInput *input) {
-    FldAct_SetAcmd(actor, GetAcmdForDir(input->dir, ACMD_STAY_WALK_2F));
+    FldAct_SetAcmd(actor, GetAcmdForDir(input->dir, ACMD_STAY_WALK_4F));
     grid->state = GRID_STATE_TURN;
     FieldPlayerCore_SetMoveStatus(grid->core, PLAYER_MOVE_STATUS_TURN);
 }
@@ -1240,7 +1226,7 @@ static void FieldPlayerGrid_UpdateSurfMove(FieldPlayerGrid *grid, FieldActor *ac
 }
 
 static void FieldPlayerGrid_UpdateSurfTurn(FieldPlayerGrid *grid, FieldActor *actor, const GridMoveInput *input) {
-    FldAct_SetAcmd(actor, GetAcmdForDir(input->dir, ACMD_STAY_WALK_2F));
+    FldAct_SetAcmd(actor, GetAcmdForDir(input->dir, ACMD_STAY_WALK_4F));
     grid->state = GRID_STATE_TURN;
     FieldPlayerCore_SetMoveStatus(grid->core, PLAYER_MOVE_STATUS_TURN);
 }

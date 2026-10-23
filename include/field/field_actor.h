@@ -10,6 +10,9 @@
 #include "struct_decls.h"
 #include "system/game_event.h"
 
+// The UID of the player's actor
+#define ACTOR_UID_PLAYER 0xff
+
 // A position on the grid of 16-unit tiles. The game copies it as 8 bytes, with a field after z
 typedef struct {
     s16 x;

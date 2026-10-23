@@ -1,5 +1,6 @@
 #include "types.h"
 #include "constants/language.h"
+#include "constants/pokemon.h"
 #include "constants/text_banks.h"
 #include "constants/version.h"
 #include "field/unity_tower.h"
@@ -24,11 +25,6 @@
 
 // The species and the forms' entries that a profile's Pokémon can be
 #define GDS_PROFILE_SPECIES_END 686
-// The sexes of the profile's player
-enum {
-    GDS_PROFILE_SEX_MALE,
-    GDS_PROFILE_SEX_FEMALE,
-};
 #define GDS_PROFILE_UNION_VIEW_MAX 15
 // The sentences an introduction can be: the first five types and their first twenty sentences
 #define GDS_PROFILE_PMS_TYPE_END 5
@@ -94,8 +90,8 @@ StrBuf *GdsProfile_CreateNameStrBuf(GdsProfile *profile, u32 heapId) {
 }
 
 u32 GdsProfile_GetSex(GdsProfile *profile) {
-    if (profile->sex != GDS_PROFILE_SEX_MALE && profile->sex != GDS_PROFILE_SEX_FEMALE) {
-        return GDS_PROFILE_SEX_MALE;
+    if (profile->sex != GENDER_MALE && profile->sex != GENDER_FEMALE) {
+        return GENDER_MALE;
     }
     return profile->sex;
 }

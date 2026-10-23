@@ -2,6 +2,7 @@
 // the mission its calls. The name is the ROM's own, from GFL_HeapAllocate's file argument. Names from swan
 // (https://github.com/ds-pokemon-hacking/swan, GPL-3.0)
 #include "types.h"
+#include "field/fest_mission_data.h"
 #include "field/fest_mission_gimmick.h"
 #include "field/fest_mission_hollow.h"
 #include "field/fest_mission_people.h"
@@ -19,14 +20,6 @@
 #include "system/fest_mission.h"
 #include "system/game_data.h"
 #include "system/game_system.h"
-
-// The kinds of mission that run on the field, FestMissionHeader's kind
-enum {
-    MISSION_FLAGS = 2,
-    MISSION_HOLLOW,
-    MISSION_SPARKLE,
-    MISSION_PEOPLE,
-};
 
 // The event flags that the first kind of mission clears when it ends
 #define FIRST_MISSION_FLAG 0x3a1

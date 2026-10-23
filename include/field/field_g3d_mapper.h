@@ -111,7 +111,7 @@ struct FieldG3DMapper {
     u16 unk4E;
     u32 unk50;
     VecFx32 chunkBasePos;
-    void *mapTextures;
+    G3DResource *mapTextures;
     FieldPropSystem *propSystem;
     FieldTerrainAnimator *terrainAnimator;
     void *wfbc;

@@ -56,10 +56,6 @@ void FieldPlayer_GetGPos(FieldPlayer *player, s16 *x, s16 *y, s16 *z);
 u32 TrainerCard_CountStars(GameData *gameData);
 // The grid position in front of the player, facing dir
 void GetPlayerGPosPlusDir(FieldPlayer *player, u16 dir, s16 *x, s16 *y, s16 *z);
-// Where a balloon over an actor goes, from where the player stands, and the offset and window position of each
-u8 ActorMsgWin_CalcWinPosAuto(FieldActor *player, const VecFx32 *pos);
-void func_ov036_021a8bec(const VecFx32 *pos, VecFx32 *offset, G3DCamera *g3dCamera, FieldCamera *camera, u8 winPos);
-void func_ov036_021a8c00(u32 winPos, u32 *a1, u32 *a2);
 GameEvent *JoinAvenueNameEntry_Create(u16 target, GameSystem *gsys, u16 *result, u16 useCurrent);
 // Check the party and the Battle Box against a regulation. func_ov036_021aebf0 returns the event that lets the player
 // choose between them, or NULL when neither can enter

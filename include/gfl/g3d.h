@@ -146,7 +146,7 @@ void GFL_G3DSysSetSwapBufferParams(u32 sortMode, u32 bufferMode);
 BOOL GFL_G3DSysUsesFrmTexVramMgr(void);
 BOOL GFL_G3DSysUsesFrmPlttVramMgr(void);
 // Resources, each a file of a model, textures or an animation
-void *GFL_G3DSysReadArcSysResource(u32 arcId, u32 fileId);
+G3DResource *GFL_G3DSysReadArcSysResource(u32 arcId, u32 fileId);
 void *GFL_G3DSysReadArcToolResource(ArcTool *handle, u32 fileId);
 void *GFL_G3DSysReadFSResource(const char *path, u32 fileId);
 // The size of a resource, for one allocated outside the 3D system, which GFL_G3DResSetup sets up with its file
@@ -171,7 +171,6 @@ void GFL_G3DResFree(G3DResource *resource);
 // The size of a resource's header, which GFL_G3DResSetup fills in
 u32 GFL_G3DResGetAllocSize(void);
 void GFL_G3DResSetup(void *resource, void *data);
-void *GFL_G3DSysReadArcSysResource(u32 arcId, u32 fileId);
 BOOL GFL_G3DResUploadAndReleaseTexData(void *resource);
 G3DModel *GFL_G3DMdlCreate(void *resource, u32 modelId, void *texture);
 void GFL_G3DMdlFree(G3DModel *model);

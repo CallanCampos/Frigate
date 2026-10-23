@@ -252,8 +252,8 @@ typedef struct {
     u32 touchY;
     G3DCamera *camera;
     G3DLight *light;
-    void *earthRes;
-    void *markRes[MARK_COUNT];
+    G3DResource *earthRes;
+    G3DResource *markRes[MARK_COUNT];
     G3DModel *earthModel;
     G3DModel *markModels[MARK_COUNT];
     G3DActor *earthActor;

@@ -6,6 +6,7 @@
 #include "constants/sound.h"
 #include "field/event_data.h"
 #include "field/field.h"
+#include "field/field_acmd.h"
 #include "field/field_actor.h"
 #include "field/field_map.h"
 #include "field/field_player.h"
@@ -47,16 +48,6 @@ enum {
 #define NOGRID_FLAG_SLIDE_PENDING 0x40
 
 #define NOGRID_MOVE_CODE 0x45 // Guessed name: the player rail movement callback set.
-
-#define ACMD_FACE 0x0
-#define ACMD_WALK_8F 0x8
-#define ACMD_WALK_8F_DASH 0xc
-#define ACMD_WALK_4F 0x10
-#define ACMD_WALK_2F 0x14
-#define ACMD_STAY_WALK_16F 0x1c
-#define ACMD_STAY_WALK_2F 0x28
-#define ACMD_JUMP_2 0x38
-#define ACMD_DASH 0x58
 
 typedef struct {
     u8 active;
@@ -556,7 +547,7 @@ static void func_ov036_0219d54c(FieldPlayerNoGrid *nogrid, FieldActor *actor, u3
     } else if (heldKeys & PAD_BUTTON_B) {
         acmd = ACMD_DASH;
     } else {
-        acmd = ACMD_WALK_8F_DASH;
+        acmd = ACMD_WALK_8F;
     }
     FldAct_SetAcmd(actor, GetAcmdForDir(dir, acmd));
     nogrid->state = NOGRID_STATE_MOVE;
@@ -1154,7 +1145,7 @@ static u16 func_ov036_0219e110(FieldPlayerNoGrid *nogrid, u16 dir, u32 a2) {
     result = func_ov036_0219e2bc(&nogrid->slide, dir);
     if (func_ov036_0219e2d4(&nogrid->slide)) {
         SetActorFlag(nogrid->actor, 0x18);
-        FldAct_SetAcmd(nogrid->actor, GetAcmdForDir(result, ACMD_WALK_8F));
+        FldAct_SetAcmd(nogrid->actor, GetAcmdForDir(result, ACMD_WALK_16F));
         FieldPlayerCore_SetMoveStatus(nogrid->core, PLAYER_MOVE_STATUS_MOVE);
         result = DIR_NONE;
     } else {

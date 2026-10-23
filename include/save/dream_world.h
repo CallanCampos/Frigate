@@ -81,11 +81,11 @@ void SetDreamRadarFlag(DreamRadarSave *save, u32 flag, u32 value);
 void *DreamRadar_AllocBuffer(HeapID heapId);
 void DreamRadar_FreeBuffer(void *buffer);
 void ReadDreamRadarSaveData(void *buffer);
-void *DreamRadar_GetSaveData(void *buffer);
+CygnusSaveData *DreamRadar_GetSaveData(void *buffer);
 // Writes the data back to the card
 void DreamRadar_WriteSaveData(void);
 // Checks the data and decodes its 32 words with the seed. Returns 2 when the data is valid
-u32 CygnusSaveData_Load(void *data, u32 seed, u32 *words);
+u32 CygnusSaveData_Load(CygnusSaveData *cygnus, u32 seed, u32 *words);
 // Marks the data read with a new seed and the Pokémon received
 void CygnusSaveData_Store(CygnusSaveData *data, u32 seed, u32 received);
 // The Pokémon that a word of the data names, if any: its bit in the Pokémon received, its species, form and sex

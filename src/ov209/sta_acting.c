@@ -51,9 +51,6 @@
 #define STA_ACTING_NO_POKE 4
 #define STA_ACTING_NO_LIGHT 4
 
-// The props held in each hand, whose use the other Pokémon plan
-#define STA_ACTING_EQUIP_HAND_R 7
-#define STA_ACTING_EQUIP_HAND_L 8
 // What the communication reports when a Pokémon uses no prop
 #define STA_ACTING_EQUIP_NONE 10
 
@@ -1041,9 +1038,9 @@ static void StaActing_UpdateItemUse(StaActing *stage) {
                 users[userCount] = i;
                 userCount++;
                 stage->useRequest[i] = FALSE;
-                if (stage->useEquip[i] == STA_ACTING_EQUIP_HAND_R) {
+                if (stage->useEquip[i] == MUS_POKE_DRAW_EQUIP_HAND_R) {
                     stage->handPropUsed[i][0] = TRUE;
-                } else if (stage->useEquip[i] == STA_ACTING_EQUIP_HAND_L) {
+                } else if (stage->useEquip[i] == MUS_POKE_DRAW_EQUIP_HAND_L) {
                     stage->handPropUsed[i][1] = TRUE;
                 }
                 StaActing_SetNpcItemTiming(stage, 2, i);
@@ -1081,9 +1078,9 @@ static void StaActing_UpdateItemUse(StaActing *stage) {
             if (equip != STA_ACTING_EQUIP_NONE) {
                 StaActPoke_StartItemEffect(stage->pokeSys, stage->pokes[i], equip);
                 MusComm_ClearEquipUsed(stage->param->comm, i);
-                if (equip == STA_ACTING_EQUIP_HAND_R) {
+                if (equip == MUS_POKE_DRAW_EQUIP_HAND_R) {
                     stage->handPropUsed[i][0] = TRUE;
-                } else if (equip == STA_ACTING_EQUIP_HAND_L) {
+                } else if (equip == MUS_POKE_DRAW_EQUIP_HAND_L) {
                     stage->handPropUsed[i][1] = TRUE;
                 }
                 StaActing_SetNpcItemTiming(stage, 2, i);
@@ -1150,9 +1147,9 @@ static void StaActing_UpdateNpcItemUse(StaActing *stage) {
 
 static inline u8 StaActing_RandomHand(void) {
     if ((u8)GFL_RandomMTRange(2) == 0) {
-        return STA_ACTING_EQUIP_HAND_R;
+        return MUS_POKE_DRAW_EQUIP_HAND_R;
     }
-    return STA_ACTING_EQUIP_HAND_L;
+    return MUS_POKE_DRAW_EQUIP_HAND_L;
 }
 
 void StaActing_SetNpcItemTiming(StaActing *stage, u32 timing, u8 pos) {
@@ -1164,19 +1161,19 @@ void StaActing_SetNpcItemTiming(StaActing *stage, u32 timing, u8 pos) {
             MusicalPoke *poke = stage->param->pokes[i];
 
             if (poke->owner == 2 && StaActing_IsPokeUsingItem(stage, i) != TRUE && stage->npcUseWait[i] == 0) {
-                if (poke->equips[STA_ACTING_EQUIP_HAND_R].itemId != 0xff && stage->handPropUsed[i][0] == FALSE) {
+                if (poke->equips[MUS_POKE_DRAW_EQUIP_HAND_R].itemId != 0xff && stage->handPropUsed[i][0] == FALSE) {
                     hand[0] = TRUE;
                 }
-                if (poke->equips[STA_ACTING_EQUIP_HAND_L].itemId != 0xff && stage->handPropUsed[i][1] == FALSE) {
+                if (poke->equips[MUS_POKE_DRAW_EQUIP_HAND_L].itemId != 0xff && stage->handPropUsed[i][1] == FALSE) {
                     hand[1] = TRUE;
                 }
                 if (hand[0] != FALSE || hand[1] != FALSE) {
                     u8 equip;
 
                     if (hand[0] == TRUE && hand[1] == FALSE) {
-                        equip = STA_ACTING_EQUIP_HAND_R;
+                        equip = MUS_POKE_DRAW_EQUIP_HAND_R;
                     } else if (hand[1] == TRUE && hand[0] == FALSE) {
-                        equip = STA_ACTING_EQUIP_HAND_L;
+                        equip = MUS_POKE_DRAW_EQUIP_HAND_L;
                     } else {
                         equip = StaActing_RandomHand();
                     }

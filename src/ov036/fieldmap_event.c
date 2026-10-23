@@ -23,6 +23,7 @@
 #include "field/event_wild_battle.h"
 #include "field/festival.h"
 #include "field/field.h"
+#include "field/field_acmd.h"
 #include "field/field_actor.h"
 #include "field/field_daycare.h"
 #include "field/field_effect.h"
@@ -108,13 +109,6 @@
 #define GIMMICK_CHARGESTONE_CAVE 13
 #define GIMMICK_HUMILAU_GYM 38
 #define GIMMICK_ROLLER_COASTER 48
-
-// The action commands of the dash and the dash up a slope, which come in one per direction, and of the two jumps that
-// the player makes off the water
-#define ACMD_DASH 0x58
-#define ACMD_DASH_UPHILL 0xa3
-#define ACMD_JUMP_1 0x34
-#define ACMD_JUMP_2 0x38
 
 // A grid tile's side, in world units and in fx32
 #define GRID_UNITS 16

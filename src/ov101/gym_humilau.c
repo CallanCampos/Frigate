@@ -3,6 +3,7 @@
 #include "constants/directions.h"
 #include "constants/sound.h"
 #include "field/field.h"
+#include "field/field_acmd.h"
 #include "field/field_actor.h"
 #include "field/field_camera.h"
 #include "field/field_exp_obj.h"
@@ -57,9 +58,6 @@ enum {
 // The ride whose lane runs back down to the gym's entrance; once it has been ridden, the platforms that were never
 // moved start at the second set of positions
 #define RIDE_SHORTCUT 3
-
-// The player's hop in place before a ride, one per direction
-#define ACMD_HOP_FIRST 0x38
 
 // Where the player stands: on the platform of the last ride, on the one next to it, or on neither
 enum {
@@ -528,7 +526,7 @@ static GameEventReturnCode GymHumilau_RideEventCallback(GameEvent *event, u32 *s
         if (IsAllActorAcmdFinished(FieldPlayer_GetActor(ev->player))) {
             u32 dir = FieldPlayer_GetFaceDir(ev->player);
 
-            FldAct_SetAcmd(FieldPlayer_GetActor(ev->player), dir + ACMD_HOP_FIRST);
+            FldAct_SetAcmd(FieldPlayer_GetActor(ev->player), dir + ACMD_JUMP_2);
             ev->wait = 15;
             *state = 2;
         }

@@ -297,6 +297,7 @@ typedef struct Elboard Elboard;
 typedef struct ElboardInit ElboardInit;
 typedef struct ElboardMessage ElboardMessage;
 typedef struct ElboardMessageArg ElboardMessageArg;
+typedef struct ElevatorFloor ElevatorFloor;
 typedef struct ElScoreboard ElScoreboard;
 typedef struct ElScoreboardPaletteTarget ElScoreboardPaletteTarget;
 typedef struct EncEff EncEff;

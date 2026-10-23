@@ -151,7 +151,12 @@ u32 PassPower_ApplyLuckyShiny(u32 rolls);
 // Two levels of what GameData_GetMyPassPowerLevels returns, which the pass powers need
 u16 PassPowerLevel_GetWhite(void *levels);
 u16 PassPowerLevel_GetBlack(void *levels);
-// Overlay 12's pass_power_check.c: whether a pass power is unlocked (0), nearly (1) or not (2), and how many are
+// Overlay 12's pass_power_check.c: whether a pass power is unlocked, nearly or not, and how many are
+enum {
+    PASS_POWER_UNLOCKED,
+    PASS_POWER_NEAR,
+    PASS_POWER_LOCKED,
+};
 u32 CheckPassPowerUnlocked(void *data, int index, void *levels, u8 *flags);
 u32 GetUnlockedPassPowerCount(void *data, void *levels, u8 *flags);
 

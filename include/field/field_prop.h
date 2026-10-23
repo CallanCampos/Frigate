@@ -133,7 +133,7 @@ struct FieldPropSystem {
     FieldPropResBank resBank;
     u32 resourceCount;
     FieldPropResource *resources;
-    void *textureResource;
+    G3DResource *textureResource;
     u32 resInstanceCount;
     FieldPropResInstance *resInstances;
     FieldPropHandle *handles[7];
