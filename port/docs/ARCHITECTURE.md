@@ -282,3 +282,10 @@ The planned parts ([PLAN.md §4.3](PLAN.md#43-directory-structure)) have no dire
 ## Glossary
 
 The DS's hardware, Nintendo's libraries and Frigate's own terms, from ARM7 to VBlank: [GLOSSARY.md](GLOSSARY.md).
+
+## Contribution and upstream validation
+
+The source ownership boundaries above are maintained by [reviewed sync PRs](SYNC.md).
+[upstream_sync.py](../tools/upstream_sync.py) publishes bounded history-preserving proposals;
+[sync_upstream.sh](../tools/sync_upstream.sh) verifies ROMs and native tests on the exact proposed head.
+[The ruleset payloads](../tools/main-ruleset.json) and [review policy](REPOSITORY-POLICY.md) protect main.

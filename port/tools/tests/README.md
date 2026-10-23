@@ -1,0 +1,13 @@
+# Sync tooling tests
+
+`test_upstream_sync.py` creates isolated Git repositories to check upstream merge preservation, conflict/history/reference
+stops, frozen pending proposals and publication behavior. It makes no real GitHub writes and needs no ROM.
+
+Run from the repository root:
+
+```sh
+python3 -m unittest discover -s port/tools/tests -p test_upstream_sync.py
+```
+
+The `Sync tooling tests` job feeds the required `Frigate CI` gate. The publishing helper lives in
+[../upstream_sync.py](../upstream_sync.py); the maintainer procedure is [SYNC.md](../../docs/SYNC.md).

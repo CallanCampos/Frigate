@@ -4,7 +4,7 @@ name: Frigate CI
 # skipping. The ROM build needs the base ROMs, which CI doesn't have; upstream's compile.yml compiles every C file with
 # MWCC instead, and every port session's sync builds both ROMs locally (port/docs/SYNC.md).
 #
-# Four jobs: the development build on macOS and Linux (host), as port/README.md's quick start makes it; the same on
+# Four build groups: the development build on macOS and Linux (host), as port/README.md's quick start makes it; the same on
 # Windows (host-windows), with MSYS2's CLANG64 toolchain (clang, lld and the UCRT;
 # port/docs/adr/0013-windows-build-with-msys2-clang64.md); the macOS distribution build (macos-distribution,
 # port/docs/adr/0015-universal-macos-app-for-macos-11.md), one universal app, arm64 and x86_64, for macOS 11.0 and later,
@@ -16,13 +16,14 @@ on:
   push:
     branches: [main]
   pull_request:
+    branches: [main]
   workflow_dispatch:
 
 permissions:
   contents: read
 
 concurrency:
-  group: port-ci-${{ github.ref }}
+  group: port-ci-${{ github.event_name }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -36,10 +37,12 @@ jobs:
     timeout-minutes: 45
     steps:
       - name: Checkout code
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
 
       - name: Set up Python
-        uses: actions/setup-python@v7
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7
         with:
           python-version: "3.12"
 
@@ -95,8 +98,9 @@ jobs:
         run: git config --global core.autocrlf false
 
       - name: Checkout code
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
+          persist-credentials: false
           sparse-checkout-cone-mode: false
           sparse-checkout: |
             /*
@@ -107,7 +111,7 @@ jobs:
       # MSYS2's current packages, not pinned: the build takes any SDL3 3.4 (3.4.16 on the runner of 2026-10-18), and
       # the CLANG64 shell's PATH is MSYS2's own, so that its Python is the one CMake finds (port/CMakeLists.txt)
       - name: Install build tools
-        uses: msys2/setup-msys2@v2
+        uses: msys2/setup-msys2@ec48f7c5447b3140e2b088413ae3a55687bccb6e # v2
         with:
           msystem: CLANG64
           update: false
@@ -153,10 +157,12 @@ jobs:
     timeout-minutes: 90
     steps:
       - name: Checkout code
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
 
       - name: Set up Python
-        uses: actions/setup-python@v7
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7
         with:
           python-version: "3.12"
 
@@ -170,6 +176,8 @@ jobs:
       - name: Use Xcode 26
         if: startsWith(matrix.os, 'macos-15')
         run: |
+          # Xcode bundle names are controlled by the runner image and contain no newlines.
+          # shellcheck disable=SC2012
           xcode=$(ls -d /Applications/Xcode_26*.app 2>/dev/null | sort -V | tail -1)
           if [ -z "$xcode" ]; then
             echo "::error::the ${{ matrix.os }} image has no Xcode 26 (its readme of 2026-10-18 lists 26.0.1 to 26.3)"
@@ -238,10 +246,12 @@ jobs:
     timeout-minutes: 90
     steps:
       - name: Checkout code
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
 
       - name: Set up Python
-        uses: actions/setup-python@v7
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7
         with:
           python-version: "3.12"
 
@@ -272,3 +282,48 @@ jobs:
       # only the smoke test runs, and the replays' fixtures, which empty their save directories; the rest skip
       - name: The smoke test, the one route that runs without the ROM
         run: ctest --test-dir build/port-san -L route -LE oracle --output-on-failure
+
+  # Exercises the maintainer's upstream merge policy in isolated Git repositories, without ROMs or secrets.
+  sync-tooling:
+    name: Sync tooling tests
+    runs-on: ubuntu-26.04
+    timeout-minutes: 10
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7
+        with:
+          python-version: "3.12"
+
+      - name: Test upstream sync policy
+        run: python -m unittest discover -s port/tools/tests -p test_upstream_sync.py
+
+  # A single stable required check: a failed, cancelled or skipped build must never make the PR mergeable.
+  # Keep needs in sync with every build/test job above. Matrix jobs report success only when every leg succeeds.
+  frigate-ci:
+    name: Frigate CI
+    if: ${{ always() }}
+    needs: [host, host-windows, macos-distribution, sanitize, sync-tooling]
+    runs-on: ubuntu-26.04
+    timeout-minutes: 5
+    steps:
+      - name: Require every build and test
+        env:
+          JOB_RESULTS: ${{ toJSON(needs) }}
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+          import sys
+
+          jobs = json.loads(os.environ["JOB_RESULTS"])
+          failed = {name: job["result"] for name, job in jobs.items() if job["result"] != "success"}
+          if failed:
+              print(f"::error::Required Frigate jobs did not succeed: {failed}")
+              sys.exit(1)
+          print("Every required Frigate build and test succeeded.")
+          PY

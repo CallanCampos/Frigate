@@ -1,0 +1,4 @@
+# Frigate review ownership, including imported game changes and this policy.
+# The sole maintainer reviews contributor and bot sync PRs. Owner-authored PRs
+# use the review-only exception; validation and history rules have no bypass.
+* @CallanCampos
