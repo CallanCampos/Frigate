@@ -1434,7 +1434,7 @@ static void EventFieldEffectCutinSub_DrawStrToTexture(PlayerInfo *info, RivalDat
     raw = ci->palette->pRawData;
     raw[1] = color;
     raw[2] = color2;
-    G3DTextDraw_CreateResource(res, texName, (u32)raw, palName, str, (u16)width, 0, 0x440, heapId, &resource);
+    G3DTextDraw_CreateResource(res, texName, (uptr)raw, palName, str, (u16)width, 0, 0x440, heapId, &resource);
     GFL_HeapFree(ci->paletteData);
     GFL_HeapFree(str);
     GFL_MsgDataFree(msgData);
