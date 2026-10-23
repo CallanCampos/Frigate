@@ -618,8 +618,8 @@ int MB_Init(void *work, const MBUserInfo *user, u32 ggid, u32 tgid, u32 dma) {
     if (mbc != NULL && mbc->isMbInitialized != 0) {
         return MB_ERRCODE_INVALID_STATE;
     }
-    wmWork = (MBiParam *)(((u32)work + 0x1f) & ~0x1f);
-    commWork = (MB_CommCommonWork *)(((u32)wmWork + sizeof(MBiParam) + 0x1f) & ~0x1f);
+    wmWork = (MBiParam *)(((uptr)work + 0x1f) & ~0x1f);
+    commWork = (MB_CommCommonWork *)(((uptr)wmWork + sizeof(MBiParam) + 0x1f) & ~0x1f);
     if (tgid == MB_TGID_AUTO) {
         tgid = WM_GetNextTgid();
     }
@@ -739,7 +739,7 @@ static int MBi_StartParentCore(int channel) {
     int i;
 
     sWmWork->parentParam.channel = channel;
-    sWmBuf = (void *)(((u32)mbc + sizeof(MB_CommPWork) + 0x1f) & ~0x1f);
+    sWmBuf = (void *)(((uptr)mbc + sizeof(MB_CommPWork) + 0x1f) & ~0x1f);
     callback = pPwork->parent_callback;
     MI_CpuClear16(&pPwork->childUser, sizeof(MB_CommPWork) - sizeof(MB_CommCommonWork));
     MB_CommSetParentStateCallback(callback);
