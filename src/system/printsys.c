@@ -1083,9 +1083,18 @@ const u16 *GFL_StrCmdSkipCommand(const u16 *cmd) {
 static u32 PrintQueue_GetStringSize(const StrBuf *strbuf) {
     u32 size = (GFL_StrBufGetCharCount(strbuf) + 1) * 2;
 
+#ifdef PLATFORM_PC
+    // The queue keeps a copy of the renderer after the string, and the renderer holds pointers, which a host aligns to
+    // 8 bytes: rounded to the DS's 4, a string of an odd count of words left it 4 bytes past such a boundary
+    // (port/docs/sanitizers.md). The queue's sizes are all multiples of 8, so a wrap keeps the alignment too
+    while (size & 7) {
+        size++;
+    }
+#else
     while (size & 3) {
         size++;
     }
+#endif
     return size;
 }
 
