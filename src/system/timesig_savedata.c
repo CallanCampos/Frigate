@@ -8,8 +8,6 @@
 // The save block of the trainer card's signature, when each badge was obtained and saved badge polish. The ROM has
 // no string for the file, so the name is a guess (it comes from swan's getTimeSigBlkAddress). Block 0x21.
 
-#define SAVE_BLOCK_TIMESIG 0x21
-
 u32 TimeSigSave_GetSize(void) {
     return sizeof(TimeSigSave);
 }

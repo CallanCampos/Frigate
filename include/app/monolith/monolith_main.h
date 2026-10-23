@@ -4,6 +4,7 @@
 #include "types.h"
 #include "app/monolith.h"
 #include "gfl/clact.h"
+#include "save/high_link.h"
 #include "struct_decls.h"
 #include "system/app_printsys_common.h"
 #include "system/printsys.h"
@@ -121,7 +122,7 @@ struct MonolithWork {
     MsgData *msgMonolith;
     BmpOamSys *bmpOam;
     ArcTool *arc;
-    void *passPowerData;
+    PassPowerData *passPowerData;
     AppPrintsysCommon printsys;
     MonolithActorRes actorRes[2];
     u8 unk60[0x90];

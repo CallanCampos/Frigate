@@ -15,8 +15,6 @@
 // The rules of a battle, and the save block of the competitions' regulations and the teams entered in them, which
 // swan calls the tournament block. Block 0x2f.
 
-#define SAVE_BLOCK_TOURNAMENT 0x2f
-
 #define REGULATION_NAME_STRBUF_SIZE 26
 
 static void loadBattleTypeTextToStrbuf(Regulation *regulation, StrBuf *strbuf);
@@ -356,8 +354,8 @@ void *TournamentBlock_GetEntry(TournamentBlock *tournament, u32 index) {
     return &tournament->entries[index];
 }
 
-void TournamentBlock_SetEntry(TournamentBlock *tournament, u32 index, const void *entry) {
-    tournament->entries[index] = *(const TournamentEntry *)entry;
+void TournamentBlock_SetEntry(TournamentBlock *tournament, u32 index, const TournamentEntry *entry) {
+    tournament->entries[index] = *entry;
 }
 
 void TournamentTeam_Clear(void *record) {

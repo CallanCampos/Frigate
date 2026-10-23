@@ -9,10 +9,10 @@ AspertiaCity_LoadModels kind:function(thumb,size=0xbc) addr:0x021eee0c
 AspertiaCity_FreeScene kind:function(thumb,size=0xc) addr:0x021eeec8
 AspertiaCity_StepAnimations kind:function(thumb,size=0xc) addr:0x021eeed4
 AspertiaCity_ShowSeasonModel kind:function(thumb,size=0x78) addr:0x021eeee0
-data_ov112_021eef58 kind:data(any) addr:0x021eef58
-data_ov112_021eef60 kind:data(any) addr:0x021eef60
-data_ov112_021eef68 kind:data(any) addr:0x021eef68
-data_ov112_021eef70 kind:data(any) addr:0x021eef70
+sSummerAnimations kind:data(any) addr:0x021eef58
+sAutumnAnimations kind:data(any) addr:0x021eef60
+sSpringAnimations kind:data(any) addr:0x021eef68
+sWinterAnimations kind:data(any) addr:0x021eef70
 data_ov112_021eef78 kind:data(any) addr:0x021eef78
 data_ov112_021eef85 kind:data(any) addr:0x021eef85 ambiguous
 data_ov112_021eef88 kind:data(any) addr:0x021eef88

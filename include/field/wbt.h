@@ -326,7 +326,7 @@ u8 WbtTool_GetDownloadedTrainerClass(u32 index);
 typedef struct {
     u32 unk0;
     u16 *unk4;
-    void *save;
+    WbtSave *save;
     PlayerInfo *playerInfo;
     // Whether the tournament of each of the save's counts is open
     u8 open[29];

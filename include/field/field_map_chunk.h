@@ -2,6 +2,7 @@
 #define POKEBW2_FIELD_FIELD_MAP_CHUNK_H
 
 #include "types.h"
+#include "field/field_terrain_animator.h"
 #include "gfl/g3d.h"
 #include "gfl/heap.h"
 #include "nitro/fx.h"
@@ -49,10 +50,10 @@ typedef struct {
 } FieldChunkProps;
 
 struct FieldChunkContext {
-    void *srtAnimatorState;
+    FieldTerrainSRTAnimatorChunkState *srtAnimatorState;
     FieldPropSystem *propSystem;
     void *wfbc;
-    void *resortMap;
+    ResortMapCreateWork *resortMap;
     u32 chunkIndex;
     u16 heapId;
 };

@@ -74,8 +74,8 @@ sTradeDemoCommonPosEnd kind:data(any) addr:0x021b6a1c
 sTradeDemoCommonPosSecond kind:data(any) addr:0x021b6a28
 data_ov193_021b69f4 kind:data(any) addr:0x021b6a34
 data_ov193_021b6a00 kind:data(any) addr:0x021b6a40
-data_ov193_021b6a10 kind:data(any) addr:0x021b6a50
-data_ov193_021b6a1c kind:data(any) addr:0x021b6a5c
+sPosFirst kind:data(any) addr:0x021b6a50
+sPosSecond kind:data(any) addr:0x021b6a5c
 data_ov193_021b6a28 kind:data(any) addr:0x021b6a68
 data_ov193_021b6a38 kind:data(any) addr:0x021b6a78
 sTradeDemoCommonHopPath kind:data(any) addr:0x021b6aa0

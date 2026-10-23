@@ -10,7 +10,6 @@
 // The symbol encounters of the Entree Forest: the Pokémon that came from the Dream World, kept encrypted in ranges
 // of slots by kind. The file's name is the ROM's string. Block 0x3c.
 
-#define SAVE_BLOCK_SYMBOL 0x3c
 #define SYMBOL_SLOT_NONE 0xffff
 
 // The slots of the last kind are the deep areas', 60 each after the first two

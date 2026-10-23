@@ -7,8 +7,6 @@
 // The save block of the records, which the trainer card shows (the ROM has no string for the file, so the name is a
 // guess). Block 0x26.
 
-#define SAVE_BLOCK_TRAINER_CARD 0x26
-
 u32 GameRecords_GetSize(void) {
     return sizeof(GameRecords);
 }
@@ -20,5 +18,5 @@ void initTrainerCardInfoBlk(GameRecords *records) {
 }
 
 GameRecords *getTrainerCardInfoBlkAddress(SaveControl *save) {
-    return SaveControl_GetBlockPtr(save, SAVE_BLOCK_TRAINER_CARD);
+    return SaveControl_GetBlockPtr(save, SAVE_BLOCK_RECORDS);
 }

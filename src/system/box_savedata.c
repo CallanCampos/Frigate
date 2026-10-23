@@ -15,9 +15,6 @@
 // block per box of 30 Pokémon. The name is the ROM's string, and trayNum, pos, BOX_MAX_TRAY, BOX_MAX_POS and
 // BOXDAT_TRAYNUM_CURRENT are the names its assertions keep. Blocks 0 (main) and 1 to 24 (the boxes).
 
-#define SAVE_BLOCK_BOX_MAIN 0
-#define SAVE_BLOCK_BOX_TRAY 1
-
 // Boxes open at the start, and how many more each unlock opens
 #define BOX_START_TRAY 8
 #define BOX_UNLOCK_TRAY 8

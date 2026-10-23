@@ -2,6 +2,7 @@
 // the mission its calls. The name is the ROM's own, from GFL_HeapAllocate's file argument. Names from swan
 // (https://github.com/ds-pokemon-hacking/swan, GPL-3.0)
 #include "types.h"
+#include "field/fest_mission_data.h"
 #include "field/fest_mission_gimmick.h"
 #include "field/fest_mission_hollow.h"
 #include "field/fest_mission_people.h"
@@ -20,12 +21,6 @@
 #include "system/game_data.h"
 #include "system/game_system.h"
 
-// The kinds of mission that run on the field, FestMissionHeader's kind
-#define MISSION_FLAGS 2
-#define MISSION_HOLLOW 3
-#define MISSION_SPARKLE 4
-#define MISSION_PEOPLE 5
-
 // The event flags that the first kind of mission clears when it ends
 #define FIRST_MISSION_FLAG 0x3a1
 #define MISSION_FLAG_COUNT 12
@@ -33,7 +28,7 @@
 static void FesGimmick_SetEnabled(FesGimmick *gimmick, BOOL enabled);
 static void ClearFesEventFlags(FesGimmick *gimmick);
 
-void *FesGimmick_Create(GameSystem *gsys, Field *field, HeapID heapId) {
+FesGimmick *FesGimmick_Create(GameSystem *gsys, Field *field, HeapID heapId) {
     FesGimmick *gimmick = GFL_HeapAllocate(heapId, sizeof(FesGimmick), TRUE, "fes_gimmick.c", 74);
     NoGridMapper *mapper;
 
@@ -41,7 +36,7 @@ void *FesGimmick_Create(GameSystem *gsys, Field *field, HeapID heapId) {
     gimmick->gameData = GSYS_GetGameData(gsys);
     gimmick->festival = GSYS_GetLinkFestival(gsys);
     gimmick->mission = GetFestMissionCfg(gimmick->festival);
-    gimmick->work = (FesMissionWork *)LinkFestival_GetEntries(gimmick->festival);
+    gimmick->work = LinkFestival_GetEntries(gimmick->festival);
     gimmick->field = field;
     gimmick->eventData = GameData_GetEventData(gimmick->gameData);
     gimmick->eventWork = GameData_GetEventWork(gimmick->gameData);
@@ -53,7 +48,7 @@ void *FesGimmick_Create(GameSystem *gsys, Field *field, HeapID heapId) {
     return gimmick;
 }
 
-void FesGimmick_Free(void *gimmick) {
+void FesGimmick_Free(FesGimmick *gimmick) {
     FesGimmick_SetEnabled(gimmick, FALSE);
     MI_CpuFill8(gimmick, 0, sizeof(FesGimmick));
     GFL_HeapFree(gimmick);
@@ -96,23 +91,21 @@ void FesGimmick_BindActorSystem(FesGimmick *fes, MMSys *actorSystem) {
     }
 }
 
-void FesGimmick_BindPlayer(FesGimmick *fes, void *effects, FieldPlayer *player) {
+void FesGimmick_BindPlayer(FesGimmick *fes, FieldEffects *effects, FieldPlayer *player) {
     fes->effects = effects;
     fes->player = player;
     fes->playerActor = FieldPlayer_GetActor(player);
-    fes->unk3C = func_ov036_021a5bb4(fes->effects);
+    fes->sparkles = func_ov036_021a5bb4(fes->effects);
 }
 
 void func_ov036_021b65d4(FesGimmick *fes) {
-    if (fes->unk3C != NULL) {
-        func_ov036_021a3a70(fes->unk3C);
-        fes->unk3C = NULL;
+    if (fes->sparkles != NULL) {
+        func_ov036_021a3a70(fes->sparkles);
+        fes->sparkles = NULL;
     }
 }
 
-void func_ov036_021b65e8(void *gimmick) {
-    FesGimmick *fes = gimmick;
-
+void func_ov036_021b65e8(FesGimmick *fes) {
     if (getStatusOfFesMission(fes->festival)) {
         MI_CpuFill8(LinkFestival_GetEntries(fes->festival), 0, sizeof(FesMissionWork));
         switch (fes->mission->header.kind) {
@@ -120,8 +113,8 @@ void func_ov036_021b65e8(void *gimmick) {
             ClearFesEventFlags(fes);
             break;
         case MISSION_HOLLOW:
-            if (FesMissionHollow_IsActive(gimmick)) {
-                FesMissionHollow_Setup(gimmick);
+            if (FesMissionHollow_IsActive(fes)) {
+                FesMissionHollow_Setup(fes);
             }
             break;
         case MISSION_PEOPLE:
@@ -152,8 +145,7 @@ void func_ov036_021b6660(FesGimmick *fes) {
     }
 }
 
-BOOL func_ov036_021b6690(void *gimmick) {
-    FesGimmick *fes = gimmick;
+BOOL func_ov036_021b6690(FesGimmick *fes) {
     RivalEntry *work = LinkFestival_GetEntries(fes->festival);
 
     if (!getStatusOfFesMission(fes->festival)) {
@@ -161,11 +153,11 @@ BOOL func_ov036_021b6690(void *gimmick) {
     }
     switch (fes->mission->header.kind) {
     case MISSION_SPARKLE:
-        return FestSparkle_End(gimmick, (FestSparkleWork *)work);
+        return FestSparkle_End(fes, (FestSparkleWork *)work);
     case MISSION_PEOPLE:
-        return FesMissionGimmick_End(gimmick, (FesMissionWork *)work);
+        return FesMissionGimmick_End(fes, (FesMissionWork *)work);
     case MISSION_HOLLOW:
-        return RivalSelect_RemoveHollowActorIfMission(gimmick);
+        return RivalSelect_RemoveHollowActorIfMission(fes);
     default:
         return FALSE;
     }
@@ -181,38 +173,32 @@ BOOL FesGimmick_IsCurrent(FesGimmick *fes, u32 type) {
     return FALSE;
 }
 
-GameEvent *func_ov036_021b6700(void *gimmick, const VecFx32 *position) {
-    FesGimmick *fes = gimmick;
-
+GameEvent *func_ov036_021b6700(FesGimmick *fes, const VecFx32 *position) {
     if (!getStatusOfFesMission(fes->festival)) {
         return NULL;
     }
     if (fes->mission->header.kind == MISSION_SPARKLE) {
-        return FestSparkle_CheckPickUpGrid(gimmick, position);
+        return FestSparkle_CheckPickUpGrid(fes, position);
     }
     return NULL;
 }
 
-GameEvent *func_ov036_021b672c(void *gimmick, const RailPosition *position) {
-    FesGimmick *fes = gimmick;
-
+GameEvent *func_ov036_021b672c(FesGimmick *fes, const RailPosition *position) {
     if (!getStatusOfFesMission(fes->festival)) {
         return NULL;
     }
     if (fes->mission->header.kind == MISSION_SPARKLE) {
-        return FestSparkle_CheckPickUpRail(gimmick, position);
+        return FestSparkle_CheckPickUpRail(fes, position);
     }
     return NULL;
 }
 
-BOOL func_ov036_021b6758(void *gimmick, u16 x, u16 z, fx32 height) {
-    FesGimmick *fes = gimmick;
-
+BOOL func_ov036_021b6758(FesGimmick *fes, u16 x, u16 z, fx32 height) {
     if (!getStatusOfFesMission(fes->festival)) {
         return FALSE;
     }
     if (fes->mission->header.kind == MISSION_SPARKLE) {
-        return FestSparkle_IsOnTile(gimmick, x, z, height);
+        return FestSparkle_IsOnTile(fes, x, z, height);
     }
     return FALSE;
 }
@@ -227,22 +213,20 @@ void DeleteFunfestActor(FesGimmick *fes, u16 zoneId, u8 actorIndex) {
     }
 }
 
-u32 func_ov036_021b67bc(void *gimmick) {
-    FesGimmick *fes = gimmick;
-
-    if (FesGimmick_IsCurrent(gimmick, MISSION_PEOPLE)) {
+u32 func_ov036_021b67bc(FesGimmick *fes) {
+    if (FesGimmick_IsCurrent(fes, MISSION_PEOPLE)) {
         return FesMissionPeople_IsOnSale(fes->mission);
     }
     return 0;
 }
 
-void func_ov036_021b67d8(void *gimmick, PokeParty *party) {
+void func_ov036_021b67d8(FesGimmick *gimmick, PokeParty *party) {
     if (FesGimmick_IsCurrent(gimmick, MISSION_PEOPLE)) {
         FesMissionGimmick_BoostPartyLevels(gimmick, party);
     }
 }
 
-BOOL hollowFesMissions(void *gimmick, u32 id) {
+BOOL hollowFesMissions(FesGimmick *gimmick, u32 id) {
     if (FesGimmick_IsCurrent(gimmick, MISSION_HOLLOW) && FesMissionHollow_IsActive(gimmick) &&
         RivalSelect_FindEntryIndex(gimmick, id) != 10) {
         return TRUE;

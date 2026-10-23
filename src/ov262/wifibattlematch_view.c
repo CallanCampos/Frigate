@@ -47,10 +47,12 @@
 
 // The cell actors of a card, by index: the Pokémon, the player's badge and mark, the stars of the rank, and the held
 // items
-#define CARD_ACTOR_BADGE 7
-#define CARD_ACTOR_MARK 8
-#define CARD_ACTOR_STAR 9
-#define CARD_ACTOR_ITEM 15
+enum {
+    CARD_ACTOR_BADGE = 7,
+    CARD_ACTOR_MARK,
+    CARD_ACTOR_STAR,
+    CARD_ACTOR_ITEM = 15,
+};
 
 // The resources of the backdrop, by index: its palettes, characters and cells, of the main screen and then of the sub
 // screen
@@ -165,7 +167,7 @@ static void WifiBattleMatchView_CardFreeMark(WifiBattleMatchCard *card);
 static void WifiBattleMatchView_CardLoadStars(WifiBattleMatchCard *card, const WifiBattleMatchRankInfo *info,
                                               ClActUnit *unit, WifiBattleMatchRes *res, HeapID heapId);
 static void WifiBattleMatchView_CardFreeStars(WifiBattleMatchCard *card);
-static void WifiBattleMatchView_PartnerWindows(WifiBattleMatchPartnerCard *card, const LiveBattleMatchPlayerData *data,
+static void WifiBattleMatchView_PartnerWindows(WifiBattleMatchPartnerCard *card, const WifiBattleMatchPlayer *data,
                                                Font *font, PrintQueue *printQueue, MsgData *msgData, WordSet *wordSet,
                                                u32 colorKind, HeapID heapId);
 static BOOL WifiBattleMatchView_PartnerFlush(WifiBattleMatchPartnerCard *card, PrintQueue *printQueue);
@@ -173,9 +175,8 @@ static void WifiBattleMatchView_PartnerFreeWindows(WifiBattleMatchPartnerCard *c
 static void WifiBattleMatchView_PartnerLoadBadge(WifiBattleMatchPartnerCard *card, u32 look, ClActUnit *unit,
                                                  HeapID heapId);
 static void WifiBattleMatchView_PartnerFreeBadge(WifiBattleMatchPartnerCard *card);
-static void WifiBattleMatchView_PartnerLoadStars(WifiBattleMatchPartnerCard *card,
-                                                 const LiveBattleMatchPlayerData *data, ClActUnit *unit,
-                                                 WifiBattleMatchRes *res, HeapID heapId);
+static void WifiBattleMatchView_PartnerLoadStars(WifiBattleMatchPartnerCard *card, const WifiBattleMatchPlayer *data,
+                                                 ClActUnit *unit, WifiBattleMatchRes *res, HeapID heapId);
 static void WifiBattleMatchView_PartnerFreeStars(WifiBattleMatchPartnerCard *card);
 static u32 WifiBattleMatchView_GetStarCount(u32 unk0, u32 count, u32 unk2);
 
@@ -1220,7 +1221,7 @@ static void WifiBattleMatchView_CardFreeStars(WifiBattleMatchCard *card) {
     }
 }
 
-WifiBattleMatchPartnerCard *WifiBattleMatchPartnerCard_Create(const LiveBattleMatchPlayerData *data, ClActUnit *unit,
+WifiBattleMatchPartnerCard *WifiBattleMatchPartnerCard_Create(const WifiBattleMatchPlayer *data, ClActUnit *unit,
                                                               WifiBattleMatchRes *res, Font *font,
                                                               PrintQueue *printQueue, MsgData *msgData,
                                                               WordSet *wordSet, u32 kind, u32 shown, u32 variant,
@@ -1344,7 +1345,7 @@ BOOL WifiBattleMatchPartnerCard_SlideIn(WifiBattleMatchPartnerCard *card) {
     return done;
 }
 
-static void WifiBattleMatchView_PartnerWindows(WifiBattleMatchPartnerCard *card, const LiveBattleMatchPlayerData *data,
+static void WifiBattleMatchView_PartnerWindows(WifiBattleMatchPartnerCard *card, const WifiBattleMatchPlayer *data,
                                                Font *font, PrintQueue *printQueue, MsgData *msgData, WordSet *wordSet,
                                                u32 colorKind, HeapID heapId) {
     StrBuf *format;
@@ -1491,9 +1492,8 @@ static void WifiBattleMatchView_PartnerFreeBadge(WifiBattleMatchPartnerCard *car
     ClActSys_FreePltt(card->badgePalette);
 }
 
-static void WifiBattleMatchView_PartnerLoadStars(WifiBattleMatchPartnerCard *card,
-                                                 const LiveBattleMatchPlayerData *data, ClActUnit *unit,
-                                                 WifiBattleMatchRes *res, HeapID heapId) {
+static void WifiBattleMatchView_PartnerLoadStars(WifiBattleMatchPartnerCard *card, const WifiBattleMatchPlayer *data,
+                                                 ClActUnit *unit, WifiBattleMatchRes *res, HeapID heapId) {
     u32 count = WifiBattleMatchView_GetStarCount(data->record0, data->record1, data->record2);
     ClActorSetup setup;
     u32 i;

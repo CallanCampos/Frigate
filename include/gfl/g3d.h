@@ -25,7 +25,7 @@ typedef struct G3DModel G3DModel;
 G3DCurve *GFL_G3DCurveCreateToLoadBufferEntire(HeapID heapId, u32 arcId, u16 fileId, void *buffer, u32 bufferSize);
 G3DCurve *GFL_G3DCurveCreateToLoadBuffer(HeapID heapId, u32 arcId, u32 fileId, u32 preloadCount, void *buffer,
                                          u32 bufferSize);
-void GFL_G3DResBindData(void *resource, u32 kind, void *data);
+void GFL_G3DResBindData(G3DResource *resource, u32 kind, void *data);
 BOOL GFL_G3DCurveFrameStepLoop(G3DCurve *curve, fx32 step);
 BOOL GFL_G3DCurveGetNowTranslation(G3DCurve *curve, VecFx32 *translation);
 BOOL GFL_G3DCurveGetNowRotation(G3DCurve *curve, VecFx32 *rotation);
@@ -146,40 +146,35 @@ void GFL_G3DSysSetSwapBufferParams(u32 sortMode, u32 bufferMode);
 BOOL GFL_G3DSysUsesFrmTexVramMgr(void);
 BOOL GFL_G3DSysUsesFrmPlttVramMgr(void);
 // Resources, each a file of a model, textures or an animation
-void *GFL_G3DSysReadArcSysResource(u32 arcId, u32 fileId);
-void *GFL_G3DSysReadArcToolResource(ArcTool *handle, u32 fileId);
-void *GFL_G3DSysReadFSResource(const char *path, u32 fileId);
+G3DResource *GFL_G3DSysReadArcSysResource(u32 arcId, u32 fileId);
+G3DResource *GFL_G3DSysReadArcToolResource(ArcTool *handle, u32 fileId);
+G3DResource *GFL_G3DSysReadFSResource(const char *path, u32 fileId);
 // The size of a resource, for one allocated outside the 3D system, which GFL_G3DResSetup sets up with its file
 u32 GFL_G3DResGetAllocSize(void);
-void GFL_G3DResSetup(void *resource, void *data);
-BOOL GFL_G3DResCheckType(void *resource, u32 type);
-BOOL GFL_G3DResIsTexUploadDone(void *resource);
+void GFL_G3DResSetup(G3DResource *resource, void *data);
+BOOL GFL_G3DResCheckType(G3DResource *resource, u32 type);
+BOOL GFL_G3DResIsTexUploadDone(G3DResource *resource);
 // Puts a resource's textures and palettes in VRAM, and frees them; SetupTexData only allocates the VRAM, and
 // UploadAndRelease also frees the texture images once they are in VRAM
-BOOL GFL_G3DResUploadTexData(void *resource);
-BOOL GFL_G3DResUploadAndReleaseTexData(void *resource);
-BOOL GFL_G3DResSetupTexData(void *resource);
-BOOL GFL_G3DResUploadTexDataCore(void *resource);
-BOOL GFL_G3DResFreeTexData(void *resource);
-NNSG3dResTex *GFL_G3DResGetTexData(void *resource);
-NNSGfdTexKey GFL_G3DResGetTexVRAMHandle(void *resource);
-NNSGfdPlttKey GFL_G3DResGetPltVRAMHandle(void *resource);
-void *GFL_G3DResGetTexImageData(void *resource);
-void *GFL_G3DResGetTexPaletteData(void *resource);
-void *GFL_G3DResGetResData(void *resource);
+BOOL GFL_G3DResUploadTexData(G3DResource *resource);
+BOOL GFL_G3DResUploadAndReleaseTexData(G3DResource *resource);
+BOOL GFL_G3DResSetupTexData(G3DResource *resource);
+BOOL GFL_G3DResUploadTexDataCore(G3DResource *resource);
+BOOL GFL_G3DResFreeTexData(G3DResource *resource);
+NNSG3dResTex *GFL_G3DResGetTexData(G3DResource *resource);
+NNSGfdTexKey GFL_G3DResGetTexVRAMHandle(G3DResource *resource);
+NNSGfdPlttKey GFL_G3DResGetPltVRAMHandle(G3DResource *resource);
+void *GFL_G3DResGetTexImageData(G3DResource *resource);
+void *GFL_G3DResGetTexPaletteData(G3DResource *resource);
+void *GFL_G3DResGetResData(G3DResource *resource);
 void GFL_G3DResFree(G3DResource *resource);
-// The size of a resource's header, which GFL_G3DResSetup fills in
-u32 GFL_G3DResGetAllocSize(void);
-void GFL_G3DResSetup(void *resource, void *data);
-void *GFL_G3DSysReadArcSysResource(u32 arcId, u32 fileId);
-BOOL GFL_G3DResUploadAndReleaseTexData(void *resource);
-G3DModel *GFL_G3DMdlCreate(void *resource, u32 modelId, void *texture);
+G3DModel *GFL_G3DMdlCreate(G3DResource *resource, u32 modelId, G3DResource *texture);
 void GFL_G3DMdlFree(G3DModel *model);
 void *GFL_G3DMdlGetMdlResource(G3DModel *model);
 void *GFL_G3DMdlGetTexResource(G3DModel *model);
-void *GFL_G3DAnmCreate(G3DModel *model, void *resource, u32 a2);
+void *GFL_G3DAnmCreate(G3DModel *model, G3DResource *resource, u32 a2);
 void GFL_G3DAnmFree(G3DAnimation *animation);
-NNSG3dAnmObj *GFL_G3DAnmGetRenderObj(void *animation);
+NNSG3dAnmObj *GFL_G3DAnmGetRenderObj(G3DAnimation *animation);
 G3DActor *GFL_G3DActorCreate(G3DModel *model, void **animations, int count);
 void GFL_G3DActorFree(G3DActor *actor);
 

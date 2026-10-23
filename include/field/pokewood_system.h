@@ -3,6 +3,9 @@
 
 #include "types.h"
 #include "app/p_status.h"
+#include "app/pkwd_book.h"
+#include "app/pkwd_record_monitor.h"
+#include "app/pkwd_selectscreen.h"
 #include "app/pokelist.h"
 #include "battle/regulation.h"
 #include "gfl/heap.h"
@@ -76,12 +79,13 @@ void PokewoodSystem_PushLastSeries(GameData *gameData, PokewoodSystem *sys, u32 
 void PokewoodSystem_SetSlotInfo(PokewoodSystem *sys, const u8 *src);
 
 // pokewood_setup.c: the parameters of overlay 23's events, which the caller frees once the event has them
-void *PokewoodSetup_CreateBookParam(HeapID heapId, GameSystem *gsys, u16 *var);
-void PokewoodSetup_FreeBookParam(void *param);
-void *PokewoodSetup_CreateMenuParam(HeapID heapId, GameSystem *gsys, u16 a2, u16 *var);
-void PokewoodSetup_FreeMenuParam(void *param);
-void *PokewoodSetup_CreateRecordMonitorParam(HeapID heapId, GameSystem *gsys);
-void PokewoodSetup_FreeRecordMonitorParam(void *param);
+PkwdBookParam *PokewoodSetup_CreateBookParam(HeapID heapId, GameSystem *gsys, u16 *var);
+void PokewoodSetup_FreeBookParam(PkwdBookParam *param);
+// mode is a PKWD_SELECTSCREEN_MODE_*
+PkwdSelectScreenParam *PokewoodSetup_CreateMenuParam(HeapID heapId, GameSystem *gsys, u16 mode, u16 *var);
+void PokewoodSetup_FreeMenuParam(PkwdSelectScreenParam *param);
+PkwdRecordMonitorParam *PokewoodSetup_CreateRecordMonitorParam(HeapID heapId, GameSystem *gsys);
+void PokewoodSetup_FreeRecordMonitorParam(PkwdRecordMonitorParam *param);
 GameEvent *EventPokewoodSave_Create(GameSystem *gsys, u16 *var);
 
 #endif // POKEBW2_FIELD_POKEWOOD_SYSTEM_H

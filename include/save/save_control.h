@@ -16,59 +16,61 @@
 // follow it on the card, each loaded on its own. Names from swan (https://github.com/ds-pokemon-hacking/swan,
 // GPL-3.0) where the functions have them; the fields' names are ours, except sv_extra, which an assert names
 
-// The main save's blocks. The files that own a block define its ID again, with the same value
-#define SAVE_BLOCK_BOX_MAIN 0
-// The first of the 24 trays
-#define SAVE_BLOCK_BOX_TRAY 1
-#define SAVE_BLOCK_BAG 0x19
-#define SAVE_BLOCK_PARTY 0x1a
-#define SAVE_BLOCK_TRAINER_DATA 0x1b
-#define SAVE_BLOCK_PLAYER 0x1c
-#define SAVE_BLOCK_UNITY_TOWER_SURVEY 0x1d
-#define SAVE_BLOCK_WIFI_LIST 0x1e
-#define SAVE_BLOCK_PAL_PAD 0x1f
-#define SAVE_BLOCK_CGEAR 0x20
-#define SAVE_BLOCK_TIMESIG 0x21
-#define SAVE_BLOCK_MYSTERY_GIFT 0x22
-#define SAVE_BLOCK_DREAM_WORLD 0x23
-#define SAVE_BLOCK_CHATTER 0x24
-#define SAVE_BLOCK_ADVENTURE 0x25
-#define SAVE_BLOCK_RECORDS 0x26
-#define SAVE_BLOCK_PMS 0x27
-#define SAVE_BLOCK_MAIL 0x28
-#define SAVE_BLOCK_FIELD_ACTORS 0x29
-#define SAVE_BLOCK_MUSICAL 0x2a
-#define SAVE_BLOCK_RESH_ZEK 0x2b
-#define SAVE_BLOCK_TRAINER_LOG 0x2c
-#define SAVE_BLOCK_EVENT_WORK 0x2d
-#define SAVE_BLOCK_WORLDTRADE 0x2e
-#define SAVE_BLOCK_TOURNAMENT 0x2f
-#define SAVE_BLOCK_GIMMICK 0x30
-#define SAVE_BLOCK_BATTLE_BOX 0x31
-#define SAVE_BLOCK_DAY_CARE 0x32
-#define SAVE_BLOCK_STRENGTH_ROCKS 0x33
-#define SAVE_BLOCK_TRAINER_GAME_INFO 0x34
-#define SAVE_BLOCK_HIGH_LINK 0x35
-#define SAVE_BLOCK_POKEDEX 0x36
-#define SAVE_BLOCK_ENCOUNT 0x37
-#define SAVE_BLOCK_BSUBWAY_PLAY 0x38
-#define SAVE_BLOCK_BSUBWAY_SCORE 0x39
-#define SAVE_BLOCK_BSUBWAY_3A 0x3a
-#define SAVE_BLOCK_RECORD 0x3b
-#define SAVE_BLOCK_SYMBOL 0x3c
-#define SAVE_BLOCK_SURVEY 0x3d
-#define SAVE_BLOCK_UNITY_TOWER_FLOOR 0x3e
-#define SAVE_BLOCK_TRIAL_HOUSE 0x3f
-#define SAVE_BLOCK_40 0x40
-#define SAVE_BLOCK_TRADED_POKEMON 0x41
-#define SAVE_BLOCK_MISC 0x42
-#define SAVE_BLOCK_JOIN_AVENUE 0x43
-#define SAVE_BLOCK_MEDAL_BOX 0x44
-#define SAVE_BLOCK_KEY_DATA 0x45
-#define SAVE_BLOCK_FUNFEST 0x46
-#define SAVE_BLOCK_POKEWOOD 0x47
-#define SAVE_BLOCK_DREAM_RADAR 0x48
-#define SAVE_BLOCK_MAX 0x49
+// The main save's blocks, by their IDs
+enum {
+    SAVE_BLOCK_BOX_MAIN,
+    // The first of the 24 trays
+    SAVE_BLOCK_BOX_TRAY,
+    SAVE_BLOCK_BAG = 0x19,
+    SAVE_BLOCK_PARTY,
+    SAVE_BLOCK_TRAINER_DATA,
+    SAVE_BLOCK_PLAYER,
+    SAVE_BLOCK_UNITY_TOWER_SURVEY,
+    SAVE_BLOCK_WIFI_LIST,
+    SAVE_BLOCK_PAL_PAD,
+    SAVE_BLOCK_CGEAR,
+    SAVE_BLOCK_TIMESIG,
+    SAVE_BLOCK_MYSTERY_GIFT,
+    SAVE_BLOCK_DREAM_WORLD,
+    SAVE_BLOCK_CHATTER,
+    SAVE_BLOCK_ADVENTURE,
+    SAVE_BLOCK_RECORDS,
+    SAVE_BLOCK_PMS,
+    SAVE_BLOCK_MAIL,
+    SAVE_BLOCK_FIELD_ACTORS,
+    SAVE_BLOCK_MUSICAL,
+    SAVE_BLOCK_RESH_ZEK,
+    SAVE_BLOCK_TRAINER_LOG,
+    SAVE_BLOCK_EVENT_WORK,
+    SAVE_BLOCK_WORLDTRADE,
+    SAVE_BLOCK_TOURNAMENT,
+    SAVE_BLOCK_GIMMICK,
+    SAVE_BLOCK_BATTLE_BOX,
+    SAVE_BLOCK_DAY_CARE,
+    SAVE_BLOCK_STRENGTH_ROCKS,
+    SAVE_BLOCK_TRAINER_GAME_INFO,
+    SAVE_BLOCK_HIGH_LINK,
+    SAVE_BLOCK_POKEDEX,
+    SAVE_BLOCK_ENCOUNT,
+    SAVE_BLOCK_BSUBWAY_PLAY,
+    SAVE_BLOCK_BSUBWAY_SCORE,
+    SAVE_BLOCK_BSUBWAY_3A,
+    SAVE_BLOCK_RECORD,
+    SAVE_BLOCK_SYMBOL,
+    SAVE_BLOCK_SURVEY,
+    SAVE_BLOCK_UNITY_TOWER_FLOOR,
+    SAVE_BLOCK_TRIAL_HOUSE,
+    SAVE_BLOCK_40,
+    SAVE_BLOCK_TRADED_POKEMON,
+    SAVE_BLOCK_MISC,
+    SAVE_BLOCK_JOIN_AVENUE,
+    SAVE_BLOCK_MEDAL_BOX,
+    SAVE_BLOCK_KEY_DATA,
+    SAVE_BLOCK_FUNFEST,
+    SAVE_BLOCK_POKEWOOD,
+    SAVE_BLOCK_DREAM_RADAR,
+    SAVE_BLOCK_MAX,
+};
 
 // The extra saves, each of one block. Only the Hall of Fame has a backup copy
 typedef enum {
@@ -177,7 +179,17 @@ void TrainerGameInfo_AddSurveyCount(TrainerGameInfoSave *info, u8 index, u16 cou
 // Poké Transfer's high score, 28 bits
 u32 TrainerGameInfo_GetPalParkHighScore(TrainerGameInfoSave *info);
 void TrainerGameInfo_SetPalParkHighScore(TrainerGameInfoSave *info, u32 score);
-// How the last Poké Transfer session ended, 4 bits, which the Poké Transfer Lab's scripts react to
+// How the last Poké Transfer session ended, 4 bits, which the Poké Transfer Lab's scripts react to: Pokémon were
+// transferred, with a new high score, or none; the connection failed, before or after some were; or the player quit,
+// which is also the value set when the session starts
+enum {
+    PAL_PARK_RESULT_TRANSFERRED,
+    PAL_PARK_RESULT_HIGH_SCORE,
+    PAL_PARK_RESULT_NONE_TRANSFERRED,
+    PAL_PARK_RESULT_ERROR,
+    PAL_PARK_RESULT_CANCELED,
+    PAL_PARK_RESULT_ERROR_AFTER_TRANSFER,
+};
 u8 TrainerGameInfo_GetPalParkResult(TrainerGameInfoSave *info);
 void TrainerGameInfo_SetPalParkResult(TrainerGameInfoSave *info, u8 result);
 u32 getCash(TrainerGameInfoSave *info);
@@ -301,7 +313,7 @@ PokeParty *SaveControl_GetPokePartySave(SaveControl *save);
 WorldTradeData *SaveControl_GetWorldTradeData(SaveControl *save);
 DreamWorldSave *getDreamWorldStuffAddress(SaveControl *save);
 HighLinkSave *getHighLinkBlockAddress(SaveControl *save);
-void *FestRecords_GetFromSave(SaveControl *save);
+FunfestSave *FestRecords_GetFromSave(SaveControl *save);
 // The Funfest mission records of FestRecords_GetFromSave's block: missions hosted, joined and completed, the most
 // participants and the best score
 u16 FestRecords_GetHosted(FunfestSave *a0);
@@ -315,11 +327,11 @@ u16 FestRecords_GetTopScores(FunfestSave *a0);
 // A Funfest mission's record in FestRecords_GetFromSave's block, by the mission's index, which is 0 for an index past
 // the missions: a 14-bit count, another count, the highest level cleared (0 to 4) and whether the mission is new, which
 // FestRecords_ClearMissionNew clears
-u16 FestRecords_GetMissionCount(void *records, u8 mission);
-u16 FestRecords_GetMissionBest(void *records, u8 mission);
+u16 FestRecords_GetMissionCount(FunfestSave *records, u8 mission);
+u16 FestRecords_GetMissionBest(FunfestSave *records, u8 mission);
 u32 FestRecords_GetMissionLevel(FunfestSave *records, u8 mission);
 BOOL FestRecords_IsMissionNew(FunfestSave *records, u8 mission);
-void FestRecords_ClearMissionNew(void *records, u8 mission);
+void FestRecords_ClearMissionNew(FunfestSave *records, u8 mission);
 KeyInfoSave *getKeyInfoSaveBlk(SaveControl *save);
 // Whether a key system key is unlocked
 BOOL KeyInfo_IsKeyUnlocked(KeyInfoSave *keyInfo, u32 key);

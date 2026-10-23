@@ -37,9 +37,11 @@
 #define TRAI_STATUS_SUSPENDED 0x10
 
 // TrAIContext.seq
-#define TRAI_SEQ_LOAD_SCRIPT 0
-#define TRAI_SEQ_RUN_SCRIPT 1
-#define TRAI_SEQ_DONE 2
+enum {
+    TRAI_SEQ_LOAD_SCRIPT,
+    TRAI_SEQ_RUN_SCRIPT,
+    TRAI_SEQ_DONE,
+};
 
 // How AIConditionalJump compares a value with the script's value
 enum {

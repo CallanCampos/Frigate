@@ -40,9 +40,11 @@
 #define RIDE_OBJECT_0 8
 
 // The actors of the gym's scene: the two objects, the model around the player on a ride, and an effect
-#define ACTOR_OBJECT_0 0
-#define ACTOR_RIDE 2
-#define ACTOR_EFFECT 3
+enum {
+    ACTOR_OBJECT_0,
+    ACTOR_RIDE = 2,
+    ACTOR_EFFECT,
+};
 #define OBJECT_COUNT 2
 
 typedef struct {
@@ -562,7 +564,7 @@ static void GymInsect_EffectTask(TCB *tcb, void *data) {
 
 static void GymInsect_InitAreas(Field *field) {
     int i;
-    void *list = func_ov036_02184590(Field_GetG3DMapper(field));
+    HeightExList *list = func_ov036_02184590(Field_GetG3DMapper(field));
 
     for (i = 0; i < NELEMS(sAreas); i++) {
         func_ov036_021ba624(i, sAreas[i].x, sAreas[i].z, sAreas[i].width, sAreas[i].depth, sAreas[i].value,

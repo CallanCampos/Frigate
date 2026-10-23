@@ -40,8 +40,10 @@
 #include "text/system/event_pass_power_startmenu.h"
 
 // The kinds of movie event, in PokewoodMovieParam's kind
-#define POKEWOOD_KIND_FILM 1
-#define POKEWOOD_KIND_WATCH 2
+enum {
+    POKEWOOD_KIND_FILM = 1,
+    POKEWOOD_KIND_WATCH,
+};
 
 // The slot of the movie that is still in the Pokewood block, the one just filmed
 #define POKEWOOD_BLOCK_SLOT 8
@@ -122,17 +124,9 @@ typedef struct {
 
 // The same for overlay 323
 typedef struct {
-    PlayerInfo *playerInfo;
-    SaveControl *saveControl;
-    u16 *var;
-    PokewoodSave *save;
-    u32 unk10;
-} PokewoodMenuParam;
-
-typedef struct {
     GameSystem *gsys;
     Field *field;
-    PokewoodMenuParam param;
+    PkwdSelectScreenParam param;
 } PokewoodMenuEvent;
 
 // The same for the record monitor, overlay 325
@@ -450,13 +444,13 @@ static BtlSetup *EventPokewood_CreateSetup(PokewoodMovieParam *param, GameSystem
 
     switch (param->kind) {
     case 0:
-    case 1:
+    case POKEWOOD_KIND_FILM:
         setup = EventPokewood_CreateFilmSetup(gsys, field, heapId, param->movie);
         setup->fieldSituation.bgm = SEQ_BGM_PW_FILMING;
         setup->fieldSituation.unk12 = SEQ_BGM_WIN1;
         EventPokewood_LoadIntroText(param, setup, param->movie, POKEWOOD_KIND_FILM, heapId);
         break;
-    case 2:
+    case POKEWOOD_KIND_WATCH:
         setup = EventPokewood_LoadWatchSetup(gsys, field, heapId, param->slot);
         file = GFL_ArcSysReadHeapNew(ARCID_POKEWOOD_MOVIE, setup->unkDF, HEAPID_TAIL(heapId));
         setup->fieldSituation.bgm = file->bgm;
@@ -850,7 +844,7 @@ GameEvent *EventPokewood_CreateMenuEvent(GameSystem *gsys, void *args) {
     MI_CpuFill8(wk, 0, sizeof(PokewoodMenuEvent));
     wk->gsys = gsys;
     wk->field = field;
-    wk->param = *(PokewoodMenuParam *)args;
+    wk->param = *(PkwdSelectScreenParam *)args;
     return event;
 }
 
@@ -865,8 +859,8 @@ static GameEventReturnCode EventPokewood_RunMenu(GameEvent *event, u32 *state, v
         *state = 1;
         break;
     case 1:
-        if (wk->param.var != NULL && *wk->param.var == 8) {
-            *wk->param.var = 8;
+        if (wk->param.result != NULL && *wk->param.result == PKWD_SELECTSCREEN_CANCEL) {
+            *wk->param.result = PKWD_SELECTSCREEN_CANCEL;
         } else {
             GSYS_GetGameData(wk->gsys);
         }

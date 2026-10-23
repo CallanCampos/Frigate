@@ -631,11 +631,11 @@ void BtlvCore_StartTargetSelect(BtlvCore *core, BattleMon *mon, void *arg2) {
 u32 BtlvCore_WaitTargetSelect(BtlvCore *core) {
     if (BtlvCore_RunMainProc(core)) {
         if (BtlvScd_IsTargetChosen(core->scd)) {
-            return 1;
+            return BTLV_TARGET_SELECT_CHOSEN;
         }
-        return 2;
+        return BTLV_TARGET_SELECT_BACK;
     }
-    return 0;
+    return BTLV_TARGET_SELECT_NONE;
 }
 
 void BtlvCore_StopTargetSelect(BtlvCore *core) {

@@ -10,8 +10,6 @@
 // settings in it: the order of its panels, its colors and its downloaded skin. The ROM has no string for the file,
 // so the name is a guess (swan's getCGearDataBlkAddress). Block 0x20.
 
-#define SAVE_BLOCK_CGEAR 0x20
-
 u32 CGearSave_GetSize(void) {
     return sizeof(CGearSave);
 }

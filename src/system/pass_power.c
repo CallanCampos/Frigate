@@ -102,13 +102,13 @@ u8 PassPower_GetSPowerBaseID(int passPower) {
     return 0xff;
 }
 
-void PassPower_Activate(u32 passPower, const void *data, BOOL paid) {
+void PassPower_Activate(u32 passPower, const PassPowerData *data, BOOL paid) {
     int effect;
     const PassPowerData *entry;
     if (!PassPower_IsIDValid(passPower)) {
         return;
     }
-    entry = &((const PassPowerData *)data)[passPower];
+    entry = &data[passPower];
     effect = entry->effect;
     g_PassPowerState.passPowers[effect] = passPower;
     g_PassPowerState.timers[effect] = entry->minutes * (60 * PASS_POWER_TICKS_PER_SECOND);
@@ -135,8 +135,8 @@ void PassPower_Activate(u32 passPower, const void *data, BOOL paid) {
     }
 }
 
-u32 PassPower_GetUsedIDByPassPower(u32 passPower, void *data) {
-    return g_PassPowerState.passPowers[((const PassPowerData *)data)[passPower].effect];
+u32 PassPower_GetUsedIDByPassPower(u32 passPower, PassPowerData *data) {
+    return g_PassPowerState.passPowers[data[passPower].effect];
 }
 
 u32 PassPower_GetUsedIDByEffect(int effect) {
@@ -167,8 +167,8 @@ u32 PassPower_GetDepletedID(void) {
     return PASS_POWER_NONE;
 }
 
-void PassPower_Deactivate(u32 passPower, void *data) {
-    PassPower_DeactivateEffect(((const PassPowerData *)data)[passPower].effect);
+void PassPower_Deactivate(u32 passPower, PassPowerData *data) {
+    PassPower_DeactivateEffect(data[passPower].effect);
 }
 
 static void PassPower_DeactivateEffect(int effect) {
@@ -182,20 +182,20 @@ static void PassPower_DeactivateEffect(int effect) {
     }
 }
 
-void *PassPowerData_Create(HeapID heapId) {
+PassPowerData *PassPowerData_Create(HeapID heapId) {
     return GFL_ArcSysReadHeapNew(ARCID_PASS_POWER, 0, heapId);
 }
 
-void PassPowerData_Free(void *data) {
+void PassPowerData_Free(PassPowerData *data) {
     GFL_HeapFree(data);
 }
 
-u8 PassPowerData_GetEffect(void *data, u32 passPower) {
-    return ((const PassPowerData *)data)[passPower].effect;
+u8 PassPowerData_GetEffect(PassPowerData *data, u32 passPower) {
+    return data[passPower].effect;
 }
 
-u16 PassPowerData_GetPrice(void *data, u32 passPower) {
-    return ((const PassPowerData *)data)[passPower].unk02;
+u16 PassPowerData_GetPrice(PassPowerData *data, u32 passPower) {
+    return data[passPower].unk02;
 }
 
 static void PassPower_Dummy(void) {

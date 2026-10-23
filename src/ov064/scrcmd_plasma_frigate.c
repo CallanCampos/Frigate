@@ -136,7 +136,8 @@ static GameEvent *PlasmaFrigate_CreatePasswordEvent(GameSystem *gsys, u16 *resul
     wk->heapId = HEAPID_GAMEEVENT;
     wk->gameInfo = getTrainerGameInfoAddress(GameData_GetSaveControl(wk->gameData));
     wk->playerInfo = GetGameDataPlayerInfo(wk->gameData);
-    wk->nameEntry = setupNameEntry(HEAPID_GAMEEVENT, 11, 0, 0, PASSWORD_MAX_LENGTH, NULL, wk->gameInfo);
+    wk->nameEntry =
+        setupNameEntry(HEAPID_GAMEEVENT, NAME_ENTRY_PLASMA_PASSWORD, 0, 0, PASSWORD_MAX_LENGTH, NULL, wk->gameInfo);
     return event;
 }
 

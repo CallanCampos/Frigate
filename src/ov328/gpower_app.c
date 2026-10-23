@@ -46,33 +46,41 @@
 
 #define HEAPID_GPOWER_APP 0xa0
 
-#define WINDOW_COUNT 22
 #define BUTTON_COUNT 4
 #define POWER_BUTTON_COUNT 3
 #define ACTIVE_POWER_MAX 10
 #define POS_COUNT 9
 
 // The windows: the title, the running Pass Powers' names and times, and the message
-#define WINDOW_TITLE 0
-#define WINDOW_ACTIVE_NAME 1
-#define WINDOW_ACTIVE_TIME 11
-#define WINDOW_MESSAGE 21
+enum {
+    WINDOW_TITLE,
+    WINDOW_ACTIVE_NAME,
+    WINDOW_ACTIVE_TIME = 11,
+    WINDOW_MESSAGE = 21,
+    WINDOW_COUNT,
+};
 
 // The buttons, and what a touch gives beyond them
-#define BUTTON_ENTRALINK 3
-#define TOUCH_RETURN 4
+enum {
+    BUTTON_ENTRALINK = 3,
+    TOUCH_RETURN,
+};
 
-#define ACTOR_RETURN 0
-#define ACTOR_BUTTON 1
+enum {
+    ACTOR_RETURN,
+    ACTOR_BUTTON,
+};
 
-#define RES_COMMON_PALETTE 0
-#define RES_COMMON_CHARS 1
-#define RES_COMMON_CELLS 2
-#define RES_PALETTE 3
-#define RES_CHARS 4
-#define RES_CELLS 5
-#define RES_FONT_PALETTE 6
-#define RES_COUNT 7
+enum {
+    RES_COMMON_PALETTE,
+    RES_COMMON_CHARS,
+    RES_COMMON_CELLS,
+    RES_PALETTE,
+    RES_CHARS,
+    RES_CELLS,
+    RES_FONT_PALETTE,
+    RES_COUNT,
+};
 
 // The flags of the work
 #define FLAG_REDRAW 0x1
@@ -1495,7 +1503,7 @@ static BOOL GPowerApp_CheckAnyInput(GPowerApp *work) {
 }
 
 static void GPowerApp_LoadPrices(GPowerApp *work) {
-    void *data = PassPowerData_Create(work->heapId);
+    PassPowerData *data = PassPowerData_Create(work->heapId);
     int i;
 
     for (i = 0; i < work->param->highLinkCount; i++) {

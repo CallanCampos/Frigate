@@ -106,7 +106,7 @@ BOOL WifiBattleMatchCard_SlideIn(WifiBattleMatchCard *card);
 BOOL WifiBattleMatchCard_SlideOut(WifiBattleMatchCard *card);
 
 // The other player's card
-WifiBattleMatchPartnerCard *WifiBattleMatchPartnerCard_Create(const LiveBattleMatchPlayerData *data, ClActUnit *unit,
+WifiBattleMatchPartnerCard *WifiBattleMatchPartnerCard_Create(const WifiBattleMatchPlayer *data, ClActUnit *unit,
                                                               WifiBattleMatchRes *res, Font *font,
                                                               PrintQueue *printQueue, MsgData *msgData,
                                                               WordSet *wordSet, u32 kind, u32 shown, u32 variant,

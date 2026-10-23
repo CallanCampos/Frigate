@@ -57,13 +57,17 @@
 // The experience of each level, 0 to MAX_LEVEL, of a growth rate
 #define GROWTH_TABLE_SIZE (MAX_LEVEL + 1)
 // The ability slots of getPkmAbilSlotNumber
-#define ABILITY_SLOT_1 0
-#define ABILITY_SLOT_2 1
-#define ABILITY_SLOT_HIDDEN 2
+enum {
+    ABILITY_SLOT_1,
+    ABILITY_SLOT_2,
+    ABILITY_SLOT_HIDDEN,
+};
 // How PML_GenPID treats shininess: never shiny, always shiny, or as the random value falls
-#define PID_RARE_NEVER 0
-#define PID_RARE_ALWAYS 1
-#define PID_RARE_RANDOM 2
+enum {
+    PID_RARE_NEVER,
+    PID_RARE_ALWAYS,
+    PID_RARE_RANDOM,
+};
 
 // The most effort values a Pokémon has in all, and in one stat
 #define PKM_EV_TOTAL_MAX 510

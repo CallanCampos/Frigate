@@ -24,24 +24,28 @@
 // ROM has no name for this file; "beacon_view.c" is a guess from "beacon_view_setup.c"
 
 // The view's sequences
-#define SEQ_MAIN 0
-#define SEQ_NEW_BEACON 1
-#define SEQ_WAIT_TASKS 2
-#define SEQ_SCROLL 3
-#define SEQ_BAR 4
-#define SEQ_THANKS 5
+enum {
+    SEQ_MAIN,
+    SEQ_NEW_BEACON,
+    SEQ_WAIT_TASKS,
+    SEQ_SCROLL,
+    SEQ_BAR,
+    SEQ_THANKS,
+};
 
 // What SEQ_THANKS does
-#define THANKS_START 0
-#define THANKS_WAIT_BUTTON 1
-#define THANKS_INPUT 2
-#define THANKS_SCROLL_END 3
-#define THANKS_SEND 4
-#define THANKS_SENT 5
-#define THANKS_END 6
-#define THANKS_EXIT 7
-// The bar is touched: not a state, but what the input gives
-#define THANKS_BAR 8
+enum {
+    THANKS_START,
+    THANKS_WAIT_BUTTON,
+    THANKS_INPUT,
+    THANKS_SCROLL_END,
+    THANKS_SEND,
+    THANKS_SENT,
+    THANKS_END,
+    THANKS_EXIT,
+    // The bar is touched: not a state, but what the input gives
+    THANKS_BAR,
+};
 
 // How long the view leaves a message alone
 #define MESSAGE_WAIT 90

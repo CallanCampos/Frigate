@@ -6,6 +6,7 @@
 
 #include "types.h"
 #include "app/manual_common.h"
+#include "app/ui/touchbar.h"
 
 // What the bar shows, by the screen it is under
 enum {
@@ -16,19 +17,14 @@ enum {
     MANUAL_TOUCHBAR_MODE_NONE,
 };
 
-// The icons ManualTouchBar_GetDecided and ManualTouchBar_GetTouched return
-#define MANUAL_TOUCHBAR_ICON_CLOSE 0
-#define MANUAL_TOUCHBAR_ICON_RETURN 1
-#define MANUAL_TOUCHBAR_ICON_PREV 4
-#define MANUAL_TOUCHBAR_ICON_NEXT 5
-
 ManualTouchBar *ManualTouchBar_Create(ManualCommon *common);
 void ManualTouchBar_Free(ManualTouchBar *bar);
 void ManualTouchBar_Main(ManualTouchBar *bar);
 void ManualTouchBar_SetMode(ManualTouchBar *bar, u32 mode);
 // Shows the page number and the arrows of MANUAL_TOUCHBAR_MODE_EXPLAIN
 void ManualTouchBar_SetPage(ManualTouchBar *bar, u8 pageCount, u8 page);
-// The icon whose animation has ended, and the icon being touched, or -1
+// The icon whose animation has ended, and the icon being touched, or TOUCHBAR_ICON_NONE: the bar's close and return
+// icons, and the explanation's page arrows as TOUCHBAR_ICON_LEFT and TOUCHBAR_ICON_RIGHT
 u32 ManualTouchBar_GetDecided(ManualTouchBar *bar);
 u32 ManualTouchBar_GetTouched(ManualTouchBar *bar);
 

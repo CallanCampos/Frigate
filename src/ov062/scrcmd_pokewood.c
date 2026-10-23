@@ -171,7 +171,7 @@ static BOOL PokewoodCmd_PickMovie(VM *vm, FieldScriptEnv *env) {
     HeapID heapId = FieldScriptEnv_GetHeapID(env);
     u16 *var = ScriptReadVar(vm, env);
     PokewoodSystem **sys = GameData_GetPokewoodSystemPtr(gameData);
-    void *param = PokewoodSetup_CreateBookParam(heapId, gsys, var);
+    PkwdBookParam *param = PokewoodSetup_CreateBookParam(heapId, gsys, var);
     GameEvent *event =
         GameEvent_CreateOverlayDelegate(gsys, OVERLAY_EVENT_POKEWOOD, EventPokewood_CreateMoviePickerEvent, param);
 
@@ -185,9 +185,9 @@ static BOOL PokewoodCmd_OpenMenu(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     GameData *gameData = GSYS_GetGameData(gsys);
     HeapID heapId = FieldScriptEnv_GetHeapID(env);
-    u16 arg = ScriptReadAny(vm, env);
+    u16 mode = ScriptReadAny(vm, env);
     u16 *var = ScriptReadVar(vm, env);
-    void *param = PokewoodSetup_CreateMenuParam(heapId, gsys, arg, var);
+    PkwdSelectScreenParam *param = PokewoodSetup_CreateMenuParam(heapId, gsys, mode, var);
     GameEvent *event =
         GameEvent_CreateOverlayDelegate(gsys, OVERLAY_EVENT_POKEWOOD, EventPokewood_CreateMenuEvent, param);
 
@@ -448,7 +448,7 @@ static BOOL PokewoodCmd_OpenRecordMonitor(VM *vm, FieldScriptEnv *env) {
     HeapID heapId = FieldScriptEnv_GetHeapID(env);
     u16 *var = ScriptReadVar(vm, env);
     PokewoodSystem **sys = GameData_GetPokewoodSystemPtr(gameData);
-    void *param = PokewoodSetup_CreateRecordMonitorParam(heapId, gsys);
+    PkwdRecordMonitorParam *param = PokewoodSetup_CreateRecordMonitorParam(heapId, gsys);
     GameEvent *event =
         GameEvent_CreateOverlayDelegate(gsys, OVERLAY_EVENT_POKEWOOD, EventPokewood_CreateScreenEvent, param);
 

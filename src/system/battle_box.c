@@ -13,8 +13,6 @@
 // The battle box: the box of six Pokémon kept for link and Wi-Fi battles, with its name and the flags that lock
 // it. The ROM has no string for the file, so the name is a guess (swan's getBattleBox). Block 0x31.
 
-#define SAVE_BLOCK_BATTLE_BOX 0x31
-
 static void copyPkmIntoBattleBox(BattleBoxSave *battleBox, u32 box, u32 slot, const BoxPkm *pkm);
 
 u32 BattleBoxSave_GetSize(void) {

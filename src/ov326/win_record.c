@@ -341,7 +341,7 @@ static const FrameListTouch sWinRecordListTouchRects[] = {
 };
 
 static const FrameListSetup sWinRecordListSetup = {
-    { 2, 0xff, 1, 3, 28, 3, 1, 0, 26, 3, 2, 24, 12, 8, 6, 4, 3, 2, 16, 0 },
+    { 2, FRAMELIST_BG_NONE, 1, 3, 28, 3, 1, 0, 26, 3, 2, 24, 12, 8, 6, 4, 3, 2, 16, 0 },
     7,
     1,
     0,
@@ -1111,24 +1111,24 @@ static int WinRecord_ListResult(WinRecordWork *wk, u32 result) {
     case 6:
         handled = 2;
         break;
-    case -7:
-    case -5:
+    case FRAMELIST_PAGE_UP:
+    case FRAMELIST_CURSOR_TOP:
         WinRecord_PressButton(wk, WIN_RECORD_BUTTON_UP);
         handled = TRUE;
         wk->seq = WIN_RECORD_SEQ_UP;
         break;
-    case -6:
-    case -4:
+    case FRAMELIST_PAGE_DOWN:
+    case FRAMELIST_CURSOR_BOTTOM:
         WinRecord_PressButton(wk, WIN_RECORD_BUTTON_DOWN);
         handled = TRUE;
         wk->seq = WIN_RECORD_SEQ_DOWN;
         break;
-    case -3:
-    case -2:
+    case FRAMELIST_JUMP_TOP:
+    case FRAMELIST_JUMP_BOTTOM:
         handled = TRUE;
         break;
-    case -11:
-    case -10:
+    case FRAMELIST_CURSOR_MOVE:
+    case FRAMELIST_SCROLL:
         handled = TRUE;
         break;
     }

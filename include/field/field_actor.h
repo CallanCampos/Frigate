@@ -10,6 +10,9 @@
 #include "struct_decls.h"
 #include "system/game_event.h"
 
+// The UID of the player's actor
+#define ACTOR_UID_PLAYER 0xff
+
 // A position on the grid of 16-unit tiles. The game copies it as 8 bytes, with a field after z
 typedef struct {
     s16 x;
@@ -392,7 +395,7 @@ void FldActMatColorPreset_Free(FldActMatColorPreset *preset);
 void FldActMatColorPreset_Load(FldActMatColorPreset *preset, u32 presetId);
 void FldActMatColorPreset_Apply(FldActMatColorPreset *preset, BlActScene *scene);
 void FldActSys_AttachField(MMSys *system, HeapID heapId, GameData *gameData, Field *field, FieldG3DMapper *mapper,
-                           NoGridMapper *noGridMapper, void *colorPostFx);
+                           NoGridMapper *noGridMapper, FieldColorPostFX *colorPostFx);
 void FldActSys_InitBlAct(MMSys *system, BlActSys *blAct, u32 count);
 void FldActSys_LoadCachedBlact(MMSys *system);
 void FldActSys_LoadStaticBlact(MMSys *system, u16 objCode);

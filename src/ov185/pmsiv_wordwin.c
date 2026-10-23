@@ -33,8 +33,10 @@
 #define SCROLL_BAR_HEIGHT 132
 
 // The cursor's animations
-#define CURSOR_ANIM 8
-#define CURSOR_ANIM_DECIDE 28
+enum {
+    CURSOR_ANIM = 8,
+    CURSOR_ANIM_DECIDE = 28,
+};
 
 struct PMSIVWordWin {
     PMSInputView *vwk;

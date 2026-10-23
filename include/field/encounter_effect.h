@@ -72,7 +72,7 @@ void func_ov036_021c5ebc(EncEff *effect);
 void *EncEff_AllocWorkArea(EncEff *effect, u32 size, HeapID heapId);
 void *EncEff_GetWorkArea(EncEff *effect);
 void *EncEff_GetEventData(EncEff *effect);
-void *Field_Get3DCi(Field *field);
+Fld3DCi *Field_Get3DCi(Field *field);
 void EncEff_CallRenderFunc(EncEff *effect);
 GameEvent *EventFieldEffect_CreatePokeSprite(GameSystem *gsys, Fld3DCi *ci, u8 partySlot);
 GameEvent *EventFieldEffect_CreateAlderFly(GameSystem *gsys, Fld3DCi *ci, u32 actorId);

@@ -162,14 +162,14 @@ BOOL ManualList_Main(ManualList *list) {
     if (list->state == STATE_IDLE || list->state == STATE_TOUCH_BAR) {
         ManualTouchBar_Main(list->common->touchBar);
         if (list->state == STATE_IDLE) {
-            if (ManualTouchBar_GetTouched(list->common->touchBar) != -1) {
+            if (ManualTouchBar_GetTouched(list->common->touchBar) != TOUCHBAR_ICON_NONE) {
                 list->state = STATE_TOUCH_BAR;
             }
         } else {
             u32 decided = ManualTouchBar_GetDecided(list->common->touchBar);
 
-            if (decided != -1) {
-                if (decided == MANUAL_TOUCHBAR_ICON_RETURN) {
+            if (decided != TOUCHBAR_ICON_NONE) {
+                if (decided == TOUCHBAR_ICON_RETURN) {
                     list->param->result = MANUAL_LIST_RESULT_RETURN;
                 }
                 list->state = STATE_END;

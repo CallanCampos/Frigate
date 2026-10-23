@@ -97,22 +97,22 @@ struct FestMissionEntry {
     FestMissionRecord record;
 };
 
-void *Field_GetFesGimmick(Field *field);
+FesGimmick *Field_GetFesGimmick(Field *field);
 BOOL FesGimmick_IsCurrent(FesGimmick *gimmick, u32 type);
 // Whether the Hidden Grotto has a Funfest mission
-BOOL hollowFesMissions(void *gimmick, u32 id);
+BOOL hollowFesMissions(FesGimmick *gimmick, u32 id);
 // Whether the Funfest mission keeps phenomena off the tile
-BOOL func_ov036_021b6758(void *gimmick, u16 x, u16 z, fx32 height);
+BOOL func_ov036_021b6758(FesGimmick *gimmick, u16 x, u16 z, fx32 height);
 // Changes the party of a Funfest mission's battle, when gimmick 5 is current
-void func_ov036_021b67d8(void *gimmick, PokeParty *party);
+void func_ov036_021b67d8(FesGimmick *gimmick, PokeParty *party);
 // The number the salesman's messages are offset by, when gimmick 5 is current
-u32 func_ov036_021b67bc(void *gimmick);
+u32 func_ov036_021b67bc(FesGimmick *gimmick);
 void DeleteFunfestActor(FesGimmick *gimmick, u16 zoneId, u8 actorIndex);
-void func_ov036_021b65e8(void *gimmick);
-BOOL func_ov036_021b6690(void *gimmick);
+void func_ov036_021b65e8(FesGimmick *gimmick);
+BOOL func_ov036_021b6690(FesGimmick *gimmick);
 // The event of the Funfest mission at a grid or rail position, or NULL
-GameEvent *func_ov036_021b6700(void *gimmick, const VecFx32 *position);
-GameEvent *func_ov036_021b672c(void *gimmick, const RailPosition *position);
+GameEvent *func_ov036_021b6700(FesGimmick *gimmick, const VecFx32 *position);
+GameEvent *func_ov036_021b672c(FesGimmick *gimmick, const RailPosition *position);
 u32 LinkFestival_GetNormalChangeBGMID(LinkFestival *festival);
 void *GetFestMissionCfg(LinkFestival *festival);
 // Overlay 12's fest_mission_field.c: the zone a mission uses in place of a zone, a random state seeded for the
@@ -170,10 +170,10 @@ void *FieldFMissionInfo_Create(GameSystem *gsys, HeapID heapId);
 void FieldFMissionInfo_Free(FieldFMissionInfo *work);
 void FieldFMissionInfo_Update(FieldFMissionInfo *work);
 void FieldFMissionInfo_UpdateDisplay(FieldFMissionInfo *work);
-void *FesGimmick_Create(GameSystem *gsys, Field *field, HeapID heapId);
-void FesGimmick_Free(void *gimmick);
+FesGimmick *FesGimmick_Create(GameSystem *gsys, Field *field, HeapID heapId);
+void FesGimmick_Free(FesGimmick *gimmick);
 void FesGimmick_BindActorSystem(FesGimmick *gimmick, MMSys *actorSystem);
-void FesGimmick_BindPlayer(FesGimmick *gimmick, void *effects, FieldPlayer *player);
+void FesGimmick_BindPlayer(FesGimmick *gimmick, FieldEffects *effects, FieldPlayer *player);
 void func_ov036_021b65d4(FesGimmick *gimmick);
 void func_ov036_021b6660(FesGimmick *gimmick);
 
