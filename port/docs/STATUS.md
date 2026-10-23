@@ -41,10 +41,9 @@ level that doesn't exist yet says "not yet"; no field is left out.
   review rule disables last-push approval to avoid the sole owner's update/review deadlock, retaining stale-review
   dismissal, owner code review, required checks and local verification. App setup stays in [SYNC.md](SYNC.md); App `5435198` is installed only on Frigate, with its two write scopes
   verified and a trial token revoked. Its variable/secret are configured and default-token PR creation/approval is off.
-- **Next:** finish App registration/installation and secret setup, apply/read back the review-rule change, validate
-  and merge this PR, then disable default Actions create/approve-PR permission and test one bounded sync proposal.
-- **Blockers:** App registration/installation and live App publishing are not complete. Automatic CI does not remove
-  explicit owner approval before contributor/sync PR merges. The solo owner-authored review exception remains.
+- **Next:** validate and merge the App publisher PR, then test a bounded sync proposal with automatic hosted CI.
+- **Blockers:** live App publishing awaits the protected publisher PR merge. Automatic CI does not remove explicit
+  owner approval before contributor/sync PR merges. The solo owner-authored review exception remains.
 
 ## 2026-10-22: protected main and reviewed sync proposals
 
