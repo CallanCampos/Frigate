@@ -67,12 +67,21 @@ enum {
     ACTOR_MSG_WIN_COUNT,
 };
 
+// The steps of func_ov036_0218779c, which loads the frames one at a time: the palettes, the system message window's
+// frame, and the list window's
+enum {
+    MSGBG_LOAD_PALETTES,
+    MSGBG_LOAD_SYSTEM_FRAME,
+    MSGBG_LOAD_LIST_FRAME,
+};
+
 // Creates the system, sets up its BGs, either with the talk windows' textures or loading them in a VBlank task, loads
 // the frames' characters and palettes to a BG, all at once or one step at a time, and frees the system
 FieldMsgBG *CreateFieldMsgBGSystem(HeapID heapId, G3DCamera *camera);
 void func_ov036_02187760(FieldMsgBG *sys);
 void func_ov036_0218776c(FieldMsgBG *sys);
 void func_ov036_02187794(u32 bg, HeapID heapId);
+// step is a MSGBG_LOAD_ step
 void func_ov036_0218779c(FieldMsgBG *sys, u32 step);
 void func_ov036_021877ac(FieldMsgBG *sys);
 // Frees the talk windows and the first BG while an app uses the screen, releases the second BG (returning whether it
@@ -167,9 +176,10 @@ BmpWin *func_ov036_021886b0(FieldMsgWin *win);
 
 // A message balloon over an actor at pos, of an ACTOR_MSG_WIN_ type: create it, or NULL when that one is in use, close
 // it, whether it has closed, free it at once, print another string in it, update it (TRUE once printed), and draw the
-// wait-for-input cursor. A frameType is a TALKMSG_WIN_FRAME_ style; the spiky one shakes as it opens
+// wait-for-input cursor. A frameType is a TALKMSG_WIN_FRAME_ style; the spiky one shakes as it opens. tail is a
+// TALKMSG_WIN_TAIL_ corner for the top and bottom balloons
 ActorMsgWin *ActorMsgWin_CheckAndCreate(FieldMsgBG *sys, s32 type, const VecFx32 *pos, StrBuf *strbuf, u32 frameType,
-                                        u32 tailBase);
+                                        u32 tail);
 void func_ov036_021887d4(ActorMsgWin *win);
 BOOL func_ov036_021887f4(ActorMsgWin *win);
 void func_ov036_02188818(ActorMsgWin *win);

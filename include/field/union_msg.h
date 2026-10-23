@@ -20,7 +20,7 @@ typedef struct {
 
 // Main code that overlay 34 is the only user of yet
 void *PokeRegulation_CreatePrintMsg(Regulation *regulation, WordSet *wordset, HeapID heapId, BOOL battleType);
-void PokeRegulation_FreePrintMsg(void *rulesText);
+void PokeRegulation_FreePrintMsg(RegulationPrintMsg *rulesText);
 StrBuf *makeStrbufLoadBattleTypeText(Regulation *regulation, HeapID heapId);
 
 // The message IDs of the Union Room's texts, for a gender (0 or 1) or a language. The tables are of two IDs

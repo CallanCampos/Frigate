@@ -16,20 +16,6 @@
 
 #define BEACON_STATUS_GREETING_SIZE 9
 
-struct BeaconStatus {
-    GameBeaconInfoTable table;
-    // Set by the phrase input when the player enters a new greeting, read as a u16
-    u8 greetingChanged[2];
-    // The top row of the beacon view's list
-    u8 logTop;
-    u32 unkB84;
-    u32 unkB88;
-    // The Pass Power that a beacon gave and its giver's name
-    u32 givenPassPower;
-    StrBuf *givenName;
-    StrBuf *greeting;
-};
-
 BeaconStatus *BeaconStatus_Create(HeapID heapId, HeapID msgHeapId) {
     BeaconStatus *status = GFL_HeapAllocate(heapId, sizeof(BeaconStatus), TRUE, "beacon_status.c", 33);
     MsgData *msgData;

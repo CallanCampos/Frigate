@@ -37,6 +37,8 @@ struct WarpSequence {
     u8 endSeason;
     u32 unk48;
     u32 unk4C;
+    // The task that walks the player one tile, which the entrance events start
+    FieldAcmdTCB *walkTask;
 };
 
 GameEvent *CallFieldMapEntranceInTransition(GameSystem *gsys, Field *field, u32 type, u32 a3, u32 a4, u8 startSeason,

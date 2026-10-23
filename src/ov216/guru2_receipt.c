@@ -174,7 +174,7 @@ typedef int (*Guru2ReceiptSeqFunc)(Guru2ReceiptWork *wk, int procSeq);
 static UnionApp *Guru2Receipt_GetUnionApp(Guru2ReceiptWork *wk);
 static void Guru2Receipt_OnJoin(u8 netId, UnionAppMember *member, void *work);
 static void Guru2Receipt_OnLeave(u8 netId, UnionAppMember *member, void *work);
-static void Guru2Receipt_UpdatePalAnim(TCB *tcb, void *data);
+static void Guru2Receipt_UpdatePalAnim(TCB *tcb, Guru2ReceiptWork *data);
 static void Guru2Receipt_VBlank(TCB *tcb, void *data);
 static void Guru2Receipt_UpdatePrint(Guru2ReceiptWork *wk);
 static void Guru2Receipt_SetVRAMBanks(void);
@@ -425,8 +425,7 @@ static const Guru2ReceiptPalAnimStep sPalAnimSteps[] = {
 
 // clang-format on
 
-static void Guru2Receipt_UpdatePalAnim(TCB *tcb, void *data) {
-    Guru2ReceiptWork *wk = data;
+static void Guru2Receipt_UpdatePalAnim(TCB *tcb, Guru2ReceiptWork *wk) {
     Guru2ReceiptPalAnim *anim = &wk->palAnim;
 
     if (anim->active) {

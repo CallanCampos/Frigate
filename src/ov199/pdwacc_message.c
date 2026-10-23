@@ -276,7 +276,7 @@ void PdwAccMessage_ShowGSyncId(PdwAccMessage *msg, u32 id, u32 unused) {
 
         code >>= 5;
         GFL_StrBufAppend(strBuf, sPdwAccIdChars[index]);
-        GFL_StrCmdBuild(strBuf, 0xbd, 4, 1, params);
+        GFL_StrCmdBuild(strBuf, STRCMD_CATEGORY_LAYOUT, STRCMD_LAYOUT_MOVE_X, 1, params);
     }
 
     if (msg->idWin == NULL) {

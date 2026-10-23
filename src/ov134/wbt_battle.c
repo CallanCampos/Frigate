@@ -34,7 +34,7 @@
 // The Pokémon World Tournament's rounds, opponents and battles, in overlay 134, which names this file
 
 // The stadium's list of the player's Pokémon, which the script shows while the player picks which of them to send
-typedef struct {
+struct WbtPartyList {
     FieldScriptEnv *env;
     WbtSystem *sys;
     void *window;
@@ -43,7 +43,7 @@ typedef struct {
     WordSet *wordSet;
     StrBuf *mainStrBuf;
     StrBuf *altStrBuf;
-} WbtPartyList;
+};
 
 // The header of a file of a Trainer's Pokémon in the Battle Subway's arc
 typedef struct {
@@ -163,8 +163,7 @@ void *WbtBattle_CreatePartyList(FieldScriptEnv *env, WbtSystem *sys) {
 }
 
 // Shows the player's Pokémon, with those already picked in a different message
-void WbtBattle_ShowPartyList(void *work) {
-    WbtPartyList *list = work;
+void WbtBattle_ShowPartyList(WbtPartyList *list) {
     PokeParty *party = WbtSystem_GetPlayerParty(list->sys);
     u16 size = PokeParty_GetPkmCount(party) * 14;
     int count;
@@ -190,9 +189,7 @@ void WbtBattle_ShowPartyList(void *work) {
     GFL_BGSysLoadScr(BmpWin_GetBGIndex(func_ov036_02187c9c(list->window)));
 }
 
-void WbtBattle_ClosePartyList(void *work) {
-    WbtPartyList *list = work;
-
+void WbtBattle_ClosePartyList(WbtPartyList *list) {
     func_ov036_02187c7c(list->window);
     func_ov036_02187c1c(list->window);
     GFL_BGSysLoadScr(1);

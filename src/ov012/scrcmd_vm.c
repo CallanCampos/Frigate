@@ -84,7 +84,7 @@ static const u8 VM_CMP_LUT[][3] = {
 };
 
 // What finishes each of the script's sub events when it ends, by the IDs of FieldScriptSubEvent_Register
-const FieldScriptSubEventFinishFunc FIELD_SCRIPT_SUB_EVENT_FINISH_FUNCS[15] = {
+const FieldScriptSubEventFinishFunc FIELD_SCRIPT_SUB_EVENT_FINISH_FUNCS[SCRIPT_SUB_EVENT_MAX] = {
     FieldScriptSubEventFinish_EvCamera,
     func_ov036_021a8844,
     func_ov036_021a90fc,

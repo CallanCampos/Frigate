@@ -98,15 +98,6 @@ typedef struct {
 
 extern const FieldProcLink FIELD_PROC_LINK_LIST[15];
 
-// The procs of FIELD_PROC_LINK_LIST's apps that no header declares yet
-extern const GameProcFunctions data_ov012_0216dd78;
-extern const GameProcFunctions CONFIG_PANEL_PROC_FUNCTIONS;
-extern const GameProcFunctions TOWNMAP_PROC_FUNCTIONS;
-extern const GameProcFunctions MEDALBOX_PROC_FUNCTIONS;
-
-// Overlay 12: the trainer card's param, whose canEdit is FALSE in the Union Room
-void *TrainerCardParam_Create(GameData *gameData, HeapID heapId, BOOL canEdit);
-
 void *FieldAppCall_CreatePokeListParam(FieldAppCallWork *work, s32 appParam, s32 prevAppId, const void *prevParam);
 u32 FieldAppCall_GetPokeListResult(FieldAppCallWork *work, void *param);
 void *FieldAppCall_CreateZukanParam(FieldAppCallWork *work, s32 appParam, s32 prevAppId, const void *prevParam);

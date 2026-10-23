@@ -887,7 +887,7 @@ void BtlvInput_SetScreen(BtlvInput *work, u32 screen, void *param) {
         task = GFL_HeapAllocate(HEAPID_TAIL(work->heapId), sizeof(BtlvInputScreenTask), TRUE, "btlv_input.c", 0x60e);
         work->pokePos = cmd->pokePos;
         BtlvInput_StartFingerCursor(work);
-        BtlvEffect_SetIdleEffectMode(2);
+        BtlvEffect_SetIdleEffectMode(BTLV_IDLE_EFFECT_COMMAND);
         if (cmd->pokePos >= 2) {
             cmd->pokePos = (cmd->pokePos - 2) / 2;
         }
@@ -946,7 +946,7 @@ void BtlvInput_SetScreen(BtlvInput *work, u32 screen, void *param) {
             work->moves[i] = mv->moves[i];
         }
         if (work->inBattle == TRUE && (work->rule == 1 || work->rule == 2)) {
-            BtlvEffect_RestartIdleEffect(2);
+            BtlvEffect_RestartIdleEffect(BTLV_IDLE_EFFECT_COMMAND);
             BtlvEffect_Start(0x244);
         }
         if (work->screen == 3) {
@@ -2404,7 +2404,7 @@ static void BtlvInput_StartRotationSwitch(BtlvInput *work, int screen) {
     task->work = work;
     BtlvInput_AddTask(work, GFL_TCBMgrAddTask(work->tcbMgr, BtlvInput_RotationSwitchTask, task, 1),
                       BtlvInput_ScreenTaskEnd);
-    BtlvEffect_RestartIdleEffect(2);
+    BtlvEffect_RestartIdleEffect(BTLV_IDLE_EFFECT_COMMAND);
     BtlvEffect_Start(data_ov168_021f3658[slot][index]);
 }
 
@@ -3374,8 +3374,8 @@ static void BtlvInput_PrintLauncherPoints(BtlvInput *work, BtlvInputCommandParam
 }
 
 static void BtlvInput_StartFingerCursor(BtlvInput *work) {
-    BtlvEffect_RestartIdleEffect(2);
-    BtlvEffect_ZoomCamera(work->pokePos, 1, 10, 0, 8);
+    BtlvEffect_RestartIdleEffect(BTLV_IDLE_EFFECT_COMMAND);
+    BtlvEffect_ZoomCamera(work->pokePos, BTLV_EFFECT_ZOOM_MOVE, 10, 0, 8);
 }
 
 // Forgets the Pokémon's cursor stops when it changed

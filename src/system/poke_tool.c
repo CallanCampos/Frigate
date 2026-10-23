@@ -73,27 +73,6 @@
 #define PKM_BOX_DATA_SIZE sizeof(PkmBuffer)
 #define PKM_PARTY_DATA_SIZE (sizeof(PartyPkm) - sizeof(BoxPkm))
 
-#define LEARNSET_MAX 26
-#define LEARNSET_END 0xffff
-
-// A move a species learns at a level
-typedef struct {
-    u16 move;
-    u16 level;
-} LearnsetEntry;
-
-static inline BOOL LearnsetEntry_IsEnd(LearnsetEntry entry) {
-    return entry.move == LEARNSET_END && entry.level == LEARNSET_END;
-}
-
-static inline u16 LearnsetEntry_GetMove(LearnsetEntry entry) {
-    return entry.move;
-}
-
-static inline u16 LearnsetEntry_GetLevel(LearnsetEntry entry) {
-    return entry.level;
-}
-
 // The species and form whose data g_PersonalDataCache holds
 typedef struct {
     u16 form;
@@ -783,7 +762,7 @@ static u8 getPkmAbilSlotNumber(BoxPkm *pkm) {
     int slot = ABILITY_SLOT_1;
     u32 species = PML_PkmGetParam(pkm, PKM_PARAM_SPECIES, NULL);
     u32 form = PML_PkmGetParam(pkm, PKM_PARAM_FORM, NULL);
-    void *personal = PML_PersonalLoadBW2(species, form);
+    PersonalData *personal = PML_PersonalLoadBW2(species, form);
     u32 pid = PML_PkmGetParam(pkm, PKM_PARAM_PID, NULL);
     u32 mask = 0x10000;
 

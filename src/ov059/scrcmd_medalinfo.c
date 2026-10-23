@@ -23,16 +23,16 @@ BOOL ResortCmd_ShowMedalInfo(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     MedalInfoParam *param = GFL_HeapAllocate(HEAPID_GAMEEVENT, sizeof(MedalInfoParam), TRUE, "scrcmd_medalinfo.c", 88);
     ResortPerson *person = ResortCmd_GetMedalPerson(field, env);
-    u16 date = ResortPerson_GetParam(person, 42, NULL);
+    u16 date = ResortPerson_GetParam(person, JOIN_AVE_PARAM_MEDAL_DATE, NULL);
     u16 name[8];
     u16 unkC;
     u16 unkE;
     u16 unk10;
 
     ResortPerson_GetParam(person, JOIN_AVE_PARAM_NAME, name);
-    unkC = ResortPerson_GetParam(person, 41, NULL);
-    unkE = ResortPerson_GetParam(person, 43, NULL);
-    unk10 = ResortPerson_GetParam(person, 40, NULL);
+    unkC = ResortPerson_GetParam(person, JOIN_AVE_PARAM_LAST_MEDAL, NULL);
+    unkE = ResortPerson_GetParam(person, JOIN_AVE_PARAM_MEDAL_COUNT, NULL);
+    unk10 = ResortPerson_GetParam(person, JOIN_AVE_PARAM_MEDAL_RANK, NULL);
     param->nameBuf = GFL_StrBufCreate(8, HEAPID_GAMEEVENT);
     GFL_StrBufLoadString(param->nameBuf, name);
     param->name = param->nameBuf;

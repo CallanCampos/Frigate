@@ -6,7 +6,10 @@
 // entrance
 
 #include "types.h"
+#include "gfl/heap.h"
+#include "nitro/fx.h"
 #include "struct_decls.h"
+#include "system/game_event.h"
 
 // What the entrance camera plays: the warp's transition, coming out of the entrance or going into it
 typedef struct {
@@ -14,6 +17,38 @@ typedef struct {
     BOOL isArrival;
     BOOL isDeparture;
 } EntranceCameraParam;
+
+// An entrance camera's file in archive 0xb1, one for each transition type from 7: where the camera starts or ends, in
+// whole units
+typedef struct {
+    u32 unk0;
+    u32 pitch;
+    u32 yaw;
+    s32 distance;
+    BOOL useTarget;
+    s32 target[3];
+    s32 offset[3];
+    u32 frames;
+    BOOL unk68;
+    BOOL unk6c;
+    BOOL unk48;
+    BOOL unk4C;
+} EntranceCameraFile;
+
+// The events of a warp's ways out of a zone and into one, which EventWarpSequence_CreateOut and
+// EventWarpSequence_CreateIn pick by its type
+GameEventReturnCode func_ov036_021b73b4(GameEvent *event, u32 *state, void *data);
+GameEventReturnCode func_ov036_021b73f8(GameEvent *event, u32 *state, void *data);
+GameEventReturnCode func_ov036_021b74c8(GameEvent *event, u32 *state, void *data);
+GameEventReturnCode func_ov036_021b7538(GameEvent *event, u32 *state, void *data);
+GameEventReturnCode func_ov036_021b7570(GameEvent *event, u32 *state, void *data);
+GameEventReturnCode func_ov036_021b7604(GameEvent *event, u32 *state, void *data);
+GameEventReturnCode func_ov036_021b77d0(GameEvent *event, u32 *state, void *data);
+GameEventReturnCode func_ov036_021b7810(GameEvent *event, u32 *state, void *data);
+GameEventReturnCode func_ov036_021b7848(GameEvent *event, u32 *state, void *data);
+GameEventReturnCode EventWarpSequence_CallbackSpinDown(GameEvent *event, u32 *state, void *data);
+GameEventReturnCode func_ov036_021b78fc(GameEvent *event, u32 *state, void *data);
+GameEventReturnCode func_ov036_021b793c(GameEvent *event, u32 *state, void *data);
 
 // The event that walks the player into the entrance
 GameEvent *func_ov036_021b74a0(GameSystem *gsys, WarpSequence *warp);
@@ -28,5 +63,26 @@ void EntranceCamera_FinishCamera(EntranceCamera *camera);
 BOOL func_ov036_021b7ae0(EntranceCamera *camera);
 // Whether the configured animation has a duration of zero frames
 BOOL EntranceCamera_HasZeroFrames(EntranceCamera *camera);
+EntranceCamera *EntranceCamera_Allocate(HeapID heapId);
+void EntranceCamera_Free(EntranceCamera *camera);
+void EntranceCamera_Init(EntranceCamera *camera, Field *field);
+void EntranceCamera_CreateController(EntranceCamera *camera, HeapID heapId);
+void EntranceCamera_FreeController(EntranceCamera *camera);
+// Sets up the animation from the player's direction, or from the transition type's file
+void EntranceCamera_ConfigureDefaultDeparture(EntranceCamera *camera);
+void EntranceCamera_ConfigureDefaultArrival(EntranceCamera *camera);
+void EntranceCamera_ConfigureFileDeparture(EntranceCamera *camera);
+void EntranceCamera_ConfigureFileArrival(EntranceCamera *camera);
+// Reads the file of a transition type, and moves the camera's target to a position
+void EntranceCamera_ReadFile(EntranceCameraFile *dest, u32 index);
+void FieldCamera_ChangeRefPos(FieldCamera *camera, const VecFx32 *target);
+FieldCamera *EntranceCamera_GetFieldCamera(EntranceCamera *camera);
+EntranceCameraParam *EntranceCamera_GetParam(EntranceCamera *camera);
+void EntranceCamera_SetParam(EntranceCamera *camera, const EntranceCameraParam *param);
+u32 EntranceCamera_GetTransitionType(EntranceCamera *camera);
+// Whether the transition type has a camera file, whether the camera doesn't depart, and whether it animates
+BOOL func_ov036_021b7f40(EntranceCamera *camera);
+BOOL func_ov036_021b7f50(EntranceCamera *camera);
+BOOL func_ov036_021b7f64(EntranceCamera *camera);
 
 #endif // POKEBW2_FIELD_ENTRANCE_CAMERA_H

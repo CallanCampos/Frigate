@@ -13,14 +13,14 @@
 // the dive spots of Undella Bay. Function names from swan (https://github.com/ds-pokemon-hacking/swan, GPL-3.0); the
 // layout is ours
 
-typedef struct {
+struct FldActMatColorPreset {
     ArcTool *arcTool;
     s32 normal[3];
     u16 diffuse[3];
     u16 ambient[3];
     u16 specular[3];
     u16 emissive[3];
-} FldActMatColorPreset;
+};
 
 static u16 DecideAbyssalRuinsDiveZoneByUndellaBayPos(u32 zoneId, u32 x, u32 z);
 
@@ -40,21 +40,16 @@ void *FldActMatColorPreset_Create(HeapID heapId) {
     return preset;
 }
 
-void FldActMatColorPreset_Free(void *work) {
-    FldActMatColorPreset *preset = work;
-
+void FldActMatColorPreset_Free(FldActMatColorPreset *preset) {
     GFL_ArcToolFree(preset->arcTool);
     GFL_HeapFree(preset);
 }
 
-void FldActMatColorPreset_Load(void *work, u32 presetId) {
-    FldActMatColorPreset *preset = work;
-
+void FldActMatColorPreset_Load(FldActMatColorPreset *preset, u32 presetId) {
     GFL_ArcToolRead(preset->arcTool, presetId, preset->normal);
 }
 
-void FldActMatColorPreset_Apply(void *work, BlActScene *scene) {
-    FldActMatColorPreset *preset = work;
+void FldActMatColorPreset_Apply(FldActMatColorPreset *preset, BlActScene *scene) {
     VecFx16 normal;
     GXRgb diffuse, ambient, specular, emissive;
 

@@ -13,7 +13,7 @@
 #define BATTLE_EXAMINATION_NUMBER_MASK 0x7f
 #define BATTLE_EXAMINATION_DOUBLE 0x8000
 
-typedef struct BattleExaminationSave {
+struct BattleExaminationSave {
     BSubwayTrainer trainers[BATTLE_EXAMINATION_TRAINER_COUNT];
     // What the Trial House copies into its own save block
     u8 unk5A0[0x22];
@@ -23,7 +23,7 @@ typedef struct BattleExaminationSave {
     u16 flags;
     // getCRC16 of everything before it
     u16 crc;
-} BattleExaminationSave; // size: 0x5c8
+}; // size: 0x5c8
 
 void BattleExamination_Init(BattleExaminationSave *examination);
 

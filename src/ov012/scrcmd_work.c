@@ -342,12 +342,12 @@ void ListMenu_ShowDescription(BmpMenuList *list, s32 value, u8 a2) {
     if (menu->descriptions[index] == NULL) {
         return;
     }
-    if (FieldScriptSubEvent_IsRegistered(1)) {
+    if (FieldScriptSubEvent_IsRegistered(SCRIPT_SUB_EVENT_SYSTEM_MSG)) {
         window = getMapDisplayInfoPtr(env);
         func_ov036_02188660(window);
         func_ov036_02188680(window, 0, 0, menu->descriptions[index]);
-    } else if (FieldScriptSubEvent_IsRegistered(2)) {
-    } else if (FieldScriptSubEvent_IsRegistered(3)) {
+    } else if (FieldScriptSubEvent_IsRegistered(SCRIPT_SUB_EVENT_ACTOR_MSG)) {
+    } else if (FieldScriptSubEvent_IsRegistered(SCRIPT_SUB_EVENT_MSG)) {
     }
 }
 

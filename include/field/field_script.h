@@ -297,10 +297,32 @@ typedef struct {
     s32 count;
 } FinishScriptSubEventsWork;
 
+// The script's sub events, which run beside it until it ends: FieldScriptSubEvent_Register's IDs, by which
+// FIELD_SCRIPT_SUB_EVENT_FINISH_FUNCS finishes them. 14 has no finish function
+enum {
+    SCRIPT_SUB_EVENT_EV_CAMERA,
+    // The message windows: the system's, an actor's balloon, the message that the mouth moves with, a sign, the
+    // numbered windows and the checkered window
+    SCRIPT_SUB_EVENT_SYSTEM_MSG,
+    SCRIPT_SUB_EVENT_ACTOR_MSG,
+    SCRIPT_SUB_EVENT_MSG,
+    SCRIPT_SUB_EVENT_SIGN,
+    SCRIPT_SUB_EVENT_MULTI_MSG,
+    SCRIPT_SUB_EVENT_CHECKER_MSG,
+    SCRIPT_SUB_EVENT_NDEMO,
+    SCRIPT_SUB_EVENT_SUBSCREEN,
+    SCRIPT_SUB_EVENT_AUTOSCROLL,
+    SCRIPT_SUB_EVENT_BGM_PUSH,
+    SCRIPT_SUB_EVENT_GAME_COMM_PAUSE,
+    SCRIPT_SUB_EVENT_BGM_VOLUME,
+    SCRIPT_SUB_EVENT_BGM_PLAY,
+    SCRIPT_SUB_EVENT_MAX = 15,
+};
+
 // Returns TRUE once the sub event is finished
 typedef BOOL (*FieldScriptSubEventFinishFunc)(FinishScriptSubEventsWork *work, u32 *state);
 
-extern const FieldScriptSubEventFinishFunc FIELD_SCRIPT_SUB_EVENT_FINISH_FUNCS[15];
+extern const FieldScriptSubEventFinishFunc FIELD_SCRIPT_SUB_EVENT_FINISH_FUNCS[SCRIPT_SUB_EVENT_MAX];
 // scrcmd_network.c: tries to boot the game's communication again
 BOOL GameCommPause_Finish(FinishScriptSubEventsWork *work, u32 *state);
 // scrcmd_ndemo.c
@@ -346,7 +368,7 @@ BOOL FieldScript_VMExists(ScriptWork *work, u8 index);
 void FieldScript_Run(GameSystem *gsys, ScriptWork *work, u16 scriptId, u32 featureLevel);
 // What ScriptWork_GetFieldWork returns: the field's message BG system and the field, or NULLs outside the field
 typedef struct {
-    void *msgBGSys;
+    FieldMsgBG *msgBGSys;
     Field *field;
 } ScriptFieldWork;
 
@@ -389,8 +411,6 @@ void ScriptWork_RestoreVarCopy(ScriptWork *work, void *copy);
 u16 *ScriptWork_GetLocalWork(ScriptWork *work, u16 id);
 WordSet *ScriptWork_GetWordSet(ScriptWork *work);
 MMSys *GetScrEnvMMdlSys(FieldScriptEnv *env);
-// Adds an entry to the script's list menu
-void AddItemToListMenu(FieldScriptEnv *env, u32 a1, u32 message, u32 value, StrBuf *a4, StrBuf *a5);
 
 // Overlay 36: show a message, and have the script wait for it
 BOOL func_ov036_021a8eb4(VM *vm, FieldScriptEnv *env, StrBuf *message, u16 actorId, u16 pos, u32 a5);

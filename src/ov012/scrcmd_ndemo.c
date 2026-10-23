@@ -9,8 +9,6 @@
 // The scenes with N, which overlay 155 plays (a descriptive name). Command names from swan
 // (https://github.com/ds-pokemon-hacking/swan, GPL-3.0)
 
-#define SCRIPT_SUB_EVENT_NDEMO 7
-
 static GameEventReturnCode EventNDemoEnd_Callback(GameEvent *event, u32 *state, void *data);
 
 BOOL s01C9_NDemoStart(VM *vm, FieldScriptEnv *env) {

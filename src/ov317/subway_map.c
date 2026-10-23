@@ -91,7 +91,7 @@ static BOOL SubwayMap_Init(GameProc *proc, u32 *state, void *param, void *work) 
     GXS_SetVisibleWnd(GX_WNDMASK_NONE);
     GXS_DispOn();
     GFL_BGSysDisableAllB();
-    GXS_SetGraphicsMode(0);
+    GXS_SetGraphicsMode(GX_BGMODE_0);
     GFL_BGSysDisableBGsB();
     for (i = 0; i < NELEMS(sSubBGSetups); i++) {
         GFL_BGSysCreateBG(sSubBGSetups[i].bg, &sSubBGSetups[i].setup, sSubBGSetups[i].mode);

@@ -24,10 +24,10 @@ struct KeyInfoSave {
 }; // size: 0x38
 
 // The key system's data that ov331 reads: the key information and the Memory Link's data
-typedef struct {
+struct KeySystemData {
     KeyInfoSave keyInfo;
     MemoryLinkSave memoryLink;
-} KeySystemData; // size: 0x214
+}; // size: 0x214
 
 // Clears the key information and draws its seed
 void KeyInfoSave_Init(KeyInfoSave *keyInfo);
@@ -54,7 +54,7 @@ u32 KeyInfo_GetChamberKey(KeyInfoSave *keyInfo);
 // Returns its argument, as the key information in data that ov331 reads
 KeyInfoSave *KeySystemData_GetKeyInfo(void *a0);
 // The Memory Link's data, at 0x38 in the same data
-void *KeySystemData_GetMemoryLink(void *a0);
+void *KeySystemData_GetMemoryLink(KeySystemData *a0);
 // Clears the key system's data, and the copy of the key information into the save
 void KeySystemData_Init(void *a0);
 void KeyInfoSave_Copy(KeyInfoSave *dest, const KeyInfoSave *src);

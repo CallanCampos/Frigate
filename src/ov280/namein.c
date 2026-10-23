@@ -57,6 +57,74 @@
 // The cell actors of the name field, one for each possible character
 #define NAME_SLOT_COUNT 16
 
+// The cell actors: the name field's from OBJ_NAME_SLOTS, one that is created hidden and never used, the two ends of
+// the key highlight, and the selectors of the preset names
+enum {
+    OBJ_NAME_SLOTS = 0,
+    OBJ_HIDDEN = 17,
+    OBJ_HIGHLIGHT = 18,
+    OBJ_SELECTOR_GREETING = 21,
+    OBJ_SELECTOR_THANKS,
+    OBJ_SELECTOR_CGEAR,
+};
+
+// The names that the selectors put in the field: the trainer's greeting and thanks, and the C-Gear's name.
+// PRESET_NAME_MAX is what NameEntryObjs_UpdateSelectors returns when none is touched
+enum {
+    PRESET_NAME_GREETING,
+    PRESET_NAME_THANKS,
+    PRESET_NAME_CGEAR,
+    PRESET_NAME_MAX,
+};
+
+// How the key highlight shows: not at all, blinking on the selected key, or lit on a key that was pressed
+enum {
+    HIGHLIGHT_OFF,
+    HIGHLIGHT_BLINK,
+    HIGHLIGHT_PRESSED,
+};
+
+// What the keyboard does on a frame: take input, check whether the name is full after a key, or slide to another
+// keyboard
+enum {
+    KEYBOARD_STATE_INPUT,
+    KEYBOARD_STATE_CHECK_FULL,
+    KEYBOARD_STATE_SLIDE,
+};
+
+// The steps of the slide between keyboards: out, switch the keyboard, show it, in, and done
+enum {
+    SLIDE_STAGE_OUT,
+    SLIDE_STAGE_SWITCH,
+    SLIDE_STAGE_SHOW,
+    SLIDE_STAGE_IN,
+    SLIDE_STAGE_END,
+};
+
+// What the icon does: wait for a touch, or bounce
+enum {
+    ICON_STATE_WAIT,
+    ICON_STATE_BOUNCE,
+};
+
+// The steps of the fade tasks, of the message task and of the task that pauses the save
+enum {
+    FADE_SEQ_START,
+    FADE_SEQ_WAIT,
+    FADE_SEQ_END,
+};
+
+enum {
+    TALK_SEQ_PRINT,
+    TALK_SEQ_WAIT,
+    TALK_SEQ_END,
+};
+
+enum {
+    PAUSE_SEQ_START,
+    PAUSE_SEQ_WAIT,
+};
+
 // The characters that a Game Sync ID is made of
 #define GAME_SYNC_ID_CHAR_COUNT 32
 
@@ -616,10 +684,10 @@ static void NameEntryObjs_Init(NameEntryObjs *objs, ClActUnit *unit, HeapID heap
         objs->actors[i] = ClActor_Create(unit, objs->chars, objs->palette, objs->cellAnims, &setup, 0, heapId);
     }
     setup.sequence = 1;
-    objs->actors[17] = ClActor_Create(unit, objs->chars, objs->palette, objs->cellAnims, &setup, 0, heapId);
-    ClActor_SetVisible(objs->actors[17], FALSE);
+    objs->actors[OBJ_HIDDEN] = ClActor_Create(unit, objs->chars, objs->palette, objs->cellAnims, &setup, 0, heapId);
+    ClActor_SetVisible(objs->actors[OBJ_HIDDEN], FALSE);
 
-    for (i = 18; i < 20; i++) {
+    for (i = OBJ_HIGHLIGHT; i < OBJ_HIGHLIGHT + 2; i++) {
         setup.x = -32;
         setup.y = -32;
         setup.sequence = i - 15;
@@ -628,9 +696,9 @@ static void NameEntryObjs_Init(NameEntryObjs *objs, ClActUnit *unit, HeapID heap
         ClActor_SetVisible(objs->actors[i], FALSE);
     }
 
-    for (i = 21; i <= 23; i++) {
-        setup.x = 200 + (i - 21) * 16;
-        setup.x += i - 21;
+    for (i = OBJ_SELECTOR_GREETING; i <= OBJ_SELECTOR_CGEAR; i++) {
+        setup.x = 200 + (i - OBJ_SELECTOR_GREETING) * 16;
+        setup.x += i - OBJ_SELECTOR_GREETING;
         setup.y = 20;
         setup.sequence = i - 15;
         objs->actors[i] = ClActor_Create(unit, objs->chars, objs->palette, objs->cellAnims, &setup, 0, heapId);
@@ -665,7 +733,7 @@ static void KeyHighlight_Init(KeyHighlight *highlight, u32 type, NameEntryObjs *
     MI_CpuFill8(highlight, 0, sizeof(KeyHighlight));
     highlight->type = type;
     for (i = 0; i < 2; i++) {
-        highlight->actors[i] = NameEntryObjs_Get(objs, 18 + i);
+        highlight->actors[i] = NameEntryObjs_Get(objs, OBJ_HIGHLIGHT + i);
     }
     file = GFL_G2DIOReadNCLR(ARCID_NAMEIN_GRAPHIC, 2, &palette, heapId);
     colors = palette->pRawData;
@@ -699,9 +767,9 @@ static void KeyHighlight_Set(KeyHighlight *highlight, u32 mode, const KeyRect *r
     palette = (type + 1) * 3;
     GFL_BGSysSetScrPaletteNo(1, palette, 20, 3, 3, 4);
     GFL_BGSysSetScrPaletteNo(2, palette, 20, 3, 3, 4);
-    if (rect != NULL && mode != 0) {
+    if (rect != NULL && mode != HIGHLIGHT_OFF) {
         highlight->rect = *rect;
-        if (mode == 2) {
+        if (mode == HIGHLIGHT_PRESSED) {
             GFL_BGSysSetScrPaletteNo(2, rect->left, rect->top, rect->right - rect->left, rect->bottom - rect->top,
                                      mode + 1);
             GFL_BGSysSetScrPaletteNo(1, rect->left, rect->top, rect->right - rect->left, rect->bottom - rect->top,
@@ -719,13 +787,13 @@ static void KeyHighlight_Set(KeyHighlight *highlight, u32 mode, const KeyRect *r
             ClActor_SetVisible(highlight->actors[1], TRUE);
         }
     }
-    if (mode == 0 || GCTX_HIDIsUsingTouch() == TRUE) {
+    if (mode == HIGHLIGHT_OFF || GCTX_HIDIsUsingTouch() == TRUE) {
         ClActor_SetVisible(highlight->actors[0], FALSE);
         ClActor_SetVisible(highlight->actors[1], FALSE);
     }
     GFL_BGSysLoadScr(2);
     GFL_BGSysLoadScr(1);
-    if (mode != 0) {
+    if (mode != HIGHLIGHT_OFF) {
         MI_CpuFill8(highlight->phase, 0, sizeof(highlight->phase));
         highlight->timer = 0;
         highlight->active = TRUE;
@@ -740,20 +808,20 @@ static void KeyHighlight_Update(KeyHighlight *highlight, u32 type, const KeyRect
 
     if (highlight->active) {
         switch (highlight->mode) {
-        case 0:
+        case HIGHLIGHT_OFF:
             break;
-        case 1:
+        case HIGHLIGHT_BLINK:
             palette = 2;
             step = sKeyBlinkStep;
             break;
-        case 2:
+        case HIGHLIGHT_PRESSED:
             palette = 3;
             step = 0x1999;
             if (highlight->timer++ > 10) {
                 if (!GCTX_HIDIsUsingTouch()) {
-                    KeyHighlight_Set(highlight, 1, rect, highlight->kanaPage, type);
+                    KeyHighlight_Set(highlight, HIGHLIGHT_BLINK, rect, highlight->kanaPage, type);
                 } else {
-                    KeyHighlight_Set(highlight, 0, rect, highlight->kanaPage, type);
+                    KeyHighlight_Set(highlight, HIGHLIGHT_OFF, rect, highlight->kanaPage, type);
                 }
             }
             break;
@@ -772,9 +840,9 @@ static void KeyHighlight_Update(KeyHighlight *highlight, u32 type, const KeyRect
     ClActor_SetSurfacePos(highlight->actors[1], &pos, 0);
     if (highlight->type != type) {
         if (!GCTX_HIDIsUsingTouch()) {
-            KeyHighlight_Set(highlight, 1, &highlight->rect, highlight->kanaPage, type);
+            KeyHighlight_Set(highlight, HIGHLIGHT_BLINK, &highlight->rect, highlight->kanaPage, type);
         } else {
-            KeyHighlight_Set(highlight, 0, &highlight->rect, highlight->kanaPage, type);
+            KeyHighlight_Set(highlight, HIGHLIGHT_OFF, &highlight->rect, highlight->kanaPage, type);
         }
     }
 }
@@ -1972,7 +2040,7 @@ static int KanaLayout_GetKind(const KeyPos *pos, KeyPos *cell) {
     case 3:
         kind = KEY_KIND_SPACE;
         if (pos->x != 4) {
-            kind = pos->x + 2;
+            kind = pos->x + KEY_KIND_TYPE_0;
         }
         break;
     }
@@ -2019,11 +2087,11 @@ static void Keyboard_Init(Keyboard *kb, u32 type, Font *font, PrintQueue *queue,
     KeyLayout_PrintKeys(&kb->layout, &kb->print, queue, font, heapId);
     if (!GCTX_HIDIsUsingTouch()) {
         if (KeyLayout_GetRect(&kb->layout, &kb->pos, &rect)) {
-            KeyHighlight_Set(&kb->highlight, 1, &rect, kb->kanaPage, kb->type);
+            KeyHighlight_Set(&kb->highlight, HIGHLIGHT_BLINK, &rect, kb->kanaPage, kb->type);
         }
     } else {
         if (KeyLayout_GetRect(&kb->layout, &kb->pos, &rect)) {
-            KeyHighlight_Set(&kb->highlight, 0, &rect, kb->kanaPage, kb->type);
+            KeyHighlight_Set(&kb->highlight, HIGHLIGHT_OFF, &rect, kb->kanaPage, kb->type);
         }
     }
 }
@@ -2040,7 +2108,7 @@ static void Keyboard_Free(Keyboard *kb) {
 static void Keyboard_Update(Keyboard *kb, NameBox *box) {
     kb->result = KEY_RESULT_NONE;
     switch (kb->state) {
-    case 0: {
+    case KEYBOARD_STATE_INPUT: {
         KeyInput input;
         BOOL acted;
 
@@ -2055,7 +2123,7 @@ static void Keyboard_Update(Keyboard *kb, NameBox *box) {
         }
         break;
     }
-    case 2: {
+    case KEYBOARD_STATE_SLIDE: {
         KeyInput input;
         BOOL acted;
 
@@ -2069,16 +2137,16 @@ static void Keyboard_Update(Keyboard *kb, NameBox *box) {
             Keyboard_SelectSlide(kb, &input);
         }
         if (Keyboard_UpdateSlide(kb)) {
-            kb->state = 0;
+            kb->state = KEYBOARD_STATE_INPUT;
         }
         break;
     }
-    case 1:
+    case KEYBOARD_STATE_CHECK_FULL:
         if (NameBox_IsFull(box)) {
             KeyLayout_FindKind(&kb->layout, KEY_KIND_OK, &kb->pos);
             kb->result = KEY_RESULT_COMMIT_COMPOSE;
         }
-        kb->state = 0;
+        kb->state = KEYBOARD_STATE_INPUT;
         break;
     }
     {
@@ -2171,16 +2239,16 @@ static BOOL Keyboard_UpdateSlide(Keyboard *kb) {
 
     if (kb->sliding) {
         switch (kb->slideStage) {
-        case 0:
+        case SLIDE_STAGE_OUT:
             GFL_BGSysGetBGOffsetY(1);
             frame = kb->slideFrame;
             alpha = -(frame * 16) / 7 + 16;
             reg_G2_BLDALPHA = alpha | (1 << 12);
             offset = -48 * frame / 7;
-            GFL_BGSysMoveBG(1, 3, offset);
-            GFL_BGSysMoveBG(3, 3, offset);
+            GFL_BGSysMoveBG(1, BG_MOVE_SET_Y, offset);
+            GFL_BGSysMoveBG(3, BG_MOVE_SET_Y, offset);
             if (kb->hasUpperLayer) {
-                GFL_BGSysMoveBG(2, 3, offset);
+                GFL_BGSysMoveBG(2, BG_MOVE_SET_Y, offset);
             }
             if (kb->slideFrame++ > 7) {
                 if (kb->hasUpperLayer) {
@@ -2192,22 +2260,22 @@ static BOOL Keyboard_UpdateSlide(Keyboard *kb) {
                     GFL_BGSysSetBGEnabled(3, FALSE);
                 }
                 kb->slideFrame = 0;
-                kb->slideStage = 1;
+                kb->slideStage = SLIDE_STAGE_SWITCH;
             }
             break;
-        case 1:
+        case SLIDE_STAGE_SWITCH:
             offset = -48;
-            GFL_BGSysMoveBG(1, 3, offset);
-            GFL_BGSysMoveBG(3, 3, offset);
+            GFL_BGSysMoveBG(1, BG_MOVE_SET_Y, offset);
+            GFL_BGSysMoveBG(3, BG_MOVE_SET_Y, offset);
             if (kb->hasUpperLayer) {
-                GFL_BGSysMoveBG(2, 3, offset);
+                GFL_BGSysMoveBG(2, BG_MOVE_SET_Y, offset);
             }
             Keyboard_ApplyType(kb, kb->nextType);
-            kb->slideStage = 2;
+            kb->slideStage = SLIDE_STAGE_SHOW;
             break;
-        case 2:
+        case SLIDE_STAGE_SHOW:
             kb->slideFrame = 7;
-            kb->slideStage = 3;
+            kb->slideStage = SLIDE_STAGE_IN;
             GFL_BGSysSetBGEnabled(1, TRUE);
             GFL_BGSysSetBGEnabled(3, TRUE);
             if (kb->type != KEYBOARD_TYPE_KANA) {
@@ -2215,24 +2283,24 @@ static BOOL Keyboard_UpdateSlide(Keyboard *kb) {
             }
             reg_G2_BLDALPHA = 1 << 12;
             break;
-        case 3:
+        case SLIDE_STAGE_IN:
             frame = kb->slideFrame;
             alpha = -(frame * 16) / 7 + 16;
             reg_G2_BLDALPHA = alpha | (1 << 12);
             offset = -48 * frame / 7;
-            GFL_BGSysMoveBG(1, 3, offset);
-            GFL_BGSysMoveBG(3, 3, offset);
+            GFL_BGSysMoveBG(1, BG_MOVE_SET_Y, offset);
+            GFL_BGSysMoveBG(3, BG_MOVE_SET_Y, offset);
             if (kb->hasUpperLayer) {
-                GFL_BGSysMoveBG(2, 3, offset);
+                GFL_BGSysMoveBG(2, BG_MOVE_SET_Y, offset);
             }
             if (kb->slideFrame-- == 0) {
-                kb->slideStage = 4;
+                kb->slideStage = SLIDE_STAGE_END;
             }
             break;
-        case 4:
-            GFL_BGSysMoveBG(1, 3, 0);
-            GFL_BGSysMoveBG(3, 3, 0);
-            GFL_BGSysMoveBG(2, 3, 0);
+        case SLIDE_STAGE_END:
+            GFL_BGSysMoveBG(1, BG_MOVE_SET_Y, 0);
+            GFL_BGSysMoveBG(3, BG_MOVE_SET_Y, 0);
+            GFL_BGSysMoveBG(2, BG_MOVE_SET_Y, 0);
             kb->hasUpperLayer = FALSE;
             reg_G2_BLDCNT = 0;
             kb->sliding = FALSE;
@@ -2312,14 +2380,14 @@ static BOOL Keyboard_HandleKeys(Keyboard *kb, KeyInput *input) {
         if (GCTX_HIDIsUsingTouch() == TRUE) {
             if (KeyLayout_GetRect(&kb->layout, &kb->pos, &rect)) {
                 GCTX_HIDSetUsingTouch(FALSE);
-                KeyHighlight_Set(&kb->highlight, 1, &rect, kb->kanaPage, kb->type);
+                KeyHighlight_Set(&kb->highlight, HIGHLIGHT_BLINK, &rect, kb->kanaPage, kb->type);
                 GFL_SndSEPlay(SEQ_SE_SELECT1);
             }
         } else {
             KeyLayout_Move(&kb->layout, &kb->pos, &delta);
             if (KeyLayout_GetRect(&kb->layout, &kb->pos, &rect)) {
                 GFL_SndSEPlay(SEQ_SE_SELECT1);
-                KeyHighlight_Set(&kb->highlight, 1, &rect, kb->kanaPage, kb->type);
+                KeyHighlight_Set(&kb->highlight, HIGHLIGHT_BLINK, &rect, kb->kanaPage, kb->type);
             }
         }
     }
@@ -2341,7 +2409,7 @@ static BOOL Keyboard_HandleButtons(Keyboard *kb, KeyInput *input) {
         acted = TRUE;
     }
     if (GCTX_HIDGetPressedKeys() == PAD_BUTTON_SELECT) {
-        input->button = kb->type + 3;
+        input->button = kb->type + KEY_KIND_TYPE_1;
         if (input->button > KEY_KIND_TYPE_3) {
             input->button = KEY_KIND_TYPE_0;
         }
@@ -2357,7 +2425,7 @@ static BOOL Keyboard_HandleButtons(Keyboard *kb, KeyInput *input) {
         if (KeyLayout_GetRect(&kb->layout, &kb->pos, &rect)) {
             GFL_SndSEPlay(SEQ_SE_SELECT1);
             GCTX_HIDSetUsingTouch(FALSE);
-            KeyHighlight_Set(&kb->highlight, 1, &rect, kb->kanaPage, kb->type);
+            KeyHighlight_Set(&kb->highlight, HIGHLIGHT_BLINK, &rect, kb->kanaPage, kb->type);
             return FALSE;
         }
     }
@@ -2399,11 +2467,11 @@ static void Keyboard_Select(Keyboard *kb, KeyInput *input) {
     switch (kind) {
     case KEY_KIND_CHAR:
         kb->result = KEY_RESULT_CHAR;
-        kb->state = 1;
+        kb->state = KEYBOARD_STATE_CHECK_FULL;
         break;
     case KEY_KIND_SPACE:
         kb->result = KEY_RESULT_SPACE;
-        kb->state = 1;
+        kb->state = KEYBOARD_STATE_CHECK_FULL;
         break;
     case KEY_KIND_TYPE_0:
     case KEY_KIND_TYPE_1:
@@ -2413,9 +2481,9 @@ static void Keyboard_Select(Keyboard *kb, KeyInput *input) {
             GFL_SndSEPlay(SEQ_SE_BEEP);
             break;
         }
-        if (Keyboard_StartSwitch(kb, kind - 2)) {
+        if (Keyboard_StartSwitch(kb, kind - KEY_KIND_TYPE_0)) {
             GFL_SndSEPlay(SEQ_SE_SYS_12);
-            kb->state = 2;
+            kb->state = KEYBOARD_STATE_SLIDE;
             kb->result = KEY_RESULT_CLEAR_COMPOSE;
         }
         break;
@@ -2438,7 +2506,7 @@ static void Keyboard_Select(Keyboard *kb, KeyInput *input) {
         break;
     }
     if (KeyLayout_GetRect(&kb->layout, &input->pos, &rect)) {
-        KeyHighlight_Set(&kb->highlight, 2, &rect, kb->kanaPage, kb->type);
+        KeyHighlight_Set(&kb->highlight, HIGHLIGHT_PRESSED, &rect, kb->kanaPage, kb->type);
     }
 }
 
@@ -2477,13 +2545,13 @@ static BOOL Keyboard_HandleKeysSlide(Keyboard *kb, KeyInput *input) {
                 if (KeyLayout_GetRect(&kb->layout, &kb->pos, &rect)) {
                     GFL_SndSEPlay(SEQ_SE_SELECT1);
                     GCTX_HIDSetUsingTouch(FALSE);
-                    KeyHighlight_Set(&kb->highlight, 1, &rect, kb->kanaPage, kb->type);
+                    KeyHighlight_Set(&kb->highlight, HIGHLIGHT_BLINK, &rect, kb->kanaPage, kb->type);
                 }
             } else {
                 KeyLayout_Move(&kb->layout, &kb->pos, &delta);
                 if (KeyLayout_GetRect(&kb->layout, &kb->pos, &rect)) {
                     GFL_SndSEPlay(SEQ_SE_SELECT1);
-                    KeyHighlight_Set(&kb->highlight, 1, &rect, kb->kanaPage, kb->type);
+                    KeyHighlight_Set(&kb->highlight, HIGHLIGHT_BLINK, &rect, kb->kanaPage, kb->type);
                 }
             }
         }
@@ -2502,7 +2570,7 @@ static BOOL Keyboard_HandleButtonsSlide(Keyboard *kb, KeyInput *input) {
             input->moved = TRUE;
         }
         if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_SELECT) {
-            input->button = kb->type + 3;
+            input->button = kb->type + KEY_KIND_TYPE_1;
             if (input->button > KEY_KIND_TYPE_3) {
                 input->button = KEY_KIND_TYPE_0;
             }
@@ -2514,7 +2582,7 @@ static BOOL Keyboard_HandleButtonsSlide(Keyboard *kb, KeyInput *input) {
             if (KeyLayout_GetRect(&kb->layout, &kb->pos, &rect)) {
                 GFL_SndSEPlay(SEQ_SE_SELECT1);
                 GCTX_HIDSetUsingTouch(FALSE);
-                KeyHighlight_Set(&kb->highlight, 1, &rect, kb->kanaPage, kb->type);
+                KeyHighlight_Set(&kb->highlight, HIGHLIGHT_BLINK, &rect, kb->kanaPage, kb->type);
                 return FALSE;
             }
         }
@@ -2566,15 +2634,15 @@ static void Keyboard_SelectSlide(Keyboard *kb, KeyInput *input) {
     case KEY_KIND_TYPE_1:
     case KEY_KIND_TYPE_2:
     case KEY_KIND_TYPE_3:
-        if (Keyboard_StartSwitch(kb, kind - 2)) {
+        if (Keyboard_StartSwitch(kb, kind - KEY_KIND_TYPE_0)) {
             GFL_SndSEPlay(SEQ_SE_SYS_12);
-            kb->state = 2;
+            kb->state = KEYBOARD_STATE_SLIDE;
             kb->result = KEY_RESULT_CLEAR_COMPOSE;
         }
         break;
     }
     if (KeyLayout_GetRect(&kb->layout, &input->pos, &rect)) {
-        KeyHighlight_Set(&kb->highlight, 2, &rect, kb->kanaPage, kb->type);
+        KeyHighlight_Set(&kb->highlight, HIGHLIGHT_PRESSED, &rect, kb->kanaPage, kb->type);
     }
 }
 
@@ -2877,7 +2945,7 @@ static void NameEntryIcon_Update(NameEntryIcon *icon) {
     TouchPos touch;
 
     switch (icon->state) {
-    case 0:
+    case ICON_STATE_WAIT:
         ClActor_GetSurfacePos(icon->actor, &pos, 0);
         icon->touched = FALSE;
         if (GFL_HIDGetTouchPressedPoint(&x, &y)) {
@@ -2889,14 +2957,14 @@ static void NameEntryIcon_Update(NameEntryIcon *icon) {
             touch.y = y;
             if (NameEntry_PointInRect(&rect, &touch)) {
                 NameEntryIcon_StartBounce(icon);
-                icon->state = 1;
+                icon->state = ICON_STATE_BOUNCE;
             }
         }
         break;
-    case 1:
+    case ICON_STATE_BOUNCE:
         if (NameEntryIcon_Bounce(icon)) {
             icon->touched = TRUE;
-            icon->state = 0;
+            icon->state = ICON_STATE_WAIT;
         }
         break;
     }
@@ -2980,13 +3048,13 @@ static void NameEntryObjs_ShowSelectors(NameEntryObjs *objs, BOOL show) {
     int i;
 
     if (show == TRUE) {
-        for (i = 21; i <= 23; i++) {
+        for (i = OBJ_SELECTOR_GREETING; i <= OBJ_SELECTOR_CGEAR; i++) {
             ClActor_SetVisible(NameEntryObjs_Get(objs, i), TRUE);
         }
     }
 }
 
-// Returns which of the preset names' selectors is touched, or 3
+// Returns which of the preset names' selectors is touched, or PRESET_NAME_MAX
 static int NameEntryObjs_UpdateSelectors(NameEntryObjs *objs) {
     KeyRect rect;
     u32 x;
@@ -2995,7 +3063,7 @@ static int NameEntryObjs_UpdateSelectors(NameEntryObjs *objs) {
     TouchPos touch;
     int i;
 
-    for (i = 21; i <= 23; i++) {
+    for (i = OBJ_SELECTOR_GREETING; i <= OBJ_SELECTOR_CGEAR; i++) {
         ClActor_GetSurfacePos(NameEntryObjs_Get(objs, i), &pos, 0);
         if (GFL_HIDGetTouchPressedPoint(&x, &y)) {
             rect.left = pos.x - 8;
@@ -3008,11 +3076,11 @@ static int NameEntryObjs_UpdateSelectors(NameEntryObjs *objs) {
                 ClActor_SetAutoAnim(NameEntryObjs_Get(objs, i), TRUE);
                 ClActor_SetAnimTime(NameEntryObjs_Get(objs, i), 0);
                 ClActor_RestartAnim(NameEntryObjs_Get(objs, i));
-                return i - 21;
+                return i - OBJ_SELECTOR_GREETING;
             }
         }
     }
-    return 3;
+    return PRESET_NAME_MAX;
 }
 
 // The name that the trainer card, or the avenue, already has
@@ -3020,13 +3088,13 @@ static StrBuf *NameEntry_LoadPresetName(NameEntryParam *param, u32 which, HeapID
     StrBuf *buf = GFL_StrBufCreate(9, heapId);
 
     switch (which) {
-    case 0:
+    case PRESET_NAME_GREETING:
         GFL_StrBufLoadString(buf, TrainerGameInfo_GetGreeting(param->gameInfo));
         break;
-    case 1:
+    case PRESET_NAME_THANKS:
         GFL_StrBufLoadString(buf, TrainerGameInfo_GetThanks(param->gameInfo));
         break;
-    case 2:
+    case PRESET_NAME_CGEAR:
         GFL_StrBufLoadString(buf, CGearName_Get(param->unk30));
         break;
     default:
@@ -3042,29 +3110,29 @@ static BOOL NameEntry_PointInRect(const KeyRect *rect, const TouchPos *touch) {
 // The name that touching the icon puts in the field
 static StrBuf *NameEntry_GetPresetName(NameEntryWork *work, u32 mode, HeapID heapId) {
     switch (mode) {
-    case 0:
+    case NAME_ENTRY_PLAYER:
         return NULL;
-    case 1:
+    case NAME_ENTRY_POKEMON:
         if (GFL_StrBufGetCharCount(work->name) == 0) {
             return GFL_MsgDataLoadStrbufNew(g_PMLSpeciesNamesResident, work->param->gender);
         }
         return GFL_StrBufClone(work->name, heapId);
-    case 2:
+    case NAME_ENTRY_BOX:
         return GFL_StrBufClone(work->name, heapId);
-    case 3:
+    case NAME_ENTRY_RIVAL:
         return GFL_StrBufClone(work->name, heapId);
-    case 4:
+    case NAME_ENTRY_FRIEND:
         return GFL_StrBufClone(work->name, heapId);
-    case 5:
+    case NAME_ENTRY_GREETING:
         return GFL_StrBufClone(work->name, heapId);
-    case 6:
+    case NAME_ENTRY_THANKS:
         return GFL_StrBufClone(work->name, heapId);
-    case 15:
+    case NAME_ENTRY_HAPPY_MESSAGE:
         return GFL_StrBufClone(work->name, heapId);
-    case 7:
-    case 14:
+    case NAME_ENTRY_PASSERBY_MESSAGE:
+    case NAME_ENTRY_TRAINER_MESSAGE:
         return GFL_StrBufClone(work->name, heapId);
-    case 11:
+    case NAME_ENTRY_PLASMA_PASSWORD:
         return GFL_StrBufClone(work->name, heapId);
     default:
         return NULL;
@@ -3094,15 +3162,15 @@ static void NameEntry_CheckChanged(NameEntryWork *work) {
 
     if (work->usesPresetNames == TRUE && work->presetNameFilled) {
         preset = GFL_StrBufCreate(9, HEAPID_NAMEIN);
-        for (i = 0; i <= 2; i++) {
+        for (i = PRESET_NAME_GREETING; i <= PRESET_NAME_CGEAR; i++) {
             switch (i) {
-            case 0:
+            case PRESET_NAME_GREETING:
                 GFL_StrBufLoadString(preset, TrainerGameInfo_GetGreeting(work->param->gameInfo));
                 break;
-            case 1:
+            case PRESET_NAME_THANKS:
                 GFL_StrBufLoadString(preset, TrainerGameInfo_GetThanks(work->param->gameInfo));
                 break;
-            case 2:
+            case PRESET_NAME_CGEAR:
                 GFL_StrBufLoadString(preset, CGearName_Get(work->param->unk30));
                 break;
             }
@@ -3206,7 +3274,7 @@ static void NameEntryTask_WaitDraw(NameEntryTask *task, u32 *state, NameEntryWor
 static void NameEntryTask_FadeIn(NameEntryTask *task, u32 *state, NameEntryWork *work) {
     switch (*state) {
     case 0:
-        GFL_FadeSet(3, 16, 0, 0);
+        GFL_FadeSet(FADE_ENGINE_A_BLACK | FADE_ENGINE_B_BLACK, 16, 0, 0);
         *state = 1;
         break;
     case 1:
@@ -3223,7 +3291,7 @@ static void NameEntryTask_FadeIn(NameEntryTask *task, u32 *state, NameEntryWork 
 static void NameEntryTask_FadeOut(NameEntryTask *task, u32 *state, NameEntryWork *work) {
     switch (*state) {
     case 0:
-        GFL_FadeSet(3, 0, 16, 0);
+        GFL_FadeSet(FADE_ENGINE_A_BLACK | FADE_ENGINE_B_BLACK, 0, 16, 0);
         *state = 1;
         break;
     case 1:
@@ -3418,7 +3486,7 @@ static void NameEntryTask_Input(NameEntryTask *task, u32 *state, NameEntryWork *
         }
         if (work->usesPresetNames == TRUE) {
             which = NameEntryObjs_UpdateSelectors(&work->objs);
-            if (which != 3) {
+            if (which != PRESET_NAME_MAX) {
                 name = NameEntry_LoadPresetName(work->param, which, HEAPID_NAMEIN);
                 NameBox_Clear(&work->box);
                 if (name != NULL) {

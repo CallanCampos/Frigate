@@ -4,16 +4,16 @@
 #include "gfl/heap.h"
 #include "system/game_data.h"
 
-typedef struct FieldWFBC {
+struct FieldWFBC {
     u8 city;
     u8 isOther;
     CityState *state;
-} FieldWFBC;
+};
 
 static void func_ov036_0218adfc(void *wfbc, HeapID heapId);
 static void func_ov036_0218ae00(void *wfbc);
 static void func_ov036_0218ae04(FieldWFBC *wfbc);
-static void func_ov036_0218ae10(void *work, CityState *city, BOOL isOther);
+static void func_ov036_0218ae10(FieldWFBC *work, CityState *city, BOOL isOther);
 
 void *func_ov036_0218adac(HeapID heapId) {
     void *wfbc = GFL_HeapAllocate(heapId, sizeof(FieldWFBC), TRUE, "field_wfbc.c", 87);
@@ -44,9 +44,7 @@ static void func_ov036_0218ae04(FieldWFBC *wfbc) {
     wfbc->state = NULL;
 }
 
-static void func_ov036_0218ae10(void *work, CityState *city, BOOL isOther) {
-    FieldWFBC *wfbc = work;
-
+static void func_ov036_0218ae10(FieldWFBC *wfbc, CityState *city, BOOL isOther) {
     CityState_IsSet(city);
     func_ov036_0218ae04(wfbc);
     wfbc->city = city->city;

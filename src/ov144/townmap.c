@@ -46,21 +46,6 @@
 // this one file, since every part is only reached from the process's functions and its .rodata is a single run. It
 // ends with the empty VBlank task that the process adds, just before townmap_grh.c's TownMapGraphic_Create
 
-// The parameters of the process, which the field's callers allocate (they declare the layout themselves)
-typedef struct {
-    // TOWNMAP_MODE_*
-    u32 mode;
-    // TOWNMAP_RESULT_*
-    u32 result;
-    // The zone the player is in, then the zone picked to fly to
-    u16 zoneId;
-    u16 escapeZoneId;
-    // Where to land in the zone picked
-    u32 warpX;
-    u32 warpZ;
-    GameSystem *gsys;
-} TownMapParam;
-
 // A place's parameters that townmap_data.h doesn't name: where a flight to it lands
 #define TOWNMAP_PARAM_WARP_X 13
 #define TOWNMAP_PARAM_WARP_Z 14

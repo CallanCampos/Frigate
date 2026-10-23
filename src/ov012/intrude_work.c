@@ -52,11 +52,11 @@ u32 Intrude_GetAlertState(GameCommSys *commSys) {
     return 0;
 }
 
-u32 func_ov012_0215365c(void) {
+u32 func_ov012_0215365c(GameCommSys *commSys) {
     return 0;
 }
 
-u32 func_ov012_02153660(void) {
+BOOL func_ov012_02153660(GameCommSys *commSys, StrBuf *name) {
     return 0;
 }
 

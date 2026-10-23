@@ -25,11 +25,25 @@
 // of the names are ours
 
 // What the list's states do: wait for input, scroll the rows, follow the scroll bar, follow a drag
-#define LIST_STATE_INPUT 0
-#define LIST_STATE_SCROLL 1
-#define LIST_STATE_BAR 2
-#define LIST_STATE_DRAG 3
-#define LIST_STATE_CURSOR_WAIT 4
+enum {
+    LIST_STATE_INPUT,
+    LIST_STATE_SCROLL,
+    LIST_STATE_BAR,
+    LIST_STATE_DRAG,
+    LIST_STATE_CURSOR_WAIT,
+};
+
+// FrameList_Draw's steps, in the same field: draw every row, then wait for the print queue
+enum {
+    LIST_DRAW_START,
+    LIST_DRAW_WAIT,
+};
+
+// What a drag does: wait for the touch to reach another item, then count the frames it stays there
+enum {
+    LIST_DRAG_HOLD,
+    LIST_DRAG_MOVED,
+};
 
 // What the keys and the touch screen ask for
 enum {
@@ -53,6 +67,9 @@ enum {
 // The screen height in tiles, and the BG's screen buffer height
 #define LIST_SCREEN_ROWS 24
 #define LIST_BG_ROWS 32
+
+// The cursor's row when it isn't shown
+#define LIST_CURSOR_NONE 0xff
 
 static void InitCounts(FrameList *list);
 static void DrawAll(FrameList *list, BOOL moved);
@@ -117,7 +134,7 @@ FrameList *FrameList_Create(const FrameListSetup *setup, HeapID heapId) {
     }
     list->rowCount = LIST_SCREEN_ROWS / list->setup.layout.rowHeight + 2;
     list->rowsPerBG = list->rowCount;
-    if (list->setup.layout.bg2 != 0xff) {
+    if (list->setup.layout.bg2 != FRAMELIST_BG_NONE) {
         list->rowCount = list->rowCount * 2;
     }
     list->frames = BGWinFrame_Create(BGWINFRAME_TRANSFER_VBLANK, list->rowCount, list->heapId);
@@ -126,7 +143,7 @@ FrameList *FrameList_Create(const FrameListSetup *setup, HeapID heapId) {
     for (i = 0; i < list->rowCount; i++) {
         BmpWin *window;
 
-        if (list->setup.layout.bg2 != 0xff && list->rowsPerBG <= i) {
+        if (list->setup.layout.bg2 != FRAMELIST_BG_NONE && list->rowsPerBG <= i) {
             BGWinFrame_InitFrame(list->frames, i, list->setup.layout.bg2, list->setup.layout.width,
                                  list->setup.layout.rowHeight);
             window = BmpWin_CreateDynamic(list->setup.layout.bg2, list->setup.layout.windowX,
@@ -217,14 +234,14 @@ void FrameList_LoadCursorPalette(FrameList *list, ArcTool *arc, u32 fileId, u32 
 
 BOOL FrameList_Draw(FrameList *list) {
     switch (list->state) {
-    case 0:
+    case LIST_DRAW_START:
         InitCounts(list);
         DrawAll(list, FALSE);
         list->state++;
         break;
-    case 1:
+    case LIST_DRAW_WAIT:
         if (PrintQueue_IsEmpty(list->printQueue) == TRUE) {
-            list->state = 0;
+            list->state = LIST_DRAW_START;
             return FALSE;
         }
         break;
@@ -247,17 +264,17 @@ u32 FrameList_Main(FrameList *list) {
         break;
     case LIST_STATE_SCROLL:
         if (UpdateScroll(list) == TRUE) {
-            result = -10;
+            result = FRAMELIST_SCROLL;
         }
         break;
     case LIST_STATE_BAR:
         if (UpdateBar(list) == TRUE) {
-            result = -9;
+            result = FRAMELIST_BAR;
         }
         break;
     case LIST_STATE_DRAG:
         if (UpdateDrag(list) == TRUE) {
-            result = -8;
+            result = FRAMELIST_DRAG;
         }
         break;
     case LIST_STATE_CURSOR_WAIT:
@@ -301,7 +318,7 @@ static void DrawAll(FrameList *list, BOOL moved) {
     s16 item;
     s8 y;
 
-    GFL_BGSysMoveBGReq(list->setup.layout.bg, 3, 0);
+    GFL_BGSysMoveBGReq(list->setup.layout.bg, BG_MOVE_SET_Y, 0);
     list->bgOffset = 0;
     item = list->scroll;
     y = list->setup.layout.y;
@@ -323,8 +340,8 @@ static void DrawAll(FrameList *list, BOOL moved) {
         y += list->setup.layout.rowHeight;
     }
     list->shownRows = list->firstRow;
-    if (list->setup.layout.bg2 != 0xff) {
-        GFL_BGSysMoveBGReq(list->setup.layout.bg2, 3, 0);
+    if (list->setup.layout.bg2 != FRAMELIST_BG_NONE) {
+        GFL_BGSysMoveBGReq(list->setup.layout.bg2, BG_MOVE_SET_Y, 0);
         y = list->setup.layout.y + LIST_SCREEN_ROWS - list->setup.layout.rowHeight;
         item = list->scroll - 1;
         while (TRUE) {
@@ -345,7 +362,7 @@ static void DrawAll(FrameList *list, BOOL moved) {
             y += list->setup.layout.rowHeight;
         }
         list->shownRows2 = list->firstRow2;
-        SetCursorRow(list, list->cursor, 0xff);
+        SetCursorRow(list, list->cursor, LIST_CURSOR_NONE);
         list->setup.callbacks->select(list->setup.work, list->cursor + list->scroll, moved);
     }
 }
@@ -437,7 +454,7 @@ static int TouchEvent(FrameList *list) {
 static int KeyEvent(FrameList *list) {
     if ((GetKeyTrigger(list) & 0x3f1) && GCTX_HIDIsUsingTouch() == TRUE) {
         GCTX_HIDSetUsingTouch(FALSE);
-        list->prevCursor = 0xff;
+        list->prevCursor = LIST_CURSOR_NONE;
         list->cursorDelay = 8;
         return LIST_EVENT_CURSOR_SHOWN;
     }
@@ -542,19 +559,19 @@ static int HandleEvent(FrameList *list) {
             SetCursorRow(list, list->cursor, list->prevCursor);
             list->setup.callbacks->select(list->setup.work, list->cursor + list->scroll, TRUE);
             list->state = LIST_STATE_CURSOR_WAIT;
-            return -12;
+            return FRAMELIST_CURSOR_SHOWN;
         case LIST_EVENT_CURSOR_MOVE:
             GFL_SndSEPlay(SEQ_SE_SELECT1);
             SetCursorRow(list, list->cursor, list->prevCursor);
             list->setup.callbacks->select(list->setup.work, list->cursor + list->scroll, TRUE);
             list->state = LIST_STATE_CURSOR_WAIT;
-            return -11;
+            return FRAMELIST_CURSOR_MOVE;
         case LIST_EVENT_SCROLL_UP:
             StartScroll(list, -list->setup.layout.speed[list->repeatStage], 1, LIST_STATE_CURSOR_WAIT, TRUE);
-            return -10;
+            return FRAMELIST_SCROLL;
         case LIST_EVENT_SCROLL_DOWN:
             StartScroll(list, list->setup.layout.speed[list->repeatStage], 1, LIST_STATE_CURSOR_WAIT, TRUE);
-            return -10;
+            return FRAMELIST_SCROLL;
         case LIST_EVENT_PAGE_UP:
             rows = list->rows;
             list->prevCursor = list->cursor;
@@ -562,10 +579,10 @@ static int HandleEvent(FrameList *list) {
                 list->cursor = 0;
                 rows = list->scroll;
             }
-            SetCursorRow(list, 0xff, list->prevCursor);
+            SetCursorRow(list, LIST_CURSOR_NONE, list->prevCursor);
             StartScroll(list, -list->setup.layout.speed[0], rows, LIST_STATE_CURSOR_WAIT, FALSE);
             GFL_SndSEPlay(SEQ_SE_SELECT1);
-            return -7;
+            return FRAMELIST_PAGE_UP;
         case LIST_EVENT_PAGE_DOWN:
             rows = list->rows;
             list->prevCursor = list->cursor;
@@ -573,45 +590,45 @@ static int HandleEvent(FrameList *list) {
                 list->cursor = list->rows - 1;
                 rows = list->maxScroll - list->scroll;
             }
-            SetCursorRow(list, 0xff, list->prevCursor);
+            SetCursorRow(list, LIST_CURSOR_NONE, list->prevCursor);
             StartScroll(list, list->setup.layout.speed[0], rows, LIST_STATE_CURSOR_WAIT, FALSE);
             GFL_SndSEPlay(SEQ_SE_SELECT1);
-            return -6;
+            return FRAMELIST_PAGE_DOWN;
         case LIST_EVENT_CURSOR_TOP:
             GFL_SndSEPlay(SEQ_SE_SELECT1);
             SetCursorRow(list, list->cursor, list->prevCursor);
             list->setup.callbacks->select(list->setup.work, list->cursor + list->scroll, TRUE);
             list->state = LIST_STATE_CURSOR_WAIT;
-            return -5;
+            return FRAMELIST_CURSOR_TOP;
         case LIST_EVENT_CURSOR_BOTTOM:
             GFL_SndSEPlay(SEQ_SE_SELECT1);
             SetCursorRow(list, list->cursor, list->prevCursor);
             list->setup.callbacks->select(list->setup.work, list->cursor + list->scroll, TRUE);
             list->state = LIST_STATE_CURSOR_WAIT;
-            return -4;
+            return FRAMELIST_CURSOR_BOTTOM;
         case LIST_EVENT_JUMP_TOP:
             list->cursor = 0;
             list->scroll = 0;
             DrawAll(list, TRUE);
             GFL_SndSEPlay(SEQ_SE_SELECT1);
-            return -3;
+            return FRAMELIST_JUMP_TOP;
         case LIST_EVENT_JUMP_BOTTOM:
             list->cursor = list->rows - 1;
             list->scroll = list->maxScroll;
             DrawAll(list, TRUE);
             GFL_SndSEPlay(SEQ_SE_SELECT1);
-            return -2;
+            return FRAMELIST_JUMP_BOTTOM;
         case LIST_EVENT_BAR:
-            SetCursorRow(list, 0xff, list->prevCursor);
+            SetCursorRow(list, LIST_CURSOR_NONE, list->prevCursor);
             StartBar(list, list->barIndex);
             GFL_SndSEPlay(SEQ_SE_SYS_06);
-            return -9;
+            return FRAMELIST_BAR;
         case LIST_EVENT_TOUCH_ITEM:
-            SetCursorRow(list, 0xff, list->prevCursor);
+            SetCursorRow(list, LIST_CURSOR_NONE, list->prevCursor);
             list->setup.callbacks->select(list->setup.work, list->cursor + list->scroll, TRUE);
             StartDrag(list, list->cursor);
             GFL_SndSEPlay(SEQ_SE_SYS_06);
-            return -8;
+            return FRAMELIST_DRAG;
         case LIST_EVENT_DECIDE:
             if (GCTX_HIDIsUsingTouch() == TRUE) {
                 SetCursorRow(list, list->cursor, list->prevCursor);
@@ -734,7 +751,7 @@ static BOOL UpdateScroll(FrameList *list) {
                     list->flickStartY = list->touchY;
                     list->flickEndY = list->touchY;
                     list->flags.touching = 0;
-                    SetCursorRow(list, list->cursor, 0xff);
+                    SetCursorRow(list, list->cursor, LIST_CURSOR_NONE);
                     list->state = list->nextState;
                     return FALSE;
                 }
@@ -743,12 +760,12 @@ static BOOL UpdateScroll(FrameList *list) {
                 list->flickEndY = list->touchY;
                 list->flags.scrolledByDrag = 0;
                 list->flags.touching = 0;
-                SetCursorRow(list, list->cursor, 0xff);
+                SetCursorRow(list, list->cursor, LIST_CURSOR_NONE);
                 list->state = list->nextState;
                 return FALSE;
             }
         }
-        SetCursorRow(list, 0xff, list->cursor);
+        SetCursorRow(list, LIST_CURSOR_NONE, list->cursor);
         if (list->nextState == LIST_STATE_DRAG) {
             if (list->flicking == 0) {
                 if (list->scrollDir < 0) {
@@ -813,7 +830,7 @@ static BOOL UpdateScroll(FrameList *list) {
         }
         list->setup.callbacks->select(list->setup.work, list->cursor + list->scroll, TRUE);
         if (list->playSE == TRUE) {
-            if ((u16)(list->nextState + 0xfffe) <= 1) {
+            if (list->nextState == LIST_STATE_BAR || list->nextState == LIST_STATE_DRAG) {
                 GFL_SndSEPlay(SEQ_SE_SYS_06);
             } else {
                 GFL_SndSEPlay(SEQ_SE_SELECT1);
@@ -821,9 +838,9 @@ static BOOL UpdateScroll(FrameList *list) {
         }
     }
     list->bgOffset = list->bgOffset + list->scrollDir;
-    GFL_BGSysMoveBGReq(list->setup.layout.bg, 3, list->bgOffset);
-    if (list->setup.layout.bg2 != 0xff) {
-        GFL_BGSysMoveBGReq(list->setup.layout.bg2, 3, list->bgOffset);
+    GFL_BGSysMoveBGReq(list->setup.layout.bg, BG_MOVE_SET_Y, list->bgOffset);
+    if (list->setup.layout.bg2 != FRAMELIST_BG_NONE) {
+        GFL_BGSysMoveBGReq(list->setup.layout.bg2, BG_MOVE_SET_Y, list->bgOffset);
     }
     list->setup.callbacks->scroll(list->setup.work, list->scrollDir);
     list->scrollFrames--;
@@ -974,7 +991,7 @@ static BOOL UpdateBar(FrameList *list) {
 
 // Starts following a touch that began on an item
 static void StartDrag(FrameList *list, u32 item) {
-    list->dragState = 0;
+    list->dragState = LIST_DRAG_HOLD;
     list->dragItem = item;
     list->flags.touchFrames = 0;
     list->flickStartY = list->touchY;
@@ -992,7 +1009,7 @@ static BOOL UpdateDrag(FrameList *list) {
     }
     touched = GFL_HIDGetTouchHeldRect(list->touchRects);
     switch (list->dragState) {
-    case 0:
+    case LIST_DRAG_HOLD:
         if (touched == TOUCH_RECT_NONE) {
             if (list->flickStartY != -1 && list->flickEndY != -1) {
                 list->dragDelta = list->flickEndY - list->flickStartY;
@@ -1021,23 +1038,23 @@ static BOOL UpdateDrag(FrameList *list) {
             list->dragItemPrev = touched;
             list->dragDelta = list->dragItem - touched;
             list->flags.touchFrames = 0;
-            list->dragState = 1;
+            list->dragState = LIST_DRAG_MOVED;
         }
         list->flickEndY = list->flickStartY;
         list->flickStartY = list->touchY;
         break;
-    case 1:
+    case LIST_DRAG_MOVED:
         if (touched == TOUCH_RECT_NONE) {
-            list->dragState = 0;
+            list->dragState = LIST_DRAG_HOLD;
             return StartFlick(list);
         }
         if (list->setup.touch[touched].action != FRAMELIST_TOUCH_ITEM) {
-            list->dragState = 0;
+            list->dragState = LIST_DRAG_HOLD;
             return StartFlick(list);
         }
         if (list->flags.touchFrames == 5) {
             list->flags.touchFrames = 0;
-            list->dragState = 0;
+            list->dragState = LIST_DRAG_HOLD;
             if (ScrollToTouched(list, touched) == TRUE) {
                 list->flags.scrolledByDrag = 1;
             }
@@ -1277,7 +1294,7 @@ static void PrintRow(FrameList *list, int item, s8 y) {
 }
 
 static void PrintRowOnBg2(FrameList *list, int item, s8 y) {
-    if (list->setup.layout.bg2 != 0xff) {
+    if (list->setup.layout.bg2 != FRAMELIST_BG_NONE) {
         if (item >= 0) {
             int row = list->firstRow2 + list->rowsPerBG;
 
@@ -1375,11 +1392,11 @@ void FrameList_SetCursor(FrameList *list, int pos) {
 }
 
 void FrameList_ShowCursor(FrameList *list) {
-    SetCursorRow(list, list->cursor, 0xff);
+    SetCursorRow(list, list->cursor, LIST_CURSOR_NONE);
 }
 
 void FrameList_RedrawCursor(FrameList *list) {
-    SetCursorRow(list, 0xff, list->cursor);
+    SetCursorRow(list, LIST_CURSOR_NONE, list->cursor);
 }
 
 void FrameList_SetShownRows(FrameList *list, int a1) {

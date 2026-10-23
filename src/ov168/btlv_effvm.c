@@ -2763,17 +2763,17 @@ static BOOL BtlvEffvm_WaitNative(VM *vm, void *env) {
         }
     }
     if (wk->waitKind == 0 || wk->waitKind == 6 || wk->waitKind == 8) {
-        if (BtlvEffect_IsPaletteFading(0)) {
+        if (BtlvEffect_IsPaletteFading(BTLV_EFFECT_FADE_STAGE)) {
             return FALSE;
         }
     }
     if (wk->waitKind == 0 || wk->waitKind == 7 || wk->waitKind == 8) {
-        if (BtlvEffect_IsPaletteFading(1)) {
+        if (BtlvEffect_IsPaletteFading(BTLV_EFFECT_FADE_FIELD)) {
             return FALSE;
         }
     }
     if (wk->waitKind == 0 || wk->waitKind == 9) {
-        if (BtlvEffect_IsPaletteFading(3)) {
+        if (BtlvEffect_IsPaletteFading(BTLV_EFFECT_FADE_PALETTES)) {
             return FALSE;
         }
     }
@@ -4465,7 +4465,7 @@ static void BtlvEffvm_ScaleAllMcss(fx32 scaleX, fx32 scaleY, int frames, int wai
             dest.x = scale;
             dest.y = scale;
             dest.z = FX32_ONE;
-            BtlvMcss_MoveScale(BtlvEffect_GetMcss(), i, 1, &dest, frames, wait, count);
+            BtlvMcss_MoveScale(BtlvEffect_GetMcss(), i, BTLV_EFFTOOL_MOVE_STEP, &dest, frames, wait, count);
         }
     }
 }

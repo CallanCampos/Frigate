@@ -17,13 +17,12 @@ typedef struct {
     u32 dataNum;
 } DeliveryIrcInit;
 
-// The work is passed as void * by the screens that use it
-void *DeliveryIrc_Init(const DeliveryIrcInit *init);
+DeliveryIrcWork *DeliveryIrc_Init(const DeliveryIrcInit *init);
 // Starts the network, unless it is busy
-BOOL DeliveryIrc_RecvStart(void *work);
+BOOL DeliveryIrc_RecvStart(DeliveryIrcWork *work);
 // 1 once the data came or went, 2 if it came damaged, 3 if there was none to give
-u8 DeliveryIrc_GetResult(void *work);
-void DeliveryIrc_Main(void *work);
-void DeliveryIrc_End(void *work);
+u8 DeliveryIrc_GetResult(DeliveryIrcWork *work);
+void DeliveryIrc_Main(DeliveryIrcWork *work);
+void DeliveryIrc_End(DeliveryIrcWork *work);
 
 #endif // POKEBW2_FIELD_DELIVERY_IRC_H

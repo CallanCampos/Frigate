@@ -73,7 +73,7 @@ BOOL GFL_StrBufCmp(const StrBuf *a, const StrBuf *b) {
     return FALSE;
 }
 
-u16 GFL_StrBufGetCharCount(const StrBuf *strbuf) {
+u32 GFL_StrBufGetCharCount(const StrBuf *strbuf) {
     return strbuf->length;
 }
 

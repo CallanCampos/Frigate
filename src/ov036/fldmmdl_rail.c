@@ -452,20 +452,20 @@ static u32 RailActor_ConvertDirection(u32 dir) {
 }
 
 static u32 RailActor_GetSpeedIndex(s32 speed) {
-    u32 result = 1;
+    u32 result = RAIL_SPEED_2;
 
     switch (speed) {
     case 0x10:
-        result = 0;
+        result = RAIL_SPEED_1;
         break;
     case 4:
-        result = 2;
+        result = RAIL_SPEED_4;
         break;
     case 2:
-        result = 3;
+        result = RAIL_SPEED_8;
         break;
     case 8:
-        result = 1;
+        result = RAIL_SPEED_2;
         break;
     }
     return result;

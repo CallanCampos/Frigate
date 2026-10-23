@@ -244,7 +244,7 @@ BOOL RailMath_WorldToRailNoCurve(u32 lineId, FieldRailSystem *rail, const VecFx3
     if (front <= w0 + (u32)(base * (w1 - w0)) / (u32)length + 0x10) {
         outPos->componentIsLine = 1;
         outPos->componentId = lineId;
-        outPos->railDirection = 3;
+        outPos->railDirection = RAIL_DIR_DOWN;
         if (cross.y >= 0) {
             outPos->posSide = func_ov036_021b0d2c(front);
         } else {
@@ -289,7 +289,7 @@ BOOL RailMath_WorldToRailSlerp(u32 lineId, FieldRailSystem *rail, const VecFx32 
     }
     step = 1;
     outPos->componentIsLine = 1;
-    outPos->railDirection = 3;
+    outPos->railDirection = RAIL_DIR_DOWN;
     outPos->componentId = lineId;
     outPos->posSide = 0;
     outPos->posFront = 0;

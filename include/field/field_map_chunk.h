@@ -172,7 +172,7 @@ BOOL FieldChunkAccessor_RD_Update(FieldChunk *chunk, FieldChunkContext *context)
 void FieldChunkAccessor_RD_GetTerrain(MapTerrainSamplerOutput *out, const void *container, const VecFx32 *pos,
                                       fx32 size, fx32 baseY);
 // field_map_chunk_height.c
-void FieldChunkAccessor_GetTerrainCore(MapTerrainSamplerOutput *out, u32 layer, void *terrain, const VecFx32 *pos,
-                                       fx32 size, fx32 baseY);
+void FieldChunkAccessor_GetTerrainCore(MapTerrainSamplerOutput *out, u32 layer, MapHeightData *terrain,
+                                       const VecFx32 *pos, fx32 size, fx32 baseY);
 
 #endif // POKEBW2_FIELD_FIELD_MAP_CHUNK_H

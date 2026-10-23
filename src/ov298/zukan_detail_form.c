@@ -1675,7 +1675,7 @@ static void ZukanDetailForm_GatherEntries(ZukanDetailFormParam *param, ZukanDeta
     u16 prevValue;
     u32 form;
     u16 n = 0;
-    void *personal = PML_PersonalLoad(species, 0, param->heapId);
+    PersonalData *personal = PML_PersonalLoad(species, 0, param->heapId);
     // The personal data's count of forms is read, but the Pokédex's own count is used
     u32 formCount = PML_PersonalGetParam(personal, PERSONAL_FORM_COUNT);
 

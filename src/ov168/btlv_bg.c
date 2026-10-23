@@ -179,7 +179,7 @@ static void BtlvBg_MoveTask(TCB *tcb, void *data) {
     BtlvBg *work = move->bg;
     BOOL done;
 
-    if (move->move.type == 4) {
+    if (move->move.type == BTLV_EFFTOOL_MOVE_SCROLL) {
         move->pos.x += move->move.end.x;
         move->pos.y += move->move.end.y;
         if (move->move.stepTime == 0) {

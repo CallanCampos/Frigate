@@ -237,3 +237,42 @@ A function that matches only under a type the original didn't have isn't faithfu
 An enum isn't a stand-in for `unsigned int`: under `-enum int` it is a signed `int`.
 
 **Checked:** by review. `docs/matching.md` ("Game Freak's code mixes the SDK's types") has the lever.
+
+## 15. Constants, parameters and tables with their structure
+
+Game Freak's code names its value sets: a task's sequence numbers, a function's results, the kinds, modes, commands
+and indices that a field or parameter takes are an `enum`, often closed by a count (`..._MAX`), as in pret's Gen 4
+decomps; fixed values, sizes and magic numbers are `#define`s. The SDK's own enums (`GXBGMode`, `GXVRamBG`,
+`NNS_GFD_DST_TYPE`) are the constants of its parameters.
+
+**Do:**
+- write a value set as an `enum` (anonymous, or a typedef where a declaration names it), keeping our names and, where
+  swan has the set, swan's type name;
+- pass the constant, not its number, where a parameter takes an enum's or a set's value;
+- type a parameter as the struct it always points to, not `void *`, unless callers pass several types (a callback's
+  `void *work`, an SDK callback's argument);
+- define a type once, in its owner's header, and use it everywhere, rather than a copy with `unk` fields under another
+  name;
+- write a table whose elements are records as an array of a struct.
+
+**Don't:** change the type a field, parameter or local stores in to the enum unless the original evidently had it:
+under `-enum int` an enum is a signed `int` (section 14), so a `u8` field keeps `u8` and takes the enum's constants.
+
+```c
+/* Wrong, in field_player_grid.c and gfl/g3d.h */
+#define GRID_COMMAND_NONE 0
+#define GRID_COMMAND_IDLE 1
+void GFL_G3DResFree(void *resource); /* whose first line is G3DResource *res = resource; */
+
+/* Right */
+enum {
+    GRID_COMMAND_NONE,
+    GRID_COMMAND_IDLE,
+};
+void GFL_G3DResFree(G3DResource *resource);
+```
+
+**Does not apply when:** a group of `#define`s are bits that combine (a flag set may be an enum with explicit values
+when a field holds the combination), or are generated constant lists (`generated/`).
+
+**Checked:** by review.

@@ -20,15 +20,11 @@ void *TrialHouseSave_GetWbtSave(SaveControl *save) {
     return TrialHouseSave_Get(save)->unk5C;
 }
 
-u16 WbtSave_GetCount(void *save, u32 tournament) {
-    WbtSave *wbt = save;
-
+u16 WbtSave_GetCount(WbtSave *wbt, u32 tournament) {
     return wbt->counts[tournament];
 }
 
-void WbtSave_IncrementCount(void *save, u32 tournament) {
-    WbtSave *wbt = save;
-
+void WbtSave_IncrementCount(WbtSave *wbt, u32 tournament) {
     if (wbt->counts[tournament] < WBT_COUNT_MAX) {
         wbt->counts[tournament]++;
     }
@@ -44,20 +40,14 @@ BOOL WbtSave_IsTrainerBeaten(WbtSave *wbt, int trainer) {
     return FALSE;
 }
 
-void WbtSave_SetTrainerBeaten(void *save, int trainer) {
-    WbtSave *wbt = save;
-
+void WbtSave_SetTrainerBeaten(WbtSave *wbt, int trainer) {
     wbt->beaten[trainer / 8] |= 1 << (trainer % 8);
 }
 
-void WbtSave_SetSlot(void *save, u8 index, u16 value) {
-    WbtSave *wbt = save;
-
+void WbtSave_SetSlot(WbtSave *wbt, u8 index, u16 value) {
     wbt->slots[index] = value;
 }
 
-u16 WbtSave_GetSlot(void *save, u8 index) {
-    WbtSave *wbt = save;
-
+u16 WbtSave_GetSlot(WbtSave *wbt, u8 index) {
     return wbt->slots[index];
 }

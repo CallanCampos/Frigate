@@ -119,6 +119,7 @@ struct MCSS {
     u32 fadeColor;
     u32 alpha : 8;
     u32 flipV : 1;
+    // MCSS_PAUSE_PAUSED and MCSS_PAUSE_FROZEN
     u32 pause : 2;
     u32 hidden : 1;
     u32 fading : 1;
@@ -148,9 +149,20 @@ struct MCSS {
 #define MCSS_SHADOW_PLTT 355
 #define MCSS_SHADOW_PLTT_ADDR 0x1100
 
-// Each sprite's share of the texture image and of the texture palette
+// Where the sprites' texture images and palettes start in texture VRAM, unless MCSSSys_SetTexBase and
+// MCSSSys_SetPlttBase move them, and each sprite's share of them
+#define MCSS_TEX_BASE 0x24000
+#define MCSS_PLTT_BASE 0x1000
 #define MCSS_TEX_SIZE 0x4000
 #define MCSS_PLTT_SIZE 0x20
+
+// The matrix stack's slots of a sprite's matrix and its shadow's
+#define MCSS_MTX_SPRITE 29
+#define MCSS_MTX_SHADOW 30
+
+// The bits of a sprite's pause: MCSS_PauseAnimation's and MCSS_FreezeAnimation's
+#define MCSS_PAUSE_PAUSED 1
+#define MCSS_PAUSE_FROZEN 2
 
 #define MCSS_ALPHA_MAX 31
 #define MCSS_SHADOW_ALPHA_HALF 0x20
@@ -184,8 +196,8 @@ MCSSSystem *MCSSSys_Create(u32 capacity, HeapID heapId) {
     system->heapId = heapId;
     system->offsetScale = FX32_ONE;
     system->mcss = GFL_HeapAllocate(heapId, capacity * sizeof(MCSS *), TRUE, "mcss.c", 129);
-    system->texBase = 0x24000;
-    system->plttBase = 0x1000;
+    system->texBase = MCSS_TEX_BASE;
+    system->plttBase = MCSS_PLTT_BASE;
     NNS_G2dInitImagePaletteProxy(&system->shadowPltt);
 
     load = GFL_HeapAllocate(HEAPID_TAIL(heapId), sizeof(MCSSLoad), TRUE, "mcss.c", 144);
@@ -387,7 +399,7 @@ void MCSSSys_Draw(MCSSSystem *system) {
         if (mcss->scale.x < 0) {
             flip++;
         }
-        G3_StoreMtx(29);
+        G3_StoreMtx(MCSS_MTX_SPRITE);
 
         // The shadow's matrix
         G3i_LookAt_(&NNS_G3dGlb.camPos, &NNS_G3dGlb.camUp, &NNS_G3dGlb.camTarget, TRUE, NULL);
@@ -401,7 +413,7 @@ void MCSSSys_Draw(MCSSSystem *system) {
         G3_Scale(FX_Mul(FX_Mul(FX_Mul(mcSrt.sx, mcss->shadowScale.x), mcss->shadowScaleOffset.x), mcss->scaleOffset.x),
                  FX_Mul(FX_Mul(FX_Mul(mcSrt.sy, mcss->shadowScale.y), mcss->shadowScaleOffset.y), mcss->scaleOffset.y),
                  FX32_ONE);
-        G3_StoreMtx(30);
+        G3_StoreMtx(MCSS_MTX_SHADOW);
 
         MCSS_SetMaterial();
         G3_TexImageParam(imageProxy->attr.fmt, GX_TEXGEN_TEXCOORD, imageProxy->attr.sizeS, imageProxy->attr.sizeT,
@@ -481,7 +493,7 @@ static void MCSS_DrawQuad(MCSSSystem *system, MCSS *mcss, fx32 x, fx32 y, fx32 w
                     FX32_ONE * (system->orthoNear ? 512 : 1024), FX32_ONE, TRUE, NULL);
         G3_MtxMode(GX_MTXMODE_POSITION_VECTOR);
     }
-    G3_RestoreMtx(29);
+    G3_RestoreMtx(MCSS_MTX_SPRITE);
     G3_TexPlttBase(mcss->plttProxy.vramLocation.baseAddrOfVram[NNS_G2D_VRAM_TYPE_3DMAIN], mcss->plttProxy.fmt);
     G3_PolygonAttr(GX_LIGHTMASK_NONE, GX_POLYGONMODE_MODULATE, GX_CULL_NONE, polygonId, mcss->alpha, 0);
     nodeX =
@@ -521,7 +533,7 @@ static void MCSS_DrawQuad(MCSSSystem *system, MCSS *mcss, fx32 x, fx32 y, fx32 w
     G3_MtxMode(GX_MTXMODE_PROJECTION);
     G3_RestoreMtx(0);
     G3_MtxMode(GX_MTXMODE_POSITION_VECTOR);
-    G3_RestoreMtx(30);
+    G3_RestoreMtx(MCSS_MTX_SHADOW);
 
     if (mcss->noShadow == FALSE && shadowAlpha != 0) {
         G3_TexPlttBase(shadowPltt->vramLocation.baseAddrOfVram[NNS_G2D_VRAM_TYPE_3DMAIN], shadowPltt->fmt);
@@ -740,19 +752,19 @@ BOOL MCSS_IsPaused(MCSS *mcss) {
 }
 
 void MCSS_PauseAnimation(MCSS *mcss) {
-    mcss->pause |= 1;
+    mcss->pause |= MCSS_PAUSE_PAUSED;
 }
 
 void MCSS_FreezeAnimation(MCSS *mcss) {
-    mcss->pause |= 2;
+    mcss->pause |= MCSS_PAUSE_FROZEN;
 }
 
 void MCSS_ResumeAnimation(MCSS *mcss) {
-    mcss->pause &= ~1;
+    mcss->pause &= ~MCSS_PAUSE_PAUSED;
 }
 
 void MCSS_UnfreezeAnimation(MCSS *mcss) {
-    mcss->pause &= ~2;
+    mcss->pause &= ~MCSS_PAUSE_FROZEN;
 }
 
 BOOL MCSS_IsHidden(MCSS *mcss) {
@@ -808,7 +820,7 @@ u8 func_0201ae00(MCSS *mcss) {
 }
 
 void MCSS_SetAnimationEndCallback(MCSS *mcss, u32 param, MCSSAnimationCallback callback, u32 unused) {
-    NNS_G2dSetAnimCtrlCallBackFunctor(&mcss->mcAnim.animCtrl, 1, param, callback);
+    NNS_G2dSetAnimCtrlCallBackFunctor(&mcss->mcAnim.animCtrl, NNS_G2D_ANMCALLBACKTYPE_LAST_FRM, param, callback);
 }
 
 void MCSS_TraverseNodes(MCSS *mcss, u32 param,

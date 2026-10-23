@@ -520,7 +520,7 @@ BOOL WorldTrade_SexSelectionCheck(Dpw_Tr_PokemonSearchData *dtps, int sexSelecti
 static int Deposit_SubSeqPokeNameSelectWait(WorldTradeWork *wk) {
     u32 ret = WorldTrade_Input_Main(wk->inputWork);
     int gender;
-    void *personal;
+    PersonalData *personal;
     int sexSelection;
 
     switch (ret) {

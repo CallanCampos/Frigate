@@ -5,11 +5,11 @@
 #include "struct_decls.h"
 
 // The data 0xb4 bytes into save block 0x42 (hollow_rival_savedata.c, a guessed name after swan's
-// getHollow_RivalBlk). The other functions of the file are in save/save_control.h, which takes the data as a void *.
+// getHollow_RivalBlk). The other functions of the file are in save/save_control.h
 
 #define HOLLOW_RIVAL_INDEX_COUNT 8
 
-typedef struct {
+struct HollowRivalSave {
     u8 values[HOLLOW_RIVAL_INDEX_COUNT];
     u8 flags[HOLLOW_RIVAL_INDEX_COUNT];
     // The meeting the secret caller arranged (2: the Ferris wheel in Nimbasa City), and whether it was arranged today
@@ -20,7 +20,7 @@ typedef struct {
     u8 met : 1;
     u16 species;
     u8 unk14[4];
-} HollowRivalSave;
+};
 
 u8 HollowRivalSave_GetFlag(HollowRivalSave *hollowRival, u16 index);
 void HollowRivalSave_SetMeeting(HollowRivalSave *hollowRival, u32 value);

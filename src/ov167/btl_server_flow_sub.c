@@ -764,7 +764,7 @@ u8 UseBagItem(BtlServerFlow *flow, BattleMon *mon, u16 item, u8 param, u8 slot) 
         }
     }
     if (flow->unk18 != 1) {
-        BtlServerCmdQueue_PutMsg(flow->queue, 0x5a, 0x21, clientId, item, 0xffff0000);
+        BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_STD, 0x21, clientId, item, SC_MSG_ARG_END);
         if (ItemGetParam(item, 0xf) == 4) {
             if (ThrowBall(flow, mon, item)) {
                 BattleClient_SubItem(flow->mainModule, clientId, item);
@@ -776,7 +776,7 @@ u8 UseBagItem(BtlServerFlow *flow, BattleMon *mon, u16 item, u8 param, u8 slot) 
             return TRUE;
         }
     } else {
-        BtlServerCmdQueue_PutMsg(flow->queue, 0x5a, 0x24, clientId, targetId, item, 0xffff0000);
+        BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_STD, 0x24, clientId, targetId, item, SC_MSG_ARG_END);
         if (clientId == GetPlayerClientID(flow->mainModule)) {
             IncRecord(flow->mainModule, 0x6f);
         }
@@ -798,36 +798,36 @@ u8 UseBagItem(BtlServerFlow *flow, BattleMon *mon, u16 item, u8 param, u8 slot) 
         }
     }
     if (!usable) {
-        BtlServerCmdQueue_PutMsg(flow->queue, 0x5a, 0xc4, 0xffff0000);
+        BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_STD, 0xc4, SC_MSG_ARG_END);
         return FALSE;
     }
     if (flow->unk18 == 1) {
         if (targetPos != 6) {
-            BtlServerCmdQueue_Put(flow->queue, 0x4d, targetPos, 0x282);
+            BtlServerCmdQueue_Put(flow->queue, SC_EFFECT_BY_POS, targetPos, 0x282);
         }
         for (i = 0; i < 23; i++) {
             if (data_ov167_021d6d20[i].exact && item == data_ov167_021d6d20[i].param) {
                 result = FALSE;
                 if (!BtlServerFlow_IsSemiInvuln(flow, targetId)) {
-                    u32 reservePos = SCQUE_RESERVE_Pos(flow->queue, 0x4d);
+                    u32 reservePos = SCQUE_RESERVE_Pos(flow->queue, SC_EFFECT_BY_POS);
 
                     result = data_ov167_021d6d20[i].func(flow, target, item, 0, param);
                     if (result == TRUE) {
-                        BtlServerCmdQueue_PutReserved(flow->queue, reservePos, 0x4d, targetPos, 0x25e);
-                        BtlServerCmdQueue_Put(flow->queue, 0x4c, 0x236);
+                        BtlServerCmdQueue_PutReserved(flow->queue, reservePos, SC_EFFECT_BY_POS, targetPos, 0x25e);
+                        BtlServerCmdQueue_Put(flow->queue, SC_EFFECT, 0x236);
                         return FALSE;
                     }
                 }
                 if (result == FALSE) {
-                    BtlServerCmdQueue_PutMsg(flow->queue, 0x5a, 0x44, 0xffff0000);
+                    BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_STD, 0x44, SC_MSG_ARG_END);
                 }
-                BtlServerCmdQueue_Put(flow->queue, 0x4c, 0x236);
+                BtlServerCmdQueue_Put(flow->queue, SC_EFFECT, 0x236);
                 return FALSE;
             }
         }
     }
     used = FALSE;
-    reserve = SCQUE_RESERVE_Pos(flow->queue, 0x4d);
+    reserve = SCQUE_RESERVE_Pos(flow->queue, SC_EFFECT_BY_POS);
     state = PushState(&flow->actionState, 0x4d7);
     for (i = 0; i < 23; i++) {
         effect = &data_ov167_021d6d20[i];
@@ -838,16 +838,16 @@ u8 UseBagItem(BtlServerFlow *flow, BattleMon *mon, u16 item, u8 param, u8 slot) 
     }
     if (used) {
         effectId = targetPos != 6 ? 0x25e : 0x292;
-        BtlServerCmdQueue_PutReserved(flow->queue, reserve, 0x4d, targetPos, effectId);
+        BtlServerCmdQueue_PutReserved(flow->queue, reserve, SC_EFFECT_BY_POS, targetPos, effectId);
         if (flow->unk18 != 1) {
             BattleClient_SubItem(flow->mainModule, clientId, item);
             ChangeFriendshipByItem(flow->mainModule, target, item);
         }
     } else {
-        BtlServerCmdQueue_PutMsg(flow->queue, 0x5a, 0x44, 0xffff0000);
+        BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_STD, 0x44, SC_MSG_ARG_END);
     }
     PopState(&flow->actionState, state, 0x4f4);
-    BtlServerCmdQueue_Put(flow->queue, 0x4c, 0x236);
+    BtlServerCmdQueue_Put(flow->queue, SC_EFFECT, 0x236);
     return FALSE;
 }
 
@@ -885,12 +885,12 @@ static BOOL ThrowBall(BtlServerFlow *flow, BattleMon *mon, u16 item) {
             } else {
                 isNew = FALSE;
             }
-            BtlServerCmdQueue_Put(flow->queue, 0x46, targetPos, shakes, caught, isNew, critical, item);
+            BtlServerCmdQueue_Put(flow->queue, SC_BALL_THROW, targetPos, shakes, caught, isNew, critical, item);
         }
         return TRUE;
     }
     if (targetPos != 6) {
-        BtlServerCmdQueue_Put(flow->queue, 0x47, targetPos, item);
+        BtlServerCmdQueue_Put(flow->queue, SC_BALL_THROW_TRAINER, targetPos, item);
     }
     return FALSE;
 }
@@ -1177,15 +1177,15 @@ static BOOL BagItemDireHit(BtlServerFlow *flow, BattleMon *mon, u16 item, s32 va
 
     if (!GetAdditionalConditionFlag(mon, 9)) {
         BattleMon_SetConditionFlag(mon, 9);
-        BtlServerCmdQueue_Put(flow->queue, 0x19, GetMonID(mon), 9);
+        BtlServerCmdQueue_Put(flow->queue, SC_OP_SET_CONDITION_FLAG, GetMonID(mon), 9);
         used = TRUE;
     }
     if (value > 1 && BattleMon_AddCritStage(mon, value - 1)) {
-        BtlServerCmdQueue_Put(flow->queue, 0xe, GetMonID(mon), value - 1);
+        BtlServerCmdQueue_Put(flow->queue, SC_OP_ADD_CRIT_STAGE, GetMonID(mon), value - 1);
         used = TRUE;
     }
     if (used) {
-        BtlServerCmdQueue_PutMsg(flow->queue, 0x5b, 0x411, GetMonID(mon), 0xffff0000);
+        BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_SET, 0x411, GetMonID(mon), SC_MSG_ARG_END);
         return TRUE;
     }
     return FALSE;

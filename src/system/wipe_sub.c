@@ -192,7 +192,7 @@ static WipeLinePattern sLinePatterns[] = {
 };
 
 BOOL WipeFunc_BrightnessOut(WipeScreen *screen) {
-    if (screen->seq == 0) {
+    if (screen->seq == WIPE_SEQ_INIT) {
         screen->endCovered = TRUE;
         screen->useBrightness = TRUE;
         WipeBright_Init(screen, TRUE);
@@ -202,7 +202,7 @@ BOOL WipeFunc_BrightnessOut(WipeScreen *screen) {
 }
 
 BOOL WipeFunc_BrightnessIn(WipeScreen *screen) {
-    if (screen->seq == 0) {
+    if (screen->seq == WIPE_SEQ_INIT) {
         screen->endCovered = FALSE;
         screen->useBrightness = TRUE;
         WipeBright_Init(screen, FALSE);
@@ -212,7 +212,7 @@ BOOL WipeFunc_BrightnessIn(WipeScreen *screen) {
 }
 
 BOOL WipeFunc_LinesDownOut(WipeScreen *screen) {
-    if (screen->seq == 0) {
+    if (screen->seq == WIPE_SEQ_INIT) {
         static const WipeLineRange range = { 0x00, 0xc0, TRUE };
 
         sLinePatterns[LINE_PATTERN_DOWN_OUT].ranges = &range;
@@ -226,7 +226,7 @@ BOOL WipeFunc_LinesDownOut(WipeScreen *screen) {
 }
 
 BOOL WipeFunc_LinesDownIn(WipeScreen *screen) {
-    if (screen->seq == 0) {
+    if (screen->seq == WIPE_SEQ_INIT) {
         static const WipeLineRange range = { 0x00, 0xc0, FALSE };
 
         sLinePatterns[LINE_PATTERN_DOWN_IN].ranges = &range;
@@ -240,7 +240,7 @@ BOOL WipeFunc_LinesDownIn(WipeScreen *screen) {
 }
 
 BOOL WipeFunc_LinesUpOut(WipeScreen *screen) {
-    if (screen->seq == 0) {
+    if (screen->seq == WIPE_SEQ_INIT) {
         static const WipeLineRange range = { 0xc0, 0x00, TRUE };
 
         sLinePatterns[LINE_PATTERN_UP_OUT].ranges = &range;
@@ -254,7 +254,7 @@ BOOL WipeFunc_LinesUpOut(WipeScreen *screen) {
 }
 
 BOOL WipeFunc_LinesUpIn(WipeScreen *screen) {
-    if (screen->seq == 0) {
+    if (screen->seq == WIPE_SEQ_INIT) {
         static const WipeLineRange range = { 0xc0, 0x00, FALSE };
 
         sLinePatterns[LINE_PATTERN_UP_IN].ranges = &range;
@@ -268,7 +268,7 @@ BOOL WipeFunc_LinesUpIn(WipeScreen *screen) {
 }
 
 BOOL WipeFunc_ShrinkLeftOut(WipeScreen *screen) {
-    if (screen->seq == 0) {
+    if (screen->seq == WIPE_SEQ_INIT) {
         static const WipeRectParam param = {
             { 0x00, 0x00, 0xff, 0xc0 }, { 0x00, 0x00, 0x00, 0xc0 }, 0, 0x3f, 0x20, TRUE
         };
@@ -283,7 +283,7 @@ BOOL WipeFunc_ShrinkLeftOut(WipeScreen *screen) {
 }
 
 BOOL WipeFunc_GrowRightIn(WipeScreen *screen) {
-    if (screen->seq == 0) {
+    if (screen->seq == WIPE_SEQ_INIT) {
         static const WipeRectParam param = {
             { 0x00, 0x00, 0x00, 0xc0 }, { 0x00, 0x00, 0xff, 0xc0 }, 0, 0x3f, 0x20, FALSE
         };
@@ -298,7 +298,7 @@ BOOL WipeFunc_GrowRightIn(WipeScreen *screen) {
 }
 
 BOOL WipeFunc_CircleOut(WipeScreen *screen) {
-    if (screen->seq == 0) {
+    if (screen->seq == WIPE_SEQ_INIT) {
         static const WipeCircleParam param = { 256, 0, 128, 96, 0, 0x3f, 0x20, TRUE };
 
         Wipe_SetBackdropColor(screen->color);
@@ -311,7 +311,7 @@ BOOL WipeFunc_CircleOut(WipeScreen *screen) {
 }
 
 BOOL WipeFunc_CircleIn(WipeScreen *screen) {
-    if (screen->seq == 0) {
+    if (screen->seq == WIPE_SEQ_INIT) {
         static const WipeCircleParam param = { 0, 256, 128, 96, 0, 0x3f, 0x20, FALSE };
 
         Wipe_SetBackdropColor(screen->color);
@@ -324,7 +324,7 @@ BOOL WipeFunc_CircleIn(WipeScreen *screen) {
 }
 
 BOOL WipeFunc_GrowRightOut(WipeScreen *screen) {
-    if (screen->seq == 0) {
+    if (screen->seq == WIPE_SEQ_INIT) {
         static const WipeRectParam param = {
             { 0x00, 0x00, 0x00, 0xc0 }, { 0x00, 0x00, 0xff, 0xc0 }, 0, 0x20, 0x3f, TRUE
         };
@@ -339,7 +339,7 @@ BOOL WipeFunc_GrowRightOut(WipeScreen *screen) {
 }
 
 BOOL WipeFunc_ShrinkLeftIn(WipeScreen *screen) {
-    if (screen->seq == 0) {
+    if (screen->seq == WIPE_SEQ_INIT) {
         static const WipeRectParam param = {
             { 0x00, 0x00, 0xff, 0xc0 }, { 0x00, 0x00, 0x00, 0xc0 }, 0, 0x20, 0x3f, FALSE
         };
@@ -422,19 +422,19 @@ static BOOL WipeBright_Main(WipeScreen *screen) {
     WipeBrightWork *work = screen->work;
 
     switch (screen->seq) {
-    case 1:
+    case WIPE_SEQ_MAIN:
         if (WipeBright_Step(work) == TRUE) {
             screen->seq++;
         }
         break;
-    case 2:
+    case WIPE_SEQ_EXIT:
         GFL_TCBRemove(work->tcb);
         GFL_HeapFree(screen->work);
         screen->work = NULL;
         screen->seq++;
         done = TRUE;
         break;
-    case 3:
+    case WIPE_SEQ_DONE:
         done = TRUE;
         break;
     }
@@ -567,9 +567,9 @@ static void WipeScanWnd_CopyTask(TCB *tcb, void *data) {
 // Leaves the windows as a wipe that ends covered or uncovered does
 static void WipeSub_ResetWnd(BOOL isOut, WipeWnd *wnd, s32 screen) {
     if (isOut == FALSE) {
-        WipeWnd_SetVisibleAtVBlank(wnd, 0, screen);
+        WipeWnd_SetVisibleAtVBlank(wnd, GX_WNDMASK_NONE, screen);
     } else {
-        WipeWnd_SetVisibleAtVBlank(wnd, 1, screen);
+        WipeWnd_SetVisibleAtVBlank(wnd, GX_WNDMASK_W0, screen);
         WipeWnd_SetInsidePlaneAtVBlank(wnd, 0x3f, FALSE, 0, screen);
         WipeWnd_SetPositionAtVBlank(wnd, 0, 0, 0, 0, 0, screen);
         WipeWnd_SetOutsidePlaneAtVBlank(wnd, 0x20, FALSE, screen);
@@ -706,9 +706,9 @@ static void WipeRect_Init(WipeScreen *screen, const WipeRectParam *param) {
     screen->work = work;
     WipeRectWork_Init(work, param, screen->division, screen->sync, screen->screen, screen->wnd);
     if (param->window == 0) {
-        WipeSub_SetWndVisible(screen->wnd, 1, work->screen, work->isOut);
+        WipeSub_SetWndVisible(screen->wnd, GX_WNDMASK_W0, work->screen, work->isOut);
     } else {
-        WipeSub_SetWndVisible(screen->wnd, 2, work->screen, work->isOut);
+        WipeSub_SetWndVisible(screen->wnd, GX_WNDMASK_W1, work->screen, work->isOut);
     }
     screen->seq++;
 }
@@ -718,19 +718,19 @@ static BOOL WipeRect_Main(WipeScreen *screen) {
     WipeRectWork *work = screen->work;
 
     switch (screen->seq) {
-    case 1:
+    case WIPE_SEQ_MAIN:
         if (WipeRectWork_Step(work) == TRUE) {
             WipeSub_ResetWnd(work->isOut, screen->wnd, screen->screen);
             screen->seq++;
         }
         break;
-    case 2:
+    case WIPE_SEQ_EXIT:
         GFL_HeapFree(work);
         screen->work = NULL;
         screen->seq++;
         done = TRUE;
         break;
-    case 3:
+    case WIPE_SEQ_DONE:
         done = TRUE;
         break;
     }
@@ -781,20 +781,20 @@ static BOOL WipeCircle_Main(WipeScreen *screen) {
     WipeCircleWork *work = screen->work;
 
     switch (screen->seq) {
-    case 1:
+    case WIPE_SEQ_MAIN:
         if (WipeCircleWork_Step(work) == TRUE) {
             WipeSub_ResetWnd(work->isOut, work->wnd, screen->screen);
             screen->seq++;
         }
         break;
-    case 2:
+    case WIPE_SEQ_EXIT:
         WipeScanWnd_Exit(&work->scan);
         GFL_HeapFree(screen->work);
         screen->work = NULL;
         screen->seq++;
         done = TRUE;
         break;
-    case 3:
+    case WIPE_SEQ_DONE:
         done = TRUE;
         break;
     }
@@ -824,9 +824,9 @@ static void WipeCircleWork_Init(WipeCircleWork *work, const WipeCircleParam *par
     WipeSub_SetWnd(wnd, param->inPlanes, param->outPlanes, param->window, screen, buf->next.left[0], 0,
                    buf->next.right[0], 192, work->isOut);
     if (param->window == 0) {
-        WipeSub_SetWndVisible(wnd, 1, screen, work->isOut);
+        WipeSub_SetWndVisible(wnd, GX_WNDMASK_W0, screen, work->isOut);
     } else {
-        WipeSub_SetWndVisible(wnd, 2, screen, work->isOut);
+        WipeSub_SetWndVisible(wnd, GX_WNDMASK_W1, screen, work->isOut);
     }
     WipeHBlank_AddAtVBlank(work->hblank, &work->scan, WipeScanWnd_HBlank, screen, heapId);
 }
@@ -912,20 +912,20 @@ static BOOL WipeLine_Main(WipeScreen *screen) {
     WipeLineWork *work = screen->work;
 
     switch (screen->seq) {
-    case 1:
+    case WIPE_SEQ_MAIN:
         if (WipeLineWork_Step(work) == TRUE) {
             WipeSub_ResetWnd(work->isOut, work->wnd, screen->screen);
             screen->seq++;
         }
         break;
-    case 2:
+    case WIPE_SEQ_EXIT:
         WipeLineWork_Exit(work);
         GFL_HeapFree(screen->work);
         screen->work = NULL;
         screen->seq++;
         done = TRUE;
         break;
-    case 3:
+    case WIPE_SEQ_DONE:
         done = TRUE;
         break;
     }
@@ -958,7 +958,7 @@ static void WipeLineWork_Init(WipeLineWork *work, WipeLinePattern *pattern, s32 
     } else {
         WipeSub_SetWnd(wnd, 0x3f, 0x20, 0, screen, 0, 0, 0, 0, pattern->isOut);
     }
-    WipeSub_SetWndVisible(wnd, 1, screen, work->isOut);
+    WipeSub_SetWndVisible(wnd, GX_WNDMASK_W0, screen, work->isOut);
 }
 
 static BOOL WipeLineWork_Step(WipeLineWork *work) {

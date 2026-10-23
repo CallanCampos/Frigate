@@ -33,7 +33,7 @@ struct LiveBattleMatchIrc {
     BOOL partyArrived;
     BOOL unusedArrived;
     BOOL readyArrived;
-    void *p_delivery; // the ROM's name, from its assert
+    DeliveryIrcWork *p_delivery; // the ROM's name, from its assert
     int deliveryResult;
 };
 

@@ -15,11 +15,11 @@ typedef struct LandPatchCell {
 } LandPatchCell;
 
 // A grid of cells
-typedef struct LandPatchGrid {
+struct LandPatchGrid {
     u16 width;
     u16 height;
     LandPatchCell cells[1];
-} LandPatchGrid;
+};
 
 // The buildings of a patch: how many, then where each is
 typedef struct LandPatchBuildings {
@@ -46,10 +46,9 @@ void FreeLandDataPatch(LandDataPatch *patch) {
     GFL_HeapFree(patch);
 }
 
-void func_ov036_021c2d04(LandDataPatch *patch, void *map, u32 srcX, u32 srcY, u32 destX, u32 destY, u32 width,
+void func_ov036_021c2d04(LandDataPatch *patch, LandPatchGrid *src, u32 srcX, u32 srcY, u32 destX, u32 destY, u32 width,
                          u32 height) {
     LandPatchGrid *dest = func_ov036_021c2dcc(patch);
-    LandPatchGrid *src = map;
     LandPatchCell *srcCells = src->cells;
     LandPatchCell *destCells = dest->cells;
     u32 i;

@@ -17,7 +17,7 @@ typedef struct {
 } MusicalDistHeader;
 
 // The work that reads the block, or that writes a downloaded musical to it
-typedef struct {
+struct MusicalDistWork {
     u16 heapId;
     // Whether the block was read
     BOOL loaded;
@@ -28,7 +28,7 @@ typedef struct {
     MusicalDistHeader *blockHeader;
     void *data;
     GameData *gameData;
-} MusicalDistWork; // size: 0x2c
+}; // size: 0x2c
 
 // The size of the block and its init
 u32 MusicalDist_GetSaveSize(void);

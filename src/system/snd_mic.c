@@ -43,7 +43,7 @@ void setupMic(HeapID heapId) {
     MI_CpuFill8(buffer, 0, SND_MIC_BUFFER_SIZE);
     mic->buffer = buffer;
     PM_SetAmp(PM_AMP_ON);
-    PM_SetAmpGain(2);
+    PM_SetAmpGain(PM_AMPGAIN_80);
     mic->enabled = TRUE;
     MIC_Init();
     SNDEX_SetIirFilter(SNDEX_IIR_FILTER_ADC_1, (const SNDEXIirFilterParam *)sMicFilter);

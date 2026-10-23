@@ -288,7 +288,7 @@ static u8 CountMonNames(const StrBuf *strbuf) {
     count = 0;
     while (str != NULL) {
         str = FindNextWordSetCommand(str, &category, &index, &param);
-        if (str != NULL && category == 1) {
+        if (str != NULL && category == STRCMD_CATEGORY_WORD) {
             switch (index) {
             case 1:
             case 2:
@@ -322,7 +322,7 @@ static void RegisterArgWords(StrBuf *strbuf, const u32 *args, WordSet *wordSet) 
             if (GFL_StrCmdIsWordSet(str)) {
                 u16 param = GFL_WordSetGetCommandParameter(str, 0);
                 u8 category = GFL_StrCmdGetCommandCategory(str);
-                if (category == 1 && GFL_StrCmdGetCommandIndex(str) == 14) {
+                if (category == STRCMD_CATEGORY_WORD && GFL_StrCmdGetCommandIndex(str) == 14) {
                     for (i = param + 1; i < 8; i++) {
                         skip[i]++;
                     }
@@ -345,7 +345,7 @@ static void RegisterArgWords(StrBuf *strbuf, const u32 *args, WordSet *wordSet) 
                 if (param >= skip[param]) {
                     arg = param - skip[param];
                 }
-                if (category == 2) {
+                if (category == STRCMD_CATEGORY_NUMBER) {
                     // The command's index is the number's digits less one
                     u8 digits = GFL_StrCmdGetCommandIndex(str) + 1;
                     WordSetNumber(wordSet, param, args[arg], digits, 0, 1);

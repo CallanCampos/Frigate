@@ -249,9 +249,7 @@ void func_0200b760(Regulation *regulation, RegulationUnkAC *out) {
     MI_CpuCopy8(regulation->unkAC, out->unk0, sizeof(out->unk0));
 }
 
-void *TournamentEntry_GetCardData(void *entry) {
-    TournamentEntry *tournament = entry;
-
+void *TournamentEntry_GetCardData(TournamentEntry *tournament) {
     return tournament->cardData;
 }
 
@@ -343,9 +341,7 @@ void TournamentEntry_SetField(void *entry, u32 field, u32 value) {
     }
 }
 
-BOOL TournamentEntry_CheckCRC(void *entry) {
-    TournamentEntry *tournament = entry;
-
+BOOL TournamentEntry_CheckCRC(TournamentEntry *tournament) {
     if (tournament->crc == CRC16_350bytes(tournament)) {
         return TRUE;
     }
@@ -356,15 +352,11 @@ u16 CRC16_350bytes(const void *entry) {
     return getCRC16(entry, offsetof(TournamentEntry, crc));
 }
 
-void *TournamentBlock_GetEntry(void *block, u32 index) {
-    TournamentBlock *tournament = block;
-
+void *TournamentBlock_GetEntry(TournamentBlock *tournament, u32 index) {
     return &tournament->entries[index];
 }
 
-void TournamentBlock_SetEntry(void *block, u32 index, const void *entry) {
-    TournamentBlock *tournament = block;
-
+void TournamentBlock_SetEntry(TournamentBlock *tournament, u32 index, const void *entry) {
     tournament->entries[index] = *(const TournamentEntry *)entry;
 }
 
@@ -372,9 +364,7 @@ void TournamentTeam_Clear(void *record) {
     MI_CpuFill8(record, 0, sizeof(TournamentTeam));
 }
 
-void *TournamentBlock_GetTeam(void *block, u32 index) {
-    TournamentBlock *tournament = block;
-
+void *TournamentBlock_GetTeam(TournamentBlock *tournament, u32 index) {
     return &tournament->teams[index];
 }
 

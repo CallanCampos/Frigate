@@ -118,10 +118,14 @@ typedef struct {
 void TrainerCardData_FillExtras(TrainerCardData *data, GameData *gameData, HeapID heapId);
 // isSnapshot is TRUE for a card that is sent away, with the play time copied
 void TrainerCardData_Fill(TrainerCardData *data, GameData *gameData, BOOL isSnapshot, BOOL canEdit, HeapID heapId);
+// The param of the card's own proc, whose canEdit is FALSE in the Union Room
+TrainerCardParam *TrainerCardParam_Create(GameData *gameData, HeapID heapId, BOOL canEdit);
 TrainerCardParam *TrainerCardParam_CreateView(GameData *gameData, TrainerCardData *data, HeapID heapId);
 u16 TrainerCardData_GetMedalCount(TrainerCardData *data);
 u8 TrainerCardData_GetMedalRank(TrainerCardData *data);
 
+// The proc of the player's own card, which FIELD_PROC_LINK_LIST opens
+extern const GameProcFunctions data_ov012_0216dd78;
 // The proc that shows a card it is given, which it frees
 extern const GameProcFunctions data_ov012_0216dd6c;
 

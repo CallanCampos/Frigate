@@ -34,13 +34,13 @@ GameEventReturnCode EventShortcutChoicePopup_Callback(GameEvent *event, u32 *sta
 GameEventReturnCode EventShortcutCallDirect_Callback(GameEvent *event, u32 *state, void *data);
 
 void *func_ov036_021bedd8(GameData *gameData, u32 mode, ShortcutMenuPos *listPos, HeapID menuHeapId, HeapID heapId);
-void func_ov036_021bf004(void *app);
-u32 func_ov036_021bf198(void *app);
-void func_ov036_021bf088(void *app);
-void func_ov036_021bf1ac(void *app);
-void func_ov036_021bf1d0(void *app);
-BOOL func_ov036_021bf1e4(void *app);
-u32 func_ov036_021bf1f8(void *app, u32 *item);
+void func_ov036_021bf004(ShortcutMenuApp *app);
+u32 func_ov036_021bf198(ShortcutMenuApp *app);
+void func_ov036_021bf088(ShortcutMenuApp *app);
+void func_ov036_021bf1ac(ShortcutMenuApp *app);
+void func_ov036_021bf1d0(ShortcutMenuApp *app);
+BOOL func_ov036_021bf1e4(ShortcutMenuApp *app);
+u32 func_ov036_021bf1f8(ShortcutMenuApp *app, u32 *item);
 // Puts the field back through a subprocess of overlay 0x118, then finishes
 GameEvent *func_ov036_021bf890(GameSystem *gsys, Field *field, void *param, BOOL transition);
 

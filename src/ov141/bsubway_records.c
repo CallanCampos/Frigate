@@ -85,21 +85,6 @@ enum {
 #define INPUT_BACK 2
 #define INPUT_NONE (-1)
 
-// A record of the Battle Subway's save, which BSubwayWifiData_AllocLeaders copies: a player's name and place, and the
-// message that they left
-typedef struct {
-    u16 name[8];
-    u8 unk10[2];
-    u8 country;
-    u8 area;
-    u8 unk14[4];
-    PMSData message;
-    u8 unk20_0 : 1;
-    u8 female : 1;
-    u8 unk20_2 : 6;
-    u8 unk21;
-} BSubwayRecord;
-
 typedef struct {
     u32 bg;
     u8 x;
@@ -122,7 +107,7 @@ typedef struct {
 typedef struct {
     ArcTool *arc;
     BGWinFrame *frames;
-    BSubwayRecord *records;
+    BSubwayWifiLeader *records;
     Font *font;
     BmpWin *windows[WINDOW_COUNT];
     PrintWindow printWindows[WINDOW_COUNT];
@@ -177,7 +162,7 @@ static void BSubwayRecords_OnCursorOff(void *work, int pos, int prevPos);
 static void BSubwayRecords_OnCursorMove(void *work, int pos, int prevPos);
 static void BSubwayRecords_OnCursorTouch(void *work, int pos, int prevPos);
 static void BSubwayRecords_MoveCursorActor(BSubwayRecordsWork *wk, int pos);
-static void BSubwayRecords_ShowRecord(BSubwayRecordsWork *wk, BSubwayRecord *records, int index);
+static void BSubwayRecords_ShowRecord(BSubwayRecordsWork *wk, BSubwayWifiLeader *records, int index);
 static int BSubwayRecords_GetInput(BSubwayRecordsWork *wk);
 static void BSubwayRecords_HandleInput(BSubwayRecordsWork *wk, int input);
 static void BSubwayRecords_InitPages(BSubwayRecordsWork *wk);
@@ -643,7 +628,7 @@ static void BSubwayRecords_MoveCursorActor(BSubwayRecordsWork *wk, int pos) {
 
 // Shows a record's name, place, message and numbers in the windows under the list, or clears them for a position past
 // the last record
-static void BSubwayRecords_ShowRecord(BSubwayRecordsWork *wk, BSubwayRecord *records, int index) {
+static void BSubwayRecords_ShowRecord(BSubwayRecordsWork *wk, BSubwayWifiLeader *records, int index) {
     u32 country = records[index].country;
     u32 area = records[index].area;
     PMSData *message = &records[index].message;

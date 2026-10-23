@@ -380,7 +380,7 @@ static void FieldTerrainTexPatAnimation_Update(FieldTerrainTexPatAnimation *anim
 
             if (value.textureIndex != animation->currentValues[i].textureIndex || animation->isLoaded) {
                 NNS_GfdRegisterNewVramTransferTask(
-                    0, animation->textureDestVRAMAddresses[i],
+                    NNS_GFD_DST_3D_TEX_VRAM, animation->textureDestVRAMAddresses[i],
                     FieldTerrainTexPatAnimation_GetTextureAddress(animation->privateTextures, value.textureIndex),
                     animation->textureSizes[i]);
             }

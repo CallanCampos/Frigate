@@ -2,10 +2,10 @@
 #define POKEBW2_SAVE_FUNFEST_SAVEDATA_H
 
 #include "types.h"
+#include "struct_decls.h"
 
 // Block 0x46, the Funfest missions' records (funfest_savedata.c, a descriptive name). The block's getter and the
-// functions that read it for the Unova Link's records and the mission list are declared in save/save_control.h,
-// where they take the block as a void *
+// functions that read it for the Unova Link's records and the mission list are declared in save/save_control.h
 
 #define FUNFEST_MISSION_COUNT 55
 // The levels of a mission, of which the record keeps none above FUNFEST_MISSION_LEVEL_MAX - 1
@@ -23,7 +23,7 @@ typedef struct {
     u32 isNew : 1;
 } FunfestMissionRecord;
 
-typedef struct FunfestSave {
+struct FunfestSave {
     FunfestMissionRecord missions[FUNFEST_MISSION_COUNT];
     u8 unkDC[0x14];
     // Missions hosted, joined and completed
@@ -37,7 +37,7 @@ typedef struct FunfestSave {
     // The most participants of a mission, up to 100
     u8 mostParticipants;
     u8 paddingFB;
-} FunfestSave; // size: 0xfc
+}; // size: 0xfc
 
 // The block's size and its initial state, with every mission new
 u32 FestRecords_GetSize(void);
