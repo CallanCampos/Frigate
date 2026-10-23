@@ -3,6 +3,29 @@
 What port work taught that isn't obvious from the code, newest first. A lesson about MWCC or the decomp's own
 workflow goes in the decomp checkout instead; this file is the port's ([CLAUDE.md](../CLAUDE.md), the iteration loop).
 
+## 2026-10-23: the field's entry
+
+- **A size hook covers only the paths that go through it.** `PORT_HEAP_SIZE` scaled every heap made from the arena
+  and every child heap, so the heaps looked covered, but `GFL_HeapCreateRoot` makes a root in memory the caller gives
+  it, at the caller's size, and three callers do (the field's, the trade screen's, GFL's extra heap). The field's ran
+  out at its first load. When a hook scales a resource, list every way the resource is made, not the ways the first
+  failures went through ([ADR 0021](adr/0021-root-heaps-in-the-games-own-memory-from-host-memory.md)).
+- **A stop that moves isn't a pass the tests can see.** With the field's heap given room, CONTINUE crashed three
+  frames later instead of stopping, and `oracle_continue` failed either way. A fix whose effect needs another change
+  (here upstream's typed `Field.colorPostFX`) is verified on a scratch merge with that change, never committed, and
+  its pull request says so and waits on it.
+- **The literal's spelling is a token.** `check_mwcc_neutral.py` compares MWCC's token streams, so `HW_LCDC_VRAM`
+  (`0x06800000`) in place of `0x6800000` shows as a difference although the value and the object are the same. A
+  Neutral change of a constant in a complete file is proven by the ROM build's SHA1s; in an incomplete file, by the
+  compiler probe.
+- **Check a claimed cause on the run that has it.** The deep dive's notes said New Game needed the building
+  transition's VRAM fix to enter the house, and that it stopped on MSL's division at frame 12,542. Taking each fix
+  out of the scratch build alone showed the house's door uses another transition, and that the division stops New Game
+  at frame 14,902, at that change of map. Records cite what a run of this tree showed.
+- **A replay's screens with 3D can still be held to the DS.** The field's top screen is 3D, which matches melonDS
+  only within a tolerance, but its bottom screen (the field menu, the save's dialog, with the clock and the play time)
+  is 2D and matches bit for bit: `check_screens.py`'s `3d` column holds such a row to its bottom screen alone.
+
 ## 2026-10-19: the merge of the performance and hygiene tracks, after review
 
 - **An ADR's note says who accepted it.** ADRs 0013 to 0016 were accepted at their tracks' merges by the sessions that

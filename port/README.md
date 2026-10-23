@@ -119,8 +119,9 @@ build/port/frigate-black2 --rom /c/Games/black2.nds                      # your 
 ### The test launcher
 
 The launcher was built to open apps while the field had no C. It now detects the imported
-`FIELDMAP_PROC_FUNCS` and steps aside; these commands document the earlier test path and cannot bypass the current
-field-heap blocker. On revisions with the placeholder, it opens apps in order at COUNT (at once without one):
+`FIELDMAP_PROC_FUNCS` and steps aside; these commands document the earlier test path, and the field menu itself opens
+the apps once the field does ([docs/STATUS.md](docs/STATUS.md)). On revisions with the placeholder, it opens apps in
+order at COUNT (at once without one):
 
 ```sh
 build/port/frigate-black2 --save-dir SAVES --launch bag,card        # the bag, then the trainer card, after CONTINUE

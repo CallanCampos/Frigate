@@ -143,12 +143,12 @@ port_test_labels(replay_start_menu route)
 # Black 2 only: the screens it checks are the oracle's hashes of Black 2's
 if(PORT_VERSION STREQUAL "b2_us")
     # A replay from power-on through the start menu's NEW GAME and the intro (overlay 294) into the opening's 3D flight
-    # over Aspertia City (port/tests/replay/new_game.pbwinput), up to just before the field's first script, whose tables
-    # have no C yet: a test of level T3. check_screens.py runs it with --run-dir and checks that it shows, each
-    # within a range of frames, nine screens from the start menu to the opening's season banner exactly as the DS does,
-    # by the oracle's hashes of them (port/tests/replay/new_game.screens.tsv), and that it runs all its frames. The
-    # intro takes the start menu's first item, NEW GAME, only without a save, so the replay's save directory is emptied
-    # before each run. Without the player's ROM the program exits 66 and the test is skipped
+    # over Aspertia City (port/tests/replay/new_game.pbwinput), up to just before the field: a test of level T3.
+    # check_screens.py runs it with --run-dir and checks that it shows, each within a range of frames, nine screens
+    # from the start menu to the opening's season banner exactly as the DS does, by the oracle's hashes of them
+    # (port/tests/replay/new_game.screens.tsv), and that it runs all its frames. The intro takes the start menu's first
+    # item, NEW GAME, only without a save, so the replay's save directory is emptied before each run. Without the
+    # player's ROM the program exits 66 and the test is skipped. replay_new_game_house, below, goes on into the field
     set(replay_new_game_saves "${CMAKE_CURRENT_BINARY_DIR}/replay_new_game_saves")
     add_test(NAME replay_new_game_clean COMMAND ${CMAKE_COMMAND} -E rm -rf "${replay_new_game_saves}")
     set_tests_properties(replay_new_game_clean PROPERTIES FIXTURES_SETUP replay_new_game_saves)
@@ -162,6 +162,32 @@ if(PORT_VERSION STREQUAL "b2_us")
         FIXTURES_REQUIRED replay_new_game_saves SKIP_RETURN_CODE 66 TIMEOUT 1800)
     port_test_labels(replay_new_game_clean route)
     port_test_labels(replay_new_game route)
+endif()
+
+# New Game on into the field and the house (T3): the first save's input file (port/tests/oracle), which the oracle
+# plays to make that save, from power-on through NEW GAME, the intro and the opening's flight into Aspertia City, the
+# first scripts in front of the player's house and inside it, to the player's room and the field menu's SAVE, 18,800
+# frames. It runs past frame 10,759, where the field's heap ran out before ADR 0021, and past the first change of map,
+# into the house at frame 14,902, where the field's lens flare data divides with MSL's routine (port/hal/msl).
+# check_screens.py holds it to the DS's screens (port/tests/replay/new_game_house_<version>.screens.tsv, the oracle's
+# hashes): a screen without 3D bit for bit, and where the field's top screen shows 3D, which only the oracle's
+# comparison holds, the bottom screen alone. Its own save directory, emptied before each run, so that the start menu
+# offers NEW GAME. Without the player's ROM the program exits 66 and the test is skipped
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/tests/replay/new_game_house_${PORT_VERSION}.screens.tsv")
+    set(replay_new_game_house_saves "${CMAKE_CURRENT_BINARY_DIR}/replay_new_game_house_saves")
+    add_test(NAME replay_new_game_house_clean COMMAND ${CMAKE_COMMAND} -E rm -rf "${replay_new_game_house_saves}")
+    set_tests_properties(replay_new_game_house_clean PROPERTIES FIXTURES_SETUP replay_new_game_house_saves)
+    add_test(NAME replay_new_game_house
+        COMMAND "${CMAKE_COMMAND}" -E env PYTHONDONTWRITEBYTECODE=1 "${PORT_PYTHON}"
+            "${CMAKE_CURRENT_SOURCE_DIR}/tests/replay/check_screens.py"
+            "${CMAKE_CURRENT_SOURCE_DIR}/tests/replay/new_game_house_${PORT_VERSION}.screens.tsv" --
+            $<TARGET_FILE:${PORT_PROGRAM}> --headless --frames 18800 --watchdog 30
+            --save-dir "${replay_new_game_house_saves}"
+            --input "${CMAKE_CURRENT_SOURCE_DIR}/tests/oracle/first_save_${PORT_VERSION}.pbwinput")
+    set_tests_properties(replay_new_game_house PROPERTIES
+        FIXTURES_REQUIRED replay_new_game_house_saves SKIP_RETURN_CODE 66 TIMEOUT 2400)
+    port_test_labels(replay_new_game_house_clean route)
+    port_test_labels(replay_new_game_house route)
 endif()
 
 # The port's saves depend only on the input file and the clock it names (T3, T6): New Game's formatting of the blank

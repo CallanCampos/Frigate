@@ -207,3 +207,16 @@ has its row in [game-changes.md](game-changes.md) and its finding in [decomp-fin
 | H2 | `src/system/gf_font.c`, `GFL_FontBitmapCopy_16x16` and the bit reader, at the title screen's first text: every route past it | The glyph copy reads 16 rows of a 15-row font's cell, and the byte after its last bits: 4 bytes past the cell's block (the 16th row is never drawn) | The host's cell has room for every row the copy reads, zeroed |
 | H3 | `src/system/printsys.c`, `func_020223cc`, New Game's intro | Ends a print stream's task, which frees the stream when the task's data was allocated, then clears the stream's task field: a write to freed memory | The host clears the field first |
 | H4 | `src/gfl/arc_util.c`, `GFL_BGSysLoadNCGRDynamicCore`, from the touch bars (`src/ov139/touchbar.c`, `src/ov298/zknd_tbar.c`): the test launcher's Pokédex, where the bytes after the file were free, found on the merged tree of 2026-10-19 | Asks for 32 * 64 bytes of the touch bar's characters, a file of 4 (128 bytes), reserving 64 characters and copying the file's last 16 bytes and 1,904 past its block into the 60 after the file's, which the bar's screen never shows | The host reserves the same characters and copies the file's alone; the others keep what VRAM held |
+
+The field's first survey, on 2026-10-23, ran `replay_new_game_house` (New Game through the field and the house to the
+field menu's SAVE) in the survey build of Black 2. It ran on a scratch merge of the field-entry branch with upstream's
+`b62c655bfa`, which the field needs. The strict build stops at the first report, at the field's first load (R6). The
+survey run goes on to all 18,800 frames and shows all 16 screens of the replay's table. Its reports are open, and none
+is in a root heap's host memory ([ADR 0021](adr/0021-root-heaps-in-the-games-own-memory-from-host-memory.md)); the
+plan of 2026-10-23 gives them to its encounters and battles track:
+
+| Report | Where | What the sanitizer saw | What the host does |
+| --- | --- | --- | --- |
+| R6 | `src/ov036/fldeff_fes_kira.c:210`, `fldeff_gyoe.c:213`, `fldeff_shadow.c:128` to `193`: the field's effect tasks, from the field's first load | Each task's work lies 4 bytes past an 8-byte boundary while its struct holds pointers: misaligned loads and stores (UBSan) | Nothing yet: open |
+| H5 | `src/ov036/field_buildmodel.c:852`, `FieldChunkPropHolder_SetVisible`, from `FieldPropSystem_Free` as the field closes for a change of map | A write of 4 bytes into memory of the game's heap that is no longer allocated (ASan, use-after-poison, in the main arena) | Nothing yet: open |
+| H6 | `lib/nnsys/src/gfd/gfd_VramTransferManager.c:327`, `NNS_GfdDoVramTransfer`, from the main loop (`src/system/main.c`) in the field | A transfer reads its source from memory of the game's heap that is no longer allocated (ASan, use-after-poison, twice) | Nothing yet: open |

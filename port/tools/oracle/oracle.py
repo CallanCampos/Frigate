@@ -156,6 +156,10 @@ CURSOR = ("the start menu's cursor pulses a step ahead on the port since the tit
 TITLE_FADE = ("the title's bottom screen fading in over its 3D, where the copyright screen's tiles read past their "
               "file show as a band (port/docs/sanitizers.md, H1), a step or two from black: within the 3D's tolerance; "
               "from a blank save the port's heap holds the DS's bytes there")
+# How far the continue sequences run into the field: the port to its frame 3900, the oracle to its 6000, where its
+# count is 3955 (it reaches the field 2045 frames after the port, most of them in the movies)
+PORT_FRAMES_CONTINUE = 3900
+ORACLE_FRAMES_CONTINUE = 6000
 SEQUENCES = {
     # Power-on, the boot screens, the Game Freak logo and the whole opening to the title and its first 274 frames of
     # 3D, nothing pressed: the movies run from port frame 313 (count 312) to the title, at port frame 3527 in both
@@ -192,16 +196,15 @@ SEQUENCES = {
     ),
     # The title sequence's presses from first_save's save, then A at game frame 3400 on the start menu's CONTINUE,
     # which now shows the saved game: the player, the place, the badges and the play time (the Pokédex once the
-    # player has one). CONTINUE blinks, the menu wipes out to black from port frame 3425, and the field loads; the port
-    # stops there on overlay 36's field code and data, which have no C yet (stop_from). The title's known differences
-    # are the title sequence's; on the oracle they come 23 frames sooner, since its start-up, which reads the save,
-    # starts the main loop at frame 219 with this save and at 242 with a blank one. In White 2 the press of CONTINUE
-    # brings the counts together again. The title's first frames of 3D aren't held close as the title sequence's are:
-    # from a save, the heap after the copyright screen's file holds other bytes on the port than on the DS, so the band
-    # they show differs (README.md, "Known differences")
+    # player has one). CONTINUE blinks, the menu wipes out to black from port frame 3425, and the field loads and shows
+    # the player in his room. The title's known differences are the title sequence's; on the oracle they come 23
+    # frames sooner, since its start-up, which reads the save, starts the main loop at frame 219 with this save and at
+    # 242 with a blank one. In White 2 the press of CONTINUE brings the counts together again. The title's first frames
+    # of 3D aren't held close as the title sequence's are: from a save, the heap after the copyright screen's file holds
+    # other bytes on the port than on the DS, so the band they show differs (README.md, "Known differences")
     "continue": Sequence(
-        port_frames=3600,
-        oracle_frames=6000,
+        port_frames=PORT_FRAMES_CONTINUE,
+        oracle_frames=ORACLE_FRAMES_CONTINUE,
         sample="",
         clock="313-1108",
         lags={"b2_us": "1109=0", "w2_us": "1109=0,3241=-1,3403=0"},
@@ -212,15 +215,12 @@ SEQUENCES = {
         },
         known_oracle={"b2_us": {"4920": TORN_START}, "w2_us": {"1260": TORN_OPENING, "4852": TORN_START}},
         save="first_save",
-        stop_from=3425,
-        stop_trap=r"\bFIELDMAP_PROC_FUNCS\b.*\(ov036, ",
-        stop="the field after CONTINUE, whose process table, overlay 36's FIELDMAP_PROC_FUNCS, has no C yet",
     ),
     # continue's presses from starter_save's save: the start menu's saved game now has the Pokédex line (Pokédex: 1,
-    # time 0:04), and CONTINUE goes to the Aspertia City lookout, where the port stops on the same trap
+    # time 0:04), and CONTINUE goes to the Aspertia City lookout
     "continue_starter": Sequence(
-        port_frames=3600,
-        oracle_frames=6000,
+        port_frames=PORT_FRAMES_CONTINUE,
+        oracle_frames=ORACLE_FRAMES_CONTINUE,
         sample="",
         clock="313-1108",
         lags={"b2_us": "1109=0", "w2_us": "1109=0,3241=-1,3403=0"},
@@ -232,9 +232,6 @@ SEQUENCES = {
         known_oracle={"b2_us": {"4920": TORN_START}, "w2_us": {"1260": TORN_OPENING, "4852": TORN_START}},
         save="starter_save",
         input="continue",
-        stop_from=3425,
-        stop_trap=r"\bFIELDMAP_PROC_FUNCS\b.*\(ov036, ",
-        stop="the field after CONTINUE, whose process table, overlay 36's FIELDMAP_PROC_FUNCS, has no C yet",
     ),
 }
 REFERENCE_COLUMNS = ["port", "oracle", "counter", "lag", "top", "bottom"]

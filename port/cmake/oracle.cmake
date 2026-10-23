@@ -105,11 +105,11 @@ port_test_labels(oracle_boot oracle)
 #   where. Skipped (77) without the oracle or the ROM
 # The continue sequence starts from a save that the oracle makes first, from power-on through New Game into the field
 # and its SAVE (oracle.py save first_save, checked against the SHA-1 oracle.py keeps): the start menu's CONTINUE with
-# the saved game, then the field, where the port stops on overlay 36 for now. continue_starter plays the same presses
-# from the starter save, made from the first save's CONTINUE through the story to the first Pokémon, whose start menu
-# shows the Pokédex line. Only the oracle can make their saves, so they have no reference and no _hashes test; the
-# oracle_saves test makes the saves into the build tree first (a fixture), where a later run reuses each while its
-# SHA-1 is still the one oracle.py keeps
+# the saved game, then the field, the player's room, to port frame 3,900. continue_starter plays the same presses from
+# the starter save, made from the first save's CONTINUE through the story to the first Pokémon, whose start menu shows
+# the Pokédex line, into the field at the Aspertia City lookout. Only the oracle can make their saves, so they have no
+# reference and no _hashes test; the oracle_saves test makes the saves into the build tree first (a fixture), where a
+# later run reuses each while its SHA-1 is still the one oracle.py keeps
 set(port_oracle_saves "${CMAKE_BINARY_DIR}/oracle-saves")
 add_test(NAME oracle_saves
     COMMAND "${CMAKE_COMMAND}" -E env PYTHONDONTWRITEBYTECODE=1
