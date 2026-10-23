@@ -887,6 +887,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
   (`case 3: case 4: default:`). (matching.md: "the empty labels set the jump table's range")
 - An extra block that sets the default's value in a case: let the case fall through into `default`, and stack an
   empty case on `default:` where the SDK compiled out a warning. (matching.md: "A case that falls through")
+- A case's table entry at the `b` ending the case before it, where an empty case goes to the switch's end: the case held
+  a debug print compiled out; write `(void)0;` with a comment (2.0/sp2). (matching.md: "compiled out to `(void)0`")
 - Cases are laid out in source order, not by value. (matching.md: "Switch cases are laid out in source order")
 - `case -1:` tested on its own before a jump table the original folds it into (`adds r0, #1; cmp`): the switch is on
   a `u32`; make the value (or the function returning it) signed. (matching.md: "takes `-1` in")

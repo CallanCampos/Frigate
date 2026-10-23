@@ -3283,6 +3283,12 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
       _pDLWork->error = error;                              ...
                                                             }
                                                             _pDLWork->error = result;
+- A case whose jump-table entry points at the `b` that ends the case before it (where an empty case goes straight to the
+  switch's end) held a debug print compiled out to `(void)0`, the statement a print macro leaves in a release build.
+  Under 2.0/sp2 that statement survives until the blocks are made and keeps the case apart, where `;` and `{}` are
+  removed first. `dwc_aoss_ap.c`'s `AOSSi_WLANConnect` gives the scan alarm's case its entry with `(void)0;` (31 bytes
+  to 30), and the function's empty loop over the SSID is another print compiled out; the scan function itself puts the
+  connection's alarm among the events it ignores, with no case of its own.
 - An empty `if` whose condition has three or more `&&` operands is not removed with the other empty statements: its
   branches become blocks and go only later, so it splits the code around it for CSE and register allocation and
   emits nothing. Two operands, `(void)(a && b && c)` and `if (TRUE)` are removed first; a discarded ternary

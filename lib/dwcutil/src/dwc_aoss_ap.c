@@ -278,7 +278,7 @@ int AOSSi_WLANGetBSSList(WLLA_BSS_LIST **list) {
                 break;
             case 4:
             case DWC_WCM_EVENT_SEARCHING:
-            case 18:
+            case WIFI_ALARM_CONNECT:
                 break;
             case 0:
             case 1:
@@ -366,12 +366,15 @@ int AOSSi_WLANConnect(const WLLA_CONNECT_PARAM *param, WLLA_LINK_STAT *result) {
         while (running) {
             OS_ReceiveMessage(&sAossApQueue, &message, OS_MESSAGE_BLOCK);
             switch ((int)message) {
-            case 18:
+            case WIFI_ALARM_CONNECT:
                 if (!connected) {
                     running = FALSE;
                 }
                 break;
-            case 19:
+            case WIFI_ALARM_SCAN:
+                // A debug print, compiled out: the scan's alarm has its own case here, where the scan puts the
+                // connection's alarm among the events it ignores
+                (void)0;
                 break;
             case 4:
             case DWC_WCM_EVENT_SEARCHING:
