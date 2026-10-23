@@ -1,4 +1,8 @@
 #include "types.h"
+#include "app/p_status.h"
+#include "app/zukan.h"
+#include "constants/bag.h"
+#include "constants/items.h"
 #include "constants/pokemon.h"
 #include "field/field.h"
 #include "field/field_actor.h"
@@ -11,6 +15,7 @@
 #include "field/player_action.h"
 #include "field/player_state.h"
 #include "field/shortcut_menu.h"
+#include "field/trcard_sys.h"
 #include "gfl/graphics.h"
 #include "gfl/heap.h"
 #include "gfl/key.h"
@@ -326,7 +331,7 @@ GameEventReturnCode EventShortcutCallDirect_Callback(GameEvent *event, u32 *stat
 u32 ShortcutMenu_SetKeyItemID(FieldAppCallInput *input, u32 item) {
     switch (item) {
     case SHORTCUT_BICYCLE:
-        input->eventId = 0;
+        input->eventId = FIELD_COMMON_EVENT_CYCLING;
         return 1;
     case SHORTCUT_TOWN_MAP:
         input->appId = FIELD_APP_TOWNMAP;
@@ -338,102 +343,102 @@ u32 ShortcutMenu_SetKeyItemID(FieldAppCallInput *input, u32 item) {
         input->appId = FIELD_APP_WIFI_NOTE;
         return 0;
     case SHORTCUT_SUPER_ROD:
-        input->eventId = 4;
+        input->eventId = FIELD_COMMON_EVENT_FISHING;
         return 1;
     case SHORTCUT_DOWSING_MCHN:
-        input->eventId = 5;
+        input->eventId = FIELD_COMMON_EVENT_DOWSING;
         return 1;
     case SHORTCUT_GRACIDEA:
         input->appId = FIELD_APP_POKELIST;
-        input->appParam = 466;
+        input->appParam = ITEM_GRACIDEA;
         return 0;
     case SHORTCUT_DNA_SPLICERS_FUSE:
         input->appId = FIELD_APP_POKELIST;
-        input->appParam = 628;
+        input->appParam = ITEM_DNA_SPLICERS_FUSE;
         return 0;
     case SHORTCUT_DNA_SPLICERS_SEPARATE:
         input->appId = FIELD_APP_POKELIST;
-        input->appParam = 629;
+        input->appParam = ITEM_DNA_SPLICERS_SEPARATE;
         return 0;
     case SHORTCUT_PSTATUS_INFO:
         input->appId = FIELD_APP_POKESTATUS;
-        input->appParam = 0;
+        input->appParam = PSTATUS_PAGE_INFO;
         return 0;
     case SHORTCUT_PSTATUS_SKILL:
         input->appId = FIELD_APP_POKESTATUS;
-        input->appParam = 1;
+        input->appParam = PSTATUS_PAGE_SKILL;
         return 0;
     case SHORTCUT_PSTATUS_RIBBON:
         input->appId = FIELD_APP_POKESTATUS;
-        input->appParam = 2;
+        input->appParam = PSTATUS_PAGE_RIBBON;
         return 0;
     case SHORTCUT_BAG_ITEMS:
         input->appId = FIELD_APP_BAG;
-        input->appParam = 0;
+        input->appParam = BAG_POCKET_ITEMS;
         return 0;
     case SHORTCUT_BAG_MEDICINE:
         input->appId = FIELD_APP_BAG;
-        input->appParam = 1;
+        input->appParam = BAG_POCKET_MEDICINE;
         return 0;
     case SHORTCUT_BAG_TMS_HMS:
         input->appId = FIELD_APP_BAG;
-        input->appParam = 2;
+        input->appParam = BAG_POCKET_TMS_HMS;
         return 0;
     case SHORTCUT_BAG_BERRIES:
         input->appId = FIELD_APP_BAG;
-        input->appParam = 3;
+        input->appParam = BAG_POCKET_BERRIES;
         return 0;
     case SHORTCUT_BAG_KEY_ITEMS:
         input->appId = FIELD_APP_BAG;
-        input->appParam = 4;
+        input->appParam = BAG_POCKET_KEY_ITEMS;
         return 0;
     case SHORTCUT_BAG_FREE_SPACE:
         input->appId = FIELD_APP_BAG;
-        input->appParam = 5;
+        input->appParam = BAG_POCKET_FREE_SPACE;
         return 0;
     case SHORTCUT_POKEDEX_LIST:
         input->appId = FIELD_APP_ZUKAN;
-        input->appParam = 1;
+        input->appParam = ZUKAN_START_LIST;
         return 0;
     case SHORTCUT_POKEDEX_SEARCH:
         input->appId = FIELD_APP_ZUKAN;
-        input->appParam = 6;
+        input->appParam = ZUKAN_START_SEARCH;
         return 0;
     case SHORTCUT_POKEDEX_INFO:
         input->appId = FIELD_APP_ZUKAN;
-        input->appParam = 2;
+        input->appParam = ZUKAN_START_INFO;
         return 0;
     case SHORTCUT_POKEDEX_MAP:
         input->appId = FIELD_APP_ZUKAN;
-        input->appParam = 3;
+        input->appParam = ZUKAN_START_MAP;
         return 0;
     case SHORTCUT_POKEDEX_VOICE:
         input->appId = FIELD_APP_ZUKAN;
-        input->appParam = 4;
+        input->appParam = ZUKAN_START_VOICE;
         return 0;
     case SHORTCUT_POKEDEX_FORM:
         input->appId = FIELD_APP_ZUKAN;
-        input->appParam = 5;
+        input->appParam = ZUKAN_START_FORM;
         return 0;
     case SHORTCUT_POKEDEX_AWARDS:
         input->appId = FIELD_APP_ZUKAN;
-        input->appParam = 7;
+        input->appParam = ZUKAN_START_AWARDS;
         return 0;
     case SHORTCUT_POKEDEX_HABITAT:
         input->appId = FIELD_APP_ZUKAN;
-        input->appParam = 8;
+        input->appParam = ZUKAN_START_HABITATS;
         return 0;
     case SHORTCUT_TRAINER_CARD_FRONT:
         input->appId = FIELD_APP_TRAINER_CARD;
-        input->appParam = 1;
+        input->appParam = TRCARD_START_FRONT;
         return 0;
     case SHORTCUT_TRAINER_CARD_BACK:
         input->appId = FIELD_APP_TRAINER_CARD;
-        input->appParam = 2;
+        input->appParam = TRCARD_START_BACK;
         return 0;
     case SHORTCUT_TRAINER_CARD_BADGES:
         input->appId = FIELD_APP_TRAINER_CARD;
-        input->appParam = 3;
+        input->appParam = TRCARD_START_BADGES;
         return 0;
     case SHORTCUT_CONFIG_PANEL:
         input->appId = FIELD_APP_CONFIG;
@@ -450,7 +455,7 @@ u32 ShortcutMenu_SetKeyItemID(FieldAppCallInput *input, u32 item) {
         return 0;
     case SHORTCUT_REVEAL_GLASS:
         input->appId = FIELD_APP_POKELIST;
-        input->appParam = 638;
+        input->appParam = ITEM_REVEAL_GLASS;
         return 0;
     default:
         input->appId = FIELD_APP_ZUKAN;

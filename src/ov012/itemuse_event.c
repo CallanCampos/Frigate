@@ -53,7 +53,7 @@ static FieldActionResult FieldActionBlockCheck_NormalZoneNotRoyalUnova(GameData 
 static GameEventReturnCode EventFieldToggleCycling_Callback(GameEvent *event, u32 *state, void *data);
 static GameEventReturnCode EventFieldToggleDowsing_Callback(GameEvent *event, u32 *state, void *data);
 
-static const FieldCommonEvent FIELD_COMMON_EVENTS[6] = {
+static const FieldCommonEvent FIELD_COMMON_EVENTS[FIELD_COMMON_EVENT_COUNT] = {
     { EventFieldToggleCycling_Create, 0 },  { EventEntralinkWarpIn_CreateDefault, 0xff },
     { EventMapChangeEscapeRope_Create, 3 }, { EventSweetScent_Create, 0xff },
     { EventFieldFishing_Create, 5 },        { EventFieldToggleDowsing_Create, 9 },

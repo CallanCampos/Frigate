@@ -226,13 +226,13 @@ static BOOL TrainerCardSys_ExitView(GameProc *proc, u32 *state, void *param, voi
 
 static u32 TrainerCardSys_SeqStart(TrainerCardSysWork *wk, TrainerCardParam *param) {
     switch (param->appParam) {
-    case 0:
+    case TRCARD_START_DEFAULT:
         break;
-    case 1:
+    case TRCARD_START_FRONT:
         return TRCARD_SEQ_CARD;
-    case 2:
+    case TRCARD_START_BACK:
         return TRCARD_SEQ_CARD;
-    case 3:
+    case TRCARD_START_BADGES:
         return TRCARD_SEQ_OTHER;
     }
     return TRCARD_SEQ_CARD;

@@ -631,19 +631,19 @@ u32 FieldAppCall_GetBagResult(FieldAppCallWork *work, void *data) {
         return FIELD_APP_RESULT_NEXT;
     case 10:
     case 11:
-        work->input->eventId = 0;
+        work->input->eventId = FIELD_COMMON_EVENT_CYCLING;
         return 3;
     case 13:
-        work->input->eventId = 1;
+        work->input->eventId = FIELD_COMMON_EVENT_ENTRALINK;
         return 3;
     case 15:
-        work->input->eventId = 3;
+        work->input->eventId = FIELD_COMMON_EVENT_SWEET_SCENT;
         return 3;
     case 16:
-        work->input->eventId = 4;
+        work->input->eventId = FIELD_COMMON_EVENT_FISHING;
         return 3;
     case 14:
-        work->input->eventId = 2;
+        work->input->eventId = FIELD_COMMON_EVENT_ESCAPE_ROPE;
         return 3;
     case 8:
         work->nextAppId = FIELD_APP_WIFI_NOTE;
@@ -674,7 +674,7 @@ u32 FieldAppCall_GetBagResult(FieldAppCallWork *work, void *data) {
         work->subMode = 2;
         return FIELD_APP_RESULT_NEXT;
     case 20:
-        work->input->eventId = 5;
+        work->input->eventId = FIELD_COMMON_EVENT_DOWSING;
         return 3;
     case 2:
         if (PML_ItemIsMail(param->item) == TRUE) {

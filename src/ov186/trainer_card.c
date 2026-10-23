@@ -223,8 +223,8 @@ BOOL TrainerCard_Init(GameProc *proc, u32 *state, void *param, void *work) {
     wk->pmsDraw =
         PMSDraw_Create(wk->obj.unit, CLACT_VRAM_SUB, wk->printQueue, wk->font, 8, 1, HEAPID_TRAINER_CARD_SCREEN);
     TrCardBmp_Stub(wk, wk->win[TRCARD_WIN_MONEY], 1, wk->colonBuf);
-    if (wk->param->appParam == 2) {
-        wk->param->appParam = 0;
+    if (wk->param->appParam == TRCARD_START_BACK) {
+        wk->param->appParam = TRCARD_START_DEFAULT;
         wk->side = 1;
     } else {
         wk->side = 0;
