@@ -62,7 +62,7 @@ MICResult MICEXi_StartLimitedSamplingAsync(const MICAutoParam *param, MICCallbac
     if (param->size == 0) {
         return MIC_RESULT_ILLEGAL_PARAMETER;
     }
-    if (((u32)param->buffer & MIC_ALIGN_MASK) || (param->size & MIC_ALIGN_MASK)) {
+    if (((uptr)param->buffer & MIC_ALIGN_MASK) || (param->size & MIC_ALIGN_MASK)) {
         return MIC_RESULT_ILLEGAL_PARAMETER;
     }
 
