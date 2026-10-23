@@ -1,6 +1,7 @@
 #include "types.h"
 #include "app/pkwd_count.h"
 #include "app/pkwd_count_graphic.h"
+#include "app/ui/print_msg.h"
 #include "constants/arc.h"
 #include "constants/sound.h"
 #include "constants/text_banks.h"
@@ -38,13 +39,6 @@
 #define WINDOW_COUNT 2
 #define TIMER_COUNT 4
 #define LOAD_COUNT_MAX 8
-
-// The ways to align a text on its x
-enum {
-    ALIGN_LEFT,
-    ALIGN_RIGHT,
-    ALIGN_CENTER,
-};
 
 // The flags of the work
 #define FLAG_WIPE_IN_DONE 0x1
@@ -912,9 +906,9 @@ static void PkwdCount_PrintText(PkwdCountWork *wk, u32 window, s32 x, s32 y, con
 }
 
 static u16 PkwdCount_GetAlignOffset(const StrBuf *strbuf, Font *font, u32 align) {
-    if (align == ALIGN_RIGHT) {
+    if (align == PRINT_ALIGN_RIGHT) {
         return GFL_FontGetBlockWidth(strbuf, font, 0);
-    } else if (align == ALIGN_CENTER) {
+    } else if (align == PRINT_ALIGN_CENTER) {
         return GFL_FontGetBlockWidth(strbuf, font, 0) / 2;
     }
     return 0;
@@ -928,7 +922,7 @@ static void PkwdCount_PrintTitle(PkwdCountWork *wk) {
     StrBuf *tagline;
     StrBuf *buf;
 
-    PkwdCount_PrintText(wk, 0, 0x68, 0, title, ALIGN_CENTER, PRINT_COLOR(1, 2, 0));
+    PkwdCount_PrintText(wk, 0, 0x68, 0, title, PRINT_ALIGN_CENTER, PRINT_COLOR(1, 2, 0));
     GFL_StrBufFree(title);
     lineId = sPkwdCountTaglines[wk->param->movie][wk->param->gender];
     if (wk->param->title != NULL) {
@@ -936,11 +930,11 @@ static void PkwdCount_PrintTitle(PkwdCountWork *wk) {
         GFL_WordSetSetStrbuf(wordSet, 0, wk->param->title, 0, 1, 2);
         tagline = GFL_MsgDataLoadStrbufNew(wk->msgData[0], lineId);
         GFL_WordSetFormatStrbuf(wordSet, buf, tagline);
-        PkwdCount_PrintText(wk, 1, 0x68, 0, buf, ALIGN_CENTER, PRINT_COLOR(1, 2, 0));
+        PkwdCount_PrintText(wk, 1, 0x68, 0, buf, PRINT_ALIGN_CENTER, PRINT_COLOR(1, 2, 0));
         GFL_StrBufFree(tagline);
     } else {
         buf = GFL_MsgDataLoadStrbufNew(wk->msgData[0], lineId);
-        PkwdCount_PrintText(wk, 1, 0x68, 0, buf, ALIGN_CENTER, PRINT_COLOR(1, 2, 0));
+        PkwdCount_PrintText(wk, 1, 0x68, 0, buf, PRINT_ALIGN_CENTER, PRINT_COLOR(1, 2, 0));
     }
     GFL_StrBufFree(buf);
     GFL_WordSetSystemFree(wordSet);

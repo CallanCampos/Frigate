@@ -243,7 +243,7 @@ GameEvent *BeaconView_CreateEvent(BeaconViewWork *work, BOOL enabled) {
         work->unk88 = 0;
         break;
     case BEACON_VIEW_EVENT_GREETING:
-        event = EventPhraseInput_Create(work->gsys, work->field, NULL, 7,
+        event = EventPhraseInput_Create(work->gsys, work->field, NULL, NAME_ENTRY_PASSERBY_MESSAGE,
                                         (u16 *)BeaconStatus_GetGreetingChanged(work->status));
         event = BeaconView_CreateWaitEvent(work, event, EVENT_WAIT_BUTTON, BEACON_VIEW_ACTOR_GREETING);
         break;

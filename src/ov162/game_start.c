@@ -230,7 +230,7 @@ static BOOL NewGame_Init(GameProc *proc, u32 *state, void *param, void *work) {
     wk->onlyCGearQuestion = FALSE;
     wk->config = wk->newConfig;
     wk->playerInfo = wk->newPlayerInfo;
-    wk->nameEntryParam = setupNameEntry(1, 0, 0, 0, 7, 0, 0);
+    wk->nameEntryParam = setupNameEntry(1, NAME_ENTRY_PLAYER, 0, 0, 7, 0, 0);
     wk->procManager = CreateGameProcManager(HEAPID_USER);
 
     // The name entry's and the intro's sounds, loaded now so that they play at once

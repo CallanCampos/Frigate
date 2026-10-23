@@ -1414,7 +1414,7 @@ void FrameList_ScrollBlocking(FrameList *list, int a1) {
     if (a1 > 0) {
         list->waiting = TRUE;
         StartScroll(list, list->setup.layout.speed[0], a1, LIST_STATE_CURSOR_WAIT, FALSE);
-        while (FrameList_Main(list) == -10) {
+        while (FrameList_Main(list) == FRAMELIST_SCROLL) {
         }
         list->waiting = FALSE;
     }

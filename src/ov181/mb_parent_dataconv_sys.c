@@ -263,15 +263,15 @@ static BOOL MBDataConv_Connect(MBDataConv *conv, u32 *seq) {
         }
         break;
     case MB_DATACONV_CONNECT_SEQ_WAIT_DATA:
-        if (MBComm_GetState(conv->comm) == 10) {
+        if (MBComm_GetState(conv->comm) == MB_COMM_STATE_ERROR_1) {
             conv->result = MB_DATACONV_RESULT_CHILD_ERROR_1;
             MBComm_StartDisconnect(conv->comm);
             *seq = MB_DATACONV_CONNECT_SEQ_WAIT_DISCONNECT;
-        } else if (MBComm_GetState(conv->comm) == 11) {
+        } else if (MBComm_GetState(conv->comm) == MB_COMM_STATE_ERROR_2) {
             conv->result = MB_DATACONV_RESULT_CHILD_ERROR_2;
             MBComm_StartDisconnect(conv->comm);
             *seq = MB_DATACONV_CONNECT_SEQ_WAIT_DISCONNECT;
-        } else if (MBComm_GetState(conv->comm) == 12) {
+        } else if (MBComm_GetState(conv->comm) == MB_COMM_STATE_ERROR_3) {
             conv->result = MB_DATACONV_RESULT_CHILD_ERROR_3;
             MBComm_StartDisconnect(conv->comm);
             *seq = MB_DATACONV_CONNECT_SEQ_WAIT_DISCONNECT;

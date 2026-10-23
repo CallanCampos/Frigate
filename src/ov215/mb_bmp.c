@@ -1,5 +1,6 @@
 #include "types.h"
 #include "app/mailbox_local.h"
+#include "app/ui/print_msg.h"
 #include "constants/arc.h"
 #include "gfl/bg_sys.h"
 #include "gfl/bmp.h"
@@ -96,18 +97,12 @@ void MailBox_FreeWindows(MailBoxWork *work) {
     BmpWin_FreeAllocator();
 }
 
-enum {
-    MAILBOX_ALIGN_LEFT,
-    MAILBOX_ALIGN_RIGHT,
-    MAILBOX_ALIGN_CENTER,
-};
-
 // Starts printing a string into the window the state belongs to
 static void MailBox_PrintString(BmpWin *window, StrBuf *str, MailBoxPrintState *state, PrintQueue *queue, int x, int y,
                                 Font *font, u16 color, u32 align) {
-    if (align == MAILBOX_ALIGN_RIGHT) {
+    if (align == PRINT_ALIGN_RIGHT) {
         x -= GFL_FontGetBlockWidth(str, font, 0);
-    } else if (align == MAILBOX_ALIGN_CENTER) {
+    } else if (align == PRINT_ALIGN_CENTER) {
         x -= GFL_FontGetBlockWidth(str, font, 0) / 2;
     }
     PrintQueue_PrintColor(queue, BmpWin_GetBitmap(state->window), x, y, str, font, color);
@@ -146,10 +141,10 @@ void MailBox_DrawMailFrame(MailBoxWork *work, u32 frame, u32 windowIndex, u32 ma
     GFL_BitmapFill(BmpWin_GetBitmap(window), 4);
     if (MailData_GetTrainerGender(mail) == 0) {
         MailBox_PrintString(window, work->view->strbuf, printState, work->view->printQueue, 0, 0, work->font,
-                            PRINT_COLOR(5, 6, 4), MAILBOX_ALIGN_LEFT);
+                            PRINT_COLOR(5, 6, 4), PRINT_ALIGN_LEFT);
     } else {
         MailBox_PrintString(window, work->view->strbuf, printState, work->view->printQueue, 0, 0, work->font,
-                            PRINT_COLOR(7, 8, 4), MAILBOX_ALIGN_LEFT);
+                            PRINT_COLOR(7, 8, 4), PRINT_ALIGN_LEFT);
     }
     BGWinFrame_WriteBmpWin(work->view->frames, frame, window);
     GFL_BitmapFree(tileB);
@@ -161,7 +156,7 @@ void MailBox_PrintTitle(MailBoxWork *work) {
 
     GFL_BitmapFill(BmpWin_GetBitmap(work->view->windows[MAILBOX_WIN_TITLE]), 0);
     MailBox_PrintMessageId(work->view, work->view->msgData, MAILBOX_WIN_TITLE, BtlServerFlow2_Text_Mailbox, 52, 0,
-                           work->font, PRINT_COLOR(1, 2, 0), MAILBOX_ALIGN_CENTER);
+                           work->font, PRINT_COLOR(1, 2, 0), PRINT_ALIGN_CENTER);
     window = work->view->windows[MAILBOX_WIN_TITLE];
     BmpWin_Transfer(window);
 }
@@ -257,7 +252,7 @@ void MailBox_PrintMail(MailBoxWork *work) {
     GFL_StrBufLoadString(work->view->strbuf, MailData_GetTrainerName(work->view->mails[work->mailIndex]));
     MailBox_PrintString(work->view->windows[MAILBOX_WIN_AUTHOR], work->view->strbuf,
                         &work->view->printStates[MAILBOX_WIN_AUTHOR], work->view->printQueue, 0, 2, work->font,
-                        PRINT_COLOR(1, 2, 0), MAILBOX_ALIGN_LEFT);
+                        PRINT_COLOR(1, 2, 0), PRINT_ALIGN_LEFT);
     window = work->view->windows[MAILBOX_WIN_AUTHOR];
     BmpWin_Transfer(window);
 }

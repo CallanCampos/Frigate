@@ -94,16 +94,6 @@ enum {
     WIFIP2PMATCH_STATUS_PLAYING,
 };
 
-// The game modes of a status (WIFI_STATUS_GetGameMode) that have a name here. The eight battles follow
-// WIFIP2PMATCH_GAMEMODE_BATTLE, by battle mode and rule
-enum {
-    WIFIP2PMATCH_GAMEMODE_VCHAT = 4,
-    WIFIP2PMATCH_GAMEMODE_TVT,
-    WIFIP2PMATCH_GAMEMODE_TRADE,
-    WIFIP2PMATCH_GAMEMODE_BATTLE,
-};
-#define WIFIP2PMATCH_GAMEMODE_MAX 15
-
 // The timing number both sides wait for before the state they agreed on
 #define WIFIP2PMATCH_TIMING_SEQ 0x1b
 
@@ -1392,7 +1382,7 @@ const u16 WIFIP2PMATCH_UNK_100 = 100;
 // The detail page's touch bar, with the return button
 static void WifiP2PMatch_CreateTouchBar(WIFIP2PMATCH_WORK *wk, HeapID heapId) {
     TouchBarItem items[] = {
-        { 1, { 232, 168 } },
+        { TOUCHBAR_ICON_RETURN, { 232, 168 } },
     };
     TouchBarSetup setup;
 
@@ -1407,7 +1397,7 @@ static void WifiP2PMatch_CreateTouchBar(WIFIP2PMATCH_WORK *wk, HeapID heapId) {
         setup.objPalette = 12;
         setup.vramType = 2;
         wk->touchBar = TouchBar_Create(&setup, heapId);
-        TouchBar_SetIconKey(wk->touchBar, 1, 0);
+        TouchBar_SetIconKey(wk->touchBar, TOUCHBAR_ICON_RETURN, 0);
     }
 }
 
@@ -6482,7 +6472,7 @@ static BOOL WifiP2PMatch_ViewDetailCloseInput(WIFIP2PMATCH_WORK *wk) {
     }
     if (wk->touchBar != NULL) {
         TouchBar_Main(wk->touchBar);
-        if (TouchBar_GetDecided(wk->touchBar) == 1) {
+        if (TouchBar_GetDecided(wk->touchBar) == TOUCHBAR_ICON_RETURN) {
             return TRUE;
         }
     }
@@ -7066,7 +7056,7 @@ static BOOL WifiP2PMatch_ProcMain(GameProc *proc, u32 *state, void *param, void 
 
     if (GFL_NetIsInitialized()) {
         switch (DWCRapCommon_CheckError(1, 1)) {
-        case 4:
+        case DWCRAP_RESULT_TIMEOUT:
             // The partner was lost: back to the room
             WifiP2PMatch_ClosePartyMenu(wk);
             WifiP2PMatch_FreeWindows(wk);
@@ -7077,7 +7067,7 @@ static BOOL WifiP2PMatch_ProcMain(GameProc *proc, u32 *state, void *param, void 
             wk->timer = 20;
             wk->seq = WIFIP2PMATCH_SEQ_DISCONNECT_WAIT;
             return FALSE;
-        case 2:
+        case DWCRAP_RESULT_FAILED:
             Wipe_SetScreenCovered(0, 0);
             Wipe_SetScreenCovered(1, 0);
             wk->endSeq = 1;

@@ -116,7 +116,7 @@ BOOL s0205_CallGreetingPhraseInput(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     Field *field = GSYS_GetField(gsys);
 
-    ScriptWork_CallEvent(work, EventPhraseInput_Create(gsys, field, NULL, 5, ScriptReadVar(vm, env)));
+    ScriptWork_CallEvent(work, EventPhraseInput_Create(gsys, field, NULL, NAME_ENTRY_GREETING, ScriptReadVar(vm, env)));
     return TRUE;
 }
 
@@ -125,7 +125,7 @@ BOOL s0206_CallThanksPhraseInput(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     Field *field = GSYS_GetField(gsys);
 
-    ScriptWork_CallEvent(work, EventPhraseInput_Create(gsys, field, NULL, 6, ScriptReadVar(vm, env)));
+    ScriptWork_CallEvent(work, EventPhraseInput_Create(gsys, field, NULL, NAME_ENTRY_THANKS, ScriptReadVar(vm, env)));
     return TRUE;
 }
 
@@ -134,7 +134,8 @@ BOOL s02CA_CallHappyPhraseInput(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     Field *field = GSYS_GetField(gsys);
 
-    ScriptWork_CallEvent(work, EventPhraseInput_Create(gsys, field, NULL, 15, ScriptReadVar(vm, env)));
+    ScriptWork_CallEvent(work,
+                         EventPhraseInput_Create(gsys, field, NULL, NAME_ENTRY_HAPPY_MESSAGE, ScriptReadVar(vm, env)));
     return TRUE;
 }
 

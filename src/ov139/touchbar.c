@@ -153,14 +153,14 @@ int TouchBar_GetDecided(TouchBar *bar) {
     if (bar->state == TOUCHBAR_STATE_DONE && bar->selected != -1) {
         return TouchBarIcon_GetId(&bar->icons[bar->selected]);
     }
-    return -1;
+    return TOUCHBAR_ICON_NONE;
 }
 
 u32 TouchBar_GetTouched(TouchBar *bar) {
     if (bar->state == TOUCHBAR_STATE_TOUCHED && bar->selected != -1) {
         return TouchBarIcon_GetId(&bar->icons[bar->selected]);
     }
-    return -1;
+    return TOUCHBAR_ICON_NONE;
 }
 
 BOOL TouchBar_IsTouching(TouchBar *bar) {

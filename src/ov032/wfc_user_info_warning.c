@@ -9,6 +9,7 @@
 #include "gfl/heap.h"
 #include "gfl/key.h"
 #include "gfl/msg.h"
+#include "gfl/net.h"
 #include "gfl/std.h"
 #include "gfl/str.h"
 #include "gfl/ui.h"
@@ -28,13 +29,6 @@
 // The messages of the warning in MSG_FILE_WIFI_ERROR, for a DS and for a DSi
 #define MSG_USER_INFO_ERASED 16
 #define MSG_USER_INFO_ERASED_DSI 42
-
-// The files of the window's graphics in ARCID_ERROR_WINDOW_GRA (save_error.c's)
-enum {
-    ERROR_WINDOW_GRA_PLTT,
-    ERROR_WINDOW_GRA_CHAR,
-    ERROR_WINDOW_GRA_SCRN,
-};
 
 // The message file of Nintendo Wi-Fi Connection's errors in ARCID_SYSTEM_MESSAGE
 #define MSG_FILE_WIFI_ERROR TEXT_BANK_WIFI_ERROR

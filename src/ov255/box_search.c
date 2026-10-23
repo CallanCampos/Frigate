@@ -376,7 +376,7 @@ static const TouchRect data_ov255_021d8f65[] = {
 };
 
 static const FrameListSetup data_ov255_021d8fa8 = {
-    { 2, 255, 14, 0, 16, 3, 3, 0, 12, 3, 1, 24, 12, 8, 6, 4, 3, 5, 21, 0 },
+    { 2, FRAMELIST_BG_NONE, 14, 0, 16, 3, 3, 0, 12, 3, 1, 24, 12, 8, 6, 4, 3, 5, 21, 0 },
     7,
     2,
     0,
@@ -614,7 +614,7 @@ static void BoxSearch_LoadBgGraphics(HeapID heapId) {
 // Creates the bar at the bottom with its return button
 static TouchBar *BoxSearch_CreateTouchBar(BoxSearchWork *wk, ClActUnit *unit, HeapID heapId) {
     TouchBarSetup setup;
-    TouchBarItem item = { 1, { 232, 168 } };
+    TouchBarItem item = { TOUCHBAR_ICON_RETURN, { 232, 168 } };
 
     MI_CpuFill8(&setup, 0, sizeof(TouchBarSetup));
     setup.items = &item;
@@ -952,14 +952,14 @@ static int BoxSearch_SeqSpeciesLetterList(BoxSearchWork *wk, int seq) {
         }
         GFL_SndSEPlay(SEQ_SE_BEEP);
         break;
-    case -11:
-    case -10:
-    case -9:
-    case -8:
+    case FRAMELIST_CURSOR_MOVE:
+    case FRAMELIST_SCROLL:
+    case FRAMELIST_BAR:
+    case FRAMELIST_DRAG:
         ShowListArrows(wk, FALSE);
         break;
-    case -3:
-    case -2:
+    case FRAMELIST_JUMP_TOP:
+    case FRAMELIST_JUMP_BOTTOM:
         FrameList_SetCursor(wk->list, FrameList_GetCursor(wk->list));
         if (wk->param->syswk->search.species == 0) {
             PutCursorAtValue(wk, 11, 8, 0);
@@ -967,11 +967,11 @@ static int BoxSearch_SeqSpeciesLetterList(BoxSearchWork *wk, int seq) {
             ClActor_SetVisible(wk->actors[11], FALSE);
         }
         break;
-    case -7:
+    case FRAMELIST_PAGE_UP:
         return BoxSearch_StartButtonAnm(wk, 34, 12, 4);
-    case -6:
+    case FRAMELIST_PAGE_DOWN:
         return BoxSearch_StartButtonAnm(wk, 35, 13, 4);
-    case -1:
+    case FRAMELIST_NONE:
         if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_SELECT) {
             SetCriterion(wk, CRITERION_SPECIES, 0);
             if (FrameList_GetScroll(wk->list) == 0) {
@@ -1069,16 +1069,16 @@ static int BoxSearch_SeqSpeciesList(BoxSearchWork *wk, int seq) {
             seq = 11;
         }
         break;
-    case -11:
-    case -10:
-    case -9:
-    case -8:
+    case FRAMELIST_CURSOR_MOVE:
+    case FRAMELIST_SCROLL:
+    case FRAMELIST_BAR:
+    case FRAMELIST_DRAG:
         if (GetCaughtGroupCount(wk, wk->group - 1, wk->subGroup) > 7) {
             ShowListArrows(wk, FALSE);
         }
         break;
-    case -3:
-    case -2:
+    case FRAMELIST_JUMP_TOP:
+    case FRAMELIST_JUMP_BOTTOM:
         FrameList_SetCursor(wk->list, FrameList_GetCursor(wk->list));
         ClActor_SetVisible(wk->actors[11], FALSE);
         scroll = FrameList_GetScroll(wk->list);
@@ -1093,17 +1093,17 @@ static int BoxSearch_SeqSpeciesList(BoxSearchWork *wk, int seq) {
             }
         }
         break;
-    case -7:
+    case FRAMELIST_PAGE_UP:
         if (GetCaughtGroupCount(wk, wk->group - 1, wk->subGroup) > 7) {
             return BoxSearch_StartButtonAnm(wk, 34, 12, 10);
         }
         break;
-    case -6:
+    case FRAMELIST_PAGE_DOWN:
         if (GetCaughtGroupCount(wk, wk->group - 1, wk->subGroup) > 7) {
             return BoxSearch_StartButtonAnm(wk, 35, 13, 10);
         }
         break;
-    case -1:
+    case FRAMELIST_NONE:
         if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_SELECT) {
             SetCriterion(wk, CRITERION_SPECIES, 0);
             ClActor_SetVisible(wk->actors[11], FALSE);
@@ -1182,22 +1182,22 @@ static int BoxSearch_SeqNatureList(BoxSearchWork *wk, int seq) {
         GFL_SndSEPlay(SEQ_SE_DECIDE1);
         seq = 14;
         break;
-    case -11:
-    case -10:
-    case -9:
-    case -8:
+    case FRAMELIST_CURSOR_MOVE:
+    case FRAMELIST_SCROLL:
+    case FRAMELIST_BAR:
+    case FRAMELIST_DRAG:
         ShowListArrows(wk, FALSE);
         break;
-    case -3:
-    case -2:
+    case FRAMELIST_JUMP_TOP:
+    case FRAMELIST_JUMP_BOTTOM:
         FrameList_SetCursor(wk->list, FrameList_GetCursor(wk->list));
         PutCursorAtValue(wk, 11, 8, wk->param->syswk->search.nature);
         break;
-    case -7:
+    case FRAMELIST_PAGE_UP:
         return BoxSearch_StartButtonAnm(wk, 34, 12, 13);
-    case -6:
+    case FRAMELIST_PAGE_DOWN:
         return BoxSearch_StartButtonAnm(wk, 35, 13, 13);
-    case -1:
+    case FRAMELIST_NONE:
         if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_SELECT) {
             SetCriterion(wk, CRITERION_NATURE, 0);
             if (FrameList_GetScroll(wk->list) == 0) {
@@ -1280,14 +1280,14 @@ static int BoxSearch_SeqAbilityLetterList(BoxSearchWork *wk, int seq) {
         }
         GFL_SndSEPlay(SEQ_SE_BEEP);
         break;
-    case -11:
-    case -10:
-    case -9:
-    case -8:
+    case FRAMELIST_CURSOR_MOVE:
+    case FRAMELIST_SCROLL:
+    case FRAMELIST_BAR:
+    case FRAMELIST_DRAG:
         ShowListArrows(wk, FALSE);
         break;
-    case -3:
-    case -2:
+    case FRAMELIST_JUMP_TOP:
+    case FRAMELIST_JUMP_BOTTOM:
         FrameList_SetCursor(wk->list, FrameList_GetCursor(wk->list));
         if (wk->param->syswk->search.ability == 0) {
             PutCursorAtValue(wk, 11, 8, 0);
@@ -1295,11 +1295,11 @@ static int BoxSearch_SeqAbilityLetterList(BoxSearchWork *wk, int seq) {
             ClActor_SetVisible(wk->actors[11], FALSE);
         }
         break;
-    case -7:
+    case FRAMELIST_PAGE_UP:
         return BoxSearch_StartButtonAnm(wk, 34, 12, 16);
-    case -6:
+    case FRAMELIST_PAGE_DOWN:
         return BoxSearch_StartButtonAnm(wk, 35, 13, 16);
-    case -1:
+    case FRAMELIST_NONE:
         if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_SELECT) {
             SetCriterion(wk, CRITERION_ABILITY, 0);
             if (FrameList_GetScroll(wk->list) == 0) {
@@ -1396,16 +1396,16 @@ static int BoxSearch_SeqAbilityList(BoxSearchWork *wk, int seq) {
             seq = 23;
         }
         break;
-    case -11:
-    case -10:
-    case -9:
-    case -8:
+    case FRAMELIST_CURSOR_MOVE:
+    case FRAMELIST_SCROLL:
+    case FRAMELIST_BAR:
+    case FRAMELIST_DRAG:
         if (GetAbilityGroupSize(wk->group - 1, wk->subGroup) > 7) {
             ShowListArrows(wk, FALSE);
         }
         break;
-    case -3:
-    case -2:
+    case FRAMELIST_JUMP_TOP:
+    case FRAMELIST_JUMP_BOTTOM:
         FrameList_SetCursor(wk->list, FrameList_GetCursor(wk->list));
         ClActor_SetVisible(wk->actors[11], FALSE);
         scroll = FrameList_GetScroll(wk->list);
@@ -1420,17 +1420,17 @@ static int BoxSearch_SeqAbilityList(BoxSearchWork *wk, int seq) {
             }
         }
         break;
-    case -7:
+    case FRAMELIST_PAGE_UP:
         if (GetAbilityGroupSize(wk->group - 1, wk->subGroup) > 7) {
             return BoxSearch_StartButtonAnm(wk, 34, 12, 22);
         }
         break;
-    case -6:
+    case FRAMELIST_PAGE_DOWN:
         if (GetAbilityGroupSize(wk->group - 1, wk->subGroup) > 7) {
             return BoxSearch_StartButtonAnm(wk, 35, 13, 22);
         }
         break;
-    case -1:
+    case FRAMELIST_NONE:
         if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_SELECT) {
             SetCriterion(wk, CRITERION_ABILITY, 0);
             ClActor_SetVisible(wk->actors[11], FALSE);
@@ -1499,11 +1499,11 @@ static int BoxSearch_SeqSexList(BoxSearchWork *wk, int seq) {
             seq = 26;
         }
         break;
-    case -3:
-    case -2:
+    case FRAMELIST_JUMP_TOP:
+    case FRAMELIST_JUMP_BOTTOM:
         FrameList_SetCursor(wk->list, FrameList_GetCursor(wk->list));
         break;
-    case -1:
+    case FRAMELIST_NONE:
         if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_SELECT) {
             SetCriterion(wk, CRITERION_SEX, 0);
             PutListMarkerAtRow(wk, 11, 0);
@@ -1563,11 +1563,11 @@ static int BoxSearch_SeqItemList(BoxSearchWork *wk, int seq) {
             seq = 29;
         }
         break;
-    case -3:
-    case -2:
+    case FRAMELIST_JUMP_TOP:
+    case FRAMELIST_JUMP_BOTTOM:
         FrameList_SetCursor(wk->list, FrameList_GetCursor(wk->list));
         break;
-    case -1:
+    case FRAMELIST_NONE:
         if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_SELECT) {
             SetCriterion(wk, CRITERION_ITEM, 0);
             PutListMarkerAtRow(wk, 11, 0);
@@ -1643,11 +1643,11 @@ static int BoxSearch_SeqMarkingList(BoxSearchWork *wk, int seq) {
         ShowMarks(wk, 28);
         GFL_SndSEPlay(SEQ_SE_DECIDE1);
         break;
-    case -3:
-    case -2:
+    case FRAMELIST_JUMP_TOP:
+    case FRAMELIST_JUMP_BOTTOM:
         FrameList_SetCursor(wk->list, FrameList_GetCursor(wk->list));
         break;
-    case -1:
+    case FRAMELIST_NONE:
         if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_SELECT) {
             for (i = 0; i < 6; i++) {
                 SetMark(wk, i, FALSE);
@@ -1753,7 +1753,7 @@ static int BoxSearch_SeqUnused3(BoxSearchWork *wk, int seq) {
 // Waits for a button to be animated
 static int BoxSearch_SeqButtonAnmWait(BoxSearchWork *wk, int seq) {
     if (wk->btnActor == -1) {
-        if (TouchBar_GetDecided(wk->touchBar) == TRUE) {
+        if (TouchBar_GetDecided(wk->touchBar) == TOUCHBAR_ICON_RETURN) {
             return wk->nextSeq;
         }
     } else if (ClActor_IsAnimActive(wk->actors[wk->btnActor]) == FALSE) {
@@ -2535,7 +2535,7 @@ static void ClearAllCriteria(BoxSearchWork *wk) {
 
 // Whether the return button or B was pressed
 static BOOL IsReturnPressed(BoxSearchWork *wk) {
-    if (TouchBar_GetTouched(wk->touchBar) == TRUE) {
+    if (TouchBar_GetTouched(wk->touchBar) == TOUCHBAR_ICON_RETURN) {
         return TRUE;
     }
     if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_B) {

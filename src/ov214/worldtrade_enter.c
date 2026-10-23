@@ -27,14 +27,6 @@
 // logging out, through the Wi-Fi login proc; and the text printing the other screens share. The names are ours,
 // guessed
 
-// The modes that the connection screen is entered with
-enum {
-    ENTER_MODE_LOGIN = 0x13,
-    ENTER_MODE_LOGOUT,
-    // Logging in again after an error
-    ENTER_MODE_RELOGIN,
-};
-
 // The connection screen's steps
 enum {
     ENTER_START,
@@ -103,11 +95,11 @@ int WorldTrade_Enter_Init(WorldTradeWork *wk, int seq) {
     GX_SetDispSelect(GX_DISP_SELECT_SUB_MAIN);
 
     switch (wk->subProcessMode) {
-    case ENTER_MODE_LOGIN:
-    case ENTER_MODE_RELOGIN:
+    case WT_MODE_LOGIN:
+    case WT_MODE_RELOGIN:
         wk->subprocessSeq = ENTER_WIFI_LOGIN;
         break;
-    case ENTER_MODE_LOGOUT:
+    case WT_MODE_LOGOUT:
         wk->subprocessSeq = ENTER_WIFI_LOGOUT;
         break;
     }
@@ -335,7 +327,7 @@ static int Enter_WifiConnectionLogin(WorldTradeWork *wk) {
     param->unk20 = Enter_LoginCallback;
     param->unk24 = wk;
     wk->loginSeq = LOGIN_INTERNET_CONNECT;
-    if (wk->subProcessMode == ENTER_MODE_RELOGIN) {
+    if (wk->subProcessMode == WT_MODE_RELOGIN) {
         param->unk14 = 1;
     } else {
         param->unk14 = 0;

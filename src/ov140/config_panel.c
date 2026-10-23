@@ -148,10 +148,6 @@ enum {
     CONFIRM_NO,
 };
 
-// The touch bar's own icons that the screen uses
-#define TOUCHBAR_ICON_CLOSE 0
-#define TOUCHBAR_ICON_CHECK 6
-
 typedef struct {
     s32 x;
     s32 y;

@@ -1,4 +1,5 @@
 #include "types.h"
+#include "app/ui/print_msg.h"
 #include "battle/b_scenario_graphic.h"
 #include "battle/b_scenario_main.h"
 #include "constants/arc.h"
@@ -43,11 +44,6 @@
 #define BG_PAGES 7
 
 #define TEXT_COLOR 0x440
-enum {
-    ALIGN_RIGHT = 1,
-    ALIGN_CENTER,
-};
-
 #define PALETTE_KEEP (-1)
 
 #define FLASH_ACTIVE 0x1
@@ -396,10 +392,10 @@ void BScenarioGraphic_UpdatePrint(BScenarioWork *work) {
 }
 
 static u16 BScenarioGraphic_GetAlignOffset(StrBuf *str, Font *font, u32 align) {
-    if (align == ALIGN_RIGHT) {
+    if (align == PRINT_ALIGN_RIGHT) {
         return GFL_FontGetBlockWidth(str, font, 0);
     }
-    if (align == ALIGN_CENTER) {
+    if (align == PRINT_ALIGN_CENTER) {
         return GFL_FontGetBlockWidth(str, font, 0) >> 1;
     }
     return 0;

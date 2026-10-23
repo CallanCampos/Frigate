@@ -220,7 +220,7 @@ static void WorldTrade_InitWork(WorldTradeWork *wk, WorldTradeParam *param) {
 
     wk->param = param;
     wk->subProcess = WORLDTRADE_ENTER;
-    WorldTrade_SubProcessChange(wk, WORLDTRADE_ENTER, 0x13);
+    WorldTrade_SubProcessChange(wk, WORLDTRADE_ENTER, WT_MODE_LOGIN);
     wk->titleCursorPos = 0;
     wk->search.characterNo = 0;
     wk->search.gender = 3;

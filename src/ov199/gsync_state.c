@@ -47,14 +47,6 @@
 
 #define HEAPID_GSYNC 0x62
 
-// Errors of Game Sync's own, beside the server's
-enum {
-    GSYNC_ERROR_DOWNLOAD = 0xfff0,
-    GSYNC_ERROR_SERVICE_UNAVAILABLE,
-    GSYNC_ERROR_BAD_GATEWAY,
-    GSYNC_ERROR_HTTP,
-};
-
 // The kinds of file Game Sync downloads
 enum {
     GSYNC_DOWNLOAD_CGEAR,

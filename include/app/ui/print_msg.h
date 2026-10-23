@@ -9,9 +9,11 @@
 // print_msg.c, a guessed name: printing a string into a window through the print queue
 
 // How a string is aligned at its x
-#define PRINT_ALIGN_LEFT 0
-#define PRINT_ALIGN_RIGHT 1
-#define PRINT_ALIGN_CENTER 2
+enum {
+    PRINT_ALIGN_LEFT,
+    PRINT_ALIGN_RIGHT,
+    PRINT_ALIGN_CENTER,
+};
 
 // Prints a string into a window through the queue, aligned at x by a PRINT_ALIGN_*
 void PrintStrAligned(PrintWindow *window, PrintQueue *queue, u16 x, u16 y, const StrBuf *strbuf, Font *font, u16 color,

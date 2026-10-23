@@ -105,27 +105,6 @@ enum {
     UPLOAD_SEQ_SERVER_SERVICE_END,
 };
 
-// What the screen was started for
-enum {
-    UPLOAD_MODE_UPLOAD = 7,
-    UPLOAD_MODE_DOWNLOAD,
-    UPLOAD_MODE_EXCHANGE,
-    UPLOAD_MODE_DOWNLOAD_EX,
-    UPLOAD_MODE_SERVER_CHECK,
-    UPLOAD_MODE_POKEMON_EVO_SAVE,
-};
-
-// How the trade demo is started
-enum {
-    DEMO_MODE_UPLOAD = 7,
-    DEMO_MODE_DOWNLOAD,
-    DEMO_MODE_EXCHANGE,
-    DEMO_MODE_DOWNLOAD_EX,
-};
-
-// How the connection screen is started to log in again
-#define ENTER_MODE_RELOGIN 0x15
-
 // The versions of the other color, whose trades earn a medal, and the name that replaces a bad one
 #ifdef BLACK2
 #define OTHER_COLOR VERSION_WHITE
@@ -272,7 +251,7 @@ int WorldTrade_Upload_Init(WorldTradeWork *wk, int seq) {
     Upload_InitWork(wk);
     Upload_BgInit();
     WorldTrade_SubLcdBgInit(wk, 0, FALSE);
-    if (wk->subProcessMode == UPLOAD_MODE_SERVER_CHECK) {
+    if (wk->subProcessMode == WT_MODE_SERVER_CHECK) {
         GFL_BGSysSetBGEnabled(4, FALSE);
         GFL_BGSysSetBGEnabled(6, FALSE);
     }
@@ -423,32 +402,32 @@ static void Upload_FreeWork(WorldTradeWork *wk) {
 
 static int Upload_SubSeqStart(WorldTradeWork *wk) {
     switch (wk->subProcessMode) {
-    case UPLOAD_MODE_UPLOAD:
+    case WT_MODE_UPLOAD:
         Enter_MessagePrintNoStream(wk, wk->msgManager, 0x18, 1, 0xf0f);
         WorldTrade_SetNextSeq(wk, UPLOAD_SEQ_MES_WAIT, UPLOAD_SEQ_EVIL_CHECK_START);
         wk->evilCheckRetry = 0;
         wk->nameCheckNextSeq = UPLOAD_SEQ_UPLOAD_START;
         break;
-    case UPLOAD_MODE_DOWNLOAD:
+    case WT_MODE_DOWNLOAD:
         Enter_MessagePrintNoStream(wk, wk->msgManager, 0x18, 1, 0xf0f);
         WorldTrade_SetNextSeq(wk, UPLOAD_SEQ_MES_WAIT, UPLOAD_SEQ_DOWNLOAD_START);
         break;
-    case UPLOAD_MODE_EXCHANGE:
+    case WT_MODE_EXCHANGE:
         Enter_MessagePrintNoStream(wk, wk->msgManager, 0x18, 1, 0xf0f);
         WorldTrade_SetNextSeq(wk, UPLOAD_SEQ_MES_WAIT, UPLOAD_SEQ_EVIL_CHECK_START);
         wk->evilCheckRetry = 0;
         wk->nameCheckNextSeq = UPLOAD_SEQ_EXCHANGE_START;
         break;
-    case UPLOAD_MODE_DOWNLOAD_EX:
+    case WT_MODE_DOWNLOAD_EX:
         Enter_MessagePrintNoStream(wk, wk->msgManager, 0x18, 1, 0xf0f);
         WorldTrade_SetNextSeq(wk, UPLOAD_SEQ_MES_WAIT, UPLOAD_SEQ_DOWNLOAD_EX_START);
         wk->subOutFlag = 1;
         break;
-    case UPLOAD_MODE_SERVER_CHECK:
+    case WT_MODE_SERVER_CHECK:
         Enter_MessagePrintNoStream(wk, wk->msgManager, 0x18, 1, 0xf0f);
         WorldTrade_SetNextSeq(wk, UPLOAD_SEQ_MES_WAIT, UPLOAD_SEQ_SERVER_TRADE_CHECK);
         break;
-    case UPLOAD_MODE_POKEMON_EVO_SAVE:
+    case WT_MODE_POKEMON_EVO_SAVE:
         Enter_MessagePrintNoStream(wk, wk->msgManager, 0x9a, 1, 0xf0f);
         wk->subprocessSeq = UPLOAD_SEQ_NOW_SAVE_MESSAGE;
         wk->subNextProcess = WORLDTRADE_TITLE;
@@ -1239,27 +1218,27 @@ static int Upload_SubSeqMain(WorldTradeWork *wk) {
 
 static int Upload_SubSeqUploadSuccessMessage(WorldTradeWork *wk) {
     wk->depositFlag = 1;
-    WorldTrade_SubProcessChange(wk, WORLDTRADE_DEMO, DEMO_MODE_UPLOAD);
+    WorldTrade_SubProcessChange(wk, WORLDTRADE_DEMO, WT_MODE_UPLOAD);
     wk->subprocessSeq = UPLOAD_SEQ_END;
     return WT_SEQ_MAIN;
 }
 
 static int Upload_SubSeqDownloadSuccessMessage(WorldTradeWork *wk) {
     wk->depositFlag = 0;
-    WorldTrade_SubProcessChange(wk, WORLDTRADE_DEMO, DEMO_MODE_DOWNLOAD);
+    WorldTrade_SubProcessChange(wk, WORLDTRADE_DEMO, WT_MODE_DOWNLOAD);
     wk->subprocessSeq = UPLOAD_SEQ_END;
     return WT_SEQ_MAIN;
 }
 
 static int Upload_SubSeqExchangeSuccessMessage(WorldTradeWork *wk) {
-    WorldTrade_SubProcessChange(wk, WORLDTRADE_DEMO, DEMO_MODE_EXCHANGE);
+    WorldTrade_SubProcessChange(wk, WORLDTRADE_DEMO, WT_MODE_EXCHANGE);
     wk->subprocessSeq = UPLOAD_SEQ_END;
     return WT_SEQ_MAIN;
 }
 
 static int Upload_SubSeqDownloadExSuccessMessage(WorldTradeWork *wk) {
     wk->depositFlag = 0;
-    WorldTrade_SubProcessChange(wk, WORLDTRADE_DEMO, DEMO_MODE_DOWNLOAD_EX);
+    WorldTrade_SubProcessChange(wk, WORLDTRADE_DEMO, WT_MODE_DOWNLOAD_EX);
     wk->subprocessSeq = UPLOAD_SEQ_SAVE;
     return WT_SEQ_MAIN;
 }
@@ -1382,7 +1361,7 @@ static int Upload_SubSeqErrorMessage(WorldTradeWork *wk) {
     } else {
         WorldTrade_SetNextSeq(wk, UPLOAD_SEQ_MES_WAIT, UPLOAD_SEQ_CANCEL);
     }
-    WorldTrade_SubProcessChange(wk, WORLDTRADE_ENTER, ENTER_MODE_RELOGIN);
+    WorldTrade_SubProcessChange(wk, WORLDTRADE_ENTER, WT_MODE_RELOGIN);
     WorldTrade_TimeIconDel(wk);
     return WT_SEQ_MAIN;
 }
@@ -1393,7 +1372,7 @@ static int Upload_SubSeqErrorEnd(WorldTradeWork *wk) {
     } else {
         wk->subprocessSeq = UPLOAD_SEQ_CANCEL;
     }
-    WorldTrade_SubProcessChange(wk, WORLDTRADE_ENTER, ENTER_MODE_RELOGIN);
+    WorldTrade_SubProcessChange(wk, WORLDTRADE_ENTER, WT_MODE_RELOGIN);
     return WT_SEQ_MAIN;
 }
 
