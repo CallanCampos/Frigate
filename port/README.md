@@ -171,8 +171,9 @@ asm oracle, each spike, the artwork) lists its files there.
 [PLAN.md §4.3](docs/PLAN.md#43-directory-structure) also places `vfs/`, `save/`, `mod/`, `features/`, `net/`, `ui/`,
 `third_party/` and the GPU renderer's `gfx/gpu/` and `gfx/shaders/`, which appear as their phases start. Outside
 `port/`, Frigate's own files are `.github/README.md` (the repository's landing page), `.github/workflows/port-sync.yml`
-(the hourly upstream merge) and `.github/workflows/port-ci.yml` (the host build and tests, plain and sanitized, and the
-macOS distribution build); any other change outside `port/` is a game change listed in
+(the hourly upstream PR proposal) and `.github/workflows/port-ci.yml` (the host build and tests, plain and sanitized, and the
+macOS distribution build), plus `.github/CODEOWNERS`, `.github/CONTRIBUTING.md`, the port PR template and
+`port_*.yml` issue templates. Game-source changes outside these port-owned paths are listed in
 [docs/game-changes.md](docs/game-changes.md).
 
 ## Where to go next
@@ -489,17 +490,12 @@ commits, so a script that runs gh or git itself isn't checked; it backs up CLAUD
 
 ## Syncing with the decomp
 
-Two mechanisms keep this repository on top of upstream; [docs/SYNC.md](docs/SYNC.md) describes both and what to do
-when one stops.
+The hourly `port-sync` Action proposes one upstream merge PR and leaves it unchanged for the owner's review.
+Public PR CI checks compilation and native builds; a local maintainer verifies both ROM SHA1s and host tests before
+merging. Neither automation nor the local sync script pushes `main`. Contributors update from Frigate's reviewed
+`main`, while maintainers use `port/tools/sync_upstream.sh` for dedicated sync PRs and
+`port/tools/sync_upstream.sh --verify-pr NUMBER` to validate a checked-out PR head.
 
-- Every hour, the `port-sync` Action (`.github/workflows/port-sync.yml`) merges upstream's `main` into the port's
-  `main` when the merge is clean and every C file still compiles for both versions. CI has no ROMs, so it can't check
-  the SHA1s. A conflict, a compile failure, a change to upstream's workflows or a rewrite of upstream's history leaves
-  `main` as it was and opens an `upstream-sync` issue.
-- Locally, `port/tools/sync_upstream.sh` merges upstream on top of that, builds both ROMs and checks both SHA1s,
-  builds and tests the host side once `port/CMakeLists.txt` exists, and pushes only when all of it passes. Run it
-  before starting a task and at least daily: upstream lands 150–250 commits a day. Exit status 3 is a merge conflict
-  and 4 an upstream history rewrite.
-
-Why the repository works this way is [ADR 0001](docs/adr/0001-repository-and-upstream-sync.md). Record each local sync
-in [docs/STATUS.md](docs/STATUS.md).
+[docs/SYNC.md](docs/SYNC.md) describes the commands, conflict handling and validation. The decision is
+[ADR 0018](docs/adr/0018-protected-main-and-sync-prs.md); actual GitHub settings are documented in
+[repository policy](docs/REPOSITORY-POLICY.md). Record each local sync in [docs/STATUS.md](docs/STATUS.md).

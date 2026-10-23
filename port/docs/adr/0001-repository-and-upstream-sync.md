@@ -1,6 +1,6 @@
 # 0001: Repository and upstream sync
 
-- **Status:** accepted; amended by [0002](0002-solo-project-no-upstream-posts.md)
+- **Status:** accepted; amended by [0002](0002-solo-project-no-upstream-posts.md); amended by [0018](0018-protected-main-and-sync-prs.md) (PR-only publication and protection)
 - **Date:** 2026-10-16
 - **Plan:** D1 and §4.1; §8, step 1
 - **Upstream:** `462e90193` (merge of PR #345)

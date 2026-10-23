@@ -19,6 +19,7 @@ records keep what was decided or found at the time, and are added to, not rewrit
 | Document | What it covers |
 | --- | --- |
 | [PLAN.md](PLAN.md) | The plan of record: goals, what "native" means, decisions D1 to D11, the architecture, the mod design, verification, the roadmap's phases |
+| [REPOSITORY-POLICY.md](REPOSITORY-POLICY.md) | Enforced main rules, reviews, required checks, Actions permissions and audit commands |
 | [SYNC.md](SYNC.md) | How this repository follows upstream: the hourly Action, the local sync, conflicts, what to do when either stops |
 | [game-changes.md](game-changes.md) | Every change Frigate makes outside `port/`, with its kind, its guard and its proof that the ROMs stay byte for byte |
 | [decomp-findings.md](decomp-findings.md) | Where the decomp's C that the ROM doesn't link behaves differently from the ROM, or is unresolved |
@@ -48,6 +49,7 @@ records keep what was decided or found at the time, and are added to, not rewrit
 | [adr/0014](adr/0014-sanitized-build-game-heaps-poisoned-ds-isms-ignorelisted.md) | The sanitized build: the game's heaps poisoned in place, the DS-isms ignorelisted |
 | [adr/0015](adr/0015-universal-macos-app-for-macos-11.md) | A universal macOS app for macOS 11, with the pinned SDL3 linked statically |
 | [adr/0017](adr/0017-external-contributions.md) | External contributions through forks and PRs, with maintainer sync and ROM verification |
+| [adr/0018](adr/0018-protected-main-and-sync-prs.md) | Protected main and reviewed upstream syncs |
 | [RESEARCH.md](RESEARCH.md) | The research of 2026-10-16 behind the plan, summarized |
 | [research/README.md](research/README.md) | The full research reports, with what each covers |
 | [research/decomp-progress.md](research/decomp-progress.md) | The decomp's C coverage per module, data and pointer coverage, pace, claims |

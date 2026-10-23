@@ -13,10 +13,11 @@ Fork [CallanCampos/Frigate](https://github.com/CallanCampos/Frigate), then clone
 git clone https://github.com/YOUR-USERNAME/Frigate.git
 cd Frigate
 git remote add frigate https://github.com/CallanCampos/Frigate.git
-git switch -c your-topic
+git fetch frigate
+git switch -c your-topic frigate/main
 ```
 
-`origin` is your personal fork; `frigate` is the canonical port. Update from `frigate/main` before starting another
+`origin` is your personal fork; `frigate` is the canonical port. Fetch `frigate` and branch from `frigate/main` before starting another
 change. You do not need a remote for the decomp to contribute to the port. If you add one, keep it fetch-only.
 
 Keep each change focused. Push your topic branch to your fork:
@@ -54,9 +55,36 @@ A contributor without ROMs can submit a draft PR and state that T0 and ROM-depen
 merging, a maintainer must verify both ROM SHA1s and the applicable host tests on the final change.
 
 `port/tools/sync_upstream.sh` and the hourly sync are maintainer tools. Do not run the sync script in a personal fork:
-it expects `origin` to be the canonical repository and publishes to its `main`. Maintainers handle decomp sync and
+it expects `origin` to be the canonical repository and opens a dedicated sync PR. Maintainers handle decomp sync and
 verification; contributors take updates from Frigate's `main`. The maintainer checkout preparation and agent hooks in
 [Preparing a checkout](README.md#preparing-a-checkout) are optional local setup, not prerequisites for a host build.
+
+## Required checks and review
+
+Every change reaches `main` through a PR, including maintainer work and upstream syncs. Main rejects force pushes
+and deletion. Required checks are **Compile src/ and lib/**, **Code standards**, **Frigate CI** (all supported host
+and sanitizer jobs plus sync-tool tests), and **Frigate local verification**. The branch must include the latest
+`main`; new commits require fresh checks and review. Public CI runs automatically for established contributors;
+GitHub may require run approval for first-time contributors with new GitHub accounts. A maintainer inspects code
+and workflow changes before granting a requested run approval. CI uses hosted runners and needs no ROM or App
+secrets. Sync PRs use a dedicated App so their CI also starts automatically; [SYNC.md](docs/SYNC.md) covers setup.
+An automatic or approved CI run does not approve the proposed code.
+
+After reviewing the code, the maintainer checks out the PR head in a separate prepared worktree and runs:
+
+```sh
+gh pr checkout NUMBER --repo CallanCampos/Frigate
+port/tools/sync_upstream.sh --verify-pr NUMBER
+```
+
+This runs both ROM builds and native tests and records success for the tested commit. Contributors do not need
+credentials to set this status. A passing status is not a substitute for reviewing portability changes, incomplete
+functions' matching evidence, or relevant gameplay regressions.
+
+The owner explicitly reviews and approves contributor and bot sync PRs before merge. As the sole maintainer cannot approve their own PR, an owner-only
+exception can bypass review approval through a PR. It cannot bypass CI, the PR requirement, unresolved review threads,
+or history protection. Use it only for owner-authored work; no bot or contributor has bypass access.
+[Repository policy](docs/REPOSITORY-POLICY.md) records the settings and how to audit them.
 
 ## Scope and evidence
 
