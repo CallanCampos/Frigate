@@ -128,7 +128,7 @@ static void add1_be8(u8 *counterEnd);
 static u32 SSLi_Rc4Crypt(CPSSslConnection *ctx, void *buf, u32 len);
 static u32 make_plaintext(CPSSslConnection *ctx, u8 *hdr);
 static u32 make_ciphertext(CPSSslConnection *ctx, u8 *hdr);
-static int tcp_read_raw_nbytes(u8 *dest, u32 len, CPSSoc *soc);
+static int tcp_read_raw_nbytes(u8 *dest, s32 len, CPSSoc *soc);
 static void update_digest(CPSSslConnection *ctx, const u8 *data, u32 len);
 static void parse_record_in_buf(CPSSslConnection *ctx, u8 *record);
 static int parse_record(CPSSoc *soc);
@@ -253,15 +253,13 @@ void CPS_SetSslHandshakePriority(u32 priority) {
 // Applies the configured priority without comparing it to the thread's current priority, returning the old value.
 // An invalid configured value (>= 32) returns UINT32_MAX without calling the thread APIs.
 static u32 enter_computebound(void) {
-    if (sConfig.max_priority >= 0x20) {
-        return (u32)-1;
-    }
-    {
+    if (sConfig.max_priority < 0x20) {
         OSThread *thread = OS_GetCurrentThread();
         u32 old = OS_GetThreadPriority(thread);
         OS_SetThreadPriority(thread, sConfig.max_priority);
         return old;
     }
+    return (u32)-1;
 }
 
 static void exit_computebound(u32 priority) {
@@ -284,14 +282,19 @@ void CPS_SetRootCa(CPSCaInfo **ca, int count) {
 
 // Finds the registered root CA whose distinguished name matches, or NULL
 static const CPSCaInfo *get_rootCA(const CPSSslConnection *ctx, const char *name) {
+    int i = 0;
+    CPSCaInfo **params;
     int count = ctx->named_param_count;
-    int i;
 
-    for (i = 0; i < count; i++) {
-        const CPSCaInfo *param = ctx->named_params[i];
-        if (strcmp(param->dn, name) == 0) {
-            return param;
-        }
+    if (count > 0) {
+        params = ctx->named_params;
+        do {
+            const CPSCaInfo *param = params[i];
+            if (strcmp(param->dn, name) == 0) {
+                return param;
+            }
+            i++;
+        } while (i < count);
     }
     return NULL;
 }
@@ -319,26 +322,26 @@ static s32 cert_item_len(const u8 **cursor) {
 // Appends a certificate name value, separating existing values with ", ". The destination has room for 255 bytes
 // excluding its terminator. byteCount controls copying; a NUL in value does not stop it.
 static void make_dn(char *dest, const char *value, int byteCount) {
-    char *p = dest;
+    char *start = dest;
 
-    if (*p != '\0') {
-        while (*++p != '\0') {
+    if (*dest != '\0') {
+        while (*++dest != '\0') {
         }
         // BUG: At length 254, the delimiter leaves the terminator one byte beyond the 256-byte destination.
 #ifdef BUGFIX
-        if (p - dest >= 0xfe) {
+        if (dest - start >= 0xfe) {
 #else
-        if (p - dest >= 0xff) {
+        if (dest - start >= 0xff) {
 #endif
             return;
         }
-        *p++ = ',';
-        *p++ = ' ';
+        *dest++ = ',';
+        *dest++ = ' ';
     }
-    while (byteCount-- != 0 && p - dest < 0xff) {
-        *p++ = *value++;
+    while (byteCount-- != 0 && dest - start < 0xff) {
+        *dest++ = *value++;
     }
-    *p = '\0';
+    *dest = '\0';
 }
 
 // Packs the calendar date as year:16, month:8, day:8. Time of day is ignored.
@@ -347,14 +350,19 @@ static u32 parse_time(const u8 *digits, int tag) {
     u32 year, month, day;
     digits += 2;
     if (tag == 23) {
-        year = first + (first < 50 ? 2000 : 1900);
+        if (first < 50) {
+            year = first + 2000;
+        } else {
+            year = first + 1900;
+        }
     } else {
         year = first * 100 + (digits[0] * 10 + digits[1] - '0' * 11);
         digits += 2;
     }
     month = digits[0] * 10 + digits[1] - '0' * 11;
+    year = (year << 16) + (month << 8);
     day = digits[2] * 10 + digits[3] - '0' * 11;
-    return (year << 16) + (month << 8) + day;
+    return year + day;
 }
 
 // mode 0 retains the leaf key, mode 1 walks subsequent certificates, and mode 2 extracts
@@ -513,7 +521,7 @@ static int validate_signature(CPSSslConnection *ctx, const CPSCaInfo *key) {
     u16 *sigDigits, *expDigits, *modDigits;
     u8 *decrypted;
     u32 priority;
-    int status = 0;
+    int status;
 
     if (ctx->certificate_signature == NULL || ctx->certificate_signature_len == 0 || key->exponent == NULL ||
         key->exponent_len == 0 || key->modulus == NULL || key->modulus_len == 0) {
@@ -539,10 +547,12 @@ static int validate_signature(CPSSslConnection *ctx, const CPSCaInfo *key) {
     exit_computebound(priority);
     CPSi_char_from_big(decrypted, digits, key->modulus_len, n);
 
+    status = 0;
     if (decrypted[0] == 0 && decrypted[1] == 1) {
         int pos = 2;
-        while (pos < key->modulus_len && decrypted[pos] == 0xff) {
-            pos++;
+        for (; pos < key->modulus_len; pos++) {
+            if (decrypted[pos] != 0xff)
+                break;
         }
         if (pos + 1 >= key->modulus_len || decrypted[pos] != 0 || decrypted[pos + 1] != 0x30 ||
             memcmp(ctx->certificate_digest, decrypted + key->modulus_len - ctx->certificate_digest_len,
@@ -567,20 +577,25 @@ static int auth_cert(CPSSslConnection *ctx) {
     }
     {
         s32 type = ctx->signature_algorithm;
-        const u8 *start = ctx->signed_start;
-        const u8 *end = ctx->signed_end;
 
-        if (type == 3) {
-            CPSi_md5_init(&ctx->handshake_md5_snapshot);
-            CPSi_md5_calc(&ctx->handshake_md5_snapshot, start, end - start);
-            CPSi_md5_result(&ctx->handshake_md5_snapshot, ctx->certificate_digest);
+        switch (type) {
+        case 3: {
+            CPSMd5Ctx *hash = &ctx->handshake_md5_snapshot;
+            CPSi_md5_init(hash);
+            CPSi_md5_calc(hash, ctx->signed_start, ctx->signed_end - ctx->signed_start);
+            CPSi_md5_result(hash, ctx->certificate_digest);
             ctx->certificate_digest_len = 0x10;
-        } else if (type == 4) {
-            CPSi_sha1_init(&ctx->handshake_sha1_snapshot);
-            CPSi_sha1_calc(&ctx->handshake_sha1_snapshot, start, end - start);
-            CPSi_sha1_result(&ctx->handshake_sha1_snapshot, ctx->certificate_digest);
+            break;
+        }
+        case 4: {
+            CPSSha1Ctx *hash = &ctx->handshake_sha1_snapshot;
+            CPSi_sha1_init(hash);
+            CPSi_sha1_calc(hash, ctx->signed_start, ctx->signed_end - ctx->signed_start);
+            CPSi_sha1_result(hash, ctx->certificate_digest);
             ctx->certificate_digest_len = 0x14;
-        } else {
+            break;
+        }
+        default:
             return 3 | flags;
         }
     }
@@ -594,11 +609,11 @@ static int auth_cert(CPSSslConnection *ctx) {
 
 // How many bytes until the next '.' or the end of the string
 static int chars_till_end(const char *host) {
-    int i = 0;
-    while (host[i] != '.' && host[i] != '\0') {
-        i++;
+    const char *start = host;
+    while (*host != '.' && *host != '\0') {
+        host++;
     }
-    return i;
+    return host - start;
 }
 
 // Compares the requested hostname with the certificate pattern (the second
@@ -627,9 +642,7 @@ static int compare_fqdn(const char *host, const char *pattern) {
 // Processes the Certificate message's BE24-length-prefixed chain. The callback can
 // override validation; continuation depends on the original low-byte result as well.
 static void rcv_certificate(CPSSslConnection *ctx, const u8 *body) {
-    int remaining = (body[0] << 16) + (body[1] << 8) + body[2];
-    int index = 0;
-    int mode = 0;
+    int remaining = (((body[0] << 8) + body[1]) << 8) + body[2];
     RTCDate date;
     body += 3;
     ctx->public_key_algorithm = -1;
@@ -638,8 +651,10 @@ static void rcv_certificate(CPSSslConnection *ctx, const u8 *body) {
     ctx->subject[0] = 0;
     ctx->certificate_key.exponent_len = 0;
     ctx->certificate_key.modulus_len = 0;
+    int mode = 0;
+    int index = 0;
     for (;;) {
-        int len = (body[0] << 16) + (body[1] << 8) + body[2];
+        int len = (((body[0] << 8) + body[1]) << 8) + body[2];
         int result, original;
         body += 3;
         remaining -= len + 3;
@@ -678,7 +693,11 @@ static void rcv_certificate(CPSSslConnection *ctx, const u8 *body) {
             mode = 1;
             continue;
         }
-        ctx->state = result == 0 ? SSLI_STATE_CERTIFICATE_ACCEPTED : SSLI_STATE_ERROR;
+        if (result == 0) {
+            ctx->state = SSLI_STATE_CERTIFICATE_ACCEPTED;
+            return;
+        }
+        ctx->state = SSLI_STATE_ERROR;
         return;
     }
 }
@@ -722,9 +741,9 @@ static BOOL has_method(const u8 *data, int count, int width, u32 value) {
     int i;
 
     for (i = 0; i < count; i++, data += width) {
-        u32 entry = (data[0] << 8) | data[1];
+        u32 entry = (data[0] << 8) + data[1];
         if (width == 3) {
-            entry = (entry << 8) | data[2];
+            entry = (entry << 8) + data[2];
         }
         if (entry == value) {
             return TRUE;
@@ -736,7 +755,7 @@ static BOOL has_method(const u8 *data, int count, int width, u32 value) {
 // Picks the first of this connection's offered cipher suites that the count entries of width bytes each in data
 // also list, or 0
 static u16 select_method(const u8 *data, int count, int width) {
-    int i;
+    u32 i;
 
     for (i = 0; i < 2; i++) {
         if (has_method(data, count, width, sConfig.cipher_suites[i])) {
@@ -875,10 +894,11 @@ static void create_ms_sub(u8 *out, const u8 *label, CPSSslConnection *ctx) {
     CPSi_sha1_calc(&ctx->handshake_sha1_snapshot, ctx->client_random, 0x40);
     CPSi_sha1_result(&ctx->handshake_sha1_snapshot, digest);
 
-    CPSi_md5_init(&ctx->handshake_md5_snapshot);
-    CPSi_md5_calc(&ctx->handshake_md5_snapshot, ctx->secret, 0x30);
-    CPSi_md5_calc(&ctx->handshake_md5_snapshot, digest, 0x14);
-    CPSi_md5_result(&ctx->handshake_md5_snapshot, out);
+    CPSMd5Ctx *md5 = &ctx->handshake_md5_snapshot;
+    CPSi_md5_init(md5);
+    CPSi_md5_calc(md5, ctx->secret, 0x30);
+    CPSi_md5_calc(md5, digest, 0x14);
+    CPSi_md5_result(md5, out);
 }
 
 // Turns the pre-master secret (ctx->secret) into the 0x30-byte master secret, overwriting it in place:
@@ -955,41 +975,49 @@ static void rcv_client_key_exchange(CPSSslConnection *ctx, u8 *msg) {
 // Computes the MD5 half of Finished using the sender label and master secret.
 // This destructively finalizes the running transcript; callers save and restore it.
 static void finished_md5(CPSSslConnection *ctx, u8 *out, int sender) {
-    const u8 *label = (ctx->is_server == sender) ? sLabelClient : sLabelServer;
+    CPSMd5Ctx *transcript = &ctx->handshake_md5;
     u8 pad[0x30];
 
     // The caller restores the transcript after this destructive computation.
-    CPSi_md5_calc(&ctx->handshake_md5, label, 4);
-    CPSi_md5_calc(&ctx->handshake_md5, ctx->secret, 0x30);
+    if (ctx->is_server ^ sender) {
+        CPSi_md5_calc(transcript, sLabelServer, 4);
+    } else {
+        CPSi_md5_calc(transcript, sLabelClient, 4);
+    }
+    CPSi_md5_calc(transcript, ctx->secret, 0x30);
     MI_CpuFill8(pad, 0x36, 0x30);
-    CPSi_md5_calc(&ctx->handshake_md5, pad, 0x30);
-    CPSi_md5_result(&ctx->handshake_md5, out);
+    CPSi_md5_calc(transcript, pad, 0x30);
+    CPSi_md5_result(transcript, out);
 
-    CPSi_md5_init(&ctx->handshake_md5);
-    CPSi_md5_calc(&ctx->handshake_md5, ctx->secret, 0x30);
+    CPSi_md5_init(transcript);
+    CPSi_md5_calc(transcript, ctx->secret, 0x30);
     MI_CpuFill8(pad, 0x5c, 0x30);
-    CPSi_md5_calc(&ctx->handshake_md5, pad, 0x30);
-    CPSi_md5_calc(&ctx->handshake_md5, out, 0x10);
-    CPSi_md5_result(&ctx->handshake_md5, out);
+    CPSi_md5_calc(transcript, pad, 0x30);
+    CPSi_md5_calc(transcript, out, 0x10);
+    CPSi_md5_result(transcript, out);
 }
 
 // SHA1 half of Finished; also destroys the running transcript until the caller restores it.
 static void finished_sha1(CPSSslConnection *ctx, u8 *out, int sender) {
-    const u8 *label = (ctx->is_server == sender) ? sLabelClient : sLabelServer;
+    CPSSha1Ctx *transcript = &ctx->handshake_sha1;
     u8 pad[0x28];
 
-    CPSi_sha1_calc(&ctx->handshake_sha1, label, 4);
-    CPSi_sha1_calc(&ctx->handshake_sha1, ctx->secret, 0x30);
+    if (ctx->is_server ^ sender) {
+        CPSi_sha1_calc(transcript, sLabelServer, 4);
+    } else {
+        CPSi_sha1_calc(transcript, sLabelClient, 4);
+    }
+    CPSi_sha1_calc(transcript, ctx->secret, 0x30);
     MI_CpuFill8(pad, 0x36, 0x28);
-    CPSi_sha1_calc(&ctx->handshake_sha1, pad, 0x28);
-    CPSi_sha1_result(&ctx->handshake_sha1, out);
+    CPSi_sha1_calc(transcript, pad, 0x28);
+    CPSi_sha1_result(transcript, out);
 
-    CPSi_sha1_init(&ctx->handshake_sha1);
-    CPSi_sha1_calc(&ctx->handshake_sha1, ctx->secret, 0x30);
+    CPSi_sha1_init(transcript);
+    CPSi_sha1_calc(transcript, ctx->secret, 0x30);
     MI_CpuFill8(pad, 0x5c, 0x28);
-    CPSi_sha1_calc(&ctx->handshake_sha1, pad, 0x28);
-    CPSi_sha1_calc(&ctx->handshake_sha1, out, 0x14);
-    CPSi_sha1_result(&ctx->handshake_sha1, out);
+    CPSi_sha1_calc(transcript, pad, 0x28);
+    CPSi_sha1_calc(transcript, out, 0x14);
+    CPSi_sha1_result(transcript, out);
 }
 
 // Checks the received Finished with the original fixed sender selector 1, restoring the running
@@ -997,17 +1025,17 @@ static void finished_sha1(CPSSslConnection *ctx, u8 *out, int sender) {
 static void rcv_finished(CPSSslConnection *ctx, u8 *msg) {
     u8 computed[0x14];
 
-    ctx->handshake_md5_snapshot = ctx->handshake_md5;
+    MI_CpuCopy8(&ctx->handshake_md5, &ctx->handshake_md5_snapshot, sizeof(ctx->handshake_md5));
     finished_md5(ctx, computed, 1);
-    ctx->handshake_md5 = ctx->handshake_md5_snapshot;
+    MI_CpuCopy8(&ctx->handshake_md5_snapshot, &ctx->handshake_md5, sizeof(ctx->handshake_md5));
     if (memcmp(msg, computed, 0x10) != 0) {
         ctx->state = SSLI_STATE_ERROR;
         return;
     }
 
-    ctx->handshake_sha1_snapshot = ctx->handshake_sha1;
+    MI_CpuCopy8(&ctx->handshake_sha1, &ctx->handshake_sha1_snapshot, sizeof(ctx->handshake_sha1));
     finished_sha1(ctx, computed, 1);
-    ctx->handshake_sha1 = ctx->handshake_sha1_snapshot;
+    MI_CpuCopy8(&ctx->handshake_sha1_snapshot, &ctx->handshake_sha1, sizeof(ctx->handshake_sha1));
     if (memcmp(msg + 0x10, computed, 0x14) != 0) {
         ctx->state = SSLI_STATE_ERROR;
         return;
@@ -1017,11 +1045,12 @@ static void rcv_finished(CPSSslConnection *ctx, u8 *msg) {
 
 // counterEnd is one past an 8-byte big-endian counter; carry is bounded to those eight bytes.
 static void add1_be8(u8 *counterEnd) {
-    int remaining = 8;
+    u32 remaining = 8;
 
     do {
-        --counterEnd;
-        if (++*counterEnd != 0) {
+        u8 value = *--counterEnd + 1;
+        *counterEnd = value;
+        if (value != 0) {
             break;
         }
     } while (--remaining != 0);
@@ -1147,8 +1176,8 @@ static u32 make_ciphertext(CPSSslConnection *ctx, u8 *hdr) {
 
 // Reads exactly len bytes from the socket's TCP stream into dest, waiting across as many reads as it takes; -1 if
 // the connection ends first
-static int tcp_read_raw_nbytes(u8 *dest, u32 len, CPSSoc *soc) {
-    while (len > 0) {
+static int tcp_read_raw_nbytes(u8 *dest, s32 len, CPSSoc *soc) {
+    do {
         u32 avail;
         u8 *data = CPSi_TcpReadRaw(&avail, soc);
 
@@ -1160,9 +1189,9 @@ static int tcp_read_raw_nbytes(u8 *dest, u32 len, CPSSoc *soc) {
         }
         MI_CpuCopy8(data, dest, avail);
         CPSi_SocConsumeRaw(avail, soc);
-        dest += avail;
         len -= avail;
-    }
+        dest += avail;
+    } while (len > 0);
     return 0;
 }
 
@@ -1584,13 +1613,12 @@ static void send_client_key_exchange(CPSSoc *soc) {
     CPSiFree(padded);
 }
 
-// Waits for the server's ChangeCipherSpec and Finished, in that order; TRUE if the connection ended first (the
-// Finished check itself sets ctx->state to an error rather than failing this)
+// Requires the server's ChangeCipherSpec and Finished in that order. TRUE reports an unexpected state or an error.
 static BOOL mustget_change_cipher_spec_and_finished(CPSSoc *soc) {
-    if (parse_record(soc) == SSLI_STATE_ERROR) {
+    if (parse_record(soc) != SSLI_STATE_EXPECT_FINISHED) {
         return TRUE;
     }
-    if (parse_record(soc) == SSLI_STATE_ERROR) {
+    if (parse_record(soc) != SSLI_STATE_FINISHED_VERIFIED) {
         return TRUE;
     }
     return FALSE;
@@ -1752,7 +1780,7 @@ s32 CPSi_SslGetLength(CPSSoc *soc) {
     if (ctx->read_buf != NULL && ctx->application_record_ready) {
         return (s32)(ctx->read_buf_len - ctx->read_buf_pos);
     }
-    if (ctx->read_buf == NULL && soc->state == CPS_STT_ESTABLISHED && ctx->state == SSLI_STATE_ERROR) {
+    if (ctx->read_buf == NULL && (soc->state != CPS_STT_ESTABLISHED || ctx->state == SSLI_STATE_ERROR)) {
         return -1;
     }
     return 0;

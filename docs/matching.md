@@ -8,6 +8,15 @@ tools that show the differences.
 
 ## Registers
 
+- Repeated hash operations can retain one typed context pointer for a digest phase. NitroWiFi's `create_ms_sub`
+  and `auth_cert` match with borrowed `CPSMd5Ctx *` or `CPSSha1Ctx *` locals used by every operation in that phase.
+  `finished_md5` and `finished_sha1` also keep that pointer and call each sender-label branch directly.
+- NitroWiFi's `CPSi_big_modinv` derives each adjacent scratch region from the preceding region with a typed pointer
+  addition. Computing every region separately from the scratch base changes the saved pointers and frame.
+- NitroWiFi's `CPSi_char_from_big` reloads its input digit after writing the low byte only with the recovered mutable
+  `u16 *` source type and an advancing destination parameter. Both callers supply mutable allocated digit buffers.
+  This is observed MWCC alias behavior for this function, rather than a general guarantee about `const` in C.
+
 - DWC's `DWCi_QR2ServerKeyCallback` shares an `int value` between its node-count and suspension queries,
   assigning the suspension field before passing it to `qr2_buffer_add_int`. This preserves the original field-load
   lifetime while naming the numeric query result rather than introducing a one-case matching temporary.
@@ -1207,6 +1216,10 @@ Same code, other `sp` offsets or frame size.
 
 ## Instruction order
 
+- NitroWiFi's `send_ping` snapshots the current `u16` sequence after initializing the ICMP header. The socket port
+  receives that value, the global advances, and the packet receives the saved value. Chained postincrement changes
+  the order of the stores; the meaningful local preserves the value being serialized across the state update.
+
 - A `volatile` field is loaded in source order and never reused: NitroWiFi's `SOCLi_GetWriteBufferFreeSize` loads
   `write_pos` before `read_pos`, as the original does, only with `write_pos` `volatile` (the writers move it while the
   pipe's thread reads it); `read_pos` needs none.
@@ -1813,6 +1826,9 @@ Same instructions, scheduled in another order.
   inline against the SDK's own definition before writing a local copy with its terms swapped.
 
 ## An instruction too many or too few
+
+- NitroWiFi's `rcv_finished` saves and restores whole transcript contexts with explicit `MI_CpuCopy8` calls.
+  Structure assignment changes the runtime-copy shape and frame even though it expresses the same snapshot.
 
 - `field_msgbg.c`'s `CalcMsgWindowDimensions` keeps `adds r0, r0, #0` after the font-height call when its pixel
   bounds include both components of a local text origin, assigned field by field by an inline initializer. The
@@ -2531,6 +2547,10 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 
 ## Branches and block layout
 
+- A near match can still contain a wrong branch condition. NitroWiFi's `CPSi_SslGetLength` differed by one branch
+  byte because its terminal socket condition used AND where the ROM requires OR. Check the destinations and return
+  values of conditional branches before treating a small difference as register allocation.
+
 - An early exit with its own call, `if (work == NULL) { OS_RestoreInterrupts(irq); return 0; }`, then straight-line
   code, where one condition (`work != NULL && ...`) with one shared restore is 8 bytes short: NitroWiFi's
   `WCM_CountApList` and `WCM_ClearApList`. A `result` local returned once, `result = f(...); return result;`,
@@ -2945,6 +2965,12 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   its key ID as a `u8`, which GameSpy's prototype doesn't.
 
 ## Loops
+
+- NitroWiFi's `CPSi_big_power` and `CPSi_big_montpower` use a signed bit index with an unsigned loop bound: the
+  index supplies the arithmetic digit-index shift, and the bound supplies the unsigned loop comparison. The first
+  matches with `s32 bit` and `unsigned int totalBits`, the second with `int bit` and `u32 totalBits`; SDK `u32` is
+  `unsigned long`, a distinct MWCC type. The earlier apparent signedness conflict disappears when the index and
+  bound are recovered separately.
 
 - A field that the loop's test reads, kept in a register for the body where the original loads it again, can be an
   enum: MWCC reuses a loaded `int` field across the loop's head, but not an enum-typed one passed to a function whose

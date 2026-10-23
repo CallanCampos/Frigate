@@ -7,6 +7,13 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 ## Registers swapped
 
+- Rebuilt hash-context offsets across a digest phase: borrow a typed context pointer for all its operations.
+  (matching.md: "one typed context pointer for a digest phase")
+- Adjacent scratch partitions in different saved registers: derive each typed region from its predecessor.
+  (matching.md: "derives each adjacent scratch region")
+- Missing digit reload after a byte store: check the inferred pointer qualification against mutable callers.
+  (matching.md: "observed MWCC alias behavior")
+
 - A numeric query field copied through an extra register: share the meaningful query-result local with the
   count case (`DWCi_QR2ServerKeyCallback`). (matching.md: "shares an `int value`")
 - A selected record header coalesced with the payload cursor: advance the cursor before reading the saved
@@ -341,6 +348,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 ## Instructions in another order (scheduling)
 
+- Packet sequence stores in another order: snapshot the current sequence across the global increment.
+  (matching.md: "snapshots the current `u16` sequence")
+
 - Two field loads in the other order, with every other instruction right: the field the original loads first may be
   `volatile`; prove it by probing without it. (matching.md: "A `volatile` field is loaded in source order")
 - A swapped scalar's byte-copy address or registers differ: a `const u8 *` object-representation view with fixed
@@ -524,6 +534,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
   use of the incremented value gets its own copy of the sum. (matching.md: "whose only use is the copy")
 
 ## An instruction too many or too few
+
+- Context snapshot copy calls differ: recover explicit SDK copies (`rcv_finished`).
+  (matching.md: "saves and restores whole transcript contexts")
 
 - A zero text-origin component missing from measured bounds: `CalcMsgWindowDimensions` shares a paired origin's
   field-by-field inline initializer with printer placement. (matching.md: "bounds include both components")
@@ -724,6 +737,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 ## Branches and block layout
 
+- A single conditional-branch byte differs: verify both destinations and return values before tuning allocation.
+  (matching.md: "A near match can still contain a wrong branch condition")
+
 - An early exit 8 bytes short, or a call's result returned through another layout: give the exit its own call
   and return, or return through a `result` local. (matching.md: "An early exit with its own call")
 - A flag set in several cases and tested at the end to pick a shared block, where the original branches straight to
@@ -810,6 +826,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
   (matching.md: "ends in a single `return NULL;`")
 
 ## Loops
+
+- Signed digit shift but unsigned exponent-loop comparison: recover the signed index and unsigned bound separately
+  (`CPSi_big_power`, `CPSi_big_montpower`). (matching.md: "signed bit index with an unsigned loop bound")
 
 - An unrolled loop over tables with the wrong registers and spills: step the tables by pointer (`*p++`) instead of
   indexing them. (matching.md: "A table read in an unrolled loop")
