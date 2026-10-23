@@ -129,7 +129,7 @@ void PhotoSign_FlushCache(const void *addr, u32 size) {
 
 // Writes back the lines the buffer shares at its ends before discarding it
 void PhotoSign_InvalidateCache(void *addr, u32 size) {
-    u32 end;
+    uptr end;
 
     if (size < IC_RANGE_MAX) {
         IC_InvalidateRange(addr, size);
@@ -137,8 +137,8 @@ void PhotoSign_InvalidateCache(void *addr, u32 size) {
         IC_InvalidateAll();
     }
     if (size < DC_RANGE_MAX) {
-        end = (u32)addr + size;
-        if ((u32)addr & CACHE_LINE_MASK) {
+        end = (uptr)addr + size;
+        if ((uptr)addr & CACHE_LINE_MASK) {
             DC_StoreRange(addr, 1);
         }
         if (end & CACHE_LINE_MASK) {

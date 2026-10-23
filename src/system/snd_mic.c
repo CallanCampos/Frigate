@@ -98,5 +98,5 @@ void SndMic_EncodeChatter(void *chatter) {
 
 // The buffer from its first 32-byte boundary
 static void *SndMic_GetAlignedBuffer(void) {
-    return (void *)(((u32)sSndMic->buffer + 0x1f) & ~0x1f);
+    return (void *)(((uptr)sSndMic->buffer + 0x1f) & ~0x1f);
 }

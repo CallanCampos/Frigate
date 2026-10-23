@@ -92,7 +92,7 @@ static void func_0270633c(u32 address, u8 *dst, u32 length) {
         address++;
         length--;
     }
-    if (((u32)dst & 1) == 0) {
+    if (((uptr)dst & 1) == 0) {
         u32 even = length & ~1;
         if (even != 0) {
             DSPi_ReadWords((u16 *)dst, address >> 1, even >> 1);
@@ -136,7 +136,7 @@ static void func_02706694(u32 address, const u8 *src, u32 length) {
         address++;
         length--;
     }
-    if (((u32)src & 1) == 0) {
+    if (((uptr)src & 1) == 0) {
         u32 even = length & ~1;
         if (even != 0) {
             DSPi_WriteWords(address >> 1, (const u16 *)src, even >> 1);

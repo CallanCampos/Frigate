@@ -350,12 +350,12 @@ void CPS_SetThreadPriority(u32 priority) {
 // calc_checksum_do: adds the 16-bit words of data to sum, in ones' complement
 static u32 calc_checksum_do(void *data, u32 len, u32 sum) {
     u32 *p = data;
-    u32 align = (u32)data & 3;
+    u32 align = (uptr)data & 3;
     u32 acc = 0;
     u32 word;
 
     if (align != 0) {
-        p = (u32 *)((u32)p & ~3);
+        p = (u32 *)((uptr)p & ~3);
         word = *p;
         p++;
         switch (align) {
