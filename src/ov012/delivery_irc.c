@@ -22,7 +22,6 @@ typedef struct {
     u32 mask;
 } DeliveryIrcWanted;
 
-typedef struct DeliveryIrcWork DeliveryIrcWork;
 typedef void (*DeliveryIrcSeq)(void *work);
 
 struct DeliveryIrcWork {
@@ -337,7 +336,7 @@ static void DeliveryIrc_SeqWaitNetInit(void *work) {
     }
 }
 
-void *DeliveryIrc_Init(const DeliveryIrcInit *init) {
+DeliveryIrcWork *DeliveryIrc_Init(const DeliveryIrcInit *init) {
     DeliveryIrcWork *pWork = GFL_HeapAllocate(init->heapId, sizeof(DeliveryIrcWork), TRUE, "delivery_irc.c", 461);
 
     MI_CpuCopy8(init, &pWork->aInit, sizeof(DeliveryIrcInit));
@@ -353,8 +352,7 @@ static BOOL DeliveryIrc_InitNet(DeliveryIrcWork *pWork) {
     return TRUE;
 }
 
-BOOL DeliveryIrc_RecvStart(void *work) {
-    DeliveryIrcWork *pWork = work;
+BOOL DeliveryIrc_RecvStart(DeliveryIrcWork *pWork) {
     BOOL started = DeliveryIrc_InitNet(pWork);
 
     pWork->isSender = FALSE;
@@ -365,21 +363,17 @@ BOOL DeliveryIrc_RecvStart(void *work) {
     return started;
 }
 
-u8 DeliveryIrc_GetResult(void *work) {
-    DeliveryIrcWork *pWork = work;
-
+u8 DeliveryIrc_GetResult(DeliveryIrcWork *pWork) {
     return pWork->result;
 }
 
-void DeliveryIrc_Main(void *work) {
-    DeliveryIrcWork *pWork = work;
-
+void DeliveryIrc_Main(DeliveryIrcWork *pWork) {
     if (pWork->seq != NULL) {
         pWork->seq(pWork);
     }
 }
 
-void DeliveryIrc_End(void *work) {
+void DeliveryIrc_End(DeliveryIrcWork *work) {
     GFL_HeapFree(work);
     GFL_NetExit(NULL);
 }

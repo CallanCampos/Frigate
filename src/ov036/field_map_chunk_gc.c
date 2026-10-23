@@ -78,8 +78,10 @@ void FieldChunkAccessor_GC_GetTerrain(MapTerrainSamplerOutput *out, const void *
     MapTerrainSamplerOutput terrain;
 
     MI_CpuFill8(&terrain, 0, sizeof(terrain));
-    FieldChunkAccessor_GetTerrainCore(&terrain, 0, (u8 *)file + file->terrainOffsets[0], pos, size, baseY);
-    FieldChunkAccessor_GetTerrainCore(&terrain, 1, (u8 *)file + file->terrainOffsets[1], pos, size, baseY);
+    FieldChunkAccessor_GetTerrainCore(&terrain, 0, (MapHeightData *)((u8 *)file + file->terrainOffsets[0]), pos, size,
+                                      baseY);
+    FieldChunkAccessor_GetTerrainCore(&terrain, 1, (MapHeightData *)((u8 *)file + file->terrainOffsets[1]), pos, size,
+                                      baseY);
     *out = terrain;
     out->layerCount = 2;
 }
@@ -90,7 +92,8 @@ void FieldChunkAccessor_GC_GetTerrainBaseLayer(MapTerrainSamplerOutput *out, con
     MapTerrainSamplerOutput terrain;
 
     MI_CpuFill8(&terrain, 0, sizeof(terrain));
-    FieldChunkAccessor_GetTerrainCore(&terrain, 0, (u8 *)file + file->terrainOffsets[0], pos, size, baseY);
+    FieldChunkAccessor_GetTerrainCore(&terrain, 0, (MapHeightData *)((u8 *)file + file->terrainOffsets[0]), pos, size,
+                                      baseY);
     *out = terrain;
     out->layerCount = 1;
 }

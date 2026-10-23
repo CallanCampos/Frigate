@@ -71,8 +71,7 @@ u32 ValidateDreamRadarSave(CygnusSaveData *data) {
     return CYGNUS_DATA_BROKEN;
 }
 
-void CygnusSaveData_Store(void *data, u32 seed, u32 received) {
-    CygnusSaveData *cygnus = data;
+void CygnusSaveData_Store(CygnusSaveData *cygnus, u32 seed, u32 received) {
     u32 mask = getNextSeed(seed) >> 32;
 
     if (cygnus->seed == 0) {

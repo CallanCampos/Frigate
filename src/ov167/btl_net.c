@@ -40,12 +40,12 @@ typedef struct {
 } BtlNetVersions;
 
 // Command 0x104: a party sent for one client, the header then the data
-typedef struct {
+struct BtlNetPartyPacket {
     // 4 for none
     u32 clientId : 8;
     u32 size : 24;
     u8 data[];
-} BtlNetPartyPacket;
+};
 
 typedef struct {
     NetHandle *netHandle;
@@ -375,9 +375,7 @@ void BtlNet_EndChatterExchange(void) {
 }
 
 // Sends a party for one client to everyone
-BOOL BtlNet_SendPartyPacket(void *data) {
-    BtlNetPartyPacket *packet = data;
-
+BOOL BtlNet_SendPartyPacket(BtlNetPartyPacket *packet) {
     return GFL_NetSendCommandToMachine(sWork->netHandle, 0xff, 0x104, packet->size + sizeof(BtlNetPartyPacket), packet,
                                        0, 1, 1);
 }

@@ -29,14 +29,14 @@ typedef struct {
 } LiveMatchOpponent;
 
 // The results of the live competition (livematch_savedata.c)
-typedef struct {
+struct LiveMatchData {
     // The console the competition was entered on
     u8 macAddress[BATTLEMATCH_MAC_ADDRESS_SIZE];
     // The first is the number of opponents
     u8 counts[4];
     // A ring of the last opponents
     LiveMatchOpponent opponents[LIVEMATCH_OPPONENT_MAX];
-} LiveMatchData; // size: 0x5a
+}; // size: 0x5a
 
 // Block 0x3b (battlematch_savedata.c)
 struct RecordSave {
@@ -103,10 +103,10 @@ u32 LiveMatchData_GetCount(void *results, u32 index);
 
 // rndmatch_savedata.c
 void RndMatchData_Init(void *results);
-u16 RndMatchData_GetParam(void *results, u32 index, u32 field);
+u16 RndMatchData_GetParam(RndMatchData *results, u32 index, u32 field);
 // Sets a field of a result, from 0 to 0xffff
-void RndMatchData_SetParam(void *results, u32 index, u32 field, s32 value);
+void RndMatchData_SetParam(RndMatchData *results, u32 index, u32 field, s32 value);
 // Adds 1 to a field of a result, up to 0xffff
-void RndMatchData_IncParam(void *results, u32 index, u32 field);
+void RndMatchData_IncParam(RndMatchData *results, u32 index, u32 field);
 
 #endif // POKEBW2_SAVE_RECORDS_H

@@ -87,7 +87,7 @@ void DreamRadar_WriteSaveData(void);
 // Checks the data and decodes its 32 words with the seed. Returns 2 when the data is valid
 u32 CygnusSaveData_Load(void *data, u32 seed, u32 *words);
 // Marks the data read with a new seed and the Pokémon received
-void CygnusSaveData_Store(void *data, u32 seed, u32 received);
+void CygnusSaveData_Store(CygnusSaveData *data, u32 seed, u32 received);
 // The Pokémon that a word of the data names, if any: its bit in the Pokémon received, its species, form and sex
 BOOL DreamRadar_IsPokemonWord(u32 word);
 u32 DreamRadar_GetPokemonBit(u32 word);

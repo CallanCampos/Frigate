@@ -31,7 +31,7 @@ enum {
 // The fields of a team's record, for TournamentTeam_GetField
 enum { TOURNAMENT_TEAM_SPECIES, TOURNAMENT_TEAM_FORM, TOURNAMENT_TEAM_HAS_ITEM, TOURNAMENT_TEAM_GENDER };
 
-typedef struct {
+struct TournamentEntry {
     Regulation regulation;
     // The game versions that may enter, a bit for each
     u32 versionMask;
@@ -53,7 +53,7 @@ typedef struct {
     u8 allowRematch;
     // getCRC16 of everything before it
     u16 crc;
-} TournamentEntry; // size: 0x160
+}; // size: 0x160
 
 // The Pokémon of a team entered
 typedef struct {
@@ -65,31 +65,31 @@ typedef struct {
     u8 unk14[0xa];
 } TournamentTeam; // size: 0x1e
 
-typedef struct {
+struct TournamentBlock {
     TournamentEntry entries[TOURNAMENT_ENTRY_MAX];
     TournamentTeam teams[TOURNAMENT_ENTRY_MAX];
-} TournamentBlock; // size: 0x2fc
+}; // size: 0x2fc
 
 u32 getSizeofTourneyBlock(void);
 // An entry's regulation, which is the entry itself, and a parameter of the regulation. The battle type is 0x15
 Regulation *TournamentEntry_GetRegulation(void *entry);
 // The entry's data of 0x92 bytes
-void *TournamentEntry_GetCardData(void *entry);
+void *TournamentEntry_GetCardData(TournamentEntry *entry);
 // An entry's field, and setting it. The Wi-Fi login reads field 2 and field 10 and sets field 10
 u32 TournamentEntry_GetField(void *entry, u32 field);
 void TournamentEntry_SetField(void *entry, u32 field, u32 value);
 // Checks the CRC of an entry
-BOOL TournamentEntry_CheckCRC(void *entry);
+BOOL TournamentEntry_CheckCRC(TournamentEntry *entry);
 // The CRC16 of the first 0x15e bytes of an entry
 u16 CRC16_350bytes(const void *entry);
 // An entry of the block
-void *TournamentBlock_GetEntry(void *block, u32 index);
+void *TournamentBlock_GetEntry(TournamentBlock *block, u32 index);
 // Copies an entry into the block
-void TournamentBlock_SetEntry(void *block, u32 index, const void *entry);
+void TournamentBlock_SetEntry(TournamentBlock *block, u32 index, const void *entry);
 // Clears a team's record
 void TournamentTeam_Clear(void *record);
 // The block's other entries, of 0x1e bytes
-void *TournamentBlock_GetTeam(void *block, u32 index);
+void *TournamentBlock_GetTeam(TournamentBlock *block, u32 index);
 // A field of the Pokémon number index of such an entry: the species (0), the form (1), whether it holds an item (2)
 // and its gender (3)
 u32 TournamentTeam_GetField(void *record, u32 field, u8 index);

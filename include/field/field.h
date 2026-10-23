@@ -68,8 +68,8 @@ u32 func_ov036_021aece0(GameSystem *gsys, u32 a1, Regulation *regulation, HeapID
 // The screen that picks the party or the Battle Box for a battle, whether it is done, and the choice
 void *func_ov036_021c3180(Field *field, PokeParty *party, PokeParty *battleBoxParty, u8 partyOk, u32 battleBoxOk,
                           HeapID heapId);
-BOOL func_ov036_021c3278(void *select);
-int func_ov036_021c3218(void *select, u32 *a1);
+BOOL func_ov036_021c3278(PartySelectList *select);
+int func_ov036_021c3218(PartySelectList *select, u32 *a1);
 void *func_ov036_021c6574(void *effects, u32 a1, const VecFx32 *pos);
 void func_ov036_021c65a8(void *obj, u16 a1);
 void func_ov036_021c65e8(void *obj, u16 a1);
@@ -87,13 +87,13 @@ void Field_DeleteGimmickWorkBlock(Field *field, u32 id);
 // A list of areas of the map, which the list's entry index sets: a grid rectangle, a value and flags
 void *func_ov036_021ba5d0(u32 count, u8 heapId);
 void func_ov036_021ba624(u8 index, u32 x, u32 z, u32 width, u32 depth, u32 value, u32 flags, void *list);
-void func_ov036_021ba670(void *list);
+void func_ov036_021ba670(HeightExList *list);
 u32 func_ov036_021ba684(void *list);
-BOOL func_ov036_021ba688(s32 x, s32 z, void *list, u8 index);
-u32 func_ov036_021ba6a4(u8 index, void *list);
-u32 func_ov036_021ba6b0(u8 index, void *list);
+BOOL func_ov036_021ba688(s32 x, s32 z, HeightExList *list, u8 index);
+u32 func_ov036_021ba6a4(u8 index, HeightExList *list);
+u32 func_ov036_021ba6b0(u8 index, HeightExList *list);
 // Sets whether the entry at index is in use, which func_ov036_021ba624 checks before it fills one in
-void func_ov036_021ba6bc(u8 index, BOOL inUse, void *list);
+void func_ov036_021ba6bc(u8 index, BOOL inUse, HeightExList *list);
 // Overlay 36's field_fade.c: whether a grid position is in the rectangle of an entry of the list
 BOOL func_ov036_021ba594(s32 x, s32 z, const void *entry);
 // The mapper's WFBC work

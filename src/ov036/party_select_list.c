@@ -27,7 +27,7 @@
 
 #define PARTY_SELECT_LIST_MAX 6
 
-typedef struct {
+struct PartySelectList {
     Field *field;
     PokeParty *temoti;
     PokeParty *bbox;
@@ -56,7 +56,7 @@ typedef struct {
     int cursor;
     u8 state;
     u8 finish;
-} PartySelectList;
+};
 
 static void PartySelectList_CreateMessages(PartySelectList *psl);
 static void PartySelectList_LoadIconResources(PartySelectList *psl);
@@ -131,8 +131,7 @@ void *func_ov036_021c3180(Field *field, PokeParty *temoti, PokeParty *bbox, u8 p
     return psl;
 }
 
-int func_ov036_021c3218(void *select, u32 *out) {
-    PartySelectList *psl = select;
+int func_ov036_021c3218(PartySelectList *psl, u32 *out) {
     int result = PartySelectList_GetResult(psl, out);
 
     // clang-format off
@@ -149,9 +148,7 @@ int func_ov036_021c3218(void *select, u32 *out) {
     return result;
 }
 
-BOOL func_ov036_021c3278(void *select) {
-    PartySelectList *psl = select;
-
+BOOL func_ov036_021c3278(PartySelectList *psl) {
     switch (psl->state) {
     case 0:
         PartySelectList_CreateMessageWindow(psl);

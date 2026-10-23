@@ -167,7 +167,7 @@ NNSGfdPlttKey GFL_G3DResGetPltVRAMHandle(void *resource);
 void *GFL_G3DResGetTexImageData(void *resource);
 void *GFL_G3DResGetTexPaletteData(void *resource);
 void *GFL_G3DResGetResData(void *resource);
-void GFL_G3DResFree(void *resource);
+void GFL_G3DResFree(G3DResource *resource);
 // The size of a resource's header, which GFL_G3DResSetup fills in
 u32 GFL_G3DResGetAllocSize(void);
 void GFL_G3DResSetup(void *resource, void *data);
@@ -178,7 +178,7 @@ void GFL_G3DMdlFree(G3DModel *model);
 void *GFL_G3DMdlGetMdlResource(G3DModel *model);
 void *GFL_G3DMdlGetTexResource(G3DModel *model);
 void *GFL_G3DAnmCreate(G3DModel *model, void *resource, u32 a2);
-void GFL_G3DAnmFree(void *animation);
+void GFL_G3DAnmFree(G3DAnimation *animation);
 NNSG3dAnmObj *GFL_G3DAnmGetRenderObj(void *animation);
 G3DActor *GFL_G3DActorCreate(G3DModel *model, void **animations, int count);
 void GFL_G3DActorFree(G3DActor *actor);

@@ -14,26 +14,18 @@ void PokedexSkinSave_Init(void *block) {
     MI_CpuFill8(block, 0, PokedexSkinSave_GetSize());
 }
 
-void *PokedexSkinSave_GetChars(void *block) {
-    PokedexSkinSave *skin = block;
-
+void *PokedexSkinSave_GetChars(PokedexSkinSave *skin) {
     return skin->chars;
 }
 
-void *PokedexSkinSave_GetPalette(void *block) {
-    PokedexSkinSave *skin = block;
-
+void *PokedexSkinSave_GetPalette(PokedexSkinSave *skin) {
     return skin->palette;
 }
 
-BOOL PokedexSkinSave_IsValid(void *block) {
-    PokedexSkinSave *skin = block;
-
+BOOL PokedexSkinSave_IsValid(PokedexSkinSave *skin) {
     return skin->valid;
 }
 
-void PokedexSkinSave_SetValid(void *block, u32 valid) {
-    PokedexSkinSave *skin = block;
-
+void PokedexSkinSave_SetValid(PokedexSkinSave *skin, u32 valid) {
     skin->valid = valid;
 }

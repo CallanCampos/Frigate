@@ -28,39 +28,29 @@ void *FestRecords_GetFromSave(SaveControl *save) {
     return SaveControl_GetBlockPtr(save, SAVE_BLOCK_FUNFEST);
 }
 
-u16 FestRecords_GetHosted(void *a0) {
-    FunfestSave *save = a0;
-
+u16 FestRecords_GetHosted(FunfestSave *save) {
     return save->hosted;
 }
 
-u16 FestRecords_AddHosted(void *records) {
-    FunfestSave *save = records;
-
+u16 FestRecords_AddHosted(FunfestSave *save) {
     if (save->hosted < FUNFEST_COUNT_MAX) {
         save->hosted++;
     }
     return save->hosted;
 }
 
-u16 FestRecords_GetJoined(void *a0) {
-    FunfestSave *save = a0;
-
+u16 FestRecords_GetJoined(FunfestSave *save) {
     return save->joined;
 }
 
-u16 FestRecords_AddJoined(void *records) {
-    FunfestSave *save = records;
-
+u16 FestRecords_AddJoined(FunfestSave *save) {
     if (save->joined < FUNFEST_COUNT_MAX) {
         save->joined++;
     }
     return save->joined;
 }
 
-u16 FestRecords_GetCompleted(void *a0) {
-    FunfestSave *save = a0;
-
+u16 FestRecords_GetCompleted(FunfestSave *save) {
     return save->completed;
 }
 
@@ -70,9 +60,7 @@ void FestRecords_AddCompleted(FunfestSave *save) {
     }
 }
 
-u8 FestRecords_GetMostParticipants(void *a0) {
-    FunfestSave *save = a0;
-
+u8 FestRecords_GetMostParticipants(FunfestSave *save) {
     return save->mostParticipants;
 }
 
@@ -82,9 +70,7 @@ void FestRecords_UpdateMostParticipants(FunfestSave *save, u32 count) {
     }
 }
 
-u16 FestRecords_GetTopScores(void *a0) {
-    FunfestSave *save = a0;
-
+u16 FestRecords_GetTopScores(FunfestSave *save) {
     return save->topScores;
 }
 
@@ -134,9 +120,7 @@ BOOL FestRecords_UpdateMissionBest(FunfestSave *save, u32 mission, u32 best) {
     return FALSE;
 }
 
-u32 FestRecords_GetMissionLevel(void *records, u8 mission) {
-    FunfestSave *save = records;
-
+u32 FestRecords_GetMissionLevel(FunfestSave *save, u8 mission) {
     if (mission >= FUNFEST_MISSION_COUNT) {
         return 0;
     }
@@ -151,9 +135,7 @@ void FestRecords_UpdateMissionLevel(FunfestSave *save, u32 mission, int level) {
     }
 }
 
-BOOL FestRecords_IsMissionNew(void *records, u8 mission) {
-    FunfestSave *save = records;
-
+BOOL FestRecords_IsMissionNew(FunfestSave *save, u8 mission) {
     if (mission >= FUNFEST_MISSION_COUNT) {
         return FALSE;
     }

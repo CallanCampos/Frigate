@@ -26,7 +26,7 @@ BOOL BtlNet_SendChatter(void *chatter);
 BOOL BtlNet_AreChattersReceived(void);
 void *BtlNet_GetChatter(u8 clientId);
 void BtlNet_EndChatterExchange(void);
-BOOL BtlNet_SendPartyPacket(void *data);
+BOOL BtlNet_SendPartyPacket(BtlNetPartyPacket *data);
 BOOL BtlNet_IsClientPartyReceived(u8 clientId);
 PokeParty *BtlNet_GetParty(u8 clientId);
 void BtlNet_EndPartyExchange(void);

@@ -234,7 +234,7 @@ void GFL_NetErrClear(void);
 // The state of the wireless connections, as bits: 0x2 a local wireless one, 0x3c the signal, 0x3c0 Wi-Fi
 u32 WihDwc_GetStatus(WifiList *wifiList);
 void *WihDwc_Create(int num, HeapID heapId);
-void WihDwc_Destroy(void *work);
+void WihDwc_Destroy(WihDwcWork *work);
 void WihDwc_TickTimers(void);
 void GFL_NetErrAbort(void);
 void GFL_NetErrRecord(void);

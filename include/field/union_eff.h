@@ -19,14 +19,14 @@ int UnionEff_GetKindStep(int kind);
 // Whether the beacon's player is one of the wifi list's friends
 BOOL UnionEff_IsFriendBeacon(WifiList *wifiList, const UnionBeacon *beacon);
 void *UnionEff_Create(HeapID heapId);
-void UnionEff_Free(void *work);
-void UnionEff_Update(void *work);
-void UnionEff_Draw(void *work);
+void UnionEff_Free(UnionEffect *work);
+void UnionEff_Update(UnionEffect *work);
+void UnionEff_Draw(UnionEffect *work);
 // Focus on an actor
-void UnionEff_AddFocus(void *work, FieldActor *actor);
+void UnionEff_AddFocus(UnionEffect *work, FieldActor *actor);
 // Put a mark over an actor, the asonda one when asonda is TRUE and else the tomo one
-void UnionEff_AddMark(void *work, FieldActor *actor, BOOL asonda);
+void UnionEff_AddMark(UnionEffect *work, FieldActor *actor, BOOL asonda);
 // Take the mark off an actor
-void UnionEff_RemoveMark(void *work, FieldActor *actor);
+void UnionEff_RemoveMark(UnionEffect *work, FieldActor *actor);
 
 #endif // POKEBW2_FIELD_UNION_EFF_H

@@ -30,7 +30,7 @@ enum {
 #define SLIPDOWN_END_Y (-FX32_CONST(10))
 #define SLIPDOWN_SPEED FX32_CONST(8)
 
-typedef struct {
+struct RailSlipdown {
     u32 state;
     NoGridMapper *mapper;
     RailUnit *railUnit;
@@ -53,7 +53,7 @@ typedef struct {
     // Where the slide lands on the rail
     RailPosition railPos;
     TCB *task;
-} RailSlipdown;
+};
 
 static void RailSlipdown_Task(TCB *tcb, void *data);
 
@@ -80,16 +80,12 @@ void *RailSlipdown_Create(GameSystem *gsys, Field *field, FieldActor *actor, BOO
     return work;
 }
 
-void RailSlipdown_Delete(void *data) {
-    RailSlipdown *work = data;
-
+void RailSlipdown_Delete(RailSlipdown *work) {
     GFL_TCBRemove(work->task);
     GFL_HeapFree(work);
 }
 
-BOOL RailSlipdown_IsDone(void *data) {
-    RailSlipdown *work = data;
-
+BOOL RailSlipdown_IsDone(RailSlipdown *work) {
     if (work->state == SLIPDOWN_STATE_DONE) {
         return TRUE;
     }

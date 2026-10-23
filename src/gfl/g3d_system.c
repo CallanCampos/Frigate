@@ -42,11 +42,11 @@ enum {
     G3D_FLUSH_WVP,
 };
 
-typedef struct {
+struct G3DResource {
     u16 magic;
     u16 type;
     NNSG3dResFileHeader *data;
-} G3DResource;
+};
 
 struct G3DModel {
     u16 magic;
@@ -55,11 +55,11 @@ struct G3DModel {
     G3DResource *texResource;
 };
 
-typedef struct {
+struct G3DAnimation {
     u16 magic;
     NNSG3dAnmObj *anmObj;
     G3DResource *resource;
-} G3DAnimation;
+};
 
 struct G3DActor {
     G3DModel *model;
@@ -387,9 +387,7 @@ void *GFL_G3DSysReadFSResource(const char *path, u32 fileId) {
     return res;
 }
 
-void GFL_G3DResFree(void *resource) {
-    G3DResource *res = resource;
-
+void GFL_G3DResFree(G3DResource *res) {
     if (res != NULL && res->magic == G3D_RES_MAGIC) {
         res->magic = G3D_RES_MAGIC - 1;
         if (res->data != NULL) {
@@ -684,9 +682,7 @@ void *GFL_G3DAnmCreate(G3DModel *model, void *resource, u32 anmIdx) {
     return animation;
 }
 
-void GFL_G3DAnmFree(void *anm) {
-    G3DAnimation *animation = anm;
-
+void GFL_G3DAnmFree(G3DAnimation *animation) {
     if (animation != NULL && animation->magic == G3D_ANM_MAGIC) {
         NNS_G3dFreeAnmObj(&g_G3DSystem.sys->allocator, animation->anmObj);
         animation->magic = G3D_ANM_MAGIC - 1;

@@ -81,10 +81,10 @@ struct FieldLight {
     s32 daySeconds;
 };
 
-typedef struct {
+struct FieldColorPostFX {
     const u8 *lut;
     BOOL vintage;
-} FieldColorPostFX;
+};
 
 static void FieldLight_LoadData(FieldLight *light, u32 lightsId);
 static void FieldLight_LoadDataCore(FieldLight *light, u32 arcId, u32 fileId);

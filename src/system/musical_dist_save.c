@@ -47,9 +47,7 @@ void *MusicalDist_Load(GameData *gameData, HeapID heapId) {
     return wk;
 }
 
-void MusicalDist_Free(void *work) {
-    MusicalDistWork *wk = work;
-
+void MusicalDist_Free(MusicalDistWork *wk) {
     freeIntermediateSaveExtraBlksAfterLoad(GameData_GetSaveControl(wk->gameData), SAVE_EXTRA_BLOCK_MUSICAL_DIST);
     if (wk->block != NULL) {
         GFL_HeapFree(wk->block);
@@ -68,9 +66,7 @@ void *MusicalDist_StartWrite(GameData *gameData, void *data, u32 size, HeapID he
     return wk;
 }
 
-BOOL MusicalDist_WriteStep(void *work) {
-    MusicalDistWork *wk = work;
-
+BOOL MusicalDist_WriteStep(MusicalDistWork *wk) {
     switch (wk->seq) {
     case 0:
         if (wk->block == NULL) {
@@ -109,14 +105,10 @@ BOOL MusicalDist_WriteStep(void *work) {
     return FALSE;
 }
 
-void *MusicalDist_GetData(void *work) {
-    MusicalDistWork *wk = work;
-
+void *MusicalDist_GetData(MusicalDistWork *wk) {
     return wk->data;
 }
 
-u32 MusicalDist_GetDataSize(void *work) {
-    MusicalDistWork *wk = work;
-
+u32 MusicalDist_GetDataSize(MusicalDistWork *wk) {
     return wk->blockHeader->size;
 }
