@@ -1,17 +1,22 @@
 name: Frigate CI
 
 # Builds Frigate, the native port, on macOS, Linux and Windows and runs its tests, those that need the player's ROM
-# skipping. The ROM build needs the base ROMs, which CI doesn't have; upstream's compile.yml compiles every C file with
-# MWCC instead, and every port session's sync builds both ROMs locally (port/docs/SYNC.md).
+# skipping, on every pull request to main and every push to it. The ROM build needs the base ROMs, which CI doesn't
+# have; upstream's compile.yml compiles every C file with MWCC instead, and a maintainer builds both ROMs and runs the
+# host tests on the pull request's exact head with port/tools/sync_upstream.sh --verify-pr N, which posts the separate
+# required status "Frigate local verification" (port/docs/SYNC.md, port/docs/REPOSITORY-POLICY.md).
 #
-# Four build groups: the development build on macOS and Linux (host), as port/README.md's quick start makes it; the same on
-# Windows (host-windows), with MSYS2's CLANG64 toolchain (clang, lld and the UCRT;
+# Four build groups: the development build on macOS and Linux (host), as port/README.md's quick start makes it; the
+# same on Windows (host-windows), with MSYS2's CLANG64 toolchain (clang, lld and the UCRT;
 # port/docs/adr/0013-windows-build-with-msys2-clang64.md); the macOS distribution build (macos-distribution,
-# port/docs/adr/0015-universal-macos-app-for-macos-11.md), one universal app, arm64 and x86_64, for macOS 11.0 and later,
-# made and tested on Apple Silicon and on Intel, with macOS 26 and with macOS 15, the oldest runners that aren't
+# port/docs/adr/0015-universal-macos-app-for-macos-11.md), one universal app, arm64 and x86_64, for macOS 11.0 and
+# later, made and tested on Apple Silicon and on Intel, with macOS 26 and with macOS 15, the oldest runners that aren't
 # deprecated; and the sanitized build on macOS and Linux (sanitize, port/docs/sanitizers.md,
-# port/docs/adr/0014-sanitized-build-game-heaps-poisoned-ds-isms-ignorelisted.md). Each job builds its own copy and
-# uploads nothing: the port's compiled game code is never uploaded (port/CLAUDE.md).
+# port/docs/adr/0014-sanitized-build-game-heaps-poisoned-ds-isms-ignorelisted.md). Beside them, sync-tooling tests the
+# upstream sync's policy (port/tools/upstream_sync.py, sync_upstream.sh) in scratch Git repositories, and
+# frigate-ci, the one job of this workflow that the main ruleset requires, passes only when every job above succeeded
+# (port/docs/adr/0018-protected-main-and-sync-prs.md). Each job builds its own copy and uploads nothing: the port's
+# compiled game code is never uploaded (port/CLAUDE.md).
 on:
   push:
     branches: [main]

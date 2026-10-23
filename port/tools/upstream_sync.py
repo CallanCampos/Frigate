@@ -53,9 +53,13 @@ def publish(branch):
     if os.environ.get('GITHUB_ACTIONS') != 'true' and run('gh', 'api', 'user', '--jq', '.login').lower() == 'callancampos':
         reviewer = []
     print(gh('pr', 'create', '--base', 'main', '--head', branch, *reviewer, '--title', 'Merge upstream decomp updates', '--body',
-             'Bounded upstream merge preserving Frigate changes. Review the full merge and its PR CI results. '
-             'Before merging, a maintainer must run the local sync on this exact head to verify both ROM SHA1s and the host build/tests. '
-             'The hourly sync leaves this PR unchanged while it is open.'))
+             'Bounded upstream merge preserving Frigate changes. Review the full merge and its PR CI results.\n\n'
+             'Before merging, a maintainer verifies this exact head in a separate worktree prepared with '
+             '`port/tools/bootstrap_checkout.sh`, where N is this PR\'s number:\n\n'
+             f'```sh\ngh pr checkout N --repo {REPO}\nport/tools/sync_upstream.sh --verify-pr N\n```\n\n'
+             'It builds both ROMs and checks their SHA1s, builds and tests the host in both versions, and posts '
+             '`Frigate local verification` on the tested head (port/docs/SYNC.md). '
+             'The owner\'s explicit approval follows; the hourly sync leaves this PR unchanged while it is open.'))
 
 
 def last_upstream(upstream):
