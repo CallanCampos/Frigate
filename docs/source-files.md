@@ -128,7 +128,8 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 | `ssl_rc4.c` | `0x0215b1d8`–`0x0215b274` | 2 | complete | descriptive |
 | `biginteger.c` | `0x0215b274`–`0x0215bbec` | 19 | partial | descriptive |
 | `wcm.c` | `0x0215bbec`–`0x0215dd74` | 93 | partial | descriptive |
-| `dwc_match.c` | `0x0215fa0c`–`0x02168818` | 210 | partial | descriptive |
+| `dwc_main.c` | `0x0215fa0c`–`0x02160e10` | 49 | partial | descriptive |
+| `dwc_match.c` | `0x02160e10`–`0x02168818` | 161 | partial | descriptive |
 | `dwc_nasfunc.c` | `0x021694d4`–`0x0216a408` | 30 | complete | descriptive |
 | `dwc_http_client.c` | `0x0216a408`–`0x0216b14c` | 25 | partial | descriptive |
 | `dwc_conntest.c` | `0x0216b14c`–`0x0216bbe4` | 8 | partial | descriptive |

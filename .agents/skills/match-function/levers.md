@@ -7,6 +7,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 ## Registers swapped
 
+- A numeric query field copied through an extra register: share the meaningful query-result local with the
+  count case (`DWCi_QR2ServerKeyCallback`). (matching.md: "shares an `int value`")
 - A selected record header coalesced with the payload cursor: advance the cursor before reading the saved
   header length (`GetSecurityData`). (matching.md: "distinct cursor and header lifetimes")
 - An alternating buffer's index reloaded after a byte copy: snapshot the selected index in its unsigned type and
@@ -959,6 +961,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 ## Data and sections
 
+- Duplicate protocol literals pooled once, with two independently grouped sets of globals: verify original
+  source boundaries (`dwc_main.c`/`dwc_match.c`). (matching.md: "boundary at `DWC_AddMatchKeyInt`")
 - MSL exception indices before ordinary rodata: restore `-Cpp_exceptions on` and register the emitted `.exceptix`.
   (matching.md: "`dsi/1.2` with `-Cpp_exceptions on` emits exception indices")
 - A live empty assertion filename before earlier allocation literals: recover its named data object and probe

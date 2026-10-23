@@ -8,6 +8,13 @@ tools that show the differences.
 
 ## Registers
 
+- DWC's `DWCi_QR2ServerKeyCallback` shares an `int value` between its node-count and suspension queries,
+  assigning the suspension field before passing it to `qr2_buffer_add_int`. This preserves the original field-load
+  lifetime while naming the numeric query result rather than introducing a one-case matching temporary.
+- DWC's `func_ov011_021683b8` starts its deadline from `OS_GetTick()`, then accumulates its fixed 3000 ms,
+  active-peer and position-dependent waits. The separate fixed-delay update spills the current tick's high word
+  before the first addition, as the original does; folding that term into the initializer spills it later.
+
 - Nested inline boundaries and file-level interprocedural analysis can explain saved-result lifetimes and register
   allocation. DS Protect's `DSProt_RunChecks` matches with an inline Boolean checksum helper inside an inline
   queue runner, whose result the public function returns. Its flashcart check uses an inline test returning
@@ -747,6 +754,11 @@ Same instructions, registers swapped.
   `u32 value; int i; int bit;` declared in that order.
 
 ## Stack slots
+
+- DWC's `DWCi_ProcessRecvMatchCommand` takes the protocol's 16-bit port. Its case 16 tests the missing node and
+  pending profile together, followed by the existing-node fallback. Those type and branch corrections restore the
+  original saved-register set and frame size before any spill-slot work; the remaining generated spills still move
+  the address and reply aggregates four bytes higher.
 
 - NitroWiFi's `CPSi_sha1_block` runs its rounds in groups of five, rotating the arguments of a two-statement
   round macro instead of copying the five state words after each round. The first fifteen rounds use direct words,
@@ -3439,6 +3451,18 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   registers written one by one, and matches in the same register allocation as `HPFFilter`.
 
 ## Data and sections
+
+- DWC's friends-match front end and matching core are separate source files. A boundary at `DWC_AddMatchKeyInt`
+  gives the front end its 20-byte string pool and four connection statics, and the core its 776-byte initialized
+  data and two statics. Their separate copies of `SCM`, `SCN`, `GPCM` and `MAT` then arise from normal per-file
+  string pooling; the combined file pools them once and puts `sMatchChance` before the front-end strings.
+  The split also restores the core's data-relative `sMatchChance` target in `DWCi_MatchProcess`, whose instructions
+  already match. Both data pools, the core's constant data and all six BSS object addresses match in both versions.
+  Shared types and calls belong in `dwc/match_internal.h`; no data objects need external linkage. Objdiff still
+  reports three argument differences in `DWCi_MatchProcess`: the original object relocates its internal Thumb BLs
+  to local labels with addend -4, while MWCC resolves the same branch bytes directly. The displayed relocated
+  destinations are four bytes early. The valid relocation records remain; this function is not counted as matched
+  by the current report despite the matching final instructions and targets.
 
 - `dsi/1.2` with `-Cpp_exceptions on` emits exception indices for C functions with stack frames even when their
   instructions are unchanged. MSL's `register_atexit.c`, `console_io.c` and `call_static_initializers.c` emit the ROM's
