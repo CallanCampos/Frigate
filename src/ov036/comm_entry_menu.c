@@ -519,8 +519,8 @@ CommEntryMenu *CommEntryMenu_Create(const PlayerInfo *info, Field *field, u32 mi
     CommEntryMenu *menu = GFL_HeapAllocate(heapId, sizeof(CommEntryMenu), TRUE, "comm_entry_menu.c", 377);
 
     menu->wordSet = GFL_WordSetSystemCreateDefault(heapId);
-    menu->msgData = func_ov036_021879a0(msgBGSys, TEXT_BANK_COMM_ENTRY_MENU);
-    menu->msgWin = func_ov036_0218845c(msgBGSys, menu->msgData);
+    menu->msgData = MsgBGPrinter_CreateMsgData(msgBGSys, TEXT_BANK_COMM_ENTRY_MENU);
+    menu->msgWin = MsgBGPrinter_CreateBottomSysWin(msgBGSys, menu->msgData);
     menu->msgBuf = GFL_StrBufCreate(100, heapId);
     menu->memberFmt = GFL_MsgDataLoadStrbufNew(menu->msgData, CommEntryMenu_Text_Id);
     menu->memberBuf = GFL_StrBufCreate(64, heapId);
@@ -556,7 +556,7 @@ u32 CommEntryMenu_Free(CommEntryMenu *menu) {
 
     CommEntryMenu_FreeWindows(menu);
     if (menu->yesNo.window != NULL) {
-        func_ov036_02187ea0(menu->yesNo.window);
+        MsgBGPrinter_DeleteMenuFunc(menu->yesNo.window);
         menu->yesNo.window = NULL;
     }
     GFL_StrBufFree(menu->countBuf);
@@ -564,8 +564,8 @@ u32 CommEntryMenu_Free(CommEntryMenu *menu) {
     GFL_StrBufFree(menu->memberBuf);
     GFL_StrBufFree(menu->memberFmt);
     GFL_StrBufFree(menu->msgBuf);
-    func_ov036_02188338(menu->msgWin);
-    func_ov036_021879b8(menu->msgData);
+    MsgBGPrinter_DeleteSysWin(menu->msgWin);
+    MsgBGPrinter_DeleteMsgData(menu->msgData);
     GFL_WordSetSystemFree(menu->wordSet);
     if (GFL_NetIsInitialized() == TRUE) {
         CommEntryMenu_RemoveCommands();
@@ -792,7 +792,7 @@ static BOOL CommEntryMenu_UpdateLeader(CommEntryMenu *menu) {
         menu->seq = COMM_ENTRY_LEADER_SEQ_WAIT_ERROR;
         break;
     case COMM_ENTRY_LEADER_SEQ_WAIT_ERROR:
-        if (func_ov036_021883e8(menu->msgWin) == TRUE) {
+        if (MsgBGPrinter_SysWinMain(menu->msgWin) == TRUE) {
             menu->seq = COMM_ENTRY_LEADER_SEQ_WAIT_DISCONNECT;
         }
         break;
@@ -807,7 +807,7 @@ static BOOL CommEntryMenu_UpdateLeader(CommEntryMenu *menu) {
         menu->seq = COMM_ENTRY_LEADER_SEQ_WAIT_NO_MEMBERS;
         break;
     case COMM_ENTRY_LEADER_SEQ_WAIT_NO_MEMBERS:
-        if (func_ov036_021883e8(menu->msgWin) == TRUE) {
+        if (MsgBGPrinter_SysWinMain(menu->msgWin) == TRUE) {
             menu->result = COMM_ENTRY_MENU_CANCELLED;
             menu->seq = COMM_ENTRY_LEADER_SEQ_END;
         }
@@ -831,7 +831,7 @@ static BOOL CommEntryMenu_UpdateSelectLeader(CommEntryMenu *menu) {
         menu->seq++;
         break;
     case COMM_ENTRY_SELECT_SEQ_WAIT_CHOOSE:
-        if (func_ov036_021883e8(menu->msgWin) == TRUE) {
+        if (MsgBGPrinter_SysWinMain(menu->msgWin) == TRUE) {
             menu->seq++;
         }
         break;
@@ -868,7 +868,7 @@ static BOOL CommEntryMenu_UpdateSelectLeader(CommEntryMenu *menu) {
         }
         break;
     case COMM_ENTRY_SELECT_SEQ_WAIT_REPLIED:
-        if (func_ov036_021883e8(menu->msgWin) == TRUE) {
+        if (MsgBGPrinter_SysWinMain(menu->msgWin) == TRUE) {
             CommEntryMenu_PrintMessage(menu, CommEntryMenu_Text_PleaseWaitBButton_2);
             CommEntryMenu_CreateWindows(menu);
             menu->seq++;
@@ -903,7 +903,7 @@ static BOOL CommEntryMenu_UpdateSelectLeader(CommEntryMenu *menu) {
         NetHandle_SendTimingPair(NetHandle_GetOwn(), COMM_ENTRY_SYNC_START, COMM_ENTRY_SYNC_CLASS);
         break;
     case COMM_ENTRY_SELECT_SEQ_WAIT_SYNC:
-        if (menu->mode == COMM_ENTRY_MENU_MULTI_BATTLE && func_ov036_021883e8(menu->msgWin) != TRUE) {
+        if (menu->mode == COMM_ENTRY_MENU_MULTI_BATTLE && MsgBGPrinter_SysWinMain(menu->msgWin) != TRUE) {
             break;
         }
         if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), COMM_ENTRY_SYNC_START, COMM_ENTRY_SYNC_CLASS) == TRUE) {
@@ -918,7 +918,7 @@ static BOOL CommEntryMenu_UpdateSelectLeader(CommEntryMenu *menu) {
         menu->seq = COMM_ENTRY_SELECT_SEQ_WAIT_ERROR;
         break;
     case COMM_ENTRY_SELECT_SEQ_WAIT_ERROR:
-        if (func_ov036_021883e8(menu->msgWin) == TRUE) {
+        if (MsgBGPrinter_SysWinMain(menu->msgWin) == TRUE) {
             menu->seq = COMM_ENTRY_SELECT_SEQ_CANCEL;
         }
         break;
@@ -933,7 +933,7 @@ static BOOL CommEntryMenu_UpdateSelectLeader(CommEntryMenu *menu) {
         menu->seq = COMM_ENTRY_SELECT_SEQ_WAIT_NET_EXIT;
         break;
     case COMM_ENTRY_SELECT_SEQ_WAIT_NET_EXIT:
-        if (GFL_NetIsEnded() == TRUE && func_ov036_021883e8(menu->msgWin) == TRUE) {
+        if (GFL_NetIsEnded() == TRUE && MsgBGPrinter_SysWinMain(menu->msgWin) == TRUE) {
             menu->seq = COMM_ENTRY_SELECT_SEQ_NET_INIT;
         }
         break;
@@ -1010,7 +1010,7 @@ static BOOL CommEntryMenu_UpdateJoin(CommEntryMenu *menu) {
         NetHandle_SendTimingPair(NetHandle_GetOwn(), COMM_ENTRY_SYNC_START, COMM_ENTRY_SYNC_CLASS);
         break;
     case COMM_ENTRY_JOIN_SEQ_WAIT_SYNC:
-        if (menu->mode == COMM_ENTRY_MENU_MULTI_BATTLE && func_ov036_021883e8(menu->msgWin) != TRUE) {
+        if (menu->mode == COMM_ENTRY_MENU_MULTI_BATTLE && MsgBGPrinter_SysWinMain(menu->msgWin) != TRUE) {
             break;
         }
         if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), COMM_ENTRY_SYNC_START, COMM_ENTRY_SYNC_CLASS) == TRUE) {
@@ -1025,7 +1025,7 @@ static BOOL CommEntryMenu_UpdateJoin(CommEntryMenu *menu) {
         menu->seq = COMM_ENTRY_JOIN_SEQ_WAIT_ERROR;
         break;
     case COMM_ENTRY_JOIN_SEQ_WAIT_ERROR:
-        if (func_ov036_021883e8(menu->msgWin) == TRUE) {
+        if (MsgBGPrinter_SysWinMain(menu->msgWin) == TRUE) {
             menu->result = COMM_ENTRY_MENU_CANCELLED;
             menu->seq = COMM_ENTRY_JOIN_SEQ_END;
         }
@@ -1039,7 +1039,7 @@ static BOOL CommEntryMenu_UpdateJoin(CommEntryMenu *menu) {
         menu->seq = COMM_ENTRY_JOIN_SEQ_WAIT_REFUSED;
         break;
     case COMM_ENTRY_JOIN_SEQ_WAIT_REFUSED:
-        if (GFL_NetIsEnded() == TRUE && func_ov036_021883e8(menu->msgWin) == TRUE) {
+        if (GFL_NetIsEnded() == TRUE && MsgBGPrinter_SysWinMain(menu->msgWin) == TRUE) {
             menu->result = COMM_ENTRY_MENU_REFUSED;
             menu->seq = COMM_ENTRY_JOIN_SEQ_END;
         }
@@ -1128,7 +1128,7 @@ static BOOL CommEntryMenu_UpdateAskToJoin(CommEntryMenu *menu) {
         NetHandle_SendTimingPair(NetHandle_GetOwn(), COMM_ENTRY_SYNC_START, COMM_ENTRY_SYNC_CLASS);
         break;
     case COMM_ENTRY_ASK_TO_JOIN_SEQ_WAIT_SYNC:
-        if (menu->mode == COMM_ENTRY_MENU_MULTI_BATTLE && func_ov036_021883e8(menu->msgWin) != TRUE) {
+        if (menu->mode == COMM_ENTRY_MENU_MULTI_BATTLE && MsgBGPrinter_SysWinMain(menu->msgWin) != TRUE) {
             break;
         }
         if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), COMM_ENTRY_SYNC_START, COMM_ENTRY_SYNC_CLASS) == TRUE) {
@@ -1143,7 +1143,7 @@ static BOOL CommEntryMenu_UpdateAskToJoin(CommEntryMenu *menu) {
         menu->seq = COMM_ENTRY_ASK_TO_JOIN_SEQ_WAIT_ERROR;
         break;
     case COMM_ENTRY_ASK_TO_JOIN_SEQ_WAIT_ERROR:
-        if (func_ov036_021883e8(menu->msgWin) == TRUE) {
+        if (MsgBGPrinter_SysWinMain(menu->msgWin) == TRUE) {
             menu->result = COMM_ENTRY_MENU_CANCELLED;
             menu->seq = COMM_ENTRY_ASK_TO_JOIN_SEQ_END;
         }
@@ -1155,7 +1155,7 @@ static BOOL CommEntryMenu_UpdateAskToJoin(CommEntryMenu *menu) {
         menu->seq = COMM_ENTRY_ASK_TO_JOIN_SEQ_WAIT_REFUSED;
         break;
     case COMM_ENTRY_ASK_TO_JOIN_SEQ_WAIT_REFUSED:
-        if (GFL_NetIsEnded() == TRUE && func_ov036_021883e8(menu->msgWin) == TRUE) {
+        if (GFL_NetIsEnded() == TRUE && MsgBGPrinter_SysWinMain(menu->msgWin) == TRUE) {
             menu->result = COMM_ENTRY_MENU_REFUSED;
             menu->seq = COMM_ENTRY_ASK_TO_JOIN_SEQ_END;
         }
@@ -1308,7 +1308,7 @@ static void CommEntryMenu_UpdateAsk(CommEntryMenu *menu) {
     CommEntryYesNo *yesNo = &menu->yesNo;
     u8 i;
 
-    if (menu->asking != FALSE && func_ov036_021883e8(menu->msgWin) != FALSE) {
+    if (menu->asking != FALSE && MsgBGPrinter_SysWinMain(menu->msgWin) != FALSE) {
         switch (yesNo->seq) {
         case COMM_ENTRY_ASK_SEQ_PRINT:
             copyVarForText(menu->wordSet, 0, &asked->info);
@@ -1316,11 +1316,11 @@ static void CommEntryMenu_UpdateAsk(CommEntryMenu *menu) {
             yesNo->seq++;
             return;
         case COMM_ENTRY_ASK_SEQ_OPEN:
-            yesNo->window = func_ov036_021880d4(Field_GetMsgBGSys(menu->field), 0);
+            yesNo->window = MsgBGPrinter_CreateYesNoMenu(Field_GetMsgBGSys(menu->field), 0);
             yesNo->seq++;
             return;
         case COMM_ENTRY_ASK_SEQ_ANSWER: {
-            u32 answer = func_ov036_0218816c(yesNo->window);
+            u32 answer = MsgBGPrinter_YesNoMenuMain(yesNo->window);
 
             if (answer != MSGBG_YES_NO_WAITING) {
                 u8 state = COMM_ENTRY_MEMBER_ACCEPTED;
@@ -1339,7 +1339,7 @@ static void CommEntryMenu_UpdateAsk(CommEntryMenu *menu) {
                         break;
                     }
                 }
-                func_ov036_02187ea0(yesNo->window);
+                MsgBGPrinter_DeleteMenuFunc(yesNo->window);
                 yesNo->window = NULL;
                 yesNo->seq++;
                 return;
@@ -1367,7 +1367,7 @@ static u32 CommEntryMenu_AskGroupOk(CommEntryMenu *menu) {
     CommEntryYesNo *yesNo = &menu->yesNo;
     u32 answer;
 
-    if (func_ov036_021883e8(menu->msgWin) == FALSE) {
+    if (MsgBGPrinter_SysWinMain(menu->msgWin) == FALSE) {
         return COMM_ENTRY_ASK_PENDING;
     }
     switch (yesNo->seq) {
@@ -1376,7 +1376,7 @@ static u32 CommEntryMenu_AskGroupOk(CommEntryMenu *menu) {
         yesNo->seq++;
         break;
     case COMM_ENTRY_ASK_SEQ_OPEN:
-        yesNo->window = func_ov036_021880d4(Field_GetMsgBGSys(menu->field), 0);
+        yesNo->window = MsgBGPrinter_CreateYesNoMenu(Field_GetMsgBGSys(menu->field), 0);
         yesNo->seq++;
         break;
     case COMM_ENTRY_ASK_SEQ_ANSWER:
@@ -1384,12 +1384,12 @@ static u32 CommEntryMenu_AskGroupOk(CommEntryMenu *menu) {
         if (CommEntryMenu_StatesUnchanged(menu) == FALSE) {
             answer = MSGBG_YES_NO_NO;
         } else {
-            answer = func_ov036_0218816c(yesNo->window);
+            answer = MsgBGPrinter_YesNoMenuMain(yesNo->window);
             if (answer == MSGBG_YES_NO_WAITING) {
                 break;
             }
         }
-        func_ov036_02187ea0(yesNo->window);
+        MsgBGPrinter_DeleteMenuFunc(yesNo->window);
         yesNo->window = NULL;
         yesNo->seq = COMM_ENTRY_ASK_SEQ_PRINT;
         if (answer == MSGBG_YES_NO_YES) {
@@ -1405,7 +1405,7 @@ static u32 CommEntryMenu_AskCancel(CommEntryMenu *menu) {
     CommEntryYesNo *yesNo = &menu->yesNo;
     u32 answer;
 
-    if (func_ov036_021883e8(menu->msgWin) == FALSE) {
+    if (MsgBGPrinter_SysWinMain(menu->msgWin) == FALSE) {
         return COMM_ENTRY_ASK_PENDING;
     }
     switch (yesNo->seq) {
@@ -1414,15 +1414,15 @@ static u32 CommEntryMenu_AskCancel(CommEntryMenu *menu) {
         yesNo->seq++;
         break;
     case COMM_ENTRY_CANCEL_SEQ_OPEN:
-        yesNo->window = func_ov036_021880d4(Field_GetMsgBGSys(menu->field), 0);
+        yesNo->window = MsgBGPrinter_CreateYesNoMenu(Field_GetMsgBGSys(menu->field), 0);
         yesNo->seq++;
         break;
     case COMM_ENTRY_CANCEL_SEQ_ANSWER:
-        answer = func_ov036_0218816c(yesNo->window);
+        answer = MsgBGPrinter_YesNoMenuMain(yesNo->window);
         if (answer == MSGBG_YES_NO_WAITING) {
             break;
         }
-        func_ov036_02187ea0(yesNo->window);
+        MsgBGPrinter_DeleteMenuFunc(yesNo->window);
         yesNo->window = NULL;
         if (answer == MSGBG_YES_NO_NO) {
             yesNo->result = COMM_ENTRY_ASK_NO;
@@ -1437,15 +1437,15 @@ static u32 CommEntryMenu_AskCancel(CommEntryMenu *menu) {
         }
         break;
     case COMM_ENTRY_CANCEL_SEQ_OPEN_AGAIN:
-        yesNo->window = func_ov036_021880d4(Field_GetMsgBGSys(menu->field), 0);
+        yesNo->window = MsgBGPrinter_CreateYesNoMenu(Field_GetMsgBGSys(menu->field), 0);
         yesNo->seq++;
         break;
     case COMM_ENTRY_CANCEL_SEQ_ANSWER_AGAIN:
-        answer = func_ov036_0218816c(yesNo->window);
+        answer = MsgBGPrinter_YesNoMenuMain(yesNo->window);
         if (answer == MSGBG_YES_NO_WAITING) {
             break;
         }
-        func_ov036_02187ea0(yesNo->window);
+        MsgBGPrinter_DeleteMenuFunc(yesNo->window);
         yesNo->window = NULL;
         if (answer == MSGBG_YES_NO_YES) {
             CommEntryMenu_PrintMessage(menu, sCommEntryMessages[menu->mode].cancelled);
@@ -1469,7 +1469,7 @@ static u32 CommEntryMenu_AskCancel(CommEntryMenu *menu) {
         break;
     case COMM_ENTRY_CANCEL_SEQ_END:
         if (yesNo->window) {
-            func_ov036_02187ea0(yesNo->window);
+            MsgBGPrinter_DeleteMenuFunc(yesNo->window);
             yesNo->window = NULL;
         }
         yesNo->seq = COMM_ENTRY_CANCEL_SEQ_PRINT;
@@ -1524,7 +1524,7 @@ static u32 CommEntryMenu_GetAcceptedMask(CommEntryMenu *menu) {
 
 // Whether the leader is asked about nothing and the message has been printed
 static BOOL CommEntryMenu_IsIdle(CommEntryMenu *menu) {
-    if (menu->asking == FALSE && func_ov036_021883e8(menu->msgWin) == TRUE) {
+    if (menu->asking == FALSE && MsgBGPrinter_SysWinMain(menu->msgWin) == TRUE) {
         return TRUE;
     }
     return FALSE;
@@ -1539,30 +1539,30 @@ static void CommEntryMenu_CreateWindows(CommEntryMenu *menu) {
     }
     menu->membersWin = FieldMsgBG_CreateMoneyWin(msgBGSys, menu->msgData, 2, 6, 18, bottom - 6);
     menu->titleWin = FieldMsgBG_CreateMoneyWin(msgBGSys, menu->msgData, 2, 1, 28, 2);
-    func_ov036_02187c34(menu->titleWin, 0, 0, sCommEntryMessages[menu->mode].title);
+    MsgBGPrinter_MsgWinPrintMsg(menu->titleWin, 0, 0, sCommEntryMessages[menu->mode].title);
 }
 
 static void CommEntryMenu_FreeWindows(CommEntryMenu *menu) {
     FieldMsgBG *msgBGSys = Field_GetMsgBGSys(menu->field);
 
     if (menu->titleWin != NULL) {
-        func_ov036_02187c1c(menu->titleWin);
+        MsgBGPrinter_DeleteMsgWin(menu->titleWin);
         menu->titleWin = NULL;
     }
     if (menu->membersWin != NULL) {
-        func_ov036_02187c1c(menu->membersWin);
+        MsgBGPrinter_DeleteMsgWin(menu->membersWin);
         menu->membersWin = NULL;
     }
-    func_ov036_02187980(msgBGSys);
+    MsgBGPrinter_ClearPrintQue(msgBGSys);
 }
 
 // Prints how many more players can join or are needed
 static BOOL CommEntryMenu_PrintCount(CommEntryMenu *menu, int count) {
-    if (menu->membersWin != NULL && func_ov036_02187c70(menu->membersWin) == TRUE) {
-        func_ov036_02187c88(menu->membersWin, 0, 64, 144, 80);
+    if (menu->membersWin != NULL && MsgBGPrinter_IsMsgWinTransDone(menu->membersWin) == TRUE) {
+        MsgBGPrinter_FillMsgWin(menu->membersWin, 0, 64, 144, 80);
         WordSetNumber(menu->wordSet, 0, menu->maxCount - count, 1, 0, TRUE);
         GFL_WordSetFormatStrbuf(menu->wordSet, menu->countBuf, menu->countFmt);
-        func_ov036_02187c4c(menu->membersWin, 0, 64, menu->countBuf);
+        MsgBGPrinter_MsgWinPrintStr(menu->membersWin, 0, 64, menu->countBuf);
         return TRUE;
     }
     return FALSE;
@@ -1590,13 +1590,13 @@ static void CommEntryMenu_PrintMember(CommEntryMenu *menu, PlayerInfo *info, u8 
         copyVarForText(menu->wordSet, 0, info);
         WordSetNumber(menu->wordSet, 1, getTrainerID(info), 5, 2, TRUE);
         GFL_WordSetFormatStrbuf(menu->wordSet, menu->memberBuf, menu->memberFmt);
-        func_ov036_02187c4c(menu->membersWin, 0, row << 4, menu->memberBuf);
+        MsgBGPrinter_MsgWinPrintStr(menu->membersWin, 0, row << 4, menu->memberBuf);
     }
 }
 
 static void CommEntryMenu_ClearRow(CommEntryMenu *menu, int row) {
     if (menu->membersWin != NULL) {
-        func_ov036_02187c88(menu->membersWin, 0, row << 4, 144, 16);
+        MsgBGPrinter_FillMsgWin(menu->membersWin, 0, row << 4, 144, 16);
     }
 }
 
@@ -1624,8 +1624,8 @@ static void CommEntryMenu_PrintMessage(CommEntryMenu *menu, int msgId) {
         str = GFL_MsgDataLoadStrbufNew(menu->msgData, msgId);
         GFL_WordSetFormatStrbuf(menu->wordSet, menu->msgBuf, str);
         GFL_StrBufFree(str);
-        func_ov036_02188474(menu->msgWin);
-        func_ov036_021883b0(menu->msgWin, 0, 0, menu->msgBuf);
+        MsgBGPrinter_ClearSysWin(menu->msgWin);
+        MsgBGPrinter_SysWinPrintStr(menu->msgWin, 0, 0, menu->msgBuf);
     }
 }
 
@@ -1684,13 +1684,13 @@ static void CommEntryMenu_CreateLeaderList(CommEntryMenu *menu) {
 
     menu->list.options = InitListMenuOptionHeap(COMM_ENTRY_LEADER_MAX, menu->heapId);
     CommEntryMenu_BuildLeaderOptions(menu);
-    menu->list.menu = func_ov036_02187e60(msgBGSys, &sLeaderListRequest, menu->list.options);
+    menu->list.menu = MsgBGPrinter_CreateMenuFunc(msgBGSys, &sLeaderListRequest, menu->list.options);
     menu->list.seq = COMM_ENTRY_LIST_SEQ_PICK;
 }
 
 static void CommEntryMenu_FreeLeaderList(CommEntryMenu *menu) {
     if (menu->list.menu != NULL) {
-        func_ov036_02187ea0(menu->list.menu);
+        MsgBGPrinter_DeleteMenuFunc(menu->list.menu);
         menu->list.menu = NULL;
         menu->list.optionsBuilt = FALSE;
     }
@@ -1711,7 +1711,7 @@ static u32 CommEntryMenu_UpdateLeaderList(CommEntryMenu *menu) {
                 list->seq = COMM_ENTRY_LIST_SEQ_END;
             } else if (menu->list.changed == TRUE) {
                 CommEntryMenu_BuildLeaderOptions(menu);
-                func_ov036_02187ef8(menu->list.menu);
+                MsgBGPrinter_RewriteMenuFunc(menu->list.menu);
                 menu->list.changed = FALSE;
             }
         } else if (NetSystem_CountConnected() > 1) {
@@ -1768,33 +1768,33 @@ static u32 CommEntryMenu_UpdateLeaderList(CommEntryMenu *menu) {
         return list->result;
     case COMM_ENTRY_LIST_SEQ_ASK_LEAVE:
         CommEntryMenu_PrintMessage(menu, CommEntryMenu_Text_WantLeaveGroup);
-        yesNo->window = func_ov036_021880d4(Field_GetMsgBGSys(menu->field), 0);
+        yesNo->window = MsgBGPrinter_CreateYesNoMenu(Field_GetMsgBGSys(menu->field), 0);
         list->seq = COMM_ENTRY_LIST_SEQ_ANSWER_LEAVE;
         break;
     case COMM_ENTRY_LIST_SEQ_ANSWER_LEAVE: {
-        u32 answer = func_ov036_0218816c(yesNo->window);
+        u32 answer = MsgBGPrinter_YesNoMenuMain(yesNo->window);
 
         // The leader checked on the members: stay
-        if (func_ov036_0218798c(Field_GetMsgBGSys(menu->field)) == TRUE && menu->checked == TRUE) {
+        if (MsgBGPrinter_IsPrintQueFinished(Field_GetMsgBGSys(menu->field)) == TRUE && menu->checked == TRUE) {
             answer = MSGBG_YES_NO_NO;
         }
-        if (answer == MSGBG_YES_NO_WAITING && func_ov036_0218798c(Field_GetMsgBGSys(menu->field)) == TRUE) {
+        if (answer == MSGBG_YES_NO_WAITING && MsgBGPrinter_IsPrintQueFinished(Field_GetMsgBGSys(menu->field)) == TRUE) {
             if (menu->started != TRUE && menu->cancelled != TRUE) {
                 break;
             }
-            func_ov036_02187ea0(yesNo->window);
+            MsgBGPrinter_DeleteMenuFunc(yesNo->window);
             yesNo->window = NULL;
             list->result = COMM_ENTRY_LEADER_LIST_JOINED;
             list->seq = COMM_ENTRY_LIST_SEQ_END;
             break;
         }
-        func_ov036_02187ea0(yesNo->window);
+        MsgBGPrinter_DeleteMenuFunc(yesNo->window);
         yesNo->window = NULL;
         if (answer == MSGBG_YES_NO_NO) {
             list->seq = list->prevSeq;
             CommEntryMenu_PrintMessage(menu, CommEntryMenu_Text_AwaitingSResponseB);
             if (menu->list.menu != NULL) {
-                func_ov036_02188008(menu->list.menu);
+                MsgBGPrinter_DrawMenuFuncFrame(menu->list.menu);
             }
             break;
         }
@@ -1803,7 +1803,7 @@ static u32 CommEntryMenu_UpdateLeaderList(CommEntryMenu *menu) {
         break;
     }
     case COMM_ENTRY_LIST_SEQ_WAIT_PROBLEM:
-        if (func_ov036_021883e8(menu->msgWin) != TRUE) {
+        if (MsgBGPrinter_SysWinMain(menu->msgWin) != TRUE) {
             break;
         }
         list->result = COMM_ENTRY_LEADER_LIST_LEFT;
@@ -1899,7 +1899,7 @@ static void CommEntryMenu_BuildLeaderOptions(CommEntryMenu *menu) {
     int i;
 
     if (menu->list.optionsBuilt == TRUE) {
-        func_ov036_02187f50(menu->list.options);
+        MsgBGPrinter_DeleteMenuItems(menu->list.options);
     }
     emptyFmt = GFL_StrBufCreate(64, menu->heapId);
     leaderFmt = GFL_StrBufCreate(64, menu->heapId);
@@ -1935,19 +1935,19 @@ static u32 CommEntryMenu_AskLeave(CommEntryMenu *menu) {
     switch (yesNo->seq) {
     case COMM_ENTRY_LEAVE_SEQ_WAIT_B:
         if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_B) {
-            yesNo->window = func_ov036_021880d4(Field_GetMsgBGSys(menu->field), 0);
+            yesNo->window = MsgBGPrinter_CreateYesNoMenu(Field_GetMsgBGSys(menu->field), 0);
             CommEntryMenu_PrintMessage(menu, CommEntryMenu_Text_WantLeaveGroup);
             yesNo->seq = COMM_ENTRY_LEAVE_SEQ_ANSWER;
         }
         break;
     case COMM_ENTRY_LEAVE_SEQ_ANSWER: {
-        u32 answer = func_ov036_0218816c(yesNo->window);
+        u32 answer = MsgBGPrinter_YesNoMenuMain(yesNo->window);
 
-        if (func_ov036_0218798c(Field_GetMsgBGSys(menu->field)) == TRUE && menu->checked == TRUE) {
+        if (MsgBGPrinter_IsPrintQueFinished(Field_GetMsgBGSys(menu->field)) == TRUE && menu->checked == TRUE) {
             answer = MSGBG_YES_NO_NO;
         }
         if (answer != MSGBG_YES_NO_WAITING) {
-            func_ov036_02187ea0(yesNo->window);
+            MsgBGPrinter_DeleteMenuFunc(yesNo->window);
             yesNo->window = NULL;
             if (answer == MSGBG_YES_NO_NO) {
                 yesNo->seq = COMM_ENTRY_LEAVE_SEQ_WAIT_B;
@@ -1966,7 +1966,7 @@ static void CommEntryMenu_CloseYesNo(CommEntryMenu *menu) {
     CommEntryYesNo *yesNo = &menu->yesNo;
 
     if (yesNo->window != NULL) {
-        func_ov036_02187ea0(yesNo->window);
+        MsgBGPrinter_DeleteMenuFunc(yesNo->window);
         yesNo->window = NULL;
     }
     yesNo->seq = COMM_ENTRY_ASK_SEQ_PRINT;

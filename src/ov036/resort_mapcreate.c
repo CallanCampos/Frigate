@@ -78,7 +78,7 @@ u32 func_ov036_021c89cc(ResortMapCreateWork *work, void *map, FieldPropSystem *p
                     y = 0;
                     addBuildings = FALSE;
                 }
-                func_ov036_021c2d04(patch, map, 0, srcY, x, y, 6, rows);
+                LandDataPatch_OverwriteAttr(patch, map, 0, srcY, x, y, 6, rows);
                 if (addBuildings) {
                     propCount = LoadLandDataPatchBuildings(patch, propSystem, fieldChunk, propCount, x, y);
                 }

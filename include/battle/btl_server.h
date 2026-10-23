@@ -98,7 +98,7 @@ BOOL BattleServer_ProcCommEnd(BtlServer *server, int *seq);
 BOOL BattleServer_ProcTrainerEnd(BtlServer *server, int *seq);
 BOOL BattleServer_ProcFacilityEnd(BtlServer *server, int *seq);
 void BattleServer_ReadRecActions(BtlServer *server, const void *data, u32 size);
-void func_ov167_0219ef70(BtlClientActions *clientActions);
+void BattleServer_NoOp(BtlClientActions *clientActions);
 BOOL BattleServer_CheckCmdMismatch(BtlServer *server, u32 mode, const void *data, u32 size);
 BOOL BattleServer_SendRecStartChunk(BtlServer *server, BOOL value);
 BOOL BattleServer_SendRecActionsChunk(BtlServer *server, u8 value, BOOL flag);

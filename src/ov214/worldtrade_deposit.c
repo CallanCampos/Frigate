@@ -959,7 +959,7 @@ void WorldTrade_PostPokemonBaseDataMake(Dpw_Tr_Data *dtd, WorldTradeWork *wk) {
     dtd->langCode = 2;
     dtd->unk126 = getPlayerSurveys(wk->param->wifihistory);
     dtd->unk127 = UnityTower_GetCountryCount(wk->param->wifihistory);
-    dtd->unkF7 = func_02009d28(wk->param->wifihistory);
+    dtd->unkF7 = UnityTower_GetRatingLevel(wk->param->wifihistory);
 }
 
 static void Deposit_DepositPokemonDataMake(Dpw_Tr_Data *dtd, WorldTradeWork *wk) {

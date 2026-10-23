@@ -99,7 +99,7 @@ BOOL FestSparkle_IsOnTile(FesGimmick *gimmick, u16 x, u16 z, fx32 height) {
                 GetBGEntityCenterPosGrid(place, &pos);
             } else {
                 GetBGEntityPosRail(place, &railPos);
-                func_ov036_021b06ec(gimmick->railSystem, &railPos, &pos);
+                FieldRailSystem_GetLocationPos(gimmick->railSystem, &railPos, &pos);
             }
             if (POS_TO_GRID(pos.x) == x && POS_TO_GRID(pos.z) == z && pos.y - SPARKLE_HEIGHT_RANGE <= height &&
                 pos.y + SPARKLE_HEIGHT_RANGE >= height) {
@@ -151,7 +151,7 @@ static BOOL FestSparkle_ShowAll(FesGimmick *gimmick, FestSparkleWork *work) {
                 zone->found[i] = TRUE;
                 continue;
             }
-            func_ov036_021b06ec(gimmick->railSystem, &railPos, &pos);
+            FieldRailSystem_GetLocationPos(gimmick->railSystem, &railPos, &pos);
         }
         func_ov036_021a5c04(gimmick->sparkles, i, work->values[i], &pos);
     }

@@ -32,7 +32,7 @@ u8 EncountSave_GetSwarmLocation(EncountSave *save) {
     return save->swarmLocation;
 }
 
-u8 func_0200dd38(EncountSave *save, u8 index) {
+u8 EncountSave_GetEntryState(EncountSave *save, u8 index) {
     return save->unk2A[index];
 }
 

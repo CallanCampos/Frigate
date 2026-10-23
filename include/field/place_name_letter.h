@@ -40,6 +40,6 @@ void func_ov036_021b68e8(PlaceNameLetter *letter);
 void func_ov036_021b6900(PlaceNameLetter *letter, s16 param0, u16 param1);
 void func_ov036_021b6910(PlaceNameLetter *letter, s16 param0, u16 param1);
 void func_ov036_021b6920(PlaceNameLetter *letter);
-BOOL func_ov036_021b6940(PlaceNameLetter *letter);
+BOOL PlaceName_GetMessageLength(PlaceNameLetter *letter);
 
 #endif // POKEBW2_FIELD_PLACE_NAME_LETTER_H

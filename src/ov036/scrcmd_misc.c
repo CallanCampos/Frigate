@@ -60,7 +60,7 @@ typedef struct {
 } ItemCollectorPrice;
 
 static ElevatorFloor *ElevatorTable_GetEntry(ElevatorFloor *table, u32 index);
-static void func_ov036_021afdd0(ElevatorFloor *floor);
+static void ElevatorTable_NoopWarpEntry(ElevatorFloor *floor);
 static u32 ElevatorTable_CountEntries(ElevatorFloor *table);
 static BOOL AnvilleTrain_IsSpecialDate(u32 month, u32 day);
 
@@ -94,7 +94,7 @@ BOOL s0134_CasteliaRushInit(VM *vm, FieldScriptEnv *env) {
 }
 
 // Set a word to the name of the trainer log entry that the DS owner's birthday picks, with that trainer's gender
-BOOL func_ov036_021afcfc(VM *vm, FieldScriptEnv *env) {
+BOOL ElevatorTable_RegisterBirthdayEntry(VM *vm, FieldScriptEnv *env) {
     OSOwnerInfo ownerInfo;
     u16 wordIndex;
     TrainerLogSave *data;
@@ -125,7 +125,7 @@ BOOL func_ov036_021afcfc(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL func_ov036_021afd9c(VM *vm, FieldScriptEnv *env) {
+BOOL ElevatorTable_GetMysteryEntryCount(VM *vm, FieldScriptEnv *env) {
     GameData *gameData = FieldScriptEnv_GetGameData(env);
     u16 *result = ScriptReadVar(vm, env);
 
@@ -138,7 +138,7 @@ static ElevatorFloor *ElevatorTable_GetEntry(ElevatorFloor *table, u32 index) {
 }
 
 // Empty in the game, though called for each floor counted: perhaps a check left out of the release build
-static void func_ov036_021afdd0(ElevatorFloor *floor) {
+static void ElevatorTable_NoopWarpEntry(ElevatorFloor *floor) {
 }
 
 // The number of floors, or 0 if the table has no end
@@ -148,7 +148,7 @@ static u32 ElevatorTable_CountEntries(ElevatorFloor *table) {
     for (i = 0; i < ELEVATOR_FLOOR_MAX; i++) {
         ElevatorFloor *floor = ElevatorTable_GetEntry(table, i);
 
-        func_ov036_021afdd0(floor);
+        ElevatorTable_NoopWarpEntry(floor);
         if (floor->messageId == ELEVATOR_TABLE_END) {
             return i;
         }

@@ -34,19 +34,19 @@ typedef struct {
     G3DAnimation *anm[BTRAIN_ANM_COUNT];
 } BTrainTask;
 
-static void func_ov036_021c64d0(FieldEffectBTrain *effect, u32 trainIdx);
-static void func_ov036_021c6534(FieldEffectBTrain *effect);
-static void func_ov036_021c65f8(FieldEffectTask *task, void *work);
-static void func_ov036_021c6664(FieldEffectTask *task, void *work);
-static void func_ov036_021c6684(FieldEffectTask *task, void *work);
-static void func_ov036_021c66a8(FieldEffectTask *task, void *work);
+static void FldeffBtrain_LoadResources(FieldEffectBTrain *effect, u32 trainIdx);
+static void FldeffBtrain_FreeResources(FieldEffectBTrain *effect);
+static void FldeffBtrain_Init(FieldEffectTask *task, void *work);
+static void FldeffBtrain_Exit(FieldEffectTask *task, void *work);
+static void FldeffBtrain_Update(FieldEffectTask *task, void *work);
+static void FldeffBtrain_Draw(FieldEffectTask *task, void *work);
 
 static const u16 BTRAIN_ANM_DATIDS[BTRAIN_ANM_COUNT] = { 0x80, 0x81, 0x82, 0x83 };
 
 static const u16 BATTLE_SUBWAY_TRAIN_EFFECT_DATIDS[BTRAIN_COUNT] = { 0x55, 0x56, 0x57, 0x58, 0x59, 0x5a, 0x5b, 0x5c };
 
 static const FieldEffectTaskVTable BTRAIN_TASK_VTABLE = {
-    sizeof(BTrainTask), func_ov036_021c65f8, func_ov036_021c6664, func_ov036_021c6684, func_ov036_021c66a8,
+    sizeof(BTrainTask), FldeffBtrain_Init, FldeffBtrain_Exit, FldeffBtrain_Update, FldeffBtrain_Draw,
 };
 
 static const SRTMatrix BTRAIN_SRT = { { 0, 0, 0 }, { FX32_ONE, FX32_ONE, FX32_ONE } };
@@ -59,11 +59,11 @@ void *FieldEffect_BTrain_Create(FieldEffects *effects, HeapID heapId) {
 }
 
 void FieldEffect_BTrain_Free(FieldEffects *effects, void *data) {
-    func_ov036_021c6534(data);
+    FldeffBtrain_FreeResources(data);
     GFL_HeapFree(data);
 }
 
-static void func_ov036_021c64d0(FieldEffectBTrain *effect, u32 trainIdx) {
+static void FldeffBtrain_LoadResources(FieldEffectBTrain *effect, u32 trainIdx) {
     ArcTool *arc = FieldEffects_GetArc(effect->effects);
     const u16 *trainIds = BATTLE_SUBWAY_TRAIN_EFFECT_DATIDS;
     const u16 *anmIds;
@@ -82,7 +82,7 @@ static void func_ov036_021c64d0(FieldEffectBTrain *effect, u32 trainIdx) {
     }
 }
 
-static void func_ov036_021c6534(FieldEffectBTrain *effect) {
+static void FldeffBtrain_FreeResources(FieldEffectBTrain *effect) {
     int i;
 
     for (i = 0; i < BTRAIN_COUNT; i++) {
@@ -100,20 +100,20 @@ static void func_ov036_021c6534(FieldEffectBTrain *effect) {
 }
 
 // A train of the given kind, which starts at pos
-FieldEffectTask *func_ov036_021c6574(FieldEffects *effects, u32 trainIdx, const VecFx32 *pos) {
+FieldEffectTask *FldeffBtrain_Start(FieldEffects *effects, u32 trainIdx, const VecFx32 *pos) {
     BTrainTaskParams params;
 
     params.effect = FieldEffects_GetHandleData(effects, 13);
     params.trainIdx = trainIdx;
-    func_ov036_021c64d0(params.effect, trainIdx);
+    FldeffBtrain_LoadResources(params.effect, trainIdx);
     return FieldEffects_TCBCreate(effects, &BTRAIN_TASK_VTABLE, pos, 0, &params, 0);
 }
 
 // Plays the animation anmIdx from its start
-void func_ov036_021c65a8(FieldEffectTask *task, u16 anmIdx) {
+void FldeffBtrain_SetAnime(FieldEffectTask *task, u16 anmIdx) {
     if (task != NULL) {
         int i;
-        BTrainTask *trainTask = func_ov036_021a3afc(task);
+        BTrainTask *trainTask = FieldEffects_GetObjectWork(task);
 
         for (i = 0; i < BTRAIN_ANM_COUNT; i++) {
             GFL_G3DActorResetAnmFrame(trainTask->actor, i);
@@ -128,17 +128,17 @@ void func_ov036_021c65a8(FieldEffectTask *task, u16 anmIdx) {
     }
 }
 
-void func_ov036_021c65e8(FieldEffectTask *task, u16 hidden) {
+void FldeffBtrain_SetHidden(FieldEffectTask *task, u16 hidden) {
     if (task != NULL) {
-        BTrainTask *trainTask = func_ov036_021a3afc(task);
+        BTrainTask *trainTask = FieldEffects_GetObjectWork(task);
 
         trainTask->hidden = hidden;
     }
 }
 
-static void func_ov036_021c65f8(FieldEffectTask *task, void *work) {
+static void FldeffBtrain_Init(FieldEffectTask *task, void *work) {
     BTrainTask *trainTask = work;
-    BTrainTaskParams *params = func_ov036_021a3ac8(task);
+    BTrainTaskParams *params = FieldEffects_GetObjectParam(task);
     FieldEffectBTrain *effect = params->effect;
     u32 trainIdx = params->trainIdx;
     int i;
@@ -156,7 +156,7 @@ static void func_ov036_021c65f8(FieldEffectTask *task, void *work) {
     }
 }
 
-static void func_ov036_021c6664(FieldEffectTask *task, void *work) {
+static void FldeffBtrain_Exit(FieldEffectTask *task, void *work) {
     BTrainTask *trainTask = work;
     int i;
 
@@ -166,7 +166,7 @@ static void func_ov036_021c6664(FieldEffectTask *task, void *work) {
     }
 }
 
-static void func_ov036_021c6684(FieldEffectTask *task, void *work) {
+static void FldeffBtrain_Update(FieldEffectTask *task, void *work) {
     BTrainTask *trainTask = work;
 
     if (trainTask->anmIdx != BTRAIN_ANM_COUNT) {
@@ -177,14 +177,14 @@ static void func_ov036_021c6684(FieldEffectTask *task, void *work) {
     }
 }
 
-static void func_ov036_021c66a8(FieldEffectTask *task, void *work) {
+static void FldeffBtrain_Draw(FieldEffectTask *task, void *work) {
     BTrainTask *trainTask = work;
     SRTMatrix srt;
 
     if (trainTask->hidden == 0) {
         srt = BTRAIN_SRT;
         MTX_Identity33_(&srt.rotation);
-        func_ov036_021a3ad4(task, &srt.translation);
+        FieldEffects_GetObjectPos(task, &srt.translation);
         GFL_G3DSysDrawObjBBoxCull(trainTask->actor, &srt);
     }
 }

@@ -33,16 +33,16 @@ void FieldG3DObjSystem_SetObjPosition(FieldG3DObjSystem *sys, u16 objIdx, const 
 void FieldG3DObjSystem_SetAnmFrame(FieldG3DObjSystem *sys, u16 objIdx, int anmIdx, fx32 frame);
 fx32 FieldG3DObjSystem_GetAnmFrame(FieldG3DObjSystem *sys, u16 objIdx, u32 anmIdx);
 // Hide the object, or not
-void func_ov036_021c0154(FieldG3DObjSystem *sys, u16 objIdx, BOOL hidden);
+void FieldG3DObjSystem_SetObjectHidden(FieldG3DObjSystem *sys, u16 objIdx, BOOL hidden);
 // TRUE until the object's animation ends
 BOOL FieldG3DObjSystem_StepObjAnm(FieldG3DObjSystem *sys, u16 objIdx, fx32 addend);
 BOOL FieldG3DObjSystem_StepObjAnmLoop(FieldG3DObjSystem *sys, u16 objIdx, fx32 addend);
 // Leave the object out of FieldG3DObjSystem_Draw, for its owner to draw with FieldG3DObjSystem_DrawObj, or not
-void func_ov036_021c02b4(FieldG3DObjSystem *sys, u16 objIdx, BOOL flag);
+void FieldG3DObjSystem_SetObjectManualDraw(FieldG3DObjSystem *sys, u16 objIdx, BOOL flag);
 void FieldG3DObjSystem_DrawObj(FieldG3DObjSystem *sys, u16 objIdx);
 // A flag of the object that its owner sets, and its value
-void func_ov036_021c0304(FieldG3DObjSystem *sys, u16 objIdx, BOOL value);
-u32 func_ov036_021c0320(FieldG3DObjSystem *sys, u16 objIdx);
+void FieldG3DObjSystem_SetObjectRedrawFlag(FieldG3DObjSystem *sys, u16 objIdx, BOOL value);
+u32 FieldG3DObjSystem_GetObjectRedrawFlag(FieldG3DObjSystem *sys, u16 objIdx);
 void FieldG3DObjResRequest_Clear(FieldG3DObjResRequest *req);
 void FieldG3DObjResRequest_SetModel(FieldG3DObjResRequest *req, ArcTool *arc, u16 datId);
 void FieldG3DObjResRequest_SetAnmArc(FieldG3DObjResRequest *req, ArcTool *arc);

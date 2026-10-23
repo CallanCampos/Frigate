@@ -73,7 +73,7 @@ struct Regulation {
     u8 maxBattles;
 }; // size: 0xbc
 
-// What func_0200b760 fills in from a regulation
+// What Regulation_GetShooterSettings fills in from a regulation
 typedef struct {
     u8 unk0[0x7];
     u8 launcher;
@@ -88,7 +88,7 @@ StrBuf *makeStrbufLoadBattleTypeText(Regulation *regulation, HeapID heapId);
 u32 Regulation_GetParam(Regulation *regulation, u32 param);
 // Whether a bit of one of the regulation's bit arrays is set
 BOOL Regulation_CheckParamBit(Regulation *regulation, u32 param, int index);
-void func_0200b760(Regulation *regulation, RegulationUnkAC *out);
+void Regulation_GetShooterSettings(Regulation *regulation, RegulationUnkAC *out);
 // poke_regulation.c, which the ROM names: checks of Pokémon and parties against a regulation. Names are not swan's
 
 // What a party fails a regulation by, which PokeRegulation_CheckPicked, PokeRegulation_CheckPartyCanEnter and

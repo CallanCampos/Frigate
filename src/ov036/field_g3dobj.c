@@ -208,7 +208,7 @@ void FieldG3DObjSystem_SetObjPosition(FieldG3DObjSystem *system, u16 objIndex, c
     system->objs[objIndex].transform.translation = *position;
 }
 
-void func_ov036_021c0154(FieldG3DObjSystem *system, u16 objIndex, BOOL value) {
+void FieldG3DObjSystem_SetObjectHidden(FieldG3DObjSystem *system, u16 objIndex, BOOL value) {
     system->objs[objIndex].hidden = value;
 }
 
@@ -279,7 +279,7 @@ fx32 FieldG3DObjSystem_GetAnmFrame(FieldG3DObjSystem *system, u16 objIndex, u32 
     return frame;
 }
 
-void func_ov036_021c02b4(FieldG3DObjSystem *system, u16 objIndex, BOOL value) {
+void FieldG3DObjSystem_SetObjectManualDraw(FieldG3DObjSystem *system, u16 objIndex, BOOL value) {
     system->objs[objIndex].flag4 = value;
 }
 
@@ -295,11 +295,11 @@ void FieldG3DObjSystem_DrawObj(FieldG3DObjSystem *system, u16 objIndex) {
     }
 }
 
-void func_ov036_021c0304(FieldG3DObjSystem *system, u16 objIndex, BOOL value) {
+void FieldG3DObjSystem_SetObjectRedrawFlag(FieldG3DObjSystem *system, u16 objIndex, BOOL value) {
     system->objs[objIndex].flag5 = value;
 }
 
-u32 func_ov036_021c0320(FieldG3DObjSystem *system, u16 objIndex) {
+u32 FieldG3DObjSystem_GetObjectRedrawFlag(FieldG3DObjSystem *system, u16 objIndex) {
     return system->objs[objIndex].flag5;
 }
 

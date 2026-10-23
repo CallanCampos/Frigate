@@ -1654,8 +1654,8 @@ static BOOL ResortCmd_UpdateRecords(VM *vm, void *data) {
         wk->state++;
         break;
     case 2:
-        if (func_ov036_02187c70(wk->window)) {
-            GFL_BGSysQueueScrLoad(BmpWin_GetBGIndex(func_ov036_02187c9c(wk->window)));
+        if (MsgBGPrinter_IsMsgWinTransDone(wk->window)) {
+            GFL_BGSysQueueScrLoad(BmpWin_GetBGIndex(MsgBGPrinter_GetMsgWinBmpWin(wk->window)));
             wk->state++;
         }
         break;
@@ -1676,9 +1676,9 @@ static BOOL ResortCmd_UpdateRecords(VM *vm, void *data) {
         }
         break;
     case 4:
-        func_ov036_02187c7c(wk->window);
-        GFL_BGSysQueueScrLoad(BmpWin_GetBGIndex(func_ov036_02187c9c(wk->window)));
-        func_ov036_02187c1c(wk->window);
+        MsgBGPrinter_ClearMsgWin(wk->window);
+        GFL_BGSysQueueScrLoad(BmpWin_GetBGIndex(MsgBGPrinter_GetMsgWinBmpWin(wk->window)));
+        MsgBGPrinter_DeleteMsgWin(wk->window);
         wk->state++;
         break;
     case 5:

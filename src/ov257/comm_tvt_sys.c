@@ -757,7 +757,7 @@ static void CommTvt_UpdateNames(CommTvtWork *sys) {
         u8 talker = CtvtComm_GetTalker(sys, sys->comm);
 
         if (talker != CTVT_COMM_NONE) {
-            func_ov257_021aad74(sys, talker);
+            CommTvt_PlaceSlotMarker(sys, talker);
         }
     }
 }
@@ -911,19 +911,19 @@ BOOL func_ov257_021aab10(CommTvtWork *sys) {
     return sys->unk20;
 }
 
-void func_ov257_021aab14(CommTvtWork *sys, BOOL value) {
+void CommTvt_SetMessageActive(CommTvtWork *sys, BOOL value) {
     sys->unk20 = value;
 }
 
-BOOL func_ov257_021aab18(CommTvtWork *sys) {
+BOOL CommTvt_GetViewSwapped(CommTvtWork *sys) {
     return sys->unk24;
 }
 
-void func_ov257_021aab1c(CommTvtWork *sys) {
+void CommTvt_ToggleViewSwapped(CommTvtWork *sys) {
     sys->unk24 = sys->unk24 == FALSE ? TRUE : FALSE;
 }
 
-BOOL func_ov257_021aab2c(CommTvtWork *sys) {
+BOOL CommTvt_GetInputLocked(CommTvtWork *sys) {
     return sys->unk28;
 }
 
@@ -931,7 +931,7 @@ void func_ov257_021aab30(CommTvtWork *sys, BOOL value) {
     sys->unk28 = value;
 }
 
-BOOL func_ov257_021aab34(CommTvtWork *sys) {
+BOOL CommTvt_GetEndRequested(CommTvtWork *sys) {
     return sys->unk2C;
 }
 
@@ -939,7 +939,7 @@ void func_ov257_021aab38(CommTvtWork *sys, BOOL value) {
     sys->unk2C = value;
 }
 
-BOOL func_ov257_021aab3c(CommTvtWork *sys) {
+BOOL CommTvt_IsLaunchModeCall(CommTvtWork *sys) {
     if (sys->param->unk4 == COMM_TVT_START_EXISTING) {
         return TRUE;
     }
@@ -969,7 +969,7 @@ BOOL CommTvt_IsCameraEnabled(void) {
     return FALSE;
 }
 
-AppTaskMenu *func_ov257_021aab80(CommTvtWork *sys) {
+AppTaskMenu *CommTvt_OpenConfirmMenu(CommTvtWork *sys) {
     AppTaskMenuInit init = { 0 };
     AppTaskMenuItem items[2] = { 0 };
     AppTaskMenu *menu;
@@ -1040,7 +1040,7 @@ AppTaskMenu *func_ov257_021aac98(CommTvtWork *sys, u8 right, u8 bottom) {
     return menu;
 }
 
-void func_ov257_021aad08(CommTvtWork *sys) {
+void CommTvt_ClearNameWindows(CommTvtWork *sys) {
     u8 i;
 
     sys->namesPrinted = 0;
@@ -1053,7 +1053,7 @@ void func_ov257_021aad08(CommTvtWork *sys) {
     }
 }
 
-void func_ov257_021aad48(CommTvtWork *sys) {
+void CommTvt_ClearAndTransferNameWindows(CommTvtWork *sys) {
     u8 i;
 
     for (i = 0; i < COMM_TVT_MEMBERS; i++) {
@@ -1063,7 +1063,7 @@ void func_ov257_021aad48(CommTvtWork *sys) {
 }
 
 // Points the cursor at the talker's name
-void func_ov257_021aad74(CommTvtWork *sys, u8 talker) {
+void CommTvt_PlaceSlotMarker(CommTvtWork *sys, u8 talker) {
     int displayMode = CommTvt_GetDisplayMode(sys);
     u8 window = talker;
 
@@ -1095,23 +1095,23 @@ void func_ov257_021aad74(CommTvtWork *sys, u8 talker) {
     }
 }
 
-void func_ov257_021aae44(CommTvtWork *sys) {
+void CommTvt_HideSlotMarker(CommTvtWork *sys) {
     ClActor_SetVisible(sys->talkerCursor, FALSE);
 }
 
-void func_ov257_021aae54(CommTvtWork *sys, const CtvtCommMemberInfo *info) {
+void CommTvt_SavePeerRecord(CommTvtWork *sys, const CtvtCommMemberInfo *info) {
     Misc_AddMetTrainer(getHollow_RivalData(GameData_GetSaveControl(sys->param->gameData)),
                        getIDAsUInt((PlayerInfo *)info->playerInfo));
 }
 
-void func_ov257_021aae7c(CommTvtWork *sys, BmpWin *window) {
+void CommTvt_CreateTimeIcon(CommTvtWork *sys, BmpWin *window) {
     if (sys->waitIcon != NULL) {
-        func_ov257_021aaeb0(sys);
+        CommTvt_DeleteTimeIcon(sys);
     }
     sys->waitIcon = WaitIcon_CreateTCBEx(sys->tcbEx, window, 15, 16, sys->heapId);
 }
 
-void func_ov257_021aaeb0(CommTvtWork *sys) {
+void CommTvt_DeleteTimeIcon(CommTvtWork *sys) {
     if (sys->waitIcon != NULL) {
         WaitIcon_Free(sys->waitIcon);
         sys->waitIcon = NULL;

@@ -118,7 +118,7 @@ static int DWCi_SendResvCommand(int profileId, int flag);
 static int DWCi_SendResvCommandToFriend(int a0, int a1, int a2);
 static int DWCi_RetryReserving(int a0);
 static int DWCi_CancelReservation(int unused);
-static int func_ov011_02165094(int profileId, int a1);
+static int DWCi_CancelPreConnectedServerProcessWithResetLevel(int profileId, int a1);
 static int DWCi_CancelPreConnectedServerProcess(int profileId);
 static int DWCi_CancelPreConnectedClientProcess(int unused);
 static void DWCi_PostProcessConnection(int a0);
@@ -198,10 +198,10 @@ static BOOL DWCi_IsTargetNodeInfoValid(void);
 static void DWCi_ClearNodeInfo(void *address);
 static BOOL DWCi_IsValidNodeInfo(DWCNodeInfo *peer);
 static u64 func_ov011_021683b8(void);
-static int func_ov011_02168590(void);
+static int DWCi_IsFirstServer(void);
 static BOOL DWCi_IsMatchLocked(void);
 static int DWCi_GetTopologyType(void);
-static void func_ov011_021685fc(void);
+static void DWCi_ClearMeshMakingTempInfo(void);
 static void DWCi_ApplyPendingSuspend(void);
 static void DWCi_FinishSuspendRequest(int cancelled);
 static int func_ov011_021686b8(void);
@@ -588,7 +588,7 @@ void DWCi_MatchProcess(int a0) {
                 DWCi_RetryReserving(0);
                 return;
             }
-            if (func_ov011_02168468() == 1) {
+            if (DWCi_StopMeshMaking() == 1) {
                 DWCi_SetMatchStatus(1);
                 break;
             }
@@ -650,7 +650,7 @@ void DWCi_MatchProcess(int a0) {
         if (DWCi_GetMatchCnt()->nnFinishTime != 0) {
             if (OS_TicksToMilliSeconds(OS_GetTick() - DWCi_GetMatchCnt()->nnFinishTime) > 25000) {
                 DWCi_GetMatchCnt()->nnFinishTime = 0;
-                if (func_ov011_02168468() == 1) {
+                if (DWCi_StopMeshMaking() == 1) {
                     DWCi_SetMatchStatus(1);
                 } else if (DWCi_CancelPreConnectedClientProcess(DWCi_GetMatchCnt()->self.profileId) == 0) {
                     DWCi_ClearTargetNodeInfo();
@@ -659,7 +659,7 @@ void DWCi_MatchProcess(int a0) {
             }
         } else if (DWCi_GetMatchCnt()->cmdCommand == 6 &&
                    OS_TicksToMilliSeconds(OS_GetTick() - DWCi_GetMatchCnt()->cmdSendTime) > 6000) {
-            if (func_ov011_02168468() == 1) {
+            if (DWCi_StopMeshMaking() == 1) {
                 DWCi_StopResendingMatchCommand();
                 DWCi_SetMatchStatus(1);
             } else {
@@ -686,7 +686,7 @@ void DWCi_MatchProcess(int a0) {
              (DWCi_GetMatchCnt()->qr2MatchType != 0 &&
               OS_TicksToMilliSeconds(OS_GetTick() - DWCi_GetMatchCnt()->cmdSendTime) > 19000))) {
             DWCi_StopResendingMatchCommand();
-            if (func_ov011_02168468() == 1) {
+            if (DWCi_StopMeshMaking() == 1) {
                 DWCi_SetMatchStatus(1);
             } else if (DWCi_CancelPreConnectedServerProcess(DWCi_GetMatchCnt()->self.profileId) == 0) {
                 return;
@@ -729,7 +729,7 @@ void DWCi_MatchProcess(int a0) {
         }
         break;
     case 9:
-        func_ov011_02168468();
+        DWCi_StopMeshMaking();
         c = DWCi_GetMatchCnt();
         c->newHostAckBit = 0;
         c->newHostResendCount = 0;
@@ -740,7 +740,7 @@ void DWCi_MatchProcess(int a0) {
         }
         c->newHostAckBit |= 1 << DWCi_GetAIDFromProfileID(c->profileID, 1);
         if (DWCi_IsServerNodeMyself() != 0) {
-            if (func_ov011_02167fd0() == 0) {
+            if (DWCi_IsServerChangeEnabled() == 0) {
                 DWCi_StopMatching(0x16, -80431);
                 break;
             }
@@ -779,7 +779,7 @@ void DWCi_MatchProcess(int a0) {
         break;
     case 11:
         if (DWCi_IsServerNodeMyself() != 0) {
-            if (func_ov011_02167fd0() == 0) {
+            if (DWCi_IsServerChangeEnabled() == 0) {
                 DWCi_StopMatching(0x16, -80431);
                 break;
             }
@@ -830,7 +830,7 @@ void DWCi_MatchProcess(int a0) {
                         DWCi_GetMatchCnt()->memberConnecting = 0;
                         DWCi_ClearTargetNodeInfo();
                     } else {
-                        func_ov011_021685fc();
+                        DWCi_ClearMeshMakingTempInfo();
                         DWCi_SetMatchStatus(3);
                     }
                     break;
@@ -930,7 +930,7 @@ void DWCi_GT2ConnectAttemptCallback(GT2Socket socket, GT2Connection connection, 
     slot = DWCi_GT2GetConnectionListIdx();
     if (slot == -1) {
         gt2Reject(connection, "Server full", -1);
-        if (func_ov011_02168468() == 1) {
+        if (DWCi_StopMeshMaking() == 1) {
             DWCi_StopResendingMatchCommand();
             DWCi_SetMatchStatus(1);
             return;
@@ -989,12 +989,12 @@ void DWCi_GT2ConnectedCallback(GT2Connection connection, GT2Result result, GT2By
         return;
     }
     if (result != 0) {
-        if (func_ov011_02168468() == 1) {
+        if (DWCi_StopMeshMaking() == 1) {
             DWCi_SetMatchStatus(1);
             return;
         }
         if (DWCi_GetMatchCnt()->abortedMemberState == 0xf) {
-            func_ov011_021685fc();
+            DWCi_ClearMeshMakingTempInfo();
             return;
         }
         if (result == 5) {
@@ -1104,7 +1104,7 @@ void DWCi_ClearQR2Key(void) {
 }
 
 void DWCi_ProcessMatchSynPacket(u8 aid, u16 type, const void *data) {
-    if (func_ov011_021686a0()) {
+    if (DWCi_IsFullMesh()) {
         func_ov011_02162bf8(aid, type, data);
     } else {
         func_ov011_02162958(aid, type, data);
@@ -1139,7 +1139,7 @@ static void func_ov011_02162958(u8 conn, int kind, u32 *msg) {
                 DWCi_GetMatchCnt()->pending.profileId = 0;
                 value = msg[1];
                 DWCi_GetMatchCnt()->synId = value;
-                if (func_ov011_021686a0()) {
+                if (DWCi_IsFullMesh()) {
                     DWCi_PushFrontNodeInfo(&DWCi_GetMatchCnt()->self);
                 }
             } else {
@@ -1338,7 +1338,7 @@ static void DWCi_ResetMatchParam(int mode) {
     DWCi_GetMatchCnt()->closedTime = 0;
     MIi_CpuClear32(0, &DWCi_GetMatchCnt()->cmdCommand, 0x98);
     DWCi_GetMatchCnt()->memberConnecting = 0;
-    func_ov011_021685fc();
+    DWCi_ClearMeshMakingTempInfo();
     if (mode == 2) {
         if (DWCi_GetHostState() == 2) {
             DWCi_SetMatchStatus(0xd);
@@ -1898,7 +1898,7 @@ static int DWCi_ProcessRecvMatchCommand(int type, s32 profileId, u32 ip, u16 por
             break;
         }
         code = data[0];
-        if (func_ov011_02168468() == 1) {
+        if (DWCi_StopMeshMaking() == 1) {
             DWCi_SetMatchStatus(1);
             break;
         }
@@ -1912,7 +1912,7 @@ static int DWCi_ProcessRecvMatchCommand(int type, s32 profileId, u32 ip, u16 por
         if (DWCi_GetMatchCnt()->state != 3) {
             break;
         }
-        if (func_ov011_02168468() == 1) {
+        if (DWCi_StopMeshMaking() == 1) {
             DWCi_SetMatchStatus(1);
             break;
         }
@@ -1956,7 +1956,7 @@ static int DWCi_ProcessRecvMatchCommand(int type, s32 profileId, u32 ip, u16 por
         if (DWCi_GetMatchCnt()->qr2IsReserved == 0 || profileId != DWCi_GetMatchCnt()->qr2Reservation) {
             break;
         }
-        if (func_ov011_02168468() == 1) {
+        if (DWCi_StopMeshMaking() == 1) {
             DWCi_SetMatchStatus(1);
             break;
         }
@@ -1975,7 +1975,7 @@ static int DWCi_ProcessRecvMatchCommand(int type, s32 profileId, u32 ip, u16 por
         if (DWCi_IsTargetNodeInfoValid() == 0) {
             break;
         }
-        if (func_ov011_021686a0() == 0 && DWCi_GetMatchCnt()->mode == 3 && DWCi_GetMatchCnt()->memberConnecting == 0) {
+        if (DWCi_IsFullMesh() == 0 && DWCi_GetMatchCnt()->mode == 3 && DWCi_GetMatchCnt()->memberConnecting == 0) {
             break;
         }
         if (DWCi_GetMatchCnt()->state == 1) {
@@ -1994,7 +1994,7 @@ static int DWCi_ProcessRecvMatchCommand(int type, s32 profileId, u32 ip, u16 por
         break;
     }
     case 7: {
-        if (func_ov011_02168468() == 1) {
+        if (DWCi_StopMeshMaking() == 1) {
             DWCi_SetMatchStatus(1);
         }
         if (DWCi_GetMatchCnt()->state != 1 || profileId != DWCi_GetNodeInfoByIndex(0)->profileId) {
@@ -2006,7 +2006,7 @@ static int DWCi_ProcessRecvMatchCommand(int type, s32 profileId, u32 ip, u16 por
             break;
         }
         DWCi_GetMatchCnt()->newHostAckBit = 0;
-        if (func_ov011_021686a0() != 0) {
+        if (DWCi_IsFullMesh() != 0) {
             DWCi_GetMatchCnt()->self.profileId = id;
             DWCi_GetMatchCnt()->self.aid = aid;
         } else {
@@ -2259,7 +2259,7 @@ static u8 DWCi_CheckResvCommand(int profileId, int ip, u16 port, int nodeType, i
                 if (DWCi_GetMatchCnt()->state == 1) {
                     if (DWCi_GetMatchCnt()->pending.profileId == 0) {
                         DWCi_GetMatchCnt()->memberConnecting = 1;
-                        func_ov011_021685fc();
+                        DWCi_ClearMeshMakingTempInfo();
                         result = 2;
                         now = OS_GetTick();
                         DWCi_GetMatchCnt()->cmdSendTime = now;
@@ -2570,7 +2570,7 @@ static int DWCi_CancelReservation(int unused) {
     return result;
 }
 
-static int func_ov011_02165094(int profileId, int a1) {
+static int DWCi_CancelPreConnectedServerProcessWithResetLevel(int profileId, int a1) {
     int i;
 
     if (DWCi_IsTargetNodeInfoValid() != 0) {
@@ -2598,7 +2598,7 @@ static int func_ov011_02165094(int profileId, int a1) {
             DWCi_RestartFromCancel(a1);
         }
     } else {
-        func_ov011_02168468();
+        DWCi_StopMeshMaking();
     }
     return 1;
 }
@@ -2611,7 +2611,7 @@ static int DWCi_CancelPreConnectedServerProcess(int profileId) {
             a1 = 1;
         }
     }
-    return func_ov011_02165094(profileId, a1);
+    return DWCi_CancelPreConnectedServerProcessWithResetLevel(profileId, a1);
 }
 
 static int DWCi_CancelPreConnectedClientProcess(int unused) {
@@ -2628,7 +2628,7 @@ static int DWCi_CancelPreConnectedClientProcess(int unused) {
         }
         return 0;
     }
-    if (func_ov011_02168468() == 1) {
+    if (DWCi_StopMeshMaking() == 1) {
         return result;
     }
     if (DWCi_GetMatchCnt()->pending.profileId != 0) {
@@ -2638,7 +2638,7 @@ static int DWCi_CancelPreConnectedClientProcess(int unused) {
         NNCancel(DWCi_GetMatchCnt()->target.cookie);
         DWCi_GetMatchCnt()->target.cookie = 0;
     }
-    if ((func_ov011_021686a0() != 0 && DWCi_GetMatchCnt()->unk_62f != 0) ||
+    if ((DWCi_IsFullMesh() != 0 && DWCi_GetMatchCnt()->unk_62f != 0) ||
         (DWCi_IsTargetNodeInfoValid() != 0 &&
          DWCi_GetGT2ConnectionByProfileID(DWCi_GetMatchCnt()->self.profileId, 1) != NULL) ||
         DWCi_GetNumNodeInfo() > 1) {
@@ -2653,7 +2653,7 @@ static int DWCi_CancelPreConnectedClientProcess(int unused) {
 static void DWCi_PostProcessConnection(int a0) {
     switch (a0) {
     case 0:
-        if (func_ov011_021686a0() != 0) {
+        if (DWCi_IsFullMesh() != 0) {
             DWCi_SendClientLinkRequest();
         } else {
             DWCi_StartMatchSyn();
@@ -2667,8 +2667,8 @@ static void DWCi_PostProcessConnection(int a0) {
         break;
     case 2:
         DWCi_SetMatchStatus(1);
-        if (func_ov011_02168468() == 1) {
-            func_ov011_021685fc();
+        if (DWCi_StopMeshMaking() == 1) {
+            DWCi_ClearMeshMakingTempInfo();
         } else {
             DWCi_SetHostState(1);
             DWCi_GetMatchCnt()->mode = 3;
@@ -2677,7 +2677,7 @@ static void DWCi_PostProcessConnection(int a0) {
                 DWCi_GetMatchCnt()->qr2Reservation = DWCi_GetMatchCnt()->profileID;
             }
             DWCi_InitClWaitTimeout();
-            if (func_ov011_021686a0() != 0) {
+            if (DWCi_IsFullMesh() != 0) {
                 if (DWCi_IsValidNodeInfo(&DWCi_GetMatchCnt()->pending) != 0) {
                     u32 data;
                     DWCNodeInfo *node;
@@ -2729,7 +2729,7 @@ static void DWCi_PostProcessConnection(int a0) {
 
 static void func_ov011_0216549c(void) {
     DWCi_GetMatchCnt()->nnFailureCount = 0;
-    if (func_ov011_021686a0() != 0) {
+    if (DWCi_IsFullMesh() != 0) {
         func_ov011_02165540();
         return;
     }
@@ -2779,7 +2779,7 @@ static int DWCi_StartMatchSyn(void) {
         DWCi_GetMatchCnt()->qr2IsReserved = 0;
         DWCi_GetMatchCnt()->qr2Reservation = 0;
         DWCi_SetMatchStatus(1);
-        func_ov011_02168468();
+        DWCi_StopMeshMaking();
         return 0;
     }
     DWCi_GetMatchCnt()->qr2IsReserved = 0;
@@ -3102,7 +3102,7 @@ static void DWCi_SendMatchSynPacket(u8 aid, u16 type) {
         if (DWCi_IsTargetNodeInfoValid() != 0 && aid == DWCi_GetMatchCnt()->self.aid) {
             int count;
 
-            if (func_ov011_021686a0() != 0) {
+            if (DWCi_IsFullMesh() != 0) {
                 count = 0;
             } else {
                 count = DWCi_GetNumNodeInfo() - 1;
@@ -4055,7 +4055,7 @@ static void DWCi_QR2NatnegCallback(int cookie, void *userData) {
         return;
     }
     if (DWCi_GetMatchCnt()->state == 1) {
-        if (func_ov011_021686a0() == 0) {
+        if (DWCi_IsFullMesh() == 0) {
             return;
         }
         DWCi_SetMatchStatus(5);
@@ -4158,7 +4158,7 @@ static void DWCi_NNCompletedCallback(NegotiateResult result, SOCKET gameSocket, 
                     -1, 5000, DWCi_GetMatchCnt()->gt2Callbacks, 0);
                 if (DWCi_GetMatchCnt()->memberConnecting != 0 && status != 0) {
                     DWCi_GetNodeInfoByProfileID(DWCi_GetMatchCnt()->self.profileId)->connectFailureCount++;
-                    func_ov011_02168468();
+                    DWCi_StopMeshMaking();
                     DWCi_SetMatchStatus(1);
                     return;
                 }
@@ -4187,7 +4187,7 @@ static void DWCi_NNCompletedCallback(NegotiateResult result, SOCKET gameSocket, 
         } else if (connection->cookie != 0) {
             if (DWCi_GetMatchCnt()->memberConnecting != 0) {
                 DWCi_GetNodeInfoByProfileID(DWCi_GetMatchCnt()->self.profileId)->connectFailureCount++;
-                func_ov011_02168468();
+                DWCi_StopMeshMaking();
                 DWCi_SetMatchStatus(1);
                 return;
             }
@@ -4602,7 +4602,7 @@ static u8 DWCi_GetHostState(void) {
     return DWCi_GetMatchCnt()->hostState;
 }
 
-BOOL func_ov011_02167fd0(void) {
+BOOL DWCi_IsServerChangeEnabled(void) {
     if (DWCi_GetMatchCnt()->topology != 1) {
         return TRUE;
     }
@@ -4815,7 +4815,7 @@ static u64 func_ov011_021683b8(void) {
     return time;
 }
 
-BOOL func_ov011_02168468(void) {
+BOOL DWCi_StopMeshMaking(void) {
     if (DWCi_GetMatchCnt()->memberConnecting == 0) {
         return FALSE;
     }
@@ -4848,7 +4848,7 @@ BOOL func_ov011_02168468(void) {
     return TRUE;
 }
 
-static int func_ov011_02168590(void) {
+static int DWCi_IsFirstServer(void) {
     return DWCi_GetMatchCnt()->unlocked;
 }
 
@@ -4859,7 +4859,7 @@ static BOOL DWCi_IsMatchLocked(void) {
     if (DWC_IsServerMyself() != 0) {
         if (DWCi_GetMatchCnt()->qr2MatchType == 1 || DWCi_GetMatchCnt()->qr2MatchType == 3 ||
             DWCi_GetMatchCnt()->qr2MatchType == 2) {
-            if (func_ov011_02168590() == 0) {
+            if (DWCi_IsFirstServer() == 0) {
                 return TRUE;
             }
         }
@@ -4871,7 +4871,7 @@ static int DWCi_GetTopologyType(void) {
     return DWCi_GetMatchCnt()->topology;
 }
 
-static void func_ov011_021685fc(void) {
+static void DWCi_ClearMeshMakingTempInfo(void) {
     DWCi_GetMatchCnt()->abortedMemberState = 0;
     MI_CpuFill8(&DWCi_GetMatchCnt()->abortedMember, 0, 0x28);
 }
@@ -4901,7 +4901,7 @@ static void DWCi_FinishSuspendRequest(int cancelled) {
     DWCi_GetMatchCnt()->suspendPending = 0;
 }
 
-BOOL func_ov011_021686a0(void) {
+BOOL DWCi_IsFullMesh(void) {
     if (DWCi_GetMatchCnt()->topology == 2) {
         return TRUE;
     }

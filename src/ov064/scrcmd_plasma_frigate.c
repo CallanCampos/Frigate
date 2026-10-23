@@ -168,7 +168,7 @@ static void PlasmaFrigate_CheckPassword(PlasmaFrigatePassword *wk, NameEntryPara
     if (wk->result == NULL) {
         return;
     }
-    if (func_ov012_02165b0c(nameEntry) == TRUE) {
+    if (NameEntryParam_IsCanceled(nameEntry) == TRUE) {
         *wk->result = FALSE;
         return;
     }

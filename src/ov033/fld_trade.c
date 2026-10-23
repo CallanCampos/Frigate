@@ -167,7 +167,7 @@ void EventFieldTrade_DebugLogPkm(PartyPkm *pkm) {
     PokeParty_GetParam(pkm, 0x95, NULL);
 }
 
-void func_ov033_0217a864(FieldTradeOfferData *param) {
+void FieldTradeInput_DumpTradeData(FieldTradeOfferData *param) {
 }
 
 GameEventReturnCode EventFieldTrade_Callback(GameEvent *event, u32 *state, void *data) {
@@ -195,7 +195,7 @@ GameEventReturnCode EventFieldTrade_Callback(GameEvent *event, u32 *state, void 
         EventFieldTrade_CreatePkm(gameData, HEAPID_GAMEEVENT, work->input->tradeData, work->input->offerData,
                                   work->offerIndex);
         EventFieldTrade_DebugLogPkm(work->input->tradeData);
-        func_ov033_0217a864(work->input->offerData);
+        FieldTradeInput_DumpTradeData(work->input->offerData);
         *state = 1;
         break;
     case 1:

@@ -154,7 +154,7 @@ BOOL BattleServer_ProcStart(BtlServer *server, int *seq) {
 BOOL BattleServer_ProcSelectAction(BtlServer *server, int *seq) {
     switch (*seq) {
     case 0:
-        if (func_ov167_0219fe24(server->flow)) {
+        if (ServerControl_RunBagModeSetup(server->flow)) {
             BattleServer_BroadcastCmdData(server, BTL_ACMD_SERVER_CMD, server->queuePtr->buffer,
                                           server->queuePtr->writePtr);
             (*seq)++;
@@ -177,7 +177,7 @@ BOOL BattleServer_ProcSelectAction(BtlServer *server, int *seq) {
             BattleServer_FinishCmd(server);
             if (IsGameTimeUp(server->mainModule)) {
                 BattleServer_SetProc(server, BattleServer_ProcTimeUp);
-            } else if (func_ov167_0219df50(server->mainModule)) {
+            } else if (BtlMain_CheckOwnWindowDone(server->mainModule)) {
                 BattleServer_SetProc(server, BattleServer_ProcBattleEnd);
             } else {
                 BattleServer_StoreClientActions(server);
@@ -202,7 +202,7 @@ BOOL BattleServer_ProcSelectAction(BtlServer *server, int *seq) {
     case 6:
         server->flowResult = BtlServerFlow_RunTurn(server->flow, &server->clientActions);
         if (GetCommMode(server->mainModule)) {
-            func_ov167_0219ef70(&server->clientActions);
+            BattleServer_NoOp(&server->clientActions);
         }
         BattleServer_BroadcastCmdData(server, BTL_ACMD_SERVER_CMD, server->queuePtr->buffer,
                                       server->queuePtr->writePtr);
@@ -233,7 +233,7 @@ BOOL BattleServer_ProcSelectAction(BtlServer *server, int *seq) {
                 BattleServer_SetProc(server, BattleServer_ProcChangePokemonMidTurn);
                 break;
             case 6:
-                func_ov167_0219c9fc(server->mainModule, func_ov167_0219fff0(server->flow));
+                BtlMain_StoreSlotNthResult(server->mainModule, ServerControl_GetChosenSlot(server->flow));
                 BattleServer_SetProc(server, BattleServer_ProcBattleEnd);
                 return FALSE;
             case 4:
@@ -308,7 +308,7 @@ BOOL BattleServer_ProcChangePokemonEndTurn(BtlServer *server, int *seq) {
     case 2:
         if (BattleServer_AllClientsReplied(server)) {
             BattleServer_FinishCmd(server);
-            if (func_ov167_0219df50(server->mainModule)) {
+            if (BtlMain_CheckOwnWindowDone(server->mainModule)) {
                 BattleServer_SetProc(server, BattleServer_ProcBattleEnd);
             } else {
                 BattleServer_StoreClientActions(server);
@@ -407,7 +407,7 @@ BOOL BattleServer_ProcChangePokemonMidTurn(BtlServer *server, int *seq) {
     case 1:
         if (BattleServer_AllClientsReplied(server)) {
             BattleServer_FinishCmd(server);
-            if (func_ov167_0219df50(server->mainModule)) {
+            if (BtlMain_CheckOwnWindowDone(server->mainModule)) {
                 BattleServer_SetProc(server, BattleServer_ProcBattleEnd);
             } else {
                 BattleServer_StoreClientActions(server);
@@ -669,7 +669,7 @@ void BattleServer_ReadRecActions(BtlServer *server, const void *data, u32 size) 
     }
 }
 
-void func_ov167_0219ef70(BtlClientActions *clientActions) {
+void BattleServer_NoOp(BtlClientActions *clientActions) {
 }
 
 // Whether running the step mode writes commands different from data
@@ -768,7 +768,7 @@ void BattleServer_BroadcastCmdData(BtlServer *server, u32 cmd, const void *data,
             BtlAdapter_SetCmd(server->clients[i].adapter, cmd, data, size);
         }
     }
-    func_ov167_021d4ae8();
+    BtlAdapter_Idle();
 }
 
 void BattleServer_SendCmdToClient(BtlServer *server, u32 cmd, u8 clientId, const void *data, u32 size) {

@@ -24,10 +24,10 @@ struct EventPhraseInputData {
 
 GameEvent *EventPhraseInput_Create(GameSystem *gsys, Field *field, GameEvent *parent, unsigned int mode, u16 *result);
 GameEventReturnCode EventPhraseInput_Callback(GameEvent *event, u32 *state, void *data);
-void func_ov033_02177734(struct EventPhraseInputData *data, NameEntryParam *nameEntryParams);
+void EventPhraseInput_StoreResult(struct EventPhraseInputData *data, NameEntryParam *nameEntryParams);
 // Script commands
-BOOL func_ov033_021777dc(VM *vm, FieldScriptEnv *env);
-BOOL func_ov033_02177844(VM *vm, FieldScriptEnv *env);
-BOOL func_ov033_02177908(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_CheckWifiListFlags(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_WifiListOperation(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_SetWifiFriendNameWord(VM *vm, FieldScriptEnv *env);
 
 #endif // POKEBW2_FIELD_EVENT_PHRASE_INPUT_H

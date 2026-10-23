@@ -104,7 +104,7 @@ BOOL DWC_BACKUPlCheckIp(const u8 *address, const u8 *mask);
 // Whether the first byte of an address is neither 0, 127 nor above 223
 BOOL DWC_BACKUPlCheckAddress(const u8 *address);
 // Returns TRUE without doing anything; the settings' writes end by it
-BOOL func_02056e74(void);
+BOOL writeDisable(void);
 // Packs an ID and returns the packed bytes, DWC_BM_PACKED_SIZE of them, which are kept
 const u8 *DWCi_BACKUPlConvWifiInfo(const DWCWiFiInfo *info);
 // The packed Wi-Fi ID that the settings were last read with

@@ -40,8 +40,8 @@ BOOL IsTileWaterCurrent_(u32 tileClass);
 const WaterCurrentTileAcmd *GetWaterCurrentFlowTileConfig(u32 tileClass);
 u16 WaterCurrent_GetTileAcmd(EventWaterCurrentMove *work);
 u16 WaterCurrent_GetFlowAcmd(EventWaterCurrentMove *work);
-void func_ov036_021c2714(EventWaterCurrentMove *work);
-void func_ov036_021c2734(EventWaterCurrentMove *work);
+void WaterCurrent_SlidePlayBumpSe(EventWaterCurrentMove *work);
+void WaterCurrent_SlidePlayBumpEffectSe(EventWaterCurrentMove *work);
 
 static const WaterCurrentTileAcmd WATER_CURRENT_FLOW_TILES[4] = {
     { 0x72, 0x78 },
@@ -87,16 +87,16 @@ const WaterCurrentTileAcmd *GetWaterCurrentFlowTileConfig(u32 tileClass) {
 }
 
 u16 WaterCurrent_GetTileClass(EventWaterCurrentMove *work);
-GameEventReturnCode func_ov036_021c2514(GameEvent *event, u32 *state, void *data);
-void func_ov036_021c2750(EventWaterCurrentMove *work);
-void func_ov036_021c268c(EventWaterCurrentMove *work);
-void func_ov036_021c26dc(EventWaterCurrentMove *work);
-void func_ov036_021c26ec(EventWaterCurrentMove *work);
-void func_ov036_021c2654(EventWaterCurrentMove *work);
-void func_ov036_021c26fc(EventWaterCurrentMove *work);
-void func_ov036_021c277c(EventWaterCurrentMove *work);
+GameEventReturnCode WaterCurrent_SlideTaskMain(GameEvent *event, u32 *state, void *data);
+void WaterCurrent_SlidePlayLoopSe(EventWaterCurrentMove *work);
+void WaterCurrent_SlideFinishBump(EventWaterCurrentMove *work);
+void WaterCurrent_SlideSelectSlideEntry(EventWaterCurrentMove *work);
+void WaterCurrent_SlideSelectBumpEntry(EventWaterCurrentMove *work);
+void WaterCurrent_SlideStartStep(EventWaterCurrentMove *work);
+void WaterCurrent_SlideShowSurfPokemon(EventWaterCurrentMove *work);
+void WaterCurrent_SlideStopLoopSe(EventWaterCurrentMove *work);
 
-GameEventReturnCode func_ov036_021c2514(GameEvent *event, u32 *state, void *data) {
+GameEventReturnCode WaterCurrent_SlideTaskMain(GameEvent *event, u32 *state, void *data) {
     EventWaterCurrentMove *work = data;
 
     switch (*state) {
@@ -104,27 +104,27 @@ GameEventReturnCode func_ov036_021c2514(GameEvent *event, u32 *state, void *data
         if (!IsTileWaterCurrent_(WaterCurrent_GetTileClass(work))) {
             *state = 2;
         } else {
-            func_ov036_021a4514(func_ov036_0219a5c4(work->player), FALSE);
-            func_ov036_021c2750(work);
+            FldeffNamipoke_SetWakeEnabled(FieldPlayer_GetRideEffect(work->player), FALSE);
+            WaterCurrent_SlidePlayLoopSe(work);
             *state = 1;
         }
         break;
     case 1:
-        func_ov036_021c2750(work);
+        WaterCurrent_SlidePlayLoopSe(work);
         if (FldAct_CheckAcmdEnd(work->actor)) {
-            func_ov036_021c268c(work);
-            func_ov036_021c26dc(work);
-            func_ov036_021c26ec(work);
+            WaterCurrent_SlideFinishBump(work);
+            WaterCurrent_SlideSelectSlideEntry(work);
+            WaterCurrent_SlideSelectBumpEntry(work);
             if (!work->tile && !work->flowTile) {
-                func_ov036_021c277c(work);
+                WaterCurrent_SlideStopLoopSe(work);
                 *state = 2;
             } else {
-                func_ov036_021c2654(work);
+                WaterCurrent_SlideStartStep(work);
             }
         }
         break;
     case 2:
-        func_ov036_021c26fc(work);
+        WaterCurrent_SlideShowSurfPokemon(work);
         return GAMEEVENT_DONE;
     }
     return GAMEEVENT_CONTINUE;
@@ -132,7 +132,7 @@ GameEventReturnCode func_ov036_021c2514(GameEvent *event, u32 *state, void *data
 
 GameEvent *EventWaterCurrentMove_Create(GameEvent *parent, GameSystem *gsys, Field *field) {
     FieldPlayer *player = Field_GetPlayer(field);
-    GameEvent *event = GameEvent_Create(gsys, parent, func_ov036_021c2514, sizeof(EventWaterCurrentMove));
+    GameEvent *event = GameEvent_Create(gsys, parent, WaterCurrent_SlideTaskMain, sizeof(EventWaterCurrentMove));
     EventWaterCurrentMove *work = GameEvent_GetData(event);
 
     work->gsys = gsys;
@@ -173,17 +173,17 @@ u16 WaterCurrent_GetTileClass(EventWaterCurrentMove *work) {
     return GetTileClass(GetTileTypeAtPos(Field_GetG3DMapper(work->field), &pos));
 }
 
-void func_ov036_021c2654(EventWaterCurrentMove *work) {
+void WaterCurrent_SlideStartStep(EventWaterCurrentMove *work) {
     if (work->flowTile) {
         FldAct_SetAcmd(work->actor, WaterCurrent_GetFlowAcmd(work));
-        func_ov036_021c2714(work);
+        WaterCurrent_SlidePlayBumpSe(work);
         work->flowing = TRUE;
     } else if (work->tile) {
         FldAct_SetAcmd(work->actor, WaterCurrent_GetTileAcmd(work));
     }
 }
 
-void func_ov036_021c268c(EventWaterCurrentMove *work) {
+void WaterCurrent_SlideFinishBump(EventWaterCurrentMove *work) {
     if (work->flowTile) {
         FieldEffects *effects = Field_GetFieldEffects(work->field);
         u32 effectId = 8;
@@ -193,45 +193,45 @@ void func_ov036_021c268c(EventWaterCurrentMove *work) {
             FieldEffects_Load(effects, &effectId, 1);
         }
         FieldPlayer_GetWPos(work->player, &pos);
-        func_ov036_021a4ee4(effects, 0, &pos);
-        func_ov036_021c2734(work);
+        FldeffNamipokeSplash_StartAtPos(effects, 0, &pos);
+        WaterCurrent_SlidePlayBumpEffectSe(work);
         work->flowTile = NULL;
         work->flowing = FALSE;
     }
 }
 
-void func_ov036_021c26dc(EventWaterCurrentMove *work) {
+void WaterCurrent_SlideSelectSlideEntry(EventWaterCurrentMove *work) {
     work->tile = GetWaterCurrentTileConfig(WaterCurrent_GetTileClass(work));
 }
 
-void func_ov036_021c26ec(EventWaterCurrentMove *work) {
+void WaterCurrent_SlideSelectBumpEntry(EventWaterCurrentMove *work) {
     work->flowTile = GetWaterCurrentFlowTileConfig(WaterCurrent_GetTileClass(work));
 }
 
-void func_ov036_021c26fc(EventWaterCurrentMove *work) {
-    func_ov036_021a4514(func_ov036_0219a5c4(work->player), TRUE);
-    func_ov036_0219ac0c(work->player);
+void WaterCurrent_SlideShowSurfPokemon(EventWaterCurrentMove *work) {
+    FldeffNamipoke_SetWakeEnabled(FieldPlayer_GetRideEffect(work->player), TRUE);
+    FieldPlayer_SetGridHopLanded(work->player);
 }
 
-void func_ov036_021c2714(EventWaterCurrentMove *work) {
+void WaterCurrent_SlidePlayBumpSe(EventWaterCurrentMove *work) {
     if (!GFL_SndIsLoadThreadRunning()) {
         GFL_SndPlayerStop(work->loopPlayer);
         GFL_SEPlayKeepVol(SEQ_SE_DANSA, work->flowPlayer);
     }
 }
 
-void func_ov036_021c2734(EventWaterCurrentMove *work) {
+void WaterCurrent_SlidePlayBumpEffectSe(EventWaterCurrentMove *work) {
     if (!GFL_SndIsLoadThreadRunning()) {
         GFL_SEPlayKeepVol(SEQ_SE_FLD_83, work->endPlayer);
     }
 }
 
-void func_ov036_021c2750(EventWaterCurrentMove *work) {
+void WaterCurrent_SlidePlayLoopSe(EventWaterCurrentMove *work) {
     if (!GFL_SndIsLoadThreadRunning() && !work->flowing && !GFL_SndPlayerIsActive(work->loopPlayer)) {
         GFL_SEPlayKeepVol(SEQ_SE_FLD_129, work->loopPlayer);
     }
 }
 
-void func_ov036_021c277c(EventWaterCurrentMove *work) {
+void WaterCurrent_SlideStopLoopSe(EventWaterCurrentMove *work) {
     GFL_SndPlayerStop(work->loopPlayer);
 }

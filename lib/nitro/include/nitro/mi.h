@@ -20,7 +20,7 @@ typedef enum {
 
 // On a DSi, sets up TwlSDK's shared WRAM manager, which is in the LTD autoload (MIi_InitWramManagerCore). OS_Init calls
 // it
-void func_02078000(void);
+void MI_InitWramManager(void);
 void MI_SetWramBank(MIWram bank);
 // NitroSDK's MI_Init: gives the shared WRAM to the ARM7, sets up the new DMA on a DSi and stops DMA channel 0. OS_Init
 // calls it

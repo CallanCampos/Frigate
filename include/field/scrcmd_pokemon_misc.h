@@ -29,6 +29,6 @@ BOOL s02C0_FieldTradeGetSpecies(VM *vm, FieldScriptEnv *env);
 BOOL s0225_ItemGetRandomOwnedTMMove(VM *vm, FieldScriptEnv *env);
 BOOL s0120_FieldTradeSavePokemon(VM *vm, FieldScriptEnv *env);
 BOOL s022F_WordSetLoadPastTradePkmName(VM *vm, FieldScriptEnv *env);
-BOOL func_ov036_021af9dc(VM *vm, FieldScriptEnv *env);
+BOOL PokeParty_ControlLegendMon(VM *vm, FieldScriptEnv *env);
 
 #endif // POKEBW2_FIELD_SCRCMD_POKEMON_MISC_H

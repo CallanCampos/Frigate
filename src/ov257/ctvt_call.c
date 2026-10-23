@@ -508,7 +508,7 @@ int CtvtCall_Main(CommTvtWork *sys, CtvtCall *call) {
                 call->joinTarget = CTVT_CALL_NONE;
                 BmpWin_ClearFrame(call->infoWin, 1);
                 CtvtCall_ClearWindow(call->infoWin);
-                func_ov257_021aaeb0(sys);
+                CommTvt_DeleteTimeIcon(sys);
                 ClActor_SetSequence(call->returnButton, 1);
                 call->menuMode = CALL_MENU_RESET;
             }
@@ -530,7 +530,7 @@ int CtvtCall_Main(CommTvtWork *sys, CtvtCall *call) {
         if (call->photoTimer > 0) {
             call->photoTimer--;
         }
-        if (GFL_HIDIsTouchPressed() == TRUE || func_ov257_021aab34(sys) == TRUE || call->photoTimer <= 0) {
+        if (GFL_HIDIsTouchPressed() == TRUE || CommTvt_GetEndRequested(sys) == TRUE || call->photoTimer <= 0) {
             GFL_SndSEPlay(SEQ_SE_DECIDE1);
             BmpWin_ClearFrame(call->msgWin, 1);
             CtvtCall_ClearWindow(call->msgWin);
@@ -623,7 +623,7 @@ int CtvtCall_Main(CommTvtWork *sys, CtvtCall *call) {
         call->infoWinPending = FALSE;
         if (call->showInfo == TRUE) {
             call->showInfo = FALSE;
-            func_ov257_021aae7c(sys, call->infoWin);
+            CommTvt_CreateTimeIcon(sys, call->infoWin);
         }
     }
     if (call->menu != NULL) {
@@ -1182,7 +1182,7 @@ static void CtvtCall_UpdateFoundMessage(CommTvtWork *sys, CtvtCall *call) {
             BmpWin_ClearFrame(call->msgWin, 1);
         } else if (call->prevRowCount == 0 && call->rowCount != 0) {
             CtvtCall_PrintMessage(sys, call, 17);
-            func_ov257_021aaeb0(sys);
+            CommTvt_DeleteTimeIcon(sys);
             BmpWin_ClearFrame(call->infoWin, 1);
             CtvtCall_ClearWindow(call->infoWin);
         }
@@ -1221,5 +1221,5 @@ static void CtvtCall_PrintInfo(CommTvtWork *sys, CtvtCall *call, u32 msgId) {
     BmpWin_DrawFrame(call->infoWin, 2, 0x140, 9);
     call->infoWinPending = TRUE;
     call->showInfo = FALSE;
-    func_ov257_021aaeb0(sys);
+    CommTvt_DeleteTimeIcon(sys);
 }

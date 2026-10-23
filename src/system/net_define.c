@@ -105,7 +105,7 @@ void NetDefine_Update(void) {
     }
 }
 
-BOOL func_02011844(void) {
+BOOL GflNet_IsWifiGameKind(void) {
     switch (GFL_NetGetGameCommandBase()) {
     case 0xc:
     case 0xd:

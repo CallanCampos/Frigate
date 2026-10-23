@@ -28,36 +28,36 @@ typedef BOOL (*ActorEvTypeFunc)(FieldActor *actor);
 typedef void (*ActorEvTypeInitFunc)(FieldActor *actor);
 
 static void ExecActorEvTypeFunction(FieldActor *actor);
-static BOOL func_ov036_021925ec(FieldActor *actor);
-static BOOL func_ov036_02192608(FieldActor *actor);
-static BOOL func_ov036_02192624(FieldActor *actor);
-static BOOL func_ov036_02192658(FieldActor *actor);
+static BOOL FldmmdlMovecode_CheckByEventType(FieldActor *actor);
+static BOOL FldmmdlMovecode_UpdateByEventType(FieldActor *actor);
+static BOOL FldmmdlMovecode_HasLeftOldGrid(FieldActor *actor);
+static BOOL FldmmdlMovecode_IsAtOldGrid(FieldActor *actor);
 static void func_ov036_0219268c(FieldActor *actor);
 static BOOL func_ov036_02192690(FieldActor *actor);
 static BOOL func_ov036_02192694(FieldActor *actor);
 static void func_ov036_02192698(FieldActor *actor);
 static BOOL func_ov036_021926b0(FieldActor *actor);
-static BOOL func_ov036_0219272c(FieldActor *actor);
-static void func_ov036_02192840(FieldActor *actor);
+static BOOL FldmmdlMove_TurnLookAround(FieldActor *actor);
+static void FldmmdlMove_InitWalkRepeatSpin(FieldActor *actor);
 static BOOL func_ov036_02192870(FieldActor *actor);
-static BOOL func_ov036_021928ec(FieldActor *actor);
-static BOOL func_ov036_02192a38(void);
+static BOOL FldmmdlMove_TurnSpin(FieldActor *actor);
+static BOOL FldmmdlMove_IsButtonBHeld(void);
 
 // The tables by event type, defined after the functions: there, MWCC's size sort lays the two 16-byte local
-// initializers of func_ov036_0219272c out in the ROM's order
+// initializers of FldmmdlMove_TurnLookAround out in the ROM's order
 static const ActorEvTypeInitFunc ACTOR_EVENTTYPE_FUNCS[21];
 static const ActorEvTypeFunc data_ov036_021cbe44[21];
 static const ActorEvTypeFunc data_ov036_021cbe98[21];
 
-void func_ov036_021925a4(FieldActor *actor) {
+void FldmmdlMovecode_InitEventTypeProcThunk(FieldActor *actor) {
     ExecActorEvTypeFunction(actor);
 }
 
-BOOL func_ov036_021925ac(FieldActor *actor) {
-    if (!func_ov036_021925ec(actor)) {
+BOOL FldmmdlMovecode_UpdateEventTypeProc(FieldActor *actor) {
+    if (!FldmmdlMovecode_CheckByEventType(actor)) {
         return FALSE;
     }
-    if (func_ov036_02192608(actor)) {
+    if (FldmmdlMovecode_UpdateByEventType(actor)) {
         return TRUE;
     }
     return FALSE;
@@ -67,15 +67,15 @@ static void ExecActorEvTypeFunction(FieldActor *actor) {
     ACTOR_EVENTTYPE_FUNCS[GetActorEvType(actor)](actor);
 }
 
-static BOOL func_ov036_021925ec(FieldActor *actor) {
+static BOOL FldmmdlMovecode_CheckByEventType(FieldActor *actor) {
     return data_ov036_021cbe44[GetActorEvType(actor)](actor);
 }
 
-static BOOL func_ov036_02192608(FieldActor *actor) {
+static BOOL FldmmdlMovecode_UpdateByEventType(FieldActor *actor) {
     return data_ov036_021cbe98[GetActorEvType(actor)](actor);
 }
 
-static BOOL func_ov036_02192624(FieldActor *actor) {
+static BOOL FldmmdlMovecode_HasLeftOldGrid(FieldActor *actor) {
     if (GetGPosX(actor) != FldAct_GetInitGPosX(actor)) {
         return TRUE;
     }
@@ -85,7 +85,7 @@ static BOOL func_ov036_02192624(FieldActor *actor) {
     return FALSE;
 }
 
-static BOOL func_ov036_02192658(FieldActor *actor) {
+static BOOL FldmmdlMovecode_IsAtOldGrid(FieldActor *actor) {
     if (GetGPosX(actor) != FldAct_GetInitGPosX(actor)) {
         return FALSE;
     }
@@ -107,22 +107,22 @@ static BOOL func_ov036_02192694(FieldActor *actor) {
 }
 
 static void func_ov036_02192698(FieldActor *actor) {
-    ActorSpinWork *work = func_ov012_02167120(actor, 9);
+    ActorSpinWork *work = FldAct_InitMoveSubProcWork(actor, 9);
 
     work->limit = GetActorUserParam(actor, 1);
 }
 
 static BOOL func_ov036_021926b0(FieldActor *actor) {
-    ActorSpinWork *work = func_ov012_02167138(actor);
+    ActorSpinWork *work = FldAct_GetMoveSubProcWork(actor);
 
     switch (work->state) {
     case 0:
-        if (func_ov036_02192624(actor) == TRUE) {
+        if (FldmmdlMovecode_HasLeftOldGrid(actor) == TRUE) {
             work->state++;
         }
         break;
     case 1:
-        if (!func_ov036_02192658(actor)) {
+        if (!FldmmdlMovecode_IsAtOldGrid(actor)) {
             break;
         }
         work->count++;
@@ -144,8 +144,8 @@ static BOOL func_ov036_021926b0(FieldActor *actor) {
     return FALSE;
 }
 
-static BOOL func_ov036_0219272c(FieldActor *actor) {
-    ActorSpinWork *work = func_ov012_02167138(actor);
+static BOOL FldmmdlMove_TurnLookAround(FieldActor *actor) {
+    ActorSpinWork *work = FldAct_GetMoveSubProcWork(actor);
     s32 wait;
 
     switch (work->phase) {
@@ -164,13 +164,13 @@ static BOOL func_ov036_0219272c(FieldActor *actor) {
         work->phase++;
     }
     case 2:
-        if (func_ov036_0218f01c(actor) == FALSE) {
+        if (FieldAcmdTCB_Update(actor) == FALSE) {
             return TRUE;
         }
         work->phase++;
     case 3:
         wait = 8;
-        if (GetActorEvType(actor) == 14 && func_ov036_02192a38() == TRUE && FldAct_IsNearPlayer(actor) == TRUE) {
+        if (GetActorEvType(actor) == 14 && FldmmdlMove_IsButtonBHeld() == TRUE && FldAct_IsNearPlayer(actor) == TRUE) {
             wait = 4;
         }
         work->wait++;
@@ -192,8 +192,8 @@ static BOOL func_ov036_0219272c(FieldActor *actor) {
     return FALSE;
 }
 
-static void func_ov036_02192840(FieldActor *actor) {
-    ActorSpinWork *work = func_ov012_02167120(actor, 9);
+static void FldmmdlMove_InitWalkRepeatSpin(FieldActor *actor) {
+    ActorSpinWork *work = FldAct_InitMoveSubProcWork(actor, 9);
     u32 variant = 1;
     u16 evType;
 
@@ -206,16 +206,16 @@ static void func_ov036_02192840(FieldActor *actor) {
 }
 
 static BOOL func_ov036_02192870(FieldActor *actor) {
-    ActorSpinWork *work = func_ov012_02167138(actor);
+    ActorSpinWork *work = FldAct_GetMoveSubProcWork(actor);
 
     switch (work->state) {
     case 0:
-        if (func_ov036_02192624(actor) == TRUE) {
+        if (FldmmdlMovecode_HasLeftOldGrid(actor) == TRUE) {
             work->state++;
         }
         break;
     case 1:
-        if (!func_ov036_02192658(actor)) {
+        if (!FldmmdlMovecode_IsAtOldGrid(actor)) {
             break;
         }
         work->count++;
@@ -237,9 +237,9 @@ static BOOL func_ov036_02192870(FieldActor *actor) {
     return FALSE;
 }
 
-static BOOL func_ov036_021928ec(FieldActor *actor) {
+static BOOL FldmmdlMove_TurnSpin(FieldActor *actor) {
     s32 dirs[2][4] = { { DIR_UP, DIR_LEFT, DIR_DOWN, DIR_RIGHT }, { DIR_UP, DIR_RIGHT, DIR_DOWN, DIR_LEFT } };
-    ActorSpinWork *work = func_ov012_02167138(actor);
+    ActorSpinWork *work = FldAct_GetMoveSubProcWork(actor);
     s32 wait;
     s32 i;
     u32 face;
@@ -259,7 +259,7 @@ static BOOL func_ov036_021928ec(FieldActor *actor) {
         StartDirAcmd(actor, dirs[work->variant][work->turn], 0);
         work->phase++;
     case 2:
-        if (func_ov036_0218f01c(actor) == FALSE) {
+        if (FieldAcmdTCB_Update(actor) == FALSE) {
             return TRUE;
         }
         work->phase++;
@@ -268,7 +268,8 @@ static BOOL func_ov036_021928ec(FieldActor *actor) {
         {
             u16 evType = GetActorEvType(actor);
 
-            if ((evType == 15 || evType == 16) && func_ov036_02192a38() == TRUE && FldAct_IsNearPlayer(actor) == TRUE) {
+            if ((evType == 15 || evType == 16) && FldmmdlMove_IsButtonBHeld() == TRUE &&
+                FldAct_IsNearPlayer(actor) == TRUE) {
                 wait = 4;
             }
         }
@@ -291,20 +292,34 @@ static BOOL func_ov036_021928ec(FieldActor *actor) {
     return FALSE;
 }
 
-static BOOL func_ov036_02192a38(void) {
+static BOOL FldmmdlMove_IsButtonBHeld(void) {
     if (GCTX_HIDGetHeldKeys() & PAD_BUTTON_B) {
         return TRUE;
     }
     return FALSE;
 }
 
-static const ActorEvTypeInitFunc ACTOR_EVENTTYPE_FUNCS[] = {
-    func_ov036_0219268c, func_ov036_0219268c, func_ov036_0219268c, func_ov036_0219268c, func_ov036_02192698,
-    func_ov036_02192840, func_ov036_02192840, func_ov036_0219268c, func_ov036_0219268c, func_ov036_0219268c,
-    func_ov036_0219268c, func_ov036_0219268c, func_ov036_0219268c, func_ov036_0219268c, func_ov036_02192698,
-    func_ov036_02192840, func_ov036_02192840, func_ov036_0219268c, func_ov036_0219268c, func_ov036_0219268c,
-    func_ov036_02192840
-};
+static const ActorEvTypeInitFunc ACTOR_EVENTTYPE_FUNCS[] = { func_ov036_0219268c,
+                                                             func_ov036_0219268c,
+                                                             func_ov036_0219268c,
+                                                             func_ov036_0219268c,
+                                                             func_ov036_02192698,
+                                                             FldmmdlMove_InitWalkRepeatSpin,
+                                                             FldmmdlMove_InitWalkRepeatSpin,
+                                                             func_ov036_0219268c,
+                                                             func_ov036_0219268c,
+                                                             func_ov036_0219268c,
+                                                             func_ov036_0219268c,
+                                                             func_ov036_0219268c,
+                                                             func_ov036_0219268c,
+                                                             func_ov036_0219268c,
+                                                             func_ov036_02192698,
+                                                             FldmmdlMove_InitWalkRepeatSpin,
+                                                             FldmmdlMove_InitWalkRepeatSpin,
+                                                             func_ov036_0219268c,
+                                                             func_ov036_0219268c,
+                                                             func_ov036_0219268c,
+                                                             FldmmdlMove_InitWalkRepeatSpin };
 
 static const ActorEvTypeFunc data_ov036_021cbe44[] = { func_ov036_02192690, func_ov036_02192690, func_ov036_02192690,
                                                        func_ov036_02192690, func_ov036_021926b0, func_ov036_02192870,
@@ -314,10 +329,10 @@ static const ActorEvTypeFunc data_ov036_021cbe44[] = { func_ov036_02192690, func
                                                        func_ov036_02192870, func_ov036_02192870, func_ov036_02192690,
                                                        func_ov036_02192690, func_ov036_02192690, func_ov036_02192870 };
 
-static const ActorEvTypeFunc data_ov036_021cbe98[] = { func_ov036_02192694, func_ov036_02192694, func_ov036_02192694,
-                                                       func_ov036_02192694, func_ov036_0219272c, func_ov036_021928ec,
-                                                       func_ov036_021928ec, func_ov036_02192694, func_ov036_02192694,
-                                                       func_ov036_02192694, func_ov036_02192694, func_ov036_02192694,
-                                                       func_ov036_02192694, func_ov036_02192694, func_ov036_0219272c,
-                                                       func_ov036_021928ec, func_ov036_021928ec, func_ov036_02192694,
-                                                       func_ov036_02192694, func_ov036_02192694, func_ov036_021928ec };
+static const ActorEvTypeFunc data_ov036_021cbe98[] = {
+    func_ov036_02192694,  func_ov036_02192694,  func_ov036_02192694, func_ov036_02192694, FldmmdlMove_TurnLookAround,
+    FldmmdlMove_TurnSpin, FldmmdlMove_TurnSpin, func_ov036_02192694, func_ov036_02192694, func_ov036_02192694,
+    func_ov036_02192694,  func_ov036_02192694,  func_ov036_02192694, func_ov036_02192694, FldmmdlMove_TurnLookAround,
+    FldmmdlMove_TurnSpin, FldmmdlMove_TurnSpin, func_ov036_02192694, func_ov036_02192694, func_ov036_02192694,
+    FldmmdlMove_TurnSpin
+};

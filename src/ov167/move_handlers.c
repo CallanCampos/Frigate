@@ -6121,7 +6121,8 @@ static void HandlerUturn(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s
     BattleHandlerSwitchParam *param;
     BattleHandlerEffectAtPosParam *effect;
 
-    if (BattleEventVar_GetValue(3) == monId && BtlServerFlow_HasReserveMon(flow, monId) && func_ov167_021aba8c(flow)) {
+    if (BattleEventVar_GetValue(3) == monId && BtlServerFlow_HasReserveMon(flow, monId) &&
+        ServerControl_TrySetOnceFlag(flow)) {
         trainerId = GetClientIDFromMonID(monId);
         param = BattleHandler_PushWork(flow, 0x29, monId);
         param->monIndex = monId;
@@ -6209,7 +6210,8 @@ static void HandlerBatonPass(BattleEventItem *item, BtlServerFlow *flow, u8 monI
     BattleHandlerFlagParam *flag;
     BattleHandlerSwitchParam *sw;
 
-    if (BattleEventVar_GetValue(3) == monId && BtlServerFlow_HasReserveMon(flow, monId) && func_ov167_021aba8c(flow)) {
+    if (BattleEventVar_GetValue(3) == monId && BtlServerFlow_HasReserveMon(flow, monId) &&
+        ServerControl_TrySetOnceFlag(flow)) {
         param = BattleHandler_PushWork(flow, 0x1e, monId);
         param->effect = 4;
         param->pos = BtlServerFlow_MonIDToPos(flow, monId);

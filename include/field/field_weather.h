@@ -37,7 +37,7 @@ typedef struct {
 
 typedef struct {
     WeatherGraphics graphics;
-    // The size of the work that func_ov036_021997e4 returns
+    // The size of the work that WeatherTask_GetWorkBuffer returns
     u32 workSize;
     WeatherFunc funcs[7];
     // Moves one particle, every frame
@@ -50,63 +50,63 @@ u16 FieldLightStatus_GetWeatherLight(u32 index);
 // Overlay 36's weather_task.c: a weather's task, which runs the functions of its data. weather.c creates and frees
 // two, updates them, starts a weather (mode 1 at once, 2 over the other task's) and ends one, and asks whether one is
 // fading
-WeatherTask *func_ov036_021993e0(ClActUnit *unit, FieldCamera *camera, FieldLight *light, FieldFog *fog,
-                                 FieldFogCtrl *fogCtrl, Field3DBg **bgs, FieldSound *fieldSound, u16 season,
-                                 HeapID heapId);
-void func_ov036_02199424(WeatherTask *task);
-void func_ov036_02199434(WeatherTask *task, HeapID heapId);
-void func_ov036_02199618(WeatherTask *task, const WeatherData *data, u8 unk25, u32 fade, u32 mode, u32 ambience,
-                         HeapID heapId);
-void func_ov036_0219967c(WeatherTask *task, u32 fade, u32 mode);
-void func_ov036_021996f4(WeatherTask *task);
-u8 func_ov036_021997dc(WeatherTask *task);
+WeatherTask *WeatherTask_Create(ClActUnit *unit, FieldCamera *camera, FieldLight *light, FieldFog *fog,
+                                FieldFogCtrl *fogCtrl, Field3DBg **bgs, FieldSound *fieldSound, u16 season,
+                                HeapID heapId);
+void WeatherTask_Delete(WeatherTask *task);
+void WeatherTask_Update(WeatherTask *task, HeapID heapId);
+void WeatherTask_Start(WeatherTask *task, const WeatherData *data, u8 unk25, u32 fade, u32 mode, u32 ambience,
+                       HeapID heapId);
+void WeatherTask_RequestEnd(WeatherTask *task, u32 fade, u32 mode);
+void WeatherTask_ForceEnd(WeatherTask *task);
+u8 WeatherTask_GetPhase(WeatherTask *task);
 // The index of the camera's defaults
-u32 func_ov036_02199774(WeatherTask *task);
-void *func_ov036_021997e4(WeatherTask *task);
-void func_ov036_0219978c(WeatherTask *task, u32 a1, u32 index);
-void func_ov036_021997bc(WeatherTask *task, int value, u32 index);
-void func_ov036_021997cc(WeatherTask *task, int value, u32 index);
-BOOL func_ov036_021997e8(WeatherTask *task);
-WeatherObj *func_ov036_021997f4(WeatherTask *task, HeapID heapId);
-void func_ov036_0219980c(WeatherObj *obj);
-void func_ov036_02199824(WeatherTask *task, u32 a1, u32 a2, u32 a3, int a4, int a5, int a6, int a7,
-                         WeatherSpawnFunc spawn);
-void func_ov036_02199854(WeatherTask *task, u32 a1, u32 a2, u32 a3, int a4);
-BOOL func_ov036_02199868(WeatherTask *task, HeapID heapId);
-BOOL func_ov036_02199874(WeatherTask *task, HeapID heapId);
-void func_ov036_02199880(WeatherTask *task, WeatherSpawnFunc spawn, int count, int a3, int a4, HeapID heapId);
-void func_ov036_02199734(WeatherTask *task, u32 a1, u32 a2);
-void func_ov036_0219975c(WeatherTask *task, u16 a1, u32 a2, u32 a3);
-BOOL func_ov036_02199768(WeatherTask *task);
-void func_ov036_02199780(WeatherTask *task, u16 a1, u16 a2);
-void func_ov036_0219979c(WeatherTask *task, int value, u32 index);
-void func_ov036_021997ac(WeatherTask *task, int value, u32 index);
-void func_ov036_02199740(WeatherTask *task, u32 a1, u32 a2);
-void func_ov036_0219974c(WeatherTask *task, u32 a1);
-void func_ov036_0219990c(WeatherTask *task, u32 a1, u32 a2, u32 a3);
-void func_ov036_02199948(WeatherTask *task, u32 a1);
-void func_ov036_02199958(WeatherTask *task, u32 a1, u32 a2, int a3, u32 a4);
-void func_ov036_021999bc(WeatherTask *task, u32 a1, u32 a2, u32 a3);
-BOOL func_ov036_021999dc(WeatherTask *task);
-BOOL func_ov036_02199a00(WeatherTask *task);
-BOOL func_ov036_02199a14(WeatherTask *task);
-BOOL func_ov036_02199a20(WeatherTask *task);
-u32 func_ov036_02199a2c(WeatherTask *task);
-u32 func_ov036_02199a38(WeatherTask *task);
-u32 func_ov036_02199a44(WeatherTask *task);
-void func_ov036_02199a50(WeatherTask *task);
+u32 WeatherTask_GetCameraSettingId(WeatherTask *task);
+void *WeatherTask_GetWorkBuffer(WeatherTask *task);
+void WeatherTask_SetBillboardVisible(WeatherTask *task, u32 a1, u32 index);
+void WeatherTask_SetBillboardTexOffsetX(WeatherTask *task, int value, u32 index);
+void WeatherTask_SetBillboardTexOffsetY(WeatherTask *task, int value, u32 index);
+BOOL WeatherTask_GetParticleCount(WeatherTask *task);
+WeatherObj *WeatherTask_AddParticle(WeatherTask *task, HeapID heapId);
+void WeatherTask_RemoveParticle(WeatherObj *obj);
+void WeatherTask_SetupSpawner(WeatherTask *task, u32 a1, u32 a2, u32 a3, int a4, int a5, int a6, int a7,
+                              WeatherSpawnFunc spawn);
+void WeatherTask_RetargetSpawner(WeatherTask *task, u32 a1, u32 a2, u32 a3, int a4);
+BOOL WeatherTask_StepSpawner(WeatherTask *task, HeapID heapId);
+BOOL WeatherTask_StepSpawnTimer(WeatherTask *task, HeapID heapId);
+void WeatherTask_PrewarmParticles(WeatherTask *task, WeatherSpawnFunc spawn, int count, int a3, int a4, HeapID heapId);
+void WeatherTask_FadeLight(WeatherTask *task, u32 a1, u32 a2);
+void WeatherTask_FlashLight(WeatherTask *task, u16 a1, u32 a2, u32 a3);
+BOOL WeatherTask_IsLightFlashing(WeatherTask *task);
+void WeatherTask_SetLightColor(WeatherTask *task, u16 a1, u16 a2);
+void WeatherTask_SetBillboardScaleX(WeatherTask *task, int value, u32 index);
+void WeatherTask_SetBillboardScaleY(WeatherTask *task, int value, u32 index);
+void WeatherTask_SetLight(WeatherTask *task, u32 a1, u32 a2);
+void WeatherTask_ResetLight(WeatherTask *task, u32 a1);
+void WeatherTask_InitFog(WeatherTask *task, u32 a1, u32 a2, u32 a3);
+void WeatherTask_DisableFog(WeatherTask *task, u32 a1);
+void WeatherTask_ChangeFog(WeatherTask *task, u32 a1, u32 a2, int a3, u32 a4);
+void WeatherTask_ChangeFogOffset(WeatherTask *task, u32 a1, u32 a2, u32 a3);
+BOOL WeatherTask_IsFogIdle(WeatherTask *task);
+BOOL WeatherTask_IsZoneFogActive(WeatherTask *task);
+BOOL WeatherTask_IsZoneFog(WeatherTask *task);
+BOOL WeatherTask_IsZoneFogLight(WeatherTask *task);
+u32 WeatherTask_GetZoneFogOffset(WeatherTask *task);
+u32 WeatherTask_GetZoneFogSlope(WeatherTask *task);
+u32 WeatherTask_GetZoneFogLightId(WeatherTask *task);
+void WeatherTask_SaveCameraPos(WeatherTask *task);
 // The camera's movement since the last frame, as a scroll
-void func_ov036_02199a78(WeatherTask *task, int *x, int *y);
-void func_ov036_02199b90(WeatherTask *task, int x, int y);
-void func_ov036_02199be8(WeatherTask *task, u32 a1);
-void func_ov036_02199bf8(WeatherTask *task);
-void func_ov036_02199c08(WeatherTask *task, u32 sound);
-void func_ov036_02199c30(WeatherTask *task, u32 sound, u32 a2);
-void *func_ov036_02199c5c(WeatherObj *obj);
-ClActor *func_ov036_02199c64(WeatherObj *obj);
+void WeatherTask_GetCameraScroll(WeatherTask *task, int *x, int *y);
+void WeatherTask_ShiftParticles(WeatherTask *task, int x, int y);
+void WeatherTask_PlaySe(WeatherTask *task, u32 a1);
+void WeatherTask_StopSe(WeatherTask *task);
+void WeatherTask_PlaySeDirect(WeatherTask *task, u32 sound);
+void WeatherTask_PlaySeWithVoice(WeatherTask *task, u32 sound, u32 a2);
+void *WeatherTask_GetParticleWork(WeatherObj *obj);
+ClActor *WeatherTask_GetParticleActor(WeatherObj *obj);
 void func_ov036_02199c6c(WeatherObj *obj, ClActorPos *pos);
-void func_ov036_02199c80(WeatherObj *obj, const ClActorPos *pos);
-void func_ov036_02199cf0(WeatherObj *obj, const ClActorPos *pos);
+void WeatherTask_SetParticlePosWrapped(WeatherObj *obj, const ClActorPos *pos);
+void WeatherTask_SetParticlePos(WeatherObj *obj, const ClActorPos *pos);
 
 // Overlay 74
 extern WeatherData SUNNY_WEATHER;
@@ -119,13 +119,13 @@ BOOL Sunny_FadeOut(WeatherTask *task, u32 arg, HeapID heapId);
 BOOL Sunny_Exit(WeatherTask *task, u32 arg, HeapID heapId);
 FieldWeather *func_ov036_02199004(FieldCamera *camera, FieldLight *light, FieldFog *fog, FieldFogCtrl *fogCtrl,
                                   FieldSound *sound, u16 season, HeapID heapId);
-void func_ov036_021990d8(FieldWeather *weather);
+void FieldWeather_Delete(FieldWeather *weather);
 void FieldWeather_Update(FieldWeather *weather, HeapID heapId);
 void FieldWeather_Draw(FieldWeather *weather);
-BOOL func_ov036_0219917c(FieldWeather *weather);
+BOOL FieldWeather_IsTaskActive(FieldWeather *weather);
 void SetWeatherInit(FieldWeather *weather, u16 weatherId, HeapID heapId);
-void func_ov036_02199208(FieldWeather *weather, u32 weatherId);
+void FieldWeather_RequestChange(FieldWeather *weather, u32 weatherId);
 // Sets the weather at once, without a transition
-void func_ov036_02199210(FieldWeather *weather, u32 weatherId);
+void FieldWeather_RequestChangeNoFade(FieldWeather *weather, u32 weatherId);
 
 #endif // POKEBW2_FIELD_FIELD_WEATHER_H

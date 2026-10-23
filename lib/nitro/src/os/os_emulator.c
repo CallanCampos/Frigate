@@ -13,7 +13,7 @@
 #define OS_CONSOLE_NITRO_BASE 0x80000001
 #define OSi_CONSOLE_NOT_DETECT 0xffffffff
 
-static u32 func_0207ac60(void);
+static u32 OSi_DetectDeviceType(void);
 
 // The file's words in .data and .bss are more than its code reads: the link removed the functions that used the others
 static struct {
@@ -40,12 +40,12 @@ u32 OS_GetConsoleType(void) {
         } else {
             sConsole.consoleType = OS_CONSOLE_NITRO_BASE;
         }
-        sConsole.consoleType |= func_0207ac60();
+        sConsole.consoleType |= OSi_DetectDeviceType();
     }
     return sConsole.consoleType;
 }
 
-static u32 func_0207ac60(void) {
+static u32 OSi_DetectDeviceType(void) {
     return sBootTypeConsoleBits[OS_GetBootType()];
 }
 
@@ -65,6 +65,6 @@ BOOL OS_IsRunOnTwl(void) {
     return sTwl.isTwl;
 }
 
-BOOL func_0207acbc(void) {
+BOOL OSi_IsRunOnTwl(void) {
     return OS_IsRunOnTwl();
 }

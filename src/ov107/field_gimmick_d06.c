@@ -334,7 +334,7 @@ static GameEventReturnCode PushEvent(GameEvent *event, u32 *state, void *data) {
         if (FldAct_CheckAcmdEnd(player) == TRUE) {
             FldAct_EndAcmd(push->slot->actor);
             FldAct_EndAcmd(player);
-            func_ov036_021c29bc(push->slot->effect);
+            StoneTask_FollowFreezeLoop(push->slot->effect);
             return GAMEEVENT_DONE;
         }
         break;
@@ -354,11 +354,11 @@ static GameEventReturnCode BlockedEvent(GameEvent *event, u32 *state, void *data
             (*state)++;
         }
     case 1:
-        func_ov036_021c29cc(push->slot->effect);
+        StoneTask_FollowStartEnding(push->slot->effect);
         (*state)++;
         break;
     case 2:
-        if (!func_ov036_021c29f0(push->slot->effect)) {
+        if (!StoneTask_FollowIsEnded(push->slot->effect)) {
             break;
         }
         (*state)++;
@@ -377,9 +377,9 @@ static void InitStoneAt(StoneWork *work, StoneSlot *slot, int x, int z) {
 
     slot->actor = CreateStone(work->field, x, z);
     CopyActorWPos(slot->actor, &pos);
-    slot->effect = func_ov036_021c2984(Field_GetFieldEffects(work->field), &pos, slot->actor);
+    slot->effect = StoneTask_StartFollow(Field_GetFieldEffects(work->field), &pos, slot->actor);
     if (IsNextToElectricRock(work, slot) == TRUE) {
-        func_ov036_021c29bc(slot->effect);
+        StoneTask_FollowFreezeLoop(slot->effect);
     }
 }
 
@@ -388,9 +388,9 @@ static void InitStoneActor(StoneWork *work, StoneSlot *slot, FieldActor *actor) 
 
     slot->actor = actor;
     CopyActorWPos(actor, &pos);
-    slot->effect = func_ov036_021c2984(Field_GetFieldEffects(work->field), &pos, slot->actor);
+    slot->effect = StoneTask_StartFollow(Field_GetFieldEffects(work->field), &pos, slot->actor);
     if (IsNextToElectricRock(work, slot) == TRUE) {
-        func_ov036_021c29bc(slot->effect);
+        StoneTask_FollowFreezeLoop(slot->effect);
     }
 }
 
@@ -460,14 +460,14 @@ static void InitMark(StoneWork *work, FieldEffectTask **mark, int x, int y, int 
 
     ConvGXZToVector(x, z, &pos);
     pos.y = (y << 16) + 0x8000;
-    *mark = func_ov036_021c2b78(Field_GetFieldEffects(work->field), &pos);
+    *mark = StoneTask_StartPulse(Field_GetFieldEffects(work->field), &pos);
 }
 
 static void StopMark(Field *field, u32 index) {
     GimmickState *gimmickState = GameData_GetGimmickState(GSYS_GetGameData(Field_GetGameSystem(field)));
     D06State *state = GimmickState_GetUserData(gimmickState, GetGimmickId(Field_GetPlayerStateZoneID(field)));
 
-    func_ov036_021c2bac(state->work->marks[index]);
+    StoneTask_PulseTrigger(state->work->marks[index]);
 }
 
 static FieldActor *CreateStone(Field *field, int x, int z) {

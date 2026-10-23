@@ -23,9 +23,9 @@ static void FieldmapCtrlNoGrid_Create(Field *field, VecFx32 *pos, u16 dir);
 static void FieldmapCtrlNoGrid_Free(Field *field);
 static void FieldmapCtrlNoGrid_Update(Field *field, VecFx32 *pos);
 static VecFx32 *FieldmapCtrlNoGrid_GetPos(Field *field);
-static FieldmapCtrlNoGrid *func_ov036_0219e3c8(Field *field, HeapID heapId);
+static FieldmapCtrlNoGrid *FieldmapCtrlNoGrid_CreateWork(Field *field, HeapID heapId);
 static void func_ov036_0219e40c(FieldmapCtrlNoGrid *controller);
-static void func_ov036_0219e414(FieldmapCtrlNoGrid *controller);
+static void FieldmapCtrlNoGrid_MovePlayer(FieldmapCtrlNoGrid *controller);
 
 const FieldmapCtrlVTable FIELDMAP_CTRL_NOGRID = {
     1, FieldmapCtrlNoGrid_Create, FieldmapCtrlNoGrid_Update, FieldmapCtrlNoGrid_Free, FieldmapCtrlNoGrid_GetPos,
@@ -41,7 +41,7 @@ static void FieldmapCtrlNoGrid_Create(Field *field, VecFx32 *pos, u16 dir) {
     Field_GetCameraSystem(field);
     Field_GetNoGridMapper(field);
     player = Field_GetPlayer(field);
-    Field_SetController(field, func_ov036_0219e3c8(field, Field_GetHeapID(field)));
+    Field_SetController(field, FieldmapCtrlNoGrid_CreateWork(field, Field_GetHeapID(field)));
     Field_SetPlayerPosPtr(field, GetMModelWPosPtr(FieldPlayer_GetActor(player)));
     FieldPlayer_SetRailPos(
         player, PlayerState_GetRailPos(GameData_GetPlayerState(GSYS_GetGameData(Field_GetGameSystem(field)))));
@@ -55,22 +55,22 @@ static void FieldmapCtrlNoGrid_Free(Field *field) {
 }
 
 static void FieldmapCtrlNoGrid_Update(Field *field, VecFx32 *pos) {
-    func_ov036_0219e414(Field_GetController(field));
+    FieldmapCtrlNoGrid_MovePlayer(Field_GetController(field));
 }
 
 static VecFx32 *FieldmapCtrlNoGrid_GetPos(Field *field) {
     return GetMModelWPosPtr(FieldPlayer_GetActor(Field_GetPlayer(field)));
 }
 
-static FieldmapCtrlNoGrid *func_ov036_0219e3c8(Field *field, HeapID heapId) {
+static FieldmapCtrlNoGrid *FieldmapCtrlNoGrid_CreateWork(Field *field, HeapID heapId) {
     NoGridMapper *mapper = Field_GetNoGridMapper(field);
     FieldmapCtrlNoGrid *controller =
         GFL_HeapAllocate(heapId, sizeof(FieldmapCtrlNoGrid), TRUE, "fieldmap_ctrl_nogrid_work.c", 62);
     FieldPlayer *player = Field_GetPlayer(field);
 
     controller->player = player;
-    func_ov036_0219accc(player, heapId);
-    FieldNoGridMapper_SetCameraParent(mapper, func_ov036_0219ad0c(player));
+    FieldPlayer_CreateNogrid(player, heapId);
+    FieldNoGridMapper_SetCameraParent(mapper, FieldPlayer_GetNogridRailWork(player));
     return controller;
 }
 
@@ -78,7 +78,7 @@ static void func_ov036_0219e40c(FieldmapCtrlNoGrid *controller) {
     GFL_HeapFree(controller);
 }
 
-static void func_ov036_0219e414(FieldmapCtrlNoGrid *controller) {
+static void FieldmapCtrlNoGrid_MovePlayer(FieldmapCtrlNoGrid *controller) {
     u32 pressedKeys = GCTX_HIDGetPressedKeys();
     u32 heldKeys = GCTX_HIDGetHeldKeys();
 

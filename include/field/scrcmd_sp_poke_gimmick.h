@@ -14,6 +14,6 @@ BOOL s0210_SpPokeWaitAnimEnd(VM *vm, FieldScriptEnv *env);
 BOOL s0211_SpPokeWaitFrame(VM *vm, FieldScriptEnv *env);
 BOOL s020D_PokePartyFindEx(VM *vm, FieldScriptEnv *env);
 BOOL s0215_SetSpecialTransferUsed(VM *vm, FieldScriptEnv *env);
-BOOL func_ov012_02165950(VM *vm, FieldScriptEnv *env);
+BOOL FieldChunk_ScrCmdReadSaveByte(VM *vm, FieldScriptEnv *env);
 
 #endif // POKEBW2_FIELD_SCRCMD_SP_POKE_GIMMICK_H

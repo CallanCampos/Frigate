@@ -21,7 +21,7 @@ BOOL ScriptNative_WaitGameCommDisconnect(VM *vm, void *arg) {
     commSys = GSYS_GetGameCommSystem(gsys);
     GSYS_GetField(gsys);
     data = *ScriptWork_GetUserHeapPtr(work);
-    switch (func_ov036_02180fc0(commSys)) {
+    switch (Field_CheckCommExit(commSys)) {
     case 0:
         return FALSE;
     case 1:

@@ -37,18 +37,18 @@ typedef struct {
 
 // The events of a warp's ways out of a zone and into one, which EventWarpSequence_CreateOut and
 // EventWarpSequence_CreateIn pick by its type
-GameEventReturnCode func_ov036_021b73b4(GameEvent *event, u32 *state, void *data);
-GameEventReturnCode func_ov036_021b73f8(GameEvent *event, u32 *state, void *data);
+GameEventReturnCode EventWarpSequenceOut_RunPlain(GameEvent *event, u32 *state, void *data);
+GameEventReturnCode EventWarpSequenceOut_RunGroundAnime(GameEvent *event, u32 *state, void *data);
 GameEventReturnCode func_ov036_021b74c8(GameEvent *event, u32 *state, void *data);
-GameEventReturnCode func_ov036_021b7538(GameEvent *event, u32 *state, void *data);
-GameEventReturnCode func_ov036_021b7570(GameEvent *event, u32 *state, void *data);
+GameEventReturnCode EventWarpSequenceOut_RunAppear(GameEvent *event, u32 *state, void *data);
+GameEventReturnCode EventWarpSequenceOut_RunCamera(GameEvent *event, u32 *state, void *data);
 GameEventReturnCode func_ov036_021b7604(GameEvent *event, u32 *state, void *data);
-GameEventReturnCode func_ov036_021b77d0(GameEvent *event, u32 *state, void *data);
-GameEventReturnCode func_ov036_021b7810(GameEvent *event, u32 *state, void *data);
-GameEventReturnCode func_ov036_021b7848(GameEvent *event, u32 *state, void *data);
+GameEventReturnCode EventWarpSequenceIn_RunPlain(GameEvent *event, u32 *state, void *data);
+GameEventReturnCode EventWarpSequenceIn_RunGroundAnime(GameEvent *event, u32 *state, void *data);
+GameEventReturnCode EventWarpSequenceIn_RunObjectAnime(GameEvent *event, u32 *state, void *data);
 GameEventReturnCode EventWarpSequence_CallbackSpinDown(GameEvent *event, u32 *state, void *data);
-GameEventReturnCode func_ov036_021b78fc(GameEvent *event, u32 *state, void *data);
-GameEventReturnCode func_ov036_021b793c(GameEvent *event, u32 *state, void *data);
+GameEventReturnCode EventWarpSequenceIn_RunCamera(GameEvent *event, u32 *state, void *data);
+GameEventReturnCode EventWarpSequenceIn_RunFadeSe(GameEvent *event, u32 *state, void *data);
 
 // The event that walks the player into the entrance
 GameEvent *func_ov036_021b74a0(GameSystem *gsys, WarpSequence *warp);
@@ -60,7 +60,7 @@ void EntranceCamera_Configure(EntranceCamera *camera, const EntranceCameraParam 
 void EntranceCamera_StartAnimation(EntranceCamera *camera);
 void EntranceCamera_FinishCamera(EntranceCamera *camera);
 // Whether the configured arrival or departure has an animation
-BOOL func_ov036_021b7ae0(EntranceCamera *camera);
+BOOL EntranceCamera_IsActive(EntranceCamera *camera);
 // Whether the configured animation has a duration of zero frames
 BOOL EntranceCamera_HasZeroFrames(EntranceCamera *camera);
 EntranceCamera *EntranceCamera_Allocate(HeapID heapId);
@@ -81,8 +81,8 @@ EntranceCameraParam *EntranceCamera_GetParam(EntranceCamera *camera);
 void EntranceCamera_SetParam(EntranceCamera *camera, const EntranceCameraParam *param);
 u32 EntranceCamera_GetTransitionType(EntranceCamera *camera);
 // Whether the transition type has a camera file, whether the camera doesn't depart, and whether it animates
-BOOL func_ov036_021b7f40(EntranceCamera *camera);
-BOOL func_ov036_021b7f50(EntranceCamera *camera);
-BOOL func_ov036_021b7f64(EntranceCamera *camera);
+BOOL EntranceCamera_HasRecord(EntranceCamera *camera);
+BOOL EntranceCamera_AimsAtEntrance(EntranceCamera *camera);
+BOOL EntranceCamera_IsPhaseActive(EntranceCamera *camera);
 
 #endif // POKEBW2_FIELD_ENTRANCE_CAMERA_H

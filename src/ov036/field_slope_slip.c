@@ -39,7 +39,7 @@ static const SlopeSlipTileConfig SLOPE_SLIP_TILES[4] = {
 
 const SlopeSlipTileConfig *GetSlopeSlipTileConfig(u32 tileClass);
 BOOL IsTileSlopeSlip_(u32 tileClass);
-GameEventReturnCode func_ov036_021c22d4(GameEvent *event, u32 *state, void *data);
+GameEventReturnCode SlopeSlip_SpinTaskMain(GameEvent *event, u32 *state, void *data);
 u16 SlopeSlip_GetAcmd(SlopeSlipWork *work);
 u16 SlopeSlip_GetDirection(SlopeSlipWork *work);
 u16 SlopeSlip_GetTurnInterval(SlopeSlipWork *work);
@@ -63,13 +63,13 @@ BOOL IsTileSlopeSlip_(u32 tileClass) {
 }
 
 u16 SlopeSlip_GetTileClass(SlopeSlipWork *work);
-void func_ov036_021c23e8(SlopeSlipWork *work);
-void func_ov036_021c242c(SlopeSlipWork *work);
-void func_ov036_021c2460(SlopeSlipWork *work);
-BOOL func_ov036_021c2474(SlopeSlipWork *work);
-void func_ov036_021c2490(SlopeSlipWork *work);
+void SlopeSlip_SpinTick(SlopeSlipWork *work);
+void SlopeSlip_SpinStartStep(SlopeSlipWork *work);
+void SlopeSlip_SpinSelectEntry(SlopeSlipWork *work);
+BOOL SlopeSlip_SpinIsBlocked(SlopeSlipWork *work);
+void SlopeSlip_SpinFinish(SlopeSlipWork *work);
 
-GameEventReturnCode func_ov036_021c22d4(GameEvent *event, u32 *state, void *data) {
+GameEventReturnCode SlopeSlip_SpinTaskMain(GameEvent *event, u32 *state, void *data) {
     SlopeSlipWork *work = data;
     switch (*state) {
     case 0:
@@ -80,26 +80,26 @@ GameEventReturnCode func_ov036_021c22d4(GameEvent *event, u32 *state, void *data
         }
         break;
     case 1:
-        func_ov036_021c23e8(work);
+        SlopeSlip_SpinTick(work);
         if (FldAct_CheckAcmdEnd(work->actor)) {
-            func_ov036_021c2460(work);
-            if (func_ov036_021c2474(work)) {
+            SlopeSlip_SpinSelectEntry(work);
+            if (SlopeSlip_SpinIsBlocked(work)) {
                 GFL_SndPlayerStop(GFL_SndSeqGetPlayerIndex(SEQ_SE_FLD_35));
                 *state = 2;
             } else {
-                func_ov036_021c242c(work);
+                SlopeSlip_SpinStartStep(work);
             }
         }
         break;
     case 2:
-        func_ov036_021c2490(work);
+        SlopeSlip_SpinFinish(work);
         return GAMEEVENT_DONE;
     }
     return GAMEEVENT_CONTINUE;
 }
 
 GameEvent *EventSlopeSlip_Create(GameEvent *parent, GameSystem *gsys, Field *field) {
-    GameEvent *event = GameEvent_Create(gsys, parent, func_ov036_021c22d4, sizeof(SlopeSlipWork));
+    GameEvent *event = GameEvent_Create(gsys, parent, SlopeSlip_SpinTaskMain, sizeof(SlopeSlipWork));
     SlopeSlipWork *work = GameEvent_GetData(event);
 
     work->gsys = gsys;
@@ -144,7 +144,7 @@ u16 SlopeSlip_GetTileClass(SlopeSlipWork *work) {
     return GetTileClass(GetTileTypeAtPos(Field_GetG3DMapper(work->field), &pos));
 }
 
-void func_ov036_021c23e8(SlopeSlipWork *work) {
+void SlopeSlip_SpinTick(SlopeSlipWork *work) {
     u32 interval = SlopeSlip_GetTurnInterval(work);
 
     work->frames++;
@@ -156,7 +156,7 @@ void func_ov036_021c23e8(SlopeSlipWork *work) {
     }
 }
 
-void func_ov036_021c242c(SlopeSlipWork *work) {
+void SlopeSlip_SpinStartStep(SlopeSlipWork *work) {
     FldAct_SetAcmd(work->actor, SlopeSlip_GetAcmd(work));
     SetActorFlag(work->actor, 8);
     if (!GFL_SndPlayerIsActive(GFL_SndSeqGetPlayerIndex(SEQ_SE_FLD_35))) {
@@ -164,7 +164,7 @@ void func_ov036_021c242c(SlopeSlipWork *work) {
     }
 }
 
-void func_ov036_021c2460(SlopeSlipWork *work) {
+void SlopeSlip_SpinSelectEntry(SlopeSlipWork *work) {
     const SlopeSlipTileConfig *config = GetSlopeSlipTileConfig(SlopeSlip_GetTileClass(work));
 
     if (config != NULL) {
@@ -172,14 +172,14 @@ void func_ov036_021c2460(SlopeSlipWork *work) {
     }
 }
 
-BOOL func_ov036_021c2474(SlopeSlipWork *work) {
+BOOL SlopeSlip_SpinIsBlocked(SlopeSlipWork *work) {
     if (ActorRouteCollCheckOneTileInDir(work->actor, SlopeSlip_GetDirection(work))) {
         return TRUE;
     }
     return FALSE;
 }
 
-void func_ov036_021c2490(SlopeSlipWork *work) {
+void SlopeSlip_SpinFinish(SlopeSlipWork *work) {
     ClearActorFlag(work->actor, 8);
     if (work->config != NULL) {
         CheckSetActorFaceDir(work->actor, SlopeSlip_GetDirection(work));

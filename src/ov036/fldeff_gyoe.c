@@ -46,16 +46,16 @@ typedef struct {
     fx32 speed;
 } GyoeTask;
 
-static void func_ov036_021b3ea8(FieldEffectGyoe *gyoe);
-static void func_ov036_021b3ef0(FieldEffectGyoe *gyoe);
-static void func_ov036_021b3fc8(FieldEffectTask *task, void *work);
+static void FldeffGyoe_InitResource(FieldEffectGyoe *gyoe);
+static void FldeffGyoe_DeleteResource(FieldEffectGyoe *gyoe);
+static void FldeffGyoe_InitHeldTask(FieldEffectTask *task, void *work);
 static void func_ov036_021b3ff4(FieldEffectTask *task, void *work);
-static void func_ov036_021b3ff8(FieldEffectTask *task, void *work);
-static void func_ov036_021b4034(FieldEffectTask *task, void *work);
-static void func_ov036_021b4078(FieldEffectTask *task, void *work);
-static void func_ov036_021b4164(u32 kind);
-static void func_ov036_021b41a0(G3DCamera *camera, const VecFx32 *src, VecFx32 *dest);
-static void func_ov036_021b41f4(GyoeTask *gyoeTask, VecFx32 *pos);
+static void FldeffGyoe_UpdateHeldTask(FieldEffectTask *task, void *work);
+static void FldeffGyoe_UpdateTask(FieldEffectTask *task, void *work);
+static void FldeffGyoe_DrawTask(FieldEffectTask *task, void *work);
+static void FldeffGyoe_PlaySe(u32 kind);
+static void FldeffGyoe_RotateByCamera(G3DCamera *camera, const VecFx32 *src, VecFx32 *dest);
+static void FldeffGyoe_StepAnimation(GyoeTask *gyoeTask, VecFx32 *pos);
 
 // The models of the bubbles in the field effects' archive, by kind
 static const u32 GYOE_MODEL_FILES[GYOE_KIND_COUNT] = { 50, 51, 52, 53 };
@@ -64,10 +64,10 @@ static const u32 GYOE_MODEL_FILES[GYOE_KIND_COUNT] = { 50, 51, 52, 53 };
 // clang-format off
 static const FieldEffectTaskVTable GYOE_TASK_VTABLE = {
     sizeof(GyoeTask),
-    func_ov036_021b3fc8,
+    FldeffGyoe_InitHeldTask,
     func_ov036_021b3ff4,
-    func_ov036_021b3ff8,
-    func_ov036_021b4078,
+    FldeffGyoe_UpdateHeldTask,
+    FldeffGyoe_DrawTask,
 };
 
 // clang-format on
@@ -76,10 +76,10 @@ static const FieldEffectTaskVTable GYOE_TASK_VTABLE = {
 // clang-format off
 static const FieldEffectTaskVTable GYOE_AUTO_END_TASK_VTABLE = {
     sizeof(GyoeTask),
-    func_ov036_021b3fc8,
+    FldeffGyoe_InitHeldTask,
     func_ov036_021b3ff4,
-    func_ov036_021b4034,
-    func_ov036_021b4078,
+    FldeffGyoe_UpdateTask,
+    FldeffGyoe_DrawTask,
 };
 
 // clang-format on
@@ -89,7 +89,7 @@ void *func_ov036_021b3e50(FieldEffects *effects, HeapID heapId) {
     int i;
 
     gyoe->effects = effects;
-    func_ov036_021b3ea8(gyoe);
+    FldeffGyoe_InitResource(gyoe);
     for (i = 0; i < GYOE_KIND_COUNT; i++) {
         NNS_G3dMdlSetMdlFogEnableFlagAll(GFL_G3DMdlGetEngineModel(gyoe->models[i])->resMdl, FALSE);
     }
@@ -97,11 +97,11 @@ void *func_ov036_021b3e50(FieldEffects *effects, HeapID heapId) {
 }
 
 void func_ov036_021b3e94(FieldEffects *effects, void *data) {
-    func_ov036_021b3ef0(data);
+    FldeffGyoe_DeleteResource(data);
     GFL_HeapFree(data);
 }
 
-static void func_ov036_021b3ea8(FieldEffectGyoe *gyoe) {
+static void FldeffGyoe_InitResource(FieldEffectGyoe *gyoe) {
     int i;
     ArcTool *arc = FieldEffects_GetArc(gyoe->effects);
 
@@ -114,7 +114,7 @@ static void func_ov036_021b3ea8(FieldEffectGyoe *gyoe) {
     gyoe->depthOffset = 4;
 }
 
-static void func_ov036_021b3ef0(FieldEffectGyoe *gyoe) {
+static void FldeffGyoe_DeleteResource(FieldEffectGyoe *gyoe) {
     int i;
 
     for (i = 0; i < GYOE_KIND_COUNT; i++) {
@@ -124,7 +124,7 @@ static void func_ov036_021b3ef0(FieldEffectGyoe *gyoe) {
     }
 }
 
-FieldEffectTask *func_ov036_021b3f14(FieldEffects *effects, FieldActor *actor, u32 kind, BOOL playSE) {
+FieldEffectTask *FldeffGyoe_SetMMdl(FieldEffects *effects, FieldActor *actor, u32 kind, BOOL playSE) {
     GyoeTaskParams params;
 
     params.kind = kind;
@@ -134,12 +134,12 @@ FieldEffectTask *func_ov036_021b3f14(FieldEffects *effects, FieldActor *actor, u
     FldAct_GetIdentity(actor, &params.identity);
     params.field = FieldEffects_GetField(effects);
     if (playSE == TRUE) {
-        func_ov036_021b4164(kind);
+        FldeffGyoe_PlaySe(kind);
     }
     return FieldEffects_TCBCreate(effects, &GYOE_TASK_VTABLE, NULL, 0, &params, 0);
 }
 
-FieldEffectTask *func_ov036_021b3f64(FieldEffects *effects, FieldActor *actor, u32 kind, BOOL playSE) {
+FieldEffectTask *FldeffGyoe_StartHeld(FieldEffects *effects, FieldActor *actor, u32 kind, BOOL playSE) {
     GyoeTaskParams params;
 
     params.kind = kind;
@@ -149,34 +149,34 @@ FieldEffectTask *func_ov036_021b3f64(FieldEffects *effects, FieldActor *actor, u
     FldAct_GetIdentity(actor, &params.identity);
     params.field = FieldEffects_GetField(effects);
     if (playSE == TRUE) {
-        func_ov036_021b4164(kind);
+        FldeffGyoe_PlaySe(kind);
     }
     return FieldEffects_TCBCreate(effects, &GYOE_AUTO_END_TASK_VTABLE, NULL, 0, &params, 0);
 }
 
-BOOL func_ov036_021b3fb4(FieldEffectTask *task) {
+BOOL FldeffGyoe_IsFinished(FieldEffectTask *task) {
     if (task != NULL) {
-        GyoeTask *gyoeTask = func_ov036_021a3afc(task);
+        GyoeTask *gyoeTask = FieldEffects_GetObjectWork(task);
 
         return gyoeTask->done;
     }
     return TRUE;
 }
 
-static void func_ov036_021b3fc8(FieldEffectTask *task, void *work) {
+static void FldeffGyoe_InitHeldTask(FieldEffectTask *task, void *work) {
     GyoeTask *gyoeTask = work;
-    GyoeTaskParams *params = func_ov036_021a3ac8(task);
+    GyoeTaskParams *params = FieldEffects_GetObjectParam(task);
 
     gyoeTask->params = *params;
     gyoeTask->speed = FX32_CONST(6);
-    func_ov036_021a3a94(task);
+    FieldEffects_UpdateObject(task);
 }
 
 static void func_ov036_021b3ff4(FieldEffectTask *task, void *work) {
 }
 
 // Follow the actor; when it is gone, the bubble is done
-static void func_ov036_021b3ff8(FieldEffectTask *task, void *work) {
+static void FldeffGyoe_UpdateHeldTask(FieldEffectTask *task, void *work) {
     GyoeTask *gyoeTask = work;
     VecFx32 pos;
 
@@ -185,26 +185,26 @@ static void func_ov036_021b3ff8(FieldEffectTask *task, void *work) {
         return;
     }
     CopyActorWPos(gyoeTask->params.actor, &pos);
-    func_ov036_021b41f4(gyoeTask, &pos);
-    func_ov036_021a3ae8(task, &pos);
+    FldeffGyoe_StepAnimation(gyoeTask, &pos);
+    FieldEffects_SetObjectPos(task, &pos);
 }
 
 // Follow the actor, and end once the bubble is done or the actor is gone
-static void func_ov036_021b4034(FieldEffectTask *task, void *work) {
+static void FldeffGyoe_UpdateTask(FieldEffectTask *task, void *work) {
     GyoeTask *gyoeTask = work;
     VecFx32 pos;
 
     if (gyoeTask->done == TRUE || !FldAct_CheckIdentity(gyoeTask->params.actor, &gyoeTask->params.identity)) {
-        func_ov036_021a3a70(task);
+        FieldEffects_DeleteObject(task);
         return;
     }
     CopyActorWPos(gyoeTask->params.actor, &pos);
-    func_ov036_021b41f4(gyoeTask, &pos);
-    func_ov036_021a3ae8(task, &pos);
+    FldeffGyoe_StepAnimation(gyoeTask, &pos);
+    FieldEffects_SetObjectPos(task, &pos);
 }
 
 // Draw the bubble moved toward the camera by its depth offset, through the projection matrix
-static void func_ov036_021b4078(FieldEffectTask *task, void *work) {
+static void FldeffGyoe_DrawTask(FieldEffectTask *task, void *work) {
     GyoeTask *gyoeTask = work;
     SRTMatrix status = { { 0, 0, 0 }, { FX32_ONE, FX32_ONE, FX32_ONE } };
     const MtxFx44 *proj = NNS_G3dGlbGetProjectionMtx();
@@ -219,14 +219,14 @@ static void func_ov036_021b4078(FieldEffectTask *task, void *work) {
     NNS_G3dGlbFlushP();
     NNS_G3dGeFlushBuffer();
     MTX_Identity33_(&status.rotation);
-    func_ov036_021a3ad4(task, &status.translation);
+    FieldEffects_GetObjectPos(task, &status.translation);
     GFL_G3DSysDrawObjBBoxCull(gyoeTask->params.gyoe->actors[gyoeTask->params.kind], &status);
     NNS_G3dGlbSetProjectionMtx(&saved);
     NNS_G3dGlbFlushP();
     NNS_G3dGeFlushBuffer();
 }
 
-static void func_ov036_021b4164(u32 kind) {
+static void FldeffGyoe_PlaySe(u32 kind) {
     u32 se = 0;
 
     switch (kind) {
@@ -246,7 +246,7 @@ static void func_ov036_021b4164(u32 kind) {
 }
 
 // Turns src from the camera's view space into the world's
-static void func_ov036_021b41a0(G3DCamera *camera, const VecFx32 *src, VecFx32 *dest) {
+static void FldeffGyoe_RotateByCamera(G3DCamera *camera, const VecFx32 *src, VecFx32 *dest) {
     VecFx32 camPos;
     VecFx32 camUp;
     VecFx32 target;
@@ -263,7 +263,7 @@ static void func_ov036_021b41a0(G3DCamera *camera, const VecFx32 *src, VecFx32 *
 }
 
 // The bubble hops up and comes back down, then stays for 30 frames, above the actor's head as the camera sees it
-static void func_ov036_021b41f4(GyoeTask *gyoeTask, VecFx32 *pos) {
+static void FldeffGyoe_StepAnimation(GyoeTask *gyoeTask, VecFx32 *pos) {
     VecFx32 vec;
     G3DCamera *camera;
 
@@ -291,6 +291,6 @@ static void func_ov036_021b41f4(GyoeTask *gyoeTask, VecFx32 *pos) {
 
         vec = offset;
     }
-    func_ov036_021b41a0(camera, &vec, &vec);
+    FldeffGyoe_RotateByCamera(camera, &vec, &vec);
     VEC_Add(&vec, pos, pos);
 }

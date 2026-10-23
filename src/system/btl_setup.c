@@ -100,7 +100,7 @@ void BtlSetup_ApplyRegulation(BtlSetup *setup, Regulation *regulation, HeapID he
 
     setup->unk8E = Regulation_GetParam(regulation, REGULATION_PARAM_16) * 60;
     setup->unk8C = Regulation_GetParam(regulation, REGULATION_PARAM_15) * 60;
-    func_0200b760(regulation, (RegulationUnkAC *)setup->unk90);
+    Regulation_GetShooterSettings(regulation, (RegulationUnkAC *)setup->unk90);
     switch (Regulation_GetParam(regulation, REGULATION_PARAM_18)) {
     case 0:
         break;

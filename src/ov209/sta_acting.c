@@ -628,7 +628,7 @@ static void StaActing_InitBg(StaActing *stage) {
 }
 
 static void StaActing_LoadBg(StaActing *stage, u32 unused) {
-    StaActBg_LoadBg(stage->bg, func_ov012_02152614(stage->param->program));
+    StaActBg_LoadBg(stage->bg, MusicalProgram_GetBaseProgramId(stage->param->program));
 }
 
 static void StaActing_InitBG(const BGSetup *setup, u8 bg, u8 mode) {

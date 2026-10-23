@@ -75,7 +75,7 @@ typedef struct {
     u8 anim;
 } RailObjAnim;
 
-static void func_ov036_02196324(FieldActor *actor);
+static void FldmmdlMove_VanishProc(FieldActor *actor);
 static void func_ov036_0219633c(FieldActor *actor);
 static void func_ov036_02196340(FieldActor *actor);
 static void func_ov036_02196344(FieldActor *actor);
@@ -92,30 +92,30 @@ static void func_ov036_021965cc(FieldActor *actor);
 static void func_ov036_02196680(FieldActor *actor);
 static void func_ov036_02196728(FieldActor *actor);
 static u32 func_ov036_021967c8(FieldActor *actor, u32 param);
-static void func_ov036_021967d4(FieldActor *actor);
-static void func_ov036_02196870(FieldActor *actor);
+static void RailActorAnim_DrawTwoFrame(FieldActor *actor);
+static void RailActorAnim_DrawThreeFrame(FieldActor *actor);
 static void TransformVecByCamera(G3DCamera *camera, VecFx32 *vec, VecFx32 *dest);
-static void func_ov036_0219696c(FieldActor *actor, u16 anim, u16 step, VecFx32 *dest);
-static void func_ov036_02196978(FieldActor *actor);
-static void func_ov036_02196a94(FieldActor *actor);
-static void func_ov036_02196bb4(FieldActor *actor);
-static void func_ov036_02196c0c(FieldActor *actor);
+static void RailActorAnim_GetFrameOffsetZero(FieldActor *actor, u16 anim, u16 step, VecFx32 *dest);
+static void RailActorAnim_DrawBillboardOffset(FieldActor *actor);
+static void RailActorAnim_DrawStatic(FieldActor *actor);
+static void RailActorAnim_DrawPositionOnly(FieldActor *actor);
+static void RailActorAnim_InitFixedState(FieldActor *actor);
 static void func_ov036_02196c24(FieldActor *actor);
-static void func_ov036_02196c38(FieldActor *actor);
-static void func_ov036_02196cd4(FieldActor *actor, RailNpcWork *work, u8 dir);
-static void func_ov036_02196df8(FieldActor *actor, u32 dir, const FieldActorConfig *config, VecFx32 *offset);
-static BOOL func_ov036_02196e1c(RailNpcWork *work, u32 dir, const FieldActorConfig *config);
+static void RailActorAnim_DrawWalking(FieldActor *actor);
+static void RailActorAnim_UpdateWalkOffset(FieldActor *actor, RailNpcWork *work, u8 dir);
+static void RailActorAnim_ShiftOffsetByDir(FieldActor *actor, u32 dir, const FieldActorConfig *config, VecFx32 *offset);
+static BOOL RailActorAnim_CheckStepFrame(RailNpcWork *work, u32 dir, const FieldActorConfig *config);
 static void FldAct_SyncLights(BlActSys *sys, FieldActor *actor, RailActorWork *work);
 static u32 func_ov036_02196ed4(FieldActor *actor, u32 param);
 static void func_ov036_02196ee0(FieldActor *actor);
 static void func_ov036_02196efc(FieldActor *actor);
 static void func_ov036_02196f10(FieldActor *actor);
 static u32 func_ov036_02197054(FieldActor *actor, u32 param);
-static void func_ov036_02197114(FieldActor *actor);
+static void RailActorAnim_DrawTwoPattern(FieldActor *actor);
 static void func_ov036_0219718c(FieldActor *actor);
 static void RailActorAnim_Reset(RailActorAnim *anim);
 static void RailActorAnim_Update(RailActorAnim *anim, FieldActor *actor, BlActSys *sys, u16 index);
-static void func_ov036_021973ec(FieldActor *actor, VecFx32 *pos);
+static void RailActorAnim_AddHeightOffset(FieldActor *actor, VecFx32 *pos);
 static u8 RailActor_GetCameraRelativeDir(FieldActor *actor);
 static void RailActor_UpdateVisibilityAndAnimation(FieldActor *actor, BlActSys *sys, u16 index, BOOL changed,
                                                    BOOL flag);
@@ -166,7 +166,7 @@ GameEvent *CreatePlayerXActorScriptCall(GameSystem *gsys, Field *field, u32 scri
     return EventScriptCall_Create(gsys, scriptId, actor, heapId);
 }
 
-static void func_ov036_02196324(FieldActor *actor) {
+static void FldmmdlMove_VanishProc(FieldActor *actor) {
     SetActorHidden(actor, TRUE);
     SetActorMovementFlag(actor, 0x8000);
 }
@@ -183,7 +183,7 @@ static void func_ov036_02196344(FieldActor *actor) {
 static void func_ov036_02196348(FieldActor *actor) {
 }
 
-void func_ov036_0219634c(FieldActor *actor, u16 *anim, u16 *step) {
+void RailActorAnim_GetBlactAnime(FieldActor *actor, u16 *anim, u16 *step) {
     if (GetActorMdlInfo(actor)->entityType == 1) {
         RailActorWork *work = FldAct_GetBlActWorkPtr(actor);
 
@@ -202,10 +202,11 @@ void func_ov036_0219634c(FieldActor *actor, u16 *anim, u16 *step) {
     *step = 0;
 }
 
-const FieldActorSceneNodeVTable data_ov036_021cf868 = { func_ov036_02196324, func_ov036_0219633c, func_ov036_02196340,
-                                                        func_ov036_02196344, func_ov036_02196348, NULL };
+const FieldActorSceneNodeVTable data_ov036_021cf868 = { FldmmdlMove_VanishProc, func_ov036_0219633c,
+                                                        func_ov036_02196340,    func_ov036_02196344,
+                                                        func_ov036_02196348,    NULL };
 
-void func_ov036_021963a4(FieldActor *actor, u16 anim, u16 step) {
+void RailActorAnim_SetBlactAnime(FieldActor *actor, u16 anim, u16 step) {
     if (GetActorMdlInfo(actor)->entityType == 1) {
         RailActorWork *work = FldAct_GetBlActWorkPtr(actor);
 
@@ -222,13 +223,13 @@ static void func_ov036_021963ec(FieldActor *actor) {
     RailActorWork *work = FldAct_ResetBlActWork(actor, 8);
 
     RailActorAnim_Reset(&work->anim);
-    func_ov036_02193a00(actor, &work->index);
+    FldBlAct_AddActorMmdlOrReserve(actor, &work->index);
 }
 
 static void func_ov036_02196408(FieldActor *actor) {
     RailActorWork *work = FldAct_GetBlActWorkPtr(actor);
 
-    func_ov036_02193ac0(actor, work->index);
+    FldBlAct_DeleteActorMmdl(actor, work->index);
 }
 
 static void func_ov036_0219641c(FieldActor *actor) {
@@ -240,7 +241,7 @@ static void func_ov036_0219641c(FieldActor *actor) {
 
         RailActorAnim_Update(&work->anim, actor, sys, work->index);
         CopyActorPosAllAdd(actor, &pos);
-        func_ov036_021973ec(actor, &pos);
+        RailActorAnim_AddHeightOffset(actor, &pos);
         BlActScene_SetActorPos(BlActSys_GetScene(sys), work->index, &pos);
         FldAct_SyncLights(sys, actor, work);
     }
@@ -279,7 +280,7 @@ static void func_ov036_02196488(FieldActor *actor) {
         }
         RailActor_UpdateVisibilityAndAnimation(actor, sys, work->index, changed, FALSE);
         CopyActorPosAllAdd(actor, &pos);
-        func_ov036_021973ec(actor, &pos);
+        RailActorAnim_AddHeightOffset(actor, &pos);
         BlActScene_SetActorPos(BlActSys_GetScene(sys), work->index, &pos);
         FldAct_SyncLights(sys, actor, work);
     }
@@ -292,13 +293,13 @@ static void func_ov036_0219653c(FieldActor *actor) {
     RailActorWork *work = FldAct_ResetBlActWork(actor, 8);
 
     RailActorAnim_Reset(&work->anim);
-    func_ov036_02193a00(actor, &work->index);
+    FldBlAct_AddActorMmdlOrReserve(actor, &work->index);
 }
 
 static void func_ov036_02196558(FieldActor *actor) {
     RailActorWork *work = FldAct_GetBlActWorkPtr(actor);
 
-    func_ov036_02193ac0(actor, work->index);
+    FldBlAct_DeleteActorMmdl(actor, work->index);
 }
 
 static void func_ov036_0219656c(FieldActor *actor) {
@@ -310,7 +311,7 @@ static void func_ov036_0219656c(FieldActor *actor) {
 
         RailActorAnim_Update(&work->anim, actor, sys, work->index);
         CopyActorPosAllAdd(actor, &pos);
-        func_ov036_021973ec(actor, &pos);
+        RailActorAnim_AddHeightOffset(actor, &pos);
         BlActScene_SetActorPos(BlActSys_GetScene(sys), work->index, &pos);
         FldAct_SyncLights(sys, actor, work);
     }
@@ -350,7 +351,7 @@ static void func_ov036_021965cc(FieldActor *actor) {
         }
         RailActor_UpdateVisibilityAndAnimation(actor, sys, work->index, changed, flag);
         CopyActorPosAllAdd(actor, &pos);
-        func_ov036_021973ec(actor, &pos);
+        RailActorAnim_AddHeightOffset(actor, &pos);
         BlActScene_SetActorPos(BlActSys_GetScene(sys), work->index, &pos);
         FldAct_SyncLights(sys, actor, work);
     }
@@ -384,7 +385,7 @@ static void func_ov036_02196680(FieldActor *actor) {
             RailActorAnim_Update(&work->anim, actor, sys, work->index);
         }
         CopyActorPosAllAdd(actor, &pos);
-        func_ov036_021973ec(actor, &pos);
+        RailActorAnim_AddHeightOffset(actor, &pos);
         BlActScene_SetActorPos(BlActSys_GetScene(sys), work->index, &pos);
         FldAct_SyncLights(sys, actor, work);
     }
@@ -415,7 +416,7 @@ static void func_ov036_02196728(FieldActor *actor) {
             RailActorAnim_Update(&work->anim, actor, sys, work->index);
         }
         CopyActorPosAllAdd(actor, &pos);
-        func_ov036_021973ec(actor, &pos);
+        RailActorAnim_AddHeightOffset(actor, &pos);
         BlActScene_SetActorPos(BlActSys_GetScene(sys), work->index, &pos);
         FldAct_SyncLights(sys, actor, work);
     }
@@ -430,7 +431,7 @@ static u32 func_ov036_021967c8(FieldActor *actor, u32 param) {
     return work->index;
 }
 
-static void func_ov036_021967d4(FieldActor *actor) {
+static void RailActorAnim_DrawTwoFrame(FieldActor *actor) {
     RailActorWork *work = FldAct_GetBlActWorkPtr(actor);
 
     if (work->index != BLACT_NONE) {
@@ -451,15 +452,16 @@ static void func_ov036_021967d4(FieldActor *actor) {
         }
         RailActor_UpdateVisibilityAndAnimation(actor, sys, work->index, FALSE, FALSE);
         CopyActorPosAllAdd(actor, &pos);
-        func_ov036_021973ec(actor, &pos);
+        RailActorAnim_AddHeightOffset(actor, &pos);
         BlActScene_SetActorPos(BlActSys_GetScene(sys), work->index, &pos);
     }
 }
 
-const FieldActorSceneNodeVTable data_ov036_021cf898 = { func_ov036_021963ec, func_ov036_021967d4, func_ov036_02196408,
-                                                        func_ov036_02196408, func_ov036_021963ec, func_ov036_0219647c };
+const FieldActorSceneNodeVTable data_ov036_021cf898 = { func_ov036_021963ec, RailActorAnim_DrawTwoFrame,
+                                                        func_ov036_02196408, func_ov036_02196408,
+                                                        func_ov036_021963ec, func_ov036_0219647c };
 
-static void func_ov036_02196870(FieldActor *actor) {
+static void RailActorAnim_DrawThreeFrame(FieldActor *actor) {
     RailActorWork *work = FldAct_GetBlActWorkPtr(actor);
 
     if (work->index != BLACT_NONE) {
@@ -480,15 +482,16 @@ static void func_ov036_02196870(FieldActor *actor) {
         }
         RailActor_UpdateVisibilityAndAnimation(actor, sys, work->index, FALSE, FALSE);
         CopyActorPosAllAdd(actor, &pos);
-        func_ov036_021973ec(actor, &pos);
+        RailActorAnim_AddHeightOffset(actor, &pos);
         BlActScene_SetActorPos(BlActSys_GetScene(sys), work->index, &pos);
     }
 }
 
-const FieldActorSceneNodeVTable data_ov036_021cf880 = { func_ov036_021963ec, func_ov036_02196870, func_ov036_02196408,
-                                                        func_ov036_02196408, func_ov036_021963ec, func_ov036_0219647c };
+const FieldActorSceneNodeVTable data_ov036_021cf880 = { func_ov036_021963ec, RailActorAnim_DrawThreeFrame,
+                                                        func_ov036_02196408, func_ov036_02196408,
+                                                        func_ov036_021963ec, func_ov036_0219647c };
 
-void func_ov036_0219690c(FieldActor *actor, BOOL value) {
+void RailActorAnim_SetState(FieldActor *actor, BOOL value) {
     RailActorWork *work = FldAct_GetBlActWorkPtr(actor);
 
     work->unk2 = value;
@@ -510,13 +513,13 @@ static void TransformVecByCamera(G3DCamera *camera, VecFx32 *vec, VecFx32 *dest)
     MTX_MultVec33(vec, &inverse, dest);
 }
 
-static void func_ov036_0219696c(FieldActor *actor, u16 anim, u16 step, VecFx32 *dest) {
+static void RailActorAnim_GetFrameOffsetZero(FieldActor *actor, u16 anim, u16 step, VecFx32 *dest) {
     dest->x = 0;
     dest->y = 0;
     dest->z = 0;
 }
 
-static void func_ov036_02196978(FieldActor *actor) {
+static void RailActorAnim_DrawBillboardOffset(FieldActor *actor) {
     BOOL changed = FALSE;
     RailActorWork *work = FldAct_GetBlActWorkPtr(actor);
 
@@ -537,9 +540,9 @@ static void func_ov036_02196978(FieldActor *actor) {
         }
         RailActor_UpdateVisibilityAndAnimation(actor, sys, work->index, changed, TRUE);
         CopyActorPosAllAdd(actor, &pos);
-        func_ov036_021973ec(actor, &pos);
-        func_ov036_0219696c(actor, BlActSys_GetActorAnim(sys, work->index), BlActSys_GetActorStep(sys, work->index),
-                            &offset);
+        RailActorAnim_AddHeightOffset(actor, &pos);
+        RailActorAnim_GetFrameOffsetZero(actor, BlActSys_GetActorAnim(sys, work->index),
+                                         BlActSys_GetActorStep(sys, work->index), &offset);
         pos.x += offset.x;
         pos.y += offset.y;
         pos.z += offset.z;
@@ -558,10 +561,11 @@ static void func_ov036_02196978(FieldActor *actor) {
     }
 }
 
-const FieldActorSceneNodeVTable data_ov036_021cf838 = { func_ov036_021963ec, func_ov036_02196978, func_ov036_02196408,
-                                                        func_ov036_02196408, func_ov036_021963ec, func_ov036_0219647c };
+const FieldActorSceneNodeVTable data_ov036_021cf838 = { func_ov036_021963ec, RailActorAnim_DrawBillboardOffset,
+                                                        func_ov036_02196408, func_ov036_02196408,
+                                                        func_ov036_021963ec, func_ov036_0219647c };
 
-static void func_ov036_02196a94(FieldActor *actor) {
+static void RailActorAnim_DrawStatic(FieldActor *actor) {
     RailActorWork *work = FldAct_GetBlActWorkPtr(actor);
 
     if (work->index != BLACT_NONE) {
@@ -576,15 +580,16 @@ static void func_ov036_02196a94(FieldActor *actor) {
         }
         RailActor_UpdateVisibilityAndAnimation(actor, sys, work->index, FALSE, FALSE);
         CopyActorPosAllAdd(actor, &pos);
-        func_ov036_021973ec(actor, &pos);
+        RailActorAnim_AddHeightOffset(actor, &pos);
         BlActScene_SetActorPos(BlActSys_GetScene(sys), work->index, &pos);
     }
 }
 
-const FieldActorSceneNodeVTable data_ov036_021cf910 = { func_ov036_021963ec, func_ov036_02196a94, func_ov036_02196408,
-                                                        func_ov036_02196408, func_ov036_021963ec, func_ov036_0219647c };
+const FieldActorSceneNodeVTable data_ov036_021cf910 = { func_ov036_021963ec, RailActorAnim_DrawStatic,
+                                                        func_ov036_02196408, func_ov036_02196408,
+                                                        func_ov036_021963ec, func_ov036_0219647c };
 
-BOOL func_ov036_02196b10(FieldActor *actor, u16 time) {
+BOOL RailActorAnim_SyncFrameGroup(FieldActor *actor, u16 time) {
     u16 step;
     RailActorWork *work = FldAct_GetBlActWorkPtr(actor);
     BlActSys *sys;
@@ -634,7 +639,7 @@ BOOL func_ov036_02196b10(FieldActor *actor, u16 time) {
     return TRUE;
 }
 
-static void func_ov036_02196bb4(FieldActor *actor) {
+static void RailActorAnim_DrawPositionOnly(FieldActor *actor) {
     RailActorWork *work = FldAct_GetBlActWorkPtr(actor);
 
     if (work->index != BLACT_NONE) {
@@ -643,28 +648,29 @@ static void func_ov036_02196bb4(FieldActor *actor) {
 
         RailActor_UpdateVisibilityAndAnimation(actor, sys, work->index, FALSE, FALSE);
         CopyActorPosAllAdd(actor, &pos);
-        func_ov036_021973ec(actor, &pos);
+        RailActorAnim_AddHeightOffset(actor, &pos);
         BlActScene_SetActorPos(BlActSys_GetScene(sys), work->index, &pos);
     }
 }
 
-const FieldActorSceneNodeVTable data_ov036_021cf820 = { func_ov036_0219653c, func_ov036_02196bb4, func_ov036_02196558,
-                                                        func_ov036_02196558, func_ov036_0219653c, func_ov036_021967c8 };
+const FieldActorSceneNodeVTable data_ov036_021cf820 = { func_ov036_0219653c, RailActorAnim_DrawPositionOnly,
+                                                        func_ov036_02196558, func_ov036_02196558,
+                                                        func_ov036_0219653c, func_ov036_021967c8 };
 
-static void func_ov036_02196c0c(FieldActor *actor) {
+static void RailActorAnim_InitFixedState(FieldActor *actor) {
     RailActorWork *work = FldAct_ResetBlActWork(actor, 8);
 
     work->unk2 = 9;
-    func_ov036_02193a00(actor, &work->index);
+    FldBlAct_AddActorMmdlOrReserve(actor, &work->index);
 }
 
 static void func_ov036_02196c24(FieldActor *actor) {
     RailActorWork *work = FldAct_GetBlActWorkPtr(actor);
 
-    func_ov036_02193ac0(actor, work->index);
+    FldBlAct_DeleteActorMmdl(actor, work->index);
 }
 
-static void func_ov036_02196c38(FieldActor *actor) {
+static void RailActorAnim_DrawWalking(FieldActor *actor) {
     RailNpcWork *work = FldAct_GetBlActWorkPtr(actor);
 
     if (work->index != BLACT_NONE) {
@@ -685,18 +691,19 @@ static void func_ov036_02196c38(FieldActor *actor) {
                 CopyActorWPosOffset(actor, &offset);
             }
         }
-        func_ov036_02196cd4(actor, work, dir);
+        RailActorAnim_UpdateWalkOffset(actor, work, dir);
         CopyActorPosAllAdd(actor, &pos);
-        func_ov036_021973ec(actor, &pos);
+        RailActorAnim_AddHeightOffset(actor, &pos);
         BlActScene_SetActorPos(BlActSys_GetScene(sys), work->index, &pos);
         RailActor_UpdateVisibilityAndAnimation(actor, sys, work->index, changed, FALSE);
     }
 }
 
-const FieldActorSceneNodeVTable data_ov036_021cf808 = { func_ov036_02196c0c, func_ov036_02196c38, func_ov036_02196c24,
-                                                        func_ov036_02196c24, func_ov036_02196c0c, func_ov036_02196ed4 };
+const FieldActorSceneNodeVTable data_ov036_021cf808 = { RailActorAnim_InitFixedState, RailActorAnim_DrawWalking,
+                                                        func_ov036_02196c24,          func_ov036_02196c24,
+                                                        RailActorAnim_InitFixedState, func_ov036_02196ed4 };
 
-static void func_ov036_02196cd4(FieldActor *actor, RailNpcWork *work, u8 dir) {
+static void RailActorAnim_UpdateWalkOffset(FieldActor *actor, RailNpcWork *work, u8 dir) {
     BOOL walking;
     BOOL isPlayer;
     VecFx32 offset;
@@ -715,7 +722,7 @@ static void func_ov036_02196cd4(FieldActor *actor, RailNpcWork *work, u8 dir) {
     offset.x = 0;
     offset.y = 0;
     offset.z = 0;
-    hidden = func_ov036_0218ed68(actor);
+    hidden = FieldAcmdTCB_CheckAnimePaused(actor);
     CopyActorWPosOffset(actor, &base);
     gx = GetGPosX(actor);
     zone = GetActorZoneID(actor);
@@ -736,7 +743,7 @@ static void func_ov036_02196cd4(FieldActor *actor, RailNpcWork *work, u8 dir) {
     }
     if (hidden != 0 || (base.y > 0x1800 && config->sceneNodeType != 11)) {
         offset.y = base.y;
-    } else if (func_ov036_02196e1c(work, dir, config) == 0 && walking) {
+    } else if (RailActorAnim_CheckStepFrame(work, dir, config) == 0 && walking) {
         offset.y += 0x1800;
     }
     if (!isPlayer) {
@@ -752,7 +759,7 @@ static void func_ov036_02196cd4(FieldActor *actor, RailNpcWork *work, u8 dir) {
             }
         }
     }
-    func_ov036_02196df8(actor, dir, config, &offset);
+    RailActorAnim_ShiftOffsetByDir(actor, dir, config, &offset);
     if (isPuppet) {
         offset.x = 0;
         offset.y = 0;
@@ -762,7 +769,8 @@ static void func_ov036_02196cd4(FieldActor *actor, RailNpcWork *work, u8 dir) {
     work->frame++;
 }
 
-static void func_ov036_02196df8(FieldActor *actor, u32 dir, const FieldActorConfig *config, VecFx32 *offset) {
+static void RailActorAnim_ShiftOffsetByDir(FieldActor *actor, u32 dir, const FieldActorConfig *config,
+                                           VecFx32 *offset) {
     switch (dir) {
     case 2:
         offset->x -= 0x2000;
@@ -773,7 +781,7 @@ static void func_ov036_02196df8(FieldActor *actor, u32 dir, const FieldActorConf
     }
 }
 
-static BOOL func_ov036_02196e1c(RailNpcWork *work, u32 dir, const FieldActorConfig *config) {
+static BOOL RailActorAnim_CheckStepFrame(RailNpcWork *work, u32 dir, const FieldActorConfig *config) {
     int frame = work->frame % 20;
 
     work->frame = frame;
@@ -815,13 +823,13 @@ static void func_ov036_02196ee0(FieldActor *actor) {
     RailActorWork *work = FldAct_ResetBlActWork(actor, 8);
 
     RailActorAnim_Reset(&work->anim);
-    func_ov036_02193a00(actor, &work->index);
+    FldBlAct_AddActorMmdlOrReserve(actor, &work->index);
 }
 
 static void func_ov036_02196efc(FieldActor *actor) {
     RailActorWork *work = FldAct_GetBlActWorkPtr(actor);
 
-    func_ov036_02193ac0(actor, work->index);
+    FldBlAct_DeleteActorMmdl(actor, work->index);
 }
 
 static const RailObjAnim RAIL_OBJ_ANIMS[12] = {
@@ -916,7 +924,7 @@ static void func_ov036_02196f10(FieldActor *actor) {
         }
         RailActor_UpdateVisibilityAndAnimation(actor, sys, work->index, changed, TRUE);
         CopyActorPosAllAdd(actor, &pos);
-        func_ov036_021973ec(actor, &pos);
+        RailActorAnim_AddHeightOffset(actor, &pos);
         BlActScene_SetActorPos(BlActSys_GetScene(sys), work->index, &pos);
     }
 }
@@ -930,7 +938,7 @@ static u32 func_ov036_02197054(FieldActor *actor, u32 param) {
     return work->index;
 }
 
-BOOL func_ov036_02197060(FieldActor *actor, u16 *anim, u16 *step) {
+BOOL RailActorAnim_GetBlactAnimeTypeA(FieldActor *actor, u16 *anim, u16 *step) {
     u16 objCode = FldAct_GetObjCode(actor);
 
     if (objCode == OBJ_CODE_211 || objCode == OBJ_CODE_213) {
@@ -950,7 +958,7 @@ BOOL func_ov036_02197060(FieldActor *actor, u16 *anim, u16 *step) {
     return TRUE;
 }
 
-BOOL func_ov036_021970b8(FieldActor *actor, u16 *anim, u16 *step) {
+BOOL RailActorAnim_GetBlactAnimeTypeB(FieldActor *actor, u16 *anim, u16 *step) {
     u16 objCode = FldAct_GetObjCode(actor);
 
     if (objCode == OBJ_CODE_221 || objCode == OBJ_CODE_222) {
@@ -970,7 +978,7 @@ BOOL func_ov036_021970b8(FieldActor *actor, u16 *anim, u16 *step) {
     return TRUE;
 }
 
-static void func_ov036_02197114(FieldActor *actor) {
+static void RailActorAnim_DrawTwoPattern(FieldActor *actor) {
     BOOL changed = FALSE;
     RailActorWork *work = FldAct_GetBlActWorkPtr(actor);
 
@@ -986,13 +994,14 @@ static void func_ov036_02197114(FieldActor *actor) {
         }
         RailActor_UpdateVisibilityAndAnimation(actor, sys, work->index, changed, FALSE);
         CopyActorPosAllAdd(actor, &pos);
-        func_ov036_021973ec(actor, &pos);
+        RailActorAnim_AddHeightOffset(actor, &pos);
         BlActScene_SetActorPos(BlActSys_GetScene(sys), work->index, &pos);
     }
 }
 
-const FieldActorSceneNodeVTable data_ov036_021cf7d8 = { func_ov036_0219653c, func_ov036_02197114, func_ov036_02196558,
-                                                        func_ov036_02196558, func_ov036_0219653c, func_ov036_021967c8 };
+const FieldActorSceneNodeVTable data_ov036_021cf7d8 = { func_ov036_0219653c, RailActorAnim_DrawTwoPattern,
+                                                        func_ov036_02196558, func_ov036_02196558,
+                                                        func_ov036_0219653c, func_ov036_021967c8 };
 
 static void func_ov036_0219718c(FieldActor *actor) {
     BOOL changed = FALSE;
@@ -1028,7 +1037,7 @@ static void func_ov036_0219718c(FieldActor *actor) {
         }
         RailActor_UpdateVisibilityAndAnimation(actor, sys, work->index, changed, FALSE);
         CopyActorPosAllAdd(actor, &pos);
-        func_ov036_021973ec(actor, &pos);
+        RailActorAnim_AddHeightOffset(actor, &pos);
         BlActScene_SetActorPos(BlActSys_GetScene(sys), work->index, &pos);
     }
 }
@@ -1036,7 +1045,7 @@ static void func_ov036_0219718c(FieldActor *actor) {
 const FieldActorSceneNodeVTable data_ov036_021cf7f0 = { func_ov036_0219653c, func_ov036_0219718c, func_ov036_02196558,
                                                         func_ov036_02196558, func_ov036_0219653c, func_ov036_021967c8 };
 
-BOOL func_ov036_02197238(FieldActor *actor) {
+BOOL RailActorAnim_CheckBlactReady(FieldActor *actor) {
     u16 objCode = FldAct_GetObjCode(actor);
 
     if (objCode != OBJ_CODE_123 && objCode != OBJ_CODE_374) {
@@ -1129,7 +1138,7 @@ static void RailActorAnim_Update(RailActorAnim *anim, FieldActor *actor, BlActSy
     RailActor_UpdateVisibilityAndAnimation(actor, sys, index, changed, FALSE);
 }
 
-static void func_ov036_021973ec(FieldActor *actor, VecFx32 *pos) {
+static void RailActorAnim_AddHeightOffset(FieldActor *actor, VecFx32 *pos) {
     pos->y += Field_GetActorYOffset(GetMMSysField(GetActorMModelSystem(actor)));
 }
 
@@ -1138,7 +1147,7 @@ static u8 RailActor_GetCameraRelativeDir(FieldActor *actor) {
     u16 dir = GetActorFaceDir(actor);
 
     if (CheckActorFlag(actor, 0x2000)) {
-        return func_ov036_021949a4(actor, angle);
+        return RailActor_GetDirByAngle(actor, angle);
     }
     return RotateDirByAngle(dir, angle);
 }
@@ -1147,14 +1156,14 @@ static void RailActor_UpdateVisibilityAndAnimation(FieldActor *actor, BlActSys *
                                                    BOOL flag) {
     BOOL animate = TRUE;
     BOOL visible;
-    u8 shown = func_ov036_0219381c(actor);
+    u8 shown = FldBlAct_GetEntryHookFlag(actor);
 
     if (!changed) {
         if (flag == 1) {
             if (shown == 1 && CheckActorFlag(actor, 0x10)) {
                 animate = FALSE;
             }
-        } else if (shown == 1 && func_ov036_0218ed68(actor) == 1) {
+        } else if (shown == 1 && FieldAcmdTCB_CheckAnimePaused(actor) == 1) {
             animate = FALSE;
         }
     }

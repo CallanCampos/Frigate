@@ -322,7 +322,7 @@ void EventBattleCall_DecideEnvTrainer(u32 trainerId, Field *field, u32 *encEffec
     *encEffect = env;
 }
 
-BOOL func_ov036_021c6220(VM *vm, FieldScriptEnv *env) {
+BOOL CountTrainersEvent_StartCountOtherOtIdsTask(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     GameData *gameData = FieldScriptEnv_GetGameData(env);

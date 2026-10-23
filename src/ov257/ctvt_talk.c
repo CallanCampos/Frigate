@@ -283,7 +283,7 @@ void CtvtTalk_Enter(CommTvtWork *sys, CtvtTalk *talk) {
     setup.bgPriority = 2;
     talk->speedCursor = CtvtTalk_CreateActor(sys, 5, 1, 9, &setup, heapId);
     ClActor_SetVisible(talk->speedCursor, TRUE);
-    if (func_ov257_021aab18(sys) == TRUE) {
+    if (CommTvt_GetViewSwapped(sys) == TRUE) {
         setup.sequence = 21;
     } else {
         setup.sequence = 22;
@@ -334,13 +334,13 @@ void CtvtTalk_Enter(CommTvtWork *sys, CtvtTalk *talk) {
     talk->expanded = GFL_StrBufCreate(109, heapId);
     talker = CtvtComm_GetTalker(sys, CommTvt_GetComm(sys));
     if (talker != CTVT_COMM_NONE) {
-        func_ov257_021aad74(sys, talker);
+        CommTvt_PlaceSlotMarker(sys, talker);
         talk->voiceIconState = VOICE_ICON_BUSY;
     }
     if (!CtvtMic_IsReady(talk->mic)) {
         talk->voiceIconState = VOICE_ICON_BUSY;
     }
-    if (CommTvt_GetSelfIndex(sys) != 0 || func_ov257_021aab3c(sys) == TRUE || talk->notAlone == TRUE) {
+    if (CommTvt_GetSelfIndex(sys) != 0 || CommTvt_IsLaunchModeCall(sys) == TRUE || talk->notAlone == TRUE) {
         ClActor_SetAnimFrame(talk->gameButtons[0], 1);
         ClActor_SetAnimFrame(talk->gameButtons[1], 1);
     }
@@ -698,7 +698,7 @@ int CtvtTalk_Main(CommTvtWork *sys, CtvtTalk *talk) {
 
             talk->next = TALK_NEXT_EXIT;
             talk->state = TALK_STATE_FADE_OUT;
-            func_ov257_021aab14(sys, TRUE);
+            CommTvt_SetMessageActive(sys, TRUE);
             CtvtCamera_StopCamera(sys, camera);
             CtvtCamera_EndRecording(sys, camera);
             talk->waitSound = TRUE;
@@ -706,7 +706,7 @@ int CtvtTalk_Main(CommTvtWork *sys, CtvtTalk *talk) {
         break;
     case TALK_STATE_DISCONNECTED:
         CtvtComm_Disconnect(sys, CommTvt_GetComm(sys));
-        func_ov257_021aab14(sys, TRUE);
+        CommTvt_SetMessageActive(sys, TRUE);
         CtvtTalk_PrintMessage(sys, talk, 36);
         talk->state = TALK_STATE_WAIT_DISCONNECTED;
         CtvtCamera_EndRecording(sys, CommTvt_GetCamera(sys));
@@ -724,7 +724,7 @@ int CtvtTalk_Main(CommTvtWork *sys, CtvtTalk *talk) {
         if (CtvtComm_SendPacket(sys, CommTvt_GetComm(sys), CTVT_PACKET_UNK_A, 0) == TRUE) {
             CtvtCamera *camera = CommTvt_GetCamera(sys);
 
-            func_ov257_021aab14(sys, TRUE);
+            CommTvt_SetMessageActive(sys, TRUE);
             CtvtCamera_EndRecording(sys, camera);
             talk->state = TALK_STATE_SYNC_EXIT;
         }
@@ -734,7 +734,7 @@ int CtvtTalk_Main(CommTvtWork *sys, CtvtTalk *talk) {
         CtvtTalk_PrintMessage(sys, talk, 37);
         talk->state = TALK_STATE_WAIT_PARENT_LEFT;
         talk->waitFrames = 0;
-        func_ov257_021aab14(sys, TRUE);
+        CommTvt_SetMessageActive(sys, TRUE);
         CtvtCamera_EndRecording(sys, CommTvt_GetCamera(sys));
         talk->waitSound = TRUE;
         break;
@@ -753,8 +753,8 @@ int CtvtTalk_Main(CommTvtWork *sys, CtvtTalk *talk) {
         if (CtvtComm_IsSynced(sys, CommTvt_GetComm(sys), 47) == TRUE) {
             talk->next = TALK_NEXT_EXIT;
             talk->state = TALK_STATE_FADE_OUT;
-            func_ov257_021aaeb0(sys);
-            func_ov257_021aab14(sys, TRUE);
+            CommTvt_DeleteTimeIcon(sys);
+            CommTvt_SetMessageActive(sys, TRUE);
             CtvtCamera_StopCamera(sys, CommTvt_GetCamera(sys));
             talk->waitSound = TRUE;
         }
@@ -763,7 +763,7 @@ int CtvtTalk_Main(CommTvtWork *sys, CtvtTalk *talk) {
         CtvtComm_Disconnect(sys, CommTvt_GetComm(sys));
         CtvtTalk_PrintMessage(sys, talk, 38);
         talk->state = TALK_STATE_WAIT_ALONE;
-        func_ov257_021aab14(sys, TRUE);
+        CommTvt_SetMessageActive(sys, TRUE);
         CtvtCamera_EndRecording(sys, CommTvt_GetCamera(sys));
         talk->waitSound = TRUE;
         break;
@@ -771,7 +771,7 @@ int CtvtTalk_Main(CommTvtWork *sys, CtvtTalk *talk) {
         if (GFL_HIDIsTouchPressed() == TRUE || (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B))) {
             talk->next = TALK_NEXT_EXIT;
             talk->state = TALK_STATE_FADE_OUT;
-            func_ov257_021aab14(sys, TRUE);
+            CommTvt_SetMessageActive(sys, TRUE);
             CtvtCamera_StopCamera(sys, CommTvt_GetCamera(sys));
             talk->waitSound = TRUE;
         }
@@ -790,7 +790,7 @@ int CtvtTalk_Main(CommTvtWork *sys, CtvtTalk *talk) {
             talk->messagePending = FALSE;
             if (talk->notifyExit == TRUE) {
                 talk->notifyExit = FALSE;
-                func_ov257_021aae7c(sys, talk->messageWindow);
+                CommTvt_CreateTimeIcon(sys, talk->messageWindow);
             }
         }
     }
@@ -870,7 +870,7 @@ static void CtvtTalk_UpdateMain(CommTvtWork *sys, CtvtTalk *talk) {
     if (CtvtTalk_CheckDisconnect(sys, talk) == TRUE) {
         return;
     }
-    if (talk->state <= TALK_STATE_RECORD && func_ov257_021aab18(sys) == FALSE) {
+    if (talk->state <= TALK_STATE_RECORD && CommTvt_GetViewSwapped(sys) == FALSE) {
         CtvtCamera *camera = CommTvt_GetCamera(sys);
 
         if (GCTX_HIDGetPressedKeys() & PAD_KEY_UP) {
@@ -923,7 +923,7 @@ static void CtvtTalk_UpdateMain(CommTvtWork *sys, CtvtTalk *talk) {
         }
     }
     if (talk->state == TALK_STATE_MAIN) {
-        if (CommTvt_GetSelfIndex(sys) == 0 && func_ov257_021aab3c(sys) == FALSE &&
+        if (CommTvt_GetSelfIndex(sys) == 0 && CommTvt_IsLaunchModeCall(sys) == FALSE &&
             GFL_HIDGetTouchPressedRect(sGameButtons1) != TOUCH_RECT_NONE && talk->notAlone == FALSE) {
             CtvtGame_SetType(CommTvt_GetGame(sys), 0);
             CtvtTalk_OpenGameWindow(sys, talk);
@@ -932,7 +932,7 @@ static void CtvtTalk_UpdateMain(CommTvtWork *sys, CtvtTalk *talk) {
             ClActor_SetAutoAnim(talk->gameButtons[0], TRUE);
             GFL_SndSEPlay(SEQ_SE_SYS_45);
         }
-        if (CommTvt_GetSelfIndex(sys) == 0 && func_ov257_021aab3c(sys) == FALSE &&
+        if (CommTvt_GetSelfIndex(sys) == 0 && CommTvt_IsLaunchModeCall(sys) == FALSE &&
             GFL_HIDGetTouchPressedRect(sGameButtons2) != TOUCH_RECT_NONE && talk->notAlone == FALSE) {
             CtvtGame_SetType(CommTvt_GetGame(sys), 1);
             CtvtTalk_OpenGameWindow(sys, talk);
@@ -974,9 +974,9 @@ static void CtvtTalk_UpdateMain(CommTvtWork *sys, CtvtTalk *talk) {
             GFL_SndSEPlay(SEQ_SE_CANCEL1);
             ClActor_SetSequence(talk->talkButton, 9);
         } else if (hit == 1 || (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_SELECT | PAD_BUTTON_START))) {
-            func_ov257_021aab1c(sys);
+            CommTvt_ToggleViewSwapped(sys);
             GFL_SndSEPlay(SEQ_SE_SYS_48);
-            if (func_ov257_021aab18(sys) == TRUE) {
+            if (CommTvt_GetViewSwapped(sys) == TRUE) {
                 ClActor_SetSequence(talk->zoomButton, 21);
             } else {
                 ClActor_SetSequence(talk->zoomButton, 22);
@@ -1268,7 +1268,7 @@ static void CtvtTalk_AskExit(CommTvtWork *sys, CtvtTalk *talk) {
     } else {
         CtvtTalk_PrintMessage(sys, talk, 32);
     }
-    talk->exitMenu = func_ov257_021aab80(sys);
+    talk->exitMenu = CommTvt_OpenConfirmMenu(sys);
     talk->state = TALK_STATE_EXIT_MENU;
     if (ClActor_IsAnimActive(talk->talkButton) == FALSE) {
         ClActor_SetSequence(talk->talkButton, 15);
@@ -1297,7 +1297,7 @@ static void CtvtTalk_UpdateExitMenu(CommTvtWork *sys, CtvtTalk *talk) {
 
             talk->next = TALK_NEXT_EXIT;
             talk->state = TALK_STATE_FADE_OUT;
-            func_ov257_021aab14(sys, TRUE);
+            CommTvt_SetMessageActive(sys, TRUE);
             camera = CommTvt_GetCamera(sys);
             CtvtCamera_StopCamera(sys, camera);
             CtvtCamera_EndRecording(sys, camera);
@@ -1316,7 +1316,7 @@ static void CtvtTalk_UpdateExitMenu(CommTvtWork *sys, CtvtTalk *talk) {
 }
 
 static BOOL CtvtTalk_CheckDisconnect(CommTvtWork *sys, CtvtTalk *talk) {
-    if (func_ov257_021aab34(sys) == TRUE) {
+    if (CommTvt_GetEndRequested(sys) == TRUE) {
         if (CtvtComm_GetConnectType(sys, CommTvt_GetComm(sys)) == CTVT_CONNECT_EXISTING) {
             talk->state = TALK_STATE_PARENT_LEFT;
         } else {

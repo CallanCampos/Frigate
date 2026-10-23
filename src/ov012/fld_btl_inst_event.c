@@ -158,18 +158,18 @@ static GameEventReturnCode EventBtlInstTrainerMsg_Callback(GameEvent *event, u32
 
     switch (*state) {
     case 0:
-        if (func_ov036_02188884(work->msgWin) == TRUE) {
+        if (MsgBGPrinter_TalkWinMain(work->msgWin) == TRUE) {
             (*state)++;
         }
         break;
     case 1:
         if (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) {
-            func_ov036_021887d4(work->msgWin);
+            MsgBGPrinter_DeleteTalkWin(work->msgWin);
             (*state)++;
         }
         break;
     case 2:
-        if (func_ov036_021887f4(work->msgWin) == TRUE) {
+        if (MsgBGPrinter_WaitTalkWinClose(work->msgWin) == TRUE) {
             GFL_StrBufFree(work->strbuf);
             return GAMEEVENT_DONE;
         }

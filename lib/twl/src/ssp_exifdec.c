@@ -44,7 +44,7 @@ static char sDateTime[20];
 static char sSoftware[32];
 
 // Reads a 16-bit value of the TIFF structure, in its byte order
-static u16 func_ov257_021ac664(u8 *data, u32 pos, BOOL bigEndian) {
+static u16 GetWord(u8 *data, u32 pos, BOOL bigEndian) {
     u16 value;
     if (bigEndian == FALSE) {
         value = *(data + pos);
@@ -57,7 +57,7 @@ static u16 func_ov257_021ac664(u8 *data, u32 pos, BOOL bigEndian) {
 }
 
 // Reads a 32-bit value of the TIFF structure, in its byte order
-static u32 func_ov257_021ac694(u8 *data, u32 pos, BOOL bigEndian) {
+static u32 GetLong(u8 *data, u32 pos, BOOL bigEndian) {
     u32 value;
     if (bigEndian == FALSE) {
         value = *(data + pos);
@@ -75,7 +75,7 @@ static u32 func_ov257_021ac694(u8 *data, u32 pos, BOOL bigEndian) {
 
 // Reads the APP1 segment at pos: the 0th IFD, the Exif IFD, then the maker note, the Interoperability IFD and the 1st
 // IFD in the order they are stored
-static int func_ov257_021ac6f0(u8 *data, u32 size, u32 pos, int *posOut, u32 option) {
+static int GetAPP1(u8 *data, u32 size, u32 pos, int *posOut, u32 option) {
     u16 len;
     u16 tag;
     u16 count;
@@ -92,7 +92,7 @@ static int func_ov257_021ac6f0(u8 *data, u32 size, u32 pos, int *posOut, u32 opt
         return EXIF_RESULT_ERROR;
     }
     bigEndian = TRUE;
-    len = func_ov257_021ac664(data, pos, TRUE);
+    len = GetWord(data, pos, TRUE);
     if (*(data + pos + 2) != 'E') {
         return EXIF_RESULT_ERROR;
     }
@@ -113,7 +113,7 @@ static int func_ov257_021ac6f0(u8 *data, u32 size, u32 pos, int *posOut, u32 opt
     }
 
     // The byte order is read into the variable the IFD loops read the tags into
-    tag = func_ov257_021ac664(data, pos + 8, bigEndian);
+    tag = GetWord(data, pos + 8, bigEndian);
     if (tag == 0x4949) {
         bigEndian = FALSE;
     } else if (tag != 0x4d4d) {
@@ -121,16 +121,16 @@ static int func_ov257_021ac6f0(u8 *data, u32 size, u32 pos, int *posOut, u32 opt
     }
 
     // The 0th IFD
-    count = func_ov257_021ac664(data, pos + 0x10, bigEndian);
+    count = GetWord(data, pos + 0x10, bigEndian);
     pos += 0x12;
     if (pos + count * 12 + 4 >= size) {
         return EXIF_RESULT_ERROR;
     }
     while (count != 0) {
-        tag = func_ov257_021ac664(data, pos, bigEndian);
-        func_ov257_021ac664(data, pos + 2, bigEndian);
-        valueCount = func_ov257_021ac694(data, pos + 4, bigEndian);
-        value = func_ov257_021ac694(data, pos + 8, bigEndian);
+        tag = GetWord(data, pos, bigEndian);
+        GetWord(data, pos + 2, bigEndian);
+        valueCount = GetLong(data, pos + 4, bigEndian);
+        value = GetLong(data, pos + 8, bigEndian);
         pos += 12;
         if (tag == EXIF_TAG_EXIF_IFD) {
             exifIfd = value;
@@ -154,7 +154,7 @@ static int func_ov257_021ac6f0(u8 *data, u32 size, u32 pos, int *posOut, u32 opt
         }
         count--;
     }
-    ifd1 = func_ov257_021ac694(data, pos, bigEndian);
+    ifd1 = GetLong(data, pos, bigEndian);
     if (ifd1 == 0) {
         ifd1 = IFD_NONE;
     }
@@ -165,16 +165,16 @@ static int func_ov257_021ac6f0(u8 *data, u32 size, u32 pos, int *posOut, u32 opt
     if (pos + 2 >= size) {
         return EXIF_RESULT_ERROR;
     }
-    count = func_ov257_021ac664(data, pos, bigEndian);
+    count = GetWord(data, pos, bigEndian);
     pos += 2;
     if (pos + count * 12 >= size) {
         return EXIF_RESULT_ERROR;
     }
     while (count != 0) {
-        tag = func_ov257_021ac664(data, pos, bigEndian);
-        func_ov257_021ac664(data, pos + 2, bigEndian);
-        valueCount = func_ov257_021ac694(data, pos + 4, bigEndian);
-        value = func_ov257_021ac694(data, pos + 8, bigEndian);
+        tag = GetWord(data, pos, bigEndian);
+        GetWord(data, pos + 2, bigEndian);
+        valueCount = GetLong(data, pos + 4, bigEndian);
+        value = GetLong(data, pos + 8, bigEndian);
         pos += 12;
         if (tag == EXIF_TAG_MAKER_NOTE && valueCount > 4) {
             makerNote = value;
@@ -196,11 +196,11 @@ static int func_ov257_021ac6f0(u8 *data, u32 size, u32 pos, int *posOut, u32 opt
             if (pos + 0xe >= size) {
                 return EXIF_RESULT_ERROR;
             }
-            entries = func_ov257_021ac664(data, pos, bigEndian);
-            firstTag = func_ov257_021ac664(data, pos + 2, bigEndian);
-            firstType = func_ov257_021ac664(data, pos + 4, bigEndian);
-            firstCount = func_ov257_021ac694(data, pos + 6, bigEndian);
-            func_ov257_021ac694(data, pos + 10, bigEndian);
+            entries = GetWord(data, pos, bigEndian);
+            firstTag = GetWord(data, pos + 2, bigEndian);
+            firstType = GetWord(data, pos + 4, bigEndian);
+            firstCount = GetLong(data, pos + 6, bigEndian);
+            GetLong(data, pos + 10, bigEndian);
             pos += 0xe;
             if (firstTag == MAKER_NOTE_TAG_SIGNATURE && firstType == 7 && firstCount == SSP_SIGNATURE_SIZE) {
                 count = entries - 1;
@@ -208,10 +208,10 @@ static int func_ov257_021ac6f0(u8 *data, u32 size, u32 pos, int *posOut, u32 opt
                     return EXIF_RESULT_ERROR;
                 }
                 while (count != 0) {
-                    tag = func_ov257_021ac664(data, pos, bigEndian);
-                    func_ov257_021ac664(data, pos + 2, bigEndian);
-                    valueCount = func_ov257_021ac694(data, pos + 4, bigEndian);
-                    value = func_ov257_021ac694(data, pos + 8, bigEndian);
+                    tag = GetWord(data, pos, bigEndian);
+                    GetWord(data, pos + 2, bigEndian);
+                    valueCount = GetLong(data, pos + 4, bigEndian);
+                    value = GetLong(data, pos + 8, bigEndian);
                     pos += 12;
                     if (tag == MAKER_NOTE_TAG_DATA_1) {
                         // Up to 4 bytes are stored in the entry itself. The offsets are kept to 16 bits, the size of
@@ -249,16 +249,16 @@ static int func_ov257_021ac6f0(u8 *data, u32 size, u32 pos, int *posOut, u32 opt
             if (pos + 2 >= size) {
                 return EXIF_RESULT_ERROR;
             }
-            count = func_ov257_021ac664(data, pos, bigEndian);
+            count = GetWord(data, pos, bigEndian);
             pos += 2;
             if (pos + count * 12 >= size) {
                 return EXIF_RESULT_ERROR;
             }
             while (count != 0) {
-                func_ov257_021ac664(data, pos, bigEndian);
-                func_ov257_021ac664(data, pos + 2, bigEndian);
-                func_ov257_021ac694(data, pos + 4, bigEndian);
-                func_ov257_021ac694(data, pos + 8, bigEndian);
+                GetWord(data, pos, bigEndian);
+                GetWord(data, pos + 2, bigEndian);
+                GetLong(data, pos + 4, bigEndian);
+                GetLong(data, pos + 8, bigEndian);
                 pos += 12;
                 count--;
             }
@@ -268,16 +268,16 @@ static int func_ov257_021ac6f0(u8 *data, u32 size, u32 pos, int *posOut, u32 opt
             if (pos + 2 >= size) {
                 return EXIF_RESULT_ERROR;
             }
-            count = func_ov257_021ac664(data, pos, bigEndian);
+            count = GetWord(data, pos, bigEndian);
             pos += 2;
             if (pos + count * 12 >= size) {
                 return EXIF_RESULT_ERROR;
             }
             while (count != 0) {
-                tag = func_ov257_021ac664(data, pos, bigEndian);
-                func_ov257_021ac664(data, pos + 2, bigEndian);
-                func_ov257_021ac694(data, pos + 4, bigEndian);
-                value = func_ov257_021ac694(data, pos + 8, bigEndian);
+                tag = GetWord(data, pos, bigEndian);
+                GetWord(data, pos + 2, bigEndian);
+                GetLong(data, pos + 4, bigEndian);
+                value = GetLong(data, pos + 8, bigEndian);
                 pos += 12;
                 if (tag == EXIF_TAG_JPEG_INTERCHANGE_FORMAT) {
                     thumbnail = value;
@@ -313,7 +313,7 @@ s32 SSP_ExifDecode(u8 *src, u32 src_size, int *cur, u32 option) {
     sMakerNoteData2 = 0;
     sMakerNoteData2Size = 0;
     sSoftwareLength = 0;
-    result = func_ov257_021ac6f0(src, src_size, start, cur, option);
+    result = GetAPP1(src, src_size, start, cur, option);
     if (sMakerNoteData1 != 0) {
         sMakerNoteData1 += (u32)src + TIFF_HEADER_OFFSET;
     }

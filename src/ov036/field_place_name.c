@@ -93,29 +93,29 @@ void func_ov036_021b5434(PlaceName *wk);
 void func_ov036_021b54e0(PlaceName *wk);
 void func_ov036_021b5500(PlaceName *wk);
 void func_ov036_021b5550(PlaceName *wk);
-void func_ov036_021b5570(PlaceName *wk);
-BOOL func_ov036_021b5588(PlaceName *wk);
+void PlaceName_UpdateLetters(PlaceName *wk);
+BOOL PlaceName_IsAllSpawned(PlaceName *wk);
 void func_ov036_021b55ac(PlaceName *wk);
 void func_ov036_021b55cc(PlaceName *wk);
 void func_ov036_021b55ec(PlaceName *wk);
 void func_ov036_021b5600(PlaceName *wk);
-void func_ov036_021b5614(PlaceName *wk);
-void func_ov036_021b561c(PlaceName *wk);
-u32 func_ov036_021b5624(PlaceName *wk);
-void func_ov036_021b5628(PlaceName *wk);
-void func_ov036_021b5630(PlaceName *wk);
-u32 func_ov036_021b5638(PlaceName *wk);
+void PlaceName_RequestForceShow(PlaceName *wk);
+void PlaceName_ClearForceShowRequest(PlaceName *wk);
+u32 PlaceName_GetZoneChangeRequest(PlaceName *wk);
+void PlaceName_SetZoneChangeRequest(PlaceName *wk);
+void PlaceName_ClearZoneChangeRequest(PlaceName *wk);
+u32 PlaceName_GetForceShowRequest(PlaceName *wk);
 BOOL IsLocNameIdxChanged(PlaceName *wk);
-void func_ov036_021b5660(PlaceName *wk);
-void func_ov036_021b56d4(PlaceName *wk, u32 mode);
-void func_ov036_021b5708(PlaceName *wk);
-void func_ov036_021b5778(PlaceName *wk);
-void func_ov036_021b57bc(PlaceName *wk);
-void func_ov036_021b58b4(PlaceName *wk);
-void func_ov036_021b5900(PlaceName *wk);
-void func_ov036_021b5914(PlaceName *wk);
-void func_ov036_021b5938(PlaceName *wk);
-void func_ov036_021b5978(PlaceName *wk);
+void PlaceName_LoadMessage(PlaceName *wk);
+void PlaceName_SetState(PlaceName *wk, u32 mode);
+void PlaceName_Interrupt(PlaceName *wk);
+void PlaceName_StateIdle(PlaceName *wk);
+void PlaceName_StatePrepare(PlaceName *wk);
+void PlaceName_StateFadeIn(PlaceName *wk);
+void PlaceName_StateFadeInWait(PlaceName *wk);
+void PlaceName_StateLettersLaunch(PlaceName *wk);
+void PlaceName_StateLettersLand(PlaceName *wk);
+void PlaceName_StateFadeOut(PlaceName *wk);
 void func_ov036_021b5994(PlaceName *wk);
 void func_ov036_021b5998(PlaceName *wk);
 void __endColorBlending(PlaceName *wk);
@@ -171,7 +171,7 @@ PlaceName *FieldPlaceName_Create(GameSystem *gsys, HeapID heapId, FieldMsgBG *ms
     func_ov036_021b5a2c(wk);
     func_ov036_021b5a44(wk);
     PlaceName_SetHeapID(wk, heapId);
-    PlaceName_SetFont(wk, func_ov036_0218799c(msgBGSys));
+    PlaceName_SetFont(wk, MsgBGPrinter_GetFont(msgBGSys));
     func_ov036_021b5318(wk);
     func_ov036_021b5344(wk);
     func_ov036_021b53cc(wk);
@@ -189,7 +189,7 @@ PlaceName *FieldPlaceName_Create(GameSystem *gsys, HeapID heapId, FieldMsgBG *ms
         func_ov036_021b5284(wk, 2);
     }
     func_ov036_021b52e0(wk);
-    func_ov036_021b56d4(wk, 0);
+    PlaceName_SetState(wk, 0);
     return wk;
 }
 
@@ -212,32 +212,32 @@ void FieldPlaceName_Free(PlaceName *wk) {
     func_ov036_021b5a0c(wk);
 }
 
-void func_ov036_021b4ff8(PlaceName *wk) {
+void PlaceName_Main(PlaceName *wk) {
     PlaceName_IncrementTimer(wk);
     switch (PlaceName_GetMode(wk)) {
     case 0:
-        func_ov036_021b5778(wk);
+        PlaceName_StateIdle(wk);
         break;
     case 1:
-        func_ov036_021b57bc(wk);
+        PlaceName_StatePrepare(wk);
         break;
     case 2:
-        func_ov036_021b58b4(wk);
+        PlaceName_StateFadeIn(wk);
         break;
     case 3:
-        func_ov036_021b5900(wk);
+        PlaceName_StateFadeInWait(wk);
         break;
     case 4:
-        func_ov036_021b5914(wk);
+        PlaceName_StateLettersLaunch(wk);
         break;
     case 5:
-        func_ov036_021b5938(wk);
+        PlaceName_StateLettersLand(wk);
         break;
     case 6:
-        func_ov036_021b5978(wk);
+        PlaceName_StateFadeOut(wk);
         break;
     }
-    func_ov036_021b5570(wk);
+    PlaceName_UpdateLetters(wk);
 }
 
 void func_ov036_021b5064(PlaceName *wk) {
@@ -267,40 +267,40 @@ void func_ov036_021b5064(PlaceName *wk) {
     PrintQueue_Main(wk->printQueue);
 }
 
-void func_ov036_021b50c8(PlaceName *wk, s32 zoneId) {
+void PlaceName_OnZoneChange(PlaceName *wk, s32 zoneId) {
     SetPlaceNameDispZone(wk, zoneId);
     if (CheckPopupPlaceNameDispAuto(zoneId, FALSE)) {
-        func_ov036_021b5708(wk);
-        func_ov036_021b5628(wk);
+        PlaceName_Interrupt(wk);
+        PlaceName_SetZoneChangeRequest(wk);
     }
 }
 
-void func_ov036_021b50f4(PlaceName *wk, u32 zoneId) {
+void PlaceName_ShowForZone(PlaceName *wk, u32 zoneId) {
     SetPlaceNameDispZone(wk, zoneId);
     if (CheckPopupPlaceNameDispAuto(zoneId, FALSE)) {
-        func_ov036_021b5708(wk);
-        func_ov036_021b5614(wk);
+        PlaceName_Interrupt(wk);
+        PlaceName_RequestForceShow(wk);
     }
 }
 
 void BeginContinuePlaceNameDisp(PlaceName *wk, s32 zoneId) {
     SetPlaceNameDispZone(wk, zoneId);
     if (CheckPopupPlaceNameDispAuto(zoneId, TRUE)) {
-        func_ov036_021b5708(wk);
-        func_ov036_021b5614(wk);
+        PlaceName_Interrupt(wk);
+        PlaceName_RequestForceShow(wk);
     }
 }
 
 void BeginForcePlaceNameDisp(PlaceName *wk, s32 zoneId) {
     SetPlaceNameDispZone(wk, zoneId);
-    func_ov036_021b5708(wk);
-    func_ov036_021b5614(wk);
+    PlaceName_Interrupt(wk);
+    PlaceName_RequestForceShow(wk);
 }
 
-void func_ov036_021b5168(PlaceName *wk) {
-    func_ov036_021b56d4(wk, 0);
-    func_ov036_021b5630(wk);
-    func_ov036_021b561c(wk);
+void PlaceName_Cancel(PlaceName *wk) {
+    PlaceName_SetState(wk, 0);
+    PlaceName_ClearZoneChangeRequest(wk);
+    PlaceName_ClearForceShowRequest(wk);
 }
 
 void func_ov036_021b5180(PlaceName *wk) {
@@ -505,18 +505,18 @@ void func_ov036_021b5550(PlaceName *wk) {
     GFL_BGSysSetBGEnabled(3, 0);
 }
 
-void func_ov036_021b5570(PlaceName *wk) {
+void PlaceName_UpdateLetters(PlaceName *wk) {
     int i;
     for (i = 0; i < 2; i++) {
         func_ov036_021b68e8(wk->objects[i]);
     }
 }
 
-BOOL func_ov036_021b5588(PlaceName *wk) {
+BOOL PlaceName_IsAllSpawned(PlaceName *wk) {
     BOOL done = TRUE;
     int i;
     for (i = 0; i < 2; i++) {
-        if (!func_ov036_021b6940(wk->objects[i])) {
+        if (!PlaceName_GetMessageLength(wk->objects[i])) {
             done = FALSE;
             break;
         }
@@ -549,27 +549,27 @@ void func_ov036_021b5600(PlaceName *wk) {
     }
 }
 
-void func_ov036_021b5614(PlaceName *wk) {
+void PlaceName_RequestForceShow(PlaceName *wk) {
     wk->forced = TRUE;
 }
 
-void func_ov036_021b561c(PlaceName *wk) {
+void PlaceName_ClearForceShowRequest(PlaceName *wk) {
     wk->forced = FALSE;
 }
 
-u32 func_ov036_021b5624(PlaceName *wk) {
+u32 PlaceName_GetZoneChangeRequest(PlaceName *wk) {
     return wk->requested;
 }
 
-void func_ov036_021b5628(PlaceName *wk) {
+void PlaceName_SetZoneChangeRequest(PlaceName *wk) {
     wk->requested = TRUE;
 }
 
-void func_ov036_021b5630(PlaceName *wk) {
+void PlaceName_ClearZoneChangeRequest(PlaceName *wk) {
     wk->requested = FALSE;
 }
 
-u32 func_ov036_021b5638(PlaceName *wk) {
+u32 PlaceName_GetForceShowRequest(PlaceName *wk) {
     return wk->forced;
 }
 
@@ -582,14 +582,14 @@ BOOL IsLocNameIdxChanged(PlaceName *wk) {
     return FALSE;
 }
 
-void func_ov036_021b5660(PlaceName *wk) {
+void PlaceName_LoadMessage(PlaceName *wk) {
     u16 zoneId = PlaceName_GetReqZoneID(wk);
     u16 nameId = ZoneData_GetPlaceNameID(zoneId);
     if (nameId >= 0x9a) {
         nameId = 0;
     }
     if (nameId == 0) {
-        func_ov036_021b5168(wk);
+        PlaceName_Cancel(wk);
         return;
     }
     if (IsZoneJoinAvenue(zoneId)) {
@@ -604,7 +604,7 @@ void func_ov036_021b5660(PlaceName *wk) {
     wk->shownZoneId = zoneId;
 }
 
-void func_ov036_021b56d4(PlaceName *wk, u32 mode) {
+void PlaceName_SetState(PlaceName *wk, u32 mode) {
     PlaceName_SetMode(wk, mode);
     PlaceName_ResetTimer(wk);
     PlaceName_ResetState(wk);
@@ -614,7 +614,7 @@ void func_ov036_021b56d4(PlaceName *wk, u32 mode) {
     }
 }
 
-void func_ov036_021b5708(PlaceName *wk) {
+void PlaceName_Interrupt(PlaceName *wk) {
     u32 mode;
     s32 timer;
     switch (wk->mode) {
@@ -636,30 +636,30 @@ void func_ov036_021b5708(PlaceName *wk) {
         timer = 0;
         break;
     }
-    func_ov036_021b56d4(wk, mode);
+    PlaceName_SetState(wk, mode);
     wk->timer = timer;
 }
 
-void func_ov036_021b5778(PlaceName *wk) {
+void PlaceName_StateIdle(PlaceName *wk) {
     BOOL start = FALSE;
-    if (func_ov036_021b5638(wk)) {
+    if (PlaceName_GetForceShowRequest(wk)) {
         start = TRUE;
-        func_ov036_021b561c(wk);
-    } else if (func_ov036_021b5624(wk)) {
+        PlaceName_ClearForceShowRequest(wk);
+    } else if (PlaceName_GetZoneChangeRequest(wk)) {
         if (IsLocNameIdxChanged(wk)) {
             start = TRUE;
         }
-        func_ov036_021b5630(wk);
+        PlaceName_ClearZoneChangeRequest(wk);
     }
     if (start) {
-        func_ov036_021b56d4(wk, 1);
+        PlaceName_SetState(wk, 1);
     }
 }
 
-void func_ov036_021b57bc(PlaceName *wk) {
+void PlaceName_StatePrepare(PlaceName *wk) {
     switch (PlaceName_GetState(wk)) {
     case 0:
-        func_ov036_021b5660(wk);
+        PlaceName_LoadMessage(wk);
         PlaceName_NextState(wk);
         break;
     case 1:
@@ -698,14 +698,14 @@ void func_ov036_021b57bc(PlaceName *wk) {
         PlaceName_NextState(wk);
         break;
     case 8:
-        if (func_ov036_021b5588(wk)) {
-            func_ov036_021b56d4(wk, 2);
+        if (PlaceName_IsAllSpawned(wk)) {
+            PlaceName_SetState(wk, 2);
         }
         break;
     }
 }
 
-void func_ov036_021b58b4(PlaceName *wk) {
+void PlaceName_StateFadeIn(PlaceName *wk) {
     switch (PlaceName_GetState(wk)) {
     case 0:
         __endColorBlending(wk);
@@ -714,47 +714,47 @@ void func_ov036_021b58b4(PlaceName *wk) {
         PlaceName_NextState(wk);
         break;
     case 1:
-        if (wk->timer > 10 && func_ov036_021b5588(wk)) {
-            func_ov036_021b56d4(wk, 3);
+        if (wk->timer > 10 && PlaceName_IsAllSpawned(wk)) {
+            PlaceName_SetState(wk, 3);
         }
         break;
     }
 }
 
-void func_ov036_021b5900(PlaceName *wk) {
+void PlaceName_StateFadeInWait(PlaceName *wk) {
     if (wk->timer > 30) {
-        func_ov036_021b56d4(wk, 4);
+        PlaceName_SetState(wk, 4);
     }
 }
 
-void func_ov036_021b5914(PlaceName *wk) {
+void PlaceName_StateLettersLaunch(PlaceName *wk) {
     switch (PlaceName_GetState(wk)) {
     case 0:
         PlaceName_NextState(wk);
         break;
     case 1:
-        func_ov036_021b56d4(wk, 5);
+        PlaceName_SetState(wk, 5);
         break;
     }
 }
 
-void func_ov036_021b5938(PlaceName *wk) {
+void PlaceName_StateLettersLand(PlaceName *wk) {
     switch (PlaceName_GetState(wk)) {
     case 0:
         func_ov036_021b55cc(wk);
         PlaceName_NextState(wk);
         break;
     case 1:
-        if (wk->timer > 12 && func_ov036_021b5588(wk)) {
-            func_ov036_021b56d4(wk, 6);
+        if (wk->timer > 12 && PlaceName_IsAllSpawned(wk)) {
+            PlaceName_SetState(wk, 6);
         }
         break;
     }
 }
 
-void func_ov036_021b5978(PlaceName *wk) {
+void PlaceName_StateFadeOut(PlaceName *wk) {
     if (wk->timer > 5) {
-        func_ov036_021b56d4(wk, 0);
+        PlaceName_SetState(wk, 0);
         func_ov036_021b5550(wk);
     }
 }

@@ -73,7 +73,7 @@ NameEntryParam *pokemonNameEntry(HeapID heapId, PartyPkm *pkm, u32 maxLength, co
 void NameEntryParam_Free(NameEntryParam *param);
 // Copies the entered name, and compares it with a string
 void NameEntryParam_GetName(NameEntryParam *param, StrBuf *dest);
-BOOL func_ov012_02165b0c(NameEntryParam *param);
+BOOL NameEntryParam_IsCanceled(NameEntryParam *param);
 BOOL NameEntryParam_CompareName(NameEntryParam *param, const StrBuf *str);
 // Overlay 12
 void GameBeacon_BroadcastPhrase(StrBuf *name, u8 value);

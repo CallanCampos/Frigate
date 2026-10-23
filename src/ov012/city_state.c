@@ -17,7 +17,7 @@ void CityState_Init(CityState *state) {
     state->city = 2;
 }
 
-BOOL func_ov012_0215cd98(s32 value) {
+BOOL CityState_IsSlotIndexOutOfRange(s32 value) {
     if (value >= 7) {
         return TRUE;
     }

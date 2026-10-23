@@ -312,7 +312,7 @@ FieldMenu *FieldMenu_Create(HeapID heapId, HeapID tmpHeapId, FieldSubscreen *sub
 
 static void FieldMenu_RestoreSubscreenOnCancel(FieldMenu *menu) {
     if (menu->cancel == TRUE) {
-        func_ov036_021984f0(menu->subscreen, menu->heapId);
+        FieldSubscreen_ResumeField(menu->subscreen, menu->heapId);
     }
 }
 
@@ -357,7 +357,7 @@ void FieldMenu_Update(FieldMenu *menu) {
         if (PrintQueue_IsEmpty(menu->printQueue) == TRUE) {
             u8 i;
 
-            func_ov036_02198884(menu->subscreen, menu->tmpHeapId);
+            FieldSubscreen_LoadBackdrop(menu->subscreen, menu->tmpHeapId);
             for (i = 0; i < FIELD_MENU_SLOT_COUNT; i++) {
                 FieldMenu_FlushItem(menu, &menu->items[i]);
             }
@@ -383,7 +383,7 @@ void FieldMenu_Update(FieldMenu *menu) {
         break;
     case FIELD_MENU_STATE_WAIT_WIPE:
         if (GFL_WipeIsFinished() == TRUE) {
-            func_ov036_02198884(menu->subscreen, menu->tmpHeapId);
+            FieldSubscreen_LoadBackdrop(menu->subscreen, menu->tmpHeapId);
             menu->state = FIELD_MENU_STATE_INPUT;
         }
         break;
@@ -858,7 +858,7 @@ static void FieldMenu_UpdateCursor(FieldMenu *menu) {
 }
 
 static void FieldMenu_CreateItem(FieldMenu *menu, FieldMenuItem *item, const FieldMenuItemSetup *setup) {
-    Font *font = func_ov036_0218799c(Field_GetMsgBGSys(menu->field));
+    Font *font = MsgBGPrinter_GetFont(Field_GetMsgBGSys(menu->field));
     ClActorSetupEx actorSetup;
 
     item->active = TRUE;

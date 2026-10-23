@@ -10,11 +10,26 @@
 // The curves' conversions between rail and world positions, and the rails' camera functions, by their IDs in the
 // rail data. Names from swan
 static RailCameraFunc RAIL_CAMERA_CURVE_FUNC_SET[20] = {
-    RailCameraFuncSetStaticPYR, RailCameraFuncSetStaticPYDist, func_ov036_021b2cfc, func_ov036_021b2eb0,
-    func_ov036_021b2f04,        func_ov036_021b309c,           func_ov036_021b3164, func_ov036_021b3294,
-    func_ov036_021b3368,        func_ov036_021b33e4,           func_ov036_021b3450, func_ov036_021b34e4,
-    func_ov036_021b3568,        func_ov036_021b3590,           func_ov036_021b2e48, func_ov036_021b2cc4,
-    func_ov036_021b2e78,        func_ov036_021b35b8,           func_ov036_021b365c, func_ov036_021b3628,
+    RailCameraFuncSetStaticPYR,
+    RailCameraFuncSetStaticPYDist,
+    FieldRailCamera_BlendAngles,
+    FieldRailCamera_FixedEyeTarget,
+    FieldRailCamera_BlendEyeTarget,
+    FieldRailCamera_BlendOrbit,
+    FieldRailCamera_Orbit,
+    FieldRailCamera_OrbitMovingPoint,
+    FieldRailCamera_YawFromPoint,
+    FieldRailCamera_FollowHeading,
+    FieldRailCamera_FollowHeadingSlope,
+    FieldRailCamera_FollowHeadingAtCentre,
+    func_ov036_021b3568,
+    func_ov036_021b3590,
+    FieldRailCamera_BlendAnglesAtFocus,
+    func_ov036_021b2cc4,
+    func_ov036_021b2e78,
+    FieldRailCamera_FixedAngleShift,
+    FieldRailCamera_BlendAnglesShift,
+    FieldRailCamera_FixedAngleShiftAtFocus,
 };
 static RailToWorldFunc RAIL_CONV_RAIL_TO_WORLD_FUNCS[3] = {
     RailMath_RailToWorldNoCurve,

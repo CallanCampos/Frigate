@@ -105,7 +105,7 @@ static void setPartyFullToConst(Field *field);
 static u32 DayCare_CalcNewExp(u32 exp, u32 steps);
 static void DayCare_CommitPkmGrowth(PartyPkm *pkm, u32 steps);
 static void writeLvUpMoveOpenSlot(PartyPkm *pkm, u32 move);
-static BOOL func_ov036_021bd788(PartyPkm *pkm, int move);
+static BOOL DayCare_MonKnowsMove(PartyPkm *pkm, int move);
 static void DayCareSave_ShiftPkms(DayCareSave *save);
 static u32 DayCare_CalcBaseEggSpawnChance(PartyPkm *pkm1, PartyPkm *pkm2);
 static u32 DayCare_CalcBaseEggSpawnChanceCore(PartyPkm *pkm1, PartyPkm *pkm2);
@@ -372,7 +372,7 @@ static void writeLvUpMoveOpenSlot(PartyPkm *pkm, u32 move) {
     DayCareMoveParamTable moveParams = sOpenSlotMoveParams;
     int i;
 
-    if (move != 0 && !func_ov036_021bd788(pkm, move)) {
+    if (move != 0 && !DayCare_MonKnowsMove(pkm, move)) {
         for (i = 0; i < 4; i++) {
             if (PokeParty_GetParam(pkm, moveParams.values[i], NULL) == 0) {
                 PokeParty_SetMove(pkm, move, i);
@@ -383,7 +383,7 @@ static void writeLvUpMoveOpenSlot(PartyPkm *pkm, u32 move) {
     }
 }
 
-static BOOL func_ov036_021bd788(PartyPkm *pkm, int move) {
+static BOOL DayCare_MonKnowsMove(PartyPkm *pkm, int move) {
     DayCareMoveParamTable moveParams = sExistingMoveParams;
     int i;
 

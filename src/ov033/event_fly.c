@@ -28,7 +28,7 @@ struct FlyEventWork {
     u32 effectIn;
 };
 
-GameEvent *func_ov033_02178908(GameSystem *gsys, Field *field, u32 zoneId) {
+GameEvent *EventFly_CreateMapChangeEvent(GameSystem *gsys, Field *field, u32 zoneId) {
     GameEvent *event;
     FlyEventWork *work;
 
@@ -108,7 +108,7 @@ GameEventReturnCode EventFly_Callback(GameEvent *event, u32 *state, void *data) 
         EnableAllActorsMovement(Field_GetActorSystem(field));
         SetActorHidden(FieldPlayer_GetActor(Field_GetPlayer(field)), TRUE);
         FieldCameraAnm_EVCameraEnd(camera);
-        GameEvent_ChainNext(event, func_ov036_021b8890(work->gsys, field, 0, 0));
+        GameEvent_ChainNext(event, EventGameTransition_CreateFadeOutEvent(work->gsys, field, 0, 0));
         (*state)++;
         break;
     case 4:
@@ -116,7 +116,7 @@ GameEventReturnCode EventFly_Callback(GameEvent *event, u32 *state, void *data) 
         (*state)++;
         break;
     case 5:
-        func_ov036_021b5168(Field_GetPlaceName(field));
+        PlaceName_Cancel(Field_GetPlaceName(field));
         work->bind = FieldCamera_GetBind(camera);
         FieldCamera_FinishDelay(camera);
         (*state)++;
@@ -170,7 +170,7 @@ GameEventReturnCode EventFly_Callback(GameEvent *event, u32 *state, void *data) 
             actor = FieldPlayer_GetActor(Field_GetPlayer(field));
             SetActorHidden(actor, FALSE);
             CheckSetActorFaceDir(actor, 1);
-            next = GameEvent_Create(work->gsys, event, func_ov033_02178c6c, 0);
+            next = GameEvent_Create(work->gsys, event, EventFly_FadeOutEventMain, 0);
             GameEvent_ChainNext(event, next);
         }
         (*state)++;
@@ -179,7 +179,7 @@ GameEventReturnCode EventFly_Callback(GameEvent *event, u32 *state, void *data) 
         FieldEvCameraAnimationFlags returnFlags;
 
         EnableAllActorsMovement(Field_GetActorSystem(field));
-        func_ov036_021b50f4(Field_GetPlaceName(field), work->zoneId);
+        PlaceName_ShowForZone(Field_GetPlaceName(field), work->zoneId);
         returnFlags.animateExtraTranslation = TRUE;
         returnFlags.animatePitch = TRUE;
         returnFlags.animateYaw = FALSE;
@@ -205,7 +205,7 @@ GameEventReturnCode EventFly_Callback(GameEvent *event, u32 *state, void *data) 
     return GAMEEVENT_CONTINUE;
 }
 
-GameEventReturnCode func_ov033_02178c6c(GameEvent *event, u32 *state, void *data) {
+GameEventReturnCode EventFly_FadeOutEventMain(GameEvent *event, u32 *state, void *data) {
     GameSystem *gsys;
 
     gsys = GameEvent_GetGameSystem(event);

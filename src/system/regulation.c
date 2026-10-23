@@ -238,7 +238,7 @@ BOOL Regulation_CheckParamBit(Regulation *regulation, u32 param, int index) {
     return FALSE;
 }
 
-void func_0200b760(Regulation *regulation, RegulationUnkAC *out) {
+void Regulation_GetShooterSettings(Regulation *regulation, RegulationUnkAC *out) {
     MI_CpuFill8(out, 0, sizeof(RegulationUnkAC));
     out->launcher = Regulation_GetParam(regulation, REGULATION_PARAM_LAUNCHER);
     if (out->launcher >= 2) {

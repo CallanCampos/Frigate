@@ -2169,11 +2169,11 @@ BOOL BtlvScu_ShowGauge(BtlvScu *scu, u8 pos) {
     return TRUE;
 }
 
-void func_ov167_021d34ec(BtlvScu *scu, u8 viewPos) {
+void BtlvScu_StartPosCueEffect(BtlvScu *scu, u8 viewPos) {
     BtlvEffect_StartPos(viewPos, 0x25F);
 }
 
-BOOL func_ov167_021d34fc(BtlvScu *scu, u8 viewPos) {
+BOOL BtlvScu_IsPosCueEffectDone(BtlvScu *scu, u8 viewPos) {
     if (!BtlvEffect_IsBusy()) {
         return TRUE;
     }

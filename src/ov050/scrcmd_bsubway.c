@@ -128,8 +128,8 @@ static GameEvent *EventBSubwayCommEnd_Create(GameSystem *gsys, BSubwayScrWork *b
 static GameEvent *EventBSubwayMsgWindow_Create(GameSystem *gsys, FieldScriptEnv *env, u16 *var, u32 message);
 static void BSubway_PlacePassengers(BSubwayScrWork *bsw, GameData *gameData, MMSys *mmSys, Field *field);
 static u16 func_ov050_021e6e6c(FieldActor *actor);
-static BOOL func_ov050_021e6e78(BSubwayScrWork *bsw, u16 index);
-static void func_ov050_021e6e9c(BSubwayScrWork *bsw, u16 index, u16 *a, u16 *b, u16 *c);
+static BOOL BSubwayCmd_IsNpcEntryAvailable(BSubwayScrWork *bsw, u16 index);
+static void BSubwayCmd_GetNpcEntryInfo(BSubwayScrWork *bsw, u16 index, u16 *a, u16 *b, u16 *c);
 static BOOL ScriptNative_BSubwayBattleRecSaveWait(VM *vm, void *env);
 static u32 BSubway_GetModeRegulation(u32 mode);
 static u32 BSubway_GetZonePlayMode(Field *field);
@@ -141,7 +141,7 @@ BOOL BSubwayCmd_CreateWork(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = ScriptWork_GetGameSystem(work);
     u16 a1 = VM_Read16(vm);
 
-    func_ov033_0217b478(gsys, a1, ScriptReadAny(vm, env));
+    BsubwayScr_CreateWork(gsys, a1, ScriptReadAny(vm, env));
     return FALSE;
 }
 
@@ -149,7 +149,7 @@ BOOL BSubwayCmd_ClearWork(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     ScriptFieldWork *fieldWork = ScriptWork_GetFieldWork(work);
 
-    func_ov033_0217b468(ScriptWork_GetGameSystem(work));
+    BsubwayScr_ClearWorkPtr(ScriptWork_GetGameSystem(work));
     return FALSE;
 }
 
@@ -158,7 +158,7 @@ BOOL BSubwayCmd_FreeWork(VM *vm, FieldScriptEnv *env) {
     ScriptFieldWork *fieldWork = ScriptWork_GetFieldWork(work);
     GameSystem *gsys = ScriptWork_GetGameSystem(work);
 
-    func_ov033_0217b664(gsys, GameData_GetBSubwayScrWork(GSYS_GetGameData(gsys)));
+    BsubwayScr_DeleteWork(gsys, GameData_GetBSubwayScrWork(GSYS_GetGameData(gsys)));
     return FALSE;
 }
 
@@ -281,10 +281,10 @@ BOOL BSubwayCmd_Tool(VM *vm, FieldScriptEnv *env) {
         FieldGimmickBSubway_StartTrainEffect(field, sTable706c[param0], &sTable7054[param1]);
         break;
     case 19:
-        func_ov036_021c65a8(FieldGimmickBSubway_GetTrainEffect(field), param0);
+        FldeffBtrain_SetAnime(FieldGimmickBSubway_GetTrainEffect(field), param0);
         break;
     case 20:
-        func_ov036_021c65e8(FieldGimmickBSubway_GetTrainEffect(field), param0);
+        FldeffBtrain_SetHidden(FieldGimmickBSubway_GetTrainEffect(field), param0);
         break;
     case 21:
         *retWk = BSubwayPlayData_GetData(playData, BSUBWAY_PLAY_MODE, NULL);
@@ -334,16 +334,16 @@ BOOL BSubwayCmd_Tool(VM *vm, FieldScriptEnv *env) {
         }
         break;
     case 27:
-        *retWk = func_ov033_0217bcb4(score, gsys, 0);
+        *retWk = BsubwayScr_UpdateStageRank(score, gsys, 0);
         if ((s16)*retWk <= 0) {
             *retWk = 1;
         }
         break;
     case 28:
-        *retWk = func_ov033_0217bcb4(score, gsys, 3);
+        *retWk = BsubwayScr_UpdateStageRank(score, gsys, 3);
         break;
     case 29:
-        *retWk = func_ov033_0217bcb4(score, gsys, 4);
+        *retWk = BsubwayScr_UpdateStageRank(score, gsys, 4);
         break;
     case 30:
         *retWk = BSubwayScoreData_GetStage(score, param0);
@@ -393,7 +393,7 @@ BOOL BSubwayCmd_Tool(VM *vm, FieldScriptEnv *env) {
         actor = FindFieldActor(Field_GetActorSystem(field), param0);
         index = GetActorUserParam(actor, 0);
         *retWk = FALSE;
-        if (func_ov050_021e6e78(bsw, index) == TRUE) {
+        if (BSubwayCmd_IsNpcEntryAvailable(bsw, index) == TRUE) {
             *retWk = TRUE;
         }
         break;
@@ -402,7 +402,7 @@ BOOL BSubwayCmd_Tool(VM *vm, FieldScriptEnv *env) {
         u16 a, b, c;
 
         actor = FindFieldActor(Field_GetActorSystem(field), param0);
-        func_ov050_021e6e9c(bsw, GetActorUserParam(actor, 0), &a, &b, &c);
+        BSubwayCmd_GetNpcEntryInfo(bsw, GetActorUserParam(actor, 0), &a, &b, &c);
         *retWk = a;
         break;
     }
@@ -410,7 +410,7 @@ BOOL BSubwayCmd_Tool(VM *vm, FieldScriptEnv *env) {
         u16 a, b, c;
 
         actor = FindFieldActor(Field_GetActorSystem(field), param0);
-        func_ov050_021e6e9c(bsw, GetActorUserParam(actor, 0), &a, &b, &c);
+        BSubwayCmd_GetNpcEntryInfo(bsw, GetActorUserParam(actor, 0), &a, &b, &c);
         *retWk = b;
         break;
     }
@@ -418,7 +418,7 @@ BOOL BSubwayCmd_Tool(VM *vm, FieldScriptEnv *env) {
         u16 a, b, c;
 
         actor = FindFieldActor(Field_GetActorSystem(field), param0);
-        func_ov050_021e6e9c(bsw, GetActorUserParam(actor, 0), &a, &b, &c);
+        BSubwayCmd_GetNpcEntryInfo(bsw, GetActorUserParam(actor, 0), &a, &b, &c);
         *retWk = c;
         break;
     }
@@ -532,32 +532,32 @@ BOOL BSubwayCmd_Tool(VM *vm, FieldScriptEnv *env) {
         break;
     }
     case 301:
-        *retWk = func_ov033_0217ba94(bsw, gsys);
+        *retWk = BsubwayScr_SetSelectedMembers(bsw, gsys);
         break;
     case 302:
         *retWk = 0;
         break;
     case 303:
-        if (func_ov033_0217bb20(bsw) == TRUE) {
+        if (BsubwayScr_IsWinMax(bsw) == TRUE) {
             *retWk = 1;
         } else {
             *retWk = 0;
         }
         break;
     case 304:
-        func_ov033_0217b8ac(gsys, bsw);
+        BsubwayScr_SetLoseScore(gsys, bsw);
         break;
     case 305:
-        func_ov033_0217bb4c(bsw, gsys);
+        BsubwayScr_SetClearScore(bsw, gsys);
         break;
     case 306:
-        func_ov033_0217b708(bsw);
+        BsubwayScr_SaveRestPlayData(bsw);
         break;
     case 307:
-        func_ov033_0217bbac(bsw);
+        BsubwayScr_CreateRoundTrainers(bsw);
         break;
     case 308:
-        *retWk = func_ov033_0217bca0(bsw, param0);
+        *retWk = BsubwayScr_GetTrainerObjCode(bsw, param0);
         break;
     case 309:
         ScriptWork_CallEvent(work, EventBSubwayBattle_Create(bsw, gsys, field));
@@ -582,7 +582,7 @@ BOOL BSubwayCmd_Tool(VM *vm, FieldScriptEnv *env) {
         *retWk = bsw->unkC_5;
         break;
     case 316:
-        func_ov033_0217b9dc(bsw);
+        BsubwayScr_DrawTrainerNos(bsw);
         break;
     case 317:
         *retWk = bsw->memberSlots[param0];
@@ -596,10 +596,10 @@ BOOL BSubwayCmd_Tool(VM *vm, FieldScriptEnv *env) {
         result = TRUE;
         break;
     case 321:
-        func_ov033_0217b7e8(bsw);
+        BsubwayScr_SavePlayDataMembers(bsw);
         break;
     case 323:
-        func_ov033_0217b790(bsw, gsys);
+        BsubwayScr_LoadMembers(bsw, gsys);
         break;
     case 324: {
         u8 value = param0;
@@ -608,7 +608,7 @@ BOOL BSubwayCmd_Tool(VM *vm, FieldScriptEnv *env) {
         break;
     }
     case 325:
-        func_ov033_0217b6b4(bsw);
+        BsubwayScr_ChangeCommMultiMode(bsw);
         break;
     case 326:
         if (mode == 5 || mode == 6 || mode == 7 || mode == 8) {
@@ -636,7 +636,7 @@ BOOL BSubwayCmd_Tool(VM *vm, FieldScriptEnv *env) {
         }
         break;
     case 333:
-        func_ov033_0217bb98(bsw, gsys);
+        BsubwayScr_ClearStateBits(bsw, gsys);
         break;
     // Fades in the switches for the train's cars
     case 334: {
@@ -656,8 +656,8 @@ BOOL BSubwayCmd_Tool(VM *vm, FieldScriptEnv *env) {
         break;
     }
     case 335:
-        func_ov033_0217be88(bsw,
-                            getTrainerGender(&GameData_GetPlayerState(gameData)->playerInfo) == GENDER_MALE ? 1 : 0);
+        BsubwayScr_CreatePartners(
+            bsw, getTrainerGender(&GameData_GetPlayerState(gameData)->playerInfo) == GENDER_MALE ? 1 : 0);
         break;
     case 336:
         *retWk = bsw->memberSpecies[param0];
@@ -695,13 +695,13 @@ BOOL BSubwayCmd_Tool(VM *vm, FieldScriptEnv *env) {
         break;
     }
     case 340:
-        func_ov033_0217bd34(bsw);
+        BsubwayScr_LoadPartyCopy(bsw);
         break;
     case 341:
         *retWk = BSubway_GetModeRegulation(mode);
         break;
     case 342:
-        *retWk = func_ov033_0217bdc0(mode);
+        *retWk = BsubwayScr_GetMemberNum(mode);
         break;
     case 343: {
         u32 buffer;
@@ -748,7 +748,7 @@ BOOL BSubwayCmd_Tool(VM *vm, FieldScriptEnv *env) {
         bsw->ov306Param.unk8 = 0;
         bsw->ov306Param.unkC = 1;
         bsw->ov306Param.unk10 = sTable7008[mode];
-        bsw->ov306Param.unk14 = func_ov033_0217bd84(bsw);
+        bsw->ov306Param.unk14 = BsubwayScr_GetWinCount(bsw);
         if (bsw->ov306Param.unk14 > BSUBWAY_COUNT_MAX) {
             bsw->ov306Param.unk14 = BSUBWAY_COUNT_MAX;
         }
@@ -818,14 +818,14 @@ BOOL BSubwayCmd_Tool(VM *vm, FieldScriptEnv *env) {
         break;
     case 357:
         BSubwayPlayData_IncRound(playData);
-        func_ov033_0217bd8c(bsw);
-        *retWk = func_ov033_0217bd84(bsw);
+        BsubwayScr_IncWinCount(bsw);
+        *retWk = BsubwayScr_GetWinCount(bsw);
         if (*retWk > BSUBWAY_COUNT_MAX) {
             *retWk = BSUBWAY_COUNT_MAX;
         }
         break;
     case 358:
-        *retWk = func_ov033_0217bd84(bsw);
+        *retWk = BsubwayScr_GetWinCount(bsw);
         if (*retWk > BSUBWAY_COUNT_MAX) {
             *retWk = BSUBWAY_COUNT_MAX;
         }
@@ -834,7 +834,7 @@ BOOL BSubwayCmd_Tool(VM *vm, FieldScriptEnv *env) {
         if (BSubwayScoreData_HasStage(score, mode) == 0) {
             BSubwayScoreData_StartStage(score, mode);
             BSubwayPlayData_ResetRound(playData);
-            func_ov033_0217bda0(bsw);
+            BsubwayScr_ClearWinCount(bsw);
         }
         break;
     case 400:
@@ -1094,13 +1094,13 @@ static GameEventReturnCode EventBSubwayMsgWindow_Callback(GameEvent *event, u32 
         (*state)++;
     case 1:
         if (FieldScriptEnv_UpdateWaitCounter(wk->env) == TRUE) {
-            wk->window = func_ov036_021880d4(Field_GetMsgBGSys(GSYS_GetField(FieldScriptEnv_GetGameSystem(wk->env))),
-                                             wk->message);
+            wk->window = MsgBGPrinter_CreateYesNoMenu(
+                Field_GetMsgBGSys(GSYS_GetField(FieldScriptEnv_GetGameSystem(wk->env))), wk->message);
             (*state)++;
         }
         break;
     case 2:
-        switch (func_ov036_0218816c(wk->window)) {
+        switch (MsgBGPrinter_YesNoMenuMain(wk->window)) {
         case 0:
             *wk->var = 0;
             (*state)++;
@@ -1114,7 +1114,7 @@ static GameEventReturnCode EventBSubwayMsgWindow_Callback(GameEvent *event, u32 
         }
         break;
     case 3:
-        func_ov036_02187ea0(wk->window);
+        MsgBGPrinter_DeleteMenuFunc(wk->window);
         return GAMEEVENT_DONE;
     }
     return GAMEEVENT_CONTINUE;
@@ -1203,7 +1203,7 @@ static u16 func_ov050_021e6e6c(FieldActor *actor) {
     return GetActorUserParam(actor, 1);
 }
 
-static BOOL func_ov050_021e6e78(BSubwayScrWork *bsw, u16 index) {
+static BOOL BSubwayCmd_IsNpcEntryAvailable(BSubwayScrWork *bsw, u16 index) {
     const BSubwayActor *entry = &sActors[index];
 
     if (bsw->playMode == 4) {
@@ -1215,7 +1215,7 @@ static BOOL func_ov050_021e6e78(BSubwayScrWork *bsw, u16 index) {
     return FALSE;
 }
 
-static void func_ov050_021e6e9c(BSubwayScrWork *bsw, u16 index, u16 *a, u16 *b, u16 *c) {
+static void BSubwayCmd_GetNpcEntryInfo(BSubwayScrWork *bsw, u16 index, u16 *a, u16 *b, u16 *c) {
     const BSubwayActor *entry = &sActors[index];
 
     if (bsw->playMode == 4) {

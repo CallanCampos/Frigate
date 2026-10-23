@@ -3973,7 +3973,7 @@ static const BattleEventHandlerEntry *EventAddEjectButton(u32 *priority) {
 static void HandlerEjectButtonReaction(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work) {
     if (IsEventTargetMon(monId) && BattleEventVar_GetValue(0x4d) == 0 && !BtlServerFlow_IsInSkyDrop(flow, monId) &&
         !BtlServerFlow_CheckMatchup(flow) && !IsMonSwitchingOut(flow) && BtlServerFlow_HasReserveMon(flow, monId) &&
-        func_ov167_021aba8c(flow)) {
+        ServerControl_TrySetOnceFlag(flow)) {
         ItemEvent_PushRun(item, flow, monId);
     }
 }

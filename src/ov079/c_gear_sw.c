@@ -2173,16 +2173,16 @@ static void CGearSw_Init(CGearSw *work, CGearSettings *settings, FieldSubscreen 
         CGearSw_StateFlash(work);
     }
     comm = GSYS_GetGameCommSystem(gsys);
-    if (comm != NULL && func_ov012_02153650(comm) == 2) {
-        func_ov012_02153654(comm);
+    if (comm != NULL && Intrude_GetVisitProgress(comm) == 2) {
+        Intrude_SetCompleted(comm);
     }
 }
 
 static void CGearSw_Exit(CGearSw *work) {
     GameCommSys *comm = GSYS_GetGameCommSystem(work->gsys);
 
-    if (comm != NULL && func_ov012_02153650(comm) == 2) {
-        func_ov012_02153654(comm);
+    if (comm != NULL && Intrude_GetVisitProgress(comm) == 2) {
+        Intrude_SetCompleted(comm);
     }
     CGearSw_StopNoticeGlow(work);
     CGearSwFlash_Exit(&work->flash);

@@ -11,7 +11,7 @@
 #include "system/union_view.h"
 #include "system/wordset.h"
 
-void func_ov033_0217aa1c(GameSystem *gsys, s32 floor, u32 value) {
+void Scrcmd_FillPartnerCandidates(GameSystem *gsys, s32 floor, u32 value) {
     GameData *gameData;
     UnityTowerFloor *unityTowerSave;
     SaveControl *saveControl;
@@ -20,13 +20,14 @@ void func_ov033_0217aa1c(GameSystem *gsys, s32 floor, u32 value) {
     unityTowerSave = GameData_GetUnityTowerSave(gameData);
     if (floor < 0xe9) {
         saveControl = GameData_GetSaveControl(gameData);
-        func_ov033_0217aa50(getUnityTower_SurveySaveBlkAddrress(saveControl), unityTowerSave, floor, value);
+        Scrcmd_CollectPartnersByLanguage(getUnityTower_SurveySaveBlkAddrress(saveControl), unityTowerSave, floor,
+                                         value);
     } else {
         UnityTowerSave_Init(unityTowerSave);
     }
 }
 
-void func_ov033_0217aa50(UnityTowerSurveySave *survey, UnityTowerFloor *output, s32 floor, u32 value) {
+void Scrcmd_CollectPartnersByLanguage(UnityTowerSurveySave *survey, UnityTowerFloor *output, s32 floor, u32 value) {
     PlayerInfo *visitor;
     u32 visitorValue;
     s32 country;
@@ -59,7 +60,7 @@ void func_ov033_0217aa50(UnityTowerSurveySave *survey, UnityTowerFloor *output, 
     }
 }
 
-u32 func_ov033_0217aac4(UnityTowerFloor *output, u32 index) {
+u32 Scrcmd_GetPartnerCandidateHistoryIndex(UnityTowerFloor *output, u32 index) {
     u32 result;
 
     result = 0xff;
@@ -69,7 +70,7 @@ u32 func_ov033_0217aac4(UnityTowerFloor *output, u32 index) {
     return result;
 }
 
-u32 func_ov033_0217aad8(WordSet *wordSet, GameSystem *gsys, UnityTowerFloor *save, s32 index, u32 param) {
+u32 Scrcmd_GetPartnerGreetingMessage(WordSet *wordSet, GameSystem *gsys, UnityTowerFloor *save, s32 index, u32 param) {
     GameData *gameData;
     UnityTowerSurveySave *surveySave;
     PlayerInfo *visitor;
@@ -94,10 +95,10 @@ u32 func_ov033_0217aad8(WordSet *wordSet, GameSystem *gsys, UnityTowerFloor *sav
     if (CountryHasProvinces(GameData_GetUnityTowerSave(gameData)->floor) != 0) {
         hasProvince = 1;
     }
-    return func_ov033_0217ab58(gender, id, province, param, hasProvince);
+    return Scrcmd_CalcPartnerGreetingIndex(gender, id, province, param, hasProvince);
 }
 
-u32 func_ov033_0217ab58(u32 gender, u32 id, u32 province, u32 a3, u32 hasProvince) {
+u32 Scrcmd_CalcPartnerGreetingIndex(u32 gender, u32 id, u32 province, u32 a3, u32 hasProvince) {
     u32 messageId;
 
     if (hasProvince != 0) {

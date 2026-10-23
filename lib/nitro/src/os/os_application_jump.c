@@ -12,7 +12,7 @@
 // keeps the ID of the sender. If the ID is not in the system's title list, or its first character is one of '0' to '4',
 // the sender is forgotten and the next program gets an empty buffer (set up, then sent and cleared). Otherwise the
 // buffer is just forgotten and the ID stays
-void func_0207c888(void) {
+void OSi_InitPrevTitleId(void) {
     OSDeliverArgInfo info;
 
     OS_InitDeliverArg(&info, 0);

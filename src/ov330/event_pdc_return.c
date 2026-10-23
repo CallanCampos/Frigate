@@ -189,7 +189,7 @@ static BOOL EventPdcReturn_Main(GameProc *proc, u32 *state, void *param, void *w
         break;
     case 2:
         if (procRunning != TRUE) {
-            if (func_ov012_02165b0c(wk->nameEntry) == FALSE) {
+            if (NameEntryParam_IsCanceled(wk->nameEntry) == FALSE) {
                 oldName = GFL_StrBufCreate(32, wk->heapId);
                 NameEntryParam_GetName(wk->nameEntry, wk->name);
                 PokeParty_GetParam(prm->pkm, PKM_PARAM_NICKNAME, oldName);

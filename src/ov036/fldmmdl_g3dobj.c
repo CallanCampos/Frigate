@@ -44,20 +44,20 @@ static u16 FieldActorG3DSystem_RegistObj(ActorG3DSystem *sys, u16 objCode, u16 r
 static u16 FieldActorG3DSystem_FindResGroup(ActorG3DSystem *sys, u16 objCode);
 static u16 FldActSys_SetupG3DObj(MMSys *system, ActorG3DSystem *sys, u16 objCode, const FieldActorResGroup *group);
 static void FieldActorG3DSystem_UnloadObjCode(ActorG3DSystem *sys, u16 objCode);
-static BOOL func_ov036_021949ec(FieldActor *actor);
-static void func_ov036_02194a18(FieldActor *actor);
-static void func_ov036_02194a3c(FieldActor *actor);
-static void func_ov036_02194a5c(FieldActor *actor);
-static void func_ov036_02194a90(FieldActor *actor);
+static BOOL RailActor_CheckMoveStart(FieldActor *actor);
+static void RailActor_UpdateAttrBeforeMove(FieldActor *actor);
+static void RailActor_ProcMoveStartFirst(FieldActor *actor);
+static void RailActor_ProcMoveStartSecond(FieldActor *actor);
+static void RailActor_ProcMoveEnd(FieldActor *actor);
 static BOOL RailActor_CacheTerrain(FieldActor *actor);
-static void func_ov036_02194b48(FieldActor *actor);
-static void func_ov036_02194ba8(FieldActor *actor);
-static void func_ov036_02194c14(FieldActor *actor);
-static void func_ov036_02194c68(FieldActor *actor);
-static void func_ov036_02194cbc(FieldActor *actor);
-static void func_ov036_02194d28(FieldActor *actor, u32 tile, u32 origYTile, const FieldActorConfig *info);
-static void func_ov036_02194d4c(FieldActor *actor, u32 tile, u32 origYTile, const FieldActorConfig *info);
-static void func_ov036_02194d78(FieldActor *actor, u32 tile, u32 origYTile, const FieldActorConfig *info);
+static void RailActor_MapAttrProcMoveStartFirst(FieldActor *actor);
+static void RailActor_MapAttrProcMoveStartSecond(FieldActor *actor);
+static void RailActor_MapAttrProcMoveStartJumpSecond(FieldActor *actor);
+static void RailActor_MapAttrProcMoveEnd(FieldActor *actor);
+static void RailActor_MapAttrProcMoveEndJump(FieldActor *actor);
+static void RailActor_MapAttrGrassProc0(FieldActor *actor, u32 tile, u32 origYTile, const FieldActorConfig *info);
+static void RailActor_MapAttrGrassProc12(FieldActor *actor, u32 tile, u32 origYTile, const FieldActorConfig *info);
+static void RailActor_MapAttrFootMarkProc1(FieldActor *actor, u32 tile, u32 origYTile, const FieldActorConfig *info);
 static void func_ov036_02194dac(FieldActor *actor, u32 tile, u32 origYTile, const FieldActorConfig *info);
 static void RailActor_EnsureShadow(FieldActor *actor, u32 tile, u32 origYTile, const FieldActorConfig *info);
 static void func_ov036_02194dec(FieldActor *actor, u32 tile, u32 origYTile, const FieldActorConfig *info);
@@ -87,7 +87,7 @@ void FieldActorG3DSystem_Create(MMSys *system, FieldG3DObjSystem *g3dObjSystem) 
     FldActSys_BindActorG3DSystem(system, sys);
 }
 
-void func_ov036_021946f4(MMSys *system) {
+void FieldActorG3DSystem_Delete(MMSys *system) {
     ActorG3DSystem *sys = FldActSys_GetActorG3DSystem(system);
 
     FieldActorG3DSystem_FreeEntries(sys);
@@ -184,7 +184,7 @@ static void FieldActorG3DSystem_UnloadObjCode(ActorG3DSystem *sys, u16 objCode) 
     }
 }
 
-u16 func_ov036_021948a0(FieldActor *actor) {
+u16 FieldActorG3DSystem_AddObj(FieldActor *actor) {
     const FieldActorConfig *info = GetActorMdlInfo(actor);
     MMSys *system = GetActorMModelSystem(actor);
     ActorG3DSystem *sys = FldActSys_GetActorG3DSystem(system);
@@ -196,7 +196,7 @@ u16 func_ov036_021948a0(FieldActor *actor) {
     return FieldG3DObjSystem_AddObj(sys->objSystem, resGroup, 0, NULL);
 }
 
-void func_ov036_021948ec(FieldActor *actor, u16 objIdx) {
+void FieldActorG3DSystem_DelObj(FieldActor *actor, u16 objIdx) {
     ActorG3DSystem *sys = FldActSys_GetActorG3DSystem(GetActorMModelSystem(actor));
     u16 objCode = FldAct_GetObjCode(actor);
 
@@ -206,36 +206,36 @@ void func_ov036_021948ec(FieldActor *actor, u16 objIdx) {
     }
 }
 
-void func_ov036_02194924(FieldActor *actor) {
+void RailActor_InitMove(FieldActor *actor) {
     FldAct_CallMoveInitProc(actor);
     SetActorFlag(actor, 2);
 }
 
-void func_ov036_02194938(FieldActor *actor) {
+void RailActor_UpdateMove(FieldActor *actor) {
     if (CheckActorMMSysFlag(actor, 2) == 0) {
-        func_ov036_02194a18(actor);
-        func_ov036_02194a3c(actor);
+        RailActor_UpdateAttrBeforeMove(actor);
+        RailActor_ProcMoveStartFirst(actor);
         if (CheckActorMovementFlag(actor, 0x200)) {
-            func_ov036_0218eff4(actor);
+            FieldAcmdTCB_RunCmds(actor);
         } else if (IsActorMovementDisabled(actor) == FALSE) {
-            if (func_ov036_021949ec(actor) == TRUE) {
+            if (RailActor_CheckMoveStart(actor) == TRUE) {
                 FldAct_CallMoveProc(actor);
             }
         }
-        func_ov036_02194a5c(actor);
-        func_ov036_02194a90(actor);
+        RailActor_ProcMoveStartSecond(actor);
+        RailActor_ProcMoveEnd(actor);
     }
 }
 
-u32 func_ov036_02194990(FieldActor *actor, const RailPosition *pos) {
+u32 RailActor_GetLocationAttr(FieldActor *actor, const RailPosition *pos) {
     return FieldNoGridMapper_GetTileAtPos(FldActSys_GetNoGridMapper(GetActorMModelSystem(actor)), pos);
 }
 
-u8 func_ov036_021949a4(FieldActor *actor, int angle) {
+u8 RailActor_GetDirByAngle(FieldActor *actor, int angle) {
     VecFx16 vec;
     int diff;
 
-    func_ov036_02195a78(actor, GetActorFaceDir(actor), &vec);
+    RailActor_GetDrawOffsetByDir(actor, GetActorFaceDir(actor), &vec);
     vec.y = 0;
     VEC_Fx16Normalize(&vec, &vec);
     diff = FX_Atan2Idx(vec.x, vec.z) - angle;
@@ -245,7 +245,7 @@ u8 func_ov036_021949a4(FieldActor *actor, int angle) {
     return FACE_DIRS_BY_ANGLE[diff >> 12];
 }
 
-static BOOL func_ov036_021949ec(FieldActor *actor) {
+static BOOL RailActor_CheckMoveStart(FieldActor *actor) {
     if (IsActorFlag16(actor) == TRUE) {
         return TRUE;
     }
@@ -256,7 +256,7 @@ static BOOL func_ov036_021949ec(FieldActor *actor) {
     return TRUE;
 }
 
-static void func_ov036_02194a18(FieldActor *actor) {
+static void RailActor_UpdateAttrBeforeMove(FieldActor *actor) {
     if (CheckActorMovementFlag(actor, 0x800)) {
         if (RailActor_CacheTerrain(actor) == TRUE) {
             FldAct_SetMoveStart(actor);
@@ -264,27 +264,27 @@ static void func_ov036_02194a18(FieldActor *actor) {
     }
 }
 
-static void func_ov036_02194a3c(FieldActor *actor) {
+static void RailActor_ProcMoveStartFirst(FieldActor *actor) {
     if (CheckActorMovementFlag(actor, 0x20)) {
-        func_ov036_02194b48(actor);
+        RailActor_MapAttrProcMoveStartFirst(actor);
     }
     ClearActorMovementFlag(actor, 0xa0);
 }
 
-static void func_ov036_02194a5c(FieldActor *actor) {
+static void RailActor_ProcMoveStartSecond(FieldActor *actor) {
     if (CheckActorMovementFlag(actor, 0x80)) {
-        func_ov036_02194c14(actor);
+        RailActor_MapAttrProcMoveStartJumpSecond(actor);
     } else if (CheckActorMovementFlag(actor, 0x20)) {
-        func_ov036_02194ba8(actor);
+        RailActor_MapAttrProcMoveStartSecond(actor);
     }
     ClearActorMovementFlag(actor, 0xa0);
 }
 
-static void func_ov036_02194a90(FieldActor *actor) {
+static void RailActor_ProcMoveEnd(FieldActor *actor) {
     if (CheckActorMovementFlag(actor, 0x100)) {
-        func_ov036_02194cbc(actor);
+        RailActor_MapAttrProcMoveEndJump(actor);
     } else if (CheckActorMovementFlag(actor, 0x40)) {
-        func_ov036_02194c68(actor);
+        RailActor_MapAttrProcMoveEnd(actor);
     }
     ClearActorMovementFlag(actor, 0x140);
 }
@@ -299,7 +299,7 @@ static BOOL RailActor_CacheTerrain(FieldActor *actor) {
         RailPosition pos;
 
         GetActorRailPos(actor, &pos);
-        func_ov036_02195604(actor, &origYPos);
+        RailActor_GetNowLocation(actor, &origYPos);
         origYTile = FieldNoGridMapper_GetTileAtPos(mapper, &origYPos);
         tile = FieldNoGridMapper_GetTileAtPos(mapper, &pos);
     }
@@ -313,34 +313,34 @@ static BOOL RailActor_CacheTerrain(FieldActor *actor) {
     return TRUE;
 }
 
-static void func_ov036_02194b48(FieldActor *actor) {
+static void RailActor_MapAttrProcMoveStartFirst(FieldActor *actor) {
     if (RailActor_CacheTerrain(actor) && FldAct_IsDrawReady(actor) == TRUE) {
         u32 tile = GetCachedTileUnderActor(actor);
         u32 origYTile = GetCachedOrigYTileUnderActor(actor);
         const FieldActorConfig *info = GetActorMdlInfo(actor);
 
-        func_ov036_02194d28(actor, tile, origYTile, info);
+        RailActor_MapAttrGrassProc0(actor, tile, origYTile, info);
         func_ov036_02194dac(actor, tile, origYTile, info);
         RailActor_StartReflection(actor, tile, origYTile, info);
         RailActor_UpdateShadowGroup(actor, tile, origYTile, info);
     }
 }
 
-static void func_ov036_02194ba8(FieldActor *actor) {
+static void RailActor_MapAttrProcMoveStartSecond(FieldActor *actor) {
     if (RailActor_CacheTerrain(actor) && FldAct_IsDrawReady(actor) == TRUE) {
         u32 tile = GetCachedTileUnderActor(actor);
         u32 origYTile = GetCachedOrigYTileUnderActor(actor);
         const FieldActorConfig *info = GetActorMdlInfo(actor);
 
-        func_ov036_02194d4c(actor, tile, origYTile, info);
-        func_ov036_02194d78(actor, tile, origYTile, info);
+        RailActor_MapAttrGrassProc12(actor, tile, origYTile, info);
+        RailActor_MapAttrFootMarkProc1(actor, tile, origYTile, info);
         RailActor_EnsureShadow(actor, tile, origYTile, info);
         RailActor_StartReflection(actor, tile, origYTile, info);
         RailActor_UpdateShadowGroup(actor, tile, origYTile, info);
     }
 }
 
-static void func_ov036_02194c14(FieldActor *actor) {
+static void RailActor_MapAttrProcMoveStartJumpSecond(FieldActor *actor) {
     if (RailActor_CacheTerrain(actor) && FldAct_IsDrawReady(actor) == TRUE) {
         u32 tile = GetCachedTileUnderActor(actor);
         u32 origYTile = GetCachedOrigYTileUnderActor(actor);
@@ -352,7 +352,7 @@ static void func_ov036_02194c14(FieldActor *actor) {
     }
 }
 
-static void func_ov036_02194c68(FieldActor *actor) {
+static void RailActor_MapAttrProcMoveEnd(FieldActor *actor) {
     if (RailActor_CacheTerrain(actor) && FldAct_IsDrawReady(actor) == TRUE) {
         u32 tile = GetCachedTileUnderActor(actor);
         u32 origYTile = GetCachedOrigYTileUnderActor(actor);
@@ -364,7 +364,7 @@ static void func_ov036_02194c68(FieldActor *actor) {
     }
 }
 
-static void func_ov036_02194cbc(FieldActor *actor) {
+static void RailActor_MapAttrProcMoveEndJump(FieldActor *actor) {
     if (RailActor_CacheTerrain(actor) && FldAct_IsDrawReady(actor) == TRUE) {
         u32 tile = GetCachedTileUnderActor(actor);
         u32 origYTile = GetCachedOrigYTileUnderActor(actor);
@@ -372,25 +372,25 @@ static void func_ov036_02194cbc(FieldActor *actor) {
 
         RailActor_ClearReflectionIfOffTile(actor, tile, origYTile, info);
         func_ov036_02194dec(actor, tile, origYTile, info);
-        func_ov036_02194d4c(actor, tile, origYTile, info);
+        RailActor_MapAttrGrassProc12(actor, tile, origYTile, info);
         func_ov036_02194df0(actor, tile, origYTile, info);
         RailActor_UpdateShadowGroup(actor, tile, origYTile, info);
     }
 }
 
-static void func_ov036_02194d28(FieldActor *actor, u32 tile, u32 origYTile, const FieldActorConfig *info) {
+static void RailActor_MapAttrGrassProc0(FieldActor *actor, u32 tile, u32 origYTile, const FieldActorConfig *info) {
     if (GetTileFlags(tile) & 0x20) {
-        func_ov036_021a40ac(FldAct_GetFieldEffects(actor), actor, FALSE, 0);
+        GrassTask_Start(FldAct_GetFieldEffects(actor), actor, FALSE, 0);
     }
 }
 
-static void func_ov036_02194d4c(FieldActor *actor, u32 tile, u32 origYTile, const FieldActorConfig *info) {
+static void RailActor_MapAttrGrassProc12(FieldActor *actor, u32 tile, u32 origYTile, const FieldActorConfig *info) {
     if (tile != -1 && (GetTileFlags(tile) & 0x20)) {
-        func_ov036_021a40ac(FldAct_GetFieldEffects(actor), actor, TRUE, 0);
+        GrassTask_Start(FldAct_GetFieldEffects(actor), actor, TRUE, 0);
     }
 }
 
-static void func_ov036_02194d78(FieldActor *actor, u32 tile, u32 origYTile, const FieldActorConfig *info) {
+static void RailActor_MapAttrFootMarkProc1(FieldActor *actor, u32 tile, u32 origYTile, const FieldActorConfig *info) {
     if (origYTile != -1 && (GetTileFlags(origYTile) & 0x8)) {
         FieldEffects *effects = FldAct_GetFieldEffects(actor);
         u32 kind = 0;
@@ -398,7 +398,7 @@ static void func_ov036_02194d78(FieldActor *actor, u32 tile, u32 origYTile, cons
         if (info->footprintType == 2) {
             kind = 1;
         }
-        func_ov036_021b47c8(actor, effects, kind);
+        Footmark_SetMMdl(actor, effects, kind);
     }
 }
 
@@ -409,7 +409,7 @@ static void func_ov036_02194dac(FieldActor *actor, u32 tile, u32 origYTile, cons
 static void RailActor_EnsureShadow(FieldActor *actor, u32 tile, u32 origYTile, const FieldActorConfig *info) {
     if (FldActSys_AreShadowsEnabled(GetActorMModelSystem(actor))) {
         if (!CheckActorMovementFlag(actor, 0x4000)) {
-            func_ov036_021a3bf0(actor, FldAct_GetFieldEffects(actor));
+            FldeffShadow_Start(actor, FldAct_GetFieldEffects(actor));
             SetActorMovementFlag(actor, 0x4000);
         }
     }
@@ -419,7 +419,7 @@ static void func_ov036_02194dec(FieldActor *actor, u32 tile, u32 origYTile, cons
 }
 
 static void func_ov036_02194df0(FieldActor *actor, u32 tile, u32 origYTile, const FieldActorConfig *info) {
-    func_ov036_021a3ec4(actor, FldAct_GetFieldEffects(actor));
+    FldeffKemuri_StartFacing(actor, FldAct_GetFieldEffects(actor));
 }
 
 static void RailActor_StartReflection(FieldActor *actor, u32 tile, u32 origYTile, const FieldActorConfig *info) {
@@ -440,7 +440,7 @@ static void RailActor_StartReflection(FieldActor *actor, u32 tile, u32 origYTile
                 MMSys *system = GetActorMModelSystem(actor);
 
                 FldAct_SetReflectingFlag(actor, TRUE);
-                func_ov036_021b49ac(system, actor, effects, 1);
+                ReflectTask_SetMMdl(system, actor, effects, 1);
             }
         }
     }
@@ -511,19 +511,19 @@ BOOL func_ov036_02194f4c(FieldActor *actor) {
 }
 
 static void RailActorAcmd_InitMove(FieldActor *actor, u32 dir, u32 speed, u32 frames) {
-    func_ov036_02195640(actor, dir, speed);
-    func_ov036_021959bc(actor, dir);
+    RailActor_SetMoveRequest(actor, dir, speed);
+    RailActor_SetGridPosByDir(actor, dir);
     ChangeActorDirection(actor, dir);
     FldAct_SetDrawStatus(actor, frames);
     SetActorMovementFlag(actor, 0x20);
     FieldActor_NextAcmdState(actor);
 }
 
-BOOL func_ov036_02194f94(FieldActor *actor) {
+BOOL RailActor_AcWalk1(FieldActor *actor) {
     VecFx32 pos;
     RailUnit *unit = FldAct_GetRailUnit(actor);
 
-    func_ov036_02195624(actor);
+    RailActor_UpdateRailWork(actor);
     RailUnit_GetCalcPos(unit, &pos);
     SetActorWPosValue(actor, &pos);
     if (RailUnit_IsMovePending(unit)) {
@@ -535,7 +535,7 @@ BOOL func_ov036_02194f94(FieldActor *actor) {
     return FALSE;
 }
 
-BOOL func_ov036_02194fe8(FieldActor *actor) {
+BOOL RailActor_AcWalkEnd(FieldActor *actor) {
     FldAct_SetDrawStatus(actor, 0);
     return FALSE;
 }
@@ -604,24 +604,24 @@ BOOL func_ov036_021950e4(FieldActor *actor) {
     RailActorAcmd_InitMove(actor, 3, 2, 5);
     return TRUE;
 }
-BOOL func_ov036_021950f4(FieldActor *actor) {
+BOOL RailActor_AcDashU4F0(FieldActor *actor) {
     RailActorAcmd_InitMove(actor, 0, 4, 10);
     return TRUE;
 }
-BOOL func_ov036_02195104(FieldActor *actor) {
+BOOL RailActor_AcDashD4F0(FieldActor *actor) {
     RailActorAcmd_InitMove(actor, 1, 4, 10);
     return TRUE;
 }
-BOOL func_ov036_02195114(FieldActor *actor) {
+BOOL RailActor_AcDashL4F0(FieldActor *actor) {
     RailActorAcmd_InitMove(actor, 2, 4, 10);
     return TRUE;
 }
-BOOL func_ov036_02195124(FieldActor *actor) {
+BOOL RailActor_AcDashR4F0(FieldActor *actor) {
     RailActorAcmd_InitMove(actor, 3, 4, 10);
     return TRUE;
 }
 static void RailActorAcmd_InitWait(FieldActor *actor, u32 dir, u32 speed, u32 frames) {
-    ActorWaitWork *work = func_ov012_0216713c(actor, sizeof(ActorWaitWork));
+    ActorWaitWork *work = FldAct_InitMoveCmdWork(actor, sizeof(ActorWaitWork));
 
     work->unk0 = frames;
     work->wait = speed;
@@ -630,8 +630,8 @@ static void RailActorAcmd_InitWait(FieldActor *actor, u32 dir, u32 speed, u32 fr
     SetActorInitialGPosToNowGPos(actor);
     FieldActor_NextAcmdState(actor);
 }
-BOOL func_ov036_02195168(FieldActor *actor) {
-    ActorWaitWork *work = func_ov012_02167154(actor);
+BOOL RailActor_AcStayWalk1(FieldActor *actor) {
+    ActorWaitWork *work = FldAct_GetMoveCmdWork(actor);
 
     work->wait--;
     if (work->wait > 0) {
@@ -724,7 +724,7 @@ BOOL func_ov036_021952cc(FieldActor *actor) {
 }
 static void RailActorAcmd_InitJump(FieldActor *actor, u32 dir, u32 speed, u32 timer, u16 frame, s16 height, u16 step,
                                    u32 se) {
-    ActorRailJumpWork *work = func_ov012_0216713c(actor, sizeof(ActorRailJumpWork));
+    ActorRailJumpWork *work = FldAct_InitMoveCmdWork(actor, sizeof(ActorRailJumpWork));
 
     work->dir = dir;
     work->speed = speed;
@@ -735,8 +735,8 @@ static void RailActorAcmd_InitJump(FieldActor *actor, u32 dir, u32 speed, u32 ti
     if (speed == 0) {
         SetActorInitialGPosToNowGPos(actor);
     } else {
-        func_ov036_02195640(actor, dir, 8);
-        func_ov036_021959bc(actor, dir);
+        RailActor_SetMoveRequest(actor, dir, 8);
+        RailActor_SetGridPosByDir(actor, dir);
     }
     SetActorMovementFlag(actor, 0xa0);
     ChangeActorDirection(actor, dir);

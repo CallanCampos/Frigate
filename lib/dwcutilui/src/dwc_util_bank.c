@@ -83,14 +83,14 @@ void clearVram(void) {
     MI_CpuClearFast((void *)HW_DB_BG_PLTT, HW_PLTT_SIZE);
 }
 
-void func_ov182_021bd0ac(void) {
+void DWCi_SetLedWireless(void) {
     u32 value;
 
-    if (func_0207f520(&value) == 0 && value != 15) {
-        func_0207f50c(15);
+    if (PM_GetLEDPattern(&value) == 0 && value != 15) {
+        PMi_SendLEDPatternCommand(15);
     }
 }
 
 void DWCi_SetLedNormal(void) {
-    func_0207f50c(1);
+    PMi_SendLEDPatternCommand(1);
 }

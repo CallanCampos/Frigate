@@ -50,13 +50,16 @@ static const u8 sOneShotDRGifts[8] = {
 
 static const PdwPostmanGiftHandler sGiftHandlers[5] = {
     { 0, NULL, NULL, NULL, NULL, NULL },
-    { 1, doesPartyHaveSpace, func_ov033_02178110, func_ov033_02178154, func_ov033_02178180, func_ov033_021781e0 },
-    { 2, func_ov033_021781e4, func_ov033_021781e8, func_ov033_02178218, func_ov033_02178230, func_ov033_02178260 },
-    { 3, func_ov033_02178274, func_ov033_02178278, func_ov033_02178290, func_ov033_02178294, func_ov033_021782cc },
+    { 1, doesPartyHaveSpace, ScrcmdPokemonFld_ReceiveGiftMon, ScrcmdPokemonFld_GetGiftMonReceiveType,
+      ScrcmdPokemonFld_PrepareGiftMonMessage, func_ov033_021781e0 },
+    { 2, func_ov033_021781e4, func_ov033_021781e8, ScrcmdPokemonFld_GetGiftItemReceiveType,
+      ScrcmdPokemonFld_PrepareGiftItemMessage, ScrcmdPokemonFld_PrepareGiftItemFollowUpMessage },
+    { 3, func_ov033_02178274, ScrcmdPokemonFld_ReceiveGiftFlag, ScrcmdPokemonFld_GetGiftFlagReceiveType,
+      ScrcmdPokemonFld_PrepareGiftFlagMessage, func_ov033_021782cc },
     { 4, func_ov033_021782f0, func_ov033_021782f4, func_ov033_02178334, func_ov033_02178338, func_ov033_02178374 },
 };
 
-PdwPostmanItemWindow *func_ov033_02177998(Field *field, PdwPostmanItem *items, u32 count) {
+PdwPostmanItemWindow *PdwPostman_CreateListWin(Field *field, PdwPostmanItem *items, u32 count) {
     u16 heapId;
     PdwPostmanItemWindow *work;
     s32 height;
@@ -76,9 +79,9 @@ PdwPostmanItemWindow *func_ov033_02177998(Field *field, PdwPostmanItem *items, u
     return work;
 }
 
-void func_ov033_02177a28(PdwPostmanItemWindow *work) {
-    func_ov036_02187c7c(work->window);
-    func_ov036_02187c1c(work->window);
+void PdwPostman_DeleteListWin(PdwPostmanItemWindow *work) {
+    MsgBGPrinter_ClearMsgWin(work->window);
+    MsgBGPrinter_DeleteMsgWin(work->window);
     GFL_BGSysLoadScr(1);
     GFL_StrBufFree(work->first);
     GFL_StrBufFree(work->second);
@@ -87,24 +90,24 @@ void func_ov033_02177a28(PdwPostmanItemWindow *work) {
     GFL_HeapFree(work);
 }
 
-void func_ov033_02177a60(PdwPostmanItemWindow *work) {
+void PdwPostman_PrintListWin(PdwPostmanItemWindow *work) {
     MsgData *messages;
     s32 i;
 
     messages = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_ITEM_NAMES, HEAPID_TAIL(work->heapId));
     for (i = 0; i < work->count; i++) {
         GFL_MsgDataLoadStrbuf(messages, work->items[i].item, work->first);
-        func_ov036_02187c4c(work->window, 0, 14 * i, work->first);
+        MsgBGPrinter_MsgWinPrintStr(work->window, 0, 14 * i, work->first);
         GFL_MsgDataLoadStrbuf(work->messages, Global10390_Text_X, work->first);
         WordSetNumber(work->wordSet, 0, work->items[i].quantity, 2, 1, 1);
         GFL_WordSetFormatStrbuf(work->wordSet, work->second, work->first);
-        func_ov036_02187c4c(work->window, 0x6c, 14 * i, work->second);
+        MsgBGPrinter_MsgWinPrintStr(work->window, 0x6c, 14 * i, work->second);
     }
     GFL_MsgDataFree(messages);
-    GFL_BGSysLoadScr(BmpWin_GetBGIndex(func_ov036_02187c9c(work->window)));
+    GFL_BGSysLoadScr(BmpWin_GetBGIndex(MsgBGPrinter_GetMsgWinBmpWin(work->window)));
 }
 
-GameEventReturnCode func_ov033_02177b08(GameEvent *unused, u32 *state, void *data) {
+GameEventReturnCode PdwPostman_ListEvent(GameEvent *unused, u32 *state, void *data) {
     PdwPostmanItemEvent *event;
     BmpWin *bitmapWindow;
     u16 remaining;
@@ -116,20 +119,20 @@ GameEventReturnCode func_ov033_02177b08(GameEvent *unused, u32 *state, void *dat
         if (remaining > 7) {
             remaining = 7;
         }
-        event->window = func_ov033_02177998(event->field, &event->items[event->index], remaining);
-        func_ov033_02177a60(event->window);
-        event->window->unk10 = func_ov036_02189cb0(Field_GetMsgBGSys(event->field));
+        event->window = PdwPostman_CreateListWin(event->field, &event->items[event->index], remaining);
+        PdwPostman_PrintListWin(event->window);
+        event->window->unk10 = MsgBGPrinter_CreateCursor(Field_GetMsgBGSys(event->field));
         (*state)++;
         break;
     case 1:
-        if (func_ov036_02187c70(event->window->window) != TRUE) {
+        if (MsgBGPrinter_IsMsgWinTransDone(event->window->window) != TRUE) {
             break;
         }
         (*state)++;
         break;
     case 2:
-        bitmapWindow = func_ov036_02187c9c(event->window->window);
-        func_ov036_02189de8(event->window->unk10, BmpWin_GetBitmap(bitmapWindow), 15);
+        bitmapWindow = MsgBGPrinter_GetMsgWinBmpWin(event->window->window);
+        MsgBGPrinter_AnimateCursor(event->window->unk10, BmpWin_GetBitmap(bitmapWindow), 15);
         BmpWin_FlushChar(bitmapWindow);
         if (!(GCTX_HIDGetPressedKeys() & 3)) {
             break;
@@ -138,8 +141,8 @@ GameEventReturnCode func_ov033_02177b08(GameEvent *unused, u32 *state, void *dat
         (*state)++;
         break;
     case 3:
-        func_ov036_02189cd8(event->window->unk10);
-        func_ov033_02177a28(event->window);
+        MsgBGPrinter_DeleteCursor(event->window->unk10);
+        PdwPostman_DeleteListWin(event->window);
         (*state)++;
         break;
     case 4:
@@ -154,7 +157,8 @@ GameEventReturnCode func_ov033_02177b08(GameEvent *unused, u32 *state, void *dat
     return FALSE;
 }
 
-PdwPostmanItem *func_ov033_02177bd4(GameData *gameData, HeapID heapId, DreamWorldSave *dreamWorld, u32 *count) {
+PdwPostmanItem *PdwPostman_CreateReceivableList(GameData *gameData, HeapID heapId, DreamWorldSave *dreamWorld,
+                                                u32 *count) {
     PdwPostmanItem *result;
     BagSave *bag;
     u32 n;
@@ -179,7 +183,7 @@ PdwPostmanItem *func_ov033_02177bd4(GameData *gameData, HeapID heapId, DreamWorl
     return result;
 }
 
-void func_ov033_02177c48(GameData *gameData, HeapID heapId, DreamWorldSave *dreamWorld) {
+void PdwPostman_ReceiveItems(GameData *gameData, HeapID heapId, DreamWorldSave *dreamWorld) {
     BagSave *bag;
     u32 i;
     u16 item;
@@ -195,7 +199,7 @@ void func_ov033_02177c48(GameData *gameData, HeapID heapId, DreamWorldSave *drea
     }
 }
 
-u32 func_ov033_02177c8c(GameData *gameData, HeapID heapId, DreamWorldSave *dreamWorld) {
+u32 PdwPostman_CountUnreceivable(GameData *gameData, HeapID heapId, DreamWorldSave *dreamWorld) {
     BagSave *bag;
     u32 i;
     u32 count;
@@ -215,7 +219,7 @@ u32 func_ov033_02177c8c(GameData *gameData, HeapID heapId, DreamWorldSave *dream
     return count;
 }
 
-u16 func_ov033_02177cd4(GameData *gameData, HeapID heapId, DreamWorldSave *dreamWorld, u32 position) {
+u16 PdwPostman_GetUnreceivableItem(GameData *gameData, HeapID heapId, DreamWorldSave *dreamWorld, u32 position) {
     BagSave *bag;
     s32 i;
     u32 count;
@@ -238,7 +242,7 @@ u16 func_ov033_02177cd4(GameData *gameData, HeapID heapId, DreamWorldSave *dream
     return 0;
 }
 
-GameEvent *func_ov033_02177d28(GameSystem *gsys) {
+GameEvent *PdwPostman_CreateListEvent(GameSystem *gsys) {
     GameData *gameData;
     DreamWorldSave *dreamWorld;
     GameEvent *event;
@@ -246,11 +250,11 @@ GameEvent *func_ov033_02177d28(GameSystem *gsys) {
 
     gameData = GSYS_GetGameData(gsys);
     dreamWorld = getDreamWorldStuffAddress(GameData_GetSaveControl(gameData));
-    event = GameEvent_Create(gsys, NULL, func_ov033_02177b08, sizeof(PdwPostmanItemEvent));
+    event = GameEvent_Create(gsys, NULL, PdwPostman_ListEvent, sizeof(PdwPostmanItemEvent));
     work = GameEvent_GetData(event);
     work->field = GSYS_GetField(gsys);
     work->index = 0;
-    work->items = func_ov033_02177bd4(gameData, Field_GetHeapID(work->field), dreamWorld, &work->count);
+    work->items = PdwPostman_CreateReceivableList(gameData, Field_GetHeapID(work->field), dreamWorld, &work->count);
     return event;
 }
 
@@ -262,7 +266,7 @@ BOOL func_ov033_02177d78(VM *vm, FieldScriptEnv *env) {
     MysteryGiftSave *save = mysteryGiftBlock(GameData_GetSaveControl(gameData), 0, heapId);
     u32 slot;
     MysteryGift buffer;
-    MysteryGift *gift = func_ov033_021783f8(save, &slot, &buffer);
+    MysteryGift *gift = PdwPostman_FindMysteryCard(save, &slot, &buffer);
     u8 kind = func_ov033_02178428(save);
 
     if (kind != sGiftHandlers[kind].kind) {
@@ -281,15 +285,15 @@ BOOL func_ov033_02177d78(VM *vm, FieldScriptEnv *env) {
         *result = func_ov033_02177ed0(kind, env, gameData, gift);
         break;
     case 2:
-        *result = func_ov033_02177ef4(kind, gift, env);
+        *result = ScrcmdPokemonFld_PrepareGiftReceiveMessage(kind, gift, env);
         break;
     case 3:
-        *result = func_ov033_02177f28(kind, gift, env);
+        *result = ScrcmdPokemonFld_PrepareGiftFollowUpMessage(kind, gift, env);
         break;
     case 4:
-        if (func_ov033_02177f5c(kind, env, gameData, gift) == TRUE) {
+        if (ScrcmdPokemonFld_ReceiveGift(kind, env, gameData, gift) == TRUE) {
             func_ov033_02178420(save, slot);
-            if (func_ov033_02178074(gift, kind) == TRUE) {
+            if (ScrcmdPokemonFld_IsLibertyPassGift(gift, kind) == TRUE) {
                 setOneShotDRObtained(getTrainerCardDataBlkAddress(gameData), 1, GetGameDataPlayerInfo(gameData));
             }
             if (func_ov033_021780a4(env, gift, kind) == TRUE) {
@@ -321,7 +325,7 @@ BOOL func_ov033_02177ed0(u32 kind, FieldScriptEnv *env, GameData *gameData, Myst
     return FALSE;
 }
 
-u32 func_ov033_02177ef4(u32 kind, MysteryGift *gift, FieldScriptEnv *env) {
+u32 ScrcmdPokemonFld_PrepareGiftReceiveMessage(u32 kind, MysteryGift *gift, FieldScriptEnv *env) {
     WordSet *wordSet = ScriptWork_GetWordSet(FieldScriptEnv_GetScriptWork(env));
     u32 (*getMessage)(WordSet *, MysteryGift *, FieldScriptEnv *) = sGiftHandlers[kind].unk10;
 
@@ -331,7 +335,7 @@ u32 func_ov033_02177ef4(u32 kind, MysteryGift *gift, FieldScriptEnv *env) {
     return 7;
 }
 
-u32 func_ov033_02177f28(u32 kind, MysteryGift *gift, FieldScriptEnv *env) {
+u32 ScrcmdPokemonFld_PrepareGiftFollowUpMessage(u32 kind, MysteryGift *gift, FieldScriptEnv *env) {
     WordSet *wordSet = ScriptWork_GetWordSet(FieldScriptEnv_GetScriptWork(env));
     u32 (*getMessage)(WordSet *, MysteryGift *, FieldScriptEnv *) = sGiftHandlers[kind].unk14;
 
@@ -341,7 +345,7 @@ u32 func_ov033_02177f28(u32 kind, MysteryGift *gift, FieldScriptEnv *env) {
     return 8;
 }
 
-BOOL func_ov033_02177f5c(u32 kind, FieldScriptEnv *env, GameData *gameData, MysteryGift *gift) {
+BOOL ScrcmdPokemonFld_ReceiveGift(u32 kind, FieldScriptEnv *env, GameData *gameData, MysteryGift *gift) {
     void (*receive)(FieldScriptEnv *, GameData *, MysteryGift *) = sGiftHandlers[kind].receive;
 
     if (gift != NULL && receive != NULL) {
@@ -411,7 +415,7 @@ s32 FindMysteryGiftDeliveryManNPCID(GameData *gameData) {
     return -1;
 }
 
-BOOL func_ov033_02178074(MysteryGift *gift, u8 kind) {
+BOOL ScrcmdPokemonFld_IsLibertyPassGift(MysteryGift *gift, u8 kind) {
     if (kind != 2) {
         return FALSE;
     }
@@ -430,7 +434,7 @@ u32 func_ov033_021780a4(FieldScriptEnv *env, MysteryGift *gift, u8 kind) {
     u32 result;
 
     if (kind == 1) {
-        pkm = func_ov033_021780d8(env, gift);
+        pkm = ScrcmdPokemonFld_CreateGiftMon(env, gift);
         if (pkm != NULL) {
             playerInfo = GetGameDataPlayerInfo(FieldScriptEnv_GetGameData(env));
             result = PokeParty_IsSpecialTransfer(pkm, 8, playerInfo);
@@ -441,7 +445,7 @@ u32 func_ov033_021780a4(FieldScriptEnv *env, MysteryGift *gift, u8 kind) {
     return 0;
 }
 
-PartyPkm *func_ov033_021780d8(FieldScriptEnv *env, MysteryGift *gift) {
+PartyPkm *ScrcmdPokemonFld_CreateGiftMon(FieldScriptEnv *env, MysteryGift *gift) {
     HeapID heapId;
     GameData *gameData;
 
@@ -454,12 +458,12 @@ BOOL doesPartyHaveSpace(FieldScriptEnv *env, GameData *gameData, MysteryGift *gi
     return PokeParty_GetPkmCount(GameData_GetParty(gameData)) < 6;
 }
 
-void func_ov033_02178110(FieldScriptEnv *env, GameData *gameData, MysteryGift *gift) {
+void ScrcmdPokemonFld_ReceiveGiftMon(FieldScriptEnv *env, GameData *gameData, MysteryGift *gift) {
     PokeParty *party;
     PartyPkm *pkm;
 
     party = GameData_GetParty(gameData);
-    pkm = func_ov033_021780d8(env, gift);
+    pkm = ScrcmdPokemonFld_CreateGiftMon(env, gift);
     if (PokeParty_GetPkmCount(party) < 6 && pkm != NULL) {
         PokeParty_AddPkm(party, pkm);
         addPkmToDex(GameData_GetPokedex(gameData), pkm);
@@ -467,11 +471,11 @@ void func_ov033_02178110(FieldScriptEnv *env, GameData *gameData, MysteryGift *g
     }
 }
 
-u32 func_ov033_02178154(FieldScriptEnv *env, GameData *gameData, MysteryGift *gift) {
+u32 ScrcmdPokemonFld_GetGiftMonReceiveType(FieldScriptEnv *env, GameData *gameData, MysteryGift *gift) {
     PartyPkm *pkm;
     u32 isEgg;
 
-    pkm = func_ov033_021780d8(env, gift);
+    pkm = ScrcmdPokemonFld_CreateGiftMon(env, gift);
     if (pkm == NULL) {
         return 1;
     }
@@ -483,13 +487,13 @@ u32 func_ov033_02178154(FieldScriptEnv *env, GameData *gameData, MysteryGift *gi
     return 1;
 }
 
-u32 func_ov033_02178180(WordSet *wordSet, MysteryGift *gift, FieldScriptEnv *env) {
+u32 ScrcmdPokemonFld_PrepareGiftMonMessage(WordSet *wordSet, MysteryGift *gift, FieldScriptEnv *env) {
     PlayerInfo *playerInfo;
     PartyPkm *pkm;
     u32 result;
 
     playerInfo = GetGameDataPlayerInfo(FieldScriptEnv_GetGameData(env));
-    pkm = func_ov033_021780d8(env, gift);
+    pkm = ScrcmdPokemonFld_CreateGiftMon(env, gift);
     result = 5;
     copyVarForText(wordSet, 0, playerInfo);
     if (pkm == NULL) {
@@ -526,14 +530,14 @@ void func_ov033_021781e8(FieldScriptEnv *env, GameData *gameData, MysteryGift *g
     }
 }
 
-u32 func_ov033_02178218(FieldScriptEnv *env, GameData *gameData, MysteryGift *gift) {
-    if (func_ov033_02178074(gift, gift->kind) == TRUE) {
+u32 ScrcmdPokemonFld_GetGiftItemReceiveType(FieldScriptEnv *env, GameData *gameData, MysteryGift *gift) {
+    if (ScrcmdPokemonFld_IsLibertyPassGift(gift, gift->kind) == TRUE) {
         return 4;
     }
     return 3;
 }
 
-u32 func_ov033_02178230(WordSet *wordSet, MysteryGift *gift, FieldScriptEnv *env) {
+u32 ScrcmdPokemonFld_PrepareGiftItemMessage(WordSet *wordSet, MysteryGift *gift, FieldScriptEnv *env) {
     PlayerInfo *playerInfo;
     u16 item;
 
@@ -544,7 +548,7 @@ u32 func_ov033_02178230(WordSet *wordSet, MysteryGift *gift, FieldScriptEnv *env
     return 7;
 }
 
-u32 func_ov033_02178260(WordSet *wordSet, MysteryGift *gift, FieldScriptEnv *env) {
+u32 ScrcmdPokemonFld_PrepareGiftItemFollowUpMessage(WordSet *wordSet, MysteryGift *gift, FieldScriptEnv *env) {
     loadItemNameToStrbuf(wordSet, 0, (u16)gift->value);
     return 8;
 }
@@ -553,15 +557,15 @@ BOOL func_ov033_02178274(FieldScriptEnv *env, GameData *gameData, MysteryGift *g
     return TRUE;
 }
 
-void func_ov033_02178278(FieldScriptEnv *env, GameData *gameData, MysteryGift *gift) {
+void ScrcmdPokemonFld_ReceiveGiftFlag(FieldScriptEnv *env, GameData *gameData, MysteryGift *gift) {
     HighLinkSave_SetSpecialPowerFlag(getHighLinkBlockAddress(GameData_GetSaveControl(gameData)), gift->value);
 }
 
-u32 func_ov033_02178290(FieldScriptEnv *env, GameData *gameData, MysteryGift *gift) {
+u32 ScrcmdPokemonFld_GetGiftFlagReceiveType(FieldScriptEnv *env, GameData *gameData, MysteryGift *gift) {
     return 5;
 }
 
-u32 func_ov033_02178294(WordSet *wordSet, MysteryGift *gift, FieldScriptEnv *env) {
+u32 ScrcmdPokemonFld_PrepareGiftFlagMessage(WordSet *wordSet, MysteryGift *gift, FieldScriptEnv *env) {
     GameData *gameData;
     PlayerInfo *playerInfo;
     u32 passPower;
@@ -641,7 +645,7 @@ u32 func_ov033_02178374(WordSet *wordSet, MysteryGift *gift, FieldScriptEnv *env
     return 13;
 }
 
-MysteryGift *func_ov033_021783a8(MysteryGiftSave *save, u32 slot, MysteryGift *gift) {
+MysteryGift *PdwPostman_GetMysteryCard(MysteryGiftSave *save, u32 slot, MysteryGift *gift) {
     if (!MysteryGiftSave_IsSlotUsed(save, slot)) {
         return NULL;
     }
@@ -660,11 +664,11 @@ MysteryGift *func_ov033_021783a8(MysteryGiftSave *save, u32 slot, MysteryGift *g
     return gift;
 }
 
-MysteryGift *func_ov033_021783f8(MysteryGiftSave *save, u32 *slot, MysteryGift *gift) {
+MysteryGift *PdwPostman_FindMysteryCard(MysteryGiftSave *save, u32 *slot, MysteryGift *gift) {
     s32 i;
 
     for (i = 0; i < 12; i++) {
-        if (func_ov033_021783a8(save, i, gift) != NULL) {
+        if (PdwPostman_GetMysteryCard(save, i, gift) != NULL) {
             *slot = i;
             return gift;
         }
@@ -681,7 +685,7 @@ u8 func_ov033_02178428(MysteryGiftSave *save) {
     MysteryGift gift;
     MysteryGift *result;
 
-    result = func_ov033_021783f8(save, &slot, &gift);
+    result = PdwPostman_FindMysteryCard(save, &slot, &gift);
     if (result == NULL) {
         return 0;
     }

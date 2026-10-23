@@ -231,14 +231,14 @@ void DWCi_CloseMatching(void);
 void DWCi_DoCancelMatching(void);
 DWCMatchControl *DWCi_GetMatchCnt(void);
 void DWCi_SetMatchStatus(int state);
-BOOL func_ov011_02167fd0(void);
+BOOL DWCi_IsServerChangeEnabled(void);
 void DWCi_InitNodeInfoList(void);
 BOOL DWCi_DeleteNodeInfoByAID(int index);
 DWCNodeInfo *DWCi_GetServerNodeInfo(void);
 DWCNodeInfo *DWCi_GetNodeInfoByProfileID(int id);
 DWCNodeInfo *DWCi_GetNodeInfoByAID(u8 index);
-BOOL func_ov011_02168468(void);
-BOOL func_ov011_021686a0(void);
+BOOL DWCi_StopMeshMaking(void);
+BOOL DWCi_IsFullMesh(void);
 void DWCi_NNFreeNegotiateList(void);
 
 #endif

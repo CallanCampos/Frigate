@@ -100,7 +100,7 @@ void FesGimmick_BindPlayer(FesGimmick *fes, FieldEffects *effects, FieldPlayer *
 
 void func_ov036_021b65d4(FesGimmick *fes) {
     if (fes->sparkles != NULL) {
-        func_ov036_021a3a70(fes->sparkles);
+        FieldEffects_DeleteObject(fes->sparkles);
         fes->sparkles = NULL;
     }
 }

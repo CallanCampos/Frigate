@@ -68,7 +68,7 @@ typedef struct {
     s16 maxZ;
 } EffectEncountArea;
 
-void func_ov036_021a2364(EncountSystem *system);
+void EffectEncount_ConsumeSpot(EncountSystem *system);
 static void EffectEncount_SuspendSpot(EncountSystem *system);
 static void EffectEncount_ResumeSpot(EncountSystem *system, EffectEncountState *state);
 static BOOL EffectEncount_UpdateStepCounter(EncountState *encountState, EffectEncountState *state);
@@ -130,16 +130,16 @@ void EffectEncountState_Free(EffectEncountState *state) {
 
 void PrepareFieldEncountSystem(EncountSystem *system, EffectEncountState *state) {
     state->fieldEffects = Field_GetFieldEffects(system->field);
-    func_ov036_021a203c(system, state);
+    EffectEncount_LoadSetting(system, state);
     EffectEncount_ResumeSpot(system, state);
 }
 
-void func_ov036_021a202c(EncountSystem *system, EffectEncountState *state) {
+void EffectEncount_Exit(EncountSystem *system, EffectEncountState *state) {
     EffectEncount_SuspendSpot(system);
     EffectEncount_FreeSpotEffect(state);
 }
 
-void func_ov036_021a203c(EncountSystem *system, EffectEncountState *state) {
+void EffectEncount_LoadSetting(EncountSystem *system, EffectEncountState *state) {
     u8 setting = system->encData->flags;
 
     if (setting > 2) {
@@ -281,18 +281,18 @@ GameEvent *CreateRandomPhenomenonEvent(EncountSystem *system) {
         FieldPlayer *player;
 
         if (spot->kind == 5 || spot->kind == 6) {
-            func_ov036_021a23c4(system, 1);
+            EffectEncount_SetEffectFlag(system, 1);
         }
         spot->triggered = 1;
         player = Field_GetPlayer(system->field);
-        if (func_ov036_0219ac8c(player)) {
-            func_ov036_0219acac(player);
+        if (FieldPlayer_IsGridHopping(player)) {
+            FieldPlayer_FinishGridHop(player);
         }
     }
     return event;
 }
 
-BOOL func_ov036_021a22f4(EncountSystem *system, u16 *distance) {
+BOOL EffectEncount_GetSpotDistance(EncountSystem *system, u16 *distance) {
     RareEncountSpot *spot = &GameData_GetEncountState(system->gameData)->rareSpot;
     GridPos pos;
     s16 dx;
@@ -319,36 +319,36 @@ BOOL func_ov036_021a22f4(EncountSystem *system, u16 *distance) {
     return TRUE;
 }
 
-void func_ov036_021a2364(EncountSystem *system) {
+void EffectEncount_ConsumeSpot(EncountSystem *system) {
     RareEncountSpot *spot = &GameData_GetEncountState(system->gameData)->rareSpot;
 
     if (spot->active) {
         spot->triggered = 1;
         if (system->effectEncountState->effect != NULL) {
-            func_ov036_021a5498(system->effectEncountState->effect, 1);
+            EncountTask_SetPaused(system->effectEncountState->effect, 1);
         }
     }
 }
 
-void func_ov036_021a2398(EncountSystem *system, u32 a1) {
+void EffectEncount_SetEffectPaused(EncountSystem *system, u32 a1) {
     EncountState *encountState = GameData_GetEncountState(system->gameData);
     EffectEncountState *state = system->effectEncountState;
 
     if (encountState->rareSpot.active && state->effect != NULL) {
-        func_ov036_021a5498(state->effect, a1);
+        EncountTask_SetPaused(state->effect, a1);
     }
 }
 
-void func_ov036_021a23c4(EncountSystem *system, u32 a1) {
+void EffectEncount_SetEffectFlag(EncountSystem *system, u32 a1) {
     EncountState *encountState = GameData_GetEncountState(system->gameData);
     EffectEncountState *state = system->effectEncountState;
 
     if (encountState->rareSpot.active && state->effect != NULL) {
-        func_ov036_021a54a8(state->effect, a1);
+        EncountTask_SetDrawHidden(state->effect, a1);
     }
 }
 
-u16 func_ov036_021a23f0(EncountSystem *system) {
+u16 EffectEncount_GetItemId(EncountSystem *system) {
     return system->effectEncountState->itemId;
 }
 
@@ -461,7 +461,7 @@ static void positionShakingSpot(EncountSystem *system, EffectEncountState *state
             u32 kind;
 
             func_ov036_02185230(mapper, chunk, &pos, &terrain);
-            kind = func_ov036_021a2e18(terrain.tileType);
+            kind = MapTile_GetEncounterEffectKind(terrain.tileType);
             if (kindMask & sPhenomenonKindMasks[kind]) {
                 state->candidates.entries[state->candidates.count].kind = kind;
                 state->candidates.entries[state->candidates.count].x = x;
@@ -552,7 +552,7 @@ static void EncountSystem_CancelPhenomenonCore(EncountSystem *system, EffectEnco
 
 static void EffectEncount_CreateSpotEffect(EncountSystem *system, EffectEncountState *state, RareEncountSpot *spot) {
     if (state->effect == NULL) {
-        state->effect = func_ov036_021a53f8(system, state->fieldEffects, spot->x, spot->z, spot->height, spot->kind);
+        state->effect = EncountTask_Start(system, state->fieldEffects, spot->x, spot->z, spot->height, spot->kind);
         if (state->effect == NULL) {
             MI_CpuFill8(spot, 0, sizeof(RareEncountSpot));
         }
@@ -561,7 +561,7 @@ static void EffectEncount_CreateSpotEffect(EncountSystem *system, EffectEncountS
 
 static void EffectEncount_FreeSpotEffect(EffectEncountState *state) {
     if (state->effect != NULL) {
-        func_ov036_021a3a70(state->effect);
+        FieldEffects_DeleteObject(state->effect);
         state->effect = NULL;
     }
 }

@@ -1588,7 +1588,7 @@ static void BtlvGauge_FlashTask(TCB *tcb, void *data) {
 }
 
 static void BtlvGauge_PauseBgm(BOOL paused) {
-    if (func_02011844() != TRUE) {
+    if (GflNet_IsWifiGameKind() != TRUE) {
         GFL_SndBGMSetPaused(paused);
     }
 }

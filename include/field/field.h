@@ -24,11 +24,11 @@ u32 FieldPlayer_GetSex(FieldPlayer *player);
 void FieldPlayer_GetWPos(FieldPlayer *player, VecFx32 *pos);
 u16 FieldPlayer_GetFaceDir(FieldPlayer *player);
 // The unit vector of the direction on the grid, and the rail position a step in the direction on rails
-void func_ov036_0219aab0(FieldPlayer *player, u16 dir, VecFx32 *vec);
+void FieldPlayer_GetMoveOffsetInDir(FieldPlayer *player, u16 dir, VecFx32 *vec);
 // Whether the player is on a catwalk, and takes them off it
-BOOL func_ov036_0219ac8c(FieldPlayer *player);
-void func_ov036_0219acac(FieldPlayer *player);
-void func_ov036_0219ad30(FieldPlayer *player, u16 dir, RailPosition *pos);
+BOOL FieldPlayer_IsGridHopping(FieldPlayer *player);
+void FieldPlayer_FinishGridHop(FieldPlayer *player);
+void FieldPlayer_GetNogridLocationByDir(FieldPlayer *player, u16 dir, RailPosition *pos);
 // The player's object code for a sex, in a form or an extra state
 u16 FieldPlayer_GetObjCodeByForme(u32 sex, u32 forme);
 u16 FieldPlayer_GetObjCodeByExState(u32 sex, u32 exState);
@@ -65,18 +65,19 @@ u32 TrainerCard_CountStars(GameData *gameData);
 // The grid position in front of the player, facing dir
 void GetPlayerGPosPlusDir(FieldPlayer *player, u16 dir, s16 *x, s16 *y, s16 *z);
 GameEvent *JoinAvenueNameEntry_Create(u16 target, GameSystem *gsys, u16 *result, u16 useCurrent);
-// Check the party and the Battle Box against a regulation. func_ov036_021aebf0 returns the event that lets the player
-// choose between them, or NULL when neither can enter
-GameEvent *func_ov036_021aebf0(GameSystem *gsys, u32 a1, Regulation *regulation, u16 *result, HeapID heapId);
+// Check the party and the Battle Box against a regulation. Regulation_CreatePartyCheckTask returns the event that lets
+// the player choose between them, or NULL when neither can enter
+GameEvent *Regulation_CreatePartyCheckTask(GameSystem *gsys, u32 a1, Regulation *regulation, u16 *result,
+                                           HeapID heapId);
 u32 func_ov036_021aece0(GameSystem *gsys, u32 a1, Regulation *regulation, HeapID heapId);
 // The screen that picks the party or the Battle Box for a battle, whether it is done, and the choice
-PartySelectList *func_ov036_021c3180(Field *field, PokeParty *party, PokeParty *battleBoxParty, u8 partyOk,
-                                     u32 battleBoxOk, HeapID heapId);
-BOOL func_ov036_021c3278(PartySelectList *select);
-int func_ov036_021c3218(PartySelectList *select, u32 *a1);
-FieldEffectTask *func_ov036_021c6574(FieldEffects *effects, u32 a1, const VecFx32 *pos);
-void func_ov036_021c65a8(FieldEffectTask *task, u16 a1);
-void func_ov036_021c65e8(FieldEffectTask *task, u16 a1);
+PartySelectList *PartySelectList_Create(Field *field, PokeParty *party, PokeParty *battleBoxParty, u8 partyOk,
+                                        u32 battleBoxOk, HeapID heapId);
+BOOL PartySelectList_Main(PartySelectList *select);
+int PartySelectList_Delete(PartySelectList *select, u32 *a1);
+FieldEffectTask *FldeffBtrain_Start(FieldEffects *effects, u32 a1, const VecFx32 *pos);
+void FldeffBtrain_SetAnime(FieldEffectTask *task, u16 a1);
+void FldeffBtrain_SetHidden(FieldEffectTask *task, u16 a1);
 void FieldPlayer_SetWPos(FieldPlayer *player, const VecFx32 *pos);
 void FieldPlayer_SetDirection(FieldPlayer *player, u16 dir);
 void FieldFadeTCB_Start(GameSystem *gsys, Field *field, u32 a2, u32 a3, u32 a4);
@@ -89,17 +90,17 @@ BOOL Field_CheckGimmickWorkPassword(Field *field, u32 password);
 void Field_DeleteGimmickWorkBlock(Field *field, u32 id);
 
 // A list of areas of the map, which the list's entry index sets: a grid rectangle, a value and flags
-HeightExList *func_ov036_021ba5d0(u32 count, u8 heapId);
-void func_ov036_021ba624(u8 index, u32 x, u32 z, u32 width, u32 depth, u32 value, u32 flags, HeightExList *list);
+HeightExList *HeightEx_CreateTable(u32 count, u8 heapId);
+void HeightEx_SetArea(u8 index, u32 x, u32 z, u32 width, u32 depth, u32 value, u32 flags, HeightExList *list);
 void func_ov036_021ba670(HeightExList *list);
-u32 func_ov036_021ba684(HeightExList *list);
-BOOL func_ov036_021ba688(s32 x, s32 z, HeightExList *list, u8 index);
-u32 func_ov036_021ba6a4(u8 index, HeightExList *list);
-u32 func_ov036_021ba6b0(u8 index, HeightExList *list);
-// Sets whether the entry at index is in use, which func_ov036_021ba624 checks before it fills one in
+u32 HeightEx_GetAreaCount(HeightExList *list);
+BOOL HeightEx_IsPointInAreaAt(s32 x, s32 z, HeightExList *list, u8 index);
+u32 HeightEx_GetAreaHeight(u8 index, HeightExList *list);
+u32 HeightEx_GetAreaAttr(u8 index, HeightExList *list);
+// Sets whether the entry at index is in use, which HeightEx_SetArea checks before it fills one in
 void func_ov036_021ba6bc(u8 index, BOOL inUse, HeightExList *list);
 // Overlay 36's field_fade.c: whether a grid position is in the rectangle of an entry of the list
-BOOL func_ov036_021ba594(s32 x, s32 z, const HeightExEntry *entry);
+BOOL HeightEx_IsPointInArea(s32 x, s32 z, const HeightExEntry *entry);
 // The mapper's WFBC work
 FieldWFBC *func_ov036_0218adac(HeapID heapId);
 void func_ov036_0218add0(FieldWFBC *wfbc);
@@ -133,8 +134,8 @@ u32 GetZoneFogIndexAll(Field *field, u16 zoneId);
 void ShutdownFollowWork(GameData *gameData);
 void EvTime_Update(GameData *gameData);
 void FestMission_OnZoneEnter(GameSystem *gsys, u16 zoneId);
-void func_ov036_0219ad24(FieldPlayer *player, RailPosition *pos);
-void func_ov036_021a2398(EncountSystem *encount, u32 a1);
+void FieldPlayer_GetNogridNextRailLocation(FieldPlayer *player, RailPosition *pos);
+void EffectEncount_SetEffectPaused(EncountSystem *encount, u32 a1);
 
 // One of N's Pokémon, which createNPkm makes
 typedef struct {
@@ -171,7 +172,7 @@ const FieldmapCtrlVTable *GetZoneFieldmapCtrlVTable(u16 zoneId);
 u32 GetFieldmapZoneHeapSize(u16 zoneId);
 PlaceName *FieldPlaceName_Create(GameSystem *gsys, HeapID heapId, FieldMsgBG *msgBGSys);
 void FieldPlaceName_Free(PlaceName *placeName);
-void func_ov036_021b4ff8(PlaceName *placeName);
+void PlaceName_Main(PlaceName *placeName);
 void func_ov036_021b5064(PlaceName *placeName);
 void Field_InitGimmick(Field *field);
 void Field_TerminateGimmick(Field *field);
@@ -216,8 +217,8 @@ void FieldCameraBoundary_ChangeZone(Field *field, u32 zoneId, HeapID heapId);
 void Field_LoadWFBC(GameData *gameData, Field *field, u32 zoneId);
 void Field_LoadJoinAvenue(GameData *gameData, Field *field, u32 zoneId);
 void Field_LoadSceneArea(Field *field, u32 zoneId);
-u32 func_ov036_02180f80(GameCommSys *comm);
-BOOL func_ov036_02180fc0(GameCommSys *comm);
+u32 Field_GetCommKind(GameCommSys *comm);
+BOOL Field_CheckCommExit(GameCommSys *comm);
 
 void FieldRenderPhase1_Fieldmap(Field *field);
 void FieldRenderPhase2_Fieldmap(Field *field);

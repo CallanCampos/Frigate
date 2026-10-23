@@ -500,7 +500,7 @@ int GFL_NetGetFriendData(void) {
     return 0;
 }
 
-u8 func_02042d80(void) {
+u8 GflNet_GetFriendListNum(void) {
     GFLNetSys *pNet = GFL_NetGetSys();
 
     return pNet->aNetInit.unk62;
@@ -555,7 +555,7 @@ void GFL_NetNotifyChildConnect(void) {
     }
 }
 
-void func_02042e30(int a0) {
+void GflNet_CallErrorStateFunc(int a0) {
     GFLNetSys *pNet = GFL_NetGetSys();
 
     if (pNet->aNetInit.unk28 != NULL) {
@@ -582,8 +582,8 @@ GFLNetInitData *GFL_NetGetInitData(void) {
     return NULL;
 }
 
-void func_02042e94(u8 a0) {
-    func_02042410(a0);
+void GflNet_SetAutoExit(u8 a0) {
+    NetState_SetAutoExit(a0);
 }
 
 void GFL_NetSetDisconnectError(BOOL a0) {

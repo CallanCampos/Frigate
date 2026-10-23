@@ -332,7 +332,7 @@ static void Passerby_Init(CasteliaRushPasserby *passerby, MMSys *actorSys, u16 z
     passerby->dir = 0;
     passerby->walkAcmd = CasteliaRushConfig_GetWalkAcmd(config);
     SetActorHidden(passerby->actor, TRUE);
-    func_ov012_021677bc(passerby->actor, TRUE);
+    FldAct_SetMoveBitAttrEffectOff(passerby->actor, TRUE);
 
     {
         VecFx32 offset = { 0, 0, 0 };
@@ -371,7 +371,7 @@ static void Passerby_Start(CasteliaRushPasserby *passerby, MMSys *actorSys, Fiel
     passerby->steps = steps;
     passerby->dodging = FALSE;
     passerby->dodgeDir = 0;
-    func_ov012_021677bc(passerby->actor, TRUE);
+    FldAct_SetMoveBitAttrEffectOff(passerby->actor, TRUE);
     passerby->lane = lane;
     sPasserbyStartFuncs[type](passerby);
 }
@@ -758,14 +758,15 @@ static void CasteliaRushBalloon_Show(CasteliaRushBalloon *balloon, FieldMsgBG *m
 
     balloon->active = TRUE;
     balloon->timer = 0;
-    func_ov036_02188d6c(msgBGSys, msgData, msgBase + rand % msgCount, balloon->index, balloon->x, balloon->y, 8, 2);
+    MsgBGPrinter_AddSubMsgWinMsg(msgBGSys, msgData, msgBase + rand % msgCount, balloon->index, balloon->x, balloon->y,
+                                 8, 2);
 }
 
 static void CasteliaRushBalloon_Update(CasteliaRushBalloon *balloon, FieldMsgBG *msgBGSys) {
     if (balloon->active) {
         balloon->timer++;
         if (balloon->timer >= BALLOON_FRAMES) {
-            func_ov036_02188e90(msgBGSys, balloon->index);
+            MsgBGPrinter_DeleteSubMsgWin(msgBGSys, balloon->index);
             CasteliaRushBalloon_Reset(balloon);
         }
     }
@@ -778,7 +779,7 @@ static void CasteliaRushBalloon_Reset(CasteliaRushBalloon *balloon) {
 
 static void CasteliaRushBalloon_Hide(CasteliaRushBalloon *balloon, FieldMsgBG *msgBGSys) {
     if (balloon->active) {
-        func_ov036_02188e90(msgBGSys, balloon->index);
+        MsgBGPrinter_DeleteSubMsgWin(msgBGSys, balloon->index);
         CasteliaRushBalloon_Reset(balloon);
     }
 }
