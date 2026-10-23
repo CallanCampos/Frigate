@@ -2507,7 +2507,7 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `namein.c` | `0x021d96e0`–`0x021dd28c` | 111 | partial | descriptive |
+| `namein.c` | `0x021d96e0`–`0x021dd28c` | 111 | complete | descriptive |
 | `namein_graphic.c` | `0x021dd28c`–`0x021dd4c8` | 14 | complete | string at `0x021ddb84` |
 | `namein_data.c` | `0x021dd4c8`–`0x021dd8e4` | 23 | complete | string at `0x021ddb98` |
 

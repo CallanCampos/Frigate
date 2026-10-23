@@ -3943,10 +3943,11 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   section comes before small initializers; check the object's section order, not only its symbol table.
 - A global nothing refers to that the ROM has after the shared section, where ours sorts it first, needs an object
   of its size or less in the shared section that the sort puts first, and the globals' declaration order decides
-  that tie: overlay 280's `namein.c` puts `NAME_ENTRY_SOUND_COUNT` where the ROM has it only declared right after
-  the array it counts, above the tables. When the function-local statics are all one size and every table is at
-  file scope, though, the layout fixes only their order in MWCC's list, not which functions own them: a fit with
-  placeholder statics proves nothing without the code using the values.
+  that tie: overlay 280's `namein.c` declares `NAME_ENTRY_SOUND_COUNT` after the other exports, below the tables,
+  and its eight leading words are `const` locals of the functions that use them: `NameBox_Update`'s left and top
+  edge of the name, `Keyboard_Init`'s first key of the cursor, and `Keyboard_UpdateSlide`'s frame count and three
+  BGs. When the function-local statics are all one size, though, the layout fixes only their order in MWCC's list,
+  not which functions own them: a fit with placeholder statics proves nothing without the code using the values.
 - A small table that sits among a file's other small `static const` tables but that no code loads from was a
   referenced static whose reads were folded: an unreferenced `static const` is dropped, and a global gets a section
   of its own after the packed one. `pleasure_boat_rooms.c`'s `sTrainerCounts` holds the weekday `switch`'s seven
@@ -4111,7 +4112,7 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   (each group: the function's statics in declaration order, then the file-scope scalars it first uses, in use
   order). Arrays and structs, a function-local `static const` array included, are listed where they are defined,
   and so is a function-local `static` that isn't `const`: overlay 280's `sKeyBlinkStep` (`.data`), moved into
-  `KeyHighlight_Update`, gives the same `.rodata` as at file scope, with the `const` scalars in a later function.
+  `KeyHighlight_Update`, gives the same `.rodata` as at file scope.
   Overlay 208's `dup_fitting.c` gets the ROM's `.rodata` with its three `BOOL`s passed by address as function-local
   `static const BOOL` and its `{227, 128}` as two `static const u16` scalars of the functions that compare with them;
   as one array no order of its 13 file-scope objects works. About 120 orders of those objects then fit, so the
