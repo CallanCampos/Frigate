@@ -4,13 +4,12 @@
 #include "types.h"
 #include "gfl/heap.h"
 #include "nitro/rtc.h"
+#include "save/save_control.h"
 #include "struct_decls.h"
 #include "system/pms_data.h"
 
-// The Battle Subway's save blocks: 0x38 the current play, 0x39 the scores, which include the Battle Points, and 0x3a
-#define SAVE_BLOCK_BSUBWAY_PLAY 0x38
-#define SAVE_BLOCK_BSUBWAY_SCORE 0x39
-#define SAVE_BLOCK_BSUBWAY_3A 0x3a
+// The Battle Subway's save blocks (save_control.h's SAVE_BLOCK_BSUBWAY_*): the current play, the scores, which
+// include the Battle Points, and block 0x3a
 
 #define BSUBWAY_WIFI_RANK_MAX 10
 #define BSUBWAY_WIFI_ROOM_MAX 200

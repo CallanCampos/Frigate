@@ -3,6 +3,7 @@
 
 #include "types.h"
 #include "gfl/heap.h"
+#include "save/save_control.h"
 #include "struct_decls.h"
 
 // A mystery gift card, 0xcc bytes
@@ -75,9 +76,6 @@ typedef struct {
     // The date the gift was made, as year << 16 | month << 8 | day
     s32 date;
 } MysteryGiftPokemon;
-
-// The save's block of mystery gifts, which mgEncryptData encrypts
-#define SAVE_BLOCK_MYSTERY_GIFT 0x22
 
 #define MG_CARD_MAX 12
 #define MG_CARD_MAX_OUTSIDE 3
