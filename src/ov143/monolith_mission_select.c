@@ -456,7 +456,7 @@ static BOOL MonolithMission_Main(GameProc *proc, u32 *state, void *param, void *
     u32 pressed;
     int hit;
     BOOL yes;
-    FestMission mission;
+    FestMissionConfig mission;
     u16 picked;
     s16 level;
     u8 bootState;
@@ -856,7 +856,7 @@ static void MonolithMission_FreeList(MonolithMissionWork *mfw) {
 static BOOL MonolithMission_DrawList(MonolithMissionWork *mfw, MonolithWork *wk, int count) {
     int drawn = 0;
     StrBuf *str = GFL_StrBufCreate(37, HEAPID_MONOLITH);
-    FestMission mission;
+    FestMissionConfig mission;
     int i;
 
     for (i = mfw->drawnCount; i < mfw->count; i++) {
@@ -880,7 +880,7 @@ static BOOL MonolithMission_DrawList(MonolithMissionWork *mfw, MonolithWork *wk,
 // Draws the cursor's row again, with its mission at a level
 static void MonolithMission_RedrawRow(MonolithMissionWork *mfw, MonolithWork *wk, int level) {
     StrBuf *str;
-    FestMission mission;
+    FestMissionConfig mission;
 
     GFL_BitmapFill(mfw->listBitmaps[mfw->cursor], 0);
     str = GFL_StrBufCreate(37, HEAPID_MONOLITH);
@@ -1616,7 +1616,7 @@ static void MonolithMission_InitIcons(MonolithMissionWork *mfw, BOOL skip) {
 static void MonolithMission_ShowStartMessage(MonolithScreenParam *screen, MonolithMissionWork *mfw) {
     int level = mfw->level;
     StrBuf *str;
-    FestMission mission;
+    FestMissionConfig mission;
 
     if (mfw->flags & MONOLITH_MISSION_FLAG_CHEAT) {
         level = MONOLITH_MISSION_LEVEL_CHEAT;

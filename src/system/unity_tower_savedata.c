@@ -199,11 +199,11 @@ void UnityTower_SetVisitorParam(UnityTowerSurveySave *save, int index, u32 param
     }
 }
 
-void *UnityTower_GetVisitor(UnityTowerSurveySave *save, int index) {
+PlayerInfo *UnityTower_GetVisitor(UnityTowerSurveySave *save, int index) {
     if (index >= UNITY_TOWER_VISITOR_MAX) {
         return NULL;
     }
-    return &save->visitors[index];
+    return &save->visitors[index].info;
 }
 
 UnityTowerVisitor *UnityTower_GetVisitors(UnityTowerSurveySave *save) {

@@ -37,7 +37,7 @@ typedef struct {
     BOOL nationalObtained;
     WordSet *wordSet;
     u32 unk718;
-    void *habitatSave;
+    ZukanHabitatSave *habitatSave;
     // 9 for a button whose animation the next state does not wait for, else 8
     u32 stateParam;
     // What the list returned this frame

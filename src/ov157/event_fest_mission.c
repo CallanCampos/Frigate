@@ -61,9 +61,7 @@ typedef struct {
     PassPowerData *passPowerData;
     u32 unk40;
     LinkFestival *festival;
-    // Copied from a FestMissionConfig, the same 0x2c bytes: FestMissionConfig and FestMission are two layouts of one
-    // struct, so the copies cast until they are merged
-    FestMission mission;
+    FestMissionConfig mission;
     FestivalText *festText;
     u8 unk78[0x14];
     // 0 or 1, which picks message 3 or 4 when the mission ends
@@ -103,7 +101,7 @@ GameEvent *EventFestMissionStart_Create(GameSystem *gsys, void *args) {
     FestMissionEventWork *work = GameEvent_GetData(event);
 
     FestMissionEvent_Init(work, gsys, field);
-    work->mission = *(FestMission *)&eventArgs->config;
+    work->mission = eventArgs->config;
     work->joined = eventArgs->joined;
     return event;
 }
@@ -115,7 +113,7 @@ GameEvent *EventFestMissionMessage_Create(GameSystem *gsys, void *args) {
     FestMissionEventWork *work = GameEvent_GetData(event);
 
     FestMissionEvent_Init(work, gsys, field);
-    work->mission = *(FestMission *)&eventArgs->config;
+    work->mission = eventArgs->config;
     work->messageType = eventArgs->messageType;
     FestMissionOffers_Remove(work->festival, &eventArgs->config);
     return event;
@@ -135,7 +133,7 @@ GameEvent *EventFestMissionInfo_Create(GameSystem *gsys, void *args) {
     FestMissionEventWork *work = GameEvent_GetData(event);
 
     FestMissionEvent_Init(work, gsys, field);
-    work->mission = *(FestMission *)&eventArgs->config;
+    work->mission = eventArgs->config;
     return event;
 }
 
@@ -249,8 +247,8 @@ static GameEventReturnCode EventFestMissionStart_Callback(GameEvent *event, u32 
         if (work->joined) {
             joinedCount = FestRecords_AddJoined(records);
             LinkFestival_StartMission(work->festival, &work->mission, work->joined);
-            work->mission = *(FestMission *)GetFestMissionCfg(work->festival);
-            FestMissionOffers_Remove(work->festival, (FestMissionConfig *)&work->mission);
+            work->mission = *GetFestMissionCfg(work->festival);
+            FestMissionOffers_Remove(work->festival, &work->mission);
             if (joinedCount >= 1) {
                 MedalBox_GiveMedal(medalBox, MEDAL_MISSION_JOIN_1);
                 if (joinedCount >= 10) {
@@ -337,7 +335,7 @@ static GameEventReturnCode EventFestMissionMessage_Callback(GameEvent *event, u3
         (*state)++;
         break;
     case 1:
-        FestMissionOffers_Remove(work->festival, (FestMissionConfig *)&work->mission);
+        FestMissionOffers_Remove(work->festival, &work->mission);
         LinkFestival_AddRecord(work->festival, &work->mission);
         FestMissionEvent_Exit(work);
         return GAMEEVENT_DONE;
@@ -451,7 +449,7 @@ static void FestMission_PrintLine(FestMissionEventWork *work, StrBuf *format, u1
 
 // Prints the mission's name and description, the time it has left, how many it wants and its kind
 static void FestMission_Print(FestMissionEventWork *work) {
-    s32 seconds = FestMissionConfig_GetSecondsLeft((FestMissionConfig *)&work->mission);
+    s32 seconds = FestMissionConfig_GetSecondsLeft(&work->mission);
     s32 minutes;
 
     GFL_MsgDataLoadStrbuf(work->msgData, EventFestMission_Text_Empty, work->strbuf);
@@ -463,14 +461,14 @@ static void FestMission_Print(FestMissionEventWork *work) {
     minutes = seconds / 60;
     WordSetNumber(work->wordSet, 2, minutes, 4, NUM_PAD_NONE, TRUE);
     WordSetNumber(work->wordSet, 3, seconds % 60, 2, NUM_PAD_NONE, TRUE);
-    WordSetNumber(work->wordSet, 4, work->mission.count, 4, NUM_PAD_NONE, TRUE);
+    WordSetNumber(work->wordSet, 4, work->mission.info.count, 4, NUM_PAD_NONE, TRUE);
     if (minutes == 0) {
         GFL_MsgDataLoadStrbuf(work->msgData, EventFestMission_Text_TimeRemainingSec, work->strbuf);
     } else {
         GFL_MsgDataLoadStrbuf(work->msgData, EventFestMission_Text_TimeRemainingMinSec, work->strbuf);
     }
     FestMission_PrintLine(work, work->strbuf, 8, 7);
-    GFL_MsgDataLoadStrbuf(work->msgData, work->mission.unk10_6 + 13, work->strbuf);
+    GFL_MsgDataLoadStrbuf(work->msgData, work->mission.info.unk10_6 + 13, work->strbuf);
     FestMission_PrintLine(work, work->strbuf, 8, 8);
 }
 

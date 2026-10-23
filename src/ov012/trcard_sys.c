@@ -272,7 +272,7 @@ static u32 TrainerCardSys_SeqGreeting(TrainerCardSysWork *wk) {
 }
 
 static u32 TrainerCardSys_SeqGreetingWait(TrainerCardSysWork *wk) {
-    void *cgear;
+    CGearSave *cgear;
 
     if (!TrainerCardSys_UpdateProcMgr(&wk->procMgr)) {
         return TRCARD_SEQ_GREETING_WAIT;
@@ -416,12 +416,12 @@ void TrainerCardData_Fill(TrainerCardData *data, GameData *gameData, BOOL isSnap
     RTCTime time;
     u8 passPowerFlags[2];
     SaveControl *save = GameData_GetSaveControl(gameData);
-    void *timeSig = getTimeSigBlkAddress(save);
+    TimeSigSave *timeSig = getTimeSigBlkAddress(save);
     PlayerInfo *playerInfo = GetGameDataPlayerInfo(gameData);
     TrainerCardSave *card = getTrainerCardDataBlkAddress(gameData);
     AdventureTime *adventureTime = getSaveAdventureTimeBlock(save);
     GameRecords *records = getTrainerCardInfoBlkAddress(save);
-    void *cgear = CGearPhrases_GetBlock(save);
+    CGearSave *cgear = CGearPhrases_GetBlock(save);
     PokeDexSave *pokedex = GameData_GetPokedex(gameData);
     HighLinkSave *highLink;
     PassPowerData *passPowerData;

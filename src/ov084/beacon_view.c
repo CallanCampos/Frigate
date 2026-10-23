@@ -448,7 +448,7 @@ static BOOL BeaconView_CheckMission(BeaconViewWork *work) {
         return FALSE;
     }
     GFL_WordSetSetStrbuf(work->wordSet, 0, work->strTemplate, 0, 1, 2);
-    FestMission_GetMessage(work->festText, work->strTemplate, (const FestMission *)&config, work->tmpHeapId);
+    FestMission_GetMessage(work->festText, work->strTemplate, &config, work->tmpHeapId);
     GFL_WordSetSetStrbuf(work->wordSet, 1, work->strTemplate, 0, 1, 2);
     BeaconView_OfferMission(work, &config, &work->pending);
     return TRUE;

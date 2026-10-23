@@ -38,7 +38,7 @@ LinkFestival *CreateLinkFestival(HeapID heapId, GameSystem *gsys) {
     festival->archive = GFL_ArcSysCreateFileHandle(0x121, heapId);
     festival->headers = FestMissionData_LoadHeaders(festival->archive, heapId);
     ClearFesMissionCfg(&festival->config);
-    festival->info = (FestMissionInfo *)&festival->config;
+    festival->info = &festival->config.info;
     festival->missionHeader = &festival->config.header;
     festival->best = LinkFestivalBest_Create(heapId);
     ClearLinkFestivalData(festival);
@@ -76,7 +76,7 @@ u32 getStatusOfFesMission(LinkFestival *festival) {
     return isFesMissionAvailable(&festival->config);
 }
 
-void *GetFestMissionCfg(LinkFestival *festival) {
+FestMissionConfig *GetFestMissionCfg(LinkFestival *festival) {
     return &festival->config;
 }
 
@@ -166,7 +166,7 @@ void FetchFestMissionCfgGimmickID(LinkFestival *festival, u8 index, FestMissionH
     *header = headers[index];
 }
 
-void LinkFestival_StartMission(LinkFestival *festival, void *mission, u8 joined) {
+void LinkFestival_StartMission(LinkFestival *festival, const FestMissionConfig *mission, u8 joined) {
     ClearLinkFestivalData(festival);
     FestMissionConfig_Start(&festival->config, mission, joined);
     LinkFestival_SetState(festival, 1);
@@ -332,7 +332,7 @@ void LinkFestival_AddRecord(LinkFestival *festival, void *mission) {
 }
 
 BOOL LinkFestival_ShouldSkipOffer(LinkFestival *festival, FestMissionConfig *config) {
-    FestMissionInfo *info = (FestMissionInfo *)config;
+    FestMissionInfo *info = &config->info;
 
     if (info->index == 0) {
         return TRUE;
@@ -410,7 +410,7 @@ void LinkFestivalBest_Free(LinkFestivalBest *best) {
 static void SetFesGimmickResidentEnable(FestMissionConfig *config, BOOL enable) {
     u32 overlayId;
 
-    switch (config->type) {
+    switch (config->header.kind) {
     case 4:
         overlayId = OVERLAY_ID(24);
         break;

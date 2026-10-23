@@ -51,12 +51,11 @@ u32 KeyInfo_GetCityKey(KeyInfoSave *keyInfo);
 u32 GetGameDifficulty(KeyInfoSave *keyInfo);
 // 1 or 2 if a key that opens a chamber is set
 u32 KeyInfo_GetChamberKey(KeyInfoSave *keyInfo);
-// Returns its argument, as the key information in data that ov331 reads
-KeyInfoSave *KeySystemData_GetKeyInfo(void *a0);
-// The Memory Link's data, at 0x38 in the same data
-void *KeySystemData_GetMemoryLink(KeySystemData *a0);
+// The key information and the Memory Link's data in the key system's data that ov331 reads
+KeyInfoSave *KeySystemData_GetKeyInfo(KeySystemData *data);
+MemoryLinkSave *KeySystemData_GetMemoryLink(KeySystemData *data);
 // Clears the key system's data, and the copy of the key information into the save
-void KeySystemData_Init(void *a0);
+void KeySystemData_Init(KeySystemData *data);
 void KeyInfoSave_Copy(KeyInfoSave *dest, const KeyInfoSave *src);
 
 // The difficulties, which GetGameDifficulty returns

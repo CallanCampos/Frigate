@@ -58,7 +58,7 @@ struct FesGimmick {
     GameSystem *gsys;
     GameData *gameData;
     LinkFestival *festival;
-    FestMission *mission;
+    FestMissionConfig *mission;
     // Whether overlay 71, 72 or 73 is loaded for the mission, and which
     BOOL overlayLoaded;
     u32 overlayId;

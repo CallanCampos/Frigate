@@ -200,7 +200,7 @@ ClActor *ZukanCommon_CreateActor(ClActUnit *unit, const ZukanActorTemplate *temp
                           template->surface, heapId);
 }
 
-u32 ZukanCommon_LoadHabitatSpecies(PokeDexSave *pokedex, void *habitat, u16 **outList, HeapID heapId) {
+u32 ZukanCommon_LoadHabitatSpecies(PokeDexSave *pokedex, ZukanHabitatSave *habitat, u16 **outList, HeapID heapId) {
     u16 total;
     ZukanHabitatFile file;
     u16 zone;
@@ -235,7 +235,7 @@ u32 ZukanCommon_LoadHabitatSpecies(PokeDexSave *pokedex, void *habitat, u16 **ou
     return total;
 }
 
-void ZukanCommon_BuildHabitatList(void *habitat, ZukanHabitatListParam *param, BOOL current) {
+void ZukanCommon_BuildHabitatList(ZukanHabitatSave *habitat, ZukanHabitatListParam *param, BOOL current) {
     PokeDexSave *pokedex;
     ZukanHabitatConditions conditions;
     int habitatIndex;
@@ -317,7 +317,7 @@ void ZukanCommon_BuildHabitatList(void *habitat, ZukanHabitatListParam *param, B
     }
 }
 
-void ZukanCommon_BuildHabitatSummary(void *habitat, ZukanHabitatSummaryParam *param) {
+void ZukanCommon_BuildHabitatSummary(ZukanHabitatSave *habitat, ZukanHabitatSummaryParam *param) {
     ZukanHabitatConditions conditions;
     PokeDexSave *pokedex;
     EventWork *eventWork = GameData_GetEventWork(param->gameData);
@@ -326,7 +326,7 @@ void ZukanCommon_BuildHabitatSummary(void *habitat, ZukanHabitatSummaryParam *pa
     int index;
     int i;
     ZukanHabitatFile countFile;
-    void *habitatSave = SaveControl_GetZukanHabitatSave(GameData_GetSaveControl(param->gameData));
+    ZukanHabitatSave *habitatSave = SaveControl_GetZukanHabitatSave(GameData_GetSaveControl(param->gameData));
     ZukanHabitatFile file;
 
     pokedex = GameData_GetPokedex(param->gameData);

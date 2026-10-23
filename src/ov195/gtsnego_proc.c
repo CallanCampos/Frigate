@@ -643,11 +643,11 @@ static void GtsNego_StateStartExchange(GtsNegoWork *wk) {
         }
         if (NetHandle_CountNegotiated() == 2) {
             GtsNegoParam *param = wk->param;
-            void *phrases = CGearPhrases_GetBlock(wk->save);
+            CGearSave *cgear = CGearPhrases_GetBlock(wk->save);
 
             param->unk4[0].unk0 = wk->level;
             param->unk4[0].unk4 = wk->myKind;
-            CGearPhrases_Get(phrases, 0, &wk->send.phrase);
+            CGearPhrases_Get(cgear, 0, &wk->send.phrase);
             wk->send.tradeCount = PalPadFriendList_GetTradeCount(GameData_GetPalPadFriendList(wk->gameData));
             NetHandle_SendTimingPair(NetHandle_GetOwn(), 2, GTSNEGO_TIMING_NO);
             GtsNego_ChangeState(wk, GtsNego_StateSendRequest, 898);

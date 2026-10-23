@@ -787,7 +787,7 @@ static void ZukanDetailMap_Command(ZukanDetailProcSys *sys, int *seq, void *para
             ZukanDetailMap_SetState(param, wk, common, MAP_STATE_CLOSE_START);
             break;
         case ZUKAN_DETAIL_CMD_MAP_PLACE: {
-            void *habitatList =
+            ZukanHabitatSave *habitatList =
                 SaveControl_GetZukanHabitatSave(GameData_GetSaveControl(ZukanDetailCommon_GetGameData(common)));
 
             ZukanHabitatSave_SetZone(habitatList, TownMapData_GetParam(wk->townmap, wk->place, TOWNMAP_PARAM_ZONE));
@@ -1729,7 +1729,7 @@ static BOOL ZukanDetailMap_SetHabitatKind(ZukanDetailMapWork *wk, ZukanDetailCom
 
         if (kinds != 0 && ZukanDetailMap_IsPlaceListed(wk, common) == TRUE) {
             GameData *gameData = ZukanDetailCommon_GetGameData(common);
-            void *habitatList = SaveControl_GetZukanHabitatSave(GameData_GetSaveControl(gameData));
+            ZukanHabitatSave *habitatList = SaveControl_GetZukanHabitatSave(GameData_GetSaveControl(gameData));
             EventWork *eventWork = GameData_GetEventWork(gameData);
 
             if (kinds & HABITAT_LAND) {

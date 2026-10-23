@@ -331,7 +331,7 @@ static const G3DSceneResourceSetup sSceneResources[] = {
 static const G3DSceneSetup sScene = { sSceneResources, 6, sSceneActors, 2 };
 
 void ResortField_Setup(Field *field) {
-    void *block;
+    HollowRivalSave *block;
     GameData *gameData;
     ResortWork *unk;
     ResortFieldWork *work;

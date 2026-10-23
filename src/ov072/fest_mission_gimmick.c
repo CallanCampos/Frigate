@@ -63,7 +63,7 @@ void FesMissionGimmick_BoostPartyLevels(FesGimmick *gimmick, PokeParty *party) {
     int level;
     u32 species;
 
-    if (gimmick->mission->target == 6) {
+    if (gimmick->mission->info.target == 6) {
         count = PokeParty_GetPkmCount(party);
         bonus = LinkFestival_GetTotalScore(gimmick->festival);
         if (bonus > 30) {
@@ -87,12 +87,12 @@ void FesMissionGimmick_GetItemExchangeInfo(FesGimmick *gimmick, FieldActor *acto
                                            u16 *out1) {
     const FesMissionAnswers *answers;
 
-    if (gimmick->mission->target != 2) {
+    if (gimmick->mission->info.target != 2) {
         *out0 = 0x11;
         *out1 = 0x1a;
         return;
     }
-    answers = &FesMissionPeople_Answers[gimmick->mission->unk0_20];
+    answers = &FesMissionPeople_Answers[gimmick->mission->info.unk0_20];
     *out0 = answers->values[GetActorUserParam(actor, 0)][arg0];
     *out1 = answers->values[GetActorUserParam(actor, 1)][arg1];
 }
@@ -101,7 +101,7 @@ void FesMissionGimmick_GetItemSaleInfo(FesGimmick *gimmick, FieldActor *actor, u
     u8 onSale = FesMissionPeople_IsOnSale(gimmick->mission);
     int value;
 
-    if (gimmick->mission->target != 3) {
+    if (gimmick->mission->info.target != 3) {
         *item = 0x11;
         *price = 300;
         return;

@@ -701,7 +701,7 @@ static void GameBeacon_Init(GameBeacon *beacon, GameData *gameData) {
     PlayerInfo *player = GetGameDataPlayerInfo(gameData);
     SaveControl *save = GameData_GetSaveControl(gameData);
     TrainerGameInfoSave *info = getTrainerGameInfoAddress(save);
-    void *cgear = CGearPhrases_GetBlock(save);
+    CGearSave *cgear = CGearPhrases_GetBlock(save);
     OSOwnerInfo owner;
     PMSData cgearRecord;
     MedalBox *medalBox;

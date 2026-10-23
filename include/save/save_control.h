@@ -165,13 +165,13 @@ u16 TrainerGameInfo_GetSurveyRank(TrainerGameInfoSave *info);
 void TrainerGameInfo_SetSurveyRank(TrainerGameInfoSave *info, u32 value);
 // The name at the end of the C-Gear block, its init and its getter
 void CGearName_Init(u16 *name);
-void *CGearName_GetFromSave(SaveControl *save);
+u16 *CGearName_GetFromSave(SaveControl *save);
 const u16 *TrainerGameInfo_GetGreeting(TrainerGameInfoSave *info);
 void TrainerGameInfo_SetGreeting(TrainerGameInfoSave *info, StrBuf *name);
 const u16 *TrainerGameInfo_GetThanks(TrainerGameInfoSave *info);
 void TrainerGameInfo_SetThanks(TrainerGameInfoSave *info, StrBuf *name);
-void CGearName_Set(void *saveBlock, StrBuf *name);
-const u16 *CGearName_Get(void *saveBlock);
+void CGearName_Set(u16 *dest, StrBuf *name);
+const u16 *CGearName_Get(u16 *name);
 u16 TrainerGameInfo_GetSurveyQuestion(TrainerGameInfoSave *info);
 u16 TrainerGameInfo_GetSurveyAnswer(TrainerGameInfoSave *info, u8 index);
 // Adds to a survey question's count, up to 0xffff
@@ -247,7 +247,7 @@ void KeyDataSave_SetMoney(KeyDataSave *keyData, u32 value);
 // Save block 0x42, which keeps the rival's name
 RivalDataSave *getHollow_RivalData(SaveControl *save);
 // Save block 0x42, and setting a byte of it
-void *getHollow_RivalBlk(SaveControl *save);
+HollowRivalSave *getHollow_RivalBlk(SaveControl *save);
 void HollowRivalSave_SetMeetingToday(HollowRivalSave *rival, u32 value);
 // The rival's hollow data: a value of an index, a flag of an index, and the hollows visited
 void HollowRivalSave_SetValue(HollowRivalSave *block, u32 index, u16 value);

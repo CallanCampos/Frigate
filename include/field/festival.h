@@ -114,7 +114,7 @@ BOOL func_ov036_021b6690(FesGimmick *gimmick);
 GameEvent *func_ov036_021b6700(FesGimmick *gimmick, const VecFx32 *position);
 GameEvent *func_ov036_021b672c(FesGimmick *gimmick, const RailPosition *position);
 u32 LinkFestival_GetNormalChangeBGMID(LinkFestival *festival);
-void *GetFestMissionCfg(LinkFestival *festival);
+FestMissionConfig *GetFestMissionCfg(LinkFestival *festival);
 // Overlay 12's fest_mission_field.c: the zone a mission uses in place of a zone, a random state seeded for the
 // mission, a random number below max that the list doesn't have, and the mission's work on entering a zone
 u16 FestMission_GetMissionZone(u16 zoneId);
@@ -135,7 +135,7 @@ FestMissionLog *LinkFestival_GetViewLog(LinkFestival *festival);
 FestMissionPassPowers *LinkFestival_GetPassPowers(LinkFestival *festival);
 // Copies a mission's FestMissionHeader to dest
 void FetchFestMissionCfgGimmickID(LinkFestival *festival, u8 index, FestMissionHeader *dest);
-void LinkFestival_StartMission(LinkFestival *festival, void *mission, u8 joined);
+void LinkFestival_StartMission(LinkFestival *festival, const FestMissionConfig *mission, u8 joined);
 void LinkFestival_SetState(LinkFestival *festival, u32 state);
 int LinkFestival_GetState(LinkFestival *festival);
 u16 LinkFestival_GetShownTotal(LinkFestival *festival);

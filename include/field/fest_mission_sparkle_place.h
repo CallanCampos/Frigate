@@ -10,6 +10,6 @@
 
 // On entering a zone: picks the places of the mission's sparkles and what they give
 void FestSparklePlace_OnZoneEnter(RivalEntry *entry, GameSystem *gsys, LinkFestival *festival,
-                                  FestMissionConfig *config, u16 zoneId);
+                                  FestMissionConfig *mission, u16 zoneId);
 
 #endif // POKEBW2_FIELD_FEST_MISSION_SPARKLE_PLACE_H

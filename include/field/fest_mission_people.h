@@ -24,12 +24,12 @@ int GetZoneEncIDHighest3Bits(u16 zoneId);
 
 // On entering a zone: picks the places of the mission's people, then creates them
 void FesMissionPeople_OnZoneEnter(RivalEntry *entry, GameSystem *gsys, LinkFestival *festival,
-                                  FestMissionConfig *config, u16 zoneId);
+                                  FestMissionConfig *mission, u16 zoneId);
 // Reads the species the mission's quiz or people use from the festival's archive into the work
 void FesMissionPeople_LoadSpecies(FesGimmick *gimmick, FesMissionWork *work);
 // Overlay 25's mission functions: the object code of the people, whether the items are on sale, and a zone's entry
-u8 FesMissionPeople_IsOnSale(FestMission *mission);
-u16 FesMissionPeople_GetObjCode(FesMissionWork *work, FestMission *mission);
+u8 FesMissionPeople_IsOnSale(FestMissionConfig *mission);
+u16 FesMissionPeople_GetObjCode(FesMissionWork *work, FestMissionConfig *mission);
 FesMissionZone *FesMissionPeople_GetZone(FesMissionWork *work, u16 zoneId);
 
 #endif // POKEBW2_FIELD_FEST_MISSION_PEOPLE_H

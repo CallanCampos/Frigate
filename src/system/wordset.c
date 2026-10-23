@@ -394,7 +394,6 @@ void WordSet_LoadPWTTournamentType(WordSet *wordSet, u32 index, u32 tournament) 
 }
 
 void WordSet_LoadFestivalMission(WordSet *wordSet, u32 index, u8 mission, s32 a3) {
-    // The mission's config, whose first 0x14 bytes are a FestMission (system/fest_mission.h)
     FestMissionConfig *buffer;
     FestivalText *text;
 
@@ -407,8 +406,8 @@ void WordSet_LoadFestivalMission(WordSet *wordSet, u32 index, u8 mission, s32 a3
     }
     buffer = allocateForFestMission(HEAPID_TAIL((HeapID)wordSet->heapId));
     text = getTextFileForFestMissions(HEAPID_TAIL((HeapID)wordSet->heapId));
-    FestMission_Load(text->archive, mission, a3, (FestMission *)buffer);
-    FestMission_GetMessage(text, wordSet->tmp, (const FestMission *)buffer, HEAPID_TAIL((HeapID)wordSet->heapId));
+    FestMission_Load(text->archive, mission, a3, buffer);
+    FestMission_GetMessage(text, wordSet->tmp, buffer, HEAPID_TAIL((HeapID)wordSet->heapId));
     GFL_WordSetCopyStrbuf(wordSet, index, wordSet->tmp, NULL);
     FestivalText_Free(text);
     GFL_HeapFree(buffer);

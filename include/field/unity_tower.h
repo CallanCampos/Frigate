@@ -107,8 +107,8 @@ u8 getPlayerSurveys(UnityTowerSurveySave *save);
 u32 UnityTower_GetVisitorParam(UnityTowerSurveySave *save, u32 index, u32 param);
 // Sets a visitor's UNITY_TOWER_VISITOR_PARAM_UNK26_0, SCRIPT_FLAG or VALID
 void UnityTower_SetVisitorParam(UnityTowerSurveySave *save, int index, u32 param, u32 value);
-// A visitor, whose PlayerInfo comes first, or NULL out of range
-void *UnityTower_GetVisitor(UnityTowerSurveySave *save, int index);
+// A visitor's PlayerInfo, or NULL out of range
+PlayerInfo *UnityTower_GetVisitor(UnityTowerSurveySave *save, int index);
 UnityTowerVisitor *UnityTower_GetVisitors(UnityTowerSurveySave *save);
 // Records the country met, returning whether it is a new one
 BOOL UnityTower_MarkCountryMet(UnityTowerSurveySave *save, u32 country);

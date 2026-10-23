@@ -27,7 +27,7 @@ void func_ov033_0217aa1c(GameSystem *gsys, s32 floor, u32 value) {
 }
 
 void func_ov033_0217aa50(UnityTowerSurveySave *survey, UnityTowerFloor *output, s32 floor, u32 value) {
-    void *visitor;
+    PlayerInfo *visitor;
     u32 visitorValue;
     s32 country;
     s32 index;
@@ -123,7 +123,7 @@ void LoadUnityTowerVisitorWordSet(WordSet *wordSet, GameData *gameData, u32 inde
     UnityTowerSurveySave *survey;
     UnityTowerFloor *towerSave;
     u8 country;
-    void *visitor;
+    PlayerInfo *visitor;
     u32 value;
     u8 hobby;
 

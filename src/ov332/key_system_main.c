@@ -731,7 +731,7 @@ static void KeySystemTags_Clear(KeySystemTag *tags) {
 }
 
 void KeySystem_Setup(KeySystemWork *wk, HeapID heapId) {
-    void *data;
+    KeySystemData *data;
     SaveControl *save;
 
     GFL_OvlLoad(OVERLAY_ID(331));

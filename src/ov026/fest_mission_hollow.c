@@ -28,7 +28,7 @@ static const FesMissionHollowPerson data_ov026_0216fa50[] = {
 // clang-format on
 
 void FesMissionHollow_Setup(FesGimmick *gimmick) {
-    FestMission *mission = GetFestMissionCfg(gimmick->festival);
+    FestMissionConfig *mission = GetFestMissionCfg(gimmick->festival);
     RivalEntry *entries = LinkFestival_GetEntries(gimmick->festival);
     MATHRandContext32 rand;
     u8 hollows[20];
@@ -61,13 +61,13 @@ void FesMissionHollow_Setup(FesGimmick *gimmick) {
 }
 
 static u16 FesMissionHollow_GetPersonObjCode(FesGimmick *gimmick) {
-    FestMission *mission = GetFestMissionCfg(gimmick->festival);
-    return data_ov026_0216fa50[mission->unk0_20].unk0;
+    FestMissionConfig *mission = GetFestMissionCfg(gimmick->festival);
+    return data_ov026_0216fa50[mission->info.unk0_20].unk0;
 }
 
 static u8 FesMissionHollow_GetPersonUnk2(FesGimmick *gimmick) {
-    FestMission *mission = GetFestMissionCfg(gimmick->festival);
-    return data_ov026_0216fa50[mission->unk0_20].unk2;
+    FestMissionConfig *mission = GetFestMissionCfg(gimmick->festival);
+    return data_ov026_0216fa50[mission->info.unk0_20].unk2;
 }
 
 // Shuffles the list
@@ -83,8 +83,8 @@ static void FesMissionHollow_Shuffle(u8 *list, int count, MATHRandContext32 *ran
 }
 
 BOOL FesMissionHollow_IsActive(FesGimmick *gimmick) {
-    FestMission *mission = GetFestMissionCfg(gimmick->festival);
-    if (mission->target == 5 && mission->unk0_20 != 0) {
+    FestMissionConfig *mission = GetFestMissionCfg(gimmick->festival);
+    if (mission->info.target == 5 && mission->info.unk0_20 != 0) {
         return TRUE;
     }
     return FALSE;

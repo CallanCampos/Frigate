@@ -7,6 +7,7 @@
 #include "gfl/msg.h"
 #include "gfl/std.h"
 #include "gfl/str.h"
+#include "system/fest_mission.h"
 #include "system/wordset.h"
 
 // Set in Black 2 and clear in White 2
@@ -56,60 +57,60 @@ FestMissionData *FestivalText_LoadAllMissions(FestivalText *text, HeapID heapId)
     return FestMissionData_LoadAll(text->archive, heapId);
 }
 
-void FestMission_Load(ArcTool *arc, u8 index, u32 level, FestMission *mission) {
+void FestMission_Load(ArcTool *arc, u8 index, u32 level, FestMissionConfig *mission) {
     FestMissionData data;
     FestMissionParams *params;
 
-    MI_CpuFill8(mission, 0, sizeof(FestMission));
+    MI_CpuFill8(mission, 0, sizeof(FestMissionConfig));
     FestMissionData_Load(arc, index, &data);
     params = &data.params;
-    mission->index = index;
-    mission->level = level;
-    mission->target = params->target;
-    mission->unk0_20 = params->unk0C;
-    mission->unk0_30 = 0;
-    mission->unk0_31 = MISSION_VERSION_BIT;
-    mission->unk4_0 = params->unk0E;
-    mission->unk4_10 = params->levels[level].unk3;
-    mission->count = params->levels[level].count;
-    mission->unk4_31 = params->unk00;
-    mission->unk8_0 = params->unk14;
-    mission->unk8_18 = params->unk12;
-    mission->unk8_30 = params->unk03;
-    mission->unkC_0 = 0;
-    mission->unkC_10 = params->levels[level].unk0;
-    mission->unkC_22 = params->unk08;
-    mission->unk10_0 = params->unk04;
-    mission->unk10_6 = params->unk05;
-    mission->unk10_9 = params->unk02;
-    mission->messageId = params->messageId;
-    mission->resultMessageId = params->resultMessageId;
+    mission->info.index = index;
+    mission->info.level = level;
+    mission->info.target = params->target;
+    mission->info.unk0_20 = params->unk0C;
+    mission->info.unk0_30 = 0;
+    mission->info.unk0_31 = MISSION_VERSION_BIT;
+    mission->info.unk4_0 = params->unk0E;
+    mission->info.unk4_10 = params->levels[level].unk3;
+    mission->info.count = params->levels[level].count;
+    mission->info.unk4_31 = params->unk00;
+    mission->info.unk8_0 = params->unk14;
+    mission->info.requiredFlag = params->unk12;
+    mission->info.unk8_30 = params->unk03;
+    mission->info.unkC_0 = 0;
+    mission->info.seconds = params->levels[level].unk0;
+    mission->info.unkC_22 = params->unk08;
+    mission->info.unk10_0 = params->unk04;
+    mission->info.unk10_6 = params->unk05;
+    mission->info.extraSecondsIndex = params->unk02;
+    mission->info.messageId = params->messageId;
+    mission->info.resultMessageId = params->resultMessageId;
     mission->header = data.header;
 }
 
-void FestivalText_LoadMission(FestivalText *text, u8 index, u32 level, FestMission *mission) {
+void FestivalText_LoadMission(FestivalText *text, u8 index, u32 level, FestMissionConfig *mission) {
     FestMission_Load(text->archive, index, level, mission);
 }
 
-void FestMission_GetMessage(FestivalText *text, StrBuf *dest, const FestMission *mission, HeapID heapId) {
+void FestMission_GetMessage(FestivalText *text, StrBuf *dest, const FestMissionConfig *mission, HeapID heapId) {
     WordSet *wordSet = GFL_WordSetSystemCreate(2, 0x49, HEAPID_TAIL(heapId));
     StrBuf *message = GFL_StrBufCreate(0x25, HEAPID_TAIL(heapId));
 
-    FestMission_SetTargetWord(wordSet, message, 0, data_ov027_021711c0[mission->header.kind], mission->target);
-    WordSetNumber(wordSet, 1, mission->count, 3, 0, 1);
-    GFL_MsgDataLoadStrbuf(text->message, mission->messageId, message);
+    FestMission_SetTargetWord(wordSet, message, 0, data_ov027_021711c0[mission->header.kind], mission->info.target);
+    WordSetNumber(wordSet, 1, mission->info.count, 3, 0, 1);
+    GFL_MsgDataLoadStrbuf(text->message, mission->info.messageId, message);
     GFL_WordSetFormatStrbuf(wordSet, dest, message);
     GFL_StrBufFree(message);
     GFL_WordSetSystemFree(wordSet);
 }
 
-void FestMission_GetResultMessage(FestivalText *text, StrBuf *dest, const FestMission *mission, HeapID heapId) {
+void FestMission_GetResultMessage(FestivalText *text, StrBuf *dest, const FestMissionConfig *mission, HeapID heapId) {
     WordSet *wordSet = GFL_WordSetSystemCreate(2, 0x49, HEAPID_TAIL(heapId));
     StrBuf *message = GFL_StrBufCreate(0xa1, HEAPID_TAIL(heapId));
 
-    FestMission_SetTargetWord(wordSet, message, 0, data_ov027_021711c0[mission->header.kind], mission->target);
-    WordSetNumber(wordSet, 1, mission->count, 5, 0, 1);
-    GFL_MsgDataLoadStrbuf(text->message, mission->resultMessageId, message);
+    FestMission_SetTargetWord(wordSet, message, 0, data_ov027_021711c0[mission->header.kind], mission->info.target);
+    WordSetNumber(wordSet, 1, mission->info.count, 5, 0, 1);
+    GFL_MsgDataLoadStrbuf(text->message, mission->info.resultMessageId, message);
     GFL_WordSetFormatStrbuf(wordSet, dest, message);
     GFL_StrBufFree(message);
     GFL_WordSetSystemFree(wordSet);

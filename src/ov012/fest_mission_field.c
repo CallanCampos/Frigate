@@ -65,7 +65,7 @@ void FestMission_OnZoneEnter(GameSystem *gsys, u16 zoneId) {
         return;
     }
     config = GetFestMissionCfg(festival);
-    switch (config->type) {
+    switch (config->header.kind) {
     case 4:
         FestSparklePlace_OnZoneEnter(entry, gsys, festival, config, zoneId);
         break;

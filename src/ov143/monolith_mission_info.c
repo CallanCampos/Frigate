@@ -18,6 +18,7 @@
 #include "gfl/str.h"
 #include "nitro/gx.h"
 #include "save/save_control.h"
+#include "system/fest_mission.h"
 #include "system/game_data.h"
 #include "system/game_system.h"
 #include "system/printsys.h"
@@ -316,7 +317,7 @@ static void MonolithMissionInfo_DrawTitle(MonolithWork *wk, MonolithMissionInfoW
 
 static void MonolithMissionInfo_DrawDescription(MonolithWork *wk, MonolithMissionInfoWork *miw, int mission,
                                                 int level) {
-    FestMission data;
+    FestMissionConfig data;
     StrBuf *str;
 
     GFL_BitmapFill(BmpWin_GetBitmap(miw->prints[MONOLITH_MISSION_INFO_WINDOW_DESCRIPTION].window), 0);
@@ -373,7 +374,7 @@ static void MonolithMissionInfo_DrawValue(MonolithWork *wk, MonolithMissionInfoW
 static void MonolithMissionInfo_DrawRecords(MonolithScreenParam *screen, MonolithMissionInfoWork *miw, int mission) {
     BOOL unplayed = FALSE;
     FunfestSave *records = FestRecords_GetFromSave(GameData_GetSaveControl(GSYS_GetGameData(screen->param->gsys)));
-    FestMission data;
+    FestMissionConfig data;
     MonolithMissionInfoRecord record;
     StrBuf *str;
     StrBuf *format;
