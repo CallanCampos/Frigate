@@ -74,6 +74,6 @@ void CPSi_big_from_char(u16 *dst, const u8 *src, int nbytes, int n);
 // n is the source digit count passed by callers; the original implementation does not use it.
 // Converts little-endian digits to nbytes big-endian bytes. Callers must supply ceil(nbytes/2) actual readable
 // source digits and nbytes writable output bytes; the ignored n argument does not validate either extent.
-void CPSi_char_from_big(u8 *dst, const u16 *src, int nbytes, int n);
+void CPSi_char_from_big(u8 *dst, u16 *src, int nbytes, int n);
 
 #endif // POKEBW2_NITROWIFI_SSL_INTERNAL_H
