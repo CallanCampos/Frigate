@@ -504,7 +504,6 @@ WCM_CompareBytes kind:function(thumb,size=0x22) addr:0x0215cd28
 WCM_CompareBssID kind:function(thumb,size=0xc) addr:0x0215cd4c
 WCM_GetLinkLevel kind:function(thumb,size=0x34) addr:0x0215cd58
 WcmGetLinkLevel kind:function(thumb,size=0x4c) addr:0x0215cd8c
-ReshZekSave_UnresolvedInitTarget kind:label(thumb) addr:0x0215cd8c
 WCMi_GetRssiAverage kind:function(thumb,size=0x4c) addr:0x0215cdd8
 WCMi_ShelterRssi kind:function(thumb,size=0x64) addr:0x0215ce24
 WCM_StartupStep1 kind:function(thumb,size=0xc8) addr:0x0215ce88
