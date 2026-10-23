@@ -48,7 +48,7 @@
 . 0x0200aa04 reloc_module overlay(331)
 . 0x0200aab8 reloc_module overlay(331)
 . 0x0200aafc reloc_module overlay(331)
-. 0x0200af7c reloc_module overlay(11)
+. 0x0200af7c reloc_module overlay(12)
 . 0x0200dbb4 add_function func_0200dbb4:thumb:0x28
 . 0x0200dbd8 remove_symbol
 . 0x0200e9b4 reloc_addend 2
@@ -856,7 +856,6 @@ overlays/ov011 0x0215208e reloc_module overlay(32)
 overlays/ov011 0x02152708 add_reloc load,main,0x020050ac
 overlays/ov011 0x02155e68 add_reloc load,main,0x020050c4
 overlays/ov011 0x0215a5fc add_reloc load,main,0x020050f0
-overlays/ov011 0x0215cd8c add_label ReshZekSave_UnresolvedInitTarget
 overlays/ov011 0x0216c7ea reloc_module overlay(189)
 overlays/ov011 0x0216eba2 reloc_module overlay(189)
 overlays/ov011 0x0216ebe8 reloc_module overlay(189)
