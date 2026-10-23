@@ -2,8 +2,10 @@
 
 Compiles every C file in `src/` and `lib/` with clang for the DS target and for 64-bit hosts (arm64 macOS, x86-64
 Linux and Windows, wasm32, i386), counts pointer/int and other portability warnings by kind and module, and compares
-struct layouts against i386 SysV, which matches MWCC on every size the ROM records. The game-code warning count is a
-port metric that must only go down.
+struct layouts against i386 SysV, which matches MWCC on every size the ROM records. It doesn't define `PLATFORM_PC`, so
+the host build's `uptr` fixes don't show in its counts: the port's 64-bit metric and its gate are the pointer cast
+guard's, which runs the host build's own commands ([../check_ptrcasts.py](../check_ptrcasts.py),
+[../../docs/SYNC.md](../../docs/SYNC.md#when-the-pointer-cast-guard-fails)).
 
     sh port/tools/compile-probe/run_all.sh <configured checkout>
 
@@ -20,7 +22,7 @@ in `port/docs/research/compile-probe.md`.
 | `scripts/dialect_scan.sh` | Counts the constructs of MWCC's dialect in `src/`, `lib/` and `include/`: `dialect_scan.txt` |
 | `scripts/probe.py` | One syntax pass: clang `-fsyntax-only` over every C file for one target, with its diagnostics: `<pass>/diags.tsv`, `status.tsv` |
 | `scripts/summarize.py` | One pass's results by module and kind of diagnostic, by hand |
-| `scripts/table.py` | The 64-bit warnings of several passes by flag, game and libraries apart, for `metrics.txt`: the port's 64-bit warning metric |
+| `scripts/table.py` | The 64-bit warnings of several passes by flag, game and libraries apart, for `metrics.txt` |
 | `scripts/classify64.py` | One host pass's pointer and int sites classed by their source line: `classify_*.txt` |
 | `scripts/sites_no_overlay.py` | The game's 64-bit sites that aren't overlay IDs, by file |
 | `scripts/layouts.py` | Every struct's and union's size and alignment for one target: `layouts_<target>.tsv` |

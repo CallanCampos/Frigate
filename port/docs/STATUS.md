@@ -21,10 +21,66 @@ level that doesn't exist yet says "not yet"; no field is left out.
 | Tests | Result of each level T2–T7 that ran, with counts; "not yet" for levels that don't exist |
 | Tiers | Functions and code bytes in tiers (a), (b) and (c) from `port/tools/progress/`, and the change since the last entry |
 | Trap stubs | How many functions the host build still stubs, and which the game hit first |
-| 64-bit warnings | The host build's pointer/int warning count, game and `lib/` apart; it must not rise |
+| 64-bit warnings | The pointer cast guard's line, `port/tools/check_ptrcasts.py --build-dir build/port --report` (T1; [SYNC.md](SYNC.md#when-the-pointer-cast-guard-fails)): its sites by class, the real ones not above the last entry's |
 | Work done | What changed, with ADRs and game changes by number |
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
+
+## 2026-10-23: the pointer cast guard, its baseline on main, and T1 measured by it
+
+- **Upstream:** `0bed98c4c3` (upstream merge #478), as `main` has it since PR 13 (`72749b5a0d`); this work brings no
+  upstream commit.
+- **Port:** `PORT_SHA` on `port-ptrcast-guard`, [PR 17](https://github.com/CallanCampos/Frigate/pull/17), from `main`
+  `8ca29313d1` with `72749b5a0d` merged in.
+- **ROM:** `python3 configure.py && ninja` at each commit and after `main` was merged in: both SHA1s match (Black 2
+  `e51e6dfb8`, White 2 `b5d7490be`). The typedef change's proof is in [game-changes.md](game-changes.md):
+  `check_mwcc_neutral.py` 3,556 of 3,556 file and version pairs identical, and `compiler_probe.py --mismatches` on the
+  94 incomplete files the same before and after in both versions.
+- **Host build:** macOS arm64, Apple clang 21, RelWithDebInfo, both versions (`build/port`, `build/port-w2`); a
+  configure-only tree with Homebrew clang 23 for the guard's keys. CI on PR 17: [run
+  39992625406](https://github.com/CallanCampos/Frigate/actions/runs/39992625406) at `968fc4b556`: every job passes, the
+  macOS, Linux and Windows host builds, both sanitized builds and the four macOS distribution builds; `game_ptrcasts`
+  passes in the macOS and Linux jobs (Apple clang 17 and 21, arm64 and x86_64, and Ubuntu's clang 21.1.8) and skips on
+  Windows, as designed. The first run's Windows job failed on the guard's own test, which expected findings where the
+  guard skips; `968fc4b556` makes it skip there too.
+- **Tests:** full `ctest` with the oracle and the cached saves copied from the verify tree. Black 2: 304 tests, 291
+  passed, 2 skipped (`app_universal_slices`; `frame_times_new_game`, over its budget at a load of 40 to 60, which passes
+  alone), 11 failed: `game_ptrcasts_tool`, which a run by hand in the same build directory collided with (it passes
+  alone), and the 10 below that fail on `main` too. White 2: 301 tests, 290 passed, 1 skipped (`app_universal_slices`),
+  the same 10 failed. `game_ptrcasts` and `game_ptrcasts_tool` pass in both versions, and `upstream_sync.py`'s 14 tests
+  pass. T3 is in that run; T4 is its oracle tests; T5 ran in CI's sanitized jobs only; T7 not run.
+- **Tiers:** not remeasured: no C that MWCC compiles changed (the typedefs are host-only).
+- **Trap stubs:** unchanged, 31 functions and 22 data placeholders in each version (`gen/stubs.c`).
+- **64-bit warnings:** the pointer cast guard, now T1's measurement: `check_ptrcasts: 414 sites in 292 keys (real 213,
+  harmless 62, handled 96, unreachable 43)`, the same in both versions and with Apple clang 21, Homebrew clang 23 and
+  Ubuntu's clang 21.1.8 (CI). The last entry's measure, reproduced on this head with the configured commands and
+  `-isystem` kept: game 161, libraries 231 instances, as it said. PR 7's "libraries' 218" was the same warnings counted
+  as distinct sites on Linux at its base (its description: 452 to 379 distinct, the game's 234 to 161); on this head the
+  distinct sites are 161 and 196. The guard's count is higher because it sees the SDK headers' inline casts (`-I` for
+  the decomp's headers), counts each site once, and adds a `uptr` narrowed to 32 bits; its `real` rows are the work
+  list.
+- **Work done:** the guard of the stopped `port-64bit-sweep` branch, restarted on `main` ([ADR
+  0019](adr/0019-pointer-cast-guard-against-a-classified-baseline.md), accepted by this session on the developer's plan
+  of 2026-10-23, not by the developer in person). `uptr` and `sptr` are typedefs on hosts (a Platform row in
+  game-changes.md). `port/tools/check_ptrcasts.py` and the test `game_ptrcasts` (with `game_ptrcasts_tool`, label
+  `static`) hold the game's casts to `port/tools/ptrcast_baseline.tsv`, regenerated on `main` and each row classed with
+  a reason; the stopped branch's arena constraint is left out, since no row needs it. [SYNC.md](SYNC.md) says what to do
+  when it fails, and that on a sync PR the maintainer fixes it in a follow-up feature PR, never by editing the sync PR.
+  T1 is now the guard (port/CLAUDE.md, PLAN.md §6, CONTRIBUTING.md, the PR template, this file's "64-bit warnings"), and
+  `sync_upstream.sh` prints its line in the summary and in `--verify-pr`'s log. The pending sync PR 16 (upstream
+  `b62c655bfa`), checked in a scratch copy with these typedefs, passes the guard with this baseline: no new finding, and
+  upstream's typed `NameEntryParam` removes the six R08 rows, which `--update` drops after it merges.
+- **Next:** fix the field's real rows, R02 to R05 (45 sites: the shortcut menu, the Day Care's egg and mail, the
+  field-move cut-in's palette, Join Avenue), in a feature PR with their game-changes rows, leaving `fld3d_ci.c`'s cut-in
+  palette to the battle-path track, which changes that file; contributor PRs 14 and 15 cover Join Avenue and seventeen
+  files of these rows, so whichever lands second runs `--update`. Then battle (R06, R08) and the menus and apps (R09,
+  R11 to R19).
+- **Blockers:** none for the guard. As on `main`: the field heap stops CONTINUE and New Game at the field's entry
+  (`OS_Terminate` in `FieldmapProc_Init`), so the oracle and launcher tests that reach it fail (`oracle_continue`,
+  `oracle_continue_starter`, `oracle_launch_field_menus`, `oracle_launch_party_menus`, `launch_summary_standalone`,
+  `launch_touch_then_party`, `launch_unfinished`, `launch_not_offered` and `frame_times_party_menus`, in both versions,
+  as the deep dive of 2026-10-23 found on `main` in Black 2), and `asm_oracle` fails on SDK names that upstream changed;
+  the field's track and the hygiene PR fix those.
 
 ## 2026-10-22: reviewed upstream SDK sync completed
 

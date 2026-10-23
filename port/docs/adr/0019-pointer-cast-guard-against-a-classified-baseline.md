@@ -56,9 +56,11 @@ a merge.
 - **On a host the type names say what a value is:** `uptr` and `sptr` are typedefs under `PLATFORM_PC` (macros for
   MWCC, as before; a Platform row in game-changes.md), so that clang's messages name them and a narrowed `uptr` is told
   from a number in an `unsigned long`.
-- **The keys are LP64's**: the same with Apple clang 21 and Homebrew clang 23 on macOS, in both versions, and checked
-  by CI's Linux host and sanitized jobs, whose `ctest` runs the test with Ubuntu's clang. It skips (77) on Windows,
-  whose LLP64 (a 32-bit `long`) gives other keys, and without clang or the compile database.
+- **The keys are LP64's**: the same in both versions, with Apple clang 21 and Homebrew clang 23 on macOS, and in CI,
+  whose macOS, Linux and sanitized jobs run the test in their `ctest`: Apple clang 17 and 21 (arm64 and x86_64) and
+  Ubuntu's clang 21.1.8 found the baseline's keys on the pull request that added it. It skips (77) on Windows, whose
+  LLP64 (a 32-bit `long`) gives other keys, and without clang or the compile database; its own test checks the skip
+  there.
 - **Who fixes a failure**: the session or contributor whose change brought the cast; on a sync PR, the maintainer, in a
   follow-up feature PR, never by editing the sync PR's resolutions
   ([../SYNC.md](../SYNC.md#when-the-pointer-cast-guard-fails)).

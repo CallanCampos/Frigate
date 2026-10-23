@@ -153,8 +153,9 @@ An upstream merge can bring C that cuts an address to 32 bits on a 64-bit host: 
 API whose parameter is a `u32`, an integer made a pointer with `(FieldTask *)a2`, a `uptr` stored in a `u32`. Under
 MWCC that is the DS's code as it was, so both ROMs still match and nothing in the ROM build notices; on a host the game
 faults the first time it runs it. The test `game_ptrcasts` ([../cmake/game.cmake](../cmake/game.cmake)) catches it in
-every host build's `ctest`: CI's macOS and Linux host and sanitized jobs on every PR, sync PRs included, the local
-verification's `ctest` in both versions (`--verify-pr`), and the local sync's before it publishes.
+every host build's `ctest`: CI's macOS and Linux jobs (host, sanitized and the macOS distribution builds) on every PR,
+sync PRs included, the local verification's `ctest` in both versions (`--verify-pr`), and the local sync's before it
+publishes.
 
 It runs [../tools/check_ptrcasts.py](../tools/check_ptrcasts.py) on the build: each `src/` and `lib/` command of the
 build's `compile_commands.json` again with the build's clang, syntax only, with the cast warnings the host build

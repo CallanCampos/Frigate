@@ -5,6 +5,13 @@ workflow goes in the decomp checkout instead; this file is the port's ([CLAUDE.m
 
 ## 2026-10-23: the pointer cast guard, restarted on main
 
+- **A test that runs a tool which skips on a host must skip there too.** The guard skips on Windows, and its own test
+  expected findings, so CI's Windows job failed on the first push of the guard's PR, a failure that no local run
+  could show. A test of a tool checks the tool's skip on that host and skips itself, and the first CI run of a new
+  test is read job by job, Windows' included.
+- **Don't run a test by hand in a build directory whose full suite is running.** `game_ptrcasts_tool` writes its tree
+  into the build directory, so a second copy started by hand while `ctest` ran the same test made both fail; rerun it
+  alone, and keep hand runs in another build directory while a suite runs.
 - **A warning count says how it counted.** STATUS.md's libraries' 235 to 231 and PR 7's 218 measured the same
   warnings two ways: STATUS.md's audit counted instances, a private header's site once for each file that includes it,
   on macOS; PR 7's 218 counted distinct sites, on Linux (its description: 452 to 379 distinct, the game's 234 to 161).
@@ -24,7 +31,7 @@ workflow goes in the decomp checkout instead; this file is the port's ([CLAUDE.m
   old one with `--update` keeps the classes of the rest, and a script that sets the new rows' classes by file and
   function keeps the work reviewable.
 - **clang's spelling of a type is the guard's key, so check it on two compilers.** Apple clang 21 and Homebrew's
-  clang 23 give the same keys on main (a configure-only build directory with
+  clang 23 give the same keys on main, and so did CI's Apple clang 17 and Ubuntu's clang 21.1.8 (a configure-only build directory with
   `-DCMAKE_C_COMPILER=/opt/homebrew/opt/llvm/bin/clang` is enough: the guard needs only the compile database), but
   clang 23 calls a pointer difference `__ptrdiff_t` where Apple clang says `long`, and a `const uptr` read from a const
   table is spelled with its qualifier, which a set of names misses until the qualifiers are stripped.
