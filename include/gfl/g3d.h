@@ -168,10 +168,6 @@ void *GFL_G3DResGetTexImageData(void *resource);
 void *GFL_G3DResGetTexPaletteData(void *resource);
 void *GFL_G3DResGetResData(void *resource);
 void GFL_G3DResFree(G3DResource *resource);
-// The size of a resource's header, which GFL_G3DResSetup fills in
-u32 GFL_G3DResGetAllocSize(void);
-void GFL_G3DResSetup(void *resource, void *data);
-BOOL GFL_G3DResUploadAndReleaseTexData(void *resource);
 G3DModel *GFL_G3DMdlCreate(void *resource, u32 modelId, void *texture);
 void GFL_G3DMdlFree(G3DModel *model);
 void *GFL_G3DMdlGetMdlResource(G3DModel *model);
