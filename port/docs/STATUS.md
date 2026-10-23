@@ -26,6 +26,73 @@ level that doesn't exist yet says "not yet"; no field is left out.
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
 
+## 2026-10-23: the battle path: the trainer cut-in and Hugh's battle to the first move
+
+- **Upstream:** `b62c655bfa` (upstream merge #481), as on the field's entry branch, which this branch starts from
+  (`port-field-entry` at `7f5cad4dd9`, PR 18) and which already merges it through `main`'s PR 16; so the Route 19 route
+  ran on this branch itself, with no scratch merge. No upstream commit is merged here.
+- **Port:** `PORT_SHA`, on the topic branch `port-battle-path`, a draft PR stacked on PR 18.
+- **ROM:** T0 passes after each of the branch's six commits and on the head: Black 2
+  `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb` and White 2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`. Every game file the
+  branch changes is complete in both versions but `src/system/printsys.c`, whose compiler probe is the same before and
+  after in both versions (`GFL_TextRendererDrawToBitmap` and `GFL_TextRendererDrawToBitmapEx`, as before). No incomplete
+  file depends on `include/battle/btl_handler.h` (`ninja -t deps`: its 15 dependents are complete in both versions).
+  `check_mwcc_neutral.py` over the whole tree against `b62c655bfa` finds 24 files different in both versions: the 21
+  this branch changes on purpose (the `sizeof`s, the constants' spelling and the typed mon sets, with the header's 15
+  dependents), `field_transition.c` (the field's entry) and `pokemontrade_2d.c` and `vct.c` (PRs 7 and 15 on `main`);
+  the guard-only changes (`field_effect.h` and its dependents, `printsys.c`, `btlv_scu.c`, `machine_use.c`) and the 22
+  incomplete files that include `graphics.h` are identical.
+- **Host build:** T1 passes on macOS arm64, RelWithDebInfo, both versions (`build/port`, `build/port-w2`), and Black 2's
+  sanitized survey program (`build/port-san-survey`). The full builds have 723 warnings each, as on the field's entry;
+  no changed file adds one. clang-format 23 is clean on every changed C file.
+- **Tests:** full ctest on the head: Black 2, 298 passed, 7 failed and 4 skipped of 309; White 2, 297 passed, 7 failed
+  and 2 skipped of 306. The failures are the seven tests of the test launcher, `frame_times_party_menus` among them,
+  which steps aside now that the field opens (as on the field's entry, whose retirement of it is plan A-2). `asm_oracle`
+  skips here: this worktree has no `build/port-venv` with Unicorn. The machine's load average was about 45 on its 8
+  cores during Black 2's run, so `frame_times_title` and `frame_times_new_game` skipped, as they do above the cores'
+  count. `oracle_continue` and `oracle_continue_starter` (T4) and `replay_new_game_house` (T3) pass in both versions.
+  The Route 19 route by hand (T3, Black 2; White 2 has no Route 19 input file yet): the oracle's
+  `route19_save_b2_us.pbwinput` from the starter save (`build/port/oracle-saves`, SHA-1 `ce71fe0b8c…`), headless. On the
+  field's entry branch the program ends at frame 6,397, status 1 with no message (the cut-in's work past its heap
+  block). On this branch it plays CONTINUE, Route 19, the trainer's VS cut-in (frame 6,555: AAAAAAA against HughAAA) and
+  Hugh's battle to "What will Tepig do?" (frame 7,600), and stops at frame 7,623 on `data_ov167_021d7490` (status 70,
+  "the game accessed data_ov167_021d7490+0x0 (ov167, 0x021d7490, 32 bytes), which has no C yet"), its frames identical
+  after each commit. T5: the survey build on the same route shows only H6 and R10 (the deep dive's showed R6 to R10 and
+  H6), and on `replay_new_game_house` runs all 18,800 frames with only H5 and H6 ([sanitizers.md](sanitizers.md)). T6:
+  `replay_same_save` passes in both versions. T2: every test that isn't a route passes after each commit (Black 2). T7
+  not run.
+- **Tiers:** per version, a 37,546 functions, b 3,472 and c zero; code bytes Black 2 a 3,435,848, White 2 a 3,435,936,
+  and b 414,418 in each; 2,384 veneers left out. Unchanged since the field's entry (`port/tools/progress/progress.py`
+  on the head).
+- **Trap stubs:** 30 function stubs and 22 data placeholders per version, unchanged. The Route 19 route reaches
+  `data_ov167_021d7490` at the battle's first move (frame 7,623); CONTINUE and New Game to the save reach none.
+- **64-bit warnings:** the four pointer/int cast families, counted as the field's entry counted them (each translation
+  unit's own command with the families enabled, `-fsyntax-only`, each place once): 276 places, game 97 and libraries
+  179, from 278 (game 99): the cut-in's palette cast and `G3DTextDraw_CreateResource`'s cast of its palette back to a
+  pointer. By flag, game and libraries: `-Wpointer-to-int-cast` 53 and 64, `-Wint-to-pointer-cast` 35 and 36,
+  `-Wvoid-pointer-to-int-cast` 6 and 31, `-Wint-to-void-pointer-cast` 3 and 48. The same count on the field's entry
+  branch gives its 278.
+- **Work done:** the plan's track C, the encounters' and battles' host fixes, each a row of
+  [game-changes.md](game-changes.md): the trainer cut-in's work by `sizeof`, its palette through `uptr` (with
+  `G3DTextDraw_CreateResource`'s parameter, the same change as the contributors' open PR 19) and its VRAM D through
+  `HW_LCDC_VRAM_D` (`src/ov036/fld3d_ci.c`); the battle flow's mon sets typed as `BtlMonSet`, `monSets` and the
+  switch-in set `unk1A68` beside it (`include/battle/btl_handler.h`); 20 more event works allocated by `sizeof` in
+  `hiden_event.c`, `field_fade.c`, `scrcmd_survey.c` and `event_battle_lose.c` (three `field_fade.c` events keep the
+  DS's 0x68, which holds their work); the C-Gear help's palette through `HW_DB_BG_PLTT` and the DSi's SCFG_EXT through
+  `PORT_HW_ADDR` under `PLATFORM_PC`; and the sanitizers' R6 to R9: the field effects' work and the print queue's
+  renderer aligned for a host's pointers, and the marked extra gauge of `BtlvScu_InitGauges` fixed under `PLATFORM_PC`.
+  [decomp-findings.md](decomp-findings.md) has the battle table and the encounter effects' table; the feature map has
+  a row for encounters and battles; lessons.md has two lessons.
+- **Next:** retire the test launcher (plan A-2), then phase 3's exit route (A-3). For battles, once the table has C:
+  the Route 19 route's full 28,600 frames in both versions with the save's checkpoint and T4 on the cut-in and the
+  battle screens, as a test; the explanation of the 5,716 bytes by which the deep dive's save differed from melonDS's;
+  and R10 (an ignorelist entry, as for R1).
+- **Blockers:** `data_ov167_021d7490` (overlay 167's battle table, no C yet), which stops every battle at its first
+  move: overlay 167 is under another contributor's claim upstream since 2026-10-18, so the port waits, with no
+  stand-in. `src/ov036/enceff_data.c` names four functions of another overlay at the same address (a decomp finding),
+  which stopped the deep dive's route at a wild encounter later on (frame 20,077): overlay 36 is under the user's own
+  decomp claim, so the fix is ordinary decomp work, which reaches the port by sync; the user decides.
+
 ## 2026-10-23: the field's entry: root heaps in host memory, MSL's division, CONTINUE and New Game into the field
 
 - **Upstream:** `b62c655bfa` (upstream merge #481), merged into Frigate's `main` by PR 16 (`6a1ace981b`), which this
@@ -34,7 +101,7 @@ level that doesn't exist yet says "not yet"; no field is left out.
   committed, with the same results as below. The branch also merges `main` at `a4648fce71` (PRs 14 and 15, the
   contributors' `uptr` changes, no upstream commit), keeping both sides' rows at the end of
   [game-changes.md](game-changes.md).
-- **Port:** `PORT_SHA`, on the topic branch `port-field-entry` (PR 18), after the review's fixes.
+- **Port:** `7f5cad4dd9`, on the topic branch `port-field-entry` (PR 18), after the review's fixes.
 - **ROM:** T0 passes on the head after the merge of `main` at `a4648fce71`: Black 2
   `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb` and White 2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`. The two game files
   this branch changes are complete, so the SHA1s prove them; `check_mwcc_neutral.py` finds `heapsys.c` identical to
