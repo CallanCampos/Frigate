@@ -26,6 +26,52 @@ level that doesn't exist yet says "not yet"; no field is left out.
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
 
+## 2026-10-22: reviewed upstream SDK sync completed
+
+This is the completed result of [PR 10](https://github.com/CallanCampos/Frigate/pull/10). The prepared entry below
+is retained as a historical snapshot from before final verification and owner review; its pending work is resolved
+by the results here.
+
+- **Upstream:** `d4a30c66b0` (upstream merge #479), the current imported tip: 110 commits after `fc478a9ee5`.
+- **Port:** reviewed main merge `8c30c6fd70`, whose Git tree is identical to the final verified PR head
+  `06e40a54efab0cb56f624834aff9f3907328d73f`.
+- **ROM:** the official exact-head T0 gate passes; Black 2 SHA1 `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb` and
+  White 2 SHA1 `b5d7490be7b415b8f1e672a53e978a9cc667e56a` both match. The actual local verification commit status
+  on that head is `success`, posted by CallanCampos, not an Actions job with the same name.
+- **Host build:** T1 passes for both canonical macOS arm64 native builds. All macOS, Linux and Windows native builds,
+  both sanitized builds and all four macOS distribution builds pass in the final
+  [Frigate CI run](https://github.com/CallanCampos/Frigate/actions/runs/39891758039).
+- **Tests:** final complete serial T2/T3/T6 suites pass: Black 2, 284 passed and 18 expected skips of 302; White 2,
+  281 passed and 18 expected skips of 299. All available timing gates pass. Optional prerequisites account for the
+  skips; full optional T4 comparisons and T7 playtests were not run. Hosted T5 sanitizer coverage passes on macOS
+  and Linux; full local sanitized gameplay routes remain unrun. The expheap regression fails on the old code and
+  passes with the fix, including ASan/UBSan. Compile, Code standards, sync tooling and the aggregate CI gate pass.
+  Main merge rule suites `4677197273` (PR 7) and `4677521638` (PR 10) report every rule `pass`.
+- **Tiers:** unchanged from the prepared measurement: per version, a 37,546 functions, b 3,472 and c zero. Code
+  bytes: Black 2 a 3,435,848, White 2 a 3,435,936, and b 414,418 in each. Compared with the preceding completed sync,
+  a gains 396 functions and 66,714 bytes per version while b loses the same amounts. Excluded veneers remain 2,384;
+  SDK assembly definitions total 225, including 47 now represented in MSL's assembly file. This representation
+  change is not native C progress, and source coverage does not establish native gameplay readiness.
+- **Trap stubs:** unchanged, 31 function traps and 22 data placeholders per version. The observed field-entry stop
+  remains `OS_Terminate` in `FieldmapProc_Init`, not a missing-field-C trap.
+- **64-bit warnings:** the normalized all-TU audit reproduces the documented baseline and passes without compilation
+  failures: four pointer/int cast families fall from 469 to 392 instances (game 234 to 161, libraries 235 to 231).
+  Optional narrowing diagnostics also fall, 388 to 383. The comparison covers 1,655 baseline and 1,657 final native
+  translation units; individual upstream-file increases were reviewed. PR 10 records the detailed proof and limits.
+- **Work done:** preserved the documented [port adaptations](game-changes.md) while resolving 27 conflicting files
+  across 110 upstream commits. SDK names, layouts and signatures now agree with the native HAL and tests. Fixed
+  `MI_CpuFill8`'s signed high-half shift, expheap capacity arithmetic across 4 GiB address boundaries and PXI callback
+  signatures exposed by Linux UBSan. Upstream's MSL assembly conversion retains the native libc/libm replacement.
+  The pointer-width contribution was reviewed and merged in [PR 7](https://github.com/CallanCampos/Frigate/pull/7).
+  The dedicated sync App is installed, configured and verified; protected-main review and verification rules remain
+  active ([ADR 0018](adr/0018-protected-main-and-sync-prs.md)). The owner approved PR 10 before merge, all required
+  checks passed, and [Issue 6](https://github.com/CallanCampos/Frigate/issues/6) is closed.
+- **Next:** size the external field heap for native allocations, then repeat field-entry, CONTINUE and real-menu
+  checks before claiming a playable field.
+- **Blockers:** no sync, review or App-setup blocker remains. The existing gameplay blocker is the fixed 64 KiB
+  external field heap: weather and place-name child allocations grow to a combined `0x1b000` before other overhead,
+  and the recorded field-entry trace stops at frame 10,759. This sync does not claim to resolve that heap-sizing work.
+
 ## 2026-10-22: prepared upstream SDK sync (owner review pending)
 
 - **Upstream:** `d4a30c66b066b2d231c7e9fd5aa83b3daca157c2`, a frozen proposal of 110 commits after
