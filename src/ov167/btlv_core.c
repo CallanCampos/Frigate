@@ -17,6 +17,7 @@
 #include "battle/tr_ai.h"
 #include "battle/trainer_data.h"
 #include "constants/arc.h"
+#include "constants/battle.h"
 #include "constants/text_banks.h"
 #include "gfl/bmpwin.h"
 #include "gfl/clact.h"
@@ -400,7 +401,7 @@ BOOL BtlvCore_CmdCaptureDemo(BtlvCore *core, s32 *seq, void *work) {
     case 7:
         if (BtlvScu_WaitMoveEffect(core->scu)) {
             mon = BtlvCore_GetMonAtViewPos(core, 1);
-            BtlvEffect_CalcGaugeHP(1, (s32)GetBattleMonStat(mon, 0xe) / 6);
+            BtlvEffect_CalcGaugeHP(1, (s32)GetBattleMonStat(mon, BATTLEMON_MAX_HP) / 6);
             BtlvEffect_StartDamage(1, 0x21);
             BtlvCore_PlaySE(core, 0x564);
             (*seq)++;

@@ -210,7 +210,7 @@ BattleEventItem *AbilityEvent_AddItem(BattleMon *mon) {
     u32 packed;
     u32 priority;
 
-    ability = GetBattleMonStat(mon, 0x10);
+    ability = GetBattleMonStat(mon, BATTLEMON_ABILITY);
     for (i = 0; i < 0x9e; i++) {
         if (ability == sAbilityEventAddTable[i].ability) {
             subPriority = calcAbilHandlerSubPriority(mon);
@@ -284,7 +284,7 @@ void AbilityEvent_Swap(BattleMon *first, BattleMon *second) {
 
 // Function name from swan.
 u16 calcAbilHandlerSubPriority(BattleMon *mon) {
-    return RawBattleMonStat(mon, 12);
+    return RawBattleMonStat(mon, BATTLEMON_SPEED);
 }
 
 // Function name from swan.
@@ -838,7 +838,7 @@ void CommonLowHPBoostAbility(BtlServerFlow *flow, u8 monId, u32 type) {
     if (BattleEventVar_GetValue(3) == monId) {
         mon = GetBattleMon(flow, monId);
         threshold = DivideMaxHp(mon, divisor);
-        if (GetBattleMonStat(mon, 0xd) <= threshold) {
+        if (GetBattleMonStat(mon, BATTLEMON_HP) <= threshold) {
             if (BattleEventVar_GetValue(0x16) == type) {
                 BattleEventVar_MulValue(0x35, divisor << 11);
             }
@@ -898,7 +898,8 @@ BOOL CheckAllyHasAbility(BtlServerFlow *flow, u8 monId, u8 *mons, u32 ability) {
         packed = (7 << 8) | pos;
         count = HandlerGetAlivePartyCount(flow, packed, mons);
         for (i = 0; i < count; i++) {
-            if (monId != mons[i] && GetBattleMonStat(GetBattleMon(flow, mons[i]), 0x11) == ability) {
+            if (monId != mons[i] &&
+                GetBattleMonStat(GetBattleMon(flow, mons[i]), BATTLEMON_EFFECTIVE_ABILITY) == ability) {
                 return TRUE;
             }
         }
@@ -936,7 +937,7 @@ void CommonFlowerGiftFormChange(BattleEventItem *item, BtlServerFlow *flow, u8 m
     BattleHandlerChangeFormParam *work;
 
     mon = GetBattleMon(flow, monId);
-    if (sunny != GetBattleMonStat(mon, 0x13)) {
+    if (sunny != GetBattleMonStat(mon, BATTLEMON_FORM)) {
         work = BattleHandler_PushWork(flow, 0x39, monId);
         work->monIndex = monId;
         work->form = sunny;
@@ -1053,8 +1054,8 @@ void HandlerRivalry(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *w
         attacker = GetBattleMon(flow, monId);
         targetMonId = BattleEventVar_GetValue(4);
         defender = GetBattleMon(flow, (u8)targetMonId);
-        attackerGender = GetBattleMonStat(attacker, 0x12);
-        defenderGender = GetBattleMonStat(defender, 0x12);
+        attackerGender = GetBattleMonStat(attacker, BATTLEMON_GENDER);
+        defenderGender = GetBattleMonStat(defender, BATTLEMON_GENDER);
         if (attackerGender != 2 && defenderGender != 2) {
             if (attackerGender == defenderGender) {
                 BattleEventVar_MulValue(0x31, FX32_CONST(1.25));
@@ -2007,8 +2008,8 @@ void HandlerCuteCharm(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 
         !BtlServerFlow_CheckMatchup(flow)) {
         mon = GetBattleMon(flow, monId);
         attacker = GetBattleMon(flow, (u8)BattleEventVar_GetValue(3));
-        sex = GetBattleMonStat(mon, 0x12);
-        attackerSex = GetBattleMonStat(attacker, 0x12);
+        sex = GetBattleMonStat(mon, BATTLEMON_GENDER);
+        attackerSex = GetBattleMonStat(attacker, BATTLEMON_GENDER);
         if (sex != 2 && attackerSex != 2 && sex != attackerSex) {
             BtlCalc_MakeDefaultCondition(7, mon, &condition);
             CommonContactStatusAbility(flow, monId, 7, condition, 30);
@@ -2260,14 +2261,14 @@ void HandlerTrace(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *wor
         count = HandlerGetAlivePartyCount(flow, myPos | 0x100, mons);
         numCandidates = 0;
         for (i = 0; i < count; i++) {
-            if (!IsTraceExcludedAbility(GetBattleMonStat(GetBattleMon(flow, mons[i]), 0x10))) {
+            if (!IsTraceExcludedAbility(GetBattleMonStat(GetBattleMon(flow, mons[i]), BATTLEMON_ABILITY))) {
                 candidates[numCandidates++] = mons[i];
             }
         }
         if (numCandidates != 0) {
             i = (numCandidates == 1) ? 0 : BattleRandom(numCandidates);
             mon = GetBattleMon(flow, candidates[i]);
-            ability = GetBattleMonStat(mon, 0x10);
+            ability = GetBattleMonStat(mon, BATTLEMON_ABILITY);
             targetId = GetMonID(mon);
         } else {
             work[0] = 1;
@@ -2276,7 +2277,7 @@ void HandlerTrace(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *wor
         pos = BtlServerFlow_MonIDToPos(flow, enteringId);
         myPos = BtlServerFlow_GetMonBattlePos(flow, monId);
         if (pos != 6 && (BtlServerFlow_GetBattleStyle(flow) != 2 || IsAdjacentOpponent(myPos, pos))) {
-            count = GetBattleMonStat(GetBattleMon(flow, enteringId), 0x10);
+            count = GetBattleMonStat(GetBattleMon(flow, enteringId), BATTLEMON_ABILITY);
             if (!IsTraceExcludedAbility(count)) {
                 ability = count;
                 targetId = enteringId;
@@ -2337,8 +2338,8 @@ void HandlerDownload(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *
             spDefense = 0;
             for (i = 0; i < count; i++) {
                 mon = GetBattleMon(flow, mons[i]);
-                defense += (u16)GetBattleMonStat(mon, 9);
-                spDefense += (u16)GetBattleMonStat(mon, 0xb);
+                defense += (u16)GetBattleMonStat(mon, BATTLEMON_DEFENSE);
+                spDefense += (u16)GetBattleMonStat(mon, BATTLEMON_SP_DEFENSE);
             }
             if (defense >= spDefense) {
                 stat = 3;
@@ -3292,7 +3293,7 @@ void CommonForecastOff(BattleEventItem *item, BtlServerFlow *flow, u8 monId) {
 
     mon = GetBattleMon(flow, monId);
     if (GetBattleMonSpecies(mon) == 0x15f) {
-        if (GetBattleMonStat(mon, 0x13) != 0) {
+        if (GetBattleMonStat(mon, BATTLEMON_FORM) != 0) {
             work = BattleHandler_PushWork(flow, 0x39, monId);
             work->monIndex = monId;
             work->form = 0;
@@ -3311,7 +3312,7 @@ void CommonForecastFormChange(BtlServerFlow *flow, u8 monId, u32 weather) {
 
     mon = GetBattleMon(flow, monId);
     if (GetBattleMonSpecies(mon) == 0x15f) {
-        currentForm = GetBattleMonStat(mon, 0x13);
+        currentForm = GetBattleMonStat(mon, BATTLEMON_FORM);
         switch (weather) {
         case 0:
             newForm = 0;
@@ -3719,7 +3720,7 @@ void HandlerShadowTag(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 
     if (!IsAllyMonID(BattleEventVar_GetValue(2), monId)) {
         count = HandlerGetAlivePartyCount(flow, BtlServerFlow_GetMonBattlePos(flow, monId) | 0x100, mons);
         for (i = 0; i < count; i++) {
-            if (GetBattleMonStat(GetBattleMon(flow, mons[i]), 0x11) == 0x17) {
+            if (GetBattleMonStat(GetBattleMon(flow, mons[i]), BATTLEMON_EFFECTIVE_ABILITY) == 0x17) {
                 return;
             }
         }
@@ -4067,7 +4068,7 @@ void HandlerDefeatist(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 
 
     if (BattleEventVar_GetValue(3) == monId) {
         mon = GetBattleMon(flow, monId);
-        hp = GetBattleMonStat(mon, 0xd);
+        hp = GetBattleMonStat(mon, BATTLEMON_HP);
         if (hp <= DivideMaxHp(mon, 2)) {
             BattleEventVar_MulValue(0x35, 0x800);
         }
@@ -4335,7 +4336,7 @@ void HandlerRegenerator(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s3
         mon = GetBattleMon(flow, monId);
         if (!IsFainted(mon) && !IsMonFullHP(mon)) {
             amount = DivideMaxHPZeroCheck(mon, 3);
-            missing = GetBattleMonStat(mon, 0xe) - GetBattleMonStat(mon, 0xd);
+            missing = GetBattleMonStat(mon, BATTLEMON_MAX_HP) - GetBattleMonStat(mon, BATTLEMON_HP);
             if (amount > missing) {
                 amount = missing;
             }
@@ -4455,8 +4456,8 @@ void HandlerZenMode(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *w
 
     mon = GetBattleMon(flow, monId);
     if (GetBattleMonSpecies(mon) == 0x22b) {
-        form = GetBattleMonStat(mon, 0xd) <= DivideMaxHp(mon, 2) ? 1 : 0;
-        if (form != GetBattleMonStat(mon, 0x13)) {
+        form = GetBattleMonStat(mon, BATTLEMON_HP) <= DivideMaxHp(mon, 2) ? 1 : 0;
+        if (form != GetBattleMonStat(mon, BATTLEMON_FORM)) {
             param = BattleHandler_PushWork(flow, 0x39, monId);
             param->popup = 1;
             param->monIndex = monId;
@@ -4624,7 +4625,7 @@ void HandlerMummy(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *wor
     if (BattleEventVar_GetValue(4) == monId && BattleEventVar_GetValue(0x46) == 0 &&
         !BtlServerFlow_CheckMatchup(flow) && getMoveFlag(BattleEventVar_GetValue(0x12), 0)) {
         attackerId = BattleEventVar_GetValue(3);
-        if (GetBattleMonStat(GetBattleMon(flow, attackerId), 0x10) != 0x98) {
+        if (GetBattleMonStat(GetBattleMon(flow, attackerId), BATTLEMON_ABILITY) != 0x98) {
             param = BattleHandler_PushWork(flow, 0x1f, monId);
             param->ability = 0x98;
             param->targetIndex = attackerId;

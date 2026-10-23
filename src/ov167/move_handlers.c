@@ -1547,7 +1547,7 @@ static void HandlerCurse(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s
         mon = GetBattleMon(flow, monId);
         effect = 0;
         if (DoesMonHaveType(mon, 7)) {
-            if ((s32)GetBattleMonStat(mon, 0xd) > 0) {
+            if ((s32)GetBattleMonStat(mon, BATTLEMON_HP) > 0) {
                 targetId = BattleEventVar_GetValue(6);
                 if (targetId != 0x1f) {
                     condition = BattleHandler_PushWork(flow, 0xc, monId);
@@ -1623,7 +1623,8 @@ static void HandlerWorrySeedCheckFail(BattleEventItem *item, BtlServerFlow *flow
     if (BattleEventVar_GetValue(3) == monId) {
         targetId = BattleEventVar_GetValue(4);
         target = GetBattleMon(flow, targetId);
-        if (GetBattleMonStat(target, 0x11) == 0x36 || GetBattleMonStat(target, 0x11) == 0xf) {
+        if (GetBattleMonStat(target, BATTLEMON_EFFECTIVE_ABILITY) == 0x36 ||
+            GetBattleMonStat(target, BATTLEMON_EFFECTIVE_ABILITY) == 0xf) {
             BattleEventVar_RewriteValue(0x40, 1);
         }
     }
@@ -1690,8 +1691,8 @@ static void HandlerCaptivate(BattleEventItem *item, BtlServerFlow *flow, u8 monI
     if (BattleEventVar_GetValue(3) == monId) {
         targetId = BattleEventVar_GetValue(4);
         target = GetBattleMon(flow, targetId);
-        sex = GetBattleMonStat(GetBattleMon(flow, monId), 0x12);
-        targetSex = GetBattleMonStat(target, 0x12);
+        sex = GetBattleMonStat(GetBattleMon(flow, monId), BATTLEMON_GENDER);
+        targetSex = GetBattleMonStat(target, BATTLEMON_GENDER);
         if (sex == 2 || targetSex == 2 || sex == targetSex) {
             BattleEventVar_RewriteValue(0x40, 1);
         }
@@ -1981,7 +1982,7 @@ static void HandlerSuperFang(BattleEventItem *item, BtlServerFlow *flow, u8 monI
 
     if (BattleEventVar_GetValue(3) == monId) {
         targetId = BattleEventVar_GetValue(4);
-        hp = GetBattleMonStat(GetBattleMon(flow, targetId), 0xd);
+        hp = GetBattleMonStat(GetBattleMon(flow, targetId), BATTLEMON_HP);
         damage = hp / 2;
         if (damage == 0) {
             damage = 1;
@@ -2040,7 +2041,7 @@ static void HandlerEndeavorCheckFail(BattleEventItem *item, BtlServerFlow *flow,
         targetId = BattleEventVar_GetValue(4);
         target = GetBattleMon(flow, targetId);
         mon = GetBattleMon(flow, monId);
-        diff = GetBattleMonStat(target, 0xd) - GetBattleMonStat(mon, 0xd);
+        diff = GetBattleMonStat(target, BATTLEMON_HP) - GetBattleMonStat(mon, BATTLEMON_HP);
         if (diff <= 0) {
             BattleEventVar_RewriteValue(0x40, 1);
         }
@@ -2055,7 +2056,7 @@ static void HandlerEndeavor(BattleEventItem *item, BtlServerFlow *flow, u8 monId
     if (BattleEventVar_GetValue(3) == monId) {
         mon = GetBattleMon(flow, monId);
         target = GetBattleMon(flow, BattleEventVar_GetValue(4));
-        damage = GetBattleMonStat(target, 0xd) - GetBattleMonStat(mon, 0xd);
+        damage = GetBattleMonStat(target, BATTLEMON_HP) - GetBattleMonStat(mon, BATTLEMON_HP);
         if (damage < 0) {
             damage = 1;
         }
@@ -2076,7 +2077,7 @@ static void HandlerSeismicToss(BattleEventItem *item, BtlServerFlow *flow, u8 mo
     u8 level;
 
     if (BattleEventVar_GetValue(3) == monId) {
-        level = GetBattleMonStat(GetBattleMon(flow, monId), 0xf);
+        level = GetBattleMonStat(GetBattleMon(flow, monId), BATTLEMON_LEVEL);
         BattleEventVar_RewriteValue(0x37, level);
     }
 }
@@ -2096,7 +2097,7 @@ static void HandlerPsywave(BattleEventItem *item, BtlServerFlow *flow, u8 monId,
     u16 damage;
 
     if (BattleEventVar_GetValue(3) == monId) {
-        level = GetBattleMonStat(GetBattleMon(flow, monId), 0xf);
+        level = GetBattleMonStat(GetBattleMon(flow, monId), BATTLEMON_LEVEL);
         percent = BattleRandom(101) + 50;
         damage = level * percent / 100;
         if (damage == 0) {
@@ -2735,7 +2736,7 @@ static void HandlerPayDay(BattleEventItem *item, BtlServerFlow *flow, u8 monId, 
     BattleHandlerMessageParam *message;
 
     if (BattleEventVar_GetValue(3) == monId &&
-        BtlServerFlow_AddPayDayMoney(flow, GetBattleMonStat(GetBattleMon(flow, monId), 0xf) * 5, monId)) {
+        BtlServerFlow_AddPayDayMoney(flow, GetBattleMonStat(GetBattleMon(flow, monId), BATTLEMON_LEVEL) * 5, monId)) {
         message = BattleHandler_PushWork(flow, 4, monId);
         BattleHandler_StrSetup(&message->string, 1, 0x7a);
         BattleHandler_PopWork(flow, message);
@@ -3183,8 +3184,8 @@ static void HandlerFlail(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s
 
     if (BattleEventVar_GetValue(3) == monId) {
         mon = GetBattleMon(flow, monId);
-        hp = GetBattleMonStat(mon, 0xd);
-        maxHp = GetBattleMonStat(mon, 0xe);
+        hp = GetBattleMonStat(mon, BATTLEMON_HP);
+        maxHp = GetBattleMonStat(mon, BATTLEMON_MAX_HP);
         ratio = hp * 48 / maxHp;
         if (ratio == 0) {
             ratio = 1;
@@ -3252,8 +3253,8 @@ static void HandlerEruption(BattleEventItem *item, BtlServerFlow *flow, u8 monId
 
     if (BattleEventVar_GetValue(3) == monId) {
         mon = GetBattleMon(flow, monId);
-        hp = GetBattleMonStat(mon, 0xd);
-        maxHp = GetBattleMonStat(mon, 0xe);
+        hp = GetBattleMonStat(mon, BATTLEMON_HP);
+        maxHp = GetBattleMonStat(mon, BATTLEMON_MAX_HP);
         power = PML_MoveGetBasePower(BattleEventItem_GetSubID(item));
         power = power * hp / maxHp;
         if (power == 0) {
@@ -4698,8 +4699,8 @@ static void HandlerPainSplit(BattleEventItem *item, BtlServerFlow *flow, u8 monI
         targetId = BattleEventVar_GetValue(6);
         user = GetBattleMon(flow, monId);
         target = GetBattleMon(flow, targetId);
-        userHp = GetBattleMonStat(user, 0xd);
-        targetHp = GetBattleMonStat(target, 0xd);
+        userHp = GetBattleMonStat(user, BATTLEMON_HP);
+        targetHp = GetBattleMonStat(target, BATTLEMON_HP);
         average = (userHp + targetHp) / 2;
 
         hpParam = BattleHandler_PushWork(flow, 8, monId);
@@ -4749,7 +4750,7 @@ static void HandlerBellyDrum(BattleEventItem *item, BtlServerFlow *flow, u8 monI
         mon = GetBattleMon(flow, monId);
         hpCost = DivideMaxHPZeroCheck(mon, 2);
         stages = BattleMon_GetStatRaiseRoom(mon, 1);
-        if (GetBattleMonStat(mon, 0xd) > hpCost && stages != 0) {
+        if (GetBattleMonStat(mon, BATTLEMON_HP) > hpCost && stages != 0) {
             hpParam = BattleHandler_PushWork(flow, 8, monId);
             hpParam->count = 1;
             hpParam->skipReaction = 1;
@@ -4915,7 +4916,7 @@ static void HandlerRestCheckFail(BattleEventItem *item, BtlServerFlow *flow, u8 
             BattleEventVar_RewriteValue(0x22, 0xe);
             return;
         }
-        ability = GetBattleMonStat(mon, 0x11);
+        ability = GetBattleMonStat(mon, BATTLEMON_EFFECTIVE_ABILITY);
         if (ability == 0xf || ability == 0x48) {
             BattleEventVar_RewriteValue(0x22, 0xf);
         }
@@ -4944,7 +4945,7 @@ static void HandlerRest(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s3
 
             recover = BattleHandler_PushWork(flow, 5, monId);
             recover->targetIndex = monId;
-            recover->amount = GetBattleMonStat(mon, 0xe) - GetBattleMonStat(mon, 0xd);
+            recover->amount = GetBattleMonStat(mon, BATTLEMON_MAX_HP) - GetBattleMonStat(mon, BATTLEMON_HP);
             recover->checkPrevResult = 1;
             BattleHandler_PopWork(flow, recover);
 
@@ -4977,8 +4978,8 @@ static void HandlerAttractCheckFail(BattleEventItem *item, BtlServerFlow *flow, 
     if (BattleEventVar_GetValue(3) == monId) {
         attacker = GetBattleMon(flow, monId);
         defender = GetBattleMon(flow, BattleEventVar_GetValue(4));
-        attackerSex = GetBattleMonStat(attacker, 0x12);
-        defenderSex = GetBattleMonStat(defender, 0x12);
+        attackerSex = GetBattleMonStat(attacker, BATTLEMON_GENDER);
+        defenderSex = GetBattleMonStat(defender, BATTLEMON_GENDER);
         if (attackerSex == 2 || defenderSex == 2 || attackerSex == defenderSex) {
             BattleEventVar_RewriteValue(0x40, 1);
         }
@@ -5382,13 +5383,13 @@ static void HandlerPsychUp(BattleEventItem *item, BtlServerFlow *flow, u8 monId,
         target = GetBattleMon(flow, targetId);
         param = BattleHandler_PushWork(flow, 0xf, monId);
         param->monIndex = monId;
-        param->attack = GetBattleMonStat(target, 1);
-        param->defense = GetBattleMonStat(target, 2);
-        param->spAttack = GetBattleMonStat(target, 3);
-        param->spDefense = GetBattleMonStat(target, 4);
-        param->speed = GetBattleMonStat(target, 5);
-        param->accuracy = GetBattleMonStat(target, 6);
-        param->evasion = GetBattleMonStat(target, 7);
+        param->attack = GetBattleMonStat(target, BATTLEMON_ATTACK_STAGE);
+        param->defense = GetBattleMonStat(target, BATTLEMON_DEFENSE_STAGE);
+        param->spAttack = GetBattleMonStat(target, BATTLEMON_SP_ATTACK_STAGE);
+        param->spDefense = GetBattleMonStat(target, BATTLEMON_SP_DEFENSE_STAGE);
+        param->speed = GetBattleMonStat(target, BATTLEMON_SPEED_STAGE);
+        param->accuracy = GetBattleMonStat(target, BATTLEMON_ACCURACY_STAGE);
+        param->evasion = GetBattleMonStat(target, BATTLEMON_EVASION_STAGE);
         BattleHandler_PopWork(flow, param);
 
         msg = BattleHandler_PushWork(flow, 4, monId);
@@ -5428,13 +5429,13 @@ static void HandlerHeartSwap(BattleEventItem *item, BtlServerFlow *flow, u8 monI
 
         param = BattleHandler_PushWork(flow, 0xf, monId);
         param->monIndex = monId;
-        param->attack = GetBattleMonStat(target, 1);
-        param->defense = GetBattleMonStat(target, 2);
-        param->spAttack = GetBattleMonStat(target, 3);
-        param->spDefense = GetBattleMonStat(target, 4);
-        param->speed = GetBattleMonStat(target, 5);
-        param->accuracy = GetBattleMonStat(target, 6);
-        param->evasion = GetBattleMonStat(target, 7);
+        param->attack = GetBattleMonStat(target, BATTLEMON_ATTACK_STAGE);
+        param->defense = GetBattleMonStat(target, BATTLEMON_DEFENSE_STAGE);
+        param->spAttack = GetBattleMonStat(target, BATTLEMON_SP_ATTACK_STAGE);
+        param->spDefense = GetBattleMonStat(target, BATTLEMON_SP_DEFENSE_STAGE);
+        param->speed = GetBattleMonStat(target, BATTLEMON_SPEED_STAGE);
+        param->accuracy = GetBattleMonStat(target, BATTLEMON_ACCURACY_STAGE);
+        param->evasion = GetBattleMonStat(target, BATTLEMON_EVASION_STAGE);
         BattleHandler_PopWork(flow, param);
 
         param = BattleHandler_PushWork(flow, 0xf, monId);
@@ -5477,29 +5478,29 @@ static void HandlerPowerSwap(BattleEventItem *item, BtlServerFlow *flow, u8 monI
         targetId = BattleEventVar_GetValue(6);
         target = GetBattleMon(flow, targetId);
         mon = GetBattleMon(flow, monId);
-        attack = GetBattleMonStat(mon, 1);
-        spAttack = GetBattleMonStat(mon, 3);
+        attack = GetBattleMonStat(mon, BATTLEMON_ATTACK_STAGE);
+        spAttack = GetBattleMonStat(mon, BATTLEMON_SP_ATTACK_STAGE);
 
         param = BattleHandler_PushWork(flow, 0xf, monId);
         param->monIndex = monId;
-        param->attack = GetBattleMonStat(target, 1);
-        param->spAttack = GetBattleMonStat(target, 3);
-        param->defense = GetBattleMonStat(mon, 2);
-        param->spDefense = GetBattleMonStat(mon, 4);
-        param->speed = GetBattleMonStat(mon, 5);
-        param->accuracy = GetBattleMonStat(mon, 6);
-        param->evasion = GetBattleMonStat(mon, 7);
+        param->attack = GetBattleMonStat(target, BATTLEMON_ATTACK_STAGE);
+        param->spAttack = GetBattleMonStat(target, BATTLEMON_SP_ATTACK_STAGE);
+        param->defense = GetBattleMonStat(mon, BATTLEMON_DEFENSE_STAGE);
+        param->spDefense = GetBattleMonStat(mon, BATTLEMON_SP_DEFENSE_STAGE);
+        param->speed = GetBattleMonStat(mon, BATTLEMON_SPEED_STAGE);
+        param->accuracy = GetBattleMonStat(mon, BATTLEMON_ACCURACY_STAGE);
+        param->evasion = GetBattleMonStat(mon, BATTLEMON_EVASION_STAGE);
         BattleHandler_PopWork(flow, param);
 
         param = BattleHandler_PushWork(flow, 0xf, monId);
         param->monIndex = targetId;
         param->attack = attack;
         param->spAttack = spAttack;
-        param->defense = GetBattleMonStat(target, 2);
-        param->spDefense = GetBattleMonStat(target, 4);
-        param->speed = GetBattleMonStat(target, 5);
-        param->accuracy = GetBattleMonStat(target, 6);
-        param->evasion = GetBattleMonStat(target, 7);
+        param->defense = GetBattleMonStat(target, BATTLEMON_DEFENSE_STAGE);
+        param->spDefense = GetBattleMonStat(target, BATTLEMON_SP_DEFENSE_STAGE);
+        param->speed = GetBattleMonStat(target, BATTLEMON_SPEED_STAGE);
+        param->accuracy = GetBattleMonStat(target, BATTLEMON_ACCURACY_STAGE);
+        param->evasion = GetBattleMonStat(target, BATTLEMON_EVASION_STAGE);
         BattleHandler_PopWork(flow, param);
 
         msg = BattleHandler_PushWork(flow, 4, monId);
@@ -5531,29 +5532,29 @@ static void HandlerGuardSwap(BattleEventItem *item, BtlServerFlow *flow, u8 monI
         targetId = BattleEventVar_GetValue(6);
         target = GetBattleMon(flow, targetId);
         mon = GetBattleMon(flow, monId);
-        defense = GetBattleMonStat(mon, 2);
-        spDefense = GetBattleMonStat(mon, 4);
+        defense = GetBattleMonStat(mon, BATTLEMON_DEFENSE_STAGE);
+        spDefense = GetBattleMonStat(mon, BATTLEMON_SP_DEFENSE_STAGE);
 
         param = BattleHandler_PushWork(flow, 0xf, monId);
         param->monIndex = monId;
-        param->attack = GetBattleMonStat(mon, 1);
-        param->spAttack = GetBattleMonStat(mon, 3);
-        param->defense = GetBattleMonStat(target, 2);
-        param->spDefense = GetBattleMonStat(target, 4);
-        param->speed = GetBattleMonStat(mon, 5);
-        param->accuracy = GetBattleMonStat(mon, 6);
-        param->evasion = GetBattleMonStat(mon, 7);
+        param->attack = GetBattleMonStat(mon, BATTLEMON_ATTACK_STAGE);
+        param->spAttack = GetBattleMonStat(mon, BATTLEMON_SP_ATTACK_STAGE);
+        param->defense = GetBattleMonStat(target, BATTLEMON_DEFENSE_STAGE);
+        param->spDefense = GetBattleMonStat(target, BATTLEMON_SP_DEFENSE_STAGE);
+        param->speed = GetBattleMonStat(mon, BATTLEMON_SPEED_STAGE);
+        param->accuracy = GetBattleMonStat(mon, BATTLEMON_ACCURACY_STAGE);
+        param->evasion = GetBattleMonStat(mon, BATTLEMON_EVASION_STAGE);
         BattleHandler_PopWork(flow, param);
 
         param = BattleHandler_PushWork(flow, 0xf, monId);
         param->monIndex = targetId;
-        param->attack = GetBattleMonStat(target, 1);
-        param->spAttack = GetBattleMonStat(target, 3);
+        param->attack = GetBattleMonStat(target, BATTLEMON_ATTACK_STAGE);
+        param->spAttack = GetBattleMonStat(target, BATTLEMON_SP_ATTACK_STAGE);
         param->defense = defense;
         param->spDefense = spDefense;
-        param->speed = GetBattleMonStat(target, 5);
-        param->accuracy = GetBattleMonStat(target, 6);
-        param->evasion = GetBattleMonStat(target, 7);
+        param->speed = GetBattleMonStat(target, BATTLEMON_SPEED_STAGE);
+        param->accuracy = GetBattleMonStat(target, BATTLEMON_ACCURACY_STAGE);
+        param->evasion = GetBattleMonStat(target, BATTLEMON_EVASION_STAGE);
         BattleHandler_PopWork(flow, param);
 
         msg = BattleHandler_PushWork(flow, 4, monId);
@@ -5581,8 +5582,8 @@ static void HandlerPowerTrick(BattleEventItem *item, BtlServerFlow *flow, u8 mon
         mon = GetBattleMon(flow, monId);
         param = BattleHandler_PushWork(flow, 0x11, monId);
         param->monIndex = monId;
-        param->attack = RawBattleMonStat(mon, 9);
-        param->defense = RawBattleMonStat(mon, 8);
+        param->attack = RawBattleMonStat(mon, BATTLEMON_DEFENSE);
+        param->defense = RawBattleMonStat(mon, BATTLEMON_ATTACK);
         param->setAttack = 1;
         param->setDefense = 1;
         BattleHandler_StrSetup(&param->string, 2, 0x305);
@@ -5617,8 +5618,8 @@ static void HandlerPowerSplit(BattleEventItem *item, BtlServerFlow *flow, u8 mon
         targetId = BattleEventVar_GetValue(6);
         mon = GetBattleMon(flow, monId);
         target = GetBattleMon(flow, targetId);
-        attack = (RawBattleMonStat(mon, 8) + RawBattleMonStat(target, 8)) / 2;
-        spAttack = (RawBattleMonStat(mon, 0xa) + RawBattleMonStat(target, 0xa)) / 2;
+        attack = (RawBattleMonStat(mon, BATTLEMON_ATTACK) + RawBattleMonStat(target, BATTLEMON_ATTACK)) / 2;
+        spAttack = (RawBattleMonStat(mon, BATTLEMON_SP_ATTACK) + RawBattleMonStat(target, BATTLEMON_SP_ATTACK)) / 2;
 
         param = BattleHandler_PushWork(flow, 0x11, monId);
         param->monIndex = targetId;
@@ -5661,8 +5662,8 @@ static void HandlerGuardSplit(BattleEventItem *item, BtlServerFlow *flow, u8 mon
         targetId = BattleEventVar_GetValue(6);
         mon = GetBattleMon(flow, monId);
         target = GetBattleMon(flow, targetId);
-        defense = (RawBattleMonStat(mon, 9) + RawBattleMonStat(target, 9)) / 2;
-        spDefense = (RawBattleMonStat(mon, 0xb) + RawBattleMonStat(target, 0xb)) / 2;
+        defense = (RawBattleMonStat(mon, BATTLEMON_DEFENSE) + RawBattleMonStat(target, BATTLEMON_DEFENSE)) / 2;
+        spDefense = (RawBattleMonStat(mon, BATTLEMON_SP_DEFENSE) + RawBattleMonStat(target, BATTLEMON_SP_DEFENSE)) / 2;
 
         param = BattleHandler_PushWork(flow, 0x11, monId);
         param->monIndex = targetId;
@@ -6092,7 +6093,7 @@ static void HandlerRolePlay(BattleEventItem *item, BtlServerFlow *flow, u8 monId
 
     if (BattleEventVar_GetValue(3) == monId) {
         targetId = BattleEventVar_GetValue(6);
-        ability = GetBattleMonStat(GetBattleMon(flow, targetId), 0x10);
+        ability = GetBattleMonStat(GetBattleMon(flow, targetId), BATTLEMON_ABILITY);
         if (!IsRolePlayExcludedAbility(ability)) {
             param = BattleHandler_PushWork(flow, 0x1f, monId);
             param->targetIndex = monId;
@@ -7753,12 +7754,12 @@ static void HandlerEntrainment(BattleEventItem *item, BtlServerFlow *flow, u8 mo
     BattleHandlerAbilityChangeParam *param;
 
     if (BattleEventVar_GetValue(3) == monId) {
-        ability = GetBattleMonStat(GetBattleMon(flow, monId), 0x10);
+        ability = GetBattleMonStat(GetBattleMon(flow, monId), BATTLEMON_ABILITY);
         if (!IsEntrainmentExcludedAbility(ability)) {
             count = BattleEventVar_GetValue(5);
             for (i = 0; i < count; i++) {
                 targetId = BattleEventVar_GetValue(6 + i);
-                if (GetBattleMonStat(GetBattleMon(flow, targetId), 0x10) != 0x36) {
+                if (GetBattleMonStat(GetBattleMon(flow, targetId), BATTLEMON_ABILITY) != 0x36) {
                     param = BattleHandler_PushWork(flow, 0x1f, monId);
                     param->targetIndex = BattleEventVar_GetValue(6 + i);
                     param->ability = ability;
@@ -8239,7 +8240,7 @@ static const BattleEventHandlerEntry *EventAddFinalGambit(u32 *priority) {
 
 static void HandlerFinalGambit(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work) {
     if (BattleEventVar_GetValue(3) == monId) {
-        BattleEventVar_RewriteValue(0x37, GetBattleMonStat(GetBattleMon(flow, monId), 0xd));
+        BattleEventVar_RewriteValue(0x37, GetBattleMonStat(GetBattleMon(flow, monId), BATTLEMON_HP));
     }
 }
 
@@ -8529,7 +8530,7 @@ static void HandlerRelicSong(BattleEventItem *item, BtlServerFlow *flow, u8 monI
 
     mon = GetBattleMon(flow, monId);
     if (GetBattleMonSpecies(mon) == SPECIES_MELOETTA && BattleEventVar_GetValue(3) == monId) {
-        form = GetBattleMonStat(mon, 0x13) == 0 ? 1 : 0;
+        form = GetBattleMonStat(mon, BATTLEMON_FORM) == 0 ? 1 : 0;
         param = BattleHandler_PushWork(flow, 0x39, monId);
         param->monIndex = monId;
         param->form = form;

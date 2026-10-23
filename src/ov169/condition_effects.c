@@ -129,7 +129,7 @@ static void ConditionEndTurnLeechSeed(BtlServerFlow *flow, BattleMon *mon, u8 mo
     sourceId = BtlServerFlow_GetMonIDAtPos(flow, pos);
     if (sourceId != 0x1f) {
         amount = DivideMaxHPZeroCheck(mon, 8);
-        hp = GetBattleMonStat(mon, 0xd);
+        hp = GetBattleMonStat(mon, BATTLEMON_HP);
         if (amount > hp) {
             amount = hp;
         }

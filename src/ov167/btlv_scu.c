@@ -64,7 +64,7 @@ typedef struct BtlvScuGauge {
 typedef struct BtlvScuAbilityWin {
     BtlvScu *scu;      // 0x00
     GFLBitmap *bitmap; // 0x04 18x4 characters
-    u16 ability;       // 0x08 GetBattleMonStat(mon, 0x10)
+    u16 ability;       // 0x08 GetBattleMonStat(mon, BATTLEMON_ABILITY)
     u8 side;           // 0x0A the index, 0 or 1, from BtlvScu_GetSide
     u8 bg;             // 0x0B 2, or 3 for side 1
     u8 monId;          // 0x0C 0x1F while none

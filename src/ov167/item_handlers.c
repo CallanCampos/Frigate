@@ -635,7 +635,7 @@ static BattleEventItem *ItemEvent_AddItemCore(BattleMon *mon, u16 itemId) {
 
     for (i = 0; i < 0xac; i++) {
         if (itemId == sItemEventAddTable[i].item) {
-            subPriority = RawBattleMonStat(mon, 12);
+            subPriority = RawBattleMonStat(mon, BATTLEMON_SPEED);
             monId = GetMonID(mon);
             handlers = sItemEventAddTable[i].eventAdd(&numHandlers);
             return BattleEvent_AddItem(5, itemId, 6, subPriority, monId, handlers, numHandlers);
@@ -1092,7 +1092,7 @@ static void HandlerSitrusBerryUse(BattleEventItem *item, BtlServerFlow *flow, u8
     u8 ratio;
 
     if (BattleEventVar_GetValue(2) == monId) {
-        maxHp = GetBattleMonStat(GetBattleMon(flow, monId), 0xe);
+        maxHp = GetBattleMonStat(GetBattleMon(flow, monId), BATTLEMON_MAX_HP);
         ratio = CommonGetItemParam(item, 2);
         param = BattleHandler_PushWork(flow, 5, monId);
         param->targetIndex = monId;
@@ -1763,14 +1763,14 @@ static BOOL CommonDamageReactCheckCore(BtlServerFlow *flow, u8 monId, u32 ratio)
     u32 hp;
 
     mon = GetBattleMon(flow, monId);
-    if (GetBattleMonStat(mon, 0x11) == 0x52 && ratio > 2) {
+    if (GetBattleMonStat(mon, BATTLEMON_EFFECTIVE_ABILITY) == 0x52 && ratio > 2) {
         ratio /= 2;
     }
     if (ratio == 0) {
         ratio = 1;
     }
-    if (GetBattleMonStat(mon, 0xe) > 1) {
-        hp = GetBattleMonStat(mon, 0xd);
+    if (GetBattleMonStat(mon, BATTLEMON_MAX_HP) > 1) {
+        hp = GetBattleMonStat(mon, BATTLEMON_HP);
         if (hp <= DivideMaxHp(mon, ratio)) {
             return TRUE;
         }

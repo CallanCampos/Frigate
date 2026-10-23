@@ -17,6 +17,7 @@
 #include "battle/handler_common.h"
 #include "battle/side_handlers.h"
 #include "constants/abilities.h"
+#include "constants/battle.h"
 #include "constants/items.h"
 #include "constants/moves.h"
 #include "constants/types.h"
@@ -391,8 +392,8 @@ static BOOL RetargetFromFaintedFoe(BtlServerFlow *flow, u32 style, BattleMon *mo
                     dist1 *= -1;
                 }
                 if (dist0 == dist1) {
-                    dist0 = GetBattleMonStat(mons[0], 0xd);
-                    dist1 = GetBattleMonStat(mons[1], 0xd);
+                    dist0 = GetBattleMonStat(mons[0], BATTLEMON_HP);
+                    dist1 = GetBattleMonStat(mons[1], BATTLEMON_HP);
                 }
                 if (dist0 < dist1) {
                     index = 0;
@@ -554,8 +555,8 @@ void AddExpAndEVs(BtlServerFlow *flow, BattleParty *party, BattleMon *defeated, 
             player = GetPlayerInfo(flow->mainModule);
             mon = GetBattleMonFromParty(party, i);
             pkm = GetSrcData(mon);
-            level = GetBattleMonStat(mon, 0xf);
-            defeatedLevel = GetBattleMonStat(defeated, 0xf);
+            level = GetBattleMonStat(mon, BATTLEMON_LEVEL);
+            defeatedLevel = GetBattleMonStat(defeated, BATTLEMON_LEVEL);
             if (setup->levelDiff < 0) {
                 defeatedLevel += (u16)MATH_ABS(setup->levelDiff);
             }
@@ -634,7 +635,7 @@ static void AddEVs(BattleMon *mon, BattleMon *defeated, BtlFlowExpEntry *entry) 
     u32 total;
 
     species = GetBattleMonSpecies(defeated);
-    form = GetBattleMonStat(defeated, 0x13);
+    form = GetBattleMonStat(defeated, BATTLEMON_FORM);
     for (i = 0; i < 6; i++) {
         evs[i] = PML_PersonalGetParamSingle(species, form, data_ov167_021d6cfc[i].personalParam);
     }
@@ -913,14 +914,14 @@ static BOOL CheckBallCapture(BtlServerFlow *flow, BattleMon *mon, BattleMon *tar
         *shakes = 3;
         return TRUE;
     }
-    maxHP = GetBattleMonStat(target, 0xe) * 3;
-    base = maxHP - GetBattleMonStat(target, 0xd) * 2;
+    maxHP = GetBattleMonStat(target, BATTLEMON_MAX_HP) * 3;
+    base = maxHP - GetBattleMonStat(target, BATTLEMON_HP) * 2;
     rate = FX32_CONST(base);
     if (BtlSetup_IsBattleType(flow->mainModule, 0x20)) {
         rate = FX_MUL(rate, GetDarkGrassCaptureMod(flow));
     }
     species = GetBattleMonSpecies(target);
-    form = GetBattleMonStat(target, 0x13);
+    form = GetBattleMonStat(target, BATTLEMON_FORM);
     rate *= (u16)PML_PersonalGetParamSingle(species, form, PERSONAL_CATCH_RATE);
     rate = (u32)FX_MUL(rate, GetBallCaptureMod(flow, mon, target, item)) / maxHP;
     switch (GetBattleMonStatus(target)) {
@@ -996,7 +997,7 @@ static fx32 GetBallCaptureMod(BtlServerFlow *flow, BattleMon *mon, BattleMon *ta
         }
         break;
     case ITEM_NEST_BALL: {
-        u16 level = GetBattleMonStat(target, 0xf);
+        u16 level = GetBattleMonStat(target, BATTLEMON_LEVEL);
 
         if (level < 30) {
             u16 bonus = 41 - level;
@@ -1127,7 +1128,7 @@ static BOOL BagItemRevive(BtlServerFlow *flow, BattleMon *mon, u16 item, s32 val
         revive->monIndex = monId;
         switch (ItemGetParam(item, 0x3a)) {
         case 0xff:
-            revive->amount = GetBattleMonStat(mon, 0xe);
+            revive->amount = GetBattleMonStat(mon, BATTLEMON_MAX_HP);
             break;
         case 0xfe:
             revive->amount = DivideMaxHPZeroCheck(mon, 2);
@@ -1275,7 +1276,7 @@ static BOOL BagItemRestoreHP(BtlServerFlow *flow, BattleMon *mon, u16 item, s32 
         amount = ItemGetParam(item, 0x3a);
         switch (amount) {
         case 0xff:
-            recover->amount = GetBattleMonStat(mon, 0xe);
+            recover->amount = GetBattleMonStat(mon, BATTLEMON_MAX_HP);
             break;
         case 0xfe:
             recover->amount = DivideMaxHPZeroCheck(mon, 2);
@@ -1384,7 +1385,7 @@ static BOOL BagItemAbilityUrge(BtlServerFlow *flow, BattleMon *mon, u16 item, s3
     u32 state;
     u32 result;
 
-    if (GetBattleMonStat(mon, 0x10) != ABILITY_IMPOSTER) {
+    if (GetBattleMonStat(mon, BATTLEMON_ABILITY) != ABILITY_IMPOSTER) {
         state = PushState(&flow->actionState, 0x797);
         BtlServerFlow_TriggerAbility(flow, mon);
         result = BtlServerFlow_GetHandlerResult(flow);
@@ -1797,8 +1798,8 @@ static void GetSideHP(BtlServerFlow *flow, s32 *hp, s32 *percent, u8 side) {
             numMons = GetNumMonsInParty(party);
             for (j = 0; j < numMons; j++) {
                 mon = GetBattleMonFromParty(party, j);
-                maxHP += GetBattleMonStat(mon, 0xe);
-                *hp += GetBattleMonStat(mon, 0xd);
+                maxHP += GetBattleMonStat(mon, BATTLEMON_MAX_HP);
+                *hp += GetBattleMonStat(mon, BATTLEMON_HP);
             }
         }
     }

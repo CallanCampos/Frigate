@@ -18,6 +18,7 @@
 #include "battle/pokewood_cutin.h"
 #include "constants/abilities.h"
 #include "constants/arc.h"
+#include "constants/battle.h"
 #include "constants/pokemon.h"
 #include "constants/species.h"
 #include "constants/text_banks.h"
@@ -2512,7 +2513,7 @@ void PokeCon_CreateClientParty(BtlPokeCon *pokeCon, BtlMainModule *mainModule, u
     eligible = GetPartyPkmnEligibleForBattle(srcParty);
     if (eligible > 0) {
         for (monId = firstMonId, i = 0; i < eligible; monId++) {
-            if (GetBattleMonStat(pokeCon->mons[monId], 0x11) == ABILITY_ILLUSION) {
+            if (GetBattleMonStat(pokeCon->mons[monId], BATTLEMON_EFFECTIVE_ABILITY) == ABILITY_ILLUSION) {
                 SetIllusionDisguise(pokeCon->mons[monId], PokeParty_GetPkm(srcParty, eligible));
             }
             i++;
@@ -2521,7 +2522,8 @@ void PokeCon_CreateClientParty(BtlPokeCon *pokeCon, BtlMainModule *mainModule, u
     if (BtlSetup_GetBattleType(mainModule) == 0 && clientId == 1) {
         for (i = 0; i < count; firstMonId++) {
             mon = pokeCon->mons[firstMonId];
-            if (GetBattleMonSpecies(mon) == SPECIES_ZOROARK && GetBattleMonStat(mon, 0x11) == ABILITY_ILLUSION) {
+            if (GetBattleMonSpecies(mon) == SPECIES_ZOROARK &&
+                GetBattleMonStat(mon, BATTLEMON_EFFECTIVE_ABILITY) == ABILITY_ILLUSION) {
                 party = GetClientSrcParty(mainModule, 0, pokeCon->unkE4);
                 species = 0;
                 partyCount = PokeParty_GetPkmCount(party);
@@ -2543,8 +2545,8 @@ void PokeCon_CreateClientParty(BtlPokeCon *pokeCon, BtlMainModule *mainModule, u
                 }
                 if (species != 0) {
                     if (mainModule->unk2C0 == NULL) {
-                        mainModule->unk2C0 =
-                            PokeParty_NewTempPkm(species, GetBattleMonStat(mon, 0xf), 0, mainModule->heapId);
+                        mainModule->unk2C0 = PokeParty_NewTempPkm(species, GetBattleMonStat(mon, BATTLEMON_LEVEL), 0,
+                                                                  mainModule->heapId);
                     }
                     SetIllusionDisguise(mon, mainModule->unk2C0);
                 }
@@ -3024,7 +3026,7 @@ void UpdatePartyIllusionDisguises(BtlMainModule *mainModule, BattleParty *party,
     }
     for (; i < party->count; i++) {
         mon = party->mons[i];
-        if (GetBattleMonStat(mon, 0x11) == ABILITY_ILLUSION) {
+        if (GetBattleMonStat(mon, BATTLEMON_EFFECTIVE_ABILITY) == ABILITY_ILLUSION) {
             if (i < last) {
                 SetIllusionDisguise(mon, GetSrcData(party->mons[last]));
             } else if (BattleMon_GetViewSrcData(mon) != mainModule->unk2C0) {
@@ -3417,8 +3419,8 @@ void BtlMain_StorePartiesToSetup(BtlMainModule *mainModule) {
             for (i = 0; i < monCount; i++) {
                 mon = BattleParty_GetMon(battleParty, i);
                 slot = GetMonID(mon) - firstMonId;
-                hp += GetBattleMonStat(mon, 13);
-                maxHP += GetBattleMonStat(mon, 14);
+                hp += GetBattleMonStat(mon, BATTLEMON_HP);
+                maxHP += GetBattleMonStat(mon, BATTLEMON_MAX_HP);
                 if (IsFainted(mon)) {
                     mainModule->setup->unkE7[index][slot] = 2;
                 } else if (GetBattleMonStatus(mon) != 0) {
@@ -3628,7 +3630,7 @@ void BtlMain_StoreResultStats(BtlMainModule *mainModule) {
     for (i = 0; i < count; i++) {
         mon = BattleParty_GetMon(party, i);
         setup->unkDC += BattleMon_GetUsedMoveKindCount(mon);
-        setup->unkD0 += GetBattleMonStat(mon, 13);
+        setup->unkD0 += GetBattleMonStat(mon, BATTLEMON_HP);
     }
     setup->unkDB = count - alive;
     party = GetPartyData(&mainModule->pokeCons[1], 1);

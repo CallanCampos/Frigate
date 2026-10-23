@@ -1262,7 +1262,7 @@ static void BattleClient_SaveFrontMonHp(BtlClient *client) {
     BattleMon *mon = BattleClient_GetSingleBattleFrontMon(client);
 
     if (mon != NULL) {
-        client->savedHp = GetBattleMonStat(mon, 13);
+        client->savedHp = GetBattleMonStat(mon, BATTLEMON_HP);
     }
 }
 
@@ -1270,7 +1270,7 @@ static u32 BattleClient_GetFrontMonHpLossRatio(BtlClient *client) {
     BattleMon *mon = BattleClient_GetSingleBattleFrontMon(client);
 
     if (mon != NULL) {
-        u32 hp = GetBattleMonStat(mon, 13);
+        u32 hp = GetBattleMonStat(mon, BATTLEMON_HP);
 
         if (hp >= client->savedHp) {
             return 0;
@@ -3326,7 +3326,7 @@ static BOOL CanMonUseHeldItem(BtlClient *client, BattleMon *mon) {
     if (CheckCondition(mon, CONDITION_EMBARGO)) {
         return FALSE;
     }
-    if (GetBattleMonStat(mon, 0x11) != ABILITY_KLUTZ) {
+    if (GetBattleMonStat(mon, BATTLEMON_EFFECTIVE_ABILITY) != ABILITY_KLUTZ) {
         return TRUE;
     }
     return FALSE;
@@ -3354,7 +3354,7 @@ static u32 CheckEscapeBlocked(BtlClient *client, u8 *trapMonId, u16 *trapAbility
             if (CanMonUseHeldItem(client, mon) && GetBattleMonHeldItem(mon) == ITEM_SMOKE_BALL) {
                 return TRAP_NONE;
             }
-            if (GetBattleMonStat(mon, 0x11) == ABILITY_RUN_AWAY) {
+            if (GetBattleMonStat(mon, BATTLEMON_EFFECTIVE_ABILITY) == ABILITY_RUN_AWAY) {
                 return TRAP_NONE;
             }
         }
@@ -3376,7 +3376,7 @@ static u32 IsMonTrapped(BtlClient *client, BattleMon *mon, u8 *trapMonId, u16 *t
     u8 i;
     for (i = 0; i < count; i++) {
         BattleMon *opponent = GetPokeParam(client->pokeCon, monIds[i]);
-        u16 ability = GetBattleMonStat(opponent, 0x11);
+        u16 ability = GetBattleMonStat(opponent, BATTLEMON_EFFECTIVE_ABILITY);
         // The ID is read and dropped here, likely left from a removed debug print
         GetMonID(opponent);
         if (ability == ABILITY_SHADOW_TAG && DoesMonHaveShadowTag(client, mon)) {
@@ -3405,7 +3405,7 @@ static u32 IsMonTrapped(BtlClient *client, BattleMon *mon, u8 *trapMonId, u16 *t
 }
 
 static BOOL DoesMonHaveShadowTag(BtlClient *client, BattleMon *mon) {
-    if (GetBattleMonStat(mon, 0x11) != ABILITY_SHADOW_TAG) {
+    if (GetBattleMonStat(mon, BATTLEMON_EFFECTIVE_ABILITY) != ABILITY_SHADOW_TAG) {
         return TRUE;
     }
     return FALSE;
@@ -3425,7 +3425,7 @@ static BOOL IsMonTrappedByArenaTrap(BtlClient *client, BattleMon *mon) {
     if (canUseItem && GetBattleMonHeldItem(mon) == ITEM_IRON_BALL) {
         return TRUE;
     }
-    if (GetBattleMonStat(mon, 0x11) == ABILITY_LEVITATE) {
+    if (GetBattleMonStat(mon, BATTLEMON_EFFECTIVE_ABILITY) == ABILITY_LEVITATE) {
         return FALSE;
     }
     if (DoesMonHaveType(mon, TYPE_FLYING)) {
@@ -3559,7 +3559,7 @@ static BOOL ShouldSwitchIfWonderGuard(BtlClient *client, BattleMon *mon, BattleM
     if (BtlSetup_GetBattleStyle(client->mainModule) != BTL_STYLE_SINGLE) {
         return FALSE;
     }
-    if (GetBattleMonStat(target, 0x11) == ABILITY_WONDER_GUARD &&
+    if (GetBattleMonStat(target, BATTLEMON_EFFECTIVE_ABILITY) == ABILITY_WONDER_GUARD &&
         !DoesMonHaveSuperEffectiveMove(client, mon, target, TYPE_EFFECTIVENESS_DOUBLE) &&
         CheckIfMonToSwitchToWithSEMove(client, target, TYPE_EFFECTIVENESS_DOUBLE) &&
         MATH_Rand32(&client->aiRand, 3) < 2) {
@@ -3661,7 +3661,7 @@ static BOOL ShouldSwitchIfAsleepWithNaturalCure(BtlClient *client, BattleMon *mo
     BattleMonDamageRecord record;
     u8 found;
 
-    if (GetBattleMonStat(mon, 0x11) == ABILITY_NATURAL_CURE &&
+    if (GetBattleMonStat(mon, BATTLEMON_EFFECTIVE_ABILITY) == ABILITY_NATURAL_CURE &&
         (CheckCondition(mon, CONDITION_SLEEP) || CheckCondition(mon, CONDITION_FREEZE)) &&
         GetHPRatio(mon) >= FX32_CONST(50)) {
         if (GetDamageReceived(mon, 1, 0, &record)) {
@@ -3729,7 +3729,7 @@ static BOOL CheckMonsForTypeAbsorbingAbility(BtlClient *client, u16 ability, u8 
     for (i = GetNumMonsOnField(BtlSetup_GetBattleStyle(client->mainModule), client->numCoverPos); i < numMons; i++) {
         if (!IsAISwitchReserved(client, i)) {
             BattleMon *candidate = GetBattleMonFromParty(client->party, i);
-            if (!IsFainted(candidate) && ability == GetBattleMonStat(candidate, 0x11)) {
+            if (!IsFainted(candidate) && ability == GetBattleMonStat(candidate, BATTLEMON_EFFECTIVE_ABILITY)) {
                 *slot = i;
                 return TRUE;
             }
@@ -6830,7 +6830,7 @@ static u16 AICheckItemUse(BtlClient *client, BattleMon *mon, BattleParty *party)
             BOOL use = FALSE;
 
             if (ItemGetParam(client->aiItems[i], 0x29)) {
-                if (GetBattleMonStat(mon, 0xd) > DivideMaxHp(mon, 4)) {
+                if (GetBattleMonStat(mon, BATTLEMON_HP) > DivideMaxHp(mon, 4)) {
                     continue;
                 }
                 use = TRUE;

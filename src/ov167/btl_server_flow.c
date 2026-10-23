@@ -540,7 +540,7 @@ void ServerControl_BeforeFirstFight(BtlServerFlow *flow) {
         move = ActionOrder_GetMove(&flow->actionOrder[i]);
         if (move != 0) {
             mon = flow->actionOrder[i].mon;
-            if (MoveEvent_AddItem(mon, move, GetBattleMonStat(mon, 0xc))) {
+            if (MoveEvent_AddItem(mon, move, GetBattleMonStat(mon, BATTLEMON_SPEED))) {
                 ServerEvent_BeforeFight(flow, mon, move);
                 MoveEvent_RemoveItem(mon, move);
             }
@@ -700,7 +700,7 @@ u8 ServerEvent_GetMovePriority(BtlServerFlow *flow, u16 move, BattleMon *mon) {
 u16 ServerEvent_CalculateSpeed(BtlServerFlow *flow, BattleMon *mon, BOOL flag) {
     u32 speed;
 
-    speed = GetBattleMonStat(mon, 0xc);
+    speed = GetBattleMonStat(mon, BATTLEMON_SPEED);
     BattleEventVar_Push(0x6ea);
     BattleEventVar_SetConstValue(2, GetMonID(mon));
     BattleEventVar_SetConstValue(0x2f, speed);
@@ -955,7 +955,7 @@ u32 ServerControl_CheckObedience(BtlServerFlow *flow, BattleMon *mon) {
         if (!IsTrainerOT(src, player)) {
             badges = GetBadgeCount(flow->mainModule);
             if (badges < 8) {
-                level = GetBattleMonStat(mon, 0xf);
+                level = GetBattleMonStat(mon, BATTLEMON_LEVEL);
                 maxLevel = (badges + 1) * 10;
                 if (level <= maxLevel) {
                     return 0;
@@ -1265,8 +1265,8 @@ BOOL ServerControl_EscapeSub(BtlServerFlow *handler, BattleMon *mon, u32 flag) {
     if (!flag) {
         enemy = GetClientMonData(handler->pokeCon, 1, 0);
         if (enemy != NULL) {
-            speed = RawBattleMonStat(mon, 0xc);
-            enemySpeed = RawBattleMonStat(enemy, 0xc);
+            speed = RawBattleMonStat(mon, BATTLEMON_SPEED);
+            enemySpeed = RawBattleMonStat(enemy, BATTLEMON_SPEED);
             if (speed <= enemySpeed) {
                 chance = (speed << 12) / enemySpeed * 128 >> 12;
                 chance += handler->unk786 * 30;
@@ -1733,7 +1733,7 @@ void ServerControl_ReflectMoves(BtlServerFlow *flow, u16 move) {
             flow->unk1AB0->flags.unk0 = TRUE;
             CollectMoveTargets(flow, mon, flow->unk4B0->targets[i], flow->unk1AB0, flow->unk864);
             BattleEvent_PausePersistentMoveItems(GetMonID(mon));
-            MoveEvent_AddItem(mon, move, GetBattleMonStat(mon, 0xc));
+            MoveEvent_AddItem(mon, move, GetBattleMonStat(mon, BATTLEMON_SPEED));
             ServerControl_ExecuteMove(flow, mon, move, flow->unk864);
             RemoveForce(mon, move);
             BattleEvent_ResumeMoveItems(GetMonID(mon));
@@ -1774,7 +1774,7 @@ void ServerControl_StealMove(BtlServerFlow *flow, BattleMon *attacker, u16 move,
             ServerDisplay_MoveFailMessage(flow, mon, move, 0xd);
             return;
         }
-        MoveEvent_AddItem(mon, move, GetBattleMonStat(mon, 0xc));
+        MoveEvent_AddItem(mon, move, GetBattleMonStat(mon, BATTLEMON_SPEED));
         ServerControl_ExecuteMove(flow, mon, move, flow->unk864);
         RemoveForce(mon, move);
     }
@@ -2259,11 +2259,11 @@ BOOL IsGuaranteedHit(BtlServerFlow *flow, BattleMon *attacker, BattleMon *defend
     u8 lockedId;
 
     if (BtlPosPoke_IsMonAtActivePos(&flow->posPoke, flow->mainModule, GetMonID(attacker)) &&
-        GetBattleMonStat(attacker, 0x11) == 0x63) {
+        GetBattleMonStat(attacker, BATTLEMON_EFFECTIVE_ABILITY) == 0x63) {
         return TRUE;
     }
     if (BtlPosPoke_IsMonAtActivePos(&flow->posPoke, flow->mainModule, GetMonID(defender)) &&
-        GetBattleMonStat(defender, 0x11) == 0x63) {
+        GetBattleMonStat(defender, BATTLEMON_EFFECTIVE_ABILITY) == 0x63) {
         return TRUE;
     }
     if (CheckCondition(attacker, CONDITION_ALWAYS_HIT)) {
@@ -2456,8 +2456,8 @@ BOOL ServerEvent_CheckHit(BtlServerFlow *flow, BattleMon *mon, BattleMon *target
     BattleEventVar_SetConstValue(3, GetMonID(mon));
     BattleEventVar_SetConstValue(4, GetMonID(target));
     BattleEventVar_SetRewriteOnceValue(0x4b, 0);
-    BattleEventVar_SetValue(0x27, GetBattleMonStat(mon, 6));
-    BattleEventVar_SetValue(0x28, GetBattleMonStat(target, 7));
+    BattleEventVar_SetValue(0x27, GetBattleMonStat(mon, BATTLEMON_ACCURACY_STAGE));
+    BattleEventVar_SetValue(0x28, GetBattleMonStat(target, BATTLEMON_EVASION_STAGE));
     BattleEventVar_SetMulValue(0x35, 0x1000, 0x29, 0x20000);
     BattleEvent_CallHandlers(flow, 0x33);
     accuracy = BattleEventVar_GetValue(0x27);
@@ -3317,7 +3317,7 @@ void ServerDisplay_EffectivenessMessage(BtlServerFlow *flow, s32 effectiveness) 
 }
 
 u32 ClampDamageToHP(BattleMon *mon, u32 damage) {
-    u32 hp = GetBattleMonStat(mon, 0xd);
+    u32 hp = GetBattleMonStat(mon, BATTLEMON_HP);
     if (damage > hp) {
         damage = hp;
     }
@@ -3343,7 +3343,7 @@ void ServerEvent_DamageDetermine(BtlServerFlow *flow, BattleMon *attacker, Battl
 
 u32 ServerEvent_CheckEndure(BtlServerFlow *flow, BattleMon *attacker, BattleMon *target, u32 arg3, u16 *damage) {
     u32 cause;
-    int hp = GetBattleMonStat(target, 0xd);
+    int hp = GetBattleMonStat(target, BATTLEMON_HP);
 
     if (hp > *damage) {
         return 0;
@@ -3357,7 +3357,7 @@ u32 ServerEvent_CheckEndure(BtlServerFlow *flow, BattleMon *attacker, BattleMon 
     cause = BattleEventVar_GetValue(0x3a);
     BattleEventVar_Pop(0x19f6);
     if (cause != 0) {
-        *damage = GetBattleMonStat(target, 0xd) - 1;
+        *damage = GetBattleMonStat(target, BATTLEMON_HP) - 1;
     }
     return cause;
 }
@@ -3650,7 +3650,7 @@ BOOL ServerEvent_CalcDamage(BtlServerFlow *flow, BattleMon *attacker, BattleMon 
         power = ServerEvent_GetMovePower(flow, attacker, defender, param);
         attack = ServerEvent_GetAttackPower(flow, attacker, defender, param, critical);
         defense = ServerEvent_GetTargetDefenses(flow, attacker, defender, param, critical);
-        level = (u8)GetBattleMonStat(attacker, 0xf);
+        level = (u8)GetBattleMonStat(attacker, BATTLEMON_LEVEL);
         value = CalcBaseDamage(power, attack, level, defense);
         if (ratio != 0x1000) {
             value = fixed_round(value, ratio);
@@ -3675,7 +3675,8 @@ BOOL ServerEvent_CalcDamage(BtlServerFlow *flow, BattleMon *attacker, BattleMon 
             value = fixed_round(value, ServerEvent_SameTypeAttackBonus(flow, attacker, param->type));
         }
         value = TypeEffectivenessPowerMod(value, effectiveness);
-        if (category == 1 && GetBattleMonStatus(attacker) == 4 && GetBattleMonStat(attacker, 0x11) != 0x3e) {
+        if (category == 1 && GetBattleMonStatus(attacker) == 4 &&
+            GetBattleMonStat(attacker, BATTLEMON_EFFECTIVE_ABILITY) != 0x3e) {
             value = value * 50 / 100;
         }
         if (value == 0) {
@@ -4017,7 +4018,7 @@ u32 AddConditionCheckFailOverwrite(BtlServerFlow *flow, BattleMon *mon, s32 cond
     if (condition == 0xe && GetBattleMonStatus(mon) != 0) {
         return 3;
     }
-    if (condition == 0x10 && GetBattleMonStat(mon, 0x10) == 0x79) {
+    if (condition == 0x10 && GetBattleMonStat(mon, BATTLEMON_ABILITY) == 0x79) {
         return 3;
     }
     return 0;
@@ -4059,7 +4060,7 @@ void ServerControl_AddCondition(BtlServerFlow *flow, BattleMon *target, BattleMo
     } else if (string != NULL) {
         BattleHandler_SetString(flow, string);
     }
-    if (condition == 3 && GetBattleMonSpecies(target) == 0x1ec && GetBattleMonStat(target, 0x13) == 1) {
+    if (condition == 3 && GetBattleMonSpecies(target) == 0x1ec && GetBattleMonStat(target, BATTLEMON_FORM) == 1) {
         AbilityEvent_RemoveItem(target);
         ChangeForm(target, 0);
         BtlServerCmdQueue_Put(flow->queue, SC_CHANGE_FORM, GetMonID(target), 0);
@@ -4071,7 +4072,7 @@ void ServerControl_AddCondition(BtlServerFlow *flow, BattleMon *target, BattleMo
         ServerEvent_ConditionConfirmed(flow, target, attacker, condition, value);
     } else if (condition == 0x10) {
         ServerEvent_GastroAcidConfirmed(flow, target);
-        if (GetBattleMonStat(target, 0x11) == 0x7f) {
+        if (GetBattleMonStat(target, BATTLEMON_EFFECTIVE_ABILITY) == 0x7f) {
             ServerControl_UnnerveAction(flow, target);
         }
     } else {
@@ -4424,7 +4425,7 @@ void ServerControl_RecoverHPCore(BtlServerFlow *flow, BattleMon *mon, u16 amount
 
 void ServerControl_OHKO(BtlServerFlow *flow, BtlFlowMoveParam *param, BattleMon *mon, void *targets) {
     u32 i = 0;
-    u8 attackerLevel = GetBattleMonStat(mon, 0xf);
+    u8 attackerLevel = GetBattleMonStat(mon, BATTLEMON_LEVEL);
     BattleMon *target;
 
     while (TRUE) {
@@ -4448,7 +4449,7 @@ void ServerControl_OHKO(BtlServerFlow *flow, BtlFlowMoveParam *param, BattleMon 
             ServerDisplay_MoveAvoided(flow, target, param->move);
             continue;
         }
-        if (attackerLevel < (u8)GetBattleMonStat(target, 0xf)) {
+        if (attackerLevel < (u8)GetBattleMonStat(target, BATTLEMON_LEVEL)) {
             ServerDisplay_Unaffected(flow, target);
             continue;
         }
@@ -4460,7 +4461,7 @@ void ServerControl_OHKO(BtlServerFlow *flow, BtlFlowMoveParam *param, BattleMon 
         state = PushState(&flow->actionState, 0x217b);
         if (ServerEvent_CheckOHKOHit(flow, mon, target, param->move)) {
             u8 attackerPos = GetBattlePos(&flow->posPoke, GetMonID(mon));
-            u16 damage = GetBattleMonStat(target, 0xd);
+            u16 damage = GetBattleMonStat(target, BATTLEMON_HP);
             u32 critical = BtlCalc_GetEffectivenessCategory(effectiveness);
             BOOL substitute = FALSE;
             BOOL endured = FALSE;
@@ -4604,8 +4605,8 @@ BOOL ServerControl_ForceSwitchCore(BtlServerFlow *flow, BattleMon *attacker, Bat
     } else {
         u8 attackerClient = GetClientIDFromMonID(GetMonID(attacker));
         if (!ignoreLevel) {
-            u8 attackerLevel = GetBattleMonStat(attacker, 0xf);
-            if ((u8)GetBattleMonStat(target, 0xf) > attackerLevel) {
+            u8 attackerLevel = GetBattleMonStat(attacker, BATTLEMON_LEVEL);
+            if ((u8)GetBattleMonStat(target, BATTLEMON_LEVEL) > attackerLevel) {
                 return FALSE;
             }
         }
@@ -4804,8 +4805,8 @@ void ServerControl_SkillSwap(BtlServerFlow *flow, BattleMon *mon, void *targets)
     u32 targetAbility;
 
     target = BtlMonSet_Get(targets, 0);
-    ability = GetBattleMonStat(mon, 0x10);
-    targetAbility = GetBattleMonStat(target, 0x10);
+    ability = GetBattleMonStat(mon, BATTLEMON_ABILITY);
+    targetAbility = GetBattleMonStat(target, BATTLEMON_ABILITY);
     if (ability != targetAbility && !IsSkillSwapExcludedAbility(ability) &&
         !IsSkillSwapExcludedAbility(targetAbility)) {
         BattleMoveEffectState *effect;
@@ -4870,7 +4871,7 @@ void ServerControl_UnnerveAction(BtlServerFlow *flow, BattleMon *mon) {
 BOOL ServerControl_Substitute(BtlServerFlow *flow, BattleMon *mon) {
     if (!IsSubstituteActive(mon)) {
         s32 cost = DivideMaxHPZeroCheck(mon, 4);
-        if ((s32)GetBattleMonStat(mon, 0xd) > cost) {
+        if ((s32)GetBattleMonStat(mon, BATTLEMON_HP) > cost) {
             u8 pos = GetBattlePos(&flow->posPoke, GetMonID(mon));
             if (pos != 6) {
                 ServerDisplay_SimpleHP(flow, mon, -cost, TRUE);
@@ -5118,7 +5119,7 @@ void ServerControl_CommPlayerSupportHeal(BtlServerFlow *flow) {
             if (count != 0) {
                 u8 monId = monIds[GFL_RandomMTRange(count)];
                 BattleMon *mon = GetPokeParam(flow->pokeCon, monId);
-                u32 amount = GetBattleMonStat(mon, 0xe);
+                u32 amount = GetBattleMonStat(mon, BATTLEMON_MAX_HP);
                 if (type == 1) {
                     amount >>= 1;
                 }
@@ -5404,7 +5405,7 @@ void ServerControl_WeatherDamage(BtlServerFlow *flow, BattleMon *mon, u32 weathe
         BattleHandler_SetString(flow, &flow->message);
         BattleHandler_StrClear(&flow->message);
         ServerControl_ViewEffect(flow, 0x290, BtlServerFlow_MonIDToPos(flow, monId), 6, 0, 0);
-        if ((s32)GetBattleMonStat(mon, 0xd) <= damage) {
+        if ((s32)GetBattleMonStat(mon, BATTLEMON_HP) <= damage) {
             ServerControl_ViewEffect(flow, 0x255, 6, 6, 0, 0);
         }
         ServerControl_SimpleDamageCore(flow, mon, damage, NULL);
@@ -5431,7 +5432,7 @@ BOOL ServerControl_CheckFainted(BtlServerFlow *flow, BattleMon *mon) {
         Clear_ForFainted(mon);
         if (GetClientIDFromMonID(monId) == GetPlayerClientID(flow->mainModule)) {
             bigLevelGap = FALSE;
-            s32 level = GetBattleMonStat(mon, 0xf);
+            s32 level = GetBattleMonStat(mon, BATTLEMON_LEVEL);
             if (level + 30 <= (s32)GetEnemyMaxLevel(flow)) {
                 bigLevelGap = TRUE;
             }
@@ -5461,7 +5462,7 @@ u32 GetEnemyMaxLevel(BtlServerFlow *flow) {
         if (!IsAllyClientID(playerClient, GetClientIDFromPos(flow->mainModule, pos))) {
             u8 monId = GetExistPokeID(&flow->posPoke, pos);
             if (monId != 0x1f) {
-                u32 level = GetBattleMonStat(GetPokeParam(flow->pokeCon, monId), 0xf);
+                u32 level = GetBattleMonStat(GetPokeParam(flow->pokeCon, monId), BATTLEMON_LEVEL);
                 if (level > maxLevel) {
                     maxLevel = level;
                 }
@@ -5494,7 +5495,7 @@ void ServerControl_ClearMonDependentEffects(BtlServerFlow *flow, BattleMon *mon,
     }
     FieldStatusRemoveDependPoke(monId);
     BtlServerCmdQueue_Put(flow->queue, SC_OP_REMOVE_FIELD_EFFECT_DEPEND_MON, monId);
-    if (!ServerControl_CheckMatchup(flow) && (u16)GetBattleMonStat(mon, 0x11) == 0x7f) {
+    if (!ServerControl_CheckMatchup(flow) && (u16)GetBattleMonStat(mon, BATTLEMON_EFFECTIVE_ABILITY) == 0x7f) {
         ServerControl_UnnerveAction(flow, mon);
     }
 }
@@ -5559,7 +5560,7 @@ BOOL ServerControl_GiveExp(BtlServerFlow *flow, BattleParty *party, const BtlFlo
         const BtlFlowExpEntry *entry = &entries[i];
         if (entries[i].exp != 0) {
             BattleMon *mon = BattleParty_GetMon(party, i);
-            if ((s32)GetBattleMonStat(mon, 0xf) < 100) {
+            if ((s32)GetBattleMonStat(mon, BATTLEMON_LEVEL) < 100) {
                 u32 exp = entry->exp;
                 if (entry->boosted) {
                     message = 0x2b;
@@ -5899,7 +5900,7 @@ void ServerDisplay_SimpleHP(BtlServerFlow *flow, BattleMon *mon, s32 amount, BOO
 }
 
 void ServerDisplay_FaintPokemon(BtlServerFlow *flow, BattleMon *mon, u32 flag) {
-    u32 hp = GetBattleMonStat(mon, 0xd);
+    u32 hp = GetBattleMonStat(mon, BATTLEMON_HP);
     u8 monId = GetMonID(mon);
 
     HPZero(mon);
@@ -6115,7 +6116,8 @@ u32 ServerEvent_InterruptSwitch(BtlServerFlow *flow, BattleMon *mon) {
         if (flow->actionOrder[i].mon != mon && !flow->actionOrder[i].done) {
             move = ActionOrder_GetMove(&flow->actionOrder[i]);
             if (move == MOVE_PURSUIT &&
-                MoveEvent_AddItem(flow->actionOrder[i].mon, move, GetBattleMonStat(flow->actionOrder[i].mon, 0xc))) {
+                MoveEvent_AddItem(flow->actionOrder[i].mon, move,
+                                  GetBattleMonStat(flow->actionOrder[i].mon, BATTLEMON_SPEED))) {
                 flow->actionOrder[i].interrupting = TRUE;
             }
         }
@@ -6181,9 +6183,9 @@ u16 ServerControl_ConfusionDamage(BtlServerFlow *flow, BattleMon *mon) {
     u32 cause;
     u16 damage;
 
-    attack = GetBattleMonStat(mon, 8);
-    defense = GetBattleMonStat(mon, 9);
-    damage = CalcBaseDamage(40, attack, GetBattleMonStat(mon, 0xf), defense);
+    attack = GetBattleMonStat(mon, BATTLEMON_ATTACK);
+    defense = GetBattleMonStat(mon, BATTLEMON_DEFENSE);
+    damage = CalcBaseDamage(40, attack, GetBattleMonStat(mon, BATTLEMON_LEVEL), defense);
     damage = damage * (100 - BattleRandom(16)) / 100;
     if (damage == 0) {
         damage = 1;
@@ -6436,8 +6438,8 @@ BOOL ServerEvent_CheckOHKOHit(BtlServerFlow *flow, BattleMon *attacker, BattleMo
     BOOL failed;
     BOOL result;
 
-    attackerLevel = GetBattleMonStat(attacker, 0xf);
-    targetLevel = GetBattleMonStat(target, 0xf);
+    attackerLevel = GetBattleMonStat(attacker, BATTLEMON_LEVEL);
+    targetLevel = GetBattleMonStat(target, BATTLEMON_LEVEL);
     if (attackerLevel < targetLevel) {
         return FALSE;
     }
@@ -6563,7 +6565,7 @@ s32 ServerEvent_CalcRecoil(BtlServerFlow *flow, BattleMon *mon, u16 move, s32 da
     ratio += bonus;
     if (ratio != 0) {
         if (kind == 2) {
-            damage = MultiplyValueByRatio(GetBattleMonStat(mon, 0xe), ratio);
+            damage = MultiplyValueByRatio(GetBattleMonStat(mon, BATTLEMON_MAX_HP), ratio);
             if (damage < 1) {
                 damage = 1;
             }
@@ -6870,7 +6872,7 @@ u16 ServerEvent_GetTargetDefenses(BtlServerFlow *flow, BattleMon *attacker, Batt
     u16 defense;
     u32 ratio;
 
-    stat = PML_MoveGetCategory(param->move) == MOVE_CATEGORY_SPECIAL ? 11 : 9;
+    stat = PML_MoveGetCategory(param->move) == MOVE_CATEGORY_SPECIAL ? BATTLEMON_SP_DEFENSE : BATTLEMON_DEFENSE;
     category = param->category;
     BattleEventVar_Push(0x3154);
     BattleEventVar_SetConstValue(3, GetMonID(attacker));
@@ -6881,12 +6883,12 @@ u16 ServerEvent_GetTargetDefenses(BtlServerFlow *flow, BattleMon *attacker, Batt
     BattleEvent_CallHandlers(flow, 0x3a);
     // Wonder Room swaps the two defenses
     if (BattleEventVar_GetValue(0x3d) & 1) {
-        if (stat == 9) {
-            stat = 11;
+        if (stat == BATTLEMON_DEFENSE) {
+            stat = BATTLEMON_SP_DEFENSE;
         } else {
-            stat = 9;
+            stat = BATTLEMON_DEFENSE;
         }
-        if (stat == 9) {
+        if (stat == BATTLEMON_DEFENSE) {
             category = MOVE_CATEGORY_PHYSICAL;
         } else {
             category = MOVE_CATEGORY_SPECIAL;
@@ -7100,7 +7102,7 @@ u32 ServerEvent_CalcMoveHealAmount(BtlServerFlow *flow, u16 move, BattleMon *mon
     BattleEvent_CallHandlers(flow, 0x8f);
     multiplier = BattleEventVar_GetValue(0x35);
     BattleEventVar_Pop(0x32c2);
-    maxHP = GetBattleMonStat(mon, 0xe);
+    maxHP = GetBattleMonStat(mon, BATTLEMON_MAX_HP);
     if (multiplier != 0) {
         amount = fixed_round(maxHP, multiplier);
     } else {
@@ -7540,7 +7542,7 @@ BOOL BtlServerFlow_CanUseHeldItem(BtlServerFlow *flow, u8 monId) {
     BattleMon *mon;
 
     mon = GetPokeParam(flow->pokeCon, monId);
-    if (GetBattleMonStat(mon, 0x11) == ABILITY_KLUTZ) {
+    if (GetBattleMonStat(mon, BATTLEMON_EFFECTIVE_ABILITY) == ABILITY_KLUTZ) {
         return FALSE;
     }
     if (CheckCondition(mon, CONDITION_EMBARGO)) {
@@ -8634,7 +8636,7 @@ u8 BattleHandler_AbilityChange(BtlServerFlow *handler, BattleHandlerAbilityChang
     u32 state;
 
     mon = GetPokeParam(handler->pokeCon, param->targetIndex);
-    oldAbility = GetBattleMonStat(mon, 0x10);
+    oldAbility = GetBattleMonStat(mon, BATTLEMON_ABILITY);
     if (IsAbilityMultitype(oldAbility)) {
         return FALSE;
     }
@@ -9041,7 +9043,7 @@ u8 BattleHandler_Transform(BtlServerFlow *handler, BattleHandlerTransformParam *
     mon = GetPokeParam(handler->pokeCon, param->monIndex);
     target = GetPokeParam(handler->pokeCon, param->targetIndex);
     if (!IsIllusionEnabled(mon) && !IsIllusionEnabled(target) && !IsSemiInvulnMove(mon)) {
-        oldAbility = GetBattleMonStat(mon, 0x10);
+        oldAbility = GetBattleMonStat(mon, BATTLEMON_ABILITY);
         if (TransformSet(mon, target)) {
             monId = GetMonID(mon);
             targetId = GetMonID(target);
@@ -9056,7 +9058,7 @@ u8 BattleHandler_Transform(BtlServerFlow *handler, BattleHandlerTransformParam *
             if (param->popup) {
                 ServerDisplay_AbilityPopupRemove(handler, mon);
             }
-            if (oldAbility != GetBattleMonStat(mon, 0x11)) {
+            if (oldAbility != GetBattleMonStat(mon, BATTLEMON_EFFECTIVE_ABILITY)) {
                 state = PushState(&handler->actionState, 0x3f37);
                 ServerEvent_ChangeAbilityAfter(handler, monId);
                 PopState(&handler->actionState, state, 0x3f39);
@@ -9153,7 +9155,7 @@ u8 BattleHandler_ChangeForm(BtlServerFlow *handler, BattleHandlerChangeFormParam
 
     mon = GetPokeParam(handler->pokeCon, param->monIndex);
     if (!IsFainted(mon) && !TransformCheck(mon)) {
-        currentForm = GetBattleMonStat(mon, 0x13);
+        currentForm = GetBattleMonStat(mon, BATTLEMON_FORM);
         if (currentForm != param->form) {
             if (param->popup) {
                 ServerDisplay_AbilityPopupAdd(handler, mon);
