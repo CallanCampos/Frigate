@@ -7,11 +7,14 @@
 #include "constants/battle.h"
 #include "struct_decls.h"
 
-// The stat that a move's stat change affects, as PML_MoveGetStatChangeStage returns it: one stat from 1, or
-// MOVE_STAT_CHANGE_ALL for the five from attack to speed at once. An enum, which MWCC loads again where it is
-// passed on after tests of it that share one load, as ServerControl_ApplyMoveStatChanges does
+// The stat that a move's stat change affects, as PML_MoveGetStatChangeStage returns it: one stat from 1, a
+// BATTLEMON_*_STAGE, or MOVE_STAT_CHANGE_ALL for the five from attack to speed at once. An enum, which MWCC loads again
+// where it is passed on after tests of it that share one load, as ServerControl_ApplyMoveStatChanges does
 typedef enum {
     MOVE_STAT_CHANGE_NONE = 0,
+    // Every stat, as the move data of Ancient Power, Ominous Wind and Silver Wind gives it and Clear Body guards
+    // against: dropped after the move's handlers unless one of them turns it into MOVE_STAT_CHANGE_ALL
+    MOVE_STAT_CHANGE_MULTI = 8,
     MOVE_STAT_CHANGE_ALL = 10,
 } MoveStatChangeStat;
 

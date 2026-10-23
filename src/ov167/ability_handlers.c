@@ -1177,7 +1177,7 @@ const BattleEventHandlerEntry *EventAddHyperCutter(u32 *priority) {
 }
 
 void HandlerHyperCutterCheck(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work) {
-    CommonStatDropGuardCheck(flow, monId, work, 1);
+    CommonStatDropGuardCheck(flow, monId, work, BATTLEMON_ATTACK_STAGE);
 }
 
 void HandlerHyperCutterGuard(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work) {
@@ -1195,7 +1195,7 @@ const BattleEventHandlerEntry *EventAddKeenEye(u32 *priority) {
 }
 
 void HandlerKeenEyeCheck(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work) {
-    CommonStatDropGuardCheck(flow, monId, work, 6);
+    CommonStatDropGuardCheck(flow, monId, work, BATTLEMON_ACCURACY_STAGE);
 }
 
 void HandlerKeenEyeGuard(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work) {
@@ -1213,7 +1213,7 @@ const BattleEventHandlerEntry *EventAddClearBody(u32 *priority) {
 }
 
 void HandlerClearBodyCheck(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work) {
-    CommonStatDropGuardCheck(flow, monId, work, 8);
+    CommonStatDropGuardCheck(flow, monId, work, MOVE_STAT_CHANGE_MULTI);
 }
 
 void HandlerClearBodyGuard(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work) {
@@ -1223,7 +1223,7 @@ void HandlerClearBodyGuard(BattleEventItem *item, BtlServerFlow *flow, u8 monId,
 void CommonStatDropGuardCheck(BtlServerFlow *flow, u32 monId, u32 *result, u32 stat) {
     if (BattleEventVar_GetValue(2) == monId) {
         if (BattleEventVar_GetValue(3) != monId) {
-            if (stat == 8 || BattleEventVar_GetValue(0x1f) == stat) {
+            if (stat == MOVE_STAT_CHANGE_MULTI || BattleEventVar_GetValue(0x1f) == stat) {
                 if ((s32)BattleEventVar_GetValue(0x20) < 0) {
                     *result = BattleEventVar_RewriteValue(0x41, 1);
                 }
@@ -4370,7 +4370,7 @@ const BattleEventHandlerEntry *EventAddBigPecks(u32 *priority) {
 }
 
 void HandlerBigPecksCheck(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work) {
-    CommonStatDropGuardCheck(flow, monId, work, 2);
+    CommonStatDropGuardCheck(flow, monId, work, BATTLEMON_DEFENSE_STAGE);
 }
 
 void HandlerBigPecksGuard(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work) {

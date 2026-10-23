@@ -4279,8 +4279,8 @@ void ServerEvent_GetMoveStatChangeValue(BtlServerFlow *flow, u16 move, u32 index
         *change *= multiplier;
     }
     BattleEventVar_Pop(0x2072);
-    if (*stat == 8) {
-        *stat = 0;
+    if (*stat == MOVE_STAT_CHANGE_MULTI) {
+        *stat = MOVE_STAT_CHANGE_NONE;
     }
 }
 

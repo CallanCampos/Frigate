@@ -1174,7 +1174,7 @@ static void HandlerDefog(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s
         targetId = BattleEventVar_GetValue(6);
         if (!IsSubstituteActive(GetBattleMon(flow, targetId))) {
             stat = BattleHandler_PushWork(flow, 0xe, monId);
-            stat->stat = 7;
+            stat->stat = BATTLEMON_EVASION_STAGE;
             stat->change = -1;
             stat->unk0e = 1;
             stat->count = 1;
@@ -1571,19 +1571,19 @@ static void HandlerCurse(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s
             stat = BattleHandler_PushWork(flow, 0xe, monId);
             stat->count = 1;
             stat->monIds[0] = monId;
-            stat->stat = 5;
+            stat->stat = BATTLEMON_SPEED_STAGE;
             stat->change = -1;
             BattleHandler_PopWork(flow, stat);
             stat = BattleHandler_PushWork(flow, 0xe, monId);
             stat->count = 1;
             stat->monIds[0] = monId;
-            stat->stat = 1;
+            stat->stat = BATTLEMON_ATTACK_STAGE;
             stat->change = 1;
             BattleHandler_PopWork(flow, stat);
             stat = BattleHandler_PushWork(flow, 0xe, monId);
             stat->count = 1;
             stat->monIds[0] = monId;
-            stat->stat = 2;
+            stat->stat = BATTLEMON_DEFENSE_STAGE;
             stat->change = 1;
             BattleHandler_PopWork(flow, stat);
         }
@@ -2146,7 +2146,7 @@ static void HandlerStockpileIncreaseStats(BattleEventItem *item, BtlServerFlow *
             stat = BattleHandler_PushWork(flow, 0xe, monId);
             stat->count = 1;
             stat->monIds[0] = monId;
-            stat->stat = 2;
+            stat->stat = BATTLEMON_DEFENSE_STAGE;
             stat->change = 1;
             stat->unk0e = 1;
             BattleHandler_PopWork(flow, stat);
@@ -2159,7 +2159,7 @@ static void HandlerStockpileIncreaseStats(BattleEventItem *item, BtlServerFlow *
             stat = BattleHandler_PushWork(flow, 0xe, monId);
             stat->count = 1;
             stat->monIds[0] = monId;
-            stat->stat = 4;
+            stat->stat = BATTLEMON_SP_DEFENSE_STAGE;
             stat->change = 1;
             stat->unk0e = 1;
             BattleHandler_PopWork(flow, stat);
@@ -2217,7 +2217,7 @@ static void HandlerSpitUpResetStats(BattleEventItem *item, BtlServerFlow *flow, 
             stat = BattleHandler_PushWork(flow, 0xe, monId);
             stat->count = 1;
             stat->monIds[0] = monId;
-            stat->stat = 2;
+            stat->stat = BATTLEMON_DEFENSE_STAGE;
             stat->change = -defense;
             BattleHandler_PopWork(flow, stat);
             counter = BattleHandler_PushWork(flow, 0x26, monId);
@@ -2230,7 +2230,7 @@ static void HandlerSpitUpResetStats(BattleEventItem *item, BtlServerFlow *flow, 
             stat = BattleHandler_PushWork(flow, 0xe, monId);
             stat->count = 1;
             stat->monIds[0] = monId;
-            stat->stat = 4;
+            stat->stat = BATTLEMON_SP_DEFENSE_STAGE;
             stat->change = -spDefense;
             BattleHandler_PopWork(flow, stat);
             counter = BattleHandler_PushWork(flow, 0x26, monId);
@@ -7437,7 +7437,7 @@ static const BattleEventHandlerEntry *EventAddAncientPower(u32 *priority) {
 
 static void HandlerAncientPower(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work) {
     if (BattleEventVar_GetValue(4) == monId && BattleEventVar_GetValue(3) == monId) {
-        BattleEventVar_RewriteValue(0x1f, 10);
+        BattleEventVar_RewriteValue(0x1f, MOVE_STAT_CHANGE_ALL);
     }
 }
 
