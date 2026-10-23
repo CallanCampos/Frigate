@@ -70,16 +70,18 @@ a merge.
   game-changes.md), and the two null tests of cut pointers (`PosEventAdd`, CPS's `no_need_inq`) test static data, not
   the arena. A comparison of cut addresses that could straddle 4 GiB is a `real` row.
 
-The groups of real rows when the guard was added, on `main` after the sync of upstream `b62c655bfa` and PR 14,
-182 sites in all (on `8ca29313d1`, where the baseline was first regenerated, they were 213: PR 14 fixed most of Join
-Avenue's, and upstream typed the box name entry's parameters, group R08):
+The groups of real rows when the guard was added, on `main` after the sync of upstream `b62c655bfa` and PRs 14 and
+15, 159 sites in all. On `8ca29313d1`, where the baseline was first regenerated, they were 213: PR 14 fixed most of
+Join Avenue's (R05), PR 15 the Day Care's egg and mail (R03), the Mystery Gift album's palette (R12), the Musical's
+sound data (R18), the mic's buffer (R19) and parts of local wireless and Wi-Fi, and upstream typed the box name entry's
+parameters (R08).
 
 | Group | What | Sites |
 | --- | --- | --- |
-| R02–R05 | The field: the Y button's shortcut menu, the Day Care's egg and mail, the field-move cut-in's palette, the Join Avenue names that two callers still cut and overlay 137's function types that PR 14's `uptr` getters and setters are cast to | 20 |
+| R02, R04, R05 | The field: the Y button's shortcut menu, the field-move cut-in's palette, the Join Avenue names that two callers still cut, and overlay 137's function types that PR 14's `uptr` getters and setters are cast to | 17 |
 | R06 | Battle: the handlers' message in event variable 0x3f | 12 |
-| R09, R11–R19 | Menus and apps: evolution by trade, Mystery Gift, GX's extended palettes, the C-Gear and Funfest views, Memory Link, Pokéstar Studios, the Musical, the mic | 51 |
-| R21–R24 | Wireless and Wi-Fi (phase 7): the Union Room, DWC's game code, the Wi-Fi libraries, local wireless and Download Play | 99 |
+| R09, R11, R13–R17 | Menus and apps: evolution by trade, Mystery Gift's list, GX's extended palettes, the C-Gear and Funfest views, Memory Link, Pokéstar Studios | 38 |
+| R21–R24 | Wireless and Wi-Fi (phase 7): the Union Room, DWC's game code, the Wi-Fi libraries, local wireless and Download Play | 92 |
 
 ## Alternatives
 

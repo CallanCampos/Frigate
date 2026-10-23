@@ -16,9 +16,9 @@ workflow goes in the decomp checkout instead; this file is the port's ([CLAUDE.m
   warnings two ways: STATUS.md's audit counted instances, a private header's site once for each file that includes it,
   on macOS; PR 7's 218 counted distinct sites, on Linux (its description: 452 to 379 distinct, the game's 234 to 161).
   Both reran the host build's commands with its `-isystem` kept, so the casts in the SDK's public headers' inline
-  functions (`gx.h`, `card.h`, `fnd.h`) never showed. On main the audit's way gives the game 161 and the libraries 231
-  again; distinct sites, 161 and 196. A figure in STATUS.md names its tool and its way of counting, and the tool is
-  committed: the guard's `--report` line now.
+  functions (`gx.h`, `card.h`, `fnd.h`) never showed. On `8ca29313d1` the audit's way gives the game 161 and the
+  libraries 231 again; distinct sites, 161 and 196. A figure in STATUS.md names its tool and its way of counting, and
+  the tool is committed: the guard's `--report` line now.
 - **The host build's decomp headers are system headers.** `port_decomp_env` passes the decomp's include directories
   with `-isystem`, which silences every warning in them; a check that reruns the build's commands has to turn them into
   `-I` to see the headers' code, as `check_ptrcasts.py` does, and then maps a host variant of a header
@@ -31,10 +31,11 @@ workflow goes in the decomp checkout instead; this file is the port's ([CLAUDE.m
   old one with `--update` keeps the classes of the rest, and a script that sets the new rows' classes by file and
   function keeps the work reviewable.
 - **clang's spelling of a type is the guard's key, so check it on two compilers.** Apple clang 21 and Homebrew's
-  clang 23 give the same keys on main, and so did CI's Apple clang 17 and Ubuntu's clang 21.1.8 (a configure-only build directory with
-  `-DCMAKE_C_COMPILER=/opt/homebrew/opt/llvm/bin/clang` is enough: the guard needs only the compile database), but
-  clang 23 calls a pointer difference `__ptrdiff_t` where Apple clang says `long`, and a `const uptr` read from a const
-  table is spelled with its qualifier, which a set of names misses until the qualifiers are stripped.
+  clang 23 give the same keys on main, and so did CI's Apple clang 17 and Ubuntu's clang 21.1.8 (a configure-only
+  build directory with `-DCMAKE_C_COMPILER=/opt/homebrew/opt/llvm/bin/clang` is enough: the guard needs only the
+  compile database), but clang 23 calls a pointer difference `__ptrdiff_t` where Apple clang says `long`, and a
+  `const uptr` read from a const table is spelled with its qualifier, which a set of names misses until the qualifiers
+  are stripped.
 - **Only `u32` to `uptr` keeps MWCC's tokens.** `uptr` and `sptr` are `u32` and `s32` for MWCC, so retyping a `u32` or
   an `s32` leaves every file's preprocessed text as it was, which `check_mwcc_neutral.py` proves for every file that
   includes the header at once. An `int` made `sptr` becomes `s32`, the same type but another token: the check then

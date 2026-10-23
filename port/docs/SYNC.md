@@ -216,7 +216,7 @@ PR comes first, and the sync runs again after it.
 With `--report` it prints the sites by class in one line, when it was added:
 
 ```text
-check_ptrcasts: 429 sites in 280 keys (real 182, harmless 108, handled 96, unreachable 43), 1667 files, 0 not compiled
+check_ptrcasts: 389 sites in 250 keys (real 159, harmless 99, handled 96, unreachable 35), 1667 files, 0 not compiled
 ```
 
 That line is T1's 64-bit measurement: [STATUS.md](STATUS.md) gives it in each entry's "64-bit warnings", the real
