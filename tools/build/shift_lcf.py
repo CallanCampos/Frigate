@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Pad a linker script so that code and data move, for `configure.py --shift`.
 
-    shift_lcf.py build/b2_us/arm9_symbols.lcf build/b2_us/arm9_shifted.lcf 0x100
+    shift_lcf.py build/b2_us/arm9.lcf build/b2_us/arm9_shifted.lcf 0x100
 
 The padding goes into the main module's .text just before Game Freak's library (heapsys.o), so that the rest of main's
 code, all of its data and every overlay, which are placed after main, move; and at the start of every overlay's .text,

@@ -24,7 +24,6 @@ from pathlib import Path
 
 ROOT = Path(__file__).parent.resolve()
 sys.path.insert(0, str(ROOT))
-from tools.build.object_aliases import label_aliases  # noqa: E402
 from tools.data.gen_constants import ordered_files  # noqa: E402
 from tools.data.graphics_archive import GRAPHICS, directory_archive  # noqa: E402
 from tools.text.pms_words import CATEGORIES as PMS_WORD_CATEGORIES  # noqa: E402
@@ -66,7 +65,7 @@ MWCCARM_URL = "https://decomp.aetias.com/files/mwccarm.zip"
 # changes are upstreamed. Its dsi-hybrid branch is released as DSD_VERSION; after a new release, bump it and
 # configure.py replaces tools/dsd.
 DSD_REPO = "https://github.com/fuddlesworth/ds-decomp"
-DSD_VERSION = "v0.12.1-dsi.4"
+DSD_VERSION = "v0.12.1-dsi.6"
 # Release binary of each platform, by (sys.platform, machine)
 DSD_BINARIES = {
     ("linux", "x86_64"): "dsd-linux-x86_64",
@@ -214,12 +213,6 @@ ROM_BLOBS = {
     "rom/dsp/dsp_g711_image.inc": ("dsi/ltd_autoload_0.bin", "ltd_autoload_0", "DSP_G711Image"),
     "rom/dsp/dsp_graphics_image.inc": ("dsi/ltd_autoload_0.bin", "ltd_autoload_0", "DSP_GraphicsImage"),
 }
-
-
-def overlay_digest_includes(version: str) -> list[str]:
-    """Returns the include files, under the generated headers, of a version's overlay table digest and overlay digests,
-    which lib/nitro/src/fs/fs_overlay_digest.c includes and tools/build/overlay_digests.py writes in that order."""
-    return [f"rom/{version}/overlay_table_digest.inc", f"rom/{version}/overlay_digests.inc"]
 
 
 def library_of(source: Path) -> tuple[str, list[str]] | None:
@@ -546,12 +539,10 @@ def add_version(n: Writer, version: str, dsd: Path, bugfix: bool, shift: int) ->
     delink_outputs = sorted({f["delink_file"] for f in files})
     n.build(delink_outputs, "delink", dsd_configs, implicit=[extract_dir / "config.yaml"],
             variables={"config": str(arm9_config)})
-    n.build([lcf_file, objects_file], "lcf", dsd_configs, implicit=[extract_dir / "config.yaml"],
-            variables={"config": str(arm9_config)})
-    # NitroSDK's linker symbols, which dsd's linker script doesn't define, see tools/build/lcf_symbols.py
-    link_lcf = build_dir / "arm9_symbols.lcf"
-    n.build([link_lcf], "lcf_symbols", [lcf_file, "config/linker_symbols.toml"],
-            implicit=["tools/build/lcf_symbols.py"])
+    # The linker script also defines NitroSDK's linker symbols, as the SDK's template does, from linker_symbols.toml
+    n.build([lcf_file, objects_file], "lcf", dsd_configs,
+            implicit=[extract_dir / "config.yaml", "config/linker_symbols.toml"], variables={"config": str(arm9_config)})
+    link_lcf = lcf_file
     if shift:
         # Padding in the linker script moves the code and data after it, see tools/build/shift_lcf.py
         shifted_lcf = build_dir / "arm9_shifted.lcf"
@@ -566,24 +557,15 @@ def add_version(n: Writer, version: str, dsd: Path, bugfix: bool, shift: int) ->
     as_defines = " ".join(f"-D{define}" for define in version_defines)
     objects = []
     compiled = []
-    # A function's second names, kept as labels in the configs, which the compiled object gets added, see
-    # tools/build/object_aliases.py
-    aliases = label_aliases(arm9_config.parent)
     for f in files:
         source = Path(f["name"])
         if source.suffix in (".c", ".cpp") and source.exists():
             obj = build_dir / source.with_suffix(".o")
             settings = source_compiler(source)
             rule = f"mwcc_{LIBRARY_COMPILERS.index(settings.compiler)}" if settings.is_library else "mwcc"
-            source_aliases = aliases.get(source.as_posix())
-            compiler_obj = obj.with_suffix(".unaliased.o") if source_aliases else obj
-            variables = {"defines": defines, "dep": compiler_obj.with_suffix(".d")}
+            variables = {"defines": defines, "dep": obj.with_suffix(".d")}
             variables["flags"] = " ".join(settings.flags)
-            n.build([compiler_obj], rule, [source], variables=variables, order_only=["constants_headers"])
-            if source_aliases:
-                n.build([obj], "object_aliases", [compiler_obj], implicit=["tools/build/object_aliases.py"],
-                        variables={"aliases": " ".join(f"{label}={function}"
-                                                       for label, function in sorted(source_aliases.items()))})
+            n.build([obj], rule, [source], variables=variables, order_only=["constants_headers"])
             compiled.append(obj)
         elif source.suffix == ".s" and source.exists():
             obj = build_dir / source.with_suffix(".o")
@@ -779,7 +761,8 @@ def main():
     n.rule("check_baserom", "echo '$sha1  $in' | sha1sum --quiet -c - && touch $out", "Checking base ROM $in")
     n.rule("extract", "$dsd rom extract --rom $in --output-path $extract_dir", "Extracting $in")
     n.rule("delink", "$dsd delink --config-path $config", "Delinking $config")
-    n.rule("lcf", "$dsd lcf --config-path $config", "Generating linker script for $config")
+    n.rule("lcf", "$dsd lcf --config-path $config --symbols config/linker_symbols.toml",
+           "Generating linker script for $config")
     # mwccarm writes the dependency file next to the object, with Windows paths that fix_depfile.py converts
     n.rule("mwcc", f"mkdir -p $$(dirname $out) && $wine $sjiswrap {shlex.quote(str(mwcc))} $flags "
            "$defines -gccdep -MD $includes -o $out $in && $python tools/build/fix_depfile.py $dep", "Compiling $in",
@@ -796,8 +779,6 @@ def main():
         lib_mwasm = tools_dir / "mwccarm" / compiler / "mwasmarm.exe"
         n.rule(f"mwasm_{i}", f"mkdir -p $$(dirname $out) && $wine {shlex.quote(str(lib_mwasm))} $flags -o $out $in",
                "Assembling $in")
-    n.rule("object_aliases", "$python tools/build/object_aliases.py $in $out $aliases", "Adding labels to $out")
-    n.rule("lcf_symbols", "$python tools/build/lcf_symbols.py $in $out", "Adding NitroSDK's symbols to $out")
     n.rule("shift_lcf", "$python tools/build/shift_lcf.py $in $out $amount", "Shifting $in")
     n.rule("ltd_objects", "$python tools/build/ltd_objects.py $in $out", "Grouping the LTD autoload's objects in $out")
     n.rule("mwld", f"$wine {shlex.quote(str(mwld))} {' '.join(LD_FLAGS)} @$objects $lcf -o $out", "Linking $out")
@@ -838,8 +819,13 @@ def main():
     n.rule("report", f"{tools_dir / 'objdiff-cli'} report generate -p . -o $out", "Generating $out")
     n.rule("complete_report", "$python tools/build/complete_report.py $in $out", "Counting complete files in $out")
     n.rule("progress", "$python tools/build/progress.py $in", "Progress")
+    # A regeneration keeps the options that chose the tools, so that a build with another dsd keeps it
     configure_args = [*args.versions, *(["--bugfix"] if args.bugfix else []),
-                      *([f"--shift {args.shift:#x}"] if args.shift else [])]
+                      *([f"--shift {args.shift:#x}"] if args.shift else []),
+                      *([f"--dsd {shlex.quote(str(args.dsd.resolve()))}"] if args.dsd else []),
+                      *(["--dsd-from-source"] if args.dsd_from_source else []),
+                      *([f"--wine {shlex.quote(args.wine)}"] if args.wine else []),
+                      *(["--no-download"] if args.no_download else [])]
     n.rule("configure", f"$python configure.py {' '.join(configure_args)}", "Reconfiguring", generator="1")
     # Formats the sources and headers in place with clang-format and .clang-format
     n.rule("format", "clang-format -i $in", "Formatting")
@@ -882,15 +868,6 @@ def main():
                 implicit=["tools/build/rom_blob.py", Path("extract") / versions[0] / "config.yaml"],
                 variables={"module": str(Path("extract") / versions[0] / module), "name": name})
         constant_headers.append(output)
-    # Each version's digests of its overlays, computed from its base ROM (tools/build/overlay_digests.py)
-    n.rule("overlay_digests", "$python tools/build/overlay_digests.py $in $key $out", "Generating $out", restat="1")
-    for version in versions:
-        outputs = [Path(GENERATED_INCLUDE_DIR) / include for include in overlay_digest_includes(version)]
-        extract_dir = Path("extract") / version
-        n.build(outputs, "overlay_digests", [Path("orig") / f"baserom_{version}.nds"],
-                implicit=["tools/build/overlay_digests.py", extract_dir / "config.yaml"],
-                variables={"key": str(extract_dir / "arm9" / "hmac_sha1_key.bin")})
-        constant_headers += outputs
     n.build(["constants_headers"], "phony", constant_headers)
 
     checks, configs = [], []
