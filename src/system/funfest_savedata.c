@@ -6,7 +6,6 @@
 // The save block of the Funfest missions: how many were hosted, joined and completed, and each mission's record.
 // The ROM has no string for the file, so the name is a guess. Block 0x46.
 
-#define SAVE_BLOCK_FUNFEST 0x46
 #define FUNFEST_PARTICIPANTS_MAX 100
 #define FUNFEST_LEVEL_POINTS_COUNT 2
 #define FUNFEST_LEVEL_POINTS_MAX 100

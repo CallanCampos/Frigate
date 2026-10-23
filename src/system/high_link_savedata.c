@@ -9,7 +9,6 @@
 // and the time played while a pass power ran. The ROM has no string for the file, so the name is a guess.
 // Block 0x35.
 
-#define SAVE_BLOCK_HIGH_LINK 0x35
 #define HIGH_LINK_LEVEL_MAX 999
 
 // The play time, in seconds, when the count of HighLinkSave_CountPlaySeconds started

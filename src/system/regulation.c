@@ -15,8 +15,6 @@
 // The rules of a battle, and the save block of the competitions' regulations and the teams entered in them, which
 // swan calls the tournament block. Block 0x2f.
 
-#define SAVE_BLOCK_TOURNAMENT 0x2f
-
 #define REGULATION_NAME_STRBUF_SIZE 26
 
 static void loadBattleTypeTextToStrbuf(Regulation *regulation, StrBuf *strbuf);

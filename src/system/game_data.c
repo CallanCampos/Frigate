@@ -50,16 +50,6 @@
 // of the save's blocks that the report writes back. Names from swan (https://github.com/ds-pokemon-hacking/swan,
 // GPL-3.0) where the functions have them; the fields' names are ours
 
-#define SAVE_BLOCK_BAG 0x19
-#define SAVE_BLOCK_PARTY 0x1a
-#define SAVE_BLOCK_RECORDS 0x26
-#define SAVE_BLOCK_FIELD_ACTORS 0x29
-#define SAVE_BLOCK_MUSICAL 0x2a
-#define SAVE_BLOCK_EVENT_WORK 0x2d
-#define SAVE_BLOCK_STRENGTH_ROCKS 0x33
-#define SAVE_BLOCK_40 0x40
-#define SAVE_BLOCK_TRADED_POKEMON 0x41
-
 // The players of the game data: the four of a communication, by net ID, then the player's own
 #define GAME_DATA_PLAYER_MAX 5
 #define GAME_DATA_PLAYER_MINE 4

@@ -6,8 +6,6 @@
 // The save block of the Battle Institute (the trial house): the results of the challenges, and the data of the file
 // that follows the battle examination's. The ROM has no string for the file, so the name is descriptive. Block 0x3f.
 
-#define SAVE_BLOCK_TRIAL_HOUSE 0x3f
-
 u32 TrialHouseSave_GetSize(void) {
     return sizeof(TrialHouseSave);
 }

@@ -10,8 +10,6 @@
 
 // The Chatot's recorded cry (Perap is Chatot's Japanese name). The name is the ROM's string. Block 0x24.
 
-#define SAVE_BLOCK_PERAP_VOICE 0x24
-
 u32 PerapVoice_GetSize(void) {
     return sizeof(PerapVoice);
 }
@@ -29,7 +27,7 @@ PerapVoice *allocChatotChatterBlk(HeapID heapId) {
 }
 
 PerapVoice *getChatterBlockAddress(SaveControl *save) {
-    return SaveControl_GetBlockPtr(save, SAVE_BLOCK_PERAP_VOICE);
+    return SaveControl_GetBlockPtr(save, SAVE_BLOCK_CHATTER);
 }
 
 BOOL doesChatotExist(PerapVoice *chatter) {

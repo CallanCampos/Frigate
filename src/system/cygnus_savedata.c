@@ -9,8 +9,6 @@
 // which cygnus_save_control.c reads and writes. The ROM has no string for the file, so the name is a guess; the
 // function names are swan's except getNextSeed's callers. Block 0x48.
 
-#define SAVE_BLOCK_DREAM_RADAR 0x48
-
 static u64 getNextSeed(u64 seed);
 
 u32 getDreamRadarSaveSize(void) {

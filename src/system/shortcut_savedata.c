@@ -9,8 +9,6 @@
 // The shortcuts registered to the Y button, a list without gaps inside the C-Gear's save block. The ROM has no
 // string for the file, so the name is a guess; the functions' names are swan's.
 
-#define SAVE_BLOCK_CGEAR 0x20
-
 static void ShortcutSave_Condense(ShortcutSave *shortcutSave);
 
 void ShortcutSave_Init(ShortcutSave *shortcutSave) {
