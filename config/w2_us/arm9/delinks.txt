@@ -1567,6 +1567,7 @@ src/system/field_light_status.c:
     .rodata     start:0x02090150 end:0x0209018c
 
 src/system/mcss.c:
+    complete
     .text       start:0x02019a14 end:0x0201c008
     .rodata     start:0x0209018c end:0x020901a4
     .data       start:0x0209a3d0 end:0x0209a3d8
