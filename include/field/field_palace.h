@@ -8,14 +8,14 @@
 typedef struct FieldPalaceSys {
     GameSystem *gsys;
     Field *field;
-    void *luminanceTable;
+    u8 *luminanceTable;
 } FieldPalaceSys;
 
 FieldPalaceSys *FieldPalaceSys_Create(HeapID heapId, GameSystem *gsys, Field *field, u16 zoneId);
 void FieldPalaceSys_InitPostFX(FieldPalaceSys *sys, u16 zoneId, HeapID heapId);
 void FieldPalaceSys_LoadLuminanceTable(FieldPalaceSys *sys, u32 fileId, u16 zoneId, u32 season, HeapID heapId);
 void FieldPalaceSys_Free(FieldPalaceSys *sys);
-void *FieldPalaceSys_GetLuminanceTable(FieldPalaceSys *sys);
+u8 *FieldPalaceSys_GetLuminanceTable(FieldPalaceSys *sys);
 BOOL FieldPalaceSys_CheckEventFlag(GameData *gameData, u16 zoneId);
 
 // Overlay 12

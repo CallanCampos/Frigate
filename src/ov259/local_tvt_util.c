@@ -61,9 +61,11 @@
 #define BAR_HEIGHT 3
 
 // The animations of the return button
-#define RETURN_SEQUENCE_ACTIVE 1
-#define RETURN_SEQUENCE_PRESSED 9
-#define RETURN_SEQUENCE_INACTIVE 15
+enum {
+    RETURN_SEQUENCE_ACTIVE = 1,
+    RETURN_SEQUENCE_PRESSED = 9,
+    RETURN_SEQUENCE_INACTIVE = 15,
+};
 
 // How fast the cursor's color pulses, and for how long the entry the player decided on flashes
 #define PULSE_SPEED 0x400

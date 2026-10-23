@@ -17,8 +17,6 @@
 // the survey's answers, the Gym parties and the table of the gifts given once. The ROM has no string for the file,
 // so the name is a guess. Block 0x34.
 
-#define SAVE_BLOCK_TRAINER_GAME_INFO 0x34
-
 static void TrainerGameInfo_ClearKeyboardTypes(TrainerGameInfoSave *info);
 
 u32 TrainerGameInfo_GetSize(void) {

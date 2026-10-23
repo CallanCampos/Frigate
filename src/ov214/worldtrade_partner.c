@@ -41,12 +41,6 @@ enum {
     PARTNER_SEQ_EXCHANGE_SCREEN2,
 };
 
-// The sub-process modes of the screens it goes to and comes from
-#define SEARCH_MODE_PARTNER_RETURN 15
-#define PARTNER_MODE_FROM_SEARCH 16
-#define PARTNER_MODE_FROM_PARTNER 17
-#define BOX_MODE_EXCHANGE_SELECT 6
-
 // How many windows of information the screen has
 #define PARTNER_INFOWIN_NUM 16
 
@@ -123,7 +117,7 @@ int WorldTrade_Partner_Init(WorldTradeWork *wk, int seq) {
     GX_SetDispSelect(GX_DISP_SELECT_MAIN_SUB);
     GFL_NetSetIconScreen(TRUE, HEAPID_WORLDTRADE);
 
-    if (wk->subProcessMode == PARTNER_MODE_FROM_PARTNER) {
+    if (wk->subProcessMode == WT_MODE_PARTNER_FROM_PARTNER) {
         if (GX_GetMasterBrightness() == -16 && GXS_GetMasterBrightness() != -16) {
             GFL_WipeSet(3, 1, 1, 0, 6, 1, HEAPID_WORLDTRADE);
         } else if (GX_GetMasterBrightness() != -16 && GXS_GetMasterBrightness() == -16) {
@@ -337,7 +331,7 @@ static void Partner_FreeWork(WorldTradeWork *wk) {
 
 static int Partner_SubSeqStart(WorldTradeWork *wk) {
     ClActor_SetVisible(wk->promptDsAct, FALSE);
-    if (wk->subProcessMode == PARTNER_MODE_FROM_SEARCH) {
+    if (wk->subProcessMode == WT_MODE_PARTNER_FROM_SEARCH) {
         GFL_WipeSet(0, 1, 1, 0, 16, 1, HEAPID_WORLDTRADE);
         wk->subprocessSeq = PARTNER_SEQ_RETURN_SCREEN1;
     } else {
@@ -351,7 +345,7 @@ static void Partner_DecidePartner(WorldTradeWork *wk, int result) {
     if (result != wk->touchTrainerPos && result >= 0) {
         ClActor_SetSequence(wk->subAct[result + 1], result * 4 + 16);
         wk->subprocessSeq = PARTNER_SEQ_END;
-        WorldTrade_SubProcessChange(wk, WORLDTRADE_PARTNER, PARTNER_MODE_FROM_PARTNER);
+        WorldTrade_SubProcessChange(wk, WORLDTRADE_PARTNER, WT_MODE_PARTNER_FROM_PARTNER);
         wk->touchTrainerPos = result;
         WorldTrade_SetPartnerCursorPos(wk, result, 0);
         GFL_SndSEPlay(0x54c);
@@ -415,8 +409,8 @@ static int Partner_SubSeqMain(WorldTradeWork *wk) {
 
 static int Partner_SubSeqEnd(WorldTradeWork *wk) {
     ClActor_SetVisible(wk->partnerCursorAct, FALSE);
-    if (wk->subProcessMode != SEARCH_MODE_PARTNER_RETURN) {
-        if (wk->subProcessMode == BOX_MODE_EXCHANGE_SELECT) {
+    if (wk->subProcessMode != WT_MODE_SEARCH_PARTNER_RETURN) {
+        if (wk->subProcessMode == WT_MODE_EXCHANGE_SELECT) {
             GFL_WipeSet(0, 0, 0, 0, 6, 1, HEAPID_WORLDTRADE);
         } else {
             GFL_WipeSet(3, 0, 0, 0, 6, 1, HEAPID_WORLDTRADE);
@@ -438,7 +432,7 @@ static int Partner_SubSeqYesNoSelect(WorldTradeWork *wk) {
     if (ret == 1) {
         WorldTrade_TouchWinYesNoDel(wk);
         wk->subprocessSeq = PARTNER_SEQ_END;
-        WorldTrade_SubProcessChange(wk, WORLDTRADE_MYBOX, BOX_MODE_EXCHANGE_SELECT);
+        WorldTrade_SubProcessChange(wk, WORLDTRADE_MYBOX, WT_MODE_EXCHANGE_SELECT);
         Partner_PokeLabelPrint(wk->msgManager, &wk->infoWin[14], 0x53, &wk->print, 0x440);
         Partner_PokeLabelPrint(wk->msgManager, &wk->infoWin[9], 0x57, &wk->print, 0x3c40);
         Partner_ChangePage(wk);
@@ -482,7 +476,7 @@ static int Partner_SubSeqExchangeScreen2(WorldTradeWork *wk) {
     if (GFL_WipeIsFinished()) {
         GX_SetDispSelect(GX_DISP_SELECT_SUB_MAIN);
         wk->subprocessSeq = PARTNER_SEQ_END;
-        WorldTrade_SubProcessChange(wk, WORLDTRADE_SEARCH, SEARCH_MODE_PARTNER_RETURN);
+        WorldTrade_SubProcessChange(wk, WORLDTRADE_SEARCH, WT_MODE_SEARCH_PARTNER_RETURN);
         wk->drawOffset = 16;
     }
     return WT_SEQ_MAIN;

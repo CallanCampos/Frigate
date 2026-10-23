@@ -572,7 +572,7 @@ void func_ov194_021c0b6c(PokemonTradeWork *wk, PartyPkm *pkm) {
         wk->unk11F9 = 1;
         GFL_VBlankTCBAdd(func_ov194_021c189c, wk, 0);
     }
-    TouchBar_SetIconVisible(wk->touchBar, 1, TRUE);
+    TouchBar_SetIconVisible(wk->touchBar, TOUCHBAR_ICON_RETURN, TRUE);
 }
 
 // The page of the Pokémon's summary on the lower screen: its stats (0) or its moves (1)
@@ -861,7 +861,7 @@ AppTaskMenuWin *func_ov194_021c1788(PokemonTradeWork *wk, u32 msg) {
     wk->menuWin = AppTaskMenuWin_CreateEx(wk->taskMenuRes, &wk->menuItems[0], 8, 21, 16, 3, 0, 1, wk->heapId);
     GFL_StrBufFree(wk->menuItems[0].str);
     ClActor_SetVisible(wk->actors[2], FALSE);
-    TouchBar_SetIconVisible(wk->touchBar, 8, FALSE);
+    TouchBar_SetIconVisible(wk->touchBar, TOUCHBAR_ICON_CUSTOM + 1, FALSE);
     return wk->menuWin;
 }
 
@@ -874,7 +874,7 @@ void func_ov194_021c1820(PokemonTradeWork *wk, BOOL showActor, BOOL showButton) 
         ClActor_SetVisible(wk->actors[2], TRUE);
     }
     if (showButton) {
-        TouchBar_SetIconVisible(wk->touchBar, 8, func_ov194_021bc098(wk));
+        TouchBar_SetIconVisible(wk->touchBar, TOUCHBAR_ICON_CUSTOM + 1, func_ov194_021bc098(wk));
     }
     if (wk->menuWin != NULL) {
         AppTaskMenuWin_Free(wk->menuWin);

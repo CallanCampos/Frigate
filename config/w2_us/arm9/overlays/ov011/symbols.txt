@@ -1767,8 +1767,8 @@ sLabelBB kind:data(any) addr:0x02185564
 sLabelCCC kind:data(any) addr:0x02185568
 sLabelServer kind:data(any) addr:0x0218556c
 sLabelClient kind:data(any) addr:0x02185574
-sMD5Padding kind:data(any) addr:0x0218557c
-sMD5WordIndex kind:data(any) addr:0x021855bc
+sMD5WordIndex kind:data(any) addr:0x0218557c
+sMD5Padding kind:data(any) addr:0x021855bc
 sMD5Constants kind:data(any) addr:0x021855fc
 sSha1Padding kind:data(any) addr:0x021856fc
 data_ov011_021856bd kind:data(any) addr:0x021856fd
@@ -1842,7 +1842,7 @@ data_ov011_02185adc kind:data(any) addr:0x02185b1c
 data_ov011_02185ae0 kind:data(any) addr:0x02185b20
 data_ov011_02185ae8 kind:data(any) addr:0x02185b28
 DWCauthhttpparam kind:data(any) addr:0x02185b2c
-data_ov011_02185b08 kind:data(any) addr:0x02185b48
+sDefaultUrl kind:data(any) addr:0x02185b48
 data_ov011_02185b28 kind:data(any) addr:0x02185b68
 data_ov011_02185b30 kind:data(any) addr:0x02185b70
 data_ov011_02185b3c kind:data(any) addr:0x02185b7c
@@ -1950,8 +1950,8 @@ data_ov011_0218601c kind:data(any) addr:0x0218605c
 data_ov011_02186028 kind:data(any) addr:0x02186068
 data_ov011_02186030 kind:data(any) addr:0x02186070
 data_ov011_02186040 kind:data(any) addr:0x02186080
-data_ov011_0218604c kind:data(any) addr:0x0218608c
-data_ov011_0218604f kind:data(any) addr:0x0218608f
+sExponent kind:data(any) addr:0x0218608c
+sName kind:data(any) addr:0x0218608f
 DWCi_RootCertBaltimoreCyberTrust kind:data(any) addr:0x021860c4
 data_ov011_02186098 kind:data(any) addr:0x021860d8
 data_ov011_02186198 kind:data(any) addr:0x021861d8
@@ -2015,8 +2015,8 @@ data_ov011_02186ef0 kind:data(any) addr:0x02186f30
 data_ov011_02186f18 kind:data(any) addr:0x02186f58
 data_ov011_02186f50 kind:data(any) addr:0x02186f90
 randomnum kind:data(any) addr:0x02186f9c
-sLeapYearDays kind:data(any) addr:0x02186fa0
-sYearDays kind:data(any) addr:0x02186fd4
+_lpdays kind:data(any) addr:0x02186fa0
+_days kind:data(any) addr:0x02186fd4
 data_ov011_02186fc8 kind:data(any) addr:0x02187008
 data_ov011_02186fd0 kind:data(any) addr:0x02187010
 data_ov011_02186ffc kind:data(any) addr:0x0218703c
@@ -2725,13 +2725,13 @@ data_ov011_0218e1e4 kind:bss addr:0x0218e224
 data_ov011_0218e1e8 kind:bss addr:0x0218e228
 data_ov011_0218e918 kind:bss addr:0x0218e958
 data_ov011_0218e920 kind:bss addr:0x0218e960
-data_ov011_0218e924 kind:bss addr:0x0218e964
+sNas kind:bss addr:0x0218e964
 data_ov011_0218e928 kind:bss addr:0x0218e968
 data_ov011_0218e930 kind:bss addr:0x0218e970
-data_ov011_0218e944 kind:bss addr:0x0218e984
-data_ov011_0218e960 kind:bss addr:0x0218e9a0
+sResult kind:bss addr:0x0218e984
+sInit kind:bss addr:0x0218e9a0
 data_ov011_0218e994 kind:bss addr:0x0218e9d4
-data_ov011_0218e9a8 kind:bss addr:0x0218e9e8
+sHttp kind:bss addr:0x0218e9e8
 data_ov011_02190019_w2_us kind:bss addr:0x02190019
 data_ov011_02190213_w2_us kind:bss addr:0x02190213
 data_ov011_02190218_w2_us kind:bss addr:0x02190218
@@ -2743,7 +2743,7 @@ DWCi_ConnTestConfig kind:bss addr:0x0219066c
 DWCi_ConnTestInit kind:bss addr:0x02190688
 data_ov011_02190668 kind:bss addr:0x021906a8
 data_ov011_02190690 kind:bss addr:0x021906d0
-data_ov011_02190694 kind:bss addr:0x021906d4
+sLocator kind:bss addr:0x021906d4
 __GSIACResult kind:bss addr:0x021906d8
 __GSIACGamename kind:bss addr:0x021906dc
 GSIACHostname kind:bss addr:0x0219071c
@@ -2781,7 +2781,7 @@ data_ov011_02191780 kind:bss addr:0x021917c0
 gcd_gamename kind:bss addr:0x021917fc
 gcd_secret_key kind:bss addr:0x021918fc
 data_ov011_021919bc kind:bss addr:0x021919fc
-data_ov011_02191bbc kind:bss addr:0x02191bfc
+nIndex kind:bss addr:0x02191bfc
 data_ov011_02191bc0 kind:bss addr:0x02191c00
 gotADDRESS1b kind:bss addr:0x02191c2c
 strAddressArray kind:bss addr:0x02191c4c

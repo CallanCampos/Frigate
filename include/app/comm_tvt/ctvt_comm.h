@@ -9,6 +9,9 @@
 
 // The Xtransceiver's communication: the wireless connection, the members of the call and what they send each other
 
+// No member: the talker when nobody talks
+#define CTVT_COMM_NONE 0xff
+
 // How to connect, which CtvtComm_SetNextConnectType asks for
 enum {
     CTVT_CONNECT_NONE,
@@ -114,6 +117,7 @@ void CtvtComm_ResetSession(CommTvtWork *sys, CtvtComm *comm);
 void CtvtComm_StartSync(CommTvtWork *sys, CtvtComm *comm, int no);
 BOOL CtvtComm_IsSynced(CommTvtWork *sys, CtvtComm *comm, int no);
 u8 CtvtComm_GetSelfNetId(CommTvtWork *sys, CtvtComm *comm);
+// The member talking, or CTVT_COMM_NONE
 u8 CtvtComm_GetTalker(CommTvtWork *sys, CtvtComm *comm);
 u8 CtvtComm_GetUnk3dc(CommTvtWork *sys, CtvtComm *comm, u8 index);
 BOOL CtvtComm_IsVoiceBusy(CommTvtWork *sys, CtvtComm *comm);

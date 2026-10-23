@@ -204,6 +204,16 @@ void *NetCommand_GetRecvBuffer(int command, int netId, int size);
 BOOL NetCommand_IsForThisMachine(int netId);
 
 // net_err.c: the network error screen. The error's code is its message in TEXT_BANK_WIFI_ERROR
+
+// The files of an error window's graphics, in ARCID_ERROR_WINDOW_GRA (net_err.c's, save_error.c's,
+// wfc_user_info_warning.c's and error_window_screen.c's window) and in ARCID_ASSERT_WINDOW_GRA (net_err.c's for a
+// failed assertion)
+enum {
+    ERROR_WINDOW_GRA_PLTT,
+    ERROR_WINDOW_GRA_CHAR,
+    ERROR_WINDOW_GRA_SCRN,
+};
+
 // Creates the network's heap, and the buffers the error screen saves the display in
 void GFL_NetHeapInit(void);
 void GFL_NetErrInit(u32 heapId);

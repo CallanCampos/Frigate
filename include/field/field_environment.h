@@ -8,9 +8,9 @@
 #include "gfl/heap.h"
 #include "struct_decls.h"
 
-void *Field_GetLightSystem(Field *field);
-void *Field_GetFogCtrl(Field *field);
-void *Field_GetWeatherSystem(Field *field);
+FieldLight *Field_GetLightSystem(Field *field);
+FieldFogCtrl *Field_GetFogCtrl(Field *field);
+FieldWeather *Field_GetWeatherSystem(Field *field);
 u16 func_ov036_02199220(FieldWeather *weatherSystem);
 u32 Field_GetWeatherForZone(Field *field, u16 zoneId);
 // field_light.c: the field's lights, which follow the time of day

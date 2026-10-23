@@ -586,7 +586,7 @@ void HandlerSlowStartTurnCheck(BattleEventItem *item, BtlServerFlow *flow, u8 mo
             if (!BtlServerFlow_GetPendingAction(flow, monId, &action)) {
                 return;
             }
-            if (action.bits.action == 3) {
+            if (action.bits.action == BATTLE_ACTION_CHANGE) {
                 return;
             }
             work[1]++;

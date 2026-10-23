@@ -470,7 +470,7 @@ data_ov185_021a7290 kind:data(any) addr:0x021a72d0
 PMS_INPUT_PROC_FUNCTIONS kind:data(any) addr:0x021a72d8
 data_ov185_021a72a4 kind:data(any) addr:0x021a72e4
 PMS_SELECT_PROC_FUNCTIONS kind:data(any) addr:0x021a72f4 ambiguous
-data_ov185_021a72c0 kind:data(any) addr:0x021a7300
+sPMSSelectPlateFades kind:data(any) addr:0x021a7300
 data_ov185_021a72d8 kind:data(any) addr:0x021a7318
 sPMSSelectLCDConfig kind:data(any) addr:0x021a7338
 sPMSSelectClActSetup kind:data(any) addr:0x021a7348
@@ -485,7 +485,7 @@ data_ov185_021a7538 kind:data(any) addr:0x021a7578
 data_ov185_021a7548 kind:data(any) addr:0x021a7588
 data_ov185_021a7558 kind:data(any) addr:0x021a7598
 data_ov185_021a7564 kind:data(any) addr:0x021a75a4
-data_ov185_021a7574 kind:data(any) addr:0x021a75b4
+sPMSSelectMenuMessages kind:data(any) addr:0x021a75b4
 data_ov185_021a7578 kind:data(any) addr:0x021a75b8
 PMSI_FIXED_CATEGORIES kind:data(any) addr:0x021a516c
 PMSIV_CATEGORY_UNK_7198 kind:data(any) addr:0x021a71d8

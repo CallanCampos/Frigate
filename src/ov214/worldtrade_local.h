@@ -49,6 +49,31 @@ enum {
     WORLDTRADE_DEMO,
 };
 
+// The modes a screen is started with (WorldTrade_SubProcessChange's mode), one numbering that all the screens share:
+// what the screen is to do, or which screen it was reached from
+enum {
+    // The box, to pick the Pokémon to deposit or to offer for one found
+    WT_MODE_DEPOSIT_SELECT = 5,
+    WT_MODE_EXCHANGE_SELECT,
+    // The upload screen's, which the trade demo is also started with
+    WT_MODE_UPLOAD,
+    WT_MODE_DOWNLOAD,
+    WT_MODE_EXCHANGE,
+    WT_MODE_DOWNLOAD_EX,
+    WT_MODE_SERVER_CHECK,
+    // Saves the Pokémon that evolved by the trade
+    WT_MODE_POKEMON_EVO_SAVE,
+    WT_MODE_SEARCH_FROM_TITLE,
+    WT_MODE_SEARCH_PARTNER_RETURN = 15,
+    WT_MODE_PARTNER_FROM_SEARCH,
+    WT_MODE_PARTNER_FROM_PARTNER,
+    // The connection screen's
+    WT_MODE_LOGIN = 0x13,
+    WT_MODE_LOGOUT,
+    // Logging in again after an error
+    WT_MODE_RELOGIN,
+};
+
 // The cell actor resources: the main screen's, the lower screen's, the player's and the main screen's second set
 enum {
     WT_CLACT_RES_MAIN,

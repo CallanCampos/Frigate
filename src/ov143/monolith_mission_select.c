@@ -1491,7 +1491,7 @@ static BOOL MonolithMission_IsAvailable(MonolithScreenParam *screen, MonolithMis
 
 // Reads a mission's record from the save into the list
 static void MonolithMission_LoadRecord(MonolithScreenParam *screen, MonolithMissionWork *mfw, int index, int id) {
-    void *records = FestRecords_GetFromSave(GameData_GetSaveControl(GSYS_GetGameData(screen->param->gsys)));
+    FunfestSave *records = FestRecords_GetFromSave(GameData_GetSaveControl(GSYS_GetGameData(screen->param->gsys)));
 
     mfw->records[index].clearedLevel = FestRecords_GetMissionLevel(records, id);
     if (FestRecords_IsMissionNew(records, id) == TRUE) {

@@ -6,7 +6,6 @@
 // The save block of the Funfest missions: how many were hosted, joined and completed, and each mission's record.
 // The ROM has no string for the file, so the name is a guess. Block 0x46.
 
-#define SAVE_BLOCK_FUNFEST 0x46
 #define FUNFEST_PARTICIPANTS_MAX 100
 #define FUNFEST_LEVEL_POINTS_COUNT 2
 #define FUNFEST_LEVEL_POINTS_MAX 100
@@ -24,7 +23,7 @@ void FestRecords_Init(FunfestSave *save) {
     }
 }
 
-void *FestRecords_GetFromSave(SaveControl *save) {
+FunfestSave *FestRecords_GetFromSave(SaveControl *save) {
     return SaveControl_GetBlockPtr(save, SAVE_BLOCK_FUNFEST);
 }
 
@@ -80,9 +79,7 @@ void FestRecords_AddTopScore(FunfestSave *save) {
     }
 }
 
-u16 FestRecords_GetMissionCount(void *records, u8 mission) {
-    FunfestSave *save = records;
-
+u16 FestRecords_GetMissionCount(FunfestSave *save, u8 mission) {
     if (mission >= FUNFEST_MISSION_COUNT) {
         return 0;
     }
@@ -100,9 +97,7 @@ BOOL FestRecords_UpdateMissionCount(FunfestSave *save, u32 mission, u32 count) {
     return FALSE;
 }
 
-u16 FestRecords_GetMissionBest(void *records, u8 mission) {
-    FunfestSave *save = records;
-
+u16 FestRecords_GetMissionBest(FunfestSave *save, u8 mission) {
     if (mission >= FUNFEST_MISSION_COUNT) {
         return 0;
     }
@@ -142,9 +137,7 @@ BOOL FestRecords_IsMissionNew(FunfestSave *save, u8 mission) {
     return save->missions[mission].isNew;
 }
 
-void FestRecords_ClearMissionNew(void *records, u8 mission) {
-    FunfestSave *save = records;
-
+void FestRecords_ClearMissionNew(FunfestSave *save, u8 mission) {
     if (mission < FUNFEST_MISSION_COUNT) {
         save->missions[mission].isNew = FALSE;
     }

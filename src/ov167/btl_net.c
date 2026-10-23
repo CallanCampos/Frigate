@@ -687,7 +687,7 @@ static void ClearReplies(void) {
 }
 
 // A party packet of a size, for no client yet
-void *BtlNet_CreatePartyPacket(u32 size, HeapID heapId) {
+BtlNetPartyPacket *BtlNet_CreatePartyPacket(u32 size, HeapID heapId) {
     BtlNetPartyPacket *packet = GFL_HeapAllocate(heapId, size + sizeof(BtlNetPartyPacket), TRUE, "btl_net.c", 1143);
 
     packet->size = size;
@@ -695,14 +695,12 @@ void *BtlNet_CreatePartyPacket(u32 size, HeapID heapId) {
     return packet;
 }
 
-void BtlNet_FreePartyPacket(void *data) {
-    GFL_HeapFree(data);
+void BtlNet_FreePartyPacket(BtlNetPartyPacket *packet) {
+    GFL_HeapFree(packet);
 }
 
 // Puts a client's party in a party packet
-void BtlNet_SetPartyPacket(void *data, PokeParty *party, u8 clientId) {
-    BtlNetPartyPacket *packet = data;
-
+void BtlNet_SetPartyPacket(BtlNetPartyPacket *packet, PokeParty *party, u8 clientId) {
     packet->clientId = clientId;
     MI_CpuCopy8(party, packet->data, packet->size);
 }

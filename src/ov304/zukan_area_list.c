@@ -360,22 +360,22 @@ static void ZukanAreaList_StateList(ZukanAreaListWork *wk) {
     case FRAMELIST_NONE:
         ZukanAreaList_Input(wk);
         break;
-    case -7:
+    case FRAMELIST_PAGE_UP:
         ZukanAreaList_StartButton(wk, ZUKAN_AREA_LIST_OBJ_PAGE_UP, 12, STATE_LIST, STATE_PARAM_NO_WAIT,
                                   STATE_PARAM_NORMAL);
         break;
-    case -6:
+    case FRAMELIST_PAGE_DOWN:
         ZukanAreaList_StartButton(wk, ZUKAN_AREA_LIST_OBJ_PAGE_DOWN, 13, STATE_LIST, STATE_PARAM_NO_WAIT,
                                   STATE_PARAM_NORMAL);
         break;
-    case -5:
+    case FRAMELIST_CURSOR_TOP:
         ZukanAreaListView_SetActorAnim(&wk->view, ZUKAN_AREA_LIST_OBJ_PAGE_UP, 18);
         break;
-    case -4:
+    case FRAMELIST_CURSOR_BOTTOM:
         ZukanAreaListView_SetActorAnim(&wk->view, ZUKAN_AREA_LIST_OBJ_PAGE_DOWN, 19);
         break;
-    case -3:
-    case -2:
+    case FRAMELIST_JUMP_TOP:
+    case FRAMELIST_JUMP_BOTTOM:
         ZukanAreaListView_HideUndrawnMarks(&wk->view);
         ZukanAreaList_SetState(wk, STATE_JUMP, STATE_PARAM_NORMAL);
         break;
@@ -385,11 +385,11 @@ static void ZukanAreaList_StateList(ZukanAreaListWork *wk) {
         ZukanAreaList_SetState(wk, STATE_DECIDE, STATE_PARAM_NORMAL);
         GFL_SndSEPlay(SEQ_SE_DECIDE1);
         break;
-    case -12:
-    case -11:
-    case -10:
-    case -9:
-    case -8:
+    case FRAMELIST_CURSOR_SHOWN:
+    case FRAMELIST_CURSOR_MOVE:
+    case FRAMELIST_SCROLL:
+    case FRAMELIST_BAR:
+    case FRAMELIST_DRAG:
         break;
     }
 }

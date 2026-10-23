@@ -22,9 +22,6 @@
 // The word categories, each with a message file
 #define PMS_WORD_CATEGORY_COUNT 13
 
-// The save block of sentences
-#define SAVE_BLOCK_PMS 0x27
-
 // The message files of the word categories, loaded for a while
 PMSWordBank *PMSWordBank_Create(u32 heapId);
 void PMSWordBank_Free(PMSWordBank *bank);

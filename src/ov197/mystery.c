@@ -87,10 +87,12 @@ typedef struct {
     u16 fromColors[16];
 } MysteryActors;
 
-#define ACTOR_CURSOR 0
-#define ACTOR_STARS 1
 #define STAR_COUNT 32
-#define ACTOR_HINT 34
+enum {
+    ACTOR_CURSOR,
+    ACTOR_STARS,
+    ACTOR_HINT = 34,
+};
 
 // The particles of a special gift's effect
 typedef struct {

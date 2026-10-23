@@ -9,8 +9,6 @@
 // A save block of several small things: the IDs of the trainers the player met last, a set of flags, the rival's
 // name and what the Hidden Hollows hold. The ROM has no string for the file, so the name is a guess. Block 0x42.
 
-#define SAVE_BLOCK_MISC 0x42
-
 static const u32 slot_type[] = {
     1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3,
 };

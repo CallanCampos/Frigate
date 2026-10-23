@@ -4,7 +4,8 @@
 Each row names a source file, its functions and their addresses, Black 2's then White 2's (`same` when they are
 equal). For every function the row gives an address for, the file must be delinked in a module of both versions, the
 function must be a symbol of that module at Black 2's address and at White 2's, and the source file must define it.
-Rows about data, whose function column is in parentheses, are left out. It needs no ROM, so CI runs it.
+Rows about data, whose function column is in parentheses, are left out. Merge markers and duplicate function
+entries are rejected. It needs no ROM, so CI runs it.
 
     check_nonmatching_rows.py          # list the rows that are wrong, exit 1 if any
     check_nonmatching_rows.py --fix    # also rewrite White 2 addresses that have one right answer
@@ -22,6 +23,28 @@ VERSIONS = ("b2_us", "w2_us")
 ROW_RE = re.compile(r"^\| `([^`]+)` \| (.*?) \| (`0x[0-9a-f]+`.*?) \| ")
 PAIR_RE = re.compile(r"`0x([0-9a-f]+)` / (?:`0x([0-9a-f]+)`|(same))")
 FILE_RE = re.compile(r"^(\S+\.(?:c|cpp|s)):\s*$")
+MERGE_MARKER_RE = re.compile(r"^(?:<{7,}|\|{7,}|={7,}|>{7,})(?:\s.*)?$")
+
+
+def structural_problems(lines: list[str]) -> list[str]:
+    """Reject merge debris and repeated function entries, including those in grouped rows."""
+    problems = []
+    seen = {}
+    for number, line in enumerate(lines, 1):
+        where = f"{DOC.relative_to(ROOT)}:{number}"
+        if MERGE_MARKER_RE.match(line):
+            problems.append(f"{where}: unresolved merge marker")
+        row = ROW_RE.match(line)
+        if not row or row.group(2).startswith("("):
+            continue
+        path = row.group(1)
+        for name in re.findall(r"`([A-Za-z_]\w*)`", row.group(2)):
+            key = (path, name)
+            if key in seen:
+                problems.append(f"{where}: {path}: duplicate function {name} (first listed on line {seen[key]})")
+            else:
+                seen[key] = number
+    return problems
 
 
 def modules_by_file(version: str) -> dict[str, str]:
@@ -62,18 +85,22 @@ def main():
     files = {v: modules_by_file(v) for v in VERSIONS}
     symbols = {v: symbols_by_module(v) for v in VERSIONS}
     lines = DOC.read_text().split("\n")
-    problems = []
+    problems = structural_problems(lines)
     fixed = 0
+    repaired_problems = 0
     for index, line in enumerate(lines):
         row = ROW_RE.match(line)
         if not row or row.group(2).startswith("("):
             continue
         path, names = row.group(1), re.findall(r"`([A-Za-z_]\w*)`", row.group(2))
-        pairs = PAIR_RE.findall(row.group(3))
+        pairs = list(PAIR_RE.finditer(row.group(3)))
+        shared_pair = len(pairs) == 1 and len(names) > 1
         where = f"{DOC.relative_to(ROOT)}:{index + 1}: {path}"
         if len(pairs) not in (1, len(names)):
             problems.append(f"{where}: {len(names)} functions but {len(pairs)} address pairs")
             continue
+        if len(pairs) == 1:
+            pairs *= len(names)
         source_path = ROOT / path
         source = source_path.read_text(errors="replace") if source_path.exists() else None
         if source is None:
@@ -82,7 +109,13 @@ def main():
         for v, module in modules.items():
             if module is None:
                 problems.append(f"{where}: not in any {v} delinks.txt")
-        for name, (b2, w2, same) in zip(names, pairs):
+        can_fix_white = True
+        if shared_pair and modules["w2_us"] is not None:
+            targets = [symbols["w2_us"][modules["w2_us"]].get(name, set()) for name in names]
+            can_fix_white = all(len(target) == 1 and target == targets[0] for target in targets)
+        edits = {}
+        for name, pair in zip(names, pairs):
+            b2, w2, same = pair.groups()
             if source is not None and not defines(source, name):
                 problems.append(f"{where}: {name} is not defined there")
             if None in modules.values():
@@ -94,17 +127,22 @@ def main():
                     continue
                 found = ", ".join(f"0x{a:08x}" for a in sorted(actual)) or "none"
                 problem = f"{where}: {name} is not at 0x{wanted[v]:08x} in {v} (its symbols: {found})"
-                if args.fix and v == "w2_us" and not same and len(actual) == 1:
-                    lines[index] = lines[index].replace(f"`0x{w2}`", f"`0x{min(actual):08x}`", 1)
-                    fixed += 1
+                if args.fix and v == "w2_us" and not same and len(actual) == 1 and can_fix_white:
+                    start, end = pair.span(2)
+                    offset = row.start(3)
+                    edits[(offset + start, offset + end)] = f"{min(actual):08x}"
+                    repaired_problems += 1
                     problem += " (fixed)"
                 problems.append(problem)
+        for (start, end), replacement in sorted(edits.items(), reverse=True):
+            lines[index] = lines[index][:start] + replacement + lines[index][end:]
+        fixed += len(edits)
     if fixed:
         DOC.write_text("\n".join(lines))
         print(f"fixed {fixed} White 2 address{'es' if fixed > 1 else ''}")
     for problem in problems:
         print(problem)
-    sys.exit(1 if problems and not (args.fix and fixed == len(problems)) else 0)
+    sys.exit(1 if problems and not (args.fix and repaired_problems == len(problems)) else 0)
 
 
 if __name__ == "__main__":

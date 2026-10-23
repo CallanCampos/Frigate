@@ -851,10 +851,10 @@ data_ov257_021b4a38 kind:bss addr:0x021b4a78
 data_ov257_021b50a8 kind:bss addr:0x021b50e8 ambiguous
 data_ov257_021b52bc kind:bss addr:0x021b52fc ambiguous
 data_ov257_021b5c79 kind:bss addr:0x021b5cb9 ambiguous
-data_ov257_021b6238 kind:bss addr:0x021b6278
+sMakerNoteData1Size kind:bss addr:0x021b6278
 data_ov257_021b6240 kind:bss addr:0x021b6280
-data_ov257_021b624c kind:bss addr:0x021b628c
-data_ov257_021b6260 kind:bss addr:0x021b62a0
+sDateTime kind:bss addr:0x021b628c
+sSoftware kind:bss addr:0x021b62a0
 sJpegEncBitsLeft kind:bss addr:0x021b62c0
 sExifEncDateTimeSet kind:bss addr:0x021b62cc
 ExifEnc_SignMode kind:bss addr:0x021b62d4

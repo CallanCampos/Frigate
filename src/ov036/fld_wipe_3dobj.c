@@ -15,7 +15,7 @@
 #include "system/game_system.h"
 
 struct FieldFlashG3D {
-    void *resource;
+    G3DResource *resource;
     G3DActor *actor;
 };
 

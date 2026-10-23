@@ -7,9 +7,11 @@
 // Numbers as strings, raw strings, accents and case, and compressed strings (str_tool.c, a guessed name)
 
 // How GFL_WordSetFormatNumber pads a number to its digits
-#define NUM_PAD_NONE 0
-#define NUM_PAD_SPACE 1
-#define NUM_PAD_ZERO 2
+enum {
+    NUM_PAD_NONE,
+    NUM_PAD_SPACE,
+    NUM_PAD_ZERO,
+};
 
 // Writes a number in digits characters, the last of which is always printed; ascii picks ASCII digits over full-width
 // ones. A negative number gets a minus sign first

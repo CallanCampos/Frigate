@@ -53,7 +53,7 @@ data_ov122_021ef908 kind:data(any) addr:0x021ef908
 data_ov122_021ef920 kind:data(any) addr:0x021ef920
 data_ov122_021ef938 kind:data(any) addr:0x021ef938
 data_ov122_021ef958 kind:data(any) addr:0x021ef958
-data_ov122_021ef97c kind:data(any) addr:0x021ef97c
+sModelFrom2Animations kind:data(any) addr:0x021ef97c
 data_ov122_021ef9a0 kind:data(any) addr:0x021ef9a0
 data_ov122_021ef9d0 kind:data(any) addr:0x021ef9d0
 data_ov122_021efa70 kind:data(any) addr:0x021efa70

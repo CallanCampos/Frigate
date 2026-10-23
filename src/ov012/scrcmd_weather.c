@@ -18,7 +18,7 @@ BOOL s0136_FieldSetWeather(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys;
     GameData *gameData;
     Field *field;
-    void *weather;
+    FieldWeather *weather;
     u32 weatherId;
     u16 immediate;
 

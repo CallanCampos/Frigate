@@ -9,8 +9,6 @@
 // there, or else added to the people met or the entries. The ROM has no string for the file, so the name is
 // descriptive. Block 0x43.
 
-#define SAVE_BLOCK_JOIN_AVENUE 0x43
-
 // What JoinAvenue_MergeExisting and JoinAvenue_MergeOrAdd return
 enum {
     JOIN_AVE_ADD_FAILED = 0,

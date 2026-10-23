@@ -54,16 +54,18 @@
 
 #define HEAPID_MEDALBOX 0x97
 
-#define BG_COUNT 8
 // Indexes into sMedalBoxBGs
-#define BG_MAIN_BACK 0
-#define BG_MAIN_MESSAGE 1
-#define BG_MAIN_NUMBER 2
-#define BG_MAIN_TEXT 3
-#define BG_SUB_CASE 4
-#define BG_SUB_CASE_BACK 5
-#define BG_SUB_BACK 6
-#define BG_SUB_TEXT 7
+enum {
+    BG_MAIN_BACK,
+    BG_MAIN_MESSAGE,
+    BG_MAIN_NUMBER,
+    BG_MAIN_TEXT,
+    BG_SUB_CASE,
+    BG_SUB_CASE_BACK,
+    BG_SUB_BACK,
+    BG_SUB_TEXT,
+    BG_COUNT,
+};
 
 // The columns of medals the screen holds actors for, and how many of them each view shows
 #define SHOWN_MAX 5
@@ -72,52 +74,62 @@
 #define COLUMN_WIDTH 0x50
 
 // The views of the touch screen
-#define VIEW_NAMES 0
-#define VIEW_COLUMNS 1
+enum {
+    VIEW_NAMES,
+    VIEW_COLUMNS,
+};
 
-#define ACTOR_MEDAL 0
-#define ACTOR_SLIDER 25
-#define ACTOR_SLIDER_BAR 26
-#define ACTOR_CURSOR 27
-#define ACTOR_FAVORITE 28
-#define ACTOR_SPARKLE 29
-#define ACTOR_COVER 39
-#define ACTOR_RETURN 40
-#define ACTOR_LEFT 41
-#define ACTOR_RIGHT 42
-#define ACTOR_EXIT 43
-#define ACTOR_MENU 44
-// The medals again as OBJ windows, which the shine of the BG shows through
-#define ACTOR_MEDAL_WINDOW 45
-// The medal under the cursor, on the top screen
-#define ACTOR_INFO_MEDAL 70
-#define ACTOR_COUNT 71
+enum {
+    ACTOR_MEDAL,
+    ACTOR_SLIDER = 25,
+    ACTOR_SLIDER_BAR,
+    ACTOR_CURSOR,
+    ACTOR_FAVORITE,
+    ACTOR_SPARKLE,
+    ACTOR_COVER = 39,
+    ACTOR_RETURN,
+    ACTOR_LEFT,
+    ACTOR_RIGHT,
+    ACTOR_EXIT,
+    ACTOR_MENU,
+    // The medals again as OBJ windows, which the shine of the BG shows through
+    ACTOR_MEDAL_WINDOW,
+    // The medal under the cursor, on the top screen
+    ACTOR_INFO_MEDAL = 70,
+    ACTOR_COUNT,
+};
 
 #define MEDAL_ACTOR_COUNT 25
 #define SPARKLE_COUNT 10
 
-#define RES_MEDAL_CELLS 0
-#define RES_MEDAL_PALETTE 1
-#define RES_MEDAL_CHARS 2
-#define RES_CELLS 3
-#define RES_PALETTE 4
-#define RES_CHARS 5
-#define RES_COMMON_CELLS 6
-#define RES_COMMON_PALETTE 7
-#define RES_COMMON_CHARS 8
-#define RES_BAR_CHARS 9
-#define RES_BAR_CELLS 10
-#define RES_COUNT 11
+enum {
+    RES_MEDAL_CELLS,
+    RES_MEDAL_PALETTE,
+    RES_MEDAL_CHARS,
+    RES_CELLS,
+    RES_PALETTE,
+    RES_CHARS,
+    RES_COMMON_CELLS,
+    RES_COMMON_PALETTE,
+    RES_COMMON_CHARS,
+    RES_BAR_CHARS,
+    RES_BAR_CELLS,
+    RES_COUNT,
+};
 
-#define WINDOW_NAMES 0
-#define WINDOW_INFO 1
-#define WINDOW_COUNT 2
+enum {
+    WINDOW_NAMES,
+    WINDOW_INFO,
+    WINDOW_COUNT,
+};
 
-#define MSG_UI 0
-#define MSG_MEDAL_NAMES 1
-#define MSG_MEDAL_HINTS 2
-#define MSG_MEDAL_INFO 3
-#define MSG_COUNT 4
+enum {
+    MSG_UI,
+    MSG_MEDAL_NAMES,
+    MSG_MEDAL_HINTS,
+    MSG_MEDAL_INFO,
+    MSG_COUNT,
+};
 
 // The slider's range, and where it starts on the screen
 #define SLIDER_X 0x3c
@@ -125,19 +137,25 @@
 #define SLIDER_WIDTH 0x70
 
 // What the cursor does: hidden until a key is pressed, hidden while the columns move, or shown
-#define CURSOR_TOUCH 0
-#define CURSOR_HIDDEN 1
-#define CURSOR_SHOWN 2
+enum {
+    CURSOR_TOUCH,
+    CURSOR_HIDDEN,
+    CURSOR_SHOWN,
+};
 
 // Where the cursor goes after the columns scrolled: where it was, or to the first or last medal of its column
-#define CURSOR_EDGE_NONE 0
-#define CURSOR_EDGE_TOP 1
-#define CURSOR_EDGE_BOTTOM 2
+enum {
+    CURSOR_EDGE_NONE,
+    CURSOR_EDGE_TOP,
+    CURSOR_EDGE_BOTTOM,
+};
 
 // What MedalBoxApp_SetFavorite did, for its message
-#define FAVORITE_SET 0
-#define FAVORITE_REMOVED 1
-#define FAVORITE_HINT 2
+enum {
+    FAVORITE_SET,
+    FAVORITE_REMOVED,
+    FAVORITE_HINT,
+};
 
 // The menu's buttons are messages of the screen's bank, and this is none
 #define MENU_ITEM_NONE 22

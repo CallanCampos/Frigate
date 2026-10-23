@@ -14,13 +14,6 @@
 #include "system/game_system.h"
 #include "system/vm.h"
 
-// What the Unova Link starts on
-typedef struct {
-    u32 unk00;
-    GameData *gameData;
-    u32 mode;
-} UnovaLinkKeyParam;
-
 static void FreeUnovaLinkKeyParam(void *param);
 
 BOOL s02AE_GameGetMyCity(VM *vm, FieldScriptEnv *env) {
@@ -65,13 +58,12 @@ BOOL s02B0_CallUnovaLinkKeyUnlock(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     Field *field = GSYS_GetField(gsys);
     GameData *gameData = GSYS_GetGameData(gsys);
-    u16 mode = ScriptReadAny(vm, env);
-    UnovaLinkKeyParam *param =
-        GFL_HeapAllocate(HEAPID_GAMEEVENT, sizeof(UnovaLinkKeyParam), TRUE, "scrcmd_keysystem.c", 140);
+    u16 key = ScriptReadAny(vm, env);
+    UnovaLinkParam *param = GFL_HeapAllocate(HEAPID_GAMEEVENT, sizeof(UnovaLinkParam), TRUE, "scrcmd_keysystem.c", 140);
 
     param->gameData = gameData;
-    param->unk00 = 0;
-    param->mode = mode;
+    param->mode = UNOVA_LINK_MODE_GAME_CLEAR;
+    param->key = key;
     ScriptWork_CallEvent(work, EventFieldSubprocessTransition_CreateWithCallback(gsys, field, OVERLAY_ID(332),
                                                                                  &UNOVA_LINK_PROC_FUNCTIONS, param,
                                                                                  FreeUnovaLinkKeyParam, param));

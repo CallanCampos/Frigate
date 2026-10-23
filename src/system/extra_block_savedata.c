@@ -23,8 +23,7 @@ void WbtDownloadData_Clear(void *block) {
     MI_CpuFill8(block, 0, WbtDownloadData_GetSize());
 }
 
-BOOL WbtDownloadData_IsCRCValid(void *data) {
-    WbtDownloadData *download = data;
+BOOL WbtDownloadData_IsCRCValid(WbtDownloadData *download) {
     u16 crc = download->crc;
 
     if (crc == getCRC16(download, sizeof(download->data))) {

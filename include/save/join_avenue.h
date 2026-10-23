@@ -53,8 +53,7 @@ typedef enum {
     JOIN_AVE_PARAM_MINUTE = 25,
     JOIN_AVE_PARAM_UNK_26 = 26,
     JOIN_AVE_PARAM_UNK_27 = 27,
-    // How the person last came: 1 replacing another, 2 into an empty place, 3 changed and 4 the same; setting it keeps
-    // the lowest
+    // How the person last came, a JOIN_AVE_STATUS_*; setting it keeps the lowest
     JOIN_AVE_PARAM_STATUS = 28,
     JOIN_AVE_PARAM_UNK_29 = 29,
     JOIN_AVE_PARAM_UNK_30 = 30,
@@ -212,6 +211,16 @@ struct JoinAvenuePerson {
     u32 seed;
 };
 
+// JOIN_AVE_PARAM_STATUS: none since it was cleared, or how a person last came, replacing one whose stay was over, into
+// an empty place, or as a merge that changed the trainer type or not
+enum {
+    JOIN_AVE_STATUS_NONE,
+    JOIN_AVE_STATUS_NEW,
+    JOIN_AVE_STATUS_ADDED,
+    JOIN_AVE_STATUS_CHANGED,
+    JOIN_AVE_STATUS_UPDATED,
+};
+
 // A person who has left the avenue
 struct JoinAvenueRecord {
     JoinAvenueProfile profile;
@@ -357,6 +366,12 @@ BOOL JoinAvenuePerson_IsEmpty(JoinAvenuePerson *person);
 void JoinAvenuePerson_SetParam(JoinAvenuePerson *person, JoinAvenuePersonParam param, u32 value);
 JoinAvenueInfo *JoinAvenue_GetInfo(JoinAvenueSave *joinAvenue);
 void JoinAvenueInfo_Init(JoinAvenueInfo *info);
+// The fields of the info that JoinAvenue_GetParam reads and JoinAvenueInfo_SetParam sets that overlay 137 names: the
+// avenue's rank, and the popularity points toward the next rank
+enum {
+    JOIN_AVE_INFO_RANK = 2,
+    JOIN_AVE_INFO_POPULARITY,
+};
 // A field of the info, which reads into the buffer for the avenue's names
 u32 JoinAvenue_GetParam(JoinAvenueInfo *info, u32 param, void *buffer);
 JoinAvenuePersonList *JoinAvenue_GetPersonList(JoinAvenueSave *joinAvenue);

@@ -9,6 +9,7 @@
 #include "battle/btl_main.h"
 #include "battle/btl_net.h"
 #include "battle/btl_pokeparam.h"
+#include "battle/btl_result.h"
 #include "battle/btl_server.h"
 #include "battle/btl_server_cmd.h"
 #include "battle/btl_server_flow.h"
@@ -128,7 +129,7 @@ BOOL BtlMain_ProcInit(GameProc *proc, u32 *state, void *param, void *work) {
         mainModule->mainFunc = NULL;
         notInitialized = FALSE;
         mainModule->viewCore = NULL;
-        mainModule->result = 7;
+        mainModule->result = BTL_RESULT_NOT_SET;
         mainModule->unk43C = Config_GetTextSpeed(mainModule->setup->config);
         if (!Config_GetBattleScene(setup->config)) {
             notInitialized = TRUE;
@@ -2327,7 +2328,7 @@ void func_ov167_0219c9fc(BtlMainModule *mainModule, u8 pos) {
 }
 
 void SetBattleResult(BtlMainModule *mainModule, u32 result) {
-    if (mainModule->result == 7) {
+    if (mainModule->result == BTL_RESULT_NOT_SET) {
         mainModule->result = result;
     }
 }
@@ -3443,17 +3444,17 @@ u32 BtlMain_DetermineResult(BtlMainModule *mainModule) {
     u32 result;
 
     if (BtlSetup_GetBattleType(mainModule) == 4) {
-        result = 1;
+        result = BTL_RESULT_VICTORY;
     } else if (mainModule->unk473_0) {
-        result = 6;
+        result = BTL_RESULT_6;
     } else if (mainModule->setup->unkAC != 6) {
-        result = 5;
+        result = BTL_RESULT_CAPTURE;
     } else if (BtlClientIDList_GetCount(&mainModule->unk448)) {
         result = BtlClientIDList_GetEscapeResult(&mainModule->unk448, mainModule->playerClientId,
                                                  BtlSetup_GetBattleType(mainModule));
     } else {
-        if (mainModule->result == 7) {
-            mainModule->result = 1;
+        if (mainModule->result == BTL_RESULT_NOT_SET) {
+            mainModule->result = BTL_RESULT_VICTORY;
         }
         result = mainModule->result;
     }
@@ -3485,7 +3486,7 @@ BOOL func_ov167_0219df50(BtlMainModule *mainModule) {
     if (mainModule->setup->fieldSituation.unk1b != 0) {
         result = BattleClient_IsRecPlayCanceled(mainModule->clients[mainModule->playerClientId]);
         if (result) {
-            mainModule->result = 2;
+            mainModule->result = BTL_RESULT_DRAW;
         }
         return result;
     }
