@@ -111,6 +111,11 @@ CC_FLAGS = [
 LIB_DIR = ROOT / "lib"
 
 
+# The assembler flags of each library that has assembly sources, from library.toml's asm_flags: a library's hand-written
+# assembly (MSL's runtime, fp_fastI.s) is assembled by the mwasmarm of its compiler's version
+LIBRARY_ASM_FLAGS: dict[str, list[str]] = {}
+
+
 def load_libraries() -> dict[str, tuple[str, list[str]]]:
     """Returns the compiler and flags of each library with sources, keyed by its source directory ("lib/spl/src/")."""
     libraries = {}
@@ -124,6 +129,8 @@ def load_libraries() -> dict[str, tuple[str, list[str]]]:
             library = tomllib.load(f)
         src = f"{(lib / 'src').relative_to(ROOT).as_posix()}/"
         libraries[src] = (library["compiler"], [*library["flags"], ENCODING_FLAG])
+        if "asm_flags" in library:
+            LIBRARY_ASM_FLAGS[src] = library["asm_flags"]
         for path, flags in library.get("file_flags", {}).items():
             FILE_FLAGS[src + path] = flags
         for path, compiler in library.get("file_compilers", {}).items():
@@ -223,6 +230,15 @@ def library_of(source: Path) -> tuple[str, list[str]] | None:
         return None
     library = next((library for prefix, library in LIBRARIES.items() if relative.startswith(prefix)), None)
     return (FILE_COMPILERS.get(relative, library[0]), file_flags(source, library[1])) if library else None
+
+
+def source_assembler(source: Path) -> tuple[str, list[str]]:
+    """Returns the compiler version whose mwasmarm assembles a library's assembly source, and its flags."""
+    relative = (ROOT / source).resolve().relative_to(ROOT).as_posix()
+    prefix = next((prefix for prefix in LIBRARIES if relative.startswith(prefix)), None)
+    if prefix is None or prefix not in LIBRARY_ASM_FLAGS:
+        sys.exit(f"{relative}: assembly sources are built only in a library whose library.toml has asm_flags")
+    return FILE_COMPILERS.get(relative, LIBRARIES[prefix][0]), LIBRARY_ASM_FLAGS[prefix]
 
 
 @dataclass(frozen=True)
@@ -569,6 +585,12 @@ def add_version(n: Writer, version: str, dsd: Path, bugfix: bool, shift: int) ->
                         variables={"aliases": " ".join(f"{label}={function}"
                                                        for label, function in sorted(source_aliases.items()))})
             compiled.append(obj)
+        elif source.suffix == ".s" and source.exists():
+            obj = build_dir / source.with_suffix(".o")
+            compiler, asm_flags = source_assembler(source)
+            n.build([obj], f"mwasm_{LIBRARY_COMPILERS.index(compiler)}", [source],
+                    variables={"flags": " ".join(asm_flags)})
+            compiled.append(obj)
         objects.append(f["object_to_link"])
 
     # Preserve the LTD autoload grouping in both the private prelink and final link.
@@ -678,6 +700,8 @@ def add_version(n: Writer, version: str, dsd: Path, bugfix: bool, shift: int) ->
     # Context files for decomp.me scratches, made by objdiff
     for obj in compiled:
         source = obj.relative_to(build_dir).with_suffix(".c")
+        if not source.exists():
+            continue
         n.build([obj.with_suffix(f".ctx{source.suffix}")], "ctx", [source], variables={"defines": defines},
                 order_only=["constants_headers"])
 
@@ -767,6 +791,11 @@ def main():
         n.rule(f"mwcc_{i}", f"mkdir -p $$(dirname $out) && MWCIncludes=. $wine $sjiswrap {shlex.quote(str(lib_mwcc))} "
                "$flags $defines -gccdep -MD $includes -o $out $in && $python tools/build/fix_depfile.py $dep",
                "Compiling $in", depfile="$dep", deps="gcc")
+    # A library's assembly sources, with the mwasmarm of its compiler's version
+    for i, compiler in enumerate(LIBRARY_COMPILERS):
+        lib_mwasm = tools_dir / "mwccarm" / compiler / "mwasmarm.exe"
+        n.rule(f"mwasm_{i}", f"mkdir -p $$(dirname $out) && $wine {shlex.quote(str(lib_mwasm))} $flags -o $out $in",
+               "Assembling $in")
     n.rule("object_aliases", "$python tools/build/object_aliases.py $in $out $aliases", "Adding labels to $out")
     n.rule("lcf_symbols", "$python tools/build/lcf_symbols.py $in $out", "Adding NitroSDK's symbols to $out")
     n.rule("shift_lcf", "$python tools/build/shift_lcf.py $in $out $amount", "Shifting $in")

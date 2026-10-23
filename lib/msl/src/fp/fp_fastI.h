@@ -1,7 +1,7 @@
 #ifndef POKEBW2_MSL_RUNTIME_FP_FASTI_H
 #define POKEBW2_MSL_RUNTIME_FP_FASTI_H
 
-// The routines of fp/fp_fastI.c, MSL's floating-point and integer runtime, which MWCC's code calls for arithmetic that
+// The routines of fp/fp_fastI.s, MSL's floating-point and integer runtime, which MWCC's code calls for arithmetic that
 // the processor has no instruction for. The names are the runtime's own, which the compiler's calls use and pret's
 // pokediamond labels; the comments give swan's name where it differs.
 

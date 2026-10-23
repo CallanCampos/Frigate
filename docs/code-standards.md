@@ -155,7 +155,10 @@ say in one line what changes the value behind the compiler's back: an interrupt,
 
 **Don't:** write `asm` in `src/`. In `lib/`, `asm` is only for code the SDK, or a library it bundles, wrote in
 assembly (an MWCC `asm` function), or assembly a library inlined at several sites (a `static inline` with an `asm {}`
-block, such as `nitro/math.h`'s `MATH_CountLeadingZeros` in ARM code), with a comment saying which.
+block, such as `nitro/math.h`'s `MATH_CountLeadingZeros` in ARM code), with a comment saying which. A library that
+is hand-written assembly as a whole, whose routines have several entries or names, is an assembly file in its `src/`
+(MSL's runtime, `lib/msl/src/fp/fp_fastI.s`), assembled by the mwasmarm of its compiler's version with
+library.toml's `asm_flags`.
 
 **Do:** wrap every `asm` function in `// clang-format off` and `// clang-format on`, with a blank line before `on`:
 clang-format joins assembly into one line.
