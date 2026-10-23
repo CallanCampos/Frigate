@@ -389,10 +389,9 @@ static const ListMenuRequest sLeaderListRequest = {
     .height = 10,
 };
 
-// The messages of each activity. The explicit alignment is a guess, from the code of the functions that read the
-// table: MWCC enters the loop of a function that reads an aligned object at its test (docs/matching.md), as
-// CommEntryMenu_UpdateLeader's is, and with it every reader matches with the table indexed where it is read. An
-// alignment of 1, 2 or 4 gives the same code and layout, and the table's White 2 address allows nothing above 4.
+// The messages of each activity. The alignment is a guess from the code of the table's readers: MWCC enters the loop
+// of a function that reads an aligned object at its test (docs/matching.md), as CommEntryMenu_UpdateLeader's is, and
+// the table's White 2 address allows nothing above 4.
 static const CommEntryMessages sCommEntryMessages[] ATTRIBUTE_ALIGN(4) = {
     [COMM_ENTRY_MENU_MULTI_BATTLE] = {
         CommEntryMenu_Text_SeekingMultiBattleParticipants,
@@ -1579,7 +1578,7 @@ static void CommEntryMenu_DrawMember(CommEntryMenu *menu, CommEntryMember *membe
 
 // Clears a row whose member left
 static void CommEntryMenu_ClearMember(CommEntryMenu *menu, CommEntryMember *member, u32 netId) {
-    // The two indexes differ in signedness, the getter's row being an int: the original computes the address twice
+    // The getter indexes by an int row and the copy by the u32 netId, so each computes the row's address
     if (GFL_STD_MemCmp(CommEntryMenu_GetShownMac(menu, netId), sNoMac, sizeof(sNoMac)) != 0) {
         CommEntryMenu_ClearRow(menu, netId);
         MI_CpuCopy8(sNoMac, menu->shownMacs[netId], sizeof(sNoMac));

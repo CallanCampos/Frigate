@@ -660,9 +660,8 @@ void EntranceCamera_ConfigureDefaultDeparture(EntranceCamera *camera) {
         FieldCameraAnimationController_PrepareCamera(camera->controller);
         FieldCamera_GetAnimationCoords(camera->camera, &animation->src);
         {
-            // Leftovers of the original: this vector is zeroed and never read, pos is fetched and never read, and the
-            // field camera fetched at the top is discarded. The ROM zeroes the vector here, after the start's
-            // coordinates, so it is declared in the block of the destination's coordinates.
+            // Leftovers: this vector is zeroed and never read, as pos is fetched and never read and the field camera
+            // fetched at the top is discarded
             VecFx32 unused = { 0, 0, 0 };
 
             FieldCamera_GetAnimationCoords(camera->camera, dst);
