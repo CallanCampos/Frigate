@@ -20,7 +20,7 @@
 
 // The Funfest's work: the current mission, the players in it and the missions seen. The file's name is the ROM's.
 
-static void SetFesGimmickResidentEnable(FestMissionConfig *config, BOOL enable);
+static void SetFesGimmickResidentEnable(const FestMissionConfig *config, BOOL enable);
 static void LinkFestival_TickMissionBeacon(LinkFestival *festival);
 static void LinkFestivalBest_InitMine(LinkFestival *festival, LinkFestivalBest *best);
 static void ClearLinkFestivalData(LinkFestival *festival);
@@ -405,7 +405,7 @@ void LinkFestivalBest_Free(LinkFestivalBest *best) {
 }
 
 // Loads or unloads the overlay of the mission's kind
-static void SetFesGimmickResidentEnable(FestMissionConfig *config, BOOL enable) {
+static void SetFesGimmickResidentEnable(const FestMissionConfig *config, BOOL enable) {
     u32 overlayId;
 
     switch (config->header.kind) {
