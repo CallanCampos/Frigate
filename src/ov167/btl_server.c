@@ -390,7 +390,7 @@ u8 GetNextEnemyForSwitchMode(BtlServer *server) {
     client = &server->clients[1];
     if (IsSwitchModeEnabled(client)) {
         action = BtlAdapter_GetReturnData(client->adapter, NULL);
-        if (BattleAction_GetAction(action) == 3) {
+        if (BattleAction_GetAction(action) == BATTLE_ACTION_CHANGE) {
             slot = action->change.slot;
             return GetMonID(GetClientMonData(server->pokeCon, 1, slot));
         }

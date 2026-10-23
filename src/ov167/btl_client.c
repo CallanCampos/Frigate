@@ -2248,7 +2248,7 @@ static BOOL RecPlaySelectActionCore(BtlClient *client, s32 *seq, BOOL arg2) {
         }
         client->returnData = action;
         client->returnDataSize = count * 4;
-        if (action->bits.action == 8) {
+        if (action->bits.action == BATTLE_ACTION_REC_TIMEOUT) {
             RecPlayer_SetDataEnd(&client->recPlayer);
             if (client->viewCore != NULL) {
                 Btlv_StringParam_Setup(&client->strParam, 1, 0xb7);
@@ -2259,7 +2259,7 @@ static BOOL RecPlaySelectActionCore(BtlClient *client, s32 *seq, BOOL arg2) {
                 client->recTimeUp = TRUE;
                 return TRUE;
             }
-        } else if (action->bits.action == 9) {
+        } else if (action->bits.action == BATTLE_ACTION_REC_ERROR) {
             client->recCanceled = TRUE;
             RecPlayer_SetDataEnd(&client->recPlayer);
             if (client->viewCore != NULL) {
@@ -2271,7 +2271,7 @@ static BOOL RecPlaySelectActionCore(BtlClient *client, s32 *seq, BOOL arg2) {
                 return TRUE;
             }
         } else {
-            if (action->bits.action == 1 && action->bits.target >= 6) {
+            if (action->bits.action == BATTLE_ACTION_FIGHT && action->bits.target >= 6) {
                 client->actions[0].bits.move = action->bits.move;
             }
             *seq = REC_SELECT_SEQ_STUDIO;
@@ -2489,10 +2489,10 @@ static BOOL BattleClient_ActionSelectRoot(BtlClient *client, s32 *seq) {
                             client, PokeCon_GetClientPartyMon(client->pokeCon, client->clientId, client->procActionIdx),
                             NULL)) {
                         client->shooterEnergy += shooterWork_GetCost(client, client->procActionIdx);
-                        if (BattleAction_GetAction(&client->actions[client->procActionIdx]) == 3) {
+                        if (BattleAction_GetAction(&client->actions[client->procActionIdx]) == BATTLE_ACTION_CHANGE) {
                             PokeSelect_Pop(&client->pokeSelect);
                         }
-                        if (BattleAction_GetAction(&client->actions[client->procActionIdx]) == 2) {
+                        if (BattleAction_GetAction(&client->actions[client->procActionIdx]) == BATTLE_ACTION_ITEM) {
                             selItemWork_Restore(client, client->procActionIdx);
                         }
                         BattleClient_SetSelActProc(client, BattleClient_ActionSelectRoot);
