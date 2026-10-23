@@ -20,16 +20,50 @@ as an automatic first step of unrelated feature work. Review the pending sync in
    avoids dismissing approvals whenever upstream advances.
 2. Fetches upstream `main`, verifies continuity against the last recorded upstream parent, and checks incoming
    messages for cross-repository issue references. It stops on upstream workflow changes, including add/revert
-   pairs, because the short-lived default token cannot publish them.
+   pairs, because the sync App deliberately has no Workflows permission.
 3. Creates a fresh branch from reviewed Frigate `main` and performs a real `--no-ff` merge. A conflict stops the run;
    it never chooses upstream's version automatically or discards port changes.
-4. Pushes only the topic branch, records local verification as pending, opens a PR and requests CallanCampos review.
+4. Pushes only the topic branch, opens a PR and requests CallanCampos review. Local verification stays missing
+   until a maintainer runs the verifier; a missing required status blocks merging.
 
 The publishing job runs trusted git/gh logic from Frigate's base, disables Git hooks, and never executes incoming
 build scripts with its write token. The usual PR workflows perform compilation and host tests on separate hosted
-runners with read-only permissions. Approve the bot-created PR's workflow runs after inspecting it. No ROMs or game
+runners with read-only permissions. The dedicated App token allows PR CI to start automatically, without the
+default token's workflow-approval restriction. Human code review and local ROM verification remain required. No ROMs or game
 assets are uploaded. A failed proposal is visible as a failed Actions run; inspect its error and use the local path
 below. No issue or comment is posted upstream. New proposals wait until the current sync PR is merged or closed.
+
+### Set up the dedicated sync App
+
+The dedicated **Frigate Upstream Sync** App (ID `5435198`) is registered and installed on Frigate alone. Its
+repository variable and secret are configured; the default token's combined create/approve-PR setting is disabled.
+The steps below document recreation and rotation; never create a duplicate installation just to repair a secret.
+
+The owner registers a dedicated GitHub App and installs it on **CallanCampos/Frigate only**, using selected
+repositories. Grant repository **Contents: read and write** and **Pull requests: read and write**; Metadata read is
+automatic. Grant no other repository or organization permissions, subscribe to no webhook events, and leave the
+webhook inactive. The App needs neither Actions nor Workflows nor Commit statuses write access. Never add it to a
+ruleset bypass list or configure it to approve or merge PRs.
+
+Set repository variable `FRIGATE_SYNC_APP_ID` to its numeric App ID and repository Actions secret
+`FRIGATE_SYNC_APP_PRIVATE_KEY` to its generated PEM private key. Store the key only as a secret, never in Git,
+PRs or logs. Keep this installation dedicated to sync: installation tokens cannot reduce access to individual
+branches. Contents write enables ordinary repository pushes, so protected-main rules are still essential.
+Pull requests write is GitHub's coarse scope for PR creation; the publisher uses it only to inspect/create PRs and
+request owner review, never to submit reviews or approvals.
+
+The pinned official [create-github-app-token action](https://github.com/actions/create-github-app-token) mints a
+short-lived installation token explicitly limited to this owner/repository and those two permissions. Its post-job
+cleanup revokes the token (`skip-token-revoke: false`). The ordinary workflow token has only Contents read for
+checkout, with persisted credentials disabled. Only the trusted publishing step receives the App token; incoming
+code never runs in that job, and separate PR CI receives no App key or token. The App cannot certify
+`Frigate local verification`; the maintainer's local command still does that after real builds.
+
+Missing variables/secrets or an invalid installation make the scheduled run visibly fail. There is no
+`GITHUB_TOKEN` or PAT fallback. After setup, dispatch `port-sync.yml` manually and confirm the bounded PR has the
+App as author, PR checks start automatically, CallanCampos review is requested, and local verification remains
+required. If the run stops on workflow imports or another safeguard, inspect that blocker and use the documented
+local procedure. Do not expand App permissions to get past it.
 
 ## Validate and approve a proposed PR
 
@@ -69,8 +103,9 @@ port/tools/sync_upstream.sh --branch codex/upstream-sync-manual
 
 The tool fetches Frigate and upstream, merges them without rewriting history, runs local validation, then publishes
 only the topic branch and opens a PR. It refuses `--branch main`. When you are repairing an existing pending sync,
-check out that branch and pass its exact name. Do not start a second sync while one is pending. A local PR created
-by the owner uses the review-only exception; use the bot's proposed PR when available so the owner can approve it.
+check out that branch and pass its exact name. Do not start a second sync while one is pending. A locally prepared sync still requires the owner's explicit human review before merge, even when owner credentials
+created its PR. Automation must not treat it as ordinary owner-authored feature work and merge it under the solo
+exception without that review. Prefer an App-authored proposal so GitHub can record the owner's approval.
 
 Useful options:
 
