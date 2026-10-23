@@ -8,6 +8,7 @@
 #include "battle/btl_poke_select.h"
 #include "battle/btl_pokeparam.h"
 #include "battle/btl_rec.h"
+#include "battle/btl_result.h"
 #include "battle/btl_server.h"
 #include "battle/btl_server_cmd.h"
 #include "battle/btl_setup.h"
@@ -2174,7 +2175,7 @@ static BOOL Studio_ShowResult(BtlClient *client) {
     case STUDIO_RESULT_SEQ_INIT:
         setup = GetBattleSetupParam(client->mainModule);
         rules = GetStudioRules(client->mainModule);
-        if (GetBattleResultForClient(client) == 1) {
+        if (GetBattleResultForClient(client) == BTL_RESULT_VICTORY) {
             client->turnCount = 100;
         } else {
             client->turnCount = 101;
@@ -4387,13 +4388,13 @@ static BOOL BattleClient_ExitCommBattle(BtlClient *client, s32 *seq) {
         isMulti = IsMultiMode(client->mainModule);
         SetBattleResult(client->mainModule, result);
         switch (result) {
-        case 1:
+        case BTL_RESULT_VICTORY:
             msg = isMulti ? 0x31 : 0x30;
             break;
-        case 0:
+        case BTL_RESULT_DEFEAT:
             msg = isMulti ? 0x33 : 0x32;
             break;
-        case 2:
+        case BTL_RESULT_DRAW:
             msg = isMulti ? 0x35 : 0x34;
             break;
         default:
@@ -4441,12 +4442,12 @@ static u32 GetBattleResultForClient(BtlClient *client) {
     switch (data[1]) {
     case 0:
         if (!IsAllyClientID(data[0], client->clientId)) {
-            return 1;
+            return BTL_RESULT_VICTORY;
         }
         break;
     case 1:
         if (!IsAllyClientID(data[0], client->clientId)) {
-            return 0;
+            return BTL_RESULT_DEFEAT;
         }
         break;
     }
@@ -4472,7 +4473,7 @@ static BOOL BattleClient_ExitTrainerBattle(BtlClient *client, s32 *seq) {
     switch (*seq) {
     case EXIT_TRAINER_SEQ_INIT:
         if (GetStudioMode(client->mainModule) == 0) {
-            if (GetBattleResultForClient(client) == 1) {
+            if (GetBattleResultForClient(client) == BTL_RESULT_VICTORY) {
                 BtlvEffect_PlayBgm(GetWinBGM(client->mainModule));
                 name1 = GetPlayerOpponentClientID(client->mainModule, 0);
                 name2 = GetPlayerOpponentClientID(client->mainModule, 1);
@@ -4661,10 +4662,10 @@ static BOOL BattleClient_ExitFacilityBattle(BtlClient *client, s32 *seq) {
         }
         result = GetBattleResultForClient(client);
         SetBattleResult(client->mainModule, result);
-        if (result == 1) {
+        if (result == BTL_RESULT_VICTORY) {
             BtlvEffect_PlayBgm(GetWinBGM(client->mainModule));
         }
-        if (result <= 1) {
+        if (result <= BTL_RESULT_VICTORY) {
             BtlvEffect_SetTrainer(
                 GetClientTrainerClass(client->mainModule, GetPlayerOpponentClientID(client->mainModule, 0)), 9, 0, 0,
                 0);
