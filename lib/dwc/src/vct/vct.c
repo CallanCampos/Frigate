@@ -35,7 +35,7 @@ BOOL VCT_Init(VCTConfig *config) {
     if (config->audioBuffer == NULL || config->audioBufferSize == 0) {
         return FALSE;
     }
-    if ((int)config->audioBuffer % 32 != 0) {
+    if ((sptr)config->audioBuffer % 32 != 0) {
         return FALSE;
     }
     MI_CpuFill8(&vct, 0, sizeof(vct));
