@@ -87,17 +87,17 @@ GameEventReturnCode EventFieldMenu_Callback(GameEvent *event, u32 *state, void *
             actorSystem = Field_GetActorSystem(work->field);
             gameData = GSYS_GetGameData(GameEvent_GetGameSystem(event));
             DisableAllActorsMovement(actorSystem);
-            GameData_SetFieldMenuItem(gameData, 1);
+            GameData_SetFieldMenuItem(gameData, FIELD_MENU_ITEM_POKEMON);
             FieldSubscreen_ReqChange(Field_GetSubscreen(work->field), 1);
             work->state = 1;
         }
         break;
     case 1:
         returnSubscreen = FieldSubscreen_GetReturnSubscreen(Field_GetSubscreen(work->field));
-        if (returnSubscreen == 3) {
+        if (returnSubscreen == FIELD_MENU_RESULT_SELECTED) {
             work->state = 2;
             FieldSubscreen_ResetReturnSubscreen(Field_GetSubscreen(work->field));
-        } else if (returnSubscreen == 4) {
+        } else if (returnSubscreen == FIELD_MENU_RESULT_CANCELLED) {
             work->state = 3;
             FieldSubscreen_ResetReturnSubscreen(Field_GetSubscreen(work->field));
         }

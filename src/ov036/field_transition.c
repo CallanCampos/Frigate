@@ -489,16 +489,16 @@ GameEventReturnCode func_ov036_021b8e10(GameEvent *event, u32 *state, void *data
         if (!func_ov036_021878bc(msgBGSys)) {
             break;
         }
-        func_ov036_0218779c(msgBGSys, 0);
+        func_ov036_0218779c(msgBGSys, MSGBG_LOAD_PALETTES);
         (*state)++;
         break;
     }
     case 5:
-        func_ov036_0218779c(Field_GetMsgBGSys(work->field), 1);
+        func_ov036_0218779c(Field_GetMsgBGSys(work->field), MSGBG_LOAD_SYSTEM_FRAME);
         (*state)++;
         break;
     case 6:
-        func_ov036_0218779c(Field_GetMsgBGSys(work->field), 2);
+        func_ov036_0218779c(Field_GetMsgBGSys(work->field), MSGBG_LOAD_LIST_FRAME);
         (*state)++;
         break;
     case 7:
