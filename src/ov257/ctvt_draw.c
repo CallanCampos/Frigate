@@ -769,14 +769,14 @@ static void CtvtDraw_UpdateStroke(CommTvtWork *sys, CtvtDraw *draw) {
     }
     if (GFL_HIDIsTouchPressed() == TRUE && draw->inputHandled == FALSE) {
         if (draw->tool == DRAW_TOOL_PICK) {
-            u16 *screen = (u16 *)((u32)G2_GetBG2ScrPtr() + x * 2 + y * 512);
+            u16 *screen = (u16 *)((uptr)G2_GetBG2ScrPtr() + x * 2 + y * 512);
             u16 *camera;
 
             G2_GetBG3ScrPtr();
             if (CommTvt_IsZoomed(sys) == TRUE) {
-                camera = (u16 *)((u32)G2_GetBG3ScrPtr() + (x / 2) * 2 + (y / 2) * 512);
+                camera = (u16 *)((uptr)G2_GetBG3ScrPtr() + (x / 2) * 2 + (y / 2) * 512);
             } else {
-                camera = (u16 *)((u32)G2_GetBG3ScrPtr() + x * 2 + y * 512);
+                camera = (u16 *)((uptr)G2_GetBG3ScrPtr() + x * 2 + y * 512);
             }
             if (*screen & CTVT_DRAW_OPAQUE) {
                 draw->color = *screen;
