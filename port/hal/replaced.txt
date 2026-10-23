@@ -7,7 +7,7 @@
 # host versions in port/hal (port/docs/game-changes.md lists them).
 
 # The C library: the host's libc and libm replace MSL, the Metrowerks runtime (PLAN.md §4.8, rule 8)
-lib/msl/src/* # MSL, replaced by the host's C library
+lib/msl/src/* # MSL, replaced by the host's C library; port/hal/msl has the runtime division the game's C calls by name
 
 # DS Protect checksums its own ARM code, which never matches natively; port/hal/stubs returns a genuine cartridge's
 # results (PLAN.md §4.5)

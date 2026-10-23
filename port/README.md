@@ -154,7 +154,7 @@ asm oracle, each spike, the artwork) lists its files there.
 | Directory | What it is | Guide |
 | --- | --- | --- |
 | `app/` | The program: `main()` and its options, the SDL3 window, the keyboard, mouse and gamepads, presenting and pacing, replays, the oracle's run directory and the sound driver's trace, the test launcher (`--launch`), the macOS app's scripts, the Windows programs' manifest | [app/README.md](app/README.md) |
-| `hal/` | The platform layer: host C for the parts of the DS that the game reaches through Nintendo's SDK, one directory per SDK module or ARM7 service (threads and time, memory, VRAM, DMA, the ROM, files and overlays, saves and the cartridge's infrared chip, sound, touch, the clock, power, input), and `host/`, the host operating system's services where macOS, Linux and Windows differ | [hal/README.md](hal/README.md) |
+| `hal/` | The platform layer: host C for the parts of the DS that the game reaches through Nintendo's SDK, one directory per SDK module or ARM7 service (threads and time, memory, VRAM, DMA, the ROM, files and overlays, saves and the cartridge's infrared chip, sound, touch, the clock, power, input, MSL's runtime division), and `host/`, the host operating system's services where macOS, Linux and Windows differ | [hal/README.md](hal/README.md) |
 | `gfx/` | The renderers: the 2D engines line by line, the geometry engine, the 3D rasterizer, display capture | [gfx/README.md](gfx/README.md) |
 | `audio/` | The sound output: the default device and the WAV dump | [audio/README.md](audio/README.md) |
 | `include/` | `port_host.h`, force-included into every decomp file of the host build | [include/README.md](include/README.md) |
