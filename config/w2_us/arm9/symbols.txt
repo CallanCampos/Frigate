@@ -9076,7 +9076,7 @@ sNetSys kind:bss addr:0x021418d8
 _pBaseWork kind:bss addr:0x021418dc
 _pCommandWork kind:bss addr:0x021418e0
 _pNetState kind:bss addr:0x021418e4
-data_021418a8 kind:bss addr:0x021418e8
+sNet kind:bss addr:0x021418e8
 NetIwSys kind:bss addr:0x021418f8
 netLdataWork kind:bss addr:0x021418fc
 sGFLStd kind:bss addr:0x02141900

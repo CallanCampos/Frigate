@@ -14,7 +14,7 @@ sThrownAnimations kind:data(any) addr:0x021ef204
 sReleaseAnimations kind:data(any) addr:0x021ef210
 sSceneSetupBlack2 kind:data(any) addr:0x021ef220
 sSceneSetupWhite2 kind:data(any) addr:0x021ef230
-data_ov132_021ef200 kind:data(any) addr:0x021ef240
+sActors kind:data(any) addr:0x021ef240
 data_ov132_021ef211 kind:data(any) addr:0x021ef251 ambiguous
 sResourcesWhite2 kind:data(any) addr:0x021ef260
 data_ov132_021ef231 kind:data(any) addr:0x021ef271 ambiguous

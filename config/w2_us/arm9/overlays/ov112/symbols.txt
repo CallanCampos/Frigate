@@ -13,12 +13,12 @@ sSummerAnimations kind:data(any) addr:0x021eef98
 sAutumnAnimations kind:data(any) addr:0x021eefa0
 sSpringAnimations kind:data(any) addr:0x021eefa8
 sWinterAnimations kind:data(any) addr:0x021eefb0
-data_ov112_021eef78 kind:data(any) addr:0x021eefb8
+sSceneSetup kind:data(any) addr:0x021eefb8
 data_ov112_021eef85 kind:data(any) addr:0x021eefc5 ambiguous
-data_ov112_021eef88 kind:data(any) addr:0x021eefc8
+sAnimationCounts kind:data(any) addr:0x021eefc8
 data_ov112_021eef98 kind:data(any) addr:0x021eefd8
 data_ov112_021eef99 kind:data(any) addr:0x021eefd9 ambiguous
-data_ov112_021eefb8 kind:data(any) addr:0x021eeff8
+sActors kind:data(any) addr:0x021eeff8
 data_ov112_021eefe1 kind:data(any) addr:0x021ef021 ambiguous
-data_ov112_021eeff8 kind:data(any) addr:0x021ef038
+sResources kind:data(any) addr:0x021ef038
 data_ov112_021ef011 kind:data(any) addr:0x021ef051 ambiguous

@@ -1855,4 +1855,4 @@ data_ov012_0216e5fc kind:data(any) addr:0x0216e63c
 data_ov012_0216e60c kind:data(any) addr:0x0216e64c
 data_ov012_0216e618 kind:data(any) addr:0x0216e658
 g_ActiveFieldScriptSubEvents kind:bss addr:0x0216e680
-data_ov012_0216e644 kind:bss addr:0x0216e684
+sEffect kind:bss addr:0x0216e684

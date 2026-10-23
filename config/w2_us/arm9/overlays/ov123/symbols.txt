@@ -16,15 +16,15 @@ GrimsleyRoom_SetGroup0Played kind:function(thumb,size=0x4) addr:0x021ef184
 GrimsleyRoom_GetGroup0Played kind:function(thumb,size=0x4) addr:0x021ef188
 GrimsleyRoom_SetGroup1Played kind:function(thumb,size=0x4) addr:0x021ef18c
 GrimsleyRoom_GetGroup1Played kind:function(thumb,size=0x4) addr:0x021ef190
-data_ov123_021ef154 kind:data(any) addr:0x021ef194
+sModel0Animations kind:data(any) addr:0x021ef194
 sGroupLastModels kind:data(any) addr:0x021ef19c
 sGroupFirstModels kind:data(any) addr:0x021ef1a4
 sGroupModelAnimations kind:data(any) addr:0x021ef1ac
-data_ov123_021ef17c kind:data(any) addr:0x021ef1bc
+sSceneSetup kind:data(any) addr:0x021ef1bc
 data_ov123_021ef18c kind:data(any) addr:0x021ef1cc
-data_ov123_021ef1d4 kind:data(any) addr:0x021ef214
+sResources kind:data(any) addr:0x021ef214
 data_ov123_021ef211 kind:data(any) addr:0x021ef251 ambiguous
 data_ov123_021ef231 kind:data(any) addr:0x021ef271 ambiguous
-data_ov123_021ef234 kind:data(any) addr:0x021ef274
+sActors kind:data(any) addr:0x021ef274
 data_ov123_021ef289 kind:data(any) addr:0x021ef2c9 ambiguous
 data_ov123_021ef29d kind:data(any) addr:0x021ef2dd ambiguous

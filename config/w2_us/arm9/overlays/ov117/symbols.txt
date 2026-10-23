@@ -59,7 +59,7 @@ sAreaValues kind:data(any) addr:0x021efd3c
 sPanelAnimations kind:data(any) addr:0x021efd44
 sEffectBAnimations kind:data(any) addr:0x021efd50
 sEffectAAnimations kind:data(any) addr:0x021efd5c
-data_ov117_021efd3c kind:data(any) addr:0x021efd68
+sSceneSetup kind:data(any) addr:0x021efd68
 data_ov117_021efd4c kind:data(any) addr:0x021efd78
 data_ov117_021efd5c kind:data(any) addr:0x021efd88
 data_ov117_021efd74 kind:data(any) addr:0x021efda0
@@ -74,12 +74,12 @@ data_ov117_021efe5e kind:data(any) addr:0x021efe8a
 data_ov117_021efe5f kind:data(any) addr:0x021efe8b
 sPanelPairs kind:data(any) addr:0x021efec8
 data_ov117_021efea0 kind:data(any) addr:0x021efecc
-data_ov117_021eff0c kind:data(any) addr:0x021eff38
+sResources kind:data(any) addr:0x021eff38
 data_ov117_021f0001_w2_us kind:data(any) addr:0x021f0001 ambiguous
 sPanelPlacements kind:data(any) addr:0x021f0010
 data_ov117_021f0086_w2_us kind:data(any) addr:0x021f0086 ambiguous
 data_ov117_021f0105_w2_us kind:data(any) addr:0x021f0105 ambiguous
 sIndicatorPlacements kind:data(any) addr:0x021f0110
 data_ov117_021f021e_w2_us kind:data(any) addr:0x021f021e ambiguous
-data_ov117_021f0204 kind:data(any) addr:0x021f0230
+sActors kind:data(any) addr:0x021f0230
 sPanelIndicators kind:data(any) addr:0x021f05a0

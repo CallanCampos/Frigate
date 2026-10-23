@@ -4856,12 +4856,12 @@ sSideMessages kind:data(any) addr:0x021daa84
 sHandlers kind:data(any) addr:0x021daabc
 data_ov167_021daa80 kind:data(any) addr:0x021daac0
 sActorSetup kind:data(any) addr:0x021dab2c
-data_ov167_021daaf4 kind:data(any) addr:0x021dab34
+sSurfaceSetup kind:data(any) addr:0x021dab34
 sMoveFuncs kind:data(any) addr:0x021dab44
 data_ov167_021dab08 kind:data(any) addr:0x021dab48
 data_ov167_021dab0c kind:data(any) addr:0x021dab4c
 data_ov167_021dab10 kind:data(any) addr:0x021dab50
-data_ov167_021dab24 kind:data(any) addr:0x021dab64
+sCommands kind:data(any) addr:0x021dab64
 sNudgeFuncs kind:data(any) addr:0x021dab90
 data_ov167_021dab54 kind:data(any) addr:0x021dab94
 data_ov167_021dab58 kind:data(any) addr:0x021dab98
@@ -4896,7 +4896,7 @@ data_ov167_021db044 kind:bss addr:0x021db084
 data_ov167_021db04c kind:bss addr:0x021db08c
 data_ov167_021db058 kind:bss addr:0x021db098
 data_ov167_021db05c kind:bss addr:0x021db09c
-data_ov167_021db06c kind:bss addr:0x021db0ac
+sWork kind:bss addr:0x021db0ac
 sTransformMoveBackup kind:bss addr:0x021db0b0
 sTransformCoreBackup kind:bss addr:0x021db0e8
 data_ov167_021db194 kind:bss addr:0x021db1d4
@@ -4913,7 +4913,7 @@ data_ov167_021dd84c kind:bss addr:0x021dd88c
 sOverlayLoaded kind:bss addr:0x021dd8a4
 sCommMode kind:bss addr:0x021dd8a8
 sAdapters kind:bss addr:0x021dd8ac
-data_ov167_021dd87c kind:bss addr:0x021dd8bc
+sWork kind:bss addr:0x021dd8bc
 data_ov167_021dd8b8 kind:bss addr:0x021dd8f8
 data_ov167_021dd8bc kind:bss addr:0x021dd8fc
 sField kind:bss addr:0x021dd928

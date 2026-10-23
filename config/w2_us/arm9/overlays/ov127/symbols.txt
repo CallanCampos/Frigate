@@ -198,7 +198,7 @@ sRoomTemplates kind:data(any) addr:0x021f3fb8
 data_ov127_021f3f79 kind:data(any) addr:0x021f3fb9
 data_ov127_021f42e5 kind:data(any) addr:0x021f4325 ambiguous
 data_ov127_021f42fd kind:data(any) addr:0x021f433d ambiguous
-data_ov127_021f43a0 kind:data(any) addr:0x021f43e0
+sTrainers kind:data(any) addr:0x021f43e0
 data_ov127_021f43a3 kind:data(any) addr:0x021f43e3
 data_ov127_021f43b5 kind:data(any) addr:0x021f43f5 ambiguous
 data_ov127_021f43d1 kind:data(any) addr:0x021f4411 ambiguous

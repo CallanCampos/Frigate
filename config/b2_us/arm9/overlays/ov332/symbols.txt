@@ -387,15 +387,15 @@ sPreloadedSeqs kind:data(any) addr:0x021c8b3c
 sTopSceneFuncs kind:data(any) addr:0x021c8b44
 sMsgSceneFuncs kind:data(any) addr:0x021c8b54
 UNOVA_LINK_PROC_FUNCTIONS kind:data(any) addr:0x021c8b64 ambiguous
-data_ov332_021c8b70 kind:data(any) addr:0x021c8b70
-data_ov332_021c8b7c kind:data(any) addr:0x021c8b7c
-data_ov332_021c8b88 kind:data(any) addr:0x021c8b88
-data_ov332_021c8b94 kind:data(any) addr:0x021c8b94
-data_ov332_021c8ba4 kind:data(any) addr:0x021c8ba4
-data_ov332_021c8bc0 kind:data(any) addr:0x021c8bc0
-data_ov332_021c8be0 kind:data(any) addr:0x021c8be0
-data_ov332_021c8c00 kind:data(any) addr:0x021c8c00
-data_ov332_021c8c30 kind:data(any) addr:0x021c8c30
+sCameraPosition kind:data(any) addr:0x021c8b70
+sCameraUpVector kind:data(any) addr:0x021c8b7c
+sCameraTarget kind:data(any) addr:0x021c8b88
+sLCDConfig kind:data(any) addr:0x021c8b94
+sClActSetup kind:data(any) addr:0x021c8ba4
+sLights kind:data(any) addr:0x021c8bc0
+sSurfaceSetups kind:data(any) addr:0x021c8be0
+sVRAMConfig kind:data(any) addr:0x021c8c00
+sBGSetups kind:data(any) addr:0x021c8c30
 data_ov332_021c8d64 kind:data(any) addr:0x021c8d64
 sScrollListTouch kind:data(any) addr:0x021c8d68
 sScrollListCallbacks kind:data(any) addr:0x021c8d70

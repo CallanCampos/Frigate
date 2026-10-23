@@ -40,14 +40,14 @@ sScene3 kind:data(any) addr:0x021ef874
 sScene2 kind:data(any) addr:0x021ef884
 sGateWorks kind:data(any) addr:0x021ef894
 sCameraShakes kind:data(any) addr:0x021ef8a8
-data_ov103_021ef890 kind:data(any) addr:0x021ef8d0
+sScene3Resources kind:data(any) addr:0x021ef8d0
 sGatePositions kind:data(any) addr:0x021ef900
 data_ov103_021ef920 kind:data(any) addr:0x021ef960
-data_ov103_021ef92c kind:data(any) addr:0x021ef96c
+sScene1Resources kind:data(any) addr:0x021ef96c
 sScene0Actors kind:data(any) addr:0x021ef9d8
 sScene1Actors kind:data(any) addr:0x021efa58
 sScene2Actors kind:data(any) addr:0x021efae8
-data_ov103_021efb38 kind:data(any) addr:0x021efb78
+sScene2Resources kind:data(any) addr:0x021efb78
 data_ov103_021efb91 kind:data(any) addr:0x021efbd1 ambiguous
 data_ov103_021efbb0 kind:data(any) addr:0x021efbf0 ambiguous
 sScene0Resources kind:data(any) addr:0x021efc50

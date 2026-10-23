@@ -4,22 +4,22 @@ LeagueStatue_Update kind:function(thumb,size=0xc) addr:0x021eed08
 LeagueStatue_LoadScene kind:function(thumb,size=0x150) addr:0x021eed14
 LeagueStatue_DummyInit kind:function(thumb,size=0x2) addr:0x021eee64
 LeagueStatue_DummyEnd kind:function(thumb,size=0x2) addr:0x021eee68
-data_ov105_021eee2c kind:data(any) addr:0x021eee6c
-data_ov105_021eee30 kind:data(any) addr:0x021eee70
-data_ov105_021eee34 kind:data(any) addr:0x021eee74
-data_ov105_021eee3c kind:data(any) addr:0x021eee7c
+sAnimations01 kind:data(any) addr:0x021eee6c
+sAnimations03 kind:data(any) addr:0x021eee70
+sAnimations0B kind:data(any) addr:0x021eee74
+sAnimations0E kind:data(any) addr:0x021eee7c
 sAnimations08 kind:data(any) addr:0x021eee84
-data_ov105_021eee4c kind:data(any) addr:0x021eee8c
+sAnimations05 kind:data(any) addr:0x021eee8c
 data_ov105_021eee4d kind:data(any) addr:0x021eee8d ambiguous
-data_ov105_021eee54 kind:data(any) addr:0x021eee94
+sSceneSetup kind:data(any) addr:0x021eee94
 data_ov105_021eee61 kind:data(any) addr:0x021eeea1 ambiguous
-data_ov105_021eee64 kind:data(any) addr:0x021eeea4
+sActorPositions kind:data(any) addr:0x021eeea4
 data_ov105_021eee81 kind:data(any) addr:0x021eeec1 ambiguous
 data_ov105_021eee9d kind:data(any) addr:0x021eeedd ambiguous
-data_ov105_021eeeac kind:data(any) addr:0x021eeeec
+sActors kind:data(any) addr:0x021eeeec
 data_ov105_021eeec0 kind:data(any) addr:0x021eef00 ambiguous
 data_ov105_021eeec9 kind:data(any) addr:0x021eef09 ambiguous
-data_ov105_021eef0c kind:data(any) addr:0x021eef4c
+sResources kind:data(any) addr:0x021eef4c
 data_ov105_021eef29 kind:data(any) addr:0x021eef69 ambiguous
 data_ov105_021eef55 kind:data(any) addr:0x021eef95 ambiguous
 data_ov105_021eef85 kind:data(any) addr:0x021eefc5 ambiguous
