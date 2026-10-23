@@ -270,14 +270,14 @@ static void gsUdpPingRoutingCB(GT2Connection addr, int latencyMs) {
         GSUdpMsgHandler *pending = (GSUdpMsgHandler *)ArrayNth(engine->mMsgHandlers, i);
         if (pending->mPingReply != NULL) {
             gsDebugFormat(GSIDebugCat_Common, GSIDebugType_Network, GSIDebugLevel_Comment,
-                          "[Udp Engine] Passing to message handler\n");
+                          "[Udp Engine] Passed to message handler\n");
             pending->mPingReply(gt2GetRemoteIP(addr), gt2GetRemotePort(addr), latencyMs, pending->mUserData);
             return;
         }
     }
 
     if (engine->mAppPingReply != NULL) {
-        gsDebugFormat(GSIDebugCat_Common, GSIDebugType_Network, GSIDebugLevel_Comment, "[Udp Engine] Passing to app\n");
+        gsDebugFormat(GSIDebugCat_Common, GSIDebugType_Network, GSIDebugLevel_Comment, "[Udp Engine] Passed to app\n");
         engine->mAppPingReply(gt2GetRemoteIP(addr), gt2GetRemotePort(addr), latencyMs, engine->mAppUserData);
     }
 }
@@ -688,7 +688,7 @@ GSUdpErrorCode gsUdpEngineRemoveMsgHandler(char header[GS_UDP_MSG_HEADER_LEN]) {
     }
     if (header == NULL || header[0] == 0) {
         gsDebugFormat(GSIDebugCat_Common, GSIDebugType_Network, GSIDebugLevel_Debug,
-                      "[Udp Engine] Invalid or empty header\n");
+                      "[Udp Engine] invalid or empty header\n");
         return 0xa;
     }
 
