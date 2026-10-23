@@ -14,7 +14,8 @@ port_test_labels(game_ptrcasts static)
 
 # The guard's own test, on a small tree it makes in the build directory with this build's compiler: new findings, the
 # baseline's counts and classes, renames, the narrowing and callback kinds, the headers' host variants, a file that
-# doesn't compile (port/tests/game/test_check_ptrcasts.py). It skips without clang
+# doesn't compile (port/tests/game/test_check_ptrcasts.py). It skips without clang, and on Windows once it has seen the
+# guard skip there
 add_test(NAME game_ptrcasts_tool
     COMMAND "${CMAKE_COMMAND}" -E env PYTHONDONTWRITEBYTECODE=1 "${PORT_PYTHON}"
         "${CMAKE_CURRENT_SOURCE_DIR}/tests/game/test_check_ptrcasts.py" "${CMAKE_C_COMPILER}"

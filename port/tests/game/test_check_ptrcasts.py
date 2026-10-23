@@ -10,12 +10,14 @@ the header it was made from, a file that doesn't compile fails, and a build with
 
     test_check_ptrcasts.py CC WORKDIR
 
-It skips (77) when CC isn't clang, whose warnings the guard reads. Standard library only.
+It skips (77) when CC isn't clang, whose warnings the guard reads, and on Windows, after checking that the guard skips
+there too (Windows' LLP64 gives other keys than its baseline's). Standard library only.
 """
 
 from __future__ import annotations
 
 import json
+import os
 import shutil
 import subprocess
 import sys
@@ -92,6 +94,17 @@ def main() -> int:
     # No compile database: skip
     status, output = run()
     check(status == 77, "a build without compile_commands.json skips", output)
+
+    # On Windows the guard skips whatever the tree holds: check that it does, and skip the rest
+    if os.name == "nt" or sys.platform in ("win32", "cygwin", "msys"):
+        write("src/a.c", FIRST)
+        database("src/a.c")
+        status, output = run()
+        check(status == 77 and "Windows is LLP64" in output, "the guard skips on Windows", output)
+        if failures:
+            return 1
+        print("skipped: the guard skips on Windows, whose LLP64 gives other keys than its baseline's")
+        return 77
 
     # Two new findings, no baseline: fail, naming each site and the ways out
     write("src/a.c", FIRST)
