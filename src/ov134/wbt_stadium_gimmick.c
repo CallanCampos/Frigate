@@ -149,7 +149,7 @@ void WbtStadiumGimmick_SetNames(Field *field, u8 mode, StrBuf *name, StrBuf *pla
     FieldExpObj_SetActorHidden(work->expObj, 0, 1, TRUE);
     FieldExpObj_SetActorHidden(work->expObj, 0, 2, TRUE);
     FieldExpObj_SetActorHidden(work->expObj, 0, 3, TRUE);
-    font = func_ov036_0218799c(Field_GetMsgBGSys(field));
+    font = MsgBGPrinter_GetFont(Field_GetMsgBGSys(field));
     switch (mode) {
     case 0:
         WbtStadiumGimmick_DrawNamePlate(work, font, 0, name, heapId);

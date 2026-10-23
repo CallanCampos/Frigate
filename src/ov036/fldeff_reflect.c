@@ -77,7 +77,7 @@ static void func_ov036_021b49a4(FieldEffectReflect *effect) {
 static void func_ov036_021b49a8(FieldEffectReflect *effect) {
 }
 
-void func_ov036_021b49ac(MMSys *mmSys, FieldActor *actor, FieldEffects *effects, u32 type) {
+void ReflectTask_SetMMdl(MMSys *mmSys, FieldActor *actor, FieldEffects *effects, u32 type) {
     ReflectTaskParams params;
 
     FieldEffects_GetField(effects);
@@ -91,7 +91,7 @@ void func_ov036_021b49ac(MMSys *mmSys, FieldActor *actor, FieldEffects *effects,
 
 static void ReflectTask_Init(FieldEffectTask *task, void *data) {
     ReflectTask *work = data;
-    ReflectTaskParams *params = func_ov036_021a3ac8(task);
+    ReflectTaskParams *params = FieldEffects_GetObjectParam(task);
 
     work->params = *params;
     work->swingSpeed = 0x40;
@@ -108,7 +108,7 @@ static void ReflectTask_Free(FieldEffectTask *task, void *data) {
 
     if (work->created) {
         work->created = FALSE;
-        func_ov036_02193b7c(work->params.mmSys, work->blAct);
+        FldBlAct_DeleteActorPos(work->params.mmSys, work->blAct);
     }
 }
 
@@ -119,7 +119,7 @@ static void ReflectTask_Update(FieldEffectTask *task, void *data) {
     u16 y;
 
     if (!FldAct_CheckIdentity(work->params.actor, &work->identity) || !FldAct_CheckReflectingFlag(work->params.actor)) {
-        func_ov036_021a3a70(task);
+        FieldEffects_DeleteObject(task);
         return;
     }
     blActIdx = FldAct_GetBlActIdx(work->params.actor, 0);
@@ -138,7 +138,7 @@ static void ReflectTask_Update(FieldEffectTask *task, void *data) {
     }
     if (work->blAct[1] != 0xffff) {
         if (!work->initialized) {
-            func_ov036_02193bd0(work->params.actor, &x, &y);
+            FldBlAct_GetActorSize(work->params.actor, &x, &y);
             work->base = x;
             work->scaleY = y;
             work->swing = x;

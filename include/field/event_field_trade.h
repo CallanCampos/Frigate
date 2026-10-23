@@ -31,7 +31,7 @@ GameEventReturnCode EventFieldTrade_Callback(GameEvent *event, u32 *state, void 
 void EventFieldTrade_CreatePkm(GameData *gameData, HeapID heapId, PartyPkm *pkm, FieldTradeOfferData *offer,
                                u32 offerIndex);
 void EventFieldTrade_DebugLogPkm(PartyPkm *pkm);
-void func_ov033_0217a864(FieldTradeOfferData *param);
+void FieldTradeInput_DumpTradeData(FieldTradeOfferData *param);
 
 extern const GameProcFunctions data_ov194_021c63ac;
 

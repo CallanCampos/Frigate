@@ -185,7 +185,7 @@ void CtvtDraw_Enter(CommTvtWork *sys, CtvtDraw *draw) {
     setup.sequence = 7;
     draw->buttons[3] = CtvtDraw_CreateActor(sys, 4, 0, 8, &setup, 0, heapId);
     setup.x = 200;
-    if (func_ov257_021aab18(sys) == TRUE) {
+    if (CommTvt_GetViewSwapped(sys) == TRUE) {
         setup.sequence = 12;
     } else {
         setup.sequence = 10;
@@ -268,7 +268,7 @@ void CtvtDraw_Enter(CommTvtWork *sys, CtvtDraw *draw) {
     *(vu16 *)(HW_BG_PLTT + 0x21a) = draw->color & 0x7fff;
     CtvtDraw_PrintMenu(sys, draw, FALSE);
     GFL_NetSetIconScreen(TRUE, heapId);
-    func_ov257_021aae44(sys);
+    CommTvt_HideSlotMarker(sys);
 }
 
 static inline void CtvtDraw_ClearWindow(BmpWin *window) {
@@ -317,7 +317,7 @@ void CtvtDraw_Leave(CommTvtWork *sys, CtvtDraw *draw) {
     GFL_BGSysLoadScr(6);
     GFL_BGSysSetBGEnabled(5, TRUE);
     GX_SetDispSelect(1);
-    func_ov257_021aad08(sys);
+    CommTvt_ClearNameWindows(sys);
 }
 
 int CtvtDraw_Main(CommTvtWork *sys, CtvtDraw *draw) {
@@ -381,7 +381,7 @@ int CtvtDraw_Main(CommTvtWork *sys, CtvtDraw *draw) {
     case DRAW_STATE_DISCONNECTED:
         CtvtComm_Disconnect(sys, CommTvt_GetComm(sys));
         CtvtDraw_PrintMessage(sys, draw, 36);
-        func_ov257_021aab14(sys, TRUE);
+        CommTvt_SetMessageActive(sys, TRUE);
         draw->state = DRAW_STATE_WAIT_DISCONNECTED;
         CtvtCamera_EndRecording(sys, CommTvt_GetCamera(sys));
         draw->waitSound = TRUE;
@@ -390,7 +390,7 @@ int CtvtDraw_Main(CommTvtWork *sys, CtvtDraw *draw) {
         if (GFL_HIDIsTouchPressed() == TRUE || (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B))) {
             draw->exit = TRUE;
             draw->state = DRAW_STATE_FADE_OUT;
-            func_ov257_021aab14(sys, TRUE);
+            CommTvt_SetMessageActive(sys, TRUE);
             CtvtCamera_StopCamera(sys, CommTvt_GetCamera(sys));
             draw->waitSound = TRUE;
         }
@@ -403,7 +403,7 @@ int CtvtDraw_Main(CommTvtWork *sys, CtvtDraw *draw) {
     case DRAW_STATE_PARENT_LEFT:
         CtvtComm_Disconnect(sys, CommTvt_GetComm(sys));
         CtvtDraw_PrintMessage(sys, draw, 37);
-        func_ov257_021aab14(sys, TRUE);
+        CommTvt_SetMessageActive(sys, TRUE);
         draw->state = DRAW_STATE_WAIT_PARENT_LEFT;
         draw->waitFrames = 0;
         CtvtCamera_EndRecording(sys, CommTvt_GetCamera(sys));
@@ -424,7 +424,7 @@ int CtvtDraw_Main(CommTvtWork *sys, CtvtDraw *draw) {
         if (CtvtComm_IsSynced(sys, CommTvt_GetComm(sys), 47) == TRUE) {
             draw->exit = TRUE;
             draw->state = DRAW_STATE_FADE_OUT;
-            func_ov257_021aab14(sys, TRUE);
+            CommTvt_SetMessageActive(sys, TRUE);
             CtvtCamera_StopCamera(sys, CommTvt_GetCamera(sys));
             draw->waitSound = TRUE;
         }
@@ -432,7 +432,7 @@ int CtvtDraw_Main(CommTvtWork *sys, CtvtDraw *draw) {
     case DRAW_STATE_ALONE:
         CtvtComm_Disconnect(sys, CommTvt_GetComm(sys));
         CtvtDraw_PrintMessage(sys, draw, 38);
-        func_ov257_021aab14(sys, TRUE);
+        CommTvt_SetMessageActive(sys, TRUE);
         draw->state = DRAW_STATE_WAIT_ALONE;
         CtvtCamera_EndRecording(sys, CommTvt_GetCamera(sys));
         draw->waitSound = TRUE;
@@ -441,7 +441,7 @@ int CtvtDraw_Main(CommTvtWork *sys, CtvtDraw *draw) {
         if (GFL_HIDIsTouchPressed() == TRUE || (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B))) {
             draw->exit = TRUE;
             draw->state = DRAW_STATE_FADE_OUT;
-            func_ov257_021aab14(sys, TRUE);
+            CommTvt_SetMessageActive(sys, TRUE);
             CtvtCamera_StopCamera(sys, CommTvt_GetCamera(sys));
             draw->waitSound = TRUE;
         }
@@ -492,7 +492,7 @@ int CtvtDraw_Main(CommTvtWork *sys, CtvtDraw *draw) {
             draw->messageWindowPending = FALSE;
         }
     }
-    if (draw->state <= DRAW_STATE_DRAW && func_ov257_021aab18(sys) == FALSE) {
+    if (draw->state <= DRAW_STATE_DRAW && CommTvt_GetViewSwapped(sys) == FALSE) {
         CtvtCamera *camera = CommTvt_GetCamera(sys);
 
         if (GCTX_HIDGetPressedKeys() & PAD_KEY_UP) {
@@ -541,7 +541,7 @@ static void CtvtDraw_UpdateMenu(CommTvtWork *sys, CtvtDraw *draw) {
         GFL_SndSEPlay(SEQ_SE_CANCEL1);
     }
     if (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_SELECT | PAD_BUTTON_START)) {
-        func_ov257_021aab1c(sys);
+        CommTvt_ToggleViewSwapped(sys);
         CtvtDraw_RefreshButtons(sys, draw);
         GFL_SndSEPlay(SEQ_SE_SYS_48);
     }
@@ -610,7 +610,7 @@ static void CtvtDraw_UpdateDraw(CommTvtWork *sys, CtvtDraw *draw) {
         GFL_SndSEPlay(SEQ_SE_SYS_45);
     }
     if (hit == 4) {
-        func_ov257_021aab1c(sys);
+        CommTvt_ToggleViewSwapped(sys);
         CtvtDraw_RefreshButtons(sys, draw);
         draw->inputHandled = TRUE;
         GFL_SndSEPlay(SEQ_SE_SYS_48);
@@ -672,7 +672,7 @@ static void CtvtDraw_UpdateDraw(CommTvtWork *sys, CtvtDraw *draw) {
         ClActor_SetSequence(draw->buttons[5], 9);
     }
     if (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_SELECT | PAD_BUTTON_START)) {
-        func_ov257_021aab1c(sys);
+        CommTvt_ToggleViewSwapped(sys);
         CtvtDraw_RefreshButtons(sys, draw);
         GFL_SndSEPlay(SEQ_SE_SYS_48);
     }
@@ -727,7 +727,7 @@ static void CtvtDraw_UpdateStroke(CommTvtWork *sys, CtvtDraw *draw) {
     DrawCommand *cmd;
 
     GFL_HIDGetTouchPressedPoint(&x, &y);
-    if (func_ov257_021aab2c(sys) == TRUE) {
+    if (CommTvt_GetInputLocked(sys) == TRUE) {
         return;
     }
     if (GFL_HIDIsTouchHeld() == FALSE) {
@@ -872,7 +872,7 @@ static void CtvtDraw_RefreshButtons(CommTvtWork *sys, CtvtDraw *draw) {
     ClActor_SetSequence(draw->buttons[1], sPickButtonAnims[draw->tool == DRAW_TOOL_PICK ? 1 : 0]);
     ClActor_SetSequence(draw->buttons[2], sEraserButtonAnims[draw->tool == DRAW_TOOL_ERASER ? 1 : 0]);
     ClActor_SetSequence(draw->buttons[3], sStampButtonAnims[draw->tool == DRAW_TOOL_STAMP ? 1 : 0]);
-    if (func_ov257_021aab18(sys) == TRUE) {
+    if (CommTvt_GetViewSwapped(sys) == TRUE) {
         ClActor_SetSequence(draw->buttons[4], 12);
     } else {
         ClActor_SetSequence(draw->buttons[4], 10);
@@ -942,7 +942,7 @@ static void CtvtDraw_PrintMenu(CommTvtWork *sys, CtvtDraw *draw, BOOL expanded) 
 }
 
 static BOOL CtvtDraw_CheckDisconnect(CommTvtWork *sys, CtvtDraw *draw) {
-    if (func_ov257_021aab34(sys) == TRUE) {
+    if (CommTvt_GetEndRequested(sys) == TRUE) {
         if (CtvtComm_GetConnectType(sys, CommTvt_GetComm(sys)) == CTVT_CONNECT_EXISTING) {
             draw->state = DRAW_STATE_PARENT_LEFT;
         } else {

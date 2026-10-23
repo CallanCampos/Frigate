@@ -382,7 +382,7 @@ static int BeaconView_UpdateBarDrag(BeaconViewWork *work) {
 
 // Leaves the view for the menu when something else needs the touch screen
 static BOOL BeaconView_CheckLeave(BeaconViewWork *work) {
-    u32 state = func_ov012_02153650(work->commSys);
+    u32 state = Intrude_GetVisitProgress(work->commSys);
 
     if (GSYS_IsLowBatteryCGearOff(work->gsys)) {
         BeaconView_RequestEvent(work, BEACON_VIEW_EVENT_MENU);

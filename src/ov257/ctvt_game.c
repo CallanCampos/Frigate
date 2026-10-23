@@ -593,7 +593,7 @@ void CtvtGame_Enter(CommTvtWork *sys, CtvtGame *game) {
     }
     game->state = CTVT_GAME_STATE_START_CAMERA;
     game->replay = FALSE;
-    func_ov257_021aae44(sys);
+    CommTvt_HideSlotMarker(sys);
     GFL_NetSetIconScreen(TRUE, heapId);
 }
 

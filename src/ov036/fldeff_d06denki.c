@@ -82,7 +82,7 @@ static void MarkTask_Delete(FieldEffectTask *task, void *work);
 static void MarkTask_Update(FieldEffectTask *task, void *work);
 static void MarkTask_Draw(FieldEffectTask *task, void *work);
 
-void *func_ov036_021c2788(FieldEffects *effects, HeapID heapId) {
+void *StoneTask_Create(FieldEffects *effects, HeapID heapId) {
     FieldEffectD06Denki *effect = GFL_HeapAllocate(heapId, sizeof(FieldEffectD06Denki), TRUE, "fldeff_d06denki.c", 169);
 
     effect->effects = effects;
@@ -153,10 +153,10 @@ void func_ov036_021c289c(FieldActor *actor, FieldEffects *effects) {
 
 void FieldTerrainEffectElec_Init(FieldEffectTask *task, void *work) {
     SparkTask *sparkTask = work;
-    SparkTaskParams *params = func_ov036_021a3ac8(task);
+    SparkTaskParams *params = FieldEffects_GetObjectParam(task);
 
     sparkTask->effect = params->effect;
-    func_ov036_021a3ae8(task, &params->pos);
+    FieldEffects_SetObjectPos(task, &params->pos);
     GFL_SndSEPlay(SEQ_SE_FLD_49);
 }
 
@@ -167,7 +167,7 @@ static void SparkTask_Update(FieldEffectTask *task, void *work) {
     SparkTask *sparkTask = work;
 
     if (sparkTask->done == TRUE) {
-        func_ov036_021a3a70(task);
+        FieldEffects_DeleteObject(task);
     }
 }
 
@@ -186,12 +186,12 @@ static void SparkTask_Draw(FieldEffectTask *task, void *work) {
             sparkTask->done = TRUE;
         }
         MTX_Identity33_(&srt.rotation);
-        func_ov036_021a3ad4(task, &srt.translation);
+        FieldEffects_GetObjectPos(task, &srt.translation);
         GFL_G3DSysDrawObjBBoxCull(actor, &srt);
     }
 }
 
-FieldEffectTask *func_ov036_021c2984(FieldEffects *effects, const VecFx32 *pos, FieldActor *actor) {
+FieldEffectTask *StoneTask_StartFollow(FieldEffects *effects, const VecFx32 *pos, FieldActor *actor) {
     StoneTaskParams params;
 
     params.effect = FieldEffects_GetHandleData(effects, 10);
@@ -200,18 +200,18 @@ FieldEffectTask *func_ov036_021c2984(FieldEffects *effects, const VecFx32 *pos, 
     return FieldEffects_TCBCreate(effects, &STONE_TASK_VTABLE, NULL, 0, &params, 0);
 }
 
-void func_ov036_021c29bc(FieldEffectTask *task) {
+void StoneTask_FollowFreezeLoop(FieldEffectTask *task) {
     if (task != NULL) {
-        StoneTask *stoneTask = func_ov036_021a3afc(task);
+        StoneTask *stoneTask = FieldEffects_GetObjectWork(task);
 
         stoneTask->paused = TRUE;
     }
 }
 
-void func_ov036_021c29cc(FieldEffectTask *task) {
+void StoneTask_FollowStartEnding(FieldEffectTask *task) {
     if (task != NULL) {
         fx32 frame = 0;
-        StoneTask *stoneTask = func_ov036_021a3afc(task);
+        StoneTask *stoneTask = FieldEffects_GetObjectWork(task);
 
         stoneTask->lit = TRUE;
         stoneTask->litDone = FALSE;
@@ -219,9 +219,9 @@ void func_ov036_021c29cc(FieldEffectTask *task) {
     }
 }
 
-u8 func_ov036_021c29f0(FieldEffectTask *task) {
+u8 StoneTask_FollowIsEnded(FieldEffectTask *task) {
     if (task != NULL) {
-        StoneTask *stoneTask = func_ov036_021a3afc(task);
+        StoneTask *stoneTask = FieldEffects_GetObjectWork(task);
 
         return stoneTask->litDone;
     }
@@ -230,10 +230,10 @@ u8 func_ov036_021c29f0(FieldEffectTask *task) {
 
 static void StoneTask_Init(FieldEffectTask *task, void *work) {
     StoneTask *stoneTask = work;
-    StoneTaskParams *params = func_ov036_021a3ac8(task);
+    StoneTaskParams *params = FieldEffects_GetObjectParam(task);
 
     *(StoneTaskParams *)stoneTask = *params;
-    func_ov036_021a3ae8(task, &stoneTask->pos);
+    FieldEffects_SetObjectPos(task, &stoneTask->pos);
     stoneTask->stoneMdl = GFL_G3DMdlCreate(stoneTask->effect->mdlRes[1], 0, stoneTask->effect->mdlRes[1]);
     stoneTask->anms[0] = GFL_G3DAnmCreate(stoneTask->stoneMdl, stoneTask->effect->anmRes[1], 0);
     stoneTask->anms[1] = GFL_G3DAnmCreate(stoneTask->stoneMdl, stoneTask->effect->anmRes[2], 0);
@@ -263,7 +263,7 @@ static void StoneTask_Update(FieldEffectTask *task, void *work) {
 
         CopyActorWPos(stoneTask->actor, &pos);
         stoneTask->glowPos = pos;
-        func_ov036_021a3ae8(task, &pos);
+        FieldEffects_SetObjectPos(task, &pos);
         stoneTask->glowPos.y -= FX32_CONST(4);
         stoneTask->glowPos.z += FX32_CONST(2.5);
         if (stoneTask->paused == FALSE) {
@@ -282,13 +282,13 @@ static void StoneTask_Draw(FieldEffectTask *task, void *work) {
     StoneTask *stoneTask = work;
 
     MTX_Identity33_(&srt.rotation);
-    func_ov036_021a3ad4(task, &srt.translation);
+    FieldEffects_GetObjectPos(task, &srt.translation);
     GFL_G3DSysDrawObjBBoxCull(stoneTask->stoneActor, &srt);
     srt.translation = stoneTask->glowPos;
     GFL_G3DSysDrawObjBBoxCull(stoneTask->glowActor, &srt);
 }
 
-FieldEffectTask *func_ov036_021c2b78(FieldEffects *effects, const VecFx32 *pos) {
+FieldEffectTask *StoneTask_StartPulse(FieldEffects *effects, const VecFx32 *pos) {
     SparkTaskParams params;
 
     params.effect = FieldEffects_GetHandleData(effects, 10);
@@ -296,9 +296,9 @@ FieldEffectTask *func_ov036_021c2b78(FieldEffects *effects, const VecFx32 *pos) 
     return FieldEffects_TCBCreate(effects, &MARK_TASK_VTABLE, NULL, 0, &params, 0);
 }
 
-void func_ov036_021c2bac(FieldEffectTask *task) {
+void StoneTask_PulseTrigger(FieldEffectTask *task) {
     if (task != NULL) {
-        MarkTask *markTask = func_ov036_021a3afc(task);
+        MarkTask *markTask = FieldEffects_GetObjectWork(task);
 
         if (markTask->lit == FALSE) {
             fx32 frame = 0;
@@ -311,10 +311,10 @@ void func_ov036_021c2bac(FieldEffectTask *task) {
 
 static void MarkTask_Init(FieldEffectTask *task, void *work) {
     MarkTask *markTask = work;
-    SparkTaskParams *params = func_ov036_021a3ac8(task);
+    SparkTaskParams *params = FieldEffects_GetObjectParam(task);
 
     *(SparkTaskParams *)markTask = *params;
-    func_ov036_021a3ae8(task, &markTask->pos);
+    FieldEffects_SetObjectPos(task, &markTask->pos);
     markTask->mdl = GFL_G3DMdlCreate(markTask->effect->mdlRes[2], 0, markTask->effect->mdlRes[2]);
     markTask->anms[0] = GFL_G3DAnmCreate(markTask->mdl, markTask->effect->anmRes[3], 0);
     markTask->anms[1] = GFL_G3DAnmCreate(markTask->mdl, markTask->effect->anmRes[4], 0);
@@ -348,6 +348,6 @@ static void MarkTask_Draw(FieldEffectTask *task, void *work) {
     MarkTask *markTask = work;
 
     MTX_Identity33_(&srt.rotation);
-    func_ov036_021a3ad4(task, &srt.translation);
+    FieldEffects_GetObjectPos(task, &srt.translation);
     GFL_G3DSysDrawObjBBoxCull(markTask->actor, &srt);
 }

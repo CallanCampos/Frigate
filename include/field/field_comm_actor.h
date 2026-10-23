@@ -19,7 +19,7 @@ BOOL FldCommActSys_FindActor(FldCommActSys *sys, s16 x, s16 y, s16 z, u32 *netId
 // The init, delete and update functions of the move code of these actors, which follow their player's direction,
 // position and visibility
 void func_ov036_0218b044(FieldActor *actor);
-void func_ov036_0218b050(FieldActor *actor);
+void FieldCommActor_MoveDelete(FieldActor *actor);
 void func_ov036_0218b060(FieldActor *actor);
 
 #endif // POKEBW2_FIELD_FIELD_COMM_ACTOR_H

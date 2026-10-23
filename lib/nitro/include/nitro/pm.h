@@ -90,8 +90,8 @@ void PM_ForceToPowerOff(void);
 // went off too recently to be turned on
 BOOL PM_SetLCDPower(BOOL on);
 // Two more settings of the ARM7 (the request 0x12, and the read of the register 8)
-u32 func_0207f50c(u32 value);
-u32 func_0207f520(u32 *value);
+u32 PMi_SendLEDPatternCommand(u32 value);
+u32 PM_GetLEDPattern(u32 *value);
 // NitroSDK's PMi_SetDispOffCount (the name is recalled, not shown): records the vertical blank count at which the
 // display went off, which the screens' power waits two frames from
 void PMi_SetDispOffCount(void);

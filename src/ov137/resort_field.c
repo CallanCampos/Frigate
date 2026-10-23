@@ -682,7 +682,7 @@ static void ResortWalker_Update(ResortWalker *walker, MMSys *mmSys, FieldPlayer 
                 FldAct_SetLocalAcmd(actor, 0xbe);
                 walker->unk54++;
             case 1:
-                if (func_ov036_0218f01c(actor)) {
+                if (FieldAcmdTCB_Update(actor)) {
                     walker->unk54 = 0;
                     walker->unk14 = FALSE;
                     walker->unk15 = TRUE;
@@ -898,7 +898,7 @@ static BOOL ResortWalker_StateStep(ResortWalker *walker, MMSys *mmSys, FieldPlay
 
 static BOOL ResortWalker_StateWaitStep(ResortWalker *walker, MMSys *mmSys, FieldPlayer *player) {
     FieldActor *actor = ResortPerson_GetActor(walker->person);
-    if (func_ov036_0218f01c(actor)) {
+    if (FieldAcmdTCB_Update(actor)) {
         FldAct_ClearMoving(actor);
         walker->state = 0;
     }
@@ -914,7 +914,7 @@ static BOOL ResortWalker_StateLookAround(ResortWalker *walker, MMSys *mmSys, Fie
         FldAct_SetLocalAcmd(actor, walker->lookDir);
         walker->lookState++;
     case 1:
-        if (func_ov036_0218f01c(actor)) {
+        if (FieldAcmdTCB_Update(actor)) {
             walker->lookState++;
         } else {
             return FALSE;
@@ -931,7 +931,7 @@ static BOOL ResortWalker_StateLookAround(ResortWalker *walker, MMSys *mmSys, Fie
         FldAct_SetLocalAcmd(actor, walker->lookDir);
         walker->lookState++;
     case 4:
-        if (func_ov036_0218f01c(actor)) {
+        if (FieldAcmdTCB_Update(actor)) {
             walker->lookState++;
         } else {
             return FALSE;
@@ -960,7 +960,7 @@ static BOOL ResortWalker_StateStopAtShop(ResortWalker *walker, MMSys *mmSys, Fie
         FldAct_SetLocalAcmd(actor, walker->stopAcmd[walker->stop]);
         walker->stopState++;
     case 1:
-        if (func_ov036_0218f01c(actor)) {
+        if (FieldAcmdTCB_Update(actor)) {
             walker->stopState++;
         } else {
             return FALSE;
@@ -1512,7 +1512,7 @@ static void ResortBubble_Show(ResortBubble *bubble, FieldMsgBG *msgBGSys, Resort
 
 static void ResortBubble_Hide(ResortBubble *bubble, FieldMsgBG *msgBGSys) {
     if (bubble->active) {
-        func_ov036_02188e90(msgBGSys, bubble->index);
+        MsgBGPrinter_DeleteSubMsgWin(msgBGSys, bubble->index);
         ResortBubble_Reset(bubble);
     }
 }

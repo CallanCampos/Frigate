@@ -89,7 +89,7 @@ void UpdateWeatherToDefault(GameData *gameData, u32 zoneId) {
 
     if (weather != WEATHER_NONE) {
         SetNowWeather(gameData, weather);
-    } else if ((nowWeather == 6 || nowWeather == 7) && func_ov012_0215922c(gameData) == TRUE) {
+    } else if ((nowWeather == 6 || nowWeather == 7) && EncountSave_IsAnyEntryActive(gameData) == TRUE) {
         weather = GetZoneEnvFlagsWeather(zoneId);
         SetNowWeather(gameData, weather);
     }

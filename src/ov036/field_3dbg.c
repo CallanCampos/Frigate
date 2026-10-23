@@ -46,16 +46,17 @@ struct Field3DBg {
     Field3DBgQuad quad;
 };
 
-static void func_ov036_02198d08(Field3DBgTex *tex, ArcTool *arc, const Field3DBgRes *res, u32 heapId);
-static void func_ov036_02198d6c(Field3DBgTex *tex);
-static void func_ov036_02198d84(Field3DBgTex *tex);
-static u8 func_ov036_02198d9c(Field3DBgTex *tex);
-static void func_ov036_02198da0(Field3DBgQuad *quad, const Field3DBg *bg, Field3DBgTex *tex, const MtxFx44 *proj);
-static void func_ov036_02198e64(const Field3DBgQuad *quad);
-static void func_ov036_02198f50(Field3DBg *bg);
-static void func_ov036_02198f78(const Field3DBg *bg);
+static void Field3DBG_LoadTexture(Field3DBgTex *tex, ArcTool *arc, const Field3DBgRes *res, u32 heapId);
+static void Field3DBG_FreeTexture(Field3DBgTex *tex);
+static void Field3DBG_ReleaseTextureVram(Field3DBgTex *tex);
+static u8 Field3DBG_IsTextureLoaded(Field3DBgTex *tex);
+static void Field3DBG_CalcQuadGeometry(Field3DBgQuad *quad, const Field3DBg *bg, Field3DBgTex *tex,
+                                       const MtxFx44 *proj);
+static void Field3DBG_DrawQuad(const Field3DBgQuad *quad);
+static void Field3DBG_SetPolygonAttr(Field3DBg *bg);
+static void Field3DBG_SetTextureParams(const Field3DBg *bg);
 
-Field3DBg *func_ov036_02198bc0(const Field3DBgInit *init, u32 heapId) {
+Field3DBg *Field3DBG_CreateBillboard(const Field3DBgInit *init, u32 heapId) {
     Field3DBg *bg = GFL_HeapAllocate(heapId, sizeof(Field3DBg), TRUE, "field_3dbg.c", 149);
 
     bg->width = init->width;
@@ -66,17 +67,17 @@ Field3DBg *func_ov036_02198bc0(const Field3DBgInit *init, u32 heapId) {
     return bg;
 }
 
-void func_ov036_02198bf0(Field3DBg *bg) {
-    if (func_ov036_02198d9c(&bg->tex)) {
-        func_ov036_02198d6c(&bg->tex);
+void Field3DBG_DeleteBillboard(Field3DBg *bg) {
+    if (Field3DBG_IsTextureLoaded(&bg->tex)) {
+        Field3DBG_FreeTexture(&bg->tex);
     }
     GFL_HeapFree(bg);
 }
 
-void func_ov036_02198c10(Field3DBg *bg) {
+void Field3DBG_DrawBillboard(Field3DBg *bg) {
     MtxFx44 proj;
 
-    if (bg != NULL && bg->enabled != 0 && func_ov036_02198d9c(&bg->tex)) {
+    if (bg != NULL && bg->enabled != 0 && Field3DBG_IsTextureLoaded(&bg->tex)) {
         NNS_G3dGeFlushBuffer();
         G3_MtxMode(GX_MTXMODE_PROJECTION);
         proj = NNS_G3dGlb.projMtx;
@@ -84,62 +85,62 @@ void func_ov036_02198c10(Field3DBg *bg) {
         G3_MtxMode(GX_MTXMODE_POSITION_VECTOR);
         G3_Identity();
         G3_PushMtx();
-        func_ov036_02198da0(&bg->quad, bg, &bg->tex, &proj);
-        func_ov036_02198f50(bg);
-        func_ov036_02198f78(bg);
-        func_ov036_02198e64(&bg->quad);
+        Field3DBG_CalcQuadGeometry(&bg->quad, bg, &bg->tex, &proj);
+        Field3DBG_SetPolygonAttr(bg);
+        Field3DBG_SetTextureParams(bg);
+        Field3DBG_DrawQuad(&bg->quad);
         G3_PopMtx(1);
     }
 }
 
-void func_ov036_02198c8c(Field3DBg *bg) {
+void Field3DBG_ReleaseBillboardTextureVram(Field3DBg *bg) {
     if (bg != NULL) {
-        func_ov036_02198d84(&bg->tex);
+        Field3DBG_ReleaseTextureVram(&bg->tex);
     }
 }
 
-void func_ov036_02198c9c(Field3DBg *bg) {
-    if (func_ov036_02198d9c(&bg->tex)) {
-        func_ov036_02198d6c(&bg->tex);
+void Field3DBG_FreeBillboardTexture(Field3DBg *bg) {
+    if (Field3DBG_IsTextureLoaded(&bg->tex)) {
+        Field3DBG_FreeTexture(&bg->tex);
     }
 }
 
-void func_ov036_02198cb4(Field3DBg *bg, ArcTool *arc, const Field3DBgRes *res, u32 heapId) {
-    if (func_ov036_02198d9c(&bg->tex)) {
-        func_ov036_02198d6c(&bg->tex);
+void Field3DBG_LoadBillboardTexture(Field3DBg *bg, ArcTool *arc, const Field3DBgRes *res, u32 heapId) {
+    if (Field3DBG_IsTextureLoaded(&bg->tex)) {
+        Field3DBG_FreeTexture(&bg->tex);
     }
-    func_ov036_02198d08(&bg->tex, arc, res, heapId);
+    Field3DBG_LoadTexture(&bg->tex, arc, res, heapId);
     bg->alpha = res->alpha;
     bg->scaleX = FX32_ONE;
     bg->scaleY = FX32_ONE;
     bg->angle = 0;
 }
 
-void func_ov036_02198cf0(Field3DBg *bg, u32 enabled) {
+void Field3DBG_SetBillboardVisible(Field3DBg *bg, u32 enabled) {
     bg->enabled = enabled;
 }
 
-void func_ov036_02198cf4(Field3DBg *bg, u8 polygonId) {
+void Field3DBG_SetBillboardPolygonId(Field3DBg *bg, u8 polygonId) {
     bg->polygonId = polygonId;
 }
 
-void func_ov036_02198cf8(Field3DBg *bg, s32 texX) {
+void Field3DBG_SetBillboardTexOffsetX(Field3DBg *bg, s32 texX) {
     bg->texX = texX;
 }
 
-void func_ov036_02198cfc(Field3DBg *bg, s32 texY) {
+void Field3DBG_SetBillboardTexOffsetY(Field3DBg *bg, s32 texY) {
     bg->texY = texY;
 }
 
-void func_ov036_02198d00(Field3DBg *bg, fx32 scaleX) {
+void Field3DBG_SetBillboardScaleX(Field3DBg *bg, fx32 scaleX) {
     bg->scaleX = scaleX;
 }
 
-void func_ov036_02198d04(Field3DBg *bg, fx32 scaleY) {
+void Field3DBG_SetBillboardScaleY(Field3DBg *bg, fx32 scaleY) {
     bg->scaleY = scaleY;
 }
 
-static void func_ov036_02198d08(Field3DBgTex *tex, ArcTool *arc, const Field3DBgRes *res, u32 heapId) {
+static void Field3DBG_LoadTexture(Field3DBgTex *tex, ArcTool *arc, const Field3DBgRes *res, u32 heapId) {
     tex->texParams[0] = res->texParams[0];
     tex->texParams[1] = res->texParams[1];
     tex->texParams[2] = res->texParams[2];
@@ -153,25 +154,26 @@ static void func_ov036_02198d08(Field3DBgTex *tex, ArcTool *arc, const Field3DBg
     tex->needsUpload = TRUE;
 }
 
-static void func_ov036_02198d6c(Field3DBgTex *tex) {
+static void Field3DBG_FreeTexture(Field3DBgTex *tex) {
     GFL_G3DResFreeTexData(tex->resource);
     GFL_G3DResFree(tex->resource);
     tex->resource = NULL;
     tex->loaded = FALSE;
 }
 
-static void func_ov036_02198d84(Field3DBgTex *tex) {
+static void Field3DBG_ReleaseTextureVram(Field3DBgTex *tex) {
     if (tex->needsUpload) {
         GFL_G3DResUploadTexDataCore(tex->resource);
         tex->needsUpload = FALSE;
     }
 }
 
-static u8 func_ov036_02198d9c(Field3DBgTex *tex) {
+static u8 Field3DBG_IsTextureLoaded(Field3DBgTex *tex) {
     return tex->loaded;
 }
 
-static void func_ov036_02198da0(Field3DBgQuad *quad, const Field3DBg *bg, Field3DBgTex *tex, const MtxFx44 *proj) {
+static void Field3DBG_CalcQuadGeometry(Field3DBgQuad *quad, const Field3DBg *bg, Field3DBgTex *tex,
+                                       const MtxFx44 *proj) {
     MtxFx33 scaling;
     fx32 u;
     fx32 v;
@@ -205,7 +207,7 @@ static void func_ov036_02198da0(Field3DBgQuad *quad, const Field3DBg *bg, Field3
     MTX_Concat33(&quad->mtx, &scaling, &quad->mtx);
 }
 
-static void func_ov036_02198e64(const Field3DBgQuad *quad) {
+static void Field3DBG_DrawQuad(const Field3DBgQuad *quad) {
     G3_MtxMode(GX_MTXMODE_TEXTURE);
     G3_Identity();
     G3_MultMtx33(&quad->mtx);
@@ -223,13 +225,13 @@ static void func_ov036_02198e64(const Field3DBgQuad *quad) {
     G3_End();
 }
 
-static void func_ov036_02198f50(Field3DBg *bg) {
+static void Field3DBG_SetPolygonAttr(Field3DBg *bg) {
     G3_MaterialColorDiffAmb(0x7fff, 0x7fff, TRUE);
     G3_PolygonAttr(GX_LIGHTMASK_NONE, GX_POLYGONMODE_MODULATE, GX_CULL_BACK, bg->polygonId, bg->alpha,
                    GX_POLYGON_ATTR_MISC_FOG);
 }
 
-static void func_ov036_02198f78(const Field3DBg *bg) {
+static void Field3DBG_SetTextureParams(const Field3DBg *bg) {
     G3_TexImageParam(bg->tex.texParams[4], GX_TEXGEN_TEXCOORD, bg->tex.texParams[0], bg->tex.texParams[1],
                      bg->tex.texParams[2], bg->tex.texParams[3], bg->tex.texParams[5],
                      NNS_GfdGetTexKeyAddr(GFL_G3DResGetTexVRAMHandle(bg->tex.resource)));

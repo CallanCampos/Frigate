@@ -22,16 +22,16 @@
 #define VERSION_DRAGON SPECIES_ZEKROM
 #endif
 
-static BOOL func_ov036_021afb74(GameData *gameData, u16 species, u16 *boxOut, u16 *slotOut);
+static BOOL ScrcmdPokemonFld_FindBoxedLegend(GameData *gameData, u16 species, u16 *boxOut, u16 *slotOut);
 
 // Swaps the party Pokémon at partyIdx with the player's own dragon of the version from a box, and takes the mail off
 // the one that holds it
-void func_ov036_021afa2c(FieldScriptEnv *env, u32 partyIdx) {
+void ScrcmdPokemonFld_SwapPartyMonWithBoxedLegend(FieldScriptEnv *env, u32 partyIdx) {
     GameData *gameData = FieldScriptEnv_GetGameData(env);
     PokeParty *party = GameData_GetParty(gameData);
     u16 box, slot;
 
-    if (func_ov036_021afb74(gameData, VERSION_DRAGON, &box, &slot)) {
+    if (ScrcmdPokemonFld_FindBoxedLegend(gameData, VERSION_DRAGON, &box, &slot)) {
         HeapID heapId = FieldScriptEnv_GetHeapID(env);
         BoxSaveAccessor *boxes = GameData_GetBoxSaveAccessor(gameData);
         PartyPkm *pkm = GFL_HeapAllocate(heapId, PokeParty_GetPkmRawSize(), TRUE, "scrcmd_pokemon_fld.c", 1179);
@@ -67,7 +67,7 @@ void func_ov036_021afa2c(FieldScriptEnv *env, u32 partyIdx) {
 }
 
 // Finds the box slot of a Pokémon of the species that the player caught
-static BOOL func_ov036_021afb74(GameData *gameData, u16 species, u16 *boxOut, u16 *slotOut) {
+static BOOL ScrcmdPokemonFld_FindBoxedLegend(GameData *gameData, u16 species, u16 *boxOut, u16 *slotOut) {
     PlayerInfo *player;
     BoxSaveAccessor *boxes;
     s32 lastBox;
@@ -100,7 +100,7 @@ static BOOL func_ov036_021afb74(GameData *gameData, u16 species, u16 *boxOut, u1
     return FALSE;
 }
 
-void func_ov036_021afc28(FieldScriptEnv *env) {
+void ScrcmdPokemonFld_MoveLegendToFront(FieldScriptEnv *env) {
     GameData *gameData = FieldScriptEnv_GetGameData(env);
     PokeParty *party = GameData_GetParty(gameData);
     int idx = GetOTZekromPartyIdx(gameData);

@@ -43,7 +43,7 @@ GameEventReturnCode EventFestival_Callback(GameEvent *event, u32 *state, void *d
             transition = CallFieldMapEntranceOutTransitionDefault(gsys, field, 1, 0);
         }
         GameEvent_ChainNext(event, transition);
-        if (GFL_NetIsInitialized() == 1 && func_ov036_02180f80(work->comm) == 1 &&
+        if (GFL_NetIsInitialized() == 1 && Field_GetCommKind(work->comm) == 1 &&
             !GameCommSys_IsTransitioning(work->comm)) {
             NetWhpipe_SetSearchPaused(1);
             work->communicationFlag = 1;
@@ -98,7 +98,7 @@ GameEventReturnCode EventFestival_Callback(GameEvent *event, u32 *state, void *d
         break;
     }
     case 7:
-        if (work->communicationFlag && GFL_NetIsInitialized() == 1 && func_ov036_02180f80(work->comm)) {
+        if (work->communicationFlag && GFL_NetIsInitialized() == 1 && Field_GetCommKind(work->comm)) {
             NetWhpipe_SetSearchPaused(0);
             work->communicationFlag = 0;
         }

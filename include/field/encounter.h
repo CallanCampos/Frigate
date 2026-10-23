@@ -22,7 +22,7 @@ typedef struct {
     s16 y;
     s16 z;
     fx32 height;
-    // The kind of tile, as func_ov036_021a2e18 gives it
+    // The kind of tile, as MapTile_GetEncounterEffectKind gives it
     u8 kind;
     u8 active : 4;
     u8 suspended : 2;
@@ -88,27 +88,27 @@ void GameData_ResetPhenomenonSteps(GameData *gameData);
 void func_ov012_021591f4(GameData *gameData);
 u16 EncountSave_GetRoamingPkmZone(EncountSave *save, u8 slot);
 u16 getSwarmLevelRangeFromData(GameData *gameData);
-u32 func_ov012_02159218(EncountSave *save);
-void func_ov012_0215921c(GameData *gameData, u8 slot);
-void func_ov012_02159220(GameData *gameData);
+u32 EncountSave_HasActiveEntry(EncountSave *save);
+void EncountSave_SpawnEntry(GameData *gameData, u8 slot);
+void EncountSave_SpawnPendingEntries(GameData *gameData);
 // A weather that overrides the zone's, which is always WEATHER_NONE
 u32 GetDefaultWeatherValue(GameData *gameData, u16 zoneId);
 // Whether weathers 6 and 7 go back to the zone's own, which is always FALSE
-BOOL func_ov012_0215922c(GameData *gameData);
+BOOL EncountSave_IsAnyEntryActive(GameData *gameData);
 // The phenomena (shaking grass, dust clouds, rippling water and flying shadows) of effect_encount.c
 EffectEncountState *EffectEncountState_Create(HeapID heapId);
 void EffectEncountState_Free(EffectEncountState *state);
 void PrepareFieldEncountSystem(EncountSystem *system, EffectEncountState *state);
-void func_ov036_021a202c(EncountSystem *system, EffectEncountState *state);
-void func_ov036_021a203c(EncountSystem *system, EffectEncountState *state);
+void EffectEncount_Exit(EncountSystem *system, EffectEncountState *state);
+void EffectEncount_LoadSetting(EncountSystem *system, EffectEncountState *state);
 void UpdatePhenomenon(EncountSystem *system);
 BOOL EncountSystem_CancelPhenomenonIfActorHit(EncountSystem *system);
 GameEvent *CreateRandomPhenomenonEvent(EncountSystem *system);
 // The distance to the phenomenon, along the axis it is farther on, and whether there is one
-BOOL func_ov036_021a22f4(EncountSystem *system, u16 *distance);
-void func_ov036_021a23c4(EncountSystem *system, u32 a1);
+BOOL EffectEncount_GetSpotDistance(EncountSystem *system, u16 *distance);
+void EffectEncount_SetEffectFlag(EncountSystem *system, u32 a1);
 // The item the phenomenon gave
-u16 func_ov036_021a23f0(EncountSystem *system);
+u16 EffectEncount_GetItemId(EncountSystem *system);
 // The wild encounters of field_encount.c
 EncountSystem *EncSys_Create(Field *field);
 void EncSys_Free(EncountSystem *system);
@@ -116,7 +116,7 @@ BOOL EncSys_IsActive(EncountSystem *system, u32 a1);
 void EncSys_Update(EncountSystem *system, BOOL moved, BOOL turned);
 GameEvent *EventWildBattleCall_CreateStatic(EncountSystem *system, u16 species, u8 level, u8 form, u16 flags);
 u32 ConvFieldWeatherToBtl(Field *field);
-void func_ov036_021a2364(EncountSystem *system);
+void EffectEncount_ConsumeSpot(EncountSystem *system);
 // Sets the setup up for a battle against the trainer, here
 // The style is 0 to 3 for single, double, triple and rotation; a double battle is against two trainers with a
 // partner, and a single one with a second trainer

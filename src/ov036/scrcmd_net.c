@@ -19,7 +19,7 @@ BOOL s013A_GameCommGetStatus(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     u16 *result = ScriptReadVar(vm, env);
 
-    *result = func_ov036_02180f80(GSYS_GetGameCommSystem(gsys));
+    *result = Field_GetCommKind(GSYS_GetGameCommSystem(gsys));
     return TRUE;
 }
 

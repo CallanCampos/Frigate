@@ -22,7 +22,7 @@
 
 static inline u16 BSubwayScr_PickTrainerInRanges(BSubwayScrWork *bsw, const BSubwayTrainerRange *ranges, u16 level);
 
-BtlSetup *func_ov033_0217c094(BSubwayScrWork *bsw, GameSystem *gsys) {
+BtlSetup *BsubwayScr_CreateBtlSetup(BSubwayScrWork *bsw, GameSystem *gsys) {
     PokeParty *party;
     PokeParty *source;
     PartyPkm *pkm;
@@ -30,7 +30,7 @@ BtlSetup *func_ov033_0217c094(BSubwayScrWork *bsw, GameSystem *gsys) {
     s32 i;
 
     party = PokeParty_Create(0x8004);
-    source = func_ov033_0217bd60(bsw);
+    source = BsubwayScr_GetParty(bsw);
     PokeParty_InitCore(party, bsw->memberCount);
     for (i = 0; i < bsw->memberCount; i++) {
         pkm = PokeParty_GetPkm(source, bsw->memberSlots[i]);
@@ -42,7 +42,7 @@ BtlSetup *func_ov033_0217c094(BSubwayScrWork *bsw, GameSystem *gsys) {
     return result;
 }
 
-void *func_ov033_0217c110(BSubwayScrWork *bsw) {
+void *BsubwayScr_GetNameinEncounterWork(BSubwayScrWork *bsw) {
     return bsw->unk74C;
 }
 
@@ -87,7 +87,7 @@ static inline u16 BSubwayScr_PickTrainerInRanges(BSubwayScrWork *bsw, const BSub
     return range->min + randFFFFFFFFdivFFFF(bsw) % count;
 }
 
-u16 func_ov033_0217c11c(BSubwayScrWork *bsw, u16 level, u8 index, u32 mode, u8 side) {
+u16 BsubwayScr_DrawTrainerNo(BSubwayScrWork *bsw, u16 level, u8 index, u32 mode, u8 side) {
     BOOL super;
     s32 boss;
     u16 trainerId;
@@ -170,12 +170,12 @@ u16 func_ov033_0217c11c(BSubwayScrWork *bsw, u16 level, u8 index, u32 mode, u8 s
     return trainerId;
 }
 
-BOOL func_ov033_0217c264(BSubwayScrWork *bsw, BSubwayTrainer *trainer, u16 trainerId, u32 count, const u16 *species,
-                         const u16 *items, BSubwayTeamConfig *config, HeapID heapId) {
+BOOL BsubwayScr_CreateTrainer(BSubwayScrWork *bsw, BSubwayTrainer *trainer, u16 trainerId, u32 count,
+                              const u16 *species, const u16 *items, BSubwayTeamConfig *config, HeapID heapId) {
     return BtlInst_MakeRomTrainerAndTeam(trainer, trainerId, count, species, items, config, heapId);
 }
 
-u8 func_ov033_0217c288(u32 value) {
+u8 BsubwayScr_GetMonIv(u32 value) {
     if (value < 100) {
         return 3;
     }
@@ -200,14 +200,14 @@ u8 func_ov033_0217c288(u32 value) {
     return 31;
 }
 
-void func_ov033_0217c2c4(BSubwayScrWork *bsw, BSubwayTrainer *trainer, u16 trainerId, u32 count,
-                         const BSubwayTeamConfig *config, HeapID heapId) {
+void BsubwayScr_CreatePartnerMons(BSubwayScrWork *bsw, BSubwayTrainer *trainer, u16 trainerId, u32 count,
+                                  const BSubwayTeamConfig *config, HeapID heapId) {
     u8 iv;
     void *temp;
     s32 i;
 
     temp = BtlInst_MakeRomTrainer(trainer, 0xd4, trainerId, 15, heapId);
-    iv = func_ov033_0217c288(trainerId);
+    iv = BsubwayScr_GetMonIv(trainerId);
     for (i = 0; i < 2; i++) {
         BtlInst_MakeRomPokemon(&trainer->pokemon[i], 0xd3, config->files[i], config->id, config->pids[i], iv, i, count,
                                heapId);

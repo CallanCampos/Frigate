@@ -60,34 +60,36 @@
 #define SCREEN_CELLS (0x24 / 2)
 #define SCREEN_WIDTH 32
 
-static u8 func_ov194_021c2b08(BoxPkm *pkm, HeapID heapId);
-static void func_ov194_021c2b8c(PokemonTradeWork *wk, int box, u8 *colors);
-static void func_ov194_021c2bc0(PokemonTradeWork *wk, PokeParty *party, u8 *colors);
-static u16 func_ov194_021c2fa4(int x, int y, PokemonTradeWork *wk, BOOL marked);
-static BOOL func_ov194_021c3020(PokemonTradeWork *wk, int x, int y);
-static void func_ov194_021c3128(PokemonTradeWork *wk, u32 chars);
-static void func_ov194_021c31e0(PokemonTradeWork *wk);
-static void func_ov194_021c3614(PokemonTradeWork *wk, int index);
-static void func_ov194_021c3770(int column, int row, ClActorPos *pos);
-static BoxPkm *func_ov194_021c3788(BoxSaveAccessor *boxes, int column, int row, PokemonTradeWork *wk, BOOL *isParty);
-static TradeBoxEntry *func_ov194_021c37e0(int column, int row, PokemonTradeWork *wk);
-static BOOL func_ov194_021c3888(PokemonTradeWork *wk, int species);
-static void func_ov194_021c38d4(PokemonTradeWork *wk, int column, int row, BoxPkm *pkm, BOOL isParty, int index);
-static void func_ov194_021c3904(PokemonTradeWork *wk, BoxSaveAccessor *boxes, int column, int index, BOOL async);
-static void func_ov194_021c3d2c(PokemonTradeWork *wk);
-static int func_ov194_021c3f5c(int column);
-static void func_ov194_021c3f68(PokemonTradeWork *wk);
-static void func_ov194_021c4e0c(PokemonTradeWork *wk, int side, PartyPkm *pkm);
-static void func_ov194_021c6024(TCB *tcb, void *data);
-static void func_ov194_021c6038(TCB *tcb, void *data);
-static void func_ov194_021c604c(TradeCurve *curve, VecFx32 *start, VecFx32 *control1, VecFx32 *control2, VecFx32 *end,
-                                int frames);
-static BOOL func_ov194_021c60a0(TradeCurve *curve);
-static void func_ov194_021c4324(void);
-static void func_ov194_021c58b4(PokemonTradeWork *wk);
-static void func_ov194_021c5dcc(u32 param, fx32 frame);
-static void func_ov194_021c5e9c(const PokemonTradeWork *wk, u32 vram, u32 paletteMask);
-static void func_ov194_021c5f64(PokemonTradeWork *wk, BOOL dim, u16 vram, u32 paletteMask);
+static u8 Poketrade2D_GetMonMarkingIcon(BoxPkm *pkm, HeapID heapId);
+static void Poketrade2D_BuildBoxMarkingTable(PokemonTradeWork *wk, int box, u8 *colors);
+static void Poketrade2D_BuildPartyMarkingTable(PokemonTradeWork *wk, PokeParty *party, u8 *colors);
+static u16 Poketrade2D_GetBoxScreenEntry(int x, int y, PokemonTradeWork *wk, BOOL marked);
+static BOOL Poketrade2D_HitTestBoxGrid(PokemonTradeWork *wk, int x, int y);
+static void Poketrade2D_LoadBoxScreenData(PokemonTradeWork *wk, u32 chars);
+static void Poketrade2D_FreeBoxScreenData(PokemonTradeWork *wk);
+static void Poketrade2D_DeleteBoxIconRow(PokemonTradeWork *wk, int index);
+static void Poketrade2D_GetGridCellPos(int column, int row, ClActorPos *pos);
+static BoxPkm *Poketrade2D_ResolveGridCell(BoxSaveAccessor *boxes, int column, int row, PokemonTradeWork *wk,
+                                           BOOL *isParty);
+static TradeBoxEntry *Poketrade2D_GetGridCellMon(int column, int row, PokemonTradeWork *wk);
+static BOOL Poketrade2D_IsBoxIconFiltered(PokemonTradeWork *wk, int species);
+static void Poketrade2D_UpdateIconObjMode(PokemonTradeWork *wk, int column, int row, BoxPkm *pkm, BOOL isParty,
+                                          int index);
+static void Poketrade2D_CreateBoxIcon(PokemonTradeWork *wk, BoxSaveAccessor *boxes, int column, int index, BOOL async);
+static void Poketrade2D_UpdateBoxIconPositions(PokemonTradeWork *wk);
+static int Poketrade2D_WrapIndex12(int column);
+static void Poketrade2D_HideAllBoxIcons(PokemonTradeWork *wk);
+static void Poketrade2D_CreateCuredPokerusIcon(PokemonTradeWork *wk, int side, PartyPkm *pkm);
+static void Poketrade2D_TaskSetMainPlaneVisible(TCB *tcb, void *data);
+static void Poketrade2D_TaskSetSubPlaneVisible(TCB *tcb, void *data);
+static void Poketrade2D_InitBezierCurve(TradeCurve *curve, VecFx32 *start, VecFx32 *control1, VecFx32 *control2,
+                                        VecFx32 *end, int frames);
+static BOOL Poketrade2D_StepBezierCurve(TradeCurve *curve);
+static void Poketrade2D_Setup3DRenderState(void);
+static void Poketrade2D_SetCursorSlidePositions(PokemonTradeWork *wk);
+static void Poketrade2D_OnCursorAnimDone(u32 param, fx32 frame);
+static void Poketrade2D_FadePaletteBank(const PokemonTradeWork *wk, u32 vram, u32 paletteMask);
+static void Poketrade2D_FadePaletteCopy(PokemonTradeWork *wk, BOOL dim, u16 vram, u32 paletteMask);
 
 // The cell actor systems of the trade demo, which has only a few sprites, and of the trade
 static const ClActSysSetup sDemoClActSetup = { 0, 0, 0, 512, 4, 124, 4, 124, 0, 5, 5, 5, 5, 16, 16 };
@@ -108,7 +110,7 @@ static const BGSysVRAMConfig sVRAMConfig = {
 
 // The colour of a Pokémon's slot, an index into the box palette: none for an empty slot, the species' colour, or the
 // colour of an egg, Manaphy's being different
-static u8 func_ov194_021c2b08(BoxPkm *pkm, HeapID heapId) {
+static u8 Poketrade2D_GetMonMarkingIcon(BoxPkm *pkm, HeapID heapId) {
     u16 color = 0;
     BOOL encrypted = PML_PkmDecrypt(pkm);
     u32 species = PML_PkmGetParam(pkm, PKM_PARAM_SPECIES, NULL);
@@ -131,21 +133,21 @@ static u8 func_ov194_021c2b08(BoxPkm *pkm, HeapID heapId) {
     return color;
 }
 
-static void func_ov194_021c2b8c(PokemonTradeWork *wk, int box, u8 *colors) {
+static void Poketrade2D_BuildBoxMarkingTable(PokemonTradeWork *wk, int box, u8 *colors) {
     u8 i;
 
     for (i = 0; i < 30; i++) {
-        colors[i] = func_ov194_021c2b08(BoxSaveAccessor_GetPkm(wk->boxes, box, i), wk->heapId);
+        colors[i] = Poketrade2D_GetMonMarkingIcon(BoxSaveAccessor_GetPkm(wk->boxes, box, i), wk->heapId);
     }
 }
 
-static void func_ov194_021c2bc0(PokemonTradeWork *wk, PokeParty *party, u8 *colors) {
+static void Poketrade2D_BuildPartyMarkingTable(PokemonTradeWork *wk, PokeParty *party, u8 *colors) {
     int count = PokeParty_GetPkmCount(party);
     u8 i;
 
     for (i = 0; i < 6; i++) {
         if (count > i) {
-            colors[i] = func_ov194_021c2b08(PokeParty_GetBoxPkm(PokeParty_GetPkm(party, i)), wk->heapId);
+            colors[i] = Poketrade2D_GetMonMarkingIcon(PokeParty_GetBoxPkm(PokeParty_GetPkm(party, i)), wk->heapId);
         } else {
             colors[i] = 0;
         }
@@ -154,28 +156,28 @@ static void func_ov194_021c2bc0(PokemonTradeWork *wk, PokeParty *party, u8 *colo
 
 // Works out the colours of this machine's box, one a frame, and the party's after the last box; TRUE when that is
 // done
-BOOL func_ov194_021c2c04(PokemonTradeWork *wk, int box) {
+BOOL Poketrade2D_BuildMarkingTablesFrom(PokemonTradeWork *wk, int box) {
     // One box a frame: the loop stops after its first pass, as the original's does
     while (box < wk->boxCount + 1) {
         if (box == wk->boxCount) {
-            func_ov194_021c2bc0(wk, wk->party, wk->boxColors[0].party);
+            Poketrade2D_BuildPartyMarkingTable(wk, wk->party, wk->boxColors[0].party);
             return TRUE;
         }
-        func_ov194_021c2b8c(wk, box, wk->boxColors[0].boxes[box]);
+        Poketrade2D_BuildBoxMarkingTable(wk, box, wk->boxColors[0].boxes[box]);
         break;
     }
     return FALSE;
 }
 
-void func_ov194_021c2c44(PokemonTradeWork *wk) {
+void Poketrade2D_InitClactSystemMain(PokemonTradeWork *wk) {
     ClActSys_Create(&sDemoClActSetup, &sVRAMConfig, wk->heapId);
 }
 
-void func_ov194_021c2c64(PokemonTradeWork *wk) {
+void Poketrade2D_InitClactSystemSub(PokemonTradeWork *wk) {
     ClActSys_Create(&sClActSetup, &sVRAMConfig, wk->heapId);
 }
 
-void func_ov194_021c2c84(PokemonTradeWork *wk) {
+void Poketrade2D_LoadBackgroundGfx(PokemonTradeWork *wk) {
     ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_POKEMONTRADE, wk->heapId);
     int screen;
 
@@ -192,39 +194,39 @@ void func_ov194_021c2c84(PokemonTradeWork *wk) {
     GFL_ArcToolFree(arc);
 }
 
-void func_ov194_021c2d0c(PokemonTradeWork *wk) {
+void Poketrade2D_FreeBackgroundPalette(PokemonTradeWork *wk) {
     if (wk->bg2Chars != 0) {
         GFL_BGSysFreeCharMemory(2, CHAR_POS(wk->bg2Chars), CHAR_SIZE(wk->bg2Chars));
     }
     wk->bg2Chars = 0;
 }
 
-void func_ov194_021c2d34(PokemonTradeWork *wk) {
+void Poketrade2D_LoadSubBackgroundGfx(PokemonTradeWork *wk) {
     ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_POKEMONTRADE, wk->heapId);
 
     GFL_G2DIOLoadNSCRSync(arc, 12, 4, 0, CHAR_POS(wk->bg5Chars), 0, FALSE, wk->heapId);
     GFL_ArcToolFree(arc);
 }
 
-void func_ov194_021c2d74(PokemonTradeWork *wk) {
+void Poketrade2D_NoOp(PokemonTradeWork *wk) {
 }
 
-void func_ov194_021c2d78(PokemonTradeWork *wk) {
+void Poketrade2D_LoadMainGfxAndMessageWindow(PokemonTradeWork *wk) {
     ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_POKEMONTRADE, wk->heapId);
 
     GFL_G2DIOLoadArcNCLRDefault(arc, 17, 4, 0, 0xc0, wk->heapId);
     wk->bg7Chars = GFL_BGSysLoadArcNCGRDynamic(arc, 13, 7, 0, FALSE, wk->heapId);
     wk->bg5Chars = GFL_BGSysLoadArcNCGRDynamic(arc, 13, 5, 0, FALSE, wk->heapId);
     GFL_ArcToolFree(arc);
-    func_ov194_021c3128(wk, wk->bg7Chars);
+    Poketrade2D_LoadBoxScreenData(wk, wk->bg7Chars);
 }
 
-void func_ov194_021c2de8(PokemonTradeWork *wk) {
+void Poketrade2D_CreateFontResource(PokemonTradeWork *wk) {
     wk->cursorImage = LoadCursorImageEndOfHeap(6, 15, 0, wk->heapId);
 }
 
-void func_ov194_021c2e04(PokemonTradeWork *wk) {
-    func_ov194_021c31e0(wk);
+void Poketrade2D_FreeMainResources(PokemonTradeWork *wk) {
+    Poketrade2D_FreeBoxScreenData(wk);
     if (wk->bg5Chars != 0) {
         GFL_BGSysFreeCharMemory(5, CHAR_POS(wk->bg5Chars), CHAR_SIZE(wk->bg5Chars));
         wk->bg5Chars = 0;
@@ -240,7 +242,7 @@ void func_ov194_021c2e04(PokemonTradeWork *wk) {
 }
 
 // Loads the common UI sprites once
-void func_ov194_021c2e6c(PokemonTradeWork *wk) {
+void Poketrade2D_RegisterIconCharResources(PokemonTradeWork *wk) {
     if (wk->objRes[TRADE_OBJRES_PLTT_COMMON] == 0) {
         ArcTool *arc = GFL_ArcSysCreateFileHandle(getUINarcIdx(), wk->heapId);
 
@@ -254,7 +256,7 @@ void func_ov194_021c2e6c(PokemonTradeWork *wk) {
     }
 }
 
-void func_ov194_021c2ef0(PokemonTradeWork *wk, int side, int page) {
+void Poketrade2D_LoadSummaryBackground(PokemonTradeWork *wk, int side, int page) {
     u32 screens[] = { 27, 28 };
     ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_POKEMONTRADE, wk->heapId);
 
@@ -269,16 +271,16 @@ void func_ov194_021c2ef0(PokemonTradeWork *wk, int side, int page) {
     GFL_BGSysSetBGEnabled(4, TRUE);
 }
 
-void func_ov194_021c2f78(PokemonTradeWork *wk) {
+void Poketrade2D_ClearSummaryBackground(PokemonTradeWork *wk) {
     GFL_BGSysSetBGEnabled(4, FALSE);
     GFL_BGSysMoveBG(4, BG_MOVE_SET_X, 0);
-    func_ov194_021c5504(wk);
+    Poketrade2D_SetupSubBlend(wk);
     GFL_BGSysClearScr(4);
     GFL_BGSysQueueScrLoad(4);
 }
 
 // The cell of the strip's background at a tile, the strip repeating every stripTileWidth tiles
-static u16 func_ov194_021c2fa4(int x, int y, PokemonTradeWork *wk, BOOL marked) {
+static u16 Poketrade2D_GetBoxScreenEntry(int x, int y, PokemonTradeWork *wk, BOOL marked) {
     if (x >= wk->stripTileWidth) {
         x -= wk->stripTileWidth;
     }
@@ -296,7 +298,7 @@ static u16 func_ov194_021c2fa4(int x, int y, PokemonTradeWork *wk, BOOL marked) 
 }
 
 // Whether a tile of the screen is under a marked icon
-static BOOL func_ov194_021c3020(PokemonTradeWork *wk, int x, int y) {
+static BOOL Poketrade2D_HitTestBoxGrid(PokemonTradeWork *wk, int x, int y) {
     int i, j;
 
     for (i = 0; i < ICON_COLUMNS; i++) {
@@ -320,14 +322,15 @@ static BOOL func_ov194_021c3020(PokemonTradeWork *wk, int x, int y) {
 }
 
 // Draws the strip's background at its scroll, with the marked icons' slots lit
-void func_ov194_021c30b8(PokemonTradeWork *wk) {
+void Poketrade2D_DrawBoxGridScreen(PokemonTradeWork *wk) {
     int scroll = wk->scrollX / 8;
     int x, y;
 
-    func_ov194_021c3bc0(wk);
+    Poketrade2D_GetScrollColumn(wk);
     for (y = 0; y < 24; y++) {
         for (x = 0; x < 52; x++) {
-            GFL_BGSysSetScrTile(7, x, y, func_ov194_021c2fa4(scroll + x, y, wk, func_ov194_021c3020(wk, x, y)));
+            GFL_BGSysSetScrTile(7, x, y,
+                                Poketrade2D_GetBoxScreenEntry(scroll + x, y, wk, Poketrade2D_HitTestBoxGrid(wk, x, y)));
         }
     }
     wk->unk108C = wk->scrollX % 8;
@@ -336,7 +339,7 @@ void func_ov194_021c30b8(PokemonTradeWork *wk) {
 }
 
 // Reads the strip's screens and moves their cells to the characters where they were loaded
-static void func_ov194_021c3128(PokemonTradeWork *wk, u32 chars) {
+static void Poketrade2D_LoadBoxScreenData(PokemonTradeWork *wk, u32 chars) {
     int i;
 
     wk->stripScreens[0] = GFL_ArcSysReadHeapNew(ARCID_POKEMONTRADE, 14, wk->heapId);
@@ -350,10 +353,10 @@ static void func_ov194_021c3128(PokemonTradeWork *wk, u32 chars) {
         wk->stripScreens[3][SCREEN_CELLS + i] += CHAR_POS(chars);
     }
     wk->scrollX = wk->stripWidth - 80;
-    func_ov194_021c30b8(wk);
+    Poketrade2D_DrawBoxGridScreen(wk);
 }
 
-static void func_ov194_021c31e0(PokemonTradeWork *wk) {
+static void Poketrade2D_FreeBoxScreenData(PokemonTradeWork *wk) {
     if (wk->stripScreens[0] != NULL) {
         GFL_HeapFree(wk->stripScreens[0]);
         wk->stripScreens[0] = NULL;
@@ -367,7 +370,7 @@ static void func_ov194_021c31e0(PokemonTradeWork *wk) {
 }
 
 // Draws the names of the boxes, and the party's, into their windows
-void func_ov194_021c3224(PokemonTradeWork *wk) {
+void Poketrade2D_CreateBoxWindows(PokemonTradeWork *wk) {
     int i;
 
     GFL_BGSysLoadNCLRDefault(ARCID_FONT, 5, 4, 0x1c0, 0x20, wk->heapId);
@@ -388,7 +391,7 @@ void func_ov194_021c3224(PokemonTradeWork *wk) {
     }
 }
 
-void func_ov194_021c3374(PokemonTradeWork *wk) {
+void Poketrade2D_DeleteBoxWindows(PokemonTradeWork *wk) {
     int i;
 
     for (i = 0; i < MAX_BOXES + 1; i++) {
@@ -400,7 +403,7 @@ void func_ov194_021c3374(PokemonTradeWork *wk) {
 }
 
 // Puts the names of the boxes on screen over the strip at its scroll
-void func_ov194_021c339c(PokemonTradeWork *wk) {
+void Poketrade2D_DrawBoxNames(PokemonTradeWork *wk) {
     int scroll = wk->scrollX / 8;
     int x, y, i, box;
 
@@ -441,7 +444,7 @@ void func_ov194_021c339c(PokemonTradeWork *wk) {
 }
 
 // Loads the icons' palette and cells, and sets up the icons of the strip's columns with their cursors, all hidden
-void func_ov194_021c3480(PokemonTradeWork *wk) {
+void Poketrade2D_CreateBoxIconActors(PokemonTradeWork *wk) {
     ClActorSetup setup;
     int i, j;
     ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_POKEICON, wk->heapId);
@@ -474,7 +477,7 @@ void func_ov194_021c3480(PokemonTradeWork *wk) {
     GFL_ArcToolFree(arc);
 }
 
-static void func_ov194_021c3614(PokemonTradeWork *wk, int index) {
+static void Poketrade2D_DeleteBoxIconRow(PokemonTradeWork *wk, int index) {
     int i;
 
     for (i = 0; i < COLUMN_ROWS; i++) {
@@ -493,12 +496,12 @@ static void func_ov194_021c3614(PokemonTradeWork *wk, int index) {
     }
 }
 
-void func_ov194_021c368c(PokemonTradeWork *wk) {
+void Poketrade2D_DeleteAllBoxIcons(PokemonTradeWork *wk) {
     int i;
 
-    func_ov194_021c57a8(wk);
+    Poketrade2D_DeletePickedIconActor(wk);
     for (i = 0; i < ICON_COLUMNS; i++) {
-        func_ov194_021c3614(wk, i);
+        Poketrade2D_DeleteBoxIconRow(wk, i);
     }
     if (wk->objRes[TRADE_OBJRES_PLTT_ICON] != 0) {
         ClActSys_FreePltt(wk->objRes[TRADE_OBJRES_PLTT_ICON]);
@@ -514,11 +517,11 @@ void func_ov194_021c368c(PokemonTradeWork *wk) {
     wk->iconCharData = NULL;
 }
 
-void func_ov194_021c36e4(PokemonTradeWork *wk) {
+void Poketrade2D_DeleteOfferIcons(PokemonTradeWork *wk) {
     int i;
 
-    func_ov194_021c5e5c(wk);
-    func_ov194_021c0aac(wk);
+    Poketrade2D_DeleteCursorActor(wk);
+    PoketradeSave_DeleteOfferStatusIcons(wk);
     for (i = 0; i < 10; i++) {
         if (wk->actors[i] != NULL) {
             ClActor_Delete(wk->actors[i]);
@@ -545,7 +548,7 @@ void func_ov194_021c36e4(PokemonTradeWork *wk) {
     }
 }
 
-static void func_ov194_021c3770(int column, int row, ClActorPos *pos) {
+static void Poketrade2D_GetGridCellPos(int column, int row, ClActorPos *pos) {
     // A column's width and a row's height, and where the first row is. They are the first bytes of the file's
     // .rodata, though their reads fold
     static const u8 width = 24;
@@ -557,7 +560,8 @@ static void func_ov194_021c3770(int column, int row, ClActorPos *pos) {
 }
 
 // The Pokémon in a column's row of the strip, and whether it is in the party
-static BoxPkm *func_ov194_021c3788(BoxSaveAccessor *boxes, int column, int row, PokemonTradeWork *wk, BOOL *isParty) {
+static BoxPkm *Poketrade2D_ResolveGridCell(BoxSaveAccessor *boxes, int column, int row, PokemonTradeWork *wk,
+                                           BOOL *isParty) {
     if (column >= PARTY_COLUMNS) {
         int box = PokemonTrade_GetColumnBox(column, wk);
         int slot = PokemonTrade_GetColumnSlot(column, row);
@@ -572,7 +576,7 @@ static BoxPkm *func_ov194_021c3788(BoxSaveAccessor *boxes, int column, int row, 
     return NULL;
 }
 
-static TradeBoxEntry *func_ov194_021c37e0(int column, int row, PokemonTradeWork *wk) {
+static TradeBoxEntry *Poketrade2D_GetGridCellMon(int column, int row, PokemonTradeWork *wk) {
     if (column >= PARTY_COLUMNS) {
         int box = PokemonTrade_GetColumnBox(column, wk);
 
@@ -585,7 +589,7 @@ static TradeBoxEntry *func_ov194_021c37e0(int column, int row, PokemonTradeWork 
 }
 
 // Takes the place of the cursor shown under an icon as where the stylus is
-void func_ov194_021c3820(PokemonTradeWork *wk) {
+void Poketrade2D_PlaceBoxIconActors(PokemonTradeWork *wk) {
     int i, j;
 
     for (i = 0; i < COLUMN_ROWS; i++) {
@@ -642,14 +646,14 @@ static u8 sSpeciesInitials[] = {
 };
 
 // Whether a species has the initial searched for
-static BOOL func_ov194_021c3888(PokemonTradeWork *wk, int species) {
+static BOOL Poketrade2D_IsBoxIconFiltered(PokemonTradeWork *wk, int species) {
     if (wk->unk800 != 0 && wk->unk800 - 1 == sSpeciesInitials[species]) {
         return TRUE;
     }
     return FALSE;
 }
 
-BOOL func_ov194_021c38a8(u32 species, u32 initial) {
+BOOL Poketrade2D_IsBoxIconMatch(u32 species, u32 initial) {
     if (initial == sSpeciesInitials[species]) {
         return TRUE;
     }
@@ -657,17 +661,18 @@ BOOL func_ov194_021c38a8(u32 species, u32 initial) {
 }
 
 // Greys an icon out or not
-void func_ov194_021c38bc(PokemonTradeWork *wk, ClActor *icon, BOOL grey) {
+void Poketrade2D_SetIconObjMode(PokemonTradeWork *wk, ClActor *icon, BOOL grey) {
     ClActor_SetObjMode(icon, grey ? 1 : 0);
 }
 
-static void func_ov194_021c38d4(PokemonTradeWork *wk, int column, int row, BoxPkm *pkm, BOOL isParty, int index) {
+static void Poketrade2D_UpdateIconObjMode(PokemonTradeWork *wk, int column, int row, BoxPkm *pkm, BOOL isParty,
+                                          int index) {
     BOOL grey = FALSE;
 
-    if (func_ov194_021be3bc(wk, column, row)) {
+    if (PoketradeNego_IsMonOwnOffer(wk, column, row)) {
         grey = TRUE;
     }
-    func_ov194_021c38bc(wk, wk->icons[index][row], grey);
+    Poketrade2D_SetIconObjMode(wk, wk->icons[index][row], grey);
 }
 
 // Where an image's characters are in a screen's OBJ VRAM, as NNS_G2dGetImageLocation(), inlined
@@ -677,7 +682,7 @@ static inline u32 ImageProxy_GetLocation(const NNSG2dImageProxy *proxy, int type
 
 // Sets up the icons of a column of the strip in the icon column at an index, loading the characters of the ones that
 // changed, in the V-blank if asked and the icon is on screen
-static void func_ov194_021c3904(PokemonTradeWork *wk, BoxSaveAccessor *boxes, int column, int index, BOOL async) {
+static void Poketrade2D_CreateBoxIcon(PokemonTradeWork *wk, BoxSaveAccessor *boxes, int column, int index, BOOL async) {
     int i;
     BoxPkm *pkm;
     TradeBoxEntry *entry;
@@ -692,8 +697,8 @@ static void func_ov194_021c3904(PokemonTradeWork *wk, BoxSaveAccessor *boxes, in
     for (i = 0; i < COLUMN_ROWS; i++) {
         int species, form, sex;
 
-        pkm = func_ov194_021c3788(boxes, column, i, wk, &isParty);
-        entry = func_ov194_021c37e0(column, i, wk);
+        pkm = Poketrade2D_ResolveGridCell(boxes, column, i, wk, &isParty);
+        entry = Poketrade2D_GetGridCellMon(column, i, wk);
         if (entry == NULL) {
             wk->iconColumns[index][i] = 0xff;
             continue;
@@ -708,7 +713,7 @@ static void func_ov194_021c3904(PokemonTradeWork *wk, BoxSaveAccessor *boxes, in
         sex = entry->sex;
         if (species == wk->iconSpecies[index][i] && form == wk->iconForms[index][i] && sex == wk->iconSexes[index][i]) {
             ClActor_SetVisible(wk->icons[index][i], TRUE);
-            func_ov194_021c38d4(wk, column, i, pkm, isParty, index);
+            Poketrade2D_UpdateIconObjMode(wk, column, i, pkm, isParty, index);
         } else if (species != wk->iconSpecies[index][i] ||
                    (species == wk->iconSpecies[index][i] && form != wk->iconForms[index][i]) ||
                    (species == wk->iconSpecies[index][i] && sex != wk->iconSexes[index][i])) {
@@ -717,7 +722,7 @@ static void func_ov194_021c3904(PokemonTradeWork *wk, BoxSaveAccessor *boxes, in
             wk->iconSpecies[index][i] = species;
             wk->iconForms[index][i] = form;
             wk->iconSexes[index][i] = sex;
-            func_ov194_021c3770(column, i, &pos);
+            Poketrade2D_GetGridCellPos(column, i, &pos);
             ClActor_GetImageProxy(wk->icons[index][i], &proxy);
             box = PokemonTrade_GetColumnBox(column, wk);
             slot = PokemonTrade_GetColumnSlot(column, i);
@@ -738,19 +743,19 @@ static void func_ov194_021c3904(PokemonTradeWork *wk, BoxSaveAccessor *boxes, in
                     (void *)((u32)G2S_GetOBJCharPtr() + ImageProxy_GetLocation(&proxy, NNS_G2D_VRAM_TYPE_2DSUB)),
                     0x200);
             }
-            func_ov194_021c38d4(wk, column, i, pkm, isParty, index);
+            Poketrade2D_UpdateIconObjMode(wk, column, i, pkm, isParty, index);
             ClActor_SetPalette(wk->icons[index][i], PokeIcon_GetPaletteOfPkm(pkm), CLACT_VRAM_SUB);
             ClActor_SetAutoAnim(wk->icons[index][i], FALSE);
             ClActor_SetVisible(wk->icons[index][i], TRUE);
         }
-        if (!PML_PkmGetParam(pkm, PKM_PARAM_IS_EGG, NULL) && func_ov194_021c3888(wk, species)) {
+        if (!PML_PkmGetParam(pkm, PKM_PARAM_IS_EGG, NULL) && Poketrade2D_IsBoxIconFiltered(wk, species)) {
             wk->iconMarked[index][i] = TRUE;
         }
     }
 }
 
 // The column of the strip at the left edge of the screen
-int func_ov194_021c3bc0(PokemonTradeWork *wk) {
+int Poketrade2D_GetScrollColumn(PokemonTradeWork *wk) {
     int x = wk->scrollX;
     int column;
 
@@ -777,8 +782,8 @@ int func_ov194_021c3bc0(PokemonTradeWork *wk) {
 }
 
 // Whether the cursor's column is on screen, and the third column on screen, where the cursor goes if not
-BOOL func_ov194_021c3c10(PokemonTradeWork *wk, int *column) {
-    int first = func_ov194_021c3bc0(wk);
+BOOL Poketrade2D_GetVisibleColumnRange(PokemonTradeWork *wk, int *column) {
+    int first = Poketrade2D_GetScrollColumn(wk);
     int last = first + 10;
 
     *column = first + 2;
@@ -801,9 +806,9 @@ BOOL func_ov194_021c3c10(PokemonTradeWork *wk, int *column) {
 }
 
 // Sets up the icons for the strip's scroll when the columns on screen changed, and places them
-void func_ov194_021c3c68(BoxSaveAccessor *boxes, PokemonTradeWork *wk, BOOL async) {
+void Poketrade2D_UpdateVisibleColumns(BoxSaveAccessor *boxes, PokemonTradeWork *wk, BOOL async) {
     int i, j;
-    int column = func_ov194_021c3bc0(wk);
+    int column = Poketrade2D_GetScrollColumn(wk);
 
     if (wk->firstColumn != column) {
         wk->firstColumn = column;
@@ -814,26 +819,26 @@ void func_ov194_021c3c68(BoxSaveAccessor *boxes, PokemonTradeWork *wk, BOOL asyn
             }
         }
         wk->unk1090 = column;
-        func_ov194_021c3f68(wk);
+        Poketrade2D_HideAllBoxIcons(wk);
         for (i = 0; i < ICON_COLUMNS; i++) {
-            func_ov194_021c3904(wk, boxes, column, func_ov194_021c3f5c(wk->firstColumn + i), async);
+            Poketrade2D_CreateBoxIcon(wk, boxes, column, Poketrade2D_WrapIndex12(wk->firstColumn + i), async);
             column++;
             if (column >= wk->columnCount) {
                 column = 0;
             }
         }
     }
-    func_ov194_021c3d2c(wk);
+    Poketrade2D_UpdateBoxIconPositions(wk);
 }
 
 // Places the icons and their cursors where their columns are at the strip's scroll, lifting the one the cursor is on
-static void func_ov194_021c3d2c(PokemonTradeWork *wk) {
+static void Poketrade2D_UpdateBoxIconPositions(PokemonTradeWork *wk) {
     int i, j;
     int wrap = 0;
     int column = wk->firstColumn;
 
     for (i = 0; i < ICON_COLUMNS; i++) {
-        int index = func_ov194_021c3f5c(wk->firstColumn + i);
+        int index = Poketrade2D_WrapIndex12(wk->firstColumn + i);
 
         if (column >= wk->columnCount) {
             column -= wk->columnCount;
@@ -856,7 +861,7 @@ static void func_ov194_021c3d2c(PokemonTradeWork *wk) {
             pos.x = wrap + (x - wk->scrollX);
             pos.y = y;
             markPos = pos;
-            if (func_ov194_021be45c(wk, column, j) && GCTX_HIDIsUsingTouch() == TRUE) {
+            if (PoketradeNego_IsMonPeerSelected(wk, column, j) && GCTX_HIDIsUsingTouch() == TRUE) {
                 pos.y -= 8;
                 ClActor_SetPriority(wk->icons[index][j], 11);
             } else {
@@ -875,7 +880,7 @@ static void func_ov194_021c3d2c(PokemonTradeWork *wk) {
 
 // Copies the characters of the icons of a box's Pokémon, or of the party's after the last box, one box a call; the
 // first call allocates room for all of them
-void func_ov194_021c3e9c(PokemonTradeWork *wk, int box) {
+void Poketrade2D_LoadBoxIconGfx(PokemonTradeWork *wk, int box) {
     ArcTool *arc;
     int i, slot;
     void *file;
@@ -912,11 +917,11 @@ void func_ov194_021c3e9c(PokemonTradeWork *wk, int box) {
 }
 
 // The icon column that a column of the strip is set up in
-static int func_ov194_021c3f5c(int column) {
+static int Poketrade2D_WrapIndex12(int column) {
     return column % ICON_COLUMNS;
 }
 
-static void func_ov194_021c3f68(PokemonTradeWork *wk) {
+static void Poketrade2D_HideAllBoxIcons(PokemonTradeWork *wk) {
     int i, j;
 
     for (i = 0; i < ICON_COLUMNS; i++) {
@@ -928,8 +933,8 @@ static void func_ov194_021c3f68(PokemonTradeWork *wk) {
 
 // The Pokémon icon at a point of the screen. If asked, the box and slot of its Pokémon, NULL if the icon shows none,
 // and the column of the strip, the row and the icon column it is in
-ClActor *func_ov194_021c3fa8(PokemonTradeWork *wk, int x, int y, int *box, int *slot, int *column, int *row,
-                             int *index) {
+ClActor *Poketrade2D_HitTestBoxIcons(PokemonTradeWork *wk, int x, int y, int *box, int *slot, int *column, int *row,
+                                     int *index) {
     int i, j;
     int iconColumn;
 
@@ -964,10 +969,10 @@ ClActor *func_ov194_021c3fa8(PokemonTradeWork *wk, int x, int y, int *box, int *
 }
 
 // Sets up the trade demo's BGs 6 and 7 on the lower screen, with the graphics of the trade or of the other demo
-void func_ov194_021c4088(PokemonTradeWork *wk, BOOL other) {
+void Poketrade2D_SetupSummaryBgs(PokemonTradeWork *wk, BOOL other) {
     ArcTool *arc;
 
-    func_ov194_021c45ec(1);
+    Poketrade2D_SetDisplayConfig(1);
     wk->demoBGsCreated = TRUE;
     {
         BGSetup setup = { 0,
@@ -1023,7 +1028,7 @@ void func_ov194_021c4088(PokemonTradeWork *wk, BOOL other) {
     }
 }
 
-void func_ov194_021c41d0(PokemonTradeWork *wk) {
+void Poketrade2D_ExitSummaryBgs(PokemonTradeWork *wk) {
     if (wk->demoBGsCreated) {
         GFL_BGSysFreeFilledChar(6, 1, 0);
         GFL_BGSysReleaseBG(6);
@@ -1033,16 +1038,16 @@ void func_ov194_021c41d0(PokemonTradeWork *wk) {
 }
 
 // Sets up the VRAM and the cell actor system, with every BG hidden
-void func_ov194_021c41fc(PokemonTradeWork *wk) {
+void Poketrade2D_InitDisplayAndClact(PokemonTradeWork *wk) {
     GFL_BGSysSetVRAMBanks(&sVRAMConfig);
     ClActSys_Create(&sClActSetup, &sVRAMConfig, wk->heapId);
-    func_ov194_021c45ec(0);
+    Poketrade2D_SetDisplayConfig(0);
     GFL_BGSysSetEnabledBGsA(0);
     GFL_BGSysSetEnabledBGsB(0);
 }
 
 // Sets up the upper screen's BGs 1 to 3, over the 3D of BG 0
-void func_ov194_021c4234(PokemonTradeWork *wk) {
+void Poketrade2D_SetupMainBgs(PokemonTradeWork *wk) {
     {
         BGSetup setup = { 0,
                           0,
@@ -1108,7 +1113,7 @@ void func_ov194_021c4234(PokemonTradeWork *wk) {
 }
 
 // The 3D system calls this once it is set up
-static void func_ov194_021c4324(void) {
+static void Poketrade2D_Setup3DRenderState(void) {
     u32 i;
 
     GFL_BGSysSetBGEnabledA(GX_PLANEMASK_BG0, TRUE);
@@ -1126,7 +1131,7 @@ static void func_ov194_021c4324(void) {
 }
 
 // Sets up the 3D system and the upper screen's camera
-void func_ov194_021c43c0(PokemonTradeWork *wk) {
+void Poketrade2D_InitG3DSystem(PokemonTradeWork *wk) {
     // Nothing reads it, but the original's .rodata has these 16 zero bytes after the camera's vectors. Its type and
     // name are a guess: the eight colors that G3X_SetEdgeColorTable takes, which overlay 207's p_sta_sys.c sets in
     // the same place, just before G3X_EdgeMarking(FALSE), in a setup otherwise like this one. These four are declared
@@ -1138,7 +1143,7 @@ void func_ov194_021c43c0(PokemonTradeWork *wk) {
     static const VecFx32 sCameraTarget = { 0, 0, 0 };
     static const VecFx32 sCameraUp = { 0, FX32_ONE, 0 };
 
-    GFL_G3DSysCreate(FALSE, 2, FALSE, 1, 0, HEAPID_TAIL(wk->heapId), func_ov194_021c4324);
+    GFL_G3DSysCreate(FALSE, 2, FALSE, 1, 0, HEAPID_TAIL(wk->heapId), Poketrade2D_Setup3DRenderState);
     {
         HeapID heapId = HEAPID_TAIL(wk->heapId);
         VecFx32 up = { 0, FX32_ONE, 0 };
@@ -1154,7 +1159,7 @@ void func_ov194_021c43c0(PokemonTradeWork *wk) {
 }
 
 // Sets up the lower screen's BGs
-void func_ov194_021c4484(PokemonTradeWork *wk) {
+void Poketrade2D_SetupSubBgs(PokemonTradeWork *wk) {
     {
         BGSetup setup = { 0,
                           0,
@@ -1235,7 +1240,7 @@ void func_ov194_021c4484(PokemonTradeWork *wk) {
     wk->subBGsCreated = TRUE;
 }
 
-void func_ov194_021c45a8(PokemonTradeWork *wk) {
+void Poketrade2D_ExitSubBgs(PokemonTradeWork *wk) {
     if (wk->subBGsCreated == TRUE) {
         GFL_BGSysFreeFilledChar(4, 1, 0);
         GFL_BGSysFreeFilledChar(6, 1, 0);
@@ -1254,12 +1259,12 @@ static const BGSysLCDConfig sLCDConfigs[] = {
 };
 
 // Sets the display up for the trade, or for the trade demo
-void func_ov194_021c45ec(int config) {
+void Poketrade2D_SetDisplayConfig(int config) {
     GFL_BGSysSetLCDConfig(&sLCDConfigs[config]);
 }
 
 // Loads the sprites of the upper screen once
-void func_ov194_021c4600(PokemonTradeWork *wk) {
+void Poketrade2D_RegisterMarkerResources(PokemonTradeWork *wk) {
     if (wk->objRes[TRADE_OBJRES_CHAR_MAIN] == 0) {
         ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_POKEMONTRADE, wk->heapId);
 
@@ -1270,7 +1275,7 @@ void func_ov194_021c4600(PokemonTradeWork *wk) {
     }
 }
 
-void func_ov194_021c466c(PokemonTradeWork *wk) {
+void Poketrade2D_ReleaseMarkerResources(PokemonTradeWork *wk) {
     if (wk->objRes[TRADE_OBJRES_CHAR_MAIN] != 0) {
         ClActSys_FreeChars(wk->objRes[TRADE_OBJRES_CHAR_MAIN]);
         ClActSys_FreePltt(wk->objRes[TRADE_OBJRES_PLTT_MAIN]);
@@ -1282,7 +1287,7 @@ void func_ov194_021c466c(PokemonTradeWork *wk) {
 }
 
 // Loads the sprites of the lower screen, and shows the one at the bottom of the strip
-void func_ov194_021c46a4(PokemonTradeWork *wk) {
+void Poketrade2D_RegisterIconSpriteResources(PokemonTradeWork *wk) {
     ClActorSetup setup;
     ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_POKEMONTRADE, wk->heapId);
 
@@ -1301,7 +1306,7 @@ void func_ov194_021c46a4(PokemonTradeWork *wk) {
     ClActor_SetVisible(wk->actors[2], TRUE);
 }
 
-void func_ov194_021c475c(PokemonTradeWork *wk) {
+void Poketrade2D_LoadMainPalette(PokemonTradeWork *wk) {
     ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_POKEMONTRADE, wk->heapId);
 
     GFL_G2DIOLoadNSCRSync(arc, 29, 2, 0, CHAR_POS(wk->bg2Chars), 0, FALSE, wk->heapId);
@@ -1309,7 +1314,7 @@ void func_ov194_021c475c(PokemonTradeWork *wk) {
 }
 
 // Sets up the sprites of the two Pokémon traded, over the upper screen's panels, and the arrows between them
-void func_ov194_021c479c(PokemonTradeWork *wk) {
+void Poketrade2D_CreateTouchbarActors(PokemonTradeWork *wk) {
     ArcTool *arc;
     BoxPkm *pkm0, *pkm1;
     ClActorSetup setup;
@@ -1365,7 +1370,7 @@ void func_ov194_021c479c(PokemonTradeWork *wk) {
 }
 
 // Places the icons of the two Pokémon, the one of the side picked raised unless they are level
-void func_ov194_021c4970(PokemonTradeWork *wk, int side, BOOL level) {
+void Poketrade2D_PlaceTouchbarActors(PokemonTradeWork *wk, int side, BOOL level) {
     ClActorPos pos;
 
     if (level) {
@@ -1385,7 +1390,7 @@ void func_ov194_021c4970(PokemonTradeWork *wk, int side, BOOL level) {
     }
 }
 
-void func_ov194_021c49e8(PokemonTradeWork *wk) {
+void Poketrade2D_DeleteTouchbarActors(PokemonTradeWork *wk) {
     if (wk->actors[3] != NULL) {
         ClActor_Delete(wk->actors[3]);
     }
@@ -1420,7 +1425,7 @@ static u32 sInitialWindowPos[][2] = {
 };
 
 // Opens the search by initial: its screen, and a window for each letter
-void func_ov194_021c4a68(PokemonTradeWork *wk) {
+void Poketrade2D_LoadSubScreenGfx(PokemonTradeWork *wk) {
     ArcTool *arc;
     int i;
 
@@ -1447,7 +1452,7 @@ void func_ov194_021c4a68(PokemonTradeWork *wk) {
 }
 
 // Closes the search by initial
-void func_ov194_021c4b88(PokemonTradeWork *wk) {
+void Poketrade2D_ClearSubScreen(PokemonTradeWork *wk) {
     int i;
 
     GFL_BGSysSetBGEnabled(4, FALSE);
@@ -1471,7 +1476,7 @@ void func_ov194_021c4b88(PokemonTradeWork *wk) {
 }
 
 // Shows the icon of a Pokémon's held item, a letter for mail, over a side's panel or, for side 2, the summary
-void func_ov194_021c4c00(PokemonTradeWork *wk, int side, PartyPkm *pkm) {
+void Poketrade2D_CreateMarkingIcon(PokemonTradeWork *wk, int side, PartyPkm *pkm) {
     PokemonTradeSprite *sprite = &wk->infoIcons[0];
     UIObjResSetup setup;
     int x, y;
@@ -1519,7 +1524,7 @@ void func_ov194_021c4c00(PokemonTradeWork *wk, int side, PartyPkm *pkm) {
     }
 }
 
-void func_ov194_021c4cfc(PokemonTradeSprite *sprite) {
+void Poketrade2D_DeleteMarkingIcon(PokemonTradeSprite *sprite) {
     if (sprite->actor != NULL) {
         ClActor_Delete(sprite->actor);
         UIObjRes_Free(&sprite->res);
@@ -1529,7 +1534,7 @@ void func_ov194_021c4cfc(PokemonTradeSprite *sprite) {
 
 // Shows the Pokérus icon of a Pokémon that has it, over a side's panel or in the summary, or the icon of a Pokémon
 // that had it
-void func_ov194_021c4d18(PokemonTradeWork *wk, int side, BOOL summary, PartyPkm *pkm) {
+void Poketrade2D_CreatePokerusIcon(PokemonTradeWork *wk, int side, BOOL summary, PartyPkm *pkm) {
     PokemonTradeSprite *sprite = &wk->infoIcons[1];
     UIObjResSetup setup;
     BOOL pokerus = pokerusDuration(pkm);
@@ -1544,7 +1549,7 @@ void func_ov194_021c4d18(PokemonTradeWork *wk, int side, BOOL summary, PartyPkm 
     }
     if (!pokerus) {
         if (!summary) {
-            func_ov194_021c4e0c(wk, side, pkm);
+            Poketrade2D_CreateCuredPokerusIcon(wk, side, pkm);
         }
         return;
     }
@@ -1572,13 +1577,13 @@ void func_ov194_021c4d18(PokemonTradeWork *wk, int side, BOOL summary, PartyPkm 
 }
 
 // Shows the icon of a Pokémon that had Pokérus over a side's panel
-static void func_ov194_021c4e0c(PokemonTradeWork *wk, int side, PartyPkm *pkm) {
+static void Poketrade2D_CreateCuredPokerusIcon(PokemonTradeWork *wk, int side, PartyPkm *pkm) {
     PokemonTradeSprite *sprite = &wk->infoIcons[2];
     UIObjResSetup setup;
     BOOL cured = pokeHasPkrs(pkm);
 
     if (cured) {
-        // The same test of an existing icon as func_ov194_021c4d18's, though it can only be shown here
+        // The same test of an existing icon as Poketrade2D_CreatePokerusIcon's, though it can only be shown here
         if (sprite->actor != NULL) {
             if (!cured) {
                 ClActor_SetVisible(sprite->actor, FALSE);
@@ -1604,7 +1609,7 @@ static void func_ov194_021c4e0c(PokemonTradeWork *wk, int side, PartyPkm *pkm) {
 
 // Shows the icons of a Pokémon's markings in the summary, each lit if it is set, and the rare and Pokérus flags,
 // which show only when set. An egg shows no rare flag
-void func_ov194_021c4ec0(PokemonTradeWork *wk, PartyPkm *pkm, BOOL isEgg) {
+void Poketrade2D_CreateSummaryIcons(PokemonTradeWork *wk, PartyPkm *pkm, BOOL isEgg) {
     u32 marks = PokeParty_GetParam(pkm, PKM_PARAM_MARKINGS, NULL);
     UIObjResSetup setup;
     u32 xs[] = { 25, 26, 27, 28, 29, 30, 20, 21 };
@@ -1663,7 +1668,7 @@ void func_ov194_021c4ec0(PokemonTradeWork *wk, PartyPkm *pkm, BOOL isEgg) {
     }
 }
 
-void func_ov194_021c5060(PokemonTradeWork *wk) {
+void Poketrade2D_DeleteSummaryIcons(PokemonTradeWork *wk) {
     TradeMarkIcons *marks = &wk->markIcons;
     int i;
 
@@ -1680,12 +1685,12 @@ void func_ov194_021c5060(PokemonTradeWork *wk) {
 }
 
 // Loads the box palette into a BG palette slot, with the colours of the UI's last four after it
-void func_ov194_021c5098(PokemonTradeWork *wk, u32 palette, u32 type) {
+void Poketrade2D_UploadWindowPalette(PokemonTradeWork *wk, u32 palette, u32 type) {
     GFL_BGSysLoadNCLRDefault(ARCID_FONT, 5, type, palette * 32, 32, wk->heapId);
     GFL_G2DIOLoadNCLR(getUINarcIdx(), 31, type, 0x1c, palette * 32 + 0x1c, 4, wk->heapId);
 }
 
-void func_ov194_021c50d8(PokemonTradeWork *wk, int side, int index) {
+void Poketrade2D_DeleteOfferIconActor(PokemonTradeWork *wk, int side, int index) {
     if (wk->negoIcons[side][index] != NULL) {
         ClActor_Delete(wk->negoIcons[side][index]);
         wk->negoIcons[side][index] = NULL;
@@ -1693,7 +1698,7 @@ void func_ov194_021c50d8(PokemonTradeWork *wk, int side, int index) {
     }
 }
 
-void func_ov194_021c510c(PokemonTradeWork *wk, int side, BOOL visible) {
+void Poketrade2D_SetOfferIconsVisible(PokemonTradeWork *wk, int side, BOOL visible) {
     int i;
 
     for (i = 0; i < 3; i++) {
@@ -1713,13 +1718,14 @@ static const u32 sNegoIconPosSub[6][2] = {
 };
 
 // Sets up the icon of a Pokémon offered in a negotiation, in the row of the main screen or on the sub screen's panel
-void func_ov194_021c5138(PokemonTradeWork *wk, int side, int index, PartyPkm *pkm, BOOL onMain, BOOL visible) {
+void Poketrade2D_CreateOfferIconActor(PokemonTradeWork *wk, int side, int index, PartyPkm *pkm, BOOL onMain,
+                                      BOOL visible) {
     BoxPkm *boxPkm = PokeParty_GetBoxPkm(pkm);
     ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_POKEICON, wk->heapId);
     ClActorSetup setup;
     u32 vramType;
 
-    func_ov194_021c50d8(wk, side, index);
+    Poketrade2D_DeleteOfferIconActor(wk, side, index);
     if (onMain) {
         setup.x = sNegoIconPosMain[side * 3 + index][0];
         setup.y = sNegoIconPosMain[side * 3 + index][1];
@@ -1744,7 +1750,7 @@ void func_ov194_021c5138(PokemonTradeWork *wk, int side, int index, PartyPkm *pk
 }
 
 // Places the icons on the panels of a negotiation, the one picked raised
-void func_ov194_021c5244(PokemonTradeWork *wk, int side, int index) {
+void Poketrade2D_UpdateOfferIconHighlight(PokemonTradeWork *wk, int side, int index) {
     int i, j;
     ClActorPos pos;
 
@@ -1762,18 +1768,18 @@ void func_ov194_021c5244(PokemonTradeWork *wk, int side, int index) {
     }
 }
 
-void func_ov194_021c52bc(PokemonTradeWork *wk) {
+void Poketrade2D_DeleteAllOfferIconActors(PokemonTradeWork *wk) {
     int j, i;
 
     for (i = 0; i < 2; i++) {
         for (j = 0; j < 3; j++) {
-            func_ov194_021c50d8(wk, i, j);
+            Poketrade2D_DeleteOfferIconActor(wk, i, j);
         }
     }
 }
 
 // Makes the copy of an icon that the stylus carries
-void func_ov194_021c52e0(PokemonTradeWork *wk, int column, int row, int x, int y, BoxPkm *pkm) {
+void Poketrade2D_CreateFloatingIconActor(PokemonTradeWork *wk, int column, int row, int x, int y, BoxPkm *pkm) {
     ClActorSetup setup;
 
     setup.x = x;
@@ -1787,7 +1793,7 @@ void func_ov194_021c52e0(PokemonTradeWork *wk, int column, int row, int x, int y
 }
 
 // Lets the carried icon go: it flies on in the direction the stylus moved it and curves off to the upper left
-void func_ov194_021c5348(PokemonTradeWork *wk) {
+void Poketrade2D_StartIconFlight(PokemonTradeWork *wk) {
     ClActorPos pos;
     VecFx32 points[4];
     fx32 x, y, dx, dy, length;
@@ -1810,12 +1816,12 @@ void func_ov194_021c5348(PokemonTradeWork *wk) {
     points[2].x = x + FX_Mul(dx, length);
     points[2].y = y + FX_Mul(dy, length);
     points[2].z = 0;
-    func_ov194_021c604c(&wk->curve, &points[0], &points[1], &points[2], &points[3], 19);
+    Poketrade2D_InitBezierCurve(&wk->curve, &points[0], &points[1], &points[2], &points[3], 19);
     wk->curveTimer = 21;
 }
 
 // Moves the icon that was let go along its curve; TRUE when its flight is over
-BOOL func_ov194_021c5460(PokemonTradeWork *wk) {
+BOOL Poketrade2D_UpdateIconFlight(PokemonTradeWork *wk) {
     ClActorPos pos;
 
     if (wk->curveTimer != 0) {
@@ -1828,9 +1834,9 @@ BOOL func_ov194_021c5460(PokemonTradeWork *wk) {
             wk->curveTimer = 1;
         }
         if (wk->curveTimer == 1) {
-            func_ov194_021c54ec(wk);
+            Poketrade2D_DeleteFloatingIconActor(wk);
         } else {
-            func_ov194_021c60a0(&wk->curve);
+            Poketrade2D_StepBezierCurve(&wk->curve);
             pos.x = wk->curve.pos.x / FX32_ONE;
             pos.y = wk->curve.pos.y / FX32_ONE;
             ClActor_SetSurfacePos(wk->actors[9], &pos, CLACT_VRAM_SUB);
@@ -1839,20 +1845,20 @@ BOOL func_ov194_021c5460(PokemonTradeWork *wk) {
     return FALSE;
 }
 
-void func_ov194_021c54ec(PokemonTradeWork *wk) {
+void Poketrade2D_DeleteFloatingIconActor(PokemonTradeWork *wk) {
     if (wk->actors[9] != NULL) {
         ClActor_Delete(wk->actors[9]);
         wk->actors[9] = NULL;
     }
 }
 
-void func_ov194_021c5504(PokemonTradeWork *wk) {
+void Poketrade2D_SetupSubBlend(PokemonTradeWork *wk) {
     G2x_SetBlendAlpha_(REG_DB_BLDCNT_ADDR, 0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG1 | GX_PLANEMASK_BG2 | GX_PLANEMASK_BG3,
                        8, 8);
 }
 
 // Shows a stamp's button, under the lower screen's panels
-void func_ov194_021c551c(PokemonTradeWork *wk, int index) {
+void Poketrade2D_CreateMarkerActor(PokemonTradeWork *wk, int index) {
     ClActorSetup setup;
 
     if (wk->stampButtons[index] == NULL) {
@@ -1869,11 +1875,11 @@ void func_ov194_021c551c(PokemonTradeWork *wk, int index) {
     ClActor_SetVisible(wk->stampButtons[index], TRUE);
 }
 
-void func_ov194_021c5594(PokemonTradeWork *wk, int index, BOOL visible) {
+void Poketrade2D_SetMarkerActorVisible(PokemonTradeWork *wk, int index, BOOL visible) {
     ClActor_SetVisible(wk->stampButtons[index], visible);
 }
 
-void func_ov194_021c55ac(PokemonTradeWork *wk, int index) {
+void Poketrade2D_DeleteMarkerActor(PokemonTradeWork *wk, int index) {
     if (wk->stampButtons[index] != NULL) {
         ClActor_Delete(wk->stampButtons[index]);
         wk->stampButtons[index] = NULL;
@@ -1881,12 +1887,12 @@ void func_ov194_021c55ac(PokemonTradeWork *wk, int index) {
 }
 
 // Plays the animation of a stamp's button being pressed
-void func_ov194_021c55c8(PokemonTradeWork *wk, u32 index) {
+void Poketrade2D_SetMarkerActorAnim(PokemonTradeWork *wk, u32 index) {
     ClActor_SetSequence(wk->stampButtons[index], index + 15);
 }
 
 // Shows a stamp in a side's balloon
-void func_ov194_021c55e4(PokemonTradeWork *wk, u32 index, int side) {
+void Poketrade2D_CreateMarkerButtonActor(PokemonTradeWork *wk, u32 index, int side) {
     ClActorSetup setup;
 
     setup.x = side * 206 + 8;
@@ -1916,7 +1922,7 @@ void func_ov194_021c55e4(PokemonTradeWork *wk, u32 index, int side) {
     }
 }
 
-void func_ov194_021c56b8(PokemonTradeWork *wk, int side) {
+void Poketrade2D_DeleteMarkerButtonPair(PokemonTradeWork *wk, int side) {
     if (wk->stamps[side * 2 + 1] != NULL) {
         ClActor_Delete(wk->stamps[side * 2 + 1]);
         wk->stamps[side * 2 + 1] = NULL;
@@ -1928,7 +1934,7 @@ void func_ov194_021c56b8(PokemonTradeWork *wk, int side) {
 }
 
 // Puts the cursor on one of the six panels of a negotiation's Pokémon, or hides it for -1
-void func_ov194_021c56f8(PokemonTradeWork *wk, int cursor) {
+void Poketrade2D_MovePickedIconActor(PokemonTradeWork *wk, int cursor) {
     ClActorPos positions[] = {
         { 64, 48 }, { 64, 96 }, { 64, 144 }, { 192, 48 }, { 192, 96 }, { 192, 144 },
     };
@@ -1955,7 +1961,7 @@ void func_ov194_021c56f8(PokemonTradeWork *wk, int cursor) {
     ClActor_SetSurfacePos(wk->negoCursor, &positions[cursor], CLACT_VRAM_SUB);
 }
 
-void func_ov194_021c57a8(PokemonTradeWork *wk) {
+void Poketrade2D_DeletePickedIconActor(PokemonTradeWork *wk) {
     if (wk->negoCursor != NULL) {
         ClActor_Delete(wk->negoCursor);
         wk->negoCursor = NULL;
@@ -1963,9 +1969,9 @@ void func_ov194_021c57a8(PokemonTradeWork *wk) {
 }
 
 // Slides the panels of a negotiation in, each side from its edge, 4 pixels a frame; TRUE when they are in
-BOOL func_ov194_021c57c4(PokemonTradeWork *wk) {
-    // The 4 of the file's .rodata, though its reads fold. Whose it is is a guess: as the 4 of func_ov194_021c5244's
-    // icon raise it gives the same layout, but this is the 4 the file uses most
+BOOL Poketrade2D_StepCursorSlide(PokemonTradeWork *wk) {
+    // The 4 of the file's .rodata, though its reads fold. Whose it is is a guess: as the 4 of
+    // Poketrade2D_UpdateOfferIconHighlight's icon raise it gives the same layout, but this is the 4 the file uses most
     static const int speed = 4;
     ClActorPos pos, leftPos, rightPos;
     int i;
@@ -2004,7 +2010,7 @@ BOOL func_ov194_021c57c4(PokemonTradeWork *wk) {
 }
 
 // Moves the panels of a negotiation and their icons off the screen, each side past its edge, for them to slide in
-static void func_ov194_021c58b4(PokemonTradeWork *wk) {
+static void Poketrade2D_SetCursorSlidePositions(PokemonTradeWork *wk) {
     ClActorPos pos, leftPos, rightPos;
     int i;
 
@@ -2038,7 +2044,7 @@ static void func_ov194_021c58b4(PokemonTradeWork *wk) {
 }
 
 // Sets up the lower screen's BGs for a negotiation, with its panels off the screen
-void func_ov194_021c5994(PokemonTradeWork *wk) {
+void Poketrade2D_SetupCursorBg(PokemonTradeWork *wk) {
     ArcTool *arc;
 
     wk->cursorImage = LoadCursorImageEndOfHeap(6, 15, 0, wk->heapId);
@@ -2071,13 +2077,13 @@ void func_ov194_021c5994(PokemonTradeWork *wk) {
     GFL_G2DIOLoadNSCRSync(arc, 11, 2, 0, CHAR_POS(wk->bg2Chars), 0, FALSE, wk->heapId);
     GFL_ArcToolFree(arc);
     wk->panelSlide = 0;
-    func_ov194_021c58b4(wk);
+    Poketrade2D_SetCursorSlidePositions(wk);
     GFL_BGSysSetEnabledBGsB(GX_PLANEMASK_BG0 | GX_PLANEMASK_BG1 | GX_PLANEMASK_BG2 | GX_PLANEMASK_BG3 |
                             GX_PLANEMASK_OBJ);
 }
 
 // Sets up the panels of a negotiation: their bitmaps, the characters they are copied to, and their sprites
-void func_ov194_021c5abc(PokemonTradeWork *wk) {
+void Poketrade2D_CreateOfferWindows(PokemonTradeWork *wk) {
     ClActorPos positions[] = {
         { 96, 32 }, { 104, 64 }, { 104, 112 }, { 104, 160 }, { 224, 32 }, { 232, 64 }, { 232, 112 }, { 232, 160 },
     };
@@ -2104,7 +2110,7 @@ void func_ov194_021c5abc(PokemonTradeWork *wk) {
     GFL_ArcToolFree(arc);
 }
 
-void func_ov194_021c5bf0(PokemonTradeWork *wk) {
+void Poketrade2D_DeleteOfferWindowActors(PokemonTradeWork *wk) {
     int i;
 
     for (i = 0; i < 8; i++) {
@@ -2138,7 +2144,7 @@ void func_ov194_021c5bf0(PokemonTradeWork *wk) {
 
 // Copies the bitmaps of the panels of a negotiation to their characters, which take the 8 tiles of a row of the
 // bitmap two rows apart
-void func_ov194_021c5c80(PokemonTradeWork *wk) {
+void Poketrade2D_UpdateOfferWindowActors(PokemonTradeWork *wk) {
     u8 order[] = { 0, 2, 4, 6, 1, 3, 5, 7 };
     int i, j;
 
@@ -2155,7 +2161,7 @@ void func_ov194_021c5c80(PokemonTradeWork *wk) {
 }
 
 // Shows the background of a side's panel on the sub screen
-void func_ov194_021c5d10(PokemonTradeWork *wk, int side, PartyPkm *pkm) {
+void Poketrade2D_LoadMonPalette(PokemonTradeWork *wk, int side, PartyPkm *pkm) {
     ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_POKEMONTRADE, wk->heapId);
     NNSG2dScreenData *screen;
     void *file;
@@ -2185,14 +2191,14 @@ void func_ov194_021c5d10(PokemonTradeWork *wk, int side, PartyPkm *pkm) {
     GFL_BGSysQueueScrLoad(1);
 }
 
-static void func_ov194_021c5dcc(u32 param, fx32 frame) {
+static void Poketrade2D_OnCursorAnimDone(u32 param, fx32 frame) {
     PokemonTradeWork *wk = (PokemonTradeWork *)param;
 
     wk->boxCursorDone = TRUE;
 }
 
 // Shows the cursor over a box of the box list, at its top left corner
-void func_ov194_021c5dd8(PokemonTradeWork *wk, u8 x, u8 y) {
+void Poketrade2D_CreateCursorActor(PokemonTradeWork *wk, u8 x, u8 y) {
     ClActorSetup setup;
     ClActorCallback callback;
 
@@ -2201,7 +2207,7 @@ void func_ov194_021c5dd8(PokemonTradeWork *wk, u8 x, u8 y) {
     setup.sequence = 24;
     setup.priority = 0;
     setup.bgPriority = 0;
-    func_ov194_021c5e5c(wk);
+    Poketrade2D_DeleteCursorActor(wk);
     wk->boxCursor = ClActor_Create(wk->clactUnit, wk->objRes[TRADE_OBJRES_CHAR_SUB], wk->objRes[TRADE_OBJRES_PLTT_SUB],
                                    wk->objRes[TRADE_OBJRES_CELL_SUB], &setup, CLACT_VRAM_SUB, wk->heapId);
     ClActor_SetVisible(wk->boxCursor, TRUE);
@@ -2209,11 +2215,11 @@ void func_ov194_021c5dd8(PokemonTradeWork *wk, u8 x, u8 y) {
     wk->boxCursorDone = FALSE;
     callback.type = CLACT_CALLBACK_LAST_FRAME;
     callback.param = (u32)wk;
-    callback.func = func_ov194_021c5dcc;
+    callback.func = Poketrade2D_OnCursorAnimDone;
     ClActor_SetAnimCallback(wk->boxCursor, &callback);
 }
 
-void func_ov194_021c5e5c(PokemonTradeWork *wk) {
+void Poketrade2D_DeleteCursorActor(PokemonTradeWork *wk) {
     if (wk->boxCursor != NULL) {
         ClActor_Delete(wk->boxCursor);
         wk->boxCursor = NULL;
@@ -2222,16 +2228,16 @@ void func_ov194_021c5e5c(PokemonTradeWork *wk) {
 }
 
 // Removes the box list's cursor once its animation has ended; TRUE while it plays
-BOOL func_ov194_021c5e80(PokemonTradeWork *wk) {
+BOOL Poketrade2D_ClearCursorIfDisabled(PokemonTradeWork *wk) {
     if (wk->boxCursorDone) {
-        func_ov194_021c5e5c(wk);
+        Poketrade2D_DeleteCursorActor(wk);
         return FALSE;
     }
     return TRUE;
 }
 
 // Dims the palettes of a standard palette memory (PALFADE_VRAM_*) in paletteMask
-static void func_ov194_021c5e9c(const PokemonTradeWork *wk, u32 vram, u32 paletteMask) {
+static void Poketrade2D_FadePaletteBank(const PokemonTradeWork *wk, u32 vram, u32 paletteMask) {
     PaletteFade *fade = PaletteFade_Create(wk->heapId);
     u8 *colors;
     int i;
@@ -2265,14 +2271,14 @@ static void func_ov194_021c5e9c(const PokemonTradeWork *wk, u32 vram, u32 palett
 
 // Dims the palettes in paletteMask of the lower screen's OBJ or BG palettes, keeping a copy of them, or puts the copy
 // back
-static void func_ov194_021c5f64(PokemonTradeWork *wk, BOOL dim, u16 vram, u32 paletteMask) {
+static void Poketrade2D_FadePaletteCopy(PokemonTradeWork *wk, BOOL dim, u16 vram, u32 paletteMask) {
     if (dim) {
         if (vram == PALFADE_VRAM_SUB_OBJ) {
             MI_CpuCopy8((void *)HW_DB_OBJ_PLTT, wk->savedObjPalette, 0x200);
         } else if (vram == PALFADE_VRAM_SUB_BG) {
             MI_CpuCopy8((void *)HW_DB_BG_PLTT, wk->savedBGPalette, 0x200);
         }
-        func_ov194_021c5e9c(wk, vram, paletteMask);
+        Poketrade2D_FadePaletteBank(wk, vram, paletteMask);
     } else if (vram == PALFADE_VRAM_SUB_OBJ) {
         DC_FlushRange(wk->savedObjPalette, 0x200);
         GXS_LoadOBJPltt(wk->savedObjPalette, 0, 0x200);
@@ -2283,33 +2289,33 @@ static void func_ov194_021c5f64(PokemonTradeWork *wk, BOOL dim, u16 vram, u32 pa
 }
 
 // Dims the lower screen's OBJ palettes but the first, or brings them back
-void func_ov194_021c5fe4(PokemonTradeWork *wk, BOOL dim) {
-    func_ov194_021c5f64(wk, dim, PALFADE_VRAM_SUB_OBJ, 0xfffe);
+void Poketrade2D_FadePaletteAll(PokemonTradeWork *wk, BOOL dim) {
+    Poketrade2D_FadePaletteCopy(wk, dim, PALFADE_VRAM_SUB_OBJ, 0xfffe);
 }
 
 // Sets the planes of the main screen shown, in the next V-blank
-void func_ov194_021c5ff4(PokemonTradeWork *wk, int planes) {
-    GFL_TCBMgrAddTask(GFL_VBlankGetTCBMgr(), func_ov194_021c6024, (void *)planes, 10);
+void Poketrade2D_ScheduleMainPlaneVisible(PokemonTradeWork *wk, int planes) {
+    GFL_TCBMgrAddTask(GFL_VBlankGetTCBMgr(), Poketrade2D_TaskSetMainPlaneVisible, (void *)planes, 10);
 }
 
 // Sets the planes of the sub screen shown, in the next V-blank
-void func_ov194_021c600c(PokemonTradeWork *wk, int planes) {
-    GFL_TCBMgrAddTask(GFL_VBlankGetTCBMgr(), func_ov194_021c6038, (void *)planes, 10);
+void Poketrade2D_ScheduleSubPlaneVisible(PokemonTradeWork *wk, int planes) {
+    GFL_TCBMgrAddTask(GFL_VBlankGetTCBMgr(), Poketrade2D_TaskSetSubPlaneVisible, (void *)planes, 10);
 }
 
-static void func_ov194_021c6024(TCB *tcb, void *data) {
+static void Poketrade2D_TaskSetMainPlaneVisible(TCB *tcb, void *data) {
     GFL_BGSysSetEnabledBGsA((int)data);
     GFL_TCBRemove(tcb);
 }
 
-static void func_ov194_021c6038(TCB *tcb, void *data) {
+static void Poketrade2D_TaskSetSubPlaneVisible(TCB *tcb, void *data) {
     GFL_BGSysSetEnabledBGsB((int)data);
     GFL_TCBRemove(tcb);
 }
 
 // Starts a point along the curve from start to end, over frames
-static void func_ov194_021c604c(TradeCurve *curve, VecFx32 *start, VecFx32 *control1, VecFx32 *control2, VecFx32 *end,
-                                int frames) {
+static void Poketrade2D_InitBezierCurve(TradeCurve *curve, VecFx32 *start, VecFx32 *control1, VecFx32 *control2,
+                                        VecFx32 *end, int frames) {
     curve->pos = *start;
     curve->points[0] = *start;
     curve->points[1] = *control1;
@@ -2320,7 +2326,7 @@ static void func_ov194_021c604c(TradeCurve *curve, VecFx32 *start, VecFx32 *cont
 }
 
 // Moves the point to the curve's next frame; TRUE once it is at the end
-static BOOL func_ov194_021c60a0(TradeCurve *curve) {
+static BOOL Poketrade2D_StepBezierCurve(TradeCurve *curve) {
     fx32 t, t2, s, s2, b0, b1, b2, b3;
 
     if (curve->frame < curve->frames - 1) {

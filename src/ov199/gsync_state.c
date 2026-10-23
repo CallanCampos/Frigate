@@ -1524,7 +1524,7 @@ static void GSync_StateSendSave(GSyncWork *wk) {
     DreamWorldSave_SetSyncDate(dreamWorld,
                                (date.year << 24) | ((date.month & 0xff) << 16) | ((date.day & 0xff) << 8) | date.week);
     if (DreamWorldSave_GetResultIndex(dreamWorld) != 127) {
-        func_02009b30(dreamWorld, 1);
+        DreamWorldSave_SetFlag(dreamWorld, 1);
         DreamWorldSave_SetResultIndex(dreamWorld, 126);
     }
     wk->progress = 50;

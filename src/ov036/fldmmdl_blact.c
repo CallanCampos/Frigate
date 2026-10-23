@@ -200,7 +200,7 @@ void FldActSys_InitBlAct(MMSys *system, BlActSys *sys, u32 count) {
     BlActScene_SetBasePolyID(scene, &polyId);
 }
 
-void func_ov036_021937a4(MMSys *system) {
+void FldBlAct_Exit(MMSys *system) {
     FieldBlAct *blact = FldActSys_GetFieldBlAct(system);
 
     FldBlAct_FreeUnloader(blact);
@@ -234,7 +234,7 @@ BOOL FldActSys_IsAsyncLoadPending(MMSys *system) {
     return FALSE;
 }
 
-u8 func_ov036_0219381c(FieldActor *actor) {
+u8 FldBlAct_GetEntryHookFlag(FieldActor *actor) {
     FieldBlAct *blact = FldActSys_GetFieldBlAct(GetActorMModelSystem(actor));
 
     return blact->callbackFlag;
@@ -327,7 +327,7 @@ static u16 FldAct_InitBlActExistMat(FieldActor *actor, u16 objCode) {
     return FldAct_InitBlActWithMat(actor, info[1]);
 }
 
-BOOL func_ov036_02193a00(FieldActor *actor, u16 *index) {
+BOOL FldBlAct_AddActorMmdlOrReserve(FieldActor *actor, u16 *index) {
     FieldBlAct *blact = FldActSys_GetFieldBlAct(GetActorMModelSystem(actor));
     const FieldActorConfig *config = GetActorMdlInfo(actor);
     u16 info[2];
@@ -357,7 +357,7 @@ static void FieldBlAct_UnbindActorObjCode(FieldBlAct *blact, FieldActor *actor, 
     }
 }
 
-void func_ov036_02193ac0(FieldActor *actor, u32 index) {
+void FldBlAct_DeleteActorMmdl(FieldActor *actor, u32 index) {
     u16 objCode = FldAct_GetObjCode(actor);
     FieldBlAct *blact = FldActSys_GetFieldBlAct(GetActorMModelSystem(actor));
 
@@ -386,7 +386,7 @@ BOOL func_ov036_02193b14(MMSys *system, const FieldActorConfig *config, u16 *out
     return FALSE;
 }
 
-void func_ov036_02193b7c(MMSys *system, u16 *out) {
+void FldBlAct_DeleteActorPos(MMSys *system, u16 *out) {
     FieldBlAct *blact = FldActSys_GetFieldBlAct(system);
 
     if (out[1] != BLACT_NONE) {
@@ -409,7 +409,7 @@ BlActSys *FieldBlAct_GetBlActSys(FieldBlAct *blact) {
     return blact->sys;
 }
 
-void func_ov036_02193bd0(FieldActor *actor, u16 *scaleX, u16 *scaleY) {
+void FldBlAct_GetActorSize(FieldActor *actor, u16 *scaleX, u16 *scaleY) {
     u32 sizeIdx = GetActorMdlInfo(actor)->billboardSize;
     const BillboardScale *scale = &BILLBOARD_SCALES[sizeIdx];
 

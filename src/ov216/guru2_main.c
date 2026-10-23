@@ -853,7 +853,7 @@ BOOL Guru2Main_Init(GameProc *proc, u32 *state, void *param, void *work) {
     int i;
     Guru2MainWork *g2m;
 
-    func_02042e94(1);
+    GflNet_SetAutoExit(1);
     GFL_HeapCreateChild(HEAPID_USER, HEAPID_GURU2, 0x80000);
     g2m = GFL_ProcInitSubsystem(proc, sizeof(Guru2MainWork), HEAPID_GURU2);
     i = 0;
@@ -1669,7 +1669,7 @@ static int Guru2MainSeq_SyncEndWait(Guru2MainWork *g2m) {
         if (g2m->wait >= 180) {
             g2m->wait = 0;
             if (g2m->g2c->unk3C == 0) {
-                func_02042e94(0);
+                GflNet_SetAutoExit(0);
             }
             g2m->seq = SEQ_END_WAIT;
         }

@@ -104,9 +104,9 @@ GameEventReturnCode EventFieldMenu_Callback(GameEvent *event, u32 *state, void *
         break;
     case 2:
         gameData = GSYS_GetGameData(GameEvent_GetGameSystem(event));
-        selection = func_ov036_02198854(Field_GetSubscreen(work->field));
+        selection = FieldSubscreen_GetMenuSelectedButton(Field_GetSubscreen(work->field));
         GameData_SetFieldMenuItem(gameData, selection);
-        work->unk10 = func_ov036_02198854(Field_GetSubscreen(work->field));
+        work->unk10 = FieldSubscreen_GetMenuSelectedButton(Field_GetSubscreen(work->field));
         work->appCall.appId = FieldMenu_GetAppId(selection);
         work->state = 5;
         break;
@@ -187,7 +187,7 @@ static BOOL FieldMenu_CanRetry(FieldAppCallInput *input, void *arg) {
     FieldSubscreen *subscreen = Field_GetSubscreen(menu->field);
 
     if (input->eventType == 0) {
-        func_ov036_0219886c(subscreen, menu->unk10);
+        FieldSubscreen_SetMenuSelectedButton(subscreen, menu->unk10);
     }
     return TRUE;
 }

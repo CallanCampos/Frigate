@@ -92,8 +92,8 @@ struct Field {
     FieldLensFlare *lensFlare;
 };
 
-UnionEffect *func_ov036_0218051c(Field *field);
-void func_ov036_02180fe4(FieldGimmickWorkBlock *block);
+UnionEffect *Field_GetUnionEff(Field *field);
+void Field_InitCommonWork(FieldGimmickWorkBlock *block);
 
 // The memory of the field's heap 0x89, in overlay 36's .bss (which file defines it isn't known yet)
 extern u8 g_FieldHeapMemory[0x10000];

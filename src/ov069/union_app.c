@@ -18,7 +18,7 @@ static void UnionApp_SendProfile(UnionApp *app);
 static void UnionApp_JoinConfirmed(UnionApp *app);
 static void UnionApp_CheckProfileLeft(UnionApp *app, UnionSystem *sys);
 static void UnionApp_CheckEnteringLeft(UnionApp *app, UnionSystem *sys);
-static void func_ov069_0217cf4c(UnionApp *app);
+static void UnionApp_SetReady(UnionApp *app);
 
 UnionApp *UnionApp_Create(UnionSystem *sys, HeapID heapId, u8 memberMax, const PlayerInfo *info) {
     UnionAppMember member;
@@ -36,7 +36,7 @@ UnionApp *UnionApp_Create(UnionSystem *sys, HeapID heapId, u8 memberMax, const P
     OS_GetMacAddress(member.mac);
     UnionApp_SetMemberProfile(app, sys, GFL_NetGetHandleNetId(NetHandle_GetOwn()), &member);
     UnionApp_CloseEntry(app);
-    func_ov069_0217cf4c(app);
+    UnionApp_SetReady(app);
     return app;
 }
 
@@ -355,7 +355,7 @@ void UnionApp_LimitEntry(UnionApp *app, u8 limit) {
     }
 }
 
-static void func_ov069_0217cf4c(UnionApp *app) {
+static void UnionApp_SetReady(UnionApp *app) {
     app->unk14 = TRUE;
 }
 

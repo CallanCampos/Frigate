@@ -33,25 +33,25 @@ struct PokemonTrade3DWork {
     HeapID heapId;
 };
 
-void func_ov194_021c1b74(PokemonTrade3DWork *work, int path);
-void func_ov194_021c1d00(PokemonTrade3DWork *work);
-void func_ov194_021c1d30(PokemonTrade3DWork *work);
-void func_ov194_021c1d38(PokemonTrade3DWork *work);
+void Poketrade3D_CreateIcaStreamsForMode(PokemonTrade3DWork *work, int path);
+void Poketrade3D_CreateIcaStreamsEnding(PokemonTrade3DWork *work);
+void Poketrade3D_FreeParticleResources(PokemonTrade3DWork *work);
+void Poketrade3D_InitParticleSystems(PokemonTrade3DWork *work);
 void func_ov194_021c1db4(PokemonTrade3DWork *work);
-void func_ov194_021c1e08(PokemonTrade3DWork *work);
-void func_ov194_021c1e38(PokemonTrade3DWork *work, int count);
-void func_ov194_021c1e74(PokemonTrade3DWork *work);
-void func_ov194_021c1ef0(PokemonTradeWork *wk);
-void func_ov194_021c1fb8(PokemonTradeWork *wk);
-void func_ov194_021c1fc0(PokemonTradeWork *wk);
-void func_ov194_021c2000(PokemonTradeWork *wk);
-void func_ov194_021c200c(PokemonTradeWork *wk, int sceneId);
-void func_ov194_021c2034(PokemonTradeWork *wk);
+void Poketrade3D_SetupParticleSystemsHigh(PokemonTrade3DWork *work);
+void Poketrade3D_ExitParticleManager(PokemonTrade3DWork *work, int count);
+void Poketrade3D_InitTradeParticleSet(PokemonTrade3DWork *work);
+void Poketrade3D_Init3DScene(PokemonTradeWork *wk);
+void Poketrade3D_Update3DScene(PokemonTradeWork *wk);
+void Poketrade3D_Delete3DScene(PokemonTradeWork *wk);
+void Poketrade3D_UploadCubeTextures(PokemonTradeWork *wk);
+void Poketrade3D_AddUnitAndInit(PokemonTradeWork *wk, int sceneId);
+void Poketrade3D_RemoveCurrentUnit(PokemonTradeWork *wk);
 // Adds the sprite of a Pokémon on a side, facing front or back, mirrored if asked and the species allows it
-void func_ov194_021c23a4(PokemonTradeWork *wk, int side, BOOL front, PartyPkm *pkm, BOOL mirror);
-void func_ov194_021c24ac(PokemonTradeWork *wk, int side, BOOL front, PartyPkm *pkm, BOOL mirror, BOOL a5);
-void func_ov194_021c24cc(PokemonTradeWork *wk, int side, BOOL front, PartyPkm *pkm, BOOL mirror);
-void func_ov194_021c24dc(PokemonTradeWork *wk, int side);
-void func_ov194_021c29b4(PokemonTradeWork *wk);
+void Poketrade3D_AddPokemonMcss(PokemonTradeWork *wk, int side, BOOL front, PartyPkm *pkm, BOOL mirror);
+void Poketrade3D_AddPokemonMcssFlipped(PokemonTradeWork *wk, int side, BOOL front, PartyPkm *pkm, BOOL mirror, BOOL a5);
+void Poketrade3D_AddPokemonMcssPlain(PokemonTradeWork *wk, int side, BOOL front, PartyPkm *pkm, BOOL mirror);
+void Poketrade3D_DeleteMcssSlot(PokemonTradeWork *wk, int side);
+void Poketrade3D_FadeTexturePalette(PokemonTradeWork *wk);
 
 #endif // POKEBW2_APP_POKEMON_TRADE_POKEMONTRADE_3D_H

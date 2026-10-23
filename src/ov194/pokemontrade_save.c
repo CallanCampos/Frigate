@@ -45,42 +45,42 @@
 // Writing the trade to the save: the copies of what it changes, kept to restore if the save fails, the trade itself,
 // the evolution it may start and the saving between the two machines
 
-static void func_ov194_021bead8(PokemonTradeWork *wk, int timer);
-static void func_ov194_021beae4(PokemonTradeWork *wk);
-static void func_ov194_021beb0c(PokemonTradeWork *wk);
-static void func_ov194_021beb24(PokemonTradeWork *wk);
-static void func_ov194_021bebf0(PokemonTradeWork *wk);
-static void func_ov194_021bece8(PokemonTradeWork *wk);
-static void func_ov194_021bed88(PokemonTradeWork *wk);
-static void func_ov194_021bedb0(PokemonTradeWork *wk);
-static void func_ov194_021bedd8(PokemonTradeWork *wk);
-static void func_ov194_021bedfc(PokemonTradeWork *wk);
+static void PoketradeSave_SetWaitCounter(PokemonTradeWork *wk, int timer);
+static void PoketradeSave_PopBgmFadeIn60(PokemonTradeWork *wk);
+static void PoketradeSave_PopBgm(PokemonTradeWork *wk);
+static void PoketradeSave_PopBgmFadeIn24(PokemonTradeWork *wk);
+static void PoketradeSave_StepEventMessage1(PokemonTradeWork *wk);
+static void PoketradeSave_StepEventMessage2(PokemonTradeWork *wk);
+static void PoketradeSave_StepWaitFade1(PokemonTradeWork *wk);
+static void PoketradeSave_StepWaitFade2(PokemonTradeWork *wk);
+static void PoketradeSave_StepWaitSyncRange(PokemonTradeWork *wk);
+static void PoketradeSave_SendTradeSummary(PokemonTradeWork *wk);
 static void *func_ov194_021bef14(GameData *gameData, HeapID heapId);
-static void func_ov194_021bef58(GameData *gameData, void *copy);
+static void PoketradeSave_RestoreSaveControl(GameData *gameData, void *copy);
 static void *func_ov194_021bef7c(GameData *gameData, HeapID heapId);
-static void func_ov194_021befbc(GameData *gameData, void *copy);
+static void PoketradeSave_RestoreZukan(GameData *gameData, void *copy);
 static void *func_ov194_021befdc(GameData *gameData, HeapID heapId);
-static void func_ov194_021bf01c(GameData *gameData, void *copy);
-static void func_ov194_021bf03c(void *work);
-static void func_ov194_021bf0c4(PokemonTradeWork *wk);
-static BOOL func_ov194_021bf1ec(PokemonTradeWork *wk, PokeParty *party, int slot);
-static void func_ov194_021bf278(PokemonTradeWork *wk);
-static void func_ov194_021bf6ec(PokemonTradeWork *wk);
-static void func_ov194_021bf75c(PokemonTradeWork *wk);
-static void func_ov194_021bf784(PokemonTradeWork *wk);
-static void func_ov194_021bf868(PokemonTradeWork *wk);
-static void func_ov194_021bf9a8(PokemonTradeWork *wk);
-static void func_ov194_021bf9c8(PokemonTradeWork *wk);
-static void func_ov194_021bf9ec(PokemonTradeWork *wk);
-static void func_ov194_021bfa48(PokemonTradeWork *wk);
-static void func_ov194_021bfa7c(PokemonTradeWork *wk);
-static void func_ov194_021bfac4(PokemonTradeWork *wk);
+static void PoketradeSave_RestoreBlock1F(GameData *gameData, void *copy);
+static void PoketradeSave_FreeBackups(void *work);
+static void PoketradeSave_RestoreBackups(PokemonTradeWork *wk);
+static BOOL PoketradeSave_ConsumePerapVoice(PokemonTradeWork *wk, PokeParty *party, int slot);
+static void PoketradeSave_ApplyTradeResult(PokemonTradeWork *wk);
+static void PoketradeSave_StepAfterTrade(PokemonTradeWork *wk);
+static void PoketradeSave_StepWaitEvolutionMessage(PokemonTradeWork *wk);
+static void PoketradeSave_StepRegisterReceived(PokemonTradeWork *wk);
+static void PoketradeSave_StepCheckEvolution(PokemonTradeWork *wk);
+static void PoketradeSave_StepBeginSyncRange24(PokemonTradeWork *wk);
+static void PoketradeSave_StepWaitSyncRange24(PokemonTradeWork *wk);
+static void PoketradeSave_StepStartSave(PokemonTradeWork *wk);
+static void PoketradeSave_StepWaitSaveDone(PokemonTradeWork *wk);
+static void PoketradeSave_StepBeginWipeOut(PokemonTradeWork *wk);
+static void PoketradeSave_StepRebuildSceneAfterWipe(PokemonTradeWork *wk);
 
-static void func_ov194_021bead8(PokemonTradeWork *wk, int timer) {
+static void PoketradeSave_SetWaitCounter(PokemonTradeWork *wk, int timer) {
     wk->timer = timer;
 }
 
-static void func_ov194_021beae4(PokemonTradeWork *wk) {
+static void PoketradeSave_PopBgmFadeIn60(PokemonTradeWork *wk) {
     if (wk->bgmCount != 0) {
         GFL_SndBGMPop();
         wk->bgmCount--;
@@ -89,12 +89,12 @@ static void func_ov194_021beae4(PokemonTradeWork *wk) {
     }
 }
 
-static void func_ov194_021beb0c(PokemonTradeWork *wk) {
+static void PoketradeSave_PopBgm(PokemonTradeWork *wk) {
     GFL_SndBGMPop();
     wk->bgmCount--;
 }
 
-static void func_ov194_021beb24(PokemonTradeWork *wk) {
+static void PoketradeSave_PopBgmFadeIn24(PokemonTradeWork *wk) {
     GFL_SndBGMPop();
     wk->bgmCount--;
     GFL_SndBGMSetPaused(FALSE);
@@ -102,33 +102,33 @@ static void func_ov194_021beb24(PokemonTradeWork *wk) {
 }
 
 // After the trade's animation
-void func_ov194_021beb48(PokemonTradeWork *wk) {
+void PoketradeSave_ResetClactAndBeginEvent(PokemonTradeWork *wk) {
     ClActUnit_Delete(wk->clactUnit);
     ClActSys_Delete();
-    func_ov194_021c2c64(wk);
+    Poketrade2D_InitClactSystemSub(wk);
     wk->clactUnit = ClActUnit_Create(340, 0, wk->heapId);
     if (wk->type == 5) {
-        func_ov194_021beae4(wk);
+        PoketradeSave_PopBgmFadeIn60(wk);
         wk->param->next = 3;
         PokemonTrade_SetState(wk, PokemonTrade_FadeOutToEnd);
         return;
     }
     if (wk->type == 6) {
-        func_ov194_021beae4(wk);
+        PoketradeSave_PopBgmFadeIn60(wk);
         wk->param->next = 3;
         PokemonTrade_SetState(wk, NULL);
         return;
     }
-    func_ov194_021bfedc(wk);
+    PoketradeSave_CreateMessageResources(wk);
     GFL_SndBGMSetPaused(TRUE);
     GFL_SndBGMPush();
     wk->bgmCount++;
     GFL_SndBGMFadeOut(6);
     wk->timer = 0;
-    PokemonTrade_SetState(wk, func_ov194_021bebf0);
+    PokemonTrade_SetState(wk, PoketradeSave_StepEventMessage1);
 }
 
-static void func_ov194_021bebf0(PokemonTradeWork *wk) {
+static void PoketradeSave_StepEventMessage1(PokemonTradeWork *wk) {
     PartyPkm *pkm;
     if (wk->timer >= 6) {
         GFL_SndBGMPlay(SEQ_ME_POKEGET, 0xffff);
@@ -151,15 +151,15 @@ static void func_ov194_021bebf0(PokemonTradeWork *wk) {
         copyVarForText(wk->wordSet, 0, wk->partnerInfo);
         GFL_WordSetFormatStrbuf(wk->wordSet, wk->strbuf, wk->strbufTemplate);
         wk->cursorImage = LoadCursorImageEndOfHeap(6, 15, 0, wk->heapId);
-        func_ov194_021bfdf8(wk, TRUE, 0);
-        func_ov194_021bead8(wk, 0);
+        PoketradeSave_OpenMessageWindowAtPos(wk, TRUE, 0);
+        PoketradeSave_SetWaitCounter(wk, 0);
         GFL_BGSysSetBGEnabled(6, TRUE);
         wk->timer = 0;
-        PokemonTrade_SetState(wk, func_ov194_021bece8);
+        PokemonTrade_SetState(wk, PoketradeSave_StepEventMessage2);
     }
 }
 
-static void func_ov194_021bece8(PokemonTradeWork *wk) {
+static void PoketradeSave_StepEventMessage2(PokemonTradeWork *wk) {
     PartyPkm *pkm;
     if (wk->timer >= 200) {
         if (PokemonTrade_IsNegoType(wk)) {
@@ -173,39 +173,39 @@ static void func_ov194_021bece8(PokemonTradeWork *wk) {
             if (wk->unk11EE != 0) {
                 GFL_MsgDataLoadStrbuf(wk->msgData, 133, wk->strbufTemplate);
                 GFL_WordSetFormatStrbuf(wk->wordSet, wk->strbuf, wk->strbufTemplate);
-                func_ov194_021bfdf8(wk, TRUE, 0);
+                PoketradeSave_OpenMessageWindowAtPos(wk, TRUE, 0);
             } else {
                 GFL_MsgDataLoadStrbuf(wk->msgData, 49, wk->strbufTemplate);
                 GFL_WordSetFormatStrbuf(wk->wordSet, wk->strbuf, wk->strbufTemplate);
-                func_ov194_021bfdf8(wk, TRUE, 0);
+                PoketradeSave_OpenMessageWindowAtPos(wk, TRUE, 0);
             }
         }
-        PokemonTrade_SetState(wk, func_ov194_021bed88);
+        PokemonTrade_SetState(wk, PoketradeSave_StepWaitFade1);
     }
 }
 
-static void func_ov194_021bed88(PokemonTradeWork *wk) {
+static void PoketradeSave_StepWaitFade1(PokemonTradeWork *wk) {
     if (wk->timer >= 270) {
-        func_ov194_021beb24(wk);
-        PokemonTrade_SetState(wk, func_ov194_021bedb0);
+        PoketradeSave_PopBgmFadeIn24(wk);
+        PokemonTrade_SetState(wk, PoketradeSave_StepWaitFade2);
     }
 }
 
-static void func_ov194_021bedb0(PokemonTradeWork *wk) {
+static void PoketradeSave_StepWaitFade2(PokemonTradeWork *wk) {
     if (wk->timer >= 420) {
-        func_ov194_021bead8(wk, 0);
-        PokemonTrade_SetState(wk, func_ov194_021bf6ec);
+        PoketradeSave_SetWaitCounter(wk, 0);
+        PokemonTrade_SetState(wk, PoketradeSave_StepAfterTrade);
     }
 }
 
-static void func_ov194_021bedd8(PokemonTradeWork *wk) {
+static void PoketradeSave_StepWaitSyncRange(PokemonTradeWork *wk) {
     if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), 0x17, 8)) {
-        PokemonTrade_SetState(wk, func_ov194_021bf784);
+        PokemonTrade_SetState(wk, PoketradeSave_StepRegisterReceived);
     }
 }
 
 // Sends this player's profile, with the Pokémon traded, for the other machine's records
-static void func_ov194_021bedfc(PokemonTradeWork *wk) {
+static void PoketradeSave_SendTradeSummary(PokemonTradeWork *wk) {
     UnityTowerVisitor profile;
     UnityTowerSurveySave *survey = getUnityTower_SurveySaveBlkAddrress(GameData_GetSaveControl(wk->gameData));
     PartyPkm *sent;
@@ -230,14 +230,14 @@ static void func_ov194_021bedfc(PokemonTradeWork *wk) {
     }
     profile.hobby = getPlayerSurveys(survey);
     profile.countryCount = UnityTower_GetCountryCount(survey);
-    profile.unk26_0 = func_02009d28(survey);
+    profile.unk26_0 = UnityTower_GetRatingLevel(survey);
     if (PokemonTrade_IsNetwork(wk)) {
         if (GFL_NetSendCommand(NetHandle_GetOwn(), TRADE_NET_CMD_UNK12, sizeof(profile), &profile)) {
             NetHandle_SendTimingPair(NetHandle_GetOwn(), 0x17, 8);
-            PokemonTrade_SetState(wk, func_ov194_021bedd8);
+            PokemonTrade_SetState(wk, PoketradeSave_StepWaitSyncRange);
         }
     } else {
-        PokemonTrade_SetState(wk, func_ov194_021bfa7c);
+        PokemonTrade_SetState(wk, PoketradeSave_StepBeginWipeOut);
     }
 }
 
@@ -271,7 +271,7 @@ static void *func_ov194_021bef14(GameData *gameData, HeapID heapId) {
     return copy;
 }
 
-static void func_ov194_021bef58(GameData *gameData, void *copy) {
+static void PoketradeSave_RestoreSaveControl(GameData *gameData, void *copy) {
     MI_CpuCopy8(copy, getUnityTower_SurveySaveBlkAddrress(GameData_GetSaveControl(gameData)),
                 UnityTower_GetSurveySaveSize());
     GFL_HeapFree(copy);
@@ -284,7 +284,7 @@ static void *func_ov194_021bef7c(GameData *gameData, HeapID heapId) {
     return copy;
 }
 
-static void func_ov194_021befbc(GameData *gameData, void *copy) {
+static void PoketradeSave_RestoreZukan(GameData *gameData, void *copy) {
     MI_CpuCopy8(copy, GameData_GetPokedex(gameData), getSizeofPokedexData());
     GFL_HeapFree(copy);
 }
@@ -296,13 +296,13 @@ static void *func_ov194_021befdc(GameData *gameData, HeapID heapId) {
     return copy;
 }
 
-static void func_ov194_021bf01c(GameData *gameData, void *copy) {
+static void PoketradeSave_RestoreBlock1F(GameData *gameData, void *copy) {
     MI_CpuCopy8(copy, GameData_GetPalPadFriendList(gameData), PalPadFriendList_GetSize());
     GFL_HeapFree(copy);
 }
 
 // Frees the copies once the save has gone through
-static void func_ov194_021bf03c(void *work) {
+static void PoketradeSave_FreeBackups(void *work) {
     PokemonTradeWork *wk = work;
     if (wk->backup.mail != NULL) {
         GFL_HeapFree(wk->backup.mail);
@@ -330,7 +330,7 @@ static void func_ov194_021bf03c(void *work) {
 }
 
 // Restores what the trade changed from the copies
-static void func_ov194_021bf0c4(PokemonTradeWork *wk) {
+static void PoketradeSave_RestoreBackups(PokemonTradeWork *wk) {
     void *copy;
     if ((copy = wk->backup.mail) != NULL) {
         GameData *gameData = wk->gameData;
@@ -347,13 +347,13 @@ static void func_ov194_021bf0c4(PokemonTradeWork *wk) {
         GFL_HeapFree(copy);
     }
     if (wk->backup.survey != NULL) {
-        func_ov194_021bef58(wk->gameData, wk->backup.survey);
+        PoketradeSave_RestoreSaveControl(wk->gameData, wk->backup.survey);
     }
     if (wk->backup.pokedex != NULL) {
-        func_ov194_021befbc(wk->gameData, wk->backup.pokedex);
+        PoketradeSave_RestoreZukan(wk->gameData, wk->backup.pokedex);
     }
     if (wk->backup.playersMet != NULL) {
-        func_ov194_021bf01c(wk->gameData, wk->backup.playersMet);
+        PoketradeSave_RestoreBlock1F(wk->gameData, wk->backup.playersMet);
     }
     if (wk->backup.party != NULL) {
         PokeParty_Copy(wk->backup.party, wk->party);
@@ -373,7 +373,7 @@ static void func_ov194_021bf0c4(PokemonTradeWork *wk) {
 }
 
 // Forgets the Chatot's cry if the only Chatot of the party is traded away
-static BOOL func_ov194_021bf1ec(PokemonTradeWork *wk, PokeParty *party, int slot) {
+static BOOL PoketradeSave_ConsumePerapVoice(PokemonTradeWork *wk, PokeParty *party, int slot) {
     int chatots = 0;
     int count, i;
     PerapVoice *chatter = getChatterDataAddress(wk->gameData);
@@ -397,7 +397,7 @@ static BOOL func_ov194_021bf1ec(PokemonTradeWork *wk, PokeParty *party, int slot
 }
 
 // Trades the Pokémon in the save, keeping copies of what changes
-static void func_ov194_021bf278(PokemonTradeWork *wk) {
+static void PoketradeSave_ApplyTradeResult(PokemonTradeWork *wk) {
     PartyPkm *pkm;
     GameRecords *records;
     if (!PokemonTrade_IsNegoType(wk)) {
@@ -410,7 +410,7 @@ static void func_ov194_021bf278(PokemonTradeWork *wk) {
         if (wk->param->box == BoxSaveAccessor_GetAvailableBoxCount(wk->boxes)) {
             wk->backup.party = PokeParty_Create(wk->heapId);
             PokeParty_Copy(wk->party, wk->backup.party);
-            wk->backup.chatot = func_ov194_021bf1ec(wk, wk->party, wk->param->slot);
+            wk->backup.chatot = PoketradeSave_ConsumePerapVoice(wk, wk->party, wk->param->slot);
         } else {
             u32 size;
             wk->backup.box = GFL_HeapAllocate(wk->heapId, getSizeofPokeBox(), FALSE, "pokemontrade_save.c", 640);
@@ -420,7 +420,7 @@ static void func_ov194_021bf278(PokemonTradeWork *wk) {
     } else {
         PokemonTradeParam *param = wk->param;
         if (param->box == BoxSaveAccessor_GetAvailableBoxCount(wk->boxes)) {
-            func_ov194_021bf1ec(wk, wk->party, param->slot);
+            PoketradeSave_ConsumePerapVoice(wk, wk->party, param->slot);
         }
         wk->unk11F7 = 1;
     }
@@ -539,30 +539,30 @@ static void func_ov194_021bf278(PokemonTradeWork *wk) {
     }
 }
 
-static void func_ov194_021bf6ec(PokemonTradeWork *wk) {
-    func_ov194_021c24dc(wk, 0);
-    func_ov194_021c24dc(wk, 1);
-    func_ov194_021c24dc(wk, 2);
-    func_ov194_021c24dc(wk, 3);
+static void PoketradeSave_StepAfterTrade(PokemonTradeWork *wk) {
+    Poketrade3D_DeleteMcssSlot(wk, 0);
+    Poketrade3D_DeleteMcssSlot(wk, 1);
+    Poketrade3D_DeleteMcssSlot(wk, 2);
+    Poketrade3D_DeleteMcssSlot(wk, 3);
     if (wk->type == 4 || wk->type == 7 || wk->type == 8) {
         wk->param->next = 3;
-        func_ov194_021beae4(wk);
+        PoketradeSave_PopBgmFadeIn60(wk);
         PokemonTrade_SetState(wk, PokemonTrade_FadeOutToEnd);
     } else if (wk->type == 1 || wk->type == 2 || wk->type == 3) {
-        PokemonTrade_SetState(wk, func_ov194_021bedfc);
+        PokemonTrade_SetState(wk, PoketradeSave_SendTradeSummary);
     } else {
-        PokemonTrade_SetState(wk, func_ov194_021bf784);
+        PokemonTrade_SetState(wk, PoketradeSave_StepRegisterReceived);
     }
 }
 
-static void func_ov194_021bf75c(PokemonTradeWork *wk) {
-    if (func_ov194_021c00b0(wk) && wk->timer > 180) {
-        PokemonTrade_SetState(wk, func_ov194_021bf868);
+static void PoketradeSave_StepWaitEvolutionMessage(PokemonTradeWork *wk) {
+    if (PoketradeSave_IsMessagePrintDone(wk) && wk->timer > 180) {
+        PokemonTrade_SetState(wk, PoketradeSave_StepCheckEvolution);
     }
 }
 
 // Puts the received Pokémon in the parameter's party, for the event
-static void func_ov194_021bf784(PokemonTradeWork *wk) {
+static void PoketradeSave_StepRegisterReceived(PokemonTradeWork *wk) {
     PartyPkm *pkm;
     int slot;
     if (PokemonTrade_IsNegoType(wk)) {
@@ -582,18 +582,18 @@ static void func_ov194_021bf784(PokemonTradeWork *wk) {
     if (wk->param->box != BoxSaveAccessor_GetAvailableBoxCount(wk->boxes) &&
         PML_ItemIsMail(PokeParty_GetParam(PokeParty_GetPkm(wk->param->party, 0), PKM_PARAM_ITEM, NULL))) {
         GFL_MsgDataLoadStrbuf(wk->msgData, 107, wk->strbuf);
-        func_ov194_021bfe28(wk);
-        PokemonTrade_SetState(wk, func_ov194_021bf75c);
+        PoketradeSave_OpenMessageWindowTop(wk);
+        PokemonTrade_SetState(wk, PoketradeSave_StepWaitEvolutionMessage);
         wk->timer = 0;
         return;
     }
-    PokemonTrade_SetState(wk, func_ov194_021bf868);
+    PokemonTrade_SetState(wk, PoketradeSave_StepCheckEvolution);
 }
 
 // Starts the received Pokémon's evolution if it evolves by trade
-static void func_ov194_021bf868(PokemonTradeWork *wk) {
+static void PoketradeSave_StepCheckEvolution(PokemonTradeWork *wk) {
     if (wk->gameData == NULL) {
-        PokemonTrade_SetState(wk, func_ov194_021bfa7c);
+        PokemonTrade_SetState(wk, PoketradeSave_StepBeginWipeOut);
     } else {
         if (wk->param != NULL) {
             PartyPkm *pkm;
@@ -614,71 +614,71 @@ static void func_ov194_021bf868(PokemonTradeWork *wk) {
                 wk->param->evolveSpecies = species;
                 wk->param->evolveMethod = method;
                 PokemonTrade_SetState(wk, PokemonTrade_FadeOutToEnd);
-                func_ov194_021beb0c(wk);
+                PoketradeSave_PopBgm(wk);
                 return;
             }
         }
         GFL_MsgDataLoadStrbuf(wk->msgData, 50, wk->strbuf);
-        func_ov194_021bfe28(wk);
-        func_ov194_021bfe34(wk);
-        PokemonTrade_SetState(wk, func_ov194_021bf9a8);
+        PoketradeSave_OpenMessageWindowTop(wk);
+        PoketradeSave_ShowTimeIcon(wk);
+        PokemonTrade_SetState(wk, PoketradeSave_StepBeginSyncRange24);
     }
-    func_ov194_021beae4(wk);
+    PoketradeSave_PopBgmFadeIn60(wk);
 }
 
-void func_ov194_021bf938(PokemonTradeWork *wk) {
-    func_ov194_021bfedc(wk);
+void PoketradeSave_StepSaveCancelNotice(PokemonTradeWork *wk) {
+    PoketradeSave_CreateMessageResources(wk);
     GFL_MsgDataLoadStrbuf(wk->msgData, 50, wk->strbuf);
     wk->cursorImage = LoadCursorImageEndOfHeap(6, 15, 0, wk->heapId);
-    func_ov194_021bfe28(wk);
-    func_ov194_021bfe34(wk);
-    func_ov194_021bead8(wk, 0);
+    PoketradeSave_OpenMessageWindowTop(wk);
+    PoketradeSave_ShowTimeIcon(wk);
+    PoketradeSave_SetWaitCounter(wk, 0);
     GFL_BGSysSetBGEnabled(6, TRUE);
     GFL_NetSetIconScreen(TRUE, wk->heapId);
     GFL_FadeSet(3, 16, 0, 2);
-    PokemonTrade_SetState(wk, func_ov194_021bf9a8);
+    PokemonTrade_SetState(wk, PoketradeSave_StepBeginSyncRange24);
 }
 
-static void func_ov194_021bf9a8(PokemonTradeWork *wk) {
+static void PoketradeSave_StepBeginSyncRange24(PokemonTradeWork *wk) {
     NetHandle_SendTimingPair(NetHandle_GetOwn(), 0x18, 8);
-    PokemonTrade_SetState(wk, func_ov194_021bf9c8);
+    PokemonTrade_SetState(wk, PoketradeSave_StepWaitSyncRange24);
 }
 
-static void func_ov194_021bf9c8(PokemonTradeWork *wk) {
+static void PoketradeSave_StepWaitSyncRange24(PokemonTradeWork *wk) {
     if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), 0x18, 8)) {
-        PokemonTrade_SetState(wk, func_ov194_021bf9ec);
+        PokemonTrade_SetState(wk, PoketradeSave_StepStartSave);
     }
 }
 
-static void func_ov194_021bf9ec(PokemonTradeWork *wk) {
-    if (func_ov194_021c00b0(wk)) {
+static void PoketradeSave_StepStartSave(PokemonTradeWork *wk) {
+    if (PoketradeSave_IsMessagePrintDone(wk)) {
         if (PokemonTrade_IsNetwork(wk)) {
-            func_ov194_021bf278(wk);
-            wk->netSave = NetSave_CreateWithCallback(wk->heapId, wk->gameData, func_ov194_021bf03c, wk);
-            PokemonTrade_SetState(wk, func_ov194_021bfa48);
+            PoketradeSave_ApplyTradeResult(wk);
+            wk->netSave = NetSave_CreateWithCallback(wk->heapId, wk->gameData, PoketradeSave_FreeBackups, wk);
+            PokemonTrade_SetState(wk, PoketradeSave_StepWaitSaveDone);
         } else {
-            PokemonTrade_SetState(wk, func_ov194_021bfa7c);
+            PokemonTrade_SetState(wk, PoketradeSave_StepBeginWipeOut);
         }
     }
 }
 
-static void func_ov194_021bfa48(PokemonTradeWork *wk) {
+static void PoketradeSave_StepWaitSaveDone(PokemonTradeWork *wk) {
     if (NetSave_Update(wk->netSave)) {
-        func_ov194_021bf0c4(wk);
+        PoketradeSave_RestoreBackups(wk);
         NetSave_Free(wk->netSave);
         wk->netSave = NULL;
-        PokemonTrade_SetState(wk, func_ov194_021bfa7c);
+        PokemonTrade_SetState(wk, PoketradeSave_StepBeginWipeOut);
     }
 }
 
-static void func_ov194_021bfa7c(PokemonTradeWork *wk) {
+static void PoketradeSave_StepBeginWipeOut(PokemonTradeWork *wk) {
     GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, 0, 6, 1, wk->heapId);
     wk->timer = 0;
     wk->unk11F7 = 0;
-    PokemonTrade_SetState(wk, func_ov194_021bfac4);
+    PokemonTrade_SetState(wk, PoketradeSave_StepRebuildSceneAfterWipe);
 }
 
-static void func_ov194_021bfac4(PokemonTradeWork *wk) {
+static void PoketradeSave_StepRebuildSceneAfterWipe(PokemonTradeWork *wk) {
     if (wk->timer >= 6 && GFL_WipeIsFinished()) {
         if (wk->cursorImage != 0) {
             // The library takes the position and size as u16s, which the prototype doesn't say
@@ -689,23 +689,23 @@ static void func_ov194_021bfac4(PokemonTradeWork *wk) {
         GFL_BGSysSetEnabledBGsB(0);
         ClActUnit_Delete(wk->clactUnit);
         wk->clactUnit = ClActUnit_Create(340, 0, wk->heapId);
-        func_ov194_021bfe70(wk);
-        func_ov194_021c45a8(wk);
-        func_ov194_021c41d0(wk);
-        func_ov194_021c45ec(0);
-        func_ov194_021c4484(wk);
-        func_ov194_021c46a4(wk);
-        func_ov194_021c3480(wk);
-        func_ov194_021c3224(wk);
-        func_ov194_021c2c84(wk);
-        func_ov194_021c2de8(wk);
-        func_ov194_021c2d78(wk);
-        func_ov194_021c200c(wk, 0);
+        PoketradeSave_CloseMessageWindow(wk);
+        Poketrade2D_ExitSubBgs(wk);
+        Poketrade2D_ExitSummaryBgs(wk);
+        Poketrade2D_SetDisplayConfig(0);
+        Poketrade2D_SetupSubBgs(wk);
+        Poketrade2D_RegisterIconSpriteResources(wk);
+        Poketrade2D_CreateBoxIconActors(wk);
+        Poketrade2D_CreateBoxWindows(wk);
+        Poketrade2D_LoadBackgroundGfx(wk);
+        Poketrade2D_CreateFontResource(wk);
+        Poketrade2D_LoadMainGfxAndMessageWindow(wk);
+        Poketrade3D_AddUnitAndInit(wk, 0);
         GFL_BGSysSetEnabledBGsA(0x1f);
         GFL_BGSysSetEnabledBGsB(0x1e);
         PokemonTrade_CreateTouchBar(wk);
         GFL_NetSetIconScreen(TRUE, wk->heapId);
         wk->checkCount = 0;
-        PokemonTrade_SetState(wk, func_ov194_021b9a38);
+        PokemonTrade_SetState(wk, PokemonTrade_StepResetForNewRound);
     }
 }

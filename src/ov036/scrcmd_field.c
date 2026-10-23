@@ -100,7 +100,7 @@ BOOL FieldScriptSubEventFinish_Subscreen(FinishScriptSubEventsWork *work, u32 *s
     return FALSE;
 }
 
-BOOL func_ov036_021c730c(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_CheckPmsWordPair(VM *vm, FieldScriptEnv *env) {
     u16 kind = ScriptReadAny(vm, env);
     u16 word1 = ScriptReadAny(vm, env);
     u16 word2 = ScriptReadAny(vm, env);

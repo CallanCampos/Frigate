@@ -1061,7 +1061,7 @@ void GimmickGate_GetRoamerZones(GimmickGateWork *work, GimmickGateZoneList *list
 
     save = SaveControl_GetEncountSave(GameData_GetSaveControl(work->gameData));
     GimmickGateZoneList_Clear(list);
-    if (func_ov012_02159218(save)) {
+    if (EncountSave_HasActiveEntry(save)) {
         version = getGameVersion();
         switch (version) {
         case 0x16:

@@ -184,14 +184,14 @@ void WbtBattle_ShowPartyList(WbtPartyList *list) {
         GFL_MsgDataLoadStrbuf(list->msgData, message, list->altStrBuf);
         setPartyPokemonSpeciesNameToStrbuf(list->wordSet, 0, pkm);
         GFL_WordSetFormatStrbuf(list->wordSet, list->mainStrBuf, list->altStrBuf);
-        func_ov036_02187c4c(list->window, 0, 14 * i, list->mainStrBuf);
+        MsgBGPrinter_MsgWinPrintStr(list->window, 0, 14 * i, list->mainStrBuf);
     }
-    GFL_BGSysLoadScr(BmpWin_GetBGIndex(func_ov036_02187c9c(list->window)));
+    GFL_BGSysLoadScr(BmpWin_GetBGIndex(MsgBGPrinter_GetMsgWinBmpWin(list->window)));
 }
 
 void WbtBattle_ClosePartyList(WbtPartyList *list) {
-    func_ov036_02187c7c(list->window);
-    func_ov036_02187c1c(list->window);
+    MsgBGPrinter_ClearMsgWin(list->window);
+    MsgBGPrinter_DeleteMsgWin(list->window);
     GFL_BGSysLoadScr(1);
 }
 

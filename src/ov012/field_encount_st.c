@@ -58,7 +58,7 @@ void func_ov012_0215917c(GameData *gameData, Field *field) {
     u32 terrain;
 
     player = Field_GetPlayer(field);
-    func_ov036_021a203c(system, system->effectEncountState);
+    EffectEncount_LoadSetting(system, system->effectEncountState);
     state = GameData_GetEncountState(gameData);
     terrain = FieldPlayer_GetTileTypeUnder(player);
     EncountState_SetTerrain(state, terrain);
@@ -102,24 +102,24 @@ u16 EncountSave_GetRoamingPkmZone(EncountSave *save, u8 slot) {
     return ROAMING_POKEMON_ZONES[clock];
 }
 
-u32 func_ov012_02159218(EncountSave *save) {
+u32 EncountSave_HasActiveEntry(EncountSave *save) {
     return 0;
 }
 
-void func_ov012_0215921c(GameData *gameData, u8 slot) {
+void EncountSave_SpawnEntry(GameData *gameData, u8 slot) {
     // Nothing reads these groups, so which of the empty functions held them is a guess
     static const RoamingZoneGroup sRoamingZoneGroups[5] = {
         { 3, { 0, 1, 15 } }, { 3, { 2, 3, 14 } }, { 3, { 4, 5, 6 } }, { 3, { 7, 8, 9 } }, { 4, { 10, 11, 12, 13 } },
     };
 }
 
-void func_ov012_02159220(GameData *gameData) {
+void EncountSave_SpawnPendingEntries(GameData *gameData) {
 }
 
 u32 GetDefaultWeatherValue(GameData *gameData, u16 zoneId) {
     return WEATHER_NONE;
 }
 
-BOOL func_ov012_0215922c(GameData *gameData) {
+BOOL EncountSave_IsAnyEntryActive(GameData *gameData) {
     return FALSE;
 }

@@ -35,10 +35,10 @@ typedef struct {
 } ShadowTask;
 
 static void func_ov036_021a3b9c(FieldEffectShadow *shadow);
-static void func_ov036_021a3bdc(FieldEffectShadow *shadow);
-static void func_ov036_021a3c20(FieldEffectTask *task, void *work);
-static void func_ov036_021a3cb4(FieldEffectTask *task, void *work);
-static void func_ov036_021a3cd4(FieldEffectTask *task, void *work);
+static void FldeffShadow_DeleteSlot(FieldEffectShadow *shadow);
+static void FldeffShadow_Init(FieldEffectTask *task, void *work);
+static void FldeffShadow_Exit(FieldEffectTask *task, void *work);
+static void FldeffShadow_Update(FieldEffectTask *task, void *work);
 static void func_ov036_021a3d28(FieldEffectTask *task, void *work);
 
 static const VecFx32 SHADOW_SCALE = { FX32_ONE, FX32_ONE, FX32_CONST(0.75) };
@@ -46,9 +46,9 @@ static const VecFx32 SHADOW_SCALE = { FX32_ONE, FX32_ONE, FX32_CONST(0.75) };
 // clang-format off
 static const FieldEffectTaskVTable SHADOW_TASK_VTABLE = {
     sizeof(ShadowTask),
-    func_ov036_021a3c20,
-    func_ov036_021a3cb4,
-    func_ov036_021a3cd4,
+    FldeffShadow_Init,
+    FldeffShadow_Exit,
+    FldeffShadow_Update,
     func_ov036_021a3d28,
 };
 
@@ -69,7 +69,7 @@ void *FieldEffect_Shadow_Create(FieldEffects *effects, HeapID heapId) {
 }
 
 void FieldEffect_Shadow_Free(FieldEffects *effects, void *data) {
-    func_ov036_021a3bdc(data);
+    FldeffShadow_DeleteSlot(data);
     GFL_HeapFree(data);
 }
 
@@ -87,12 +87,12 @@ static void func_ov036_021a3b9c(FieldEffectShadow *shadow) {
     shadow->matIndex = BlActSys_ExecMatLoadRequests(shadow->blact, &request, 1);
 }
 
-static void func_ov036_021a3bdc(FieldEffectShadow *shadow) {
+static void FldeffShadow_DeleteSlot(FieldEffectShadow *shadow) {
     BlActSys_FreeMaterials(shadow->blact, shadow->matIndex, 1);
 }
 
 // Give the actor a shadow
-void func_ov036_021a3bf0(FieldActor *actor, FieldEffects *effects) {
+void FldeffShadow_Start(FieldActor *actor, FieldEffects *effects) {
     ShadowTaskParams params;
 
     params.shadow = FieldEffects_GetHandleData(effects, 0);
@@ -100,9 +100,9 @@ void func_ov036_021a3bf0(FieldActor *actor, FieldEffects *effects) {
     FieldEffects_TCBCreate(effects, &SHADOW_TASK_VTABLE, NULL, 0, &params, 0);
 }
 
-static void func_ov036_021a3c20(FieldEffectTask *task, void *work) {
+static void FldeffShadow_Init(FieldEffectTask *task, void *work) {
     ShadowTask *shadowTask = work;
-    const ShadowTaskParams *params = func_ov036_021a3ac8(task);
+    const ShadowTaskParams *params = FieldEffects_GetObjectParam(task);
     BlActActorRequest request;
     u8 polygonId;
 
@@ -121,15 +121,15 @@ static void func_ov036_021a3c20(FieldEffectTask *task, void *work) {
     shadowTask->actorIndex =
         BlActSys_ExecActorRequests(shadowTask->shadow->blact, shadowTask->shadow->matIndex, &request, 1, 3);
     if (shadowTask->actorIndex == 0xffff) {
-        func_ov036_021a3a70(task);
+        FieldEffects_DeleteObject(task);
         return;
     }
     polygonId = 2;
     BlActScene_SetActorPolygonId(shadowTask->shadow->scene, shadowTask->actorIndex, &polygonId);
-    func_ov036_021a3a94(task);
+    FieldEffects_UpdateObject(task);
 }
 
-static void func_ov036_021a3cb4(FieldEffectTask *task, void *work) {
+static void FldeffShadow_Exit(FieldEffectTask *task, void *work) {
     ShadowTask *shadowTask = work;
 
     if (shadowTask->actorIndex != 0xffff) {
@@ -138,15 +138,15 @@ static void func_ov036_021a3cb4(FieldEffectTask *task, void *work) {
 }
 
 // End with the actor; hide while the actor is hidden or flagged so
-static void func_ov036_021a3cd4(FieldEffectTask *task, void *work) {
+static void FldeffShadow_Update(FieldEffectTask *task, void *work) {
     ShadowTask *shadowTask = work;
 
     if (!FldAct_CheckIdentity(shadowTask->actor, &shadowTask->identity)) {
-        func_ov036_021a3a70(task);
+        FieldEffects_DeleteObject(task);
         return;
     }
     if (!FldActSys_AreShadowsEnabled(GetActorMModelSystem(shadowTask->actor))) {
-        func_ov036_021a3a70(task);
+        FieldEffects_DeleteObject(task);
         return;
     }
     if (IsActorHidden(shadowTask->actor) == TRUE || CheckActorMovementFlag(shadowTask->actor, 0x8000)) {

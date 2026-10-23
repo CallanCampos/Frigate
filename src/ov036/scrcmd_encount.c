@@ -83,17 +83,17 @@ BOOL s00BC_PhenomenonGetItemID(VM *vm, FieldScriptEnv *env) {
     Field *field = GSYS_GetField(FieldScriptEnv_GetGameSystem(env));
     u16 *result = ScriptReadVar(vm, env);
 
-    *result = func_ov036_021a23f0(Field_GetEncountSystem(field));
+    *result = EffectEncount_GetItemId(Field_GetEncountSystem(field));
     return FALSE;
 }
 
-BOOL func_ov036_021ae4f4(VM *vm, FieldScriptEnv *env) {
+BOOL ScrcmdProcFld_SpawnMovePokemonIfInactive(VM *vm, FieldScriptEnv *env) {
     GameData *gameData = FieldScriptEnv_GetGameData(env);
     EncountSave *save = SaveControl_GetEncountSave(GameData_GetSaveControl(gameData));
     u8 slot = ScriptReadAny(vm, env);
 
     if (EncountSave_GetRoamingPkmStatus(save, slot) == FALSE) {
-        func_ov012_0215921c(gameData, slot);
+        EncountSave_SpawnEntry(gameData, slot);
     }
     return FALSE;
 }

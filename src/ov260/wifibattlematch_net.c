@@ -495,7 +495,7 @@ u32 WifiBattleMatchNet_CheckError(WifiBattleMatchNet *p_wk, u32 a1, u32 a2) {
 
     if (GFL_NetIsInitialized()) {
         if (GFL_NetErrCheck()) {
-            func_02042e94(0);
+            GflNet_SetAutoExit(0);
             GFL_NetSetDisconnectError(0);
             GFL_SndStop();
             if (GameData_CheckEventsPaused(p_wk->gameData)) {
@@ -545,7 +545,7 @@ u32 WifiBattleMatchNet_CheckError(WifiBattleMatchNet *p_wk, u32 a1, u32 a2) {
             break;
         }
         if (result != WBM_RESULT_OK) {
-            func_02042e94(0);
+            GflNet_SetAutoExit(0);
             GFL_NetSetDisconnectError(0);
             GFL_SndStop();
             if (GameData_CheckEventsPaused(p_wk->gameData)) {
@@ -695,7 +695,7 @@ u32 WifiBattleMatchNet_MatchMain(WifiBattleMatchNet *p_wk) {
         case 1:
             p_wk->matchTimer = 0;
             p_wk->matchState = WBM_MATCH_SEQ_NEGOTIATE;
-            func_02042e94(1);
+            GflNet_SetAutoExit(1);
             GFL_NetSetDisconnectError(1);
             break;
         default:
@@ -762,7 +762,7 @@ u32 WifiBattleMatchNet_MatchMain(WifiBattleMatchNet *p_wk) {
 }
 
 void WifiBattleMatchNet_CancelMatch(WifiBattleMatchNet *p_wk) {
-    func_02042e94(0);
+    GflNet_SetAutoExit(0);
     GFL_NetSetDisconnectError(0);
     NetState_WifiDisconnect(TRUE);
 }
@@ -786,7 +786,7 @@ BOOL WifiBattleMatchNet_EndMain(WifiBattleMatchNet *p_wk) {
         }
         break;
     case WBM_END_SEQ_STOP_ERRORS:
-        func_02042e94(0);
+        GflNet_SetAutoExit(0);
         GFL_NetSetDisconnectError(0);
         p_wk->counter = 0;
         p_wk->phaseB++;

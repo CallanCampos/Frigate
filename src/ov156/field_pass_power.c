@@ -196,19 +196,19 @@ static GameEventReturnCode EventPassPowerList_Callback(GameEvent *event, u32 *st
 
     switch (*state) {
     case 0:
-        work->msgWindow = func_ov036_02188498(work->msgBGSys, work->msgData, 19);
-        func_ov036_02188538(work->msgWindow, 0, 0, 3);
+        work->msgWindow = MsgBGPrinter_CreateInfoSysWin(work->msgBGSys, work->msgData, 19);
+        MsgBGPrinter_InfoSysWinPrintMsg(work->msgWindow, 0, 0, 3);
         (*state)++;
         break;
     case 1:
-        if (func_ov036_021885bc(work->msgWindow)) {
-            func_ov036_02188504(work->msgWindow);
+        if (MsgBGPrinter_InfoSysWinMain(work->msgWindow)) {
+            MsgBGPrinter_DeleteInfoSysWin(work->msgWindow);
             (*state)++;
         }
         break;
     case 2:
-        work->listWindow = func_ov036_02187ca0(work->msgBGSys, work->msgData, 4, 1, 24, 22);
-        func_ov036_02187d38(work->listWindow);
+        work->listWindow = MsgBGPrinter_CreateInfoMsgWin(work->msgBGSys, work->msgData, 4, 1, 24, 22);
+        MsgBGPrinter_ClearInfoMsgWin(work->listWindow);
         PassPowerList_Print(work);
         (*state)++;
         break;
@@ -218,8 +218,8 @@ static GameEventReturnCode EventPassPowerList_Callback(GameEvent *event, u32 *st
         }
         break;
     default:
-        func_ov036_02187d38(work->listWindow);
-        func_ov036_02187d10(work->listWindow);
+        MsgBGPrinter_ClearInfoMsgWin(work->listWindow);
+        MsgBGPrinter_DeleteInfoMsgWin(work->listWindow);
         PassPowerList_Exit(work);
         return GAMEEVENT_DONE;
     }
@@ -232,7 +232,7 @@ static void PassPowerList_PrintRow(PassPowerListWork *work, StrBuf *format, u8 p
     WordSetNumber(work->wordSet, 1, seconds / 60, 2, NUM_PAD_SPACE, TRUE);
     WordSetNumber(work->wordSet, 2, seconds % 60, 2, NUM_PAD_ZERO, TRUE);
     GFL_WordSetFormatStrbuf(work->wordSet, work->formatted, format);
-    func_ov036_02187d28(work->listWindow, 0, row * 16, work->formatted);
+    MsgBGPrinter_InfoMsgWinPrintStr(work->listWindow, 0, row * 16, work->formatted);
 }
 
 // Prints the pass powers in use, the one with the least time left first
@@ -249,7 +249,7 @@ static void PassPowerList_Print(PassPowerListWork *work) {
     // The High Link save is fetched and not used
     getHighLinkBlockAddress(GameData_GetSaveControl(work->gameData));
     GFL_MsgDataLoadStrbuf(work->msgData, Global10435_Text_ActivePassPower, work->strbuf);
-    func_ov036_02187d28(work->listWindow, 0, 0, work->strbuf);
+    MsgBGPrinter_InfoMsgWinPrintStr(work->listWindow, 0, 0, work->strbuf);
     GFL_MsgDataLoadStrbuf(work->msgData, Global10435_Text_Empty_3, work->strbuf);
 
     for (effect = 0, count = 0; effect < PASS_POWER_EFFECT_COUNT; effect++) {

@@ -1720,7 +1720,7 @@ u32 CalcBattleResult(BtlServerFlow *flow) {
         if (alive[otherSide] == 0 && alive[side] != 0) {
             return BTL_RESULT_VICTORY;
         }
-        if (!func_ov167_0219de6c(flow->mainModule)) {
+        if (!BtlMain_IsCommTrainerBattle(flow->mainModule)) {
             return BTL_RESULT_DRAW;
         }
         if (alive[0] == 0) {

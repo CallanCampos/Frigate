@@ -362,7 +362,7 @@ static GameEventReturnCode SurveyTextEvent_Run(GameEvent *event, u32 *state, voi
         (*state)++;
         break;
     case 1:
-        if (func_ov036_02187c70(work->window) == 1)
+        if (MsgBGPrinter_IsMsgWinTransDone(work->window) == 1)
             (*state)++;
         break;
     case 2:
@@ -434,7 +434,7 @@ void SurveyTextWork_CreateWindow(SurveyTextWork *work) {
 }
 
 void SurveyTextWork_DeleteWindow(SurveyTextWork *work) {
-    func_ov036_02187c1c(work->window);
+    MsgBGPrinter_DeleteMsgWin(work->window);
     work->window = NULL;
 }
 
@@ -460,8 +460,8 @@ void SurveyTextWork_PrintRankMessage(SurveyTextWork *work) {
     source = GFL_StrBufCreate(256, work->heapId);
     formatted = GFL_StrBufCreate(256, work->heapId);
     kind = SurveyTextWork_GetRank(work);
-    num1 = func_ov027_02170a4c(work);
-    num2 = func_ov027_02170a60(work);
+    num1 = SurveyTextWork_GetReportNumberA(work);
+    num2 = SurveyTextWork_GetReportNumberB(work);
     msgId = GetTrainerCardTextMSGID(kind);
     player = GetGameDataPlayerInfo(work->gameData);
     copyVarForText(work->wordSet, 0, player);
@@ -470,27 +470,27 @@ void SurveyTextWork_PrintRankMessage(SurveyTextWork *work) {
     GFL_MsgDataLoadStrbuf(work->message, msgId, source);
     GFL_WordSetFormatStrbuf(work->wordSet, formatted, source);
     GFL_WordSetClearAll(work->wordSet);
-    func_ov036_02187c4c(work->window, 8, 0, formatted);
-    window = func_ov036_02187c9c(work->window);
+    MsgBGPrinter_MsgWinPrintStr(work->window, 8, 0, formatted);
+    window = MsgBGPrinter_GetMsgWinBmpWin(work->window);
     GFL_BGSysLoadScr(BmpWin_GetBGIndex(window));
     GFL_StrBufFree(source);
     GFL_StrBufFree(formatted);
 }
 
 void SurveyTextWork_ClearWindow(SurveyTextWork *work) {
-    func_ov036_02187c7c(work->window);
-    GFL_BGSysLoadScr(BmpWin_GetBGIndex(func_ov036_02187c9c(work->window)));
+    MsgBGPrinter_ClearMsgWin(work->window);
+    GFL_BGSysLoadScr(BmpWin_GetBGIndex(MsgBGPrinter_GetMsgWinBmpWin(work->window)));
 }
 
 u32 SurveyTextWork_GetRank(SurveyTextWork *work) {
     return TrainerGameInfo_GetSurveyRank(getTrainerCardData_wrapper(GameData_GetSaveControl_(work->gameData)));
 }
 
-u32 func_ov027_02170a4c(SurveyTextWork *work) {
+u32 SurveyTextWork_GetReportNumberA(SurveyTextWork *work) {
     return TrainerCard_GetPasserbyCount(getTrainerCardData_wrapper(GameData_GetSaveControl_(work->gameData)));
 }
 
-u32 func_ov027_02170a60(SurveyTextWork *work) {
+u32 SurveyTextWork_GetReportNumberB(SurveyTextWork *work) {
     return TrainerCard_GetThankedCount(getTrainerCardData_wrapper(GameData_GetSaveControl_(work->gameData)));
 }
 

@@ -331,10 +331,10 @@ BOOL GFL_NetIsTimingRecv(NetHandle *handle, u16 timing);
 void GFL_NetSetGameCommandBase(u8 gameCommandBase, u8 unused);
 u8 GFL_NetGetGameCommandBase(void);
 // Whether the net game command base is one of the battle kinds
-BOOL func_02011844(void);
+BOOL GflNet_IsWifiGameKind(void);
 int GFL_NetGetUserData(void);
 int GFL_NetGetFriendData(void);
-u8 func_02042d80(void);
+u8 GflNet_GetFriendListNum(void);
 void GFL_NetSetMPSendEnabled(BOOL a0);
 // The game's work, which the callbacks get
 void *GFL_NetGetWork(void);
@@ -344,11 +344,11 @@ int GFL_NetGetMaxConnectNum(void);
 int GFL_NetGetMaxSendSize(void);
 u16 GFL_NetGetParentPacketSize(void);
 void GFL_NetNotifyChildConnect(void);
-void func_02042e30(int a0);
+void GflNet_CallErrorStateFunc(int a0);
 void GFL_NetNotifyError(int a0);
 GFLNetSys *GFL_NetGetSys(void);
 GFLNetInitData *GFL_NetGetInitData(void);
-void func_02042e94(u8 a0);
+void GflNet_SetAutoExit(u8 a0);
 void GFL_NetSetDisconnectError(BOOL a0);
 void *allocConfigDSSoftwareFeature(HeapID heapId, u32 size, const char *file, u16 line);
 void GFL_NetFreeAligned32(void *ptr);

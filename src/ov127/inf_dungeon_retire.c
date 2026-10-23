@@ -155,7 +155,7 @@ void InfDungeonRetire_Update(InfDungeonRetire *work) {
         break;
     case 3:
         if (InfDungeonRetire_GetCursorPos(work) == 0) {
-            func_ov036_021984f0(work->subscreen, work->heapId);
+            FieldSubscreen_ResumeField(work->subscreen, work->heapId);
             FieldSubscreen_SaveReturnSubscreen(work->subscreen, 0xf);
         } else {
             FieldSubscreen_SaveReturnSubscreen(work->subscreen, 0x10);
@@ -181,7 +181,7 @@ static void InfDungeonRetire_Init(InfDungeonRetire *work, HeapID heapId) {
     InfDungeonRetire_InitMenuRes(work, heapId);
     InfDungeonRetire_InitWindow(work, heapId);
     GFL_NetSetIconScreen(FALSE, heapId);
-    func_ov036_02198884(work->subscreen, heapId);
+    FieldSubscreen_LoadBackdrop(work->subscreen, heapId);
 }
 
 static void InfDungeonRetire_InitBGs(InfDungeonRetire *work, HeapID heapId) {

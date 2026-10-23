@@ -163,7 +163,7 @@ void GFLAppUpdate(void) {
     RTCCache_Update();
 }
 
-void func_02005668(void) {
+void GflUse_NoOpFrameHook(void) {
 }
 
 void GFL_HBlankTCBUpdate(void) {

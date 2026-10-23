@@ -41,15 +41,15 @@ struct ChatotEventWork {
     u32 recorded;
 };
 
-GameEvent *func_ov033_02178ca8(GameSystem *gsys, Field *field, u8 partyIndex);
-GameEventReturnCode func_ov033_02178d10(GameEvent *event, u32 *state, void *data);
-void func_ov033_02178fcc(u32 result, u32 *done);
-void func_ov033_02178fd4(ChatotEventWork *work);
-void func_ov033_02178fe8(ChatotEventWork *work);
-void func_ov033_02178ffc(ChatotEventWork *work);
-void func_ov033_021790a0(ChatotEventWork *work);
-u32 func_ov033_021790c4(ChatotEventWork *work);
-void func_ov033_02179140(ChatotEventWork *work);
-void func_ov033_021791a8(ChatotEventWork *work);
+GameEvent *EventPerapRecord_Create(GameSystem *gsys, Field *field, u8 partyIndex);
+GameEventReturnCode EventPerapRecord_Main(GameEvent *event, u32 *state, void *data);
+void EventPerapRecord_OnRecorded(u32 result, u32 *done);
+void EventPerapRecord_PauseMmdls(ChatotEventWork *work);
+void EventPerapRecord_ResumeMmdls(ChatotEventWork *work);
+void EventPerapRecord_CreatePokeIcon(ChatotEventWork *work);
+void EventPerapRecord_DeletePokeIcon(ChatotEventWork *work);
+u32 EventPerapRecord_HopPokeIcon(ChatotEventWork *work);
+void EventPerapRecord_SetupWindow(ChatotEventWork *work);
+void EventPerapRecord_Cleanup(ChatotEventWork *work);
 
 #endif // POKEBW2_FIELD_EVENT_CHATOT_H

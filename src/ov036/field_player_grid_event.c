@@ -79,16 +79,16 @@ static void FieldSurfTCB_Callback(TCB *tcb, void *work);
 static void FieldWaterfallTCB_Callback(TCB *tcb, void *work);
 static void Waterfall_SetShakeOffset(FieldActor *actor, const VecFx32 *shake);
 static BOOL func_ov036_021bae8c(WaterfallTCB *waterfall);
-static BOOL func_ov036_021bafe0(WaterfallTCB *waterfall);
-static BOOL func_ov036_021bb06c(WaterfallTCB *waterfall);
-static BOOL func_ov036_021bb0f0(WaterfallTCB *waterfall);
-static BOOL func_ov036_021bb190(WaterfallTCB *waterfall);
+static BOOL FieldPlayerGrid_JumpUpApproach(WaterfallTCB *waterfall);
+static BOOL FieldPlayerGrid_JumpUpRise(WaterfallTCB *waterfall);
+static BOOL FieldPlayerGrid_JumpUpArc(WaterfallTCB *waterfall);
+static BOOL FieldPlayerGrid_JumpUpLand(WaterfallTCB *waterfall);
 static BOOL func_ov036_021bb1e4(WaterfallTCB *waterfall);
-static void func_ov036_021bb220(WaterfallTCB *waterfall);
+static void FieldPlayerGrid_UpdateJumpDown(WaterfallTCB *waterfall);
 
 static BOOL (*const WATERFALL_UP_HANDLERS[6])(WaterfallTCB *) = {
-    func_ov036_021bae8c, func_ov036_021bafe0, func_ov036_021bb06c,
-    func_ov036_021bb0f0, func_ov036_021bb190, func_ov036_021bb1e4,
+    func_ov036_021bae8c,       FieldPlayerGrid_JumpUpApproach, FieldPlayerGrid_JumpUpRise,
+    FieldPlayerGrid_JumpUpArc, FieldPlayerGrid_JumpUpLand,     func_ov036_021bb1e4,
 };
 
 GameEvent *FieldPlayerGrid_CheckObjContactEvent(FieldPlayerGrid *grid, u32 pressedKeys, u32 heldKeys, u32 flags) {
@@ -216,7 +216,7 @@ static GameEventReturnCode EventStrengthRockPush_Callback(GameEvent *event, u32 
         if (!IsAllActorAcmdFinished(push->rock)) {
             break;
         }
-        if (!IsAllActorAcmdFinished(push->player) && !func_ov036_0219ca30(push->grid)) {
+        if (!IsAllActorAcmdFinished(push->player) && !FieldPlayerGrid_StopTurnOrBlocked(push->grid)) {
             break;
         }
         FldAct_SetAcmd(push->rock, GetAcmdForDir(push->dir, 8));
@@ -297,7 +297,7 @@ TCB *FieldSurfTCB_Create(FieldPlayer *player, u32 direction, u32 tileType, HeapI
     surf->field = FieldPlayer_GetField(player);
     surf->dir = direction;
     surf->player = player;
-    surf->grid = func_ov036_0219ad48(player);
+    surf->grid = FieldPlayer_GetGrid(player);
     if (MapTile_IsSurfEdge(GetTileClass(tileType)) == TRUE) {
         surf->onSurfEdge = TRUE;
     }
@@ -344,14 +344,14 @@ static void FieldSurfTCB_Callback(TCB *tcb, void *work) {
         height = 0;
         GetHeightFromMap(actor, &pos, &height);
         pos.y = height;
-        task = func_ov036_021a4484(Field_GetFieldEffects(surf->field), dir, &pos, actor, 0);
-        func_ov036_0219a5b8(surf->player, task);
+        task = FldeffNamipoke_Start(Field_GetFieldEffects(surf->field), dir, &pos, actor, 0);
+        FieldPlayer_SetRideEffect(surf->player, task);
         encounter = Field_GetEncountSystem(surf->field);
         gridPos[0] = HEIGHT_TO_GRID(pos.x);
         gridPos[1] = HEIGHT_TO_GRID(pos.y);
         gridPos[2] = HEIGHT_TO_GRID(pos.z);
         if (EncountState_CheckSpecialEncountPos(encounter, gridPos)) {
-            func_ov036_021a23c4(encounter, 1);
+            EffectEncount_SetEffectFlag(encounter, 1);
         }
         surf->state++;
         break;
@@ -375,13 +375,13 @@ static void FieldSurfTCB_Callback(TCB *tcb, void *work) {
             break;
         }
         FldAct_EndAcmd(actor);
-        func_ov036_021a4504(func_ov036_0219a5c4(surf->player), 1);
+        FldeffNamipoke_SetFollowMode(FieldPlayer_GetRideEffect(surf->player), 1);
         FieldPlayer_SetSpecialSeq(surf->player, 4);
         surf->state++;
         // fall through
     case 4:
-        if (func_ov036_0219a580(surf->player) == TRUE) {
-            func_ov036_0219ac0c(surf->player);
+        if (FieldPlayer_StepFormChange(surf->player) == TRUE) {
+            FieldPlayer_SetGridHopLanded(surf->player);
             surf->finished = TRUE;
             surf->state++;
         }
@@ -410,7 +410,7 @@ TCB *FieldWaterfallTCB_Create(FieldPlayer *player, u32 direction, u32 param, Hea
     if (height > pos.y) {
         waterfall->up = TRUE;
     }
-    waterfall->grid = func_ov036_0219ad48(waterfall->player);
+    waterfall->grid = FieldPlayer_GetGrid(waterfall->player);
     return GFL_TCBMgrAddTask(Field_GetTCBMgr(waterfall->field), FieldWaterfallTCB_Callback, waterfall, 0);
 }
 
@@ -459,8 +459,8 @@ static BOOL func_ov036_021bae8c(WaterfallTCB *waterfall) {
     waterfall->stepZ = (posB.z - pos.z) / 2 / 16;
     waterfall->stepY = FX32_CONST(6);
     waterfall->shake.y = FX32_ONE;
-    task = func_ov036_0219a5c4(waterfall->player);
-    func_ov036_021a4504(task, 2);
+    task = FieldPlayer_GetRideEffect(waterfall->player);
+    FldeffNamipoke_SetFollowMode(task, 2);
     kind = 1;
     if ((u16)(waterfall->dir + 0xfffe) <= 1) {
         kind = 3;
@@ -468,14 +468,14 @@ static BOOL func_ov036_021bae8c(WaterfallTCB *waterfall) {
     effects = Field_GetFieldEffects(waterfall->field);
     effectId = 8;
     FieldEffects_Load(effects, &effectId, 1);
-    waterfall->splash = func_ov036_021a4eb0(effects, kind, task);
+    waterfall->splash = FldeffNamipokeSplash_StartOnEffect(effects, kind, task);
     FieldCameraZoomTCB_Create(waterfall->field, 16, FX32_CONST(32));
     GFL_SndSEPlay(SEQ_SE_FLD_81);
     waterfall->state++;
     return TRUE;
 }
 
-static BOOL func_ov036_021bafe0(WaterfallTCB *waterfall) {
+static BOOL FieldPlayerGrid_JumpUpApproach(WaterfallTCB *waterfall) {
     FieldActor *actor = FieldPlayer_GetActor(waterfall->player);
     VecFx32 pos;
     FieldEffectTask *task;
@@ -491,19 +491,19 @@ static BOOL func_ov036_021bafe0(WaterfallTCB *waterfall) {
         waterfall->counter = 0;
         waterfall->shake.y = 0;
         waterfall->state++;
-        func_ov036_021a3a70(waterfall->splash);
-        task = func_ov036_0219a5c4(waterfall->player);
+        FieldEffects_DeleteObject(waterfall->splash);
+        task = FieldPlayer_GetRideEffect(waterfall->player);
         kind = 2;
         if ((u16)(waterfall->dir + 0xfffe) <= 1) {
             kind = 2;
         }
-        waterfall->splash = func_ov036_021a4eb0(Field_GetFieldEffects(waterfall->field), kind, task);
+        waterfall->splash = FldeffNamipokeSplash_StartOnEffect(Field_GetFieldEffects(waterfall->field), kind, task);
     }
     Waterfall_SetShakeOffset(actor, &waterfall->shake);
     return FALSE;
 }
 
-static BOOL func_ov036_021bb06c(WaterfallTCB *waterfall) {
+static BOOL FieldPlayerGrid_JumpUpRise(WaterfallTCB *waterfall) {
     FieldActor *actor = FieldPlayer_GetActor(waterfall->player);
     VecFx32 pos;
 
@@ -518,13 +518,13 @@ static BOOL func_ov036_021bb06c(WaterfallTCB *waterfall) {
         waterfall->stepY = FX32_CONST(6);
         waterfall->accel = waterfall->accel / 11;
         FieldCameraZoomTCB_Create(waterfall->field, 16, -0x8000 * 4);
-        func_ov036_021a3a70(waterfall->splash);
+        FieldEffects_DeleteObject(waterfall->splash);
     }
     SetActorWPosValue(actor, &pos);
     return FALSE;
 }
 
-static BOOL func_ov036_021bb0f0(WaterfallTCB *waterfall) {
+static BOOL FieldPlayerGrid_JumpUpArc(WaterfallTCB *waterfall) {
     FieldActor *actor = FieldPlayer_GetActor(waterfall->player);
     VecFx32 pos;
 
@@ -566,15 +566,15 @@ static BOOL func_ov036_021bb0f0(WaterfallTCB *waterfall) {
     return FALSE;
 }
 
-static BOOL func_ov036_021bb190(WaterfallTCB *waterfall) {
+static BOOL FieldPlayerGrid_JumpUpLand(WaterfallTCB *waterfall) {
     FieldActor *actor = FieldPlayer_GetActor(waterfall->player);
     FieldEffectTask *task;
 
     FldAct_SetHeightCalcDisabled(actor, FALSE);
     SetActorWPosAll(actor, &waterfall->dest, waterfall->dir);
-    task = func_ov036_0219a5c4(waterfall->player);
-    func_ov036_021a4504(task, 1);
-    waterfall->splash = func_ov036_021a4eb0(Field_GetFieldEffects(waterfall->field), 0, task);
+    task = FieldPlayer_GetRideEffect(waterfall->player);
+    FldeffNamipoke_SetFollowMode(task, 1);
+    waterfall->splash = FldeffNamipokeSplash_StartOnEffect(Field_GetFieldEffects(waterfall->field), 0, task);
     GFL_SndSEPlay(SEQ_SE_FLD_83);
     waterfall->state++;
     return FALSE;
@@ -583,18 +583,18 @@ static BOOL func_ov036_021bb190(WaterfallTCB *waterfall) {
 static BOOL func_ov036_021bb1e4(WaterfallTCB *waterfall) {
     FieldEffects *effects;
 
-    if (waterfall->splash != NULL && func_ov036_021a4f18(waterfall->splash) == TRUE) {
+    if (waterfall->splash != NULL && FldeffNamipokeSplash_IsFinished(waterfall->splash) == TRUE) {
         effects = Field_GetFieldEffects(waterfall->field);
-        func_ov036_021a3a70(waterfall->splash);
+        FieldEffects_DeleteObject(waterfall->splash);
         FieldEffects_FreeEffect(effects, 8);
-        func_ov036_0219ac0c(waterfall->player);
+        FieldPlayer_SetGridHopLanded(waterfall->player);
         waterfall->splash = NULL;
         waterfall->finished = TRUE;
     }
     return FALSE;
 }
 
-static void func_ov036_021bb220(WaterfallTCB *waterfall) {
+static void FieldPlayerGrid_UpdateJumpDown(WaterfallTCB *waterfall) {
     FieldActor *actor = FieldPlayer_GetActor(waterfall->player);
     VecFx32 pos;
     VecFx32 startPos;
@@ -624,9 +624,9 @@ static void func_ov036_021bb220(WaterfallTCB *waterfall) {
         waterfall->stepZ = (posB.z - startPos.z) / 16;
         waterfall->stepY = -0x6000;
         waterfall->shake.y = FX32_ONE;
-        task = func_ov036_0219a5c4(waterfall->player);
-        func_ov036_021a4504(task, 2);
-        func_ov036_021a4514(task, FALSE);
+        task = FieldPlayer_GetRideEffect(waterfall->player);
+        FldeffNamipoke_SetFollowMode(task, 2);
+        FldeffNamipoke_SetWakeEnabled(task, FALSE);
         kind = 1;
         if ((u16)(waterfall->dir + 0xfffe) <= 1) {
             kind = 3;
@@ -634,7 +634,7 @@ static void func_ov036_021bb220(WaterfallTCB *waterfall) {
         effects = Field_GetFieldEffects(waterfall->field);
         effectId = 8;
         FieldEffects_Load(effects, &effectId, 1);
-        waterfall->splash = func_ov036_021a4eb0(effects, kind, task);
+        waterfall->splash = FldeffNamipokeSplash_StartOnEffect(effects, kind, task);
         FieldCameraZoomTCB_Create(waterfall->field, 16, FX32_CONST(32));
         GFL_SndSEPlay(SEQ_SE_FLD_82);
         waterfall->state++;
@@ -650,13 +650,13 @@ static void func_ov036_021bb220(WaterfallTCB *waterfall) {
             waterfall->counter = 0;
             waterfall->shake.y = 0;
             waterfall->state++;
-            func_ov036_021a3a70(waterfall->splash);
-            task = func_ov036_0219a5c4(waterfall->player);
+            FieldEffects_DeleteObject(waterfall->splash);
+            task = FieldPlayer_GetRideEffect(waterfall->player);
             kind = 2;
             if ((u16)(waterfall->dir + 0xfffe) <= 1) {
                 kind = 2;
             }
-            waterfall->splash = func_ov036_021a4eb0(Field_GetFieldEffects(waterfall->field), kind, task);
+            waterfall->splash = FldeffNamipokeSplash_StartOnEffect(Field_GetFieldEffects(waterfall->field), kind, task);
         }
         Waterfall_SetShakeOffset(actor, &waterfall->shake);
         break;
@@ -669,10 +669,10 @@ static void func_ov036_021bb220(WaterfallTCB *waterfall) {
             waterfall->stepX = (waterfall->dest.x - pos.x) / 16;
             waterfall->stepZ = (waterfall->dest.z - pos.z) / 16;
             FieldCameraZoomTCB_Create(waterfall->field, 16, -FX32_CONST(32));
-            func_ov036_021a3a70(waterfall->splash);
-            task = func_ov036_0219a5c4(waterfall->player);
-            func_ov036_021a4504(task, 1);
-            waterfall->splash = func_ov036_021a4eb0(Field_GetFieldEffects(waterfall->field), 0, task);
+            FieldEffects_DeleteObject(waterfall->splash);
+            task = FieldPlayer_GetRideEffect(waterfall->player);
+            FldeffNamipoke_SetFollowMode(task, 1);
+            waterfall->splash = FldeffNamipokeSplash_StartOnEffect(Field_GetFieldEffects(waterfall->field), 0, task);
         }
         SetActorWPosValue(actor, &pos);
         break;
@@ -686,10 +686,10 @@ static void func_ov036_021bb220(WaterfallTCB *waterfall) {
             effects = Field_GetFieldEffects(waterfall->field);
             FldAct_SetHeightCalcDisabled(actor, FALSE);
             SetActorWPosAll(actor, &waterfall->dest, waterfall->dir);
-            func_ov036_021a3a70(waterfall->splash);
+            FieldEffects_DeleteObject(waterfall->splash);
             FieldEffects_FreeEffect(effects, 8);
-            func_ov036_0219ac0c(waterfall->player);
-            func_ov036_021a4514(func_ov036_0219a5c4(waterfall->player), TRUE);
+            FieldPlayer_SetGridHopLanded(waterfall->player);
+            FldeffNamipoke_SetWakeEnabled(FieldPlayer_GetRideEffect(waterfall->player), TRUE);
             waterfall->splash = NULL;
             waterfall->finished = TRUE;
             GFL_SndSEPlay(SEQ_SE_FLD_83);
@@ -706,7 +706,7 @@ static void FieldWaterfallTCB_Callback(TCB *tcb, void *work) {
         do {
         } while (WATERFALL_UP_HANDLERS[waterfall->state](waterfall) == TRUE);
     } else {
-        func_ov036_021bb220(waterfall);
+        FieldPlayerGrid_UpdateJumpDown(waterfall);
     }
 }
 

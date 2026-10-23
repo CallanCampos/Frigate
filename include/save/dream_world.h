@@ -50,7 +50,7 @@ void DreamWorldSave_SetPkm(DreamWorldSave *dreamWorld, PartyPkm *pkm);
 // Whether a species' bit is set in a list of species flags
 BOOL DreamWorldSave_TestSpeciesFlag(const u8 *flags, int species);
 void func_020099d8(DreamWorldSave *dreamWorld, u8 value);
-u8 func_020099e0(DreamWorldSave *dreamWorld);
+u8 DreamWorldSave_GetMode(DreamWorldSave *dreamWorld);
 void DreamWorldSave_SetIDShown(DreamWorldSave *dreamWorld, u8 value);
 u8 DreamWorldSave_GetIDShown(DreamWorldSave *dreamWorld);
 void DreamWorldSave_SetPokemonAsleep(DreamWorldSave *dreamWorld, u8 asleep);
@@ -72,8 +72,8 @@ void DreamWorldSave_SetLastResultID(DreamWorldSave *dreamWorld, u32 id);
 // The chosen result entry, DREAM_WORLD_RESULT_INDEX_NONE when it is out of range, and the flag above it
 u32 DreamWorldSave_GetResultIndex(DreamWorldSave *dreamWorld);
 void DreamWorldSave_SetResultIndex(DreamWorldSave *dreamWorld, int value);
-u32 func_02009b20(DreamWorldSave *dreamWorld);
-void func_02009b30(DreamWorldSave *dreamWorld, u32 value);
+u32 DreamWorldSave_GetFlag(DreamWorldSave *dreamWorld);
+void DreamWorldSave_SetFlag(DreamWorldSave *dreamWorld, u32 value);
 // The Dream Radar's values in the save: 0 whether it was read, 1 the seed of the data, 2 the Pokémon received
 u32 GetDreamRadarFlag(DreamRadarSave *save, u32 flag);
 void SetDreamRadarFlag(DreamRadarSave *save, u32 flag, u32 value);

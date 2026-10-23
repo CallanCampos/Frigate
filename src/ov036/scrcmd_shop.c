@@ -535,7 +535,7 @@ BOOL s0149_CallFriendlyShopBuy(VM *vm, FieldScriptEnv *env) {
     msgBGSys = Field_GetMsgBGSys(field);
     shop = GFL_HeapAllocate(HEAPID_GAMEEVENT, sizeof(ShopScriptWork), TRUE, "scrcmd_shop.c", 293);
     *heapPtr = shop;
-    shop->work.font = func_ov036_0218799c(msgBGSys);
+    shop->work.font = MsgBGPrinter_GetFont(msgBGSys);
     shop->work.trainerCard = getTrainerCardDataBlkAddress(gameData);
     shop->work.heapId = HEAPID_FIELDMAP;
     shop->work.bag = GameData_GetBag(gameData);

@@ -261,7 +261,7 @@ void MBUtilMsg_Print(MBUtilMsg *msg, u32 msgId, s32 wait) {
     msg->stream =
         PrintStream_Create(msg->window, 0, 0, msg->strbuf, msg->font, wait, msg->tcbManager, 2, msg->heapId, 15);
     if (msg->windowType == MB_UTIL_MSG_WINDOW_TALK) {
-        func_ov036_0218b5ac(msg->talkWin, msg->window, TALKMSG_WIN_FRAME_NORMAL);
+        TalkMsgWin_DrawWindowFrame(msg->talkWin, msg->window, TALKMSG_WIN_FRAME_NORMAL);
     } else {
         BmpWin_DrawFrame(msg->window, TRUE, 1, 13);
     }
@@ -297,7 +297,7 @@ void MBUtilMsg_PrintAtOnce(MBUtilMsg *msg, u32 msgId) {
     PrintQueue_Print(msg->queue, BmpWin_GetBitmap(msg->window), 0, 0, msg->strbuf, msg->font);
     msg->queued = TRUE;
     if (msg->windowType == MB_UTIL_MSG_WINDOW_TALK) {
-        func_ov036_0218b5ac(msg->talkWin, msg->window, TALKMSG_WIN_FRAME_NORMAL);
+        TalkMsgWin_DrawWindowFrame(msg->talkWin, msg->window, TALKMSG_WIN_FRAME_NORMAL);
         GFL_BGSysLoadScr(msg->msgBg);
     } else {
         BmpWin_DrawFrame(msg->window, TRUE, 1, 13);
@@ -307,7 +307,7 @@ void MBUtilMsg_PrintAtOnce(MBUtilMsg *msg, u32 msgId) {
 void MBUtilMsg_ClearWindow(MBUtilMsg *msg) {
     GFL_BitmapFill(BmpWin_GetBitmap(msg->window), 0);
     if (msg->windowType == MB_UTIL_MSG_WINDOW_TALK) {
-        func_ov036_0218b5bc(msg->talkWin, msg->window);
+        TalkMsgWin_ClearWindowFrame(msg->talkWin, msg->window);
         GFL_BGSysLoadScr(msg->msgBg);
     } else {
         BmpWin_ClearFrame(msg->window, TRUE);

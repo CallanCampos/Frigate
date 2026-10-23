@@ -61,7 +61,7 @@ void EncountSave_Init(EncountSave *save);
 void EncountSave_RerollSwarmLocation(SaveControl *save);
 // The swarm's location, an index of overlay 36's swarm table
 u8 EncountSave_GetSwarmLocation(EncountSave *save);
-u8 func_0200dd38(EncountSave *save, u8 index);
+u8 EncountSave_GetEntryState(EncountSave *save, u8 index);
 u8 EncountSave_GetRoamingPkmZoneClock(EncountSave *save, u8 slot);
 // The roaming Pokémon of the slot, whether it roams, and its parameters
 BOOL EncountSave_GetRoamingPkmStatus(EncountSave *save, u8 slot);

@@ -14,7 +14,7 @@
 #include "nitro/math.h"
 #include "nitro/mi.h"
 
-static BOOL func_ov036_021b09fc(RailUnit *unit);
+static BOOL RailUnit_HasStepped(RailUnit *unit);
 static RailLine *GetLineContinueInDirection(const RailPoint *point, u32 dir, const RailDataHandle *data,
                                             RailDisabledLines *disabled, BOOL checkDisabled);
 static u32 RailUnit_TryEnterLine(RailUnit *unit, RailLine *line, u32 dir, s32 front, s32 side, s32 length, s32 width);
@@ -36,14 +36,14 @@ static u32 RailUnit_MoveOnLine(RailUnit *unit, u32 dir, s32 step);
 static void RailUnit_SetDataCore(RailUnit *unit, const RailDataHandle *data, FieldRailSystem *rail);
 static void RailUnit_SetData(RailUnit *unit, const RailDataHandle *data);
 static u32 RailUnit_GetState(RailUnit *unit);
-static BOOL func_ov036_021b1b60(RailUnit *unit);
+static BOOL RailUnit_IsActive(RailUnit *unit);
 static RailCamera *GetRailCameraByHandlerImpl(RailUnit *unit);
-static void func_ov036_021b1bac(RailUnit *unit, VecFx32 *pos);
-static void func_ov036_021b1bec(const RailUnit *unit, RailPosition *pos);
+static void RailUnit_GetSpotPos(RailUnit *unit, VecFx32 *pos);
+static void RailUnit_GetLocationFromSpot(const RailUnit *unit, RailPosition *pos);
 static s32 GetLineTileLengthWorldSpace(const RailLine *line, fx32 tileWidth, const RailDataHandle *data);
 static s32 GetLerpedLineWidthByLineYPos(const RailLine *line, s32 y, s32 length, const RailDataHandle *data);
 static u32 RailUnit_ClampSideToLineWidth(RailUnit *unit, RailLine *line, s32 length, u32 dir);
-static BOOL func_ov036_021b1d1c(FieldRailSystem *rail, RailPosition *pos, u32 dir, s32 extra, VecFx32 *out);
+static BOOL FieldRailSystem_ProbeStep(FieldRailSystem *rail, RailPosition *pos, u32 dir, s32 extra, VecFx32 *out);
 static u32 RailDirection_GetOpposite(u32 dir);
 static u32 RailDirection_TurnRight(u32 dir);
 static u32 RailDirection_TurnLeft(u32 dir);
@@ -59,13 +59,13 @@ static BOOL RailDisabledLines_AllowsPosition(RailDisabledLines *disabled, RailLi
 static u32 RailPoint_GetLineDirection(RailPoint *point, RailLine *line, const RailDataHandle *data);
 static BOOL RailLine_CheckEndpointDirections(RailLine *line, const RailDataHandle *data);
 static BOOL RailPoint_CheckConnections(RailPoint *point, const RailDataHandle *data);
-static void func_ov036_021b211c(const char *prefix, VecFx32 *pos, const char *suffix);
-static void func_ov036_021b2120(const char *prefix, RailPoint *point, const char *suffix);
-static void func_ov036_021b2130(RailUnit *unit);
-static int func_ov036_021b2184(const RailDataHandle *data, RailPoint *point);
-static int func_ov036_021b21b0(const RailDataHandle *data, RailLine *line);
-static BOOL func_ov036_021b21dc(const VecFx32 *a, const VecFx32 *b, const VecFx32 *p3, const VecFx32 *p4,
-                                const VecFx32 *p5, VecFx32 *out);
+static void FieldRailSystem_DebugPrintPos(const char *prefix, VecFx32 *pos, const char *suffix);
+static void RailPoint_DebugPrint(const char *prefix, RailPoint *point, const char *suffix);
+static void RailUnit_DebugCheck(RailUnit *unit);
+static int RailDataHandle_GetPointIndex(const RailDataHandle *data, RailPoint *point);
+static int RailDataHandle_GetLineIndex(const RailDataHandle *data, RailLine *line);
+static BOOL FieldRailSystem_IntersectSegmentPlane(const VecFx32 *a, const VecFx32 *b, const VecFx32 *p3,
+                                                  const VecFx32 *p4, const VecFx32 *p5, VecFx32 *out);
 
 // The step lengths of the speed indices
 static u8 sPendingSteps[RAIL_SPEED_MAX] = { 1, 2, 4, 8, 16 };
@@ -146,7 +146,7 @@ void FieldRailSystem_GetCameraParentPos(FieldRailSystem *rail, VecFx32 *pos) {
     }
 }
 
-void func_ov036_021b0398(FieldRailSystem *rail) {
+void FieldRailSystem_Update(FieldRailSystem *rail) {
     if (rail->loaded == 0 || rail->cameraEnabled == 0) {
         return;
     }
@@ -166,10 +166,10 @@ BOOL FieldRailSystem_UpdateCamera(FieldRailSystem *rail, BOOL force) {
     if (unit == NULL) {
         return FALSE;
     }
-    if (!func_ov036_021b1b60(unit)) {
+    if (!RailUnit_IsActive(unit)) {
         return FALSE;
     }
-    if (!func_ov036_021b09fc(unit) && rail->cameraDirty == 0 && !force) {
+    if (!RailUnit_HasStepped(unit) && rail->cameraDirty == 0 && !force) {
         return FALSE;
     }
     switch (unit->onLine) {
@@ -222,7 +222,7 @@ BOOL CalculateRailCurves(FieldRailSystem *rail, const VecFx32 *start, const VecF
         curve = GetRailCurve(&rail->data, line->curveId);
         VEC_Subtract(&pointA->pos, &pointB->pos, &diff);
         VEC_CrossProduct(&diff, &up, &normal);
-        if (!func_ov036_021b21dc(&diff, &normal, &pointB->pos, &startPos, &endPos, &cross)) {
+        if (!FieldRailSystem_IntersectSegmentPlane(&diff, &normal, &pointB->pos, &startPos, &endPos, &cross)) {
             continue;
         }
         handler = GetHandler2CurveFunc(&rail->data, curve->handlerId);
@@ -264,7 +264,7 @@ void FieldRailSystem_SetLineEnabled(FieldRailSystem *rail, u32 lineId, BOOL enab
     }
 }
 
-fx32 func_ov036_021b05ec(FieldRailSystem *rail) {
+fx32 FieldRailSystem_GetUnitScale(FieldRailSystem *rail) {
     return FX_Mul(rail->data.tileWidth, 16 * FX32_ONE);
 }
 
@@ -282,7 +282,7 @@ void FieldRailSystem_NormalizePos(FieldRailSystem *rail, RailDataHandle *data, u
     unit->handle = &rail->data;
 }
 
-BOOL func_ov036_021b0644(FieldRailSystem *rail, const RailPosition *pos, u32 arg, VecFx32 *calcPos) {
+BOOL FieldRailSystem_StepLocation(FieldRailSystem *rail, const RailPosition *pos, u32 arg, VecFx32 *calcPos) {
     RailUnit_SetRailPos(rail->playerUnit, pos);
     RailUnit_RequestMove(rail->playerUnit, RAIL_SPEED_16, arg);
     RailUnit_UpdateMove(rail->playerUnit);
@@ -293,7 +293,8 @@ BOOL func_ov036_021b0644(FieldRailSystem *rail, const RailPosition *pos, u32 arg
     return RailUnit_IsRailPosInBounds(rail->playerUnit, &rail->playerUnit->railPos);
 }
 
-BOOL func_ov036_021b068c(FieldRailSystem *rail, const RailPosition *railPos, u32 railDir, RailPosition *next) {
+BOOL FieldRailSystem_TryStepLocation(FieldRailSystem *rail, const RailPosition *railPos, u32 railDir,
+                                     RailPosition *next) {
     RailPosition start = *railPos;
 
     RailUnit_SetRailPos(rail->playerUnit, railPos);
@@ -306,12 +307,12 @@ BOOL func_ov036_021b068c(FieldRailSystem *rail, const RailPosition *railPos, u32
     return RailUnit_IsRailPosInBounds(rail->playerUnit, next);
 }
 
-void func_ov036_021b06ec(FieldRailSystem *rail, const RailPosition *railPos, VecFx32 *pos) {
+void FieldRailSystem_GetLocationPos(FieldRailSystem *rail, const RailPosition *railPos, VecFx32 *pos) {
     RailUnit_SetRailPos(rail->playerUnit, railPos);
     RailUnit_GetCalcPos(rail->playerUnit, pos);
 }
 
-s32 func_ov036_021b0704(FieldRailSystem *rail, const RailPosition *pos) {
+s32 FieldRailSystem_GetLocationWidthGrid(FieldRailSystem *rail, const RailPosition *pos) {
     RailUnit_SetRailPos(rail->playerUnit, pos);
     return rail->playerUnit->width / 16;
 }
@@ -384,8 +385,8 @@ BOOL RailUnit_IsRailPosInBounds(RailUnit *unit, const RailPosition *pos) {
 
 u8 RailUnit_PredictNextPos(RailUnit *unit, u32 dir, RailPosition *outPos, VecFx32 *outVec) {
     if (!unit->nextCached || dir != unit->nextDir) {
-        unit->nextOk = func_ov036_021b068c(unit->rail, &unit->railPos, dir, &unit->nextPos);
-        func_ov036_021b06ec(unit->rail, &unit->nextPos, &unit->nextVec);
+        unit->nextOk = FieldRailSystem_TryStepLocation(unit->rail, &unit->railPos, dir, &unit->nextPos);
+        FieldRailSystem_GetLocationPos(unit->rail, &unit->nextPos, &unit->nextVec);
         unit->nextCached = 1;
         unit->nextDir = dir;
     }
@@ -453,7 +454,7 @@ void RailUnit_SetRailPos(RailUnit *unit, const RailPosition *pos) {
     unit->lastMoveSpeedIndex = RAIL_SPEED_2;
     unit->direction = dir;
     unit->positionInitialized = 1;
-    func_ov036_021b1bac(unit, &unit->calcPos);
+    RailUnit_GetSpotPos(unit, &unit->calcPos);
     unit->railPos = *pos;
     unit->prevRailPos = *pos;
     unit->prevCalcPos = unit->calcPos;
@@ -471,11 +472,11 @@ u8 RailUnit_IsMovePending(RailUnit *unit) {
     return unit->movePending;
 }
 
-static BOOL func_ov036_021b09fc(RailUnit *unit) {
+static BOOL RailUnit_HasStepped(RailUnit *unit) {
     return unit->unk34;
 }
 
-void func_ov036_021b0a04(RailUnit *unit, VecFx16 *dir) {
+void RailUnit_GetStepVector(RailUnit *unit, VecFx16 *dir) {
     s32 savedSide;
     s32 savedFront;
     s32 length;
@@ -486,7 +487,7 @@ void func_ov036_021b0a04(RailUnit *unit, VecFx16 *dir) {
 
     savedSide = unit->side;
     unit->side = 0;
-    func_ov036_021b1bac(unit, &from);
+    RailUnit_GetSpotPos(unit, &from);
     unit->side = savedSide;
     savedFront = unit->front;
     length = unit->length;
@@ -494,13 +495,13 @@ void func_ov036_021b0a04(RailUnit *unit, VecFx16 *dir) {
     if (nextFront < length) {
         unit->front += 16;
         unit->side = 0;
-        func_ov036_021b1bac(unit, &to);
+        RailUnit_GetSpotPos(unit, &to);
         unit->side = savedSide;
         unit->front = savedFront;
     } else {
-        func_ov036_021b1bec(unit, &tmp);
+        RailUnit_GetLocationFromSpot(unit, &tmp);
         tmp.posSide = 0;
-        func_ov036_021b1d1c(unit->rail, &tmp, unit->component.line->dir, nextFront - length, &to);
+        FieldRailSystem_ProbeStep(unit->rail, &tmp, unit->component.line->dir, nextFront - length, &to);
     }
     VEC_Subtract(&to, &from, &to);
     VEC_Normalize(&to, &to);
@@ -529,7 +530,7 @@ void RailUnit_UpdateMove(RailUnit *unit) {
     u16 dir;
     s32 rem;
 
-    if (unit->rail->loaded == 0 || unit->positionInitialized == 0 || !func_ov036_021b1b60(unit)) {
+    if (unit->rail->loaded == 0 || unit->positionInitialized == 0 || !RailUnit_IsActive(unit)) {
         return;
     }
     resultDir = RAIL_DIR_NONE;
@@ -548,10 +549,10 @@ void RailUnit_UpdateMove(RailUnit *unit) {
         unit->direction = resultDir;
         unit->lastMoveSpeedIndex = unit->pendingSpeedIndex;
         unit->unk34 = 1;
-        func_ov036_021b1bac(unit, &unit->calcPos);
+        RailUnit_GetSpotPos(unit, &unit->calcPos);
     }
     if (onLine != unit->onLine) {
-        func_ov036_021b2130(unit);
+        RailUnit_DebugCheck(unit);
     }
     if (unit->moveProgress < 16 && resultDir != RAIL_DIR_NONE) {
         return;
@@ -559,7 +560,7 @@ void RailUnit_UpdateMove(RailUnit *unit) {
     unit->movePending = 0;
     unit->nextCached = 0;
     unit->prevRailPos = unit->railPos;
-    func_ov036_021b1bec(unit, &unit->railPos);
+    RailUnit_GetLocationFromSpot(unit, &unit->railPos);
     unit->prevCalcPos = unit->calcPos;
     rem = unit->front % 16;
     if (rem == 0) {
@@ -596,11 +597,11 @@ fx32 FieldRailSystem_GetTileWidth(FieldRailSystem *rail) {
     return rail->data.tileWidth;
 }
 
-RailUnit *func_ov036_021b0c00(FieldRailSystem *rail) {
+RailUnit *FieldRailSystem_GetProbeWork(FieldRailSystem *rail) {
     return rail->playerUnit;
 }
 
-void func_ov036_021b0c04(const FieldRailSystem *rail, const RailPosition *in, RailPosition *out) {
+void FieldRailSystem_ClampLocation(const FieldRailSystem *rail, const RailPosition *in, RailPosition *out) {
     RailPosition pos = *in;
     RailLine *lines = rail->data.lines;
     RailLine *line;
@@ -647,7 +648,7 @@ s32 GetCurrentLinePosH(RailUnit *unit) {
     return unit->side;
 }
 
-s32 func_ov036_021b0cb8(RailUnit *unit) {
+s32 RailUnit_GetWidthLimit(RailUnit *unit) {
     return unit->width;
 }
 
@@ -659,19 +660,19 @@ RailCamera *GetRailCameraByCamHandler(RailUnit *unit) {
     return GetRailCameraByHandlerImpl(unit);
 }
 
-void func_ov036_021b0cc8(RailUnit *unit, VecFx32 *pos) {
+void RailUnit_GetCentrePos(RailUnit *unit, VecFx32 *pos) {
     s32 saved = unit->side;
 
     unit->side = 0;
-    func_ov036_021b1bac(unit, pos);
+    RailUnit_GetSpotPos(unit, pos);
     unit->side = saved;
 }
 
-void func_ov036_021b0cdc(RailUnit *unit, s32 front, VecFx32 *pos) {
+void RailUnit_GetPosAtLineOffset(RailUnit *unit, s32 front, VecFx32 *pos) {
     s32 saved = unit->front;
 
     unit->front = front;
-    func_ov036_021b1bac(unit, pos);
+    RailUnit_GetSpotPos(unit, pos);
     unit->front = saved;
 }
 
@@ -691,7 +692,7 @@ RailCamera *GetRailCameraByPoint(RailUnit *unit, RailPoint *point) {
     return GetRailCamera(unit->handle, point->cameraId);
 }
 
-s32 func_ov036_021b0d2c(s32 value) {
+s32 FieldRailSystem_RoundToGrid(s32 value) {
     u32 magnitude = MATH_ABS(value);
 
     if ((magnitude & 0xf) >= 8) {
@@ -703,7 +704,7 @@ s32 func_ov036_021b0d2c(s32 value) {
     return value / 16;
 }
 
-BOOL func_ov036_021b0d64(const VecFx32 *a, const VecFx32 *b, fx32 dist) {
+BOOL FieldRailSystem_IsPosNear(const VecFx32 *a, const VecFx32 *b, fx32 dist) {
     s32 dx = (a->x >> 12) - (b->x >> 12);
     s32 dz = (a->z >> 12) - (b->z >> 12);
     s32 distSq = dx * dx + dz * dz;
@@ -739,7 +740,7 @@ void SetWkToActorRailPos(const RailUnit *unit, u16 *a1, u16 *a2, u16 *a3) {
     *a3 = unit->side / 16 + width / 16;
 }
 
-void func_ov036_021b0e38(RailUnit *unit, u16 a1, u16 a2, u16 a3) {
+void RailUnit_SetLineLocation(RailUnit *unit, u16 a1, u16 a2, u16 a3) {
     RailPosition pos;
 
     RailUnit_GetRailPos(unit, &pos);
@@ -748,7 +749,7 @@ void func_ov036_021b0e38(RailUnit *unit, u16 a1, u16 a2, u16 a3) {
     pos.posFront = a2;
     RailUnit_SetRailPos(unit, &pos);
     pos.posSide = a3 - unit->width / 16;
-    func_ov036_021b1bac(unit, &unit->calcPos);
+    RailUnit_GetSpotPos(unit, &unit->calcPos);
     unit->railPos = pos;
     unit->prevRailPos = pos;
     unit->prevCalcPos = unit->calcPos;
@@ -1299,7 +1300,7 @@ static u32 RailUnit_GetState(RailUnit *unit) {
     return unit->acquired;
 }
 
-static BOOL func_ov036_021b1b60(RailUnit *unit) {
+static BOOL RailUnit_IsActive(RailUnit *unit) {
     if (unit->onLine < RAIL_COMPONENT_NONE && unit->component.point != NULL && unit->acquired != 0) {
         return TRUE;
     }
@@ -1316,7 +1317,7 @@ static RailCamera *GetRailCameraByHandlerImpl(RailUnit *unit) {
     return (RailCamera *)&DEFAULT_RAIL_CAMERA;
 }
 
-static void func_ov036_021b1bac(RailUnit *unit, VecFx32 *pos) {
+static void RailUnit_GetSpotPos(RailUnit *unit, VecFx32 *pos) {
     if (unit->onLine == RAIL_COMPONENT_POINT) {
         *pos = unit->component.point->pos;
     } else if (unit->onLine == RAIL_COMPONENT_LINE) {
@@ -1329,15 +1330,15 @@ static void func_ov036_021b1bac(RailUnit *unit, VecFx32 *pos) {
     }
 }
 
-static void func_ov036_021b1bec(const RailUnit *unit, RailPosition *pos) {
+static void RailUnit_GetLocationFromSpot(const RailUnit *unit, RailPosition *pos) {
     u16 onLine = unit->onLine;
     s32 id;
 
     pos->componentIsLine = onLine;
     if (onLine == RAIL_COMPONENT_POINT) {
-        id = func_ov036_021b2184(unit->handle, unit->component.point);
+        id = RailDataHandle_GetPointIndex(unit->handle, unit->component.point);
     } else {
-        id = func_ov036_021b21b0(unit->handle, unit->component.line);
+        id = RailDataHandle_GetLineIndex(unit->handle, unit->component.line);
     }
     pos->componentId = id;
     pos->posFront = unit->front / 16;
@@ -1400,7 +1401,7 @@ static u32 RailUnit_ClampSideToLineWidth(RailUnit *unit, RailLine *line, s32 len
     return dir;
 }
 
-static BOOL func_ov036_021b1d1c(FieldRailSystem *rail, RailPosition *pos, u32 dir, s32 extra, VecFx32 *out) {
+static BOOL FieldRailSystem_ProbeStep(FieldRailSystem *rail, RailPosition *pos, u32 dir, s32 extra, VecFx32 *out) {
     s32 i;
 
     RailUnit_SetRailPos(rail->playerUnit, pos);
@@ -1639,28 +1640,28 @@ static BOOL RailPoint_CheckConnections(RailPoint *point, const RailDataHandle *d
     return TRUE;
 }
 
-static void func_ov036_021b211c(const char *prefix, VecFx32 *pos, const char *suffix) {
+static void FieldRailSystem_DebugPrintPos(const char *prefix, VecFx32 *pos, const char *suffix) {
 }
 
-static void func_ov036_021b2120(const char *prefix, RailPoint *point, const char *suffix) {
+static void RailPoint_DebugPrint(const char *prefix, RailPoint *point, const char *suffix) {
     if (point != NULL) {
-        func_ov036_021b211c(prefix, &point->pos, suffix);
+        FieldRailSystem_DebugPrintPos(prefix, &point->pos, suffix);
     }
 }
 
-static void func_ov036_021b2130(RailUnit *unit) {
+static void RailUnit_DebugCheck(RailUnit *unit) {
     if (unit->onLine == RAIL_COMPONENT_POINT) {
-        func_ov036_021b2120(NULL, unit->component.point, "\n");
+        RailPoint_DebugPrint(NULL, unit->component.point, "\n");
     } else if (unit->onLine == RAIL_COMPONENT_LINE) {
         RailPoint *pointA = GetRailPoint(unit->handle, unit->component.line->pointA);
         RailPoint *pointB = GetRailPoint(unit->handle, unit->component.line->pointB);
 
-        func_ov036_021b2120("start", pointA, NULL);
-        func_ov036_021b2120("-end", pointB, "\n");
+        RailPoint_DebugPrint("start", pointA, NULL);
+        RailPoint_DebugPrint("-end", pointB, "\n");
     }
 }
 
-static int func_ov036_021b2184(const RailDataHandle *data, RailPoint *point) {
+static int RailDataHandle_GetPointIndex(const RailDataHandle *data, RailPoint *point) {
     int i;
 
     for (i = 0; i < data->pointCount; i++) {
@@ -1671,7 +1672,7 @@ static int func_ov036_021b2184(const RailDataHandle *data, RailPoint *point) {
     return 0;
 }
 
-static int func_ov036_021b21b0(const RailDataHandle *data, RailLine *line) {
+static int RailDataHandle_GetLineIndex(const RailDataHandle *data, RailLine *line) {
     int i;
 
     for (i = 0; i < data->lineCount; i++) {
@@ -1682,8 +1683,8 @@ static int func_ov036_021b21b0(const RailDataHandle *data, RailLine *line) {
     return 0;
 }
 
-static BOOL func_ov036_021b21dc(const VecFx32 *a, const VecFx32 *b, const VecFx32 *p3, const VecFx32 *p4,
-                                const VecFx32 *p5, VecFx32 *out) {
+static BOOL FieldRailSystem_IntersectSegmentPlane(const VecFx32 *a, const VecFx32 *b, const VecFx32 *p3,
+                                                  const VecFx32 *p4, const VecFx32 *p5, VecFx32 *out) {
     VecFx32 n;
     VecFx32 dir;
     VecFx32 na;

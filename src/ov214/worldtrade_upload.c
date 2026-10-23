@@ -732,7 +732,8 @@ static int Upload_SubSeqDownloadResult(WorldTradeWork *wk) {
                 wk->subprocessSeq = UPLOAD_SEQ_SERVER_TRADE_CHECK;
             } else {
                 Upload_DownloadPokemonDataAdd(wk, WorldTradeData_GetPkmPtr(wk->param->worldtrade_data),
-                                              func_0200b4fc(wk->param->worldtrade_data), wk->uploadPokemonData.isTrade);
+                                              WorldTradeData_GetReturnBox(wk->param->worldtrade_data),
+                                              wk->uploadPokemonData.isTrade);
                 wk->subprocessSeq = UPLOAD_SEQ_SAVE;
             }
             break;
@@ -955,7 +956,7 @@ static int Upload_SubSeqServerTradeCheckResult(WorldTradeWork *wk) {
                 loadPokemonNicknameToStrbuf(wk->wordSet, 0, pkm);
                 wk->errorMesNo = 2;
                 wk->subprocessSeq = UPLOAD_SEQ_TIMEOUT_SAVE;
-                Upload_DownloadPokemonDataAdd(wk, pkm, func_0200b4fc(wk->param->worldtrade_data), FALSE);
+                Upload_DownloadPokemonDataAdd(wk, pkm, WorldTradeData_GetReturnBox(wk->param->worldtrade_data), FALSE);
                 WorldTradeData_SetFlag(wk->param->worldtrade_data, 0);
                 GFL_HeapFree(pkm);
             } else {
@@ -1160,7 +1161,8 @@ static int Upload_SubSeqServerServiceEnd(WorldTradeWork *wk) {
 
 static int Upload_SubSeqDownloadExStart(WorldTradeWork *wk) {
     Upload_DownloadPokemonDataAdd(wk, (PartyPkm *)wk->uploadPokemonData.postData,
-                                  func_0200b4fc(wk->param->worldtrade_data), wk->uploadPokemonData.isTrade);
+                                  WorldTradeData_GetReturnBox(wk->param->worldtrade_data),
+                                  wk->uploadPokemonData.isTrade);
     Upload_WifiHistoryDataSet(wk->param->wifihistory, &wk->uploadPokemonData);
     Upload_MakeTradeExchangeInfo(wk, (PartyPkm *)wk->uploadPokemonData.postData, &wk->uploadPokemonData, NULL);
     WorldTradeData_SetFlag(wk->param->worldtrade_data, 0);

@@ -705,7 +705,7 @@ static void GtsNego_StateSearching(GtsNegoWork *wk) {
         if (NetState_GetWifiStatus() != 1) {
             return;
         }
-        func_02042e94(1);
+        GflNet_SetAutoExit(1);
         GFL_NetSetDisconnectError(TRUE);
     }
     GtsNegoMessage_ClearWindow(wk->msg);
@@ -1498,7 +1498,7 @@ static void GtsNego_StateMainMenu(GtsNegoWork *wk) {
 // The partner was lost: back to the main menu, behind the error screen
 static void GtsNego_HandleDisconnect(GtsNegoWork *wk) {
     if (wk->param->result != GTSNEGO_RESULT_EXIT) {
-        func_02042e94(0);
+        GflNet_SetAutoExit(0);
         GFL_NetSetDisconnectError(FALSE);
         GtsNegoMessage_FreePMSDraw(wk->msg);
         GtsNegoDisp_SetDim(wk->disp, FALSE, GTSNEGO_DIM_ALL);

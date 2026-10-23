@@ -73,7 +73,7 @@ void NameEntryParam_GetName(NameEntryParam *param, StrBuf *dest) {
     GFL_StrBufCopy(dest, param->name);
 }
 
-BOOL func_ov012_02165b0c(NameEntryParam *param) {
+BOOL NameEntryParam_IsCanceled(NameEntryParam *param) {
     return param->unk1C;
 }
 

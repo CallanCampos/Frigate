@@ -41,7 +41,7 @@ static int findFriendData(DWCFriendData *friendData, int *index) {
     int i;
     DWCUserData *userData = (DWCUserData *)GFL_NetGetUserData();
     DWCFriendData *friends = (DWCFriendData *)GFL_NetGetFriendData();
-    int count = func_02042d80();
+    int count = GflNet_GetFriendListNum();
 
     *index = -1;
     if (!DWC_IsValidFriendData(friendData)) {

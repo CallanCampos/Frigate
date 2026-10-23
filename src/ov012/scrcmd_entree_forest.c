@@ -219,7 +219,7 @@ static PartyPkm *CreateEntreeForestPkmFromActor(FieldScriptEnv *env, FieldActor 
 
     GetEntreeForestActorParamBits(&pokemon->raw, actor);
     // The heap passed is not used
-    return func_ov033_02176bd0(HEAPID_GAMEEVENT, gameData, pokemon);
+    return EntreeForest_CreateSymbolMon(HEAPID_GAMEEVENT, gameData, pokemon);
 }
 
 static GameEvent *EventEntreeForestBattleCall_Create(GameSystem *gsys, Field *field, PartyPkm *pkm,

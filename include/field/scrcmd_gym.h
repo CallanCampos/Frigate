@@ -13,7 +13,7 @@ BOOL func_ov036_021aad90(VM *vm, FieldScriptEnv *env);
 BOOL func_ov036_021aadc8(VM *vm, FieldScriptEnv *env);
 BOOL func_ov036_021aae48(VM *vm, FieldScriptEnv *env);
 BOOL func_ov036_021aae74(VM *vm, FieldScriptEnv *env);
-BOOL func_ov036_021aae88(VM *vm, FieldScriptEnv *env);
+BOOL ScrcmdFieldGimmickPlateDoors_StartDoorEvent(VM *vm, FieldScriptEnv *env);
 BOOL func_ov036_021aaec8(VM *vm, FieldScriptEnv *env);
 BOOL func_ov036_021aaf1c(VM *vm, FieldScriptEnv *env);
 BOOL func_ov036_021aaf78(VM *vm, FieldScriptEnv *env);
@@ -33,7 +33,7 @@ BOOL func_ov036_021ab158(VM *vm, FieldScriptEnv *env);
 BOOL func_ov036_021ab178(VM *vm, FieldScriptEnv *env);
 BOOL func_ov036_021ab190(VM *vm, FieldScriptEnv *env);
 BOOL func_ov036_021ab1a8(VM *vm, FieldScriptEnv *env);
-BOOL func_ov036_021ab1e0(VM *vm, FieldScriptEnv *env);
+BOOL ScrcmdFieldGimmickCartLanes_UnlockLaneFromScript(VM *vm, FieldScriptEnv *env);
 BOOL func_ov036_021ab208(VM *vm, FieldScriptEnv *env);
 
 #endif // POKEBW2_FIELD_SCRCMD_GYM_H

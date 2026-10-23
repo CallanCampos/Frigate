@@ -678,7 +678,7 @@ void BtlvCore_SetupPokeListParam(BtlvCore *core, BPlistParam *param, u8 mode, u8
 
     clientId = BattleClient_GetClientId(core->client);
     param->party = GetClientPokeParty(core->mainModule, clientId);
-    param->unk18 = mode != 3 ? func_ov167_0219c7a4(core->mainModule) : 0;
+    param->unk18 = mode != 3 ? BtlMain_IsCommMulti(core->mainModule) : 0;
     if (param->unk18) {
         param->unk8 = GetAllyPokeParty(core->mainModule, clientId);
         unk1C = GetMultiTrainerIndex(core->mainModule, clientId);
@@ -1486,11 +1486,11 @@ void BtlvCore_EndWaitMsg(BtlvCore *core) {
 }
 
 void BtlvCore_StartUseItemEffect(BtlvCore *core, u8 pos) {
-    func_ov167_021d34ec(core->scu, BattlePosToViewPos(core->mainModule, pos));
+    BtlvScu_StartPosCueEffect(core->scu, BattlePosToViewPos(core->mainModule, pos));
 }
 
 BOOL BtlvCore_WaitUseItemEffect(BtlvCore *core, u8 pos) {
-    return func_ov167_021d34fc(core->scu, BattlePosToViewPos(core->mainModule, pos));
+    return BtlvScu_IsPosCueEffectDone(core->scu, BattlePosToViewPos(core->mainModule, pos));
 }
 
 void BtlvCore_StartIllusionBreak(BtlvCore *core, u8 pos, u32 arg2) {

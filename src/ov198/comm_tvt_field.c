@@ -713,7 +713,7 @@ static void CommTvtField_UpdateStatus(CommTvtFieldWork *wk) {
         CommTvtField_FreeWindow5(9, wk);
     }
     if (state == 2) {
-        if (wk->shownCaller != func_ov012_0215365c(comm)) {
+        if (wk->shownCaller != Intrude_CountEventPeers(comm)) {
             wk->shownState = 0;
         }
     }
@@ -732,7 +732,7 @@ static void CommTvtField_UpdateStatus(CommTvtFieldWork *wk) {
             CommTvtField_CreateWindow(0, wk, &sCallWindow, sTitleCenterX, sTitleCenterY);
             break;
         case 2: {
-            u32 caller = func_ov012_0215365c(comm);
+            u32 caller = Intrude_CountEventPeers(comm);
 
             wk->shownCaller = caller;
             ClActor_SetVisible(wk->actors[5], FALSE);
@@ -746,7 +746,7 @@ static void CommTvtField_UpdateStatus(CommTvtFieldWork *wk) {
         case 3:
             GFL_MsgDataLoadStrbuf(wk->msgData, 17, wk->strbuf54);
             CommTvtField_CreateWindow(0, wk, &sCallWindow, sTitleCenterX, sTitleCenterY);
-            if (func_ov012_02153660(comm, wk->strbuf54)) {
+            if (Intrude_GetRequesterStatus(comm, wk->strbuf54)) {
                 CommTvtField_CreateWindow(10, wk, &sNoticeWindow, NULL, NULL);
                 ClActor_SetVisible(wk->actors[5], TRUE);
             }
