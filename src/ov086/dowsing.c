@@ -72,22 +72,28 @@ typedef enum {
 #define BG_INFOWIN 4
 
 // The icons
-#define ICON_COUNT 4
-#define ICON_RING 0
-#define ICON_DOT 1
-#define ICON_DIRECTION 2
-#define ICON_CLOSEST 3
+enum {
+    ICON_RING,
+    ICON_DOT,
+    ICON_DIRECTION,
+    ICON_CLOSEST,
+    ICON_COUNT,
+};
 
 // The fade commands
-#define FADE_CMD_NONE 0
-#define FADE_CMD_IN 1
-#define FADE_CMD_OUT 2
+enum {
+    FADE_CMD_NONE,
+    FADE_CMD_IN,
+    FADE_CMD_OUT,
+};
 
 // The states of the exit button
-#define BUTTON_WAIT 0
-#define BUTTON_PRESSED 1
-#define BUTTON_RELEASED 2
-#define BUTTON_DONE 3
+enum {
+    BUTTON_WAIT,
+    BUTTON_PRESSED,
+    BUTTON_RELEASED,
+    BUTTON_DONE,
+};
 
 // Where the exit button is on the touch screen
 #define BUTTON_X 0xe8

@@ -504,19 +504,19 @@ u32 WifiBattleMatchNet_CheckError(WifiBattleMatchNet *p_wk, u32 a1, u32 a2) {
             }
         }
         switch (DWCRapCommon_CheckError(a1, a2)) {
-        case WBM_RESULT_OK:
+        case DWCRAP_RESULT_OK:
             result = WBM_RESULT_OK;
             break;
-        case WBM_RESULT_DISCONNECTED:
+        case DWCRAP_RESULT_DISCONNECTED:
             result = WBM_RESULT_DISCONNECTED;
             break;
-        case WBM_RESULT_FAILED:
+        case DWCRAP_RESULT_FAILED:
             result = WBM_RESULT_FAILED;
             break;
-        case WBM_RESULT_NET_ERROR:
+        case DWCRAP_RESULT_NET_ERROR:
             result = WBM_RESULT_NET_ERROR;
             break;
-        case WBM_RESULT_TIMEOUT:
+        case DWCRAP_RESULT_TIMEOUT:
             result = WBM_RESULT_TIMEOUT;
             break;
         }
@@ -914,7 +914,8 @@ static int WifiBattleMatchNet_Eval(int index, void *work) {
     return 0;
 }
 
-void WifiBattleMatchNet_StartReport(WifiBattleMatchNet *p_wk, u32 mode, u32 kind, u32 rule, const u32 *a4, u32 a5) {
+void WifiBattleMatchNet_StartReport(WifiBattleMatchNet *p_wk, u32 mode, u32 kind, u32 rule,
+                                    const WifiBattleMatchBattleResult *battleResult, u32 a5) {
     p_wk->unk1498 = 0;
     p_wk->state = WBM_REPORT_SEQ_SYNC;
     p_wk->unk1ac = 1;
@@ -953,8 +954,8 @@ void WifiBattleMatchNet_StartReport(WifiBattleMatchNet *p_wk, u32 mode, u32 kind
         } else {
             GFL_NetIsParent();
             p_wk->param.format = rule;
-            p_wk->param.outcome = a4[0];
-            p_wk->param.mine = a4[4];
+            p_wk->param.outcome = battleResult->result;
+            p_wk->param.mine = battleResult->unk10;
             switch (kind) {
             case WBM_MATCH_MODE_COMPETITION:
                 p_wk->resultFunc = WifiBattleMatchNet_SetCupBattleResult;

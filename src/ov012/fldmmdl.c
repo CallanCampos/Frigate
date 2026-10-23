@@ -203,7 +203,7 @@ void FldActSys_ClearCache(MMSys *system) {
 }
 
 void FldActSys_AttachField(MMSys *system, HeapID heapId, GameData *gameData, Field *field, FieldG3DMapper *mapper,
-                           NoGridMapper *noGridMapper, void *colorPostFx) {
+                           NoGridMapper *noGridMapper, FieldColorPostFX *colorPostFx) {
     system->g3dMapper = mapper;
     system->fieldHeapId = heapId;
     system->colorPostFx = colorPostFx;

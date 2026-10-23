@@ -29,9 +29,11 @@ typedef struct {
 } WipeHBlankRemoveRequest;
 
 // The orders the WIPE_MODE_*s run the screens' wipes in
-#define WIPE_ORDER_BOTH 0
-#define WIPE_ORDER_MAIN_FIRST 1
-#define WIPE_ORDER_SUB_FIRST 2
+enum {
+    WIPE_ORDER_BOTH,
+    WIPE_ORDER_MAIN_FIRST,
+    WIPE_ORDER_SUB_FIRST,
+};
 
 typedef struct {
     u32 order;

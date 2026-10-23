@@ -93,11 +93,11 @@ data_ov262_021c5d08 kind:data(any) addr:0x021c5d08
 data_ov262_021c5d24 kind:data(any) addr:0x021c5d24
 data_ov262_021c5d54 kind:data(any) addr:0x021c5d54
 sRows kind:data(any) addr:0x021c5eb4
-data_ov262_021c5eb6 kind:data(any) addr:0x021c5eb6
-data_ov262_021c5ec6 kind:data(any) addr:0x021c5ec6
-data_ov262_021c5ee6 kind:data(any) addr:0x021c5ee6
-data_ov262_021c5f06 kind:data(any) addr:0x021c5f06
-data_ov262_021c5f2e kind:data(any) addr:0x021c5f2e
+sBadgePaletteStarts kind:data(any) addr:0x021c5eb6
+sWifiCardRects kind:data(any) addr:0x021c5ec6
+sPartnerCardRects kind:data(any) addr:0x021c5ee6
+sLiveCardRects kind:data(any) addr:0x021c5f06
+sRankCardRects kind:data(any) addr:0x021c5f2e
 data_ov262_021c5f60 kind:data(any) addr:0x021c5f60
 data_ov262_021c5fa0 kind:data(any) addr:0x021c5fa0
 data_ov262_021c5fbc kind:data(any) addr:0x021c5fbc

@@ -281,15 +281,15 @@ static BOOL WifiBattleMatchSys_BattleProcMain(GameProc *proc, u32 *state, void *
             }
         } else {
             switch (DWCRapCommon_CheckError(TRUE, TRUE)) {
-            case 0:
+            case DWCRAP_RESULT_OK:
                 break;
-            case 1:
-            case 2:
-            case 3:
+            case DWCRAP_RESULT_DISCONNECTED:
+            case DWCRAP_RESULT_FAILED:
+            case DWCRAP_RESULT_NET_ERROR:
             default:
                 battle->result = 2;
                 return TRUE;
-            case 4:
+            case DWCRAP_RESULT_TIMEOUT:
                 battle->result = 3;
                 return TRUE;
             }

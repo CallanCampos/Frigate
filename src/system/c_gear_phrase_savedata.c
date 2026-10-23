@@ -6,8 +6,6 @@
 // The C-Gear's phrases, at the start of the C-Gear's save block, which c_gear_savedata.c owns: their initial state
 // and their accessors. The ROM has no string for the file, so the name is a guess. Block 0x20.
 
-#define SAVE_BLOCK_CGEAR 0x20
-
 void CGearPhrases_Init(PMSData *phrases) {
     PMSData_InitGreeting(&phrases[0]);
     PMSData_InitPreset(&phrases[1], 0);

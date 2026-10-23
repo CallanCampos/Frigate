@@ -9,8 +9,6 @@
 // seed the egg is made from. The ROM has no string for the file, so the name is a guess (swan's DayCareSave
 // functions). Block 0x32.
 
-#define SAVE_BLOCK_DAY_CARE 0x32
-
 static void DayCareSave_GenSeed(DayCareSave *dayCare);
 
 void DayCareSave_SetSpawnFlag(DayCareSave *dayCare) {

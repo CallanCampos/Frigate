@@ -2,6 +2,7 @@
 #define POKEBW2_APP_WIFIBATTLEMATCH_NET_H
 
 #include "types.h"
+#include "app/wifibattlematch_link.h"
 #include "dwc/competition.h"
 #include "gfl/heap.h"
 #include "gfl/proc.h"
@@ -234,7 +235,8 @@ BOOL WifiBattleMatchNet_TakePerson(WifiBattleMatchNet *p_wk);
 void WifiBattleMatchNet_SetGuest(WifiBattleMatchNet *p_wk, u32 value);
 // Starts a report (WBM_REPORT_MODE_*) of a kind (WBM_MATCH_MODE_COMPETITION or WBM_MATCH_MODE_RATING), with the
 // battle's rule (WBM_RULE_*) and result for WBM_REPORT_MODE_RESULT
-void WifiBattleMatchNet_StartReport(WifiBattleMatchNet *p_wk, u32 mode, u32 kind, u32 rule, const u32 *a4, u32 a5);
+void WifiBattleMatchNet_StartReport(WifiBattleMatchNet *p_wk, u32 mode, u32 kind, u32 rule,
+                                    const WifiBattleMatchBattleResult *battleResult, u32 a5);
 u32 WifiBattleMatchNet_ReportMain(WifiBattleMatchNet *p_wk, u32 *out);
 u32 WifiBattleMatchNet_GetReceivedValue(WifiBattleMatchNet *p_wk);
 // Reads the table of fields of a kind (WBM_READ_*) into out

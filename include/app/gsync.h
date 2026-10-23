@@ -23,6 +23,14 @@
 #define GSYNC_RESULT_DONE 6
 #define GSYNC_RESULT_RETRY_LOGIN 7
 
+// Errors of Game Sync's own, beside the server's, which the account screens share but for GSYNC_ERROR_DOWNLOAD
+enum {
+    GSYNC_ERROR_DOWNLOAD = 0xfff0,
+    GSYNC_ERROR_SERVICE_UNAVAILABLE,
+    GSYNC_ERROR_BAD_GATEWAY,
+    GSYNC_ERROR_HTTP,
+};
+
 // The answer to Game Sync's account.playstatus request. Status 0 is an account that isn't set up yet, 1 one whose
 // Pokémon isn't dreaming yet and 2 one whose Pokémon is dreaming. With 0 and 4, the Pokémon and items below come back
 // without the server's result, and with 4 Game Sync doesn't ask the server again

@@ -17,7 +17,7 @@ typedef struct {
     BlActSys *blact;
     BlActScene *scene;
     u32 matIndex;
-    void *postFx;
+    FieldColorPostFX *postFx;
 } FieldEffectShadow;
 
 // What the task of an actor's shadow starts from

@@ -23,6 +23,14 @@ typedef struct {
     u16 unk02;
 } FestMissionHeader;
 
+// The kinds of mission that run on the field (fes_gimmick.c), FestMissionHeader's kind
+enum {
+    MISSION_FLAGS = 2,
+    MISSION_HOLLOW,
+    MISSION_SPARKLE,
+    MISSION_PEOPLE,
+};
+
 // A mission's entry in file 1
 typedef struct {
     u8 unk00;

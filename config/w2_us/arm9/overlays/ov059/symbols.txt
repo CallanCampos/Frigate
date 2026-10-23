@@ -44,6 +44,6 @@ ResortCmd_ApplyEffortChange kind:function(thumb,size=0x68) addr:0x021e7c48
 ResortCmd_ShowMedalInfo kind:function(thumb,size=0xf8) addr:0x021e7cb0
 ResortCmd_FreeMedalInfo kind:function(thumb,size=0x12) addr:0x021e7da8
 ResortCmd_GetMedalPerson kind:function(thumb,size=0x38) addr:0x021e7dbc
-data_ov059_021e7db4 kind:data(any) addr:0x021e7e04
+sUnk7db4 kind:data(any) addr:0x021e7e04
 data_ov059_021e7de0 kind:data(any) addr:0x021e7e20
 data_ov059_021e7df0 kind:data(any) addr:0x021e7e30

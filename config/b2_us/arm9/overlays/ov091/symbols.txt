@@ -19,9 +19,9 @@ GymInsect_InitAreas kind:function(thumb,size=0x44) addr:0x021ef58c
 GymInsect_InitObjects kind:function(thumb,size=0x1cc) addr:0x021ef5d0
 GymInsect_FreeObjects kind:function(thumb,size=0x16) addr:0x021ef79c
 GymInsect_UpdateObjects kind:function(thumb,size=0x14) addr:0x021ef7b4
-data_ov091_021ef7c8 kind:data(any) addr:0x021ef7c8
-data_ov091_021ef7cc kind:data(any) addr:0x021ef7cc
-data_ov091_021ef7d2 kind:data(any) addr:0x021ef7d2
+sEffectAnimations kind:data(any) addr:0x021ef7c8
+sObjectPositions kind:data(any) addr:0x021ef7cc
+sObjectAnimations kind:data(any) addr:0x021ef7d2
 data_ov091_021ef7e0 kind:data(any) addr:0x021ef7e0
 data_ov091_021ef7f0 kind:data(any) addr:0x021ef7f0
 data_ov091_021ef810 kind:data(any) addr:0x021ef810

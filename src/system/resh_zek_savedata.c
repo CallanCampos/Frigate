@@ -7,8 +7,6 @@
 // The save block of the Reshiram or Zekrom fused with Kyurem. The ROM has no string for the file, so the name is a
 // guess (swan's getReshZekBlkAddress). Block 0x2b.
 
-#define SAVE_BLOCK_RESH_ZEK 0x2b
-
 u32 ReshZekSave_GetSize(void) {
     return sizeof(ReshZekSave);
 }

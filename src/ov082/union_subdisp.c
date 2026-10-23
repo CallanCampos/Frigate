@@ -45,8 +45,10 @@
 #define ACTOR_COUNT 6
 
 // What the lines show: a sentence drawn by PMSDraw, or a message printed in the window
-#define CONTENT_SENTENCE 0
-#define CONTENT_MESSAGE 1
+enum {
+    CONTENT_SENTENCE,
+    CONTENT_MESSAGE,
+};
 
 // A line is 7 tiles high, 56 pixels
 #define LINE_TILES 7

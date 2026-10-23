@@ -9,6 +9,15 @@
 // by ResortWork_UpdateRecords. Our names
 
 #define RESORT_WORK_VALUE_COUNT 19
+
+// The values that overlay 137's visits use: the group of the day's visits and their count, then a flag for each of the
+// eight people who has had a visit
+enum {
+    RESORT_WORK_GROUP = 9,
+    RESORT_WORK_VISITS,
+    RESORT_WORK_MET_FIRST,
+    RESORT_WORK_MET_LAST = 18,
+};
 // The records' sums are capped at this
 #define RESORT_WORK_RECORD_MAX 999999999
 

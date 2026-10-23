@@ -58,28 +58,34 @@
 // The command's shop IDs past the Poké Marts', whose items are in file ID + 6 of ARCID_SHOP_ITEMS. The special marts'
 // stock grows with a level that KeyDataSave_GetProgress keeps in the key system's data, its value 0 for 0xf7 to 0xfa
 // and 1 for 0xef to 0xf2
-#define SHOP_ID_SPECIAL_MART_1_FIRST 0xef
-#define SHOP_ID_SPECIAL_MART_1_LAST 0xf2
-#define SHOP_ID_MOVE_TUTOR_NACRENE 0xf3
-#define SHOP_ID_MOVE_TUTOR_HUMILAU 0xf4
-#define SHOP_ID_MOVE_TUTOR_LENTIMAS 0xf5
-#define SHOP_ID_MOVE_TUTOR_DRIFTVEIL 0xf6
-#define SHOP_ID_SPECIAL_MART_0_FIRST 0xf7
-#define SHOP_ID_SPECIAL_MART_0_LAST 0xfa
-#define SHOP_ID_BP_TMS 0xfd
-#define SHOP_ID_BP_ITEMS 0xfe
-// The Poké Mart whose items grow with the badges
-#define SHOP_ID_BADGE_MART 0xff
+enum {
+    SHOP_ID_SPECIAL_MART_1_FIRST = 0xef,
+    SHOP_ID_SPECIAL_MART_1_LAST = 0xf2,
+    SHOP_ID_MOVE_TUTOR_NACRENE,
+    SHOP_ID_MOVE_TUTOR_HUMILAU,
+    SHOP_ID_MOVE_TUTOR_LENTIMAS,
+    SHOP_ID_MOVE_TUTOR_DRIFTVEIL,
+    SHOP_ID_SPECIAL_MART_0_FIRST,
+    SHOP_ID_SPECIAL_MART_0_LAST = 0xfa,
+    SHOP_ID_BP_TMS = 0xfd,
+    SHOP_ID_BP_ITEMS,
+    // The Poké Mart whose items grow with the badges
+    SHOP_ID_BADGE_MART,
+};
 
 // What the menu lists: items, TMs with their numbers and moves, or a move tutor's moves
-#define SHOP_LIST_ITEMS 0
-#define SHOP_LIST_TMS 1
-#define SHOP_LIST_MOVES 2
+enum {
+    SHOP_LIST_ITEMS,
+    SHOP_LIST_TMS,
+    SHOP_LIST_MOVES,
+};
 
 // What the menu sells for: money, Battle Points or a move tutor's shards
-#define SHOP_CURRENCY_MONEY 0
-#define SHOP_CURRENCY_BP 1
-#define SHOP_CURRENCY_SHARDS 2
+enum {
+    SHOP_CURRENCY_MONEY,
+    SHOP_CURRENCY_BP,
+    SHOP_CURRENCY_SHARDS,
+};
 
 // The variables the move tutor's script reads once a move was bought: 0 if no Pokémon was chosen, 2 if the chosen one
 // can learn the move and 1 if it can't, then the move, the slot of the Pokémon that learns it and the price

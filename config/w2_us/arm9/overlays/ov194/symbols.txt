@@ -563,25 +563,25 @@ data_ov194_021c6778 kind:data(any) addr:0x021c67b8
 data_ov194_021c6788 kind:data(any) addr:0x021c67c8
 data_ov194_021c679c kind:data(any) addr:0x021c67dc
 data_ov194_021c67a0 kind:data(any) addr:0x021c67e0
-data_ov194_021c67a8 kind:data(any) addr:0x021c67e8
-data_ov194_021c67b0 kind:data(any) addr:0x021c67f0
-data_ov194_021c67bc kind:data(any) addr:0x021c67fc
+sSceneAnimations kind:data(any) addr:0x021c67e8
+sCameraUp kind:data(any) addr:0x021c67f0
+sSceneActor kind:data(any) addr:0x021c67fc
 data_ov194_021c67cc kind:data(any) addr:0x021c680c
-data_ov194_021c67ec kind:data(any) addr:0x021c682c
-data_ov194_021c6810 kind:data(any) addr:0x021c6850
-data_ov194_021c6834 kind:data(any) addr:0x021c6874
-data_ov194_021c6858 kind:data(any) addr:0x021c6898
-data_ov194_021c687c kind:data(any) addr:0x021c68bc
+sScene1Resources kind:data(any) addr:0x021c682c
+sScene2Resources kind:data(any) addr:0x021c6850
+sScene3Resources kind:data(any) addr:0x021c6874
+sScene4Resources kind:data(any) addr:0x021c6898
+sScene5Resources kind:data(any) addr:0x021c68bc
 data_ov194_021c68a0 kind:data(any) addr:0x021c68e0
-data_ov194_021c68c8 kind:data(any) addr:0x021c6908
+sSceneFuncs kind:data(any) addr:0x021c6908
 data_ov194_021c68cc kind:data(any) addr:0x021c690c
 data_ov194_021c68f8 kind:data(any) addr:0x021c6938
 data_ov194_021c6904 kind:data(any) addr:0x021c6944
 data_ov194_021c6910 kind:data(any) addr:0x021c6950
 data_ov194_021c6920 kind:data(any) addr:0x021c6960
-data_ov194_021c6940 kind:data(any) addr:0x021c6980
+sSceneSetups kind:data(any) addr:0x021c6980
 data_ov194_021c694c kind:data(any) addr:0x021c698c
-data_ov194_021c69a0 kind:data(any) addr:0x021c69e0
+sSpriteOffsets kind:data(any) addr:0x021c69e0
 data_ov194_021c69b0 kind:data(any) addr:0x021c69f0
 data_ov194_021c69b4 kind:data(any) addr:0x021c69f4
 data_ov194_021c69b8 kind:data(any) addr:0x021c69f8
@@ -590,13 +590,13 @@ data_ov194_021c6a90 kind:data(any) addr:0x021c6ad0
 data_ov194_021c6a98 kind:data(any) addr:0x021c6ad8
 data_ov194_021c6aa4 kind:data(any) addr:0x021c6ae4
 data_ov194_021c6acc kind:data(any) addr:0x021c6b0c
-data_ov194_021c6ae8 kind:data(any) addr:0x021c6b28
+sDemoClActSetup kind:data(any) addr:0x021c6b28
 data_ov194_021c6b04 kind:data(any) addr:0x021c6b44
-data_ov194_021c6b24 kind:data(any) addr:0x021c6b64
+sLCDConfigs kind:data(any) addr:0x021c6b64
 data_ov194_021c6b44 kind:data(any) addr:0x021c6b84
-data_ov194_021c6b74 kind:data(any) addr:0x021c6bb4
+sNegoIconPosMain kind:data(any) addr:0x021c6bb4
 data_ov194_021c6b78 kind:data(any) addr:0x021c6bb8
-data_ov194_021c6ba4 kind:data(any) addr:0x021c6be4
+sNegoIconPosSub kind:data(any) addr:0x021c6be4
 data_ov194_021c6ba8 kind:data(any) addr:0x021c6be8
 data_ov194_021c6bd4 kind:data(any) addr:0x021c6c14
 data_ov194_021c6bdc kind:data(any) addr:0x021c6c1c
@@ -625,15 +625,15 @@ data_ov194_021c6ef4 kind:data(any) addr:0x021c6f34
 data_ov194_021c6f08 kind:data(any) addr:0x021c6f48
 data_ov194_021c6f1c kind:data(any) addr:0x021c6f5c
 data_ov194_021c6f30 kind:data(any) addr:0x021c6f70
-data_ov194_021c6f44 kind:data(any) addr:0x021c6f84
+sCubeParams kind:data(any) addr:0x021c6f84
 data_ov194_021c6f50 kind:data(any) addr:0x021c6f90
-data_ov194_021c6f5c kind:data(any) addr:0x021c6f9c
-data_ov194_021c6f68 kind:data(any) addr:0x021c6fa8
-data_ov194_021c6f78 kind:data(any) addr:0x021c6fb8
-data_ov194_021c6f90 kind:data(any) addr:0x021c6fd0
+sCameraPos kind:data(any) addr:0x021c6f9c
+sCubeTexCoords kind:data(any) addr:0x021c6fa8
+sCubeNormals kind:data(any) addr:0x021c6fb8
+sCubeVertices kind:data(any) addr:0x021c6fd0
 data_ov194_021c6fc0 kind:data(any) addr:0x021c7000
-data_ov194_021c6fd4 kind:data(any) addr:0x021c7014
-data_ov194_021c70a4 kind:data(any) addr:0x021c70e4
+sInitialWindowPos kind:data(any) addr:0x021c7014
+sSpeciesInitials kind:data(any) addr:0x021c70e4
 data_ov194_021c724d_w2_us kind:data(any) addr:0x021c724d ambiguous
 data_ov194_021c72ad_w2_us kind:data(any) addr:0x021c72ad ambiguous
 data_ov194_021c72f9_w2_us kind:data(any) addr:0x021c72f9 ambiguous
@@ -697,4 +697,4 @@ data_ov194_021d0001_w2_us kind:bss addr:0x021d0001 ambiguous
 data_ov194_021d0217_w2_us kind:bss addr:0x021d0217 ambiguous
 data_ov194_021d021a_w2_us kind:bss addr:0x021d021a ambiguous
 data_ov194_021d021c_w2_us kind:bss addr:0x021d021c ambiguous
-data_ov194_021d3360 kind:bss addr:0x021d33a0
+sG3DLight kind:bss addr:0x021d33a0

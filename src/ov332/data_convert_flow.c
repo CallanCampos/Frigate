@@ -1137,7 +1137,7 @@ static void DataConvert_SeqEnterId(KeySystemSeq *seq, int *state, void *work) {
     case 0:
         KeySystem_Teardown(wk, TRUE);
         param = GFL_HeapAllocate(HEAPID_KEY_SYSTEM, sizeof(NameEntryParam), TRUE, "data_convert_flow.c", 1848);
-        param->mode = 12;
+        param->mode = NAME_ENTRY_GAME_SYNC_ID;
         param->maxLength = GAME_SYNC_ID_LENGTH;
         param->unk2C = 3;
         param->name = GFL_StrBufCreate(GAME_SYNC_ID_LENGTH + 1, HEAPID_KEY_SYSTEM);

@@ -121,22 +121,22 @@ BOOL FestMissionConfig_IsTarget(FestMissionConfig *config, u32 kind, u32 value) 
             return FALSE;
         }
         break;
-    case 2:
+    case MISSION_FLAGS:
         if (kind != 0x15 && kind != 0x16) {
             return FALSE;
         }
         break;
-    case 3:
+    case MISSION_HOLLOW:
         if (kind - 0x18 != config->info.target) {
             return FALSE;
         }
         break;
-    case 4:
+    case MISSION_SPARKLE:
         if (kind != 0x17) {
             return FALSE;
         }
         break;
-    case 5:
+    case MISSION_PEOPLE:
         if (kind - 0x1e != config->info.target) {
             return FALSE;
         }

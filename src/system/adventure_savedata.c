@@ -10,8 +10,6 @@
 // The save block with the game's clock: what the RTC was at, the DS owner's birthday, the day's countdown and when
 // the adventure began. The ROM has no string for the file, so the name is a guess. Block 0x25.
 
-#define SAVE_BLOCK_ADVENTURE 0x25
-
 u32 getSizeofAdventureDataBlk(void) {
     return sizeof(AdventureSave);
 }

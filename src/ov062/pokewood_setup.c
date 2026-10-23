@@ -1,4 +1,7 @@
 #include "types.h"
+#include "app/pkwd_book.h"
+#include "app/pkwd_record_monitor.h"
+#include "app/pkwd_selectscreen.h"
 #include "field/pokewood_system.h"
 #include "gfl/heap.h"
 #include "save/pokewood.h"
@@ -7,25 +10,6 @@
 #include "system/game_data.h"
 #include "system/game_event.h"
 #include "system/game_system.h"
-
-typedef struct {
-    PlayerInfo *playerInfo;
-    PokewoodSave *save;
-    u16 *var;
-} Ov062Param6680;
-
-typedef struct {
-    PlayerInfo *playerInfo;
-    SaveControl *saveControl;
-    u16 *var;
-    PokewoodSave *save;
-    u32 unk10;
-} Ov062Param66c0;
-
-typedef struct {
-    PlayerInfo *playerInfo;
-    PokewoodSave *save;
-} Ov062Param6714;
 
 // The event that keeps a movie's results and writes the Pokewood block to its slot
 typedef struct {
@@ -37,53 +21,56 @@ typedef struct {
     u16 *var;
 } PokewoodSaveEvent;
 
-void *PokewoodSetup_CreateBookParam(HeapID heapId, GameSystem *gsys, u16 *var) {
+PkwdBookParam *PokewoodSetup_CreateBookParam(HeapID heapId, GameSystem *gsys, u16 *var) {
     GameData *gameData = GSYS_GetGameData(gsys);
     PlayerInfo *playerInfo = GetGameDataPlayerInfo(gameData);
     PokewoodSave *save = PokewoodSave_Get(gameData);
-    Ov062Param6680 *param = GFL_HeapAllocate(heapId, sizeof(Ov062Param6680), TRUE, "pokewood_setup.c", 75);
+    PkwdBookParam *param = GFL_HeapAllocate(heapId, sizeof(PkwdBookParam), TRUE, "pokewood_setup.c", 75);
 
     param->playerInfo = playerInfo;
     param->save = save;
-    param->var = var;
+    // The script's variable holds the book's signed result
+    param->result = (s16 *)var;
     return param;
 }
 
-void PokewoodSetup_FreeBookParam(void *param) {
+void PokewoodSetup_FreeBookParam(PkwdBookParam *param) {
     GFL_HeapFree(param);
 }
 
-void *PokewoodSetup_CreateMenuParam(HeapID heapId, GameSystem *gsys, u16 a2, u16 *var) {
+PkwdSelectScreenParam *PokewoodSetup_CreateMenuParam(HeapID heapId, GameSystem *gsys, u16 mode, u16 *var) {
     GameData *gameData = GSYS_GetGameData(gsys);
     PlayerInfo *playerInfo = GetGameDataPlayerInfo(gameData);
     PokewoodSave *save = PokewoodSave_Get(gameData);
     SaveControl *saveControl = GameData_GetSaveControl(gameData);
-    Ov062Param66c0 *param = GFL_HeapAllocate(heapId, sizeof(Ov062Param66c0), TRUE, "pokewood_setup.c", 111);
+    PkwdSelectScreenParam *param =
+        GFL_HeapAllocate(heapId, sizeof(PkwdSelectScreenParam), TRUE, "pokewood_setup.c", 111);
 
     param->playerInfo = playerInfo;
     param->saveControl = saveControl;
-    param->var = var;
+    param->result = var;
     param->save = save;
-    param->unk10 = a2;
+    param->mode = mode;
     return param;
 }
 
-void PokewoodSetup_FreeMenuParam(void *param) {
+void PokewoodSetup_FreeMenuParam(PkwdSelectScreenParam *param) {
     GFL_HeapFree(param);
 }
 
-void *PokewoodSetup_CreateRecordMonitorParam(HeapID heapId, GameSystem *gsys) {
+PkwdRecordMonitorParam *PokewoodSetup_CreateRecordMonitorParam(HeapID heapId, GameSystem *gsys) {
     GameData *gameData = GSYS_GetGameData(gsys);
     PlayerInfo *playerInfo = GetGameDataPlayerInfo(gameData);
     PokewoodSave *save = PokewoodSave_Get(gameData);
-    Ov062Param6714 *param = GFL_HeapAllocate(heapId, sizeof(Ov062Param6714), TRUE, "pokewood_setup.c", 189);
+    PkwdRecordMonitorParam *param =
+        GFL_HeapAllocate(heapId, sizeof(PkwdRecordMonitorParam), TRUE, "pokewood_setup.c", 189);
 
     param->playerInfo = playerInfo;
     param->save = save;
     return param;
 }
 
-void PokewoodSetup_FreeRecordMonitorParam(void *param) {
+void PokewoodSetup_FreeRecordMonitorParam(PkwdRecordMonitorParam *param) {
     GFL_HeapFree(param);
 }
 

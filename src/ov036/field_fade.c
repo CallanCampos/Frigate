@@ -1019,17 +1019,7 @@ static GameEventReturnCode func_ov036_021ba4bc(GameEvent *event, u32 *state, voi
     return GAMEEVENT_CONTINUE;
 }
 
-typedef struct {
-    s32 x;
-    s32 z;
-    s32 width;
-    s32 height;
-    s32 unk10;
-    s32 enabled;
-} FieldFadeRect;
-
-BOOL func_ov036_021ba594(s32 x, s32 z, const void *entry) {
-    const FieldFadeRect *rect = entry;
+BOOL func_ov036_021ba594(s32 x, s32 z, const HeightExEntry *rect) {
     s32 left;
     s32 width;
     s32 top;
@@ -1037,13 +1027,13 @@ BOOL func_ov036_021ba594(s32 x, s32 z, const void *entry) {
     s32 right;
     s32 bottom;
 
-    if (rect->enabled == 0) {
+    if (rect->inUse == FALSE) {
         return FALSE;
     }
     left = rect->x;
     width = rect->width;
     top = rect->z;
-    height = rect->height;
+    height = rect->depth;
     right = left + width - 1;
     bottom = top + height - 1;
     if (left <= x && x <= right && top <= z && z <= bottom) {

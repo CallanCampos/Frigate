@@ -8,6 +8,7 @@
 #include "battle/btl_monset.h"
 #include "battle/btl_pokeparam.h"
 #include "battle/btl_pospoke.h"
+#include "battle/btl_result.h"
 #include "battle/btl_server.h"
 #include "battle/btl_server_cmd.h"
 #include "battle/btl_server_flow.h"
@@ -1685,7 +1686,7 @@ s32 CheckScriptedBattleRules(BtlMainModule *mainModule, BtlPokeCon *pokeCon) {
     return 0;
 }
 
-// The battle's result for the player: 0 for a loss, 1 for a win, 2 for a draw
+// The battle's result for the player: BTL_RESULT_DEFEAT, VICTORY or DRAW
 u32 CalcBattleResult(BtlServerFlow *flow) {
     u8 alive[2];
     u8 total[2];
@@ -1713,33 +1714,33 @@ u32 CalcBattleResult(BtlServerFlow *flow) {
         side = GetClientSide(flow->mainModule, GetPlayerClientID(flow->mainModule));
         otherSide = side ^ 1;
         if (alive[side] == 0 && alive[otherSide] != 0) {
-            return 0;
+            return BTL_RESULT_DEFEAT;
         }
         if (alive[otherSide] == 0 && alive[side] != 0) {
-            return 1;
+            return BTL_RESULT_VICTORY;
         }
         if (!func_ov167_0219de6c(flow->mainModule)) {
-            return 2;
+            return BTL_RESULT_DRAW;
         }
         if (alive[0] == 0) {
             monId = BtlFaintRec_GetLastFainted(&flow->faintRec);
             if (monId != 0x1f) {
                 monSide = GetSideFromMonID(monId);
                 if (monSide == side) {
-                    return 1;
+                    return BTL_RESULT_VICTORY;
                 }
-                return 0;
+                return BTL_RESULT_DEFEAT;
             }
-            return 2;
+            return BTL_RESULT_DRAW;
         }
         return JudgeByRemainingMons(flow, alive, total, side);
     }
     outcome = CheckScriptedBattleRules(flow->mainModule, flow->pokeCon);
     flow->unk2130 = -outcome;
     if (outcome > 0) {
-        return 1;
+        return BTL_RESULT_VICTORY;
     }
-    return 0;
+    return BTL_RESULT_DEFEAT;
 }
 
 // When both sides are still standing: the side with more mons left wins, then the one with more HP left
@@ -1755,27 +1756,27 @@ static u32 JudgeByRemainingMons(BtlServerFlow *flow, const u8 *alive, const u8 *
     if (down0 != down1) {
         winner = down0 >= down1 ? 1 : 0;
         if (winner == side) {
-            return 1;
+            return BTL_RESULT_VICTORY;
         }
-        return 0;
+        return BTL_RESULT_DEFEAT;
     }
     GetSideHP(flow, &hp[0], &percent[0], 0);
     GetSideHP(flow, &hp[1], &percent[1], 1);
     if (percent[0] != percent[1]) {
         winner = percent[0] > percent[1] ? 0 : 1;
         if (winner == side) {
-            return 1;
+            return BTL_RESULT_VICTORY;
         }
-        return 0;
+        return BTL_RESULT_DEFEAT;
     }
     if (hp[0] != hp[1]) {
         winner = hp[0] > hp[1] ? 0 : 1;
         if (winner == side) {
-            return 1;
+            return BTL_RESULT_VICTORY;
         }
-        return 0;
+        return BTL_RESULT_DEFEAT;
     }
-    return 2;
+    return BTL_RESULT_DRAW;
 }
 
 // The HP a side has left, in total and in percent of its max

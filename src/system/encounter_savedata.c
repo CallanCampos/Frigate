@@ -7,8 +7,6 @@
 // The wild encounters' save: the roaming Pokémon, the swarm's location, the repel and the special Pokémon that were
 // caught. The ROM has no string for the file, so the name is a guess. Block 0x37.
 
-#define SAVE_BLOCK_ENCOUNT 0x37
-
 u32 EncountSave_GetBlockSize(void) {
     return sizeof(EncountSave);
 }

@@ -7,6 +7,29 @@
 #include "gfl/heap.h"
 #include "struct_decls.h"
 
+// The commands that the server sends its clients through their adapters (BtlAdapter_SetCmd), named after what the
+// client does: set up the view, the players' choices, play the server's commands (SC_*), quit with the client IDs,
+// store the record, end the battle by its kind, and show that the time is up
+enum {
+    BTL_ACMD_NONE,
+    BTL_ACMD_SETUP_VIEW,
+    BTL_ACMD_SELECT_ROTATION,
+    BTL_ACMD_SELECT_ACTION,
+    BTL_ACMD_CONFIRM_SHIFT_SWITCH,
+    BTL_ACMD_SELECT_CHANGE_FAINTED,
+    BTL_ACMD_SELECT_CHANGE_MID_TURN,
+    BTL_ACMD_CONFIRM_NEXT_POKE,
+    BTL_ACMD_SERVER_CMD,
+    BTL_ACMD_QUIT,
+    BTL_ACMD_STORE_RECORD,
+    BTL_ACMD_EXIT_TRAINER,
+    BTL_ACMD_EXIT_FACILITY,
+    BTL_ACMD_EXIT_COMM,
+    BTL_ACMD_EXIT_WILD_WIN,
+    BTL_ACMD_EXIT_WILD_LOSE,
+    BTL_ACMD_TIME_UP,
+};
+
 // Sets up the adapters, sharing one per client unless commMode is set
 void BtlAdapter_InitSystem(u8 commMode);
 void BtlAdapter_QuitSystem(void);

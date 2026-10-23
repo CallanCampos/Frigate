@@ -18,7 +18,7 @@
 #include "system/vm.h"
 #include "system/wordset.h"
 
-// The longest name of modes 5 to 7
+// The longest name of modes NAME_ENTRY_GREETING to NAME_ENTRY_PASSERBY_MESSAGE
 static const u8 sMaxLengths[3] = { 8, 8, 8 };
 
 GameEvent *EventPhraseInput_Create(GameSystem *gsys, Field *field, GameEvent *parent, unsigned int mode, u16 *result) {
@@ -44,35 +44,35 @@ GameEvent *EventPhraseInput_Create(GameSystem *gsys, Field *field, GameEvent *pa
     data->nameEntry.gender = getTrainerGender(data->playerInfo);
     data->nameEntry.gameInfo = data->trainerInfo;
     data->nameEntry.unk30 = data->saveBlock;
-    if (mode == 14 || mode == 15) {
+    if (mode == NAME_ENTRY_TRAINER_MESSAGE || mode == NAME_ENTRY_HAPPY_MESSAGE) {
         data->nameEntry.maxLength = 8;
     } else {
-        data->nameEntry.maxLength = sMaxLengths[mode - 5];
+        data->nameEntry.maxLength = sMaxLengths[mode - NAME_ENTRY_GREETING];
     }
     data->nameEntry.name = GFL_StrBufCreate(data->nameEntry.maxLength + 1, data->heapId);
     data->nameEntry.unk2C = 0;
     switch (mode) {
-    case 0:
-    case 1:
-    case 2:
-    case 3:
-    case 4:
-    case 7:
-    case 8:
-    case 9:
-    case 10:
-    case 11:
-    case 12:
-    case 13:
-    case 14:
+    case NAME_ENTRY_PLAYER:
+    case NAME_ENTRY_POKEMON:
+    case NAME_ENTRY_BOX:
+    case NAME_ENTRY_RIVAL:
+    case NAME_ENTRY_FRIEND:
+    case NAME_ENTRY_PASSERBY_MESSAGE:
+    case NAME_ENTRY_AVENUE_NAME:
+    case NAME_ENTRY_AVENUE_TITLE:
+    case NAME_ENTRY_FAVORITE_PHRASE:
+    case NAME_ENTRY_PLASMA_PASSWORD:
+    case NAME_ENTRY_GAME_SYNC_ID:
+    case NAME_ENTRY_IMPRESSED:
+    case NAME_ENTRY_TRAINER_MESSAGE:
         break;
-    case 5:
+    case NAME_ENTRY_GREETING:
         GFL_StrBufLoadString(data->nameEntry.name, TrainerGameInfo_GetGreeting(data->trainerInfo));
         break;
-    case 6:
+    case NAME_ENTRY_THANKS:
         GFL_StrBufLoadString(data->nameEntry.name, TrainerGameInfo_GetThanks(data->trainerInfo));
         break;
-    case 15:
+    case NAME_ENTRY_HAPPY_MESSAGE:
         GFL_StrBufLoadString(data->nameEntry.name, CGearName_Get(data->saveBlock));
         break;
     }
@@ -104,33 +104,33 @@ void func_ov033_02177734(struct EventPhraseInputData *data, NameEntryParam *para
         return;
     }
     switch (data->mode) {
-    case 0:
-    case 1:
-    case 2:
-    case 3:
-    case 4:
-    case 8:
-    case 9:
-    case 10:
-    case 11:
-    case 12:
-    case 13:
+    case NAME_ENTRY_PLAYER:
+    case NAME_ENTRY_POKEMON:
+    case NAME_ENTRY_BOX:
+    case NAME_ENTRY_RIVAL:
+    case NAME_ENTRY_FRIEND:
+    case NAME_ENTRY_AVENUE_NAME:
+    case NAME_ENTRY_AVENUE_TITLE:
+    case NAME_ENTRY_FAVORITE_PHRASE:
+    case NAME_ENTRY_PLASMA_PASSWORD:
+    case NAME_ENTRY_GAME_SYNC_ID:
+    case NAME_ENTRY_IMPRESSED:
         break;
-    case 5:
+    case NAME_ENTRY_GREETING:
         TrainerGameInfo_SetGreeting(data->trainerInfo, param->name);
         GameBeaconSys_UpdateGreeting();
         break;
-    case 6:
+    case NAME_ENTRY_THANKS:
         TrainerGameInfo_SetThanks(data->trainerInfo, param->name);
         break;
-    case 15:
+    case NAME_ENTRY_HAPPY_MESSAGE:
         CGearName_Set(data->saveBlock, param->name);
         break;
-    case 7:
+    case NAME_ENTRY_PASSERBY_MESSAGE:
         GFL_StrBufCopy(BeaconStatus_GetGreeting(data->unk18), data->nameEntry.name);
         GameBeacon_BroadcastPhrase(param->name, param->unk34);
         break;
-    case 14:
+    case NAME_ENTRY_TRAINER_MESSAGE:
         GFL_StrBufCopy(BeaconStatus_GetGreeting(data->unk18), data->nameEntry.name);
         GameBeacon_BroadcastPhrase(param->name, param->unk34);
         break;

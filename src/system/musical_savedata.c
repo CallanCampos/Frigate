@@ -7,8 +7,6 @@
 // musical's counters. The ROM has no string for the file, so the name is a guess (swan's
 // getAddressOfMusicalDataInfo). Block 0x2a.
 
-#define SAVE_BLOCK_MUSICAL 0x2a
-
 u32 MusicalSave_GetSize(void) {
     return sizeof(MusicalSave);
 }

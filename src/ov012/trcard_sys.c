@@ -308,10 +308,10 @@ static u32 TrainerCardSys_SeqOtherWait(TrainerCardSysWork *wk) {
 void TrainerCardData_FillExtras(TrainerCardData *data, GameData *gameData, HeapID heapId) {
     SaveControl *save;
     MedalBox *box;
-    void *wbt;
+    WbtSave *wbt;
     JoinAvenueInfo *avenue;
     GameRecords *records;
-    void *unk;
+    FunfestSave *unk;
     EventWork *eventWork;
     u32 wins = 0;
     u32 i;
@@ -424,7 +424,7 @@ void TrainerCardData_Fill(TrainerCardData *data, GameData *gameData, BOOL isSnap
     void *cgear = CGearPhrases_GetBlock(save);
     PokeDexSave *pokedex = GameData_GetPokedex(gameData);
     HighLinkSave *highLink;
-    void *passPowerData;
+    PassPowerData *passPowerData;
     u8 i;
     u8 bit;
 
@@ -558,9 +558,9 @@ u32 TrainerCard_CountStars(GameData *gameData) {
     // Read but unused
     BSubwayScoreData *bsubway = GameData_GetBSubwayScoreData(gameData);
     MusicalSave *musical = getMusicalInfoBlkAddress(gameData);
-    void *levels = GameData_GetMyPassPowerLevels(gameData);
+    PassPowerLevel *levels = GameData_GetMyPassPowerLevels(gameData);
     PokewoodSave *pokewood = PokewoodSave_Get(gameData);
-    void *wbt = TrialHouseSave_GetWbtSave(save);
+    WbtSave *wbt = TrialHouseSave_GetWbtSave(save);
 
     if (EventWork_FlagGet(GameData_GetEventWork(gameData), 0x960)) {
         stars++;
