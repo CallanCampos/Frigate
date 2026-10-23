@@ -306,6 +306,12 @@ Same instructions, registers swapped.
   before the byte-copy loop and used for both the copy destination and the return value. This keeps the scaled
   index and array base across the copy and matches the original final address calculation; an `int` snapshot
   instead makes the function four bytes longer under `dsi/1.2`.
+- AOSS's `GetSecurityData` keeps `entry` as the selected record's header while advancing `record` through
+  `record->payload.bytes`, before reading `entry->length`. These distinct cursor and header lifetimes preserve
+  the original pointer copy. Reading the length before advancing the cursor lets MWCC coalesce them instead.
+- AOSS's `AstsRestartRes` declares its immutable header pointer after the state guard, then derives the record
+  directly from `packet->body`. This keeps the original separate header and body address computations without
+  reaching a field through a byte-offset cast.
 - GameSpy's `ProcessPingPacket` needs an `IN_ADDR senderIp = fromAddr->addr` before its second diagnostic, with
   `SOC_InetNtoA(senderIp)` as the formatter argument. Passing the named IPv4 value reproduces the original's
   field-address load and by-value argument where passing the field expression directly does not.

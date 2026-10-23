@@ -1062,15 +1062,14 @@ static int AstsSetSecureRes(int state, AossPacket *packet, int *errors, const u8
 }
 
 static int AstsRestartRes(int state, AossPacket *packet, int *errors, const u8 *ids) {
-    tagASTSpktHeader *header;
     AossRecord *record;
 
     if (state != 2) {
         (*errors)++;
         return state;
     }
-    header = &packet->header;
-    record = (AossRecord *)(header + 1);
+    tagASTSpktHeader *const header = &packet->header;
+    record = (AossRecord *)packet->body;
     if (CheckRecvSeqID(ids + 16, header->SeqID) < 0) {
         (*errors)++;
         return state;
@@ -1399,8 +1398,8 @@ static int GetSecurityData(int slot, const AossRecord *record, int length, ASTS_
             return -4;
         }
     }
+    record = (const AossRecord *)record->payload.bytes;
     size = AOSS_Ntohs(entry->length);
-    record = (const AossRecord *)((const u8 *)entry + 4);
     ap = &slots[slot];
     do {
         switch (record->type) {

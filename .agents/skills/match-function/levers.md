@@ -7,6 +7,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 ## Registers swapped
 
+- A selected record header coalesced with the payload cursor: advance the cursor before reading the saved
+  header length (`GetSecurityData`). (matching.md: "distinct cursor and header lifetimes")
 - An alternating buffer's index reloaded after a byte copy: snapshot the selected index in its unsigned type and
   use it for both the copy and return (`value_for_key`). (matching.md: "selected alternating buffer")
 - A by-value IPv4 formatter argument loaded differently from a struct field: name the `IN_ADDR` value before the
