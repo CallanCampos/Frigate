@@ -21,41 +21,45 @@ static inline void *DSProt_CheckFailed(DSProtCheckArgs *args, void *arg0, void *
     return args->tamper(arg0, arg1);
 }
 
-// Runs the two checks of the stubs `DSProt_CallCheckFlashcartA` and `DSProt_CallCheckFlashcartAStub`, each of which
-// gets the arguments and returns a code that is added up
-void *DSProt_RunChecks1(void *arg0, void *arg1) {
-    DSProtCheckArgs args;
-    u32 checks[32];
-    u32 *check;
-    u32 total;
-    // DS Protect keeps the pair's address biased by 0x2200 in the literal and removes the bias at run time
-    DSProtCallback *callbacks = (DSProtCallback *)((u32)(data_ov337_02182444 + 0x880) - 0x2200);
-    u32 index = data_ov337_02182440;
+// Checks the first 37 words of a decryption wrapper before it is called
+static inline BOOL DSProt_CheckWrapperMulti(const void *function) {
+    u32 i;
+    const u32 *code;
+    u32 checksum;
 
-    // The order of these stores sets the registers of the locals across the loop
+    code = function;
+    i = 0x25;
+    checksum = 0;
+    do {
+        checksum ^= (*code >> i) | (*code << (32 - i));
+        code++;
+    } while (--i != 0);
+    return checksum == DSPROT_CHECKSUM;
+}
+
+// Runs the checks of a list that ends at its first zero, each of which gets the arguments and returns a code that is
+// added up, and calls the first function of the pair the game picked if the total is a multiple of `divisor`, the
+// second if it isn't or a check failed
+static inline void *DSProt_RunQueueMulti(u32 *check, void *arg0, void *arg1, u32 divisor) {
+    DSProtCheckArgs args;
+    u32 total;
+    u32 (*func)(DSProtCheckArgs *);
+    u32 value;
+    // DS Protect keeps the addresses of the pair and of its index biased by 0x2200 in the literals and removes the
+    // bias at run time, as a signed value
+    DSProtCallback *callbacks = (DSProtCallback *)((s32)(data_ov337_02182444 + 0x880) - 0x2200);
+    u32 index = *(u32 *)((s32)(&data_ov337_02182440 + 0x880) - 0x2200);
+
     args.nop = callbacks[index];
     args.tamper = callbacks[index ^ 1];
-    checks[0] = (u32)(DSProt_CallCheckFlashcartA + 0x2200);
     args.arg0 = arg0;
-    checks[1] = (u32)(DSProt_CallCheckFlashcartAStub + 0x2200);
     args.arg1 = arg1;
-    checks[2] = 0;
-    args.failed = 0;
     args.result = NULL;
-    check = checks;
+    args.failed = 0;
     total = 0x30eb87;
     do {
-        u32 (*func)(DSProtCheckArgs *) = (u32 (*)(DSProtCheckArgs *))(*check - 0x2200);
-        u32 *code = (u32 *)func;
-        u32 checksum = 0;
-        u32 i;
-        u32 value;
-
-        for (i = 0x25; i != 0; i--) {
-            checksum ^= (*code >> i) | (*code << (32 - i));
-            code++;
-        }
-        if (checksum != DSPROT_CHECKSUM) {
+        func = (u32 (*)(DSProtCheckArgs *))(*check - 0x2200);
+        if (!DSProt_CheckWrapperMulti(func)) {
             return DSProt_CheckFailed(&args, arg0, arg1);
         }
         value = func(&args);
@@ -65,172 +69,61 @@ void *DSProt_RunChecks1(void *arg0, void *arg1) {
         total += value;
         check++;
     } while (*check != 0);
-    if (total % 241 == 0) {
+    if (total % divisor == 0) {
         return args.nop(arg0, arg1);
     }
     if (args.failed != 0) {
         return args.result;
     }
     return args.tamper(arg0, arg1);
+}
+
+// Runs the two checks of the stubs `DSProt_CallCheckFlashcartA` and `DSProt_CallCheckFlashcartAStub`, each of which
+// gets the arguments and returns a code that is added up
+void *DSProt_RunChecks1(void *arg0, void *arg1) {
+    u32 checks[32];
+
+    // The order of these stores, the list's end first, sets the registers of the runner's first loads
+    checks[2] = 0;
+    checks[0] = (u32)(DSProt_CallCheckFlashcartA + 0x2200);
+    checks[1] = (u32)(DSProt_CallCheckFlashcartAStub + 0x2200);
+    return DSProt_RunQueueMulti(checks, arg0, arg1, 241);
 }
 
 // Runs the two checks of the stubs `DSProt_CallCheckFlashcartB` and `DSProt_CallCheckFlashcartBStub`, each of which
 // gets the arguments and returns a code that is added up
 void *DSProt_RunChecks2(void *arg0, void *arg1) {
-    DSProtCheckArgs args;
     u32 checks[32];
-    u32 *check;
-    u32 total;
-    // DS Protect keeps the pair's address biased by 0x2200 in the literal and removes the bias at run time
-    DSProtCallback *callbacks = (DSProtCallback *)((u32)(data_ov337_02182444 + 0x880) - 0x2200);
-    u32 index = data_ov337_02182440;
 
-    // The order of these stores sets the registers of the locals across the loop
-    args.nop = callbacks[index];
-    args.tamper = callbacks[index ^ 1];
-    checks[0] = (u32)(DSProt_CallCheckFlashcartB + 0x2200);
-    args.arg0 = arg0;
-    checks[1] = (u32)(DSProt_CallCheckFlashcartBStub + 0x2200);
-    args.arg1 = arg1;
+    // The order of these stores, the list's end first, sets the registers of the runner's first loads
     checks[2] = 0;
-    args.failed = 0;
-    args.result = NULL;
-    check = checks;
-    total = 0x30eb87;
-    do {
-        u32 (*func)(DSProtCheckArgs *) = (u32 (*)(DSProtCheckArgs *))(*check - 0x2200);
-        u32 *code = (u32 *)func;
-        u32 checksum = 0;
-        u32 i;
-        u32 value;
-
-        for (i = 0x25; i != 0; i--) {
-            checksum ^= (*code >> i) | (*code << (32 - i));
-            code++;
-        }
-        if (checksum != DSPROT_CHECKSUM) {
-            return DSProt_CheckFailed(&args, arg0, arg1);
-        }
-        value = func(&args);
-        if (value == 0 && args.failed == 0) {
-            return DSProt_CheckFailed(&args, arg0, arg1);
-        }
-        total += value;
-        check++;
-    } while (*check != 0);
-    if (total % 251 == 0) {
-        return args.nop(arg0, arg1);
-    }
-    if (args.failed != 0) {
-        return args.result;
-    }
-    return args.tamper(arg0, arg1);
+    checks[0] = (u32)(DSProt_CallCheckFlashcartB + 0x2200);
+    checks[1] = (u32)(DSProt_CallCheckFlashcartBStub + 0x2200);
+    return DSProt_RunQueueMulti(checks, arg0, arg1, 251);
 }
 
 // Runs the two checks of the stubs `DSProt_CallCheckEmulatorA` and `DSProt_CallCheckEmulatorAStub`, each of which gets
 // the arguments and returns a code that is added up
 void *DSProt_RunChecks3(void *arg0, void *arg1) {
-    DSProtCheckArgs args;
     u32 checks[32];
-    u32 *check;
-    u32 total;
-    // DS Protect keeps the pair's address biased by 0x2200 in the literal and removes the bias at run time
-    DSProtCallback *callbacks = (DSProtCallback *)((u32)(data_ov337_02182444 + 0x880) - 0x2200);
-    u32 index = data_ov337_02182440;
 
-    // The order of these stores sets the registers of the locals across the loop
-    args.nop = callbacks[index];
-    args.tamper = callbacks[index ^ 1];
-    checks[0] = (u32)(DSProt_CallCheckEmulatorA + 0x2200);
-    args.arg0 = arg0;
-    checks[1] = (u32)(DSProt_CallCheckEmulatorAStub + 0x2200);
-    args.arg1 = arg1;
+    // The order of these stores, the list's end first, sets the registers of the runner's first loads
     checks[2] = 0;
-    args.failed = 0;
-    args.result = NULL;
-    check = checks;
-    total = 0x30eb87;
-    do {
-        u32 (*func)(DSProtCheckArgs *) = (u32 (*)(DSProtCheckArgs *))(*check - 0x2200);
-        u32 *code = (u32 *)func;
-        u32 checksum = 0;
-        u32 i;
-        u32 value;
-
-        for (i = 0x25; i != 0; i--) {
-            checksum ^= (*code >> i) | (*code << (32 - i));
-            code++;
-        }
-        if (checksum != DSPROT_CHECKSUM) {
-            return DSProt_CheckFailed(&args, arg0, arg1);
-        }
-        value = func(&args);
-        if (value == 0 && args.failed == 0) {
-            return DSProt_CheckFailed(&args, arg0, arg1);
-        }
-        total += value;
-        check++;
-    } while (*check != 0);
-    if (total % 241 == 0) {
-        return args.nop(arg0, arg1);
-    }
-    if (args.failed != 0) {
-        return args.result;
-    }
-    return args.tamper(arg0, arg1);
+    checks[0] = (u32)(DSProt_CallCheckEmulatorA + 0x2200);
+    checks[1] = (u32)(DSProt_CallCheckEmulatorAStub + 0x2200);
+    return DSProt_RunQueueMulti(checks, arg0, arg1, 241);
 }
 
 // Runs the two checks of the stubs `DSProt_CallCheckEmulatorB` and `DSProt_CallCheckEmulatorBStub`, each of which gets
 // the arguments and returns a code that is added up
 void *DSProt_RunChecks4(void *arg0, void *arg1) {
-    DSProtCheckArgs args;
     u32 checks[32];
-    u32 *check;
-    u32 total;
-    // DS Protect keeps the pair's address biased by 0x2200 in the literal and removes the bias at run time
-    DSProtCallback *callbacks = (DSProtCallback *)((u32)(data_ov337_02182444 + 0x880) - 0x2200);
-    u32 index = data_ov337_02182440;
 
-    // The order of these stores sets the registers of the locals across the loop
-    args.nop = callbacks[index];
-    args.tamper = callbacks[index ^ 1];
-    checks[0] = (u32)(DSProt_CallCheckEmulatorB + 0x2200);
-    args.arg0 = arg0;
-    checks[1] = (u32)(DSProt_CallCheckEmulatorBStub + 0x2200);
-    args.arg1 = arg1;
+    // The order of these stores, the list's end first, sets the registers of the runner's first loads
     checks[2] = 0;
-    args.failed = 0;
-    args.result = NULL;
-    check = checks;
-    total = 0x30eb87;
-    do {
-        u32 (*func)(DSProtCheckArgs *) = (u32 (*)(DSProtCheckArgs *))(*check - 0x2200);
-        u32 *code = (u32 *)func;
-        u32 checksum = 0;
-        u32 i;
-        u32 value;
-
-        for (i = 0x25; i != 0; i--) {
-            checksum ^= (*code >> i) | (*code << (32 - i));
-            code++;
-        }
-        if (checksum != DSPROT_CHECKSUM) {
-            return DSProt_CheckFailed(&args, arg0, arg1);
-        }
-        value = func(&args);
-        if (value == 0 && args.failed == 0) {
-            return DSProt_CheckFailed(&args, arg0, arg1);
-        }
-        total += value;
-        check++;
-    } while (*check != 0);
-    if (total % 251 == 0) {
-        return args.nop(arg0, arg1);
-    }
-    if (args.failed != 0) {
-        return args.result;
-    }
-    return args.tamper(arg0, arg1);
+    checks[0] = (u32)(DSProt_CallCheckEmulatorB + 0x2200);
+    checks[1] = (u32)(DSProt_CallCheckEmulatorBStub + 0x2200);
+    return DSProt_RunQueueMulti(checks, arg0, arg1, 251);
 }
 
 // Hand-written, as every DSProt_Call* is: checksums DSProt_DispatchMulti from the address and word count packed in its

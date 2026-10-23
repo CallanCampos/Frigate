@@ -25,12 +25,18 @@ tools that show the differences.
   before the first addition, as the original does; folding that term into the initializer spills it later.
 
 - Nested inline boundaries and file-level interprocedural analysis can explain saved-result lifetimes and register
-  allocation. DS Protect's `DSProt_RunChecks` matches with an inline Boolean checksum helper inside an inline
-  queue runner, whose result the public function returns. Its flashcart check uses an inline test returning
-  the encoded success/failure values and an inline raw reader taking a byte count. Both files match their
-  functions, data and relocations in both versions with per-source `-ipa file`; other DS Protect sources keep
-  their own settings. The loader-owned static constructor registrations need `__attribute__((used))` under
-  this analysis because their references are outside the C call graph.
+  allocation. DS Protect's `DSProt_RunChecks` matches with an inline Boolean checksum helper inside an inline queue
+  runner, whose result the public function returns. Its flashcart check uses an inline test returning the encoded
+  success/failure values and an inline raw reader taking a byte count. Overlay 337's copies need the same shapes.
+  `dsprot_run_multi.c`'s four runners match only with the checksum helper inside an inline queue runner; without
+  `-ipa file` they keep the 14 bytes of the loop's registers that `dsprot_run.c` has without it.
+  `dsprot_detect_multi.c`'s two flashcart checks are the inline test, with their codes as its arguments. Written flat
+  they are 8 bytes larger, rebuilding the page's address in each of the three reads. Flat with `dsprot_detect.c`'s
+  reader under `-ipa file`, they have the original's size and 260 bytes of registers and slots off. An inline reached
+  through another inline is emitted out of line without `-ipa file`. The four files match their functions, data and
+  relocations in both versions with per-source `-ipa file`; other DS Protect sources keep their own settings. The
+  loader-owned static constructor registrations need `__attribute__((used))` under this analysis because their
+  references are outside the C call graph.
 
 - A missing variadic log argument can change registers throughout a function without changing its size. Check the
   ROM's format string before tuning allocation: `download_play_wih.c`'s parent and MP callbacks and finalizer require
@@ -2572,11 +2578,10 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 - I/O registers reached as offsets from one base register (`ldr r0, [sb, #0x1a4]`, `add fp, sb, #0x100000`), with
   the base made by shifting a register that holds 1 (`mov r3, #1; lsl sb, r3, #0x1a`), are not `1 << 26` or a base
   pointer local: MWCC folds both back to a constant and loads each register's address from the literal pool. Only a
-  shift that MWCC sees after propagating the value keeps it, `u32 base = 1; base <<= 26;`, which takes DS Protect's
-  `DSProt_CheckFlashcartA` (`dsprot_detect_multi.c`) from 0x770 to between 0x74c and 0x774 against the original's
-  0x764, by how the rest is written, without matching; it was judged unnatural and left out of the source. Its header
-  address, which the original computes from the TWL bit, is `(((twl) + 5) << 23) - 0x1a0`; a
-  `twl ? 0x02fffe60 : 0x027ffe60` gave two literals and a select.
+  shift that MWCC sees after propagating the value keeps it, `u32 base = 1; base <<= 26;`, as DS Protect's card
+  readers have it (`DSProt_ReadCardRaw` in `dsprot_detect.c` and `dsprot_detect_multi.c`). Its header address,
+  which the original computes from the TWL bit, is `(((twl) + 5) << 23) - 0x1a0`; a `twl ? 0x02fffe60 :
+  0x027ffe60` gave two literals and a select.
 
 ## Branches and block layout
 
@@ -3025,12 +3030,6 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   entry test (`cmp r2, #0; addls sp, sp, #0x10; popls; ldrsh r4, [r1]`), as the original does. The same variable at
   file scope is loaded in the loop, and a local copy of it (`int amount = shift;`) is loaded above the entry test
   (`cmp r1, #0; ldrsh lr, [r2, #4]; pople`), which is what an original that reads it into a local looks like.
-- The order of independent stores before a loop can decide whether a local struct's address, passed to a call on
-  every pass, keeps a register across the loop. DS Protect's `DSProt_RunChecks1`-`4` (`dsprot_run_multi.c`) keep
-  `&args` in a register as the original does with the stores to `args` and `checks[]` interleaved (`args.nop`,
-  `args.tamper`, `checks[0]`, `args.arg0`, `checks[1]`, `args.arg1`, `checks[2]`, `args.failed`, `args.result`);
-  written group by group, 82 bytes differ instead of 71. A `DSProtCheckArgs *p = &args;` used only at the call gets
-  the register too, but names nothing. See the function's row for what still differs.
 - A loop bound held in a local is computed where the local is set, and one set before a call lives across it and can
   push another local to the stack. Written in the loop condition, the bound is computed just before the loop:
   multiboot's `MBi_ReadFromCache` (`mb_cache.c`) matched with `entry < &cache->entries[MB_CACHE_INFO_MAX]` in the `for`
@@ -4130,12 +4129,12 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   arithmetic, `&x + 0x2200 / sizeof(u32)` or `arr + 0x880`, as `Func + 0x2200` does for a function; byte arithmetic,
   `(u32)&x + 0x2200` or `(u8 *)&x + 0x2200`, loads the plain symbol and adds 0x2200 at run time. DS Protect biases its
   addresses this way and subtracts the bias at run time. The `- 0x2200` stays at run time when the result is the base
-  of a variable index: `DSProt_RunChecks1`'s `(DSProtCallback *)((u32)(data_ov337_02182444 + 0x880) - 0x2200)`, read
-  as `callbacks[index]`, gives the original's `ldr =SYM+0x2200; sub r4, r4, #0x2200`. For a scalar read MWCC folds it
-  back to the plain symbol in every spelling tried (a `u32`, `const` or pointer local, a `static inline`, a macro,
-  `[-0x880]` indexing). The one that keeps it there stores the biased value into `checks[]` and reads it back
-  (`checks[0] = biased; check = checks; index = *(u32 *)(*check++ - 0x2200);`), a store written only to stop MWCC
-  folding the constant, which `docs/code-standards.md` §2 rejects.
+  of a variable index: `DSProt_RunQueueMulti`'s `(DSProtCallback *)((s32)(data_ov337_02182444 + 0x880) - 0x2200)`, read
+  as `callbacks[index]`, gives the original's `ldr =SYM+0x2200; sub r4, r4, #0x2200`. For a scalar read through an
+  unsigned address MWCC folds it back to the plain symbol in every spelling (a `u32`, `const` or pointer local, a
+  `static inline`, a macro, `[-0x880]` indexing); through a signed one it keeps it, as an offset too large for the
+  load, which it splits: `*(u32 *)((s32)(&data_ov337_02182440 + 0x880) - 0x2200)` gives the original's
+  `sub r2, r2, #0x2000; ldr r3, [r2, #-0x200]` in `dsprot_run_multi.c`, where the same read with `(u32)` folds.
 - With `-ipa file` the order of a file's same-size statics in `.bss` is set by their declaration order, but not as that
   order: the four `int`s and two arrays of the echo filter in `vct_dsp.c` came out in 150 of 2,880 declaration orders
   with the ROM's layout (`PrevIn`, read index, write index, `PrevOut`, coefficients, taps), and the other orders give
