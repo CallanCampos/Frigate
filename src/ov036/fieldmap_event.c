@@ -263,7 +263,7 @@ static GameEvent *FieldEventProvider_Grid_CheckForEvent(GameSystem *gsys, Field 
         *scriptCalled = TRUE;
         return event;
     }
-    event = func_ov036_021c210c(gsys, *GameData_GetPleasureBoatPtr(wk.gameData));
+    event = PleasureBoat_Update(gsys, *GameData_GetPleasureBoatPtr(wk.gameData));
     if (event != NULL) {
         return event;
     }
@@ -397,7 +397,7 @@ static GameEvent *FieldEventProvider_Grid_CheckForEvent(GameSystem *gsys, Field 
         }
     }
     if (GSYS_IsNetErrorPending(gsys) == TRUE && GFL_WipeIsFinished() && wk.canAct) {
-        return func_ov036_021ba6c8(gsys, field);
+        return EventCommError_Create(gsys, field);
     }
     if (wk.xPressed && GFL_WipeIsFinished()) {
         if (FieldSubscreen_GetScreenID(Field_GetSubscreen(field)) == FLD_SUBSCREEN_ID_DOWSING) {
@@ -444,9 +444,9 @@ GameEvent *FieldEventProvider_Grid(GameSystem *gsys, void *data) {
         if (scriptCalled) {
             EncountSystem_CancelPhenomenon(encounter);
         }
-        func_ov036_021b5168(Field_GetPlaceName(field));
+        PlaceName_Cancel(Field_GetPlaceName(field));
         FieldPlayer_InterruptCatwalkBalance(Field_GetPlayer(field), menuOpened);
-        func_ov036_0219abd8(Field_GetPlayer(field));
+        FieldPlayer_StopGridForcedMove(Field_GetPlayer(field));
         rush = Field_GetCasteliaRush(field);
         if (rush != NULL) {
             CasteliaRush_ClearBalloons(rush);
@@ -467,7 +467,7 @@ GameEvent *FieldEventProvider_UnionRoom(GameSystem *gsys, void *data) {
     if (unisys == NULL) {
         if (GFL_NetErrCheck()) {
             if (GFL_WipeIsFinished()) {
-                return func_ov036_021ba6c8(gsys, field);
+                return EventCommError_Create(gsys, field);
             }
             return NULL;
         }
@@ -512,7 +512,7 @@ GameEvent *FieldEventProvider_UnionRoom(GameSystem *gsys, void *data) {
         }
     }
     if (GSYS_IsNetErrorPending(gsys) == TRUE && GFL_WipeIsFinished()) {
-        return func_ov036_021ba6c8(gsys, field);
+        return EventCommError_Create(gsys, field);
     }
     if (UnionMain_IsIdle(gsys) == FALSE) {
         return NULL;
@@ -530,7 +530,7 @@ GameEvent *FieldEventProvider_NoGrid(GameSystem *gsys, void *data) {
         CasteliaRush *rush;
         Field *field = GSYS_GetField(gsys);
 
-        func_ov036_021b5168(Field_GetPlaceName(field));
+        PlaceName_Cancel(Field_GetPlaceName(field));
         rush = Field_GetCasteliaRush(field);
         if (rush != NULL) {
             CasteliaRush_ClearBalloons(rush);
@@ -550,7 +550,7 @@ static GameEvent *FieldEventProvider_NoGrid_CheckForEvent(GameSystem *gsys, Fiel
 
     FieldEventProvider_InitCheckData(&wk, gsys, field);
     actor = FieldPlayer_GetActor(wk.player);
-    func_ov036_02195928(actor, &frontPos);
+    RailActor_GetFrontLocation(actor, &frontPos);
     event = CheckReserveEventScriptCall(&wk);
     if (event != NULL) {
         return event;
@@ -628,7 +628,7 @@ static GameEvent *FieldEventProvider_NoGrid_CheckForEvent(GameSystem *gsys, Fiel
         }
     }
     if (GSYS_IsNetErrorPending(gsys) == TRUE && GFL_WipeIsFinished() && wk.canAct) {
-        return func_ov036_021ba6c8(gsys, field);
+        return EventCommError_Create(gsys, field);
     }
     if (wk.xPressed && GFL_WipeIsFinished()) {
         if (FieldSubscreen_GetScreenID(Field_GetSubscreen(field)) == FLD_SUBSCREEN_ID_DOWSING) {
@@ -724,7 +724,7 @@ static void FieldEventProvider_InitCheckData(FieldInteractWk *wk, GameSystem *gs
 
 // Stops the Xtransceiver's ringtone, and its ringing on the C-Gear unless a call is starting
 static void StopXtransceiverRinging(GameSystem *gsys, Field *field) {
-    CGearSw *cgear = func_ov036_02198908(Field_GetSubscreen(field));
+    CGearSw *cgear = FieldSubscreen_GetCGear(Field_GetSubscreen(field));
 
     if (cgear == NULL) {
         FieldSnd_StopRingtone(GameData_GetFieldSoundSystem(GSYS_GetGameData(gsys)));
@@ -1341,7 +1341,8 @@ static GameEvent *CheckRailDiveEvent(FieldInteractWk *wk, GameSystem *gsys, Fiel
     u16 dir = FieldPlayer_GetMoveDirByKey(player, wk->held);
 
     if (dir == DIR_DOWN && (wk->observeStatus == PLAYER_OBSERVE_NONE || wk->observeStatus == PLAYER_OBSERVE_END)) {
-        if (func_ov036_021b3b3c(GetTileClass(wk->tileType)) && (func_ov036_021956e8(actor, dir) & 3) != 0) {
+        if (FieldRailTilemap_IsSignBoard(GetTileClass(wk->tileType)) &&
+            (RailActor_GetHitBitsDirNoAttr(actor, dir) & 3) != 0) {
             return func_ov033_0217a0f4(gsys, field, dir);
         }
     }
@@ -1364,7 +1365,7 @@ static GameEvent *CreateWarpMapChangeEventRail(FieldInteractWk *wk, Field *field
 
 // Whether the rail lets the player move on in the direction faced
 static BOOL CanMoveOnRail(FieldPlayer *player, FieldInteractWk *wk) {
-    if ((func_ov036_021956e8(FieldPlayer_GetActor(player), wk->faceDir) & 3) == 0) {
+    if ((RailActor_GetHitBitsDirNoAttr(FieldPlayer_GetActor(player), wk->faceDir) & 3) == 0) {
         return TRUE;
     }
     return FALSE;
@@ -1387,9 +1388,9 @@ static GameEventReturnCode EventSurfExit_Callback(GameEvent *event, u32 *state, 
     case 1: {
         u16 acmd;
 
-        func_ov036_021a4504(func_ov036_0219a5c4(player), 0);
+        FldeffNamipoke_SetFollowMode(FieldPlayer_GetRideEffect(player), 0);
         FieldPlayer_SetSpecialSeq(player, 1);
-        func_ov036_0219a58c(player);
+        FieldPlayer_FinishFormChange(player);
         acmd = GetAcmdForDir(work->dir, ACMD_JUMP_1);
         if (work->overEdge == TRUE) {
             acmd = GetAcmdForDir(work->dir, ACMD_JUMP_2);
@@ -1400,13 +1401,13 @@ static GameEventReturnCode EventSurfExit_Callback(GameEvent *event, u32 *state, 
     }
     case 2:
         if (FldAct_CheckAcmdEnd(actor) == TRUE) {
-            func_ov036_0219a5fc(player);
+            FieldPlayer_ChangeToNormalForm(player);
             (*state)++;
         }
         break;
     case 3:
         EnableAllActorsMovement(GetActorMModelSystem(actor));
-        func_ov036_0219ac0c(player);
+        FieldPlayer_SetGridHopLanded(player);
         return GAMEEVENT_DONE;
     }
     return GAMEEVENT_CONTINUE;
@@ -1482,7 +1483,7 @@ static FieldActor *FindActorForInteraction(FieldInteractWk *wk, Field *field) {
 static FieldActor *FindActorForInteractionRail(FieldInteractWk *wk, Field *field) {
     RailPosition pos;
 
-    if (func_ov036_02195928(FieldPlayer_GetActor(wk->player), &pos)) {
+    if (RailActor_GetFrontLocation(FieldPlayer_GetActor(wk->player), &pos)) {
         return FindActorByRailPos(Field_GetActorSystem(field), &pos, FALSE);
     }
     return NULL;
@@ -1544,7 +1545,7 @@ static u32 GameData_FindPartyPkmByMove(GameData *gameData, u16 move) {
 }
 
 // The number of the party's Pokémon that can battle
-u32 func_ov036_02182f90(GameSystem *gsys) {
+u32 FieldEventProvider_CountAlivePartyMembers(GameSystem *gsys) {
     PokeParty *party = GameData_GetParty(GSYS_GetGameData(gsys));
     int count = PokeParty_GetPkmCount(party);
     int i = 0;

@@ -24,7 +24,7 @@ BOOL FieldPlayerGrid_IsAcmdFinished(FieldPlayerGrid *grid, u16 dir);
 // Ends the animation of walking into a wall
 void FieldPlayerGrid_ForceBrake(FieldPlayerGrid *grid);
 // The same, for a turn too. FALSE while the player is moving
-BOOL func_ov036_0219ca30(FieldPlayerGrid *grid);
+BOOL FieldPlayerGrid_StopTurnOrBlocked(FieldPlayerGrid *grid);
 // Whether the player is sliding on ice
 BOOL FieldPlayerGrid_IsConstMoving(FieldPlayerGrid *grid);
 // Whether the player is stepping or falling off a catwalk
@@ -36,7 +36,7 @@ FieldActor *FieldPlayerGrid_GetPlayerActor(FieldPlayerGrid *grid);
 // Stops the balancing on a catwalk, keeping its time if asked
 void FieldPlayerGrid_InterruptCatwalkBalance(FieldPlayerGrid *grid, BOOL keep);
 // Ends a slide
-void func_ov036_0219cd84(FieldPlayerGrid *grid);
+void FieldPlayerGrid_StopForcedMove(FieldPlayerGrid *grid);
 // Set when the fall from a catwalk lands, until the next frame of movement
 BOOL FieldPlayerGrid_GetVerticalMoveOnlyFlag(FieldPlayerGrid *grid);
 void FieldPlayerGrid_SetVerticalMoveOnlyFlag(FieldPlayerGrid *grid);

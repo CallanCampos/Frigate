@@ -206,11 +206,11 @@ static void PokemonTradeDemoMiddle_StartBgmTimer(PokemonTradeWork *wk) {
 }
 
 static void PokemonTradeDemoMiddle_StateWaitDemo(PokemonTradeWork *wk) {
-    func_ov194_021c29b4(wk);
+    Poketrade3D_FadeTexturePalette(wk);
     if (wk->unk854 == 1) {
         PokemonTradeDemoMiddle_InitSide(wk, &wk->unk11ED, &wk->unk11EF, wk->partnerInfo, TRUE);
         PokemonTradeDemoMiddle_InitSide(wk, &wk->unk11EE, wk->unk11F0, wk->myInfo, FALSE);
-        func_ov194_021c2034(wk);
+        Poketrade3D_RemoveCurrentUnit(wk);
         if (PokemonTrade_IsNetwork(wk)) {
             NetHandle_SendTimingPair(NetHandle_GetOwn(), 0x11, 8);
             PokemonTrade_SetState(wk, PokemonTradeDemoMiddle_StateWaitSync);
@@ -242,9 +242,9 @@ static void PokemonTradeDemoMiddle_StateSetUpMoves(PokemonTradeWork *wk) {
     second = sPosSecond;
     TradeMcssMove_Free(wk->mcssMoves[1]);
     wk->mcssMoves[1] = TradeMcssMove_Create(wk->mcss[1], PokemonTradeDemoMiddle_Frame(84), &second, wk->heapId);
-    MCSS_SetAnimationEndCallback(wk->mcss[0], (u32)wk, (MCSSAnimationCallback)func_ov194_021beab4, TRUE);
+    MCSS_SetAnimationEndCallback(wk->mcss[0], (u32)wk, (MCSSAnimationCallback)TradeMcssMove_StopAnimation, TRUE);
     MCSS_StartFade(wk->mcss[1], 0, 16, (s8)(PokemonTradeDemoMiddle_Frame(14) / 16), 0);
-    func_ov194_021bfe70(wk);
+    PoketradeSave_CloseMessageWindow(wk);
     GFL_BGSysResetStdPalette(1, 0);
     GFL_BGSysResetStdPalette(5, 0);
     PokemonTradeDemoMiddle_SetTimer(wk, 0);
@@ -258,11 +258,11 @@ static void PokemonTradeDemoMiddle_StateMoves(PokemonTradeWork *wk) {
     if (wk->timer > PokemonTradeDemoMiddle_Frame(42)) {
         PartyPkm *pkm;
 
-        func_ov194_021c5ff4(wk, 0x11);
-        func_ov194_021c600c(wk, 0);
-        func_ov194_021c52bc(wk);
-        func_ov194_021c368c(wk);
-        func_ov194_021c1484(wk);
+        Poketrade2D_ScheduleMainPlaneVisible(wk, 0x11);
+        Poketrade2D_ScheduleSubPlaneVisible(wk, 0);
+        Poketrade2D_DeleteAllOfferIconActors(wk);
+        Poketrade2D_DeleteAllBoxIcons(wk);
+        PoketradeSave_DeleteOfferListWindows(wk);
         PokemonTradeDemoMiddle_SetTimer(wk, 0);
         pkm = PokemonTrade_GetPkm(wk, PokemonTrade_IsNegoType(wk));
         PokeParty_GetParam(pkm, PKM_PARAM_ID, NULL);
@@ -290,7 +290,7 @@ static void PokemonTradeDemoMiddle_StateMoves(PokemonTradeWork *wk) {
                 wk->mcssMoves[0] =
                     TradeMcssMove_CreateWithPath(wk->mcss[0], 18, &pos, sTradeDemoMiddleHopPath, wk->heapId);
             }
-            func_ov194_021c24cc(wk, 2, FALSE, PokemonTrade_GetPkm(wk, PokemonTrade_IsNegoType(wk)), TRUE);
+            Poketrade3D_AddPokemonMcssPlain(wk, 2, FALSE, PokemonTrade_GetPkm(wk, PokemonTrade_IsNegoType(wk)), TRUE);
             MCSS_PauseAnimation(wk->mcss[2]);
             MCSS_Hide(wk->mcss[2]);
         } else {
@@ -325,8 +325,8 @@ static void PokemonTradeDemoMiddle_ShowMessage(PokemonTradeWork *wk) {
     copyVarForText(wk->wordSet, 1, wk->partnerInfo);
     GFL_WordSetFormatStrbuf(wk->wordSet, wk->strbuf, wk->strbufTemplate);
     GFL_BGSysFillScrArea(4, 0, 0, 0, 32, 24, 0x11);
-    func_ov194_021bfdf8(wk, TRUE, FALSE);
-    func_ov194_021c600c(wk, 0x14);
+    PoketradeSave_OpenMessageWindowAtPos(wk, TRUE, FALSE);
+    Poketrade2D_ScheduleSubPlaneVisible(wk, 0x14);
     *(vu16 *)REG_DB_BLDCNT_ADDR = 0;
 }
 
@@ -344,10 +344,10 @@ static void PokemonTradeDemoMiddle_StateMessage(PokemonTradeWork *wk) {
         MCSS_ResumeAnimation(wk->mcss[2]);
         wk->mcssMoves[0]->mcss = wk->mcss[2];
     }
-    if (wk->timer > 200 && func_ov194_021c00b0(wk)) {
-        func_ov194_021bfe9c(wk);
+    if (wk->timer > 200 && PoketradeSave_IsMessagePrintDone(wk)) {
+        PoketradeSave_CloseMessageWindowClear(wk);
         if (wk->unk11ED == 0) {
-            func_ov194_021c24dc(wk, 0);
+            Poketrade3D_DeleteMcssSlot(wk, 0);
             wk->mcss[0] = wk->mcss[2];
             wk->mcss[2] = NULL;
         }
@@ -363,11 +363,11 @@ static void PokemonTradeDemoMiddle_StateMessage(PokemonTradeWork *wk) {
 // Frees the effects and goes on to the save
 static void PokemonTradeDemoMiddle_End(PokemonTradeWork *wk) {
     PokemonTradeDemoMiddle_FreeSprite(wk);
-    func_ov194_021c1e38(wk->work3D, 6);
-    func_ov194_021c1d30(wk->work3D);
+    Poketrade3D_ExitParticleManager(wk->work3D, 6);
+    Poketrade3D_FreeParticleResources(wk->work3D);
     GFL_HeapFree(wk->work3D);
     wk->work3D = NULL;
-    PokemonTrade_SetState(wk, func_ov194_021beb48);
+    PokemonTrade_SetState(wk, PoketradeSave_ResetClactAndBeginEvent);
 }
 
 static void PokemonTradeDemoMiddle_FreeMove(PokemonTradeWork *wk, int index) {
@@ -498,23 +498,23 @@ void PokemonTradeDemoMiddle_Start(PokemonTradeWork *wk) {
 }
 
 static void PokemonTradeDemoMiddle_Init(PokemonTradeWork *wk) {
-    func_ov194_021bb4b4(wk);
+    PokemonTrade_DeleteAllResources(wk);
     ClActSys_Delete();
-    func_ov194_021c2c44(wk);
+    Poketrade2D_InitClactSystemMain(wk);
     wk->clactUnit = ClActUnit_Create(3, 0, wk->heapId);
     wk->work3D = GFL_HeapAllocate(wk->heapId, sizeof(PokemonTrade3DWork), TRUE, "pokemontrade_demo_middle.c", 157);
     wk->work3D->heapId = wk->heapId;
-    func_ov194_021c4088(wk, FALSE);
+    Poketrade2D_SetupSummaryBgs(wk, FALSE);
     reg_G2S_DB_BLDCNT = 0;
     reg_G2_BLDCNT = 0;
     if (PokemonTrade_IsNegoType(wk)) {
-        func_ov194_021c23a4(wk, 1, FALSE, PokemonTrade_GetPkm(wk, 1), FALSE);
-        func_ov194_021c23a4(wk, 2, FALSE, PokemonTrade_GetPkm(wk, 0), FALSE);
-        func_ov194_021c23a4(wk, 3, TRUE, PokemonTrade_GetPkm(wk, 1), FALSE);
+        Poketrade3D_AddPokemonMcss(wk, 1, FALSE, PokemonTrade_GetPkm(wk, 1), FALSE);
+        Poketrade3D_AddPokemonMcss(wk, 2, FALSE, PokemonTrade_GetPkm(wk, 0), FALSE);
+        Poketrade3D_AddPokemonMcss(wk, 3, TRUE, PokemonTrade_GetPkm(wk, 1), FALSE);
     } else {
-        func_ov194_021c24cc(wk, 1, FALSE, PokemonTrade_GetPkm(wk, 1), FALSE);
-        func_ov194_021c24cc(wk, 2, FALSE, PokemonTrade_GetPkm(wk, 0), FALSE);
-        func_ov194_021c24cc(wk, 3, TRUE, PokemonTrade_GetPkm(wk, 1), FALSE);
+        Poketrade3D_AddPokemonMcssPlain(wk, 1, FALSE, PokemonTrade_GetPkm(wk, 1), FALSE);
+        Poketrade3D_AddPokemonMcssPlain(wk, 2, FALSE, PokemonTrade_GetPkm(wk, 0), FALSE);
+        Poketrade3D_AddPokemonMcssPlain(wk, 3, TRUE, PokemonTrade_GetPkm(wk, 1), FALSE);
     }
     MCSS_GetScale(wk->mcss[0], &wk->work3D->spriteSizes[0]);
     MCSS_GetScale(wk->mcss[1], &wk->work3D->spriteSizes[1]);
@@ -523,20 +523,20 @@ static void PokemonTradeDemoMiddle_Init(PokemonTradeWork *wk) {
     MCSS_Hide(wk->mcss[1]);
     MCSS_Hide(wk->mcss[2]);
     MCSS_Hide(wk->mcss[3]);
-    func_ov194_021c1d38(wk->work3D);
+    Poketrade3D_InitParticleSystems(wk->work3D);
     func_ov194_021c1db4(wk->work3D);
-    func_ov194_021c1b74(wk->work3D, 0);
+    Poketrade3D_CreateIcaStreamsForMode(wk->work3D, 0);
     PokemonTradeDemoMiddle_SetTimer(wk, 0);
     PokemonTrade_SetState(wk, PokemonTradeDemoMiddle_Wait1);
 }
 
 static void PokemonTradeDemoMiddle_Wait1(PokemonTradeWork *wk) {
-    func_ov194_021c1e08(wk->work3D);
+    Poketrade3D_SetupParticleSystemsHigh(wk->work3D);
     PokemonTrade_SetState(wk, PokemonTradeDemoMiddle_Wait2);
 }
 
 static void PokemonTradeDemoMiddle_Wait2(PokemonTradeWork *wk) {
-    func_ov194_021c200c(wk, 3);
+    Poketrade3D_AddUnitAndInit(wk, 3);
     PokemonTrade_SetState(wk, PokemonTradeDemoMiddle_Run);
 }
 
@@ -554,14 +554,14 @@ static void PokemonTradeDemoMiddle_Run(PokemonTradeWork *wk) {
     int index3;
     int index4;
 
-    func_ov194_021be808(wk->timer);
+    PoketradeNego_PlaySeByKeyA(wk->timer);
     if (wk->timer == PokemonTradeDemoMiddle_Frame(0x12d)) {
-        func_ov194_021c2034(wk);
-        func_ov194_021c200c(wk, 4);
+        Poketrade3D_RemoveCurrentUnit(wk);
+        Poketrade3D_AddUnitAndInit(wk, 4);
     }
     if (wk->timer == PokemonTradeDemoMiddle_Frame(0x2b6)) {
-        func_ov194_021c2034(wk);
-        func_ov194_021c200c(wk, 5);
+        Poketrade3D_RemoveCurrentUnit(wk);
+        Poketrade3D_AddUnitAndInit(wk, 5);
     }
     if (wk->timer == PokemonTradeDemoMiddle_Frame(1)) {
         MCSS_StartFade(wk->mcss[0], 8, 8, 0, 0xffff);
@@ -574,8 +574,8 @@ static void PokemonTradeDemoMiddle_Run(PokemonTradeWork *wk) {
         PokemonTradeDemoMiddle_CreateSprite(wk);
     }
     if (wk->timer == PokemonTradeDemoMiddle_Frame(4)) {
-        func_ov194_021c5ff4(wk, 0x11);
-        func_ov194_021c600c(wk, 0x18);
+        Poketrade2D_ScheduleMainPlaneVisible(wk, 0x11);
+        Poketrade2D_ScheduleSubPlaneVisible(wk, 0x18);
     }
     if (wk->timer == PokemonTradeDemoMiddle_Frame(4)) {
         MCSS_Hide(wk->mcss[0]);
@@ -619,11 +619,11 @@ static void PokemonTradeDemoMiddle_Run(PokemonTradeWork *wk) {
                     TRUE, wk->heapId);
     }
     if (wk->timer == PokemonTradeDemoMiddle_Frame(0x149)) {
-        func_ov194_021c24dc(wk, 0);
+        Poketrade3D_DeleteMcssSlot(wk, 0);
         if (PokemonTrade_IsNegoType(wk)) {
-            func_ov194_021c23a4(wk, 0, TRUE, PokemonTrade_GetPkm(wk, 0), FALSE);
+            Poketrade3D_AddPokemonMcss(wk, 0, TRUE, PokemonTrade_GetPkm(wk, 0), FALSE);
         } else {
-            func_ov194_021c24cc(wk, 0, TRUE, PokemonTrade_GetPkm(wk, 0), FALSE);
+            Poketrade3D_AddPokemonMcssPlain(wk, 0, TRUE, PokemonTrade_GetPkm(wk, 0), FALSE);
         }
         MCSS_GetScale(wk->mcss[0], &wk->work3D->spriteSizes[0]);
         MCSS_Hide(wk->mcss[0]);
@@ -847,7 +847,7 @@ static void PokemonTradeDemoMiddle_Run(PokemonTradeWork *wk) {
     if (wk->timer == PokemonTradeDemoMiddle_Frame(0x4c1)) {
         PokemonTradeDemoMiddle_FreeMove(wk, 0);
         PokemonTradeDemoMiddle_FreeMove(wk, 1);
-        func_ov194_021c2034(wk);
+        Poketrade3D_RemoveCurrentUnit(wk);
         PokemonTrade_SetState(wk, PokemonTradeDemoMiddle_End);
     }
     TradeMcssMove_Update(wk->mcssMoves[0], wk);

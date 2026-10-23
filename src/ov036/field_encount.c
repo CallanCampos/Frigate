@@ -61,7 +61,7 @@ EncountSystem *EncSys_Create(Field *field) {
 }
 
 void EncSys_Free(EncountSystem *system) {
-    func_ov036_021a202c(system, system->effectEncountState);
+    EffectEncount_Exit(system, system->effectEncountState);
     EffectEncountState_Free(system->effectEncountState);
     GFL_HeapFree(system);
 }
@@ -122,7 +122,7 @@ GameEvent *EventWildBattleCall_CreateRandom(EncountSystem *system, u32 mode) {
         return NULL;
     }
     CreateEncountManager(&manager, system->gameData, encType, mode,
-                         func_ov036_02199220(Field_GetWeatherSystem(system->field)));
+                         FieldWeather_GetWeatherId(Field_GetWeatherSystem(system->field)));
     if (!forced &&
         !EncSys_CheckRNGEncounter(
             system, state, FieldEncount_CalcEncountRate(&manager, system->gameData, state->encountRate), encType)) {
@@ -172,7 +172,7 @@ GameEvent *EventWildBattleCall_CreateStatic(EncountSystem *system, u16 species, 
 
     Field_GetPlayer(system->field);
     CreateEncountManager(&manager, system->gameData, 0xff, 0,
-                         func_ov036_02199220(Field_GetWeatherSystem(system->field)));
+                         FieldWeather_GetWeatherId(Field_GetWeatherSystem(system->field)));
     param = &params[0];
     MI_CpuFill8(params, 0, sizeof(params));
     param->species = species;
@@ -242,7 +242,7 @@ BtlSetup *BtlSetup_CreateFishing(EncountSystem *system, BOOL rare) {
         return NULL;
     }
     CreateEncountManager(&manager, system->gameData, encType, rare,
-                         func_ov036_02199220(Field_GetWeatherSystem(system->field)));
+                         FieldWeather_GetWeatherId(Field_GetWeatherSystem(system->field)));
     if (rare != TRUE) {
         u32 encountRate = FieldEncount_CalcEncountRate(&manager, system->gameData, rate);
 
@@ -428,7 +428,7 @@ void BtlSetup_SetTrainerLocal(EncountSystem *encountSystem, BtlSetup *setup, u32
 }
 
 u32 ConvFieldWeatherToBtl(Field *field) {
-    switch (func_ov036_02199220(Field_GetWeatherSystem(field))) {
+    switch (FieldWeather_GetWeatherId(Field_GetWeatherSystem(field))) {
     case 2:
     case 6:
     case 7:

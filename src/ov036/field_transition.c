@@ -34,46 +34,47 @@ typedef struct {
     void *callbackArg;
 } TransitionEvent;
 
-u32 func_ov036_021b88cc(u32 type);
-u32 func_ov036_021b88fc(u32 from, u32 to);
+u32 EventGameTransition_GetFadeKind(u32 type);
+u32 EventGameTransition_LookupExitEffect(u32 from, u32 to);
 u32 func_ov036_021b892c(u32 from, u32 to);
 GameEvent *func_ov036_021b895c(GameSystem *gsys, Field *field, u32 type, u32 a3, u32 a4);
-GameEvent *func_ov036_021b899c(GameSystem *gsys, Field *field, u32 type, u32 a3, u32 a4);
+GameEvent *EventGameTransition_CreateFadeInEventForEffect(GameSystem *gsys, Field *field, u32 type, u32 a3, u32 a4);
 GameEvent *func_ov036_021b89dc(GameSystem *gsys, Field *field);
-GameEvent *func_ov036_021b8a0c(GameSystem *gsys, Field *field);
+GameEvent *EventGameTransition_CreateFadeInEventDefault(GameSystem *gsys, Field *field);
 GameEvent *EventGameTransition_SeasonBanner_Create(GameSystem *gsys, Field *field, u8 startSeason, u8 endSeason);
-GameEvent *func_ov036_021b8a88(GameSystem *gsys, Field *field);
+GameEvent *EventGameTransition_CreateFadeOutEventEffect4(GameSystem *gsys, Field *field);
 GameEvent *func_ov036_021b8ab8(GameSystem *gsys, Field *field);
-GameEvent *func_ov036_021b8ae8(GameSystem *gsys, Field *field);
+GameEvent *EventGameTransition_CreateFadeInEventEffect5(GameSystem *gsys, Field *field);
 GameEvent *func_ov036_021b8b18(GameSystem *gsys, Field *field);
-GameEvent *func_ov036_021b8b48(GameSystem *gsys, Field *field);
+GameEvent *EventGameTransition_CreateFadeInEventEffect6(GameSystem *gsys, Field *field);
 GameEvent *func_ov036_021b8b78(GameSystem *gsys, Field *field);
-GameEvent *func_ov036_021b8ba8(GameSystem *gsys, Field *field);
+GameEvent *EventGameTransition_CreateFadeInEventEffect7(GameSystem *gsys, Field *field);
 GameEvent *func_ov036_021b8bd8(GameSystem *gsys, Field *field);
-GameEvent *func_ov036_021b8c08(GameSystem *gsys, Field *field);
+GameEvent *EventGameTransition_CreateFadeInEventEffect8(GameSystem *gsys, Field *field);
 GameEvent *func_ov036_021b8c38(GameSystem *gsys, Field *field);
-GameEvent *func_ov036_021b8c88(GameSystem *gsys, Field *field);
-GameEventReturnCode func_ov036_021b8cd8(GameEvent *event, u32 *state, void *data);
-GameEventReturnCode func_ov036_021b8d24(GameEvent *event, u32 *state, void *data);
+GameEvent *EventGameTransition_StartFadeInByFacing(GameSystem *gsys, Field *field);
+GameEventReturnCode EventGameTransition_RunFadeOut(GameEvent *event, u32 *state, void *data);
+GameEventReturnCode EventGameTransition_RunFadeIn(GameEvent *event, u32 *state, void *data);
 GameEventReturnCode setupScreenForEnterBuilding(GameEvent *event, u32 *state, void *data);
-GameEventReturnCode func_ov036_021b8e10(GameEvent *event, u32 *state, void *data);
+GameEventReturnCode EventGameTransition_RunDefaultFadeIn(GameEvent *event, u32 *state, void *data);
 GameEventReturnCode EventGameTransition_SeasonBanner_Callback(GameEvent *event, u32 *state, void *data);
-GameEventReturnCode func_ov036_021b8f74(GameEvent *event, u32 *state, void *data);
-GameEventReturnCode func_ov036_021b8fc0(GameEvent *event, u32 *state, void *data);
-GameEventReturnCode func_ov036_021b9038(GameEvent *event, u32 *state, void *data);
-GameEventReturnCode func_ov036_021b90b0(GameEvent *event, u32 *state, void *data);
-GameEventReturnCode func_ov036_021b9128(GameEvent *event, u32 *state, void *data);
-GameEventReturnCode func_ov036_021b91a0(GameEvent *event, u32 *state, void *data);
-GameEventReturnCode func_ov036_021b9214(GameEvent *event, u32 *state, void *data);
-GameEventReturnCode func_ov036_021b9294(GameEvent *event, u32 *state, void *data);
-GameEventReturnCode func_ov036_021b9314(GameEvent *event, u32 *state, void *data);
-GameEventReturnCode func_ov036_021b9394(GameEvent *event, u32 *state, void *data);
-GameEventReturnCode func_ov036_021b9414(GameEvent *event, u32 *state, void *data);
+GameEventReturnCode EventGameTransition_RunSeasonFadeInWithCallback(GameEvent *event, u32 *state, void *data);
+GameEventReturnCode EventGameTransition_RunWipeOutEffect4(GameEvent *event, u32 *state, void *data);
+GameEventReturnCode EventGameTransition_RunWipeOutEffect5(GameEvent *event, u32 *state, void *data);
+GameEventReturnCode EventGameTransition_RunWipeOutEffect6(GameEvent *event, u32 *state, void *data);
+GameEventReturnCode EventGameTransition_RunWipeOutEffect7(GameEvent *event, u32 *state, void *data);
+GameEventReturnCode EventGameTransition_RunWipeOutEffect8(GameEvent *event, u32 *state, void *data);
+GameEventReturnCode EventGameTransition_RunWipeInEffect5(GameEvent *event, u32 *state, void *data);
+GameEventReturnCode EventGameTransition_RunWipeInEffect6(GameEvent *event, u32 *state, void *data);
+GameEventReturnCode EventGameTransition_RunWipeInEffect7(GameEvent *event, u32 *state, void *data);
+GameEventReturnCode EventGameTransition_RunWipeInEffect8(GameEvent *event, u32 *state, void *data);
+GameEventReturnCode EventGameTransition_RunFadeInWithBgRestore(GameEvent *event, u32 *state, void *data);
 void FieldG3D_SetLCDConfigKeepBGs(Field *field);
 void func_ov036_021b948c(Field *field);
 
 u32 GetOutTransitionTypeBetweenZones(u16 fromZone, u16 toZone) {
-    return func_ov036_021b88fc(GetMapTransitionEffectType(fromZone), GetMapTransitionEffectType(toZone));
+    return EventGameTransition_LookupExitEffect(GetMapTransitionEffectType(fromZone),
+                                                GetMapTransitionEffectType(toZone));
 }
 
 u32 GetInTransitionTypeBetweenZones(u16 fromZone, u16 toZone) {
@@ -94,7 +95,7 @@ GameEvent *CallFieldMapEntranceOutTransition(GameSystem *gsys, Field *field, u32
     case 3:
         return func_ov036_021b895c(gsys, field, type, a3, a4);
     case 4:
-        return func_ov036_021b8a88(gsys, field);
+        return EventGameTransition_CreateFadeOutEventEffect4(gsys, field);
     case 5:
         return func_ov036_021b8ab8(gsys, field);
     case 6:
@@ -114,64 +115,67 @@ GameEvent *CallFieldMapEntranceInTransition(GameSystem *gsys, Field *field, u32 
     case 2:
     case 4:
     default:
-        return func_ov036_021b8a0c(gsys, field);
+        return EventGameTransition_CreateFadeInEventDefault(gsys, field);
     case 0:
     case 1:
-        return func_ov036_021b899c(gsys, field, type, a3, a4);
+        return EventGameTransition_CreateFadeInEventForEffect(gsys, field, type, a3, a4);
     case 3:
         return EventGameTransition_SeasonBanner_Create(gsys, field, startSeason, endSeason);
     case 5:
-        return func_ov036_021b8ae8(gsys, field);
+        return EventGameTransition_CreateFadeInEventEffect5(gsys, field);
     case 6:
-        return func_ov036_021b8b48(gsys, field);
+        return EventGameTransition_CreateFadeInEventEffect6(gsys, field);
     case 7:
-        return func_ov036_021b8ba8(gsys, field);
+        return EventGameTransition_CreateFadeInEventEffect7(gsys, field);
     case 8:
-        return func_ov036_021b8c08(gsys, field);
+        return EventGameTransition_CreateFadeInEventEffect8(gsys, field);
     case 9:
-        return func_ov036_021b8c88(gsys, field);
+        return EventGameTransition_StartFadeInByFacing(gsys, field);
     }
 }
 
-GameEvent *func_ov036_021b8800(GameSystem *gsys, Field *field, u8 startSeason, u8 endSeason,
-                               EventSeasonBannerCallback callback, void *callbackArg) {
-    GameEvent *event = GameEvent_Create(gsys, NULL, func_ov036_021b8f74, sizeof(TransitionEvent));
+GameEvent *EventGameTransition_CreateSeasonFadeInEventWithCallback(GameSystem *gsys, Field *field, u8 startSeason,
+                                                                   u8 endSeason, EventSeasonBannerCallback callback,
+                                                                   void *callbackArg) {
+    GameEvent *event =
+        GameEvent_Create(gsys, NULL, EventGameTransition_RunSeasonFadeInWithCallback, sizeof(TransitionEvent));
     TransitionEvent *data = GameEvent_GetData(event);
     data->gsys = gsys;
     data->field = field;
     data->type = 3;
     data->startSeason = startSeason;
     data->endSeason = endSeason;
-    data->fadeMode = func_ov036_021b88cc(data->type);
+    data->fadeMode = EventGameTransition_GetFadeKind(data->type);
     data->callback = callback;
     data->callbackArg = callbackArg;
     return event;
 }
 
-GameEvent *func_ov036_021b8850(GameSystem *gsys, Field *field, u32 a2, u32 a3, u32 a4) {
-    GameEvent *event = GameEvent_Create(gsys, NULL, func_ov036_021b9414, sizeof(TransitionEvent));
+GameEvent *EventGameTransition_CreateFadeInEventWithBgRestore(GameSystem *gsys, Field *field, u32 a2, u32 a3, u32 a4) {
+    GameEvent *event =
+        GameEvent_Create(gsys, NULL, EventGameTransition_RunFadeInWithBgRestore, sizeof(TransitionEvent));
     TransitionEvent *data = GameEvent_GetData(event);
     data->gsys = gsys;
     data->field = field;
     data->type = a2;
     data->skipWait = a3;
-    data->fadeMode = func_ov036_021b88cc(a2);
+    data->fadeMode = EventGameTransition_GetFadeKind(a2);
     data->fadeSlowness = a4;
     return event;
 }
 
-GameEvent *func_ov036_021b8890(GameSystem *gsys, Field *field, u32 a2, u32 a3) {
-    GameEvent *event = GameEvent_Create(gsys, NULL, func_ov036_021b8cd8, sizeof(TransitionEvent));
+GameEvent *EventGameTransition_CreateFadeOutEvent(GameSystem *gsys, Field *field, u32 a2, u32 a3) {
+    GameEvent *event = GameEvent_Create(gsys, NULL, EventGameTransition_RunFadeOut, sizeof(TransitionEvent));
     TransitionEvent *data = GameEvent_GetData(event);
     data->gsys = gsys;
     data->field = field;
     data->type = a2;
     data->skipWait = a3;
-    data->fadeMode = func_ov036_021b88cc(a2);
+    data->fadeMode = EventGameTransition_GetFadeKind(a2);
     return event;
 }
 
-u32 func_ov036_021b88cc(u32 type) {
+u32 EventGameTransition_GetFadeKind(u32 type) {
     switch (type) {
     case 0:
     default:
@@ -190,7 +194,7 @@ u32 func_ov036_021b88cc(u32 type) {
     }
 }
 
-u32 func_ov036_021b88fc(u32 from, u32 to) {
+u32 EventGameTransition_LookupExitEffect(u32 from, u32 to) {
     const u32 table[6][6] = {
         { 9, 2, 9, 4, 9, 0 }, { 0, 0, 0, 4, 0, 0 }, { 0, 0, 2, 0, 0, 0 },
         { 1, 1, 1, 0, 1, 0 }, { 9, 0, 9, 0, 2, 0 }, { 0, 0, 0, 0, 0, 0 },
@@ -207,25 +211,25 @@ u32 func_ov036_021b892c(u32 from, u32 to) {
 }
 
 GameEvent *func_ov036_021b895c(GameSystem *gsys, Field *field, u32 type, u32 a3, u32 a4) {
-    GameEvent *event = GameEvent_Create(gsys, NULL, func_ov036_021b8cd8, sizeof(TransitionEvent));
+    GameEvent *event = GameEvent_Create(gsys, NULL, EventGameTransition_RunFadeOut, sizeof(TransitionEvent));
     TransitionEvent *data = GameEvent_GetData(event);
     data->gsys = gsys;
     data->field = field;
     data->type = type;
     data->skipWait = a3;
     data->fadeSlowness = a4;
-    data->fadeMode = func_ov036_021b88cc(type);
+    data->fadeMode = EventGameTransition_GetFadeKind(type);
     return event;
 }
 
-GameEvent *func_ov036_021b899c(GameSystem *gsys, Field *field, u32 type, u32 a3, u32 a4) {
-    GameEvent *event = GameEvent_Create(gsys, NULL, func_ov036_021b8d24, sizeof(TransitionEvent));
+GameEvent *EventGameTransition_CreateFadeInEventForEffect(GameSystem *gsys, Field *field, u32 type, u32 a3, u32 a4) {
+    GameEvent *event = GameEvent_Create(gsys, NULL, EventGameTransition_RunFadeIn, sizeof(TransitionEvent));
     TransitionEvent *data = GameEvent_GetData(event);
     data->gsys = gsys;
     data->field = field;
     data->type = type;
     data->skipWait = a3;
-    data->fadeMode = func_ov036_021b88cc(type);
+    data->fadeMode = EventGameTransition_GetFadeKind(type);
     data->keepLCD = a4;
     return event;
 }
@@ -236,17 +240,17 @@ GameEvent *func_ov036_021b89dc(GameSystem *gsys, Field *field) {
     data->gsys = gsys;
     data->field = field;
     data->type = 2;
-    data->fadeMode = func_ov036_021b88cc(2);
+    data->fadeMode = EventGameTransition_GetFadeKind(2);
     return event;
 }
 
-GameEvent *func_ov036_021b8a0c(GameSystem *gsys, Field *field) {
-    GameEvent *event = GameEvent_Create(gsys, NULL, func_ov036_021b8e10, sizeof(TransitionEvent));
+GameEvent *EventGameTransition_CreateFadeInEventDefault(GameSystem *gsys, Field *field) {
+    GameEvent *event = GameEvent_Create(gsys, NULL, EventGameTransition_RunDefaultFadeIn, sizeof(TransitionEvent));
     TransitionEvent *data = GameEvent_GetData(event);
     data->gsys = gsys;
     data->field = field;
     data->type = 2;
-    data->fadeMode = func_ov036_021b88cc(2);
+    data->fadeMode = EventGameTransition_GetFadeKind(2);
     return event;
 }
 
@@ -258,99 +262,99 @@ GameEvent *EventGameTransition_SeasonBanner_Create(GameSystem *gsys, Field *fiel
     data->type = 3;
     data->startSeason = startSeason;
     data->endSeason = endSeason;
-    data->fadeMode = func_ov036_021b88cc(data->type);
+    data->fadeMode = EventGameTransition_GetFadeKind(data->type);
     data->callback = NULL;
     data->callbackArg = NULL;
     return event;
 }
 
-GameEvent *func_ov036_021b8a88(GameSystem *gsys, Field *field) {
-    GameEvent *event = GameEvent_Create(gsys, NULL, func_ov036_021b8fc0, sizeof(TransitionEvent));
+GameEvent *EventGameTransition_CreateFadeOutEventEffect4(GameSystem *gsys, Field *field) {
+    GameEvent *event = GameEvent_Create(gsys, NULL, EventGameTransition_RunWipeOutEffect4, sizeof(TransitionEvent));
     TransitionEvent *data = GameEvent_GetData(event);
     data->gsys = gsys;
     data->field = field;
     data->type = 4;
-    data->fadeMode = func_ov036_021b88cc(4);
+    data->fadeMode = EventGameTransition_GetFadeKind(4);
     return event;
 }
 
 GameEvent *func_ov036_021b8ab8(GameSystem *gsys, Field *field) {
-    GameEvent *event = GameEvent_Create(gsys, NULL, func_ov036_021b9038, sizeof(TransitionEvent));
+    GameEvent *event = GameEvent_Create(gsys, NULL, EventGameTransition_RunWipeOutEffect5, sizeof(TransitionEvent));
     TransitionEvent *data = GameEvent_GetData(event);
     data->gsys = gsys;
     data->field = field;
     data->type = 5;
-    data->fadeMode = func_ov036_021b88cc(5);
+    data->fadeMode = EventGameTransition_GetFadeKind(5);
     return event;
 }
 
-GameEvent *func_ov036_021b8ae8(GameSystem *gsys, Field *field) {
-    GameEvent *event = GameEvent_Create(gsys, NULL, func_ov036_021b9214, sizeof(TransitionEvent));
+GameEvent *EventGameTransition_CreateFadeInEventEffect5(GameSystem *gsys, Field *field) {
+    GameEvent *event = GameEvent_Create(gsys, NULL, EventGameTransition_RunWipeInEffect5, sizeof(TransitionEvent));
     TransitionEvent *data = GameEvent_GetData(event);
     data->gsys = gsys;
     data->field = field;
     data->type = 5;
-    data->fadeMode = func_ov036_021b88cc(5);
+    data->fadeMode = EventGameTransition_GetFadeKind(5);
     return event;
 }
 
 GameEvent *func_ov036_021b8b18(GameSystem *gsys, Field *field) {
-    GameEvent *event = GameEvent_Create(gsys, NULL, func_ov036_021b90b0, sizeof(TransitionEvent));
+    GameEvent *event = GameEvent_Create(gsys, NULL, EventGameTransition_RunWipeOutEffect6, sizeof(TransitionEvent));
     TransitionEvent *data = GameEvent_GetData(event);
     data->gsys = gsys;
     data->field = field;
     data->type = 6;
-    data->fadeMode = func_ov036_021b88cc(6);
+    data->fadeMode = EventGameTransition_GetFadeKind(6);
     return event;
 }
 
-GameEvent *func_ov036_021b8b48(GameSystem *gsys, Field *field) {
-    GameEvent *event = GameEvent_Create(gsys, NULL, func_ov036_021b9294, sizeof(TransitionEvent));
+GameEvent *EventGameTransition_CreateFadeInEventEffect6(GameSystem *gsys, Field *field) {
+    GameEvent *event = GameEvent_Create(gsys, NULL, EventGameTransition_RunWipeInEffect6, sizeof(TransitionEvent));
     TransitionEvent *data = GameEvent_GetData(event);
     data->gsys = gsys;
     data->field = field;
     data->type = 6;
-    data->fadeMode = func_ov036_021b88cc(6);
+    data->fadeMode = EventGameTransition_GetFadeKind(6);
     return event;
 }
 
 GameEvent *func_ov036_021b8b78(GameSystem *gsys, Field *field) {
-    GameEvent *event = GameEvent_Create(gsys, NULL, func_ov036_021b9128, sizeof(TransitionEvent));
+    GameEvent *event = GameEvent_Create(gsys, NULL, EventGameTransition_RunWipeOutEffect7, sizeof(TransitionEvent));
     TransitionEvent *data = GameEvent_GetData(event);
     data->gsys = gsys;
     data->field = field;
     data->type = 7;
-    data->fadeMode = func_ov036_021b88cc(7);
+    data->fadeMode = EventGameTransition_GetFadeKind(7);
     return event;
 }
 
-GameEvent *func_ov036_021b8ba8(GameSystem *gsys, Field *field) {
-    GameEvent *event = GameEvent_Create(gsys, NULL, func_ov036_021b9314, sizeof(TransitionEvent));
+GameEvent *EventGameTransition_CreateFadeInEventEffect7(GameSystem *gsys, Field *field) {
+    GameEvent *event = GameEvent_Create(gsys, NULL, EventGameTransition_RunWipeInEffect7, sizeof(TransitionEvent));
     TransitionEvent *data = GameEvent_GetData(event);
     data->gsys = gsys;
     data->field = field;
     data->type = 7;
-    data->fadeMode = func_ov036_021b88cc(7);
+    data->fadeMode = EventGameTransition_GetFadeKind(7);
     return event;
 }
 
 GameEvent *func_ov036_021b8bd8(GameSystem *gsys, Field *field) {
-    GameEvent *event = GameEvent_Create(gsys, NULL, func_ov036_021b91a0, sizeof(TransitionEvent));
+    GameEvent *event = GameEvent_Create(gsys, NULL, EventGameTransition_RunWipeOutEffect8, sizeof(TransitionEvent));
     TransitionEvent *data = GameEvent_GetData(event);
     data->gsys = gsys;
     data->field = field;
     data->type = 8;
-    data->fadeMode = func_ov036_021b88cc(8);
+    data->fadeMode = EventGameTransition_GetFadeKind(8);
     return event;
 }
 
-GameEvent *func_ov036_021b8c08(GameSystem *gsys, Field *field) {
-    GameEvent *event = GameEvent_Create(gsys, NULL, func_ov036_021b9394, sizeof(TransitionEvent));
+GameEvent *EventGameTransition_CreateFadeInEventEffect8(GameSystem *gsys, Field *field) {
+    GameEvent *event = GameEvent_Create(gsys, NULL, EventGameTransition_RunWipeInEffect8, sizeof(TransitionEvent));
     TransitionEvent *data = GameEvent_GetData(event);
     data->gsys = gsys;
     data->field = field;
     data->type = 8;
-    data->fadeMode = func_ov036_021b88cc(8);
+    data->fadeMode = EventGameTransition_GetFadeKind(8);
     return event;
 }
 
@@ -368,21 +372,21 @@ GameEvent *func_ov036_021b8c38(GameSystem *gsys, Field *field) {
     }
 }
 
-GameEvent *func_ov036_021b8c88(GameSystem *gsys, Field *field) {
+GameEvent *EventGameTransition_StartFadeInByFacing(GameSystem *gsys, Field *field) {
     switch (FieldPlayer_GetFaceDir(Field_GetPlayer(field))) {
     case 2:
     default:
-        return func_ov036_021b8ba8(gsys, field);
+        return EventGameTransition_CreateFadeInEventEffect7(gsys, field);
     case 3:
-        return func_ov036_021b8c08(gsys, field);
+        return EventGameTransition_CreateFadeInEventEffect8(gsys, field);
     case 0:
-        return func_ov036_021b8ae8(gsys, field);
+        return EventGameTransition_CreateFadeInEventEffect5(gsys, field);
     case 1:
-        return func_ov036_021b8b48(gsys, field);
+        return EventGameTransition_CreateFadeInEventEffect6(gsys, field);
     }
 }
 
-GameEventReturnCode func_ov036_021b8cd8(GameEvent *event, u32 *state, void *data) {
+GameEventReturnCode EventGameTransition_RunFadeOut(GameEvent *event, u32 *state, void *data) {
     TransitionEvent *work = data;
     switch (*state) {
     case 0:
@@ -402,7 +406,7 @@ GameEventReturnCode func_ov036_021b8cd8(GameEvent *event, u32 *state, void *data
     return GAMEEVENT_CONTINUE;
 }
 
-GameEventReturnCode func_ov036_021b8d24(GameEvent *event, u32 *state, void *data) {
+GameEventReturnCode EventGameTransition_RunFadeIn(GameEvent *event, u32 *state, void *data) {
     TransitionEvent *work = data;
     switch (*state) {
     case 0:
@@ -448,7 +452,7 @@ GameEventReturnCode setupScreenForEnterBuilding(GameEvent *event, u32 *state, vo
     return GAMEEVENT_CONTINUE;
 }
 
-GameEventReturnCode func_ov036_021b8e10(GameEvent *event, u32 *state, void *data) {
+GameEventReturnCode EventGameTransition_RunDefaultFadeIn(GameEvent *event, u32 *state, void *data) {
     TransitionEvent *work = data;
     switch (*state) {
     case 0:
@@ -486,19 +490,19 @@ GameEventReturnCode func_ov036_021b8e10(GameEvent *event, u32 *state, void *data
         break;
     case 4: {
         FieldMsgBG *msgBGSys = Field_GetMsgBGSys(work->field);
-        if (!func_ov036_021878bc(msgBGSys)) {
+        if (!MsgBGPrinter_IsSetupDone(msgBGSys)) {
             break;
         }
-        func_ov036_0218779c(msgBGSys, MSGBG_LOAD_PALETTES);
+        MsgBGPrinter_LoadWindowGraphicsStep(msgBGSys, MSGBG_LOAD_PALETTES);
         (*state)++;
         break;
     }
     case 5:
-        func_ov036_0218779c(Field_GetMsgBGSys(work->field), MSGBG_LOAD_SYSTEM_FRAME);
+        MsgBGPrinter_LoadWindowGraphicsStep(Field_GetMsgBGSys(work->field), MSGBG_LOAD_SYSTEM_FRAME);
         (*state)++;
         break;
     case 6:
-        func_ov036_0218779c(Field_GetMsgBGSys(work->field), MSGBG_LOAD_LIST_FRAME);
+        MsgBGPrinter_LoadWindowGraphicsStep(Field_GetMsgBGSys(work->field), MSGBG_LOAD_LIST_FRAME);
         (*state)++;
         break;
     case 7:
@@ -526,7 +530,7 @@ GameEventReturnCode EventGameTransition_SeasonBanner_Callback(GameEvent *event, 
     return GAMEEVENT_CONTINUE;
 }
 
-GameEventReturnCode func_ov036_021b8f74(GameEvent *event, u32 *state, void *data) {
+GameEventReturnCode EventGameTransition_RunSeasonFadeInWithCallback(GameEvent *event, u32 *state, void *data) {
     TransitionEvent *work = data;
     GameSystem *gsys = work->gsys;
     Field *field = work->field;
@@ -543,7 +547,7 @@ GameEventReturnCode func_ov036_021b8f74(GameEvent *event, u32 *state, void *data
     return GAMEEVENT_CONTINUE;
 }
 
-GameEventReturnCode func_ov036_021b8fc0(GameEvent *event, u32 *state, void *data) {
+GameEventReturnCode EventGameTransition_RunWipeOutEffect4(GameEvent *event, u32 *state, void *data) {
     TransitionEvent *work = data;
     Field *field = work->field;
     switch (*state) {
@@ -567,7 +571,7 @@ GameEventReturnCode func_ov036_021b8fc0(GameEvent *event, u32 *state, void *data
     return GAMEEVENT_CONTINUE;
 }
 
-GameEventReturnCode func_ov036_021b9038(GameEvent *event, u32 *state, void *data) {
+GameEventReturnCode EventGameTransition_RunWipeOutEffect5(GameEvent *event, u32 *state, void *data) {
     TransitionEvent *work = data;
     Field *field = work->field;
     switch (*state) {
@@ -591,7 +595,7 @@ GameEventReturnCode func_ov036_021b9038(GameEvent *event, u32 *state, void *data
     return GAMEEVENT_CONTINUE;
 }
 
-GameEventReturnCode func_ov036_021b90b0(GameEvent *event, u32 *state, void *data) {
+GameEventReturnCode EventGameTransition_RunWipeOutEffect6(GameEvent *event, u32 *state, void *data) {
     TransitionEvent *work = data;
     Field *field = work->field;
     switch (*state) {
@@ -615,7 +619,7 @@ GameEventReturnCode func_ov036_021b90b0(GameEvent *event, u32 *state, void *data
     return GAMEEVENT_CONTINUE;
 }
 
-GameEventReturnCode func_ov036_021b9128(GameEvent *event, u32 *state, void *data) {
+GameEventReturnCode EventGameTransition_RunWipeOutEffect7(GameEvent *event, u32 *state, void *data) {
     TransitionEvent *work = data;
     Field *field = work->field;
     switch (*state) {
@@ -639,7 +643,7 @@ GameEventReturnCode func_ov036_021b9128(GameEvent *event, u32 *state, void *data
     return GAMEEVENT_CONTINUE;
 }
 
-GameEventReturnCode func_ov036_021b91a0(GameEvent *event, u32 *state, void *data) {
+GameEventReturnCode EventGameTransition_RunWipeOutEffect8(GameEvent *event, u32 *state, void *data) {
     TransitionEvent *work = data;
     Field *field = work->field;
     switch (*state) {
@@ -663,7 +667,7 @@ GameEventReturnCode func_ov036_021b91a0(GameEvent *event, u32 *state, void *data
     return GAMEEVENT_CONTINUE;
 }
 
-GameEventReturnCode func_ov036_021b9214(GameEvent *event, u32 *state, void *data) {
+GameEventReturnCode EventGameTransition_RunWipeInEffect5(GameEvent *event, u32 *state, void *data) {
     TransitionEvent *work = data;
     Field *field = work->field;
     switch (*state) {
@@ -689,7 +693,7 @@ GameEventReturnCode func_ov036_021b9214(GameEvent *event, u32 *state, void *data
     return GAMEEVENT_CONTINUE;
 }
 
-GameEventReturnCode func_ov036_021b9294(GameEvent *event, u32 *state, void *data) {
+GameEventReturnCode EventGameTransition_RunWipeInEffect6(GameEvent *event, u32 *state, void *data) {
     TransitionEvent *work = data;
     Field *field = work->field;
     switch (*state) {
@@ -715,7 +719,7 @@ GameEventReturnCode func_ov036_021b9294(GameEvent *event, u32 *state, void *data
     return GAMEEVENT_CONTINUE;
 }
 
-GameEventReturnCode func_ov036_021b9314(GameEvent *event, u32 *state, void *data) {
+GameEventReturnCode EventGameTransition_RunWipeInEffect7(GameEvent *event, u32 *state, void *data) {
     TransitionEvent *work = data;
     Field *field = work->field;
     switch (*state) {
@@ -741,7 +745,7 @@ GameEventReturnCode func_ov036_021b9314(GameEvent *event, u32 *state, void *data
     return GAMEEVENT_CONTINUE;
 }
 
-GameEventReturnCode func_ov036_021b9394(GameEvent *event, u32 *state, void *data) {
+GameEventReturnCode EventGameTransition_RunWipeInEffect8(GameEvent *event, u32 *state, void *data) {
     TransitionEvent *work = data;
     Field *field = work->field;
     switch (*state) {
@@ -767,7 +771,7 @@ GameEventReturnCode func_ov036_021b9394(GameEvent *event, u32 *state, void *data
     return GAMEEVENT_CONTINUE;
 }
 
-GameEventReturnCode func_ov036_021b9414(GameEvent *event, u32 *state, void *data) {
+GameEventReturnCode EventGameTransition_RunFadeInWithBgRestore(GameEvent *event, u32 *state, void *data) {
     TransitionEvent *work = data;
     switch (*state) {
     case 0:

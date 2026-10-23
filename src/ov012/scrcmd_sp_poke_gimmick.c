@@ -223,11 +223,11 @@ BOOL s0215_SetSpecialTransferUsed(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL func_ov012_02165950(VM *vm, FieldScriptEnv *env) {
+BOOL FieldChunk_ScrCmdReadSaveByte(VM *vm, FieldScriptEnv *env) {
     EncountSave *encountSave = SaveControl_GetEncountSave(GameData_GetSaveControl(FieldScriptEnv_GetGameData(env)));
     u8 index = ScriptReadAny(vm, env);
     u16 *result = ScriptReadVar(vm, env);
 
-    *result = func_0200dd38(encountSave, index);
+    *result = EncountSave_GetEntryState(encountSave, index);
     return FALSE;
 }

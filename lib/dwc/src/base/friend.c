@@ -1081,11 +1081,11 @@ static int DWCi_GetPersCallbackLevel(void) {
     return sFriend.control->persLogin;
 }
 
-void func_ov011_0215f2c0(void) {
+void DWCi_BeginCloseStatsConnection(void) {
     sFriend.unk_10 = TRUE;
 }
 
-void func_ov011_0215f2cc(void) {
+void DWCi_EndCloseStatsConnection(void) {
     sFriend.unk_10 = FALSE;
 }
 

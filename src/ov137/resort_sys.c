@@ -1466,10 +1466,10 @@ void ResortRecords_PrintPage(MoneyWin *window, JoinAvenueOccupants *occupants, F
     templateBuf = GFL_StrBufCreate(128, HEAPID_TAIL(heapId));
     lineBuf = GFL_StrBufCreate(128, HEAPID_TAIL(heapId));
     msgData = GFL_MsgSysLoadData(FALSE, ARCID_SCRIPT_MESSAGE, SCRIPT_TEXT_GLOBAL_10685, HEAPID_TAIL(heapId));
-    font = func_ov036_0218799c(msgBGSys);
-    func_ov036_02187c7c(window);
+    font = MsgBGPrinter_GetFont(msgBGSys);
+    MsgBGPrinter_ClearMsgWin(window);
     GFL_MsgDataLoadStrbuf(msgData, RESORT_MSG_RANK_PAGE + page, lineBuf);
-    func_ov036_02187c4c(window, 120 - GFL_FontGetBlockWidth(lineBuf, font, 0) / 2, 0, lineBuf);
+    MsgBGPrinter_MsgWinPrintStr(window, 120 - GFL_FontGetBlockWidth(lineBuf, font, 0) / 2, 0, lineBuf);
 
     total = count + 1;
     for (i = 0; i < total; i++) {
@@ -1492,7 +1492,7 @@ void ResortRecords_PrintPage(MoneyWin *window, JoinAvenueOccupants *occupants, F
         GFL_WordSetFormatStrbuf(wordSet, lineBuf, templateBuf);
         width = GFL_FontGetBlockWidth(lineBuf, font, 0);
         y = (i * 2 + 3) * 8;
-        func_ov036_02187c4c(window, 40 - width, y, lineBuf);
+        MsgBGPrinter_MsgWinPrintStr(window, 40 - width, y, lineBuf);
 
         GFL_MsgDataLoadStrbuf(msgData, RESORT_MSG_RANK_PAGE + 10, templateBuf);
         if (index == 8) {
@@ -1507,16 +1507,16 @@ void ResortRecords_PrintPage(MoneyWin *window, JoinAvenueOccupants *occupants, F
         }
         GFL_WordSetFormatStrbuf(wordSet, lineBuf, templateBuf);
         GFL_FontGetBlockWidth(lineBuf, font, 0);
-        func_ov036_02187c4c(window, 56, y, lineBuf);
+        MsgBGPrinter_MsgWinPrintStr(window, 56, y, lineBuf);
 
         GFL_MsgDataLoadStrbuf(msgData, RESORT_MSG_RANK_PAGE + RESORT_WORK_MET_FIRST, lineBuf);
-        func_ov036_02187c4c(window, 128, y, lineBuf);
+        MsgBGPrinter_MsgWinPrintStr(window, 128, y, lineBuf);
 
         GFL_MsgDataLoadStrbuf(msgData, RESORT_MSG_RANK_PAGE + 12, templateBuf);
         value = entry->value;
         WordSetNumber(wordSet, 0, value, 9, 1, 1);
         GFL_WordSetFormatStrbuf(wordSet, lineBuf, templateBuf);
-        func_ov036_02187c4c(window, 216 - GFL_FontGetBlockWidth(lineBuf, font, 0), y, lineBuf);
+        MsgBGPrinter_MsgWinPrintStr(window, 216 - GFL_FontGetBlockWidth(lineBuf, font, 0), y, lineBuf);
 
         shared = TRUE;
         if (i + 1 < total && value == entries[i + 1].value) {

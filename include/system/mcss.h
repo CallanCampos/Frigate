@@ -128,7 +128,7 @@ void MCSS_ToggleHidden(MCSS *mcss);
 u16 MCSS_GetAnimationCount(MCSS *mcss);
 u8 MCSS_GetIdleNodeCount(MCSS *mcss);
 u16 MCSS_GetIdleNode(MCSS *mcss, u8 index);
-u8 func_0201ae00(MCSS *mcss);
+u8 MCSSSys_GetStopCellFlags(MCSS *mcss);
 void MCSS_TraverseNodes(MCSS *mcss, u32 param,
                         BOOL (*func)(u32 param, const NNSG2dMultiCellHierarchyData *node, NNSG2dCellAnimation *cellAnim,
                                      u16 nodeIdx));

@@ -13,7 +13,7 @@ BOOL s0297_CallWildBattleEx(VM *vm, FieldScriptEnv *env);
 BOOL s0175_CallWildBattleEnd(VM *vm, FieldScriptEnv *env);
 BOOL s0179_CallCaptureDemo(VM *vm, FieldScriptEnv *env);
 BOOL s00BC_PhenomenonGetItemID(VM *vm, FieldScriptEnv *env);
-BOOL func_ov036_021ae4f4(VM *vm, FieldScriptEnv *env);
+BOOL ScrcmdProcFld_SpawnMovePokemonIfInactive(VM *vm, FieldScriptEnv *env);
 BOOL s021E_FishingChallengeGetRandomPkm(VM *vm, FieldScriptEnv *env);
 BOOL s02C2_RepelRearm(VM *vm, FieldScriptEnv *env);
 

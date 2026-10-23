@@ -118,7 +118,7 @@ static void TalkMsgWin_RequestClose(TalkMsgWin *win);
 // A window's state, for windows that grow from their tail: the polygons follow the target, the frame is redrawn
 // when the tail moves to another side, and printing starts once the window is full size
 static void TalkMsgWin_UpdateAnimated(TalkMsgWinSys *sys, TalkMsgWin *win);
-// A window's state, for windows created by func_ov036_0218b370, which open and close at once
+// A window's state, for windows created by TalkMsgWin_SetupPlainWindow, which open and close at once
 static void TalkMsgWin_UpdateImmediate(TalkMsgWinSys *sys, TalkMsgWin *win);
 static void TalkMsgWin_Draw(TalkMsgWinSys *sys, TalkMsgWin *win);
 // Draws the tail, and the window's quad scaled by the frame of its opening while it isn't shown
@@ -143,7 +143,7 @@ static void TalkMsgWin_SetPolygons(TalkMsgWinSys *sys, TalkMsgWin *win, const Ve
 static BOOL TalkMsgWin_UpdatePolygons(TalkMsgWinSys *sys, TalkMsgWin *win);
 // Looks at the target from the camera's place relative to it, with the near plane in front of the camera's, through
 // the camera or, to draw, straight to the geometry engine
-static void func_ov036_0218bf5c(TalkMsgWinSys *sys, BOOL draw);
+static void TalkMsgWin_SetupCamera(TalkMsgWinSys *sys, BOOL draw);
 static void TalkMsgWinSys_BackupCamera(TalkMsgWinSys *sys);
 static void TalkMsgWinSys_RestoreCamera(TalkMsgWinSys *sys);
 static u32 TalkMsgWinSys_LoadFrameResources(TalkMsgWinSys *sys, TalkMsgWinSetup *setup);
@@ -194,7 +194,7 @@ void TalkMsgWinSys_Update(TalkMsgWinSys *sys) {
 
     GFL_TCBExMgrUpdate(sys->tcbMgr);
     TalkMsgWinSys_BackupCamera(sys);
-    func_ov036_0218bf5c(sys, FALSE);
+    TalkMsgWin_SetupCamera(sys, FALSE);
     for (i = 0; i < TALKMSG_WIN_COUNT; i++) {
         if (sys->windows[i].skipAnim == 0) {
             TalkMsgWin_UpdateAnimated(sys, &sys->windows[i]);
@@ -205,14 +205,14 @@ void TalkMsgWinSys_Update(TalkMsgWinSys *sys) {
     TalkMsgWinSys_RestoreCamera(sys);
 }
 
-void func_ov036_0218b2e8(TalkMsgWinSys *sys) {
+void TalkMsgWin_EndUpdate(TalkMsgWinSys *sys) {
 }
 
 void TalkMsgWinSys_Draw(TalkMsgWinSys *sys) {
     int i;
 
     NNS_G3dGeFlushBuffer();
-    func_ov036_0218bf5c(sys, TRUE);
+    TalkMsgWin_SetupCamera(sys, TRUE);
     for (i = 0; i < TALKMSG_WIN_COUNT; i++) {
         if (sys->windows[i].skipAnim == 0) {
             TalkMsgWin_Draw(sys, &sys->windows[i]);
@@ -232,8 +232,8 @@ void TalkMsgWinSys_Free(TalkMsgWinSys *sys) {
     GFL_HeapFree(sys);
 }
 
-void func_ov036_0218b370(TalkMsgWinSys *sys, u32 index, StrBuf *strbuf, u8 x, u8 y, u8 width, u8 height, u32 unused,
-                         u32 frameType, u32 wait, u8 textX, u8 textY) {
+void TalkMsgWin_SetupPlainWindow(TalkMsgWinSys *sys, u32 index, StrBuf *strbuf, u8 x, u8 y, u8 width, u8 height,
+                                 u32 unused, u32 frameType, u32 wait, u8 textX, u8 textY) {
     TalkMsgWinParam setup;
     TalkMsgWin *win;
 
@@ -298,15 +298,15 @@ void ActorMsgWin_CreateAtAutoPos(TalkMsgWinSys *sys, u32 index, const VecFx32 *t
     }
 }
 
-void func_ov036_0218b4b4(TalkMsgWinSys *sys, u32 index) {
+void TalkMsgWin_Release(TalkMsgWinSys *sys, u32 index) {
     TalkMsgWin_Free(sys, &sys->windows[index]);
 }
 
-void func_ov036_0218b4c8(TalkMsgWinSys *sys, u32 index) {
+void TalkMsgWin_Open(TalkMsgWinSys *sys, u32 index) {
     TalkMsgWin_RequestOpen(&sys->windows[index]);
 }
 
-void func_ov036_0218b4d8(TalkMsgWinSys *sys, u32 index) {
+void TalkMsgWin_Close(TalkMsgWinSys *sys, u32 index) {
     TalkMsgWin_RequestClose(&sys->windows[index]);
 }
 
@@ -321,15 +321,15 @@ BOOL func_ov036_0218b4fc(TalkMsgWinSys *sys, u32 index) {
     return TalkMsgWin_IsShown(&sys->windows[index]);
 }
 
-PrintStream *func_ov036_0218b50c(TalkMsgWinSys *sys, u32 index) {
+PrintStream *TalkMsgWin_GetPrintStream(TalkMsgWinSys *sys, u32 index) {
     return sys->windows[index].stream;
 }
 
-BmpWin *func_ov036_0218b518(TalkMsgWinSys *sys, u32 index) {
+BmpWin *TalkMsgWin_GetBmpWin(TalkMsgWinSys *sys, u32 index) {
     return sys->windows[index].bmpWin;
 }
 
-void func_ov036_0218b524(TalkMsgWinSys *sys, u32 index, StrBuf *strbuf, u32 wait) {
+void TalkMsgWin_Reprint(TalkMsgWinSys *sys, u32 index, StrBuf *strbuf, u32 wait) {
     TalkMsgWin *win = &sys->windows[index];
 
     if (win->stream != NULL) {
@@ -345,23 +345,23 @@ void func_ov036_0218b524(TalkMsgWinSys *sys, u32 index, StrBuf *strbuf, u32 wait
     }
 }
 
-BmpWin *func_ov036_0218b588(TalkMsgWinSys *sys, u8 x, u8 y, u8 width, u8 height, u32 frameType) {
+BmpWin *TalkMsgWin_AddFrameWindow(TalkMsgWinSys *sys, u8 x, u8 y, u8 width, u8 height, u32 frameType) {
     BmpWin *bmpWin = TalkMsgWinSys_CreateBmpWin(sys, x, y, width, height);
 
     TalkMsgWin_DrawFrameByType(sys, bmpWin, frameType, TALKMSG_WIN_TAIL_NONE);
     return bmpWin;
 }
 
-void func_ov036_0218b5ac(TalkMsgWinSys *sys, BmpWin *bmpWin, u32 frameType) {
+void TalkMsgWin_DrawWindowFrame(TalkMsgWinSys *sys, BmpWin *bmpWin, u32 frameType) {
     TalkMsgWin_DrawFrameByType(sys, bmpWin, frameType, TALKMSG_WIN_TAIL_NONE);
 }
 
-void func_ov036_0218b5bc(TalkMsgWinSys *sys, BmpWin *bmpWin) {
+void TalkMsgWin_ClearWindowFrame(TalkMsgWinSys *sys, BmpWin *bmpWin) {
     TalkMsgWin_ClearFrame(sys, bmpWin);
     GFL_BGSysLoadScr(sys->setup.bg);
 }
 
-void func_ov036_0218b5d0(TalkMsgWinSys *sys, BmpWin *bmpWin) {
+void TalkMsgWin_DeleteFrameWindow(TalkMsgWinSys *sys, BmpWin *bmpWin) {
     TalkMsgWin_ClearFrame(sys, bmpWin);
     BmpWin_Free(bmpWin);
 }
@@ -807,7 +807,7 @@ static BOOL TalkMsgWin_UpdatePolygons(TalkMsgWinSys *sys, TalkMsgWin *win) {
     return FALSE;
 }
 
-static void func_ov036_0218bf5c(TalkMsgWinSys *sys, BOOL draw) {
+static void TalkMsgWin_SetupCamera(TalkMsgWinSys *sys, BOOL draw) {
     VecFx32 offset;
     VecFx32 pos;
     VecFx32 up;
@@ -876,7 +876,7 @@ static void loadTexture(TalkMsgWinSys *sys) {
     GX_EndLoadTexPltt();
 }
 
-void func_ov036_0218c110(TalkMsgWinSys *sys) {
+void TalkMsgWin_ReloadFrameGraphics(TalkMsgWinSys *sys) {
     u32 palType;
 
     GFL_BGSysClearScr(sys->setup.bg);

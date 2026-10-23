@@ -49,7 +49,7 @@ void loadItemsNameToStrbuf(WordSet *wordSet, u32 index, u32 item);
 void loadAbilityNameToStrbuf(WordSet *wordSet, u32 index, u32 ability);
 void loadNatureToStrbuf(WordSet *wordSet, u32 index, u32 nature);
 void loadSayingForDisplay(WordSet *wordSet, u32 index, u16 saying);
-void func_02024574(WordSet *wordSet, u32 index, u32 value);
+void WordSet_SetSlotMarkerFlag(WordSet *wordSet, u32 index, u32 value);
 void loadTypeTextToStrbuf(WordSet *wordSet, u32 index, u32 type);
 void loadTrainerTypeText(WordSet *wordSet, u32 index, u8 trainerType);
 void loadTrainerTypeToStrbuf(WordSet *wordSet, u32 index, u32 trainerId);

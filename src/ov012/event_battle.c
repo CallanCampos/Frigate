@@ -203,7 +203,7 @@ GameEvent *EventWildBattleCall_CreateCore(GameSystem *gsys, Field *field, BtlSet
     }
     EventBattleCall_BroadcastWildBattle(setup, 0);
     RecordAddOne(GameData_GetRecords(GSYS_GetGameData(gsys)), 5);
-    func_ov036_021a2364(Field_GetEncountSystem(field));
+    EffectEncount_ConsumeSpot(Field_GetEncountSystem(field));
     return event;
 }
 
@@ -253,7 +253,7 @@ GameEvent *EventTrainerBattleCall_Create(GameSystem *gsys, Field *field, u32 a2,
         }
     }
     EventBattleCall_DecideEnvTrainer(trainerId, field, &work->encEffect, &work->setup->fieldSituation.bgm);
-    func_ov036_021a2364(Field_GetEncountSystem(field));
+    EffectEncount_ConsumeSpot(Field_GetEncountSystem(field));
     return event;
 }
 
@@ -266,7 +266,7 @@ GameEvent *EventBSubwayBattleCall_Create(GameSystem *gsys, Field *field, BtlSetu
     work->unk18 = TRUE;
     work->unk20 = TRUE;
     work->encEffect = 9;
-    func_ov036_021a2364(Field_GetEncountSystem(field));
+    EffectEncount_ConsumeSpot(Field_GetEncountSystem(field));
     return event;
 }
 
@@ -280,7 +280,7 @@ GameEvent *CreateTrialHouseBattleEvent(GameSystem *gsys, Field *field, BtlSetup 
     work->unk18 = TRUE;
     work->encEffect = 9;
     work->setup->fieldSituation.bgm = 0x46b;
-    func_ov036_021a2364(Field_GetEncountSystem(field));
+    EffectEncount_ConsumeSpot(Field_GetEncountSystem(field));
     return event;
 }
 
@@ -298,7 +298,7 @@ GameEvent *EventInfinityDungeonBattleCall_Create(GameSystem *gsys, Field *field,
     work->encEffect = 9;
     work->setup->fieldSituation.bgm = 0x46a;
     work->setup->fieldSituation.unk12 = 0x47d;
-    func_ov036_021a2364(Field_GetEncountSystem(field));
+    EffectEncount_ConsumeSpot(Field_GetEncountSystem(field));
     return event;
 }
 
@@ -311,7 +311,7 @@ GameEvent *EventWbtBattleCall_Create(GameSystem *gsys, Field *field, BtlSetup *s
     work->unk18 = TRUE;
     work->unk20 = TRUE;
     work->encEffect = 0x1c;
-    func_ov036_021a2364(Field_GetEncountSystem(field));
+    EffectEncount_ConsumeSpot(Field_GetEncountSystem(field));
     return event;
 }
 

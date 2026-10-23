@@ -41,7 +41,7 @@ struct CityState {
 void SetAllowVersionSpecificZone(u32 side, u32 allow);
 void CityState_ApplyVersionZones(CityState *state);
 void CityState_Init(CityState *state);
-BOOL func_ov012_0215cd98(s32 value);
+BOOL CityState_IsSlotIndexOutOfRange(s32 value);
 
 GameData *GameData_Create(HeapID heapId);
 void GameData_Free(GameData *gameData);

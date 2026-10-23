@@ -57,9 +57,9 @@ u32 BtlServerFlow_RunMidTurnSwitch(BtlServerFlow *serverFlow, BtlClientActions *
 void BtlServerFlow_PrepareFaintSwitch(BtlServerFlow *serverFlow);
 u32 BtlServerFlow_RunFaintSwitch(BtlServerFlow *serverFlow, BtlClientActions *clientActions);
 u32 BtlServerFlow_TryEscape(BtlServerFlow *serverFlow);
-BOOL func_ov167_0219fe24(BtlServerFlow *serverFlow);
+BOOL ServerControl_RunBagModeSetup(BtlServerFlow *serverFlow);
 BtlClientIDList *BtlServerFlow_GetClientIDList(BtlServerFlow *serverFlow);
-u8 func_ov167_0219fff0(BtlServerFlow *serverFlow);
+u8 ServerControl_GetChosenSlot(BtlServerFlow *serverFlow);
 u32 BtlServerFlow_GetBattleResult(BtlServerFlow *serverFlow);
 
 // The damage of a move, with the type effectiveness if withEffectiveness is set. damageRoll is USE_MIN_DAMAGE for the
@@ -98,7 +98,7 @@ u8 BtlServerFlow_GetChatterEffect(BtlServerFlow *flow, u8 monId);
 u8 BtlServerFlow_GetClientCoverPosCount(BtlServerFlow *flow, u8 monId);
 u8 BtlServerFlow_GetClientFrontSlotCount(BtlServerFlow *flow, u8 monId);
 BOOL BtlServerFlow_HasReserveMon(BtlServerFlow *flow, u8 monId);
-BOOL func_ov167_021aba8c(BtlServerFlow *flow);
+BOOL ServerControl_TrySetOnceFlag(BtlServerFlow *flow);
 BattleParty *BtlServerFlow_GetMonParty(BtlServerFlow *flow, u8 monId);
 BattleParty *BtlServerFlow_GetAllyParty(BtlServerFlow *flow, u8 monId);
 u8 BtlServerFlow_GetMoveTargetPos(BtlServerFlow *flow, u8 monId, u16 move);
@@ -172,14 +172,14 @@ BOOL ServerControl_MidTurnSwitchIn(BtlServerFlow *flow, BtlClientActions *client
 u8 ActionOrder_Build(BtlServerFlow *flow, BtlClientActions *clientActions, ActionOrderEntry *order, u8 max);
 void BtlFlowMonIter_Init(BtlFlowMonIter *iter, BtlServerFlow *flow);
 BOOL BtlFlowMonIter_Next(BtlFlowMonIter *iter, BtlServerFlow *flow, BattleMon **mon);
-void func_ov167_021a8f8c(BtlFlowUnk1B54 *work);
+void ServerControl_ClearPendingCounter(BtlFlowUnk1B54 *work);
 void BtlServerFlow_ClearEffectivenessCounts(u16 *counts);
 void BtlServerFlow_ClearRevivedMons(BtlServerFlow *flow);
 void BtlServerFlow_ResetFrames(BtlServerFlow *flow);
 BOOL ServerControl_ChangeWeather(BtlServerFlow *flow, u8 weather, u8 turns);
 void ServerControl_SwitchInCore(BtlServerFlow *flow, u8 clientId, u8 pos, u8 slot);
 void ActionOrder_RecalcAndSort(BtlServerFlow *flow, ActionOrderEntry *order, u32 count);
-void func_ov167_0219fe44(BtlServerFlow *flow);
+void ServerControl_PushBagModePositions(BtlServerFlow *flow);
 void ServerControl_Rotation(BtlServerFlow *flow, u8 clientId, u8 slot);
 BOOL ServerControl_RequestChangeForEmptyPos(BtlServerFlow *flow, BtlFlowClientList *list);
 void ServerControl_BeforeFirstFight(BtlServerFlow *flow);

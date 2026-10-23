@@ -611,7 +611,7 @@ BOOL s022F_WordSetLoadPastTradePkmName(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL func_ov036_021af9dc(VM *vm, FieldScriptEnv *env) {
+BOOL PokeParty_ControlLegendMon(VM *vm, FieldScriptEnv *env) {
     u16 kind = ScriptReadAny(vm, env);
     u16 *result = ScriptReadVar(vm, env);
     GameData *gameData = FieldScriptEnv_GetGameData(env);
@@ -625,11 +625,11 @@ BOOL func_ov036_021af9dc(VM *vm, FieldScriptEnv *env) {
         }
         break;
     case 1:
-        func_ov036_021afc28(env);
+        ScrcmdPokemonFld_MoveLegendToFront(env);
         break;
     case 2:
-        func_ov036_021afa2c(env, *result);
-        func_ov036_021afc28(env);
+        ScrcmdPokemonFld_SwapPartyMonWithBoxedLegend(env, *result);
+        ScrcmdPokemonFld_MoveLegendToFront(env);
         break;
     }
     return FALSE;

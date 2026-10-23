@@ -32,9 +32,9 @@ typedef struct {
 static void FieldCommActor_Reset(FldCommActEntry *entry);
 static FieldActor *FieldCommActor_Add(FldCommActSys *sys, u16 modelId, const u16 *dir, const VecFx32 *pos,
                                       const u32 *hidden, FldCommActEntry *entry);
-static void func_ov036_0218b110(FieldActor *actor, const u16 *dir, const VecFx32 *pos, const u32 *hidden,
-                                FldCommActEntry *entry);
-static u16 func_ov036_0218b128(u16 dir);
+static void FieldCommActor_SetMoveWork(FieldActor *actor, const u16 *dir, const VecFx32 *pos, const u32 *hidden,
+                                       FldCommActEntry *entry);
+static u16 FieldCommActor_ConvertDir(u16 dir);
 
 FldCommActSys *FldCommActSys_Create(u8 count, MMSys *actorSystem, HeapID heapId, BOOL a3) {
     FldCommActSys *sys = GFL_HeapAllocate(heapId, sizeof(FldCommActSys), TRUE, "field_comm_actor.c", 93);
@@ -64,7 +64,7 @@ void FldCommActSys_CreateActor(FldCommActSys *sys, u32 netId, u16 modelId, const
     u16 i;
     FldCommActEntry *entry = sys->entries;
 
-    func_ov036_0218b128(*dir);
+    FieldCommActor_ConvertDir(*dir);
     for (i = 0; i < sys->count; i++, entry++) {
         if (entry->actor == NULL) {
             entry->actor = FieldCommActor_Add(sys, modelId, dir, pos, hidden, entry);
@@ -139,14 +139,14 @@ static FieldActor *FieldCommActor_Add(FldCommActSys *sys, u16 modelId, const u16
 
     npc.modelId = modelId;
     actor = CreateNewActorByEntityNoWKOBJCODE(actorSystem, &npc, 0);
-    func_ov036_0218b110(actor, dir, pos, hidden, entry);
-    SetActorWPosAll(actor, pos, func_ov036_0218b128(*dir));
+    FieldCommActor_SetMoveWork(actor, dir, pos, hidden, entry);
+    SetActorWPosAll(actor, pos, FieldCommActor_ConvertDir(*dir));
     FldAct_SetHeightCalcDisabled(actor, TRUE);
     FldAct_SetMapAttrDisabled(actor, TRUE);
     SetActorFlag32(actor, TRUE);
     SetActorCollisionEnabled(actor, FALSE);
     FldAct_SetIgnoreDisableAll(actor, TRUE);
-    func_ov012_021677bc(actor, TRUE);
+    FldAct_SetMoveBitAttrEffectOff(actor, TRUE);
     return actor;
 }
 
@@ -154,7 +154,7 @@ void func_ov036_0218b044(FieldActor *actor) {
     ClearActorPositionBlock(actor, sizeof(FldCommActLink));
 }
 
-void func_ov036_0218b050(FieldActor *actor) {
+void FieldCommActor_MoveDelete(FieldActor *actor) {
     FldCommActLink *link = GetNPCRailPosPtrAddr(actor);
 
     link->entry->actorDeleted = 1;
@@ -165,7 +165,7 @@ void func_ov036_0218b060(FieldActor *actor) {
     VecFx32 pos;
     u32 state;
 
-    CheckSetActorFaceDir(actor, func_ov036_0218b128(*link->dir));
+    CheckSetActorFaceDir(actor, FieldCommActor_ConvertDir(*link->dir));
     state = 0;
     CopyActorWPos(actor, &pos);
     if (pos.x != link->pos->x || pos.y != link->pos->y || pos.z != link->pos->z) {
@@ -205,8 +205,8 @@ void func_ov036_0218b060(FieldActor *actor) {
     }
 }
 
-static void func_ov036_0218b110(FieldActor *actor, const u16 *dir, const VecFx32 *pos, const u32 *hidden,
-                                FldCommActEntry *entry) {
+static void FieldCommActor_SetMoveWork(FieldActor *actor, const u16 *dir, const VecFx32 *pos, const u32 *hidden,
+                                       FldCommActEntry *entry) {
     FldCommActLink *link = GetNPCRailPosPtrAddr(actor);
 
     link->dir = dir;
@@ -215,6 +215,6 @@ static void func_ov036_0218b110(FieldActor *actor, const u16 *dir, const VecFx32
     link->entry = entry;
 }
 
-static u16 func_ov036_0218b128(u16 dir) {
+static u16 FieldCommActor_ConvertDir(u16 dir) {
     return dir;
 }

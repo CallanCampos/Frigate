@@ -32,20 +32,20 @@ u32 FieldSubscreen_GetScreenID(FieldSubscreen *subscreen);
 u32 FieldSubscreen_GetReturnSubscreen(FieldSubscreen *subscreen);
 // FieldSubscreen_SaveReturnSubscreen with FLD_SUBSCREEN_ID_DEFAULT
 void FieldSubscreen_ResetReturnSubscreen(FieldSubscreen *subscreen);
-void func_ov036_0219886c(FieldSubscreen *subscreen, u32 param);
+void FieldSubscreen_SetMenuSelectedButton(FieldSubscreen *subscreen, u32 param);
 BOOL FieldSubscreen_IsReady(FieldSubscreen *subscreen);
 // The report's subscreen
-void func_ov036_021984f0(FieldSubscreen *subscreen, HeapID heapId);
+void FieldSubscreen_ResumeField(FieldSubscreen *subscreen, HeapID heapId);
 // Sets the subscreen to change to once the field menu closes
 void FieldSubscreen_SaveReturnSubscreen(FieldSubscreen *subscreen, u32 screenId);
-void func_ov036_02198884(FieldSubscreen *subscreen, HeapID heapId);
+void FieldSubscreen_LoadBackdrop(FieldSubscreen *subscreen, HeapID heapId);
 BOOL func_ov036_02198b04(FieldSubscreen *subscreen);
 void func_ov036_02198b10(FieldSubscreen *subscreen);
 void func_ov036_02198b1c(FieldSubscreen *subscreen);
 BOOL func_ov036_02198b28(FieldSubscreen *subscreen);
 void func_ov036_02198b34(FieldSubscreen *subscreen);
 BOOL func_ov036_02198b40(FieldSubscreen *subscreen);
-u32 func_ov036_02198854(FieldSubscreen *subscreen);
+u32 FieldSubscreen_GetMenuSelectedButton(FieldSubscreen *subscreen);
 // heapId is a u32, not a HeapID: the original keeps the whole word and only truncates it to 16 bits where it passes it
 // to GFL_HeapAllocate and stores it
 FieldSubscreen *FieldSubscreen_Create(u32 heapId, Field *field, u32 mode);
@@ -55,6 +55,6 @@ void FieldSubscreen_UpdateAltFrame(FieldSubscreen *subscreen);
 // The current screen's event, or NULL, while no change is under way
 GameEvent *FieldSubscreen_CheckGameEvents(FieldSubscreen *subscreen, BOOL enabled);
 // The C-Gear while it is the current screen, or NULL
-CGearSw *func_ov036_02198908(FieldSubscreen *subscreen);
+CGearSw *FieldSubscreen_GetCGear(FieldSubscreen *subscreen);
 
 #endif // POKEBW2_FIELD_SUBSCREEN_H

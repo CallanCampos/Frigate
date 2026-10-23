@@ -452,7 +452,7 @@ BOOL s00E4_BoxUnlockWallpapers(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL func_ov012_02155d30(VM *vm, FieldScriptEnv *env) {
+BOOL FieldScriptEnv_CmdGetTrainerViewGroupAndMarkSeen(VM *vm, FieldScriptEnv *env) {
     u16 *flag = ScriptReadVar(vm, env);
     u16 *value = ScriptReadVar(vm, env);
     GameData *gameData = FieldScriptEnv_GetGameData(env);

@@ -21,7 +21,7 @@ typedef struct {
     BOOL ex;
 } ListMenuEvent;
 
-static GameEventReturnCode func_ov036_021a82bc(GameEvent *event, u32 *state, void *data) {
+static GameEventReturnCode ScrcmdMsgwin_YesNoEventMain(GameEvent *event, u32 *state, void *data) {
     YesNoEvent *yesNo = data;
 
     FieldScriptEnv_GetScriptWork(yesNo->env);
@@ -31,13 +31,13 @@ static GameEventReturnCode func_ov036_021a82bc(GameEvent *event, u32 *state, voi
         (*state)++;
     case 1:
         if (FieldScriptEnv_UpdateWaitCounter(yesNo->env) == TRUE) {
-            yesNo->window =
-                func_ov036_021880d4(Field_GetMsgBGSys(GSYS_GetField(FieldScriptEnv_GetGameSystem(yesNo->env))), 0);
+            yesNo->window = MsgBGPrinter_CreateYesNoMenu(
+                Field_GetMsgBGSys(GSYS_GetField(FieldScriptEnv_GetGameSystem(yesNo->env))), 0);
             (*state)++;
         }
         break;
     case 2:
-        switch (func_ov036_0218816c(yesNo->window)) {
+        switch (MsgBGPrinter_YesNoMenuMain(yesNo->window)) {
         case 0:
             *yesNo->result = FALSE;
             (*state)++;
@@ -51,14 +51,14 @@ static GameEventReturnCode func_ov036_021a82bc(GameEvent *event, u32 *state, voi
         }
         break;
     case 3:
-        func_ov036_02187ea0(yesNo->window);
+        MsgBGPrinter_DeleteMenuFunc(yesNo->window);
         return GAMEEVENT_DONE;
     }
     return GAMEEVENT_CONTINUE;
 }
 
-static GameEvent *func_ov036_021a8344(GameSystem *gsys, FieldScriptEnv *env, u16 *result) {
-    GameEvent *event = GameEvent_Create(gsys, NULL, func_ov036_021a82bc, sizeof(YesNoEvent));
+static GameEvent *ScrcmdMsgwin_CreateYesNoEvent(GameSystem *gsys, FieldScriptEnv *env, u16 *result) {
+    GameEvent *event = GameEvent_Create(gsys, NULL, ScrcmdMsgwin_YesNoEventMain, sizeof(YesNoEvent));
     YesNoEvent *yesNo = GameEvent_GetData(event);
 
     yesNo->env = env;
@@ -70,7 +70,7 @@ BOOL s0047_YesNoWin(VM *vm, FieldScriptEnv *env) {
     u16 *result = ScriptReadVar(vm, env);
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
 
-    ScriptWork_CallEvent(work, func_ov036_021a8344(FieldScriptEnv_GetGameSystem(env), env, result));
+    ScriptWork_CallEvent(work, ScrcmdMsgwin_CreateYesNoEvent(FieldScriptEnv_GetGameSystem(env), env, result));
     return TRUE;
 }
 

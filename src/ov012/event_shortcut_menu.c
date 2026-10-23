@@ -97,14 +97,14 @@ GameEventReturnCode EventShortcutChoicePopup_Callback(GameEvent *event, u32 *sta
         *state = 3;
         break;
     case 3:
-        func_ov036_021bf088(work->app);
-        if (!func_ov036_021bf1e4(work->app)) {
+        ShortcutMenu_Main(work->app);
+        if (!ShortcutMenu_IsWaitingInput(work->app)) {
             *state = 4;
         }
         break;
     case 4:
-        func_ov036_021bf088(work->app);
-        result = func_ov036_021bf1f8(work->app, &item);
+        ShortcutMenu_Main(work->app);
+        result = ShortcutMenu_GetResult(work->app, &item);
         if (result == 1) {
             noRibbon = FALSE;
             work->blocked = 0;
@@ -138,12 +138,12 @@ GameEventReturnCode EventShortcutChoicePopup_Callback(GameEvent *event, u32 *sta
         }
         break;
     case 5:
-        func_ov036_021bf1d0(work->app);
+        ShortcutMenu_RequestClose(work->app);
         *state = 6;
         break;
     case 6:
-        func_ov036_021bf088(work->app);
-        if (!func_ov036_021bf1e4(work->app)) {
+        ShortcutMenu_Main(work->app);
+        if (!ShortcutMenu_IsWaitingInput(work->app)) {
             *state = 7;
         }
         break;
@@ -510,7 +510,7 @@ void ShortcutMenu_Open(u32 arg0, ShortcutMenuWork *work) {
         GFL_BGSysSetBGEnabled(1, 0);
         msgBGSys = Field_GetMsgBGSys(work->field);
         if (msgBGSys != NULL) {
-            func_ov036_02187834(msgBGSys);
+            MsgBGPrinter_ReleaseBg(msgBGSys);
         }
         gameData = GSYS_GetGameData(work->gameSystem);
         listPos = GameData_GetShortcutMenuPos(gameData);
@@ -524,7 +524,7 @@ BOOL ShortcutMenu_Close(ShortcutMenuWork *work) {
         case 0:
             if (work->app) {
                 GFL_BGSysSetBGEnabled(1, 0);
-                func_ov036_021bf004(work->app);
+                ShortcutMenu_Delete(work->app);
                 work->app = NULL;
                 work->state = 1;
             } else {
@@ -532,7 +532,7 @@ BOOL ShortcutMenu_Close(ShortcutMenuWork *work) {
             }
             break;
         case 1:
-            func_ov036_02187888(Field_GetMsgBGSys(work->field));
+            MsgBGPrinter_SetupBgSingle(Field_GetMsgBGSys(work->field));
             work->state = 2;
             break;
         case 2:
@@ -566,7 +566,7 @@ BOOL ShortcutMenu_CanRetry(FieldAppCallInput *input, void *arg) {
         }
         break;
     case 1:
-        if (func_ov036_021bf198(work->app)) {
+        if (ShortcutMenu_RunPrint(work->app)) {
             work->state = 2;
         }
         break;

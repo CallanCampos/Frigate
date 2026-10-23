@@ -440,8 +440,8 @@ static void GymOpelucid_PlacePlates(Field *field) {
     HeightExList *list = func_ov036_02184590(Field_GetG3DMapper(field));
 
     for (i = 0; i < PLATE_COUNT; i++) {
-        func_ov036_021ba624(i, sPlates[i].x, sPlates[i].z, sPlates[i].width, sPlates[i].depth, sPlates[i].value,
-                            0x800000, list);
+        HeightEx_SetArea(i, sPlates[i].x, sPlates[i].z, sPlates[i].width, sPlates[i].depth, sPlates[i].value, 0x800000,
+                         list);
     }
 }
 

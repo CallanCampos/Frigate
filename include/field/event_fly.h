@@ -3,8 +3,8 @@
 
 #include "system/game_event.h"
 
-GameEvent *func_ov033_02178908(GameSystem *gsys, Field *field, u32 zoneId);
+GameEvent *EventFly_CreateMapChangeEvent(GameSystem *gsys, Field *field, u32 zoneId);
 GameEventReturnCode EventFly_Callback(GameEvent *event, u32 *state, void *data);
-GameEventReturnCode func_ov033_02178c6c(GameEvent *event, u32 *state, void *data);
+GameEventReturnCode EventFly_FadeOutEventMain(GameEvent *event, u32 *state, void *data);
 
 #endif // POKEBW2_FIELD_EVENT_FLY_H

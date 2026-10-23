@@ -281,34 +281,37 @@ static ListMenuUI *ListMenuUI_CreateCore(FieldMsgBG *sys, const ListMenuRequest 
                                          u16 listTop, u16 cursorRow, u16 palette,
                                          BmpMenuListCursorCallback cursorCallback,
                                          BmpMenuListPrintCallback printCallback, void *work);
-static ListMenuUI *func_ov036_02187e44(FieldMsgBG *sys, const ListMenuRequest *request, ListMenuOption *options,
-                                       u16 listTop, u16 cursorRow);
+static ListMenuUI *MsgBGPrinter_CreateMenuFuncPos(FieldMsgBG *sys, const ListMenuRequest *request,
+                                                  ListMenuOption *options, u16 listTop, u16 cursorRow);
 static u32 FieldMsgBG_GetWidestOption(FieldMsgBG *sys, ListMenuOption *options, u32 *widestIndex, u32 spacing);
 static void BmpMenuListSetup_Init(BmpMenuListHeader *header, const ListMenuRequest *request);
 
-// The yes/no menu's request, which func_ov036_021880d4 copies and sets the menu's position and size in. It is defined
-// after the BG setup functions, where the size sort lays it out after their setups, as the ROM has it
+// The yes/no menu's request, which MsgBGPrinter_CreateYesNoMenu copies and sets the menu's position and size in. It is
+// defined after the BG setup functions, where the size sort lays it out after their setups, as the ROM has it
 static const ListMenuRequest sYesNoMenuRequest;
 
-static MsgStream *func_ov036_02188188(FieldMsgBG *sys, StrBuf *strbuf, BmpWin *window, u16 x, u16 y, u32 wait, u16 a6);
-static BOOL func_ov036_021881fc(u32 event);
-static MsgStream *func_ov036_02188220(FieldMsgBG *sys, StrBuf *strbuf, BmpWin *window, u16 x, u16 y, u32 wait);
+static MsgStream *MsgBGPrinter_CreateMsgStreamColor(FieldMsgBG *sys, StrBuf *strbuf, BmpWin *window, u16 x, u16 y,
+                                                    u32 wait, u16 a6);
+static BOOL MsgBGPrinter_MsgStreamCallback(u32 event);
+static MsgStream *MsgBGPrinter_CreateMsgStream(FieldMsgBG *sys, StrBuf *strbuf, BmpWin *window, u16 x, u16 y, u32 wait);
 static void MsgStream_Free(MsgStream *stream);
 static u32 MsgStream_Update(MsgStream *stream);
-static FieldMsgWin *func_ov036_021882c0(FieldMsgBG *sys, MsgData *msgData, u16 x, u16 y, u16 width, u16 height);
+static FieldMsgWin *MsgBGPrinter_CreateSysWin(FieldMsgBG *sys, MsgData *msgData, u16 x, u16 y, u16 width, u16 height);
 static void ActorMsgWin_Create(FieldMsgBG *sys, ActorMsgWin *win, u32 type, const VecFx32 *pos, StrBuf *strbuf,
                                u32 frameType, u32 tail);
-static void func_ov036_02188a00(FieldMsgBG *sys, InfoMsgWin *win, u32 x, u32 y, u16 width, u16 height, u32 frameType);
-static void func_ov036_02188cc0(FieldMsgBG *sys, NumberedMsgWin *win, StrBuf *strbuf, u16 index, u8 x, u8 y, u8 width,
-                                u8 height, u32 userId, u32 frameType);
-static void func_ov036_02188e70(NumberedMsgWin *win);
-static BOOL func_ov036_02188eec(NumberedMsgWin *win);
-static void func_ov036_021892b0(u32 bg, u32 palSlot, u32 style, HeapID heapId);
-static void func_ov036_021892f0(u8 bg, u8 x, u8 y, u8 w, u8 h, u16 tile, u8 pal);
-static void func_ov036_021894c8(u8 bg, u8 x, u8 y, u8 w, u8 h, u16 tile, u8 pal);
-static BOOL func_ov036_02189660(const StrBuf *src, StrBuf *dest, u32 line);
-static BOOL func_ov036_02189674(GFLBitmap *bitmap, Font *font, const StrBuf *src, StrBuf *dest, u32 *line, u8 color);
-static BOOL func_ov036_021896f0(GFLBitmap *dest, GFLBitmap *src1, GFLBitmap *src2, int amount, u16 color);
+static void MsgBGPrinter_SetupPlainWin(FieldMsgBG *sys, InfoMsgWin *win, u32 x, u32 y, u16 width, u16 height,
+                                       u32 frameType);
+static void MsgBGPrinter_SetupSubMsgWin(FieldMsgBG *sys, NumberedMsgWin *win, StrBuf *strbuf, u16 index, u8 x, u8 y,
+                                        u8 width, u8 height, u32 userId, u32 frameType);
+static void MsgBGPrinter_FreeSubMsgWin(NumberedMsgWin *win);
+static BOOL MsgBGPrinter_SubMsgWinMain(NumberedMsgWin *win);
+static void MsgBGPrinter_LoadBgWinGraphics(u32 bg, u32 palSlot, u32 style, HeapID heapId);
+static void MsgBGPrinter_DrawBgWinFrame(u8 bg, u8 x, u8 y, u8 w, u8 h, u16 tile, u8 pal);
+static void MsgBGPrinter_ClearBgWinFrame(u8 bg, u8 x, u8 y, u8 w, u8 h, u16 tile, u8 pal);
+static BOOL MsgBGPrinter_IsLineMissing(const StrBuf *src, StrBuf *dest, u32 line);
+static BOOL MsgBGPrinter_PrintTwoLines(GFLBitmap *bitmap, Font *font, const StrBuf *src, StrBuf *dest, u32 *line,
+                                       u8 color);
+static BOOL MsgBGPrinter_RollLines(GFLBitmap *dest, GFLBitmap *src1, GFLBitmap *src2, int amount, u16 color);
 static void CheckerMsgWin_LoadPalette(u32 bg, u32 slot, HeapID heapId);
 static void CheckerMsgWin_LoadFrameTile(GFLBitmap *bitmap, u32 style, HeapID heapId, CheckerFrameTile tile);
 static void CheckerMsgWin_DrawFrame(GFLBitmap *bitmap, u32 style, HeapID heapId);
@@ -318,24 +321,24 @@ static void MsgBGCursor_Free(MsgBGCursor *cursor);
 static BOOL MsgBGCursor_IsShown(MsgBGCursor *cursor);
 static void MsgBGCursor_Clear(MsgBGCursor *cursor, GFLBitmap *bitmap, u32 color);
 static void MsgBGCursor_Draw(MsgBGCursor *cursor, GFLBitmap *bitmap, u32 color);
-static void func_ov036_02189e20(MsgBGCursor *cursor, GFLBitmap *bitmap, GFLBitmap *dest);
-static void func_ov036_02189f10(HeapID heapId);
-static void func_ov036_02189f2c(BmpWin *win);
-static BmpWin *func_ov036_0218a048(u8 x, u8 y, u8 w, u8 h, HeapID heapId);
-static void func_ov036_0218a08c(BmpWin *win);
-static void func_ov036_0218a0e8(BmpWin *win);
-static void func_ov036_0218a0f8(FieldMsgBG *sys, BOOL loadFrame);
-static void func_ov036_0218a218(FieldMsgBG *sys, BOOL loadFrame);
-static void func_ov036_0218a334(FieldMsgBG *sys);
-static void func_ov036_0218a3e0(TCB *tcb, void *data);
-static void func_ov036_0218a408(u32 create, u32 alphaBlend);
-static void func_ov036_0218a4a4(FieldMsgBG *sys);
-static void func_ov036_0218a4dc(u32 bg, HeapID heapId);
-static void func_ov036_0218a524(u32 bg, HeapID heapId, u32 step);
+static void MsgBGPrinter_AnimateCursorOnFrame(MsgBGCursor *cursor, GFLBitmap *bitmap, GFLBitmap *dest);
+static void MsgBGPrinter_LoadSysWindowFrameGraphics(HeapID heapId);
+static void MsgBGPrinter_DrawSysWindowFrame(BmpWin *win);
+static BmpWin *MsgBGPrinter_CreateSysFrameWindow(u8 x, u8 y, u8 w, u8 h, HeapID heapId);
+static void MsgBGPrinter_ClearSysWindowFrame(BmpWin *win);
+static void MsgBGPrinter_DeleteSysFrameWindow(BmpWin *win);
+static void MsgBGPrinter_InitBgTwoLayerTalk(FieldMsgBG *sys, BOOL loadFrame);
+static void MsgBGPrinter_InitBgTwoLayer(FieldMsgBG *sys, BOOL loadFrame);
+static void MsgBGPrinter_InitBgOneLayer(FieldMsgBG *sys);
+static void MsgBGPrinter_VblankTalkSysTask(TCB *tcb, void *data);
+static void MsgBGPrinter_SetupSysFrameBg(u32 create, u32 alphaBlend);
+static void MsgBGPrinter_SetupSysFrame(FieldMsgBG *sys);
+static void MsgBGPrinter_LoadWindowGraphicsAll(u32 bg, HeapID heapId);
+static void MsgBGPrinter_LoadWindowGraphicsStepFn(u32 bg, HeapID heapId, u32 step);
 static void setAlphaBlend(BOOL on);
 static BmpWin *FieldMsgBG_CreateBmpWin(u32 bg, u32 heapId, u32 x, u32 y, u16 w, u16 h, u16 pal);
-static void func_ov036_0218a668(BmpWin *win);
-static void func_ov036_0218a67c(u32 heapId);
+static void MsgBGPrinter_DeleteWindow(BmpWin *win);
+static void MsgBGPrinter_LoadMenuGraphicsLower(u32 heapId);
 static void loadPltt(u32 heapId);
 static int FieldMsgBG_AddNumberedWindow(FieldMsgBG *sys, NumberedMsgWin *win);
 static NumberedMsgWin *FieldMsgBG_TakeNumberedWindow(FieldMsgBG *sys, u32 userId);
@@ -344,9 +347,9 @@ static void MsgBGInput_Reset(MsgBGInput *input);
 static void MsgBGInput_SetAutoAdvance(MsgBGInput *input, BOOL value);
 static BOOL MsgBGInput_GetAutoAdvance(MsgBGInput *input);
 static s32 MsgBGInput_GetTextWait(MsgBGInput *input);
-static BOOL func_ov036_0218a760(MsgBGInput *input);
-static BOOL func_ov036_0218a798(MsgBGInput *input, BOOL fast);
-static void func_ov036_0218a7d8(PrintStream *stream, BOOL fast);
+static BOOL MsgBGPrinter_KeyWaitCheckSkip(MsgBGInput *input);
+static BOOL MsgBGPrinter_KeyWaitCheckAdvance(MsgBGInput *input, BOOL fast);
+static void MsgBGPrinter_StreamSetSpeed(PrintStream *stream, BOOL fast);
 
 FieldMsgBG *CreateFieldMsgBGSystem(HeapID heapId, G3DCamera *camera) {
     FieldMsgBG *sys = GFL_HeapAllocate(heapId, sizeof(FieldMsgBG), TRUE, "field_msgbg.c", 422);
@@ -365,26 +368,26 @@ FieldMsgBG *CreateFieldMsgBGSystem(HeapID heapId, G3DCamera *camera) {
     return sys;
 }
 
-void func_ov036_02187760(FieldMsgBG *sys) {
-    func_ov036_0218a0f8(sys, TRUE);
+void MsgBGPrinter_SetupBg(FieldMsgBG *sys) {
+    MsgBGPrinter_InitBgTwoLayerTalk(sys, TRUE);
 }
 
-void func_ov036_0218776c(FieldMsgBG *sys) {
-    func_ov036_0218a218(sys, FALSE);
+void MsgBGPrinter_SetupBgDelayed(FieldMsgBG *sys) {
+    MsgBGPrinter_InitBgTwoLayer(sys, FALSE);
     if (sys->vblankTcb == NULL) {
-        sys->vblankTcb = GFL_VBlankTCBAdd(func_ov036_0218a3e0, sys, 0);
+        sys->vblankTcb = GFL_VBlankTCBAdd(MsgBGPrinter_VblankTalkSysTask, sys, 0);
     }
 }
 
-void func_ov036_02187794(u32 bg, HeapID heapId) {
-    func_ov036_0218a4dc(bg, heapId);
+void MsgBGPrinter_LoadWindowGraphics(u32 bg, HeapID heapId) {
+    MsgBGPrinter_LoadWindowGraphicsAll(bg, heapId);
 }
 
-void func_ov036_0218779c(FieldMsgBG *sys, u32 step) {
-    func_ov036_0218a524(sys->bg, sys->heapId, step);
+void MsgBGPrinter_LoadWindowGraphicsStep(FieldMsgBG *sys, u32 step) {
+    MsgBGPrinter_LoadWindowGraphicsStepFn(sys->bg, sys->heapId, step);
 }
 
-void func_ov036_021877ac(FieldMsgBG *sys) {
+void MsgBGPrinter_Delete(FieldMsgBG *sys) {
     int i = 0;
     MsgBGPrinter *printer = sys->printers;
 
@@ -418,7 +421,7 @@ void func_ov036_021877ac(FieldMsgBG *sys) {
     GFL_HeapFree(sys);
 }
 
-void func_ov036_02187834(FieldMsgBG *sys) {
+void MsgBGPrinter_ReleaseBg(FieldMsgBG *sys) {
     if (sys->talk != NULL) {
         TalkMsgWinSys_Free(sys->talk);
         sys->talk = NULL;
@@ -430,7 +433,7 @@ void func_ov036_02187834(FieldMsgBG *sys) {
     }
 }
 
-BOOL func_ov036_02187868(FieldMsgBG *sys) {
+BOOL MsgBGPrinter_ReleaseSysFrame(FieldMsgBG *sys) {
     if (sys->bg2 != MSGBG_NO_BG) {
         GFL_BGSysReleaseBG(sys->bg2);
         sys->bg2 = MSGBG_NO_BG;
@@ -439,24 +442,24 @@ BOOL func_ov036_02187868(FieldMsgBG *sys) {
     return FALSE;
 }
 
-void func_ov036_02187888(FieldMsgBG *sys) {
+void MsgBGPrinter_SetupBgSingle(FieldMsgBG *sys) {
     if (sys->talk != NULL) {
         TalkMsgWinSys_Free(sys->talk);
     }
-    func_ov036_0218a334(sys);
+    MsgBGPrinter_InitBgOneLayer(sys);
     if (sys->vblankTcb == NULL) {
-        sys->vblankTcb = GFL_VBlankTCBAdd(func_ov036_0218a3e0, sys, 0);
+        sys->vblankTcb = GFL_VBlankTCBAdd(MsgBGPrinter_VblankTalkSysTask, sys, 0);
     }
 }
 
-BOOL func_ov036_021878bc(FieldMsgBG *sys) {
+BOOL MsgBGPrinter_IsSetupDone(FieldMsgBG *sys) {
     if (sys->vblankTcb == NULL) {
         return TRUE;
     }
     return FALSE;
 }
 
-void func_ov036_021878d0(FieldMsgBG *sys) {
+void MsgBGPrinter_Main(FieldMsgBG *sys) {
     MsgBGPrinter *printer;
     int i;
     NumberedMsgWin **numberedWin;
@@ -465,7 +468,7 @@ void func_ov036_021878d0(FieldMsgBG *sys) {
     numberedWin = sys->numberedWins;
     for (i = 0; i < MSGBG_NUMBERED_WIN_COUNT; i++, numberedWin++) {
         if (*numberedWin != NULL) {
-            func_ov036_02188eec(*numberedWin);
+            MsgBGPrinter_SubMsgWinMain(*numberedWin);
         }
     }
     printer = sys->printers;
@@ -478,45 +481,45 @@ void func_ov036_021878d0(FieldMsgBG *sys) {
     GFL_TCBExMgrUpdate(sys->tcbMgr);
     if (sys->talk != NULL) {
         TalkMsgWinSys_Update(sys->talk);
-        func_ov036_0218b2e8(sys->talk);
+        TalkMsgWin_EndUpdate(sys->talk);
     }
 }
 
-void func_ov036_0218796c(FieldMsgBG *sys) {
+void MsgBGPrinter_DrawTalkSys(FieldMsgBG *sys) {
     if (sys->talk != NULL) {
         TalkMsgWinSys_Draw(sys->talk);
     }
 }
 
-void func_ov036_02187980(FieldMsgBG *sys) {
+void MsgBGPrinter_ClearPrintQue(FieldMsgBG *sys) {
     PrintQueue_Clear(sys->queue);
 }
 
-BOOL func_ov036_0218798c(FieldMsgBG *sys) {
+BOOL MsgBGPrinter_IsPrintQueFinished(FieldMsgBG *sys) {
     return PrintQueue_IsEmpty(sys->queue);
 }
 
-PrintQueue *func_ov036_02187998(FieldMsgBG *sys) {
+PrintQueue *MsgBGPrinter_GetPrintQue(FieldMsgBG *sys) {
     return sys->queue;
 }
 
-Font *func_ov036_0218799c(FieldMsgBG *sys) {
+Font *MsgBGPrinter_GetFont(FieldMsgBG *sys) {
     return sys->font;
 }
 
-MsgData *func_ov036_021879a0(FieldMsgBG *sys, u32 fileId) {
+MsgData *MsgBGPrinter_CreateMsgData(FieldMsgBG *sys, u32 fileId) {
     return GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, fileId, sys->heapId);
 }
 
-void func_ov036_021879b8(MsgData *msgData) {
+void MsgBGPrinter_DeleteMsgData(MsgData *msgData) {
     GFL_MsgDataFree(msgData);
 }
 
-void func_ov036_021879c0(FieldMsgBG *sys) {
+void MsgBGPrinter_RequestSysFrame(FieldMsgBG *sys) {
     sys->resetBG2 = TRUE;
 }
 
-void func_ov036_021879cc(FieldMsgBG *sys, BOOL enable) {
+void MsgBGPrinter_SetAutoMode(FieldMsgBG *sys, BOOL enable) {
     MsgBGInput_SetAutoAdvance(&sys->input, enable);
 }
 
@@ -592,7 +595,7 @@ static MoneyWin *MoneyWin_Create(FieldMsgBG *sys, MsgData *msgData, u16 x, u16 y
     u8 bg = sys->bg;
     MoneyWin *win;
 
-    func_ov036_0218a4a4(sys);
+    MsgBGPrinter_SetupSysFrame(sys);
     if (palette == MSGBG_PLTT_BG2) {
         bg = sys->bg2;
     }
@@ -601,7 +604,7 @@ static MoneyWin *MoneyWin_Create(FieldMsgBG *sys, MsgData *msgData, u16 x, u16 y
     win->window = FieldMsgBG_CreateBmpWin(bg, sys->heapId, x, y, width, height, palette);
     win->printer = MsgBGPrinter_Create(sys, msgData, win->window);
     if (palette == MSGBG_PLTT_BG2) {
-        func_ov036_0218a67c(sys->heapId);
+        MsgBGPrinter_LoadMenuGraphicsLower(sys->heapId);
         setAlphaBlend(sys->alphaBlend);
     } else {
         loadPltt(sys->heapId);
@@ -614,65 +617,65 @@ MoneyWin *FieldMsgBG_CreateMoneyWin(FieldMsgBG *sys, MsgData *msgData, u16 x, u1
     return MoneyWin_Create(sys, msgData, x, y, width, height, sys->palette);
 }
 
-void func_ov036_02187c1c(MoneyWin *win) {
-    func_ov036_0218a668(win->window);
+void MsgBGPrinter_DeleteMsgWin(MoneyWin *win) {
+    MsgBGPrinter_DeleteWindow(win->window);
     MsgBGPrinter_Free(win->printer);
     GFL_HeapFree(win);
 }
 
-void func_ov036_02187c34(MoneyWin *win, u16 x, u16 y, u32 messageId) {
+void MsgBGPrinter_MsgWinPrintMsg(MoneyWin *win, u16 x, u16 y, u32 messageId) {
     MsgBGPrinter_PrintMessage(win->printer, x, y, messageId);
     GFL_BGSysLoadScr(BmpWin_GetBGIndex(win->window));
 }
 
-void func_ov036_02187c4c(MoneyWin *win, u16 x, u16 y, StrBuf *strbuf) {
+void MsgBGPrinter_MsgWinPrintStr(MoneyWin *win, u16 x, u16 y, StrBuf *strbuf) {
     MsgBGPrinter_PrintStrBuf(win->printer, x, y, strbuf);
 }
 
-void func_ov036_02187c58(MoneyWin *win, u16 x, u16 y, StrBuf *strbuf, u16 color, Font *font) {
+void MsgBGPrinter_MsgWinPrintStrColorFont(MoneyWin *win, u16 x, u16 y, StrBuf *strbuf, u16 color, Font *font) {
     MsgBGPrinter_PrintColorFont(win->printer, x, y, strbuf, color, font);
 }
 
-BOOL func_ov036_02187c70(MoneyWin *win) {
+BOOL MsgBGPrinter_IsMsgWinTransDone(MoneyWin *win) {
     return MsgBGPrinter_IsIdle(win->printer);
 }
 
-void func_ov036_02187c7c(MoneyWin *win) {
+void MsgBGPrinter_ClearMsgWin(MoneyWin *win) {
     MsgBGPrinter_Clear(win->printer);
 }
 
-void func_ov036_02187c88(MoneyWin *win, u32 x, u32 y, u32 width, u32 height) {
+void MsgBGPrinter_FillMsgWin(MoneyWin *win, u32 x, u32 y, u32 width, u32 height) {
     MsgBGPrinter_ClearArea(win->printer, x, y, width, height);
 }
 
-BmpWin *func_ov036_02187c9c(MoneyWin *win) {
+BmpWin *MsgBGPrinter_GetMsgWinBmpWin(MoneyWin *win) {
     return win->window;
 }
 
-MoneyWin *func_ov036_02187ca0(FieldMsgBG *sys, MsgData *msgData, u16 x, u16 y, u16 width, u16 height) {
+MoneyWin *MsgBGPrinter_CreateInfoMsgWin(FieldMsgBG *sys, MsgData *msgData, u16 x, u16 y, u16 width, u16 height) {
     MoneyWin *win;
 
     sys->palette = MSGBG_PLTT_BG2;
-    func_ov036_0218a4a4(sys);
+    MsgBGPrinter_SetupSysFrame(sys);
     win = GFL_HeapAllocate(sys->heapId, sizeof(MoneyWin), TRUE, "field_msgbg.c", 1379);
     win->sys = sys;
-    win->window = func_ov036_0218a048(x, y, width, height, sys->heapId);
+    win->window = MsgBGPrinter_CreateSysFrameWindow(x, y, width, height, sys->heapId);
     win->printer = MsgBGPrinter_Create(sys, msgData, win->window);
     setAlphaBlend(sys->alphaBlend);
     return win;
 }
 
-void func_ov036_02187d10(MoneyWin *win) {
-    func_ov036_0218a0e8(win->window);
+void MsgBGPrinter_DeleteInfoMsgWin(MoneyWin *win) {
+    MsgBGPrinter_DeleteSysFrameWindow(win->window);
     MsgBGPrinter_Free(win->printer);
     GFL_HeapFree(win);
 }
 
-void func_ov036_02187d28(MoneyWin *win, u16 x, u16 y, StrBuf *strbuf) {
+void MsgBGPrinter_InfoMsgWinPrintStr(MoneyWin *win, u16 x, u16 y, StrBuf *strbuf) {
     MsgBGPrinter_PrintStrBuf(win->printer, x + 8, y, strbuf);
 }
 
-void func_ov036_02187d38(MoneyWin *win) {
+void MsgBGPrinter_ClearInfoMsgWin(MoneyWin *win) {
     MsgBGPrinter_Clear(win->printer);
 }
 
@@ -684,7 +687,7 @@ static ListMenuUI *ListMenuUI_CreateCore(FieldMsgBG *sys, const ListMenuRequest 
     ListMenuUI *menu;
     BmpMenuListHeader header;
 
-    func_ov036_0218a4a4(sys);
+    MsgBGPrinter_SetupSysFrame(sys);
     if (palette == MSGBG_PLTT_BG2) {
         bg = sys->bg2;
     }
@@ -706,7 +709,7 @@ static ListMenuUI *ListMenuUI_CreateCore(FieldMsgBG *sys, const ListMenuRequest 
     menu->list = BmpMenuList_Create(&header, listTop, cursorRow, sys->heapId);
     BmpMenuList_LoadCursor(menu->list, sys->heapId);
     if (palette == MSGBG_PLTT_BG2) {
-        func_ov036_0218a67c(sys->heapId);
+        MsgBGPrinter_LoadMenuGraphicsLower(sys->heapId);
         setAlphaBlend(sys->alphaBlend);
     } else {
         loadPltt(sys->heapId);
@@ -714,21 +717,23 @@ static ListMenuUI *ListMenuUI_CreateCore(FieldMsgBG *sys, const ListMenuRequest 
     return menu;
 }
 
-ListMenuUI *func_ov036_02187e1c(FieldMsgBG *sys, const ListMenuRequest *request, ListMenuOption *options, u16 listTop,
-                                u16 cursorRow, BmpMenuListCursorCallback cursorCallback,
-                                BmpMenuListPrintCallback printCallback, void *work) {
+ListMenuUI *MsgBGPrinter_CreateMenuFuncCallback(FieldMsgBG *sys, const ListMenuRequest *request,
+                                                ListMenuOption *options, u16 listTop, u16 cursorRow,
+                                                BmpMenuListCursorCallback cursorCallback,
+                                                BmpMenuListPrintCallback printCallback, void *work) {
     sys->palette = MSGBG_PLTT_BG2;
     return ListMenuUI_CreateCore(sys, request, options, listTop, cursorRow, sys->palette, cursorCallback, printCallback,
                                  work);
 }
 
-static ListMenuUI *func_ov036_02187e44(FieldMsgBG *sys, const ListMenuRequest *request, ListMenuOption *options,
-                                       u16 listTop, u16 cursorRow) {
-    return func_ov036_02187e1c(sys, request, options, listTop, cursorRow, NULL, request->printCallback, NULL);
+static ListMenuUI *MsgBGPrinter_CreateMenuFuncPos(FieldMsgBG *sys, const ListMenuRequest *request,
+                                                  ListMenuOption *options, u16 listTop, u16 cursorRow) {
+    return MsgBGPrinter_CreateMenuFuncCallback(sys, request, options, listTop, cursorRow, NULL, request->printCallback,
+                                               NULL);
 }
 
-ListMenuUI *func_ov036_02187e60(FieldMsgBG *sys, const ListMenuRequest *request, ListMenuOption *options) {
-    return func_ov036_02187e44(sys, request, options, 0, 0);
+ListMenuUI *MsgBGPrinter_CreateMenuFunc(FieldMsgBG *sys, const ListMenuRequest *request, ListMenuOption *options) {
+    return MsgBGPrinter_CreateMenuFuncPos(sys, request, options, 0, 0);
 }
 
 ListMenuUI *ListMenuUI_Create(FieldMsgBG *sys, ListMenuRequest *request, ListMenuOption *options,
@@ -743,10 +748,10 @@ ListMenuUI *ListMenuUI_Create(FieldMsgBG *sys, ListMenuRequest *request, ListMen
     return menu;
 }
 
-void func_ov036_02187ea0(ListMenuUI *menu) {
+void MsgBGPrinter_DeleteMenuFunc(ListMenuUI *menu) {
     BmpMenuList_Free(menu->list, NULL, NULL);
     ListMenuCore_FreeOptionList(menu->options);
-    func_ov036_0218a668(menu->window);
+    MsgBGPrinter_DeleteWindow(menu->window);
     MsgBGPrinter_Free(menu->printer);
     GFL_HeapFree(menu);
 }
@@ -754,7 +759,7 @@ void func_ov036_02187ea0(ListMenuUI *menu) {
 s32 ListMenuUI_Update(ListMenuUI *menu) {
     s32 result;
 
-    if (!func_ov036_0218798c(menu->sys)) {
+    if (!MsgBGPrinter_IsPrintQueFinished(menu->sys)) {
         return BMPMENULIST_NULL;
     }
     result = BmpMenuList_Update(menu->list);
@@ -767,7 +772,7 @@ s32 ListMenuUI_Update(ListMenuUI *menu) {
     return result;
 }
 
-void func_ov036_02187ef8(ListMenuUI *menu) {
+void MsgBGPrinter_RewriteMenuFunc(ListMenuUI *menu) {
     BmpMenuList_Redraw(menu->list);
 }
 
@@ -775,7 +780,8 @@ ListMenuOption *InitListMenuOptionHeap(u32 count, HeapID heapId) {
     return ListMenuCore_CreateOptionList(count, heapId);
 }
 
-ListMenuOption *func_ov036_02187f0c(const ListMenuRow *rows, s32 count, MsgData *msgData, HeapID heapId) {
+ListMenuOption *MsgBGPrinter_CreateMenuItemsFromTable(const ListMenuRow *rows, s32 count, MsgData *msgData,
+                                                      HeapID heapId) {
     ListMenuOption *options = InitListMenuOptionHeap(count, heapId);
     s32 i;
 
@@ -789,7 +795,7 @@ void AppendListMenuOption(ListMenuOption *options, StrBuf *text, u32 value, Heap
     ListMenuCore_AppendStrBufOption(options, text, value, heapId);
 }
 
-void func_ov036_02187f50(ListMenuOption *options) {
+void MsgBGPrinter_DeleteMenuItems(ListMenuOption *options) {
     ListMenuCore_FreeStrBufs(options);
 }
 
@@ -857,7 +863,7 @@ void ListMenuRequest_Set(ListMenuRequest *request, u16 count, u16 x, u16 y, u16 
     request->height = height;
 }
 
-void func_ov036_02188008(ListMenuUI *menu) {
+void MsgBGPrinter_DrawMenuFuncFrame(ListMenuUI *menu) {
     BmpWin_DrawFrame(menu->window, WINFRAME_TRANSFER_NOW, MSGBG_CHAR_FRAME, MSGBG_PLTT_BG2_FRAME);
 }
 
@@ -881,11 +887,11 @@ static void BmpMenuListSetup_Init(BmpMenuListHeader *header, const ListMenuReque
     header->wait = 20;
 }
 
-ListMenuUI *func_ov036_021880d4(FieldMsgBG *sys, u32 cursorRow) {
+ListMenuUI *MsgBGPrinter_CreateYesNoMenu(FieldMsgBG *sys, u32 cursorRow) {
     ListMenuRequest request = sYesNoMenuRequest;
     ListMenuRow rows[2] = { { YesNo_Text_Yes, { MSGBG_YES_NO_YES } }, { YesNo_Text_No, { MSGBG_YES_NO_NO } } };
-    MsgData *msgData = func_ov036_021879a0(sys, TEXT_BANK_YES_NO);
-    ListMenuOption *options = func_ov036_02187f0c(rows, 2, msgData, sys->heapId);
+    MsgData *msgData = MsgBGPrinter_CreateMsgData(sys, TEXT_BANK_YES_NO);
+    ListMenuOption *options = MsgBGPrinter_CreateMenuItemsFromTable(rows, 2, msgData, sys->heapId);
     ListMenuUI *menu;
 
     GFL_MsgDataFree(msgData);
@@ -895,7 +901,7 @@ ListMenuUI *func_ov036_021880d4(FieldMsgBG *sys, u32 cursorRow) {
     return menu;
 }
 
-u32 func_ov036_0218816c(ListMenuUI *menu) {
+u32 MsgBGPrinter_YesNoMenuMain(ListMenuUI *menu) {
     s32 result = ListMenuUI_Update(menu);
 
     if (result == BMPMENULIST_NULL) {
@@ -907,18 +913,19 @@ u32 func_ov036_0218816c(ListMenuUI *menu) {
     return result;
 }
 
-static MsgStream *func_ov036_02188188(FieldMsgBG *sys, StrBuf *strbuf, BmpWin *window, u16 x, u16 y, u32 wait, u16 a6) {
+static MsgStream *MsgBGPrinter_CreateMsgStreamColor(FieldMsgBG *sys, StrBuf *strbuf, BmpWin *window, u16 x, u16 y,
+                                                    u32 wait, u16 a6) {
     MsgStream *stream = GFL_HeapAllocate(sys->heapId, sizeof(MsgStream), TRUE, "field_msgbg.c", 2179);
 
     stream->sys = sys;
     stream->wait = wait;
     stream->stream = PrintStream_CreateWithCallback(window, x, y, strbuf, sys->font, wait, sys->tcbMgr, 0, sys->heapId,
-                                                    a6, func_ov036_021881fc);
+                                                    a6, MsgBGPrinter_MsgStreamCallback);
     MsgBGInput_Reset(&stream->sys->input);
     return stream;
 }
 
-static BOOL func_ov036_021881fc(u32 event) {
+static BOOL MsgBGPrinter_MsgStreamCallback(u32 event) {
     switch (event) {
     case MSGBG_EVENT_KNOCK:
         GFL_SndSEPlay(SEQ_SE_KON);
@@ -929,8 +936,9 @@ static BOOL func_ov036_021881fc(u32 event) {
     return FALSE;
 }
 
-static MsgStream *func_ov036_02188220(FieldMsgBG *sys, StrBuf *strbuf, BmpWin *window, u16 x, u16 y, u32 wait) {
-    return func_ov036_02188188(sys, strbuf, window, x, y, wait, 15);
+static MsgStream *MsgBGPrinter_CreateMsgStream(FieldMsgBG *sys, StrBuf *strbuf, BmpWin *window, u16 x, u16 y,
+                                               u32 wait) {
+    return MsgBGPrinter_CreateMsgStreamColor(sys, strbuf, window, x, y, wait, 15);
 }
 
 static void MsgStream_Free(MsgStream *stream) {
@@ -943,20 +951,20 @@ static u32 MsgStream_Update(MsgStream *stream) {
 
     switch (state) {
     case PRINT_STREAM_RUNNING:
-        if (func_ov036_0218a760(&stream->sys->input)) {
-            func_ov036_0218a7d8(stream->stream, TRUE);
+        if (MsgBGPrinter_KeyWaitCheckSkip(&stream->sys->input)) {
+            MsgBGPrinter_StreamSetSpeed(stream->stream, TRUE);
         } else {
-            func_ov036_0218a7d8(stream->stream, FALSE);
+            MsgBGPrinter_StreamSetSpeed(stream->stream, FALSE);
         }
         break;
     case PRINT_STREAM_PAUSED:
-        if (func_ov036_0218a798(&stream->sys->input, PrintStream_GetPageMode(stream->stream))) {
+        if (MsgBGPrinter_KeyWaitCheckAdvance(&stream->sys->input, PrintStream_GetPageMode(stream->stream))) {
             if (!MsgBGInput_GetAutoAdvance(&stream->sys->input)) {
                 GFL_SndSEPlay(SEQ_SE_MESSAGE);
             }
             PrintStream_Continue(stream->stream);
             state = PRINT_STREAM_RUNNING;
-            func_ov036_0218a7d8(stream->stream, FALSE);
+            MsgBGPrinter_StreamSetSpeed(stream->stream, FALSE);
         }
         break;
     case PRINT_STREAM_DONE:
@@ -965,24 +973,24 @@ static u32 MsgStream_Update(MsgStream *stream) {
     return state;
 }
 
-static FieldMsgWin *func_ov036_021882c0(FieldMsgBG *sys, MsgData *msgData, u16 x, u16 y, u16 width, u16 height) {
+static FieldMsgWin *MsgBGPrinter_CreateSysWin(FieldMsgBG *sys, MsgData *msgData, u16 x, u16 y, u16 width, u16 height) {
     FieldMsgWin *win;
 
     sys->palette = MSGBG_PLTT_BG2;
-    func_ov036_0218a4a4(sys);
+    MsgBGPrinter_SetupSysFrame(sys);
     win = GFL_HeapAllocate(sys->heapId, sizeof(FieldMsgWin), TRUE, "field_msgbg.c", 2340);
     win->sys = sys;
     win->msgData = msgData;
     win->window = FieldMsgBG_CreateBmpWin(sys->bg2, sys->heapId, x, y, width, height, sys->palette);
     win->strbuf = GFL_StrBufCreate(MSGBG_STRBUF_LEN, sys->heapId);
     MsgBGCursor_Init(&win->cursor, sys);
-    func_ov036_0218a67c(sys->heapId);
+    MsgBGPrinter_LoadMenuGraphicsLower(sys->heapId);
     setAlphaBlend(sys->alphaBlend);
     return win;
 }
 
-void func_ov036_02188338(FieldMsgWin *win) {
-    func_ov036_0218a668(win->window);
+void MsgBGPrinter_DeleteSysWin(FieldMsgWin *win) {
+    MsgBGPrinter_DeleteWindow(win->window);
     if (win->stream != NULL) {
         MsgStream_Free(win->stream);
     }
@@ -994,23 +1002,24 @@ void func_ov036_02188338(FieldMsgWin *win) {
     GFL_HeapFree(win);
 }
 
-void func_ov036_0218836c(FieldMsgWin *win, u16 x, u16 y, u32 messageId) {
+void MsgBGPrinter_SysWinPrintMsg(FieldMsgWin *win, u16 x, u16 y, u32 messageId) {
     if (win->stream != NULL) {
         MsgStream_Free(win->stream);
     }
     GFL_MsgDataLoadStrbuf(win->msgData, messageId, win->strbuf);
-    win->stream =
-        func_ov036_02188220(win->sys, win->strbuf, win->window, x, y, MsgBGInput_GetTextWait(&win->sys->input));
+    win->stream = MsgBGPrinter_CreateMsgStream(win->sys, win->strbuf, win->window, x, y,
+                                               MsgBGInput_GetTextWait(&win->sys->input));
 }
 
-void func_ov036_021883b0(FieldMsgWin *win, u16 x, u16 y, StrBuf *strbuf) {
+void MsgBGPrinter_SysWinPrintStr(FieldMsgWin *win, u16 x, u16 y, StrBuf *strbuf) {
     if (win->stream != NULL) {
         MsgStream_Free(win->stream);
     }
-    win->stream = func_ov036_02188220(win->sys, strbuf, win->window, x, y, MsgBGInput_GetTextWait(&win->sys->input));
+    win->stream =
+        MsgBGPrinter_CreateMsgStream(win->sys, strbuf, win->window, x, y, MsgBGInput_GetTextWait(&win->sys->input));
 }
 
-BOOL func_ov036_021883e8(FieldMsgWin *win) {
+BOOL MsgBGPrinter_SysWinMain(FieldMsgWin *win) {
     u32 state = MsgStream_Update(win->stream);
 
     GCTX_HIDGetPressedKeys();
@@ -1024,7 +1033,7 @@ BOOL func_ov036_021883e8(FieldMsgWin *win) {
         break;
     case PRINT_STREAM_PAUSED:
         if (!MsgBGInput_GetAutoAdvance(&win->sys->input)) {
-            func_ov036_02189de8(&win->cursor, BmpWin_GetBitmap(win->window), MSGBG_COLOR_BG);
+            MsgBGPrinter_AnimateCursor(&win->cursor, BmpWin_GetBitmap(win->window), MSGBG_COLOR_BG);
             BmpWin_FlushChar(win->window);
         }
         break;
@@ -1034,37 +1043,37 @@ BOOL func_ov036_021883e8(FieldMsgWin *win) {
     return FALSE;
 }
 
-FieldMsgWin *func_ov036_0218845c(FieldMsgBG *sys, MsgData *msgData) {
-    return func_ov036_021882c0(sys, msgData, 1, 19, 30, 4);
+FieldMsgWin *MsgBGPrinter_CreateBottomSysWin(FieldMsgBG *sys, MsgData *msgData) {
+    return MsgBGPrinter_CreateSysWin(sys, msgData, 1, 19, 30, 4);
 }
 
-void func_ov036_02188474(FieldMsgWin *win) {
+void MsgBGPrinter_ClearSysWin(FieldMsgWin *win) {
     GFL_BitmapFill(BmpWin_GetBitmap(win->window), MSGBG_COLOR_BG_FILL);
     GFL_BGSysLoadScr(win->sys->bg);
 }
 
-BmpWin *func_ov036_02188494(FieldMsgWin *win) {
+BmpWin *MsgBGPrinter_GetSysWinBmpWin(FieldMsgWin *win) {
     return win->window;
 }
 
-FieldMsgWin *func_ov036_02188498(FieldMsgBG *sys, MsgData *msgData, u32 y) {
+FieldMsgWin *MsgBGPrinter_CreateInfoSysWin(FieldMsgBG *sys, MsgData *msgData, u32 y) {
     FieldMsgWin *win;
 
     sys->palette = MSGBG_PLTT_BG2;
-    func_ov036_0218a4a4(sys);
+    MsgBGPrinter_SetupSysFrame(sys);
     win = GFL_HeapAllocate(sys->heapId, sizeof(FieldMsgWin), TRUE, "field_msgbg.c", 2585);
     win->sys = sys;
     win->msgData = msgData;
-    win->window = func_ov036_0218a048(1, y, 30, 4, sys->heapId);
+    win->window = MsgBGPrinter_CreateSysFrameWindow(1, y, 30, 4, sys->heapId);
     win->strbuf = GFL_StrBufCreate(MSGBG_STRBUF_LEN, sys->heapId);
     MsgBGCursor_Init(&win->cursor, sys);
-    func_ov036_0218a67c(sys->heapId);
+    MsgBGPrinter_LoadMenuGraphicsLower(sys->heapId);
     setAlphaBlend(sys->alphaBlend);
     return win;
 }
 
-void func_ov036_02188504(FieldMsgWin *win) {
-    func_ov036_0218a0e8(win->window);
+void MsgBGPrinter_DeleteInfoSysWin(FieldMsgWin *win) {
+    MsgBGPrinter_DeleteSysFrameWindow(win->window);
     if (win->stream != NULL) {
         MsgStream_Free(win->stream);
     }
@@ -1076,24 +1085,24 @@ void func_ov036_02188504(FieldMsgWin *win) {
     GFL_HeapFree(win);
 }
 
-void func_ov036_02188538(FieldMsgWin *win, u16 x, u16 y, u32 messageId) {
+void MsgBGPrinter_InfoSysWinPrintMsg(FieldMsgWin *win, u16 x, u16 y, u32 messageId) {
     if (win->stream != NULL) {
         MsgStream_Free(win->stream);
     }
     GFL_MsgDataLoadStrbuf(win->msgData, messageId, win->strbuf);
-    win->stream =
-        func_ov036_02188220(win->sys, win->strbuf, win->window, x + 8, y, MsgBGInput_GetTextWait(&win->sys->input));
+    win->stream = MsgBGPrinter_CreateMsgStream(win->sys, win->strbuf, win->window, x + 8, y,
+                                               MsgBGInput_GetTextWait(&win->sys->input));
 }
 
-void func_ov036_02188580(FieldMsgWin *win, u16 x, u16 y, StrBuf *strbuf) {
+void MsgBGPrinter_InfoSysWinPrintStr(FieldMsgWin *win, u16 x, u16 y, StrBuf *strbuf) {
     if (win->stream != NULL) {
         MsgStream_Free(win->stream);
     }
     win->stream =
-        func_ov036_02188220(win->sys, strbuf, win->window, x + 8, y, MsgBGInput_GetTextWait(&win->sys->input));
+        MsgBGPrinter_CreateMsgStream(win->sys, strbuf, win->window, x + 8, y, MsgBGInput_GetTextWait(&win->sys->input));
 }
 
-BOOL func_ov036_021885bc(FieldMsgWin *win) {
+BOOL MsgBGPrinter_InfoSysWinMain(FieldMsgWin *win) {
     u32 state = MsgStream_Update(win->stream);
 
     GCTX_HIDGetPressedKeys();
@@ -1107,7 +1116,7 @@ BOOL func_ov036_021885bc(FieldMsgWin *win) {
         break;
     case PRINT_STREAM_PAUSED:
         if (!MsgBGInput_GetAutoAdvance(&win->sys->input)) {
-            func_ov036_02189de8(&win->cursor, BmpWin_GetBitmap(win->window), MSGBG_COLOR_BG);
+            MsgBGPrinter_AnimateCursor(&win->cursor, BmpWin_GetBitmap(win->window), MSGBG_COLOR_BG);
             BmpWin_FlushChar(win->window);
         }
         break;
@@ -1117,19 +1126,19 @@ BOOL func_ov036_021885bc(FieldMsgWin *win) {
     return FALSE;
 }
 
-void func_ov036_02188630(FieldMsgWin *win) {
+void MsgBGPrinter_SysWinDrawCursor(FieldMsgWin *win) {
     if (!MsgBGInput_GetAutoAdvance(&win->sys->input)) {
-        func_ov036_02189de8(&win->cursor, BmpWin_GetBitmap(win->window), MSGBG_COLOR_BG);
+        MsgBGPrinter_AnimateCursor(&win->cursor, BmpWin_GetBitmap(win->window), MSGBG_COLOR_BG);
         BmpWin_FlushChar(win->window);
     }
 }
 
-void func_ov036_02188660(FieldMsgWin *win) {
+void MsgBGPrinter_ClearInfoSysWin(FieldMsgWin *win) {
     GFL_BitmapFill(BmpWin_GetBitmap(win->window), MSGBG_COLOR_BG_FILL);
     GFL_BGSysLoadScr(win->sys->bg);
 }
 
-void func_ov036_02188680(FieldMsgWin *win, u16 x, u16 y, StrBuf *strbuf) {
+void MsgBGPrinter_InfoSysWinPrintStrNow(FieldMsgWin *win, u16 x, u16 y, StrBuf *strbuf) {
     if (win->printer != NULL) {
         MsgBGPrinter_Free(win->printer);
     }
@@ -1137,7 +1146,7 @@ void func_ov036_02188680(FieldMsgWin *win, u16 x, u16 y, StrBuf *strbuf) {
     MsgBGPrinter_PrintStrBuf(win->printer, x + 8, y, strbuf);
 }
 
-BmpWin *func_ov036_021886b0(FieldMsgWin *win) {
+BmpWin *MsgBGPrinter_GetInfoSysWinBmpWin(FieldMsgWin *win) {
     return win->window;
 }
 
@@ -1166,7 +1175,7 @@ static void ActorMsgWin_Create(FieldMsgBG *sys, ActorMsgWin *win, u32 type, cons
         break;
     }
     MsgBGInput_Reset(&sys->input);
-    func_ov036_0218b4c8(win->talk, win->type);
+    TalkMsgWin_Open(win->talk, win->type);
     MsgBGCursor_Init(&win->cursor, sys);
     if (frameType == TALKMSG_WIN_FRAME_SPIKY) {
         win->shake = 8;
@@ -1187,15 +1196,15 @@ ActorMsgWin *ActorMsgWin_CheckAndCreate(FieldMsgBG *sys, s32 type, const VecFx32
     return NULL;
 }
 
-void func_ov036_021887d4(ActorMsgWin *win) {
+void MsgBGPrinter_DeleteTalkWin(ActorMsgWin *win) {
     if (win->strbuf != NULL) {
         GFL_StrBufFree(win->strbuf);
     }
     MsgBGCursor_Free(&win->cursor);
-    func_ov036_0218b4d8(win->talk, win->type);
+    TalkMsgWin_Close(win->talk, win->type);
 }
 
-BOOL func_ov036_021887f4(ActorMsgWin *win) {
+BOOL MsgBGPrinter_WaitTalkWinClose(ActorMsgWin *win) {
     if (func_ov036_0218b4e8(win->talk, win->type)) {
         MI_CpuFill8(win, 0, sizeof(ActorMsgWin));
         return TRUE;
@@ -1203,24 +1212,24 @@ BOOL func_ov036_021887f4(ActorMsgWin *win) {
     return FALSE;
 }
 
-void func_ov036_02188818(ActorMsgWin *win) {
+void MsgBGPrinter_ClearTalkWin(ActorMsgWin *win) {
     if (win->strbuf != NULL) {
         GFL_StrBufFree(win->strbuf);
     }
-    func_ov036_0218b4b4(win->talk, win->type);
+    TalkMsgWin_Release(win->talk, win->type);
     MsgBGCursor_Free(&win->cursor);
     MI_CpuFill8(win, 0, sizeof(ActorMsgWin));
 }
 
-void func_ov036_02188844(ActorMsgWin *actorWin, StrBuf *strbuf) {
-    BmpWin *win = func_ov036_0218b518(actorWin->talk, actorWin->type);
+void MsgBGPrinter_TalkWinPrintStr(ActorMsgWin *actorWin, StrBuf *strbuf) {
+    BmpWin *win = TalkMsgWin_GetBmpWin(actorWin->talk, actorWin->type);
 
     GFL_BitmapFill(BmpWin_GetBitmap(win), MSGBG_COLOR_BG_FILL);
-    func_ov036_0218b524(actorWin->talk, actorWin->type, strbuf, MsgBGInput_GetTextWait(&actorWin->sys->input));
+    TalkMsgWin_Reprint(actorWin->talk, actorWin->type, strbuf, MsgBGInput_GetTextWait(&actorWin->sys->input));
     GFL_BGSysLoadScr(BmpWin_GetBGIndex(win));
 }
 
-BOOL func_ov036_02188884(ActorMsgWin *actorWin) {
+BOOL MsgBGPrinter_TalkWinMain(ActorMsgWin *actorWin) {
     BmpWin *win;
     GFLBitmap *bitmap;
     PrintStream *stream;
@@ -1229,7 +1238,7 @@ BOOL func_ov036_02188884(ActorMsgWin *actorWin) {
     if (!func_ov036_0218b4fc(actorWin->talk, actorWin->type)) {
         return FALSE;
     }
-    stream = func_ov036_0218b50c(actorWin->talk, actorWin->type);
+    stream = TalkMsgWin_GetPrintStream(actorWin->talk, actorWin->type);
     state = PrintStream_GetState(stream);
     GFL_BGSysMoveBG(MSGBG_BG, BG_MOVE_SET_Y, actorWin->shake);
     if (actorWin->shake < 0) {
@@ -1242,29 +1251,29 @@ BOOL func_ov036_02188884(ActorMsgWin *actorWin) {
     switch (state) {
     case PRINT_STREAM_RUNNING:
         if (MsgBGCursor_IsShown(&actorWin->cursor) == TRUE) {
-            win = func_ov036_0218b518(actorWin->talk, actorWin->type);
+            win = TalkMsgWin_GetBmpWin(actorWin->talk, actorWin->type);
             MsgBGCursor_Clear(&actorWin->cursor, BmpWin_GetBitmap(win), MSGBG_COLOR_BG);
             BmpWin_FlushChar(win);
         }
-        if (func_ov036_0218a760(&actorWin->sys->input)) {
-            func_ov036_0218a7d8(stream, TRUE);
+        if (MsgBGPrinter_KeyWaitCheckSkip(&actorWin->sys->input)) {
+            MsgBGPrinter_StreamSetSpeed(stream, TRUE);
         } else {
-            func_ov036_0218a7d8(stream, FALSE);
+            MsgBGPrinter_StreamSetSpeed(stream, FALSE);
         }
         break;
     case PRINT_STREAM_PAUSED:
-        win = func_ov036_0218b518(actorWin->talk, actorWin->type);
+        win = TalkMsgWin_GetBmpWin(actorWin->talk, actorWin->type);
         bitmap = BmpWin_GetBitmap(win);
         if (MsgBGInput_GetAutoAdvance(&actorWin->sys->input) == FALSE) {
-            func_ov036_02189de8(&actorWin->cursor, bitmap, MSGBG_COLOR_BG);
+            MsgBGPrinter_AnimateCursor(&actorWin->cursor, bitmap, MSGBG_COLOR_BG);
         }
-        if (func_ov036_0218a798(&actorWin->sys->input, PrintStream_GetPageMode(stream))) {
+        if (MsgBGPrinter_KeyWaitCheckAdvance(&actorWin->sys->input, PrintStream_GetPageMode(stream))) {
             if (MsgBGInput_GetAutoAdvance(&actorWin->sys->input) == FALSE) {
                 GFL_SndSEPlay(SEQ_SE_MESSAGE);
             }
             PrintStream_Continue(stream);
             MsgBGCursor_Clear(&actorWin->cursor, bitmap, MSGBG_COLOR_BG);
-            func_ov036_0218a7d8(stream, FALSE);
+            MsgBGPrinter_StreamSetSpeed(stream, FALSE);
         }
         BmpWin_FlushChar(win);
         break;
@@ -1278,39 +1287,41 @@ BOOL func_ov036_02188884(ActorMsgWin *actorWin) {
     return FALSE;
 }
 
-void func_ov036_021889c8(ActorMsgWin *actorWin) {
+void MsgBGPrinter_TalkWinDrawCursor(ActorMsgWin *actorWin) {
     BmpWin *win;
 
     if (MsgBGInput_GetAutoAdvance(&actorWin->sys->input) == FALSE) {
-        win = func_ov036_0218b518(actorWin->talk, actorWin->type);
-        func_ov036_02189de8(&actorWin->cursor, BmpWin_GetBitmap(win), MSGBG_COLOR_BG);
+        win = TalkMsgWin_GetBmpWin(actorWin->talk, actorWin->type);
+        MsgBGPrinter_AnimateCursor(&actorWin->cursor, BmpWin_GetBitmap(win), MSGBG_COLOR_BG);
         BmpWin_FlushChar(win);
     }
 }
 
-static void func_ov036_02188a00(FieldMsgBG *sys, InfoMsgWin *win, u32 x, u32 y, u16 width, u16 height, u32 frameType) {
+static void MsgBGPrinter_SetupPlainWin(FieldMsgBG *sys, InfoMsgWin *win, u32 x, u32 y, u16 width, u16 height,
+                                       u32 frameType) {
     sys->palette = MSGBG_PLTT_TALK;
     win->talk = sys->talk;
     loadPltt(sys->heapId);
     setAlphaBlend(FALSE);
-    win->window = func_ov036_0218b588(win->talk, x, y, width, height, frameType);
+    win->window = TalkMsgWin_AddFrameWindow(win->talk, x, y, width, height, frameType);
     MsgBGCursor_Init(&win->cursor, sys);
 }
 
-InfoMsgWin *func_ov036_02188a54(FieldMsgBG *sys, MsgData *msgData, u32 frameType, u16 x, u16 y, u16 width, u16 height) {
+InfoMsgWin *MsgBGPrinter_CreatePlainWin(FieldMsgBG *sys, MsgData *msgData, u32 frameType, u16 x, u16 y, u16 width,
+                                        u16 height) {
     InfoMsgWin *win = GFL_HeapAllocate(sys->heapId, sizeof(InfoMsgWin), TRUE, "field_msgbg.c", 3276);
 
     win->sys = sys;
     win->msgData = msgData;
     win->strbuf = GFL_StrBufCreate(MSGBG_STRBUF_LEN, sys->heapId);
-    func_ov036_02188a00(sys, win, x, y, width, height, frameType);
+    MsgBGPrinter_SetupPlainWin(sys, win, x, y, width, height, frameType);
     if (frameType == TALKMSG_WIN_FRAME_SPIKY) {
         win->shake = 8;
     }
     return win;
 }
 
-void func_ov036_02188ab0(InfoMsgWin *win) {
+void MsgBGPrinter_DeletePlainWin(InfoMsgWin *win) {
     if (win->stream != NULL) {
         MsgStream_Free(win->stream);
     }
@@ -1320,21 +1331,21 @@ void func_ov036_02188ab0(InfoMsgWin *win) {
     if (win->strbuf != NULL) {
         GFL_StrBufFree(win->strbuf);
     }
-    func_ov036_0218b5d0(win->talk, win->window);
+    TalkMsgWin_DeleteFrameWindow(win->talk, win->window);
     MsgBGCursor_Free(&win->cursor);
     GFL_HeapFree(win);
 }
 
-void func_ov036_02188ae8(InfoMsgWin *win) {
+void MsgBGPrinter_ClearPlainWin(InfoMsgWin *win) {
     GFL_BitmapFill(BmpWin_GetBitmap(win->window), MSGBG_COLOR_BG_FILL);
     GFL_BGSysLoadScr(win->sys->bg);
 }
 
-void func_ov036_02188b08(InfoMsgWin *win) {
-    func_ov036_0218b5bc(win->talk, win->window);
+void MsgBGPrinter_OpenPlainWin(InfoMsgWin *win) {
+    TalkMsgWin_ClearWindowFrame(win->talk, win->window);
 }
 
-void func_ov036_02188b18(InfoMsgWin *win, u16 x, u16 y, u32 messageId) {
+void MsgBGPrinter_PlainWinPrintMsg(InfoMsgWin *win, u16 x, u16 y, u32 messageId) {
     if (win->printer != NULL) {
         MsgBGPrinter_Free(win->printer);
     }
@@ -1342,7 +1353,7 @@ void func_ov036_02188b18(InfoMsgWin *win, u16 x, u16 y, u32 messageId) {
     MsgBGPrinter_PrintMessage(win->printer, x, y, messageId);
 }
 
-void func_ov036_02188b44(InfoMsgWin *win, u16 x, u16 y, StrBuf *strbuf) {
+void MsgBGPrinter_PlainWinPrintStr(InfoMsgWin *win, u16 x, u16 y, StrBuf *strbuf) {
     if (win->printer != NULL) {
         MsgBGPrinter_Free(win->printer);
     }
@@ -1350,7 +1361,7 @@ void func_ov036_02188b44(InfoMsgWin *win, u16 x, u16 y, StrBuf *strbuf) {
     MsgBGPrinter_PrintStrBuf(win->printer, x, y, strbuf);
 }
 
-void func_ov036_02188b70(InfoMsgWin *win, u16 x, u16 y, StrBuf *strbuf, u16 color) {
+void MsgBGPrinter_PlainWinPrintStrColor(InfoMsgWin *win, u16 x, u16 y, StrBuf *strbuf, u16 color) {
     if (win->printer != NULL) {
         MsgBGPrinter_Free(win->printer);
     }
@@ -1358,14 +1369,15 @@ void func_ov036_02188b70(InfoMsgWin *win, u16 x, u16 y, StrBuf *strbuf, u16 colo
     MsgBGPrinter_PrintColor(win->printer, x, y, strbuf, color);
 }
 
-void func_ov036_02188ba4(InfoMsgWin *win, u16 x, u16 y, StrBuf *strbuf) {
+void MsgBGPrinter_PlainWinPrintStream(InfoMsgWin *win, u16 x, u16 y, StrBuf *strbuf) {
     if (win->stream != NULL) {
         MsgStream_Free(win->stream);
     }
-    win->stream = func_ov036_02188220(win->sys, strbuf, win->window, x, y, MsgBGInput_GetTextWait(&win->sys->input));
+    win->stream =
+        MsgBGPrinter_CreateMsgStream(win->sys, strbuf, win->window, x, y, MsgBGInput_GetTextWait(&win->sys->input));
 }
 
-BOOL func_ov036_02188bdc(InfoMsgWin *win) {
+BOOL MsgBGPrinter_PlainWinMain(InfoMsgWin *win) {
     u32 result;
 
     GCTX_HIDGetPressedKeys();
@@ -1389,7 +1401,7 @@ BOOL func_ov036_02188bdc(InfoMsgWin *win) {
         break;
     case PRINT_STREAM_PAUSED:
         if (MsgBGInput_GetAutoAdvance(&win->sys->input) == FALSE) {
-            func_ov036_02189de8(&win->cursor, BmpWin_GetBitmap(win->window), MSGBG_COLOR_BG);
+            MsgBGPrinter_AnimateCursor(&win->cursor, BmpWin_GetBitmap(win->window), MSGBG_COLOR_BG);
             BmpWin_FlushChar(win->window);
         }
         break;
@@ -1403,14 +1415,14 @@ BOOL func_ov036_02188bdc(InfoMsgWin *win) {
     return FALSE;
 }
 
-void func_ov036_02188c90(InfoMsgWin *win) {
+void MsgBGPrinter_PlainWinDrawCursor(InfoMsgWin *win) {
     if (MsgBGInput_GetAutoAdvance(&win->sys->input) == FALSE) {
-        func_ov036_02189de8(&win->cursor, BmpWin_GetBitmap(win->window), MSGBG_COLOR_BG);
+        MsgBGPrinter_AnimateCursor(&win->cursor, BmpWin_GetBitmap(win->window), MSGBG_COLOR_BG);
         BmpWin_FlushChar(win->window);
     }
 }
 
-u32 func_ov036_02188cbc(InfoMsgWin *win) {
+u32 MsgBGPrinter_GetPlainWinStreamState(InfoMsgWin *win) {
     return win->state;
 }
 
@@ -1419,8 +1431,8 @@ static inline void NumberedMsgWin_InitTextOrigin(NumberedMsgWinTextOrigin *origi
     origin->y = 0;
 }
 
-static void func_ov036_02188cc0(FieldMsgBG *sys, NumberedMsgWin *win, StrBuf *strbuf, u16 index, u8 x, u8 y, u8 width,
-                                u8 height, u32 userId, u32 frameType) {
+static void MsgBGPrinter_SetupSubMsgWin(FieldMsgBG *sys, NumberedMsgWin *win, StrBuf *strbuf, u16 index, u8 x, u8 y,
+                                        u8 width, u8 height, u32 userId, u32 frameType) {
     NumberedMsgWinTextOrigin origin;
 
     NumberedMsgWin_InitTextOrigin(&origin);
@@ -1430,9 +1442,9 @@ static void func_ov036_02188cc0(FieldMsgBG *sys, NumberedMsgWin *win, StrBuf *st
     win->userId = userId;
     loadPltt(sys->heapId);
     setAlphaBlend(FALSE);
-    func_ov036_0218b370(win->talk, win->index, strbuf, x, y, width, height, 0xff, frameType,
-                        MsgBGInput_GetTextWait(&sys->input), origin.x, origin.y);
-    func_ov036_0218b4c8(win->talk, win->index);
+    TalkMsgWin_SetupPlainWindow(win->talk, win->index, strbuf, x, y, width, height, 0xff, frameType,
+                                MsgBGInput_GetTextWait(&sys->input), origin.x, origin.y);
+    TalkMsgWin_Open(win->talk, win->index);
 }
 
 void CalcMsgWindowDimensions(FieldMsgBG *sys, StrBuf *str, u8 *width, u8 *height) {
@@ -1460,14 +1472,15 @@ void CalcMsgWindowDimensions(FieldMsgBG *sys, StrBuf *str, u8 *width, u8 *height
     *height = h;
 }
 
-void func_ov036_02188d6c(FieldMsgBG *sys, MsgData *msgData, u32 msgId, u16 userId, u8 x, u8 y, u8 width, u8 height) {
+void MsgBGPrinter_AddSubMsgWinMsg(FieldMsgBG *sys, MsgData *msgData, u32 msgId, u16 userId, u8 x, u8 y, u8 width,
+                                  u8 height) {
     NumberedMsgWin *win = GFL_HeapAllocate(sys->heapId, sizeof(NumberedMsgWin), TRUE, "field_msgbg.c", 3662);
     int slot = FieldMsgBG_AddNumberedWindow(sys, win);
 
     win->strbuf = GFL_StrBufCreate(MSGBG_NUMBERED_STRBUF_LEN, sys->heapId);
     GFL_MsgDataLoadStrbuf(msgData, msgId, win->strbuf);
-    func_ov036_02188cc0(sys, win, win->strbuf, slot + ACTOR_MSG_WIN_COUNT, x, y, width, height, userId,
-                        TALKMSG_WIN_FRAME_NORMAL);
+    MsgBGPrinter_SetupSubMsgWin(sys, win, win->strbuf, slot + ACTOR_MSG_WIN_COUNT, x, y, width, height, userId,
+                                TALKMSG_WIN_FRAME_NORMAL);
 }
 
 void func_ov036_02188ddc(FieldMsgBG *sys, StrBuf *strbuf, u16 userId, u8 x, u8 y, u8 width, u8 height) {
@@ -1480,22 +1493,23 @@ void func_ov036_02188dfc(FieldMsgBG *sys, StrBuf *strbuf, u16 userId, u8 x, u8 y
 
     win->strbuf = GFL_StrBufCreate(GFL_StrBufGetCharCount(strbuf) + 1, sys->heapId);
     GFL_StrBufCopy(win->strbuf, strbuf);
-    func_ov036_02188cc0(sys, win, win->strbuf, slot + ACTOR_MSG_WIN_COUNT, x, y, width, height, userId, frameType);
+    MsgBGPrinter_SetupSubMsgWin(sys, win, win->strbuf, slot + ACTOR_MSG_WIN_COUNT, x, y, width, height, userId,
+                                frameType);
 }
 
-static void func_ov036_02188e70(NumberedMsgWin *win) {
+static void MsgBGPrinter_FreeSubMsgWin(NumberedMsgWin *win) {
     if (win->strbuf != NULL) {
         GFL_StrBufFree(win->strbuf);
     }
-    func_ov036_0218b4b4(win->talk, win->index);
+    TalkMsgWin_Release(win->talk, win->index);
     GFL_HeapFree(win);
 }
 
-void func_ov036_02188e90(FieldMsgBG *sys, u16 userId) {
-    func_ov036_02188e70(FieldMsgBG_TakeNumberedWindow(sys, userId));
+void MsgBGPrinter_DeleteSubMsgWin(FieldMsgBG *sys, u16 userId) {
+    MsgBGPrinter_FreeSubMsgWin(FieldMsgBG_TakeNumberedWindow(sys, userId));
 }
 
-void func_ov036_02188e9c(FieldMsgBG *sys) {
+void MsgBGPrinter_DeleteAllSubMsgWin(FieldMsgBG *sys) {
     int i;
     NumberedMsgWin *win;
 
@@ -1511,12 +1525,12 @@ void func_ov036_02188e9c(FieldMsgBG *sys) {
             win = sys->numberedWins[i];
             sys->numberedWins[i] = NULL;
 #endif
-            func_ov036_02188e70(win);
+            MsgBGPrinter_FreeSubMsgWin(win);
         }
     }
 }
 
-BOOL func_ov036_02188ed0(FieldMsgBG *sys) {
+BOOL MsgBGPrinter_ExistsSubMsgWin(FieldMsgBG *sys) {
     int i;
 
     for (i = 0; i < MSGBG_NUMBERED_WIN_COUNT; i++) {
@@ -1527,13 +1541,13 @@ BOOL func_ov036_02188ed0(FieldMsgBG *sys) {
     return FALSE;
 }
 
-static BOOL func_ov036_02188eec(NumberedMsgWin *win) {
+static BOOL MsgBGPrinter_SubMsgWinMain(NumberedMsgWin *win) {
     if (!func_ov036_0218b4fc(win->talk, win->index)) {
         return FALSE;
     }
     GCTX_HIDGetPressedKeys();
     GCTX_HIDGetHeldKeys();
-    switch (PrintStream_GetState(func_ov036_0218b50c(win->talk, win->index))) {
+    switch (PrintStream_GetState(TalkMsgWin_GetPrintStream(win->talk, win->index))) {
     case PRINT_STREAM_RUNNING:
     case PRINT_STREAM_PAUSED:
         break;
@@ -1543,11 +1557,11 @@ static BOOL func_ov036_02188eec(NumberedMsgWin *win) {
     return FALSE;
 }
 
-SignMsgWin *func_ov036_02188f28(FieldMsgBG *sys, u16 style) {
-    return func_ov036_02188f34(sys, style, sys->font);
+SignMsgWin *MsgBGPrinter_CreateBgWin(FieldMsgBG *sys, u16 style) {
+    return MsgBGPrinter_CreateBgWinFont(sys, style, sys->font);
 }
 
-SignMsgWin *func_ov036_02188f34(FieldMsgBG *sys, u16 style, Font *font) {
+SignMsgWin *MsgBGPrinter_CreateBgWinFont(FieldMsgBG *sys, u16 style, Font *font) {
     SignMsgWin *win = GFL_HeapAllocate(sys->heapId, sizeof(SignMsgWin), TRUE, "field_msgbg.c", 3862);
 
     win->sys = sys;
@@ -1561,9 +1575,10 @@ SignMsgWin *func_ov036_02188f34(FieldMsgBG *sys, u16 style, Font *font) {
     GFL_BitmapFill(BmpWin_GetBitmap(win->window), MSGBG_COLOR_BG);
     BmpWin_FlushMap(win->window);
     BmpWin_FlushChar(win->window);
-    func_ov036_021892b0(sys->bg, MSGBG_PLTT_SIGN, style, sys->heapId);
-    func_ov036_021892f0(sys->bg, BmpWin_GetPosX(win->window), BmpWin_GetPosY(win->window), BmpWin_GetSizeX(win->window),
-                        BmpWin_GetSizeY(win->window), MSGBG_CHAR_SIGN_FRAME, MSGBG_PLTT_SIGN);
+    MsgBGPrinter_LoadBgWinGraphics(sys->bg, MSGBG_PLTT_SIGN, style, sys->heapId);
+    MsgBGPrinter_DrawBgWinFrame(sys->bg, BmpWin_GetPosX(win->window), BmpWin_GetPosY(win->window),
+                                BmpWin_GetSizeX(win->window), BmpWin_GetSizeY(win->window), MSGBG_CHAR_SIGN_FRAME,
+                                MSGBG_PLTT_SIGN);
     GFL_BGSysLoadScr(sys->bg);
     MsgBGCursor_Init(&win->cursor, win->sys);
     sys->palette = MSGBG_PLTT_TALK;
@@ -1571,10 +1586,10 @@ SignMsgWin *func_ov036_02188f34(FieldMsgBG *sys, u16 style, Font *font) {
     return win;
 }
 
-void func_ov036_0218903c(SignMsgWin *win) {
+void MsgBGPrinter_DeleteBgWin(SignMsgWin *win) {
     BmpWin_GetBitmap(win->window);
-    func_ov036_021894c8(win->sys->bg, BmpWin_GetPosX(win->window), BmpWin_GetPosY(win->window),
-                        BmpWin_GetSizeX(win->window), BmpWin_GetSizeY(win->window), 0, 0xf);
+    MsgBGPrinter_ClearBgWinFrame(win->sys->bg, BmpWin_GetPosX(win->window), BmpWin_GetPosY(win->window),
+                                 BmpWin_GetSizeX(win->window), BmpWin_GetSizeY(win->window), 0, 0xf);
     BmpWin_ClearScreen(win->window);
     GFL_BGSysFillScrArea(win->sys->bg, 0, BmpWin_GetPosX(win->window), BmpWin_GetPosY(win->window),
                          BmpWin_GetSizeX(win->window), BmpWin_GetSizeY(win->window), BGSYS_FILL_TILE_PALETTE);
@@ -1591,13 +1606,13 @@ void func_ov036_0218903c(SignMsgWin *win) {
     GFL_HeapFree(win);
 }
 
-BOOL func_ov036_02189110(SignMsgWin *win, StrBuf *text) {
+BOOL MsgBGPrinter_BgWinMain(SignMsgWin *win, StrBuf *text) {
     switch (win->state) {
     case SIGN_STATE_PRINT:
         win->src = text;
         win->line = GFL_StrBufCreate(GFL_StrBufGetCharCount(text) + 2, win->sys->heapId);
-        func_ov036_02189674(BmpWin_GetBitmap(win->window), win->font, win->src, win->line, &win->lineNo,
-                            MSGBG_COLOR_BG);
+        MsgBGPrinter_PrintTwoLines(BmpWin_GetBitmap(win->window), win->font, win->src, win->line, &win->lineNo,
+                                   MSGBG_COLOR_BG);
         BmpWin_FlushChar(win->window);
         GFL_BGSysLoadScr(win->sys->bg);
         win->state++;
@@ -1611,7 +1626,7 @@ BOOL func_ov036_02189110(SignMsgWin *win, StrBuf *text) {
         GFL_BGSysMoveBG(win->sys->bg, BG_MOVE_SET_Y, win->scroll);
         break;
     case SIGN_STATE_CHECK_PAGE:
-        if (func_ov036_02189660(win->src, win->line, win->lineNo) == TRUE) {
+        if (MsgBGPrinter_IsLineMissing(win->src, win->line, win->lineNo) == TRUE) {
             win->state = SIGN_STATE_WAIT_END;
             break;
         }
@@ -1619,20 +1634,20 @@ BOOL func_ov036_02189110(SignMsgWin *win, StrBuf *text) {
         // fallthrough
     case SIGN_STATE_WAIT_PAGE:
         if (!(GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B))) {
-            func_ov036_02189de8(&win->cursor, BmpWin_GetBitmap(win->window), MSGBG_COLOR_BG);
+            MsgBGPrinter_AnimateCursor(&win->cursor, BmpWin_GetBitmap(win->window), MSGBG_COLOR_BG);
             BmpWin_FlushChar(win->window);
             break;
         }
         MsgBGCursor_Clear(&win->cursor, BmpWin_GetBitmap(win->window), MSGBG_COLOR_BG);
         GFL_BitmapCopy(BmpWin_GetBitmap(win->window), win->page);
-        func_ov036_02189674(win->nextPage, win->font, win->src, win->line, &win->lineNo, MSGBG_COLOR_BG);
+        MsgBGPrinter_PrintTwoLines(win->nextPage, win->font, win->src, win->line, &win->lineNo, MSGBG_COLOR_BG);
         win->pageScroll = 0;
         GFL_SndSEPlay(SEQ_SE_MESSAGE);
         win->state++;
         // fallthrough
     case SIGN_STATE_SCROLL_PAGE:
-        if (func_ov036_021896f0(BmpWin_GetBitmap(win->window), win->page, win->nextPage, win->pageScroll,
-                                MSGBG_COLOR_BG) == TRUE) {
+        if (MsgBGPrinter_RollLines(BmpWin_GetBitmap(win->window), win->page, win->nextPage, win->pageScroll,
+                                   MSGBG_COLOR_BG) == TRUE) {
             win->state = SIGN_STATE_CHECK_PAGE;
         } else {
             win->pageScroll += SIGN_PAGE_SCROLL_SPEED;
@@ -1663,7 +1678,7 @@ BOOL func_ov036_02189110(SignMsgWin *win, StrBuf *text) {
     return FALSE;
 }
 
-static void func_ov036_021892b0(u32 bg, u32 palSlot, u32 style, HeapID heapId) {
+static void MsgBGPrinter_LoadBgWinGraphics(u32 bg, u32 palSlot, u32 style, HeapID heapId) {
     if (style >= SIGN_STYLE_COUNT) {
         style = 0;
     }
@@ -1672,7 +1687,7 @@ static void func_ov036_021892b0(u32 bg, u32 palSlot, u32 style, HeapID heapId) {
                       MSGBG_PLTT_SIZE, heapId);
 }
 
-static void func_ov036_021892f0(u8 bg, u8 x, u8 y, u8 w, u8 h, u16 tile, u8 pal) {
+static void MsgBGPrinter_DrawBgWinFrame(u8 bg, u8 x, u8 y, u8 w, u8 h, u16 tile, u8 pal) {
     GFL_BGSysFillScrArea(bg, tile, x - 2, y - 1, 1, 1, pal);
     GFL_BGSysFillScrArea(bg, tile + 1, x - 1, y - 1, 1, 1, pal);
     GFL_BGSysFillScrArea(bg, tile + 2, x, y - 1, w, 1, pal);
@@ -1689,7 +1704,7 @@ static void func_ov036_021892f0(u8 bg, u8 x, u8 y, u8 w, u8 h, u16 tile, u8 pal)
     GFL_BGSysFillScrArea(bg, tile + 17, x + w + 1, y + h, 1, 1, pal);
 }
 
-static void func_ov036_021894c8(u8 bg, u8 x, u8 y, u8 w, u8 h, u16 tile, u8 pal) {
+static void MsgBGPrinter_ClearBgWinFrame(u8 bg, u8 x, u8 y, u8 w, u8 h, u16 tile, u8 pal) {
     GFL_BGSysFillScrArea(bg, tile, x - 2, y - 1, 1, 1, pal);
     GFL_BGSysFillScrArea(bg, tile, x - 1, y - 1, 1, 1, pal);
     GFL_BGSysFillScrArea(bg, tile, x, y - 1, w, 1, pal);
@@ -1706,14 +1721,15 @@ static void func_ov036_021894c8(u8 bg, u8 x, u8 y, u8 w, u8 h, u16 tile, u8 pal)
     GFL_BGSysFillScrArea(bg, tile, x + w + 1, y + h, 1, 1, pal);
 }
 
-static BOOL func_ov036_02189660(const StrBuf *src, StrBuf *dest, u32 line) {
+static BOOL MsgBGPrinter_IsLineMissing(const StrBuf *src, StrBuf *dest, u32 line) {
     if (GFL_FontCopyLine(src, dest, line) == FALSE) {
         return TRUE;
     }
     return FALSE;
 }
 
-static BOOL func_ov036_02189674(GFLBitmap *bitmap, Font *font, const StrBuf *src, StrBuf *dest, u32 *line, u8 color) {
+static BOOL MsgBGPrinter_PrintTwoLines(GFLBitmap *bitmap, Font *font, const StrBuf *src, StrBuf *dest, u32 *line,
+                                       u8 color) {
     s32 y = 1;
 
     GFL_BitmapFill(bitmap, color);
@@ -1730,7 +1746,7 @@ static BOOL func_ov036_02189674(GFLBitmap *bitmap, Font *font, const StrBuf *src
     return FALSE;
 }
 
-static BOOL func_ov036_021896f0(GFLBitmap *dest, GFLBitmap *src1, GFLBitmap *src2, int amount, u16 color) {
+static BOOL MsgBGPrinter_RollLines(GFLBitmap *dest, GFLBitmap *src1, GFLBitmap *src2, int amount, u16 color) {
     int w = GFL_BitmapGetWidth(dest);
     int h = GFL_BitmapGetHeight(dest);
     int rest;
@@ -1879,7 +1895,7 @@ BOOL CheckerMsgWin_Update(CheckerMsgWin *win) {
     if (pressed & (PAD_BUTTON_A | PAD_BUTTON_B)) {
         return TRUE;
     }
-    func_ov036_02189e20(&win->cursor, BmpWin_GetBitmap(win->window), win->cursorBack);
+    MsgBGPrinter_AnimateCursorOnFrame(&win->cursor, BmpWin_GetBitmap(win->window), win->cursorBack);
     BmpWin_FlushChar(win->window);
     return FALSE;
 }
@@ -1912,14 +1928,14 @@ u32 CheckerMsgWin_CalcHeight(FieldMsgBG *sys, StrBuf *str, u32 margin) {
     return h / 8;
 }
 
-MsgBGCursor *func_ov036_02189cb0(FieldMsgBG *sys) {
+MsgBGCursor *MsgBGPrinter_CreateCursor(FieldMsgBG *sys) {
     MsgBGCursor *cursor = GFL_HeapAllocate(sys->heapId, sizeof(MsgBGCursor), TRUE, "field_msgbg.c", 4733);
 
     MsgBGCursor_Init(cursor, sys);
     return cursor;
 }
 
-void func_ov036_02189cd8(MsgBGCursor *cursor) {
+void MsgBGPrinter_DeleteCursor(MsgBGCursor *cursor) {
     MsgBGCursor_Free(cursor);
     GFL_HeapFree(cursor);
 }
@@ -1956,7 +1972,7 @@ static void MsgBGCursor_Draw(MsgBGCursor *cursor, GFLBitmap *bitmap, u32 color) 
     cursor->shown = TRUE;
 }
 
-void func_ov036_02189de8(MsgBGCursor *cursor, GFLBitmap *bitmap, u32 color) {
+void MsgBGPrinter_AnimateCursor(MsgBGCursor *cursor, GFLBitmap *bitmap, u32 color) {
     MsgBGCursor_Clear(cursor, bitmap, color);
     cursor->timer++;
     if (cursor->timer >= 4) {
@@ -1967,7 +1983,7 @@ void func_ov036_02189de8(MsgBGCursor *cursor, GFLBitmap *bitmap, u32 color) {
     MsgBGCursor_Draw(cursor, bitmap, color);
 }
 
-static void func_ov036_02189e20(MsgBGCursor *cursor, GFLBitmap *bitmap, GFLBitmap *dest) {
+static void MsgBGPrinter_AnimateCursorOnFrame(MsgBGCursor *cursor, GFLBitmap *bitmap, GFLBitmap *dest) {
     u16 offsets[3] = { 0, 1, 2 };
     s16 x = GFL_BitmapGetWidth(bitmap) - 8;
     s16 y = GFL_BitmapGetHeight(bitmap) - 8 - offsets[cursor->frame];
@@ -1989,11 +2005,11 @@ static void func_ov036_02189e20(MsgBGCursor *cursor, GFLBitmap *bitmap, GFLBitma
     cursor->shown = TRUE;
 }
 
-static void func_ov036_02189f10(HeapID heapId) {
+static void MsgBGPrinter_LoadSysWindowFrameGraphics(HeapID heapId) {
     GFL_BGSysLoadNCGRStatic(ARCID_WINFRAME, 9, MSGBG_BG, MSGBG_CHAR_LIST_FRAME, 0, FALSE, heapId);
 }
 
-static void func_ov036_02189f2c(BmpWin *win) {
+static void MsgBGPrinter_DrawSysWindowFrame(BmpWin *win) {
     u8 x = BmpWin_GetPosX(win);
     u8 y = BmpWin_GetPosY(win);
     u8 w = BmpWin_GetSizeX(win);
@@ -2011,17 +2027,17 @@ static void func_ov036_02189f2c(BmpWin *win) {
     GFL_BGSysLoadScr(bg);
 }
 
-static BmpWin *func_ov036_0218a048(u8 x, u8 y, u8 w, u8 h, HeapID heapId) {
+static BmpWin *MsgBGPrinter_CreateSysFrameWindow(u8 x, u8 y, u8 w, u8 h, HeapID heapId) {
     BmpWin *win = BmpWin_CreateDynamic(MSGBG_BG2, x, y, w, h, MSGBG_PLTT_BG2, 1);
 
     GFL_BitmapFill(BmpWin_GetBitmap(win), MSGBG_COLOR_BG_FILL);
     BmpWin_FlushMap(win);
     BmpWin_FlushChar(win);
-    func_ov036_02189f2c(win);
+    MsgBGPrinter_DrawSysWindowFrame(win);
     return win;
 }
 
-static void func_ov036_0218a08c(BmpWin *win) {
+static void MsgBGPrinter_ClearSysWindowFrame(BmpWin *win) {
     u8 bg = BmpWin_GetBGIndex(win);
 
     GFL_BGSysFillScrArea(bg, 0, BmpWin_GetPosX(win) - 1, BmpWin_GetPosY(win) - 1, BmpWin_GetSizeX(win) + 2,
@@ -2029,12 +2045,12 @@ static void func_ov036_0218a08c(BmpWin *win) {
     GFL_BGSysLoadScr(bg);
 }
 
-static void func_ov036_0218a0e8(BmpWin *win) {
-    func_ov036_0218a08c(win);
+static void MsgBGPrinter_DeleteSysFrameWindow(BmpWin *win) {
+    MsgBGPrinter_ClearSysWindowFrame(win);
     BmpWin_Free(win);
 }
 
-static void func_ov036_0218a0f8(FieldMsgBG *sys, BOOL loadFrame) {
+static void MsgBGPrinter_InitBgTwoLayerTalk(FieldMsgBG *sys, BOOL loadFrame) {
     sys->bg = MSGBG_BG;
     {
         BGSetup setup = { 0,
@@ -2075,7 +2091,7 @@ static void func_ov036_0218a0f8(FieldMsgBG *sys, BOOL loadFrame) {
     GFL_BGSysLoadScr(sys->bg);
     GFL_BGSysLoadScr(sys->bg2);
     if (loadFrame) {
-        func_ov036_0218a4dc(sys->bg, sys->heapId);
+        MsgBGPrinter_LoadWindowGraphicsAll(sys->bg, sys->heapId);
     }
     if (sys->camera != NULL) {
         TalkMsgWinSetup init;
@@ -2096,7 +2112,7 @@ static void func_ov036_0218a0f8(FieldMsgBG *sys, BOOL loadFrame) {
     sys->palette = MSGBG_PLTT_BG2;
 }
 
-static void func_ov036_0218a218(FieldMsgBG *sys, BOOL loadFrame) {
+static void MsgBGPrinter_InitBgTwoLayer(FieldMsgBG *sys, BOOL loadFrame) {
     sys->bg = MSGBG_BG;
     {
         BGSetup setup = { 0,
@@ -2137,7 +2153,7 @@ static void func_ov036_0218a218(FieldMsgBG *sys, BOOL loadFrame) {
     GFL_BGSysLoadScr(sys->bg);
     GFL_BGSysLoadScr(sys->bg2);
     if (loadFrame) {
-        func_ov036_0218a4dc(sys->bg, sys->heapId);
+        MsgBGPrinter_LoadWindowGraphicsAll(sys->bg, sys->heapId);
     }
     if (sys->camera != NULL) {
         TalkMsgWinSetup init;
@@ -2157,7 +2173,7 @@ static void func_ov036_0218a218(FieldMsgBG *sys, BOOL loadFrame) {
     sys->palette = MSGBG_PLTT_BG2;
 }
 
-static void func_ov036_0218a334(FieldMsgBG *sys) {
+static void MsgBGPrinter_InitBgOneLayer(FieldMsgBG *sys) {
     sys->bg = MSGBG_BG;
     {
         BGSetup setup = { 0,
@@ -2178,7 +2194,7 @@ static void func_ov036_0218a334(FieldMsgBG *sys) {
     GFL_BGSysFillChar(sys->bg, 0, 1, 0);
     GFL_BGSysFillScrArea(sys->bg, 0, 0, 0, 0x20, 0x20, BGSYS_FILL_TILE_PALETTE);
     GFL_BGSysLoadScr(sys->bg);
-    func_ov036_0218a4dc(sys->bg, sys->heapId);
+    MsgBGPrinter_LoadWindowGraphicsAll(sys->bg, sys->heapId);
     if (sys->camera != NULL) {
         TalkMsgWinSetup init;
 
@@ -2195,7 +2211,7 @@ static void func_ov036_0218a334(FieldMsgBG *sys) {
     sys->palette = MSGBG_PLTT_BG2;
 }
 
-static void func_ov036_0218a3e0(TCB *tcb, void *data) {
+static void MsgBGPrinter_VblankTalkSysTask(TCB *tcb, void *data) {
     FieldMsgBG *sys = data;
 
     if (!GFL_IRQCartDataTransferIsEnabled()) {
@@ -2205,7 +2221,7 @@ static void func_ov036_0218a3e0(TCB *tcb, void *data) {
     }
 }
 
-static void func_ov036_0218a408(u32 create, u32 alphaBlend) {
+static void MsgBGPrinter_SetupSysFrameBg(u32 create, u32 alphaBlend) {
     GFL_BGSysSetBGEnabled(MSGBG_BG2, 0);
     if (create == TRUE) {
         BGSetup setup = { 0,
@@ -2239,28 +2255,28 @@ static const ListMenuRequest sYesNoMenuRequest = {
     1, 10, 0, 13, 0, 3, 1, 0xf, 2, 0, 1, 0, 0, 12, 13, 0, 0, 0, 0, NULL
 };
 
-static void func_ov036_0218a4a4(FieldMsgBG *sys) {
+static void MsgBGPrinter_SetupSysFrame(FieldMsgBG *sys) {
     if (sys->resetBG2 != FALSE) {
         sys->resetBG2 = FALSE;
         if (sys->bg2 == MSGBG_NO_BG) {
             GFL_BGSysReleaseBG(MSGBG_BG2);
-            func_ov036_0218a408(TRUE, sys->alphaBlend);
+            MsgBGPrinter_SetupSysFrameBg(TRUE, sys->alphaBlend);
             sys->bg2 = MSGBG_BG2;
         } else {
-            func_ov036_0218a408(FALSE, sys->alphaBlend);
+            MsgBGPrinter_SetupSysFrameBg(FALSE, sys->alphaBlend);
         }
     }
 }
 
-static void func_ov036_0218a4dc(u32 bg, HeapID heapId) {
+static void MsgBGPrinter_LoadWindowGraphicsAll(u32 bg, HeapID heapId) {
     GFL_BGSysLoadNCLRDefault(ARCID_FONT, 5, PALTYPE_MAIN_BG, MSGBG_PLTT_TALK * MSGBG_PLTT_SIZE, MSGBG_PLTT_SIZE,
                              heapId);
     GFL_BGSysLoadNCLRDefault(ARCID_FONT, 7, PALTYPE_MAIN_BG, MSGBG_PLTT_BG2 * MSGBG_PLTT_SIZE, MSGBG_PLTT_SIZE, heapId);
     LoadSysMsgBox(bg, MSGBG_CHAR_FRAME, MSGBG_PLTT_BG2_FRAME, 0, heapId);
-    func_ov036_02189f10(heapId);
+    MsgBGPrinter_LoadSysWindowFrameGraphics(heapId);
 }
 
-static void func_ov036_0218a524(u32 bg, HeapID heapId, u32 step) {
+static void MsgBGPrinter_LoadWindowGraphicsStepFn(u32 bg, HeapID heapId, u32 step) {
     if (step == MSGBG_LOAD_PALETTES) {
         GFL_BGSysLoadNCLRDefault(ARCID_FONT, 5, PALTYPE_MAIN_BG, MSGBG_PLTT_TALK * MSGBG_PLTT_SIZE, MSGBG_PLTT_SIZE,
                                  heapId);
@@ -2269,7 +2285,7 @@ static void func_ov036_0218a524(u32 bg, HeapID heapId, u32 step) {
     } else if (step == MSGBG_LOAD_SYSTEM_FRAME) {
         LoadSysMsgBox(bg, MSGBG_CHAR_FRAME, MSGBG_PLTT_BG2_FRAME, 0, heapId);
     } else if (step == MSGBG_LOAD_LIST_FRAME) {
-        func_ov036_02189f10(heapId);
+        MsgBGPrinter_LoadSysWindowFrameGraphics(heapId);
     }
 }
 
@@ -2283,13 +2299,13 @@ void setAlphaBlend_wrapper(BOOL on) {
     setAlphaBlend(on);
 }
 
-void func_ov036_0218a5a0(FieldMsgBG *sys) {
+void MsgBGPrinter_ReloadBg(FieldMsgBG *sys) {
     GFL_BGSysFreeFilledChar(sys->bg, 1, 0);
     GFL_BGSysFillChar(sys->bg, 0, 1, 0);
     GFL_BGSysFillScrArea(sys->bg, 0, 0, 0, 0x20, 0x20, BGSYS_FILL_TILE_PALETTE);
     GFL_BGSysLoadScr(sys->bg);
-    func_ov036_0218a4dc(sys->bg, sys->heapId);
-    func_ov036_0218c110(sys->talk);
+    MsgBGPrinter_LoadWindowGraphicsAll(sys->bg, sys->heapId);
+    TalkMsgWin_ReloadFrameGraphics(sys->talk);
 }
 
 static BmpWin *FieldMsgBG_CreateBmpWin(u32 bg, u32 heapId, u32 x, u32 y, u16 w, u16 h, u16 pal) {
@@ -2304,12 +2320,12 @@ static BmpWin *FieldMsgBG_CreateBmpWin(u32 bg, u32 heapId, u32 x, u32 y, u16 w, 
     return win;
 }
 
-static void func_ov036_0218a668(BmpWin *win) {
+static void MsgBGPrinter_DeleteWindow(BmpWin *win) {
     BmpWin_ClearFrame(win, WINFRAME_TRANSFER_NOW);
     BmpWin_Free(win);
 }
 
-static void func_ov036_0218a67c(u32 heapId) {
+static void MsgBGPrinter_LoadMenuGraphicsLower(u32 heapId) {
     GFL_G2DIOLoadNCLR(ARCID_WINFRAME, GetSysMsgBoxPaletteDatID(0), PALTYPE_MAIN_BG, MSGBG_PLTT_SIZE,
                       MSGBG_PLTT_BG2_FRAME * MSGBG_PLTT_SIZE, MSGBG_PLTT_SIZE, heapId);
 }
@@ -2369,7 +2385,7 @@ static s32 MsgBGInput_GetTextWait(MsgBGInput *input) {
     return TextSpeed_GetCurrentWait();
 }
 
-static BOOL func_ov036_0218a760(MsgBGInput *input) {
+static BOOL MsgBGPrinter_KeyWaitCheckSkip(MsgBGInput *input) {
     u32 pressed = GCTX_HIDGetPressedKeys();
     u32 held = GCTX_HIDGetHeldKeys();
 
@@ -2385,7 +2401,7 @@ static BOOL func_ov036_0218a760(MsgBGInput *input) {
     return FALSE;
 }
 
-static BOOL func_ov036_0218a798(MsgBGInput *input, BOOL fast) {
+static BOOL MsgBGPrinter_KeyWaitCheckAdvance(MsgBGInput *input, BOOL fast) {
     int limit;
     u32 pressed;
 
@@ -2405,7 +2421,7 @@ static BOOL func_ov036_0218a798(MsgBGInput *input, BOOL fast) {
     return FALSE;
 }
 
-static void func_ov036_0218a7d8(PrintStream *stream, BOOL fast) {
+static void MsgBGPrinter_StreamSetSpeed(PrintStream *stream, BOOL fast) {
     if (fast == TRUE) {
         PrintStream_SetFastWait(stream, TextSpeed_GetWait(2));
     } else {

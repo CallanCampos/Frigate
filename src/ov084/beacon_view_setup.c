@@ -179,7 +179,7 @@ GameEvent *BeaconView_CreateEvent(BeaconViewWork *work, BOOL enabled) {
     }
     switch (work->eventRequest) {
     case BEACON_VIEW_EVENT_MENU_COMM:
-        func_ov012_02153654(work->commSys);
+        Intrude_SetCompleted(work->commSys);
         // fallthrough
     case BEACON_VIEW_EVENT_MENU:
     case BEACON_VIEW_EVENT_MENU_WIFI:
@@ -447,7 +447,7 @@ static void BeaconView_InitSystems(BeaconViewWork *work) {
     work->printQueue = PrintQueue_CreateDefault(work->heapId);
     PrintQueue_SetQueueAlways(work->printQueue, TRUE);
     PrintQueue_SetTimeLimit(work->printQueue, 500);
-    work->font = func_ov036_0218799c(Field_GetMsgBGSys(work->field));
+    work->font = MsgBGPrinter_GetFont(Field_GetMsgBGSys(work->field));
     GFL_TextRndResetColorIndexLUT();
     work->wordSet = GFL_WordSetSystemCreate(8, 64, work->heapId);
     work->msgData = GFL_MsgSysLoadData(TRUE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_GAME_BEACON, work->heapId);

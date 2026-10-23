@@ -978,25 +978,25 @@ BOOL s01DC_DreamWorldItems(VM *vm, FieldScriptEnv *env) {
         *result = DreamWorldSave_CountItems(dreamWorld) > 0 ? TRUE : FALSE;
         break;
     case 1:
-        if (func_ov033_02177c8c(gameData, heapId, dreamWorld) < count) {
+        if (PdwPostman_CountUnreceivable(gameData, heapId, dreamWorld) < count) {
             *result = TRUE;
         } else {
             *result = FALSE;
         }
         break;
     case 2:
-        event = func_ov033_02177d28(gsys);
+        event = PdwPostman_CreateListEvent(gsys);
         ScriptWork_CallEvent(FieldScriptEnv_GetScriptWork(env), event);
         return TRUE;
     case 3:
-        func_ov033_02177c48(gameData, heapId, dreamWorld);
+        PdwPostman_ReceiveItems(gameData, heapId, dreamWorld);
         break;
     case 5:
         loadItemsNameToStrbuf(ScriptWork_GetWordSet(FieldScriptEnv_GetScriptWork(env)), 0,
-                              func_ov033_02177cd4(gameData, heapId, dreamWorld, *result));
+                              PdwPostman_GetUnreceivableItem(gameData, heapId, dreamWorld, *result));
         break;
     case 4:
-        *result = func_ov033_02177c8c(gameData, heapId, dreamWorld);
+        *result = PdwPostman_CountUnreceivable(gameData, heapId, dreamWorld);
         break;
     }
     return FALSE;

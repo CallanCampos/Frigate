@@ -144,9 +144,9 @@ WeatherData TINT_WEATHER_14 = {
 };
 
 static BOOL Tint9_Init(WeatherTask *task, u32 arg, HeapID heapId) {
-    Tint9Work *work = func_ov036_021997e4(task);
+    Tint9Work *work = WeatherTask_GetWorkBuffer(task);
 
-    func_ov036_0219990c(task, 9, TINT_START_COLOR, arg);
+    WeatherTask_InitFog(task, 9, TINT_START_COLOR, arg);
     work->state = 0;
     work->level = 9;
     work->color = TINT_START_COLOR - 0x67;
@@ -154,23 +154,23 @@ static BOOL Tint9_Init(WeatherTask *task, u32 arg, HeapID heapId) {
 }
 
 static BOOL Tint9_FadeIn(WeatherTask *task, u32 arg, HeapID heapId) {
-    Tint9Work *work = func_ov036_021997e4(task);
+    Tint9Work *work = WeatherTask_GetWorkBuffer(task);
 
     if (work->state == 0) {
-        func_ov036_02199958(task, work->level, work->color, TINT_FADE_IN_FRAMES, arg);
-        func_ov036_02199734(task, TINT_SOUND_TYPE, FieldLightStatus_GetWeatherLight(9));
+        WeatherTask_ChangeFog(task, work->level, work->color, TINT_FADE_IN_FRAMES, arg);
+        WeatherTask_FadeLight(task, TINT_SOUND_TYPE, FieldLightStatus_GetWeatherLight(9));
         work->state--;
-    } else if (func_ov036_021999dc(task)) {
+    } else if (WeatherTask_IsFogIdle(task)) {
         return TRUE;
     }
     return FALSE;
 }
 
 static BOOL Tint9_InitNoFade(WeatherTask *task, u32 arg, HeapID heapId) {
-    Tint9Work *work = func_ov036_021997e4(task);
+    Tint9Work *work = WeatherTask_GetWorkBuffer(task);
 
-    func_ov036_0219990c(task, work->level, work->color, arg);
-    func_ov036_02199740(task, TINT_SOUND_TYPE, FieldLightStatus_GetWeatherLight(9));
+    WeatherTask_InitFog(task, work->level, work->color, arg);
+    WeatherTask_SetLight(task, TINT_SOUND_TYPE, FieldLightStatus_GetWeatherLight(9));
     return TRUE;
 }
 
@@ -179,27 +179,27 @@ static BOOL Tint9_Main(WeatherTask *task, u32 arg, HeapID heapId) {
 }
 
 static BOOL Tint9_InitFadeOut(WeatherTask *task, u32 arg, HeapID heapId) {
-    Tint9Work *work = func_ov036_021997e4(task);
+    Tint9Work *work = WeatherTask_GetWorkBuffer(task);
 
     work->state = 0;
     return TRUE;
 }
 
 static BOOL Tint9_FadeOut(WeatherTask *task, u32 arg, HeapID heapId) {
-    Tint9Work *work = func_ov036_021997e4(task);
+    Tint9Work *work = WeatherTask_GetWorkBuffer(task);
 
     if (work->state == 0) {
         work->state--;
-        func_ov036_021999bc(task, TINT_START_COLOR, TINT_FADE_OUT_FRAMES, arg);
-    } else if ((arg != 0 ? func_ov036_021999dc(task) : TRUE) && !func_ov036_021997e8(task)) {
+        WeatherTask_ChangeFogOffset(task, TINT_START_COLOR, TINT_FADE_OUT_FRAMES, arg);
+    } else if ((arg != 0 ? WeatherTask_IsFogIdle(task) : TRUE) && !WeatherTask_GetParticleCount(task)) {
         return TRUE;
     }
     return FALSE;
 }
 
 static BOOL Tint9_Exit(WeatherTask *task, u32 arg, HeapID heapId) {
-    func_ov036_02199948(task, arg);
-    func_ov036_0219974c(task, arg);
+    WeatherTask_DisableFog(task, arg);
+    WeatherTask_ResetLight(task, arg);
     return TRUE;
 }
 
@@ -207,71 +207,71 @@ static void Tint9_ObjFunc(WeatherObj *obj) {
 }
 
 static BOOL Tint10_Init(WeatherTask *task, u32 arg, HeapID heapId) {
-    u32 index = func_ov036_02199774(task);
-    TintWork *work = func_ov036_021997e4(task);
+    u32 index = WeatherTask_GetCameraSettingId(task);
+    TintWork *work = WeatherTask_GetWorkBuffer(task);
 
     work->state = 0;
     work->sound = 10;
     work->level = sLevels[index];
     work->color = sColors[index];
-    func_ov036_0219990c(task, work->level, TINT_START_COLOR, arg);
+    WeatherTask_InitFog(task, work->level, TINT_START_COLOR, arg);
     return TRUE;
 }
 
 static BOOL Tint11_Init(WeatherTask *task, u32 arg, HeapID heapId) {
-    u32 index = func_ov036_02199774(task);
-    TintWork *work = func_ov036_021997e4(task);
+    u32 index = WeatherTask_GetCameraSettingId(task);
+    TintWork *work = WeatherTask_GetWorkBuffer(task);
 
     work->state = 0;
     work->sound = 11;
     work->level = sLevels[index];
     work->color = sColors[index];
-    func_ov036_0219990c(task, work->level, TINT_START_COLOR, arg);
+    WeatherTask_InitFog(task, work->level, TINT_START_COLOR, arg);
     return TRUE;
 }
 
 static BOOL Tint13_Init(WeatherTask *task, u32 arg, HeapID heapId) {
-    u32 index = func_ov036_02199774(task);
-    TintWork *work = func_ov036_021997e4(task);
+    u32 index = WeatherTask_GetCameraSettingId(task);
+    TintWork *work = WeatherTask_GetWorkBuffer(task);
 
     work->state = 0;
     work->sound = 13;
     work->level = sLevels[index];
     work->color = sColors[index];
-    func_ov036_0219990c(task, work->level, TINT_START_COLOR, arg);
+    WeatherTask_InitFog(task, work->level, TINT_START_COLOR, arg);
     return TRUE;
 }
 
 static BOOL Tint14_Init(WeatherTask *task, u32 arg, HeapID heapId) {
-    u32 index = func_ov036_02199774(task);
-    TintWork *work = func_ov036_021997e4(task);
+    u32 index = WeatherTask_GetCameraSettingId(task);
+    TintWork *work = WeatherTask_GetWorkBuffer(task);
 
     work->state = 0;
     work->sound = 14;
     work->level = sLevels[index];
     work->color = sColors[index];
-    func_ov036_0219990c(task, work->level, TINT_START_COLOR, arg);
+    WeatherTask_InitFog(task, work->level, TINT_START_COLOR, arg);
     return TRUE;
 }
 
 static BOOL Tint_FadeIn(WeatherTask *task, u32 arg, HeapID heapId) {
-    TintWork *work = func_ov036_021997e4(task);
+    TintWork *work = WeatherTask_GetWorkBuffer(task);
 
     if (work->state == 0) {
-        func_ov036_02199958(task, work->level, work->color, TINT_FADE_IN_FRAMES, arg);
-        func_ov036_02199734(task, TINT_SOUND_TYPE, FieldLightStatus_GetWeatherLight(work->sound));
+        WeatherTask_ChangeFog(task, work->level, work->color, TINT_FADE_IN_FRAMES, arg);
+        WeatherTask_FadeLight(task, TINT_SOUND_TYPE, FieldLightStatus_GetWeatherLight(work->sound));
         work->state--;
-    } else if (func_ov036_021999dc(task)) {
+    } else if (WeatherTask_IsFogIdle(task)) {
         return TRUE;
     }
     return FALSE;
 }
 
 static BOOL Tint_InitNoFade(WeatherTask *task, u32 arg, HeapID heapId) {
-    TintWork *work = func_ov036_021997e4(task);
+    TintWork *work = WeatherTask_GetWorkBuffer(task);
 
-    func_ov036_0219990c(task, work->level, work->color, arg);
-    func_ov036_02199740(task, TINT_SOUND_TYPE, FieldLightStatus_GetWeatherLight(work->sound));
+    WeatherTask_InitFog(task, work->level, work->color, arg);
+    WeatherTask_SetLight(task, TINT_SOUND_TYPE, FieldLightStatus_GetWeatherLight(work->sound));
     return TRUE;
 }
 
@@ -280,27 +280,27 @@ static BOOL Tint_Main(WeatherTask *task, u32 arg, HeapID heapId) {
 }
 
 static BOOL Tint_InitFadeOut(WeatherTask *task, u32 arg, HeapID heapId) {
-    TintWork *work = func_ov036_021997e4(task);
+    TintWork *work = WeatherTask_GetWorkBuffer(task);
 
     work->state = 0;
     return TRUE;
 }
 
 static BOOL Tint_FadeOut(WeatherTask *task, u32 arg, HeapID heapId) {
-    TintWork *work = func_ov036_021997e4(task);
+    TintWork *work = WeatherTask_GetWorkBuffer(task);
 
     if (work->state == 0) {
         work->state--;
-        func_ov036_021999bc(task, TINT_START_COLOR, TINT_FADE_OUT_FRAMES, arg);
-    } else if ((arg != 0 ? func_ov036_021999dc(task) : TRUE) && !func_ov036_021997e8(task)) {
+        WeatherTask_ChangeFogOffset(task, TINT_START_COLOR, TINT_FADE_OUT_FRAMES, arg);
+    } else if ((arg != 0 ? WeatherTask_IsFogIdle(task) : TRUE) && !WeatherTask_GetParticleCount(task)) {
         return TRUE;
     }
     return FALSE;
 }
 
 static BOOL Tint_Exit(WeatherTask *task, u32 arg, HeapID heapId) {
-    func_ov036_02199948(task, arg);
-    func_ov036_0219974c(task, arg);
+    WeatherTask_DisableFog(task, arg);
+    WeatherTask_ResetLight(task, arg);
     return TRUE;
 }
 

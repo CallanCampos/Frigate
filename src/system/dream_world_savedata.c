@@ -50,7 +50,7 @@ void func_020099d8(DreamWorldSave *dreamWorld, u8 value) {
     dreamWorld->unk1A4 = value;
 }
 
-u8 func_020099e0(DreamWorldSave *dreamWorld) {
+u8 DreamWorldSave_GetMode(DreamWorldSave *dreamWorld) {
     return dreamWorld->unk1A4;
 }
 
@@ -170,11 +170,11 @@ void DreamWorldSave_SetResultIndex(DreamWorldSave *dreamWorld, int value) {
     }
 }
 
-u32 func_02009b20(DreamWorldSave *dreamWorld) {
+u32 DreamWorldSave_GetFlag(DreamWorldSave *dreamWorld) {
     return dreamWorld->unk1A6_7;
 }
 
-void func_02009b30(DreamWorldSave *dreamWorld, u32 value) {
+void DreamWorldSave_SetFlag(DreamWorldSave *dreamWorld, u32 value) {
     dreamWorld->unk1A6_7 = (u8)value;
 }
 

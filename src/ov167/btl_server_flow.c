@@ -83,7 +83,7 @@ void BtlServerFlow_InitWork(BtlServerFlow *flow) {
     BtlServerFlow_ResetFrames(flow);
     BtlClientIDList_Init(&flow->clientIdList);
     InitState(&flow->actionState);
-    func_ov167_021a8f8c(&flow->unk1B54);
+    ServerControl_ClearPendingCounter(&flow->unk1B54);
     SideEffectsInit();
     flow->unk786 = 0;
     flow->unk787 = 0;
@@ -440,19 +440,19 @@ u32 BtlServerFlow_TryEscape(BtlServerFlow *flow) {
     return result;
 }
 
-BOOL func_ov167_0219fe24(BtlServerFlow *flow) {
+BOOL ServerControl_RunBagModeSetup(BtlServerFlow *flow) {
     BOOL result;
 
     result = FALSE;
     BtlServerCmdQueue_Init(flow->queue);
-    func_ov167_0219fe44(flow);
+    ServerControl_PushBagModePositions(flow);
     if (flow->queue->writePtr != 0) {
         result = TRUE;
     }
     return result;
 }
 
-void func_ov167_0219fe44(BtlServerFlow *flow) {
+void ServerControl_PushBagModePositions(BtlServerFlow *flow) {
     u32 i;
     u32 count;
     u8 clientIds[4];
@@ -525,7 +525,7 @@ BtlClientIDList *BtlServerFlow_GetClientIDList(BtlServerFlow *flow) {
     return &flow->clientIdList;
 }
 
-u8 func_ov167_0219fff0(BtlServerFlow *flow) {
+u8 ServerControl_GetChosenSlot(BtlServerFlow *flow) {
     return flow->unk784;
 }
 
@@ -5600,7 +5600,7 @@ BOOL ServerControl_HideTurnCancel(BtlServerFlow *flow, BattleMon *mon, u32 flag)
     return FALSE;
 }
 
-void func_ov167_021a8f8c(BtlFlowUnk1B54 *work) {
+void ServerControl_ClearPendingCounter(BtlFlowUnk1B54 *work) {
     work->unk220 = 0;
 }
 
@@ -7370,7 +7370,7 @@ BOOL BtlServerFlow_HasReserveMon(BtlServerFlow *flow, u8 monId) {
 }
 
 // Sets a flag that can only be set once, and returns whether this call set it
-BOOL func_ov167_021aba8c(BtlServerFlow *flow) {
+BOOL ServerControl_TrySetOnceFlag(BtlServerFlow *flow) {
     if (flow->unk78A_3) {
         return FALSE;
     }

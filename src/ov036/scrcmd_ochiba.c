@@ -92,7 +92,7 @@ void func_ov036_021c97b8(OchibaEffectArgs *args) {
     FieldG3DObjResRequest request;
 
     FieldPlayer_GetWPos(args->player, &position);
-    sys = func_ov036_021a3724(effects);
+    sys = FieldEffects_GetFieldMapData(effects);
     arc = FieldEffects_GetArc(effects);
     FieldG3DObjResRequest_Clear(&request);
     FieldG3DObjResRequest_SetModel(&request, arc, 0x61);
@@ -215,7 +215,7 @@ BOOL func_ov036_021c9a7c(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL func_ov036_021c9ab0(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_GetWifiHistoryCountryCount(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys;
     u16 index;
     u16 *result;
@@ -244,7 +244,7 @@ BOOL s02DD_UnityTowerGetVisitorCount(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL func_ov036_021c9b38(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_MarkPartnerCandidate(VM *vm, FieldScriptEnv *env) {
     GameData *gameData;
     UnityTowerFloor *unityTower;
     u8 visitor;
@@ -254,14 +254,14 @@ BOOL func_ov036_021c9b38(VM *vm, FieldScriptEnv *env) {
     gameData = GSYS_GetGameData(FieldScriptEnv_GetGameSystem(env));
     unityTower = GameData_GetUnityTowerSave(gameData);
     visitor = ScriptReadAny(vm, env);
-    index = func_ov033_0217aac4(unityTower, visitor);
+    index = Scrcmd_GetPartnerCandidateHistoryIndex(unityTower, visitor);
     if (index != 0xff) {
         UnityTower_SetVisitorParam(getUnityTower_SurveySaveBlkAddrress(GameData_GetSaveControl(gameData)), index, 5, 1);
     }
     return FALSE;
 }
 
-BOOL func_ov036_021c9b88(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_IsPartnerCandidateMarked(VM *vm, FieldScriptEnv *env) {
     GameData *gameData;
     UnityTowerFloor *unityTower;
     u16 visitor;
@@ -274,7 +274,7 @@ BOOL func_ov036_021c9b88(VM *vm, FieldScriptEnv *env) {
     visitor = ScriptReadAny(vm, env);
     result = ScriptReadVar(vm, env);
     *result = FALSE;
-    index = func_ov033_0217aac4(unityTower, visitor);
+    index = Scrcmd_GetPartnerCandidateHistoryIndex(unityTower, visitor);
     if (index != 0xff &&
         (u8)UnityTower_GetVisitorParam(getUnityTower_SurveySaveBlkAddrress(GameData_GetSaveControl(gameData)), index,
                                        UNITY_TOWER_VISITOR_PARAM_SCRIPT_FLAG)) {
@@ -290,7 +290,8 @@ BOOL func_ov036_021c9bec(VM *vm, FieldScriptEnv *env) {
     FieldScriptEnv_GetScriptWork(env);
     gsys = FieldScriptEnv_GetGameSystem(env);
     index = ScriptReadAny(vm, env);
-    func_02009d18(getUnityTower_SurveySaveBlkAddrress(GameData_GetSaveControl(GSYS_GetGameData(gsys))), index);
+    UnityTower_SetRatingLevel(getUnityTower_SurveySaveBlkAddrress(GameData_GetSaveControl(GSYS_GetGameData(gsys))),
+                              index);
     return FALSE;
 }
 
@@ -329,7 +330,7 @@ BOOL s02DB_UnityTowerSetFloor(VM *vm, FieldScriptEnv *env) {
     gsys = FieldScriptEnv_GetGameSystem(env);
     floor = ScriptReadAny(vm, env);
     value = ScriptReadAny(vm, env);
-    func_ov033_0217aa1c(gsys, floor, value);
+    Scrcmd_FillPartnerCandidates(gsys, floor, value);
     return FALSE;
 }
 
@@ -349,11 +350,11 @@ BOOL s02DC_UnityTowerInitVisitorMessage(VM *vm, FieldScriptEnv *env) {
     index = ScriptReadAny(vm, env);
     param = VM_Read16(vm);
     result = ScriptReadVar(vm, env);
-    *result = func_ov033_0217aad8(wordSet, gsys, save, index, param);
+    *result = Scrcmd_GetPartnerGreetingMessage(wordSet, gsys, save, index, param);
     return FALSE;
 }
 
-BOOL func_ov036_021c9d24(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_HasPlayerLanguage(VM *vm, FieldScriptEnv *env) {
     u16 *result;
     GameSystem *gsys;
 

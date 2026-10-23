@@ -85,7 +85,7 @@ void BtlAdapter_ClearNetReplies(void) {
     }
 }
 
-void func_ov167_021d4ae8(void) {
+void BtlAdapter_Idle(void) {
 }
 
 void BtlAdapter_SetCmd(BtlAdapter *adapter, u32 cmd, const void *data, u32 size) {

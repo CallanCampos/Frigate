@@ -815,7 +815,7 @@ s16 MCSS_GetOffsetY(MCSS *mcss) {
     return mcss->bin->offsetY;
 }
 
-u8 func_0201ae00(MCSS *mcss) {
+u8 MCSSSys_GetStopCellFlags(MCSS *mcss) {
     return mcss->binTail->unk1;
 }
 

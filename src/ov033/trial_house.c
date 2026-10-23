@@ -31,12 +31,12 @@ struct TrialHouseWork *CreateTrialHouseWk(GameSystem *gsys) {
     work = GFL_HeapAllocate(HEAPID_TRIAL_HOUSE, sizeof(struct TrialHouseWork), TRUE, "trial_house.c", 0x5d);
     work->heapId = HEAPID_TRIAL_HOUSE;
     work->saveBuffer = GFL_HeapAllocate(HEAPID_TRIAL_HOUSE, saveSize, TRUE, "trial_house.c", 0x5f);
-    func_ov033_0217acd4(gsys, work);
+    TrialHouse_LoadDeliveryState(gsys, work);
     work->party = PokeParty_Create(work->heapId);
     return work;
 }
 
-void func_ov033_0217acd4(GameSystem *gsys, TrialHouseWork *work) {
+void TrialHouse_LoadDeliveryState(GameSystem *gsys, TrialHouseWork *work) {
     u32 state;
     SaveControl *save;
     void *buffer;
@@ -68,7 +68,7 @@ void TrialHouseWorkDelete(void *unused, struct TrialHouseWork **workPtr) {
     }
 }
 
-void func_ov033_0217ad78(TrialHouseWork *work, u32 mode) {
+void TrialHouse_SetBattleMode(TrialHouseWork *work, u32 mode) {
     u32 battleType;
 
     if (work != NULL) {
@@ -93,16 +93,16 @@ void func_ov033_0217adbc(TrialHouseWork *work, u32 selectionFlag) {
     work->selectionFlag = selectionFlag;
 }
 
-u32 func_ov033_0217adc4(GameSystem *gsys, TrialHouseWork *work, u32 mode) {
+u32 TrialHouse_LoadTrainer(GameSystem *gsys, TrialHouseWork *work, u32 mode) {
     if (work->selectionFlag != 0) {
-        func_ov033_0217ae5c(gsys, work, mode);
+        TrialHouse_LoadDeliveredTrainer(gsys, work, mode);
     } else {
-        func_ov033_0217ade8(work, mode);
+        TrialHouse_BuildTrainerFromMode(work, mode);
     }
-    return func_ov033_0217aed0(work);
+    return TrialHouse_GetTrainerObjCode(work);
 }
 
-void func_ov033_0217ade8(TrialHouseWork *work, u32 mode) {
+void TrialHouse_BuildTrainerFromMode(TrialHouseWork *work, u32 mode) {
     u32 base;
     u32 range;
     u32 value;
@@ -137,7 +137,7 @@ void func_ov033_0217ade8(TrialHouseWork *work, u32 mode) {
     BtlInst_MakeRomTrainerAndTeam(&work->trainer, value, work->capacity, NULL, NULL, NULL, HEAPID_TAIL(work->heapId));
 }
 
-void func_ov033_0217ae5c(GameSystem *gsys, TrialHouseWork *work, u32 mode) {
+void TrialHouse_LoadDeliveredTrainer(GameSystem *gsys, TrialHouseWork *work, u32 mode) {
     SaveControl *save;
     void *buffer;
     BattleExaminationSave *extra;
@@ -152,11 +152,11 @@ void func_ov033_0217ae5c(GameSystem *gsys, TrialHouseWork *work, u32 mode) {
     GFL_HeapFree(buffer);
 }
 
-u32 func_ov033_0217aed0(TrialHouseWork *work) {
+u32 TrialHouse_GetTrainerObjCode(TrialHouseWork *work) {
     return BtlInst_GetTrainerClassObjCode(work->trainer.trainerId);
 }
 
-GameEvent *func_ov033_0217aedc(GameSystem *gsys, TrialHouseWork *work, u32 index, u32 actorId) {
+GameEvent *TrialHouse_CreateTrainerMsgEvent(GameSystem *gsys, TrialHouseWork *work, u32 index, u32 actorId) {
     return EventBtlInstTrainerMsg_Create(gsys, &work->trainer, index, (u16)actorId);
 }
 
@@ -164,7 +164,7 @@ GameEvent *func_ov033_0217aee8(GameSystem *gsys, TrialHouseWork *work, u16 *resu
     GameEvent *event;
     struct TrialHouseEventData *data;
 
-    event = GameEvent_Create(gsys, NULL, func_ov033_0217af5c, sizeof(struct TrialHouseEventData));
+    event = GameEvent_Create(gsys, NULL, TrialHouse_DeliveryTaskMain, sizeof(struct TrialHouseEventData));
     data = GameEvent_GetData(event);
     data->gsys = gsys;
     data->result = result;
@@ -185,7 +185,7 @@ GameEvent *func_ov033_0217aee8(GameSystem *gsys, TrialHouseWork *work, u16 *resu
     return event;
 }
 
-GameEventReturnCode func_ov033_0217af5c(GameEvent *event, u32 *state, void *arg) {
+GameEventReturnCode TrialHouse_DeliveryTaskMain(GameEvent *event, u32 *state, void *arg) {
     TrialHouseEventData *data;
     GameSystem *gsys;
     GameData *gameData;
@@ -248,9 +248,9 @@ GameEventReturnCode func_ov033_0217af5c(GameEvent *event, u32 *state, void *arg)
         saveBuffer = data->work->saveBuffer;
         a = BattleExamination_GetNumber(saveBuffer);
         b = BattleExamination_IsValid(saveBuffer);
-        c = func_ov033_0217b35c(save, a);
+        c = TrialHouse_IsDeliveryIdReceived(save, a);
         if (b != 0 && (c == 0 || a == 0)) {
-            func_ov033_0217b384(save, a);
+            TrialHouse_MarkDeliveryIdReceived(save, a);
             BattleExamination_Load(gameData, data->work->saveBuffer, 0x8004);
             *data->result = 1;
         } else if (c != 0) {
@@ -270,7 +270,7 @@ GameEventReturnCode func_ov033_0217af5c(GameEvent *event, u32 *state, void *arg)
         }
         break;
     case 6:
-        func_ov033_0217acd4(gsys, data->work);
+        TrialHouse_LoadDeliveryState(gsys, data->work);
         return GAMEEVENT_DONE;
     }
     return GAMEEVENT_CONTINUE;
@@ -362,25 +362,25 @@ void TrialHouseCalcPointScore(GameSystem *gsys, TrialHouseWork *work, u16 *rankO
     RecordSetTrialHouseRank(records, rank);
 }
 
-u32 func_ov033_0217b2e4(GameSystem *gsys, TrialHouseWork *work) {
+u32 TrialHouse_GetDeliveryState(GameSystem *gsys, TrialHouseWork *work) {
     return work->initState;
 }
 
-GameEvent *func_ov033_0217b2ec(GameSystem *gsys, TrialHouseWork *work, u32 mode) {
+GameEvent *TrialHouse_CreateSaveTask(GameSystem *gsys, TrialHouseWork *work, u32 mode) {
     GameEvent *event;
     TrialHouseEffectEvent *data;
 
-    event = GameEvent_Create(gsys, NULL, func_ov033_0217b3ac, sizeof(TrialHouseEffectEvent));
+    event = GameEvent_Create(gsys, NULL, TrialHouse_SaveTaskMain, sizeof(TrialHouseEffectEvent));
     data = GameEvent_GetData(event);
     data->gsys = gsys;
     data->buffer = NULL;
     data->mode = mode;
-    data->effect = func_ov036_021c6cc8(0x8015, GSYS_GetField(gsys));
-    func_ov036_021c6d14(data->effect);
+    data->effect = FieldSaveanime_Create(0x8015, GSYS_GetField(gsys));
+    FieldSaveanime_Start(data->effect);
     return event;
 }
 
-u32 func_ov033_0217b32c(GameSystem *gsys) {
+u32 TrialHouse_GetRecordSlotsState(GameSystem *gsys) {
     TrialHouseSave *save;
 
     save = TrialHouseSave_Get(GameData_GetSaveControl(GSYS_GetGameData(gsys)));
@@ -396,7 +396,7 @@ u32 func_ov033_0217b32c(GameSystem *gsys) {
     return 0;
 }
 
-u8 func_ov033_0217b35c(TrialHouseSave *save, u32 index) {
+u8 TrialHouse_IsDeliveryIdReceived(TrialHouseSave *save, u32 index) {
     u8 byte;
     u8 bit;
 
@@ -408,7 +408,7 @@ u8 func_ov033_0217b35c(TrialHouseSave *save, u32 index) {
     return TRUE;
 }
 
-void func_ov033_0217b384(TrialHouseSave *save, u32 index) {
+void TrialHouse_MarkDeliveryIdReceived(TrialHouseSave *save, u32 index) {
     u8 byte;
     u8 bit;
 
@@ -419,7 +419,7 @@ void func_ov033_0217b384(TrialHouseSave *save, u32 index) {
     }
 }
 
-GameEventReturnCode func_ov033_0217b3ac(GameEvent *event, u32 *state, void *arg) {
+GameEventReturnCode TrialHouse_SaveTaskMain(GameEvent *event, u32 *state, void *arg) {
     TrialHouseEffectEvent *data;
     GameData *gameData;
     SaveControl *save;
@@ -445,8 +445,8 @@ GameEventReturnCode func_ov033_0217b3ac(GameEvent *event, u32 *state, void *arg)
         if (GameData_UpdateSaveBlock(gameData, 5) == 2) {
             freeIntermediateSaveExtraBlksAfterLoad2(save, 5);
             GFL_HeapFree(data->buffer);
-            func_ov036_021c6d3c(data->effect);
-            func_ov036_021c6cf8(data->effect);
+            FieldSaveanime_Stop(data->effect);
+            FieldSaveanime_Delete(data->effect);
             return GAMEEVENT_DONE;
         }
         break;

@@ -16,7 +16,7 @@
 // bsubway_scr.c and overlay 12 keep it, and script plugin 1 (overlay 50) drives it
 
 // A Pokémon of a Battle Subway Trainer, which genSubwayBtlInstitutePoke makes a party Pokémon of. The fields are
-// the PokeParty fields func_ov033_0217bf04 copies into it
+// the PokeParty fields BsubwayScr_PackBattleMon copies into it
 struct BSubwayPokemon {
     u16 species : 11;
     u16 form : 5;
@@ -196,47 +196,47 @@ GameEvent *EventBSubwayRecords_Create(GameSystem *gsys);
 GameEvent *EventBSubwayLeaderMsg_Create(GameSystem *gsys, u16 index, u16 actorId);
 
 // Overlay 33's bsubway_scr.c
-void func_ov033_0217b468(GameSystem *gsys);
-BSubwayScrWork *func_ov033_0217b478(GameSystem *gsys, u16 a1, u16 a2);
-void func_ov033_0217b664(GameSystem *gsys, BSubwayScrWork *bsw);
-void func_ov033_0217b6b4(BSubwayScrWork *bsw);
-void func_ov033_0217b708(BSubwayScrWork *bsw);
-void func_ov033_0217b790(BSubwayScrWork *bsw, GameSystem *gsys);
-void func_ov033_0217b7e8(BSubwayScrWork *bsw);
+void BsubwayScr_ClearWorkPtr(GameSystem *gsys);
+BSubwayScrWork *BsubwayScr_CreateWork(GameSystem *gsys, u16 a1, u16 a2);
+void BsubwayScr_DeleteWork(GameSystem *gsys, BSubwayScrWork *bsw);
+void BsubwayScr_ChangeCommMultiMode(BSubwayScrWork *bsw);
+void BsubwayScr_SaveRestPlayData(BSubwayScrWork *bsw);
+void BsubwayScr_LoadMembers(BSubwayScrWork *bsw, GameSystem *gsys);
+void BsubwayScr_SavePlayDataMembers(BSubwayScrWork *bsw);
 u16 func_ov033_0217b86c(GameSystem *gsys);
-void func_ov033_0217b8ac(GameSystem *gsys, BSubwayScrWork *bsw);
+void BsubwayScr_SetLoseScore(GameSystem *gsys, BSubwayScrWork *bsw);
 u16 func_ov033_0217b8ec(BSubwayScrWork *bsw);
-void func_ov033_0217b9dc(BSubwayScrWork *bsw);
-u16 func_ov033_0217ba94(BSubwayScrWork *bsw, GameSystem *gsys);
-BOOL func_ov033_0217bb20(BSubwayScrWork *bsw);
-void func_ov033_0217bb4c(BSubwayScrWork *bsw, GameSystem *gsys);
-void func_ov033_0217bb98(BSubwayScrWork *bsw, GameSystem *gsys);
-void func_ov033_0217bbac(BSubwayScrWork *bsw);
-u32 func_ov033_0217bca0(BSubwayScrWork *bsw, u16 a1);
-u16 func_ov033_0217bcb4(BSubwayScoreData *score, GameSystem *gsys, u32 a2);
-void func_ov033_0217bd34(BSubwayScrWork *bsw);
-PokeParty *func_ov033_0217bd60(BSubwayScrWork *bsw);
-BOOL func_ov033_0217bdf4(const u16 *list, u16 value, u16 count);
-u16 func_ov033_0217be1c(s32 value);
-u16 func_ov033_0217bd84(BSubwayScrWork *bsw);
-void func_ov033_0217bd8c(BSubwayScrWork *bsw);
-void func_ov033_0217bd88(BSubwayScrWork *bsw, u32 score);
-void func_ov033_0217be2c(BSubwayScrWork *bsw, SaveControl *save, u32 a2, u32 a3);
-void func_ov033_0217c010(BSubwayScrWork *bsw, SaveControl *save, u32 value);
-void func_ov033_0217bda0(BSubwayScrWork *bsw);
-void func_ov033_0217bda8(BSubwayScrWork *bsw, u32 count, u32 extra);
-u16 func_ov033_0217bdc0(u16 mode);
-void func_ov033_0217be88(BSubwayScrWork *bsw, u8 a1);
-void func_ov033_0217b9dc(BSubwayScrWork *bsw);
-void func_ov033_0217bf04(BSubwayPokemon *dest, PartyPkm *pkm);
-void *func_ov033_0217c110(BSubwayScrWork *bsw);
-BtlSetup *func_ov033_0217c094(BSubwayScrWork *bsw, GameSystem *gsys);
-BOOL func_ov033_0217c264(BSubwayScrWork *bsw, BSubwayTrainer *trainer, u16 trainerId, u32 count, const u16 *species,
-                         const u16 *items, BSubwayTeamConfig *config, HeapID heapId);
-u16 func_ov033_0217c11c(BSubwayScrWork *bsw, u16 level, u8 index, u32 mode, u8 side);
-u8 func_ov033_0217c288(u32 value);
-void func_ov033_0217c2c4(BSubwayScrWork *bsw, BSubwayTrainer *trainer, u16 trainerId, u32 count,
-                         const BSubwayTeamConfig *config, HeapID heapId);
+void BsubwayScr_DrawTrainerNos(BSubwayScrWork *bsw);
+u16 BsubwayScr_SetSelectedMembers(BSubwayScrWork *bsw, GameSystem *gsys);
+BOOL BsubwayScr_IsWinMax(BSubwayScrWork *bsw);
+void BsubwayScr_SetClearScore(BSubwayScrWork *bsw, GameSystem *gsys);
+void BsubwayScr_ClearStateBits(BSubwayScrWork *bsw, GameSystem *gsys);
+void BsubwayScr_CreateRoundTrainers(BSubwayScrWork *bsw);
+u32 BsubwayScr_GetTrainerObjCode(BSubwayScrWork *bsw, u16 a1);
+u16 BsubwayScr_UpdateStageRank(BSubwayScoreData *score, GameSystem *gsys, u32 a2);
+void BsubwayScr_LoadPartyCopy(BSubwayScrWork *bsw);
+PokeParty *BsubwayScr_GetParty(BSubwayScrWork *bsw);
+BOOL BsubwayScr_IsTrainerNoUsed(const u16 *list, u16 value, u16 count);
+u16 BsubwayScr_GetStageNo(s32 value);
+u16 BsubwayScr_GetWinCount(BSubwayScrWork *bsw);
+void BsubwayScr_IncWinCount(BSubwayScrWork *bsw);
+void BsubwayScr_SetWinCount(BSubwayScrWork *bsw, u32 score);
+void BsubwayScr_SaveRecordParty(BSubwayScrWork *bsw, SaveControl *save, u32 a2, u32 a3);
+void BsubwayScr_SaveMemberParty(BSubwayScrWork *bsw, SaveControl *save, u32 value);
+void BsubwayScr_ClearWinCount(BSubwayScrWork *bsw);
+void BsubwayScr_SetWinCountFromRound(BSubwayScrWork *bsw, u32 count, u32 extra);
+u16 BsubwayScr_GetMemberNum(u16 mode);
+void BsubwayScr_CreatePartners(BSubwayScrWork *bsw, u8 a1);
+void BsubwayScr_DrawTrainerNos(BSubwayScrWork *bsw);
+void BsubwayScr_PackBattleMon(BSubwayPokemon *dest, PartyPkm *pkm);
+void *BsubwayScr_GetNameinEncounterWork(BSubwayScrWork *bsw);
+BtlSetup *BsubwayScr_CreateBtlSetup(BSubwayScrWork *bsw, GameSystem *gsys);
+BOOL BsubwayScr_CreateTrainer(BSubwayScrWork *bsw, BSubwayTrainer *trainer, u16 trainerId, u32 count,
+                              const u16 *species, const u16 *items, BSubwayTeamConfig *config, HeapID heapId);
+u16 BsubwayScr_DrawTrainerNo(BSubwayScrWork *bsw, u16 level, u8 index, u32 mode, u8 side);
+u8 BsubwayScr_GetMonIv(u32 value);
+void BsubwayScr_CreatePartnerMons(BSubwayScrWork *bsw, BSubwayTrainer *trainer, u16 trainerId, u32 count,
+                                  const BSubwayTeamConfig *config, HeapID heapId);
 // Function name from swan
 u16 randFFFFFFFFdivFFFF(BSubwayScrWork *bsw);
 

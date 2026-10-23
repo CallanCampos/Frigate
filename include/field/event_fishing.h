@@ -35,8 +35,8 @@ struct FishingEventWork {
 GameEvent *EventFieldFishing_Create(Field *field, GameSystem *gsys);
 GameEventReturnCode EventFieldFishing_Callback(GameEvent *event, u32 *state, void *data);
 
-u32 func_ov033_021795a4(FishingEventWork *work, u32 value);
-u32 func_ov033_021795bc(FishingEventWork *work, u32 value);
+u32 Fishing_StepCounter(FishingEventWork *work, u32 value);
+u32 Fishing_WaitBite(FishingEventWork *work, u32 value);
 void func_ov033_021795e8(FishingEventWork *work);
 void func_ov033_02179614(FishingEventWork *work);
 void func_ov033_02179628(FishingEventWork *work);

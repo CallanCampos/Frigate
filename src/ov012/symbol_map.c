@@ -368,7 +368,7 @@ static BOOL SymbolMap_GetMapLevels(GameSystem *gsys, u32 *a, u32 *b) {
 
     GSYS_GetGameCommSystem(gsys);
     *a = SymbolSaveField_GetDeepestArea(npcData);
-    *b = func_ov012_02161260(npcData);
+    *b = SymbolSaveField_GetGroup(npcData);
     return TRUE;
 }
 
@@ -395,7 +395,7 @@ SymbolMapList *SymbolMap_CreatePokemonList(HeapID heapId, GameSystem *gsys, u32 
     *count = SymbolSaveField_GetAreaPokemon(npcData, list->pokemon, 20, season, &found);
     list->count = found;
     list->unk50_6 = SymbolSaveField_GetDeepestArea(npcData);
-    list->unk50_10 = func_ov012_02161260(npcData);
+    list->unk50_10 = SymbolSaveField_GetGroup(npcData);
     list->unk50_14 = 4;
     list->unk50_18 = season;
     return list;

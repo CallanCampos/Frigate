@@ -118,13 +118,13 @@ void UnityTower_IncrementCountryCount(UnityTowerSurveySave *save) {
     }
 }
 
-void func_02009d18(UnityTowerSurveySave *save, s32 value) {
+void UnityTower_SetRatingLevel(UnityTowerSurveySave *save, s32 value) {
     if (value < 5) {
         save->unk347 = value;
     }
 }
 
-u8 func_02009d28(UnityTowerSurveySave *save) {
+u8 UnityTower_GetRatingLevel(UnityTowerSurveySave *save) {
     return save->unk347;
 }
 

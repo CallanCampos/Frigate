@@ -16,11 +16,11 @@ typedef struct {
     int frame;
 } TradeSoundCue;
 
-static void func_ov194_021be878(int frame, PokemonTradeWork *wk);
+static void PoketradeNego_PlaySeByEvent(int frame, PokemonTradeWork *wk);
 static fx32 TradeMcssMove_Interpolate(fx32 start, fx32 end, TradeMcssMove *move, BOOL bounce);
 static void TradeMcssMove_FollowPath(TradeMcssMove *move, PokemonTradeWork *wk);
 
-void func_ov194_021be808(int frame) {
+void PoketradeNego_PlaySeByKeyA(int frame) {
     TradeSoundCue cues[] = {
         { SEQ_SE_W554_PAKIN, 1 },   { SEQ_SE_BOWA2, 4 },       { SEQ_SE_KON, 29 },         { SEQ_SE_KON, 45 },
         { SEQ_SE_KON, 56 },         { SEQ_SE_KON, 63 },        { SEQ_SE_TDEMO_001, 17 },   { SEQ_SE_TDEMO_002, 107 },
@@ -38,7 +38,7 @@ void func_ov194_021be808(int frame) {
     }
 }
 
-void func_ov194_021be840(int frame) {
+void PoketradeNego_PlaySeByKeyB(int frame) {
     TradeSoundCue cues[] = {
         { SEQ_SE_W554_PAKIN, 32 }, { SEQ_SE_BOWA2, 33 },      { SEQ_SE_KON, 38 },        { SEQ_SE_KON, 45 },
         { SEQ_SE_KON, 56 },        { SEQ_SE_KON, 64 },        { SEQ_SE_TDEMO_001, 30 },  { SEQ_SE_W028_02, 110 },
@@ -55,7 +55,7 @@ void func_ov194_021be840(int frame) {
     }
 }
 
-static void func_ov194_021be878(int frame, PokemonTradeWork *wk) {
+static void PoketradeNego_PlaySeByEvent(int frame, PokemonTradeWork *wk) {
     TradeSoundCue cues[] = {
         { SEQ_SE_DANSA, 1 },
         { SEQ_SE_SYS_83, 13 },
@@ -125,7 +125,7 @@ static void TradeMcssMove_FollowPath(TradeMcssMove *move, PokemonTradeWork *wk) 
     pos.y = offset->y + move->start.y;
     pos.z = offset->z + move->start.z;
     MCSS_SetPosition(move->mcss, &pos);
-    func_ov194_021be878(move->frame, wk);
+    PoketradeNego_PlaySeByEvent(move->frame, wk);
 }
 
 void TradeMcssMove_Update(TradeMcssMove *move, PokemonTradeWork *wk) {
@@ -154,7 +154,7 @@ void TradeMcssMove_Update(TradeMcssMove *move, PokemonTradeWork *wk) {
     }
 }
 
-void func_ov194_021beab4(PokemonTradeWork *wk) {
+void TradeMcssMove_StopAnimation(PokemonTradeWork *wk) {
     MCSS_PauseAnimation(wk->mcss[0]);
     wk->unk854 = 1;
 }

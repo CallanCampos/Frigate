@@ -46,7 +46,7 @@ FieldG3DMapper *FieldG3DMapper_Create(HeapID heapId, u16 season) {
     mapper->propSystem = FieldPropSystem_Create(mapper->heapId, mapper, season);
     mapper->wfbc = func_ov036_0218adac(heapId);
     mapper->resortMap = func_ov036_021c8954(heapId);
-    mapper->heightEx = func_ov036_021ba5d0(0x10, heapId);
+    mapper->heightEx = HeightEx_CreateTable(0x10, heapId);
     return mapper;
 }
 
@@ -157,7 +157,7 @@ void FieldG3DMapper_CallAllLoaderUpdate(FieldG3DMapper *mapper) {
         for (i = 0; i < mapper->chunkCapacity; i++) {
             FieldChunk_CallLoaderUpdate(mapper->chunkHandles[i].chunk);
         }
-        func_ov036_02185578(mapper);
+        FieldG3DMapper_StampFrame(mapper);
     }
 }
 
@@ -399,14 +399,14 @@ void FieldG3DMapper_GenLocators1(FieldG3DMapper *mapper, const VecFx32 *playerPo
     span = mapper->chunkSpan;
     halfSpan = FX_Div(mapper->chunkSpan, FX32_CONST(2));
     if (mapper->chunkLoadDiameterX % 2 == 0) {
-        startX = func_ov036_02184fb8(mapper->chunkLoadDiameterX, span, playerPos->x);
+        startX = FieldG3DMapper_GetWindowStartEven(mapper->chunkLoadDiameterX, span, playerPos->x);
     } else {
-        startX = func_ov036_02184ff4(mapper->chunkLoadDiameterX, span, playerPos->x);
+        startX = FieldG3DMapper_GetWindowStartOdd(mapper->chunkLoadDiameterX, span, playerPos->x);
     }
     if (mapper->chunkLoadDiameterZ % 2 == 0) {
-        startZ = func_ov036_02184fb8(mapper->chunkLoadDiameterZ, span, playerPos->z);
+        startZ = FieldG3DMapper_GetWindowStartEven(mapper->chunkLoadDiameterZ, span, playerPos->z);
     } else {
-        startZ = func_ov036_02184ff4(mapper->chunkLoadDiameterZ, span, playerPos->z);
+        startZ = FieldG3DMapper_GetWindowStartOdd(mapper->chunkLoadDiameterZ, span, playerPos->z);
     }
     for (z = 0; z < mapper->chunkLoadDiameterZ; z++) {
         s32 chunkZ = startZ + z;
@@ -556,7 +556,7 @@ BOOL FieldG3DMapper_UpdateChunkLoad(FieldG3DMapper *mapper, FieldChunkLocator *l
                 FieldChunkLocator_Disable(&mapper->chunkHandles[i].locator);
                 FieldChunk_SetActive(mapper->chunkHandles[i].chunk, FALSE);
                 FieldPropSystem_UnlinkChunk(mapper->propSystem, mapper->chunkHandles[i].chunk);
-                func_ov036_021853d4(&mapper->chunkHandles[i].context);
+                FieldG3DMapper_ReleaseGroundAnimeSlot(&mapper->chunkHandles[i].context);
                 FieldChunk_Disable(mapper->chunkHandles[i].chunk);
             }
         }
@@ -587,7 +587,7 @@ BOOL FieldG3DMapper_UpdateChunkLoad(FieldG3DMapper *mapper, FieldChunkLocator *l
     return result;
 }
 
-s32 func_ov036_02184fb8(u32 diameter, fx32 chunkSpan, fx32 pos) {
+s32 FieldG3DMapper_GetWindowStartEven(u32 diameter, fx32 chunkSpan, fx32 pos) {
     s32 start = -(diameter / 2 - 1);
     s32 chunk = pos / chunkSpan;
 
@@ -599,7 +599,7 @@ s32 func_ov036_02184fb8(u32 diameter, fx32 chunkSpan, fx32 pos) {
     return start;
 }
 
-s32 func_ov036_02184ff4(u32 diameter, fx32 chunkSpan, fx32 pos) {
+s32 FieldG3DMapper_GetWindowStartOdd(u32 diameter, fx32 chunkSpan, fx32 pos) {
     s32 start = -(diameter / 2);
 
     start += pos / chunkSpan;
@@ -681,7 +681,7 @@ BOOL FieldG3DMapper_GetTerrainAll(FieldG3DMapper *mapper, const VecFx32 *positio
         }
     }
     output->layerCount = count;
-    func_ov036_0218543c(mapper, position, output);
+    FieldG3DMapper_AppendHeightExHits(mapper, position, output);
     if (output->layerCount != 0) {
         return TRUE;
     }
@@ -761,11 +761,11 @@ BOOL FieldG3DMapper_IsPosOutOfBounds(FieldG3DMapper *mapper, const VecFx32 *posi
     return TRUE;
 }
 
-void func_ov036_021852d0(FieldG3DMapper *mapper, const VecFx32 *position) {
+void FieldG3DMapper_SetOriginOffset(FieldG3DMapper *mapper, const VecFx32 *position) {
     mapper->chunkBasePos = *position;
 }
 
-void func_ov036_021852e0(FieldG3DMapper *mapper, VecFx32 *out) {
+void FieldG3DMapper_GetOriginOffset(FieldG3DMapper *mapper, VecFx32 *out) {
     *out = mapper->chunkBasePos;
 }
 
@@ -840,7 +840,7 @@ void FieldChunkContext_FreeAnimator(FieldChunkContext *context) {
     }
 }
 
-void func_ov036_021853d4(FieldChunkContext *context) {
+void FieldG3DMapper_ReleaseGroundAnimeSlot(FieldChunkContext *context) {
     if (context->srtAnimatorState != NULL) {
         FieldTerrainSRTAnimatorChunkState_ClearUsedFlag(context->srtAnimatorState);
     }
@@ -886,11 +886,12 @@ void FieldChunkLocator_GetPos(FieldChunkLocator *locator, VecFx32 *position) {
 }
 
 // Adds the terrain layers of the map's height areas at the position
-void func_ov036_0218543c(const FieldG3DMapper *mapper, const VecFx32 *position, FieldG3DMapperTerrain *output) {
+void FieldG3DMapper_AppendHeightExHits(const FieldG3DMapper *mapper, const VecFx32 *position,
+                                       FieldG3DMapperTerrain *output) {
     VecFx16 normal = { 0, FX16_ONE, 0 };
     s32 added = 0;
     u32 count = output->layerCount;
-    s32 areaCount = func_ov036_021ba684(mapper->heightEx);
+    s32 areaCount = HeightEx_GetAreaCount(mapper->heightEx);
     s32 z;
     s32 x;
     s32 i;
@@ -899,7 +900,7 @@ void func_ov036_0218543c(const FieldG3DMapper *mapper, const VecFx32 *position, 
     z = position->z / FX32_CONST(16);
 
     for (i = 0; i < areaCount; i++) {
-        if (func_ov036_021ba688(x, z, mapper->heightEx, i)) {
+        if (HeightEx_IsPointInAreaAt(x, z, mapper->heightEx, i)) {
             s32 index;
             MapTerrainBuf *layer;
 
@@ -910,8 +911,8 @@ void func_ov036_0218543c(const FieldG3DMapper *mapper, const VecFx32 *position, 
             }
             layer = &output->layers[index];
             layer->normal = normal;
-            layer->tileType = func_ov036_021ba6b0(i, mapper->heightEx);
-            layer->height = func_ov036_021ba6a4(i, mapper->heightEx);
+            layer->tileType = HeightEx_GetAreaAttr(i, mapper->heightEx);
+            layer->height = HeightEx_GetAreaHeight(i, mapper->heightEx);
         }
     }
     output->layerCount += (u16)added;
@@ -941,7 +942,7 @@ void FieldG3DMapper_ResetDrawCalcState(FieldG3DMapper *mapper) {
     mapper->maxConcurrentDrawChunkByteSize = 0xf000 - ((vcount - 10) << 10);
 }
 
-void func_ov036_02185578(FieldG3DMapper *mapper) {
+void FieldG3DMapper_StampFrame(FieldG3DMapper *mapper) {
     mapper->loaderUpdateVBlank = OS_GetVBlankCount();
 }
 

@@ -223,7 +223,7 @@ void loadSayingForDisplay(WordSet *wordSet, u32 index, u16 saying) {
     GFL_WordSetCopyStrbuf(wordSet, index, wordSet->tmp, NULL);
 }
 
-void func_02024574(WordSet *wordSet, u32 index, u32 value) {
+void WordSet_SetSlotMarkerFlag(WordSet *wordSet, u32 index, u32 value) {
     int copy = value;
 
     PMSNumber_Validate(&copy, FALSE);

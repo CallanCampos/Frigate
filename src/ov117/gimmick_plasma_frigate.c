@@ -929,7 +929,7 @@ static BOOL GimmickPlasmaFrigate_FindLinkedModel(PlasmaFrigateWork *work, u16 mo
 
 static void GimmickPlasmaFrigate_ClearAreas(PlasmaFrigateWork *work) {
     HeightExList *list = func_ov036_02184590(Field_GetG3DMapper(work->field));
-    int count = func_ov036_021ba684(list);
+    int count = HeightEx_GetAreaCount(list);
     int i;
 
     for (i = 0; i < count; i++) {
@@ -956,8 +956,8 @@ static void GimmickPlasmaFrigate_SetPanelArea(PlasmaFrigateWork *work, int panel
                     first--;
                 }
                 func_ov036_021ba6bc(first, 0, list);
-                func_ov036_021ba624(first, sAreasOff[first].x, sAreasOff[first].z, sAreasOff[first].width,
-                                    sAreasOff[first].depth + 1, sAreaValues[0], AREA_FLAGS, list);
+                HeightEx_SetArea(first, sAreasOff[first].x, sAreasOff[first].z, sAreasOff[first].width,
+                                 sAreasOff[first].depth + 1, sAreaValues[0], AREA_FLAGS, list);
             }
             if (first == panel) {
                 return;
@@ -972,13 +972,13 @@ static void GimmickPlasmaFrigate_SetPanelArea(PlasmaFrigateWork *work, int panel
             if (GimmickPlasmaFrigate_FindLinkedModel(work, model, &linkedModel) == FALSE) {
                 first = panel - 1;
                 func_ov036_021ba6bc(first, 0, list);
-                func_ov036_021ba624(first, sAreasOff[first].x, sAreasOff[first].z, sAreasOff[first].width,
-                                    sAreasOff[first].depth, sAreaValues[0], AREA_FLAGS, list);
+                HeightEx_SetArea(first, sAreasOff[first].x, sAreasOff[first].z, sAreasOff[first].width,
+                                 sAreasOff[first].depth, sAreaValues[0], AREA_FLAGS, list);
             }
         }
     }
     func_ov036_021ba6bc(panel, 0, list);
-    func_ov036_021ba624(panel, area->x, area->z, area->width, area->depth, sAreaValues[mode], AREA_FLAGS, list);
+    HeightEx_SetArea(panel, area->x, area->z, area->width, area->depth, sAreaValues[mode], AREA_FLAGS, list);
 }
 
 static void GimmickPlasmaFrigate_SetSavedPanel(PlasmaFrigateState *state, u8 on, int panel) {

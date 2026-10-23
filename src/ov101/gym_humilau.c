@@ -516,7 +516,7 @@ static GameEventReturnCode GymHumilau_RideEventCallback(GameEvent *event, u32 *s
         GymHumilau_ClearAreas(work);
         GymHumilau_AddRideAreas(work, ev->ride);
         actor = FieldPlayer_GetActor(ev->player);
-        if (!FldAct_CheckAcmdEnd(actor) && func_ov036_0219a5dc(ev->player) == TRUE) {
+        if (!FldAct_CheckAcmdEnd(actor) && FieldPlayer_CheckMoveBusy(ev->player) == TRUE) {
             FldAct_FreeAcmd(actor);
         }
         *state = 1;
@@ -1150,7 +1150,7 @@ static int GymHumilau_GetStanding(HumilauGymWork *work, int x, int z) {
     int i;
 
     for (i = 0; i < work->areaCount; i++) {
-        if (func_ov036_021ba688(x, z, areas, i)) {
+        if (HeightEx_IsPointInAreaAt(x, z, areas, i)) {
             if (i / 2 == 0) {
                 onRidePlatform = TRUE;
             } else if (i / 2 == 1) {
@@ -1169,7 +1169,7 @@ static int GymHumilau_GetStanding(HumilauGymWork *work, int x, int z) {
 
 static void GymHumilau_ClearAreas(HumilauGymWork *work) {
     HeightExList *areas = func_ov036_02184590(Field_GetG3DMapper(work->field));
-    int count = func_ov036_021ba684(areas);
+    int count = HeightEx_GetAreaCount(areas);
     int i;
 
     for (i = 0; i < count; i++) {
@@ -1185,8 +1185,8 @@ static void GymHumilau_AddRideAreas(HumilauGymWork *work, u8 ride) {
     int x, z;
 
     GymHumilau_GetRidePlatformPos(ride, &x, &z);
-    func_ov036_021ba624(work->areaCount++, x, z - 1, 1, 3, PLATFORM_Y, 0x800000, areas);
-    func_ov036_021ba624(work->areaCount++, x - 1, z, 3, 1, PLATFORM_Y, 0x800000, areas);
+    HeightEx_SetArea(work->areaCount++, x, z - 1, 1, 3, PLATFORM_Y, 0x800000, areas);
+    HeightEx_SetArea(work->areaCount++, x - 1, z, 3, 1, PLATFORM_Y, 0x800000, areas);
 }
 
 static void GymHumilau_AddPlatformAreas(HumilauGymWork *work, u16 platform) {
@@ -1195,8 +1195,8 @@ static void GymHumilau_AddPlatformAreas(HumilauGymWork *work, u16 platform) {
     int x = FX_Whole(matrix->translation.x - FX32_CONST(8)) / 16;
     int z = FX_Whole(matrix->translation.z - FX32_CONST(8)) / 16;
 
-    func_ov036_021ba624(work->areaCount++, x, z - 1, 1, 3, PLATFORM_Y, 0x800000, areas);
-    func_ov036_021ba624(work->areaCount++, x - 1, z, 3, 1, PLATFORM_Y, 0x800000, areas);
+    HeightEx_SetArea(work->areaCount++, x, z - 1, 1, 3, PLATFORM_Y, 0x800000, areas);
+    HeightEx_SetArea(work->areaCount++, x - 1, z, 3, 1, PLATFORM_Y, 0x800000, areas);
 }
 
 static void GymHumilau_StartEffect(HumilauGymWork *work, u16 actor, u8 anmCount) {

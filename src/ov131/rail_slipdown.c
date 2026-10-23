@@ -110,7 +110,7 @@ static void RailSlipdown_Task(TCB *tcb, void *data) {
         u16 count;
         int i;
 
-        func_ov036_02195a58(work->actor, &dir);
+        RailActor_GetDrawOffset(work->actor, &dir);
         found = FALSE;
         dir.y = 0;
         VEC_Fx16Normalize(&dir, &dir);
@@ -133,7 +133,7 @@ static void RailSlipdown_Task(TCB *tcb, void *data) {
 
         // From two steps to the side, step across the rail and land on the last free tile before a blocked one
         railPos = work->railPos;
-        maxSide = func_ov036_021b0704(rail, &work->railPos);
+        maxSide = FieldRailSystem_GetLocationWidthGrid(rail, &work->railPos);
         if (!(GetTileFlags(FieldNoGridMapper_GetTileAtPos(work->mapper, &railPos)) & 1)) {
             found = TRUE;
         }
@@ -155,7 +155,7 @@ static void RailSlipdown_Task(TCB *tcb, void *data) {
             return;
         }
 
-        func_ov036_021b06ec(rail, &work->railPos, &work->end);
+        FieldRailSystem_GetLocationPos(rail, &work->railPos, &work->end);
         VEC_Subtract(&work->end, &work->start, &diff);
         dist = VEC_Mag(&diff);
         VEC_Normalize(&diff, &diff);
@@ -220,7 +220,7 @@ static void RailSlipdown_Task(TCB *tcb, void *data) {
                     work->start.z + FX_Mul(work->dir.z, dist));
             // Dust every other frame
             if (work->frame % 2 == 0) {
-                func_ov036_021a3e74(work->actor, work->effects);
+                FldeffKemuri_Start(work->actor, work->effects);
             }
         }
         if (work->player != NULL) {

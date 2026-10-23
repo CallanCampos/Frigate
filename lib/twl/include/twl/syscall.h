@@ -6,7 +6,7 @@
 // TwlSDK's system call library (libsyscall.twl, one object, syscall_twl.o) for the DSi's BIOS calls that the DS does
 // not have: the SHA-1 and HMAC-SHA-1 of the DSi's BIOS. The object has a half in ARM9 main, the wrappers below, and
 // another in the LTD autoload, the cores that they call (the BIOS calls themselves, and an HMAC built on them). A
-// wrapper ends the program if the console is not a DSi (func_0207acbc, which asks OS_IsRunOnTwl), and calls its core
+// wrapper ends the program if the console is not a DSi (OSi_IsRunOnTwl, which asks OS_IsRunOnTwl), and calls its core
 // otherwise. The functions
 // have the SDK's names, and the cores in the LTD autoload keep their default names
 

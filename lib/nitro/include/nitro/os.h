@@ -255,7 +255,7 @@ void OS_InitVAlarm(void);
 void OSi_InitVramExclusive(void);
 void OSi_UnlockVram(u16 bank, u16 lockId);
 // Takes the arguments that the last program left and keeps the ID of its sender, or drops both (os_application_jump.c)
-void func_0207c888(void);
+void OSi_InitPrevTitleId(void);
 
 // Whether an address is in the extended main memory (0x0d000000 to 0x0e000000 on a DSi, 0x02400000 to 0x02800000
 // otherwise) or in the video memory (the palettes, VRAM and OAM)
@@ -367,7 +367,7 @@ u32 OS_GetBootType(void); // swan's sys_get_boot_indicator
 #define OS_CONSOLE_DEV_MASK 0x03000000
 u32 OS_GetConsoleType(void);
 BOOL OS_IsRunOnEmulator(void);
-BOOL func_0207acbc(void);
+BOOL OSi_IsRunOnTwl(void);
 
 // NitroSDK's OS_WaitIrq, and TwlSDK's OS_IsRunOnTwl
 void OS_WaitIrq(BOOL clear, OSIrqMask interrupts); // swan's irq_waitFor

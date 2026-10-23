@@ -583,7 +583,7 @@ static void IrcBattleMatch_StateWaitJingle(IrcBattleMatch *work) {
 
 static void IrcBattleMatch_StateWaitResultSync(IrcBattleMatch *work) {
     if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), IRCMATCH_TIMING_RESULT, IRCMATCH_TIMING_GROUP)) {
-        func_02042e94(0);
+        GflNet_SetAutoExit(0);
         GFL_NetSetDisconnectError(0);
         work->counter = 0;
         IrcBattleMatch_SetState(work, IrcBattleMatch_StateWaitJingle);
@@ -859,7 +859,7 @@ static void IrcBattleMatch_StateWaitStart(IrcBattleMatch *work) {
 static void IrcBattleMatch_StateRegisterCommands(IrcBattleMatch *work) {
     NetCommand_AddTable(IRCMATCH_CMD_MODE, sIrcBattleMatchCommands, IRCMATCH_CMD_COUNT, work);
     NetHandle_SendTimingPair(NetHandle_GetOwn(), IRCMATCH_TIMING_COMMANDS, IRCMATCH_TIMING_GROUP);
-    func_02042e94(1);
+    GflNet_SetAutoExit(1);
     GFL_NetSetDisconnectError(1);
     IrcBattleMatch_SetState(work, IrcBattleMatch_StateWaitStart);
 }

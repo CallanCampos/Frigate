@@ -62,12 +62,12 @@ static void EventWarpSequenceOut_PlayTransition(WarpOutData *out, GameEvent *eve
 static void EventWarpSequenceIn_FadeInBGM(WarpInData *in);
 static void EventWarpSequenceIn_ChainBGMFadeIn(WarpInData *in, GameEvent *event);
 static void EventWarpSequenceIn_PlayTransition(WarpInData *in, GameEvent *event);
-static void func_ov036_021b7a20(WarpInData *in);
+static void EventWarpSequenceIn_ShowPlaceName(WarpInData *in);
 
 GameEvent *EventWarpSequence_CreateOut(WarpSequence *warp) {
     const GameEventCallback callbacks[] = {
-        func_ov036_021b73b4, func_ov036_021b73f8, func_ov036_021b74c8,
-        func_ov036_021b7538, func_ov036_021b7570, func_ov036_021b7604,
+        EventWarpSequenceOut_RunPlain,  EventWarpSequenceOut_RunGroundAnime, func_ov036_021b74c8,
+        EventWarpSequenceOut_RunAppear, EventWarpSequenceOut_RunCamera,      func_ov036_021b7604,
     };
     int index;
     GameEvent *event;
@@ -106,7 +106,7 @@ GameEvent *EventWarpSequence_CreateOut(WarpSequence *warp) {
     return event;
 }
 
-GameEventReturnCode func_ov036_021b73b4(GameEvent *event, u32 *state, void *work) {
+GameEventReturnCode EventWarpSequenceOut_RunPlain(GameEvent *event, u32 *state, void *work) {
     WarpOutData *out = work;
     WarpSequence *warp = out->warp;
 
@@ -125,13 +125,13 @@ GameEventReturnCode func_ov036_021b73b4(GameEvent *event, u32 *state, void *work
     return GAMEEVENT_CONTINUE;
 }
 
-GameEventReturnCode func_ov036_021b73f8(GameEvent *event, u32 *state, void *work) {
+GameEventReturnCode EventWarpSequenceOut_RunGroundAnime(GameEvent *event, u32 *state, void *work) {
     WarpOutData *out = work;
     WarpSequence *warp = out->warp;
 
     switch (*state) {
     case 0:
-        GameEvent_ChainNext(event, func_ov036_0219f4e0(warp));
+        GameEvent_ChainNext(event, EntranceEffect_CreateB(warp));
         (*state)++;
         break;
     case 1:
@@ -212,14 +212,14 @@ GameEventReturnCode func_ov036_021b74c8(GameEvent *event, u32 *state, void *work
     return GAMEEVENT_CONTINUE;
 }
 
-GameEventReturnCode func_ov036_021b7538(GameEvent *event, u32 *state, void *work) {
+GameEventReturnCode EventWarpSequenceOut_RunAppear(GameEvent *event, u32 *state, void *work) {
     WarpOutData *out = work;
     GameSystem *gsys = out->warp->gsys;
     Field *field = out->warp->field;
 
     switch (*state) {
     case 0:
-        GameEvent_ChainNext(event, func_ov036_021b9df8(NULL, gsys, field));
+        GameEvent_ChainNext(event, EventDig_CreateRisingSpin(NULL, gsys, field));
         (*state)++;
         break;
     case 1:
@@ -228,7 +228,7 @@ GameEventReturnCode func_ov036_021b7538(GameEvent *event, u32 *state, void *work
     return GAMEEVENT_CONTINUE;
 }
 
-GameEventReturnCode func_ov036_021b7570(GameEvent *event, u32 *state, void *work) {
+GameEventReturnCode EventWarpSequenceOut_RunCamera(GameEvent *event, u32 *state, void *work) {
     WarpOutData *out = work;
     WarpSequence *warp = out->warp;
     FieldCamera *camera = Field_GetCameraSystem(warp->field);
@@ -254,7 +254,7 @@ GameEventReturnCode func_ov036_021b7570(GameEvent *event, u32 *state, void *work
         }
         break;
     case 2:
-        GameEvent_ChainNext(event, func_ov036_0219f4e0(warp));
+        GameEvent_ChainNext(event, EntranceEffect_CreateB(warp));
         *state = 3;
         return GAMEEVENT_CONTINUE_DIRECT;
     case 3:
@@ -341,8 +341,8 @@ static void EventWarpSequenceOut_PlayTransition(WarpOutData *out, GameEvent *eve
 
 GameEvent *EventWarpSequence_CreateIn(WarpSequence *warp) {
     const GameEventCallback callbacks[] = {
-        func_ov036_021b77d0, func_ov036_021b7810, func_ov036_021b7848, EventWarpSequence_CallbackSpinDown,
-        func_ov036_021b78fc, func_ov036_021b793c,
+        EventWarpSequenceIn_RunPlain,       EventWarpSequenceIn_RunGroundAnime, EventWarpSequenceIn_RunObjectAnime,
+        EventWarpSequence_CallbackSpinDown, EventWarpSequenceIn_RunCamera,      EventWarpSequenceIn_RunFadeSe,
     };
     int index;
     GameEvent *event;
@@ -385,7 +385,7 @@ GameEvent *EventWarpSequence_CreateIn(WarpSequence *warp) {
     return event;
 }
 
-GameEventReturnCode func_ov036_021b77d0(GameEvent *event, u32 *state, void *work) {
+GameEventReturnCode EventWarpSequenceIn_RunPlain(GameEvent *event, u32 *state, void *work) {
     WarpInData *in = work;
     WarpSequence *warp = in->warp;
 
@@ -398,29 +398,29 @@ GameEventReturnCode func_ov036_021b77d0(GameEvent *event, u32 *state, void *work
         (*state)++;
         break;
     case 1:
-        func_ov036_021b7a20(in);
+        EventWarpSequenceIn_ShowPlaceName(in);
         return GAMEEVENT_DONE;
     }
     return GAMEEVENT_CONTINUE;
 }
 
-GameEventReturnCode func_ov036_021b7810(GameEvent *event, u32 *state, void *work) {
+GameEventReturnCode EventWarpSequenceIn_RunGroundAnime(GameEvent *event, u32 *state, void *work) {
     WarpInData *in = work;
     WarpSequence *warp = in->warp;
 
     switch (*state) {
     case 0:
-        GameEvent_ChainNext(event, func_ov036_0219f190(warp));
+        GameEvent_ChainNext(event, EntranceEffect_CreateA(warp));
         (*state)++;
         break;
     case 1:
-        func_ov036_021b7a20(in);
+        EventWarpSequenceIn_ShowPlaceName(in);
         return GAMEEVENT_DONE;
     }
     return GAMEEVENT_CONTINUE;
 }
 
-GameEventReturnCode func_ov036_021b7848(GameEvent *event, u32 *state, void *work) {
+GameEventReturnCode EventWarpSequenceIn_RunObjectAnime(GameEvent *event, u32 *state, void *work) {
     WarpInData *in = work;
     WarpSequence *warp = in->warp;
     GameSystem *gsys = warp->gsys;
@@ -444,7 +444,7 @@ GameEventReturnCode func_ov036_021b7848(GameEvent *event, u32 *state, void *work
         (*state)++;
         break;
     case 3:
-        func_ov036_021b7a20(in);
+        EventWarpSequenceIn_ShowPlaceName(in);
         return GAMEEVENT_DONE;
     }
     return GAMEEVENT_CONTINUE;
@@ -461,30 +461,30 @@ GameEventReturnCode EventWarpSequence_CallbackSpinDown(GameEvent *event, u32 *st
         (*state)++;
         break;
     case 1:
-        func_ov036_021b7a20(in);
+        EventWarpSequenceIn_ShowPlaceName(in);
         return GAMEEVENT_DONE;
     }
     return GAMEEVENT_CONTINUE;
 }
 
-GameEventReturnCode func_ov036_021b78fc(GameEvent *event, u32 *state, void *work) {
+GameEventReturnCode EventWarpSequenceIn_RunCamera(GameEvent *event, u32 *state, void *work) {
     WarpInData *in = work;
     WarpSequence *warp = in->warp;
 
     Field_GetCameraSystem(warp->field);
     switch (*state) {
     case 0:
-        GameEvent_ChainNext(event, func_ov036_0219f190(warp));
+        GameEvent_ChainNext(event, EntranceEffect_CreateA(warp));
         (*state)++;
         break;
     case 1:
-        func_ov036_021b7a20(in);
+        EventWarpSequenceIn_ShowPlaceName(in);
         return GAMEEVENT_DONE;
     }
     return GAMEEVENT_CONTINUE;
 }
 
-GameEventReturnCode func_ov036_021b793c(GameEvent *event, u32 *state, void *work) {
+GameEventReturnCode EventWarpSequenceIn_RunFadeSe(GameEvent *event, u32 *state, void *work) {
     WarpInData *in = work;
     WarpSequence *warp = in->warp;
     GameSystem *gsys = warp->gsys;
@@ -502,7 +502,7 @@ GameEventReturnCode func_ov036_021b793c(GameEvent *event, u32 *state, void *work
         (*state)++;
         break;
     case 2:
-        func_ov036_021b7a20(in);
+        EventWarpSequenceIn_ShowPlaceName(in);
         return GAMEEVENT_DONE;
     }
     return GAMEEVENT_CONTINUE;
@@ -535,10 +535,10 @@ static void EventWarpSequenceIn_PlayTransition(WarpInData *in, GameEvent *event)
     }
 }
 
-static void func_ov036_021b7a20(WarpInData *in) {
+static void EventWarpSequenceIn_ShowPlaceName(WarpInData *in) {
     WarpSequence *warp = in->warp;
 
-    func_ov036_021b50c8(Field_GetPlaceName(warp->field), (s16)warp->spawn.zoneId);
+    PlaceName_OnZoneChange(Field_GetPlaceName(warp->field), (s16)warp->spawn.zoneId);
 }
 
 EntranceCamera *EntranceCamera_Create(Field *field) {
@@ -558,7 +558,7 @@ void EntranceCamera_Destroy(EntranceCamera *camera) {
 void EntranceCamera_Configure(EntranceCamera *camera, const EntranceCameraParam *param) {
     EntranceCamera_SetParam(camera, param);
     FieldCameraAnimationController_SetAnimation(camera->controller, &camera->animation);
-    if (func_ov036_021b7f40(camera)) {
+    if (EntranceCamera_HasRecord(camera)) {
         switch (param->isArrival) {
         case FALSE:
             EntranceCamera_ConfigureFileDeparture(camera);
@@ -581,7 +581,7 @@ void EntranceCamera_Configure(EntranceCamera *camera, const EntranceCameraParam 
 }
 
 void EntranceCamera_StartAnimation(EntranceCamera *camera) {
-    if (func_ov036_021b7f64(camera)) {
+    if (EntranceCamera_IsPhaseActive(camera)) {
         FieldCameraAnimationController_StartAnimation(camera->controller);
     }
 }
@@ -590,8 +590,8 @@ void EntranceCamera_FinishCamera(EntranceCamera *camera) {
     FieldCameraAnimationController_FinishCamera(camera->controller);
 }
 
-BOOL func_ov036_021b7ae0(EntranceCamera *camera) {
-    return func_ov036_021b7f64(camera);
+BOOL EntranceCamera_IsActive(EntranceCamera *camera) {
+    return EntranceCamera_IsPhaseActive(camera);
 }
 
 BOOL EntranceCamera_HasZeroFrames(EntranceCamera *camera) {
@@ -652,8 +652,8 @@ void EntranceCamera_ConfigureDefaultDeparture(EntranceCamera *camera) {
     if (camera->hasDepartureAnimation) {
         animation->unk4C = FALSE;
         animation->unk48 = FALSE;
-        if (func_ov036_021b7f50(camera)) {
-            func_ov036_0219f178(camera->field, &pos);
+        if (EntranceCamera_AimsAtEntrance(camera)) {
+            EntranceEffect_GetEntryPos(camera->field, &pos);
         } else {
             FieldPlayer_GetWPos(player, &pos);
         }
@@ -721,8 +721,8 @@ void EntranceCamera_ConfigureDefaultArrival(EntranceCamera *camera) {
     if (camera->hasArrivalAnimation) {
         animation->unk4C = FALSE;
         animation->unk48 = FALSE;
-        if (func_ov036_021b7f50(camera)) {
-            func_ov036_0219f178(camera->field, &pos);
+        if (EntranceCamera_AimsAtEntrance(camera)) {
+            EntranceEffect_GetEntryPos(camera->field, &pos);
         } else {
             FieldPlayer_GetWPos(player, &pos);
         }
@@ -740,7 +740,7 @@ void EntranceCamera_ConfigureDefaultArrival(EntranceCamera *camera) {
             animation->frames = 10;
             break;
         }
-        if (func_ov036_021b7f50(camera)) {
+        if (EntranceCamera_AimsAtEntrance(camera)) {
             FieldCamera_ChangeRefPos(fieldCamera, &pos);
         }
         FieldCameraAnimationController_PrepareCamera(camera->controller);
@@ -781,8 +781,8 @@ void EntranceCamera_ConfigureFileDeparture(EntranceCamera *camera) {
     camera->hasDepartureAnimation = file.hasDepartureAnimation;
     camera->hasArrivalAnimation = file.hasArrivalAnimation;
     if (camera->hasDepartureAnimation) {
-        if (func_ov036_021b7f50(camera)) {
-            func_ov036_0219f178(camera->field, &pos);
+        if (EntranceCamera_AimsAtEntrance(camera)) {
+            EntranceEffect_GetEntryPos(camera->field, &pos);
         } else {
             FieldPlayer_GetWPos(player, &pos);
         }
@@ -819,12 +819,12 @@ void EntranceCamera_ConfigureFileArrival(EntranceCamera *camera) {
     camera->hasDepartureAnimation = file.hasDepartureAnimation;
     camera->hasArrivalAnimation = file.hasArrivalAnimation;
     if (camera->hasArrivalAnimation) {
-        if (func_ov036_021b7f50(camera)) {
-            func_ov036_0219f178(camera->field, &pos);
+        if (EntranceCamera_AimsAtEntrance(camera)) {
+            EntranceEffect_GetEntryPos(camera->field, &pos);
         } else {
             FieldPlayer_GetWPos(player, &pos);
         }
-        if (animation->unk48 && func_ov036_021b7f50(camera)) {
+        if (animation->unk48 && EntranceCamera_AimsAtEntrance(camera)) {
             FieldCamera_ChangeRefPos(fieldCamera, &pos);
         }
         FieldCameraAnimationController_PrepareCamera(camera->controller);
@@ -873,18 +873,18 @@ u32 EntranceCamera_GetTransitionType(EntranceCamera *camera) {
     return EntranceCamera_GetParam(camera)->transitionType;
 }
 
-BOOL func_ov036_021b7f40(EntranceCamera *camera) {
-    return func_ov012_0215cd98(EntranceCamera_GetParam(camera)->transitionType);
+BOOL EntranceCamera_HasRecord(EntranceCamera *camera) {
+    return CityState_IsSlotIndexOutOfRange(EntranceCamera_GetParam(camera)->transitionType);
 }
 
-BOOL func_ov036_021b7f50(EntranceCamera *camera) {
+BOOL EntranceCamera_AimsAtEntrance(EntranceCamera *camera) {
     if (EntranceCamera_GetParam(camera)->isDeparture == 0) {
         return TRUE;
     }
     return FALSE;
 }
 
-BOOL func_ov036_021b7f64(EntranceCamera *camera) {
+BOOL EntranceCamera_IsPhaseActive(EntranceCamera *camera) {
     if (EntranceCamera_GetParam(camera)->isArrival == 0) {
         return camera->hasDepartureAnimation;
     }

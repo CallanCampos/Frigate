@@ -752,12 +752,12 @@ static void Guru2Receipt_FreeWindows(Guru2ReceiptWork *wk) {
 
 static int Guru2ReceiptSeq_Init(Guru2ReceiptWork *wk, int procSeq) {
     if (NetSystem_GetNetId() == 0) {
-        func_02042e94(FALSE);
+        GflNet_SetAutoExit(FALSE);
         if (UnionApp_CountJoined(Guru2Receipt_GetUnionApp(wk)) >= 2) {
             Guru2Receipt_PrintMessage(wk, BtlPokeparam_Text_WhenGroupReadyButton, 0);
         }
     } else {
-        func_02042e94(TRUE);
+        GflNet_SetAutoExit(TRUE);
         Guru2Receipt_PrintMessage(wk, BtlPokeparam_Text_PleaseWaitBButton, 0);
     }
     Guru2Receipt_SetMsgWait(wk, GURU2_RECEIPT_SEQ_MAIN);
@@ -1089,7 +1089,7 @@ static int Guru2ReceiptSeq_ParentCancelSync(Guru2ReceiptWork *wk, int procSeq) {
 static int Guru2ReceiptSeq_ParentCancelSyncWait(Guru2ReceiptWork *wk, int procSeq) {
     if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), 0xcf, 40) ||
         wk->syncBits != (Guru2Receipt_GetJoined(wk) ^ wk->unk480C)) {
-        func_02042e94(FALSE);
+        GflNet_SetAutoExit(FALSE);
         GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, WIPE_COLOR_BLACK, 16, 1, HEAPID_GURU2);
         procSeq = GURU2_RECEIPT_PROC_FADE_OUT;
     }

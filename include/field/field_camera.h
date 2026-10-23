@@ -266,8 +266,8 @@ FieldTask *FieldCameraShakeTask_Create(Field *field, const FieldCameraShakeSetup
 FieldCamera *FieldCamera_Create(u32 cameraIndex, u32 a1, G3DCamera *g3dCamera, const VecFx32 *target, HeapID heapId);
 void FieldCamera_Free(FieldCamera *camera);
 // The camera's pitch
-u16 *func_ov036_021863c4(FieldCamera *camera);
-u16 *func_ov036_021863d8(FieldCamera *camera);
+u16 *FieldCamera_GetViewPitchPtr(FieldCamera *camera);
+u16 *FieldCamera_GetViewYawPtr(FieldCamera *camera);
 void FieldCameraBoundary_LoadDummy(FieldCamera *camera);
 void FieldCameraBoundary_ChangeID(FieldCamera *camera, u16 boundaryId, HeapID heapId);
 

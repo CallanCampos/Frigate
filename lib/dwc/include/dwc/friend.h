@@ -152,8 +152,8 @@ int DWCi_GetFriendListIndex(int profileId);
 void DWCi_InitGPProcessCount(void);
 int DWCi_SetGPStatus(int status, const char *statusString, const char *locationString);
 void DWCi_ShutdownFriend(void);
-void func_ov011_0215f2c0(void);
-void func_ov011_0215f2cc(void);
+void DWCi_BeginCloseStatsConnection(void);
+void DWCi_EndCloseStatsConnection(void);
 
 // The login: starting it with its memory, starting the login to the authentication server, running it for a frame, the
 // user data, ending it with an error, and ending it

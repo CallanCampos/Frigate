@@ -30,6 +30,6 @@ PartyPkm *WorldTradeData_GetPkmPtr(WorldTradeData *data);
 void WorldTradeData_SetPkm(WorldTradeData *data, PartyPkm *pkm, u32 box);
 void WorldTradeData_SetDepositTradeDate(WorldTradeData *data, u32 value);
 void WorldTradeData_SetExchangeDate(WorldTradeData *data, u32 value);
-u16 func_0200b4fc(WorldTradeData *data);
+u16 WorldTradeData_GetReturnBox(WorldTradeData *data);
 
 #endif // POKEBW2_SAVE_WORLDTRADE_DATA_H

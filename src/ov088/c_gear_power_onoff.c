@@ -208,11 +208,11 @@ static void CGearPowerOnOff_Init(CGearPowerOnOff *work, HeapID heapId) {
     CGearPowerOnOff_CreateMenuRes(work, heapId);
     CGearPowerOnOff_CreateWindows(work, heapId);
     GFL_NetSetIconScreen(FALSE, heapId);
-    func_ov036_02198884(work->subscreen, heapId);
+    FieldSubscreen_LoadBackdrop(work->subscreen, heapId);
 }
 
 static void CGearPowerOnOff_Exit(CGearPowerOnOff *work) {
-    func_ov036_021984f0(work->subscreen, work->heapId);
+    FieldSubscreen_ResumeField(work->subscreen, work->heapId);
     CGearPowerOnOff_FreeWindows(work);
     CGearPowerOnOff_FreeMenuRes(work);
     CGearPowerOnOff_ExitBG(work);

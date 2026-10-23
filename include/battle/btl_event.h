@@ -62,7 +62,7 @@ typedef struct {
 
 void BattleEvent_Init(void);
 void BattleEvent_ClearTurnPause(void);
-void func_ov167_021bc718(void);
+void BattleEvent_DebugPrintFactorList(void);
 BattleEventItem *BattleEvent_AddItem(u32 factorType, u16 subId, u32 priority, u32 subPriority, u8 monId,
                                      const BattleEventHandlerEntry *handlers, u16 numHandlers);
 void BattleEvent_RemoveIsolatedItems(void);

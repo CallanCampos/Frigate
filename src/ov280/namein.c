@@ -2743,7 +2743,7 @@ static void NameEntryTalk_Start(NameEntryTalk *talk, NameEntryMessage *message, 
     WordSet *wordSet = GFL_WordSetSystemCreateDefault(heapId);
     StrBuf *name;
 
-    if (func_ov012_02165b0c(param)) {
+    if (NameEntryParam_IsCanceled(param)) {
         loadPokemonNicknameToStrbuf(wordSet, 0, param->pkm);
     } else {
         name = GFL_StrBufClone(param->name, heapId);

@@ -378,7 +378,7 @@ BOOL ResortShopCmd_Open(VM *vm, FieldScriptEnv *env) {
     ResortShop *shop = GFL_HeapAllocate(HEAPID_GAMEEVENT, sizeof(ResortShop), TRUE, "scrcmd_resort_shop.c", 375);
 
     *ptr = shop;
-    shop->work.font = func_ov036_0218799c(msgBGSys);
+    shop->work.font = MsgBGPrinter_GetFont(msgBGSys);
     shop->work.trainerCard = getTrainerCardDataBlkAddress(gameData);
     shop->work.heapId = HEAPID_FIELDMAP;
     shop->work.bag = GameData_GetBag(gameData);

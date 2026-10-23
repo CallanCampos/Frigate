@@ -46,7 +46,7 @@ typedef struct {
 static void Hide_LoadObjects(FieldEffectHide *effect);
 static void Hide_FreeObjects(FieldEffectHide *effect);
 static void HideTask_Init(FieldEffectTask *task, void *work);
-static void func_ov036_021c6860(FieldEffectTask *task, void *work);
+static void HideTask_Exit(FieldEffectTask *task, void *work);
 static void HideTask_UpdatePosition(FieldEffectTask *task, void *work);
 static void HideTask_Draw(FieldEffectTask *task, void *work);
 
@@ -55,7 +55,7 @@ static const u32 HIDE_SE_IDS[HIDE_KIND_COUNT] = { SEQ_SE_TB_START, SEQ_SE_FLD_14
 static const HideResIds HIDE_RES_IDS[HIDE_KIND_COUNT] = { { 0x5e, 0x6d }, { 0x5d, 0x6c }, { 0x62, 0x86 } };
 
 static const FieldEffectTaskVTable HIDE_TASK_VTABLE = {
-    sizeof(HideTask), HideTask_Init, func_ov036_021c6860, HideTask_UpdatePosition, HideTask_Draw,
+    sizeof(HideTask), HideTask_Init, HideTask_Exit, HideTask_UpdatePosition, HideTask_Draw,
 };
 
 void *func_ov036_021c66e8(FieldEffects *effects, HeapID heapId) {
@@ -76,7 +76,7 @@ static void Hide_LoadObjects(FieldEffectHide *effect) {
     int i = 0;
     const HideResIds *ids = HIDE_RES_IDS;
     ArcTool *arc = FieldEffects_GetArc(effect->effects);
-    FieldG3DObjSystem *objSys = func_ov036_021a3724(effect->effects);
+    FieldG3DObjSystem *objSys = FieldEffects_GetFieldMapData(effect->effects);
 
     for (; i < HIDE_KIND_COUNT; i++, ids++) {
         FieldG3DObjResRequest_Clear(&request);
@@ -85,13 +85,13 @@ static void Hide_LoadObjects(FieldEffectHide *effect) {
         FieldG3DObjResRequest_AddAnm(&request, ids->anmId);
         effect->resGroup[i] = FieldG3DObjSystem_AddResGroup(objSys, &request, FALSE);
         effect->objIdx[i] = FieldG3DObjSystem_AddObj(objSys, effect->resGroup[i], 0, NULL);
-        func_ov036_021c02b4(objSys, effect->objIdx[i], TRUE);
+        FieldG3DObjSystem_SetObjectManualDraw(objSys, effect->objIdx[i], TRUE);
     }
 }
 
 static void Hide_FreeObjects(FieldEffectHide *effect) {
     int i = 0;
-    FieldG3DObjSystem *objSys = func_ov036_021a3724(effect->effects);
+    FieldG3DObjSystem *objSys = FieldEffects_GetFieldMapData(effect->effects);
 
     for (; i < HIDE_KIND_COUNT; i++) {
         FieldG3DObjSystem_FreeObj(objSys, effect->objIdx[i]);
@@ -100,20 +100,20 @@ static void Hide_FreeObjects(FieldEffectHide *effect) {
 }
 
 // A hiding object of the given kind for the actor
-FieldEffectTask *func_ov036_021c67c8(FieldEffects *effects, FieldActor *actor, u32 kind) {
+FieldEffectTask *HideTask_Start(FieldEffects *effects, FieldActor *actor, u32 kind) {
     HideTaskParams params;
 
     params.effect = FieldEffects_GetHandleData(effects, 14);
-    params.objSys = func_ov036_021a3724(effects);
+    params.objSys = FieldEffects_GetFieldMapData(effects);
     params.actor = actor;
     params.kind = kind;
     return FieldEffects_TCBCreate(effects, &HIDE_TASK_VTABLE, NULL, 0, &params, 0);
 }
 
 // Starts the object's animation and its sound
-void func_ov036_021c6800(FieldEffectTask *task) {
+void HideTask_RequestEnd(FieldEffectTask *task) {
     if (task != NULL) {
-        HideTask *hideTask = func_ov036_021a3afc(task);
+        HideTask *hideTask = FieldEffects_GetObjectWork(task);
 
         hideTask->soundPlayed = TRUE;
         GFL_SndSEPlay(HIDE_SE_IDS[hideTask->params.kind]);
@@ -121,9 +121,9 @@ void func_ov036_021c6800(FieldEffectTask *task) {
 }
 
 // Whether the object's animation has ended
-u16 func_ov036_021c6820(FieldEffectTask *task) {
+u16 HideTask_IsFinished(FieldEffectTask *task) {
     if (task != NULL) {
-        HideTask *hideTask = func_ov036_021a3afc(task);
+        HideTask *hideTask = FieldEffects_GetObjectWork(task);
 
         return hideTask->animDone;
     }
@@ -132,18 +132,18 @@ u16 func_ov036_021c6820(FieldEffectTask *task) {
 
 static void HideTask_Init(FieldEffectTask *task, void *work) {
     HideTask *hideTask = work;
-    HideTaskParams *params = func_ov036_021a3ac8(task);
+    HideTaskParams *params = FieldEffects_GetObjectParam(task);
 
     hideTask->params = *params;
     FldAct_GetIdentity(hideTask->params.actor, &hideTask->identity);
     hideTask->objIdx = hideTask->params.effect->objIdx[hideTask->params.kind];
 }
 
-static void func_ov036_021c6860(FieldEffectTask *task, void *work) {
+static void HideTask_Exit(FieldEffectTask *task, void *work) {
     HideTask *hideTask = work;
 
     if (FldAct_CheckIdentity(hideTask->params.actor, &hideTask->identity) == TRUE) {
-        func_ov036_02193110(hideTask->params.actor, NULL);
+        FldmmdlMove_SetHideEffect(hideTask->params.actor, NULL);
     }
 }
 
@@ -153,14 +153,14 @@ static void HideTask_UpdatePosition(FieldEffectTask *task, void *work) {
     fx32 height;
 
     if (FldAct_CheckIdentity(hideTask->params.actor, &hideTask->identity) == FALSE) {
-        func_ov036_021a3a70(task);
+        FieldEffects_DeleteObject(task);
         return;
     }
     CopyActorWPos(hideTask->params.actor, &pos);
     if (GetHeightFromMap(hideTask->params.actor, &pos, &height) == TRUE) {
         pos.y = height;
     }
-    func_ov036_021a3ae8(task, &pos);
+    FieldEffects_SetObjectPos(task, &pos);
 }
 
 static void HideTask_Draw(FieldEffectTask *task, void *work) {
@@ -176,7 +176,7 @@ static void HideTask_Draw(FieldEffectTask *task, void *work) {
     } else {
         FieldG3DObjSystem_SetAnmFrame(hideTask->params.objSys, hideTask->objIdx, 0, hideTask->anmFrame);
     }
-    func_ov036_021a3ad4(task, &pos);
+    FieldEffects_GetObjectPos(task, &pos);
     FieldG3DObjSystem_SetObjPosition(hideTask->params.objSys, hideTask->objIdx, &pos);
     FieldG3DObjSystem_DrawObj(hideTask->params.objSys, hideTask->objIdx);
 }

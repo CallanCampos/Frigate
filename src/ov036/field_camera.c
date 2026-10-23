@@ -607,7 +607,7 @@ void FieldCamera_CoordsSetPitch(FieldCamera *camera, u16 pitch) {
     camera->pitch = pitch;
 }
 
-u16 *func_ov036_021863c4(FieldCamera *camera) {
+u16 *FieldCamera_GetViewPitchPtr(FieldCamera *camera) {
     return &camera->anglePitch;
 }
 
@@ -619,7 +619,7 @@ void FieldCamera_CoordsSetYaw(FieldCamera *camera, u16 yaw) {
     camera->yaw = yaw;
 }
 
-u16 *func_ov036_021863d8(FieldCamera *camera) {
+u16 *FieldCamera_GetViewYawPtr(FieldCamera *camera) {
     return &camera->angleYaw;
 }
 

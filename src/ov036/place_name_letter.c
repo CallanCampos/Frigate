@@ -221,7 +221,7 @@ static void func_ov036_021b692c(PlaceNameLetter *letter, s32 state) {
     }
 }
 
-BOOL func_ov036_021b6940(PlaceNameLetter *letter) {
+BOOL PlaceName_GetMessageLength(PlaceNameLetter *letter) {
     if (letter->changed == 0) {
         return TRUE;
     }

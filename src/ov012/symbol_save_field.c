@@ -12,7 +12,7 @@ static u16 SymbolSaveField_CopyUpperRowAreaPokemon(AreaNPCSave *npcData, EntreeF
 static u16 SymbolSaveField_CopyLowerAreaPokemon(AreaNPCSave *npcData, EntreeForestPokemon *dest, int max, int area,
                                                 u8 *count);
 
-u32 func_ov012_02161260(AreaNPCSave *npcData) {
+u32 SymbolSaveField_GetGroup(AreaNPCSave *npcData) {
     u8 value;
 
     SymbolSave_Decrypt(npcData);

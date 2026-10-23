@@ -245,42 +245,42 @@ WeatherData RAIN_WEATHER = {
 };
 
 static BOOL Rain_Init(WeatherTask *task, u32 arg, HeapID heapId) {
-    RainWork *work = func_ov036_021997e4(task);
+    RainWork *work = WeatherTask_GetWorkBuffer(task);
 
-    func_ov036_02199824(task, 1, 8, 2, 0, -4, 2, 1, Rain_AddDrops);
-    func_ov036_0219990c(task, 8, RAIN_START_COLOR, arg);
+    WeatherTask_SetupSpawner(task, 1, 8, 2, 0, -4, 2, 1, Rain_AddDrops);
+    WeatherTask_InitFog(task, 8, RAIN_START_COLOR, arg);
     work->timer = 1;
-    func_ov036_02199a50(task);
+    WeatherTask_SaveCameraPos(task);
     return TRUE;
 }
 
 static BOOL Rain_FadeIn(WeatherTask *task, u32 arg, HeapID heapId) {
-    RainWork *work = func_ov036_021997e4(task);
-    BOOL done = func_ov036_02199868(task, heapId);
+    RainWork *work = WeatherTask_GetWorkBuffer(task);
+    BOOL done = WeatherTask_StepSpawner(task, heapId);
     int x;
     int y;
 
     if (work->timer > 0) {
         if (--work->timer == 0) {
-            func_ov036_02199958(task, 8, 0x7f5f, RAIN_FADE_IN_FRAMES, arg);
-            func_ov036_02199734(task, WEATHER_SOUND_TYPE, FieldLightStatus_GetWeatherLight(2));
-            func_ov036_02199be8(task, SEQ_SE_FLD_32);
+            WeatherTask_ChangeFog(task, 8, 0x7f5f, RAIN_FADE_IN_FRAMES, arg);
+            WeatherTask_FadeLight(task, WEATHER_SOUND_TYPE, FieldLightStatus_GetWeatherLight(2));
+            WeatherTask_PlaySe(task, SEQ_SE_FLD_32);
         }
-    } else if (func_ov036_021999dc(task) && done) {
+    } else if (WeatherTask_IsFogIdle(task) && done) {
         return TRUE;
     }
-    func_ov036_02199a78(task, &x, &y);
-    func_ov036_02199b90(task, x, y);
+    WeatherTask_GetCameraScroll(task, &x, &y);
+    WeatherTask_ShiftParticles(task, x, y);
     return FALSE;
 }
 
 static BOOL Rain_InitNoFade(WeatherTask *task, u32 arg, HeapID heapId) {
-    func_ov036_021997e4(task);
-    func_ov036_02199824(task, 2, 0, 2, 0, -4, 2, 1, Rain_AddDrops);
-    func_ov036_0219990c(task, 8, 0x7f5f, arg);
-    func_ov036_02199880(task, Rain_AddDrops, 20, 10, 1, heapId);
-    func_ov036_02199be8(task, SEQ_SE_FLD_32);
-    func_ov036_02199740(task, WEATHER_SOUND_TYPE, FieldLightStatus_GetWeatherLight(2));
+    WeatherTask_GetWorkBuffer(task);
+    WeatherTask_SetupSpawner(task, 2, 0, 2, 0, -4, 2, 1, Rain_AddDrops);
+    WeatherTask_InitFog(task, 8, 0x7f5f, arg);
+    WeatherTask_PrewarmParticles(task, Rain_AddDrops, 20, 10, 1, heapId);
+    WeatherTask_PlaySe(task, SEQ_SE_FLD_32);
+    WeatherTask_SetLight(task, WEATHER_SOUND_TYPE, FieldLightStatus_GetWeatherLight(2));
     return TRUE;
 }
 
@@ -288,50 +288,50 @@ static BOOL Rain_Main(WeatherTask *task, u32 arg, HeapID heapId) {
     int x;
     int y;
 
-    func_ov036_021997e4(task);
-    func_ov036_02199874(task, heapId);
-    func_ov036_02199a78(task, &x, &y);
-    func_ov036_02199b90(task, x, y);
+    WeatherTask_GetWorkBuffer(task);
+    WeatherTask_StepSpawnTimer(task, heapId);
+    WeatherTask_GetCameraScroll(task, &x, &y);
+    WeatherTask_ShiftParticles(task, x, y);
     return FALSE;
 }
 
 static BOOL Rain_InitFadeOut(WeatherTask *task, u32 arg, HeapID heapId) {
-    RainWork *work = func_ov036_021997e4(task);
+    RainWork *work = WeatherTask_GetWorkBuffer(task);
 
-    func_ov036_02199854(task, 0, 8, 4, -1);
+    WeatherTask_RetargetSpawner(task, 0, 8, 4, -1);
     work->timer = 1;
-    func_ov036_02199bf8(task);
+    WeatherTask_StopSe(task);
     return TRUE;
 }
 
 static BOOL Rain_FadeOut(WeatherTask *task, u32 arg, HeapID heapId) {
-    RainWork *work = func_ov036_021997e4(task);
-    BOOL done = func_ov036_02199868(task, heapId);
+    RainWork *work = WeatherTask_GetWorkBuffer(task);
+    BOOL done = WeatherTask_StepSpawner(task, heapId);
     int x;
     int y;
 
     if (work->timer > 0) {
         if (--work->timer == 0) {
-            func_ov036_021999bc(task, RAIN_START_COLOR, RAIN_FADE_OUT_FRAMES, arg);
+            WeatherTask_ChangeFogOffset(task, RAIN_START_COLOR, RAIN_FADE_OUT_FRAMES, arg);
         }
-    } else if ((arg ? func_ov036_021999dc(task) : TRUE) && done && !func_ov036_021997e8(task)) {
+    } else if ((arg ? WeatherTask_IsFogIdle(task) : TRUE) && done && !WeatherTask_GetParticleCount(task)) {
         return TRUE;
     }
-    func_ov036_02199a78(task, &x, &y);
-    func_ov036_02199b90(task, x, y);
+    WeatherTask_GetCameraScroll(task, &x, &y);
+    WeatherTask_ShiftParticles(task, x, y);
     return FALSE;
 }
 
 static BOOL Rain_Exit(WeatherTask *task, u32 arg, HeapID heapId) {
-    func_ov036_021997e4(task);
-    func_ov036_02199948(task, arg);
-    func_ov036_0219974c(task, arg);
+    WeatherTask_GetWorkBuffer(task);
+    WeatherTask_DisableFog(task, arg);
+    WeatherTask_ResetLight(task, arg);
     return TRUE;
 }
 
 static void RainDrop_Move(WeatherObj *obj) {
-    RainDrop *drop = func_ov036_02199c5c(obj);
-    ClActor *actor = func_ov036_02199c64(obj);
+    RainDrop *drop = WeatherTask_GetParticleWork(obj);
+    ClActor *actor = WeatherTask_GetParticleActor(obj);
     ClActorPos pos;
 
     func_ov036_02199c6c(obj, &pos);
@@ -349,7 +349,7 @@ static void RainDrop_Move(WeatherObj *obj) {
                 ClActor_SetAnimFrame(actor, 3);
             }
         }
-        func_ov036_02199cf0(obj, &pos);
+        WeatherTask_SetParticlePos(obj, &pos);
         break;
     case 1:
         if (drop->frame-- <= 0) {
@@ -357,7 +357,7 @@ static void RainDrop_Move(WeatherObj *obj) {
         }
         break;
     case 2:
-        func_ov036_0219980c(obj);
+        WeatherTask_RemoveParticle(obj);
         break;
     }
 }
@@ -365,7 +365,7 @@ static void RainDrop_Move(WeatherObj *obj) {
 static void Rain_AddDrops(WeatherTask *task, int count, HeapID heapId) {
     int i;
 
-    func_ov036_021997e4(task);
+    WeatherTask_GetWorkBuffer(task);
     for (i = 0; i < count; i++) {
         WeatherObj *obj;
         RainDrop *drop;
@@ -375,12 +375,12 @@ static void Rain_AddDrops(WeatherTask *task, int count, HeapID heapId) {
         int slant;
         ClActorPos pos;
 
-        obj = func_ov036_021997f4(task, heapId);
+        obj = WeatherTask_AddParticle(task, heapId);
         if (obj == NULL) {
             return;
         }
-        drop = func_ov036_02199c5c(obj);
-        actor = func_ov036_02199c64(obj);
+        drop = WeatherTask_GetParticleWork(obj);
+        actor = WeatherTask_GetParticleActor(obj);
         random = GFL_RandomLC(0);
         drop->frame = 0;
         size = random % 3;
@@ -398,7 +398,7 @@ static void Rain_AddDrops(WeatherTask *task, int count, HeapID heapId) {
         drop->splashFrame = (random & 1) + 1;
         pos.x = (u8)random + (size * 15 - 0x48);
         pos.y = -0x60;
-        func_ov036_02199cf0(obj, &pos);
+        WeatherTask_SetParticlePos(obj, &pos);
         drop->speedX *= 2;
         drop->speedY *= 2;
         drop->splash = GFL_RandomLC(10);
@@ -406,23 +406,23 @@ static void Rain_AddDrops(WeatherTask *task, int count, HeapID heapId) {
 }
 
 static BOOL Thunder_Init(WeatherTask *task, u32 arg, HeapID heapId) {
-    ThunderWork *work = func_ov036_021997e4(task);
+    ThunderWork *work = WeatherTask_GetWorkBuffer(task);
 
     Lightning_Init(&work->lightning, 2);
-    func_ov036_02199824(task, 1, 15, 2, 0, -3, 1, 1, Thunder_AddDrops);
-    func_ov036_0219990c(task, 9, RAIN_START_COLOR, arg);
+    WeatherTask_SetupSpawner(task, 1, 15, 2, 0, -3, 1, 1, Thunder_AddDrops);
+    WeatherTask_InitFog(task, 9, RAIN_START_COLOR, arg);
     work->timer = 0;
     work->state = 0;
-    func_ov036_02199a50(task);
+    WeatherTask_SaveCameraPos(task);
     return TRUE;
 }
 
 static BOOL Thunder_FadeIn(WeatherTask *task, u32 arg, HeapID heapId) {
-    ThunderWork *work = func_ov036_021997e4(task);
+    ThunderWork *work = WeatherTask_GetWorkBuffer(task);
 
     switch (work->state) {
     case 0:
-        func_ov036_02199734(task, WEATHER_SOUND_TYPE, FieldLightStatus_GetWeatherLight(6));
+        WeatherTask_FadeLight(task, WEATHER_SOUND_TYPE, FieldLightStatus_GetWeatherLight(6));
         work->state++;
         work->timer = RAIN_FADE_IN_FRAMES;
         break;
@@ -432,20 +432,20 @@ static BOOL Thunder_FadeIn(WeatherTask *task, u32 arg, HeapID heapId) {
         }
         break;
     case 2:
-        func_ov036_02199780(task, 0x28c6, 8);
+        WeatherTask_SetLightColor(task, 0x28c6, 8);
         work->timer = 16;
         work->state++;
         break;
     case 3:
         if (--work->timer < 0) {
-            func_ov036_0219975c(task, 0x23de, 4, 60);
-            func_ov036_02199c08(task, SEQ_SE_FLD_33);
+            WeatherTask_FlashLight(task, 0x23de, 4, 60);
+            WeatherTask_PlaySeDirect(task, SEQ_SE_FLD_33);
             work->state++;
         }
         break;
     case 4:
-        if (!func_ov036_02199768(task)) {
-            func_ov036_02199958(task, 9, 0x7f80, 0x50, arg);
+        if (!WeatherTask_IsLightFlashing(task)) {
+            WeatherTask_ChangeFog(task, 9, 0x7f80, 0x50, arg);
             work->state++;
             work->timer = 0x30;
         }
@@ -455,11 +455,11 @@ static BOOL Thunder_FadeIn(WeatherTask *task, u32 arg, HeapID heapId) {
         BOOL flashed;
 
         if (--work->timer == 0) {
-            func_ov036_02199be8(task, SEQ_SE_FLD_31);
-            func_ov036_0219978c(task, 1, 0);
+            WeatherTask_PlaySe(task, SEQ_SE_FLD_31);
+            WeatherTask_SetBillboardVisible(task, 1, 0);
         }
-        done = func_ov036_02199868(task, heapId);
-        flashed = func_ov036_021999dc(task);
+        done = WeatherTask_StepSpawner(task, heapId);
+        flashed = WeatherTask_IsFogIdle(task);
         if (done && flashed) {
             return TRUE;
         }
@@ -471,45 +471,45 @@ static BOOL Thunder_FadeIn(WeatherTask *task, u32 arg, HeapID heapId) {
 }
 
 static BOOL Thunder_InitNoFade(WeatherTask *task, u32 arg, HeapID heapId) {
-    func_ov036_021997e4(task);
-    func_ov036_02199824(task, 2, 0, 2, 0, -3, 1, 1, Thunder_AddDrops);
-    func_ov036_0219990c(task, 9, 0x7f80, arg);
-    func_ov036_02199880(task, Thunder_AddDrops, 20, 5, 1, heapId);
-    func_ov036_02199be8(task, SEQ_SE_FLD_31);
-    func_ov036_02199740(task, WEATHER_SOUND_TYPE, FieldLightStatus_GetWeatherLight(6));
-    func_ov036_0219978c(task, 1, 0);
+    WeatherTask_GetWorkBuffer(task);
+    WeatherTask_SetupSpawner(task, 2, 0, 2, 0, -3, 1, 1, Thunder_AddDrops);
+    WeatherTask_InitFog(task, 9, 0x7f80, arg);
+    WeatherTask_PrewarmParticles(task, Thunder_AddDrops, 20, 5, 1, heapId);
+    WeatherTask_PlaySe(task, SEQ_SE_FLD_31);
+    WeatherTask_SetLight(task, WEATHER_SOUND_TYPE, FieldLightStatus_GetWeatherLight(6));
+    WeatherTask_SetBillboardVisible(task, 1, 0);
     return TRUE;
 }
 
 static BOOL Thunder_Main(WeatherTask *task, u32 arg, HeapID heapId) {
-    ThunderWork *work = func_ov036_021997e4(task);
+    ThunderWork *work = WeatherTask_GetWorkBuffer(task);
 
     work->frame = (work->frame + 1) % 300;
-    func_ov036_02199874(task, heapId);
+    WeatherTask_StepSpawnTimer(task, heapId);
     Lightning_Update(&work->lightning, task);
     Thunder_ScrollBg(task, work);
     return FALSE;
 }
 
 static BOOL Thunder_InitFadeOut(WeatherTask *task, u32 arg, HeapID heapId) {
-    ThunderWork *work = func_ov036_021997e4(task);
+    ThunderWork *work = WeatherTask_GetWorkBuffer(task);
 
-    func_ov036_02199854(task, 0, 15, 3, -1);
+    WeatherTask_RetargetSpawner(task, 0, 15, 3, -1);
     work->timer = 1;
-    func_ov036_02199bf8(task);
-    func_ov036_0219978c(task, 0, 0);
+    WeatherTask_StopSe(task);
+    WeatherTask_SetBillboardVisible(task, 0, 0);
     return TRUE;
 }
 
 static BOOL Thunder_FadeOut(WeatherTask *task, u32 arg, HeapID heapId) {
-    ThunderWork *work = func_ov036_021997e4(task);
-    BOOL done = func_ov036_02199868(task, heapId);
+    ThunderWork *work = WeatherTask_GetWorkBuffer(task);
+    BOOL done = WeatherTask_StepSpawner(task, heapId);
 
     if (work->timer > 0) {
         if (--work->timer == 0) {
-            func_ov036_021999bc(task, RAIN_START_COLOR, RAIN_FADE_OUT_FRAMES, arg);
+            WeatherTask_ChangeFogOffset(task, RAIN_START_COLOR, RAIN_FADE_OUT_FRAMES, arg);
         }
-    } else if ((arg ? func_ov036_021999dc(task) : TRUE) && done && !func_ov036_021997e8(task)) {
+    } else if ((arg ? WeatherTask_IsFogIdle(task) : TRUE) && done && !WeatherTask_GetParticleCount(task)) {
         return TRUE;
     }
     Thunder_ScrollBg(task, work);
@@ -517,19 +517,19 @@ static BOOL Thunder_FadeOut(WeatherTask *task, u32 arg, HeapID heapId) {
 }
 
 static BOOL Thunder_Exit(WeatherTask *task, u32 arg, HeapID heapId) {
-    ThunderWork *work = func_ov036_021997e4(task);
+    ThunderWork *work = WeatherTask_GetWorkBuffer(task);
 
-    func_ov036_02199948(task, arg);
-    func_ov036_0219974c(task, arg);
+    WeatherTask_DisableFog(task, arg);
+    WeatherTask_ResetLight(task, arg);
     Lightning_Exit(&work->lightning);
     return TRUE;
 }
 
 static void ThunderDrop_Move(WeatherObj *obj) {
-    ThunderDrop *drop = func_ov036_02199c5c(obj);
+    ThunderDrop *drop = WeatherTask_GetParticleWork(obj);
     ClActorPos pos;
 
-    func_ov036_02199c64(obj);
+    WeatherTask_GetParticleActor(obj);
     func_ov036_02199c6c(obj, &pos);
     switch (drop->state) {
     case 0:
@@ -538,17 +538,17 @@ static void ThunderDrop_Move(WeatherObj *obj) {
         if (pos.y >= 192) {
             drop->state = 1;
         }
-        func_ov036_02199cf0(obj, &pos);
+        WeatherTask_SetParticlePos(obj, &pos);
         break;
     case 1:
-        func_ov036_0219980c(obj);
+        WeatherTask_RemoveParticle(obj);
         break;
     }
 }
 
 static void Thunder_AddDrops(WeatherTask *task, int count, HeapID heapId) {
     int i;
-    ThunderWork *work = func_ov036_021997e4(task);
+    ThunderWork *work = WeatherTask_GetWorkBuffer(task);
 
     for (i = 0; i < count; i++) {
         WeatherObj *obj;
@@ -558,12 +558,12 @@ static void Thunder_AddDrops(WeatherTask *task, int count, HeapID heapId) {
         u32 size;
         ClActorPos pos;
 
-        obj = func_ov036_021997f4(task, heapId);
+        obj = WeatherTask_AddParticle(task, heapId);
         if (obj == NULL) {
             return;
         }
-        drop = func_ov036_02199c5c(obj);
-        actor = func_ov036_02199c64(obj);
+        drop = WeatherTask_GetParticleWork(obj);
+        actor = WeatherTask_GetParticleActor(obj);
         random = GFL_RandomLC(0);
         size = random % 3;
         ClActor_SetAnimFrame(actor, size);
@@ -574,7 +574,7 @@ static void Thunder_AddDrops(WeatherTask *task, int count, HeapID heapId) {
         drop->state = 0;
         pos.x = random % 0x180 - 0x80;
         pos.y = random % 40 - 0x50;
-        func_ov036_02199cf0(obj, &pos);
+        WeatherTask_SetParticlePos(obj, &pos);
     }
 }
 
@@ -582,31 +582,31 @@ static void Thunder_ScrollBg(WeatherTask *task, ThunderWork *work) {
     int x;
     int y;
 
-    func_ov036_02199a78(task, &x, &y);
-    func_ov036_02199b90(task, x, y);
+    WeatherTask_GetCameraScroll(task, &x, &y);
+    WeatherTask_ShiftParticles(task, x, y);
     work->scroll = (work->scroll + 9) % 256;
-    func_ov036_021997bc(task, -(work->scroll + x), 0);
-    func_ov036_021997cc(task, y - work->scroll, 0);
+    WeatherTask_SetBillboardTexOffsetX(task, -(work->scroll + x), 0);
+    WeatherTask_SetBillboardTexOffsetY(task, y - work->scroll, 0);
 }
 
 static BOOL GustyRain_Init(WeatherTask *task, u32 arg, HeapID heapId) {
-    GustWork *work = func_ov036_021997e4(task);
+    GustWork *work = WeatherTask_GetWorkBuffer(task);
 
-    func_ov036_02199824(task, 1, 4, 1, 1, -4, 1, 1, Gust_AddParticles);
-    func_ov036_0219990c(task, 9, RAIN_START_COLOR, arg);
-    func_ov036_02199a50(task);
+    WeatherTask_SetupSpawner(task, 1, 4, 1, 1, -4, 1, 1, Gust_AddParticles);
+    WeatherTask_InitFog(task, 9, RAIN_START_COLOR, arg);
+    WeatherTask_SaveCameraPos(task);
     Gust_ResetRumble(work);
     return TRUE;
 }
 
 static BOOL GustyRain_FadeIn(WeatherTask *task, u32 arg, HeapID heapId) {
-    GustWork *work = func_ov036_021997e4(task);
+    GustWork *work = WeatherTask_GetWorkBuffer(task);
     BOOL done;
     BOOL flashed;
 
     switch (work->state) {
     case 0:
-        func_ov036_02199734(task, WEATHER_SOUND_TYPE, FieldLightStatus_GetWeatherLight(7));
+        WeatherTask_FadeLight(task, WEATHER_SOUND_TYPE, FieldLightStatus_GetWeatherLight(7));
         work->timer = RAIN_FADE_IN_FRAMES;
         work->state++;
         break;
@@ -620,12 +620,12 @@ static BOOL GustyRain_FadeIn(WeatherTask *task, u32 arg, HeapID heapId) {
         break;
     case 2:
         if (--work->timer == 0) {
-            func_ov036_02199be8(task, SEQ_SE_FLD_31);
-            func_ov036_0219978c(task, 1, 0);
-            func_ov036_02199958(task, 9, 0x7f80, 10, arg);
+            WeatherTask_PlaySe(task, SEQ_SE_FLD_31);
+            WeatherTask_SetBillboardVisible(task, 1, 0);
+            WeatherTask_ChangeFog(task, 9, 0x7f80, 10, arg);
         }
-        done = func_ov036_02199868(task, heapId);
-        flashed = func_ov036_021999dc(task);
+        done = WeatherTask_StepSpawner(task, heapId);
+        flashed = WeatherTask_IsFogIdle(task);
         if (done == TRUE && flashed == TRUE && work->timer <= 0) {
             return TRUE;
         }
@@ -637,42 +637,42 @@ static BOOL GustyRain_FadeIn(WeatherTask *task, u32 arg, HeapID heapId) {
 }
 
 static BOOL GustyRain_InitNoFade(WeatherTask *task, u32 arg, HeapID heapId) {
-    GustWork *work = func_ov036_021997e4(task);
+    GustWork *work = WeatherTask_GetWorkBuffer(task);
 
-    func_ov036_02199824(task, 1, 1, 1, 1, -4, 1, 1, Gust_AddParticles);
-    func_ov036_0219990c(task, 9, 0x7f80, arg);
-    func_ov036_02199880(task, Gust_AddParticles, 20, 5, 1, heapId);
-    func_ov036_02199be8(task, SEQ_SE_FLD_31);
+    WeatherTask_SetupSpawner(task, 1, 1, 1, 1, -4, 1, 1, Gust_AddParticles);
+    WeatherTask_InitFog(task, 9, 0x7f80, arg);
+    WeatherTask_PrewarmParticles(task, Gust_AddParticles, 20, 5, 1, heapId);
+    WeatherTask_PlaySe(task, SEQ_SE_FLD_31);
     Gust_StartLull(task, work, arg, FALSE);
-    func_ov036_0219978c(task, 1, 0);
-    func_ov036_02199740(task, WEATHER_SOUND_TYPE, FieldLightStatus_GetWeatherLight(7));
+    WeatherTask_SetBillboardVisible(task, 1, 0);
+    WeatherTask_SetLight(task, WEATHER_SOUND_TYPE, FieldLightStatus_GetWeatherLight(7));
     return TRUE;
 }
 
 static BOOL GustyRain_Main(WeatherTask *task, u32 arg, HeapID heapId) {
-    GustWork *work = func_ov036_021997e4(task);
+    GustWork *work = WeatherTask_GetWorkBuffer(task);
 
-    func_ov036_02199874(task, heapId);
+    WeatherTask_StepSpawnTimer(task, heapId);
     Gust_Update(task, work, arg, FALSE);
     Gust_ScrollBgs(task, work);
     return FALSE;
 }
 
 static BOOL GustyRain_InitFadeOut(WeatherTask *task, u32 arg, HeapID heapId) {
-    func_ov036_021997e4(task);
-    func_ov036_02199854(task, 0, 4, 4, -1);
-    func_ov036_02199bf8(task);
-    func_ov036_021999bc(task, RAIN_START_COLOR, RAIN_FADE_OUT_FRAMES, arg);
-    func_ov036_0219978c(task, 0, 0);
-    func_ov036_0219978c(task, 0, 1);
+    WeatherTask_GetWorkBuffer(task);
+    WeatherTask_RetargetSpawner(task, 0, 4, 4, -1);
+    WeatherTask_StopSe(task);
+    WeatherTask_ChangeFogOffset(task, RAIN_START_COLOR, RAIN_FADE_OUT_FRAMES, arg);
+    WeatherTask_SetBillboardVisible(task, 0, 0);
+    WeatherTask_SetBillboardVisible(task, 0, 1);
     return TRUE;
 }
 
 static BOOL GustyRain_FadeOut(WeatherTask *task, u32 arg, HeapID heapId) {
-    GustWork *work = func_ov036_021997e4(task);
-    BOOL done = func_ov036_02199868(task, heapId);
+    GustWork *work = WeatherTask_GetWorkBuffer(task);
+    BOOL done = WeatherTask_StepSpawner(task, heapId);
 
-    if ((arg ? func_ov036_021999dc(task) : TRUE) && done && !func_ov036_021997e8(task)) {
+    if ((arg ? WeatherTask_IsFogIdle(task) : TRUE) && done && !WeatherTask_GetParticleCount(task)) {
         return TRUE;
     }
     Gust_Update(task, work, arg, TRUE);
@@ -681,22 +681,22 @@ static BOOL GustyRain_FadeOut(WeatherTask *task, u32 arg, HeapID heapId) {
 }
 
 static BOOL GustyRain_Exit(WeatherTask *task, u32 arg, HeapID heapId) {
-    func_ov036_021997e4(task);
-    func_ov036_02199948(task, arg);
-    func_ov036_0219974c(task, arg);
+    WeatherTask_GetWorkBuffer(task);
+    WeatherTask_DisableFog(task, arg);
+    WeatherTask_ResetLight(task, arg);
     return TRUE;
 }
 
 static void GustParticle_Move(WeatherObj *obj) {
-    GustParticle *particle = func_ov036_02199c5c(obj);
-    ClActor *actor = func_ov036_02199c64(obj);
+    GustParticle *particle = WeatherTask_GetParticleWork(obj);
+    ClActor *actor = WeatherTask_GetParticleActor(obj);
 
     sGustParticleMove[particle->kind](obj, particle->work, &particle->data, actor);
 }
 
 static void Gust_AddParticles(WeatherTask *task, int count, HeapID heapId) {
     u32 random = GFL_RandomLC(0);
-    GustWork *work = func_ov036_021997e4(task);
+    GustWork *work = WeatherTask_GetWorkBuffer(task);
     int i;
 
     if (work->mode == 0) {
@@ -710,12 +710,12 @@ static void Gust_AddParticles(WeatherTask *task, int count, HeapID heapId) {
         GustParticle *particle;
         ClActor *actor;
 
-        obj = func_ov036_021997f4(task, heapId);
+        obj = WeatherTask_AddParticle(task, heapId);
         if (obj == NULL) {
             return;
         }
-        particle = func_ov036_02199c5c(obj);
-        actor = func_ov036_02199c64(obj);
+        particle = WeatherTask_GetParticleWork(obj);
+        actor = WeatherTask_GetParticleActor(obj);
         particle->work = work;
         switch (work->mode) {
         case 1:
@@ -760,10 +760,10 @@ static void GustSlant_Move(WeatherObj *obj, const GustWork *work, GustParticleDa
     pos.x = data->x / 8;
     pos.y = data->y / 8;
     if (pos.x >= 256 || pos.y >= 192) {
-        func_ov036_0219980c(obj);
+        WeatherTask_RemoveParticle(obj);
         return;
     }
-    func_ov036_02199cf0(obj, &pos);
+    WeatherTask_SetParticlePos(obj, &pos);
 }
 
 static void GustSlant_Init(WeatherObj *obj, const GustWork *work, GustParticleData *data, ClActor *actor) {
@@ -779,7 +779,7 @@ static void GustSlant_Init(WeatherObj *obj, const GustWork *work, GustParticleDa
     data->baseY = work->windY;
     pos.x = (random & 7) - 8;
     pos.y = random % 160 - 16;
-    func_ov036_02199cf0(obj, &pos);
+    WeatherTask_SetParticlePos(obj, &pos);
     data->x = pos.x << 3;
     data->y = pos.y << 3;
     ClActor_SetSequence(actor, 0);
@@ -796,10 +796,10 @@ static void GustStreak_Move(WeatherObj *obj, const GustWork *work, GustParticleD
     pos.x = data->x / 8;
     pos.y = data->y / 8;
     if (pos.x >= 256 || pos.y >= 160) {
-        func_ov036_0219980c(obj);
+        WeatherTask_RemoveParticle(obj);
         return;
     }
-    func_ov036_02199cf0(obj, &pos);
+    WeatherTask_SetParticlePos(obj, &pos);
 }
 
 static void GustStreak_Init(WeatherObj *obj, const GustWork *work, GustParticleData *data, ClActor *actor) {
@@ -811,7 +811,7 @@ static void GustStreak_Init(WeatherObj *obj, const GustWork *work, GustParticleD
     data->speedY = r * 2 + 258;
     pos.x = random % 336 - 80;
     pos.y = random % 40 - 80;
-    func_ov036_02199cf0(obj, &pos);
+    WeatherTask_SetParticlePos(obj, &pos);
     data->x = pos.x << 3;
     data->y = pos.y << 3;
     ClActor_SetSequence(actor, 1);
@@ -839,10 +839,10 @@ static void GustDriven_Move(WeatherObj *obj, const GustWork *work, GustParticleD
         pos.y = data->y / 8;
     }
     if (pos.x >= 256 || pos.y >= 192) {
-        func_ov036_0219980c(obj);
+        WeatherTask_RemoveParticle(obj);
         return;
     }
-    func_ov036_02199cf0(obj, &pos);
+    WeatherTask_SetParticlePos(obj, &pos);
 }
 
 static void GustDriven_Init(WeatherObj *obj, const GustWork *work, GustParticleData *data, ClActor *actor) {
@@ -856,7 +856,7 @@ static void GustDriven_Init(WeatherObj *obj, const GustWork *work, GustParticleD
     data->baseY = data->speedY + work->windY;
     pos.x = (random & 7) - 8;
     pos.y = random % 160 - 16;
-    func_ov036_02199cf0(obj, &pos);
+    WeatherTask_SetParticlePos(obj, &pos);
     data->x = pos.x << 3;
     data->y = pos.y << 3;
     ClActor_SetSequence(actor, 2);
@@ -871,9 +871,9 @@ static void Gust_StartLull(WeatherTask *task, GustWork *work, u32 arg, BOOL noFa
     work->limit = random % 400 + 60;
     work->counter = 0;
     if (!noFade) {
-        func_ov036_02199958(task, 9, 0x7f80, 10, arg);
-        func_ov036_0219978c(task, 0, 1);
-        func_ov036_02199be8(task, SEQ_SE_FLD_31);
+        WeatherTask_ChangeFog(task, 9, 0x7f80, 10, arg);
+        WeatherTask_SetBillboardVisible(task, 0, 1);
+        WeatherTask_PlaySe(task, SEQ_SE_FLD_31);
     }
 }
 
@@ -887,8 +887,8 @@ static void Gust_Update(WeatherTask *task, GustWork *work, u32 arg, BOOL noFade)
             work->limit = 16;
             work->counter = 0;
             if (!noFade) {
-                func_ov036_02199958(task, 9, 0x7f70, 10, arg);
-                func_ov036_02199be8(task, SEQ_SE_FLD_32);
+                WeatherTask_ChangeFog(task, 9, 0x7f70, 10, arg);
+                WeatherTask_PlaySe(task, SEQ_SE_FLD_32);
             }
         }
         break;
@@ -901,9 +901,9 @@ static void Gust_Update(WeatherTask *task, GustWork *work, u32 arg, BOOL noFade)
             work->limit = 16;
             work->counter = 0;
             if (!noFade) {
-                func_ov036_0219978c(task, 0, 1);
-                func_ov036_0219979c(task, 0x1000, 0);
-                func_ov036_021997ac(task, 0x1000, 0);
+                WeatherTask_SetBillboardVisible(task, 0, 1);
+                WeatherTask_SetBillboardScaleX(task, 0x1000, 0);
+                WeatherTask_SetBillboardScaleY(task, 0x1000, 0);
             }
         }
         break;
@@ -916,9 +916,9 @@ static void Gust_Update(WeatherTask *task, GustWork *work, u32 arg, BOOL noFade)
             work->limit = random % 400 + 60;
             work->counter = 0;
             if (!noFade) {
-                func_ov036_0219978c(task, 1, 1);
-                func_ov036_0219979c(task, 0x800, 0);
-                func_ov036_021997ac(task, 0x1800, 0);
+                WeatherTask_SetBillboardVisible(task, 1, 1);
+                WeatherTask_SetBillboardScaleX(task, 0x800, 0);
+                WeatherTask_SetBillboardScaleY(task, 0x1800, 0);
             }
         }
         break;
@@ -961,8 +961,8 @@ static void Gust_ScrollBgs(WeatherTask *task, GustWork *work) {
     int x;
     int y;
 
-    func_ov036_02199a78(task, &x, &y);
-    func_ov036_02199b90(task, x, y);
+    WeatherTask_GetCameraScroll(task, &x, &y);
+    WeatherTask_ShiftParticles(task, x, y);
     if (work->windX != 0) {
         work->scrollX1 = (work->scrollX1 + 9) % 256;
         work->scrollY1 = (work->scrollY1 + 3) % 256;
@@ -972,17 +972,17 @@ static void Gust_ScrollBgs(WeatherTask *task, GustWork *work) {
         work->scrollX1 = (work->scrollX1 + 3) % 256;
         work->scrollY1 = (work->scrollY1 + 8) % 256;
     }
-    func_ov036_021997bc(task, -(work->scrollX1 + x), 0);
-    func_ov036_021997cc(task, y - work->scrollY1, 0);
-    func_ov036_021997bc(task, -(work->scrollX2 + x), 1);
-    func_ov036_021997cc(task, y - work->scrollY2, 1);
-    func_ov036_0219979c(task, work->bgScale, 1);
-    func_ov036_021997ac(task, work->bgScale, 1);
+    WeatherTask_SetBillboardTexOffsetX(task, -(work->scrollX1 + x), 0);
+    WeatherTask_SetBillboardTexOffsetY(task, y - work->scrollY1, 0);
+    WeatherTask_SetBillboardTexOffsetX(task, -(work->scrollX2 + x), 1);
+    WeatherTask_SetBillboardTexOffsetY(task, y - work->scrollY2, 1);
+    WeatherTask_SetBillboardScaleX(task, work->bgScale, 1);
+    WeatherTask_SetBillboardScaleY(task, work->bgScale, 1);
 }
 
 static void Gust_PlayGustSound(WeatherTask *task, GustWork *work, u32 arg, u32 sound) {
     if (arg != 0 && work->counter == work->limit - 24) {
-        func_ov036_02199c08(task, sound);
+        WeatherTask_PlaySeDirect(task, sound);
     }
 }
 
@@ -998,7 +998,7 @@ static void Gust_PlayRumble(WeatherTask *task, GustWork *work, u32 arg) {
             if (!GFL_SndPlayerIsActive(GFL_SndSeqGetPlayerIndex(SEQ_SE_FLD_99))) {
                 u32 delay = GFL_RandomLC(27) + 100;
 
-                func_ov036_02199c30(task, SEQ_SE_FLD_98, delay);
+                WeatherTask_PlaySeWithVoice(task, SEQ_SE_FLD_98, delay);
                 Gust_ResetRumble(work);
             } else {
                 work->rumbleCounter = work->rumbleLimit - 10;
@@ -1069,7 +1069,7 @@ static void Lightning_Update(Lightning *lightning, WeatherTask *task) {
         if (lightning->kind != 2) {
             lightning->state = 4;
         } else {
-            func_ov036_02199780(task, 0x3129, 4);
+            WeatherTask_SetLightColor(task, 0x3129, 4);
             lightning->timer = 10;
             lightning->state = 3;
         }
@@ -1081,8 +1081,8 @@ static void Lightning_Update(Lightning *lightning, WeatherTask *task) {
         break;
     case 4:
         if (lightning->kind != 0) {
-            func_ov036_0219975c(task, Lightning_GetShade(lightning), lightning->flashes[lightning->index].flashSpeed,
-                                lightning->flashes[lightning->index].flashFrames);
+            WeatherTask_FlashLight(task, Lightning_GetShade(lightning), lightning->flashes[lightning->index].flashSpeed,
+                                   lightning->flashes[lightning->index].flashFrames);
         }
         if (lightning->type == 2) {
             lightning->timer = GFL_RandomLC(lightning->flashes[lightning->index].flashFrames) +
@@ -1102,17 +1102,17 @@ static void Lightning_Update(Lightning *lightning, WeatherTask *task) {
     case 5:
         if (lightning->soundDelay > 0) {
             if (--lightning->soundDelay == 0) {
-                func_ov036_02199c08(task, lightning->sound);
+                WeatherTask_PlaySeDirect(task, lightning->sound);
             }
         }
-        if (!func_ov036_02199768(task)) {
+        if (!WeatherTask_IsLightFlashing(task)) {
             lightning->state = 6;
         }
         break;
     case 6:
         if (lightning->soundDelay > 0) {
             if (--lightning->soundDelay == 0) {
-                func_ov036_02199c08(task, lightning->sound);
+                WeatherTask_PlaySeDirect(task, lightning->sound);
             }
         }
         lightning->flashes[lightning->index].delay--;

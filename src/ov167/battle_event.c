@@ -46,7 +46,7 @@ void BattleEvent_ClearTurnPause(void) {
     }
 }
 
-void func_ov167_021bc718(void) {
+void BattleEvent_DebugPrintFactorList(void) {
 }
 
 BattleEventItem *BattleEvent_AddItem(u32 factorType, u16 subId, u32 priority, u32 subPriority, u8 monId,
@@ -108,7 +108,7 @@ BattleEventItem *BattleEvent_AddItem(u32 factorType, u16 subId, u32 priority, u3
                 item->prev = prev;
             }
         }
-        func_ov167_021bc718();
+        BattleEvent_DebugPrintFactorList();
         return item;
     }
     return NULL;
@@ -142,7 +142,7 @@ void BattleEventItem_Remove(BattleEventItem *item) {
         if (item->next != NULL) {
             item->next->prev = item->prev;
         }
-        func_ov167_021bc718();
+        BattleEvent_DebugPrintFactorList();
         BattleEvent_FreeItem(item);
     }
 }

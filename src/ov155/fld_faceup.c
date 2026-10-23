@@ -195,8 +195,8 @@ static void FaceUp_LoadGraphics(FaceUpWork *work, Field *field) {
     G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, GX_PLANEMASK_BG3, GX_PLANEMASK_BG2, 0, 16);
 
     msgBGSys = Field_GetMsgBGSys(field);
-    if (func_ov036_02187868(msgBGSys)) {
-        func_ov036_021879c0(msgBGSys);
+    if (MsgBGPrinter_ReleaseSysFrame(msgBGSys)) {
+        MsgBGPrinter_RequestSysFrame(msgBGSys);
     } else {
         GFL_BGSysReleaseBG(FACEUP_BG_FACE);
     }
@@ -321,7 +321,7 @@ static void FaceUp_Free(Field *field, FaceUpWork *work) {
     G2_SetBG3ControlText(work->bg3Control.screenSize, work->bg3Control.colorMode, work->bg3Control.screenBase,
                          work->bg3Control.charBase);
     func_ov036_021b5180(placeName);
-    func_ov036_021879c0(Field_GetMsgBGSys(field));
+    MsgBGPrinter_RequestSysFrame(Field_GetMsgBGSys(field));
     G2_BlendNone();
     FaceUp_RestoreBGPriorities(work);
     FaceUp_RestoreEnabledBGs(work);
@@ -372,7 +372,7 @@ static void FaceUp_Task(TCB *tcb, void *data) {
 
     if (!work->talkEnded && FieldScriptSubEvent_IsRegistered(SCRIPT_SUB_EVENT_MSG) &&
         (window = getMapDisplayInfoPtr(work->env)) != NULL) {
-        msgState = func_ov036_02188cbc(window);
+        msgState = MsgBGPrinter_GetPlainWinStreamState(window);
         if (msgState == 0) {
             work->mouth.stopped = FALSE;
             work->waitingForMsg = FALSE;
