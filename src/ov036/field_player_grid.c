@@ -997,7 +997,7 @@ static void FieldPlayerGrid_UpdateNormalIdle(FieldPlayerGrid *grid, FieldActor *
     }
     FldAct_SetAcmd(actor, GetAcmdForDir(dir, ACMD_FACE));
     grid->state = GRID_STATE_IDLE;
-    FieldPlayerCore_SetMoveStatus(grid->core, 0);
+    FieldPlayerCore_SetMoveStatus(grid->core, PLAYER_MOVE_STATUS_NONE);
 }
 
 // A step, slower when the tile ahead is higher
@@ -1029,19 +1029,19 @@ static void FieldPlayerGrid_UpdateNormalMove(FieldPlayerGrid *grid, FieldActor *
     }
     FldAct_SetAcmd(actor, GetAcmdForDir(input->dir, acmd));
     grid->state = GRID_STATE_MOVE;
-    FieldPlayerCore_SetMoveStatus(grid->core, 1);
+    FieldPlayerCore_SetMoveStatus(grid->core, PLAYER_MOVE_STATUS_MOVE);
 }
 
 static void FieldPlayerGrid_UpdateNormalTurn(FieldPlayerGrid *grid, FieldActor *actor, const GridMoveInput *input) {
     FldAct_SetAcmd(actor, GetAcmdForDir(input->dir, ACMD_STAY_WALK_2F));
     grid->state = GRID_STATE_TURN;
-    FieldPlayerCore_SetMoveStatus(grid->core, 2);
+    FieldPlayerCore_SetMoveStatus(grid->core, PLAYER_MOVE_STATUS_TURN);
 }
 
 static void FieldPlayerGrid_UpdateNormalBrake(FieldPlayerGrid *grid, FieldActor *actor, const GridMoveInput *input) {
     FldAct_SetAcmd(actor, GetAcmdForDir(input->dir, ACMD_STAY_WALK_16F));
     grid->state = GRID_STATE_BRAKE;
-    FieldPlayerCore_SetMoveStatus(grid->core, 0);
+    FieldPlayerCore_SetMoveStatus(grid->core, PLAYER_MOVE_STATUS_NONE);
     if (!FieldPlayerGrid_CheckWarpAtHitWall(grid, input->dir)) {
         GFL_SndSEPlay(SEQ_SE_WALL_HIT);
     }
@@ -1050,7 +1050,7 @@ static void FieldPlayerGrid_UpdateNormalBrake(FieldPlayerGrid *grid, FieldActor 
 static void FieldPlayerGrid_UpdateNormalJump(FieldPlayerGrid *grid, FieldActor *actor, const GridMoveInput *input) {
     FldAct_SetAcmd(actor, GetAcmdForDir(input->dir, ACMD_JUMP_2));
     grid->state = GRID_STATE_MOVE;
-    FieldPlayerCore_SetMoveStatus(grid->core, 1);
+    FieldPlayerCore_SetMoveStatus(grid->core, PLAYER_MOVE_STATUS_MOVE);
     GFL_SndSEPlay(SEQ_SE_DANSA);
 }
 
@@ -1136,7 +1136,7 @@ static void FieldPlayerGrid_UpdateBikeIdle(FieldPlayerGrid *grid, FieldActor *ac
     }
     FldAct_SetAcmd(actor, GetAcmdForDir(dir, ACMD_FACE));
     grid->state = GRID_STATE_IDLE;
-    FieldPlayerCore_SetMoveStatus(grid->core, 0);
+    FieldPlayerCore_SetMoveStatus(grid->core, PLAYER_MOVE_STATUS_NONE);
 }
 
 // A step, slower in deep sand and when the tile ahead is higher
@@ -1165,19 +1165,19 @@ static void FieldPlayerGrid_UpdateBikeMove(FieldPlayerGrid *grid, FieldActor *ac
     }
     FldAct_SetAcmd(actor, GetAcmdForDir(input->dir, acmd));
     grid->state = GRID_STATE_MOVE;
-    FieldPlayerCore_SetMoveStatus(grid->core, 1);
+    FieldPlayerCore_SetMoveStatus(grid->core, PLAYER_MOVE_STATUS_MOVE);
 }
 
 static void FieldPlayerGrid_UpdateBikeTurn(FieldPlayerGrid *grid, FieldActor *actor, const GridMoveInput *input) {
     FldAct_SetAcmd(actor, GetAcmdForDir(input->dir, ACMD_STAY_WALK_2F));
     grid->state = GRID_STATE_TURN;
-    FieldPlayerCore_SetMoveStatus(grid->core, 2);
+    FieldPlayerCore_SetMoveStatus(grid->core, PLAYER_MOVE_STATUS_TURN);
 }
 
 static void FieldPlayerGrid_UpdateBikeBrake(FieldPlayerGrid *grid, FieldActor *actor, const GridMoveInput *input) {
     FldAct_SetAcmd(actor, GetAcmdForDir(input->dir, ACMD_STAY_WALK_16F));
     grid->state = GRID_STATE_BRAKE;
-    FieldPlayerCore_SetMoveStatus(grid->core, 0);
+    FieldPlayerCore_SetMoveStatus(grid->core, PLAYER_MOVE_STATUS_NONE);
     if (!FieldPlayerGrid_CheckWarpAtHitWall(grid, input->dir)) {
         GFL_SndSEPlay(SEQ_SE_WALL_HIT);
     }
@@ -1186,7 +1186,7 @@ static void FieldPlayerGrid_UpdateBikeBrake(FieldPlayerGrid *grid, FieldActor *a
 static void FieldPlayerGrid_UpdateBikeJump(FieldPlayerGrid *grid, FieldActor *actor, const GridMoveInput *input) {
     FldAct_SetAcmd(actor, GetAcmdForDir(input->dir, ACMD_JUMP_2));
     grid->state = GRID_STATE_MOVE;
-    FieldPlayerCore_SetMoveStatus(grid->core, 1);
+    FieldPlayerCore_SetMoveStatus(grid->core, PLAYER_MOVE_STATUS_MOVE);
     GFL_SndSEPlay(SEQ_SE_DANSA);
 }
 
@@ -1223,7 +1223,7 @@ static void FieldPlayerGrid_UpdateSurfIdle(FieldPlayerGrid *grid, FieldActor *ac
     }
     FldAct_SetAcmd(actor, GetAcmdForDir(dir, ACMD_FACE));
     grid->state = GRID_STATE_IDLE;
-    FieldPlayerCore_SetMoveStatus(grid->core, 0);
+    FieldPlayerCore_SetMoveStatus(grid->core, PLAYER_MOVE_STATUS_NONE);
 }
 
 static void FieldPlayerGrid_UpdateSurfMove(FieldPlayerGrid *grid, FieldActor *actor, const GridMoveInput *input) {
@@ -1236,19 +1236,19 @@ static void FieldPlayerGrid_UpdateSurfMove(FieldPlayerGrid *grid, FieldActor *ac
     }
     FldAct_SetAcmd(actor, GetAcmdForDir(input->dir, acmd));
     grid->state = GRID_STATE_MOVE;
-    FieldPlayerCore_SetMoveStatus(grid->core, 1);
+    FieldPlayerCore_SetMoveStatus(grid->core, PLAYER_MOVE_STATUS_MOVE);
 }
 
 static void FieldPlayerGrid_UpdateSurfTurn(FieldPlayerGrid *grid, FieldActor *actor, const GridMoveInput *input) {
     FldAct_SetAcmd(actor, GetAcmdForDir(input->dir, ACMD_STAY_WALK_2F));
     grid->state = GRID_STATE_TURN;
-    FieldPlayerCore_SetMoveStatus(grid->core, 2);
+    FieldPlayerCore_SetMoveStatus(grid->core, PLAYER_MOVE_STATUS_TURN);
 }
 
 static void FieldPlayerGrid_UpdateSurfBrake(FieldPlayerGrid *grid, FieldActor *actor, const GridMoveInput *input) {
     FldAct_SetAcmd(actor, GetAcmdForDir(input->dir, ACMD_STAY_WALK_16F));
     grid->state = GRID_STATE_BRAKE;
-    FieldPlayerCore_SetMoveStatus(grid->core, 0);
+    FieldPlayerCore_SetMoveStatus(grid->core, PLAYER_MOVE_STATUS_NONE);
     if (!FieldPlayerGrid_CheckWarpAtHitWall(grid, input->dir)) {
         GFL_SndSEPlay(SEQ_SE_WALL_HIT);
     }
@@ -1360,7 +1360,7 @@ void FieldPlayerGrid_ForceBrake(FieldPlayerGrid *grid) {
         FldAct_FreeAcmd(actor);
         CheckSetActorFaceDir(actor, dir);
         FldAct_SetDrawStatus(actor, 0);
-        FieldPlayerCore_SetMoveStatus(grid->core, 0);
+        FieldPlayerCore_SetMoveStatus(grid->core, PLAYER_MOVE_STATUS_NONE);
     }
 }
 
@@ -1378,7 +1378,7 @@ BOOL func_ov036_0219ca30(FieldPlayerGrid *grid) {
         FldAct_FreeAcmd(actor);
         CheckSetActorFaceDir(actor, dir);
         FldAct_SetDrawStatus(actor, 0);
-        FieldPlayerCore_SetMoveStatus(grid->core, 0);
+        FieldPlayerCore_SetMoveStatus(grid->core, PLAYER_MOVE_STATUS_NONE);
         break;
     }
     }
@@ -1446,14 +1446,14 @@ static BOOL FieldPlayerGrid_ConstMoveUpdate_STRAIGHT(FieldPlayerGrid *grid, u16 
     if (PlayerMoveCollCheck(grid, actor, motionDir, &tileType) != 0) {
         FieldPlayerGrid_ClearConstMove(grid);
         FieldPlayerGrid_SetConstMoveEndSpotFlag(grid);
-        FieldPlayerCore_SetMoveStatus(grid->core, 0);
+        FieldPlayerCore_SetMoveStatus(grid->core, PLAYER_MOVE_STATUS_NONE);
         return FALSE;
     }
     FieldPlayerGrid_SetConstMoveFlag(grid);
     FldAct_SetAcmd(actor, GetAcmdForDir(motionDir, ACMD_WALK_4F));
     SetActorFlag(actor, 0x18);
     grid->state = GRID_STATE_MOVE;
-    FieldPlayerCore_SetMoveStatus(grid->core, 1);
+    FieldPlayerCore_SetMoveStatus(grid->core, PLAYER_MOVE_STATUS_MOVE);
     return TRUE;
 }
 

@@ -53,8 +53,7 @@ typedef enum {
     JOIN_AVE_PARAM_MINUTE = 25,
     JOIN_AVE_PARAM_UNK_26 = 26,
     JOIN_AVE_PARAM_UNK_27 = 27,
-    // How the person last came: 1 replacing another, 2 into an empty place, 3 changed and 4 the same; setting it keeps
-    // the lowest
+    // How the person last came, a JOIN_AVE_STATUS_*; setting it keeps the lowest
     JOIN_AVE_PARAM_STATUS = 28,
     JOIN_AVE_PARAM_UNK_29 = 29,
     JOIN_AVE_PARAM_UNK_30 = 30,
@@ -210,6 +209,15 @@ struct JoinAvenuePerson {
     u32 row : 7;
     u32 shopKind : 4;
     u32 seed;
+};
+
+// JOIN_AVE_PARAM_STATUS: how a person last came, replacing one whose stay was over, into an empty place, or as a merge
+// that changed the trainer type or not
+enum {
+    JOIN_AVE_STATUS_NEW = 1,
+    JOIN_AVE_STATUS_ADDED,
+    JOIN_AVE_STATUS_CHANGED,
+    JOIN_AVE_STATUS_UPDATED,
 };
 
 // A person who has left the avenue
