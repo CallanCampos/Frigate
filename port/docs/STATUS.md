@@ -34,33 +34,37 @@ old entry gets is its `PORT_SHA` filled in.
 
 ## 2026-10-23: the process after the PR 12 sync written down, the guard refusing main, asm_oracle green again
 
-- **Upstream:** `0a12a2bd3e` (upstream merge #480), unchanged: this change imports nothing.
-- **Port:** `PORT_SHA`, the branch `port-process-docs` from main `8ca29313d1`.
-- **ROM:** T0 passes: a full `python3 configure.py && ninja` on main `8ca29313d1` (dsd `v0.12.1-dsi.6`) matches Black 2
-  `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb` and White 2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`, and `ninja` has no
-  work to do after each commit of this branch, none of which changes a file the ROM build reads. No file outside `port/`
-  and `.github/` changes, so there is no game change, no game-changes.md row and no compiler probe to run.
-- **Host build:** T1 passes on macOS arm64 for both versions (`build/port`, `build/port-w2`, RelWithDebInfo). The one
-  header the game's code includes that changes is `port/include/port_wcm.h` (its include guard and its header comment),
-  included only under `PLATFORM_PC`. 64-bit warnings: not remeasured, since no C the game build compiles changed; the
-  all-TU audit behind the last figure (392) isn't committed, which the pointer-cast guard (ADR 0019, reserved) is to
-  make reproducible.
+- **Upstream:** `b62c655bfa` (upstream merge #481), which main took in PR 16 (after PR 13's `0bed98c4c`) while this
+  change was under way; this change imports nothing of its own.
+- **Port:** `PORT_SHA`, the branch `port-process-docs` from main `8ca29313d1`, with main `6a1ace981b` merged into it.
+- **ROM:** T0 passes on the head: a full `python3 configure.py && ninja` (dsd `v0.12.1-dsi.6`) matches Black 2
+  `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb` and White 2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`, on main
+  `8ca29313d1` before the branch's commits and again after main's merge into it; `ninja` had no work to do after each of
+  the branch's own commits, none of which changes a file the ROM build reads. No file outside `port/` and `.github/`
+  changes, so there is no game change, no game-changes.md row and no compiler probe to run.
+- **Host build:** T1 passes on macOS arm64 for both versions (`build/port`, `build/port-w2`, RelWithDebInfo), before and
+  after the merge. The one header the game's code includes that changes is `port/include/port_wcm.h` (its include guard
+  and its header comment), included only under `PLATFORM_PC`. 64-bit warnings: not remeasured, since no C the game build
+  compiles changed; the all-TU audit behind the last figure (392) isn't committed, which the pointer-cast guard
+  (ADR 0019, reserved) is to make reproducible.
 - **Tests:** T2, T3, T4 and T6 ran in full, serially, with the melonDS oracle (`pbw-oracle` in each build's `oracle/`),
-  its cached saves and `build/port-venv`: Black 2, 302 tests, 291 passed, 9 failed and 2 skipped (3,613 s); White 2, 299
-  tests, 288 passed, 9 failed and 2 skipped (3,720 s). The nine are the same in both versions and fail on main too,
-  since this branch changes none of their code: `oracle_continue` and `oracle_continue_starter` wait for a stop on the
-  trap of overlay 36's `FIELDMAP_PROC_FUNCS` (`port/tools/oracle/oracle.py`'s CONTINUE sequences), which has C now, and
-  the port stops instead at frame 3436 in `FieldmapProc_Init` (`OS_Terminate`, status 71), on the field's external heap;
+  its cached saves and `build/port-venv`, on the head: Black 2, 302 tests, 292 passed, 9 failed and 1 skipped (3,524 s);
+  White 2, 299 tests, 289 passed, 9 failed and 1 skipped (2,375 s). Before the merge, on main `8ca29313d1`, the same
+  nine failed in each version, with `frame_times_title` skipped as well (over its budget while the load average was
+  above the cores, `frame_times.py --max-load`). The nine are the same in both versions and fail on main too, since this
+  branch changes none of their code: `oracle_continue` and `oracle_continue_starter` wait for a stop on the trap of
+  overlay 36's `FIELDMAP_PROC_FUNCS` (`port/tools/oracle/oracle.py`'s CONTINUE sequences), which has C now, and the port
+  stops instead at frame 3436 in `FieldmapProc_Init` (`OS_Terminate`, status 71), on the field's external heap;
   `oracle_launch_field_menus`, `oracle_launch_party_menus`, `launch_summary_standalone`, `launch_touch_then_party`,
   `launch_unfinished`, `launch_not_offered` and `frame_times_party_menus` run `--launch`, which steps aside now that the
-  field has C, so they stop at the same frame. `asm_oracle`, which fails on main, passes in both versions (264 s and
-  811 s). Skipped: `frame_times_title`, over its budget while the load average was above the cores
-  (`frame_times.py --max-load`), and `app_universal_slices`, which only a distribution build has; `frame_times_new_game`
-  passes. The sync tooling's 14 tests pass, `port_guard.py --self-test` passes 145 of 145, and actionlint finds nothing
-  in `port-ci.yml` but its unknown `ubuntu-26.04` label. T5 not run locally (no code a sanitizer checks changed; CI's
-  sanitized jobs run on the PR); T7 not run (nothing visible changed).
-- **Tiers:** unchanged from the entry below: per version, a 37,546 functions, b 3,472, c zero.
-- **Trap stubs:** unchanged: 31 function stubs and 22 data placeholders in each version (`gen_stubs` in both builds).
+  field has C, so they stop at the same frame. `asm_oracle`, which fails on main, passes in both versions. Skipped:
+  `app_universal_slices`, which only a distribution build has; the other timing gates pass. The sync tooling's 14 tests
+  pass, `port_guard.py --self-test` passes 145 of 145, and actionlint finds nothing in `port-ci.yml` but its unknown
+  `ubuntu-26.04` label. T5 not run locally (no code a sanitizer checks changed; CI's sanitized jobs run on the PR); T7
+  not run (nothing visible changed).
+- **Tiers:** unchanged from the entry below, on the head too: per version, a 37,546 functions, b 3,472, c zero.
+- **Trap stubs:** unchanged: 31 function stubs and 22 data placeholders in each version (`gen_stubs` in both builds,
+  before and after the merge).
 - **Work done:**
   - **STATUS.md:** the entry below, for the PR 12 sync that merged without one; the two `PORT_SHA`s of 2026-10-22 filled
     (`88237af41d`, the last STATUS commit of PR 8's branch, and `e6becbc07c`, PR 9's), as earlier fills took a merged
@@ -91,16 +95,16 @@ old entry gets is its `PORT_SHA` filled in.
   - **lessons.md:** never run lldb on this Mac (developer mode off, its password prompt hangs every `wibo` process,
     other sessions' ROM builds included); use the sanitizers, the crash reports and logging. And a green `--verify-pr`
     says nothing about T4.
-- **Next:** the owner verifies and merges PR 13 (upstream `0bed98c4c`, tools only), then the next sync PR, which brings
-  upstream #481 and with it `Field.colorPostFX`'s host size, the field's second stop. Then the field entry (root heaps
-  in host memory, ADR 0021; a native `_u32_div_f`; `field_transition.c`'s VRAM literal; the CONTINUE sequences into the
-  field), which closes the oracle failures below.
+- **Next:** the field entry, PR 18 (root heaps in host memory, ADR 0021; a native `_u32_div_f`; `field_transition.c`'s
+  VRAM literal; the CONTINUE sequences into the field), which closes the oracle failures below; then the launcher's
+  retirement. PR 13's and PR 16's syncs merged without STATUS entries; each gets one, with its verification, as the
+  PR 12 sync's below does.
 - **Blockers:** **the oracle and launch tests that expected the old field trap, the nine above, fail on main in both
   versions until the field entry PR lands**; the seven that run `--launch` then need the launcher's retirement too
   (ADR 0012's note). T4 is red on main until then, and `--verify-pr`, which builds no oracle, shows green. The field's
   external heap (`g_FieldHeapMemory`, a 64 KiB root on a fixed buffer that `port_heap_size` doesn't scale) stops
   CONTINUE at frame 3436 and New Game at 10,759. Battles also wait on overlay 167's `data_ov167_021d7490`, which has no
-  C and is under another contributor's claim. PR 13 and the next sync PR wait for the owner's verification and approval.
+  C and is under another contributor's claim.
 
 ## 2026-10-23: upstream sync `0a12a2bd3` merged (PR 12): the save's city state initialized by the game's own C
 
