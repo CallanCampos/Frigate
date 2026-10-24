@@ -2152,6 +2152,12 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `ZukanDetailForm_PrintEntry` declares `EntryLine colorY = ENTRY_LINE_BOTTOM;` (17) and passes it to the color's
   print; set in the color's block, the 17 is built before `x`'s arithmetic (9 bytes), and an `int` or a field
   folds the narrowing away.
+  A constant offset added to a pointer in a call's argument is an enum local in the same way, assigned where the
+  original builds it: `ctvt_talk.c`'s `CtvtTalk_UpdateRecord` builds the wave's skipped 0x800 (`movs r2, #2;
+  lsls r2, #0xa`) after the recorded size's call and before the stack argument's store only with
+  `CtvtTalkVoiceSize skipped = VOICE_CHUNK_SIZE;` after the size, and `CtvtTalk_Main` gives `packet + skipped` the
+  original's registers (the offset in r2, the pointer in r3) with the same local, where a literal or any integer
+  local is folded into the sum.
   An enum-typed index local stays a variable of its own too, which decides which register the copy for a multiply
   gets: overlay 209's `MusPokeDraw_CellCallback` keeps `kind - 7` in `r4` and multiplies a copy in `r1`, as the
   original does, only with `MusPokeDrawEquipNo pos = kind - MUS_POKE_DRAW_CELL_EQUIP;` and `poke->equips[pos]`

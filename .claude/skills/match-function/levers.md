@@ -550,6 +550,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
   store, `d->a = s[0] & 0xf;`. (matching.md: "A mask written before a bit-field store")
 - A constant narrowed at a call after `movs` (`movs r3, #0x11; lsls; asrs`): an enum-typed local set at the top of
   the function, before the calls. (matching.md: "A constant narrowed at a call")
+- A constant offset of a pointer argument built after a call where ours builds it later, or with the sum's
+  registers swapped: an enum-typed local for the offset, assigned where the original builds it. (matching.md:
+  "A constant offset added to a pointer in a call's argument")
 - A table field's offset folded into a second literal (`ldr r1, =table+4`) where the original adds the element
   offset to the base after a plain read: read that field through an inline taking an `int` index.
   (matching.md: "Two fields of one element of a static table")

@@ -43,6 +43,14 @@
 // The keys that hold the talk button
 #define CTVT_TALK_KEYS (PAD_BUTTON_A | PAD_BUTTON_R)
 
+// The sizes of a voice in bytes: it is sent in chunks, and its first chunk, the click of the microphone starting, is
+// left out of the wave drawn, which leaves at most VOICE_MAX_SIZE of a recording. A type of its own, so that MWCC
+// keeps the skipped size as a variable at the wave's two DrawWave calls
+typedef enum {
+    VOICE_CHUNK_SIZE = 0x800,
+    VOICE_MAX_SIZE = 0xc000,
+} CtvtTalkVoiceSize;
+
 // The steps of the talk mode
 typedef enum {
     TALK_STATE_FADE_IN,
@@ -841,11 +849,12 @@ int CtvtTalk_Main(CommTvtWork *sys, CtvtTalk *talk) {
             int frames = CtvtMic_GetPlayFrames(talk->mic);
             u16 length = CtvtMic_GetPlayLength(talk->mic);
             u32 size = CtvtMic_GetPlaySize(talk->mic);
+            CtvtTalkVoiceSize skipped = VOICE_CHUNK_SIZE;
 
             if (frames > length) {
                 frames = length;
             }
-            CtvtTalk_DrawWave(sys, talk, (const s16 *)((u8 *)packet + 0x800), 3, size * frames / length, size);
+            CtvtTalk_DrawWave(sys, talk, (const s16 *)((u8 *)packet + skipped), 3, size * frames / length, size);
         }
     }
     if (ClActor_IsAnimActive(talk->talkButton) == FALSE) {
@@ -1017,8 +1026,13 @@ static void CtvtTalk_UpdateRecord(CommTvtWork *sys, CtvtTalk *talk) {
             talk->next = RECORD_SENDING;
             talk->voiceIconState = VOICE_ICON_BUSY;
         }
-        CtvtTalk_DrawWave(sys, talk, (const s16 *)((u8 *)CtvtMic_GetBuffer(talk->mic) + 0x800), 9,
-                          CtvtMic_GetRecordedSize(talk->mic), 0xc000);
+        {
+            u8 *buffer = CtvtMic_GetBuffer(talk->mic);
+            u32 size = CtvtMic_GetRecordedSize(talk->mic);
+            CtvtTalkVoiceSize skipped = VOICE_CHUNK_SIZE;
+
+            CtvtTalk_DrawWave(sys, talk, (const s16 *)(buffer + skipped), 9, size, VOICE_MAX_SIZE);
+        }
         // fallthrough
     case RECORD_SENDING: {
         BOOL busy;
@@ -1031,17 +1045,17 @@ static void CtvtTalk_UpdateRecord(CommTvtWork *sys, CtvtTalk *talk) {
         busy = CtvtComm_IsVoiceBusy(sys, comm);
         size = CtvtMic_GetRecordedSize(talk->mic);
         if (talk->chunkPending == FALSE && busy == FALSE &&
-            (size >= (talk->chunk + 1) * 0x800 || talk->next == RECORD_SENDING)) {
+            (size >= (talk->chunk + 1) * VOICE_CHUNK_SIZE || talk->next == RECORD_SENDING)) {
             u8 *buffer = CtvtMic_GetBuffer(talk->mic);
 
-            u32 encoded =
-                CtvtMic_Encode(talk->mic, (const s16 *)(buffer + talk->chunk * 0x800), talk->voiceData, 0x800);
+            u32 encoded = CtvtMic_Encode(talk->mic, (const s16 *)(buffer + talk->chunk * VOICE_CHUNK_SIZE),
+                                         talk->voiceData, VOICE_CHUNK_SIZE);
 
             talk->voicePacket->chunk = talk->chunk;
             talk->voicePacket->size = encoded;
             talk->voicePacket->playSize = size;
             talk->voicePacket->speed = talk->speed;
-            if (talk->next == RECORD_SENDING && size <= (talk->chunk + 1) * 0x800) {
+            if (talk->next == RECORD_SENDING && size <= (talk->chunk + 1) * VOICE_CHUNK_SIZE) {
                 talk->voicePacket->isLast = TRUE;
             } else {
                 talk->voicePacket->isLast = FALSE;
