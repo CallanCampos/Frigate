@@ -1411,7 +1411,7 @@ Same instructions, scheduled in another order.
   `vct_flush_send_buffer` matches with `sTransceiverBalance[sSendInfo.scheduleRow][sSendInfo.scheduleColumn++]`.
 - An OR of two shifts of one value computes its right operand first and folds the left one's shift into the `orr`: `(x
   << 16) | (x >> 16)` is `lsr r1, r0, #16; orr r0, r1, r0, lsl #16`, so the ROM's `lsl` first is `(x >> 16) | (x <<
-  16)`, as the DSP's `dsp_audio.c` and `dsp_pipe.c` swap the halves of a word.
+  16)`, as the DSP's `dsp_util.c` and `dsp_pipe.c` swap the halves of a word.
 - Loads through a pointer are not moved above stores unless the pointee is `const`. A load that the original
   schedules early, such as an argument loaded before the stack arguments are stored, points to a `const` parameter.
   A narrow parameter's spill to its stack slot at entry counts as a store: `btl_main.c`'s `PokeCon_GetPosMonInner`
@@ -1457,8 +1457,8 @@ Same instructions, scheduled in another order.
   constant offsets: TwlSDK's `SNDEXi_SetIirFilter` (`sndex.c`) clears two flags and then reloads `result`, a local
   whose address it passed to `OS_ReceiveMessage`. With the two flags as fields at 0x18 and 4 of a 0x5c-byte struct,
   the reload goes between the two stores, and with them separate statics it stays after both, as in the original.
-  Growing the object works too: TwlSDK's shutter sound (`dsp_audio.c`) stores `playing`, at 0x18 of its work, after the
-  argument setup of `func_027060b4`'s pipe write and right before the message's four stores, as the original does,
+  Growing the object works too: TwlSDK's shutter sound (`dsp_util.c`) stores `playing`, at 0x18 of its work, after the
+  argument setup of `DSPi_PlaySoundEx`'s pipe write and right before the message's four stores, as the original does,
   only with the stop alarm that follows the work in `.bss` as the work's last member (0x50 bytes, as Black 1's decomp
   has it), and with the message built in the function; with the work 0x24 bytes and the alarm a static of its own,
   `playing` was stored before the argument setup (44 bytes), and with the alarm in the work but the message built in a
