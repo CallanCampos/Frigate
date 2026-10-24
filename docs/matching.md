@@ -3052,13 +3052,20 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   the original's size as `for (kind = ..., segment = ..., i = 0; ...; i++, segment++, kind++)`.
 - Inside a loop, MWCC rewrites the reads `p[v]`, `p[v + 1]` and `p[v + 2]` of a 32-bit `v` into one `p + v * 4` kept
   in a register and the offsets 4 and 8 in the loads, whatever the loop's size and whether or not `v` is an induction
-  variable. Either `opt_loop_invariants` or `opt_strength_reduction` does it, so only both pragmas off stop it. A
-  pointer conversion around the element's whole address, `*(f32 *)&words[v + 1]`, hides the address from that pass,
-  and each read keeps its own `(v + 1) << 2`; a cast on the base alone, `((f32 *)buffer)[v + 1]`, or a same-width cast
-  of the index does not. It is the cast that hides the address, not a change of type: `ica_anime.c`'s
-  `GFL_G3DCurvePreloadFrames` reads its `f32 *` buffer as `*(f32 *)&values[v + 1]`, a cast to the type it already
-  has, which is how its loop matches (its curve files hold only floats, so a `u32 *` buffer, which matches too, has
-  no evidence).
+  variable. The pass is `IRO_DistributePartiallyInvariantMultiplies` in `mwccarm.exe`, which runs on every natural
+  loop when `opt_loop_invariants` or `opt_strength_reduction` is on, so only both pragmas off stop it. For a load
+  whose address is directly a sum, it turns the scaled `(v + 1) << 2` into `(v << 2) + 4`, and a later pass shares
+  `p + (v << 2)` between the reads. A read keeps its own `(v + 1) << 2` only when one of these holds:
+  - a pointer conversion sits between the `*` and the sum, as in `*(f32 *)&words[v + 1]`. A cast on the base alone,
+    `((f32 *)buffer)[v + 1]`, leaves the sum on top and is rewritten;
+  - the address is `volatile`;
+  - the index sum is converted to the other signedness or narrowed: `p[(u32)(v + 1)]` with an `int v`, or the same
+    conversion done implicitly by passing the sum to a `u32` index parameter of an inline accessor. A widening or
+    same-signedness conversion is removed first and doesn't stop it;
+  - the subscript is a variable that holds the sum.
+  `ica_anime.c`'s `GFL_G3DCurvePreloadFrames` reads its `f32 *` buffer as `*(f32 *)&values[v + 1]`, a cast to the type
+  it already has, which is how its loop matches (its curve files hold only floats, so a `u32 *` buffer, which matches
+  too, has no evidence).
 - MWCC's `-flag` takes a pragma's name, so `-flag no-opt_loop_invariants -flag no-opt_strength_reduction` turns the
   two passes off for a whole file exactly as the two pragmas do, while the `-opt noloopinvariants` and
   `-opt nostrength` sub-options after `-O4,p` change nothing. `ica_anime.c` matches whole with the two `-flag`s in
