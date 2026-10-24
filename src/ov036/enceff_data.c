@@ -7,19 +7,20 @@
 #include "field/encounter_effect.h"
 #include "field/encounter_effect_model.h"
 #include "field/encounter_effect_ripple.h"
+#include "field/encounter_effect_spread.h"
 #include "field/event_encounter_cutin.h"
 
 const EncEffInfo ENC_EFFECT_CONTROLLERS[ENCEFF_COUNT] = {
-    /* 0 */ { (EncEffCreateFunc)EventEncountEffectCutin_Create01, EncEffModel_Render, 149, 1, 0x13010 },
+    /* 0 */ { (EncEffCreateFunc)EncEffModel_CreateModel7, EncEffModel_Render, 149, 1, 0x13010 },
     /* 1 */ { (EncEffCreateFunc)EncEffModel_CreateModel9, EncEffModel_Render, 149, 1, 0x131a4 },
     /* 2 */ { (EncEffCreateFunc)EncEffRipple_CreateWhite, EncEffRipple_ClearAndDraw, 151, 1, 0x0 },
     /* 3 */ { EventEncountEffectCutin_Create25, NULL, 146, 0, 0x1e04 },
     /* 4 */ { EventEncountEffectCutin_Create26, NULL, 146, 1, 0x14bc8 },
     /* 5 */ { (EncEffCreateFunc)EncEffModel_CreateModel5, EncEffModel_Render, 149, 1, 0x12fbc },
-    /* 6 */ { EventEncountEffectCutin_Create05, EncEffModel_Render, 149, 1, 0x13b20 },
+    /* 6 */ { (EncEffCreateFunc)EncEffModel_CreateModel3, EncEffModel_Render, 149, 1, 0x13b20 },
     /* 7 */ { (EncEffCreateFunc)EncEffCells_Create, EncEffGrid_ClearAndDraw, 152, 0, 0x0 },
-    /* 8 */ { (EncEffCreateFunc)EncEffCells_Create, EncEffGrid_ClearAndDraw, 154, 1, 0x0 },
-    /* 9 */ { (EncEffCreateFunc)EncEffCells_Create, EncEffGrid_ClearAndDraw, 153, 1, 0x0 },
+    /* 8 */ { (EncEffCreateFunc)EncEffSpread_Create, EncEffGrid_ClearAndDraw, 154, 1, 0x0 },
+    /* 9 */ { (EncEffCreateFunc)EncEffColumns_Create, EncEffGrid_ClearAndDraw, 153, 1, 0x0 },
     /* 10 */ { EventEncountEffectCutin_Create00, NULL, 146, 0, 0xe570 },
     /* 11 */ { EventEncountEffectCutin_Create01, NULL, 146, 0, 0xe570 },
     /* 12 */ { EventEncountEffectCutin_Create02, NULL, 146, 0, 0xe570 },

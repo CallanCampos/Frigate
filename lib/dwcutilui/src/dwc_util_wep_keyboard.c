@@ -71,7 +71,7 @@ void DWCUtilWepKeyboard_Init(void) {
     DWCi_GetParam2_(&field, &fromList);
     if (field == 0) {
         DWCi_SETTINGlGetSsid(sWepKeyboard->str);
-        sWepKeyboard->length = DWCi_MOV_WH_SetUserGameInfo(sWepKeyboard->str, WEP_KEYBOARD_LENGTH);
+        sWepKeyboard->length = DWCi_STRlNLen(sWepKeyboard->str, WEP_KEYBOARD_LENGTH);
     }
     initGraphics();
     DWCi_HLlLoad(field + 9);
@@ -119,7 +119,7 @@ static void procInit(void) {
 
 static void procInit1(void) {
     if (DWCi_EFFlCheck(1) == 0 && DWCi_EFFlCheck(0) == 0) {
-        DWCUtilKeyboard_Open();
+        DWCi_KBlInit();
         DWCUtilSound_PlaySe(0x14);
         if (sWepKeyboard->length == 0) {
             DWCi_KBlSetErase(FALSE);
@@ -236,7 +236,7 @@ static void endScene3(void) {
     int fromList;
 
     DWCi_COMMENTlDelete();
-    DWCi_MOV_MBP_GetChildBmp(sWepKeyboard->cursor);
+    DWCi_OBJlDelete(sWepKeyboard->cursor);
     DWCi_FNTlDeleteBgLcd(0);
     DWCUtilGfxResource_Load("char/ybObjMain.ncl.l", GX_LoadOBJPltt);
     DWCUtilDisplay_HidePlanes(1, GX_PLANEMASK_BG0);
@@ -354,7 +354,7 @@ static BOOL isCorrect(void) {
     if (fromList == 1 && sWepKeyboard->str[0] == '\0') {
         return FALSE;
     }
-    length = DWCi_MOV_WH_SetUserGameInfo(sWepKeyboard->str, WEP_KEYBOARD_LENGTH);
+    length = DWCi_STRlNLen(sWepKeyboard->str, WEP_KEYBOARD_LENGTH);
     switch (length) {
     case 0:
     case 5:

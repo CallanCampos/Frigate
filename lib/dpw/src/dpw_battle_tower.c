@@ -1,6 +1,6 @@
 #include "dpw/dpw_bt.h"
 #include "dpw_internal.h"
-#include "dwc/gamestats.h"
+#include "dwc/dwc_encsession.h"
 #include "nitro/os.h"
 
 // The Battle Subway's client, see dpw_bt.h. It works like dpw_tr.c: the states are even while a request is out and the
@@ -68,37 +68,37 @@ void DpwBt_Process(void) {
 
     switch (sDpwBtWork.state) {
     case 2:
-        switch (Gamestats_Poll()) {
+        switch (DWCi_EncSessionProcess()) {
         case GAMESTATS_STATE_FAILED:
             sDpwBtWork.state = 0xc;
             DWC_GetLastErrorEx(&type, &group);
             sDpwBtWork.result = DpwBtMapGamestatsError(group);
-            Gamestats_Close();
+            DWCi_EncSessionShutdown();
             break;
         case GAMESTATS_STATE_DONE:
             sDpwBtWork.state = 0xc;
-            answer = Gamestats_GetBody(&size);
+            answer = DWCi_EncSessionGetResponse(&size);
             __memcpy(sDpwBtWork.code, answer, sizeof(sDpwBtWork.code));
             if (size != 0) {
                 sDpwBtWork.result = sDpwBtWork.code[0];
             } else {
                 sDpwBtWork.result = -2;
             }
-            Gamestats_Close();
+            DWCi_EncSessionShutdown();
             break;
         }
         break;
     case 4:
-        switch (Gamestats_Poll()) {
+        switch (DWCi_EncSessionProcess()) {
         case GAMESTATS_STATE_FAILED:
             sDpwBtWork.state = 0xc;
             DWC_GetLastErrorEx(&type, &group);
             sDpwBtWork.result = DpwBtMapGamestatsError(group);
-            Gamestats_Close();
+            DWCi_EncSessionShutdown();
             break;
         case GAMESTATS_STATE_DONE:
             sDpwBtWork.state = 0xc;
-            answer = Gamestats_GetBody(&size);
+            answer = DWCi_EncSessionGetResponse(&size);
             memcpy(sDpwBtWork.resultData, answer, 0xa8c);
             if (size == 0xa8c) {
                 sDpwBtWork.result = 0;
@@ -115,21 +115,21 @@ void DpwBt_Process(void) {
                     break;
                 }
             }
-            Gamestats_Close();
+            DWCi_EncSessionShutdown();
             break;
         }
         break;
     case 6:
-        switch (Gamestats_Poll()) {
+        switch (DWCi_EncSessionProcess()) {
         case GAMESTATS_STATE_FAILED:
             sDpwBtWork.state = 0xc;
             DWC_GetLastErrorEx(&type, &group);
             sDpwBtWork.result = DpwBtMapGamestatsError(group);
-            Gamestats_Close();
+            DWCi_EncSessionShutdown();
             break;
         case GAMESTATS_STATE_DONE:
             sDpwBtWork.state = 0xc;
-            answer = Gamestats_GetBody(&size);
+            answer = DWCi_EncSessionGetResponse(&size);
             __memcpy(sDpwBtWork.code, answer, sizeof(sDpwBtWork.code));
             switch (sDpwBtWork.code[0]) {
             case 1:
@@ -148,21 +148,21 @@ void DpwBt_Process(void) {
                 sDpwBtWork.result = -5;
                 break;
             }
-            Gamestats_Close();
+            DWCi_EncSessionShutdown();
             break;
         }
         break;
     case 8:
-        switch (Gamestats_Poll()) {
+        switch (DWCi_EncSessionProcess()) {
         case GAMESTATS_STATE_FAILED:
             sDpwBtWork.state = 0xc;
             DWC_GetLastErrorEx(&type, &group);
             sDpwBtWork.result = DpwBtMapGamestatsError(group);
-            Gamestats_Close();
+            DWCi_EncSessionShutdown();
             break;
         case GAMESTATS_STATE_DONE:
             sDpwBtWork.state = 0xc;
-            answer = Gamestats_GetBody(&size);
+            answer = DWCi_EncSessionGetResponse(&size);
             __memcpy(sDpwBtWork.code, answer, sizeof(sDpwBtWork.code));
             switch (sDpwBtWork.code[0]) {
             case 1:
@@ -181,21 +181,21 @@ void DpwBt_Process(void) {
                 sDpwBtWork.result = -5;
                 break;
             }
-            Gamestats_Close();
+            DWCi_EncSessionShutdown();
             break;
         }
         break;
     case 10:
-        switch (Gamestats_Poll()) {
+        switch (DWCi_EncSessionProcess()) {
         case GAMESTATS_STATE_FAILED:
             sDpwBtWork.state = 0xc;
             DWC_GetLastErrorEx(&type, &group);
             sDpwBtWork.result = DpwBtMapGamestatsError(group);
-            Gamestats_Close();
+            DWCi_EncSessionShutdown();
             break;
         case GAMESTATS_STATE_DONE:
             sDpwBtWork.state = 0xc;
-            answer = Gamestats_GetBody(&size);
+            answer = DWCi_EncSessionGetResponse(&size);
             __memcpy(sDpwBtWork.resultData, answer, 8);
             if (size == 8) {
                 sDpwBtWork.result = 0;
@@ -218,7 +218,7 @@ void DpwBt_Process(void) {
                     break;
                 }
             }
-            Gamestats_Close();
+            DWCi_EncSessionShutdown();
             break;
         }
         break;
@@ -229,7 +229,7 @@ void DpwBt_Process(void) {
     case 11:
         sDpwBtWork.state = 0xc;
         sDpwBtWork.result = -4;
-        Gamestats_Close();
+        DWCi_EncSessionShutdown();
         break;
     case 0:
     case 1:
@@ -260,13 +260,13 @@ s32 DpwBt_GetResult(void) {
 
 void DpwBt_GetRoomNumber(int kind) {
     sDpwBtWork.request[0] = kind - 1;
-    Gamestats_Start(sDpwBtServerType, DPW_GAMESTATS_KEY);
-    if (Gamestats_Send("/web/battletower/roomnum.asp", sDpwBtWork.pid, sDpwBtWork.request, 1, NULL) == 0) {
+    DWCi_EncSessionInitialize(sDpwBtServerType, DPW_GAMESTATS_KEY);
+    if (DWCi_EncSessionGetAsync("/web/battletower/roomnum.asp", sDpwBtWork.pid, sDpwBtWork.request, 1, NULL) == 0) {
         sDpwBtWork.state = 2;
     } else {
         sDpwBtWork.state = 0xc;
         sDpwBtWork.result = -5;
-        Gamestats_Close();
+        DWCi_EncSessionShutdown();
     }
 }
 
@@ -274,13 +274,13 @@ void DpwBt_Download(int kind, int room, void *result) {
     sDpwBtWork.resultData = result;
     sDpwBtWork.request[0] = kind - 1;
     sDpwBtWork.request[1] = room - 1;
-    Gamestats_Start(sDpwBtServerType, DPW_GAMESTATS_KEY);
-    if (Gamestats_Send("/web/battletower/download.asp", sDpwBtWork.pid, sDpwBtWork.request, 2, NULL) == 0) {
+    DWCi_EncSessionInitialize(sDpwBtServerType, DPW_GAMESTATS_KEY);
+    if (DWCi_EncSessionGetAsync("/web/battletower/download.asp", sDpwBtWork.pid, sDpwBtWork.request, 2, NULL) == 0) {
         sDpwBtWork.state = 4;
     } else {
         sDpwBtWork.state = 0xc;
         sDpwBtWork.result = -5;
-        Gamestats_Close();
+        DWCi_EncSessionShutdown();
     }
 }
 
@@ -293,49 +293,49 @@ void DpwBt_Upload(int kind, int room, u8 win, const void *team, const void *sign
     memcpy(sDpwBtUpload.sign, sign, 0x80);
     sDpwBtUpload.id = id;
     *(DpwBtUpload *)sDpwBtWork.request = sDpwBtUpload;
-    Gamestats_Start(sDpwBtServerType, DPW_GAMESTATS_KEY);
-    if (Gamestats_Send("/web/battletower/upload.asp", sDpwBtWork.pid, sDpwBtWork.request, 0x184, NULL) == 0) {
+    DWCi_EncSessionInitialize(sDpwBtServerType, DPW_GAMESTATS_KEY);
+    if (DWCi_EncSessionGetAsync("/web/battletower/upload.asp", sDpwBtWork.pid, sDpwBtWork.request, 0x184, NULL) == 0) {
         sDpwBtWork.state = 6;
     } else {
         sDpwBtWork.state = 0xc;
         sDpwBtWork.result = -5;
-        Gamestats_Close();
+        DWCi_EncSessionShutdown();
     }
 }
 
 void DpwBt_Cancel(void) {
     switch (sDpwBtWork.state) {
     case 2:
-        Gamestats_Abort();
+        DWCi_EncSessionCancel();
         sDpwBtWork.state = 3;
         break;
     case 4:
-        Gamestats_Abort();
+        DWCi_EncSessionCancel();
         sDpwBtWork.state = 5;
         break;
     case 6:
-        Gamestats_Abort();
+        DWCi_EncSessionCancel();
         sDpwBtWork.state = 7;
         break;
     case 8:
-        Gamestats_Abort();
+        DWCi_EncSessionCancel();
         sDpwBtWork.state = 9;
         break;
     case 10:
-        Gamestats_Abort();
+        DWCi_EncSessionCancel();
         sDpwBtWork.state = 11;
         break;
     }
 }
 
 void DpwBt_GetServerState(void) {
-    Gamestats_Start(sDpwBtServerType, DPW_GAMESTATS_KEY);
-    if (Gamestats_Send("/web/battletower/info.asp", sDpwBtWork.pid, sDpwBtWork.request, 0, NULL) == 0) {
+    DWCi_EncSessionInitialize(sDpwBtServerType, DPW_GAMESTATS_KEY);
+    if (DWCi_EncSessionGetAsync("/web/battletower/info.asp", sDpwBtWork.pid, sDpwBtWork.request, 0, NULL) == 0) {
         sDpwBtWork.state = 8;
     } else {
         sDpwBtWork.state = 0xc;
         sDpwBtWork.result = -5;
-        Gamestats_Close();
+        DWCi_EncSessionShutdown();
     }
 }
 
@@ -343,13 +343,13 @@ void DpwBt_SetProfile(Dpw_Common_Profile *profile, Dpw_Common_ProfileResult *res
     OS_GetMacAddress(profile->macAddress);
     memcpy(sDpwBtWork.request, profile, 0x64);
     sDpwBtWork.resultData = result;
-    Gamestats_Start(sDpwBtServerType, DPW_GAMESTATS_KEY);
-    if (Gamestats_Send("/web/common/setProfile.asp", sDpwBtWork.pid, sDpwBtWork.request, 0x64, NULL) == 0) {
+    DWCi_EncSessionInitialize(sDpwBtServerType, DPW_GAMESTATS_KEY);
+    if (DWCi_EncSessionGetAsync("/web/common/setProfile.asp", sDpwBtWork.pid, sDpwBtWork.request, 0x64, NULL) == 0) {
         sDpwBtWork.state = 10;
     } else {
         sDpwBtWork.state = 0xc;
         sDpwBtWork.result = -5;
-        Gamestats_Close();
+        DWCi_EncSessionShutdown();
     }
 }
 

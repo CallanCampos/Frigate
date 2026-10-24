@@ -1,6 +1,6 @@
 #include "dwc_util_string.h"
 
-int DWCi_MOV_WH_SetUserGameInfo(const u8 *str, int max) {
+int DWCi_STRlNLen(const u8 *str, int max) {
     int i;
 
     for (i = 0; i < max; i++) {
@@ -11,7 +11,7 @@ int DWCi_MOV_WH_SetUserGameInfo(const u8 *str, int max) {
     return i;
 }
 
-int DWCUtilString_Widen(u16 *dst, const u8 *src, int size) {
+int DWCi_STRlConvertStringAsciiToUnicode(u16 *dst, const u8 *src, int size) {
     int i;
 
     for (i = 0; i < size - 1; i++) {

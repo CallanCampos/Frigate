@@ -1,9 +1,12 @@
-#include "dwc/gamestats.h"
-#include "gamestats_internal.h"
+#include "dwc/dwc_encsession.h"
+#include "enc_internal.h"
 
-// The client of the game statistics server, see gamestats.h. A call is a small state machine that the game runs every
-// frame with gamestats_Poll: 3 once the key is set, 4 to send the first request, 5 while it is in flight, 6 to send the
-// second one, 7 while it is in flight, 8 when the answer is kept, and 1 when anything failed.
+// DWC's encrypted session, the client of the game statistics server, see dwc_encsession.h. The file and its functions
+// have the names that Black 1's decompilation (aletheia) gives the same functions, in the same order, of
+// libdwcenc.TWL.HYB.a's dwc_encsession.o, including b64size, my_randinit and my_rand in lower case. A call is a small
+// state machine that the game runs every frame with DWCi_EncSessionProcess: 3 once the key is set, 4 to send the first
+// request, 5 while it is in flight, 6 to send the second one, 7 while it is in flight, 8 when the answer is kept, and 1
+// when anything failed.
 
 // The state of the client
 typedef struct GamestatsClient {
@@ -34,41 +37,43 @@ typedef struct GamestatsClient {
     u8 unk9D[3];
 } GamestatsClient;
 
-static u32 GamestatsEncodedSize(u32 size);
-static void SeedRandom(u32 seed);
-static u8 NextRandom(void);
-static BOOL Configure(const char *gameName, const char *secret, u32 multiplier, u32 increment, u32 modulus,
-                      u32 hashKey);
-static BOOL CheckAnswer(const char *data, int size);
-static void OnSent(DWCGHTTPState state, const char *buffer, int length, int received, int total, void *arg);
-static void OnAnswered(const char *data, int size, DWCGHTTPResult status, void *arg);
-static int EncodePayload(char *dest, const u8 *header, int headerSize, const u8 *payload, u32 payloadSize);
-static void SetFailed(void);
-static int Send(const char *page, int pid, const void *payload, int size, GamestatsCheckFunc check, BOOL useHash);
+static u32 b64size(u32 size);
+static void my_randinit(u32 seed);
+static u8 my_rand(void);
+static BOOL DWCi_EncValidateKey(const char *gameName, const char *secret, u32 multiplier, u32 increment, u32 modulus,
+                                u32 hashKey);
+static BOOL DWCi_EncSessionValidateResponse(const char *data, int size);
+static void DWCi_EncSessionProgressCallback(DWCGHTTPState state, const char *buffer, int length, int received,
+                                            int total, void *arg);
+static void DWCi_EncSessionCompleteCallback(const char *data, int size, DWCGHTTPResult status, void *arg);
+static int DWCi_EncSessionEncrypt(char *dest, const u8 *header, int headerSize, const u8 *payload, u32 payloadSize);
+static void DWCi_EncSetError(void);
+static int DWCi_EncSessionGetPrivateAsync(const char *page, int pid, const void *payload, int size,
+                                          GamestatsCheckFunc check, BOOL useHash);
 
 static int sRandomState;
 static const char *sBaseUrl;
 static GamestatsClient sClient = { 2 };
 
 // The size of size bytes in base64
-static u32 GamestatsEncodedSize(u32 size) {
+static u32 b64size(u32 size) {
     return (size / 3 + (size % 3 != 0 ? 1 : 0)) * 4;
 }
 
-static void SeedRandom(u32 seed) {
+static void my_randinit(u32 seed) {
     sRandomState = (seed << 16) | seed;
 }
 
 // The next byte of the generator
-static u8 NextRandom(void) {
+static u8 my_rand(void) {
     sRandomState = (sClient.multiplier * sRandomState + sClient.increment) % sClient.modulus;
     return sRandomState >> 16;
 }
 
 // Takes the game's name and secret and the generator's numbers, which have to be the ones of a full cycle: the
 // multiplier is 5 more than a multiple of 8, the increment odd and the modulus a power of two
-static BOOL Configure(const char *gameName, const char *secret, u32 multiplier, u32 increment, u32 modulus,
-                      u32 hashKey) {
+static BOOL DWCi_EncValidateKey(const char *gameName, const char *secret, u32 multiplier, u32 increment, u32 modulus,
+                                u32 hashKey) {
     int bits = 0;
     int i;
 
@@ -104,7 +109,7 @@ static BOOL Configure(const char *gameName, const char *secret, u32 multiplier, 
 }
 
 // Checks that the answer ends with the hash of the secret, the answer in base64 and the secret, and keeps it
-static BOOL CheckAnswer(const char *data, int size) {
+static BOOL DWCi_EncSessionValidateResponse(const char *data, int size) {
     char hash[0x29];
     u8 digest[0x14];
     char digits[17] = "0123456789abcdef";
@@ -116,14 +121,14 @@ static BOOL CheckAnswer(const char *data, int size) {
         return FALSE;
     }
     bodySize = size - 0x28;
-    buffer = DWC_Alloc(8, GamestatsEncodedSize(bodySize) + 0x29);
+    buffer = DWC_Alloc(8, b64size(bodySize) + 0x29);
     if (buffer == NULL) {
         return FALSE;
     }
     memcpy(buffer, sClient.secret, sizeof(sClient.secret));
     B64Encode(data, buffer + 0x14, bodySize, 2);
-    memcpy(buffer + 0x14 + GamestatsEncodedSize(bodySize), sClient.secret, sizeof(sClient.secret));
-    MATH_CalcSHA1(digest, buffer, GamestatsEncodedSize(bodySize) + 0x28);
+    memcpy(buffer + 0x14 + b64size(bodySize), sClient.secret, sizeof(sClient.secret));
+    MATH_CalcSHA1(digest, buffer, b64size(bodySize) + 0x28);
     DWC_Free(8, buffer, 0);
     for (i = 0; i < 0x14; i++) {
         hash[i * 2] = digits[digest[i] >> 4];
@@ -139,12 +144,13 @@ static BOOL CheckAnswer(const char *data, int size) {
     return TRUE;
 }
 
-static void OnSent(DWCGHTTPState state, const char *buffer, int length, int received, int total, void *arg) {
+static void DWCi_EncSessionProgressCallback(DWCGHTTPState state, const char *buffer, int length, int received,
+                                            int total, void *arg) {
 }
 
 // The HTTP client's answer to either request. The first one answers with a challenge of 32 characters, from which the
 // hash of the second request is made; the second answers with the data, or with a text that starts with "error:"
-static void OnAnswered(const char *data, int size, DWCGHTTPResult status, void *arg) {
+static void DWCi_EncSessionCompleteCallback(const char *data, int size, DWCGHTTPResult status, void *arg) {
     sClient.request = -1;
     if (sClient.state == 1) {
         return;
@@ -169,28 +175,28 @@ static void OnAnswered(const char *data, int size, DWCGHTTPResult status, void *
                 strncpy(sClient.hash, sClient.hashField, 0x29);
                 sClient.state = 6;
             } else {
-                SetFailed();
+                DWCi_EncSetError();
             }
             DWCi_GsFree(data);
             break;
         case 7:
             if (strncmp(data, "error:", strlen("error:")) == 0) {
                 DWCi_GsFree(data);
-                SetFailed();
+                DWCi_EncSetError();
                 return;
             }
             if (sClient.answer != NULL) {
                 DWCi_GsFree(sClient.answer);
                 sClient.answer = NULL;
             }
-            if (!CheckAnswer(data, size)) {
+            if (!DWCi_EncSessionValidateResponse(data, size)) {
                 DWCi_GsFree(data);
-                SetFailed();
+                DWCi_EncSetError();
                 return;
             }
             if (sClient.check != NULL && !sClient.check(data, size)) {
                 DWCi_GsFree(data);
-                SetFailed();
+                DWCi_EncSetError();
                 return;
             }
             sClient.answer = data;
@@ -199,13 +205,13 @@ static void OnAnswered(const char *data, int size, DWCGHTTPResult status, void *
             break;
         }
     } else {
-        SetFailed();
+        DWCi_EncSetError();
     }
 }
 
 // Scrambles the header and the payload into dest, in base64: a checksum xored with the key, and the bytes xored with
 // the generator that the checksum seeds
-static int EncodePayload(char *dest, const u8 *header, int headerSize, const u8 *payload, u32 payloadSize) {
+static int DWCi_EncSessionEncrypt(char *dest, const u8 *header, int headerSize, const u8 *payload, u32 payloadSize) {
     int total = payloadSize + headerSize;
     u8 *buffer;
     u32 sum = 0;
@@ -224,9 +230,9 @@ static int EncodePayload(char *dest, const u8 *header, int headerSize, const u8 
     for (i = 0; i < total; i++) {
         sum += buffer[i + 4];
     }
-    SeedRandom(sum);
+    my_randinit(sum);
     for (i = 0; i < total; i++) {
-        buffer[i + 4] ^= NextRandom();
+        buffer[i + 4] ^= my_rand();
     }
     sum ^= sClient.hashKey;
     buffer[0] = sum >> 24;
@@ -235,11 +241,11 @@ static int EncodePayload(char *dest, const u8 *header, int headerSize, const u8 
     buffer[3] = sum;
     B64Encode(buffer, dest, total + 4, 2);
     DWC_Free(8, buffer, 0);
-    dest[GamestatsEncodedSize(total + 4)] = '\0';
+    dest[b64size(total + 4)] = '\0';
     return 0;
 }
 
-void Gamestats_Start(int server, const char *key) {
+void DWCi_EncSessionInitialize(int server, const char *key) {
     char secret[0x15];
     char digits[9] = { 0 };
     u32 multiplier;
@@ -270,21 +276,21 @@ void Gamestats_Start(int server, const char *key) {
     increment = strtoul(strncpy(digits, key + 0x1c, 8), NULL, 16);
     modulus = strtoul(strncpy(digits, key + 0x24, 8), NULL, 16);
     hashKey = strtoul(strncpy(digits, key + 0x2c, 8), NULL, 16);
-    Configure(key + 0x34, secret, multiplier, increment, modulus, hashKey);
+    DWCi_EncValidateKey(key + 0x34, secret, multiplier, increment, modulus, hashKey);
     DWC_InitGHTTP(NULL);
     sClient.state = 3;
     sClient.active = TRUE;
 }
 
 // Fails the call, and tells the Wi-Fi library unless it has an error
-static void SetFailed(void) {
+static void DWCi_EncSetError(void) {
     if (!DWCi_IsError()) {
         DWCi_SetError(6, -90040);
     }
     sClient.state = 1;
 }
 
-int Gamestats_Poll(void) {
+int DWCi_EncSessionProcess(void) {
     switch (sClient.state) {
     case 0:
     case 2:
@@ -292,46 +298,48 @@ int Gamestats_Poll(void) {
     case 8:
         break;
     case 1:
-        SetFailed();
+        DWCi_EncSetError();
         break;
     case 4:
-        sClient.request = DWC_GetGHTTPDataEx(sClient.url, 0, 0, OnSent, OnAnswered, NULL);
+        sClient.request = DWC_GetGHTTPDataEx(sClient.url, 0, 0, DWCi_EncSessionProgressCallback,
+                                             DWCi_EncSessionCompleteCallback, NULL);
         if (sClient.request >= 0) {
             sClient.state = 5;
         } else {
-            SetFailed();
+            DWCi_EncSetError();
         }
         break;
     case 5:
         if (!DWC_ProcessGHTTP()) {
-            SetFailed();
+            DWCi_EncSetError();
         }
         break;
     case 6:
-        sClient.request = DWC_GetGHTTPDataEx(sClient.url, 0, 0, OnSent, OnAnswered, NULL);
+        sClient.request = DWC_GetGHTTPDataEx(sClient.url, 0, 0, DWCi_EncSessionProgressCallback,
+                                             DWCi_EncSessionCompleteCallback, NULL);
         if (sClient.request >= 0) {
             sClient.state = 7;
         } else {
-            SetFailed();
+            DWCi_EncSetError();
         }
         break;
     case 7:
         if (!DWC_ProcessGHTTP()) {
-            SetFailed();
+            DWCi_EncSetError();
         }
         break;
     }
     return sClient.state;
 }
 
-void Gamestats_Abort(void) {
+void DWCi_EncSessionCancel(void) {
     if (sClient.request >= 0) {
         DWC_CancelGHTTPRequest(sClient.request);
     }
     sClient.state = 0;
 }
 
-void Gamestats_Close(void) {
+void DWCi_EncSessionShutdown(void) {
     if (sClient.active) {
         if (sClient.url != NULL) {
             DWC_Free(8, sClient.url, 0);
@@ -348,14 +356,15 @@ void Gamestats_Close(void) {
     }
 }
 
-void *Gamestats_GetBody(int *size) {
+void *DWCi_EncSessionGetResponse(int *size) {
     *size = sClient.bodySize;
     return sClient.body;
 }
 
 // Builds the URL of a request: the server, the game, the page and the player's ID, the hash that is still a placeholder
 // and the payload. The first request is cut before its hash, and the second keeps the one made from the first's answer
-static int Send(const char *page, int pid, const void *payload, int size, GamestatsCheckFunc check, BOOL useHash) {
+static int DWCi_EncSessionGetPrivateAsync(const char *page, int pid, const void *payload, int size,
+                                          GamestatsCheckFunc check, BOOL useHash) {
     char pidText[0x10];
     int header[2];
     int result;
@@ -370,7 +379,7 @@ static int Send(const char *page, int pid, const void *payload, int size, Gamest
     }
     sClient.url = DWC_Alloc(8, strlen(sBaseUrl) + strlen(sClient.gameName) + strlen(page) + strlen("?pid=") +
                                    OS_SNPrintf(pidText, 0x10, "%d", pid) + strlen("&hash=") + 0x28 + strlen("&data=") +
-                                   GamestatsEncodedSize(size + 0xc) + 1);
+                                   b64size(size + 0xc) + 1);
     if (sClient.url == NULL) {
         return 2;
     }
@@ -381,7 +390,7 @@ static int Send(const char *page, int pid, const void *payload, int size, Gamest
     sClient.hashField = sClient.urlEnd - strlen("&data=") - 0x28;
     header[0] = pid;
     header[1] = size;
-    result = EncodePayload(sClient.urlEnd, (u8 *)header, 8, payload, size);
+    result = DWCi_EncSessionEncrypt(sClient.urlEnd, (u8 *)header, 8, payload, size);
     if (result == 2) {
         DWC_Free(8, sClient.url, 0);
         sClient.url = NULL;
@@ -398,6 +407,6 @@ static int Send(const char *page, int pid, const void *payload, int size, Gamest
     return 0;
 }
 
-int Gamestats_Send(const char *page, int pid, const void *payload, int size, GamestatsCheckFunc check) {
-    return Send(page, pid, payload, size, check, FALSE);
+int DWCi_EncSessionGetAsync(const char *page, int pid, const void *payload, int size, GamestatsCheckFunc check) {
+    return DWCi_EncSessionGetPrivateAsync(page, pid, payload, size, check, FALSE);
 }

@@ -103,7 +103,7 @@ BOOL DWC_AC_Create(DWCACConfig *param) {
         if (work->rssiPacked == 1) {
             result = WCM_Init(sBlocks.wcm, 0x4800);
         } else {
-            result = WCM_InitCore(sBlocks.wcm, 0x4800, 2);
+            result = WCM_InitEx(sBlocks.wcm, 0x4800, 2);
         }
     } else {
         result = WCM_Init(sBlocks.wcm, 0x4800);

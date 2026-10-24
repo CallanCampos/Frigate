@@ -597,10 +597,10 @@ static void DWCUtilMenu_DestroyTask(DWCUtilTask *task, void *arg) {
         DWCi_CELLlDelete(sMenu->buttons[i]);
     }
     for (i = 0; i < 2; i++) {
-        DWCi_MOV_MBP_GetChildBmp(sMenu->arrowOams[i]);
+        DWCi_OBJlDelete(sMenu->arrowOams[i]);
     }
     for (i = 0; i < 10; i++) {
-        DWCi_MOV_MBP_GetChildBmp(sMenu->keyOams[i]);
+        DWCi_OBJlDelete(sMenu->keyOams[i]);
     }
     DWCi_HEAPlFree_(&sMenu);
 }

@@ -57,7 +57,7 @@ void DWCi_SETTINGlSetWep(const u8 *key) {
     u8 *dest;
 
     MI_CpuFill8(sWifiSettings->edit.connection.wepKey[0], 0, sizeof(sWifiSettings->edit.connection.wepKey[0]));
-    length = DWCi_MOV_WH_SetUserGameInfo(key, 32);
+    length = DWCi_STRlNLen(key, 32);
     switch (length) {
     case 0:
     case 10:
