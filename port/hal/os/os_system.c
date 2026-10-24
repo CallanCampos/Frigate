@@ -6,10 +6,10 @@
 // A no-op would hang their callers, which wait for state that an interrupt delivers (PMi_SendPxiDataSync, PM_Init,
 // OSi_DoLockByWord, CARD's pull-out check).
 //
-// OS_WaitIrq is the decomp's lib/nitro/src/os/os_irqHandler.c (whose ITCM handlers have no C; core.c has them) and
-// OS_WaitInterrupt the decomp's os_system.c, with OS_SetIrqCheckFlag's word reached through the host's DTCM: os.h's
-// HW_INTR_CHECK_BUF truncates its 64-bit address (see os_irqTable.c). port/hal/os/replaced.txt keeps
-// os_irqHandler.c out of the game's sources.
+// OS_WaitIrq is the decomp's lib/nitro/src/os/os_irqHandler.c (whose ITCM handlers, os_irqHandler_itcm.c's asm
+// functions, core.c replaces) and OS_WaitInterrupt the decomp's os_system.c, with OS_SetIrqCheckFlag's word reached
+// through the host's DTCM: os.h's HW_INTR_CHECK_BUF truncates its 64-bit address (see os_irqTable.c).
+// port/hal/os/replaced.txt keeps os_irqHandler.c out of the game's sources.
 #include "hal/os/os_internal.h"
 #include "nitro/os.h"
 #include "nitro/svc.h"

@@ -125,7 +125,7 @@ int port_heap_root_memory_release(const void *start) {
 }
 
 // No heap is alive in an overlay's static when the overlay loads again: the code that deletes the heap is the
-// overlay's own (FieldmapProc_Exit in overlay 36, the trade screen's exit in overlay 194). So the memory is zeroed, as
+// overlay's own (FieldmapProc_End in overlay 36, the trade screen's exit in overlay 194). So the memory is zeroed, as
 // the DS clears the static, and left poisoned, as it is between two heaps
 void port_heap_root_memory_reset(const void *start, size_t size) {
     const u8 *from = start;

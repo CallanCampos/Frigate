@@ -1,4 +1,5 @@
-// The BIOS's CpuSet (NitroSDK's SVC_CpuSet, a Thumb stub that runs SWI 0x0b, with no C in the decomp), on the host.
+// The BIOS's CpuSet (NitroSDK's SVC_CpuSet, a Thumb stub that runs SWI 0x0b: an asm function of the decomp's
+// lib/nitro/src/syscall/secure_area.c, which port/hal/replaced.txt keeps out), on the host.
 // Its only caller is the cartridge library's CTRDGi_InitCommon, which clears its work with it, so it lives with the
 // cartridge slot; a module for the BIOS calls would take it.
 //
