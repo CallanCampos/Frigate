@@ -837,10 +837,10 @@ static void PkwdSelectScreen_LoadMovies(PkwdSelectScreenWork *wk, PkwdSelectScre
             wk->movies[i].time = Pokewood_GetLoadedMovieField(POKEWOOD_BLOCK_FIELD_TIME, 0);
             wk->movies[i].watched = func_020111a0(param->save, i);
             for (j = 0; j < CAST_COUNT; j++) {
-                Pokewood_GetLoadedMovieField(POKEWOOD_BLOCK_FIELD_PKM_0 + j, (u32)pkm);
+                Pokewood_GetLoadedMovieField(POKEWOOD_BLOCK_FIELD_PKM_0 + j, (uptr)pkm);
                 wk->movies[i].cast[j] = PokeParty_GetParam(pkm, PKM_PARAM_SPECIES, NULL);
             }
-            Pokewood_GetLoadedMovieField(POKEWOOD_BLOCK_FIELD_PKM_0, (u32)pkm);
+            Pokewood_GetLoadedMovieField(POKEWOOD_BLOCK_FIELD_PKM_0, (uptr)pkm);
             setPartyPokemonSpeciesNameToStrbuf(wk->movies[i].wordSet, 0, pkm);
             GFL_HeapFree(pkm);
         } else {

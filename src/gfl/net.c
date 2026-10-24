@@ -482,7 +482,7 @@ u8 GFL_NetGetGameCommandBase(void) {
     return 0;
 }
 
-int GFL_NetGetUserData(void) {
+sptr GFL_NetGetUserData(void) {
     GFLNetSys *pNet = GFL_NetGetSys();
 
     if (pNet->aNetInit.getUserData != NULL) {
@@ -491,7 +491,7 @@ int GFL_NetGetUserData(void) {
     return 0;
 }
 
-int GFL_NetGetFriendData(void) {
+sptr GFL_NetGetFriendData(void) {
     GFLNetSys *pNet = GFL_NetGetSys();
 
     if (pNet->aNetInit.getFriendData != NULL) {

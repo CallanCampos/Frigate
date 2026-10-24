@@ -496,7 +496,7 @@ static void EventPokewood_InitTitleParam(PokewoodTitleParam *title, BtlSetup *se
     MsgData *msgData;
 
     BattleRec_LoadToolOverlay();
-    Pokewood_GetLoadedMovieField(POKEWOOD_BLOCK_FIELD_PKM_0, (u32)pkm);
+    Pokewood_GetLoadedMovieField(POKEWOOD_BLOCK_FIELD_PKM_0, (uptr)pkm);
     species = PokeParty_GetParam(pkm, PKM_PARAM_SPECIES, NULL);
     msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_SPECIES_NAMES, HEAPID_TAIL(HEAPID_GAMEEVENT));
     GFL_MsgDataLoadStrbuf(msgData, species, name);
