@@ -28,7 +28,7 @@ struct FieldExpObjAnm {
     // What the last step returned: FALSE once an animation that doesn't loop has reached its end
     BOOL playing;
     // The actor's animation, from GFL_G3DActorGetAnm
-    void *anm;
+    G3DAnimation *anm;
 };
 
 typedef struct {

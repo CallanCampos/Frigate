@@ -55,10 +55,12 @@ static DWCUtilUsbScan *sUsbScan;
 
 BOOL DWCi_USBAPlBegin(DWCUtilUsbScanCallback callback) {
     OSOwnerInfo info;
+    OSTick startTick;
 
     sUsbScan = DWCi_HEAPlAllocEx(sizeof(DWCUtilUsbScan), 32);
     sUsbScan->callback = callback;
-    sUsbScan->startTick = OS_GetTick();
+    startTick = OS_GetTick();
+    sUsbScan->startTick = startTick;
     if (WM_Initialize(sUsbScan, cbWm, 3) == WM_ERRCODE_OPERATING) {
         do {
             WM_ReadStatus(&sUsbScan->status);
@@ -184,9 +186,10 @@ static void scanFirst(const WMStartScanExCallback *cb) {
 // The scans after the first: a connector that didn't take the console and now does is the result
 static void scanWait(const WMStartScanExCallback *cb) {
     int i;
+    WMBssDesc *desc;
     DWCUtilUsbScan *scan;
     int count;
-    int j;
+    s32 j;
 
     if (sUsbScan->pending) {
         if (sUsbScan->callback != NULL) {
@@ -197,9 +200,12 @@ static void scanWait(const WMStartScanExCallback *cb) {
     DC_InvalidateRange(sUsbScan->scanBuffer, sizeof(sUsbScan->scanBuffer));
     i = 0;
     count = cb->bssDescCount;
+    if (count <= 0) {
+        return;
+    }
     scan = sUsbScan;
-    for (; i < count; i++) {
-        WMBssDesc *desc = cb->bssDesc[i];
+    do {
+        desc = cb->bssDesc[i];
 
         if (memcmp(desc->ssid, sUsbScanSsid, 8) == 0 && (desc->ssid[9] & 1)) {
             for (j = 0; j < USB_SCAN_CONNECTORS; j++) {
@@ -216,7 +222,8 @@ static void scanWait(const WMStartScanExCallback *cb) {
                 }
             }
         }
-    }
+        i++;
+    } while (i < count);
 }
 
 // The result of the first scan, once it has run for USB_SCAN_TIME: a connector that takes the console, some that do

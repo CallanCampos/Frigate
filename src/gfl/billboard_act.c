@@ -141,7 +141,7 @@ u16 BlActSys_ExecMatLoadRequests(BlActSys *sys, const BlActMatRequest *requests,
     return first;
 }
 
-u16 BlActSys_AddTexMat(BlActSys *sys, u32 material, void *texResource) {
+u16 BlActSys_AddTexMat(BlActSys *sys, u32 material, G3DResource *texResource) {
     u32 idx = GFL_AreaManAllocDefault(sys->texMatAlloc, 1);
 
     sys->texMats[idx].material = material;

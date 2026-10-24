@@ -14,7 +14,7 @@ void NetIw_Free(void);
 void NetIw_FreeIfIdle(void);
 // Whether it is running
 BOOL NetIw_IsRunning(void);
-void NetIw_SetPeerFilter(void *a0);
+void NetIw_SetPeerFilter(GFLNetPeerFilter filter);
 void (*NetIw_SetCallbacks(void (*a0)(void *work), void (*a1)(void *work, BOOL a1), void (*a2)(void *work)))(void *work);
 // Adds a MAC address to the ones collected
 void NetIw_AddCollectedMac(const u8 *mac);

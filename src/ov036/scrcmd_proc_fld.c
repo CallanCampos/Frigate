@@ -49,7 +49,7 @@ static void func_ov036_021ae21c(void *work);
 static void func_ov036_021ae38c(void *work);
 
 // Store the Battle Box's team when it was edited, and whether the player picked a Pokémon
-static void func_ov036_021add94(void *data) {
+static void ScrcmdProcFld_FinishOv170Event(void *data) {
     PCCallWork *work = data;
     u16 picked;
 
@@ -107,7 +107,7 @@ BOOL s014F_CallPC(VM *vm, FieldScriptEnv *env) {
     callWork->param = param;
     ScriptWork_CallEvent(work,
                          EventFieldSubprocessCall_CreateWithCallback(gsys, field, OVERLAY_BOX2, &BOX2_PROC_FUNCTIONS,
-                                                                     param, func_ov036_021add94, callWork));
+                                                                     param, ScrcmdProcFld_FinishOv170Event, callWork));
     return TRUE;
 }
 
@@ -191,7 +191,7 @@ BOOL s014D_CallRecordSystem(VM *vm, FieldScriptEnv *env) {
         option = 1;
         break;
     }
-    ScriptWork_CallEvent(work, func_ov033_02179868(gsys, option, result));
+    ScriptWork_CallEvent(work, Scrcmd_CreateSubProcEvent(gsys, option, result));
     return TRUE;
 }
 
@@ -199,7 +199,7 @@ BOOL func_ov036_021ae0cc(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
 
-    ScriptWork_CallEvent(work, func_ov033_02179dd4(gsys, ScriptReadVar(vm, env)));
+    ScriptWork_CallEvent(work, EventGameManual_Create(gsys, ScriptReadVar(vm, env)));
     return TRUE;
 }
 

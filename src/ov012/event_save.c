@@ -11,7 +11,8 @@
 #include "system/game_event.h"
 #include "system/game_system.h"
 
-GameEvent *EventSave_Create(GameSystem *gsys, Field *field, u16 heapId, void *msgBgSys, u32 screenId, u32 *result) {
+GameEvent *EventSave_Create(GameSystem *gsys, Field *field, u16 heapId, FieldMsgBG *msgBgSys, u32 screenId,
+                            u32 *result) {
     GameEvent *event = GameEvent_Create(gsys, NULL, EventSave_Callback, sizeof(EventSaveWork));
     EventSaveWork *work = GameEvent_GetData(event);
     GameData *gameData;

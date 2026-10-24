@@ -10,8 +10,8 @@ a rule here changes, change it there too.
 ## Rules
 
 - **Both ROMs stay byte for byte.** Every change ends with `ninja`, which compiles every source file, complete or
-  not, and checks each module and both SHA1s. Black 2 is
-  primary. White 2 shares the source (`BLACK2`/`WHITE2` defines) and gets its configs through the version map, so
+  not, and checks each module and both SHA1s, and with no compiler warnings: `compile_all.py` fails on any, as CI
+  does, and an incremental build hides those in files it didn't rebuild. Black 2 is primary. White 2 shares the source (`BLACK2`/`WHITE2` defines) and gets its configs through the version map, so
   change configs only with the scripts, which update both versions and record what they did:
   `add_source_file.py`, `mark_complete.py`, `rename_symbol.py`, `config_fixes.py`.
 - **One source file per original file**, named after the ROM's embedded string, or descriptively, with the guess said
@@ -97,6 +97,7 @@ a rule here changes, change it there too.
 | Rename a constant of `generated/` and its uses | `.venv/bin/python tools/data/rename_constant.py OLD NEW` |
 | Progress of the local build | `ninja progress` |
 | Build and verify | `python3 configure.py && ninja 2>&1 \| tail -20` (configure only when source files were added) |
+| Check for warnings, every file and version | `.venv/bin/python tools/decomp/compile_all.py -j 6 \| tail -3` |
 
 ## Skills and agents
 

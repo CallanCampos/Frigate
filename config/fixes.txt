@@ -855,7 +855,9 @@ overlays/ov011 0x020050c4 remove_orphan_reloc .
 overlays/ov011 0x0215208e reloc_module overlay(32)
 overlays/ov011 0x02152708 add_reloc load,main,0x020050ac
 overlays/ov011 0x02155e68 add_reloc load,main,0x020050c4
+overlays/ov011 0x02158b58 add_function compare_fqdn:thumb:0x48
 overlays/ov011 0x0215a5fc add_reloc load,main,0x020050f0
+overlays/ov011 0x02160e10 section_start lib/dwc/src/match/dwc_match.c:.text
 overlays/ov011 0x0216c7ea reloc_module overlay(189)
 overlays/ov011 0x0216eba2 reloc_module overlay(189)
 overlays/ov011 0x0216ebe8 reloc_module overlay(189)
@@ -863,6 +865,8 @@ overlays/ov011 0x0216fbe0 section_end lib/dwc/src/gt2/gsUdpEngine.c:.text
 overlays/ov011 0x0216fbe0 section_start lib/dwc/src/gscommon/gsXML.c:.text
 overlays/ov011 0x021722c4 remove_reloc
 overlays/ov011 0x02185568 remove_reloc
+overlays/ov011 0x021857d0 section_start lib/dwc/src/match/dwc_match.c:.data
+overlays/ov011 0x0218e1c0 section_start lib/dwc/src/match/dwc_match.c:.bss
 overlays/ov012 0x02150aa0 overlay_id 36
 overlays/ov012 0x02150aa4 reloc_module overlay(36)
 overlays/ov012 0x02150aa8 overlay_id 174
@@ -1268,6 +1272,8 @@ overlays/ov029 0x0219729c remove_reloc
 overlays/ov029 0x021973e0 section_end lib/dwc/src/vct/vct_audio.c:.data
 overlays/ov029 0x02197418 section_start lib/dwc/src/vct/vct_dsp.c:.data
 overlays/ov029 0x02197424 add_data data_ov029_02197424
+overlays/ov029 0x02197424 remove_symbol
+overlays/ov029 0x02197440 section_end lib/dwc/src/vct/vct_dsp.c:.data
 overlays/ov029 0x02198358 section_end lib/dwc/src/vct/vct_audio.c:.bss
 overlays/ov029 0x02198358 section_start lib/dwc/src/vct/vct_buffer.c:.bss
 overlays/ov029 0x02198408 section_start lib/dwc/src/vct/vct_dsp.c:.bss
@@ -2124,6 +2130,8 @@ overlays/ov099 0x021ef672 reloc_module overlay(36)
 overlays/ov102 0x021ef19e reloc_module overlay(36)
 overlays/ov102 0x021ef21a reloc_module overlay(36)
 overlays/ov103 0x021ef240 reloc_module overlay(36)
+overlays/ov104 0x021efab6 reloc_module overlay(36)
+overlays/ov104 0x021efaf4 reloc_module overlay(36)
 overlays/ov107 0x021ef212 reloc_module overlay(36)
 overlays/ov111 0x021ef0a6 reloc_module overlay(36)
 overlays/ov120 0x021eefca reloc_module overlay(36)
@@ -2307,6 +2315,7 @@ overlays/ov167 0x021d03ac reloc_module overlay(168)
 overlays/ov167 0x021d03bc reloc_module overlay(168)
 overlays/ov167 0x021d34f8 reloc_module overlay(168)
 overlays/ov167 0x021d6ee4 remove_reloc
+overlays/ov167 0x021d7490 add_section src/ov167/btl_pokeparam.c:.rodata:0x10
 overlays/ov167 0x021da9ec remove_reloc
 overlays/ov167 0x021daa0c remove_reloc
 overlays/ov167 0x021db070 add_section src/ov167/btl_pokeparam.c:.bss:0x124

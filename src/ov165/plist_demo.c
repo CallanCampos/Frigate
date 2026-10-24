@@ -245,7 +245,7 @@ static BOOL PokeListDemo_UpdateFusion(PokeListWork *wk) {
             if (wk->demoForm != 2) {
                 GFL_SndSEPlay(SEQ_SE_SW_KYUREM_04);
             }
-            GFL_WipeSet(3, 0, 0, 0x7fff, 12, 1, wk->heapId);
+            GFL_WipeSet(WIPE_MODE_MAIN, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, 0x7fff, 12, 1, wk->heapId);
             wk->demoStep++;
         }
         break;
@@ -320,7 +320,7 @@ static BOOL PokeListDemo_UpdateFusion(PokeListWork *wk) {
     }
     case 4:
         if (PokeVoice_IsPlaying(wk->voice) == FALSE) {
-            GFL_WipeSet(3, 1, 1, 0x7fff, 12, 1, wk->heapId);
+            GFL_WipeSet(WIPE_MODE_MAIN, WIPE_TYPE_FADE_IN, WIPE_TYPE_FADE_IN, 0x7fff, 12, 1, wk->heapId);
             wk->demoStep++;
         }
         break;

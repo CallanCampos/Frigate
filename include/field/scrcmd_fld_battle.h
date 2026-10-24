@@ -7,7 +7,7 @@
 #include "struct_decls.h"
 #include "system/vm.h"
 
-BOOL func_ov036_021aea40(VM *vm, FieldScriptEnv *env);
-BOOL func_ov036_021aea8c(VM *vm, FieldScriptEnv *env);
+BOOL Regulation_RegisterAllowedSpecies(VM *vm, FieldScriptEnv *env);
+BOOL Regulation_CheckPartyRegulation(VM *vm, FieldScriptEnv *env);
 
 #endif // POKEBW2_FIELD_SCRCMD_FLD_BATTLE_H

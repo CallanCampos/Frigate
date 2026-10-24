@@ -14,16 +14,18 @@
 #define ENCOUNT_SAVE_SWARM_LOCATION_COUNT 19
 
 // The fields of a roaming Pokémon, for EncountSave_GetRoamingPkmParam
-#define ROAMING_PKM_PARAM_ZONE 1
-#define ROAMING_PKM_PARAM_IVS 2
-#define ROAMING_PKM_PARAM_PERSONALITY 3
-#define ROAMING_PKM_PARAM_SPECIES 4
-#define ROAMING_PKM_PARAM_HP 5
-#define ROAMING_PKM_PARAM_LEVEL 6
-#define ROAMING_PKM_PARAM_STATUS 7
-#define ROAMING_PKM_PARAM_ACTIVE 8
-#define ROAMING_PKM_PARAM_UNK13 9
-#define ROAMING_PKM_PARAM_NATURE 10
+enum {
+    ROAMING_PKM_PARAM_ZONE = 1,
+    ROAMING_PKM_PARAM_IVS,
+    ROAMING_PKM_PARAM_PERSONALITY,
+    ROAMING_PKM_PARAM_SPECIES,
+    ROAMING_PKM_PARAM_HP,
+    ROAMING_PKM_PARAM_LEVEL,
+    ROAMING_PKM_PARAM_STATUS,
+    ROAMING_PKM_PARAM_ACTIVE,
+    ROAMING_PKM_PARAM_UNK13,
+    ROAMING_PKM_PARAM_NATURE,
+};
 
 typedef struct {
     u16 zone;
@@ -59,7 +61,7 @@ void EncountSave_Init(EncountSave *save);
 void EncountSave_RerollSwarmLocation(SaveControl *save);
 // The swarm's location, an index of overlay 36's swarm table
 u8 EncountSave_GetSwarmLocation(EncountSave *save);
-u8 func_0200dd38(EncountSave *save, u8 index);
+u8 EncountSave_GetEntryState(EncountSave *save, u8 index);
 u8 EncountSave_GetRoamingPkmZoneClock(EncountSave *save, u8 slot);
 // The roaming Pokémon of the slot, whether it roams, and its parameters
 BOOL EncountSave_GetRoamingPkmStatus(EncountSave *save, u8 slot);

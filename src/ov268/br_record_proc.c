@@ -556,7 +556,7 @@ static void BrRecord_SeqDownloadOutline(BrSeq *p_seqwk, u32 *p_seq, void *p_wk_a
             BattleRecVideo *video;
             u32 value;
 
-            if (BrNet_GetDownloadVideo(p_wk->p_param->net, (void **)&video, &value)) {
+            if (BrNet_GetDownloadVideo(p_wk->p_param->net, &video, &value)) {
                 p_wk->profile = (GdsProfile *)video->profile;
                 p_wk->header = &video->header;
                 *p_seq = SEQ_FADEOUT_START;
@@ -700,7 +700,7 @@ static void BrRecord_SeqDownloadPlay(BrSeq *p_seqwk, u32 *p_seq, void *p_wk_adrs
             u32 value;
             BattleRecVideo *video;
 
-            if (BrNet_GetDownloadVideo(p_wk->p_param->net, (void **)&video, &value)) {
+            if (BrNet_GetDownloadVideo(p_wk->p_param->net, &video, &value)) {
                 BattleRec_StoreDownloaded((GdsProfile *)video->profile, &video->header, &video->body,
                                           GameData_GetSaveControl(p_wk->p_param->gameData));
                 *p_wk->p_param->unk2C = (s32)value;

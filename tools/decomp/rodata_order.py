@@ -27,7 +27,10 @@ it), so it is a plain entry, never `!`. `--from-object` prints every data object
 the build's own (build/b2_us/src/ov168/btlv_input.o), so nothing is forgotten, with the layout the compiler actually
 produced; `--check` compares the prediction against that object: the order of each shared section and of the named
 objects with sections of their own, the spec's names and sizes against the object's, and the local initializers by
-size (their compiler-made names can't be matched to the spec's, so their order is not checked).
+size (their compiler-made names can't be matched to the spec's, so their order is not checked). For a file that
+config/deadstrip.toml lists, the build's object at the usual path has been dead-stripped, which removes local
+initializers the size sort counted, so both read the compiler's own object under build/<version>/unstripped/ instead,
+and say so.
 
     rodata_order.py VRAM:48 VRAMNamed:48 Pos:12 Up:12 BG1:32@ BG2:32@
     rodata_order.py VRAM:48 VRAMNamed:48 Pos:12 Up:12 BG1:32@ BG2:32@ --want Pos Up VRAM VRAMNamed BG2 BG1 \
@@ -42,9 +45,34 @@ import argparse
 import itertools
 import re
 import subprocess
+import sys
 from collections import Counter
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT))
+from tools.build.deadstrip import load_manifest  # noqa: E402
 
 SEPARATE_SIZE = 64
+
+
+def layout_object(path: str) -> str:
+    """Returns the object to read a file's data layout from: for the build's object of a file in config/deadstrip.toml,
+    the compiler's own under build/<version>/unstripped/, since the strip removes local initializers the size sort
+    counted (and the functions and strings only dead code used)."""
+    try:
+        version, *parts = Path(path).resolve().relative_to(ROOT / "build").parts
+    except ValueError:
+        return path
+    if not parts or parts[0] == "unstripped":
+        return path
+    stem = Path(*parts).with_suffix("")
+    if not any(stem.with_suffix(suffix).as_posix() in load_manifest() for suffix in (".c", ".cpp")):
+        return path
+    unstripped = ROOT / "build" / version / "unstripped" / Path(*parts)
+    print(f"{path} is dead-stripped (config/deadstrip.toml): reading {unstripped.relative_to(ROOT)} instead",
+          file=sys.stderr)
+    return str(unstripped)
 
 
 def heapsort(items: list, key) -> list:
@@ -127,7 +155,7 @@ def object_layout(symbols: list) -> dict[str, list]:
 
 
 def from_object(path: str):
-    symbols = read_object(path)
+    symbols = read_object(layout_object(path))
     layouts = object_layout(symbols)
     print("objects (declaration order is yours to supply; @NNNN names are function-local initializers):")
     for name, size, _, _, kind in sorted(symbols, key=lambda s: (s[4], s[1], s[0])):
@@ -143,7 +171,7 @@ def from_object(path: str):
 
 def check(objects: list[tuple[str, int, bool]], markers: dict[str, str], path: str) -> bool:
     """Compares the predicted layout with a compiled object's; returns True when they agree."""
-    symbols = read_object(path)
+    symbols = read_object(layout_object(path))
     layouts = object_layout(symbols)
     predicted = layout(objects)
     ok = True

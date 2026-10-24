@@ -868,23 +868,31 @@ static int DWCi_GPSendBuddyRequest(int profileId) {
 }
 
 static BOOL DWCi_GetFriendBuddyStatus(const DWCFriendData *friendData, GPBuddyStatus *status) {
-    int index = 0;
     BOOL result = FALSE;
+    int index = 0;
     int profileId;
 
     if (sFriend.control == NULL || !DWCi_CheckLogin()) {
         return FALSE;
     }
     profileId = DWC_GetGsProfileId(DWCi_GetUserData(), friendData);
-    if (profileId > 0 && gpGetBuddyIndex(sFriend.control->pGpObj, profileId, &index)) {
-        return result;
+    if (profileId > 0) {
+        if (gpGetBuddyIndex(sFriend.control->pGpObj, profileId, &index) != 0) {
+            // style-ok: goto-return BW1's DWC decompilation (aletheia, dwc_friend.c) exits the same way
+            goto end;
+        }
     }
-    if (profileId <= 0 || index == -1) {
-        return FALSE;
+    if (!(profileId > 0 && index != -1)) {
+        result = FALSE;
+    } else {
+        int error = gpGetBuddyStatus(sFriend.control->pGpObj, index, status);
+
+        result = FALSE;
+        if (error == 0) {
+            result = TRUE;
+        }
     }
-    if (gpGetBuddyStatus(sFriend.control->pGpObj, index, status) == 0) {
-        result = TRUE;
-    }
+end:
     return result;
 }
 
@@ -1084,11 +1092,11 @@ static int DWCi_GetPersCallbackLevel(void) {
     return sFriend.control->persLogin;
 }
 
-void func_ov011_0215f2c0(void) {
+void DWCi_BeginCloseStatsConnection(void) {
     sFriend.unk_10 = TRUE;
 }
 
-void func_ov011_0215f2cc(void) {
+void DWCi_EndCloseStatsConnection(void) {
     sFriend.unk_10 = FALSE;
 }
 

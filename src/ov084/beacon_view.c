@@ -72,7 +72,7 @@ static int BeaconView_UpdateThanks(BeaconViewWork *work);
 static int BeaconView_CheckThanksTouch(BeaconViewWork *work);
 static void BeaconView_ResetArrows(BeaconViewWork *work);
 
-BeaconViewWork *BeaconView_Init(GameSystem *gsys, void *parent) {
+BeaconViewWork *BeaconView_Init(GameSystem *gsys, FieldSubscreen *parent) {
     BeaconViewWork *work = BeaconView_Create(gsys, parent);
 
     work->printNow = TRUE;
@@ -382,7 +382,7 @@ static int BeaconView_UpdateBarDrag(BeaconViewWork *work) {
 
 // Leaves the view for the menu when something else needs the touch screen
 static BOOL BeaconView_CheckLeave(BeaconViewWork *work) {
-    u32 state = func_ov012_02153650(work->commSys);
+    u32 state = Intrude_GetVisitProgress(work->commSys);
 
     if (GSYS_IsLowBatteryCGearOff(work->gsys)) {
         BeaconView_RequestEvent(work, BEACON_VIEW_EVENT_MENU);
@@ -448,7 +448,7 @@ static BOOL BeaconView_CheckMission(BeaconViewWork *work) {
         return FALSE;
     }
     GFL_WordSetSetStrbuf(work->wordSet, 0, work->strTemplate, 0, 1, 2);
-    FestMission_GetMessage(work->festText, work->strTemplate, (const FestMission *)&config, work->tmpHeapId);
+    FestMission_GetMessage(work->festText, work->strTemplate, &config, work->tmpHeapId);
     GFL_WordSetSetStrbuf(work->wordSet, 1, work->strTemplate, 0, 1, 2);
     BeaconView_OfferMission(work, &config, &work->pending);
     return TRUE;

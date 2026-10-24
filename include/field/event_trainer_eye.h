@@ -14,7 +14,7 @@ typedef struct EventTrainerEyeWork EventTrainerEyeWork;
 // The event of the Trainers that have seen the player, or NULL if none has
 GameEvent *EventTrainerEye_CheckAll(Field *field);
 // How far the actor, facing dir, sees the player within range, or -1 if it doesn't
-int func_ov036_021a5e30(FieldActor *actor, u16 dir, int range, EncountSystem *encounter);
+int EventTrainerEyeSub_GetPlayerDistance(FieldActor *actor, u16 dir, int range, EncountSystem *encounter);
 // The event that walks one or two Trainers up to the player
 GameEvent *EventTrainerEye_Create(GameSystem *gsys, EventTrainerEyeWork *eye1, EventTrainerEyeWork *eye2);
 EventTrainerEyeWork *EventTrainerEye_CreateData(HeapID heapId, Field *field, const TrainerClashData *data, BOOL isPair);

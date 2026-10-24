@@ -33,7 +33,7 @@ void FieldFogCtrl_Free(FieldFogCtrl *ctrl);
 void FieldFogCtrl_Update(FieldFogCtrl *ctrl, HeapID heapId);
 void FieldFogCtrl_RequestLoad(FieldFogCtrl *ctrl, u32 fileId, u32 staticLightIndex, s8 delay);
 // Whether a load is waiting for its delay
-u8 func_ov036_021977a4(FieldFogCtrl *ctrl);
+u8 FieldFogCtrl_IsLoadRequest(FieldFogCtrl *ctrl);
 void FieldFogCtrl_Reset(FieldFogCtrl *ctrl);
 BOOL FieldFogCtrl_CheckArc(FieldFogCtrl *ctrl);
 BOOL FieldFogCtrl_IsStaticLightExists(FieldFogCtrl *ctrl);

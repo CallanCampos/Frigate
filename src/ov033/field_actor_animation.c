@@ -10,11 +10,6 @@
 #include "system/game_event.h"
 #include "system/vm.h"
 
-struct ActorAnimationFieldWork {
-    u32 unk0;
-    Field *field;
-};
-
 struct EventActorAnmProcWaitWork {
     FieldActorAnmProc *proc;
 };
@@ -28,7 +23,7 @@ static const FieldAsyncProcDef FIELD_ACTOR_ANM_ASYNC_PROC_TEMPLATE = {
 
 BOOL s0157_ActorAnimationInit(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
-    ActorAnimationFieldWork *fieldWork = ScriptWork_GetFieldWork(work);
+    ScriptFieldWork *fieldWork = ScriptWork_GetFieldWork(work);
     HeapID heapId = Field_GetHeapID(fieldWork->field);
     u16 actorId = ScriptReadAny(vm, env);
     VecFx32 pos;

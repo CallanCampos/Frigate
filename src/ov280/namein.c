@@ -486,31 +486,22 @@ static void NameEntryTask_Input(NameEntryTask *task, u32 *state, NameEntryWork *
 static void NameEntryTask_SaveKeyboardType(NameEntryTask *task, u32 *state, NameEntryWork *work);
 static void NameEntryTask_PauseSave(NameEntryTask *task, u32 *state, NameEntryWork *work);
 
-// The original's .rodata starts with 8 words that nothing in this file refers to, 1, 0, 0, 3, 2, 7, 0, 0, which are not
-// reproduced
-
 // The kana keyboard's rows: where each starts and its top
 static const u32 sKanaRowLeft[3] = { 5, 6, 7 };
 static const u32 sKanaRowTop[3] = { 8, 12, 16 };
 
-// Where the selection starts on each part of a keyboard layout
-static const u8 sDefaultKeyMemory[13] = { 0, 2, 3, 5, 6, 10, 0, 1, 9, 8, 0, 4, 4 };
-
 // The palette of the icon of each type
 static const u8 sIconPalettes[16] = { 2, 3, 6, 5, 4, 5, 2, 0, 1, 3, 6, 5, 4, 7, 7, 0 };
 
-const u32 NAME_ENTRY_SOUND_COUNT = 6;
-
-const GameProcFunctions NAME_ENTRY_PROC_FUNCTIONS = { NameEntry_ProcInit, NameEntry_ProcMain, NameEntry_ProcExit };
+// Where the selection starts on each part of a keyboard layout
+static const u8 sDefaultKeyMemory[13] = { 0, 2, 3, 5, 6, 10, 0, 1, 9, 8, 0, 4, 4 };
 
 const u32 NAME_ENTRY_SOUNDS[6] = { SEQ_SE_SELECT1, SEQ_SE_CANCEL3, SEQ_SE_DECIDE1,
                                    SEQ_SE_SYS_12,  SEQ_SE_DECIDE2, SEQ_SE_BEEP };
 
-// The characters of a Game Sync ID (no I, O, 0 or 1)
-static const u16 sGameSyncIdChars[GAME_SYNC_ID_CHAR_COUNT] = {
-    'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'N', 'P', 'Q', 'R',
-    'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '2', '3', '4', '5', '6', '7', '8', '9',
-};
+const GameProcFunctions NAME_ENTRY_PROC_FUNCTIONS = { NameEntry_ProcInit, NameEntry_ProcMain, NameEntry_ProcExit };
+
+const u32 NAME_ENTRY_SOUND_COUNT = 6;
 
 // How fast the key highlight blinks
 static u32 sKeyBlinkStep = 0x51e;
@@ -962,6 +953,9 @@ static void NameBox_Free(NameBox *box) {
 }
 
 static BOOL NameBox_Update(NameBox *box) {
+    // The name's text is printed from its window's top left edge
+    const int left = 0;
+    const int top = 0;
     u16 chars[14];
     u16 ch[2];
     PrintQueue *queue;
@@ -983,22 +977,23 @@ static BOOL NameBox_Update(NameBox *box) {
                 GFL_StrBufLoadFixedString(box->buf, ch, 2);
                 if (box->centered) {
                     x = 64 - box->maxLength * 14 / 2;
-                    if (x < 0) {
-                        x = 0;
+                    if (x < left) {
+                        x = left;
                     }
                     x += i * 14 + 7;
                     x -= GFL_FontGetBlockWidth(box->buf, box->font, 0) / 2;
                 } else {
-                    x = 0;
+                    x = left;
                     x += i * 14;
                     x += 7 - GFL_FontGetBlockWidth(box->buf, box->font, 0) / 2;
                 }
                 if (i >= box->length) {
                     queue = box->queue;
-                    PrintQueue_PrintColor(queue, BmpWin_GetBitmap(box->printWindow), x, 0, box->buf, box->font, 0xc80);
+                    PrintQueue_PrintColor(queue, BmpWin_GetBitmap(box->printWindow), x, top, box->buf, box->font,
+                                          0xc80);
                 } else {
                     queue = box->queue;
-                    PrintQueue_Print(queue, BmpWin_GetBitmap(box->printWindow), x, 0, box->buf, box->font);
+                    PrintQueue_Print(queue, BmpWin_GetBitmap(box->printWindow), x, top, box->buf, box->font);
                 }
                 box->printing = TRUE;
             }
@@ -1264,6 +1259,11 @@ static BOOL NameBox_IsValidGameSyncId(NameBox *box) {
 }
 
 static BOOL NameEntry_IsGameSyncIdChar(u16 c) {
+    // The characters of a Game Sync ID (no I, O, 0 or 1)
+    static const u16 sGameSyncIdChars[GAME_SYNC_ID_CHAR_COUNT] = {
+        'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'N', 'P', 'Q', 'R',
+        'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '2', '3', '4', '5', '6', '7', '8', '9',
+    };
     u32 i;
 
     c = GFL_StrCharToUpperCase(c);
@@ -2052,12 +2052,15 @@ static int KanaLayout_GetKind(const KeyPos *pos, KeyPos *cell) {
 
 static void Keyboard_Init(Keyboard *kb, u32 type, Font *font, PrintQueue *queue, NameinKeyboardSet *keyboards,
                           NameEntryObjs *objs, HeapID heapId) {
+    // The cursor starts on the top left key
+    const int startX = 0;
+    const int startY = 0;
     BmpWin *window;
     KeyRect rect;
 
     MI_CpuFill8(kb, 0, sizeof(Keyboard));
-    kb->pos.x = 0;
-    kb->pos.y = 0;
+    kb->pos.x = startX;
+    kb->pos.y = startY;
     kb->font = font;
     kb->queue = queue;
     kb->heapId = heapId;
@@ -2233,6 +2236,12 @@ static BOOL Keyboard_StartSwitch(Keyboard *kb, u32 type) {
 }
 
 static BOOL Keyboard_UpdateSlide(Keyboard *kb) {
+    // The keys (BG 1) and their labels (BG 3) slide over 7 frames each way, with the upper layer (BG 2) when there
+    // is one
+    const int slideFrames = 7;
+    const u32 upperBg = 2;
+    const u32 keyBg = 1;
+    const u32 labelBg = 3;
     int frame;
     s16 alpha;
     s16 offset;
@@ -2240,24 +2249,24 @@ static BOOL Keyboard_UpdateSlide(Keyboard *kb) {
     if (kb->sliding) {
         switch (kb->slideStage) {
         case SLIDE_STAGE_OUT:
-            GFL_BGSysGetBGOffsetY(1);
+            GFL_BGSysGetBGOffsetY(keyBg);
             frame = kb->slideFrame;
-            alpha = -(frame * 16) / 7 + 16;
+            alpha = -(frame * 16) / slideFrames + 16;
             reg_G2_BLDALPHA = alpha | (1 << 12);
-            offset = -48 * frame / 7;
-            GFL_BGSysMoveBG(1, BG_MOVE_SET_Y, offset);
-            GFL_BGSysMoveBG(3, BG_MOVE_SET_Y, offset);
+            offset = -48 * frame / slideFrames;
+            GFL_BGSysMoveBG(keyBg, BG_MOVE_SET_Y, offset);
+            GFL_BGSysMoveBG(labelBg, BG_MOVE_SET_Y, offset);
             if (kb->hasUpperLayer) {
-                GFL_BGSysMoveBG(2, BG_MOVE_SET_Y, offset);
+                GFL_BGSysMoveBG(upperBg, BG_MOVE_SET_Y, offset);
             }
-            if (kb->slideFrame++ > 7) {
+            if (kb->slideFrame++ > slideFrames) {
                 if (kb->hasUpperLayer) {
-                    GFL_BGSysSetBGEnabled(1, FALSE);
-                    GFL_BGSysSetBGEnabled(2, FALSE);
-                    GFL_BGSysSetBGEnabled(3, FALSE);
+                    GFL_BGSysSetBGEnabled(keyBg, FALSE);
+                    GFL_BGSysSetBGEnabled(upperBg, FALSE);
+                    GFL_BGSysSetBGEnabled(labelBg, FALSE);
                 } else {
-                    GFL_BGSysSetBGEnabled(1, FALSE);
-                    GFL_BGSysSetBGEnabled(3, FALSE);
+                    GFL_BGSysSetBGEnabled(keyBg, FALSE);
+                    GFL_BGSysSetBGEnabled(labelBg, FALSE);
                 }
                 kb->slideFrame = 0;
                 kb->slideStage = SLIDE_STAGE_SWITCH;
@@ -2265,42 +2274,42 @@ static BOOL Keyboard_UpdateSlide(Keyboard *kb) {
             break;
         case SLIDE_STAGE_SWITCH:
             offset = -48;
-            GFL_BGSysMoveBG(1, BG_MOVE_SET_Y, offset);
-            GFL_BGSysMoveBG(3, BG_MOVE_SET_Y, offset);
+            GFL_BGSysMoveBG(keyBg, BG_MOVE_SET_Y, offset);
+            GFL_BGSysMoveBG(labelBg, BG_MOVE_SET_Y, offset);
             if (kb->hasUpperLayer) {
-                GFL_BGSysMoveBG(2, BG_MOVE_SET_Y, offset);
+                GFL_BGSysMoveBG(upperBg, BG_MOVE_SET_Y, offset);
             }
             Keyboard_ApplyType(kb, kb->nextType);
             kb->slideStage = SLIDE_STAGE_SHOW;
             break;
         case SLIDE_STAGE_SHOW:
-            kb->slideFrame = 7;
+            kb->slideFrame = slideFrames;
             kb->slideStage = SLIDE_STAGE_IN;
-            GFL_BGSysSetBGEnabled(1, TRUE);
-            GFL_BGSysSetBGEnabled(3, TRUE);
+            GFL_BGSysSetBGEnabled(keyBg, TRUE);
+            GFL_BGSysSetBGEnabled(labelBg, TRUE);
             if (kb->type != KEYBOARD_TYPE_KANA) {
-                GFL_BGSysSetBGEnabled(2, TRUE);
+                GFL_BGSysSetBGEnabled(upperBg, TRUE);
             }
             reg_G2_BLDALPHA = 1 << 12;
             break;
         case SLIDE_STAGE_IN:
             frame = kb->slideFrame;
-            alpha = -(frame * 16) / 7 + 16;
+            alpha = -(frame * 16) / slideFrames + 16;
             reg_G2_BLDALPHA = alpha | (1 << 12);
-            offset = -48 * frame / 7;
-            GFL_BGSysMoveBG(1, BG_MOVE_SET_Y, offset);
-            GFL_BGSysMoveBG(3, BG_MOVE_SET_Y, offset);
+            offset = -48 * frame / slideFrames;
+            GFL_BGSysMoveBG(keyBg, BG_MOVE_SET_Y, offset);
+            GFL_BGSysMoveBG(labelBg, BG_MOVE_SET_Y, offset);
             if (kb->hasUpperLayer) {
-                GFL_BGSysMoveBG(2, BG_MOVE_SET_Y, offset);
+                GFL_BGSysMoveBG(upperBg, BG_MOVE_SET_Y, offset);
             }
             if (kb->slideFrame-- == 0) {
                 kb->slideStage = SLIDE_STAGE_END;
             }
             break;
         case SLIDE_STAGE_END:
-            GFL_BGSysMoveBG(1, BG_MOVE_SET_Y, 0);
-            GFL_BGSysMoveBG(3, BG_MOVE_SET_Y, 0);
-            GFL_BGSysMoveBG(2, BG_MOVE_SET_Y, 0);
+            GFL_BGSysMoveBG(keyBg, BG_MOVE_SET_Y, 0);
+            GFL_BGSysMoveBG(labelBg, BG_MOVE_SET_Y, 0);
+            GFL_BGSysMoveBG(upperBg, BG_MOVE_SET_Y, 0);
             kb->hasUpperLayer = FALSE;
             reg_G2_BLDCNT = 0;
             kb->sliding = FALSE;
@@ -2743,7 +2752,7 @@ static void NameEntryTalk_Start(NameEntryTalk *talk, NameEntryMessage *message, 
     WordSet *wordSet = GFL_WordSetSystemCreateDefault(heapId);
     StrBuf *name;
 
-    if (func_ov012_02165b0c(param)) {
+    if (NameEntryParam_IsCanceled(param)) {
         loadPokemonNicknameToStrbuf(wordSet, 0, param->pkm);
     } else {
         name = GFL_StrBufClone(param->name, heapId);

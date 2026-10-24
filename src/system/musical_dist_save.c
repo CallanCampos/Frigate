@@ -22,7 +22,7 @@ u32 MusicalDist_GetSaveSize(void) {
 void MusicalDist_InitBlock(void *block) {
 }
 
-void *MusicalDist_Load(GameData *gameData, HeapID heapId) {
+MusicalDistWork *MusicalDist_Load(GameData *gameData, HeapID heapId) {
     SaveControl *save = GameData_GetSaveControl(gameData);
     MusicalDistWork *wk = GFL_HeapAllocate(heapId, sizeof(MusicalDistWork), TRUE, "musical_dist_save.c", 82);
     u32 result;
@@ -55,7 +55,7 @@ void MusicalDist_Free(MusicalDistWork *wk) {
     GFL_HeapFree(wk);
 }
 
-void *MusicalDist_StartWrite(GameData *gameData, void *data, u32 size, HeapID heapId) {
+MusicalDistWork *MusicalDist_StartWrite(GameData *gameData, void *data, u32 size, HeapID heapId) {
     MusicalDistWork *wk = MusicalDist_Load(gameData, heapId);
 
     if (wk->block != NULL) {

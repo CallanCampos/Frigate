@@ -93,14 +93,14 @@ static NVRAMWork sNvramWork;
 static u8 sNvramBuffer[NVRAM_BUFFER_SIZE] ATTRIBUTE_ALIGN(32);
 static NVRAMInitState sNvramInitState;
 
-static void func_02079944(PXIFifoTag tag, u32 data, BOOL err);
-static void func_020792f4(u32 data, BOOL err);
-static void func_02079458(u32 data, BOOL err);
-static void func_020797d4(u32 data, BOOL err);
-static BOOL func_02079930(void);
-static void func_0207997c(NVRAMResult result, void *arg);
-static void func_02079994(void *arg);
-static BOOL func_020799a4(const u8 *a, const u8 *b, u32 size);
+static void NVRAMi_Callback(PXIFifoTag tag, u32 data, BOOL err);
+static void NVRAMi_ReadCallback(u32 data, BOOL err);
+static void NVRAMi_WriteCallback(u32 data, BOOL err);
+static void NVRAMi_VerifyCallback(u32 data, BOOL err);
+static BOOL NVRAMi_IsInitialized(void);
+static void NVRAMi_SyncCallback(NVRAMResult result, void *arg);
+static void NVRAMi_AlarmHandler(void *arg);
+static BOOL NVRAMi_VerifyDataArray(const u8 *a, const u8 *b, u32 size);
 static BOOL SPI_NvramWriteEnable(void);
 static BOOL SPI_NvramWriteDisable(void);
 static BOOL SPI_NvramReadStatusRegister(u8 *status);
@@ -124,7 +124,7 @@ static inline void NVRAMi_EndCommand(NVRAMResult result) {
 
 // Fires the alarm (OS_SetAlarm) that stands in for an answer of the ARM7, after the poll time
 static inline void NVRAMi_SetAlarm(u32 pxiResult) {
-    OS_SetAlarm(&sNvramWork.alarm, OS_MilliSecondsToTicks(NVRAM_POLL_MSEC), func_02079994, (void *)pxiResult);
+    OS_SetAlarm(&sNvramWork.alarm, OS_MilliSecondsToTicks(NVRAM_POLL_MSEC), NVRAMi_AlarmHandler, (void *)pxiResult);
 }
 
 void NVRAM_Init(void) {
@@ -140,7 +140,7 @@ void NVRAM_Init(void) {
     PXI_Init();
     while (!PXI_IsCallbackReady(PXI_FIFO_TAG_NVRAM, PXI_PROC_ARM7)) {
     }
-    PXI_SetFifoRecvCallback(PXI_FIFO_TAG_NVRAM, func_02079944);
+    PXI_SetFifoRecvCallback(PXI_FIFO_TAG_NVRAM, NVRAMi_Callback);
     MI_CpuClearFast(&sNvramWork, sizeof(sNvramWork));
     if (!OS_IsTickAvailable()) {
         OS_InitTick();
@@ -156,7 +156,7 @@ void NVRAM_Init(void) {
 NVRAMResult NVRAM_ReadDataBytesAsync(u32 address, u32 size, void *buf, NVRAMCallback callback, void *arg) {
     OSIntrMode enabled;
 
-    if (!func_02079930()) {
+    if (!NVRAMi_IsInitialized()) {
         return NVRAM_RESULT_ILLEGAL_STATUS;
     }
     enabled = OS_DisableInterrupts();
@@ -181,7 +181,7 @@ NVRAMResult NVRAM_ReadDataBytesAsync(u32 address, u32 size, void *buf, NVRAMCall
 }
 
 // The answer to a read
-static void func_020792f4(u32 data, BOOL err) {
+static void NVRAMi_ReadCallback(u32 data, BOOL err) {
     NVRAMResult result = NVRAM_RESULT_FATAL_ERROR;
     u16 status = data & SPI_PXI_RESULT_DATA_MASK;
 
@@ -217,7 +217,7 @@ NVRAMResult NVRAM_ReadDataBytes(u32 address, u32 size, void *buf) {
     OS_InitMessageQueue(&queue, message, 1);
     while (TRUE) {
         enabled = OS_DisableInterrupts();
-        result = NVRAM_ReadDataBytesAsync(address, size, buf, func_0207997c, &queue);
+        result = NVRAM_ReadDataBytesAsync(address, size, buf, NVRAMi_SyncCallback, &queue);
         if (result == NVRAM_RESULT_BUSY) {
             OS_SleepThread(&sNvramWork.queue);
         } else if (result == NVRAM_RESULT_SEND_ERROR) {
@@ -239,7 +239,7 @@ NVRAMResult NVRAM_ReadDataBytes(u32 address, u32 size, void *buf) {
 NVRAMResult NVRAM_WriteDataBytesAsync(u32 address, u32 size, const void *src, NVRAMCallback callback, void *arg) {
     OSIntrMode enabled;
 
-    if (!func_02079930()) {
+    if (!NVRAMi_IsInitialized()) {
         return NVRAM_RESULT_ILLEGAL_STATUS;
     }
     enabled = OS_DisableInterrupts();
@@ -267,7 +267,7 @@ NVRAMResult NVRAM_WriteDataBytesAsync(u32 address, u32 size, const void *src, NV
 }
 
 // The answer to a write, or the alarm that stands for one
-static void func_02079458(u32 data, BOOL err) {
+static void NVRAMi_WriteCallback(u32 data, BOOL err) {
     NVRAMResult result = NVRAM_RESULT_FATAL_ERROR;
     u16 status = data & SPI_PXI_RESULT_DATA_MASK;
     u16 room = SPI_NVRAM_PAGE_SIZE - (u8)sNvramWork.address;
@@ -408,7 +408,7 @@ NVRAMResult NVRAM_WriteDataBytes(u32 address, u32 size, const void *src) {
     OS_InitMessageQueue(&queue, message, 1);
     while (TRUE) {
         enabled = OS_DisableInterrupts();
-        result = NVRAM_WriteDataBytesAsync(address, size, src, func_0207997c, &queue);
+        result = NVRAM_WriteDataBytesAsync(address, size, src, NVRAMi_SyncCallback, &queue);
         if (result == NVRAM_RESULT_BUSY) {
             OS_SleepThread(&sNvramWork.queue);
         } else if (result == NVRAM_RESULT_SEND_ERROR) {
@@ -431,7 +431,7 @@ NVRAMResult NVRAM_VerifyDataBytesAsync(u32 address, u32 size, const void *src, N
     OSIntrMode enabled;
     u32 chunk;
 
-    if (!func_02079930()) {
+    if (!NVRAMi_IsInitialized()) {
         return NVRAM_RESULT_ILLEGAL_STATUS;
     }
     enabled = OS_DisableInterrupts();
@@ -464,7 +464,7 @@ NVRAMResult NVRAM_VerifyDataBytesAsync(u32 address, u32 size, const void *src, N
 }
 
 // The answer to a verify, which compares what the ARM7 read into the buffer with the data and reads the next 32 bytes
-static void func_020797d4(u32 data, BOOL err) {
+static void NVRAMi_VerifyCallback(u32 data, BOOL err) {
     NVRAMResult result = NVRAM_RESULT_FATAL_ERROR;
     u16 status = data & SPI_PXI_RESULT_DATA_MASK;
     u32 remaining = sNvramWork.size;
@@ -476,7 +476,7 @@ static void func_020797d4(u32 data, BOOL err) {
     }
     chunk = remaining;
     if (err == FALSE && status == NVRAM_PXI_RESULT_SUCCESS) {
-        if (!func_020799a4(sNvramBuffer, sNvramWork.buf, chunk)) {
+        if (!NVRAMi_VerifyDataArray(sNvramBuffer, sNvramWork.buf, chunk)) {
             result = NVRAM_RESULT_VERIFY_ERROR;
         } else {
             sNvramWork.address += chunk;
@@ -530,7 +530,7 @@ NVRAMResult NVRAM_VerifyDataBytes(u32 address, u32 size, const void *src) {
     OS_InitMessageQueue(&queue, message, 1);
     while (TRUE) {
         enabled = OS_DisableInterrupts();
-        result = NVRAM_VerifyDataBytesAsync(address, size, src, func_0207997c, &queue);
+        result = NVRAM_VerifyDataBytesAsync(address, size, src, NVRAMi_SyncCallback, &queue);
         if (result == NVRAM_RESULT_BUSY) {
             OS_SleepThread(&sNvramWork.queue);
         } else if (result == NVRAM_RESULT_SEND_ERROR) {
@@ -550,7 +550,7 @@ NVRAMResult NVRAM_VerifyDataBytes(u32 address, u32 size, const void *src) {
 }
 
 // Whether NVRAM_Init has finished
-static BOOL func_02079930(void) {
+static BOOL NVRAMi_IsInitialized(void) {
     if (sNvramInitState == NVRAM_INIT_DONE) {
         return TRUE;
     }
@@ -558,34 +558,34 @@ static BOOL func_02079930(void) {
 }
 
 // Gets the ARM7's words with the NVRAM's tag, and hands them to the function of the call that runs
-static void func_02079944(PXIFifoTag tag, u32 data, BOOL err) {
+static void NVRAMi_Callback(PXIFifoTag tag, u32 data, BOOL err) {
     switch (sNvramWork.command) {
     case NVRAM_COMMAND_READ:
-        func_020792f4(data, err);
+        NVRAMi_ReadCallback(data, err);
         break;
     case NVRAM_COMMAND_WRITE:
-        func_02079458(data, err);
+        NVRAMi_WriteCallback(data, err);
         break;
     case NVRAM_COMMAND_VERIFY:
-        func_020797d4(data, err);
+        NVRAMi_VerifyCallback(data, err);
         break;
     }
 }
 
 // The callback of the synchronous calls, which sends the result to the queue that they wait on
-static void func_0207997c(NVRAMResult result, void *arg) {
+static void NVRAMi_SyncCallback(NVRAMResult result, void *arg) {
     if (!OS_SendMessage((OSMessageQueue *)arg, (OSMessage)result, OS_MESSAGE_NOBLOCK)) {
         OS_Terminate();
     }
 }
 
 // The alarm's function, which stands in for an answer of the ARM7
-static void func_02079994(void *arg) {
-    func_02079944(PXI_FIFO_TAG_NVRAM, (u32)arg, FALSE);
+static void NVRAMi_AlarmHandler(void *arg) {
+    NVRAMi_Callback(PXI_FIFO_TAG_NVRAM, (u32)arg, FALSE);
 }
 
 // Whether the two ranges are the same
-static BOOL func_020799a4(const u8 *a, const u8 *b, u32 size) {
+static BOOL NVRAMi_VerifyDataArray(const u8 *a, const u8 *b, u32 size) {
     u32 i;
 
     for (i = 0; i < size; i++) {

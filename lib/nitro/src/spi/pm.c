@@ -133,7 +133,7 @@ BOOL PMi_AutoExitFlag = TRUE;
 static void PMi_WaitBusy(void);
 static void PMi_DummyCallback(u32 result, void *arg);
 static void PMi_CallCallbackAndUnlock(u32 result);
-static void func_0207eb9c(void);
+static void PMi_WaitVBlank(void);
 static void PMi_CommonCallback(PXIFifoTag tag, u32 data, BOOL err);
 static u32 PMi_SendPxiRequest(const u32 *words, int length, u16 *result, PMCallback callback, void *arg);
 static void PMi_SendPxiDataSync(const u32 *words, int length);
@@ -142,13 +142,13 @@ static u32 PMi_SendRequestAsync(u32 request, u32 data, u16 *result, PMCallback c
 static u32 PMi_SetLEDAsync(u32 power, PMCallback callback, void *arg);
 static u32 PMi_SetLED(u32 power);
 static u32 PM_ForceToPowerOffAsync(PMCallback callback, void *arg);
-static u32 func_0207ef60(void);
+static u32 PMi_ForceToPowerOff(void);
 static u32 PMi_SetAmp(int amp);
 static void PMi_SendPxiData(u32 word);
 static void PMi_StopDma(void);
 static BOOL PMi_SetLCDPower(BOOL on, u32 power, BOOL force, BOOL sync);
 static BOOL PM_GetLCDPower(void);
-static void func_0207f64c(void);
+static void PMi_LCDOnAvoidReset(void);
 
 // PMi_WaitBusy: waits for the answer of the request that is being sent, reading the ARM7's words itself where the
 // interrupt that would run the callback can't. The lock is polled through its address, which the callback clears
@@ -184,7 +184,7 @@ static void PMi_CallCallbackAndUnlock(u32 result) {
 }
 
 // Waits for the next vertical blank, by polling. The count is read back from the stack at every turn of the loop
-static void func_0207eb9c(void) {
+static void PMi_WaitVBlank(void) {
     vu32 count = OS_GetVBlankCount();
 
     while (count == OS_GetVBlankCount()) {
@@ -423,7 +423,7 @@ u32 PM_SetBackLight(PMLCDTarget target, PMBackLightSwitch backlight) {
 
 static u32 PM_ForceToPowerOffAsync(PMCallback callback, void *arg) {
     PMi_ExitType = PM_EXIT_FACTOR_USER;
-    func_0207f64c();
+    PMi_LCDOnAvoidReset();
     if (OS_IsRunOnTwl()) {
         PMi_ExecuteList(PMi_PostExitCallbackList);
     }
@@ -431,7 +431,7 @@ static u32 PM_ForceToPowerOffAsync(PMCallback callback, void *arg) {
 }
 
 // Sends the power-off request and waits for it, polling for the answer in every state
-static u32 func_0207ef60(void) {
+static u32 PMi_ForceToPowerOff(void) {
     u32 res;
     u32 sent = PM_ForceToPowerOffAsync(PMi_DummyCallback, &res);
 
@@ -445,7 +445,7 @@ static u32 func_0207ef60(void) {
 }
 
 void PM_ForceToPowerOff(void) {
-    while (func_0207ef60() != PM_RESULT_SUCCESS) {
+    while (PMi_ForceToPowerOff() != PM_RESULT_SUCCESS) {
         OS_SpinWaitSysCycles(PM_RETRY_CYCLES);
     }
     OS_DisableInterrupts();
@@ -612,11 +612,11 @@ void PM_GoSleepMode(u32 trigger, u32 logic, u16 keyPattern) {
     while (PM_SetBackLight(PM_LCD_ALL, PM_BACKLIGHT_OFF) != PM_RESULT_SUCCESS) {
         OS_SpinWaitSysCycles(PM_RETRY_CYCLES);
     }
-    func_0207eb9c();
+    PMi_WaitVBlank();
     reg_GX_DISPCNT &= ~REG_GX_DISPCNT_MODE_MASK;
     reg_GXS_DB_DISPCNT &= ~REG_GXS_DB_DISPCNT_MODE_MASK;
-    func_0207eb9c();
-    func_0207eb9c();
+    PMi_WaitVBlank();
+    PMi_WaitVBlank();
     PMi_StopDma();
     PMi_SleepEndFlag = FALSE;
     startTrigger = trigger | (top ? PM_TRIGGER_BACKLIGHT_TOP : 0) | (bottom ? PM_TRIGGER_BACKLIGHT_BOTTOM : 0);
@@ -682,8 +682,8 @@ static BOOL PMi_SetLCDPower(BOOL on, u32 power, BOOL force, BOOL sync) {
             OS_SpinWaitSysCycles(PM_RETRY_CYCLES);
         }
         if (OS_GetVBlankCount() - PMi_DisplayOffCount <= 2) {
-            func_0207eb9c();
-            func_0207eb9c();
+            PMi_WaitVBlank();
+            PMi_WaitVBlank();
         }
         reg_GX_POWCNT &= ~REG_GX_POWCNT_LCD_MASK;
         PMi_LCDCount = OS_GetVBlankCount();
@@ -719,11 +719,11 @@ static BOOL PM_GetLCDPower(void) {
     return (reg_GX_POWCNT & REG_GX_POWCNT_LCD_MASK) != 0;
 }
 
-u32 func_0207f50c(u32 value) {
+u32 PMi_SendLEDPatternCommand(u32 value) {
     return PMi_ReadRegister(PM_REQ_UNK_12, value, NULL);
 }
 
-u32 func_0207f520(u32 *value) {
+u32 PM_GetLEDPattern(u32 *value) {
     u16 data;
     u32 result = PMi_ReadRegister(PM_REQ_READ_REGISTER, PM_REG_UNK_8, &data);
 
@@ -818,7 +818,7 @@ void PM_DeletePostSleepCallback(PMSleepCallbackInfo *info) {
 
 // Waits out the screens before the power-off: turns the backlights off and the screens on if they were off, in every
 // state of the interrupts
-static void func_0207f64c(void) {
+static void PMi_LCDOnAvoidReset(void) {
     u32 method;
 
     OS_SpinWaitSysCycles(PM_SCREENS_SETTLE_CYCLES);

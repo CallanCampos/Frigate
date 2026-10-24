@@ -13,11 +13,13 @@ void NetDefine_Update(void);
 
 // What WifiList_FindFriendKey, DWCFriend_UpdateFriendData's check and WifiList_AddFriend's check say of a friend's data
 // against a list
-#define FRIEND_CHECK_SAME 0
-// The same profile under other data
-#define FRIEND_CHECK_SAME_PROFILE 1
-#define FRIEND_CHECK_NEW 2
-#define FRIEND_CHECK_INVALID 3
+enum {
+    FRIEND_CHECK_SAME,
+    // The same profile under other data
+    FRIEND_CHECK_SAME_PROFILE,
+    FRIEND_CHECK_NEW,
+    FRIEND_CHECK_INVALID,
+};
 
 // Looks for a friend key in the Friend Roster: index gets the friend's place, or the first free place, or -1
 int WifiList_FindFriendKey(WifiList *wifiList, u64 friendKey, int *index);

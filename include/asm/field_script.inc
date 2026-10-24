@@ -2169,7 +2169,7 @@
     .2byte \a0
     .endm
 
-    // func_ov036_021ab1e0
+    // ScrcmdFieldGimmickCartLanes_UnlockLaneFromScript
     .macro Cmd_017D a0
     FieldCommand 381
     .2byte \a0
@@ -2186,7 +2186,7 @@
     .2byte \a0
     .endm
 
-    // func_ov036_021aae88
+    // ScrcmdFieldGimmickPlateDoors_StartDoorEvent
     .macro Cmd_018C a0, a1
     FieldCommand 396
     .2byte \a0
@@ -2315,14 +2315,14 @@
     FieldCommand 430
     .endm
 
-    // func_ov036_021aea40
+    // Regulation_RegisterAllowedSpecies
     .macro Cmd_01AF a0, a1
     FieldCommand 431
     .2byte \a0
     .2byte \a1
     .endm
 
-    // func_ov036_021aea8c
+    // Regulation_CheckPartyRegulation
     .macro Cmd_01B0 a0, a1
     FieldCommand 432
     .2byte \a0
@@ -2333,13 +2333,13 @@
     FieldCommand 433
     .endm
 
-    // func_ov036_021ae4f4
+    // ScrcmdProcFld_SpawnMovePokemonIfInactive
     .macro Cmd_01B2 a0
     FieldCommand 434
     .2byte \a0
     .endm
 
-    // func_ov012_02165950
+    // FieldChunk_ScrCmdReadSaveByte
     .macro Cmd_01B3 a0, a1
     FieldCommand 435
     .2byte \a0
@@ -2415,13 +2415,13 @@
     FieldCommand 459
     .endm
 
-    // func_ov036_021afd9c
+    // ElevatorTable_GetMysteryEntryCount
     .macro Cmd_01CC a0
     FieldCommand 460
     .2byte \a0
     .endm
 
-    // func_ov036_021afcfc
+    // ElevatorTable_RegisterBirthdayEntry
     .macro Cmd_01CD a0
     FieldCommand 461
     .2byte \a0
@@ -2673,7 +2673,7 @@
     .2byte \a0
     .endm
 
-    // func_ov033_021777dc
+    // Scrcmd_CheckWifiListFlags
     .macro Cmd_01F6 a0, a1, a2, a3
     FieldCommand 502
     .2byte \a0
@@ -2682,7 +2682,7 @@
     .2byte \a3
     .endm
 
-    // func_ov033_02177844
+    // Scrcmd_WifiListOperation
     .macro Cmd_01F7 a0, a1, a2, a3
     FieldCommand 503
     .2byte \a0
@@ -2691,14 +2691,14 @@
     .2byte \a3
     .endm
 
-    // func_ov033_02177908
+    // Scrcmd_SetWifiFriendNameWord
     .macro Cmd_01F8 a0, a1
     FieldCommand 504
     .2byte \a0
     .2byte \a1
     .endm
 
-    // func_ov036_021c730c
+    // Scrcmd_CheckPmsWordPair
     .macro Cmd_01F9 a0, a1, a2, a3
     FieldCommand 505
     .2byte \a0
@@ -2976,7 +2976,7 @@
     .2byte \a0
     .endm
 
-    // func_ov036_021c6220
+    // CountTrainersEvent_StartCountOtherOtIdsTask
     .macro Cmd_0226 a0
     FieldCommand 550
     .2byte \a0
@@ -3000,7 +3000,7 @@
     .2byte \a1
     .endm
 
-    // func_ov036_021c7ad0
+    // Scrcmd_StartSwapNpcEvent
     .macro Cmd_022B a0, a1
     FieldCommand 555
     .2byte \a0
@@ -3012,7 +3012,7 @@
     .2byte \a0
     .endm
 
-    // func_ov036_021aa2cc
+    // ScriptNative_SetMmdlZoneDeleteOff
     .macro Cmd_022E a0
     FieldCommand 558
     .2byte \a0
@@ -3037,7 +3037,7 @@
     .2byte \a0
     .endm
 
-    // func_ov036_021af9dc
+    // PokeParty_ControlLegendMon
     .macro Cmd_0232 a0, a1
     FieldCommand 562
     .2byte \a0
@@ -3082,7 +3082,7 @@
     .2byte \a0
     .endm
 
-    // func_ov036_021aa968
+    // ScriptNative_CheckPlayerFormModel
     .macro Cmd_0239 a0
     FieldCommand 569
     .2byte \a0
@@ -3120,14 +3120,14 @@
     FieldCommand 575
     .endm
 
-    // func_ov036_021a6e74
+    // ScriptWork_FadeBgmVolume
     .macro Cmd_0240 a0, a1
     FieldCommand 576
     .2byte \a0
     .2byte \a1
     .endm
 
-    // func_ov036_021a6ec4
+    // ScriptWork_RestoreBgmVolume
     .macro Cmd_0241 a0
     FieldCommand 577
     .2byte \a0

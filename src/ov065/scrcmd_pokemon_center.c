@@ -593,7 +593,7 @@ static BOOL PokemonCenter_CheckFriendCount(MedalCheckContext *ctx, GameData *gam
     WifiList *wifiList = GameData_GetWifiList(gameData);
 
     for (i = 0; i < 32; i++) {
-        if (WifiList_IsFriendValid(wifiList, i) && WifiList_GetFriendParam(wifiList, i, 9) != 2) {
+        if (WifiList_IsFriendValid(wifiList, i) && WifiList_GetFriendParam(wifiList, i, WIFI_LIST_FRIEND_GENDER) != 2) {
             count++;
         }
     }

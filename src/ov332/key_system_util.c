@@ -1050,7 +1050,7 @@ KeySystemScrollList *KeySystemScrollList_Create(const KeySystemScrollListSetup *
 void KeySystemScrollList_Free(KeySystemScrollList *list) {
     FrameList_Free(list->list);
     GFL_StrBufFree(list->str);
-    GFL_BGSysMoveBG(list->setup.bg, 3, 0);
+    GFL_BGSysMoveBG(list->setup.bg, BG_MOVE_SET_Y, 0);
     GFL_HeapFree(list);
 }
 

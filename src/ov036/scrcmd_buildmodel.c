@@ -67,7 +67,7 @@ BOOL s0132_PokecenPCClose(VM *vm, FieldScriptEnv *env) {
     Field *field = GSYS_GetField(gsys);
     u16 skipSound = ScriptReadAny(vm, env);
 
-    ScriptWork_CallEvent(work, func_ov033_02179b24(ScriptWork_GetEvent(work), gsys, field, skipSound));
+    ScriptWork_CallEvent(work, FieldDoorAnime_StartClose(ScriptWork_GetEvent(work), gsys, field, skipSound));
     return TRUE;
 }
 

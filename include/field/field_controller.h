@@ -22,6 +22,7 @@ extern const FieldmapCtrlVTable FIELDMAP_CTRL_GRID;
 extern const FieldmapCtrlVTable FIELDMAP_CTRL_NOGRID;
 extern const FieldmapCtrlVTable FIELDMAP_CTRL_HYBRID;
 
+// The field's controller: a FieldmapCtrlGrid, FieldmapCtrlNoGrid or FieldmapCtrlHybrid, by the kind of map
 void *Field_GetController(Field *field);
 void Field_SetController(Field *field, void *controller);
 u32 Field_GetControllerTypeID(Field *field);

@@ -1161,7 +1161,7 @@ static void ZukanInfo_CreateSpriteActor(ZukanInfo *info, int x, u16 y, u32 slot)
     if (info->mode == ZUKAN_INFO_MODE_DETAIL) {
         ClActor_SetObjMode(info->sprites[slot], 1);
     }
-    if (PML_PersonalGetParam(info->personal, PERSONAL_SPRITE_FLIP) == 0) {
+    if (PML_PersonalGetParam(info->personal, PERSONAL_NO_FLIP) == 0) {
         ClActor_SetFlip(info->sprites[slot], 1, TRUE);
     }
 }

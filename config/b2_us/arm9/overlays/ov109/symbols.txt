@@ -15,12 +15,12 @@ SkyarrowBridge_RaiseBGMVolume kind:function(thumb,size=0xe) addr:0x021ef0d0
 SkyarrowBridge_LowerBGMVolume kind:function(thumb,size=0xe) addr:0x021ef0e0
 PassingSE_Init kind:function(thumb,size=0x10) addr:0x021ef0f0
 PassingSE_Update kind:function(thumb,size=0x17c) addr:0x021ef100
-data_ov109_021ef27c kind:data(any) addr:0x021ef27c
-data_ov109_021ef280 kind:data(any) addr:0x021ef280
+sAnimations kind:data(any) addr:0x021ef27c
+sResources kind:data(any) addr:0x021ef280
 data_ov109_021ef289 kind:data(any) addr:0x021ef289 ambiguous
 data_ov109_021ef29d kind:data(any) addr:0x021ef29d ambiguous
 data_ov109_021ef2b0 kind:data(any) addr:0x021ef2b0
-data_ov109_021ef2c4 kind:data(any) addr:0x021ef2c4
+sActors kind:data(any) addr:0x021ef2c4
 data_ov109_021ef2e1 kind:data(any) addr:0x021ef2e1 ambiguous
-data_ov109_021ef320 kind:data(any) addr:0x021ef320
+sSceneSetup kind:data(any) addr:0x021ef320
 data_ov109_021ef335 kind:data(any) addr:0x021ef335 ambiguous

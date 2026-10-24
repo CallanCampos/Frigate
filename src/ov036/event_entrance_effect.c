@@ -44,7 +44,7 @@ enum {
 typedef struct {
     WarpSequence *warp;
     FieldSound *fieldSound;
-    void *camera;
+    EntranceCamera *camera;
     EntranceCameraParam cameraParam;
     u16 timer;
     u8 dir;
@@ -79,7 +79,7 @@ static void EntranceEffect_ChainArrivalTransition(GameEvent *event, EntranceEffe
 static void EntranceEffect_ChainDepartureTransition(GameEvent *event, EntranceEffectWork *work);
 static BOOL EntranceEffect_ShouldPlayStairsSound(EntranceEffectWork *work);
 
-void func_ov036_0219f178(Field *field, VecFx32 *pos) {
+void EntranceEffect_GetEntryPos(Field *field, VecFx32 *pos) {
     EntranceEffect_GetFrontPosition(field, pos);
 }
 
@@ -87,7 +87,7 @@ static void EntranceEffect_FreePlayerAcmd(Field *field) {
     FldAct_FreeAcmd(FieldPlayer_GetActor(Field_GetPlayer(field)));
 }
 
-GameEvent *func_ov036_0219f190(WarpSequence *warp) {
+GameEvent *EntranceEffect_CreateA(WarpSequence *warp) {
     GameEvent *event = GameEvent_Create(warp->gsys, NULL, EntranceEffect_ArrivalCallback, sizeof(EntranceEffectWork));
     EntranceEffectWork *work = GameEvent_GetData(event);
 
@@ -141,7 +141,7 @@ static void EntranceEffect_SetArrivalSteps(EntranceEffectWork *work) {
             work->steps[9] = ENTRANCE_STEP_END;
             break;
         }
-    } else if (func_ov012_0215cd98(warp->transitionType)) {
+    } else if (CityState_IsSlotIndexOutOfRange(warp->transitionType)) {
         work->steps[0] = ENTRANCE_STEP_START;
         work->steps[1] = ENTRANCE_STEP_TRANSITION;
         work->steps[2] = ENTRANCE_STEP_2;
@@ -227,7 +227,7 @@ static GameEventReturnCode EntranceEffect_ArrivalCallback(GameEvent *event, u32 
     case ENTRANCE_STEP_WALK:
         Field_SetPlayerHidden(field, FALSE);
         GameEvent_ChainNext(event, CallMoveOneTileFrontEvent(gsys, field));
-        if (func_ov036_021b7ae0(work->camera) && EntranceCamera_HasZeroFrames(work->camera)) {
+        if (EntranceCamera_IsActive(work->camera) && EntranceCamera_HasZeroFrames(work->camera)) {
             *state = ENTRANCE_STEP_WAIT_TIMER;
             break;
         }
@@ -270,7 +270,7 @@ static GameEventReturnCode EntranceEffect_ArrivalCallback(GameEvent *event, u32 
     return GAMEEVENT_CONTINUE;
 }
 
-GameEvent *func_ov036_0219f4e0(WarpSequence *warp) {
+GameEvent *EntranceEffect_CreateB(WarpSequence *warp) {
     GameEvent *event = GameEvent_Create(warp->gsys, NULL, EntranceEffect_DepartureCallback, sizeof(EntranceEffectWork));
     EntranceEffectWork *work = GameEvent_GetData(event);
 
@@ -287,7 +287,7 @@ GameEvent *func_ov036_0219f4e0(WarpSequence *warp) {
     EntranceEffect_GetFrontPosition(warp->field, &work->pos);
     EntranceEffect_CreateDoorHandle(work);
     EntranceEffect_SetDepartureSteps(work);
-    if (func_ov012_0215cd98(warp->unk10)) {
+    if (CityState_IsSlotIndexOutOfRange(warp->unk10)) {
         work->continueDirect = TRUE;
     } else {
         work->continueDirect = FALSE;
@@ -355,7 +355,7 @@ static GameEventReturnCode EntranceEffect_DepartureCallback(GameEvent *event, u3
         if (!FieldTaskManager_IsIdle(taskManager)) {
             break;
         }
-        if (func_ov036_021b7ae0(work->camera) && EntranceCamera_HasZeroFrames(work->camera)) {
+        if (EntranceCamera_IsActive(work->camera) && EntranceCamera_HasZeroFrames(work->camera)) {
             *state = 9;
         } else {
             *state = EntranceEffect_GetNextStep(work);
@@ -441,7 +441,7 @@ static void EntranceEffect_GetGridFrontPosition(Field *field, VecFx32 *pos) {
     fx32 height;
 
     FieldPlayer_GetWPos(player, &playerPos);
-    func_ov036_0219aab0(player, dir, &dirVec);
+    FieldPlayer_GetMoveOffsetInDir(player, dir, &dirVec);
     VEC_MultAdd(FX32_CONST(16), &dirVec, &playerPos, &front);
     GetHeightFromMap(FieldPlayer_GetActor(player), &front, &height);
     front.y = height;
@@ -456,8 +456,8 @@ static void EntranceEffect_GetRailFrontPosition(Field *field, VecFx32 *pos) {
     VecFx32 front;
     RailPosition railPos;
 
-    func_ov036_0219ad30(player, dir, &railPos);
-    func_ov036_021b06ec(rail, &railPos, &front);
+    FieldPlayer_GetNogridLocationByDir(player, dir, &railPos);
+    FieldRailSystem_GetLocationPos(rail, &railPos, &front);
     *pos = front;
 }
 

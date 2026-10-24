@@ -404,8 +404,8 @@ static void KeySystemBG_Update(KeySystemBG *bg) {
     u16 t;
 
     bg->scroll -= 0x333;
-    GFL_BGSysMoveBGReq(3, 3, bg->scroll >> FX32_SHIFT);
-    GFL_BGSysMoveBGReq(7, 3, bg->scroll >> FX32_SHIFT);
+    GFL_BGSysMoveBGReq(3, BG_MOVE_SET_Y, bg->scroll >> FX32_SHIFT);
+    GFL_BGSysMoveBGReq(7, BG_MOVE_SET_Y, bg->scroll >> FX32_SHIFT);
     if (bg->fade != KEY_SYSTEM_BG_FADE_NONE) {
         t = 0x7fff * bg->frame / bg->duration;
         switch (bg->fade) {
@@ -731,7 +731,7 @@ static void KeySystemTags_Clear(KeySystemTag *tags) {
 }
 
 void KeySystem_Setup(KeySystemWork *wk, HeapID heapId) {
-    void *data;
+    KeySystemData *data;
     SaveControl *save;
 
     GFL_OvlLoad(OVERLAY_ID(331));

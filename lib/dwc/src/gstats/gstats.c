@@ -180,6 +180,7 @@ static void xcode_buf(char *buf, int len) {
 static char *value_for_key(const char *s, const char *key) {
     char *pos;
     char *pos2;
+    gsi_u32 index;
     char keyspec[256] = "\\";
     static char value[2][256];
 
@@ -191,12 +192,13 @@ static char *value_for_key(const char *s, const char *key) {
         return NULL;
     }
     pos += strlen(keyspec);
-    pos2 = value[valueindex];
+    index = valueindex;
+    pos2 = value[index];
     while (*pos != '\0' && *pos != '\\') {
         *pos2++ = *pos++;
     }
     *pos2 = '\0';
-    return value[valueindex];
+    return value[index];
 }
 
 static char *value_for_key_safe(const char *s, const char *key) {

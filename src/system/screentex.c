@@ -45,8 +45,8 @@ static const u8 CAPTURE_TEX_RESHEADER[0x8c] = {
     0x10, 0x00, 0x08, 0x00, 0x0c, 0x00, 0x7f, 0x00, 0x00, 0x00, 0x04, 0x00, 0x04, 0x00,
 };
 
-void *GFL_G3DScreenTexCreate(HeapID heapId, u32 bank) {
-    void *resource;
+G3DResource *GFL_G3DScreenTexCreate(HeapID heapId, u32 bank) {
+    G3DResource *resource;
     NNSG3dResFileHeader *file;
     NNSG3dResTex *tex;
     u32 size;

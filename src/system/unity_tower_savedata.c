@@ -118,13 +118,13 @@ void UnityTower_IncrementCountryCount(UnityTowerSurveySave *save) {
     }
 }
 
-void func_02009d18(UnityTowerSurveySave *save, s32 value) {
+void UnityTower_SetRatingLevel(UnityTowerSurveySave *save, s32 value) {
     if (value < 5) {
         save->unk347 = value;
     }
 }
 
-u8 func_02009d28(UnityTowerSurveySave *save) {
+u8 UnityTower_GetRatingLevel(UnityTowerSurveySave *save) {
     return save->unk347;
 }
 
@@ -199,11 +199,11 @@ void UnityTower_SetVisitorParam(UnityTowerSurveySave *save, int index, u32 param
     }
 }
 
-void *UnityTower_GetVisitor(UnityTowerSurveySave *save, int index) {
+PlayerInfo *UnityTower_GetVisitor(UnityTowerSurveySave *save, int index) {
     if (index >= UNITY_TOWER_VISITOR_MAX) {
         return NULL;
     }
-    return &save->visitors[index];
+    return &save->visitors[index].info;
 }
 
 UnityTowerVisitor *UnityTower_GetVisitors(UnityTowerSurveySave *save) {

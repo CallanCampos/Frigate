@@ -148,7 +148,8 @@ static inline GXRgb FieldMenu_InterpolateCursorColor(const FieldMenuCursorColor 
     s32 blue = phase * (end->blue - start->blue) / FX32_CONST(2) + start->blue;
     s32 green = phase * (end->green - start->green) / FX32_CONST(2) + start->green;
 
-    return GX_RGB(red, green, blue);
+    // Packs the channels from the highest field down, as palanm.c and fld3d_ci.c pack theirs
+    return (blue << GX_RGB_B_SHIFT) | (green << GX_RGB_G_SHIFT) | red;
 }
 
 static void FieldMenu_RestoreSubscreenOnCancel(FieldMenu *menu);
@@ -191,7 +192,7 @@ static const u16 FIELD_MENU_NAME_MESSAGES[FIELD_MENU_ITEM_MAX] = {
 // The screen of each kind of menu
 static const u32 FIELD_MENU_SCREEN_FILES[FIELD_MENU_TYPE_MAX] = { 0x12, 0x14, 0x14, 0x13, 0x14, 0x14, 0x12 };
 
-// The two colors of the cursor, each fading between its first and second endpoint.
+// The cursor's colors 0 and 1, each pulsing between a start and an end endpoint
 static const FieldMenuCursorColor sCursorColorEndpoints[2][2] = {
     { { 9, 31, 18 }, { 17, 31, 23 } },
     { { 0, 25, 18 }, { 31, 31, 31 } },
@@ -311,7 +312,7 @@ FieldMenu *FieldMenu_Create(HeapID heapId, HeapID tmpHeapId, FieldSubscreen *sub
 
 static void FieldMenu_RestoreSubscreenOnCancel(FieldMenu *menu) {
     if (menu->cancel == TRUE) {
-        func_ov036_021984f0(menu->subscreen, menu->heapId);
+        FieldSubscreen_ResumeField(menu->subscreen, menu->heapId);
     }
 }
 
@@ -356,7 +357,7 @@ void FieldMenu_Update(FieldMenu *menu) {
         if (PrintQueue_IsEmpty(menu->printQueue) == TRUE) {
             u8 i;
 
-            func_ov036_02198884(menu->subscreen, menu->tmpHeapId);
+            FieldSubscreen_LoadBackdrop(menu->subscreen, menu->tmpHeapId);
             for (i = 0; i < FIELD_MENU_SLOT_COUNT; i++) {
                 FieldMenu_FlushItem(menu, &menu->items[i]);
             }
@@ -382,7 +383,7 @@ void FieldMenu_Update(FieldMenu *menu) {
         break;
     case FIELD_MENU_STATE_WAIT_WIPE:
         if (GFL_WipeIsFinished() == TRUE) {
-            func_ov036_02198884(menu->subscreen, menu->tmpHeapId);
+            FieldSubscreen_LoadBackdrop(menu->subscreen, menu->tmpHeapId);
             menu->state = FIELD_MENU_STATE_INPUT;
         }
         break;
@@ -495,13 +496,13 @@ static void FieldMenu_LoadResources(FieldMenu *menu, ArcTool *arc, u8 menuType, 
     ClActorSetup setup;
 
     GXS_SetMasterBrightness(-16);
-    GFL_BGSysCreateBG(5, &sFieldMenuBG5Setup, 0);
+    GFL_BGSysCreateBG(5, &sFieldMenuBG5Setup, BGMODE_TEXT);
     GFL_BGSysSetBGEnabled(5, TRUE);
     GFL_BGSysClearScr(5);
-    GFL_BGSysCreateBG(6, &sFieldMenuBG6Setup, 0);
+    GFL_BGSysCreateBG(6, &sFieldMenuBG6Setup, BGMODE_TEXT);
     GFL_BGSysSetBGEnabled(6, TRUE);
     GFL_BGSysClearScr(6);
-    GFL_BGSysCreateBG(7, &sFieldMenuBG7Setup, 0);
+    GFL_BGSysCreateBG(7, &sFieldMenuBG7Setup, BGMODE_TEXT);
     GFL_BGSysSetBGEnabled(7, TRUE);
     GFL_BGSysClearScr(7);
     GFL_BGSysMoveBG(6, BG_MOVE_SET_Y, -5);
@@ -665,13 +666,14 @@ static void LoadFieldMenuTexts(FieldMenu *menu, ArcTool *arc, u8 menuType) {
 // Pulses the cursor's colors
 static void FieldMenu_PulseCursorTCB(TCB *tcb, void *data) {
     FieldMenu *menu = data;
-    fx32 t = GFL_MathSinDegWrap((u16)menu->cursorFadeFrame) + FX32_ONE;
-    GXRgb colors[2];
+    fx32 t = GFL_MathSinDegWrap(menu->cursorFadeFrame) + FX32_ONE;
+    GXRgb cursorColor0;
+    GXRgb cursorColor1;
 
-    colors[1] = FieldMenu_InterpolateCursorColor(&sCursorColorEndpoints[0][0], &sCursorColorEndpoints[0][1], t);
-    GXS_LoadOBJPltt(&colors[1], 0x142, sizeof(GXRgb));
-    colors[0] = FieldMenu_InterpolateCursorColor(&sCursorColorEndpoints[1][0], &sCursorColorEndpoints[1][1], t);
-    GXS_LoadOBJPltt(&colors[0], 0x15e, sizeof(GXRgb));
+    cursorColor0 = FieldMenu_InterpolateCursorColor(&sCursorColorEndpoints[0][0], &sCursorColorEndpoints[0][1], t);
+    GXS_LoadOBJPltt(&cursorColor0, 0x142, sizeof(GXRgb));
+    cursorColor1 = FieldMenu_InterpolateCursorColor(&sCursorColorEndpoints[1][0], &sCursorColorEndpoints[1][1], t);
+    GXS_LoadOBJPltt(&cursorColor1, 0x15e, sizeof(GXRgb));
     menu->cursorFadeFrame += 6;
 }
 
@@ -856,7 +858,7 @@ static void FieldMenu_UpdateCursor(FieldMenu *menu) {
 }
 
 static void FieldMenu_CreateItem(FieldMenu *menu, FieldMenuItem *item, const FieldMenuItemSetup *setup) {
-    Font *font = func_ov036_0218799c(Field_GetMsgBGSys(menu->field));
+    Font *font = MsgBGPrinter_GetFont(Field_GetMsgBGSys(menu->field));
     ClActorSetupEx actorSetup;
 
     item->active = TRUE;

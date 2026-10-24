@@ -9,13 +9,13 @@
 #include "field/field_g3dobj.h"
 #include "nitro/fx.h"
 
-static void func_ov036_0219749c(FieldActor *actor) {
+static void FldmmdlDraw_InitBlactId(FieldActor *actor) {
     u16 *work = FldAct_ResetBlActWork(actor, 2);
 
-    *work = func_ov036_021948a0(actor);
+    *work = FieldActorG3DSystem_AddObj(actor);
 }
 
-static void func_ov036_021974b4(FieldActor *actor) {
+static void FldmmdlDraw_DrawEffect(FieldActor *actor) {
     u16 *work = FldAct_GetBlActWorkPtr(actor);
     BOOL hidden;
     VecFx32 pos;
@@ -27,8 +27,8 @@ static void func_ov036_021974b4(FieldActor *actor) {
     if (IsActorHidden(actor) == 1) {
         hidden = TRUE;
     }
-    func_ov036_021c0154(g3d, *work, hidden);
-    if (func_ov036_0218ed68(actor) == 0) {
+    FieldG3DObjSystem_SetObjectHidden(g3d, *work, hidden);
+    if (FieldAcmdTCB_CheckAnimePaused(actor) == 0) {
         FieldG3DObjSystem_StepObjAnmLoop(g3d, *work, 0x1000);
     }
 }
@@ -36,7 +36,7 @@ static void func_ov036_021974b4(FieldActor *actor) {
 static void func_ov036_02197510(FieldActor *actor) {
     u16 *work = FldAct_GetBlActWorkPtr(actor);
 
-    func_ov036_021948ec(actor, *work);
+    FieldActorG3DSystem_DelObj(actor, *work);
 }
 
 static void func_ov036_02197524(FieldActor *actor) {
@@ -44,8 +44,9 @@ static void func_ov036_02197524(FieldActor *actor) {
 }
 
 static void func_ov036_0219752c(FieldActor *actor) {
-    func_ov036_0219749c(actor);
+    FldmmdlDraw_InitBlactId(actor);
 }
 
-const FieldActorSceneNodeVTable data_ov036_021cf9a0 = { func_ov036_0219749c, func_ov036_021974b4, func_ov036_02197510,
-                                                        func_ov036_02197524, func_ov036_0219752c, NULL };
+const FieldActorSceneNodeVTable data_ov036_021cf9a0 = { FldmmdlDraw_InitBlactId, FldmmdlDraw_DrawEffect,
+                                                        func_ov036_02197510,     func_ov036_02197524,
+                                                        func_ov036_0219752c,     NULL };

@@ -76,30 +76,30 @@ WeatherData SANDSTORM_WEATHER_2 = {
 };
 
 static BOOL Sandstorm_Init(WeatherTask *task, u32 arg, HeapID heapId) {
-    SandstormWork *work = func_ov036_021997e4(task);
+    SandstormWork *work = WeatherTask_GetWorkBuffer(task);
 
-    func_ov036_02199824(task, 1, 15, 1, 2, -2, 4, 1, Sandstorm_AddGrains);
-    func_ov036_0219990c(task, 8, 0x7fdf, arg);
+    WeatherTask_SetupSpawner(task, 1, 15, 1, 2, -2, 4, 1, Sandstorm_AddGrains);
+    WeatherTask_InitFog(task, 8, 0x7fdf, arg);
     work->timer = 1;
     work->cycle = 0;
     work->scroll = 0;
     work->windSpeed = 0;
-    func_ov036_02199a50(task);
-    func_ov036_02199be8(task, 0x6e3);
+    WeatherTask_SaveCameraPos(task);
+    WeatherTask_PlaySe(task, 0x6e3);
     return TRUE;
 }
 
 static BOOL Sandstorm_FadeIn(WeatherTask *task, u32 arg, HeapID heapId) {
-    SandstormWork *work = func_ov036_021997e4(task);
-    BOOL done = func_ov036_02199868(task, heapId);
+    SandstormWork *work = WeatherTask_GetWorkBuffer(task);
+    BOOL done = WeatherTask_StepSpawner(task, heapId);
 
     if (work->timer > 0) {
         if (--work->timer == 0) {
-            func_ov036_02199958(task, 8, 0x7f5e, 0x5a, arg);
-            func_ov036_02199734(task, 0x3d, FieldLightStatus_GetWeatherLight(3));
+            WeatherTask_ChangeFog(task, 8, 0x7f5e, 0x5a, arg);
+            WeatherTask_FadeLight(task, 0x3d, FieldLightStatus_GetWeatherLight(3));
         }
-    } else if (func_ov036_021999dc(task) && done) {
-        func_ov036_0219978c(task, 1, 0);
+    } else if (WeatherTask_IsFogIdle(task) && done) {
+        WeatherTask_SetBillboardVisible(task, 1, 0);
         return TRUE;
     }
     Sandstorm_ScrollBg(task, work);
@@ -107,19 +107,19 @@ static BOOL Sandstorm_FadeIn(WeatherTask *task, u32 arg, HeapID heapId) {
 }
 
 static BOOL Sandstorm_InitNoFade(WeatherTask *task, u32 arg, HeapID heapId) {
-    func_ov036_021997e4(task);
-    func_ov036_02199824(task, 1, 2, 1, 2, -2, 4, 1, Sandstorm_AddGrains);
-    func_ov036_0219990c(task, 8, 0x7f5e, arg);
-    func_ov036_02199880(task, Sandstorm_AddGrains, 24, 2, 2, heapId);
-    func_ov036_0219978c(task, 1, 0);
-    func_ov036_02199740(task, 0x3d, FieldLightStatus_GetWeatherLight(3));
+    WeatherTask_GetWorkBuffer(task);
+    WeatherTask_SetupSpawner(task, 1, 2, 1, 2, -2, 4, 1, Sandstorm_AddGrains);
+    WeatherTask_InitFog(task, 8, 0x7f5e, arg);
+    WeatherTask_PrewarmParticles(task, Sandstorm_AddGrains, 24, 2, 2, heapId);
+    WeatherTask_SetBillboardVisible(task, 1, 0);
+    WeatherTask_SetLight(task, 0x3d, FieldLightStatus_GetWeatherLight(3));
     return TRUE;
 }
 
 static BOOL Sandstorm_Main(WeatherTask *task, u32 arg, HeapID heapId) {
-    SandstormWork *work = func_ov036_021997e4(task);
+    SandstormWork *work = WeatherTask_GetWorkBuffer(task);
 
-    if (func_ov036_02199874(task, heapId)) {
+    if (WeatherTask_StepSpawnTimer(task, heapId)) {
         work->windSpeed = sWindSpeedX[work->cycle / 40];
         // Never true, since sWindSpeedX holds no negative speed
         if (work->windSpeed <= -6) {
@@ -131,24 +131,24 @@ static BOOL Sandstorm_Main(WeatherTask *task, u32 arg, HeapID heapId) {
 }
 
 static BOOL Sandstorm_InitFadeOut(WeatherTask *task, u32 arg, HeapID heapId) {
-    SandstormWork *work = func_ov036_021997e4(task);
+    SandstormWork *work = WeatherTask_GetWorkBuffer(task);
 
-    func_ov036_02199854(task, 0, 15, 2, -1);
+    WeatherTask_RetargetSpawner(task, 0, 15, 2, -1);
     work->timer = 31;
-    func_ov036_0219978c(task, 0, 0);
-    func_ov036_02199bf8(task);
+    WeatherTask_SetBillboardVisible(task, 0, 0);
+    WeatherTask_StopSe(task);
     return TRUE;
 }
 
 static BOOL Sandstorm_FadeOut(WeatherTask *task, u32 arg, HeapID heapId) {
-    SandstormWork *work = func_ov036_021997e4(task);
-    BOOL done = func_ov036_02199868(task, heapId);
+    SandstormWork *work = WeatherTask_GetWorkBuffer(task);
+    BOOL done = WeatherTask_StepSpawner(task, heapId);
 
     if (work->timer > 0) {
         if (--work->timer == 0) {
-            func_ov036_021999bc(task, 0x7fdf, 0x5a, arg);
+            WeatherTask_ChangeFogOffset(task, 0x7fdf, 0x5a, arg);
         }
-    } else if ((arg ? func_ov036_021999dc(task) : TRUE) && done && !func_ov036_021997e8(task)) {
+    } else if ((arg ? WeatherTask_IsFogIdle(task) : TRUE) && done && !WeatherTask_GetParticleCount(task)) {
         return TRUE;
     }
     Sandstorm_ScrollBg(task, work);
@@ -156,17 +156,17 @@ static BOOL Sandstorm_FadeOut(WeatherTask *task, u32 arg, HeapID heapId) {
 }
 
 static BOOL Sandstorm_Exit(WeatherTask *task, u32 arg, HeapID heapId) {
-    func_ov036_021997e4(task);
-    func_ov036_02199948(task, arg);
-    func_ov036_0219974c(task, arg);
+    WeatherTask_GetWorkBuffer(task);
+    WeatherTask_DisableFog(task, arg);
+    WeatherTask_ResetLight(task, arg);
     return TRUE;
 }
 
 static void SandGrain_Move(WeatherObj *obj) {
-    SandGrain *grain = func_ov036_02199c5c(obj);
+    SandGrain *grain = WeatherTask_GetParticleWork(obj);
     ClActorPos pos;
 
-    func_ov036_02199c64(obj);
+    WeatherTask_GetParticleActor(obj);
     func_ov036_02199c6c(obj, &pos);
     if (!grain->done) {
         pos.x += (s16)grain->speedX;
@@ -177,14 +177,14 @@ static void SandGrain_Move(WeatherObj *obj) {
         if (grain->frame++ > grain->lifetime) {
             grain->done = TRUE;
         }
-        func_ov036_02199c80(obj, &pos);
+        WeatherTask_SetParticlePosWrapped(obj, &pos);
     } else {
-        func_ov036_0219980c(obj);
+        WeatherTask_RemoveParticle(obj);
     }
 }
 
 static void Sandstorm_AddGrains(WeatherTask *task, int count, HeapID heapId) {
-    SandstormWork *work = func_ov036_021997e4(task);
+    SandstormWork *work = WeatherTask_GetWorkBuffer(task);
     int index;
     int i;
 
@@ -197,12 +197,12 @@ static void Sandstorm_AddGrains(WeatherTask *task, int count, HeapID heapId) {
         int size;
         ClActorPos pos;
 
-        obj = func_ov036_021997f4(task, heapId);
+        obj = WeatherTask_AddParticle(task, heapId);
         if (obj == NULL) {
             return;
         }
-        grain = func_ov036_02199c5c(obj);
-        actor = func_ov036_02199c64(obj);
+        grain = WeatherTask_GetParticleWork(obj);
+        actor = WeatherTask_GetParticleActor(obj);
         grain->frame = 0;
         grain->lifetime = GFL_RandomLC(20) + 15;
         size = 3 - (grain->lifetime - 15) / 6;
@@ -217,7 +217,7 @@ static void Sandstorm_AddGrains(WeatherTask *task, int count, HeapID heapId) {
         ClActor_SetAnimFrame(actor, size);
         pos.x = -6 - GFL_RandomLC(24);
         pos.y = GFL_RandomLC(192) - 64;
-        func_ov036_02199c80(obj, &pos);
+        WeatherTask_SetParticlePosWrapped(obj, &pos);
     }
 }
 
@@ -225,9 +225,9 @@ static void Sandstorm_ScrollBg(WeatherTask *task, SandstormWork *work) {
     int x;
     int y;
 
-    func_ov036_02199a78(task, &x, &y);
-    func_ov036_02199b90(task, x, y);
+    WeatherTask_GetCameraScroll(task, &x, &y);
+    WeatherTask_ShiftParticles(task, x, y);
     work->scroll = (work->scroll + 6) % 256;
-    func_ov036_021997bc(task, -work->scroll * 2 - x, 0);
-    func_ov036_021997cc(task, -work->scroll * 2 + y, 0);
+    WeatherTask_SetBillboardTexOffsetX(task, -work->scroll * 2 - x, 0);
+    WeatherTask_SetBillboardTexOffsetY(task, -work->scroll * 2 + y, 0);
 }

@@ -9,7 +9,7 @@
 void DWCi_ClearVram(void);
 void DWCUtilBank_Exit(void);
 void clearVram(void);
-void func_ov182_021bd0ac(void);
+void DWCi_SetLedWireless(void);
 void DWCi_SetLedNormal(void);
 
 #endif // POKEBW2_DWCUTIL_DWC_UTIL_BANK_H

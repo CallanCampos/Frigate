@@ -9,9 +9,9 @@
 #include "struct_decls.h"
 
 // Swaps the party Pokémon at partyIdx with the player's own dragon of the version from a box
-void func_ov036_021afa2c(FieldScriptEnv *env, u32 partyIdx);
+void ScrcmdPokemonFld_SwapPartyMonWithBoxedLegend(FieldScriptEnv *env, u32 partyIdx);
 // Moves the player's own dragon of the version to the front of the party
-void func_ov036_021afc28(FieldScriptEnv *env);
+void ScrcmdPokemonFld_MoveLegendToFront(FieldScriptEnv *env);
 // The party index of the player's own dragon of the version, or -1
 int GetOTZekromPartyIdx(GameData *gameData);
 

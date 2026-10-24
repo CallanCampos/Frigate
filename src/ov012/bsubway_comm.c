@@ -78,7 +78,7 @@ static const GFLNetInitData data_ov012_0216d93c = {
     8,
     1,
     0,
-    0,
+    GFL_NET_TYPE_WIRELESS,
     0,
     0x2c,
     {0x2c, 1, 0, 0},
@@ -132,14 +132,14 @@ BOOL BSubwayComm_IsTimingRecv(u8 timing) {
 
 static void BSubwayComm_SetMembersData(BSubwayScrWork *bsw, GameData *gameData) {
     PlayerInfo *info = GetGameDataPlayerInfo(gameData);
-    PokeParty *party = func_ov033_0217bd60(bsw);
+    PokeParty *party = BsubwayScr_GetParty(bsw);
     int i;
 
     bsw->sendBuf[0] = getTrainerGender(info);
     for (i = 0; i < 2; i++) {
         bsw->sendBuf[1 + i] = PokeParty_GetParam(PokeParty_GetPkm(party, bsw->memberSlots[i]), PKM_PARAM_SPECIES, NULL);
     }
-    bsw->sendBuf[3] = func_ov033_0217be1c(func_ov033_0217bd84(bsw));
+    bsw->sendBuf[3] = BsubwayScr_GetStageNo(BsubwayScr_GetWinCount(bsw));
 }
 
 static void BSubwayComm_SetTrainersData(BSubwayScrWork *bsw) {

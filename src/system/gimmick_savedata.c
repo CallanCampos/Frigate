@@ -34,11 +34,11 @@ void *GimmickState_GetUserData(GimmickState *gimmick, u32 gimmickId) {
     return gimmick->work;
 }
 
-void *func_0200bac8(GimmickState *gimmick, u32 gimmickId) {
+u8 *func_0200bac8(GimmickState *gimmick, u32 gimmickId) {
     return gimmick->unk84;
 }
 
-void *func_0200bacc(GimmickState *gimmick, u32 gimmickId) {
+u8 *func_0200bacc(GimmickState *gimmick, u32 gimmickId) {
     return gimmick->unk89;
 }
 

@@ -1,6 +1,7 @@
 #include "types.h"
 #include "field/fest_mission_gimmick.h"
 #include "field/fest_mission_hollow.h"
+#include "field/festival.h"
 #include "field/field.h"
 #include "field/field_actor.h"
 #include "field/rival_select.h"
@@ -11,7 +12,7 @@
 #include "system/game_data.h"
 
 RivalEntry *RivalSelect_GetEntry(FesGimmick *gimmick, u32 id) {
-    RivalEntry *entries = LinkFestival_GetEntries(gimmick->festival);
+    RivalEntry *entries = LinkFestival_GetMissionWork(gimmick->festival)->hollows;
     return &entries[RivalSelect_FindEntryIndex(gimmick, id)];
 }
 
@@ -20,7 +21,7 @@ void RivalSelect_SelectOtherRandom(FesGimmick *gimmick, u32 id) {
     int i;
     u8 current = RivalSelect_FindEntryIndex(gimmick, id);
     u8 count = 0;
-    RivalEntry *entries = LinkFestival_GetEntries(gimmick->festival);
+    RivalEntry *entries = LinkFestival_GetMissionWork(gimmick->festival)->hollows;
     u8 choice;
 
     if (current == 10) {
@@ -62,7 +63,7 @@ BOOL RivalSelect_RemoveHollowActor(FesGimmick *gimmick) {
 }
 
 BOOL RivalSelect_IsSelectedAndActive(FesGimmick *gimmick, u32 id) {
-    RivalEntry *entries = LinkFestival_GetEntries(gimmick->festival);
+    RivalEntry *entries = LinkFestival_GetMissionWork(gimmick->festival)->hollows;
     int i;
     for (i = 0; i < 10; i++) {
         if (entries[i].id == id && entries[i].selected == 1 && entries[i].active != 0) {
@@ -73,7 +74,7 @@ BOOL RivalSelect_IsSelectedAndActive(FesGimmick *gimmick, u32 id) {
 }
 
 void RivalSelect_SetActive(FesGimmick *gimmick, u32 id) {
-    RivalEntry *entries = LinkFestival_GetEntries(gimmick->festival);
+    RivalEntry *entries = LinkFestival_GetMissionWork(gimmick->festival)->hollows;
     int i;
     for (i = 0; i < 10; i++) {
         if (entries[i].id == id) {
@@ -83,7 +84,7 @@ void RivalSelect_SetActive(FesGimmick *gimmick, u32 id) {
 }
 
 u8 RivalSelect_FindEntryIndex(FesGimmick *gimmick, u32 id) {
-    RivalEntry *entries = LinkFestival_GetEntries(gimmick->festival);
+    RivalEntry *entries = LinkFestival_GetMissionWork(gimmick->festival)->hollows;
     int i;
     for (i = 0; i < 10; i++) {
         if (entries[i].id == id) {

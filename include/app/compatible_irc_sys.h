@@ -3,6 +3,7 @@
 
 #include "types.h"
 #include "gfl/heap.h"
+#include "gfl/net_command.h"
 #include "save/player_info.h"
 #include "struct_decls.h"
 
@@ -47,7 +48,7 @@ BOOL CompatibleIrcSys_SendCount(CompatibleIrcSys *sys);
 int CompatibleIrcSys_GetPendingCount(CompatibleIrcSys *sys);
 BOOL CompatibleIrcSys_SendEx(CompatibleIrcSys *sys, u16 command, u32 size, const void *data, u8 sendId, u32 a5, BOOL a6,
                              BOOL noCopy);
-void CompatibleIrcSys_AddCommands(CompatibleIrcSys *sys, int base, const void *list, int count, void *work);
+void CompatibleIrcSys_AddCommands(CompatibleIrcSys *sys, int base, const NetCommand *list, int count, void *work);
 void CompatibleIrcSys_RemoveCommands(CompatibleIrcSys *sys, int base);
 BOOL CompatibleIrcSys_SendSelection(CompatibleIrcSys *sys, u32 a, u32 b);
 BOOL CompatibleIrcSys_PollSelection(CompatibleIrcSys *sys);

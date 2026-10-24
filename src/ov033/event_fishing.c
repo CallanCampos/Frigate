@@ -26,7 +26,7 @@
 #include "system/game_event.h"
 #include "system/game_system.h"
 
-BOOL CreateSurfPos(void *context, Field *field, VecFx32 *position) {
+BOOL CreateSurfPos(GameData *context, Field *field, VecFx32 *position) {
     VecFx32 targetPosition;
     MapTerrainBuf terrain;
     VecFx32 actorPosition;
@@ -137,7 +137,7 @@ GameEventReturnCode EventFieldFishing_Callback(GameEvent *event, u32 *state, voi
         FieldPlayer_SetSpecialSeq(work->player, 0x200);
         ++*state;
     case 1:
-        if (func_ov036_0219a580(work->player) == 1) {
+        if (FieldPlayer_StepFormChange(work->player) == 1) {
             FldAct_SetDrawStatus(work->actor, 0);
             func_ov012_02167564(work->actor, work->flag5B);
             GFL_SndSEPlay(0x684);
@@ -145,7 +145,7 @@ GameEventReturnCode EventFieldFishing_Callback(GameEvent *event, u32 *state, voi
         }
         break;
     case 2:
-        if (func_ov033_021795a4(work, 15) != 0) {
+        if (Fishing_StepCounter(work, 15) != 0) {
             func_ov033_02179628(work);
             if (work->battleSetup == NULL) {
                 *state = 5;
@@ -156,7 +156,7 @@ GameEventReturnCode EventFieldFishing_Callback(GameEvent *event, u32 *state, voi
         }
         break;
     case 3:
-        result = func_ov033_021795bc(work, work->timer);
+        result = Fishing_WaitBite(work, work->timer);
         if (result == 1) {
             *state = 6;
         } else if (result == 2) {
@@ -165,7 +165,7 @@ GameEventReturnCode EventFieldFishing_Callback(GameEvent *event, u32 *state, voi
         }
         break;
     case 4:
-        result = func_ov033_021795bc(work, 30);
+        result = Fishing_WaitBite(work, 30);
         if (result != 0) {
             func_ov033_02179614(work);
             if (result == 1) {
@@ -184,7 +184,7 @@ GameEventReturnCode EventFieldFishing_Callback(GameEvent *event, u32 *state, voi
         }
         break;
     case 5:
-        result = func_ov033_021795bc(work, 120);
+        result = Fishing_WaitBite(work, 120);
         if (result != 2) {
             if (result == 1) {
                 *state = 6;
@@ -208,7 +208,7 @@ GameEventReturnCode EventFieldFishing_Callback(GameEvent *event, u32 *state, voi
         FieldPlayer_SetSpecialSeq(work->player, 8);
         *state = 9;
     case 9:
-        if (func_ov036_0219a580(work->player) != 1) {
+        if (FieldPlayer_StepFormChange(work->player) != 1) {
             break;
         }
         func_ov012_02167564(work->actor, 0);
@@ -224,7 +224,7 @@ GameEventReturnCode EventFieldFishing_Callback(GameEvent *event, u32 *state, voi
     return GAMEEVENT_CONTINUE;
 }
 
-u32 func_ov033_021795a4(FishingEventWork *work, u32 value) {
+u32 Fishing_StepCounter(FishingEventWork *work, u32 value) {
     u32 elapsed;
 
     elapsed = work->elapsed++;
@@ -235,7 +235,7 @@ u32 func_ov033_021795a4(FishingEventWork *work, u32 value) {
     return 1;
 }
 
-u32 func_ov033_021795bc(FishingEventWork *work, u32 value) {
+u32 Fishing_WaitBite(FishingEventWork *work, u32 value) {
     u32 elapsed;
 
     elapsed = work->elapsed++;
@@ -256,13 +256,13 @@ void func_ov033_021795e8(FishingEventWork *work) {
 
     effects = Field_GetFieldEffects(work->field);
     FldAct_SetDrawStatus(work->actor, 2);
-    work->effect2C = func_ov036_021b3f14(effects, work->actor, 0, 1);
-    func_ov036_021a5968(work->effect30, 1);
+    work->effect2C = FldeffGyoe_SetMMdl(effects, work->actor, 0, 1);
+    FldeffFishing_SetAnimeSpeed(work->effect30, 1);
 }
 
 void func_ov033_02179614(FishingEventWork *work) {
     if (work->effect2C != NULL) {
-        func_ov036_021a3a70(work->effect2C);
+        FieldEffects_DeleteObject(work->effect2C);
         work->effect2C = NULL;
     }
 }
@@ -281,7 +281,7 @@ void func_ov033_02179628(FishingEventWork *work) {
 
 void func_ov033_02179650(FishingEventWork *work) {
     if (work->effect30 != NULL) {
-        func_ov036_021a3a70(work->effect30);
+        FieldEffects_DeleteObject(work->effect30);
         work->effect30 = NULL;
     }
 }

@@ -38,25 +38,25 @@ typedef struct TwlWork {
 } TwlWork;
 
 static DWCBmReadResult func_0205e020(DWCMemPage *pages);
-static int func_0205e160(DWCMemPage *pages, const MATHCRC16Table *table);
-static int func_0205e380(TwlWork *work, const MATHCRC16Table *table);
-static void func_0205e540(DWCMemPage *pages, int index);
-static void func_0205e56c(DWCBmTwlPage *pages, int index);
-static BOOL func_0205e598(DWCMemPage *pages);
-static BOOL func_0205e614(DWCBmTwlPage *pages);
-static BOOL func_0205e668(DWCMemPage *pages, const MATHCRC16Table *table);
-static BOOL func_0205e714(DWCBmTwlPage *pages, const MATHCRC16Table *table);
+static int checkConfig(DWCMemPage *pages, const MATHCRC16Table *table);
+static int checkConfigEx(TwlWork *work, const MATHCRC16Table *table);
+static void initPage(DWCMemPage *pages, int index);
+static void initPageEx(DWCBmTwlPage *pages, int index);
+static BOOL readAllSlots(DWCMemPage *pages);
+static BOOL readAllExSlots(DWCBmTwlPage *pages);
+static BOOL writeAllSlots(DWCMemPage *pages, const MATHCRC16Table *table);
+static BOOL writeAllExSlots(DWCBmTwlPage *pages, const MATHCRC16Table *table);
 static BOOL checkAp(const DWCBMApInfo *connection);
-static BOOL func_0205e7f8(const DWCBMApInfo *connection, const DWCBmTwlExtra *extra);
-static BOOL func_0205e870(const DWCBMApInfo *connection);
-static void func_0205e93c(u32 bits, u8 *mask);
-static BOOL func_0205e968(const u8 *ssid);
-static BOOL func_0205e990(const u8 *address, const u8 *mask);
-static BOOL func_0205ea10(const u8 *address);
+static BOOL NCFGi_CheckApInfoEx(const DWCBMApInfo *connection, const DWCBmTwlExtra *extra);
+static BOOL NCFGi_CheckIpInfo(const DWCBMApInfo *connection);
+static void NCFGi_ConvMaskAddr(u32 bits, u8 *mask);
+static BOOL NCFGi_CheckSsid(const u8 *ssid);
+static BOOL NCFGi_CheckIp(const u8 *address, const u8 *mask);
+static BOOL NCFGi_CheckAddress(const u8 *address);
 
 // Reads the four pages of the NTR settings
 static DWCBmReadResult func_0205e020(DWCMemPage *pages) {
-    if (func_0205e598(pages)) {
+    if (readAllSlots(pages)) {
         return DWC_BM_READ_OK;
     }
     return DWC_BM_READ_FAILED;
@@ -64,9 +64,9 @@ static DWCBmReadResult func_0205e020(DWCMemPage *pages) {
 
 // Whether the TWL's pages could be read, which is only tried when the console has them and the NTR ones were read
 static inline BOOL readTwlPages(TwlWork *twl, BOOL ntrRead) {
-    if (func_0205dc78() >= TWL_FIRST_VERSION) {
+    if (NCFG_GetFormatVersion() >= TWL_FIRST_VERSION) {
         if (ntrRead) {
-            if (func_0205e614(twl->twlPages)) {
+            if (readAllExSlots(twl->twlPages)) {
                 return TRUE;
             }
         }
@@ -87,7 +87,7 @@ DWCBmReadResult func_0205e038(void *work, int unused) {
 }
 
 // DWC_BM_Init's check for an NTR console: a work area of 0x700 bytes
-int func_0205e094(void *work) {
+int NCFG_CheckConfig(void *work) {
     NtrWork *ntr = work;
 
     MI_CpuFill8(work, 0, NTR_WORK_SIZE);
@@ -95,14 +95,14 @@ int func_0205e094(void *work) {
         return DWC_BM_INIT_READ_ERROR;
     }
     MATHi_CRC16InitTableRev(&ntr->crcTable, 0xA001);
-    if (!func_0205e598(ntr->pages)) {
+    if (!readAllSlots(ntr->pages)) {
         return DWC_BM_INIT_READ_ERROR;
     }
-    return func_0205e160(ntr->pages, &ntr->crcTable);
+    return checkConfig(ntr->pages, &ntr->crcTable);
 }
 
 // The same for a TWL console, with a work area of 0x1000 bytes
-int func_0205e0f0(void *work) {
+int NCFG_CheckConfigEx(void *work) {
     TwlWork *twl = work;
 
     MI_CpuFill8(work, 0, TWL_WORK_SIZE);
@@ -110,19 +110,19 @@ int func_0205e0f0(void *work) {
         return DWC_BM_INIT_READ_ERROR;
     }
     MATHi_CRC16InitTableRev(&twl->crcTable, 0xA001);
-    if (!func_0205e598(twl->ntrPages)) {
+    if (!readAllSlots(twl->ntrPages)) {
         return DWC_BM_INIT_READ_ERROR;
     }
-    if (!func_0205e614(twl->twlPages)) {
+    if (!readAllExSlots(twl->twlPages)) {
         return DWC_BM_INIT_READ_ERROR;
     }
-    return func_0205e380(twl, &twl->crcTable);
+    return checkConfigEx(twl, &twl->crcTable);
 }
 
 // Checks the four pages of the NTR settings and makes them whole: a page whose CRC16 or connection is wrong is emptied
 // (the Wi-Fi ID of the first two pages is copied from the other, when that one is fine), and the mask of the
 // connections in use is made again. Returns 0, or what was lost
-static int func_0205e160(DWCMemPage *pages, const MATHCRC16Table *table) {
+static int checkConfig(DWCMemPage *pages, const MATHCRC16Table *table) {
     BOOL valid[NTR_PAGE_COUNT];
     u8 usedMask;
     u8 newUsedMask;
@@ -152,20 +152,20 @@ static int func_0205e160(DWCMemPage *pages, const MATHCRC16Table *table) {
     usedMask = pages[0].ap.state;
     if (!valid[0]) {
         usedMask = 0;
-        func_0205e540(pages, 0);
+        initPage(pages, 0);
         if (valid[1]) {
             usedMask = pages[1].ap.state;
             MI_CpuCopy8(pages[1].wifi, pages[0].wifi, DWC_BM_PACKED_SIZE);
         }
     }
     if (!valid[1]) {
-        func_0205e540(pages, 1);
+        initPage(pages, 1);
         if (valid[0]) {
             MI_CpuCopy8(pages[0].wifi, pages[1].wifi, DWC_BM_PACKED_SIZE);
         }
     }
     if (!valid[2]) {
-        func_0205e540(pages, 2);
+        initPage(pages, 2);
     }
     if (!valid[3]) {
         MI_CpuClear16(&pages[3], sizeof(DWCMemPage));
@@ -182,7 +182,7 @@ static int func_0205e160(DWCMemPage *pages, const MATHCRC16Table *table) {
     }
     pages[0].ap.state = newUsedMask;
     pages[1].ap.state = newUsedMask;
-    if (!func_0205e668(pages, table)) {
+    if (!writeAllSlots(pages, table)) {
         return DWC_BM_INIT_WRITE_ERROR;
     }
 
@@ -200,9 +200,9 @@ static int func_0205e160(DWCMemPage *pages, const MATHCRC16Table *table) {
 
 // The same for a TWL console, with the NTR pages checked first and their result kept unless it is 0. When the first two
 // TWL pages are both bad, all three connections are taken as having been in use
-static int func_0205e380(TwlWork *work, const MATHCRC16Table *table) {
+static int checkConfigEx(TwlWork *work, const MATHCRC16Table *table) {
     DWCBmTwlPage *pages = work->twlPages;
-    int ntrResult = func_0205e160(work->ntrPages, table);
+    int ntrResult = checkConfig(work->ntrPages, table);
     BOOL valid[TWL_PAGE_COUNT];
     u8 usedMask;
     u8 newUsedMask;
@@ -215,7 +215,7 @@ static int func_0205e380(TwlWork *work, const MATHCRC16Table *table) {
         u16 extraCrc = MATH_CalcCRC16(table, &pages[i].extra, TWL_EXTRA_CRC_SIZE);
 
         if (ntrCrc == pages[i].ntr.crc && extraCrc == pages[i].extra.crc16) {
-            if (func_0205e7f8(&pages[i].ntr.ap, &pages[i].extra)) {
+            if (NCFGi_CheckApInfoEx(&pages[i].ntr.ap, &pages[i].extra)) {
                 valid[i] = TRUE;
             }
         }
@@ -226,7 +226,7 @@ static int func_0205e380(TwlWork *work, const MATHCRC16Table *table) {
 
     usedMask = pages[0].ntr.ap.state;
     if (!valid[0]) {
-        func_0205e56c(pages, 0);
+        initPageEx(pages, 0);
         if (valid[1]) {
             usedMask = pages[1].ntr.ap.state;
         } else {
@@ -234,10 +234,10 @@ static int func_0205e380(TwlWork *work, const MATHCRC16Table *table) {
         }
     }
     if (!valid[1]) {
-        func_0205e56c(pages, 1);
+        initPageEx(pages, 1);
     }
     if (!valid[2]) {
-        func_0205e56c(pages, 2);
+        initPageEx(pages, 2);
     }
 
     lost = FALSE;
@@ -251,7 +251,7 @@ static int func_0205e380(TwlWork *work, const MATHCRC16Table *table) {
     }
     pages[0].ntr.ap.state = newUsedMask;
     pages[1].ntr.ap.state = newUsedMask;
-    if (!func_0205e714(pages, table)) {
+    if (!writeAllExSlots(pages, table)) {
         return DWC_BM_INIT_WRITE_ERROR;
     }
 
@@ -268,18 +268,18 @@ static int func_0205e380(TwlWork *work, const MATHCRC16Table *table) {
 }
 
 // Empties a page, and marks its connection as not in use
-static void func_0205e540(DWCMemPage *pages, int index) {
+static void initPage(DWCMemPage *pages, int index) {
     MI_CpuClear16(&pages[index], sizeof(DWCMemPage));
     pages[index].ap.setType = DWC_SETTYPE_NONE;
 }
 
-static void func_0205e56c(DWCBmTwlPage *pages, int index) {
+static void initPageEx(DWCBmTwlPage *pages, int index) {
     MI_CpuClear16(&pages[index], sizeof(DWCBmTwlPage));
     pages[index].ntr.ap.setType = DWC_SETTYPE_NONE;
 }
 
 // Reads the four pages of the NTR settings; TRUE when all could be read
-static BOOL func_0205e598(DWCMemPage *pages) {
+static BOOL readAllSlots(DWCMemPage *pages) {
     BOOL ok = TRUE;
     int i;
 
@@ -287,7 +287,7 @@ static BOOL func_0205e598(DWCMemPage *pages) {
         BOOL read = FALSE;
 
         if (ok) {
-            int size = func_0205dca4(&pages[i], sizeof(DWCMemPage), i);
+            int size = NCFG_ReadBackupMemory(&pages[i], sizeof(DWCMemPage), i);
 
             if (size >= 0) {
                 read = TRUE;
@@ -296,7 +296,7 @@ static BOOL func_0205e598(DWCMemPage *pages) {
         ok = read;
     }
     if (ok) {
-        if (func_0205dca4(&pages[3], sizeof(DWCMemPage), 3) >= 0) {
+        if (NCFG_ReadBackupMemory(&pages[3], sizeof(DWCMemPage), 3) >= 0) {
             return TRUE;
         }
     }
@@ -304,42 +304,42 @@ static BOOL func_0205e598(DWCMemPage *pages) {
 }
 
 // Reads the three pages of the TWL settings
-static BOOL func_0205e614(DWCBmTwlPage *pages) {
+static BOOL readAllExSlots(DWCBmTwlPage *pages) {
     int i;
     BOOL ok = TRUE;
 
     for (i = 0; i < TWL_PAGE_COUNT; i++) {
-        ok = ok && func_0205dca4(&pages[i], sizeof(DWCBmTwlPage), i + TWL_FIRST_PAGE) >= 0;
+        ok = ok && NCFG_ReadBackupMemory(&pages[i], sizeof(DWCBmTwlPage), i + TWL_FIRST_PAGE) >= 0;
     }
     return ok;
 }
 
 // Writes the four pages of the NTR settings, each with the CRC16 of what comes before it
-static BOOL func_0205e668(DWCMemPage *pages, const MATHCRC16Table *table) {
+static BOOL writeAllSlots(DWCMemPage *pages, const MATHCRC16Table *table) {
     int i;
     BOOL ok = TRUE;
 
     for (i = 0; i < CONNECTION_COUNT; i++) {
         pages[i].crc = MATH_CalcCRC16(table, &pages[i], NTR_CRC_SIZE);
-        ok = ok && func_0205dd40(i, &pages[i], sizeof(DWCMemPage)) >= 0;
+        ok = ok && NCFG_WriteBackupMemory(i, &pages[i], sizeof(DWCMemPage)) >= 0;
     }
     pages[3].crc = MATH_CalcCRC16(table, &pages[3], NTR_CRC_SIZE);
     if (ok) {
-        if (func_0205dd40(3, &pages[3], sizeof(DWCMemPage)) >= 0) {
+        if (NCFG_WriteBackupMemory(3, &pages[3], sizeof(DWCMemPage)) >= 0) {
             return TRUE;
         }
     }
     return FALSE;
 }
 
-static BOOL func_0205e714(DWCBmTwlPage *pages, const MATHCRC16Table *table) {
+static BOOL writeAllExSlots(DWCBmTwlPage *pages, const MATHCRC16Table *table) {
     int i;
     BOOL ok = TRUE;
 
     for (i = 0; i < TWL_PAGE_COUNT; i++) {
         pages[i].ntr.crc = MATH_CalcCRC16(table, &pages[i].ntr, NTR_CRC_SIZE);
         pages[i].extra.crc16 = MATH_CalcCRC16(table, &pages[i].extra, TWL_EXTRA_CRC_SIZE);
-        ok = ok && func_0205dd40(i + TWL_FIRST_PAGE, &pages[i], sizeof(DWCBmTwlPage)) >= 0;
+        ok = ok && NCFG_WriteBackupMemory(i + TWL_FIRST_PAGE, &pages[i], sizeof(DWCBmTwlPage)) >= 0;
     }
     return ok;
 }
@@ -353,27 +353,27 @@ static BOOL checkAp(const DWCBMApInfo *connection) {
     if (connection->setType > 2) {
         return FALSE;
     }
-    if (!func_0205e968(connection->ssid)) {
+    if (!NCFGi_CheckSsid(connection->ssid)) {
         return FALSE;
     }
-    if (func_0205e870(connection)) {
+    if (NCFGi_CheckIpInfo(connection)) {
         return TRUE;
     }
     return FALSE;
 }
 
 // The same for the first half of a TWL page, whose kinds above 2 also need the flags of the second half to be 0 or 1
-static BOOL func_0205e7f8(const DWCBMApInfo *connection, const DWCBmTwlExtra *extra) {
+static BOOL NCFGi_CheckApInfoEx(const DWCBMApInfo *connection, const DWCBmTwlExtra *extra) {
     if (connection->setType == DWC_SETTYPE_NONE) {
         return TRUE;
     }
     if (connection->setType <= 2) {
         return checkAp(connection);
     }
-    if (!func_0205e968(connection->ssid)) {
+    if (!NCFGi_CheckSsid(connection->ssid)) {
         return FALSE;
     }
-    if (!func_0205e870(connection)) {
+    if (!NCFGi_CheckIpInfo(connection)) {
         return FALSE;
     }
     if (extra->unk82 > 1) {
@@ -388,24 +388,24 @@ static BOOL func_0205e7f8(const DWCBMApInfo *connection, const DWCBmTwlExtra *ex
 // Whether the address settings of a connection are in order: when it has an address of its own, a gateway that can be
 // one, a mask length of at most 32 and an address that suits the mask; and when it has DNS servers, either of them
 // can be one
-static BOOL func_0205e870(const DWCBMApInfo *connection) {
+static BOOL NCFGi_CheckIpInfo(const DWCBMApInfo *connection) {
     if (connection->ip[0] != 0 || connection->ip[1] != 0 || connection->ip[2] != 0 || connection->ip[3] != 0) {
         u8 mask[4];
 
-        if (!func_0205ea10(connection->gateway)) {
+        if (!NCFGi_CheckAddress(connection->gateway)) {
             return FALSE;
         }
         if (connection->netmask > 0x20) {
             return FALSE;
         }
-        func_0205e93c(connection->netmask, mask);
-        if (!func_0205e990(connection->ip, mask)) {
+        NCFGi_ConvMaskAddr(connection->netmask, mask);
+        if (!NCFGi_CheckIp(connection->ip, mask)) {
             return FALSE;
         }
     }
     if (connection->dns[0][0] != 0 || connection->dns[0][1] != 0 || connection->dns[0][2] != 0 ||
         connection->dns[0][3] != 0) {
-        if (!func_0205ea10(connection->dns[0]) && !func_0205ea10(connection->dns[1])) {
+        if (!NCFGi_CheckAddress(connection->dns[0]) && !NCFGi_CheckAddress(connection->dns[1])) {
             return FALSE;
         }
     }
@@ -413,7 +413,7 @@ static BOOL func_0205e870(const DWCBMApInfo *connection) {
 }
 
 // The four bytes of the mask that has the given number of its high bits set (a copy of dwc_backup.c's)
-static void func_0205e93c(u32 bits, u8 *mask) {
+static void NCFGi_ConvMaskAddr(u32 bits, u8 *mask) {
     int i;
     u32 value = 0xFFFFFFFF ^ (0xFFFFFFFF >> bits);
 
@@ -423,7 +423,7 @@ static void func_0205e93c(u32 bits, u8 *mask) {
 }
 
 // Whether any of the 32 bytes of a network name is not 0
-static BOOL func_0205e968(const u8 *ssid) {
+static BOOL NCFGi_CheckSsid(const u8 *ssid) {
     int i;
 
     for (i = 0; i < 0x20; i++) {
@@ -436,11 +436,11 @@ static BOOL func_0205e968(const u8 *ssid) {
 
 // Whether an address can be used with a mask: a usable address, not one that makes all but the lowest bit set together
 // with the mask, and with a bit that the mask leaves to the host
-static BOOL func_0205e990(const u8 *address, const u8 *mask) {
+static BOOL NCFGi_CheckIp(const u8 *address, const u8 *mask) {
     u32 addressBits;
     u32 maskBits;
 
-    if (!func_0205ea10(address)) {
+    if (!NCFGi_CheckAddress(address)) {
         return FALSE;
     }
     MI_CpuCopy8(address, &addressBits, 4);
@@ -452,7 +452,7 @@ static BOOL func_0205e990(const u8 *address, const u8 *mask) {
 }
 
 // Whether the first byte of an address is neither 0, 127 nor above 223 (a copy of dwc_backup.c's)
-static BOOL func_0205ea10(const u8 *address) {
+static BOOL NCFGi_CheckAddress(const u8 *address) {
     u8 first = address[0];
 
     if (first == 127) {

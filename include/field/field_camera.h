@@ -226,11 +226,11 @@ BOOL FieldCamera_SupportsDelay(FieldCamera *camera);
 void FieldCamera_FinishDelay(FieldCamera *camera);
 BOOL FieldCamera_IsDelayActive(FieldCamera *camera);
 // What the camera follows
-void *FieldCamera_GetBind(FieldCamera *camera);
+const VecFx32 *FieldCamera_GetBind(FieldCamera *camera);
 void FieldCamera_SetBind(FieldCamera *camera, const VecFx32 *bind);
 // What the camera follows on a rail map
 void FieldCamera_SetRefBind(FieldCamera *camera, const VecFx32 *bind);
-void *FieldCamera_GetRefBind(FieldCamera *camera);
+const VecFx32 *FieldCamera_GetRefBind(FieldCamera *camera);
 // The event camera's animations: start, animate to a target or back over frames, and end
 void FieldCamera_EVCameraInit(FieldCamera *camera);
 void FieldCameraAnm_EnsureInitDone(FieldCamera *camera);
@@ -266,8 +266,8 @@ FieldTask *FieldCameraShakeTask_Create(Field *field, const FieldCameraShakeSetup
 FieldCamera *FieldCamera_Create(u32 cameraIndex, u32 a1, G3DCamera *g3dCamera, const VecFx32 *target, HeapID heapId);
 void FieldCamera_Free(FieldCamera *camera);
 // The camera's pitch
-u16 *func_ov036_021863c4(FieldCamera *camera);
-u16 *func_ov036_021863d8(FieldCamera *camera);
+u16 *FieldCamera_GetViewPitchPtr(FieldCamera *camera);
+u16 *FieldCamera_GetViewYawPtr(FieldCamera *camera);
 void FieldCameraBoundary_LoadDummy(FieldCamera *camera);
 void FieldCameraBoundary_ChangeID(FieldCamera *camera, u16 boundaryId, HeapID heapId);
 

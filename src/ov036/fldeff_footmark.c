@@ -69,7 +69,7 @@ static const u16 FOOTMARK_TEXTURE_FILES[FOOTMARK_TEXTURE_COUNT] = {
     19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 39, 40, 41, 42, 43, 44, 33, 34, 35, 36, 37, 38,
 };
 
-void *func_ov036_021b46b0(FieldEffects *effects, HeapID heapId) {
+void *Footmark_Init(FieldEffects *effects, HeapID heapId) {
     FieldEffectFootmark *footmark =
         GFL_HeapAllocate(heapId, sizeof(FieldEffectFootmark), TRUE, "fldeff_footmark.c", 157);
 
@@ -139,7 +139,7 @@ static u32 Footmark_GetTexture(FieldEffectFootmark *footmark, u32 kind, u32 dir,
     return texture;
 }
 
-void func_ov036_021b47c8(FieldActor *actor, FieldEffects *effects, u32 kind) {
+void Footmark_SetMMdl(FieldActor *actor, FieldEffects *effects, u32 kind) {
     FootmarkTaskParams params;
     VecFx32 pos;
     u16 texture;
@@ -165,7 +165,7 @@ void func_ov036_021b47c8(FieldActor *actor, FieldEffects *effects, u32 kind) {
 
 static void FootmarkTask_Init(FieldEffectTask *task, void *work) {
     FootmarkTask *fmTask = work;
-    FootmarkTaskParams *params = func_ov036_021a3ac8(task);
+    FootmarkTaskParams *params = FieldEffects_GetObjectParam(task);
     BlActActorRequest request;
 
     fmTask->params = *params;
@@ -178,10 +178,10 @@ static void FootmarkTask_Init(FieldEffectTask *task, void *work) {
     request.lights = 1;
     request.callback = NULL;
     request.callbackData = fmTask;
-    func_ov036_021a3ad4(task, &request.pos);
+    FieldEffects_GetObjectPos(task, &request.pos);
     fmTask->actor = BlActSys_ExecActorRequests(fmTask->params.footmark->blact, 0, &request, 1, 3);
     if (fmTask->actor == BLACT_NONE) {
-        func_ov036_021a3a70(task);
+        FieldEffects_DeleteObject(task);
     }
 }
 
@@ -212,7 +212,7 @@ static void FootmarkTask_Update(FieldEffectTask *task, void *work) {
     case 1:
         fmTask->alpha -= 2;
         if (fmTask->alpha < 0) {
-            func_ov036_021a3a70(task);
+            FieldEffects_DeleteObject(task);
             return;
         }
         alpha = fmTask->alpha;

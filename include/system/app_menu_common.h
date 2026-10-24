@@ -13,16 +13,18 @@
 // for each of the three OBJ VRAM mappings (32, 64 and 128 KB), picked by `mapping`.
 
 // The status icons, as AppMenuCommon_GetStatusIcon returns them
-#define APP_STATUS_ICON_PARALYSIS 1
-#define APP_STATUS_ICON_FREEZE 2
-#define APP_STATUS_ICON_SLEEP 3
-#define APP_STATUS_ICON_POISON 4
-#define APP_STATUS_ICON_BURN 5
-#define APP_STATUS_ICON_FAINTED 6
-#define APP_STATUS_ICON_NONE 8
+enum {
+    APP_STATUS_ICON_PARALYSIS = 1,
+    APP_STATUS_ICON_FREEZE,
+    APP_STATUS_ICON_SLEEP,
+    APP_STATUS_ICON_POISON,
+    APP_STATUS_ICON_BURN,
+    APP_STATUS_ICON_FAINTED,
+    APP_STATUS_ICON_NONE = 8,
+};
 
-BOOL func_0202d7d8(void);
-void func_0202d7dc(void);
+BOOL BeaconStatus_IsLocked(void);
+void BeaconStatus_DoNothing(void);
 u32 getUINarcIdx(void);
 
 // The type and contest category icons: the palette, each icon's palette within it, the icons, cells and animations
@@ -43,7 +45,7 @@ u32 AppMenuCommon_GetTouchBarAnimFile(u32 mapping);
 u32 AppMenuCommon_GetBarBgPaletteFile(void);
 u32 AppMenuCommon_GetBarBgCharFile(void);
 u32 AppMenuCommon_GetBarScreenFile(void);
-u32 func_0202d82c(void);
+u32 AppMenuCommon_GetStatusExtraFileId(void);
 
 // Loads the menu bar's screen into the bottom three rows of bg's screen buffer, with its characters starting at
 // charBase and in palette `palette`

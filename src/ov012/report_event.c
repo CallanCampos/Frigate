@@ -56,10 +56,10 @@ struct ReportWork {
     // Set once the player has continued a paused message
     u32 continued;
     AppTaskMenuItem items[2];
-    void *menuRes;
-    void *menu;
+    AppTaskMenuRes *menuRes;
+    AppTaskMenu *menu;
     WaitIcon *waitIcon;
-    void *effect;
+    FieldSaveAnime *effect;
     u32 timer;
 };
 
@@ -79,7 +79,7 @@ static int Report_UpdateYesNoMenu(EventSaveWork *work);
 static void Report_StartPlayerSaveSeq(EventSaveWork *work);
 static void Report_EndPlayerSaveSeq(EventSaveWork *work);
 static BOOL Report_IsPlayerSeqDone(EventSaveWork *work);
-static BOOL func_ov012_021642dc(EventSaveWork *work);
+static BOOL Report_IsAvatarReady(EventSaveWork *work);
 static void Report_StartSaveIcon(EventSaveWork *work);
 static void Report_EndSaveIcon(EventSaveWork *work);
 
@@ -156,7 +156,7 @@ u32 EventSave_Update(EventSaveWork *work, u32 *state) {
         }
         break;
     case 8:
-        if (func_ov012_021642dc(work)) {
+        if (Report_IsAvatarReady(work)) {
             work->report->waitIcon =
                 WaitIcon_Create(GFL_VBlankGetTCBMgr(), work->report->window.window, 0xf, 0x10, work->heapId);
             func_ov036_02198b1c(Field_GetSubscreen(work->field));
@@ -200,7 +200,7 @@ u32 EventSave_Update(EventSaveWork *work, u32 *state) {
         }
         break;
     case 11:
-        if (Report_IsPlayerSeqDone(work) == TRUE && func_ov012_021642dc(work) && Report_UpdateMessage(work) == FALSE) {
+        if (Report_IsPlayerSeqDone(work) == TRUE && Report_IsAvatarReady(work) && Report_UpdateMessage(work) == FALSE) {
             *state = 12;
         }
         break;
@@ -210,7 +210,7 @@ u32 EventSave_Update(EventSaveWork *work, u32 *state) {
         }
         break;
     case 13:
-        if (Report_IsPlayerSeqDone(work) != TRUE || !func_ov012_021642dc(work)) {
+        if (Report_IsPlayerSeqDone(work) != TRUE || !Report_IsAvatarReady(work)) {
             break;
         }
         *state = 14;
@@ -253,7 +253,7 @@ u32 EventSave_Update(EventSaveWork *work, u32 *state) {
         *state = 20;
         break;
     case 20:
-        func_ov036_021984f0(Field_GetSubscreen(work->field), work->heapId);
+        FieldSubscreen_ResumeField(Field_GetSubscreen(work->field), work->heapId);
         return 0;
     }
     return 2;
@@ -293,7 +293,7 @@ static void Report_StartStream(EventSaveWork *work) {
     BmpWin_DrawFrame(work->report->window.window, 2, 1, 13);
     report = work->report;
     work->report->stream =
-        PrintStream_Create(report->window.window, 0, 0, report->strbuf, func_ov036_0218799c(work->msgBgSys),
+        PrintStream_Create(report->window.window, 0, 0, report->strbuf, MsgBGPrinter_GetFont(work->msgBgSys),
                            TextSpeed_GetCurrentWait(), report->tcbManager, 10, work->heapId, 15);
     work->report->continued = FALSE;
     window = work->report->window.window;
@@ -346,7 +346,7 @@ static void Report_PrintMessageInstant(EventSaveWork *work, u32 messageId) {
     GFL_BitmapFill(BmpWin_GetBitmap(work->report->window.window), 15);
     BmpWin_DrawFrame(work->report->window.window, 2, 1, 13);
     str = GFL_MsgDataLoadStrbufNew(work->report->msgData, messageId);
-    font = func_ov036_0218799c(work->msgBgSys);
+    font = MsgBGPrinter_GetFont(work->msgBgSys);
     reportWindow = &work->report->window;
     queue = work->report->printQueue;
     PrintQueue_Print(queue, BmpWin_GetBitmap(reportWindow->window), 0, 0, str, font);
@@ -380,8 +380,8 @@ static void Report_CreateYesNoRes(EventSaveWork *work) {
     work->report->items[1].color = 0x39e3;
     work->report->items[1].type = 0;
     GFL_MsgDataFree(msgData);
-    work->report->menuRes = AppTaskMenuRes_Create(6, 14, func_ov036_0218799c(work->msgBgSys),
-                                                  func_ov036_02187998(work->msgBgSys), work->heapId);
+    work->report->menuRes = AppTaskMenuRes_Create(6, 14, MsgBGPrinter_GetFont(work->msgBgSys),
+                                                  MsgBGPrinter_GetPrintQue(work->msgBgSys), work->heapId);
 }
 
 static void Report_FreeYesNoRes(EventSaveWork *work) {
@@ -424,51 +424,51 @@ static void Report_StartPlayerSaveSeq(EventSaveWork *work) {
     FieldPlayer *player = Field_GetPlayer(work->field);
     FieldActor *actor;
 
-    if (func_ov036_0219a834(player) == TRUE) {
+    if (FieldPlayer_CheckNotWaterForm(player) == TRUE) {
         actor = FieldPlayer_GetActor(player);
         FieldPlayer_SetSpecialSeq(player, 0x20);
         EnableActorMovement(actor);
         ClearActorFlag(actor, 0x10);
-        func_ov036_0219a580(player);
+        FieldPlayer_StepFormChange(player);
     }
 }
 
 static void Report_EndPlayerSaveSeq(EventSaveWork *work) {
     FieldPlayer *player = Field_GetPlayer(work->field);
 
-    if (func_ov036_0219a834(player) == TRUE) {
+    if (FieldPlayer_CheckNotWaterForm(player) == TRUE) {
         FieldPlayer_SetSpecialSeq(player, 8);
-        func_ov036_0219a580(player);
+        FieldPlayer_StepFormChange(player);
     }
 }
 
 static BOOL Report_IsPlayerSeqDone(EventSaveWork *work) {
     FieldPlayer *player = Field_GetPlayer(work->field);
 
-    if (func_ov036_0219a834(player) == FALSE) {
+    if (FieldPlayer_CheckNotWaterForm(player) == FALSE) {
         return TRUE;
     }
-    if (func_ov036_0219a580(player) == TRUE) {
+    if (FieldPlayer_StepFormChange(player) == TRUE) {
         return TRUE;
     }
     return FALSE;
 }
 
-static BOOL func_ov012_021642dc(EventSaveWork *work) {
+static BOOL Report_IsAvatarReady(EventSaveWork *work) {
     FieldPlayer *player = Field_GetPlayer(work->field);
 
-    if (func_ov036_0219a834(player) == TRUE) {
-        return func_ov036_0219a870(player);
+    if (FieldPlayer_CheckNotWaterForm(player) == TRUE) {
+        return FieldPlayer_CheckAnimePaused(player);
     }
     return TRUE;
 }
 
 static void Report_StartSaveIcon(EventSaveWork *work) {
-    work->report->effect = func_ov036_021c6cc8(work->heapId, work->field);
-    func_ov036_021c6d14(work->report->effect);
+    work->report->effect = FieldSaveanime_Create(work->heapId, work->field);
+    FieldSaveanime_Start(work->report->effect);
 }
 
 static void Report_EndSaveIcon(EventSaveWork *work) {
-    func_ov036_021c6d3c(work->report->effect);
-    func_ov036_021c6cf8(work->report->effect);
+    FieldSaveanime_Stop(work->report->effect);
+    FieldSaveanime_Delete(work->report->effect);
 }

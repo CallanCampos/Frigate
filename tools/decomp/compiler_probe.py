@@ -1,10 +1,13 @@
 #!/usr/bin/env python3
 """Compile a C file with several CodeWarrior versions and compare each function against the original game code.
 
-Relocated bytes (calls and pointers) are ignored, since the probe objects are not linked.
+Relocated bytes (calls and pointers) are ignored, since the probe objects are not linked. For a file in
+config/deadstrip.toml, each object goes through the build's dead-strip first, so the functions the original link
+dropped, which the ROM has nothing to compare with, are left out with what only they used.
 """
 import argparse
 import difflib
+import functools
 import re
 import shlex
 import subprocess
@@ -21,6 +24,7 @@ ROOT = Path(__file__).resolve().parents[2]
 TOOLS = ROOT / "tools"
 sys.path.insert(0, str(ROOT))
 from configure import ENCODING_FLAG, INCLUDE_DIRS, source_compiler, mwcc_command  # noqa: E402
+from tools.build.deadstrip import DeadStripError, dead_symbols, strip  # noqa: E402
 
 # Preprocessor defines of each game version, as in configure.py
 VERSION_DEFINES = {"b2_us": ["BLACK2"], "w2_us": ["WHITE2"]}
@@ -56,10 +60,38 @@ def load_modules(version: str) -> dict[str, tuple[Path, int]]:
     return modules
 
 
-def find_function(version: str, name: str, modules) -> tuple[bytes, int, bool] | None:
+@functools.lru_cache(maxsize=None)
+def source_ranges(root: Path, version: str, source: Path) -> dict[Path, tuple[tuple[int, int], ...]]:
+    """Returns the source's registered ranges, keyed by module; local names are only unique within a source."""
+    source = source.resolve() if source.is_absolute() else (root / source).resolve()
+    try:
+        owner = source.relative_to(root).as_posix()
+    except ValueError:
+        return {}
+    found = {}
+    for delinks in (root / "config" / version / "arm9").rglob("delinks.txt"):
+        current = None
+        ranges = []
+        for line in delinks.read_text().splitlines():
+            if line and not line[0].isspace() and line.endswith(":"):
+                current = line[:-1]
+            if current == owner:
+                match = re.match(r"\s+\S+\s+start:(0x[0-9a-f]+) end:(0x[0-9a-f]+)", line)
+                if match:
+                    ranges.append((int(match.group(1), 16), int(match.group(2), 16)))
+        if ranges:
+            found[delinks.parent] = tuple(ranges)
+    return found
+
+
+def find_function(version: str, name: str, modules, source: Path | None = None) -> tuple[bytes, int, bool] | None:
     """Returns the original bytes, address and Thumb flag of a function."""
     config = ROOT / "config" / version / "arm9"
+    ranges = source_ranges(ROOT, version, source) if source is not None else {}
+    candidates = []
     for symbols in config.rglob("symbols.txt"):
+        if ranges and symbols.parent not in ranges:
+            continue
         for line in symbols.read_text().splitlines():
             if not line.startswith(name + " "):
                 continue
@@ -67,25 +99,42 @@ def find_function(version: str, name: str, modules) -> tuple[bytes, int, bool] |
             if not match:
                 continue
             mode, size, addr = match.group(2), int(match.group(3), 16), int(match.group(4), 16)
-            if "dsprot=" in line:
-                # DS Protect's functions are encrypted in the ROM; dsd decrypts them into the delinked objects
-                data = delinked_function(version, name)
-                if data is None:
-                    print(f"{name}: encrypted, and not in build/{version}/delinks; run ninja first", file=sys.stderr)
-                    return None
-                return data[:size], addr, mode == "thumb"
-            binary, base = modules[str(symbols.parent)]
-            data = binary.read_bytes()[addr - base : addr - base + size]
-            return data, addr, mode == "thumb"
-    return None
+            if ranges and not any(start <= addr < end for start, end in ranges[symbols.parent]):
+                continue
+            candidates.append((symbols.parent, line, mode, size, addr))
+    if not candidates:
+        return None
+    if len(candidates) != 1:
+        locations = ", ".join(f"{directory.relative_to(config)}:{addr:#010x}"
+                              for directory, _, _, _, addr in candidates)
+        raise ValueError(f"{name}: ambiguous original ({locations}); select its registered source file")
+    directory, line, mode, size, addr = candidates[0]
+    if "dsprot=" in line:
+        # DS Protect's functions are encrypted in the ROM; dsd decrypts them into the delinked objects
+        data = delinked_function(version, name, source if ranges else None)
+        if data is None:
+            print(f"{name}: encrypted, and not in build/{version}/delinks; run ninja first", file=sys.stderr)
+            return None
+        return data[:size], addr, mode == "thumb"
+    binary, base = modules[str(directory)]
+    data = binary.read_bytes()[addr - base : addr - base + size]
+    return data, addr, mode == "thumb"
 
 
 _delinked: dict[str, dict[str, bytes]] = {}
 
 
-def delinked_function(version: str, name: str) -> bytes | None:
+def delinked_function(version: str, name: str, source: Path | None = None) -> bytes | None:
     """Returns a function's bytes from the delinked objects of build/<version>/delinks, which hold DS Protect's code
     decrypted."""
+    if source is not None:
+        source = source.resolve() if source.is_absolute() else (ROOT / source).resolve()
+        try:
+            relative = source.relative_to(ROOT)
+        except ValueError:
+            return None
+        obj = ROOT / "build" / version / "delinks" / relative.with_suffix(".o")
+        return compiled_functions(obj).get(name, (None, set()))[0] if obj.exists() else None
     if version not in _delinked:
         found: dict[str, bytes] = {}
         for path in (ROOT / "build" / version / "delinks").rglob("*.o"):
@@ -193,6 +242,8 @@ def main():
     if args.flags is None:
         args.flags = flags
     functions = set(args.functions.split(",")) if args.functions else None
+    # The ROM has none of the code the original link dead-stripped
+    dead = dead_symbols(args.source)
 
     if args.opt:
         args.flags = args.flags.replace("-O4,p", args.opt)
@@ -221,18 +272,34 @@ def main():
                 print(f"{compiler}: compile failed\n{proc.stdout}{proc.stderr}", file=sys.stderr)
                 failed.append(compiler)
                 for name in defined_functions(args.source):
-                    if functions is None or name in functions:
+                    if name not in dead and (functions is None or name in functions):
                         results.setdefault(name, {})[compiler] = "no compile"
                 continue
+            gone = set(dead)
+            if dead:
+                # Compare what the link takes, without the dead code and what only it used
+                try:
+                    stripped = strip(obj.read_bytes(), dead)
+                except DeadStripError as error:
+                    print(f"{compiler}: dead-strip failed: {error}", file=sys.stderr)
+                    failed.append(compiler)
+                else:
+                    obj.write_bytes(stripped.data)
+                    gone |= stripped.symbols
             compiled = compiled_functions(obj)
             # MWCC drops a static function that nothing references, which would otherwise pass unnoticed
             for name in defined_functions(args.source):
-                if name not in compiled and (functions is None or name in functions):
+                if name not in compiled and name not in gone and (functions is None or name in functions):
                     results.setdefault(name, {})[compiler] = "not emitted"
             for name, (data, masked) in compiled.items():
-                if functions is not None and name not in functions:
+                if (functions is not None and name not in functions) or name in gone:
                     continue
-                original = find_function(args.version, name, modules)
+                try:
+                    original = find_function(args.version, name, modules, args.source)
+                except ValueError as error:
+                    print(error, file=sys.stderr)
+                    results.setdefault(name, {})[compiler] = "ambiguous"
+                    continue
                 if original is None:
                     results.setdefault(name, {})[compiler] = "unknown"
                     continue
@@ -257,6 +324,9 @@ def main():
                         mark = " " if a.split(":", 1)[-1] == b.split(":", 1)[-1] else "*"
                         print(f"{mark} {a:45s} | {b}")
 
+    if dead:
+        print(f"left out the {len(dead)} dead-stripped symbol{'s' * (len(dead) != 1)} config/deadstrip.toml lists "
+              "for the file, and what only they use", file=sys.stderr)
     width = max((len(n) for n in results), default=8)
     print(f"{'function':{width}s}  " + "  ".join(f"{c:>12s}" for c in compilers))
     for name, row in results.items():

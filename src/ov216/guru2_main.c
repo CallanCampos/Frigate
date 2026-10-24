@@ -853,7 +853,7 @@ BOOL Guru2Main_Init(GameProc *proc, u32 *state, void *param, void *work) {
     int i;
     Guru2MainWork *g2m;
 
-    func_02042e94(1);
+    GflNet_SetAutoExit(1);
     GFL_HeapCreateChild(HEAPID_USER, HEAPID_GURU2, 0x80000);
     g2m = GFL_ProcInitSubsystem(proc, sizeof(Guru2MainWork), HEAPID_GURU2);
     i = 0;
@@ -896,7 +896,7 @@ BOOL Guru2Main_Init(GameProc *proc, u32 *state, void *param, void *work) {
     Guru2Main_InitDiscBump(g2m);
     Guru2Main_InitButton(g2m);
     Guru2Main_InitBonus(g2m);
-    GFL_WipeSet(0, WIPE_TYPE_FADE_IN, WIPE_TYPE_FADE_IN, WIPE_COLOR_BLACK, 8, 1, HEAPID_GURU2);
+    GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_IN, WIPE_TYPE_FADE_IN, WIPE_COLOR_BLACK, 8, 1, HEAPID_GURU2);
     GFL_NetSetDisconnectError(TRUE);
     return TRUE;
 }
@@ -1669,7 +1669,7 @@ static int Guru2MainSeq_SyncEndWait(Guru2MainWork *g2m) {
         if (g2m->wait >= 180) {
             g2m->wait = 0;
             if (g2m->g2c->unk3C == 0) {
-                func_02042e94(0);
+                GflNet_SetAutoExit(0);
             }
             g2m->seq = SEQ_END_WAIT;
         }
@@ -1688,7 +1688,7 @@ static int Guru2MainSeq_EndWait(Guru2MainWork *g2m) {
 }
 
 static int Guru2MainSeq_FadeOut(Guru2MainWork *g2m) {
-    GFL_WipeSet(2, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, WIPE_COLOR_BLACK, 8, 1, HEAPID_GURU2);
+    GFL_WipeSet(WIPE_MODE_SUB_FIRST, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, WIPE_COLOR_BLACK, 8, 1, HEAPID_GURU2);
     g2m->seq = SEQ_FADE_OUT_WAIT;
     return SEQ_RESULT_WAIT;
 }

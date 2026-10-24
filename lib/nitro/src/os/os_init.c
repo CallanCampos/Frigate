@@ -51,13 +51,13 @@ static void OSi_InitBody(void) {
     OS_InitReset();
     CTRDG_Init(); // the game's, which replaces the SDK's weak CTRDG_Init
     CARD_Init();
-    func_02078000(); // TwlSDK's shared WRAM manager, on a DSi
+    MI_InitWramManager(); // TwlSDK's shared WRAM manager, on a DSi
     if (OS_IsRunOnTwl() == TRUE) {
         SCFG_Init(); // SCFG: sets the PXI callback for its tag
     }
     PM_Init();
     OSi_WaitVCount0();
     if (OS_IsRunOnTwl() == TRUE) {
-        func_0207c888();
+        OSi_InitPrevTitleId();
     }
 }

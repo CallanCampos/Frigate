@@ -1104,7 +1104,7 @@ u8 BtlvMcss_GetUnk(BtlvMcss *work, int pos) {
     if (work->entries[index].mcss == NULL) {
         return 0;
     }
-    return func_0201ae00(work->entries[index].mcss);
+    return MCSSSys_GetStopCellFlags(work->entries[index].mcss);
 }
 
 void BtlvMcss_SetSubstitute(BtlvMcss *work, int pos, BOOL substitute, BOOL flag) {

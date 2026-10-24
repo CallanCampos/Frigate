@@ -55,15 +55,15 @@ typedef struct {
 // A fade of 3D textures' palettes toward a color, which BtlvEffect_UpdateTexPaletteFade (btlv_effect.c) steps; the
 // stage and the field each have one
 typedef struct {
-    void **resources; // 0x0  the G3D resources whose palettes fade
-    void **palettes;  // 0x4  a copy of each one's palette data, the fade's source
-    u8 active;        // 0x8
-    u8 count;         // 0x9  of resources
-    u8 evy;           // 0xa  the current blend, stepped by one toward targetEvy
-    u8 targetEvy;     // 0xb
-    u8 wait;          // 0xc  frames left until the next step
-    u8 waitFrames;    // 0xd
-    u16 color;        // 0xe
+    G3DResource **resources; // 0x0  the G3D resources whose palettes fade
+    void **palettes;         // 0x4  a copy of each one's palette data, the fade's source
+    u8 active;               // 0x8
+    u8 count;                // 0x9  of resources
+    u8 evy;                  // 0xa  the current blend, stepped by one toward targetEvy
+    u8 targetEvy;            // 0xb
+    u8 wait;                 // 0xc  frames left until the next step
+    u8 waitFrames;           // 0xd
+    u16 color;               // 0xe
 } BtlvTexPaletteFade;
 
 // The setup that the init copies, and the init and end of the view

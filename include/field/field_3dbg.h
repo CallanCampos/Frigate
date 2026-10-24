@@ -24,21 +24,21 @@ typedef struct {
     u8 unk09[3];
 } Field3DBgRes;
 
-Field3DBg *func_ov036_02198bc0(const Field3DBgInit *init, u32 heapId);
-void func_ov036_02198bf0(Field3DBg *bg);
-void func_ov036_02198c10(Field3DBg *bg);
+Field3DBg *Field3DBG_CreateBillboard(const Field3DBgInit *init, u32 heapId);
+void Field3DBG_DeleteBillboard(Field3DBg *bg);
+void Field3DBG_DrawBillboard(Field3DBg *bg);
 // Uploads a texture loaded since the last call
-void func_ov036_02198c8c(Field3DBg *bg);
+void Field3DBG_ReleaseBillboardTextureVram(Field3DBg *bg);
 // Frees the texture
-void func_ov036_02198c9c(Field3DBg *bg);
+void Field3DBG_FreeBillboardTexture(Field3DBg *bg);
 // Loads the texture, in place of the last one
-void func_ov036_02198cb4(Field3DBg *bg, ArcTool *arc, const Field3DBgRes *res, u32 heapId);
-void func_ov036_02198cf0(Field3DBg *bg, u32 enabled);
-void func_ov036_02198cf4(Field3DBg *bg, u8 polygonId);
+void Field3DBG_LoadBillboardTexture(Field3DBg *bg, ArcTool *arc, const Field3DBgRes *res, u32 heapId);
+void Field3DBG_SetBillboardVisible(Field3DBg *bg, u32 enabled);
+void Field3DBG_SetBillboardPolygonId(Field3DBg *bg, u8 polygonId);
 // Where the texture starts, in texels, and how it is scaled
-void func_ov036_02198cf8(Field3DBg *bg, s32 texX);
-void func_ov036_02198cfc(Field3DBg *bg, s32 texY);
-void func_ov036_02198d00(Field3DBg *bg, fx32 scaleX);
-void func_ov036_02198d04(Field3DBg *bg, fx32 scaleY);
+void Field3DBG_SetBillboardTexOffsetX(Field3DBg *bg, s32 texX);
+void Field3DBG_SetBillboardTexOffsetY(Field3DBg *bg, s32 texY);
+void Field3DBG_SetBillboardScaleX(Field3DBg *bg, fx32 scaleX);
+void Field3DBG_SetBillboardScaleY(Field3DBg *bg, fx32 scaleY);
 
 #endif // POKEBW2_FIELD_FIELD_3DBG_H

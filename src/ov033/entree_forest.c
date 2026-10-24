@@ -94,7 +94,7 @@ u16 GetActorUserParam0(FieldActor *actor) {
     return GetActorUserParam(actor, 0);
 }
 
-PartyPkm *func_ov033_02176bd0(HeapID heapId, GameData *gameData, const EntreeForestPokemon *pokemon) {
+PartyPkm *EntreeForest_CreateSymbolMon(HeapID heapId, GameData *gameData, const EntreeForestPokemon *pokemon) {
     u8 *levels;
     u8 level;
     u32 id;

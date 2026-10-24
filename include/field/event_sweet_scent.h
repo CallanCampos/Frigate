@@ -17,7 +17,7 @@ struct SweetScentScreenWork {
     u8 alpha;
     u8 step;
     u8 timer;
-    void *displayControl;
+    FieldDispControl *displayControl;
 };
 
 struct SweetScentPalette {
@@ -28,10 +28,10 @@ struct SweetScentPalette {
 GameEvent *EventSweetScent_Create(Field *field, GameSystem *gsys);
 GameEvent *func_ov033_021785d4(GameSystem *gsys, Field *field, u8 partySlot);
 GameEventReturnCode EventSweetScent_Callback(GameEvent *event, u32 *state, void *data);
-BOOL func_ov033_02178730(SweetScentEventData *work);
+BOOL EventSweetScent_CheckWeatherClear(SweetScentEventData *work);
 void func_ov033_02178748(GameEvent *event, GameSystem *gsys, Field *field);
-GameEventReturnCode func_ov033_02178788(GameEvent *event, u32 *state, void *data);
-void func_ov033_0217884c(SweetScentScreenWork *work);
-void func_ov033_021788c4(SweetScentScreenWork *work);
+GameEventReturnCode EventSweetScent_FadeMain(GameEvent *event, u32 *state, void *data);
+void EventSweetScent_FadeSetup(SweetScentScreenWork *work);
+void EventSweetScent_FadeCleanup(SweetScentScreenWork *work);
 
 #endif // POKEBW2_FIELD_EVENT_SWEET_SCENT_H

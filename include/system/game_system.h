@@ -83,7 +83,7 @@ BOOL GSYS_IsLowBatteryCGearOff(GameSystem *gsys);
 ISS *GameSystem_GetISS(GameSystem *gsys);
 u32 getStatusOfFesMission(LinkFestival *festival);
 
-void GSYS_SetEventProvider(GameSystem *gsys, void *provider, void *data);
+void GSYS_SetEventProvider(GameSystem *gsys, GameEventProvider provider, void *data);
 GameEvent *GSYS_GetNowEvent(GameSystem *gsys);
 void GSYS_SetNowEvent(GameSystem *gsys, GameEvent *event);
 void GSYS_StartFieldmapProc(GameSystem *gsys);

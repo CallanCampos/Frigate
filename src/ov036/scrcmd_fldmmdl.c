@@ -578,7 +578,7 @@ BOOL s0079_ActorGetUserParam(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL func_ov036_021aa2cc(VM *vm, FieldScriptEnv *env) {
+BOOL ScriptNative_SetMmdlZoneDeleteOff(VM *vm, FieldScriptEnv *env) {
     u16 id = ScriptReadAny(vm, env);
     FieldActor *actor = FindFieldActor(GetScrEnvMMdlSys(env), id);
 
@@ -741,7 +741,7 @@ static BOOL ScriptNative_WaitPlayerSpecialSequence(VM *vm, void *data) {
     FieldScriptEnv *env = data;
     ScriptFieldWork *fieldWork = ScriptWork_GetFieldWork(FieldScriptEnv_GetScriptWork(env));
 
-    if (func_ov036_0219a580(Field_GetPlayer(fieldWork->field)) == TRUE) {
+    if (FieldPlayer_StepFormChange(Field_GetPlayer(fieldWork->field)) == TRUE) {
         return TRUE;
     }
     return FALSE;
@@ -753,7 +753,7 @@ BOOL s0075_PlayerSetSpecialSequence(VM *vm, FieldScriptEnv *env) {
     FieldPlayer *player = Field_GetPlayer(fieldWork->field);
 
     FieldPlayer_SetSpecialSeq(player, seq);
-    if (func_ov036_0219a580(player) == TRUE) {
+    if (FieldPlayer_StepFormChange(player) == TRUE) {
         return FALSE;
     }
     VM_SetNativeCallback(vm, ScriptNative_WaitPlayerSpecialSequence);
@@ -912,12 +912,12 @@ BOOL s007B_ActorJumpToGPos(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL func_ov036_021aa968(VM *vm, FieldScriptEnv *env) {
+BOOL ScriptNative_CheckPlayerFormModel(VM *vm, FieldScriptEnv *env) {
     ScriptFieldWork *fieldWork = ScriptWork_GetFieldWork(FieldScriptEnv_GetScriptWork(env));
     FieldPlayer *player = Field_GetPlayer(fieldWork->field);
     u16 *result = ScriptReadVar(vm, env);
 
-    *result = func_ov036_0219a864(player);
+    *result = FieldPlayer_CheckFormModel(player);
     return FALSE;
 }
 
@@ -989,7 +989,7 @@ BOOL s007C_PlayerSetRailPos(VM *vm, FieldScriptEnv *env) {
     u16 c = ScriptReadAny(vm, env);
     RailUnit *unit = FldAct_GetRailUnit(actor);
 
-    func_ov036_021b0e38(unit, a, b, c);
+    RailUnit_SetLineLocation(unit, a, b, c);
     RailUnit_GetRailPos(unit, &railPos);
     SetActorInitedPositionRail(actor, &railPos);
     return FALSE;
@@ -1004,7 +1004,7 @@ BOOL s007D_ActorSetRailPos(VM *vm, FieldScriptEnv *env) {
     u16 c = ScriptReadAny(vm, env);
     RailUnit *unit = FldAct_GetRailUnit(actor);
 
-    func_ov036_021b0e38(unit, a, b, c);
+    RailUnit_SetLineLocation(unit, a, b, c);
     RailUnit_GetRailPos(unit, &railPos);
     SetActorInitedPositionRail(actor, &railPos);
     return FALSE;

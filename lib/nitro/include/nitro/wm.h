@@ -2,6 +2,7 @@
 #define POKEBW2_NITRO_WM_H
 
 #include "types.h"
+#include <stddef.h>
 
 // NitroSDK's wireless manager. The names are NitroSDK's, as ntrtwl's reconstruction of NitroSDK has them, where it has
 // the code, and ours, in the SDK's style, elsewhere
@@ -565,6 +566,29 @@ WMErrCode WM_StartMPEx(WMCallbackFunc callback, u16 *recvBuf, u16 recvBufSize, u
                        BOOL ignoreFatalError);
 WMErrCode WM_StartConnectEx(WMCallbackFunc callback, const WMBssDesc *bssDesc, const u8 *ssid, BOOL powerSave,
                             u16 authMode);
+
+// NitroSDK's WM_StartConnect: WM_StartConnectEx in power-save mode, with open-system authentication
+static inline WMErrCode WM_StartConnect(WMCallbackFunc callback, const WMBssDesc *bssDesc, const u8 *ssid) {
+    return WM_StartConnectEx(callback, bssDesc, ssid, TRUE, 0);
+}
+
+// NitroSDK's WM_IsBssidEqual: whether two BSSIDs are the same
+static inline BOOL WM_IsBssidEqual(const u8 *idp1, const u8 *idp2) {
+    return idp1[0] == idp2[0] && idp1[1] == idp2[1] && idp1[2] == idp2[2] && idp1[3] == idp2[3] && idp1[4] == idp2[4] &&
+           idp1[5] == idp2[5];
+}
+
+// NitroSDK's WM_IsValidGameInfo: whether a beacon's game info has a valid length and the magic number
+static inline BOOL WM_IsValidGameInfo(const WMGameInfo *gameInfo, u16 gameInfoLength) {
+    return gameInfoLength >= 0x10 && gameInfoLength <= sizeof(WMGameInfo) &&
+           gameInfoLength == 0x10 + gameInfo->userGameInfoLength && gameInfo->magicNumber == 1;
+}
+
+// NitroSDK's WM_IsValidGameBeacon: whether a beacon carries a valid game info that fills it
+static inline BOOL WM_IsValidGameBeacon(const WMBssDesc *bssDesc) {
+    return WM_IsValidGameInfo(&bssDesc->gameInfo, bssDesc->gameInfoLength) &&
+           bssDesc->length == (bssDesc->gameInfoLength + 1 + offsetof(WMBssDesc, gameInfo)) / sizeof(u16);
+}
 WMErrCode WM_Disconnect(WMCallbackFunc callback, u16 aid);
 WMErrCode WM_StartMP(WMCallbackFunc callback, u16 *recvBuf, u16 recvBufSize, u16 *sendBuf, u16 sendBufSize, u16 mpFreq);
 WMErrCode WM_SetMPDataToPortEx(WMCallbackFunc callback, void *arg, const u16 *sendData, u16 sendDataSize,

@@ -355,7 +355,7 @@ static BOOL BadgeView_Init(GameProc *proc, u32 *state, void *param, void *work) 
     BadgeView_InitPrint(wk);
     BadgeView_SetPage(wk, wk->page);
     GFL_NetSetIconScreen(TRUE, HEAPID_TRAINER_CARD_SCREEN);
-    GFL_WipeSet(0, 1, 1, 0, 6, 1, HEAPID_TRAINER_CARD_SCREEN);
+    GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_IN, WIPE_TYPE_FADE_IN, 0, 6, 1, HEAPID_TRAINER_CARD_SCREEN);
     return TRUE;
 }
 
@@ -503,7 +503,7 @@ static void BadgeView_InitBG(BadgeViewWork *wk) {
         for (i = 0; i < NELEMS(sBadgeViewBGs); i++) {
             u32 bg = sBadgeViewBGs[i];
 
-            GFL_BGSysCreateBG(bg, &setups[i], 0);
+            GFL_BGSysCreateBG(bg, &setups[i], BGMODE_TEXT);
             GFL_BGSysClearScr(bg);
             GFL_BGSysClearCharCore(bg, 0x20, 0, HEAPID_TRAINER_CARD_SCREEN);
             GFL_BGSysSetBGEnabled(bg, TRUE);
@@ -887,7 +887,7 @@ static BOOL BadgeView_SeqButton(BadgeViewWork *wk) {
 }
 
 static BOOL BadgeView_SeqFadeOutStart(BadgeViewWork *wk) {
-    GFL_WipeSet(0, 0, 0, 0, 6, 1, HEAPID_TRAINER_CARD_SCREEN);
+    GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, 0, 6, 1, HEAPID_TRAINER_CARD_SCREEN);
     wk->seq = BADGE_SEQ_FADE_OUT;
     return TRUE;
 }

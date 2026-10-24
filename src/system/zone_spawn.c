@@ -10,7 +10,7 @@
 static u16 ConvWarpDirToDir(s16 warpDir);
 
 void InitZoneSpawnInfo(ZoneSpawnInfo *spawn) {
-    spawn->changeType = 0;
+    spawn->changeType = ZONE_SPAWN_CHANGE_TYPE_WARP;
     spawn->zoneId = 0;
     spawn->warpId = 0;
     spawn->warpDir = 0;
@@ -23,7 +23,7 @@ void InitZoneSpawnInfo(ZoneSpawnInfo *spawn) {
 
 void SetupZoneWarpArrivalGrid(ZoneSpawnInfo *spawn, u16 zoneId, s16 warpId, s16 warpDir, u16 posWeightBits, s32 x,
                               s32 y, s32 z) {
-    spawn->changeType = 0;
+    spawn->changeType = ZONE_SPAWN_CHANGE_TYPE_WARP;
     spawn->zoneId = zoneId;
     spawn->warpId = warpId;
     spawn->warpDir = warpDir;
@@ -34,7 +34,7 @@ void SetupZoneWarpArrivalGrid(ZoneSpawnInfo *spawn, u16 zoneId, s16 warpId, s16 
 
 void SetupZoneWarpArrivalRail(ZoneSpawnInfo *spawn, u16 zoneId, s16 warpId, s16 warpDir, u16 posWeightBits,
                               u16 componentId, u16 posFront, s16 posSide) {
-    spawn->changeType = 0;
+    spawn->changeType = ZONE_SPAWN_CHANGE_TYPE_WARP;
     spawn->zoneId = zoneId;
     spawn->warpId = warpId;
     spawn->warpDir = warpDir;

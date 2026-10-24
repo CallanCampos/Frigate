@@ -89,14 +89,14 @@ GameEventReturnCode EventPhraseInput_Callback(GameEvent *event, u32 *state, void
         (*state)++;
         break;
     case 1:
-        func_ov033_02177734(data, &data->nameEntry);
+        EventPhraseInput_StoreResult(data, &data->nameEntry);
         GFL_StrBufFree(data->nameEntry.name);
         return GAMEEVENT_DONE;
     }
     return GAMEEVENT_CONTINUE;
 }
 
-void func_ov033_02177734(struct EventPhraseInputData *data, NameEntryParam *param) {
+void EventPhraseInput_StoreResult(struct EventPhraseInputData *data, NameEntryParam *param) {
     if (data->result != NULL) {
         *data->result = param->unk1C == 0;
     }
@@ -137,7 +137,7 @@ void func_ov033_02177734(struct EventPhraseInputData *data, NameEntryParam *para
     }
 }
 
-BOOL func_ov033_021777dc(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_CheckWifiListFlags(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work;
     GameSystem *gsys;
     GameData *gameData;
@@ -154,7 +154,7 @@ BOOL func_ov033_021777dc(VM *vm, FieldScriptEnv *env) {
     result = ScriptReadVar(vm, env);
     save = GameData_GetDreamWorldSave(gameData);
     if (input == 0) {
-        if (DreamWorldSave_GetIDShown(save) == 1 && func_020099e0(save) == 1) {
+        if (DreamWorldSave_GetIDShown(save) == 1 && DreamWorldSave_GetMode(save) == 1) {
             *result = 1;
         } else {
             *result = 0;
@@ -163,7 +163,7 @@ BOOL func_ov033_021777dc(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL func_ov033_02177844(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_WifiListOperation(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work;
     GameSystem *gsys;
     GameData *gameData;
@@ -202,14 +202,14 @@ BOOL func_ov033_02177844(VM *vm, FieldScriptEnv *env) {
         }
         break;
     case 2:
-        if (func_02009b20(save) == 1) {
+        if (DreamWorldSave_GetFlag(save) == 1) {
             *result = 1;
         } else {
             *result = 0;
         }
         break;
     case 3:
-        func_02009b30(save, 0);
+        DreamWorldSave_SetFlag(save, 0);
         break;
     case 4:
         DreamWorldSave_SetResultIndex(save, input2);
@@ -218,7 +218,7 @@ BOOL func_ov033_02177844(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL func_ov033_02177908(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_SetWifiFriendNameWord(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work;
     GameSystem *gsys;
     GameData *gameData;

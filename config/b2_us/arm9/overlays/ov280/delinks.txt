@@ -16,6 +16,7 @@ src/ov280/namein_data.c:
     .data       start:0x021ddb98 end:0x021ddbc0
 
 src/ov280/namein.c:
+    complete
     .text       start:0x021d96e0 end:0x021dd28c
     .rodata     start:0x021dd8e4 end:0x021dd9a4
     .data       start:0x021ddb80 end:0x021ddb84

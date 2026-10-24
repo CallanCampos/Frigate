@@ -18,7 +18,7 @@ typedef struct {
 } G3DScene;
 
 struct G3DManager {
-    void **resources;
+    G3DResource **resources;
     // Whether an actor has taken each resource
     u8 *resourceUsed;
     u16 resourceLimit;
@@ -42,7 +42,7 @@ G3DManager *GFL_G3DMgrCreate(u16 resourceLimit, u16 actorLimit, HeapID heapId) {
     int i;
 
     manager->heapId = heapId;
-    manager->resources = GFL_HeapAllocate(heapId, resourceLimit * sizeof(void *), TRUE, "g3d_util.c", 97);
+    manager->resources = GFL_HeapAllocate(heapId, resourceLimit * sizeof(G3DResource *), TRUE, "g3d_util.c", 97);
     manager->resourceUsed = GFL_HeapAllocate(heapId, resourceLimit, TRUE, "g3d_util.c", 98);
     manager->resourceLimit = resourceLimit;
     for (i = 0; i < resourceLimit; i++) {
@@ -143,7 +143,8 @@ void GFL_G3DMgrDeleteScene(G3DManager *manager, u16 scene) {
     manager->scenes[scene].actorCount = G3D_MGR_SCENE_NONE;
 }
 
-static inline void G3DMgr_ReadResource(G3DManager *manager, const G3DSceneResourceSetup *setup, void **resource) {
+static inline void G3DMgr_ReadResource(G3DManager *manager, const G3DSceneResourceSetup *setup,
+                                       G3DResource **resource) {
     switch (setup->type) {
     case G3D_SCENE_RES_ARCSYS:
         *resource = GFL_G3DSysReadArcSysResource(setup->arcId, setup->fileId);
@@ -152,14 +153,14 @@ static inline void G3DMgr_ReadResource(G3DManager *manager, const G3DSceneResour
         *resource = GFL_G3DSysReadFSResource((const char *)setup->arcId, setup->fileId);
         break;
     case G3D_SCENE_RES_ARCSYS_MGRHEAP: {
-        void *res = GFL_HeapAllocate(manager->heapId, GFL_G3DResGetAllocSize(), FALSE, "g3d_util.c", 342);
+        G3DResource *res = GFL_HeapAllocate(manager->heapId, GFL_G3DResGetAllocSize(), FALSE, "g3d_util.c", 342);
 
         GFL_G3DResSetup(res, GFL_ArcSysReadHeapNew(setup->arcId, setup->fileId, manager->heapId));
         *resource = res;
         break;
     }
     case G3D_SCENE_RES_FS_MGRHEAP: {
-        void *res = GFL_HeapAllocate(manager->heapId, GFL_G3DResGetAllocSize(), FALSE, "g3d_util.c", 355);
+        G3DResource *res = GFL_HeapAllocate(manager->heapId, GFL_G3DResGetAllocSize(), FALSE, "g3d_util.c", 355);
 
         GFL_G3DResSetup(res, GFL_ArcSysReadHeapNewDirect((const char *)setup->arcId, setup->fileId, manager->heapId));
         *resource = res;
@@ -197,7 +198,7 @@ static void GFL_G3DMgrFreeSceneResources(G3DManager *manager, u16 scene) {
     int i;
 
     for (i = 0; i < count; i++) {
-        void *resource = manager->resources[firstResource + i];
+        G3DResource *resource = manager->resources[firstResource + i];
 
         if (resource != NULL) {
             manager->resourceUsed[firstResource + i] = FALSE;
@@ -210,14 +211,14 @@ static void GFL_G3DMgrFreeSceneResources(G3DManager *manager, u16 scene) {
 }
 
 // The scene's resource, which the actor takes without a copy
-static inline void *G3DMgr_UseResource(G3DManager *manager, u16 firstResource, u16 index) {
+static inline G3DResource *G3DMgr_UseResource(G3DManager *manager, u16 firstResource, u16 index) {
     manager->resourceUsed[firstResource + index] = TRUE;
     return manager->resources[firstResource + index];
 }
 
 // The scene's resource for an actor, or a copy of it if another actor has taken it, returning whether it is a copy
 static inline BOOL G3DMgr_TakeResource(G3DManager *manager, u16 firstResource, u16 index, const G3DSceneSetup *setup,
-                                       void **resource) {
+                                       G3DResource **resource) {
     if (manager->resourceUsed[firstResource + index] == TRUE) {
         G3DMgr_ReadResource(manager, &setup->resources[index], resource);
         return TRUE;
@@ -234,10 +235,10 @@ static void GFL_G3DMgrLoadActors(G3DManager *manager, u16 scene, const G3DSceneS
 
     for (i = 0; i < count; i++) {
         const G3DSceneActorSetup *actorSetup = &setup->actors[i];
-        void *mdlResource;
-        void *texResource;
+        G3DResource *mdlResource;
+        G3DResource *texResource;
         G3DModel *model;
-        void **animations;
+        G3DAnimation **animations;
         int j;
 
         if (G3DMgr_TakeResource(manager, firstResource, actorSetup->modelResource, setup, &mdlResource) == TRUE) {
@@ -261,11 +262,11 @@ static void GFL_G3DMgrLoadActors(G3DManager *manager, u16 scene, const G3DSceneS
             }
         }
         model = GFL_G3DMdlCreate(mdlResource, actorSetup->modelIndex, texResource);
-        animations =
-            GFL_HeapAllocate(HEAPID_TAIL(heapId), actorSetup->animationCount * sizeof(void *), TRUE, "g3d_util.c", 534);
+        animations = GFL_HeapAllocate(HEAPID_TAIL(heapId), actorSetup->animationCount * sizeof(G3DAnimation *), TRUE,
+                                      "g3d_util.c", 534);
         for (j = 0; j < actorSetup->animationCount; j++) {
             const G3DSceneAnimationSetup *anmSetup = &actorSetup->animations[j];
-            void *animation;
+            G3DAnimation *animation;
 
             if (anmSetup->resource == 0xff) {
                 animation = NULL;
@@ -288,10 +289,10 @@ static void GFL_G3DMgrLoadActorsFast(G3DManager *manager, u16 scene, const G3DSc
 
     for (i = 0; i < count; i++) {
         const G3DSceneActorSetup *actorSetup = &setup->actors[i];
-        void *mdlResource;
-        void *texResource;
+        G3DResource *mdlResource;
+        G3DResource *texResource;
         G3DModel *model;
-        void **animations;
+        G3DAnimation **animations;
         int j;
 
         mdlResource = G3DMgr_UseResource(manager, firstResource, actorSetup->modelResource);
@@ -310,11 +311,11 @@ static void GFL_G3DMgrLoadActorsFast(G3DManager *manager, u16 scene, const G3DSc
             }
         }
         model = GFL_G3DMdlCreate(mdlResource, actorSetup->modelIndex, texResource);
-        animations =
-            GFL_HeapAllocate(HEAPID_TAIL(heapId), actorSetup->animationCount * sizeof(void *), TRUE, "g3d_util.c", 609);
+        animations = GFL_HeapAllocate(HEAPID_TAIL(heapId), actorSetup->animationCount * sizeof(G3DAnimation *), TRUE,
+                                      "g3d_util.c", 609);
         for (j = 0; j < actorSetup->animationCount; j++) {
             const G3DSceneAnimationSetup *anmSetup = &actorSetup->animations[j];
-            void *animation;
+            G3DAnimation *animation;
 
             if (anmSetup->resource == 0xff) {
                 animation = NULL;
@@ -351,7 +352,7 @@ static void GFL_G3DMgrFreeSceneActors(G3DManager *manager, u16 scene) {
 #else
         if (manager->actorFlags[firstActor + i] & (u8)~G3D_ACTOR_OWN_TEXTURE) {
 #endif
-            void *texResource = GFL_G3DMdlGetTexResource(model);
+            G3DResource *texResource = GFL_G3DMdlGetTexResource(model);
 
             GFL_G3DResFreeTexData(texResource);
             GFL_G3DResFree(texResource);
@@ -380,7 +381,7 @@ u16 GFL_G3DSceneGetNodeActorCount(G3DManager *manager, u16 scene) {
     return manager->scenes[scene].actorCount;
 }
 
-void *GFL_G3DMgrGetResource(G3DManager *manager, u16 resource) {
+G3DResource *GFL_G3DMgrGetResource(G3DManager *manager, u16 resource) {
     return manager->resources[resource];
 }
 

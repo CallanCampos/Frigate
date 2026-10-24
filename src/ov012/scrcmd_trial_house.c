@@ -32,7 +32,7 @@ BOOL s01E8_TrialHousePrepareParty(VM *vm, FieldScriptEnv *env) {
 
     FieldScriptEnv_GetScriptWork(env);
     workPtr = GetTrialHouseWkPPtr(GSYS_GetGameData(FieldScriptEnv_GetGameSystem(env)));
-    func_ov033_0217ad78(*workPtr, ScriptReadAny(vm, env));
+    TrialHouse_SetBattleMode(*workPtr, ScriptReadAny(vm, env));
     return FALSE;
 }
 
@@ -59,7 +59,7 @@ BOOL s01EA_TrialHouseSetTrainer(VM *vm, FieldScriptEnv *env) {
     workPtr = GetTrialHouseWkPPtr(GSYS_GetGameData(gsys));
     mode = ScriptReadAny(vm, env);
     result = ScriptReadVar(vm, env);
-    *result = func_ov033_0217adc4(gsys, *workPtr, mode);
+    *result = TrialHouse_LoadTrainer(gsys, *workPtr, mode);
     return FALSE;
 }
 
@@ -70,7 +70,7 @@ BOOL s01EB_TrialHouseMsgDisp(VM *vm, FieldScriptEnv *env) {
     u16 index = ScriptReadAny(vm, env);
     u16 actorId = ScriptReadAny(vm, env);
 
-    ScriptWork_CallEvent(work, func_ov033_0217aedc(gsys, *workPtr, index, actorId));
+    ScriptWork_CallEvent(work, TrialHouse_CreateTrainerMsgEvent(gsys, *workPtr, index, actorId));
     return TRUE;
 }
 
@@ -146,7 +146,7 @@ BOOL s01F2_TrialHouseGetExaminationType(VM *vm, FieldScriptEnv *env) {
     gsys = FieldScriptEnv_GetGameSystem(env);
     workPtr = GetTrialHouseWkPPtr(GSYS_GetGameData(gsys));
     result = ScriptReadVar(vm, env);
-    *result = func_ov033_0217b2e4(gsys, *workPtr);
+    *result = TrialHouse_GetDeliveryState(gsys, *workPtr);
     return FALSE;
 }
 
@@ -155,7 +155,7 @@ BOOL s01F3_TrialHouseSaveData(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     TrialHouseWork **workPtr = GetTrialHouseWkPPtr(GSYS_GetGameData(gsys));
 
-    ScriptWork_CallEvent(work, func_ov033_0217b2ec(gsys, *workPtr, ScriptReadAny(vm, env)));
+    ScriptWork_CallEvent(work, TrialHouse_CreateSaveTask(gsys, *workPtr, ScriptReadAny(vm, env)));
     return TRUE;
 }
 
@@ -179,6 +179,6 @@ BOOL s01F5_TrialHouseGetRecordMask(VM *vm, FieldScriptEnv *env) {
     FieldScriptEnv_GetScriptWork(env);
     gsys = FieldScriptEnv_GetGameSystem(env);
     result = ScriptReadVar(vm, env);
-    *result = func_ov033_0217b32c(gsys);
+    *result = TrialHouse_GetRecordSlotsState(gsys);
     return FALSE;
 }

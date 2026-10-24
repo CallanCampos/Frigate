@@ -46,16 +46,16 @@ GimmickShauntal_SetModel8Played kind:function(thumb,size=0x4) addr:0x021ef910
 GimmickShauntal_GetModel8Played kind:function(thumb,size=0x4) addr:0x021ef914
 GimmickShauntal_SetRoomChanged kind:function(thumb,size=0x4) addr:0x021ef918
 GimmickShauntal_GetRoomChanged kind:function(thumb,size=0x4) addr:0x021ef91c
-data_ov122_021ef8e0 kind:data(any) addr:0x021ef920
-data_ov122_021ef8e8 kind:data(any) addr:0x021ef928
-data_ov122_021ef8f8 kind:data(any) addr:0x021ef938
-data_ov122_021ef908 kind:data(any) addr:0x021ef948
-data_ov122_021ef920 kind:data(any) addr:0x021ef960
-data_ov122_021ef938 kind:data(any) addr:0x021ef978
-data_ov122_021ef958 kind:data(any) addr:0x021ef998
+sModel7Animations kind:data(any) addr:0x021ef920
+sModel9Animations kind:data(any) addr:0x021ef928
+sSceneSetup kind:data(any) addr:0x021ef938
+sModel8Animations kind:data(any) addr:0x021ef948
+sModel6Animations kind:data(any) addr:0x021ef960
+sModel0Animations kind:data(any) addr:0x021ef978
+sModel1Animations kind:data(any) addr:0x021ef998
 sModelFrom2Animations kind:data(any) addr:0x021ef9bc
 data_ov122_021ef9a0 kind:data(any) addr:0x021ef9e0
-data_ov122_021ef9d0 kind:data(any) addr:0x021efa10
-data_ov122_021efa70 kind:data(any) addr:0x021efab0
+sActors kind:data(any) addr:0x021efa10
+sResources kind:data(any) addr:0x021efab0
 data_ov122_021efb91 kind:data(any) addr:0x021efbd1 ambiguous
 data_ov122_021efbb0 kind:data(any) addr:0x021efbf0 ambiguous

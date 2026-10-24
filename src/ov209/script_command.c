@@ -1113,7 +1113,7 @@ static BOOL StaScriptCmd_LightAdd(VM *vm, void *work) {
     StaActLight *light = StaActLight_AddLight(lightSys, 1);
 
     StaActLight_SetColor(lightSys, light, GX_RGB(31, 31, 0), 16);
-    func_ov209_021bd770(lightSys, light, unk, 0);
+    StaActLight_SetElemB(lightSys, light, unk, 0);
     StaActing_SetLight(sys->stage, light, index);
     StaActing_RefreshAudience(sys->stage);
     return FALSE;

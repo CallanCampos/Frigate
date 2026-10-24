@@ -23,14 +23,14 @@ struct TradeMcssMove {
 };
 
 // The sounds of the animations, at each frame
-void func_ov194_021be808(int frame);
-void func_ov194_021be840(int frame);
+void PoketradeNego_PlaySeByKeyA(int frame);
+void PoketradeNego_PlaySeByKeyB(int frame);
 void TradeMcssMove_Start(TradeMcssMove *move, int duration, const VecFx32 *end);
 TradeMcssMove *TradeMcssMove_Create(MCSS *mcss, int duration, const VecFx32 *end, HeapID heapId);
 TradeMcssMove *TradeMcssMove_CreateWithPath(MCSS *mcss, int duration, const VecFx32 *end, const VecFx32 *path,
                                             HeapID heapId);
 void TradeMcssMove_Update(TradeMcssMove *move, PokemonTradeWork *wk);
-void func_ov194_021beab4(PokemonTradeWork *wk);
+void TradeMcssMove_StopAnimation(PokemonTradeWork *wk);
 void TradeMcssMove_Free(TradeMcssMove *move);
 
 #endif // POKEBW2_APP_POKEMON_TRADE_POKEMONTRADE_MCSS_H

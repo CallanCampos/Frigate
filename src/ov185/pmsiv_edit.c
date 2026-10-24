@@ -78,7 +78,7 @@ struct PMSIVEdit {
     u32 unk1A8;
     u32 unk1AC;
     TCB *vblankTask;
-    void *frames;
+    BGWinFrame *frames;
     BOOL framesDirty;
 };
 

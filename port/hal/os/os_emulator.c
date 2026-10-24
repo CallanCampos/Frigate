@@ -44,6 +44,6 @@ BOOL OS_IsRunOnTwl(void) {
     return FALSE;
 }
 
-BOOL func_0207acbc(void) {
+BOOL OSi_IsRunOnTwl(void) {
     return OS_IsRunOnTwl();
 }

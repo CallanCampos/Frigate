@@ -10,14 +10,16 @@
 #include "struct_decls.h"
 
 // The kinds of encounter, which pick the zone's slots
-#define ENCTYPE_GRASS 0
-#define ENCTYPE_GRASS_RARE 1
-#define ENCTYPE_GRASS_SHAKING 2
-#define ENCTYPE_SURF 3
-#define ENCTYPE_SURF_RARE 4
-#define ENCTYPE_FISHING 5
-#define ENCTYPE_FISHING_RARE 6
-#define ENCTYPE_MAX 7
+enum {
+    ENCTYPE_GRASS,
+    ENCTYPE_GRASS_RARE,
+    ENCTYPE_GRASS_SHAKING,
+    ENCTYPE_SURF,
+    ENCTYPE_SURF_RARE,
+    ENCTYPE_FISHING,
+    ENCTYPE_FISHING_RARE,
+    ENCTYPE_MAX,
+};
 
 // What an encounter knows of the player's lead Pokémon and how it rolls the wild ones
 typedef struct {

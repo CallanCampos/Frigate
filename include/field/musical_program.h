@@ -18,7 +18,7 @@ u32 MusicalProgram_PackNpcs(MusicalProgram *program);
 void MusicalProgram_UnpackNpcs(MusicalProgram *program, u32 value);
 u8 MusicalProgram_GetTopKind(MusicalProgram *program);
 void MusicalProgram_PutNpcOnStage(MusicalProgram *program, MusicalStageParam *stage, u8 pos, u8 cpu, HeapID heapId);
-u8 func_ov012_02152614(MusicalProgram *program);
+u8 MusicalProgram_GetBaseProgramId(MusicalProgram *program);
 u8 MusicalProgram_GetPropList(MusicalProgram *program);
 u8 MusicalProgram_GetNpcTrainerClass(MusicalProgram *program, u8 cpu);
 u8 MusicalProgram_GetNpcNameMsg(MusicalProgram *program, u8 cpu);

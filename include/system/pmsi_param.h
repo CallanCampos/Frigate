@@ -28,7 +28,7 @@ u16 PMSIParam_GetWord(const PMSIParam *param);
 void PMSIParam_GetWords(const PMSIParam *param, u16 *words);
 void PMSIParam_GetSentence(const PMSIParam *param, PMSData *sentence);
 u32 PMSIParam_GetMode(const PMSIParam *param);
-void *PMSIParam_GetPokeDex(const PMSIParam *param);
+PokeDexSave *PMSIParam_GetPokeDex(const PMSIParam *param);
 PMSWordSave *PMSIParam_GetWordSave(const PMSIParam *param);
 BOOL PMSIParam_AreMovesEnabled(const PMSIParam *param);
 BOOL PMSIParam_HasStartSentence(const PMSIParam *param);

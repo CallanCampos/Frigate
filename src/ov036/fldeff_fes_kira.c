@@ -20,14 +20,14 @@ typedef struct {
 
 typedef struct {
     G3DActor *actor;
-    void *anms[4];
+    G3DAnimation *anms[4];
     G3DModel *mdl;
 } FesKiraObj;
 
 typedef struct {
     FieldEffects *effects;
-    void *mdlRes;
-    void *anmRes[4];
+    G3DResource *mdlRes;
+    G3DResource *anmRes[4];
     FesKiraObj obj;
     FesKiraSpec spec;
 } FieldEffectFesKira;
@@ -50,7 +50,7 @@ typedef struct {
     FesKira kiras[FES_KIRA_MAX];
 } FesKiraTask;
 
-static void *func_ov036_021a5a34(FieldEffects *effects, HeapID heapId);
+static FieldEffectFesKira *func_ov036_021a5a34(FieldEffects *effects, HeapID heapId);
 static void func_ov036_021a5a58(FieldEffectFesKira *effect);
 static void func_ov036_021a5a90(FesKiraObj *obj, FieldEffectFesKira *effect);
 static void func_ov036_021a5afc(FesKiraObj *obj, FieldEffectFesKira *effect);
@@ -83,7 +83,7 @@ void func_ov036_021a5a20(FieldEffects *effects, void *data) {
     GFL_HeapFree(data);
 }
 
-static void *func_ov036_021a5a34(FieldEffects *effects, HeapID heapId) {
+static FieldEffectFesKira *func_ov036_021a5a34(FieldEffects *effects, HeapID heapId) {
     FieldEffectFesKira *effect = GFL_HeapAllocate(heapId, sizeof(FieldEffectFesKira), TRUE, "fldeff_fes_kira.c", 179);
 
     effect->effects = effects;
@@ -158,7 +158,7 @@ FieldEffectTask *func_ov036_021a5bb4(FieldEffects *effects) {
 
 // Show sparkle idx at pos
 void func_ov036_021a5c04(FieldEffectTask *task, u8 idx, u16 value, const VecFx32 *pos) {
-    FesKiraTask *kiraTask = func_ov036_021a3afc(task);
+    FesKiraTask *kiraTask = FieldEffects_GetObjectWork(task);
 
     if (idx < FES_KIRA_MAX) {
         kiraTask->kiras[idx].active = TRUE;
@@ -169,7 +169,7 @@ void func_ov036_021a5c04(FieldEffectTask *task, u8 idx, u16 value, const VecFx32
 
 // Hide sparkle idx, and every sparkle
 void func_ov036_021a5c2c(FieldEffectTask *task, u8 idx) {
-    FesKiraTask *kiraTask = func_ov036_021a3afc(task);
+    FesKiraTask *kiraTask = FieldEffects_GetObjectWork(task);
 
     if (idx < FES_KIRA_MAX) {
         kiraTask->kiras[idx].active = FALSE;
@@ -178,7 +178,7 @@ void func_ov036_021a5c2c(FieldEffectTask *task, u8 idx) {
 
 void func_ov036_021a5c44(FieldEffectTask *task) {
     int i;
-    FesKiraTask *kiraTask = func_ov036_021a3afc(task);
+    FesKiraTask *kiraTask = FieldEffects_GetObjectWork(task);
 
     for (i = 0; i < FES_KIRA_MAX; i++) {
         kiraTask->kiras[i].active = FALSE;
@@ -187,7 +187,7 @@ void func_ov036_021a5c44(FieldEffectTask *task) {
 
 // Whether sparkle idx shows, and its value
 u16 func_ov036_021a5c5c(FieldEffectTask *task, u8 idx) {
-    FesKiraTask *kiraTask = func_ov036_021a3afc(task);
+    FesKiraTask *kiraTask = FieldEffects_GetObjectWork(task);
 
     if (idx >= FES_KIRA_MAX) {
         return 0;
@@ -196,7 +196,7 @@ u16 func_ov036_021a5c5c(FieldEffectTask *task, u8 idx) {
 }
 
 u16 func_ov036_021a5c74(FieldEffectTask *task, u8 idx) {
-    FesKiraTask *kiraTask = func_ov036_021a3afc(task);
+    FesKiraTask *kiraTask = FieldEffects_GetObjectWork(task);
 
     if (idx >= FES_KIRA_MAX) {
         return 0;
@@ -207,8 +207,8 @@ u16 func_ov036_021a5c74(FieldEffectTask *task, u8 idx) {
 static void func_ov036_021a5c8c(FieldEffectTask *task, void *work) {
     FesKiraTask *kiraTask = work;
 
-    kiraTask->params = *(FesKiraTaskParams *)func_ov036_021a3ac8(task);
-    func_ov036_021a3a94(task);
+    kiraTask->params = *(FesKiraTaskParams *)FieldEffects_GetObjectParam(task);
+    FieldEffects_UpdateObject(task);
 }
 
 static void func_ov036_021a5ca8(FieldEffectTask *task, void *work) {

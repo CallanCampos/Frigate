@@ -4,11 +4,14 @@
 #include "types.h"
 #include "struct_decls.h"
 
-#define SEASON_SPRING 0
-#define SEASON_SUMMER 1
-#define SEASON_AUTUMN 2
-#define SEASON_WINTER 3
-#define SEASON_COUNT 4
+// The seasons, which the functions below take and return
+enum {
+    SEASON_SPRING,
+    SEASON_SUMMER,
+    SEASON_AUTUMN,
+    SEASON_WINTER,
+    SEASON_COUNT,
+};
 
 // season.c (the name is a guess). Names from swan (https://github.com/ds-pokemon-hacking/swan, GPL-3.0)
 

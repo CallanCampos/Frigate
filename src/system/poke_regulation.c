@@ -521,7 +521,8 @@ static StrBuf *makeLauncherText(const Regulation *regulation, WordSet *wordset, 
     return GFL_MsgDataLoadStrbufNew(printMsg->msgData, messageId);
 }
 
-void *PokeRegulation_CreatePrintMsg(Regulation *regulation, WordSet *wordset, HeapID heapId, BOOL launcher) {
+RegulationPrintMsg *PokeRegulation_CreatePrintMsg(Regulation *regulation, WordSet *wordset, HeapID heapId,
+                                                  BOOL launcher) {
     RegulationPrintMsg *printMsg = GFL_HeapAllocate(heapId, sizeof(RegulationPrintMsg), TRUE, "poke_regulation.c", 871);
     StrBuf *temp;
     int i;

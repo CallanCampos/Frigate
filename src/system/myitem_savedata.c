@@ -954,7 +954,7 @@ BOOL BagSave_SubItem(BagSave *bag, u16 item, u16 count, HeapID heapId) {
     return TRUE;
 }
 
-BOOL BagSave_CheckAmount(BagSave *bag, u32 item, u32 count, u32 heapId) {
+BOOL BagSave_CheckAmount(BagSave *bag, u16 item, u16 count, HeapID heapId) {
     if (BagSave_GetItemHandleIfAmount(bag, item, count) != NULL) {
         return TRUE;
     }

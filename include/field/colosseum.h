@@ -66,7 +66,7 @@ struct UnionColosseum {
 // Registers the colosseum's net commands, with the UnionSystem as their work
 void Colosseum_RegisterCommands(UnionSystem *sys);
 // Sends the player's info (to the parent only when toParent is TRUE, else to all), the card, and the card's first part
-BOOL Colosseum_SendMember(const void *member, BOOL toParent);
+BOOL Colosseum_SendMember(const ColosseumMember *member, BOOL toParent);
 BOOL Colosseum_SendCard(const TrainerCardData *card);
 BOOL Colosseum_SendCardHead(const TrainerCardData *card);
 BOOL Colosseum_SendChoice(const ColosseumChoice *choice);

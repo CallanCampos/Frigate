@@ -528,7 +528,7 @@ static BOOL BoxSearchProc_Init(GameProc *proc, u32 *state, void *param, void *wo
     BoxSearch_PrintMainMenu(wk);
     BoxSearch_SeqMainMenuStart(wk, 0);
     GFL_NetSetIconScreen(TRUE, wk->heapId);
-    GFL_WipeSet(0, 1, 1, 0, 6, 1, wk->heapId);
+    GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_IN, WIPE_TYPE_FADE_IN, 0, 6, 1, wk->heapId);
     return TRUE;
 }
 
@@ -577,7 +577,7 @@ static BOOL BoxSearchProc_Main(GameProc *proc, u32 *state, void *param, void *wo
         }
         break;
     case 2:
-        GFL_WipeSet(0, 0, 0, 0, 6, 1, wk->heapId);
+        GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, 0, 6, 1, wk->heapId);
         *state = 3;
         break;
     case 3:

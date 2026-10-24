@@ -9,6 +9,7 @@
 #include "app/wifibattlematch.h"
 #include "app/wifibattlematch_battle.h"
 #include "app/wifibattlematch_link.h"
+#include "app/wifibattlematch_net.h"
 #include "app/wifibattlematch_subproc.h"
 #include "battle/battle_proc.h"
 #include "battle/battle_rec_tool.h"
@@ -105,7 +106,7 @@ struct WifiBattleMatchSys {
     WifiBattleMatchLinkAccount account;
     WifiBattleMatchLinkRanking ranking;
     WifiBattleMatchLinkRatings ratings;
-    u8 unk7D4[0xd4];
+    WifiBattleMatchNetData unk7D4;
     u32 unk8A8;
     BOOL unk8AC;
 };
@@ -369,7 +370,7 @@ static void *WifiBattleMatchSys_CreateNetParam(WifiBattleMatchChain *chain, Heap
     param->unk1C = sys->unk40;
     param->unk20 = &sys->unk1CC;
     param->report = &sys->report;
-    param->unk3C = sys->unk7D4;
+    param->unk3C = &sys->unk7D4;
     param->unk28 = &sys->unk8A8;
     param->battleResult = &sys->battleResult;
     param->account = &sys->account;
@@ -516,8 +517,8 @@ static BOOL WifiBattleMatchSys_FinishList(WifiBattleMatchChain *chain, void *par
 static void *WifiBattleMatchSys_CreateBattleParam(WifiBattleMatchChain *chain, HeapID heapId, WifiBattleMatchSys *sys) {
     WifiBattleMatchBattleParam *param;
     Regulation *regulation;
-    void *tournament;
-    void *entry;
+    TournamentBlock *tournament;
+    TournamentEntry *entry;
     BOOL ownsRegulation = FALSE;
     u32 fileId;
     u32 battleType;
@@ -680,16 +681,16 @@ static BOOL WifiBattleMatchSys_FinishBattle(WifiBattleMatchChain *chain, void *p
     BtlSetup *setup = battle->setup;
     u32 result = battle->result;
     Regulation *regulation;
-    void *entry;
+    TournamentEntry *entry;
     u32 value;
     u8 aliveOther;
     u8 aliveOwn;
     u8 hpPercent;
 
     sys->battleResult.battleStyle = setup->battleStyle;
-    sys->battleResult.result = setup->unkA8;
+    sys->battleResult.result = setup->result;
     sys->battleResult.unk10 = setup->unkDD_0;
-    sys->battleResult.result = setup->unkA8;
+    sys->battleResult.result = setup->result;
     WifiBattleMatchSys_CountAlive(battle->setup, &aliveOwn, &aliveOther);
     sys->battleResult.aliveOwn = aliveOwn;
     sys->battleResult.aliveOther = aliveOther;
@@ -799,7 +800,7 @@ static void *WifiBattleMatchSys_CreateExchangeParam(WifiBattleMatchChain *chain,
     param->gameData = &sys->param.gameData;
     param->party = sys->party;
     param->otherParty = sys->otherParty;
-    param->unk14 = sys->unk7D4;
+    param->unk14 = &sys->unk7D4;
     param->unk18 = &sys->unk8A8;
     if (sys->mode == 1) {
         param->mode = WIFIBATTLEMATCH_EXCHANGE_IRC;
@@ -1021,7 +1022,7 @@ static void WifiBattleMatchSys_BuildReport(WifiBattleMatchReport *report, PokePa
     report->hour = time.hour;
     report->minute = time.minute;
     report->unk48 = unk14;
-    report->result = setup->unkA8;
+    report->result = setup->result;
     WifiBattleMatchSys_CountAlive(setup, &alive[0], &alive[1]);
     report->aliveOwn = alive[0];
     report->aliveOther = alive[1];

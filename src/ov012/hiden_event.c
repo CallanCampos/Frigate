@@ -83,7 +83,7 @@ void CalcPlayerActionPossibilities(Field *field, PlayerActionPossibilities *acti
     if (GetZoneFlagsEnableEscapeRope(action->zoneId) == TRUE) {
         action->flags |= 0x80;
     }
-    if (FieldStatus_GetFlashPerms(GameData_GetFieldStatus(GSYS_GetGameData(action->gsys))) & 1) {
+    if (FieldStatus_GetFlashPerms(GameData_GetFieldStatus(GSYS_GetGameData(action->gsys))) & FLD_FLASH_ALLOW) {
         action->flags |= 0x20;
     }
     if (GetAbyssalRuinsDiveZoneID(field, &diveZone) == TRUE) {
@@ -313,7 +313,7 @@ GameEvent *EventSweetScentCall_Create(HiddenEventArgs *args, PlayerActionPossibi
 
 GameEvent *EventFly_Create(HiddenEventArgs *args, PlayerActionPossibilities *context) {
     GameBeacon_BroadcastFieldMove(0x13);
-    return func_ov033_02178908(context->gsys, context->field, args->value);
+    return EventFly_CreateMapChangeEvent(context->gsys, context->field, args->value);
 }
 
 u32 EventFly_Check(PlayerActionPossibilities *context) {
@@ -508,7 +508,7 @@ u32 EventChatterCall_Check(PlayerActionPossibilities *context) {
 
 GameEvent *EventChatterCall_Create(HiddenEventArgs *args, PlayerActionPossibilities *context) {
     GameBeacon_BroadcastFieldMove(0x1c0);
-    return func_ov033_02178ca8(context->gsys, context->field, args->partySlot);
+    return EventPerapRecord_Create(context->gsys, context->field, args->partySlot);
 }
 
 GameEventReturnCode EventRuinsStrengthCall_Callback(GameEvent *event, u32 *state, void *data) {

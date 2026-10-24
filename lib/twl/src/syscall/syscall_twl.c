@@ -6,28 +6,28 @@
 #include "twl/syscall.h"
 
 void SVC_SHA1Init(SVCSHA1Context *context) {
-    if (!func_0207acbc()) {
+    if (!OSi_IsRunOnTwl()) {
         OS_Terminate();
     }
     func_027696e8(context);
 }
 
 void SVC_SHA1Update(SVCSHA1Context *context, const void *input, u32 len) {
-    if (!func_0207acbc()) {
+    if (!OSi_IsRunOnTwl()) {
         OS_Terminate();
     }
     func_027696f4(context, input, len);
 }
 
 void SVC_SHA1GetHash(SVCSHA1Context *context, void *digest) {
-    if (!func_0207acbc()) {
+    if (!OSi_IsRunOnTwl()) {
         OS_Terminate();
     }
     func_027696f8(context, digest);
 }
 
 void SVC_CalcHMACSHA1(void *digest, const void *bin_ptr, u32 bin_len, const void *key_ptr, u32 key_len) {
-    if (!func_0207acbc()) {
+    if (!OSi_IsRunOnTwl()) {
         OS_Terminate();
     }
     func_027698b4(digest, bin_ptr, bin_len, key_ptr, key_len);
