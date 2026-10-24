@@ -38,7 +38,7 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
   108 commits) and the seven after it: three that complete `src/ov257/ctvt_talk.c` (merge #502), two that put
   `lib/nitro/include/nitro/wm.h`'s includes in clang-format's order (merge #503), and two that complete
   `src/system/wipe_sub.c` through a dead-strip step of the ROM build (merge #504). This entry records a prepared sync,
-  published as a topic PR for the owner's review; it is not on `main`. The hourly `port-sync` Action had stopped on its
+  published as PR 27 for the owner's review; it is not on `main`. The hourly `port-sync` Action had stopped on its
   conflict since 2026-10-23 23:53 UTC.
 - **Port:** `PORT_SHA`, on the topic `codex/upstream-sync-manual` from `main` at `e5508df96a` (PR 24's merge): the merge
   `f99298de25` of `53767c5a2c` (its 14 conflicts resolved and committed with `git commit --no-edit --cleanup=strip`
@@ -48,10 +48,13 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
   row, which landed first as [SYNC.md](SYNC.md#when-the-pointer-cast-guard-fails) says: STATUS.md keeps both entries,
   this one above PR 25's, whose `PORT_SHA` it fills), the merge `e77206acfa` of `629a53cccb`, which `sync_upstream.sh
   --branch codex/upstream-sync-manual --no-push` made without a conflict as `f8d6ab83a6` and which was amended, before
-  anything was published, only to end its message with the co-author line the topic's other commits end with, and this
-  records commit. Two earlier runs merged `b35b167898` (upstream merge #502) as `a71bb52d3a` and `be593c3370` (upstream
-  merge #503) as `aa360344ff`, each validated and given a records commit (`0621258b02`, `008a39fe6d`); upstream merged
-  more before either was published, so both were set aside unpublished, and the run above merges the newest head in one
+  anything was published, only to end its message with the co-author line the topic's other commits end with, its
+  records commit `ed3d1599ad`, which `sync_upstream.sh --branch codex/upstream-sync-manual` validated and published as
+  PR 27, the merge `05c3a26fd5` of `main` at `def88de18f` (PR 26's merge, phase 3's exit route, which merged as PR 27
+  was published: STATUS.md keeps both entries, this one above PR 26's, whose `PORT_SHA` it fills), and this records
+  commit. Two earlier runs merged `b35b167898` (upstream merge #502) as `a71bb52d3a` and `be593c3370` (upstream merge
+  #503) as `aa360344ff`, each validated and given a records commit (`0621258b02`, `008a39fe6d`); upstream merged more
+  before either was published, so both were set aside unpublished, and the run above merges the newest head in one
   merge. `aa360344ff`'s tree differs from `e77206acfa`'s only in the 25 files upstream changes from `be593c3370` to
   `629a53cccb`.
 - **ROM:** T0 passes on `e77206acfa`, whose tree is `f8d6ab83a6`'s: `sync_upstream.sh`'s `configure.py b2_us w2_us` and
@@ -96,7 +99,11 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
   a scene is over the budget while the load average is above the cores (other sessions' builds: 37 to 61 on 8 cores
   through the run), after running their scenes (119 and 210 seconds); a lone rerun of the two (`ctest -R`) skipped both
   again at a load of 47 to 61. White 2's `frame_times_title` passed. On `a71bb52d3a` none skipped but the 14 above and
-  none failed (290 and 287 passed). T4, T5 and T7 not run.
+  none failed (290 and 287 passed). The publishing run on `ed3d1599ad`, PR 27's first head: both SHA1s, and ctest with
+  none failed, Black 2 290 passed and 14 skipped of 304, its two timing tests passing, and White 2 287 passed and 14
+  skipped of 301, `game_ptrcasts` passing in both. The head after the merge of `main`, which brings only PR 26's `port/`
+  and `.github/README.md` changes, gets the same validation from `sync_upstream.sh` before it pushes, and its `Frigate
+  local verification` status records it. T4, T5 and T7 not run.
 - **Tiers:** per version, a 39,366 functions (+1,820), b 1,651 (-1,821) and c zero; code bytes Black 2 a 3,649,440,
   White 2 a 3,649,528 (+213,592 each), and b 200,820 in each (-213,598); 2,385 veneers left out (+1)
   (`port/tools/progress/progress.py` and `summarize.py` on `e77206acfa`, against the last entry that measured them). Of
@@ -174,8 +181,8 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
   this sync didn't cause: `compile_check.py`'s call of the removed `lib_compiler`, the rows of game-changes.md that name
   functions upstream renamed before `b62c655bfa` (`particle.c`'s `func_0204f980`, `func_0204fa84` and `func_020500c8`,
   `printsys.c`'s `func_020223cc`), and the two `printsys.c` rows that call the file incomplete, which is complete in
-  both versions. Then the Route 19 route, as the battle run's entry says, with #497's table, and the three documents
-  above brought up to date by it.
+  both versions. Then phase 4's first gap, as PR 26's entry says: the battle, with the Route 19 route as a test now that
+  #497's table is in, and the three documents above brought up to date by it.
 - **Blockers:** none for the sync but the owner's review. #496 is still open upstream at `629a53cccb`, so
   `src/ov036/enceff_data.c`'s four entries are not in this sync.
 
