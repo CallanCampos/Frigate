@@ -123,6 +123,12 @@ class StaticReferenceTests(unittest.TestCase):
                     f'from:{origin:#010x} kind:arm_call to:0x02700000 module:ltd_autoload(0)\n')
                 self.assertEqual(mark_complete.externally_used_statics('src/library_part.c', self.version), expected)
 
+    def test_module_names_are_the_relocs(self):
+        for directory, name in (('', 'main'), ('overlays/ov011', 'overlay(11)'), ('autoload_3', 'autoload(3)'),
+                                ('ltd_autoload_0', 'ltd_autoload(0)'), ('itcm', 'itcm')):
+            with self.subTest(directory=directory):
+                self.assertEqual(mark_complete.module_name(self.version / directory, self.version), name)
+
     def test_ltd_autoload_static_reference(self):
         self.relocs('from:0x02000000 kind:arm_call to:0x02700000 module:ltd_autoload(0)')
         ltd = self.version / 'ltd_autoload_0'
