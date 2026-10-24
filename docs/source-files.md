@@ -118,8 +118,8 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 | `socl_close.c` | `0x021572f4`–`0x02157620` | 7 | complete | descriptive |
 | `socl_cleanup.c` | `0x02157620`–`0x02157894` | 8 | complete | descriptive |
 | `socl_poll.c` | `0x02157894`–`0x02157978` | 2 | complete | descriptive |
-| `socl_misc.c` | `0x02157978`–`0x02157980` | 1 | complete | descriptive |
-| `socl_list.c` | `0x02157980`–`0x02157bd0` | 13 | partial | descriptive |
+| `socl_misc.c` | `0x02157978`–`0x02157af0` | 5 | partial | descriptive |
+| `socl_list.c` | `0x02157af0`–`0x02157bd0` | 9 | complete | descriptive |
 | `soc.c` | `0x02157bd0`–`0x02158174` | 23 | partial | descriptive |
 | `socl_ssl.c` | `0x02158174`–`0x02158250` | 3 | complete | descriptive |
 | `ssl.c` | `0x02158250`–`0x0215a6b4` | 60 | partial | descriptive |
@@ -127,7 +127,11 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 | `sha1.c` | `0x0215ab04`–`0x0215b1d8` | 8 | complete | descriptive |
 | `ssl_rc4.c` | `0x0215b1d8`–`0x0215b274` | 2 | complete | descriptive |
 | `biginteger.c` | `0x0215b274`–`0x0215bbec` | 19 | partial | descriptive |
-| `wcm.c` | `0x0215bbec`–`0x0215dd74` | 93 | partial | descriptive |
+| `wcm_system.c` | `0x0215bbec`–`0x0215c594` | 39 | complete | descriptive |
+| `wcm_aplist.c` | `0x0215c594`–`0x0215cac4` | 14 | complete | descriptive |
+| `wcm_cpsif.c` | `0x0215cac4`–`0x0215cd28` | 13 | complete | descriptive |
+| `wcm_util.c` | `0x0215cd28`–`0x0215ce88` | 6 | complete | descriptive |
+| `wcm_wmif.c` | `0x0215ce88`–`0x0215dd74` | 21 | complete | descriptive |
 | `dwc_main.c` | `0x0215fa0c`–`0x02160e10` | 49 | partial | descriptive |
 | `dwc_match.c` | `0x02160e10`–`0x02168818` | 161 | partial | descriptive |
 | `dwc_nasfunc.c` | `0x021694d4`–`0x0216a408` | 30 | complete | descriptive |

@@ -213,7 +213,7 @@ this way, while the LCF still places the objects. Before, a file that called the
 `camera_system.c`, couldn't be completed. NitroWiFi's Thumb code in the LTD autoload (`.ltdmain`) gives every call its
 own veneer too, as an overlay does, while dsd lists the module's objects with ARM9 main's: `tools/build/ltd_objects.py`
 moves them to the end of the linker's object list, after `-overlaygroup LTD_AUTOLOAD_0,0` and `-overlay LTD_AUTOLOAD_0`,
-which gives `wcm_dsi.c`'s 56 calls of `WcmSetPhase` their 56 veneers. TwlSDK's `.ltdmain` objects share one veneer per
+which gives `wcm_dsi.c`'s 56 calls of `WCMi_SetPhase` their 56 veneers. TwlSDK's `.ltdmain` objects share one veneer per
 target, across files, as main's do: `card_hash.c`'s six calls of `OS_DisableInterrupts` go through one veneer, which
 `mi_ndma.c`, `mi_ndma_gxcommand.c`, `mi_sharedWram_twl.c` and `pm_twl.c` call too, so the tool leaves the objects of
 `lib/twl/` with main's.

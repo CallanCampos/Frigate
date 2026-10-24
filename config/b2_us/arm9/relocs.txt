@@ -3309,7 +3309,7 @@ from:0x02017038 kind:thumb_call to:0x02008ddc module:main
 from:0x02017046 kind:thumb_call to:0x02007dc8 module:main
 from:0x02017052 kind:thumb_call to:0x02009ee0 module:main
 from:0x02017064 kind:thumb_call to:0x0200c5c8 module:main
-from:0x0201707a kind:thumb_call to:0x0215cd8c module:overlays(11,12)
+from:0x0201707a kind:thumb_call to:0x0215cd8c module:overlay(12)
 from:0x02017086 kind:thumb_call to:0x02008c1c module:main
 from:0x0201709a kind:thumb_call to:0x02007460 module:main
 from:0x020170a0 kind:thumb_call to:0x02159150 module:overlay(12)

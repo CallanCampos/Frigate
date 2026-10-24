@@ -45,7 +45,7 @@ tools that show the differences.
   reload after the scan filter and the original switch exits.
 - A constant kept in a register for the whole function that is not ours (the original's `movs r7, #1` with every 0
   built where it is used, where ours keeps 0 in `r7`) can come from a store that the optimizer drops. `wcm_dsi.c`'s
-  `func_02769e60`, which does at once what `wcm.c`'s reset request and its completion do, matches only with the
+  `func_02769e60`, which does at once what `wcm_wmif.c`'s reset request and its completion do, matches only with the
   request's `work->resetPending = 1;` before the completion's `work->resetPending = 0;`: the dead store is removed,
   but the 1 it used is the constant kept.
 - A static assigned in both arms of an `if`/`else` is stored and then read through a second load of its address
@@ -3325,9 +3325,9 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 
 - A case that falls through into `default` shares the default's code: NitroWiFi's WCM calls pick their backend with
   `case 2: if (OS_IsRunOnTwl()) { result = ...; break; } default: result = 7;`, which gives the original's one
-  block, where an `if`/`else` that sets 7 itself adds a block (`WCM_SearchAsyncWithParams`, 12 bytes, and five more).
+  block, where an `if`/`else` that sets 7 itself adds a block (`WCM_BeginSearchAsync`, 12 bytes, and five more).
   An empty `case 3:` stacked on `default:`, the case whose warning the SDK compiles out, is what fixes
-  `WCM_StartupStep2` and four more steps: the empty labels set the jump table's range and the order of the compares.
+  `WCMi_WmifCleanupAsync` and four more steps: the empty labels set the jump table's range and the order of the compares.
   `case 3: case 4: default:`, the SDK's release build of its warning cases, matched 13 more of WCM's callbacks
   (`WcmWmcbConnect`, `WcmWmcbReset` and others).
 - A `switch` of two cases tests them in value order but lays their bodies out in source order, which no order of
@@ -3586,8 +3586,16 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 
 - A local array with an initializer goes in a `.rodata` section of its own, ahead of the file's shared one; a struct
   of the same bytes copied from a static gives the same inline `ldrb`/`strb` pairs and keeps the static in declaration
-  order in the shared section. NitroWiFi's `WCM_FindVendorIE` matches, with the file's `.rodata`, only with its OUI as
-  a `WCMVendorOui` struct copied from a static.
+  order in the shared section. NitroWiFi's `WCMi_GetGameInfo` matches, with the file's `.rodata`, only with its OUI as
+  a `WCMVendorOui` struct copied from a static. Each object's section is written where it is defined, so the static
+  comes first only when its definition, with its bytes, is above the function with the local arrays: `wcm_aplist.c`
+  defines the Nintendo OUI at the top, ahead of `WCMi_BssDescCopy`'s WPA and WMM OUIs, as the ROM has them; defined
+  after the last function, it came after them.
+- Initialized file statics are reached from the first one's address, as one object, even without `-ipa file`: WCM's
+  `wcm_system.c` reads its work pointer as `[r0, #4]` from the address of the device ID before it, which a struct of
+  the two gave too, except in `WCM_InitEx`, whose load of that address moved before a store to the stack. NitroWiFi's
+  two statics, `static u8 WCMi_OverridedDeviceId = 0;` and `static WCMWork *wcmw = NULL;`, match every function;
+  without the initializers they are tentative `.bss` objects of their own, and 18 functions differ.
 - Data that the ROM sorts among the others but that only another object's initializer points to is a global: as a
   `static const`, MWCC lays it out after the whole size-sorted list. DWC's `crypt.c` keeps a constant big number 1
   (`CryptOne`, a 20-byte `BigNum`) and its digit (`CryptOneDigit`) that only dead-stripped code used; as globals they

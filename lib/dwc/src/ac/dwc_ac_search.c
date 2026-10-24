@@ -42,7 +42,7 @@ static s8 DWCAc_NextHiddenChannel(void);
 
 // Whether the wireless manager lets the channels of the mask be used
 static inline BOOL IsChannelAllowed(u16 mask) {
-    u32 allowed = WCM_GetChannelMask();
+    u32 allowed = WCM_GetAllowedChannel();
 
     if (allowed & mask) {
         return TRUE;
@@ -98,7 +98,7 @@ u8 DWCi_AC_SearchAP(void) {
     s32 wcmState = WCM_GetPhase();
 
     if (state == 2 && wcmState == 3) {
-        u32 channels = WCM_GetChannelMask();
+        u32 channels = WCM_GetAllowedChannel();
         int i;
 
         for (i = 0; i <= 12; i++) {

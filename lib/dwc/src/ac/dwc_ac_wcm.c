@@ -202,7 +202,7 @@ static void SetDataListTail(u8 id, const WMBssDesc *bss, u8 tag, ACWORK *work) {
     }
     info->rssi = level;
     info->channel = tag;
-    WCM_FillApEntry(bss, dest);
+    WCMi_BssDescCopy(bss, dest);
 }
 
 // Refreshes a candidate with a beacon of the same access point: its signal and the tag, if the signal is stronger

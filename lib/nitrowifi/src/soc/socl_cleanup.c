@@ -28,7 +28,7 @@ int SOCL_Cleanup(void) {
             SOCLiConfigPtr->free(SOCLiCPSConfig.lan_buf);
         }
         SOCLiConfigPtr = NULL;
-        SOCLi_ResetSocketCount();
+        SOCLi_InitResource();
     }
     return result;
 }

@@ -64,7 +64,7 @@ typedef void (*WCMRecvInd)(const u8 *srcAddr, const u8 *dstAddr, const u8 *buf, 
 s32 WCM_Init(void *work, s32 size);
 // WCM_Init selects mode 1 (DS). The core also accepts 2 (DSi, requiring 0x4800 bytes), or 0 to use the stored
 // preference or hardware default. Main's direct caller selects mode 2; this parameter is a mode, not a boolean.
-s32 WCM_InitCore(void *work, s32 size, s32 requestedMode);
+s32 WCM_InitEx(void *work, s32 size, s32 requestedMode);
 // Releases the work buffer: 0, or 1 when WCM is not initialized or not idle (state 1)
 s32 WCM_Finish(void);
 s32 WCM_StartupAsync(WCMConfig *config, WCMNotify notify);
@@ -92,7 +92,7 @@ u32 WCM_UpdateOption(u32 option);
 #define WCM_OPTION_AUTH_SHAREDKEY 0xc0000
 // DS mode fills gaps between the lowest and highest hardware-allowed channel bits; DSi uses its backend mask.
 // Returns zero outside states 3 through 10.
-s32 WCM_GetChannelMask(void);
+s32 WCM_GetAllowedChannel(void);
 // Clears the AP-list storage with IRQs disabled, invalidating borrowed AP-list records regardless of list lock.
 void WCM_ClearApList(void);
 // Returns a computed level from 0 through 3 in connected state 9, or zero otherwise.
@@ -102,14 +102,14 @@ s32 WCM_LockApList(s32 lock);
 WMBssDesc *WCM_PointApList(u16 index);
 // A beacon or probe response NitroSDK's WM handed WCM; fills or touches its WCM_PointApList entry
 void WCMi_EntryApList(const WMBssDesc *bss, u16 scanLinkLevel);
-// Descriptive name: destination is a raw 0xc0-byte retained descriptor with selected IEs packed after offset 0x40.
-void WCM_FillApEntry(const WMBssDesc *source, WMBssDesc *destination);
+// destination is a raw 0xc0-byte retained descriptor with selected IEs packed after offset 0x40.
+void WCMi_BssDescCopy(const WMBssDesc *source, WMBssDesc *destination);
 // Borrowed SSID bytes and optional length, or NULL/zero while disconnected. The bytes need not be
 // NUL-terminated and remain owned by WCM; a connection change or Finish can invalidate the pointer.
 u8 *WCM_GetApEssid(u16 *ssidLength);
 void WCMi_CpsifRecvCallback(const u8 *src, const u8 *dst, const u8 *data, s32 len);
 // Releases one mutex level only when its owner is the IRQ-handler address used as a special marker.
-void WcmCpsifUnlockMutexInIRQ(OSMutex *mutex);
+void WCMi_CpsifUnlockMutexInIRQ(OSMutex *mutex);
 // Sends to the six-byte address dst, copying headerLen/dataLen bytes into WCM's work during this call. Assembly
 // precedes backend length validation. Returns -1 without work or -4 for an invalid state/reset in progress;
 // after a send attempt it returns headerLen + dataLen even if the backend rejected the assembled frame.
