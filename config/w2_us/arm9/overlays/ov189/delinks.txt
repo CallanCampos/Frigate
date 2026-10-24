@@ -38,7 +38,7 @@ lib/dpw/src/dpw_battle_tower.c:
     .data       start:0x021ae468 end:0x021ae53c
     .bss        start:0x021b2c7c end:0x021b2fa8
 
-lib/dwc/src/gamestats/gamestats.c:
+lib/dwc/src/enc/dwc_encsession.c:
     .text       start:0x021a897c end:0x021a9130
     .rodata     start:0x021aceb8 end:0x021acee0
     .data       start:0x021ae53c end:0x021ae6c4

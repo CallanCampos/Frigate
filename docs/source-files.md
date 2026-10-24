@@ -1951,7 +1951,7 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 | `nd.c` | `0x021a54b4`–`0x021a6c84` | 61 | partial | descriptive |
 | `dpw_tr.c` | `0x021a6c84`–`0x021a8010` | 19 | complete | descriptive |
 | `dpw_battle_tower.c` | `0x021a8010`–`0x021a893c` | 12 | complete | descriptive |
-| `gamestats.c` | `0x021a893c`–`0x021a90f0` | 16 | partial | descriptive |
+| `dwc_encsession.c` | `0x021a893c`–`0x021a90f0` | 16 | partial | descriptive |
 | `crypt.c` | `0x021a90f0`–`0x021ac838` | 67 | complete | descriptive |
 
 ### Overlay 190
