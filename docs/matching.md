@@ -3055,10 +3055,10 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   variable. Either `opt_loop_invariants` or `opt_strength_reduction` does it, so only both pragmas off stop it. A
   pointer conversion around the element's whole address, `*(f32 *)&words[v + 1]`, hides the address from that pass,
   and each read keeps its own `(v + 1) << 2`; a cast on the base alone, `((f32 *)buffer)[v + 1]`, or a same-width cast
-  of the index does not. `ica_anime.c`'s `GFL_G3DCurvePreloadFrames` matches so with a `u32 *` buffer of floats,
-  which is not used, as nothing else there types the buffer as words: try it where a buffer really holds another type.
-  It is the cast that hides the address, not a change of type: the same function matches with its `f32 *` buffer
-  read as `*(f32 *)&values[v + 1]`, a cast to the type it already has, which is not used either.
+  of the index does not. It is the cast that hides the address, not a change of type: `ica_anime.c`'s
+  `GFL_G3DCurvePreloadFrames` reads its `f32 *` buffer as `*(f32 *)&values[v + 1]`, a cast to the type it already
+  has, which is how its loop matches (its curve files hold only floats, so a `u32 *` buffer, which matches too, has
+  no evidence).
 - MWCC's `-flag` takes a pragma's name, so `-flag no-opt_loop_invariants -flag no-opt_strength_reduction` turns the
   two passes off for a whole file exactly as the two pragmas do, while the `-opt noloopinvariants` and
   `-opt nostrength` sub-options after `-O4,p` change nothing. `ica_anime.c` matches whole with the two `-flag`s in
