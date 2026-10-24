@@ -14,10 +14,10 @@ entries are rejected. It needs no ROM, so CI runs it.
 import argparse
 import re
 import sys
-import tomllib
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+from tools.build.merge_objects import merged_sources  # noqa: E402
 from tools.decomp.dsd_config import ROOT, parse_symbols  # noqa: E402
 
 DOC = ROOT / "docs" / "nonmatching-functions.md"
@@ -77,11 +77,9 @@ def symbols_by_module(version: str) -> dict[str, dict[str, set[int]]]:
 def merged_parts() -> dict[str, list[str]]:
     """Returns the parts of each merged file (config/merged_sources.toml), which delinks.txt lists under their own
     names, in their own modules, while the whole's source holds their code."""
-    path = ROOT / "config" / "merged_sources.toml"
     parts = {}
-    if path.exists():
-        for part, whole in tomllib.loads(path.read_text())["merged"].items():
-            parts.setdefault(whole, []).append(part)
+    for part, whole in merged_sources(ROOT / "config/merged_sources.toml").items():
+        parts.setdefault(whole, []).append(part)
     return parts
 
 

@@ -25,6 +25,7 @@ from pathlib import Path
 ROOT = Path(__file__).parent.resolve()
 sys.path.insert(0, str(ROOT))
 from tools.build.deadstrip import load_manifest as load_deadstrip  # noqa: E402
+from tools.build.merge_objects import merged_sources  # noqa: E402
 from tools.data.gen_constants import ordered_files  # noqa: E402
 from tools.data.graphics_archive import GRAPHICS, directory_archive  # noqa: E402
 from tools.text.pms_words import CATEGORIES as PMS_WORD_CATEGORIES  # noqa: E402
@@ -203,7 +204,7 @@ DEADSTRIP = load_deadstrip(ROOT / "config/deadstrip.toml", ROOT)
 LIBRARY_COMPILERS = list(dict.fromkeys([*(compiler for compiler, _ in LIBRARIES.values()), *FILE_COMPILERS.values()]))
 FILE_FLAGS.update(load_source_flags(ROOT / "config/compiler_flags.toml"))
 # Parts of merged files, each mapped to its whole, whose object it links from (tools/build/merge_objects.py)
-MERGED_SOURCES: dict[str, str] = tomllib.loads((ROOT / "config/merged_sources.toml").read_text())["merged"]
+MERGED_SOURCES = merged_sources(ROOT / "config/merged_sources.toml")
 # Header search path of every source file, the game's and the libraries': the game's headers, each library's public
 # headers, and the headers the build generates from the constant lists in generated/ (see
 # tools/data/gen_constants.py). A library's private headers sit beside its sources.

@@ -20,10 +20,10 @@ import argparse
 import csv
 import re
 import sys
-import tomllib
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+from tools.build.merge_objects import merged_sources  # noqa: E402
 from tools.decomp.dsd_config import ROOT, SYMBOL_RE, config_lock  # noqa: E402
 
 PRIMARY = "b2_us"
@@ -69,10 +69,9 @@ def owning_source(module: str, addr: int) -> Path | None:
 def code_source(source: Path | None) -> Path | None:
     """The file that holds a source's code: a part of a merged file has its code in its whole's
     (config/merged_sources.toml)."""
-    path = ROOT / "config/merged_sources.toml"
-    if source is None or not path.exists():
+    if source is None:
         return source
-    merged = tomllib.loads(path.read_text())["merged"]
+    merged = merged_sources(ROOT / "config/merged_sources.toml")
     return ROOT / merged.get(source.relative_to(ROOT).as_posix(), source.relative_to(ROOT).as_posix())
 
 

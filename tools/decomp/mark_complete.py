@@ -13,10 +13,10 @@ version, restoring the original assembly fallback without checking static refere
 import argparse
 import re
 import sys
-import tomllib
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+from tools.build.merge_objects import merged_sources as load_merged_sources  # noqa: E402
 from tools.decomp.dsd_config import config_lock, reloc_module_names  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -27,8 +27,7 @@ SECTION_RANGE_RE = re.compile(r"\s*(\S+)\s+start:(0x[0-9a-f]+) end:(0x[0-9a-f]+)
 
 def merged_sources() -> dict[str, str]:
     """Each part of a merged file, mapped to its whole."""
-    path = ROOT / "config/merged_sources.toml"
-    return tomllib.loads(path.read_text())["merged"] if path.exists() else {}
+    return load_merged_sources(ROOT / "config/merged_sources.toml")
 
 
 def merged_ranges(source: str, version_dir: Path) -> list[tuple[Path, int, int]]:
