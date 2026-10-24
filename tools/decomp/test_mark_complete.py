@@ -108,6 +108,30 @@ class StaticReferenceTests(unittest.TestCase):
                     f'from:{origin:#010x} kind:arm_call to:0x02100000 module:overlay(11)\n')
                 self.assertEqual(self.check(), expected)
 
+    def test_merged_whole_references_are_internal_to_a_part(self):
+        self.relocs()
+        (self.root / self.source).write_text('static int Local(void) { return 1; }\nstatic int PartLocal(void) { return 2; }\n')
+        (self.root / 'config/merged_sources.toml').write_text('[merged]\n"src/library_part.c" = "src/library.c"\n')
+        part = self.version / 'ltd_autoload_0'
+        part.mkdir()
+        (part / 'delinks.txt').write_text('src/library_part.c:\n    .ltdmain start:0x02700000 end:0x02700020\n')
+        (part / 'symbols.txt').write_text('PartLocal kind:function(thumb,size=0x10) addr:0x02700000\n')
+        (part / 'relocs.txt').write_text('')
+        for origin, expected in ((0x02100004, []), (0x02100020, ['PartLocal'])):
+            with self.subTest(origin=origin):
+                (self.owner / 'relocs.txt').write_text(
+                    f'from:{origin:#010x} kind:arm_call to:0x02700000 module:ltd_autoload(0)\n')
+                self.assertEqual(mark_complete.externally_used_statics('src/library_part.c', self.version), expected)
+
+    def test_ltd_autoload_static_reference(self):
+        self.relocs('from:0x02000000 kind:arm_call to:0x02700000 module:ltd_autoload(0)')
+        ltd = self.version / 'ltd_autoload_0'
+        ltd.mkdir()
+        (ltd / 'delinks.txt').write_text('src/ltd.c:\n    .text start:0x02700000 end:0x02700020\n')
+        (ltd / 'symbols.txt').write_text('Local kind:function(arm,size=0x10) addr:0x02700000\n')
+        (self.root / 'src/ltd.c').write_text('static int Local(void) { return 1; }\n')
+        self.assertEqual(mark_complete.externally_used_statics('src/ltd.c', self.version), ['Local'])
+
     def test_same_overlay_unowned_and_end_boundary_sources_rejected(self):
         self.relocs()
         with (self.owner / 'delinks.txt').open('a') as f:

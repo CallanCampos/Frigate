@@ -31,18 +31,21 @@ def merged_sources() -> dict[str, str]:
     return tomllib.loads(path.read_text())["merged"] if path.exists() else {}
 
 
-def merged_part_ranges(source: str, version_dir: Path) -> list[tuple[Path, int, int]]:
-    """The section ranges of a merged file's parts, each with its module's config directory. The parts link from the
-    whole's object, so their references are the file's own (config/merged_sources.toml)."""
-    parts = {f"{part}:" for part, whole in merged_sources().items() if whole == source}
+def merged_ranges(source: str, version_dir: Path) -> list[tuple[Path, int, int]]:
+    """The section ranges of the rest of a merged file, its whole and its parts but the source, each with its module's
+    config directory. They link from the whole's object, so their references are the file's own
+    (config/merged_sources.toml)."""
+    merged = merged_sources()
+    whole = merged.get(source, source)
+    members = {f"{member}:" for member in {whole, *(part for part, of in merged.items() if of == whole)} - {source}}
     ranges = []
-    if parts:
+    if members:
         for delinks in version_dir.rglob("delinks.txt"):
             current = None
             for line in delinks.read_text().splitlines():
                 if line and not line[0].isspace():
                     current = line
-                elif current in parts and (m := SECTION_RANGE_RE.match(line)):
+                elif current in members and (m := SECTION_RANGE_RE.match(line)):
                     ranges.append((delinks.parent, int(m.group(2), 16), int(m.group(3), 16)))
     return ranges
 
@@ -53,6 +56,8 @@ def module_name(config_dir: Path, version_dir: Path) -> str:
         return "main"
     if config_dir.name.startswith("ov"):
         return f"overlay({int(config_dir.name[2:])})"
+    if match := re.fullmatch(r"(ltd_)?autoload_(\d+)", config_dir.name):
+        return f"{match.group(1) or ''}autoload({match.group(2)})"
     return config_dir.name
 
 
@@ -60,7 +65,7 @@ def externally_used_statics(source: str, version_dir: Path) -> list[str]:
     """Returns static functions referenced outside their original source file."""
     # A part of a merged file has its code in its whole's source (config/merged_sources.toml)
     text = (ROOT / merged_sources().get(source, source)).read_text()
-    part_ranges = merged_part_ranges(source, version_dir)
+    merged = merged_ranges(source, version_dir)
     for delinks in version_dir.rglob("delinks.txt"):
         lines = delinks.read_text().splitlines()
         if f"{source}:" not in lines:
@@ -73,7 +78,8 @@ def externally_used_statics(source: str, version_dir: Path) -> list[str]:
             if m:
                 bounds = (int(m.group(2), 16), int(m.group(3), 16))
                 owner_ranges.append(bounds)
-                if m.group(1) == ".text":
+                # Code: the LTD autoload's TwlSDK code is in .ltdmain
+                if m.group(1) in (".text", ".ltdmain"):
                     ranges.append(bounds)
             i += 1
         own = module_name(delinks.parent, version_dir)
@@ -95,8 +101,8 @@ def externally_used_statics(source: str, version_dir: Path) -> list[str]:
                     origin = int(m.group(1), 16)
                     if any(start <= origin < end for start, end in owner_ranges):
                         continue
-                if m and any(relocs.parent == part and start <= int(m.group(1), 16) < end
-                             for part, start, end in part_ranges):
+                if m and any(relocs.parent == member and start <= int(m.group(1), 16) < end
+                             for member, start, end in merged):
                     continue
                 # dsd v0.12.1-dsi.4's delinker uses first_module() for symbol
                 # relocations, so overlays(11,12) binds only overlay 11.

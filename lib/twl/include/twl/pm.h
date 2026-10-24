@@ -5,9 +5,9 @@
 #include "nitro/pm.h"
 
 // TwlSDK's power management for the DSi, in the LTD autoload: the callbacks run when the console is about to exit the
-// application, as when the power button is pressed. The functions and types have the names of the TWL-SDK Function
-// Reference Manual (PM_SetExitCallbackInfo, PM_GetExitFactor, the exit callback lists) from their code, and libntr's
-// where the manual has none
+// application, as when the power button is pressed. The PM_ functions and the types have the names of the TWL-SDK
+// Function Reference Manual (PM_SetExitCallbackInfo, PM_GetExitFactor, the exit callback lists) from their code, and
+// libntr's where the manual has none; the PMi_ functions of pm.c's DSi part have names of ours
 
 // The exit callbacks are the general PM callbacks, which the SDK's header names so with macros
 #define PMExitCallback PMGenCallback

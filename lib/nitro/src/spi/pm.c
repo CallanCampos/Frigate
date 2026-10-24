@@ -8,8 +8,8 @@
 // (func_0207ece4/e8, func_0207f058/5c and func_0207f16c/70, after their callers), and the DSi part calls back through
 // veneers of its own. The named functions have NitroSDK's names, as ntrtwl's reconstruction of NitroSDK has them, where
 // it has the code, and the DSi part's PM_ functions have the names of the TWL-SDK Function Reference Manual. The
-// TwlSDK-era functions have names in the SDK's style that it can't confirm elsewhere, and PMi_SendPxiRequest and the
-// DSi part's other functions have names of ours.
+// TwlSDK-era functions have names in the SDK's style that ntrtwl's reconstruction can't confirm, and PMi_SendPxiRequest
+// and the DSi part's other functions have names of ours.
 #include "nitro/pm.h"
 #include "nitro/card.h"
 #include "nitro/ctrdg.h"
