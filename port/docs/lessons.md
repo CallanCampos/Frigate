@@ -3,6 +3,28 @@
 What port work taught that isn't obvious from the code, newest first. A lesson about MWCC or the decomp's own
 workflow goes in the decomp checkout instead; this file is the port's ([CLAUDE.md](../CLAUDE.md), the iteration loop).
 
+## 2026-10-24: T5 on the field's sequences
+
+- **A report at a shared copy names the copy, not the source.** ASan put the field's H6 and the Route 19 route's
+  read at the same place, `NNS_GfdDoVramTransfer`, which copies every queued VRAM transfer at the VBlank, and the
+  battles' survey took them for one report. `ASAN_OPTIONS=poison_history_size=4096` adds the stack that poisoned the
+  memory: the report's free of a task menu in one, the cut-in's free of its bitmap in the other (H7). Read who freed
+  it before calling two reports at one place the same.
+- **UBSan's place in an inline function is the inline's line.** R11 reported at `fx.h:86`, `FX_SinIdx`, not at the
+  camera code that passed it the angle, and UBSan reports a place once a process: a survey run shows the first caller
+  that indexes outside the sine table and hides every other one until it is fixed. Run the survey again after each fix
+  to a check in an inline.
+- **A read outside a ROM table reads the ROM's neighbours.** The camera's angles a degree under 0 read 48 bytes before
+  `FX_SinCosTable_`, which on the DS are the end of the file system's interface table, zeros, and a host reads its own
+  linker's choice. The link map (`config/<version>/arm9/symbols.txt`, `delinks.txt`'s sections) and the extracted ARM9
+  image (`extract/<version>/arm9/arm9.bin`, loaded at `0x02004000`) say what the DS reads, and whether it is constant
+  (`.rodata`). Then follow the values on: the DS's zeros made one of the function's divisors 0, a case the fix had to
+  give the DS's result too.
+- **Find who made a leftover object by its creator's return address.** H5's handle was freed with the prop system,
+  far from where it was made. A scratch build that printed each handle with `__builtin_return_address` at creation and
+  at the system's free, symbolized with `atos` and the run's slide (a known function's runtime address against `nm`'s),
+  named the script command in one run, without a debugger.
+
 ## 2026-10-24: phase 3's exit route
 
 - **A route through the field keeps random numbers out of its way.** GFL's seed differs between the programs
