@@ -35,6 +35,7 @@ static void TestValidFile(void) {
                                "time 2012-10-07 12:00:00   # the RTC\n"
                                "version b2_us\n"
                                "frames video\n"
+                               "clock pinned  # stays at the time\n"
                                "1 -\n"
                                "120\tA\n"
                                "121 -   -\n"
@@ -56,6 +57,7 @@ static void TestValidFile(void) {
     CHECK(strcmp(input.time, "2012-10-07 12:00:00") == 0);
     CHECK(strcmp(input.version, "b2_us") == 0);
     CHECK(input.frames == PBW_INPUT_VIDEO_FRAMES);
+    CHECK(input.clock == PBW_INPUT_CLOCK_PINNED);
     CHECK(input.count == 9);
 
     state = pbw_input_state(&input, 1);
@@ -89,11 +91,12 @@ static void TestStatesBeforeTheFirstChange(void) {
     CHECK(pbw_input_state(&input, 10).buttons == PBW_INPUT_A);
     CHECK(pbw_input_state(&input, 0xffffffffu).buttons == PBW_INPUT_A);
     CHECK(input.time[0] == '\0' && input.version[0] == '\0');
-    // Game frames unless the file says otherwise
+    // Game frames and a running clock unless the file says otherwise
     CHECK(input.frames == PBW_INPUT_GAME_FRAMES);
+    CHECK(input.clock == PBW_INPUT_CLOCK_RUNNING);
     pbw_input_free(&input);
-    CHECK(Parse(&input, "pbwinput 1\nframes game\n10 A\n", error, sizeof(error)));
-    CHECK(input.frames == PBW_INPUT_GAME_FRAMES && input.count == 1);
+    CHECK(Parse(&input, "pbwinput 1\nframes game\nclock running\n10 A\n", error, sizeof(error)));
+    CHECK(input.frames == PBW_INPUT_GAME_FRAMES && input.clock == PBW_INPUT_CLOCK_RUNNING && input.count == 1);
     pbw_input_free(&input);
 
     // A header alone: nothing held on any frame
@@ -158,6 +161,11 @@ static void TestErrors(void) {
         { "pbwinput 1\nframes game video\n", "game or video" },
         { "pbwinput 1\nframes video\nframes video\n", "one \"frames\" line" },
         { "pbwinput 1\n1 A\nframes video\n", "one \"frames\" line" },
+        { "pbwinput 1\nclock\n", "running or pinned" },
+        { "pbwinput 1\nclock stopped\n", "running or pinned" },
+        { "pbwinput 1\nclock pinned running\n", "running or pinned" },
+        { "pbwinput 1\nclock pinned\nclock pinned\n", "one \"clock\" line" },
+        { "pbwinput 1\n1 A\nclock pinned\n", "one \"clock\" line" },
         { "pbwinput 1\n10 AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\n",
           "longer than" },
     };
@@ -302,6 +310,7 @@ static void TestFormatAndRoundTrip(const char *program) {
     memcpy(input.time, "2012-10-07 12:00:00", 20);
     memcpy(input.version, "w2_us", 6);
     input.frames = PBW_INPUT_VIDEO_FRAMES;
+    input.clock = PBW_INPUT_CLOCK_PINNED;
     memset(&state, 0, sizeof(state));
     CHECK(pbw_input_append(&input, 1, &state));
     CHECK(input.count == 0);
@@ -343,6 +352,7 @@ static void TestFormatAndRoundTrip(const char *program) {
     CHECK(strcmp(back.time, input.time) == 0);
     CHECK(strcmp(back.version, input.version) == 0);
     CHECK(back.frames == PBW_INPUT_VIDEO_FRAMES);
+    CHECK(back.clock == PBW_INPUT_CLOCK_PINNED);
     for (i = 0; i < input.count && i < back.count; i++) {
         CHECK(back.changes[i].frame == input.changes[i].frame);
         CHECK(SameState(back.changes[i].state, input.changes[i].state));

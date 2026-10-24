@@ -36,7 +36,7 @@ set(port_pxi_scenarios
     pm_battery_backlight pm_amp pm_sleep pm_power_off
     tp_sampling tp_calibration tp_auto_sampling
     nvram_user_info nvram_read nvram_write
-    rtc_fixed_time rtc_runs_with_clock rtc_async rtc_host_time
+    rtc_fixed_time rtc_runs_with_clock rtc_pinned rtc_async rtc_host_time
     reset_command ctrdg_empty mic_silence
     snd_init snd_sequence_ends snd_sequence_loops snd_sequence_tracks snd_sequence_variables
     snd_sequence_shifts snd_sequence_outside snd_invalidate snd_alarm snd_driver_info)

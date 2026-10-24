@@ -631,6 +631,27 @@ static void TestRtcRunsWithClock(void) {
     CHECK(date.year == 0 && date.month == 1 && date.day == 1);
 }
 
+// A replay's pinned clock (an input file's "clock pinned") stays at the fixed time while the virtual clock runs, and
+// runs with it again from where the virtual clock is once it isn't pinned
+static void TestRtcPinned(void) {
+    RTCDate date;
+    RTCTime time;
+
+    port_rtc_set_pinned(1);
+    Boot();
+    RTC_Init();
+    WaitFrames(180);
+    CHECK(RTC_GetDateTime(&date, &time) == RTC_RESULT_SUCCESS);
+    Log("pinned, after 180 frames: %02u:%02u:%02u", time.hour, time.minute, time.second);
+    CHECK(date.year == 12 && date.month == 6 && date.day == 23);
+    CHECK(time.hour == 13 && time.minute == 45 && time.second == 56);
+    port_rtc_set_pinned(0);
+    CHECK(RTC_GetTime(&time) == RTC_RESULT_SUCCESS);
+    Log("running again: %02u:%02u:%02u", time.hour, time.minute, time.second);
+    // Some 3 s of the virtual clock have gone by since the game started
+    CHECK(time.hour == 13 && (time.minute > 45 || time.second > 56));
+}
+
 static void LogRtcDone(RTCResult result, void *arg) {
     Log("callback %d (%s)", result, (const char *)arg);
 }
@@ -1059,6 +1080,7 @@ static const Test sTests[] = {
     { "nvram_write", TestNvramWrite },
     { "rtc_fixed_time", TestRtcFixedTime },
     { "rtc_runs_with_clock", TestRtcRunsWithClock },
+    { "rtc_pinned", TestRtcPinned },
     { "rtc_async", TestRtcAsync },
     { "rtc_host_time", TestRtcHostTime },
     { "reset_command", TestResetCommand },

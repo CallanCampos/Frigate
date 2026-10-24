@@ -78,11 +78,12 @@ static const Option sOptions[] = {
     { "audio-dump", "PATH", 0, "writes the sound as it is made to a WAV file, with or without --headless" },
     { "input", "FILE", 0,
       "plays the buttons, lid and touch of an input file instead of the window's (port/app/replay.h); its time line "
-      "(or the format's default) sets the clock unless --fixed-time is given" },
+      "(or the format's default) sets the clock unless --fixed-time is given, and its clock line can pin the clock "
+      "there for the whole run" },
     { "rom", "PATH", 0, "the player's ROM (port/hal/rom)" },
     { "save-dir", "PATH", 0, "where saves go (port/hal/card)" },
     { "fixed-time", "\"YYYY-MM-DD HH:MM:SS\"", 0,
-      "the clock's time at boot, moving with the virtual clock (port/hal/rtc)" },
+      "the clock's time at boot, moving with the virtual clock unless --input's file pins it (port/hal/rtc)" },
     { "run-dir", "DIR", 0,
       "writes a run directory for the melonDS oracle's compare.py (port/app/run_dir.h): frames.tsv with a row at every "
       "frame (the video frame, NitroSDK's VBlank count, GFL's frame count, the game frame and each screen's hash), "
@@ -551,12 +552,14 @@ int main(int argc, char **argv) {
         if (!port_replay_open(inputPath)) {
             return EXIT_BAD_OPTIONS;
         }
-        // The file's time is the clock's unless --fixed-time says otherwise (port/hal/rtc reads that at boot)
+        // The file's time is the clock's unless --fixed-time says otherwise (port/hal/rtc reads that at boot); either
+        // stays put for the whole run when the file pins the clock, as on the oracle
         if (port_app_option("fixed-time") == NULL && !port_rtc_set_fixed_time(port_replay_time())) {
             fprintf(stderr, "port: --input %s: its time \"%s\" isn't a time the clock can hold\n", inputPath,
                     port_replay_time());
             return EXIT_BAD_OPTIONS;
         }
+        port_rtc_set_pinned(port_replay_clock_pinned());
     }
     runDir = port_app_option("run-dir");
     if ((runDir != NULL && *runDir == '\0') ||

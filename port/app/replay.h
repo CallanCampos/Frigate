@@ -15,6 +15,8 @@ int port_replay_active(void);
 // The real-time clock at power-on for the replay, "YYYY-MM-DD HH:MM:SS": the file's "time" line, or the format's
 // default when it has none, never the host's time, so that the oracle and the port start from the same moment
 const char *port_replay_time(void);
+// Whether the file pins the clock at that time for the whole run ("clock pinned"), as the oracle then does too
+int port_replay_clock_pinned(void);
 // The file's "version" line, "b2_us" or "w2_us", or NULL when it has none
 const char *port_replay_version(void);
 // What the file's frames count, "game" or "video", or NULL without a file

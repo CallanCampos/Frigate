@@ -221,6 +221,7 @@ pbwinput 1
 time 2012-10-07 12:00:00      # optional: the clock at power-on
 version b2_us                 # optional: b2_us or w2_us
 frames game                   # optional: game (the default) or video
+clock pinned                  # optional: running (the default) or pinned
 # FRAME BUTTONS [TOUCH]
 120 A                         # A held from frame 120
 122 -                         # nothing held from frame 122
@@ -231,9 +232,18 @@ frames game                   # optional: game (the default) or video
 ```
 
 - The first line that isn't blank or a comment is `pbwinput 1`, the format's version.
-- `time`, `version` and `frames` come before the first frame line, once each. `time` is `YYYY-MM-DD HH:MM:SS` from
-  2000 to 2099; the oracle's `--time` overrides it. `version` is checked against the ROM's game code (`IREO` for
-  `b2_us`, `IRDO` for `w2_us`).
+- `time`, `version`, `frames` and `clock` come before the first frame line, once each. `time` is
+  `YYYY-MM-DD HH:MM:SS` from 2000 to 2099; the oracle's `--time` overrides it. `version` is checked against the ROM's
+  game code (`IREO` for `b2_us`, `IRDO` for `w2_us`).
+- `clock` says whether the real-time clock runs on from `time`: **`running`**, the default, as a console's does, or
+  **`pinned`**, at `time` for the whole run. A running clock moves with each program's video frames, and the DS takes
+  more of them than the port to reach the same count (its movies, its loads), so a screen that shows the clock, such as
+  the field menu's bottom screen, shows another time on each at the same count: some 34 seconds apart once the field
+  has opened, which turns the colon on or off (it shows on odd seconds, `src/system/infowin.c`) and the minute over on
+  different frames. Pinned, both show the same time, so the comparison can hold that screen exact. The oracle stops
+  melonDS's clock chip timer, which counts the seconds on, and the port's clock stays at its fixed time
+  (`port/hal/rtc/rtc7.c`); the game never uses the chip's interrupts, which the timer also raises. Only the date and
+  time stop: the play time counts the CPU's ticks (`src/system/playtime_ctrl.c`), and goes on as before.
 - `frames` says what FRAME counts. **`game`**, the default, counts passes of the game's main loop, the only count that
   gives both programs the same input at the same moment of the game ([PLAN.md §6](../../docs/PLAN.md#6-verification)):
   the DS drops frames under load and its start-up takes 241 frames, and the port does neither. Game frame N is the pass
@@ -819,8 +829,9 @@ What the port needs to compare itself frame by frame:
   `pbw_input_state(&input, pbw_input_frame_at_vblank(&input, &clock, frame, count))`, with `frame` the hook's count
   since `main()` and `count` GFL's frame count. The state goes in through `port_input_set` and the touch panel's host
   setter. The real-time clock at power-on is `--fixed-time`, else the file's `time` line, else the format's default
-  (2012-10-07 12:00:00), never the host's; `oracle.py port --input` passes `--fixed-time` only when it is given
-  `--time`, as `oracle.py run` does with the oracle.
+  (2012-10-07 12:00:00), never the host's, and it stays there for the run when the file's `clock` line pins it;
+  `oracle.py port --input` passes `--fixed-time` only when it is given `--time`, as `oracle.py run` does with the
+  oracle.
 - **Memory dumps** by name, written as `memory.txt` (done for globals: `--run-dump`, `oracle.py port --dump`). The
   game's statics have no name the program can look up; a static the comparisons need will need the port to export
   its address.

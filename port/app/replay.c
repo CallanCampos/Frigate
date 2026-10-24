@@ -46,6 +46,10 @@ const char *port_replay_version(void) {
     return sActive && sInput.version[0] != '\0' ? sInput.version : NULL;
 }
 
+int port_replay_clock_pinned(void) {
+    return sActive && sInput.clock == PBW_INPUT_CLOCK_PINNED;
+}
+
 const char *port_replay_frames(void) {
     if (!sActive) {
         return NULL;
