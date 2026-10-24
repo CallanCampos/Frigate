@@ -36,13 +36,16 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
 
 - **Upstream:** `629a53cccb` (upstream merge #504), as `main` has it since PR 27; this branch merges no upstream commit.
 - **Port:** `PORT_SHA`, on the topic `port-battle-ptrcasts` from `main` at `c0a0d67c84` (PR 19's merge): `51ea50ac0f`,
-  the retyping with its row of [game-changes.md](game-changes.md), the guard's baseline and the feature map's rows,
-  and this commit, the records, which fills that row's commit and the last entry's `PORT_SHA`, `f6c426990d`.
+  the retyping with its row of [game-changes.md](game-changes.md), the guard's baseline and the feature map's rows;
+  `2c0c902d55`, the records, which filled that row's commit and the last entry's `PORT_SHA`, `f6c426990d`; and this
+  commit, the review's round (below), which changes only `port/`.
 - **ROM:** T0 passes on `51ea50ac0f`'s tree: `python3 configure.py && ninja`, from an empty build directory, compiled
   every C file of both versions with no compiler warning, and both SHA1s match (Black 2
   `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb`, White 2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`). The build began
-  before the change, so `ninja` ran again after it, rebuilding the objects the change touched (the 11 files that
-  include `battle/btl_event.h`) until it had no work left, and checked both SHA1s again: they match.
+  before the change, so `ninja` ran again after it, rebuilding the objects the change touched (the 11 files that include
+  `battle/btl_event.h`) until it had no work left, and checked both SHA1s again: they match. On the review's round,
+  which changes no file outside `port/`, `python3 configure.py && ninja` again checked both ROMs and had no other work:
+  both SHA1s match.
 - **MWCC-neutrality:** `port/tools/check_mwcc_neutral.py --base origin/main` (`c0a0d67c84`): 3,558 of 3,558 file and
   version pairs preprocess identically (`sptr` and `uptr` are `s32` and `u32` for MWCC). The files the branch changes
   and the 11 that include the header (`ninja -t deps`) are complete in both versions, so no compiler probe applies; the
@@ -56,15 +59,22 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
   these builds), `frame_times_party_menus` (the oracle's save), `asm_oracle` (no Unicorn in this Python) and
   `app_universal_slices` (a distribution build's); in Black 2 also `frame_times_new_game`, which `frame_times.py` skips
   over its budget while the load average is above the machine's 8 cores (other sessions' builds held it at 20 to 50);
-  run alone (`ctest -R`), it passed, every scene's 95th percentile within the budget of 8.36 ms. T3 by hand, the
-  Route 19 route (`frigate-black2 --headless --frames 10500 --input port/tests/oracle/route19_save_b2_us.pbwinput
-  --save-dir DIR --run-dir DIR`, from `starter_save`'s save, SHA-1 `ce71fe0b8c1d`, the one `oracle.py` keeps; White 2
-  from its `3b9dac231d1f` with the input's version line changed, to frame 10,700): Hugh's battle plays to its end in
-  both, Tepig at level 6 and Hugh's last words, the screen black from frame 9,804 and the field from 9,871 in Black 2,
-  and from 10,012 and 10,079 in White 2, the frames that the entry of Hugh's battle (2026-10-24, below) gives for its
-  run with a local candidate, the semi-invulnerable conditions' table that `main` now has from upstream. Every move
-  used sets variable 0x3f (`ServerEvent_SetMoveMessage`), now at pointer width; no move of the route has one of the
-  eight message handlers, so no route reaches their reads yet. T4, T5 and T7 not run.
+  run alone (`ctest -R`), it passed, every scene's 95th percentile within the budget of 8.36 ms. T3 by hand, the Route
+  19 route (`frigate-black2 --headless --frames 10500 --input port/tests/oracle/route19_save_b2_us.pbwinput --save-dir
+  DIR --run-dir DIR`, from `starter_save`'s save, SHA-1 `ce71fe0b8c1d`, the one `oracle.py` keeps; White 2 from its
+  `3b9dac231d1f` with the input's version line changed, to frame 10,700): Hugh's battle plays to its end in both, Tepig
+  at level 6 and Hugh's last words, the screen black from frame 9,804 and the field from 9,871 in Black 2, and from
+  10,012 and 10,079 in White 2, the frames that the entry of Hugh's battle (2026-10-24, below) gives for its run with a
+  local candidate, the semi-invulnerable conditions' table that `main` now has from upstream. Every move used sets
+  variable 0x3f (`ServerEvent_SetMoveMessage`), now at pointer width; no move of the route has one of the eight message
+  handlers, so no route reaches their reads yet. The review's round ran the route on past the battle, with the same
+  builds and saves, to frame 20,500 in Black 2 and 20,700 in White 2: both stop at frame 20,077, at Bianca's wild
+  encounter, on GFL's overlay collision assert (`GFL_OvlLoad` from `EventFieldEffect_CreateBattleCutin`, which
+  `EventEncountEffectCutin_Callback` calls; the error screen spins and the watchdog ends the run, status 73), the
+  encounter effects' four entries of [decomp-findings.md](decomp-findings.md), which upstream's #496 fixes (merged
+  upstream at `b962ecf040`, after `629a53cccb`, so not on `main` yet). After the round's change to the guard's baseline,
+  a note, `game_ptrcasts` and `game_ptrcasts_tool` pass again in both versions (`ctest -R game_ptrcasts`). T4, T5 and T7
+  not run.
 - **Tiers:** unchanged: the branch adds and removes no game C.
 - **Trap stubs:** 30 function stubs and 21 data placeholders per version (`build/port*/gen/stubs.c`), as the last
   entry's; none in the battle's overlays 167 to 170.
@@ -81,29 +91,54 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
   getter that returns numbers and an address alike, the values (`BattleEventVarStack.values`) and
   `BattleEventVar_SetConstValue`'s value are `sptr`, the getter returns a `uptr`, and the setters' four `(s32)` casts
   are `(sptr)`; the other setters keep their `s32`, since no caller gives them an address. Its row of
-  [game-changes.md](game-changes.md) is the last. That every other variable's number gives the host the DS's result was
-  checked with `clang-query` (Homebrew LLVM's) on each build's compile database, over the 11 files that include the
-  header, with matchers of the getter's calls: of its 1,128 calls, 8 read variable 0x3f and are cast to the string's
-  pointer; none is converted to a 64-bit or floating type, a switch's condition, a division, a remainder or a right
-  shift; 9 go through arithmetic (`+`, `*`, `<<`, unary `-`, `& 1`) that is then kept in 32 bits or tested; and the 20
-  comparisons with anything but a non-negative constant, an enumerator or an unsigned 8- or 16-bit value are of
-  variables that hold mon, type, stat, condition, weather and category IDs (variables 2, 3 and 4, 6 on for the targets,
-  0x16, 0x1a, 0x1d, 0x1f and 0x39, set from `GetMonID`, a move's type and category, a stat or condition ID and the
-  weather), whose bit 31 is clear, so comparing them at 64 bits gives the DS's result. The same matches in both
-  versions. `check_ptrcasts.py --update` dropped the 12 R06 rows and added 7 `harmless` `narrow` rows, each classified
-  with its reason: five handlers' arithmetic on a number kept in 32 bits (Simple's doubled stages, Weather Ball's
-  doubled power, Psyshock's and Wonder Room's defense swap count, the Jaboca and Rowap Berries' attacker ID) and two
-  reads of a slot inside `battle_event.c` (`BattleEventVar_MulValue`'s multiplier and
-  `BattleEventVar_GetValueIfExist`'s, whose one caller reads variable 0x2e). No R06 site was a false alarm: each of the
-  12 carries the string's address on every path. [ARCHITECTURE.md](ARCHITECTURE.md#feature-map)'s guard row gives the
-  new counts and R06 among the fixed groups, and its battles row names `battle_event.c` and this fix.
-  `src/ov036/enceff_data.c` and `src/ov167/btl_pokeparam.c` are untouched.
+  [game-changes.md](game-changes.md) is the last. `check_ptrcasts.py --update` dropped the 12 R06 rows and added 7
+  `harmless` `narrow` rows, each classified with its reason: five handlers' arithmetic on a number kept in 32 bits
+  (Simple's doubled stages, Weather Ball's doubled power, Psyshock's and Wonder Room's defense swap count, the Jaboca
+  and Rowap Berries' attacker ID) and two reads of a slot inside `battle_event.c`: `BattleEventVar_MulValue`'s read of a
+  multiplied variable's fx32 product into `FX_Mul`, a slot written only by `BattleEventVar_SetMulValue` and with
+  `BattleEventVar_ClampValue`'s result, both `s32`, and `BattleEventVar_GetValueIfExist`'s, whose one caller reads
+  variable 0x2e. No R06 site was a false alarm: each of the 12 carries the string's address on every path.
+  [ARCHITECTURE.md](ARCHITECTURE.md#feature-map)'s guard row gives the new counts and R06 among the fixed groups, and
+  its battles row names `battle_event.c` and this fix.
+
+  That every other variable's number gives the host the DS's results is checked by the clang-query matchers of
+  [port/tools/battle_event_values.query](../tools/battle_event_values.query), which the review's round committed:
+  `clang-query -p build/port -f port/tools/battle_event_values.query $(git grep -l -e '"battle/btl_event.h"' -e
+  '"battle/btl_ability.h"' -- src)` (Homebrew LLVM 23.1.3) over the 11 files that include the header, and again with
+  `-p build/port-w2`. In both versions the matchers find the same sites, in the file's order:
+  - **Every call** of the getter: 1,128.
+  - **The address's path:** 8 reads of variable 0x3f and 8 casts of the getter's result to a pointer, the same sites
+    in the eight handlers; 4 setters given variable 0x3f and 4 given a pointer's value, the same sites, the server's
+    four `(sptr)string`.
+  - **Computed variables:** 9 reads whose variable is computed, none of which can be 0x3f: 3 (`run`) and 0x22 (`key`),
+    each set just before, and `6 + i` for the targets, `i` under variable 5's count of them.
+  - **Uses that differ at 64 bits for a negative number:** none, no division, remainder or right shift, switch, index,
+    `?:`, floating conversion, 64-bit parameter, variadic argument, or 64-bit variable, assignment or return.
+  - **Comparisons to read:** 20 with anything but an `int` literal, an enumerator or an unsigned 8- or 16-bit value. 19
+    are of variables that hold mon, type, stat, condition, weather and category IDs (variables 2, 3 and 4, `6 + i` for
+    the targets, 0x16, 0x1a, 0x1d, 0x1f and 0x39, set from `GetMonID`, a move's type and category, a stat or condition
+    ID and the weather), whose bit 31 is clear, and Helping Hand's compares variable 3 with its signed `work[0]`
+    (`move_handlers.c:6436`): each gives the DS's result at 64 bits.
+  - **Arithmetic to read:** 10 sites and a negation, each kept in 32 bits or tested for truth: the five handlers' that
+    are the guard's new rows; Contrary's negation of variable 0x20 into `BattleEventVar_RewriteValue`'s `s32`;
+    Pressure's `+ 1` into a `u8` and Rainbow's `* 2` into a `u16`; `MultiplyBasePower`'s `factor *=` and Bide's
+    `work[1] +=` into 32-bit variables; and `ServerEvent_GetTargetDefenses`'s `& 1` of the swap count, a truth test.
+
+  The review's round: the matchers, which the first round ran from a scratch directory, are committed with the command
+  and the result above, so the audit can be run again, and the tools guide has their row; SYNC.md's guard steps say to
+  check a `uptr` getter's numbers that way. ARCHITECTURE.md's battles row, which still had the route stop at the first
+  move, and its particles row say where the route stands; decomp-findings.md's battle table row is resolved upstream and
+  on `main`, and its encounter effects row has #496's merge and the stop in both versions. The game-changes row's Why is
+  one line, with the audit left to this entry, its proof names `main`'s `c0a0d67c84`, and its change says that the
+  header's three comments are the port's; the guard's `BattleEventVar_MulValue` row names the slot's product, not the
+  multiplier.
 - **Next:** this branch's PR, its checks and local verification (`port/tools/sync_upstream.sh --verify-pr`), and its
   merge. Then what the last entries' Next lists: what the sync's review found that it didn't cause (`compile_check.py`'s
   call of the removed `lib_compiler`, the rows that name functions upstream renamed, the two `printsys.c` rows that call
-  the file incomplete), and phase 4's battle past Hugh's, now that the Route 19 route plays his battle to its end on
-  `main`.
-- **Blockers:** none.
+  the file incomplete), and phase 4's battle: the Route 19 route as a test, which plays Hugh's battle to its end on
+  `main` and, once the sync brings #496 (upstream's `b962ecf040`), goes on past Bianca's wild encounter.
+- **Blockers:** none for this branch. Past Bianca's wild encounter, the Route 19 route waits for the sync of upstream's
+  `b962ecf040` (#496, the encounter effects' entries).
 
 ## 2026-10-24: the contributor's PR 19, addresses passed as values through `uptr` and `sptr`, with its records corrected
 
