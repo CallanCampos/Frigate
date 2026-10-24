@@ -1225,6 +1225,13 @@ Same code, other `sp` offsets or frame size.
 
 ## Instruction order
 
+- A table read through an inline getter that holds it as a function-local `static` is scheduled differently
+  from the same table at file scope, with the same data. NitroSystem's `NNS_G2dApplyOamManagerToHW`
+  (`g2d_OAM.c`) shifts the type's table index (`lsls r1, r1, #2`) before it spills the count (`str r2, [sp,
+  #8]`) only with the load functions as `GetOBJLoadFunction_`'s `static funcTbl`, as NitroSystem has them; at
+  file scope, or with the getter returning a file-scope table, the store comes first. With `u16` bounds its affine
+  loop matches over `GXOamAffine` records, not over groups of four `GXOamAttr`.
+
 - NitroWiFi's `send_ping` snapshots the current `u16` sequence after initializing the ICMP header. The socket port
   receives that value, the global advances, and the packet receives the saved value. Chained postincrement changes
   the order of the stores; the meaningful local preserves the value being serialized across the state update.

@@ -346,6 +346,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 ## Instructions in another order (scheduling)
 
+- A table index computed after a spill where the original computes it before: the table may be a function-local
+  `static` in an inline getter. (matching.md: "holds it as a function-local `static`")
+
 - Packet sequence stores in another order: snapshot the current sequence across the global increment.
   (matching.md: "snapshots the current `u16` sequence")
 
