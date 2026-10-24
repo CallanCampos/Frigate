@@ -103,32 +103,32 @@ static int sSpecialSounds[KEYBOARD_SPECIAL_KEYS] = { 0, 0, 0, 2 };
 
 static DWCUtilKeyboard *sKeyboard;
 
-static void DWCUtilKeyboard_SlideInRow0Task(DWCUtilTask *task, void *arg);
-static void DWCUtilKeyboard_SlideInRow1Task(DWCUtilTask *task, void *arg);
-static void DWCUtilKeyboard_SlideInRow2Task(DWCUtilTask *task, void *arg);
-static void DWCUtilKeyboard_SlideInRow3Task(DWCUtilTask *task, void *arg);
-static void DWCUtilKeyboard_SlideInButtonsTask(DWCUtilTask *task, void *arg);
-static void DWCUtilKeyboard_UpdateTask(DWCUtilTask *task, void *arg);
+static void taskStart0(DWCUtilTask *task, void *arg);
+static void taskStart1(DWCUtilTask *task, void *arg);
+static void taskStart2(DWCUtilTask *task, void *arg);
+static void taskStart3(DWCUtilTask *task, void *arg);
+static void taskStart4(DWCUtilTask *task, void *arg);
+static void taskMain(DWCUtilTask *task, void *arg);
 static void touchTriger(void);
-static void DWCUtilKeyboard_HandleTouchEnd(void);
-static void DWCUtilKeyboard_ToggleCapitals(void);
-static void DWCUtilKeyboard_ToggleShift(void);
-static void DWCUtilKeyboard_HandleTouchHold(void);
+static void touchRelease(void);
+static void pushCaps(void);
+static void pushShift(void);
+static void touch(void);
 static void exchangeBack(int key);
-static void DWCUtilKeyboard_HandlePad(void);
-static void DWCUtilKeyboard_MoveRow(int mode, int row, int y);
-static void DWCUtilKeyboard_SetMode(int mode);
+static void key(void);
+static void disp(int mode, int row, int y);
+static void changePage(int mode);
 static void changeColor(int key, int pressed);
 static void dispFocus(void);
 static void moveFocus(int direction);
-static void DWCUtilKeyboard_SlideOutButtonsTask(DWCUtilTask *task, void *arg);
-static void DWCUtilKeyboard_SlideOutRow3Task(DWCUtilTask *task, void *arg);
-static void DWCUtilKeyboard_SlideOutRow2Task(DWCUtilTask *task, void *arg);
-static void DWCUtilKeyboard_SlideOutRow1Task(DWCUtilTask *task, void *arg);
-static void DWCUtilKeyboard_SlideOutRow0Task(DWCUtilTask *task, void *arg);
-static void DWCUtilKeyboard_DestroyTask(DWCUtilTask *task, void *arg);
+static void taskEnd0(DWCUtilTask *task, void *arg);
+static void taskEnd1(DWCUtilTask *task, void *arg);
+static void taskEnd2(DWCUtilTask *task, void *arg);
+static void taskEnd3(DWCUtilTask *task, void *arg);
+static void taskEnd4(DWCUtilTask *task, void *arg);
+static void taskEnd5(DWCUtilTask *task, void *arg);
 
-void DWCUtilKeyboard_Open(void) {
+void DWCi_KBlInit(void) {
     u16 rect[4] = { 0, 0, 0, 0 };
     int objCount;
     u16 label[2];
@@ -180,13 +180,13 @@ void DWCUtilKeyboard_Open(void) {
     sKeyboard->cursor = DWCUtilCell_AllocOamRun(0, 0x40, TRUE);
     DWCi_CELLlSetEffect(sKeyboard->cursor, -1, 0x200, 0);
     DWCi_CELLlSetPriority(sKeyboard->cursor, -1, 2);
-    sKeyboard->task = DWCi_TSKlForm(0, DWCUtilKeyboard_SlideInRow0Task, NULL, 0x78);
-    DWCUtilKeyboard_MoveRow(sKeyboard->mode, 0, 0xc0);
+    sKeyboard->task = DWCi_TSKlForm(0, taskStart0, NULL, 0x78);
+    disp(sKeyboard->mode, 0, 0xc0);
 }
 
 void DWCi_KBlEnd(void) {
     DWCi_CELLlDelete(sKeyboard->cursor);
-    DWCi_TSKlChangeFunc(sKeyboard->task, DWCUtilKeyboard_SlideOutButtonsTask);
+    DWCi_TSKlChangeFunc(sKeyboard->task, taskEnd0);
 }
 
 u8 DWCi_KBlGet(void) {
@@ -208,86 +208,86 @@ BOOL DWCi_KBlIsInit(void) {
     return FALSE;
 }
 
-static void DWCUtilKeyboard_SlideInRow0Task(DWCUtilTask *task, void *arg) {
+static void taskStart0(DWCUtilTask *task, void *arg) {
     int x;
     int y;
 
     G2_GetOBJPosition(sKeyboard->charOams[0], (u32 *)&x, (u32 *)&y);
     y -= 12;
     if (y > 0x51) {
-        DWCUtilKeyboard_MoveRow(sKeyboard->mode, 0, y);
+        disp(sKeyboard->mode, 0, y);
         return;
     }
-    DWCUtilKeyboard_MoveRow(sKeyboard->mode, 0, 0x51);
-    DWCUtilKeyboard_MoveRow(sKeyboard->mode, 1, 0xc0);
-    DWCi_TSKlChangeFunc(task, DWCUtilKeyboard_SlideInRow1Task);
+    disp(sKeyboard->mode, 0, 0x51);
+    disp(sKeyboard->mode, 1, 0xc0);
+    DWCi_TSKlChangeFunc(task, taskStart1);
 }
 
-static void DWCUtilKeyboard_SlideInRow1Task(DWCUtilTask *task, void *arg) {
+static void taskStart1(DWCUtilTask *task, void *arg) {
     int x;
     int y;
 
     G2_GetOBJPosition(sKeyboard->charOams[12], (u32 *)&x, (u32 *)&y);
     y -= 12;
     if (y > 0x67) {
-        DWCUtilKeyboard_MoveRow(sKeyboard->mode, 1, y);
+        disp(sKeyboard->mode, 1, y);
         return;
     }
-    DWCUtilKeyboard_MoveRow(sKeyboard->mode, 1, 0x67);
-    DWCUtilKeyboard_MoveRow(sKeyboard->mode, 2, 0xc0);
-    DWCi_TSKlChangeFunc(task, DWCUtilKeyboard_SlideInRow2Task);
+    disp(sKeyboard->mode, 1, 0x67);
+    disp(sKeyboard->mode, 2, 0xc0);
+    DWCi_TSKlChangeFunc(task, taskStart2);
 }
 
-static void DWCUtilKeyboard_SlideInRow2Task(DWCUtilTask *task, void *arg) {
+static void taskStart2(DWCUtilTask *task, void *arg) {
     int x;
     int y;
 
     G2_GetOBJPosition(sKeyboard->charOams[24], (u32 *)&x, (u32 *)&y);
     y -= 12;
     if (y > 0x7d) {
-        DWCUtilKeyboard_MoveRow(sKeyboard->mode, 2, y);
+        disp(sKeyboard->mode, 2, y);
         return;
     }
-    DWCUtilKeyboard_MoveRow(sKeyboard->mode, 2, 0x7d);
-    DWCUtilKeyboard_MoveRow(sKeyboard->mode, 3, 0xc0);
-    DWCi_TSKlChangeFunc(task, DWCUtilKeyboard_SlideInRow3Task);
+    disp(sKeyboard->mode, 2, 0x7d);
+    disp(sKeyboard->mode, 3, 0xc0);
+    DWCi_TSKlChangeFunc(task, taskStart3);
 }
 
-static void DWCUtilKeyboard_SlideInRow3Task(DWCUtilTask *task, void *arg) {
+static void taskStart3(DWCUtilTask *task, void *arg) {
     int x;
     int y;
 
     G2_GetOBJPosition(sKeyboard->charOams[36], (u32 *)&x, (u32 *)&y);
     y -= 12;
     if (y > 0x93) {
-        DWCUtilKeyboard_MoveRow(sKeyboard->mode, 3, y);
+        disp(sKeyboard->mode, 3, y);
         return;
     }
-    DWCUtilKeyboard_MoveRow(sKeyboard->mode, 3, 0x93);
-    DWCUtilKeyboard_MoveRow(sKeyboard->mode, 4, 0xc0);
-    DWCi_TSKlChangeFunc(task, DWCUtilKeyboard_SlideInButtonsTask);
+    disp(sKeyboard->mode, 3, 0x93);
+    disp(sKeyboard->mode, 4, 0xc0);
+    DWCi_TSKlChangeFunc(task, taskStart4);
 }
 
-static void DWCUtilKeyboard_SlideInButtonsTask(DWCUtilTask *task, void *arg) {
+static void taskStart4(DWCUtilTask *task, void *arg) {
     int x;
     int y;
 
     DWCi_CELLlGetPosition(sKeyboard->buttons[0], 0, &x, &y);
     y -= 12;
     if (y > 0xaa) {
-        DWCUtilKeyboard_MoveRow(sKeyboard->mode, 4, y);
+        disp(sKeyboard->mode, 4, y);
         return;
     }
-    DWCUtilKeyboard_MoveRow(sKeyboard->mode, 4, 0xaa);
+    disp(sKeyboard->mode, 4, 0xaa);
     dispFocus();
-    DWCi_TSKlChangeFunc(task, DWCUtilKeyboard_UpdateTask);
+    DWCi_TSKlChangeFunc(task, taskMain);
 }
 
-static void DWCUtilKeyboard_UpdateTask(DWCUtilTask *task, void *arg) {
+static void taskMain(DWCUtilTask *task, void *arg) {
     touchTriger();
-    DWCUtilKeyboard_HandleTouchEnd();
-    DWCUtilKeyboard_HandleTouchHold();
-    DWCUtilKeyboard_HandlePad();
+    touchRelease();
+    touch();
+    key();
 }
 
 static const DWCUtilKeyboardPoint sSpecialPositions[KEYBOARD_SPECIAL_KEYS] = {
@@ -344,7 +344,7 @@ static void touchTriger(void) {
     }
 }
 
-static void DWCUtilKeyboard_HandleTouchEnd(void) {
+static void touchRelease(void) {
     u16 rect[4];
     int i;
     int j;
@@ -362,7 +362,7 @@ static void DWCUtilKeyboard_HandleTouchEnd(void) {
             }
             sKeyboard->key = sKeyCodes[sKeyboard->mode][i];
             if (sKeyboard->mode == 1) {
-                DWCUtilKeyboard_SetMode(0);
+                changePage(0);
             }
             sKeyboard->cursorPos = i;
             dispFocus();
@@ -379,7 +379,7 @@ static void DWCUtilKeyboard_HandleTouchEnd(void) {
             }
             sKeyboard->key = sSpecialKeys[j];
             if (sKeyboard->mode == 1) {
-                DWCUtilKeyboard_SetMode(0);
+                changePage(0);
             }
             sKeyboard->cursorPos = j + KEYBOARD_FIRST_SPECIAL;
             dispFocus();
@@ -404,7 +404,7 @@ static void DWCUtilKeyboard_HandleTouchEnd(void) {
     DWCUtilDisplay_SetRectFromSize(&sSpecialPositions[0], &sSpecialSizes[0], rect);
     if (DWCi_TPlCheckRelease(rect)) {
         if (sKeyboard->touched == KEYBOARD_FIRST_SPECIAL) {
-            DWCUtilKeyboard_ToggleCapitals();
+            pushCaps();
             sKeyboard->cursorPos = KEYBOARD_FIRST_SPECIAL;
             dispFocus();
             return;
@@ -412,24 +412,24 @@ static void DWCUtilKeyboard_HandleTouchEnd(void) {
     } else {
         DWCUtilDisplay_SetRectFromSize(&sSpecialPositions[1], &sSpecialSizes[1], rect);
         if (DWCi_TPlCheckRelease(rect) && sKeyboard->touched == KEYBOARD_FIRST_SPECIAL + 1) {
-            DWCUtilKeyboard_ToggleShift();
+            pushShift();
             sKeyboard->cursorPos = KEYBOARD_FIRST_SPECIAL + 1;
             dispFocus();
         }
     }
 }
 
-static void DWCUtilKeyboard_ToggleCapitals(void) {
-    DWCUtilKeyboard_SetMode(sKeyboard->mode == 2 ? 0 : 2);
+static void pushCaps(void) {
+    changePage(sKeyboard->mode == 2 ? 0 : 2);
     DWCUtilSound_PlaySe(1);
 }
 
-static void DWCUtilKeyboard_ToggleShift(void) {
-    DWCUtilKeyboard_SetMode(sKeyboard->mode == 1 ? 0 : 1);
+static void pushShift(void) {
+    changePage(sKeyboard->mode == 1 ? 0 : 1);
     DWCUtilSound_PlaySe(1);
 }
 
-static void DWCUtilKeyboard_HandleTouchHold(void) {
+static void touch(void) {
     u16 rect[4];
     int i;
 
@@ -496,7 +496,7 @@ static void exchangeBack(int key) {
 
 // The pad: the cross keys move the cursor (left 0x20, up 0x40, right 0x10, down 0x80), A (1) presses its key, B (2)
 // is backspace, and X (0x400) and Y (0x800) are the capitals and shift keys
-static void DWCUtilKeyboard_HandlePad(void) {
+static void key(void) {
     int key;
 
     if (DWCi_IPTlCheckRepeat(0x20)) {
@@ -522,16 +522,16 @@ static void DWCUtilKeyboard_HandlePad(void) {
             if (sKeyboard->mode != 1) {
                 return;
             }
-            DWCUtilKeyboard_SetMode(0);
+            changePage(0);
             return;
         }
         if (key - KEYBOARD_FIRST_SPECIAL < KEYBOARD_SPECIAL_KEYS) {
             switch (key - KEYBOARD_FIRST_SPECIAL) {
             case 0:
-                DWCUtilKeyboard_ToggleCapitals();
+                pushCaps();
                 return;
             case 1:
-                DWCUtilKeyboard_ToggleShift();
+                pushShift();
                 return;
             case 2:
                 if (!sKeyboard->charsEnabled) {
@@ -547,7 +547,7 @@ static void DWCUtilKeyboard_HandlePad(void) {
                 break;
             }
             if (sKeyboard->mode == 1) {
-                DWCUtilKeyboard_SetMode(0);
+                changePage(0);
             }
             sKeyboard->key = sSpecialKeys[key - KEYBOARD_FIRST_SPECIAL];
             return;
@@ -568,15 +568,15 @@ static void DWCUtilKeyboard_HandlePad(void) {
         sKeyboard->errorPlayed = FALSE;
     }
     if (DWCi_IPTlCheckTrigger(0x400)) {
-        DWCUtilKeyboard_ToggleCapitals();
+        pushCaps();
     }
     if (DWCi_IPTlCheckTrigger(0x800)) {
-        DWCUtilKeyboard_ToggleShift();
+        pushShift();
     }
 }
 
 // Moves the row's keys, or with row 4 the two buttons, to y
-static void DWCUtilKeyboard_MoveRow(int mode, int row, int y) {
+static void disp(int mode, int row, int y) {
     const u8 charCounts[5] = { 12, 12, 12, 11, 0 };
     const u8 specialCounts[5] = { 1, 1, 1, 1, 0 };
     const u8 buttonCounts[5] = { 0, 0, 0, 0, 2 };
@@ -603,14 +603,14 @@ static void DWCUtilKeyboard_MoveRow(int mode, int row, int y) {
     }
 }
 
-static void DWCUtilKeyboard_SetMode(int mode) {
+static void changePage(int mode) {
     int i;
     int capitals = FALSE;
     int shift = FALSE;
 
     sKeyboard->mode = mode;
     for (i = 0; i < 4; i++) {
-        DWCUtilKeyboard_MoveRow(mode, i, sCharKeyPositions[i * 12].y);
+        disp(mode, i, sCharKeyPositions[i * 12].y);
     }
     if (mode == 2) {
         capitals = TRUE;
@@ -818,7 +818,7 @@ static void moveFocus(int direction) {
     DWCUtilSound_PlaySe(8);
 }
 
-static void DWCUtilKeyboard_SlideOutButtonsTask(DWCUtilTask *task, void *arg) {
+static void taskEnd0(DWCUtilTask *task, void *arg) {
     GXOamAttr *oam;
     int x;
     int y;
@@ -826,13 +826,13 @@ static void DWCUtilKeyboard_SlideOutButtonsTask(DWCUtilTask *task, void *arg) {
     oam = DWCi_CELLlGetObj(sKeyboard->buttons[0], 0);
     G2_GetOBJPosition(oam, (u32 *)&x, (u32 *)&y);
     y += 12;
-    DWCUtilKeyboard_MoveRow(sKeyboard->mode, 4, y);
+    disp(sKeyboard->mode, 4, y);
     if (y >= 0xc0) {
-        DWCi_TSKlChangeFunc(task, DWCUtilKeyboard_SlideOutRow3Task);
+        DWCi_TSKlChangeFunc(task, taskEnd1);
     }
 }
 
-static void DWCUtilKeyboard_SlideOutRow3Task(DWCUtilTask *task, void *arg) {
+static void taskEnd1(DWCUtilTask *task, void *arg) {
     GXOamAttr *oam;
     int x;
     int y;
@@ -840,13 +840,13 @@ static void DWCUtilKeyboard_SlideOutRow3Task(DWCUtilTask *task, void *arg) {
     oam = sKeyboard->charOams[36];
     G2_GetOBJPosition(oam, (u32 *)&x, (u32 *)&y);
     y += 12;
-    DWCUtilKeyboard_MoveRow(sKeyboard->mode, 3, y);
+    disp(sKeyboard->mode, 3, y);
     if (y >= 0xc0) {
-        DWCi_TSKlChangeFunc(task, DWCUtilKeyboard_SlideOutRow2Task);
+        DWCi_TSKlChangeFunc(task, taskEnd2);
     }
 }
 
-static void DWCUtilKeyboard_SlideOutRow2Task(DWCUtilTask *task, void *arg) {
+static void taskEnd2(DWCUtilTask *task, void *arg) {
     GXOamAttr *oam;
     int x;
     int y;
@@ -854,13 +854,13 @@ static void DWCUtilKeyboard_SlideOutRow2Task(DWCUtilTask *task, void *arg) {
     oam = sKeyboard->charOams[24];
     G2_GetOBJPosition(oam, (u32 *)&x, (u32 *)&y);
     y += 12;
-    DWCUtilKeyboard_MoveRow(sKeyboard->mode, 2, y);
+    disp(sKeyboard->mode, 2, y);
     if (y >= 0xc0) {
-        DWCi_TSKlChangeFunc(task, DWCUtilKeyboard_SlideOutRow1Task);
+        DWCi_TSKlChangeFunc(task, taskEnd3);
     }
 }
 
-static void DWCUtilKeyboard_SlideOutRow1Task(DWCUtilTask *task, void *arg) {
+static void taskEnd3(DWCUtilTask *task, void *arg) {
     GXOamAttr *oam;
     int x;
     int y;
@@ -868,13 +868,13 @@ static void DWCUtilKeyboard_SlideOutRow1Task(DWCUtilTask *task, void *arg) {
     oam = sKeyboard->charOams[12];
     G2_GetOBJPosition(oam, (u32 *)&x, (u32 *)&y);
     y += 12;
-    DWCUtilKeyboard_MoveRow(sKeyboard->mode, 1, y);
+    disp(sKeyboard->mode, 1, y);
     if (y >= 0xc0) {
-        DWCi_TSKlChangeFunc(task, DWCUtilKeyboard_SlideOutRow0Task);
+        DWCi_TSKlChangeFunc(task, taskEnd4);
     }
 }
 
-static void DWCUtilKeyboard_SlideOutRow0Task(DWCUtilTask *task, void *arg) {
+static void taskEnd4(DWCUtilTask *task, void *arg) {
     GXOamAttr *oam;
     int x;
     int y;
@@ -882,13 +882,13 @@ static void DWCUtilKeyboard_SlideOutRow0Task(DWCUtilTask *task, void *arg) {
     oam = sKeyboard->charOams[0];
     G2_GetOBJPosition(oam, (u32 *)&x, (u32 *)&y);
     y += 12;
-    DWCUtilKeyboard_MoveRow(sKeyboard->mode, 0, y);
+    disp(sKeyboard->mode, 0, y);
     if (y >= 0xc0) {
-        DWCi_TSKlChangeFunc(task, DWCUtilKeyboard_DestroyTask);
+        DWCi_TSKlChangeFunc(task, taskEnd5);
     }
 }
 
-static void DWCUtilKeyboard_DestroyTask(DWCUtilTask *task, void *arg) {
+static void taskEnd5(DWCUtilTask *task, void *arg) {
     int i;
     int j;
 

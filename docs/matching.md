@@ -1199,7 +1199,7 @@ Same code, other `sp` offsets or frame size.
   use (`target >> FX32_SHIFT` five times in `MedalBoxApp_UpdateSlider`) is computed once by CSE as a temporary the
   variable cannot absorb, where `target >>= FX32_SHIFT` once changes the registers.
   The merge also needs each call where the original has it: the DWC utility's `DWCUtilMenu_HandleTouchHold` and
-  `DWCUtilKeyboard_HandleTouchHold` move the held key into `r0` on each path to one shared call only with the held
+  `dwc_util_keyboard.c`'s `touch` move the held key into `r0` on each path to one shared call only with the held
   key's `SetPressedKey(i); goto clear;` inside the button loop, where the key loop's `goto held` joins it, and the
   release's own `SetPressedKey(-1)` after the loops; one call fed by `i`, or by a `key` set on each path, keeps the key
   in the loop counter's register and copies it at the call.
@@ -1835,7 +1835,7 @@ Same instructions, scheduled in another order.
   MWCC tests the kept bit before the calls and spills it (12 bytes larger). It matches with two calls into locals, the
   store of the first word, and then the other two calls.
 - An SDK inline written from memory can match every user that doesn't care about its order of terms and still be
-  wrong. `nitro/gx.h`'s `G2_SetOBJPosition` ORed x before y, and only `DWCUtilKeyboard_MoveRow` (`dwc_util_keyboard.c`)
+  wrong. `nitro/gx.h`'s `G2_SetOBJPosition` ORed x before y, and only `dwc_util_keyboard.c`'s `disp`
   showed it; NitroSDK's `g2_oam.h` masks both fields at once and ORs y first, which matches every user. Check such an
   inline against the SDK's own definition before writing a local copy with its terms swapped.
 

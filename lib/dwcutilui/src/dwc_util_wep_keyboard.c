@@ -119,7 +119,7 @@ static void procInit(void) {
 
 static void procInit1(void) {
     if (DWCi_EFFlCheck(1) == 0 && DWCi_EFFlCheck(0) == 0) {
-        DWCUtilKeyboard_Open();
+        DWCi_KBlInit();
         DWCUtilSound_PlaySe(0x14);
         if (sWepKeyboard->length == 0) {
             DWCi_KBlSetErase(FALSE);
