@@ -32,11 +32,48 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
 
+## 2026-10-24: the pointer cast guard's row for the sync of upstream `53767c5a2c`
+
+- **Upstream:** `b62c655bfa` (upstream merge #481), as `main` has it; this branch merges no upstream commit. Upstream's
+  `main` is at `53767c5a2c` (its merge of #497), whose sync is prepared on the local topic
+  `codex/upstream-sync-manual` and needs this row first.
+- **Port:** `PORT_SHA`, on the topic branch `port-sync-ptrcast-rows` from `main` at `e5508df96a` (PR 24's merge), one
+  commit, published as one pull request to `main`. It fills the last entry's `PORT_SHA`, `dcdc552ae4`.
+- **ROM:** T0 passes: `python3 configure.py && ninja`, both SHA1s match (Black 2
+  `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb`, White 2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`), no compiler warning.
+  The branch changes only `port/`.
+- **Host build:** T1 passes on macOS arm64, Apple clang 21, RelWithDebInfo, both versions (`build/port-verify-b2_us`,
+  `build/port-verify-w2_us`, configured as `sync_upstream.sh` configures them).
+- **Tests:** ctest: Black 2, 290 passed and 14 skipped of 304; White 2, 287 passed and 14 skipped of 301; none
+  failed. Skipped in both: the 11 oracle tests that need the oracle, which that configuration doesn't build,
+  `frame_times_party_menus` (the oracle's save), `asm_oracle` (no Unicorn in this Python) and `app_universal_slices`
+  (a distribution build's). `game_ptrcasts` passes in both; T4, T5 and T7 not run.
+- **Tiers:** unchanged: the branch changes no game C.
+- **Trap stubs:** 30 function stubs and 22 data placeholders per version, unchanged.
+- **64-bit warnings:** `check_ptrcasts: 422 sites in 269 keys (real 142, harmless 102, handled 141, unreachable 37),
+  1681 files, 0 not compiled` in both versions, as on the last entry; the new row passes as no longer found, since
+  `main` doesn't have the cast yet. On the sync's head, with this baseline, both versions give `check_ptrcasts: 422
+  sites in 269 keys (real 142, harmless 102, handled 141, unreachable 37), 1682 files, 0 not compiled`.
+- **Work done:** the guard's baseline ([../tools/ptrcast_baseline.tsv](../tools/ptrcast_baseline.tsv)) gets the row
+  that the sync of `53767c5a2c` needs, as [SYNC.md](SYNC.md#when-the-pointer-cast-guard-fails) says for a sync's new
+  sites. Upstream's `de6cd09688`, which types the void pointers that always hold one type, casts
+  `GFL_NetGetUserData()`'s int to `DWCUserData *` in `NetDevWifi_Start` (`src/ov011/net_devwifi.c`), where it was
+  `void *`. The guard keys a row by its types, so the merge finds a new int-to-ptr site there, and its `game_ptrcasts`
+  fails in both versions. It is the truncation that the cast's `void *` row already holds: `real`, R22 (the Wi-Fi game
+  code's DWC user and friend data carried as `int`), until phase 7. On the sync's head the `void *` row passes as no
+  longer found, until a PR after the sync runs `--update`.
+- **Next:** the sync of `53767c5a2c`: `main` merged into `codex/upstream-sync-manual`, `sync_upstream.sh --branch
+  codex/upstream-sync-manual` run again, and the sync published for the owner's review. Then phase 3's exit route, as
+  the last entry says.
+- **Blockers:** the sync's required `Code standards` check will fail on upstream's `lib/nitro/include/nitro/wm.h`
+  (`84607012af`, from #483), whose include order clang-format 23.1.1 rejects, as it did in upstream's own check; the
+  port can't change it, so it waits for upstream or the owner's decision. #496 is still open upstream.
+
 ## 2026-10-24: the battle's run: SPL's particles drawn again, and Hugh's battle to its end with a local candidate
 
 - **Upstream:** `b62c655bfa` (upstream merge #481), as `main` has it; this branch merges no upstream commit. Upstream's
   `main` is at `53767c5a2c` (its merge of #497, below), for the sync to propose on its own.
-- **Port:** `PORT_SHA`, on the topic branch `port-battle-run` from `main` at `1807efb68f` (PR 21's merge): the
+- **Port:** `dcdc552ae4`, on the topic branch `port-battle-run` from `main` at `1807efb68f` (PR 21's merge): the
   particles' fix (`942e275903`), the review's round on it (`4f096d8eb4`), `main` merged twice, at `2e510abc6d`
   (`c6868a5ec6`: PR 22, the field's pointer casts) and at `65eae1f0a2` (`70b1322063`: PR 23, the test launcher
   retired), and the records commits, published together as one pull request to `main`.
