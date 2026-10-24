@@ -430,10 +430,10 @@ static void endScene2(void) {
     DWCi_TSKlDeleteEx(1, sApList->vblankTask);
     for (i = 0; i < AP_LIST_ROWS + 1; i++) {
         if (sApList->securityOams[i] != NULL) {
-            DWCi_MOV_MBP_GetChildBmp(sApList->securityOams[i]);
+            DWCi_OBJlDelete(sApList->securityOams[i]);
         }
         if (sApList->signalOams[i] != NULL) {
-            DWCi_MOV_MBP_GetChildBmp(sApList->signalOams[i]);
+            DWCi_OBJlDelete(sApList->signalOams[i]);
         }
     }
     DWCi_FNTlDeleteBg(sApList->text);

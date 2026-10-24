@@ -211,7 +211,7 @@ static void endScene1(void) {
 
 static void endScene2(void) {
     if (DWCi_EFFlCheck(1) == 0 && DWCi_EFFlCheck(0) == 0 && DWCi_BTNlIsEnd()) {
-        DWCi_MOV_MBP_GetChildBmp(sOptionMenu.cursor);
+        DWCi_OBJlDelete(sOptionMenu.cursor);
         DWCi_FOCUSlDelete();
         DWCi_COMMENTlDelete();
         DWCi_ARClRelease(sOptionMenu.palette);

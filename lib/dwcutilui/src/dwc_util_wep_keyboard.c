@@ -236,7 +236,7 @@ static void endScene3(void) {
     int fromList;
 
     DWCi_COMMENTlDelete();
-    DWCi_MOV_MBP_GetChildBmp(sWepKeyboard->cursor);
+    DWCi_OBJlDelete(sWepKeyboard->cursor);
     DWCi_FNTlDeleteBgLcd(0);
     DWCUtilGfxResource_Load("char/ybObjMain.ncl.l", GX_LoadOBJPltt);
     DWCUtilDisplay_HidePlanes(1, GX_PLANEMASK_BG0);

@@ -37,7 +37,7 @@ void DWCi_ANIMElInitEx(u8 variant) {
 
 void DWCi_ANIMElEnd(void) {
     DWCi_TSKlDeleteEx(1, sEffect->task);
-    DWCi_MOV_MBP_GetChildBmp(sEffect->oam);
+    DWCi_OBJlDelete(sEffect->oam);
     DWCi_HEAPlFree_(&sEffect);
 }
 

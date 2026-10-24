@@ -550,10 +550,10 @@ static void DWCUtilAddressSettings_WaitFadeOut(void) {
     DWCi_TSKlDeleteEx(0, sAddressSettings.work->task);
     DWCi_TSKlDeleteEx(1, sAddressSettings.work->vblankTask);
     for (i = 0; i < 7; i++) {
-        DWCi_MOV_MBP_GetChildBmp(sAddressSettings.work->marks[i]);
+        DWCi_OBJlDelete(sAddressSettings.work->marks[i]);
     }
     if (sAddressSettings.work->setupIcon != NULL) {
-        DWCi_MOV_MBP_GetChildBmp(sAddressSettings.work->setupIcon);
+        DWCi_OBJlDelete(sAddressSettings.work->setupIcon);
     }
     DWCi_SBlEnd();
     DWCi_FNTlDeleteBgLcd(0);

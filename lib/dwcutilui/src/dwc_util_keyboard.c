@@ -905,10 +905,10 @@ static void taskEnd5(DWCUtilTask *task, void *arg) {
         DWCi_CELLlDelete(sKeyboard->buttons[i]);
     }
     for (i = 0; i < KEYBOARD_SPECIAL_KEYS; i++) {
-        DWCi_MOV_MBP_GetChildBmp(sKeyboard->specialOams[i]);
+        DWCi_OBJlDelete(sKeyboard->specialOams[i]);
     }
     for (i = 0; i < KEYBOARD_CHAR_KEYS; i++) {
-        DWCi_MOV_MBP_GetChildBmp(sKeyboard->charOams[i]);
+        DWCi_OBJlDelete(sKeyboard->charOams[i]);
     }
     DWCi_HEAPlFree_(&sKeyboard);
 }

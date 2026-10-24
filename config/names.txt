@@ -22552,11 +22552,11 @@ overlays/ov182 0x021bcb90 DWCi_LSTlInsert
 overlays/ov182 0x021bcbb0 DWCi_LSTlPushBack
 overlays/ov182 0x021bcbbc DWCi_LSTlPushFront
 overlays/ov182 0x021bcbc8 DWCi_OBJlInit
-overlays/ov182 0x021bcc2c DWCUtilOamBuf_UploadTask
+overlays/ov182 0x021bcc2c taskTransfer
 overlays/ov182 0x021bcc5c DWCi_OBJlEnd
 overlays/ov182 0x021bcc80 DWCi_OBJlFormGx
-overlays/ov182 0x021bcc9c DWCi_MOV_MBP_GetChildBmp
-overlays/ov182 0x021bccd8 DWCUtilOamBuf_GetEntry
+overlays/ov182 0x021bcc9c DWCi_OBJlDelete
+overlays/ov182 0x021bccd8 DWCi_OBJlGetOam
 overlays/ov182 0x021bccec DWCi_OVRlInit
 overlays/ov182 0x021bcdbc DWCi_OVRlAlloc
 overlays/ov182 0x021bcec4 DWCi_OVRlFree
