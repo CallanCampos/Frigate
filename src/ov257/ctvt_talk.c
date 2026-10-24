@@ -203,13 +203,8 @@ static void CtvtTalk_OpenGameWindow(CommTvtWork *sys, CtvtTalk *talk);
 static void CtvtTalk_CloseGameWindow(CommTvtWork *sys, CtvtTalk *talk);
 static BOOL CtvtTalk_CheckGameCancel(CommTvtWork *sys, CtvtTalk *talk);
 
-// The buttons of the bottom screen
-static const TouchRect sZoomButtons[] = {
-    { 0xa8, 0xc0, 0xe8, 0x00 },
-    { 0x68, 0xa0, 0xd8, 0xff },
-    { TOUCH_RECT_END },
-};
-
+// The buttons of the bottom screen, declared in the order CtvtTalk_UpdateMain and CtvtTalk_UpdateSpeed test them,
+// which is the order MWCC's size sort needs to lay them out as the ROM does
 static const TouchRect sExitButtons[] = {
     { 0x08, 0x18, 0xb8, 0xe8 },
     { 0x18, 0x28, 0xb8, 0xf0 },
@@ -225,6 +220,12 @@ static const TouchRect sGameButtons1[] = {
 static const TouchRect sGameButtons2[] = {
     { 0x48, 0x58, 0xc8, 0xff },
     { 0x58, 0x68, 0xd0, 0xff },
+    { TOUCH_RECT_END },
+};
+
+static const TouchRect sZoomButtons[] = {
+    { 0xa8, 0xc0, 0xe8, 0x00 },
+    { 0x68, 0xa0, 0xd8, 0xff },
     { TOUCH_RECT_END },
 };
 
@@ -264,10 +265,10 @@ void CtvtTalk_Delete(CommTvtWork *sys, CtvtTalk *talk) {
 }
 
 // The resources of the actors are the system's: characters, palette and cells
-static inline ClActor *CtvtTalk_CreateActor(CommTvtWork *sys, int chars, int palette, int cells,
-                                            const ClActorSetup *setup, HeapID heapId) {
-    return ClActor_Create(CommTvt_GetClActUnit(sys), CommTvt_GetObjResource(sys, chars),
-                          CommTvt_GetObjResource(sys, palette), CommTvt_GetObjResource(sys, cells), setup, 1, heapId);
+static inline void CtvtTalk_CreateActor(CommTvtWork *sys, ClActor **actor, int chars, int palette, int cells,
+                                        const ClActorSetup *setup, HeapID heapId) {
+    *actor = ClActor_Create(CommTvt_GetClActUnit(sys), CommTvt_GetObjResource(sys, chars),
+                            CommTvt_GetObjResource(sys, palette), CommTvt_GetObjResource(sys, cells), setup, 1, heapId);
 }
 
 void CtvtTalk_Enter(CommTvtWork *sys, CtvtTalk *talk) {
@@ -289,39 +290,39 @@ void CtvtTalk_Enter(CommTvtWork *sys, CtvtTalk *talk) {
     setup.sequence = talk->speed + 25;
     setup.priority = 0;
     setup.bgPriority = 2;
-    talk->speedCursor = CtvtTalk_CreateActor(sys, 5, 1, 9, &setup, heapId);
+    CtvtTalk_CreateActor(sys, &talk->speedCursor, 5, 1, 9, &setup, heapId);
     ClActor_SetVisible(talk->speedCursor, TRUE);
     if (CommTvt_GetViewSwapped(sys) == TRUE) {
         setup.sequence = 21;
     } else {
         setup.sequence = 22;
     }
-    talk->zoomButton = CtvtTalk_CreateActor(sys, 5, 1, 9, &setup, heapId);
+    CtvtTalk_CreateActor(sys, &talk->zoomButton, 5, 1, 9, &setup, heapId);
     ClActor_SetVisible(talk->zoomButton, TRUE);
     setup.sequence = 20;
-    talk->exitButton = CtvtTalk_CreateActor(sys, 5, 1, 9, &setup, heapId);
+    CtvtTalk_CreateActor(sys, &talk->exitButton, 5, 1, 9, &setup, heapId);
     ClActor_SetVisible(talk->exitButton, TRUE);
     setup.sequence = 36;
-    talk->gameButtons[0] = CtvtTalk_CreateActor(sys, 5, 1, 9, &setup, heapId);
+    CtvtTalk_CreateActor(sys, &talk->gameButtons[0], 5, 1, 9, &setup, heapId);
     ClActor_SetVisible(talk->gameButtons[0], TRUE);
     setup.sequence = 37;
-    talk->gameButtons[1] = CtvtTalk_CreateActor(sys, 5, 1, 9, &setup, heapId);
+    CtvtTalk_CreateActor(sys, &talk->gameButtons[1], 5, 1, 9, &setup, heapId);
     ClActor_SetVisible(talk->gameButtons[1], TRUE);
     setup.sequence = 24;
-    talk->voiceIcon = CtvtTalk_CreateActor(sys, 5, 1, 9, &setup, heapId);
+    CtvtTalk_CreateActor(sys, &talk->voiceIcon, 5, 1, 9, &setup, heapId);
     ClActor_SetVisible(talk->voiceIcon, TRUE);
     setup.x = 232;
     setup.y = 168;
     setup.sequence = 1;
     setup.priority = 0;
     setup.bgPriority = 0;
-    talk->talkButton = CtvtTalk_CreateActor(sys, 6, 2, 10, &setup, heapId);
+    CtvtTalk_CreateActor(sys, &talk->talkButton, 6, 2, 10, &setup, heapId);
     ClActor_SetVisible(talk->talkButton, TRUE);
     ClActor_SetAutoAnim(talk->talkButton, TRUE);
 
-    talk->voiceIconState = VOICE_ICON_READY;
     talk->state = TALK_STATE_FADE_IN;
     talk->waitSound = FALSE;
+    talk->voiceIconState = VOICE_ICON_READY;
     talk->shownVoiceIconState = VOICE_ICON_MAX;
     talk->waveWindow = BmpWin_CreateDynamic(4, 8, 3, 16, 8, 10, TRUE);
     talk->messageWindow = BmpWin_CreateDynamic(4, 1, 1, 30, 4, 10, TRUE);
@@ -391,14 +392,19 @@ void CtvtTalk_Leave(CommTvtWork *sys, CtvtTalk *talk) {
 }
 
 int CtvtTalk_Main(CommTvtWork *sys, CtvtTalk *talk) {
+    // The fades' steps and frames per step, read as immediates. A function-local static const is emitted even when
+    // its reads fold: these two are the bytes 06 01 at the head of the file's .rodata, which nothing points to. That
+    // they are these calls' is inferred from their arguments
+    static const u8 wipeDivision = 6;
+    static const u8 wipeSync = 1;
     HeapID heapId = CommTvt_GetHeapId(sys);
 
     switch (talk->state) {
     case TALK_STATE_FADE_IN:
         if (func_ov257_021aaa74(sys) == TRUE) {
-            GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_IN, WIPE_TYPE_FADE_IN, 0, 6, 1, heapId);
+            GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_IN, WIPE_TYPE_FADE_IN, 0, wipeDivision, wipeSync, heapId);
         } else {
-            GFL_WipeSet(WIPE_MODE_SUB, WIPE_TYPE_FADE_IN, WIPE_TYPE_FADE_IN, 0, 6, 1, heapId);
+            GFL_WipeSet(WIPE_MODE_SUB, WIPE_TYPE_FADE_IN, WIPE_TYPE_FADE_IN, 0, wipeDivision, wipeSync, heapId);
         }
         talk->state = TALK_STATE_WAIT_FADE_IN;
         break;
@@ -408,7 +414,7 @@ int CtvtTalk_Main(CommTvtWork *sys, CtvtTalk *talk) {
         }
         break;
     case TALK_STATE_FADE_OUT_TO_GAME:
-        GFL_WipeSet(WIPE_MODE_SUB, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, 0, 6, 1, heapId);
+        GFL_WipeSet(WIPE_MODE_SUB, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, 0, wipeDivision, wipeSync, heapId);
         func_ov257_021aaa78(sys, FALSE);
         talk->state = TALK_STATE_WAIT_FADE_OUT;
         break;
@@ -422,7 +428,7 @@ int CtvtTalk_Main(CommTvtWork *sys, CtvtTalk *talk) {
         if (talk->waitSound && CtvtCamera_IsSoundDone(sys, camera) != TRUE) {
             break;
         }
-        GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, 0, 6, 1, heapId);
+        GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, 0, wipeDivision, wipeSync, heapId);
         func_ov257_021aaa78(sys, TRUE);
         talk->state = TALK_STATE_WAIT_FADE_OUT;
         break;

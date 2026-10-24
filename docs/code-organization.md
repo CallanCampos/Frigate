@@ -14,6 +14,12 @@ every section.
 - The C file holds its functions in address order. A function that doesn't match yet stays in the file as the closest
   C found, so objdiff shows how far off it is. Library code built with another compiler can differ: SPL's compiler
   emits a file's functions in reverse source order, so `lib/spl/src/` files hold theirs in reverse address order.
+- Code the original link dead-stripped, which `config/deadstrip.toml` lists and the build strips again, is the
+  exception to both rules above (`docs/configs.md`, "Dead-stripped code"): written back from another decomp so that
+  the data it pooled with live code comes out, or because such code calls it, it has no address and sits among the
+  live functions in that decomp's order, can't be checked against the asm, and doesn't keep its file from `complete`.
+  The file's comments flag it as reconstructions. It is used for `src/system/wipe_sub.c`'s dead wipe handlers and for
+  the two `src/system/wipe_wnd.c` window readers that their plane swap calls.
 - `src/` holds the code built with the game's compiler. An overlay's files go in `src/ovNNN/`, and the main
   module's in `src/gfl/` (Game Freak's library) and `src/system/` (the game's own code), mirroring `include/`.
   The default flags are in `configure.py`; a file whose original code and data require another setting goes in
