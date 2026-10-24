@@ -71,6 +71,9 @@ project(frigate
     HOMEPAGE_URL "https://github.com/CallanCampos/Frigate"
     LANGUAGES C)
 set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/hal/os/port_app.h")
+# compile_commands.json in the build directory: the pointer cast guard (port/tools/check_ptrcasts.py, the test
+# game_ptrcasts of port/cmake/game.cmake) runs the game's compile commands again from it, and editors read it too
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 if(PORT_MACOS_DISTRIBUTION AND NOT APPLE)
     message(FATAL_ERROR "PORT_MACOS_DISTRIBUTION is the macOS build for other Macs; configure without it here")
 endif()
@@ -262,7 +265,8 @@ target_compile_options(pokebw2_game PRIVATE
     -fgnu89-inline
     # See port_decomp_env: the decomp drops const and volatile where the original did
     -Wno-incompatible-pointer-types-discards-qualifiers
-    # The 64-bit warnings are counted by port/tools/compile-probe; here they only make noise
+    # The 64-bit warnings: the pointer cast guard turns them on again and holds them to its baseline (the test
+    # game_ptrcasts, port/cmake/game.cmake); here they only make noise
     -Wno-pointer-to-int-cast -Wno-int-to-pointer-cast -Wno-void-pointer-to-int-cast
     -Wno-int-to-void-pointer-cast -Wno-unknown-pragmas)
 # MWCC places middleware signature strings in a custom ROM section; host code refers to the same constants
@@ -374,6 +378,7 @@ target_link_libraries(${PORT_PROGRAM} PRIVATE SDL3::SDL3)
 #   timing  a limit on the host's time, which a slow or loaded machine can fail: the frame_times_* routes, in an
 #           optimized build only (port/cmake/frame_times.cmake), and the timing gates (PORT_G3D_TIMING_GATE,
 #           PORT_GFX_TIMING_GATE)
+#   static  the game's C read, not run: the pointer cast guard and its own test (port/cmake/game.cmake)
 function(port_test_labels test)
     set_property(TEST ${test} APPEND PROPERTY LABELS ${ARGN})
 endfunction()

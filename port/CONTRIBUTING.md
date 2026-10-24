@@ -50,8 +50,11 @@ See [the test guide](tests/README.md) for coverage and [the sanitized build](doc
 White 2 uses a separate build directory with `-DPORT_VERSION=w2_us`, as the quick start describes.
 
 With both personal ROM dumps and the decomp toolchain prepared as in the repository's root README, run
-`python3 configure.py && ninja`: both Black 2 and White 2 must match their SHA1s (T0). Report the host build (T1),
-unit/save tests (T2/T6), relevant replay tests (T3) and any additional checks you ran, with their commands and results.
+`python3 configure.py && ninja`: both Black 2 and White 2 must match their SHA1s (T0). Report the host build (T1,
+with the pointer cast guard's line from `python3 port/tools/check_ptrcasts.py --build-dir build/port --report`; the
+guard is the ctest test `game_ptrcasts`, and [SYNC.md](docs/SYNC.md#when-the-pointer-cast-guard-fails) says what to do
+when it fails), unit/save tests (T2/T6), relevant replay tests (T3) and any additional checks you ran, with their
+commands and results.
 A contributor without ROMs can submit a draft PR and state that T0 and ROM-dependent tests were not run. Before
 merging, a maintainer must verify both ROM SHA1s and the applicable host tests on the final change.
 

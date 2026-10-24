@@ -3,6 +3,69 @@
 What port work taught that isn't obvious from the code, newest first. A lesson about MWCC or the decomp's own
 workflow goes in the decomp checkout instead; this file is the port's ([CLAUDE.md](../CLAUDE.md), the iteration loop).
 
+## 2026-10-23: the pointer cast guard, restarted on main
+
+- **A gate that passes when it sees nothing isn't a gate.** The guard's first version passed with every baseline row
+  "no longer found" when a `-w` was added to the commands, and a skip on a host where it should run showed CI green.
+  A check that reads a compiler's messages first proves on a sample that it reads each kind back with the build's own
+  flags, and a test that the build can run fails rather than skips (`--require`).
+- **A row in a function the host build replaces is `handled`, not `real`.** GX's extended palette loaders were classed
+  `real` while `port/cmake/gx.cmake` renames them `port_sdk_*` and `port/hal/gx/gx_load2d_extpltt.c` replaces them.
+  Before classing a row, look for the function in the `port_sdk_*` renames of `port/cmake/*.cmake` and in the
+  `#define`s of `port/hal`'s `*_host.c` wrappers.
+- **The decomp's C isn't only `src/` and `lib/` entries of the compile database.** Thirteen decomp files, `gfl_use.c`
+  and NitroSDK's thread, NVRAM and sound interface among them, compile only through a `port/hal` wrapper that
+  `#include`s them with its own definitions; a check that keeps the database's `src/` and `lib/` entries never sees
+  them. Find them by their wrapper's `#include` of a `.c` file.
+- **A rename is a pair whose old name is gone.** Pairing a vanished row with a new one by two of file, function and
+  types let a new cast in one function pass as the "rename" of a cast fixed in another of the same file; the pair is a
+  rename only when the part that differs no longer exists in the tree.
+- **A test that runs a tool which skips on a host must skip there too.** The guard skips on Windows, and its own test
+  expected findings, so CI's Windows job failed on the first push of the guard's PR, a failure that no local run
+  could show. A test of a tool checks the tool's skip on that host and skips itself, and the first CI run of a new
+  test is read job by job, Windows' included.
+- **Don't run a test by hand in a build directory whose full suite is running.** `game_ptrcasts_tool` writes its tree
+  into the build directory, so a second copy started by hand while `ctest` ran the same test made both fail; rerun it
+  alone, and keep hand runs in another build directory while a suite runs.
+- **A warning count says how it counted.** STATUS.md's libraries' 235 to 231 and PR 7's 218 measured the same
+  warnings two ways: STATUS.md's audit counted instances, a private header's site once for each file that includes it,
+  on macOS; PR 7's 218 counted distinct sites, on Linux (its description: 452 to 379 distinct, the game's 234 to 161).
+  Both reran the host build's commands with its `-isystem` kept, so the casts in the SDK's public headers' inline
+  functions (`gx.h`, `card.h`, `fnd.h`) never showed. On `8ca29313d1` the audit's way gives the game 161 and the
+  libraries 231 again; distinct sites, 161 and 196. A figure in STATUS.md names its tool and its way of counting, and
+  the tool is committed: the guard's `--report` line now.
+- **The host build's decomp headers are system headers.** `port_decomp_env` passes the decomp's include directories
+  with `-isystem`, which silences every warning in them; a check that reruns the build's commands has to turn them into
+  `-I` to see the headers' code, as `check_ptrcasts.py` does, and then maps a host variant of a header
+  (`gen/hwinclude`) back to the header it was made from.
+- **Not every rename upstream passes as one.** The guard pairs a vanished row with a new one only when the kind and
+  two of file, function and types agree and the pair is the only one: two functions of one file renamed with the same
+  kind and types (`allocator.c`'s `SystemHeapAllocator_Malloc` and `_Free`, CPS's ping and its reply, battle's two
+  messages in variable 0x3f) can't be told apart, and a row whose function and types both changed (`mb_wm.c`'s)
+  doesn't match. Of the 29 new rows on main, 8 were old findings under new names. Regenerating the baseline from the
+  old one with `--update` keeps the classes of the rest, and a script that sets the new rows' classes by file and
+  function keeps the work reviewable.
+- **clang's spelling of a type is the guard's key, so check it on two compilers.** Apple clang 21 and Homebrew's
+  clang 23 give the same keys on main, and so did CI's Apple clang 17 and Ubuntu's clang 21.1.8 (a configure-only
+  build directory with `-DCMAKE_C_COMPILER=/opt/homebrew/opt/llvm/bin/clang` is enough: the guard needs only the
+  compile database), but clang 23 calls a pointer difference `__ptrdiff_t` where Apple clang says `long`, and a
+  `const uptr` read from a const table is spelled with its qualifier, which a set of names misses until the qualifiers
+  are stripped.
+- **Only `u32` to `uptr` keeps MWCC's tokens.** `uptr` and `sptr` are `u32` and `s32` for MWCC, so retyping a `u32` or
+  an `s32` leaves every file's preprocessed text as it was, which `check_mwcc_neutral.py` proves for every file that
+  includes the header at once. An `int` made `sptr` becomes `s32`, which MWCC's `types.h` (its `#else`) makes
+  `signed long`: the same size as `int` but another type, so the tokens differ and the code may. The check then lists
+  every file that includes the header, and the proof is ninja's SHA1s for the complete ones and `compiler_probe.py`
+  before and after, in both versions, for the incomplete ones (learned on the stopped `port-64bit-sweep` branch).
+- **A getter that returns pointers and numbers alike is retyped whole, with every function its pointer type
+  reaches.** On the stopped branch, Join Avenue's four getters and four setters shared overlay 137's function types,
+  so all of them had to return or take a `uptr`, even those that only give numbers: a callback that returns a `u32`
+  through a pointer typed to return a `uptr` leaves the high half undefined on arm64. Its callers keep their numbers
+  in 32-bit locals; the guard doesn't count a call's result narrowed as it is stored, and flags any caller that makes
+  a pointer of the cut value. PR 14 retyped the getters and setters on `main` but not overlay 137's
+  `ResortPersonGetParamFunc` and `ResortPersonSetParamFunc` they are cast to, nor two callers that cut a name with
+  `(u32)` before the setter; the guard's first run after it merged found all of them (R05's `fn-cast` rows).
+
 ## 2026-10-23: the field's entry, after review
 
 - **Host memory that stands in for the game's follows the life of what it stands for.** The first version of the
