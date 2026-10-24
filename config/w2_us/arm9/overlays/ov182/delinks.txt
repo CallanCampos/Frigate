@@ -168,6 +168,7 @@ lib/dwcutilui/src/dwc_util_link_icon.c:
     .bss        start:0x021c40b8 end:0x021c40bc
 
 lib/dwcutilui/src/dwc_util_keyboard.c:
+    complete
     .text       start:0x021abb50 end:0x021acdc0
     .rodata     start:0x021bfbf8 end:0x021bfebc
     .data       start:0x021c09c8 end:0x021c0bac

@@ -1457,6 +1457,12 @@ Same instructions, scheduled in another order.
   constant offsets: TwlSDK's `SNDEXi_SetIirFilter` (`sndex.c`) clears two flags and then reloads `result`, a local
   whose address it passed to `OS_ReceiveMessage`. With the two flags as fields at 0x18 and 4 of a 0x5c-byte struct,
   the reload goes between the two stores, and with them separate statics it stays after both, as in the original.
+  Growing the object works too: TwlSDK's shutter sound (`dsp_audio.c`) stores `playing`, at 0x18 of its work, after the
+  argument setup of `func_027060b4`'s pipe write and right before the message's four stores, as the original does,
+  only with the stop alarm that follows the work in `.bss` as the work's last member (0x50 bytes, as Black 1's decomp
+  has it), and with the message built in the function; with the work 0x24 bytes and the alarm a static of its own,
+  `playing` was stored before the argument setup (44 bytes), and with the alarm in the work but the message built in a
+  `static inline`, 10 bytes of registers still differed.
 - Stores to `volatile` fields are scheduled apart from the instructions around them even when they are written in order:
   NitroSDK's `SNDi_InitSharedWork` (`snd_work.c`) copies its parameter to a saved register before it builds the zero it
   stores (`adds r4, r0, #0; movs r1, #0`) only with `SNDSharedWork`'s status words `volatile`, as NitroSDK declares the
@@ -3503,7 +3509,10 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   for the packets' 2-byte `memcpy`s (`add r2, sp, #0; adds r2, #2`, then `ldrb`/`strb` pairs) and the bound address's
   8-byte `memset`, and so does ghttp's `ghttpEncryption.c`, whose `ghiEncryptorSslInitFunc` clears its 8-byte state with
   eight `strb`, where every loop spelling stays a loop and `memset` from `dwc/ext.h` stays a call. The other functions
-  retain their matches, apart from `POKE_NET_Connecting`'s documented scheduling difference.
+  retain their matches, apart from `POKE_NET_Connecting`'s documented scheduling difference. DWC's `gamestats.c`
+  includes it for its 20-byte secret: `OnAnswered` copies it in place as the ROM does with `memcpy` into a `char`
+  array, where a struct copy of a 20-byte struct gave the same loop with the source and destination registers swapped,
+  and its 0x20- and 0x28-byte `memcpy`s stay calls, as in the ROM.
 - In the same way, MWCC takes the `exit` that a header named `stdlib.h` declares for a function that doesn't return,
   and drops the code after a call of it: `gfl/heap.c`'s `GFL_HeapDumpOnFailure` calls `exit(1)` and goes on, and comes
   out 0x22 bytes against 0x3c with `<stdlib.h>`. It gets `exit` from `nitro/os.h` instead.
