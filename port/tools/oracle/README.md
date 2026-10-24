@@ -388,7 +388,8 @@ clock's, and its stack holds its own frames ([../../docs/decomp-findings.md](../
   another, the clock being among what it hashes (Black 2 `0x5a0af77416c50a14`, White 2 `0x270fd5258c56ebe3`); a
   battle's depends on how the DS reached it, the clock, the presses and the save among it.
 - **An input file gives them to the port** ([`seed` lines](#input-files)), which takes them in place of the ones it
-  builds (`port/hal/gfl/random_seed.h`) and lists the seeds it used in `run.txt`.
+  builds (`port/hal/gfl/random_seed.h`) and lists the seeds it used in `run.txt`
+  ([ADR 0022](../../docs/adr/0022-the-ds-random-seeds-given-by-input-files.md)).
 - **`oracle.py seeds NAME`** plays a sequence's or a save's input file on the oracle, from the save it starts from, and
   prints the seeds the DS built as the file's lines; `oracle.py sequence` reads them from its own oracle run the same
   way, and fails when the file gives seeds that aren't the DS's, all of them in order (a file without seeds leaves the
@@ -400,9 +401,9 @@ clock's, and its stack holds its own frames ([../../docs/decomp-findings.md](../
   Route 19 route in both versions.
 - **With the DS's seeds the port draws the DS's numbers** wherever its passes draw as the DS's do: New Game's day care
   egg seed, which it writes into the save, is the DS's (`replay_same_save`), and on the Route 19 route GFL's linear
-  generator's state and the twister's index are the DS's count for count, through the title, CONTINUE and the field, to
-  Hugh's battle. Where the CPU's time decides when the game draws they part: the trainers' AI
-  ([below](#known-differences-from-the-hardware)).
+  generator's state and the twister's index were the DS's count for count, through the title, CONTINUE and the field, to
+  Hugh's battle, in a trace with scratch instrumentation that no test holds yet. Where the CPU's time decides when the
+  game draws they part: the trainers' AI ([below](#known-differences-from-the-hardware)).
 
 ## The boot sequence (Black 2, no input, blank save)
 
@@ -547,34 +548,38 @@ Results, every port frame but the known differences:
 | field_menus, White 2 | 5,200 | 5,171 | 2,171 | 3,000 | the title's 28 port frames and 3402, oracle frames 1260, 4852 | not compared |
 | party_menus, Black 2 | 8,500 | 8,190 | 4,250 | 3,940 | the title's 21 port frames, the summary's 289 (4534-4822), oracle frame 4920 | not compared |
 | party_menus, White 2 | 8,500 | 8,182 | 4,252 | 3,930 | the title's 28 port frames and 3402, the summary's 289, oracle frames 1260, 4852 | not compared |
-| aspertia, Black 2 | 15,800 | 15,708 | 5,446 | 9,869 | the title's 21 port frames, 7751, Mom's balloon's 16, the zoom's 54, oracle frames 4943, 9841, 17462-17519; the top screen of Minccino's 393 (its bottom screen exact) | 14,656 of 14,656, 29 left out |
-| aspertia, White 2 | 15,800 | 15,700 | 5,508 | 9,799 | the title's 28 port frames and 3402, 7811, Mom's balloon's 16, the zoom's 54, oracle frames 1283, 4875, 9837-9838, 17401-17457; the top screen of Minccino's 393 (its bottom screen exact) | 14,656 of 14,656, 29 left out |
+| aspertia, Black 2 | 15,800 | 15,708 | 8,469 | 6,846 | the title's 21 port frames, 7751, Mom's balloon's 16, the zoom's 54, oracle frames 4943, 9841, 17462-17519; the top screen of Minccino's 393 (its bottom screen exact) | 14,656 of 14,656, 29 left out |
+| aspertia, White 2 | 15,800 | 15,700 | 8,531 | 6,776 | the title's 28 port frames and 3402, 7811, Mom's balloon's 16, the zoom's 54, oracle frames 1283, 4875, 9837-9838, 17401-17457; the top screen of Minccino's 393 (its bottom screen exact) | 14,656 of 14,656, 29 left out |
 
 Each comparison's summary gives its screens with 3D, compared by their pictures, and their pixels beyond the pixel
-tolerance at the median and at most: 6 to 18 at the median by sequence and version, but for party_menus, whose 3D is
-mostly the Aspertia City lookout (39 in Black 2, 21 in White 2); at most 80 before the field (the title's), 138 at the
-lookout and 89 in the exit route, of the 245 allowed, nearly all on polygon edges (their coverage and fill). Inside
-polygons the pixels match: they didn't until the rasterizer took the values along an edge by line, as melonDS does,
-where it had taken them along an X-major edge's run, which put whole spans' colours a step apart (before, a median of
-79 and at most 172). The field is no known difference: its 464 frames in each continue sequence match, the black of
-its load, the season banner and the bottom screen exactly (170 frames, 169 from the starter save) and its 3D within
-the tolerance. Once it has faded in, the player's room has 21 to 25 pixels beyond the pixel tolerance in every frame,
-and the Aspertia City lookout 135 to 138, the edges of its trees and of the hills on the horizon, more than any other
-scene but within the 245, in both versions; the lookout had 141 to 143 until the geometry engine divided the viewport
-transform as the DS's 32-bit divider does (the exit route's lake, above). With the field menu open the game darkens
-the field on the top screen, every channel to about 5/8 (a wall's 243, 231, 178 to 154, 146, 113 on the oracle),
-which brings the two rasterizers' edge pixels closer together: the room's 25 become 18 and the lookout's 135 to 138
-become 103 to 108, in both versions. These are the "18 pixels on the 3D edges behind the open menu" of the deep dive of
-2026-10-23, whose 28 frames that failed failed on the bottom screen's clock alone, the top passing. Every frame of the
-apps is exact on the count, but the summary's ([below](#known-differences-from-the-hardware)). The menu's bottom
-screen shows the clock; pinned, it shows 12:00 on both, so that screen is held exact. The house replay, whose clock
-runs, holds it to the oracle's within its frame ranges ([port/tests/replay](../../tests/replay/check_screens.py)). In
-the exit route (aspertia) a screen with 3D has 18 pixels beyond the pixel tolerance at the median in Black 2 and 17 in
-White 2: about 16 in the flight over the city, 58 in front of the player's house, 18 in the house and on Aspertia
-City's street, 25 in the house the route enters and 38 back on the street, and at most 80 in the flight and 89 on the
-street (port frame 14549), in both versions; the flight had up to 200 before the divider. Outside Minccino's idle,
-whose top screen is left out, the intro's 3D is exact in both versions, Minccino's Poké Ball burst, the first
-particles any sequence reached, among it. NNS G3D's state matches at every frame compared.
+tolerance at the median and at most: 5 to 18 at the median by sequence and version, 0 in the exit route, and in
+party_menus, whose 3D is mostly the Aspertia City lookout, 35 in Black 2 and 21 in White 2; at most 80, the title's
+(port frame 2144 in Black 2; White 2's 54 at 1884, and 80 at 9152 in its exit route), of the 245 allowed, nearly all on
+polygon edges (their coverage and fill). Inside polygons the pixels match: they didn't until the rasterizer took the
+values along an edge by line, as melonDS does, where it had taken them along an X-major edge's run, which put whole
+spans' colours a step apart (before, a median of 79 and at most 172). The field is no known difference: its 464 frames
+in each continue sequence match, the black of its load, the season banner and the bottom screen exactly (170 frames, 169
+from the starter save) and its 3D within the tolerance. Once it had faded in, the player's room had 21 to 25 pixels
+beyond the pixel tolerance in every frame, and the Aspertia City lookout 135 to 138, the edges of its trees and of the
+hills on the horizon (141 to 143 until the geometry engine divided the viewport transform as the DS's 32-bit divider
+does: the exit route's lake, above), in both versions, until `port/gfx/ref/ds3d.c` interpolated Z-buffer depth as
+melonDS does (`DepthLine`, derived from melonDS's code; the railing's seam at the lookout, which phase 4's route found;
+[../../docs/STATUS.md](../../docs/STATUS.md)): now the room has 2 in every frame from port frame 3640 to 3900 and the
+lookout 40 or 41, in both versions. With the field menu open the game darkens the field on the top screen, every channel
+to about 5/8 (a wall's 243, 231, 178 to 154, 146, 113 on the oracle), which brought the two rasterizers' edge pixels
+closer together before that change: the room's 25 became 18 and the lookout's 135 to 138 became 103 to 108, in both
+versions. These are the "18 pixels on the 3D edges behind the open menu" of the deep dive of 2026-10-23, whose 28 frames
+that failed failed on the bottom screen's clock alone, the top passing. Every frame of the apps is exact on the count,
+but the summary's ([below](#known-differences-from-the-hardware)). The menu's bottom screen shows the clock; pinned, it
+shows 12:00 on both, so that screen is held exact. The house replay, whose clock runs, holds it to the oracle's within
+its frame ranges ([port/tests/replay](../../tests/replay/check_screens.py)). In the exit route (aspertia) a screen with
+3D has 0 pixels beyond the pixel tolerance at the median in both versions since the depth change, and 8,469 of Black 2's
+frames are exact (8,531 of White 2's), where 5,446 (5,508) were before it, when the median was 18 (17): about 16 in the
+flight over the city, 58 in front of the player's house, 18 in the house and on Aspertia City's street, 25 in the house
+the route enters and 38 back on the street, and at most 80 in the flight and 89 on the street (port frame 14549), in
+both versions; the flight had up to 200 before the divider. Outside Minccino's idle, whose top screen is left out, the
+intro's 3D is exact in both versions, Minccino's Poké Ball burst, the first particles any sequence reached, among it.
+NNS G3D's state matches at every frame compared.
 
 ## Saves
 
@@ -994,9 +999,13 @@ failure to fix, never a known difference. By kind:
   setup draws in the same pass on both (count 7495 for the first), and the port's AI picks at the next pass, the DS's
   two passes later, the seventh number after the setup where the port's is the third. Oshawott's first pick is the same
   by chance, its second (count 7969 on the port) is another, and the battle differs from that turn's rolls on (count
-  8193) ([../../docs/decomp-findings.md](../../docs/decomp-findings.md)). No host has the DS's time, so a trainer battle
-  is held to melonDS only while the AI thinks within a pass there. A wild Pokémon has no AI scripts (no AI flags,
-  `GetClientAIFlags` in `src/ov167/btl_main.c`) and picks at once.
+  8193) ([../../docs/decomp-findings.md](../../docs/decomp-findings.md)). The trace was made with scratch
+  instrumentation (a log of `GFL_RandomMT`'s callers in a scratch build of the port and a PC hook in a scratch build of
+  melonDS), which no test holds yet. No host has the DS's time, so a trainer battle is held to melonDS only while the AI
+  thinks within a pass there: a sequence stops before the AI's first decision that the DS's time moves, and the route
+  goes on from melonDS's save made after the battle ([ADR
+  0023](../../docs/adr/0023-oracle-routes-part-where-the-ds-cpu-time-decides.md)). A wild Pokémon has no AI scripts (no
+  AI flags, `GetClientAIFlags` in `src/ov167/btl_main.c`) and picks at once.
 - **Random numbers.** GFL seeds its random numbers from a hash that includes a buffer the DS's stack fills
   ([../../docs/decomp-findings.md](../../docs/decomp-findings.md), `buildSeed`), so the port's differ from the DS's
   unless the input file gives the DS's seeds ([Random seeds](#random-seeds)), which the exit route's doesn't.

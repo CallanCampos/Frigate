@@ -30,7 +30,8 @@ workflow goes in the decomp checkout instead; this file is the port's ([CLAUDE.m
 - **A budget of the CPU's time is where a native port parts from the DS.** Code that works until `OS_GetTick` says
   its time is up (the trainers' AI, 500 ticks a pass) runs a different number of passes on a host, whose clock moves
   only by modelled busy loops. If anything else draws from the same generator at every pass, the outcome changes. A
-  test of such code holds it up to the first decision the budget moves, and starts again from the oracle's save after.
+  test of such code holds it up to the first decision the budget moves, and starts again from the oracle's save after
+  ([ADR 0023](adr/0023-oracle-routes-part-where-the-ds-cpu-time-decides.md)).
 
 ## 2026-10-24: T5 on the field's sequences
 
