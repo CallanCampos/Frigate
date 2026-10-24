@@ -264,10 +264,10 @@ void CtvtTalk_Delete(CommTvtWork *sys, CtvtTalk *talk) {
 }
 
 // The resources of the actors are the system's: characters, palette and cells
-static inline ClActor *CtvtTalk_CreateActor(CommTvtWork *sys, int chars, int palette, int cells,
-                                            const ClActorSetup *setup, HeapID heapId) {
-    return ClActor_Create(CommTvt_GetClActUnit(sys), CommTvt_GetObjResource(sys, chars),
-                          CommTvt_GetObjResource(sys, palette), CommTvt_GetObjResource(sys, cells), setup, 1, heapId);
+static inline void CtvtTalk_CreateActor(CommTvtWork *sys, ClActor **actor, int chars, int palette, int cells,
+                                        const ClActorSetup *setup, HeapID heapId) {
+    *actor = ClActor_Create(CommTvt_GetClActUnit(sys), CommTvt_GetObjResource(sys, chars),
+                            CommTvt_GetObjResource(sys, palette), CommTvt_GetObjResource(sys, cells), setup, 1, heapId);
 }
 
 void CtvtTalk_Enter(CommTvtWork *sys, CtvtTalk *talk) {
@@ -289,39 +289,39 @@ void CtvtTalk_Enter(CommTvtWork *sys, CtvtTalk *talk) {
     setup.sequence = talk->speed + 25;
     setup.priority = 0;
     setup.bgPriority = 2;
-    talk->speedCursor = CtvtTalk_CreateActor(sys, 5, 1, 9, &setup, heapId);
+    CtvtTalk_CreateActor(sys, &talk->speedCursor, 5, 1, 9, &setup, heapId);
     ClActor_SetVisible(talk->speedCursor, TRUE);
     if (CommTvt_GetViewSwapped(sys) == TRUE) {
         setup.sequence = 21;
     } else {
         setup.sequence = 22;
     }
-    talk->zoomButton = CtvtTalk_CreateActor(sys, 5, 1, 9, &setup, heapId);
+    CtvtTalk_CreateActor(sys, &talk->zoomButton, 5, 1, 9, &setup, heapId);
     ClActor_SetVisible(talk->zoomButton, TRUE);
     setup.sequence = 20;
-    talk->exitButton = CtvtTalk_CreateActor(sys, 5, 1, 9, &setup, heapId);
+    CtvtTalk_CreateActor(sys, &talk->exitButton, 5, 1, 9, &setup, heapId);
     ClActor_SetVisible(talk->exitButton, TRUE);
     setup.sequence = 36;
-    talk->gameButtons[0] = CtvtTalk_CreateActor(sys, 5, 1, 9, &setup, heapId);
+    CtvtTalk_CreateActor(sys, &talk->gameButtons[0], 5, 1, 9, &setup, heapId);
     ClActor_SetVisible(talk->gameButtons[0], TRUE);
     setup.sequence = 37;
-    talk->gameButtons[1] = CtvtTalk_CreateActor(sys, 5, 1, 9, &setup, heapId);
+    CtvtTalk_CreateActor(sys, &talk->gameButtons[1], 5, 1, 9, &setup, heapId);
     ClActor_SetVisible(talk->gameButtons[1], TRUE);
     setup.sequence = 24;
-    talk->voiceIcon = CtvtTalk_CreateActor(sys, 5, 1, 9, &setup, heapId);
+    CtvtTalk_CreateActor(sys, &talk->voiceIcon, 5, 1, 9, &setup, heapId);
     ClActor_SetVisible(talk->voiceIcon, TRUE);
     setup.x = 232;
     setup.y = 168;
     setup.sequence = 1;
     setup.priority = 0;
     setup.bgPriority = 0;
-    talk->talkButton = CtvtTalk_CreateActor(sys, 6, 2, 10, &setup, heapId);
+    CtvtTalk_CreateActor(sys, &talk->talkButton, 6, 2, 10, &setup, heapId);
     ClActor_SetVisible(talk->talkButton, TRUE);
     ClActor_SetAutoAnim(talk->talkButton, TRUE);
 
-    talk->voiceIconState = VOICE_ICON_READY;
     talk->state = TALK_STATE_FADE_IN;
     talk->waitSound = FALSE;
+    talk->voiceIconState = VOICE_ICON_READY;
     talk->shownVoiceIconState = VOICE_ICON_MAX;
     talk->waveWindow = BmpWin_CreateDynamic(4, 8, 3, 16, 8, 10, TRUE);
     talk->messageWindow = BmpWin_CreateDynamic(4, 1, 1, 30, 4, 10, TRUE);

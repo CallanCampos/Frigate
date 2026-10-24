@@ -785,6 +785,23 @@ Same instructions, registers swapped.
   dead: `dwc_aoss.c`'s `make_crc_table(int i, u32 *table)` with `for (i = 0; ...)` swaps its two counters' registers
   (`r2`/`r0`) under MWCC 2.0, and matches with the caller's argument as a parameter it doesn't read (`int ready`) and
   `u32 value; int i; int bit;` declared in that order.
+- Instruction selection starts a new basic block before a statement once the current block holds more than 100 PCode
+  instructions, counting every temporary, call argument and dead store (mwccarm 1.1p1's check at file offset 0x50dcd0,
+  the threshold byte at 0x50dd11). At -O2 and up block merging folds each cut back into the block before it, unless that
+  block ends with a call whose value is discarded. Value numbering shares a constant across an unmerged cut, but the
+  peephole that turns a copy of a register holding a small constant back into `movs rd, #imm` works within one block, so
+  uses behind the cut stay `adds rd, rm, #0`, and padding before a run of calls moves where such copies start.
+  `CtvtTalk_Enter` (overlay 257) passes its 1 as copies of r7 from the talk button on because the original has a cut
+  after the voice icon's `ClActor_SetVisible`, which an out-parameter actor helper (`*actor = ClActor_Create(...)`, as
+  in `ctvt_call.c`) gives where a helper returning the actor does not: one PCode instruction less per actor.
+- Which constant keeps a saved register can turn on the order of field stores between calls. Simplify (mwccarm 1.1p1
+  file offset 0x526630) spills the node with the lowest cost over degree, a tie going to the higher-numbered node, and
+  the spill cost (0x5b0420) counts copies against a constant and one reload per stretch of uses that a call, or a store
+  through a large-offset address temporary (`adds rT, r4, #0xac; str rV, [rT]`), ends. With the out-parameter helper,
+  `CtvtTalk_Enter` still spilled the 1 and built it at each use (14 bytes longer) until the work's first stores were
+  written in struct order: `voiceIconState` (at 0xac) stored after `state` and `waitSound` ends a stretch that already
+  holds them, the shared 0 costs one reload less and ties with the 1, and the 0 is spilled and rebuilt as `movs` in each
+  group, as in the original.
 
 ## Stack slots
 

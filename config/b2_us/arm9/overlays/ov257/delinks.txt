@@ -47,6 +47,7 @@ src/ov257/ctvt_draw.c:
     .data       start:0x021b264c end:0x021b2658
 
 src/ov257/ctvt_talk.c:
+    complete
     .text       start:0x0219cd74 end:0x0219ef4c
     .rodata     start:0x021b19ac end:0x021b1a08
     .data       start:0x021b2604 end:0x021b2610
