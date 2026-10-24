@@ -495,7 +495,7 @@ static void drawApInfo(void) {
 
 // The access point's SSID, on two lines when it is longer than 16 characters
 static void drawAp(int index, int row) {
-    int length = DWCi_MOV_WH_SetUserGameInfo(sApList->entries[index].ssid, sizeof(sApList->entries[index].ssid));
+    int length = DWCi_STRlNLen(sApList->entries[index].ssid, sizeof(sApList->entries[index].ssid));
     int y = row * AP_LIST_ROW_HEIGHT;
     u16 line[17];
     int count;

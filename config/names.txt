@@ -22560,8 +22560,8 @@ overlays/ov182 0x021bccd8 DWCi_OBJlGetOam
 overlays/ov182 0x021bccec DWCi_OVRlInit
 overlays/ov182 0x021bcdbc DWCi_OVRlAlloc
 overlays/ov182 0x021bcec4 DWCi_OVRlFree
-overlays/ov182 0x021bcef8 DWCi_MOV_WH_SetUserGameInfo
-overlays/ov182 0x021bcf10 DWCUtilString_Widen
+overlays/ov182 0x021bcef8 DWCi_STRlNLen
+overlays/ov182 0x021bcf10 DWCi_STRlConvertStringAsciiToUnicode
 overlays/ov182 0x021bcf38 DWCi_ClearVram
 overlays/ov182 0x021bcf9c DWCUtilBank_Exit
 overlays/ov182 0x021bd040 clearVram

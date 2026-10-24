@@ -71,7 +71,7 @@ void DWCUtilWepKeyboard_Init(void) {
     DWCi_GetParam2_(&field, &fromList);
     if (field == 0) {
         DWCi_SETTINGlGetSsid(sWepKeyboard->str);
-        sWepKeyboard->length = DWCi_MOV_WH_SetUserGameInfo(sWepKeyboard->str, WEP_KEYBOARD_LENGTH);
+        sWepKeyboard->length = DWCi_STRlNLen(sWepKeyboard->str, WEP_KEYBOARD_LENGTH);
     }
     initGraphics();
     DWCi_HLlLoad(field + 9);
@@ -354,7 +354,7 @@ static BOOL isCorrect(void) {
     if (fromList == 1 && sWepKeyboard->str[0] == '\0') {
         return FALSE;
     }
-    length = DWCi_MOV_WH_SetUserGameInfo(sWepKeyboard->str, WEP_KEYBOARD_LENGTH);
+    length = DWCi_STRlNLen(sWepKeyboard->str, WEP_KEYBOARD_LENGTH);
     switch (length) {
     case 0:
     case 5:
