@@ -25,6 +25,7 @@ at build time, pinned to a release, and never committed.
 | `compare.py` | compares two runs: screens, memory, alignment |
 | `sound.py` | compares two runs' sound: the sound driver's state run by run, what the ARM9 sees of it frame by frame, and the sound by segment ([Sound](#sound)) |
 | `sndtrace.h` | the sound trace's format, plain C11, which the port's sound driver (`port/hal/snd7/snd7.c`), its `--sound-trace` (`port/app/sound_trace.c`) and the sound driver's tests include |
+| `seeds.py` | the random seeds the DS built in an oracle run, read from the memory it dumps ([Random seeds](#random-seeds)) |
 | `symbols.py` | the decomp's symbols, statics included, for memory dumps |
 | `melonds.cmake` | the pinned melonDS release (tag and SHA-256) |
 | `CMakeLists.txt` | the oracle's own build |
@@ -65,6 +66,7 @@ oracle.py sequence title --port build/port/frigate-black2 --out build/oracle-run
 oracle.py sequence-check title --port build/port/frigate-black2
 oracle.py save first_save --out build/oracle-runs/first_save.sav
 oracle.py sequence continue --port build/port/frigate-black2 --out build/oracle-runs/continue
+oracle.py seeds first_save
 oracle.py sound opening --port build/port/frigate-black2 --out build/oracle-runs/sound
 oracle.py sound-check title --port build/port/frigate-black2
 ```
@@ -83,8 +85,9 @@ are the comparison sequences and their check without the oracle ([below](#the-co
 new save directory with FILE in it under the ROM's game code (`IREO.sav`, `IRDO.sav`), as the port names its saves, and
 its `--save-out` is the blank chip (524,288 bytes of 0xff) when the game neither had a save nor wrote one, never a file
 left by an earlier run. `oracle.py save NAME` makes one of the saves the sequences start from on the oracle, and
-`oracle.py port-save` boots the port's own save on it ([below](#saves)). `pbw-oracle --help` and the scripts' `-h` list
-every option.
+`oracle.py port-save` boots the port's own save on it ([below](#saves)). `oracle.py seeds NAME` prints the random seeds
+the DS builds playing a sequence's or a save's input file, as the file's `seed` lines ([below](#random-seeds)).
+`pbw-oracle --help` and the scripts' `-h` list every option.
 
 `pbw-oracle`'s options, which `oracle.py run` fills in:
 
@@ -93,7 +96,7 @@ every option.
 | `--rom PATH`, `--out DIR`, `--frames N` | the ROM, the run directory, how many frames to run |
 | `--input FILE` | an input file (below); without one nothing is held. One on game frames needs `--counter`, and its `version` must be the ROM's (status 2 otherwise) |
 | `--screens LIST` | the frames to write as PNG: `N`, `A-B`, `A-B/STEP`, `all` or `none`, comma-separated |
-| `--dump [LABEL=]TARGET[:SIZE][@LIST]` | memory to write to `memory.txt` at the frames of LIST (the last frame by default) |
+| `--dump [LABEL=][*]TARGET[:SIZE][@LIST]` | memory to write to `memory.txt` at the frames of LIST (the last frame by default); with `*`, SIZE bytes from where the 32-bit pointer at TARGET points at that frame, plus TARGET's `+OFFSET`, as the port's `--run-dump` takes it (none at a frame where the pointer leads outside the memory a dump reads, a NULL one) |
 | `--config DIR`, `--symbols FILE` | where symbols come from (below) |
 | `--counter TARGET` | a 32-bit counter recorded for every frame: GFL's frame count, for alignment and game frames |
 | `--time "YYYY-MM-DD HH:MM:SS"` | the clock at power-on; else the input file's; else `2012-10-07 12:00:00` |
@@ -219,6 +222,7 @@ time 2012-10-07 12:00:00      # optional: the clock at power-on
 version b2_us                 # optional: b2_us or w2_us
 frames game                   # optional: game (the default) or video
 clock pinned                  # optional: running (the default) or pinned
+seed 0xea56a175a2fffc8a       # optional, repeated: the random seeds the DS built, in order
 # FRAME BUTTONS [TOUCH]
 120 A                         # A held from frame 120
 122 -                         # nothing held from frame 122
@@ -229,9 +233,9 @@ clock pinned                  # optional: running (the default) or pinned
 ```
 
 - The first line that isn't blank or a comment is `pbwinput 1`, the format's version.
-- `time`, `version`, `frames` and `clock` come before the first frame line, once each. `time` is
-  `YYYY-MM-DD HH:MM:SS` from 2000 to 2099; the oracle's `--time` overrides it. `version` is checked against the ROM's
-  game code (`IREO` for `b2_us`, `IRDO` for `w2_us`).
+- `time`, `version`, `frames` and `clock` come before the first frame line, once each, and so do the `seed` lines.
+  `time` is `YYYY-MM-DD HH:MM:SS` from 2000 to 2099; the oracle's `--time` overrides it. `version` is checked against
+  the ROM's game code (`IREO` for `b2_us`, `IRDO` for `w2_us`).
 - `clock` says whether the real-time clock runs on from `time`: **`running`**, the default, as a console's does, or
   **`pinned`**, at `time` for the whole run. A running clock moves with each program's video frames, and the DS takes
   more of them than the port to reach the same count (its movies, its loads), so a screen that shows the clock, such as
@@ -241,6 +245,20 @@ clock pinned                  # optional: running (the default) or pinned
   melonDS's clock chip timer, which counts the seconds on, and the port's clock stays at its fixed time
   (`port/hal/rtc/rtc7.c`); the game never uses the chip's interrupts, which the timer also raises. Only the date and
   time stop: the play time counts the CPU's ticks (`src/system/playtime_ctrl.c`), and goes on as before.
+- `seed` lines give the **random seeds the DS built**, in the order it built them, each a 64-bit number in
+  hexadecimal (`0x` and 1 to 16 digits), up to 64 of them. The game builds a seed from the console's entropy at
+  start-up, for GFL's random numbers, which the field draws from (a townsperson's walk, a wild Pokémon), and at each
+  battle's start, for the battle's (its damage rolls, critical hits, a Poké Ball's shakes): `buildSeed` in
+  `src/gfl/gf_standard.c`, which hashes the console's timers, the line being drawn, the VBlank count and the geometry
+  engine's status as the call finds them, and 20 bytes of whatever the DS's stack held. A host can't have any of
+  those as the DS has them (its CPU takes no time, and its stack holds other things), so the port builds other seeds,
+  and every random outcome differs from the DS's (port/docs/decomp-findings.md). The port's game takes the file's
+  seeds in place of the ones it builds, the n-th line for the n-th seed, and builds its own after the last
+  (port/hal/gfl/random_seed.h); its run directory's `run.txt` lists the seeds it used. melonDS builds the DS's own, so
+  the oracle reads the lines only as part of the file. With the DS's seeds the two programs draw the same random
+  numbers, and a battle or a wild encounter plays as the DS plays it. A file's seeds belong to its start: a DS that
+  starts from another save, or reaches a battle by other presses, builds other seeds. [Random seeds](#random-seeds)
+  says how to find a DS's.
 - `frames` says what FRAME counts. **`game`**, the default, counts passes of the game's main loop, the only count that
   gives both programs the same input at the same moment of the game ([PLAN.md §6](../../docs/PLAN.md#6-verification)):
   the DS drops frames under load and its start-up takes 241 frames, and the port does neither. Game frame N is the pass
@@ -284,7 +302,8 @@ What `pbw-oracle` and `oracle.py port` write, and `compare.py` reads:
   (`[LABEL=][*]SYMBOL[+OFFSET]:SIZE[@LIST]`: a global of the program by name, which the program finds with `dlsym`, so
   not a static; a size, which the host doesn't know; `*` for the bytes where the pointer at SYMBOL points, the
   oracle's `--dump` of the address that pointer holds there; the last frame of `--frames` without a list); and
-  `run.txt`, written at the start and again at the end with the frames completed and the exit status, so that a run a
+  `run.txt`, written at the start and again at the end with the frames completed, the exit status and the random seeds
+  the game used (`seeds`, then `seed_N: 0x... given` for one the input file gave, `built` for its own), so that a run a
   trap stub ends keeps its frames and says it didn't finish. A dump's ADDRESS is the host's, and its bytes are too: only
   data without pointers, longs or host padding compare with the DS's.
 - `run.txt`: `key: value` lines on how the run was made.
@@ -347,6 +366,43 @@ the PNG files and `frames.tsv` agree, that the WAV dump has a sample for each 10
 periodic runs 2728 ticks apart, each record in the frame whose VBlank comes next, and compares the screens of 11 frames
 with `port/tests/oracle/boot_<version>.tsv`, hashes the pinned melonDS gives (`oracle.py check --update` writes them).
 It exits 77 (skipped) without the oracle or without the ROM the decomp builds.
+
+## Random seeds
+
+The game seeds its random numbers from the console's entropy with `buildSeed` (`src/gfl/gf_standard.c`): GFL's at
+start-up (`GFL_RandomInit`, `src/system/gfl_use.c`: a linear congruential generator, and a Mersenne Twister seeded from
+its first number), which the field, the trainers' AI and the battle's view draw from, and each battle's at its start
+(`src/ov167/btl_main.c`), which its damage rolls, critical hits and a Poké Ball's shakes draw from. `buildSeed` hashes
+20 bytes of whatever its stack held and the 32 of `OS_GetLowEntropyData`: the line being drawn and the tick when the
+call comes, the tick counter and the VBlank count, the geometry engine's status, the clock, the MAC address, and the
+microphone's, touch screen's and buttons' state. Read at its return in an instrumented scratch build of melonDS
+(2026-10-24), Black 2's start-up hashes the tick `0x0f91` at line 119, VBlank 5, and return addresses and pointers on
+its stack (`0x0209aee8`, `0x02039de9`, `0x02200010`, ...), and builds `0xea56a175a2fffc8a`; the port hashes its virtual
+clock's tick and line there and zeros (`-ftrivial-auto-var-init=zero`), and builds `0x91230e3906d9f8f8` from the first
+save's input file. No host has what the DS hashes: its CPU takes no time, so the tick and the line at the call are its
+clock's, and its stack holds its own frames ([../../docs/decomp-findings.md](../../docs/decomp-findings.md)).
+
+- **The DS's seeds are the same at every run of an input file**, as the rest of the oracle is. Start-up builds GFL's at
+  frame 20, before it reads the save, so every file from power-on with the default clock gives the same first seed
+  (Black 2 `0xea56a175a2fffc8a`, White 2 `0x81d63ca2c9f3143e`), and every file with the clock pinned (`clock pinned`)
+  another, the clock being among what it hashes (Black 2 `0x5a0af77416c50a14`, White 2 `0x270fd5258c56ebe3`); a
+  battle's depends on how the DS reached it, the clock, the presses and the save among it.
+- **An input file gives them to the port** ([`seed` lines](#input-files)), which takes them in place of the ones it
+  builds (`port/hal/gfl/random_seed.h`) and lists the seeds it used in `run.txt`.
+- **`oracle.py seeds NAME`** plays a sequence's or a save's input file on the oracle, from the save it starts from, and
+  prints the seeds the DS built as the file's lines; `oracle.py sequence` reads them from its own oracle run the same
+  way, and fails when the file gives seeds that aren't the DS's, all of them in order (a file without seeds leaves the
+  port its own, and says so). melonDS has no hook where `buildSeed` returns, so they are read from memory the oracle
+  dumps at each frame (`seeds.py`): GFL's from its context and the twister's first word in the frames after start-up has
+  built it, the context's state walked back to the draw that seeded the twister, whose step before is the seed; a
+  battle's from `btl_calc.c`'s work (`data_ov167_021dd844`), which takes a copy of the battle's context at its start,
+  before its first roll. The instrumented build's seeds and these are the same: the start-up's and each battle's of the
+  Route 19 route in both versions.
+- **With the DS's seeds the port draws the DS's numbers** wherever its passes draw as the DS's do: New Game's day care
+  egg seed, which it writes into the save, is the DS's (`replay_same_save`), and on the Route 19 route GFL's linear
+  generator's state and the twister's index are the DS's count for count, through the title, CONTINUE and the field, to
+  Hugh's battle. Where the CPU's time decides when the game draws they part: the trainers' AI
+  ([below](#known-differences-from-the-hardware)).
 
 ## The boot sequence (Black 2, no input, blank save)
 
@@ -927,8 +983,23 @@ failure to fix, never a known difference. By kind:
   season's name, the field and each map), NNS G3D's state at its first frame, which the comparison pairs with the
   port's frame on the count, is the pass's work in progress; at its later frames it is the port's. In the exit route
   these are 14 frames in each version (`MID_PASS`), each checked against the DS's later frames of the same count.
+- **A budget of the CPU's time a pass.** The trainers' AI runs its scripts for at most 500 ticks of `OS_GetTick` a pass,
+  about a millisecond, and goes on where it stopped at the next (`TRAI_TIME_LIMIT`, `TrAI_RunScripts` in
+  `src/ov170/tr_ai.c`). On the DS the scripts take the CPU's time; on the port each `OS_GetTick` moves the virtual clock
+  a tick, so the AI runs 500 of its checks a pass and thinks in one. The battle's view draws two numbers a pass from
+  GFL's Mersenne Twister (`BtlvMcss_Main`'s blinks, `src/ov168/btlv_mcss.c`), and the AI picks among its best moves with
+  the next number (`TrAI_ChooseMove`), so its pick depends on how many passes it thought. Traced by the twister's
+  callers on both programs, with the DS's seeds (Black 2, the Route 19 route from the starter save): GFL's linear
+  generator's state and the twister's index are the DS's at every count to Hugh's battle; at each of his turns his AI's
+  setup draws in the same pass on both (count 7495 for the first), and the port's AI picks at the next pass, the DS's
+  two passes later, the seventh number after the setup where the port's is the third. Oshawott's first pick is the same
+  by chance, its second (count 7969 on the port) is another, and the battle differs from that turn's rolls on (count
+  8193) ([../../docs/decomp-findings.md](../../docs/decomp-findings.md)). No host has the DS's time, so a trainer battle
+  is held to melonDS only while the AI thinks within a pass there. A wild Pokémon has no AI scripts (no AI flags,
+  `GetClientAIFlags` in `src/ov167/btl_main.c`) and picks at once.
 - **Random numbers.** GFL seeds its random numbers from a hash that includes a buffer the DS's stack fills
-  ([../../docs/decomp-findings.md](../../docs/decomp-findings.md), `buildSeed`), so the port's differ from the DS's.
+  ([../../docs/decomp-findings.md](../../docs/decomp-findings.md), `buildSeed`), so the port's differ from the DS's
+  unless the input file gives the DS's seeds ([Random seeds](#random-seeds)), which the exit route's doesn't.
   In the exit route, Minccino plays its idle animation, about 290 frames long, after a random wait of 200 to 280
   passes in steps of 20 (`GFL_RandomMTRange(5) * 20 + 200`, `IntroMcss_Update` in `src/ov294/intro_mcss.c`), so its
   pose on the top screen can differ. The port starts the idle at port frame 4668 in both versions. White 2's DS draws a

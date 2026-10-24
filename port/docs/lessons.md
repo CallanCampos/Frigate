@@ -3,6 +3,22 @@
 What port work taught that isn't obvious from the code, newest first. A lesson about MWCC or the decomp's own
 workflow goes in the decomp checkout instead; this file is the port's ([CLAUDE.md](../CLAUDE.md), the iteration loop).
 
+## 2026-10-24: the DS's random seeds, and what they don't fix
+
+- **A seed is an input, like the clock.** `buildSeed` hashes the DS's CPU timing and its stack's leftovers, which no
+  host has; the port can't build the DS's seed, but it can be given it. Read the DS's seed where the game keeps it
+  (GFL's context and the twister it seeds, a battle's copy before its first roll), check the reading once against an
+  instrumented melonDS that logs the function's result, and give it to the port from the input file. Then hold the
+  outcome the seed decides (New Game's day care egg seed in the save) to the oracle's.
+- **Trace random numbers by the generator's state per count, then by its callers.** Comparing GFL's linear state and
+  the twister's index at every count found the first count they part in one pass over two runs; logging the twister's
+  callers there on both programs (a wrapper around the port's `GFL_RandomMT`, a PC hook in a scratch melonDS) showed
+  the AI drawing the same numbers two passes apart. The screens parted 550 counts later.
+- **A budget of the CPU's time is where a native port parts from the DS.** Code that works until `OS_GetTick` says
+  its time is up (the trainers' AI, 500 ticks a pass) runs a different number of passes on a host, whose clock moves
+  only by modelled busy loops. If anything else draws from the same generator at every pass, the outcome changes. A
+  test of such code holds it up to the first decision the budget moves, and starts again from the oracle's save after.
+
 ## 2026-10-24: T5 on the field's sequences
 
 - **A report at a shared copy names the copy, not the source.** ASan put the field's H6 and the Route 19 route's

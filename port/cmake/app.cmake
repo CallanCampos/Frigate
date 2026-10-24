@@ -74,11 +74,13 @@ target_compile_options(port_test_symbols PRIVATE -std=c11 -Wall -Wextra -Werror)
 target_link_libraries(port_test_symbols PRIVATE ${CMAKE_DL_LIBS})
 add_test(NAME app_symbols COMMAND port_test_symbols)
 
-# The run directory's writer (port/app/run_dir.c), plain and under the sanitizers, with the platform layer's SHA-1
+# The run directory's writer (port/app/run_dir.c), plain and under the sanitizers, with the platform layer's SHA-1 and
+# its record of the random seeds the game built
 foreach(variant IN ITEMS plain sanitized)
     set(target port_test_run_dir_${variant})
     add_executable(${target} "${CMAKE_CURRENT_SOURCE_DIR}/tests/app/test_run_dir.c"
-        "${CMAKE_CURRENT_SOURCE_DIR}/app/run_dir.c" "${CMAKE_CURRENT_SOURCE_DIR}/hal/rom/sha1.c" ${port_host_sources})
+        "${CMAKE_CURRENT_SOURCE_DIR}/app/run_dir.c" "${CMAKE_CURRENT_SOURCE_DIR}/hal/rom/sha1.c"
+        "${CMAKE_CURRENT_SOURCE_DIR}/hal/gfl/random_seed.c" ${port_host_sources})
     target_include_directories(${target} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
     target_compile_options(${target} PRIVATE -std=c11 -Wall -Wextra -Werror)
     if(variant STREQUAL "sanitized")
@@ -184,20 +186,28 @@ endif()
 # save directory of its own, writes the same save byte for byte (port/tests/replay/check_same_save.py). The console's
 # pending Wi-Fi ID that New Game copies into both copies of the main save is the oracle's, which DWC makes from the
 # clock and the DS's address of OS_GetTick: a host's address, which moves at every launch, once made each run's save
-# different (port/include/port_host.h). Without the player's ROM the program exits 66 and the test is skipped
-# The save file is named after the ROM's game code (port/hal/card/port_card.h); the ID's 8 bytes are the oracle's
+# different (port/include/port_host.h). The day care's egg seed, which New Game draws from GFL's Mersenne Twister
+# (src/system/daycare_savedata.c) into both copies too, is the oracle's: the input file gives the port the random seed
+# the DS built at start-up (port/hal/gfl/random_seed.h), and with the port's own seed the egg seed is another. Without
+# the player's ROM the program exits 66 and the test is skipped
+# The save file is named after the ROM's game code (port/hal/card/port_card.h); the ID's 8 bytes and the egg seed's are
+# the oracle's
 if(PORT_VERSION STREQUAL "b2_us")
     set(replay_same_save_file IREO.sav)
     set(replay_same_save_wifi_id 280c0000f2a0b315)
+    set(replay_same_save_egg_seed 255446c3ef431e3f)
 else()
     set(replay_same_save_file IRDO.sav)
     set(replay_same_save_wifi_id 69080000f2a0b3ff)
+    set(replay_same_save_egg_seed ffddcac38df8296c)
 endif()
 add_test(NAME replay_same_save
     COMMAND "${CMAKE_COMMAND}" -E env PYTHONDONTWRITEBYTECODE=1 "${PORT_PYTHON}"
         "${CMAKE_CURRENT_SOURCE_DIR}/tests/replay/check_same_save.py"
         --expect "${replay_same_save_file}:0x1aa04:${replay_same_save_wifi_id}"
-        --expect "${replay_same_save_file}:0x40a04:${replay_same_save_wifi_id}" --
+        --expect "${replay_same_save_file}:0x40a04:${replay_same_save_wifi_id}"
+        --expect "${replay_same_save_file}:0x20ecc:${replay_same_save_egg_seed}"
+        --expect "${replay_same_save_file}:0x46ecc:${replay_same_save_egg_seed}" --
         $<TARGET_FILE:${PORT_PROGRAM}> --headless --frames 5600 --watchdog 30
         --input "${CMAKE_CURRENT_SOURCE_DIR}/tests/oracle/first_save_${PORT_VERSION}.pbwinput")
 set_tests_properties(replay_same_save PROPERTIES SKIP_RETURN_CODE 66 TIMEOUT 1200)

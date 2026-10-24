@@ -4,10 +4,12 @@
 // frames by GFL's frame count (port/hal/gfl/gfl_frame.h), or video frames. The port's console never sleeps through a
 // VBlank (port/hal/pm wakes it at once), so every frame comes through port_replay_vblank. The file's time and clock
 // lines set the real-time clock at power-on and can pin it there for the whole run (port/hal/rtc, from
-// port/app/main.c). Plain C types only.
+// port/app/main.c), and its seed lines give the game a DS's random seeds (port/hal/gfl/random_seed.h). Plain C types
+// only.
 #ifndef PORT_APP_REPLAY_H
 #define PORT_APP_REPLAY_H
 
+#include <stddef.h>
 #include <stdint.h>
 
 // Loads the file. Returns 0, after printing why, when it can't be read or parsed
@@ -23,6 +25,9 @@ int port_replay_clock_pinned(void);
 const char *port_replay_version(void);
 // What the file's frames count, "game" or "video", or NULL without a file
 const char *port_replay_frames(void);
+// The file's "seed" lines, the seeds a DS built that the game takes in place of the ones it builds
+// (port/hal/gfl/random_seed.h): how many, and where they are; 0 without a file or without the lines
+size_t port_replay_seeds(const uint64_t **seeds);
 
 // Gives the game frame 1's state, which holds from power-on; before the game starts
 void port_replay_start(void);

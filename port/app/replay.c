@@ -1,16 +1,21 @@
 // Input replays (--input FILE, port/app/replay.h): at each VBlank, the buttons, lid and touch an input file holds for
 // the frame go to the game in place of the window's (port/hal/input, port/hal/tp), with the file's frames counted in
 // the game's own passes (GFL's frame count, port/hal/gfl/gfl_frame.h) or in VBlanks. It also gives port/app/main.c the
-// file's time and its clock line, which sets the real-time clock at power-on and can pin it there (port/hal/rtc). The
-// replay tests and the oracle's comparisons use it to bring a run to the same moments of the game as melonDS given the
-// same file.
+// file's time and its clock line, which sets the real-time clock at power-on and can pin it there (port/hal/rtc), and
+// its seed lines, the random seeds a DS built, which the game takes in place of its own (port/hal/gfl/random_seed.h).
+// The replay tests and the oracle's comparisons use it to bring a run to the same moments of the game as melonDS given
+// the same file.
 #include "app/replay.h"
 #include "hal/gfl/gfl_frame.h"
+#include "hal/gfl/random_seed.h"
 #include "hal/input/port_input.h"
 #include "hal/tp/tp_host.h"
 #include "tools/oracle/pbwinput.h"
 #include <stdio.h>
 #include <string.h>
+
+// Every seed a file can give fits where the platform layer keeps them
+_Static_assert(PBW_INPUT_MAX_SEEDS <= PORT_RANDOM_SEED_MAX_GIVEN, "an input file's seeds must fit random_seed.c's");
 
 // The file's input, empty without one, and the game clock, which runs either way for the run directory's game frames
 // (port/app/run_dir.h); zero-initialised, as pbw_input_init and pbw_game_clock_init leave them
@@ -57,6 +62,11 @@ const char *port_replay_frames(void) {
         return NULL;
     }
     return sInput.frames == PBW_INPUT_VIDEO_FRAMES ? "video" : "game";
+}
+
+size_t port_replay_seeds(const uint64_t **seeds) {
+    *seeds = sInput.seeds;
+    return sActive ? sInput.seedCount : 0;
 }
 
 // The buttons and lid where the game reads them, and the touch where the ARM7's touch service samples it. The input
