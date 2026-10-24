@@ -291,13 +291,14 @@ static BOOL GFL_G3DCurveSetLoadBuffer(G3DCurve *curve, int count, void *buffer, 
     return TRUE;
 }
 
-// Reads the frames from the one given into the buffers, as fixed-point numbers
+// Reads the frames from the one given into the buffers, as fixed-point numbers. The file's bytes are read into a
+// temporary buffer, and the floats are taken from it
 static void GFL_G3DCurvePreloadFrames(G3DCurve *curve, fx32 frame) {
     u32 index = (frame >> FX32_SHIFT) % curve->frameCount;
     u32 offset = CURVE_FILE_FRAMES;
     u32 size = 0;
     int i;
-    f32 *values;
+    u8 *buffer;
     int value;
 
     if (curve->hasScale) {
@@ -318,29 +319,29 @@ static void GFL_G3DCurvePreloadFrames(G3DCurve *curve, fx32 frame) {
     if (curve->hasTranslation) {
         size += curve->loadedCount * sizeof(VecFx32);
     }
-    values = GFL_HeapAllocate(HEAPID_TAIL(curve->heapId), size, FALSE, "ica_anime.c", 716);
-    GFL_ArcToolReadRange(curve->arc, curve->fileId, offset, size, values);
+    buffer = GFL_HeapAllocate(HEAPID_TAIL(curve->heapId), size, FALSE, "ica_anime.c", 716);
+    GFL_ArcToolReadRange(curve->arc, curve->fileId, offset, size, buffer);
     for (i = 0, value = 0; i < curve->loadedCount; i++) {
         if (curve->hasScale) {
-            curve->scales[i].x = FX32_CONST(*(f32 *)&values[value]);
-            curve->scales[i].y = FX32_CONST(*(f32 *)&values[value + 1]);
-            curve->scales[i].z = FX32_CONST(*(f32 *)&values[value + 2]);
+            curve->scales[i].x = FX32_CONST(*(f32 *)(buffer + value * sizeof(f32)));
+            curve->scales[i].y = FX32_CONST(*(f32 *)(buffer + (value + 1) * sizeof(f32)));
+            curve->scales[i].z = FX32_CONST(*(f32 *)(buffer + (value + 2) * sizeof(f32)));
             value += 3;
         }
         if (curve->hasRotation) {
-            curve->rotations[i].x = FX32_CONST(*(f32 *)&values[value]);
-            curve->rotations[i].y = FX32_CONST(*(f32 *)&values[value + 1]);
-            curve->rotations[i].z = FX32_CONST(*(f32 *)&values[value + 2]);
+            curve->rotations[i].x = FX32_CONST(*(f32 *)(buffer + value * sizeof(f32)));
+            curve->rotations[i].y = FX32_CONST(*(f32 *)(buffer + (value + 1) * sizeof(f32)));
+            curve->rotations[i].z = FX32_CONST(*(f32 *)(buffer + (value + 2) * sizeof(f32)));
             value += 3;
         }
         if (curve->hasTranslation) {
-            curve->translations[i].x = FX32_CONST(*(f32 *)&values[value]);
-            curve->translations[i].y = FX32_CONST(*(f32 *)&values[value + 1]);
-            curve->translations[i].z = FX32_CONST(*(f32 *)&values[value + 2]);
+            curve->translations[i].x = FX32_CONST(*(f32 *)(buffer + value * sizeof(f32)));
+            curve->translations[i].y = FX32_CONST(*(f32 *)(buffer + (value + 1) * sizeof(f32)));
+            curve->translations[i].z = FX32_CONST(*(f32 *)(buffer + (value + 2) * sizeof(f32)));
             value += 3;
         }
     }
-    GFL_HeapFree(values);
+    GFL_HeapFree(buffer);
     curve->loadedFrame = frame >> FX32_SHIFT;
 }
 

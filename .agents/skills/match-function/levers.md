@@ -890,8 +890,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - `p + v * 4` kept in a register with reads at `#4` and `#8`, where the original computes `(v + k) << 2` for each
   read: the original's read had a pointer conversion around the element's whole address (`*(f32 *)&words[v + k]`), a
   `volatile` address, an index sum converted to the other signedness or narrowed (also implicitly, through a `u32`
-  index parameter), or a variable subscript. Use the one the code's types call for. (matching.md: "only when one of
-  these holds")
+  index parameter), or a variable subscript. Use the one the code's types call for: a file's floats read from a `u8 *`
+  buffer of its bytes, `*(f32 *)(bytes + (v + k) * sizeof(f32))`, in `ica_anime.c`; never a cast to the type the
+  buffer already has. (matching.md: "only when one of these holds")
 - The loop passes off for a whole file, as a test: `-flag no-opt_loop_invariants` and
   `-flag no-opt_strength_reduction` in `--extra-flags`; the `-opt` sub-options do nothing after `-O4,p`.
   (matching.md: "takes a pragma's name")
