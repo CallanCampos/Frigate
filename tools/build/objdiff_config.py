@@ -17,7 +17,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
-from configure import ENCODING_FLAG, FILE_FLAGS, MERGED_SOURCES, source_compiler  # noqa: E402
+from configure import ENCODING_FLAG, FILE_FLAGS, source_compiler  # noqa: E402
 
 # The libraries of lib/, by directory, for their category names
 LIBRARY_NAMES = {
@@ -62,8 +62,7 @@ def categorize(config: dict, version: str):
         source = metadata.get("source_path")
         if source:
             group = modules.get(source, "main")
-            # A part of a merged file is its whole's code, in its whole's library (config/merged_sources.toml)
-            parts = Path(MERGED_SOURCES.get(source, source)).parts
+            parts = Path(source).parts
             if parts[0] == "lib":
                 libraries.add(parts[1])
                 origin = ["lib", f"lib/{parts[1]}"]
@@ -99,17 +98,10 @@ def main():
         cwd=ROOT, capture_output=True, text=True, check=True,
     )
     config = normalize(json.loads(result.stdout))
-    # A part of a merged file compares its whole's object, which holds its code (config/merged_sources.toml)
-    for unit in config.get("units", []):
-        source = unit.get("metadata", {}).get("source_path")
-        if source in MERGED_SOURCES and "base_path" in unit:
-            whole = Path(MERGED_SOURCES[source]).with_suffix(".o").as_posix()
-            unit["base_path"] = unit["base_path"].replace(Path(source).with_suffix(".o").as_posix(), whole)
-            unit.pop("scratch", None)
     # A source file that isn't written yet has no object to compare, only the delinked one
     for unit in config.get("units", []):
         source = unit.get("metadata", {}).get("source_path")
-        if source and source not in MERGED_SOURCES and not (ROOT / source).exists():
+        if source and not (ROOT / source).exists():
             unit.pop("base_path", None)
             unit.pop("scratch", None)
     # --c-flags remains the default for ordinary units. Game overrides replace those

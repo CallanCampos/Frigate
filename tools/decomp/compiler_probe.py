@@ -23,8 +23,9 @@ from elftools.elf.relocation import RelocationSection
 ROOT = Path(__file__).resolve().parents[2]
 TOOLS = ROOT / "tools"
 sys.path.insert(0, str(ROOT))
-from configure import ENCODING_FLAG, INCLUDE_DIRS, MERGED_SOURCES, source_compiler, mwcc_command  # noqa: E402
+from configure import ENCODING_FLAG, INCLUDE_DIRS, source_compiler, mwcc_command  # noqa: E402
 from tools.build.deadstrip import DeadStripError, dead_symbols, strip  # noqa: E402
+from tools.decomp.dsd_config import section_module  # noqa: E402
 
 # Preprocessor defines of each game version, as in configure.py
 VERSION_DEFINES = {"b2_us": ["BLACK2"], "w2_us": ["WHITE2"]}
@@ -62,28 +63,27 @@ def load_modules(version: str) -> dict[str, tuple[Path, int]]:
 
 @functools.lru_cache(maxsize=None)
 def source_ranges(root: Path, version: str, source: Path) -> dict[Path, tuple[tuple[int, int], ...]]:
-    """Returns the source's registered ranges, keyed by module; local names are only unique within a source."""
+    """Returns the source's registered ranges, keyed by module; local names are only unique within a source. An ARM9 main
+    file's migrated .ltdmain sections are the LTD autoload's."""
     source = source.resolve() if source.is_absolute() else (root / source).resolve()
     try:
         owner = source.relative_to(root).as_posix()
     except ValueError:
         return {}
-    # A merged file's parts are registered under their own names (config/merged_sources.toml)
-    owners = {owner} | {part for part, whole in MERGED_SOURCES.items() if whole == owner}
+    version_dir = root / "config" / version / "arm9"
     found = {}
-    for delinks in (root / "config" / version / "arm9").rglob("delinks.txt"):
+    for delinks in version_dir.rglob("delinks.txt"):
+        module = delinks.parent.relative_to(version_dir).as_posix()
         current = None
-        ranges = []
         for line in delinks.read_text().splitlines():
             if line and not line[0].isspace() and line.endswith(":"):
                 current = line[:-1]
-            if current in owners:
-                match = re.match(r"\s+\S+\s+start:(0x[0-9a-f]+) end:(0x[0-9a-f]+)", line)
+            if current == owner:
+                match = re.match(r"\s+(\S+)\s+start:(0x[0-9a-f]+) end:(0x[0-9a-f]+)", line)
                 if match:
-                    ranges.append((int(match.group(1), 16), int(match.group(2), 16)))
-        if ranges:
-            found[delinks.parent] = tuple(ranges)
-    return found
+                    placed = version_dir / section_module(module, match.group(1))
+                    found.setdefault(placed, []).append((int(match.group(2), 16), int(match.group(3), 16)))
+    return {module: tuple(ranges) for module, ranges in found.items()}
 
 
 def find_function(version: str, name: str, modules, source: Path | None = None) -> tuple[bytes, int, bool] | None:

@@ -10,10 +10,10 @@ regenerate_configs.py runs after importing names from swan.
     rename_symbol.py --file renames.txt
 
 The sources are rewritten everywhere, except for a static: only its own file, the one delinks.txt places it in (for a
-part of a merged file, its whole, config/merged_sources.toml), can refer to it, and another file may have a static of
-the same name. A static may also take a name that only other
-files' statics have, unless one of them is in the same module and both files are incomplete: an incomplete file links
-its delinked assembly, whose statics are global, so the two would clash. Any other name already in use is refused.
+symbol in a migrated .ltdmain section, the ARM9 main file whose entry lists it), can refer to it, and another file may
+have a static of the same name. A static may also take a name that only other files' statics have, unless one of them
+is in the same module and both files are incomplete: an incomplete file links its delinked assembly, whose statics are
+global, so the two would clash. Any other name already in use is refused.
     rename_symbol.py --apply
 """
 import argparse
@@ -23,8 +23,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
-from tools.build.merge_objects import merged_sources  # noqa: E402
-from tools.decomp.dsd_config import ROOT, SYMBOL_RE, config_lock  # noqa: E402
+from tools.decomp.dsd_config import LTD_MODULE, ROOT, SYMBOL_RE, config_lock, section_module  # noqa: E402
 
 PRIMARY = "b2_us"
 OTHERS = ["w2_us"]
@@ -53,26 +52,24 @@ def find_symbols(version: str, name: str) -> list[tuple[str, int]]:
     return found
 
 
+def entry_modules(module: str) -> list[str]:
+    """The modules whose delinks.txt may list a file with sections at a module's addresses: the LTD autoload's are also
+    an ARM9 main file's migrated .ltdmain sections."""
+    return [module, "."] if module == LTD_MODULE else [module]
+
+
 def owning_source(module: str, addr: int) -> Path | None:
     """Returns the source file whose sections in the primary version's delinks.txt contain an address."""
-    path = ROOT / "config" / PRIMARY / "arm9" / module / "delinks.txt"
-    source = None
-    for line in path.read_text().splitlines():
-        if line.endswith(":") and not line.startswith(" "):
-            source = line[:-1]
-        elif source and (m := re.search(r"start:(0x[0-9a-f]+) end:(0x[0-9a-f]+)", line)):
-            if int(m.group(1), 16) <= addr < int(m.group(2), 16):
-                return ROOT / source
+    for listing in entry_modules(module):
+        path = ROOT / "config" / PRIMARY / "arm9" / listing / "delinks.txt"
+        source = None
+        for line in path.read_text().splitlines():
+            if line.endswith(":") and not line.startswith(" "):
+                source = line[:-1]
+            elif source and (m := re.search(r"^\s+(\S+)\s+start:(0x[0-9a-f]+) end:(0x[0-9a-f]+)", line)):
+                if section_module(listing, m.group(1)) == module and int(m.group(2), 16) <= addr < int(m.group(3), 16):
+                    return ROOT / source
     return None
-
-
-def code_source(source: Path | None) -> Path | None:
-    """The file that holds a source's code: a part of a merged file has its code in its whole's
-    (config/merged_sources.toml)."""
-    if source is None:
-        return source
-    merged = merged_sources(ROOT / "config/merged_sources.toml")
-    return ROOT / merged.get(source.relative_to(ROOT).as_posix(), source.relative_to(ROOT).as_posix())
 
 
 def load_pairs() -> dict[str, dict[tuple[str, int], int]]:
@@ -169,15 +166,16 @@ def apply(module: str, addr: int, name: str, pairs) -> list[str]:
 
 def is_complete(module: str, source: Path) -> bool:
     """Whether the primary version's delinks.txt marks a source file of a module complete."""
-    lines = (ROOT / "config" / PRIMARY / "arm9" / module / "delinks.txt").read_text().splitlines()
     header = str(source.relative_to(ROOT)) + ":"
-    for i, line in enumerate(lines):
-        if line == header:
-            for body in lines[i + 1:]:
-                if not body.startswith(" "):
-                    break
-                if body.strip() == "complete":
-                    return True
+    for listing in entry_modules(module):
+        lines = (ROOT / "config" / PRIMARY / "arm9" / listing / "delinks.txt").read_text().splitlines()
+        for i, line in enumerate(lines):
+            if line == header:
+                for body in lines[i + 1:]:
+                    if not body.startswith(" "):
+                        break
+                    if body.strip() == "complete":
+                        return True
     return False
 
 
@@ -193,7 +191,7 @@ def is_static(source: Path, name: str) -> bool:
 
 def static_elsewhere(module: str, addr: int, name: str, source: Path) -> bool:
     """Whether the symbol at an address is a static of another source file than this one."""
-    owner = code_source(owning_source(module, addr))
+    owner = owning_source(module, addr)
     return owner is not None and owner != source and owner.exists() and is_static(owner, name)
 
 
@@ -232,7 +230,7 @@ def rename(old: str, new: str, pairs, names: list, module: str | None = None) ->
     # only visible in its own file, so only that file is rewritten; rewriting everywhere would rename the others too.
     # The file may already define the static by the new name, when the config catches up with the C
     owner = owning_source(module, addr)
-    only = code_source(owner)
+    only = owner
     if only is not None and not (only.exists() and (is_static(only, old) or is_static(only, new))):
         only = None
 

@@ -89,11 +89,6 @@ lib/twl/src/syscall/syscall_twl_ltd.c:
     complete
     .ltdmain    start:0x027696e8 end:0x02769930
 
-lib/twl/src/card/card_rom_twl.c:
-    complete
-    .ltdmain    start:0x027674a0 end:0x02767674
-    .bss        start:0x0276aee0 end:0x0276af74
-
 lib/twl/src/dsp/dsp_g711_image.c:
     complete
     .rodata     start:0x02707fcc end:0x0272ecec
@@ -116,33 +111,6 @@ lib/twl/src/mi/mi_ndma_gxcommand.c:
     complete
     .ltdmain    start:0x027683d4 end:0x02768614
     .bss        start:0x0276b07c end:0x0276b09c
-
-lib/twl/src/mi/mi_sharedWram_twl.c:
-    complete
-    .ltdmain    start:0x02768614 end:0x027692b8
-    .bss        start:0x0276b09c end:0x0276b0dc
-
-lib/twl/src/os/os_interrupt_twl.c:
-    complete
-    .ltdmain    start:0x027692b8 end:0x027692ec
-
-lib/twl/src/os/os_arena_twl.c:
-    complete
-    .ltdmain    start:0x027692ec end:0x02769318
-
-lib/twl/src/os/os_ownerInfoEx_twl.c:
-    complete
-    .ltdmain    start:0x02769318 end:0x0276934c
-
-lib/twl/src/os/os_application_jump_twl.c:
-    complete
-    .ltdmain    start:0x0276934c end:0x027693dc
-    .bss        start:0x0276b0dc end:0x0276b0e4
-
-lib/twl/src/spi/pm_twl.c:
-    complete
-    .ltdmain    start:0x027693dc end:0x027696e8
-    .bss        start:0x0276b0e4 end:0x0276b100
 
 lib/nitrowifi/src/wcm/wcm_dsi.c:
     complete

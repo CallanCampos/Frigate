@@ -96,32 +96,39 @@ class StaticReferenceTests(unittest.TestCase):
                     f'from:{origin:#010x} kind:load to:0x02100001 add:0x4 module:overlays(11,12)\n')
                 self.assertEqual(self.check(), ['Local'])
 
-    def test_merged_part_references_are_internal(self):
+    def migrated(self):
+        """Moves the source to ARM9 main, with a DSi part in a migrated .ltdmain section, and returns the LTD
+        autoload's config directory."""
+        (self.owner / 'delinks.txt').write_text('')
+        (self.version / 'delinks.txt').write_text(
+            f'{self.source}:\n    .text start:0x02000100 end:0x02000120\n'
+            '    .ltdmain start:0x02700000 end:0x02700020\n    .ltdmain.bss start:0x02710000 end:0x02710010\n')
+        (self.version / 'symbols.txt').write_text('Local kind:function(thumb,size=0x10) addr:0x02000100\n')
         self.relocs()
-        (self.root / 'config/merged_sources.toml').write_text('[merged]\n"src/library_part.c" = "src/library.c"\n')
-        part = self.version / 'ltd_autoload_0'
-        part.mkdir()
-        (part / 'delinks.txt').write_text('src/library_part.c:\n    .ltdmain start:0x02700000 end:0x02700020\n')
+        ltd = self.version / 'ltd_autoload_0'
+        ltd.mkdir()
+        (ltd / 'symbols.txt').write_text('PartLocal kind:function(thumb,size=0x10) addr:0x02700000\n')
+        (ltd / 'relocs.txt').write_text('')
+        return ltd
+
+    def test_migrated_section_references_are_internal(self):
+        ltd = self.migrated()
         for origin, expected in ((0x02700004, []), (0x02700020, ['Local'])):
             with self.subTest(origin=origin):
-                (part / 'relocs.txt').write_text(
-                    f'from:{origin:#010x} kind:arm_call to:0x02100000 module:overlay(11)\n')
+                (ltd / 'relocs.txt').write_text(f'from:{origin:#010x} kind:arm_call to:0x02000100 module:main\n')
                 self.assertEqual(self.check(), expected)
 
-    def test_merged_whole_references_are_internal_to_a_part(self):
-        self.relocs()
+    def test_migrated_section_statics_are_internal_to_the_main_part(self):
+        ltd = self.migrated()
         (self.root / self.source).write_text('static int Local(void) { return 1; }\nstatic int PartLocal(void) { return 2; }\n')
-        (self.root / 'config/merged_sources.toml').write_text('[merged]\n"src/library_part.c" = "src/library.c"\n')
-        part = self.version / 'ltd_autoload_0'
-        part.mkdir()
-        (part / 'delinks.txt').write_text('src/library_part.c:\n    .ltdmain start:0x02700000 end:0x02700020\n')
-        (part / 'symbols.txt').write_text('PartLocal kind:function(thumb,size=0x10) addr:0x02700000\n')
-        (part / 'relocs.txt').write_text('')
-        for origin, expected in ((0x02100004, []), (0x02100020, ['PartLocal'])):
+        for origin, expected in ((0x02000104, []), (0x02000120, ['PartLocal'])):
             with self.subTest(origin=origin):
-                (self.owner / 'relocs.txt').write_text(
-                    f'from:{origin:#010x} kind:arm_call to:0x02700000 module:ltd_autoload(0)\n')
-                self.assertEqual(mark_complete.externally_used_statics('src/library_part.c', self.version), expected)
+                self.relocs(f'from:{origin:#010x} kind:arm_call to:0x02700000 module:ltd_autoload(0)')
+                self.assertEqual(self.check(), expected)
+        # Its .bss isn't code
+        self.relocs('from:0x02000120 kind:load to:0x02710000 module:ltd_autoload(0)')
+        (ltd / 'symbols.txt').write_text('PartLocal kind:bss addr:0x02710000\n')
+        self.assertEqual(self.check(), [])
 
     def test_module_names_are_the_relocs(self):
         for directory, name in (('', 'main'), ('overlays/ov011', 'overlay(11)'), ('autoload_3', 'autoload(3)'),

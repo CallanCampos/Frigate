@@ -715,6 +715,17 @@
 . 0x0214e31c remove_symbol
 . 0x0214e338 remove_symbol
 . 0x0214edc4 remove_symbol
+. 0x027674a0 add_section lib/nitro/src/card/card_rom.c:.ltdmain:0x1d4
+. 0x02768614 add_section lib/nitro/src/mi/mi_sharedWram.c:.ltdmain:0xca4
+. 0x027692b8 add_section lib/nitro/src/os/os_interrupt.c:.ltdmain:0x34
+. 0x027692ec add_section lib/nitro/src/os/os_arena.c:.ltdmain:0x2c
+. 0x02769318 add_section lib/nitro/src/os/os_ownerInfoEx.c:.ltdmain:0x34
+. 0x0276934c add_section lib/nitro/src/os/os_application_jump.c:.ltdmain:0x90
+. 0x027693dc add_section lib/nitro/src/spi/pm.c:.ltdmain:0x30c
+. 0x0276aee0 add_section lib/nitro/src/card/card_rom.c:.ltdmain.bss:0x94
+. 0x0276b09c add_section lib/nitro/src/mi/mi_sharedWram.c:.ltdmain.bss:0x40
+. 0x0276b0dc add_section lib/nitro/src/os/os_application_jump.c:.ltdmain.bss:0x8
+. 0x0276b0e4 add_section lib/nitro/src/spi/pm.c:.ltdmain.bss:0x1c
 ltd_autoload_0 0x02700228 reloc_addend 0x1000
 ltd_autoload_0 0x0270022c reloc_addend 0x11b4
 ltd_autoload_0 0x027007bc reloc_addend 0x1000
@@ -760,6 +771,7 @@ ltd_autoload_0 0x027052fc add_function func_027052fc:arm:0x24
 ltd_autoload_0 0x0270531c remove_symbol
 ltd_autoload_0 0x027674a0 add_data CARDi_NdmaInterface
 ltd_autoload_0 0x027674a0 add_reloc load,ltd_autoload(0),0x02768371
+ltd_autoload_0 0x027674a0 remove_file lib/twl/src/card/card_rom_twl.c
 ltd_autoload_0 0x027674a4 add_reloc load,ltd_autoload(0),0x02768271
 ltd_autoload_0 0x027674fc reloc_addend 0x500
 ltd_autoload_0 0x027675cc reloc_addend 0x500
@@ -767,6 +779,7 @@ ltd_autoload_0 0x02767674 add_data sDigestKey
 ltd_autoload_0 0x027676ae remove_symbol
 ltd_autoload_0 0x02767bec add_reloc load,ltd_autoload(0),0x02767674
 ltd_autoload_0 0x02768614 add_data sGetWramBankOwnerFuncs
+ltd_autoload_0 0x02768614 remove_file lib/twl/src/mi/mi_sharedWram_twl.c
 ltd_autoload_0 0x02768620 add_data sGetWramBaseFuncs
 ltd_autoload_0 0x0276862c add_data sEnableWramBankFuncs
 ltd_autoload_0 0x02768638 add_data sGiveWramBankFuncs
@@ -774,10 +787,14 @@ ltd_autoload_0 0x027686c4 add_reloc load,ltd_autoload(0),0x02768638
 ltd_autoload_0 0x0276873c add_reloc load,ltd_autoload(0),0x0276862c
 ltd_autoload_0 0x02768780 add_reloc load,ltd_autoload(0),0x02768614
 ltd_autoload_0 0x027687e4 add_reloc load,ltd_autoload(0),0x02768620
+ltd_autoload_0 0x027692b8 remove_file lib/twl/src/os/os_interrupt_twl.c
 ltd_autoload_0 0x027692e0 reloc_addend 0x30
 ltd_autoload_0 0x027692e4 reloc_addend 0x38
 ltd_autoload_0 0x027692e8 reloc_addend 0x34
-ltd_autoload_0 0x0276b100 section_end lib/twl/src/spi/pm_twl.c:.bss
+ltd_autoload_0 0x027692ec remove_file lib/twl/src/os/os_arena_twl.c
+ltd_autoload_0 0x02769318 remove_file lib/twl/src/os/os_ownerInfoEx_twl.c
+ltd_autoload_0 0x0276934c remove_file lib/twl/src/os/os_application_jump_twl.c
+ltd_autoload_0 0x027693dc remove_file lib/twl/src/spi/pm_twl.c
 ltd_autoload_0 0x0276b108 add_data data_0276b108
 ltd_autoload_0 0x0276b13c remove_symbol
 ltd_autoload_0 0x0276b14c remove_symbol

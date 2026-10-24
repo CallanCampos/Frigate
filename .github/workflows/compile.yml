@@ -35,8 +35,5 @@ jobs:
       - name: Dead-strip tests
         run: python -m unittest tools.build.test_deadstrip
 
-      - name: Merged-file tests
-        run: python -m unittest tools.build.test_merge_objects
-
       - name: Compile
         run: python tools/decomp/compile_all.py

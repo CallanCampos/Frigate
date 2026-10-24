@@ -3,7 +3,7 @@
 
 Each row names a source file, its functions and their addresses, Black 2's then White 2's (`same` when they are
 equal). For every function the row gives an address for, the file must be delinked in a module of both versions, the
-function must be a symbol of that module, or of a module of one of a merged file's parts (config/merged_sources.toml),
+function must be a symbol of that module, or of the LTD autoload for an ARM9 main file with migrated .ltdmain sections,
 at Black 2's address and at White 2's, and the source file must define it.
 Rows about data, whose function column is in parentheses, are left out. Merge markers and duplicate function
 entries are rejected. It needs no ROM, so CI runs it.
@@ -17,14 +17,14 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
-from tools.build.merge_objects import merged_sources  # noqa: E402
-from tools.decomp.dsd_config import ROOT, parse_symbols  # noqa: E402
+from tools.decomp.dsd_config import ROOT, parse_symbols, section_module  # noqa: E402
 
 DOC = ROOT / "docs" / "nonmatching-functions.md"
 VERSIONS = ("b2_us", "w2_us")
 ROW_RE = re.compile(r"^\| `([^`]+)` \| (.*?) \| (`0x[0-9a-f]+`.*?) \| ")
 PAIR_RE = re.compile(r"`0x([0-9a-f]+)` / (?:`0x([0-9a-f]+)`|(same))")
 FILE_RE = re.compile(r"^(\S+\.(?:c|cpp|s)):\s*$")
+SECTION_RE = re.compile(r"^\s+(\S+)\s+start:0x[0-9a-f]+ end:0x[0-9a-f]+")
 MERGE_MARKER_RE = re.compile(r"^(?:<{7,}|\|{7,}|={7,}|>{7,})(?:\s.*)?$")
 
 
@@ -62,6 +62,19 @@ def modules_by_file(version: str) -> dict[str, str]:
     return files
 
 
+def migrated_modules(version: str) -> dict[str, set[str]]:
+    """Returns the other modules that an ARM9 main file's migrated sections are in, by source file: the LTD autoload,
+    for its .ltdmain sections."""
+    files: dict[str, set[str]] = {}
+    source = None
+    for line in (ROOT / "config" / version / "arm9" / "delinks.txt").read_text().splitlines():
+        if match := FILE_RE.match(line):
+            source = match.group(1)
+        elif source and (match := SECTION_RE.match(line)) and section_module(".", match.group(1)) != ".":
+            files.setdefault(source, set()).add(section_module(".", match.group(1)))
+    return files
+
+
 def symbols_by_module(version: str) -> dict[str, dict[str, set[int]]]:
     """Returns each module's function addresses by name (Thumb bit cleared)."""
     arm9 = ROOT / "config" / version / "arm9"
@@ -72,15 +85,6 @@ def symbols_by_module(version: str) -> dict[str, dict[str, set[int]]]:
             if symbol.kind == "function":
                 names.setdefault(symbol.name, set()).add(symbol.addr & ~1)
     return modules
-
-
-def merged_parts() -> dict[str, list[str]]:
-    """Returns the parts of each merged file (config/merged_sources.toml), which delinks.txt lists under their own
-    names, in their own modules, while the whole's source holds their code."""
-    parts = {}
-    for part, whole in merged_sources(ROOT / "config/merged_sources.toml").items():
-        parts.setdefault(whole, []).append(part)
-    return parts
 
 
 def defines(source: str, name: str) -> bool:
@@ -95,7 +99,7 @@ def main():
 
     files = {v: modules_by_file(v) for v in VERSIONS}
     symbols = {v: symbols_by_module(v) for v in VERSIONS}
-    parts = merged_parts()
+    migrated = {v: migrated_modules(v) for v in VERSIONS}
     lines = DOC.read_text().split("\n")
     problems = structural_problems(lines)
     fixed = 0
@@ -121,8 +125,8 @@ def main():
         for v, module in modules.items():
             if module is None:
                 problems.append(f"{where}: not in any {v} delinks.txt")
-        # A merged file's functions may be in a part's module
-        searched = {v: [m for m in (module, *(files[v].get(part) for part in parts.get(path, ()))) if m is not None]
+        # An ARM9 main file's functions may be in its migrated sections' module too
+        searched = {v: [m for m in (module, *sorted(migrated[v].get(path, ()))) if m is not None]
                     for v, module in modules.items()}
 
         def addresses(v: str, name: str) -> set[int]:
