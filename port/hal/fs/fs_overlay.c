@@ -1,8 +1,9 @@
 // NitroSDK's file system (libfs), overlays, on the host: the decomp's lib/nitro/src/fs/fs_overlay.c (which
 // port/hal/replaced.txt keeps out of the game's sources) with the overlay's memory replaced. Every overlay's code is in
 // the program, so loading one reads no image: where the DS clears the overlay's .bss and reads its .data from the ROM,
-// the host sets its writable statics back from the snapshot (port/hal/fs/ovsec.h). The rest stays the DS's, so that the
-// game's overlay bookkeeping (src/gfl/gf_overlay.c) sees what it sees on the DS:
+// the host sets its writable statics back from the snapshot (port/hal/fs/ovsec.h), and zeroes the host memory that
+// stands in for a static the game made a root heap in (the field's g_FieldHeapMemory, port/hal/gfl/heap_policy.h). The
+// rest stays the DS's, so that the game's overlay bookkeeping (src/gfl/gf_overlay.c) sees what it sees on the DS:
 //   - FS_LoadOverlayInfo reads the overlay's header from the ROM's table, through the ROM archive, and finds its file.
 //     FSOverlayInfo's pointers keep the DS addresses of the header (where the image would load, its static
 //     initializers), which nothing on the host dereferences: GFL's memory-collision check compares those ranges, so it
@@ -19,6 +20,7 @@
 // image and its .bss, the start and end of its static initializers, its file's number, and the size of the stored
 // image in 24 bits with the flags in the top byte (the DS's FSOverlayInfo, as it lays out in the DS's memory).
 #include "hal/fs/ovsec.h"
+#include "hal/gfl/heap_policy.h"
 #include "nitro/card.h"
 #include "nitro/fs.h"
 #include "nitro/mi.h"
@@ -82,9 +84,17 @@ u32 FSi_GetOverlayBinarySize(const FSOverlayInfo *info) {
 }
 
 // NitroSDK's FS_ClearOverlayImage: the DS invalidates the caches over the overlay's memory and clears its .bss; the
-// host clears the overlay's bss section
+// host clears the overlay's bss section, and the host memory that stands in for a root heap's memory in one of the
+// overlay's zeroed statics (port/hal/gfl/heap_policy.h): those statics are in the bss section, or in the combined
+// layout in the one section, which the load's port_ovsec_restore_data zeroes from the snapshot
 void FS_ClearOverlayImage(FSOverlayInfo *info) {
+    const PortOvsecOverlay *overlay = port_ovsec_get(info->id);
+
     port_ovsec_clear_bss(info->id);
+    if (overlay != NULL) {
+        port_heap_root_memory_reset(overlay->bss.start, overlay->bss.size);
+        port_heap_root_memory_reset(overlay->data.start, overlay->data.size);
+    }
 }
 
 // NitroSDK's FS_GetOverlayFileID: the archive and the number of the overlay's file

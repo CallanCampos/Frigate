@@ -8,10 +8,14 @@
 #define HEAP_INDEX_NONE 0xff
 
 #ifdef PLATFORM_PC
-// A host's structs are larger than the DS's (pointers are 8 bytes), so the platform layer sizes the heaps
+// A host's structs are larger than the DS's (pointers are 8 bytes), so the platform layer sizes the heaps, and gives a
+// root heap that the game creates in memory of its own (the field's, the trade screen's, GFL's extra heap) host memory
+// of that size in place of the caller's, which is only as large as the DS needs
 #define PORT_HEAP_SIZE(index, size, root) port_heap_size(index, size, root)
+#define PORT_HEAP_ROOT_MEMORY(index, memory, size) port_heap_root_memory(index, memory, size)
 #else
 #define PORT_HEAP_SIZE(index, size, root) size
+#define PORT_HEAP_ROOT_MEMORY(index, memory, size) memory
 #endif
 
 typedef struct {
@@ -145,7 +149,8 @@ BOOL GFL_HeapAddRoot(void *memory, u32 size, HeapID heapId) {
     heapId &= HEAPID_TAIL_BIT - 1;
     if (sHeapMgr.indices[heapId] != HEAP_INDEX_NONE) {
         sHeapMgr.lastResult = HEAP_RESULT_1;
-    } else if (GFL_HeapAdd(NULL, heapId, memory, size)) {
+    } else if (GFL_HeapAdd(NULL, heapId, PORT_HEAP_ROOT_MEMORY(heapId, memory, size),
+                           PORT_HEAP_SIZE(heapId, size, TRUE))) {
         sHeapMgr.heaps[sHeapMgr.indices[heapId]].external = TRUE;
         return TRUE;
     }

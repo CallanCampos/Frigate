@@ -55,6 +55,7 @@ and Frigate itself. [ARCHITECTURE.md](ARCHITECTURE.md) shows how the parts fit.
 | **SPL** | Nintendo's particle library (`lib/spl`) |
 | **DWC** | Nintendo Wi-Fi Connection (`lib/dwc`), the online library |
 | **DS Protect** | Nintendo's anti-piracy library (`lib/dsprot`); Frigate's stub passes its checks as on a genuine cartridge |
+| **MSL** | The Metrowerks Standard Library (`lib/msl`), MWCC's C library and runtime, which the ROM links. The host's C library replaces it, but for the runtime routine that the game's C calls by name, the division `_u32_div_f` ([../hal/msl](../hal/msl/fp_fastI.c)), and MSL's string extensions (`hal/stubs`) |
 | **GFL** | Game Freak's library (`src/gfl`): heaps, overlays, archives, processes, tasks, backgrounds, cell actors, input, text |
 | **Process (proc)** | A GFL process: a screen or mode with its init, main and exit functions and its overlay (`src/gfl/procsys.c`) |
 | **TCB** | A GFL task (task control block) in a priority list run each frame, each VBlank or each HBlank (`src/gfl/tcb.c`) |
