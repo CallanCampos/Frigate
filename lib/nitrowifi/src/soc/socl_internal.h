@@ -274,6 +274,13 @@ int SOCL_GetStatus(int s);
 
 // socl_misc.c
 u32 SOCLi_RoundUp4(u32 value);
+// Two counters that SOCL_CreateSocket raises and SOCL_Close lowers, for the TCP sockets and for the others (the name
+// and the split are guesses)
+extern s32 SOCLiSocketCount[2];
+// Zeroes the socket counters before SOCL starts
+void SOCLi_InitResource(void);
+// CPS's address check callback: drops a gateway or DNS server that the net mask and address rule out
+BOOL SOCLi_CheckNConfig(void);
 
 // socl_read.c
 // len is a byte capacity; queued UDP returns the full datagram length and discards any uncopied tail unless peeking.
@@ -283,9 +290,6 @@ int SOCL_ReadFrom(int s, void *buf, int len, u16 *remote_port, CPSInAddr *remote
 BOOL SOCLi_UdpRecvCallback(u8 *data, u32 len, CPSSoc *soc);
 
 // socl_list.c
-// Two counters that SOCL_CreateSocket raises and SOCL_Close lowers, for the TCP sockets and for the others (the name
-// and the split are guesses)
-extern s32 SOCLiSocketCount[2];
 // Puts a new socket in the list of sockets (SOCLi_SocketRegister in pokediamond's NitroWiFi)
 void SOCLi_SocketRegister(SOCLSocket *socket);
 BOOL SOCL_SocketIsInvalid(const SOCLSocket *socket); // TRUE for a handle that is not a socket of the list
@@ -296,10 +300,5 @@ void SOCLi_SocketUnregisterTrash(SOCLSocket *socket);
 // The sockets that were closed and wait for SOCLi_TrashSocket to free them
 extern SOCLSocket *SOCLiSocketList;
 extern SOCLSocket *SOCLiSocketListTrash;
-// Zeroes the socket counters before SOCL starts (no counterpart in pokediamond's NitroWiFi; name a guess)
-void SOCLi_ResetSocketCount(void);
-// CPS's address check callback: drops a gateway or DNS server that the net mask and address rule out (no counterpart in
-// pokediamond's NitroWiFi; name a guess)
-BOOL SOCLi_AddressCheckCallback(void);
 
 #endif // POKEBW2_NITROWIFI_SOCL_INTERNAL_H

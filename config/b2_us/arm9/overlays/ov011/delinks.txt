@@ -74,12 +74,13 @@ lib/nitrowifi/src/soc/socl_poll.c:
     .text       start:0x02157894 end:0x02157978
 
 lib/nitrowifi/src/soc/socl_misc.c:
-    complete
-    .text       start:0x02157978 end:0x02157980
+    .text       start:0x02157978 end:0x02157af0
+    .bss        start:0x0218dc4c end:0x0218dc54
 
 lib/nitrowifi/src/soc/socl_list.c:
-    .text       start:0x02157980 end:0x02157bd0
-    .bss        start:0x0218dc4c end:0x0218dc5c
+    complete
+    .text       start:0x02157af0 end:0x02157bd0
+    .bss        start:0x0218dc54 end:0x0218dc5c
 
 lib/nitrowifi/src/soc/soc.c:
     .text       start:0x02157bd0 end:0x02158174

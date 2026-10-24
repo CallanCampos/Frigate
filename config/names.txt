@@ -6394,10 +6394,10 @@ overlays/ov011 0x02157850 SOCL_GetHostID
 overlays/ov011 0x02157894 SOCL_GetStatus
 overlays/ov011 0x02157940 SOCLi_GetReadBufferOccpiedSize
 overlays/ov011 0x02157978 SOCLi_RoundUp4
-overlays/ov011 0x02157980 SOCLi_ResetSocketCount
-overlays/ov011 0x02157994 SOCLi_IsValidRemoteIp
-overlays/ov011 0x02157a00 SOCLi_IsValidHostIp
-overlays/ov011 0x02157a48 SOCLi_AddressCheckCallback
+overlays/ov011 0x02157980 SOCLi_InitResource
+overlays/ov011 0x02157994 SOCLi_IsIPv4ValidDNSAddr
+overlays/ov011 0x02157a00 SOCLi_IsIPv4ValidNodeAddr
+overlays/ov011 0x02157a48 SOCLi_CheckNConfig
 overlays/ov011 0x02157af0 SOCLi_SocketRegister
 overlays/ov011 0x02157b00 SOCLi_SocketRegisterList
 overlays/ov011 0x02157b0c SOCLi_SocketRegisterTrash

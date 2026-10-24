@@ -118,8 +118,8 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 | `socl_close.c` | `0x021572f4`–`0x02157620` | 7 | complete | descriptive |
 | `socl_cleanup.c` | `0x02157620`–`0x02157894` | 8 | complete | descriptive |
 | `socl_poll.c` | `0x02157894`–`0x02157978` | 2 | complete | descriptive |
-| `socl_misc.c` | `0x02157978`–`0x02157980` | 1 | complete | descriptive |
-| `socl_list.c` | `0x02157980`–`0x02157bd0` | 13 | partial | descriptive |
+| `socl_misc.c` | `0x02157978`–`0x02157af0` | 5 | partial | descriptive |
+| `socl_list.c` | `0x02157af0`–`0x02157bd0` | 9 | complete | descriptive |
 | `soc.c` | `0x02157bd0`–`0x02158174` | 23 | partial | descriptive |
 | `socl_ssl.c` | `0x02158174`–`0x02158250` | 3 | complete | descriptive |
 | `ssl.c` | `0x02158250`–`0x0215a6b4` | 60 | partial | descriptive |
