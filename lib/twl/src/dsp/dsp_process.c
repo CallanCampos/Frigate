@@ -393,12 +393,12 @@ BOOL DSP_ExecuteProcess(DSPProcessContext *context, FSFile *image, int banksB, i
         context->image = NULL;
         if (!sExitCallbackSet) {
             PM_SetExitCallbackInfo(&sDspExitCallbackInfo, func_027052fc, NULL);
-            PM_InsertPostExitCallback(&sDspExitCallbackInfo, DSP_PM_PRIORITY);
+            PMi_InsertPostExitCallbackEx(&sDspExitCallbackInfo, DSP_PM_PRIORITY);
             sExitCallbackSet = TRUE;
         }
         if (!sSleepCallbackSet) {
             PM_SetSleepCallbackInfo(&sDspSleepCallbackInfo, func_02705320, NULL);
-            PM_InsertPreSleepCallback(&sDspSleepCallbackInfo, DSP_PM_PRIORITY);
+            PMi_InsertPreSleepCallbackEx(&sDspSleepCallbackInfo, DSP_PM_PRIORITY);
             sSleepCallbackSet = TRUE;
         }
         DSP_PowerOn();

@@ -1910,6 +1910,8 @@ lib/nitro/src/card/card_rom.c:
     .text       start:0x0206f8b4 end:0x0206fed8
     .data       start:0x0209b500 end:0x0209b508
     .bss        start:0x0214ba80 end:0x0214bd40
+    .ltdmain    start:0x027674a0 end:0x02767674
+    .ltdmain.bss start:0x0276aee0 end:0x0276af74
 
 lib/nitro/src/fs/fs_archive.c:
     complete
@@ -2004,6 +2006,8 @@ lib/nitro/src/gx/gx_state.c:
 lib/nitro/src/mi/mi_sharedWram.c:
     complete
     .text       start:0x02078000 end:0x02078020
+    .ltdmain    start:0x02768614 end:0x027692b8
+    .ltdmain.bss start:0x0276b09c end:0x0276b0dc
 
 lib/nitro/src/mi/mi_wram.c:
     complete
@@ -2056,6 +2060,7 @@ lib/nitro/src/os/os_irqTable.c:
 lib/nitro/src/os/os_interrupt.c:
     complete
     .text       start:0x02079d10 end:0x02079f04
+    .ltdmain    start:0x027692b8 end:0x027692ec
 
 lib/nitro/src/os/os_reset_pxi.c:
     complete
@@ -2107,6 +2112,7 @@ lib/nitro/src/os/os_arena.c:
     complete
     .text       start:0x0207b18c end:0x0207b468
     .bss        start:0x0214c4a4 end:0x0214c4ac
+    .ltdmain    start:0x027692ec end:0x02769318
 
 lib/nitro/src/os/os_alloc.c:
     complete
@@ -2178,6 +2184,7 @@ lib/nitro/src/os/os_ownerInfo.c:
 lib/nitro/src/os/os_ownerInfoEx.c:
     complete
     .text       start:0x0207c3bc end:0x0207c4f4
+    .ltdmain    start:0x02769318 end:0x0276934c
 
 lib/nitro/src/os/os_vramExclusive.c:
     complete
@@ -2205,6 +2212,8 @@ lib/nitro/src/os/os_event.c:
 lib/nitro/src/os/os_application_jump.c:
     complete
     .text       start:0x0207c888 end:0x0207c94c
+    .ltdmain    start:0x0276934c end:0x027693dc
+    .ltdmain.bss start:0x0276b0dc end:0x0276b0e4
 
 lib/nitro/src/pxi/pxi_init.c:
     complete
@@ -2277,6 +2286,8 @@ lib/nitro/src/spi/pm.c:
     .text       start:0x0207eb24 end:0x0207f6cc
     .data       start:0x0209b78c end:0x0209b794
     .bss        start:0x0214e240 end:0x0214e280
+    .ltdmain    start:0x027693dc end:0x027696e8
+    .ltdmain.bss start:0x0276b0e4 end:0x0276b100
 
 lib/twl/src/scfg/scfg_proc.c:
     complete

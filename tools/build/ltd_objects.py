@@ -9,8 +9,12 @@ The original gives each call of NitroWiFi's Thumb code in the LTD autoload (.ltd
 while dsd's objects.txt lists the module's objects with ARM9 main's. This moves the objects that the linker script
 places in each LTD autoload to the end, in a group named after the autoload's memory region. TwlSDK's objects stay
 with main's: their .ltdmain code shares one veneer per target across files, as main's does (card_hash.c's veneer of
-OS_DisableInterrupts serves mi_ndma.c, mi_ndma_gxcommand.c, mi_sharedWram_twl.c and pm_twl.c, and os_interrupt_twl.c
-calls OS_EnableIrqMask through mi_ndma_gxcommand.c's), which the group would give each call apart.
+OS_DisableInterrupts serves mi_ndma.c, mi_ndma_gxcommand.c and the DSi parts of mi_sharedWram.c and pm.c, and
+os_interrupt.c's DSi part calls OS_EnableIrqMask through mi_ndma_gxcommand.c's), which the group would give each call
+apart. So does an object that the linker script places in another module too, a NitroSDK file whose entry in ARM9
+main's delinks.txt has TwlSDK's DSi part in .ltdmain sections (docs/configs.md, "Migrated LTD sections"): card_rom.c's
+DSi part calls CARD_GetOwnRomHeaderTWL twice through one veneer, and card_hash.c and mi_sharedWram.c's DSi part call
+others through its veneers.
 """
 import argparse
 import re
@@ -31,12 +35,18 @@ def main():
     args = parser.parse_args()
 
     lines = [line for line in args.objects.read_text().splitlines() if line]
+    lcf = args.lcf.read_text()
+    # The objects with sections in other modules too
+    placed_elsewhere = set(PLACED_OBJECT.findall(LTD_SECTION.sub("", lcf)))
+
+    def shares_veneers(line: str) -> bool:
+        path = line.strip('"')
+        return SHARED_VENEERS in path or Path(path).name in placed_elsewhere
+
     groups = []
-    for body, region in LTD_SECTION.findall(args.lcf.read_text()):
+    for body, region in LTD_SECTION.findall(lcf):
         names = set(PLACED_OBJECT.findall(body))
-        objects = [
-            line for line in lines if Path(line.strip('"')).name in names and SHARED_VENEERS not in line.strip('"')
-        ]
+        objects = [line for line in lines if Path(line.strip('"')).name in names and not shares_veneers(line)]
         if objects:
             groups.append((region, objects))
     moved = {line for _, objects in groups for line in objects}

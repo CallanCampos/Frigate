@@ -2043,7 +2043,7 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 - A bit flag at a fixed address read with `ldrb r0, [r0, #4]` from a literal of the block's base, where ours folds the
   offset into the literal (`0x02fffd6c`, then `[r0]`), is read through a pointer local: `OSTWLHWSecureInfo *info =
   (OSTWLHWSecureInfo *)HW_HW_SECURE_INFO; return info->flags.forceDisableWireless == 1 ...` with a `u8` bitfield matches
-  `os_ownerInfoEx_twl.c`'s `OSi_IsForceDisableWirelessTwl`, and the same field through a cast in the expression folds
+  `os_ownerInfoEx.c`'s `OS_IsForceDisableWireless_ltdmain`, and the same field through a cast in the expression folds
   the offset.
 - A parameter stored at entry to an outgoing argument slot (`str r2, [sp, #8]`) and read back from it later, in a
   frame with no slot of its own for it, is the parameter's spill, not an argument of the call that uses that area:
@@ -3708,11 +3708,20 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   each and are reached through literals of their own, as under `-ipa function`, while the block's functions still reach
   the file's default `.bss` from its pooled base. `#pragma define_section NAME "init" "uninit" "const" abs32 RWX` names
   the block's sections for code and initialized data, for zeroed data and for constants. TwlSDK compiled DSi-only code
-  so, inside the file of the NITRO code it extends: `card_rom_twl.c`'s `CARDi_InitTwlRom` stores the ROM reader at
-  offset 4 of `card_rom.c`'s pooled `.bss`, and matches, with all of `card_rom.c`'s functions, only when compiled in
-  `card_rom.c` after `#pragma define_section LTDMAIN ".ltdmain" ".ltdmain.bss" ".ltdmain" abs32 RWX` (a scratch test;
-  the other two spellings tried put the code or the statics in the wrong sections). Code in the LTD autoload that
-  reaches a main global at a pooled base plus an offset was compiled in that global's file.
+  so, inside the file of the NITRO code it extends: the DSi part's `CARDi_InitRomHash` stores the ROM reader at offset
+  4 of `card_rom.c`'s pooled `.bss`, and matches, with all of `card_rom.c`'s functions, only when compiled in
+  `card_rom.c` after `#pragma define_section LTDMAIN ".ltdmain" ".ltdmain.bss" ".ltdmain" abs32 RWX` (the other two
+  spellings tried put the code or the statics in the wrong sections). Code in the LTD autoload that reaches a main
+  global at a pooled base plus an offset was compiled in that global's file, and links from its object
+  (`docs/configs.md`, Migrated LTD sections).
+- The block's statics, though in a section of their own, still take part in the size sort of the file's `.bss`, by
+  their place among the file's other declarations. `pm.c`'s DSi part declares four; with them at the end of the file,
+  before the DSi code, six of `pm.c`'s main functions reach their statics at other offsets. Declaring them, in one more
+  `#pragma section LTDMAIN` block, at each place among `pm.c`'s statics in each order (312 variants, compiled by a
+  script) matched only between `PMi_PreDmaCnt` and `sAmpSwitch`, with `PMi_BatteryLowCallbackInfo` first. The
+  linker places the block's sections by the sort too, which the probe can't see: it put the three words declared after
+  the 16-byte `PMi_BatteryLowCallbackInfo` in their declaration order, and the 16-byte one after them, so the words
+  are declared in the ROM's order, `PMi_PreExitCallbackList`, `PMi_ResetLocked` and `PMi_PostExitCallbackList`.
 - The file's `.data` objects take part in MWCC's size sort that orders `.rodata`: `btlv_mcss.c`'s 3-byte idle-wait
   array had to be counted before `rodata_order.py` predicted the layout. So do its `.bss` statics: the object's
   symbol table lists them interleaved with the `.rodata` objects by size, and moving a table moves the statics too.
@@ -4224,9 +4233,9 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `card_rom.c`, `card_pull_out.c` and `mi_init.c` call TwlSDK's code in the LTD autoload this way, and `pm.c`'s call to
   `func_02768298` shares `card_pull_out.c`'s veneer, as the original's does. NitroWiFi's code in the LTD autoload's
   `.ltdmain` gives each call its own veneer instead, as an overlay does (`docs/configs.md`), which the build gets by
-  linking its objects as an overlay group; TwlSDK's `.ltdmain` objects share theirs across files, so
-  `os_interrupt_twl.c` reaches `OS_EnableIrqMask` through `mi_ndma_gxcommand.c`'s veneer, and a file whose calls use
-  another file's veneers can be complete only once that file is.
+  linking its objects as an overlay group; TwlSDK's `.ltdmain` objects share theirs across files, so `os_interrupt.c`'s
+  DSi part reaches `OS_EnableIrqMask` through `mi_ndma_gxcommand.c`'s veneer, and a file whose calls use another file's
+  veneers can be complete only once that file is.
 
 - A Thumb function that ends 2 bytes past a word boundary is followed by the linker's `mov r8, r8` before an ARM veneer,
   a pad that belongs to no function: `mic.c`'s `MIC_StopLimitedSampling` is 0x16 bytes, then the pad and the veneer
@@ -4297,7 +4306,7 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `MIi_NDmaFIFOCallback` calls the transfer through a `static inline`, `MIi_NDmaAsync`, which adds the channel's
   config, so the arguments are computed in the inline's order; `card_hash.c`'s `CARD_InitRomHashContext` lays its
   buffer out through a cursor and puts the rest under `if (end > hi) ... else`, and its `CARDi_ReadRomHashImageDirect`
-  gets the sector index from a `static inline`; `mi_sharedWram_twl.c`'s `MIi_ReserveWramSlotCore` bounds both loops
+  gets the sector index from a `static inline`; `mi_sharedWram.c`'s `MIi_DoReserveWramSlot` bounds both loops
   by `slot + banks`. Look the function up there before grinding registers.
 
 - MWCC 2.0/sp2 (`-O4,p`) ignores the `register` storage class: `register` on any local or parameter leaves the code

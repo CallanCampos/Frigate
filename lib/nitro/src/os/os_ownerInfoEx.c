@@ -1,12 +1,31 @@
-// TwlSDK OS: the DSi's settings (os_ownerInfoEx.c, a guessed name). On a DSi the system leaves its own settings in the
-// shared main memory, and these functions give out what is in them, on top of the owner's settings that the DS has;
-// each checks OS_IsRunOnTwl (OS_IsRunOnTwl) first. The calls to the LTD autoload's functions go through linker veneers.
+// TwlSDK OS: the DSi's settings (os_ownerInfoEx.c, TwlSDK's os_ownerinfoex.o, which aletheia's match of Black 1's
+// code to libos.TWL.HYB.a gives with its functions' names). On a DSi the system leaves its own settings in the shared
+// main memory, and these functions give out what is in them, on top of the owner's settings that the DS has; each
+// checks OS_IsRunOnTwl first. The file has TwlSDK's DSi part too, the wireless settings, in TwlSDK's LTDMAIN section,
+// which the LTD autoload's .ltdmain holds: this file's entry in ARM9 main's delinks.txt lists it in an .ltdmain
+// section. The main part calls it through linker veneers.
 #include "nitro/mi.h"
 #include "nitro/os.h"
 #include "twl/os.h"
 
 // A byte of the TWL ROM header that the system puts in main memory
 #define HW_TWL_ROM_HEADER_BYTE_20E 0x02ffe20e
+
+// The DSi's secure hardware settings that the system leaves in the shared memory, in the layout of
+// cybervisi0n/libntr's reconstruction (OSTWLHWSecureInfo). The flag is the low bit of the byte after the first word,
+// which the load reaches as offset 4 of the block
+typedef struct OSTWLHWSecureInfo {
+    u32 validLanguageBitmap;
+    struct {
+        u8 forceDisableWireless : 1;
+        u8 : 7;
+    } flags;
+    u8 pad[3];
+    u8 region;
+    u8 serialNo[15];
+} OSTWLHWSecureInfo;
+
+#define HW_HW_SECURE_INFO 0x02fffd68
 
 // TwlSDK's OS_GetOwnerInfoEx: the owner's settings, with the language and the country from the DSi's settings on a DSi
 void OS_GetOwnerInfoEx(OSOwnerInfoEx *info) {
@@ -35,7 +54,7 @@ void OS_GetOwnerInfoEx(OSOwnerInfoEx *info) {
 // TwlSDK's OS_IsAvailableWireless: TRUE on a DS
 BOOL OS_IsAvailableWireless(void) {
     if (OS_IsRunOnTwl()) {
-        return OSi_IsAvailableWirelessTwl();
+        return OS_IsAvailableWireless_ltdmain();
     }
     return TRUE;
 }
@@ -72,10 +91,30 @@ OSTWLParentalControl *OS_GetParentalControlInfoPtr(void) {
     return NULL;
 }
 
-// TwlSDK's OS_IsForceDisableWireless (the name is recalled, not shown): FALSE on a DS
+// TwlSDK's OS_IsForceDisableWireless: FALSE on a DS
 BOOL OS_IsForceDisableWireless(void) {
     if (OS_IsRunOnTwl()) {
-        return OSi_IsForceDisableWirelessTwl();
+        return OS_IsForceDisableWireless_ltdmain();
     }
     return FALSE;
 }
+
+// clang-format off
+// TwlSDK's section for the DSi-only code and data that the LTD autoload's .ltdmain holds
+#pragma define_section LTDMAIN ".ltdmain" ".ltdmain.bss" ".ltdmain" abs32 RWX
+// clang-format on
+// The DSi part, in the LTD autoload: the wireless settings that OS_IsAvailableWireless and
+// OS_IsForceDisableWireless read on a DSi
+#pragma section LTDMAIN begin
+
+BOOL OS_IsAvailableWireless_ltdmain(void) {
+    return TWL_SETTINGS->flags.isAvailableWireless == 1 ? TRUE : FALSE;
+}
+
+BOOL OS_IsForceDisableWireless_ltdmain(void) {
+    OSTWLHWSecureInfo *info = (OSTWLHWSecureInfo *)HW_HW_SECURE_INFO;
+
+    return info->flags.forceDisableWireless == 1 ? TRUE : FALSE;
+}
+
+#pragma section LTDMAIN end
