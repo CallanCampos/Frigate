@@ -18,7 +18,7 @@ struct G3DTextDrawResource {
     u32 unk10;
 };
 
-BOOL G3DTextDraw_CreateResource(void *texture, const char *texName, u32 a2, const char *plName, const StrBuf *text,
+BOOL G3DTextDraw_CreateResource(void *texture, const char *texName, uptr a2, const char *plName, const StrBuf *text,
                                 u16 a5, u16 a6, u16 color, HeapID heapId, G3DTextDrawResource *resource);
 u32 G3DTextDraw_GetTexDimCount(void);
 // NitroSDK's GX functions are in nitro/gx.h

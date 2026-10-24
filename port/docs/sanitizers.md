@@ -221,6 +221,20 @@ its encounters and battles track:
 
 | Report | Where | What the sanitizer saw | What the host does |
 | --- | --- | --- | --- |
-| R6 | `src/ov036/fldeff_fes_kira.c:210`, `fldeff_gyoe.c:213`, `fldeff_shadow.c:128` to `193`: the field's effect tasks, from the field's first load | Each task's work lies 4 bytes past an 8-byte boundary while its struct holds pointers: misaligned loads and stores (UBSan) | Nothing yet: open |
+| R6 | `src/ov036/fldeff_fes_kira.c:210`, `fldeff_gyoe.c:213`, `fldeff_shadow.c:128` to `193`: the field's effect tasks, from the field's first load | Each task's work lies 4 bytes past an 8-byte boundary while its struct holds pointers: misaligned loads and stores (UBSan) | Fixed in the game's header under `PLATFORM_PC`: `FieldEffectTask.work` (`include/field/field_effect.h`) is aligned to 8 bytes on a host ([game-changes.md](game-changes.md)) |
 | H5 | `src/ov036/field_buildmodel.c:852`, `FieldChunkPropHolder_SetVisible`, from `FieldPropSystem_Free` as the field closes for a change of map | A write of 4 bytes into memory of the game's heap that is no longer allocated (ASan, use-after-poison, in the main arena) | Nothing yet: open |
 | H6 | `lib/nnsys/src/gfd/gfd_VramTransferManager.c:327`, `NNS_GfdDoVramTransfer`, from the main loop (`src/system/main.c`) in the field | A transfer reads its source from memory of the game's heap that is no longer allocated (ASan, use-after-poison, twice) | Nothing yet: open |
+
+The battles' track ran the same survey build on 2026-10-23 on the Route 19 route from the starter save (the oracle's
+`route19_save_b2_us.pbwinput`, port frames 0 to 7,623: CONTINUE, Route 19, the trainer's VS cut-in and Hugh's battle to
+the first move's menu, where `data_ov167_021d7490` stops the program; [STATUS.md](STATUS.md)). The deep dive's survey of
+the same route, on its scratch build, showed R6 to R10 and H6; after the track's fixes it shows only H6 and R10, and
+`replay_new_game_house` in the survey build runs all 18,800 frames with only H5 and H6 (H5, at the change of map into
+the house, is now its first report, where the strict build would stop; the strict build wasn't run):
+
+| Report | Where | What the sanitizer saw | What the host does |
+| --- | --- | --- | --- |
+| R7 | `src/system/printsys.c:247` to `464`, `PrintQueue_Main`, and `:1164`, `PrintQueue_GetNextJob`: the field's queued text on Route 19 | The print queue keeps a copy of the renderer after each string, and a string rounded to the DS's 4 bytes left the renderer, which holds pointers, 4 bytes past an 8-byte boundary (UBSan, misaligned) | Fixed in the game's file under `PLATFORM_PC`: on a host the queue moves its write position on to an 8-byte boundary after each string, and copies no more of the string than the DS does, so a read past a `GFL_StrBufClone`'s buffer can't follow ([game-changes.md](game-changes.md)) |
+| R8 | `src/ov167/btlv_scu.c:2407`, `BtlvScu_InitGauges`, from `BtlvScu_Setup` at every battle's start | The marked `// BUG:`: the loop clears one gauge past `gauges[6]` (UBSan, out-of-bounds index); its writes land on `abilityWins[0]`'s `scu` and `bg`, which `BtlvScu_InitAbilityWins` sets right after | Fixed under `PLATFORM_PC`, which takes the `BUGFIX` loop; the battle is unchanged |
+| R9 | `src/ov169/btl_monset.c:15` to `84`, from `ServerControl_AfterSwitchIn` at the battle's first switch-in | `BtlServerFlow.unk1A68`, a mon set kept as `u8 [0x48]`, lies 4 bytes past an 8-byte boundary (UBSan, misaligned); it is also 24 bytes short of a host's set, which the clear overruns | Fixed in the game's header: the flow's mon sets are `BtlMonSet` (`include/battle/btl_handler.h`, [game-changes.md](game-changes.md)) |
+| R10 | `lib/nitro/src/std/std_string.c:116`, `STD_GetStringLength`, from `G3DTextDraw_CreateResource` (`src/ov012/g3d_text_draw.c:91`) for the trainer cut-in's texture names (`src/ov036/fld3d_ci.c`) | NitroSDK's string length reads a word at a time once the address is aligned, so it reads up to 3 bytes past a string literal's end (`"name_up_pl"`, 11 bytes) (ASan, global-buffer-overflow, a read of 4) | Nothing yet: open. The read stays in the aligned word, which never crosses a page, so it is safe on every host as on the DS's ARM9: a candidate for the ignorelist's `[address]` section, as R1 is for alignment |

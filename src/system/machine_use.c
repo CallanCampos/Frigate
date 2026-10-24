@@ -27,8 +27,15 @@
 // OnExitRequest (swan's dsi276952D, dsi2769595, dsi27694DD and dsi2769589) are those, not functions of this file
 
 // The DSi's system configuration: the extensions it enables for the game, and the copy that the boot code keeps
+#ifdef PLATFORM_PC
+// A DS address is no host address, and the host build translates the ones in headers only (port/docs/adr/0004): these
+// two go to the host's windows of the DS's memory map as a header's would. Only a development console's start uses them
+#define reg_SCFG_EXT (*(vu32 *)PORT_HW_ADDR(0x04004008))
+#define SCFG_EXT_COPY (*(vu32 *)PORT_HW_ADDR(0x02fffdf0))
+#else
 #define reg_SCFG_EXT (*(vu32 *)0x04004008)
 #define SCFG_EXT_COPY (*(vu32 *)0x02fffdf0)
+#endif
 #define SCFG_EXT_VRAM 0x2000
 
 #define VRAM_TRANSFER_TASK_COUNT 48

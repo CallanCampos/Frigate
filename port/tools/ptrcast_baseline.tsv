@@ -200,7 +200,6 @@ src/gfl/net_state.c	NetState_ConnectMac	ptr-to-int	u32 <- u8 *	1	harmless	an ali
 src/ov011/net_devwifi.c	NetDevWifi_Start	int-to-ptr	DWCFriendData * <- int	1	real	R22: Wi-Fi game code: DWC user and friend data as int, login buffers, callbacks in u32 fields (phase 7)
 src/ov011/net_devwifi.c	NetDevWifi_Start	int-to-ptr	void * <- int	1	real	R22: Wi-Fi game code: DWC user and friend data as int, login buffers, callbacks in u32 fields (phase 7)
 src/ov011/net_devwifi.c	NetDevWifi_Unk4C	int-to-ptr	const char * <- int	1	real	R22: Wi-Fi game code: DWC user and friend data as int, login buffers, callbacks in u32 fields (phase 7)
-src/ov012/g3d_text_draw.c	G3DTextDraw_CreateResource	int-to-ptr	const void * <- u32	1	real	R04: G3DTextDraw_CreateResource takes its palette pointer as u32 (the field-move cut-in's name)
 src/ov012/game_beacon_set.c	GameBeacon_BroadcastPhrase	ptr-to-int	u32 <- StrBuf *	1	real	R15: the Funfest beacon mission's StrBuf * in a u32 value
 src/ov012/scrcmd_download_data.c	s02B7_MemoryLinkAddMusicalProps	int-to-ptr	const u8 * <- u32	1	real	R16: the Memory Link getter (MemoryLinkSave_GetValue) returns pointers as u32
 src/ov012/script_plugin.c	GetCurrentScrPluginCmdCount	ptr-to-int	u32 <- FieldScriptCommand	1	harmless	a compare with the sentinel (u32)-1
@@ -213,7 +212,6 @@ src/ov034/union_oneself.c	UnionOneself_StepAskRun	ptr-to-int	u32 <- UnionBeaconE
 src/ov034/union_oneself.c	UnionOneself_StepAskedRun	ptr-to-int	u32 <- UnionBeaconEntry *	1	real	R21: the Union Room's UnionComm_SetSelf u32 value and menu values (phase 7)
 src/ov034/union_oneself.c	UnionOneself_StepIdleRun	ptr-to-int	u32 <- UnionBeaconEntry *	2	real	R21: the Union Room's UnionComm_SetSelf u32 value and menu values (phase 7)
 src/ov034/union_oneself.c	UnionOneself_StepRecruitRun	ptr-to-int	u32 <- UnionBeaconEntry *	1	real	R21: the Union Room's UnionComm_SetSelf u32 value and menu values (phase 7)
-src/ov036/fld3d_ci.c	EventFieldEffectCutinSub_DrawStrToTexture	ptr-to-int	u32 <- u16 *	1	real	R04: G3DTextDraw_CreateResource takes its palette pointer as u32 (the field-move cut-in's name)
 src/ov036/shortcut_menu.c	OnListCursor	int-to-ptr	ShortcutMenuList * <- s32	1	real	R02: BmpMenuList_GetParam returns the list's work pointer and callbacks as s32 (the Y button's shortcut menu)
 src/ov036/shortcut_menu.c	RedrawHighlight	int-to-ptr	ShortcutMenuList * <- s32	1	real	R02: BmpMenuList_GetParam returns the list's work pointer and callbacks as s32 (the Y button's shortcut menu)
 src/ov084/beacon_view_setup.c	BeaconView_CreateEvent	ptr-to-int	u32 <- AppTaskMenuWin *	6	real	R14: the C-Gear passersby log's and Funfest view's wait events carry an AppTaskMenuWin * in a u32 param

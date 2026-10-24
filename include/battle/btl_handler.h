@@ -6,6 +6,7 @@
 #include "battle/btl_action_order.h"
 #include "battle/btl_faintrec.h"
 #include "battle/btl_handler_work.h"
+#include "battle/btl_monset.h"
 #include "battle/btl_pokeparam.h"
 #include "battle/btl_pospoke.h"
 #include "battle/btl_server.h"
@@ -145,7 +146,7 @@ typedef struct {
 // current one
 typedef struct {
     // Mon sets in overlay 169's format
-    u8 monSets[7][0x48];
+    BtlMonSet monSets[7];
     BattleMoveEffectState moveEffect;
     BtlFlowMoveParam moveParams[2];
     BtlFlowHitWork hitWork;
@@ -222,7 +223,7 @@ struct BtlServerFlow {
     BtlFlowWorkFrame frames[7];
     u32 frameDepth;
     // The mons that came in this turn, in overlay 169's format
-    u8 unk1A68[0x48];
+    BtlMonSet unk1A68;
     BtlFlowMoveParam *unk1AB0;
     BtlFlowMoveParam *unk1AB4;
     BtlPosPoke posPoke;
