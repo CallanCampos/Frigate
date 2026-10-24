@@ -31,6 +31,22 @@ def merged_sources() -> dict[str, str]:
     return tomllib.loads(path.read_text())["merged"] if path.exists() else {}
 
 
+def merged_part_ranges(source: str, version_dir: Path) -> list[tuple[Path, int, int]]:
+    """The section ranges of a merged file's parts, each with its module's config directory. The parts link from the
+    whole's object, so their references are the file's own (config/merged_sources.toml)."""
+    parts = {f"{part}:" for part, whole in merged_sources().items() if whole == source}
+    ranges = []
+    if parts:
+        for delinks in version_dir.rglob("delinks.txt"):
+            current = None
+            for line in delinks.read_text().splitlines():
+                if line and not line[0].isspace():
+                    current = line
+                elif current in parts and (m := SECTION_RANGE_RE.match(line)):
+                    ranges.append((delinks.parent, int(m.group(2), 16), int(m.group(3), 16)))
+    return ranges
+
+
 def module_name(config_dir: Path, version_dir: Path) -> str:
     """The relocs' name for the module whose config is in config_dir."""
     if config_dir == version_dir:
@@ -44,6 +60,7 @@ def externally_used_statics(source: str, version_dir: Path) -> list[str]:
     """Returns static functions referenced outside their original source file."""
     # A part of a merged file has its code in its whole's source (config/merged_sources.toml)
     text = (ROOT / merged_sources().get(source, source)).read_text()
+    part_ranges = merged_part_ranges(source, version_dir)
     for delinks in version_dir.rglob("delinks.txt"):
         lines = delinks.read_text().splitlines()
         if f"{source}:" not in lines:
@@ -78,6 +95,9 @@ def externally_used_statics(source: str, version_dir: Path) -> list[str]:
                     origin = int(m.group(1), 16)
                     if any(start <= origin < end for start, end in owner_ranges):
                         continue
+                if m and any(relocs.parent == part and start <= int(m.group(1), 16) < end
+                             for part, start, end in part_ranges):
+                    continue
                 # dsd v0.12.1-dsi.4's delinker uses first_module() for symbol
                 # relocations, so overlays(11,12) binds only overlay 11.
                 targets = reloc_module_names(m.group(3)) if m else []

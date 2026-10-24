@@ -62,7 +62,8 @@ def categorize(config: dict, version: str):
         source = metadata.get("source_path")
         if source:
             group = modules.get(source, "main")
-            parts = Path(source).parts
+            # A part of a merged file is its whole's code, in its whole's library (config/merged_sources.toml)
+            parts = Path(MERGED_SOURCES.get(source, source)).parts
             if parts[0] == "lib":
                 libraries.add(parts[1])
                 origin = ["lib", f"lib/{parts[1]}"]

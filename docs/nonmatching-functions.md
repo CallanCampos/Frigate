@@ -115,4 +115,5 @@ gets `complete` in both versions' `delinks.txt` only when all its functions matc
 `build/b2_us/report.json` helps find candidates, but its fuzzy match can be below 100 for a matching function because of
 relocations, and misses some differences, so the probe decides. `tools/decomp/check_nonmatching_rows.py`, which CI's
 Standards workflow runs, checks that each row's functions are defined in its file and are symbols of that file's module
-at the row's Black 2 and White 2 addresses; `--fix` corrects a White 2 address that has one answer.
+(or of a merged file's parts' modules, `docs/configs.md`) at the row's Black 2 and White 2 addresses; `--fix` corrects a
+White 2 address that has one answer.

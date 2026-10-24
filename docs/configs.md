@@ -171,8 +171,8 @@ which gives `wcm_dsi.c`'s 56 calls of `WcmSetPhase` their 56 veneers. TwlSDK's `
 target, across files, as main's do: `card_hash.c`'s six calls of `OS_DisableInterrupts` go through one veneer, which
 `mi_ndma.c`, `mi_ndma_gxcommand.c`, `mi_sharedWram_twl.c` and `pm.c`'s DSi part call too, so the tool leaves the
 objects of `lib/twl/` with main's, and those of the merged files that hold a DSi part (below): `card_rom.c`'s DSi part
-calls `CARD_GetOwnRomHeaderTWL` twice through one veneer, and `card_hash.c` and `mi_sharedWram_twl.c` call
-`OS_Terminate`, `OS_GetBootType`, `OS_GetLockID` and `OS_ReleaseLockID` through its veneers.
+calls `CARD_GetOwnRomHeaderTWL` twice through one veneer, `card_hash.c` calls `OS_Terminate` and `OS_GetBootType`
+through its veneers, and `mi_sharedWram_twl.c` calls `OS_GetLockID` and `OS_ReleaseLockID` through them.
 
 DS Protect's `dsprot_detect.c` (overlay 165) and `dsprot_detect_multi.c` (overlay 337) also retain legacy
 ARM-to-Thumb veneers, eight and sixteen. The normal ARM946E linker replaces those calls with BLX and drops 96 and

@@ -3,7 +3,8 @@
 
 Each row names a source file, its functions and their addresses, Black 2's then White 2's (`same` when they are
 equal). For every function the row gives an address for, the file must be delinked in a module of both versions, the
-function must be a symbol of that module at Black 2's address and at White 2's, and the source file must define it.
+function must be a symbol of that module, or of a module of one of a merged file's parts (config/merged_sources.toml),
+at Black 2's address and at White 2's, and the source file must define it.
 Rows about data, whose function column is in parentheses, are left out. Merge markers and duplicate function
 entries are rejected. It needs no ROM, so CI runs it.
 

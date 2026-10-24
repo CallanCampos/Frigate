@@ -9,8 +9,9 @@ regenerate_configs.py runs after importing names from swan.
     rename_symbol.py sButtonAnims sTDownloadButtonAnims --module overlays/ov326   # a name several symbols share
     rename_symbol.py --file renames.txt
 
-The sources are rewritten everywhere, except for a static: only its own file, the one delinks.txt places it in, can
-refer to it, and another file may have a static of the same name. A static may also take a name that only other
+The sources are rewritten everywhere, except for a static: only its own file, the one delinks.txt places it in (for a
+part of a merged file, its whole, config/merged_sources.toml), can refer to it, and another file may have a static of
+the same name. A static may also take a name that only other
 files' statics have, unless one of them is in the same module and both files are incomplete: an incomplete file links
 its delinked assembly, whose statics are global, so the two would clash. Any other name already in use is refused.
     rename_symbol.py --apply

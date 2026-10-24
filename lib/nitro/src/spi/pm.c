@@ -2,13 +2,14 @@
 // ARM7's power management through the PXI FIFO, for the backlights and the screens' power, the battery, the sound
 // amplifier of the microphone, the sleep mode and the power-off. The file name is the SDK's, and the split is certain:
 // the functions come in the SDK's order, and the .bss and .data hold its statics. The file has TwlSDK's DSi part too,
-// in TwlSDK's LTDMAIN section, which the LTD autoload's .ltdmain holds: dsd lists it as lib/twl/src/spi/pm_twl.c,
-// which config/merged_sources.toml links from this file's object, since the parts share the object's statics, and the
-// DSi part's place among them sets the layout of the .bss. The two parts call each other through the linker's veneers
-// (func_0207ece4/e8, func_0207f058/5c and func_0207f16c/70, after their callers). The named functions have NitroSDK's
-// names, as ntrtwl's reconstruction of NitroSDK has them, where it has the code, and the DSi part's PM_ functions have
-// the names of the TWL-SDK Function Reference Manual. The others have names of ours in the SDK's style: the TwlSDK-era
-// functions, PMi_SendPxiRequest and the DSi part's other functions.
+// in TwlSDK's LTDMAIN section, which the LTD autoload's .ltdmain holds: dsd lists it as lib/twl/src/spi/pm_twl.c, which
+// config/merged_sources.toml links from this file's object, since the parts share the object's statics, and the DSi
+// part's place among them sets the layout of the .bss. The main part calls the DSi part through the linker's veneers
+// (func_0207ece4/e8, func_0207f058/5c and func_0207f16c/70, after their callers), and the DSi part calls back through
+// veneers of its own. The named functions have NitroSDK's names, as ntrtwl's reconstruction of NitroSDK has them, where
+// it has the code, and the DSi part's PM_ functions have the names of the TWL-SDK Function Reference Manual. The
+// TwlSDK-era functions have names in the SDK's style that it can't confirm elsewhere, and PMi_SendPxiRequest and the
+// DSi part's other functions have names of ours.
 #include "nitro/pm.h"
 #include "nitro/card.h"
 #include "nitro/ctrdg.h"
@@ -138,9 +139,9 @@ static u32 PMi_PreDmaCnt[4];
 // TwlSDK's section for the DSi-only code and data that the LTD autoload's .ltdmain holds
 #pragma define_section LTDMAIN ".ltdmain" ".ltdmain.bss" ".ltdmain" abs32 RWX
 // clang-format on
-// The DSi part's statics, in the LTD autoload's .ltdmain.bss, are declared here, among the others: of the places and
-// orders tried, only this one keeps the main part's offsets and gives the ROM's .ltdmain.bss (docs/matching.md). Each
-// has a section of its own, which the linker places in the order of the size sort too
+// The DSi part's statics, in the LTD autoload's .ltdmain.bss, are declared here, among the others: their place and
+// order set both the main part's .bss offsets and the layout of the ROM's .ltdmain.bss (docs/matching.md). Each has a
+// section of its own, which the linker places in the order of the size sort too
 #pragma section LTDMAIN begin
 // The callback for a low battery
 static PMGenCallbackInfo PMi_BatteryLowCallbackInfo;
@@ -976,8 +977,8 @@ static void PMi_ExecuteExit(BOOL reset) {
     GXS_DispOff();
     MI_SetMainMemoryPriority(MI_PROCESSOR_ARM7);
     for (i = 0; i < 3; i++) {
-        u32 count = *(vu32 *)HW_VBLANK_COUNT_BUF;
-        while (count == *(vu32 *)HW_VBLANK_COUNT_BUF) {
+        u32 count = OS_GetVBlankCount();
+        while (count == OS_GetVBlankCount()) {
             OS_SpinWaitSysCycles(PM_VBLANK_WAIT_CYCLES);
         }
     }

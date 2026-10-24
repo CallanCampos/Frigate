@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+"""merge_objects.py's linker-script and object-list rewrite, on a small fixture without ROMs or a build.
+
+    python3 -m unittest discover -s tools/build -p test_merge_objects.py
+"""
 import sys
 import unittest
 from pathlib import Path

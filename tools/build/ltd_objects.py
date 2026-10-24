@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Link the LTD autoload's NitroWiFi objects as an overlay group of their own.
 
-    ltd_objects.py build/b2_us/objects.txt build/b2_us/arm9.lcf build/b2_us/objects_link.txt
+    ltd_objects.py build/b2_us/objects_merged.txt build/b2_us/arm9_merged.lcf build/b2_us/objects_link.txt
 
 mwldarm gives every out-of-range call in a file listed after its -overlaygroup and -overlay options a long-branch
 veneer of its own, and shares one veneer per target among the other files (docs/configs.md, "Long-branch veneers").
@@ -12,7 +12,8 @@ with main's: their .ltdmain code shares one veneer per target across files, as m
 OS_DisableInterrupts serves mi_ndma.c, mi_ndma_gxcommand.c, mi_sharedWram_twl.c and pm.c's DSi part, and
 os_interrupt_twl.c calls OS_EnableIrqMask through mi_ndma_gxcommand.c's), which the group would give each call apart. So
 does the object of a merged file (config/merged_sources.toml) that holds a TwlSDK part: card_rom.c's TWL code calls
-CARD_GetOwnRomHeaderTWL twice through one veneer, and card_hash.c and mi_sharedWram_twl.c call through its veneers.
+CARD_GetOwnRomHeaderTWL twice through one veneer, and card_hash.c and mi_sharedWram_twl.c call others through its
+veneers.
 """
 import argparse
 import re
@@ -31,8 +32,8 @@ SHARED_VENEERS = "/lib/twl/"
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("objects", type=Path, help="dsd's objects.txt")
-    parser.add_argument("lcf", type=Path, help="dsd's linker script")
+    parser.add_argument("objects", type=Path, help="dsd's objects.txt, as merge_objects.py rewrites it")
+    parser.add_argument("lcf", type=Path, help="dsd's linker script, as merge_objects.py rewrites it")
     parser.add_argument("output", type=Path)
     args = parser.parse_args()
 

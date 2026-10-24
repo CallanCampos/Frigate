@@ -96,6 +96,18 @@ class StaticReferenceTests(unittest.TestCase):
                     f'from:{origin:#010x} kind:load to:0x02100001 add:0x4 module:overlays(11,12)\n')
                 self.assertEqual(self.check(), ['Local'])
 
+    def test_merged_part_references_are_internal(self):
+        self.relocs()
+        (self.root / 'config/merged_sources.toml').write_text('[merged]\n"src/library_part.c" = "src/library.c"\n')
+        part = self.version / 'ltd_autoload_0'
+        part.mkdir()
+        (part / 'delinks.txt').write_text('src/library_part.c:\n    .ltdmain start:0x02700000 end:0x02700020\n')
+        for origin, expected in ((0x02700004, []), (0x02700020, ['Local'])):
+            with self.subTest(origin=origin):
+                (part / 'relocs.txt').write_text(
+                    f'from:{origin:#010x} kind:arm_call to:0x02100000 module:overlay(11)\n')
+                self.assertEqual(self.check(), expected)
+
     def test_same_overlay_unowned_and_end_boundary_sources_rejected(self):
         self.relocs()
         with (self.owner / 'delinks.txt').open('a') as f:

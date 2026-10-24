@@ -12,8 +12,8 @@ every section.
   is linked until then, as with `src/ov059/scrcmd_resort.c`. Never split a file into several entries to link the
   matching parts early, and never put two original files in one entry. An original file that the code shows in two
   modules is one source file with an entry in each module's `delinks.txt`, the part's mapped to its whole in
-  `config/merged_sources.toml` (`docs/configs.md`, Merged files): NitroSDK's `pm.c`, whose DSi part in the LTD
-  autoload reaches the main part's statics from their pooled base, as only code of the same object does. TwlSDK's
+  `config/merged_sources.toml` (`docs/configs.md`, Merged files): NitroSDK's `card_rom.c` and `pm.c`, whose DSi parts in
+  the LTD autoload reach the main parts' statics from their pooled base, as only code of the same object does. TwlSDK's
   other DSi parts of main's files, such as `os_arena_twl.c`, link as files of their own, since nothing in them shows
   that.
 - The C file holds its functions in address order. A function that doesn't match yet stays in the file as the closest
