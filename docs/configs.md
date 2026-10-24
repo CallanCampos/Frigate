@@ -29,9 +29,9 @@ script defines only `__OVERLAY_COUNT` of them. `config/linker_symbols.toml` give
 in both versions: the stack sizes, which `os_interrupt.c`, `os_thread.c`, `os_arena.c` and the startup code `crt0.c`
 (`_start`, `func_02004d50` and `func_02004da0`) read, and the start of the DSi's extended main memory arena, which
 `os_arena.c` reads. `dsd lcf --symbols config/linker_symbols.toml` defines them after `__OVERLAY_COUNT` as absolute
-symbols in the linker script it writes, `build/<version>/arm9.lcf`, which the link (or `--shift`'s padding) takes, as
-NitroSDK's template defines them in its own. Another one goes in
-the config when a file that reads it is written, with its value read from the pool word in both versions.
+symbols in the linker script it writes, `build/<version>/arm9.lcf`, which the link (or `--shift`'s padding) takes
+through `build/<version>/arm9_merged.lcf` (Merged files), as NitroSDK's template defines them in its own. Another one
+goes in the config when a file that reads it is written, with its value read from the pool word in both versions.
 
 ## Compiler exception indices
 
@@ -171,7 +171,8 @@ which gives `wcm_dsi.c`'s 56 calls of `WcmSetPhase` their 56 veneers. TwlSDK's `
 target, across files, as main's do: `card_hash.c`'s six calls of `OS_DisableInterrupts` go through one veneer, which
 `mi_ndma.c`, `mi_ndma_gxcommand.c`, `mi_sharedWram_twl.c` and `pm.c`'s DSi part call too, so the tool leaves the
 objects of `lib/twl/` with main's, and those of the merged files that hold a DSi part (below): `card_rom.c`'s DSi part
-shares its veneer of `CARD_GetOwnRomHeaderTWL` with `card_hash.c`.
+calls `CARD_GetOwnRomHeaderTWL` twice through one veneer, and `card_hash.c` and `mi_sharedWram_twl.c` call
+`OS_Terminate`, `OS_GetBootType`, `OS_GetLockID` and `OS_ReleaseLockID` through its veneers.
 
 DS Protect's `dsprot_detect.c` (overlay 165) and `dsprot_detect_multi.c` (overlay 337) also retain legacy
 ARM-to-Thumb veneers, eight and sixteen. The normal ARM946E linker replaces those calls with BLX and drops 96 and
@@ -201,7 +202,9 @@ DSi-only code of some NitroSDK files into the object of their NITRO code, in its
 autoload's `.ltdmain` holds, so one original file has a part in ARM9 main and a part in the LTD autoload. Both parts
 reach the object's pooled statics from one base, and the DSi part's statics, in `.ltdmain.bss`, take part in the size
 sort of the object's `.bss`, so they match only compiled as one file: `card_rom.c` and `pm.c`, whose DSi parts the LTD
-autoload's `delinks.txt` lists as `lib/twl/src/card/card_rom_twl.c` and `lib/twl/src/spi/pm_twl.c`.
+autoload's `delinks.txt` lists as `lib/twl/src/card/card_rom_twl.c` and `lib/twl/src/spi/pm_twl.c`. TwlSDK's other DSi
+parts of main's files, such as `os_arena_twl.c`, link as files of their own, since nothing in them shows a shared
+object.
 `config/merged_sources.toml` maps each such part to its whole, whose source holds the part's code between
 `#pragma section LTDMAIN begin` and `end`. The part has no source and isn't compiled: `tools/build/merge_objects.py`
 rewrites dsd's linker script to place the part's sections from the whole's object, its `.bss` from the object's
@@ -209,8 +212,11 @@ rewrites dsd's linker script to place the part's sections from the whole's objec
 veneers object by object, in the list's order, and a later call in range shares an earlier veneer: at its ARM9 main
 place, `pm.o` came before `card_hash.o`, so `pm.c`'s DSi part made the veneers of `OS_DisableInterrupts` and
 `OS_RestoreInterrupts` that `card_hash.c` makes in the original, and `.ltdmain` moved by 0x10 from `card_hash.c` on.
-`compiler_probe.py`, `mark_complete.py` and the objdiff config find the part's code in its whole, and the part's
-entry is marked `complete` like any other.
+`compiler_probe.py`, `mark_complete.py`, `rename_symbol.py`, `check_nonmatching_rows.py` and the objdiff config find
+the part's code in its whole, and a row of `docs/nonmatching-functions.md` names the whole. The part and its whole are
+one object, so they are complete together, each marked with `mark_complete.py`: `merge_objects.py` stops the build when
+only one is, and leaves both to link their original code when neither is. `config/merged_sources.toml` is the same for
+both versions and changes no dsd config, so it has no script and is edited by hand when a part is found.
 
 ## Shifting
 

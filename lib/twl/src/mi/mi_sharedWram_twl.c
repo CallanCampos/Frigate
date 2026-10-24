@@ -1,10 +1,12 @@
-// TwlSDK's shared WRAM manager, the DSi part of mi_sharedWram.c in the LTD autoload (ARM9 main has the NITRO part):
-// the WRAM A, B and C banks' registers, and the bookkeeping of which processor has each bank, or has reserved it,
-// which the ARM7 asks for through the PXI FIFO. The ROM names none of it: the public functions have the names of the
-// TWL-SDK Function Reference Manual, and the register setters libntr's (sharedWram.h); the cores of the requests, the
-// PXI handling and the locks are named for what they do. The ARM9's own requests besides the slot allocation and the
+// TwlSDK's shared WRAM manager, the DSi part of mi_sharedWram.c in the LTD autoload (ARM9 main has the NITRO part): the
+// WRAM A, B and C banks' registers, and the bookkeeping of which processor has each bank, or has reserved it, which the
+// ARM7 asks for through the PXI FIFO. The ROM names none of it: the public functions have the names of the TWL-SDK
+// Function Reference Manual, and the register setters libntr's (sharedWram.h); the cores of the requests, the PXI
+// handling and the locks are named for what they do. The ARM9's own requests besides the slot allocation and the
 // release are not linked. The file is built with -ipa function (file_flags in lib/twl/library.toml): the original
-// reaches each static through a literal of its own.
+// reaches each static through a literal of its own. It links as a file of its own: unlike card_rom.c's and pm.c's DSi
+// parts (config/merged_sources.toml), nothing in it reaches main's statics from their pooled base, which would show
+// that it shares main's object.
 #include "nitro/os.h"
 #include "nitro/pxi.h"
 #include "nitro/svc.h"

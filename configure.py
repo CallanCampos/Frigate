@@ -897,7 +897,8 @@ def main():
 
     # objdiff.json covers one version, the primary one if it is being built
     objdiff_version = versions[0]
-    n.build(["objdiff.json"], "objdiff_config", configs, implicit=["tools/build/objdiff_config.py", "configure.py", "config/compiler_flags.toml"],
+    n.build(["objdiff.json"], "objdiff_config", configs, implicit=["tools/build/objdiff_config.py", "configure.py", "config/compiler_flags.toml",
+                                                                   "config/merged_sources.toml"],
             variables={"version": objdiff_version})
     n.build(["report"], "phony", [Path("build") / objdiff_version / "report.json"])
     n.build(["progress"], "phony", [f"{objdiff_version}_progress"])
@@ -909,7 +910,7 @@ def main():
     data_dirs = sorted({str(p.relative_to(ROOT)) for d in source_dirs for p in [ROOT / d, *(ROOT / d).rglob("*")]
                         if p.is_dir()})
     n.build(["build.ninja"], "configure", ["configure.py"],
-            implicit=[*configs, "config/compiler_flags.toml", *(str(p.relative_to(ROOT)) for p in sorted(LIB_DIR.glob("*/library.toml"))),
+            implicit=[*configs, "config/compiler_flags.toml", "config/merged_sources.toml", *(str(p.relative_to(ROOT)) for p in sorted(LIB_DIR.glob("*/library.toml"))),
                       *data_dirs])
     sources = sorted(str(p.relative_to(ROOT)) for pattern in ("src/**/*.c", "lib/*/src/**/*.[ch]", "include/**/*.h",
                                                                "lib/*/include/**/*.h") for p in ROOT.glob(pattern))

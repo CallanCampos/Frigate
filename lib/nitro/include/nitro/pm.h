@@ -118,7 +118,8 @@ static inline void PM_SetSleepCallbackInfo(PMSleepCallbackInfo *info, PMGenCallb
 #define PM_INSERT_APPEND 0
 #define PM_INSERT_PREPEND 1
 
-// PMi_InsertList, PMi_DeleteList and PMi_ExecuteList, which TwlSDK's exit callbacks (the LTD autoload) use too
+// PMi_InsertList, PMi_DeleteList and PMi_ExecuteList, which pm.c's DSi part, in the LTD autoload, uses for its exit
+// callbacks too
 void PMi_InsertList(PMGenCallbackInfo **list, PMGenCallbackInfo *info, int priority, int insertType);
 void PMi_DeleteList(PMGenCallbackInfo **list, PMGenCallbackInfo *info);
 void PMi_ExecuteList(PMGenCallbackInfo *list);

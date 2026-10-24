@@ -6,10 +6,9 @@
 // which config/merged_sources.toml links from this file's object, since the parts share the object's statics, and the
 // DSi part's place among them sets the layout of the .bss. The two parts call each other through the linker's veneers
 // (func_0207ece4/e8, func_0207f058/5c and func_0207f16c/70, after their callers). The named functions have NitroSDK's
-// names, as ntrtwl's reconstruction of NitroSDK has them, where it has the code, the DSi part's PM_ functions have the
-// names of the TWL-SDK Function Reference Manual, and the others have names in the SDK's style that it can't confirm
-// elsewhere: the TwlSDK-era functions and PMi_SendPxiRequest, which is ours. The statics still named by address are not
-// known.
+// names, as ntrtwl's reconstruction of NitroSDK has them, where it has the code, and the DSi part's PM_ functions have
+// the names of the TWL-SDK Function Reference Manual. The others have names of ours in the SDK's style: the TwlSDK-era
+// functions, PMi_SendPxiRequest and the DSi part's other functions.
 #include "nitro/pm.h"
 #include "nitro/card.h"
 #include "nitro/ctrdg.h"
@@ -139,8 +138,9 @@ static u32 PMi_PreDmaCnt[4];
 // TwlSDK's section for the DSi-only code and data that the LTD autoload's .ltdmain holds
 #pragma define_section LTDMAIN ".ltdmain" ".ltdmain.bss" ".ltdmain" abs32 RWX
 // clang-format on
-// The DSi part's statics, in the LTD autoload's .ltdmain.bss, are declared here, among the others. Each has a section
-// of its own, which the linker places in the order of the size sort too
+// The DSi part's statics, in the LTD autoload's .ltdmain.bss, are declared here, among the others: of the places and
+// orders tried, only this one keeps the main part's offsets and gives the ROM's .ltdmain.bss (docs/matching.md). Each
+// has a section of its own, which the linker places in the order of the size sort too
 #pragma section LTDMAIN begin
 // The callback for a low battery
 static PMGenCallbackInfo PMi_BatteryLowCallbackInfo;
@@ -942,11 +942,11 @@ PMExitFactor PM_GetExitFactor(void) {
 }
 
 void PM_AppendPreExitCallback(PMExitCallbackInfo *info) {
-    PMi_InsertList(&PMi_PreExitCallbackList, info, 0xff, 0);
+    PMi_InsertList(&PMi_PreExitCallbackList, info, PM_CALLBACK_PRIORITY_MAX, PM_INSERT_APPEND);
 }
 
 void PM_InsertPostExitCallback(PMExitCallbackInfo *info, int priority) {
-    PMi_InsertList(&PMi_PostExitCallbackList, info, priority, 0);
+    PMi_InsertList(&PMi_PostExitCallbackList, info, priority, PM_INSERT_APPEND);
 }
 
 void PM_DeletePostExitCallback(PMExitCallbackInfo *info) {

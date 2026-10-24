@@ -3,8 +3,8 @@
 // ntrtwl's reconstruction of NitroSDK has it); the library has no file name string. The file has TwlSDK's DSi part
 // too, the secure ROM reader, which reads through the card's hash table, in TwlSDK's LTDMAIN section, which the LTD
 // autoload's .ltdmain holds: dsd lists it as lib/twl/src/card/card_rom_twl.c, which config/merged_sources.toml links
-// from this file's object. The DSi part's CARDi_InitTwlRom reaches sRomReader from the base of this part's pooled .bss,
-// as only code of the same object does.
+// from this file's object. The DSi part's CARDi_InitTwlRom reaches sRomReader from the base of the main part's pooled
+// .bss, as only code of the same object does.
 #include "nitro/card.h"
 #include "nitro/hw.h"
 #include "nitro/mi.h"

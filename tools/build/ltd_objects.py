@@ -11,8 +11,8 @@ places in each LTD autoload to the end, in a group named after the autoload's me
 with main's: their .ltdmain code shares one veneer per target across files, as main's does (card_hash.c's veneer of
 OS_DisableInterrupts serves mi_ndma.c, mi_ndma_gxcommand.c, mi_sharedWram_twl.c and pm.c's DSi part, and
 os_interrupt_twl.c calls OS_EnableIrqMask through mi_ndma_gxcommand.c's), which the group would give each call apart. So
-does the object of a merged file (config/merged_sources.toml) that holds a TwlSDK part: card_rom.c's TWL code shares its
-veneer of CARD_GetOwnRomHeaderTWL with card_hash.c.
+does the object of a merged file (config/merged_sources.toml) that holds a TwlSDK part: card_rom.c's TWL code calls
+CARD_GetOwnRomHeaderTWL twice through one veneer, and card_hash.c and mi_sharedWram_twl.c call through its veneers.
 """
 import argparse
 import re

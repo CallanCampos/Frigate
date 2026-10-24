@@ -19,6 +19,7 @@ import argparse
 import csv
 import re
 import sys
+import tomllib
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
@@ -62,6 +63,16 @@ def owning_source(module: str, addr: int) -> Path | None:
             if int(m.group(1), 16) <= addr < int(m.group(2), 16):
                 return ROOT / source
     return None
+
+
+def code_source(source: Path | None) -> Path | None:
+    """The file that holds a source's code: a part of a merged file has its code in its whole's
+    (config/merged_sources.toml)."""
+    path = ROOT / "config/merged_sources.toml"
+    if source is None or not path.exists():
+        return source
+    merged = tomllib.loads(path.read_text())["merged"]
+    return ROOT / merged.get(source.relative_to(ROOT).as_posix(), source.relative_to(ROOT).as_posix())
 
 
 def load_pairs() -> dict[str, dict[tuple[str, int], int]]:
@@ -182,7 +193,7 @@ def is_static(source: Path, name: str) -> bool:
 
 def static_elsewhere(module: str, addr: int, name: str, source: Path) -> bool:
     """Whether the symbol at an address is a static of another source file than this one."""
-    owner = owning_source(module, addr)
+    owner = code_source(owning_source(module, addr))
     return owner is not None and owner != source and owner.exists() and is_static(owner, name)
 
 
@@ -220,7 +231,8 @@ def rename(old: str, new: str, pairs, names: list, module: str | None = None) ->
     # Statics in different files can share a name, including one whose symbol still has its default name. A static is
     # only visible in its own file, so only that file is rewritten; rewriting everywhere would rename the others too.
     # The file may already define the static by the new name, when the config catches up with the C
-    only = owning_source(module, addr)
+    owner = owning_source(module, addr)
+    only = code_source(owner)
     if only is not None and not (only.exists() and (is_static(only, old) or is_static(only, new))):
         only = None
 
@@ -231,7 +243,7 @@ def rename(old: str, new: str, pairs, names: list, module: str | None = None) ->
         sys.exit(f"{new} is already a symbol in {PRIMARY}")
     for holder_module, holder_addr in holders:
         holder = owning_source(holder_module, holder_addr)
-        if holder_module == module and not (is_complete(module, only) or is_complete(module, holder)):
+        if holder_module == module and not (is_complete(module, owner) or is_complete(module, holder)):
             sys.exit(f"{new} is a static of {holder.relative_to(ROOT)} in the same module, and both files are "
                      "incomplete, and an incomplete file's statics are global")
     for version in OTHERS:

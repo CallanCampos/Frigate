@@ -39,8 +39,9 @@ void PM_DeletePostExitCallback(PMExitCallbackInfo *info);
 // Why the system is exiting (PMi_ExitType), which NWM checks
 PMExitFactor PM_GetExitFactor(void);
 
-// The part of TwlSDK's pm.c that main's pm.c calls on a DSi: the exit request, which starts the exit sequence and runs
-// the pre-exit callbacks, the DSi's battery level, and the stop of a new DMA channel, the DSi's part of PMi_StopDma
+// The functions of pm.c's DSi part that its main part calls on a DSi: the exit request, which starts the exit
+// sequence and runs the pre-exit callbacks, the DSi's battery level, and the stop of a new DMA channel, the DSi's part
+// of PMi_StopDma
 void PMi_ProcessExitRequest(PMExitFactor exitType);
 u32 PMi_GetBatteryLevelCore(u16 *level);
 void PMi_StopNDma(u32 ndmaNo);

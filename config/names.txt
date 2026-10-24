@@ -6007,6 +6007,10 @@ ltd_autoload_0 0x02769594 PM_GetAutoExit
 ltd_autoload_0 0x027695a0 PMi_ExecuteExit
 ltd_autoload_0 0x027696c0 PMi_TryLockExit
 ltd_autoload_0 0x0276aebc sPriority
+ltd_autoload_0 0x0276aee0 sSecureAreaStart
+ltd_autoload_0 0x0276aee4 sSecureAreaSize
+ltd_autoload_0 0x0276aee8 sSecureRead
+ltd_autoload_0 0x0276af04 sSecureWork
 ltd_autoload_0 0x0276af74 sOuterContext
 ltd_autoload_0 0x0276afd8 sInnerContext
 ltd_autoload_0 0x0276b03c MIi_NDmaConfig

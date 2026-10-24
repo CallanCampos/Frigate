@@ -43,6 +43,16 @@ def merge(lcf: str, objects: str, merged: dict[str, str]) -> tuple[str, str]:
     for part, whole in merged.items():
         part_object = Path(part).with_suffix(".o").name
         whole_object = Path(whole).with_suffix(".o").name
+        lines = objects.splitlines()
+        part_line = listed(lines, part)
+        whole_line = listed(lines, whole)
+        # An incomplete file links its delinked object, from build/<version>/delinks. The parts are one object, so
+        # both link the original code, apart, or both the whole's
+        delinked = ("/delinks/" in part_line, "/delinks/" in whole_line)
+        if all(delinked):
+            continue
+        if any(delinked):
+            sys.exit(f"merge_objects.py: {part} and {whole} are one object; mark both complete or neither")
         placed = re.compile(r"^(\s*)" + re.escape(part_object) + r"\((\S+)\)$", re.M)
         if not placed.search(lcf):
             sys.exit(f"merge_objects.py: the linker script places nothing from {part_object}")
@@ -52,9 +62,6 @@ def merge(lcf: str, objects: str, merged: dict[str, str]) -> tuple[str, str]:
             return f"{match.group(1)}{whole_object}({section})"
 
         lcf = placed.sub(place, lcf)
-        lines = objects.splitlines()
-        part_line = listed(lines, part)
-        whole_line = listed(lines, whole)
         objects = "\n".join(whole_line if line == part_line else line for line in lines if line != whole_line) + "\n"
     return lcf, objects
 

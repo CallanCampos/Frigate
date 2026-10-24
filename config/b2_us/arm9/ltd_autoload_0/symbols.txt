@@ -693,10 +693,10 @@ data_0276aeb8 kind:data(any) addr:0x0276aeb8
 sPriority kind:data(any) addr:0x0276aebc
 data_0276aec0 kind:data(any) addr:0x0276aec0
 data_0276aec8 kind:data(any) addr:0x0276aec8
-data_0276aee0 kind:bss addr:0x0276aee0
-data_0276aee4 kind:bss addr:0x0276aee4
-data_0276aee8 kind:bss addr:0x0276aee8
-data_0276af04 kind:bss addr:0x0276af04
+sSecureAreaStart kind:bss addr:0x0276aee0
+sSecureAreaSize kind:bss addr:0x0276aee4
+sSecureRead kind:bss addr:0x0276aee8
+sSecureWork kind:bss addr:0x0276af04
 sOuterContext kind:bss addr:0x0276af74
 sInnerContext kind:bss addr:0x0276afd8
 MIi_NDmaConfig kind:bss addr:0x0276b03c

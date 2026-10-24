@@ -10,10 +10,12 @@ every section.
 - An original file is one entry in `delinks.txt`, covering its whole range in each section, even while only some of
   its functions are written. The entry stays without `complete` until every function matches, and the original code
   is linked until then, as with `src/ov059/scrcmd_resort.c`. Never split a file into several entries to link the
-  matching parts early, and never put two original files in one entry. An original file with code in two modules,
-  such as NitroSDK's `pm.c` with TwlSDK's DSi part in the LTD autoload, is one source file with an entry in each
-  module's `delinks.txt`, the part's mapped to its whole in `config/merged_sources.toml` (`docs/configs.md`, Merged
-  files).
+  matching parts early, and never put two original files in one entry. An original file that the code shows in two
+  modules is one source file with an entry in each module's `delinks.txt`, the part's mapped to its whole in
+  `config/merged_sources.toml` (`docs/configs.md`, Merged files): NitroSDK's `pm.c`, whose DSi part in the LTD
+  autoload reaches the main part's statics from their pooled base, as only code of the same object does. TwlSDK's
+  other DSi parts of main's files, such as `os_arena_twl.c`, link as files of their own, since nothing in them shows
+  that.
 - The C file holds its functions in address order. A function that doesn't match yet stays in the file as the closest
   C found, so objdiff shows how far off it is. Library code built with another compiler can differ: SPL's compiler
   emits a file's functions in reverse source order, so `lib/spl/src/` files hold theirs in reverse address order.
@@ -28,11 +30,12 @@ every section.
   (Nintendo's SPL particle library), `lib/dsprot/` (Nintendo's DS Protect, in overlays 165 and 337), `lib/nitro/`
   (NitroSDK: in ARM9 main its startup code, its system call stubs, its card, cartridge, file system, graphics,
   memory, NVRAM, OS, PXI, RTC, sound, SPI (microphone, power and touch panel), STD and wireless libraries, its
-  fixed-point math and libmath, and libcrypto's RC4; in overlay 181 the multiboot library), `lib/nnsys/` (NitroSystem: FND, G2D, G3D, GFD and sound), `lib/twl/`
+  fixed-point math and libmath, and libcrypto's RC4; in the LTD autoload's `.ltdmain`, the DSi parts of its card ROM
+  and PM files, in `card_rom.c` and `pm.c`; in overlay 181 the multiboot library), `lib/nnsys/` (NitroSystem: FND, G2D, G3D, GFD and sound), `lib/twl/`
   (TwlSDK's DSi libraries: SCFG and the DSi system calls in ARM9 main; in the LTD autoload the camera, the DSP, the
   microphone, NWM, FATFS and the sound and RTC extensions, beside the DSi's photo signature code (names guessed), and
-  in `.ltdmain` the card's hashed ROM reads, the new DMA, the shared WRAM manager and the DSi parts of NitroSDK's card
-  ROM, OS and PM files; and in `lib/twl/src/`, the SSP JPEG encoder and decoder with their EXIF writer and reader,
+  in `.ltdmain` the card's hashed ROM reads, the new DMA, the shared WRAM manager and the DSi parts of NitroSDK's OS
+  files; and in `lib/twl/src/`, the SSP JPEG encoder and decoder with their EXIF writer and reader,
   linked into overlay 257 and built as Thumb with the game's compiler, `-ipa file` and `-inline on,noauto`), `lib/dwc/`
   (Nintendo's Wi-Fi Connection library, TWL-DWC: its account, auto-connect, backup and WDS code in ARM9 main, ARM
   code; the rest in overlays 11, 29, 189 and 260, mostly Thumb), `lib/msl/` (Metrowerks' MSL C library for NITRO, the

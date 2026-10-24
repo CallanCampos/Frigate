@@ -1,6 +1,8 @@
 // TwlSDK's DSi part of os_application_jump.c (ARM9 main), in the LTD autoload: the lookup in the system's list of
 // titles, and the title ID of the program that sent the arguments, which main's half keeps here. ARM code, as main's
-// half is. The file name is inferred from main's half; the names are ours
+// half is. The file name is inferred from main's half; the names are ours. It links as a file of its own: unlike
+// card_rom.c's and pm.c's DSi parts (config/merged_sources.toml), nothing in it reaches main's statics from their
+// pooled base, which would show that it shares main's object.
 #include "nitro/os.h"
 #include "twl/os.h"
 
