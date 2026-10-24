@@ -209,20 +209,15 @@ src/ov137/resort_data_manager.c	ResortData_RollPair	narrow	u32 <- uptr	1	harmles
 src/ov137/resort_sys.c	ResortSys_SetScriptWord	narrow	s32 <- uptr	1	harmless	arithmetic on the number Join Avenue's uptr getter returns for field 0x1a
 src/ov162/game_start.c	Continue_Main	ptr-to-int	u32 <- void *	3	harmless	an int carried in a void * and back (Continue's task parameter)
 src/ov165/plist_sys.c	PokeList_Main	ptr-to-int	u32 <- PokeListParam *	1	harmless	the callee ignores the parameter (NetSync_StartTiming, src/ov164/net_sync.c)
-src/ov167/btl_server_flow.c	ServerEvent_AddMoveConditionString	ptr-to-int	s32 <- BattleHandlerString *	1	real	R06: battle event variable 0x3f keeps a BattleHandlerString * in s32 values[]
-src/ov167/btl_server_flow.c	ServerEvent_CheckNoEffect	ptr-to-int	s32 <- BattleHandlerString *	1	real	R06: battle event variable 0x3f keeps a BattleHandlerString * in s32 values[]
-src/ov167/btl_server_flow.c	ServerEvent_DecideSpecialMoveCondition	ptr-to-int	s32 <- BattleHandlerString *	1	real	R06: battle event variable 0x3f keeps a BattleHandlerString * in s32 values[]
-src/ov167/btl_server_flow.c	ServerEvent_SetMoveMessage	ptr-to-int	s32 <- BattleHandlerString *	1	real	R06: battle event variable 0x3f keeps a BattleHandlerString * in s32 values[]
-src/ov167/move_handlers.c	HandlerBideTextSet	int-to-ptr	BattleHandlerString * <- u32	1	real	R06: battle event variable 0x3f keeps a BattleHandlerString * in s32 values[]
-src/ov167/move_handlers.c	HandlerBindTextSet	int-to-ptr	BattleHandlerString * <- u32	1	real	R06: battle event variable 0x3f keeps a BattleHandlerString * in s32 values[]
-src/ov167/move_handlers.c	HandlerMetronomeTextSet	int-to-ptr	BattleHandlerString * <- u32	1	real	R06: battle event variable 0x3f keeps a BattleHandlerString * in s32 values[]
-src/ov167/move_handlers.c	HandlerNaturePowerTextSet	int-to-ptr	BattleHandlerString * <- u32	1	real	R06: battle event variable 0x3f keeps a BattleHandlerString * in s32 values[]
-src/ov167/move_handlers.c	HandlerSuckerPunch	int-to-ptr	BattleHandlerString * <- u32	1	real	R06: battle event variable 0x3f keeps a BattleHandlerString * in s32 values[]
-src/ov167/move_handlers.c	HandlerTelekinesis	int-to-ptr	BattleHandlerString * <- u32	1	real	R06: battle event variable 0x3f keeps a BattleHandlerString * in s32 values[]
+src/ov167/ability_handlers.c	HandlerSimple	narrow	s32 <- uptr	1	harmless	arithmetic on the number BattleEventVar_GetValue's uptr returns for variable 0x20, the stat change's stages, doubled, kept in 32 bits as on the DS (only 0x3f carries an address)
+src/ov167/battle_event.c	BattleEventVar_GetValueIfExist	narrow	s32 <- sptr	1	harmless	a battle event variable's number, read for the one caller's variable 0x2e (item_handlers.c); only 0x3f carries an address, read with BattleEventVar_GetValue
+src/ov167/battle_event.c	BattleEventVar_MulValue	narrow	fx32 <- sptr	1	harmless	a multiplied battle event variable's number (BattleEventVar_SetMulValue's fx32 multipliers); only 0x3f carries an address
+src/ov167/item_handlers.c	CommonJabocaRowapBerryReaction	narrow	s32 <- uptr	1	harmless	arithmetic on the number BattleEventVar_GetValue's uptr returns for variable 3, the attacker's mon ID, kept in 32 bits as on the DS (only 0x3f carries an address)
+src/ov167/move_handlers.c	HandlerPsyshock	narrow	s32 <- uptr	1	harmless	arithmetic on the number BattleEventVar_GetValue's uptr returns for variable 0x3d, the count of defense swaps, kept in 32 bits as on the DS (only 0x3f carries an address)
+src/ov167/move_handlers.c	HandlerWeatherBallPower	narrow	s32 <- uptr	1	harmless	arithmetic on the number BattleEventVar_GetValue's uptr returns for variable 0x30, the move's power, doubled, kept in 32 bits as on the DS (only 0x3f carries an address)
 src/ov168/btlv_mcss.c	BtlvMcss_OnAnimationEnd	narrow	s32 <- uptr	1	harmless	the animation callback's uptr parameter is an entry index here
+src/ov169/field_handlers.c	HandlerFieldWonderRoom	narrow	s32 <- uptr	1	harmless	arithmetic on the number BattleEventVar_GetValue's uptr returns for variable 0x3d, the count of defense swaps, kept in 32 bits as on the DS (only 0x3f carries an address)
 src/ov169/pos_handlers.c	PosEventAdd	ptr-to-int	BOOL <- BattleEventItem *	1	harmless	(BOOL)item, a null test of an item of the battle's static event pool: false only for an item whose address's low 32 bits are 0, at a 4 GiB boundary of the program's static data
-src/ov169/side_handlers.c	HandlerSideQuickGuard	int-to-ptr	BattleHandlerString * <- u32	1	real	R06: battle event variable 0x3f keeps a BattleHandlerString * in s32 values[]
-src/ov169/side_handlers.c	HandlerSideWideGuard	int-to-ptr	BattleHandlerString * <- u32	1	real	R06: battle event variable 0x3f keeps a BattleHandlerString * in s32 values[]
 src/ov197/mystery_util.c	MysteryList_Create	narrow	u32 <- const uptr	1	harmless	a message ID: the setup's items are StrBufs only when it has no msgData, and this branch has one
 src/ov197/mystery_util.c	MysteryYesNo_Update	narrow	s32 <- sptr	1	harmless	BmpMenuList_GetParam's result for the item count (param 2), a number
 src/system/poke_tool.c	PML_PkmSetParamCore	narrow	int <- uptr	6	harmless	the setter's uptr value is an integer for these parameters
