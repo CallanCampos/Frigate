@@ -3,6 +3,19 @@
 What port work taught that isn't obvious from the code, newest first. A lesson about MWCC or the decomp's own
 workflow goes in the decomp checkout instead; this file is the port's ([CLAUDE.md](../CLAUDE.md), the iteration loop).
 
+## 2026-10-24: phase 4's route
+
+- **Compare the polygon lists, then one pixel's history.** A one-line seam on the Aspertia City lookout's railing,
+  beyond the tolerance in 12 frames of each version (up to 359 pixels), came with polygon lists the same on both
+  programs (dumped from scratch builds of the port's geometry engine and melonDS's renderer), so the rasterizer was the
+  cause; logging every polygon that reached one of the seam's pixels, on both, showed the railing two units nearer on
+  melonDS, whose depth arithmetic lands an edge's top line short of its vertex, and so winning a tie with a flat strip
+  drawn first. The port's exact interpolation kept the strip.
+- **Following the oracle's model is not matching the hardware: say which it is, and where the code came from.** The
+  fix writes melonDS's Z interpolation again step for step, and melonDS's own comment there says it doesn't match the
+  hardware exactly yet. So the code says it is derived from melonDS 1.1 (GPLv3 or later, which Frigate's GPLv3 can
+  take) and names the function, and the records call it alignment with the oracle, not the DS's arithmetic.
+
 ## 2026-10-24: the DS's random seeds, and what they don't fix
 
 - **A seed is an input, like the clock.** `buildSeed` hashes the DS's CPU timing and its stack's leftovers, which no
