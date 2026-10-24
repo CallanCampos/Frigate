@@ -32,11 +32,120 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
 
+## 2026-10-24: the test launcher retired; the field menu's apps held to melonDS through the menu, the clock pinned
+
+- **Upstream:** `b62c655bfa` (upstream merge #481), as `main` has it since PR 16 (`6a1ace981b`); this branch merges no
+  upstream commit. Upstream's `main` has moved on (`e522642f9e`), for the sync to propose on its own.
+- **Port:** `PORT_SHA`, on the topic branch `port-retire-launcher` from `main` at `1807efb68f` (PR 21): `0499fc07bb`
+  (the pinned clock), `145d776f17` (the field menu's routes as sequences), `a2fd007bf4` (the launcher retired) and this
+  records commit. The battle path's entry gets its `PORT_SHA`, `1e80528149`, and the seam's removal row in
+  game-changes.md `a2fd007bf4`.
+- **ROM:** T0 passes on `main` as the branch started from it and after the seam's removal (`a2fd007bf4`), the only
+  game file the branch changes: Black 2 `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb` and White 2
+  `b5d7490be7b415b8f1e672a53e978a9cc667e56a`. `src/ov035/event_mapchange.c` is complete in both versions, and
+  `check_mwcc_neutral.py` finds it identical to `origin/main` (`1807efb68f`) and to `b62c655bfa`, 2 of 2 pairs each:
+  the block was `PLATFORM_PC`-only. No header outside `port/` changes.
+- **Host build:** T1 passes on macOS arm64, AppleClang 21, RelWithDebInfo, both versions (`build/port`,
+  `build/port-w2`), each with the oracle (`-DPORT_BUILD_ORACLE=ON`) and 723 warnings, as on the battle path, the
+  game rebuilt whole since `port/include/port_host.h` changed. clang-format 23 is clean on every changed C file.
+- **Tests:** full ctest on `a2fd007bf4` (this records commit changes documents and `oracle.py`'s docstring only), with
+  the oracle built and the cached oracle saves: Black 2, 301 passed, 1 failed and 1 skipped of 303; White 2, 298 passed
+  and 2 skipped of 300, none failed. Black 2's failure was `asm_oracle`, a timeout at 900 s on a load average of about
+  60 on the machine's 8 cores, which then passed alone (351 s). Skipped: `app_universal_slices` in both, which only a
+  distribution build has, and White 2's `frame_times_title`, over its budget while the load average was above the cores.
+  The launcher's eleven tests are gone (its seven that failed, `app_launcher_spec_*`, `integrate_launch_*` and
+  `integrate_launcher_off`), and three are new (`oracle_field_menus`, `oracle_party_menus`, `pxi_rtc_pinned`): 311 and
+  308 tests before, 303 and 300 now. T4: `oracle_field_menus` and `oracle_party_menus` pass in both versions, with
+  `oracle_continue`, `oracle_continue_starter` and every other oracle test; by `oracle.py sequence NAME --out DIR` (the
+  runs kept and compared again), field_menus matches 5,179 of 5,179 frames in Black 2 (2,169 exact, 3,010 with 3D within
+  the tolerance) and 5,171 of 5,171 in White 2, party_menus 8,190 of 8,190 (4,250 exact) and 8,182 of 8,182, the
+  summary's 289 frames left out; without them, 289 frames failed, all of them the summary's, and with the clock running
+  the deep dive saw 28 of the field menu's frames fail on the clock. T3: every replay passes, and
+  `frame_times_party_menus` passes through the field menu in both versions (its scene's 95th percentile 4.63 ms in Black
+  2, 6.87 ms in White 2, at load averages of 45 to 70). T2 passes, the reader's `clock` line and `pxi_rtc_pinned` among
+  it. T6: `replay_same_save` passes. T5 not run here (CI's sanitize job runs on the pull request); T7 not run.
+- **Tiers:** per version, a 37,546 functions, b 3,472 and c zero; code bytes Black 2 a 3,435,848, White 2 a 3,435,936,
+  and b 414,418 in each; 2,384 veneers left out. Unchanged (`port/tools/progress/progress.py` on `a2fd007bf4`).
+- **Trap stubs:** 30 function stubs and 22 data placeholders per version (`build/port*/gen/stubs.c`), unchanged. The
+  field menu's routes reach none; the first on the story's path is still `data_ov167_021d7490`, at a battle's first
+  move.
+- **64-bit warnings:** `check_ptrcasts: 429 sites in 274 keys (real 150, harmless 101, handled 141, unreachable 37),
+  1681 files, 0 not compiled` on `build/port`, the same as the battle path's: the seam held no cast, and the baseline
+  is unchanged.
+- **Work done:** the plan's A-2. The pinned clock (`0499fc07bb`): an input file's new `clock` line (`running`, the
+  default, or `pinned`), which pbw-oracle honours by cancelling melonDS's clock chip timer and Frigate by keeping its
+  fixed clock at its start (`port_rtc_set_pinned`, set from a replay), with the reader's tests and `pxi_rtc_pinned`.
+  The field menu's routes (`145d776f17`): `field_menus` and `party_menus` are oracle sequences now, their input files
+  renamed from `launch_*` and pinning the clock, so both programs open the bag, the trainer card, the party list,
+  Tepig's summary, the Pokédex and its entry through the field menu itself; `oracle.py launch`, its labelled screens,
+  the `oracle_launch_*` and `launch_*` tests and `check_launch_smoke.py` are gone; `frame_times_party_menus` plays the
+  party_menus file through the menu. The launcher's retirement (`a2fd007bf4`): what ADR 0012's note lists, with the
+  `port_launcher` library, `--launch` and its statuses, the run directory's `launch:` line, the seam in
+  `src/ov035/event_mapchange.c` and its declaration (game-changes.md records the removal in a row of its own, a rule it
+  now states), `port_trap_is_placeholder`, the `app_launcher_spec_*`, `integrate_launch_*` and
+  `integrate_launcher_off` tests, and the launcher in every guide, ARCHITECTURE.md, GLOSSARY.md, MODDING.md,
+  port/CLAUDE.md, PLAN.md and the READMEs; ADR 0012 gets its note, "superseded: retired when the field opened". The
+  deep dive's two differences on the real menu's route are explained in the oracle README: the clock was the RTC
+  running with each program's video frames, the DS some 34 seconds ahead at the same count once the field opened,
+  which the pinned clock removes (the menu's bottom screen is exact on both); the "18 pixels on the 3D edges behind
+  the open menu" are the room's 25 polygon-edge pixels beyond the pixel tolerance, fewer because the game darkens the
+  field to about 5/8 behind the menu (the 18 are among the 25; the lookout's 142 become 110 to 112), each frame within
+  the 3D's tolerance, the deep dive's 28 failing frames having failed on the clock alone. The summary's background
+  stays the one known difference: the DS spends 38 VBlanks more than passes loading it, which step its scroll some 9
+  pixels on (port frames 4534-4822, both versions). This entry also adds the one that PRs 13 to 16 never got, below;
+  lessons.md has three lessons.
+- **Next:** phase 3's exit route (plan A-3): New Game to Aspertia, a walk, an NPC, a building and a change of map,
+  against melonDS at its checkpoints, and a T7 playtest on macOS. For battles, once overlay 167's table has C, the
+  Route 19 route as a test. For the guard, the field's other real rows (R02, R05), then battle (R06) and the menus.
+- **Blockers:** `data_ov167_021d7490` (overlay 167's battle table, issue #120), which stops every battle at its first
+  move, unchanged since the battle path's entry, and `src/ov036/enceff_data.c`'s four entries (a decomp finding). The
+  launcher's seven failing tests are gone, so T4 on `main` is no longer red for them.
+
+## 2026-10-23: upstream syncs `0bed98c4c` (PR 13) and `b62c655bfa` (PR 16) and the contributors' PRs 14 and 15 merged
+
+This entry was added afterwards, by the entry above: the four merged without one on 2026-10-23 (UTC), in this order,
+after the PR 12 sync and before the field's entry (PR 18).
+
+- **Upstream:** `0bed98c4c3` (upstream merge #478) by PR 13, then `b62c655bfa` (upstream merge #481, 26 commits on)
+  by PR 16. PRs 14 and 15 bring no upstream commit.
+- **Port:** the merges of [PR 13](https://github.com/CallanCampos/Frigate/pull/13) (`72749b5a0d`, 16:15, the sync
+  App's head `ef9eef0dc5`), [PR 16](https://github.com/CallanCampos/Frigate/pull/16) (`6a1ace981b`, 17:01, head
+  `d35f1b92aa`), [PR 14](https://github.com/CallanCampos/Frigate/pull/14) (`bfd5d788b5`, 18:08, MushroomMan321's
+  head `e30a8ab32a`) and [PR 15](https://github.com/CallanCampos/Frigate/pull/15) (`a4648fce71`, 18:56, head
+  `526c20673f`).
+- **ROM:** T0 passes on each exact head: `Frigate local verification` is `success` on all four, posted by
+  CallanCampos after both SHA1s matched (Black 2 `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb`, White 2
+  `b5d7490be7b415b8f1e672a53e978a9cc667e56a`). The owner's approving reviews record the game changes' proofs:
+  PR 16's 16 files with port changes keep exactly the port's diff after the merge, and `check_mwcc_neutral.py` finds
+  3,554 of 3,556 file and version pairs identical to `b62c655bfa13` (the 2 being `pokemontrade_2d.c`'s recorded
+  `(void *)(uptr)` cast, in a complete file); PR 14's 8 of 8 identical to `main`; PR 15's 32 of 34, the 2 being
+  `vct.c`'s `(int)` to `(sptr)` in a complete file, which the SHA1s prove.
+- **Host build:** T1 passes on macOS arm64 in each exact-head verification, both versions, and every CI job on each
+  head passes (`Frigate CI`, `Compile src/ and lib/`, `Code standards`).
+- **Tests:** each exact-head verification passes T2, T3 and T6 in both versions (PRs 14, 15 and 16: 302 and 299
+  tests), with no oracle built, as under `--verify-pr`; T4 was not run, and the tests that failed on `main` then (the
+  oracle's routes and `asm_oracle`, as the PR 12 sync's entry says) skip there. T5 runs only in CI, passing; T7 not run.
+- **Tiers:** unchanged from the 2026-10-22 entry, as the field's entry below measures after all four.
+- **Trap stubs:** 31 function stubs and 22 data placeholders per version, as after PR 12; MSL's `_u32_div_f` gets its
+  routine with the field's entry.
+- **64-bit warnings:** PR 14 retypes Join Avenue's parameter API to `uptr` and PR 15 carries addresses worked out in
+  seventeen files through `uptr`, each with its row of [game-changes.md](game-changes.md); the pointer cast guard's
+  entry of 2026-10-23 measures what they fixed (30 of its rows by PR 15).
+- **Work done:** PR 13 brings upstream's DS Protect prelink's private map (`restore_dsprot_veneers.py`), a stricter
+  `check_nonmatching_rows.py` and the nonmatching list's leftover block's removal: `tools/` and docs only. PR 16 brings
+  upstream #481 (491 files): value sets as enums, the save block IDs in one enum, typed `void *` parameters across the
+  field and G3D, and complete files' statics under their C names, `Field.colorPostFX` among the typed members, which
+  the field needs on a host; it merged with no conflict. PRs 14 and 15, from the contributor MushroomMan321, are the
+  `uptr` changes above. The owner approved each exact head in chat once every required check had passed, and merged
+  it with a merge commit.
+- **Next:** the field's entry (PR 18).
+- **Blockers:** the field's external heap, until the field's entry.
+
 ## 2026-10-23: the battle path: the trainer cut-in and Hugh's battle to the first move
 
 - **Upstream:** `b62c655bfa` (upstream merge #481), as `main` has it since PR 16 (`6a1ace981b`); this branch merges no
   upstream commit. Upstream's `main` has moved on (`c9f0912d43`), for the sync to propose on its own.
-- **Port:** `PORT_SHA`, on the topic branch `port-battle-path`, [PR
+- **Port:** `1e80528149`, on the topic branch `port-battle-path`, [PR
   21](https://github.com/CallanCampos/Frigate/pull/21), from `port-field-entry` at `7f5cad4dd9` (PR 18), with the
   review's fixes (`dd153fea48`) and `main` merged at `00e3468c79` (`957b7931f4`: PRs 18, 20 and 17, the field's entry,
   the process docs and the pointer cast guard). The Route 19 route ran on the branch itself, with no scratch merge.

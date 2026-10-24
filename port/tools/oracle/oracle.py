@@ -42,8 +42,7 @@ the field menu's bag and trainer card from first_save's; party_menus, the same m
 list, Tepig's summary, the Pokédex and its entry, the card and the bag, the clock pinned for both), from the save the
 sequence names, made first on the oracle (or taken from --save-cache), and compares every frame the same way but the
 known differences, up to the frame where the port stops when the sequence allows it to stop on code with no C yet;
-with --update it writes
-port/tests/oracle/<name>_<version>.tsv, the oracle's hashes at sampled frames. sequence-check runs the port alone on
+with --update it writes port/tests/oracle/<name>_<version>.tsv, the oracle's hashes at sampled frames. sequence-check runs the port alone on
 that input file and checks its counts and its screens without 3D against that reference. sound runs both programs
 on a sequence with their sound traces and WAV dumps (--sound-trace, --audio-dump) and compares the sound driver's state
 run by run, what the ARM9 sees of it frame by frame, and the sound by segment (sound.py, SOUND); with --update it
