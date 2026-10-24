@@ -250,13 +250,13 @@ static const TileClassSFX TILE_CLASS_SFX_LAY1[] = {
     {(BOOL (*)(u32))MapTile_IsReallyTallGrass, SEQ_SE_FLD_08, 2, 4, SEASON_ANY},
     {MapTile_IsSnow_, SEQ_SE_FLD_11, 2, 4, SEASON_ANY},
     {MapTile_IsSnowNoCycling, SEQ_SE_FLD_11, 2, 4, SEASON_ANY},
-    {func_ov036_021a2c04, SEQ_SE_FLD_13, 2, 4, SEASON_ANY},
+    {MapTile_IsSplashWater, SEQ_SE_FLD_13, 2, 4, SEASON_ANY},
     {func_ov036_021a2bf4, SEQ_SE_FLD_13, 2, 4, SEASON_ANY},
     {MapTile_IsSwamp, SEQ_SE_FLD_13, 2, 4, SEASON_ANY},
     {MapTile_IsDeepSand, SEQ_SE_FLD_91, 2, 4, SEASON_ANY},
-    {func_ov036_021a2c90, SEQ_SE_FLD_14, 2, 4, SEASON_ANY},
-    {func_ov036_021a2ce0, SEQ_SE_FLD_11, 2, 4, 3},
-    {func_ov036_021a2cec, SEQ_SE_FLD_11, 2, 4, 3},
+    {MapTile_IsAnySand, SEQ_SE_FLD_14, 2, 4, SEASON_ANY},
+    {MapTile_IsPuddle, SEQ_SE_FLD_11, 2, 4, 3},
+    {MapTile_IsMud, SEQ_SE_FLD_11, 2, 4, 3},
     {MapTile_IsHiddenGrottoEntranceGrass, SEQ_SE_FLD_08, 2, 4, SEASON_ANY},
     {func_ov036_021a2cd4, SEQ_SE_FLD_12, 2, 4, 2},
     {NULL, 0, 0, 0, SEASON_ANY},
@@ -274,11 +274,11 @@ FieldPlayerGrid *FieldPlayerGrid_Create(FieldPlayerCore *core, HeapID heapId) {
     switch (FieldPlayerCore_GetExState(grid->core)) {
     case FLD_PLAYER_EXSTATE_SURF:
         FieldPlayerCore_SetSpecialSeq(grid->core, 4);
-        func_ov036_0219b350(grid->core);
+        FieldPlayerCore_FinishFormChange(grid->core);
         break;
     case FLD_PLAYER_EXSTATE_DIVE:
         FieldPlayerCore_SetSpecialSeq(grid->core, 0x100);
-        func_ov036_0219b350(grid->core);
+        FieldPlayerCore_FinishFormChange(grid->core);
         break;
     }
     return grid;
@@ -294,7 +294,7 @@ void FieldPlayerGrid_UpdateMovement(FieldPlayerGrid *grid, u32 pressedKeys, u32 
     u16 dir = FieldPlayerCore_GetMoveDirByKey(grid->core, heldKeys);
 
     if (FieldPlayerGrid_CheckAllowUpdate(grid, dir) == TRUE) {
-        func_ov036_0219b328(grid->core);
+        FieldPlayerCore_StepFormChange(grid->core);
         if (!FieldPlayerGrid_ConstMoveUpdate(grid, dir, FALSE)) {
             input.pressedKeys = pressedKeys;
             input.heldKeys = heldKeys;
@@ -673,7 +673,7 @@ static u32 FieldPlayerGrid_DecideCommandCatwalkBalance(FieldPlayerGrid *grid, Fi
         if (!FieldPlayerGrid_CheckCatwalkBalancingFlag(grid)) {
             FieldPlayerGrid_BeginCatwalkBalance(grid);
         }
-        if (grid->balanceKept == TRUE && func_ov036_02196b10(actor, grid->balanceTime)) {
+        if (grid->balanceKept == TRUE && RailActorAnim_SyncFrameGroup(actor, grid->balanceTime)) {
             grid->balanceKept = FALSE;
         }
         grid->balanceTime++;
@@ -1139,7 +1139,7 @@ static void FieldPlayerGrid_UpdateBikeMove(FieldPlayerGrid *grid, FieldActor *ac
         if (FieldPlayerGrid_GetTileInDir(grid, PLAYER_DIR_NONE, &tileType) == TRUE &&
             MapTile_IsDeepSand(GetTileClass(tileType)) == TRUE) {
             acmd = ACMD_BIKE_DEEP_SAND;
-            func_ov036_021a3e74(actor, Field_GetFieldEffects(grid->field));
+            FldeffKemuri_Start(actor, Field_GetFieldEffects(grid->field));
         }
     }
     if (checkHeight == TRUE && FieldPlayerGrid_CompareHeightChange(grid, input->dir) == 1) {
@@ -1350,7 +1350,7 @@ void FieldPlayerGrid_ForceBrake(FieldPlayerGrid *grid) {
     }
 }
 
-BOOL func_ov036_0219ca30(FieldPlayerGrid *grid) {
+BOOL FieldPlayerGrid_StopTurnOrBlocked(FieldPlayerGrid *grid) {
     switch (grid->state) {
     case GRID_STATE_IDLE:
         break;
@@ -1526,7 +1526,7 @@ static BOOL FieldPlayerGrid_CheckModelHeightMismatch(FieldPlayerGrid *grid) {
 
 static void FieldPlayerGrid_BeginCatwalkBalance(FieldPlayerGrid *grid) {
     FieldPlayerGrid_SetCatwalkBalancingFlag(grid, TRUE);
-    func_ov036_0219b014(grid->core, 7);
+    FieldPlayerCore_SetFormSlotModel(grid->core, 7);
 }
 
 static void FieldPlayerGrid_ResetCatwalkBalance(FieldPlayerGrid *grid) {
@@ -1557,7 +1557,7 @@ void FieldPlayerGrid_InterruptCatwalkBalance(FieldPlayerGrid *grid, BOOL keep) {
     }
 }
 
-void func_ov036_0219cd84(FieldPlayerGrid *grid) {
+void FieldPlayerGrid_StopForcedMove(FieldPlayerGrid *grid) {
     FieldPlayerGrid_ClearConstMove(grid);
 }
 

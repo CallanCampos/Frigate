@@ -85,11 +85,11 @@ typedef struct {
 
 // What overlay 290 shares with this file: the player's ID in the Sake database, the player's side and the other
 // player's
-typedef struct {
+struct WifiBattleMatchNetData {
     s32 sake_recordID;
     WifiBattleMatchNetInfo mine;
     WifiBattleMatchNetInfo theirs;
-} WifiBattleMatchNetData;
+};
 
 // What the matching of two players is looking for: the rating, the disconnects, the cup and the number of matches
 typedef struct {
@@ -107,7 +107,7 @@ typedef struct {
 } WifiBattleMatchNetCheck;
 
 // The fields of the arena's table, by the number that WifiBattleMatchNet_GetArenaFieldName gives their names for
-enum {
+typedef enum {
     ARENA_DISCONNECTS_COUNTER = 3,
     ARENA_COMPLETE_MATCHES_COUNTER = 4,
     ARENA_NUM_SINGLE_WIN = 9,
@@ -142,7 +142,7 @@ enum {
     ARENA_NUM_WIFICUP_LOSE = 38,
     ARENA_CHEATS_WIFICUP_COUNTER = 39,
     ARENA_DISCONNECTS_WIFICUP_COUNTER = 40,
-};
+} WifiBattleMatchNetArenaField;
 
 // The kinds of read that WifiBattleMatchNet_StartRead starts: it fills a WifiBattleMatchNetStats, a
 // WifiBattleMatchNetCupStats, a record ID, the team of the Wi-Fi cup and the date of the last login
@@ -248,19 +248,19 @@ u32 WifiBattleMatchNet_WriteMain(WifiBattleMatchNet *p_wk);
 void WifiBattleMatchNet_StartCreateRecord(WifiBattleMatchNet *p_wk);
 u32 WifiBattleMatchNet_CreateRecordMain(WifiBattleMatchNet *p_wk);
 u32 WifiBattleMatchNet_GetRecordId(WifiBattleMatchNet *p_wk);
-BOOL WifiBattleMatchNet_SendPlayerInfo(WifiBattleMatchNet *p_wk, const void *data);
+BOOL WifiBattleMatchNet_SendPlayerInfo(WifiBattleMatchNet *p_wk, const WifiBattleMatchPlayer *data);
 BOOL WifiBattleMatchNet_TakePlayerInfo(WifiBattleMatchNet *p_wk, void **out);
 // Sends the team picked, and then is TRUE once it is sent
 BOOL WifiBattleMatchNet_SendParty(WifiBattleMatchNet *p_wk, PokeParty *party);
 // Copies the other player's team into party, and then is TRUE, once it has arrived
 BOOL WifiBattleMatchNet_TakeParty(WifiBattleMatchNet *p_wk, PokeParty *party);
-BOOL WifiBattleMatchNet_SendValue4(WifiBattleMatchNet *p_wk, const void *data);
-BOOL WifiBattleMatchNet_TakeValue4(WifiBattleMatchNet *p_wk, void *out);
+BOOL WifiBattleMatchNet_SendValue4(WifiBattleMatchNet *p_wk, const u32 *data);
+BOOL WifiBattleMatchNet_TakeValue4(WifiBattleMatchNet *p_wk, u32 *out);
 BOOL WifiBattleMatchNet_SendReportValue(WifiBattleMatchNet *p_wk, const void *data);
 BOOL WifiBattleMatchNet_TakeReportValue(WifiBattleMatchNet *p_wk, u32 *out);
 void WifiBattleMatchNet_InitDownload(WifiBattleMatchNet *p_wk, s32 profileId);
 u32 WifiBattleMatchNet_DownloadMain(WifiBattleMatchNet *p_wk);
-void WifiBattleMatchNet_GetDownload(WifiBattleMatchNet *p_wk, void *dest);
+void WifiBattleMatchNet_GetDownload(WifiBattleMatchNet *p_wk, TournamentEntry *dest);
 void WifiBattleMatchNet_StartAccountRequest(WifiBattleMatchNet *p_wk, HeapID heapId);
 u32 WifiBattleMatchNet_AccountRequestMain(WifiBattleMatchNet *p_wk);
 void WifiBattleMatchNet_GetAccountValues(WifiBattleMatchNet *p_wk, void *out);
@@ -280,6 +280,6 @@ const char **WifiBattleMatchNet_GetArenaFieldNames(void);
 int WifiBattleMatchNet_GetArenaFieldCount(void);
 const char **WifiBattleMatchNet_GetWifiCupFieldNames(void);
 int WifiBattleMatchNet_GetWifiCupFieldCount(void);
-const char *WifiBattleMatchNet_GetArenaFieldName(int field);
+const char *WifiBattleMatchNet_GetArenaFieldName(WifiBattleMatchNetArenaField field);
 
 #endif // POKEBW2_APP_WIFIBATTLEMATCH_NET_H

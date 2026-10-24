@@ -53,8 +53,6 @@
 // quit. The ROM has no name for this file; "config_panel.c" is a guess
 
 #define HEAPID_CONFIG_PANEL 0x1c
-// The options screen's shortcut
-#define SHORTCUT_CONFIG_PANEL 27
 
 #define BG_COUNT 6
 #define BG_BAR 0
@@ -1503,8 +1501,8 @@ static void ConfigPanelScroll_Move(ConfigPanelScroll *scroll, int dy, int min, i
 
     y += dy;
     y = MATH_CLAMP(y, min, max);
-    GFL_BGSysMoveBGReq(scroll->textBg, 3, y + 20);
-    GFL_BGSysMoveBGReq(scroll->rowsBg, 3, y);
+    GFL_BGSysMoveBGReq(scroll->textBg, BG_MOVE_SET_Y, y + 20);
+    GFL_BGSysMoveBGReq(scroll->rowsBg, BG_MOVE_SET_Y, y);
 
     scroll->y -= dy;
     scroll->y = MATH_CLAMP(scroll->y, 16 - max, 16 - min);

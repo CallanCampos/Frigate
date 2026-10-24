@@ -71,7 +71,7 @@ static u32 WbtStadiumGimmick_GetPlttAddr(const NNSG3dResTex *tex, const NNSG3dRe
 static void WbtStadiumGimmick_MakeResName(NNSG3dResName *resName, const char *name);
 static u32 WbtStadiumGimmick_FindTexAddr(const NNSG3dResTex *tex, const char *name);
 static u32 WbtStadiumGimmick_FindPlttAddr(const NNSG3dResTex *tex, const char *name);
-static void WbtStadiumGimmick_LoadPortrait(GimmickWork *work, void *texResource, const char *texName,
+static void WbtStadiumGimmick_LoadPortrait(GimmickWork *work, G3DResource *texResource, const char *texName,
                                            const char *plttName, u16 file, u16 heapId);
 static void WbtStadiumGimmick_LoadSinglePortraitScene(GimmickWork *work, u8 position);
 static void WbtStadiumGimmick_AddEndTask(GimmickWork *work);
@@ -149,7 +149,7 @@ void WbtStadiumGimmick_SetNames(Field *field, u8 mode, StrBuf *name, StrBuf *pla
     FieldExpObj_SetActorHidden(work->expObj, 0, 1, TRUE);
     FieldExpObj_SetActorHidden(work->expObj, 0, 2, TRUE);
     FieldExpObj_SetActorHidden(work->expObj, 0, 3, TRUE);
-    font = func_ov036_0218799c(Field_GetMsgBGSys(field));
+    font = MsgBGPrinter_GetFont(Field_GetMsgBGSys(field));
     switch (mode) {
     case 0:
         WbtStadiumGimmick_DrawNamePlate(work, font, 0, name, heapId);
@@ -435,7 +435,7 @@ static void WbtStadiumGimmick_DrawNamePlate(GimmickWork *work, Font *font, u32 p
     u16 actor;
     G3DTextDrawResource resource;
     u32 width;
-    void *tex;
+    G3DResource *tex;
 
     switch (plate) {
     case 0:
@@ -458,7 +458,7 @@ static void WbtStadiumGimmick_DrawNamePlate(GimmickWork *work, Font *font, u32 p
 static void WbtStadiumGimmick_DrawPortrait(GimmickWork *work, u32 mode, u16 file) {
     u16 actor;
     HeapID heapId = HEAPID_TAIL(work->heapId);
-    void *tex;
+    G3DResource *tex;
 
     switch (mode) {
     case 0:
@@ -613,7 +613,7 @@ static u32 WbtStadiumGimmick_FindPlttAddr(const NNSG3dResTex *tex, const char *n
 
 // Reads the portrait's character and palette, 4 by 4 characters taken from the 28th character of the first four
 // rows, and sends them to the texture and palette in VRAM
-static void WbtStadiumGimmick_LoadPortrait(GimmickWork *work, void *texResource, const char *texName,
+static void WbtStadiumGimmick_LoadPortrait(GimmickWork *work, G3DResource *texResource, const char *texName,
                                            const char *plttName, u16 file, u16 heapId) {
     NNSG3dResTex *tex;
     u32 texAddr;

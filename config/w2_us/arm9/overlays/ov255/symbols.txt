@@ -817,7 +817,7 @@ sMenu71f0 kind:data(any) addr:0x021d7230
 sSubProcs kind:data(any) addr:0x021d7248
 data_ov255_021d720c kind:data(any) addr:0x021d724c
 data_ov255_021d7210 kind:data(any) addr:0x021d7250
-data_ov255_021d7238 kind:data(any) addr:0x021d7278
+sYesNoFuncs kind:data(any) addr:0x021d7278
 data_ov255_021d723c kind:data(any) addr:0x021d727c
 sMainSeq kind:data(any) addr:0x021d72a8
 sWinData kind:data(any) addr:0x021d747c
@@ -834,8 +834,8 @@ sRangeDotData kind:data(any) addr:0x021d7584
 sTypeIconData kind:data(any) addr:0x021d759c
 sTrayIconData kind:data(any) addr:0x021d75b4
 sTrayIconColors kind:data(any) addr:0x021d75cc
-data_ov255_021d75a4 kind:data(any) addr:0x021d75e4
-data_ov255_021d75c0 kind:data(any) addr:0x021d7600
+sClActSysSetup kind:data(any) addr:0x021d75e4
+sActorData kind:data(any) addr:0x021d7600
 data_ov255_021d75d8 kind:data(any) addr:0x021d7618
 data_ov255_021d75f0 kind:data(any) addr:0x021d7630
 data_ov255_021d7608 kind:data(any) addr:0x021d7648

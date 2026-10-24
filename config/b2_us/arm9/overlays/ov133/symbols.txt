@@ -4,10 +4,10 @@ GimmickNuvema_Update kind:function(thumb,size=0x80) addr:0x021eed9c
 GimmickNuvema_PlayModel kind:function(thumb,size=0x60) addr:0x021eee1c
 GimmickNuvema_CreateWaitEvent kind:function(thumb,size=0x14) addr:0x021eee7c
 GimmickNuvema_WaitEvent kind:function(thumb,size=0x1e) addr:0x021eee90
-data_ov133_021eeeb0 kind:data(any) addr:0x021eeeb0
+sAnimations kind:data(any) addr:0x021eeeb0
 sDaySceneSetup kind:data(any) addr:0x021eeeb8
 data_ov133_021eeec0 kind:data(any) addr:0x021eeec0 ambiguous
-data_ov133_021eeec8 kind:data(any) addr:0x021eeec8
+sActors kind:data(any) addr:0x021eeec8
 data_ov133_021eeec9 kind:data(any) addr:0x021eeec9 ambiguous
 sNightSceneSetup kind:data(any) addr:0x021eeed8
 sDayResources kind:data(any) addr:0x021eeee8

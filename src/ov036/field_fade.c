@@ -122,10 +122,10 @@ typedef struct {
 
 static GameEventReturnCode EventQuicksandArrive_Callback(GameEvent *event, u32 *state, void *data);
 static GameEventReturnCode func_ov036_021b9764(GameEvent *event, u32 *state, void *data);
-static GameEventReturnCode func_ov036_021b98e4(GameEvent *event, u32 *state, void *data);
-static GameEventReturnCode func_ov036_021b9a64(GameEvent *event, u32 *state, void *data);
+static GameEventReturnCode EventQuicksandArrive_RunSpinZoomAlt(GameEvent *event, u32 *state, void *data);
+static GameEventReturnCode EventQuicksandArrive_RunSpinZoomSmoke(GameEvent *event, u32 *state, void *data);
 static GameEventReturnCode EventPlayerSpinDown_Callback(GameEvent *event, u32 *state, void *data);
-static GameEventReturnCode func_ov036_021b9c90(GameEvent *event, u32 *state, void *data);
+static GameEventReturnCode EventQuicksandArrive_RunMoveAnime(GameEvent *event, u32 *state, void *data);
 
 GameEvent *EventQuicksandArrive_Create(GameEvent *parent, GameSystem *gsys, Field *field) {
     GameEvent *event = GameEvent_Create(gsys, parent, EventQuicksandArrive_Callback, 0x68);
@@ -149,9 +149,9 @@ GameEvent *func_ov036_021b95ac(GameEvent *parent, GameSystem *gsys, Field *field
     return event;
 }
 
-GameEvent *func_ov036_021b95e0(GameEvent *parent, GameSystem *gsys, Field *field, BOOL seasonChanged, u32 prevSeason,
-                               u32 nextSeason) {
-    GameEvent *event = GameEvent_Create(gsys, parent, func_ov036_021b98e4, sizeof(SpinEventWork));
+GameEvent *EventQuicksandArrive_CreateSpinZoomAlt(GameEvent *parent, GameSystem *gsys, Field *field, BOOL seasonChanged,
+                                                  u32 prevSeason, u32 nextSeason) {
+    GameEvent *event = GameEvent_Create(gsys, parent, EventQuicksandArrive_RunSpinZoomAlt, sizeof(SpinEventWork));
     SpinEventWork *wk = GameEvent_GetData(event);
 
     wk->field = field;
@@ -163,7 +163,7 @@ GameEvent *func_ov036_021b95e0(GameEvent *parent, GameSystem *gsys, Field *field
 }
 
 GameEvent *func_ov036_021b9614(GameEvent *parent, GameSystem *gsys, Field *field) {
-    GameEvent *event = GameEvent_Create(gsys, parent, func_ov036_021b9a64, sizeof(SpinEventWork));
+    GameEvent *event = GameEvent_Create(gsys, parent, EventQuicksandArrive_RunSpinZoomSmoke, sizeof(SpinEventWork));
     SpinEventWork *wk = GameEvent_GetData(event);
 
     wk->field = field;
@@ -181,7 +181,7 @@ GameEvent *EventPlayerSpinDown_Create(GameEvent *parent, GameSystem *gsys, Field
 }
 
 GameEvent *func_ov036_021b9664(GameEvent *parent, GameSystem *gsys, Field *field) {
-    GameEvent *event = GameEvent_Create(gsys, parent, func_ov036_021b9c90, 0x68);
+    GameEvent *event = GameEvent_Create(gsys, parent, EventQuicksandArrive_RunMoveAnime, 0x68);
     FallEventWork *wk = GameEvent_GetData(event);
 
     wk->field = field;
@@ -300,31 +300,32 @@ static void func_ov036_021b986c(SpinEventWork *wk) {
     FieldTaskManager_AddTask(taskManager, task, 0);
 }
 
-static void func_ov036_021b98d4(void *data);
+static void EventQuicksandArrive_OnScoreboardEnd(void *data);
 
 static GameEvent *func_ov036_021b9890(SpinEventWork *wk) {
     GameSystem *gsys = wk->gsys;
     Field *field = wk->field;
 
     if (wk->hasWarp != 0) {
-        return func_ov036_021b8800(gsys, field, wk->warpA, wk->warpB, func_ov036_021b98d4, wk);
+        return EventGameTransition_CreateSeasonFadeInEventWithCallback(gsys, field, wk->warpA, wk->warpB,
+                                                                       EventQuicksandArrive_OnScoreboardEnd, wk);
     }
     return CallFieldMapEntranceInTransition(gsys, field, 1, 1, 1, 0, 0);
 }
 
-static void func_ov036_021b98d4(void *data) {
+static void EventQuicksandArrive_OnScoreboardEnd(void *data) {
     SpinEventWork *wk = data;
 
     func_ov036_021b986c(wk);
     func_ov036_021b97f0(wk);
 }
 
-static void func_ov036_021b9970(SpinEventWork *wk);
-static GameEvent *func_ov036_021b9a10(SpinEventWork *wk);
-static void func_ov036_021b99d8(SpinEventWork *wk);
-static void func_ov036_021b99ec(SpinEventWork *wk);
+static void EventQuicksandArrive_StartZoomOutAlt(SpinEventWork *wk);
+static GameEvent *EventQuicksandArrive_CreateFadeInAlt(SpinEventWork *wk);
+static void EventQuicksandArrive_EndZoomOutAlt(SpinEventWork *wk);
+static void EventQuicksandArrive_StartPlayerSpinAlt(SpinEventWork *wk);
 
-static GameEventReturnCode func_ov036_021b98e4(GameEvent *event, u32 *state, void *data) {
+static GameEventReturnCode EventQuicksandArrive_RunSpinZoomAlt(GameEvent *event, u32 *state, void *data) {
     SpinEventWork *wk = data;
     Field *field = wk->field;
     FieldCamera *camera = Field_GetCameraSystem(field);
@@ -342,13 +343,13 @@ static GameEventReturnCode func_ov036_021b98e4(GameEvent *event, u32 *state, voi
         break;
     case 2:
         if (wk->hasWarp == 0) {
-            func_ov036_021b99ec(wk);
-            func_ov036_021b9970(wk);
+            EventQuicksandArrive_StartPlayerSpinAlt(wk);
+            EventQuicksandArrive_StartZoomOutAlt(wk);
         }
         (*state)++;
         break;
     case 3:
-        GameEvent_ChainNext(event, func_ov036_021b9a10(wk));
+        GameEvent_ChainNext(event, EventQuicksandArrive_CreateFadeInAlt(wk));
         (*state)++;
         break;
     case 4:
@@ -357,13 +358,13 @@ static GameEventReturnCode func_ov036_021b98e4(GameEvent *event, u32 *state, voi
         }
         break;
     case 5:
-        func_ov036_021b99d8(wk);
+        EventQuicksandArrive_EndZoomOutAlt(wk);
         return GAMEEVENT_DONE;
     }
     return GAMEEVENT_CONTINUE;
 }
 
-static void func_ov036_021b9970(SpinEventWork *wk) {
+static void EventQuicksandArrive_StartZoomOutAlt(SpinEventWork *wk) {
     FieldCamera *camera = Field_GetCameraSystem(wk->field);
     FieldCameraAnimationController *controller = Field_CreateCameraAnimationController(wk->field);
 
@@ -380,38 +381,39 @@ static void func_ov036_021b9970(SpinEventWork *wk) {
     FieldCameraAnimationController_StartAnimation(wk->controller);
 }
 
-static void func_ov036_021b99d8(SpinEventWork *wk) {
+static void EventQuicksandArrive_EndZoomOutAlt(SpinEventWork *wk) {
     FieldCameraAnimationController_FinishCamera(wk->controller);
     FieldCameraAnimationController_FreeAnimation(wk->controller);
 }
 
-static void func_ov036_021b99ec(SpinEventWork *wk) {
+static void EventQuicksandArrive_StartPlayerSpinAlt(SpinEventWork *wk) {
     FieldTaskManager *taskManager = Field_GetTaskManager(wk->field);
     FieldTask *task = FieldActorSpinTask_CreatePlayerDeaccel(wk->field, 0x3c, 8, 1);
 
     FieldTaskManager_AddTask(taskManager, task, 0);
 }
 
-static void func_ov036_021b9a54(void *data);
+static void EventQuicksandArrive_OnScoreboardEndAlt(void *data);
 
-static GameEvent *func_ov036_021b9a10(SpinEventWork *wk) {
+static GameEvent *EventQuicksandArrive_CreateFadeInAlt(SpinEventWork *wk) {
     GameSystem *gsys = wk->gsys;
     Field *field = wk->field;
 
     if (wk->hasWarp != 0) {
-        return func_ov036_021b8800(gsys, field, wk->warpA, wk->warpB, func_ov036_021b9a54, wk);
+        return EventGameTransition_CreateSeasonFadeInEventWithCallback(gsys, field, wk->warpA, wk->warpB,
+                                                                       EventQuicksandArrive_OnScoreboardEndAlt, wk);
     }
     return CallFieldMapEntranceInTransition(gsys, field, 1, 1, 1, 0, 0);
 }
 
-static void func_ov036_021b9a54(void *data) {
+static void EventQuicksandArrive_OnScoreboardEndAlt(void *data) {
     SpinEventWork *wk = data;
 
-    func_ov036_021b99ec(wk);
-    func_ov036_021b9970(wk);
+    EventQuicksandArrive_StartPlayerSpinAlt(wk);
+    EventQuicksandArrive_StartZoomOutAlt(wk);
 }
 
-static GameEventReturnCode func_ov036_021b9a64(GameEvent *event, u32 *state, void *data) {
+static GameEventReturnCode EventQuicksandArrive_RunSpinZoomSmoke(GameEvent *event, u32 *state, void *data) {
     SpinEventWork *wk = data;
     GameSystem *gsys = wk->gsys;
     Field *field = wk->field;
@@ -453,7 +455,7 @@ static GameEventReturnCode func_ov036_021b9a64(GameEvent *event, u32 *state, voi
         break;
     case 4:
         if (FieldTaskManager_IsIdle(taskManager)) {
-            func_ov036_021a3e74(FieldPlayer_GetActor(Field_GetPlayer(field)), Field_GetFieldEffects(field));
+            FldeffKemuri_Start(FieldPlayer_GetActor(Field_GetPlayer(field)), Field_GetFieldEffects(field));
             (*state)++;
         }
         break;
@@ -507,7 +509,7 @@ static GameEventReturnCode EventPlayerSpinDown_Callback(GameEvent *event, u32 *s
         }
         break;
     case 2:
-        func_ov036_021a3e74(FieldPlayer_GetActor(Field_GetPlayer(field)), Field_GetFieldEffects(wk->field));
+        FldeffKemuri_Start(FieldPlayer_GetActor(Field_GetPlayer(field)), Field_GetFieldEffects(wk->field));
         GFL_SndSEPlay(SEQ_SE_FLD_10);
         (*state)++;
         break;
@@ -521,7 +523,7 @@ static GameEventReturnCode EventPlayerSpinDown_Callback(GameEvent *event, u32 *s
     return GAMEEVENT_CONTINUE;
 }
 
-static GameEventReturnCode func_ov036_021b9c90(GameEvent *event, u32 *state, void *data) {
+static GameEventReturnCode EventQuicksandArrive_RunMoveAnime(GameEvent *event, u32 *state, void *data) {
     FallEventWork *wk = data;
     FieldCamera *camera = Field_GetCameraSystem(wk->field);
     FieldActor *actor = FieldPlayer_GetActor(Field_GetPlayer(wk->field));
@@ -568,7 +570,7 @@ static GameEventReturnCode EventQuicksandDrawIn_Callback(GameEvent *event, u32 *
 static GameEventReturnCode EventEscapeRope_Callback(GameEvent *event, u32 *state, void *data);
 static GameEventReturnCode EventDig_Callback(GameEvent *event, u32 *state, void *data);
 static GameEventReturnCode EventTeleportEffect_Callback(GameEvent *event, u32 *state, void *data);
-static GameEventReturnCode func_ov036_021ba4bc(GameEvent *event, u32 *state, void *data);
+static GameEventReturnCode EventDig_RunRisingSpin(GameEvent *event, u32 *state, void *data);
 
 GameEvent *EventQuicksandDrawIn_Create(GameEvent *parent, GameSystem *gsys, Field *field, const VecFx32 *pos) {
     GameEvent *event = GameEvent_Create(gsys, parent, EventQuicksandDrawIn_Callback, sizeof(EffectEventWork));
@@ -617,8 +619,8 @@ GameEvent *EventTeleportEffect_Create(GameEvent *parent, GameSystem *gsys, Field
     return event;
 }
 
-GameEvent *func_ov036_021b9df8(GameEvent *parent, GameSystem *gsys, Field *field) {
-    GameEvent *event = GameEvent_Create(gsys, parent, func_ov036_021ba4bc, sizeof(EffectEventWork));
+GameEvent *EventDig_CreateRisingSpin(GameEvent *parent, GameSystem *gsys, Field *field) {
+    GameEvent *event = GameEvent_Create(gsys, parent, EventDig_RunRisingSpin, sizeof(EffectEventWork));
     EffectEventWork *wk = GameEvent_GetData(event);
 
     wk->gsys = gsys;
@@ -716,7 +718,7 @@ static GameEventReturnCode EventQuicksandDrawIn_Callback(GameEvent *event, u32 *
             FldAct_SetAcmd(actor, 0x27);
         }
         if (wk->frame++ % 10 == 0) {
-            func_ov036_021a3e74(actor, effects);
+            FldeffKemuri_Start(actor, effects);
         }
         if (FieldTaskManager_IsIdle(Field_GetTaskManager(wk->field))) {
             *state = 4;
@@ -973,7 +975,7 @@ static GameEventReturnCode EventTeleportEffect_Callback(GameEvent *event, u32 *s
     return GAMEEVENT_CONTINUE;
 }
 
-static GameEventReturnCode func_ov036_021ba4bc(GameEvent *event, u32 *state, void *data) {
+static GameEventReturnCode EventDig_RunRisingSpin(GameEvent *event, u32 *state, void *data) {
     EffectEventWork *wk = data;
     Field *field = wk->field;
     FieldCamera *camera;
@@ -1019,7 +1021,7 @@ static GameEventReturnCode func_ov036_021ba4bc(GameEvent *event, u32 *state, voi
     return GAMEEVENT_CONTINUE;
 }
 
-BOOL func_ov036_021ba594(s32 x, s32 z, const HeightExEntry *rect) {
+BOOL HeightEx_IsPointInArea(s32 x, s32 z, const HeightExEntry *rect) {
     s32 left;
     s32 width;
     s32 top;

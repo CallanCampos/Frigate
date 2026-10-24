@@ -40,7 +40,7 @@ struct FieldTradeInput {
     u16 padding;
     u32 offerIndex;
     FieldTradeOfferData *offerData;
-    void *tradeData;
+    PartyPkm *tradeData;
     PlayerInfo *trainer;
 };
 

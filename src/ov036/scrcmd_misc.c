@@ -5,6 +5,8 @@
 // GPL-3.0). Anville train names and collector group names are our descriptive names from the scripts and resources.
 #include "types.h"
 #include "constants/directions.h"
+#include "constants/language.h"
+#include "constants/pokemon.h"
 #include "field/castelia_rush.h"
 #include "field/ev_time.h"
 #include "field/event_mapchange.h"
@@ -58,7 +60,7 @@ typedef struct {
 } ItemCollectorPrice;
 
 static ElevatorFloor *ElevatorTable_GetEntry(ElevatorFloor *table, u32 index);
-static void func_ov036_021afdd0(ElevatorFloor *floor);
+static void ElevatorTable_NoopWarpEntry(ElevatorFloor *floor);
 static u32 ElevatorTable_CountEntries(ElevatorFloor *table);
 static BOOL AnvilleTrain_IsSpecialDate(u32 month, u32 day);
 
@@ -91,14 +93,14 @@ BOOL s0134_CasteliaRushInit(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-// Set a word to the name of the entry of the DS owner's birthday, with its article unless it is flagged
-BOOL func_ov036_021afcfc(VM *vm, FieldScriptEnv *env) {
+// Set a word to the name of the trainer log entry that the DS owner's birthday picks, with that trainer's gender
+BOOL ElevatorTable_RegisterBirthdayEntry(VM *vm, FieldScriptEnv *env) {
     OSOwnerInfo ownerInfo;
     u16 wordIndex;
     TrainerLogSave *data;
     RTCDate *date;
     u32 index;
-    u32 article;
+    u32 gender;
     const u16 *name;
     WordSet *wordSet;
     StrBuf *strBuf;
@@ -110,20 +112,20 @@ BOOL func_ov036_021afcfc(VM *vm, FieldScriptEnv *env) {
     OS_GetOwnerInfo(&ownerInfo);
     index = TrainerLogSave_FindFortuneEntry(data, ownerInfo.birthday.month, ownerInfo.birthday.day, date);
     if (TrainerLogSave_IsEntryMale(data, index) == TRUE) {
-        article = FALSE;
+        gender = GENDER_MALE;
     } else {
-        article = TRUE;
+        gender = GENDER_FEMALE;
     }
     name = TrainerLogSave_GetEntryName(data, index);
     wordSet = ScriptWork_GetWordSet(FieldScriptEnv_GetScriptWork(env));
     strBuf = GFL_StrBufCreate(8, HEAPID_TAIL(HEAPID_USER));
     GFL_StrBufLoadString(strBuf, name);
-    GFL_WordSetSetStrbuf(wordSet, wordIndex, strBuf, article, 1, 2);
+    GFL_WordSetSetStrbuf(wordSet, wordIndex, strBuf, gender, TRUE, GAME_LANGUAGE);
     GFL_StrBufFree(strBuf);
     return FALSE;
 }
 
-BOOL func_ov036_021afd9c(VM *vm, FieldScriptEnv *env) {
+BOOL ElevatorTable_GetMysteryEntryCount(VM *vm, FieldScriptEnv *env) {
     GameData *gameData = FieldScriptEnv_GetGameData(env);
     u16 *result = ScriptReadVar(vm, env);
 
@@ -135,7 +137,8 @@ static ElevatorFloor *ElevatorTable_GetEntry(ElevatorFloor *table, u32 index) {
     return &table[index];
 }
 
-static void func_ov036_021afdd0(ElevatorFloor *floor) {
+// Empty in the game, though called for each floor counted: perhaps a check left out of the release build
+static void ElevatorTable_NoopWarpEntry(ElevatorFloor *floor) {
 }
 
 // The number of floors, or 0 if the table has no end
@@ -145,7 +148,7 @@ static u32 ElevatorTable_CountEntries(ElevatorFloor *table) {
     for (i = 0; i < ELEVATOR_FLOOR_MAX; i++) {
         ElevatorFloor *floor = ElevatorTable_GetEntry(table, i);
 
-        func_ov036_021afdd0(floor);
+        ElevatorTable_NoopWarpEntry(floor);
         if (floor->messageId == ELEVATOR_TABLE_END) {
             return i;
         }
@@ -186,6 +189,7 @@ BOOL s01C2_ElevatorChangeMap(VM *vm, FieldScriptEnv *env) {
     u16 index = ScriptReadAny(vm, env);
     ElevatorFloor *table = FieldScriptEnv_GetElevatorTable(env);
 
+    // The current zone is read but not used
     GetScriptEnvZoneID(env);
     if (index < ElevatorTable_CountEntries(table)) {
         ElevatorFloor *floor = ElevatorTable_GetEntry(table, index);
@@ -232,24 +236,23 @@ BOOL s01FC_ItemCollectorGetPrice(VM *vm, FieldScriptEnv *env) {
 
 // Whether the player has any item that the item collector of the group buys
 BOOL s01FB_ItemCollectorCheckGroup(VM *vm, FieldScriptEnv *env) {
-    u32 size;
-    u32 i;
-    ItemCollectorPrice *prices;
-    BagSave *bag;
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameData *gameData = FieldScriptEnv_GetGameData(env);
     ScriptFieldWork *fieldWork = ScriptWork_GetFieldWork(work);
     HeapID heapId = Field_GetHeapID(fieldWork->field);
     u16 group = ScriptReadAny(vm, env);
     u16 *result = ScriptReadVar(vm, env);
+    BagSave *bag = GameData_GetBag(gameData);
+    u32 size;
+    ItemCollectorPrice *prices;
+    u32 i;
 
-    bag = GameData_GetBag(gameData);
     prices = GFL_ArcSysReadHeapNewLZGetLen(ARC_ITEM_COLLECTOR, ITEM_COLLECTOR_FILES[group], FALSE, HEAPID_TAIL(heapId),
                                            &size);
     size /= sizeof(ItemCollectorPrice);
     *result = FALSE;
     for (i = 0; i < size; i++) {
-        if (BagSave_CheckAmount(bag, (u16)prices[i].item, 1, heapId)) {
+        if (BagSave_CheckAmount(bag, prices[i].item, 1, heapId)) {
             *result = TRUE;
             break;
         }
@@ -295,6 +298,7 @@ BOOL s0237_ItemCollectorSell(VM *vm, FieldScriptEnv *env) {
     u16 group = ScriptReadAny(vm, env);
 
     gameData = FieldScriptEnv_GetGameData(env);
+    // The player's state is read but not used
     GameData_GetPlayerState(gameData);
     prices = GFL_ArcSysReadHeapNewLZGetLen(ARC_ITEM_COLLECTOR, ITEM_COLLECTOR_FILES[group], FALSE, HEAPID_TAIL(heapId),
                                            &size);

@@ -127,7 +127,7 @@ GameEventReturnCode EventGameSync_Callback(GameEvent *event, u32 *state, void *d
                 wk->gsyncResult = GSYNC_RESULT_WIFI_SETTINGS;
                 *state = 19;
             } else {
-                wk->gsyncResult = 0;
+                wk->gsyncResult = GSYNC_RESULT_NONE;
                 *state = 19;
             }
         }

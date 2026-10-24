@@ -92,7 +92,7 @@ WifiLogout_StateWaitDisconnectedMessage kind:function(thumb,size=0x24) addr:0x02
 WifiLogout_StateStartFadeOut kind:function(thumb,size=0x54) addr:0x021b5028
 WifiLogout_StateWaitFadeOut kind:function(thumb,size=0x1c) addr:0x021b507c
 WifiLogout_OnDisconnected kind:function(thumb,size=0x6) addr:0x021b5098
-data_ov190_021b50a0 kind:data(any) addr:0x021b50a0
+sNetCommands kind:data(any) addr:0x021b50a0
 WIFILOGIN_PROC_FUNCTIONS kind:data(any) addr:0x021b50a8 ambiguous
 data_ov190_021b50b4 kind:data(any) addr:0x021b50b4
 data_ov190_021b50d4 kind:data(any) addr:0x021b50d4

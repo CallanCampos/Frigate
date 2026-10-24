@@ -67,7 +67,7 @@ BOOL s0198_FieldSubscreenChange(VM *vm, FieldScriptEnv *env) {
 
 BOOL s0199_FieldSubscreenReturn(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
-    FieldSubscreen *subscreen = Field_GetSubscreen(((ScriptFieldWork *)ScriptWork_GetFieldWork(work))->field);
+    FieldSubscreen *subscreen = Field_GetSubscreen(ScriptWork_GetFieldWork(work)->field);
     GameEvent *event = GameEvent_Create(FieldScriptEnv_GetGameSystem(env), NULL, EventFieldSubscreenChange_Callback,
                                         sizeof(EventFieldSubscreenChange));
     EventFieldSubscreenChange *change = GameEvent_GetData(event);
@@ -100,7 +100,7 @@ BOOL FieldScriptSubEventFinish_Subscreen(FinishScriptSubEventsWork *work, u32 *s
     return FALSE;
 }
 
-BOOL func_ov036_021c730c(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_CheckPmsWordPair(VM *vm, FieldScriptEnv *env) {
     u16 kind = ScriptReadAny(vm, env);
     u16 word1 = ScriptReadAny(vm, env);
     u16 word2 = ScriptReadAny(vm, env);

@@ -2,6 +2,7 @@
 #define POKEBW2_FIELD_UNION_MSG_H
 
 #include "types.h"
+#include "battle/regulation.h"
 #include "field/field.h"
 #include "field/union_comm.h"
 #include "struct_decls.h"
@@ -9,18 +10,7 @@
 // union_msg.c, overlay 34, which the ROM names: the Union Room's messages, menus and their tables. Names are not
 // swan's. The first functions are lookups of message IDs, by gender, language or a random pick
 
-// The rules of a regulation printed (PokeRegulation_CreatePrintMsg): its message data and, for each of the six rules,
-// the name of the rule and its value. alloc.rpm of the system holds one
-typedef struct {
-    MsgData *msgData;
-    StrBuf *rule[6];
-    StrBuf *value[6];
-    u8 unk34;
-} RegulationRulesText;
-
 // Main code that overlay 34 is the only user of yet
-void *PokeRegulation_CreatePrintMsg(Regulation *regulation, WordSet *wordset, HeapID heapId, BOOL battleType);
-void PokeRegulation_FreePrintMsg(RegulationPrintMsg *rulesText);
 StrBuf *makeStrbufLoadBattleTypeText(Regulation *regulation, HeapID heapId);
 
 // The message IDs of the Union Room's texts, for a gender (0 or 1) or a language. The tables are of two IDs

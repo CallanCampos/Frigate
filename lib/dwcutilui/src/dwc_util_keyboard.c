@@ -3,7 +3,6 @@
 #include "dwc_util_display.h"
 #include "dwc_util_heap.h"
 #include "dwc_util_oam.h"
-#include "dwc_util_oam_attr.h"
 #include "dwc_util_oam_buf.h"
 #include "dwc_util_shared.h"
 #include "dwc_util_sound.h"
@@ -210,8 +209,11 @@ BOOL DWCi_KBlIsInit(void) {
 }
 
 static void DWCUtilKeyboard_SlideInRow0Task(DWCUtilTask *task, void *arg) {
-    int y = (u8)DWCUtilOam_ReadAttr01(sKeyboard->charOams[0]).attr01 - 12;
+    int x;
+    int y;
 
+    G2_GetOBJPosition(sKeyboard->charOams[0], (u32 *)&x, (u32 *)&y);
+    y -= 12;
     if (y > 0x51) {
         DWCUtilKeyboard_MoveRow(sKeyboard->mode, 0, y);
         return;
@@ -222,8 +224,11 @@ static void DWCUtilKeyboard_SlideInRow0Task(DWCUtilTask *task, void *arg) {
 }
 
 static void DWCUtilKeyboard_SlideInRow1Task(DWCUtilTask *task, void *arg) {
-    int y = (u8)DWCUtilOam_ReadAttr01(sKeyboard->charOams[12]).attr01 - 12;
+    int x;
+    int y;
 
+    G2_GetOBJPosition(sKeyboard->charOams[12], (u32 *)&x, (u32 *)&y);
+    y -= 12;
     if (y > 0x67) {
         DWCUtilKeyboard_MoveRow(sKeyboard->mode, 1, y);
         return;
@@ -234,8 +239,11 @@ static void DWCUtilKeyboard_SlideInRow1Task(DWCUtilTask *task, void *arg) {
 }
 
 static void DWCUtilKeyboard_SlideInRow2Task(DWCUtilTask *task, void *arg) {
-    int y = (u8)DWCUtilOam_ReadAttr01(sKeyboard->charOams[24]).attr01 - 12;
+    int x;
+    int y;
 
+    G2_GetOBJPosition(sKeyboard->charOams[24], (u32 *)&x, (u32 *)&y);
+    y -= 12;
     if (y > 0x7d) {
         DWCUtilKeyboard_MoveRow(sKeyboard->mode, 2, y);
         return;
@@ -246,8 +254,11 @@ static void DWCUtilKeyboard_SlideInRow2Task(DWCUtilTask *task, void *arg) {
 }
 
 static void DWCUtilKeyboard_SlideInRow3Task(DWCUtilTask *task, void *arg) {
-    int y = (u8)DWCUtilOam_ReadAttr01(sKeyboard->charOams[36]).attr01 - 12;
+    int x;
+    int y;
 
+    G2_GetOBJPosition(sKeyboard->charOams[36], (u32 *)&x, (u32 *)&y);
+    y -= 12;
     if (y > 0x93) {
         DWCUtilKeyboard_MoveRow(sKeyboard->mode, 3, y);
         return;
@@ -808,8 +819,13 @@ static void moveFocus(int direction) {
 }
 
 static void DWCUtilKeyboard_SlideOutButtonsTask(DWCUtilTask *task, void *arg) {
-    int y = (u8)DWCUtilOam_ReadAttr01(DWCi_CELLlGetObj(sKeyboard->buttons[0], 0)).attr01 + 12;
+    GXOamAttr *oam;
+    int x;
+    int y;
 
+    oam = DWCi_CELLlGetObj(sKeyboard->buttons[0], 0);
+    G2_GetOBJPosition(oam, (u32 *)&x, (u32 *)&y);
+    y += 12;
     DWCUtilKeyboard_MoveRow(sKeyboard->mode, 4, y);
     if (y >= 0xc0) {
         DWCi_TSKlChangeFunc(task, DWCUtilKeyboard_SlideOutRow3Task);
@@ -817,8 +833,13 @@ static void DWCUtilKeyboard_SlideOutButtonsTask(DWCUtilTask *task, void *arg) {
 }
 
 static void DWCUtilKeyboard_SlideOutRow3Task(DWCUtilTask *task, void *arg) {
-    int y = (u8)DWCUtilOam_ReadAttr01(sKeyboard->charOams[36]).attr01 + 12;
+    GXOamAttr *oam;
+    int x;
+    int y;
 
+    oam = sKeyboard->charOams[36];
+    G2_GetOBJPosition(oam, (u32 *)&x, (u32 *)&y);
+    y += 12;
     DWCUtilKeyboard_MoveRow(sKeyboard->mode, 3, y);
     if (y >= 0xc0) {
         DWCi_TSKlChangeFunc(task, DWCUtilKeyboard_SlideOutRow2Task);
@@ -826,8 +847,13 @@ static void DWCUtilKeyboard_SlideOutRow3Task(DWCUtilTask *task, void *arg) {
 }
 
 static void DWCUtilKeyboard_SlideOutRow2Task(DWCUtilTask *task, void *arg) {
-    int y = (u8)DWCUtilOam_ReadAttr01(sKeyboard->charOams[24]).attr01 + 12;
+    GXOamAttr *oam;
+    int x;
+    int y;
 
+    oam = sKeyboard->charOams[24];
+    G2_GetOBJPosition(oam, (u32 *)&x, (u32 *)&y);
+    y += 12;
     DWCUtilKeyboard_MoveRow(sKeyboard->mode, 2, y);
     if (y >= 0xc0) {
         DWCi_TSKlChangeFunc(task, DWCUtilKeyboard_SlideOutRow1Task);
@@ -835,8 +861,13 @@ static void DWCUtilKeyboard_SlideOutRow2Task(DWCUtilTask *task, void *arg) {
 }
 
 static void DWCUtilKeyboard_SlideOutRow1Task(DWCUtilTask *task, void *arg) {
-    int y = (u8)DWCUtilOam_ReadAttr01(sKeyboard->charOams[12]).attr01 + 12;
+    GXOamAttr *oam;
+    int x;
+    int y;
 
+    oam = sKeyboard->charOams[12];
+    G2_GetOBJPosition(oam, (u32 *)&x, (u32 *)&y);
+    y += 12;
     DWCUtilKeyboard_MoveRow(sKeyboard->mode, 1, y);
     if (y >= 0xc0) {
         DWCi_TSKlChangeFunc(task, DWCUtilKeyboard_SlideOutRow0Task);
@@ -844,8 +875,13 @@ static void DWCUtilKeyboard_SlideOutRow1Task(DWCUtilTask *task, void *arg) {
 }
 
 static void DWCUtilKeyboard_SlideOutRow0Task(DWCUtilTask *task, void *arg) {
-    int y = (u8)DWCUtilOam_ReadAttr01(sKeyboard->charOams[0]).attr01 + 12;
+    GXOamAttr *oam;
+    int x;
+    int y;
 
+    oam = sKeyboard->charOams[0];
+    G2_GetOBJPosition(oam, (u32 *)&x, (u32 *)&y);
+    y += 12;
     DWCUtilKeyboard_MoveRow(sKeyboard->mode, 0, y);
     if (y >= 0xc0) {
         DWCi_TSKlChangeFunc(task, DWCUtilKeyboard_DestroyTask);

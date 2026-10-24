@@ -16,6 +16,7 @@ lib/dwcutil/src/dwc_wcm.c:
     .bss        start:0x021c2ae0 end:0x021c2b30
 
 lib/dwcutil/src/dwc_aoss.c:
+    complete
     .text       start:0x021a4a10 end:0x021a6c5c
     .rodata     start:0x021bd324 end:0x021bd328
     .data       start:0x021c0610 end:0x021c0688
@@ -51,6 +52,7 @@ lib/dwcutilui/src/dwc_util_ui_object.c:
     .bss        start:0x021c4068 end:0x021c406c
 
 src/ov182/download_play.c:
+    complete
     .text       start:0x021b9428 end:0x021b9bfc
     .data       start:0x021c14c4 end:0x021c17b0
     .bss        start:0x021c41bc end:0x021c41c0
@@ -72,6 +74,7 @@ lib/dwcutilui/src/dwc_util_rom_resource.c:
     .bss        start:0x021c41cc end:0x021c41d0
 
 lib/dwcutilui/src/dwc_util_oam.c:
+    complete
     .text       start:0x021bb4c0 end:0x021bb91c
     .bss        start:0x021c41d0 end:0x021c41d4
 
@@ -96,6 +99,7 @@ lib/dwcutilui/src/dwc_util_fade.c:
     .bss        start:0x021c41dc end:0x021c41e0
 
 lib/dwcutilui/src/dwc_util_text.c:
+    complete
     .text       start:0x021bbc90 end:0x021bc1e8
     .rodata     start:0x021c05d0 end:0x021c05dc
     .data       start:0x021c1b44 end:0x021c1ba0
@@ -164,6 +168,7 @@ lib/dwcutilui/src/dwc_util_link_icon.c:
     .bss        start:0x021c40b8 end:0x021c40bc
 
 lib/dwcutilui/src/dwc_util_keyboard.c:
+    complete
     .text       start:0x021abb50 end:0x021acdc0
     .rodata     start:0x021bfbf8 end:0x021bfebc
     .data       start:0x021c09c8 end:0x021c0bac
@@ -299,6 +304,7 @@ lib/dwcutilui/src/dwc_util_error.c:
     .bss        start:0x021c4148 end:0x021c414c
 
 lib/dwcutilui/src/dwc_util_address_settings.c:
+    complete
     .text       start:0x021b2d88 end:0x021b4444
     .rodata     start:0x021c017c end:0x021c0280
     .data       start:0x021c10e0 end:0x021c1160

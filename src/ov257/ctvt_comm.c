@@ -215,7 +215,7 @@ static const GFLNetInitData sCtvtCommNetInitData = {
     0x10,
     1,
     0,
-    0,
+    GFL_NET_TYPE_WIRELESS,
     1,
     CTVT_COMM_CMD_BASE >> 8,
     { 0x2c, 1, 0, 0 },
@@ -238,7 +238,7 @@ CtvtComm *CtvtComm_Create(CommTvtWork *sys, HeapID heapId) {
         CtvtComm_ClearMember(sys, comm, &comm->members[i]);
     }
     for (i = 0; i < CTVT_COMM_PICTURE_BUFFERS; i++) {
-        if (!func_ov257_021aab3c(sys) || i == 0) {
+        if (!CommTvt_IsLaunchModeCall(sys) || i == 0) {
             comm->pictureBuffers[i] = allocConfigDSSoftwareFeature(heapId, CTVT_COMM_PICTURE_SIZE, "ctvt_comm.c", 326);
         }
     }
@@ -296,7 +296,7 @@ void CtvtComm_Delete(CommTvtWork *sys, CtvtComm *comm) {
     GFL_NetFreeAligned32(comm->photoJpeg);
     GFL_NetFreeAligned32(comm->jpegWork);
     for (i = 0; i < CTVT_COMM_PICTURE_BUFFERS; i++) {
-        if (!func_ov257_021aab3c(sys) || i == 0) {
+        if (!CommTvt_IsLaunchModeCall(sys) || i == 0) {
             GFL_NetFreeAligned32(comm->pictureBuffers[i]);
         }
     }
@@ -559,7 +559,7 @@ static void CtvtComm_UpdateTalk(CommTvtWork *sys, CtvtComm *comm) {
 
         if (comm->memberCount != count) {
             CtvtComm_UpdateMembers(sys, comm);
-            func_ov257_021aad08(sys);
+            CommTvt_ClearNameWindows(sys);
             if (comm->memberCount < count && selfNetId == 0) {
                 comm->sendZoom = TRUE;
                 comm->zoom = CommTvt_IsZoomed(sys);
@@ -768,8 +768,8 @@ static void CtvtComm_UpdateMember(CommTvtWork *sys, CtvtComm *comm, CtvtCommMemb
         return;
     }
     if (member->infoApplied == FALSE && member->infoReceived == TRUE) {
-        if (!func_ov257_021aab3c(sys)) {
-            func_ov257_021aae54(sys, &member->info);
+        if (!CommTvt_IsLaunchModeCall(sys)) {
+            CommTvt_SavePeerRecord(sys, &member->info);
         }
         member->infoApplied = TRUE;
     }
@@ -879,11 +879,11 @@ static void CtvtComm_RecvPacket(int netId, int size, const void *data, void *wor
 
         comm->talker = talker;
         if (talker != CTVT_COMM_NONE) {
-            func_ov257_021aad74(comm->sys, talker);
+            CommTvt_PlaceSlotMarker(comm->sys, talker);
         } else {
             CtvtMic *mic = CommTvt_GetMic(comm->sys);
 
-            func_ov257_021aae44(comm->sys);
+            CommTvt_HideSlotMarker(comm->sys);
             CtvtMic_StopPlaying(mic);
         }
         break;
@@ -934,13 +934,13 @@ static void CtvtComm_RecvPacket(int netId, int size, const void *data, void *wor
             comm->members[netId].wantsToTalk = FALSE;
             comm->talkRequestsChanged = TRUE;
         }
-        func_ov257_021aae44(comm->sys);
+        CommTvt_HideSlotMarker(comm->sys);
         break;
     case CTVT_PACKET_TALK_DONE:
         if (netId == comm->talker) {
             comm->talkRequestsChanged = TRUE;
         }
-        func_ov257_021aae44(comm->sys);
+        CommTvt_HideSlotMarker(comm->sys);
         break;
     case CTVT_PACKET_UNK_B:
         if (selfNetId != 0) {
@@ -1082,7 +1082,7 @@ static void CtvtComm_RecvInfo(int netId, int size, const void *data, void *work,
 
     if (comm->members[netId].infoReceived == FALSE) {
         comm->members[netId].infoReceived = TRUE;
-        func_ov257_021aad08(comm->sys);
+        CommTvt_ClearNameWindows(comm->sys);
     }
 }
 

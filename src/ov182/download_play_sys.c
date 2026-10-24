@@ -19,7 +19,7 @@ static void func_ov182_021badd4(void);
 static void func_ov182_021badf8(void);
 static void func_ov182_021baf38(void);
 static BOOL func_ov182_021baf4c(void);
-static BOOL func_ov182_021baf70(void *info);
+static BOOL func_ov182_021baf70(WMStartParentCallback *callback);
 static void func_ov182_021baf9c(void);
 static void func_ov182_021bafc8(u16 code, u16 arg, const u8 *data);
 static void func_ov182_021bb0c0(void);
@@ -449,8 +449,7 @@ static BOOL func_ov182_021baf4c(void) {
 
 // The scan filter the flow installs: the child that connected is looked up by its MAC address, kept by its player
 // number, and let in only if the parent knows it
-static BOOL func_ov182_021baf70(void *info) {
-    WMStartParentCallback *callback = info;
+static BOOL func_ov182_021baf70(WMStartParentCallback *callback) {
     u16 playerNo = DownloadPlay_GetPlayerNoByMac(callback->macAddress);
 
     if (playerNo == 0) {

@@ -104,7 +104,7 @@ GameEventReturnCode EventGtsNego_Callback(GameEvent *event, u32 *state, void *da
                 *state = 10;
             } else {
                 NetHandle_SendTimingPair(NetHandle_GetOwn(), 1, 12);
-                func_02042e94(FALSE);
+                GflNet_SetAutoExit(FALSE);
                 GFL_NetSetDisconnectError(FALSE);
                 wk->timeout = 100;
                 *state = 8;

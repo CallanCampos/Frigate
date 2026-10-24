@@ -38,7 +38,7 @@ typedef struct {
 typedef struct {
     GameSystem *gsys;
     VecFx32 pos;
-    void *msgWin;
+    ActorMsgWin *msgWin;
     StrBuf *strbuf;
     u32 unk18;
 } BtlInstTrainerMsgWork;
@@ -131,7 +131,7 @@ static GameEventReturnCode EventBtlInstPokeSelect_Callback(GameEvent *event, u32
 GameEvent *EventBtlInstTrainerMsg_Create(GameSystem *gsys, BSubwayTrainer *trainers, u32 index, u16 actorId) {
     GameEvent *event;
     GameData *gameData = GSYS_GetGameData(gsys);
-    void *msgBGSys = Field_GetMsgBGSys(GSYS_GetField(gsys));
+    FieldMsgBG *msgBGSys = Field_GetMsgBGSys(GSYS_GetField(gsys));
     BtlInstTrainerMsgWork *work;
 
     event = GameEvent_Create(gsys, NULL, EventBtlInstTrainerMsg_Callback, sizeof(BtlInstTrainerMsgWork));
@@ -158,18 +158,18 @@ static GameEventReturnCode EventBtlInstTrainerMsg_Callback(GameEvent *event, u32
 
     switch (*state) {
     case 0:
-        if (func_ov036_02188884(work->msgWin) == TRUE) {
+        if (MsgBGPrinter_TalkWinMain(work->msgWin) == TRUE) {
             (*state)++;
         }
         break;
     case 1:
         if (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) {
-            func_ov036_021887d4(work->msgWin);
+            MsgBGPrinter_DeleteTalkWin(work->msgWin);
             (*state)++;
         }
         break;
     case 2:
-        if (func_ov036_021887f4(work->msgWin) == TRUE) {
+        if (MsgBGPrinter_WaitTalkWinClose(work->msgWin) == TRUE) {
             GFL_StrBufFree(work->strbuf);
             return GAMEEVENT_DONE;
         }

@@ -1,11 +1,13 @@
 # Nintendo's DWC utility (libdwcutil), the Wi-Fi Connection settings that overlay 182 runs through DWC_StartUtility
 # (lib/dwc/include/dwc/utility.h). It was built apart from the rest of DWC: with MWCC 2.0, which keeps reloading a
 # static's address where dsi/1.1p1 keeps it in a register. Its first file, dwc_wcm.c, went from 1 to 6 of 9 functions
-# matching on the compiler alone, with DWC's own flags (Thumb, -O4,p). The build is 2.0/sp1p6, sp1p7 or sp2, which
-# compile it alike: dwcutil_ac.c's MD5Transform has no branch, so its literal pool island sits where the
-# compiler's pool margin alone puts it (docs/matching.md, the bullet on ConstantPools.c), and it matches under those three
-# and under no later build. 2.0/sp2 is named, the newest of them, which also builds NitroSystem.
-compiler = "2.0/sp2"
+# matching on the compiler alone, with DWC's own flags (Thumb, -O4,p). dwcutil_ac.c's MD5Transform has no branch, so its
+# literal pool island sits where the compiler's pool margin alone puts it (docs/matching.md, the bullet on
+# ConstantPools.c): it matches under 2.0/sp1 to sp2 and under no later build. Of those, 2.0/sp1 to sp1p5 compile
+# the library alike, and only they match dwcutil_ac.c's CheckAccessPoint and dwc_aoss.c's AOSS_seq_data_copy, which
+# sp1p6 to sp2 schedule otherwise. 2.0/sp1p2 is named, the build that Black 1's decompilation (aletheia) gives the same
+# objects (its aoss.c, aosslink.c, atermset.c and apc.c).
+compiler = "2.0/sp1p2"
 flags = [
     "-O4,p",               # Optimize for speed
     "-proc arm946e",       # ARM9 processor

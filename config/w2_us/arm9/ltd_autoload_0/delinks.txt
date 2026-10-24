@@ -63,6 +63,7 @@ lib/twl/src/dsp/dsp_process.c:
     .bss        start:0x0276c5ec end:0x0276c618
 
 lib/twl/src/dsp/dsp_audio.c:
+    complete
     .text       start:0x02705f64 end:0x0270633c
     .data       start:0x0276aebc end:0x0276aec0
     .bss        start:0x0276c618 end:0x0276c668

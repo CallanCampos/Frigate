@@ -157,7 +157,7 @@ static BOOL Guru2Seq_WaitReceipt(Guru2CallWork *wk) {
     if (!Guru2ProcWork_IsReceiptDone(wk->g2p)) {
         wk->seq = GURU2_SEQ_END;
     } else {
-        func_02042e94(TRUE);
+        GflNet_SetAutoExit(TRUE);
         wk->pokeList = Guru2_CreatePokeListParam(wk, GURU2_POKELIST_MODE, 0);
         QueueGameProc(wk->procManager, OVERLAY_ID(165), &POKELIST_PROC_FUNCTIONS, wk->pokeList);
         wk->g2p->state = GURU2_PROC_STATE_POKE_LIST;

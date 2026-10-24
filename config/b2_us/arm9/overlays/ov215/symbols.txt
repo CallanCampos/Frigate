@@ -216,7 +216,7 @@ data_ov215_021ab3b9 kind:data(any) addr:0x021ab3b9 ambiguous
 data_ov215_021ab3e9 kind:data(any) addr:0x021ab3e9 ambiguous
 data_ov215_021ab419 kind:data(any) addr:0x021ab419 ambiguous
 data_ov215_021ab449 kind:data(any) addr:0x021ab449 ambiguous
-data_ov215_021ab454 kind:data(any) addr:0x021ab454
+sClActSetup kind:data(any) addr:0x021ab454
 sActorTemplates kind:data(any) addr:0x021ab470
 data_ov215_021ab479 kind:data(any) addr:0x021ab479 ambiguous
 data_ov215_021ab489 kind:data(any) addr:0x021ab489 ambiguous
@@ -228,10 +228,10 @@ data_ov215_021ab620 kind:data(any) addr:0x021ab620
 sChildProcs kind:data(any) addr:0x021ab62c
 data_ov215_021ab630 kind:data(any) addr:0x021ab630
 data_ov215_021ab634 kind:data(any) addr:0x021ab634
-data_ov215_021ab65c kind:data(any) addr:0x021ab65c
+sStateFuncs kind:data(any) addr:0x021ab65c
 sReturnRects kind:data(any) addr:0x021ab6c8
 sCursorCallbacks kind:data(any) addr:0x021ab6d0
-data_ov215_021ab6e0 kind:data(any) addr:0x021ab6e0
+sButtonRects kind:data(any) addr:0x021ab6e0
 sCursorData kind:data(any) addr:0x021ab6f4
 data_ov215_021ab73d kind:data(any) addr:0x021ab73d ambiguous
 data_ov215_021ab769 kind:data(any) addr:0x021ab769 ambiguous

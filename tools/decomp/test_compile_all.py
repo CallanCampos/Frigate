@@ -88,6 +88,15 @@ class CompileAllTests(unittest.TestCase):
                 if not out:
                     self.assertNotIn('src/example.c', stdout)
 
+    def test_warning_on_success_fails(self):
+        for out, err in [('src/example.c:3: warning: implicit conversion\n', ''),
+                         ('', 'src/example.c:3: warning: implicit conversion\n')]:
+            with self.subTest(stdout=out, stderr=err):
+                code, stdout, stderr = self.run_main({('src/example.c', 'BLACK2'): (0, out, err)}, ['b2_us'])
+                self.assertEqual(code, 1)
+                self.assertIn('1 of 1 compiled (1 files, b2_us)', stdout)
+                self.assertIn('1 compiled with warnings, which fail the run', stderr)
+
     def test_failure_diagnostics_and_silent_failure(self):
         for out, err in [('compiler output\n', 'compiler error\n'), ('', '')]:
             with self.subTest(stdout=out, stderr=err):

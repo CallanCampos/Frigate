@@ -12,6 +12,6 @@ BOOL s0198_FieldSubscreenChange(VM *vm, FieldScriptEnv *env);
 BOOL s0199_FieldSubscreenReturn(VM *vm, FieldScriptEnv *env);
 // FIELD_SCRIPT_SUB_EVENT_FINISH_FUNCS's entry for the subscreen
 BOOL FieldScriptSubEventFinish_Subscreen(FinishScriptSubEventsWork *work, u32 *state);
-BOOL func_ov036_021c730c(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_CheckPmsWordPair(VM *vm, FieldScriptEnv *env);
 
 #endif // POKEBW2_FIELD_SCRCMD_FIELD_H

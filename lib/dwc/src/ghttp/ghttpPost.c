@@ -1,3 +1,6 @@
+#include <string.h>
+// First: MWCC builds the memset of ghiNewPost and the memcpy of the DIME headers in place, as the ROM does, only when
+// <string.h> declares them before dwc/ext.h does
 #include "ghttp_internal.h"
 
 // ghttpPost: the posts of a request (the form or the XML message that it sends), made of items, and how they are sent.
@@ -99,17 +102,11 @@ static void ghiPostDataFree(void *element) {
 
 GHTTPPost ghiNewPost(void) {
     GHTTPPost post = gsimalloc(sizeof(GHIPost));
-    char *p;
-    gsi_u32 size;
 
     if (post == NULL) {
         return NULL;
     }
-    p = (char *)post;
-    size = sizeof(GHIPost);
-    while (size--) {
-        *p++ = 0;
-    }
+    memset(post, 0, sizeof(GHIPost));
     post->autoFree = gsi_true;
     post->data = ArrayNew(sizeof(GHIPostData), 0, ghiPostDataFree);
     if (post->data == NULL) {
@@ -670,12 +667,12 @@ static GHIPostingResult ghiPostFileMemoryStateDoPosting(GHIPostState *state, GHI
 // later
 static GHIPostingResult ghiPostStateDoPosting(GHIPostState *state, GHIConnection *connection, GHTTPBool first,
                                               GHTTPBool last) {
-    char buffer[0x800];
-    GHIDimeHeader headers[2];
     int length = 0;
     int result;
 
     if (state->pos == -1) {
+        char buffer[0x800];
+
         state->pos = 0;
         if (!connection->post->hasFiles && !connection->post->hasSoap) {
             if (first) {
@@ -684,105 +681,113 @@ static GHIPostingResult ghiPostStateDoPosting(GHIPostState *state, GHIConnection
                 OS_SPrintf(buffer, "&%s=", state->data->name);
             }
         } else {
-            GHIPostData *item = state->data;
-
-            if (item->type == GHIString) {
+            if (state->data->type == GHIString) {
                 OS_SPrintf(buffer, "%sContent-Disposition: form-data; name=\"%s\"\r\n\r\n",
-                           first ? GHI_BOUNDARY_LINE "\r\n" : "\r\n" GHI_BOUNDARY_LINE "\r\n", item->name);
-            } else if (item->type == GHIXmlData) {
+                           first ? GHI_BOUNDARY_LINE "\r\n" : "\r\n" GHI_BOUNDARY_LINE "\r\n", state->data->name);
+            } else if (state->data->type == GHIXmlData) {
                 if (connection->post->useDIME) {
-                    int count;
+                    int pos = 0;
                     int padding;
+                    gsi_u32 count;
+                    GHIDimeHeader header;
 
-                    headers[1].mVersionAndFlags = GHI_DIME_VERSION;
+                    header.mVersionAndFlags = GHI_DIME_VERSION;
                     if (first) {
-                        headers[1].mVersionAndFlags |= GHI_DIME_FIRST;
+                        header.mVersionAndFlags |= GHI_DIME_FIRST;
                     }
                     if (last) {
-                        headers[1].mVersionAndFlags |= GHI_DIME_LAST;
+                        header.mVersionAndFlags |= GHI_DIME_LAST;
                     }
-                    headers[1].mTypeT = GHI_DIME_TYPE_URI;
-                    headers[1].mOptionsLength = 0;
-                    headers[1].mIdLength = GHI_DIME_LENGTH16(strlen(GHI_MESSAGE_ID));
-                    headers[1].mTypeLength = GHI_DIME_LENGTH16(strlen(GHI_MESSAGE_TYPE));
-                    headers[1].mDataLength = GHI_SWAP32(gsXmlWriterGetDataLength(state->data->data.xml.message));
-                    ghiCopy(buffer, &headers[1], sizeof(GHIDimeHeader));
-                    length += sizeof(GHIDimeHeader);
-                    count = gsiSafeStrcpyA(buffer + length, GHI_MESSAGE_ID, sizeof(buffer) - length);
-                    length += count;
-                    padding = 4 - (count & 3);
+                    header.mTypeT = GHI_DIME_TYPE_URI;
+                    header.mOptionsLength = 0;
+                    header.mIdLength = GHI_DIME_LENGTH16(strlen(GHI_MESSAGE_ID));
+                    header.mTypeLength = GHI_DIME_LENGTH16(strlen(GHI_MESSAGE_TYPE));
+                    header.mDataLength = GHI_SWAP32(gsXmlWriterGetDataLength(state->data->data.xml.message));
+                    memcpy(&buffer[pos], &header, sizeof(GHIDimeHeader));
+                    pos += sizeof(GHIDimeHeader);
+
+                    count = gsiSafeStrcpyA(&buffer[pos], GHI_MESSAGE_ID, sizeof(buffer) - pos);
+                    pos += count;
+                    padding = (int)(4 - (count % 4));
                     if (padding != 4) {
                         while (padding-- > 0) {
-                            buffer[length++] = 0;
+                            buffer[pos++] = '\0';
                         }
                     }
-                    count = gsiSafeStrcpyA(buffer + length, GHI_MESSAGE_TYPE, sizeof(buffer) - length);
-                    length += count;
-                    padding = 4 - (count & 3);
+
+                    count = gsiSafeStrcpyA(&buffer[pos], GHI_MESSAGE_TYPE, sizeof(buffer) - pos);
+                    pos += count;
+                    padding = (int)(4 - (count % 4));
                     if (padding != 4) {
                         while (padding-- > 0) {
-                            buffer[length++] = 0;
+                            buffer[pos++] = '\0';
                         }
                     }
+
+                    length = pos;
                 } else {
                     buffer[0] = '\0';
                 }
-            } else if (item->type == GHIFileDisk || item->type == GHIFileMemory) {
-                int dataLength;
+            } else if (state->data->type == GHIFileDisk || state->data->type == GHIFileMemory) {
                 char *fileName;
                 char *contentType;
+                int dataLength;
 
-                if (item->type == GHIFileDisk) {
+                if (state->data->type == GHIFileDisk) {
                     dataLength = state->fileSize;
-                    fileName = item->data.disk.fileName;
-                    contentType = item->data.disk.contentType;
+                    fileName = state->data->data.disk.fileName;
+                    contentType = state->data->data.disk.contentType;
                 } else {
-                    dataLength = item->data.memory.length;
-                    fileName = item->data.memory.fileName;
-                    contentType = item->data.memory.contentType;
+                    dataLength = state->data->data.memory.length;
+                    fileName = state->data->data.memory.fileName;
+                    contentType = state->data->data.memory.contentType;
                 }
                 if (connection->post->useDIME) {
-                    int count;
+                    int pos = 0;
                     int padding;
-                    char *name;
+                    gsi_u32 count;
+                    GHIDimeHeader header;
 
-                    headers[0].mVersionAndFlags = GHI_DIME_VERSION;
+                    header.mVersionAndFlags = GHI_DIME_VERSION;
                     if (first) {
-                        headers[0].mVersionAndFlags |= GHI_DIME_FIRST;
+                        header.mVersionAndFlags |= GHI_DIME_FIRST;
                     }
                     if (last) {
-                        headers[0].mVersionAndFlags |= GHI_DIME_LAST;
+                        header.mVersionAndFlags |= GHI_DIME_LAST;
                     }
-                    headers[0].mTypeT = GHI_DIME_TYPE_MEDIA;
-                    headers[0].mOptionsLength = 0;
-                    name = state->data->name;
-                    headers[0].mIdLength = GHI_DIME_LENGTH16(strlen(name));
-                    headers[0].mTypeLength = GHI_DIME_LENGTH16(strlen(contentType));
-                    headers[0].mDataLength = GHI_SWAP32(dataLength);
-                    ghiCopy(buffer, &headers[0], sizeof(GHIDimeHeader));
-                    length += sizeof(GHIDimeHeader);
-                    count = gsiSafeStrcpyA(buffer + length, state->data->name, sizeof(buffer) - length);
-                    length += count;
-                    padding = 4 - (count & 3);
+                    header.mTypeT = GHI_DIME_TYPE_MEDIA;
+                    header.mOptionsLength = 0;
+                    header.mIdLength = GHI_DIME_LENGTH16(strlen(state->data->name));
+                    header.mTypeLength = GHI_DIME_LENGTH16(strlen(contentType));
+                    header.mDataLength = GHI_SWAP32(dataLength);
+                    memcpy(&buffer[pos], &header, sizeof(GHIDimeHeader));
+                    pos += sizeof(GHIDimeHeader);
+
+                    count = gsiSafeStrcpyA(&buffer[pos], state->data->name, sizeof(buffer) - pos);
+                    pos += count;
+                    padding = (int)(4 - (count % 4));
                     if (padding != 4) {
                         while (padding-- > 0) {
-                            buffer[length++] = 0;
+                            buffer[pos++] = '\0';
                         }
                     }
-                    count = gsiSafeStrcpyA(buffer + length, contentType, sizeof(buffer) - length);
-                    length += count;
-                    padding = 4 - (count & 3);
+
+                    count = gsiSafeStrcpyA(&buffer[pos], contentType, sizeof(buffer) - pos);
+                    pos += count;
+                    padding = (int)(4 - (count % 4));
                     if (padding != 4) {
                         while (padding-- > 0) {
-                            buffer[length++] = 0;
+                            buffer[pos++] = '\0';
                         }
                     }
+
+                    length = pos;
                 } else {
                     OS_SPrintf(buffer,
                                "%sContent-Disposition: form-data; name=\"%s\"; filename=\"%s\"\r\nContent-Type: "
                                "%s\r\n\r\n",
-                               first ? GHI_BOUNDARY_LINE "\r\n" : "\r\n" GHI_BOUNDARY_LINE "\r\n", item->name, fileName,
-                               contentType);
+                               first ? GHI_BOUNDARY_LINE "\r\n" : "\r\n" GHI_BOUNDARY_LINE "\r\n", state->data->name,
+                               fileName, contentType);
                 }
             }
         }
@@ -800,6 +805,7 @@ static GHIPostingResult ghiPostStateDoPosting(GHIPostState *state, GHIConnection
             if (connection->sendBuffer.pos < connection->sendBuffer.len) {
                 return 2;
             }
+            ghiResetBuffer(&connection->sendBuffer);
         } else {
             if (length == 0) {
                 length = strlen(buffer);
@@ -811,8 +817,8 @@ static GHIPostingResult ghiPostStateDoPosting(GHIPostState *state, GHIConnection
             if (result == 2) {
                 return 2;
             }
+            ghiResetBuffer(&connection->sendBuffer);
         }
-        ghiResetBuffer(&connection->sendBuffer);
     }
 
     if (state->data->type == GHIString) {

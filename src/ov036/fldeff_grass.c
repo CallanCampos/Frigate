@@ -142,7 +142,7 @@ static void Grass_FreeTextures(FieldEffectGrass *grass) {
 }
 
 // Shake the grass of the given kind on the actor's tile; it settles at once unless animate
-void func_ov036_021a40ac(FieldEffects *effects, FieldActor *actor, BOOL animate, int kind) {
+void GrassTask_Start(FieldEffects *effects, FieldActor *actor, BOOL animate, int kind) {
     VecFx32 pos;
     GrassTaskParams params;
     fx32 height;
@@ -173,7 +173,7 @@ void func_ov036_021a40ac(FieldEffects *effects, FieldActor *actor, BOOL animate,
 
 static void GrassTask_Init(FieldEffectTask *task, void *work) {
     GrassTask *grassTask = work;
-    GrassTaskParams *params = func_ov036_021a3ac8(task);
+    GrassTaskParams *params = FieldEffects_GetObjectParam(task);
     BlActActorRequest request;
     u16 kind;
     BlActSys *blact;
@@ -181,7 +181,7 @@ static void GrassTask_Init(FieldEffectTask *task, void *work) {
 
     grassTask->params = *params;
     FldAct_GetIdentity(params->actor, &grassTask->identity);
-    func_ov036_021a3ae8(task, &params->pos);
+    FieldEffects_SetObjectPos(task, &params->pos);
     kind = grassTask->params.kind;
     request.texMat = grassTask->params.grass->matIndices[kind];
     request.scaleX = FX32_CONST(2);
@@ -195,17 +195,17 @@ static void GrassTask_Init(FieldEffectTask *task, void *work) {
     blact = grassTask->params.grass->blact;
     grassTask->actorIndex = BlActSys_ExecActorRequests(blact, 0, &request, 1, 0);
     if (grassTask->actorIndex == 0xffff) {
-        func_ov036_021a3a70(task);
+        FieldEffects_DeleteObject(task);
         return;
     }
     BlActSys_SetActorAnims(blact, grassTask->actorIndex, GRASS_KIND_ANIMS[kind], 1);
     actorIndex = grassTask->actorIndex;
     BlActSys_SetActorAnim(blact, actorIndex, 0);
     BlActSys_SetActorAnimating(blact, actorIndex, TRUE);
-    if (func_ov036_021a3abc(task) == FALSE) {
+    if (FieldEffects_GetObjectMode(task) == FALSE) {
         grassTask->state = 1;
     }
-    func_ov036_021a3a94(task);
+    FieldEffects_UpdateObject(task);
 }
 
 static void GrassTask_Delete(FieldEffectTask *task, void *work) {
@@ -230,7 +230,7 @@ static void GrassTask_Update(FieldEffectTask *task, void *work) {
 
             if (FldAct_CheckIdentity(actor, &grassTask->identity) == TRUE && !GrassTask_IsActorOnTile(grassTask) &&
                 GetActorMotionDir(actor) == 1) {
-                func_ov036_021a3a70(task);
+                FieldEffects_DeleteObject(task);
                 return;
             }
         }
@@ -241,7 +241,7 @@ static void GrassTask_Update(FieldEffectTask *task, void *work) {
     case 1:
         // Settle
         if (!FldAct_CheckIdentity(grassTask->params.actor, &grassTask->identity)) {
-            func_ov036_021a3a70(task);
+            FieldEffects_DeleteObject(task);
             return;
         }
         BlActSys_SetActorStep(blact, grassTask->actorIndex, GRASS_REST_STEPS[grassTask->params.kind]);
@@ -252,11 +252,11 @@ static void GrassTask_Update(FieldEffectTask *task, void *work) {
     case 3:
         // Stay until the actor leaves the tile
         if (!FldAct_CheckIdentity(grassTask->params.actor, &grassTask->identity)) {
-            func_ov036_021a3a70(task);
+            FieldEffects_DeleteObject(task);
             return;
         }
         if (!GrassTask_IsActorOnTile(grassTask)) {
-            func_ov036_021a3a70(task);
+            FieldEffects_DeleteObject(task);
         }
         break;
     }

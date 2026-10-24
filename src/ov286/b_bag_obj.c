@@ -258,7 +258,7 @@ void BBagObj_SetPage(BBagWork *wk, u8 page) {
 static void BBagObj_ShowPockets(BBagWork *wk) {
     if (wk->lastItem != 0) {
         BBagObj_LoadItemIcon(wk, wk->lastItem, 6, 6);
-        BBagObj_ShowAt(wk->actors[6], &data_ov286_021f6ec8);
+        BBagObj_ShowAt(wk->actors[BBAG_ACTOR_SHOWN_ITEM], &data_ov286_021f6ec8);
     }
     if (wk->param->mode == 2) {
         BBagObj_ShowFingerCursor(wk, 192, 24);
@@ -293,7 +293,7 @@ static void BBagObj_ShowItem(BBagWork *wk) {
     u16 item = BBagItem_GetSlotItem(wk, wk->param->rows[wk->pocket]);
 
     BBagObj_LoadItemIcon(wk, item, 6, 6);
-    BBagObj_ShowAt(wk->actors[6], &data_ov286_021f6ecc);
+    BBagObj_ShowAt(wk->actors[BBAG_ACTOR_SHOWN_ITEM], &data_ov286_021f6ecc);
     if (wk->param->mode == 1) {
         BBagObj_ShowCost(wk, BBAG_ACTOR_COST, BBagItem_GetShooterCost(item), 0, &data_ov286_021f6ed0);
     }

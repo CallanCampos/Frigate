@@ -3,6 +3,7 @@
 
 #include "types.h"
 #include "gfl/heap.h"
+#include "gfl/net_command.h"
 #include "gfl/net_handle.h"
 #include "struct_decls.h"
 
@@ -11,8 +12,8 @@
 
 // How the game set up the network: what net.c keeps from GFL_NetInit
 typedef struct {
-    // The game's commands, a NetCommand table
-    const void *commandTable;
+    // The game's commands
+    const NetCommand *commandTable;
     int commandNum;
     // Called when a machine disconnects
     void (*disconnectCallback)(void *work, int netId);
@@ -90,20 +91,30 @@ typedef struct {
 // The most machines that can connect
 #define GFL_NET_MACHINE_MAX 8
 
-// The kinds of connection: Wi-Fi through DWC, and the others through the wireless or infrared devices
-#define GFL_NET_TYPE_WIFI 1
-#define GFL_NET_TYPE_WIFI_LOBBY 2
-#define GFL_NET_TYPE_WIFI_GTS 6
+// The kinds of connection: the wireless, Wi-Fi through DWC, infrared, infrared that changes to the wireless once linked
+// (net_irc_wireless.c), and the wireless started for listening (WM_InitializeForListening), which is otherwise run as
+// the wireless is
+enum {
+    GFL_NET_TYPE_WIRELESS,
+    GFL_NET_TYPE_WIFI,
+    GFL_NET_TYPE_WIFI_LOBBY,
+    GFL_NET_TYPE_IRC,
+    GFL_NET_TYPE_IRC_WIRELESS,
+    GFL_NET_TYPE_WIRELESS_LISTEN,
+    GFL_NET_TYPE_WIFI_GTS,
+};
 
 // What the network device does, wireless or Wi-Fi; the code calls each through GFLNetSys
 typedef BOOL (*GFLNetRecvFunc)(u16 netId, u8 *data, u16 size);
+// Whether the infrared device links with a machine of the peer's game code
+typedef BOOL (*GFLNetPeerFilter)(int gameCode, int peerGameCode);
 typedef BOOL (*GFLNetSendDoneFunc)(BOOL ok);
 
 typedef struct {
     // Prepares the device before its heap is made (the Wi-Fi library's start)
     void (*prepare)(int a0, int a1);
     // Starts the device; the callback, which the wireless device calls when its helper ends, is NULL from the net
-    BOOL (*init)(HeapID heapId, void *sys, BOOL (*callback)(BOOL success), void *work);
+    BOOL (*init)(HeapID heapId, GFLNetSys *sys, BOOL (*callback)(BOOL success), void *work);
     BOOL (*start)(void (*callback)(BOOL ok));
     // Runs the device each frame with the connected machines, returning a negative error or a status
     int (*update)(u16 connectBits);
@@ -167,11 +178,11 @@ typedef struct {
     void (*holdScan)(int a0);
     // The infrared device's timeout, and its filter of the machines to link with
     void (*setTimeout)(int a0);
-    void (*setPeerFilter)(void *a0);
+    void (*setPeerFilter)(GFLNetPeerFilter filter);
 } GFLNetDevTable;
 
 // The network library's state, with a copy of the game's init data
-typedef struct {
+struct GFLNetSys {
     GFLNetInitData aNetInit;
     NetHandle handles[GFL_NET_HANDLE_MAX];
     const GFLNetDevTable *pDevTable;
@@ -183,7 +194,7 @@ typedef struct {
     // Whether a handle already negotiated may still be rejected
     u8 rejectNegotiated;
     u8 unk353;
-} GFLNetSys;
+};
 
 // The network error, which NetState_RecordError records
 typedef struct {
@@ -243,7 +254,7 @@ BOOL GFL_NetErrShutdown(void);
 void GFL_NetErrClear(void);
 // The state of the wireless connections, as bits: 0x2 a local wireless one, 0x3c the signal, 0x3c0 Wi-Fi
 u32 WihDwc_GetStatus(WifiList *wifiList);
-void *WihDwc_Create(int num, HeapID heapId);
+WihDwcWork *WihDwc_Create(int num, HeapID heapId);
 void WihDwc_Destroy(WihDwcWork *work);
 void WihDwc_TickTimers(void);
 void GFL_NetErrAbort(void);
@@ -283,7 +294,7 @@ void GFL_NetStartServer(void);
 void GFL_NetIwChangeoverConnect(void (*callback)(void *work), void (*a1)(void *work, BOOL a1), void (*a2)(void *work));
 void GFL_NetIwSetGameCommandBase(int a0);
 void GFL_NetIwGetCollectedMac(u8 *mac, int index);
-void GFL_NetIwSetPeerFilter(void *a0);
+void GFL_NetIwSetPeerFilter(GFLNetPeerFilter filter);
 void GFL_NetIwFree(void);
 void GFL_NetChangeoverConnect(void (*callback)(void *work));
 // The argument is unused
@@ -320,10 +331,10 @@ BOOL GFL_NetIsTimingRecv(NetHandle *handle, u16 timing);
 void GFL_NetSetGameCommandBase(u8 gameCommandBase, u8 unused);
 u8 GFL_NetGetGameCommandBase(void);
 // Whether the net game command base is one of the battle kinds
-BOOL func_02011844(void);
+BOOL GflNet_IsWifiGameKind(void);
 int GFL_NetGetUserData(void);
 int GFL_NetGetFriendData(void);
-u8 func_02042d80(void);
+u8 GflNet_GetFriendListNum(void);
 void GFL_NetSetMPSendEnabled(BOOL a0);
 // The game's work, which the callbacks get
 void *GFL_NetGetWork(void);
@@ -333,11 +344,11 @@ int GFL_NetGetMaxConnectNum(void);
 int GFL_NetGetMaxSendSize(void);
 u16 GFL_NetGetParentPacketSize(void);
 void GFL_NetNotifyChildConnect(void);
-void func_02042e30(int a0);
+void GflNet_CallErrorStateFunc(int a0);
 void GFL_NetNotifyError(int a0);
 GFLNetSys *GFL_NetGetSys(void);
 GFLNetInitData *GFL_NetGetInitData(void);
-void func_02042e94(u8 a0);
+void GflNet_SetAutoExit(u8 a0);
 void GFL_NetSetDisconnectError(BOOL a0);
 void *allocConfigDSSoftwareFeature(HeapID heapId, u32 size, const char *file, u16 line);
 void GFL_NetFreeAligned32(void *ptr);

@@ -20,15 +20,15 @@ struct HeightExList {
     HeightExEntry *entries;
 };
 
-GameEventReturnCode func_ov036_021ba6dc(GameEvent *event, u32 *state, void *data);
+GameEventReturnCode EventCommError_Run(GameEvent *event, u32 *state, void *data);
 BOOL func_ov036_021ba804(GameProc *proc, u32 *state, void *param, void *work);
 BOOL func_ov036_021ba808(GameProc *proc, u32 *state, void *param, void *work);
 BOOL func_ov036_021ba80c(GameProc *proc, u32 *state, void *param, void *work);
 
 const GameProcFunctions data_ov036_021d1760 = { func_ov036_021ba804, func_ov036_021ba808, func_ov036_021ba80c };
-GameEventReturnCode func_ov036_021ba77c(GameEvent *event, u32 *state, void *data);
+GameEventReturnCode EventCommError_RunCommExit(GameEvent *event, u32 *state, void *data);
 
-HeightExList *func_ov036_021ba5d0(u32 count, u8 heapId) {
+HeightExList *HeightEx_CreateTable(u32 count, u8 heapId) {
     u8 i = 0;
     HeightExList *list = GFL_HeapAllocate(heapId, sizeof(HeightExList), FALSE, "height_ex.c", 90);
 
@@ -40,7 +40,7 @@ HeightExList *func_ov036_021ba5d0(u32 count, u8 heapId) {
     return list;
 }
 
-void func_ov036_021ba624(u8 index, u32 x, u32 z, u32 width, u32 depth, u32 value, u32 flags, HeightExList *list) {
+void HeightEx_SetArea(u8 index, u32 x, u32 z, u32 width, u32 depth, u32 value, u32 flags, HeightExList *list) {
     if (index < list->count) {
         if (list->entries[index].inUse == FALSE) {
             list->entries[index].x = x;
@@ -59,22 +59,22 @@ void func_ov036_021ba670(HeightExList *list) {
     GFL_HeapFree(list);
 }
 
-u32 func_ov036_021ba684(HeightExList *list) {
+u32 HeightEx_GetAreaCount(HeightExList *list) {
     return list->count;
 }
 
-BOOL func_ov036_021ba688(s32 x, s32 z, HeightExList *list, u8 index) {
-    if (func_ov036_021ba594(x, z, &list->entries[index])) {
+BOOL HeightEx_IsPointInAreaAt(s32 x, s32 z, HeightExList *list, u8 index) {
+    if (HeightEx_IsPointInArea(x, z, &list->entries[index])) {
         return TRUE;
     }
     return FALSE;
 }
 
-u32 func_ov036_021ba6a4(u8 index, HeightExList *list) {
+u32 HeightEx_GetAreaHeight(u8 index, HeightExList *list) {
     return list->entries[index].value;
 }
 
-u32 func_ov036_021ba6b0(u8 index, HeightExList *list) {
+u32 HeightEx_GetAreaAttr(u8 index, HeightExList *list) {
     return list->entries[index].flags;
 }
 
@@ -82,11 +82,11 @@ void func_ov036_021ba6bc(u8 index, BOOL inUse, HeightExList *list) {
     list->entries[index].inUse = inUse;
 }
 
-GameEvent *func_ov036_021ba6c8(GameSystem *gsys, Field *field) {
-    return GameEvent_Create(gsys, NULL, func_ov036_021ba6dc, 0);
+GameEvent *EventCommError_Create(GameSystem *gsys, Field *field) {
+    return GameEvent_Create(gsys, NULL, EventCommError_Run, 0);
 }
 
-GameEventReturnCode func_ov036_021ba6dc(GameEvent *event, u32 *state, void *data) {
+GameEventReturnCode EventCommError_Run(GameEvent *event, u32 *state, void *data) {
     GameSystem *gsys = GameEvent_GetGameSystem(event);
     Field *field = GSYS_GetField(gsys);
     GameEvent *next;
@@ -99,7 +99,7 @@ GameEventReturnCode func_ov036_021ba6dc(GameEvent *event, u32 *state, void *data
                 GFL_NetErrMarkShown();
                 next = EventFieldSubprocessTransition_Create(gsys, field, OVERLAY_ID(36), &data_ov036_021d1760, gsys);
             } else {
-                next = GameEvent_Create(gsys, NULL, func_ov036_021ba77c, 0);
+                next = GameEvent_Create(gsys, NULL, EventCommError_RunCommExit, 0);
             }
         } else {
             GFL_NetErrMarkShown();
@@ -118,7 +118,7 @@ GameEventReturnCode func_ov036_021ba6dc(GameEvent *event, u32 *state, void *data
     return FALSE;
 }
 
-GameEventReturnCode func_ov036_021ba77c(GameEvent *event, u32 *state, void *data) {
+GameEventReturnCode EventCommError_RunCommExit(GameEvent *event, u32 *state, void *data) {
     GameSystem *gsys = GameEvent_GetGameSystem(event);
     GameCommSys *comm = GSYS_GetGameCommSystem(gsys);
     void *work;

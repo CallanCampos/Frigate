@@ -394,7 +394,7 @@ static GameEventReturnCode EventPokeList_Callback(GameEvent *event, u32 *state, 
     return GAMEEVENT_CONTINUE;
 }
 
-GameEvent *EventPokeList_Create(GameSystem *gsys, Field *field, PokeListParam *param, void *summaryParam) {
+GameEvent *EventPokeList_Create(GameSystem *gsys, Field *field, PokeListParam *param, PStatusParam *summaryParam) {
     GameEvent *event = GameEvent_Create(gsys, NULL, EventPokeList_Callback, sizeof(EventPokeListWork));
     EventPokeListWork *wk = GameEvent_GetData(event);
 

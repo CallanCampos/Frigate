@@ -45,7 +45,7 @@ BOOL s02F2_IsOneShotDRObtained(VM *vm, FieldScriptEnv *env);
 BOOL s00E2_SaveDataCheckRequired(VM *vm, FieldScriptEnv *env);
 BOOL s00E3_GiveRunningShoes(VM *vm, FieldScriptEnv *env);
 BOOL s00E4_BoxUnlockWallpapers(VM *vm, FieldScriptEnv *env);
-BOOL func_ov012_02155d30(VM *vm, FieldScriptEnv *env);
+BOOL FieldScriptEnv_CmdGetTrainerViewGroupAndMarkSeen(VM *vm, FieldScriptEnv *env);
 BOOL s00E6_StartMenuIsItemUnlocked(VM *vm, FieldScriptEnv *env);
 BOOL s00E7_StartMenuUnlockItem(VM *vm, FieldScriptEnv *env);
 BOOL s00E8_StartMenuIsItemSelected(VM *vm, FieldScriptEnv *env);

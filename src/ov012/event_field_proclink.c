@@ -40,7 +40,7 @@
 #include "system/game_system.h"
 
 // clang-format off
-const FieldProcLink FIELD_PROC_LINK_LIST[15] = {
+const FieldProcLink FIELD_PROC_LINK_LIST[FIELD_APP_MAX] = {
     { OVERLAY_ID(165), &POKELIST_PROC_FUNCTIONS, FieldAppCall_CreatePokeListParam, FieldAppCall_GetPokeListResult, NULL, FieldProcLink_FreeParam },
     { OVERLAY_ID(302), &ZUKAN_PROC_FUNCTIONS, FieldAppCall_CreateZukanParam, FieldAppCall_GetZukanResult, NULL, FieldProcLink_FreeParam },
     { OVERLAY_ID(142), &BAG_PROC_FUNCTIONS, FieldAppCall_CreateBagParam, FieldAppCall_GetBagResult, NULL, FieldProcLink_FreeParam },
@@ -217,7 +217,7 @@ void EventFieldAppCall_ConvAppResultToEventType(u32 result, u32 *eventType) {
 void FieldAppCall_ClearBagFreeSpaceFilter(FieldAppCallWork *work) {
     GameSystem *gsys = work->input->gameSystem;
     GameData *gameData = GSYS_GetGameData(gsys);
-    void *data = GameData_GetBagCursor(gameData);
+    BagCursor *data = GameData_GetBagCursor(gameData);
 
     BagCursor_SetFreeSpaceFilter(data, 0);
 }
@@ -266,7 +266,7 @@ void *FieldAppCall_CreatePokeListParam(FieldAppCallWork *work, s32 appParam, s32
     param->move = 0;
     param->unk6E = 0xff;
     param->zoneId = GameData_GetPlayerState(gameData)->zoneId;
-    if (GameData_IsShortcutRegistered(gameData, 0x1e) == TRUE) {
+    if (GameData_IsShortcutRegistered(gameData, SHORTCUT_POKELIST) == TRUE) {
         param->keyItemRegistered = TRUE;
     } else {
         param->keyItemRegistered = FALSE;
@@ -377,9 +377,9 @@ u32 FieldAppCall_GetPokeListResult(FieldAppCallWork *work, void *data) {
     }
     gameData = GSYS_GetGameData(work->input->gameSystem);
     if (param->keyItemRegistered == TRUE) {
-        GameData_SetKeyItemRegistration(gameData, 0x1e, TRUE);
+        GameData_SetKeyItemRegistration(gameData, SHORTCUT_POKELIST, TRUE);
     } else {
-        GameData_SetKeyItemRegistration(gameData, 0x1e, FALSE);
+        GameData_SetKeyItemRegistration(gameData, SHORTCUT_POKELIST, FALSE);
     }
     switch (param->result) {
     case 0:
@@ -428,7 +428,7 @@ u32 FieldAppCall_GetPokeListResult(FieldAppCallWork *work, void *data) {
         work->input->eventId = param->result - 11;
         return 2;
     case 15:
-        work->nextAppId = 8;
+        work->nextAppId = FIELD_APP_TOWNMAP;
         return FIELD_APP_RESULT_NEXT;
     }
     return 1;
@@ -631,34 +631,34 @@ u32 FieldAppCall_GetBagResult(FieldAppCallWork *work, void *data) {
         return FIELD_APP_RESULT_NEXT;
     case 10:
     case 11:
-        work->input->eventId = 0;
+        work->input->eventId = FIELD_COMMON_EVENT_CYCLING;
         return 3;
     case 13:
-        work->input->eventId = 1;
+        work->input->eventId = FIELD_COMMON_EVENT_ENTRALINK;
         return 3;
     case 15:
-        work->input->eventId = 3;
+        work->input->eventId = FIELD_COMMON_EVENT_SWEET_SCENT;
         return 3;
     case 16:
-        work->input->eventId = 4;
+        work->input->eventId = FIELD_COMMON_EVENT_FISHING;
         return 3;
     case 14:
-        work->input->eventId = 2;
+        work->input->eventId = FIELD_COMMON_EVENT_ESCAPE_ROPE;
         return 3;
     case 8:
-        work->nextAppId = 9;
+        work->nextAppId = FIELD_APP_WIFI_NOTE;
         return FIELD_APP_RESULT_NEXT;
     case 7:
-        work->nextAppId = 8;
+        work->nextAppId = FIELD_APP_TOWNMAP;
         return FIELD_APP_RESULT_NEXT;
     case 22:
-        work->nextAppId = 14;
+        work->nextAppId = FIELD_APP_MEDALBOX;
         return FIELD_APP_RESULT_NEXT;
     case 17:
-        work->nextAppId = 12;
+        work->nextAppId = FIELD_APP_BATTLE_RECORDER;
         return FIELD_APP_RESULT_NEXT;
     case 21:
-        work->nextAppId = 13;
+        work->nextAppId = FIELD_APP_XTRANSCEIVER;
         return FIELD_APP_RESULT_NEXT;
     case 19:
         work->nextAppId = FIELD_APP_MAIL;
@@ -674,7 +674,7 @@ u32 FieldAppCall_GetBagResult(FieldAppCallWork *work, void *data) {
         work->subMode = 2;
         return FIELD_APP_RESULT_NEXT;
     case 20:
-        work->input->eventId = 5;
+        work->input->eventId = FIELD_COMMON_EVENT_DOWSING;
         return 3;
     case 2:
         if (PML_ItemIsMail(param->item) == TRUE) {
@@ -741,7 +741,7 @@ void *FieldAppCall_CreateTownMapParam(FieldAppCallWork *work, s32 appParam, s32 
 u32 FieldAppCall_GetTownMapResult(FieldAppCallWork *work, void *data) {
     TownMapParam *param = data;
 
-    if (work->input->appId == 8) {
+    if (work->input->appId == FIELD_APP_TOWNMAP) {
         switch (param->result) {
         case TOWNMAP_RESULT_RETURN:
             return 0;
@@ -819,7 +819,7 @@ void *FieldAppCall_CreateWifiNoteParam(FieldAppCallWork *work, s32 appParam, s32
 u32 FieldAppCall_GetWifiNoteResult(FieldAppCallWork *work, void *data) {
     WifiNoteParam *param = data;
 
-    if (work->input->appId == 9) {
+    if (work->input->appId == FIELD_APP_WIFI_NOTE) {
         switch (param->result) {
         case WIFI_NOTE_RESULT_RETURN:
             return 0;
@@ -973,7 +973,7 @@ void *FieldAppCall_CreateBattleRecorderParam(FieldAppCallWork *work, s32 appPara
 u32 FieldAppCall_GetBattleRecorderResult(FieldAppCallWork *work, void *data) {
     BattleRecorderParam *param = data;
 
-    if (work->input->appId == 12) {
+    if (work->input->appId == FIELD_APP_BATTLE_RECORDER) {
         switch (param->result) {
         case 0:
             return 0;
@@ -1006,7 +1006,7 @@ void *FieldAppCall_CreateXtransceiverParam(FieldAppCallWork *work, s32 appParam,
 }
 
 u32 FieldAppCall_GetXtransceiverResult(FieldAppCallWork *work, void *param) {
-    if (work->input->appId == 13) {
+    if (work->input->appId == FIELD_APP_XTRANSCEIVER) {
         return 0;
     }
     work->nextAppId = FIELD_APP_BAG;
@@ -1024,7 +1024,7 @@ void *FieldAppCall_CreateMedalBoxParam(FieldAppCallWork *work, s32 appParam, s32
 u32 FieldAppCall_GetMedalBoxResult(FieldAppCallWork *work, void *data) {
     MedalBoxParam *param = data;
 
-    if (work->input->appId == 14) {
+    if (work->input->appId == FIELD_APP_MEDALBOX) {
         switch (param->result) {
         case MEDALBOX_RESULT_RETURN:
             return 0;

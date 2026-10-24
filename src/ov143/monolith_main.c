@@ -323,8 +323,8 @@ static void Monolith_FreePaletteFade(MonolithWork *wk) {
 static void Monolith_CreateBGs(void) {
     int i;
 
-    GFL_BGSysCreateBG(MONOLITH_BG_MAIN, &sMonolithBGSetupMain, 0);
-    GFL_BGSysCreateBG(MONOLITH_BG_SUB, &sMonolithBGSetupSub, 0);
+    GFL_BGSysCreateBG(MONOLITH_BG_MAIN, &sMonolithBGSetupMain, BGMODE_TEXT);
+    GFL_BGSysCreateBG(MONOLITH_BG_SUB, &sMonolithBGSetupSub, BGMODE_TEXT);
     GFL_BGSysFillScrArea(MONOLITH_BG_MAIN, 0, 0, 0, 32, 32, 17);
     GFL_BGSysFillScrArea(MONOLITH_BG_SUB, 0, 0, 0, 32, 32, 17);
     // Every BG of both engines

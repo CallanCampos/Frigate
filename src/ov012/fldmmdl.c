@@ -225,7 +225,7 @@ static void FldActSys_FreeFieldResources(MMSys *system) {
 }
 
 void FldActSys_DetachField(MMSys *system) {
-    func_ov036_0218ed18(system);
+    FieldAcmdTCB_DeleteDrawSys(system);
     system->cameraAngle = NULL;
     FldActSys_FreeFieldResources(system);
 }
@@ -487,7 +487,7 @@ static void FldAct_InitMoveProc(MMSys *system, FieldActor *actor) {
     if (!CheckActorFlag(actor, 0x2000)) {
         FldAct_InitMoveProcGrid(actor);
     } else {
-        func_ov036_02194924(actor);
+        RailActor_InitMove(actor);
     }
 }
 
@@ -495,7 +495,7 @@ static void FldAct_UpdateMoveProc(FieldActor *actor) {
     if (!CheckActorFlag(actor, 0x2000)) {
         FldAct_UpdateMoveProcGrid(actor);
     } else {
-        func_ov036_02194938(actor);
+        RailActor_UpdateMove(actor);
     }
 }
 
@@ -555,7 +555,7 @@ static void FldAct_UpdateTask(TCB *tcb, void *data) {
 
 static void FldAct_UpdateDraw(FieldActor *actor) {
     if (FldActSys_IsDrawInited(GetActorMModelSystem(actor)) == TRUE) {
-        func_ov036_0218ed44(actor);
+        FieldAcmdTCB_DrawIfInitialized(actor);
     }
 }
 
@@ -652,19 +652,19 @@ ArcTool *GetMMSysDataArcHandle(MMSys *system) {
     return system->dataArc;
 }
 
-void FldActSys_BindFieldBlAct(MMSys *system, void *fieldBlAct) {
+void FldActSys_BindFieldBlAct(MMSys *system, FieldBlAct *fieldBlAct) {
     system->fieldBlAct = fieldBlAct;
 }
 
-void *FldActSys_GetFieldBlAct(MMSys *system) {
+FieldBlAct *FldActSys_GetFieldBlAct(MMSys *system) {
     return system->fieldBlAct;
 }
 
-void FldActSys_BindActorG3DSystem(MMSys *system, void *actorG3DSystem) {
+void FldActSys_BindActorG3DSystem(MMSys *system, ActorG3DSystem *actorG3DSystem) {
     system->actorG3DSystem = actorG3DSystem;
 }
 
-void *FldActSys_GetActorG3DSystem(MMSys *system) {
+ActorG3DSystem *FldActSys_GetActorG3DSystem(MMSys *system) {
     return system->actorG3DSystem;
 }
 
@@ -889,25 +889,25 @@ void *GetNPCRailPosPtrAddr(FieldActor *actor) {
     return &actor->defaultRailPos;
 }
 
-void *func_ov012_02167120(FieldActor *actor, u32 size) {
-    void *block = func_ov012_02167138(actor);
+void *FldAct_InitMoveSubProcWork(FieldActor *actor, u32 size) {
+    void *block = FldAct_GetMoveSubProcWork(actor);
 
     MI_CpuFill8(block, 0, size);
     return block;
 }
 
-void *func_ov012_02167138(FieldActor *actor) {
+void *FldAct_GetMoveSubProcWork(FieldActor *actor) {
     return actor->unkA4;
 }
 
-void *func_ov012_0216713c(FieldActor *actor, u32 size) {
-    void *block = func_ov012_02167154(actor);
+void *FldAct_InitMoveCmdWork(FieldActor *actor, u32 size) {
+    void *block = FldAct_GetMoveCmdWork(actor);
 
     MI_CpuFill8(block, 0, size);
     return block;
 }
 
-void *func_ov012_02167154(FieldActor *actor) {
+void *FldAct_GetMoveCmdWork(FieldActor *actor) {
     return actor->unkB4;
 }
 
@@ -1139,7 +1139,7 @@ void FldAct_SetAttrDrawOffset(FieldActor *actor, const VecFx32 *offset) {
     actor->unk68 = *offset;
 }
 
-void *FldAct_GetFieldBlAct(FieldActor *actor) {
+FieldBlAct *FldAct_GetFieldBlAct(FieldActor *actor) {
     return FldActSys_GetFieldBlAct(GetActorMModelSystem(actor));
 }
 
@@ -1401,7 +1401,7 @@ BOOL FldAct_IsSplashed(FieldActor *actor) {
     return FALSE;
 }
 
-BOOL func_ov012_021676f0(FieldActor *actor) {
+BOOL FldAct_CheckStatusBitAttrOffsetOff(FieldActor *actor) {
     if (CheckActorFlag(actor, 0x1000)) {
         return TRUE;
     }
@@ -1460,7 +1460,7 @@ BOOL FldAct_IsMapAttrDisabled(FieldActor *actor) {
     return FALSE;
 }
 
-void func_ov012_021677bc(FieldActor *actor, BOOL value) {
+void FldAct_SetMoveBitAttrEffectOff(FieldActor *actor, BOOL value) {
     if (value == TRUE) {
         SetActorMovementFlag(actor, 0x100000);
     } else {

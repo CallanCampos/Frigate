@@ -199,7 +199,7 @@ GameEvent *EventGameClear_Create(GameSystem *gsys, u32 param) {
     work->counter = 0;
     work->ov295Param.gsys = gsys;
     work->ov295Param.param = param;
-    func_ov012_02159220(gameData);
+    EncountSave_SpawnPendingEntries(gameData);
     SetGameClearGameData(work);
     SetGameClearStaffRollParam(work);
     work->unovaLinkParam.gameData = gameData;

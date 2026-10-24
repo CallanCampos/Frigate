@@ -4,12 +4,12 @@ GimmickPlasmaFrigateDeck_Update kind:function(thumb,size=0xe) addr:0x021eed0c
 PlasmaFrigateDeck_LoadObjects kind:function(thumb,size=0xa4) addr:0x021eed1c
 PlasmaFrigateDeck_FreeObjects kind:function(thumb,size=0xc) addr:0x021eedc0
 PlasmaFrigateDeck_StepAnimations kind:function(thumb,size=0xc) addr:0x021eedcc
-data_ov118_021eed98 kind:data(any) addr:0x021eedd8
+sSceneSetup kind:data(any) addr:0x021eedd8
 data_ov118_021eed9d kind:data(any) addr:0x021eeddd ambiguous
 data_ov118_021eeda5 kind:data(any) addr:0x021eede5 ambiguous
-data_ov118_021eeda8 kind:data(any) addr:0x021eede8
+sResources kind:data(any) addr:0x021eede8
 data_ov118_021eedb5 kind:data(any) addr:0x021eedf5 ambiguous
 data_ov118_021eedb9 kind:data(any) addr:0x021eedf9 ambiguous
-data_ov118_021eedc0 kind:data(any) addr:0x021eee00
+sActors kind:data(any) addr:0x021eee00
 data_ov118_021eedd9 kind:data(any) addr:0x021eee19 ambiguous
 data_ov118_021eeddd kind:data(any) addr:0x021eee1d ambiguous

@@ -45,16 +45,24 @@ struct FieldAppCallInput {
 };
 
 // The apps of FIELD_PROC_LINK_LIST, by index
-#define FIELD_APP_POKELIST 0
-#define FIELD_APP_ZUKAN 1
-#define FIELD_APP_BAG 2
-#define FIELD_APP_TRAINER_CARD 3
-#define FIELD_APP_SAVE 4
-#define FIELD_APP_CONFIG 5
-#define FIELD_APP_INF_DUNGEON_RETIRE 6
-#define FIELD_APP_POKESTATUS 7
-#define FIELD_APP_MAIL 10
-#define FIELD_APP_SHINKA_DEMO 11
+enum {
+    FIELD_APP_POKELIST,
+    FIELD_APP_ZUKAN,
+    FIELD_APP_BAG,
+    FIELD_APP_TRAINER_CARD,
+    FIELD_APP_SAVE,
+    FIELD_APP_CONFIG,
+    FIELD_APP_INF_DUNGEON_RETIRE,
+    FIELD_APP_POKESTATUS,
+    FIELD_APP_TOWNMAP,
+    FIELD_APP_WIFI_NOTE,
+    FIELD_APP_MAIL,
+    FIELD_APP_SHINKA_DEMO,
+    FIELD_APP_BATTLE_RECORDER,
+    FIELD_APP_XTRANSCEIVER,
+    FIELD_APP_MEDALBOX,
+    FIELD_APP_MAX,
+};
 
 // The results of an app: 4 opens nextApp, the others are event types for EventFieldAppCall_ConvAppResultToEventType
 #define FIELD_APP_RESULT_NEXT 4
@@ -96,7 +104,7 @@ typedef struct {
     void (*freeParam)(void *param);
 } FieldProcLink;
 
-extern const FieldProcLink FIELD_PROC_LINK_LIST[15];
+extern const FieldProcLink FIELD_PROC_LINK_LIST[FIELD_APP_MAX];
 
 void *FieldAppCall_CreatePokeListParam(FieldAppCallWork *work, s32 appParam, s32 prevAppId, const void *prevParam);
 u32 FieldAppCall_GetPokeListResult(FieldAppCallWork *work, void *param);

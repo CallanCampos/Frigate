@@ -25,22 +25,22 @@
 #define HYBRID_GRID 0
 #define HYBRID_RAIL 1
 
-void func_ov036_0219e434(FieldmapCtrlHybrid *controller, Field *field);
-void func_ov036_0219e5cc(Field *field, FieldmapCtrlHybrid *controller);
-void func_ov036_0219e680(Field *field, FieldmapCtrlHybrid *controller);
-void func_ov036_0219e740(Field *field, FieldmapCtrlHybrid *controller, u16 dir, BOOL keyDir,
-                         const RailPosition *railPos, u32 pressedKeys, u32 heldKeys);
-void func_ov036_0219e79c(Field *field, FieldmapCtrlHybrid *controller, u16 dir, BOOL keyDir, const VecFx32 *pos,
-                         u32 pressedKeys, u32 heldKeys);
-BOOL func_ov036_0219e808(Field *field, FieldmapCtrlHybrid *controller, VecFx32 *pos, u16 dir);
-BOOL func_ov036_0219e854(Field *field, FieldmapCtrlHybrid *controller, RailPosition *railPos, u16 dir);
-void func_ov036_0219e8c8(Field *field, FieldmapCtrlHybrid *controller, u32 type, const void *pos, u16 dir, u16 a5,
-                         u16 a6);
+void FieldmapCtrlHybrid_ReplacePlayer(FieldmapCtrlHybrid *controller, Field *field);
+void FieldmapCtrlHybrid_UpdateGrid(Field *field, FieldmapCtrlHybrid *controller);
+void FieldmapCtrlHybrid_UpdateNogrid(Field *field, FieldmapCtrlHybrid *controller);
+void FieldmapCtrlHybrid_SwitchToNogrid(Field *field, FieldmapCtrlHybrid *controller, u16 dir, BOOL keyDir,
+                                       const RailPosition *railPos, u32 pressedKeys, u32 heldKeys);
+void FieldmapCtrlHybrid_SwitchToGrid(Field *field, FieldmapCtrlHybrid *controller, u16 dir, BOOL keyDir,
+                                     const VecFx32 *pos, u32 pressedKeys, u32 heldKeys);
+BOOL FieldmapCtrlHybrid_FindGridPos(Field *field, FieldmapCtrlHybrid *controller, VecFx32 *pos, u16 dir);
+BOOL FieldmapCtrlHybrid_FindRailLocation(Field *field, FieldmapCtrlHybrid *controller, RailPosition *railPos, u16 dir);
+void FieldmapCtrlHybrid_SetMode(Field *field, FieldmapCtrlHybrid *controller, u32 type, const void *pos, u16 dir,
+                                u16 a5, u16 a6);
 
 // The update of each controller type
 static void (*sUpdateFuncs[2])(Field *field, FieldmapCtrlHybrid *controller) = {
-    func_ov036_0219e5cc,
-    func_ov036_0219e680,
+    FieldmapCtrlHybrid_UpdateGrid,
+    FieldmapCtrlHybrid_UpdateNogrid,
 };
 
 // The player's actor on the grid, whose object code is filled in
@@ -51,17 +51,17 @@ u32 FieldmapCtrlHybrid_GetActiveTypeID(FieldmapCtrlHybrid *controller) {
 }
 
 // Moves the player to the other kind of movement where it stands, if it can
-void func_ov036_0219e434(FieldmapCtrlHybrid *controller, Field *field) {
+void FieldmapCtrlHybrid_ReplacePlayer(FieldmapCtrlHybrid *controller, Field *field) {
     u16 dir = GetActorFaceDir(FieldPlayer_GetActor(controller->player));
     RailPosition railPos;
     VecFx32 pos;
 
     if (controller->activeType == HYBRID_GRID) {
-        if (func_ov036_0219e854(field, controller, &railPos, dir)) {
-            func_ov036_0219e740(field, controller, dir, FALSE, &railPos, 0, 0);
+        if (FieldmapCtrlHybrid_FindRailLocation(field, controller, &railPos, dir)) {
+            FieldmapCtrlHybrid_SwitchToNogrid(field, controller, dir, FALSE, &railPos, 0, 0);
         }
-    } else if (func_ov036_0219e808(field, controller, &pos, dir)) {
-        func_ov036_0219e79c(field, controller, dir, FALSE, &pos, 0, 0);
+    } else if (FieldmapCtrlHybrid_FindGridPos(field, controller, &pos, dir)) {
+        FieldmapCtrlHybrid_SwitchToGrid(field, controller, dir, FALSE, &pos, 0, 0);
     }
     controller->unk08 = 0;
 }
@@ -82,18 +82,18 @@ void FieldmapCtrlHybrid_Create(Field *field, VecFx32 *pos, u16 dir) {
     isRail = PlayerState_IsRail(playerState);
     controller->activeType = 2;
     actor = FieldPlayer_GetActor(controller->player);
-    func_ov036_0219634c(actor, &a5, &a6);
+    RailActorAnim_GetBlactAnime(actor, &a5, &a6);
     if (isRail == FALSE) {
         FieldPlayer_InitGrid(controller->player, heapId);
-        func_ov036_0219accc(controller->player, heapId);
+        FieldPlayer_CreateNogrid(controller->player, heapId);
         FieldPlayer_SetDirection(controller->player, dir);
-        func_ov036_0219e8c8(field, controller, isRail, pos, dir, a5, a6);
+        FieldmapCtrlHybrid_SetMode(field, controller, isRail, pos, dir, a5, a6);
     } else {
         railPos = PlayerState_GetRailPos(playerState);
-        func_ov036_0219accc(controller->player, heapId);
+        FieldPlayer_CreateNogrid(controller->player, heapId);
         FieldPlayer_InitGrid(controller->player, heapId);
         FieldPlayer_SetDirection(controller->player, dir);
-        func_ov036_0219e8c8(field, controller, isRail, railPos, dir, a5, a6);
+        FieldmapCtrlHybrid_SetMode(field, controller, isRail, railPos, dir, a5, a6);
     }
     Field_SetPlayerPosPtr(field, GetMModelWPosPtr(actor));
     FieldPlayer_GetWPos(controller->player, pos);
@@ -115,7 +115,7 @@ VecFx32 *FieldmapCtrlHybrid_GetPos(Field *field) {
 }
 
 // On the grid: walks onto a rail when the player walks against a wall from a rail's tile
-void func_ov036_0219e5cc(Field *field, FieldmapCtrlHybrid *controller) {
+void FieldmapCtrlHybrid_UpdateGrid(Field *field, FieldmapCtrlHybrid *controller) {
     u32 pressedKeys = GCTX_HIDGetPressedKeys();
     u32 heldKeys = GCTX_HIDGetHeldKeys();
     u32 flags = 0;
@@ -125,13 +125,13 @@ void func_ov036_0219e5cc(Field *field, FieldmapCtrlHybrid *controller) {
     u32 tileAhead;
     RailPosition railPos;
 
-    if ((IsAllActorAcmdFinished(actor) == TRUE || func_ov036_0219a5dc(controller->player) == TRUE) &&
+    if ((IsAllActorAcmdFinished(actor) == TRUE || FieldPlayer_CheckMoveBusy(controller->player) == TRUE) &&
         dir != MOVE_DIR_NONE) {
         tileUnder = FieldPlayer_GetTileTypeUnder(controller->player);
         tileAhead = FieldPlayer_GetTileTypeInDir(controller->player, dir);
-        if (func_ov036_021b3b54(GetTileClass(tileUnder)) && MapTile_BlocksCollision(tileAhead) &&
-            func_ov036_0219e854(field, controller, &railPos, dir)) {
-            func_ov036_0219e740(field, controller, dir, TRUE, &railPos, pressedKeys, heldKeys);
+        if (FieldRailTilemap_IsJumpStart(GetTileClass(tileUnder)) && MapTile_BlocksCollision(tileAhead) &&
+            FieldmapCtrlHybrid_FindRailLocation(field, controller, &railPos, dir)) {
+            FieldmapCtrlHybrid_SwitchToNogrid(field, controller, dir, TRUE, &railPos, pressedKeys, heldKeys);
             return;
         }
     }
@@ -142,7 +142,7 @@ void func_ov036_0219e5cc(Field *field, FieldmapCtrlHybrid *controller) {
 }
 
 // On a rail: steps off onto the grid the same way
-void func_ov036_0219e680(Field *field, FieldmapCtrlHybrid *controller) {
+void FieldmapCtrlHybrid_UpdateNogrid(Field *field, FieldmapCtrlHybrid *controller) {
     u32 pressedKeys = GCTX_HIDGetPressedKeys();
     u32 heldKeys = GCTX_HIDGetHeldKeys();
     FieldActor *actor = FieldPlayer_GetActor(controller->player);
@@ -159,49 +159,49 @@ void func_ov036_0219e680(Field *field, FieldmapCtrlHybrid *controller) {
         dir = GetActorMotionDir(actor);
         keyDir = FALSE;
     }
-    if ((IsAllActorAcmdFinished(actor) == TRUE || func_ov036_0219a5dc(controller->player) == TRUE) &&
+    if ((IsAllActorAcmdFinished(actor) == TRUE || FieldPlayer_CheckMoveBusy(controller->player) == TRUE) &&
         dir != MOVE_DIR_NONE) {
         tileUnder = FieldPlayer_GetTileTypeUnder(controller->player);
         tileAhead = FieldPlayer_GetTileTypeInDir(controller->player, dir);
-        if (func_ov036_021b3b54(GetTileClass(tileUnder)) && MapTile_BlocksCollision(tileAhead) &&
-            func_ov036_0219e808(field, controller, &pos, dir)) {
-            func_ov036_0219e79c(field, controller, dir, keyDir, &pos, pressedKeys, heldKeys);
+        if (FieldRailTilemap_IsJumpStart(GetTileClass(tileUnder)) && MapTile_BlocksCollision(tileAhead) &&
+            FieldmapCtrlHybrid_FindGridPos(field, controller, &pos, dir)) {
+            FieldmapCtrlHybrid_SwitchToGrid(field, controller, dir, keyDir, &pos, pressedKeys, heldKeys);
             controller->unk08 = 0;
             return;
         }
     }
-    controller->unk08 = func_ov036_0219ad00(controller->player);
+    controller->unk08 = FieldPlayer_IsNogridForcedMove(controller->player);
     FieldPlayer_UpdateRailMovement(controller->player, pressedKeys, heldKeys);
 }
 
-void func_ov036_0219e740(Field *field, FieldmapCtrlHybrid *controller, u16 dir, BOOL keyDir,
-                         const RailPosition *railPos, u32 pressedKeys, u32 heldKeys) {
+void FieldmapCtrlHybrid_SwitchToNogrid(Field *field, FieldmapCtrlHybrid *controller, u16 dir, BOOL keyDir,
+                                       const RailPosition *railPos, u32 pressedKeys, u32 heldKeys) {
     FieldActor *actor = FieldPlayer_GetActor(controller->player);
     u16 a6;
     u16 a5;
 
-    func_ov036_0219634c(actor, &a5, &a6);
+    RailActorAnim_GetBlactAnime(actor, &a5, &a6);
     FieldPlayer_UpdateGridMovement(controller->player, 0, 0, 0);
     if (!keyDir) {
         dir = GetActorFaceDir(actor);
     }
-    func_ov036_0219e8c8(field, controller, HYBRID_RAIL, railPos, dir, a5, a6);
+    FieldmapCtrlHybrid_SetMode(field, controller, HYBRID_RAIL, railPos, dir, a5, a6);
     FieldPlayer_UpdateRailMovement(controller->player, pressedKeys, heldKeys);
 }
 
-void func_ov036_0219e79c(Field *field, FieldmapCtrlHybrid *controller, u16 dir, BOOL keyDir, const VecFx32 *pos,
-                         u32 pressedKeys, u32 heldKeys) {
+void FieldmapCtrlHybrid_SwitchToGrid(Field *field, FieldmapCtrlHybrid *controller, u16 dir, BOOL keyDir,
+                                     const VecFx32 *pos, u32 pressedKeys, u32 heldKeys) {
     u32 flags = 0;
     FieldActor *actor = FieldPlayer_GetActor(controller->player);
     u16 a6;
     u16 a5;
 
-    func_ov036_0219634c(actor, &a5, &a6);
+    RailActorAnim_GetBlactAnime(actor, &a5, &a6);
     FieldPlayer_UpdateRailMovement(controller->player, 0, 0);
     if (!keyDir) {
         dir = GetActorFaceDir(actor);
     }
-    func_ov036_0219e8c8(field, controller, HYBRID_GRID, pos, dir, a5, a6);
+    FieldmapCtrlHybrid_SetMode(field, controller, HYBRID_GRID, pos, dir, a5, a6);
     if (FieldPlayer_CheckRunningShoesFlag(controller->player) == TRUE) {
         flags |= 1;
     }
@@ -209,7 +209,7 @@ void func_ov036_0219e79c(Field *field, FieldmapCtrlHybrid *controller, u16 dir, 
 }
 
 // Whether the grid tile in the direction is free, with the player's position
-BOOL func_ov036_0219e808(Field *field, FieldmapCtrlHybrid *controller, VecFx32 *pos, u16 dir) {
+BOOL FieldmapCtrlHybrid_FindGridPos(Field *field, FieldmapCtrlHybrid *controller, VecFx32 *pos, u16 dir) {
     FieldG3DMapper *mapper = Field_GetG3DMapper(field);
     VecFx32 ahead;
 
@@ -223,7 +223,7 @@ BOOL func_ov036_0219e808(Field *field, FieldmapCtrlHybrid *controller, VecFx32 *
 }
 
 // Whether there is a rail where the player stands, and where on it
-BOOL func_ov036_0219e854(Field *field, FieldmapCtrlHybrid *controller, RailPosition *railPos, u16 dir) {
+BOOL FieldmapCtrlHybrid_FindRailLocation(Field *field, FieldmapCtrlHybrid *controller, RailPosition *railPos, u16 dir) {
     FieldRailSystem *rail = FieldNoGridMapper_GetRailSystem(Field_GetNoGridMapper(field));
     VecFx32 hit;
     VecFx32 pos;
@@ -239,15 +239,15 @@ BOOL func_ov036_0219e854(Field *field, FieldmapCtrlHybrid *controller, RailPosit
     pos.y -= FX32_CONST(4);
     result = CalculateRailCurves(rail, &pos, &top, &found, &hit);
     if (result) {
-        result = func_ov036_021b068c(rail, &found, ConvDirToRailDir(dir), &next);
+        result = FieldRailSystem_TryStepLocation(rail, &found, ConvDirToRailDir(dir), &next);
     }
     *railPos = found;
     return result;
 }
 
 // Switches the player to the controller type at the position, a VecFx32 for the grid and a RailPosition for a rail
-void func_ov036_0219e8c8(Field *field, FieldmapCtrlHybrid *controller, u32 type, const void *pos, u16 dir, u16 a5,
-                         u16 a6) {
+void FieldmapCtrlHybrid_SetMode(Field *field, FieldmapCtrlHybrid *controller, u32 type, const void *pos, u16 dir,
+                                u16 a5, u16 a6) {
     NoGridMapper *mapper = Field_GetNoGridMapper(field);
     FieldCamera *camera = Field_GetCameraSystem(field);
     FieldActor *actor;
@@ -265,7 +265,7 @@ void func_ov036_0219e8c8(Field *field, FieldmapCtrlHybrid *controller, u32 type,
         vec = pos;
         position = *vec;
         sGridPlayer.modelId = FldAct_GetObjCode(actor);
-        func_ov036_0219acf4(controller->player);
+        FieldPlayer_ResetNogrid(controller->player);
         FldAct_Transplant(actor, &sGridPlayer);
         SetActorGPos(actor, FX_Whole(position.x) / 16, FX_Whole(position.y) / 16, FX_Whole(position.z) / 16, dir);
         CopyActorWPos(actor, &position);
@@ -275,12 +275,12 @@ void func_ov036_0219e8c8(Field *field, FieldmapCtrlHybrid *controller, u32 type,
         FieldCamera_ResetBind(camera);
         FieldCamera_LoadDefaults(camera);
     } else {
-        func_ov036_0219ace8(controller->player, pos);
-        FieldNoGridMapper_SetCameraParent(mapper, func_ov036_0219ad0c(controller->player));
+        FieldPlayer_AttachNogridMmdl(controller->player, pos);
+        FieldNoGridMapper_SetCameraParent(mapper, FieldPlayer_GetNogridRailWork(controller->player));
         FieldCamera_EnableDelay(camera);
     }
     CheckSetActorFaceDir(actor, dir);
     SetActorMotionDir(actor, dir);
-    func_ov036_021963a4(actor, a5, a6);
+    RailActorAnim_SetBlactAnime(actor, a5, a6);
     controller->activeType = type;
 }

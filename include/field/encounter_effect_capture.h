@@ -13,7 +13,7 @@
 // The file's name is a guess, since the overlay has no strings
 
 // The event's data, which the effects' render functions get back from EncEff_GetEventData
-typedef struct {
+struct EncEffCaptureWork {
     // How many times the screen has flashed white
     s32 flashes;
     u32 texBanks;
@@ -29,7 +29,7 @@ typedef struct {
     void *effectWork;
     GameEvent *(*init)(GameSystem *gsys);
     void (*render)(EncEffGrid *grid);
-} EncEffCaptureWork;
+};
 
 // The event of an effect without the flashes: init makes the effect's event, and render draws it. The event with two
 // white flashes first, EncEffCapture_CreateFlashEvent, and the draw function, EncEffCapture_Draw, are declared in

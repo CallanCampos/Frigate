@@ -62,7 +62,7 @@ void main(void) {
         Machine_ProcessExitRequest();
         GFLAppUpdate();
         GameUpdate();
-        func_02005668();
+        GflUse_NoOpFrameHook();
         GFL_G3DSysCheckSwapBuffers();
 
         // The ARM9 has the main memory first while it waits for the VBlank, and the sound thread waits with it

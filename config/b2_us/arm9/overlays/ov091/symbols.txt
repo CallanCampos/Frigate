@@ -22,11 +22,11 @@ GymInsect_UpdateObjects kind:function(thumb,size=0x14) addr:0x021ef7b4
 sEffectAnimations kind:data(any) addr:0x021ef7c8
 sObjectPositions kind:data(any) addr:0x021ef7cc
 sObjectAnimations kind:data(any) addr:0x021ef7d2
-data_ov091_021ef7e0 kind:data(any) addr:0x021ef7e0
-data_ov091_021ef7f0 kind:data(any) addr:0x021ef7f0
+sSceneSetup kind:data(any) addr:0x021ef7e0
+sFogTable kind:data(any) addr:0x021ef7f0
 data_ov091_021ef810 kind:data(any) addr:0x021ef810
-data_ov091_021ef81c kind:data(any) addr:0x021ef81c
-data_ov091_021ef85c kind:data(any) addr:0x021ef85c
-data_ov091_021ef8b0 kind:data(any) addr:0x021ef8b0
-data_ov091_021ef91c kind:data(any) addr:0x021ef91c
+sActors kind:data(any) addr:0x021ef81c
+sResources kind:data(any) addr:0x021ef85c
+sAreas kind:data(any) addr:0x021ef8b0
+sRides kind:data(any) addr:0x021ef91c
 data_ov091_021ef9c0 kind:data(any) addr:0x021ef9c0

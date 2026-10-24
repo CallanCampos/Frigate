@@ -22,7 +22,7 @@ typedef struct {
     GFLNetInitData aNetInit;
     void *work;
     // The filter of the infrared machines to link with (NetIw_SetPeerFilter)
-    void *peerFilter;
+    GFLNetPeerFilter peerFilter;
     // The game's callbacks from its init data
     void *(*getBeaconData)(void *work);
     int (*getBeaconSize)(void *work);
@@ -77,7 +77,7 @@ const GFLNetInitData *NetIw_Start(const GFLNetInitData *pNetInit, void *work) {
     sys->exitCallback = pNetInit->endCallback;
     sys->getBeaconData = pNetInit->getBeaconData;
     sys->getBeaconSize = pNetInit->getBeaconSize;
-    sys->aNetInit.bNetType = 3;
+    sys->aNetInit.bNetType = GFL_NET_TYPE_IRC;
     sys->aNetInit.endCallback = NetIw_EndedCallback;
     sys->aNetInit.getBeaconData = NetIw_GetBeaconData;
     sys->aNetInit.getBeaconSize = NetIw_GetBeaconSize;
@@ -110,8 +110,8 @@ BOOL NetIw_IsRunning(void) {
     return FALSE;
 }
 
-void NetIw_SetPeerFilter(void *a0) {
-    NetIwSys->peerFilter = a0;
+void NetIw_SetPeerFilter(GFLNetPeerFilter filter) {
+    NetIwSys->peerFilter = filter;
 }
 
 void (*NetIw_SetCallbacks(void (*a0)(void *work), void (*a1)(void *work, BOOL a1),
@@ -243,7 +243,7 @@ void NetIw_Update(void) {
         break;
     case 4:
         if (!GFL_NetIsInitialized()) {
-            sys->aNetInit.bNetType = 3;
+            sys->aNetInit.bNetType = GFL_NET_TYPE_IRC;
             sys->aNetInit.endCallback = NetIw_EndedCallback;
             if (sys->gameCommandBase != 0) {
                 sys->aNetInit.gameCommandBase = sys->gameCommandBase;
@@ -289,7 +289,7 @@ void NetIw_Update(void) {
                 sys->aNetInit.negotiationCommandBase = 0;
                 sys->aNetInit.gameCommandBase = sys->gameCommandBase;
             }
-            sys->aNetInit.bNetType = 0;
+            sys->aNetInit.bNetType = GFL_NET_TYPE_WIRELESS;
             sys->aNetInit.endCallback = sys->exitCallback;
             sys->aNetInit.bMPMode = sys->bMPMode;
             GFL_NetInit(&sys->aNetInit, NULL, sys->work);
@@ -359,7 +359,7 @@ void NetIw_Update(void) {
         break;
     case 14:
         if (!GFL_NetIsInitialized()) {
-            sys->aNetInit.bNetType = 3;
+            sys->aNetInit.bNetType = GFL_NET_TYPE_IRC;
             sys->aNetInit.endCallback = NetIw_EndedCallback;
             sys->connected = FALSE;
             sys->ended = FALSE;

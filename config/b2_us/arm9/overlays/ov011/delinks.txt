@@ -17,6 +17,7 @@ src/ov011/net_devwifi.c:
     .bss        start:0x0218ba00 end:0x0218ba04
 
 src/ov011/dwc_rap.c:
+    complete
     .text       start:0x021505d4 end:0x02152078
     .rodata     start:0x02184fc8 end:0x02184fd4
     .data       start:0x021852bc end:0x02185394
@@ -101,6 +102,7 @@ lib/nitrowifi/src/ssl/md5.c:
     .data       start:0x0218553c end:0x021856bc
 
 lib/nitrowifi/src/ssl/sha1.c:
+    complete
     .text       start:0x0215ab04 end:0x0215b1d8
     .data       start:0x021856bc end:0x021856fc
 
@@ -109,6 +111,7 @@ lib/nitrowifi/src/ssl/ssl_rc4.c:
     .text       start:0x0215b1d8 end:0x0215b274
 
 lib/nitrowifi/src/ssl/biginteger.c:
+    complete
     .text       start:0x0215b274 end:0x0215bbec
 
 lib/nitrowifi/src/wcm/wcm.c:
@@ -117,6 +120,7 @@ lib/nitrowifi/src/wcm/wcm.c:
     .bss        start:0x0218df74 end:0x0218dfc8
 
 lib/dwc/src/gt2/gsUdpEngine.c:
+    complete
     .text       start:0x0216eea8 end:0x0216fbe0
     .data       start:0x02186ffc end:0x021874a0
     .bss        start:0x02190928 end:0x02190964
@@ -221,6 +225,7 @@ lib/dwc/src/gp/gpiProfile.c:
     .data       start:0x02188964 end:0x021889d4
 
 lib/dwc/src/gp/gpiSearch.c:
+    complete
     .text       start:0x02179834 end:0x0217b5fc
     .data       start:0x021889d4 end:0x02188e2c
 
@@ -329,6 +334,7 @@ lib/dwc/src/natneg/NATify.c:
     .bss        start:0x02191bec end:0x02191e38
 
 lib/dwc/src/natneg/natneg.c:
+    complete
     .text       start:0x0217f490 end:0x02180774
     .data       start:0x02189204 end:0x02189d94
     .bss        start:0x02191e38 end:0x02192140
@@ -460,7 +466,12 @@ lib/dwc/src/auth/dwc_rootcert_rsa_secure_server.c:
     .data       start:0x02186da0 end:0x02186e7c
 
 lib/dwc/src/match/dwc_match.c:
-    .text       start:0x0215fa0c end:0x02168818
+    .text       start:0x02160e10 end:0x02168818
     .rodata     start:0x02185014 end:0x0218502c
-    .data       start:0x021857bc end:0x02185ad8
-    .bss        start:0x0218e018 end:0x0218e918
+    .data       start:0x021857d0 end:0x02185ad8
+    .bss        start:0x0218e1c0 end:0x0218e918
+
+lib/dwc/src/base/dwc_main.c:
+    .text       start:0x0215fa0c end:0x02160e10
+    .data       start:0x021857bc end:0x021857d0
+    .bss        start:0x0218e018 end:0x0218e1c0

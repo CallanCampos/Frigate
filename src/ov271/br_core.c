@@ -651,7 +651,8 @@ static void BrCore_LoadRecordInfo(BrRecordInfo *info, BOOL keepLoaded, GameData 
                 info->isValid[i] = TRUE;
                 info->name[i] = GdsProfile_CreateNameStrBuf(profile, HEAPID_BATTLE_RECORDER_SYS);
                 info->sex[i] = GdsProfile_GetSex(profile);
-                info->videoNumber[i] = BattleRec_GetHeaderValue(BattleRec_GetHeader(), 4, 0);
+                info->videoNumber[i] =
+                    BattleRec_GetHeaderValue(BattleRec_GetHeader(), BATTLE_REC_HEADER_DATA_NUMBER, 0);
             }
         }
         info->hasMusicalShot = MusicalSave_HasShot(getAddressOfMusicalDataInfo(GameData_GetSaveControl(gameData)));

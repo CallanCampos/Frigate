@@ -759,7 +759,7 @@ static void WifiBSubwayUpload_FillPlayer(Dpw_Bt_Player *player, GameData *gameDa
     UnityTowerSurveySave *survey = getUnityTower_SurveySaveBlkAddrress(save);
     WifiList *wifiList = GameData_GetWifiList(gameData);
     BSubwayScoreData *score = GameData_GetBSubwayScoreData(gameData);
-    void *cgear = getCGearDataBlkAddress(save);
+    CGearSave *cgear = getCGearDataBlkAddress(save);
     int i;
 
     MI_CpuFill8(player, 0, sizeof(Dpw_Bt_Player));

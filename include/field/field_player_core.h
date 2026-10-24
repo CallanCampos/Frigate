@@ -28,20 +28,20 @@ void FieldPlayerCore_SetExState(FieldPlayerCore *core, u32 state);
 u32 FieldPlayerCore_GetSex(FieldPlayerCore *core);
 GameSystem *FieldPlayerCore_GetGameSystem(FieldPlayerCore *core);
 PlayerState *FieldPlayerCore_GetPlayerState(FieldPlayerCore *core);
-BOOL func_ov036_0219b04c(FieldPlayerCore *core);
+BOOL FieldPlayerCore_WaitModelReady(FieldPlayerCore *core);
 u32 FieldPlayerCore_DeriveExState(FieldPlayerCore *core);
-u32 func_ov036_0219b088(FieldPlayerCore *core);
-BOOL func_ov036_0219b0a4(FieldPlayerCore *core);
+u32 FieldPlayerCore_CheckFormModel(FieldPlayerCore *core);
+BOOL FieldPlayerCore_CheckAnimePaused(FieldPlayerCore *core);
 u16 FieldPlayerCore_GetMoveDirByKey(FieldPlayerCore *core, u32 heldKeys);
-void func_ov036_0219b138(FieldPlayerCore *core, FieldEffectTask *task);
+void FieldPlayerCore_SetRideEffect(FieldPlayerCore *core, FieldEffectTask *task);
 FieldEffectTask *FieldPlayerCore_GetTerrainEffectTCB(FieldPlayerCore *core);
 void FieldPlayerCore_SetSpecialSeq(FieldPlayerCore *core, u32 seq);
-BOOL func_ov036_0219b328(FieldPlayerCore *core);
-void func_ov036_0219b350(FieldPlayerCore *core);
+BOOL FieldPlayerCore_StepFormChange(FieldPlayerCore *core);
+void FieldPlayerCore_FinishFormChange(FieldPlayerCore *core);
 void FieldPlayerCore_SetMoveStatus(FieldPlayerCore *core, u32 status);
 void FieldPlayerCore_InitModel(FieldPlayerCore *core);
 // Changes the player's model to a form's
-void func_ov036_0219b014(FieldPlayerCore *core, u32 forme);
+void FieldPlayerCore_SetFormSlotModel(FieldPlayerCore *core, u32 forme);
 BOOL FieldPlayerCore_IsAcmdFinished(FieldPlayerCore *core);
 void FieldPlayerCore_CalcSeparateKeyDirs(FieldPlayerCore *core, u32 heldKeys);
 

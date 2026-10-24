@@ -270,16 +270,17 @@ void DDemoObj_AddPoke(DDemoWork *wk) {
     pkm = PokeParty_GetBoxPkm(wk->mons[wk->monIndex]);
     wasEncrypted = PML_PkmDecrypt(pkm);
     wk->chrRes[DDEMO_CHR_POKE_FRONT] =
-        PokeGra_LoadClActCharsByBoxData(arc, pkm, 0, CLACT_VRAM_MAIN, HEAPID_DENDOU_DEMO);
+        PokeGra_LoadClActCharsByBoxData(arc, pkm, POKEGRA_DIR_FRONT, CLACT_VRAM_MAIN, HEAPID_DENDOU_DEMO);
     wk->palRes[DDEMO_PAL_POKE_FRONT] =
-        PokeGra_LoadClActPaletteByBoxData(arc, pkm, 0, CLACT_VRAM_MAIN, 0x60, HEAPID_DENDOU_DEMO);
+        PokeGra_LoadClActPaletteByBoxData(arc, pkm, POKEGRA_DIR_FRONT, CLACT_VRAM_MAIN, 0x60, HEAPID_DENDOU_DEMO);
     wk->celRes[DDEMO_CEL_POKE_FRONT] =
-        PokeGra_LoadClActCellAnimsByBoxData(pkm, 0, 2, CLACT_VRAM_MAIN, HEAPID_DENDOU_DEMO);
-    wk->chrRes[DDEMO_CHR_POKE_BACK] = PokeGra_LoadClActCharsByBoxData(arc, pkm, 1, CLACT_VRAM_MAIN, HEAPID_DENDOU_DEMO);
+        PokeGra_LoadClActCellAnimsByBoxData(pkm, POKEGRA_DIR_FRONT, 2, CLACT_VRAM_MAIN, HEAPID_DENDOU_DEMO);
+    wk->chrRes[DDEMO_CHR_POKE_BACK] =
+        PokeGra_LoadClActCharsByBoxData(arc, pkm, POKEGRA_DIR_BACK, CLACT_VRAM_MAIN, HEAPID_DENDOU_DEMO);
     wk->palRes[DDEMO_PAL_POKE_BACK] =
-        PokeGra_LoadClActPaletteByBoxData(arc, pkm, 1, CLACT_VRAM_MAIN, 0x80, HEAPID_DENDOU_DEMO);
+        PokeGra_LoadClActPaletteByBoxData(arc, pkm, POKEGRA_DIR_BACK, CLACT_VRAM_MAIN, 0x80, HEAPID_DENDOU_DEMO);
     wk->celRes[DDEMO_CEL_POKE_BACK] =
-        PokeGra_LoadClActCellAnimsByBoxData(pkm, 1, 2, CLACT_VRAM_MAIN, HEAPID_DENDOU_DEMO);
+        PokeGra_LoadClActCellAnimsByBoxData(pkm, POKEGRA_DIR_BACK, 2, CLACT_VRAM_MAIN, HEAPID_DENDOU_DEMO);
     PML_PkmReEncrypt(pkm, wasEncrypted);
     GFL_ArcToolFree(arc);
     wk->clact[DDEMOOBJ_POKE_FRONT] = DDemoObj_Add(wk, &sDDemoObjPokeFront);

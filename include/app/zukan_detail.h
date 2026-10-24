@@ -162,7 +162,7 @@ enum {
 struct ZukanDetailPalFade {
     TCBManager *tcbMgr;
     void *tcbBuffer;
-    void *palette;
+    PaletteFade *palette;
     // The ZUKAN_DETAIL_PALFADE_* palettes that it fades
     u16 buffers;
     int state;

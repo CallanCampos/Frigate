@@ -33,7 +33,7 @@ static BOOL EncSys_CheckRNGEncounter(EncountSystem *system, EncountState *state,
 static void FieldEncount_SetupNormal(EncountSystem *system, EncountManager *manager, BtlSetup *setup, HeapID heapId,
                                      WildPkmParam *params);
 static void FieldEncount_SetupRoaming(EncountSystem *system, EncountManager *manager, BtlSetup *setup, HeapID heapId,
-                                      void *roamingPkm);
+                                      RoamingPkm *roamingPkm);
 static void FieldEncount_SetupNPoke(EncountSystem *system, EncountManager *manager, BtlSetup *setup, HeapID heapId,
                                     u8 index);
 static void EncountState_SyncToPlayer(EncountState *state, FieldPlayer *player);
@@ -61,7 +61,7 @@ EncountSystem *EncSys_Create(Field *field) {
 }
 
 void EncSys_Free(EncountSystem *system) {
-    func_ov036_021a202c(system, system->effectEncountState);
+    EffectEncount_Exit(system, system->effectEncountState);
     EffectEncountState_Free(system->effectEncountState);
     GFL_HeapFree(system);
 }
@@ -104,7 +104,7 @@ GameEvent *EventWildBattleCall_CreateRandom(EncountSystem *system, u32 mode) {
     BOOL forced = FALSE;
     BtlSetup *setup;
     u8 nIndex = 0xff;
-    void *roamingPkm = NULL;
+    RoamingPkm *roamingPkm = NULL;
     EncountState *state;
     FieldPlayer *player;
 
@@ -122,7 +122,7 @@ GameEvent *EventWildBattleCall_CreateRandom(EncountSystem *system, u32 mode) {
         return NULL;
     }
     CreateEncountManager(&manager, system->gameData, encType, mode,
-                         func_ov036_02199220(Field_GetWeatherSystem(system->field)));
+                         FieldWeather_GetWeatherId(Field_GetWeatherSystem(system->field)));
     if (!forced &&
         !EncSys_CheckRNGEncounter(
             system, state, FieldEncount_CalcEncountRate(&manager, system->gameData, state->encountRate), encType)) {
@@ -172,7 +172,7 @@ GameEvent *EventWildBattleCall_CreateStatic(EncountSystem *system, u16 species, 
 
     Field_GetPlayer(system->field);
     CreateEncountManager(&manager, system->gameData, 0xff, 0,
-                         func_ov036_02199220(Field_GetWeatherSystem(system->field)));
+                         FieldWeather_GetWeatherId(Field_GetWeatherSystem(system->field)));
     param = &params[0];
     MI_CpuFill8(params, 0, sizeof(params));
     param->species = species;
@@ -242,7 +242,7 @@ BtlSetup *BtlSetup_CreateFishing(EncountSystem *system, BOOL rare) {
         return NULL;
     }
     CreateEncountManager(&manager, system->gameData, encType, rare,
-                         func_ov036_02199220(Field_GetWeatherSystem(system->field)));
+                         FieldWeather_GetWeatherId(Field_GetWeatherSystem(system->field)));
     if (rare != TRUE) {
         u32 encountRate = FieldEncount_CalcEncountRate(&manager, system->gameData, rate);
 
@@ -361,7 +361,7 @@ static void FieldEncount_SetupNormal(EncountSystem *system, EncountManager *mana
 }
 
 static void FieldEncount_SetupRoaming(EncountSystem *system, EncountManager *manager, BtlSetup *setup, HeapID heapId,
-                                      void *roamingPkm) {
+                                      RoamingPkm *roamingPkm) {
     PokeParty *party = PokeParty_Create(heapId);
     PartyPkm *pkm = GFL_HeapAllocate(HEAPID_TAIL(heapId), PokeParty_GetPkmRawSize(), TRUE, "field_encount.c", 684);
     BtlFieldStatus status;
@@ -428,7 +428,7 @@ void BtlSetup_SetTrainerLocal(EncountSystem *encountSystem, BtlSetup *setup, u32
 }
 
 u32 ConvFieldWeatherToBtl(Field *field) {
-    switch (func_ov036_02199220(Field_GetWeatherSystem(field))) {
+    switch (FieldWeather_GetWeatherId(Field_GetWeatherSystem(field))) {
     case 2:
     case 6:
     case 7:

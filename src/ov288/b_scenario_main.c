@@ -409,7 +409,7 @@ static void BScenarioMain_Init(BScenarioWork *work) {
 }
 
 static void BScenarioMain_StartWipe(BScenarioWork *work) {
-    GFL_WipeSet(4, 1, 1, 0, 6, 1, work->param->heapId);
+    GFL_WipeSet(WIPE_MODE_SUB, WIPE_TYPE_FADE_IN, WIPE_TYPE_FADE_IN, 0, 6, 1, work->param->heapId);
 }
 
 static BOOL BScenarioMain_IsWiping(void) {

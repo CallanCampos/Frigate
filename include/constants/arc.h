@@ -211,6 +211,7 @@
 #define ARCID_DEMO3D_2D 159               // demo3d_cmdsys.c
 #define ARCID_TVT 170                     // comm_tvt_sys.c, local_tvt_chara.c, local_tvt_util.c
 #define ARCID_BEACON 171                  // beacon_view_setup.c, beacon_detail.c
+#define ARCID_ENTRANCE_CAMERA 177         // entrance_camera.c
 #define ARCID_COMM_BTL_DEMO 178           // comm_btl_demo.c
 #define ARCID_GURU2 180                   // guru2_main.c
 #define ARCID_GURU2_OBJ 181               // guru2_receipt.c, guru2_main.c

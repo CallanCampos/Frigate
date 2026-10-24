@@ -136,7 +136,7 @@ void GetActorRailPos(FieldActor *actor, RailPosition *position) {
     }
 }
 
-void func_ov036_02195604(FieldActor *actor, RailPosition *position) {
+void RailActor_GetNowLocation(FieldActor *actor, RailPosition *position) {
     RailUnit_GetRailPos(RAIL_WORK(actor)->unit, position);
 }
 
@@ -144,14 +144,14 @@ RailUnit *FldAct_GetRailUnit(FieldActor *actor) {
     return RAIL_WORK(actor)->unit;
 }
 
-void func_ov036_02195624(FieldActor *actor) {
+void RailActor_UpdateRailWork(FieldActor *actor) {
     ActorRailWork *rail = RAIL_WORK(actor);
 
     RailUnit_UpdateMove(rail->unit);
     RailActor_SaveUnitPosition(rail, actor);
 }
 
-void func_ov036_02195640(FieldActor *actor, u16 dir, u32 speed) {
+void RailActor_SetMoveRequest(FieldActor *actor, u16 dir, u32 speed) {
     ActorRailWork *rail = RAIL_WORK(actor);
     u32 railDir = RailActor_ConvertDirection(dir);
 
@@ -185,11 +185,11 @@ static u32 RailActor_CheckCollision(FieldActor *actor, const RailPosition *from,
     return flags;
 }
 
-u32 func_ov036_021956e8(FieldActor *actor, u16 dir) {
-    return func_ov036_021956f4(actor, dir, NULL);
+u32 RailActor_GetHitBitsDirNoAttr(FieldActor *actor, u16 dir) {
+    return RailActor_GetHitBitsDir(actor, dir, NULL);
 }
 
-u32 func_ov036_021956f4(FieldActor *actor, u16 dir, u32 *tile) {
+u32 RailActor_GetHitBitsDir(FieldActor *actor, u16 dir, u32 *tile) {
     FieldRailSystem *railSystem =
         FieldNoGridMapper_GetRailSystem(FldActSys_GetNoGridMapper(GetActorMModelSystem(actor)));
     ActorRailWork *rail = RAIL_WORK(actor);
@@ -202,7 +202,7 @@ u32 func_ov036_021956f4(FieldActor *actor, u16 dir, u32 *tile) {
     if (moved == dir) {
         moved = RailUnit_PredictNextPos(rail->unit, RailActor_ConvertDirection(dir), &to, NULL);
     } else {
-        moved = func_ov036_021b068c(railSystem, &from, RailActor_ConvertDirection(dir), &to);
+        moved = FieldRailSystem_TryStepLocation(railSystem, &from, RailActor_ConvertDirection(dir), &to);
     }
     if (moved) {
         return RailActor_CheckCollision(actor, &from, &to, tile);
@@ -220,8 +220,8 @@ static BOOL RailActor_CheckActorCollision(FieldActor *actor, const RailPosition 
     RailUnit *unit;
     fx32 radius;
 
-    func_ov036_021b06ec(railSystem, pos, &target);
-    radius = FX_Div(func_ov036_021b05ec(railSystem), 0x4000);
+    FieldRailSystem_GetLocationPos(railSystem, pos, &target);
+    radius = FX_Div(FieldRailSystem_GetUnitScale(railSystem), 0x4000);
     while (NextActor(mmSys, &other, &index) == 1) {
         if (other == actor) {
             continue;
@@ -235,12 +235,12 @@ static BOOL RailActor_CheckActorCollision(FieldActor *actor, const RailPosition 
         unit = FldAct_GetRailUnit(other);
         if (RailUnit_IsMovePending(unit)) {
             RailUnit_PredictNextPos(unit, RailUnit_GetMoveDirection(unit), NULL, &otherPos);
-            if (func_ov036_021b0d64(&target, &otherPos, radius)) {
+            if (FieldRailSystem_IsPosNear(&target, &otherPos, radius)) {
                 return TRUE;
             }
         }
         RailUnit_GetPreviousCalcPos(unit, &otherPos);
-        if (func_ov036_021b0d64(&target, &otherPos, radius)) {
+        if (FieldRailSystem_IsPosNear(&target, &otherPos, radius)) {
             return TRUE;
         }
     }
@@ -260,8 +260,8 @@ FieldActor *func_ov036_0219584c(MMSys *mmSys, const RailPosition *pos, BOOL chec
     fx32 radius;
 
     railSystem = FieldNoGridMapper_GetRailSystem(FldActSys_GetNoGridMapper(mmSys));
-    func_ov036_021b06ec(railSystem, pos, &target);
-    radius = FX_Div(func_ov036_021b05ec(railSystem), 0x4000);
+    FieldRailSystem_GetLocationPos(railSystem, pos, &target);
+    radius = FX_Div(FieldRailSystem_GetUnitScale(railSystem), 0x4000);
     while (NextActor(mmSys, &other, &index) == 1) {
         RailPosition initRail;
         RailPosition otherRail;
@@ -276,22 +276,22 @@ FieldActor *func_ov036_0219584c(MMSys *mmSys, const RailPosition *pos, BOOL chec
             continue;
         }
         if (checkInit) {
-            func_ov036_02195604(other, &initRail);
-            func_ov036_021b06ec(railSystem, &initRail, &otherPos);
-            if (func_ov036_021b0d64(&target, &otherPos, radius)) {
+            RailActor_GetNowLocation(other, &initRail);
+            FieldRailSystem_GetLocationPos(railSystem, &initRail, &otherPos);
+            if (FieldRailSystem_IsPosNear(&target, &otherPos, radius)) {
                 return other;
             }
         }
         GetActorRailPos(other, &otherRail);
-        func_ov036_021b06ec(railSystem, &otherRail, &otherPos);
-        if (func_ov036_021b0d64(&target, &otherPos, radius)) {
+        FieldRailSystem_GetLocationPos(railSystem, &otherRail, &otherPos);
+        if (FieldRailSystem_IsPosNear(&target, &otherPos, radius)) {
             return other;
         }
     }
     return NULL;
 }
 
-BOOL func_ov036_02195928(FieldActor *actor, RailPosition *position) {
+BOOL RailActor_GetFrontLocation(FieldActor *actor, RailPosition *position) {
     ActorRailWork *rail;
 
     FldActSys_GetNoGridMapper(GetActorMModelSystem(actor));
@@ -307,19 +307,19 @@ BOOL GetActorRailPosForDir(FieldActor *actor, u16 dir, RailPosition *position) {
 
     if (faceDir != dir) {
         GetActorRailPos(actor, position);
-        return func_ov036_021b068c(railSystem, position, ConvDirToRailDir(dir), position);
+        return FieldRailSystem_TryStepLocation(railSystem, position, ConvDirToRailDir(dir), position);
     }
     return RailUnit_PredictNextPos(rail->unit, ConvDirToRailDir(dir), position, NULL);
 }
 
-void func_ov036_021959bc(FieldActor *actor, u16 dir) {
+void RailActor_SetGridPosByDir(FieldActor *actor, u16 dir) {
     FieldRailSystem *railSystem =
         FieldNoGridMapper_GetRailSystem(FldActSys_GetNoGridMapper(GetActorMModelSystem(actor)));
     RailPosition rail;
     VecFx32 pos;
 
     GetActorRailPos(actor, &rail);
-    func_ov036_021b0644(railSystem, &rail, ConvDirToRailDir(dir), &pos);
+    FieldRailSystem_StepLocation(railSystem, &rail, ConvDirToRailDir(dir), &pos);
     SetActorInitialGPosX(actor, GetGPosX(actor));
     SetActorInitialGPosY(actor, FldAct_GetGPosY(actor));
     SetActorInitialGPosZ(actor, GetGPosZ(actor));
@@ -328,19 +328,19 @@ void func_ov036_021959bc(FieldActor *actor, u16 dir) {
     SetActorGPosZ(actor, (pos.z >> 4) / 4096);
 }
 
-void func_ov036_02195a58(FieldActor *actor, VecFx16 *dest) {
+void RailActor_GetDrawOffset(FieldActor *actor, VecFx16 *dest) {
     FldAct_GetRailUnit(actor);
-    func_ov036_02195a78(actor, (u16)(u32)GetActorFaceDir(actor), dest);
+    RailActor_GetDrawOffsetByDir(actor, (u16)(u32)GetActorFaceDir(actor), dest);
 }
 
-void func_ov036_02195a78(FieldActor *actor, u32 dir, VecFx16 *dest) {
+void RailActor_GetDrawOffsetByDir(FieldActor *actor, u32 dir, VecFx16 *dest) {
     RailUnit *unit = FldAct_GetRailUnit(actor);
     u16 angle;
     fx16 cos;
     MtxFx33 mtx;
     VecFx32 vec;
 
-    func_ov036_021b0a04(unit, dest);
+    RailUnit_GetStepVector(unit, dest);
     angle = DIR_ANGLES[TURN_DIRS[RailUnit_GetLineDirection(unit)][dir]];
     cos = FX_CosIdx(angle);
     dest->y = FX_MUL(cos, dest->y);
@@ -351,7 +351,7 @@ void func_ov036_02195a78(FieldActor *actor, u32 dir, VecFx16 *dest) {
     VEC_Fx16Set(dest, vec.x, vec.y, vec.z);
 }
 
-void func_ov036_02195b1c(FieldActor *actor) {
+void RailActor_StayInit(FieldActor *actor) {
     RailActor_InitWork(actor, 0xc);
 }
 
@@ -627,7 +627,7 @@ static void RailActorWalk_Update(FieldActor *actor) {
         work->state++;
         break;
     case 1:
-        if (!func_ov036_0218f01c(actor)) {
+        if (!FieldAcmdTCB_Update(actor)) {
             break;
         }
         work->wait = RailActor_ChooseListValue(WAIT_TIMES, -1);
@@ -644,7 +644,7 @@ static void RailActorWalk_Update(FieldActor *actor) {
         RailPosition next;
 
         ChangeActorDirection(actor, dir);
-        if (func_ov036_021956e8(actor, dir) != 0) {
+        if (RailActor_GetHitBitsDirNoAttr(actor, dir) != 0) {
             work->state = 0;
             break;
         }
@@ -663,7 +663,7 @@ static void RailActorWalk_Update(FieldActor *actor) {
         work->state++;
     }
     case 4:
-        if (func_ov036_0218f01c(actor)) {
+        if (FieldAcmdTCB_Update(actor)) {
             FldAct_ClearMoving(actor);
             work->state = 0;
         }
@@ -718,7 +718,7 @@ static void RailActorPatrol_Update(FieldActor *actor) {
         }
         otherComponent = FALSE;
         dir = (u32)GetActorMotionDir(actor);
-        blocked = func_ov036_021956e8(actor, dir);
+        blocked = RailActor_GetHitBitsDirNoAttr(actor, dir);
         GetActorRailPosForDir(actor, dir, &next);
         outside = RailActor_IsOutsideWalkArea(actor, work->front, work->side, &next);
         if (current.componentId != next.componentId) {
@@ -727,7 +727,7 @@ static void RailActorPatrol_Update(FieldActor *actor) {
         if ((blocked & 1) || outside || otherComponent) {
             work->reversed = 1;
             dir = GetInverseDirection((u16)dir);
-            blocked = func_ov036_021956e8(actor, dir);
+            blocked = RailActor_GetHitBitsDirNoAttr(actor, dir);
             GetActorRailPosForDir(actor, dir, &next);
         }
         acmd = 0xc;
@@ -740,7 +740,7 @@ static void RailActorPatrol_Update(FieldActor *actor) {
         break;
     }
     case 2:
-        if (func_ov036_0218f01c(actor) == 1) {
+        if (FieldAcmdTCB_Update(actor) == 1) {
             FldAct_ClearMoving(actor);
             work->state = 0;
         }

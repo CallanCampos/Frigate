@@ -9,7 +9,7 @@
 // links the OAM manager as one object, g2d_oam.o, whose .rodata is these two tables. Its linker file cuts object names
 // at 15 characters (g2d_celltransfe, g2d_oamsoftware), so g2d_oam is the whole name, and the case is NitroSystem's, as
 // ntrtwl's reconstruction of NitroSystem has it. The names are NitroSystem's, as that reconstruction has them, except
-// LoadOams_ and loadFunctions_, which are ours (NitroSystem's table is a static funcTbl in its function)
+// LoadOams_, which is ours
 
 #define NUM_HW_OAM_ATTR 128
 #define NUM_HW_OAM_AFFINE 32
@@ -30,8 +30,6 @@ static void CpuLoadOAMMain_(const void *src, u32 offset, u32 size);
 
 static u16 numRegisterdInstance_;
 static OamCache oamCache_[NNS_G2D_OAMTYPE_MAX];
-
-static OBJLoadFunction loadFunctions_[NNS_G2D_OAMTYPE_SOFTWAREEMULATION + 1] = { CpuLoadOAMMain_, CpuLoadOAMSub_ };
 
 // The width and height in pixels of each OAM shape and size, by [shape][size]. Objects of one size come out in the
 // reverse of their definition order, so the widths are defined first and the ROM has the heights first
@@ -57,6 +55,13 @@ static void CpuLoadOAMMain_(const void *src, u32 offset, u32 size) {
 
 static inline OamCache *GetOamCachePtr_(NNSG2dOamType type) {
     return &oamCache_[type];
+}
+
+// The function that copies to the type's OAM, which the software-emulated type doesn't have
+static inline OBJLoadFunction GetOBJLoadFunction_(NNSG2dOamType type) {
+    static OBJLoadFunction funcTbl[NNS_G2D_OAMTYPE_SOFTWAREEMULATION + 1] = { CpuLoadOAMMain_, CpuLoadOAMSub_ };
+
+    return funcTbl[type];
 }
 
 // Whether every entry of usedBy from from to last is free
@@ -212,7 +217,7 @@ static inline void LoadOam_(u32 type, u16 from, u16 to) {
     const GXOamAttr *src = &oamCache_[type].oamBuffer[from];
     u16 num = to - from + 1;
     u16 offset = from * sizeof(GXOamAttr);
-    OBJLoadFunction load = loadFunctions_[type];
+    OBJLoadFunction load = GetOBJLoadFunction_(type);
 
     for (i = 0; i < num; i++) {
         load(src, offset, 3 * sizeof(u16));
@@ -222,20 +227,20 @@ static inline void LoadOam_(u32 type, u16 from, u16 to) {
 }
 
 // Sends the affine parameters from from to to of the type alone, through the type's load function
-static inline void LoadAffine_(u32 type, int from, int to) {
+static inline void LoadAffine_(u32 type, u16 from, u16 to) {
     u16 i;
-    const GXOamAttr *src = &oamCache_[type].oamBuffer[from * 4];
+    const GXOamAffine *src = (const GXOamAffine *)oamCache_[type].oamBuffer + from;
     u16 num = to - from + 1;
-    u16 offset = from * 4 * sizeof(GXOamAttr);
-    OBJLoadFunction load = loadFunctions_[type];
+    u16 offset = from * sizeof(GXOamAffine);
+    OBJLoadFunction load = GetOBJLoadFunction_(type);
 
     for (i = 0; i < num; i++) {
-        load(&src[0]._3, offset + 6, sizeof(u16));
-        load(&src[1]._3, offset + 14, sizeof(u16));
-        load(&src[2]._3, offset + 22, sizeof(u16));
-        load(&src[3]._3, offset + 30, sizeof(u16));
-        offset += 4 * sizeof(GXOamAttr);
-        src += 4;
+        load(&src->PA, offset + 6, sizeof(u16));
+        load(&src->PB, offset + 14, sizeof(u16));
+        load(&src->PC, offset + 22, sizeof(u16));
+        load(&src->PD, offset + 30, sizeof(u16));
+        offset += sizeof(GXOamAffine);
+        src++;
     }
 }
 

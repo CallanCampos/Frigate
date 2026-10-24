@@ -160,6 +160,26 @@ typedef union {
     };
 } GXOamAttr;
 
+// An affine parameter, whose four values are the fourth halfwords of four OAMs
+typedef struct {
+    u16 _0;
+    u16 _1;
+    u16 _2;
+    s16 PA;
+    u16 _4;
+    u16 _5;
+    u16 _6;
+    s16 PB;
+    u16 _8;
+    u16 _9;
+    u16 _10;
+    s16 PC;
+    u16 _12;
+    u16 _13;
+    u16 _14;
+    s16 PD;
+} GXOamAffine;
+
 #define GX_OAM_ATTR01_Y_SHIFT 0
 #define GX_OAM_ATTR01_CM_MASK 0x00002000
 #define GX_OAM_ATTR01_MODE_SHIFT 10
@@ -251,6 +271,11 @@ static inline void G2_SetOBJEffect(GXOamAttr *oam, GXOamEffect effect, int rsPar
 static inline void G2_SetOBJPosition(GXOamAttr *oam, int x, int y) {
     oam->attr01 = (oam->attr01 & ~(GX_OAM_ATTR01_Y_MASK | GX_OAM_ATTR01_X_MASK)) | (y & GX_OAM_ATTR01_Y_MASK) |
                   ((x & (GX_OAM_ATTR01_X_MASK >> GX_OAM_ATTR01_X_SHIFT)) << GX_OAM_ATTR01_X_SHIFT);
+}
+
+static inline void G2_GetOBJPosition(const GXOamAttr *oam, u32 *x, u32 *y) {
+    *x = (oam->attr01 & GX_OAM_ATTR01_X_MASK) >> GX_OAM_ATTR01_X_SHIFT;
+    *y = (oam->attr01 & GX_OAM_ATTR01_Y_MASK) >> GX_OAM_ATTR01_Y_SHIFT;
 }
 
 static inline void G2_SetOBJAttr(GXOamAttr *oam, int x, int y, int priority, GXOamMode mode, BOOL mosaic,

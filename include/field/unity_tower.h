@@ -43,19 +43,24 @@ typedef struct {
 #define UNITY_TOWER_VISITOR_MAX 20
 
 // What UnityTower_GetVisitorParam gives of a visitor
-#define UNITY_TOWER_VISITOR_PARAM_SENT_SPECIES 0
-#define UNITY_TOWER_VISITOR_PARAM_RECEIVED_SPECIES 1
-#define UNITY_TOWER_VISITOR_PARAM_HOBBY 2
-#define UNITY_TOWER_VISITOR_PARAM_COUNTRY_COUNT 3
-#define UNITY_TOWER_VISITOR_PARAM_UNK26_0 4
-#define UNITY_TOWER_VISITOR_PARAM_SCRIPT_FLAG 5
-#define UNITY_TOWER_VISITOR_PARAM_VALID 6
+enum {
+    UNITY_TOWER_VISITOR_PARAM_SENT_SPECIES,
+    UNITY_TOWER_VISITOR_PARAM_RECEIVED_SPECIES,
+    UNITY_TOWER_VISITOR_PARAM_HOBBY,
+    UNITY_TOWER_VISITOR_PARAM_COUNTRY_COUNT,
+    UNITY_TOWER_VISITOR_PARAM_UNK26_0,
+    UNITY_TOWER_VISITOR_PARAM_SCRIPT_FLAG,
+    UNITY_TOWER_VISITOR_PARAM_VALID,
+};
 
 // The two bits the survey keeps per region of a country
-#define UNITY_TOWER_REGION_NONE 0
-#define UNITY_TOWER_REGION_TODAY 1
-#define UNITY_TOWER_REGION_BEFORE 2
-#define UNITY_TOWER_REGION_OWN 3
+enum {
+    UNITY_TOWER_REGION_NONE,
+    UNITY_TOWER_REGION_TODAY,
+    UNITY_TOWER_REGION_BEFORE,
+    UNITY_TOWER_REGION_OWN,
+};
+
 // 64 regions of each country from 1 on, two bits each
 #define UNITY_TOWER_REGION_BYTES (255 * 16)
 
@@ -95,15 +100,15 @@ u8 UnityTower_GetCountryCountForPlayer(UnityTowerSurveySave *save, PlayerInfo *p
 u8 UnityTower_CountVisitors(UnityTowerSurveySave *save);
 // Counts one more country met
 void UnityTower_IncrementCountryCount(UnityTowerSurveySave *save);
-void func_02009d18(UnityTowerSurveySave *save, s32 value);
-u8 func_02009d28(UnityTowerSurveySave *save);
+void UnityTower_SetRatingLevel(UnityTowerSurveySave *save, s32 value);
+u8 UnityTower_GetRatingLevel(UnityTowerSurveySave *save);
 void setPlayerSurveys(UnityTowerSurveySave *save, s32 hobby);
 u8 getPlayerSurveys(UnityTowerSurveySave *save);
 u32 UnityTower_GetVisitorParam(UnityTowerSurveySave *save, u32 index, u32 param);
 // Sets a visitor's UNITY_TOWER_VISITOR_PARAM_UNK26_0, SCRIPT_FLAG or VALID
 void UnityTower_SetVisitorParam(UnityTowerSurveySave *save, int index, u32 param, u32 value);
-// A visitor, whose PlayerInfo comes first, or NULL out of range
-void *UnityTower_GetVisitor(UnityTowerSurveySave *save, int index);
+// A visitor's PlayerInfo, or NULL out of range
+PlayerInfo *UnityTower_GetVisitor(UnityTowerSurveySave *save, int index);
 UnityTowerVisitor *UnityTower_GetVisitors(UnityTowerSurveySave *save);
 // Records the country met, returning whether it is a new one
 BOOL UnityTower_MarkCountryMet(UnityTowerSurveySave *save, u32 country);
@@ -115,12 +120,12 @@ u8 UnityTowerVisitor_GetCountry(PlayerInfo *playerInfo);
 // moves to the end of the list, 2 for a new one, who takes the place of the first from the same country once five
 // are listed, or of the first visitor once the list is full
 u32 UnityTowerSurvey_RegisterTrade(UnityTowerSurveySave *save, UnityTowerVisitor *visitor);
-void func_ov033_0217aa1c(GameSystem *gsys, s32 floor, u32 value);
-void func_ov033_0217aa50(UnityTowerSurveySave *save, UnityTowerFloor *output, s32 floor, u32 value);
-u32 func_ov033_0217aac4(UnityTowerFloor *output, u32 index);
-u32 func_ov033_0217ab58(u32 gender, u32 id, u32 province, u32 a3, u32 hasProvince);
+void Scrcmd_FillPartnerCandidates(GameSystem *gsys, s32 floor, u32 value);
+void Scrcmd_CollectPartnersByLanguage(UnityTowerSurveySave *save, UnityTowerFloor *output, s32 floor, u32 value);
+u32 Scrcmd_GetPartnerCandidateHistoryIndex(UnityTowerFloor *output, u32 index);
+u32 Scrcmd_CalcPartnerGreetingIndex(u32 gender, u32 id, u32 province, u32 a3, u32 hasProvince);
 void UnityTowerSave_Init(UnityTowerFloor *save);
-u32 func_ov033_0217aad8(WordSet *wordSet, GameSystem *gsys, UnityTowerFloor *save, s32 index, u32 param);
+u32 Scrcmd_GetPartnerGreetingMessage(WordSet *wordSet, GameSystem *gsys, UnityTowerFloor *save, s32 index, u32 param);
 
 void LoadUnityTowerVisitorWordSet(WordSet *wordSet, GameData *gameData, u32 index);
 

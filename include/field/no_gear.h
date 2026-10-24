@@ -13,7 +13,7 @@
 typedef struct NoGearWork NoGearWork;
 
 // The first two arguments are unused
-NoGearWork *NoGear_Create(void *saveData, FieldSubscreen *subscreen, GameSystem *gsys);
+NoGearWork *NoGear_Create(CGearSettings *saveData, FieldSubscreen *subscreen, GameSystem *gsys);
 void NoGear_Update(NoGearWork *work);
 void NoGear_Draw(NoGearWork *work);
 void NoGear_Free(NoGearWork *work);

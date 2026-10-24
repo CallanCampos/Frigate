@@ -580,20 +580,20 @@ void UnionMsg_CreateMsgSystem(UnionSystem *unisys, Field *field) {
     if (unisys->fld_msgwin_stream == NULL) {
         GFL_ASSERT(unisys->msgdata == NULL);
         fldmsg_bg = Field_GetMsgBGSys(field);
-        unisys->msgdata = func_ov036_021879a0(fldmsg_bg, TEXT_BANK_UNION_MSG);
+        unisys->msgdata = MsgBGPrinter_CreateMsgData(fldmsg_bg, TEXT_BANK_UNION_MSG);
         unisys->msgbuf = GFL_StrBufCreate(0x100, UNION_HEAPID);
         unisys->fmtbuf = GFL_StrBufCreate(0x100, UNION_HEAPID);
         UnionMsg_CreateWordSet(unisys);
-        unisys->fld_msgwin_stream = func_ov036_02188a54(fldmsg_bg, unisys->msgdata, 0, 1, 0x13, 0x1e, 4);
+        unisys->fld_msgwin_stream = MsgBGPrinter_CreatePlainWin(fldmsg_bg, unisys->msgdata, 0, 1, 0x13, 0x1e, 4);
     } else {
-        func_ov036_02188ae8(unisys->fld_msgwin_stream);
+        MsgBGPrinter_ClearPlainWin(unisys->fld_msgwin_stream);
     }
 }
 
 static void UnionMsg_FreeMsgSystem(UnionSystem *unisys) {
     if (unisys->fld_msgwin_stream != NULL) {
-        func_ov036_02188b08(unisys->fld_msgwin_stream);
-        func_ov036_02188ab0(unisys->fld_msgwin_stream);
+        MsgBGPrinter_OpenPlainWin(unisys->fld_msgwin_stream);
+        MsgBGPrinter_DeletePlainWin(unisys->fld_msgwin_stream);
         unisys->fld_msgwin_stream = NULL;
         unisys->msgPrinting = 0;
         GFL_StrBufFree(unisys->msgbuf);
@@ -603,7 +603,7 @@ static void UnionMsg_FreeMsgSystem(UnionSystem *unisys) {
     }
     if (unisys->msgdata != NULL) {
         UnionMsg_FreeWordSet(unisys);
-        func_ov036_021879b8(unisys->msgdata);
+        MsgBGPrinter_DeleteMsgData(unisys->msgdata);
         unisys->msgdata = NULL;
     }
 }
@@ -612,7 +612,7 @@ void UnionMsg_PrintMessage(UnionSystem *unisys, u32 messageId) {
     GFL_ASSERT(unisys->fld_msgwin_stream != NULL);
     GFL_MsgDataLoadStrbuf(unisys->msgdata, messageId, unisys->msgbuf);
     GFL_WordSetFormatStrbuf(unisys->wordset, unisys->fmtbuf, unisys->msgbuf);
-    func_ov036_02188ba4(unisys->fld_msgwin_stream, 0, 0, unisys->fmtbuf);
+    MsgBGPrinter_PlainWinPrintStream(unisys->fld_msgwin_stream, 0, 0, unisys->fmtbuf);
     unisys->msgPrinting = 1;
 }
 
@@ -620,7 +620,7 @@ BOOL UnionMsg_IsPrintDone(UnionSystem *unisys) {
     if (unisys->fld_msgwin_stream == NULL || unisys->msgPrinting == 0) {
         return TRUE;
     }
-    return func_ov036_02188bdc(unisys->fld_msgwin_stream);
+    return MsgBGPrinter_PlainWinMain(unisys->fld_msgwin_stream);
 }
 
 void UnionMsg_CreateAndPrint(UnionSystem *unisys, Field *field, u32 messageId) {
@@ -631,13 +631,13 @@ void UnionMsg_CreateAndPrint(UnionSystem *unisys, Field *field, u32 messageId) {
 
 void UnionMsg_CreateYesNo(UnionSystem *unisys, Field *field) {
     if (unisys->fldmenu_yesno_func == NULL) {
-        unisys->fldmenu_yesno_func = func_ov036_021880d4(Field_GetMsgBGSys(field), 0);
+        unisys->fldmenu_yesno_func = MsgBGPrinter_CreateYesNoMenu(Field_GetMsgBGSys(field), 0);
     }
 }
 
 void UnionMsg_FreeYesNo(UnionSystem *unisys) {
     if (unisys->fldmenu_yesno_func != NULL) {
-        func_ov036_02187ea0(unisys->fldmenu_yesno_func);
+        MsgBGPrinter_DeleteMenuFunc(unisys->fldmenu_yesno_func);
         unisys->fldmenu_yesno_func = NULL;
     }
 }
@@ -646,7 +646,7 @@ BOOL UnionMsg_UpdateYesNo(UnionSystem *unisys, BOOL *yes) {
     u32 answer;
 
     GFL_ASSERT(unisys->fldmenu_yesno_func != NULL);
-    answer = func_ov036_0218816c(unisys->fldmenu_yesno_func);
+    answer = MsgBGPrinter_YesNoMenuMain(unisys->fldmenu_yesno_func);
     if (answer == 2) {
         return FALSE;
     }
@@ -656,10 +656,10 @@ BOOL UnionMsg_UpdateYesNo(UnionSystem *unisys, BOOL *yes) {
 
 static void UnionMsg_CreateMenu(UnionSystem *unisys, Field *field, const ListMenuRow *rows, u32 count,
                                 ListMenuRequest *request) {
-    void *msgBGSys = Field_GetMsgBGSys(field);
+    FieldMsgBG *msgBGSys = Field_GetMsgBGSys(field);
 
     if (unisys->fldmenu_func == NULL) {
-        ListMenuOption *options = func_ov036_02187f0c(rows, count, unisys->msgdata, UNION_HEAPID);
+        ListMenuOption *options = MsgBGPrinter_CreateMenuItemsFromTable(rows, count, unisys->msgdata, UNION_HEAPID);
 
         unisys->fldmenu_func = ListMenuUI_Create(msgBGSys, request, options, NULL, NULL, 0, 0, TRUE);
     }
@@ -667,7 +667,7 @@ static void UnionMsg_CreateMenu(UnionSystem *unisys, Field *field, const ListMen
 
 static void UnionMsg_FreeMenu(UnionSystem *unisys) {
     if (unisys->fldmenu_func != NULL) {
-        func_ov036_02187ea0(unisys->fldmenu_func);
+        MsgBGPrinter_DeleteMenuFunc(unisys->fldmenu_func);
         unisys->fldmenu_func = NULL;
     }
 }
@@ -676,7 +676,7 @@ static s32 UnionMsg_UpdateMenu(UnionSystem *unisys, Field *field) {
     void *fldmsg_bg = Field_GetMsgBGSys(field);
 
     GFL_ASSERT(fldmsg_bg != NULL);
-    if (fldmsg_bg != NULL && !func_ov036_0218798c(fldmsg_bg)) {
+    if (fldmsg_bg != NULL && !MsgBGPrinter_IsPrintQueFinished(fldmsg_bg)) {
         return BMPMENULIST_NULL;
     }
     GFL_ASSERT(unisys->fldmenu_func != NULL);
@@ -830,23 +830,23 @@ u32 UnionMsg_UpdateRuleMenu(UnionSystem *unisys, BOOL *picked, u8 *ruleSel, BOOL
 
 void UnionMsg_CreateInfoWindow(UnionSystem *unisys, Field *field) {
     if (unisys->fldmsgwin == NULL) {
-        void *msgBGSys = Field_GetMsgBGSys(field);
+        FieldMsgBG *msgBGSys = Field_GetMsgBGSys(field);
 
-        unisys->fldmsgwin = func_ov036_02188a54(msgBGSys, unisys->msgdata, 0, 1, 1, 0x1e, 2);
-        func_ov036_02188b18(unisys->fldmsgwin, 0, 0, UnionMsg_Text_BattleFormatMultiBattle);
+        unisys->fldmsgwin = MsgBGPrinter_CreatePlainWin(msgBGSys, unisys->msgdata, 0, 1, 1, 0x1e, 2);
+        MsgBGPrinter_PlainWinPrintMsg(unisys->fldmsgwin, 0, 0, UnionMsg_Text_BattleFormatMultiBattle);
     }
 }
 
 void UnionMsg_FreeInfoWindow(UnionSystem *unisys) {
     if (unisys->fldmsgwin != NULL) {
-        func_ov036_02188ab0(unisys->fldmsgwin);
+        MsgBGPrinter_DeletePlainWin(unisys->fldmsgwin);
         unisys->fldmsgwin = NULL;
     }
 }
 
 // Opens the window that lists the regulation's rules, each in the color of whether the party meets it
 void UnionMsg_CreateRulesWindow(UnionSystem *unisys, Field *field, u32 okMask, u32 battleType, u32 mode) {
-    void *msgBGSys = Field_GetMsgBGSys(field);
+    FieldMsgBG *msgBGSys = Field_GetMsgBGSys(field);
     BOOL isMulti;
     int i;
 
@@ -858,21 +858,22 @@ void UnionMsg_CreateRulesWindow(UnionSystem *unisys, Field *field, u32 okMask, u
     if (battleType != 1) {
         isMulti = FALSE;
     }
-    unisys->fldmsgwin = func_ov036_02188a54(msgBGSys, unisys->msgdata, 0, 1, 1, 0x1a, 0x10);
+    unisys->fldmsgwin = MsgBGPrinter_CreatePlainWin(msgBGSys, unisys->msgdata, 0, 1, 1, 0x1a, 0x10);
     unisys->alloc.rpm = PokeRegulation_CreatePrintMsg(unisys->alloc.regulation, unisys->wordset, UNION_HEAPID, isMulti);
     UnionMsg_SetupWordSet(unisys);
 
     if (mode == 0) {
         StrBuf *title = makeStrbufLoadBattleTypeText(unisys->alloc.regulation, UNION_HEAPID);
 
-        func_ov036_02188b44(unisys->fldmsgwin, 0, 0, title);
+        MsgBGPrinter_PlainWinPrintStr(unisys->fldmsgwin, 0, 0, title);
         GFL_StrBufFree(title);
     } else {
-        func_ov036_02188b18(unisys->fldmsgwin, 0, 0, mode == 1 ? UnionMsg_Text_Party : UnionMsg_Text_BattleBox);
+        MsgBGPrinter_PlainWinPrintMsg(unisys->fldmsgwin, 0, 0,
+                                      mode == 1 ? UnionMsg_Text_Party : UnionMsg_Text_BattleBox);
     }
 
     for (i = 0; i < 6; i++) {
-        RegulationRulesText *rpm;
+        RegulationPrintMsg *rpm;
         u16 color;
 
         if (okMask & (1 << i)) {
@@ -882,14 +883,14 @@ void UnionMsg_CreateRulesWindow(UnionSystem *unisys, Field *field, u32 okMask, u
         }
 
         rpm = unisys->alloc.rpm;
-        func_ov036_02188b70(unisys->fldmsgwin, 0, (i * 2 + 4) * 8, rpm->rule[i], color);
+        MsgBGPrinter_PlainWinPrintStrColor(unisys->fldmsgwin, 0, (i * 2 + 4) * 8, rpm->rule[i], color);
         rpm = unisys->alloc.rpm;
-        func_ov036_02188b70(unisys->fldmsgwin, 0x70, (i * 2 + 4) * 8, rpm->value[i], color);
+        MsgBGPrinter_PlainWinPrintStrColor(unisys->fldmsgwin, 0x70, (i * 2 + 4) * 8, rpm->value[i], color);
     }
 }
 
 BOOL UnionMsg_IsRulesPrinted(UnionSystem *unisys, Field *field) {
-    void *queue = func_ov036_02187998(Field_GetMsgBGSys(field));
+    void *queue = MsgBGPrinter_GetPrintQue(Field_GetMsgBGSys(field));
 
     if (unisys->alloc.rpm == NULL) {
         return TRUE;
@@ -899,7 +900,7 @@ BOOL UnionMsg_IsRulesPrinted(UnionSystem *unisys, Field *field) {
 
 void UnionMsg_FreeRulesWindow(UnionSystem *unisys) {
     if (unisys->alloc.rpm != NULL) {
-        func_ov036_02188ab0(unisys->fldmsgwin);
+        MsgBGPrinter_DeletePlainWin(unisys->fldmsgwin);
         unisys->fldmsgwin = NULL;
         PokeRegulation_FreePrintMsg(unisys->alloc.rpm);
         unisys->alloc.rpm = NULL;

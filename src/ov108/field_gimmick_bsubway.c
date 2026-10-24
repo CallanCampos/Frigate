@@ -33,7 +33,7 @@ typedef struct {
 } BSubwayGimmickWork;
 
 typedef struct {
-    void *effect;
+    FieldEffectTask *effect;
 } TrainWork;
 
 typedef struct {
@@ -152,10 +152,10 @@ void FieldGimmickBSubway_StartTrainEffect(Field *field, u32 a1, const VecFx32 *p
     state = GameData_GetGimmickState(GSYS_GetGameData(Field_GetGameSystem(field)));
     GetZoneGimmick(Field_GetPlayerStateZoneID(field), &gimmickId, &index);
     train = ((BSubwayGimmickWork *)GimmickState_GetUserData(state, gimmickId))->data;
-    train->effect = func_ov036_021c6574(Field_GetFieldEffects(field), a1, pos);
+    train->effect = FldeffBtrain_Start(Field_GetFieldEffects(field), a1, pos);
 }
 
-void *FieldGimmickBSubway_GetTrainEffect(Field *field) {
+FieldEffectTask *FieldGimmickBSubway_GetTrainEffect(Field *field) {
     u16 heapId;
     GimmickState *state;
     u32 index;
@@ -234,7 +234,7 @@ static void ShakeMove(BSubwayGimmickWork *work, Field *field) {
         break;
     case 2:
         pos.y = shake->shake * FX32_ONE;
-        func_ov036_021852d0(mapper, &pos);
+        FieldG3DMapper_SetOriginOffset(mapper, &pos);
         if (shake->shake == 0) {
             shake->state = 0;
         }

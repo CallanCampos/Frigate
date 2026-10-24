@@ -333,7 +333,7 @@ static BOOL MBParent_Main(MBParentWork *wk) {
     }
     switch (wk->state) {
     case MB_PARENT_STATE_WIPE_IN:
-        GFL_WipeSet(0, 1, 1, 0, 6, 1, wk->heapId);
+        GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_IN, WIPE_TYPE_FADE_IN, 0, 6, 1, wk->heapId);
         wk->state = MB_PARENT_STATE_WAIT_WIPE_IN;
         break;
     case MB_PARENT_STATE_WAIT_WIPE_IN:
@@ -354,9 +354,9 @@ static BOOL MBParent_Main(MBParentWork *wk) {
         break;
     case MB_PARENT_STATE_WIPE_OUT:
         if (wk->param->startMenu == FALSE) {
-            GFL_WipeSet(0, 0, 0, 0, 6, 1, wk->heapId);
+            GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, 0, 6, 1, wk->heapId);
         } else {
-            GFL_WipeSet(0, 0, 0, 0x7fff, 6, 1, wk->heapId);
+            GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, 0x7fff, 6, 1, wk->heapId);
             GFL_SndBGMFadeOut(6);
         }
         wk->state = MB_PARENT_STATE_WAIT_WIPE_OUT;

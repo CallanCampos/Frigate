@@ -475,7 +475,8 @@ BOOL GFL_NetErrShutdown(void) {
         GFL_NetExit(NULL);
         GFL_NetIwFree();
         do {
-            if (init != NULL && (init->bNetType == 0 || init->bNetType == 5)) {
+            if (init != NULL &&
+                (init->bNetType == GFL_NET_TYPE_WIRELESS || init->bNetType == GFL_NET_TYPE_WIRELESS_LISTEN)) {
                 if (WH_GetSystemState() == 10) {
                     return FALSE;
                 }

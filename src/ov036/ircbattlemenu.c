@@ -1061,7 +1061,7 @@ static void IrcMenu_CreateBattleBoxButtons(IrcMenuWork *wk) {
     }
 }
 
-static void func_ov036_0218e568(IrcMenuWork *wk, u32 a, u32 b, u32 c, u32 d) {
+static void IrcMenu_CreateDecoration(IrcMenuWork *wk, u32 a, u32 b, u32 c, u32 d) {
 }
 
 static void IrcMenu_FreeActorsAndResources(IrcMenuWork *wk) {
@@ -1282,8 +1282,8 @@ static BOOL IrcMenu_Init(GameProc *proc, u32 *state, void *param, void *work) {
     wk->printQueue = PrintQueue_CreateDefault(wk->heapId);
     wk->menuRes = AppTaskMenuRes_Create(5, 9, wk->font, wk->printQueue, wk->heapId);
     IrcMenu_LoadButtonResources(wk);
-    func_ov036_0218e568(wk, 0x39, 0x9a, 0, 10);
-    func_ov036_0218e568(wk, 0xc8, 0x26, 1, 11);
+    IrcMenu_CreateDecoration(wk, 0x39, 0x9a, 0, 10);
+    IrcMenu_CreateDecoration(wk, 0xc8, 0x26, 1, 11);
     GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_IN, WIPE_TYPE_FADE_IN, WIPE_COLOR_BLACK, 6, 1, wk->heapId);
     IrcMenu_SetStateAtLine(wk, IrcMenu_ShowMainMenu, 0x844);
     wk->param = param;

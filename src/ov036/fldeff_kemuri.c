@@ -25,8 +25,8 @@ typedef struct {
 } SmokeTask;
 
 static void func_ov036_021a3e18(FieldEffectSmoke *smoke);
-static void func_ov036_021a3e60(FieldEffectSmoke *smoke);
-static void func_ov036_021a3f78(FieldEffectTask *task, void *work);
+static void FldeffKemuri_FreeResource(FieldEffectSmoke *smoke);
+static void FldeffKemuri_Init(FieldEffectTask *task, void *work);
 static void func_ov036_021a3fac(FieldEffectTask *task, void *work);
 static void func_ov036_021a3fb8(FieldEffectTask *task, void *work);
 static void func_ov036_021a3fd4(FieldEffectTask *task, void *work);
@@ -34,7 +34,7 @@ static void func_ov036_021a3fd4(FieldEffectTask *task, void *work);
 // clang-format off
 static const FieldEffectTaskVTable SMOKE_TASK_VTABLE = {
     sizeof(SmokeTask),
-    func_ov036_021a3f78,
+    FldeffKemuri_Init,
     func_ov036_021a3fac,
     func_ov036_021a3fb8,
     func_ov036_021a3fd4,
@@ -51,13 +51,13 @@ void *playSmokeEffect(FieldEffects *effects, HeapID heapId) {
 }
 
 void freeSmokeEffect(FieldEffects *effects, void *data) {
-    func_ov036_021a3e60(data);
+    FldeffKemuri_FreeResource(data);
     GFL_HeapFree(data);
 }
 
 static void func_ov036_021a3e18(FieldEffectSmoke *smoke) {
     FieldG3DObjResRequest request;
-    FieldG3DObjSystem *objSys = func_ov036_021a3724(smoke->effects);
+    FieldG3DObjSystem *objSys = FieldEffects_GetFieldMapData(smoke->effects);
     ArcTool *arc = FieldEffects_GetArc(smoke->effects);
 
     FieldG3DObjResRequest_Clear(&request);
@@ -67,12 +67,12 @@ static void func_ov036_021a3e18(FieldEffectSmoke *smoke) {
     smoke->resGroup = FieldG3DObjSystem_AddResGroup(objSys, &request, FALSE);
 }
 
-static void func_ov036_021a3e60(FieldEffectSmoke *smoke) {
-    FieldG3DObjSystem_FreeResGroup(func_ov036_021a3724(smoke->effects), smoke->resGroup);
+static void FldeffKemuri_FreeResource(FieldEffectSmoke *smoke) {
+    FieldG3DObjSystem_FreeResGroup(FieldEffects_GetFieldMapData(smoke->effects), smoke->resGroup);
 }
 
 // A puff of dust under the actor
-void func_ov036_021a3e74(FieldActor *actor, FieldEffects *effects) {
+void FldeffKemuri_Start(FieldActor *actor, FieldEffects *effects) {
     VecFx32 pos;
     SmokeTaskParams params;
 
@@ -85,7 +85,7 @@ void func_ov036_021a3e74(FieldActor *actor, FieldEffects *effects) {
 }
 
 // A puff of dust in front of the actor
-void func_ov036_021a3ec4(FieldActor *actor, FieldEffects *effects) {
+void FldeffKemuri_StartFacing(FieldActor *actor, FieldEffects *effects) {
     VecFx32 pos;
     SmokeTaskParams params;
     u16 angle = FldActSys_GetCameraAngle(GetActorMModelSystem(actor));
@@ -99,13 +99,13 @@ void func_ov036_021a3ec4(FieldActor *actor, FieldEffects *effects) {
     FieldEffects_TCBCreate(effects, &SMOKE_TASK_VTABLE, NULL, 0, &params, 0);
 }
 
-static void func_ov036_021a3f78(FieldEffectTask *task, void *work) {
+static void FldeffKemuri_Init(FieldEffectTask *task, void *work) {
     SmokeTask *smokeTask = work;
-    SmokeTaskParams *params = func_ov036_021a3ac8(task);
+    SmokeTaskParams *params = FieldEffects_GetObjectParam(task);
 
     smokeTask->smoke = params->smoke;
-    smokeTask->objSys = func_ov036_021a3724(smokeTask->smoke->effects);
-    func_ov036_021a3ae8(task, &params->pos);
+    smokeTask->objSys = FieldEffects_GetFieldMapData(smokeTask->smoke->effects);
+    FieldEffects_SetObjectPos(task, &params->pos);
     smokeTask->objIdx = FieldG3DObjSystem_AddObj(smokeTask->objSys, smokeTask->smoke->resGroup, 0, &params->pos);
 }
 
@@ -120,7 +120,7 @@ static void func_ov036_021a3fb8(FieldEffectTask *task, void *work) {
     SmokeTask *smokeTask = work;
 
     if (!FieldG3DObjSystem_StepObjAnm(smokeTask->objSys, smokeTask->objIdx, FX32_ONE)) {
-        func_ov036_021a3a70(task);
+        FieldEffects_DeleteObject(task);
     }
 }
 

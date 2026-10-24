@@ -353,6 +353,7 @@ lib/spl/src/spl_manager.c:
     .text       start:0x02050a6c end:0x0205156c
 
 src/system/printsys.c:
+    complete
     .text       start:0x020219a0 end:0x02022d84
     .data       start:0x0209a450 end:0x0209a45c
     .bss        start:0x02141458 end:0x02141478
@@ -893,6 +894,7 @@ lib/nnsys/src/g2d/g2d_Image.c:
     .text       start:0x02060b5c end:0x020610e8
 
 lib/nnsys/src/g2d/g2d_OAM.c:
+    complete
     .text       start:0x0206067c end:0x02060b54
     .rodata     start:0x020942c4 end:0x020942f4
     .data       start:0x0209b28c end:0x0209b298
@@ -1283,6 +1285,7 @@ src/system/cgear_picture_save.c:
     .text       start:0x0200ce50 end:0x0200ce8c
 
 src/system/pokedex.c:
+    complete
     .text       start:0x0200ce8c end:0x0200dcec
     .rodata     start:0x0208f838 end:0x0208f9a0
 
@@ -1567,6 +1570,7 @@ src/system/field_light_status.c:
     .rodata     start:0x02090150 end:0x0209018c
 
 src/system/mcss.c:
+    complete
     .text       start:0x02019a14 end:0x0201c008
     .rodata     start:0x0209018c end:0x020901a4
     .data       start:0x0209a3d0 end:0x0209a3d8
@@ -1785,6 +1789,7 @@ lib/dwc/src/bm/dwc_bm_init.c:
     .text       start:0x02056f74 end:0x02056fe0
 
 lib/dwc/src/bm/util_wifiidtool.c:
+    complete
     .text       start:0x02056fe0 end:0x020575fc
     .rodata     start:0x020940dc end:0x02094104
 

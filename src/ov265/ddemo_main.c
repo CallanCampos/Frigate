@@ -166,17 +166,17 @@ void DDemoMain_InitBg2nd(void) {
 
     GFL_BGSysCreateBG(3, &setup, BGMODE_EXTENDED);
     GFL_BGSysCreateBG(BGSYS_BG_SUB + 3, &setup, BGMODE_EXTENDED);
-    MAT2_SetScaleRot(&mtx, 0, FX32_ONE, FX32_ONE, 0);
+    MAT2_SetScaleRot(&mtx, 0, FX32_ONE, FX32_ONE, MAT2_ROT_IDX);
     G2_SetBG3Affine(&mtx, 0, 0, 0, 0);
     G2S_SetBG3Affine(&mtx, 0, 0, 0, 0);
     GFL_BGSysMoveBGReq(3, BG_MOVE_SET_X, 160);
     GFL_BGSysMoveBGReq(3, BG_MOVE_SET_Y, 112);
     GFL_BGSysMoveBGReq(BGSYS_BG_SUB + 3, BG_MOVE_SET_X, 160);
     GFL_BGSysMoveBGReq(BGSYS_BG_SUB + 3, BG_MOVE_SET_Y, -152);
-    GFL_BGSysAdjustBGOriginReq(3, 9, 160);
-    GFL_BGSysAdjustBGOriginReq(3, 12, 160);
-    GFL_BGSysAdjustBGOriginReq(BGSYS_BG_SUB + 3, 9, 160);
-    GFL_BGSysAdjustBGOriginReq(BGSYS_BG_SUB + 3, 12, 160);
+    GFL_BGSysAdjustBGOriginReq(3, BG_CENTER_SET_X, 160);
+    GFL_BGSysAdjustBGOriginReq(3, BG_CENTER_SET_Y, 160);
+    GFL_BGSysAdjustBGOriginReq(BGSYS_BG_SUB + 3, BG_CENTER_SET_X, 160);
+    GFL_BGSysAdjustBGOriginReq(BGSYS_BG_SUB + 3, BG_CENTER_SET_Y, 160);
     GFL_BGSysSetBGEnabledA(GX_PLANEMASK_BG3, TRUE);
     GFL_BGSysSetBGEnabledB(GX_PLANEMASK_BG3, TRUE);
     GFL_BGSysResetStdPalette(0, GX_RGB(0, 0, 0));

@@ -15,8 +15,10 @@
 #define INFINITY_DUNGEON_ROOM_TYPE_NONE 19
 
 // The room kinds that the room templates give
-#define ROOM_KIND_START 0
-#define ROOM_KIND_GOAL 1
+enum {
+    ROOM_KIND_START,
+    ROOM_KIND_GOAL,
+};
 
 // A room of a floor's grid, x + y * 4
 typedef struct {

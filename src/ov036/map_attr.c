@@ -7,7 +7,7 @@
 
 static BOOL MapTile_IsNormalTallGrassSingleBtl(u32 tileClass);
 static BOOL MapTile_IsTallGrassSingleBtl(u32 tileClass);
-static BOOL func_ov036_021a2c70(u32 tileClass);
+static BOOL MapTile_IsSandD(u32 tileClass);
 
 // The battle terrain of each tile class
 // clang-format off
@@ -270,7 +270,7 @@ BOOL func_ov036_021a2bf4(u32 tileClass) {
     return FALSE;
 }
 
-BOOL func_ov036_021a2c04(u32 tileClass) {
+BOOL MapTile_IsSplashWater(u32 tileClass) {
     if (tileClass == 0x17) {
         return TRUE;
     }
@@ -312,7 +312,7 @@ BOOL IsTileSlidingIce(u32 tileClass) {
     return FALSE;
 }
 
-BOOL func_ov036_021a2c58(u32 tileClass) {
+BOOL MapTile_IsIce(u32 tileClass) {
     if (tileClass == 0x10) {
         return TRUE;
     }
@@ -326,7 +326,7 @@ BOOL MapTile_IsSwamp(u32 tileClass) {
     return FALSE;
 }
 
-static BOOL func_ov036_021a2c70(u32 tileClass) {
+static BOOL MapTile_IsSandD(u32 tileClass) {
     if (tileClass == 0x19) {
         return TRUE;
     }
@@ -340,8 +340,8 @@ BOOL IsTileSand(u32 tileClass) {
     return FALSE;
 }
 
-BOOL func_ov036_021a2c90(u32 tileClass) {
-    if (func_ov036_021a2c70(tileClass) || IsTileSand(tileClass)) {
+BOOL MapTile_IsAnySand(u32 tileClass) {
+    if (MapTile_IsSandD(tileClass) || IsTileSand(tileClass)) {
         return TRUE;
     }
     return FALSE;
@@ -361,14 +361,14 @@ BOOL func_ov036_021a2cd4(u32 tileClass) {
     return FALSE;
 }
 
-BOOL func_ov036_021a2ce0(u32 tileClass) {
+BOOL MapTile_IsPuddle(u32 tileClass) {
     if (tileClass == 0x2) {
         return TRUE;
     }
     return FALSE;
 }
 
-BOOL func_ov036_021a2cec(u32 tileClass) {
+BOOL MapTile_IsMud(u32 tileClass) {
     if (tileClass == 0x1e) {
         return TRUE;
     }
@@ -410,21 +410,21 @@ BOOL MapTile_IsDeepSand(u32 tileClass) {
     return FALSE;
 }
 
-BOOL func_ov036_021a2d34(u32 tileClass) {
+BOOL MapTile_IsGrassSingleB(u32 tileClass) {
     if (tileClass == 0x5) {
         return TRUE;
     }
     return FALSE;
 }
 
-BOOL func_ov036_021a2d40(u32 tileClass) {
+BOOL MapTile_IsGrassDoubleB(u32 tileClass) {
     if (tileClass == 0x7) {
         return TRUE;
     }
     return FALSE;
 }
 
-BOOL func_ov036_021a2d4c(u32 tileClass) {
+BOOL MapTile_IsMirrorFloor(u32 tileClass) {
     if (tileClass == 0x1b) {
         return TRUE;
     }
@@ -468,14 +468,14 @@ BOOL MapTile_IsBlocksCycling(u16 tileClass) {
     return FALSE;
 }
 
-BOOL func_ov036_021a2df4(u32 tileClass) {
+BOOL MapTile_IsGrassSingleC(u32 tileClass) {
     if (tileClass == 0x21) {
         return TRUE;
     }
     return FALSE;
 }
 
-BOOL func_ov036_021a2e00(u32 tileClass) {
+BOOL MapTile_IsGrassDoubleC(u32 tileClass) {
     if (tileClass == 0x22) {
         return TRUE;
     }
@@ -491,7 +491,7 @@ BOOL MapTile_IsHiddenGrottoEntranceGrass(u32 tileClass) {
 
 // The kind of phenomenon the tile can have: 0 to 3 for grass, 4 for dust clouds, 5 and 6 for water, 7 for flying
 // shadows and 8 for none
-u32 func_ov036_021a2e18(u32 tileType) {
+u32 MapTile_GetEncounterEffectKind(u32 tileType) {
     u16 tileClass = tileType;
     u16 flags = tileType >> 16;
 

@@ -41,7 +41,7 @@ static int findFriendData(DWCFriendData *friendData, int *index) {
     int i;
     DWCUserData *userData = (DWCUserData *)GFL_NetGetUserData();
     DWCFriendData *friends = (DWCFriendData *)GFL_NetGetFriendData();
-    int count = func_02042d80();
+    int count = GflNet_GetFriendListNum();
 
     *index = -1;
     if (!DWC_IsValidFriendData(friendData)) {
@@ -136,7 +136,7 @@ static void addFriend(GameData *gameData, PlayerInfo *info, const void *friendDa
     WifiList_SetFriendParam(wifiList, index, WIFI_LIST_FRIEND_TRAINER_VIEW, PlayerInfo_GetUnionView(info));
 }
 
-BOOL WifiList_AddFriend(GameData *gameData, PlayerInfo *info, const void *friendData, HeapID heapId) {
+BOOL WifiList_AddFriend(GameData *gameData, PlayerInfo *info, const DWCFriendData *friendData, HeapID heapId) {
     WifiList *wifiList = GameData_GetWifiList(gameData);
     int i;
 

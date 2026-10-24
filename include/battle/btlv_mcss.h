@@ -20,6 +20,8 @@ typedef enum {
     BTLV_MCSS_POS_SINGLE_ENEMY = 1,  // the opponent's
     BTLV_MCSS_POS_TRAINER = 8,
     BTLV_MCSS_POS_MAX = 14,
+    // No position, as an effect's attacker or defender
+    BTLV_MCSS_POS_NONE = 0xff,
 } BtlvMcssPos;
 
 // What BtlvMcss_GetFlags returns of a sprite

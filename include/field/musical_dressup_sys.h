@@ -11,7 +11,7 @@
 
 typedef struct {
     // Overlay 211's communication work, or NULL
-    void *comm;
+    MusCommWork *comm;
     MusicalPoke *poke;
     MusicalSave *save;
 } MusicalDressUpParam;

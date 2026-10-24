@@ -126,27 +126,27 @@ u32 GetTileEncountType(u32 tileClass);
 BOOL MapTile_IsReallyTallGrassSingleBtl(u32 tileClass);
 BOOL MapTile_IsReallyTallGrassDoubleBtl(u32 tileClass);
 BOOL func_ov036_021a2bf4(u32 tileClass);
-BOOL func_ov036_021a2c04(u32 tileClass);
+BOOL MapTile_IsSplashWater(u32 tileClass);
 BOOL MapTile_IsSnowNoCycling(u32 tileClass);
 BOOL MapTile_IsSnow(u32 tileClass);
-BOOL func_ov036_021a2c58(u32 tileClass);
+BOOL MapTile_IsIce(u32 tileClass);
 BOOL MapTile_IsSwamp(u32 tileClass);
 BOOL func_ov036_021a2cd4(u32 tileClass);
-BOOL func_ov036_021a2ce0(u32 tileClass);
-BOOL func_ov036_021a2cec(u32 tileClass);
+BOOL MapTile_IsPuddle(u32 tileClass);
+BOOL MapTile_IsMud(u32 tileClass);
 BOOL MapTile_IsElectricField(u32 tileClass);
 BOOL MapTile_IsDeepSand(u32 tileClass);
-BOOL func_ov036_021a2d34(u32 tileClass);
-BOOL func_ov036_021a2d40(u32 tileClass);
-BOOL func_ov036_021a2d4c(u32 tileClass);
+BOOL MapTile_IsGrassSingleB(u32 tileClass);
+BOOL MapTile_IsGrassDoubleB(u32 tileClass);
+BOOL MapTile_IsMirrorFloor(u32 tileClass);
 // Whether a tile class keeps an actor from leaving it in a direction
 BOOL TileExitBlockCheck_Up(u16 tileClass);
 BOOL TileExitBlockCheck_Down(u16 tileClass);
 BOOL TileExitBlockCheck_Left(u16 tileClass);
 BOOL TileExitBlockCheck_Right(u16 tileClass);
-BOOL func_ov036_021a2df4(u32 tileClass);
-BOOL func_ov036_021a2e00(u32 tileClass);
-BOOL func_ov036_021b3b54(u32 tileClass);
+BOOL MapTile_IsGrassSingleC(u32 tileClass);
+BOOL MapTile_IsGrassDoubleC(u32 tileClass);
+BOOL FieldRailTilemap_IsJumpStart(u32 tileClass);
 BOOL MapTile_IsSurfEdge(u32 tileClass);
 BOOL IsTileSurfWater(u16 tileClass);
 // The rest of map_attr.c
@@ -174,12 +174,12 @@ BOOL IsTileWaterfall(u32 tileClass);
 BOOL MapTile_IsSnow_(u32 tileClass);
 BOOL IsTileSlidingIce(u32 tileClass);
 BOOL IsTileSand(u32 tileClass);
-BOOL func_ov036_021a2c90(u32 tileClass);
+BOOL MapTile_IsAnySand(u32 tileClass);
 BOOL MapTile_IsElectricRock(u32 tileClass);
 BOOL MapTile_IsCatwalkBody_(u32 tileClass);
 BOOL MapTile_IsCatwalkEntryPoint(u32 tileClass);
 BOOL MapTile_IsHiddenGrottoEntranceGrass(u32 tileClass);
-u32 func_ov036_021a2e18(u32 tileType);
+u32 MapTile_GetEncounterEffectKind(u32 tileType);
 BOOL CheckSurfBeginTiles(u32 tileType, u32 frontTileType);
 
 // Overlay 36: patches of map land data from archive 0x9a, of which Join Avenue's shops are built
@@ -188,9 +188,9 @@ typedef struct LandDataPatch LandDataPatch;
 LandDataPatch *ReadLandDataPatchA154Data(u16 fileId, HeapID heapId);
 void FreeLandDataPatch(LandDataPatch *patch);
 // Copies height rows of width cells, from srcX and srcY in the patch to destX and destY in the map
-void func_ov036_021c2d04(LandDataPatch *patch, LandPatchGrid *map, u32 srcX, u32 srcY, u32 destX, u32 destY, u32 width,
-                         u32 height);
+void LandDataPatch_OverwriteAttr(LandDataPatch *patch, LandPatchGrid *map, u32 srcX, u32 srcY, u32 destX, u32 destY,
+                                 u32 width, u32 height);
 // Adds the patch's buildings at x and y, after the count already added, and returns the new count
-u32 LoadLandDataPatchBuildings(LandDataPatch *patch, void *a1, void *a2, u32 count, u32 x, u32 y);
+u32 LoadLandDataPatchBuildings(LandDataPatch *patch, FieldPropSystem *a1, FieldChunk *a2, u32 count, u32 x, u32 y);
 
 #endif // POKEBW2_FIELD_FIELD_MAP_H

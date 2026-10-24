@@ -10,7 +10,7 @@
 
 #define PLEASURE_BOAT_PERIOD 1350
 
-static BOOL func_ov036_021c2260(PleasureBoat *boat);
+static BOOL PleasureBoat_GetTimeEvent(PleasureBoat *boat);
 
 PleasureBoat *PleasureBoat_Create(BOOL a0) {
     PleasureBoat *boat = GFL_HeapAllocate(HEAPID_TRIAL_HOUSE, sizeof(PleasureBoat), TRUE, "pleasure_boat.c", 49);
@@ -29,7 +29,7 @@ PleasureBoat *PleasureBoat_Create(BOOL a0) {
     return boat;
 }
 
-void func_ov036_021c20e0(PleasureBoat *boat) {
+void PleasureBoat_AckEvent(PleasureBoat *boat) {
     if (boat != NULL && boat->unk1B4 == 0 && boat->unk0 != 0) {
         GFL_SndSEPlay(SEQ_SE_FLD_78);
         boat->period++;
@@ -37,7 +37,7 @@ void func_ov036_021c20e0(PleasureBoat *boat) {
     }
 }
 
-GameEvent *func_ov036_021c210c(GameSystem *gsys, PleasureBoat *boat) {
+GameEvent *PleasureBoat_Update(GameSystem *gsys, PleasureBoat *boat) {
     GameEvent *event;
     BOOL created;
 
@@ -48,7 +48,7 @@ GameEvent *func_ov036_021c210c(GameSystem *gsys, PleasureBoat *boat) {
         return NULL;
     }
     boat->clock++;
-    switch (func_ov036_021c2260(boat)) {
+    switch (PleasureBoat_GetTimeEvent(boat)) {
     case 1:
         boat->unk0 = 1;
         created = FALSE;
@@ -119,19 +119,19 @@ u32 PleasureBoat_GetInfo(PleasureBoat *boat, u32 info) {
     return value;
 }
 
-u32 func_ov036_021c2220(PleasureBoat *boat, u32 room) {
+u32 PleasureBoat_GetPassengerParam(PleasureBoat *boat, u32 room) {
     return boat->rooms[room].kind;
 }
 
-u32 func_ov036_021c222c(PleasureBoat *boat, u32 room) {
+u32 PleasureBoat_GetPassengerType(PleasureBoat *boat, u32 room) {
     return boat->rooms[room].unk4;
 }
 
-u32 func_ov036_021c2238(PleasureBoat *boat, u32 room, u32 index) {
+u32 PleasureBoat_GetPassengerExtra(PleasureBoat *boat, u32 room, u32 index) {
     return boat->rooms[room].values[index];
 }
 
-BOOL func_ov036_021c2248(PleasureBoat *boat, u32 room) {
+BOOL PleasureBoat_GetPassengerOccupied(PleasureBoat *boat, u32 room) {
     return boat->rooms[room].defeated;
 }
 
@@ -139,7 +139,7 @@ void PleasureBoat_SetTrainerDefeated(PleasureBoat *boat, u32 trainer, BOOL defea
     boat->rooms[trainer].defeated = defeated;
 }
 
-static BOOL func_ov036_021c2260(PleasureBoat *boat) {
+static BOOL PleasureBoat_GetTimeEvent(PleasureBoat *boat) {
     if (boat->clock >= 0x1518 && boat->period >= 4) {
         return 2;
     }

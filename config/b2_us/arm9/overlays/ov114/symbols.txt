@@ -7,11 +7,11 @@ UndergroundRuins_PlayAnm kind:function(thumb,size=0x6c) addr:0x021eeda0
 UndergroundRuins_LoadScene kind:function(thumb,size=0xd0) addr:0x021eee0c
 UndergroundRuins_FreeScene kind:function(thumb,size=0xc) addr:0x021eeedc
 UndergroundRuins_StepAnimations kind:function(thumb,size=0xc) addr:0x021eeee8
-data_ov114_021eeef4 kind:data(any) addr:0x021eeef4
-data_ov114_021eeef8 kind:data(any) addr:0x021eeef8
-data_ov114_021eef08 kind:data(any) addr:0x021eef08
+sAnimations kind:data(any) addr:0x021eeef4
+sSceneSetup kind:data(any) addr:0x021eeef8
+sResources kind:data(any) addr:0x021eef08
 data_ov114_021eef29 kind:data(any) addr:0x021eef29 ambiguous
-data_ov114_021eef50 kind:data(any) addr:0x021eef50
+sActors kind:data(any) addr:0x021eef50
 data_ov114_021eef55 kind:data(any) addr:0x021eef55 ambiguous
 data_ov114_021eef85 kind:data(any) addr:0x021eef85 ambiguous
 data_ov114_021eef99 kind:data(any) addr:0x021eef99 ambiguous

@@ -53,7 +53,7 @@ GameEventReturnCode EventSweetScent_Callback(GameEvent *event, u32 *state, void 
         FieldPlayer_SetSpecialSeq(work->player, 0x80);
         (*state)++;
     case 1:
-        if (func_ov036_0219a580(work->player) != TRUE) {
+        if (FieldPlayer_StepFormChange(work->player) != TRUE) {
             break;
         }
         FldAct_SetAcmd(FieldPlayer_GetActor(work->player), 0xa2);
@@ -73,12 +73,12 @@ GameEventReturnCode EventSweetScent_Callback(GameEvent *event, u32 *state, void 
         FieldPlayer_SetSpecialSeq(work->player, 8);
         (*state)++;
     case 4:
-        if (func_ov036_0219a580(work->player) == TRUE) {
+        if (FieldPlayer_StepFormChange(work->player) == TRUE) {
             *state = 5;
         }
         break;
     case 5:
-        if (func_ov033_02178730(work) == 0) {
+        if (EventSweetScent_CheckWeatherClear(work) == 0) {
             *state = 8;
             break;
         }
@@ -109,8 +109,8 @@ GameEventReturnCode EventSweetScent_Callback(GameEvent *event, u32 *state, void 
     return GAMEEVENT_CONTINUE;
 }
 
-BOOL func_ov033_02178730(SweetScentEventData *work) {
-    if (func_ov036_02199220(Field_GetWeatherSystem(work->field)) == 0) {
+BOOL EventSweetScent_CheckWeatherClear(SweetScentEventData *work) {
+    if (FieldWeather_GetWeatherId(Field_GetWeatherSystem(work->field)) == 0) {
         return TRUE;
     }
     return FALSE;
@@ -120,7 +120,7 @@ void func_ov033_02178748(GameEvent *event, GameSystem *gsys, Field *field) {
     GameEvent *next;
     SweetScentScreenWork *data;
 
-    next = GameEvent_Create(gsys, NULL, func_ov033_02178788, sizeof(SweetScentScreenWork));
+    next = GameEvent_Create(gsys, NULL, EventSweetScent_FadeMain, sizeof(SweetScentScreenWork));
     data = GameEvent_GetData(next);
     data->bgId = 3;
     data->alpha = 0;
@@ -130,13 +130,13 @@ void func_ov033_02178748(GameEvent *event, GameSystem *gsys, Field *field) {
     GameEvent_ChainNext(event, next);
 }
 
-GameEventReturnCode func_ov033_02178788(GameEvent *event, u32 *state, void *data) {
+GameEventReturnCode EventSweetScent_FadeMain(GameEvent *event, u32 *state, void *data) {
     SweetScentScreenWork *work;
 
     work = data;
     switch (*state) {
     case 0:
-        func_ov033_0217884c(work);
+        EventSweetScent_FadeSetup(work);
         GFL_SndSEPlay(0x683);
         (*state)++;
         break;
@@ -171,13 +171,13 @@ GameEventReturnCode func_ov033_02178788(GameEvent *event, u32 *state, void *data
         (*state)++;
         break;
     default:
-        func_ov033_021788c4(work);
+        EventSweetScent_FadeCleanup(work);
         return GAMEEVENT_DONE;
     }
     return GAMEEVENT_CONTINUE;
 }
 
-void func_ov033_0217884c(SweetScentScreenWork *work) {
+void EventSweetScent_FadeSetup(SweetScentScreenWork *work) {
     SweetScentPalette palette = sPalette;
     GFL_BGSysSetBGEnabled(work->bgId, FALSE);
     GFL_BGSysUploadStdPalette(work->bgId, &palette, 8, 0x20);
@@ -188,7 +188,7 @@ void func_ov033_0217884c(SweetScentScreenWork *work) {
     FieldDispControl_ReqSetBGEnabled(work->displayControl, work->bgId, TRUE);
 }
 
-void func_ov033_021788c4(SweetScentScreenWork *work) {
+void EventSweetScent_FadeCleanup(SweetScentScreenWork *work) {
     u16 palette[2] = { 0, 0 };
 
     GFL_BGSysUploadStdPalette(work->bgId, palette, 8, 0x20);

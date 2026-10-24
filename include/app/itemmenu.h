@@ -33,7 +33,7 @@ struct ItemMenuWork {
     PlayerInfo *playerInfo;
     PlayerActionPerms *perms;
     u32 mode;
-    void *cursor;
+    BagCursor *cursor;
     BagSave *bag;
     BOOL isCycling;
     BOOL dowsingActive;

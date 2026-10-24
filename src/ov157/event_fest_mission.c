@@ -50,8 +50,8 @@ typedef struct {
     GameSystem *gsys;
     GameData *gameData;
     Field *field;
-    void *msgBGSys;
-    void *window;
+    FieldMsgBG *msgBGSys;
+    MoneyWin *window;
     u8 unk1C[8];
     MMSys *actorSystem;
     FesGimmick *fesGimmick;
@@ -61,9 +61,7 @@ typedef struct {
     PassPowerData *passPowerData;
     u32 unk40;
     LinkFestival *festival;
-    // Copied from a FestMissionConfig, the same 0x2c bytes: FestMissionConfig and FestMission are two layouts of one
-    // struct, so the copies cast until they are merged
-    FestMission mission;
+    FestMissionConfig mission;
     FestivalText *festText;
     u8 unk78[0x14];
     // 0 or 1, which picks message 3 or 4 when the mission ends
@@ -75,15 +73,15 @@ typedef struct {
 
 typedef struct {
     u32 state;
-    void *window;
+    FieldMsgWin *window;
     BOOL waitButton;
 } FestMissionMsgWork;
 
 static void FestMissionEvent_Init(FestMissionEventWork *work, GameSystem *gsys, Field *field);
 static void FestMissionEvent_Exit(FestMissionEventWork *work);
-static void FestMissionMsg_Call(GameSystem *gsys, GameEvent *parent, void *msgBGSys, MsgData *msgData, u16 messageId,
-                                BOOL waitButton);
-static void FestMissionMsg_CallNoWait(GameSystem *gsys, GameEvent *parent, void *msgBGSys, MsgData *msgData,
+static void FestMissionMsg_Call(GameSystem *gsys, GameEvent *parent, FieldMsgBG *msgBGSys, MsgData *msgData,
+                                u16 messageId, BOOL waitButton);
+static void FestMissionMsg_CallNoWait(GameSystem *gsys, GameEvent *parent, FieldMsgBG *msgBGSys, MsgData *msgData,
                                       u16 messageId);
 static GameEventReturnCode FestMissionMsg_Callback(GameEvent *event, u32 *state, void *data);
 static GameEventReturnCode EventFestMissionStart_Callback(GameEvent *event, u32 *state, void *data);
@@ -103,7 +101,7 @@ GameEvent *EventFestMissionStart_Create(GameSystem *gsys, void *args) {
     FestMissionEventWork *work = GameEvent_GetData(event);
 
     FestMissionEvent_Init(work, gsys, field);
-    work->mission = *(FestMission *)&eventArgs->config;
+    work->mission = eventArgs->config;
     work->joined = eventArgs->joined;
     return event;
 }
@@ -115,7 +113,7 @@ GameEvent *EventFestMissionMessage_Create(GameSystem *gsys, void *args) {
     FestMissionEventWork *work = GameEvent_GetData(event);
 
     FestMissionEvent_Init(work, gsys, field);
-    work->mission = *(FestMission *)&eventArgs->config;
+    work->mission = eventArgs->config;
     work->messageType = eventArgs->messageType;
     FestMissionOffers_Remove(work->festival, &eventArgs->config);
     return event;
@@ -135,7 +133,7 @@ GameEvent *EventFestMissionInfo_Create(GameSystem *gsys, void *args) {
     FestMissionEventWork *work = GameEvent_GetData(event);
 
     FestMissionEvent_Init(work, gsys, field);
-    work->mission = *(FestMission *)&eventArgs->config;
+    work->mission = eventArgs->config;
     return event;
 }
 
@@ -189,18 +187,18 @@ static void FestMissionEvent_Exit(FestMissionEventWork *work) {
 }
 
 // Shows a message in a chained event, which ends when it is printed or, with waitButton, when a button is pressed
-static void FestMissionMsg_Call(GameSystem *gsys, GameEvent *parent, void *msgBGSys, MsgData *msgData, u16 messageId,
-                                BOOL waitButton) {
+static void FestMissionMsg_Call(GameSystem *gsys, GameEvent *parent, FieldMsgBG *msgBGSys, MsgData *msgData,
+                                u16 messageId, BOOL waitButton) {
     GameEvent *event = GameEvent_Create(gsys, NULL, FestMissionMsg_Callback, sizeof(FestMissionMsgWork));
     FestMissionMsgWork *work = GameEvent_GetData(event);
 
     work->waitButton = waitButton;
-    work->window = func_ov036_02188498(msgBGSys, msgData, 19);
-    func_ov036_02188538(work->window, 0, 0, messageId);
+    work->window = MsgBGPrinter_CreateInfoSysWin(msgBGSys, msgData, 19);
+    MsgBGPrinter_InfoSysWinPrintMsg(work->window, 0, 0, messageId);
     GameEvent_ChainNext(parent, event);
 }
 
-static void FestMissionMsg_CallNoWait(GameSystem *gsys, GameEvent *parent, void *msgBGSys, MsgData *msgData,
+static void FestMissionMsg_CallNoWait(GameSystem *gsys, GameEvent *parent, FieldMsgBG *msgBGSys, MsgData *msgData,
                                       u16 messageId) {
     FestMissionMsg_Call(gsys, parent, msgBGSys, msgData, messageId, FALSE);
 }
@@ -210,7 +208,7 @@ static GameEventReturnCode FestMissionMsg_Callback(GameEvent *event, u32 *state,
 
     switch (work->state) {
     case 0:
-        if (func_ov036_021885bc(work->window)) {
+        if (MsgBGPrinter_InfoSysWinMain(work->window)) {
             if (!work->waitButton) {
                 break;
             }
@@ -224,7 +222,7 @@ static GameEventReturnCode FestMissionMsg_Callback(GameEvent *event, u32 *state,
         }
         break;
     }
-    func_ov036_02188504(work->window);
+    MsgBGPrinter_DeleteInfoSysWin(work->window);
     return GAMEEVENT_DONE;
 }
 
@@ -249,8 +247,8 @@ static GameEventReturnCode EventFestMissionStart_Callback(GameEvent *event, u32 
         if (work->joined) {
             joinedCount = FestRecords_AddJoined(records);
             LinkFestival_StartMission(work->festival, &work->mission, work->joined);
-            work->mission = *(FestMission *)GetFestMissionCfg(work->festival);
-            FestMissionOffers_Remove(work->festival, (FestMissionConfig *)&work->mission);
+            work->mission = *GetFestMissionCfg(work->festival);
+            FestMissionOffers_Remove(work->festival, &work->mission);
             if (joinedCount >= 1) {
                 MedalBox_GiveMedal(medalBox, MEDAL_MISSION_JOIN_1);
                 if (joinedCount >= 10) {
@@ -273,8 +271,8 @@ static GameEventReturnCode EventFestMissionStart_Callback(GameEvent *event, u32 
         JoinAvenue_RecordActivity(7);
         LinkFestival_IsNewZoneFromOutside(work->festival,
                                           TownMap_GetMapZone(work->gameData, Field_GetPlayerStateZoneID(work->field)));
-        work->window = func_ov036_02187ca0(work->msgBGSys, work->msgData, 1, 1, 30, 20);
-        func_ov036_02187d38(work->window);
+        work->window = MsgBGPrinter_CreateInfoMsgWin(work->msgBGSys, work->msgData, 1, 1, 30, 20);
+        MsgBGPrinter_ClearInfoMsgWin(work->window);
         FestMission_PrintStart(work);
         (*state)++;
         break;
@@ -292,8 +290,8 @@ static GameEventReturnCode EventFestMissionStart_Callback(GameEvent *event, u32 
         (*state)++;
         break;
     case 2:
-        func_ov036_02187d38(work->window);
-        func_ov036_02187d10(work->window);
+        MsgBGPrinter_ClearInfoMsgWin(work->window);
+        MsgBGPrinter_DeleteInfoMsgWin(work->window);
         func_ov036_021b65e8(Field_GetFesGimmick(work->field));
         FestMission_OnZoneEnter(work->gsys, Field_GetPlayerStateZoneID(work->field));
         if (!work->joined) {
@@ -337,7 +335,7 @@ static GameEventReturnCode EventFestMissionMessage_Callback(GameEvent *event, u3
         (*state)++;
         break;
     case 1:
-        FestMissionOffers_Remove(work->festival, (FestMissionConfig *)&work->mission);
+        FestMissionOffers_Remove(work->festival, &work->mission);
         LinkFestival_AddRecord(work->festival, &work->mission);
         FestMissionEvent_Exit(work);
         return GAMEEVENT_DONE;
@@ -380,8 +378,8 @@ static GameEventReturnCode EventFestMissionInfo_Callback(GameEvent *event, u32 *
         (*state)++;
         break;
     case 1:
-        work->window = func_ov036_02187ca0(work->msgBGSys, work->msgData, 1, 1, 30, 20);
-        func_ov036_02187d38(work->window);
+        work->window = MsgBGPrinter_CreateInfoMsgWin(work->msgBGSys, work->msgData, 1, 1, 30, 20);
+        MsgBGPrinter_ClearInfoMsgWin(work->window);
         FestMission_PrintInfo(work);
         (*state)++;
         break;
@@ -391,8 +389,8 @@ static GameEventReturnCode EventFestMissionInfo_Callback(GameEvent *event, u32 *
         }
         break;
     default:
-        func_ov036_02187d38(work->window);
-        func_ov036_02187d10(work->window);
+        MsgBGPrinter_ClearInfoMsgWin(work->window);
+        MsgBGPrinter_DeleteInfoMsgWin(work->window);
         FestMissionEvent_Exit(work);
         return GAMEEVENT_DONE;
     }
@@ -446,12 +444,12 @@ static GameEventReturnCode EventFestMissionEnd_Callback(GameEvent *event, u32 *s
 
 static void FestMission_PrintLine(FestMissionEventWork *work, StrBuf *format, u16 x, u16 row) {
     GFL_WordSetFormatStrbuf(work->wordSet, work->formatted, format);
-    func_ov036_02187d28(work->window, x, row * 16 + 8, work->formatted);
+    MsgBGPrinter_InfoMsgWinPrintStr(work->window, x, row * 16 + 8, work->formatted);
 }
 
 // Prints the mission's name and description, the time it has left, how many it wants and its kind
 static void FestMission_Print(FestMissionEventWork *work) {
-    s32 seconds = FestMissionConfig_GetSecondsLeft((FestMissionConfig *)&work->mission);
+    s32 seconds = FestMissionConfig_GetSecondsLeft(&work->mission);
     s32 minutes;
 
     GFL_MsgDataLoadStrbuf(work->msgData, EventFestMission_Text_Empty, work->strbuf);
@@ -463,14 +461,14 @@ static void FestMission_Print(FestMissionEventWork *work) {
     minutes = seconds / 60;
     WordSetNumber(work->wordSet, 2, minutes, 4, NUM_PAD_NONE, TRUE);
     WordSetNumber(work->wordSet, 3, seconds % 60, 2, NUM_PAD_NONE, TRUE);
-    WordSetNumber(work->wordSet, 4, work->mission.count, 4, NUM_PAD_NONE, TRUE);
+    WordSetNumber(work->wordSet, 4, work->mission.info.count, 4, NUM_PAD_NONE, TRUE);
     if (minutes == 0) {
         GFL_MsgDataLoadStrbuf(work->msgData, EventFestMission_Text_TimeRemainingSec, work->strbuf);
     } else {
         GFL_MsgDataLoadStrbuf(work->msgData, EventFestMission_Text_TimeRemainingMinSec, work->strbuf);
     }
     FestMission_PrintLine(work, work->strbuf, 8, 7);
-    GFL_MsgDataLoadStrbuf(work->msgData, work->mission.unk10_6 + 13, work->strbuf);
+    GFL_MsgDataLoadStrbuf(work->msgData, work->mission.info.unk10_6 + 13, work->strbuf);
     FestMission_PrintLine(work, work->strbuf, 8, 8);
 }
 

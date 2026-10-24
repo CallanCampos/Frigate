@@ -18,7 +18,7 @@ BOOL UnionEff_IsPlayerOnSpot(Field *field);
 int UnionEff_GetKindStep(int kind);
 // Whether the beacon's player is one of the wifi list's friends
 BOOL UnionEff_IsFriendBeacon(WifiList *wifiList, const UnionBeacon *beacon);
-void *UnionEff_Create(HeapID heapId);
+UnionEffect *UnionEff_Create(HeapID heapId);
 void UnionEff_Free(UnionEffect *work);
 void UnionEff_Update(UnionEffect *work);
 void UnionEff_Draw(UnionEffect *work);

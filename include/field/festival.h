@@ -2,6 +2,8 @@
 #define POKEBW2_FIELD_FESTIVAL_H
 
 #include "types.h"
+#include "field/fest_mission_gimmick.h"
+#include "field/fest_mission_sparkle.h"
 #include "field/rival_select.h"
 #include "gfl/heap.h"
 #include "nitro/fx.h"
@@ -47,6 +49,14 @@ typedef struct {
     u16 total;
 } LinkFestivalRanking;
 
+// The current mission's work, which the festival keeps and each kind of mission uses as its own: the hollows'
+// rivals, the people's places and actors, or the sparkles' places
+union FestMissionWork {
+    RivalEntry hollows[224];
+    FesMissionWork people;
+    FestSparkleWork sparkle;
+};
+
 // The Funfest's work, which the game system holds (GSYS_GetLinkFestival)
 struct LinkFestival {
     GameSystem *gsys;
@@ -71,12 +81,12 @@ struct LinkFestival {
     u16 lastTotal;
     ArcTool *archive;
     // File 0 of the archive: every mission's FestMissionHeader (field/fest_mission_data.h)
-    void *headers;
+    FestMissionHeader *headers;
     FestMissionConfig config;
     // The two parts of config
     FestMissionInfo *info;
-    // The FestMissionHeader at the start of config
-    void *missionHeader;
+    // config's FestMissionHeader
+    FestMissionHeader *missionHeader;
     FestMissionRecord records[LINK_FESTIVAL_RECORD_COUNT];
     // The current mission
     FestMissionRecord current;
@@ -86,8 +96,7 @@ struct LinkFestival {
     FestMissionLog log;
     FestMissionPassPowers passPowers;
     FestMissionOffers offers;
-    // What LinkFestival_GetEntries (field/rival_select.h) gives
-    RivalEntry entries[224];
+    FestMissionWork missionWork;
 };
 
 // A mission taken from a beacon (FestMissionEntry_Clear, FestMissionConfig_FromBeacon, LinkFestival_UpdateMember)
@@ -114,7 +123,7 @@ BOOL func_ov036_021b6690(FesGimmick *gimmick);
 GameEvent *func_ov036_021b6700(FesGimmick *gimmick, const VecFx32 *position);
 GameEvent *func_ov036_021b672c(FesGimmick *gimmick, const RailPosition *position);
 u32 LinkFestival_GetNormalChangeBGMID(LinkFestival *festival);
-void *GetFestMissionCfg(LinkFestival *festival);
+FestMissionConfig *GetFestMissionCfg(LinkFestival *festival);
 // Overlay 12's fest_mission_field.c: the zone a mission uses in place of a zone, a random state seeded for the
 // mission, a random number below max that the list doesn't have, and the mission's work on entering a zone
 u16 FestMission_GetMissionZone(u16 zoneId);
@@ -123,19 +132,19 @@ u32 FestMission_RandExcluding(MATHRandContext32 *rand, u32 max, const u32 *list,
 LinkFestival *CreateLinkFestival(HeapID heapId, GameSystem *gsys);
 void FreeLinkFestival(LinkFestival *festival);
 void LinkFestival_Update(LinkFestival *festival);
-// Copies the current mission's beacon data to mission, with value
-void LinkFestival_FillMissionInfo(LinkFestival *festival, void *mission, u16 value);
+// Copies the current mission's beacon data to info, with value
+void LinkFestival_FillMissionInfo(LinkFestival *festival, FestMissionInfo *info, u16 value);
 // The player's score in the mission
 u16 LinkFestival_GetScore(LinkFestival *festival);
 // The mission's seconds left
 u16 LinkFestival_GetSecondsLeft(LinkFestival *festival);
 void LinkFestival_GetRanking(LinkFestival *festival, LinkFestivalRanking *ranking);
-void *LinkFestival_GetLog(LinkFestival *festival);
-void *LinkFestival_GetViewLog(LinkFestival *festival);
-void *LinkFestival_GetPassPowers(LinkFestival *festival);
+FestMissionLog *LinkFestival_GetLog(LinkFestival *festival);
+FestMissionLog *LinkFestival_GetViewLog(LinkFestival *festival);
+FestMissionPassPowers *LinkFestival_GetPassPowers(LinkFestival *festival);
 // Copies a mission's FestMissionHeader to dest
 void FetchFestMissionCfgGimmickID(LinkFestival *festival, u8 index, FestMissionHeader *dest);
-void LinkFestival_StartMission(LinkFestival *festival, void *mission, u8 joined);
+void LinkFestival_StartMission(LinkFestival *festival, const FestMissionConfig *mission, u8 joined);
 void LinkFestival_SetState(LinkFestival *festival, u32 state);
 int LinkFestival_GetState(LinkFestival *festival);
 u16 LinkFestival_GetShownTotal(LinkFestival *festival);
@@ -152,7 +161,7 @@ u32 LinkFestival_AddMissionScore(GameSystem *gsys, u32 a1, u32 a2);
 // The players in the mission, or 0 without one
 int LinkFestival_GetMemberCount(LinkFestival *festival);
 // Remembers a mission seen while none is on
-void LinkFestival_AddRecord(LinkFestival *festival, void *mission);
+void LinkFestival_AddRecord(LinkFestival *festival, FestMissionConfig *config);
 // Whether a mission of a beacon is not to be offered
 BOOL LinkFestival_ShouldSkipOffer(LinkFestival *festival, FestMissionConfig *config);
 // A score for best: the player's own when name is NULL
@@ -166,7 +175,7 @@ void FestMissionEntry_Clear(FestMissionEntry *entry);
 int LinkFestival_UpdateMember(LinkFestival *festival, FestMissionEntry *entry, u32 *out);
 void LinkFestival_StartTimer(LinkFestival *festival, u32 arg1);
 u32 GetTrainerCardTextMSGID(u32 type);
-void *FieldFMissionInfo_Create(GameSystem *gsys, HeapID heapId);
+FieldFMissionInfo *FieldFMissionInfo_Create(GameSystem *gsys, HeapID heapId);
 void FieldFMissionInfo_Free(FieldFMissionInfo *work);
 void FieldFMissionInfo_Update(FieldFMissionInfo *work);
 void FieldFMissionInfo_UpdateDisplay(FieldFMissionInfo *work);
@@ -176,5 +185,7 @@ void FesGimmick_BindActorSystem(FesGimmick *gimmick, MMSys *actorSystem);
 void FesGimmick_BindPlayer(FesGimmick *gimmick, FieldEffects *effects, FieldPlayer *player);
 void func_ov036_021b65d4(FesGimmick *gimmick);
 void func_ov036_021b6660(FesGimmick *gimmick);
+
+FestMissionWork *LinkFestival_GetMissionWork(LinkFestival *festival);
 
 #endif // POKEBW2_FIELD_FESTIVAL_H

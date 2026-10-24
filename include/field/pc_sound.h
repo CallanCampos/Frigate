@@ -20,9 +20,9 @@ GameEvent *CreatePCSoundCallEvent(GameEvent *parent, GameSystem *gsys, Field *fi
 GameEventReturnCode func_ov033_021799e8(GameEvent *event, u32 *state, void *data);
 GameEvent *func_ov033_02179a58(GameEvent *parent, GameSystem *gsys, Field *field);
 GameEventReturnCode pcLogOffSound(GameEvent *event, u32 *state, void *data);
-GameEvent *func_ov033_02179b24(GameEvent *parent, GameSystem *gsys, Field *field, u32 skipSound);
-GameEvent *func_ov033_02179868(GameSystem *gsys, u16 option, u16 *result);
-GameEventReturnCode func_ov033_021798a0(GameEvent *event, u32 *state, void *data);
+GameEvent *FieldDoorAnime_StartClose(GameEvent *parent, GameSystem *gsys, Field *field, u32 skipSound);
+GameEvent *Scrcmd_CreateSubProcEvent(GameSystem *gsys, u16 option, u16 *result);
+GameEventReturnCode Scrcmd_SubProcEventMain(GameEvent *event, u32 *state, void *data);
 
 extern const GameProcFunctions DENDOU_PC_PROC_FUNCTIONS;
 

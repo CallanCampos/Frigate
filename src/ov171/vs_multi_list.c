@@ -283,13 +283,13 @@ static int VsMultiList_StateSlide(VsMultiListWork *wk) {
 }
 
 static int VsMultiList_StartWipeIn(VsMultiListWork *wk, int next) {
-    GFL_WipeSet(0, 1, 1, 0, 6, TRUE, HEAPID_VS_MULTI_LIST);
+    GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_IN, WIPE_TYPE_FADE_IN, 0, 6, TRUE, HEAPID_VS_MULTI_LIST);
     wk->wipeNext = next;
     return STATE_WAIT_WIPE;
 }
 
 static int VsMultiList_StartWipeOut(VsMultiListWork *wk, int next) {
-    GFL_WipeSet(0, 0, 0, 0, 6, TRUE, HEAPID_VS_MULTI_LIST);
+    GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, 0, 6, TRUE, HEAPID_VS_MULTI_LIST);
     wk->wipeNext = next;
     return STATE_WAIT_WIPE;
 }

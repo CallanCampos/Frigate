@@ -11,9 +11,11 @@
 typedef struct MedalInfoViewer MedalInfoViewer;
 
 // The viewer's modes
-#define MEDAL_INFO_VIEWER_MODE_BACK 0
-#define MEDAL_INFO_VIEWER_MODE_BACK_OR_FIELD 1
-#define MEDAL_INFO_VIEWER_MODE_LIST 2
+enum {
+    MEDAL_INFO_VIEWER_MODE_BACK,
+    MEDAL_INFO_VIEWER_MODE_BACK_OR_FIELD,
+    MEDAL_INFO_VIEWER_MODE_LIST,
+};
 
 // The medal id of an entry that holds no medal
 #define MEDAL_INFO_NO_MEDAL 0xff
@@ -37,6 +39,7 @@ typedef struct {
     u32 count;
     // The entry shown first
     u32 startIndex;
+    // A MEDAL_INFO_VIEWER_MODE_*
     u32 mode;
     // The entry that was shown last, set when the viewer closes
     u32 selected;

@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Compile every C file in src/ and lib/, and assemble every library assembly file, for each version, with the tools
-and flags configure.py gives them, and report compiler diagnostics, including warnings on successful compilations. Only a nonzero compiler exit status
-counts as failure. It needs no base ROM, so CI runs it on every push and pull request; matching is still checked
-by `ninja` with the ROMs.
+and flags configure.py gives them, and report compiler diagnostics. A nonzero compiler exit status fails the run, and so
+does a warning on a successful compilation: the project has none, as the macOS build checks in its log. It needs no
+base ROM, so CI runs it on every push and pull request; matching is still checked by `ninja` with the ROMs.
 
     compile_all.py                  # every file, both versions
     compile_all.py --version b2_us  # one version
@@ -109,6 +109,7 @@ def main():
         jobs = [pool.submit(compile_file, source, version, Path(tmp)) for version in versions for source in sources]
         results = [job.result() for job in jobs]
     failures = 0
+    warned = 0
     for result in results:
         for output, stream in ((result.stdout, sys.stdout), (result.stderr, sys.stderr)):
             if output:
@@ -119,9 +120,13 @@ def main():
             if not result.stdout and not result.stderr:
                 print(f"{result.source} ({result.version}): compiler exited with status {result.returncode}",
                       file=sys.stderr)
+        elif "warning:" in result.stdout or "warning:" in result.stderr:
+            warned += 1
     print(f"{len(sources) * len(versions) - failures} of {len(sources) * len(versions)} compiled "
           f"({len(sources)} files, {', '.join(versions)})")
-    sys.exit(1 if failures else 0)
+    if warned:
+        print(f"{warned} compiled with warnings, which fail the run", file=sys.stderr)
+    sys.exit(1 if failures or warned else 0)
 
 
 if __name__ == "__main__":

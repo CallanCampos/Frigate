@@ -160,7 +160,7 @@ void StaActLight_SetColor(StaActLightSys *sys, StaActLight *light, GXRgb color, 
     light->alpha = alpha;
 }
 
-void func_ov209_021bd770(StaActLightSys *sys, StaActLight *light, u32 a2, u32 a3) {
+void StaActLight_SetElemB(StaActLightSys *sys, StaActLight *light, u32 a2, u32 a3) {
     light->unk14 = a2;
     light->unk18 = a3;
 }
