@@ -307,7 +307,6 @@ s8 *BattleMon_GetStatStagePtr(BattleMon *mon, u32 stat, s8 *min, s8 *max);
 BOOL IsStatChangeValid(BattleMon *mon, u32 stat, s32 change);
 BOOL AreStatsLowered(BattleMon *mon);
 u32 BattleMon_GetSemiInvulnFlag(BattleMon *mon);
-extern const u32 data_ov167_021d7490[];
 BattleCondition ZeroConditionTurns(void);
 BOOL Condition_IsNull(BattleCondition condition);
 void SetMoveCondition(BattleMon *mon, u32 condition, BattleCondition value);

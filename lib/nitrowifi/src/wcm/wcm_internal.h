@@ -4,8 +4,9 @@
 #include "nitrowifi/wcm.h"
 #include "twl/nwm.h"
 
-// Descriptive private interface recovered from WCM and its LTD callers. The original header identity and
-// source-file boundaries are unconfirmed; these declarations do not establish additional SDK API names.
+// WCM's private interface, which its files (wcm_system.c, wcm_aplist.c, wcm_cpsif.c, wcm_util.c, wcm_wmif.c and the
+// DSi backend wcm_dsi.c) share. The SDK's private header isn't known; the functions have the SDK's names, and the types
+// are ours.
 typedef struct WCMWork WCMWork;
 typedef struct WCMCpsifWork WCMCpsifWork;
 
@@ -34,11 +35,11 @@ struct WCMWork {
     WCMNotify notify;     // 0x12d0
     u32 searchOption;     // 0x12d4
     u16 scanChannelTime;  // 0x12d8, zero selects the WM default
-    s16 pendingNotify;    // 0x12da, notification ID consumed by WCM_NotifyResult
+    s16 pendingNotify;    // 0x12da, notification ID consumed by WCMi_Notify
     u8 apListLocked;      // 0x12dc
     u8 resetPending;      // 0x12dd, set before reset submission; successful reset completion clears it
     u8 state;             // 0x12de
-    u8 wirelessMode;      // 0x12df, selected by WCM_InitCore: 1 for DS, 2 for DSi
+    u8 wirelessMode;      // 0x12df, selected by WCM_InitEx: 1 for DS, 2 for DSi
     WMBssDesc connectBss; // 0x12e0, the access point's description, copied from WCM_ConnectAsync's argument
     union {
         // The DS's
@@ -76,23 +77,61 @@ struct WCMCpsifWork {
     u8 unk_36[2];
 };
 
+// An access point WCM found during a search, in a doubly linked list off the caller's apBuffer. WCM_PointApList's
+// result points at data, past this header
+typedef struct WCMApList WCMApList;
+struct WCMApList {
+    u8 inUse;
+    u8 unk_01;
+    u16 scanLinkLevel; // DS scan link level; the DSi producer's value domain is unconfirmed
+    u32 id;            // the AP list header's count when this entry was allocated or reused
+    WCMApList *prev;
+    WCMApList *next;
+    u32 data[WCM_APLIST_SIZE / sizeof(u32)]; // a WMBssDesc's prefix; bytes 0x40..0xbf hold packed IEs, not WMGameInfo
+};
+
+// The caller's AP list buffer (WCMConfig.pbdbuffer), read as a header followed by up to apMax WCMApList records
+typedef struct WCMApListHeader {
+    u32 count;
+    WCMApList *head; // the oldest entry (WcmGetOldestApList's result)
+    WCMApList *tail; // the newest
+    WCMApList entries[];
+} WCMApListHeader;
+
+// wcm_system.c
 // Borrowed internal storage. WCM_Finish invalidates the work pointer; the globals have static lifetime.
 // Callers must obey WCM's initialization and IRQ synchronization requirements.
 WCMWork *WCMi_GetSystemWork(void);
-WCMCpsifWork *WCM_GetGlobal(void);
-void WcmSetPhase(s32 newState);
-u16 WcmGetNextScanChannel(s32 channelIndex);
-
+u16 WCMi_GetNextScanChannel(s32 channelIndex);
 // Notification callbacks run synchronously with temporary notice storage and must not retain its pointer.
 // Mixed pointer/integer payloads use ARM32 words; a host port must widen this representation.
-void WcmNotifyEx(s16 notify, s16 result, s32 parameter, void *param1, s32 param2);
-void WCM_NotifyResult(s16 result, void *parameter, u32 detail, u32 line);
-
-// Adds a mode-dependent encoded signal sample; its physical units are unconfirmed.
-void WCMi_ShelterRssi(s32 rssi);
+void WCMi_Notify(s16 result, void *parameter, u32 detail, u32 line);
+void WCMi_NotifyEx(s16 notify, s16 result, s32 parameter, void *param1, s32 param2);
+void WCMi_SetPhase(s32 newState);
 // Cancels the timeout alarm and rearms it while connected in state 9.
 void WCMi_ResetKeepAliveAlarm(void);
+
+// wcm_cpsif.c
+// Sets up the send state once, at WCM_InitEx
+void WCMi_InitCpsif(void);
+WCMCpsifWork *WCMi_GetCpsifWork(void);
 // Copies six MAC-address bytes into WCM's globals; the source pointer is not retained.
-void WCM_SetMacAddress(const u8 *mac);
+void WCMi_CpsifSetMacAddress(const u8 *mac);
+
+// wcm_util.c
+// TRUE when the two six-byte BSSIDs are the same
+BOOL WCM_CompareBssID(const u8 *a, const u8 *b);
+// Adds a mode-dependent encoded signal sample; its physical units are unconfirmed.
+void WCMi_ShelterRssi(s32 rssi);
+
+// wcm_wmif.c: the DS's steps of wcm_system.c's operations, through NitroSDK's WM
+s32 WCMi_WmifStartupAsync(void);
+s32 WCMi_WmifCleanupAsync(void);
+s32 WCMi_WmifBeginSearchAsync(const u8 *bssid, const u8 *essid, u32 option);
+s32 WCMi_WmifConnectAsync(void);
+s32 WCMi_WmifDisconnectAsync(void);
+s32 WCMi_WmifTerminateAsync(void);
+s32 WCMi_WmifSetDCFData(const u8 *dst, const void *buffer, u16 byteLen, void (*completion)(s32));
+u16 WCMi_WmifGetAllowedChannel(void);
 
 #endif // POKEBW2_NITROWIFI_WCM_INTERNAL_H

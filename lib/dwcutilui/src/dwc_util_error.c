@@ -151,7 +151,7 @@ static void DWCUtilError_DrawMessage(void) {
     text = DWCi_FNTlFormBgEx(0, sErrorFonts[DWCi_Language()]);
     msg = DWCi_MSGlGet(gDWCUtilMsg, type);
     OS_SNPrintf(digits, sizeof(digits), "%d", -sErrorCode);
-    DWCUtilString_Widen(str, (u8 *)digits, 8);
+    DWCi_STRlConvertStringAsciiToUnicode(str, (u8 *)digits, 8);
     y = sErrorCodePos[DWCi_Language()][1];
     x = sErrorCodePos[DWCi_Language()][0];
     DWCi_FNTlDrawStringEx(text, x, y, 2, 10, str, 0);

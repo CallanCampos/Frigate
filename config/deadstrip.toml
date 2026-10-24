@@ -1,0 +1,54 @@
+# Code the original link dead-stripped, by source file (docs/configs.md, "Dead-stripped code").
+#
+# Game Freak's link dropped the functions nothing called, but kept the data those functions had pooled with live code,
+# so a few files hold data whose only readers are missing from the ROM. Our link keeps everything with -nodead, since
+# dead-stripping would also drop the delinked objects nothing refers to, and that stays for every other file;
+# mwldarm -partial can't strip either. For a source listed here, the build compiles an intermediate object and
+# tools/build/deadstrip.py drops the listed symbols from it, with what only they reached, before the link and objdiff
+# take it. The rest of the object is unchanged. The ROM has none of the listed code, so it can't be checked against
+# the original's: each entry is a flagged exception for the maintainer to accept, and its source file says which
+# functions are reconstructions and from what.
+#
+# Each key is a source file's path, and its list the global symbols (functions or data) the original link dropped.
+# A static function, a string or an unpooled static (one in a section of its own, such as a local initializer's
+# template) that only listed code uses goes with it; data pooled with live code stays, and so does a global the list
+# doesn't name. The strip fails if code of the object that stays refers to a listed symbol, and
+# tools/build/check_deadstrip.py if any other object of the link does.
+[deadstrip]
+# The wipe handlers the game's table doesn't use, whose function-local statics are the rest of the file's .rodata
+# and .data
+"src/system/wipe_sub.c" = [
+    "WipeFunc_LinesInwardOut",
+    "WipeFunc_LinesOutwardIn",
+    "WipeFunc_LinesOutwardOut",
+    "WipeFunc_LinesInwardIn",
+    "WipeFunc_ShrinkMiddleOut",
+    "WipeFunc_GrowMiddleIn",
+    "WipeFunc_GrowMiddleOut",
+    "WipeFunc_ShrinkMiddleIn",
+    "WipeFunc_LowCircleOut",
+    "WipeFunc_LowCircleIn",
+    "WipeFunc_WedgeOut",
+    "WipeFunc_WedgeIn",
+    "WipeFunc_ShrinkCenterOut",
+    "WipeFunc_GrowCenterIn",
+    "WipeFunc_GrowCenterOut",
+    "WipeFunc_ShrinkCenterIn",
+    "WipeFunc_HourglassOut",
+    "WipeFunc_HourglassIn",
+    "WipeFunc_BandsOut",
+    "WipeFunc_BandsIn",
+    "WipeFunc_LinesThreeWayOut",
+    "WipeFunc_LinesThreeWayIn",
+    "WipeFunc_SweepOut",
+    "WipeFunc_SweepIn",
+    "WipeFunc_CrossOut",
+    "WipeFunc_CrossIn",
+    "WipeFunc_HighCircleOut",
+    "WipeFunc_HighCircleIn",
+    "WipeFunc_ClampOut",
+    "WipeFunc_ClampIn",
+    "WipeFunc_ClockOut",
+]
+# The window readers that only wipe_sub.c's dead-stripped plane swap called
+"src/system/wipe_wnd.c" = ["WipeWnd_GetInsidePlane", "WipeWnd_GetOutsidePlane"]

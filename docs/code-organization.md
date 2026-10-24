@@ -19,6 +19,12 @@ every section.
 - The C file holds its functions in address order. A function that doesn't match yet stays in the file as the closest
   C found, so objdiff shows how far off it is. Library code built with another compiler can differ: SPL's compiler
   emits a file's functions in reverse source order, so `lib/spl/src/` files hold theirs in reverse address order.
+- Code the original link dead-stripped, which `config/deadstrip.toml` lists and the build strips again, is the
+  exception to both rules above (`docs/configs.md`, "Dead-stripped code"): written back from another decomp so that
+  the data it pooled with live code comes out, or because such code calls it, it has no address and sits among the
+  live functions in that decomp's order, can't be checked against the asm, and doesn't keep its file from `complete`.
+  The file's comments flag it as reconstructions. It is used for `src/system/wipe_sub.c`'s dead wipe handlers and for
+  the two `src/system/wipe_wnd.c` window readers that their plane swap calls.
 - `src/` holds the code built with the game's compiler. An overlay's files go in `src/ovNNN/`, and the main
   module's in `src/gfl/` (Game Freak's library) and `src/system/` (the game's own code), mirroring `include/`.
   The default flags are in `configure.py`; a file whose original code and data require another setting goes in
@@ -44,7 +50,9 @@ every section.
   backend in the LTD autoload's `.ltdmain`, Thumb with the game's compiler), `lib/dpw/` (the Global Trade Station's
   and the Battle Subway's Wi-Fi library in overlay 189, ARM),
   `lib/poke_net/` (the Global Data Server client at the end of overlay 201, ARM), `lib/dwcutil/` (the DWC utility, the
-  Wi-Fi Connection settings in overlay 182, built with MWCC 2.0), `lib/dwcutilui/` (that utility's main loop, screens,
+  Wi-Fi Connection settings in overlay 182, built with MWCC 2.0, but for its DS Download Play parent and wireless
+  helper, `dwc_mov_mbp.c` and `dwc_mov_wh.c`, built with the game's compiler and flags through `file_compilers` and
+  `file_flags`), `lib/dwcutilui/` (that utility's main loop, screens,
   keyboards and selectable objects, and the helpers under them: resources, messages, heap, OAM, cells, fades, text,
   input, interrupts, lists, OBJ characters, strings, VRAM banks, tasks and display, built with the game's compiler and
   flags but unsigned `char`; the name is ours) and `lib/irc/` (the infrared link, overlay 31's last two files, built
@@ -92,8 +100,8 @@ every section.
   `lib/dsprot/include/dsprot/`, `lib/dwc/include/dwc/` (Nintendo's Wi-Fi Connection library),
   `lib/nitrowifi/include/nitrowifi/` (NitroWiFi, under DWC), `lib/twl/include/twl/` (TwlSDK),
   `lib/dpw/include/dpw/` (the Global Trade Station's server library), `lib/poke_net/include/poke_net/` (the Global
-  Data Server client), `lib/dwcutil/include/dwcutil/` (the DWC utility's AOSS client and connection test, which its
-  screens call) and `lib/irc/include/irc/` (the infrared link).
+  Data Server client), `lib/dwcutil/include/dwcutil/` (the DWC utility's AOSS client, connection test and
+  DS Download Play parent and wireless helper, which its screens and overlay 182's Download Play flow call) and `lib/irc/include/irc/` (the infrared link).
   A header is named after the original file that owns its declarations, or after swan's header for it, such as
   `field/field_3dci.h`.
 - Put functions, data and callback tables used across source files or overlays in the owning file's header. Declare

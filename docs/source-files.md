@@ -118,8 +118,8 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 | `socl_close.c` | `0x021572f4`–`0x02157620` | 7 | complete | descriptive |
 | `socl_cleanup.c` | `0x02157620`–`0x02157894` | 8 | complete | descriptive |
 | `socl_poll.c` | `0x02157894`–`0x02157978` | 2 | complete | descriptive |
-| `socl_misc.c` | `0x02157978`–`0x02157980` | 1 | complete | descriptive |
-| `socl_list.c` | `0x02157980`–`0x02157bd0` | 13 | partial | descriptive |
+| `socl_misc.c` | `0x02157978`–`0x02157af0` | 5 | partial | descriptive |
+| `socl_list.c` | `0x02157af0`–`0x02157bd0` | 9 | complete | descriptive |
 | `soc.c` | `0x02157bd0`–`0x02158174` | 23 | partial | descriptive |
 | `socl_ssl.c` | `0x02158174`–`0x02158250` | 3 | complete | descriptive |
 | `ssl.c` | `0x02158250`–`0x0215a6b4` | 60 | partial | descriptive |
@@ -127,7 +127,11 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 | `sha1.c` | `0x0215ab04`–`0x0215b1d8` | 8 | complete | descriptive |
 | `ssl_rc4.c` | `0x0215b1d8`–`0x0215b274` | 2 | complete | descriptive |
 | `biginteger.c` | `0x0215b274`–`0x0215bbec` | 19 | partial | descriptive |
-| `wcm.c` | `0x0215bbec`–`0x0215dd74` | 93 | partial | descriptive |
+| `wcm_system.c` | `0x0215bbec`–`0x0215c594` | 39 | complete | descriptive |
+| `wcm_aplist.c` | `0x0215c594`–`0x0215cac4` | 14 | complete | descriptive |
+| `wcm_cpsif.c` | `0x0215cac4`–`0x0215cd28` | 13 | complete | descriptive |
+| `wcm_util.c` | `0x0215cd28`–`0x0215ce88` | 6 | complete | descriptive |
+| `wcm_wmif.c` | `0x0215ce88`–`0x0215dd74` | 21 | complete | descriptive |
 | `dwc_main.c` | `0x0215fa0c`–`0x02160e10` | 49 | partial | descriptive |
 | `dwc_match.c` | `0x02160e10`–`0x02168818` | 161 | partial | descriptive |
 | `dwc_nasfunc.c` | `0x021694d4`–`0x0216a408` | 30 | complete | descriptive |
@@ -1616,8 +1620,8 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 | `btl_server_flow.c` | `0x0219f390`–`0x021ae32c` | 997 | complete | string at `0x021dae9c` |
 | `btl_server_flow_sub.c` | `0x021ae32c`–`0x021b083c` | 151 | complete | descriptive |
 | `btl_handler_work.c` | `0x021b083c`–`0x021b0a1c` | 11 | complete | descriptive |
-| `btl_server_cmd.c` | `0x021b0a1c`–`0x021b1674` | 19 | partial | descriptive |
-| `btl_client.c` | `0x021b1674`–`0x021b9950` | 311 | partial | string at `0x021daf60` |
+| `btl_server_cmd.c` | `0x021b0a1c`–`0x021b1674` | 19 | complete | descriptive |
+| `btl_client.c` | `0x021b1674`–`0x021b9950` | 311 | complete | string at `0x021daf60` |
 | `btl_net.c` | `0x021b9950`–`0x021ba584` | 63 | complete | string at `0x021daf70` |
 | `btl_pokeparam.c` | `0x021ba584`–`0x021bc6bc` | 154 | complete | string at `0x021daf7c` |
 | `battle_event.c` | `0x021bc6bc`–`0x021bd054` | 46 | complete | descriptive |
@@ -1793,14 +1797,15 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 
 ### Overlay 182
 
-982 of 1113 functions are in source files.
+1113 of 1113 functions are in source files.
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
 | `dwc_raputil.c` | `0x021a4920`–`0x021a49d0` | 5 | complete | string at `0x021c05c0` |
-| `dwc_aoss.c` | `0x021a49d0`–`0x021a6c1c` | 71 | partial | descriptive |
+| `dwc_aoss.c` | `0x021a49d0`–`0x021a6c1c` | 71 | complete | descriptive |
 | `dwc_aoss_ap.c` | `0x021a6c1c`–`0x021a71fc` | 12 | partial | descriptive |
 | `dwc_wcm.c` | `0x021a71fc`–`0x021a7858` | 9 | complete | descriptive |
+| `dwcutil_ac.c` | `0x021a7858`–`0x021ab040` | 66 | partial | descriptive |
 | `dwc_util_ui_effect.c` | `0x021ab040`–`0x021ab17c` | 3 | complete | descriptive |
 | `dwc_util_ui_object.c` | `0x021ab17c`–`0x021ab588` | 15 | complete | descriptive |
 | `dwc_util_screen.c` | `0x021ab588`–`0x021ab63c` | 3 | complete | descriptive |
@@ -1808,7 +1813,7 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 | `dwc_util_button_sprites.c` | `0x021ab7c8`–`0x021ab90c` | 5 | complete | descriptive |
 | `dwc_util_bg_overlay.c` | `0x021ab90c`–`0x021ab9fc` | 6 | complete | descriptive |
 | `dwc_util_link_icon.c` | `0x021ab9fc`–`0x021abb10` | 3 | complete | descriptive |
-| `dwc_util_keyboard.c` | `0x021abb10`–`0x021acd80` | 30 | partial | descriptive |
+| `dwc_util_keyboard.c` | `0x021abb10`–`0x021acd80` | 30 | complete | descriptive |
 | `dwc_util_menu.c` | `0x021acd80`–`0x021ada94` | 28 | complete | descriptive |
 | `dwc_util_aoss_session.c` | `0x021ada94`–`0x021adbc0` | 5 | complete | descriptive |
 | `dwc_util_main.c` | `0x021adbc0`–`0x021ae084` | 15 | complete | descriptive |
@@ -1830,7 +1835,7 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 | `dwc_util_wep_keyboard.c` | `0x021b19f4`–`0x021b2120` | 19 | complete | descriptive |
 | `dwc_util_address_edit.c` | `0x021b2120`–`0x021b293c` | 21 | complete | descriptive |
 | `dwc_util_error.c` | `0x021b293c`–`0x021b2d48` | 14 | complete | descriptive |
-| `dwc_util_address_settings.c` | `0x021b2d48`–`0x021b4404` | 40 | partial | descriptive |
+| `dwc_util_address_settings.c` | `0x021b2d48`–`0x021b4404` | 40 | complete | descriptive |
 | `dwc_util_save_settings.c` | `0x021b4404`–`0x021b4588` | 9 | complete | descriptive |
 | `dwc_util_test_progress.c` | `0x021b4588`–`0x021b4864` | 16 | complete | descriptive |
 | `dwc_util_test_connect.c` | `0x021b4864`–`0x021b4b68` | 16 | complete | descriptive |
@@ -1853,12 +1858,14 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 | `dwc_util_sub_screen.c` | `0x021b8154`–`0x021b8834` | 18 | complete | descriptive |
 | `dwc_util_usb_scan.c` | `0x021b8834`–`0x021b8cf0` | 8 | partial | descriptive |
 | `dwc_util_dialog.c` | `0x021b8cf0`–`0x021b93e8` | 15 | complete | descriptive |
-| `download_play.c` | `0x021b93e8`–`0x021b9bbc` | 19 | complete | descriptive |
+| `dwc_mov_mbp.c` | `0x021b93e8`–`0x021b9bbc` | 19 | complete | descriptive |
+| `dwc_mov_wh.c` | `0x021b9bbc`–`0x021ba768` | 45 | partial | descriptive |
+| `download_play_sys.c` | `0x021ba768`–`0x021bb18c` | 20 | complete | descriptive |
 | `dwc_util_rom_resource.c` | `0x021bb18c`–`0x021bb480` | 9 | complete | descriptive |
-| `dwc_util_oam.c` | `0x021bb480`–`0x021bb8dc` | 11 | partial | descriptive |
+| `dwc_util_oam.c` | `0x021bb480`–`0x021bb8dc` | 11 | complete | descriptive |
 | `dwc_util_cell.c` | `0x021bb8dc`–`0x021bba6c` | 10 | complete | descriptive |
 | `dwc_util_fade.c` | `0x021bba6c`–`0x021bbc50` | 7 | complete | descriptive |
-| `dwc_util_text.c` | `0x021bbc50`–`0x021bc1a8` | 15 | partial | descriptive |
+| `dwc_util_text.c` | `0x021bbc50`–`0x021bc1a8` | 15 | complete | descriptive |
 | `dwc_util_display.c` | `0x021bc1a8`–`0x021bc468` | 7 | complete | descriptive |
 | `dwc_util_heap.c` | `0x021bc468`–`0x021bc544` | 6 | complete | descriptive |
 | `dwc_util_touch.c` | `0x021bc544`–`0x021bcaac` | 15 | partial | descriptive |
@@ -1936,22 +1943,22 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 | `nhttp_request.c` | `0x0219e538`–`0x0219ea14` | 8 | partial | descriptive |
 | `nhttp_response.c` | `0x0219ea14`–`0x0219ec24` | 4 | complete | descriptive |
 | `nhttp_thread.c` | `0x0219ec24`–`0x021a076c` | 30 | complete | descriptive |
-| `d_nhttp.c` | `0x021a076c`–`0x021a0a38` | 15 | partial | descriptive |
+| `d_nhttp.c` | `0x021a076c`–`0x021a0a38` | 15 | complete | descriptive |
 | `d_nhttp_common.c` | `0x021a0a38`–`0x021a0e1c` | 35 | partial | descriptive |
 | `d_nhttp_private.c` | `0x021a0e1c`–`0x021a1160` | 11 | partial | descriptive |
 | `dwc_ghttp.c` | `0x021a1160`–`0x021a154c` | 15 | complete | descriptive |
 | `ghttpBuffer.c` | `0x021a154c`–`0x021a1980` | 11 | complete | descriptive |
 | `ghttpCallbacks.c` | `0x021a1980`–`0x021a1a44` | 3 | partial | descriptive |
 | `ghttpCommon.c` | `0x021a1a44`–`0x021a1e0c` | 8 | partial | descriptive |
-| `ghttpConnection.c` | `0x021a1e0c`–`0x021a23d8` | 10 | partial | descriptive |
+| `ghttpConnection.c` | `0x021a1e0c`–`0x021a23d8` | 10 | complete | descriptive |
 | `ghttpEncryption.c` | `0x021a23d8`–`0x021a2c50` | 17 | complete | descriptive |
 | `ghttpMain.c` | `0x021a2c50`–`0x021a3074` | 16 | partial | descriptive |
-| `ghttpPost.c` | `0x021a3074`–`0x021a4114` | 21 | partial | descriptive |
+| `ghttpPost.c` | `0x021a3074`–`0x021a4114` | 21 | complete | descriptive |
 | `ghttpProcess.c` | `0x021a4114`–`0x021a54b4` | 18 | complete | descriptive |
 | `nd.c` | `0x021a54b4`–`0x021a6c84` | 61 | partial | descriptive |
 | `dpw_tr.c` | `0x021a6c84`–`0x021a8010` | 19 | complete | descriptive |
 | `dpw_battle_tower.c` | `0x021a8010`–`0x021a893c` | 12 | complete | descriptive |
-| `gamestats.c` | `0x021a893c`–`0x021a90f0` | 16 | partial | descriptive |
+| `dwc_encsession.c` | `0x021a893c`–`0x021a90f0` | 16 | partial | descriptive |
 | `crypt.c` | `0x021a90f0`–`0x021ac838` | 67 | complete | descriptive |
 
 ### Overlay 190

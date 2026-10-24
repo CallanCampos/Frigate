@@ -140,7 +140,9 @@ static const FieldMapConfig MAP_CONFIGS[] = { ... };
 ahead of its definition, which can keep its data order (the two shop scripts' window setups). Also the C library's
 string functions that a library declares in its own header (`dwc/ext.h`, `ssl_internal.h`) where its ROM calls them:
 the same declarations from a header named `string.h` change the code (`docs/matching.md`, "a header named
-`string.h`"); and MSL's `exit`, which `nitro/os.h` declares for the same reason.
+`string.h`"); MSL's `exit`, which `nitro/os.h` declares for the same reason; and the functions a file lists in
+`config/deadstrip.toml`, which it declares itself rather than in its header, so that no other file can call code the
+build removes, unless another file's removed code calls them (`docs/configs.md`, "Dead-stripped code").
 
 **Checked:** `extern` in a `.c` file, and a non-static prototype in a `.c` file that the file doesn't define.
 
