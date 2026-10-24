@@ -424,6 +424,7 @@ src/system/wipe.c:
     .bss        start:0x02141664 end:0x021417bc
 
 src/system/wipe_sub.c:
+    complete
     .text       start:0x02028004 end:0x0202946c
     .rodata     start:0x0209177c end:0x02091930
     .data       start:0x0209a4a0 end:0x0209a52c

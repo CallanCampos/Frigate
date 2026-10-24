@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 """Compile every C file in src/ and lib/, and assemble every library assembly file, for each version, with the tools
 and flags configure.py gives them, and report compiler diagnostics. A nonzero compiler exit status fails the run, and so
-does a warning on a successful compilation: the project has none, as the macOS build checks in its log. It needs no
-base ROM, so CI runs it on every push and pull request; matching is still checked by `ninja` with the ROMs.
+does a warning on a successful compilation: the project has none, as the macOS build checks in its log. The objects of
+the files config/deadstrip.toml lists then go through the build's dead-strip, and the run fails when a strip does or
+when any object refers to what one removed (tools/build/deadstrip.py). It needs no base ROM, so CI runs it on every
+push and pull request; matching is still checked by `ninja` with the ROMs.
 
     compile_all.py                  # every file, both versions
     compile_all.py --version b2_us  # one version
@@ -22,7 +24,7 @@ sys.path.insert(0, str(ROOT))
 from configure import (GENERATED_INCLUDE_DIR, INCLUDE_DIRS, ROM_BLOBS, TEXT_ARCHIVES,  # noqa: E402
                        VERSIONS, download_tools, source_assembler, source_compiler, mwcc_command)
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
-from tools.build import rom_blob  # noqa: E402
+from tools.build import deadstrip, rom_blob  # noqa: E402
 from tools.data.gen_constants import generate  # noqa: E402
 from tools.text import pms_words, text_ids  # noqa: E402
 
@@ -66,6 +68,29 @@ def compile_file(source: Path, version: str, out_dir: Path) -> CompileResult:
     return CompileResult(source, version, proc.returncode, proc.stdout, proc.stderr)
 
 
+def deadstrip_errors(out_dir: Path, version: str, compiled: list[Path], manifest: dict[str, list[str]],
+                     known: set[str]) -> list[str]:
+    """Runs the build's dead-strip on the object of each compiled source that the manifest lists, in place, then checks
+    every compiled object for references to what a strip removed, as the build does; returns the errors."""
+    errors = []
+    strips = []
+    for source in compiled:
+        dead = manifest.get(source.as_posix())
+        if dead is None:
+            continue
+        obj = out_dir / version / source.with_suffix(".o")
+        try:
+            stripped = deadstrip.strip(obj.read_bytes(), dead)
+        except deadstrip.DeadStripError as error:
+            errors.append(f"{source} ({version}): dead-strip: {error}")
+            continue
+        obj.write_bytes(stripped.data)
+        strips.append((source.as_posix(), dead, stripped))
+    objects = ((f"{source} ({version})", (out_dir / version / source.with_suffix(".o")).read_bytes())
+               for source in compiled)
+    return errors + deadstrip.check_references(strips, objects, known)
+
+
 def write_header(header: Path, text: str):
     header.parent.mkdir(parents=True, exist_ok=True)
     if not header.exists() or header.read_text() != text:
@@ -105,9 +130,17 @@ def main():
     generate_constants()
     sources = sorted(p.relative_to(ROOT) for pattern in ("src/**/*.c", "lib/*/src/**/*.c", "lib/*/src/**/*.s") for p in ROOT.glob(pattern))
     versions = args.version or list(VERSIONS)
+    manifest_path = ROOT / "config" / "deadstrip.toml"
+    manifest = deadstrip.load_manifest(manifest_path, ROOT) if manifest_path.exists() else {}
     with tempfile.TemporaryDirectory() as tmp, ThreadPoolExecutor(args.jobs) as pool:
         jobs = [pool.submit(compile_file, source, version, Path(tmp)) for version in versions for source in sources]
         results = [job.result() for job in jobs]
+        strip_errors = []
+        if manifest:
+            for version in versions:
+                compiled = [r.source for r in results if r.version == version and r.returncode == 0]
+                strip_errors += deadstrip_errors(Path(tmp), version, compiled, manifest,
+                                                 deadstrip.rom_symbol_names(ROOT / "config" / version))
     failures = 0
     warned = 0
     for result in results:
@@ -126,7 +159,11 @@ def main():
           f"({len(sources)} files, {', '.join(versions)})")
     if warned:
         print(f"{warned} compiled with warnings, which fail the run", file=sys.stderr)
-    sys.exit(1 if failures or warned else 0)
+    for error in strip_errors:
+        print(error, file=sys.stderr)
+    if strip_errors:
+        print(f"{len(strip_errors)} dead-strip errors, which fail the run", file=sys.stderr)
+    sys.exit(1 if failures or warned or strip_errors else 0)
 
 
 if __name__ == "__main__":
