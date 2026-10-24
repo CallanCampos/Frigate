@@ -78,7 +78,7 @@ def externally_used_statics(source: str, version_dir: Path) -> list[str]:
             if m:
                 bounds = (int(m.group(2), 16), int(m.group(3), 16))
                 owner_ranges.append(bounds)
-                # Code: the LTD autoload's TwlSDK code is in .ltdmain
+                # Code: .text, and the LTD autoload's .ltdmain, which holds what was built in TwlSDK's LTDMAIN section
                 if m.group(1) in (".text", ".ltdmain"):
                     ranges.append(bounds)
             i += 1
