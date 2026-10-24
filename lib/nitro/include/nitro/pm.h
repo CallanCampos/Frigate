@@ -65,10 +65,6 @@ u32 PMi_ReadRegister(u8 request, u16 data, u16 *result);
 #define PM_RETRY_CYCLES 0x51d23
 // A word of the shared memory that the exit notifications set and PM_Init clears
 #define HW_PM_EXIT_FLAG 0x02fff684
-// Why the system is exiting, and whether it exits once the exit callbacks have run, which pm.c keeps for TwlSDK's
-// exit sequence in the LTD autoload (twl/pm.h)
-extern u32 PMi_ExitType;
-extern BOOL PMi_AutoExitFlag;
 
 // PM_SetBackLight sends the request and waits for the answer, PM_SetBackLightAsync calls back
 u32 PM_SetBackLightAsync(PMLCDTarget target, PMBackLightSwitch backlight, PMCallback callback, void *arg);

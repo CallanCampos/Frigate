@@ -1,5 +1,5 @@
 // TwlSDK's DSi part of os_arena.c (ARM9 main), in the LTD autoload: what main's OS_InitArenaEx does on a DSi. The file
-// name is inferred from main's half, as card_rom_twl.c's is; the function's name is ours
+// name is inferred from main's half; the function's name is ours
 #include "nitro/os.h"
 #include "twl/os.h"
 

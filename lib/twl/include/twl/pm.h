@@ -48,9 +48,4 @@ void PMi_StopNDma(u32 ndmaNo);
 // pull-out do on a DSi
 void PMi_ExecutePostExitCallbackList(void);
 
-// The objects of the LTD autoload that main's pm.c reaches: the callbacks run when the system is forced to power off,
-// and the one for a low battery
-extern PMGenCallbackInfo *PMi_PostExitCallbackList;
-extern PMGenCallbackInfo PMi_BatteryLowCallbackInfo;
-
 #endif // POKEBW2_TWL_PM_H

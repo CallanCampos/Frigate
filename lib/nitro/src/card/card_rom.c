@@ -1,11 +1,16 @@
 // NitroSDK's CARD library, the game card's ROM: the commands to the card through its registers, reading the ROM a page
 // at a time with the CPU or with a DMA channel, and the setup of the reads. The file name is NitroSDK's (card_rom.c, as
-// ntrtwl's reconstruction of NitroSDK has it); the library has no file name string.
+// ntrtwl's reconstruction of NitroSDK has it); the library has no file name string. The file has TwlSDK's DSi part
+// too, the secure ROM reader, which reads through the card's hash table, in TwlSDK's LTDMAIN section, which the LTD
+// autoload's .ltdmain holds: dsd lists it as lib/twl/src/card/card_rom_twl.c, which config/merged_sources.toml links
+// from this file's object. The DSi part's CARDi_InitTwlRom reaches sRomReader from the base of this part's pooled .bss,
+// as only code of the same object does.
 #include "nitro/card.h"
 #include "nitro/hw.h"
 #include "nitro/mi.h"
 #include "nitro/os.h"
 #include "twl/card.h"
+#include "twl/mi.h"
 
 // The card's registers are in nitro/hw.h
 
@@ -31,8 +36,9 @@
 // A ROM page, the unit that the card reads in
 #define CARD_ROM_PAGE_SIZE 0x200
 
-// What reads the ROM, as CARDi_ReadRomWithCPU does: len bytes from the offset src into dst. The first parameter is for
-// the argument of a callback, which a reader by DMA gives the read
+// The boot code leaves the card security flag in shared memory
+#define CARD_TWL_BOOT_FLAGS (*(vu8 *)0x02ffe01c)
+
 static void CARDi_SetRomOp(u32 cmd, u32 offset);
 static BOOL CARDi_IsTwlRomMode(void);
 static void CARDi_StartReadRomPage(u32 offset);
@@ -45,6 +51,8 @@ static void CARDi_OnReadRomDmaDone(void *arg);
 static BOOL CARDi_CanReadRomWithDMA(u32 dma, u32 dst, u32 src, u32 len);
 static void CARDi_ReadRomTask(CARDiCommon *p);
 static void CARDi_WaitRomTask(void);
+static u32 CARDi_ReadSecureRom(void *arg, void *dst, u32 src, u32 len);
+static u32 CARDi_ReadSecureRomWithDMA(void *arg, void *dst, u32 src, u32 len);
 
 // The file's data. -ipa file reaches the statics of a section from one base, and lays out those of one size in an order
 // that follows from the order they are declared in, which is the ROM's with this one: the read by DMA, and the pointer
@@ -55,7 +63,7 @@ u32 cardi_rom_base;
 static CARDiRomDmaRead *sRomDmaActive;
 // How the thread's tasks read the ROM. A read uses DMA only while this is the CPU's reader; the DSi's setup in the LTD
 // autoload swaps it for its own
-CARDiRomReader sRomReader;
+static CARDiRomReader sRomReader;
 // Whether a read discards the instruction cache of what it read, which nothing turns on
 static BOOL sInvalidateIC;
 // The 0x88 bytes that follow the ROM's program, which CARD_Init reads on a ROM boot. The multiboot library sends them
@@ -63,10 +71,10 @@ static BOOL sInvalidateIC;
 static u8 sRomAuthCode[0x88];
 // The last page that the CPU read
 static u8 sPageBuffer[CARD_ROM_PAGE_SIZE] ATTRIBUTE_ALIGN(32);
-// The page that the buffer holds, or 1 for none
-static u32 sCachedPage = 1;
 // Whether a read by DMA discards the data cache of what it read
 static BOOL sInvalidateDC = TRUE;
+// The page that the buffer holds, or 1 for none
+static u32 sCachedPage = 1;
 
 // Starts a command to the card with its command byte and the ROM offset it works on
 static void CARDi_SetRomOp(u32 cmd, u32 offset) {
@@ -373,3 +381,75 @@ static void CARDi_WaitRomTask(void) {
 const void *CARDi_GetRomAuthCode(void) {
     return sRomAuthCode;
 }
+
+// clang-format off
+// TwlSDK's section for the DSi-only code and data that the LTD autoload's .ltdmain holds
+#pragma define_section LTDMAIN ".ltdmain" ".ltdmain.bss" ".ltdmain" abs32 RWX
+// clang-format on
+// The DSi part, in the LTD autoload: the secure ROM reader
+#pragma section LTDMAIN begin
+
+const CARDDmaInterface CARDi_NdmaInterface = { MI_Card_NDmaCopy, MI_StopNDma };
+
+static u32 sSecureAreaStart;
+static u32 sSecureAreaSize;
+static CARDiRomDmaRead sSecureRead;
+static CARDRomHashContext sSecureWork;
+
+static u32 CARDi_ReadSecureRom(void *arg, void *dst, u32 src, u32 len) {
+    CARD_ReadRomHashImage(&sSecureWork, dst, src, len);
+    return len;
+}
+
+static u32 CARDi_ReadSecureRomWithDMA(void *arg, void *dst, u32 src, u32 len) {
+    if (cardi_common.dma == (u32)-1) {
+        len = 0;
+    } else {
+        DC_FlushRange(dst, len);
+        sSecureRead.callback = CARD_NotifyRomHashReadAsync;
+        sSecureRead.arg = arg;
+        sSecureRead.src = src;
+        sSecureRead.dst = (u32)dst;
+        sSecureRead.len = len;
+        sSecureRead.unk_00 = 0;
+        sSecureRead.unk_18 = 0;
+        CARDi_ReadRomWithDMA(&sSecureRead);
+    }
+    return len;
+}
+
+void CARDi_InitTwlRom(void) {
+    u32 arenaLo = ((u32)OS_GetArenaLo(OS_ARENA_MAIN) + 31) & ~31;
+    u32 arenaHi = (u32)OS_GetArenaHi(OS_ARENA_MAIN);
+    const CARDTwlRomHeader *header = CARD_GetOwnRomHeaderTWL();
+    u32 workSize = CARD_CalcRomHashBufferLength(header);
+
+    arenaHi &= ~31;
+    if (arenaLo + workSize > arenaHi) {
+        OS_Terminate();
+        return;
+    }
+
+    OS_SetArenaLo(OS_ARENA_MAIN, (void *)(arenaLo + workSize));
+    sSecureAreaStart = arenaLo;
+    sSecureAreaSize = workSize;
+
+    if (OS_GetBootType() == OS_BOOTTYPE_ROM && (CARD_TWL_BOOT_FLAGS & 1)) {
+        cardi_common.dma = (u32)-1;
+        sRomReader = CARDi_ReadSecureRom;
+
+        u16 lockId = OS_GetLockID();
+        CARD_LockRom(lockId);
+
+        header = CARD_GetOwnRomHeaderTWL();
+        CARD_InitRomHashContext(&sSecureWork, header, (void *)sSecureAreaStart, sSecureAreaSize, CARDi_ReadRomWithCPU,
+                                CARDi_ReadSecureRomWithDMA, &sSecureWork);
+
+        sSecureAreaStart = 0;
+        sSecureAreaSize = 0;
+        CARD_UnlockRom(lockId);
+        OS_ReleaseLockID(lockId);
+    }
+}
+
+#pragma section LTDMAIN end

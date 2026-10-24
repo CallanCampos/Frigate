@@ -169,8 +169,9 @@ own veneer too, as an overlay does, while dsd lists the module's objects with AR
 moves them to the end of the linker's object list, after `-overlaygroup LTD_AUTOLOAD_0,0` and `-overlay LTD_AUTOLOAD_0`,
 which gives `wcm_dsi.c`'s 56 calls of `WcmSetPhase` their 56 veneers. TwlSDK's `.ltdmain` objects share one veneer per
 target, across files, as main's do: `card_hash.c`'s six calls of `OS_DisableInterrupts` go through one veneer, which
-`mi_ndma.c`, `mi_ndma_gxcommand.c`, `mi_sharedWram_twl.c` and `pm_twl.c` call too, so the tool leaves the objects of
-`lib/twl/` with main's.
+`mi_ndma.c`, `mi_ndma_gxcommand.c`, `mi_sharedWram_twl.c` and `pm.c`'s DSi part call too, so the tool leaves the
+objects of `lib/twl/` with main's, and those of the merged files that hold a DSi part (below): `card_rom.c`'s DSi part
+shares its veneer of `CARD_GetOwnRomHeaderTWL` with `card_hash.c`.
 
 DS Protect's `dsprot_detect.c` (overlay 165) and `dsprot_detect_multi.c` (overlay 337) also retain legacy
 ARM-to-Thumb veneers, eight and sixteen. The normal ARM946E linker replaces those calls with BLX and drops 96 and
@@ -192,6 +193,24 @@ addresses. It discovers addresses on every prelink, including `--shift` builds, 
 contiguous generated fragments, real Thumb mappings and each file's count of veneers. Unsupported ELF metadata,
 unexpected layouts and linker diagnostics fail with an error. Modified code that changes these
 invariants needs a new layout audit; do not change the count merely to bypass the check.
+
+## Merged files
+
+dsd lists each module's files in that module's `delinks.txt`, and a file name in one module only. TwlSDK compiled the
+DSi-only code of some NitroSDK files into the object of their NITRO code, in its LTDMAIN section, which the LTD
+autoload's `.ltdmain` holds, so one original file has a part in ARM9 main and a part in the LTD autoload. Both parts
+reach the object's pooled statics from one base, and the DSi part's statics, in `.ltdmain.bss`, take part in the size
+sort of the object's `.bss`, so they match only compiled as one file: `card_rom.c` and `pm.c`, whose DSi parts the LTD
+autoload's `delinks.txt` lists as `lib/twl/src/card/card_rom_twl.c` and `lib/twl/src/spi/pm_twl.c`.
+`config/merged_sources.toml` maps each such part to its whole, whose source holds the part's code between
+`#pragma section LTDMAIN begin` and `end`. The part has no source and isn't compiled: `tools/build/merge_objects.py`
+rewrites dsd's linker script to place the part's sections from the whole's object, its `.bss` from the object's
+`.ltdmain.bss`, and lists the whole's object in the part's place in the object list. `mwldarm` makes the long-branch
+veneers object by object, in the list's order, and a later call in range shares an earlier veneer: at its ARM9 main
+place, `pm.o` came before `card_hash.o`, so `pm.c`'s DSi part made the veneers of `OS_DisableInterrupts` and
+`OS_RestoreInterrupts` that `card_hash.c` makes in the original, and `.ltdmain` moved by 0x10 from `card_hash.c` on.
+`compiler_probe.py`, `mark_complete.py` and the objdiff config find the part's code in its whole, and the part's
+entry is marked `complete` like any other.
 
 ## Shifting
 

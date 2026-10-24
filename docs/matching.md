@@ -3674,11 +3674,20 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   each and are reached through literals of their own, as under `-ipa function`, while the block's functions still reach
   the file's default `.bss` from its pooled base. `#pragma define_section NAME "init" "uninit" "const" abs32 RWX` names
   the block's sections for code and initialized data, for zeroed data and for constants. TwlSDK compiled DSi-only code
-  so, inside the file of the NITRO code it extends: `card_rom_twl.c`'s `CARDi_InitTwlRom` stores the ROM reader at
-  offset 4 of `card_rom.c`'s pooled `.bss`, and matches, with all of `card_rom.c`'s functions, only when compiled in
-  `card_rom.c` after `#pragma define_section LTDMAIN ".ltdmain" ".ltdmain.bss" ".ltdmain" abs32 RWX` (a scratch test;
-  the other two spellings tried put the code or the statics in the wrong sections). Code in the LTD autoload that
-  reaches a main global at a pooled base plus an offset was compiled in that global's file.
+  so, inside the file of the NITRO code it extends: the DSi part's `CARDi_InitTwlRom` stores the ROM reader at offset
+  4 of `card_rom.c`'s pooled `.bss`, and matches, with all of `card_rom.c`'s functions, only when compiled in
+  `card_rom.c` after `#pragma define_section LTDMAIN ".ltdmain" ".ltdmain.bss" ".ltdmain" abs32 RWX` (the other two
+  spellings tried put the code or the statics in the wrong sections). Code in the LTD autoload that reaches a main
+  global at a pooled base plus an offset was compiled in that global's file, and links from its object
+  (`docs/configs.md`, Merged files).
+- The block's statics, though in a section of their own, still take part in the size sort of the file's `.bss`, by
+  their place among the file's other declarations. `pm.c`'s DSi part declares four; with them at the end of the file,
+  before the DSi code, six of `pm.c`'s main functions reach their statics at other offsets. Declaring them, in one more
+  `#pragma section LTDMAIN` block, at each place among `pm.c`'s statics in each order (312 variants, compiled by a
+  script) matched only between `PMi_PreDmaCnt` and `sAmpSwitch`, with `PMi_BatteryLowCallbackInfo` first. The
+  linker places the block's sections by the sort too, which the probe can't see: the three words came out in their
+  declaration order after the 16-byte `PMi_BatteryLowCallbackInfo`, so they are declared in the ROM's,
+  `PMi_PreExitCallbackList`, `PMi_ExitLocked` and `PMi_PostExitCallbackList`.
 - The file's `.data` objects take part in MWCC's size sort that orders `.rodata`: `btlv_mcss.c`'s 3-byte idle-wait
   array had to be counted before `rodata_order.py` predicted the layout. So do its `.bss` statics: the object's
   symbol table lists them interleaved with the `.rodata` objects by size, and moving a table moves the statics too.

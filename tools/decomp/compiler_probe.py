@@ -21,7 +21,7 @@ from elftools.elf.relocation import RelocationSection
 ROOT = Path(__file__).resolve().parents[2]
 TOOLS = ROOT / "tools"
 sys.path.insert(0, str(ROOT))
-from configure import ENCODING_FLAG, INCLUDE_DIRS, source_compiler, mwcc_command  # noqa: E402
+from configure import ENCODING_FLAG, INCLUDE_DIRS, MERGED_SOURCES, source_compiler, mwcc_command  # noqa: E402
 
 # Preprocessor defines of each game version, as in configure.py
 VERSION_DEFINES = {"b2_us": ["BLACK2"], "w2_us": ["WHITE2"]}
@@ -65,6 +65,8 @@ def source_ranges(root: Path, version: str, source: Path) -> dict[Path, tuple[tu
         owner = source.relative_to(root).as_posix()
     except ValueError:
         return {}
+    # A merged file's parts are registered under their own names (config/merged_sources.toml)
+    owners = {owner} | {part for part, whole in MERGED_SOURCES.items() if whole == owner}
     found = {}
     for delinks in (root / "config" / version / "arm9").rglob("delinks.txt"):
         current = None
@@ -72,7 +74,7 @@ def source_ranges(root: Path, version: str, source: Path) -> dict[Path, tuple[tu
         for line in delinks.read_text().splitlines():
             if line and not line[0].isspace() and line.endswith(":"):
                 current = line[:-1]
-            if current == owner:
+            if current in owners:
                 match = re.match(r"\s+\S+\s+start:(0x[0-9a-f]+) end:(0x[0-9a-f]+)", line)
                 if match:
                     ranges.append((int(match.group(1), 16), int(match.group(2), 16)))

@@ -45,7 +45,7 @@ typedef struct CARDRomHashContext {
     u32 sector_max;
     // The functions that read the ROM, waiting for the end or not, and their first argument. The second returns 0 when
     // it can't read without waiting. The SDK's type is MIDeviceReadFunction, which returns an int; NitroSDK's readers
-    // that card_rom_twl.c passes return a u32
+    // that card_rom.c's DSi part passes return a u32
     void *userdata;
     CARDiRomReader ReadSync;
     CARDiRomReader ReadAsync;

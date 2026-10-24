@@ -1,6 +1,6 @@
 // TwlSDK's DSi part of os_ownerInfoEx.c (ARM9 main), in the LTD autoload: the wireless settings that main's
-// OS_IsAvailableWireless and OS_IsForceDisableWireless read on a DSi. The file name is inferred from main's half, as
-// card_rom_twl.c's is; the functions' names are ours
+// OS_IsAvailableWireless and OS_IsForceDisableWireless read on a DSi. The file name is inferred from main's half; the
+// functions' names are ours
 #include "nitro/os.h"
 #include "twl/os.h"
 

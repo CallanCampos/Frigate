@@ -198,6 +198,8 @@ LIBRARIES = load_libraries()
 # Every compiler that a library source is built with, each with a rule of its own
 LIBRARY_COMPILERS = list(dict.fromkeys([*(compiler for compiler, _ in LIBRARIES.values()), *FILE_COMPILERS.values()]))
 FILE_FLAGS.update(load_source_flags(ROOT / "config/compiler_flags.toml"))
+# Parts of merged files, each mapped to its whole, whose object it links from (tools/build/merge_objects.py)
+MERGED_SOURCES: dict[str, str] = tomllib.loads((ROOT / "config/merged_sources.toml").read_text())["merged"]
 # Header search path of every source file, the game's and the libraries': the game's headers, each library's public
 # headers, and the headers the build generates from the constant lists in generated/ (see
 # tools/data/gen_constants.py). A library's private headers sit beside its sources.
@@ -542,7 +544,12 @@ def add_version(n: Writer, version: str, dsd: Path, bugfix: bool, shift: int) ->
     # The linker script also defines NitroSDK's linker symbols, as the SDK's template does, from linker_symbols.toml
     n.build([lcf_file, objects_file], "lcf", dsd_configs,
             implicit=[extract_dir / "config.yaml", "config/linker_symbols.toml"], variables={"config": str(arm9_config)})
-    link_lcf = lcf_file
+    # A part of a merged file (config/merged_sources.toml) links from its whole's object
+    merged_lcf = build_dir / "arm9_merged.lcf"
+    merged_objects = build_dir / "objects_merged.txt"
+    n.build([merged_lcf, merged_objects], "merge_objects", [lcf_file, objects_file],
+            implicit=["tools/build/merge_objects.py", "config/merged_sources.toml"])
+    link_lcf = merged_lcf
     if shift:
         # Padding in the linker script moves the code and data after it, see tools/build/shift_lcf.py
         shifted_lcf = build_dir / "arm9_shifted.lcf"
@@ -559,6 +566,9 @@ def add_version(n: Writer, version: str, dsd: Path, bugfix: bool, shift: int) ->
     compiled = []
     for f in files:
         source = Path(f["name"])
+        if f["name"] in MERGED_SOURCES:
+            # Compiled and linked as part of its whole's object
+            continue
         if source.suffix in (".c", ".cpp") and source.exists():
             obj = build_dir / source.with_suffix(".o")
             settings = source_compiler(source)
@@ -577,7 +587,7 @@ def add_version(n: Writer, version: str, dsd: Path, bugfix: bool, shift: int) ->
 
     # Preserve the LTD autoload grouping in both the private prelink and final link.
     grouped_objects = build_dir / "objects_link.txt"
-    n.build([grouped_objects], "ltd_objects", [objects_file, lcf_file],
+    n.build([grouped_objects], "ltd_objects", [merged_objects, merged_lcf],
             implicit=["tools/build/ltd_objects.py"])
 
     # Keep DS Protect's legacy interworking glue separate from its compiler objects, one derived object per copy of
@@ -789,6 +799,7 @@ def main():
                "Assembling $in")
     n.rule("shift_lcf", "$python tools/build/shift_lcf.py $in $out $amount", "Shifting $in")
     n.rule("ltd_objects", "$python tools/build/ltd_objects.py $in $out", "Grouping the LTD autoload's objects in $out")
+    n.rule("merge_objects", "$python tools/build/merge_objects.py $in $out", "Linking merged files' parts from $out")
     n.rule("mwld", f"$wine {shlex.quote(str(mwld))} {' '.join(LD_FLAGS)} @$objects $lcf -o $out", "Linking $out")
     # Pass the runner as one executable path and the normal flags as argv data.
     # The helper changes -proc only for its private prelink.

@@ -1,13 +1,15 @@
 // NitroSDK's power management library (TwlSDK's libspi, spi/ARM9/src/pm.c): the ARM9's side of the requests to the
 // ARM7's power management through the PXI FIFO, for the backlights and the screens' power, the battery, the sound
 // amplifier of the microphone, the sleep mode and the power-off. The file name is the SDK's, and the split is certain:
-// the functions come in the SDK's order, and the .bss and .data hold its statics. The same object has TwlSDK's DSi
-// part in the LTD autoload (the exit callbacks and the battery level), which this part reaches through the linker's
-// veneers (func_0207ece4/e8, func_0207f058/5c and func_0207f16c/70, after their callers) and which reaches back to
-// the work of this part by the addresses of its first objects, so PMi_IsInit, PMi_WaitBusyMethod and PMi_AutoExitFlag
-// are not static. The named functions have NitroSDK's names, as ntrtwl's reconstruction of NitroSDK has them, where it
-// has the code, and names in the SDK's style that it can't confirm elsewhere: the TwlSDK-era functions and
-// PMi_SendPxiRequest, which is ours. The statics still named by address are not known.
+// the functions come in the SDK's order, and the .bss and .data hold its statics. The file has TwlSDK's DSi part too,
+// in TwlSDK's LTDMAIN section, which the LTD autoload's .ltdmain holds: dsd lists it as lib/twl/src/spi/pm_twl.c,
+// which config/merged_sources.toml links from this file's object, since the parts share the object's statics, and the
+// DSi part's place among them sets the layout of the .bss. The two parts call each other through the linker's veneers
+// (func_0207ece4/e8, func_0207f058/5c and func_0207f16c/70, after their callers). The named functions have NitroSDK's
+// names, as ntrtwl's reconstruction of NitroSDK has them, where it has the code, the DSi part's PM_ functions have the
+// names of the TWL-SDK Function Reference Manual, and the others have names in the SDK's style that it can't confirm
+// elsewhere: the TwlSDK-era functions and PMi_SendPxiRequest, which is ours. The statics still named by address are not
+// known.
 #include "nitro/pm.h"
 #include "nitro/card.h"
 #include "nitro/ctrdg.h"
@@ -46,7 +48,7 @@
 #define PM_PXI_NOTIFY_EXIT_2 5
 
 // The requests, in the low byte of the first word of a PM_PXI_COMMAND_REQUEST: three that follow the screens' power,
-// six for the backlights, the power-off, and the settings and reads of the registers
+// six for the backlights, the power-off, the settings and reads of the registers, and the DSi's shutdown and restart
 #define PM_UTIL_LED_ON 1
 #define PM_UTIL_LED_BLINK_HIGH_SPEED 2
 #define PM_UTIL_LED_BLINK_LOW_SPEED 3
@@ -61,10 +63,13 @@
 #define PM_REQ_SET_AMP 0x10
 #define PM_REQ_SET_AMP_GAIN 0x11
 #define PM_REQ_UNK_12 0x12
+#define PM_REQ_SHUTDOWN 0x13
+#define PM_REQ_RESET 0x14
 #define PM_REQ_SET_AMP_GAIN_LEVEL 0x16
 
-// The registers that PM_REQ_READ_REGISTER reads, and the bits of the backlight one
+// The registers that PM_REQ_READ_REGISTER reads, with the DSi's battery level, and the bits of the backlight one
 #define PM_REG_BATTERY 0
+#define PM_REG_BATTERY_LEVEL 1
 #define PM_REG_BACKLIGHT 3
 #define PM_REG_AMP 6
 #define PM_REG_UNK_8 8
@@ -95,6 +100,14 @@
 // The wait before the screens are touched on the way out (about 100 ms), and the one of their power
 #define PM_SCREENS_SETTLE_CYCLES 0x360000
 #define PM_SCREENS_RETRY_CYCLES 5
+// The wait between two reads of the vertical blank count in the DSi's exit
+#define PM_VBLANK_WAIT_CYCLES 0x32
+
+// The word of main memory that a restart after an exit notification clears
+#define PM_RESET_PARAM (*(u32 *)0x02000300)
+// The shared memory of the handshake with the ARM7 before the exit, and the byte that says the ARM9 is done
+#define PM_EXIT_SYNC_WORK ((vu8 *)0x02fffff0)
+#define PM_EXIT_SYNC_DONE (*(vu8 *)0x02fffff4)
 
 // The sleep leaves on the PXI FIFO's interrupt, and the timer of the clock when it runs. The card's pull-out interrupt
 // request (OS_IE_CARD_IREQ) wakes the system. The card's control register keeps its start bit set while a transfer runs
@@ -109,7 +122,7 @@ typedef struct {
 
 // The order of these decides the layout of the .bss, which MWCC sorts by size from the order of declaration (the two
 // words of the .data count in it too)
-u16 PMi_IsInit;
+static u16 PMi_IsInit;
 static PMiWork PMi_Work;
 // The callbacks that run after the system wakes
 static PMGenCallbackInfo *PMi_PostSleepCallbackList;
@@ -118,17 +131,34 @@ static BOOL PMi_SleepEndFlag;
 // The vertical blank count when the screens' power went off, and when the display did
 static u32 PMi_LCDCount;
 static u32 PMi_DisplayOffCount;
-// Why the system is exiting, for TwlSDK's exit sequence
-u32 PMi_ExitType;
+// Why the system is exiting
+static u32 PMi_ExitType;
 // The DMA control registers before the sleep
 static u32 PMi_PreDmaCnt[4];
+// clang-format off
+// TwlSDK's section for the DSi-only code and data that the LTD autoload's .ltdmain holds
+#pragma define_section LTDMAIN ".ltdmain" ".ltdmain.bss" ".ltdmain" abs32 RWX
+// clang-format on
+// The DSi part's statics, in the LTD autoload's .ltdmain.bss, are declared here, among the others. Each has a section
+// of its own, which the linker places in the order of the size sort too
+#pragma section LTDMAIN begin
+// The callback for a low battery
+static PMGenCallbackInfo PMi_BatteryLowCallbackInfo;
+// The callbacks that run when the exit sequence starts
+static PMGenCallbackInfo *PMi_PreExitCallbackList;
+// Set once the exit sequence has started
+static BOOL PMi_ExitLocked;
+// The callbacks that run when the application is ready to exit
+static PMGenCallbackInfo *PMi_PostExitCallbackList;
+#pragma section LTDMAIN end
 // What the amplifier was set to, for when the screens come back on
 static int sAmpSwitch;
 // The callbacks that run before the system sleeps
 static PMGenCallbackInfo *PMi_PreSleepCallbackList;
 // How PMi_WaitBusy waits; the power-off waits another way
-u32 PMi_WaitBusyMethod = PM_WAIT_BUSY_IRQ_MODE;
-BOOL PMi_AutoExitFlag = TRUE;
+static u32 PMi_WaitBusyMethod = PM_WAIT_BUSY_IRQ_MODE;
+// Whether the system exits by itself once the exit callbacks have run
+static BOOL PMi_AutoExitFlag = TRUE;
 
 static void PMi_WaitBusy(void);
 static void PMi_DummyCallback(u32 result, void *arg);
@@ -149,6 +179,9 @@ static void PMi_StopDma(void);
 static BOOL PMi_SetLCDPower(BOOL on, u32 power, BOOL force, BOOL sync);
 static BOOL PM_GetLCDPower(void);
 static void PMi_LCDOnAvoidReset(void);
+static void PMi_SyncExitWithOtherProc(void);
+static void PMi_ExecuteExit(BOOL reset);
+static BOOL PMi_TryLockExit(void);
 
 // PMi_WaitBusy: waits for the answer of the request that is being sent, reading the ARM7's words itself where the
 // interrupt that would run the callback can't. The lock is polled through its address, which the callback clears
@@ -840,3 +873,152 @@ static void PMi_LCDOnAvoidReset(void) {
 void PMi_SetDispOffCount(void) {
     PMi_DisplayOffCount = OS_GetVBlankCount();
 }
+
+// The DSi part, in the LTD autoload: the DSi's battery level, the stop of a new DMA channel before the sleep, and the
+// exit sequence, with its callbacks, that the power button and the power-off start
+#pragma section LTDMAIN begin
+
+u32 PMi_GetBatteryLevelCore(u16 *level) {
+    u16 value;
+    u32 result = PMi_ReadRegister(PM_REQ_READ_REGISTER, PM_REG_BATTERY_LEVEL, &value);
+
+    if (result == 0 && level != NULL) {
+        *level = value;
+    }
+    return result;
+}
+
+void PMi_StopNDma(u32 ndmaNo) {
+    if (MI_NDMA_REG(ndmaNo, MI_NDMA_CNT) & MI_NDMA_IMM) {
+        MI_WaitNDma(ndmaNo);
+        return;
+    }
+    switch (MI_NDMA_REG(ndmaNo, MI_NDMA_CNT) & MI_NDMA_TIMING_MASK) {
+    case MI_NDMA_TIMING_CARD:
+        while (reg_MI_MCCNT1 & REG_MI_MCCNT1_START_MASK) {
+        }
+        break;
+    case MI_NDMA_TIMING_DISP:
+    case MI_NDMA_TIMING_DISP_MMEM:
+        MI_WaitNDma(ndmaNo);
+    case MI_NDMA_TIMING_CAMERA:
+        MI_StopNDma(ndmaNo);
+        break;
+    default:
+        if (!(MI_NDMA_REG(ndmaNo, MI_NDMA_CNT) & MI_NDMA_CONTINUOUS)) {
+            MI_WaitNDma(ndmaNo);
+        } else {
+            MI_StopNDma(ndmaNo);
+        }
+        break;
+    }
+}
+
+void PMi_ProcessExitRequest(PMExitFactor exitType) {
+    if (PMi_TryLockExit()) {
+        PMi_ExitType = exitType;
+        PMi_ExecuteList(PMi_PreExitCallbackList);
+        if (PMi_AutoExitFlag) {
+            PM_ReadyToExit();
+        }
+    }
+}
+
+void PM_ReadyToExit(void) {
+    PMi_ExecuteExit(TRUE);
+}
+
+// Tells the ARM7 that the ARM9 is about to stop
+static void PMi_SyncExitWithOtherProc(void) {
+    PM_EXIT_SYNC_DONE = FALSE;
+    OSi_SyncWithOtherProc(0, PM_EXIT_SYNC_WORK);
+    OSi_SyncWithOtherProc(1, PM_EXIT_SYNC_WORK);
+    OS_DisableInterrupts();
+    PM_EXIT_SYNC_DONE = TRUE;
+}
+
+PMExitFactor PM_GetExitFactor(void) {
+    return PMi_ExitType;
+}
+
+void PM_AppendPreExitCallback(PMExitCallbackInfo *info) {
+    PMi_InsertList(&PMi_PreExitCallbackList, info, 0xff, 0);
+}
+
+void PM_InsertPostExitCallback(PMExitCallbackInfo *info, int priority) {
+    PMi_InsertList(&PMi_PostExitCallbackList, info, priority, 0);
+}
+
+void PM_DeletePostExitCallback(PMExitCallbackInfo *info) {
+    PMi_DeleteList(&PMi_PostExitCallbackList, info);
+}
+
+void PMi_ExecutePostExitCallbackList(void) {
+    PMi_ExecuteList(PMi_PostExitCallbackList);
+}
+
+void PM_SetAutoExit(BOOL enabled) {
+    PMi_AutoExitFlag = enabled;
+}
+
+BOOL PM_GetAutoExit(void) {
+    return PMi_AutoExitFlag;
+}
+
+// Runs the post-exit callbacks, turns the displays off, waits for three vertical blanks, has the ARM7 restart or shut
+// the system down until it answers, and stops the program
+static void PMi_ExecuteExit(BOOL reset) {
+    int i;
+    u16 result;
+
+    PMi_ExecuteList(PMi_PostExitCallbackList);
+    GX_DispOff();
+    GXS_DispOff();
+    MI_SetMainMemoryPriority(MI_PROCESSOR_ARM7);
+    for (i = 0; i < 3; i++) {
+        u32 count = *(vu32 *)HW_VBLANK_COUNT_BUF;
+        while (count == *(vu32 *)HW_VBLANK_COUNT_BUF) {
+            OS_SpinWaitSysCycles(PM_VBLANK_WAIT_CYCLES);
+        }
+    }
+
+    for (;;) {
+        u8 request;
+        if (reset) {
+            request = PM_REQ_RESET;
+        } else {
+            request = PM_REQ_SHUTDOWN;
+        }
+        if (*(u32 *)HW_PM_EXIT_FLAG == 1) {
+            request = PM_REQ_RESET;
+            PM_RESET_PARAM = 0;
+        }
+        while (PMi_ReadRegister(request, 0, &result) != 0) {
+            OS_SpinWaitSysCycles(PM_RETRY_CYCLES);
+        }
+        if (result == 0) {
+            break;
+        }
+        OS_SpinWaitSysCycles(PM_RETRY_CYCLES);
+    }
+
+    OS_DisableInterrupts();
+    MI_StopAllDma();
+    MI_StopAllNDma();
+    PMi_SyncExitWithOtherProc();
+    OSi_TerminateCore();
+}
+
+static BOOL PMi_TryLockExit(void) {
+    OSIntrMode enabled = OS_DisableInterrupts();
+
+    if (PMi_ExitLocked) {
+        OS_RestoreInterrupts(enabled);
+        return FALSE;
+    }
+    PMi_ExitLocked = TRUE;
+    OS_RestoreInterrupts(enabled);
+    return TRUE;
+}
+
+#pragma section LTDMAIN end

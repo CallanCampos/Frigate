@@ -10,7 +10,10 @@ every section.
 - An original file is one entry in `delinks.txt`, covering its whole range in each section, even while only some of
   its functions are written. The entry stays without `complete` until every function matches, and the original code
   is linked until then, as with `src/ov059/scrcmd_resort.c`. Never split a file into several entries to link the
-  matching parts early, and never put two original files in one entry.
+  matching parts early, and never put two original files in one entry. An original file with code in two modules,
+  such as NitroSDK's `pm.c` with TwlSDK's DSi part in the LTD autoload, is one source file with an entry in each
+  module's `delinks.txt`, the part's mapped to its whole in `config/merged_sources.toml` (`docs/configs.md`, Merged
+  files).
 - The C file holds its functions in address order. A function that doesn't match yet stays in the file as the closest
   C found, so objdiff shows how far off it is. Library code built with another compiler can differ: SPL's compiler
   emits a file's functions in reverse source order, so `lib/spl/src/` files hold theirs in reverse address order.

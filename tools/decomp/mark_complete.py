@@ -13,6 +13,7 @@ version, restoring the original assembly fallback without checking static refere
 import argparse
 import re
 import sys
+import tomllib
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
@@ -22,6 +23,12 @@ ROOT = Path(__file__).resolve().parents[2]
 SYMBOL_RE = re.compile(r"(\S+) kind:\S+ addr:(0x[0-9a-f]+)")
 RELOC_RE = re.compile(r"from:(0x[0-9a-f]+) kind:\S+ to:(0x[0-9a-f]+)(?: add:\S+)? module:(\S+)")
 SECTION_RANGE_RE = re.compile(r"\s*(\S+)\s+start:(0x[0-9a-f]+) end:(0x[0-9a-f]+)")
+
+
+def merged_sources() -> dict[str, str]:
+    """Each part of a merged file, mapped to its whole."""
+    path = ROOT / "config/merged_sources.toml"
+    return tomllib.loads(path.read_text())["merged"] if path.exists() else {}
 
 
 def module_name(config_dir: Path, version_dir: Path) -> str:
@@ -35,7 +42,8 @@ def module_name(config_dir: Path, version_dir: Path) -> str:
 
 def externally_used_statics(source: str, version_dir: Path) -> list[str]:
     """Returns static functions referenced outside their original source file."""
-    text = (ROOT / source).read_text()
+    # A part of a merged file has its code in its whole's source (config/merged_sources.toml)
+    text = (ROOT / merged_sources().get(source, source)).read_text()
     for delinks in version_dir.rglob("delinks.txt"):
         lines = delinks.read_text().splitlines()
         if f"{source}:" not in lines:

@@ -1,6 +1,5 @@
 // TwlSDK's DSi part of os_interrupt.c (ARM9 main), in the LTD autoload: the callback of a new DMA channel's interrupt,
-// which main's OSi_EnterNDmaCallback calls. The file name is inferred from main's half, as card_rom_twl.c's is; the
-// function's name is ours
+// which main's OSi_EnterNDmaCallback calls. The file name is inferred from main's half; the function's name is ours
 #include "nitro/os.h"
 #include "twl/os.h"
 
