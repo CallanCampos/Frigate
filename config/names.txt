@@ -18667,6 +18667,7 @@ overlays/ov167 0x021d6bfc CutinScript_GetHeader
 overlays/ov167 0x021d6c04 CutinScript_GetStepValue
 overlays/ov167 0x021d6c14 CutinScript_GetStepCount
 overlays/ov167 0x021d7070 sCmdProcTable
+overlays/ov167 0x021d7490 sSemiInvulnFlags
 overlays/ov167 0x021d7624 sHandlersStall
 overlays/ov167 0x021d762c sHandlersHydration
 overlays/ov167 0x021d7634 sHandlersRattled

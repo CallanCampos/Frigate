@@ -7204,9 +7204,10 @@ static s32 StudioScore_CalcTotal(BtlClient *client, BtlClientStudioScore *score)
     s32 total;
     s32 sum;
 
-    sum = score->points[STUDIO_SCORE_FAME] + score->points[STUDIO_SCORE_TURN];
-    sum += score->points[STUDIO_SCORE_SCENE];
-    sum += score->points[STUDIO_SCORE_CHOICE];
+    sum = score->points[STUDIO_SCORE_FAME];
+    sum = score->points[STUDIO_SCORE_TURN] + (s32)sum;
+    sum = score->points[STUDIO_SCORE_SCENE] + (s32)sum;
+    sum = score->points[STUDIO_SCORE_CHOICE] + (s32)sum;
     if (sum == 0) {
         sum = 1;
     }
