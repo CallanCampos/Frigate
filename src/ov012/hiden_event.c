@@ -178,7 +178,7 @@ GameEvent *EventCutCall_Create(HiddenEventArgs *param, PlayerActionPossibilities
     GameEvent *event;
     HiddenEventData *data;
 
-    event = GameEvent_Create(context->gsys, NULL, EventCutCall_Callback, 0x14);
+    event = GameEvent_Create(context->gsys, NULL, EventCutCall_Callback, sizeof(HiddenEventData));
     data = GameEvent_GetData(event);
     HiddenEventData_Init(data, param, context);
     return event;
@@ -217,7 +217,7 @@ GameEvent *EventSurfCall_Create(HiddenEventArgs *param, PlayerActionPossibilitie
     GameEvent *event;
     HiddenEventData *data;
 
-    event = GameEvent_Create(context->gsys, NULL, EventSurfCall_Callback, 0x14);
+    event = GameEvent_Create(context->gsys, NULL, EventSurfCall_Callback, sizeof(HiddenEventData));
     data = GameEvent_GetData(event);
     HiddenEventData_Init(data, param, context);
     return event;
@@ -249,7 +249,7 @@ GameEvent *EventWaterfallCall_Create(HiddenEventArgs *param, PlayerActionPossibi
     GameEvent *event;
     HiddenEventData *data;
 
-    event = GameEvent_Create(context->gsys, NULL, EventWaterfallCall_Callback, 0x14);
+    event = GameEvent_Create(context->gsys, NULL, EventWaterfallCall_Callback, sizeof(HiddenEventData));
     data = GameEvent_GetData(event);
     HiddenEventData_Init(data, param, context);
     return event;
@@ -280,7 +280,7 @@ GameEvent *EventStrengthCall_Create(HiddenEventArgs *param, PlayerActionPossibil
     GameEvent *event;
     HiddenEventData *data;
 
-    event = GameEvent_Create(context->gsys, NULL, EventStrengthCall_Callback, 0x14);
+    event = GameEvent_Create(context->gsys, NULL, EventStrengthCall_Callback, sizeof(HiddenEventData));
     data = GameEvent_GetData(event);
     HiddenEventData_Init(data, param, context);
     return event;
@@ -339,7 +339,7 @@ GameEvent *EventFlash_Create(HiddenEventArgs *param, PlayerActionPossibilities *
     GameEvent *event;
     HiddenEventData *data;
 
-    event = GameEvent_Create(context->gsys, NULL, EventFlash_Callback, 0x14);
+    event = GameEvent_Create(context->gsys, NULL, EventFlash_Callback, sizeof(HiddenEventData));
     data = GameEvent_GetData(event);
     HiddenEventData_Init(data, param, context);
     return event;
@@ -404,7 +404,7 @@ GameEvent *EventDigCall_Create(HiddenEventArgs *param, PlayerActionPossibilities
     GameEvent *event;
     HiddenEventData *data;
     GameBeacon_BroadcastFieldMove(0x5b);
-    event = GameEvent_Create(context->gsys, NULL, EventDigCall_Callback, 0x14);
+    event = GameEvent_Create(context->gsys, NULL, EventDigCall_Callback, sizeof(HiddenEventData));
     data = GameEvent_GetData(event);
     HiddenEventData_Init(data, param, context);
     return event;
@@ -442,7 +442,7 @@ GameEvent *EventTeleportCall_Create(HiddenEventArgs *param, PlayerActionPossibil
     GameEvent *event;
     HiddenEventData *data;
     GameBeacon_BroadcastFieldMove(0x64);
-    event = GameEvent_Create(context->gsys, NULL, EventTeleportCall_Callback, 0x14);
+    event = GameEvent_Create(context->gsys, NULL, EventTeleportCall_Callback, sizeof(HiddenEventData));
     data = GameEvent_GetData(event);
     HiddenEventData_Init(data, param, context);
     return event;
@@ -479,7 +479,7 @@ u32 EventDivingCall_Check(PlayerActionPossibilities *context) {
 GameEvent *EventDivingCall_Create(HiddenEventArgs *param, PlayerActionPossibilities *context) {
     GameEvent *event;
     HiddenEventData *data;
-    event = GameEvent_Create(context->gsys, NULL, EventDivingCall_Callback, 0x14);
+    event = GameEvent_Create(context->gsys, NULL, EventDivingCall_Callback, sizeof(HiddenEventData));
     data = GameEvent_GetData(event);
     HiddenEventData_Init(data, param, context);
     return event;
@@ -536,7 +536,7 @@ GameEventReturnCode EventRuinsStrengthCall_Callback(GameEvent *event, u32 *state
 GameEvent *EventRuinsStrengthCall_Create(HiddenEventArgs *param, PlayerActionPossibilities *context) {
     GameEvent *event;
     HiddenEventData *data;
-    event = GameEvent_Create(context->gsys, NULL, EventRuinsStrengthCall_Callback, 0x14);
+    event = GameEvent_Create(context->gsys, NULL, EventRuinsStrengthCall_Callback, sizeof(HiddenEventData));
     data = GameEvent_GetData(event);
     HiddenEventData_Init(data, param, context);
     return event;
@@ -567,7 +567,7 @@ GameEventReturnCode EventRuinsFlash_Callback(GameEvent *event, u32 *state, void 
 GameEvent *EventRuinsFlash_Create(HiddenEventArgs *param, PlayerActionPossibilities *context) {
     GameEvent *event;
     HiddenEventData *data;
-    event = GameEvent_Create(context->gsys, NULL, EventRuinsFlash_Callback, 0x14);
+    event = GameEvent_Create(context->gsys, NULL, EventRuinsFlash_Callback, sizeof(HiddenEventData));
     data = GameEvent_GetData(event);
     HiddenEventData_Init(data, param, context);
     return event;

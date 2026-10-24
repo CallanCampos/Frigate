@@ -138,7 +138,7 @@ GameEvent *EventQuicksandArrive_Create(GameEvent *parent, GameSystem *gsys, Fiel
 
 GameEvent *func_ov036_021b95ac(GameEvent *parent, GameSystem *gsys, Field *field, BOOL seasonChanged, u32 prevSeason,
                                u32 nextSeason) {
-    GameEvent *event = GameEvent_Create(gsys, parent, func_ov036_021b9764, 0x68);
+    GameEvent *event = GameEvent_Create(gsys, parent, func_ov036_021b9764, sizeof(SpinEventWork));
     SpinEventWork *wk = GameEvent_GetData(event);
 
     wk->field = field;
@@ -151,7 +151,7 @@ GameEvent *func_ov036_021b95ac(GameEvent *parent, GameSystem *gsys, Field *field
 
 GameEvent *func_ov036_021b95e0(GameEvent *parent, GameSystem *gsys, Field *field, BOOL seasonChanged, u32 prevSeason,
                                u32 nextSeason) {
-    GameEvent *event = GameEvent_Create(gsys, parent, func_ov036_021b98e4, 0x68);
+    GameEvent *event = GameEvent_Create(gsys, parent, func_ov036_021b98e4, sizeof(SpinEventWork));
     SpinEventWork *wk = GameEvent_GetData(event);
 
     wk->field = field;
@@ -163,7 +163,7 @@ GameEvent *func_ov036_021b95e0(GameEvent *parent, GameSystem *gsys, Field *field
 }
 
 GameEvent *func_ov036_021b9614(GameEvent *parent, GameSystem *gsys, Field *field) {
-    GameEvent *event = GameEvent_Create(gsys, parent, func_ov036_021b9a64, 0x68);
+    GameEvent *event = GameEvent_Create(gsys, parent, func_ov036_021b9a64, sizeof(SpinEventWork));
     SpinEventWork *wk = GameEvent_GetData(event);
 
     wk->field = field;
@@ -571,7 +571,7 @@ static GameEventReturnCode EventTeleportEffect_Callback(GameEvent *event, u32 *s
 static GameEventReturnCode func_ov036_021ba4bc(GameEvent *event, u32 *state, void *data);
 
 GameEvent *EventQuicksandDrawIn_Create(GameEvent *parent, GameSystem *gsys, Field *field, const VecFx32 *pos) {
-    GameEvent *event = GameEvent_Create(gsys, parent, EventQuicksandDrawIn_Callback, 0x7c);
+    GameEvent *event = GameEvent_Create(gsys, parent, EventQuicksandDrawIn_Callback, sizeof(EffectEventWork));
     EffectEventWork *wk = GameEvent_GetData(event);
 
     wk->gsys = gsys;
@@ -583,7 +583,7 @@ GameEvent *EventQuicksandDrawIn_Create(GameEvent *parent, GameSystem *gsys, Fiel
 }
 
 GameEvent *EventEscapeRope_Create(GameEvent *parent, GameSystem *gsys, Field *field, BOOL seasonChanged) {
-    GameEvent *event = GameEvent_Create(gsys, parent, EventEscapeRope_Callback, 0x7c);
+    GameEvent *event = GameEvent_Create(gsys, parent, EventEscapeRope_Callback, sizeof(EffectEventWork));
     EffectEventWork *wk = GameEvent_GetData(event);
 
     wk->gsys = gsys;
@@ -595,7 +595,7 @@ GameEvent *EventEscapeRope_Create(GameEvent *parent, GameSystem *gsys, Field *fi
 }
 
 GameEvent *EventDig_Create(GameEvent *parent, GameSystem *gsys, Field *field, BOOL seasonChanged) {
-    GameEvent *event = GameEvent_Create(gsys, parent, EventDig_Callback, 0x7c);
+    GameEvent *event = GameEvent_Create(gsys, parent, EventDig_Callback, sizeof(EffectEventWork));
     EffectEventWork *wk = GameEvent_GetData(event);
 
     wk->gsys = gsys;
@@ -607,7 +607,7 @@ GameEvent *EventDig_Create(GameEvent *parent, GameSystem *gsys, Field *field, BO
 }
 
 GameEvent *EventTeleportEffect_Create(GameEvent *parent, GameSystem *gsys, Field *field, BOOL a3) {
-    GameEvent *event = GameEvent_Create(gsys, parent, EventTeleportEffect_Callback, 0x7c);
+    GameEvent *event = GameEvent_Create(gsys, parent, EventTeleportEffect_Callback, sizeof(EffectEventWork));
     EffectEventWork *wk = GameEvent_GetData(event);
 
     wk->gsys = gsys;
@@ -618,7 +618,7 @@ GameEvent *EventTeleportEffect_Create(GameEvent *parent, GameSystem *gsys, Field
 }
 
 GameEvent *func_ov036_021b9df8(GameEvent *parent, GameSystem *gsys, Field *field) {
-    GameEvent *event = GameEvent_Create(gsys, parent, func_ov036_021ba4bc, 0x7c);
+    GameEvent *event = GameEvent_Create(gsys, parent, func_ov036_021ba4bc, sizeof(EffectEventWork));
     EffectEventWork *wk = GameEvent_GetData(event);
 
     wk->gsys = gsys;

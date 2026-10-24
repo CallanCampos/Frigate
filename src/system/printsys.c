@@ -1090,7 +1090,12 @@ static u32 PrintQueue_GetStringSize(const StrBuf *strbuf) {
 }
 
 static u32 PrintQueue_GetJobSize(const StrBuf *strbuf) {
+#ifdef PLATFORM_PC
+    // With the padding a host leaves after the string (PrintQueue_WriteString)
+    return ((PrintQueue_GetStringSize(strbuf) + 7) & ~7) + sizeof(TextRenderer) + sizeof(TextRenderer *);
+#else
     return PrintQueue_GetStringSize(strbuf) + sizeof(TextRenderer) + sizeof(TextRenderer *);
+#endif
 }
 
 // The free space of the queue
@@ -1101,10 +1106,30 @@ static u32 PrintQueue_GetFreeSize(PrintQueue *queue) {
     return queue->size - queue->writePos + queue->readPos;
 }
 
+#ifdef PLATFORM_PC
+// Writes a string to the queue as the DS does, then moves the write position on to an 8-byte boundary. The renderer's
+// copy follows each string, and the renderer holds pointers, which a host aligns to 8 bytes: a string rounded to the
+// DS's 4 left it 4 bytes past such a boundary (port/docs/sanitizers.md, R7). Only the position moves, so the copy reads
+// no more of the caller's string than the DS does, which stays in a GFL_StrBufClone's buffer. The queue's sizes are
+// all multiples of 8, so a wrap keeps the alignment
+static const u16 *PrintQueue_WriteString(PrintQueue *queue, const u16 *str, u32 size) {
+    const u16 *queued = PrintQueue_Write(queue, str, size, sizeof(u16));
+
+    if (size & 7) {
+        queue->writePos = PrintQueue_Advance(queue, queue->writePos, 4);
+    }
+    return queued;
+}
+#endif
+
 // Adds the string and a copy of the renderer, and links them after the last one
 static void PrintQueue_Enqueue(PrintQueue *queue, TextRenderer *renderer, const StrBuf *strbuf) {
     const u16 *str = GFL_StrBufGetStringPtr(strbuf);
+#ifdef PLATFORM_PC
+    const u16 *queued = PrintQueue_WriteString(queue, str, PrintQueue_GetStringSize(strbuf));
+#else
     const u16 *queued = PrintQueue_Write(queue, str, PrintQueue_GetStringSize(strbuf), sizeof(u16));
+#endif
     TextRenderer *job = PrintQueue_Write(queue, renderer, sizeof(TextRenderer), sizeof(TextRenderer));
     TextRenderer *next = NULL;
 

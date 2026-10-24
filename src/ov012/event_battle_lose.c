@@ -44,7 +44,7 @@ GameEventReturnCode EventBattleLose_Callback(GameEvent *event, u32 *state, void 
 
 GameEvent *EventBattleLose_Create(GameSystem *gsys) {
     GameData *gameData = GSYS_GetGameData(gsys);
-    GameEvent *event = GameEvent_Create(gsys, NULL, EventBattleLose_Callback, 12);
+    GameEvent *event = GameEvent_Create(gsys, NULL, EventBattleLose_Callback, sizeof(BattleLoseData));
     BattleLoseData *data = GameEvent_GetData(event);
     data->gsys = gsys;
     data->returnNonLeague = IsReturnLocationNonLeaguePokeCen(gameData);

@@ -416,7 +416,7 @@ static void CGHelp_InitText(CGHelp *help) {
     help->quitButton = AppTaskMenuWin_Create(help->taskMenuRes, &item, 22, 21, 10, help->heapId);
     GFL_StrBufFree(item.str);
     AppTaskMenuWin_ClearScreen(help->previousButton);
-    *(vu16 *)0x050005e2 = 0;
+    *(vu16 *)(HW_DB_BG_PLTT + 0x1e2) = 0;
 }
 
 static void CGHelp_FreeText(CGHelp *help) {

@@ -3,6 +3,20 @@
 What port work taught that isn't obvious from the code, newest first. A lesson about MWCC or the decomp's own
 workflow goes in the decomp checkout instead; this file is the port's ([CLAUDE.md](../CLAUDE.md), the iteration loop).
 
+## 2026-10-23: the battle path
+
+- **A byte array the DS's size of a type is that type: find its siblings.** `BtlFlowWorkFrame.monSets` was
+  `u8 [7][0x48]`, 0x48 being the DS's `sizeof(BtlMonSet)`, and the deep dive's fix sized only that array for a host.
+  `BtlServerFlow.unk1A68`, a few lines further down and as old, is the same set in the same bytes, and its clear at the
+  battle's first switch-in ran 24 bytes past it. Typing both as the struct fixes the size and the alignment together;
+  before changing one such array, grep its header for the same size and comment.
+- **A literal size handed to an allocator is the DS's `sizeof`, until a check says otherwise.** The cut-in's
+  `GameEvent_Create(..., 0x44)` had 24 siblings with non-zero literal sizes. Twenty were their work's size on the DS,
+  where `sizeof` is neutral, and now use it; three `field_fade.c` events allocate 0x68, the spin events' size, for a
+  12-byte `FallEventWork`, where `sizeof` would change the ROM, and funfest's 4 bytes are an `s32` on both. Compare
+  each literal with the DS's size of the work it holds (ninja proves the complete files), and leave the ones that
+  already hold the host's work.
+
 ## 2026-10-23: the pointer cast guard, restarted on main
 
 - **A gate that passes when it sees nothing isn't a gate.** The guard's first version passed with every baseline row

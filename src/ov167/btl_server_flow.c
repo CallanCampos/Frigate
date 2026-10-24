@@ -1404,7 +1404,7 @@ BOOL ServerControl_AfterSwitchIn(BtlServerFlow *handler) {
     u32 state;
 
     result = FALSE;
-    monSet = handler->unk1A68;
+    monSet = &handler->unk1A68;
     BtlMonSet_Clear(monSet);
     BtlFlowMonIter_Init(&iter, handler);
     while (BtlFlowMonIter_Next(&iter, handler, &mon)) {
@@ -7750,13 +7750,13 @@ void BtlServerFlow_PopFrame(BtlServerFlow *flow) {
 void BtlServerFlow_SetFrame(BtlServerFlow *flow, u32 depth, BOOL clear) {
     BtlFlowWorkFrame *frame = &flow->frames[depth];
 
-    flow->unk850 = frame->monSets[0];
-    flow->unk854 = frame->monSets[1];
-    flow->unk858 = frame->monSets[2];
-    flow->unk85C = frame->monSets[3];
-    flow->unk860 = frame->monSets[4];
-    flow->unk864 = frame->monSets[5];
-    flow->unk868 = frame->monSets[6];
+    flow->unk850 = &frame->monSets[0];
+    flow->unk854 = &frame->monSets[1];
+    flow->unk858 = &frame->monSets[2];
+    flow->unk85C = &frame->monSets[3];
+    flow->unk860 = &frame->monSets[4];
+    flow->unk864 = &frame->monSets[5];
+    flow->unk868 = &frame->monSets[6];
     flow->moveEffect = &frame->moveEffect;
     flow->unk1AB0 = &frame->moveParams[0];
     flow->unk1AB4 = &frame->moveParams[1];
