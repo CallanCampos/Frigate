@@ -2113,7 +2113,7 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   #n` between an `ldrb` and its `beq` is a doubling in the source, `x * 2`, `x << 1` or `x + x`, where a plain byte
   test, through any type (`_Bool` included), cast or inline, is `cmp r0, #0`: `btlv_effect.c`'s `BtlvEffect_Init`
   tests its background's seasonal flag with `ldrb r0, [r0, #1]; lsls r0, r0, #1; beq`, the only such test in either
-  binary (a row). The doubling can also be an address: MWCC folds `&a[x] != a` (or `a + x == a`) to
+  binary, written `seasonal * 2`. The doubling can also be an address: MWCC folds `&a[x] != a` (or `a + x == a`) to
   `x * sizeof(*a) != 0` and drops the base, whatever it is, so over 2-byte elements the test is the same
   `lsls #1; beq`. Only `==` and `!=` fold: an ordering keeps the address and a `cmp`, a difference becomes a
   signed halving, and a comparison with `NULL` keeps the address.
