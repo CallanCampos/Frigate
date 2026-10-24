@@ -265,6 +265,7 @@ the part's code in its whole, and a row of `docs/nonmatching-functions.md` names
 one object, so they are complete together, each marked with `mark_complete.py`: `merge_objects.py` stops the build when
 only one is, and leaves both to link their original code when neither is. `config/merged_sources.toml` is the same for
 both versions and changes no dsd config, so it has no script and is edited by hand when a part is found.
+`python3 -m unittest tools.build.test_merge_objects` tests the rewrite, and CI's Compile workflow runs it.
 
 ## Shifting
 
