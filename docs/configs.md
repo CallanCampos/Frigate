@@ -107,7 +107,8 @@ A relocation that dsd could not pin to one overlay only links while its symbol i
 `static` in a decompiled file, check `relocs.txt` of both versions for relocations to its address with several
 candidate modules, and fix the ones that belong to another overlay. Field gimmicks, such as gym puzzles, share one load
 address, so calls between them are often ambiguous; the gimmick table in ov036 gives each entry's overlay ID, and its
-pointers are fixed from it.
+pointers are fixed from it. So are the encounter-effect table's (`ENC_EFFECT_CONTROLLERS`), and the Funfest mission
+events that `CheckFunfestMissionEvent` creates from overlay 157, which shares its address with overlay 146.
 
 ## Regenerating configs
 

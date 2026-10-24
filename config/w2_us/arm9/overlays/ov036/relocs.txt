@@ -936,8 +936,8 @@ from:0x021825ea kind:thumb_call to:0x02016b34 module:main
 from:0x021825fa kind:thumb_call to:0x02016ea0 module:main
 from:0x02182602 kind:thumb_call to:0x020148cc module:main
 from:0x02182612 kind:thumb_call to:0x02016ea0 module:main
-from:0x02182620 kind:load to:0x021f5b59 module:overlays(146,157)
-from:0x02182624 kind:load to:0x021f5abd module:overlays(146,157)
+from:0x02182620 kind:load to:0x021f5b59 module:overlay(157)
+from:0x02182624 kind:load to:0x021f5abd module:overlay(157)
 from:0x02182632 kind:thumb_call to:0x02182744 module:overlay(36)
 from:0x02182648 kind:thumb_call to:0x0215d060 module:overlay(12)
 from:0x0218264e kind:thumb_call to:0x0215d180 module:overlay(12)
