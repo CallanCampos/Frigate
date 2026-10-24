@@ -196,7 +196,8 @@ aren't part of a row, so upstream's edits elsewhere in a file leave the baseline
 or types upstream renamed passes as the same row, with a note, when the old name is gone: the old function's from its
 file, the old file, or the old type's from the decomp's C. A cast fixed in one function and another added in a function
 that still exists is a new row. Both versions give the same findings, and so do Apple clang, Homebrew's clang and
-Ubuntu's.
+Ubuntu's: clang 21 and later report a negated address narrowed under `-Wimplicit-int-conversion-on-negation` rather
+than `-Wshorten-64-to-32`, as clang 17 does, so the check adds that flag where the compiler has it.
 
 When it fails, it prints each new site with its file, line, function and source line. For each:
 

@@ -13,7 +13,10 @@ platform layer's wrappers that #include a decomp .c file to compile it with thei
 *_host.c, such as gfl_use_host.c and os_thread_host.c). It turns on what the host build turns off: the four cast
 warnings that port/CMakeLists.txt silences for the game's C come back, the decomp's include directories are -I rather
 than -isystem so that warnings in its headers show (a host variant of a header, in the build's gen/hwinclude, is
-reported as the header it was made from, ADR 0004), and -Wshorten-64-to-32 and -Wcast-function-type-strict are added.
+reported as the header it was made from, ADR 0004), and -Wshorten-64-to-32 and -Wcast-function-type-strict are added,
+with -Wimplicit-int-conversion-on-negation where the compiler has it: clang 21 and later report a negated value
+narrowed (an s32 given -x for a uptr x) under that flag, where clang 17 reports it under -Wshorten-64-to-32, so that
+every clang finds the same sites.
 It counts what it finds in the decomp's files, not in port/, whose own code the platform layer's review covers. What it
 counts, a site being one place in one file however many files include it:
 
@@ -105,9 +108,12 @@ WARNINGS = ["-Wpointer-to-int-cast", "-Wvoid-pointer-to-int-cast", "-Wint-to-poi
 KIND_OF_FLAG = {
     "-Wpointer-to-int-cast": "ptr-to-int", "-Wvoid-pointer-to-int-cast": "ptr-to-int",
     "-Wint-to-pointer-cast": "int-to-ptr", "-Wint-to-void-pointer-cast": "int-to-ptr",
-    "-Wshorten-64-to-32": "narrow",
+    "-Wshorten-64-to-32": "narrow", "-Wimplicit-int-conversion-on-negation": "narrow",
     "-Wcast-function-type": "fn-cast", "-Wcast-function-type-strict": "fn-cast",
 }
+# Clang 21 and later report a negated value narrowed under this flag rather than -Wshorten-64-to-32, as clang 17 does;
+# it is added for a compiler that knows it (negation_warning)
+NEGATION_WARNING = "-Wimplicit-int-conversion-on-negation"
 # The integers that carry an address, as the source spells them: include/types.h's, and the C library's that the host
 # variants of the SDK's headers give a DS address (ADR 0004)
 POINTER_WIDE = {"uptr", "sptr", "uintptr_t", "intptr_t"}
@@ -132,14 +138,21 @@ TYPE_KEYWORDS = {"struct", "union", "enum", "const", "volatile", "restrict", "si
                  "int", "long", "float", "double", "void", "_Bool"}
 
 # The sample that shows the check can see what it checks: one cast of each kind it counts, compiled with each distinct
-# set of the build's flags, and one in a header that the command reaches through -isystem, as the build reaches the
-# decomp's headers
+# set of the build's flags, and in a header that the command reaches through -isystem, as the build reaches the
+# decomp's headers, a pointer cut and a negated address narrowed (which clang 21 and later report under
+# NEGATION_WARNING)
 CANARY_SOURCE = "ptrcasts_canary.c"
 CANARY_HEADER = "ptrcasts_canary.h"
 CANARY_HEADER_TEXT = """\
 // The pointer cast guard's sample header (port/tools/check_ptrcasts.py), reached through -isystem
+#include <stdint.h>
+
 static inline unsigned int PtrCastsCanary_HeaderCut(void *work) {
     return (unsigned int)work;
+}
+
+static inline int PtrCastsCanary_HeaderNegate(uintptr_t address) {
+    return -address;
 }
 """
 CANARY_TEXT = """\
@@ -167,7 +180,7 @@ PtrCastsCanaryNumber PtrCastsCanary_Callback(PtrCastsCanaryWork callback) {
 }
 """
 CANARY_EXPECTED = {(CANARY_SOURCE, "ptr-to-int"), (CANARY_SOURCE, "int-to-ptr"), (CANARY_SOURCE, "narrow"),
-                   (CANARY_SOURCE, "fn-cast"), (CANARY_HEADER, "ptr-to-int")}
+                   (CANARY_SOURCE, "fn-cast"), (CANARY_HEADER, "ptr-to-int"), (CANARY_HEADER, "narrow")}
 
 # --require: where the build can run the check, each reason to skip is a failure instead
 REQUIRED = False
@@ -217,6 +230,21 @@ def target_flags(argv: list[str]) -> list[str]:
     return flags
 
 
+NEGATION_SUPPORT: dict[str, bool] = {}
+
+
+def negation_warning(compiler: str) -> list[str]:
+    """NEGATION_WARNING for a compiler that knows it, else nothing: an older clang would only warn that it doesn't."""
+    if compiler not in NEGATION_SUPPORT:
+        try:
+            proc = subprocess.run([compiler, "-Werror=unknown-warning-option", NEGATION_WARNING, "-fsyntax-only", "-x",
+                                   "c", "-"], input="", capture_output=True, text=True)
+            NEGATION_SUPPORT[compiler] = proc.returncode == 0
+        except OSError:
+            NEGATION_SUPPORT[compiler] = False
+    return [NEGATION_WARNING] if NEGATION_SUPPORT[compiler] else []
+
+
 def syntax_command(argv: list[str], source: str) -> list[str]:
     """The host build's command for one file, as a syntax-only pass with the cast warnings on."""
     out, arch = [argv[0]], False
@@ -245,9 +273,9 @@ def syntax_command(argv: list[str], source: str) -> list[str]:
             continue
         out.append(arg)
         i += 1
-    return out + WARNINGS + ["-fsyntax-only", "-ferror-limit=0", "-fno-color-diagnostics",
-                             "-fno-caret-diagnostics", "-fdiagnostics-show-option",
-                             "-fdiagnostics-print-source-range-info", source]
+    return out + WARNINGS + negation_warning(argv[0]) + [
+        "-fsyntax-only", "-ferror-limit=0", "-fno-color-diagnostics", "-fno-caret-diagnostics",
+        "-fdiagnostics-show-option", "-fdiagnostics-print-source-range-info", source]
 
 
 def repository_name(path: Path):

@@ -209,6 +209,7 @@ src/ov137/resort_data_manager.c	ResortData_RollPair	narrow	u32 <- uptr	1	harmles
 src/ov137/resort_sys.c	ResortSys_SetScriptWord	narrow	s32 <- uptr	1	harmless	arithmetic on the number Join Avenue's uptr getter returns for field 0x1a
 src/ov162/game_start.c	Continue_Main	ptr-to-int	u32 <- void *	3	harmless	an int carried in a void * and back (Continue's task parameter)
 src/ov165/plist_sys.c	PokeList_Main	ptr-to-int	u32 <- PokeListParam *	1	harmless	the callee ignores the parameter (NetSync_StartTiming, src/ov164/net_sync.c)
+src/ov167/ability_handlers.c	HandlerContrary	narrow	s32 <- uptr	1	harmless	the negated number BattleEventVar_GetValue's uptr returns for variable 0x20, the stat change's stages, kept in 32 bits as on the DS (only 0x3f carries an address)
 src/ov167/ability_handlers.c	HandlerSimple	narrow	s32 <- uptr	1	harmless	arithmetic on the number BattleEventVar_GetValue's uptr returns for variable 0x20, the stat change's stages, doubled, kept in 32 bits as on the DS (only 0x3f carries an address)
 src/ov167/battle_event.c	BattleEventVar_GetValueIfExist	narrow	s32 <- sptr	1	harmless	a battle event variable's number, read for the one caller's variable 0x2e (item_handlers.c); only 0x3f carries an address, read with BattleEventVar_GetValue
 src/ov167/battle_event.c	BattleEventVar_MulValue	narrow	fx32 <- sptr	1	harmless	a multiplied battle event variable's fx32 product, read into FX_Mul: its slot is written only by BattleEventVar_SetMulValue and with BattleEventVar_ClampValue's result, both s32; only 0x3f carries an address

@@ -37,15 +37,16 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
 - **Upstream:** `629a53cccb` (upstream merge #504), as `main` has it since PR 27; this branch merges no upstream commit.
 - **Port:** `PORT_SHA`, on the topic `port-battle-ptrcasts` from `main` at `c0a0d67c84` (PR 19's merge): `51ea50ac0f`,
   the retyping with its row of [game-changes.md](game-changes.md), the guard's baseline and the feature map's rows;
-  `2c0c902d55`, the records, which filled that row's commit and the last entry's `PORT_SHA`, `f6c426990d`; and this
-  commit, the review's round (below), which changes only `port/`.
+  `2c0c902d55`, the records, which filled that row's commit and the last entry's `PORT_SHA`, `f6c426990d`;
+  `dd53a57af1`, the review's round (below); and this commit, the guard's fix for what CI's Apple clang 17 found (below).
+  Both later commits change only `port/`.
 - **ROM:** T0 passes on `51ea50ac0f`'s tree: `python3 configure.py && ninja`, from an empty build directory, compiled
   every C file of both versions with no compiler warning, and both SHA1s match (Black 2
   `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb`, White 2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`). The build began
   before the change, so `ninja` ran again after it, rebuilding the objects the change touched (the 11 files that include
-  `battle/btl_event.h`) until it had no work left, and checked both SHA1s again: they match. On the review's round,
-  which changes no file outside `port/`, `python3 configure.py && ninja` again checked both ROMs and had no other work:
-  both SHA1s match.
+  `battle/btl_event.h`) until it had no work left, and checked both SHA1s again: they match. On the review's round and
+  again on this commit, which change no file outside `port/`, `python3 configure.py && ninja` checked both ROMs and had
+  no other work: both SHA1s match.
 - **MWCC-neutrality:** `port/tools/check_mwcc_neutral.py --base origin/main` (`c0a0d67c84`): 3,558 of 3,558 file and
   version pairs preprocess identically (`sptr` and `uptr` are `s32` and `u32` for MWCC). The files the branch changes
   and the 11 that include the header (`ninja -t deps`) are complete in both versions, so no compiler probe applies; the
@@ -78,10 +79,11 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
 - **Tiers:** unchanged: the branch adds and removes no game C.
 - **Trap stubs:** 30 function stubs and 21 data placeholders per version (`build/port*/gen/stubs.c`), as the last
   entry's; none in the battle's overlays 167 to 170.
-- **64-bit warnings:** `check_ptrcasts: 360 sites in 224 keys (real 66, harmless 116, handled 141, unreachable 37),
-  1682 files, 0 not compiled` in both versions, the real sites down from the last entry's 78: R06 is fixed, and every
-  real site left is wireless or Wi-Fi (R21's 3, R22's 1, R23's 50, R24's 12; phase 7). The game's pointer/int casts
-  (the guard's `ptr-to-int` and `int-to-ptr` sites outside `lib/`) fall from 33 to 21.
+- **64-bit warnings:** `check_ptrcasts: 361 sites in 225 keys (real 66, harmless 117, handled 141, unreachable 37),
+  1682 files, 0 not compiled` in both versions, with the review's round (360 sites and harmless 116 before it, without
+  Contrary's row), the real sites down from the last entry's 78: R06 is fixed, and every real site left is wireless or
+  Wi-Fi (R21's 3, R22's 1, R23's 50, R24's 12; phase 7). The game's pointer/int casts (the guard's `ptr-to-int` and
+  `int-to-ptr` sites outside `lib/`) fall from 33 to 21.
 - **Work done:** the battle's event variables carry the string for the handlers' message at pointer width. The server
   gives the handlers the `BattleHandlerString` they write a move's message to as variable 0x3f
   (`ServerEvent_CheckNoEffect`, `ServerEvent_DecideSpecialMoveCondition`, `ServerEvent_AddMoveConditionString`,
@@ -119,9 +121,9 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
     the targets, 0x16, 0x1a, 0x1d, 0x1f and 0x39, set from `GetMonID`, a move's type and category, a stat or condition
     ID and the weather), whose bit 31 is clear, and Helping Hand's compares variable 3 with its signed `work[0]`
     (`move_handlers.c:6436`): each gives the DS's result at 64 bits.
-  - **Arithmetic to read:** 10 sites and a negation, each kept in 32 bits or tested for truth: the five handlers' that
-    are the guard's new rows; Contrary's negation of variable 0x20 into `BattleEventVar_RewriteValue`'s `s32`;
-    Pressure's `+ 1` into a `u8` and Rainbow's `* 2` into a `u16`; `MultiplyBasePower`'s `factor *=` and Bide's
+  - **Arithmetic to read:** 10 sites and a negation, each kept in 32 bits or tested for truth: the six handlers' that
+    are the guard's new rows, Contrary's negation of variable 0x20 into `BattleEventVar_RewriteValue`'s `s32` among
+    them; Pressure's `+ 1` into a `u8` and Rainbow's `* 2` into a `u16`; `MultiplyBasePower`'s `factor *=` and Bide's
     `work[1] +=` into 32-bit variables; and `ServerEvent_GetTargetDefenses`'s `& 1` of the swap count, a truth test.
 
   The review's round: the matchers, which the first round ran from a scratch directory, are committed with the command
@@ -132,6 +134,18 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
   one line, with the audit left to this entry, its proof names `main`'s `c0a0d67c84`, and its change says that the
   header's three comments are the port's; the guard's `BattleEventVar_MulValue` row names the slot's product, not the
   multiplier.
+
+  The pull request's first CI run, on `dd53a57af1`, failed two jobs, the macOS 15 distribution builds (arm64 and Intel),
+  in `game_ptrcasts`: their Apple clang 17 reports Contrary's `-BattleEventVar_GetValue(0x20)`, narrowed into
+  `BattleEventVar_RewriteValue`'s `s32`, under `-Wshorten-64-to-32`, while clang 21 reports a negation's narrowing under
+  `-Wimplicit-int-conversion-on-negation`, which the guard didn't turn on, so this machine's AppleClang 21.0.0 saw
+  nothing there, nor did CI's macOS 26 and Ubuntu jobs (Apple clang 21, Ubuntu's clang 21.1.8), which passed.
+  `port/tools/check_ptrcasts.py` now adds that flag where the compiler knows it (it asks the compiler once, with
+  `-Werror=unknown-warning-option`), and its sample header holds a negated `uintptr_t` narrowed, so that a clang that
+  reports it under neither flag fails the check rather than passing; `game_ptrcasts_tool` gains the case. With it, this
+  machine finds Contrary's site too: `--update` added its row, classed `harmless` (the negated stat stages, kept in 32
+  bits), the guard passes with `--require` in both versions, and so do `game_ptrcasts` and `game_ptrcasts_tool`
+  (`ctest -R game_ptrcasts`, both builds). SYNC.md says why the flag is there.
 - **Next:** this branch's PR, its checks and local verification (`port/tools/sync_upstream.sh --verify-pr`), and its
   merge. Then what the last entries' Next lists: what the sync's review found that it didn't cause (`compile_check.py`'s
   call of the removed `lib_compiler`, the rows that name functions upstream renamed, the two `printsys.c` rows that call
