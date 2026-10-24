@@ -105,6 +105,7 @@
 . 0x02014b14 overlay_id 25
 . 0x02014b18 overlay_id 26
 . 0x020168e8 reloc_addend 4
+. 0x0201707a reloc_module overlay(12)
 . 0x0201880c reloc_addend 2
 . 0x02019f78 reloc_addend 0x4c
 . 0x02019f84 reloc_addend 0x240
@@ -859,6 +860,7 @@ overlays/ov011 0x02157af0 section_start lib/nitrowifi/src/soc/socl_list.c:.text
 overlays/ov011 0x02157af0 section_end lib/nitrowifi/src/soc/socl_misc.c:.text
 overlays/ov011 0x02158b58 add_function compare_fqdn:thumb:0x48
 overlays/ov011 0x0215a5fc add_reloc load,main,0x020050f0
+overlays/ov011 0x0215c594 section_end lib/nitrowifi/src/wcm/wcm_system.c:.text
 overlays/ov011 0x02160e10 section_start lib/dwc/src/match/dwc_match.c:.text
 overlays/ov011 0x0216c7ea reloc_module overlay(189)
 overlays/ov011 0x0216eba2 reloc_module overlay(189)
@@ -866,10 +868,12 @@ overlays/ov011 0x0216ebe8 reloc_module overlay(189)
 overlays/ov011 0x0216fbe0 section_end lib/dwc/src/gt2/gsUdpEngine.c:.text
 overlays/ov011 0x0216fbe0 section_start lib/dwc/src/gscommon/gsXML.c:.text
 overlays/ov011 0x021722c4 remove_reloc
+overlays/ov011 0x02185004 section_end lib/nitrowifi/src/wcm/wcm_system.c:.rodata
 overlays/ov011 0x02185568 remove_reloc
 overlays/ov011 0x021857d0 section_start lib/dwc/src/match/dwc_match.c:.data
 overlays/ov011 0x0218dc4c add_section lib/nitrowifi/src/soc/socl_misc.c:.bss:0x8
 overlays/ov011 0x0218dc54 section_start lib/nitrowifi/src/soc/socl_list.c:.bss
+overlays/ov011 0x0218df7c section_end lib/nitrowifi/src/wcm/wcm_system.c:.bss
 overlays/ov011 0x0218e1c0 section_start lib/dwc/src/match/dwc_match.c:.bss
 overlays/ov012 0x02150aa0 overlay_id 36
 overlays/ov012 0x02150aa4 reloc_module overlay(36)

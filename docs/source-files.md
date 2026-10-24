@@ -127,7 +127,11 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 | `sha1.c` | `0x0215ab04`–`0x0215b1d8` | 8 | complete | descriptive |
 | `ssl_rc4.c` | `0x0215b1d8`–`0x0215b274` | 2 | complete | descriptive |
 | `biginteger.c` | `0x0215b274`–`0x0215bbec` | 19 | partial | descriptive |
-| `wcm.c` | `0x0215bbec`–`0x0215dd74` | 93 | partial | descriptive |
+| `wcm_system.c` | `0x0215bbec`–`0x0215c594` | 39 | complete | descriptive |
+| `wcm_aplist.c` | `0x0215c594`–`0x0215cac4` | 14 | complete | descriptive |
+| `wcm_cpsif.c` | `0x0215cac4`–`0x0215cd28` | 13 | complete | descriptive |
+| `wcm_util.c` | `0x0215cd28`–`0x0215ce88` | 6 | complete | descriptive |
+| `wcm_wmif.c` | `0x0215ce88`–`0x0215dd74` | 21 | complete | descriptive |
 | `dwc_main.c` | `0x0215fa0c`–`0x02160e10` | 49 | partial | descriptive |
 | `dwc_match.c` | `0x02160e10`–`0x02168818` | 161 | partial | descriptive |
 | `dwc_nasfunc.c` | `0x021694d4`–`0x0216a408` | 30 | complete | descriptive |
