@@ -86,7 +86,11 @@ ctest --test-dir build/port-san -L route                       # every route, wi
   block allocated there (between blocks, in FND's block heads, in free memory, or in a block already freed);
   `heap-buffer-overflow` and `heap-use-after-free` are the host's own `malloc`'s; `stack-*` and `global-*` the others.
   The "allocated by" stack of a `use-after-poison` is the 16 MiB arena all the game's heaps live in
-  (`port_pxi_alloc_arena`), not the block: find the block from the code that accessed it.
+  (`port_pxi_alloc_arena`), not the block: find the block from the code that accessed it, or run again with
+  `ASAN_OPTIONS=poison_history_size=4096`, which adds the stack that poisoned the memory, for a block the game freed its
+  free (`GFL_HeapFreeCore`) and the code that called it. A report at a copy that runs for many callers, such as the
+  VBlank's VRAM transfers (`NNS_GfdDoVramTransfer`), names the copy and not the source: that stack tells two causes
+  apart that report at the same place (H6 and H7, below).
 - **UBSan** prints `port: UndefinedBehaviorSanitizer: <check> at FILE:LINE:COLUMN, from this stack:`, the stack, then
   its own `runtime error:` line. The stack is ASan's: UBSan's own (`UBSAN_OPTIONS=print_stacktrace=1`) stops at the
   report's frame on a fiber.
@@ -161,7 +165,9 @@ The build also leaves out:
 - **A use of a stack frame after it returned**, which needs ASan's fake stacks: only `os_all_fake_stacks` runs with
   them; a route runs with them under `ASAN_OPTIONS=detect_stack_use_after_return=1`.
 - **A second report at the same place:** UBSan reports each place once a process, and a run stops at the first report
-  anyway; a survey build shows the first caller of each place.
+  anyway; a survey build shows the first caller of each place. The place of a check in an inline function is the
+  inline's line, so every caller of `FX_SinIdx` that indexes outside the table reports as `fx.h:86` (R11, below): a
+  survey shows the first such caller, and the next one only once the first is fixed.
 
 ## What it found
 
@@ -222,8 +228,8 @@ its encounters and battles track:
 | Report | Where | What the sanitizer saw | What the host does |
 | --- | --- | --- | --- |
 | R6 | `src/ov036/fldeff_fes_kira.c:210`, `fldeff_gyoe.c:213`, `fldeff_shadow.c:128` to `193`: the field's effect tasks, from the field's first load | Each task's work lies 4 bytes past an 8-byte boundary while its struct holds pointers: misaligned loads and stores (UBSan) | Fixed in the game's header under `PLATFORM_PC`: `FieldEffectTask.work` (`include/field/field_effect.h`) is aligned to 8 bytes on a host ([game-changes.md](game-changes.md)) |
-| H5 | `src/ov036/field_buildmodel.c:852`, `FieldChunkPropHolder_SetVisible`, from `FieldPropSystem_Free` as the field closes for a change of map | A write of 4 bytes into memory of the game's heap that is no longer allocated (ASan, use-after-poison, in the main arena) | Nothing yet: open |
-| H6 | `lib/nnsys/src/gfd/gfd_VramTransferManager.c:327`, `NNS_GfdDoVramTransfer`, from the main loop (`src/system/main.c`) in the field | A transfer reads its source from memory of the game's heap that is no longer allocated (ASan, use-after-poison, twice) | Nothing yet: open |
+| H5 | `src/ov036/field_buildmodel.c:852`, `FieldChunkPropHolder_SetVisible`, from `FieldPropSystem_Free` as the field closes for a change of map | A write of 4 bytes into memory of the game's heap that is no longer allocated (ASan, use-after-poison, in the main arena) | Fixed in the game's file under `PLATFORM_PC` on 2026-10-24, with its cause traced ([below](#the-fields-sequences-under-the-strict-build)) |
+| H6 | `lib/nnsys/src/gfd/gfd_VramTransferManager.c:327`, `NNS_GfdDoVramTransfer`, from the main loop (`src/system/main.c`) in the field | A transfer reads its source from memory of the game's heap that is no longer allocated (ASan, use-after-poison, twice) | Fixed in the game's file under `PLATFORM_PC` on 2026-10-24, with its cause traced ([below](#the-fields-sequences-under-the-strict-build)) |
 
 The battles' track ran the same survey build on 2026-10-23 on the Route 19 route from the starter save (the oracle's
 `route19_save_b2_us.pbwinput`, port frames 0 to 7,623: CONTINUE, Route 19, the trainer's VS cut-in and Hugh's battle to
@@ -238,3 +244,25 @@ the house, is now its first report, where the strict build would stop; the stric
 | R8 | `src/ov167/btlv_scu.c:2407`, `BtlvScu_InitGauges`, from `BtlvScu_Setup` at every battle's start | The marked `// BUG:`: the loop clears one gauge past `gauges[6]` (UBSan, out-of-bounds index); its writes land on `abilityWins[0]`'s `scu` and `bg`, which `BtlvScu_InitAbilityWins` sets right after | Fixed under `PLATFORM_PC`, which takes the `BUGFIX` loop; the battle is unchanged |
 | R9 | `src/ov169/btl_monset.c:15` to `84`, from `ServerControl_AfterSwitchIn` at the battle's first switch-in | `BtlServerFlow.unk1A68`, a mon set kept as `u8 [0x48]`, lies 4 bytes past an 8-byte boundary (UBSan, misaligned); it is also 24 bytes short of a host's set, which the clear overruns | Fixed in the game's header: the flow's mon sets are `BtlMonSet` (`include/battle/btl_handler.h`, [game-changes.md](game-changes.md)) |
 | R10 | `lib/nitro/src/std/std_string.c:116`, `STD_GetStringLength`, from `G3DTextDraw_CreateResource` (`src/ov012/g3d_text_draw.c:91`) for the trainer cut-in's texture names (`src/ov036/fld3d_ci.c`) | NitroSDK's string length reads a word at a time once the address is aligned, so it reads up to 3 bytes past a string literal's end (`"name_up_pl"`, 11 bytes) (ASan, global-buffer-overflow, a read of 4) | Nothing yet: open. The read stays in the aligned word, which never crosses a page, so it is safe on every host as on the DS's ARM9: a candidate for the ignorelist's `[address]` section, as R1 is for alignment |
+
+### The field's sequences under the strict build
+
+T5 first ran the field's oracle sequences on 2026-10-24: the strict build of both versions with the oracle
+(`build/port-san` and `build/port-san-w2`), `ctest -L route`, `oracle_aspertia`, `oracle_field_menus` and
+`oracle_party_menus` among the routes, with every replay. Before any fix, the program alone on each sequence's input
+file ran the field menu's two sequences clean in both versions, and stopped on H5 in Black 2's `aspertia` at New Game's
+change of map into the player's house, which `replay_new_game_house` makes too. The survey build of Black 2, on the
+input files of those two (`aspertia_b2_us` and `first_save_b2_us`), showed H5, H6 and a new report, R11. Each cause is
+traced below: all three are memory bugs of the game, the same in the ROM, fixed in its files under `PLATFORM_PC`, each
+with its row in [game-changes.md](game-changes.md) and its finding in [decomp-findings.md](decomp-findings.md). With the
+fixes both survey runs end without a report, and every route of both versions passes in the strict build
+([STATUS.md](STATUS.md)). H6 was two causes that report at the same place, the VBlank's copy: the field's, fixed, and
+the Route 19 route's, H7, which the same survey build shows there with H6 fixed, and which stays open for the battle
+route's track:
+
+| Report | Where | What the game does | What the host does |
+| --- | --- | --- | --- |
+| H5 | `src/ov036/field_buildmodel.c:852`, `FieldChunkPropHolder_SetVisible`, from `FieldPropSystem_Free` as the field closes: New Game's intro, at its change of map into the player's house (port frame 11,545 of `aspertia_b2_us.pbwinput`) | `FieldG3DMapper_Free` frees the map's chunks before the prop system, and with them the prop instances that the system's holders point into (`FieldChunk_Free`, `src/ov012/field_g3d_map.c`). A prop handle still alive then is freed with the system, and freeing it shows its prop again: a write of the prop's saved index into the freed instances. The intro's is a handle that a script made (`s0127_BMCreateHandleByGPos`, `src/ov036/scrcmd_buildmodel.c`) and left to the field's end, found by the return addresses of the handles' creation in a scratch build | The system's handles let go of their holders before they are freed. The holders go with the system, so nothing else changes |
+| H6 | `lib/nnsys/src/gfd/gfd_VramTransferManager.c:327`, `NNS_GfdDoVramTransfer`, copying 2 bytes (`MIi_CpuCopy16`) at the VBlank after the field menu's SAVE is answered | A task menu's update queues the transfer of its cursor's pulsing color from the menu itself (`AppTaskMenu_PulseCursorColor`, `src/system/app_taskmenu.c`); the report frees the menu in the same pass, once its flash ends (`Report_UpdateYesNoMenu`, `src/ov012/report_event.c`), so the VBlank's copy reads freed memory, which still holds the color: the poisoning stack is the free in `EventSave_Update` | The pulse's color goes through a slot of its screen and palette that outlives the menu, holding the same color, and so does the color of `AppTaskMenuWin_PulseColor`, the window's twin. The last pulse of a pass for a palette is the one the DS's transfers leave in it |
+| R11 | `lib/nitro/include/nitro/fx.h:86` and `:90`, `FX_SinIdx` and `FX_CosIdx`, from `FieldCamera_RefineDerivedAngles` (`src/ov036/field_camera.c`), from the entrance camera as the player arrives in the house | The function steps the yaw and pitch a degree either way without wrapping them to 16 bits, so at a yaw of 0 the table's index is -24 and -23 (UBSan, index out of bounds): the DS reads 48 bytes of zeros before `FX_SinCosTable_` there (the end of `FS_VTABLE_BASE`, the ROM file system's interface in `lib/nitro/src/fs/fs_command_default.c`), and within a degree under a full turn `FX_AtanIdxTable_`, which follows the table. A host reads whatever its linker put there | The six reads give the DS's values. With them, a yaw under 16, whose sine is 0, makes one of the function's divisors 0 when the direction's x is above 0, for which the DS's runtime (`_s32_div_f`) gives the dividend, so that division does too, where x86-64 would fault |
+| H7 | The same copy as H6 (`DoTransfer3dTex`, `port_gx_load_copy`, 3,856 bytes), on the Route 19 route from the starter save at the trainer's cut-in (`route19_save_b2_us.pbwinput`) | The cut-in converts its 2D pictures to textures one a pass, and queues the transfers of each one's texture from a bitmap and of its palette from the palette file (`Fld3DCi_ConvG2DToG3D`), which `EventFld3DCiBitmapConv_Callback` (`src/ov036/fld3d_ci.c`) frees in the same pass (`GFL_BitmapFree`, `GFL_HeapFree`): the VBlank's copies read freed memory, the palette's at the texture's place, which ASan reports once | Nothing yet: open, for the battle route's track. The survey of the battles' track reported H6 on this route |

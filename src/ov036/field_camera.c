@@ -429,6 +429,48 @@ static void FieldCamera_UpdateViewAngles(FieldCamera *camera, const VecFx32 *tar
     }
 }
 
+#ifdef PLATFORM_PC
+// An entry of FX_SinCosTable_ (lib/nitro/include/nitro/fx.h) as the DS reads it, the table's own and up to 24 either
+// side of it. FieldCamera_RefineDerivedAngles steps its angles a degree either way without wrapping them to 16 bits, so
+// an angle within a degree of a full turn indexes outside the table, where the DS reads the ROM's neighbours of the
+// table: 48 bytes of zeros before it (the end of FS_VTABLE_BASE) and FX_AtanIdxTable_ after it, whose first 24 entries
+// `after` repeats (lib/nitro/src/fx/fx_atanidx.c keeps the table to itself). A host would read whatever its linker put
+// there (port/docs/sanitizers.md, R11)
+static fx16 FieldCamera_SinCosEntryAsDS(int entry) {
+    static const fx16 after[24] = {
+        0,   81,   163,  244,  326,  407,  489,  570,  651,  732,  813,  894,
+        975, 1056, 1136, 1217, 1297, 1377, 1457, 1537, 1617, 1696, 1775, 1854,
+    };
+
+    if (entry < 0) {
+        return 0;
+    }
+    if (entry >= 4096 * 2) {
+        return after[entry - 4096 * 2];
+    }
+    return FX_SinCosTable_[entry];
+}
+
+// FX_SinIdx and FX_CosIdx of an angle up to a degree outside 0 to 0xffff, as the DS gives them
+static fx16 FieldCamera_SinIdxAsDS(int idx) {
+    return FieldCamera_SinCosEntryAsDS((idx >> 4) << 1);
+}
+
+static fx16 FieldCamera_CosIdxAsDS(int idx) {
+    return FieldCamera_SinCosEntryAsDS(((idx >> 4) << 1) + 1);
+}
+
+// The DS's signed division, whose runtime gives the dividend for a divisor of 0 (_s32_div_f in
+// lib/msl/src/fp/fp_fastI.s), where C leaves it undefined and x86-64 faults: with the DS's zeros before the table, a
+// yaw under 16, whose sine is 0, gives minus.x and base.x both 0
+static int FieldCamera_DivAsDS(int dividend, int divisor) {
+    if (divisor == 0) {
+        return dividend;
+    }
+    return dividend / divisor;
+}
+#endif
+
 // Moves a yaw and pitch closer to dir by a fraction of a degree: how far dir lies from the direction they give,
 // against how far one degree moves that direction, in the quadrant of each angle
 static void FieldCamera_RefineDerivedAngles(const VecFx32 *dir, u16 yaw, u16 pitch, u16 *outYaw, u16 *outPitch) {
@@ -448,16 +490,30 @@ static void FieldCamera_RefineDerivedAngles(const VecFx32 *dir, u16 yaw, u16 pit
     base.x = FX_Mul(sinYaw, cosPitch);
     base.y = FX_SinIdx(pitch);
     base.z = FX_Mul(cosYaw, cosPitch);
+#ifdef PLATFORM_PC
+    // Angles a degree away that aren't wrapped to 16 bits, with the DS's values outside the table
+    minus.x = FX_Mul(FieldCamera_SinIdxAsDS(yaw - DEG_TO_IDX(1)), cosPitch);
+    minus.z = FX_Mul(FieldCamera_CosIdxAsDS(yaw - DEG_TO_IDX(1)), cosPitch);
+    sinPitchMinus = FieldCamera_SinIdxAsDS(pitch - DEG_TO_IDX(1));
+    plus.x = FX_Mul(FieldCamera_SinIdxAsDS(yaw + DEG_TO_IDX(1)), cosPitch);
+    plus.z = FX_Mul(FieldCamera_CosIdxAsDS(yaw + DEG_TO_IDX(1)), cosPitch);
+    sinPitchPlus = FieldCamera_SinIdxAsDS(pitch + DEG_TO_IDX(1));
+#else
     minus.x = FX_Mul(FX_SinIdx(yaw - DEG_TO_IDX(1)), cosPitch);
     minus.z = FX_Mul(FX_CosIdx(yaw - DEG_TO_IDX(1)), cosPitch);
     sinPitchMinus = FX_SinIdx(pitch - DEG_TO_IDX(1));
     plus.x = FX_Mul(FX_SinIdx(yaw + DEG_TO_IDX(1)), cosPitch);
     plus.z = FX_Mul(FX_CosIdx(yaw + DEG_TO_IDX(1)), cosPitch);
     sinPitchPlus = FX_SinIdx(pitch + DEG_TO_IDX(1));
+#endif
     if (yaw < 0x4000) {
         if (base.x < dir->x && base.z > dir->z) {
             if (MATH_ABS(base.x - dir->x) >= MATH_ABS(base.z - dir->z)) {
+#ifdef PLATFORM_PC
+                yaw = yaw - (u16)FieldCamera_DivAsDS((dir->x - base.x) * DEG_TO_IDX(1), minus.x - base.x);
+#else
                 yaw = yaw - (u16)((dir->x - base.x) * DEG_TO_IDX(1) / (minus.x - base.x));
+#endif
             } else {
                 yaw = yaw - (u16)((base.z - dir->z) * DEG_TO_IDX(1) / (base.z - minus.z));
             }
