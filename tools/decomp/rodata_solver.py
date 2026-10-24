@@ -8,7 +8,9 @@ which object every slot must hold. This tool anneals that sequence until the for
 assignment defines every table before the initializers that reference it (its cost), and
 optionally polishes a feasible sequence for naturalness (same-demo/kind adjacency by
 name prefix) without raising the cost. The object list, sizes and reference edges come
-from the compiled object file; the wanted order from the module's symbols.txt. A slot or
+from the compiled object file (for a file in config/deadstrip.toml, the compiler's own
+under build/<version>/unstripped/, which it takes in place of the build's stripped one,
+as rodata_order.py does); the wanted order from the module's symbols.txt. A slot or
 two may stay in conflict after long runs: a forward declaration of the referenced table
 satisfies the reference without moving it, since MWCC lists an object where it is
 defined (demo3d_data.c of overlay 293 keeps one).
@@ -25,11 +27,15 @@ with --start-sigma and new seeds to continue from the best sequence found.
 import argparse
 import random
 import re
+import sys
 import time
 from collections import defaultdict
 from pathlib import Path
 
 from elftools.elf.elffile import ELFFile
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+from tools.decomp.rodata_order import layout_object  # noqa: E402
 
 SEPARATE_SIZE = 64
 
@@ -144,7 +150,7 @@ def main():
     args = ap.parse_args()
 
     rng = tuple(int(x, 16) for x in args.range.split("-"))
-    sizes, edges = read_elf(args.object)
+    sizes, edges = read_elf(layout_object(args.object))
     decl = declaration_order(args.source, set(sizes))
     rom = rom_order(args.symbols, rng, set(sizes))
     if set(rom) != set(decl):

@@ -807,11 +807,13 @@ u32 GetAdditionalConditionFlag(BattleMon *mon, u32 flag) {
 }
 
 u32 BattleMon_GetSemiInvulnFlag(BattleMon *mon) {
+    // The conditions of the turns out of reach: in the air, underground, under water and vanished
+    static const u32 sSemiInvulnFlags[4] = { 3, 5, 4, 6 };
     u32 i;
 
     for (i = 0; i < 4; i++) {
-        if (GetAdditionalConditionFlag(mon, data_ov167_021d7490[i])) {
-            return data_ov167_021d7490[i];
+        if (GetAdditionalConditionFlag(mon, sSemiInvulnFlags[i])) {
+            return sSemiInvulnFlags[i];
         }
     }
     return 0x10;

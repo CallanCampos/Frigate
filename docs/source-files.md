@@ -1616,8 +1616,8 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 | `btl_server_flow.c` | `0x0219f390`–`0x021ae32c` | 997 | complete | string at `0x021dae9c` |
 | `btl_server_flow_sub.c` | `0x021ae32c`–`0x021b083c` | 151 | complete | descriptive |
 | `btl_handler_work.c` | `0x021b083c`–`0x021b0a1c` | 11 | complete | descriptive |
-| `btl_server_cmd.c` | `0x021b0a1c`–`0x021b1674` | 19 | partial | descriptive |
-| `btl_client.c` | `0x021b1674`–`0x021b9950` | 311 | partial | string at `0x021daf60` |
+| `btl_server_cmd.c` | `0x021b0a1c`–`0x021b1674` | 19 | complete | descriptive |
+| `btl_client.c` | `0x021b1674`–`0x021b9950` | 311 | complete | string at `0x021daf60` |
 | `btl_net.c` | `0x021b9950`–`0x021ba584` | 63 | complete | string at `0x021daf70` |
 | `btl_pokeparam.c` | `0x021ba584`–`0x021bc6bc` | 154 | complete | string at `0x021daf7c` |
 | `battle_event.c` | `0x021bc6bc`–`0x021bd054` | 46 | complete | descriptive |
@@ -2510,7 +2510,7 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `namein.c` | `0x021d96e0`–`0x021dd28c` | 111 | partial | descriptive |
+| `namein.c` | `0x021d96e0`–`0x021dd28c` | 111 | complete | descriptive |
 | `namein_graphic.c` | `0x021dd28c`–`0x021dd4c8` | 14 | complete | string at `0x021ddb84` |
 | `namein_data.c` | `0x021dd4c8`–`0x021dd8e4` | 23 | complete | string at `0x021ddb98` |
 

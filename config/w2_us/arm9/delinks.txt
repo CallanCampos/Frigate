@@ -424,6 +424,7 @@ src/system/wipe.c:
     .bss        start:0x021416a4 end:0x021417fc
 
 src/system/wipe_sub.c:
+    complete
     .text       start:0x02028030 end:0x02029498
     .rodata     start:0x020917a8 end:0x0209195c
     .data       start:0x0209a4e0 end:0x0209a56c
@@ -894,6 +895,7 @@ lib/nnsys/src/g2d/g2d_Image.c:
     .text       start:0x02060b5c end:0x020610e8
 
 lib/nnsys/src/g2d/g2d_OAM.c:
+    complete
     .text       start:0x0206067c end:0x02060b54
     .rodata     start:0x020942c4 end:0x020942f4
     .data       start:0x0209b28c end:0x0209b298

@@ -21,6 +21,52 @@ Add an override only when both versions' original functions, data and relocation
 linked modules and both ROMs. This manifest describes compilation; it does not change dsd's section ranges or
 relocations. Changes regenerate both the Ninja configuration and objdiff metadata.
 
+## Dead-stripped code
+
+The game was linked with dead-stripping, so a function nothing called is missing from the ROM, while data it had
+pooled with live code, such as its function-local statics in MWCC's shared `.data` and `.rodata` sections, stayed. Our
+link can't do the same: it keeps everything with `-nodead`, since dead-stripping would also drop the delinked objects
+nothing refers to, and `mwldarm -partial` doesn't strip. `config/deadstrip.toml` lists, under `[deadstrip]`, the
+symbols the original link dropped from each source file that needs them. For a listed file, `configure.py` compiles
+to `build/<version>/unstripped/<path>.o`, and `tools/build/deadstrip.py` writes the object at the usual path, which
+the link, objdiff and the report take. The manifest and the script are implicit inputs of that step, and editing
+the manifest regenerates `build.ninja`. Every other file builds as before: the step is opt-in, and each entry is a
+flagged exception.
+
+The exception departs from three rules: the listed code is written from another decomp with no asm to check it
+against, it has no address to be placed by, and its file is marked complete although that code was never compared.
+It is used for `src/system/wipe_sub.c` alone, whose 31 dead wipe handlers and their engines come from pret's
+pokeplatinum and pokeheartgold, with the two window readers `wipe_wnd.c` lost with them. Any other entry is another
+exception for the maintainer to accept.
+
+The strip drops each listed symbol's section, every allocated section that only dropped code reaches (a static
+function, a string, an unpooled static), the exception indices of dropped code, the relocations of what stays (the
+debug information) into dropped sections, and undefined symbols only dropped code called. A global the list doesn't
+name stays even when only dead code calls it, so list every global the original lost. The strip fails when a listed
+symbol isn't defined in the object, shares its section with a global that isn't listed, or is reached from code of
+the object that stays. With an empty list it copies the object unchanged. `compiler_probe.py` runs each object it
+compiles for a listed file through the same strip, so the dropped functions aren't reported.
+
+The strip sees only its own object, and the linker links a call to a symbol nothing defines through a veneer to
+address 0 rather than fail. So `tools/build/check_deadstrip.py`, which every version's build runs after compiling,
+matching or not, fails when any other compiled or delinked object refers to a listed symbol, or to a function that
+only the dropped code called and that neither the ROM's `symbols.txt` nor any object defines.
+`tools/decomp/compile_all.py`, which CI runs without the ROMs, does the strip and the same check on its objects.
+Declare the listed functions in their source file, not its header, so that no other file can call them, unless
+another file's dropped code calls them, as `wipe_sub.c`'s plane swap calls `wipe_wnd.c`'s window readers.
+
+The data-layout tools read a listed file's layout from the unstripped object: the strip removes local initializers
+that MWCC's size sort counted, so `rodata_order.py` (`--from-object`, `--check`) and `rodata_solver.py` take
+`build/<version>/unstripped/<path>.o` when given the build's object, and say so.
+
+To add an entry, once the maintainer has accepted the exception, write `"src/path.c" = ["DeadFunc", ...]` and make sure
+MWCC emits each listed function: a function nothing calls is emitted only when it is global. The ROM has none of the
+listed code, so it can't be checked against the original: the source file says in a comment which functions are
+reconstructions, from which reference, and what in them is a guess. Add one only when the file's own data shows the dead
+code existed, as objects that only it read, or for a function that another entry's dead code calls, as `wipe_wnd.c`'s
+readers. `python3 -m unittest tools.build.test_deadstrip` tests the strip and the check, and CI's Compile workflow runs
+it.
+
 ## Linker symbols
 
 NitroSDK's code reads a few numbers, such as `SDK_IRQ_STACKSIZE`, as the addresses of symbols that the SDK's linker

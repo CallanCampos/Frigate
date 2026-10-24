@@ -2315,6 +2315,7 @@ overlays/ov167 0x021d03ac reloc_module overlay(168)
 overlays/ov167 0x021d03bc reloc_module overlay(168)
 overlays/ov167 0x021d34f8 reloc_module overlay(168)
 overlays/ov167 0x021d6ee4 remove_reloc
+overlays/ov167 0x021d7490 add_section src/ov167/btl_pokeparam.c:.rodata:0x10
 overlays/ov167 0x021da9ec remove_reloc
 overlays/ov167 0x021daa0c remove_reloc
 overlays/ov167 0x021db070 add_section src/ov167/btl_pokeparam.c:.bss:0x124

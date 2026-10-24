@@ -160,6 +160,26 @@ typedef union {
     };
 } GXOamAttr;
 
+// An affine parameter, whose four values are the fourth halfwords of four OAMs
+typedef struct {
+    u16 _0;
+    u16 _1;
+    u16 _2;
+    s16 PA;
+    u16 _4;
+    u16 _5;
+    u16 _6;
+    s16 PB;
+    u16 _8;
+    u16 _9;
+    u16 _10;
+    s16 PC;
+    u16 _12;
+    u16 _13;
+    u16 _14;
+    s16 PD;
+} GXOamAffine;
+
 #define GX_OAM_ATTR01_Y_SHIFT 0
 #define GX_OAM_ATTR01_CM_MASK 0x00002000
 #define GX_OAM_ATTR01_MODE_SHIFT 10
@@ -880,15 +900,41 @@ static inline void GXS_SetVisibleWnd(int window) {
 #define REG_G2_WINOUT_OBJWININ_MASK 0x3f00
 #define G2_WND_EFFECT 0x20
 
-// The planes outside all windows, and whether color effects apply there, as the register's low byte
+// The planes inside a window or outside all of them, and whether color effects apply there, as one byte of the window
+// registers: WININ holds window 0's then window 1's, WINOUT the outside's then the OBJ window's
 typedef struct {
     u8 planeMask : 5;
     u8 effect : 1;
     u8 : 2;
 } GXWndPlane;
 
+static inline GXWndPlane G2_GetWnd0InsidePlane(void) {
+    // Volatile: the window register, which the game sets at any time
+    return *(volatile GXWndPlane *)&reg_G2_WININ;
+}
+
+static inline GXWndPlane G2_GetWnd1InsidePlane(void) {
+    // Volatile: the window register, which the game sets at any time
+    return *((volatile GXWndPlane *)&reg_G2_WININ + 1);
+}
+
 static inline GXWndPlane G2_GetWndOutsidePlane(void) {
     return *(volatile GXWndPlane *)&reg_G2_WINOUT;
+}
+
+static inline GXWndPlane G2S_GetWnd0InsidePlane(void) {
+    // Volatile: the window register, which the game sets at any time
+    return *(volatile GXWndPlane *)&reg_G2S_DB_WININ;
+}
+
+static inline GXWndPlane G2S_GetWnd1InsidePlane(void) {
+    // Volatile: the window register, which the game sets at any time
+    return *((volatile GXWndPlane *)&reg_G2S_DB_WININ + 1);
+}
+
+static inline GXWndPlane G2S_GetWndOutsidePlane(void) {
+    // Volatile: the window register, which the game sets at any time
+    return *(volatile GXWndPlane *)&reg_G2S_DB_WINOUT;
 }
 
 static inline void G2_SetWnd0InsidePlane(int wnd, BOOL effect) {
