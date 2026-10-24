@@ -19,8 +19,10 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 CONFIG = ROOT / "config/merged_sources.toml"
-# The sections of a part that the whole's object has under another name
-RENAMED = {".bss": ".ltdmain.bss"}
+# Each section that a part may have, and the whole's section that holds it: TwlSDK's LTDMAIN section puts the part's
+# code and data in .ltdmain and its statics in .ltdmain.bss. Any other section of a part would be placed from the
+# whole's main sections, which hold the main part's code and data, so it stops the build
+PART_SECTIONS = {".ltdmain": ".ltdmain", ".bss": ".ltdmain.bss"}
 
 
 def merged_sources(path: Path = CONFIG) -> dict[str, str]:
@@ -54,12 +56,15 @@ def merge(lcf: str, objects: str, merged: dict[str, str]) -> tuple[str, str]:
         if any(delinked):
             sys.exit(f"merge_objects.py: {part} and {whole} are one object; mark both complete or neither")
         placed = re.compile(r"^(\s*)" + re.escape(part_object) + r"\((\S+)\)$", re.M)
-        if not placed.search(lcf):
+        sections = [match.group(2) for match in placed.finditer(lcf)]
+        if not sections:
             sys.exit(f"merge_objects.py: the linker script places nothing from {part_object}")
+        unknown = sorted(set(sections) - PART_SECTIONS.keys())
+        if unknown:
+            sys.exit(f"merge_objects.py: {part} has {', '.join(unknown)}, which its whole's object has no section for")
 
         def place(match: re.Match) -> str:
-            section = RENAMED.get(match.group(2), match.group(2))
-            return f"{match.group(1)}{whole_object}({section})"
+            return f"{match.group(1)}{whole_object}({PART_SECTIONS[match.group(2)]})"
 
         lcf = placed.sub(place, lcf)
         objects = "\n".join(whole_line if line == part_line else line for line in lines if line != whole_line) + "\n"

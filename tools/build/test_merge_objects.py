@@ -46,6 +46,11 @@ class MergeTests(unittest.TestCase):
         with self.assertRaises(SystemExit):
             merge_objects.merge(LCF.replace("card_rom_twl", "other"), OBJECTS, MERGED)
 
+    def test_part_section_outside_ltdmain_fails(self):
+        lcf = LCF.replace("        card_rom_twl.o(.bss)\n", "        card_rom_twl.o(.bss)\n        card_rom_twl.o(.data)\n")
+        with self.assertRaises(SystemExit):
+            merge_objects.merge(lcf, OBJECTS, MERGED)
+
     def test_both_incomplete_link_their_original_code(self):
         objects = OBJECTS.replace("build/b2_us/lib/", "build/b2_us/delinks/lib/")
         self.assertEqual(merge_objects.merge(LCF, objects, MERGED), (LCF, objects))

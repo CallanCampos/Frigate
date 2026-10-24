@@ -255,8 +255,9 @@ object.
 `config/merged_sources.toml` maps each such part to its whole, whose source holds the part's code between
 `#pragma section LTDMAIN begin` and `end`. The part has no source and isn't compiled: `tools/build/merge_objects.py`
 rewrites dsd's linker script to place the part's sections from the whole's object, its `.bss` from the object's
-`.ltdmain.bss`, and lists the whole's object in the part's place in the object list. `mwldarm` makes the long-branch
-veneers object by object, in the list's order, and a later call in range shares an earlier veneer: at its ARM9 main
+`.ltdmain.bss`, and stops the build for a part with any section but `.ltdmain` and `.bss`, which only the main part's
+sections of the object could fill; it lists the whole's object in the part's place in the object list. `mwldarm`
+makes the long-branch veneers object by object, in the list's order, and a later call in range shares an earlier veneer: at its ARM9 main
 place, `pm.o` came before `card_hash.o`, so `pm.c`'s DSi part made the veneers of `OS_DisableInterrupts` and
 `OS_RestoreInterrupts` that `card_hash.c` makes in the original, and `.ltdmain` moved by 0x10 from `card_hash.c` on.
 `compiler_probe.py`, `mark_complete.py`, `rename_symbol.py`, `check_nonmatching_rows.py` and the objdiff config find
