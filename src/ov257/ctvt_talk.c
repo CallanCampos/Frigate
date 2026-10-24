@@ -203,13 +203,8 @@ static void CtvtTalk_OpenGameWindow(CommTvtWork *sys, CtvtTalk *talk);
 static void CtvtTalk_CloseGameWindow(CommTvtWork *sys, CtvtTalk *talk);
 static BOOL CtvtTalk_CheckGameCancel(CommTvtWork *sys, CtvtTalk *talk);
 
-// The buttons of the bottom screen
-static const TouchRect sZoomButtons[] = {
-    { 0xa8, 0xc0, 0xe8, 0x00 },
-    { 0x68, 0xa0, 0xd8, 0xff },
-    { TOUCH_RECT_END },
-};
-
+// The buttons of the bottom screen, declared in the order CtvtTalk_UpdateMain and CtvtTalk_UpdateSpeed test them,
+// which is the order MWCC's size sort needs to lay them out as the ROM does
 static const TouchRect sExitButtons[] = {
     { 0x08, 0x18, 0xb8, 0xe8 },
     { 0x18, 0x28, 0xb8, 0xf0 },
@@ -225,6 +220,12 @@ static const TouchRect sGameButtons1[] = {
 static const TouchRect sGameButtons2[] = {
     { 0x48, 0x58, 0xc8, 0xff },
     { 0x58, 0x68, 0xd0, 0xff },
+    { TOUCH_RECT_END },
+};
+
+static const TouchRect sZoomButtons[] = {
+    { 0xa8, 0xc0, 0xe8, 0x00 },
+    { 0x68, 0xa0, 0xd8, 0xff },
     { TOUCH_RECT_END },
 };
 
@@ -391,14 +392,19 @@ void CtvtTalk_Leave(CommTvtWork *sys, CtvtTalk *talk) {
 }
 
 int CtvtTalk_Main(CommTvtWork *sys, CtvtTalk *talk) {
+    // The fades' steps and frames per step, read as immediates. A function-local static const is emitted even when
+    // its reads fold: these two are the bytes 06 01 at the head of the file's .rodata, which nothing points to. That
+    // they are these calls' is inferred from their arguments
+    static const u8 wipeDivision = 6;
+    static const u8 wipeSync = 1;
     HeapID heapId = CommTvt_GetHeapId(sys);
 
     switch (talk->state) {
     case TALK_STATE_FADE_IN:
         if (func_ov257_021aaa74(sys) == TRUE) {
-            GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_IN, WIPE_TYPE_FADE_IN, 0, 6, 1, heapId);
+            GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_IN, WIPE_TYPE_FADE_IN, 0, wipeDivision, wipeSync, heapId);
         } else {
-            GFL_WipeSet(WIPE_MODE_SUB, WIPE_TYPE_FADE_IN, WIPE_TYPE_FADE_IN, 0, 6, 1, heapId);
+            GFL_WipeSet(WIPE_MODE_SUB, WIPE_TYPE_FADE_IN, WIPE_TYPE_FADE_IN, 0, wipeDivision, wipeSync, heapId);
         }
         talk->state = TALK_STATE_WAIT_FADE_IN;
         break;
@@ -408,7 +414,7 @@ int CtvtTalk_Main(CommTvtWork *sys, CtvtTalk *talk) {
         }
         break;
     case TALK_STATE_FADE_OUT_TO_GAME:
-        GFL_WipeSet(WIPE_MODE_SUB, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, 0, 6, 1, heapId);
+        GFL_WipeSet(WIPE_MODE_SUB, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, 0, wipeDivision, wipeSync, heapId);
         func_ov257_021aaa78(sys, FALSE);
         talk->state = TALK_STATE_WAIT_FADE_OUT;
         break;
@@ -422,7 +428,7 @@ int CtvtTalk_Main(CommTvtWork *sys, CtvtTalk *talk) {
         if (talk->waitSound && CtvtCamera_IsSoundDone(sys, camera) != TRUE) {
             break;
         }
-        GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, 0, 6, 1, heapId);
+        GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, 0, wipeDivision, wipeSync, heapId);
         func_ov257_021aaa78(sys, TRUE);
         talk->state = TALK_STATE_WAIT_FADE_OUT;
         break;
