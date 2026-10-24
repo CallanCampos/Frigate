@@ -104,7 +104,7 @@ void ResortPerson_SetVisible(ResortPerson *person, BOOL visible);
 // 0 shows the person's actor, 1 hides it, and 2 shows it if the person is visible
 void ResortPerson_ApplyVisibility(ResortPerson *person, u32 mode);
 void ResortPerson_SetParam(ResortPerson *person, JoinAvenuePersonParam param, u32 value);
-u32 ResortPerson_GetParam(ResortPerson *person, JoinAvenuePersonParam param, void *buffer);
+uptr ResortPerson_GetParam(ResortPerson *person, JoinAvenuePersonParam param, void *buffer);
 u32 ResortPerson_GetAttr(ResortPerson *person, u32 which);
 FieldActor *ResortPerson_GetActor(ResortPerson *person);
 ResortPersonData *ResortPerson_GetData(ResortPerson *person);
@@ -142,7 +142,9 @@ ResortPersonData *ResortData_Create(HeapID heapId, void *person, u32 kind, u16 i
 void ResortData_Free(ResortPersonData *data);
 void ResortData_Clear(ResortPersonData *data);
 BOOL ResortData_IsEmpty(ResortPersonData *data);
-u32 ResortData_GetParam(ResortPersonData *data, JoinAvenuePersonParam param, void *buffer);
+// A param of the data's person, entry or record, from its type's getter: a number, or for a person's two raw
+// messages their address, so a uptr. A name or a message is read into the buffer
+uptr ResortData_GetParam(ResortPersonData *data, JoinAvenuePersonParam param, void *buffer);
 void ResortData_SetParam(ResortPersonData *data, JoinAvenuePersonParam param, u32 value);
 // The person, entry or record of the data, by its kind
 void *ResortData_GetPerson(ResortPersonData *data);
