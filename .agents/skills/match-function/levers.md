@@ -152,6 +152,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
   (matching.md: "array index that is a sum")
 - The operands of `*` are loaded in source order. A product assigned to its own variable gets a new register.
   (matching.md: "operands of `*`"), (matching.md: "A product assigned")
+- An `adds` emitted destination first (`adds x, x, y`) where the original has it second: the source's `x = y + x`
+  is rewritten to `x += y`; the original summed into a variable of its own that wasn't forward-substituted.
+  (matching.md: "An add whose destination is one of its operands")
 - A three-term `|` chain with its loads swapped: swap its first two terms. (matching.md: "three-term `|` chain")
 - Where a flag is first set decides which register builds its zero. The register a shared zero gets follows statement
   order, and stores of 0 before a loop take the zero of the variable its initializer sets first, as in

@@ -317,6 +317,15 @@ Same instructions, registers swapped.
   its sign fix in Power Split and Guard Split, while its own code is the same as with `u32`.
 - The operands of `*` are loaded in source order, so a multiply whose registers are swapped has its operands swapped
   in the source.
+- An add whose destination is one of its operands, `x = y + x`, is rewritten by the `opt_arithtransformation` pass
+  to `x += y` and emitted destination first (`adds x, x, y`). A sum the original emits with the destination second
+  (`adds r2, r1, r2`) went to a variable of its own, and a single-use definition is forward-substituted into its use
+  (hoisting its loads) unless the variable has a second use, is assigned again in the same block, has a store or
+  call before its use, is used in another block, or carries a conversion node: a written cast or a conversion to
+  or from an enum. Same-size `int`, `long` and `unsigned` conversions leave none. `btl_client.c`'s
+  `StudioScore_CalcTotal` adds its four score kinds this way, and matches only as `sum = points[FAME];` then
+  `sum = points[k] + (s32)sum;` for the other three (a no-op cast, flagged in its pull request); the file under
+  `-flag no-opt_arithtransformation` or `no-opt_dead_assignments` matches it but breaks 6 or 11 other functions.
 - The terms of a three-term `|` chain are not loaded in source order: `a | b | c` loads `c`, then `a`, then `b`.
   `btl_server_cmd.c`'s command encoder loads `args[2]`, `args[1]`, `args[0]` for each packed argument, which
   `((args[1] & 0x1f) << 5) | ((args[0] & 0x1f) << 10) | (args[2] & 0x1f)` gives, while its four- and five-term chains

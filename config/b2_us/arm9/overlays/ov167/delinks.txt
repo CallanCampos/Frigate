@@ -137,6 +137,7 @@ src/ov167/pokewood_cutin.c:
     .data       start:0x021dafe0 end:0x021db000
 
 src/ov167/btl_client.c:
+    complete
     .text       start:0x021b1674 end:0x021b9950
     .rodata     start:0x021d6eb0 end:0x021d7448
     .data       start:0x021daf60 end:0x021daf70
