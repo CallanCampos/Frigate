@@ -43,6 +43,35 @@ void WipeWnd_SetOutsidePlane(u32 planes, BOOL effect, u32 screen) {
     }
 }
 
+// Dead-stripped, as config/deadstrip.toml lists: the planes inside a window and outside the windows, read back from the
+// registers. Only wipe_sub.c's dead-stripped plane swap reads them, so the original link dropped both, and the ROM
+// has neither. They are reconstructed from HGSS's window module (pret's pokeheartgold, sub_020132E8 and sub_0201333C
+// in asm/unk_02012DD8.s, between the counterparts of WipeWnd_SetOutsidePlane and WipeWnd_SetPosition), in the shape of
+// this file's setters, and can't be checked against BW2's
+GXWndPlane WipeWnd_GetInsidePlane(u32 window, u32 screen) {
+    if (window == 0) {
+        if (screen == 0) {
+            return G2_GetWnd0InsidePlane();
+        } else {
+            return G2S_GetWnd0InsidePlane();
+        }
+    } else {
+        if (screen == 0) {
+            return G2_GetWnd1InsidePlane();
+        } else {
+            return G2S_GetWnd1InsidePlane();
+        }
+    }
+}
+
+GXWndPlane WipeWnd_GetOutsidePlane(u32 screen) {
+    if (screen == 0) {
+        return G2_GetWndOutsidePlane();
+    } else {
+        return G2S_GetWndOutsidePlane();
+    }
+}
+
 void WipeWnd_SetPosition(int x1, int y1, int x2, int y2, u32 window, u32 screen) {
     if (window == 0) {
         if (screen == 0) {

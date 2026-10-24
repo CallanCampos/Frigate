@@ -3762,12 +3762,23 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `dwcutil_ac.c`'s key of the first exchange, a 16-byte struct of two MAC addresses and a tag, came out ahead of the
   file's other buffers, where the ROM has it among them by size, until it was a `u8[0x10]`.
 - A function-local static of a function MWCC doesn't emit is dropped, while a global read only by an unemitted
-  static function stays in the shared section. Data that outlived code the original link dead-stripped can't be
-  reproduced under `-nodead`: wipe_sub.c's `.data` and `.rodata` hold the parameters of about 31 handlers the ROM
-  doesn't have, as their own function-local statics, which an unemitted handler takes with it. Made globals read by
-  one unemitted function, in a declaration order found from the size sort, about 47 of them reproduce both sections
-  byte for byte in both versions (the live handlers' line patterns as function-local statics); that isn't kept, as
-  it names data Game Freak kept local and invents a reader for it.
+  static function stays in the shared section. So the C alone can't reproduce, under `-nodead`, data that outlived
+  code the original link dead-stripped: wipe_sub.c's `.data` and `.rodata` hold the function-local statics of 31
+  handlers the ROM doesn't have, which an unemitted static handler takes with it. Made globals read by one unemitted
+  function, in a declaration order found from the size sort, they reproduce both sections too, but that names data
+  Game Freak kept local and invents a reader for it, so it isn't kept. The file is complete instead through the
+  build's dead-strip step (docs/configs.md, "Dead-stripped code"), as a flagged exception to "Write C from the asm"
+  made for this file alone, with the two `wipe_wnd.c` window readers its swap calls (another file would be another
+  exception for the maintainer): the 31 handlers are
+  written back as global functions, so that MWCC emits them, with the engines only they call, from pret's
+  pokeplatinum (`src/screen_fade_funcs.c`, types 8 to 15, 18 to 37, 40 and 41) and pokeheartgold's asm (the 43rd,
+  `FadeFunc_42`), and `config/deadstrip.toml` lists them, so `tools/build/deadstrip.py` drops their code while their
+  statics stay pooled with the live handlers'. One size-sorted list across both sections, in the library's handler
+  order, each line handler declaring its ranges and then its pattern, gives both sections byte for byte in both
+  versions, and leaving out any handler breaks them. Types 32 to 35 each copy an 8-byte local initializer, which the
+  sort lists while it gets a section of its own, so the strip removes it, as the original link did: HGSS, which kept
+  those handlers, has the four templates in its `.rodata` and otherwise the same bytes. None of the written-back code
+  can be checked against the ROM, and the file's flag comment says so.
 - Tables that only code the linker dropped read can be kept in the shared section as globals read by unemitted
   static functions. `mbp.c` (overlay 181) keeps NitroSDK's demo tables of state and callback names this way, after
   its heap ID and before their strings: a `static` table read only by an unemitted function is dropped with it, and a
@@ -3853,7 +3864,8 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   the prediction silently wrong: `btlv_input.c`'s layout was called unreachable until the list also counted every
   function-local initializer (down to an 8-byte `ClActorSetup` local) and the tables referenced only by other tables;
   with those in the list a top-of-file permutation matches. `rodata_order.py --from-object FILE.o` lists every data
-  object a compile produced so none is dropped, and `rodata_order.py ... --check FILE.o` fails loudly when the model
+  object a compile produced so none is dropped (for a file in `config/deadstrip.toml`, from the unstripped object,
+  which it takes in place of the build's), and `rodata_order.py ... --check FILE.o` fails loudly when the model
   and the compiler disagree; run the check against a real compile before trusting any verdict.
 - Function-local initializers of one size tie in the sort too, and `--check` doesn't compare their order. Their own
   declaration order also sets their function's stack slots, so the tie is fixed by moving other declarations:
@@ -3934,12 +3946,14 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   of equal length that each end in a `TOUCH_RECT_END` entry, with other tables pointing into the rows. Once the sizes
   are right, any order of the objects of one size can be reached; keep the natural order elsewhere and let
   `rodata_order.py` solve for the same-size groups.
-- One initialized array retains entries that no code indexes, where MWCC drops separate unreferenced statics. If
-  live `.data` objects have gaps filled by unused records, indexing a shared array preserves the ROM's offsets:
-  `wipe_sub.c`'s seven `WipeLinePattern` entries put its four used patterns at 0, 0x10, 0x20 and 0x28, matching all
-  four line-wipe functions in both versions without pointer casts. The sections' full layout needs the patterns
-  apart, though: ten 8-byte patterns as one array make an 80-byte object, which gets a section of its own after the
-  file's 24-byte objects, where the ROM has them first.
+- One initialized array retains entries that no code indexes, where MWCC drops separate unreferenced statics, so
+  indexing a shared array keeps live `.data` objects at the ROM's offsets across gaps of unused records. Look for
+  where the gaps come from first: `wipe_sub.c`'s seven-entry `WipeLinePattern` table put its four used patterns at 0,
+  0x10, 0x20 and 0x28 and matched all four line-wipe functions, but the sections' full layout needed the patterns
+  apart (ten 8-byte patterns as one array make an 80-byte object, which gets a section of its own after the file's
+  24-byte objects, where the ROM has them first). Each was a function-local static of its handler, and the unused
+  ones belonged to handlers the original link dead-stripped ("A function-local static of a function MWCC doesn't
+  emit", above).
 - The linker starts each `.rodata` section on a 4-byte boundary, whatever the section's own alignment, so a 6-byte
   `u16` table followed by a `u8` initializer leaves 2 bytes of padding between them, as at the start of
   `btl_server_flow.c`'s `.rodata`. `scrcmd_ochiba.c`'s 150-byte and 342-byte tables, both 2-aligned, end where only
