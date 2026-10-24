@@ -198,6 +198,7 @@ src/gfl/heapsys.c	GFL_HeapGetSize	ptr-to-int	u32 <- NNSiFndHeapHead *	1	harmless
 src/gfl/heapsys.c	GFL_HeapGetSize	ptr-to-int	u32 <- void *	1	harmless	a difference of two addresses in one block (a heap block's head and data)
 src/gfl/net_state.c	NetState_ConnectMac	ptr-to-int	u32 <- u8 *	1	harmless	an alignment or low-bit test: the low bits are the host address's
 src/ov011/net_devwifi.c	NetDevWifi_Start	int-to-ptr	DWCFriendData * <- int	1	real	R22: Wi-Fi game code: DWC user and friend data as int, login buffers, callbacks in u32 fields (phase 7)
+src/ov011/net_devwifi.c	NetDevWifi_Start	int-to-ptr	DWCUserData * <- int	1	real	R22: Wi-Fi game code: DWC user and friend data as int, login buffers, callbacks in u32 fields (phase 7)
 src/ov011/net_devwifi.c	NetDevWifi_Start	int-to-ptr	void * <- int	1	real	R22: Wi-Fi game code: DWC user and friend data as int, login buffers, callbacks in u32 fields (phase 7)
 src/ov011/net_devwifi.c	NetDevWifi_Unk4C	int-to-ptr	const char * <- int	1	real	R22: Wi-Fi game code: DWC user and friend data as int, login buffers, callbacks in u32 fields (phase 7)
 src/ov012/game_beacon_set.c	GameBeacon_BroadcastPhrase	ptr-to-int	u32 <- StrBuf *	1	real	R15: the Funfest beacon mission's StrBuf * in a u32 value
