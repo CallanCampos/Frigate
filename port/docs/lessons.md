@@ -26,6 +26,22 @@ workflow goes in the decomp checkout instead; this file is the port's ([CLAUDE.m
   doors' "where it stands", which still said the field was blocked. Before committing, search the guides and the front
   doors for the module's, the test's and the hook's names, and for what the change makes untrue.
 
+## 2026-10-23: the deep dive after the PR 12 sync
+
+- **Never run lldb on this Mac.** Developer mode is off, so lldb's attach raises macOS's "Developer Tools Access"
+  password prompt, and while that prompt is open every `wibo` process on the machine hangs: the MWCC compiles of every
+  ROM build, other sessions' included (a decomp build stalled about 16 minutes on 2026-10-23 until the prompt was
+  dismissed). Find a host crash with the sanitized build ([sanitizers.md](sanitizers.md)), the crash report's
+  backtrace (`port: crash: ...`) and logging; a session whose `wibo` processes all stop at once looks for that
+  prompt first.
+- **A green `--verify-pr` says nothing about T4.** It builds without `PORT_BUILD_ORACLE`, and every oracle test, and
+  each test that needs the port's virtual environment (`asm_oracle`), skips when its tool is missing, so a test that
+  expects what the game no longer does stays green there: after the field's C arrived, the oracle and launcher
+  routes that expected the field's trap, and `asm_oracle`'s names from before upstream adopted the SDK's, failed only
+  in a build with the oracle and the environment. Run T4 with the oracle (`-DPORT_BUILD_ORACLE=ON`, or a built
+  `pbw-oracle` in the build's `oracle/`) and `build/port-venv` whenever a sync brings game C that a route reaches, and
+  count the skips by name, not by number.
+
 ## 2026-10-23: the field's entry
 
 - **A size hook covers only the paths that go through it.** `PORT_HEAP_SIZE` scaled every heap made from the arena

@@ -48,6 +48,7 @@ records keep what was decided or found at the time, and are added to, not rewrit
 | [adr/0013](adr/0013-windows-build-with-msys2-clang64.md) | Windows built with MSYS2's CLANG64, its differences behind `port/hal/host` |
 | [adr/0014](adr/0014-sanitized-build-game-heaps-poisoned-ds-isms-ignorelisted.md) | The sanitized build: the game's heaps poisoned in place, the DS-isms ignorelisted |
 | [adr/0015](adr/0015-universal-macos-app-for-macos-11.md) | A universal macOS app for macOS 11, with the pinned SDL3 linked statically |
+| [adr/0016](adr/0016-3d-frame-in-bands-on-worker-threads.md) | The 3D frame drawn in bands on worker threads, the game on one |
 | [adr/0017](adr/0017-external-contributions.md) | External contributions through forks and PRs, with maintainer sync and ROM verification |
 | [adr/0018](adr/0018-protected-main-and-sync-prs.md) | Protected main and reviewed upstream syncs |
 | [adr/0021](adr/0021-root-heaps-in-the-games-own-memory-from-host-memory.md) | Root heaps in the game's own memory get host memory |
@@ -75,7 +76,7 @@ Each directory of `port/` has a guide to its files: what each does, the part of 
 | [../hal/README.md](../hal/README.md) | The platform layer: one row per module with the SDK module it replaces, how decomp files are adapted, the names |
 | [../gfx/README.md](../gfx/README.md) | The renderers: 2D, the geometry engine, 3D, capture, the scanline hook |
 | [../audio/README.md](../audio/README.md) | The sound output |
-| [../include/README.md](../include/README.md) | `port_host.h`, force-included into the decomp's C |
+| [../include/README.md](../include/README.md) | `port_host.h`, force-included into the decomp's C, and the DS's wide strings and WCM workspace for the host |
 | [../cmake/README.md](../cmake/README.md) | The build's fragments, their tests, and the build's options |
 | [../tests/README.md](../tests/README.md) | The tests by directory, which need the ROM, how to write one |
 | [../tests/asm_oracle/README.md](../tests/asm_oracle/README.md) | The differential tests of the SDK's assembly in C against the ROM's code |

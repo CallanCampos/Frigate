@@ -156,10 +156,10 @@ def fx32(rng) -> int:
 # Each function that only stores: its signature and the size of its matrix
 STORES = [
     ("MTX_Identity22_", "void(ptr)", 16),
-    ("MAT2_Scaling", "void(ptr, s32, s32)", 16),
+    ("MTX_Scale22_", "void(ptr, s32, s32)", 16),
     ("MTX_Rot22_", "void(ptr, s32, s32)", 16),
     ("MTX_Identity33_", "void(ptr)", 36),
-    ("MAT3_Scaling", "void(ptr, s32, s32, s32)", 36),
+    ("MTX_Scale33_", "void(ptr, s32, s32, s32)", 36),
     ("MTX_RotX33_", "void(ptr, s32, s32)", 36),
     ("MTX_RotY33_", "void(ptr, s32, s32)", 36),
     ("MTX_RotZ33_", "void(ptr, s32, s32)", 36),
@@ -170,7 +170,7 @@ STORES = [
 ]
 # Each copy: the sizes of its source and destination
 COPIES = [
-    ("MAT3_To4x4", 36, 64),
+    ("MTX_Copy33To44_", 36, 64),
     ("MTX_Copy43To44_", 48, 64),
     ("MTX_Copy44To43_", 64, 48),
 ]
