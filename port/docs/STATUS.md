@@ -34,70 +34,91 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
 
 ## 2026-10-23: the battle path: the trainer cut-in and Hugh's battle to the first move
 
-- **Upstream:** `b62c655bfa` (upstream merge #481), as on the field's entry branch, which this branch starts from
-  (`port-field-entry` at `7f5cad4dd9`, PR 18) and which already merges it through `main`'s PR 16; so the Route 19 route
-  ran on this branch itself, with no scratch merge. No upstream commit is merged here.
-- **Port:** `PORT_SHA`, on the topic branch `port-battle-path`, a draft PR stacked on PR 18.
-- **ROM:** T0 passes after each of the branch's six commits and on the head: Black 2
+- **Upstream:** `b62c655bfa` (upstream merge #481), as `main` has it since PR 16 (`6a1ace981b`); this branch merges no
+  upstream commit. Upstream's `main` has moved on (`c9f0912d43`), for the sync to propose on its own.
+- **Port:** `PORT_SHA`, on the topic branch `port-battle-path`, [PR
+  21](https://github.com/CallanCampos/Frigate/pull/21), from `port-field-entry` at `7f5cad4dd9` (PR 18), with the
+  review's fixes (`dd153fea48`) and `main` merged at `00e3468c79` (`957b7931f4`: PRs 18, 20 and 17, the field's entry,
+  the process docs and the pointer cast guard). The Route 19 route ran on the branch itself, with no scratch merge.
+- **ROM:** T0 passes after each of the branch's commits and on the head with `main` merged: Black 2
   `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb` and White 2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`. Every game file the
-  branch changes is complete in both versions but `src/system/printsys.c`, whose compiler probe is the same before and
-  after in both versions (`GFL_TextRendererDrawToBitmap` and `GFL_TextRendererDrawToBitmapEx`, as before). No incomplete
-  file depends on `include/battle/btl_handler.h` (`ninja -t deps`: its 15 dependents are complete in both versions).
-  `check_mwcc_neutral.py` over the whole tree against `b62c655bfa` finds 24 files different in both versions: the 21
-  this branch changes on purpose (the `sizeof`s, the constants' spelling and the typed mon sets, with the header's 15
-  dependents), `field_transition.c` (the field's entry) and `pokemontrade_2d.c` and `vct.c` (PRs 7 and 15 on `main`);
-  the guard-only changes (`field_effect.h` and its dependents, `printsys.c`, `btlv_scu.c`, `machine_use.c`) and the 22
-  incomplete files that include `graphics.h` are identical.
-- **Host build:** T1 passes on macOS arm64, RelWithDebInfo, both versions (`build/port`, `build/port-w2`), and Black 2's
-  sanitized survey program (`build/port-san-survey`). The full builds have 723 warnings each, as on the field's entry;
-  no changed file adds one. clang-format 23 is clean on every changed C file.
-- **Tests:** full ctest on the head: Black 2, 298 passed, 7 failed and 4 skipped of 309; White 2, 297 passed, 7 failed
-  and 2 skipped of 306. The failures are the seven tests of the test launcher, `frame_times_party_menus` among them,
-  which steps aside now that the field opens (as on the field's entry, whose retirement of it is plan A-2). `asm_oracle`
-  skips here: this worktree has no `build/port-venv` with Unicorn. The machine's load average was about 45 on its 8
-  cores during Black 2's run, so `frame_times_title` and `frame_times_new_game` skipped, as they do above the cores'
-  count. `oracle_continue` and `oracle_continue_starter` (T4) and `replay_new_game_house` (T3) pass in both versions.
-  The Route 19 route by hand (T3, Black 2; White 2 has no Route 19 input file yet): the oracle's
-  `route19_save_b2_us.pbwinput` from the starter save (`build/port/oracle-saves`, SHA-1 `ce71fe0b8c…`), headless. On the
-  field's entry branch the program ends at frame 6,397, status 1 with no message (the cut-in's work past its heap
-  block). On this branch it plays CONTINUE, Route 19, the trainer's VS cut-in (frame 6,555: AAAAAAA against HughAAA) and
-  Hugh's battle to "What will Tepig do?" (frame 7,600), and stops at frame 7,623 on `data_ov167_021d7490` (status 70,
-  "the game accessed data_ov167_021d7490+0x0 (ov167, 0x021d7490, 32 bytes), which has no C yet"), its frames identical
-  after each commit. T5: the survey build on the same route shows only H6 and R10 (the deep dive's showed R6 to R10 and
-  H6), and on `replay_new_game_house` runs all 18,800 frames with only H5 and H6 ([sanitizers.md](sanitizers.md)). T6:
-  `replay_same_save` passes in both versions. T2: every test that isn't a route passes after each commit (Black 2). T7
-  not run.
+  branch changes is complete in both versions but `src/system/printsys.c`, whose `compiler_probe.py --compilers 1.1p1
+  --mismatches` on the head, in both versions, gives the two rows it gave before the branch
+  (`GFL_TextRendererDrawToBitmap` size 0x30/0x2c, `GFL_TextRendererDrawToBitmapEx` 25 bytes) and lists the host-only
+  `PrintQueue_WriteString` as not emitted. No incomplete file depends on `include/battle/btl_handler.h` (`ninja -t
+  deps`: its 15 dependents are complete in both versions). `check_mwcc_neutral.py` on the head: against `origin/main`,
+  3,514 of 3,556 file and version pairs identical, the 42 others the 21 files this branch changes on purpose in both
+  versions (the `sizeof`s, the constants' spelling and the typed mon sets, with the header's 15 dependents); against
+  `b62c655bfa`, 3,508 identical, those 21 and `field_transition.c` (PR 18), `pokemontrade_2d.c` and `vct.c` (PRs 7 and
+  15) the others; against `f4f4af54f6`, the head the review read, 3,556 of 3,556 identical: the review's fixes and
+  `main`'s merge change nothing MWCC reads. The guard-only changes (`field_effect.h` and its dependents, `printsys.c`,
+  `btlv_scu.c`, `machine_use.c`) and the 22 incomplete files that include `graphics.h` are identical in every run.
+- **Host build:** T1 passes on macOS arm64, Apple clang 21, RelWithDebInfo, both versions (`build/port`,
+  `build/port-w2`), each program built from clean with 723 warnings, as on the field's entry, and Black 2's sanitized
+  survey program (`build/port-san-survey`). clang-format 23 is clean on every changed C file.
+- **Tests:** full ctest on the head with `main` merged, before this records commit (whose only test input is the guard's
+  baseline, below): Black 2, 302 passed, 7 failed and 2 skipped of 311; White 2, 300 passed, 7 failed and 1 skipped of
+  308. The failures are the seven tests of the test launcher in both versions (`frame_times_party_menus`,
+  `oracle_launch_field_menus`, `oracle_launch_party_menus`, `launch_summary_standalone`, `launch_touch_then_party`,
+  `launch_unfinished`, `launch_not_offered`), which steps aside now that the field opens, as on `main` until its
+  retirement (plan A-2). Skipped: `app_universal_slices` in both, which only a distribution build has, and in Black 2
+  `frame_times_new_game`, on a load average of about 57 on the machine's 8 cores, which then passed alone. `asm_oracle`
+  passes in both (with the clone's `build/port-venv`), and so do `oracle_continue` and `oracle_continue_starter` (T4),
+  `replay_new_game_house` (T3) and `replay_same_save` (T6). `game_ptrcasts` and `game_ptrcasts_tool` pass in both
+  versions with the baseline this commit gives them. The Route 19 route by hand (T3), headless, 7,700 frames: Black 2
+  with the oracle's `route19_save_b2_us.pbwinput` from the starter save (`build/port/oracle-saves`, SHA-1
+  `ce71fe0b8c…`); White 2 with the same input, its version line changed (`sed 's/^version b2_us$/version w2_us/'`, not
+  committed, since the oracle made the input in Black 2), from White 2's starter save (`build/port-w2/oracle-saves`,
+  SHA-1 `3b9dac231d…`). On the field's entry branch the program ended at frame 6,397, status 1 with no message (the
+  cut-in's work past its heap block). On this head both versions play CONTINUE, Route 19, the trainer's VS cut-in (frame
+  6,555: AAAAAAA against HughAAA) and Hugh's battle to "What will Tepig do?" (frame 7,600), and stop at frame 7,623 on
+  `data_ov167_021d7490` (status 70, "the game accessed data_ov167_021d7490+0x0 (ov167, 0x021d7490, 32 bytes), which has
+  no C yet", at `0x021d74d0` in White 2), their frames' hashes the same before and after the review's fixes and `main`'s
+  merge. T5: the survey build on the same route shows only H6 and R10, R7 gone with its new fix, and on
+  `replay_new_game_house`'s input runs all 18,800 frames with only H5 and H6 ([sanitizers.md](sanitizers.md)). T2: every
+  test that isn't a route passes. T7 not run.
 - **Tiers:** per version, a 37,546 functions, b 3,472 and c zero; code bytes Black 2 a 3,435,848, White 2 a 3,435,936,
-  and b 414,418 in each; 2,384 veneers left out. Unchanged since the field's entry (`port/tools/progress/progress.py`
-  on the head).
+  and b 414,418 in each; 2,384 veneers left out. Unchanged since the field's entry (`port/tools/progress/progress.py` on
+  the head).
 - **Trap stubs:** 30 function stubs and 22 data placeholders per version, unchanged. The Route 19 route reaches
-  `data_ov167_021d7490` at the battle's first move (frame 7,623); CONTINUE and New Game to the save reach none.
-- **64-bit warnings:** the four pointer/int cast families, counted as the field's entry counted them (each translation
-  unit's own command with the families enabled, `-fsyntax-only`, each place once): 276 places, game 97 and libraries
-  179, from 278 (game 99): the cut-in's palette cast and `G3DTextDraw_CreateResource`'s cast of its palette back to a
-  pointer. By flag, game and libraries: `-Wpointer-to-int-cast` 53 and 64, `-Wint-to-pointer-cast` 35 and 36,
-  `-Wvoid-pointer-to-int-cast` 6 and 31, `-Wint-to-void-pointer-cast` 3 and 48. The same count on the field's entry
-  branch gives its 278.
+  `data_ov167_021d7490` at the battle's first move (frame 7,623) in both versions; CONTINUE and New Game to the save
+  reach none.
+- **64-bit warnings:** `check_ptrcasts: 429 sites in 274 keys (real 150, harmless 101, handled 141, unreachable 37),
+  1681 files, 0 not compiled`, the same in both versions, from the last entry's 431 sites and 152 real: the cut-in's
+  palette, R04, is fixed, and `check_ptrcasts.py --update` drops its two rows (`fld3d_ci.c`'s cast and
+  `G3DTextDraw_CreateResource`'s), with no new row to classify: none of the branch's other changes adds a cast the guard
+  counts.
 - **Work done:** the plan's track C, the encounters' and battles' host fixes, each a row of
   [game-changes.md](game-changes.md): the trainer cut-in's work by `sizeof`, its palette through `uptr` (with
-  `G3DTextDraw_CreateResource`'s parameter, the same change as the contributors' open PR 19) and its VRAM D through
+  `G3DTextDraw_CreateResource`'s parameter, the same lines as the contributors' open PR 19) and its VRAM D through
   `HW_LCDC_VRAM_D` (`src/ov036/fld3d_ci.c`); the battle flow's mon sets typed as `BtlMonSet`, `monSets` and the
-  switch-in set `unk1A68` beside it (`include/battle/btl_handler.h`); 20 more event works allocated by `sizeof` in
-  `hiden_event.c`, `field_fade.c`, `scrcmd_survey.c` and `event_battle_lose.c` (three `field_fade.c` events keep the
-  DS's 0x68, which holds their work); the C-Gear help's palette through `HW_DB_BG_PLTT` and the DSi's SCFG_EXT through
-  `PORT_HW_ADDR` under `PLATFORM_PC`; and the sanitizers' R6 to R9: the field effects' work and the print queue's
-  renderer aligned for a host's pointers, and the marked extra gauge of `BtlvScu_InitGauges` fixed under `PLATFORM_PC`.
-  [decomp-findings.md](decomp-findings.md) has the battle table and the encounter effects' table; the feature map has
-  a row for encounters and battles; lessons.md has two lessons.
-- **Next:** retire the test launcher (plan A-2), then phase 3's exit route (A-3). For battles, once the table has C:
-  the Route 19 route's full 28,600 frames in both versions with the save's checkpoint and T4 on the cut-in and the
-  battle screens, as a test; the explanation of the 5,716 bytes by which the deep dive's save differed from melonDS's;
-  and R10 (an ignorelist entry, as for R1).
-- **Blockers:** `data_ov167_021d7490` (overlay 167's battle table, no C yet), which stops every battle at its first
-  move: overlay 167 is under another contributor's claim upstream since 2026-10-18, so the port waits, with no
-  stand-in. `src/ov036/enceff_data.c` names four functions of another overlay at the same address (a decomp finding),
-  which stopped the deep dive's route at a wild encounter later on (frame 20,077): overlay 36 is under the user's own
-  decomp claim, so the fix is ordinary decomp work, which reaches the port by sync; the user decides.
+  switch-in set `unk1A68` beside it (`include/battle/btl_handler.h`, as upstream's later `de6cd09688` types them too);
+  20 more event works allocated by `sizeof` in `hiden_event.c`, `field_fade.c`, `scrcmd_survey.c` and
+  `event_battle_lose.c` (three `field_fade.c` events keep the DS's 0x68, which holds their work); the C-Gear help's
+  palette through `HW_DB_BG_PLTT` and the DSi's SCFG_EXT through `PORT_HW_ADDR` under `PLATFORM_PC`; and the sanitizers'
+  R6 to R9: the field effects' work and the print queue's renderer aligned for a host's pointers, and the marked extra
+  gauge of `BtlvScu_InitGauges` fixed under `PLATFORM_PC`. After the review: the print queue moves its write position to
+  an 8-byte boundary after each string instead of copying more of the string than the DS does, which could read past a
+  `GFL_StrBufClone`'s buffer; `btl_handler.h` keeps the two comments `btl_monset.h` points to; the gauge's comment and
+  the feature map say where the writes land and what `btlv_scu.c` draws; `field_effect.h` uses `ATTRIBUTE_ALIGN`; and
+  the records say how the claims stand upstream. [decomp-findings.md](decomp-findings.md) has the battle table and the
+  encounter effects' table; the feature map has a row for encounters and battles; lessons.md has two lessons; the
+  guard's baseline drops R04.
+- **Next:** retire the test launcher (plan A-2), then phase 3's exit route (A-3). For battles, once the table has C: the
+  Route 19 route's full 28,600 frames in both versions with the save's checkpoint and T4 on the cut-in and the battle
+  screens, as a test; the explanation of the 5,716 bytes by which the deep dive's save differed from melonDS's; and R10
+  (an ignorelist entry, as for R1). For the guard, the field's other real rows (R02, R05), then battle (R06) and the
+  menus and apps.
+- **Blockers:** `data_ov167_021d7490` (overlay 167's battle table, issue #120), which stops every battle at its first
+  move: no source file owns it and upstream's `c9f0912d43` has no C for it. Overlay 167's issue is open under another
+  contributor's claim of 2026-10-18, which its author hasn't released; the user's own decomp session claimed the overlay
+  for `btl_client.c`'s last nonmatching row on 2026-10-24 (UTC) and released it the same hour, without the table. The
+  port waits, with no stand-in; whether a decomp session writes the table is the user's call. `src/ov036/enceff_data.c`
+  names four functions of another overlay at the same address (a decomp finding), which stopped the deep dive's route at
+  a wild encounter later on (frame 20,077). Overlay 36 (issue #83) has no claim: the user's claim of 2026-10-19 was
+  released on 2026-10-23, and the issue closed the same day with the overlay complete; upstream's `c9f0912d43` still has
+  the four entries. The fix is ordinary decomp work from the decomp checkout, which reaches the port by sync; the user
+  decides.
 
 ## 2026-10-23: the pointer cast guard, its baseline on main, and T1 measured by it
 
