@@ -7,6 +7,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 ## Registers swapped
 
+- A constant kept in a saved register in one version and rebuilt at each use (`movs`) in the other, with a second constant doing the opposite: the allocator's spill-cost tie between them. Reorder the field stores between calls so a store through a large-offset address temporary ends a stretch that already holds the other stores, which costs that constant one reload less. (matching.md: "Which constant keeps a saved register")
+- A constant passed as a copy of a register that holds it (`adds r1, r7, #0`) from some statement on, where ours builds it (`movs r1, #1`): a basic-block cut before that statement (more than 100 PCode instructions since the last cut, kept only after a statement that ends in a discarded call's result). Change the instruction count before the run, or the call that ends the statement before it. (matching.md: "starts a new basic block before a statement")
 - Rebuilt hash-context offsets across a digest phase: borrow a typed context pointer for all its operations.
   (matching.md: "one typed context pointer for a digest phase")
 - Adjacent scratch partitions in different saved registers: derive each typed region from its predecessor.
