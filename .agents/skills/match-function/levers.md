@@ -7,6 +7,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 ## Registers swapped
 
+- A constant kept in a saved register in one version and rebuilt at each use (`movs`) in the other, with a second constant doing the opposite: the allocator's spill-cost tie between them. Reorder the field stores between calls so a store through a large-offset address temporary ends a stretch that already holds the other stores, which costs that constant one reload less. (matching.md: "Which constant keeps a saved register")
+- A constant passed as a copy of a register that holds it (`adds r1, r7, #0`) from some statement on, where ours builds it (`movs r1, #1`): a basic-block cut before that statement (more than 100 PCode instructions since the last cut, kept only after a statement that ends in a discarded call's result). Change the instruction count before the run, or the call that ends the statement before it. (matching.md: "starts a new basic block before a statement")
 - Rebuilt hash-context offsets across a digest phase: borrow a typed context pointer for all its operations.
   (matching.md: "one typed context pointer for a digest phase")
 - Adjacent scratch partitions in different saved registers: derive each typed region from its predecessor.
@@ -152,6 +154,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
   (matching.md: "array index that is a sum")
 - The operands of `*` are loaded in source order. A product assigned to its own variable gets a new register.
   (matching.md: "operands of `*`"), (matching.md: "A product assigned")
+- An `adds` emitted destination first (`adds x, x, y`) where the original has it second: the source's `x = y + x`
+  is rewritten to `x += y`; the original summed into a variable of its own that wasn't forward-substituted.
+  (matching.md: "An add whose destination is one of its operands")
 - A three-term `|` chain with its loads swapped: swap its first two terms. (matching.md: "three-term `|` chain")
 - Where a flag is first set decides which register builds its zero. The register a shared zero gets follows statement
   order, and stores of 0 before a loop take the zero of the variable its initializer sets first, as in

@@ -317,6 +317,15 @@ Same instructions, registers swapped.
   its sign fix in Power Split and Guard Split, while its own code is the same as with `u32`.
 - The operands of `*` are loaded in source order, so a multiply whose registers are swapped has its operands swapped
   in the source.
+- An add whose destination is one of its operands, `x = y + x`, is rewritten by the `opt_arithtransformation` pass
+  to `x += y` and emitted destination first (`adds x, x, y`). A sum the original emits with the destination second
+  (`adds r2, r1, r2`) went to a variable of its own, and a single-use definition is forward-substituted into its use
+  (hoisting its loads) unless the variable has a second use, is assigned again in the same block, has a store or
+  call before its use, is used in another block, or carries a conversion node: a written cast or a conversion to
+  or from an enum. Same-size `int`, `long` and `unsigned` conversions leave none. `btl_client.c`'s
+  `StudioScore_CalcTotal` adds its four score kinds this way, and matches only as `sum = points[FAME];` then
+  `sum = points[k] + (s32)sum;` for the other three (a no-op cast, flagged in its pull request); the file under
+  `-flag no-opt_arithtransformation` or `no-opt_dead_assignments` matches it but breaks 6 or 11 other functions.
 - The terms of a three-term `|` chain are not loaded in source order: `a | b | c` loads `c`, then `a`, then `b`.
   `btl_server_cmd.c`'s command encoder loads `args[2]`, `args[1]`, `args[0]` for each packed argument, which
   `((args[1] & 0x1f) << 5) | ((args[0] & 0x1f) << 10) | (args[2] & 0x1f)` gives, while its four- and five-term chains
@@ -776,6 +785,23 @@ Same instructions, registers swapped.
   dead: `dwc_aoss.c`'s `make_crc_table(int i, u32 *table)` with `for (i = 0; ...)` swaps its two counters' registers
   (`r2`/`r0`) under MWCC 2.0, and matches with the caller's argument as a parameter it doesn't read (`int ready`) and
   `u32 value; int i; int bit;` declared in that order.
+- Instruction selection starts a new basic block before a statement once the current block holds more than 100 PCode
+  instructions, counting every temporary, call argument and dead store (mwccarm 1.1p1's check at file offset 0x50dcd0,
+  the threshold byte at 0x50dd11). At -O2 and up block merging folds each cut back into the block before it, unless that
+  block ends with a call whose value is discarded. Value numbering shares a constant across an unmerged cut, but the
+  peephole that turns a copy of a register holding a small constant back into `movs rd, #imm` works within one block, so
+  uses behind the cut stay `adds rd, rm, #0`, and padding before a run of calls moves where such copies start.
+  `CtvtTalk_Enter` (overlay 257) passes its 1 as copies of r7 from the talk button on because the original has a cut
+  after the voice icon's `ClActor_SetVisible`, which an out-parameter actor helper (`*actor = ClActor_Create(...)`, as
+  in `ctvt_call.c`) gives where a helper returning the actor does not: one PCode instruction less per actor.
+- Which constant keeps a saved register can turn on the order of field stores between calls. Simplify (mwccarm 1.1p1
+  file offset 0x526630) spills the node with the lowest cost over degree, a tie going to the higher-numbered node, and
+  the spill cost (0x5b0420) counts copies against a constant and one reload per stretch of uses that a call, or a store
+  through a large-offset address temporary (`adds rT, r4, #0xac; str rV, [rT]`), ends. With the out-parameter helper,
+  `CtvtTalk_Enter` still spilled the 1 and built it at each use (14 bytes longer) until the work's first stores were
+  written in struct order: `voiceIconState` (at 0xac) stored after `state` and `waitSound` ends a stretch that already
+  holds them, the shared 0 costs one reload less and ties with the 1, and the 0 is spilled and rebuilt as `movs` in each
+  group, as in the original.
 
 ## Stack slots
 

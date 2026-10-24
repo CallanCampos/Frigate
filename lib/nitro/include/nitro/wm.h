@@ -1,9 +1,8 @@
 #ifndef POKEBW2_NITRO_WM_H
 #define POKEBW2_NITRO_WM_H
 
-#include <stddef.h>
-
 #include "types.h"
+#include <stddef.h>
 
 // NitroSDK's wireless manager. The names are NitroSDK's, as ntrtwl's reconstruction of NitroSDK has them, where it has
 // the code, and ours, in the SDK's style, elsewhere
