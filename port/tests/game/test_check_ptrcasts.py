@@ -1,17 +1,17 @@
 #!/usr/bin/env python3
 """The pointer cast guard's own test (port/tools/check_ptrcasts.py, the test game_ptrcasts_tool of
-port/cmake/game.cmake). It touches no game functionality: it builds a small tree of its own under WORKDIR, a src/,
-lib/ and port/ with a few casts and a compile database for CC whose commands carry what the host build's do (the four
--Wno- flags of the cast warnings, the decomp's headers as -isystem), and checks what the guard says about it: a new
-finding fails with its site and the two ways out, --update writes rows to classify, a classified baseline passes, a
-count above the baseline fails, a renamed function, type or file passes as a rename, a cast fixed in one function and
-added in another of the same file doesn't, nor does a type changed to one that still exists, a finding gone passes with
-a note, a narrowed uptr counts where a narrowed unsigned long or a getter's result as it is stored doesn't, a function
-pointer cast that pairs a pointer or a uptr with an int counts where one between pointers doesn't, a header reached
-through -isystem is checked, a host variant of a header (gen/hwinclude) is reported as the header it was made from, a
-decomp file that a port/ wrapper compiles by #include is checked and the wrapper's own code isn't, a flag or a #pragma
-that hides the warnings fails rather than passing with nothing found, a file that doesn't compile fails, and a build
-without a compile database skips (77), or fails with --require.
+port/cmake/game.cmake). It touches no game functionality: it builds a small tree of its own under WORKDIR, a src/, lib/
+and port/ with a few casts and a compile database for CC whose commands carry what the host build's do (the four -Wno-
+flags of the cast warnings, the decomp's headers as -isystem), and checks what the guard says about it: a new finding
+fails with its site and the two ways out, --update writes rows to classify, a classified baseline passes, a count above
+the baseline fails, a renamed function, type or file passes as a rename, a cast fixed in one function and added in
+another of the same file doesn't, nor does a type changed to one that still exists, a finding gone passes with a note, a
+narrowed uptr counts, a negated one too, where a narrowed unsigned long or a getter's result as it is stored doesn't, a
+function pointer cast that pairs a pointer or a uptr with an int counts where one between pointers doesn't, a header
+reached through -isystem is checked, a host variant of a header (gen/hwinclude) is reported as the header it was made
+from, a decomp file that a port/ wrapper compiles by #include is checked and the wrapper's own code isn't, a flag or a
+#pragma that hides the warnings fails rather than passing with nothing found, a file that doesn't compile fails, and a
+build without a compile database skips (77), or fails with --require.
 
     test_check_ptrcasts.py CC WORKDIR
 
@@ -229,6 +229,10 @@ u32 KeepFieldSum(void) {
     return GetField(1) + 1;
 }
 
+u32 KeepNegated(uptr address) {
+    return -address;
+}
+
 static const uptr sAddresses[2];
 
 u32 KeepConstAddress(void) {
@@ -240,6 +244,8 @@ u32 KeepConstAddress(void) {
     check("KeepNumber" not in output, "a narrowed unsigned long doesn't count", output)
     check("KeepField:" not in output, "a getter's result narrowed as it is stored doesn't count", output)
     check("KeepFieldSum: narrow (u32 <- uptr)" in output, "arithmetic on a getter's result counts", output)
+    check("KeepNegated: narrow (u32 <- uptr)" in output,
+          "a negated uptr narrowed counts, which clang 21 and later report as a negation's conversion", output)
     check("KeepConstAddress: narrow (u32 <- const uptr)" in output, "a narrowed const uptr counts", output)
 
     # A function pointer cast that pairs a pointer with an int counts; one between pointer types doesn't

@@ -53,7 +53,9 @@ struct BattleEventItem {
 typedef struct {
     u32 sp;
     u16 keys[0x60];
-    s32 values[0x60];
+    // Numbers, but for variable 0x3f, which carries the address of the BattleHandlerString that the handlers write
+    // their message to (BattleEventVar_SetConstValue)
+    sptr values[0x60];
     s32 maxValues[0x60];
     s32 minValues[0x60];
     // 0, or 1 to be rewritten once (then 2), 3 to be multiplied and clamped, 4 constant
@@ -79,7 +81,8 @@ void BattleEventVar_CheckReset(void);
 void BattleEventVar_Push(u32 line);
 void BattleEventVar_Pop(u32 line);
 void BattleEventVar_SetValue(u32 key, s32 value);
-void BattleEventVar_SetConstValue(u32 key, s32 value);
+// A constant for the handlers: a number, or for variable 0x3f the address of the message's BattleHandlerString
+void BattleEventVar_SetConstValue(u32 key, sptr value);
 void BattleEventVar_SetRewriteOnceValue(u32 key, s32 value);
 void BattleEventVar_SetMulValue(u32 key, s32 value, s32 minValue, s32 maxValue);
 BOOL BattleEventVar_GetValueIfExist(u16 key, s32 *value);
@@ -108,7 +111,9 @@ BattleEventItem *BattleEvent_SeekItem(u32 type, u32 monId);
 void BattleEventItem_Remove(BattleEventItem *item);
 void BattleEvent_ItemRotationSleep(u8 monId, u32 factorType);
 BOOL BattleEvent_ItemRotationWake(u8 monId, u32 factorType);
-u32 BattleEventVar_GetValue(u32 key);
+// The variable's value in the current frame, or 0 when the frame doesn't set it: a number, or for variable 0x3f the
+// address of the message's BattleHandlerString
+uptr BattleEventVar_GetValue(u32 key);
 BOOL BattleEventVar_RewriteValue(u16 key, s32 value);
 void BattleEventVar_MulValue(u16 key, s32 value);
 

@@ -196,7 +196,8 @@ aren't part of a row, so upstream's edits elsewhere in a file leave the baseline
 or types upstream renamed passes as the same row, with a note, when the old name is gone: the old function's from its
 file, the old file, or the old type's from the decomp's C. A cast fixed in one function and another added in a function
 that still exists is a new row. Both versions give the same findings, and so do Apple clang, Homebrew's clang and
-Ubuntu's.
+Ubuntu's: clang 21 and later report a negated address narrowed under `-Wimplicit-int-conversion-on-negation` rather
+than `-Wshorten-64-to-32`, as clang 17 does, so the check adds that flag where the compiler has it.
 
 When it fails, it prints each new site with its file, line, function and source line. For each:
 
@@ -205,7 +206,10 @@ When it fails, it prints each new site with its file, line, function and source 
 2. **If it does, fix it the Neutral way** ([PLAN.md §4.8](PLAN.md#48-64-bit-and-dual-target-rules), rule 3): make the
    parameter, field or return `uptr` (`sptr` for a signed one), and the casts at the callers `(uptr)`, retyping the API
    rather than each cast; a getter that returns pointers and numbers alike returns `uptr`, and its callers' numbers
-   then show as harmless `narrow` rows. `uptr` is `u32` for MWCC, so the proof is
+   then show as harmless `narrow` rows. The guard doesn't see such a number compared or computed with at 64 bits,
+   where a negative one differs from the DS's `u32`: check those uses with clang-query, as the battle's
+   [../tools/battle_event_values.query](../tools/battle_event_values.query) does for `BattleEventVar_GetValue`, run
+   again when a sync changes the battle's handlers. `uptr` is `u32` for MWCC, so the proof is
    `port/tools/check_mwcc_neutral.py FILE...` on the changed files and every file that includes a changed header, in
    both versions, which finds their token streams unchanged, and ninja with both SHA1s; the change gets its row in
    [game-changes.md](game-changes.md). An `int` made `sptr` is `s32` for MWCC, which is `signed long` there (types.h's

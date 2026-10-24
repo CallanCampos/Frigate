@@ -2366,7 +2366,7 @@ BOOL ServerEvent_CheckNoEffect(BtlServerFlow *flow, BtlFlowMoveParam *param, u32
     BattleEventVar_SetConstValue(0x12, param->move);
     BattleEventVar_SetConstValue(0x16, param->type);
     BattleEventVar_SetConstValue(0x4e, param->flags.unk0);
-    BattleEventVar_SetConstValue(0x3f, (s32)string);
+    BattleEventVar_SetConstValue(0x3f, (sptr)string);
     BattleEventVar_SetConstValue(0x38, value);
     BattleEventVar_SetRewriteOnceValue(0x40, 0);
     BattleEventVar_SetRewriteOnceValue(0x51, 0);
@@ -3930,7 +3930,7 @@ u32 ServerEvent_DecideSpecialMoveCondition(BtlServerFlow *flow, BattleMon *attac
     BattleEventVar_Push(0x1e11);
     BattleEventVar_SetConstValue(3, GetMonID(attacker));
     BattleEventVar_SetConstValue(4, GetMonID(target));
-    BattleEventVar_SetConstValue(0x3f, (s32)string);
+    BattleEventVar_SetConstValue(0x3f, (sptr)string);
     BattleEventVar_SetValue(0x1d, 0);
     BattleEvent_CallHandlers(flow, 0x60);
     condition = BattleEventVar_GetValue(0x1d);
@@ -3943,7 +3943,7 @@ void ServerEvent_AddMoveConditionString(BtlServerFlow *flow, u32 condition, Batt
     BattleEventVar_Push(0x1e28);
     BattleEventVar_SetConstValue(3, GetMonID(attacker));
     BattleEventVar_SetConstValue(4, GetMonID(target));
-    BattleEventVar_SetConstValue(0x3f, (s32)string);
+    BattleEventVar_SetConstValue(0x3f, (sptr)string);
     BattleEventVar_SetConstValue(0x1d, condition);
     BattleEvent_CallHandlers(flow, 0x61);
     BattleEventVar_Pop(0x1e2e);
@@ -6209,7 +6209,7 @@ BOOL ServerEvent_SetMoveMessage(BtlServerFlow *flow, BattleMon *mon, u16 move, u
     BattleEventVar_Push(0x2ccf);
     BattleEventVar_SetConstValue(2, GetMonID(mon));
     BattleEventVar_SetConstValue(0x12, actualMove);
-    BattleEventVar_SetConstValue(0x3f, (s32)string);
+    BattleEventVar_SetConstValue(0x3f, (sptr)string);
     BattleEventVar_SetRewriteOnceValue(0x51, FALSE);
     BattleEvent_CallHandlers(flow, 0x19);
     result = BattleEventVar_GetValue(0x51);

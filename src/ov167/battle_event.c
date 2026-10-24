@@ -461,7 +461,7 @@ void BattleEventVar_SetValue(u32 key, s32 value) {
     data_ov167_021db3b0.kinds[index] = 0;
 }
 
-void BattleEventVar_SetConstValue(u32 key, s32 value) {
+void BattleEventVar_SetConstValue(u32 key, sptr value) {
     u32 index = BattleEventVar_FindSetIndex(&data_ov167_021db3b0, key);
 
     data_ov167_021db3b0.keys[index] = key;
@@ -515,7 +515,7 @@ void BattleEventVar_MulValue(u16 key, s32 value) {
     }
 }
 
-u32 BattleEventVar_GetValue(u32 key) {
+uptr BattleEventVar_GetValue(u32 key) {
     BattleEventVarStack *vars = &data_ov167_021db3b0;
     u32 i;
 

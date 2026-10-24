@@ -1,0 +1,75 @@
+# The audit of the battle's event variables on a 64-bit host, as clang-query matchers. The battle's handlers read and
+# rewrite their events' variables through include/battle/btl_event.h (src/ov167/battle_event.c). Since the pointer
+# cast guard's R06 was fixed, each variable's value is an sptr and BattleEventVar_GetValue returns a uptr, so that
+# variable 0x3f carries the address of the BattleHandlerString that a move's message is written to: the server sets it
+# in src/ov167/btl_server_flow.c, and eight message handlers (src/ov167/move_handlers.c, src/ov169/side_handlers.c)
+# make a pointer of it again. Every other variable holds a number set from an s32 (a mon, a move, a type, a power, a
+# multiplier), which the getter now gives as a 64-bit value where the DS gives a u32. The matchers below list every
+# use of that value through which a host could compute something other than what the DS does, and the address's path,
+# so that a change to the battle's C can be checked again; port/docs/STATUS.md's entry for R06 has the counts and the
+# reading of each listed site.
+#
+# Run it from the repository's root on a host build's compile database (Homebrew LLVM's clang-query), over the C files
+# that include the header, directly or through battle/btl_ability.h:
+#
+#   clang-query -p build/port -f port/tools/battle_event_values.query \
+#       $(git grep -l -e '"battle/btl_event.h"' -e '"battle/btl_ability.h"' -- src)
+#
+# Each match prints its sites and then its count ("N matches."), in the order of the matchers below.
+
+set output diag
+set bind-root false
+
+# A call of the getter, and an expression of a 64-bit or floating type that is one or contains one: what reaches the
+# rest of the code as the DS's u32 would not
+let getValue callExpr(callee(functionDecl(hasName("BattleEventVar_GetValue"))))
+let wide qualType(hasCanonicalType(anyOf(asString("unsigned long"), asString("long"), asString("unsigned long long"),
+    asString("long long"), realFloatingPointType())))
+let wideValue ignoringParenImpCasts(expr(hasType(wide), anyOf(getValue, hasDescendant(getValue))))
+
+# What a comparison may meet without a reading: an int literal (0 to 0x7fffffff), an enumerator, or an unsigned 8- or
+# 16-bit value. Against these, a number that was an s32 compares the same at 64 bits as at 32
+let safeOperand ignoringParenImpCasts(anyOf(integerLiteral(hasType(asString("int"))),
+    declRefExpr(to(enumConstantDecl())),
+    expr(hasType(qualType(hasCanonicalType(anyOf(asString("unsigned char"), asString("unsigned short"),
+    asString("_Bool"))))))))
+
+# The functions that write a variable's value
+let setter functionDecl(matchesName("^::BattleEventVar_(Set|SetConst|SetRewriteOnce|SetMul|Rewrite|Mul)Value$"))
+
+# 1. Every call of the getter
+match getValue.bind("call")
+
+# 2. The address's path: the reads of variable 0x3f, the getter's results made a pointer again, the setters given 0x3f,
+#    and the setters given a pointer's value; each should be the same handlers' and the server's four sites
+match callExpr(callee(functionDecl(hasName("BattleEventVar_GetValue"))),
+    hasArgument(0, ignoringParenImpCasts(integerLiteral(equals(63))))).bind("read0x3f")
+match cStyleCastExpr(hasType(pointerType()), hasSourceExpression(ignoringParenImpCasts(getValue))).bind("toPointer")
+match callExpr(callee(setter), hasArgument(0, ignoringParenImpCasts(integerLiteral(equals(63))))).bind("set0x3f")
+match callExpr(callee(setter),
+    hasAnyArgument(ignoringParenImpCasts(cStyleCastExpr(hasSourceExpression(ignoringParenImpCasts(
+    expr(hasType(pointerType())))))))).bind("setAddress")
+
+# 3. Reads whose variable is computed, not a literal: each must be shown never to be 0x3f
+match callExpr(callee(functionDecl(hasName("BattleEventVar_GetValue"))),
+    hasArgument(0, unless(ignoringParenImpCasts(integerLiteral())))).bind("computedKey")
+
+# 4. Uses that differ at 64 bits for a negative number: none should match
+match binaryOperator(hasAnyOperatorName("/", "%", ">>", "/=", "%=", ">>="), hasEitherOperand(wideValue)).bind("divide")
+match switchStmt(hasCondition(wideValue)).bind("switch")
+match arraySubscriptExpr(hasIndex(wideValue)).bind("index")
+match conditionalOperator(anyOf(hasTrueExpression(wideValue), hasFalseExpression(wideValue))).bind("conditional")
+match implicitCastExpr(hasSourceExpression(wideValue), hasType(realFloatingPointType())).bind("floating")
+match callExpr(forEachArgumentWithParam(wideValue, parmVarDecl(hasType(wide)))).bind("wideParameter")
+match callExpr(callee(functionDecl(isVariadic())), hasAnyArgument(wideValue)).bind("variadic")
+match varDecl(hasType(wide), hasInitializer(wideValue)).bind("wideVariable")
+match binaryOperator(isAssignmentOperator(), hasLHS(expr(hasType(wide))), hasRHS(wideValue)).bind("wideAssignment")
+match returnStmt(hasReturnValue(wideValue),
+    forFunction(functionDecl(returns(wide), unless(hasName("BattleEventVar_GetValue"))))).bind("wideReturn")
+
+# 5. Uses to read, site by site: comparisons with anything but a safe operand, which match the DS's when the number's
+#    bit 31 is clear or the other side is signed; and arithmetic, which matches it when the result is kept in 32 bits
+match binaryOperator(isComparisonOperator(), hasOperands(wideValue, expr(unless(safeOperand)))).bind("comparison")
+match binaryOperator(hasAnyOperatorName("+", "-", "*", "<<", "&", "|", "^", "+=", "-=", "*=", "<<=", "&=", "|=", "^="),
+    hasEitherOperand(wideValue)).bind("arithmetic")
+match unaryOperator(hasAnyOperatorName("-", "~"), hasUnaryOperand(wideValue)).bind("negation")
