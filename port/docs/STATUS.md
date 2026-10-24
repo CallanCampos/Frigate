@@ -41,7 +41,8 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
   modify): the contributor's `e6412d90d5`, `28798368fb` and `4768954275` (the last three rows of
   [game-changes.md](game-changes.md)) and `a797c1232b` (the pointer cast guard's baseline), with the branch's merges
   of `main` up to `82ebe7d5d9`; the maintainer's merge `8d35307a14` of `main` at `45f800f3e4` (PR 27's merge, the sync
-  of `629a53cccb`); and this commit, the review's record fixes. It fills the last entry's `PORT_SHA`, `79b06ccbb0`.
+  of `629a53cccb`); `f3ba15d00b`, the review's record fixes; and this commit, the wording fixes of its review. It fills
+  the last entry's `PORT_SHA`, `79b06ccbb0`.
 - **ROM:** T0 passes on this commit's tree: `python3 configure.py && ninja` compiled every C file of both versions
   (3,558) with no compiler warning, and both SHA1s match (Black 2 `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb`, White 2
   `b5d7490be7b415b8f1e672a53e978a9cc667e56a`).
@@ -81,7 +82,7 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
 - **Work done:** PR 19, from the contributor MushroomMan321, carries through `uptr` and `sptr` the values that are an
   integer in some calls and an address in others: six APIs' values and results, the Wi-Fi user and friend data, and
   in-memory parameter and event fields, each group with its row of [game-changes.md](game-changes.md), and the guard's
-  baseline. The review found the code correct and four record errors, which this commit fixes with its nits:
+  baseline. The review found the code correct and four record errors, which `f3ba15d00b` fixes with its nits:
   - the first row claimed `G3DTextDraw_CreateResource`'s palette and `include/gfl/graphics.h`,
     `src/ov012/g3d_text_draw.c` and `src/ov036/fld3d_ci.c`, which `main` changed the same way in `6664ca0ec4`, under
     that commit's own row: they leave the row, whose count is 33 of the game's 97 pointer/int warnings, not 35 of 99
@@ -97,6 +98,16 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
     `GameBeaconSendSlot_SetMissionEx`, whose `value` is the `uptr`, and the comments on `Pokewood_GetLoadedMovieField`,
     `MemoryLinkSave_GetValue` and `BmpMenuList_GetParam` say which fields or kinds carry an address (comments only,
     which no token stream sees).
+
+  The review of `f3ba15d00b` found three wording problems, which this commit fixes:
+  - [ARCHITECTURE.md](ARCHITECTURE.md#feature-map)'s row now names the Wi-Fi tournaments' download buffer among R22's
+    fixed parts: `WbtOv326Param2`'s `unk4`, whose two rows, `WbtDownload_SetupTournaments` and
+    `TDownloadSave_LoadReceived`, leave the baseline;
+  - the first row says that the four headers' comments on its APIs are upstream's, rewritten by `f3ba15d00b`, so that a
+    conflict reapplies them with the types;
+  - the PR's description lists the six APIs, 33 sites, and says that its game count of 99, taken on `a4648fce71`,
+    includes the 2 palette sites `main` fixed in `6664ca0ec4` (97 on `main`, to 33), and that the guard's six new
+    `harmless` rows hold 7 sites.
 
   The merge of `main` resolved three conflicts on upstream's names with the branch's types: `net.h`'s getters keep
   `sptr` beside upstream's `GflNet_IsWifiGameKind` and `GflNet_GetFriendListNum`, and `Pokewood_GetLoadedMovieField`'s
