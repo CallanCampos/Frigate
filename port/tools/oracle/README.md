@@ -307,8 +307,11 @@ pixels differ by more than `--pixel-tolerance` (2) steps from every pixel of the
 same place, which forgives a rasterizer drawing an edge one pixel over. On the port frames `--close` lists, the frames
 held close, a screen with 3D must also have at most `--close-tolerance` (1%) of its pixels differ at all: a 2D layer
 over the 3D that differs by a step or two everywhere, as in a fade from black, is within the pixel tolerance at every
-pixel, and only this catches it. `--report DIR` writes, for each frame that isn't exact, the oracle's screens, the
-port's and the differences side by side (the oracle's picture dimmed, forgiven differences yellow, the others red).
+pixel, and only this catches it. On the port frames `--known-top` lists, the top screen differs by construction and is
+left out, while the bottom screen is compared as usual. `--report DIR` writes, for each frame that isn't exact, the
+oracle's screens, the port's and the differences side by side (the oracle's picture dimmed, forgiven differences
+yellow, the others red). The summary gives, after the count of frames that match, the screens with 3D compared by their
+pictures, with the median and the most of their pixels beyond the pixel tolerance and the port frame of the most.
 Without a PNG on one side, `frames.tsv`'s hashes decide a screen at 6 bits without 3D (they are of the 8-bit output,
 the 6 bits widened); a screen with 3D or at `--depth 5` whose hashes differ is reported "not compared", which fails the
 run as a difference does.
@@ -422,7 +425,15 @@ sequences, compared with `--align counter`, the movies by their pictures (`oracl
   passes that take several ([below](#known-differences-from-the-hardware)). Before it, no sequence had reached a
   particle: run before the geometry command log's fix of the same day (`port/hal/hw/hw.c`, which the Route 19 route
   found), it showed the burst missing on the port, SPL's read of POLYGON_ATTR having sent a POLYGON_ATTR of 0; with the
-  fix, the burst matches.
+  fix, the burst matches. It found the lake of the flight over the city a line lower on the port in one 3D frame (port
+  frames 8064-8065 in Black 2, 8124-8125 in White 2; 301 pixels beyond the pixel tolerance, where the flight's other
+  frames have 17 to 38): the polygon lists of both programs, dumped from instrumented builds of the port's geometry
+  engine and of melonDS's renderer, differed only in the screen Y of the water's two far vertices, 135 on the port and
+  134 on melonDS. The geometry engine divided the viewport transform exactly; the DS divides with a 32-bit divider,
+  halving W and the numerators above a W of 0xffff and dropping their low bits, and keeps W to 24 bits (melonDS's
+  measurements). Since `port/gfx/ge/ge.c`'s `ToScreen` divides that way (with `g3d_ge`'s cases) those frames have 18
+  pixels beyond the tolerance in both versions, like the frames around them, and the flight 80 at most, where it had
+  200.
 
 A sequence can also allow the port to stop on code with no C yet: from a port frame (`stop_from`), on the trap stub
 it names (`stop_trap`, a pattern of the trap's message), with why (`stop`). A stop on any other trap fails, so the
@@ -456,8 +467,13 @@ party_menus), whose saves only the oracle can make, have only the first:
   around a press, the title's start and the cry. Where the game counts passes, each row is the oracle frame at the
   port's count less the declared lag, so the check holds the port to the oracle's count there (plus the lag) and its
   screens without 3D to the oracle's at 6 bits; in the movies a row is the oracle frame that showed the port frame's
-  pictures when the reference was written, which holds the port to that timing. It can't judge a screen with 3D, the
-  game's state, nor the frames between the ones it keeps. Skipped (77) without the ROM.
+  pictures when the reference was written, which holds the port to that timing. Where the sequence compares NNS G3D's
+  state, each row in its state frames has the SHA-1 of the oracle's `NNS_G3dGlb` there (the `state` column; `-`
+  elsewhere), and the port, run with the same dumps, must have the same state at that row: in the field that is the
+  camera, which follows the player, so that the exit route's walk and changes of map are held without the oracle. A top
+  screen that `known_top` leaves out is `known` in the reference. It can't judge a screen with 3D (in the exit route,
+  the townsperson's lines, whose window shows over the field's 3D, which only `oracle_aspertia` holds) nor the frames
+  between the ones it keeps. Skipped (77) without the ROM.
 
 Results, every port frame but the known differences:
 
@@ -475,31 +491,34 @@ Results, every port frame but the known differences:
 | field_menus, White 2 | 5,200 | 5,171 | 2,171 | 3,000 | the title's 28 port frames and 3402, oracle frames 1260, 4852 | not compared |
 | party_menus, Black 2 | 8,500 | 8,190 | 4,250 | 3,940 | the title's 21 port frames, the summary's 289 (4534-4822), oracle frame 4920 | not compared |
 | party_menus, White 2 | 8,500 | 8,182 | 4,252 | 3,930 | the title's 28 port frames and 3402, the summary's 289, oracle frames 1260, 4852 | not compared |
-| aspertia, Black 2 | 15,800 | 15,706 | 5,833 | 9,873 | the title's 21 port frames, 7751, the lake's 2, Mom's balloon's 16, the zoom's 54, oracle frames 4943, 9841, 17462-17519 | 14,656 of 14,656, 29 left out |
-| aspertia, White 2 | 15,800 | 15,363 | 5,542 | 9,821 | the title's 28 port frames and 3402, Minccino's 335, 7811, the lake's 2, Mom's balloon's 16, the zoom's 54, oracle frames 1283, 4875, 9837-9838, 17401-17457 | 14,656 of 14,656, 29 left out |
+| aspertia, Black 2 | 15,800 | 15,708 | 5,446 | 9,869 | the title's 21 port frames, 7751, Mom's balloon's 16, the zoom's 54, oracle frames 4943, 9841, 17462-17519; the top screen of Minccino's 393 (its bottom screen exact) | 14,656 of 14,656, 29 left out |
+| aspertia, White 2 | 15,800 | 15,700 | 5,508 | 9,799 | the title's 28 port frames and 3402, 7811, Mom's balloon's 16, the zoom's 54, oracle frames 1283, 4875, 9837-9838, 17401-17457; the top screen of Minccino's 393 (its bottom screen exact) | 14,656 of 14,656, 29 left out |
 
-A screen with 3D has 6 to 17 pixels beyond the pixel tolerance at the median, by sequence and version, and 80 at most
-of the 245 allowed, nearly all on polygon edges (their coverage and fill). Inside polygons the pixels match: they
-didn't until the rasterizer took the values along an edge by line, as melonDS does, where it had taken them along an
-X-major edge's run, which put whole spans' colours a step apart (before, a median of 79 and at most 172). The field
-is no known difference: its 464 frames in each continue sequence match, the black of its load, the season banner and
-the bottom screen exactly (170 frames, 169 from the starter save) and its 3D within the tolerance. The player's room
-has 25 pixels beyond the pixel tolerance in every frame, in both versions; the Aspertia City lookout has 141 to 143,
-the edges of its trees and of the hills on the horizon, more than any scene before it but within the 245. With the
-field menu open the game darkens the field on the top screen, every channel to about 5/8 (a wall's 243, 231, 178 to
-154, 146, 113 on the oracle), which brings the two rasterizers' edge pixels closer together: the room's 25 become 18,
-all of them among the 25 (and 143 of its 183 differing pixels differ at all), and the lookout's 142 become 110 to 112,
-in both versions. These are the "18 pixels on the 3D edges behind the open menu" of the deep dive of 2026-10-23, whose
-28 frames that failed failed on the bottom screen's clock alone, the top passing. Every frame of the apps is exact on
-the count, but the summary's ([below](#known-differences-from-the-hardware)). The menu's bottom screen shows the
-clock; pinned, it shows 12:00 on both, so that screen is held exact. The house replay, whose clock runs, holds it to
-the oracle's within its frame ranges ([port/tests/replay](../../tests/replay/check_screens.py)). In the exit route
-(aspertia) a screen with 3D has 24 pixels beyond the pixel tolerance at the median in Black 2 and 20 in White 2: about
-58 in front of the player's house, 18 in the house and on Aspertia City's street, 25 in the house the route enters and
-38 back on the street; at most 200 in the flight over the city, and 217 in White 2's intro as Minccino's idle animation
-ends (port frame 5008, beside the known frames of the next section). Minccino's Poké Ball burst, the first particles
-any sequence reached, matches within the tolerance in both versions, and NNS G3D's state matches at every frame
-compared.
+Each comparison's summary gives its screens with 3D, compared by their pictures, and their pixels beyond the pixel
+tolerance at the median and at most: 6 to 18 at the median by sequence and version, but for party_menus, whose 3D is
+mostly the Aspertia City lookout (39 in Black 2, 21 in White 2); at most 80 before the field (the title's), 138 at the
+lookout and 89 in the exit route, of the 245 allowed, nearly all on polygon edges (their coverage and fill). Inside
+polygons the pixels match: they didn't until the rasterizer took the values along an edge by line, as melonDS does,
+where it had taken them along an X-major edge's run, which put whole spans' colours a step apart (before, a median of
+79 and at most 172). The field is no known difference: its 464 frames in each continue sequence match, the black of
+its load, the season banner and the bottom screen exactly (170 frames, 169 from the starter save) and its 3D within
+the tolerance. Once it has faded in, the player's room has 21 to 25 pixels beyond the pixel tolerance in every frame,
+and the Aspertia City lookout 135 to 138, the edges of its trees and of the hills on the horizon, more than any other
+scene but within the 245, in both versions; the lookout had 141 to 143 until the geometry engine divided the viewport
+transform as the DS's 32-bit divider does (the exit route's lake, above). With the field menu open the game darkens
+the field on the top screen, every channel to about 5/8 (a wall's 243, 231, 178 to 154, 146, 113 on the oracle),
+which brings the two rasterizers' edge pixels closer together: the room's 25 become 18 and the lookout's 135 to 138
+become 103 to 108, in both versions. These are the "18 pixels on the 3D edges behind the open menu" of the deep dive of
+2026-10-23, whose 28 frames that failed failed on the bottom screen's clock alone, the top passing. Every frame of the
+apps is exact on the count, but the summary's ([below](#known-differences-from-the-hardware)). The menu's bottom
+screen shows the clock; pinned, it shows 12:00 on both, so that screen is held exact. The house replay, whose clock
+runs, holds it to the oracle's within its frame ranges ([port/tests/replay](../../tests/replay/check_screens.py)). In
+the exit route (aspertia) a screen with 3D has 18 pixels beyond the pixel tolerance at the median in Black 2 and 17 in
+White 2: about 16 in the flight over the city, 58 in front of the player's house, 18 in the house and on Aspertia
+City's street, 25 in the house the route enters and 38 back on the street, and at most 80 in the flight and 89 on the
+street (port frame 14549), in both versions; the flight had up to 200 before the divider. Outside Minccino's idle,
+whose top screen is left out, the intro's 3D is exact in both versions, Minccino's Poké Ball burst, the first
+particles any sequence reached, among it. NNS G3D's state matches at every frame compared.
 
 ## Saves
 
@@ -829,8 +848,10 @@ melonDS is a reference, not the hardware. Where the two programs can't agree by 
 - Timing: the oracle's CPUs take time and the DS drops frames, which is why frames align on the game's count, and
   why the counts part where the game waits on a clock ([above](#game-frames-and-video-frames)).
 The comparison sequences declare the rest frame by frame (`oracle.py`'s `SEQUENCES`: `known`, port frames left out of
-the screens; `known_oracle`, oracle frames no port frame can show; `known_state`, port frames whose state differs;
-`lags`), so that every frame that differs at the game's count is either one of these or a failure. By kind:
+the screens; `known_top`, port frames whose top screen alone is left out; `known_oracle`, oracle frames no port frame
+can show; `known_state`, port frames whose state differs; `lags`), so that every frame that differs at the game's count
+is either one of these or a failure. A difference is declared only with its cause traced: one whose cause is open is a
+failure to fix, never a known difference. By kind:
 
 - **A register written partway through a frame.** The DS's CPU takes time, so a pass that changes the display writes
   the registers while the DS draws the frame's lines: that frame shows the old setting above some line and the new one
@@ -908,18 +929,18 @@ the screens; `known_oracle`, oracle frames no port frame can show; `known_state`
   these are 14 frames in each version (`MID_PASS`), each checked against the DS's later frames of the same count.
 - **Random numbers.** GFL seeds its random numbers from a hash that includes a buffer the DS's stack fills
   ([../../docs/decomp-findings.md](../../docs/decomp-findings.md), `buildSeed`), so the port's differ from the DS's.
-  In the exit route, White 2's Minccino plays its idle animation after a random wait (`GFL_RandomMTRange` in
-  `src/ov294/intro_mcss.c`), at other moments on each program: port frames 4673-5007 differ beyond the tolerance and
-  are left out, and the frames on either side of them, 4668-4672 and 5008-5017, within it. Black 2's shows no
-  difference.
+  In the exit route, Minccino plays its idle animation, about 290 frames long, after a random wait of 200 to 280
+  passes in steps of 20 (`GFL_RandomMTRange(5) * 20 + 200`, `IntroMcss_Update` in `src/ov294/intro_mcss.c`), so its
+  pose on the top screen can differ. The port starts the idle at port frame 4668 in both versions. White 2's DS draws a
+  wait three steps longer and starts it 60 passes later (count 4727), so that its top screen differs for as long as
+  either program plays it, port frames 4668-5017 (beyond the tolerance from 4673 to 5007), and again as Minccino fades
+  out, 5038-5040, its pose following the idle. Black 2's DS draws the port's wait, which is chance, one in five: its
+  frames match, but another seed, a change to what `buildSeed` hashes on the port among them, would move them. Since
+  the port's wait is one of the two shortest, an idle can start from port frame 4648 to 4748 whatever either program
+  draws, and it ends by the fade-out. So port frames 4648-5040 leave the top screen out in both versions (`known_top`),
+  and their bottom screen, the same picture throughout, is compared exactly.
   The route keeps to streets the city's wandering townspeople (npcs 9 to 12) don't reach on screen, and the lens flare
   that a random choice picks on leaving a building (`src/ov036/field_goout_effect.c`) shows none.
-- **One 3D frame of the flight over Aspertia City (not traced yet).** At port frames 8064-8065 (8124-8125 in White 2),
-  one 3D frame shown twice, the lake below line 138, whose translucent water scrolls its texture 6/16 and 4/16 of a
-  texel each 3D frame, shows its ripples on other pixels than melonDS does: 301 pixels beyond the pixel tolerance,
-  where the flight's other frames have 17 to 38 and at most 245 may. The 3D frames before and after match to 3 pixels
-  in the lake, and NNS G3D's state is the same; where the rasterizer's sampling of the water parts from melonDS's is
-  the next thing to trace.
 
 - **Kyurem's cry starts later against the DS's passes (White 2).** The title waits for the cry it starts at START
   before it fades out (`STATE_WAIT_CRY`). The pass that starts it (count 3100) takes the DS two frames, loading the cry,

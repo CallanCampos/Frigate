@@ -15,8 +15,8 @@ This directory, `port/`, is Frigate's code. The rest of the repository is the de
 doesn't have, and runs it as a program, with no emulator. The ROM is only where the game's files come from.
 
 **Where it stands:** Frigate boots natively through the logos, opening, title screen and start menu, with sound, and
-into the field: a new game goes through the intro into Aspertia City, where the player walks, talks to its people and
-goes in and out of its buildings (phase 3's exit, met on 2026-10-24), CONTINUE goes into the field too, and the field
+into the field: a new game goes through the intro into Aspertia City, where the player walks, talks to a townsperson
+and goes into a house and out again (phase 3's exit, met on 2026-10-24), CONTINUE goes into the field too, and the field
 menu opens the party list and a Pokémon's summary, the Pokédex, the bag and the trainer card. Tests compare these paths
 frame by frame with melonDS and check the sound driver, music and cries. Battles wait for two fixes of the decomp to
 reach Frigate (a table of overlay 167 and the encounter effects' entries), so the game isn't playable past the first

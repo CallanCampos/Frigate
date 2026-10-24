@@ -682,29 +682,42 @@ static int Clip(const ClipVertex *in, int n, ClipVertex out[PORT_GE_POLYGON_MAX_
 
 // The viewport transform (GBATEK "VIEWPORT"): X1, Y1, X2, Y2 in the parameter's bytes, Y1 and Y2 counted from the
 // bottom of the screen. Screen X is (x + w) * (X2 - X1 + 1) / 2w + X1 and screen Y, from the top,
-// (w - y) * (Y2 - Y1 + 1) / 2w + 191 - Y2; X keeps 9 bits and Y 8, as the hardware's registers do. The Z-buffer depth
-// is ((z * 0x4000 / w) + 0x3fff) * 0x200, clamped to 24 bits; divisions round toward zero
+// (w - y) * (Y2 - Y1 + 1) / 2w + 191 - Y2; X, and the width, keep 9 bits and Y, and the height, 8, as the hardware's
+// registers do. The Z-buffer depth is ((z * 0x4000 / w) + 0x3fff) * 0x200, clamped to 24 bits; divisions round toward
+// zero.
+//
+// The hardware works with W truncated to 24 bits from here on, and divides X and Y with a 32-bit divider: for a W
+// above 0xffff it halves both numerators and W first, so that the products fit, and drops their low bits (melonDS's
+// measurements; GBATEK gives only the formulas). So a far vertex can land a pixel short of the exact quotient: the
+// lake of the flight over Aspertia City in New Game's intro starts a line higher on the DS than the exact division puts
+// it, and its scrolled water's ripples with it (port/tools/oracle/README.md, the exit route)
 static void ToScreen(const PortGe *ge, const ClipVertex *v, PortGeVertex *o) {
-    int64_t x = v->pos[0];
-    int64_t y = v->pos[1];
     int64_t z = v->pos[2];
-    int64_t w = v->pos[3];
-    int32_t x1 = ge->viewport & 0xff;
-    int32_t y1 = (ge->viewport >> 8) & 0xff;
-    int32_t x2 = (ge->viewport >> 16) & 0xff;
-    int32_t y2 = ge->viewport >> 24;
-    int64_t sx = x1;
-    int64_t sy = 191 - y2;
+    uint32_t w = (uint32_t)v->pos[3] & 0xffffff;
+    uint32_t x1 = ge->viewport & 0xff;
+    uint32_t y1 = (ge->viewport >> 8) & 0xff;
+    uint32_t x2 = (ge->viewport >> 16) & 0xff;
+    uint32_t y2 = ge->viewport >> 24;
+    uint32_t sx = x1;
+    uint32_t sy = 191 - y2;
     int64_t depth = 0;
     if (w != 0) {
-        sx += (x + w) * (x2 - x1 + 1) / (2 * w);
-        sy += (w - y) * (y2 - y1 + 1) / (2 * w);
-        depth = (z * 0x4000 / w + 0x3fff) * 0x200;
+        uint32_t nx = (uint32_t)v->pos[0] + w;
+        uint32_t ny = w - (uint32_t)v->pos[1];
+        uint32_t den = w;
+        if (w > 0xffff) {
+            nx >>= 1;
+            ny >>= 1;
+            den >>= 1;
+        }
+        sx += nx * ((x2 - x1 + 1) & 0x1ff) / (den << 1);
+        sy += ny * ((y2 - y1 + 1) & 0xff) / (den << 1);
+        depth = (z * 0x4000 / (int64_t)w + 0x3fff) * 0x200;
     }
     o->x = (uint16_t)(sx & 0x1ff);
     o->y = (uint16_t)(sy & 0xff);
     o->z = (int32_t)(depth < 0 ? 0 : depth > 0xffffff ? 0xffffff : depth);
-    o->w = v->pos[3];
+    o->w = (int32_t)w;
     // The colour's 5 bits widened for the rasterizer: c * 16 + 15, 0 staying 0 (melonDS)
     for (int c = 0; c < 3; c++) {
         uint32_t c5 = (uint32_t)v->attr[c] >> 12;

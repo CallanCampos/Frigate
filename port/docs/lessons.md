@@ -8,9 +8,18 @@ workflow goes in the decomp checkout instead; this file is the port's ([CLAUDE.m
 - **A route through the field keeps random numbers out of its way.** GFL's seed differs between the programs
   (`buildSeed`), so a townsperson who wanders at random walks elsewhere on each, can block one program's player and
   not the other's, and fails every frame it is on screen. The exit route's streets are out of the city's wanderers'
-  reach; White 2's intro still shows Minccino's random idle at other moments. And a version's intro can run longer
-  than the other's (White 2's, 60 passes): mash through it until both are certainly free, then give both the same
-  presses.
+  reach; the intro still shows Minccino's random idle, at other moments in White 2. And a version's intro can run
+  longer than the other's (White 2's, 60 passes): mash through it until both are certainly free, then give both the
+  same presses.
+- **A match by chance is still a difference by construction.** Black 2's Minccino matched only because the port drew
+  the DS's random wait, one chance in five; another seed would have failed it. Declare a difference that comes from
+  random numbers in every version it can show in, and only on the screen it shows on (`known_top`), so that the other
+  screen is still held.
+- **A difference whose cause isn't traced is a failure, not a known difference.** The lake of the intro's flight
+  differed in one 3D frame and was first filed as known, untraced. Dumping both programs' polygon lists at that frame,
+  from an instrumented geometry engine and an instrumented melonDS renderer, found the cause in one comparison: two far
+  vertices a line apart, from the DS's 32-bit divider in the viewport transform, which the port's exact division
+  didn't have. Before suspecting the rasterizer, compare the polygons it was given.
 - **A frame late on the DS is not always a pass late.** Mom's balloon scrolled a count later on the DS, which read
   like the game logic running a pass apart; the window's region in the DS's frame was the port's previous frame pixel
   for pixel, the letters printed into it were on time, and the townsperson's window at the bottom of the screen was

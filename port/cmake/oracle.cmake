@@ -2,10 +2,9 @@
 # run of the game to melonDS's: the screens and memory of the boot, the opening, the title and start menu, CONTINUE, the
 # field menu and its apps (the bag, the trainer card, the party list, the summary and the Pokédex), New Game's intro
 # and its route through the field into Aspertia City (phase 3's exit: a walk, a talk, a house and four changes of map)
-# and a save; the
-# saves made on the oracle from saves (the first save, and the starter save with a Pokémon and the Pokédex), which the
-# sequences start from; and the sound of the opening and the title (the ARM7 sound driver run by run; its output: a
-# stream and a cry to the bit, the music by its envelope and levels).
+# and a save; the saves made on the oracle from saves (the first save, and the starter save with a Pokémon and the
+# Pokédex), which the sequences start from; and the sound of the opening and the title (the ARM7 sound driver run by
+# run; its output: a stream and a cry to the bit, the music by its envelope and levels).
 #
 # The input file reader (pbwinput.c, which the port can compile as it is), the per-screen 3D decision (display3d.c),
 # compare.py and sound.py are tested in every build: they need neither melonDS nor a ROM. The oracle itself is a test
@@ -96,8 +95,10 @@ port_test_labels(oracle_boot oracle)
 #   hashes at the frames it keeps. Where the game counts passes, it proves the port reaches each of those frames at
 #   the oracle's count (plus the declared lag) and that its screens without 3D are the oracle's there at 6 bits a
 #   channel; where the game waits on a clock (the movies), that the port shows the oracle's pictures at the frames it
-#   showed them when the reference was written. It can't judge a screen with 3D, the game's state, nor the frames
-#   between the ones it keeps. Skipped (77) without the ROM; only for a version that has a reference
+#   showed them when the reference was written; and where the sequence compares NNS G3D's state, that the port's is
+#   the oracle's at those frames, bit for bit (in the field, the camera that follows the player). It can't judge a
+#   screen with 3D nor the frames between the ones it keeps. Skipped (77) without the ROM; only for a version that has a
+#   reference
 # - oracle_<name>, with the oracle built: both programs, every frame of the port but the known differences compared,
 #   on the game's count (by their pictures in the movies), the 3D within compare.py's tolerance, with every picture
 #   the oracle shows between two of the port's frames shown by one of them, and NNS G3D's state compared on the count
@@ -117,7 +118,9 @@ port_test_labels(oracle_boot oracle)
 # menu's bottom screen shows, on both programs (port/tools/oracle/README.md, "Input files"). aspertia, phase 3's exit
 # route, starts from a blank save, so it has a reference and both tests: New Game, the intro and its first scripts
 # into the player's house, Mom's scene, out into Aspertia City, a talk with a townsperson, into a house and out again,
-# 15,800 port frames and 18,700 of the oracle's, its clock pinned too
+# 15,800 port frames and 18,700 of the oracle's, its clock pinned too. Its reference holds the walk and the changes of
+# map without the oracle by NNS G3D's state; the talk shows only on the top screen, over the field's 3D, so only
+# oracle_aspertia holds it
 set(port_oracle_saves "${CMAKE_BINARY_DIR}/oracle-saves")
 add_test(NAME oracle_saves
     COMMAND "${CMAKE_COMMAND}" -E env PYTHONDONTWRITEBYTECODE=1

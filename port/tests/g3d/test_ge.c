@@ -808,6 +808,56 @@ static void TestViewport(void) {
     CheckVertex(__LINE__, PolyVertex(list, 1, 0), 128, 96, 0x7ffe00, 0, 0, 0);
 }
 
+// The projection diag(1.0, 1.0, 1.0, w): a vertex (x, y, 0) is at clip (x, y, 0, w)
+static void ProjectW(int32_t w) {
+    int32_t m[16] = { ONE, 0, 0, 0, 0, ONE, 0, 0, 0, 0, ONE, 0, 0, 0, 0, w };
+    MtxMode(0);
+    MtxLoad44(m);
+    MtxMode(2);
+}
+
+// The 32-bit divider (melonDS's measurements, ge.c's ToScreen): W keeps 24 bits, and above 0xffff the hardware halves
+// x + w, w - y and w before it divides, dropping their low bits, so that a vertex can land a pixel either side of the
+// exact quotient. Over the whole screen X is (x + w) * 256 / 2w and Y (w - y) * 192 / 2w
+static void TestViewportDivider(void) {
+    Start("viewport divider");
+    Basic();
+    PolygonAttr(ATTR(31, 0));
+    // W 0x10001: (0x10001 + 0x8000) * 192 / 0x20002 = 143.999 exactly, 0xc000 * 192 / 0x10000 = 144 halved: the dropped
+    // bit of W puts the vertex a line lower; X (0x10401 * 256 / 0x20002 = 129.99), a pixel right
+    ProjectW(0x10001);
+    Begin(0);
+    Vtx16(0, -0x8000, 0);
+    Vtx16(0x400, -0x8000, 0);
+    Vtx16(0, 0, 0);
+    const PortGeList *list = Building();
+    CHECK_EQ(list->polygon_count, 1);
+    CheckVertex(__LINE__, PolyVertex(list, 0, 0), 128, 144, 0x7ffe00, 0, 0, 0);
+    CheckVertex(__LINE__, PolyVertex(list, 0, 1), 130, 144, 0x7ffe00, 0, 0, 0);
+    CheckVertex(__LINE__, PolyVertex(list, 0, 2), 128, 96, 0x7ffe00, 0, 0, 0);
+    // W 0x20000: (0x20000 + 31403) * 192 / 0x40000 = 119.0002 exactly, 0x13d55 * 192 / 0x20000 = 118.99 halved: the
+    // dropped bit of w - y puts it a line higher, as the far edge of the lake in New Game's flight over Aspertia City
+    ProjectW(0x20000);
+    Begin(0);
+    Vtx16(0, -31403, 0);
+    Vtx16(0x400, -31403, 0);
+    Vtx16(0, 0, 0);
+    CHECK_EQ(list->polygon_count, 2);
+    CheckVertex(__LINE__, PolyVertex(list, 1, 0), 128, 118, 0x7ffe00, 0, 0, 0);
+    CheckVertex(__LINE__, PolyVertex(list, 1, 1), 129, 118, 0x7ffe00, 0, 0, 0);
+    // W 0x1000800 is 0x800 in 24 bits: Y (0x800 - 0x400) * 192 / 0x1000 = 48 and X (0x400 + 0x800) * 256 / 0x1000 =
+    // 192, where the whole W would give 95 and 128; the vertex keeps the 24 bits as its W
+    ProjectW(0x1000800);
+    Begin(0);
+    Vtx16(0, 0x400, 0);
+    Vtx16(0x400, 0x400, 0);
+    Vtx16(0, 0, 0);
+    CHECK_EQ(list->polygon_count, 3);
+    CheckVertex(__LINE__, PolyVertex(list, 2, 0), 128, 48, 0x7ffe00, 0, 0, 0);
+    CheckVertex(__LINE__, PolyVertex(list, 2, 1), 192, 48, 0x7ffe00, 0, 0, 0);
+    CHECK_EQ(PolyVertex(list, 2, 0)->w, 0x800);
+}
+
 // The dot of TestOneDot at W w: the projection diag(w, w, w, w) scales every coordinate alike, so the vertices land
 // on (128, 96) still. Returns whether polygon RAM took it
 static int DotAtW(int32_t w) {
@@ -900,6 +950,7 @@ int main(void) {
     TestTexCoords();
     TestTests();
     TestViewport();
+    TestViewportDivider();
     TestOneDot();
     TestStatus();
     port_ge_destroy(sGe);

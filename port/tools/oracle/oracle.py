@@ -42,18 +42,19 @@ continue's presses from starter_save's, whose start menu shows the Pokédex; fie
 field menu's bag and trainer card from first_save's, the card closed by the pen on its return button; party_menus, the
 same menu from starter_save's with the party list, Tepig's summary, the Pokédex and its entry, the card and the bag, the
 clock pinned for both; aspertia, phase 3's exit route: New Game from a blank save through the intro into the field and
-the player's house, out into Aspertia City, a talk with a townsperson, into a house and out, the clock pinned), from
-the save the sequence names, if any, made first on the oracle (or taken from --save-cache), and compares every frame
-the same way but the known differences, up to the frame where the port stops when the sequence allows it to stop on
-code with no C yet; with --update it writes port/tests/oracle/<name>_<version>.tsv, the oracle's
-hashes at sampled frames. sequence-check runs the port alone on that input file and checks its counts and its screens
-without 3D against that reference. sound runs both programs on a sequence with their sound traces and WAV dumps
-(--sound-trace, --audio-dump) and compares the sound driver's state run by run, what the ARM9 sees of it frame by frame,
-and the sound by segment (sound.py, SOUND); with --update it writes port/tests/oracle/sound_<name>_<version>.tsv, the
-oracle's hashes and statistics. sound-check runs the port alone and checks it against that reference. check is the
-oracle's ctest test: the oracle runs the boot sequence twice with the same results (its screens, sound trace and WAV
-dump), and its screens match the hashes in port/tests/oracle/boot_<version>.tsv. save, port-save, sequence, sound and
-check exit 77 without the oracle or the ROM, sequence-check and sound-check without the ROM.
+the player's house, out into Aspertia City, a talk with a townsperson, into a house and out, the clock pinned), from the
+save the sequence names, if any, made first on the oracle (or taken from --save-cache), and compares every frame the
+same way but the known differences, up to the frame where the port stops when the sequence allows it to stop on code
+with no C yet; with --update it writes port/tests/oracle/<name>_<version>.tsv, the oracle's hashes at sampled frames, of
+its screens and, where the sequence compares it, of the game's state (STATE). sequence-check runs the port alone on that
+input file and checks its counts, its screens without 3D and its state against that reference. sound runs both programs
+on a sequence with their sound traces and WAV dumps (--sound-trace, --audio-dump) and compares the sound driver's state
+run by run, what the ARM9 sees of it frame by frame, and the sound by segment (sound.py, SOUND); with --update it writes
+port/tests/oracle/sound_<name>_<version>.tsv, the oracle's hashes and statistics. sound-check runs the port alone and
+checks it against that reference. check is the oracle's ctest test: the oracle runs the boot sequence twice with the
+same results (its screens, sound trace and WAV dump), and its screens match the hashes in
+port/tests/oracle/boot_<version>.tsv. save, port-save, sequence, sound and check exit 77 without the oracle or the ROM,
+sequence-check and sound-check without the ROM.
 Standard library only.
 """
 
@@ -102,19 +103,21 @@ class Sequence:
     hundreds of frames more to get as far). sample: the port frames whose screens the reference keeps. clock: the port
     frames where the game waits on a clock, which pair by their pictures (compare.py --clock); everywhere else frames
     pair on the game's count. lags: by version, the count lags declared (compare.py --lag). known: by version, the port
-    frames whose screens differ from the oracle's by construction, left out of the comparison and the reference, and
-    known_oracle the oracle frames that no port frame can show; each with why (README.md, "Known differences").
-    close: by version, the port frames whose screens with 3D must also have few pixels that differ at all
-    (compare.py --close), with why: where a 2D layer the 3D's tolerance would forgive shows. state_frames: the port
-    frames whose game state (STATE) is compared with the oracle's at the frames they pair with, which state_oracle, the
-    oracle frames dumped, covers; known_state, by version, the port frames whose state differs by construction, with
-    why"""
+    frames whose screens differ from the oracle's by construction, left out of the comparison and the reference;
+    known_top, those whose top screen alone does, its bottom screen still compared (compare.py --known-top); and
+    known_oracle the oracle frames that no port frame can show; each with why (README.md, "Known differences"), a cause
+    traced: a difference whose cause is open is a failure to fix, never declared here. close: by version, the port
+    frames whose screens with 3D must also have few pixels that differ at all (compare.py --close), with why: where a 2D
+    layer the 3D's tolerance would forgive shows. state_frames: the port frames whose game state (STATE) is compared
+    with the oracle's at the frames they pair with, which state_oracle, the oracle frames dumped, covers; known_state,
+    by version, the port frames whose state differs by construction, with why"""
     port_frames: int
     oracle_frames: int
     sample: str
     clock: str
     lags: dict[str, str] = field(default_factory=dict)
     known: dict[str, dict[str, str]] = field(default_factory=dict)
+    known_top: dict[str, dict[str, str]] = field(default_factory=dict)
     known_oracle: dict[str, dict[str, str]] = field(default_factory=dict)
     close: dict[str, dict[str, str]] = field(default_factory=dict)
     state_frames: str = ""
@@ -161,16 +164,17 @@ BUILDING_ZOOM = ("the zoom into the house, a scale of BG 2 that a VBlank callbac
 DISPLAY_OFF = ("after the intro the display turns off late in the DS's pass of some 30 frames (count 7750 in Black 2, "
                "7810 in White 2), partway through a frame (black above line 115 in Black 2's last, above line 189 in "
                "White 2's second-last, whose last is white); on the port, from the first line of the pass's frame")
-MINCCINO_IDLE = ("Minccino plays its idle animation after a random wait (GFL_RandomMTRange, src/ov294/intro_mcss.c), "
-                 "and GFL's random numbers are seeded differently on the port (port/docs/decomp-findings.md, "
-                 "buildSeed), so it moves at other moments on each")
+MINCCINO_IDLE = ("Minccino's idle animation on the top screen, about 290 frames long, which it plays after a random "
+                 "wait of 200 to 280 passes in steps of 20 (GFL_RandomMTRange, IntroMcss_Update in "
+                 "src/ov294/intro_mcss.c): GFL's random numbers are seeded differently on the port "
+                 "(port/docs/decomp-findings.md, buildSeed), so the waits differ by construction. The port starts the "
+                 "idle at port frame 4668 in both versions; White 2's DS draws a wait three steps longer and starts it "
+                 "60 passes later, so the port's wait is one of the two shortest, and with any draw on either program "
+                 "an idle starts from port frame 4648 to 4748 and ends by Minccino's fade-out (5038-5040), whose pose "
+                 "follows it. Black 2's DS draws the port's wait, one chance in five, so its frames match, but they "
+                 "are left out alike, since another seed would move them. The bottom screen is compared")
 MID_PASS = ("the DS's pass at that count takes more than one frame, so NNS G3D's state at its first frame is the "
             "pass's work in progress; at the pass's later frames it is the port's")
-LAKE_TEXELS = ("one 3D frame of the flight over Aspertia City, shown for two frames: below line 138 the lake's "
-               "translucent water, whose texture scrolls 6/16 and 4/16 of a texel each 3D frame, shows its ripples on "
-               "other pixels than melonDS does, 301 pixels beyond the pixel tolerance where the flight's other frames "
-               "have 17 to 38 (and at most 245 may); the 3D frames before and after match to 3 pixels in the lake, and "
-               "NNS G3D's state is the same; the rasterizer's sampling there is not traced yet")
 CURSOR_NEW_GAME = ("as CURSOR, with NEW GAME's press from a blank save in CONTINUE's place: the port's frame shows the "
                    "step after the DS's last one (its top screen hashes d3c85a7e), which the DS shows at counts 3274, "
                    "3296, 3338 and 3360 of the same run but not on that count")
@@ -303,12 +307,13 @@ SEQUENCES = {
     # over Aspertia City), the field in front of the player's house from count 9781 (9841 in White 2, whose intro runs
     # 60 passes longer from its gender question to the room), the first scripts, the house; then Mom's scene, out of
     # the door into Aspertia City from count 14538, west along z = 762 to the townsperson at (39,764) and his three
-    # lines, into the house at (38,761) from 15199, up and back out from 15444, and east. The intro saves New Game's first data
-    # in the background and waits for the save to pause before it fades to the name entry (IntroCmd_SavePause,
-    # src/ov294/intro_cmd.c): the DS's flash writes take time, so from that fade until the name entry waits for its
-    # first press the DS is a pass later (the lag of -1, port frames 5538-5576, 5598-5636 in White 2). The DS's passes
-    # take several frames where it loads (the intro, the season's name, each map), and NNS G3D's state is compared at
-    # every port frame from the title on but at the first frame of those passes (MID_PASS)
+    # lines, into the house at (38,761) from 15199, up and back out from 15444, and east. The intro saves New Game's
+    # first data in the background and waits for the save to pause before it fades to the name entry
+    # (IntroCmd_SavePause, src/ov294/intro_cmd.c): the DS's flash writes take time, so from that fade until the name
+    # entry waits for its first press the DS is a pass later (the lag of -1, port frames 5538-5576, 5598-5636 in White
+    # 2). The DS's passes take several frames where it loads (the intro, the season's name, each map), and NNS G3D's
+    # state is compared at every port frame from the title on but at the first frame of those passes (MID_PASS); the
+    # reference keeps it at its sampled frames, the camera that follows the player through the field among it
     "aspertia": Sequence(
         port_frames=15800,
         oracle_frames=18700,
@@ -317,14 +322,13 @@ SEQUENCES = {
         lags={"b2_us": "1109=0,5538=-1,5577=0", "w2_us": "1109=0,3241=-1,3403=0,5598=-1,5637=0"},
         known={
             "b2_us": {"2878": TORN_HIDE, "3001": TORN_BACK, "3101": TORN_START, "3112-3129": CAMERA,
-                      "7751": DISPLAY_OFF, "8064-8065": LAKE_TEXELS,
-                      "12911-12914,13727-13730,13967-13970,14223-14226": WINDOW_SCROLL,
+                      "7751": DISPLAY_OFF, "12911-12914,13727-13730,13967-13970,14223-14226": WINDOW_SCROLL,
                       "15176-15229": BUILDING_ZOOM},
             "w2_us": {"2878": TORN_HIDE, "3001": TORN_BACK, "3101": TORN_START, "3112-3128": CAMERA,
-                      "3219-3240/3": CRY, "3402": CURSOR_NEW_GAME, "4673-5007": MINCCINO_IDLE, "7811": DISPLAY_OFF,
-                      "8124-8125": LAKE_TEXELS, "12911-12914,13727-13730,13967-13970,14223-14226": WINDOW_SCROLL,
-                      "15176-15229": BUILDING_ZOOM},
+                      "3219-3240/3": CRY, "3402": CURSOR_NEW_GAME, "7811": DISPLAY_OFF,
+                      "12911-12914,13727-13730,13967-13970,14223-14226": WINDOW_SCROLL, "15176-15229": BUILDING_ZOOM},
         },
+        known_top={"b2_us": {"4648-5040": MINCCINO_IDLE}, "w2_us": {"4648-5040": MINCCINO_IDLE}},
         known_oracle={"b2_us": {"4943": TORN_START, "9841": DISPLAY_OFF, "17462-17519": BUILDING_ZOOM},
                       "w2_us": {"1283": TORN_OPENING, "4875": TORN_START, "9837-9838": DISPLAY_OFF,
                                 "17401-17457": BUILDING_ZOOM}},
@@ -339,7 +343,7 @@ SEQUENCES = {
         },
     ),
 }
-REFERENCE_COLUMNS = ["port", "oracle", "counter", "lag", "top", "bottom"]
+REFERENCE_COLUMNS = ["port", "oracle", "counter", "lag", "top", "bottom", "state"]
 # The exit status of a port run that reached a function or data with no C yet (port/hal/trap.c)
 TRAP_STATUS = 70
 # The save memory, BW2's 4 Mbit flash (port/hal/card/port_card.h), as both programs write it
@@ -983,10 +987,11 @@ def by_frame(table: dict[str, str]) -> dict[int, str]:
     return out
 
 
-def load_reference(path: str) -> dict[int, tuple[int, int | None, int | None, str, str]]:
+def load_reference(path: str) -> dict[int, tuple[int, int | None, int | None, str, str, str | None]]:
     """<name>_<version>.tsv: for each port frame it keeps, the oracle frame it pairs with, the oracle's frame count
-    there, the count lag (None where the frame pairs by its pictures), and the oracle's hash of each screen, or "3d"
-    for a screen that shows 3D"""
+    there, the count lag (None where the frame pairs by its pictures), the oracle's hash of each screen, or "3d" for a
+    screen that shows 3D ("known" for a top screen the sequence leaves out), and the hash of the game's state there
+    (state_digest), None where the sequence doesn't compare it"""
     rows = {}
     header = None
     with open(path) as f:
@@ -1003,19 +1008,41 @@ def load_reference(path: str) -> dict[int, tuple[int, int | None, int | None, st
             if len(cells) != len(REFERENCE_COLUMNS):
                 raise compare.RunError(f"{path}:{number}: expected {len(REFERENCE_COLUMNS)} columns")
             rows[int(cells[0])] = (int(cells[1]), compare.optional_int(cells[2]), compare.optional_int(cells[3]),
-                                   cells[4], cells[5])
+                                   cells[4], cells[5], None if cells[6] == "-" else cells[6])
     return rows
+
+
+def state_digest(memory: dict[tuple[int, str], tuple[int, bytes]], frame: int) -> str | None:
+    """The SHA-1 of the game's state (STATE, in its order) that a run dumped at a frame, None when it dumped none"""
+    digest = hashlib.sha1()
+    for label, _ in STATE:
+        if (frame, label) not in memory:
+            return None
+        digest.update(memory[(frame, label)][1])
+    return digest.hexdigest()
+
+
+def compared_state_frames(sequence: Sequence, version: str) -> list[int]:
+    """The port frames whose game state the sequence compares: its state_frames but its known_state"""
+    if not sequence.state_frames:
+        return []
+    known_state = by_frame(sequence.known_state.get(version, {}))
+    return [frame for frame in compare.parse_frames(sequence.state_frames) if frame not in known_state]
 
 
 def write_reference(path: str, name: str, version: str, oracle_run: compare.Run, port_run: compare.Run) -> int:
     """Writes <name>_<version>.tsv from a comparison's runs: for the sampled port frames that aren't known differences,
     the oracle frame the comparison pairs each with. Where the game counts passes that is the oracle frame at the
     port's count less the lag, which comes from the oracle and the declared lags; in a clock stretch it is the oracle
-    frame that shows the port frame's pictures. Returns the number of rows"""
+    frame that shows the port frame's pictures. A row whose frame the sequence compares the game's state at has the
+    oracle's state there, which the comparison found the port's. Returns the number of rows"""
     sequence = SEQUENCES[name]
     clock = set(compare.parse_frames(sequence.clock))
     pairing = compare.counter_mapping(oracle_run, port_run, clock, compare.parse_lags(sequence.lags.get(version)))
     known = by_frame(sequence.known.get(version, {}))
+    known_top = by_frame(sequence.known_top.get(version, {}))
+    with_state = set(compared_state_frames(sequence, version))
+    oracle_memory = compare.load_memory(oracle_run) if with_state else {}
     # Where the frames pair on the count, the lag between them
     lags = {}
     for frame, target in pairing.mapping.items():
@@ -1030,10 +1057,14 @@ def write_reference(path: str, name: str, version: str, oracle_run: compare.Run,
                 "# game counts passes (lag is a number), the oracle frame whose count is the port's less the lag; in\n"
                 f"# a clock stretch (port frames {sequence.clock}, lag -), the one that shows the port frame's\n"
                 "# pictures. The SHA-1 of each screen's RGB bytes, or 3d for a screen that shows 3D, which only the\n"
-                "# oracle comparison can judge, and GFL's frame count there. Hashes only. Written by oracle.py\n"
+                "# oracle comparison can judge (known for a top screen left out), GFL's frame count there, and the\n"
+                f"# SHA-1 of the game's state ({', '.join(label for label, _ in STATE)}) where the sequence compares\n"
+                "# it (- elsewhere). Hashes only. Written by oracle.py\n"
                 f"# sequence {name} --update; checked by oracle.py sequence-check {name}.\n")
         for frames, why in sequence.known.get(version, {}).items():
             f.write(f"# Left out, port frames {frames}: {why}\n")
+        for frames, why in sequence.known_top.get(version, {}).items():
+            f.write(f"# Top screen left out, port frames {frames}: {why}\n")
         f.write("\t".join(REFERENCE_COLUMNS) + "\n")
         for frame in compare.parse_frames(sequence.sample):
             target = pairing.mapping.get(frame)
@@ -1042,9 +1073,10 @@ def write_reference(path: str, name: str, version: str, oracle_run: compare.Run,
                 continue
             counter = "-" if row.counter is None else row.counter
             lag_cell = lags.get(frame, "-")
-            top = "3d" if row.top_3d else row.top
+            top = "3d" if row.top_3d else "known" if frame in known_top else row.top
             bottom = "3d" if row.bottom_3d else row.bottom
-            f.write(f"{frame}\t{target}\t{counter}\t{lag_cell}\t{top}\t{bottom}\n")
+            state = (state_digest(oracle_memory, target) if frame in with_state else None) or "-"
+            f.write(f"{frame}\t{target}\t{counter}\t{lag_cell}\t{top}\t{bottom}\t{state}\n")
             count += 1
     return count
 
@@ -1128,16 +1160,20 @@ def command_sequence(args) -> int:
     close = sequence.close.get(args.version, {})
     if close:
         command += ["--close", ",".join(close)]
+    known_top = sequence.known_top.get(args.version, {})
+    if known_top:
+        command += ["--known-top", ",".join(known_top)]
     result = compare.main(command)
     for frames, why in sequence.known.get(args.version, {}).items():
         print(f"left out, port frames {frames}: {why}")
+    for frames, why in known_top.items():
+        print(f"top screen left out, port frames {frames}: {why}")
     for frames, why in known_oracle.items():
         print(f"no counterpart, oracle frames {frames}: {why}")
     for frames, why in close.items():
         print(f"held close, port frames {frames}: {why}")
     if sequence.state_frames:
-        known_state = by_frame(sequence.known_state.get(args.version, {}))
-        state = [f for f in compare.parse_frames(sequence.state_frames) if f not in known_state]
+        state = compared_state_frames(sequence, args.version)
         print(f"\nthe game's state ({', '.join(name for name, _ in STATE)}) at port frames {sequence.state_frames}, "
               "on the count:")
         result = max(result, compare.main(["memory", oracle_dir, port_dir, *align,
@@ -1162,13 +1198,15 @@ def command_sequence(args) -> int:
     return result
 
 
-def check_reference(rows: dict[int, tuple[int, int | None, int | None, str, str]],
-                    port_run: compare.Run) -> tuple[list[str], int, int, int]:
+def check_reference(rows: dict[int, tuple[int, int | None, int | None, str, str, str | None]],
+                    port_run: compare.Run) -> tuple[list[str], int, int, int, int]:
     """A port run against a reference's rows: what fails, and how many screens without 3D were compared, how many
-    with 3D were left to the oracle comparison, and how many rows pair on the count"""
+    with 3D (or left out) were left to the oracle comparison, how many rows pair on the count, and how many states were
+    compared (the run's memory.txt has the port's state at the rows that have one)"""
     failures = []
-    compared = left = timed = 0
-    for frame, (oracle_frame, counter, lag, top, bottom) in sorted(rows.items()):
+    compared = left = timed = states = 0
+    memory = compare.load_memory(port_run) if any(row[5] for row in rows.values()) else {}
+    for frame, (oracle_frame, counter, lag, top, bottom, state) in sorted(rows.items()):
         mine = port_run.frames.get(frame)
         if mine is None:
             failures.append(f"port frame {frame} has no row")
@@ -1180,13 +1218,20 @@ def check_reference(rows: dict[int, tuple[int, int | None, int | None, str, str]
                 failures.append(f"port frame {frame} is at count {mine.counter}, not {counter + lag} (oracle frame "
                                 f"{oracle_frame}'s count {counter} and the lag {lag})")
         for name, wanted, have in (("top", top, mine.top), ("bottom", bottom, mine.bottom)):
-            if wanted == "3d":
+            if wanted in ("3d", "known"):
                 left += 1
                 continue
             compared += 1
             if wanted != have:
                 failures.append(f"port frame {frame}'s {name} screen isn't oracle frame {oracle_frame}'s")
-    return failures, compared, left, timed
+        if state is not None:
+            states += 1
+            have = state_digest(memory, frame)
+            if have is None:
+                failures.append(f"port frame {frame} has no dump of the game's state")
+            elif have != state:
+                failures.append(f"port frame {frame}'s game state isn't oracle frame {oracle_frame}'s")
+    return failures, compared, left, timed, states
 
 
 def command_sequence_check(args) -> int:
@@ -1201,15 +1246,18 @@ def command_sequence_check(args) -> int:
         return 1
     rows = load_reference(reference)
     work = args.work or tempfile.mkdtemp(prefix=f"oracle-{args.name}-check-")
-    status, message = run_port(args.port, work, sequence.port_frames, "none", rom, args.time, input_path)
+    with_state = ",".join(str(frame) for frame, row in sorted(rows.items()) if row[5])
+    dumps = [f"{name}:{size}@{with_state}" for name, size in STATE] if with_state else []
+    status, message = run_port(args.port, work, sequence.port_frames, "none", rom, args.time, input_path, dumps=dumps)
     print(f"port: {describe_port_run(status, message, sequence.port_frames, work)}")
     if status != 0:
         return 1
-    failures, compared, left, timed = check_reference(rows, compare.load_run(work))
+    failures, compared, left, timed, states = check_reference(rows, compare.load_run(work))
     for line in failures:
         print(f"FAIL: {line}")
     print(f"{len(rows)} frames, {timed} of them on the count: {len(failures)} failures; {compared} screens without 3D "
-          f"compared, {left} with 3D left to the oracle comparison (oracle.py sequence {args.name})")
+          f"compared, {left} left to the oracle comparison (with 3D, or left out), the game's state at {states} "
+          f"frames (oracle.py sequence {args.name})")
     if not args.work:
         shutil.rmtree(work, ignore_errors=True)
     return 1 if failures else 0

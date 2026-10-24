@@ -257,6 +257,12 @@ class ScreenTests(unittest.TestCase):
         status, out = captured(compare.main, ["screens", runs.oracle, runs.port, "--frames", "3"])
         self.assertEqual(status, 0, out)
         self.assertIn("bottom 200 pixels differ, 200 beyond tolerance", out)
+        self.assertIn("screens with 3D compared by their pictures: 1; pixels beyond the pixel tolerance: 200 at the "
+                      "median, 200 at most (port frame 3)", out)
+        # With frame 2's 480 and frame 1's exact 3D screen, the median is 200 and the most 480
+        status, out = captured(compare.main, ["screens", runs.oracle, runs.port, "--frames", "1-3"])
+        self.assertIn("screens with 3D compared by their pictures: 3; pixels beyond the pixel tolerance: 200 at the "
+                      "median, 480 at most (port frame 2)", out)
         runs.frame(runs.oracle, 4, black, three_d=(True, False))
         runs.frame(runs.port, 4, scattered)
         self.assertEqual(quiet(compare.main, ["screens", runs.oracle, runs.port, "--frames", "4"]), 1)
@@ -289,6 +295,39 @@ class ScreenTests(unittest.TestCase):
         # And --close-tolerance sets how many
         self.assertEqual(quiet(compare.main, ["screens", runs.oracle, runs.port, "--frames", "2", "--close", "2",
                                               "--close-tolerance", "0.0001"]), 1)
+
+    def test_known_top(self):
+        # A top screen that differs by construction is left out with --known-top, and the bottom screen is still
+        # compared: a 20x24 block on the top screen's 3D, beyond its tolerance, then on the bottom screen too
+        runs = Runs(self)
+        black = solid(b"\x00\x00\x00")
+        top = bytearray(black)
+        for y in range(40, 64):
+            for x in range(100, 120):
+                put(top, x, y, b"\xff\x00\x00")
+        both = bytearray(top)
+        for y in range(240, 264):
+            for x in range(100, 120):
+                put(both, x, y, b"\xff\x00\x00")
+        runs.frame(runs.oracle, 1, black, three_d=(True, False))
+        runs.frame(runs.port, 1, top)
+        runs.frame(runs.oracle, 2, black, three_d=(True, False))
+        runs.frame(runs.port, 2, both)
+        self.assertEqual(quiet(compare.main, ["screens", runs.oracle, runs.port, "--frames", "1"]), 1)
+        status, out = captured(compare.main, ["screens", runs.oracle, runs.port, "--frames", "1", "--known-top", "1"])
+        self.assertEqual(status, 0, out)
+        self.assertIn("top left out, bottom exact", out)
+        self.assertIn("1 of 1 frames match (0 exact, 0 with 3D within the tolerance, 1 with the top screen left out)",
+                      out)
+        status, out = captured(compare.main, ["screens", runs.oracle, runs.port, "--known-top", "1-2"])
+        self.assertEqual(status, 1, out)
+        self.assertIn("top left out; bottom 480 pixels differ", out)
+        # Without pictures, by the hashes: the top screen is left out the same way
+        runs.frame(runs.oracle, 3, black, three_d=False, png=False)
+        runs.frame(runs.port, 3, top)
+        self.assertEqual(quiet(compare.main, ["screens", runs.oracle, runs.port, "--frames", "3"]), 1)
+        self.assertEqual(quiet(compare.main, ["screens", runs.oracle, runs.port, "--frames", "3", "--known-top", "3"]),
+                         0)
 
     def test_hashes_only(self):
         runs = Runs(self)
@@ -1160,22 +1199,66 @@ class OracleScriptTests(unittest.TestCase):
         movie_top, movie_bottom = compare.screen_hashes(bytes(movie))
         top, _ = compare.screen_hashes(bytes(scene))
         reference = oracle.load_reference(path)
-        self.assertEqual(reference, {1: (1, 0, 0, black_top, black_bottom),
-                                     2: (6, 1, None, movie_top, movie_bottom),
-                                     3: (7, 1, None, movie_top, movie_bottom),
-                                     5: (9, 3, 1, top, "3d")})
+        self.assertEqual(reference, {1: (1, 0, 0, black_top, black_bottom, None),
+                                     2: (6, 1, None, movie_top, movie_bottom, None),
+                                     3: (7, 1, None, movie_top, movie_bottom, None),
+                                     5: (9, 3, 1, top, "3d", None)})
         with open(path) as f:
             self.assertIn("# Left out, port frames 4: a known difference\n", f.read())
         # The port's run against it: as it is, nothing fails; a port a pass late fails on the count
-        failures, compared, left, timed = oracle.check_reference(reference, compare.load_run(runs.port))
-        self.assertEqual((failures, compared, left, timed), ([], 7, 1, 2))
+        failures, compared, left, timed, states = oracle.check_reference(reference, compare.load_run(runs.port))
+        self.assertEqual((failures, compared, left, timed, states), ([], 7, 1, 2, 0))
         port_run = compare.load_run(runs.port)
         port_run.frames[5].counter = 5
-        failures, _, _, _ = oracle.check_reference(reference, port_run)
+        failures, _, _, _, _ = oracle.check_reference(reference, port_run)
         self.assertEqual(failures, ["port frame 5 is at count 5, not 4 (oracle frame 9's count 3 and the lag 1)"])
         port_run.frames[1].top = "0" * 40
-        failures, _, _, _ = oracle.check_reference(reference, port_run)
+        failures, _, _, _, _ = oracle.check_reference(reference, port_run)
         self.assertIn("port frame 1's top screen isn't oracle frame 1's", failures)
+
+    def test_sequence_reference_state_and_top(self):
+        # The game's state in the reference: the oracle's at the rows whose frames the sequence compares it at, but its
+        # known_state; a top screen left out by known_top is "known" there, and its bottom screen is kept
+        runs = Runs(self)
+        black = solid(b"\x00\x00\x00")
+        for frame in range(1, 5):
+            runs.frame(runs.oracle, frame, black, counter=frame - 1, three_d=False)
+            runs.frame(runs.port, frame, black, counter=frame - 1)
+        label, size = oracle.STATE[0]
+        state = (bytes(range(256)) * (size // 256 + 1))[:size]
+        other = bytes([state[0] ^ 1]) + state[1:]
+        runs.memory(runs.oracle, [f"{frame} {label} 0x02000000 {size} {state.hex()}" for frame in (2, 3, 4)])
+        saved = dict(oracle.SEQUENCES)
+        oracle.SEQUENCES["test"] = oracle.Sequence(4, 4, "1-4", "9", known_top={"b2_us": {"4": "a known top screen"}},
+                                                   state_frames="2-4", state_oracle="2-4",
+                                                   known_state={"b2_us": {"3": "a known state"}})
+        try:
+            path = os.path.join(runs.root, "test.tsv")
+            rows = oracle.write_reference(path, "test", "b2_us", compare.load_run(runs.oracle),
+                                          compare.load_run(runs.port))
+        finally:
+            oracle.SEQUENCES.clear()
+            oracle.SEQUENCES.update(saved)
+        self.assertEqual(rows, 4)
+        black_top, black_bottom = compare.screen_hashes(bytes(black))
+        digest = hashlib.sha1(state).hexdigest()
+        reference = oracle.load_reference(path)
+        self.assertEqual(reference, {1: (1, 0, 0, black_top, black_bottom, None),
+                                     2: (2, 1, 0, black_top, black_bottom, digest),
+                                     3: (3, 2, 0, black_top, black_bottom, None),
+                                     4: (4, 3, 0, "known", black_bottom, digest)})
+        with open(path) as f:
+            self.assertIn("# Top screen left out, port frames 4: a known top screen\n", f.read())
+        # The port's run without its dumps fails at the rows with a state; with them, it passes; another state fails
+        failures, compared, left, timed, states = oracle.check_reference(reference, compare.load_run(runs.port))
+        self.assertEqual(failures, ["port frame 2 has no dump of the game's state",
+                                    "port frame 4 has no dump of the game's state"])
+        runs.memory(runs.port, [f"{frame} {label} 0x1000 {size} {state.hex()}" for frame in (2, 4)])
+        failures, compared, left, timed, states = oracle.check_reference(reference, compare.load_run(runs.port))
+        self.assertEqual((failures, compared, left, timed, states), ([], 7, 1, 4, 2))
+        runs.memory(runs.port, [f"2 {label} 0x1000 {size} {state.hex()}", f"4 {label} 0x1000 {size} {other.hex()}"])
+        failures, _, _, _, _ = oracle.check_reference(reference, compare.load_run(runs.port))
+        self.assertEqual(failures, ["port frame 4's game state isn't oracle frame 4's"])
 
     def test_sequences_skip_without_the_rom_or_the_oracle(self):
         with tempfile.TemporaryDirectory() as d:
@@ -1198,6 +1281,12 @@ class OracleScriptTests(unittest.TestCase):
                 self.assertTrue(set(compare.parse_lags(lags)) <= set(range(1, sequence.port_frames + 1)))
             for version, table in sequence.known.items():
                 self.assertTrue(set(oracle.by_frame(table)) <= set(range(1, sequence.port_frames + 1)), name)
+            # A top screen left out is a port frame it otherwise compares
+            for version, table in sequence.known_top.items():
+                self.assertIn(version, ("b2_us", "w2_us"))
+                top = set(oracle.by_frame(table))
+                self.assertTrue(top <= set(range(1, sequence.port_frames + 1)), name)
+                self.assertFalse(top & set(oracle.by_frame(sequence.known.get(version, {}))), name)
             for version, table in sequence.known_oracle.items():
                 self.assertTrue(set(oracle.by_frame(table)) <= set(range(1, sequence.oracle_frames + 1)), name)
             # The frames held close are port frames that it compares, not ones it leaves out
