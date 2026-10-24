@@ -24,6 +24,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).parent.resolve()
 sys.path.insert(0, str(ROOT))
+from tools.build.deadstrip import load_manifest as load_deadstrip  # noqa: E402
 from tools.data.gen_constants import ordered_files  # noqa: E402
 from tools.data.graphics_archive import GRAPHICS, directory_archive  # noqa: E402
 from tools.text.pms_words import CATEGORIES as PMS_WORD_CATEGORIES  # noqa: E402
@@ -195,6 +196,9 @@ def load_source_flags(path: Path) -> dict[str, list[str]]:
 
 
 LIBRARIES = load_libraries()
+# The dead symbols of each source file whose original link dead-stripped some of its code, from config/deadstrip.toml:
+# its object goes through tools/build/deadstrip.py before the link and objdiff take it
+DEADSTRIP = load_deadstrip(ROOT / "config/deadstrip.toml", ROOT)
 # Every compiler that a library source is built with, each with a rule of its own
 LIBRARY_COMPILERS = list(dict.fromkeys([*(compiler for compiler, _ in LIBRARIES.values()), *FILE_COMPILERS.values()]))
 FILE_FLAGS.update(load_source_flags(ROOT / "config/compiler_flags.toml"))
@@ -551,21 +555,30 @@ def add_version(n: Writer, version: str, dsd: Path, bugfix: bool, shift: int) ->
         link_lcf = shifted_lcf
 
     # Source files are listed in delinks.txt by their path. Complete files are linked from the compiled object, and
-    # incomplete ones are still compiled so objdiff can compare them.
+    # incomplete ones are still compiled so objdiff can compare them. A file in config/deadstrip.toml is compiled to an
+    # object under unstripped/, which the strip turns into the one at the usual path.
     version_defines = VERSIONS[version]["defines"] + (["BUGFIX"] if bugfix else [])
     defines = " ".join(f"-d {define}" for define in version_defines)
     as_defines = " ".join(f"-D{define}" for define in version_defines)
     objects = []
     compiled = []
+    deadstripped = set()
     for f in files:
         source = Path(f["name"])
         if source.suffix in (".c", ".cpp") and source.exists():
             obj = build_dir / source.with_suffix(".o")
             settings = source_compiler(source)
             rule = f"mwcc_{LIBRARY_COMPILERS.index(settings.compiler)}" if settings.is_library else "mwcc"
-            variables = {"defines": defines, "dep": obj.with_suffix(".d")}
+            stripped = source.as_posix() in DEADSTRIP
+            compiler_obj = build_dir / "unstripped" / source.with_suffix(".o") if stripped else obj
+            variables = {"defines": defines, "dep": compiler_obj.with_suffix(".d")}
             variables["flags"] = " ".join(settings.flags)
-            n.build([obj], rule, [source], variables=variables, order_only=["constants_headers"])
+            n.build([compiler_obj], rule, [source], variables=variables, order_only=["constants_headers"])
+            if stripped:
+                n.build([obj], "deadstrip", [compiler_obj],
+                        implicit=["tools/build/deadstrip.py", "config/deadstrip.toml"],
+                        variables={"source": source.as_posix()})
+                deadstripped.add(source.as_posix())
             compiled.append(obj)
         elif source.suffix == ".s" and source.exists():
             obj = build_dir / source.with_suffix(".o")
@@ -574,6 +587,22 @@ def add_version(n: Writer, version: str, dsd: Path, bugfix: bool, shift: int) ->
                     variables={"flags": " ".join(asm_flags)})
             compiled.append(obj)
         objects.append(f["object_to_link"])
+    # An entry for a file the version doesn't compile would strip nothing, unnoticed
+    unbuilt = sorted(set(DEADSTRIP) - deadstripped)
+    if unbuilt:
+        sys.exit(f"config/deadstrip.toml lists {', '.join(unbuilt)}, which {version} doesn't compile")
+    # Nothing in the link may refer to what the strip removed, since the linker would send such a call to address 0
+    # rather than fail (tools/build/check_deadstrip.py). It compares nothing with the ROM, so it runs in a build that
+    # doesn't match too
+    deadstrip_checks = []
+    if DEADSTRIP:
+        deadstrip_ok = stamp_dir / "deadstrip.ok"
+        n.build([deadstrip_ok], "check_deadstrip", [*compiled, *delink_outputs],
+                implicit=[*(build_dir / "unstripped" / Path(source).with_suffix(".o") for source in sorted(DEADSTRIP)),
+                          "tools/build/check_deadstrip.py", "tools/build/deadstrip.py", "config/deadstrip.toml",
+                          *sorted(str(p) for p in config_dir.rglob("symbols.txt"))],
+                variables={"config": str(config_dir), "unstripped": str(build_dir / "unstripped")})
+        deadstrip_checks.append(deadstrip_ok)
 
     # Preserve the LTD autoload grouping in both the private prelink and final link.
     grouped_objects = build_dir / "objects_link.txt"
@@ -705,8 +734,8 @@ def add_version(n: Writer, version: str, dsd: Path, bugfix: bool, shift: int) ->
     # The checks also compile every source file, so that an incomplete file, whose object only feeds the report and
     # is never linked, can't stop compiling without the default build noticing.
     if not matching:
-        return [rom, *checks, *compiled], dsd_configs
-    return [modules_ok, rom_ok, *checks, *compiled], dsd_configs
+        return [rom, *checks, *deadstrip_checks, *compiled], dsd_configs
+    return [modules_ok, rom_ok, *checks, *deadstrip_checks, *compiled], dsd_configs
 
 
 def write_compile_flags():
@@ -787,6 +816,11 @@ def main():
         lib_mwasm = tools_dir / "mwccarm" / compiler / "mwasmarm.exe"
         n.rule(f"mwasm_{i}", f"mkdir -p $$(dirname $out) && $wine {shlex.quote(str(lib_mwasm))} $flags -o $out $in",
                "Assembling $in")
+    # Drops the code the original link dead-stripped from a listed source's object (config/deadstrip.toml)
+    n.rule("deadstrip", "$python tools/build/deadstrip.py --source $source $in $out", "Dead-stripping $out")
+    n.rule("check_deadstrip", "$python tools/build/check_deadstrip.py --config $config --unstripped $unstripped $out "
+           "@$out.rsp", "Checking references to dead-stripped code in $config", rspfile="$out.rsp",
+           rspfile_content="$in_newline")
     n.rule("shift_lcf", "$python tools/build/shift_lcf.py $in $out $amount", "Shifting $in")
     n.rule("ltd_objects", "$python tools/build/ltd_objects.py $in $out", "Grouping the LTD autoload's objects in $out")
     n.rule("mwld", f"$wine {shlex.quote(str(mwld))} {' '.join(LD_FLAGS)} @$objects $lcf -o $out", "Linking $out")
@@ -898,8 +932,8 @@ def main():
     data_dirs = sorted({str(p.relative_to(ROOT)) for d in source_dirs for p in [ROOT / d, *(ROOT / d).rglob("*")]
                         if p.is_dir()})
     n.build(["build.ninja"], "configure", ["configure.py"],
-            implicit=[*configs, "config/compiler_flags.toml", *(str(p.relative_to(ROOT)) for p in sorted(LIB_DIR.glob("*/library.toml"))),
-                      *data_dirs])
+            implicit=[*configs, "config/compiler_flags.toml", "config/deadstrip.toml",
+                      *(str(p.relative_to(ROOT)) for p in sorted(LIB_DIR.glob("*/library.toml"))), *data_dirs])
     sources = sorted(str(p.relative_to(ROOT)) for pattern in ("src/**/*.c", "lib/*/src/**/*.[ch]", "include/**/*.h",
                                                                "lib/*/include/**/*.h") for p in ROOT.glob(pattern))
     n.build(["format"], "format", sources)
