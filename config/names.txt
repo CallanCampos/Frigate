@@ -5449,7 +5449,7 @@
 . 0x0209b1b8 tex4x4SearchArray_
 . 0x0209b1c0 texNrmSearchArray_
 . 0x0209b1d4 vramRegions_
-. 0x0209b24c loadFunctions_
+. 0x0209b24c funcTbl
 . 0x0209b260 firstSRTransformedMtxIdx_
 . 0x0209b268 mtxI_
 . 0x0209b280 zOffsetStep_
