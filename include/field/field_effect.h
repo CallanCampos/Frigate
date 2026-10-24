@@ -94,7 +94,7 @@ struct FieldEffectTask {
 #ifdef PLATFORM_PC
     // The tasks' work holds pointers, which a host aligns to 8 bytes; after param2 and pos it would start 4 bytes past
     // such a boundary. Every task's work fits the 0xa0 bytes on a host too (the largest, FesKiraTask, is 0x98)
-    u8 work[0xa0] __attribute__((aligned(8)));
+    u8 work[0xa0] ATTRIBUTE_ALIGN(8);
 #else
     u8 work[0xa0];
 #endif

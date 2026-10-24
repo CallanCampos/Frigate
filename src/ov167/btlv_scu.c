@@ -2400,8 +2400,8 @@ static void BtlvScu_InitGauges(BtlvScu *scu) {
 
 #if defined(BUGFIX) || defined(PLATFORM_PC)
     // A host takes the fix as a memory-safety fix: the extra gauge's index is past the array, which the sanitized build
-    // stops on, and lands elsewhere in abilityWins[0]'s larger host layout. BtlvScu_InitAbilityWins sets the fields it
-    // wrote right after, on the DS and on a host, so nothing the battle does changes (port/docs/sanitizers.md)
+    // stops on. Its two writes land on abilityWins[0]'s scu and bg, on a host as on the DS, and BtlvScu_InitAbilityWins
+    // sets both right after, so nothing the battle does changes (port/docs/sanitizers.md)
     for (i = 0; i < BTL_POS_MAX; i++) {
 #else
     // BUG: clears one gauge too many, writing over the start of abilityWins[0]

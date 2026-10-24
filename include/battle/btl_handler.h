@@ -145,6 +145,7 @@ typedef struct {
 // One level of the flow's work, kept for each level of nested handler calls; the flow's pointers point into the
 // current one
 typedef struct {
+    // Mon sets in overlay 169's format
     BtlMonSet monSets[7];
     BattleMoveEffectState moveEffect;
     BtlFlowMoveParam moveParams[2];
@@ -221,7 +222,7 @@ struct BtlServerFlow {
     BtlFlowDamageList *unk870;
     BtlFlowWorkFrame frames[7];
     u32 frameDepth;
-    // The mons that came in this turn
+    // The mons that came in this turn, in overlay 169's format
     BtlMonSet unk1A68;
     BtlFlowMoveParam *unk1AB0;
     BtlFlowMoveParam *unk1AB4;
