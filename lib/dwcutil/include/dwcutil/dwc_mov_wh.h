@@ -1,12 +1,13 @@
-#ifndef POKEBW2_APP_DOWNLOAD_PLAY_WIH_H
-#define POKEBW2_APP_DOWNLOAD_PLAY_WIH_H
+#ifndef POKEBW2_DWCUTIL_DWC_MOV_WH_H
+#define POKEBW2_DWCUTIL_DWC_MOV_WH_H
 
 #include "types.h"
-#include "app/download_play.h"
+#include "dwcutil/dwc_mov_mbp.h"
 #include "nitro/wm.h"
 
-// The wireless helper of the DS Download Play range of overlay 182 (src/ov182/download_play_wih.c): it measures how
-// busy each channel is and keeps the ones that were least busy. The names are ours
+// The DWC utility's wireless helper for DS Download Play in overlay 182 (dwc_mov_wh.c): it measures how busy each
+// channel is and keeps the ones that were least busy. The functions have the SDK's names (see dwc_mov_wh.c); the
+// types, the constants and the data are ours
 
 // The helper's states (WIH_STATE_*), with overlay 30's helper's numbering: the states this file does not have are
 // kept, because the state it passes on is the number the state callbacks know
@@ -72,7 +73,7 @@ typedef BOOL (*WHScanFilter)(WMStartParentCallback *info);
 // What fills the WEP key of the work, given the parent parameter, and gives the mode to set the wireless to
 typedef u16 (*WHWepKeySetup)(u16 *key, const WMParentParam *parentParam);
 
-// The helper's work, which the DS Download Play parent allocates: DownloadPlayWork's loaderContext is one of these,
+// The helper's work, which the DS Download Play parent allocates: MovMbpWork's loaderContext is one of these,
 // and the parent's own state fills the gap between the two ends of it
 typedef struct {
     // The parameter the parent sets up and hands to the wireless
@@ -128,17 +129,17 @@ typedef struct {
 extern WHWorkPointer gWork;
 
 // What the file that follows this one in the overlay calls
-void func_ov182_021ba180(u32 ggid);
-u16 func_ov182_021ba18c(void);
-int func_ov182_021ba19c(void);
-u16 func_ov182_021ba350(void);
-BOOL func_ov182_021ba42c(void);
-BOOL func_ov182_021ba4f8(u16 mode, u16 tgid, u16 channel);
-void func_ov182_021ba5d0(WHScanFilter filter);
-u8 *func_ov182_021ba5dc(u16 netId);
-BOOL func_ov182_021ba5fc(u8 *data);
-void func_ov182_021ba668(void);
-void func_ov182_021ba67c(void);
-BOOL func_ov182_021ba730(void);
+void DWCi_MOV_WH_SetGgid(u32 ggid);
+u16 DWCi_MOV_WH_GetBitmap(void);
+int DWCi_MOV_WH_GetSystemState(void);
+u16 DWCi_MOV_WH_GetMeasureChannel(void);
+BOOL DWCi_MOV_WH_Initialize(void);
+BOOL DWCi_MOV_WH_ParentConnect(u16 mode, u16 tgid, u16 channel);
+void DWCi_MOV_WH_SetJudgeAcceptFunc(WHScanFilter filter);
+u8 *DWCi_MOV_WH_GetSharedDataAdr(u16 netId);
+BOOL DWCi_MOV_WH_StepDS(u8 *data);
+void DWCi_MOV_WH_Reset(void);
+void DWCi_MOV_WH_Finalize(void);
+BOOL DWCi_MOV_WH_End(void);
 
-#endif // POKEBW2_APP_DOWNLOAD_PLAY_WIH_H
+#endif // POKEBW2_DWCUTIL_DWC_MOV_WH_H

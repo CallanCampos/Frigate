@@ -25,3 +25,15 @@ flags = [
     "-nolink",
     "-msgstyle gcc",
 ]
+
+# The DS Download Play parent and its wireless helper (dwc_mov_mbp.c and dwc_mov_wh.c, Black 1's dwc_mov_mbp.o and
+# dwc_mov_wh.o of this library) were built with the game's compiler and flags, like lib/dwcutilui: under 2.0/sp1p2 or
+# 2.0/sp2 with this library's flags DWCi_MOV_MBP_StartRebootAll and DWCi_MOV_WH_StepDS grow by 4 bytes, and
+# DWCi_MOV_WH_StartMeasureChannel, GetMeasureChannel and Initialize differ, where dsi/1.1p1 matches them all.
+[file_compilers]
+"dwc_mov_mbp.c" = "dsi/1.1p1"
+"dwc_mov_wh.c" = "dsi/1.1p1"
+
+[file_flags]
+"dwc_mov_mbp.c" = ["-inline on,noauto", "-ipa file"]
+"dwc_mov_wh.c" = ["-inline on,noauto", "-ipa file"]
