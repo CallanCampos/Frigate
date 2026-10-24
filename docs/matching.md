@@ -191,7 +191,7 @@ tools that show the differences.
   `net_command.c`'s `NetCommand_SendHuge` takes a `u8` and a `u16`, which its caller in overlay 70 narrows.
 - A pointer that follows another (`cr = cb + n`) adds its operands the other way round when written from the base,
   `cr = y + n + n`, which reuses `y + n` and adds the scaled count first: `ssp_jpegenc.c`'s
-  `JpegEnc_ConvertYUV422`. A product the original computes by doubling one factor in place (`lsls rW, rW, #1`
+  `SSP_YUV422ToYUV888`. A product the original computes by doubling one factor in place (`lsls rW, rW, #1`
   before `muls`) is written with the shift, `(width << 1) * height`, as `camera_system.c`'s `CameraSystem_StartDma`.
 - A variable initialized at its declaration before a local array with an initializer stays live across the
   initializer's `ldm`/`stm` copy, which pushes the copy's pointer to a higher saved register:
@@ -883,7 +883,7 @@ Same code, other `sp` offsets or frame size.
   every function-scope one. `STD_TVSScanf` and `STD_TVSNPrintf` (`std_sprintf.c`, whose `prefixLen` took the slot above
   the loop body's `flags` once declared at function scope) both show it.
 - A loop counter that the original keeps in a stack slot in a small function may be assigned before a call: its value
-  then lives across the call, so it can't stay in a scratch register. `ssp_jpegenc.c`'s `JpegEnc_SetupHuffmanTable`
+  then lives across the call, so it can't stay in a scratch register. `ssp_jpegenc.c`'s `Yos_JpegEncoderHuffmanEncoderBuildTable`
   matches only with `i = 0;` before its `MIi_CpuClearFast` call and the loop written `while (i < 16)` after it, with
   the table's terminator stored inside the outer loop.
 - A variable reused by several switch cases is split into one value per case (see Registers), and a split piece that is
