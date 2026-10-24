@@ -63,7 +63,7 @@ foreach(backend IN ITEMS shm mach-entry mach-remap copy)
     set_tests_properties(gx_backend_${backend} PROPERTIES SKIP_RETURN_CODE 77 TIMEOUT 120)
 endforeach()
 set(port_gx_scenarios
-    sdk_settings wrappers tex_upload texpltt_upload clear_image ext_palettes fill_source fifo cpu_pointer)
+    sdk_settings wrappers tex_upload texpltt_upload clear_image ext_palettes fill_source fifo cpu_pointer lcdc_clear)
 # Each SDK scenario with an aliasing backend and with copying
 foreach(scenario IN LISTS port_gx_scenarios)
     foreach(backend IN ITEMS shm copy)

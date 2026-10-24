@@ -1,0 +1,28 @@
+# The screens first_save_b2_us.pbwinput (port/tests/oracle) must show on the port, as New Game goes on into the field
+# and the house (port/cmake/app.cmake's replay_new_game_house, checked by check_screens.py): between the port's frames
+# FROM and TO, one frame whose top and bottom screens have these SHA-1s of their RGB bytes; where the top screen shows
+# the field's 3D (3d), which only the oracle's comparison holds, within its tolerance, the bottom screen alone. The
+# hashes are pbw-oracle's (melonDS 1.1, port/tools/oracle) playing the same file on the player's Black 2 (US) dump, at
+# the oracle frame each row names; hashes only. The first nine rows are new_game.screens.tsv's, which the same presses
+# show at the same frames. The rest are the field's: the black of the change of map into the house, then the field menu
+# in the player's room and its SAVE, on the bottom screen, the clock and the play time with them. The DS shows each of
+# the field's up to some 550 frames after the port (its save takes longer); the ranges are the port's own frames, and
+# 200 more on each side for its timing to move. The DS's saving shows more frames of its animation than the port's, so
+# the rows skip it.
+from	to	top	bottom	what
+4000	4400	8885f420f9007ad7e75b8c4d9104fbaec8517ce4	586a0a441735abff97c3bd676078492aeb1f29fa	the start menu, NEW GAME highlighted (oracle frame 4089)
+4260	4690	3faca344c840702ea42c31c23a8e34475bdfe31b	b39dd8f4e199095fbf175d6d9490a9415293ee5a	Professor Juniper (oracle frame 4533)
+4825	5282	e3fe3493c9a8189fe4ff41500a1f39761817efd4	b39dd8f4e199095fbf175d6d9490a9415293ee5a	Professor Juniper and Minccino (oracle frame 5189)
+6153	6572	ef9ecfebf6a949da2a08d0db32cb09b93d039232	b39dd8f4e199095fbf175d6d9490a9415293ee5a	"Are you a boy? Or a girl?" (oracle frame 6503)
+6595	7000	bba1bdbf9bfc37228cd37b2f6b65a9464d8eb92f	5d183258d4d159110a62b3d693d684d3dbd8813f	the player's name entry, AAAAAAA (oracle frame 6975)
+6810	7210	34e1331ff74b0254da6a164e38b809a56509a291	b39dd8f4e199095fbf175d6d9490a9415293ee5a	"So your name's AAAAAAA! What a wonderful name!" (oracle frame 7211)
+7135	7540	f866ff897eb99a7e0c5bb7b15a28e65fe645f60a	4e4fbee1baf76337cb6c529cb748306704d2a390	the rival's name entry, HughAAA (oracle frame 7575)
+8238	8645	1611a77c3493d17791c8230c19871066d6f9e2b6	b39dd8f4e199095fbf175d6d9490a9415293ee5a	"Let's go visit the world of Pokémon!" (oracle frame 8714)
+8365	8891	bdf479975d5b4a6ffd23fe38d65fe8a2aa19e370	cd838da3bb89232479050e179d5804ccc02f41be	the opening's season banner, Summer (oracle frame 8874)
+14687	15148	cd838da3bb89232479050e179d5804ccc02f41be	cd838da3bb89232479050e179d5804ccc02f41be	both screens black between the door and the house, the change of map's (oracle frame 15000)
+17116	17560	3d	3bfcf546909746b91208ee8b0431f7f8c37bf0d8	in the player's room, the field menu: BAG, AAAAAAA, SAVE, OPTIONS, 12:04 (oracle frame 17350)
+17243	17656	3d	79bac96f826cc6de815c79bf6e32e30dff17b78b	SAVE pressed (oracle frame 17450)
+17387	17916	3d	b5ac747b0c884cd7cb784a8e69d15dc6034c9c5b	"Would you like to save the game?", YES and NO, the saved game: 10/7/2012 12:04, Aspertia City, Gym Badges: 0, Time: 0:01 (oracle frame 17600)
+17264	17920	3d	a8ca0efab3912b6ba1bfd8687f58d00872c7b320	YES: "AAAAAAA's Data" (oracle frame 17750)
+17521	17941	3d	b1f9ef57271f7595b9dce7ce2d111fdd53b30311	"Saving... Don't turn off the power." (oracle frame 17800)
+17847	18553	3d	a7ca0c191c12963252179a80e5411a5c469571e6	"AAAAAAA saved the game." (oracle frame 18600)

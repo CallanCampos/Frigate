@@ -1,5 +1,6 @@
-# Tests of the platform layer's host versions of the SDK's asm functions (port/hal/mi, fx, math, crypto) and of the
-# card's SPI bus (port/hal/card/card_spi.c):
+# Tests of the platform layer's host versions of the SDK's asm functions (port/hal/mi, fx, math, crypto), of MSL's
+# runtime division (port/hal/msl), of the heaps' host sizes and the root heaps' host memory (port/hal/gfl/heap_policy.c),
+# of DWC's wide strings (port/hal/stubs) and of the card's SPI bus (port/hal/card/card_spi.c):
 # - C unit tests with known vectors, which need no ROM and run everywhere, CI included;
 # - the differential tests of port/tests/asm_oracle, which run the ROM's own machine code in a test-only CPU emulator
 #   and compare. They need the extracted ROM, build/port-venv and a build directory made with the Ninja generator,
@@ -43,6 +44,19 @@ add_test(NAME asm_oracle
         "${asm_oracle_python}" "${CMAKE_CURRENT_SOURCE_DIR}/tests/asm_oracle/run_all.py" --version "${PORT_VERSION}"
     WORKING_DIRECTORY "${REPO_ROOT}")
 set_tests_properties(asm_oracle PROPERTIES SKIP_RETURN_CODE 77 TIMEOUT 900)
+
+# MSL's runtime division as the game's C calls it (port/hal/msl), against values worked out by hand from the ARM routine
+add_executable(test_hal_msl tests/hal/test_msl.c hal/msl/fp_fastI.c)
+target_link_libraries(test_hal_msl PRIVATE port_decomp_env)
+add_test(NAME hal_msl COMMAND test_hal_msl)
+
+# The heaps' host sizes and the host memory of the root heaps the game creates in its own (port/hal/gfl/heap_policy.c,
+# ADR 0021): kept for the caller's memory, zeroed when its overlay loads again, poisoned between two heaps in the
+# sanitized build; with the program's options given by the test
+add_executable(test_hal_heap_policy tests/hal/test_heap_policy.c hal/gfl/heap_policy.c)
+target_link_libraries(test_hal_heap_policy PRIVATE port_decomp_env)
+target_include_directories(test_hal_heap_policy PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
+add_test(NAME hal_heap_policy COMMAND test_hal_heap_policy)
 
 # DWC authentication names use MSL's 16-bit code units, independently of the host libc's wchar_t ABI.
 add_executable(test_hal_wstring tests/hal/test_wstring.c hal/stubs/wstring_host.c hal/stubs/extras_string.c)

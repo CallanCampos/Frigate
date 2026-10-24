@@ -22,10 +22,11 @@ A bug fix, a refactor or anything one comment explains needs no ADR.
   waiting for an ADR take the next free number when someone writes them.
 - 0014, the sanitized build's ADR, was written on the branch `port-sanitizers` as 0013 before the Windows build's took
   that number, and became 0014 when the branch merged.
-- Three numbers are reserved for decisions whose work has started on branches of their own, so that those branches
-  don't collide when they merge: 0019 for the pointer-cast guard against a classified baseline, 0020 for one program
-  for both versions (D6) and 0021 for root heaps in host memory. A branch whose ADR took another number before the
-  reservation renumbers it when it merges. The next free number is 0022.
+- The plan of 2026-10-23 reserved three numbers for decisions whose work has started on branches of their own, so
+  that those branches don't collide when they merge: 0019 for the pointer-cast guard against a classified baseline,
+  0020 for one program for both versions (D6) and 0021 for root heaps in host memory, which was written first. A
+  branch whose ADR took another number before the reservation renumbers it when it merges. The next free number is
+  0022.
 - An accepted ADR isn't rewritten. Only its status line changes: to "superseded by NNNN" when a later ADR replaces
   it, or to "accepted; amended by NNNN" when a later ADR changes part of it. Typos and broken links may be fixed.
 - Each ADR gets a row in the index below in the same commit.
@@ -80,6 +81,7 @@ What becomes easier, what becomes harder, what must be watched, and what would m
 | [0016](0016-3d-frame-in-bands-on-worker-threads.md) | The 3D frame drawn in bands on worker threads, the game on one | §4.6, §7 phase 5 | accepted |
 | [0017](0017-external-contributions.md) | External contributions through forks and pull requests | D1, D10, §9 | accepted; amended by [0018](0018-protected-main-and-sync-prs.md) |
 | [0018](0018-protected-main-and-sync-prs.md) | Protected main and reviewed upstream syncs | D1, §4.1, §8 | accepted |
+| [0021](0021-root-heaps-in-the-games-own-memory-from-host-memory.md) | Root heaps in the game's own memory get host memory | D5, §4.5, §4.8 | proposed |
 
 ## Decisions waiting for an ADR
 

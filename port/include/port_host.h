@@ -1,8 +1,9 @@
 // Force-included into every decomp C file of the host build (port/CMakeLists.txt), so all of the game's C sees it: what
 // MWCC provides built in and clang spells differently, the translation of the DS's fixed addresses into host memory,
-// and the platform layer's few hooks that decomp files call under PLATFORM_PC (the heaps' sizes, a read the DS makes
-// past a heap block, the particle systems' work, the sound data's handles, the Wi-Fi ID's seed, Frigate's test
-// launcher's seam in CONTINUE's event). Nothing here may change what a file means on the DS.
+// and the platform layer's few hooks that decomp files call under PLATFORM_PC (the heaps' sizes and the memory of the
+// root heaps the game creates in its own, a read the DS makes past a heap block, the particle systems' work, the sound
+// data's handles, the Wi-Fi ID's seed, Frigate's test launcher's seam in CONTINUE's event). Nothing here may change
+// what a file means on the DS.
 #ifndef PORT_HOST_H
 #define PORT_HOST_H
 
@@ -89,6 +90,13 @@ void port_heap_ds_read_end(void);
 // The size the host gives one of the game's heaps (src/gfl/heapsys.c), larger than the DS's for 64-bit structs
 // (port/hal/gfl/heap_policy.c). The arguments are u32, u32 and BOOL
 unsigned int port_heap_size(unsigned int index, unsigned int size, int root);
+
+// The memory a root heap that the game creates in memory of its own gets on the host in place of that memory
+// (src/gfl/heapsys.c's GFL_HeapAddRoot; port/hal/gfl/heap_policy.c, ADR 0021): port_heap_size's root size for the
+// caller's size, zeroed when first made and the same at every later creation in the caller's memory, with what the
+// last heap left in it until the caller's overlay loads again and zeroes it (port/hal/gfl/heap_policy.h). The index
+// and size are u32
+void *port_heap_root_memory(unsigned int index, void *memory, unsigned int size);
 
 // The work a particle system's SPL manager allocates from on a host (src/gfl/particle.c), in place of the caller's
 // buffer, which is sized for the DS's structs (port/hal/gfl/particle_work.c). The size is u32, the system's ID 0 to 15
