@@ -89,7 +89,7 @@ version, to find the file. `replaced.txt` in a module lists the decomp files tha
 
 | File | What it does |
 | --- | --- |
-| [hw.h](hw/hw.h), [hw.c](hw/hw.c) | The windows of host memory that `PORT_HW_ADDR()` turns DS addresses into, the accessors of the registers whose accesses act (VCOUNT, the divider, the geometry ports), the geometry command log and its readbacks |
+| [hw.h](hw/hw.h), [hw.c](hw/hw.c) | The windows of host memory that `PORT_HW_ADDR()` turns DS addresses into, the accessors of the registers whose accesses act (VCOUNT, the divider, the geometry ports), the geometry command log and its readbacks; an access to POLYGON_ATTR, TEXIMAGE_PARAM or PLTT_BASE right after one to the same port shares its entry, so that SPL's read of POLYGON_ATTR after each particle's write sends no command of 0 (which drew no particle at all) |
 
 **[gx/](gx/vram.h)** — VRAM, loads and the screens
 

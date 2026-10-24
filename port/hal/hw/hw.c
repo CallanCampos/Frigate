@@ -201,7 +201,25 @@ static void *log_g3_write(uint32_t port) {
     return &entry->value;
 }
 
+// The command ports whose command only stores its parameter for the polygons that follow: POLYGON_ATTR, latched at the
+// next BEGIN_VTXS, and TEXIMAGE_PARAM and PLTT_BASE, taken as each polygon closes (GBATEK "3D Polygon Attributes",
+// "3D Texture Attributes"; port/gfx/ge/ge.c keeps them so). Two writes in a row to one of them leave what the second
+// leaves, so they can share one entry of the log
+static int stores_parameter(uint32_t port) {
+    return port == 0x040004a4 || port == 0x040004a8 || port == 0x040004ac;
+}
+
+// The ports are write-only: a read on the DS gets 0 and sends no command (GBATEK "DS 3D Overview"; melonDS's
+// GPU3D::Read32 does the same). Here the register macro's access can't tell a read from a write, and an entry of its
+// own would send the engine a command of 0. The game's C reads POLYGON_ATTR back right after writing it (each particle
+// of lib/spl/src/spl_draw.c: "(void)reg_G3_POLYGON_ATTR;", the ROM's load from the port), and a POLYGON_ATTR of 0
+// draws neither face, so every SPL particle vanished. An access right after one to the same parameter port therefore
+// reuses that access's entry: a read gets the value just written, which the game discards, and sends nothing more; a
+// second write replaces the first, as the engine would. A read with any other command before it still logs a 0
 void *port_hw_g3_port(uint32_t port) {
+    if (stores_parameter(port) && sG3Count != 0 && sG3Log[sG3Count - 1].port == port) {
+        return &sG3Log[sG3Count - 1].value;
+    }
     return log_g3_write(port);
 }
 

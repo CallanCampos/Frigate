@@ -3,6 +3,21 @@
 What port work taught that isn't obvious from the code, newest first. A lesson about MWCC or the decomp's own
 workflow goes in the decomp checkout instead; this file is the port's ([CLAUDE.md](../CLAUDE.md), the iteration loop).
 
+## 2026-10-24: the battle's run to its end
+
+- **A read through a write log is a write.** The host variants of the SDK's headers turn each geometry command port into
+  `*port_hw_g3_port(address)`, which logs a fresh command for every access, so `(void)reg_G3_POLYGON_ATTR;`, a read
+  that does nothing on the DS, sent the engine a POLYGON_ATTR of 0, and no SPL particle was drawn (all eight of SPL's
+  draw functions do the read): the trainers' cut-in sparks, the Poké Balls' bursts, the moves' effects, and by the
+  same code the intro's. No test caught it, since none of the screens the replays and the oracle's sequences check
+  shows a particle. When an accessor logs or acts on access, grep the decomp for reads of its registers (`(void)reg_`,
+  `= reg_`) as well as writes.
+- **Compare a battle's animations by picture, not only by count.** The DS takes some of a battle's passes over two
+  frames, so at the same GFL count the port can be a frame or two further into an animation: the first turn's Tackle
+  failed `--align counter` at the hit while every picture of it matched the oracle's, frame for frame, once both runs
+  were pictured densely and laid side by side. Past the first damage roll, the random seed (`buildSeed`,
+  [decomp-findings.md](decomp-findings.md)) makes the battles themselves differ.
+
 ## 2026-10-23: the battle path
 
 - **A byte array the DS's size of a type is that type: find its siblings.** `BtlFlowWorkFrame.monSets` was
