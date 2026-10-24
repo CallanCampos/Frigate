@@ -134,7 +134,8 @@ static void SetupMenu(ShortcutMenuList *menu, const ShortcutMenuPos *listPos, Ms
 static void FreeMenu(ShortcutMenuList *menu, ShortcutMenuPos *listPos);
 static GameEventReturnCode ReturnToField_Callback(GameEvent *event, u32 *state, void *data);
 
-void *func_ov036_021bedd8(GameData *gameData, u32 mode, ShortcutMenuPos *listPos, HeapID menuHeapId, HeapID heapId) {
+ShortcutMenuApp *func_ov036_021bedd8(GameData *gameData, u32 mode, ShortcutMenuPos *listPos, HeapID menuHeapId,
+                                     HeapID heapId) {
     ClActorSetup setup;
     ShortcutMenuApp *work;
     ShortcutSave *shortcut;
@@ -197,7 +198,7 @@ void *func_ov036_021bedd8(GameData *gameData, u32 mode, ShortcutMenuPos *listPos
     return work;
 }
 
-void func_ov036_021bf004(ShortcutMenuApp *work) {
+void ShortcutMenu_Delete(ShortcutMenuApp *work) {
     int i;
 
     G2_BlendNone();
@@ -219,10 +220,10 @@ void func_ov036_021bf004(ShortcutMenuApp *work) {
     GFL_HeapFree(work);
 }
 
-void func_ov036_021bf088(ShortcutMenuApp *work) {
+void ShortcutMenu_Main(ShortcutMenuApp *work) {
     int i;
 
-    if (!func_ov036_021bf198(work)) {
+    if (!ShortcutMenu_RunPrint(work)) {
         return;
     }
     switch (work->state) {
@@ -274,7 +275,7 @@ void func_ov036_021bf088(ShortcutMenuApp *work) {
     }
 }
 
-u32 func_ov036_021bf198(ShortcutMenuApp *work) {
+u32 ShortcutMenu_RunPrint(ShortcutMenuApp *work) {
     PrintQueue_Main(work->menuQueue);
     return PrintDone(&work->menu);
 }
@@ -288,13 +289,13 @@ void func_ov036_021bf1ac(ShortcutMenuApp *work) {
     }
 }
 
-void func_ov036_021bf1d0(ShortcutMenuApp *work) {
+void ShortcutMenu_RequestClose(ShortcutMenuApp *work) {
     if (work->state == STATE_INPUT) {
         work->state = STATE_CLOSING;
     }
 }
 
-BOOL func_ov036_021bf1e4(ShortcutMenuApp *work) {
+BOOL ShortcutMenu_IsWaitingInput(ShortcutMenuApp *work) {
     BOOL busy = TRUE;
 
     if (work->state != STATE_SCROLL_IN && work->state != STATE_SCROLL_OUT) {
@@ -303,7 +304,7 @@ BOOL func_ov036_021bf1e4(ShortcutMenuApp *work) {
     return busy;
 }
 
-u32 func_ov036_021bf1f8(ShortcutMenuApp *work, u32 *item) {
+u32 ShortcutMenu_GetResult(ShortcutMenuApp *work, u32 *item) {
     if (item != NULL) {
         *item = work->item;
     }
@@ -620,7 +621,7 @@ static void SetActorsY(ShortcutMenuList *menu, u32 y) {
     }
 }
 
-GameEvent *func_ov036_021bf890(GameSystem *gsys, Field *field, void *param, BOOL transition) {
+GameEvent *ReturnToField_CreateNameInEvent(GameSystem *gsys, Field *field, NameEntryParam *param, BOOL transition) {
     ShortcutMenuReturn *ret;
     GameEvent *event;
 

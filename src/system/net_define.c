@@ -49,12 +49,12 @@ const GFLNetDevTable *NetDefine_LoadDevice(int type) {
         GFL_OvlLoad(OVERLAY_DWC_RAP);
         GFL_OvlLoad(OVERLAY_ID(29));
         return NetDevWifi_GetTable();
-    case 0:
-    case 5:
+    case GFL_NET_TYPE_WIRELESS:
+    case GFL_NET_TYPE_WIRELESS_LISTEN:
         GFL_OvlLoad(OVERLAY_NET_WIRELESS);
         return NetDevWireless_GetTable();
-    case 3:
-    case 4:
+    case GFL_NET_TYPE_IRC:
+    case GFL_NET_TYPE_IRC_WIRELESS:
         GFL_OvlLoad(OVERLAY_NET_IRC);
         return NetDevIrc_GetTable();
     }
@@ -82,12 +82,12 @@ void NetDefine_UnloadDevice(int type) {
         GFL_OvlLoad(OVERLAY_ID(12));
         GFL_OvlLoad(OVERLAY_ID(27));
         break;
-    case 0:
-    case 5:
+    case GFL_NET_TYPE_WIRELESS:
+    case GFL_NET_TYPE_WIRELESS_LISTEN:
         GFL_OvlUnload(OVERLAY_NET_WIRELESS);
         break;
-    case 3:
-    case 4:
+    case GFL_NET_TYPE_IRC:
+    case GFL_NET_TYPE_IRC_WIRELESS:
         GFL_OvlUnload(OVERLAY_NET_IRC);
         break;
     }
@@ -105,7 +105,7 @@ void NetDefine_Update(void) {
     }
 }
 
-BOOL func_02011844(void) {
+BOOL GflNet_IsWifiGameKind(void) {
     switch (GFL_NetGetGameCommandBase()) {
     case 0xc:
     case 0xd:

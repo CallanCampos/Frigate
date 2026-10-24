@@ -86,7 +86,7 @@ enum {
 #define PAD_ALL_MASK 0x2fff
 
 // NitroSDK's GXDispCnt, the display control register's fields, with GX_GetDispCnt, GXS_GetDispCnt and
-// GXS_GetVisibleWnd, and the readers of the window registers that nitro/gx.h lacks
+// GXS_GetVisibleWnd, and the readers of the OBJ window's planes, which nitro/gx.h lacks
 typedef union {
     u32 raw;
     struct {
@@ -119,10 +119,6 @@ static inline GXDispCnt GXS_GetDispCnt(void) {
 static inline int GXS_GetVisibleWnd(void) {
     return (reg_GXS_DB_DISPCNT & (REG_GX_DISPCNT_W0_MASK | REG_GX_DISPCNT_W1_MASK | REG_GX_DISPCNT_OW_MASK)) >>
            REG_GX_DISPCNT_W0_SHIFT;
-}
-
-static inline GXWndPlane G2S_GetWndOutsidePlane(void) {
-    return *(volatile GXWndPlane *)&reg_G2S_DB_WINOUT;
 }
 
 static inline GXWndPlane G2_GetWndOBJInsidePlane(void) {
@@ -475,7 +471,8 @@ BOOL GFL_NetErrShutdown(void) {
         GFL_NetExit(NULL);
         GFL_NetIwFree();
         do {
-            if (init != NULL && (init->bNetType == 0 || init->bNetType == 5)) {
+            if (init != NULL &&
+                (init->bNetType == GFL_NET_TYPE_WIRELESS || init->bNetType == GFL_NET_TYPE_WIRELESS_LISTEN)) {
                 if (WH_GetSystemState() == 10) {
                     return FALSE;
                 }

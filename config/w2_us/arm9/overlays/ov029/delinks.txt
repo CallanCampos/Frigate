@@ -16,6 +16,7 @@ lib/dwc/src/vct/vct_adpcm.c:
     .rodata     start:0x021971e8 end:0x021972b8
 
 lib/dwc/src/vct/vct_audio.c:
+    complete
     .text       start:0x02193cf0 end:0x02194ae4
     .rodata     start:0x021972b8 end:0x021972d8
     .data       start:0x0219741c end:0x02197420
@@ -31,7 +32,7 @@ lib/dwc/src/vct/vct_session.c:
 lib/dwc/src/vct/vct_dsp.c:
     complete
     .text       start:0x02196a60 end:0x02196e0c
-    .data       start:0x02197458 end:0x02197464
+    .data       start:0x02197458 end:0x02197480
     .bss        start:0x02198448 end:0x021998cc
 
 lib/dwc/src/vct/vct.c:

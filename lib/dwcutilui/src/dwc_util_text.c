@@ -89,17 +89,19 @@ void DWCi_FNTlEnd(void) {
 }
 
 DWCUtilText *DWCi_FNTlFormEx(int screen, int width, int height, s16 fromFront, int *objCount, int font) {
+    DWCUtilText *text;
+    u8 *base;
     u32 charName;
-    DWCUtilText *text = DWCi_QUElPopFront(sTextWork->freeObjTexts);
 
+    text = DWCi_QUElPopFront(sTextWork->freeObjTexts);
     text->u.obj.width = width;
     text->u.obj.height = height;
     text->buffer = DWCi_OVRlAlloc(screen, width * height, fromFront, &charName);
     text->u.obj.charName = charName;
     *objCount = NNSi_G2dCalcRequiredOBJ(width, height);
-    NNS_G2dCharCanvasInitForOBJ1D(&text->canvas,
-                                  (void *)((screen == 1 ? HW_DB_OBJ_VRAM : HW_OBJ_VRAM) + charName * 0x80), width,
-                                  height, NNS_G2D_CHARA_COLORMODE_16);
+    base = (u8 *)(screen == 1 ? HW_DB_OBJ_VRAM : HW_OBJ_VRAM);
+    base += charName * 0x80;
+    NNS_G2dCharCanvasInitForOBJ1D(&text->canvas, base, width, height, NNS_G2D_CHARA_COLORMODE_16);
     text->canvas.vtable->pClear(&text->canvas, 0);
     NNS_G2dTextCanvasInit(&text->text, &text->canvas, &sTextWork->fonts[font], 1, 1);
     return text;

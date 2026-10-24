@@ -143,7 +143,7 @@ static GameEventReturnCode EventFieldPokeDisp_Callback(GameEvent *event, u32 *st
     return GAMEEVENT_CONTINUE;
 }
 
-BOOL func_ov036_021c7698(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_CheckBeaconTrainerKey(VM *vm, FieldScriptEnv *env) {
     u16 flag = ScriptReadAny(vm, env);
     u16 *result = ScriptReadVar(vm, env);
     GameData *gameData = GSYS_GetGameData(FieldScriptEnv_GetGameSystem(env));
@@ -156,7 +156,7 @@ BOOL func_ov036_021c7698(VM *vm, FieldScriptEnv *env) {
 BOOL s019A_CGearControlWarning(VM *vm, FieldScriptEnv *env) {
     ScriptFieldWork *fieldWork = ScriptWork_GetFieldWork(FieldScriptEnv_GetScriptWork(env));
     HeapID heapId = Field_GetHeapID(fieldWork->field);
-    void *msgBGSys = Field_GetMsgBGSys(fieldWork->field);
+    FieldMsgBG *msgBGSys = Field_GetMsgBGSys(fieldWork->field);
 
     if (VM_Read16(vm)) {
         MsgData *msgData =
@@ -170,7 +170,7 @@ BOOL s019A_CGearControlWarning(VM *vm, FieldScriptEnv *env) {
         BmpWin_DrawFrame(window, 0, 1, 13);
         strbuf = GFL_StrBufCreate(180, heapId);
         GFL_MsgDataLoadStrbuf(msgData, S019aCgearControlWarning_Text_WarningPleaseTurnC, strbuf);
-        GFL_TextRendererDrawToBitmap(BmpWin_GetBitmap(window), 0, 0, strbuf, func_ov036_0218799c(msgBGSys));
+        GFL_TextRendererDrawToBitmap(BmpWin_GetBitmap(window), 0, 0, strbuf, MsgBGPrinter_GetFont(msgBGSys));
         BmpWin_FlushChar(window);
         GFL_BGSysQueueScrLoad(2);
         GFL_StrBufFree(strbuf);
@@ -355,7 +355,7 @@ static GameEventReturnCode EventEvCameraShake_Callback(GameEvent *event, u32 *st
     return GAMEEVENT_CONTINUE;
 }
 
-BOOL func_ov036_021c7ad0(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_StartSwapNpcEvent(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     u16 actorId;

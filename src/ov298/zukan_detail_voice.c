@@ -32,9 +32,6 @@
 // The detail screen's cry page, zukan_detail_voice.c by the ROM's own string: the Pokémon on the top screen, which
 // stretches while its cry plays, with the cry's length and its wave scrolling by on the touch screen
 
-// The Pokédex's shortcut for the Y button, which the touch bar's check box registers
-#define SHORTCUT_POKEDEX_VOICE 22
-
 enum {
     VOICE_SEQ_INIT,
     VOICE_SEQ_FADE_IN,

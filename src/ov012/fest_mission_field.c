@@ -57,7 +57,7 @@ u32 FestMission_RandExcluding(MATHRandContext32 *rand, u32 max, const u32 *list,
 
 void FestMission_OnZoneEnter(GameSystem *gsys, u16 zoneId) {
     LinkFestival *festival = GSYS_GetLinkFestival(gsys);
-    RivalEntry *entry = LinkFestival_GetEntries(festival);
+    FestMissionWork *work = LinkFestival_GetMissionWork(festival);
     FestMissionConfig *config;
 
     OS_GetTick();
@@ -65,12 +65,12 @@ void FestMission_OnZoneEnter(GameSystem *gsys, u16 zoneId) {
         return;
     }
     config = GetFestMissionCfg(festival);
-    switch (config->type) {
+    switch (config->header.kind) {
     case 4:
-        FestSparklePlace_OnZoneEnter(entry, gsys, festival, config, zoneId);
+        FestSparklePlace_OnZoneEnter(&work->sparkle, gsys, festival, config, zoneId);
         break;
     case 5:
-        FesMissionPeople_OnZoneEnter(entry, gsys, festival, config, zoneId);
+        FesMissionPeople_OnZoneEnter(&work->people, gsys, festival, config, zoneId);
         break;
     }
 }

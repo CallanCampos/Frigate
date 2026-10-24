@@ -10,12 +10,14 @@
 // The bag's list of the items in the Free Space, in overlay 142 (bag_item.c)
 
 // The filters of the list: every item, or the items of one pocket
-#define BAG_ITEM_FILTER_ALL 0
-#define BAG_ITEM_FILTER_ITEMS 1
-#define BAG_ITEM_FILTER_MEDICINE 2
-#define BAG_ITEM_FILTER_TMS_HMS 3
-#define BAG_ITEM_FILTER_BERRIES 4
-#define BAG_ITEM_FILTER_KEY_ITEMS 5
+enum {
+    BAG_ITEM_FILTER_ALL,
+    BAG_ITEM_FILTER_ITEMS,
+    BAG_ITEM_FILTER_MEDICINE,
+    BAG_ITEM_FILTER_TMS_HMS,
+    BAG_ITEM_FILTER_BERRIES,
+    BAG_ITEM_FILTER_KEY_ITEMS,
+};
 
 typedef struct {
     u16 item;
@@ -35,6 +37,7 @@ struct BagItemList {
     u8 inBag[ITEM_LAST + 1];
 };
 
+// filter is a BAG_ITEM_FILTER_*
 void BagItemList_Init(BagItemList *list, BagSave *bag, u32 filter, HeapID heapId);
 void BagItemList_Exit(BagItemList *list);
 // The slot of the index-th item of a pocket that isn't in the Free Space, or of the Free Space's index-th shown item
@@ -45,7 +48,7 @@ void BagItemList_Remove(BagItemList *list, u16 index, BOOL release);
 void BagItemList_Add(BagItemList *list, u32 item, s16 pocket);
 // The number of items on the list that belong in a pocket
 s32 BagItemList_CountInPocket(BagItemList *list, u32 pocket);
-// Shows the items the filter picks and sorts the list for it
+// Shows the items the filter, a BAG_ITEM_FILTER_*, picks and sorts the list for it
 void BagItemList_SetFilter(BagItemList *list, u16 filter);
 // The number of items a pocket shows: those not in the Free Space, or the Free Space's shown items
 u32 BagItemList_CountShown(BagItemList *list, u32 pocket);

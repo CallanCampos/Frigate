@@ -322,7 +322,7 @@ static GFLNetInitData sIrcBattleMatchNetInit = {
     0x10,
     1,
     0,
-    3,
+    GFL_NET_TYPE_IRC,
     1,
     0xb,
     { 0xfe, 0xff, 0, 0 },
@@ -394,7 +394,7 @@ static void IrcBattleMatch_DimBackground(IrcBattleMatch *work, BOOL dim) {
 }
 
 static void IrcBattleMatch_StartWipeOut(IrcBattleMatch *work) {
-    GFL_WipeSet(0, 0, 0, 0, 6, 1, work->heapId);
+    GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, 0, 6, 1, work->heapId);
     IrcBattleMatch_SetState(work, IrcBattleMatch_StateWaitWipe);
 }
 
@@ -583,7 +583,7 @@ static void IrcBattleMatch_StateWaitJingle(IrcBattleMatch *work) {
 
 static void IrcBattleMatch_StateWaitResultSync(IrcBattleMatch *work) {
     if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), IRCMATCH_TIMING_RESULT, IRCMATCH_TIMING_GROUP)) {
-        func_02042e94(0);
+        GflNet_SetAutoExit(0);
         GFL_NetSetDisconnectError(0);
         work->counter = 0;
         IrcBattleMatch_SetState(work, IrcBattleMatch_StateWaitJingle);
@@ -859,7 +859,7 @@ static void IrcBattleMatch_StateWaitStart(IrcBattleMatch *work) {
 static void IrcBattleMatch_StateRegisterCommands(IrcBattleMatch *work) {
     NetCommand_AddTable(IRCMATCH_CMD_MODE, sIrcBattleMatchCommands, IRCMATCH_CMD_COUNT, work);
     NetHandle_SendTimingPair(NetHandle_GetOwn(), IRCMATCH_TIMING_COMMANDS, IRCMATCH_TIMING_GROUP);
-    func_02042e94(1);
+    GflNet_SetAutoExit(1);
     GFL_NetSetDisconnectError(1);
     IrcBattleMatch_SetState(work, IrcBattleMatch_StateWaitStart);
 }
@@ -1248,7 +1248,7 @@ static BOOL IrcBattleMatch_IsSameMusicalGame(int a, int b) {
 static void IrcBattleMatch_StateStartNet(IrcBattleMatch *work) {
     GFLNetInitData init = sIrcBattleMatchNetInit;
 
-    init.bNetType = 4;
+    init.bNetType = GFL_NET_TYPE_IRC_WIRELESS;
     switch (work->mode) {
     case IRCBATTLEMATCH_MODE_SINGLE:
     case IRCBATTLEMATCH_MODE_DOUBLE:
@@ -1650,7 +1650,7 @@ static void IrcBattleMatch_StateConnectLoop(IrcBattleMatch *work) {
             work->bannerActive = FALSE;
         }
     }
-    if (GFL_NetIsInitialized() && NetHandle_GetState(NetHandle_GetOwn()) == 7) {
+    if (GFL_NetIsInitialized() && NetHandle_GetState(NetHandle_GetOwn()) == NET_HANDLE_STATE_REJECTED) {
         IrcBattleMatch_SetState(work, IrcBattleMatch_StateShowMismatch);
         return;
     }
@@ -1732,7 +1732,7 @@ static BOOL IrcBattleMatch_Main(GameProc *proc, u32 *state, void *param, void *w
     if (work->taskWin1 != NULL) {
         AppTaskMenuWin_Update(work->taskWin1);
     }
-    GFL_BGSysMoveBG(4, 3, work->scrollY);
+    GFL_BGSysMoveBG(4, BG_MOVE_SET_Y, work->scrollY);
     work->scrollY--;
     ClActSys_Draw();
     PrintQueue_Main(work->printQueue);

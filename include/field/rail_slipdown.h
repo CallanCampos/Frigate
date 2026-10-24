@@ -8,7 +8,7 @@
 // event that loads the overlay starts the slide, polls it until it is done, then deletes it.
 // Starts the actor's slide in a task. stopPlayer is TRUE when the actor is the player, who is braked first and whom the
 // camera follows down
-void *RailSlipdown_Create(GameSystem *gsys, Field *field, FieldActor *actor, BOOL stopPlayer);
+RailSlipdown *RailSlipdown_Create(GameSystem *gsys, Field *field, FieldActor *actor, BOOL stopPlayer);
 void RailSlipdown_Delete(RailSlipdown *work);
 BOOL RailSlipdown_IsDone(RailSlipdown *work);
 

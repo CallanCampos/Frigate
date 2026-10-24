@@ -61,7 +61,7 @@ BOOL BagSave_CheckAvailItemSpace(BagSave *bag, u16 item, u16 count, HeapID heapI
 u32 BagSave_GetActualItemPocket(BagSave *bag, u16 item);
 u16 BagSave_GetItemCountByID(BagSave *bag, u16 item, HeapID heapId);
 // Whether the bag holds at least count of an item
-BOOL BagSave_CheckAmount(BagSave *bag, u32 item, u32 count, u32 heapId);
+BOOL BagSave_CheckAmount(BagSave *bag, u16 item, u16 count, HeapID heapId);
 BOOL BagSave_SubItem(BagSave *bag, u16 item, u16 count, HeapID heapId);
 void BagSave_Init(BagSave *bag);
 // Replaces the DNA Splicers that fuse (0) with those that separate, or those that separate (1) with those that fuse

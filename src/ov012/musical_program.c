@@ -206,7 +206,7 @@ void MusicalProgram_PutNpcOnStage(MusicalProgram *program, MusicalStageParam *st
     }
 }
 
-u8 func_ov012_02152614(MusicalProgram *program) {
+u8 MusicalProgram_GetBaseProgramId(MusicalProgram *program) {
     return program->data->unk0;
 }
 

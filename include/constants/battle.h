@@ -25,12 +25,19 @@
 #define BATTLEMON_ACCURACY_STAGE 6
 #define BATTLEMON_EVASION_STAGE 7
 #define BATTLEMON_ATTACK 8
+#define BATTLEMON_DEFENSE 9
 #define BATTLEMON_SP_ATTACK 10
+#define BATTLEMON_SP_DEFENSE 11
+#define BATTLEMON_SPEED 12
 #define BATTLEMON_HP 13
+#define BATTLEMON_MAX_HP 14
 #define BATTLEMON_LEVEL 15
 #define BATTLEMON_ABILITY 16
+// The ability that takes effect: none under Gastro Acid
+#define BATTLEMON_EFFECTIVE_ABILITY 17
 #define BATTLEMON_GENDER 18
 #define BATTLEMON_FORM 19
+#define BATTLEMON_EXP 20
 
 #define BATTLEMON_STAT_STAGE_NEUTRAL 6
 
@@ -146,5 +153,28 @@
 #define CONDITION_PERISH_SONG 20
 #define CONDITION_INGRAIN 21
 #define CONDITION_MEAN_LOOK 22
+#define CONDITION_ENCORE 23
+// Roost: the Pokemon loses its Flying type for the turn
+#define CONDITION_ROOST 24
+// A move that repeats over several turns, as Thrash, Uproar, Rollout and Bide
+#define CONDITION_MOVE_LOCK 25
+// The turn a two-turn move charges
+#define CONDITION_CHARGE 26
+// A Choice item's lock on the first move used
+#define CONDITION_CHOICE_LOCK 27
+// Every move of the Pokemon hits
+#define CONDITION_ALWAYS_HIT 28
+// Lock-On and Mind Reader: the Pokemon's moves hit the one target
+#define CONDITION_LOCK_ON 29
+#define CONDITION_MAGNET_RISE 30
+// Smack Down: the Pokemon is grounded
+#define CONDITION_SMACK_DOWN 31
+#define CONDITION_TELEKINESIS 32
+#define CONDITION_SKY_DROP 33
+// The Micle Berry's accuracy boost for the next move
+#define CONDITION_MICLE_BERRY 34
+#define CONDITION_AQUA_RING 35
+// Any major status condition, which Natural Cure, Shed Skin and Hydration cure
+#define CONDITION_ANY_STATUS 36
 
 #endif // POKEBW2_CONSTANTS_BATTLE_H

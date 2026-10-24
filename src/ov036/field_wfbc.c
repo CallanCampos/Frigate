@@ -10,32 +10,32 @@ struct FieldWFBC {
     CityState *state;
 };
 
-static void func_ov036_0218adfc(void *wfbc, HeapID heapId);
-static void func_ov036_0218ae00(void *wfbc);
+static void func_ov036_0218adfc(FieldWFBC *wfbc, HeapID heapId);
+static void func_ov036_0218ae00(FieldWFBC *wfbc);
 static void func_ov036_0218ae04(FieldWFBC *wfbc);
 static void func_ov036_0218ae10(FieldWFBC *work, CityState *city, BOOL isOther);
 
-void *func_ov036_0218adac(HeapID heapId) {
-    void *wfbc = GFL_HeapAllocate(heapId, sizeof(FieldWFBC), TRUE, "field_wfbc.c", 87);
+FieldWFBC *func_ov036_0218adac(HeapID heapId) {
+    FieldWFBC *wfbc = GFL_HeapAllocate(heapId, sizeof(FieldWFBC), TRUE, "field_wfbc.c", 87);
 
     func_ov036_0218ae04(wfbc);
     return wfbc;
 }
 
-void func_ov036_0218add0(void *wfbc) {
+void func_ov036_0218add0(FieldWFBC *wfbc) {
     func_ov036_0218ae00(wfbc);
     GFL_HeapFree(wfbc);
 }
 
-void func_ov036_0218ade0(void *wfbc, CityState *city, BOOL isOther, HeapID heapId) {
+void func_ov036_0218ade0(FieldWFBC *wfbc, CityState *city, BOOL isOther, HeapID heapId) {
     func_ov036_0218adfc(wfbc, heapId);
     func_ov036_0218ae10(wfbc, city, isOther);
 }
 
-static void func_ov036_0218adfc(void *wfbc, HeapID heapId) {
+static void func_ov036_0218adfc(FieldWFBC *wfbc, HeapID heapId) {
 }
 
-static void func_ov036_0218ae00(void *wfbc) {
+static void func_ov036_0218ae00(FieldWFBC *wfbc) {
 }
 
 static void func_ov036_0218ae04(FieldWFBC *wfbc) {

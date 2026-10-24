@@ -286,7 +286,7 @@ typedef struct {
 #endif
 
 struct WifiBattleMatchNet {
-    void *unk0;
+    DWCUserData *unk0;
     WifiList *wifiList;
     GameData *gameData;
     s32 profileId;
@@ -495,7 +495,7 @@ u32 WifiBattleMatchNet_CheckError(WifiBattleMatchNet *p_wk, u32 a1, u32 a2) {
 
     if (GFL_NetIsInitialized()) {
         if (GFL_NetErrCheck()) {
-            func_02042e94(0);
+            GflNet_SetAutoExit(0);
             GFL_NetSetDisconnectError(0);
             GFL_SndStop();
             if (GameData_CheckEventsPaused(p_wk->gameData)) {
@@ -545,7 +545,7 @@ u32 WifiBattleMatchNet_CheckError(WifiBattleMatchNet *p_wk, u32 a1, u32 a2) {
             break;
         }
         if (result != WBM_RESULT_OK) {
-            func_02042e94(0);
+            GflNet_SetAutoExit(0);
             GFL_NetSetDisconnectError(0);
             GFL_SndStop();
             if (GameData_CheckEventsPaused(p_wk->gameData)) {
@@ -695,7 +695,7 @@ u32 WifiBattleMatchNet_MatchMain(WifiBattleMatchNet *p_wk) {
         case 1:
             p_wk->matchTimer = 0;
             p_wk->matchState = WBM_MATCH_SEQ_NEGOTIATE;
-            func_02042e94(1);
+            GflNet_SetAutoExit(1);
             GFL_NetSetDisconnectError(1);
             break;
         default:
@@ -762,7 +762,7 @@ u32 WifiBattleMatchNet_MatchMain(WifiBattleMatchNet *p_wk) {
 }
 
 void WifiBattleMatchNet_CancelMatch(WifiBattleMatchNet *p_wk) {
-    func_02042e94(0);
+    GflNet_SetAutoExit(0);
     GFL_NetSetDisconnectError(0);
     NetState_WifiDisconnect(TRUE);
 }
@@ -786,7 +786,7 @@ BOOL WifiBattleMatchNet_EndMain(WifiBattleMatchNet *p_wk) {
         }
         break;
     case WBM_END_SEQ_STOP_ERRORS:
-        func_02042e94(0);
+        GflNet_SetAutoExit(0);
         GFL_NetSetDisconnectError(0);
         p_wk->counter = 0;
         p_wk->phaseB++;
@@ -2268,7 +2268,7 @@ u32 WifiBattleMatchNet_GetRecordId(WifiBattleMatchNet *p_wk) {
     return p_wk->p_data->sake_recordID;
 }
 
-BOOL WifiBattleMatchNet_SendPlayerInfo(WifiBattleMatchNet *p_wk, const void *data) {
+BOOL WifiBattleMatchNet_SendPlayerInfo(WifiBattleMatchNet *p_wk, const WifiBattleMatchPlayer *data) {
     BOOL toServer = GFL_NetGetHandleNetId(NetHandle_GetOwn()) == 0;
     NetHandle *handle = NetHandle_GetOwn();
 
@@ -2304,13 +2304,13 @@ BOOL WifiBattleMatchNet_TakeParty(WifiBattleMatchNet *p_wk, PokeParty *party) {
     return flag;
 }
 
-BOOL WifiBattleMatchNet_SendValue4(WifiBattleMatchNet *p_wk, const void *data) {
+BOOL WifiBattleMatchNet_SendValue4(WifiBattleMatchNet *p_wk, const u32 *data) {
     BOOL toServer = GFL_NetGetHandleNetId(NetHandle_GetOwn()) == 0;
 
     return GFL_NetSendCommandToMachine(NetHandle_GetOwn(), toServer, WBM_NET_CMD_VALUE4, 4, data, TRUE, TRUE, TRUE);
 }
 
-BOOL WifiBattleMatchNet_TakeValue4(WifiBattleMatchNet *p_wk, void *out) {
+BOOL WifiBattleMatchNet_TakeValue4(WifiBattleMatchNet *p_wk, u32 *out) {
     u32 flag = p_wk->flag148;
 
     if (flag != 0) {
@@ -2523,7 +2523,7 @@ static u32 WifiBattleMatchNet_GetHttpResultMessage(u32 result) {
     }
 }
 
-void WifiBattleMatchNet_GetDownload(WifiBattleMatchNet *p_wk, void *dest) {
+void WifiBattleMatchNet_GetDownload(WifiBattleMatchNet *p_wk, TournamentEntry *dest) {
     MI_CpuCopy8(&p_wk->downloadBuffer, dest, sizeof(p_wk->downloadBuffer));
 }
 

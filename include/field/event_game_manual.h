@@ -18,8 +18,8 @@ struct GameManualEventWork {
 extern const char data_ov033_0217c610[];
 extern const GameProcFunctions gManualProcFunctions;
 
-GameEvent *func_ov033_02179dd4(GameSystem *gsys, u16 *result);
-GameEventReturnCode func_ov033_02179e28(GameEvent *event, u32 *state, void *data);
-void func_ov033_02179e80(GameManualEventWork *work);
+GameEvent *EventGameManual_Create(GameSystem *gsys, u16 *result);
+GameEventReturnCode EventGameManual_Main(GameEvent *event, u32 *state, void *data);
+void EventGameManual_SetResult(GameManualEventWork *work);
 
 #endif // POKEBW2_FIELD_EVENT_GAME_MANUAL_H

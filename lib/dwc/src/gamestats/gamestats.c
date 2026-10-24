@@ -5,11 +5,6 @@
 // frame with gamestats_Poll: 3 once the key is set, 4 to send the first request, 5 while it is in flight, 6 to send the
 // second one, 7 while it is in flight, 8 when the answer is kept, and 1 when anything failed.
 
-// The game's secret, which is copied as a whole
-typedef struct GamestatsSecret {
-    char text[0x14];
-} GamestatsSecret;
-
 // The state of the client
 typedef struct GamestatsClient {
     int state;
@@ -17,7 +12,7 @@ typedef struct GamestatsClient {
     int request;
     BOOL configured;
     char gameName[0x20];
-    GamestatsSecret secret;
+    char secret[0x14];
     // The scrambling of the payload: a generator of numbers with a multiplier, an increment and a modulus, and the key
     // that the checksum of the payload is xored with
     u32 multiplier;
@@ -99,7 +94,7 @@ static BOOL Configure(const char *gameName, const char *secret, u32 multiplier, 
         return FALSE;
     }
     strncpy(sClient.gameName, gameName, 0x20);
-    sClient.secret = *(const GamestatsSecret *)secret;
+    memcpy(sClient.secret, secret, sizeof(sClient.secret));
     sClient.multiplier = multiplier;
     sClient.increment = increment;
     sClient.modulus = modulus;
@@ -109,10 +104,6 @@ static BOOL Configure(const char *gameName, const char *secret, u32 multiplier, 
 }
 
 // Checks that the answer ends with the hash of the secret, the answer in base64 and the secret, and keeps it
-static inline void CopySecret(char *dest) {
-    *(GamestatsSecret *)dest = sClient.secret;
-}
-
 static BOOL CheckAnswer(const char *data, int size) {
     char hash[0x29];
     u8 digest[0x14];
@@ -129,9 +120,9 @@ static BOOL CheckAnswer(const char *data, int size) {
     if (buffer == NULL) {
         return FALSE;
     }
-    CopySecret(buffer);
+    memcpy(buffer, sClient.secret, sizeof(sClient.secret));
     B64Encode(data, buffer + 0x14, bodySize, 2);
-    CopySecret(buffer + 0x14 + GamestatsEncodedSize(bodySize));
+    memcpy(buffer + 0x14 + GamestatsEncodedSize(bodySize), sClient.secret, sizeof(sClient.secret));
     MATH_CalcSHA1(digest, buffer, GamestatsEncodedSize(bodySize) + 0x28);
     DWC_Free(8, buffer, 0);
     for (i = 0; i < 0x14; i++) {
@@ -167,7 +158,7 @@ static void OnAnswered(const char *data, int size, DWCGHTTPResult status, void *
                 char digits[17] = "0123456789abcdef";
                 int i;
 
-                *(GamestatsSecret *)block = sClient.secret;
+                memcpy(block, sClient.secret, sizeof(sClient.secret));
                 memcpy(block + 0x14, data, 0x20);
                 MATH_CalcSHA1(digest, block, 0x34);
                 for (i = 0; i < 0x14; i++) {

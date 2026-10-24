@@ -26,7 +26,7 @@
 typedef struct {
     GameSystem *gsys;
     Field *field;
-    void *select;
+    PartySelectList *select;
     PokeParty *party;
     PokeParty *battleBoxParty;
     u8 partyOk;
@@ -44,7 +44,7 @@ static GameEvent *TeamSelectEvent_Create(GameSystem *gsys, u32 partyResult, u32 
 static GameEventReturnCode TeamSelectEvent_Callback(GameEvent *event, u32 *state, void *data);
 
 // Set the words to the species of the regulation that the player has caught; their count
-BOOL func_ov036_021aea40(VM *vm, FieldScriptEnv *env) {
+BOOL Regulation_RegisterAllowedSpecies(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameData *gameData = FieldScriptEnv_GetGameData(env);
     WordSet *wordSet = ScriptWork_GetWordSet(work);
@@ -56,15 +56,15 @@ BOOL func_ov036_021aea40(VM *vm, FieldScriptEnv *env) {
 }
 
 // Let the player pick the team for a battle under the regulation
-BOOL func_ov036_021aea8c(VM *vm, FieldScriptEnv *env) {
+BOOL Regulation_CheckPartyRegulation(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     u16 regulationId = ScriptReadAny(vm, env);
     u16 *result = ScriptReadVar(vm, env);
     HeapID heapId = FieldScriptEnv_GetHeapID(env);
     Regulation *regulation = PokeRegulation_LoadNew(regulationId, heapId);
-    GameEvent *event = func_ov036_021aebf0(gsys, regulationId == 20 || regulationId == 21 || regulationId == 22,
-                                           regulation, result, heapId);
+    GameEvent *event = Regulation_CreatePartyCheckTask(
+        gsys, regulationId == 20 || regulationId == 21 || regulationId == 22, regulation, result, heapId);
 
     GFL_HeapFree(regulation);
     if (event == NULL) {
@@ -110,7 +110,8 @@ static u16 *Regulation_ListCaughtSpecies(Regulation *regulation, GameData *gameD
     return species;
 }
 
-GameEvent *func_ov036_021aebf0(GameSystem *gsys, u32 a1, Regulation *regulation, u16 *result, HeapID heapId) {
+GameEvent *Regulation_CreatePartyCheckTask(GameSystem *gsys, u32 a1, Regulation *regulation, u16 *result,
+                                           HeapID heapId) {
     u32 partyResult;
     u32 battleBoxResult;
 
@@ -205,13 +206,13 @@ static GameEventReturnCode TeamSelectEvent_Callback(GameEvent *event, u32 *state
 
     switch (*state) {
     case 0:
-        select->select = func_ov036_021c3180(select->field, select->party, select->battleBoxParty, select->partyOk,
-                                             select->battleBoxOk, select->heapId);
+        select->select = PartySelectList_Create(select->field, select->party, select->battleBoxParty, select->partyOk,
+                                                select->battleBoxOk, select->heapId);
         (*state)++;
         break;
     case 1:
-        if (func_ov036_021c3278(select->select)) {
-            *select->result = func_ov036_021c3218(select->select, &cancelled);
+        if (PartySelectList_Main(select->select)) {
+            *select->result = PartySelectList_Delete(select->select, &cancelled);
             if (cancelled == TRUE) {
                 *select->result = TEAM_SELECT_NONE;
             }

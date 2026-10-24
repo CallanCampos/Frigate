@@ -542,8 +542,8 @@ void FieldCamera_ClearBind(FieldCamera *camera) {
     camera->bind = NULL;
 }
 
-void *FieldCamera_GetBind(FieldCamera *camera) {
-    return (void *)camera->bind;
+const VecFx32 *FieldCamera_GetBind(FieldCamera *camera) {
+    return camera->bind;
 }
 
 void FieldCamera_ResetBind(FieldCamera *camera) {
@@ -554,8 +554,8 @@ void FieldCamera_SetRefBind(FieldCamera *camera, const VecFx32 *bind) {
     camera->refBind = bind;
 }
 
-void *FieldCamera_GetRefBind(FieldCamera *camera) {
-    return (void *)camera->refBind;
+const VecFx32 *FieldCamera_GetRefBind(FieldCamera *camera) {
+    return camera->refBind;
 }
 
 static void FieldCamera_SetZNear(FieldCamera *camera, fx32 zNear) {
@@ -607,7 +607,7 @@ void FieldCamera_CoordsSetPitch(FieldCamera *camera, u16 pitch) {
     camera->pitch = pitch;
 }
 
-u16 *func_ov036_021863c4(FieldCamera *camera) {
+u16 *FieldCamera_GetViewPitchPtr(FieldCamera *camera) {
     return &camera->anglePitch;
 }
 
@@ -619,7 +619,7 @@ void FieldCamera_CoordsSetYaw(FieldCamera *camera, u16 yaw) {
     camera->yaw = yaw;
 }
 
-u16 *func_ov036_021863d8(FieldCamera *camera) {
+u16 *FieldCamera_GetViewYawPtr(FieldCamera *camera) {
     return &camera->angleYaw;
 }
 

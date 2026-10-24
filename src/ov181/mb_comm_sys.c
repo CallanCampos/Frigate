@@ -149,13 +149,13 @@ void MBComm_Update(MBCommSys *comm) {
         if (GFL_NetIsHandleNegotiated(NetHandle_GetOwn()) == TRUE) {
             comm->seq = MB_COMM_SEQ_CONNECTED;
             GFL_NetSetDisconnectError(TRUE);
-            func_02042e94(TRUE);
+            GflNet_SetAutoExit(TRUE);
         }
         break;
     case MB_COMM_SEQ_WAIT_DISCONNECT_TIMING:
         if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), 0x40, 4) == TRUE) {
             comm->seq = MB_COMM_SEQ_DISCONNECTED;
-            func_02042e94(FALSE);
+            GflNet_SetAutoExit(FALSE);
             GFL_NetSetDisconnectError(FALSE);
         }
         break;
@@ -201,7 +201,7 @@ void MBComm_StartNet(MBCommSys *comm) {
         2,
         1,
         1,
-        0,
+        GFL_NET_TYPE_WIRELESS,
         0,
         4,
         { 0x2c, 1, 0, 0 },

@@ -46,7 +46,8 @@ typedef struct {
 
 struct FieldG3DMapperConfig {
     fx32 chunkSpan;
-    u32 unk04;
+    // The height of a layer of the matrix (our name)
+    fx32 layerHeight;
     u16 chunkLoadDiameterX;
     u16 chunkLoadDiameterZ;
     u32 locatorGenType;
@@ -84,7 +85,8 @@ typedef struct {
 struct FieldG3DMapper {
     HeapID heapId;
     fx32 chunkSpan;
-    u32 unk08;
+    // The height of a layer of the matrix (our name)
+    fx32 layerHeight;
     u32 locatorGenType;
     u32 chunkArcId;
     u16 matrixWidth;
@@ -109,12 +111,13 @@ struct FieldG3DMapper {
     u8 chunkSizeCapPassingChunkEndIdx;
     u8 nowDrawScanline;
     u16 unk4E;
-    u32 unk50;
+    // The VBlank count at the chunks' last loader update (our name)
+    u32 loaderUpdateVBlank;
     VecFx32 chunkBasePos;
     G3DResource *mapTextures;
     FieldPropSystem *propSystem;
     FieldTerrainAnimator *terrainAnimator;
-    void *wfbc;
+    FieldWFBC *wfbc;
     ResortMapCreateWork *resortMap;
     HeightExList *heightEx;
 };
@@ -125,7 +128,7 @@ void FieldG3DMapper_UpdateSync(FieldG3DMapper *mapper);
 BOOL FieldG3DMapper_Update(FieldG3DMapper *mapper);
 void FieldG3DMapper_CallAllLoaderUpdate(FieldG3DMapper *mapper);
 // pass is a FIELD_G3D_RENDER_PHASE_
-void FieldG3D_RenderFieldmap(FieldG3DMapper *mapper, void *camera, u32 pass);
+void FieldG3D_RenderFieldmap(FieldG3DMapper *mapper, G3DCamera *camera, u32 pass);
 HeightExList *func_ov036_02184590(FieldG3DMapper *mapper);
 void FieldG3DMapper_CreateMap(FieldG3DMapper *mapper, const FieldG3DMapperConfig *config,
                               FieldColorPostFX *colorPostFx);
@@ -140,8 +143,8 @@ void FieldG3DMapper_GenLocators1(FieldG3DMapper *mapper, const VecFx32 *playerPo
 void FieldG3DMapper_GenLocators2(FieldG3DMapper *mapper, const VecFx32 *playerPos, FieldChunkLocator *locators);
 void FieldG3DMapper_GenLocators3(FieldG3DMapper *mapper, const VecFx32 *playerPos, FieldChunkLocator *locators);
 BOOL FieldG3DMapper_UpdateChunkLoad(FieldG3DMapper *mapper, FieldChunkLocator *locators);
-s32 func_ov036_02184fb8(u32 diameter, fx32 chunkSpan, fx32 pos);
-s32 func_ov036_02184ff4(u32 diameter, fx32 chunkSpan, fx32 pos);
+s32 FieldG3DMapper_GetWindowStartEven(u32 diameter, fx32 chunkSpan, fx32 pos);
+s32 FieldG3DMapper_GetWindowStartOdd(u32 diameter, fx32 chunkSpan, fx32 pos);
 s32 FieldG3DMapper_CalcChunkLoadAreaStart(u32 diameter, fx32 chunkSpan, fx32 pos);
 void ClearMapTerrainBuf(MapTerrainBuf *terrain);
 void ClearMapTerrainSamplerOutput(FieldG3DMapperTerrain *output);
@@ -150,12 +153,12 @@ BOOL FieldG3DMapper_GetTerrain(FieldG3DMapper *mapper, const VecFx32 *position, 
 BOOL func_ov036_02185230(FieldG3DMapper *mapper, u32 index, const VecFx32 *position, MapTerrainBuf *terrain);
 BOOL FieldG3DMapper_CheckChunkHandleTerrainReady(FieldG3DMapper *mapper, u32 index);
 BOOL FieldG3DMapper_IsPosOutOfBounds(FieldG3DMapper *mapper, const VecFx32 *position);
-void func_ov036_021852d0(FieldG3DMapper *mapper, const VecFx32 *position);
-void func_ov036_021852e0(FieldG3DMapper *mapper, VecFx32 *out);
+void FieldG3DMapper_SetOriginOffset(FieldG3DMapper *mapper, const VecFx32 *position);
+void FieldG3DMapper_GetOriginOffset(FieldG3DMapper *mapper, VecFx32 *out);
 FieldPropSystem *FieldG3DMapper_GetBMSystem(FieldG3DMapper *mapper);
 void func_ov036_021852f4(FieldG3DMapper *mapper, CityState *city, BOOL isOther);
 ResortMapCreateWork *func_ov036_02185304(FieldG3DMapper *mapper);
-FieldTerrainAnimator *FieldG3DMapper_CreateTerrainAnimator(u16 chunkCapacity, void *mapTextures,
+FieldTerrainAnimator *FieldG3DMapper_CreateTerrainAnimator(u16 chunkCapacity, G3DResource *mapTextures,
                                                            const FieldTerrainAnmInfo *anmInfo, u32 heapId);
 BOOL FieldChunkContext_HasAnimator(FieldChunkContext *context);
 FieldTerrainSRTAnimatorChunkState *FieldChunkContext_GetSRTAnimatorState(FieldChunkContext *context);
@@ -165,7 +168,7 @@ u32 FieldChunkContext_GetChunkIndex(FieldChunkContext *context);
 HeapID FieldChunkContext_GetHeapID(FieldChunkContext *context);
 void FieldChunkContext_Init(FieldChunkContext *context, FieldG3DMapper *mapper, u32 chunkIndex, HeapID heapId);
 void FieldChunkContext_FreeAnimator(FieldChunkContext *context);
-void func_ov036_021853d4(FieldChunkContext *context);
+void FieldG3DMapper_ReleaseGroundAnimeSlot(FieldChunkContext *context);
 BOOL FieldChunkContext_HasAnimatorCore(FieldChunkContext *context);
 FieldTerrainSRTAnimatorChunkState *FieldChunkContext_GetSRTAnimatorStateCore(FieldChunkContext *context);
 void FieldChunkLocator_Disable(FieldChunkLocator *locator);
@@ -174,9 +177,10 @@ BOOL FieldChunkLocator_IsActive(FieldChunkLocator *locator);
 u32 FieldChunkLocator_GetChunkID(FieldChunkLocator *locator);
 void FieldChunkLocator_SetPos(FieldChunkLocator *locator, fx32 x, fx32 y, fx32 z);
 void FieldChunkLocator_GetPos(FieldChunkLocator *locator, VecFx32 *position);
-void func_ov036_0218543c(const FieldG3DMapper *mapper, const VecFx32 *position, FieldG3DMapperTerrain *output);
+void FieldG3DMapper_AppendHeightExHits(const FieldG3DMapper *mapper, const VecFx32 *position,
+                                       FieldG3DMapperTerrain *output);
 void FieldG3DMapper_ResetDrawCalcState(FieldG3DMapper *mapper);
-void func_ov036_02185578(FieldG3DMapper *mapper);
+void FieldG3DMapper_StampFrame(FieldG3DMapper *mapper);
 void FieldG3DMapper_AddDrawableChunk(FieldG3DMapper *mapper, FieldChunk *chunk, u32 index);
 void FieldG3DMapper_CalcRenderPassSplit(FieldG3DMapper *mapper);
 BOOL FieldG3DMapper_CheckChunkDraw(FieldG3DMapper *mapper, u32 order, u32 pass, u32 *index);

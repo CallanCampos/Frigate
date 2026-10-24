@@ -103,7 +103,7 @@ BOOL s00A0_BGMWait(VM *vm, FieldScriptEnv *env) {
 }
 
 // Fades the BGM players' volume
-BOOL func_ov036_021a6e74(VM *vm, FieldScriptEnv *env) {
+BOOL ScriptWork_FadeBgmVolume(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     GameData *gameData = GSYS_GetGameData(gsys);
     GSYS_GetField(gsys);
@@ -118,7 +118,7 @@ BOOL func_ov036_021a6e74(VM *vm, FieldScriptEnv *env) {
 }
 
 // Fades the BGM players' volume back to full
-BOOL func_ov036_021a6ec4(VM *vm, FieldScriptEnv *env) {
+BOOL ScriptWork_RestoreBgmVolume(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     GameData *gameData = GSYS_GetGameData(gsys);
     GSYS_GetField(gsys);
@@ -130,8 +130,8 @@ BOOL func_ov036_021a6ec4(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-// Finishes func_ov036_021a6e74's sub event: the volume goes back to full at once
-BOOL func_ov036_021a6f08(FinishScriptSubEventsWork *work, u32 *state) {
+// Finishes ScriptWork_FadeBgmVolume's sub event: the volume goes back to full at once
+BOOL ScriptWork_RestoreBgmVolumeEvent(FinishScriptSubEventsWork *work, u32 *state) {
     FieldSound *fieldSound = GameData_GetFieldSoundSystem(GSYS_GetGameData(work->gsys));
 
     switch (*state) {
@@ -350,7 +350,7 @@ BOOL s00AB_PVPlay(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL func_ov036_021a7340(VM *vm, FieldScriptEnv *env) {
+BOOL ScriptWork_PlayPerapVoice(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     u16 species = ScriptReadAny(vm, env);

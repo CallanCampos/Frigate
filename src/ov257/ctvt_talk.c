@@ -43,8 +43,16 @@
 // The keys that hold the talk button
 #define CTVT_TALK_KEYS (PAD_BUTTON_A | PAD_BUTTON_R)
 
+// The sizes of a voice in bytes: it is sent in chunks, and its first chunk, the click of the microphone starting, is
+// left out of the wave drawn, which leaves at most VOICE_MAX_SIZE of a recording. A type of its own, so that MWCC
+// keeps the skipped size as a variable at the wave's two DrawWave calls
+typedef enum {
+    VOICE_CHUNK_SIZE = 0x800,
+    VOICE_MAX_SIZE = 0xc000,
+} CtvtTalkVoiceSize;
+
 // The steps of the talk mode
-enum {
+typedef enum {
     TALK_STATE_FADE_IN,
     TALK_STATE_WAIT_FADE_IN,
     TALK_STATE_FADE_OUT_TO_GAME,
@@ -80,7 +88,7 @@ enum {
     TALK_STATE_WAIT_SYNC_EXIT,
     TALK_STATE_ALONE,
     TALK_STATE_WAIT_ALONE,
-};
+} CtvtTalkState;
 
 // What the talk mode goes on to, in next
 enum {
@@ -101,12 +109,12 @@ enum {
 
 // What the voice icon shows: the talk button free, the member's own voice recording, or the button not usable (another
 // member talking, no microphone, nobody to talk to); VOICE_ICON_MAX is none of them, so that the first is drawn
-enum {
+typedef enum {
     VOICE_ICON_READY,
     VOICE_ICON_TALKING,
     VOICE_ICON_BUSY,
     VOICE_ICON_MAX,
-};
+} CtvtTalkVoiceIcon;
 
 // Which of the speed buttons is touched: the ones that speed the voice up, or the ones that slow it down
 enum {
@@ -118,7 +126,7 @@ enum {
 #define SPEED_TOUCH_NONE 0xff
 
 struct CtvtTalk {
-    int state;
+    CtvtTalkState state;
     int next;
     BOOL waitSound;
     u8 requestCooldown;
@@ -150,8 +158,8 @@ struct CtvtTalk {
     ClActor *exitButton;
     ClActor *voiceIcon;
     ClActor *gameButtons[2];
-    int voiceIconState;
-    int shownVoiceIconState;
+    CtvtTalkVoiceIcon voiceIconState;
+    CtvtTalkVoiceIcon shownVoiceIconState;
     BmpWin *gameWindow;
     BmpWin *gameWindowSub;
     BOOL gameWindowPending;
@@ -195,13 +203,8 @@ static void CtvtTalk_OpenGameWindow(CommTvtWork *sys, CtvtTalk *talk);
 static void CtvtTalk_CloseGameWindow(CommTvtWork *sys, CtvtTalk *talk);
 static BOOL CtvtTalk_CheckGameCancel(CommTvtWork *sys, CtvtTalk *talk);
 
-// The buttons of the bottom screen
-static const TouchRect sZoomButtons[] = {
-    { 0xa8, 0xc0, 0xe8, 0x00 },
-    { 0x68, 0xa0, 0xd8, 0xff },
-    { TOUCH_RECT_END },
-};
-
+// The buttons of the bottom screen, declared in the order CtvtTalk_UpdateMain and CtvtTalk_UpdateSpeed test them,
+// which is the order MWCC's size sort needs to lay them out as the ROM does
 static const TouchRect sExitButtons[] = {
     { 0x08, 0x18, 0xb8, 0xe8 },
     { 0x18, 0x28, 0xb8, 0xf0 },
@@ -217,6 +220,12 @@ static const TouchRect sGameButtons1[] = {
 static const TouchRect sGameButtons2[] = {
     { 0x48, 0x58, 0xc8, 0xff },
     { 0x58, 0x68, 0xd0, 0xff },
+    { TOUCH_RECT_END },
+};
+
+static const TouchRect sZoomButtons[] = {
+    { 0xa8, 0xc0, 0xe8, 0x00 },
+    { 0x68, 0xa0, 0xd8, 0xff },
     { TOUCH_RECT_END },
 };
 
@@ -256,10 +265,10 @@ void CtvtTalk_Delete(CommTvtWork *sys, CtvtTalk *talk) {
 }
 
 // The resources of the actors are the system's: characters, palette and cells
-static inline ClActor *CtvtTalk_CreateActor(CommTvtWork *sys, int chars, int palette, int cells,
-                                            const ClActorSetup *setup, HeapID heapId) {
-    return ClActor_Create(CommTvt_GetClActUnit(sys), CommTvt_GetObjResource(sys, chars),
-                          CommTvt_GetObjResource(sys, palette), CommTvt_GetObjResource(sys, cells), setup, 1, heapId);
+static inline void CtvtTalk_CreateActor(CommTvtWork *sys, ClActor **actor, int chars, int palette, int cells,
+                                        const ClActorSetup *setup, HeapID heapId) {
+    *actor = ClActor_Create(CommTvt_GetClActUnit(sys), CommTvt_GetObjResource(sys, chars),
+                            CommTvt_GetObjResource(sys, palette), CommTvt_GetObjResource(sys, cells), setup, 1, heapId);
 }
 
 void CtvtTalk_Enter(CommTvtWork *sys, CtvtTalk *talk) {
@@ -281,39 +290,39 @@ void CtvtTalk_Enter(CommTvtWork *sys, CtvtTalk *talk) {
     setup.sequence = talk->speed + 25;
     setup.priority = 0;
     setup.bgPriority = 2;
-    talk->speedCursor = CtvtTalk_CreateActor(sys, 5, 1, 9, &setup, heapId);
+    CtvtTalk_CreateActor(sys, &talk->speedCursor, 5, 1, 9, &setup, heapId);
     ClActor_SetVisible(talk->speedCursor, TRUE);
-    if (func_ov257_021aab18(sys) == TRUE) {
+    if (CommTvt_GetViewSwapped(sys) == TRUE) {
         setup.sequence = 21;
     } else {
         setup.sequence = 22;
     }
-    talk->zoomButton = CtvtTalk_CreateActor(sys, 5, 1, 9, &setup, heapId);
+    CtvtTalk_CreateActor(sys, &talk->zoomButton, 5, 1, 9, &setup, heapId);
     ClActor_SetVisible(talk->zoomButton, TRUE);
     setup.sequence = 20;
-    talk->exitButton = CtvtTalk_CreateActor(sys, 5, 1, 9, &setup, heapId);
+    CtvtTalk_CreateActor(sys, &talk->exitButton, 5, 1, 9, &setup, heapId);
     ClActor_SetVisible(talk->exitButton, TRUE);
     setup.sequence = 36;
-    talk->gameButtons[0] = CtvtTalk_CreateActor(sys, 5, 1, 9, &setup, heapId);
+    CtvtTalk_CreateActor(sys, &talk->gameButtons[0], 5, 1, 9, &setup, heapId);
     ClActor_SetVisible(talk->gameButtons[0], TRUE);
     setup.sequence = 37;
-    talk->gameButtons[1] = CtvtTalk_CreateActor(sys, 5, 1, 9, &setup, heapId);
+    CtvtTalk_CreateActor(sys, &talk->gameButtons[1], 5, 1, 9, &setup, heapId);
     ClActor_SetVisible(talk->gameButtons[1], TRUE);
     setup.sequence = 24;
-    talk->voiceIcon = CtvtTalk_CreateActor(sys, 5, 1, 9, &setup, heapId);
+    CtvtTalk_CreateActor(sys, &talk->voiceIcon, 5, 1, 9, &setup, heapId);
     ClActor_SetVisible(talk->voiceIcon, TRUE);
     setup.x = 232;
     setup.y = 168;
     setup.sequence = 1;
     setup.priority = 0;
     setup.bgPriority = 0;
-    talk->talkButton = CtvtTalk_CreateActor(sys, 6, 2, 10, &setup, heapId);
+    CtvtTalk_CreateActor(sys, &talk->talkButton, 6, 2, 10, &setup, heapId);
     ClActor_SetVisible(talk->talkButton, TRUE);
     ClActor_SetAutoAnim(talk->talkButton, TRUE);
 
-    talk->voiceIconState = VOICE_ICON_READY;
     talk->state = TALK_STATE_FADE_IN;
     talk->waitSound = FALSE;
+    talk->voiceIconState = VOICE_ICON_READY;
     talk->shownVoiceIconState = VOICE_ICON_MAX;
     talk->waveWindow = BmpWin_CreateDynamic(4, 8, 3, 16, 8, 10, TRUE);
     talk->messageWindow = BmpWin_CreateDynamic(4, 1, 1, 30, 4, 10, TRUE);
@@ -334,13 +343,13 @@ void CtvtTalk_Enter(CommTvtWork *sys, CtvtTalk *talk) {
     talk->expanded = GFL_StrBufCreate(109, heapId);
     talker = CtvtComm_GetTalker(sys, CommTvt_GetComm(sys));
     if (talker != CTVT_COMM_NONE) {
-        func_ov257_021aad74(sys, talker);
+        CommTvt_PlaceSlotMarker(sys, talker);
         talk->voiceIconState = VOICE_ICON_BUSY;
     }
     if (!CtvtMic_IsReady(talk->mic)) {
         talk->voiceIconState = VOICE_ICON_BUSY;
     }
-    if (CommTvt_GetSelfIndex(sys) != 0 || func_ov257_021aab3c(sys) == TRUE || talk->notAlone == TRUE) {
+    if (CommTvt_GetSelfIndex(sys) != 0 || CommTvt_IsLaunchModeCall(sys) == TRUE || talk->notAlone == TRUE) {
         ClActor_SetAnimFrame(talk->gameButtons[0], 1);
         ClActor_SetAnimFrame(talk->gameButtons[1], 1);
     }
@@ -383,14 +392,19 @@ void CtvtTalk_Leave(CommTvtWork *sys, CtvtTalk *talk) {
 }
 
 int CtvtTalk_Main(CommTvtWork *sys, CtvtTalk *talk) {
+    // The fades' steps and frames per step, read as immediates. A function-local static const is emitted even when
+    // its reads fold: these two are the bytes 06 01 at the head of the file's .rodata, which nothing points to. That
+    // they are these calls' is inferred from their arguments
+    static const u8 wipeDivision = 6;
+    static const u8 wipeSync = 1;
     HeapID heapId = CommTvt_GetHeapId(sys);
 
     switch (talk->state) {
     case TALK_STATE_FADE_IN:
         if (func_ov257_021aaa74(sys) == TRUE) {
-            GFL_WipeSet(0, 1, 1, 0, 6, 1, heapId);
+            GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_IN, WIPE_TYPE_FADE_IN, 0, wipeDivision, wipeSync, heapId);
         } else {
-            GFL_WipeSet(4, 1, 1, 0, 6, 1, heapId);
+            GFL_WipeSet(WIPE_MODE_SUB, WIPE_TYPE_FADE_IN, WIPE_TYPE_FADE_IN, 0, wipeDivision, wipeSync, heapId);
         }
         talk->state = TALK_STATE_WAIT_FADE_IN;
         break;
@@ -400,7 +414,7 @@ int CtvtTalk_Main(CommTvtWork *sys, CtvtTalk *talk) {
         }
         break;
     case TALK_STATE_FADE_OUT_TO_GAME:
-        GFL_WipeSet(4, 0, 0, 0, 6, 1, heapId);
+        GFL_WipeSet(WIPE_MODE_SUB, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, 0, wipeDivision, wipeSync, heapId);
         func_ov257_021aaa78(sys, FALSE);
         talk->state = TALK_STATE_WAIT_FADE_OUT;
         break;
@@ -414,7 +428,7 @@ int CtvtTalk_Main(CommTvtWork *sys, CtvtTalk *talk) {
         if (talk->waitSound && CtvtCamera_IsSoundDone(sys, camera) != TRUE) {
             break;
         }
-        GFL_WipeSet(0, 0, 0, 0, 6, 1, heapId);
+        GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, 0, wipeDivision, wipeSync, heapId);
         func_ov257_021aaa78(sys, TRUE);
         talk->state = TALK_STATE_WAIT_FADE_OUT;
         break;
@@ -698,7 +712,7 @@ int CtvtTalk_Main(CommTvtWork *sys, CtvtTalk *talk) {
 
             talk->next = TALK_NEXT_EXIT;
             talk->state = TALK_STATE_FADE_OUT;
-            func_ov257_021aab14(sys, TRUE);
+            CommTvt_SetMessageActive(sys, TRUE);
             CtvtCamera_StopCamera(sys, camera);
             CtvtCamera_EndRecording(sys, camera);
             talk->waitSound = TRUE;
@@ -706,7 +720,7 @@ int CtvtTalk_Main(CommTvtWork *sys, CtvtTalk *talk) {
         break;
     case TALK_STATE_DISCONNECTED:
         CtvtComm_Disconnect(sys, CommTvt_GetComm(sys));
-        func_ov257_021aab14(sys, TRUE);
+        CommTvt_SetMessageActive(sys, TRUE);
         CtvtTalk_PrintMessage(sys, talk, 36);
         talk->state = TALK_STATE_WAIT_DISCONNECTED;
         CtvtCamera_EndRecording(sys, CommTvt_GetCamera(sys));
@@ -724,7 +738,7 @@ int CtvtTalk_Main(CommTvtWork *sys, CtvtTalk *talk) {
         if (CtvtComm_SendPacket(sys, CommTvt_GetComm(sys), CTVT_PACKET_UNK_A, 0) == TRUE) {
             CtvtCamera *camera = CommTvt_GetCamera(sys);
 
-            func_ov257_021aab14(sys, TRUE);
+            CommTvt_SetMessageActive(sys, TRUE);
             CtvtCamera_EndRecording(sys, camera);
             talk->state = TALK_STATE_SYNC_EXIT;
         }
@@ -734,7 +748,7 @@ int CtvtTalk_Main(CommTvtWork *sys, CtvtTalk *talk) {
         CtvtTalk_PrintMessage(sys, talk, 37);
         talk->state = TALK_STATE_WAIT_PARENT_LEFT;
         talk->waitFrames = 0;
-        func_ov257_021aab14(sys, TRUE);
+        CommTvt_SetMessageActive(sys, TRUE);
         CtvtCamera_EndRecording(sys, CommTvt_GetCamera(sys));
         talk->waitSound = TRUE;
         break;
@@ -753,8 +767,8 @@ int CtvtTalk_Main(CommTvtWork *sys, CtvtTalk *talk) {
         if (CtvtComm_IsSynced(sys, CommTvt_GetComm(sys), 47) == TRUE) {
             talk->next = TALK_NEXT_EXIT;
             talk->state = TALK_STATE_FADE_OUT;
-            func_ov257_021aaeb0(sys);
-            func_ov257_021aab14(sys, TRUE);
+            CommTvt_DeleteTimeIcon(sys);
+            CommTvt_SetMessageActive(sys, TRUE);
             CtvtCamera_StopCamera(sys, CommTvt_GetCamera(sys));
             talk->waitSound = TRUE;
         }
@@ -763,7 +777,7 @@ int CtvtTalk_Main(CommTvtWork *sys, CtvtTalk *talk) {
         CtvtComm_Disconnect(sys, CommTvt_GetComm(sys));
         CtvtTalk_PrintMessage(sys, talk, 38);
         talk->state = TALK_STATE_WAIT_ALONE;
-        func_ov257_021aab14(sys, TRUE);
+        CommTvt_SetMessageActive(sys, TRUE);
         CtvtCamera_EndRecording(sys, CommTvt_GetCamera(sys));
         talk->waitSound = TRUE;
         break;
@@ -771,7 +785,7 @@ int CtvtTalk_Main(CommTvtWork *sys, CtvtTalk *talk) {
         if (GFL_HIDIsTouchPressed() == TRUE || (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B))) {
             talk->next = TALK_NEXT_EXIT;
             talk->state = TALK_STATE_FADE_OUT;
-            func_ov257_021aab14(sys, TRUE);
+            CommTvt_SetMessageActive(sys, TRUE);
             CtvtCamera_StopCamera(sys, CommTvt_GetCamera(sys));
             talk->waitSound = TRUE;
         }
@@ -790,7 +804,7 @@ int CtvtTalk_Main(CommTvtWork *sys, CtvtTalk *talk) {
             talk->messagePending = FALSE;
             if (talk->notifyExit == TRUE) {
                 talk->notifyExit = FALSE;
-                func_ov257_021aae7c(sys, talk->messageWindow);
+                CommTvt_CreateTimeIcon(sys, talk->messageWindow);
             }
         }
     }
@@ -841,11 +855,12 @@ int CtvtTalk_Main(CommTvtWork *sys, CtvtTalk *talk) {
             int frames = CtvtMic_GetPlayFrames(talk->mic);
             u16 length = CtvtMic_GetPlayLength(talk->mic);
             u32 size = CtvtMic_GetPlaySize(talk->mic);
+            CtvtTalkVoiceSize skipped = VOICE_CHUNK_SIZE;
 
             if (frames > length) {
                 frames = length;
             }
-            CtvtTalk_DrawWave(sys, talk, (const s16 *)((u8 *)packet + 0x800), 3, size * frames / length, size);
+            CtvtTalk_DrawWave(sys, talk, (const s16 *)((u8 *)packet + skipped), 3, size * frames / length, size);
         }
     }
     if (ClActor_IsAnimActive(talk->talkButton) == FALSE) {
@@ -870,7 +885,7 @@ static void CtvtTalk_UpdateMain(CommTvtWork *sys, CtvtTalk *talk) {
     if (CtvtTalk_CheckDisconnect(sys, talk) == TRUE) {
         return;
     }
-    if (talk->state <= TALK_STATE_RECORD && func_ov257_021aab18(sys) == FALSE) {
+    if (talk->state <= TALK_STATE_RECORD && CommTvt_GetViewSwapped(sys) == FALSE) {
         CtvtCamera *camera = CommTvt_GetCamera(sys);
 
         if (GCTX_HIDGetPressedKeys() & PAD_KEY_UP) {
@@ -923,7 +938,7 @@ static void CtvtTalk_UpdateMain(CommTvtWork *sys, CtvtTalk *talk) {
         }
     }
     if (talk->state == TALK_STATE_MAIN) {
-        if (CommTvt_GetSelfIndex(sys) == 0 && func_ov257_021aab3c(sys) == FALSE &&
+        if (CommTvt_GetSelfIndex(sys) == 0 && CommTvt_IsLaunchModeCall(sys) == FALSE &&
             GFL_HIDGetTouchPressedRect(sGameButtons1) != TOUCH_RECT_NONE && talk->notAlone == FALSE) {
             CtvtGame_SetType(CommTvt_GetGame(sys), 0);
             CtvtTalk_OpenGameWindow(sys, talk);
@@ -932,7 +947,7 @@ static void CtvtTalk_UpdateMain(CommTvtWork *sys, CtvtTalk *talk) {
             ClActor_SetAutoAnim(talk->gameButtons[0], TRUE);
             GFL_SndSEPlay(SEQ_SE_SYS_45);
         }
-        if (CommTvt_GetSelfIndex(sys) == 0 && func_ov257_021aab3c(sys) == FALSE &&
+        if (CommTvt_GetSelfIndex(sys) == 0 && CommTvt_IsLaunchModeCall(sys) == FALSE &&
             GFL_HIDGetTouchPressedRect(sGameButtons2) != TOUCH_RECT_NONE && talk->notAlone == FALSE) {
             CtvtGame_SetType(CommTvt_GetGame(sys), 1);
             CtvtTalk_OpenGameWindow(sys, talk);
@@ -974,9 +989,9 @@ static void CtvtTalk_UpdateMain(CommTvtWork *sys, CtvtTalk *talk) {
             GFL_SndSEPlay(SEQ_SE_CANCEL1);
             ClActor_SetSequence(talk->talkButton, 9);
         } else if (hit == 1 || (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_SELECT | PAD_BUTTON_START))) {
-            func_ov257_021aab1c(sys);
+            CommTvt_ToggleViewSwapped(sys);
             GFL_SndSEPlay(SEQ_SE_SYS_48);
-            if (func_ov257_021aab18(sys) == TRUE) {
+            if (CommTvt_GetViewSwapped(sys) == TRUE) {
                 ClActor_SetSequence(talk->zoomButton, 21);
             } else {
                 ClActor_SetSequence(talk->zoomButton, 22);
@@ -1017,8 +1032,13 @@ static void CtvtTalk_UpdateRecord(CommTvtWork *sys, CtvtTalk *talk) {
             talk->next = RECORD_SENDING;
             talk->voiceIconState = VOICE_ICON_BUSY;
         }
-        CtvtTalk_DrawWave(sys, talk, (const s16 *)((u8 *)CtvtMic_GetBuffer(talk->mic) + 0x800), 9,
-                          CtvtMic_GetRecordedSize(talk->mic), 0xc000);
+        {
+            u8 *buffer = CtvtMic_GetBuffer(talk->mic);
+            u32 size = CtvtMic_GetRecordedSize(talk->mic);
+            CtvtTalkVoiceSize skipped = VOICE_CHUNK_SIZE;
+
+            CtvtTalk_DrawWave(sys, talk, (const s16 *)(buffer + skipped), 9, size, VOICE_MAX_SIZE);
+        }
         // fallthrough
     case RECORD_SENDING: {
         BOOL busy;
@@ -1031,17 +1051,17 @@ static void CtvtTalk_UpdateRecord(CommTvtWork *sys, CtvtTalk *talk) {
         busy = CtvtComm_IsVoiceBusy(sys, comm);
         size = CtvtMic_GetRecordedSize(talk->mic);
         if (talk->chunkPending == FALSE && busy == FALSE &&
-            (size >= (talk->chunk + 1) * 0x800 || talk->next == RECORD_SENDING)) {
+            (size >= (talk->chunk + 1) * VOICE_CHUNK_SIZE || talk->next == RECORD_SENDING)) {
             u8 *buffer = CtvtMic_GetBuffer(talk->mic);
 
-            u32 encoded =
-                CtvtMic_Encode(talk->mic, (const s16 *)(buffer + talk->chunk * 0x800), talk->voiceData, 0x800);
+            u32 encoded = CtvtMic_Encode(talk->mic, (const s16 *)(buffer + talk->chunk * VOICE_CHUNK_SIZE),
+                                         talk->voiceData, VOICE_CHUNK_SIZE);
 
             talk->voicePacket->chunk = talk->chunk;
             talk->voicePacket->size = encoded;
             talk->voicePacket->playSize = size;
             talk->voicePacket->speed = talk->speed;
-            if (talk->next == RECORD_SENDING && size <= (talk->chunk + 1) * 0x800) {
+            if (talk->next == RECORD_SENDING && size <= (talk->chunk + 1) * VOICE_CHUNK_SIZE) {
                 talk->voicePacket->isLast = TRUE;
             } else {
                 talk->voicePacket->isLast = FALSE;
@@ -1268,7 +1288,7 @@ static void CtvtTalk_AskExit(CommTvtWork *sys, CtvtTalk *talk) {
     } else {
         CtvtTalk_PrintMessage(sys, talk, 32);
     }
-    talk->exitMenu = func_ov257_021aab80(sys);
+    talk->exitMenu = CommTvt_OpenConfirmMenu(sys);
     talk->state = TALK_STATE_EXIT_MENU;
     if (ClActor_IsAnimActive(talk->talkButton) == FALSE) {
         ClActor_SetSequence(talk->talkButton, 15);
@@ -1297,7 +1317,7 @@ static void CtvtTalk_UpdateExitMenu(CommTvtWork *sys, CtvtTalk *talk) {
 
             talk->next = TALK_NEXT_EXIT;
             talk->state = TALK_STATE_FADE_OUT;
-            func_ov257_021aab14(sys, TRUE);
+            CommTvt_SetMessageActive(sys, TRUE);
             camera = CommTvt_GetCamera(sys);
             CtvtCamera_StopCamera(sys, camera);
             CtvtCamera_EndRecording(sys, camera);
@@ -1316,7 +1336,7 @@ static void CtvtTalk_UpdateExitMenu(CommTvtWork *sys, CtvtTalk *talk) {
 }
 
 static BOOL CtvtTalk_CheckDisconnect(CommTvtWork *sys, CtvtTalk *talk) {
-    if (func_ov257_021aab34(sys) == TRUE) {
+    if (CommTvt_GetEndRequested(sys) == TRUE) {
         if (CtvtComm_GetConnectType(sys, CommTvt_GetComm(sys)) == CTVT_CONNECT_EXISTING) {
             talk->state = TALK_STATE_PARENT_LEFT;
         } else {

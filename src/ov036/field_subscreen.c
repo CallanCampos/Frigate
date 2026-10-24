@@ -345,11 +345,11 @@ void FieldSubscreen_ResetReturnSubscreen(FieldSubscreen *subscreen) {
     FieldSubscreen_SaveReturnSubscreen(subscreen, FLD_SUBSCREEN_ID_DEFAULT);
 }
 
-void func_ov036_021984f0(FieldSubscreen *subscreen, HeapID heapId) {
+void FieldSubscreen_ResumeField(FieldSubscreen *subscreen, HeapID heapId) {
     FieldDispControl_ReqSetAllA(FieldG2D_GetDispControl(subscreen->field), 1, 0, 0, 0, 0);
     setAlphaBlend_wrapper(FALSE);
     GFL_BGSysClearScr(1);
-    func_ov036_02187794(1, heapId);
+    MsgBGPrinter_LoadWindowGraphics(1, heapId);
 }
 
 static void FieldSubscreen_CGear_Init(FieldSubscreen *subscreen, u32 previousScreenId) {
@@ -508,20 +508,20 @@ static void FieldSubscreen_FieldMenu_UpdateAltFrame(FieldSubscreen *subscreen, B
     FieldMenu_UpdateScroll(subscreen->work);
 }
 
-u32 func_ov036_02198854(FieldSubscreen *subscreen) {
+u32 FieldSubscreen_GetMenuSelectedButton(FieldSubscreen *subscreen) {
     if (FieldSubscreen_GetScreenID(subscreen) != FLD_SUBSCREEN_ID_FIELD_MENU) {
         return 0;
     }
     return FieldMenu_GetSelectedItem(subscreen->work);
 }
 
-void func_ov036_0219886c(FieldSubscreen *subscreen, u32 param) {
+void FieldSubscreen_SetMenuSelectedButton(FieldSubscreen *subscreen, u32 param) {
     if (FieldSubscreen_GetScreenID(subscreen) == FLD_SUBSCREEN_ID_FIELD_MENU) {
         FieldMenu_SetCursorItem(subscreen->work, param);
     }
 }
 
-void func_ov036_02198884(FieldSubscreen *subscreen, HeapID heapId) {
+void FieldSubscreen_LoadBackdrop(FieldSubscreen *subscreen, HeapID heapId) {
     ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_FIELD_MENU, heapId);
 
     GFL_G2DIOLoadArcNCLR(arc, 0, PALTYPE_MAIN_BG, 0x140, 0x140, 0x20, heapId);
@@ -532,7 +532,7 @@ void func_ov036_02198884(FieldSubscreen *subscreen, HeapID heapId) {
     FieldDispControl_ReqSetBGEnabled(FieldG2D_GetDispControl(subscreen->field), 1, TRUE);
 }
 
-CGearSw *func_ov036_02198908(FieldSubscreen *subscreen) {
+CGearSw *FieldSubscreen_GetCGear(FieldSubscreen *subscreen) {
     if (subscreen->screenId == FLD_SUBSCREEN_ID_DEFAULT || subscreen->screenId == FLD_SUBSCREEN_ID_CGEAR_WELCOME) {
         return subscreen->work;
     }

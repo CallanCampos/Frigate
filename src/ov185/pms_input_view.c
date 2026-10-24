@@ -385,7 +385,7 @@ static void PMSIView_CmdQuit(TCB *tcb, void *data) {
 
     switch (cwk->seq) {
     case 0:
-        GFL_WipeSet(0, 0, 0, 0, 5, 1, HEAPID_PMS_INPUT);
+        GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, 0, 5, 1, HEAPID_PMS_INPUT);
         cwk->seq++;
         break;
     case 1:
@@ -563,7 +563,7 @@ static void PMSIView_CmdFadeIn(TCB *tcb, void *data) {
 
     switch (cwk->seq) {
     case 0:
-        GFL_WipeSet(0, 1, 1, 0, 5, 1, HEAPID_PMS_INPUT);
+        GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_IN, WIPE_TYPE_FADE_IN, 0, 5, 1, HEAPID_PMS_INPUT);
         cwk->seq++;
         break;
     case 1:

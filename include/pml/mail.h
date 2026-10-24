@@ -7,7 +7,7 @@
 #include "system/pms_data.h"
 
 // Names from swan
-typedef struct MailData {
+struct MailData {
     u32 trainerId;
     u8 trainerGender;
     u8 region;
@@ -18,7 +18,7 @@ typedef struct MailData {
     // The word of the mail's stamp, 0xffff when there is none
     u16 stampWord;
     PMSData message[3];
-} MailData;
+};
 
 #define MAIL_COUNT 20
 #define MAIL_DESIGN_COUNT 12
@@ -47,7 +47,7 @@ void MailData_SetStampWord(MailData *mail, u16 value);
 PMSData *MailData_GetMessage(MailData *mail, u8 index);
 void MailData_SetMessage(MailData *mail, const PMSData *src, u8 index);
 // The save block of mail, and its size
-void *MailBox_GetFromGameData(GameData *gameData);
+MailData *MailBox_GetFromGameData(GameData *gameData);
 u32 MailBox_GetSize(void);
 // Empties all of the mails of a mailbox
 void MailBox_Clear(MailData *mails);

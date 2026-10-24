@@ -79,7 +79,7 @@ GameEvent *EventFieldEffect_CreateAlderFly(GameSystem *gsys, Fld3DCi *ci, u32 ac
 // The event of an effect: init makes the effect's event, and render draws it
 GameEvent *EncEffCapture_CreateFlashEvent(GameSystem *gsys, const VecFx32 *pos, GameEvent *(*init)(GameSystem *gsys),
                                           void (*render)(EncEffGrid *grid));
-void EncEffCapture_Draw(void *data);
+void EncEffCapture_Draw(EncEffCaptureWork *work);
 GameEvent *EncEffGrid_CreateEvent(GameSystem *gsys, const EncEffGridParam *param, u32 mode);
 // Clears the screen to the grid's color, then draws the effect with overlay 148
 void EncEffGrid_ClearAndDraw(EncEff *effect);

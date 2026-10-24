@@ -72,7 +72,7 @@ static BOOL isLocked(WMBssDesc *bss);
 static WifiConfig *_localcfg;
 static WihDwcWork *_localWork;
 
-void *WihDwc_Create(int num, HeapID heapId) {
+WihDwcWork *WihDwc_Create(int num, HeapID heapId) {
     WihDwcWork *work;
 
     GFL_ASSERT(num <= _ALLBEACON_MAX);

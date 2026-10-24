@@ -38,7 +38,7 @@ FieldG3DMapper *FieldG3DMapper_Create(HeapID heapId, u16 season) {
     mapper->chunkIdCount = 0;
     mapper->chunkDatIds = NULL;
     mapper->chunkSpan = 0;
-    mapper->unk08 = 0;
+    mapper->layerHeight = 0;
     mapper->locatorGenType = FIELD_G3D_MAPPER_LOCATORS_AROUND;
     mapper->chunkArcId = 0xffffffff;
     mapper->phase1MaxChunkCount = 0;
@@ -46,7 +46,7 @@ FieldG3DMapper *FieldG3DMapper_Create(HeapID heapId, u16 season) {
     mapper->propSystem = FieldPropSystem_Create(mapper->heapId, mapper, season);
     mapper->wfbc = func_ov036_0218adac(heapId);
     mapper->resortMap = func_ov036_021c8954(heapId);
-    mapper->heightEx = func_ov036_021ba5d0(0x10, heapId);
+    mapper->heightEx = HeightEx_CreateTable(0x10, heapId);
     return mapper;
 }
 
@@ -157,11 +157,11 @@ void FieldG3DMapper_CallAllLoaderUpdate(FieldG3DMapper *mapper) {
         for (i = 0; i < mapper->chunkCapacity; i++) {
             FieldChunk_CallLoaderUpdate(mapper->chunkHandles[i].chunk);
         }
-        func_ov036_02185578(mapper);
+        FieldG3DMapper_StampFrame(mapper);
     }
 }
 
-void FieldG3D_RenderFieldmap(FieldG3DMapper *mapper, void *camera, u32 pass) {
+void FieldG3D_RenderFieldmap(FieldG3DMapper *mapper, G3DCamera *camera, u32 pass) {
     VecFx32 savedPos;
     VecFx32 pos;
     u32 index;
@@ -201,7 +201,7 @@ void FieldG3DMapper_CreateMap(FieldG3DMapper *mapper, const FieldG3DMapperConfig
     FieldChunk *chunk;
 
     mapper->chunkSpan = config->chunkSpan;
-    mapper->unk08 = config->unk04;
+    mapper->layerHeight = config->layerHeight;
     mapper->chunkArcId = config->chunkArcId;
     mapper->matrixWidth = config->matrixWidth;
     mapper->matrixHeight = config->matrixHeight;
@@ -352,7 +352,7 @@ void FieldG3DMapper_GenLocators0(FieldG3DMapper *mapper, const VecFx32 *playerPo
     u32 layer;
     fx32 y;
     fx32 layerHeight;
-    u32 span;
+    fx32 span;
     u32 chunkId;
     s32 i;
     FieldChunkLocator *locator;
@@ -363,9 +363,9 @@ void FieldG3DMapper_GenLocators0(FieldG3DMapper *mapper, const VecFx32 *playerPo
         layers++;
     }
     span = mapper->chunkSpan;
-    halfSpan = FX_Div(span, FX32_CONST(2));
+    halfSpan = FX_Div(mapper->chunkSpan, FX32_CONST(2));
     chunkId = 0;
-    layerHeight = mapper->unk08;
+    layerHeight = mapper->layerHeight;
     for (layer = 0; layer < layers; layer++) {
         for (i = 0; i < matrixSize; i++, chunkId++) {
             s32 x = i % mapper->matrixWidth;
@@ -388,7 +388,7 @@ void FieldG3DMapper_GenLocators1(FieldG3DMapper *mapper, const VecFx32 *playerPo
     s32 z;
     s32 height;
     s32 width;
-    u32 span;
+    fx32 span;
     fx32 halfSpan;
     s32 startX;
     s32 startZ;
@@ -397,16 +397,16 @@ void FieldG3DMapper_GenLocators1(FieldG3DMapper *mapper, const VecFx32 *playerPo
     width = mapper->matrixWidth;
     height = mapper->matrixHeight;
     span = mapper->chunkSpan;
-    halfSpan = FX_Div(span, FX32_CONST(2));
+    halfSpan = FX_Div(mapper->chunkSpan, FX32_CONST(2));
     if (mapper->chunkLoadDiameterX % 2 == 0) {
-        startX = func_ov036_02184fb8(mapper->chunkLoadDiameterX, span, playerPos->x);
+        startX = FieldG3DMapper_GetWindowStartEven(mapper->chunkLoadDiameterX, span, playerPos->x);
     } else {
-        startX = func_ov036_02184ff4(mapper->chunkLoadDiameterX, span, playerPos->x);
+        startX = FieldG3DMapper_GetWindowStartOdd(mapper->chunkLoadDiameterX, span, playerPos->x);
     }
     if (mapper->chunkLoadDiameterZ % 2 == 0) {
-        startZ = func_ov036_02184fb8(mapper->chunkLoadDiameterZ, span, playerPos->z);
+        startZ = FieldG3DMapper_GetWindowStartEven(mapper->chunkLoadDiameterZ, span, playerPos->z);
     } else {
-        startZ = func_ov036_02184ff4(mapper->chunkLoadDiameterZ, span, playerPos->z);
+        startZ = FieldG3DMapper_GetWindowStartOdd(mapper->chunkLoadDiameterZ, span, playerPos->z);
     }
     for (z = 0; z < mapper->chunkLoadDiameterZ; z++) {
         s32 chunkZ = startZ + z;
@@ -439,7 +439,7 @@ void FieldG3DMapper_GenLocators2(FieldG3DMapper *mapper, const VecFx32 *playerPo
     s32 chunkZ;
     s32 height;
     u16 width;
-    u32 span;
+    fx32 span;
     fx32 halfSpan;
     s32 wrappedZ;
     s32 wrappedX;
@@ -449,7 +449,7 @@ void FieldG3DMapper_GenLocators2(FieldG3DMapper *mapper, const VecFx32 *playerPo
     width = mapper->matrixWidth;
     height = mapper->matrixHeight;
     span = mapper->chunkSpan;
-    halfSpan = FX_Div(span, FX32_CONST(2));
+    halfSpan = FX_Div(mapper->chunkSpan, FX32_CONST(2));
     startX = FieldG3DMapper_CalcChunkLoadAreaStart(mapper->chunkLoadDiameterX, span, playerPos->x);
     startZ = FieldG3DMapper_CalcChunkLoadAreaStart(mapper->chunkLoadDiameterZ, span, playerPos->z);
     for (z = 0; z < mapper->chunkLoadDiameterZ; z++) {
@@ -479,7 +479,7 @@ void FieldG3DMapper_GenLocators3(FieldG3DMapper *mapper, const VecFx32 *playerPo
     fx32 layerHeight;
     fx32 halfSpan;
     u16 width;
-    u32 span;
+    fx32 span;
     s32 adjacentLayerOffset;
     u32 chunkId;
     u32 locatorIndex;
@@ -489,10 +489,10 @@ void FieldG3DMapper_GenLocators3(FieldG3DMapper *mapper, const VecFx32 *playerPo
     int chunkZ;
 
     width = mapper->matrixWidth;
-    chunksPerLayer = mapper->matrixWidth * mapper->matrixHeight;
+    chunksPerLayer = width * mapper->matrixHeight;
     span = mapper->chunkSpan;
-    halfSpan = FX_Div(span, FX32_CONST(2));
-    layerHeight = mapper->unk08;
+    halfSpan = FX_Div(mapper->chunkSpan, FX32_CONST(2));
+    layerHeight = mapper->layerHeight;
     layer = FX_Div(playerPos->y, layerHeight) >> FX32_SHIFT;
     if (playerPos->y - layer * layerHeight > layerHeight / 2) {
         adjacentLayerOffset = 1;
@@ -556,7 +556,7 @@ BOOL FieldG3DMapper_UpdateChunkLoad(FieldG3DMapper *mapper, FieldChunkLocator *l
                 FieldChunkLocator_Disable(&mapper->chunkHandles[i].locator);
                 FieldChunk_SetActive(mapper->chunkHandles[i].chunk, FALSE);
                 FieldPropSystem_UnlinkChunk(mapper->propSystem, mapper->chunkHandles[i].chunk);
-                func_ov036_021853d4(&mapper->chunkHandles[i].context);
+                FieldG3DMapper_ReleaseGroundAnimeSlot(&mapper->chunkHandles[i].context);
                 FieldChunk_Disable(mapper->chunkHandles[i].chunk);
             }
         }
@@ -587,7 +587,7 @@ BOOL FieldG3DMapper_UpdateChunkLoad(FieldG3DMapper *mapper, FieldChunkLocator *l
     return result;
 }
 
-s32 func_ov036_02184fb8(u32 diameter, fx32 chunkSpan, fx32 pos) {
+s32 FieldG3DMapper_GetWindowStartEven(u32 diameter, fx32 chunkSpan, fx32 pos) {
     s32 start = -(diameter / 2 - 1);
     s32 chunk = pos / chunkSpan;
 
@@ -599,7 +599,7 @@ s32 func_ov036_02184fb8(u32 diameter, fx32 chunkSpan, fx32 pos) {
     return start;
 }
 
-s32 func_ov036_02184ff4(u32 diameter, fx32 chunkSpan, fx32 pos) {
+s32 FieldG3DMapper_GetWindowStartOdd(u32 diameter, fx32 chunkSpan, fx32 pos) {
     s32 start = -(diameter / 2);
 
     start += pos / chunkSpan;
@@ -681,7 +681,7 @@ BOOL FieldG3DMapper_GetTerrainAll(FieldG3DMapper *mapper, const VecFx32 *positio
         }
     }
     output->layerCount = count;
-    func_ov036_0218543c(mapper, position, output);
+    FieldG3DMapper_AppendHeightExHits(mapper, position, output);
     if (output->layerCount != 0) {
         return TRUE;
     }
@@ -761,11 +761,11 @@ BOOL FieldG3DMapper_IsPosOutOfBounds(FieldG3DMapper *mapper, const VecFx32 *posi
     return TRUE;
 }
 
-void func_ov036_021852d0(FieldG3DMapper *mapper, const VecFx32 *position) {
+void FieldG3DMapper_SetOriginOffset(FieldG3DMapper *mapper, const VecFx32 *position) {
     mapper->chunkBasePos = *position;
 }
 
-void func_ov036_021852e0(FieldG3DMapper *mapper, VecFx32 *out) {
+void FieldG3DMapper_GetOriginOffset(FieldG3DMapper *mapper, VecFx32 *out) {
     *out = mapper->chunkBasePos;
 }
 
@@ -782,7 +782,7 @@ ResortMapCreateWork *func_ov036_02185304(FieldG3DMapper *mapper) {
     return mapper->resortMap;
 }
 
-FieldTerrainAnimator *FieldG3DMapper_CreateTerrainAnimator(u16 chunkCapacity, void *mapTextures,
+FieldTerrainAnimator *FieldG3DMapper_CreateTerrainAnimator(u16 chunkCapacity, G3DResource *mapTextures,
                                                            const FieldTerrainAnmInfo *anmInfo, u32 heapId) {
     GND_ANIME_WK.chunkCapacity = chunkCapacity;
     if (anmInfo->srtAnimeId == 0xffffffff) {
@@ -840,7 +840,7 @@ void FieldChunkContext_FreeAnimator(FieldChunkContext *context) {
     }
 }
 
-void func_ov036_021853d4(FieldChunkContext *context) {
+void FieldG3DMapper_ReleaseGroundAnimeSlot(FieldChunkContext *context) {
     if (context->srtAnimatorState != NULL) {
         FieldTerrainSRTAnimatorChunkState_ClearUsedFlag(context->srtAnimatorState);
     }
@@ -886,11 +886,12 @@ void FieldChunkLocator_GetPos(FieldChunkLocator *locator, VecFx32 *position) {
 }
 
 // Adds the terrain layers of the map's height areas at the position
-void func_ov036_0218543c(const FieldG3DMapper *mapper, const VecFx32 *position, FieldG3DMapperTerrain *output) {
+void FieldG3DMapper_AppendHeightExHits(const FieldG3DMapper *mapper, const VecFx32 *position,
+                                       FieldG3DMapperTerrain *output) {
     VecFx16 normal = { 0, FX16_ONE, 0 };
     s32 added = 0;
     u32 count = output->layerCount;
-    s32 areaCount = func_ov036_021ba684(mapper->heightEx);
+    s32 areaCount = HeightEx_GetAreaCount(mapper->heightEx);
     s32 z;
     s32 x;
     s32 i;
@@ -899,7 +900,7 @@ void func_ov036_0218543c(const FieldG3DMapper *mapper, const VecFx32 *position, 
     z = position->z / FX32_CONST(16);
 
     for (i = 0; i < areaCount; i++) {
-        if (func_ov036_021ba688(x, z, mapper->heightEx, i)) {
+        if (HeightEx_IsPointInAreaAt(x, z, mapper->heightEx, i)) {
             s32 index;
             MapTerrainBuf *layer;
 
@@ -910,8 +911,8 @@ void func_ov036_0218543c(const FieldG3DMapper *mapper, const VecFx32 *position, 
             }
             layer = &output->layers[index];
             layer->normal = normal;
-            layer->tileType = func_ov036_021ba6b0(i, mapper->heightEx);
-            layer->height = func_ov036_021ba6a4(i, mapper->heightEx);
+            layer->tileType = HeightEx_GetAreaAttr(i, mapper->heightEx);
+            layer->height = HeightEx_GetAreaHeight(i, mapper->heightEx);
         }
     }
     output->layerCount += (u16)added;
@@ -926,7 +927,7 @@ void FieldG3DMapper_ResetDrawCalcState(FieldG3DMapper *mapper) {
     mapper->lastDrawnCount = mapper->nowDrawnCount;
     mapper->nowDrawnCount = 0;
     mapper->chunkSizeCapPassingChunkEndIdx = 0;
-    elapsed = OS_GetVBlankCount() - mapper->unk50;
+    elapsed = OS_GetVBlankCount() - mapper->loaderUpdateVBlank;
     if (elapsed >= 2) {
         mapper->nowDrawScanline = 0xff;
         mapper->maxConcurrentDrawChunkByteSize = 0;
@@ -941,8 +942,8 @@ void FieldG3DMapper_ResetDrawCalcState(FieldG3DMapper *mapper) {
     mapper->maxConcurrentDrawChunkByteSize = 0xf000 - ((vcount - 10) << 10);
 }
 
-void func_ov036_02185578(FieldG3DMapper *mapper) {
-    mapper->unk50 = OS_GetVBlankCount();
+void FieldG3DMapper_StampFrame(FieldG3DMapper *mapper) {
+    mapper->loaderUpdateVBlank = OS_GetVBlankCount();
 }
 
 // Inserts the chunk in the drawing order by the room its data leaves

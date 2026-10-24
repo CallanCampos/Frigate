@@ -304,7 +304,7 @@ void CtvtCall_Enter(CommTvtWork *sys, CtvtCall *call) {
     call->state = CALL_STATE_FADE_IN;
     call->waitTimer = 0;
     call->photoTimer = 0;
-    GFL_BGSysMoveBGReq(6, 3, 0);
+    GFL_BGSysMoveBGReq(6, BG_MOVE_SET_Y, 0);
 
     if ((param->unk4 == 2 || param->unk4 == 3) && CommTvt_CanExchangePhotos(sys) == FALSE) {
         ClActor_SetSequence(call->returnButton, 15);
@@ -348,10 +348,10 @@ void CtvtCall_Leave(CommTvtWork *sys, CtvtCall *call) {
     }
     GFL_BGSysClearScr(6);
     GFL_BGSysLoadScr(6);
-    GFL_BGSysMoveBGReq(6, 3, 0);
+    GFL_BGSysMoveBGReq(6, BG_MOVE_SET_Y, 0);
     GFL_BGSysClearScr(4);
     GFL_BGSysLoadScr(4);
-    GFL_BGSysMoveBGReq(4, 3, 0);
+    GFL_BGSysMoveBGReq(4, BG_MOVE_SET_Y, 0);
 }
 
 int CtvtCall_Main(CommTvtWork *sys, CtvtCall *call) {
@@ -361,9 +361,9 @@ int CtvtCall_Main(CommTvtWork *sys, CtvtCall *call) {
     switch (call->state) {
     case CALL_STATE_FADE_IN:
         if (func_ov257_021aaa74(sys) == TRUE) {
-            GFL_WipeSet(0, 1, 1, 0, 6, 1, heapId);
+            GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_IN, WIPE_TYPE_FADE_IN, 0, 6, 1, heapId);
         } else {
-            GFL_WipeSet(4, 1, 1, 0, 6, 1, heapId);
+            GFL_WipeSet(WIPE_MODE_SUB, WIPE_TYPE_FADE_IN, WIPE_TYPE_FADE_IN, 0, 6, 1, heapId);
         }
         call->state = CALL_STATE_WAIT_FADE_IN;
         break;
@@ -381,13 +381,13 @@ int CtvtCall_Main(CommTvtWork *sys, CtvtCall *call) {
         }
         break;
     case CALL_STATE_FADE_OUT:
-        GFL_WipeSet(4, 0, 0, 0, 6, 1, heapId);
+        GFL_WipeSet(WIPE_MODE_SUB, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, 0, 6, 1, heapId);
         func_ov257_021aaa78(sys, FALSE);
         call->state = CALL_STATE_WAIT_FADE_OUT;
         break;
     case CALL_STATE_LEAVE:
         if (CtvtCamera_IsSoundDone(sys, CommTvt_GetCamera(sys)) == TRUE) {
-            GFL_WipeSet(0, 0, 0, 0, 6, 1, heapId);
+            GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, 0, 6, 1, heapId);
             func_ov257_021aaa78(sys, FALSE);
             call->state = CALL_STATE_WAIT_FADE_OUT;
         }
@@ -508,7 +508,7 @@ int CtvtCall_Main(CommTvtWork *sys, CtvtCall *call) {
                 call->joinTarget = CTVT_CALL_NONE;
                 BmpWin_ClearFrame(call->infoWin, 1);
                 CtvtCall_ClearWindow(call->infoWin);
-                func_ov257_021aaeb0(sys);
+                CommTvt_DeleteTimeIcon(sys);
                 ClActor_SetSequence(call->returnButton, 1);
                 call->menuMode = CALL_MENU_RESET;
             }
@@ -530,7 +530,7 @@ int CtvtCall_Main(CommTvtWork *sys, CtvtCall *call) {
         if (call->photoTimer > 0) {
             call->photoTimer--;
         }
-        if (GFL_HIDIsTouchPressed() == TRUE || func_ov257_021aab34(sys) == TRUE || call->photoTimer <= 0) {
+        if (GFL_HIDIsTouchPressed() == TRUE || CommTvt_GetEndRequested(sys) == TRUE || call->photoTimer <= 0) {
             GFL_SndSEPlay(SEQ_SE_DECIDE1);
             BmpWin_ClearFrame(call->msgWin, 1);
             CtvtCall_ClearWindow(call->msgWin);
@@ -579,7 +579,7 @@ int CtvtCall_Main(CommTvtWork *sys, CtvtCall *call) {
             for (i = 0; i < CTVT_CALL_ROWS; i++) {
                 CtvtCall_UpdateRowActors(sys, call, &call->rows[i], i);
             }
-            GFL_BGSysMoveBGReq(6, 3, call->scrollY);
+            GFL_BGSysMoveBGReq(6, BG_MOVE_SET_Y, call->scrollY);
             for (i = 0; i < CTVT_CALL_INVITES; i++) {
                 if (call->invites[i] != CTVT_CALL_NONE) {
                     inviteCount++;
@@ -623,7 +623,7 @@ int CtvtCall_Main(CommTvtWork *sys, CtvtCall *call) {
         call->infoWinPending = FALSE;
         if (call->showInfo == TRUE) {
             call->showInfo = FALSE;
-            func_ov257_021aae7c(sys, call->infoWin);
+            CommTvt_CreateTimeIcon(sys, call->infoWin);
         }
     }
     if (call->menu != NULL) {
@@ -1182,7 +1182,7 @@ static void CtvtCall_UpdateFoundMessage(CommTvtWork *sys, CtvtCall *call) {
             BmpWin_ClearFrame(call->msgWin, 1);
         } else if (call->prevRowCount == 0 && call->rowCount != 0) {
             CtvtCall_PrintMessage(sys, call, 17);
-            func_ov257_021aaeb0(sys);
+            CommTvt_DeleteTimeIcon(sys);
             BmpWin_ClearFrame(call->infoWin, 1);
             CtvtCall_ClearWindow(call->infoWin);
         }
@@ -1221,5 +1221,5 @@ static void CtvtCall_PrintInfo(CommTvtWork *sys, CtvtCall *call, u32 msgId) {
     BmpWin_DrawFrame(call->infoWin, 2, 0x140, 9);
     call->infoWinPending = TRUE;
     call->showInfo = FALSE;
-    func_ov257_021aaeb0(sys);
+    CommTvt_DeleteTimeIcon(sys);
 }

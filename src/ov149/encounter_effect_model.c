@@ -27,10 +27,10 @@ typedef struct EncounterModelWork {
     BOOL addedTexBank;
     u32 renderMode;
     G3DResource *modelRes;
-    void *screenTex;
+    G3DResource *screenTex;
     G3DResource *animRes;
     G3DModel *model;
-    void *anim;
+    G3DAnimation *anim;
     G3DActor *actor;
     u32 modelId;
     u32 animId;

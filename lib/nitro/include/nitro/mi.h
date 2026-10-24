@@ -20,7 +20,7 @@ typedef enum {
 
 // On a DSi, sets up TwlSDK's shared WRAM manager, which is in the LTD autoload (MIi_InitWramManagerCore). OS_Init calls
 // it
-void func_02078000(void);
+void MI_InitWramManager(void);
 void MI_SetWramBank(MIWram bank);
 // NitroSDK's MI_Init: gives the shared WRAM to the ARM7, sets up the new DMA on a DSi and stops DMA channel 0. OS_Init
 // calls it
@@ -85,6 +85,11 @@ void MIi_DmaFill32(u32 dmaNo, void *dest, u32 data, u32 size, BOOL dmaEnable);
 void MIi_DmaCopy32(u32 dmaNo, const void *src, void *dest, u32 size, BOOL dmaEnable); // swan's dma_copy
 // NitroSDK's MIi_DmaCopy16: the same a halfword at a time
 void MIi_DmaCopy16(u32 dmaNo, const void *src, void *dest, u32 size, BOOL dmaEnable);
+
+// NitroSDK's MI_DmaCopy16: MIi_DmaCopy16, started at once
+static inline void MI_DmaCopy16(u32 dmaNo, const void *src, void *dest, u32 size) {
+    MIi_DmaCopy16(dmaNo, src, dest, size, TRUE);
+}
 // NitroSDK's MIi_DmaFill32Async and MIi_DmaCopy32Async: callback is called when the transfer is done, or at once when
 // size is 0
 // swan's dma_fillEx

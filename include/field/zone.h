@@ -134,19 +134,28 @@ extern const u16 GEAR_STATION_PLATFORM_ZONES[9];
 #define ZONE_RAIL_NONE 0xffffffff
 #define ZONE_CAMERA_NONE 0xffff
 
-// Spawns at a position instead of a warp, warpId is -1
-#define ZONE_SPAWN_CHANGE_TYPE_POSITION 1
-#define ZONE_SPAWN_CHANGE_TYPE_3 3
+// ZoneSpawnInfo's changeType: a spawn at the warp warpId, or at a position with warpId -1. SetupZoneWarpArrival sets
+// the arrival at a warp's destination, or 3 for a warp whose destId is 0x100
+enum {
+    ZONE_SPAWN_CHANGE_TYPE_WARP,
+    ZONE_SPAWN_CHANGE_TYPE_POSITION,
+    ZONE_SPAWN_CHANGE_TYPE_WARP_ARRIVAL,
+    ZONE_SPAWN_CHANGE_TYPE_3,
+};
 
-#define WARP_DIR_UP 1
-#define WARP_DIR_DOWN 2
-#define WARP_DIR_LEFT 3
-#define WARP_DIR_RIGHT 4
+enum {
+    WARP_DIR_UP = 1,
+    WARP_DIR_DOWN,
+    WARP_DIR_LEFT,
+    WARP_DIR_RIGHT,
+};
 
 // With a map replace event set, each version allows its own area
-#define VERSION_AREA_BLACK2 0
-#define VERSION_AREA_WHITE2 1
-#define VERSION_AREA_2 2
+enum {
+    VERSION_AREA_BLACK2,
+    VERSION_AREA_WHITE2,
+    VERSION_AREA_2,
+};
 #ifdef BLACK2
 #define VERSION_AREA_OWN VERSION_AREA_BLACK2
 #else

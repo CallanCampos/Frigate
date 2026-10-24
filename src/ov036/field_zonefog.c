@@ -52,7 +52,7 @@ void FieldFogCtrl_RequestLoad(FieldFogCtrl *ctrl, u32 fileId, u32 staticLightInd
     ctrl->staticLightIndex = staticLightIndex;
 }
 
-u8 func_ov036_021977a4(FieldFogCtrl *ctrl) {
+u8 FieldFogCtrl_IsLoadRequest(FieldFogCtrl *ctrl) {
     return ctrl->loadRequested;
 }
 

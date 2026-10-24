@@ -48,6 +48,7 @@ void Box2Bmp_PrintReleaseMsg(Box2SysWork *syswk, u32 type, u32 index);
 void Box2Bmp_PrintPrompt(Box2SysWork *syswk, u32 type, u32 index);
 void Box2Bmp_PrintPokeMoveMsg(Box2SysWork *syswk, u32 pos, u32 type, u32 index);
 void Box2Bmp_PrintItemMsg(Box2SysWork *syswk, u32 type, u32 index);
+// Tells why a Pokémon can't be moved or picked: type is BOX2_MOVE_ERR_MAIL, _LAST_BATTLER, _EGG or _NOT_SLEEPY
 void Box2Bmp_PrintDenyMsg(Box2SysWork *syswk, u32 type, u32 index);
 void Box2Bmp_PrintTuckIn(Box2SysWork *syswk);
 void Box2Bmp_PrintBattleBoxLocked(Box2SysWork *syswk, u32 a1);

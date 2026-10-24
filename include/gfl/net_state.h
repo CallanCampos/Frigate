@@ -40,7 +40,7 @@ BOOL NetState_IsWifiConnecting(void);
 BOOL NetState_IsWifiReady(void);
 void NetState_EndWifi(void (*callback)(void *work));
 void NetState_StartWifiLogin(void);
-void func_02042410(u8 a0);
+void NetState_SetAutoExit(u8 a0);
 void NetState_SetDisconnectError(int a0);
 BOOL NetState_SetError(u8 a0);
 void NetState_ClearError(void);

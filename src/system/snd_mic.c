@@ -92,7 +92,7 @@ u32 SndMic_StartRecording(void (*callback)(u32 result, u32 *done), u32 *done) {
     return SndMic_StartSampling(&param);
 }
 
-void SndMic_EncodeChatter(void *chatter) {
+void SndMic_EncodeChatter(PerapVoice *chatter) {
     PerapVoice_Encode(chatter, SndMic_GetAlignedBuffer());
 }
 

@@ -46,7 +46,7 @@ NoGridMapper *FieldNoGridMapper_Create(u32 heapId, FieldCamera *camera, FieldSce
 }
 
 void FieldNoGridMapper_Free(NoGridMapper *mapper) {
-    func_ov036_021b3a58(mapper->tilemap);
+    FieldRailTilemap_Delete(mapper->tilemap);
     FieldRailSystem_Free(mapper->railSystem);
     FieldRailLoader_Free(mapper->railLoader);
     GFL_HeapFree(mapper);
@@ -93,7 +93,7 @@ static void FieldNoGridMapper_Reset(NoGridMapper *mapper) {
     FieldRailSystem_Reset(mapper->railSystem);
     FieldRailLoader_Reset(mapper->railLoader);
     ResetSceneAreaLoader(mapper->sceneAreaLoader);
-    func_ov036_021b3ad0(mapper->tilemap);
+    FieldRailTilemap_Release(mapper->tilemap);
 }
 
 BOOL FieldNoGridMapper_HasRailData(NoGridMapper *mapper) {
@@ -104,7 +104,7 @@ BOOL FieldNoGridMapper_HasRailData(NoGridMapper *mapper) {
 }
 
 void FieldNoGridMapper_UpdateCamera(NoGridMapper *mapper) {
-    func_ov036_021b0398(mapper->railSystem);
+    FieldRailSystem_Update(mapper->railSystem);
     if (!mapper->cameraAreaDisabled) {
         FieldRailSystem_UpdateCamera(mapper->railSystem, FALSE);
     }

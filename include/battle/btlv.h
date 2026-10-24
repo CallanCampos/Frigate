@@ -92,8 +92,8 @@ void BtlvScu_HideGaugePair(BtlvScu *scu, u8 pos1, u8 pos2);
 BOOL BtlvScu_ShowGaugePair(BtlvScu *scu, u8 pos1, u8 pos2);
 void BtlvScu_HideGauge(BtlvScu *scu, u8 pos);
 BOOL BtlvScu_ShowGauge(BtlvScu *scu, u8 pos);
-void func_ov167_021d34ec(BtlvScu *scu, u8 viewPos);
-BOOL func_ov167_021d34fc(BtlvScu *scu, u8 viewPos);
+void BtlvScu_StartPosCueEffect(BtlvScu *scu, u8 viewPos);
+BOOL BtlvScu_IsPosCueEffectDone(BtlvScu *scu, u8 viewPos);
 void BtlvScu_StartChangeMon(BtlvScu *scu, u8 pos, u32 arg2);
 BOOL BtlvScu_WaitChangeMon(BtlvScu *scu);
 void BtlvScu_StartTransform(BtlvScu *scu, u32 arg1, u32 index, BOOL flag);
@@ -137,7 +137,7 @@ BOOL BtlvCore_ProcTargetSelect(BtlvCore *core, s32 *seq, void *work);
 void BtlvCore_SetMainProc(BtlvCore *core, BtlvMainProc proc);
 void BtlvCore_ClearMainProc(BtlvCore *core);
 BOOL BtlvCore_RunMainProc(BtlvCore *core);
-void BtlvCore_StartCommandSelect(BtlvCore *core, BattleMon *mon, u32 arg2, void *arg3);
+void BtlvCore_StartCommandSelect(BtlvCore *core, BattleMon *mon, u32 arg2, BattleAction *arg3);
 void BtlvCore_StopCommandSelect(BtlvCore *core);
 // What the player picked on the command screen, BTLV_COMMAND_* (NONE while it waits)
 enum {
@@ -149,13 +149,13 @@ enum {
 };
 
 u32 BtlvCore_WaitCommandSelect(BtlvCore *core);
-void BtlvCore_StartMoveSelect(BtlvCore *core, BattleMon *mon, void *arg2);
-void BtlvCore_StartRotationSelect(BtlvCore *core, BtlvSelectTargetParam *param, void *arg2);
+void BtlvCore_StartMoveSelect(BtlvCore *core, BattleMon *mon, BattleAction *arg2);
+void BtlvCore_StartRotationSelect(BtlvCore *core, BtlvSelectTargetParam *param, BattleAction *arg2);
 void BtlvCore_ResumeMoveSelect(BtlvCore *core);
 BOOL BtlvCore_ProcWaitSelect(BtlvCore *core, s32 *seq, void *work);
 void BtlvCore_StopMoveSelect(BtlvCore *core);
 BOOL BtlvCore_WaitMoveSelect(BtlvCore *core);
-void BtlvCore_StartTargetSelect(BtlvCore *core, BattleMon *mon, void *arg2);
+void BtlvCore_StartTargetSelect(BtlvCore *core, BattleMon *mon, BattleAction *arg2);
 // Whether the target screen is done: a target chosen, or back to the moves (NONE while it waits)
 enum {
     BTLV_TARGET_SELECT_NONE,

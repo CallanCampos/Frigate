@@ -4,7 +4,7 @@
 #include "nitro/os.h"
 #include "twl/mi.h"
 
-void func_02078000(void) {
+void MI_InitWramManager(void) {
     if (OS_IsRunOnTwl()) {
         MIi_InitWramManagerCore();
     }

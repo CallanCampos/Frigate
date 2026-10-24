@@ -223,8 +223,8 @@ BOOL TrainerCard_Init(GameProc *proc, u32 *state, void *param, void *work) {
     wk->pmsDraw =
         PMSDraw_Create(wk->obj.unit, CLACT_VRAM_SUB, wk->printQueue, wk->font, 8, 1, HEAPID_TRAINER_CARD_SCREEN);
     TrCardBmp_Stub(wk, wk->win[TRCARD_WIN_MONEY], 1, wk->colonBuf);
-    if (wk->param->appParam == 2) {
-        wk->param->appParam = 0;
+    if (wk->param->appParam == TRCARD_START_BACK) {
+        wk->param->appParam = TRCARD_START_DEFAULT;
         wk->side = 1;
     } else {
         wk->side = 0;
@@ -252,7 +252,7 @@ BOOL TrainerCard_Init(GameProc *proc, u32 *state, void *param, void *work) {
     wk->vblankTask = GFL_VBlankTCBAdd(TrainerCard_VBlank, wk, 1);
     wk->tcbl = GFL_TCBExMgrCreate(wk->heapId, wk->heapId, 3, 0);
     GFL_NetSetIconScreen(TRUE, wk->heapId);
-    GFL_WipeSet(1, 3, 3, 0, 6, 1, wk->heapId);
+    GFL_WipeSet(WIPE_MODE_MAIN_FIRST, 3, 3, 0, 6, 1, wk->heapId);
     return TRUE;
 }
 
@@ -299,13 +299,13 @@ BOOL TrainerCard_Main(GameProc *proc, u32 *state, void *param, void *work) {
         break;
     case TRCARD_SEQ_RETURN:
         if (!ClActor_IsAnimActive(wk->obj.actors[TRCARD_ACTOR_RETURN])) {
-            GFL_WipeSet(2, 4, 4, 0, 6, 1, wk->heapId);
+            GFL_WipeSet(WIPE_MODE_SUB_FIRST, 4, 4, 0, 6, 1, wk->heapId);
             *state = TRCARD_SEQ_FADE_OUT;
         }
         break;
     case TRCARD_SEQ_EXIT:
         if (!ClActor_IsAnimActive(wk->obj.actors[TRCARD_ACTOR_EXIT])) {
-            GFL_WipeSet(2, 4, 4, 0, 6, 1, wk->heapId);
+            GFL_WipeSet(WIPE_MODE_SUB_FIRST, 4, 4, 0, 6, 1, wk->heapId);
             *state = TRCARD_SEQ_FADE_OUT;
         }
         break;
@@ -325,20 +325,20 @@ BOOL TrainerCard_Main(GameProc *proc, u32 *state, void *param, void *work) {
         }
         break;
     case TRCARD_SEQ_GREETING:
-        GFL_WipeSet(2, 4, 4, 0, 6, 1, wk->heapId);
+        GFL_WipeSet(WIPE_MODE_SUB_FIRST, 4, 4, 0, 6, 1, wk->heapId);
         wk->param->next = 1;
         *state = TRCARD_SEQ_FADE_OUT;
         break;
     case TRCARD_SEQ_BADGES:
         if (!ClActor_IsAnimActive(wk->obj.actors[TRCARD_ACTOR_BADGES])) {
-            GFL_WipeSet(2, 4, 4, 0, 6, 1, wk->heapId);
+            GFL_WipeSet(WIPE_MODE_SUB_FIRST, 4, 4, 0, 6, 1, wk->heapId);
             wk->param->next = 2;
             *state = TRCARD_SEQ_FADE_OUT;
         }
         break;
     case TRCARD_SEQ_MEDALS:
         if (!ClActor_IsAnimActive(wk->obj.actors[TRCARD_ACTOR_RANK])) {
-            GFL_WipeSet(2, 4, 4, 0, 6, 1, wk->heapId);
+            GFL_WipeSet(WIPE_MODE_SUB_FIRST, 4, 4, 0, 6, 1, wk->heapId);
             wk->param->next = 4;
             *state = TRCARD_SEQ_FADE_OUT;
         }
@@ -476,7 +476,7 @@ static void TrainerCard_SetupBG(void) {
     {
         BGSetup setup = { 0, 0, 0x800, 0, 1, 1, 15, 4, 0x10000, 0, 1, 0, 0 };
 
-        GFL_BGSysCreateBG(7, &setup, 2);
+        GFL_BGSysCreateBG(7, &setup, BGMODE_EXTENDED);
         GFL_BGSysClearBG(7);
         GFL_BGSysSetBGEnabled(7, TRUE);
     }
@@ -486,31 +486,31 @@ static void TrainerCard_SetupBG(void) {
             { 0, 0, 0x800, 0, 1, 0, 13, 1, 0x6000, 0, 3, 0, 0 },
         };
 
-        GFL_BGSysCreateBG(4, &setups[0], 0);
+        GFL_BGSysCreateBG(4, &setups[0], BGMODE_TEXT);
         GFL_BGSysClearBG(4);
         GFL_BGSysSetBGEnabled(4, TRUE);
-        GFL_BGSysCreateBG(5, &setups[1], 0);
+        GFL_BGSysCreateBG(5, &setups[1], BGMODE_TEXT);
         GFL_BGSysClearBG(5);
         GFL_BGSysSetBGEnabled(5, TRUE);
     }
     {
         BGSetup setup = { 0, 0, 0x800, 0, 1, 1, 14, 2, 0x8000, 0, 2, 0, 0 };
 
-        GFL_BGSysCreateBG(6, &setup, 2);
+        GFL_BGSysCreateBG(6, &setup, BGMODE_EXTENDED);
         GFL_BGSysClearBG(6);
         GFL_BGSysSetBGEnabled(6, TRUE);
     }
     {
         BGSetup setup = { 0, 0, 0x800, 0, 1, 0, 28, 0, 0x8000, 0, 2, 0, 0 };
 
-        GFL_BGSysCreateBG(2, &setup, 0);
+        GFL_BGSysCreateBG(2, &setup, BGMODE_TEXT);
         GFL_BGSysClearBG(2);
         GFL_BGSysSetBGEnabled(2, FALSE);
     }
     {
         BGSetup setup = { 0, 0, 0x800, 0, 1, 0, 29, 4, 0x8000, 0, 3, 0, 0 };
 
-        GFL_BGSysCreateBG(3, &setup, 0);
+        GFL_BGSysCreateBG(3, &setup, BGMODE_TEXT);
         GFL_BGSysClearBG(3);
         GFL_BGSysSetBGEnabled(3, TRUE);
     }

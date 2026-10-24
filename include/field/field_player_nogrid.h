@@ -9,19 +9,19 @@
 #include "nitro/fx.h"
 #include "struct_decls.h"
 
-FieldPlayerNoGrid *func_ov036_0219cea0(FieldPlayerCore *core, HeapID heapId);
-void func_ov036_0219cf40(FieldPlayerNoGrid *nogrid);
-void func_ov036_0219cf48(FieldPlayerNoGrid *nogrid, const RailPosition *pos);
-void func_ov036_0219cf84(FieldPlayerNoGrid *nogrid);
+FieldPlayerNoGrid *FieldPlayerRail_Create(FieldPlayerCore *core, HeapID heapId);
+void FieldPlayerRail_Delete(FieldPlayerNoGrid *nogrid);
+void FieldPlayerRail_AttachMmdl(FieldPlayerNoGrid *nogrid, const RailPosition *pos);
+void FieldPlayerRail_ClearRailWork(FieldPlayerNoGrid *nogrid);
 void FieldPlayerRail_UpdateMovement(FieldPlayerNoGrid *nogrid, u32 pressedKeys, u32 heldKeys);
-BOOL func_ov036_0219d008(FieldPlayerNoGrid *nogrid);
-BOOL func_ov036_0219d018(FieldPlayerNoGrid *nogrid);
+BOOL FieldPlayerRail_IsBlocked(FieldPlayerNoGrid *nogrid);
+BOOL FieldPlayerRail_IsForcedMove(FieldPlayerNoGrid *nogrid);
 void FieldPlayerRail_SetRailPos(FieldPlayerNoGrid *nogrid, const RailPosition *pos);
 // swan's name, though it takes the rail player
 void FieldPlayerCore_GetRailPos(FieldPlayerNoGrid *nogrid, RailPosition *pos);
-void func_ov036_0219d044(FieldPlayerNoGrid *nogrid, u16 dir, RailPosition *pos);
+void FieldPlayerRail_GetRailLocationByDir(FieldPlayerNoGrid *nogrid, u16 dir, RailPosition *pos);
 void FieldPlayerRail_GetWorldPos(FieldPlayerNoGrid *nogrid, VecFx32 *pos);
-RailUnit *func_ov036_0219d05c(FieldPlayerNoGrid *nogrid);
-void func_ov036_0219d060(FieldPlayerNoGrid *nogrid);
+RailUnit *FieldPlayerRail_GetRailWork(FieldPlayerNoGrid *nogrid);
+void FieldPlayerRail_EndBlockedWalk(FieldPlayerNoGrid *nogrid);
 
 #endif // POKEBW2_FIELD_FIELD_PLAYER_NOGRID_H

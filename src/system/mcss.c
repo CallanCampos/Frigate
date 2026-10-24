@@ -815,7 +815,7 @@ s16 MCSS_GetOffsetY(MCSS *mcss) {
     return mcss->bin->offsetY;
 }
 
-u8 func_0201ae00(MCSS *mcss) {
+u8 MCSSSys_GetStopCellFlags(MCSS *mcss) {
     return mcss->binTail->unk1;
 }
 
@@ -1271,136 +1271,161 @@ static void MCSS_RemovePaletteTask(TCB *tcb) {
 // Makes a mosaic of a sprite's characters: fills each block of the mosaic's size in each quad with the first color
 // found in it
 static void MCSS_MakeMosaic(MCSS *mcss, MCSSLoad *load) {
-    if (mcss->imageProxy.attr.fmt == GX_TEXFMT_PLTT16) {
-        u32 i;
-        int texWidth = pow(2, mcss->imageProxy.attr.sizeS + 2);
-        u8 *chars = load->chars->pRawData;
+    int texWidth;
+    u8 *chars;
+    u32 i;
+    int s;
+    int t;
+    int width;
+    int height;
+    int size;
+    int color;
+    int found;
+    int x;
+    int y;
+    int blockY;
+    int blockX;
+    int s2;
+    int t2;
+    int width2;
+    int height2;
+    int blockY2;
+    int blockX2;
+    int blockWidth;
+    int blockHeight;
+    int k;
+    int j;
+    int pixel;
+    int column;
+    int nibble;
+    int blockTop;
+    int blockTop2;
+    int searchRow;
+    int blockLeft;
+    int fillRow;
+    int fillRow2;
+    int searchRow2;
+    int blockLeft2;
 
-        for (i = 0; i < mcss->bin->count; i++) {
-            {
-                int s = mcss->bin->cells[i].quad.s >> FX32_SHIFT;
-                int t = mcss->bin->cells[i].quad.t >> FX32_SHIFT;
-                int width = mcss->bin->cells[i].quad.width >> FX32_SHIFT;
-                int height = mcss->bin->cells[i].quad.height >> FX32_SHIFT;
-                int size = mcss->mosaic + 1;
-                u8 color;
-                int x;
-                int y;
-                int blockY;
-                int blockX;
+    if (mcss->imageProxy.attr.fmt != GX_TEXFMT_PLTT16) {
+        return;
+    }
+    texWidth = pow(2, mcss->imageProxy.attr.sizeS + 2);
+    chars = load->chars->pRawData;
+    for (i = 0; i < mcss->bin->count; i++) {
+        s = mcss->bin->cells[i].quad.s >> FX32_SHIFT;
+        t = mcss->bin->cells[i].quad.t >> FX32_SHIFT;
+        width = mcss->bin->cells[i].quad.width >> FX32_SHIFT;
+        height = mcss->bin->cells[i].quad.height >> FX32_SHIFT;
+        size = mcss->mosaic + 1;
+        for (blockY = 0, y = 0; y < height; blockY++, y += size) {
+            for (blockX = 0, x = 0; x < width; blockX++, x += size) {
+                int colorHi;
 
-                blockY = 0;
-                for (y = 0; y < height; y += size) {
-                    blockX = 0;
-                    for (x = 0; x < width; x += size) {
-                        int blockWidth = x + size > width ? width - size * blockX : size;
-                        int blockHeight = y + size > height ? height - size * blockY : size;
-                        int found = 0;
-                        int j;
-                        int k;
-
+                blockWidth = x + size > width ? width - size * blockX : size;
+                blockHeight = y + size > height ? height - size * blockY : size;
+                found = 0;
+                for (k = 0; k < blockHeight; k++) {
+                    for (j = 0; j < blockWidth; j++) {
+                        column = s + x + j;
+                        searchRow = t + y + k;
+                        pixel = column / 2 + searchRow * texWidth;
                         // BUG: The pixel's half of the byte is taken from the block's column, not the image's, which
                         // differ where a quad starts at an odd pixel
-                        for (k = 0; k < blockHeight; k++) {
-                            for (j = 0; j < blockWidth; j++) {
-                                int pixel = (j + (s + x)) / 2 + texWidth * (k + (t + y));
-                                int nibble;
-
-                                if (j & 1) {
-                                    nibble = (chars[pixel] & 0xf0) >> 4;
-                                } else {
-                                    nibble = chars[pixel] & 0x0f;
-                                }
-                                if (nibble != 0) {
-                                    found = nibble;
-                                    break;
-                                }
-                            }
-                            if (found != 0) {
-                                break;
-                            }
+#ifdef BUGFIX
+                        if (column & 1) {
+#else
+                        if (j & 1) {
+#endif
+                            nibble = (chars[pixel] & 0xf0) >> 4;
+                        } else {
+                            nibble = chars[pixel] & 0x0f;
                         }
-                        color = found;
-                        for (k = 0; k < blockHeight; k++) {
-                            for (j = 0; j < blockWidth; j++) {
-                                int column = s + x + j;
-                                int pixel = column / 2 + (t + y + k) * texWidth;
-
-                                if (pixel < MCSS_TEX_SIZE) {
-                                    if (column & 1) {
-                                        chars[pixel] = (chars[pixel] & 0x0f) | (color << 4);
-                                    } else {
-                                        chars[pixel] = (chars[pixel] & 0xf0) | color;
-                                    }
-                                }
-                            }
+                        if (nibble != 0) {
+                            found = nibble;
+                            break;
                         }
-                        blockX++;
                     }
-                    blockY++;
+                    if (found != 0) {
+                        break;
+                    }
+                }
+                color = (u8)found;
+                colorHi = color << 4;
+                for (k = 0; k < blockHeight; k++) {
+                    for (j = 0; j < blockWidth; j++) {
+                        blockLeft = s + x;
+                        column = blockLeft + j;
+                        blockTop = t + y;
+                        fillRow = blockTop + k;
+                        pixel = column / 2 + fillRow * texWidth;
+                        if (pixel < MCSS_TEX_SIZE) {
+                            if (column & 1) {
+                                chars[pixel] = (chars[pixel] & 0x0f) | colorHi;
+                            } else {
+                                chars[pixel] = (chars[pixel] & 0xf0) | color;
+                            }
+                        }
+                    }
                 }
             }
-            if (mcss->bin->cells[i].quad2.width != 0) {
-                int s = mcss->bin->cells[i].quad2.s >> FX32_SHIFT;
-                int t = mcss->bin->cells[i].quad2.t >> FX32_SHIFT;
-                int width = mcss->bin->cells[i].quad2.width >> FX32_SHIFT;
-                int height = (mcss->bin->cells[i].quad2.height >> FX32_SHIFT) * 2;
-                int size = mcss->mosaic + 1;
-                u8 color;
-                int x;
-                int y;
-                int blockY;
-                int blockX;
+        }
+        width2 = mcss->bin->cells[i].quad2.width;
+        if (width2 != 0) {
+            s2 = mcss->bin->cells[i].quad2.s >> FX32_SHIFT;
+            t2 = mcss->bin->cells[i].quad2.t >> FX32_SHIFT;
+            width2 >>= FX32_SHIFT;
+            height2 = (mcss->bin->cells[i].quad2.height >> FX32_SHIFT) * 2;
+            for (blockY2 = 0, y = 0; y < height2; blockY2++, y += size) {
+                for (blockX2 = 0, x = 0; x < width2; blockX2++, x += size) {
+                    int colorHi;
 
-                blockY = 0;
-                for (y = 0; y < height; y += size) {
-                    blockX = 0;
-                    for (x = 0; x < width; x += size) {
-                        int blockWidth = x + size > width ? width - size * blockX : size;
-                        int blockHeight = y + size > height ? height - size * blockY : size;
-                        int found = 0;
-                        int j;
-                        int k;
-
-                        // BUG: The pixel's half of the byte is taken from the block's column, not the image's, which
-                        // differ where a quad starts at an odd pixel
-                        for (k = 0; k < blockHeight; k++) {
-                            for (j = 0; j < blockWidth; j++) {
-                                int pixel = (j + (s + x)) / 2 + texWidth * (k + (t + y));
-                                int nibble;
-
-                                if (j & 1) {
-                                    nibble = (chars[pixel] & 0xf0) >> 4;
-                                } else {
-                                    nibble = chars[pixel] & 0x0f;
-                                }
-                                if (nibble != 0) {
-                                    found = nibble;
-                                    break;
-                                }
+                    blockWidth = x + size > width2 ? width2 - size * blockX2 : size;
+                    blockHeight = y + size > height2 ? height2 - size * blockY2 : size;
+                    found = 0;
+                    for (k = 0; k < blockHeight; k++) {
+                        for (j = 0; j < blockWidth; j++) {
+                            column = s2 + x + j;
+                            searchRow2 = t2 + y + k;
+                            pixel = column / 2 + searchRow2 * texWidth;
+                            // BUG: The pixel's half of the byte is taken from the block's column, not the image's,
+                            // which differ where a quad starts at an odd pixel
+#ifdef BUGFIX
+                            if (column & 1) {
+#else
+                            if (j & 1) {
+#endif
+                                nibble = (chars[pixel] & 0xf0) >> 4;
+                            } else {
+                                nibble = chars[pixel] & 0x0f;
                             }
-                            if (found != 0) {
+                            if (nibble != 0) {
+                                found = nibble;
                                 break;
                             }
                         }
-                        color = found;
-                        for (k = 0; k < blockHeight; k++) {
-                            for (j = 0; j < blockWidth; j++) {
-                                int column = s + x + j;
-                                int pixel = column / 2 + (t + y + k) * texWidth;
-
-                                if (pixel < MCSS_TEX_SIZE) {
-                                    if (column & 1) {
-                                        chars[pixel] = (chars[pixel] & 0x0f) | (color << 4);
-                                    } else {
-                                        chars[pixel] = (chars[pixel] & 0xf0) | color;
-                                    }
+                        if (found != 0) {
+                            break;
+                        }
+                    }
+                    color = (u8)found;
+                    colorHi = color << 4;
+                    for (k = 0; k < blockHeight; k++) {
+                        for (j = 0; j < blockWidth; j++) {
+                            blockLeft2 = s2 + x;
+                            column = blockLeft2 + j;
+                            blockTop2 = t2 + y;
+                            fillRow2 = blockTop2 + k;
+                            pixel = column / 2 + fillRow2 * texWidth;
+                            if (pixel < MCSS_TEX_SIZE) {
+                                if (column & 1) {
+                                    chars[pixel] = (chars[pixel] & 0x0f) | colorHi;
+                                } else {
+                                    chars[pixel] = (chars[pixel] & 0xf0) | color;
                                 }
                             }
                         }
-                        blockX++;
                     }
-                    blockY++;
                 }
             }
         }

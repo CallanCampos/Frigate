@@ -56,7 +56,7 @@ void GFL_NetInit(const GFLNetInitData *pNetInit, void (*callback)(void *work), v
     pNet->rejectNegotiated = TRUE;
     pNet->pDevTable = NetDefine_LoadDevice(pNetInit->bNetType);
     GFL_ASSERT(pNet->pDevTable);
-    if (pNetInit->bNetType == 4) {
+    if (pNetInit->bNetType == GFL_NET_TYPE_IRC_WIRELESS) {
         pNetInit = NetIw_Start(pNetInit, work);
     }
     MI_CpuCopy8(pNetInit, &pNet->aNetInit, sizeof(GFLNetInitData));
@@ -67,8 +67,8 @@ void GFL_NetInit(const GFLNetInitData *pNetInit, void (*callback)(void *work), v
         pNet->pDevTable->prepare(pNetInit->parentHeapId, 0);
         GFL_HeapCreateChild(pNetInit->parentHeapId, pNetInit->wifiHeapId | HEAPID_TAIL_BIT, pNetInit->wifiHeapSize);
         break;
-    case 3:
-    case 4:
+    case GFL_NET_TYPE_IRC:
+    case GFL_NET_TYPE_IRC_WIRELESS:
         GFL_ASSERT(pNetInit->maxSendSize <= GFL_NET_IRC_SEND_MAX);
         if (sNet.parentHeapId != 0) {
             GFL_HeapCreateChild(sNet.parentHeapId, pNetInit->ircHeapId, 0x1b00);
@@ -76,8 +76,8 @@ void GFL_NetInit(const GFLNetInitData *pNetInit, void (*callback)(void *work), v
             GFL_HeapCreateChild(pNetInit->parentHeapId, pNetInit->ircHeapId, 0x1b00);
         }
         break;
-    case 0:
-    case 5:
+    case GFL_NET_TYPE_WIRELESS:
+    case GFL_NET_TYPE_WIRELESS_LISTEN:
         break;
     default:
         GFL_ASSERT(0);
@@ -88,7 +88,7 @@ void GFL_NetInit(const GFLNetInitData *pNetInit, void (*callback)(void *work), v
     NetHandle_InitAll(pNet);
     NetCommand_Init(pNetInit->gameCommandBase << 8, pNetInit->commandTable, pNetInit->commandNum, pNet->devWork,
                     pNetInit->heapId);
-    if (pNetInit->bNetType != 3 && pNetInit->bNetType != 4) {
+    if (pNetInit->bNetType != GFL_NET_TYPE_IRC && pNetInit->bNetType != GFL_NET_TYPE_IRC_WIRELESS) {
         BOOL isWifi = FALSE;
 
         if (pNetInit->bNetType == GFL_NET_TYPE_WIFI || pNetInit->bNetType == GFL_NET_TYPE_WIFI_LOBBY) {
@@ -137,12 +137,12 @@ static void GFL_NetFinishExit(void *work) {
     case GFL_NET_TYPE_WIFI_GTS:
         GFL_HeapDelete(wifiHeapId);
         break;
-    case 3:
-    case 4:
+    case GFL_NET_TYPE_IRC:
+    case GFL_NET_TYPE_IRC_WIRELESS:
         GFL_HeapDelete(ircHeapId);
         break;
-    case 0:
-    case 5:
+    case GFL_NET_TYPE_WIRELESS:
+    case GFL_NET_TYPE_WIRELESS_LISTEN:
         break;
     default:
         GFL_ASSERT(0);
@@ -239,8 +239,8 @@ void GFL_NetStartServer(void) {
     case GFL_NET_TYPE_WIFI_LOBBY:
         NetState_ConnectWifiAny();
         break;
-    case 0:
-    case 5:
+    case GFL_NET_TYPE_WIRELESS:
+    case GFL_NET_TYPE_WIRELESS_LISTEN:
         NetState_StartParent(pNet->aNetInit.heapId);
         break;
     }
@@ -263,8 +263,8 @@ void GFL_NetIwGetCollectedMac(u8 *mac, int index) {
     NetIw_GetCollectedMac(mac, index);
 }
 
-void GFL_NetIwSetPeerFilter(void *a0) {
-    NetIw_SetPeerFilter(a0);
+void GFL_NetIwSetPeerFilter(GFLNetPeerFilter filter) {
+    NetIw_SetPeerFilter(filter);
 }
 
 void GFL_NetIwFree(void) {
@@ -358,7 +358,8 @@ static void GFL_NetSetInitIconPos(int x, int y) {
 BOOL GFL_NetIsInfrared(void) {
     GFLNetSys *pNet = GFL_NetGetSys();
 
-    if (pNet != NULL && (pNet->aNetInit.bNetType == 3 || pNet->aNetInit.bNetType == 4)) {
+    if (pNet != NULL &&
+        (pNet->aNetInit.bNetType == GFL_NET_TYPE_IRC || pNet->aNetInit.bNetType == GFL_NET_TYPE_IRC_WIRELESS)) {
         return TRUE;
     }
     return FALSE;
@@ -382,7 +383,7 @@ static void GFL_NetRefreshIcon(void) {
         GFL_ASSERT(0);
         return;
     }
-    if (pNet != NULL && ini->bNetType != 3) {
+    if (pNet != NULL && ini->bNetType != GFL_NET_TYPE_IRC) {
         BOOL isWifi = FALSE;
 
         if (pNet->aNetInit.bNetType == GFL_NET_TYPE_WIFI || pNet->aNetInit.bNetType == GFL_NET_TYPE_WIFI_LOBBY) {
@@ -499,7 +500,7 @@ sptr GFL_NetGetFriendData(void) {
     return 0;
 }
 
-u8 func_02042d80(void) {
+u8 GflNet_GetFriendListNum(void) {
     GFLNetSys *pNet = GFL_NetGetSys();
 
     return pNet->aNetInit.unk62;
@@ -554,7 +555,7 @@ void GFL_NetNotifyChildConnect(void) {
     }
 }
 
-void func_02042e30(int a0) {
+void GflNet_CallErrorStateFunc(int a0) {
     GFLNetSys *pNet = GFL_NetGetSys();
 
     if (pNet->aNetInit.unk28 != NULL) {
@@ -581,8 +582,8 @@ GFLNetInitData *GFL_NetGetInitData(void) {
     return NULL;
 }
 
-void func_02042e94(u8 a0) {
-    func_02042410(a0);
+void GflNet_SetAutoExit(u8 a0) {
+    NetState_SetAutoExit(a0);
 }
 
 void GFL_NetSetDisconnectError(BOOL a0) {

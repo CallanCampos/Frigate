@@ -47,6 +47,6 @@ void WorldTradeData_SetExchangeDate(WorldTradeData *data, u32 value) {
     data->exchangeDate = value;
 }
 
-u16 func_0200b4fc(WorldTradeData *data) {
+u16 WorldTradeData_GetReturnBox(WorldTradeData *data) {
     return data->unkEE;
 }

@@ -856,22 +856,28 @@ static void DWCi_Ndi_getUserAgent(char *dest) {
 // The HTTP client's callback of every request: the answer of the server decides what the call ends with. The answer is
 // a status, and with 302 the body carries "returncd=" and the server's code in base64
 static int req_callback(int request, int event, void *arg) {
-    int bodySize;
-    char *statusText;
-    char *body;
-    char code[4];
     NdTask *task;
     int kind;
-    OSMessageQueue *waiter;
-    int serverError = -1;
     DWCNdCallback callback;
+    OSMessageQueue *waiter;
+    int status;
+    int serverError;
     int error;
+    int bodySize;
+    char *statusText;
+    int length;
+    char *body;
+    int start;
+    int size;
+    int pos;
+    char code[4];
+    BOOL isCode;
 
+    serverError = -1;
     task = NHTTPGetUserParam(request);
     kind = task->kind;
     callback = task->callback;
     waiter = task->waiter;
-
     switch (event) {
     case NHTTP_EVENT_ANSWER:
         if (NHTTPGetConnectionError(request) == 8) {
@@ -879,20 +885,12 @@ static int req_callback(int request, int event, void *arg) {
         } else if (NHTTPGetHeaderField(request, "HTTPSTATUSCODE", &statusText) != 3) {
             error = DWC_ND_ERROR_HTTP;
         } else {
-            int result = DWC_ND_ERROR_HTTP;
-            int status = DWCi_Ndi_strToInt(statusText, 3);
-
+            status = DWCi_Ndi_strToInt(statusText, 3);
             if (status == 302) {
-                int length;
-                int pos;
-                int start;
-                int nameLength;
-                int valueLength;
-                BOOL isCode = FALSE;
-
+                isCode = FALSE;
                 length = NHTTPGetBodyBuffer(request, &body, &bodySize);
                 if (length < 0) {
-                    error = result;
+                    error = DWC_ND_ERROR_HTTP;
                 } else {
                     pos = 0;
                     while (pos < length) {
@@ -900,21 +898,20 @@ static int req_callback(int request, int event, void *arg) {
                         while (body[pos] != '=' && pos < length) {
                             pos++;
                         }
-                        nameLength = pos - start;
+                        size = pos - start;
                         pos++;
-                        if (nameLength == 8) {
+                        if (size == 8) {
                             isCode = DWCi_Ndi_strncmp(body + start, "returncd", 8) == 0;
                         }
                         start = pos;
                         while (body[pos] != '&' && body[pos] != '\r' && body[pos] != '\0' && pos < length) {
                             pos++;
                         }
-                        valueLength = pos - start;
+                        size = pos - start;
                         pos++;
                         if (isCode) {
-                            if (valueLength == 4) {
-                                int size = DWCi_Ndi_decodeBASE64(code, body + start, 4);
-
+                            if (size == 4) {
+                                size = DWCi_Ndi_decodeBASE64(code, body + start, size);
                                 code[size] = '\0';
                                 serverError = DWCi_Ndi_strToInt(code, size);
                             }
@@ -932,22 +929,13 @@ static int req_callback(int request, int event, void *arg) {
             } else {
                 switch (kind) {
                 case DWC_ND_CBREASON_GETFILELISTNUM:
-                    if (DWCi_Ndi_response_count(request, task)) {
-                        result = DWC_ND_ERROR_NONE;
-                    }
-                    error = result;
+                    error = DWCi_Ndi_response_count(request, task) ? DWC_ND_ERROR_NONE : DWC_ND_ERROR_HTTP;
                     break;
                 case DWC_ND_CBREASON_GETFILELIST:
-                    if (DWCi_Ndi_response_list(request, task)) {
-                        result = DWC_ND_ERROR_NONE;
-                    }
-                    error = result;
+                    error = DWCi_Ndi_response_list(request, task) ? DWC_ND_ERROR_NONE : DWC_ND_ERROR_HTTP;
                     break;
                 case DWC_ND_CBREASON_GETFILE:
-                    if (DWCi_Ndi_response_contents(request, task)) {
-                        result = DWC_ND_ERROR_NONE;
-                    }
-                    error = result;
+                    error = DWCi_Ndi_response_contents(request, task) ? DWC_ND_ERROR_NONE : DWC_ND_ERROR_HTTP;
                     break;
                 }
             }
@@ -961,15 +949,15 @@ static int req_callback(int request, int event, void *arg) {
             DWCi_Ndi_kickThread(waiter);
         }
         break;
-    case NHTTP_EVENT_AFTER_BUFFER_FULL:
-        break;
     case NHTTP_EVENT_BUFFER_FULL:
-        ((NdBufferFullEvent *)arg)->grow = FALSE;
         error = DWC_ND_ERROR_BUFFULL;
+        ((NdBufferFullEvent *)arg)->grow = FALSE;
         SetWifiError(error, serverError);
         if (callback != NULL) {
             callback(kind, error, serverError);
         }
+        break;
+    case NHTTP_EVENT_AFTER_BUFFER_FULL:
         break;
     }
     return 0;

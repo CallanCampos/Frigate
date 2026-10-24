@@ -77,8 +77,8 @@ typedef struct {
     FieldCamera *camera;
     u32 state;
     CameraShake shake;
-    VecFx32 *bind;
-    void *refBind;
+    const VecFx32 *bind;
+    const VecFx32 *refBind;
 } CameraShakeTaskWork;
 
 static void MarshalRoom_ShowSavedState(MarshalRoomWork *work);

@@ -36,6 +36,7 @@ src/ov181/mb_parent_dataconv_sys.c:
     .bss        start:0x021a480c end:0x021a4810
 
 lib/nitro/src/mb/mb_comm.c:
+    complete
     .text       start:0x021a096c end:0x021a16d8
     .data       start:0x021a4768 end:0x021a4770
     .bss        start:0x021a4810 end:0x021a4814

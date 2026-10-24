@@ -16,12 +16,12 @@ void TimeSigSave_Init(TimeSigSave *timeSig) {
     MI_CpuFill8(timeSig, 0, sizeof(TimeSigSave));
 }
 
-void *getTimeSigBlkAddress(SaveControl *save) {
+TimeSigSave *getTimeSigBlkAddress(SaveControl *save) {
     return SaveControl_GetBlockPtr(save, SAVE_BLOCK_TIMESIG);
 }
 
-void *TimeSigSave_GetSignature(void *timeSig) {
-    return timeSig;
+u32 *TimeSigSave_GetSignature(TimeSigSave *timeSig) {
+    return timeSig->signature;
 }
 
 BOOL TimeSigSave_HasSignature(TimeSigSave *timeSig) {

@@ -312,7 +312,7 @@ void func_0202be00(GameCommSys *comm) {
     comm->unk8 = 0;
 }
 
-u32 func_0202be08(GameCommSys *comm) {
+u32 GameCommSys_GetCounter(GameCommSys *comm) {
     return comm->unk8;
 }
 

@@ -11,10 +11,12 @@
 // pml/personal.h
 
 // What the check is made for, and so which of the evolution methods it looks at
-#define EVO_CHECK_LEVEL_UP 0
-#define EVO_CHECK_TRADE 1
-#define EVO_CHECK_ITEM_UNUSED 2
-#define EVO_CHECK_ITEM 3
+enum {
+    EVO_CHECK_LEVEL_UP,
+    EVO_CHECK_TRADE,
+    EVO_CHECK_ITEM_UNUSED,
+    EVO_CHECK_ITEM,
+};
 
 // The evolutions of a species, and one of them: a method, EVO_METHOD_*, its parameter and the species it gives
 #define EVOLUTION_COUNT 7
@@ -26,9 +28,11 @@ typedef struct {
 } Evolution;
 
 // The fields of an evolution, for getEvolutionInfoParam
-#define EVOLUTION_FIELD_METHOD 0
-#define EVOLUTION_FIELD_PARAM 1
-#define EVOLUTION_FIELD_SPECIES 2
+enum {
+    EVOLUTION_FIELD_METHOD,
+    EVOLUTION_FIELD_PARAM,
+    EVOLUTION_FIELD_SPECIES,
+};
 
 // The species the Pokémon evolves into, or 0. a3 depends on the mode: the zone for EVO_CHECK_LEVEL_UP, the partner
 // PartyPkm for EVO_CHECK_TRADE, the item for the two item modes. method, if not NULL, gets the evolution's method.

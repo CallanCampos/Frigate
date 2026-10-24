@@ -113,7 +113,7 @@ typedef struct {
     s16 interval;
     u32 next;
     MsgData *msgData;
-    void *msgBGSys;
+    FieldMsgBG *msgBGSys;
     CasteliaRushBalloon balloons[BALLOON_COUNT];
 } CasteliaRushBalloons;
 
@@ -158,17 +158,17 @@ static BOOL Passerby_FindActorAhead(CasteliaRushPasserby *passerby, MMSys *actor
                                     u16 minDist);
 static BOOL Passerby_IsActorAhead(const CasteliaRushPasserby *passerby, FieldActor *actor, u16 maxDist, u16 minDist);
 static BOOL IsPosAhead(s16 x, s16 z, s16 otherX, s16 otherZ, u16 maxDist, u16 minDist, u16 dir);
-static void CasteliaRushBalloons_Init(CasteliaRushBalloons *balloons, void *msgBGSys, const CasteliaRushConfig *config,
-                                      u16 dayPeriod, HeapID heapId);
+static void CasteliaRushBalloons_Init(CasteliaRushBalloons *balloons, FieldMsgBG *msgBGSys,
+                                      const CasteliaRushConfig *config, u16 dayPeriod, HeapID heapId);
 static void CasteliaRushBalloons_Free(CasteliaRushBalloons *balloons);
 static void CasteliaRushBalloons_Clear(CasteliaRushBalloons *balloons);
 static void CasteliaRushBalloons_Update(CasteliaRushBalloons *balloons, const CasteliaRushConfig *config, Field *field);
 static void CasteliaRushBalloon_Init(CasteliaRushBalloon *balloon, u16 index);
-static void CasteliaRushBalloon_Show(CasteliaRushBalloon *balloon, void *msgBGSys, MsgData *msgData, u32 msgBase,
+static void CasteliaRushBalloon_Show(CasteliaRushBalloon *balloon, FieldMsgBG *msgBGSys, MsgData *msgData, u32 msgBase,
                                      u32 msgCount);
-static void CasteliaRushBalloon_Update(CasteliaRushBalloon *balloon, void *msgBGSys);
+static void CasteliaRushBalloon_Update(CasteliaRushBalloon *balloon, FieldMsgBG *msgBGSys);
 static void CasteliaRushBalloon_Reset(CasteliaRushBalloon *balloon);
-static void CasteliaRushBalloon_Hide(CasteliaRushBalloon *balloon, void *msgBGSys);
+static void CasteliaRushBalloon_Hide(CasteliaRushBalloon *balloon, FieldMsgBG *msgBGSys);
 
 static const PasserbyStartFunc sPasserbyStartFuncs[] = { Passerby_StartWalker, Passerby_StartTalker };
 
@@ -189,7 +189,7 @@ static void CasteliaRush_Init(FieldAsyncProc *proc, Field *field, void *data) {
     CasteliaRush *rush = data;
     HeapID heapId;
     int i;
-    void *msgBGSys = Field_GetMsgBGSys(field);
+    FieldMsgBG *msgBGSys = Field_GetMsgBGSys(field);
     GameData *gameData = GSYS_GetGameData(Field_GetGameSystem(field));
     u16 zoneId;
     u16 dayPeriod;
@@ -332,7 +332,7 @@ static void Passerby_Init(CasteliaRushPasserby *passerby, MMSys *actorSys, u16 z
     passerby->dir = 0;
     passerby->walkAcmd = CasteliaRushConfig_GetWalkAcmd(config);
     SetActorHidden(passerby->actor, TRUE);
-    func_ov012_021677bc(passerby->actor, TRUE);
+    FldAct_SetMoveBitAttrEffectOff(passerby->actor, TRUE);
 
     {
         VecFx32 offset = { 0, 0, 0 };
@@ -371,7 +371,7 @@ static void Passerby_Start(CasteliaRushPasserby *passerby, MMSys *actorSys, Fiel
     passerby->steps = steps;
     passerby->dodging = FALSE;
     passerby->dodgeDir = 0;
-    func_ov012_021677bc(passerby->actor, TRUE);
+    FldAct_SetMoveBitAttrEffectOff(passerby->actor, TRUE);
     passerby->lane = lane;
     sPasserbyStartFuncs[type](passerby);
 }
@@ -685,8 +685,8 @@ static BOOL IsPosAhead(s16 x, s16 z, s16 otherX, s16 otherZ, u16 maxDist, u16 mi
     return FALSE;
 }
 
-static void CasteliaRushBalloons_Init(CasteliaRushBalloons *balloons, void *msgBGSys, const CasteliaRushConfig *config,
-                                      u16 dayPeriod, HeapID heapId) {
+static void CasteliaRushBalloons_Init(CasteliaRushBalloons *balloons, FieldMsgBG *msgBGSys,
+                                      const CasteliaRushConfig *config, u16 dayPeriod, HeapID heapId) {
     int i = 0;
     u32 rand = GFL_RandomLC(0);
 
@@ -752,20 +752,21 @@ static void CasteliaRushBalloon_Init(CasteliaRushBalloon *balloon, u16 index) {
     balloon->timer = 0;
 }
 
-static void CasteliaRushBalloon_Show(CasteliaRushBalloon *balloon, void *msgBGSys, MsgData *msgData, u32 msgBase,
+static void CasteliaRushBalloon_Show(CasteliaRushBalloon *balloon, FieldMsgBG *msgBGSys, MsgData *msgData, u32 msgBase,
                                      u32 msgCount) {
     u32 rand = GFL_RandomLC(0);
 
     balloon->active = TRUE;
     balloon->timer = 0;
-    func_ov036_02188d6c(msgBGSys, msgData, msgBase + rand % msgCount, balloon->index, balloon->x, balloon->y, 8, 2);
+    MsgBGPrinter_AddSubMsgWinMsg(msgBGSys, msgData, msgBase + rand % msgCount, balloon->index, balloon->x, balloon->y,
+                                 8, 2);
 }
 
-static void CasteliaRushBalloon_Update(CasteliaRushBalloon *balloon, void *msgBGSys) {
+static void CasteliaRushBalloon_Update(CasteliaRushBalloon *balloon, FieldMsgBG *msgBGSys) {
     if (balloon->active) {
         balloon->timer++;
         if (balloon->timer >= BALLOON_FRAMES) {
-            func_ov036_02188e90(msgBGSys, balloon->index);
+            MsgBGPrinter_DeleteSubMsgWin(msgBGSys, balloon->index);
             CasteliaRushBalloon_Reset(balloon);
         }
     }
@@ -776,9 +777,9 @@ static void CasteliaRushBalloon_Reset(CasteliaRushBalloon *balloon) {
     balloon->active = FALSE;
 }
 
-static void CasteliaRushBalloon_Hide(CasteliaRushBalloon *balloon, void *msgBGSys) {
+static void CasteliaRushBalloon_Hide(CasteliaRushBalloon *balloon, FieldMsgBG *msgBGSys) {
     if (balloon->active) {
-        func_ov036_02188e90(msgBGSys, balloon->index);
+        MsgBGPrinter_DeleteSubMsgWin(msgBGSys, balloon->index);
         CasteliaRushBalloon_Reset(balloon);
     }
 }

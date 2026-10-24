@@ -59,7 +59,7 @@ typedef struct {
     GameSystem *gsys;
     u32 unk04;
     VecFx32 pos;
-    void *msgWin;
+    ActorMsgWin *msgWin;
     StrBuf *strbuf;
     u16 actorId;
     u8 unk1E[0xca];
@@ -100,7 +100,7 @@ typedef struct {
     GameSystem *gsys;
     u32 unk04;
     VecFx32 pos;
-    void *msgWin;
+    ActorMsgWin *msgWin;
     StrBuf *strbuf;
 } BSubwayLeaderMsgData;
 
@@ -215,7 +215,7 @@ GameEvent *EventBSubwayPokeSelect_Create(BSubwayScrWork *bsw, GameSystem *gsys, 
 
 GameEvent *EventBSubwayBattle_Create(BSubwayScrWork *bsw, GameSystem *gsys, Field *field) {
     BattleRec_Init(HEAPID_GAMEEVENT);
-    bsw->btlSetup = func_ov033_0217c094(bsw, gsys);
+    bsw->btlSetup = BsubwayScr_CreateBtlSetup(bsw, gsys);
     if (bsw->playMode == 3 || bsw->playMode == 8) {
         return EventBSubwayCommBattle_CreateFromScrWork(bsw, gsys, field);
     }
@@ -227,21 +227,21 @@ static GameEventReturnCode EventBSubwayTrainerMsg_Callback(GameEvent *event, u32
 
     switch (*state) {
     case 0:
-        if (!func_ov036_02188884(data->msgWin)) {
+        if (!MsgBGPrinter_TalkWinMain(data->msgWin)) {
             break;
         }
         (*state)++;
         // fallthrough
     case 1:
-        func_ov036_021889c8(data->msgWin);
+        MsgBGPrinter_TalkWinDrawCursor(data->msgWin);
         if (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) {
             GFL_SndSEPlay(SEQ_SE_MESSAGE);
-            func_ov036_021887d4(data->msgWin);
+            MsgBGPrinter_DeleteTalkWin(data->msgWin);
             (*state)++;
         }
         break;
     case 2:
-        if (func_ov036_021887f4(data->msgWin) == TRUE) {
+        if (MsgBGPrinter_WaitTalkWinClose(data->msgWin) == TRUE) {
             GFL_StrBufFree(data->strbuf);
             return GAMEEVENT_DONE;
         }
@@ -253,7 +253,7 @@ static GameEventReturnCode EventBSubwayTrainerMsg_Callback(GameEvent *event, u32
 GameEvent *EventBSubwayTrainerMsg_Create(BSubwayScrWork *bsw, GameSystem *gsys, int index, u16 actorId, u8 winPos) {
     GameEvent *event;
     GameData *gameData;
-    void *msgBGSys;
+    FieldMsgBG *msgBGSys;
     Field *field;
     BSubwayTrainerMsgData *data;
     PMSData *message;
@@ -287,11 +287,11 @@ GameEvent *EventBSubwayTrainerMsg_Create(BSubwayScrWork *bsw, GameSystem *gsys, 
     }
     CopyActorWPos(FindFieldActor(GameData_GetMMSys(gameData), data->actorId), &data->pos);
     camera = Field_GetCameraSystem(field);
-    func_ov036_021a8bec(&data->pos, &offset, FieldCamera_GetG3DCamera(camera), camera, winPos);
+    ActorMsgWin_GetBalloonOffset(&data->pos, &offset, FieldCamera_GetG3DCamera(camera), camera, winPos);
     data->pos.x += offset.x;
     data->pos.y += offset.y;
     data->pos.z += offset.z;
-    func_ov036_021a8c00(winPos, &winX, &winY);
+    ActorMsgWin_GetBalloonTailParams(winPos, &winX, &winY);
     data->msgWin = ActorMsgWin_CheckAndCreate(msgBGSys, winX, &data->pos, data->strbuf, 0, winY);
     return event;
 }
@@ -432,7 +432,7 @@ static GameEventReturnCode EventBSubwayCommBattle_Callback(GameEvent *event, u32
         (*state)++;
         break;
     case 2:
-        func_ov036_021a2364(Field_GetEncountSystem(field));
+        EffectEncount_ConsumeSpot(Field_GetEncountSystem(field));
         EncEff_StartEvent(Field_GetEncEff(data->field), event, 9);
         (*state)++;
         break;
@@ -480,7 +480,7 @@ static GameEvent *EventBSubwayCommBattle_Create(GameSystem *gsys, Field *field, 
 }
 
 static GameEvent *EventBSubwayCommBattle_CreateFromScrWork(BSubwayScrWork *bsw, GameSystem *gsys, Field *field) {
-    return EventBSubwayCommBattle_Create(gsys, field, bsw->btlSetup, func_ov033_0217c110(bsw));
+    return EventBSubwayCommBattle_Create(gsys, field, bsw->btlSetup, BsubwayScr_GetNameinEncounterWork(bsw));
 }
 
 static GameEventReturnCode EventBSubwayLeaderMsg_Callback(GameEvent *event, u32 *state, void *work) {
@@ -488,18 +488,18 @@ static GameEventReturnCode EventBSubwayLeaderMsg_Callback(GameEvent *event, u32 
 
     switch (*state) {
     case 0:
-        if (func_ov036_02188884(data->msgWin) == TRUE) {
+        if (MsgBGPrinter_TalkWinMain(data->msgWin) == TRUE) {
             (*state)++;
         }
         break;
     case 1:
         if (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) {
-            func_ov036_021887d4(data->msgWin);
+            MsgBGPrinter_DeleteTalkWin(data->msgWin);
             (*state)++;
         }
         break;
     case 2:
-        if (func_ov036_021887f4(data->msgWin) == TRUE) {
+        if (MsgBGPrinter_WaitTalkWinClose(data->msgWin) == TRUE) {
             GFL_StrBufFree(data->strbuf);
             return GAMEEVENT_DONE;
         }
@@ -511,7 +511,7 @@ static GameEventReturnCode EventBSubwayLeaderMsg_Callback(GameEvent *event, u32 
 GameEvent *EventBSubwayLeaderMsg_Create(GameSystem *gsys, u16 index, u16 actorId) {
     GameData *gameData = GSYS_GetGameData(gsys);
     Field *field = GSYS_GetField(gsys);
-    void *msgBGSys = Field_GetMsgBGSys(field);
+    FieldMsgBG *msgBGSys = Field_GetMsgBGSys(field);
     GameEvent *event = GameEvent_Create(gsys, NULL, EventBSubwayLeaderMsg_Callback, sizeof(BSubwayLeaderMsgData));
     BSubwayLeaderMsgData *data = GameEvent_GetData(event);
     MMSys *actorSystem;
@@ -529,7 +529,7 @@ GameEvent *EventBSubwayLeaderMsg_Create(GameSystem *gsys, u16 index, u16 actorId
     CopyActorWPos(FindFieldActor(actorSystem, actorId), &data->pos);
     winPos = ActorMsgWin_CalcWinPosAuto(player, &data->pos);
     camera = Field_GetCameraSystem(field);
-    func_ov036_021a8bec(&data->pos, &offset, FieldCamera_GetG3DCamera(camera), camera, winPos);
+    ActorMsgWin_GetBalloonOffset(&data->pos, &offset, FieldCamera_GetG3DCamera(camera), camera, winPos);
     data->pos.x += offset.x;
     data->pos.y += offset.y;
     data->pos.z += offset.z;
@@ -537,7 +537,7 @@ GameEvent *EventBSubwayLeaderMsg_Create(GameSystem *gsys, u16 index, u16 actorId
         SaveControl_GetBlockPtr(GameData_GetSaveControl(gameData), SAVE_BLOCK_BSUBWAY_3A), HEAPID_GAMEEVENT);
     data->strbuf = PMSData_ToString(&leaders[index].message, HEAPID_GAMEEVENT);
     GFL_HeapFree(leaders);
-    func_ov036_021a8c00(winPos, &winX, &winY);
+    ActorMsgWin_GetBalloonTailParams(winPos, &winX, &winY);
     data->msgWin = ActorMsgWin_CheckAndCreate(msgBGSys, winX, &data->pos, data->strbuf, 0, winY);
     return event;
 }

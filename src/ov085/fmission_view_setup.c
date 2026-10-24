@@ -193,7 +193,7 @@ GameEvent *FMissionViewSetup_CheckEvent(FMissionView *view, BOOL enabled) {
     }
     switch (view->eventRequest) {
     case FMISSION_VIEW_EVENT_MENU_END_COMM:
-        func_ov012_02153654(view->commSys);
+        Intrude_SetCompleted(view->commSys);
         // fallthrough
     case FMISSION_VIEW_EVENT_MENU:
     case FMISSION_VIEW_EVENT_MENU_3:
@@ -408,7 +408,7 @@ static void FMissionViewSetup_InitSystems(FMissionView *view) {
     view->printQueue = PrintQueue_CreateDefault(view->heapId);
     PrintQueue_SetQueueAlways(view->printQueue, TRUE);
     PrintQueue_SetTimeLimit(view->printQueue, 500);
-    view->font = func_ov036_0218799c(Field_GetMsgBGSys(view->field));
+    view->font = MsgBGPrinter_GetFont(Field_GetMsgBGSys(view->field));
     GFL_TextRndResetColorIndexLUT();
     view->wordSet = GFL_WordSetSystemCreateDefault(view->heapId);
     view->msgData = GFL_MsgSysLoadData(TRUE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_FMISSION_VIEW_SETUP, view->heapId);

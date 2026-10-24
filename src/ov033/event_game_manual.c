@@ -6,7 +6,7 @@
 #include "system/game_event.h"
 #include "system/game_system.h"
 
-GameEvent *func_ov033_02179dd4(GameSystem *gsys, u16 *result) {
+GameEvent *EventGameManual_Create(GameSystem *gsys, u16 *result) {
     GameData *gameData;
     Field *field;
     GameEvent *event;
@@ -15,7 +15,7 @@ GameEvent *func_ov033_02179dd4(GameSystem *gsys, u16 *result) {
 
     gameData = GSYS_GetGameData(gsys);
     field = GSYS_GetField(gsys);
-    event = GameEvent_Create(gsys, NULL, func_ov033_02179e28, sizeof(GameManualEventWork));
+    event = GameEvent_Create(gsys, NULL, EventGameManual_Main, sizeof(GameManualEventWork));
     work = GameEvent_GetData(event);
     work->gsys = gsys;
     work->field = field;
@@ -26,7 +26,7 @@ GameEvent *func_ov033_02179dd4(GameSystem *gsys, u16 *result) {
     return event;
 }
 
-GameEventReturnCode func_ov033_02179e28(GameEvent *event, u32 *state, void *data) {
+GameEventReturnCode EventGameManual_Main(GameEvent *event, u32 *state, void *data) {
     GameManualEventWork *work;
     GameEvent *next;
 
@@ -39,14 +39,14 @@ GameEventReturnCode func_ov033_02179e28(GameEvent *event, u32 *state, void *data
         (*state)++;
         break;
     case 1:
-        func_ov033_02179e80(work);
+        EventGameManual_SetResult(work);
         GFL_HeapFree(work->subwork);
         return GAMEEVENT_DONE;
     }
     return GAMEEVENT_CONTINUE;
 }
 
-void func_ov033_02179e80(GameManualEventWork *work) {
+void EventGameManual_SetResult(GameManualEventWork *work) {
     if (work->subwork->result == 0) {
         *work->result = 0;
     } else {

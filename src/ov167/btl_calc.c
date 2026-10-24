@@ -6,6 +6,7 @@
 #include "battle/btl_setup.h"
 #include "battle/btl_tables.h"
 #include "battle/trainer_data.h"
+#include "constants/battle.h"
 #include "constants/pokemon.h"
 #include "gfl/heap.h"
 #include "pml/item.h"
@@ -270,13 +271,13 @@ u32 MultiplyValueByRatio(u32 value, u32 ratio) {
 
 // Function names from swan.
 u32 DivideMaxHp(BattleMon *mon, u32 divisor) {
-    return GetBattleMonStat(mon, 14) / divisor;
+    return GetBattleMonStat(mon, BATTLEMON_MAX_HP) / divisor;
 }
 
 u32 DivideMaxHPZeroCheck(BattleMon *mon, u32 divisor) {
     u32 result;
 
-    result = GetBattleMonStat(mon, 14) / divisor;
+    result = GetBattleMonStat(mon, BATTLEMON_MAX_HP) / divisor;
     if (result == 0) {
         result = 1;
     }
@@ -333,7 +334,7 @@ u32 BtlCalc_GetWeatherDamage(BattleMon *mon, u32 weather) {
     default:
         return 0;
     }
-    damage = (s32)GetBattleMonStat(mon, 14) / 16;
+    damage = (s32)GetBattleMonStat(mon, BATTLEMON_MAX_HP) / 16;
     if (damage == 0) {
         damage = 1;
     }
@@ -491,7 +492,7 @@ BOOL BtlCalc_IsMoveInList(const u16 *moves, u32 count, u16 move) {
 
 u32 CalcBaseExpGain(BattleMon *mon, s32 levelDiff) {
     u32 species = GetBattleMonSpecies(mon);
-    u16 form = GetBattleMonStat(mon, 0x13);
+    u16 form = GetBattleMonStat(mon, BATTLEMON_FORM);
     u16 level;
     u32 baseExp;
 
@@ -500,8 +501,8 @@ u32 CalcBaseExpGain(BattleMon *mon, s32 levelDiff) {
     } else {
         levelDiff = 0;
     }
-    level = (u16)levelDiff + GetBattleMonStat(mon, 0xf);
-    baseExp = PML_PersonalGetParamSingle(species, form, 9);
+    level = (u16)levelDiff + GetBattleMonStat(mon, BATTLEMON_LEVEL);
+    baseExp = PML_PersonalGetParamSingle(species, form, PERSONAL_BASE_EXP);
     return baseExp * level / 5;
 }
 
@@ -580,7 +581,7 @@ u32 BtlCalc_GetTrainerPrizeMoney(BtlSetupTrainer *trainer, PokeParty *party) {
 
         if (count != 0) {
             PartyPkm *pkm = PokeParty_GetPkm(party, count - 1);
-            u32 baseMoney = TrainerData_GetParam(trainer->trainerId, 10);
+            u32 baseMoney = TrainerData_GetParam(trainer->trainerId, TRAINER_PARAM_MONEY);
 
             return PokeParty_GetParam(pkm, PKM_PARAM_LEVEL, NULL) * baseMoney * 4;
         }
@@ -595,7 +596,7 @@ u32 BtlCalc_GetLostMoney(u32 index, BattleParty *party) {
     u32 i;
 
     for (i = 0; i < count; i++) {
-        u32 level = GetBattleMonStat(GetBattleMonFromParty(party, i), 0xf);
+        u32 level = GetBattleMonStat(GetBattleMonFromParty(party, i), BATTLEMON_LEVEL);
 
         if (level > maxLevel) {
             maxLevel = level;
@@ -651,7 +652,7 @@ u32 BtlCalc_GetCurseTarget(BattleMon *mon) {
 u8 DecideMoveTargetAuto(BtlMainModule *mainModule, BtlPokeCon *pokeCon, BattleMon *mon, u16 move) {
     u32 battleStyle = BtlSetup_GetBattleStyle(mainModule);
     u8 pos = MonIDToBattlePos(mainModule, pokeCon, GetMonID(mon));
-    u32 target = PML_MoveGetParam(move, 0x1b);
+    u32 target = PML_MoveGetParam(move, MOVE_PARAM_TARGET);
     u8 monIds[6];
     u8 count;
 

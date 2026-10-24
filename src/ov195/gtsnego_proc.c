@@ -61,8 +61,10 @@ enum {
 #endif
 
 // The search's kinds
-#define GTSNEGO_MODE_ANYONE 0
-#define GTSNEGO_MODE_RENDEZVOUS 1
+enum {
+    GTSNEGO_MODE_ANYONE,
+    GTSNEGO_MODE_RENDEZVOUS,
+};
 
 // The level range a rendezvous with anyone of the Pal Pad searches with
 #define GTSNEGO_LEVEL_RENDEZVOUS 4
@@ -641,11 +643,11 @@ static void GtsNego_StateStartExchange(GtsNegoWork *wk) {
         }
         if (NetHandle_CountNegotiated() == 2) {
             GtsNegoParam *param = wk->param;
-            void *phrases = CGearPhrases_GetBlock(wk->save);
+            CGearSave *cgear = CGearPhrases_GetBlock(wk->save);
 
             param->unk4[0].unk0 = wk->level;
             param->unk4[0].unk4 = wk->myKind;
-            CGearPhrases_Get(phrases, 0, &wk->send.phrase);
+            CGearPhrases_Get(cgear, 0, &wk->send.phrase);
             wk->send.tradeCount = PalPadFriendList_GetTradeCount(GameData_GetPalPadFriendList(wk->gameData));
             NetHandle_SendTimingPair(NetHandle_GetOwn(), 2, GTSNEGO_TIMING_NO);
             GtsNego_ChangeState(wk, GtsNego_StateSendRequest, 898);
@@ -703,7 +705,7 @@ static void GtsNego_StateSearching(GtsNegoWork *wk) {
         if (NetState_GetWifiStatus() != 1) {
             return;
         }
-        func_02042e94(1);
+        GflNet_SetAutoExit(1);
         GFL_NetSetDisconnectError(TRUE);
     }
     GtsNegoMessage_ClearWindow(wk->msg);
@@ -1496,7 +1498,7 @@ static void GtsNego_StateMainMenu(GtsNegoWork *wk) {
 // The partner was lost: back to the main menu, behind the error screen
 static void GtsNego_HandleDisconnect(GtsNegoWork *wk) {
     if (wk->param->result != GTSNEGO_RESULT_EXIT) {
-        func_02042e94(0);
+        GflNet_SetAutoExit(0);
         GFL_NetSetDisconnectError(FALSE);
         GtsNegoMessage_FreePMSDraw(wk->msg);
         GtsNegoDisp_SetDim(wk->disp, FALSE, GTSNEGO_DIM_ALL);

@@ -27,11 +27,11 @@ static const u8 sIconPalettes[] = {
     0, 0, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1,
 };
 
-BOOL func_0202d7d8(void) {
+BOOL BeaconStatus_IsLocked(void) {
     return 0;
 }
 
-void func_0202d7dc(void) {
+void BeaconStatus_DoNothing(void) {
 }
 
 u32 getUINarcIdx(void) {
@@ -94,7 +94,7 @@ u32 AppMenuCommon_GetBarScreenFile(void) {
     return BAR_SCREEN_FILE;
 }
 
-u32 func_0202d82c(void) {
+u32 AppMenuCommon_GetStatusExtraFileId(void) {
     return 0x1e;
 }
 

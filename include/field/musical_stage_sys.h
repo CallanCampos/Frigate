@@ -10,14 +10,14 @@
 
 struct MusicalStageParam {
     // Overlay 211's communication work
-    void *comm;
+    MusCommWork *comm;
     MusicalPoke *pokes[4];
     MusicalProgram *program;
     Ov210Work *ov210;
     u32 unk1C;
 };
 
-MusicalStageParam *MusicalStageParam_Create(HeapID heapId, void *comm);
+MusicalStageParam *MusicalStageParam_Create(HeapID heapId, MusCommWork *comm);
 void MusicalStageParam_Free(MusicalStageParam *param);
 // Puts a Pokémon on the stage
 void MusicalStageParam_SetPlayerPoke(MusicalStageParam *param, u8 pos, MusicalPoke *poke);

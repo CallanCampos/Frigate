@@ -126,7 +126,7 @@ static void BeaconView_DeleteScreenActors(BeaconViewWork *work);
 static void BeaconView_InitPanel(BeaconViewWork *work, u8 id);
 static void BeaconView_FreePanel(BeaconViewWork *work, u8 id);
 
-BeaconViewWork *BeaconView_Create(GameSystem *gsys, void *parent) {
+BeaconViewWork *BeaconView_Create(GameSystem *gsys, FieldSubscreen *parent) {
     BeaconViewWork *work = GFL_HeapAllocate(HEAPID_FIELD_MENU, sizeof(BeaconViewWork), TRUE, "beacon_view_setup.c", 91);
 
     work->gsys = gsys;
@@ -179,7 +179,7 @@ GameEvent *BeaconView_CreateEvent(BeaconViewWork *work, BOOL enabled) {
     }
     switch (work->eventRequest) {
     case BEACON_VIEW_EVENT_MENU_COMM:
-        func_ov012_02153654(work->commSys);
+        Intrude_SetCompleted(work->commSys);
         // fallthrough
     case BEACON_VIEW_EVENT_MENU:
     case BEACON_VIEW_EVENT_MENU_WIFI:
@@ -447,7 +447,7 @@ static void BeaconView_InitSystems(BeaconViewWork *work) {
     work->printQueue = PrintQueue_CreateDefault(work->heapId);
     PrintQueue_SetQueueAlways(work->printQueue, TRUE);
     PrintQueue_SetTimeLimit(work->printQueue, 500);
-    work->font = func_ov036_0218799c(Field_GetMsgBGSys(work->field));
+    work->font = MsgBGPrinter_GetFont(Field_GetMsgBGSys(work->field));
     GFL_TextRndResetColorIndexLUT();
     work->wordSet = GFL_WordSetSystemCreate(8, 64, work->heapId);
     work->msgData = GFL_MsgSysLoadData(TRUE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_GAME_BEACON, work->heapId);
@@ -481,10 +481,10 @@ static void BeaconView_InitBG(BeaconViewWork *work, ArcTool *arc) {
         { 0, 0, 0x800, 0, 1, 0, 12, 0, 0x6000, 0, 3, 0, 0 },
     };
 
-    GFL_BGSysCreateBG(4, &sBeaconViewBGSetups[0], 0);
-    GFL_BGSysCreateBG(5, &sBeaconViewBGSetups[1], 0);
-    GFL_BGSysCreateBG(6, &sBeaconViewBGSetups[2], 0);
-    GFL_BGSysCreateBG(7, &sBeaconViewBGSetups[3], 0);
+    GFL_BGSysCreateBG(4, &sBeaconViewBGSetups[0], BGMODE_TEXT);
+    GFL_BGSysCreateBG(5, &sBeaconViewBGSetups[1], BGMODE_TEXT);
+    GFL_BGSysCreateBG(6, &sBeaconViewBGSetups[2], BGMODE_TEXT);
+    GFL_BGSysCreateBG(7, &sBeaconViewBGSetups[3], BGMODE_TEXT);
     MI_CpuClear32((void *)HW_DB_BG_VRAM, 0x20000);
     GXS_SetVisibleWnd(0);
     G2S_BlendNone();

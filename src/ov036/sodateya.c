@@ -51,9 +51,6 @@ static const DayCareStatParamTable sInheritedIVParams;
 static const DayCareStatParamTable sEggIVParams;
 static const DayCareMoveParamTable sEggMoveParams;
 
-#define PERSONAL_EGG_GROUP_1 24
-#define PERSONAL_EGG_GROUP_2 25
-
 // The day care's work area
 struct DayCare {
     HeapID heapId;
@@ -108,7 +105,7 @@ static void setPartyFullToConst(Field *field);
 static u32 DayCare_CalcNewExp(u32 exp, u32 steps);
 static void DayCare_CommitPkmGrowth(PartyPkm *pkm, u32 steps);
 static void writeLvUpMoveOpenSlot(PartyPkm *pkm, u32 move);
-static BOOL func_ov036_021bd788(PartyPkm *pkm, int move);
+static BOOL DayCare_MonKnowsMove(PartyPkm *pkm, int move);
 static void DayCareSave_ShiftPkms(DayCareSave *save);
 static u32 DayCare_CalcBaseEggSpawnChance(PartyPkm *pkm1, PartyPkm *pkm2);
 static u32 DayCare_CalcBaseEggSpawnChanceCore(PartyPkm *pkm1, PartyPkm *pkm2);
@@ -375,7 +372,7 @@ static void writeLvUpMoveOpenSlot(PartyPkm *pkm, u32 move) {
     DayCareMoveParamTable moveParams = sOpenSlotMoveParams;
     int i;
 
-    if (move != 0 && !func_ov036_021bd788(pkm, move)) {
+    if (move != 0 && !DayCare_MonKnowsMove(pkm, move)) {
         for (i = 0; i < 4; i++) {
             if (PokeParty_GetParam(pkm, moveParams.values[i], NULL) == 0) {
                 PokeParty_SetMove(pkm, move, i);
@@ -386,7 +383,7 @@ static void writeLvUpMoveOpenSlot(PartyPkm *pkm, u32 move) {
     }
 }
 
-static BOOL func_ov036_021bd788(PartyPkm *pkm, int move) {
+static BOOL DayCare_MonKnowsMove(PartyPkm *pkm, int move) {
     DayCareMoveParamTable moveParams = sExistingMoveParams;
     int i;
 
@@ -1069,13 +1066,13 @@ static BOOL canPkmLearnTMItemNumber(HeapID heapId, u16 species, u16 form, u16 it
     if (bit < 32) {
         flags = PML_PersonalGetParam(personal, PERSONAL_MACHINES_1);
     } else if (bit < 64) {
-        flags = PML_PersonalGetParam(personal, PERSONAL_MACHINES_1 + 1);
+        flags = PML_PersonalGetParam(personal, PERSONAL_MACHINES_2);
         bit -= 32;
     } else if (bit < 96) {
-        flags = PML_PersonalGetParam(personal, PERSONAL_MACHINES_1 + 2);
+        flags = PML_PersonalGetParam(personal, PERSONAL_MACHINES_3);
         bit -= 64;
     } else {
-        flags = PML_PersonalGetParam(personal, PERSONAL_MACHINES_1 + 3);
+        flags = PML_PersonalGetParam(personal, PERSONAL_MACHINES_4);
         bit -= 96;
     }
     PML_PersonalFree(personal);

@@ -5,6 +5,7 @@
 #include "battle/regulation.h"
 #include "gfl/heap.h"
 #include "nitro/math.h"
+#include "save/bag.h"
 #include "save/config.h"
 #include "struct_decls.h"
 #include "system/pms_data.h"
@@ -26,7 +27,7 @@ struct BtlFieldSituation {
     // The battle's music, and the music of a win
     u16 bgm;
     u16 unk12;
-    void *netHandle;
+    NetHandle *netHandle;
     u8 unk18;
     u8 unk19;
     u8 unk1a;
@@ -63,7 +64,7 @@ struct BtlSetup {
     BtlFieldSituation fieldSituation;
     // The parties of the four clients
     PokeParty *party[4];
-    void *unk34[4];
+    PlayerInfo *unk34[4];
     u8 unk44[4];
     // The trainers of the four clients
     BtlSetupTrainer *trainers[4];
@@ -74,13 +75,13 @@ struct BtlSetup {
     GameData *gameData;
     Config *config;
     BagSave *bag;
-    void *unk7C;
+    BagCursor *unk7C;
     PokeDexSave *pokedex;
     GameRecords *records;
-    void *unk88;
+    CommPlayerSupport *unk88;
     u16 unk8C;
     u16 unk8E;
-    // What func_0200b760 fills in from a regulation, a RegulationUnkAC
+    // What Regulation_GetShooterSettings fills in from a regulation, a RegulationUnkAC
     u8 unk90[7];
     u8 unk97;
     // The player's badges
@@ -91,7 +92,8 @@ struct BtlSetup {
     u16 unkA0;
     u16 unkA2;
     u32 unkA4;
-    u32 unkA8;
+    // How the battle ended, a BTL_RESULT_*
+    u32 result;
     u8 unkAC;
     u8 unkAD;
     u8 unkAE;
@@ -130,11 +132,13 @@ struct BtlSetup {
     // Each client's remaining HP, in percent of its party's total
     u32 unk100[4];
     u8 unk110[0x14];
-    u32 unk124;
+    // How a Pokéstar Studios movie ended, which picks its ending music
+    u32 studioEnding;
     u8 unk128;
     u8 unk129;
     u32 unk12C;
-    u32 unk130;
+    // The Pokéstar Studios movie's score
+    s32 studioScore;
     u32 unk134;
     u16 unk138;
     u16 unk13a;

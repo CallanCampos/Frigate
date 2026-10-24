@@ -219,7 +219,7 @@ MBi_SetRecvBufferFromChild kind:function(thumb,size=0xac) addr:0x021a3f30
 MBi_ReceiveRequestDataPiece kind:function(thumb,size=0x64) addr:0x021a3fdc
 IsGetAllRequestData kind:function(thumb,size=0x40) addr:0x021a4040
 sCancelButtonRect kind:data(any) addr:0x021a4080
-data_ov181_021a4048 kind:data(any) addr:0x021a4088
+sLCDConfig kind:data(any) addr:0x021a4088
 data_ov181_021a4058 kind:data(any) addr:0x021a4098
 data_ov181_021a4078 kind:data(any) addr:0x021a40b8
 data_ov181_021a4094 kind:data(any) addr:0x021a40d4 ambiguous
@@ -229,7 +229,7 @@ data_ov181_021a40d8 kind:data(any) addr:0x021a4118
 data_ov181_021a40f8 kind:data(any) addr:0x021a4138
 data_ov181_021a4118 kind:data(any) addr:0x021a4158
 data_ov181_021a4138 kind:data(any) addr:0x021a4178
-data_ov181_021a4158 kind:data(any) addr:0x021a4198
+sVRAMConfig kind:data(any) addr:0x021a4198
 data_ov181_021a4188 kind:data(any) addr:0x021a41c8
 sMBCommCommands kind:data(any) addr:0x021a4204
 data_ov181_021a41e4 kind:data(any) addr:0x021a4224
@@ -251,7 +251,7 @@ data_ov181_021a434c kind:data(any) addr:0x021a438c
 data_ov181_021a4354 kind:data(any) addr:0x021a4394
 data_ov181_021a4364 kind:data(any) addr:0x021a43a4
 data_ov181_021a438c kind:data(any) addr:0x021a43cc
-data_ov181_021a43ac kind:data(any) addr:0x021a43ec
+sHeapId kind:data(any) addr:0x021a43ec
 data_ov181_021a4424 kind:data(any) addr:0x021a4464
 data_ov181_021a4434 kind:data(any) addr:0x021a4474
 data_ov181_021a4444 kind:data(any) addr:0x021a4484

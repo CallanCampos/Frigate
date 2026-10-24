@@ -624,7 +624,7 @@ static void StaffRoll_InitBG(void) {
         MtxFx22 mtx;
 
         GFL_BGSysCreateBG(3, &setup, BGMODE_EXTENDED);
-        MAT2_SetScaleRot(&mtx, 0, FX32_ONE, FX32_ONE, 0);
+        MAT2_SetScaleRot(&mtx, 0, FX32_ONE, FX32_ONE, MAT2_ROT_IDX);
         GFL_BGSysSetBGTransform(3, &mtx, 128, 96);
     }
     StaffRoll_InitTopPictureBG();

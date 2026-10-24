@@ -244,7 +244,7 @@ sMenu_02cc kind:data(any) addr:0x0217c30c
 sMenu_02e4 kind:data(any) addr:0x0217c324
 sMenu_02fc kind:data(any) addr:0x0217c33c
 sMenuMainRequest kind:data(any) addr:0x0217c354
-data_ov034_0217c334 kind:data(any) addr:0x0217c374
+sLanguageFlags kind:data(any) addr:0x0217c374
 sMenuRulesRequest kind:data(any) addr:0x0217c394
 sMenu_0374 kind:data(any) addr:0x0217c3b4
 sMenu_039c kind:data(any) addr:0x0217c3dc

@@ -57,13 +57,13 @@ u32 PleasureBoat_GetInfo(PleasureBoat *boat, u32 info);
 void PleasureBoat_AdvanceClock(PleasureBoat *boat, u32 steps, BOOL stopBefore);
 void PleasureBoat_SetTrainerDefeated(PleasureBoat *boat, u32 trainer, BOOL defeated);
 void PleasureBoat_StopClock(PleasureBoat *boat);
-void func_ov036_021c20e0(PleasureBoat *boat);
+void PleasureBoat_AckEvent(PleasureBoat *boat);
 // Moves the clock on by one, and returns the script event that ends the cruise once it is over, or NULL
-GameEvent *func_ov036_021c210c(GameSystem *gsys, PleasureBoat *boat);
-u32 func_ov036_021c2220(PleasureBoat *boat, u32 room);
-u32 func_ov036_021c222c(PleasureBoat *boat, u32 room);
-u32 func_ov036_021c2238(PleasureBoat *boat, u32 room, u32 index);
-BOOL func_ov036_021c2248(PleasureBoat *boat, u32 room);
+GameEvent *PleasureBoat_Update(GameSystem *gsys, PleasureBoat *boat);
+u32 PleasureBoat_GetPassengerParam(PleasureBoat *boat, u32 room);
+u32 PleasureBoat_GetPassengerType(PleasureBoat *boat, u32 room);
+u32 PleasureBoat_GetPassengerExtra(PleasureBoat *boat, u32 room, u32 index);
+BOOL PleasureBoat_GetPassengerOccupied(PleasureBoat *boat, u32 room);
 
 // Overlay 12's event_royal_unova.c
 BOOL s01A1_PleasureBoatGetRoomInfo(VM *vm, FieldScriptEnv *env);

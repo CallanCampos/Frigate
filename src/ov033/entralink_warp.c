@@ -124,7 +124,7 @@ BOOL EventEntralinkWarpIn_CheckAllowed(GameSystem *gsys) {
         } else if (npc->isRail == TRUE) {
             npcRail = &npc->pos.rail;
             if (Field_GetResolvedControllerTypeID(field) == 1) {
-                func_ov036_0219ad24(player, &railPosition);
+                FieldPlayer_GetNogridNextRailLocation(player, &railPosition);
                 if (npcRail->railIndex == railPosition.componentId && npcRail->frontPos == railPosition.posFront &&
                     npcRail->sidePos == railPosition.posSide) {
                     return FALSE;

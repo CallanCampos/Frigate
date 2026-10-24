@@ -11,7 +11,7 @@
 #include "system/union_view.h"
 #include "system/wordset.h"
 
-void func_ov033_0217aa1c(GameSystem *gsys, s32 floor, u32 value) {
+void Scrcmd_FillPartnerCandidates(GameSystem *gsys, s32 floor, u32 value) {
     GameData *gameData;
     UnityTowerFloor *unityTowerSave;
     SaveControl *saveControl;
@@ -20,14 +20,15 @@ void func_ov033_0217aa1c(GameSystem *gsys, s32 floor, u32 value) {
     unityTowerSave = GameData_GetUnityTowerSave(gameData);
     if (floor < 0xe9) {
         saveControl = GameData_GetSaveControl(gameData);
-        func_ov033_0217aa50(getUnityTower_SurveySaveBlkAddrress(saveControl), unityTowerSave, floor, value);
+        Scrcmd_CollectPartnersByLanguage(getUnityTower_SurveySaveBlkAddrress(saveControl), unityTowerSave, floor,
+                                         value);
     } else {
         UnityTowerSave_Init(unityTowerSave);
     }
 }
 
-void func_ov033_0217aa50(UnityTowerSurveySave *survey, UnityTowerFloor *output, s32 floor, u32 value) {
-    void *visitor;
+void Scrcmd_CollectPartnersByLanguage(UnityTowerSurveySave *survey, UnityTowerFloor *output, s32 floor, u32 value) {
+    PlayerInfo *visitor;
     u32 visitorValue;
     s32 country;
     s32 index;
@@ -36,7 +37,7 @@ void func_ov033_0217aa50(UnityTowerSurveySave *survey, UnityTowerFloor *output, 
     output->value = value;
     output->count = 0;
     for (index = 0; index < 20; index++) {
-        if ((u8)UnityTower_GetVisitorParam(survey, index, 6) == 0) {
+        if ((u8)UnityTower_GetVisitorParam(survey, index, UNITY_TOWER_VISITOR_PARAM_VALID) == 0) {
             continue;
         }
         visitor = UnityTower_GetVisitor(survey, index);
@@ -59,7 +60,7 @@ void func_ov033_0217aa50(UnityTowerSurveySave *survey, UnityTowerFloor *output, 
     }
 }
 
-u32 func_ov033_0217aac4(UnityTowerFloor *output, u32 index) {
+u32 Scrcmd_GetPartnerCandidateHistoryIndex(UnityTowerFloor *output, u32 index) {
     u32 result;
 
     result = 0xff;
@@ -69,7 +70,7 @@ u32 func_ov033_0217aac4(UnityTowerFloor *output, u32 index) {
     return result;
 }
 
-u32 func_ov033_0217aad8(WordSet *wordSet, GameSystem *gsys, UnityTowerFloor *save, s32 index, u32 param) {
+u32 Scrcmd_GetPartnerGreetingMessage(WordSet *wordSet, GameSystem *gsys, UnityTowerFloor *save, s32 index, u32 param) {
     GameData *gameData;
     UnityTowerSurveySave *surveySave;
     PlayerInfo *visitor;
@@ -89,15 +90,15 @@ u32 func_ov033_0217aad8(WordSet *wordSet, GameSystem *gsys, UnityTowerFloor *sav
     LoadUnityTowerVisitorWordSet(wordSet, gameData, visitorIndex);
     visitor = UnityTower_GetVisitor(surveySave, visitorIndex);
     gender = getTrainerGender(visitor);
-    province = UnityTower_GetVisitorParam(surveySave, visitorIndex, 4);
+    province = UnityTower_GetVisitorParam(surveySave, visitorIndex, UNITY_TOWER_VISITOR_PARAM_UNK26_0);
     id = getIDAsUInt(visitor);
     if (CountryHasProvinces(GameData_GetUnityTowerSave(gameData)->floor) != 0) {
         hasProvince = 1;
     }
-    return func_ov033_0217ab58(gender, id, province, param, hasProvince);
+    return Scrcmd_CalcPartnerGreetingIndex(gender, id, province, param, hasProvince);
 }
 
-u32 func_ov033_0217ab58(u32 gender, u32 id, u32 province, u32 a3, u32 hasProvince) {
+u32 Scrcmd_CalcPartnerGreetingIndex(u32 gender, u32 id, u32 province, u32 a3, u32 hasProvince) {
     u32 messageId;
 
     if (hasProvince != 0) {
@@ -123,7 +124,7 @@ void LoadUnityTowerVisitorWordSet(WordSet *wordSet, GameData *gameData, u32 inde
     UnityTowerSurveySave *survey;
     UnityTowerFloor *towerSave;
     u8 country;
-    void *visitor;
+    PlayerInfo *visitor;
     u32 value;
     u8 hobby;
 
@@ -137,15 +138,17 @@ void LoadUnityTowerVisitorWordSet(WordSet *wordSet, GameData *gameData, u32 inde
         loadCountryAreaToStrbuf(wordSet, 1, country, UnityTowerVisitor_GetProvince(visitor));
     }
     copyVarForText(wordSet, 3, GetGameDataPlayerInfo(gameData));
-    WordSet_LoadSpeciesName(wordSet, 5, (u16)UnityTower_GetVisitorParam(survey, index, 0));
+    WordSet_LoadSpeciesName(wordSet, 5,
+                            (u16)UnityTower_GetVisitorParam(survey, index, UNITY_TOWER_VISITOR_PARAM_SENT_SPECIES));
     loadHobbyNameToStrbuf(wordSet, 6, getPlayerSurveys(survey));
     copyVarForText(wordSet, 7, visitor);
-    value = UnityTower_GetVisitorParam(survey, index, 3);
+    value = UnityTower_GetVisitorParam(survey, index, UNITY_TOWER_VISITOR_PARAM_COUNTRY_COUNT);
     if (value == 0) {
         value = 1;
     }
     WordSetNumber(wordSet, 8, value, 3, 0, 1);
-    WordSet_LoadSpeciesName(wordSet, 9, (u16)UnityTower_GetVisitorParam(survey, index, 1));
-    hobby = UnityTower_GetVisitorParam(survey, index, 2);
+    WordSet_LoadSpeciesName(wordSet, 9,
+                            (u16)UnityTower_GetVisitorParam(survey, index, UNITY_TOWER_VISITOR_PARAM_RECEIVED_SPECIES));
+    hobby = UnityTower_GetVisitorParam(survey, index, UNITY_TOWER_VISITOR_PARAM_HOBBY);
     loadHobbyNameToStrbuf(wordSet, 10, hobby);
 }

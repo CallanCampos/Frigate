@@ -136,7 +136,7 @@ struct RailUnit {
     s32 width;
     fx32 tileWidth;
     u32 dir;
-    RailDataHandle *handle;
+    const RailDataHandle *handle;
     RailDisabledLines *disabled;
     u8 movePending;
     s8 moveProgress; // Attempted sixteenths toward the current 16-sixteenth request
@@ -175,19 +175,19 @@ struct FieldRailSystem {
 typedef struct RailAttr RailAttr;
 
 RailAttr *AllocateRailAttrBlock(u32 heapId);
-void func_ov036_021b3a58(RailAttr *attr);
+void FieldRailTilemap_Delete(RailAttr *attr);
 void FieldRailTilemap_Load(RailAttr *attr, u32 fileId, u32 heapId);
-void func_ov036_021b3ad0(RailAttr *attr);
+void FieldRailTilemap_Release(RailAttr *attr);
 u32 FieldRailTilemap_GetTileAtPos(RailAttr *attr, const RailPosition *pos);
 // Whether a tile class is one of the rails' special tiles
-BOOL func_ov036_021b3b3c(u16 tileClass);
-BOOL func_ov036_021b3b54(u32 tileClass);
-BOOL func_ov036_021b3b64(u32 tileClass);
-BOOL func_ov036_021b3b70(u32 tileClass);
-BOOL func_ov036_021b3b7c(u32 tileClass);
-BOOL func_ov036_021b3b88(u32 tileClass);
-BOOL func_ov036_021b3b94(u32 tileClass);
-BOOL func_ov036_021b3ba0(u32 tileClass);
+BOOL FieldRailTilemap_IsSignBoard(u16 tileClass);
+BOOL FieldRailTilemap_IsJumpStart(u32 tileClass);
+BOOL FieldRailTilemap_IsForceMoveUp(u32 tileClass);
+BOOL FieldRailTilemap_IsForceMoveDown(u32 tileClass);
+BOOL FieldRailTilemap_IsForceMoveLeft(u32 tileClass);
+BOOL FieldRailTilemap_IsForceMoveRight(u32 tileClass);
+BOOL FieldRailTilemap_IsForceMoveStop(u32 tileClass);
+BOOL FieldRailTilemap_IsSlipDown(u32 tileClass);
 
 // field_rail.c: the rail system
 FieldRailSystem *FieldRailSystem_Create(HeapID heapId, u32 unitCount, FieldCamera *camera);
@@ -202,7 +202,7 @@ void FieldRailSystem_SetCameraParent(FieldRailSystem *rail, RailUnit *unit);
 void FieldRailSystem_ClearCameraParent(FieldRailSystem *rail);
 void FieldRailSystem_GetCameraParentPos(FieldRailSystem *rail, VecFx32 *pos);
 // Does nothing: what is left of a check whether the rails are loaded and active
-void func_ov036_021b0398(FieldRailSystem *rail);
+void FieldRailSystem_Update(FieldRailSystem *rail);
 // Updates the camera from its parent unit when the unit asks for it, the camera is dirty or force is set
 BOOL FieldRailSystem_UpdateCamera(FieldRailSystem *rail, BOOL force);
 // Finds where the segment from start to end meets a rail
@@ -211,17 +211,18 @@ BOOL CalculateRailCurves(FieldRailSystem *rail, const VecFx32 *start, const VecF
 // Turns a line on or off: the system keeps up to 18 lines that are off, and finds no line where one of them is
 void FieldRailSystem_SetLineEnabled(FieldRailSystem *rail, u32 lineId, BOOL enabled);
 // The length of a step on the rails
-fx32 func_ov036_021b05ec(FieldRailSystem *rail);
+fx32 FieldRailSystem_GetUnitScale(FieldRailSystem *rail);
 // Sets pos to line componentId of the rail data, front steps along it and side steps from its edge
 void FieldRailSystem_NormalizePos(FieldRailSystem *rail, RailDataHandle *data, u16 componentId, u16 front, u16 side,
                                   RailPosition *pos);
 // The world position a step from the rail position in a direction, and whether that step stays on the rails
-BOOL func_ov036_021b0644(FieldRailSystem *rail, const RailPosition *pos, u32 railDir, VecFx32 *calcPos);
+BOOL FieldRailSystem_StepLocation(FieldRailSystem *rail, const RailPosition *pos, u32 railDir, VecFx32 *calcPos);
 // The rail position a step from railPos in a direction, and whether that step stays on the rails
-BOOL func_ov036_021b068c(FieldRailSystem *rail, const RailPosition *railPos, u32 railDir, RailPosition *next);
+BOOL FieldRailSystem_TryStepLocation(FieldRailSystem *rail, const RailPosition *railPos, u32 railDir,
+                                     RailPosition *next);
 // The world position of the rail position
-void func_ov036_021b06ec(FieldRailSystem *rail, const RailPosition *railPos, VecFx32 *pos);
-s32 func_ov036_021b0704(FieldRailSystem *rail, const RailPosition *pos);
+void FieldRailSystem_GetLocationPos(FieldRailSystem *rail, const RailPosition *railPos, VecFx32 *pos);
+s32 FieldRailSystem_GetLocationWidthGrid(FieldRailSystem *rail, const RailPosition *pos);
 void FieldRailSystem_SetPlayerPos(FieldRailSystem *rail, const RailPosition *pos);
 void RailUnit_GetRailPos(const RailUnit *unit, RailPosition *pos);
 // Checks the component ID and, for lines, the front and side bounds
@@ -237,7 +238,7 @@ u8 RailUnit_GetMoveDirection(RailUnit *unit);
 // Whether a move is queued or in progress
 u8 RailUnit_IsMovePending(RailUnit *unit);
 // The unit vector along the unit's line
-void func_ov036_021b0a04(RailUnit *unit, VecFx16 *dir);
+void RailUnit_GetStepVector(RailUnit *unit, VecFx16 *dir);
 // The current line's direction; requires a unit placed on a line
 u32 RailUnit_GetLineDirection(RailUnit *unit);
 // Queues a move when idle, at a RAIL_SPEED_ speed in a RAIL_DIR_ direction
@@ -250,29 +251,29 @@ RailPoint *FieldRailSystem_GetPoint(FieldRailSystem *rail, u32 id);
 RailLine *FieldRailSystem_GetLine(FieldRailSystem *rail, u32 id);
 RailCurve *GetRailHnd2Curve(FieldRailSystem *rail, u32 id);
 fx32 FieldRailSystem_GetTileWidth(FieldRailSystem *rail);
-RailUnit *func_ov036_021b0c00(FieldRailSystem *rail);
-void func_ov036_021b0c04(const FieldRailSystem *rail, const RailPosition *in, RailPosition *out);
+RailUnit *FieldRailSystem_GetProbeWork(FieldRailSystem *rail);
+void FieldRailSystem_ClampLocation(const FieldRailSystem *rail, const RailPosition *in, RailPosition *out);
 // Returns the RAIL_COMPONENT_* tag
 u16 RailUnit_IsOnLine(RailUnit *unit);
 RailLine *GetCurrentLine(RailUnit *unit);
 s32 GetCurrentLinePosV(RailUnit *unit);
 s32 GetCurrentLineLength(RailUnit *unit);
 s32 GetCurrentLinePosH(RailUnit *unit);
-s32 func_ov036_021b0cb8(RailUnit *unit);
+s32 RailUnit_GetWidthLimit(RailUnit *unit);
 fx32 RailUnit_GetTileWidth(RailUnit *unit);
 RailCamera *GetRailCameraByCamHandler(RailUnit *unit);
-void func_ov036_021b0cc8(RailUnit *unit, VecFx32 *pos);
-void func_ov036_021b0cdc(RailUnit *unit, s32 front, VecFx32 *pos);
+void RailUnit_GetCentrePos(RailUnit *unit, VecFx32 *pos);
+void RailUnit_GetPosAtLineOffset(RailUnit *unit, s32 front, VecFx32 *pos);
 RailPoint *GetCurrentRailLinePoint1(RailUnit *unit);
 RailPoint *GetCurrentRailLinePoint2(RailUnit *unit);
 RailCurve *RailUnit_GetCurve(RailUnit *unit);
 RailCamera *GetRailCameraByPoint(RailUnit *unit, RailPoint *point);
-s32 func_ov036_021b0d2c(s32 value);
+s32 FieldRailSystem_RoundToGrid(s32 value);
 // Whether two positions are within dist of each other across and half a tile up or down
-BOOL func_ov036_021b0d64(const VecFx32 *a, const VecFx32 *b, fx32 dist);
+BOOL FieldRailSystem_IsPosNear(const VecFx32 *a, const VecFx32 *b, fx32 dist);
 // Writes the unit's rail position to three script variables, or sets it from three values
 void SetWkToActorRailPos(const RailUnit *unit, u16 *a1, u16 *a2, u16 *a3);
-void func_ov036_021b0e38(RailUnit *unit, u16 a1, u16 a2, u16 a3);
+void RailUnit_SetLineLocation(RailUnit *unit, u16 a1, u16 a2, u16 a3);
 // field_rail_func.c: the curves' conversions between rail and world positions
 void RailMath_RailToWorldNoCurve(RailUnit *unit, VecFx32 *out);
 void RailMath_RailToWorldSlerpXZ(RailUnit *unit, VecFx32 *out);
@@ -285,22 +286,22 @@ BOOL RailMath_WorldToRailSlerp(u32 lineId, FieldRailSystem *rail, const VecFx32 
 void RailCameraFuncSetStaticPYR(FieldRailSystem *rail);
 void RailCameraFuncSetStaticPYDist(FieldRailSystem *rail);
 void func_ov036_021b2cc4(FieldRailSystem *rail);
-void func_ov036_021b2cfc(FieldRailSystem *rail);
-void func_ov036_021b2e48(FieldRailSystem *rail);
+void FieldRailCamera_BlendAngles(FieldRailSystem *rail);
+void FieldRailCamera_BlendAnglesAtFocus(FieldRailSystem *rail);
 void func_ov036_021b2e78(FieldRailSystem *rail);
-void func_ov036_021b2eb0(FieldRailSystem *rail);
-void func_ov036_021b2f04(FieldRailSystem *rail);
-void func_ov036_021b309c(FieldRailSystem *rail);
-void func_ov036_021b3164(FieldRailSystem *rail);
-void func_ov036_021b3294(FieldRailSystem *rail);
-void func_ov036_021b3368(FieldRailSystem *rail);
-void func_ov036_021b33e4(FieldRailSystem *rail);
-void func_ov036_021b3450(FieldRailSystem *rail);
-void func_ov036_021b34e4(FieldRailSystem *rail);
+void FieldRailCamera_FixedEyeTarget(FieldRailSystem *rail);
+void FieldRailCamera_BlendEyeTarget(FieldRailSystem *rail);
+void FieldRailCamera_BlendOrbit(FieldRailSystem *rail);
+void FieldRailCamera_Orbit(FieldRailSystem *rail);
+void FieldRailCamera_OrbitMovingPoint(FieldRailSystem *rail);
+void FieldRailCamera_YawFromPoint(FieldRailSystem *rail);
+void FieldRailCamera_FollowHeading(FieldRailSystem *rail);
+void FieldRailCamera_FollowHeadingSlope(FieldRailSystem *rail);
+void FieldRailCamera_FollowHeadingAtCentre(FieldRailSystem *rail);
 void func_ov036_021b3568(FieldRailSystem *rail);
 void func_ov036_021b3590(FieldRailSystem *rail);
-void func_ov036_021b35b8(FieldRailSystem *rail);
-void func_ov036_021b3628(FieldRailSystem *rail);
-void func_ov036_021b365c(FieldRailSystem *rail);
+void FieldRailCamera_FixedAngleShift(FieldRailSystem *rail);
+void FieldRailCamera_FixedAngleShiftAtFocus(FieldRailSystem *rail);
+void FieldRailCamera_BlendAnglesShift(FieldRailSystem *rail);
 
 #endif // POKEBW2_FIELD_FIELD_RAIL_H

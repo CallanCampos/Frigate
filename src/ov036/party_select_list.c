@@ -47,11 +47,11 @@ struct PartySelectList {
     u16 itemCells;
     u16 itemChars;
     WordSet *wordSet;
-    void *msgBGSys;
+    FieldMsgBG *msgBGSys;
     MsgData *msgData;
     ListMenuUI *list;
-    void *infoWin;
-    void *moneyWin;
+    FieldMsgWin *infoWin;
+    MoneyWin *moneyWin;
     Font *font;
     int cursor;
     u8 state;
@@ -108,7 +108,8 @@ static const ListMenuRequest sPartySelectRequest = {
     .height = 6,
 };
 
-void *func_ov036_021c3180(Field *field, PokeParty *temoti, PokeParty *bbox, u8 partyOk, u32 bboxOk, HeapID heapId) {
+PartySelectList *PartySelectList_Create(Field *field, PokeParty *temoti, PokeParty *bbox, u8 partyOk, u32 bboxOk,
+                                        HeapID heapId) {
     PartySelectList *psl;
 
     // clang-format off
@@ -131,7 +132,7 @@ void *func_ov036_021c3180(Field *field, PokeParty *temoti, PokeParty *bbox, u8 p
     return psl;
 }
 
-int func_ov036_021c3218(PartySelectList *psl, u32 *out) {
+int PartySelectList_Delete(PartySelectList *psl, u32 *out) {
     int result = PartySelectList_GetResult(psl, out);
 
     // clang-format off
@@ -148,7 +149,7 @@ int func_ov036_021c3218(PartySelectList *psl, u32 *out) {
     return result;
 }
 
-BOOL func_ov036_021c3278(PartySelectList *psl) {
+BOOL PartySelectList_Main(PartySelectList *psl) {
     switch (psl->state) {
     case 0:
         PartySelectList_CreateMessageWindow(psl);
@@ -162,7 +163,7 @@ BOOL func_ov036_021c3278(PartySelectList *psl) {
         }
         break;
     case 2:
-        if (func_ov036_0218798c(psl->msgBGSys) == TRUE) {
+        if (MsgBGPrinter_IsPrintQueFinished(psl->msgBGSys) == TRUE) {
             u32 result = PartySelectList_UpdateMenu(psl);
 
             if (result != BMPMENULIST_NULL) {
@@ -446,28 +447,29 @@ static void PartySelectList_ShowItemIcons(PartySelectList *psl, u32 mode) {
 }
 
 static void PartySelectList_CreateMessages(PartySelectList *psl) {
-    void *msgBGSys = Field_GetMsgBGSys(psl->field);
+    FieldMsgBG *msgBGSys = Field_GetMsgBGSys(psl->field);
 
-    psl->msgData = func_ov036_021879a0(msgBGSys, TEXT_BANK_0104);
+    psl->msgData = MsgBGPrinter_CreateMsgData(msgBGSys, TEXT_BANK_0104);
     psl->msgBGSys = msgBGSys;
     psl->wordSet = GFL_WordSetSystemCreateDefault(psl->heapId);
 }
 
 static void PartySelectList_FreeMessages(PartySelectList *psl) {
     GFL_WordSetSystemFree(psl->wordSet);
-    func_ov036_021879b8(psl->msgData);
+    MsgBGPrinter_DeleteMsgData(psl->msgData);
 }
 
 static void PartySelectList_CreateMenu(PartySelectList *psl) {
     ListMenuOption *options =
-        func_ov036_02187f0c(sPartySelectRows, NELEMS(sPartySelectRows), psl->msgData, psl->heapId);
+        MsgBGPrinter_CreateMenuItemsFromTable(sPartySelectRows, NELEMS(sPartySelectRows), psl->msgData, psl->heapId);
 
-    psl->list = func_ov036_02187e1c(psl->msgBGSys, &sPartySelectRequest, options, 0, 0, PartySelectList_CursorCallback,
-                                    PartySelectList_RowColorCallback, psl);
+    psl->list =
+        MsgBGPrinter_CreateMenuFuncCallback(psl->msgBGSys, &sPartySelectRequest, options, 0, 0,
+                                            PartySelectList_CursorCallback, PartySelectList_RowColorCallback, psl);
 }
 
 static void PartySelectList_FreeMenu(PartySelectList *psl) {
-    func_ov036_02187ea0(psl->list);
+    MsgBGPrinter_DeleteMenuFunc(psl->list);
 }
 
 static u32 PartySelectList_UpdateMenu(PartySelectList *psl) {
@@ -500,19 +502,19 @@ static void PartySelectList_RowColorCallback(BmpMenuList *list, s32 value, u8 y)
 }
 
 static void PartySelectList_CreateMessageWindow(PartySelectList *psl) {
-    psl->infoWin = func_ov036_0218845c(psl->msgBGSys, psl->msgData);
+    psl->infoWin = MsgBGPrinter_CreateBottomSysWin(psl->msgBGSys, psl->msgData);
 }
 
 static void PartySelectList_FreeMessageWindow(PartySelectList *psl) {
-    func_ov036_02188338(psl->infoWin);
+    MsgBGPrinter_DeleteSysWin(psl->infoWin);
 }
 
 static void PartySelectList_PrintMessage(PartySelectList *psl, u32 messageId) {
-    func_ov036_0218836c(psl->infoWin, 0, 0, messageId);
+    MsgBGPrinter_SysWinPrintMsg(psl->infoWin, 0, 0, messageId);
 }
 
 static BOOL PartySelectList_IsMessageDone(PartySelectList *psl) {
-    return func_ov036_021883e8(psl->infoWin);
+    return MsgBGPrinter_SysWinMain(psl->infoWin);
 }
 
 static void PartySelectList_CreatePreviewWindow(PartySelectList *psl) {
@@ -523,7 +525,7 @@ static void PartySelectList_CreatePreviewWindow(PartySelectList *psl) {
 
 static void PartySelectList_FreePreviewWindow(PartySelectList *psl) {
     if (psl->moneyWin != NULL) {
-        func_ov036_02187c1c(psl->moneyWin);
+        MsgBGPrinter_DeleteMsgWin(psl->moneyWin);
         psl->moneyWin = NULL;
     }
 }
@@ -535,7 +537,7 @@ static void PartySelectList_DrawPartyDetails(PartySelectList *psl, PokeParty *pa
     int i;
 
     PartySelectList_CreatePreviewWindow(psl);
-    func_ov036_02187c7c(psl->moneyWin);
+    MsgBGPrinter_ClearMsgWin(psl->moneyWin);
     text = GFL_StrBufCreate(64, psl->heapId);
     format = GFL_StrBufCreate(64, psl->heapId);
     count = PokeParty_GetPkmCount(party);
@@ -556,16 +558,16 @@ static void PartySelectList_DrawPartyDetails(PartySelectList *psl, PokeParty *pa
             WordSetNumber(psl->wordSet, 0, level, 3, NUM_PAD_NONE, TRUE);
             GFL_WordSetFormatStrbuf(psl->wordSet, text, format);
             offset = i * 40;
-            func_ov036_02187c58(psl->moneyWin, offset, 32, text, 0x440, psl->font);
+            MsgBGPrinter_MsgWinPrintStrColorFont(psl->moneyWin, offset, 32, text, 0x440, psl->font);
             if (sex != GENDER_UNKNOWN) {
                 if ((species == SPECIES_NIDORAN_F || species == SPECIES_NIDORAN_M) && showSex == 0) {
                     continue;
                 }
                 // The male and the female sign
                 if (sex == GENDER_MALE) {
-                    func_ov036_02187c34(psl->moneyWin, offset + 31, 16, Bank0104_Text_Empty);
+                    MsgBGPrinter_MsgWinPrintMsg(psl->moneyWin, offset + 31, 16, Bank0104_Text_Empty);
                 } else {
-                    func_ov036_02187c34(psl->moneyWin, offset + 31, 16, Bank0104_Text_Empty_2);
+                    MsgBGPrinter_MsgWinPrintMsg(psl->moneyWin, offset + 31, 16, Bank0104_Text_Empty_2);
                 }
             }
         }

@@ -19,11 +19,11 @@ struct PCSubprocessEventData {
     u16 *result;
 };
 
-GameEvent *func_ov033_02179868(GameSystem *gsys, u16 option, u16 *result) {
+GameEvent *Scrcmd_CreateSubProcEvent(GameSystem *gsys, u16 option, u16 *result) {
     GameEvent *event;
     PCSubprocessEventData *data;
 
-    event = GameEvent_Create(gsys, NULL, func_ov033_021798a0, sizeof(PCSubprocessEventData));
+    event = GameEvent_Create(gsys, NULL, Scrcmd_SubProcEventMain, sizeof(PCSubprocessEventData));
     data = GameEvent_GetData(event);
     data->gsys = gsys;
     data->field = GSYS_GetField(gsys);
@@ -33,7 +33,7 @@ GameEvent *func_ov033_02179868(GameSystem *gsys, u16 option, u16 *result) {
     return event;
 }
 
-GameEventReturnCode func_ov033_021798a0(GameEvent *event, u32 *state, void *eventData) {
+GameEventReturnCode Scrcmd_SubProcEventMain(GameEvent *event, u32 *state, void *eventData) {
     PCSubprocessEventData *data;
     GameEvent *next;
 
@@ -195,7 +195,7 @@ GameEventReturnCode pcLogOffSound(GameEvent *event, u32 *state, void *eventData)
     return GAMEEVENT_CONTINUE;
 }
 
-GameEvent *func_ov033_02179b24(GameEvent *parent, GameSystem *gsys, Field *field, u32 skipSound) {
+GameEvent *FieldDoorAnime_StartClose(GameEvent *parent, GameSystem *gsys, Field *field, u32 skipSound) {
     GameEvent *event;
     struct PCSoundEventData *data;
 

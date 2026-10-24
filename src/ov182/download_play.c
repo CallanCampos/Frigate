@@ -11,7 +11,7 @@
 // it in segments, tracking each child's state in bitmaps by AID. It is a second copy of the DS Download Play parent in
 // src/ov181/mbp.c, adapted without the heap, the asserts or the started flag, and with the state moved into the
 // caller's work, which is why the child bitmap table below is filled at run time. The functions the two copies share
-// unchanged are written to match ov181's.
+// unchanged are written as ov181 writes them.
 
 // The console's settings, which the system leaves in main memory for the ARM9: the firmware's user data, whose name
 // field sits at 6 and whose length byte follows it. This file reads those two and nothing else
@@ -39,46 +39,31 @@ enum {
 
 static DownloadPlayWork *sWork;
 
-// The children's bitmaps by state and the state and callback names. src/ov181/mbp.c declares them as three tables and
-// initializes the bitmaps with the addresses of its own state; this file's state is in its caller's work, so
-// DownloadPlay_GetChildBmp fills them instead, and the ROM keeps them as one 0x74-byte data object whose first 24
-// bytes are zero. The strings are the ROM's
-typedef struct {
-    u16 *childBmps[6];
-    const char *stateNames[8];
-    const char *callbackNames[15];
-} DownloadPlayTables;
-
-DownloadPlayTables DownloadPlay_Tables = {
-    { NULL, NULL, NULL, NULL, NULL, NULL },
-    {
-        "DWCi_MOV_MBP_STATE_STOP",
-        "DWCi_MOV_MBP_STATE_IDLE",
-        "DWCi_MOV_MBP_STATE_ENTRY",
-        "DWCi_MOV_MBP_STATE_DATASENDING",
-        "DWCi_MOV_MBP_STATE_REBOOTING",
-        "DWCi_MOV_MBP_STATE_COMPLETE",
-        "DWCi_MOV_MBP_STATE_CANCEL",
-        "DWCi_MOV_MBP_STATE_ERROR",
-    },
-    {
-        "MB_COMM_PSTATE_NONE",
-        "MB_COMM_PSTATE_INIT_COMPLETE",
-        "MB_COMM_PSTATE_CONNECTED",
-        "MB_COMM_PSTATE_DISCONNECTED",
-        "MB_COMM_PSTATE_KICKED",
-        "MB_COMM_PSTATE_REQ_ACCEPTED",
-        "MB_COMM_PSTATE_SEND_PROCEED",
-        "MB_COMM_PSTATE_SEND_COMPLETE",
-        "MB_COMM_PSTATE_BOOT_REQUEST",
-        "MB_COMM_PSTATE_BOOT_STARTABLE",
-        "MB_COMM_PSTATE_REQUESTED",
-        "MB_COMM_PSTATE_MEMBER_FULL",
-        "MB_COMM_PSTATE_END",
-        "MB_COMM_PSTATE_ERROR",
-        "MB_COMM_PSTATE_WAIT_TO_SEND",
-    },
+// The callback and state names and the children's bitmaps by state, the three tables of src/ov181/mbp.c. That file
+// initializes the bitmaps with the addresses of its own state; this file's state is in its caller's work, so the
+// bitmap table starts out zero and DownloadPlay_GetChildBmp fills it. The original has that table in .data, as an
+// explicit zero. The pragma covers it alone: over DownloadPlay_Init it would copy the zeroed state from a .rodata
+// template, which the ROM doesn't have. The tables' order sets the order of their strings in .data, which are the ROM's
+const char *DownloadPlay_CallbackNames[] = {
+    "MB_COMM_PSTATE_NONE",         "MB_COMM_PSTATE_INIT_COMPLETE",
+    "MB_COMM_PSTATE_CONNECTED",    "MB_COMM_PSTATE_DISCONNECTED",
+    "MB_COMM_PSTATE_KICKED",       "MB_COMM_PSTATE_REQ_ACCEPTED",
+    "MB_COMM_PSTATE_SEND_PROCEED", "MB_COMM_PSTATE_SEND_COMPLETE",
+    "MB_COMM_PSTATE_BOOT_REQUEST", "MB_COMM_PSTATE_BOOT_STARTABLE",
+    "MB_COMM_PSTATE_REQUESTED",    "MB_COMM_PSTATE_MEMBER_FULL",
+    "MB_COMM_PSTATE_END",          "MB_COMM_PSTATE_ERROR",
+    "MB_COMM_PSTATE_WAIT_TO_SEND",
 };
+
+const char *DownloadPlay_StateNames[] = {
+    "DWCi_MOV_MBP_STATE_STOP",        "DWCi_MOV_MBP_STATE_IDLE",      "DWCi_MOV_MBP_STATE_ENTRY",
+    "DWCi_MOV_MBP_STATE_DATASENDING", "DWCi_MOV_MBP_STATE_REBOOTING", "DWCi_MOV_MBP_STATE_COMPLETE",
+    "DWCi_MOV_MBP_STATE_CANCEL",      "DWCi_MOV_MBP_STATE_ERROR",
+};
+
+#pragma explicit_zero_data on
+u16 *DownloadPlay_ChildBmps[6] = { NULL, NULL, NULL, NULL, NULL, NULL };
+#pragma explicit_zero_data reset
 
 static void DownloadPlay_ChangeState(u16 state);
 static BOOL DownloadPlay_RegistFile(const MBGameRegistry *gameInfo);
@@ -93,11 +78,11 @@ static int DownloadPlay_GetChildState(u16 childAid);
 // functions the linker dropped from the ROM: reading the tables keeps them in the file's .data, as the ROM has them.
 // Their bodies are guesses
 static const char *DownloadPlay_GetStateName(u16 state) {
-    return DownloadPlay_Tables.stateNames[state];
+    return DownloadPlay_StateNames[state];
 }
 
 static const char *DownloadPlay_GetCallbackName(u32 status) {
-    return DownloadPlay_Tables.callbackNames[status];
+    return DownloadPlay_CallbackNames[status];
 }
 
 // Takes a child out of every state's bitmap, with the interrupts off while the six words change
@@ -409,14 +394,14 @@ u16 DownloadPlay_GetState(void) {
     return sWork->state.state;
 }
 
-u16 DownloadPlay_GetChildBmp(int bmpType) {
-    DownloadPlay_Tables.childBmps[DOWNLOAD_PLAY_BMP_CONNECT] = &sWork->state.connectChildBmp;
-    DownloadPlay_Tables.childBmps[DOWNLOAD_PLAY_BMP_REQUEST] = &sWork->state.requestChildBmp;
-    DownloadPlay_Tables.childBmps[DOWNLOAD_PLAY_BMP_ENTRY] = &sWork->state.entryChildBmp;
-    DownloadPlay_Tables.childBmps[DOWNLOAD_PLAY_BMP_DOWNLOAD] = &sWork->state.downloadChildBmp;
-    DownloadPlay_Tables.childBmps[DOWNLOAD_PLAY_BMP_BOOTABLE] = &sWork->state.bootableChildBmp;
-    DownloadPlay_Tables.childBmps[DOWNLOAD_PLAY_BMP_REBOOT] = &sWork->state.rebootChildBmp;
-    return *DownloadPlay_Tables.childBmps[bmpType];
+u16 DownloadPlay_GetChildBmp(DownloadPlayBmpType bmpType) {
+    DownloadPlay_ChildBmps[DOWNLOAD_PLAY_BMP_CONNECT] = &sWork->state.connectChildBmp;
+    DownloadPlay_ChildBmps[DOWNLOAD_PLAY_BMP_REQUEST] = &sWork->state.requestChildBmp;
+    DownloadPlay_ChildBmps[DOWNLOAD_PLAY_BMP_ENTRY] = &sWork->state.entryChildBmp;
+    DownloadPlay_ChildBmps[DOWNLOAD_PLAY_BMP_DOWNLOAD] = &sWork->state.downloadChildBmp;
+    DownloadPlay_ChildBmps[DOWNLOAD_PLAY_BMP_BOOTABLE] = &sWork->state.bootableChildBmp;
+    DownloadPlay_ChildBmps[DOWNLOAD_PLAY_BMP_REBOOT] = &sWork->state.rebootChildBmp;
+    return *DownloadPlay_ChildBmps[bmpType];
 }
 
 static int DownloadPlay_GetChildState(u16 childAid) {

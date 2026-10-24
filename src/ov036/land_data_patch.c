@@ -31,7 +31,7 @@ struct LandDataPatch {
     u8 *data;
 };
 
-static LandPatchGrid *func_ov036_021c2dcc(LandDataPatch *patch);
+static LandPatchGrid *LandDataPatch_GetAttrBlock(LandDataPatch *patch);
 static LandPatchBuildings *GetLandDataPatchBMDataPtr(LandDataPatch *patch);
 
 LandDataPatch *ReadLandDataPatchA154Data(u16 fileId, HeapID heapId) {
@@ -46,9 +46,9 @@ void FreeLandDataPatch(LandDataPatch *patch) {
     GFL_HeapFree(patch);
 }
 
-void func_ov036_021c2d04(LandDataPatch *patch, LandPatchGrid *src, u32 srcX, u32 srcY, u32 destX, u32 destY, u32 width,
-                         u32 height) {
-    LandPatchGrid *dest = func_ov036_021c2dcc(patch);
+void LandDataPatch_OverwriteAttr(LandDataPatch *patch, LandPatchGrid *src, u32 srcX, u32 srcY, u32 destX, u32 destY,
+                                 u32 width, u32 height) {
+    LandPatchGrid *dest = LandDataPatch_GetAttrBlock(patch);
     LandPatchCell *srcCells = src->cells;
     LandPatchCell *destCells = dest->cells;
     u32 i;
@@ -59,7 +59,7 @@ void func_ov036_021c2d04(LandDataPatch *patch, LandPatchGrid *src, u32 srcX, u32
     }
 }
 
-u32 LoadLandDataPatchBuildings(LandDataPatch *patch, void *a1, void *a2, u32 count, u32 x, u32 y) {
+u32 LoadLandDataPatchBuildings(LandDataPatch *patch, FieldPropSystem *a1, FieldChunk *a2, u32 count, u32 x, u32 y) {
     LandPatchBuildings *buildings = GetLandDataPatchBMDataPtr(patch);
     FieldPropSourceInfo *infos = buildings->infos;
     u32 i;
@@ -75,7 +75,7 @@ u32 LoadLandDataPatchBuildings(LandDataPatch *patch, void *a1, void *a2, u32 cou
     return count + buildings->count;
 }
 
-static LandPatchGrid *func_ov036_021c2dcc(LandDataPatch *patch) {
+static LandPatchGrid *LandDataPatch_GetAttrBlock(LandDataPatch *patch) {
     return (LandPatchGrid *)(patch->data + *(u16 *)patch->data);
 }
 

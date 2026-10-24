@@ -11,7 +11,7 @@
 void GFLAppInit(void);
 void GFLAppUpdate(void);
 // Does nothing, at the end of the main loop's updates
-void func_02005668(void);
+void GflUse_NoOpFrameHook(void);
 // Runs the HBlank tasks, from the HBlank interrupt
 void GFL_HBlankTCBUpdate(void);
 // Runs the VBlank callback, from the VBlank interrupt

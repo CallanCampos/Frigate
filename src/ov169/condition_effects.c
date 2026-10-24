@@ -129,7 +129,7 @@ static void ConditionEndTurnLeechSeed(BtlServerFlow *flow, BattleMon *mon, u8 mo
     sourceId = BtlServerFlow_GetMonIDAtPos(flow, pos);
     if (sourceId != 0x1f) {
         amount = DivideMaxHPZeroCheck(mon, 8);
-        hp = GetBattleMonStat(mon, 0xd);
+        hp = GetBattleMonStat(mon, BATTLEMON_HP);
         if (amount > hp) {
             amount = hp;
         }
@@ -504,7 +504,7 @@ void Condition_CheckTypeImmunity(BtlServerFlow *flow, BattleMon *target) {
     if (CheckCondition(target, CONDITION_INGRAIN) && BattleEventVar_GetValue(0x16) == TYPE_GROUND) {
         BattleEventVar_RewriteValue(0x4b, TRUE);
     }
-    if (CheckCondition(target, 0x1f) && BattleEventVar_GetValue(0x16) == TYPE_GROUND) {
+    if (CheckCondition(target, CONDITION_SMACK_DOWN) && BattleEventVar_GetValue(0x16) == TYPE_GROUND) {
         BattleEventVar_RewriteValue(0x4b, TRUE);
     }
 }
@@ -519,10 +519,10 @@ void Condition_CheckFloating(BtlServerFlow *flow, BattleMon *mon) {
     if (CheckCondition(mon, CONDITION_INGRAIN)) {
         BattleEventVar_RewriteValue(0x41, TRUE);
     }
-    if (CheckCondition(mon, 0x1f)) {
+    if (CheckCondition(mon, CONDITION_SMACK_DOWN)) {
         BattleEventVar_RewriteValue(0x41, TRUE);
     }
-    if (CheckCondition(mon, 0x20) || CheckCondition(mon, 0x1e)) {
+    if (CheckCondition(mon, CONDITION_TELEKINESIS) || CheckCondition(mon, CONDITION_MAGNET_RISE)) {
         BattleEventVar_RewriteValue(0x51, TRUE);
     }
 }

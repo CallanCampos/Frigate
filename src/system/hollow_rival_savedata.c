@@ -7,7 +7,7 @@
 // of each of eight indices, a counter, three flags and a value. The ROM has no string for the file, so the name is a
 // guess after swan's getHollow_RivalBlk.
 
-void *getHollow_RivalBlk(SaveControl *save) {
+HollowRivalSave *getHollow_RivalBlk(SaveControl *save) {
     return Misc_GetHollowRival(SaveControl_GetBlockPtr(save, SAVE_BLOCK_MISC));
 }
 

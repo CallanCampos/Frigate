@@ -11,7 +11,7 @@
 BOOL s014A_FieldOpen(VM *vm, FieldScriptEnv *env);
 BOOL s014B_FieldClose(VM *vm, FieldScriptEnv *env);
 void CreateScrCmdOverlayProcess(VM *vm, FieldScriptEnv *env, s32 overlayId, const GameProcFunctions *functions,
-                                void *resource, void (*cleanup)(ScriptOverlayWork *), void *data);
+                                void *resource, void (*cleanup)(ScriptOverlayWork *), BagScriptResult *data);
 BOOL WaitScrCmdOverlayProcess(VM *vm, void *data);
 BOOL s014C_RTFreeUserHeap(VM *vm, FieldScriptEnv *env);
 void CallBag_ReadResult(ScriptOverlayWork *work);

@@ -43,11 +43,11 @@ void freeAndClearPokewoodBlk(void) {
     sBlock = NULL;
 }
 
-void savePokewoodBlk(void *dest) {
+void savePokewoodBlk(PokewoodBlock *dest) {
     MIi_CpuCopy32(sBlock, dest, sizeof(PokewoodBlock));
 }
 
-void setPokewoodBlk(const void *src) {
+void setPokewoodBlk(const PokewoodBlock *src) {
     MIi_CpuCopy32(src, sBlock, sizeof(PokewoodBlock));
 }
 

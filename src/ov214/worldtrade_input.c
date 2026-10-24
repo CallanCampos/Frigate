@@ -141,7 +141,7 @@ static u32 Input_NationSelectMain(WorldTradeInputWork *wk);
 static void Input_HeadWord1Init(WorldTradeInputWork *wk, int type, int x);
 static void Input_SexSelectInit(WorldTradeInputWork *wk);
 static void Input_LevelSelectInit(WorldTradeInputWork *wk);
-static void Input_SysPrint(void *frm, BmpWin *win, StrBuf *str, int x, u16 color, WorldTradePrint *print);
+static void Input_SysPrint(BGWinFrame *frm, BmpWin *win, StrBuf *str, int x, u16 color, WorldTradePrint *print);
 static u32 Input_SeqNone(WorldTradeInputWork *wk);
 static u32 Input_SeqWinIn(WorldTradeInputWork *wk);
 static u32 Input_SeqWinWait(WorldTradeInputWork *wk);
@@ -183,10 +183,10 @@ static u32 Input_SeqSexExit(WorldTradeInputWork *wk);
 static u32 Input_SeqLevelInit(WorldTradeInputWork *wk);
 static u32 Input_SeqLevelMain(WorldTradeInputWork *wk);
 static u32 Input_SeqLevelExit(WorldTradeInputWork *wk);
-static void Input_SystemPrint(void *frm, MsgData *msgManager, BmpWin *win, int msgNo, int x, u16 color,
+static void Input_SystemPrint(BGWinFrame *frm, MsgData *msgManager, BmpWin *win, int msgNo, int x, u16 color,
                               WorldTradePrint *print);
-static void Input_TouchPrint(void *frm, MsgData *msgManager, BmpWin *win, int msgNo, WorldTradePrint *print);
-static void Input_PagePrint(void *frm, WorldTradeNumFont *numFont, BmpWin *win, int page, int max);
+static void Input_TouchPrint(BGWinFrame *frm, MsgData *msgManager, BmpWin *win, int msgNo, WorldTradePrint *print);
+static void Input_PagePrint(BGWinFrame *frm, WorldTradeNumFont *numFont, BmpWin *win, int page, int max);
 static int Input_PokeSeeCountSiin(WorldTradeInputWork *wk, int siin);
 static BOOL Input_PokeSeeCountCategory(WorldTradeInputWork *wk, int select);
 static int Input_NationCountSiin(WorldTradeInputWork *wk, int siin);
@@ -1385,7 +1385,7 @@ static void Input_LevelSelectInit(WorldTradeInputWork *wk) {
     wk->seq = WI_SEQ_LEVEL_MAIN;
 }
 
-static void Input_SysPrint(void *frm, BmpWin *win, StrBuf *str, int x, u16 color, WorldTradePrint *print) {
+static void Input_SysPrint(BGWinFrame *frm, BmpWin *win, StrBuf *str, int x, u16 color, WorldTradePrint *print) {
     WorldTrade_PrintColor(win, 0, str, x, 0, 0, color, print);
     BmpWin_FlushChar(win);
     BGWinFrame_WriteBmpWin(frm, 0, win);
@@ -2157,7 +2157,7 @@ static u32 Input_SeqLevelExit(WorldTradeInputWork *wk) {
     return wk->level;
 }
 
-static void Input_SystemPrint(void *frm, MsgData *msgManager, BmpWin *win, int msgNo, int x, u16 color,
+static void Input_SystemPrint(BGWinFrame *frm, MsgData *msgManager, BmpWin *win, int msgNo, int x, u16 color,
                               WorldTradePrint *print) {
     StrBuf *str = GFL_MsgDataLoadStrbufNew(msgManager, msgNo);
 
@@ -2165,7 +2165,7 @@ static void Input_SystemPrint(void *frm, MsgData *msgManager, BmpWin *win, int m
     GFL_StrBufFree(str);
 }
 
-static void Input_TouchPrint(void *frm, MsgData *msgManager, BmpWin *win, int msgNo, WorldTradePrint *print) {
+static void Input_TouchPrint(BGWinFrame *frm, MsgData *msgManager, BmpWin *win, int msgNo, WorldTradePrint *print) {
     StrBuf *str = GFL_MsgDataLoadStrbufNew(msgManager, msgNo);
 
     WorldTrade_PrintColor(win, 0, str, 0, 0, 0, INPUT_COLOR_NORMAL, print);
@@ -2174,7 +2174,7 @@ static void Input_TouchPrint(void *frm, MsgData *msgManager, BmpWin *win, int ms
     GFL_StrBufFree(str);
 }
 
-static void Input_PagePrint(void *frm, WorldTradeNumFont *numFont, BmpWin *win, int page, int max) {
+static void Input_PagePrint(BGWinFrame *frm, WorldTradeNumFont *numFont, BmpWin *win, int page, int max) {
     GFL_BitmapFill(BmpWin_GetBitmap(win), 8);
     WorldTrade_NumFontPrintNumber(numFont, page + 1, 2, 1, win, 0, 0);
     WorldTrade_NumFontPrintSlash(numFont, 0, win, 16, 0);

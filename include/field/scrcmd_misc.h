@@ -18,8 +18,8 @@ struct ElevatorFloor {
 };
 
 BOOL s0134_CasteliaRushInit(VM *vm, FieldScriptEnv *env);
-BOOL func_ov036_021afcfc(VM *vm, FieldScriptEnv *env);
-BOOL func_ov036_021afd9c(VM *vm, FieldScriptEnv *env);
+BOOL ElevatorTable_RegisterBirthdayEntry(VM *vm, FieldScriptEnv *env);
+BOOL ElevatorTable_GetMysteryEntryCount(VM *vm, FieldScriptEnv *env);
 BOOL s01C1_ElevatorSetTablePtr(VM *vm, FieldScriptEnv *env);
 BOOL s01C2_ElevatorBuildListMenu(VM *vm, FieldScriptEnv *env);
 BOOL s01C2_ElevatorChangeMap(VM *vm, FieldScriptEnv *env);

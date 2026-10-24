@@ -36,14 +36,14 @@ typedef struct {
     u16 duration;
 } SaveAnimeStep;
 
-static void func_ov036_021c6d58(FieldSaveAnime *anime, HeapID heapId);
-static void func_ov036_021c6db8(FieldSaveAnime *anime);
-static void func_ov036_021c6dc8(FieldSaveAnime *anime);
-static void func_ov036_021c6f54(FieldSaveAnime *anime);
-static void func_ov036_021c6f64(FieldSaveAnime *anime);
-static void func_ov036_021c6f7c(FieldSaveAnime *anime);
-static void func_ov036_021c6f94(FieldSaveAnime *anime, int frame);
-static void func_ov036_021c6fec(TCB *tcb, void *data);
+static void FieldSaveanime_LoadResource(FieldSaveAnime *anime, HeapID heapId);
+static void FieldSaveanime_DeleteResource(FieldSaveAnime *anime);
+static void FieldSaveanime_CreateWindow(FieldSaveAnime *anime);
+static void FieldSaveanime_DeleteWindow(FieldSaveAnime *anime);
+static void FieldSaveanime_ShowWindow(FieldSaveAnime *anime);
+static void FieldSaveanime_HideWindow(FieldSaveAnime *anime);
+static void FieldSaveanime_DrawFrame(FieldSaveAnime *anime, int frame);
+static void FieldSaveanime_AnimTask(TCB *tcb, void *data);
 
 static const u32 SAVE_ANIME_PALETTE_OFFSETS[2] = { 0, 1 };
 
@@ -51,38 +51,38 @@ static const VecFx32 SAVE_ANIME_UP = { 0, FX32_ONE, 0 };
 
 static const SaveAnimeStep SAVE_ANIME_STEPS[4] = { { 0, 20 }, { 1, 40 }, { 0, 60 }, { 2, 80 } };
 
-void *func_ov036_021c6cc8(HeapID heapId, Field *field) {
+FieldSaveAnime *FieldSaveanime_Create(HeapID heapId, Field *field) {
     FieldSaveAnime *anime = GFL_HeapAllocate(heapId, sizeof(FieldSaveAnime), TRUE, "field_saveanime.c", 143);
 
     anime->field = field;
-    func_ov036_021c6d58(anime, heapId);
-    func_ov036_021c6dc8(anime);
+    FieldSaveanime_LoadResource(anime, heapId);
+    FieldSaveanime_CreateWindow(anime);
     return anime;
 }
 
-void func_ov036_021c6cf8(FieldSaveAnime *anime) {
-    func_ov036_021c6d3c(anime);
-    func_ov036_021c6f54(anime);
-    func_ov036_021c6db8(anime);
+void FieldSaveanime_Delete(FieldSaveAnime *anime) {
+    FieldSaveanime_Stop(anime);
+    FieldSaveanime_DeleteWindow(anime);
+    FieldSaveanime_DeleteResource(anime);
     GFL_HeapFree(anime);
 }
 
-void func_ov036_021c6d14(FieldSaveAnime *anime) {
+void FieldSaveanime_Start(FieldSaveAnime *anime) {
     GFL_BGSysClearBG(3);
     anime->timer = 0;
-    func_ov036_021c6f64(anime);
-    anime->tcb = GFL_VBlankTCBAdd(func_ov036_021c6fec, anime, 128);
+    FieldSaveanime_ShowWindow(anime);
+    anime->tcb = GFL_VBlankTCBAdd(FieldSaveanime_AnimTask, anime, 128);
 }
 
-void func_ov036_021c6d3c(FieldSaveAnime *anime) {
+void FieldSaveanime_Stop(FieldSaveAnime *anime) {
     if (anime->tcb != NULL) {
         GFL_TCBRemove(anime->tcb);
         anime->tcb = NULL;
-        func_ov036_021c6f7c(anime);
+        FieldSaveanime_HideWindow(anime);
     }
 }
 
-static void func_ov036_021c6d58(FieldSaveAnime *anime, HeapID heapId) {
+static void FieldSaveanime_LoadResource(FieldSaveAnime *anime, HeapID heapId) {
     ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_FIELD_SAVEANIME, heapId);
     u32 gender = getTrainerGender(GetGameDataPlayerInfo(GSYS_GetGameData(Field_GetGameSystem(anime->field))));
 
@@ -91,12 +91,12 @@ static void func_ov036_021c6d58(FieldSaveAnime *anime, HeapID heapId) {
     GFL_ArcToolFree(arc);
 }
 
-static void func_ov036_021c6db8(FieldSaveAnime *anime) {
+static void FieldSaveanime_DeleteResource(FieldSaveAnime *anime) {
     GFL_BitmapFree(anime->bitmap);
     anime->bitmap = NULL;
 }
 
-static void func_ov036_021c6dc8(FieldSaveAnime *anime) {
+static void FieldSaveanime_CreateWindow(FieldSaveAnime *anime) {
     VecFx32 pos;
     VecFx32 diff;
     VecFx32 flat;
@@ -145,27 +145,27 @@ static void func_ov036_021c6dc8(FieldSaveAnime *anime) {
     anime->window = BmpWin_CreateDynamic(3, x, y, 5, 5, 9, 1);
     GFL_BitmapFill(BmpWin_GetBitmap(anime->window), 0);
     BmpWin_FlushChar(anime->window);
-    func_ov036_021c6f94(anime, 0);
+    FieldSaveanime_DrawFrame(anime, 0);
 }
 
-static void func_ov036_021c6f54(FieldSaveAnime *anime) {
+static void FieldSaveanime_DeleteWindow(FieldSaveAnime *anime) {
     BmpWin_Free(anime->window);
     anime->window = NULL;
 }
 
-static void func_ov036_021c6f64(FieldSaveAnime *anime) {
+static void FieldSaveanime_ShowWindow(FieldSaveAnime *anime) {
     BmpWin_FlushMap(anime->window);
     GFL_BGSysQueueScrLoad(3);
     GFL_BGSysSetBGEnabled(3, TRUE);
 }
 
-static void func_ov036_021c6f7c(FieldSaveAnime *anime) {
+static void FieldSaveanime_HideWindow(FieldSaveAnime *anime) {
     BmpWin_ClearScreen(anime->window);
     GFL_BGSysQueueScrLoad(3);
     GFL_BGSysSetBGEnabled(3, FALSE);
 }
 
-static void func_ov036_021c6f94(FieldSaveAnime *anime, int frame) {
+static void FieldSaveanime_DrawFrame(FieldSaveAnime *anime, int frame) {
     u32 charPos = BmpWin_GetCharPos(anime->window);
     GFLBitmap *bitmap = BmpWin_GetBitmap(anime->window);
 
@@ -173,7 +173,7 @@ static void func_ov036_021c6f94(FieldSaveAnime *anime, int frame) {
     GFL_BGSysLoadChar(3, GFL_BitmapGetPixelData(bitmap), GFL_BitmapCalcPixelDataSize(bitmap), charPos);
 }
 
-static void func_ov036_021c6fec(TCB *tcb, void *data) {
+static void FieldSaveanime_AnimTask(TCB *tcb, void *data) {
     FieldSaveAnime *anime = data;
 
     anime->timer++;
@@ -183,6 +183,6 @@ static void func_ov036_021c6fec(TCB *tcb, void *data) {
             anime->frame = 0;
             anime->timer = 0;
         }
-        func_ov036_021c6f94(anime, SAVE_ANIME_STEPS[anime->frame].nextBitmapFrame);
+        FieldSaveanime_DrawFrame(anime, SAVE_ANIME_STEPS[anime->frame].nextBitmapFrame);
     }
 }

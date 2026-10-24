@@ -62,28 +62,28 @@ typedef struct {
     fx32 distance;
 } TradeCubeParams;
 
-static void func_ov194_021c1918(HeapID heapId);
-static void func_ov194_021c196c(void);
-static void func_ov194_021c197c(PokemonTradeWork *wk);
-static void func_ov194_021c19d4(PokemonTradeWork *wk);
+static void PoketradeSave_Init3DProjection(HeapID heapId);
+static void PoketradeSave_Free3DLightSet(void);
+static void PoketradeSave_SetCameraSummary(PokemonTradeWork *wk);
+static void PoketradeSave_SetCameraTrade(PokemonTradeWork *wk);
 static void func_ov194_021c1a38(PokemonTradeWork *wk, SRTMatrix *mtx);
-static void func_ov194_021c1a40(PokemonTradeWork *wk, SRTMatrix *mtx);
-static void func_ov194_021c1ca4(PokemonTrade3DWork *work);
-static void func_ov194_021c2050(PokemonTradeWork *wk, int sceneId);
-static void func_ov194_021c20c8(PokemonTradeWork *wk);
-static void func_ov194_021c20f0(PokemonTradeWork *wk);
-static void func_ov194_021c2200(MCSS *mcss, const VecFx32 *scale, BOOL front, PartyPkm *pkm);
-static void func_ov194_021c2504(int vertex);
-static void func_ov194_021c2534(int normal);
-static void func_ov194_021c2548(int texCoord);
-static void func_ov194_021c255c(u16 *tex, int col, int row, u8 color);
-static void func_ov194_021c25dc(u16 *tex, const u8 (*boxes)[30], int box, int unused);
-static void func_ov194_021c2610(u16 *tex, const u8 *party, int unused);
-static void func_ov194_021c263c(PokemonTradeWork *wk, int count);
-static void func_ov194_021c26dc(BOOL vtxColor, BOOL shininess);
-static void func_ov194_021c2714(fx32 distance, int index, u16 angle, u16 rotation);
-static void func_ov194_021c2844(PokemonTradeWork *wk);
-static void func_ov194_021c2930(PokemonTradeWork *wk);
+static void PoketradeSave_Setup3DDrawState(PokemonTradeWork *wk, SRTMatrix *mtx);
+static void Poketrade3D_DeleteIcaStreams(PokemonTrade3DWork *work);
+static void Poketrade3D_AddUnit(PokemonTradeWork *wk, int sceneId);
+static void Poketrade3D_RemoveUnit(PokemonTradeWork *wk);
+static void Poketrade3D_Draw3DScene(PokemonTradeWork *wk);
+static void Poketrade3D_SetMcssOffsetForSpecies(MCSS *mcss, const VecFx32 *scale, BOOL front, PartyPkm *pkm);
+static void Poketrade3D_EmitCubeVertex(int vertex);
+static void Poketrade3D_SetCubeNormal(int normal);
+static void Poketrade3D_SetCubeTexCoord(int texCoord);
+static void Poketrade3D_FillTextureCell(u16 *tex, int col, int row, u8 color);
+static void Poketrade3D_FillTexturePage(u16 *tex, const u8 (*boxes)[30], int box, int unused);
+static void Poketrade3D_FillTextureHeader(u16 *tex, const u8 *party, int unused);
+static void Poketrade3D_UploadTexturePages(PokemonTradeWork *wk, int count);
+static void Poketrade3D_SetToonEdgeColors(BOOL vtxColor, BOOL shininess);
+static void Poketrade3D_DrawCubeFace(fx32 distance, int index, u16 angle, u16 rotation);
+static void Poketrade3D_DrawRotatingCube(PokemonTradeWork *wk);
+static void Poketrade3D_LoadTexturePalette(PokemonTradeWork *wk);
 
 // Nothing reads it
 const u32 data_ov194_021c679c = 16;
@@ -142,9 +142,12 @@ static const Light sLights[4] = {
 
 // Scene 0 has nothing to load, and its camera looks at the box cubes
 static const TradeSceneFuncs sSceneFuncs[6] = {
-    { func_ov194_021c197c, func_ov194_021c1a38 }, { func_ov194_021c19d4, func_ov194_021c1a40 },
-    { func_ov194_021c19d4, func_ov194_021c1a40 }, { func_ov194_021c19d4, func_ov194_021c1a40 },
-    { func_ov194_021c19d4, func_ov194_021c1a40 }, { func_ov194_021c19d4, func_ov194_021c1a40 },
+    { PoketradeSave_SetCameraSummary, func_ov194_021c1a38 },
+    { PoketradeSave_SetCameraTrade, PoketradeSave_Setup3DDrawState },
+    { PoketradeSave_SetCameraTrade, PoketradeSave_Setup3DDrawState },
+    { PoketradeSave_SetCameraTrade, PoketradeSave_Setup3DDrawState },
+    { PoketradeSave_SetCameraTrade, PoketradeSave_Setup3DDrawState },
+    { PoketradeSave_SetCameraTrade, PoketradeSave_Setup3DDrawState },
 };
 
 static const G3DSceneSetup sSceneSetups[6] = {
@@ -191,7 +194,7 @@ static u32 sCubeNormals[6] = {
 
 static G3DLight *sG3DLight;
 
-static void func_ov194_021c1918(HeapID heapId) {
+static void PoketradeSave_Init3DProjection(HeapID heapId) {
     sG3DLight = GFL_G3DLightCreate(&sLightSetupList, heapId);
     GFL_G3DLightFlush(sG3DLight);
     {
@@ -209,11 +212,11 @@ static void func_ov194_021c1918(HeapID heapId) {
     }
 }
 
-static void func_ov194_021c196c(void) {
+static void PoketradeSave_Free3DLightSet(void) {
     GFL_G3DLightFree(sG3DLight);
 }
 
-static void func_ov194_021c197c(PokemonTradeWork *wk) {
+static void PoketradeSave_SetCameraSummary(PokemonTradeWork *wk) {
     VecFx32 pos;
     VecFx32 vec;
 
@@ -233,7 +236,7 @@ static void func_ov194_021c197c(PokemonTradeWork *wk) {
     GFL_G3DCameraSetLookatUpVector(wk->sceneCamera, &vec);
 }
 
-static void func_ov194_021c19d4(PokemonTradeWork *wk) {
+static void PoketradeSave_SetCameraTrade(PokemonTradeWork *wk) {
     VecFx32 pos;
     VecFx32 vec;
     fx32 far;
@@ -258,10 +261,10 @@ static void func_ov194_021c19d4(PokemonTradeWork *wk) {
 }
 
 static void func_ov194_021c1a38(PokemonTradeWork *wk, SRTMatrix *mtx) {
-    func_ov194_021c2844(wk);
+    Poketrade3D_DrawRotatingCube(wk);
 }
 
-static void func_ov194_021c1a40(PokemonTradeWork *wk, SRTMatrix *mtx) {
+static void PoketradeSave_Setup3DDrawState(PokemonTradeWork *wk, SRTMatrix *mtx) {
     u32 i;
 
     mtx->translation.x = 0;
@@ -305,7 +308,7 @@ static void func_ov194_021c1a40(PokemonTradeWork *wk, SRTMatrix *mtx) {
     }
 }
 
-void func_ov194_021c1b74(PokemonTrade3DWork *work, int path) {
+void Poketrade3D_CreateIcaStreamsForMode(PokemonTrade3DWork *work, int path) {
     switch (path) {
     case 0:
         work->cameraPosPath = GFL_G3DCurveLoadFileStream(work->heapId, 0x68, 0x38, 10);
@@ -331,7 +334,7 @@ void func_ov194_021c1b74(PokemonTrade3DWork *work, int path) {
     }
 }
 
-static void func_ov194_021c1ca4(PokemonTrade3DWork *work) {
+static void Poketrade3D_DeleteIcaStreams(PokemonTrade3DWork *work) {
     if (work->cameraPosPath != NULL) {
         GFL_G3DCurveFree(work->cameraPosPath);
         work->cameraPosPath = NULL;
@@ -350,16 +353,16 @@ static void func_ov194_021c1ca4(PokemonTrade3DWork *work) {
     }
 }
 
-void func_ov194_021c1d00(PokemonTrade3DWork *work) {
+void Poketrade3D_CreateIcaStreamsEnding(PokemonTrade3DWork *work) {
     work->cameraPosPath = GFL_G3DCurveLoadFileStream(work->heapId, 0x69, 0xb, 10);
     work->cameraTargetPath = GFL_G3DCurveLoadFileStream(work->heapId, 0x69, 0xc, 10);
 }
 
-void func_ov194_021c1d30(PokemonTrade3DWork *work) {
-    func_ov194_021c1ca4(work);
+void Poketrade3D_FreeParticleResources(PokemonTrade3DWork *work) {
+    Poketrade3D_DeleteIcaStreams(work);
 }
 
-void func_ov194_021c1d38(PokemonTrade3DWork *work) {
+void Poketrade3D_InitParticleSystems(PokemonTrade3DWork *work) {
     int i;
     BOOL camera;
 
@@ -394,7 +397,7 @@ void func_ov194_021c1db4(PokemonTrade3DWork *work) {
     }
 }
 
-void func_ov194_021c1e08(PokemonTrade3DWork *work) {
+void Poketrade3D_SetupParticleSystemsHigh(PokemonTrade3DWork *work) {
     int i;
 
     for (i = 4; i < 9; i++) {
@@ -403,7 +406,7 @@ void func_ov194_021c1e08(PokemonTrade3DWork *work) {
     }
 }
 
-void func_ov194_021c1e38(PokemonTrade3DWork *work, int count) {
+void Poketrade3D_ExitParticleManager(PokemonTrade3DWork *work, int count) {
     int i;
 
     Particle_Free();
@@ -419,7 +422,7 @@ void func_ov194_021c1e38(PokemonTrade3DWork *work, int count) {
     }
 }
 
-void func_ov194_021c1e74(PokemonTrade3DWork *work) {
+void Poketrade3D_InitTradeParticleSet(PokemonTrade3DWork *work) {
     int i;
     void *resource;
 
@@ -434,10 +437,10 @@ void func_ov194_021c1e74(PokemonTrade3DWork *work) {
     }
 }
 
-void func_ov194_021c1ef0(PokemonTradeWork *wk) {
+void Poketrade3D_Init3DScene(PokemonTradeWork *wk) {
     wk->scene = SCENE_NONE;
     wk->sceneId = -1;
-    func_ov194_021c1918(HEAPID_POKEMON_TRADE);
+    PoketradeSave_Init3DProjection(HEAPID_POKEMON_TRADE);
     wk->sceneMgr = GFL_G3DMgrCreate(20, 20, HEAPID_POKEMON_TRADE);
     if (wk->sceneCamera == NULL) {
         VecFx32 pos = { 0, 0, 0 };
@@ -454,43 +457,43 @@ void func_ov194_021c1ef0(PokemonTradeWork *wk) {
     }
 }
 
-void func_ov194_021c1fb8(PokemonTradeWork *wk) {
-    func_ov194_021c20f0(wk);
+void Poketrade3D_Update3DScene(PokemonTradeWork *wk) {
+    Poketrade3D_Draw3DScene(wk);
 }
 
-void func_ov194_021c1fc0(PokemonTradeWork *wk) {
+void Poketrade3D_Delete3DScene(PokemonTradeWork *wk) {
     if (wk->sceneCamera != NULL) {
         GFL_G3DCameraFree(wk->sceneCamera);
     }
     GFL_G3DMgrFree(wk->sceneMgr);
     if (wk->work3D != NULL) {
-        func_ov194_021c1e38(wk->work3D, 6);
-        func_ov194_021c1d30(wk->work3D);
+        Poketrade3D_ExitParticleManager(wk->work3D, 6);
+        Poketrade3D_FreeParticleResources(wk->work3D);
         GFL_HeapFree(wk->work3D);
         wk->work3D = NULL;
     }
-    func_ov194_021c196c();
+    PoketradeSave_Free3DLightSet();
 }
 
-void func_ov194_021c2000(PokemonTradeWork *wk) {
-    func_ov194_021c263c(wk, 25);
+void Poketrade3D_UploadCubeTextures(PokemonTradeWork *wk) {
+    Poketrade3D_UploadTexturePages(wk, 25);
 }
 
-void func_ov194_021c200c(PokemonTradeWork *wk, int sceneId) {
-    func_ov194_021c2050(wk, sceneId);
+void Poketrade3D_AddUnitAndInit(PokemonTradeWork *wk, int sceneId) {
+    Poketrade3D_AddUnit(wk, sceneId);
     if (wk->sceneId != -1) {
         sSceneFuncs[wk->sceneId].init(wk);
     }
 }
 
-void func_ov194_021c2034(PokemonTradeWork *wk) {
+void Poketrade3D_RemoveCurrentUnit(PokemonTradeWork *wk) {
     if (wk->sceneId != -1) {
-        func_ov194_021c20c8(wk);
+        Poketrade3D_RemoveUnit(wk);
         wk->sceneId = -1;
     }
 }
 
-static void func_ov194_021c2050(PokemonTradeWork *wk, int sceneId) {
+static void Poketrade3D_AddUnit(PokemonTradeWork *wk, int sceneId) {
     if (sSceneSetups[sceneId].actorCount != 0) {
         wk->scene = GFL_G3DMgrNewScene(wk->sceneMgr, &sSceneSetups[sceneId]);
     } else {
@@ -508,14 +511,14 @@ static void func_ov194_021c2050(PokemonTradeWork *wk, int sceneId) {
     wk->sceneId = sceneId;
 }
 
-static void func_ov194_021c20c8(PokemonTradeWork *wk) {
+static void Poketrade3D_RemoveUnit(PokemonTradeWork *wk) {
     if (wk->scene != SCENE_NONE) {
         GFL_G3DMgrDeleteScene(wk->sceneMgr, wk->scene);
     }
     wk->scene = SCENE_NONE;
 }
 
-static void func_ov194_021c20f0(PokemonTradeWork *wk) {
+static void Poketrade3D_Draw3DScene(PokemonTradeWork *wk) {
     SRTMatrix mtx;
 
     if (wk->sceneId != -1) {
@@ -562,7 +565,7 @@ static void func_ov194_021c20f0(PokemonTradeWork *wk) {
 }
 
 // Moves the sprite to where its species is drawn off centre, or else by a third of its width toward the middle
-static void func_ov194_021c2200(MCSS *mcss, const VecFx32 *scale, BOOL front, PartyPkm *pkm) {
+static void Poketrade3D_SetMcssOffsetForSpecies(MCSS *mcss, const VecFx32 *scale, BOOL front, PartyPkm *pkm) {
     VecFx32 offset;
     BOOL found;
     int dir = 0;
@@ -608,7 +611,7 @@ static void func_ov194_021c2200(MCSS *mcss, const VecFx32 *scale, BOOL front, Pa
     MCSS_SetPositionOffset(mcss, &offset);
 }
 
-void func_ov194_021c23a4(PokemonTradeWork *wk, int side, BOOL front, PartyPkm *pkm, BOOL mirror) {
+void Poketrade3D_AddPokemonMcss(PokemonTradeWork *wk, int side, BOOL front, PartyPkm *pkm, BOOL mirror) {
     VecFx32 scale = { FX32_CONST(16), FX32_CONST(16), FX32_ONE };
     fx32 x[4] = { FX32_CONST(-55), FX32_CONST(55), FX32_CONST(-55), FX32_CONST(55) };
 
@@ -617,7 +620,7 @@ void func_ov194_021c23a4(PokemonTradeWork *wk, int side, BOOL front, PartyPkm *p
         u16 form = PokeParty_GetParam(pkm, PKM_PARAM_FORM, NULL);
         PersonalData *personal = PML_PersonalLoad(species, form, wk->heapId);
         // The species' flag that its sprite is never mirrored
-        u32 noMirror = PML_PersonalGetParam(personal, 34);
+        u32 noMirror = PML_PersonalGetParam(personal, PERSONAL_NO_FLIP);
 
         PML_PersonalFree(personal);
         if (noMirror == FALSE) {
@@ -638,22 +641,23 @@ void func_ov194_021c23a4(PokemonTradeWork *wk, int side, BOOL front, PartyPkm *p
     MCSS_SetLoopAnimation(wk->mcss[side]);
     MCSS_SetScale(wk->mcss[side], &scale);
     MCSS_SetNoShadow(wk->mcss[side], 1);
-    func_ov194_021c2200(wk->mcss[side], &scale, front, pkm);
+    Poketrade3D_SetMcssOffsetForSpecies(wk->mcss[side], &scale, front, pkm);
 }
 
-void func_ov194_021c24ac(PokemonTradeWork *wk, int side, BOOL front, PartyPkm *pkm, BOOL mirror, BOOL a5) {
+void Poketrade3D_AddPokemonMcssFlipped(PokemonTradeWork *wk, int side, BOOL front, PartyPkm *pkm, BOOL mirror,
+                                       BOOL a5) {
     if (a5 && !front) {
         front = TRUE;
         mirror = FALSE;
     }
-    func_ov194_021c23a4(wk, side, front, pkm, mirror);
+    Poketrade3D_AddPokemonMcss(wk, side, front, pkm, mirror);
 }
 
-void func_ov194_021c24cc(PokemonTradeWork *wk, int side, BOOL front, PartyPkm *pkm, BOOL mirror) {
-    func_ov194_021c23a4(wk, side, front, pkm, mirror);
+void Poketrade3D_AddPokemonMcssPlain(PokemonTradeWork *wk, int side, BOOL front, PartyPkm *pkm, BOOL mirror) {
+    Poketrade3D_AddPokemonMcss(wk, side, front, pkm, mirror);
 }
 
-void func_ov194_021c24dc(PokemonTradeWork *wk, int side) {
+void Poketrade3D_DeleteMcssSlot(PokemonTradeWork *wk, int side) {
     if (wk->mcss[side] != NULL) {
         MCSS_Hide(wk->mcss[side]);
         MCSSSys_Remove(wk->mcssSys, wk->mcss[side]);
@@ -661,20 +665,20 @@ void func_ov194_021c24dc(PokemonTradeWork *wk, int side) {
     }
 }
 
-static void func_ov194_021c2504(int vertex) {
+static void Poketrade3D_EmitCubeVertex(int vertex) {
     G3_Vtx(sCubeVertices[vertex * 3], sCubeVertices[vertex * 3 + 1], sCubeVertices[vertex * 3 + 2]);
 }
 
-static void func_ov194_021c2534(int normal) {
+static void Poketrade3D_SetCubeNormal(int normal) {
     reg_G3_NORMAL = sCubeNormals[normal];
 }
 
-static void func_ov194_021c2548(int texCoord) {
+static void Poketrade3D_SetCubeTexCoord(int texCoord) {
     reg_G3_TEXCOORD = sCubeTexCoords[texCoord];
 }
 
 // Paints a slot's 3 by 3 square of a box texture, the slots 5 pixels apart across and 6 down
-static void func_ov194_021c255c(u16 *tex, int col, int row, u8 color) {
+static void Poketrade3D_FillTextureCell(u16 *tex, int col, int row, u8 color) {
     int x;
     int y;
     int left = col * 5 + 2;
@@ -691,27 +695,27 @@ static void func_ov194_021c255c(u16 *tex, int col, int row, u8 color) {
     }
 }
 
-static void func_ov194_021c25dc(u16 *tex, const u8 (*boxes)[30], int box, int unused) {
+static void Poketrade3D_FillTexturePage(u16 *tex, const u8 (*boxes)[30], int box, int unused) {
     int row;
     int col;
 
     for (row = 0; row < 5; row++) {
         for (col = 0; col < 6; col++) {
-            func_ov194_021c255c(tex, col, row, boxes[box][row * 6 + col]);
+            Poketrade3D_FillTextureCell(tex, col, row, boxes[box][row * 6 + col]);
         }
     }
 }
 
-static void func_ov194_021c2610(u16 *tex, const u8 *party, int unused) {
+static void Poketrade3D_FillTextureHeader(u16 *tex, const u8 *party, int unused) {
     int i;
 
     for (i = 0; i < 6; i++) {
-        func_ov194_021c255c(tex, i % 2 + 2, i / 2 + 1, party[i]);
+        Poketrade3D_FillTextureCell(tex, i % 2 + 2, i / 2 + 1, party[i]);
     }
 }
 
 // Draws the textures of the partner's party and boxes' cubes and loads their palette
-static void func_ov194_021c263c(PokemonTradeWork *wk, int count) {
+static void Poketrade3D_UploadTexturePages(PokemonTradeWork *wk, int count) {
     u16 *tex;
     int i;
 
@@ -720,25 +724,25 @@ static void func_ov194_021c263c(PokemonTradeWork *wk, int count) {
     for (i = 0; i < count; i++) {
         MI_CpuFill8(tex, 0, CUBE_TEX_SIZE);
         if (i == 0) {
-            func_ov194_021c2610(tex, wk->boxColors[1].party, 2);
+            Poketrade3D_FillTextureHeader(tex, wk->boxColors[1].party, 2);
         } else {
-            func_ov194_021c25dc(tex, wk->boxColors[1].boxes, i - 1, 2);
+            Poketrade3D_FillTexturePage(tex, wk->boxColors[1].boxes, i - 1, 2);
         }
         DC_FlushRange(tex, CUBE_TEX_SIZE);
         GX_LoadTex(tex, i * CUBE_TEX_SIZE + CUBE_TEX_ADDR, CUBE_TEX_SIZE);
     }
     GFL_HeapFree(tex);
     GX_EndLoadTex();
-    func_ov194_021c2930(wk);
+    Poketrade3D_LoadTexturePalette(wk);
 }
 
-static void func_ov194_021c26dc(BOOL vtxColor, BOOL shininess) {
+static void Poketrade3D_SetToonEdgeColors(BOOL vtxColor, BOOL shininess) {
     G3_MaterialColorDiffAmb(GX_RGB(23, 23, 23), GX_RGB(26, 26, 26), vtxColor);
     G3_MaterialColorSpecEmi(GX_RGB(31, 31, 31), GX_RGB(0, 0, 0), shininess);
 }
 
 // Draws the face of a cube with its texture, at the angle of the ring that the ring's rotation turns
-static void func_ov194_021c2714(fx32 distance, int index, u16 angle, u16 rotation) {
+static void Poketrade3D_DrawCubeFace(fx32 distance, int index, u16 angle, u16 rotation) {
     G3_PushMtx();
     G3_MtxMode(GX_MTXMODE_POSITION);
     G3_RotY(FX_SinIdx(rotation), FX_CosIdx(rotation));
@@ -751,24 +755,24 @@ static void func_ov194_021c2714(fx32 distance, int index, u16 angle, u16 rotatio
     G3_MtxMode(GX_MTXMODE_TEXTURE);
     G3_Identity();
     G3_MtxMode(GX_MTXMODE_POSITION_VECTOR);
-    func_ov194_021c26dc(TRUE, TRUE);
+    Poketrade3D_SetToonEdgeColors(TRUE, TRUE);
     G3_TexImageParam(GX_TEXFMT_PLTT16, GX_TEXGEN_TEXCOORD, GX_TEXSIZE_S32, GX_TEXSIZE_T32, GX_TEXREPEAT_NONE,
                      GX_TEXFLIP_NONE, GX_TEXPLTTCOLOR0_USE, index * CUBE_TEX_SIZE + CUBE_TEX_ADDR);
     G3_TexPlttBase(CUBE_PLTT_ADDR, GX_TEXFMT_PLTT16);
     G3_PolygonAttr(GX_LIGHTMASK_0, GX_POLYGONMODE_MODULATE, GX_CULL_FRONT, index, 31, 0);
     G3_Begin(GX_BEGIN_QUADS);
-    func_ov194_021c2548(1);
-    func_ov194_021c2534(0);
-    func_ov194_021c2504(2);
-    func_ov194_021c2548(0);
-    func_ov194_021c2534(0);
-    func_ov194_021c2504(0);
-    func_ov194_021c2548(2);
-    func_ov194_021c2534(0);
-    func_ov194_021c2504(4);
-    func_ov194_021c2548(3);
-    func_ov194_021c2534(0);
-    func_ov194_021c2504(6);
+    Poketrade3D_SetCubeTexCoord(1);
+    Poketrade3D_SetCubeNormal(0);
+    Poketrade3D_EmitCubeVertex(2);
+    Poketrade3D_SetCubeTexCoord(0);
+    Poketrade3D_SetCubeNormal(0);
+    Poketrade3D_EmitCubeVertex(0);
+    Poketrade3D_SetCubeTexCoord(2);
+    Poketrade3D_SetCubeNormal(0);
+    Poketrade3D_EmitCubeVertex(4);
+    Poketrade3D_SetCubeTexCoord(3);
+    Poketrade3D_SetCubeNormal(0);
+    Poketrade3D_EmitCubeVertex(6);
     G3_End();
     G3_PopMtx(1);
     G3_PopMtx(1);
@@ -776,7 +780,7 @@ static void func_ov194_021c2714(fx32 distance, int index, u16 angle, u16 rotatio
 
 // Draws the ring of cubes, the party's and one per box, turned so that the one the strip is scrolled to faces the
 // camera
-static void func_ov194_021c2844(PokemonTradeWork *wk) {
+static void Poketrade3D_DrawRotatingCube(PokemonTradeWork *wk) {
     int boxCount;
     int i;
     int count;
@@ -790,7 +794,7 @@ static void func_ov194_021c2844(PokemonTradeWork *wk) {
     G3i_LookAt_(&sCameraPos, &sCameraUp, &sCameraTarget, TRUE, NULL);
     G3_LightVector(GX_LIGHTID_0, FX16_CONST(0.577), -FX16_CONST(0.577), -FX16_CONST(0.577));
     G3_LightColor(GX_LIGHTID_0, GX_RGB(31, 31, 31));
-    boxCount = func_ov194_021b7778(wk);
+    boxCount = PokemonTrade_GetStoredBoxIndex(wk);
     count = boxCount + 1;
     width = count * 160;
     scroll = wk->unk107E;
@@ -817,12 +821,12 @@ static void func_ov194_021c2844(PokemonTradeWork *wk) {
     x %= width;
     pos = ((u64)x << 16) / width;
     for (i = 0; i < count; i++) {
-        func_ov194_021c2714(sCubeParams.distance, i, (i << 16) / count, 0x10000 - pos);
+        Poketrade3D_DrawCubeFace(sCubeParams.distance, i, (i << 16) / count, 0x10000 - pos);
     }
 }
 
 // Loads the palette of the box slots' colours, its first colour a dark grey, and keeps a copy
-static void func_ov194_021c2930(PokemonTradeWork *wk) {
+static void Poketrade3D_LoadTexturePalette(PokemonTradeWork *wk) {
     NNSG2dPaletteData *palette;
     ArcTool *arc = GFL_ArcSysCreateFileHandle(0x75, wk->heapId);
     void *file = GFL_G2DIOReadNCLRArc(arc, 0x48, &palette, wk->heapId);
@@ -841,7 +845,7 @@ static void func_ov194_021c2930(PokemonTradeWork *wk) {
 }
 
 // Loads the box slots' palette a step darker
-void func_ov194_021c29b4(PokemonTradeWork *wk) {
+void Poketrade3D_FadeTexturePalette(PokemonTradeWork *wk) {
     int i;
     int j;
 

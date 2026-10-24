@@ -18,24 +18,24 @@ u32 FieldPlayer_GetExState(FieldPlayer *player);
 u32 FieldPlayer_DeriveExState(FieldPlayer *player);
 void FieldPlayer_SetSpecialState(FieldPlayer *player, u32 state);
 void FieldPlayer_SetSpecialSeq(FieldPlayer *player, u32 seq);
-BOOL func_ov036_0219a580(FieldPlayer *player);
-u32 func_ov036_0219a864(FieldPlayer *player);
-BOOL func_ov036_0219a834(FieldPlayer *player);
-BOOL func_ov036_0219a870(FieldPlayer *player);
-BOOL func_ov036_0219ab24(FieldPlayer *player);
+BOOL FieldPlayer_StepFormChange(FieldPlayer *player);
+u32 FieldPlayer_CheckFormModel(FieldPlayer *player);
+BOOL FieldPlayer_CheckNotWaterForm(FieldPlayer *player);
+BOOL FieldPlayer_CheckAnimePaused(FieldPlayer *player);
+BOOL FieldPlayer_WaitModelReady(FieldPlayer *player);
 u32 FieldPlayer_GetTileTypeUnder(FieldPlayer *player);
 // The player's grid and rail movement
 void FieldPlayer_InitGrid(FieldPlayer *player, HeapID heapId);
-void func_ov036_0219accc(FieldPlayer *player, HeapID heapId);
+void FieldPlayer_CreateNogrid(FieldPlayer *player, HeapID heapId);
 u16 FieldPlayer_GetMoveDirByKey(FieldPlayer *player, u32 heldKeys);
-BOOL func_ov036_0219a5dc(FieldPlayer *player);
+BOOL FieldPlayer_CheckMoveBusy(FieldPlayer *player);
 BOOL FieldPlayer_CheckRunningShoesFlag(FieldPlayer *player);
 void FieldPlayer_UpdateGridMovement(FieldPlayer *player, u32 pressedKeys, u32 heldKeys, u32 flags);
 void FieldPlayer_UpdateRailMovement(FieldPlayer *player, u32 pressedKeys, u32 heldKeys);
-void func_ov036_0219ace8(FieldPlayer *player, const void *pos);
-void func_ov036_0219acf4(FieldPlayer *player);
-BOOL func_ov036_0219ad00(FieldPlayer *player);
-void *func_ov036_0219ad0c(FieldPlayer *player);
+void FieldPlayer_AttachNogridMmdl(FieldPlayer *player, const RailPosition *pos);
+void FieldPlayer_ResetNogrid(FieldPlayer *player);
+BOOL FieldPlayer_IsNogridForcedMove(FieldPlayer *player);
+RailUnit *FieldPlayer_GetNogridRailWork(FieldPlayer *player);
 u32 FieldPlayer_GetTileTypeInDir(FieldPlayer *player, u16 direction);
 FieldActor *FieldPlayer_GetActorInFront(FieldPlayer *player);
 FieldActor *FieldPlayer_GetActorInFrontEx(FieldPlayer *player, fx32 maxHeightDiff);
@@ -49,11 +49,11 @@ void FieldPlayer_SetRailPos(FieldPlayer *player, const RailPosition *pos);
 void FieldPlayer_GetRailWorldPos(FieldPlayer *player, VecFx32 *pos);
 // The event of walking into an actor, or NULL. Only on the grid
 GameEvent *FieldPlayer_CheckObjContactEvent(FieldPlayer *player, u32 pressedKeys, u32 heldKeys, u32 flags);
-void func_ov036_0219a58c(FieldPlayer *player);
+void FieldPlayer_FinishFormChange(FieldPlayer *player);
 // The core's terrain effect task: set and get
-void func_ov036_0219a5b8(FieldPlayer *player, FieldEffectTask *task);
-FieldEffectTask *func_ov036_0219a5c4(FieldPlayer *player);
-void func_ov036_0219a5fc(FieldPlayer *player);
+void FieldPlayer_SetRideEffect(FieldPlayer *player, FieldEffectTask *task);
+FieldEffectTask *FieldPlayer_GetRideEffect(FieldPlayer *player);
+void FieldPlayer_ChangeToNormalForm(FieldPlayer *player);
 void FieldPlayer_UpdateActionStatusObserver(FieldPlayer *player);
 Field *FieldPlayer_GetField(FieldPlayer *player);
 // What FieldPlayer_GetMoveObserveStatus says of the player's last action command: none, one that has started, one
@@ -85,9 +85,9 @@ void FieldPlayer_ForceObjCode(FieldPlayer *player, u16 objCode);
 void FieldPlayer_ClearObjCode(FieldPlayer *player);
 void FieldPlayer_GetGPosInFront(FieldPlayer *player, s16 *x, s16 *y, s16 *z);
 void FieldPlayer_InterruptCatwalkBalance(FieldPlayer *player, BOOL keep);
-void func_ov036_0219abd8(FieldPlayer *player);
+void FieldPlayer_StopGridForcedMove(FieldPlayer *player);
 BOOL FieldPlayer_GetVerticalMoveOnlyFlag(FieldPlayer *player);
-void func_ov036_0219ac0c(FieldPlayer *player);
-FieldPlayerGrid *func_ov036_0219ad48(FieldPlayer *player);
+void FieldPlayer_SetGridHopLanded(FieldPlayer *player);
+FieldPlayerGrid *FieldPlayer_GetGrid(FieldPlayer *player);
 
 #endif // POKEBW2_FIELD_FIELD_PLAYER_H

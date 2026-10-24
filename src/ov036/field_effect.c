@@ -56,18 +56,18 @@ static void FieldEffects_InitEffectBuffer(FieldEffects *effects);
 static void FieldEffects_FreeEffectBuffer(FieldEffects *effects);
 static FieldEffectHandle *FieldEffects_GetHandleByID(FieldEffects *effects, u32 id);
 static const FieldEffectVTable *FieldEffects_GetVTable(u32 id);
-static void func_ov036_021a38d0(FieldEffects *effects);
+static void FieldEffects_ExitObjectSystem(FieldEffects *effects);
 static void FieldEffects_TCBManagerUpdate(FieldEffects *effects);
-static void func_ov036_021a38fc(FieldEffects *effects);
+static void FieldEffects_DrawObjects(FieldEffects *effects);
 static FieldEffectTaskStore *FieldEffectTCBStore_Create(HeapID heapId, TCBManager *tcbMgr, u32 count,
                                                         FieldEffects *effects);
-static void func_ov036_021a3958(FieldEffectTaskStore *store);
-static void func_ov036_021a3990(FieldEffectTaskStore *store);
+static void FieldEffects_DeleteObjectMgr(FieldEffectTaskStore *store);
+static void FieldEffects_DrawObjectMgr(FieldEffectTaskStore *store);
 static FieldEffectTask *FieldTerrainEffectTCB_Create(FieldEffectTaskStore *store, const FieldEffectTaskVTable *vtable,
                                                      const VecFx32 *pos, u32 param1, void *param2, u32 priority);
-static void func_ov036_021a3a50(TCB *tcb, void *data);
-static void func_ov036_021a3a5c(FieldEffectTask *task);
-static void func_ov036_021a3aa8(FieldEffectTask *task);
+static void FieldEffects_ObjectTask(TCB *tcb, void *data);
+static void FieldEffects_InitObject(FieldEffectTask *task);
+static void FieldEffects_DrawObject(FieldEffectTask *task);
 
 const u32 data_ov036_021d0388 = 21;
 
@@ -81,19 +81,19 @@ static const FieldEffectVTable FIELD_EFFECT_VTABLES[FLDEFF_MAX + 1] = {
     { 0, FieldEffect_Shadow_Create, FieldEffect_Shadow_Free },
     { 1, playSmokeEffect, freeSmokeEffect },
     { 2, loadGrassEffects, freeGrassEffects },
-    { 3, func_ov036_021a4384, func_ov036_021a43a8 },
+    { 3, FldeffNamipoke_Create, func_ov036_021a43a8 },
     { 4, func_ov036_021b3e50, func_ov036_021b3e94 },
-    { 5, func_ov036_021b46b0, func_ov036_021b46ec },
+    { 5, Footmark_Init, func_ov036_021b46ec },
     { 6, func_ov036_021b496c, func_ov036_021b4990 },
     { 7, func_ov036_021be790, func_ov036_021be7c4 },
-    { 8, func_ov036_021a4d20, func_ov036_021a4d48 },
-    { 9, func_ov036_021a5604, func_ov036_021a5628 },
-    { 10, func_ov036_021c2788, func_ov036_021c27ac },
-    { 11, func_ov036_021c2ddc, func_ov036_021c2e00 },
+    { 8, FldeffNamipokeSplash_Create, func_ov036_021a4d48 },
+    { 9, FldeffIwakudaki_Create, func_ov036_021a5628 },
+    { 10, StoneTask_Create, func_ov036_021c27ac },
+    { 11, FldeffIaigiri_Create, func_ov036_021c2e00 },
     { 12, func_ov036_021a5828, func_ov036_021a584c },
     { 13, FieldEffect_BTrain_Create, FieldEffect_BTrain_Free },
     { 14, func_ov036_021c66e8, func_ov036_021c670c },
-    { 15, func_ov036_021c696c, func_ov036_021c6990 },
+    { 15, FldeffBubble_CreateRes, func_ov036_021c6990 },
     { 16, func_ov036_021be988, func_ov036_021be9ac },
     { 17, func_ov036_021c944c, func_ov036_021c9470 },
     { 18, func_ov036_021a5a18, func_ov036_021a5a20 },
@@ -129,7 +129,7 @@ FieldEffects *FieldEffects_Create(Field *field, int count, HeapID heapId) {
 }
 
 void FieldEffects_Free(FieldEffects *effects) {
-    func_ov036_021a38d0(effects);
+    FieldEffects_ExitObjectSystem(effects);
     FieldEffects_FreeEffectBuffer(effects);
     GFL_ArcToolFree(effects->arc);
     GFL_HeapFree(effects);
@@ -140,14 +140,14 @@ void FieldEffects_Update(FieldEffects *effects) {
 }
 
 void FieldEffects_Draw(FieldEffects *effects) {
-    func_ov036_021a38fc(effects);
+    FieldEffects_DrawObjects(effects);
 }
 
 Field *FieldEffects_GetField(FieldEffects *effects) {
     return effects->field;
 }
 
-struct FieldG3DObjSystem *func_ov036_021a3724(FieldEffects *effects) {
+struct FieldG3DObjSystem *FieldEffects_GetFieldMapData(FieldEffects *effects) {
     return Field_GetG3DObjSys(effects->field);
 }
 
@@ -262,9 +262,9 @@ FieldEffectTask *FieldEffects_TCBCreate(FieldEffects *effects, const FieldEffect
     return FieldTerrainEffectTCB_Create(effects->taskStore, vtable, pos, param1, param2, priority);
 }
 
-static void func_ov036_021a38d0(FieldEffects *effects) {
+static void FieldEffects_ExitObjectSystem(FieldEffects *effects) {
     if (effects->taskStore != NULL) {
-        func_ov036_021a3958(effects->taskStore);
+        FieldEffects_DeleteObjectMgr(effects->taskStore);
         GFL_TCBMgrDelete(effects->tcbMgr);
         GFL_HeapFree(effects->tcbMgrWork);
     }
@@ -276,9 +276,9 @@ static void FieldEffects_TCBManagerUpdate(FieldEffects *effects) {
     }
 }
 
-static void func_ov036_021a38fc(FieldEffects *effects) {
+static void FieldEffects_DrawObjects(FieldEffects *effects) {
     if (effects->taskStore != NULL) {
-        func_ov036_021a3990(effects->taskStore);
+        FieldEffects_DrawObjectMgr(effects->taskStore);
     }
 }
 
@@ -294,24 +294,24 @@ static FieldEffectTaskStore *FieldEffectTCBStore_Create(HeapID heapId, TCBManage
     return store;
 }
 
-static void func_ov036_021a3958(FieldEffectTaskStore *store) {
+static void FieldEffects_DeleteObjectMgr(FieldEffectTaskStore *store) {
     u32 i;
 
     for (i = 0; i < store->count; i++) {
         if (store->tasks[i].active) {
-            func_ov036_021a3a70(&store->tasks[i]);
+            FieldEffects_DeleteObject(&store->tasks[i]);
         }
     }
     GFL_HeapFree(store->tasks);
     GFL_HeapFree(store);
 }
 
-static void func_ov036_021a3990(FieldEffectTaskStore *store) {
+static void FieldEffects_DrawObjectMgr(FieldEffectTaskStore *store) {
     u32 i;
 
     for (i = 0; i < store->count; i++) {
         if (store->tasks[i].active) {
-            func_ov036_021a3aa8(&store->tasks[i]);
+            FieldEffects_DrawObject(&store->tasks[i]);
         }
     }
 }
@@ -333,30 +333,30 @@ static FieldEffectTask *FieldTerrainEffectTCB_Create(FieldEffectTaskStore *store
                 task->pos = *pos;
             }
             task->store = store;
-            task->tcb = GFL_TCBMgrAddTask(store->tcbMgr, func_ov036_021a3a50, task, priority);
+            task->tcb = GFL_TCBMgrAddTask(store->tcbMgr, FieldEffects_ObjectTask, task, priority);
             break;
         }
         i++;
         task++;
     } while (i < store->count);
     if (i < store->count) {
-        func_ov036_021a3a5c(task);
+        FieldEffects_InitObject(task);
         return task;
     }
     return NULL;
 }
 
-static void func_ov036_021a3a50(TCB *tcb, void *data) {
-    func_ov036_021a3a94(data);
+static void FieldEffects_ObjectTask(TCB *tcb, void *data) {
+    FieldEffects_UpdateObject(data);
 }
 
-static void func_ov036_021a3a5c(FieldEffectTask *task) {
+static void FieldEffects_InitObject(FieldEffectTask *task) {
     if (task != NULL) {
         task->vtable.init(task, task->work);
     }
 }
 
-void func_ov036_021a3a70(FieldEffectTask *task) {
+void FieldEffects_DeleteObject(FieldEffectTask *task) {
     if (task != NULL) {
         task->vtable.delete(task, task->work);
         GFL_TCBRemove(task->tcb);
@@ -364,45 +364,45 @@ void func_ov036_021a3a70(FieldEffectTask *task) {
     }
 }
 
-void func_ov036_021a3a94(FieldEffectTask *task) {
+void FieldEffects_UpdateObject(FieldEffectTask *task) {
     if (task != NULL) {
         task->vtable.update(task, task->work);
     }
 }
 
-static void func_ov036_021a3aa8(FieldEffectTask *task) {
+static void FieldEffects_DrawObject(FieldEffectTask *task) {
     if (task != NULL) {
         task->vtable.draw(task, task->work);
     }
 }
 
-u32 func_ov036_021a3abc(FieldEffectTask *task) {
+u32 FieldEffects_GetObjectMode(FieldEffectTask *task) {
     if (task != NULL) {
         return task->param1;
     }
     return 0;
 }
 
-void *func_ov036_021a3ac8(FieldEffectTask *task) {
+void *FieldEffects_GetObjectParam(FieldEffectTask *task) {
     if (task != NULL) {
         return task->param2;
     }
     return NULL;
 }
 
-void func_ov036_021a3ad4(FieldEffectTask *task, VecFx32 *pos) {
+void FieldEffects_GetObjectPos(FieldEffectTask *task, VecFx32 *pos) {
     if (task != NULL) {
         *pos = task->pos;
     }
 }
 
-void func_ov036_021a3ae8(FieldEffectTask *task, const VecFx32 *pos) {
+void FieldEffects_SetObjectPos(FieldEffectTask *task, const VecFx32 *pos) {
     if (task != NULL) {
         task->pos = *pos;
     }
 }
 
-void *func_ov036_021a3afc(FieldEffectTask *task) {
+void *FieldEffects_GetObjectWork(FieldEffectTask *task) {
     if (task != NULL) {
         return task->work;
     }
@@ -414,7 +414,7 @@ void FieldEffects_SetLuminanceTable(FieldEffects *effects, const u8 *table) {
 }
 
 // Recolor the texture's palettes through the luminance table, if the map has one
-void FieldEffects_ApplyLuminanceTable(FieldEffects *effects, void *resource) {
+void FieldEffects_ApplyLuminanceTable(FieldEffects *effects, G3DResource *resource) {
     NNSG3dResTex *tex;
 
     if (effects->luminanceTable != NULL) {

@@ -20,10 +20,12 @@ typedef struct WifiBattleMatchMenu WifiBattleMatchMenu;
 typedef void (*WifiBattleMatchTaskFunc)(WifiBattleMatchTask *task, u32 *seq, void *work);
 
 // How the message box prints its message
-#define WIFIBATTLEMATCH_MSG_QUEUE 0
-#define WIFIBATTLEMATCH_MSG_STREAM_KEY 1
-#define WIFIBATTLEMATCH_MSG_QUEUE_WAIT_ICON 2
-#define WIFIBATTLEMATCH_MSG_STREAM 3
+enum {
+    WIFIBATTLEMATCH_MSG_QUEUE,
+    WIFIBATTLEMATCH_MSG_STREAM_KEY,
+    WIFIBATTLEMATCH_MSG_QUEUE_WAIT_ICON,
+    WIFIBATTLEMATCH_MSG_STREAM,
+};
 
 // What WifiBattleMatchMenu is made from: a list of messages of msgData, with the cursor and its window
 typedef struct {
@@ -63,7 +65,7 @@ WifiBattleMatchMsgBox *WifiBattleMatchMsgBox_Create(u32 bg, u32 palette, u16 fra
                                                     PrintQueue *printQueue, Font *font, HeapID heapId);
 void WifiBattleMatchMsgBox_Free(WifiBattleMatchMsgBox *box);
 void WifiBattleMatchMsgBox_Update(WifiBattleMatchMsgBox *box);
-// Prints a message of msgData, with a WIFIBATTLEMATCH_MSG_* way of printing it
+// Prints a message of msgData, or a string, with a WIFIBATTLEMATCH_MSG_* way of printing it
 void WifiBattleMatchMsgBox_Print(WifiBattleMatchMsgBox *box, MsgData *msgData, u32 msgId, u32 mode);
 void WifiBattleMatchMsgBox_PrintStr(WifiBattleMatchMsgBox *box, StrBuf *text, u32 mode);
 // Gives the box a key cursor, if it has none

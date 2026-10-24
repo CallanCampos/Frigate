@@ -53,7 +53,7 @@ typedef struct {
 } BlActSceneSetup;
 
 typedef struct {
-    void *texResource;
+    G3DResource *texResource;
     u16 texWidth;
     u16 texHeight;
     u8 faceWidth;
@@ -118,7 +118,7 @@ void BlAct_GetTexDimensions(int size, u16 *width, u16 *height);
 
 // Add a material of a texture resource, of one read from an archive, or of a texture already in VRAM, faceWidth by
 // faceHeight pixels a face, and return its index
-u32 BlActScene_AddMaterialNewTex(BlActScene *scene, void *texResource, u32 format, int size, u8 faceWidth,
+u32 BlActScene_AddMaterialNewTex(BlActScene *scene, G3DResource *texResource, u32 format, int size, u8 faceWidth,
                                  u8 faceHeight);
 u32 BlActScene_AddMaterialArcTex(BlActScene *scene, u32 arcId, u32 fileId, u32 format, int size, u8 faceWidth,
                                  u8 faceHeight);
@@ -168,10 +168,12 @@ void BlActScene_Draw(BlActScene *scene, G3DCamera *camera, G3DLight *lights);
 #define BLACT_NONE 0xffff
 
 // An animation's step: show a face for wait frames, or, when face is one of these, a command with arg
-#define BLACT_ANIM_CMD_GOTO 0x3ffc
-#define BLACT_ANIM_CMD_LOOP 0x3ffd
-#define BLACT_ANIM_CMD_CHANGE 0x3ffe
-#define BLACT_ANIM_CMD_END 0x3fff
+enum {
+    BLACT_ANIM_CMD_GOTO = 0x3ffc,
+    BLACT_ANIM_CMD_LOOP,
+    BLACT_ANIM_CMD_CHANGE,
+    BLACT_ANIM_CMD_END,
+};
 
 typedef struct {
     u16 face : 14;
@@ -190,7 +192,7 @@ typedef void (*BlActCallback)(BlActSys *sys, u32 actor, void *data);
 
 typedef struct {
     u16 material;
-    void *texResource;
+    G3DResource *texResource;
 } BlActTexMat;
 
 typedef struct {
@@ -230,7 +232,7 @@ enum {
 };
 
 typedef struct {
-    void *texResource;
+    G3DResource *texResource;
     u8 format;
     u8 size;
     u8 faceWidth;
@@ -257,7 +259,7 @@ BlActScene *BlActSys_GetScene(BlActSys *sys);
 u16 BlActSys_ExecMatLoadRequests(BlActSys *sys, const BlActMatRequest *requests, u32 count);
 // Bind a scene material to a new texture material and return its index. The material is stored as a u16, but
 // fldmmdl_blact.c passes BlActScene_AddMaterialExistTex's u32 result without narrowing it
-u16 BlActSys_AddTexMat(BlActSys *sys, u32 material, void *texResource);
+u16 BlActSys_AddTexMat(BlActSys *sys, u32 material, G3DResource *texResource);
 void BlActSys_FreeMaterials(BlActSys *sys, u16 first, u32 count);
 void BlActSys_FreeTexMat(BlActSys *sys, u32 texMat);
 u16 BlActSys_GetTexMatMaterial(BlActSys *sys, u32 texMat);

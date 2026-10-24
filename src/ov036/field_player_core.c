@@ -48,7 +48,7 @@ struct FieldPlayerCore {
 static void FieldPlayerCore_ChangeObjCode(FieldPlayerCore *core, u16 objCode);
 static void FieldPlayerCore_InitModelCore(FieldPlayerCore *core, u32 exState);
 static BOOL FieldPlayerCore_IsBaseFormeObjCode(FieldPlayerCore *core);
-static BOOL func_ov036_0219b1fc(FieldPlayerCore *core);
+static BOOL FieldPlayerCore_CheckDrawProcReady(FieldPlayerCore *core);
 static u32 GetMoveDirHByKey(u32 keys);
 static u32 GetMoveDirVByKey(u32 keys);
 static u16 FieldPlayerCore_GetMoveDirByKey_(FieldPlayerCore *core, u16 heldKeys);
@@ -57,36 +57,42 @@ static BOOL FieldPlayerCore_CheckSpecialObjCode(FieldPlayerCore *core, u16 objCo
 static void FieldPlayerCore_ReqSyncBGM(FieldPlayerCore *core);
 static BOOL FieldPlayerCore_ExStateChangeFunc_NONE(FieldPlayerCore *core);
 static BOOL FieldPlayerCore_ExStateChangeFunc_CYCLING(FieldPlayerCore *core);
-static BOOL func_ov036_0219b4b0(FieldPlayerCore *core);
+static BOOL FieldPlayerCore_FormStepCycleDone(FieldPlayerCore *core);
 static BOOL FieldPlayerCore_ExStateChangeFunc_SURF(FieldPlayerCore *core);
-static BOOL func_ov036_0219b548(FieldPlayerCore *core);
-static BOOL func_ov036_0219b578(FieldPlayerCore *core);
-static BOOL func_ov036_0219b5b0(FieldPlayerCore *core);
-static BOOL func_ov036_0219b5cc(FieldPlayerCore *core);
-static BOOL func_ov036_0219b5d8(FieldPlayerCore *core);
-static BOOL func_ov036_0219b5f4(FieldPlayerCore *core);
-static BOOL func_ov036_0219b600(FieldPlayerCore *core);
-static BOOL func_ov036_0219b61c(FieldPlayerCore *core);
-static BOOL func_ov036_0219b628(FieldPlayerCore *core);
-static BOOL func_ov036_0219b644(FieldPlayerCore *core);
+static BOOL FieldPlayerCore_FormStepRestoreModel(FieldPlayerCore *core);
+static BOOL FieldPlayerCore_FormStepRestoreModelDone(FieldPlayerCore *core);
+static BOOL FieldPlayerCore_FormStepSlot4(FieldPlayerCore *core);
+static BOOL FieldPlayerCore_FormStepSlot4Done(FieldPlayerCore *core);
+static BOOL FieldPlayerCore_FormStepSlot5(FieldPlayerCore *core);
+static BOOL FieldPlayerCore_FormStepSlot5Done(FieldPlayerCore *core);
+static BOOL FieldPlayerCore_FormStepSlot6(FieldPlayerCore *core);
+static BOOL FieldPlayerCore_FormStepSlot6Done(FieldPlayerCore *core);
+static BOOL FieldPlayerCore_FormStepSlot9(FieldPlayerCore *core);
+static BOOL FieldPlayerCore_FormStepSlot9Done(FieldPlayerCore *core);
 static BOOL FieldPlayerCore_ExStateChangeFunc_DIVE(FieldPlayerCore *core);
-static BOOL func_ov036_0219b6f4(FieldPlayerCore *core);
-static BOOL func_ov036_0219b710(FieldPlayerCore *core);
+static BOOL FieldPlayerCore_FormStepSlot8(FieldPlayerCore *core);
+static BOOL FieldPlayerCore_FormStepSlot8Done(FieldPlayerCore *core);
 
 // MWCC lays these out in a different order than they are defined; this definition order gives the original layout
 static const ExStateChangeFunc PLAYER_EXSTATE_CHANGE_VTABLE_DIVE[] = { FieldPlayerCore_ExStateChangeFunc_DIVE };
 static const ExStateChangeFunc PLAYER_EXSTATE_CHANGE_VTABLE_NONE[] = { FieldPlayerCore_ExStateChangeFunc_NONE };
 static const ExStateChangeFunc PLAYER_EXSTATE_CHANGE_VTABLE_SURF[] = { FieldPlayerCore_ExStateChangeFunc_SURF };
-static const ExStateChangeFunc data_ov036_021cfc8c[] = { func_ov036_0219b628, func_ov036_0219b644 };
+static const ExStateChangeFunc data_ov036_021cfc8c[] = { FieldPlayerCore_FormStepSlot9,
+                                                         FieldPlayerCore_FormStepSlot9Done };
 static const ExStateChangeFunc PLAYER_EXSTATE_CHANGE_VTABLE_CYCLING[] = {
     FieldPlayerCore_ExStateChangeFunc_CYCLING,
-    func_ov036_0219b4b0,
+    FieldPlayerCore_FormStepCycleDone,
 };
-static const ExStateChangeFunc data_ov036_021cfc7c[] = { func_ov036_0219b5b0, func_ov036_0219b5cc };
-static const ExStateChangeFunc data_ov036_021cfc74[] = { func_ov036_0219b600, func_ov036_0219b61c };
-static const ExStateChangeFunc data_ov036_021cfc84[] = { func_ov036_0219b548, func_ov036_0219b578 };
-static const ExStateChangeFunc data_ov036_021cfc9c[] = { func_ov036_0219b6f4, func_ov036_0219b710 };
-static const ExStateChangeFunc data_ov036_021cfc6c[] = { func_ov036_0219b5d8, func_ov036_0219b5f4 };
+static const ExStateChangeFunc data_ov036_021cfc7c[] = { FieldPlayerCore_FormStepSlot4,
+                                                         FieldPlayerCore_FormStepSlot4Done };
+static const ExStateChangeFunc data_ov036_021cfc74[] = { FieldPlayerCore_FormStepSlot6,
+                                                         FieldPlayerCore_FormStepSlot6Done };
+static const ExStateChangeFunc data_ov036_021cfc84[] = { FieldPlayerCore_FormStepRestoreModel,
+                                                         FieldPlayerCore_FormStepRestoreModelDone };
+static const ExStateChangeFunc data_ov036_021cfc9c[] = { FieldPlayerCore_FormStepSlot8,
+                                                         FieldPlayerCore_FormStepSlot8Done };
+static const ExStateChangeFunc data_ov036_021cfc6c[] = { FieldPlayerCore_FormStepSlot5,
+                                                         FieldPlayerCore_FormStepSlot5Done };
 
 static const ZoneNPC PLAYER_NPC_TEMPLATE = {
     PLAYER_ACTOR_ID, OBJ_CODE_HERO, 0, 0, 0, 0, 0, 0, 0, 0, 0xffff, 0xffff, FALSE,
@@ -295,7 +301,7 @@ void FieldPlayerCore_InitModel(FieldPlayerCore *core) {
     FieldPlayerCore_InitModelCore(core, FieldPlayerCore_GetExState(core));
 }
 
-void func_ov036_0219b014(FieldPlayerCore *core, u32 forme) {
+void FieldPlayerCore_SetFormSlotModel(FieldPlayerCore *core, u32 forme) {
     u32 sex = FieldPlayerCore_GetSex(core);
     FieldActor *actor = FieldPlayerCore_GetActor(core);
     u16 objCode = FieldPlayer_GetObjCodeByForme(sex, forme);
@@ -306,7 +312,7 @@ void func_ov036_0219b014(FieldPlayerCore *core, u32 forme) {
     core->unk2C = 0;
 }
 
-BOOL func_ov036_0219b04c(FieldPlayerCore *core) {
+BOOL FieldPlayerCore_WaitModelReady(FieldPlayerCore *core) {
     if (FldAct_GetBlActIdx(FieldPlayerCore_GetActor(core), 0) != BLACT_NONE) {
         if (core->unk2C == 1) {
             return TRUE;
@@ -320,19 +326,19 @@ u32 FieldPlayerCore_DeriveExState(FieldPlayerCore *core) {
     return FieldPlayer_GetExStateByObjCode(FldAct_GetObjCode(FieldPlayerCore_GetActor(core)));
 }
 
-u32 func_ov036_0219b088(FieldPlayerCore *core) {
+u32 FieldPlayerCore_CheckFormModel(FieldPlayerCore *core) {
     if (FieldPlayer_GetExStateByObjCode(FldAct_GetObjCode(FieldPlayerCore_GetActor(core))) == 10) {
         return FALSE;
     }
     return TRUE;
 }
 
-BOOL func_ov036_0219b0a4(FieldPlayerCore *core) {
+BOOL FieldPlayerCore_CheckAnimePaused(FieldPlayerCore *core) {
     BlActSys *blActSys = FieldBlAct_GetBlActSys(FldActSys_GetFieldBlAct(GetActorMModelSystem(core->actor)));
     u32 idx;
     u16 cmd;
 
-    if (func_ov036_0218ed68(core->actor) == TRUE && func_ov036_0219381c(core->actor) == TRUE) {
+    if (FieldAcmdTCB_CheckAnimePaused(core->actor) == TRUE && FldBlAct_GetEntryHookFlag(core->actor) == TRUE) {
         return TRUE;
     }
     idx = FldAct_GetBlActIdx(core->actor, 0);
@@ -357,7 +363,7 @@ void FieldPlayerCore_CalcSeparateKeyDirs(FieldPlayerCore *core, u32 heldKeys) {
     FieldPlayerCore_CalcSeparateKeyDirs_(core, heldKeys);
 }
 
-void func_ov036_0219b138(FieldPlayerCore *core, FieldEffectTask *tcb) {
+void FieldPlayerCore_SetRideEffect(FieldPlayerCore *core, FieldEffectTask *tcb) {
     core->terrainEffectTCB = tcb;
 }
 
@@ -403,7 +409,7 @@ static BOOL FieldPlayerCore_IsBaseFormeObjCode(FieldPlayerCore *core) {
     return FALSE;
 }
 
-static BOOL func_ov036_0219b1fc(FieldPlayerCore *core) {
+static BOOL FieldPlayerCore_CheckDrawProcReady(FieldPlayerCore *core) {
     u16 idx = FldAct_GetBlActIdx(core->actor, 0);
 
     if (idx != BLACT_NONE) {
@@ -470,7 +476,7 @@ static u32 GetMoveDirVByKey(u32 keys) {
     return DIR_NONE;
 }
 
-static u16 func_ov036_0219b2d4(FieldPlayerCore *core, s32 index) {
+static u16 FieldPlayerCore_RunFormSteps(FieldPlayerCore *core, s32 index) {
     if (core->seqDone == 0) {
         const ExStateChangeFunc *funcs = PLAYER_EXSTATE_CHANGE_VTABLES[index];
 
@@ -480,7 +486,7 @@ static u16 func_ov036_0219b2d4(FieldPlayerCore *core, s32 index) {
     return core->seqDone;
 }
 
-static s32 func_ov036_0219b2fc(u32 mask) {
+static s32 FieldPlayerCore_GetLowestFormSlot(u32 mask) {
     s32 i = SEQ_NONE;
 
     if (mask != 0) {
@@ -502,23 +508,23 @@ void FieldPlayerCore_SetSpecialSeq(FieldPlayerCore *core, u32 seq) {
     core->unk2E = 0;
 }
 
-BOOL func_ov036_0219b328(FieldPlayerCore *core) {
-    s32 index = func_ov036_0219b2fc(core->specialSeq);
+BOOL FieldPlayerCore_StepFormChange(FieldPlayerCore *core) {
+    s32 index = FieldPlayerCore_GetLowestFormSlot(core->specialSeq);
 
     if (index >= SEQ_NONE) {
         return TRUE;
     }
-    if (func_ov036_0219b2d4(core, index) == 1) {
+    if (FieldPlayerCore_RunFormSteps(core, index) == 1) {
         return TRUE;
     }
     return FALSE;
 }
 
-void func_ov036_0219b350(FieldPlayerCore *core) {
-    s32 index = func_ov036_0219b2fc(core->specialSeq);
+void FieldPlayerCore_FinishFormChange(FieldPlayerCore *core) {
+    s32 index = FieldPlayerCore_GetLowestFormSlot(core->specialSeq);
 
     if (index < SEQ_NONE) {
-        while (func_ov036_0219b2d4(core, index) == 0) {
+        while (FieldPlayerCore_RunFormSteps(core, index) == 0) {
         }
     }
 }
@@ -537,13 +543,13 @@ static BOOL FieldPlayerCore_CheckSpecialObjCode(FieldPlayerCore *core, u16 objCo
     return FALSE;
 }
 
-static BOOL func_ov036_0219b3b8(FieldPlayerCore *core, u32 forme) {
+static BOOL FieldPlayerCore_ChangeToFormSlot(FieldPlayerCore *core, u32 forme) {
     return FieldPlayerCore_CheckSpecialObjCode(core,
                                                FieldPlayer_GetObjCodeByForme(FieldPlayerCore_GetSex(core), forme));
 }
 
-static BOOL func_ov036_0219b3d4(FieldPlayerCore *core, u32 forme) {
-    if (func_ov036_0219b1fc(core) == TRUE) {
+static BOOL FieldPlayerCore_FinishFormSlotChange(FieldPlayerCore *core, u32 forme) {
+    if (FieldPlayerCore_CheckDrawProcReady(core) == TRUE) {
         core->unk2E++;
         FieldPlayerCore_ChangeObjCode(core, FieldPlayer_GetObjCodeByForme(FieldPlayerCore_GetSex(core), forme));
         core->seqDone = 1;
@@ -566,8 +572,8 @@ static BOOL FieldPlayerCore_ExStateChangeFunc_NONE(FieldPlayerCore *core) {
     FieldPlayerCore_ReqSyncBGM(core);
     tcb = FieldPlayerCore_GetTerrainEffectTCB(core);
     if (tcb != NULL) {
-        func_ov036_021a3a70(tcb);
-        func_ov036_0219b138(core, NULL);
+        FieldEffects_DeleteObject(tcb);
+        FieldPlayerCore_SetRideEffect(core, NULL);
     }
     FldAct_SetOuterDrawOffset(actor, &offset);
     core->seqDone = 1;
@@ -579,14 +585,14 @@ static BOOL FieldPlayerCore_ExStateChangeFunc_CYCLING(FieldPlayerCore *core) {
     FieldPlayerCore_GetActor(core);
     FieldPlayerCore_SetExState(core, FLD_PLAYER_EXSTATE_CYCLING);
     FieldPlayerCore_ReqSyncBGM(core);
-    if (func_ov036_0219b3b8(core, 1) != TRUE) {
+    if (FieldPlayerCore_ChangeToFormSlot(core, 1) != TRUE) {
         core->seqStep++;
     }
     return FALSE;
 }
 
-static BOOL func_ov036_0219b4b0(FieldPlayerCore *core) {
-    func_ov036_0219b3d4(core, 1);
+static BOOL FieldPlayerCore_FormStepCycleDone(FieldPlayerCore *core) {
+    FieldPlayerCore_FinishFormSlotChange(core, 1);
     return FALSE;
 }
 
@@ -608,13 +614,13 @@ static BOOL FieldPlayerCore_ExStateChangeFunc_SURF(FieldPlayerCore *core) {
         u16 dir = GetActorFaceDir(actor);
 
         CopyActorWPos(actor, &pos);
-        func_ov036_0219b138(core, func_ov036_021a4484(effects, dir, &pos, actor, 1));
+        FieldPlayerCore_SetRideEffect(core, FldeffNamipoke_Start(effects, dir, &pos, actor, 1));
     }
     core->seqDone = 1;
     return FALSE;
 }
 
-static BOOL func_ov036_0219b548(FieldPlayerCore *core) {
+static BOOL FieldPlayerCore_FormStepRestoreModel(FieldPlayerCore *core) {
     u32 exState = FieldPlayerCore_GetExState(core);
 
     if (FieldPlayerCore_CheckSpecialObjCode(
@@ -624,8 +630,8 @@ static BOOL func_ov036_0219b548(FieldPlayerCore *core) {
     return FALSE;
 }
 
-static BOOL func_ov036_0219b578(FieldPlayerCore *core) {
-    if (func_ov036_0219b1fc(core) == TRUE) {
+static BOOL FieldPlayerCore_FormStepRestoreModelDone(FieldPlayerCore *core) {
+    if (FieldPlayerCore_CheckDrawProcReady(core) == TRUE) {
         u32 exState;
 
         core->unk2E++;
@@ -636,51 +642,51 @@ static BOOL func_ov036_0219b578(FieldPlayerCore *core) {
     return FALSE;
 }
 
-static BOOL func_ov036_0219b5b0(FieldPlayerCore *core) {
-    if (func_ov036_0219b3b8(core, 4) != TRUE) {
+static BOOL FieldPlayerCore_FormStepSlot4(FieldPlayerCore *core) {
+    if (FieldPlayerCore_ChangeToFormSlot(core, 4) != TRUE) {
         core->seqStep++;
     }
     return FALSE;
 }
 
-static BOOL func_ov036_0219b5cc(FieldPlayerCore *core) {
-    func_ov036_0219b3d4(core, 4);
+static BOOL FieldPlayerCore_FormStepSlot4Done(FieldPlayerCore *core) {
+    FieldPlayerCore_FinishFormSlotChange(core, 4);
     return FALSE;
 }
 
-static BOOL func_ov036_0219b5d8(FieldPlayerCore *core) {
-    if (func_ov036_0219b3b8(core, 5) != TRUE) {
+static BOOL FieldPlayerCore_FormStepSlot5(FieldPlayerCore *core) {
+    if (FieldPlayerCore_ChangeToFormSlot(core, 5) != TRUE) {
         core->seqStep++;
     }
     return FALSE;
 }
 
-static BOOL func_ov036_0219b5f4(FieldPlayerCore *core) {
-    func_ov036_0219b3d4(core, 5);
+static BOOL FieldPlayerCore_FormStepSlot5Done(FieldPlayerCore *core) {
+    FieldPlayerCore_FinishFormSlotChange(core, 5);
     return FALSE;
 }
 
-static BOOL func_ov036_0219b600(FieldPlayerCore *core) {
-    if (func_ov036_0219b3b8(core, 6) != TRUE) {
+static BOOL FieldPlayerCore_FormStepSlot6(FieldPlayerCore *core) {
+    if (FieldPlayerCore_ChangeToFormSlot(core, 6) != TRUE) {
         core->seqStep++;
     }
     return FALSE;
 }
 
-static BOOL func_ov036_0219b61c(FieldPlayerCore *core) {
-    func_ov036_0219b3d4(core, 6);
+static BOOL FieldPlayerCore_FormStepSlot6Done(FieldPlayerCore *core) {
+    FieldPlayerCore_FinishFormSlotChange(core, 6);
     return FALSE;
 }
 
-static BOOL func_ov036_0219b628(FieldPlayerCore *core) {
-    if (func_ov036_0219b3b8(core, 9) != TRUE) {
+static BOOL FieldPlayerCore_FormStepSlot9(FieldPlayerCore *core) {
+    if (FieldPlayerCore_ChangeToFormSlot(core, 9) != TRUE) {
         core->seqStep++;
     }
     return FALSE;
 }
 
-static BOOL func_ov036_0219b644(FieldPlayerCore *core) {
-    func_ov036_0219b3d4(core, 9);
+static BOOL FieldPlayerCore_FormStepSlot9Done(FieldPlayerCore *core) {
+    FieldPlayerCore_FinishFormSlotChange(core, 9);
     return FALSE;
 }
 
@@ -702,25 +708,25 @@ static BOOL FieldPlayerCore_ExStateChangeFunc_DIVE(FieldPlayerCore *core) {
         u16 dir = GetActorFaceDir(actor);
 
         CopyActorWPos(actor, &pos);
-        func_ov036_0219b138(core, func_ov036_021a4484(fieldEffects, dir, &pos, actor, 1));
+        FieldPlayerCore_SetRideEffect(core, FldeffNamipoke_Start(fieldEffects, dir, &pos, actor, 1));
     }
-    func_ov036_021c6934(core->actor, effects);
+    FldeffBubble_Start(core->actor, effects);
     if (core->terrainEffectTCB != NULL) {
-        func_ov036_021a4514(core->terrainEffectTCB, FALSE);
+        FldeffNamipoke_SetWakeEnabled(core->terrainEffectTCB, FALSE);
     }
     core->seqDone = 1;
     return FALSE;
 }
 
-static BOOL func_ov036_0219b6f4(FieldPlayerCore *core) {
-    if (func_ov036_0219b3b8(core, 8) != TRUE) {
+static BOOL FieldPlayerCore_FormStepSlot8(FieldPlayerCore *core) {
+    if (FieldPlayerCore_ChangeToFormSlot(core, 8) != TRUE) {
         core->seqStep++;
     }
     return FALSE;
 }
 
-static BOOL func_ov036_0219b710(FieldPlayerCore *core) {
-    func_ov036_0219b3d4(core, 8);
+static BOOL FieldPlayerCore_FormStepSlot8Done(FieldPlayerCore *core) {
+    FieldPlayerCore_FinishFormSlotChange(core, 8);
     if (core->seqDone == 1 && FieldPlayerCore_GetExState(core) == FLD_PLAYER_EXSTATE_SURF) {
         BOOL blocked = FALSE;
         FieldActor *actor = FieldPlayerCore_GetActor(core);
@@ -734,7 +740,7 @@ static BOOL func_ov036_0219b710(FieldPlayerCore *core) {
         if (GetFirstActorOnGPos(mmSys, x, z, TRUE) != NULL) {
             blocked = TRUE;
         }
-        func_ov036_0219690c(actor, blocked);
+        RailActorAnim_SetState(actor, blocked);
     }
     return FALSE;
 }

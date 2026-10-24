@@ -77,7 +77,7 @@ int DWC_StartUtility(void *work, int language, int param) {
         sMain.update();
         DWCUtilTask_Run(0);
         DWCUtilTouch_UpdateLid();
-        func_ov182_021bd0ac();
+        DWCi_SetLedWireless();
         OS_WaitVBlankIntr();
     } while (!sMain.finished);
     DWCUtilMain_Exit();

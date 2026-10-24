@@ -53,7 +53,7 @@ static FieldActionResult FieldActionBlockCheck_NormalZoneNotRoyalUnova(GameData 
 static GameEventReturnCode EventFieldToggleCycling_Callback(GameEvent *event, u32 *state, void *data);
 static GameEventReturnCode EventFieldToggleDowsing_Callback(GameEvent *event, u32 *state, void *data);
 
-static const FieldCommonEvent FIELD_COMMON_EVENTS[6] = {
+static const FieldCommonEvent FIELD_COMMON_EVENTS[FIELD_COMMON_EVENT_COUNT] = {
     { EventFieldToggleCycling_Create, 0 },  { EventEntralinkWarpIn_CreateDefault, 0xff },
     { EventMapChangeEscapeRope_Create, 3 }, { EventSweetScent_Create, 0xff },
     { EventFieldFishing_Create, 5 },        { EventFieldToggleDowsing_Create, 9 },
@@ -185,18 +185,18 @@ static GameEventReturnCode EventFieldToggleCycling_Callback(GameEvent *event, u3
     case 0:
         commSys = GSYS_GetGameCommSystem(work->gsys);
         work->timer++;
-        if (func_ov012_02153664(commSys) == TRUE && work->timer < 30) {
+        if (Intrude_IsSessionEndPending(commSys) == TRUE && work->timer < 30) {
             break;
         }
         Field_ToggleCycling(field);
         (*state)++;
     case 1:
-        if (func_ov036_0219a580(Field_GetPlayer(field)) == TRUE) {
+        if (FieldPlayer_StepFormChange(Field_GetPlayer(field)) == TRUE) {
             (*state)++;
         }
         break;
     case 2:
-        if (func_ov036_0219ab24(Field_GetPlayer(field)) == TRUE) {
+        if (FieldPlayer_WaitModelReady(Field_GetPlayer(field)) == TRUE) {
             return GAMEEVENT_DONE;
         }
         break;

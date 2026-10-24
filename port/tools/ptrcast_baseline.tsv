@@ -49,11 +49,11 @@ lib/nitro/src/mb/mb_segment.c	MB_ReadSegment	ptr-to-int	u32 <- void (*)(void)	1	
 lib/nitro/src/mb/mb_segment.c	MB_ReadSegment	ptr-to-int	u32 <- void *	1	real	R24: local wireless (WM) and Download Play (MB) (phase 7)
 lib/nitro/src/mb/mb_segment.c	MBi_ReadSegmentHeader	int-to-ptr	const void * <- u32	1	real	R24: local wireless (WM) and Download Play (MB) (phase 7)
 lib/nitro/src/mb/mb_segment.c	MBi_ReadSegmentHeader	int-to-ptr	void * <- u32	2	real	R24: local wireless (WM) and Download Play (MB) (phase 7)
+lib/nitro/src/nvram/nvram.c	NVRAMi_AlarmHandler	ptr-to-int	u32 <- void *	1	harmless	the PXI result, a u32, carried in the alarm's void * argument and back (func_02079994)
 lib/nitro/src/nvram/nvram.c	NVRAMi_SetAlarm	int-to-ptr	void * <- u32	1	harmless	the PXI result, a u32, carried in the alarm's void * argument and back (func_02079994)
 lib/nitro/src/nvram/nvram.c	SPI_NvramPageWrite	ptr-to-int	u32 <- const void *	2	handled	the buffer's low 32 bits in the PXI words: the host's ARM7 takes the buffer that port/hal/nvram/nvram_host.c notes (port_pxi_note_pointer, nvram7.c)
 lib/nitro/src/nvram/nvram.c	SPI_NvramReadDataBytes	ptr-to-int	u32 <- void *	2	handled	the buffer's low 32 bits in the PXI words: the host's ARM7 takes the buffer that port/hal/nvram/nvram_host.c notes (port_pxi_note_pointer, nvram7.c)
 lib/nitro/src/nvram/nvram.c	SPI_NvramReadStatusRegister	ptr-to-int	u32 <- u8 *	3	handled	the buffer's low 32 bits in the PXI words: the host's ARM7 takes the buffer that port/hal/nvram/nvram_host.c notes (port_pxi_note_pointer, nvram7.c)
-lib/nitro/src/nvram/nvram.c	func_02079994	ptr-to-int	u32 <- void *	1	harmless	the PXI result, a u32, carried in the alarm's void * argument and back (func_02079994)
 lib/nitro/src/os/os_thread.c	OS_CreateThread	int-to-ptr	u32 * <- u32	2	handled	renamed and written again for the host by port/hal/os/os_thread_host.c
 lib/nitro/src/os/os_thread.c	OS_CreateThread	int-to-ptr	void * <- u32	1	handled	renamed and written again for the host by port/hal/os/os_thread_host.c
 lib/nitro/src/os/os_thread.c	OS_CreateThread	ptr-to-int	u32 <- void (*)(void *)	1	handled	renamed and written again for the host by port/hal/os/os_thread_host.c

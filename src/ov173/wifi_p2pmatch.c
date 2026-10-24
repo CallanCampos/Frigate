@@ -337,7 +337,7 @@ typedef struct {
     NNSG2dScreenData *backScrn;
     u32 unk14;
     // NULL while the view does not exist
-    void *buttonMan;
+    ButtonMan *buttonMan;
     // What is known of each friend, by friend number - 1: 0 nothing, 1 registered, 2 in the room
     u8 friendState[WIFIP2PMATCH_MEMBER_MAX];
     u8 page;
@@ -382,7 +382,7 @@ typedef struct {
     // The Battle Box as a party, NULL if it is empty
     PokeParty *battleBoxParty;
     u8 unk0D0[8];
-    void *trainerData;
+    TrainerDataSave *trainerData;
     WordSet *wordSet;
     MsgData *msgData;
     // The messages about Nintendo WFC
@@ -2982,7 +2982,7 @@ static int WifiP2PMatch_StateTalkEndTimingWait(WIFIP2PMATCH_WORK *wk, int seq) {
     if (!NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), 0x19, 10)) {
         return seq;
     }
-    func_02042e94(0);
+    GflNet_SetAutoExit(0);
     GFL_NetSetDisconnectError(FALSE);
     if (GFL_NetIsParent()) {
         WifiP2PMatch_PrintMessage(wk, WifiP2pmatch_Text_EndedConversation, FALSE);
@@ -2996,7 +2996,7 @@ static int WifiP2PMatch_StateTalkEndTimingWait(WIFIP2PMATCH_WORK *wk, int seq) {
 // State 0xa8
 static int WifiP2PMatch_StateDeclineReset(WIFIP2PMATCH_WORK *wk, int seq) {
     WifiP2PMatch_ChangeMyStatus(wk, WIFIP2PMATCH_STATUS_WAIT, 2);
-    func_02042e94(0);
+    GflNet_SetAutoExit(0);
     GFL_NetSetDisconnectError(FALSE);
     wk->seq = WIFIP2PMATCH_SEQ_DECLINE_MSG;
     return seq;
@@ -3017,7 +3017,7 @@ static int WifiP2PMatch_StateDeclineMsg(WIFIP2PMATCH_WORK *wk, int seq) {
 // State 0x4a
 static int WifiP2PMatch_StateCancelReset(WIFIP2PMATCH_WORK *wk, int seq) {
     WifiP2PMatch_ChangeMyStatus(wk, WIFIP2PMATCH_STATUS_WAIT, 2);
-    func_02042e94(0);
+    GflNet_SetAutoExit(0);
     GFL_NetSetDisconnectError(FALSE);
     wk->seq = WIFIP2PMATCH_SEQ_CANCEL_MSG;
     return seq;
@@ -3055,7 +3055,7 @@ static int WifiP2PMatch_StateRefusedMsg(WIFIP2PMATCH_WORK *wk, int seq) {
 
 // State 0x8e
 static int WifiP2PMatch_StateDisconnectStart(WIFIP2PMATCH_WORK *wk, int seq) {
-    func_02042e94(0);
+    GflNet_SetAutoExit(0);
     GFL_NetSetDisconnectError(FALSE);
     wk->timer = 0;
     wk->seq = WIFIP2PMATCH_SEQ_CUT_CONNECTION;
@@ -3170,7 +3170,7 @@ static int WifiP2PMatch_StateSendSeq(WIFIP2PMATCH_WORK *wk, int seq) {
 static int WifiP2PMatch_StateUnableMsg(WIFIP2PMATCH_WORK *wk, int seq) {
     WifiP2PMatch_ChangeMyStatus(wk, WIFIP2PMATCH_STATUS_WAIT, 2);
     wk->result = 0;
-    func_02042e94(0);
+    GflNet_SetAutoExit(0);
     GFL_NetSetDisconnectError(FALSE);
     if (GFL_NetIsParent()) {
         WifiP2PMatch_PrintMessage(wk, WifiP2pmatch_Text_FriendApparentlyUnableParticipate, FALSE);
@@ -4349,7 +4349,7 @@ static int WifiP2PMatch_StateRoomStart(WIFIP2PMATCH_WORK *wk, int seq) {
     WifiP2PMatch_ChangeNetStatus(wk, WIFIP2PMATCH_STATUS_WAIT, 2);
     wk->seq = WIFIP2PMATCH_SEQ_ROOM;
     WifiP2PMatch_RoomResume(wk);
-    func_02042e94(0);
+    GflNet_SetAutoExit(0);
     GFL_NetSetDisconnectError(FALSE);
     return seq;
 }
@@ -4579,7 +4579,7 @@ static int WifiP2PMatch_StateRoom(WIFIP2PMATCH_WORK *wk, int seq) {
     }
     if (WifiP2PMatch_IsConnected(wk) && wk->preConnect != -1) {
         GFL_SEPlayKeepVol(SEQ_SE_SYS_101, 0);
-        func_02042e94(1);
+        GflNet_SetAutoExit(1);
         GFL_NetSetDisconnectError(TRUE);
         wk->seq = WIFIP2PMATCH_SEQ_FRIEND_CONNECTED;
         return seq;
@@ -4682,7 +4682,7 @@ static int WifiP2PMatch_StateRoomMessage(WIFIP2PMATCH_WORK *wk, int seq) {
     WIFI_MCR_PCAnmOff(&wk->room);
     if (WifiP2PMatch_IsConnected(wk) && wk->preConnect != -1) {
         GFL_SEPlayKeepVol(SEQ_SE_SYS_101, 0);
-        func_02042e94(1);
+        GflNet_SetAutoExit(1);
         GFL_NetSetDisconnectError(TRUE);
         wk->seq = WIFIP2PMATCH_SEQ_FRIEND_CONNECTED;
         return seq;
@@ -4963,7 +4963,7 @@ static int WifiP2PMatch_StateVChatEndTiming(WIFIP2PMATCH_WORK *wk, int seq) {
             wk->seq = WIFIP2PMATCH_SEQ_VCHAT_STOP_WAIT;
         } else {
             WifiP2PMatch_ChangeMyStatus(wk, WIFIP2PMATCH_STATUS_WAIT, 2);
-            func_02042e94(0);
+            GflNet_SetAutoExit(0);
             GFL_NetSetDisconnectError(FALSE);
             NetHandle_SendTimingPair(NetHandle_GetOwn(), 0x15, 10);
             wk->seq = WIFIP2PMATCH_SEQ_VCHAT_DISCONNECT_TIMING;
@@ -5822,7 +5822,7 @@ static int WifiP2PMatch_StateJoinWait(WIFIP2PMATCH_WORK *wk, int seq) {
         WifiP2PMatch_EndMessage(wk);
         WifiP2PMatchNet_CommandInit(wk);
         wk->timer = 30;
-        func_02042e94(1);
+        GflNet_SetAutoExit(1);
         GFL_NetSetDisconnectError(TRUE);
     }
     return seq;
@@ -6065,7 +6065,7 @@ static int WifiP2PMatch_StateConnectDataWait(WIFIP2PMATCH_WORK *wk, int seq) {
 // State 0x2c
 static int WifiP2PMatch_StateConnectTiming(WIFIP2PMATCH_WORK *wk, int seq) {
     if (!WifiP2PMatch_CheckDisconnect(wk) && NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), 0xf, 10)) {
-        func_02042e94(1);
+        GflNet_SetAutoExit(1);
         GFL_NetSetDisconnectError(TRUE);
         NetHandle_SendTimingPair(NetHandle_GetOwn(), 0x12, 10);
         wk->seq = WIFIP2PMATCH_SEQ_CONNECT_END;
@@ -6212,7 +6212,7 @@ static int WifiP2PMatch_StateRetryYesNoInit(WIFIP2PMATCH_WORK *wk, int seq) {
     if (!NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), 0x10, 10)) {
         return seq;
     }
-    func_02042e94(0);
+    GflNet_SetAutoExit(0);
     GFL_NetSetDisconnectError(TRUE);
     if (WifiP2PMatch_IsMessageEnd(wk)) {
         WifiP2PMatch_YesNoStart(wk);
@@ -6647,7 +6647,7 @@ static void WifiP2PMatch_ViewDrawButtons(WIFIP2PMATCH_WORK *wk) {
     for (i = 0; i < WIFIP2PMATCH_VIEW_FRIEND_NUM; i++) {
         friendNo = wk->view.page * WIFIP2PMATCH_VIEW_FRIEND_NUM + i + 1;
         if (wk->view.friendState[friendNo - 1] != 0) {
-            if (WifiList_GetFriendParam(wk->wifiList, friendNo - 1, 9) == 0) {
+            if (WifiList_GetFriendParam(wk->wifiList, friendNo - 1, WIFI_LIST_FRIEND_GENDER) == 0) {
                 type = WIFIP2PMATCH_VIEW_BUTTON_MALE;
             } else {
                 type = WIFIP2PMATCH_VIEW_BUTTON_FEMALE;
@@ -6745,7 +6745,7 @@ static void WifiP2PMatch_ViewSetFriendNameWord(WIFIP2PMATCH_WORK *wk, int friend
     u32 sex;
 
     if (friendIndex != -1) {
-        sex = WifiList_GetFriendParam(wk->wifiList, friendIndex, 9);
+        sex = WifiList_GetFriendParam(wk->wifiList, friendIndex, WIFI_LIST_FRIEND_GENDER);
         WifiList_LoadFriendName(wk->wifiList, friendIndex, wk->expStrBuf);
         GFL_WordSetSetStrbuf(wk->view.wordSet, 0, wk->expStrBuf, sex, 1, 2);
     }
@@ -7060,7 +7060,7 @@ static BOOL WifiP2PMatch_ProcMain(GameProc *proc, u32 *state, void *param, void 
             // The partner was lost: back to the room
             WifiP2PMatch_ClosePartyMenu(wk);
             WifiP2PMatch_FreeWindows(wk);
-            func_02042e94(0);
+            GflNet_SetAutoExit(0);
             GFL_NetSetDisconnectError(FALSE);
             WifiP2PMatch_ChangeMyStatus(wk, WIFIP2PMATCH_STATUS_WAIT, 2);
             wk->unk135A = 0;
@@ -7079,7 +7079,7 @@ static BOOL WifiP2PMatch_ProcMain(GameProc *proc, u32 *state, void *param, void 
         if (func != NULL) {
             *state = func(wk, *state);
             if (*state == 2) {
-                GFL_WipeSet(0, 0, 0, 0, 6, 1, WIFIP2PMATCH_HEAP);
+                GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, 0, 6, 1, WIFIP2PMATCH_HEAP);
                 return TRUE;
             }
         }

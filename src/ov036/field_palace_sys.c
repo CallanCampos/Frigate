@@ -77,7 +77,7 @@ void FieldPalaceSys_InitPostFX(FieldPalaceSys *sys, u16 zoneId, HeapID heapId) {
     if (GetZoneIsEntralinkAny(zoneId) == TRUE && commSys != NULL) {
         gameData = GSYS_GetGameData(sys->gsys);
         flag = FieldPalaceSys_CheckEventFlag(gameData, zoneId);
-        state = func_ov012_0215364c(commSys, gameData);
+        state = Intrude_GetAreaOwnerVersionClass(commSys, gameData);
         fileId = 0xffff;
         if (state == 2) {
             if (flag == TRUE) {

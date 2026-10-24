@@ -166,12 +166,14 @@ typedef struct {
 
 // What a line of the chat says: the player's sentence, or that it entered the Union Room, or what the player wants to
 // do
-#define UNION_CHAT_KIND_SENTENCE 0
-#define UNION_CHAT_KIND_ENTERED 1
-#define UNION_CHAT_KIND_BATTLE 2
-#define UNION_CHAT_KIND_TRADE 3
-#define UNION_CHAT_KIND_DRAW 4
-#define UNION_CHAT_KIND_SPIN_TRADE 5
+enum {
+    UNION_CHAT_KIND_SENTENCE,
+    UNION_CHAT_KIND_ENTERED,
+    UNION_CHAT_KIND_BATTLE,
+    UNION_CHAT_KIND_TRADE,
+    UNION_CHAT_KIND_DRAW,
+    UNION_CHAT_KIND_SPIN_TRADE,
+};
 
 #define UNION_VISITOR_MAX 30
 
@@ -205,10 +207,10 @@ struct UnionSystem {
     // The names of these six are the ROM's, from overlay 34's asserts
     WordSet *wordset;
     MsgData *msgdata;
-    void *fld_msgwin_stream;
+    InfoMsgWin *fld_msgwin_stream;
     ListMenuUI *fldmenu_func;
-    void *fldmenu_yesno_func;
-    void *fldmsgwin;
+    ListMenuUI *fldmenu_yesno_func;
+    InfoMsgWin *fldmsgwin;
     u32 unk281C;
     StrBuf *msgbuf; // the message, and with its words set
     StrBuf *fmtbuf;
@@ -230,8 +232,9 @@ struct UnionSystem {
     struct {
         UnionApp *uniapp;
         Regulation *regulation;
-        void *rpm; // the regulation's rules printed, from PokeRegulation_CreatePrintMsg (the name is the ROM's)
-        void *partySelect;
+        RegulationPrintMsg
+            *rpm; // the regulation's rules printed, from PokeRegulation_CreatePrintMsg (the name is the ROM's)
+        PartySelectList *partySelect;
         PokeParty *boxParty; // the Battle Box as a party
         TrainerCardParam *cardParam;
         TrainerCardData *my_card;

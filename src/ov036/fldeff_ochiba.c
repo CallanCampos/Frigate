@@ -75,7 +75,7 @@ void func_ov036_021c9470(FieldEffects *effects, void *data) {
 
 static void func_ov036_021c9484(FieldEffectOchiba *effect) {
     FieldG3DObjResRequest request;
-    FieldG3DObjSystem *objSys = func_ov036_021a3724(effect->effects);
+    FieldG3DObjSystem *objSys = FieldEffects_GetFieldMapData(effect->effects);
     ArcTool *arc = FieldEffects_GetArc(effect->effects);
 
     FieldG3DObjResRequest_Clear(&request);
@@ -86,11 +86,11 @@ static void func_ov036_021c9484(FieldEffectOchiba *effect) {
 }
 
 static void func_ov036_021c94cc(FieldEffectOchiba *effect) {
-    FieldG3DObjSystem_FreeResGroup(func_ov036_021a3724(effect->effects), effect->resGroup);
+    FieldG3DObjSystem_FreeResGroup(FieldEffects_GetFieldMapData(effect->effects), effect->resGroup);
 }
 
 // Leaves under the actor, which face the way it does
-void func_ov036_021c94e0(void *effects, FieldActor *actor) {
+void func_ov036_021c94e0(FieldEffects *effects, FieldActor *actor) {
     VecFx32 pos;
     OchibaTaskParams params;
     fx32 height;
@@ -113,17 +113,17 @@ void func_ov036_021c94e0(void *effects, FieldActor *actor) {
 
 static void func_ov036_021c955c(FieldEffectTask *task, void *work) {
     OchibaTask *ochibaTask = work;
-    OchibaTaskParams *params = func_ov036_021a3ac8(task);
+    OchibaTaskParams *params = FieldEffects_GetObjectParam(task);
     FieldEffectOchiba *effect = params->effect;
     FieldG3DObjSystem *objSys;
 
     ochibaTask->effect = effect;
-    objSys = func_ov036_021a3724(effect->effects);
+    objSys = FieldEffects_GetFieldMapData(effect->effects);
     ochibaTask->dir = params->dir;
     ochibaTask->objSys = objSys;
-    func_ov036_021a3ae8(task, &params->pos);
+    FieldEffects_SetObjectPos(task, &params->pos);
     ochibaTask->objIdx = FieldG3DObjSystem_AddObj(objSys, ochibaTask->effect->resGroup, 0, &params->pos);
-    func_ov036_021c02b4(objSys, ochibaTask->objIdx, TRUE);
+    FieldG3DObjSystem_SetObjectManualDraw(objSys, ochibaTask->objIdx, TRUE);
 }
 
 static void func_ov036_021c95a4(FieldEffectTask *task, void *work) {
@@ -137,7 +137,7 @@ static void func_ov036_021c95b0(FieldEffectTask *task, void *work) {
     OchibaTask *ochibaTask = work;
 
     if (!FieldG3DObjSystem_StepObjAnm(ochibaTask->objSys, ochibaTask->objIdx, FX32_ONE)) {
-        func_ov036_021a3a70(task);
+        FieldEffects_DeleteObject(task);
     }
 }
 
@@ -148,7 +148,7 @@ static void func_ov036_021c95cc(FieldEffectTask *task, void *work) {
     SRTMatrix *srt = FieldG3DObjSystem_GetObjTransform(ochibaTask->objSys, ochibaTask->objIdx);
 
     MAT3_RotationEulerZYX(rot[0], rot[1], rot[2], &srt->rotation);
-    func_ov036_021a3ad4(task, &srt->translation);
+    FieldEffects_GetObjectPos(task, &srt->translation);
     FieldG3DObjSystem_DrawObj(ochibaTask->objSys, ochibaTask->objIdx);
 }
 
@@ -194,7 +194,7 @@ static GameEventReturnCode EventLeafPileStuck_Callback(GameEvent *event, u32 *st
         break;
     case 1:
         FieldPlayer_SetSpecialSeq(work->args.player, 1);
-        func_ov036_0219a58c(work->args.player);
+        FieldPlayer_FinishFormChange(work->args.player);
         *state = 2;
         break;
     case 2:
@@ -239,7 +239,7 @@ static GameEventReturnCode EventLeafPileStuck_Callback(GameEvent *event, u32 *st
         break;
     }
     case 6:
-        if (func_ov036_0219a870(work->args.player) == TRUE) {
+        if (FieldPlayer_CheckAnimePaused(work->args.player) == TRUE) {
             *state = 7;
         }
         break;

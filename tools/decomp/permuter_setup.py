@@ -23,7 +23,9 @@ import pycparser
 import pycparser.c_generator
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
-from tools.decomp.compiler_probe import INCLUDE_DIRS, VERSION_DEFINES, find_function, probe_defaults, load_modules  # noqa: E402
+from tools.decomp.compiler_probe import (  # noqa: E402
+    INCLUDE_DIRS, VERSION_DEFINES, find_function, probe_defaults, load_modules, source_ranges,
+)
 from tools.decomp.dsd_config import ROOT  # noqa: E402
 from configure import mwcc_command  # noqa: E402
 
@@ -74,13 +76,16 @@ def main():
     (out / "base.c").write_text(single_function(preprocessed, args.function))
 
     modules = load_modules(args.version)
-    found = find_function(args.version, args.function, modules)
+    found = find_function(args.version, args.function, modules, Path(args.source))
     if found is None:
         sys.exit(f"{args.function} is not in {args.version}'s configs")
     data, address, thumb = found
     config = ROOT / "config" / args.version / "arm9"
+    owners = source_ranges(ROOT, args.version, Path(args.source))
     module_dir = next(s.parent for s in config.rglob("symbols.txt")
-                      if any(l.startswith(args.function + " ") for l in s.read_text().splitlines()))
+                      if (not owners or s.parent in owners)
+                      and any(l.startswith(args.function + " ") and f"addr:{address:#010x}" in l
+                             for l in s.read_text().splitlines()))
     data = bytearray(data)
     for offset in relocated_offsets(module_dir, address, address + len(data)):
         if offset < len(data):

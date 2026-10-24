@@ -14,6 +14,7 @@ lib/dsprot/src/dsprot_cipher_multi.c:
     .rodata     start:0x02182434 end:0x02182448
 
 lib/dsprot/src/dsprot_run_multi.c:
+    complete
     .text       start:0x021802ec end:0x02180c84
     .rodata     start:0x02182448 end:0x02182464
     .bss        start:0x02182480 end:0x0218248c
@@ -25,5 +26,6 @@ lib/dsprot/src/dsprot_decrypt_multi.c:
     .bss        start:0x0218248c end:0x021824a0
 
 lib/dsprot/src/dsprot_detect_multi.c:
+    complete
     .text       start:0x02180f84 end:0x02182430
     .rodata     start:0x0218246c end:0x02182474

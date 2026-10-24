@@ -41,7 +41,7 @@ SaveControl *SaveControl_Create(HeapID heapId) {
     u32 extraResult;
     SaveExtraID i;
     SaveOutside *outside;
-    void *keyData;
+    KeySystemData *keyData;
 
     ctrl = GFL_HeapAllocate(heapId, sizeof(SaveControl), TRUE, "save_control.c", 81);
     SaveControlWork = ctrl;
@@ -286,7 +286,7 @@ BOOL SaveControl_ReadBlockCopy(SaveControl *save, u32 block, u32 copy, void *des
     return SaveData_ReadBlockFromCard(save->sv, block, copy, dest, size);
 }
 
-void *SaveControl_GetMemoryLink(SaveControl *save) {
+MemoryLinkSave *SaveControl_GetMemoryLink(SaveControl *save) {
     return save->memoryLink;
 }
 

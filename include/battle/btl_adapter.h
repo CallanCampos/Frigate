@@ -33,11 +33,11 @@ enum {
 // Sets up the adapters, sharing one per client unless commMode is set
 void BtlAdapter_InitSystem(u8 commMode);
 void BtlAdapter_QuitSystem(void);
-BtlAdapter *BtlAdapter_Create(void *netHandle, u8 clientId, BOOL flag, HeapID heapId);
+BtlAdapter *BtlAdapter_Create(NetHandle *netHandle, u8 clientId, BOOL flag, HeapID heapId);
 void BtlAdapter_ResetState(BtlAdapter *adapter);
 void BtlAdapter_Delete(BtlAdapter *adapter);
 void BtlAdapter_ClearNetReplies(void);
-void func_ov167_021d4ae8(void);
+void BtlAdapter_Idle(void);
 void BtlAdapter_SetCmd(BtlAdapter *adapter, u32 cmd, const void *data, u32 size);
 BOOL BtlAdapter_WaitCmd(BtlAdapter *adapter);
 // The client's reply to the last command, and its size if size isn't NULL

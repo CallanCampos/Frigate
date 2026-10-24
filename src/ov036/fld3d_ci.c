@@ -279,7 +279,7 @@ static BOOL Fld3DCi_UpdateActor2(Fld3DCi *ci);
 static void EventFieldEffect_LoadGraphics(GameEvent *event, Fld3DCi *ci, Fld3DCiScene *scene, u8 effectId);
 static void Fld3DCi_FreeG3D(Fld3DCi *ci, Fld3DCiScene *scene);
 static void Fld3DCi_CreateEmitter(Fld3DCi *ci, int id);
-static void func_ov036_021bc108(SPLEmitter *emitter);
+static void Fld3DCi_FollowTargetCallback(SPLEmitter *emitter);
 static void Fld3DCi_LoadG3DSceneTemplate(Fld3DCiScene *scene, u32 fileId, HeapID heapId);
 static void Fld3DCi_FreeSceneTemplate(Fld3DCiScene *scene);
 static void Fld3DCi_RequestScreenCap(Fld3DCi *ci);
@@ -295,8 +295,8 @@ static GameEventReturnCode EventFieldEffectFadeInWhiteTop_Callback(GameEvent *ev
 static GameEventReturnCode EventFieldEffectFadeInAllBlack_Callback(GameEvent *event, u32 *state, void *work);
 static BOOL func_ov036_021bc828(u16 effectId);
 static BOOL func_ov036_021bc838(u16 effectId);
-static u32 func_ov036_021bccf0(const NNSG3dResTex *tex, const NNSG3dResDictTexData *data);
-static u32 func_ov036_021bcd00(const NNSG3dResTex *tex, const NNSG3dResDictPlttData *data);
+static u32 Fld3DCi_GetTexDataOffset(const NNSG3dResTex *tex, const NNSG3dResDictTexData *data);
+static u32 Fld3DCi_GetPlttDataOffset(const NNSG3dResTex *tex, const NNSG3dResDictPlttData *data);
 static u32 NNS_G3DResTexGetTexRAMAddress(const NNSG3dResTex *tex, const char *name);
 static u32 NNS_G3DResTexGetPltRAMAddress(const NNSG3dResTex *tex, const char *name);
 static void NNS_G3DNormalizeName(NNSG3dResName *dest, const char *name);
@@ -304,7 +304,7 @@ static void EventFieldEffect_DimCaptureColor(void);
 static void Fld3DCi_InitEventData(Fld3DCi *ci, Fld3DCiEvent *data);
 static void Fld3DCi_UpdateSound(Fld3DCi *ci, u8 speed);
 static void Fld3DCi_UpdateFade(Fld3DCi *ci, u8 speed);
-static void func_ov036_021bd074(TCB *tcb, void *work);
+static void Fld3DCi_DisplayRestoreTask(TCB *tcb, void *work);
 static Fld3DCiFade *Fld3DCiFade_Create(u32 heapId);
 static void Fld3DCi_AllFadeTCB(TCB *tcb, void *work);
 static void Fld3DCiFadeState_Apply(Fld3DCiFade *fade);
@@ -617,11 +617,11 @@ static GameEventReturnCode EventFieldEffect_Callback(GameEvent *event, u32 *stat
     case 12:
         FieldLight_Flush(Field_GetLightSystem(field), TRUE);
         ci->dimDone = 0;
-        GFL_VBlankTCBAdd(func_ov036_021bd074, &ci->dimDone, 0);
+        GFL_VBlankTCBAdd(Fld3DCi_DisplayRestoreTask, &ci->dimDone, 0);
         (*state)++;
         break;
     case 13: {
-        void *msgBGSys;
+        FieldMsgBG *msgBGSys;
         PlaceName *placeName;
 
         if (ci->dimDone == 0) {
@@ -630,9 +630,9 @@ static GameEventReturnCode EventFieldEffect_Callback(GameEvent *event, u32 *stat
         GFL_HeapGetFreeSize(ci->heapId);
         msgBGSys = Field_GetMsgBGSys(field);
         placeName = Field_GetPlaceName(field);
-        func_ov036_0218a5a0(msgBGSys);
+        MsgBGPrinter_ReloadBg(msgBGSys);
         func_ov036_021b5180(placeName);
-        func_ov036_021879c0(msgBGSys);
+        MsgBGPrinter_RequestSysFrame(msgBGSys);
         reg_G2_BG2CNT = (reg_G2_BG2CNT & 0x43) | 0x1f18;
         GFL_BGSysClearBG(2);
         Fld3DCi_RestoreBGPriorities(ci);
@@ -794,10 +794,10 @@ static void Fld3DCi_FreeG3D(Fld3DCi *ci, Fld3DCiScene *scene) {
 }
 
 static void Fld3DCi_CreateEmitter(Fld3DCi *ci, int id) {
-    Particle_CreateEmitterWithCallback(ci->particle, id, func_ov036_021bc108, NULL);
+    Particle_CreateEmitterWithCallback(ci->particle, id, Fld3DCi_FollowTargetCallback, NULL);
 }
 
-static void func_ov036_021bc108(SPLEmitter *emitter) {
+static void Fld3DCi_FollowTargetCallback(SPLEmitter *emitter) {
     VecFx32 offset = { 0, 0, 0 };
 
     offset.z = 64;
@@ -1031,7 +1031,7 @@ static BOOL EventFieldEffectPokeSpriteSub_ControlEffect(GameEvent *event, Fld3DC
 static void EventFieldEffectPokeSpriteSub_ConvertSprite(Fld3DCi *ci) {
     PokeSpriteParam *param;
     HeapID heapId = ci->heapId;
-    void *res;
+    G3DResource *res;
     u8 *charRaw;
     u8 *pixels;
     int i;
@@ -1157,7 +1157,7 @@ static BOOL func_ov036_021bc838(u16 effectId) {
 
 static void Fld3DCi_ConvG2DToG3D(Fld3DCi *ci, const char *texName, const char *palName, u32 charFile, u32 palFile,
                                  u8 width, u8 height, u8 srcStride, u8 srcOffset, u8 resource, u8 palOffset) {
-    void *res;
+    G3DResource *res;
     NNSG3dResTex *tex;
     u32 texAddr;
     u32 palAddr;
@@ -1336,11 +1336,11 @@ static GameEventReturnCode EventFld3DCiBitmapConv_Callback(GameEvent *event, u32
     return FALSE;
 }
 
-static u32 func_ov036_021bccf0(const NNSG3dResTex *tex, const NNSG3dResDictTexData *data) {
+static u32 Fld3DCi_GetTexDataOffset(const NNSG3dResTex *tex, const NNSG3dResDictTexData *data) {
     return (data->texImageParam << 16 >> 13) + NNS_GfdGetTexKeyAddr(tex->texInfo.vramKey);
 }
 
-static u32 func_ov036_021bcd00(const NNSG3dResTex *tex, const NNSG3dResDictPlttData *data) {
+static u32 Fld3DCi_GetPlttDataOffset(const NNSG3dResTex *tex, const NNSG3dResDictPlttData *data) {
     return (data->offset << 3) + NNS_GfdGetPlttKeyAddr(tex->plttInfo.vramKey);
 }
 
@@ -1353,7 +1353,7 @@ static u32 NNS_G3DResTexGetTexRAMAddress(const NNSG3dResTex *tex, const char *na
     if (data == NULL) {
         return 0;
     }
-    return func_ov036_021bccf0(tex, data);
+    return Fld3DCi_GetTexDataOffset(tex, data);
 }
 
 static u32 NNS_G3DResTexGetPltRAMAddress(const NNSG3dResTex *tex, const char *name) {
@@ -1367,7 +1367,7 @@ static u32 NNS_G3DResTexGetPltRAMAddress(const NNSG3dResTex *tex, const char *na
     if (data == NULL) {
         return 0;
     }
-    return func_ov036_021bcd00(tex, data);
+    return Fld3DCi_GetPlttDataOffset(tex, data);
 }
 
 static void NNS_G3DNormalizeName(NNSG3dResName *dest, const char *name) {
@@ -1387,7 +1387,7 @@ static void EventFieldEffectCutinSub_DrawStrToTexture(PlayerInfo *info, RivalDat
                                                       const char *texName, const char *palName, u32 messageId,
                                                       u16 color, u16 color2, BOOL measure) {
     MsgData *msgData;
-    void *res = GFL_G3DMgrGetResource(ci->mgr, 0);
+    G3DResource *res = GFL_G3DMgrGetResource(ci->mgr, 0);
     HeapID heapId = ci->heapId;
     u16 *raw;
     StrBuf *str;
@@ -1497,7 +1497,7 @@ static void Fld3DCi_UpdateFade(Fld3DCi *ci, u8 speed) {
     }
 }
 
-static void func_ov036_021bd074(TCB *tcb, void *work) {
+static void Fld3DCi_DisplayRestoreTask(TCB *tcb, void *work) {
     u32 *done = work;
 
     GFL_BGSysSetBGEnabled(0, 1);

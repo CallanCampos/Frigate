@@ -100,12 +100,12 @@ StrBuf *PMSData_ToStringWithWords(const PMSData *data, u32 heapId, int wordCount
     for (i = 0; i < wordCount; i++) {
         if (data->words[i] != PMS_WORD_NULL) {
             if ((data->words[i] >> PMS_WORD_NUMBER_SHIFT) & 1) {
-                func_02024574(wordSet, i, data->words[i] & PMS_WORD_INDEX_MASK);
+                WordSet_SetSlotMarkerFlag(wordSet, i, data->words[i] & PMS_WORD_INDEX_MASK);
             } else {
                 loadSayingForDisplay(wordSet, i, data->words[i]);
             }
         } else {
-            func_02024574(wordSet, i, 1);
+            WordSet_SetSlotMarkerFlag(wordSet, i, 1);
         }
     }
     msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, sSentenceMsgFiles[data->type], heapId);

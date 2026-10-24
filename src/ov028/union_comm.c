@@ -76,7 +76,7 @@ static const GFLNetInitData data_ov028_02172c94 = {
     10,
     1,
     0,
-    0,
+    GFL_NET_TYPE_WIRELESS,
     1,
     0x14,
     {0x2c, 1, 0, 0},

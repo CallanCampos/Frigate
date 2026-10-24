@@ -1427,10 +1427,11 @@ static void scenario_cpu_pointer(void) {
     CHECK(port_vram_cpu_pointer(0x02000000) == port_hw_pointer(0x02000000));
 }
 
-// The building transition's second event (src/ov036/field_transition.c, func_ov036_021b8e10) gives bank D to LCDC,
-// clears 128 KiB from HW_LCDC_VRAM, turns LCDC off and gives D to BG. The decomp's literal there, 0x6800000, is no
-// host address (game-changes.md); HW_LCDC_VRAM is the same DS address, bank A's place in LCDC, not D's. So the clear
-// reaches A when A is in LCDC, and nothing otherwise, and leaves D as it was, on the DS and through the host's views
+// The building transition's second event (src/ov036/field_transition.c, EventGameTransition_RunDefaultFadeIn) gives
+// bank D to LCDC, clears 128 KiB from HW_LCDC_VRAM, turns LCDC off and gives D to BG. The decomp's literal there,
+// 0x6800000, is no host address (game-changes.md); HW_LCDC_VRAM is the same DS address, bank A's place in LCDC, not
+// D's. So the clear reaches A when A is in LCDC, and nothing otherwise, and leaves D as it was, on the DS and through
+// the host's views
 static void BuildingTransitionClear(void) {
     GX_SetBankForLCDC(8);
     MIi_CpuClearFast(0, (void *)HW_LCDC_VRAM, 0x20000);

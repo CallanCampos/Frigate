@@ -8,10 +8,10 @@
 
 typedef struct {
     FieldEffects *effects;
-    void *mdlRes;
-    void *anmRes;
+    G3DResource *mdlRes;
+    G3DResource *anmRes;
     G3DActor *actor;
-    void *anm;
+    G3DAnimation *anm;
     G3DModel *mdl;
 } FieldEffectFishing;
 
@@ -28,20 +28,20 @@ typedef struct {
     u16 speedSet;
 } FishingTask;
 
-static void func_ov036_021a5860(FieldEffectFishing *effect);
-static void func_ov036_021a58b4(FieldEffectFishing *effect);
-static void func_ov036_021a597c(FieldEffectTask *task, void *work);
+static void FldeffFishing_LoadResources(FieldEffectFishing *effect);
+static void FldeffFishing_FreeResources(FieldEffectFishing *effect);
+static void FldeffFishing_Init(FieldEffectTask *task, void *work);
 static void func_ov036_021a5998(FieldEffectTask *task, void *work);
-static void func_ov036_021a599c(FieldEffectTask *task, void *work);
-static void func_ov036_021a59dc(FieldEffectTask *task, void *work);
+static void FldeffFishing_Update(FieldEffectTask *task, void *work);
+static void FldeffFishing_Draw(FieldEffectTask *task, void *work);
 
 // clang-format off
 static const FieldEffectTaskVTable FISHING_TASK_VTABLE = {
     sizeof(FishingTask),
-    func_ov036_021a597c,
+    FldeffFishing_Init,
     func_ov036_021a5998,
-    func_ov036_021a599c,
-    func_ov036_021a59dc,
+    FldeffFishing_Update,
+    FldeffFishing_Draw,
 };
 
 // clang-format on
@@ -52,16 +52,16 @@ void *func_ov036_021a5828(FieldEffects *effects, HeapID heapId) {
     FieldEffectFishing *effect = GFL_HeapAllocate(heapId, sizeof(FieldEffectFishing), TRUE, "fldeff_fishing.c", 96);
 
     effect->effects = effects;
-    func_ov036_021a5860(effect);
+    FldeffFishing_LoadResources(effect);
     return effect;
 }
 
 void func_ov036_021a584c(FieldEffects *effects, void *data) {
-    func_ov036_021a58b4(data);
+    FldeffFishing_FreeResources(data);
     GFL_HeapFree(data);
 }
 
-static void func_ov036_021a5860(FieldEffectFishing *effect) {
+static void FldeffFishing_LoadResources(FieldEffectFishing *effect) {
     ArcTool *arc = FieldEffects_GetArc(effect->effects);
 
     effect->mdlRes = GFL_G3DSysReadArcToolResource(arc, 84);
@@ -73,7 +73,7 @@ static void func_ov036_021a5860(FieldEffectFishing *effect) {
     GFL_G3DActorBindAnm(effect->actor, 0);
 }
 
-static void func_ov036_021a58b4(FieldEffectFishing *effect) {
+static void FldeffFishing_FreeResources(FieldEffectFishing *effect) {
     GFL_G3DActorFree(effect->actor);
     GFL_G3DAnmFree(effect->anm);
     GFL_G3DMdlFree(effect->mdl);
@@ -93,39 +93,39 @@ FieldEffectTask *func_ov036_021a58e0(FieldEffects *effects, const VecFx32 *pos, 
     return FieldEffects_TCBCreate(effects, &FISHING_TASK_VTABLE, NULL, 0, &params, 0);
 }
 
-void func_ov036_021a5968(FieldEffectTask *task, u16 speed) {
+void FldeffFishing_SetAnimeSpeed(FieldEffectTask *task, u16 speed) {
     if (task != NULL) {
-        FishingTask *fishingTask = func_ov036_021a3afc(task);
+        FishingTask *fishingTask = FieldEffects_GetObjectWork(task);
 
         fishingTask->speedSet = TRUE;
         fishingTask->speed = speed;
     }
 }
 
-static void func_ov036_021a597c(FieldEffectTask *task, void *work) {
+static void FldeffFishing_Init(FieldEffectTask *task, void *work) {
     FishingTask *fishingTask = work;
-    FishingTaskParams *params = func_ov036_021a3ac8(task);
+    FishingTaskParams *params = FieldEffects_GetObjectParam(task);
 
     fishingTask->effect = params->effect;
-    func_ov036_021a3ae8(task, &params->pos);
+    FieldEffects_SetObjectPos(task, &params->pos);
 }
 
 static void func_ov036_021a5998(FieldEffectTask *task, void *work) {
 }
 
-static void func_ov036_021a599c(FieldEffectTask *task, void *work) {
+static void FldeffFishing_Update(FieldEffectTask *task, void *work) {
     FishingTask *fishingTask = work;
     FieldEffectFishing *effect = fishingTask->effect;
 
     GFL_G3DActorStepAnmFrameLoop(effect->actor, 0, FX32_CONST(fishingTask->speed * 2 + 1));
 }
 
-static void func_ov036_021a59dc(FieldEffectTask *task, void *work) {
+static void FldeffFishing_Draw(FieldEffectTask *task, void *work) {
     FishingTask *fishingTask = work;
     FieldEffectFishing *effect = fishingTask->effect;
     SRTMatrix srt = { { 0, 0, 0 }, { FX32_ONE, FX32_ONE, FX32_ONE } };
 
     MTX_Identity33_(&srt.rotation);
-    func_ov036_021a3ad4(task, &srt.translation);
+    FieldEffects_GetObjectPos(task, &srt.translation);
     GFL_G3DSysDrawObjBBoxCull(effect->actor, &srt);
 }

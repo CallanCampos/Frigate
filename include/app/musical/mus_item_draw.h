@@ -37,7 +37,7 @@ struct MusItemDrawSys {
     BlActScene *blact;
     MusItemDraw *items;
     // Overlay 210's table of the props
-    void *itemData;
+    MusItemData *itemData;
     u16 count;
     GXRgb shadowPalette[16];
 };
@@ -52,15 +52,15 @@ BOOL MusItemDraw_IsItemOfPos(MusItemDrawSys *sys, u16 itemId, s32 pos);
 BOOL MusItemDraw_GetItemFlag7(MusItemDraw *item);
 BOOL MusItemDraw_GetItemFlag9(MusItemDraw *item);
 // The texture of a prop, as a 3D resource
-void *MusItemDraw_LoadTexResource(u16 itemId);
-void MusItemDraw_FreeTexResource(void *resource);
-MusItemDraw *MusItemDraw_AddItem(MusItemDrawSys *sys, u16 itemId, void *texResource, const VecFx32 *pos);
+G3DResource *MusItemDraw_LoadTexResource(u16 itemId);
+void MusItemDraw_FreeTexResource(G3DResource *resource);
+MusItemDraw *MusItemDraw_AddItem(MusItemDrawSys *sys, u16 itemId, G3DResource *texResource, const VecFx32 *pos);
 // Adds a prop that draws with a material the scene already has
 MusItemDraw *MusItemDraw_AddItemWithMaterial(MusItemDrawSys *sys, u16 itemId, u32 material, const VecFx32 *pos);
 void MusItemDraw_DelItem(MusItemDrawSys *sys, MusItemDraw *item);
 void MusItemDraw_ChangeItem(MusItemDrawSys *sys, MusItemDraw *item, u16 itemId, u16 material);
 // Gives the prop the shadow's palette
-void MusItemDraw_SetShadowPalette(MusItemDrawSys *sys, MusItemDraw *item, void *texResource);
+void MusItemDraw_SetShadowPalette(MusItemDrawSys *sys, MusItemDraw *item, G3DResource *texResource);
 // Puts a shadow prop a little behind and below right of its prop
 void MusItemDraw_CopyShadowPos(MusItemDrawSys *sys, MusItemDraw *item, MusItemDraw *shadow);
 void MusItemDraw_SetVisible(MusItemDrawSys *sys, MusItemDraw *item, BOOL visible);
@@ -73,6 +73,6 @@ void MusItemDraw_GetRotation(MusItemDrawSys *sys, MusItemDraw *item, u16 *rotati
 void MusItemDraw_SetUseOffset(MusItemDrawSys *sys, MusItemDraw *item, BOOL useOffset);
 BOOL MusItemDraw_GetUseOffset(MusItemDrawSys *sys, MusItemDraw *item);
 void MusItemDraw_GetItemOffset(MusItemDraw *item, s32 *offset);
-void *MusItemDraw_GetItemData(MusItemDrawSys *sys);
+MusItemData *MusItemDraw_GetItemData(MusItemDrawSys *sys);
 
 #endif // POKEBW2_APP_MUSICAL_MUS_ITEM_DRAW_H

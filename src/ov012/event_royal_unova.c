@@ -103,16 +103,16 @@ BOOL s01A1_PleasureBoatGetRoomInfo(VM *vm, FieldScriptEnv *env) {
         *result = PleasureBoat_GetRoomObjCode(*boat, room);
         break;
     case 5:
-        *result = func_ov036_021c2220(*boat, room);
+        *result = PleasureBoat_GetPassengerParam(*boat, room);
         break;
     case 6:
-        *result = func_ov036_021c222c(*boat, room);
+        *result = PleasureBoat_GetPassengerType(*boat, room);
         break;
     case 7:
-        *result = func_ov036_021c2238(*boat, room, index);
+        *result = PleasureBoat_GetPassengerExtra(*boat, room, index);
         break;
     case 8:
-        if (func_ov036_021c2248(*boat, room)) {
+        if (PleasureBoat_GetPassengerOccupied(*boat, room)) {
             *result = TRUE;
         } else {
             *result = FALSE;

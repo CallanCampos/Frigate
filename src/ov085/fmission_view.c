@@ -695,7 +695,7 @@ static void FMissionView_PrintMessage(FMissionView *view, StrBuf *strbuf, int *p
 static void FMissionView_DrawMission(FMissionView *view) {
     int x;
 
-    FestMission_GetMessage(view->festText, view->message, (const FestMission *)view->config, view->tmpHeapId);
+    FestMission_GetMessage(view->festText, view->message, view->config, view->tmpHeapId);
     x = (184 - (int)GFL_FontGetBlockWidth(view->message, view->font, 0)) / 2;
     BeaconViewWin_Print(&view->wins[FMISSION_VIEW_WIN_MISSION].win, view->message, (u8)x, 4, 13, PRINT_COLOR(1, 2, 13),
                         NULL, view->printNow);

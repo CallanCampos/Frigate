@@ -29,10 +29,6 @@ struct BoxMainSave {
     u8 padding3DE[2];
 };
 
-typedef struct {
-    BoxPkm pkm[BOX_MAX_POS];
-} BoxTraySave;
-
 struct BoxSaveAccessor {
     SaveControl *save;
 };
@@ -464,6 +460,6 @@ u32 getSizeofBox(void) {
     return sizeof(BoxTraySave);
 }
 
-void *BoxSaveAccessor_GetBox(BoxSaveAccessor *boxes, u32 trayNum) {
+BoxTraySave *BoxSaveAccessor_GetBox(BoxSaveAccessor *boxes, u32 trayNum) {
     return SaveControl_GetBlockPtr(boxes->save, SAVE_BLOCK_BOX_TRAY + trayNum);
 }

@@ -53,7 +53,7 @@ void EventData_LoadEncData(EventData *data, u16 zoneId, u8 season);
 void *GetZoneInitScrPointer(EventData *data);
 u32 IsEncountDataLoaded(EventData *data);
 EncData *GetEncountData(EventData *data);
-void *GetZoneProxiesAndCount(EventData *data, u32 *count);
+ZoneBGEntity *GetZoneProxiesAndCount(EventData *data, u32 *count);
 u16 CheckProxyEntityEvent(EventData *data, EventWork *eventWork, const void *position, u16 direction);
 u16 CheckProxyEntityEventGrid(EventData *data, EventWork *eventWork, const VecFx32 *position, u16 direction);
 u16 CheckProxyEntityEventRail(EventData *data, EventWork *eventWork, const RailPosition *position, u16 direction);

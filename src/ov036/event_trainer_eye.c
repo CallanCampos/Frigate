@@ -141,7 +141,7 @@ GameEvent *EventTrainerEye_CheckAll(Field *field) {
     GameData *gameData = GSYS_GetGameData(Field_GetGameSystem(field));
 
     if (EventTrainerEye_FindClashActor(field, NULL, &data) == TRUE) {
-        battleCount = func_ov036_02182f90(Field_GetGameSystem(field));
+        battleCount = FieldEventProvider_CountAlivePartyMembers(Field_GetGameSystem(field));
         if (EventTrainerEye_UsesSpecialScript(data.actor) == TRUE) {
             battleType = 0;
         } else {
@@ -187,7 +187,7 @@ GameEvent *EventTrainerEye_CheckAll(Field *field) {
     return event;
 }
 
-int func_ov036_021a5e30(FieldActor *actor, u16 dir, int range, EncountSystem *encounter) {
+int EventTrainerEyeSub_GetPlayerDistance(FieldActor *actor, u16 dir, int range, EncountSystem *encounter) {
     GridPos pos;
     GridPos playerPos;
     int dist;
@@ -381,14 +381,14 @@ static BOOL EventTrainerEyeSub_WaitTurnTrainer(EventTrainerEyeWork *work) {
 
 // The exclamation mark over the Trainer
 static BOOL EventTrainerEyeSub_StartTerrainEffect(EventTrainerEyeWork *work) {
-    work->emote = func_ov036_021b3f14(Field_GetFieldEffects(work->field), work->data.actor, 0, 0);
+    work->emote = FldeffGyoe_SetMMdl(Field_GetFieldEffects(work->field), work->data.actor, 0, 0);
     work->seq = TRAINER_EYE_SEQ_WAIT_TERRAIN_EFFECT;
     return FALSE;
 }
 
 static BOOL EventTrainerEyeSub_WaitTerrainEffect(EventTrainerEyeWork *work) {
-    if (func_ov036_021b3fb4(work->emote) == TRUE) {
-        func_ov036_021a3a70(work->emote);
+    if (FldeffGyoe_IsFinished(work->emote) == TRUE) {
+        FieldEffects_DeleteObject(work->emote);
         work->seq = TRAINER_EYE_SEQ_WAIT_30F;
     }
     return FALSE;

@@ -240,16 +240,16 @@ enum {
     BLOCK_CR,
 };
 
-static void func_ov257_021ab764(u8 *data, s16 *coef, int *pos, int tbl);
-static s32 func_ov257_021ab808(u8 *data, int *pos, s32 value, int nbits);
-static void func_ov257_021ab884(s16 *dest, int block);
-static void func_ov257_021ab8dc(const s16 *in, s16 *out, int quant);
-static int func_ov257_021abd3c(u8 *data, int *pos);
-static int func_ov257_021abd84(u8 *data, int *pos, int tbl);
-static void func_ov257_021ac018(u8 *dest, int x, int y, int width, int height);
+static void getmatrix(u8 *data, s16 *coef, int *pos, int tbl);
+static s32 get_matrix_sub(u8 *data, int *pos, s32 value, int nbits);
+static void decode_block(s16 *dest, int block);
+static void decode_block_sub(const s16 *in, s16 *out, int quant);
+static int loadbit(u8 *data, int *pos);
+static int hloadbit(u8 *data, int *pos, int tbl);
+static void writeblock(u8 *dest, int x, int y, int width, int height);
 
 // Checks the markers of a JPEG without decoding it
-static s32 func_ov257_021aafdc(u8 *data, u32 size, u32 option) {
+static s32 Mel_JPEGDecodeExif(u8 *data, u32 size, u32 option) {
     int pos;
 
     sStuffed = 0;
@@ -291,7 +291,7 @@ static s32 func_ov257_021aafdc(u8 *data, u32 size, u32 option) {
 }
 
 // Decodes a JPEG into dest, and returns its height and width, or 0
-static u32 func_ov257_021ab0a4(u8 *dest, u8 *data, u32 size, s32 maxWidth, s32 maxHeight, u32 option) {
+static u32 Mel_JPEGDecode(u8 *dest, u8 *data, u32 size, s32 maxWidth, s32 maxHeight, u32 option) {
     s32 p;
     u8 marker;
     int len;
@@ -497,14 +497,14 @@ static u32 func_ov257_021ab0a4(u8 *dest, u8 *data, u32 size, s32 maxWidth, s32 m
                             sBlocks[BLOCK_Y][0] = sBlocks[BLOCK_CB][0] = sBlocks[BLOCK_CR][0] = 0;
                         }
                         for (i = 0; i < sHSamp * sVSamp; i++) {
-                            func_ov257_021ab764(data, sBlocks[BLOCK_Y], &pos, HUFF_TBL_DC_Y);
-                            func_ov257_021ab884(sY[i], BLOCK_Y);
+                            getmatrix(data, sBlocks[BLOCK_Y], &pos, HUFF_TBL_DC_Y);
+                            decode_block(sY[i], BLOCK_Y);
                         }
-                        func_ov257_021ab764(data, sBlocks[BLOCK_CB], &pos, HUFF_TBL_DC_C);
-                        func_ov257_021ab884(sCb, BLOCK_CB);
-                        func_ov257_021ab764(data, sBlocks[BLOCK_CR], &pos, HUFF_TBL_DC_C);
-                        func_ov257_021ab884(sCr, BLOCK_CR);
-                        func_ov257_021ac018(dest, x, y, width, height);
+                        getmatrix(data, sBlocks[BLOCK_CB], &pos, HUFF_TBL_DC_C);
+                        decode_block(sCb, BLOCK_CB);
+                        getmatrix(data, sBlocks[BLOCK_CR], &pos, HUFF_TBL_DC_C);
+                        decode_block(sCr, BLOCK_CR);
+                        writeblock(dest, x, y, width, height);
                     }
                 }
                 break;
@@ -564,17 +564,17 @@ static u32 func_ov257_021ab0a4(u8 *dest, u8 *data, u32 size, s32 maxWidth, s32 m
 }
 
 // Decodes the coefficients of a block, in zigzag order, adding its DC to the prediction in coef[0]
-static void func_ov257_021ab764(u8 *data, s16 *coef, int *pos, int tbl) {
+static void getmatrix(u8 *data, s16 *coef, int *pos, int tbl) {
     int size;
     int left;
     int k;
 
-    size = func_ov257_021abd84(data, pos, tbl);
-    coef[0] += (s16)func_ov257_021ab808(data, pos, 0, size);
+    size = hloadbit(data, pos, tbl);
+    coef[0] += (s16)get_matrix_sub(data, pos, 0, size);
     left = 63;
     k = 1;
     do {
-        int rs = func_ov257_021abd84(data, pos, tbl + 1);
+        int rs = hloadbit(data, pos, tbl + 1);
         int run;
         int i;
 
@@ -596,13 +596,13 @@ static void func_ov257_021ab764(u8 *data, s16 *coef, int *pos, int tbl) {
                 k++;
             }
         }
-        coef[k] = func_ov257_021ab808(data, pos, 0, rs & 0xf);
+        coef[k] = get_matrix_sub(data, pos, 0, rs & 0xf);
         k++;
     } while (--left > 0);
 }
 
 // Reads nbits bits after value, as a signed value whose sign is its first bit
-static s32 func_ov257_021ab808(u8 *data, int *pos, s32 value, int nbits) {
+static s32 get_matrix_sub(u8 *data, int *pos, s32 value, int nbits) {
     s32 negative;
     int i;
 
@@ -611,7 +611,7 @@ static s32 func_ov257_021ab808(u8 *data, int *pos, s32 value, int nbits) {
         if (*pos + 1 >= sDataSize) {
             return negative;
         }
-        if (func_ov257_021abd3c(data, pos) == 0) {
+        if (loadbit(data, pos) == 0) {
             negative = (1 << nbits) - 1;
             nbits--;
         } else {
@@ -622,7 +622,7 @@ static s32 func_ov257_021ab808(u8 *data, int *pos, s32 value, int nbits) {
             if (*pos + 1 >= sDataSize) {
                 return 0;
             }
-            value = (value << 1) | func_ov257_021abd3c(data, pos);
+            value = (value << 1) | loadbit(data, pos);
         }
         value -= negative;
     }
@@ -630,7 +630,7 @@ static s32 func_ov257_021ab808(u8 *data, int *pos, s32 value, int nbits) {
 }
 
 // Puts a block's coefficients in natural order and transforms them into dest
-static void func_ov257_021ab884(s16 *dest, int block) {
+static void decode_block(s16 *dest, int block) {
     int i, j, k;
 
     k = 0;
@@ -641,9 +641,9 @@ static void func_ov257_021ab884(s16 *dest, int block) {
         k++;
     }
     if (block == BLOCK_Y) {
-        func_ov257_021ab8dc(sBlocks[BLOCK_IDCT_IN], dest, 0);
+        decode_block_sub(sBlocks[BLOCK_IDCT_IN], dest, 0);
     } else {
-        func_ov257_021ab8dc(sBlocks[BLOCK_IDCT_IN], dest, 64);
+        decode_block_sub(sBlocks[BLOCK_IDCT_IN], dest, 64);
     }
 }
 
@@ -658,7 +658,7 @@ static void func_ov257_021ab884(s16 *dest, int block) {
 #define IDCT_WS sBlocks[BLOCK_IDCT_WORK]
 
 // IJG's fast integer IDCT (jidctfst.c), with the dequantization, into samples from 0 to 255
-static void func_ov257_021ab8dc(const s16 *in, s16 *out, int quant) {
+static void decode_block_sub(const s16 *in, s16 *out, int quant) {
     int i;
     const s16 *quantPtr;
     const u8 *rangeLimit = IDCT_RANGE_LIMIT;
@@ -772,7 +772,7 @@ static void func_ov257_021ab8dc(const s16 *in, s16 *out, int quant) {
 }
 
 // Reads the next bit of the entropy-coded data, skipping the zero byte stuffed after each 0xff
-static int func_ov257_021abd3c(u8 *data, int *pos) {
+static int loadbit(u8 *data, int *pos) {
     if (sBitsLeft == 0) {
         sBitBuffer = data[(*pos)++];
         sStuffed = 0;
@@ -788,7 +788,7 @@ static int func_ov257_021abd3c(u8 *data, int *pos) {
 }
 
 // Decodes a Huffman code with table tbl: through the lookahead tables for a code of up to 8 bits, otherwise bit by bit
-static int func_ov257_021abd84(u8 *data, int *pos, int tbl) {
+static int hloadbit(u8 *data, int *pos, int tbl) {
     int offset = sDerivedTblOffsets[tbl];
     s32 idx;
     int code;
@@ -921,112 +921,106 @@ static int func_ov257_021abd84(u8 *data, int *pos, int tbl) {
 // IJG's sample_range_limit: the samples 0 to 255 clamped, reached with offsets from -256 to 639
 #define SAMPLE_RANGE_LIMIT (&sRangeLimit[0x100])
 
-// The RGB555 color of a pixel from its Y and the Cb and Cr at index c of the MCU, as IJG's ycc_rgb_convert, opaque
-static inline int YccToRgb555(int y, int c) {
+// Converts the decoded MCU at (x, y) into RGB555 pixels of dest, a bitmap width pixels wide, clipped to height. Each
+// pixel's color is IJG's ycc_rgb_convert, opaque, written out in every case; c holds the index of the pixel's Cb and
+// Cr, then its red, then its color, as BW1's decompilation (aletheia's jpegdec.c) has it and as the ROM's registers
+// need
+static void writeblock(u8 *dest, int x, int y, int width, int height) {
+    int p, i, j, h, v, k, c;
+    int g, b, cr, cb;
     const u8 *rangeLimit = SAMPLE_RANGE_LIMIT;
-    int cr = sCr[c];
-    int r = rangeLimit[y + sCrRTab[cr]] & 0xf8;
-    int cb = sCb[c];
-    int b = rangeLimit[y + sCbBTab[cb]] & 0xf8;
-    int g = rangeLimit[y + ((sCbGTab[cb] + sCrGTab[cr]) >> 16)] & 0xf8;
-    return (b << 7) | (g << 2) | (r >> 3) | 0x8000;
-}
 
-// Converts the decoded MCU at (x, y) into RGB555 pixels of dest, a bitmap width pixels wide, clipped to height
-static void func_ov257_021ac018(u8 *dest, int x, int y, int width, int height) {
-    int h, v, i, j;
-    int k;
-    int p;
-    int c;
-    int color;
-
-    switch (sHSamp + sVSamp * 2) {
+    switch (sVSamp * 2 + sHSamp) {
     case 3:
-        k = 0;
-        for (j = 0; j < 8; j++) {
+        for (j = k = 0; j < 8; j++) {
             if (y + j >= height) {
-                return;
+                break;
             }
-            p = ((y + j) * width + x) * 2;
-            for (i = 0; i < 8; i++) {
+            p = 2 * (width * (y + j) + x);
+            for (i = 0; i < 8; i++, k++, p += 2) {
                 if (x + i >= width) {
                     break;
                 }
-                color = YccToRgb555(sY[0][k], k);
-                dest[p] = color;
-                dest[p + 1] = color >> 8;
-                p += 2;
-
-                k++;
+                cr = sCr[k];
+                cb = sCb[k];
+                c = rangeLimit[sY[0][k] + sCrRTab[cr]] & 0xf8;
+                g = rangeLimit[sY[0][k] + ((sCbGTab[cb] + sCrGTab[cr]) >> 16)] & 0xf8;
+                b = rangeLimit[sY[0][k] + sCbBTab[cb]] & 0xf8;
+                c = (c >> 3) | (g << 2) | (b << 7) | 0x8000;
+                dest[p] = c;
+                dest[p + 1] = c >> 8;
             }
         }
         break;
     case 4:
-        k = 0;
-        for (h = 0; h < sHSamp; h++) {
+        for (h = k = 0; h < sHSamp; h++) {
             for (j = 0; j < 8; j++) {
                 if (y + j >= height) {
                     break;
                 }
-                p = ((y + j) * width + x + h * 8) * 2;
-                for (i = 0; i < 8; i++) {
-                    if (x + h * 8 + i >= width) {
+                p = 2 * (width * (y + j) + x + h * 8);
+                for (i = 0; i < 8; i++, k++, p += 2) {
+                    if (i + (x + h * 8) >= width) {
                         break;
                     }
                     c = (i >> 1) + h * 4 + j * 8;
-                    color = YccToRgb555(sY[0][k], c);
-                    dest[p] = color;
-                    dest[p + 1] = color >> 8;
-                    p += 2;
-
-                    k++;
+                    cr = sCr[c];
+                    cb = sCb[c];
+                    c = rangeLimit[sY[0][k] + sCrRTab[cr]] & 0xf8;
+                    g = rangeLimit[sY[0][k] + ((sCbGTab[cb] + sCrGTab[cr]) >> 16)] & 0xf8;
+                    b = rangeLimit[sY[0][k] + sCbBTab[cb]] & 0xf8;
+                    c = (c >> 3) | (g << 2) | (b << 7) | 0x8000;
+                    dest[p] = c;
+                    dest[p + 1] = c >> 8;
                 }
             }
         }
         break;
     case 5:
-        k = 0;
-        for (v = 0; v < sVSamp; v++) {
+        for (v = k = 0; v < sVSamp; v++) {
             for (j = 0; j < 8; j++) {
-                if (y + v * 8 + j >= height) {
+                if (j + (y + v * 8) >= height) {
                     break;
                 }
-                p = ((y + v * 8 + j) * width + x) * 2;
-                for (i = 0; i < 8; i++) {
+                p = 2 * (width * (j + (y + v * 8)) + x);
+                for (i = 0; i < 8; i++, k++, p += 2) {
                     if (x + i >= width) {
                         break;
                     }
                     c = i + (j >> 1) * 8 + v * 32;
-                    color = YccToRgb555(sY[0][k], c);
-                    dest[p] = color;
-                    dest[p + 1] = color >> 8;
-                    p += 2;
-
-                    k++;
+                    cr = sCr[c];
+                    cb = sCb[c];
+                    c = rangeLimit[sY[0][k] + sCrRTab[cr]] & 0xf8;
+                    g = rangeLimit[sY[0][k] + ((sCbGTab[cb] + sCrGTab[cr]) >> 16)] & 0xf8;
+                    b = rangeLimit[sY[0][k] + sCbBTab[cb]] & 0xf8;
+                    c = (c >> 3) | (g << 2) | (b << 7) | 0x8000;
+                    dest[p] = c;
+                    dest[p + 1] = c >> 8;
                 }
             }
         }
         break;
     case 6:
-        k = 0;
-        for (v = 0; v < sVSamp; v++) {
+        for (v = k = 0; v < sVSamp; v++) {
             for (h = 0; h < sHSamp; h++) {
                 for (j = 0; j < 8; j++) {
-                    if (y + v * 8 + j >= height) {
+                    if (j + (y + v * 8) >= height) {
                         break;
                     }
-                    p = ((y + v * 8 + j) * width + x + h * 8) * 2;
-                    for (i = 0; i < 8; i++) {
-                        if (x + h * 8 + i >= width) {
+                    p = 2 * (width * (j + (y + v * 8)) + x + h * 8);
+                    for (i = 0; i < 8; i++, k++, p += 2) {
+                        if (i + (x + h * 8) >= width) {
                             break;
                         }
                         c = (i >> 1) + h * 4 + (j >> 1) * 8 + v * 32;
-                        color = YccToRgb555(sY[0][k], c);
-                        dest[p] = color;
-                        dest[p + 1] = color >> 8;
-                        p += 2;
-
-                        k++;
+                        cr = sCr[c];
+                        cb = sCb[c];
+                        c = rangeLimit[sY[0][k] + sCrRTab[cr]] & 0xf8;
+                        g = rangeLimit[sY[0][k] + ((sCbGTab[cb] + sCrGTab[cr]) >> 16)] & 0xf8;
+                        b = rangeLimit[sY[0][k] + sCbBTab[cb]] & 0xf8;
+                        c = (c >> 3) | (g << 2) | (b << 7) | 0x8000;
+                        dest[p] = c;
+                        dest[p + 1] = c >> 8;
                     }
                 }
             }
@@ -1126,9 +1120,9 @@ BOOL SSP_StartJpegDecoder(u8 *data, u32 size, void *dst, s16 *width, s16 *height
     sError = 0;
     decodeOption = ((option & 1) ? 1 : 0) | ((option & 4) ? 4 : 0) | ((option & 0x10) ? 0x10 : 0);
     if (option & 0x10) {
-        result = func_ov257_021aafdc(data, size, decodeOption);
+        result = Mel_JPEGDecodeExif(data, size, decodeOption);
     } else {
-        result = func_ov257_021ab0a4(dst, data, size, *width, *height, decodeOption);
+        result = Mel_JPEGDecode(dst, data, size, *width, *height, decodeOption);
     }
     if (sError) {
         return FALSE;

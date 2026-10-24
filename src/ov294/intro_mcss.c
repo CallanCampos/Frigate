@@ -1,5 +1,6 @@
 #include "types.h"
 #include "demo/intro.h"
+#include "demo/intro_script.h"
 #include "gfl/graphics.h"
 #include "gfl/random.h"
 #include "nitro/hw.h"
@@ -180,7 +181,7 @@ void IntroMcss_Update(IntroMcss *mcss) {
     if (mcss->sprites[1].animationEnded) {
         if (mcss->idleTimer == 0) {
             mcss->idleTimer = GFL_RandomMTRange(5) * 20 + 200;
-            IntroMcss_SetAnimation(mcss, 1, 0, TRUE);
+            IntroMcss_SetAnimation(mcss, INTRO_SPRITE_POKEMON, 0, TRUE);
         } else {
             MCSS_PauseAnimation(mcss->sprites[1].mcss);
             mcss->idleTimer--;

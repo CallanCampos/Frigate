@@ -9,7 +9,7 @@
 BOOL Intrude_CanBootGameComm(GameSystem *gsys) {
     GameCommSys *commSys = GSYS_GetGameCommSystem(gsys);
 
-    if (GameData_IsForceSeasonSync(GSYS_GetGameData(gsys)) == TRUE && func_0202be08(commSys)) {
+    if (GameData_IsForceSeasonSync(GSYS_GetGameData(gsys)) == TRUE && GameCommSys_GetCounter(commSys)) {
         return FALSE;
     }
     return TRUE;
@@ -37,30 +37,30 @@ u8 getSeasonFromPlayerData(GameCommSys *commSys) {
     return GameData_GetSeason(getBasePlayerBlk(commSys));
 }
 
-u32 func_ov012_0215364c(GameCommSys *commSys, GameData *gameData) {
+u32 Intrude_GetAreaOwnerVersionClass(GameCommSys *commSys, GameData *gameData) {
     return 0;
 }
 
-u32 func_ov012_02153650(GameCommSys *commSys) {
+u32 Intrude_GetVisitProgress(GameCommSys *commSys) {
     return 0;
 }
 
-void func_ov012_02153654(GameCommSys *commSys) {
+void Intrude_SetCompleted(GameCommSys *commSys) {
 }
 
 u32 Intrude_GetAlertState(GameCommSys *commSys) {
     return 0;
 }
 
-u32 func_ov012_0215365c(GameCommSys *commSys) {
+u32 Intrude_CountEventPeers(GameCommSys *commSys) {
     return 0;
 }
 
-BOOL func_ov012_02153660(GameCommSys *commSys, StrBuf *name) {
+BOOL Intrude_GetRequesterStatus(GameCommSys *commSys, StrBuf *name) {
     return 0;
 }
 
-u32 func_ov012_02153664(GameCommSys *commSys) {
+u32 Intrude_IsSessionEndPending(GameCommSys *commSys) {
     return 0;
 }
 

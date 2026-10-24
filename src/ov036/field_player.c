@@ -87,7 +87,7 @@ void FieldPlayer_Free(FieldPlayer *player) {
         FieldPlayerGrid_Free(player->grid);
     }
     if (player->nogrid != NULL) {
-        func_ov036_0219cf40(player->nogrid);
+        FieldPlayerRail_Delete(player->nogrid);
     }
     FieldPlayerCore_Free(player->core);
     GFL_HeapFree(player);
@@ -124,27 +124,27 @@ void FieldPlayer_SetSpecialSeq(FieldPlayer *player, u32 seq) {
     FieldPlayerCore_SetSpecialSeq(player->core, seq);
 }
 
-BOOL func_ov036_0219a580(FieldPlayer *player) {
-    return func_ov036_0219b328(player->core);
+BOOL FieldPlayer_StepFormChange(FieldPlayer *player) {
+    return FieldPlayerCore_StepFormChange(player->core);
 }
 
-void func_ov036_0219a58c(FieldPlayer *player) {
-    func_ov036_0219b350(player->core);
+void FieldPlayer_FinishFormChange(FieldPlayer *player) {
+    FieldPlayerCore_FinishFormChange(player->core);
 }
 
 void FieldPlayer_ForceBrake(FieldPlayer *player) {
     if (Field_GetResolvedControllerTypeID(player->field) == CONTROLLER_GRID) {
         FieldPlayerGrid_ForceBrake(player->grid);
     } else {
-        func_ov036_0219d060(player->nogrid);
+        FieldPlayerRail_EndBlockedWalk(player->nogrid);
     }
 }
 
-void func_ov036_0219a5b8(FieldPlayer *player, FieldEffectTask *task) {
-    func_ov036_0219b138(player->core, task);
+void FieldPlayer_SetRideEffect(FieldPlayer *player, FieldEffectTask *task) {
+    FieldPlayerCore_SetRideEffect(player->core, task);
 }
 
-FieldEffectTask *func_ov036_0219a5c4(FieldPlayer *player) {
+FieldEffectTask *FieldPlayer_GetRideEffect(FieldPlayer *player) {
     return FieldPlayerCore_GetTerrainEffectTCB(player->core);
 }
 
@@ -152,16 +152,16 @@ u16 FieldPlayer_GetMoveDirByKey(FieldPlayer *player, u32 heldKeys) {
     return FieldPlayerCore_GetMoveDirByKey(player->core, heldKeys);
 }
 
-BOOL func_ov036_0219a5dc(FieldPlayer *player) {
+BOOL FieldPlayer_CheckMoveBusy(FieldPlayer *player) {
     if (Field_GetResolvedControllerTypeID(player->field) == CONTROLLER_GRID) {
         return FieldPlayerGrid_IsBraking(player->grid);
     }
-    return func_ov036_0219d008(player->nogrid);
+    return FieldPlayerRail_IsBlocked(player->nogrid);
 }
 
-void func_ov036_0219a5fc(FieldPlayer *player) {
+void FieldPlayer_ChangeToNormalForm(FieldPlayer *player) {
     FieldPlayerCore_SetSpecialSeq(player->core, 1);
-    func_ov036_0219b350(player->core);
+    FieldPlayerCore_FinishFormChange(player->core);
 }
 
 void FieldPlayer_UpdateActionStatusObserver(FieldPlayer *player) {
@@ -174,7 +174,7 @@ void FieldPlayer_UpdateActionStatusObserver(FieldPlayer *player) {
             FieldPlayerCore_ForceMoveObserveStatus(player->core, 2);
             return;
         }
-    } else if (func_ov036_0219d018(player->nogrid) == TRUE) {
+    } else if (FieldPlayerRail_IsForcedMove(player->nogrid) == TRUE) {
         FieldPlayerCore_ForceMoveObserveStatus(player->core, 2);
         return;
     }
@@ -270,7 +270,7 @@ u32 FieldPlayer_GetTileTypeInDirEx(FieldPlayer *player, u16 direction, fx32 *hei
         } else if (!GetActorRailPosForDir(actor, direction, &railPos)) {
             return -1;
         }
-        func_ov036_021b06ec(rail, &railPos, &pos);
+        FieldRailSystem_GetLocationPos(rail, &railPos, &pos);
         *height = pos.y;
         return FieldNoGridMapper_GetTileAtPos(mapper, &railPos);
     }
@@ -308,7 +308,7 @@ u32 FieldPlayer_GetExStateByObjCode(u32 objCode) {
     return PLAYER_FORM_COUNT;
 }
 
-BOOL func_ov036_0219a834(FieldPlayer *player) {
+BOOL FieldPlayer_CheckNotWaterForm(FieldPlayer *player) {
     switch (FieldPlayer_GetExState(player)) {
     case FLD_PLAYER_EXSTATE_SURF:
     case FLD_PLAYER_EXSTATE_DIVE:
@@ -325,12 +325,12 @@ void FieldPlayer_ClearObjCode(FieldPlayer *player) {
     FieldPlayerCore_ClearObjCode(player->core);
 }
 
-u32 func_ov036_0219a864(FieldPlayer *player) {
-    return func_ov036_0219b088(player->core);
+u32 FieldPlayer_CheckFormModel(FieldPlayer *player) {
+    return FieldPlayerCore_CheckFormModel(player->core);
 }
 
-BOOL func_ov036_0219a870(FieldPlayer *player) {
-    return func_ov036_0219b0a4(player->core);
+BOOL FieldPlayer_CheckAnimePaused(FieldPlayer *player) {
+    return FieldPlayerCore_CheckAnimePaused(player->core);
 }
 
 FieldActor *FieldPlayer_GetActorInFront(FieldPlayer *player) {
@@ -342,7 +342,7 @@ FieldActor *FieldPlayer_GetActorInFront(FieldPlayer *player) {
         FieldPlayer_GetGPosInFront(player, &x, &y, &z);
         return GetFirstActorOnGPos(system, x, z, FALSE);
     }
-    func_ov036_02195928(FieldPlayerCore_GetActor(player->core), &railPos);
+    RailActor_GetFrontLocation(FieldPlayerCore_GetActor(player->core), &railPos);
     return FindActorByRailPos(system, &railPos, FALSE);
 }
 
@@ -355,7 +355,7 @@ FieldActor *FieldPlayer_GetActorInFrontEx(FieldPlayer *player, fx32 maxHeightDif
         FieldPlayer_GetGPosInFront(player, &x, &y, &z);
         return FindActorByGPos(system, x, z, GRID_TO_FX32(y), maxHeightDiff, FALSE);
     }
-    func_ov036_02195928(FieldPlayerCore_GetActor(player->core), &railPos);
+    RailActor_GetFrontLocation(FieldPlayerCore_GetActor(player->core), &railPos);
     return FindActorByRailPos(system, &railPos, FALSE);
 }
 
@@ -387,9 +387,9 @@ void FieldPlayer_GetWPosInDir(FieldPlayer *player, u16 direction, VecFx32 *posit
         fx32 step;
 
         GetActorRailPos(actor, &railPos);
-        func_ov036_021b06ec(rail, &railPos, &pos);
-        func_ov036_02195a78(actor, direction, &dirVec);
-        step = func_ov036_021b05ec(rail);
+        FieldRailSystem_GetLocationPos(rail, &railPos, &pos);
+        RailActor_GetDrawOffsetByDir(actor, direction, &dirVec);
+        step = FieldRailSystem_GetUnitScale(rail);
         position->x = pos.x + FX_Mul(dirVec.x, step);
         position->y = pos.y + FX_Mul(dirVec.y, step);
         position->z = pos.z + FX_Mul(dirVec.z, step);
@@ -400,7 +400,7 @@ void FieldPlayer_GetGPosInFront(FieldPlayer *player, s16 *x, s16 *y, s16 *z) {
     GetPlayerGPosPlusDir(player, GetActorFaceDir(FieldPlayer_GetActor(player)), x, y, z);
 }
 
-void func_ov036_0219aab0(FieldPlayer *player, u16 dir, VecFx32 *vec) {
+void FieldPlayer_GetMoveOffsetInDir(FieldPlayer *player, u16 dir, VecFx32 *vec) {
     VecFx16 dirVec;
     FieldActor *actor = FieldPlayerCore_GetActor(player->core);
 
@@ -412,7 +412,7 @@ void func_ov036_0219aab0(FieldPlayer *player, u16 dir, VecFx32 *vec) {
         vec->z = GRID_TO_FX32(vec->z);
         VEC_Normalize(vec, vec);
     } else {
-        func_ov036_02195a78(actor, dir, &dirVec);
+        RailActor_GetDrawOffsetByDir(actor, dir, &dirVec);
         VEC_Set(vec, dirVec.x, dirVec.y, dirVec.z);
     }
 }
@@ -421,8 +421,8 @@ u32 FieldPlayer_DeriveExState(FieldPlayer *player) {
     return FieldPlayerCore_DeriveExState(player->core);
 }
 
-BOOL func_ov036_0219ab24(FieldPlayer *player) {
-    return func_ov036_0219b04c(player->core);
+BOOL FieldPlayer_WaitModelReady(FieldPlayer *player) {
+    return FieldPlayerCore_WaitModelReady(player->core);
 }
 
 // Whether the player can start surfing onto the tile in the direction: they aren't surfing or diving, the tiles allow
@@ -462,9 +462,9 @@ void FieldPlayer_InterruptCatwalkBalance(FieldPlayer *player, BOOL keep) {
     }
 }
 
-void func_ov036_0219abd8(FieldPlayer *player) {
+void FieldPlayer_StopGridForcedMove(FieldPlayer *player) {
     if (Field_GetResolvedControllerTypeID(player->field) == CONTROLLER_GRID) {
-        func_ov036_0219cd84(player->grid);
+        FieldPlayerGrid_StopForcedMove(player->grid);
     }
 }
 
@@ -475,7 +475,7 @@ BOOL FieldPlayer_GetVerticalMoveOnlyFlag(FieldPlayer *player) {
     return FALSE;
 }
 
-void func_ov036_0219ac0c(FieldPlayer *player) {
+void FieldPlayer_SetGridHopLanded(FieldPlayer *player) {
     if (Field_GetResolvedControllerTypeID(player->field) == CONTROLLER_GRID) {
         FieldPlayerGrid_SetVerticalMoveOnlyFlag(player->grid);
     }
@@ -506,7 +506,7 @@ void FieldPlayer_GetGPos(FieldPlayer *player, s16 *x, s16 *y, s16 *z) {
     *z = GetGPosZ(actor);
 }
 
-BOOL func_ov036_0219ac8c(FieldPlayer *player) {
+BOOL FieldPlayer_IsGridHopping(FieldPlayer *player) {
     if (Field_GetResolvedControllerTypeID(player->field) == CONTROLLER_GRID &&
         FieldPlayerGrid_IsCatwalkExiting(player->grid) == TRUE) {
         return TRUE;
@@ -514,53 +514,53 @@ BOOL func_ov036_0219ac8c(FieldPlayer *player) {
     return FALSE;
 }
 
-void func_ov036_0219acac(FieldPlayer *player) {
+void FieldPlayer_FinishGridHop(FieldPlayer *player) {
     if (Field_GetResolvedControllerTypeID(player->field) == CONTROLLER_GRID &&
         FieldPlayerGrid_IsCatwalkExiting(player->grid) == TRUE) {
         FieldPlayerGrid_SanitizeHeightMismatch(player->grid);
     }
 }
 
-void func_ov036_0219accc(FieldPlayer *player, HeapID heapId) {
-    player->nogrid = func_ov036_0219cea0(player->core, heapId);
+void FieldPlayer_CreateNogrid(FieldPlayer *player, HeapID heapId) {
+    player->nogrid = FieldPlayerRail_Create(player->core, heapId);
 }
 
 void FieldPlayer_UpdateRailMovement(FieldPlayer *player, u32 pressedKeys, u32 heldKeys) {
     FieldPlayerRail_UpdateMovement(player->nogrid, pressedKeys, heldKeys);
 }
 
-void func_ov036_0219ace8(FieldPlayer *player, const void *pos) {
-    func_ov036_0219cf48(player->nogrid, pos);
+void FieldPlayer_AttachNogridMmdl(FieldPlayer *player, const RailPosition *pos) {
+    FieldPlayerRail_AttachMmdl(player->nogrid, pos);
 }
 
-void func_ov036_0219acf4(FieldPlayer *player) {
-    func_ov036_0219cf84(player->nogrid);
+void FieldPlayer_ResetNogrid(FieldPlayer *player) {
+    FieldPlayerRail_ClearRailWork(player->nogrid);
 }
 
-BOOL func_ov036_0219ad00(FieldPlayer *player) {
-    return func_ov036_0219d018(player->nogrid);
+BOOL FieldPlayer_IsNogridForcedMove(FieldPlayer *player) {
+    return FieldPlayerRail_IsForcedMove(player->nogrid);
 }
 
-void *func_ov036_0219ad0c(FieldPlayer *player) {
-    return func_ov036_0219d05c(player->nogrid);
+RailUnit *FieldPlayer_GetNogridRailWork(FieldPlayer *player) {
+    return FieldPlayerRail_GetRailWork(player->nogrid);
 }
 
 void FieldPlayer_SetRailPos(FieldPlayer *player, const RailPosition *pos) {
     FieldPlayerRail_SetRailPos(player->nogrid, pos);
 }
 
-void func_ov036_0219ad24(FieldPlayer *player, RailPosition *pos) {
+void FieldPlayer_GetNogridNextRailLocation(FieldPlayer *player, RailPosition *pos) {
     FieldPlayerCore_GetRailPos(player->nogrid, pos);
 }
 
-void func_ov036_0219ad30(FieldPlayer *player, u16 dir, RailPosition *pos) {
-    func_ov036_0219d044(player->nogrid, dir, pos);
+void FieldPlayer_GetNogridLocationByDir(FieldPlayer *player, u16 dir, RailPosition *pos) {
+    FieldPlayerRail_GetRailLocationByDir(player->nogrid, dir, pos);
 }
 
 void FieldPlayer_GetRailWorldPos(FieldPlayer *player, VecFx32 *pos) {
     FieldPlayerRail_GetWorldPos(player->nogrid, pos);
 }
 
-FieldPlayerGrid *func_ov036_0219ad48(FieldPlayer *player) {
+FieldPlayerGrid *FieldPlayer_GetGrid(FieldPlayer *player) {
     return player->grid;
 }

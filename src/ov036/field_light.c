@@ -83,7 +83,7 @@ struct FieldLight {
 
 static void FieldLight_LoadData(FieldLight *light, u32 lightsId);
 static void FieldLight_LoadDataCore(FieldLight *light, u32 arcId, u32 fileId);
-static void func_ov036_02197c00(FieldLight *light);
+static void FieldLight_Dummy(FieldLight *light);
 static u32 FieldLight_GetUsedEntryIndex(FieldLight *light, s32 daySeconds);
 static s32 FieldLight_GetLightEndSecond(u32 season, const FieldLightEntry *entry);
 static void FieldLight_FlushCore(const FieldLight *light, FieldFog *fog, G3DLight *lights);
@@ -124,7 +124,7 @@ FieldLight *FieldLight_Create(u32 lightsId, s32 daySeconds, u32 season, FieldFog
 }
 
 void FieldLight_Free(FieldLight *light) {
-    func_ov036_02197c00(light);
+    FieldLight_Dummy(light);
     GFL_HeapFree(light);
 }
 
@@ -180,14 +180,14 @@ void FieldLight_Flush(FieldLight *light, BOOL force) {
 }
 
 void FieldLight_ChangeData(FieldLight *light, u32 arcId, u32 fileId, u32 frames) {
-    func_ov036_02197c00(light);
+    FieldLight_Dummy(light);
     FieldLight_LoadDataCore(light, arcId, fileId);
     light->index = FieldLight_GetUsedEntryIndex(light, light->daySeconds);
     FieldLightInterpolator_Begin(&light->interpolator, &light->current, &light->entries[light->index], frames);
 }
 
 void FieldLight_ChangeDataDefault(FieldLight *light) {
-    func_ov036_02197c00(light);
+    FieldLight_Dummy(light);
     FieldLight_LoadData(light, light->lightsId);
     light->index = FieldLight_GetUsedEntryIndex(light, light->daySeconds);
     FieldLightInterpolator_BeginDefault(&light->interpolator, &light->current, &light->entries[light->index]);
@@ -247,7 +247,7 @@ static void FieldLight_LoadDataCore(FieldLight *light, u32 arcId, u32 fileId) {
     }
 }
 
-static void func_ov036_02197c00(FieldLight *light) {
+static void FieldLight_Dummy(FieldLight *light) {
 }
 
 static u32 FieldLight_GetUsedEntryIndex(FieldLight *light, s32 daySeconds) {

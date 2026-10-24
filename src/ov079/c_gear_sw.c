@@ -1056,7 +1056,7 @@ static void CGearSw_InitBG(CGearSw *work) {
             FALSE,
         };
 
-        GFL_BGSysCreateBG(7, &setup, 0);
+        GFL_BGSysCreateBG(7, &setup, BGMODE_TEXT);
         GFL_BGSysSetBGEnabled(7, TRUE);
         GFL_BGSysSetBGPriority(7, 3);
         GFL_BGSysFillScrArea(7, 0, 0, 0, 32, 32, BGSYS_FILL_TILE_PALETTE);
@@ -1079,7 +1079,7 @@ static void CGearSw_InitBG(CGearSw *work) {
             FALSE,
         };
 
-        GFL_BGSysCreateBG(6, &setup, 0);
+        GFL_BGSysCreateBG(6, &setup, BGMODE_TEXT);
         GFL_BGSysSetBGEnabled(6, TRUE);
         GFL_BGSysSetBGPriority(6, 2);
         GFL_BGSysFillScrArea(6, 0, 0, 0, 32, 32, BGSYS_FILL_TILE_PALETTE);
@@ -1102,7 +1102,7 @@ static void CGearSw_InitBG(CGearSw *work) {
             FALSE,
         };
 
-        GFL_BGSysCreateBG(4, &setup, 0);
+        GFL_BGSysCreateBG(4, &setup, BGMODE_TEXT);
         GFL_BGSysSetBGEnabled(4, TRUE);
         GFL_BGSysSetBGPriority(4, 0);
         GFL_BGSysFillScrArea(4, 0, 0, 0, 32, 32, BGSYS_FILL_TILE_PALETTE);
@@ -1126,7 +1126,7 @@ static void CGearSw_InitBG(CGearSw *work) {
             FALSE,
         };
 
-        GFL_BGSysCreateBG(5, &setup, 0);
+        GFL_BGSysCreateBG(5, &setup, BGMODE_TEXT);
         GFL_BGSysSetBGEnabled(5, TRUE);
         GFL_BGSysSetBGPriority(5, 1);
         GFL_BGSysFillScrArea(5, 0, 0, 0, 32, 32, BGSYS_FILL_TILE_PALETTE);
@@ -2173,16 +2173,16 @@ static void CGearSw_Init(CGearSw *work, CGearSettings *settings, FieldSubscreen 
         CGearSw_StateFlash(work);
     }
     comm = GSYS_GetGameCommSystem(gsys);
-    if (comm != NULL && func_ov012_02153650(comm) == 2) {
-        func_ov012_02153654(comm);
+    if (comm != NULL && Intrude_GetVisitProgress(comm) == 2) {
+        Intrude_SetCompleted(comm);
     }
 }
 
 static void CGearSw_Exit(CGearSw *work) {
     GameCommSys *comm = GSYS_GetGameCommSystem(work->gsys);
 
-    if (comm != NULL && func_ov012_02153650(comm) == 2) {
-        func_ov012_02153654(comm);
+    if (comm != NULL && Intrude_GetVisitProgress(comm) == 2) {
+        Intrude_SetCompleted(comm);
     }
     CGearSw_StopNoticeGlow(work);
     CGearSwFlash_Exit(&work->flash);
