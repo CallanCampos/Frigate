@@ -39,10 +39,6 @@ flags = [
 "rtc/rtc_api_ex.c" = ["-nothumb"]
 "camera/camera_api.c" = ["-nothumb", "-ipa function"]
 "camera/camera.c" = ["-nothumb"]
-# The DSi part of os_application_jump.c is ARM code, as main's half is; the statics of mi_sharedWram_twl.c have a
-# literal each, as under -ipa function
-"mi/mi_sharedWram_twl.c" = ["-ipa function"]
-"os/os_application_jump_twl.c" = ["-nothumb"]
 "nwm/nwm_setup.c" = ["-nothumb", "-ipa function"]
 "nwm/nwm_events.c" = ["-nothumb"]
 "nwm/nwm.c" = ["-nothumb", "-ipa function"]

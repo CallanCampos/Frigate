@@ -1,9 +1,16 @@
 # Files that dsd keeps apart but that the original built as one object, because one object's code sits in two
 # modules: TwlSDK puts a NitroSDK file's DSi-only code in the LTD autoload's .ltdmain, beside the file's NitroSDK code
-# in ARM9 main, so both parts share the object's pooled statics. dsd names each part in its own module's delinks.txt.
+# in ARM9 main, so both parts share the object's statics: card_rom.c's and pm.c's reach them from one pooled base,
+# and TwlSDK's library objects show the others (docs/configs.md, Merged files). dsd names each part in its own
+# module's delinks.txt.
 # A part listed here has no source of its own: its code is in its whole's source, between TwlSDK's
 # `#pragma section LTDMAIN begin` and `end`, and its sections link from that file's object, with the part's .bss
 # taken from the object's .ltdmain.bss (tools/build/merge_objects.py).
 [merged]
 "lib/twl/src/card/card_rom_twl.c" = "lib/nitro/src/card/card_rom.c"
 "lib/twl/src/spi/pm_twl.c" = "lib/nitro/src/spi/pm.c"
+"lib/twl/src/mi/mi_sharedWram_twl.c" = "lib/nitro/src/mi/mi_sharedWram.c"
+"lib/twl/src/os/os_interrupt_twl.c" = "lib/nitro/src/os/os_interrupt.c"
+"lib/twl/src/os/os_arena_twl.c" = "lib/nitro/src/os/os_arena.c"
+"lib/twl/src/os/os_ownerInfoEx_twl.c" = "lib/nitro/src/os/os_ownerInfoEx.c"
+"lib/twl/src/os/os_application_jump_twl.c" = "lib/nitro/src/os/os_application_jump.c"

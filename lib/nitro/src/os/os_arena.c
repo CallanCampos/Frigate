@@ -1,6 +1,9 @@
 // NitroSDK OS: memory arenas (os_arena.c, the SDK's name for the module). Thumb code. The limits of each arena are kept
 // in a table of the shared main memory (HW_ARENA_INFO_BUF), and this file also knows where the arenas begin and end
-// before the game moves them.
+// before the game moves them. The file has TwlSDK's DSi part too, what OS_InitArenaEx does on a DSi, in TwlSDK's
+// LTDMAIN section, which the LTD autoload's .ltdmain holds: dsd lists it as lib/twl/src/os/os_arena_twl.c, which
+// config/merged_sources.toml links from this file's object, as TwlSDK's os_arena.o holds both (aletheia's match of
+// Black 1's code to libos.TWL.HYB.a, which gives the DSi part's name).
 #include "nitro/os.h"
 #include "twl/os.h"
 
@@ -61,7 +64,7 @@ void OS_InitArenaEx(void) {
         OS_SetProtectionRegion(1, 0x02000000, HW_C6_PR_4MB);
         OS_SetProtectionRegion(2, 0x027ff000, HW_C6_PR_4KB);
     } else {
-        OSi_InitArenaExTwl();
+        OSi_InitArenaEx_ltdmain();
     }
 }
 
@@ -190,3 +193,18 @@ void *OS_AllocFromArenaLo(OSArenaId arena, u32 size, u32 alignment) {
     OS_SetArenaLo(arena, (void *)end);
     return (void *)start;
 }
+
+// clang-format off
+// TwlSDK's section for the DSi-only code and data that the LTD autoload's .ltdmain holds
+#pragma define_section LTDMAIN ".ltdmain" ".ltdmain.bss" ".ltdmain" abs32 RWX
+// clang-format on
+// The DSi part, in the LTD autoload: what OS_InitArenaEx does on a DSi
+#pragma section LTDMAIN begin
+
+void OSi_InitArenaEx_ltdmain(void) {
+    // The SDK reads the console type here and drops it, as main's half does
+    OS_GetConsoleType();
+    OS_SetProtectionRegion(3, HW_CTRDG_ROM, HW_C6_PR_64MB);
+}
+
+#pragma section LTDMAIN end

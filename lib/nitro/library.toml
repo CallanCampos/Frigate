@@ -2,8 +2,8 @@
 # main: the card, cartridge, file system, graphics, memory, NVRAM, OS, PXI, RTC, sound, SPI, STD and wireless libraries,
 # libfx and libmath, which are Thumb (file_flags below), and the divider's context save (cp) and libcrypto's RC4, which
 # the game links last among its own code, ARM code like the default here; in the LTD autoload's .ltdmain, the DSi parts
-# of card_rom.c and pm.c, in TwlSDK's LTDMAIN section (config/merged_sources.toml); in overlay 181, the multiboot
-# library (Thumb).
+# of card_rom.c, pm.c, mi_sharedWram.c, os_interrupt.c, os_arena.c, os_ownerInfoEx.c and os_application_jump.c, in
+# TwlSDK's LTDMAIN section (config/merged_sources.toml); in overlay 181, the multiboot library (Thumb).
 compiler = "dsi/1.1p1"
 flags = [
     "-O4,p",               # Optimize for speed

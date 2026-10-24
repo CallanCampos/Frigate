@@ -2043,7 +2043,7 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 - A bit flag at a fixed address read with `ldrb r0, [r0, #4]` from a literal of the block's base, where ours folds the
   offset into the literal (`0x02fffd6c`, then `[r0]`), is read through a pointer local: `OSTWLHWSecureInfo *info =
   (OSTWLHWSecureInfo *)HW_HW_SECURE_INFO; return info->flags.forceDisableWireless == 1 ...` with a `u8` bitfield matches
-  `os_ownerInfoEx_twl.c`'s `OSi_IsForceDisableWirelessTwl`, and the same field through a cast in the expression folds
+  `os_ownerInfoEx.c`'s `OS_IsForceDisableWireless_ltdmain`, and the same field through a cast in the expression folds
   the offset.
 - A parameter stored at entry to an outgoing argument slot (`str r2, [sp, #8]`) and read back from it later, in a
   frame with no slot of its own for it, is the parameter's spill, not an argument of the call that uses that area:
@@ -4233,9 +4233,9 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `card_rom.c`, `card_pull_out.c` and `mi_init.c` call TwlSDK's code in the LTD autoload this way, and `pm.c`'s call to
   `func_02768298` shares `card_pull_out.c`'s veneer, as the original's does. NitroWiFi's code in the LTD autoload's
   `.ltdmain` gives each call its own veneer instead, as an overlay does (`docs/configs.md`), which the build gets by
-  linking its objects as an overlay group; TwlSDK's `.ltdmain` objects share theirs across files, so
-  `os_interrupt_twl.c` reaches `OS_EnableIrqMask` through `mi_ndma_gxcommand.c`'s veneer, and a file whose calls use
-  another file's veneers can be complete only once that file is.
+  linking its objects as an overlay group; TwlSDK's `.ltdmain` objects share theirs across files, so `os_interrupt.c`'s
+  DSi part reaches `OS_EnableIrqMask` through `mi_ndma_gxcommand.c`'s veneer, and a file whose calls use another file's
+  veneers can be complete only once that file is.
 
 - A Thumb function that ends 2 bytes past a word boundary is followed by the linker's `mov r8, r8` before an ARM veneer,
   a pad that belongs to no function: `mic.c`'s `MIC_StopLimitedSampling` is 0x16 bytes, then the pad and the veneer
@@ -4306,7 +4306,7 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `MIi_NDmaFIFOCallback` calls the transfer through a `static inline`, `MIi_NDmaAsync`, which adds the channel's
   config, so the arguments are computed in the inline's order; `card_hash.c`'s `CARD_InitRomHashContext` lays its
   buffer out through a cursor and puts the rest under `if (end > hi) ... else`, and its `CARDi_ReadRomHashImageDirect`
-  gets the sector index from a `static inline`; `mi_sharedWram_twl.c`'s `MIi_ReserveWramSlotCore` bounds both loops
+  gets the sector index from a `static inline`; `mi_sharedWram.c`'s `MIi_DoReserveWramSlot` bounds both loops
   by `slot + banks`. Look the function up there before grinding registers.
 
 - MWCC 2.0/sp2 (`-O4,p`) ignores the `register` storage class: `register` on any local or parameter leaves the code

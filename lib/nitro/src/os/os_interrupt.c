@@ -1,5 +1,8 @@
 // NitroSDK OS: setting and changing the interrupt handlers and masks (os_interrupt.c). OS_SetIrqFunction and the
-// callbacks of DMA channels and timers share os_irqTable.c's table.
+// callbacks of DMA channels and timers share os_irqTable.c's table. The file has TwlSDK's DSi part too, the callback
+// of a new DMA channel's interrupt, in TwlSDK's LTDMAIN section, which the LTD autoload's .ltdmain holds: dsd lists it
+// as lib/twl/src/os/os_interrupt_twl.c, which config/merged_sources.toml links from this file's object, as TwlSDK's
+// os_interrupt.o holds both (aletheia's match of Black 1's code to libos.TWL.HYB.a, which gives the DSi part's name).
 #include "nitro/os.h"
 #include "twl/os.h"
 
@@ -74,7 +77,7 @@ void OSi_EnterDmaCallback(u32 dmaNo, OSIrqCallback callback, void *arg) {
 
 // NitroSDK's OSi_EnterNDmaCallback, which the DSi's OS code in the LTD autoload implements
 void OSi_EnterNDmaCallback(u32 ndmaNo, OSIrqCallback callback, void *arg) {
-    OSi_EnterNDmaCallbackCore(ndmaNo, callback, arg);
+    OSi_EnterNDmaCallback_ltdmain(ndmaNo, callback, arg);
 }
 
 void OSi_EnterTimerCallback(u32 timerNo, OSIrqCallback callback, void *arg) {
@@ -127,3 +130,23 @@ void OS_SetIrqStackChecker(void) {
     *(u32 *)(HW_IRQ_STACK - 4) = OSi_STACK_CHECKNUM_BOTTOM;
     *(u32 *)HW_IRQ_STACK_END = OSi_STACK_CHECKNUM_TOP;
 }
+
+// clang-format off
+// TwlSDK's section for the DSi-only code and data that the LTD autoload's .ltdmain holds
+#pragma define_section LTDMAIN ".ltdmain" ".ltdmain.bss" ".ltdmain" abs32 RWX
+// clang-format on
+// The DSi part, in the LTD autoload: the callback of a new DMA channel's interrupt, which OSi_EnterNDmaCallback
+// sets
+#pragma section LTDMAIN begin
+
+void OSi_EnterNDmaCallback_ltdmain(u32 ndmaNo, OSIrqCallback callback, void *arg) {
+    u32 mask = 1 << (OS_IE_NDMA0_SHIFT + ndmaNo);
+    u32 enabled;
+
+    (OSi_IrqCallbackInfo + OSi_IRQCALLBACK_NO_NDMA0 + ndmaNo)->func = callback;
+    (OSi_IrqCallbackInfo + OSi_IRQCALLBACK_NO_NDMA0 + ndmaNo)->arg = arg;
+    enabled = OS_EnableIrqMask(mask);
+    (OSi_IrqCallbackInfo + OSi_IRQCALLBACK_NO_NDMA0 + ndmaNo)->enable = mask & enabled;
+}
+
+#pragma section LTDMAIN end
