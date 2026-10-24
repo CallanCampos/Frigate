@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
 """Runs the port's program once and checks how it ends: its exit status, and what its messages must and mustn't say.
-ctest's PASS_REGULAR_EXPRESSION ignores a test's status, so the program's option checks and Frigate's test launcher's
-statuses (port/app/launcher.h, ADR 0012, in port/cmake/integrate.cmake), the host's traps and crash reports
-(port/cmake/host.cmake) and the heap hooks' check of a read past a block (port/cmake/nnsys.cmake) go through this
-instead.
+ctest's PASS_REGULAR_EXPRESSION ignores a test's status, so the program's option checks (port/cmake/integrate.cmake),
+the host's traps and crash reports (port/cmake/host.cmake) and the heap hooks' check of a read past a block
+(port/cmake/nnsys.cmake) go through this instead.
 
     check_exit.py (--status N | --crash | --abort) [--expect REGEX]... [--reject REGEX]... [--skip-status M]...
                   [--fresh-save-dir] -- PROGRAM ARG...

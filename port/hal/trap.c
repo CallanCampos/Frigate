@@ -1,13 +1,11 @@
 // Reports the game reaching DS code or data that has no C yet (trap.h): the part of the game that can't run until
 // upstream writes its C. Function stubs call port_trap_function; data placeholders sit on pages with no access, and the
 // fault handler names the placeholder that was touched. Either way the program stops with status 70, its message naming
-// the symbol, its address and its caller. It also tells Frigate's test launcher whether a symbol is still a placeholder
-// (port_trap_is_placeholder), so that the launcher steps aside once the field's process table has C (ADR 0012). Any
-// other memory fault is a crash, which the fault handler reports as "port: crash: ..." with a backtrace; the crashes
-// that aren't memory faults (a division by zero, an illegal instruction, a breakpoint) the host's seam reports itself,
-// the same way, once the handler is set (port/hal/host/host.h). The host's pages, faults, backtraces and names come
-// from port/hal/host, the same code on every host here. In the sanitized build the placeholders become readable again
-// at exit, for LeakSanitizer (port/docs/sanitizers.md).
+// the symbol, its address and its caller. Any other memory fault is a crash, which the fault handler reports as "port:
+// crash: ..." with a backtrace; the crashes that aren't memory faults (a division by zero, an illegal instruction, a
+// breakpoint) the host's seam reports itself, the same way, once the handler is set (port/hal/host/host.h). The host's
+// pages, faults, backtraces and names come from port/hal/host, the same code on every host here. In the sanitized build
+// the placeholders become readable again at exit, for LeakSanitizer (port/docs/sanitizers.md).
 #include "hal/trap.h"
 #include "hal/host/host.h"
 #include <stdio.h>
@@ -76,11 +74,6 @@ static const PortTrapSymbol *find_data_symbol(const unsigned char *address, size
         }
     }
     return NULL;
-}
-
-int port_trap_is_placeholder(const void *address) {
-    size_t offset;
-    return find_data_symbol(address, &offset) != NULL;
 }
 
 // The fault handler: an access to a data placeholder is a trap, reported by the placeholder's name and offset, with a

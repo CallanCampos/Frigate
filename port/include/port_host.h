@@ -2,8 +2,7 @@
 // MWCC provides built in and clang spells differently, the translation of the DS's fixed addresses into host memory,
 // and the platform layer's few hooks that decomp files call under PLATFORM_PC (the heaps' sizes and the memory of the
 // root heaps the game creates in its own, a read the DS makes past a heap block, the particle systems' work, the sound
-// data's handles, the Wi-Fi ID's seed, Frigate's test launcher's seam in CONTINUE's event). Nothing here may change
-// what a file means on the DS.
+// data's handles, the Wi-Fi ID's seed). Nothing here may change what a file means on the DS.
 #ifndef PORT_HOST_H
 #define PORT_HOST_H
 
@@ -68,13 +67,6 @@ void *port_hw_vecmtx_result(void);
 // The card slot's SPI bus and the infrared chip on it (port/hal/card/card_spi.h)
 void *port_hw_auxspicnt(void);
 void *port_hw_auxspidata(void);
-
-// Frigate's test launcher (--launch, port/app/launcher.c, ADR 0012), which CONTINUE's event asks before it opens the
-// field (src/ov035/event_mapchange.c): 1 when the launcher chained its own event to open the field menu's apps in
-// place of the field, 0 (always, without --launch) to open the field. The tag is declared here, at file scope, so that
-// it is the game's struct GameEvent and not one local to the prototype
-struct GameEvent;
-int port_launcher_take_field_open(struct GameEvent *event);
 
 // A read the DS makes past the end of one of the game's heap blocks, into what its heap holds after the block, whose
 // bytes the game uses as the DS does (src/gfl/arc_util.c: the copyright screen's characters, which the title screen's

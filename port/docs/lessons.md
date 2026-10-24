@@ -3,6 +3,26 @@
 What port work taught that isn't obvious from the code, newest first. A lesson about MWCC or the decomp's own
 workflow goes in the decomp checkout instead; this file is the port's ([CLAUDE.md](../CLAUDE.md), the iteration loop).
 
+## 2026-10-24: the test launcher's retirement
+
+- **A clock that runs with the video frames parts the two programs at the same count.** The DS takes some 2,000 more
+  frames than the port to reach the field (its movies, its loads), so at the same count of passes its real-time clock
+  is about 34 seconds ahead: the field menu's colon blinked on other frames and its minute turned over earlier. The
+  count can't fix that, and a known difference would have left the menu's bottom screen out of every frame. Pinning
+  the clock on both programs from the input file (`clock pinned`) makes the screen comparable and keeps one file
+  saying what both programs do; the play time doesn't move with it, since it counts the CPU's ticks.
+- **Read which screen failed before explaining a number.** compare.py prints both screens' counts for a failing frame,
+  and the deep dive read the top screen's "18 beyond tolerance" as a difference to explain, where the top passed (the
+  tolerance is 245) and the bottom screen's clock failed. The 18 were the room's 25 edge pixels, fewer because the game
+  darkens the field behind the menu.
+- **A stand-in's ADR that lists what names it makes its retirement a checklist, not a complete one.** ADR 0012's note
+  named every guide, test and line that mentions the launcher, and the retirement went down the list, but it took
+  "ARCHITECTURE.md's feature map" for the field menu's row, while other features' rows named the launcher's tests
+  (`oracle_launch_*` under the HBlank effects, `launch_touch_then_party` under the touch screen), where a grep for
+  "launcher" doesn't reach. Grep every removed test's own name, and ask of each what else only it covered:
+  `launch_touch_then_party` was the only input file that touched the screen, so its touch on the trainer card's return
+  button moved into `field_menus`, against melonDS.
+
 ## 2026-10-24: the field's pointer casts
 
 - **A function that returns what a mixed getter returns is a mixed getter too.** Overlay 137's `ResortData_GetParam`

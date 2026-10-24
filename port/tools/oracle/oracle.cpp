@@ -24,7 +24,8 @@
 //   --symbols FILE   more symbols in the same format (symbols.py's statics)
 //   --counter TARGET a 32-bit counter recorded for every frame in frames.tsv: the game's own frame count
 //                    (sVBlankCount) for aligning frames
-//   --time TIME      the real-time clock at power-on; else the input file's; else 2012-10-07 12:00:00
+//   --time TIME      the real-time clock at power-on; else the input file's; else 2012-10-07 12:00:00. It runs on
+//                    from there, unless the input file pins it ("clock pinned")
 //   --save FILE      the save memory at power-on (read only); blank (0xFF) otherwise
 //   --save-out FILE  writes the save memory there after the last frame
 //   --audio-dump FILE
@@ -794,6 +795,12 @@ bool Oracle::Boot() {
 
     std::sscanf(time_.c_str(), "%d-%d-%d %d:%d:%d", &year, &month, &day, &hour, &minute, &second);
     nds_->RTC.SetDateTime(year, month, day, hour, minute, second);
+    // An input file's "clock pinned": the clock chip's timer, which the reset scheduled and which counts the seconds
+    // on, never fires, so the time stays the power-on's, as the port's pinned clock does (port/hal/rtc/rtc7.c). The
+    // game only reads the clock; it never uses the chip's interrupts, which the timer would also raise
+    if (haveInput_ && input_.clock == PBW_INPUT_CLOCK_PINNED) {
+        nds_->CancelEvent(melonDS::Event_RTC);
+    }
 
     // In the order of ORACLE_EVENT_VBLANK and ORACLE_EVENT_PROBE
     nds_->RegisterEventFuncs(ORACLE_EVENT, this,

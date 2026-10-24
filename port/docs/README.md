@@ -44,7 +44,7 @@ records keep what was decided or found at the time, and are added to, not rewrit
 | [adr/0009](adr/0009-gamepads-by-position-one-pad-at-a-time.md) | Gamepads by position, one pad at a time |
 | [adr/0010](adr/0010-macos-app-as-a-signed-copy-of-the-program.md) | The macOS app as a signed copy of the program |
 | [adr/0011](adr/0011-cartridge-infrared-chip-as-a-register-model.md) | The cartridge's infrared chip as a register model |
-| [adr/0012](adr/0012-test-launcher-for-the-field-menus-apps.md) | Frigate's test launcher for the field menu's apps while overlay 36 is claimed |
+| [adr/0012](adr/0012-test-launcher-for-the-field-menus-apps.md) | Frigate's test launcher for the field menu's apps while overlay 36 is claimed (retired when the field opened) |
 | [adr/0013](adr/0013-windows-build-with-msys2-clang64.md) | Windows built with MSYS2's CLANG64, its differences behind `port/hal/host` |
 | [adr/0014](adr/0014-sanitized-build-game-heaps-poisoned-ds-isms-ignorelisted.md) | The sanitized build: the game's heaps poisoned in place, the DS-isms ignorelisted |
 | [adr/0015](adr/0015-universal-macos-app-for-macos-11.md) | A universal macOS app for macOS 11, with the pinned SDL3 linked statically |
@@ -73,7 +73,7 @@ Each directory of `port/` has a guide to its files: what each does, the part of 
 
 | Guide | What it covers |
 | --- | --- |
-| [../app/README.md](../app/README.md) | The program: `main()` and its options, the window, the controls, replays, the run directory, the sound driver's trace, the test launcher (`--launch`), the macOS app's scripts |
+| [../app/README.md](../app/README.md) | The program: `main()` and its options, the window, the controls, replays, the run directory, the sound driver's trace, the macOS app's scripts |
 | [../hal/README.md](../hal/README.md) | The platform layer: one row per module with the SDK module it replaces, how decomp files are adapted, the names |
 | [../gfx/README.md](../gfx/README.md) | The renderers: 2D, the geometry engine, 3D, capture, the scanline hook |
 | [../audio/README.md](../audio/README.md) | The sound output |
@@ -82,7 +82,7 @@ Each directory of `port/` has a guide to its files: what each does, the part of 
 | [../tests/README.md](../tests/README.md) | The tests by directory, which need the ROM, how to write one |
 | [../tests/asm_oracle/README.md](../tests/asm_oracle/README.md) | The differential tests of the SDK's assembly in C against the ROM's code |
 | [../tools/README.md](../tools/README.md) | The generators, the sync, the packaging, the oracle, the measurement scripts |
-| [../tools/oracle/README.md](../tools/oracle/README.md) | The melonDS oracle: building and running it, input files, run directories, comparing, saves, the sound, the launch checks of the field menu's apps, known differences |
+| [../tools/oracle/README.md](../tools/oracle/README.md) | The melonDS oracle: building and running it, input files, run directories, comparing, saves, the sound, known differences |
 | [../tools/compile-probe/README.md](../tools/compile-probe/README.md) | The host-compiler probe: 64-bit warnings and struct layouts (the 64-bit metric is the pointer cast guard's, [SYNC.md](SYNC.md#when-the-pointer-cast-guard-fails)) |
 | [../assets/README.md](../assets/README.md) | Files that aren't code |
 | [../assets/branding/README.md](../assets/branding/README.md) | Frigate's logo and app icons: the files, colours, how the build uses them, how to change them, the license |

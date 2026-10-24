@@ -1,6 +1,6 @@
 # 0012: Frigate's test launcher for the field menu's apps while overlay 36 is claimed
 
-- **Status:** accepted
+- **Status:** accepted; superseded: retired when the field opened (2026-10-24)
 - **Date:** 2026-10-18
 - **Plan:** §7 phase 4 (bag, party, Pokédex, summary), §6 (T4); port/CLAUDE.md, "Code that isn't C yet"
 - **Upstream:** `045e97b90` (merged by the port's `5ad9a1e1d`)
@@ -12,6 +12,17 @@
   `port --launch`, `check_launch_smoke.py`, and the run directory's `launch:` line.
 - **Note (2026-10-18):** the Pokédex's trap in the Consequences is gone since the port's `1f0c184f6` (upstream's C of
   `NNSi_objSizeHTbl` and `NNSi_objSizeWTbl`): `party_menus` launches the Pokédex, and it matches the oracle.
+- **Note (2026-10-24):** superseded: retired when the field opened. `FIELDMAP_PROC_FUNCS` got its C by upstream sync,
+  and the field opened on the host with [ADR 0021](0021-root-heaps-in-the-games-own-memory-from-host-memory.md) (PR
+  18), so the launcher stepped aside, as its gate meant it to, and its seven tests failed on `main` in both versions.
+  The port's `a2fd007bf4` removed what the first note lists, with the `port_launcher` library and its link lines, the
+  seam in `src/ov035/event_mapchange.c` and its row of game-changes.md, its declaration in `port/include/port_host.h`,
+  `port_trap_is_placeholder`, `--launch`'s option and exit statuses, and its tests (`app_launcher_spec_*`,
+  `integrate_launch_*`, `integrate_launcher_off`, `launch_*`, `oracle_launch_*`). Before it, `145d776f17` made the
+  routes `field_menus` and `party_menus` comparison sequences, which reach the same apps through the field menu on
+  both programs, the clock pinned on both, and `frame_times_party_menus` plays the party_menus file through the field
+  menu. `launch_touch_then_party`'s touch on the trainer card's return button, the only touch an input file played,
+  is in `field_menus` now, against melonDS.
 
 ## Context
 

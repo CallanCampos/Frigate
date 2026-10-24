@@ -262,6 +262,7 @@ int pbw_input_parse(PbwInput *input, const char *text, size_t length, char *erro
     unsigned line = 0;
     int sawHeader = 0;
     int sawFrames = 0;
+    int sawClock = 0;
     uint32_t lastFrame = 0;
 
     pbw_input_init(input);
@@ -341,6 +342,17 @@ int pbw_input_parse(PbwInput *input, const char *text, size_t length, char *erro
             }
             input->frames = strcmp(tokens[1], "video") == 0 ? PBW_INPUT_VIDEO_FRAMES : PBW_INPUT_GAME_FRAMES;
             sawFrames = 1;
+        } else if (strcmp(tokens[0], "clock") == 0) {
+            if (input->count != 0 || sawClock) {
+                SetError(error, errorSize, line, "one \"clock\" line at most, before the first frame");
+                goto fail;
+            }
+            if (count != 2 || (strcmp(tokens[1], "running") != 0 && strcmp(tokens[1], "pinned") != 0)) {
+                SetError(error, errorSize, line, "\"clock\" takes running or pinned");
+                goto fail;
+            }
+            input->clock = strcmp(tokens[1], "pinned") == 0 ? PBW_INPUT_CLOCK_PINNED : PBW_INPUT_CLOCK_RUNNING;
+            sawClock = 1;
         } else {
             PbwInputState state = { 0 };
             uint32_t frame;
@@ -537,6 +549,10 @@ int pbw_input_write(const PbwInput *input, FILE *file) {
         return 0;
     }
     if (fprintf(file, "frames %s\n", input->frames == PBW_INPUT_VIDEO_FRAMES ? "video" : "game") < 0) {
+        return 0;
+    }
+    // A running clock is the default, which a file written before the line existed has too
+    if (input->clock == PBW_INPUT_CLOCK_PINNED && fprintf(file, "clock pinned\n") < 0) {
         return 0;
     }
     for (i = 0; i < input->count; i++) {

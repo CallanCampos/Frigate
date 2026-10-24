@@ -29,7 +29,9 @@ A bug fix, a refactor or anything one comment explains needs no ADR.
   branch whose ADR took another number before the reservation renumbers it when it merges. The next free number is
   0022.
 - An accepted ADR isn't rewritten. Only its status line changes: to "superseded by NNNN" when a later ADR replaces
-  it, or to "accepted; amended by NNNN" when a later ADR changes part of it. Typos and broken links may be fixed.
+  it, to "accepted; amended by NNNN" when a later ADR changes part of it, or to "accepted; superseded: retired when
+  ..." when what it decided is removed with no later decision in its place, with a dated note that says what went.
+  Typos and broken links may be fixed.
 - Each ADR gets a row in the index below in the same commit.
 
 ## Template
@@ -37,7 +39,8 @@ A bug fix, a refactor or anything one comment explains needs no ADR.
 ```markdown
 # NNNN: Title
 
-- **Status:** proposed | accepted | accepted; amended by NNNN | rejected | superseded by NNNN
+- **Status:** proposed | accepted | accepted; amended by NNNN | rejected | superseded by NNNN | accepted; superseded:
+  retired when ...
 - **Date:** YYYY-MM-DD
 - **Plan:** the PLAN.md section or decision (D1–D11) it settles
 - **Upstream:** the `fuddlesworth/pokebw2` commit it was decided against
@@ -75,7 +78,7 @@ What becomes easier, what becomes harder, what must be watched, and what would m
 | [0009](0009-gamepads-by-position-one-pad-at-a-time.md) | Gamepads by position, one pad at a time | §4.5, §7 | accepted |
 | [0010](0010-macos-app-as-a-signed-copy-of-the-program.md) | The macOS app as a signed copy of the program | D11, §7 | accepted |
 | [0011](0011-cartridge-infrared-chip-as-a-register-model.md) | The cartridge's infrared chip as a register model | §4.5, D3 | accepted |
-| [0012](0012-test-launcher-for-the-field-menus-apps.md) | Frigate's test launcher for the field menu's apps while overlay 36 is claimed | §7 phase 4, §6 | accepted |
+| [0012](0012-test-launcher-for-the-field-menus-apps.md) | Frigate's test launcher for the field menu's apps while overlay 36 is claimed | §7 phase 4, §6 | accepted; superseded: retired when the field opened (2026-10-24) |
 | [0013](0013-windows-build-with-msys2-clang64.md) | Windows built with MSYS2's CLANG64, its differences behind port/hal/host | D4, §4.4, §7 phase 5 | accepted |
 | [0014](0014-sanitized-build-game-heaps-poisoned-ds-isms-ignorelisted.md) | The sanitized build: the game's heaps poisoned in place, the DS-isms ignorelisted | §4.5, §6, §7 phase 5 | accepted |
 | [0015](0015-universal-macos-app-for-macos-11.md) | A universal macOS app for macOS 11, with the pinned SDL3 linked statically | D11, §7 | accepted |
