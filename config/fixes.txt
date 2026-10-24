@@ -2747,7 +2747,7 @@ overlays/ov189 0x021aa6ec add_function MulWords:arm:0xf0
 overlays/ov189 0x021aa7d8 remove_symbol
 overlays/ov189 0x021acd84 add_data sBase64Pad
 overlays/ov189 0x021acd85 add_data sActionCount
-overlays/ov189 0x021acea0 section_end lib/dwc/src/gamestats/gamestats.c:.rodata
+overlays/ov189 0x021acea0 section_end lib/dwc/src/enc/dwc_encsession.c:.rodata
 overlays/ov189 0x021acea0 section_start lib/dwc/src/crypt/crypt.c:.rodata
 overlays/ov189 0x021b2840 add_data data_ov189_021b2840
 overlays/ov190 0x021b5144 remove_reloc

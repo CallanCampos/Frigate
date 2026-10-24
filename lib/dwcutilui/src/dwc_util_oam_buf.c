@@ -16,7 +16,7 @@ typedef struct DWCUtilOamBuf {
 
 static DWCUtilOamBuf *sOamBuf;
 
-static void DWCUtilOamBuf_UploadTask(DWCUtilTask *task, void *arg);
+static void taskTransfer(DWCUtilTask *task, void *arg);
 
 void DWCi_OBJlInit(void) {
     int i;
@@ -26,10 +26,10 @@ void DWCi_OBJlInit(void) {
     for (i = 0; i < 2; i++) {
         sOamBuf->freeOam[i] = DWCi_QUElFormEx(64, (u8 *)sOamBuf->oam[i], sizeof(GXOamAttr));
     }
-    sOamBuf->task = DWCi_TSKlForm(1, DWCUtilOamBuf_UploadTask, NULL, 200);
+    sOamBuf->task = DWCi_TSKlForm(1, taskTransfer, NULL, 200);
 }
 
-static void DWCUtilOamBuf_UploadTask(DWCUtilTask *task, void *arg) {
+static void taskTransfer(DWCUtilTask *task, void *arg) {
     DC_FlushRange(sOamBuf, sizeof(sOamBuf->oam));
     GX_LoadOAM(sOamBuf->oam[0], 0, sizeof(sOamBuf->oam[0]));
     GXS_LoadOAM(sOamBuf->oam[1], 0, sizeof(sOamBuf->oam[1]));
@@ -44,7 +44,7 @@ GXOamAttr *DWCi_OBJlFormGx(int screen) {
     return DWCi_QUElPopFront(sOamBuf->freeOam[screen]);
 }
 
-void DWCi_MOV_MBP_GetChildBmp(GXOamAttr *oam) {
+void DWCi_OBJlDelete(GXOamAttr *oam) {
     int screen = 0;
 
     G2_SetOBJEffect(oam, GX_OAM_EFFECT_NODISPLAY, 0);
@@ -54,6 +54,6 @@ void DWCi_MOV_MBP_GetChildBmp(GXOamAttr *oam) {
     DWCi_QUElPushBack(sOamBuf->freeOam[screen], oam);
 }
 
-GXOamAttr *DWCUtilOamBuf_GetEntry(int screen, int index) {
+GXOamAttr *DWCi_OBJlGetOam(int screen, int index) {
     return &sOamBuf->oam[screen][index];
 }

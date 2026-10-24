@@ -5,10 +5,11 @@
 #include "ssp_private.h"
 #include "twl/ssp.h"
 
-// TwlSDK's JPEG encoder (SSP_StartJpegEncoder), linked into the Xtransceiver's overlay. The file name is a guess after
-// TwlSDK's ssp/jpegenc.h. It converts the image to YCbCr planes, transforms and quantizes it in 8x8 blocks with a
-// fixed point AAN DCT, and writes a baseline JPEG with the standard Huffman tables, after the EXIF data of
-// ssp_exifenc.c or, for the EXIF thumbnail, a bare header. The internal names are descriptive guesses.
+// TwlSDK's JPEG encoder (SSP_StartJpegEncoder), linked into the Xtransceiver's overlay, libssp.TWL.HYB.a's jpegenc.o.
+// It converts the image to YCbCr planes, transforms and quantizes it in 8x8 blocks with a fixed point AAN DCT, and
+// writes a baseline JPEG with the standard Huffman tables, after the EXIF data of ssp_exifenc.c or, for the EXIF
+// thumbnail, a bare header. The functions have the SDK's names (the Yos_ ones are its author's) that Black 1's
+// decompilation (aletheia) gives the same functions in the same order; the names of the data are ours.
 
 // The thumbnail that SSP_JPEG_THUMBNAIL adds to the EXIF data
 #define THUMBNAIL_WIDTH 160
@@ -18,7 +19,7 @@
 // The work memory it needs: the thumbnail's RGB555 pixels, and its JPEG data in a buffer as large
 #define THUMBNAIL_BUFFER_SIZE (THUMBNAIL_WIDTH * THUMBNAIL_HEIGHT * 2)
 
-// EXIF tags that JpegEnc_Sign looks for
+// EXIF tags that SSPi_JpegEncoderDoSign looks for
 #define EXIF_TAG_EXIF_IFD 0x8769
 #define EXIF_TAG_MAKER_NOTE 0x927c
 
@@ -41,7 +42,7 @@ typedef struct {
     u32 unused4;
 } JpegEncHuffTable;
 
-// The code lengths and codes of a table's values, in order, while JpegEnc_SetupHuffmanTable builds it
+// The code lengths and codes of a table's values, in order, while Yos_JpegEncoderHuffmanEncoderBuildTable builds it
 typedef struct {
     u32 sizes[256];
     u32 codes[256];
@@ -69,27 +70,30 @@ typedef struct {
 // Converts the source pixels to the Y, Cb and Cr planes
 typedef void (*JpegEncConvertFunc)(const void *src, u32 width, u32 height, u8 *dst);
 
-static void JpegEnc_ResetBits(void);
-static BOOL JpegEnc_PutBits(u8 *dst, u32 *pos, u32 value, u32 count);
-static void JpegEnc_ForwardDct(const u8 *block, const s32 *divisors, s16 *coefs);
-static void JpegEnc_SetupHuffmanTable(JpegEncHuffWork *work, JpegEncHuffTable *table, u32 type);
-static BOOL JpegEnc_WriteHuffmanTable(const JpegEncHuffTable *table, u8 *dst, u32 *pos);
-static u32 JpegEnc_GetHuffmanTableLength(const JpegEncHuffTable *table);
-static BOOL JpegEnc_EncodeBlock(const JpegEncHuffTable *dcTable, const JpegEncHuffTable *acTable,
-                                JpegEncComponent *component, u8 *dst, u32 *pos, u32 x, u32 y);
-static void JpegEnc_TransformH2V2(const u8 *src, const s32 *divisors, JpegEncComponent *component, u32 width);
-static void JpegEnc_TransformH2V1(const u8 *src, const s32 *divisors, JpegEncComponent *component, u32 width);
-static void JpegEnc_TransformH1V1(const u8 *src, const s32 *divisors, JpegEncComponent *component, u32 width);
-static u32 JpegEnc_GetWorkSize(u32 width, u32 height, u32 sampling);
-static BOOL JpegEnc_Sign(u8 *data, u32 size);
-static void JpegEnc_MakeThumbnail(const u16 *src, u32 width, u32 height, u16 *dst, u32 dstWidth, u32 dstHeight,
-                                  u32 option);
-static void JpegEnc_ConvertRGB555(const void *src, u32 width, u32 height, u8 *dst);
-static void JpegEnc_ConvertYUV422(const void *src, u32 width, u32 height, u8 *dst);
-static u32 JpegEnc_Encode(const void *src, u8 *dst, u32 limit, JpegEncWork *work, u32 width, u32 height, u32 quality,
+static void Yos_BitInit(void);
+static BOOL Yos_BitWrite(u8 *dst, u32 *pos, u32 value, u32 count);
+static void Yos_JpegEncoderForwardDct(const u8 *block, const s32 *divisors, s16 *coefs);
+static void Yos_JpegEncoderHuffmanEncoderBuildTable(JpegEncHuffWork *work, JpegEncHuffTable *table, u32 type);
+static BOOL Yos_JpegEncoderHuffmanEncoderPrintTable(const JpegEncHuffTable *table, u8 *dst, u32 *pos);
+static u32 Yos_JpegEncoderHuffmanEncoderOutputSize(const JpegEncHuffTable *table);
+static BOOL Yos_JpegEncoderComponentSequential(const JpegEncHuffTable *dcTable, const JpegEncHuffTable *acTable,
+                                               JpegEncComponent *component, u8 *dst, u32 *pos, u32 x, u32 y);
+static void Yos_JpegEncodeSample2to2Component(const u8 *src, const s32 *divisors, JpegEncComponent *component,
+                                              u32 width);
+static void Yos_JpegEncodeSample2to1Component(const u8 *src, const s32 *divisors, JpegEncComponent *component,
+                                              u32 width);
+static void Yos_JpegEncodeSample1to1Component(const u8 *src, const s32 *divisors, JpegEncComponent *component,
+                                              u32 width);
+static u32 Yos_JPEGGetMemorySize(u32 width, u32 height, u32 sampling);
+static BOOL SSPi_JpegEncoderDoSign(u8 *data, u32 size);
+static void SSP_JpegEncoderResample(const u16 *src, u32 width, u32 height, u16 *dst, u32 dstWidth, u32 dstHeight,
+                                    u32 option);
+static void SSP_RGB555ToYUV888(const void *src, u32 width, u32 height, u8 *dst);
+static void SSP_YUV422ToYUV888(const void *src, u32 width, u32 height, u8 *dst);
+static u32 Yos_JPEGEncode(const void *src, u8 *dst, u32 limit, JpegEncWork *work, u32 width, u32 height, u32 quality,
                           u32 sampling, BOOL isThumbnail, const u8 *thumbnail, u32 thumbnailSize,
                           JpegEncConvertFunc convert);
-static BOOL JpegEnc_CheckParameters(u32 width, u32 height, u32 sampling);
+static BOOL SSPi_JpegEncoderCheckWidthHeight(u32 width, u32 height, u32 sampling);
 
 // The bit masks, by bit count
 static const u32 sJpegEncBitMasks[17] = {
@@ -184,7 +188,7 @@ static JpegEncAcHuffSpec sJpegEncAcLumSpec ATTRIBUTE_ALIGN(32) = {
 };
 
 // The AAN DCT's scale factors, 8 * 2^21 / (s(u) * s(v)) with s(0) = 1 and s(k) = cos(k pi / 16) * sqrt(2), which
-// JpegEnc_Encode divides by the quantizer
+// Yos_JPEGEncode divides by the quantizer
 static s32 sJpegEncAanScales[64] = {
     0x200, 0x171, 0x188, 0x1b3, 0x200, 0x28c, 0x3b2, 0x740, 0x171, 0x10a, 0x11b, 0x13a, 0x171, 0x1d6, 0x2aa, 0x53a,
     0x188, 0x11b, 0x12c, 0x14d, 0x188, 0x1f3, 0x2d4, 0x58c, 0x1b3, 0x13a, 0x14d, 0x172, 0x1b3, 0x22a, 0x325, 0x62a,
@@ -197,13 +201,13 @@ static u32 sJpegEncLimit;
 static u32 sJpegEncBitsLeft;
 static u32 sJpegEncBits;
 
-static void JpegEnc_ResetBits(void) {
+static void Yos_BitInit(void) {
     sJpegEncBits = 0;
     sJpegEncBitsLeft = 8;
 }
 
 // Writes the low count bits of value, from the highest, with a 0 stuffed after each 0xff byte
-static BOOL JpegEnc_PutBits(u8 *dst, u32 *pos, u32 value, u32 count) {
+static BOOL Yos_BitWrite(u8 *dst, u32 *pos, u32 value, u32 count) {
     for (; count != 0; count--) {
         if (value & sJpegEncBitMasks[count]) {
             sJpegEncBits |= sJpegEncBitMasks[sJpegEncBitsLeft];
@@ -229,7 +233,7 @@ static BOOL JpegEnc_PutBits(u8 *dst, u32 *pos, u32 value, u32 count) {
 }
 
 // Transforms an 8x8 block of samples with the AAN DCT in 8 bit fixed point, and quantizes the coefficients
-static void JpegEnc_ForwardDct(const u8 *block, const s32 *divisors, s16 *coefs) {
+static void Yos_JpegEncoderForwardDct(const u8 *block, const s32 *divisors, s16 *coefs) {
     s32 workspace[64];
     s32 k;
     s32 i;
@@ -311,7 +315,7 @@ static void JpegEnc_ForwardDct(const u8 *block, const s32 *divisors, s16 *coefs)
 
 // Copies one of the standard tables into a Huffman table, and derives the code of each value from it (JPEG
 // specification, C.1 to C.3); type is 0 and 1 for the luminance and chrominance DC tables, 2 and 3 for the AC tables
-static void JpegEnc_SetupHuffmanTable(JpegEncHuffWork *work, JpegEncHuffTable *table, u32 type) {
+static void Yos_JpegEncoderHuffmanEncoderBuildTable(JpegEncHuffWork *work, JpegEncHuffTable *table, u32 type) {
     u32 i, j, p;
     u16 code = 0;
     u32 size;
@@ -382,7 +386,7 @@ static void JpegEnc_SetupHuffmanTable(JpegEncHuffWork *work, JpegEncHuffTable *t
 }
 
 // Writes the code counts and values of a table, as the DHT segment holds them
-static BOOL JpegEnc_WriteHuffmanTable(const JpegEncHuffTable *table, u8 *dst, u32 *pos) {
+static BOOL Yos_JpegEncoderHuffmanEncoderPrintTable(const JpegEncHuffTable *table, u8 *dst, u32 *pos) {
     u32 i;
     u32 count = 0;
 
@@ -405,7 +409,7 @@ static BOOL JpegEnc_WriteHuffmanTable(const JpegEncHuffTable *table, u8 *dst, u3
 }
 
 // The length of a table in the DHT segment, with its class and ID
-static u32 JpegEnc_GetHuffmanTableLength(const JpegEncHuffTable *table) {
+static u32 Yos_JpegEncoderHuffmanEncoderOutputSize(const JpegEncHuffTable *table) {
     u32 i;
     u32 count = 0;
 
@@ -416,8 +420,8 @@ static u32 JpegEnc_GetHuffmanTableLength(const JpegEncHuffTable *table) {
 }
 
 // Encodes the block at x, y of a component
-static BOOL JpegEnc_EncodeBlock(const JpegEncHuffTable *dcTable, const JpegEncHuffTable *acTable,
-                                JpegEncComponent *component, u8 *dst, u32 *pos, u32 x, u32 y) {
+static BOOL Yos_JpegEncoderComponentSequential(const JpegEncHuffTable *dcTable, const JpegEncHuffTable *acTable,
+                                               JpegEncComponent *component, u8 *dst, u32 *pos, u32 x, u32 y) {
     u32 k;
     s32 temp, temp2;
     s16 *block;
@@ -439,10 +443,10 @@ static BOOL JpegEnc_EncodeBlock(const JpegEncHuffTable *dcTable, const JpegEncHu
         nbits++;
         temp >>= 1;
     }
-    if (!JpegEnc_PutBits(dst, pos, dcTable->spec.codes[nbits], dcTable->spec.sizes[nbits])) {
+    if (!Yos_BitWrite(dst, pos, dcTable->spec.codes[nbits], dcTable->spec.sizes[nbits])) {
         return FALSE;
     }
-    if (nbits != 0 && !JpegEnc_PutBits(dst, pos, temp2, nbits)) {
+    if (nbits != 0 && !Yos_BitWrite(dst, pos, temp2, nbits)) {
         return FALSE;
     }
 
@@ -450,7 +454,7 @@ static BOOL JpegEnc_EncodeBlock(const JpegEncHuffTable *dcTable, const JpegEncHu
     for (k = 1; k < 64; k++) {
         if (block[sJpegEncZigzag[k]] != 0) {
             while (run >= 16) {
-                if (!JpegEnc_PutBits(dst, pos, acTable->spec.codes[0xf0], acTable->spec.sizes[0xf0])) {
+                if (!Yos_BitWrite(dst, pos, acTable->spec.codes[0xf0], acTable->spec.sizes[0xf0])) {
                     return FALSE;
                 }
                 run -= 16;
@@ -468,10 +472,10 @@ static BOOL JpegEnc_EncodeBlock(const JpegEncHuffTable *dcTable, const JpegEncHu
                 nbits++;
             }
             i = (run << 4) | nbits;
-            if (!JpegEnc_PutBits(dst, pos, acTable->spec.codes[i], acTable->spec.sizes[i])) {
+            if (!Yos_BitWrite(dst, pos, acTable->spec.codes[i], acTable->spec.sizes[i])) {
                 return FALSE;
             }
-            if (nbits != 0 && !JpegEnc_PutBits(dst, pos, temp2, nbits)) {
+            if (nbits != 0 && !Yos_BitWrite(dst, pos, temp2, nbits)) {
                 return FALSE;
             }
             run = 0;
@@ -479,14 +483,15 @@ static BOOL JpegEnc_EncodeBlock(const JpegEncHuffTable *dcTable, const JpegEncHu
             run++;
         }
     }
-    if (run != 0 && !JpegEnc_PutBits(dst, pos, acTable->spec.codes[0], acTable->spec.sizes[0])) {
+    if (run != 0 && !Yos_BitWrite(dst, pos, acTable->spec.codes[0], acTable->spec.sizes[0])) {
         return FALSE;
     }
     return TRUE;
 }
 
 // Transforms a chrominance plane subsampled 2:1 both ways
-static void JpegEnc_TransformH2V2(const u8 *src, const s32 *divisors, JpegEncComponent *component, u32 width) {
+static void Yos_JpegEncodeSample2to2Component(const u8 *src, const s32 *divisors, JpegEncComponent *component,
+                                              u32 width) {
     u32 n;
     u32 x, y;
     s16 *coefs;
@@ -517,14 +522,15 @@ static void JpegEnc_TransformH2V2(const u8 *src, const s32 *divisors, JpegEncCom
                 block[i + 7] = (row0[14] + row0[15] + row1[14] + row1[15]) >> 2;
                 offset += width * 2;
             }
-            JpegEnc_ForwardDct(block, divisors, &coefs[n * 64]);
+            Yos_JpegEncoderForwardDct(block, divisors, &coefs[n * 64]);
             n++;
         }
     }
 }
 
 // Transforms a chrominance plane subsampled 2:1 horizontally
-static void JpegEnc_TransformH2V1(const u8 *src, const s32 *divisors, JpegEncComponent *component, u32 width) {
+static void Yos_JpegEncodeSample2to1Component(const u8 *src, const s32 *divisors, JpegEncComponent *component,
+                                              u32 width) {
     u32 n;
     u32 x, y;
     s16 *coefs;
@@ -553,14 +559,15 @@ static void JpegEnc_TransformH2V1(const u8 *src, const s32 *divisors, JpegEncCom
                 block[i + 7] = (row[14] + row[15]) >> 1;
                 offset += width;
             }
-            JpegEnc_ForwardDct(block, divisors, &coefs[n * 64]);
+            Yos_JpegEncoderForwardDct(block, divisors, &coefs[n * 64]);
             n++;
         }
     }
 }
 
 // Transforms a plane at full resolution
-static void JpegEnc_TransformH1V1(const u8 *src, const s32 *divisors, JpegEncComponent *component, u32 width) {
+static void Yos_JpegEncodeSample1to1Component(const u8 *src, const s32 *divisors, JpegEncComponent *component,
+                                              u32 width) {
     u32 n;
     u32 x, y;
     s16 *coefs = component->coefs;
@@ -597,7 +604,7 @@ static void JpegEnc_TransformH1V1(const u8 *src, const s32 *divisors, JpegEncCom
                 block[i + 56] = *row7;
                 row7++;
             }
-            JpegEnc_ForwardDct(block, divisors, &coefs[n * 64]);
+            Yos_JpegEncoderForwardDct(block, divisors, &coefs[n * 64]);
             n++;
         }
         row0 = row7;
@@ -611,8 +618,8 @@ static void JpegEnc_TransformH1V1(const u8 *src, const s32 *divisors, JpegEncCom
     }
 }
 
-// The work memory that JpegEnc_Encode needs for an image
-static u32 JpegEnc_GetWorkSize(u32 width, u32 height, u32 sampling) {
+// The work memory that Yos_JPEGEncode needs for an image
+static u32 Yos_JPEGGetMemorySize(u32 width, u32 height, u32 sampling) {
     u32 alignedWidth, alignedHeight;
     u32 hFactor = 1;
     u32 vFactor = 1;
@@ -652,8 +659,8 @@ u32 SSP_GetJpegEncoderBufferSize(u32 width, u32 height, u32 sampling, u32 option
             height = THUMBNAIL_HEIGHT;
         }
     }
-    size = JpegEnc_GetWorkSize(width, height, sampling);
-    thumbnailSize = JpegEnc_GetWorkSize(THUMBNAIL_WIDTH, THUMBNAIL_HEIGHT, SSP_JPEG_OUTPUT_YUV444);
+    size = Yos_JPEGGetMemorySize(width, height, sampling);
+    thumbnailSize = Yos_JPEGGetMemorySize(THUMBNAIL_WIDTH, THUMBNAIL_HEIGHT, SSP_JPEG_OUTPUT_YUV444);
     if (size > thumbnailSize) {
         return size + (thumbnail ? THUMBNAIL_BUFFER_SIZE * 2 : 0);
     } else {
@@ -666,7 +673,7 @@ u32 SSP_GetJpegEncoderBufferSize(u32 width, u32 height, u32 sampling, u32 option
 #define READ_BE32(p) (((p)[0] << 24) + ((p)[1] << 16) + ((p)[2] << 8) + (p)[3])
 
 // Writes the signature of the image into the first entry of its EXIF maker note
-static BOOL JpegEnc_Sign(u8 *data, u32 size) {
+static BOOL SSPi_JpegEncoderDoSign(u8 *data, u32 size) {
     u8 signature[SSP_SIGNATURE_SIZE];
     u32 pos, count, i;
     u32 limit = sJpegEncLimit;
@@ -751,8 +758,8 @@ static BOOL JpegEnc_Sign(u8 *data, u32 size) {
 }
 
 // Scales the image down to the thumbnail, in RGB555 or YUV422 like the image
-static void JpegEnc_MakeThumbnail(const u16 *src, u32 width, u32 height, u16 *dst, u32 dstWidth, u32 dstHeight,
-                                  u32 option) {
+static void SSP_JpegEncoderResample(const u16 *src, u32 width, u32 height, u16 *dst, u32 dstWidth, u32 dstHeight,
+                                    u32 option) {
     u32 prev = 0;
     u32 format = option & (SSP_JPEG_RGB555 | SSP_JPEG_YUV422);
     u32 stepX = (width << 4) / dstWidth;
@@ -792,7 +799,7 @@ static void JpegEnc_MakeThumbnail(const u16 *src, u32 width, u32 height, u16 *ds
 }
 
 // Converts RGB555 pixels to the Y, Cb and Cr planes, padded to whole blocks
-static void JpegEnc_ConvertRGB555(const void *src, u32 width, u32 height, u8 *dst) {
+static void SSP_RGB555ToYUV888(const void *src, u32 width, u32 height, u8 *dst) {
     const u16 *pixels = src;
     u32 size;
     u8 *crPlane;
@@ -832,7 +839,7 @@ static void JpegEnc_ConvertRGB555(const void *src, u32 width, u32 height, u8 *ds
 }
 
 // Splits YUV422 pixels into the Y, Cb and Cr planes, doubling the chrominance horizontally
-static void JpegEnc_ConvertYUV422(const void *src, u32 width, u32 height, u8 *dst) {
+static void SSP_YUV422ToYUV888(const void *src, u32 width, u32 height, u8 *dst) {
     const u32 *pixels = src;
     u32 count = width * height / 2;
     u16 *crPlane;
@@ -852,7 +859,7 @@ static void JpegEnc_ConvertYUV422(const void *src, u32 width, u32 height, u8 *ds
 }
 
 // Encodes an image, after the EXIF data or as a thumbnail; returns its size, or 0 if it didn't fit in limit bytes
-static u32 JpegEnc_Encode(const void *src, u8 *dst, u32 limit, JpegEncWork *work, u32 width, u32 height, u32 quality,
+static u32 Yos_JPEGEncode(const void *src, u8 *dst, u32 limit, JpegEncWork *work, u32 width, u32 height, u32 quality,
                           u32 sampling, BOOL isThumbnail, const u8 *thumbnail, u32 thumbnailSize,
                           JpegEncConvertFunc convert) {
     JpegEncComponent components[3];
@@ -948,20 +955,20 @@ static u32 JpegEnc_Encode(const void *src, u8 *dst, u32 limit, JpegEncWork *work
     if (convert != NULL) {
         convert(src, width, height, (u8 *)work + yOffset);
     }
-    JpegEnc_TransformH1V1((u8 *)work + yOffset, work->divisors[0], &components[0], width);
+    Yos_JpegEncodeSample1to1Component((u8 *)work + yOffset, work->divisors[0], &components[0], width);
     if (sampling == SSP_JPEG_OUTPUT_YUV444) {
-        JpegEnc_TransformH1V1((u8 *)work + cbOffset, work->divisors[1], &components[1], width);
+        Yos_JpegEncodeSample1to1Component((u8 *)work + cbOffset, work->divisors[1], &components[1], width);
     } else if (sampling == SSP_JPEG_OUTPUT_YUV420) {
-        JpegEnc_TransformH2V2((u8 *)work + cbOffset, work->divisors[1], &components[1], width);
+        Yos_JpegEncodeSample2to2Component((u8 *)work + cbOffset, work->divisors[1], &components[1], width);
     } else {
-        JpegEnc_TransformH2V1((u8 *)work + cbOffset, work->divisors[1], &components[1], width);
+        Yos_JpegEncodeSample2to1Component((u8 *)work + cbOffset, work->divisors[1], &components[1], width);
     }
     if (sampling == SSP_JPEG_OUTPUT_YUV444) {
-        JpegEnc_TransformH1V1((u8 *)work + crOffset, work->divisors[1], &components[2], width);
+        Yos_JpegEncodeSample1to1Component((u8 *)work + crOffset, work->divisors[1], &components[2], width);
     } else if (sampling == SSP_JPEG_OUTPUT_YUV420) {
-        JpegEnc_TransformH2V2((u8 *)work + crOffset, work->divisors[1], &components[2], width);
+        Yos_JpegEncodeSample2to2Component((u8 *)work + crOffset, work->divisors[1], &components[2], width);
     } else {
-        JpegEnc_TransformH2V1((u8 *)work + crOffset, work->divisors[1], &components[2], width);
+        Yos_JpegEncodeSample2to1Component((u8 *)work + crOffset, work->divisors[1], &components[2], width);
     }
 
     // SOI, or the EXIF data, and SOF0
@@ -977,7 +984,7 @@ static u32 JpegEnc_Encode(const void *src, u8 *dst, u32 limit, JpegEncWork *work
         dst[13] = (hFactor << 4) | vFactor;
         pos = sizeof(sJpegEncThumbnailHeader);
     } else {
-        pos = ExifEnc_WriteHeader(dst, width, height, thumbnail, thumbnailSize);
+        pos = SSP_ExifEncode(dst, width, height, thumbnail, thumbnailSize);
         if (pos + sizeof(sJpegEncSofHeader) >= sJpegEncLimit) {
             return 0;
         }
@@ -1006,12 +1013,12 @@ static u32 JpegEnc_Encode(const void *src, u8 *dst, u32 limit, JpegEncWork *work
     }
 
     // DHT
-    JpegEnc_SetupHuffmanTable(huffWork, dcLum, 0);
-    JpegEnc_SetupHuffmanTable(huffWork, acLum, 2);
-    JpegEnc_SetupHuffmanTable(huffWork, dcChrom, 1);
-    JpegEnc_SetupHuffmanTable(huffWork, acChrom, 3);
-    dhtLength = 2 + JpegEnc_GetHuffmanTableLength(dcLum) + JpegEnc_GetHuffmanTableLength(dcChrom) +
-                JpegEnc_GetHuffmanTableLength(acLum) + JpegEnc_GetHuffmanTableLength(acChrom);
+    Yos_JpegEncoderHuffmanEncoderBuildTable(huffWork, dcLum, 0);
+    Yos_JpegEncoderHuffmanEncoderBuildTable(huffWork, acLum, 2);
+    Yos_JpegEncoderHuffmanEncoderBuildTable(huffWork, dcChrom, 1);
+    Yos_JpegEncoderHuffmanEncoderBuildTable(huffWork, acChrom, 3);
+    dhtLength = 2 + Yos_JpegEncoderHuffmanEncoderOutputSize(dcLum) + Yos_JpegEncoderHuffmanEncoderOutputSize(dcChrom) +
+                Yos_JpegEncoderHuffmanEncoderOutputSize(acLum) + Yos_JpegEncoderHuffmanEncoderOutputSize(acChrom);
     if (pos + 4 >= sJpegEncLimit) {
         return 0;
     }
@@ -1021,19 +1028,19 @@ static u32 JpegEnc_Encode(const void *src, u8 *dst, u32 limit, JpegEncWork *work
     *(dst + pos + 3) = dhtLength;
     pos += 4;
     dst[pos++] = 0x00;
-    if (!JpegEnc_WriteHuffmanTable(dcLum, dst, &pos)) {
+    if (!Yos_JpegEncoderHuffmanEncoderPrintTable(dcLum, dst, &pos)) {
         return 0;
     }
     dst[pos++] = 0x01;
-    if (!JpegEnc_WriteHuffmanTable(dcChrom, dst, &pos)) {
+    if (!Yos_JpegEncoderHuffmanEncoderPrintTable(dcChrom, dst, &pos)) {
         return 0;
     }
     dst[pos++] = 0x10;
-    if (!JpegEnc_WriteHuffmanTable(acLum, dst, &pos)) {
+    if (!Yos_JpegEncoderHuffmanEncoderPrintTable(acLum, dst, &pos)) {
         return 0;
     }
     dst[pos++] = 0x11;
-    if (!JpegEnc_WriteHuffmanTable(acChrom, dst, &pos)) {
+    if (!Yos_JpegEncoderHuffmanEncoderPrintTable(acChrom, dst, &pos)) {
         return 0;
     }
 
@@ -1041,7 +1048,7 @@ static u32 JpegEnc_Encode(const void *src, u8 *dst, u32 limit, JpegEncWork *work
     for (i = 0; i < 3; i++) {
         components[i].lastDc = 0;
     }
-    JpegEnc_ResetBits();
+    Yos_BitInit();
     if (pos + sizeof(sJpegEncSosHeader) > sJpegEncLimit) {
         return 0;
     }
@@ -1052,39 +1059,40 @@ static u32 JpegEnc_Encode(const void *src, u8 *dst, u32 limit, JpegEncWork *work
     for (i = 0; i < mcusY; i++) {
         for (x = 0; x < mcusX; x++) {
             if (sampling == SSP_JPEG_OUTPUT_YUV444) {
-                if (!JpegEnc_EncodeBlock(dcLum, acLum, &components[0], dst, &pos, x, i)) {
+                if (!Yos_JpegEncoderComponentSequential(dcLum, acLum, &components[0], dst, &pos, x, i)) {
                     return 0;
                 }
             } else if (sampling == SSP_JPEG_OUTPUT_YUV420) {
-                if (!JpegEnc_EncodeBlock(dcLum, acLum, &components[0], dst, &pos, x * 2, i * 2)) {
+                if (!Yos_JpegEncoderComponentSequential(dcLum, acLum, &components[0], dst, &pos, x * 2, i * 2)) {
                     return 0;
                 }
-                if (!JpegEnc_EncodeBlock(dcLum, acLum, &components[0], dst, &pos, x * 2 + 1, i * 2)) {
+                if (!Yos_JpegEncoderComponentSequential(dcLum, acLum, &components[0], dst, &pos, x * 2 + 1, i * 2)) {
                     return 0;
                 }
-                if (!JpegEnc_EncodeBlock(dcLum, acLum, &components[0], dst, &pos, x * 2, i * 2 + 1)) {
+                if (!Yos_JpegEncoderComponentSequential(dcLum, acLum, &components[0], dst, &pos, x * 2, i * 2 + 1)) {
                     return 0;
                 }
-                if (!JpegEnc_EncodeBlock(dcLum, acLum, &components[0], dst, &pos, x * 2 + 1, i * 2 + 1)) {
+                if (!Yos_JpegEncoderComponentSequential(dcLum, acLum, &components[0], dst, &pos, x * 2 + 1,
+                                                        i * 2 + 1)) {
                     return 0;
                 }
             } else {
-                if (!JpegEnc_EncodeBlock(dcLum, acLum, &components[0], dst, &pos, x * 2, i)) {
+                if (!Yos_JpegEncoderComponentSequential(dcLum, acLum, &components[0], dst, &pos, x * 2, i)) {
                     return 0;
                 }
-                if (!JpegEnc_EncodeBlock(dcLum, acLum, &components[0], dst, &pos, x * 2 + 1, i)) {
+                if (!Yos_JpegEncoderComponentSequential(dcLum, acLum, &components[0], dst, &pos, x * 2 + 1, i)) {
                     return 0;
                 }
             }
-            if (!JpegEnc_EncodeBlock(dcChrom, acChrom, &components[1], dst, &pos, x, i)) {
+            if (!Yos_JpegEncoderComponentSequential(dcChrom, acChrom, &components[1], dst, &pos, x, i)) {
                 return 0;
             }
-            if (!JpegEnc_EncodeBlock(dcChrom, acChrom, &components[2], dst, &pos, x, i)) {
+            if (!Yos_JpegEncoderComponentSequential(dcChrom, acChrom, &components[2], dst, &pos, x, i)) {
                 return 0;
             }
         }
     }
-    if (sJpegEncBitsLeft != 8 && !JpegEnc_PutBits(dst, &pos, 0, 7)) {
+    if (sJpegEncBitsLeft != 8 && !Yos_BitWrite(dst, &pos, 0, 7)) {
         return 0;
     }
 
@@ -1104,7 +1112,7 @@ static u32 JpegEnc_Encode(const void *src, u8 *dst, u32 limit, JpegEncWork *work
         return pos;
     }
     if (ExifEnc_SignMode == TRUE && OS_IsRunOnTwl() == TRUE) {
-        if (JpegEnc_Sign(dst, pos)) {
+        if (SSPi_JpegEncoderDoSign(dst, pos)) {
             return pos;
         }
         return 0;
@@ -1112,7 +1120,7 @@ static u32 JpegEnc_Encode(const void *src, u8 *dst, u32 limit, JpegEncWork *work
     return pos;
 }
 
-static BOOL JpegEnc_CheckParameters(u32 width, u32 height, u32 sampling) {
+static BOOL SSPi_JpegEncoderCheckWidthHeight(u32 width, u32 height, u32 sampling) {
     if (width == 0 || width > 0xffff || height == 0 || height > 0xffff) {
         return FALSE;
     }
@@ -1146,32 +1154,32 @@ u32 SSP_StartJpegEncoder(const void *src, u8 *dst, u32 limit, u8 *work, u32 widt
     JpegEncConvertFunc convert;
     u32 thumbnailQuality;
 
-    if (!JpegEnc_CheckParameters(width, height, sampling)) {
+    if (!SSPi_JpegEncoderCheckWidthHeight(width, height, sampling)) {
         return 0;
     }
     if ((option & (SSP_JPEG_RGB555 | SSP_JPEG_YUV422)) != SSP_JPEG_RGB555 &&
         (option & (SSP_JPEG_RGB555 | SSP_JPEG_YUV422)) == SSP_JPEG_YUV422) {
-        convert = JpegEnc_ConvertYUV422;
+        convert = SSP_YUV422ToYUV888;
     } else {
-        convert = JpegEnc_ConvertRGB555;
+        convert = SSP_RGB555ToYUV888;
     }
 
     if (thumbnail) {
         thumbnailQuality = quality;
         thumbnailBuffer = work;
         work += THUMBNAIL_BUFFER_SIZE * 2;
-        JpegEnc_MakeThumbnail(src, width, height, (u16 *)(thumbnailBuffer + THUMBNAIL_BUFFER_SIZE), THUMBNAIL_WIDTH,
-                              THUMBNAIL_HEIGHT, option);
+        SSP_JpegEncoderResample(src, width, height, (u16 *)(thumbnailBuffer + THUMBNAIL_BUFFER_SIZE), THUMBNAIL_WIDTH,
+                                THUMBNAIL_HEIGHT, option);
         if (quality > THUMBNAIL_MAX_QUALITY) {
             thumbnailQuality = THUMBNAIL_MAX_QUALITY;
         }
-        thumbnailSize = JpegEnc_Encode(thumbnailBuffer + THUMBNAIL_BUFFER_SIZE, thumbnailBuffer, THUMBNAIL_BUFFER_SIZE,
+        thumbnailSize = Yos_JPEGEncode(thumbnailBuffer + THUMBNAIL_BUFFER_SIZE, thumbnailBuffer, THUMBNAIL_BUFFER_SIZE,
                                        (JpegEncWork *)work, THUMBNAIL_WIDTH, THUMBNAIL_HEIGHT, thumbnailQuality,
                                        SSP_JPEG_OUTPUT_YUV422, TRUE, NULL, 0, convert);
         if (thumbnailSize == 0) {
             return 0;
         }
     }
-    return JpegEnc_Encode(src, dst, limit, (JpegEncWork *)work, width, height, quality, sampling, FALSE,
+    return Yos_JPEGEncode(src, dst, limit, (JpegEncWork *)work, width, height, quality, sampling, FALSE,
                           thumbnail ? thumbnailBuffer : NULL, thumbnailSize, convert);
 }
