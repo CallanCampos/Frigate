@@ -3,6 +3,20 @@
 What port work taught that isn't obvious from the code, newest first. A lesson about MWCC or the decomp's own
 workflow goes in the decomp checkout instead; this file is the port's ([CLAUDE.md](../CLAUDE.md), the iteration loop).
 
+## 2026-10-24: names the decomp moved past
+
+- **A name that only a list, a row or a comment holds goes stale without a failure.** Upstream renames functions and
+  statics, and completes files, at every sync; the build fails on a name the port's C calls, never on one a document, a
+  comment or the sanitizer ignorelist holds. `fun:SetCurrentFrameMultiCell_` named no function for two days after
+  upstream's rename reached `main` (the other entry happened to name it too), and rows called printsys.c and seven other
+  files incomplete long after they were complete. After a sync, look for the names it removed (the `symbols.txt` files'
+  and the C's identifiers at the two upstream commits) in all of `port/`, and for the files it completed in
+  decomp-findings.md and game-changes.md.
+- **A port tool that imports upstream's scripts needs a test that runs it.** compile_check.py called
+  `compiler_probe.lib_compiler`, which upstream replaced with `probe_defaults` in `6cc15d4d69`, on `main` since the
+  merge of `aae2a03f6` on 2026-10-17; nothing ran the tool but `sync_upstream.sh --metrics`, so every sync since then
+  measured its tiers with progress.py alone. `progress_compile_check` now runs it at every ctest.
+
 ## 2026-10-24: T5 on the field's sequences
 
 - **A report at a shared copy names the copy, not the source.** ASan put the field's H6 and the Route 19 route's

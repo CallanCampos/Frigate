@@ -32,10 +32,101 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
 
+## 2026-10-24: the follow-ups' hygiene: the metrics' compile step on upstream's probe, the records at the decomp's names
+
+- **Upstream:** `629a53cccb` (upstream merge #504), as `main` has it since PR 27; this branch merges no upstream commit.
+- **Port:** `PORT_SHA`, on the topic `port-hygiene-oct24` from `main` at `dd98d585e6` (PR 30's merge): `559ae5b099`,
+  `compile_check.py` on upstream's compile probe, with its test; `dbaba7f321`, the ledger, the findings and the guides
+  at the decomp's present names and states; `a34e7c249b`, the platform layer's comments; and this commit, the records:
+  this entry, which fills PR 30's entry's `PORT_SHA`, `36a6447c16`, the lessons and SYNC.md's review step. No commit
+  changes a file outside `port/` (`git diff --stat origin/main -- . ':!port'` prints nothing).
+- **ROM:** T0 passes: `python3 configure.py && ninja`, from an empty build directory on `main`'s `dd98d585e6`, compiled
+  every C file of both versions with no compiler warning, and both SHA1s match (Black 2
+  `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb`, White 2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`). Before the first
+  two commits and again on the final tree, `python3 configure.py && ninja` had no work but checking both ROMs, which
+  match: the commits change only `port/`.
+- **MWCC-neutrality:** nothing to prove: no file outside `port/` changes.
+- **Code standards:** clang-format 23.1.1 `--dry-run --Werror` passes on the eight C files the branch changes, in
+  comments only.
+- **Host build:** T1 passes on macOS arm64, AppleClang 21.0.0, RelWithDebInfo, both versions (`build/port`,
+  `build/port-w2`, configured fresh on this branch).
+- **Tests:** ctest `-j2` on the final tree: Black 2, 292 passed and 15 skipped of 307; White 2, 289 passed and 15
+  skipped of 304; none failed. The new `progress_compile_check` passes in both, and so do `game_ptrcasts`,
+  `game_ptrcasts_tool`, the replays (T3) and the timing routes that run (`frame_times_title` in both,
+  `frame_times_new_game` in Black 2). Skipped in both: the 12 oracle tests (no oracle in these builds),
+  `frame_times_party_menus` (the oracle's save), `asm_oracle` (no Unicorn in this Python) and `app_universal_slices`
+  (a distribution build's). A first full run, before one comment of `particle_work.c` changed, gave the same counts.
+  T4, T5 and T7 not run.
+- **Tiers:** unchanged, the branch adds and removes no game C: Black 2, from `port/tools/progress/progress.py` on this
+  branch, a 39,366 functions and 3,649,440 code bytes, b 1,651 and 200,820, c zero, 2,385 veneers left out, as the
+  sync's entry measured; White 2 not measured again. The compile step that `sync_upstream.sh --metrics` runs, which
+  stopped on `main`, now compiles all 56 incomplete files of Black 2 (`compile_check.py`, none failed: their C emits
+  193,264 of their ranges' 195,704 code bytes), and `summarize.py` writes its tables from it; the rest of `run_all.sh`
+  (the decomp's issues, the history, ByteMatch's measures) wasn't run.
+- **Trap stubs:** 30 function stubs and 21 data placeholders per version (`build/port*/gen/stubs.c`), the same symbols
+  in both, as the last entry's.
+- **64-bit warnings:** `check_ptrcasts: 361 sites in 225 keys (real 66, harmless 117, handled 141, unreachable 37), 1682
+  files, 0 not compiled` in both versions, as the last entry's, the real sites not above its 66; `--update` drops,
+  renames and adds nothing.
+- **Work done:** the follow-ups the last entries' Next listed that the sync's review found and didn't cause, and what a
+  pass over `port/` for names and states the decomp has moved past found besides.
+  - **The metrics' compile step.** `port/tools/progress/compile_check.py` called `compiler_probe.lib_compiler` and
+    `DEFAULT_FLAGS`, which upstream's `6cc15d4d69` replaced with `probe_defaults` (on `main` since the merge of
+    `aae2a03f6`, 2026-10-17), so `--metrics` stopped there with an `AttributeError`. It now takes each file's compiler
+    and flags from `probe_defaults`, the build's own compiler for a game file, where the probe tries every one, and
+    dead-strips a file that `config/deadstrip.toml` lists, as the probe and the link do, so that `wipe_sub.c`'s 31
+    handlers the original link dropped aren't measured (134 functions and 12,432 code bytes without the strip, 51 and
+    5,196 with it, the ROM's). Its new test, `progress_compile_check`
+    ([port/tests/progress](../tests/progress/test_compile_check.py), in
+    [port/cmake/progress.cmake](../cmake/progress.cmake), labelled `static`), holds it to the repository's tools: the
+    build's compiler and flags for `printsys.c`, `ctvt_draw.c`'s `-ipa function`, `lib/spl`'s 1.2/base and `lib/nnsys`'s
+    2.0/sp2, and five complete files' functions and code bytes against the ROM's, in the build's version. It fails on
+    `main`'s `compile_check.py` and with the strip left out, and skips without the decomp's `.venv`, as in CI, or
+    without wibo, sjiswrap or the compilers. The cmake, tests and progress guides have its rows.
+  - **The ledger and the findings.** [game-changes.md](game-changes.md)'s rows name `Particle_CreateSystemEx`,
+    `Particle_DeleteSystem` and `Particle_GetWork` (`particle.c`), `PrintStream_Delete` (`printsys.c`, whose two rows
+    now say the file was incomplete when they were proven and is complete since upstream's `677b81a333`, so ninja
+    proves it), MSL's runtime as `fp_fastI.s` and `snd.h`'s `waveOffset`; no row's change or commit changes.
+    [decomp-findings.md](decomp-findings.md)'s battle table row leads with `sSemiInvulnFlags`, and the rows of
+    `g2d_OAM.c`, `g2d_RendererCore.c` (`DoAffineTransforme_` and `DoRenderByRndCore2D_`, `SetAffinedOamPosition_` and
+    `DrawCellToSurface2D_` before upstream's `bc99248206`), `plist_sys.c`, `ir_check.c` and the three `fx_mtx` files
+    say they are complete, with the upstream commit and the merge that brought each, and that their nonmatching rows
+    are gone; `printsys.c`'s row names `PrintStream_Delete`.
+  - **The guides.** [ARCHITECTURE.md](ARCHITECTURE.md)'s battles row and [sanitizers.md](sanitizers.md)'s battle
+    survey say the table is `sSemiInvulnFlags`, C since the sync of `629a53cccb`, and what the route and the survey
+    build do with it (the survey build runs the route's 7,700 frames with H7 and R10 alone, as the T5 entry below
+    found); H3 names `PrintStream_Delete`. [MODDING.md](MODDING.md)'s limits say where a run from a starter save stops
+    now, where they still waited for that table, and its example of an unnamed function is one still unnamed.
+    lessons.md and the oracle's README name `GFL_SndBGMStack_Preload` and `ShayminForm_RevertPartyAndRegister`. ADRs
+    0008, 0011 and 0012, records that call functions by address, get a dated note with their names.
+  - **The ignorelist and the guard's notes.** [port/cmake/sanitizer_ignorelist.txt](../cmake/sanitizer_ignorelist.txt)
+    drops `fun:SetCurrentFrameMultiCell_`, a name no function has had since `bc99248206` reached `main` (PR 10):
+    `g2d_MultiCellAnimation.c`'s function is `ApplyCurrentAnimResult_` too, which the other entry names (its `-O0` IR
+    has 276 alignment checks with the list, 311 without that entry), so the sanitized build is unchanged. The guard's
+    two NVRAM rows' notes name `NVRAMi_SetAlarm` and `NVRAMi_AlarmHandler`, where they said `func_02079994`.
+  - **The comments.** `port/hal/os/core.c` and `os_system.c` name `OS_IrqHandler_ThreadSwitch` and the asm functions
+    of the decomp's `os_irqHandler_itcm.c`, where they said `func_01ff8ce0` and "assembly with no C";
+    `os_terminate.c` and `ctrdg/svc_cpuset.c` say `OSi_DoResetSystem` and `SVC_CpuSet` are the decomp's now
+    (`os_reset_itcm.c`, `secure_area.c`, both kept out by `port/hal/replaced.txt`); `particle_work.c`,
+    `fs_command_default_host.c` (`FS_TryLoadTable`, `FS_GetArchiveOffset`), `heap_policy.c` (`FieldmapProc_End`) and
+    `port/tests/rom/test_rom.c` (`GameBeaconSys_CheckGenuineCard`) name what upstream calls them.
+  - **The records.** [lessons.md](lessons.md) has why both kinds of rot passed unnoticed, and
+    [SYNC.md](SYNC.md#validate-and-approve-a-proposed-pr)'s review step says to look in `port/` for the names a sync
+    removes and in the two ledgers for the files it completes. Past STATUS entries, research notes and the frozen
+    spikes keep the names of their time. Left as they are: `port/tests/oracle/test_compare.py`'s made-up trap message
+    (`func_ov012_0216a000`, a name no symbol has, standing for any other trap), and the research script
+    `port/tools/research/sdk-surface/classify.py`'s `func_01ff8ce0`, which it checks only for ITCM code with no source
+    file, as it was at the research; the ITCM handlers have one now.
+- **Next:** this branch's PR, its checks and local verification (`port/tools/sync_upstream.sh --verify-pr`), and its
+  merge. Then phase 4's battle, as the last entries say: the Route 19 route as a test, which plays Hugh's battle to its
+  end on `main` and, once the sync brings #496 (upstream's `b962ecf040`), goes on past Bianca's wild encounter.
+- **Blockers:** none for this branch. Past Bianca's wild encounter, the Route 19 route waits for the sync of upstream's
+  `b962ecf040` (#496, the encounter effects' entries).
+
 ## 2026-10-24: the battle handlers' message string at pointer width, the pointer cast guard's R06
 
 - **Upstream:** `629a53cccb` (upstream merge #504), as `main` has it since PR 27; this branch merges no upstream commit.
-- **Port:** `PORT_SHA`, on the topic `port-battle-ptrcasts` from `main` at `c0a0d67c84` (PR 19's merge): `51ea50ac0f`,
+- **Port:** `36a6447c16`, on the topic `port-battle-ptrcasts` from `main` at `c0a0d67c84` (PR 19's merge): `51ea50ac0f`,
   the retyping with its row of [game-changes.md](game-changes.md), the guard's baseline and the feature map's rows;
   `2c0c902d55`, the records, which filled that row's commit and PR 19's entry's `PORT_SHA`, `f6c426990d`; `dd53a57af1`,
   the review's round (below); `31540ffddf`, the guard's fix for what CI's Apple clang 17 found (below); and this commit,
