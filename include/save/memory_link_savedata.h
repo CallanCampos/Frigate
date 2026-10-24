@@ -72,7 +72,8 @@ BOOL MemoryLinkSave_Merge(MemoryLinkSave *link, const MemoryLinkData *data, Save
 // TRUE when no save is linked yet, or when the save's player (ID, name, gender) is the one of every part that the
 // save would change
 BOOL MemoryLinkSave_CanMerge(MemoryLinkSave *link, const MemoryLinkData *data, SaveControl *save);
-// A value of a kind, MEMORY_LINK_KIND_*, copied to dest for some kinds
+// A value of a kind, MEMORY_LINK_KIND_*, copied to dest for some kinds; an address for the player kinds (the first
+// player's) and for MEMORY_LINK_KIND_PROPS (the props')
 uptr MemoryLinkSave_GetValue(MemoryLinkSave *link, u32 kind, void *dest);
 // A flag and a variable of the memories
 BOOL MemoryLinkSave_IsMemoryFlagSet(MemoryLinkSave *link, int index);

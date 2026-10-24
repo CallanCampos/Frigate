@@ -208,8 +208,9 @@ u16 GameBeaconSys_GetAge(u16 trainerId);
 // Refresh the beacon's header for a new type, sent to all versions or to Black 2 and White 2 only
 void GameBeaconSendSlot_Reset(GameBeaconSendSlot *slot);
 void GameBeaconSendSlot_ResetB2W2Only(GameBeaconSendSlot *slot);
-// Set a Funfest mission beacon of type, if its priority allows; for type 0x67, value is a StrBuf
+// Set a Funfest mission beacon of type, if its priority allows
 void GameBeaconSendSlot_SetMission(GameBeaconSendSlot *slot, u16 type, u32 value);
+// The same, with extra; for type 0x67, value is a StrBuf, whose text the beacon sends with extra
 void GameBeaconSendSlot_SetMissionEx(GameBeaconSendSlot *slot, u16 type, uptr value, u32 extra);
 // Whether the beacon's type is a Funfest mission's, 0x3c to 0x67
 BOOL GameBeacon_IsMissionType(const GameBeacon *beacon);
