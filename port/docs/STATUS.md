@@ -32,6 +32,93 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
 
+## 2026-10-24: the contributor's PR 19, addresses passed as values through `uptr` and `sptr`, with its records corrected
+
+- **Upstream:** `629a53cccb` (upstream merge #504), as `main` has it since PR 27; this branch merges no upstream commit
+  of its own.
+- **Port:** `PORT_SHA`, on MushroomMan321's topic `address-values-uptr`
+  ([PR 19](https://github.com/CallanCampos/Frigate/pull/19), from the contributor's fork, which maintainers may
+  modify): the contributor's `e6412d90d5`, `28798368fb` and `4768954275` (the last three rows of
+  [game-changes.md](game-changes.md)) and `a797c1232b` (the pointer cast guard's baseline), with the branch's merges
+  of `main` up to `82ebe7d5d9`; the maintainer's merge `8d35307a14` of `main` at `45f800f3e4` (PR 27's merge, the sync
+  of `629a53cccb`); `f3ba15d00b`, the review's record fixes; and this commit, the wording fixes of its review. It fills
+  the last entry's `PORT_SHA`, `79b06ccbb0`.
+- **ROM:** T0 passes on this commit's tree: `python3 configure.py && ninja` compiled every C file of both versions
+  (3,558) with no compiler warning, and both SHA1s match (Black 2 `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb`, White 2
+  `b5d7490be7b415b8f1e672a53e978a9cc667e56a`).
+- **MWCC-neutrality:** `port/tools/check_mwcc_neutral.py --base origin/main` (`45f800f3e4`): 3,000 of 3,558 file and
+  version pairs identical. The other 558 are the 279 units that include `gfl/net.h` (the ROM build's `ninja -t deps`),
+  and each differs from `main` only where an `int` is `s32` now (`sptr` for MWCC, the same size): compared token by
+  token, all 558 have `main`'s token count, and their 2,260 differing tokens are all `int` to `s32` (4 in each unit:
+  the init data's two callbacks and the two getters' declarations; 6 in `net.c`, with the getters' definitions; 10 in
+  `wifilogin.c` and `wifi_p2pmatch.c`, with their callbacks). The one incomplete file that the branch changes or that
+  includes a header it changes, `src/ov260/wifibattlematch_net.c` (incomplete for its `.data` order), gives the same
+  `compiler_probe.py --compilers 1.1p1 --mismatches` output as `main`'s in both versions, all 100 functions matching,
+  and so do the six other `net.h` includers that were incomplete when the change was reviewed and are complete since
+  the sync (`dwc_rap.c`, `comm_entry_menu.c`, `field_menu.c`, `ctvt_talk.c`, `namein.c`, `printsys.c`), each probed in
+  a worktree of `main` and on this head.
+- **Code standards:** clang-format 23.1.1, the version `.github/workflows/standards.yml` pins, `--dry-run --Werror` on
+  the 36 C files of `src/`, `lib/` and `include/` that the branch changes from `main`, and
+  `tools/decomp/check_style.py --diff 45f800f3e4 --strict`, both pass.
+- **Host build:** T1 passes on macOS arm64, AppleClang 21.0.0, RelWithDebInfo, both versions (`build/port`,
+  `build/port-w2`, configured fresh on this branch).
+- **Tests:** ctest `-j2`: Black 2, 289 passed and 17 skipped of 306; White 2, 288 passed and 15 skipped of 303; none
+  failed, `game_ptrcasts` passing in both. Skipped in both: the 12 oracle tests (no oracle in these builds),
+  `frame_times_party_menus` (the oracle's save), `asm_oracle` (no Unicorn in this Python) and `app_universal_slices` (a
+  distribution build's). Black 2's `frame_times_title` and `frame_times_new_game` skipped too, as `frame_times.py` does
+  over its budget while other sessions' builds held the load average at 30 to 52 on 8 cores; a lone rerun of the two
+  (`ctest -R`) passed both. T4, T5 and T7 not run.
+- **Tiers:** unchanged: the branch adds and removes no game C.
+- **Trap stubs:** 30 function stubs and 21 data placeholders per version (`build/port*/gen/stubs.c`), as the last
+  entry's.
+- **64-bit warnings:** `check_ptrcasts: 365 sites in 229 keys (real 78, harmless 109, handled 141, unreachable 37),
+  1682 files, 0 not compiled` in both versions, the real sites down from the last entry's 142: R02, R05's two callers,
+  R09, R11 and R14 to R17 are fixed, R21 has 3 sites left and R22 one ([ARCHITECTURE.md](ARCHITECTURE.md#feature-map)).
+  The game's pointer/int casts (the guard's `ptr-to-int` and `int-to-ptr` sites outside `lib/`) fall from 97 on `main`
+  to 33. The baseline, `check_ptrcasts.py --update` on a fresh Black 2 build of the merge, carries the update the last
+  entry's Next asked for: `NetDevWifi_Start`'s `void *` row is gone, `func_02079994`'s row is upstream's
+  `NVRAMi_AlarmHandler`'s, class and note kept, and `func_ov194_021bf868`'s, now `PoketradeSave_StepCheckEvolution`,
+  is fixed (R09).
+- **Work done:** PR 19, from the contributor MushroomMan321, carries through `uptr` and `sptr` the values that are an
+  integer in some calls and an address in others: six APIs' values and results, the Wi-Fi user and friend data, and
+  in-memory parameter and event fields, each group with its row of [game-changes.md](game-changes.md), and the guard's
+  baseline. The review found the code correct and four record errors, which `f3ba15d00b` fixes with its nits:
+  - the first row claimed `G3DTextDraw_CreateResource`'s palette and `include/gfl/graphics.h`,
+    `src/ov012/g3d_text_draw.c` and `src/ov036/fld3d_ci.c`, which `main` changed the same way in `6664ca0ec4`, under
+    that commit's own row: they leave the row, whose count is 33 of the game's 97 pointer/int warnings, not 35 of 99
+    (the first commit's message still says eight APIs; there are six);
+  - [ARCHITECTURE.md](ARCHITECTURE.md#feature-map)'s row for the guard gives this head's 365 sites and 78 real, the
+    groups fixed, and R21 and R22 as fixed in part;
+  - the three rows' proofs said "ninja, both SHA1s, not run (no ROMs)": they give the SHA1s, the
+    `check_mwcc_neutral.py` results and, for the `net.h` row, the probes above;
+  - the rows' commits: `e6412d90d5` and `28798368fb` for the first two, which the commits after them left `PORT_SHA`,
+    and `4768954275` for the third, the commit that made its change, as the column says (`git log -1 --
+    port/docs/game-changes.md` names the merge of `main` now);
+  - the nits: `include/system/game_beacon.h`'s `StrBuf` note moves from `GameBeaconSendSlot_SetMission` to
+    `GameBeaconSendSlot_SetMissionEx`, whose `value` is the `uptr`, and the comments on `Pokewood_GetLoadedMovieField`,
+    `MemoryLinkSave_GetValue` and `BmpMenuList_GetParam` say which fields or kinds carry an address (comments only,
+    which no token stream sees).
+
+  The review of `f3ba15d00b` found three wording problems, which this commit fixes:
+  - [ARCHITECTURE.md](ARCHITECTURE.md#feature-map)'s row now names the Wi-Fi tournaments' download buffer among R22's
+    fixed parts: `WbtOv326Param2`'s `unk4`, whose two rows, `WbtDownload_SetupTournaments` and
+    `TDownloadSave_LoadReceived`, leave the baseline;
+  - the first row says that the four headers' comments on its APIs are upstream's, rewritten by `f3ba15d00b`, so that a
+    conflict reapplies them with the types;
+  - the PR's description lists the six APIs, 33 sites, and says that its game count of 99, taken on `a4648fce71`,
+    includes the 2 palette sites `main` fixed in `6664ca0ec4` (97 on `main`, to 33), and that the guard's six new
+    `harmless` rows hold 7 sites.
+
+  The merge of `main` resolved three conflicts on upstream's names with the branch's types: `net.h`'s getters keep
+  `sptr` beside upstream's `GflNet_IsWifiGameKind` and `GflNet_GetFriendListNum`, and `Pokewood_GetLoadedMovieField`'s
+  callers in `event_pokewood.c` and `pkwd_selectscreen.c` keep `(uptr)` at upstream's `POKEWOOD_BLOCK_FIELD_PKM_0`.
+  The sync adds no site to the casts the branch fixes, and no new caller of its APIs passes an address through `u32`.
+- **Next:** the owner's review of PR 19's new head, verified with `port/tools/sync_upstream.sh --verify-pr 19`, and its
+  merge with a merge commit. Then what the sync's review found that it didn't cause (`compile_check.py`'s call of the
+  removed `lib_compiler`, the rows that name functions upstream renamed, the two `printsys.c` rows that call the file
+  incomplete), and phase 4's first gap, the battle, as the last entry says.
+- **Blockers:** none for PR 19 but the owner's review.
+
 ## 2026-10-24: upstream sync `629a53cccb` prepared: 14 conflicts resolved, two native fixes
 
 - **Upstream:** `629a53cccb` (upstream merge #504), 115 commits after `b62c655bfa`: `53767c5a2c` (upstream merge #497,
@@ -40,7 +127,7 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
   `src/system/wipe_sub.c` through a dead-strip step of the ROM build (merge #504). This entry records a prepared sync,
   published as PR 27 for the owner's review; it is not on `main`. The hourly `port-sync` Action had stopped on its
   conflict since 2026-10-23 23:53 UTC.
-- **Port:** `PORT_SHA`, on the topic `codex/upstream-sync-manual` from `main` at `e5508df96a` (PR 24's merge): the merge
+- **Port:** `79b06ccbb0`, on the topic `codex/upstream-sync-manual` from `main` at `e5508df96a` (PR 24's merge): the merge
   `f99298de25` of `53767c5a2c` (its 14 conflicts resolved and committed with `git commit --no-edit --cleanup=strip`
   after `port/tools/sync_upstream.sh --branch codex/upstream-sync-manual --no-push` stopped on them; first committed as
   `bf6d6cfd46` and amended, before anything was published, to rewrap the comment its `include/types.h` fix adds), its

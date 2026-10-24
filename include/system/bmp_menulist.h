@@ -110,8 +110,8 @@ void BmpMenuList_GetPos(BmpMenuList *list, u16 *listTop, u16 *cursorRow);
 u16 BmpMenuList_GetCursorY(BmpMenuList *list);
 u16 BmpMenuList_GetRowY(BmpMenuList *list, u16 row);
 s32 BmpMenuList_GetOptionValue(BmpMenuList *list, u16 index);
-// A field of the list's header, or -1
-s32 BmpMenuList_GetParam(BmpMenuList *list, u8 param);
+// A field of the list's header, or -1; an address for BMPMENULIST_PARAM_CURSOR_CALLBACK, _PRINT_CALLBACK and _WORK
+sptr BmpMenuList_GetParam(BmpMenuList *list, u8 param);
 // Makes the cursor the ROM's triangle bitmap
 void BmpMenuList_LoadCursor(BmpMenuList *list, u32 heapId);
 void *BmpMenuList_GetWork(BmpMenuList *list);
