@@ -1,0 +1,48 @@
+pbwinput 1
+# The field menu's apps from the first save (oracle.py sequence field_menus; README.md, "The comparison sequences").
+# Both programs play this file from the same save: the continue sequence's presses take CONTINUE into the field, the
+# player's room in Aspertia City; X opens the field menu, which without a Pokemon (event flag 0x961) and without the
+# Pokedex (0x962) has four items, BAG, the trainer card, SAVE and OPTIONS (FieldMenu_GetMenuType's type 3,
+# src/ov036/field_menu.c), and the menu opens the bag and the trainer card, each closed with B. The clock stays at its
+# time for the whole run on both (the "clock" line), since the menu's bottom screen shows it: running, it would show
+# each program's own time, which moves on with the video frames, and the DS takes some 2,000 more of them than the port
+# to reach the field. On game frames.
+# White 2: the same presses and counts as Black 2's file, measured again on White 2's oracle.
+version w2_us
+clock pinned
+# START in the opening skips it to the title (count 1115 on both)
+1100 START
+1101 -
+# START brings back the layers the title hid at count 2877
+3000 START
+3001 -
+# START leaves for the start menu, which shows from count 3249
+3100 START
+3101 -
+# CONTINUE: the season's name ("Summer") from count 3430, the room from 3605
+3400 A
+3401 -
+# X: the field menu slides in on the bottom screen (count 3906)
+3900 X
+3906 -
+# The first key shows the cursor, on BAG (slot 0)
+3960 DOWN
+3966 -
+# A: the bag, its items pocket empty ("It's empty."), from count 4056
+4000 A
+4006 -
+# B: back to the field with the menu open, the cursor on BAG (count 4346)
+4300 B
+4306 -
+# RIGHT: the cursor on the trainer card
+4500 RIGHT
+4506 -
+# A: the trainer card on the bottom screen, from count 4596
+4540 A
+4546 -
+# B: back to the menu (count 4957)
+4900 B
+4906 -
+# B: the menu closes (count 5136); the field as before from 5146
+5100 B
+5106 -

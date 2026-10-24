@@ -1,22 +1,20 @@
 pbwinput 1
-# The field menu's apps from the starter save (oracle.py launch party_menus; README.md, "The launch checks"). Both
-# programs play this file from the same save (Tepig, level 5, in the party; the Pokedex): the continue sequence's
-# presses take CONTINUE into the field at the Aspertia City lookout on the oracle, where X opens the field menu with
-# every item: POKEMON, POKEDEX, BAG, the trainer card, SAVE and OPTIONS (FieldMenu_GetMenuType's type 0,
-# src/ov036/field_menu.c). Then the party, Tepig's menu and its summary, the Pokedex and Tepig's entry, the trainer card
-# and the bag, each closed with B. The port, whose field has no C yet, opens the party list, the Pokedex, the card and
-# the bag with Frigate's test launcher (--launch party@4044,pokedex@5473,card@6974,bag@7673) at the counts they open
-# on the oracle, so that the presses inside each app reach both on the same pass; the presses for the field and its
-# menu reach nothing on the port. On game frames. White 2: Black 2's presses, from White 2's own starter save
-# (starter_save_w2_us.pbwinput); every app opens and closes at Black 2's counts on White 2's oracle.
-version w2_us
+# The field menu's apps from the starter save (oracle.py sequence party_menus; README.md, "The comparison sequences").
+# Both programs play this file from the same save (Tepig, level 5, in the party; the Pokedex): the continue sequence's
+# presses take CONTINUE into the field at the Aspertia City lookout, where X opens the field menu with every item:
+# POKEMON, POKEDEX, BAG, the trainer card, SAVE and OPTIONS (FieldMenu_GetMenuType's type 0, src/ov036/field_menu.c).
+# Then the party, Tepig's menu and its summary, the Pokedex and Tepig's entry, the trainer card and the bag, each closed
+# with B. The clock stays at its time for the whole run on both (the "clock" line), as field_menus_*.pbwinput says why.
+# On game frames. Black 2.
+version b2_us
+clock pinned
 1100 START  # START in the opening skips it to the title (count 1115 on both)
 1101 -
 3000 START  # START brings back the layers the title hid at count 2877
 3001 -
-3100 START  # START leaves for the start menu, which shows from count 3246
+3100 START  # START leaves for the start menu, which shows from count 3249
 3101 -
-3400 A  # CONTINUE: the lookout, from count 3603
+3400 A  # CONTINUE: the lookout, from count 3605
 3401 -
 3900 X  # X: the field menu slides in on the bottom screen
 3906 -
