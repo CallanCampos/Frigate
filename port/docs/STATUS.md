@@ -32,11 +32,111 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
 
+## 2026-10-24: T5 on the field's sequences: three memory bugs of the game fixed, every route clean sanitized
+
+- **Upstream:** `629a53cccb` (upstream merge #504), as `main` has it since PR 27 (`45f800f3e4`); this branch merges no
+  upstream commit of its own. Upstream's `main` has moved on (`b962ecf040`, upstream merge #496), for the sync to
+  propose on its own.
+- **Port:** `PORT_SHA`, on the topic branch `port-t5-field-routes` from `main` at `def88de18f` (PR 26's merge):
+  `ebd05277eb` (the three fixes and their records), `main` merged at `45f800f3e4` (`0746bb2cd1`: PR 27, the sync of
+  upstream `629a53cccb`, without a conflict), `26616a4499` (this entry, first written), `main` merged again at
+  `c0a0d67c84` (`3f28323ee8`: PR 19, the contributor's addresses through `uptr` and `sptr`, which merged as the branch
+  was pushed: STATUS.md keeps both entries, this one above PR 19's, and game-changes.md PR 19's three rows before this
+  branch's three, in merge order) and this commit, the entry brought to the final head, published together as one pull
+  request to `main`. It fills PR 19's entry's `PORT_SHA`, `f6c426990d` (the sync's, `79b06ccbb0`, was filled by both
+  `26616a4499` and PR 19), and the commit of game-changes.md's three new rows, `ebd05277eb`, the commit that made their
+  changes (`git log -1 -- port/docs/game-changes.md` names a merge, which only carries them). Neither merge touches the
+  branch's lines.
+- **ROM:** T0 passes on the final head (`3f28323ee8`'s tree, which this commit's matches outside `port/docs/`): Black 2
+  `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb` and White 2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a` (`python3
+  configure.py && ninja`, no compiler warning), as on `ebd05277eb`, where ninja recompiled the three changed files with
+  MWCC in both versions, and on `0746bb2cd1`. The three are complete in both versions, and `check_mwcc_neutral.py` on
+  them finds 6 of 6 file and version pairs identical to upstream's, against `b62c655bfa` on `ebd05277eb` and
+  `629a53cccb` on both merges: the changes are `#ifdef PLATFORM_PC` blocks alone.
+- **Host build:** T1 passes on macOS arm64, Apple clang 21, RelWithDebInfo, both versions, each with the oracle
+  (`-DPORT_BUILD_ORACLE=ON`): plain (`build/port`, `build/port-w2`) and the strict sanitized build (`build/port-san`,
+  `build/port-san-w2`, `-DPORT_SANITIZE=ON`), with Black 2's survey build beside them (`build/port-san-rec`,
+  `-DPORT_SANITIZE_RECOVER=ON`, the program alone). From clean, 723 warnings in each build, as on the last entries: the
+  sanitized builds on `main` at `def88de18f`, the plain ones with the fixes. On `0746bb2cd1`, which rebuilt 1,790
+  objects for the sync's game code, 727 in each; on the final head, incrementally, the 749 objects that PR 19's headers
+  reach, with 163 warnings among them in each build; none is in the three changed files. clang-format (Homebrew 23.1.3)
+  is clean on them, and `tools/decomp/check_style.py --diff origin/main --strict` passes.
+- **Tests:** T5, the strict sanitized build with the oracle, `ctest -j2 -L route` on the final head, both versions at
+  once, with the cached oracle saves (the verify tree's, the same SHA-1s), under load averages of 20 to 57 on the
+  machine's 8 cores from other sessions: Black 2, 24 of 24 passed (3,210 s), White 2, 22 of 22 (3,162 s), no report:
+  every replay (`replay_start_menu`, `replay_new_game` in Black 2, `replay_new_game_house`, `replay_same_save`), every
+  oracle sequence (`oracle_aspertia` in 1,894 s and 1,886 s, `oracle_field_menus`, `oracle_party_menus`, the opening's,
+  the title's, `continue` and `continue_starter`), the hashes tests of the opening, the title and `aspertia`,
+  `oracle_port_save`, the sound's four tests and the smoke test; on `0746bb2cd1` they had passed the same, 24 and 22
+  (2,959 s and 2,882 s). The sanitized runs compare as the last entries' plain runs did, on both heads:
+  `oracle_aspertia` matches 15,708 of 15,708 port frames in Black 2 (5,446 exact, 9,869 with 3D within the tolerance,
+  393 with the top screen left out) and 15,700 of 15,700 in White 2 (5,508, 9,799 and 393), NNS G3D's state 14,656 of
+  14,656 dumps in each, 3D pixels beyond the pixel tolerance 18 and 17 at the median and 89 at most;
+  `oracle_field_menus` 5,179 of 5,179 (2,169 exact) and 5,171 of 5,171 (2,171); `oracle_party_menus` 8,190 of 8,190
+  (4,250) and 8,182 of 8,182 (4,252). Before the fixes, the strict program alone (`frigate-black2 --headless --frames N
+  --watchdog 120 --save-dir DIR --input FILE`, each sequence's input file and save) ran the field menu's two sequences'
+  files clean in both versions and stopped on H5 in Black 2's `aspertia_b2_us.pbwinput` at port frame 11,545 (SIGABRT).
+  The survey program alone, on `0746bb2cd1`, ends without a report on `aspertia_b2_us` (15,800 frames) and
+  `first_save_b2_us` (18,800), and on the Route 19 route's input from the starter save (7,700 frames) shows H7 and R10
+  alone and runs all its frames, now that overlay 167's table is in (before the sync it stopped at the table's
+  placeholder at frame 7,623). T2 to T4 and T6, the plain builds' full `ctest -j2` with the oracle on `0746bb2cd1`,
+  started beside the sanitized runs, under load averages of 20 to 56: Black 2, 304 passed and 2 skipped of 306 (3,200
+  s); White 2, 302 passed and 1 skipped of 303 (2,704 s); none failed. Skipped: `app_universal_slices` in both, which
+  only a distribution build has, and Black 2's `asm_oracle`, configured before this worktree had the clone's
+  `build/port-venv` (Unicorn, port/tests/asm_oracle/README.md), which then passed alone (258 s), as White 2's did in its
+  run. Every replay and oracle test passes in both, White 2's `oracle_aspertia` with the figures above, and so does
+  every timing gate, `frame_times_title` and `frame_times_party_menus` among them. The final head's plain tests are the
+  pull request's `Frigate local verification`. T7 not run: nothing the player sees changes, which the sanitized
+  sequences hold frame by frame against melonDS.
+- **Tiers:** per version, a 39,366 functions, b 1,651 and c zero; code bytes Black 2 a 3,649,440, White 2 a 3,649,528,
+  and b 200,820 in each; 2,385 veneers left out. Unchanged from the sync's entry (`port/tools/progress/progress.py` on
+  `0746bb2cd1`; PR 19 changes none, as its entry says): the branch's game C is host-only.
+- **Trap stubs:** 30 function stubs and 21 data placeholders per version (`build/port*/gen/stubs.c`), as PR 19's entry.
+  The field's routes reach none.
+- **64-bit warnings:** `check_ptrcasts: 365 sites in 229 keys (real 78, harmless 109, handled 141, unreachable 37), 1682
+  files, 0 not compiled` on `build/port` and `build/port-w2` on the final head, as PR 19's entry; the branch adds no
+  site.
+- **Work done:** T5 on the field's oracle sequences, which the last entries' Next named. Before any fix, the strict
+  program ran the field menu's two clean, and New Game's intro stopped it at the change of map into the player's house.
+  Black 2's survey build on the input files of `oracle_aspertia` and `replay_new_game_house` showed three reports, each
+  traced to a memory bug of the game, the same in the ROM, fixed in the game's file under `PLATFORM_PC` with its row in
+  [game-changes.md](game-changes.md) and its finding in [decomp-findings.md](decomp-findings.md)
+  ([sanitizers.md](sanitizers.md#the-fields-sequences-under-the-strict-build) has each one's evidence):
+  - H5, `src/ov036/field_buildmodel.c`: `FieldG3DMapper_Free` frees the map's chunks before the prop system, so freeing
+    a prop handle that a script made (`s0127_BMCreateHandleByGPos`) and left to the field's end showed its prop again,
+    a write into the freed prop instances. Which handle it was came from a scratch build that printed each handle's
+    creator by its return address, symbolized with `atos`. The system's handles let go of their holders first.
+  - H6, `src/system/app_taskmenu.c`: a task menu's update queues the VBlank transfer of its pulsing cursor color from
+    the menu, which the report's yes and no free in the same pass, so the VBlank's copy read freed memory; ASan's
+    poisoning stack (`ASAN_OPTIONS=poison_history_size=4096`) named the free in `EventSave_Update`. The color goes
+    through a slot of its screen and palette that outlives the menu, the window's twin too.
+  - R11, `src/ov036/field_camera.c`: `FieldCamera_RefineDerivedAngles` steps its angles a degree away without wrapping
+    them, so at a yaw of 0 `FX_SinIdx` and `FX_CosIdx` read up to 48 bytes before `FX_SinCosTable_`, which on the DS are
+    zeros (the end of `FS_VTABLE_BASE`, read from the extracted ARM9 at the link map's addresses) and within a degree
+    under a full turn `FX_AtanIdxTable_`. The reads give the DS's values, and the one division those zeros can make by
+    zero gives the DS's runtime's result, the dividend, where x86-64 would fault.
+
+  H6 was two causes at one place, the VBlank's copy (`NNS_GfdDoVramTransfer`), which the battles' survey on the Route 19
+  route had counted as one: with H6 fixed, the route's report there is the trainer cut-in's texture and palette, freed
+  in the pass that queues their transfer (`src/ov036/fld3d_ci.c`), H7, traced and left open in sanitizers.md and
+  decomp-findings.md for the battle route's track, whose files it is in. sanitizers.md also says how to see who freed a
+  block and why a check in an inline function reports at the inline's line; its first two tables' H5 and H6 point to the
+  new section; the feature map's sanitized row names the three files and the field's state; lessons.md has four lessons.
+  The plain build's `asm_oracle` needs a `build/port-venv` with Unicorn when it is configured: this worktree linked the
+  clone's (`ln -s`), and port/tests/asm_oracle/README.md says how to make one.
+- **Next:** phase 4's first gap, the battle, as the sync's entry says: the Route 19 route as a test now that #497's
+  table is in, and its T5 with H7 and R10 (the cut-in's transfers from freed memory, and NitroSDK's word-wise string
+  length past a literal, a candidate for the ignorelist's `[address]` section). Then what the sync's review found that
+  it didn't cause, as PR 19's entry lists it. PLAN.md §6 runs T5 nightly, and nothing runs the routes sanitized on a
+  schedule yet: CI has no ROM, and a scheduled run on the owner's machine is the owner's to set up.
+- **Blockers:** none for the field. #496 (the encounter effects' entries) merged upstream at `b962ecf040`, after
+  `629a53cccb`, and reaches Frigate by the next sync.
+
 ## 2026-10-24: the contributor's PR 19, addresses passed as values through `uptr` and `sptr`, with its records corrected
 
 - **Upstream:** `629a53cccb` (upstream merge #504), as `main` has it since PR 27; this branch merges no upstream commit
   of its own.
-- **Port:** `PORT_SHA`, on MushroomMan321's topic `address-values-uptr`
+- **Port:** `f6c426990d`, on MushroomMan321's topic `address-values-uptr`
   ([PR 19](https://github.com/CallanCampos/Frigate/pull/19), from the contributor's fork, which maintainers may
   modify): the contributor's `e6412d90d5`, `28798368fb` and `4768954275` (the last three rows of
   [game-changes.md](game-changes.md)) and `a797c1232b` (the pointer cast guard's baseline), with the branch's merges

@@ -245,6 +245,24 @@ static void AppTaskMenu_SetWindowActive(BmpWin *window, AppTaskMenuRes *res, BOO
     GFL_BGSysQueueScrLoad(BmpWin_GetBGIndex(window));
 }
 
+#ifdef PLATFORM_PC
+// The pulsing color of each BG palette that a task menu or window pulses, by screen, for the next VBlank's transfer.
+// The DS transfers it from the menu or window itself, which its caller often frees in the same pass, once its flash
+// ends (the report's yes and no, Report_UpdateYesNoMenu in src/ov012/report_event.c): the transfer then reads freed
+// memory, which on the DS still holds the color. A host transfers it from here, which outlives them; the last pulse of
+// a pass for a palette is the one the DS's transfers leave in it (port/docs/sanitizers.md, H6). A resource's palette is
+// one of a BG's 16, with the next one for the inactive buttons (AppTaskMenuRes_Create)
+static GXRgb sPulseColors[2][16];
+
+// Keeps a pulse's color for the VBlank's transfer, in its screen's slot of its palette, and returns where
+static GXRgb *AppTaskMenu_KeepPulseColor(GXRgb color, u8 bg, u8 palette) {
+    GXRgb *kept = &sPulseColors[bg <= MAIN_BG_LAST ? 0 : 1][palette];
+
+    *kept = color;
+    return kept;
+}
+#endif
+
 static void AppTaskMenu_PulseCursorColor(u16 *angle, GXRgb *color, u8 bg, u8 palette) {
     fx16 t;
     u8 r;
@@ -263,6 +281,9 @@ static void AppTaskMenu_PulseCursorColor(u16 *angle, GXRgb *color, u8 bg, u8 pal
     b = 13 + (t * 17 >> FX32_SHIFT);
     *color = GX_RGB(r, g, b);
 
+#ifdef PLATFORM_PC
+    color = AppTaskMenu_KeepPulseColor(*color, bg, palette);
+#endif
     if (bg <= MAIN_BG_LAST) {
         NNS_GfdRegisterNewVramTransferTask(NNS_GFD_DST_2D_BG_PLTT_MAIN, palette * 0x20 + PULSE_COLOR_OFFSET, color,
                                            sizeof(GXRgb));
@@ -296,6 +317,9 @@ static void AppTaskMenuWin_PulseColor(u16 *angle, GXRgb *color, u8 bg, u8 palett
     b = b1 + ((b2 - b1) * t >> FX32_SHIFT);
     *color = GX_RGB(r, g, b);
 
+#ifdef PLATFORM_PC
+    color = AppTaskMenu_KeepPulseColor(*color, bg, palette);
+#endif
     if (bg <= MAIN_BG_LAST) {
         NNS_GfdRegisterNewVramTransferTask(NNS_GFD_DST_2D_BG_PLTT_MAIN, palette * 0x20 + PULSE_COLOR_OFFSET, color,
                                            sizeof(GXRgb));

@@ -71,6 +71,18 @@ FieldPropSystem *FieldPropSystem_Create(HeapID heapId, FieldG3DMapper *mapper, u
 void FieldPropSystem_Free(FieldPropSystem *system) {
     s32 i;
 
+#ifdef PLATFORM_PC
+    // FieldG3DMapper_Free frees the map's chunks first, and with them the prop instances the holders point into, so
+    // freeing a handle that still holds a prop shows the prop again by a write to freed memory: a handle that a script
+    // made and left to the field's end (s0127_BMCreateHandleByGPos, as New Game's intro does before it takes the player
+    // into the house). The holders go with the system, so on a host the handles let go of them first
+    // (port/docs/sanitizers.md, H5)
+    for (i = 0; i < 7; i++) {
+        if (system->handles[i] != NULL) {
+            system->handles[i]->holder = NULL;
+        }
+    }
+#endif
     for (i = 0; i < 7; i++) {
         if (system->handles[i] != NULL) {
             FieldPropHandle_Free(system->handles[i]);
