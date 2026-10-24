@@ -8,7 +8,7 @@
 // the ROM with on a DSi
 extern const CARDDmaInterface CARDi_NdmaInterface;
 // TwlSDK's part of CARDi_InitRom for a DSi, in the LTD autoload
-void CARDi_InitTwlRom(void);
+void CARDi_InitRomHash(void);
 
 // card_hash.c: the ROM reads that check what they read against the keyed hashes of the DSi's ROM header. The types,
 // fields and functions have the names of libntr's reconstruction of the SDK's card/hash.h. A sector of
@@ -45,7 +45,7 @@ typedef struct CARDRomHashContext {
     u32 sector_max;
     // The functions that read the ROM, waiting for the end or not, and their first argument. The second returns 0 when
     // it can't read without waiting. The SDK's type is MIDeviceReadFunction, which returns an int; the readers that
-    // card_rom.c's DSi part passes, CARDi_ReadRomWithCPU and CARDi_ReadSecureRomWithDMA, return a u32
+    // card_rom.c's DSi part passes, CARDi_ReadRomWithCPU and CARDi_ReadCardWithHashInternalAsync, return a u32
     void *userdata;
     CARDiRomReader ReadSync;
     CARDiRomReader ReadAsync;

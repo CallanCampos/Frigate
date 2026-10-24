@@ -6,10 +6,9 @@
 // config/merged_sources.toml links from this file's object, since the parts share the object's statics, and the DSi
 // part's place among them sets the layout of the .bss. The main part calls the DSi part through the linker's veneers
 // (func_0207ece4/e8, func_0207f058/5c and func_0207f16c/70, after their callers), and the DSi part calls back through
-// veneers of its own. The named functions have NitroSDK's names, as ntrtwl's reconstruction of NitroSDK has them, where
-// it has the code, and the DSi part's PM_ functions have the names of the TWL-SDK Function Reference Manual. The
-// TwlSDK-era functions have names in the SDK's style that ntrtwl's reconstruction can't confirm, and PMi_SendPxiRequest
-// and the DSi part's other functions have names of ours.
+// veneers of its own. The functions of both parts have TwlSDK's names, which aletheia's match of Black 1's code to
+// TwlSDK's pm.o (libspi.TWL.HYB.a) gives in the same order, as does PMi_ResetLocked; the other statics have NitroSDK's
+// names, as ntrtwl's reconstruction of NitroSDK has them, or names of ours.
 #include "nitro/pm.h"
 #include "nitro/card.h"
 #include "nitro/ctrdg.h"
@@ -148,7 +147,7 @@ static PMGenCallbackInfo PMi_BatteryLowCallbackInfo;
 // The callbacks that run when the exit sequence starts
 static PMGenCallbackInfo *PMi_PreExitCallbackList;
 // Set once the exit sequence has started
-static BOOL PMi_ExitLocked;
+static BOOL PMi_ResetLocked;
 // The callbacks that run when the application is ready to exit
 static PMGenCallbackInfo *PMi_PostExitCallbackList;
 #pragma section LTDMAIN end
@@ -166,23 +165,23 @@ static void PMi_DummyCallback(u32 result, void *arg);
 static void PMi_CallCallbackAndUnlock(u32 result);
 static void PMi_WaitVBlank(void);
 static void PMi_CommonCallback(PXIFifoTag tag, u32 data, BOOL err);
-static u32 PMi_SendPxiRequest(const u32 *words, int length, u16 *result, PMCallback callback, void *arg);
-static void PMi_SendPxiDataSync(const u32 *words, int length);
+static u32 PMi_TryToSendPxiData(const u32 *words, int length, u16 *result, PMCallback callback, void *arg);
+static void PMi_TryToSendPxiDataTillSuccess(const u32 *words, int length);
 static u32 PMi_SendSleepStart(u16 trigger, u16 keyPattern);
-static u32 PMi_SendRequestAsync(u32 request, u32 data, u16 *result, PMCallback callback, void *arg);
+static u32 PM_SendUtilityCommandAsync(u32 request, u32 data, u16 *result, PMCallback callback, void *arg);
 static u32 PMi_SetLEDAsync(u32 power, PMCallback callback, void *arg);
 static u32 PMi_SetLED(u32 power);
 static u32 PM_ForceToPowerOffAsync(PMCallback callback, void *arg);
 static u32 PMi_ForceToPowerOff(void);
 static u32 PMi_SetAmp(int amp);
 static void PMi_SendPxiData(u32 word);
-static void PMi_StopDma(void);
+static void PMi_PreSleepForDma(void);
 static BOOL PMi_SetLCDPower(BOOL on, u32 power, BOOL force, BOOL sync);
 static BOOL PM_GetLCDPower(void);
 static void PMi_LCDOnAvoidReset(void);
-static void PMi_SyncExitWithOtherProc(void);
-static void PMi_ExecuteExit(BOOL reset);
-static BOOL PMi_TryLockExit(void);
+static void PMi_FinalizeDebugger(void);
+static void PMi_CallPostExitCallbackAndReset(BOOL reset);
+static BOOL PMi_TryLockForReset(void);
 
 // PMi_WaitBusy: waits for the answer of the request that is being sent, reading the ARM7's words itself where the
 // interrupt that would run the callback can't. The lock is polled through its address, which the callback clears
@@ -273,7 +272,7 @@ static void PMi_CommonCallback(PXIFifoTag tag, u32 data, BOOL err) {
     case PM_PXI_COMMAND_NOTIFY:
         switch (value) {
         case PM_PXI_NOTIFY_EXIT_1:
-            PMi_ProcessExitRequest(PM_EXIT_FACTOR_PWSW);
+            PMi_ProceedToExit(PM_EXIT_FACTOR_PWSW);
             *(vu32 *)HW_PM_EXIT_FLAG = 1;
             break;
         case 1:
@@ -286,7 +285,7 @@ static void PMi_CommonCallback(PXIFifoTag tag, u32 data, BOOL err) {
             }
             break;
         case PM_PXI_NOTIFY_EXIT_2:
-            PMi_ProcessExitRequest(PM_EXIT_FACTOR_BATTERY);
+            PMi_ProceedToExit(PM_EXIT_FACTOR_BATTERY);
             *(vu32 *)HW_PM_EXIT_FLAG = 1;
             break;
         }
@@ -300,7 +299,7 @@ static void PMi_CommonCallback(PXIFifoTag tag, u32 data, BOOL err) {
 
 // Sends the words of a request, if the ARM7 is not on another. PM_RESULT_BUSY if it is. The name is ours: NitroSDK's
 // PMi_SendPxiData is the one-word sender that this calls
-static u32 PMi_SendPxiRequest(const u32 *words, int length, u16 *result, PMCallback callback, void *arg) {
+static u32 PMi_TryToSendPxiData(const u32 *words, int length, u16 *result, PMCallback callback, void *arg) {
     OSIntrMode irq = OS_DisableInterrupts();
     int i;
 
@@ -320,13 +319,13 @@ static u32 PMi_SendPxiRequest(const u32 *words, int length, u16 *result, PMCallb
 }
 
 // Sends the words, retrying until the ARM7 accepts them and answers with success
-static void PMi_SendPxiDataSync(const u32 *words, int length) {
+static void PMi_TryToSendPxiDataTillSuccess(const u32 *words, int length) {
     // Set by the callback, from the interrupt
     vu32 result;
 
     for (;;) {
         result = PM_SYNC_PENDING;
-        while (PMi_SendPxiRequest(words, length, NULL, PMi_DummyCallback, (void *)&result) != PM_RESULT_SUCCESS) {
+        while (PMi_TryToSendPxiData(words, length, NULL, PMi_DummyCallback, (void *)&result) != PM_RESULT_SUCCESS) {
             OS_SpinWaitSysCycles(PM_RETRY_CYCLES);
         }
         while (result == PM_SYNC_PENDING) {
@@ -344,29 +343,29 @@ static u32 PMi_SendSleepStart(u16 trigger, u16 keyPattern) {
     u32 words[2];
 
     words[0] = SPI_PXI_START_BIT | SPI_PXI_END_BIT | PM_PXI_COMMAND(SPI_PXI_COMMAND_PM_SYNC);
-    PMi_SendPxiDataSync(words, 1);
+    PMi_TryToSendPxiDataTillSuccess(words, 1);
     while (PMi_SetLCDPower(FALSE, PM_LED_BLINK_LOW, FALSE, TRUE) != TRUE) {
     }
     words[0] = SPI_PXI_START_BIT | PM_PXI_COMMAND(PM_PXI_COMMAND_SLEEP_START) | (trigger & SPI_PXI_RESULT_DATA_MASK);
     words[1] = SPI_PXI_END_BIT | PM_PXI_INDEX(1) | (keyPattern & SPI_PXI_DATA_MASK);
-    PMi_SendPxiDataSync(words, 2);
+    PMi_TryToSendPxiDataTillSuccess(words, 2);
     return PM_RESULT_SUCCESS;
 }
 
 // Sends a request with a halfword of data. The ARM7's data goes to *result
-static u32 PMi_SendRequestAsync(u32 request, u32 data, u16 *result, PMCallback callback, void *arg) {
+static u32 PM_SendUtilityCommandAsync(u32 request, u32 data, u16 *result, PMCallback callback, void *arg) {
     u32 words[2];
 
     words[0] = SPI_PXI_START_BIT | PM_PXI_COMMAND(PM_PXI_COMMAND_REQUEST) | (request & SPI_PXI_RESULT_DATA_MASK);
     words[1] = SPI_PXI_END_BIT | PM_PXI_INDEX(1) | (data & SPI_PXI_DATA_MASK);
-    return PMi_SendPxiRequest(words, 2, result, callback, arg);
+    return PMi_TryToSendPxiData(words, 2, result, callback, arg);
 }
 
-// PMi_ReadRegister (pokeheartgold's name): sends a request with a halfword of data and waits for the answer. NitroSDK
-// 4.2's PMi_ReadRegister is another call
-u32 PMi_ReadRegister(u8 request, u16 data, u16 *result) {
+// PM_SendUtilityCommand (pokeheartgold's PMi_ReadRegister): sends a request with a halfword of data and waits for the
+// answer
+u32 PM_SendUtilityCommand(u8 request, u16 data, u16 *result) {
     u32 res;
-    u32 sent = PMi_SendRequestAsync(request, data, result, PMi_DummyCallback, &res);
+    u32 sent = PM_SendUtilityCommandAsync(request, data, result, PMi_DummyCallback, &res);
 
     if (sent == PM_RESULT_SUCCESS) {
         PMi_WaitBusy();
@@ -394,7 +393,7 @@ static u32 PMi_SetLEDAsync(u32 power, PMCallback callback, void *arg) {
         break;
     }
     if (request != 0) {
-        return PMi_SendRequestAsync(request, 0, NULL, callback, arg);
+        return PM_SendUtilityCommandAsync(request, 0, NULL, callback, arg);
     }
     return PM_INVALID_COMMAND;
 }
@@ -438,7 +437,7 @@ u32 PM_SetBackLightAsync(PMLCDTarget target, PMBackLightSwitch backlight, PMCall
         }
     }
     if (request != 0) {
-        return PMi_SendRequestAsync(request, 0, NULL, callback, arg);
+        return PM_SendUtilityCommandAsync(request, 0, NULL, callback, arg);
     }
     return PM_INVALID_COMMAND;
 }
@@ -461,7 +460,7 @@ static u32 PM_ForceToPowerOffAsync(PMCallback callback, void *arg) {
     if (OS_IsRunOnTwl()) {
         PMi_ExecuteList(PMi_PostExitCallbackList);
     }
-    return PMi_SendRequestAsync(PM_UTIL_FORCE_POWER_OFF, 0, NULL, callback, arg);
+    return PM_SendUtilityCommandAsync(PM_UTIL_FORCE_POWER_OFF, 0, NULL, callback, arg);
 }
 
 // Sends the power-off request and waits for it, polling for the answer in every state
@@ -500,24 +499,24 @@ u32 PM_SetAmp(PMAmpSwitch amp) {
 // NitroSDK's PMi_SetAmp: sets the amplifier, if the screens are on
 static u32 PMi_SetAmp(int amp) {
     if (PM_GetLCDPower()) {
-        return PMi_ReadRegister(PM_REQ_SET_AMP, amp, NULL);
+        return PM_SendUtilityCommand(PM_REQ_SET_AMP, amp, NULL);
     }
     return PM_RESULT_SUCCESS;
 }
 
 u32 PM_SetAmpGain(PMAmpGain gain) {
-    return PMi_ReadRegister(PM_REQ_SET_AMP_GAIN, gain, NULL);
+    return PM_SendUtilityCommand(PM_REQ_SET_AMP_GAIN, gain, NULL);
 }
 
 u32 PM_SetAmpGainLevel(u8 level) {
-    return PMi_ReadRegister(PM_REQ_SET_AMP_GAIN_LEVEL, level, NULL);
+    return PM_SendUtilityCommand(PM_REQ_SET_AMP_GAIN_LEVEL, level, NULL);
 }
 
 // PM_GetBattery
 u32 PM_GetBattery(PMBattery *battery) {
     u16 data;
     u32 state = PM_BATTERY_HIGH;
-    u32 result = PMi_ReadRegister(PM_REQ_READ_REGISTER, PM_REG_BATTERY, &data);
+    u32 result = PM_SendUtilityCommand(PM_REQ_READ_REGISTER, PM_REG_BATTERY, &data);
 
     if (result == PM_RESULT_SUCCESS && battery != NULL) {
         if (data != 0) {
@@ -539,7 +538,7 @@ u32 PM_GetBatteryLevel(u16 *level) {
 // NitroSDK's PM_GetBackLight
 u32 PM_GetBackLight(PMBackLightSwitch *top, PMBackLightSwitch *bottom) {
     u16 data;
-    u32 result = PMi_ReadRegister(PM_REQ_READ_REGISTER, PM_REG_BACKLIGHT, &data);
+    u32 result = PM_SendUtilityCommand(PM_REQ_READ_REGISTER, PM_REG_BACKLIGHT, &data);
 
     if (result == PM_RESULT_SUCCESS) {
         if (top != NULL) {
@@ -554,7 +553,7 @@ u32 PM_GetBackLight(PMBackLightSwitch *top, PMBackLightSwitch *bottom) {
 
 u32 PM_GetAmp(PMAmpSwitch *amp) {
     u16 data;
-    u32 result = PMi_ReadRegister(PM_REQ_READ_REGISTER, PM_REG_AMP, &data);
+    u32 result = PM_SendUtilityCommand(PM_REQ_READ_REGISTER, PM_REG_AMP, &data);
 
     if (result == PM_RESULT_SUCCESS) {
         if (amp != NULL) {
@@ -570,9 +569,9 @@ static void PMi_SendPxiData(u32 word) {
     }
 }
 
-// PMi_StopDma: keeps the DMA channels from running over the sleep, by waiting for those that finish and stopping those
-// that don't, and the new DMA channels of the DSi
-static void PMi_StopDma(void) {
+// PMi_PreSleepForDma: keeps the DMA channels from running over the sleep, by waiting for those that finish and stopping
+// those that don't, and the new DMA channels of the DSi
+static void PMi_PreSleepForDma(void) {
     u32 i;
 
     for (i = 0; i <= MI_DMA_MAX_NUM; i++) {
@@ -595,7 +594,7 @@ static void PMi_StopDma(void) {
             break;
         }
         if (OS_IsRunOnTwl()) {
-            PMi_StopNDma(i);
+            PMi_PreSleepForNdma(i);
         }
     }
 }
@@ -651,7 +650,7 @@ void PM_GoSleepMode(u32 trigger, u32 logic, u16 keyPattern) {
     reg_GXS_DB_DISPCNT &= ~REG_GXS_DB_DISPCNT_MODE_MASK;
     PMi_WaitVBlank();
     PMi_WaitVBlank();
-    PMi_StopDma();
+    PMi_PreSleepForDma();
     PMi_SleepEndFlag = FALSE;
     startTrigger = trigger | (top ? PM_TRIGGER_BACKLIGHT_TOP : 0) | (bottom ? PM_TRIGGER_BACKLIGHT_BOTTOM : 0);
     OS_SetIrqMask(OS_IE_FIFO_RECV);
@@ -754,12 +753,12 @@ static BOOL PM_GetLCDPower(void) {
 }
 
 u32 PMi_SendLEDPatternCommand(u32 value) {
-    return PMi_ReadRegister(PM_REQ_UNK_12, value, NULL);
+    return PM_SendUtilityCommand(PM_REQ_UNK_12, value, NULL);
 }
 
 u32 PM_GetLEDPattern(u32 *value) {
     u16 data;
-    u32 result = PMi_ReadRegister(PM_REQ_READ_REGISTER, PM_REG_UNK_8, &data);
+    u32 result = PM_SendUtilityCommand(PM_REQ_READ_REGISTER, PM_REG_UNK_8, &data);
 
     if (result == PM_RESULT_SUCCESS) {
         if (value != NULL) {
@@ -838,7 +837,7 @@ void PM_AppendPostSleepCallback(PMSleepCallbackInfo *info) {
     PMi_InsertList(&PMi_PostSleepCallbackList, info, PM_CALLBACK_PRIORITY_MAX, PM_INSERT_APPEND);
 }
 
-void PM_InsertPreSleepCallback(PMSleepCallbackInfo *info, int priority) {
+void PMi_InsertPreSleepCallbackEx(PMSleepCallbackInfo *info, int priority) {
     PMi_InsertList(&PMi_PreSleepCallbackList, info, priority, PM_INSERT_APPEND);
 }
 
@@ -881,7 +880,7 @@ void PMi_SetDispOffCount(void) {
 
 u32 PMi_GetBatteryLevelCore(u16 *level) {
     u16 value;
-    u32 result = PMi_ReadRegister(PM_REQ_READ_REGISTER, PM_REG_BATTERY_LEVEL, &value);
+    u32 result = PM_SendUtilityCommand(PM_REQ_READ_REGISTER, PM_REG_BATTERY_LEVEL, &value);
 
     if (result == 0 && level != NULL) {
         *level = value;
@@ -889,7 +888,7 @@ u32 PMi_GetBatteryLevelCore(u16 *level) {
     return result;
 }
 
-void PMi_StopNDma(u32 ndmaNo) {
+void PMi_PreSleepForNdma(u32 ndmaNo) {
     if (MI_NDMA_REG(ndmaNo, MI_NDMA_CNT) & MI_NDMA_IMM) {
         MI_WaitNDma(ndmaNo);
         return;
@@ -915,8 +914,8 @@ void PMi_StopNDma(u32 ndmaNo) {
     }
 }
 
-void PMi_ProcessExitRequest(PMExitFactor exitType) {
-    if (PMi_TryLockExit()) {
+void PMi_ProceedToExit(PMExitFactor exitType) {
+    if (PMi_TryLockForReset()) {
         PMi_ExitType = exitType;
         PMi_ExecuteList(PMi_PreExitCallbackList);
         if (PMi_AutoExitFlag) {
@@ -926,11 +925,11 @@ void PMi_ProcessExitRequest(PMExitFactor exitType) {
 }
 
 void PM_ReadyToExit(void) {
-    PMi_ExecuteExit(TRUE);
+    PMi_CallPostExitCallbackAndReset(TRUE);
 }
 
 // Tells the ARM7 that the ARM9 is about to stop
-static void PMi_SyncExitWithOtherProc(void) {
+static void PMi_FinalizeDebugger(void) {
     PM_EXIT_SYNC_DONE = FALSE;
     OSi_SyncWithOtherProc(0, PM_EXIT_SYNC_WORK);
     OSi_SyncWithOtherProc(1, PM_EXIT_SYNC_WORK);
@@ -946,7 +945,7 @@ void PM_AppendPreExitCallback(PMExitCallbackInfo *info) {
     PMi_InsertList(&PMi_PreExitCallbackList, info, PM_CALLBACK_PRIORITY_MAX, PM_INSERT_APPEND);
 }
 
-void PM_InsertPostExitCallback(PMExitCallbackInfo *info, int priority) {
+void PMi_InsertPostExitCallbackEx(PMExitCallbackInfo *info, int priority) {
     PMi_InsertList(&PMi_PostExitCallbackList, info, priority, PM_INSERT_APPEND);
 }
 
@@ -968,7 +967,7 @@ BOOL PM_GetAutoExit(void) {
 
 // Runs the post-exit callbacks, turns the displays off, waits for three vertical blanks, has the ARM7 restart or shut
 // the system down until it answers, and stops the program
-static void PMi_ExecuteExit(BOOL reset) {
+static void PMi_CallPostExitCallbackAndReset(BOOL reset) {
     int i;
     u16 result;
 
@@ -994,7 +993,7 @@ static void PMi_ExecuteExit(BOOL reset) {
             request = PM_REQ_RESET;
             PM_RESET_PARAM = 0;
         }
-        while (PMi_ReadRegister(request, 0, &result) != 0) {
+        while (PM_SendUtilityCommand(request, 0, &result) != 0) {
             OS_SpinWaitSysCycles(PM_RETRY_CYCLES);
         }
         if (result == 0) {
@@ -1006,18 +1005,18 @@ static void PMi_ExecuteExit(BOOL reset) {
     OS_DisableInterrupts();
     MI_StopAllDma();
     MI_StopAllNDma();
-    PMi_SyncExitWithOtherProc();
+    PMi_FinalizeDebugger();
     OSi_TerminateCore();
 }
 
-static BOOL PMi_TryLockExit(void) {
+static BOOL PMi_TryLockForReset(void) {
     OSIntrMode enabled = OS_DisableInterrupts();
 
-    if (PMi_ExitLocked) {
+    if (PMi_ResetLocked) {
         OS_RestoreInterrupts(enabled);
         return FALSE;
     }
-    PMi_ExitLocked = TRUE;
+    PMi_ResetLocked = TRUE;
     OS_RestoreInterrupts(enabled);
     return TRUE;
 }
