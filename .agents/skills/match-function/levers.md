@@ -7,6 +7,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 ## Registers swapped
 
+- A constant kept in a saved register in one version and rebuilt at each use (`movs`) in the other, with a second constant doing the opposite: the allocator's spill-cost tie between them. Reorder the field stores between calls so a store through a large-offset address temporary ends a stretch that already holds the other stores, which costs that constant one reload less. (matching.md: "Which constant keeps a saved register")
+- A constant passed as a copy of a register that holds it (`adds r1, r7, #0`) from some statement on, where ours builds it (`movs r1, #1`): a basic-block cut before that statement (more than 100 PCode instructions since the last cut, kept only after a statement that ends in a discarded call's result). Change the instruction count before the run, or the call that ends the statement before it. (matching.md: "starts a new basic block before a statement")
 - Rebuilt hash-context offsets across a digest phase: borrow a typed context pointer for all its operations.
   (matching.md: "one typed context pointer for a digest phase")
 - Adjacent scratch partitions in different saved registers: derive each typed region from its predecessor.
@@ -152,6 +154,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
   (matching.md: "array index that is a sum")
 - The operands of `*` are loaded in source order. A product assigned to its own variable gets a new register.
   (matching.md: "operands of `*`"), (matching.md: "A product assigned")
+- An `adds` emitted destination first (`adds x, x, y`) where the original has it second: the source's `x = y + x`
+  is rewritten to `x += y`; the original summed into a variable of its own that wasn't forward-substituted.
+  (matching.md: "An add whose destination is one of its operands")
 - A three-term `|` chain with its loads swapped: swap its first two terms. (matching.md: "three-term `|` chain")
 - Where a flag is first set decides which register builds its zero. The register a shared zero gets follows statement
   order, and stores of 0 before a loop take the zero of the variable its initializer sets first, as in
@@ -345,6 +350,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
   despite word-sized spill accesses. (matching.md: "source-availability mask in the parameter")
 
 ## Instructions in another order (scheduling)
+
+- A table index computed after a spill where the original computes it before: the table may be a function-local
+  `static` in an inline getter. (matching.md: "holds it as a function-local `static`")
 
 - Packet sequence stores in another order: snapshot the current sequence across the global increment.
   (matching.md: "snapshots the current `u16` sequence")
@@ -547,6 +555,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
   store, `d->a = s[0] & 0xf;`. (matching.md: "A mask written before a bit-field store")
 - A constant narrowed at a call after `movs` (`movs r3, #0x11; lsls; asrs`): an enum-typed local set at the top of
   the function, before the calls. (matching.md: "A constant narrowed at a call")
+- A constant offset of a pointer argument built after a call where ours builds it later, or with the sum's
+  registers swapped: an enum-typed local for the offset, assigned where the original builds it. (matching.md:
+  "A constant offset added to a pointer in a call's argument")
 - A table field's offset folded into a second literal (`ldr r1, =table+4`) where the original adds the element
   offset to the base after a plain read: read that field through an inline taking an `int` index.
   (matching.md: "Two fields of one element of a static table")
@@ -1001,8 +1012,16 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - Odd instructions at the end of a same-size diff (`add sp, #0`, `.byte 0xff`): literal pool words, which can be a
   wrong constant; decode them before blaming registers. (matching.md: "decode the words before counting")
 - Live `.data` statics separated by unused records: one initialized array retains every entry even when code indexes
-  only some of them, preserving the original element offsets; `wipe_sub.c`'s line patterns match at 0, 0x10, 0x20
-  and 0x28 this way. (matching.md: "One initialized array retains entries")
+  only some of them, preserving the original element offsets, but first check whether the records are the statics of
+  dead-stripped functions, as `wipe_sub.c`'s were (next entry). (matching.md: "One initialized array retains
+  entries")
+- Pooled `.data` or `.rodata` objects that nothing in the ROM reads, among a file's live statics, when the file's
+  library is known from another decomp: the function-local statics of functions the original link dead-stripped.
+  Ask before going further: writing those functions back, global so that MWCC emits them and flagged in the
+  file as unverifiable reconstructions, and listing them in `config/deadstrip.toml`, which strips their code and keeps
+  their statics, is an exception to "Write C from the asm", made for `wipe_sub.c`'s 31 handlers (with the two
+  `wipe_wnd.c` readers they call) alone; any other file is another exception for the maintainer to accept. Making the objects globals instead isn't kept.
+  (matching.md: "A function-local static of a function MWCC doesn't emit"; configs.md: "Dead-stripped code")
 - String literals in another order: MWCC lays them out in the order they first appear in the source; a `""` the
   game has before the file's name needs an earlier use. (matching.md: "String literals")
 - A literal laid out before every surviving use of it: code the original link dead-stripped. Each code literal has a
@@ -1014,7 +1033,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - Static data is sorted by size by a heapsort. Objects of 64 bytes or more, local initializers and unreferenced
   globals get their own sections. Predict with `tools/decomp/rodata_order.py`; the object list must be complete, so
   `--from-object FILE.o` lists every object a compile made and `--check FILE.o` fails when the prediction and the
-  compiler disagree. A "no order works" verdict means nothing until `--check` passes. (matching.md: "Static data is sorted by size")
+  compiler disagree (for a file in `config/deadstrip.toml`, both read the unstripped object in place of the build's).
+  A "no order works" verdict means nothing until `--check` passes. (matching.md: "Static data is sorted by size")
 - On NitroSystem's `2.0/sp2`, initialized globals are ordered by size, smallest first, and objects of one size in the
   reverse of their declaration order (G3D's `anm.c`, `cgtool.c`). (matching.md: "gives each initialized global")
 - Stores at offsets from a static's own address (`ldr r1, =obj; str r3, [r1]`) where ours goes through the section's

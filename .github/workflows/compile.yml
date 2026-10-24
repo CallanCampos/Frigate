@@ -1,7 +1,8 @@
 name: Compile
 
-# Compiles every C file for both versions. Matching needs the base ROMs, which CI doesn't have, so `ninja` with your
-# own dumps remains the check that a change matches.
+# Compiles every C file for both versions, and runs the build's dead-strip on the files config/deadstrip.toml lists.
+# Matching needs the base ROMs, which CI doesn't have, so `ninja` with your own dumps remains the check that a change
+# matches.
 on:
   push:
     branches: [main]
@@ -30,6 +31,9 @@ jobs:
             tools/objdiff-cli
             tools/mwccarm
           key: tools-${{ hashFiles('configure.py', 'lib/*/library.toml') }}
+
+      - name: Dead-strip tests
+        run: python -m unittest tools.build.test_deadstrip
 
       - name: Compile
         run: python tools/decomp/compile_all.py

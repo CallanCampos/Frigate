@@ -8755,7 +8755,7 @@ NNS_GfdDefaultFuncFreePlttVram kind:data(any) addr:0x0209b1f4
 tex4x4SearchArray_ kind:data(any) addr:0x0209b1f8
 texNrmSearchArray_ kind:data(any) addr:0x0209b200
 vramRegions_ kind:data(any) addr:0x0209b214
-loadFunctions_ kind:data(any) addr:0x0209b28c
+funcTbl kind:data(any) addr:0x0209b28c
 data_0209b258 kind:data(any) addr:0x0209b298
 firstSRTransformedMtxIdx_ kind:data(any) addr:0x0209b2a0
 mtxI_ kind:data(any) addr:0x0209b2a8

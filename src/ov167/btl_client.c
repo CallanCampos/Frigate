@@ -340,12 +340,22 @@ typedef struct {
     u16 skipCount;
 } BtlClientRecPlayer;
 
+// The kinds of points in a Pokestar Studios movie's score, which index its points and counts: how close the battle's
+// turn count came to the movie's, the lead Pokemon's fame, the script entries reached and the player's choices
+enum {
+    STUDIO_SCORE_TURN,
+    STUDIO_SCORE_FAME,
+    STUDIO_SCORE_SCENE,
+    STUDIO_SCORE_CHOICE,
+    STUDIO_SCORE_MAX,
+};
+
 // A Pokestar Studios movie's score
 typedef struct {
-    s16 points[4];
+    s16 points[STUDIO_SCORE_MAX];
     s16 unk08;
     s16 unk0A;
-    u8 counts[4];
+    u8 counts[STUDIO_SCORE_MAX];
     u32 unk10;
     // Clamped to +-9999
     s32 total;
@@ -7121,10 +7131,10 @@ static void Studio_AudienceLeave(BtlvCore *core, BtlClientStudioWork *studio, u1
 }
 
 static void Studio_ReactToScenePoints(BtlvCore *core, BtlClientStudioWork *studio) {
-    if (studio->score.points[2] < 0) {
+    if (studio->score.points[STUDIO_SCORE_SCENE] < 0) {
         Studio_AudienceLeave(core, studio, studio->unk58);
         Studio_ReactAudience(core, studio, 5);
-    } else if (studio->score.points[2] > 60) {
+    } else if (studio->score.points[STUDIO_SCORE_SCENE] > 60) {
         Studio_ReactAudience(core, studio, 7);
     }
 }
@@ -7142,16 +7152,16 @@ static void Studio_AddFamePoints(BtlClient *client, BtlClientStudioWork *studio,
 
     PokeParty_GetParam(pkm, PKM_PARAM_SPECIES, NULL);
     fame = PML_GetPokestarFameLevel(PokeParty_GetParam(pkm, PKM_PARAM_POKESTAR_FAME, NULL));
-    studio->score.points[1] += sFameBonus[fame];
-    studio->score.counts[1]++;
+    studio->score.points[STUDIO_SCORE_FAME] += sFameBonus[fame];
+    studio->score.counts[STUDIO_SCORE_FAME]++;
     Studio_ReactToFame(client->viewCore, &client->studio, fame);
 }
 
 static void StudioScore_AddScenePoints(BtlClient *client, BtlClientStudioScore *score, s32 scene) {
     BtlScriptedRules *rules = GetStudioRules(client->mainModule);
 
-    score->counts[2] = scene;
-    score->points[2] += rules->scenes[scene].unk0A;
+    score->counts[STUDIO_SCORE_SCENE] = scene;
+    score->points[STUDIO_SCORE_SCENE] += rules->scenes[scene].unk0A;
 }
 
 static void StudioScore_SetTurnPoints(BtlClient *client, BtlClientStudioScore *score) {
@@ -7161,8 +7171,8 @@ static void StudioScore_SetTurnPoints(BtlClient *client, BtlClientStudioScore *s
     if (points < 0) {
         points = 0;
     }
-    score->points[0] = points;
-    score->counts[0] = client->turnCount;
+    score->points[STUDIO_SCORE_TURN] = points;
+    score->counts[STUDIO_SCORE_TURN] = client->turnCount;
 }
 
 static void StudioScore_AddChoicePoints(BtlClient *client, BtlClientStudioScore *score, s32 scene, u32 index) {
@@ -7173,8 +7183,8 @@ static void StudioScore_AddChoicePoints(BtlClient *client, BtlClientStudioScore 
     int points = rules->scenes[scene].choices[index].points;
     u32 reaction;
 
-    score->points[3] += points;
-    score->counts[3]++;
+    score->points[STUDIO_SCORE_CHOICE] += points;
+    score->counts[STUDIO_SCORE_CHOICE]++;
     if (points > 0) {
         reaction = sReactions[rules->scenes[scene].unk08][0];
         Studio_SetLastChoiceResult(client, 1);
@@ -7194,9 +7204,10 @@ static s32 StudioScore_CalcTotal(BtlClient *client, BtlClientStudioScore *score)
     s32 total;
     s32 sum;
 
-    sum = score->points[1] + score->points[0];
-    sum += score->points[2];
-    sum += score->points[3];
+    sum = score->points[STUDIO_SCORE_FAME];
+    sum = score->points[STUDIO_SCORE_TURN] + (s32)sum;
+    sum = score->points[STUDIO_SCORE_SCENE] + (s32)sum;
+    sum = score->points[STUDIO_SCORE_CHOICE] + (s32)sum;
     if (sum == 0) {
         sum = 1;
     }

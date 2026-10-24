@@ -317,6 +317,15 @@ Same instructions, registers swapped.
   its sign fix in Power Split and Guard Split, while its own code is the same as with `u32`.
 - The operands of `*` are loaded in source order, so a multiply whose registers are swapped has its operands swapped
   in the source.
+- An add whose destination is one of its operands, `x = y + x`, is rewritten by the `opt_arithtransformation` pass
+  to `x += y` and emitted destination first (`adds x, x, y`). A sum the original emits with the destination second
+  (`adds r2, r1, r2`) went to a variable of its own, and a single-use definition is forward-substituted into its use
+  (hoisting its loads) unless the variable has a second use, is assigned again in the same block, has a store or
+  call before its use, is used in another block, or carries a conversion node: a written cast or a conversion to
+  or from an enum. Same-size `int`, `long` and `unsigned` conversions leave none. `btl_client.c`'s
+  `StudioScore_CalcTotal` adds its four score kinds this way, and matches only as `sum = points[FAME];` then
+  `sum = points[k] + (s32)sum;` for the other three (a no-op cast, flagged in its pull request); the file under
+  `-flag no-opt_arithtransformation` or `no-opt_dead_assignments` matches it but breaks 6 or 11 other functions.
 - The terms of a three-term `|` chain are not loaded in source order: `a | b | c` loads `c`, then `a`, then `b`.
   `btl_server_cmd.c`'s command encoder loads `args[2]`, `args[1]`, `args[0]` for each packed argument, which
   `((args[1] & 0x1f) << 5) | ((args[0] & 0x1f) << 10) | (args[2] & 0x1f)` gives, while its four- and five-term chains
@@ -776,6 +785,23 @@ Same instructions, registers swapped.
   dead: `dwc_aoss.c`'s `make_crc_table(int i, u32 *table)` with `for (i = 0; ...)` swaps its two counters' registers
   (`r2`/`r0`) under MWCC 2.0, and matches with the caller's argument as a parameter it doesn't read (`int ready`) and
   `u32 value; int i; int bit;` declared in that order.
+- Instruction selection starts a new basic block before a statement once the current block holds more than 100 PCode
+  instructions, counting every temporary, call argument and dead store (mwccarm 1.1p1's check at file offset 0x50dcd0,
+  the threshold byte at 0x50dd11). At -O2 and up block merging folds each cut back into the block before it, unless that
+  block ends with a call whose value is discarded. Value numbering shares a constant across an unmerged cut, but the
+  peephole that turns a copy of a register holding a small constant back into `movs rd, #imm` works within one block, so
+  uses behind the cut stay `adds rd, rm, #0`, and padding before a run of calls moves where such copies start.
+  `CtvtTalk_Enter` (overlay 257) passes its 1 as copies of r7 from the talk button on because the original has a cut
+  after the voice icon's `ClActor_SetVisible`, which an out-parameter actor helper (`*actor = ClActor_Create(...)`, as
+  in `ctvt_call.c`) gives where a helper returning the actor does not: one PCode instruction less per actor.
+- Which constant keeps a saved register can turn on the order of field stores between calls. Simplify (mwccarm 1.1p1
+  file offset 0x526630) spills the node with the lowest cost over degree, a tie going to the higher-numbered node, and
+  the spill cost (0x5b0420) counts copies against a constant and one reload per stretch of uses that a call, or a store
+  through a large-offset address temporary (`adds rT, r4, #0xac; str rV, [rT]`), ends. With the out-parameter helper,
+  `CtvtTalk_Enter` still spilled the 1 and built it at each use (14 bytes longer) until the work's first stores were
+  written in struct order: `voiceIconState` (at 0xac) stored after `state` and `waitSound` ends a stretch that already
+  holds them, the shared 0 costs one reload less and ties with the 1, and the 0 is spilled and rebuilt as `movs` in each
+  group, as in the original.
 
 ## Stack slots
 
@@ -1224,6 +1250,13 @@ Same code, other `sp` offsets or frame size.
   is still stored and reloaded as a word, so those instructions alone do not establish its source width.
 
 ## Instruction order
+
+- A table read through an inline getter that holds it as a function-local `static` is scheduled differently
+  from the same table at file scope, with the same data. NitroSystem's `NNS_G2dApplyOamManagerToHW`
+  (`g2d_OAM.c`) shifts the type's table index (`lsls r1, r1, #2`) before it spills the count (`str r2, [sp,
+  #8]`) only with the load functions as `GetOBJLoadFunction_`'s `static funcTbl`, as NitroSystem has them; at
+  file scope, or with the getter returning a file-scope table, the store comes first. With `u16` bounds its affine
+  loop matches over `GXOamAffine` records, not over groups of four `GXOamAttr`.
 
 - NitroWiFi's `send_ping` snapshots the current `u16` sequence after initializing the ICMP header. The socket port
   receives that value, the global advances, and the packet receives the saved value. Chained postincrement changes
@@ -2145,6 +2178,12 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `ZukanDetailForm_PrintEntry` declares `EntryLine colorY = ENTRY_LINE_BOTTOM;` (17) and passes it to the color's
   print; set in the color's block, the 17 is built before `x`'s arithmetic (9 bytes), and an `int` or a field
   folds the narrowing away.
+  A constant offset added to a pointer in a call's argument is an enum local in the same way, assigned where the
+  original builds it: `ctvt_talk.c`'s `CtvtTalk_UpdateRecord` builds the wave's skipped 0x800 (`movs r2, #2;
+  lsls r2, #0xa`) after the recorded size's call and before the stack argument's store only with
+  `CtvtTalkVoiceSize skipped = VOICE_CHUNK_SIZE;` after the size, and `CtvtTalk_Main` gives `packet + skipped` the
+  original's registers (the offset in r2, the pointer in r3) with the same local, where a literal or any integer
+  local is folded into the sum.
   An enum-typed index local stays a variable of its own too, which decides which register the copy for a multiply
   gets: overlay 209's `MusPokeDraw_CellCallback` keeps `kind - 7` in `r4` and multiplies a copy in `r1`, as the
   original does, only with `MusPokeDrawEquipNo pos = kind - MUS_POKE_DRAW_CELL_EQUIP;` and `poke->equips[pos]`
@@ -3731,12 +3770,23 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `dwcutil_ac.c`'s key of the first exchange, a 16-byte struct of two MAC addresses and a tag, came out ahead of the
   file's other buffers, where the ROM has it among them by size, until it was a `u8[0x10]`.
 - A function-local static of a function MWCC doesn't emit is dropped, while a global read only by an unemitted
-  static function stays in the shared section. Data that outlived code the original link dead-stripped can't be
-  reproduced under `-nodead`: wipe_sub.c's `.data` and `.rodata` hold the parameters of about 31 handlers the ROM
-  doesn't have, as their own function-local statics, which an unemitted handler takes with it. Made globals read by
-  one unemitted function, in a declaration order found from the size sort, about 47 of them reproduce both sections
-  byte for byte in both versions (the live handlers' line patterns as function-local statics); that isn't kept, as
-  it names data Game Freak kept local and invents a reader for it.
+  static function stays in the shared section. So the C alone can't reproduce, under `-nodead`, data that outlived
+  code the original link dead-stripped: wipe_sub.c's `.data` and `.rodata` hold the function-local statics of 31
+  handlers the ROM doesn't have, which an unemitted static handler takes with it. Made globals read by one unemitted
+  function, in a declaration order found from the size sort, they reproduce both sections too, but that names data
+  Game Freak kept local and invents a reader for it, so it isn't kept. The file is complete instead through the
+  build's dead-strip step (docs/configs.md, "Dead-stripped code"), as a flagged exception to "Write C from the asm"
+  made for this file alone, with the two `wipe_wnd.c` window readers its swap calls (another file would be another
+  exception for the maintainer): the 31 handlers are
+  written back as global functions, so that MWCC emits them, with the engines only they call, from pret's
+  pokeplatinum (`src/screen_fade_funcs.c`, types 8 to 15, 18 to 37, 40 and 41) and pokeheartgold's asm (the 43rd,
+  `FadeFunc_42`), and `config/deadstrip.toml` lists them, so `tools/build/deadstrip.py` drops their code while their
+  statics stay pooled with the live handlers'. One size-sorted list across both sections, in the library's handler
+  order, each line handler declaring its ranges and then its pattern, gives both sections byte for byte in both
+  versions, and leaving out any handler breaks them. Types 32 to 35 each copy an 8-byte local initializer, which the
+  sort lists while it gets a section of its own, so the strip removes it, as the original link did: HGSS, which kept
+  those handlers, has the four templates in its `.rodata` and otherwise the same bytes. None of the written-back code
+  can be checked against the ROM, and the file's flag comment says so.
 - Tables that only code the linker dropped read can be kept in the shared section as globals read by unemitted
   static functions. `mbp.c` (overlay 181) keeps NitroSDK's demo tables of state and callback names this way, after
   its heap ID and before their strings: a `static` table read only by an unemitted function is dropped with it, and a
@@ -3822,7 +3872,8 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   the prediction silently wrong: `btlv_input.c`'s layout was called unreachable until the list also counted every
   function-local initializer (down to an 8-byte `ClActorSetup` local) and the tables referenced only by other tables;
   with those in the list a top-of-file permutation matches. `rodata_order.py --from-object FILE.o` lists every data
-  object a compile produced so none is dropped, and `rodata_order.py ... --check FILE.o` fails loudly when the model
+  object a compile produced so none is dropped (for a file in `config/deadstrip.toml`, from the unstripped object,
+  which it takes in place of the build's), and `rodata_order.py ... --check FILE.o` fails loudly when the model
   and the compiler disagree; run the check against a real compile before trusting any verdict.
 - Function-local initializers of one size tie in the sort too, and `--check` doesn't compare their order. Their own
   declaration order also sets their function's stack slots, so the tie is fixed by moving other declarations:
@@ -3903,12 +3954,14 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   of equal length that each end in a `TOUCH_RECT_END` entry, with other tables pointing into the rows. Once the sizes
   are right, any order of the objects of one size can be reached; keep the natural order elsewhere and let
   `rodata_order.py` solve for the same-size groups.
-- One initialized array retains entries that no code indexes, where MWCC drops separate unreferenced statics. If
-  live `.data` objects have gaps filled by unused records, indexing a shared array preserves the ROM's offsets:
-  `wipe_sub.c`'s seven `WipeLinePattern` entries put its four used patterns at 0, 0x10, 0x20 and 0x28, matching all
-  four line-wipe functions in both versions without pointer casts. The sections' full layout needs the patterns
-  apart, though: ten 8-byte patterns as one array make an 80-byte object, which gets a section of its own after the
-  file's 24-byte objects, where the ROM has them first.
+- One initialized array retains entries that no code indexes, where MWCC drops separate unreferenced statics, so
+  indexing a shared array keeps live `.data` objects at the ROM's offsets across gaps of unused records. Look for
+  where the gaps come from first: `wipe_sub.c`'s seven-entry `WipeLinePattern` table put its four used patterns at 0,
+  0x10, 0x20 and 0x28 and matched all four line-wipe functions, but the sections' full layout needed the patterns
+  apart (ten 8-byte patterns as one array make an 80-byte object, which gets a section of its own after the file's
+  24-byte objects, where the ROM has them first). Each was a function-local static of its handler, and the unused
+  ones belonged to handlers the original link dead-stripped ("A function-local static of a function MWCC doesn't
+  emit", above).
 - The linker starts each `.rodata` section on a 4-byte boundary, whatever the section's own alignment, so a 6-byte
   `u16` table followed by a `u8` initializer leaves 2 bytes of padding between them, as at the start of
   `btl_server_flow.c`'s `.rodata`. `scrcmd_ochiba.c`'s 150-byte and 342-byte tables, both 2-aligned, end where only
@@ -3959,10 +4012,11 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   section comes before small initializers; check the object's section order, not only its symbol table.
 - A global nothing refers to that the ROM has after the shared section, where ours sorts it first, needs an object
   of its size or less in the shared section that the sort puts first, and the globals' declaration order decides
-  that tie: overlay 280's `namein.c` puts `NAME_ENTRY_SOUND_COUNT` where the ROM has it only declared right after
-  the array it counts, above the tables. When the function-local statics are all one size and every table is at
-  file scope, though, the layout fixes only their order in MWCC's list, not which functions own them: a fit with
-  placeholder statics proves nothing without the code using the values.
+  that tie: overlay 280's `namein.c` declares `NAME_ENTRY_SOUND_COUNT` after the other exports, below the tables,
+  and its eight leading words are `const` locals of the functions that use them: `NameBox_Update`'s left and top
+  edge of the name, `Keyboard_Init`'s first key of the cursor, and `Keyboard_UpdateSlide`'s frame count and three
+  BGs. When the function-local statics are all one size, though, the layout fixes only their order in MWCC's list,
+  not which functions own them: a fit with placeholder statics proves nothing without the code using the values.
 - A small table that sits among a file's other small `static const` tables but that no code loads from was a
   referenced static whose reads were folded: an unreferenced `static const` is dropped, and a global gets a section
   of its own after the packed one. `pleasure_boat_rooms.c`'s `sTrainerCounts` holds the weekday `switch`'s seven
@@ -4127,7 +4181,7 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   (each group: the function's statics in declaration order, then the file-scope scalars it first uses, in use
   order). Arrays and structs, a function-local `static const` array included, are listed where they are defined,
   and so is a function-local `static` that isn't `const`: overlay 280's `sKeyBlinkStep` (`.data`), moved into
-  `KeyHighlight_Update`, gives the same `.rodata` as at file scope, with the `const` scalars in a later function.
+  `KeyHighlight_Update`, gives the same `.rodata` as at file scope.
   Overlay 208's `dup_fitting.c` gets the ROM's `.rodata` with its three `BOOL`s passed by address as function-local
   `static const BOOL` and its `{227, 128}` as two `static const u16` scalars of the functions that compare with them;
   as one array no order of its 13 file-scope objects works. About 120 orders of those objects then fit, so the
