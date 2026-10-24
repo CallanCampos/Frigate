@@ -4,10 +4,7 @@ The reference the port is held against ([PLAN.md §6](../../docs/PLAN.md#6-verif
 ROM running on [melonDS](https://melonds.kuribo64.net)'s emulation core, headless and deterministic, with an input
 file, writing both screens and named memory at chosen frames, and the sound: the mixer's output sample by sample and
 the ARM7 sound driver's state after each run of its thread. `compare.py` compares the screens and memory with the
-port's, `sound.py` the sound ([Sound](#sound)). It also makes the saves the tests start from ([Saves](#saves)), and
-held the field menu's apps, which Frigate opened through its test launcher while the field had no C, to its own route
-through the field menu ([The launch checks](#the-launch-checks)); the field opens now, and those checks wait to be
-retired.
+port's, `sound.py` the sound ([Sound](#sound)). It also makes the saves the tests start from ([Saves](#saves)).
 
 It is a **test tool only**. It is never linked into or shipped with Frigate
 ([PLAN.md §1](../../docs/PLAN.md#1-goal-and-what-native-means)): it is a CMake project of its own, built only on
@@ -24,7 +21,7 @@ at build time, pinned to a release, and never committed.
 | `oracle.cpp`, `oracle.h`, `platform.cpp`, `symtab.*`, `pngout.*` | `pbw-oracle`, the program on melonDS's core: `oracle.cpp` its options and run, `oracle.h` what melonDS's Platform layer (`platform.cpp`) reports to it, `symtab.*` the decomp's symbols for its memory dumps, `pngout.*` the screens' PNG files |
 | `display3d.c`, `display3d.h` | which screens show 3D in a frame, from the display registers; plain C11 |
 | `pbwinput.c`, `pbwinput.h` | the input file reader and writer and the game-frame clock, plain C11, which the port can compile as it is |
-| `oracle.py` | runs the oracle and the port with the repository's defaults; makes the saves the tests start from on the oracle, each from the save before it ([Saves](#saves)); the comparison sequences, the sound's comparison and the launch checks of the field menu's apps through Frigate's test launcher ([The launch checks](#the-launch-checks)); the ctest check |
+| `oracle.py` | runs the oracle and the port with the repository's defaults; makes the saves the tests start from on the oracle, each from the save before it ([Saves](#saves)); the comparison sequences, the field menu's and its apps' among them, and the sound's comparison; the ctest check |
 | `compare.py` | compares two runs: screens, memory, alignment |
 | `sound.py` | compares two runs' sound: the sound driver's state run by run, what the ARM9 sees of it frame by frame, and the sound by segment ([Sound](#sound)) |
 | `sndtrace.h` | the sound trace's format, plain C11, which the port's sound driver (`port/hal/snd7/snd7.c`), its `--sound-trace` (`port/app/sound_trace.c`) and the sound driver's tests include |
@@ -221,6 +218,7 @@ pbwinput 1
 time 2012-10-07 12:00:00      # optional: the clock at power-on
 version b2_us                 # optional: b2_us or w2_us
 frames game                   # optional: game (the default) or video
+clock pinned                  # optional: running (the default) or pinned
 # FRAME BUTTONS [TOUCH]
 120 A                         # A held from frame 120
 122 -                         # nothing held from frame 122
@@ -231,9 +229,18 @@ frames game                   # optional: game (the default) or video
 ```
 
 - The first line that isn't blank or a comment is `pbwinput 1`, the format's version.
-- `time`, `version` and `frames` come before the first frame line, once each. `time` is `YYYY-MM-DD HH:MM:SS` from
-  2000 to 2099; the oracle's `--time` overrides it. `version` is checked against the ROM's game code (`IREO` for
-  `b2_us`, `IRDO` for `w2_us`).
+- `time`, `version`, `frames` and `clock` come before the first frame line, once each. `time` is
+  `YYYY-MM-DD HH:MM:SS` from 2000 to 2099; the oracle's `--time` overrides it. `version` is checked against the ROM's
+  game code (`IREO` for `b2_us`, `IRDO` for `w2_us`).
+- `clock` says whether the real-time clock runs on from `time`: **`running`**, the default, as a console's does, or
+  **`pinned`**, at `time` for the whole run. A running clock moves with each program's video frames, and the DS takes
+  more of them than the port to reach the same count (its movies, its loads), so a screen that shows the clock, such as
+  the field menu's bottom screen, shows another time on each at the same count: some 34 seconds apart once the field
+  has opened, which turns the colon on or off (it shows on odd seconds, `src/system/infowin.c`) and the minute over on
+  different frames. Pinned, both show the same time, so the comparison can hold that screen exact. The oracle stops
+  melonDS's clock chip timer, which counts the seconds on, and the port's clock stays at its fixed time
+  (`port/hal/rtc/rtc7.c`); the game never uses the chip's interrupts, which the timer also raises. Only the date and
+  time stop: the play time counts the CPU's ticks (`src/system/playtime_ctrl.c`), and goes on as before.
 - `frames` says what FRAME counts. **`game`**, the default, counts passes of the game's main loop, the only count that
   gives both programs the same input at the same moment of the game ([PLAN.md §6](../../docs/PLAN.md#6-verification)):
   the DS drops frames under load and its start-up takes 241 frames, and the port does neither. Game frame N is the pass
@@ -364,7 +371,7 @@ that bank in VRAM display mode (`bottom_3d` is 1; the top screen, engine B's log
 
 ## The comparison sequences
 
-Three input files on game frames for each version, `port/tests/oracle/<name>_<version>.pbwinput`, played by four
+Five input files on game frames for each version, `port/tests/oracle/<name>_<version>.pbwinput`, played by six
 sequences, compared with `--align counter`, the movies by their pictures (`oracle.py`'s `SEQUENCES` says how):
 
 - **opening**: nothing pressed. Power-on, the boot screens, the Game Freak logo and the whole opening, the title and
@@ -386,6 +393,20 @@ sequences, compared with `--align counter`, the movies by their pictures (`oracl
 - **continue_starter**: continue's input file from the starter save ([below](#saves)): the start menu's saved game has
   the Pokédex line (Pokédex: 1, time 0:04), and CONTINUE goes to the Aspertia City lookout, in both versions, each
   from its own starter save.
+- **field_menus**: continue's presses from the first save, then the field menu in the player's room, the real one,
+  on both programs: X at game frame 3900 slides it in on the bottom screen (BAG, the trainer card, SAVE and OPTIONS,
+  since the save has no Pokémon and no Pokédex yet), A on BAG opens the bag, its items pocket empty, B takes it back
+  to the menu, RIGHT and A open the trainer card, the pen on the card's return button (240,180) takes it back to
+  the menu, which shows without its cursor since the touch leaves the UI in its touch mode, and B closes the menu.
+  It is the only sequence that touches the screen. The port runs 5,200 frames, the oracle 7,400. Its file pins the
+  clock ([Input files](#input-files)): the menu's bottom screen shows it, and running it would show each program's
+  own time there.
+- **party_menus**: the same presses from the starter save at the lookout, whose menu has every item: the party list,
+  Tepig's menu, SUMMARY and its summary, back to the list and the menu; the Pokédex, its Unova list and Tepig's entry;
+  the trainer card with its Pokédex line; the bag. The port runs 8,500 frames, the oracle 11,100. The clock is pinned
+  as in field_menus. These two were Frigate's test launcher's routes while the field had no C
+  ([ADR 0012](../../docs/adr/0012-test-launcher-for-the-field-menus-apps.md)); every app screen they reach now comes
+  through the field menu on both programs.
 
 A sequence can also allow the port to stop on code with no C yet: from a port frame (`stop_from`), on the trap stub
 it names (`stop_trap`, a pattern of the trap's message), with why (`stop`). A stop on any other trap fails, so the
@@ -401,8 +422,8 @@ differed in 14,330 at the first frame, 1,823 at the fourth, and passed the toler
 start from a save, which leaves other bytes after the copyright screen's file on the port than on the DS
 ([below](#known-differences-from-the-hardware)), so they don't hold those frames close.
 
-Each is two ctest tests, but continue and continue_starter, whose saves only the oracle can make, have only the
-first:
+Each is two ctest tests, but the four that start from a save (continue, continue_starter, field_menus and
+party_menus), whose saves only the oracle can make, have only the first:
 
 - `oracle_<name>` (`oracle.py sequence NAME --port BIN`), with the oracle built: runs both programs and compares every
   port frame but the known differences ([below](#known-differences-from-the-hardware)): where the game counts passes,
@@ -433,6 +454,10 @@ Results, every port frame but the known differences:
 | continue, White 2 | 3,900 | 3,871 | 1,482 | 2,389 | the title's 28 port frames and 3402, oracle frames 1260, 4852 | not compared |
 | continue_starter, Black 2 | 3,900 | 3,879 | 1,479 | 2,400 | the title's 21 port frames, oracle frame 4920 | not compared |
 | continue_starter, White 2 | 3,900 | 3,871 | 1,481 | 2,390 | the title's 28 port frames and 3402, oracle frames 1260, 4852 | not compared |
+| field_menus, Black 2 | 5,200 | 5,179 | 2,169 | 3,010 | the title's 21 port frames, oracle frame 4920 | not compared |
+| field_menus, White 2 | 5,200 | 5,171 | 2,171 | 3,000 | the title's 28 port frames and 3402, oracle frames 1260, 4852 | not compared |
+| party_menus, Black 2 | 8,500 | 8,190 | 4,250 | 3,940 | the title's 21 port frames, the summary's 289 (4534-4822), oracle frame 4920 | not compared |
+| party_menus, White 2 | 8,500 | 8,182 | 4,252 | 3,930 | the title's 28 port frames and 3402, the summary's 289, oracle frames 1260, 4852 | not compared |
 
 A screen with 3D has 6 to 17 pixels beyond the pixel tolerance at the median, by sequence and version, and 80 at most
 of the 245 allowed, nearly all on polygon edges (their coverage and fill). Inside polygons the pixels match: they
@@ -441,9 +466,15 @@ X-major edge's run, which put whole spans' colours a step apart (before, a media
 is no known difference: its 464 frames in each continue sequence match, the black of its load, the season banner and
 the bottom screen exactly (170 frames, 169 from the starter save) and its 3D within the tolerance. The player's room
 has 25 pixels beyond the pixel tolerance in every frame, in both versions; the Aspertia City lookout has 141 to 143,
-the edges of its trees and of the hills on the horizon, more than any scene before it but within the 245. Neither
-shows a clock; the field menu's bottom screen does, and the house replay holds it to the oracle's
-([port/tests/replay](../../tests/replay/check_screens.py)).
+the edges of its trees and of the hills on the horizon, more than any scene before it but within the 245. With the
+field menu open the game darkens the field on the top screen, every channel to about 5/8 (a wall's 243, 231, 178 to
+154, 146, 113 on the oracle), which brings the two rasterizers' edge pixels closer together: the room's 25 become 18,
+all of them among the 25 (and 143 of its 183 differing pixels differ at all), and the lookout's 142 become 110 to 112,
+in both versions. These are the "18 pixels on the 3D edges behind the open menu" of the deep dive of 2026-10-23, whose
+28 frames that failed failed on the bottom screen's clock alone, the top passing. Every frame of the apps is exact on
+the count, but the summary's ([below](#known-differences-from-the-hardware)). The menu's bottom screen shows the
+clock; pinned, it shows 12:00 on both, so that screen is held exact. The house replay, whose clock runs, holds it to
+the oracle's within its frame ranges ([port/tests/replay](../../tests/replay/check_screens.py)).
 
 ## Saves
 
@@ -741,72 +772,6 @@ Each sequence is two ctest tests:
   every run's state, each record in the frame whose VBlank comes next, the statuses, the segments' envelopes and levels,
   and the samples to the bit (wherever the loudest point's hash is, within two frames). Skipped (77) without the ROM.
 
-## The launch checks
-
-Since the field opened (2026-10-23, [STATUS.md](../../docs/STATUS.md)), the launcher steps aside, as it was made to,
-and these checks fail on its notice: the plan of 2026-10-23 retires them next (its track A-2). This section describes
-them as they ran.
-
-The field menu's apps against melonDS while the port has no field ([ADR 0012](../../docs/adr/0012-test-launcher-for-the-field-menus-apps.md)):
-the oracle opens each app from the field menu, where the port's continued game stops on overlay 36's trap; the port
-opens the same apps with Frigate's test launcher (`--launch`, [port/app/launcher.c](../../app/launcher.c)) at the
-counts the oracle opens them. `oracle.py launch NAME --port BIN [--save-cache DIR]`, ctest `oracle_launch_<NAME>`,
-checks a route (`oracle.py`'s `LAUNCHES`):
-
-1. its save, from the cache or made on the oracle ([Saves](#saves));
-2. the oracle on `port/tests/oracle/launch_<name>_<version>.pbwinput`: every row of
-   `launch_<name>_<version>.screens.tsv`, the oracle's labelled screens (hashes only), is at its frame with its count
-   and its hashes;
-3. the port with the same save, the same input file and the route's `--launch`: every app row (`where` is `app`;
-   `field` rows are the field's and its menu's, the oracle's only) shows on the port at the row's count, screens
-   without 3D by their hashes at the DS's 6 bits, a screen with 3D within compare.py's tolerance from pictures of
-   those frames only; and at every count of each app's span, from its first frame to the black after it closes, every
-   picture the port shows is one the oracle shows at that count;
-4. the launcher's report of each app gives the event type declared (0: the oracle's menu shows again), and no notice
-   says the launcher stepped aside;
-5. the port leaves the save as it was.
-
-Both programs play the same presses; inside an app they reach both on the same pass, since the app opens at the same
-count. The presses for the field and its menu reach nothing on the port. **The counts** in `--launch` come from both
-programs: each is the app's first frame on the oracle (from its `frames.tsv`, the first picture after the field's fade
-to black) less the passes the port itself takes from opening the app to its first frame, measured on the port with
-`--launch APP` at once (2 for the bag and the party list, 4 for the trainer card and the Pokédex). So each launched
-app's first frame is aligned by construction: its picture is checked, its timing isn't. Every later pass is a check of
-both, and so is every app a launched app opens (the party list's summary, and the party list again after it). The slack
-is 0.
-
-**What the field leaves** before an app, measured on the oracle at the bag's first frame by two-pass dumps (the oracle
-is deterministic: `g_GameSystem` at `0x021410f4`, its `GameData` at `0x0223b330`, `gfl/ui.c`'s `sSystemUI` at
-`0x021ff920` in Black 2): the UI's touch flag (`SystemUI.usingTouch`, +0x3c) is 0, set by the menu's choice by a key
-after the menu set it to 1; the last subscreen (`GameData`, +0x1ca) is 1, the menu's, which the field's close records.
-The launcher sets both through the game's setters. Nothing else was needed: the apps' pictures are the oracle's.
-
-| Route | Save | `--launch` (Black 2) | App screens | Pass by pass |
-| --- | --- | --- | --- | --- |
-| `field_menus` | `first_save` | `bag@4044,card@4584` | 2 of 2 | 621 of 621 counts: the bag (4046-4323) and the card (4588-4930) |
-| `party_menus` | `starter_save` | `party@4044,pokedex@5473,card@6974,bag@7673` | 8 of 8, 1 left out | 2,639 of 2,639 counts: the party list, Tepig's menu and back (4046-5123 but the summary), the Pokédex, its Unova list and Tepig's entry (5477-6624), the card with its Pokédex line (6978-7330), the bag (7675-8023) |
-| `field_menus`, White 2 | `first_save` | `bag@4044,card@4584`, as in Black 2 | 2 of 2 | 621 of 621 counts, the same spans |
-| `party_menus`, White 2 | `starter_save` | `party@4044,pokedex@5473,card@6974,bag@7673`, as in Black 2 | 8 of 8, 1 left out | 2,639 of 2,639 counts, the same spans |
-
-The pass-by-pass totals count each launched app's first frame, whose count its `--launch` count aligns: for 2 of the
-621 in `field_menus` and 4 of the 2,639 in `party_menus`, the picture is checked but not when it shows.
-
-Left out of `party_menus`, with its reason in `LAUNCHES` (`SUMMARY_SCROLL`):
-
-- **The summary** (counts 4533-4821): it scrolls its background a pixel every 4 VBlanks since it started
-  (`PStatus_Main`, `src/ov207/p_sta_sys.c:263-271`), and the DS spends some 37 VBlanks more than passes loading it
-  (count 4530 alone takes 30 frames), so its background is about 9 pixels further on throughout; the rest of its
-  screens are the port's. A frame the DS drops where the game steps by VBlanks, as the title's camera
-  ([Known differences](#known-differences-from-the-hardware)).
-
-White 2 has both routes, measured again on its own oracle with Black 2's presses, each from White 2's own save: every
-app's first frame and the black after it are at Black 2's counts, and the port takes Black 2's passes to each app's
-first frame (`--launch APP@4044` on White 2's port: the party list's and the bag's at 4046, the Pokédex's and the card's
-at 4048), so the routes' `--launch` and spans are Black 2's. The bag's and the Pokédex's screens are Black 2's, the
-field's top screen too; the field menu's, the party list's, the summary's and the card's bottom screens are White 2's
-own, and so is the summary's top. White 2's summary is left out for the same reason: the DS spends 38 VBlanks more than
-passes loading it (30 frames on count 4530 alone, as in Black 2).
-
 ## Integration
 
 What the port needs to compare itself frame by frame:
@@ -819,8 +784,9 @@ What the port needs to compare itself frame by frame:
   `pbw_input_state(&input, pbw_input_frame_at_vblank(&input, &clock, frame, count))`, with `frame` the hook's count
   since `main()` and `count` GFL's frame count. The state goes in through `port_input_set` and the touch panel's host
   setter. The real-time clock at power-on is `--fixed-time`, else the file's `time` line, else the format's default
-  (2012-10-07 12:00:00), never the host's; `oracle.py port --input` passes `--fixed-time` only when it is given
-  `--time`, as `oracle.py run` does with the oracle.
+  (2012-10-07 12:00:00), never the host's, and it stays there for the run when the file's `clock` line pins it;
+  `oracle.py port --input` passes `--fixed-time` only when it is given `--time`, as `oracle.py run` does with the
+  oracle.
 - **Memory dumps** by name, written as `memory.txt` (done for globals: `--run-dump`, `oracle.py port --dump`). The
   game's statics have no name the program can look up; a static the comparisons need will need the port to export
   its address.
@@ -878,6 +844,13 @@ the screens; `known_oracle`, oracle frames no port frame can show; `known_state`
       --input port/tests/oracle/title_b2_us.pbwinput --dump NNS_G3dGlb:612@3090-3140
   compare.py memory o p --align counter --clock 313-1108 --lag 1109=0
   ```
+
+  The summary of party_menus is the same kind: it scrolls its background a pixel right and down every 4 VBlanks since
+  it started (`PStatus_Main` in `src/ov207/p_sta_sys.c`), and the DS spends 38 VBlanks more than passes loading it
+  (counts 4526 to 4531 in both versions, by each program's VBlank count in `frames.tsv`), where the port spends none.
+  So its background is about 9 pixels further on on the DS for as long as it shows, port frames 4534-4822 (counts
+  4533-4821) in both versions, while its text, Tepig and the rest of its screens are the port's (`SUMMARY_SCROLL`).
+  The party list before and after it, Tepig's menu and every other app of the sequence match frame for frame.
 
 - **Kyurem's cry starts later against the DS's passes (White 2).** The title waits for the cry it starts at START
   before it fades out (`STATE_WAIT_CRY`). The pass that starts it (count 3100) takes the DS two frames, loading the cry,

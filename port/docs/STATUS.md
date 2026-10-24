@@ -32,11 +32,269 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
 
+## 2026-10-24: the battle's run: SPL's particles drawn again, and Hugh's battle to its end with a local candidate
+
+- **Upstream:** `b62c655bfa` (upstream merge #481), as `main` has it; this branch merges no upstream commit. Upstream's
+  `main` is at `53767c5a2c` (its merge of #497, below), for the sync to propose on its own.
+- **Port:** `PORT_SHA`, on the topic branch `port-battle-run` from `main` at `1807efb68f` (PR 21's merge): the
+  particles' fix (`942e275903`), the review's round on it (`4f096d8eb4`), `main` merged twice, at `2e510abc6d`
+  (`c6868a5ec6`: PR 22, the field's pointer casts) and at `65eae1f0a2` (`70b1322063`: PR 23, the test launcher
+  retired), and the records commits, published together as one pull request to `main`.
+- **ROM:** T0 passes on the review's commit and on the head after each merge of `main`: Black 2
+  `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb` and White 2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a` (`python3
+  configure.py && ninja`, no compiler warnings). The first round ran it twice, the second time with the local candidates
+  below behind `PLATFORM_PC`, which MWCC never sees. The branch changes only `port/`.
+- **Host build:** T1 passes on macOS arm64, Apple clang 21, RelWithDebInfo with the oracle (`-DPORT_BUILD_ORACLE=ON`),
+  both versions (`build/port`, `build/port-w2`). clang-format (Homebrew 23.1.3) is clean on the three changed C files.
+- **Tests:** full ctest (`ctest -j4`, with the oracle, the cached oracle saves copied from the verify tree and the
+  clone's `build/port-venv` linked into the worktree) on the head with PR 23 merged: Black 2, 303 passed and 1 skipped
+  of 304; White 2, 300 passed and 1 skipped of 301; none failed. Skipped: `app_universal_slices` in both, which only a
+  distribution build has. The new `gx_parameter_read` (T2) passes in both, and so do `asm_oracle`, `game_ptrcasts` and
+  `game_ptrcasts_tool` (T1), every replay (T3, T6), every oracle test (T4) among them `oracle_continue_starter`,
+  `oracle_field_menus` and `oracle_party_menus`, and the timing gates. Before, on a load average of 40 to 66 on the
+  machine's 8 cores: on the review's commit, Black 2 304 passed, 7 failed and 1 skipped of 312, White 2 301, 7 and 1 of
+  309, and on the head with PR 22 merged 303 and 300 passed with 2 skips each, the failures the test launcher's seven,
+  which PR 23 retired, and the extra skips timing gates over the load (`frame_times_new_game` in Black 2,
+  `frame_times_title` in White 2), each of which then passed alone. `gx_parameter_read` holds the log: without the
+  review's change to `port_hw_g3_send` its sends fail two checks (`count == 1` and `count == 2`: the write before the
+  send taken back), and without the merge in `port_hw_g3_port` the scenario fails three (two log counts, and no polygon
+  from SPL's billboard; the review's run). The Route 19 route by hand (T3; `frigate-black2 --headless --frames N --input
+  port/tests/oracle/route19_save_b2_us.pbwinput --save-dir DIR` from the starter save, White 2 with the same input and
+  its version line changed, as on the battle path's entry), against pbw-oracle's runs of the same input, on the review's commit
+  with no candidate: both versions stop at frame 7,623 on `data_ov167_021d7490` (status 70), and on the head after each
+  merge of `main` with every frame's hashes the same. Compared on the game's count (`compare.py screens --align
+  counter`) at the pictured frames up to there: Black 2, 312 of 376 match; of the others, 58 differ only on the bottom
+  screen's clock (the DS lags, so at one count its clock is some 35 s later: a minute digit, then the colon's blink), 5
+  pair with an oracle frame that has no picture, which a 3D screen needs, and one (count 5,022) shows a text box
+  printing a few letters ahead; one oracle frame (count 7,590) has no port frame with its pictures. On the first round's
+  run without the fix, 8 more failed, now within the 3D tolerance: the VS cut-in's sparks (counts 6,451 to 6,471) and
+  the burst of Hugh's Poké Ball at the send-out (7,374 to 7,414). White 2, 275 of 370, the VS cut-in's frames among the
+  matches; its battle's opening runs a few frames apart from the DS's at one count from count 7,231 (below). Both
+  versions' failures up to frame 7,623 are the same frames as on the first round's runs with the candidates. The first
+  round's results with the local, uncommitted candidates, kept as a patch outside the repository, so not reproducible
+  from this tree: with the table's 16 bytes from the ROM (`{ 3, 5, 4, 6 }`, the same in both versions), the battle plays
+  to its end in both: Black 2's Tepig wins in three turns, "Tepig gained 94 Exp. Points!", "Tepig grew to Lv. 6!",
+  "Player defeated PKMN Trainer HughAAA!", "$500 for winning", the screen black from frame 9,804 and the field from
+  frame 9,871 (count 9,870), Hugh's words and his walk down the stairs as the oracle shows them from its frame 12,593
+  (count 10,318; its battle a turn longer, its black as long, 67 counts); White 2's in four turns, black from frame
+  10,012 and the field from 10,079. At 649 Black 2 frames of the battle, compared on the count: before the fix, 353
+  matched; with it, 362, the remaining failures the clock and, from count 7,704, the move's animations a frame or two
+  apart and then the battle itself, whose damage rolls differ by the random seed (`buildSeed`,
+  [decomp-findings.md](decomp-findings.md)): three turns on the port against the oracle's four. Every frame of the first
+  turn pictured on both, side by side, shows the Tackle's hit, its splash and its sparks in the same sequence. White 2's
+  648 frames: 277 match; pictured densely on both, every 20th port frame from count 7,229 to 7,689 has an oracle picture
+  0 to 25 frames away within 1.7% of its pixels (sampled, without the 3D tolerance), but for the throw's frames 7,305 to
+  7,310 and the idle camera's at 7,505 to 7,510 (4% to 9%), likely steps that the DS's two-frame passes skip. With the
+  encounter effects' four entries as a second candidate as well, both versions play all 28,600 frames to the SAVE beside
+  Route 19's grass (Route 19, Gym Badges 0, Pokédex 2, Time 0:10, as the oracle's), through the Pokémon Center, the gate
+  and Bianca's catching lesson with its wild Purrloin; the saves' SHA-1s (Black 2 `e149f49292…`, White 2 `61bd81319d…`)
+  are not the oracle's `826bc561a3…`, which the random seed and the clock alone could explain, not yet checked. Without
+  that second candidate Black 2 stops at frame 20,077, as the deep dive did, on GFL's overlay collision assert, whose
+  error screen spins until the watchdog ends the run (status 73). T5 and T7 not run.
+- **Tiers:** unchanged: the branch changes no game C (`port/tools/progress/progress.py` not run again).
+- **Trap stubs:** 30 function stubs and 22 data placeholders per version, unchanged, the same symbols in both. All 30
+  functions have C in the decomp, in the nine files the host build replaces or leaves out (`port/hal/replaced.txt`,
+  `port/hal/card/replaced.txt`), and so do two placeholders (`dwc_aoss_ap.c`'s `.bss`); 20 placeholders have no C:
+  `data_ov167_021d7490`, overlay 182's `gDWCUtilTouchScreenRect` (a `.rodata` gap between `dwc_util_text.c` and
+  `dwc_util_task.c`) and `download_play_wih.c`'s 17 strings and tables and its `gWork`. Only the battle table is on the
+  Route 19 route.
+- **64-bit warnings:** `check_ptrcasts: 422 sites in 269 keys (real 142, harmless 102, handled 141, unreachable 37),
+  1681 files, 0 not compiled` in both versions on the head with `main` merged, as on the last two entries (PRs 22 and
+  23); on the review's commit before the merges, 429 sites and 150 real, as on `main` before PR 22.
+- **Work done:** SPL's particles are drawn again. The host's register macros made each access to a geometry command
+  port a logged command (`port_hw_g3_port`), and SPL reads POLYGON_ATTR back after each particle's write
+  (`lib/spl/src/spl_draw.c`, eight sites, `(void)reg_G3_POLYGON_ATTR;`): on the DS a read of a command port does
+  nothing, here it sent the geometry engine a POLYGON_ATTR of 0, which draws neither face, so the polygons never reached
+  polygon RAM. `port/hal/hw/hw.c` now gives an access right after one to the same parameter port (POLYGON_ATTR,
+  TEXIMAGE_PARAM, PLTT_BASE, whose commands only store their value) that access's entry, which is exact for two writes
+  and makes the read harmless. The review's round: `port_hw_g3_send` took the log's last entry back as the slot its
+  caller's `&reg_G3_*` had logged, which a shared entry isn't, so a send of no words to a parameter port right after a
+  write to it would have dropped the write (no game code sends to those ports today); hw.c now records a shared entry
+  (`sG3LastShared`) and a send keeps it. [ADR 0004](adr/0004-ds-addresses-by-header-translation.md) gets a note on the
+  change to its "fresh slot" contract, and `port/hal/hw/hw.h` says it too. The test runs once, as `gx_parameter_read`
+  on the default backend, since it uses no VRAM bank, and holds the sends as well. The feature map's particles row says
+  what was compared, on which tree, and the battles row the blockers as they stand, with the candidates' results left
+  to this entry and decomp-findings.md; lessons.md's lesson is in the past tense, with the review's as a second.
+  The HAL and tests guides follow.
+- **Next:** phase 3's exit route (plan A-3), as the last entry says. For battles, the route as a test once the sync
+  brings upstream's fixes: the Route 19 route's 28,600 frames in both versions with T4 on the cut-in and the battle's
+  first turn (by picture where the DS lags), and the saves' difference from the oracle's explained.
+- **Blockers:** the Route 19 route waits for upstream's two fixes and the sync. #497 gives `src/ov167/btl_pokeparam.c`
+  the table `data_ov167_021d7490` and completes overlay 167; it merged upstream on 2026-10-24 at 08:28 UTC
+  (`53767c5a2c`) and reaches the port by the next sync. #496 names the loaded overlay's functions in
+  `src/ov036/enceff_data.c`'s four entries; it is still open at `53767c5a2c`. Both came from the user's decomp checkout
+  on 2026-10-24 (05:57 and 05:45 UTC), and the user's claim of overlay 167 was released at 07:36 UTC with #497 open
+  ([decomp-findings.md](decomp-findings.md)). The port keeps no stand-in.
+
+## 2026-10-24: the test launcher retired; the field menu's apps held to melonDS through the menu, the clock pinned
+
+- **Upstream:** `b62c655bfa` (upstream merge #481), as `main` has it since PR 16 (`6a1ace981b`); this branch merges no
+  upstream commit. Upstream's `main` has moved on (`53767c5a2c`, upstream merge #497), for the sync to propose on its
+  own.
+- **Port:** `6573d7241c`, on the topic branch `port-retire-launcher` from `main` at `1807efb68f` (PR 21): `0499fc07bb`
+  (the pinned clock), `145d776f17` (the field menu's routes as sequences), `a2fd007bf4` (the launcher retired),
+  `29d58ffe85` (its records), `e6a60804b8` (`main` merged in, with PR 22) and this commit, the review's fixes. The
+  battle path's entry gets its `PORT_SHA`, `1e80528149`, and PR 22's entry `83bd1c7dc8`.
+- **ROM:** T0 passes on `main` as the branch started from it, after the seam's removal (`a2fd007bf4`), the only game
+  file the branch changes, and on the merge with PR 22 (`e6a60804b8`; the review's fixes change no game file): Black 2
+  `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb` and White 2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`.
+  `src/ov035/event_mapchange.c` is complete in both versions, and `check_mwcc_neutral.py` finds it identical to `main`
+  (`1807efb68f`, and `2e510abc6d` after PR 22) and to `b62c655bfa`, 2 of 2 pairs each: the block was
+  `PLATFORM_PC`-only. No header outside `port/` changes.
+- **Host build:** T1 passes on macOS arm64, AppleClang 21, RelWithDebInfo, both versions (`build/port`,
+  `build/port-w2`), each with the oracle (`-DPORT_BUILD_ORACLE=ON`): from clean on `a2fd007bf4`, 723 warnings each, as
+  on the battle path, the game rebuilt whole since `port/include/port_host.h` changed; then incrementally on the merge
+  and the fixes, whose 19 warnings each are the ones `src/ov059/scrcmd_resort.c` gave before (it includes
+  `include/field/resort.h`, which PR 22 changed). clang-format 23 is clean on all 18 changed C and C++ files.
+- **Tests:** full `ctest -j4` on the review's fixes (this commit's tree before its records), both versions at once, with
+  the oracle, the cached oracle saves copied from the verify tree and the clone's `build/port-venv`, under load averages
+  of 72 falling to 10 on the machine's 8 cores from other sessions: Black 2, 302 passed and 1 skipped of 303 (1,172 s);
+  White 2, 299 passed and 1 skipped of 300 (1,120 s); none failed. Skipped: `app_universal_slices` in both, which only a
+  distribution build has. The launcher's eleven tests are gone: six of the seven that failed on `main`
+  (`oracle_launch_field_menus`, `oracle_launch_party_menus`, `launch_summary_standalone`, `launch_touch_then_party`,
+  `launch_unfinished` and `launch_not_offered`), `app_launcher_spec_plain` and `app_launcher_spec_sanitized`,
+  `integrate_launch_bad_option`, `integrate_launch_never_asked` and `integrate_launcher_off`; the seventh,
+  `frame_times_party_menus`, plays its file through the field menu now and passes. Three are new (`oracle_field_menus`,
+  `oracle_party_menus`, `pxi_rtc_pinned`): 311 and 308 tests before, 303 and 300 now. T4: `oracle_field_menus` and
+  `oracle_party_menus` pass in both versions, with `oracle_continue`, `oracle_continue_starter`, `asm_oracle` and every
+  other oracle test. By `oracle.py sequence NAME --out DIR` (the runs kept and compared again), field_menus with its
+  touch matches 5,179 of 5,179 frames in Black 2 (2,169 exact, 3,010 with 3D within the tolerance) and 5,171 of 5,171 in
+  White 2 (2,171 exact, 3,000), the menu's bottom screen after the touch exact on both programs, without its cursor: the
+  touch reached the game on melonDS too; party_menus matches 8,190 of 8,190 (4,250 exact) and 8,182 of 8,182 on
+  `a2fd007bf4`, the summary's 289 frames left out; without them, 289 frames failed, all of them the summary's, and with
+  the clock running the deep dive saw 28 of the field menu's frames fail on the clock. T3: every replay passes, and so
+  does every timing gate, `frame_times_party_menus` through the field menu among them: its scene's 95th percentile was
+  3.46 to 6.87 ms over six runs, never on an idle machine (4.63 ms in Black 2 and 6.87 ms in White 2 on `a2fd007bf4` at
+  load averages of 45 to 70; 4.64 and 3.98 ms in the full run; 3.46 and 5.46 ms alone at 9 to 19). T2 passes, the
+  reader's `clock` line and `pxi_rtc_pinned` among it. T6: `replay_same_save` passes. T5 not run: CI's `sanitize` job
+  runs `-LE route` and `-L route -LE oracle` without a ROM, so `oracle_field_menus` and `oracle_party_menus` have not
+  run under the sanitizers anywhere yet, where the launcher's routes to the same apps did (R5 and H4 were found there);
+  Next has it. T7 not run.
+- **Tiers:** per version, a 37,546 functions, b 3,472 and c zero; code bytes Black 2 a 3,435,848, White 2 a 3,435,936,
+  and b 414,418 in each; 2,384 veneers left out. Unchanged (`port/tools/progress/progress.py` on `a2fd007bf4`; PR 22
+  changes none, as its entry says).
+- **Trap stubs:** 30 function stubs and 22 data placeholders per version (`build/port*/gen/stubs.c`), unchanged. The
+  field menu's routes reach none; the first on the story's path is still `data_ov167_021d7490`, at a battle's first
+  move.
+- **64-bit warnings:** `check_ptrcasts: 422 sites in 269 keys (real 142, harmless 102, handled 141, unreachable 37),
+  1681 files, 0 not compiled` on `build/port` and `build/port-w2`, PR 22's: the seam held no cast, and this branch
+  leaves `main`'s baseline as it is.
+- **Work done:** the plan's A-2. The pinned clock (`0499fc07bb`): an input file's new `clock` line (`running`, the
+  default, or `pinned`), which pbw-oracle honours by cancelling melonDS's clock chip timer and Frigate by keeping its
+  fixed clock at its start (`port_rtc_set_pinned`, set from a replay), with the reader's tests and `pxi_rtc_pinned`.
+  The field menu's routes (`145d776f17`): `field_menus` and `party_menus` are oracle sequences now, their input files
+  renamed from `launch_*` and pinning the clock, so both programs open the bag, the trainer card, the party list,
+  Tepig's summary, the Pokédex and its entry through the field menu itself; `oracle.py launch`, its labelled screens,
+  the `oracle_launch_*` and `launch_*` tests and `check_launch_smoke.py` are gone; `frame_times_party_menus` plays the
+  party_menus file through the menu. The launcher's retirement (`a2fd007bf4`): what ADR 0012's note lists, with the
+  `port_launcher` library, `--launch` and its statuses, the run directory's `launch:` line, the seam in
+  `src/ov035/event_mapchange.c` and its declaration (the seam's row of game-changes.md goes, as any row of a change
+  taken back; the file's history keeps it), `port_trap_is_placeholder`, the `app_launcher_spec_*`,
+  `integrate_launch_*` and `integrate_launcher_off` tests, and the launcher in every guide, ARCHITECTURE.md,
+  GLOSSARY.md, MODDING.md, port/CLAUDE.md, PLAN.md and the READMEs; ADR 0012 gets its note, "superseded: retired when
+  the field opened". The deep dive's two differences on the real menu's route are explained in the oracle README: the
+  clock was the RTC running with each program's video frames, the DS some 34 seconds ahead at the same count once the
+  field opened, which the pinned clock removes (the menu's bottom screen is exact on both); the "18 pixels on the 3D
+  edges behind the open menu" are the room's 25 polygon-edge pixels beyond the pixel tolerance, fewer because the game
+  darkens the field to about 5/8 behind the menu (the 18 are among the 25; the lookout's 142 become 110 to 112), each
+  frame within the 3D's tolerance, the deep dive's 28 failing frames having failed on the clock alone. The summary's
+  background stays the one known difference: the DS spends 38 VBlanks more than passes loading it (counts 4526 to
+  4531), which step its scroll some 9 pixels on (port frames 4534-4822, both versions). The review's fixes (this
+  commit): `field_menus` closes the trainer card with the pen on its return button (240,180), the touch of the deleted
+  `launch_touch_then_party`, which was the only input file that touched the screen, so a touch from an input file is
+  held to melonDS now, in both versions; the feature map's HBlank and touch screen rows name the sequences instead of
+  the launcher's tests, its frame times' claim is dated and the new scene's load-only measure said, and its sanitized
+  build's row says the sequences haven't run sanitized; game-changes.md has no row or rule for a removal; this
+  entry's counts and T5 line; ADR 0012's note names commits; long lines rewrapped and three opening comments say what
+  the clock line does. This entry also adds the one that PRs 13 to 16 never got, lower down where their merges fall;
+  lessons.md has three lessons.
+- **Next:** phase 3's exit route (plan A-3): New Game to Aspertia, a walk, an NPC, a building and a change of map,
+  against melonDS at its checkpoints, and a T7 playtest on macOS. T5 on the two field menu sequences (a sanitized
+  build with the oracle, `ctest -L route`, in both versions), which CI's job can't run without a ROM, and
+  `frame_times_party_menus` measured on an idle machine. For battles, once the sync brings overlay 167's table, the
+  Route 19 route as a test. For the guard, battle (R06), then the menus and apps (R09, R11, R14 to R17) and wireless
+  (R21 to R24), each for the sites the contributors' PR 19 doesn't fix; R02 and R05's two callers go when PR 19 merges.
+- **Blockers:** `data_ov167_021d7490` (overlay 167's battle table, issue #120) still stops every battle at its first
+  move on Frigate's `main`; upstream merge #497 gave it C (upstream's `53767c5a2c`), which reaches the port by the next
+  sync. `src/ov036/enceff_data.c`'s four entries are still a decomp finding. Of the launcher's seven tests that failed
+  on `main`, six are gone and the seventh, `frame_times_party_menus`, passes through the field menu, so T4 on `main` is
+  no longer red for them.
+
+## 2026-10-24: the field's pointer casts: overlay 137's Join Avenue types at full width
+
+- **Upstream:** `b62c655bfa` (upstream merge #481), as `main` has it since PR 16 (`6a1ace981b`); this branch merges no
+  upstream commit. Upstream's `main` has moved on (`e522642f9e`), for the sync to propose on its own.
+- **Port:** `83bd1c7dc8`, on the topic branch `port-field-ptrcasts` from `main` `1807efb68f` (PR 21): `ea262c5e76`
+  (overlay 137's get and set types and getters), then this records commit. The branch's first version, never
+  published, also carried the contributors' draft PR 19's lines for R02 and two R05 callers; after review that commit
+  was dropped (Work done).
+- **ROM:** T0 passes on `main` before the branch and on its head: Black 2 `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb`
+  and White 2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`. The change is a type's spelling that MWCC reads as before
+  (`uptr` is `u32` for it): `check_mwcc_neutral.py --base origin/main` on the 9 files that include
+  `include/field/resort.h` (`ninja -t deps`: `field_gimmick.c` of overlay 36, `scrcmd_medalinfo.c` and
+  `scrcmd_resort.c` of overlay 59, `scrcmd_resort_shop.c` of overlay 60, and overlay 137's `resort_data_manager.c`,
+  `resort_field.c`, `resort_npc.c`, `resort_people.c` and `resort_sys.c`) finds 18 of 18 file and version pairs
+  identical. The 9 are complete in both versions, so ninja proves them and no compiler probe applies.
+- **Host build:** T1 passes on macOS arm64, Apple clang 21, RelWithDebInfo, both versions (`build/port`,
+  `build/port-w2`), rebuilt incrementally over the branch's first version: 336 steps each (the files that include
+  `bmp_menulist.h`, back to `main`'s, and those that include `resort.h`), with 44 warnings each, the ones these files
+  gave before and none from the changed lines, so 723 in all, as the first version's builds from clean gave.
+  clang-format 23 is clean on the changed C files, and `tools/decomp/check_style.py` passes on them.
+- **Tests:** full `ctest -j4` on `ea262c5e76`, before this records commit (which changes no test input), both versions
+  at once, with the oracle, its cached saves copied from the verify tree and the clone's `build/port-venv`, under a load
+  average of 40 to 71 on the machine's 8 cores from other sessions: Black 2, 311 tests, 301 passed, 7 failed and 3
+  skipped (1,884 s); White 2, 308 tests, 299 passed, 7 failed and 2 skipped (1,728 s). The failures are the test
+  launcher's seven in both versions (`frame_times_party_menus`, `oracle_launch_field_menus`,
+  `oracle_launch_party_menus`, `launch_summary_standalone`, `launch_touch_then_party`, `launch_unfinished`,
+  `launch_not_offered`), which steps aside now that the field opens, as on `main` until its retirement (plan A-2).
+  Skipped: `app_universal_slices` in both, which only a distribution build has, and the timing gates
+  `frame_times_title` in both and `frame_times_new_game` in Black 2, over the load (`frame_times.py --max-load`); each
+  then passed alone (`ctest -R`), at a load of 15 to 25. `game_ptrcasts` and `game_ptrcasts_tool` pass in both versions
+  with this branch's baseline, and so do `asm_oracle`, `oracle_title`, `oracle_continue` and `oracle_continue_starter`
+  (T4), `replay_new_game_house` (T3) and `replay_same_save` (T6). T5 not run locally (no route reaches the changed
+  code; CI's sanitized jobs run on the PR); T7 not run.
+- **Tiers:** not remeasured: what MWCC compiles is `main`'s in every file (`check_mwcc_neutral.py`, above), so the tiers
+  are the last entry's: per version, a 37,546 functions, b 3,472 and c zero; code bytes Black 2 a 3,435,848, White 2 a
+  3,435,936, and b 414,418 in each.
+- **Trap stubs:** 30 function stubs and 22 data placeholders per version (`gen/stubs.c` in both builds), unchanged. The
+  first the game hits is still `data_ov167_021d7490`, the battle table, at Hugh's battle's first move on the Route 19
+  route (frame 7,623 in the last entry's run, both versions; not run again, since none of the route's code changed);
+  CONTINUE and New Game to the save reach none.
+- **64-bit warnings:** `check_ptrcasts: 422 sites in 269 keys (real 142, harmless 102, handled 141, unreachable 37),
+  1681 files, 0 not compiled`, the same in both versions, from the last entry's 429 sites and 150 real.
+  `check_ptrcasts.py --update` drops R05's 6 rows of `sFuncs` (8 `fn-cast` sites) and adds one, classed harmless: the
+  sum of two people's seeds in `ResortData_RollPair`, which `ResortData_GetParam`'s `uptr` now carries and the sum keeps
+  in 32 bits, as on the DS. The real sites by group: R02 5, R05 2, R06 12, R09 6, R11 4, R14 12, R15 2, R16 3, R17 4,
+  R21 14, R22 16, R23 50 and R24 12.
+- **Work done:** the field's real rows of the pointer cast guard that no open PR fixes, the Neutral way (PLAN.md §4.8,
+  rule 3), one row of [game-changes.md](game-changes.md). Overlay 137's `ResortPersonGetParamFunc` and
+  `ResortPersonSetParamFunc` return and take a `uptr`, as the Join Avenue getters and setters that its table casts to
+  them have since PR 14, so no call goes through the wrong function type. `ResortData_GetParam` and
+  `ResortPerson_GetParam` return a `uptr` too, since they return what those getters return, which for a person's two
+  raw messages is the message's address (ADR 0019's mixed getter; no caller asks for those today); the setters'
+  wrappers keep their `u32`, since every caller gives a number. R04, the cut-in's palette, was fixed by PR 21. R02 (the
+  shortcut menu's work through `BmpMenuList_GetParam`) and R05's two callers (the name the GTS negotiation and a Wi-Fi
+  battle give Join Avenue) stay in the baseline: the contributors' draft PR 19 fixes those very lines, and this branch
+  leaves them to it. Its first version applied PR 19's hunks from its diff; after review that commit was dropped, since
+  it would land a contributor's lines through the owner's review bypass without the owner's approval or credit, and PR
+  19 would still conflict on the baseline and game-changes.md. Two lessons in lessons.md: follow a mixed getter's
+  result up through the functions that return it, and leave an open PR's lines to it. The feature map's guard row has
+  the new counts. No route reaches Join Avenue yet, so nothing visible changed (T7 not run).
+- **Next:** for the phase, the launcher's retirement (plan A-2), then phase 3's exit route (A-3), as the last entry
+  says. For the guard, battle (R06), then the menus and apps (R09, R11, R14 to R17) and wireless (R21 to R24), each for
+  the sites the contributors' PR 19 doesn't fix, leaving its lines to it; R02 and R05's two callers go when PR 19
+  merges.
+- **Blockers:** `data_ov167_021d7490` (overlay 167's battle table, issue #120), which stops every battle at its first
+  move, as in the last entry: upstream's `main` (`e522642f9e`) has no C for it yet. The user's account claimed overlay
+  167 again on 2026-10-24 (UTC) and opened upstream PR #497, which gives `btl_pokeparam.c` the table and completes the
+  overlay; it is open, and the port waits for it to merge and reach `main` by sync. `src/ov036/enceff_data.c`'s four
+  entries that name another overlay's functions, the last entry's decomp finding, are still in upstream's `e522642f9e`.
+
 ## 2026-10-23: the battle path: the trainer cut-in and Hugh's battle to the first move
 
 - **Upstream:** `b62c655bfa` (upstream merge #481), as `main` has it since PR 16 (`6a1ace981b`); this branch merges no
   upstream commit. Upstream's `main` has moved on (`c9f0912d43`), for the sync to propose on its own.
-- **Port:** `PORT_SHA`, on the topic branch `port-battle-path`, [PR
+- **Port:** `1e80528149`, on the topic branch `port-battle-path`, [PR
   21](https://github.com/CallanCampos/Frigate/pull/21), from `port-field-entry` at `7f5cad4dd9` (PR 18), with the
   review's fixes (`dd153fea48`) and `main` merged at `00e3468c79` (`957b7931f4`: PRs 18, 20 and 17, the field's entry,
   the process docs and the pointer cast guard). The Route 19 route ran on the branch itself, with no scratch merge.
@@ -334,6 +592,46 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
   which ADR 0021 now gives host memory. Battles also wait on overlay 167's `data_ov167_021d7490`, which has no C and is
   under another contributor's claim.
 
+## 2026-10-23: upstream syncs `0bed98c4c` (PR 13) and `b62c655bfa` (PR 16) and the contributors' PRs 14 and 15 merged
+
+This entry was added afterwards, by the 2026-10-24 entry of the test launcher's retirement: the four merged without
+one on 2026-10-23 (UTC), in this order, after the PR 12 sync and before the field's entry (PR 18). It stands where its
+merges fall: above the PR 12 sync's entry, below the entries of PRs 20, 17 and 21, which merged after it.
+
+- **Upstream:** `0bed98c4c3` (upstream merge #478) by PR 13, then `b62c655bfa` (upstream merge #481, 26 commits on)
+  by PR 16. PRs 14 and 15 bring no upstream commit.
+- **Port:** the merges of [PR 13](https://github.com/CallanCampos/Frigate/pull/13) (`72749b5a0d`, 16:15, the sync
+  App's head `ef9eef0dc5`), [PR 16](https://github.com/CallanCampos/Frigate/pull/16) (`6a1ace981b`, 17:01, head
+  `d35f1b92aa`), [PR 14](https://github.com/CallanCampos/Frigate/pull/14) (`bfd5d788b5`, 18:08, MushroomMan321's
+  head `e30a8ab32a`) and [PR 15](https://github.com/CallanCampos/Frigate/pull/15) (`a4648fce71`, 18:56, head
+  `526c20673f`).
+- **ROM:** T0 passes on each exact head: `Frigate local verification` is `success` on all four, posted by
+  CallanCampos after both SHA1s matched (Black 2 `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb`, White 2
+  `b5d7490be7b415b8f1e672a53e978a9cc667e56a`). The owner's approving reviews record the game changes' proofs:
+  PR 16's 16 files with port changes keep exactly the port's diff after the merge, and `check_mwcc_neutral.py` finds
+  3,554 of 3,556 file and version pairs identical to `b62c655bfa13` (the 2 being `pokemontrade_2d.c`'s recorded
+  `(void *)(uptr)` cast, in a complete file); PR 14's 8 of 8 identical to `main`; PR 15's 32 of 34, the 2 being
+  `vct.c`'s `(int)` to `(sptr)` in a complete file, which the SHA1s prove.
+- **Host build:** T1 passes on macOS arm64 in each exact-head verification, both versions, and every CI job on each
+  head passes (`Frigate CI`, `Compile src/ and lib/`, `Code standards`).
+- **Tests:** each exact-head verification passes T2, T3 and T6 in both versions (PRs 14, 15 and 16: 302 and 299
+  tests), with no oracle built, as under `--verify-pr`; T4 was not run, and the tests that failed on `main` then (the
+  oracle's routes and `asm_oracle`, as the PR 12 sync's entry says) skip there. T5 runs only in CI, passing; T7 not run.
+- **Tiers:** unchanged from the 2026-10-22 entry, as the field's entry below measures after all four.
+- **Trap stubs:** 31 function stubs and 22 data placeholders per version, as after PR 12; MSL's `_u32_div_f` gets its
+  routine with the field's entry.
+- **64-bit warnings:** PR 14 retypes Join Avenue's parameter API to `uptr` and PR 15 carries addresses worked out in
+  seventeen files through `uptr`, each with its row of [game-changes.md](game-changes.md); the pointer cast guard's
+  entry of 2026-10-23 measures what they fixed (30 of its rows by PR 15).
+- **Work done:** PR 13 brings upstream's DS Protect prelink's private map (`restore_dsprot_veneers.py`), a stricter
+  `check_nonmatching_rows.py` and the nonmatching list's leftover block's removal: `tools/` and docs only. PR 16 brings
+  upstream #481 (491 files): value sets as enums, the save block IDs in one enum, typed `void *` parameters across the
+  field and G3D, and complete files' statics under their C names, `Field.colorPostFX` among the typed members, which
+  the field needs on a host; it merged with no conflict. PRs 14 and 15, from the contributor MushroomMan321, are the
+  `uptr` changes above. The owner approved each exact head in chat once every required check had passed, and merged
+  it with a merge commit.
+- **Next:** the field's entry (PR 18).
+- **Blockers:** the field's external heap, until the field's entry.
 ## 2026-10-23: upstream sync `0a12a2bd3` merged (PR 12): the save's city state initialized by the game's own C
 
 This entry was added afterwards, by the entry above: the sync merged without one.

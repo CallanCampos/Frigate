@@ -219,7 +219,7 @@ void ResortPerson_SetParam(ResortPerson *person, JoinAvenuePersonParam param, u3
     ResortData_SetParam(person->data, param, value);
 }
 
-u32 ResortPerson_GetParam(ResortPerson *person, JoinAvenuePersonParam param, void *buffer) {
+uptr ResortPerson_GetParam(ResortPerson *person, JoinAvenuePersonParam param, void *buffer) {
     return ResortData_GetParam(person->data, param, buffer);
 }
 

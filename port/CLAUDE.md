@@ -204,12 +204,10 @@ wire or in the save stay pointer-free and get host `_Static_assert`s.
   this clone, on a topic branch from upstream `main`, under the root rules and skills there (claim an overlay's issue
   first, C from the asm, both SHA1s, `finish-file`, a fork PR), as ordinary decomp work: nothing it commits, comments
   or posts mentions the port. Work under someone else's active claim stays theirs; the port waits or uses a documented
-  stand-in for a deferred subsystem where the plan documents one. The obsolete
-  `ov011_pending.c` stand-in was removed once all four SDK definitions had C. Frigate's test launcher (`port/app/launcher.c`,
-  [ADR 0012](docs/adr/0012-test-launcher-for-the-field-menus-apps.md)) is the other documented stand-in, test-only and
-  off by default; it opened the field menu's apps while overlay 36 was missing and now automatically steps aside
-  because `FIELDMAP_PROC_FUNCS` has C. The C reaches the port by sync once
-  upstream merges it.
+  stand-in for a deferred subsystem where the plan documents one. No stand-in is left: the `ov011_pending.c` stand-in
+  was removed once all four SDK definitions had C, and Frigate's test launcher
+  ([ADR 0012](docs/adr/0012-test-launcher-for-the-field-menus-apps.md)), which opened the field menu's apps while
+  overlay 36 had no C, was retired once the field opened. The C reaches the port by sync once upstream merges it.
 
 ## What native means (PLAN.md §1)
 

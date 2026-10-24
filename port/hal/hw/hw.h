@@ -22,7 +22,10 @@ void *port_hw_pointer(uint32_t address);
 void port_hw_set_vcount(uint16_t line);
 
 // One geometry command port write, as port_hw_g3_port and port_hw_gxfifo log them for the geometry engine: the port's
-// DS address (0x04000400 for GXFIFO) and the word written
+// DS address (0x04000400 for GXFIFO) and the word written. Each access to GXFIFO or a command port gets an entry of its
+// own, except an access to POLYGON_ATTR, TEXIMAGE_PARAM or PLTT_BASE right after one to the same port, which shares
+// that access's entry (hw.c): those commands only store their value, so a second write leaves what the engine would,
+// and a read, such as SPL's of POLYGON_ATTR after each particle's write, sends nothing, as on the DS
 typedef struct PortG3Write {
     uint32_t port;
     uint32_t value;
@@ -32,11 +35,13 @@ typedef struct PortG3Write {
 const PortG3Write *port_hw_g3_take(size_t *count);
 
 // Logs the words that MI's CPU sends and copies (port/hal/mi) store to a geometry port. The game passes them the
-// port's address, &reg_G3X_GXFIFO or a reg_G3_* register, and evaluating that here logs an entry and gives its value,
-// which holds one word. When dest is that value, of the last entry logged, the entry is taken back and count words from
-// src are logged instead: all to the entry's port when step is 0, or each to the address step bytes after the last
-// one, as an STM stores them (GXFIFO's mirrors, 0x04000400-0x0400043f, are logged as 0x04000400). Returns 1 then;
-// otherwise it logs nothing and returns 0, and dest is memory, for the caller to store to
+// port's address, &reg_G3X_GXFIFO or a reg_G3_* register, and evaluating that here gives the value of the log's last
+// entry, which holds one word: a fresh entry, or one shared with the access to the same parameter port before it.
+// When dest is that value, count words from src are logged: all to the entry's port when step is 0, or each to the
+// address step bytes after the last one, as an STM stores them (GXFIFO's mirrors, 0x04000400-0x0400043f, are logged as
+// 0x04000400). A fresh entry is taken back first, since it was logged only for its address; a shared one is the earlier
+// access's write and stays, so a send of no words leaves it. Returns 1 then; otherwise it logs nothing and returns 0,
+// and dest is memory, for the caller to store to
 int port_hw_g3_send(volatile void *dest, const void *src, uint32_t count, uint32_t step);
 
 // The geometry engine's readback registers (GXSTAT, RAM_COUNT, VTXRAM_COUNT, CLIPMTX_RESULT, VECMTX_RESULT): each

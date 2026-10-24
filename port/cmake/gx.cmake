@@ -51,8 +51,7 @@ port_gx_rename(lib/nitro/src/gx/gx_load2d.c ${port_gx_renamed_gx_load2d})
 enable_testing()
 add_executable(port_gx_tests
     "${CMAKE_CURRENT_SOURCE_DIR}/tests/gx/test_gx.c"
-    $<TARGET_OBJECTS:pokebw2_game> $<TARGET_OBJECTS:port_hal> $<TARGET_OBJECTS:port_launcher> ${port_gfx_objects}
-    "${PORT_GEN}/stubs.c")
+    $<TARGET_OBJECTS:pokebw2_game> $<TARGET_OBJECTS:port_hal> ${port_gfx_objects} "${PORT_GEN}/stubs.c")
 target_link_libraries(port_gx_tests PRIVATE port_decomp_env SDL3::SDL3)
 target_include_directories(port_gx_tests PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/..")
 target_compile_options(port_gx_tests PRIVATE -std=gnu11 -Wall -Wextra -Wno-unused-parameter)
@@ -71,6 +70,9 @@ foreach(scenario IN LISTS port_gx_scenarios)
         set_tests_properties(gx_${scenario}_${backend} PROPERTIES SKIP_RETURN_CODE 77 TIMEOUT 60)
     endforeach()
 endforeach()
+# The scenarios that run once, on the default backend: the backend's choice, POWCNT1, and the geometry command log's
+# accesses to a parameter port with SPL's billboard through the geometry engine, which use no VRAM bank
 add_test(NAME gx_default_backend COMMAND port_gx_tests default_backend)
 add_test(NAME gx_display COMMAND port_gx_tests display)
-set_tests_properties(gx_default_backend gx_display PROPERTIES TIMEOUT 60)
+add_test(NAME gx_parameter_read COMMAND port_gx_tests parameter_read)
+set_tests_properties(gx_default_backend gx_display gx_parameter_read PROPERTIES TIMEOUT 60)

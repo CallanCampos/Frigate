@@ -4,6 +4,11 @@
 - **Date:** 2026-10-17
 - **Plan:** D3, §4.5 (display model)
 - **Upstream:** `4aa041311` (merge of PR #348)
+- **Note (2026-10-24):** not every access to a geometry command port gets a fresh slot now: one to POLYGON_ATTR,
+  TEXIMAGE_PARAM or PLTT_BASE right after one to the same port shares that access's slot, since those commands only
+  store their value and the macro's access can't tell SPL's read of POLYGON_ATTR (`lib/spl/src/spl_draw.c`) from a
+  write, which sent the engine a POLYGON_ATTR of 0; a send to a shared slot keeps it (`port/hal/hw/hw.c`, STATUS.md's
+  entry of 2026-10-24).
 
 ## Context
 

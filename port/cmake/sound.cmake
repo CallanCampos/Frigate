@@ -12,8 +12,7 @@ target_sources(port_app PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/audio/audio.c")
 enable_testing()
 add_executable(port_snd_tests
     "${CMAKE_CURRENT_SOURCE_DIR}/tests/snd/test_snd.c" "${CMAKE_CURRENT_SOURCE_DIR}/audio/audio.c"
-    $<TARGET_OBJECTS:pokebw2_game> $<TARGET_OBJECTS:port_hal> $<TARGET_OBJECTS:port_launcher> ${port_gfx_objects}
-    "${PORT_GEN}/stubs.c")
+    $<TARGET_OBJECTS:pokebw2_game> $<TARGET_OBJECTS:port_hal> ${port_gfx_objects} "${PORT_GEN}/stubs.c")
 target_link_libraries(port_snd_tests PRIVATE port_decomp_env SDL3::SDL3)
 target_include_directories(port_snd_tests PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/..")
 target_compile_options(port_snd_tests PRIVATE -std=gnu11 -Wall -Wextra -Wno-unused-parameter)

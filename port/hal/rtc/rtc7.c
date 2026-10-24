@@ -26,10 +26,12 @@
 #define RTC_FIRST_WEEK 6
 #define SECONDS_PER_DAY 86400
 
-// The fixed clock: whether it is on, and its time at the virtual clock's 0, in seconds since 2000-01-01
+// The fixed clock: whether it is on, its time at the virtual clock's 0, in seconds since 2000-01-01, and whether it
+// stays there (pinned) instead of running with the virtual clock
 static struct {
     BOOL on;
     s64 start;
+    BOOL pinned;
 } sFixed;
 
 static BOOL IsLeapYear(int year) {
@@ -102,13 +104,17 @@ void port_rtc_use_host_time(void) {
     sFixed.on = FALSE;
 }
 
+void port_rtc_set_pinned(int pinned) {
+    sFixed.pinned = pinned != 0;
+}
+
 void port_rtc_now(PortRtcTime *now) {
     time_t host;
     struct tm local;
     s64 last;
 
     if (sFixed.on) {
-        FromSeconds(sFixed.start + (s64)(port_os_cycles() / PORT_OS_CYCLES_PER_SECOND), now);
+        FromSeconds(sFixed.start + (sFixed.pinned ? 0 : (s64)(port_os_cycles() / PORT_OS_CYCLES_PER_SECOND)), now);
         return;
     }
     host = time(NULL);

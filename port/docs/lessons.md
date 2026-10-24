@@ -3,6 +3,64 @@
 What port work taught that isn't obvious from the code, newest first. A lesson about MWCC or the decomp's own
 workflow goes in the decomp checkout instead; this file is the port's ([CLAUDE.md](../CLAUDE.md), the iteration loop).
 
+## 2026-10-24: the battle's run to its end
+
+- **A read through a write log is a write.** Before this day's fix, the host variants of the SDK's headers turned each
+  geometry command port into `*port_hw_g3_port(address)`, which logged a fresh command for every access, so
+  `(void)reg_G3_POLYGON_ATTR;`, a read that does nothing on the DS, sent the engine a POLYGON_ATTR of 0, and no SPL
+  particle was drawn (all eight of SPL's draw functions do the read): seen in the trainers' cut-in sparks and the Poké
+  Balls' bursts, and by the same code the moves' effects and the intro's. No test caught it, since none of the screens
+  the replays and the oracle's sequences check shows a particle. When an accessor logs or acts on access, grep the
+  decomp for reads of its registers (`(void)reg_`, `= reg_`) as well as writes.
+- **An entry that two accesses share is no longer the last access's own.** The fix lets an access to a parameter port
+  share the entry of the access before it, and `port_hw_g3_send` took the log's last entry back as the slot its
+  caller's `&reg_G3_*` had logged: given a shared one, a send of no words would have dropped the earlier write (the
+  review's probe). Every function that assumes an entry is fresh must be told when it isn't (`sG3LastShared` in
+  `port/hal/hw/hw.c`), and the test holds it (`gx_parameter_read`).
+- **Compare a battle's animations by picture, not only by count.** The DS takes some of a battle's passes over two
+  frames, so at the same GFL count the port can be a frame or two further into an animation: the first turn's Tackle,
+  reached with the battle table's bytes as a local, uncommitted candidate ([STATUS.md](STATUS.md)), failed `--align
+  counter` at the hit while every picture of it matched the oracle's, frame for frame, once both runs were pictured
+  densely and laid side by side. Past the first damage roll, the random seed (`buildSeed`,
+  [decomp-findings.md](decomp-findings.md)) makes the battles themselves differ.
+
+## 2026-10-24: the test launcher's retirement
+
+- **A clock that runs with the video frames parts the two programs at the same count.** The DS takes some 2,000 more
+  frames than the port to reach the field (its movies, its loads), so at the same count of passes its real-time clock
+  is about 34 seconds ahead: the field menu's colon blinked on other frames and its minute turned over earlier. The
+  count can't fix that, and a known difference would have left the menu's bottom screen out of every frame. Pinning
+  the clock on both programs from the input file (`clock pinned`) makes the screen comparable and keeps one file
+  saying what both programs do; the play time doesn't move with it, since it counts the CPU's ticks.
+- **Read which screen failed before explaining a number.** compare.py prints both screens' counts for a failing frame,
+  and the deep dive read the top screen's "18 beyond tolerance" as a difference to explain, where the top passed (the
+  tolerance is 245) and the bottom screen's clock failed. The 18 were the room's 25 edge pixels, fewer because the game
+  darkens the field behind the menu.
+- **A stand-in's ADR that lists what names it makes its retirement a checklist, not a complete one.** ADR 0012's note
+  named every guide, test and line that mentions the launcher, and the retirement went down the list, but it took
+  "ARCHITECTURE.md's feature map" for the field menu's row, while other features' rows named the launcher's tests
+  (`oracle_launch_*` under the HBlank effects, `launch_touch_then_party` under the touch screen), where a grep for
+  "launcher" doesn't reach. Grep every removed test's own name, and ask of each what else only it covered:
+  `launch_touch_then_party` was the only input file that touched the screen, so its touch on the trainer card's return
+  button moved into `field_menus`, against melonDS.
+
+## 2026-10-24: the field's pointer casts
+
+- **A function that returns what a mixed getter returns is a mixed getter too.** Overlay 137's `ResortData_GetParam`
+  returns whatever Join Avenue's getters return: a number for most params, the address of a person's message for the
+  two raw ones. Retyping only the table's function types to `uptr` left its own `u32` return cutting that address, and
+  the guard can't see it, since it skips call results by design
+  ([ADR 0019](adr/0019-pointer-cast-guard-against-a-classified-baseline.md)). When a getter's return becomes a `uptr`,
+  follow its result up through every function that returns it (`ResortPerson_GetParam` returns
+  `ResortData_GetParam`'s) and retype those returns too; their callers that keep a number stay as they are, and only
+  arithmetic on the result becomes a row (`ResortData_RollPair`'s sum of two seeds, harmless).
+- **A contributor's open PR keeps its lines.** Applying its hunks from its diff, byte for byte, doesn't make the
+  later merge clean: the guard's baseline and game-changes.md conflict on the rows around them, and its own
+  game-changes row would cover the same files twice. And a feature PR that carries them lands the contributor's code
+  through the owner's review bypass, which is for owner-authored work, with no owner approval of those lines and no
+  credit ([REPOSITORY-POLICY.md](REPOSITORY-POLICY.md), [CONTRIBUTING.md](../CONTRIBUTING.md)). Leave the sites it
+  fixes in the baseline for that PR to remove, and fix what it doesn't cover around them.
+
 ## 2026-10-23: the battle path
 
 - **A byte array the DS's size of a type is that type: find its siblings.** `BtlFlowWorkFrame.monSets` was

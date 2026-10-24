@@ -2,8 +2,7 @@
 # the gamepads, the log of an app opened from the Finder, the run directory for the oracle's comparisons, the sound
 # driver's trace, and input replays with the oracle's input file reader (port/tools/oracle/pbwinput.c, plain C11). The
 # screens they show are drawn by port/gfx/screens.c, which the port_gfx target builds. Their tests are here too, with
-# those of Frigate's test launcher's option and gate (port/app/launcher_spec.c, the field menu's apps), whose library,
-# port_launcher, port/CMakeLists.txt builds, and of check_exit.py, the checker of the tests of the program's endings.
+# those of check_exit.py, the checker of the tests of the program's endings.
 target_sources(port_app PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/app/present.c" "${CMAKE_CURRENT_SOURCE_DIR}/app/gamepad.c"
     "${CMAKE_CURRENT_SOURCE_DIR}/app/message_log.c" "${CMAKE_CURRENT_SOURCE_DIR}/app/replay.c"
     "${CMAKE_CURRENT_SOURCE_DIR}/app/run_dir.c" "${CMAKE_CURRENT_SOURCE_DIR}/app/sound_trace.c"
@@ -60,8 +59,7 @@ add_test(NAME app_check_exit
 set_tests_properties(app_check_exit PROPERTIES TIMEOUT 120)
 
 # --help's first lines against the product's names that the build read from port/hal/os/port_app.h, which the macOS
-# app's names and About window use too; then each option of its usage described, and --launch's apps as the test
-# launcher names them (port/tests/app/check_about.cmake)
+# app's names and About window use too; then each option of its usage described (port/tests/app/check_about.cmake)
 file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/app_about_expected.txt"
     "${PORT_PRODUCT_NAME} — ${PORT_GAME_NAME}\n${PORT_PRODUCT_DESCRIPTION}\n${PORT_PRODUCT_DISCLAIMER}\n\n")
 add_test(NAME app_about COMMAND "${CMAKE_COMMAND}" "-DPROGRAM=$<TARGET_FILE:${PORT_PROGRAM}>"
@@ -89,22 +87,6 @@ foreach(variant IN ITEMS plain sanitized)
         target_link_options(${target} PRIVATE -fsanitize=address,undefined)
     endif()
     add_test(NAME app_run_dir_${variant} COMMAND ${target})
-endforeach()
-
-# Frigate's test launcher's option and its gate (port/app/launcher_spec.c, and port/hal/trap.c's
-# port_trap_is_placeholder on a made-up table of placeholders), plain and under the sanitizers
-foreach(variant IN ITEMS plain sanitized)
-    set(target port_test_launcher_spec_${variant})
-    add_executable(${target} "${CMAKE_CURRENT_SOURCE_DIR}/tests/app/test_launcher_spec.c"
-        "${CMAKE_CURRENT_SOURCE_DIR}/app/launcher_spec.c" "${CMAKE_CURRENT_SOURCE_DIR}/hal/trap.c" ${port_host_sources})
-    target_include_directories(${target} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
-    target_compile_options(${target} PRIVATE -std=c11 -Wall -Wextra -Werror)
-    if(variant STREQUAL "sanitized")
-        target_compile_options(${target} PRIVATE
-            -fsanitize=address,undefined -fno-sanitize-recover=all -fno-omit-frame-pointer)
-        target_link_options(${target} PRIVATE -fsanitize=address,undefined)
-    endif()
-    add_test(NAME app_launcher_spec_${variant} COMMAND ${target})
 endforeach()
 
 # The gamepads (port/app/gamepad.c), plain and under the sanitizers: the mapping, the stick's dead zone and the pad that

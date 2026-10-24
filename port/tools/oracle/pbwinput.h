@@ -12,6 +12,10 @@
 // - Video frames: frame N ends with the N-th VBlank since power-on (on the port, since the game's main()).
 // Both programs apply a state at a VBlank, before the interrupt is taken, as pbw_input_frame_at_vblank says; the game
 // reads it at the start of its next pass (GCTX_HIDUpdate). The state of frame 1 also holds from power-on.
+//
+// A file also sets the real-time clock: its "time" line is the time at power-on, and its "clock" line says whether the
+// clock runs from there (the default) or stays pinned there for the whole run on both programs (PbwInputClock), for a
+// screen that shows the time, such as the field menu's.
 #ifndef PORT_TOOLS_ORACLE_PBWINPUT_H
 #define PORT_TOOLS_ORACLE_PBWINPUT_H
 
@@ -69,6 +73,16 @@ typedef enum PbwInputFrames {
     PBW_INPUT_VIDEO_FRAMES = 1, // video frames since power-on
 } PbwInputFrames;
 
+// Whether the real-time clock runs from the time at power-on (its "clock" line)
+typedef enum PbwInputClock {
+    // It runs with the console's own time (the default): on the DS the video frames the game takes, which are more than
+    // the port's where the DS's passes take longer, so the two programs' clocks drift apart against the game's count
+    PBW_INPUT_CLOCK_RUNNING = 0,
+    // It stays at the time at power-on for the whole run on both programs, so that a screen that shows the clock (the
+    // field menu's bottom screen) shows the same time on both at the same count
+    PBW_INPUT_CLOCK_PINNED = 1,
+} PbwInputClock;
+
 typedef struct PbwInput {
     PbwInputChange *changes; // in increasing frame order
     size_t count;
@@ -79,6 +93,8 @@ typedef struct PbwInput {
     char version[8];
     // The "frames" line: PBW_INPUT_GAME_FRAMES when the file has none
     PbwInputFrames frames;
+    // The "clock" line: PBW_INPUT_CLOCK_RUNNING when the file has none
+    PbwInputClock clock;
 } PbwInput;
 
 // Counts game frames from GFL's frame count as a program reads it at each VBlank
@@ -87,7 +103,7 @@ typedef struct PbwGameClock {
     uint32_t lastCount; // the count at the last VBlank
 } PbwGameClock;
 
-// An empty input: nothing held on any frame, no time and no version, on game frames
+// An empty input: nothing held on any frame, no time and no version, on game frames, the clock running
 void pbw_input_init(PbwInput *input);
 void pbw_input_free(PbwInput *input);
 

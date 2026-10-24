@@ -31,7 +31,7 @@ are in the module's fragment in [../cmake/](../cmake/README.md). A module's test
 | [pm/](pm/pm7.c) | The ARM7's power management service, and NitroSDK's `pm.c` compiled through `pm_host.c` | Battery, backlights, screen power, the sound amplifier, sleep and power-off requests | Backlight and sleep on closing the lid (`src/gfl/ui.c`), the amplifier (`src/system/machine_use.c`) | `pxi_pm_*` |
 | [tp/](tp/tp_host.h) | The ARM7's touch panel service (the ARM9's `lib/nitro/src/spi/tp.c` compiles unchanged) | Calibrated samples of where the player touches the bottom screen, one at a time or sampled automatically each frame | The touch screen, which the game reads through `src/gfl/touchpanel.c` | `pxi_tp_*` (no replay touches the screen yet) |
 | [nvram/](nvram/nvram_settings.h) | The ARM7's NVRAM service and the firmware's user settings, and NitroSDK's `nvram.c` compiled through `nvram_host.c` | The console's owner settings (nickname, birthday, colour, language), MAC address and touch calibration in the shared memory, and a 256 KiB firmware flash image | `OS_GetOwnerInfoEx` (the console owner's birthday on the trainer card, `src/ov012/scrcmd_game_state.c`), `OS_GetMacAddress` (wireless and Wi-Fi play, such as `src/ov012/bsubway_comm.c`), the RTC offset in the save | `pxi_nvram_*` |
-| [rtc/](rtc/rtc_host.h) | NitroSDK RTC's `rtc_api.c` (its assembly wait) and the ARM7's RTC service | The clock chip from the host's local time, or `--fixed-time`, which runs with the virtual clock | Day and night, seasons, daily events, play time (`RTC_*` in many game files: `src/gfl/rtc_cache.c`, `src/ov012/ev_time.c`) | `pxi_rtc_*` |
+| [rtc/](rtc/rtc_host.h) | NitroSDK RTC's `rtc_api.c` (its assembly wait) and the ARM7's RTC service | The clock chip from the host's local time, or `--fixed-time`, which runs with the virtual clock or, pinned by a replay's input file, stays at its time | Day and night, seasons, daily events, play time (`RTC_*` in many game files: `src/gfl/rtc_cache.c`, `src/ov012/ev_time.c`) | `pxi_rtc_*` |
 | [reset/](reset/reset7.c) | The ARM7's OS service | The reset and terminate commands | Soft reset and returning to the title (`OS_ResetSystem`, which ends the program with status 74) | `pxi_reset_command` |
 | [ctrdg/](ctrdg/ctrdg7.c) | The ARM7's cartridge slot service, and the BIOS's `SVC_CpuSet` | An empty GBA slot | The cartridge check at boot (`CTRDG_Init`, `src/system/machine_use.c`) | `pxi_ctrdg_empty` |
 | [mic/](mic/mic.c) | NitroSDK's `lib/nitro/src/spi/mic.c` (its assembly wait) and the ARM7's MIC service | The microphone API; the microphone hears silence | The title screen's microphone test (`src/ov253/mictest.c`), the Xtransceiver (`src/ov257/ctvt_mic.c`) | `pxi_mic_silence` |
@@ -47,7 +47,7 @@ The root's files:
 
 | File | What it does | Tests |
 | --- | --- | --- |
-| [trap.c](trap.c), [trap.h](trap.h) | Trap stubs: a DS function or data object that has no C yet stops the program with its name, its address and its caller (status 70). [../tools/gen_stubs.py](../tools/gen_stubs.py) writes a stub for each at every build; data placeholders sit on pages with no access (readable again at exit in the sanitized build, for LeakSanitizer's scan), and a fault handler names the one touched; any other memory fault it reports as a crash (`port: crash: ...`, with a backtrace), as [host/](host/host.h) reports the crashes that aren't memory faults. `port_trap_is_placeholder` tells Frigate's test launcher ([../app/launcher.c](../app/launcher.c)) whether the field's process table is still one, so that it steps aside once that table has C | `smoke_reaches_game_main`, `oracle_continue` (which stops at the field's first trap), `app_launcher_spec_*` (the placeholder check) |
+| [trap.c](trap.c), [trap.h](trap.h) | Trap stubs: a DS function or data object that has no C yet stops the program with its name, its address and its caller (status 70). [../tools/gen_stubs.py](../tools/gen_stubs.py) writes a stub for each at every build; data placeholders sit on pages with no access (readable again at exit in the sanitized build, for LeakSanitizer's scan), and a fault handler names the one touched; any other memory fault it reports as a crash (`port: crash: ...`, with a backtrace), as [host/](host/host.h) reports the crashes that aren't memory faults | `smoke_reaches_game_main`, `host_*` (a placeholder touched, on the host's stack and on a fiber) |
 | [replaced.txt](replaced.txt) | The decomp files the host build leaves out, whole modules and asm-only files, each with its reason. A module's own `replaced.txt` lists the rest; [../tools/gen_host_tree.py](../tools/gen_host_tree.py) reads them all | the build |
 
 ## Files of each module
@@ -89,7 +89,7 @@ version, to find the file. `replaced.txt` in a module lists the decomp files tha
 
 | File | What it does |
 | --- | --- |
-| [hw.h](hw/hw.h), [hw.c](hw/hw.c) | The windows of host memory that `PORT_HW_ADDR()` turns DS addresses into, the accessors of the registers whose accesses act (VCOUNT, the divider, the geometry ports), the geometry command log and its readbacks |
+| [hw.h](hw/hw.h), [hw.c](hw/hw.c) | The windows of host memory that `PORT_HW_ADDR()` turns DS addresses into, the accessors of the registers whose accesses act (VCOUNT, the divider, the geometry ports), the geometry command log and its readbacks; an access to POLYGON_ATTR, TEXIMAGE_PARAM or PLTT_BASE right after one to the same port shares its entry, so that SPL's read of POLYGON_ATTR after each particle's write sends no command of 0 (which drew no particle at all), and a send of MI's to a shared entry keeps it ([ADR 0004](../docs/adr/0004-ds-addresses-by-header-translation.md)'s note) |
 
 **[gx/](gx/vram.h)** — VRAM, loads and the screens
 
@@ -147,7 +147,7 @@ version, to find the file. `replaced.txt` in a module lists the decomp files tha
 | [pm/pm7.c](pm/pm7.c), [pm/pm_host.c](pm/pm_host.c) | Power: the battery, backlights, screens, the sound amplifier, sleep; the decomp's `pm.c` compiled through |
 | [tp/tp_host.h](tp/tp_host.h), [tp/tp7.c](tp/tp7.c) | The touch panel: where the program says the player touches, sampled as the ARM7 does |
 | [nvram/nvram_settings.h](nvram/nvram_settings.h), [nvram/nvram7.c](nvram/nvram7.c), [nvram/nvram_host.c](nvram/nvram_host.c) | The firmware's user settings, the MAC address, the touch calibration and the firmware flash; the decomp's `nvram.c` compiled through |
-| [rtc/rtc_host.h](rtc/rtc_host.h), [rtc/rtc7.c](rtc/rtc7.c), [rtc/rtc_api.c](rtc/rtc_api.c) | The clock chip: the host's local time or `--fixed-time`; the SDK's RTC API without its assembly wait |
+| [rtc/rtc_host.h](rtc/rtc_host.h), [rtc/rtc7.c](rtc/rtc7.c), [rtc/rtc_api.c](rtc/rtc_api.c) | The clock chip: the host's local time or `--fixed-time`, running or pinned; the SDK's RTC API without its assembly wait |
 | [reset/reset7.c](reset/reset7.c) | The reset and terminate commands |
 | [ctrdg/ctrdg7.c](ctrdg/ctrdg7.c), [ctrdg/svc_cpuset.c](ctrdg/svc_cpuset.c) | An empty GBA slot, and the BIOS's `SVC_CpuSet` its library uses |
 | [mic/mic.c](mic/mic.c) | The microphone, which hears silence |

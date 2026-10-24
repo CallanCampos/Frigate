@@ -18,8 +18,8 @@
 typedef void *(*ResortPersonCreateFunc)(HeapID heapId);
 typedef void (*ResortPersonFunc)(void *person);
 typedef BOOL (*ResortPersonIsEmptyFunc)(void *person);
-typedef u32 (*ResortPersonGetParamFunc)(void *person, u32 param, void *buffer);
-typedef void (*ResortPersonSetParamFunc)(void *person, u32 param, u32 value);
+typedef uptr (*ResortPersonGetParamFunc)(void *person, u32 param, void *buffer);
+typedef void (*ResortPersonSetParamFunc)(void *person, u32 param, uptr value);
 typedef u32 (*ResortPersonUnk1cFunc)(void *person, u32 a1, u32 a2);
 
 typedef struct {
@@ -241,7 +241,7 @@ BOOL ResortData_IsEmpty(ResortPersonData *data) {
     return data->funcs->isEmpty(data->person);
 }
 
-u32 ResortData_GetParam(ResortPersonData *data, JoinAvenuePersonParam param, void *buffer) {
+uptr ResortData_GetParam(ResortPersonData *data, JoinAvenuePersonParam param, void *buffer) {
     return data->funcs->getParam(data->person, param, buffer);
 }
 

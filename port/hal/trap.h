@@ -3,7 +3,6 @@
 // build's gen/stubs.c): a function stub calls port_trap_function, which names the function, its address and its caller
 // and stops the program with status 70; a data placeholder sits on a page with no access, so the first read or write
 // is named the same way. The first trap a run reaches is the next piece of C the game needs (port/docs/STATUS.md).
-// Frigate's test launcher asks it whether the field's process table is still a placeholder (port/app/launcher.c).
 // Plain C types only, so that the program (port/app/main.c) and the generated stubs can include it.
 #ifndef PORT_HAL_TRAP_H
 #define PORT_HAL_TRAP_H
@@ -26,10 +25,6 @@ typedef struct PortTrapSymbol {
 
 // Called by a function stub: the game called a DS function that has no C yet. Reports it with the caller and stops
 _Noreturn void port_trap_function(const PortTrapSymbol *symbol, void *caller);
-
-// Whether an address lies in one of the data placeholders, DS data that has no C yet. Frigate's test launcher asks it
-// of overlay 36's FIELDMAP_PROC_FUNCS, and steps aside once that table has C (port/app/launcher.c, ADR 0012)
-int port_trap_is_placeholder(const void *address);
 
 // Makes the data placeholders inaccessible, so that the first access to DS data with no C yet is reported by name
 // instead of reading zeros. Called once at startup, before the game runs. Under AddressSanitizer they become readable

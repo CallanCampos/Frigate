@@ -1,6 +1,7 @@
 // Tests of port/hal/gx: the VRAM banks in the region 0x06 window, the SDK's VRAMCNT functions through the HAL's
-// wrappers, the 3D and extended palette loads, the geometry FIFO copies, the renderer's source and the field's building
-// transition's clear of LCDC VRAM. The conformance
+// wrappers, the 3D and extended palette loads, the geometry FIFO copies, the geometry command log's reads of a command
+// port (port/hal/hw/hw.c), which SPL's particles do, the renderer's source and the field's building transition's clear
+// of LCDC VRAM. The conformance
 // tests are the vram-alias spike's (port/spikes/vram-alias/test_vram.c), here on the real window, with the CPU views
 // at their DS addresses. Usage:
 //   port_gx_tests layout                 the layout against GBATEK's places, without the SDK
@@ -8,17 +9,20 @@
 //                                        and a reference model; exits 77 when the backend can't run here
 //   port_gx_tests <scenario> [backend]   an SDK scenario (sdk_settings, wrappers, tex_upload, texpltt_upload,
 //                                        clear_image, ext_palettes, fifo, fill_source, cpu_pointer, default_backend,
-//                                        display, lcdc_clear),
+//                                        display, lcdc_clear, parameter_read),
 //                                        run as the game's main() on the OS core, with the backend given or the
 //                                        default one
+#include "gfx/ge/ge.h"
 #include "gfx/ref/ds2d.h"
 #include "hal/gx/gx_display.h"
 #include "hal/gx/vram.h"
 #include "hal/host/host.h"
 #include "hal/hw/hw.h"
 #include "hal/os/port_os.h"
+#include "lib/spl/src/spl_internal.h"
 #include "nitro/gx.h"
 #include "nitro/mi.h"
+#include "spl/spl.h"
 #include "tests/gx/sdk_settings.h"
 #include <stdbool.h>
 #include <stdio.h>
@@ -1262,6 +1266,128 @@ static void scenario_fifo(void) {
     CHECK(count == 0);
 }
 
+// A read of a geometry command port. The ports are write-only, and the DS reads 0 from one and sends nothing, but the
+// register macro's access can't tell a read from a write: SPL reads POLYGON_ATTR back after setting each particle's
+// (lib/spl/src/spl_draw.c, "(void)reg_G3_POLYGON_ATTR;"), and when the read was logged as a POLYGON_ATTR of 0, which
+// draws neither face, every particle of the game vanished (the trainers' cut-in sparks, the Poké Balls' bursts, the
+// moves' effects). The log keeps one POLYGON_ATTR with the value written, merges only accesses in a row to a port that
+// stores its parameter, keeps such a write when MI sends to the port right after it, and SPL's own billboard draw
+// leaves its quad in the geometry engine
+static void scenario_parameter_read(void) {
+    static const MtxFx43 identity = { { { FX32_ONE, 0, 0 }, { 0, FX32_ONE, 0 }, { 0, 0, FX32_ONE }, { 0, 0, 0 } } };
+    const u32 attr = GX_PACK_POLYGONATTR_PARAM(GX_LIGHTMASK_NONE, GX_POLYGONMODE_MODULATE, GX_CULL_NONE, 5, 31, 0);
+    const PortG3Write *log;
+    size_t count;
+    SPLResourceHeader header;
+    SPLResource resource;
+    SPLEmitter emitter;
+    SPLManager manager;
+    SPLParticle particle;
+    PortGe *ge;
+
+    sContext = "parameter read";
+    port_hw_g3_take(&count);
+
+    // The write and the read, as spl_draw.c has them
+    G3_PolygonAttr(GX_LIGHTMASK_NONE, GX_POLYGONMODE_MODULATE, GX_CULL_NONE, 5, 31, 0);
+    (void)reg_G3_POLYGON_ATTR;
+    G3_Begin(GX_BEGIN_QUADS);
+    log = port_hw_g3_take(&count);
+    CHECK(count == 2);
+    if (count == 2) {
+        CHECK(log[0].port == 0x040004a4 && log[0].value == attr);
+        CHECK(log[1].port == 0x04000500 && log[1].value == GX_BEGIN_QUADS);
+    }
+
+    // Two writes in a row to a port that stores its parameter: one entry, the second's value
+    G3_PolygonAttr(GX_LIGHTMASK_NONE, GX_POLYGONMODE_MODULATE, GX_CULL_NONE, 1, 10, 0);
+    G3_PolygonAttr(GX_LIGHTMASK_NONE, GX_POLYGONMODE_MODULATE, GX_CULL_NONE, 5, 31, 0);
+    reg_G3_TEXIMAGE_PARAM = 0x1234;
+    reg_G3_TEXIMAGE_PARAM = 0x5678;
+    reg_G3_TEXPLTT_BASE = 0x11;
+    reg_G3_TEXPLTT_BASE = 0x22;
+    log = port_hw_g3_take(&count);
+    CHECK(count == 3);
+    if (count == 3) {
+        CHECK(log[0].port == 0x040004a4 && log[0].value == attr);
+        CHECK(log[1].port == 0x040004a8 && log[1].value == 0x5678);
+        CHECK(log[2].port == 0x040004ac && log[2].value == 0x22);
+    }
+
+    // With another command between, each its own; a command that acts at each write is never merged
+    G3_PolygonAttr(GX_LIGHTMASK_NONE, GX_POLYGONMODE_MODULATE, GX_CULL_NONE, 1, 10, 0);
+    G3_Begin(GX_BEGIN_QUADS);
+    G3_PolygonAttr(GX_LIGHTMASK_NONE, GX_POLYGONMODE_MODULATE, GX_CULL_NONE, 5, 31, 0);
+    G3_Identity();
+    G3_Identity();
+    log = port_hw_g3_take(&count);
+    CHECK(count == 5);
+    if (count == 5) {
+        CHECK(log[0].port == 0x040004a4 && log[2].port == 0x040004a4 && log[2].value == attr);
+        CHECK(log[3].port == 0x04000454 && log[4].port == 0x04000454);
+    }
+
+    // MI's send to the port right after a write to it: the port's access shares the write's entry, which the send
+    // keeps, so a send of no words leaves the write, and a send of one logs its word after it
+    G3_PolygonAttr(GX_LIGHTMASK_NONE, GX_POLYGONMODE_MODULATE, GX_CULL_NONE, 5, 31, 0);
+    MIi_CpuSend32(&attr, &reg_G3_POLYGON_ATTR, 0);
+    log = port_hw_g3_take(&count);
+    CHECK(count == 1);
+    if (count == 1) {
+        CHECK(log[0].port == 0x040004a4 && log[0].value == attr);
+    }
+    G3_PolygonAttr(GX_LIGHTMASK_NONE, GX_POLYGONMODE_MODULATE, GX_CULL_NONE, 1, 10, 0);
+    MIi_CpuSend32(&attr, &reg_G3_POLYGON_ATTR, sizeof(attr));
+    log = port_hw_g3_take(&count);
+    CHECK(count == 2);
+    if (count == 2) {
+        CHECK(log[0].port == 0x040004a4 && log[0].value != attr);
+        CHECK(log[1].port == 0x040004a4 && log[1].value == attr);
+    }
+
+    // SPL's billboard of one opaque particle at the origin, in front of an identity camera, through the engine
+    memset(&header, 0, sizeof(header));
+    memset(&resource, 0, sizeof(resource));
+    memset(&emitter, 0, sizeof(emitter));
+    memset(&manager, 0, sizeof(manager));
+    memset(&particle, 0, sizeof(particle));
+    header.aspectRatio = FX16_ONE;
+    header.scaleAnimDir = SPL_SCALE_ANIM_DIR_XY;
+    resource.header = &header;
+    emitter.resource = &resource;
+    emitter.color = GX_RGB(31, 31, 31);
+    emitter.textureS = FX16_ONE;
+    emitter.textureT = FX16_ONE;
+    manager.drawEmitter = &emitter;
+    manager.viewMatrix = &identity;
+    particle.baseAlpha = 31;
+    particle.animAlpha = 31;
+    particle.polygonId = 5;
+    particle.baseScale = FX32_ONE / 4;
+    particle.animScale = FX16_ONE;
+    particle.color = GX_RGB(31, 31, 31);
+    G3_MtxMode(GX_MTXMODE_PROJECTION);
+    G3_Identity();
+    G3_MtxMode(GX_MTXMODE_POSITION_VECTOR);
+    G3_Identity();
+    G3_ViewPort(0, 0, 255, 191);
+    SPLDraw_Billboard(&manager, &particle);
+    log = port_hw_g3_take(&count);
+    ge = port_ge_create();
+    CHECK(ge != NULL);
+    if (ge != NULL) {
+        const PortGeList *list;
+
+        port_ge_run(ge, log, count);
+        list = port_ge_building_list(ge);
+        CHECK(list->polygon_count == 1);
+        if (list->polygon_count == 1) {
+            CHECK(list->polygons[0].attr == attr);
+        }
+        port_ge_destroy(ge);
+    }
+}
+
 // POWCNT1 as the SDK sets it: GX_Init's power and display swap, then the other screen order and the sub engine off
 static void scenario_display(void) {
     PortGxDisplay display;
@@ -1359,12 +1485,19 @@ typedef struct Scenario {
 } Scenario;
 
 static const Scenario sScenarios[] = {
-    { "sdk_settings", scenario_sdk_settings }, { "wrappers", scenario_wrappers },
-    { "tex_upload", scenario_tex_upload },     { "texpltt_upload", scenario_texpltt_upload },
-    { "clear_image", scenario_clear_image },   { "ext_palettes", scenario_ext_palettes },
-    { "fill_source", scenario_fill_source },   { "fifo", scenario_fifo },
-    { "cpu_pointer", scenario_cpu_pointer },   { "default_backend", scenario_default_backend },
-    { "display", scenario_display },           { "lcdc_clear", scenario_lcdc_clear },
+    { "sdk_settings", scenario_sdk_settings },
+    { "wrappers", scenario_wrappers },
+    { "tex_upload", scenario_tex_upload },
+    { "texpltt_upload", scenario_texpltt_upload },
+    { "clear_image", scenario_clear_image },
+    { "ext_palettes", scenario_ext_palettes },
+    { "fill_source", scenario_fill_source },
+    { "fifo", scenario_fifo },
+    { "cpu_pointer", scenario_cpu_pointer },
+    { "default_backend", scenario_default_backend },
+    { "display", scenario_display },
+    { "lcdc_clear", scenario_lcdc_clear },
+    { "parameter_read", scenario_parameter_read },
 };
 
 static const Scenario *sRunning;

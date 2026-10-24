@@ -2,9 +2,7 @@
 # port/hal/os/port_app.h) is exactly what the build read from that header for the macOS app's names and About window
 # (port_product_string in port/CMakeLists.txt), written to EXPECTED at configure time: the product and the game, the
 # description, the disclaimer and a blank line. So the C and the build can't name Frigate differently. After the usage,
-# --help says what each option of the usage does (main.c's sOptions), and --launch's line names the apps that Frigate's
-# test launcher says it opens when it is given one it doesn't (port/app/launcher_spec.c), so --help is where a reader
-# finds the options.
+# --help says what each option of the usage does (main.c's sOptions), so --help is where a reader finds the options.
 #
 #   cmake -DPROGRAM=PATH -DEXPECTED=FILE -DSAVE_DIR=DIR -P check_about.cmake
 foreach(variable IN ITEMS PROGRAM EXPECTED SAVE_DIR)
@@ -54,19 +52,4 @@ foreach(option IN LISTS usage_options)
     endif()
 endforeach()
 
-# --launch's line names the apps the launcher itself names, as it does to a run given one it doesn't open
-execute_process(COMMAND "${PROGRAM}" --headless --launch nosuchapp --save-dir "${SAVE_DIR}"
-    RESULT_VARIABLE status OUTPUT_VARIABLE output ERROR_VARIABLE launch_messages)
-if(NOT launch_messages MATCHES "isn't an app the launcher opens (\\([a-z, ]+\\))")
-    message(FATAL_ERROR "--launch nosuchapp (status ${status}) doesn't name the apps the launcher opens:\n"
-        "${launch_messages}")
-endif()
-set(apps "${CMAKE_MATCH_1}")
-# What an option does goes on over lines indented further than the option's own two spaces
-string(REGEX REPLACE "\n   +" " " options_flat "${options_text}")
-string(REGEX MATCH "\n  --launch [^\n]*" launch_line "${options_flat}")
-string(FIND "${launch_line}" "${apps}" at)
-if(at EQUAL -1)
-    message(FATAL_ERROR "--help's --launch doesn't name the apps ${apps}:\n${options_text}")
-endif()
-message(STATUS "--help describes the ${count} options of its usage, and --launch's names the apps ${apps}")
+message(STATUS "--help describes the ${count} options of its usage")

@@ -448,8 +448,9 @@ Each phase ends when its exit criteria pass on macOS. Phases overlap where the d
 ### Phase 4: battles, menus, saves (M5–M7)
 
 - Wild and trainer battles (overlays 167–170), encounter effects, bag, party, Pokédex, PC, summary.
-- Until overlay 36 lands, the field menu's apps are tested through Frigate's test launcher
-  ([ADR 0012](adr/0012-test-launcher-for-the-field-menus-apps.md)) against the oracle's route through the field menu.
+- The field menu's apps are tested through the field menu itself against the oracle's route through it (the
+  `field_menus` and `party_menus` sequences); Frigate's test launcher
+  ([ADR 0012](adr/0012-test-launcher-for-the-field-menus-apps.md)) stood in for the menu until overlay 36's C arrived.
 - Save and load, melonDS save import and export.
 - **Exit:** catch a Pokémon, save, quit, reload; a melonDS save continues in the port and back.
 
