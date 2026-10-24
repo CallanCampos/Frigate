@@ -1,7 +1,8 @@
 // The host console's real-time clock (port/hal/rtc): the date and time that the clock chip gives the game. It is the
 // host's local time, read again at each request, unless the program is run with --fixed-time "YYYY-MM-DD HH:MM:SS"
 // (tests and replays): then the clock starts at that time when the game starts and runs with the virtual clock, so a
-// run is deterministic. Plain C types only, so that the program can include it.
+// run is deterministic, or stays at it when a replay's input file pins it ("clock pinned", port/app/replay.h), as the
+// melonDS oracle's does on the same file. Plain C types only, so that the program can include it.
 #ifndef PORT_HAL_RTC_RTC_HOST_H
 #define PORT_HAL_RTC_RTC_HOST_H
 
@@ -25,5 +26,9 @@ void port_rtc_now(PortRtcTime *now);
 // port_rtc_use_host_time goes back to the host's local time
 int port_rtc_set_fixed_time(const char *text);
 void port_rtc_use_host_time(void);
+
+// Pins the fixed clock (nonzero) at its time, so that it no longer runs with the virtual clock, or lets it run (0, the
+// default); the host's local time is never pinned
+void port_rtc_set_pinned(int pinned);
 
 #endif // PORT_HAL_RTC_RTC_HOST_H

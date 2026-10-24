@@ -20,7 +20,7 @@ ctest --test-dir build/port-san -L route                       # every route, wi
 
 - **White 2** is `-DPORT_VERSION=w2_us` in a directory of its own (`build/port-san-w2`).
 - **The routes** are the tests labelled `route`: the program runs the game from power-on on the player's ROM (the
-  replays, the oracle's sequences and the port's checks of their hashes, the test launcher's routes, the smoke test).
+  replays, the oracle's sequences and the port's checks of their hashes, the smoke test).
   The oracle's need its program and the ROM build's link map, as in the plain build
   ([../tests/README.md](../tests/README.md)); without the ROM they skip, as in CI.
 - **One route by hand:** `build/port-san/frigate-black2 --headless --frames 4300 --watchdog 60 --save-dir
@@ -36,7 +36,7 @@ ctest --test-dir build/port-san -L route                       # every route, wi
     That holds only for a test that doesn't invert its result with `WILL_FAIL`, which turns that failure into a pass;
     so no test has `WILL_FAIL`, and configuring stops on one, in every build. A test of a failure checks how its
     program ends with [../tests/app/check_exit.py](../tests/app/check_exit.py) (`--status`, `--crash`, `--abort`).
-  - A wrapper that runs the program (`check_exit.py`, `check_launch_smoke.py`, `oracle.py`, the replays' scripts)
+  - A wrapper that runs the program (`check_exit.py`, `oracle.py`, the replays' scripts)
     shows ctest only what it prints, so it fails on the program's abort itself: each wants a status, or a stop at a
     trap, that an abort isn't. `check_exit.py`, whose `--crash` and `--abort` would take an abort for the ending they
     want, fails a run with a report in its output whatever ending it wants.

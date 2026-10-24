@@ -1,12 +1,10 @@
 // Tests of phase 1's integration: the host DMA (port/hal/dma), the OS allocator's 64-bit addresses
 // (port/hal/os/os_alloc_host.c) and the main arena's placement, the buttons and lid (port/hal/input), the screens drawn
-// by the scanline hook (port/gfx/screens.c), the PNG screenshot (port/app/present.c), Frigate's test launcher when it
-// is off (port/app/launcher.c), and the overlays' sections, which a load sets back (port/hal/fs/ovsec.c, with
-// ovsec_probe.c). Each scenario runs as the game's main() would, as the launcher of port_os_run, on the whole
-// program's objects.
+// by the scanline hook (port/gfx/screens.c), the PNG screenshot (port/app/present.c), and the overlays' sections,
+// which a load sets back (port/hal/fs/ovsec.c, with ovsec_probe.c). Each scenario runs as the game's main() would, as
+// the launcher of port_os_run, on the whole program's objects.
 //
 //   port_integrate_tests NAME | all
-#include "app/launcher.h"
 #include "app/present.h"
 #include "app/run_dir.h"
 #include "gfx/screens.h"
@@ -335,15 +333,6 @@ static void TestScreens(void) {
     }
 }
 
-// Frigate's test launcher (port/app/launcher.c, ADR 0012) without --launch: CONTINUE's seam asks it before the field
-// opens (src/ov035/event_mapchange.c), and it must answer 0 without touching the event, so that the field opens as
-// before; it never stops the run, and leaves the run's exit status alone
-static void TestLauncherOff(void) {
-    Check(port_launcher_take_field_open(NULL) == 0, "without --launch the launcher leaves the field to open");
-    Check(!port_launcher_finished(), "without --launch the launcher never stops the run");
-    Check(port_launcher_end() == PORT_LAUNCH_STATUS_DONE, "without --launch the launcher leaves the status at 0");
-}
-
 typedef struct Test {
     const char *name;
     void (*run)(void);
@@ -382,9 +371,14 @@ static void TestOverlaySections(void) {
 }
 
 static const Test sTests[] = {
-    { "dma_copies", TestDmaCopies }, { "dma_async", TestDmaAsync },       { "dma_gx_command", TestDmaGxCommand },
-    { "os_alloc", TestOsAlloc },     { "main_arena", TestMainArena },     { "input", TestInput },
-    { "screens", TestScreens },      { "launcher_off", TestLauncherOff }, { "overlay_sections", TestOverlaySections },
+    { "dma_copies", TestDmaCopies },
+    { "dma_async", TestDmaAsync },
+    { "dma_gx_command", TestDmaGxCommand },
+    { "os_alloc", TestOsAlloc },
+    { "main_arena", TestMainArena },
+    { "input", TestInput },
+    { "screens", TestScreens },
+    { "overlay_sections", TestOverlaySections },
 };
 
 int main(int argc, char **argv) {

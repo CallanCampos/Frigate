@@ -15,11 +15,11 @@ This directory, `port/`, is Frigate's code. The rest of the repository is the de
 doesn't have, and runs it as a program, with no emulator. The ROM is only where the game's files come from.
 
 **Where it stands:** Frigate boots natively through the logos, opening, title screen and start menu, with sound, and
-into the field: CONTINUE and New Game go into the field and the house, held to melonDS. Tests compare these paths
-frame by frame with melonDS and check the sound driver, music and cries. Beyond the house, encounters and battles wait
-on more host fixes and on one table of overlay 167 that has no C yet, so the game isn't playable past it. The former
-test launcher now steps aside, so its earlier app comparisons do not establish current field or app coverage.
-[docs/STATUS.md](docs/STATUS.md) records the checks and remaining work.
+into the field: CONTINUE and New Game go into the field and the house, and the field menu opens the party list and a
+Pokémon's summary, the Pokédex, the bag and the trainer card. Tests compare these paths frame by frame with melonDS and
+check the sound driver, music and cries. Beyond the house, encounters and battles wait on more host fixes and on one
+table of overlay 167 that has no C yet, so the game isn't playable past it. [docs/STATUS.md](docs/STATUS.md) records
+the checks and remaining work.
 
 ## Contributing
 
@@ -49,8 +49,7 @@ ctest --test-dir build/port -j4 --output-on-failure                      # test
 - **The program's options** are in `frigate-black2 --help`, which says what each does and what each exit status means,
   from `sOptions` in [app/main.c](app/main.c): `--headless` runs without a window or pacing, `--frames N` stops after N
   frames, `--screenshot PATH` writes both screens at the end, `--save-dir PATH` keeps the saves elsewhere,
-  `--input FILE` plays a replay, `--launch APPS` opens the field menu's apps for the tests
-  ([the test launcher](#the-test-launcher)), `--frame-times FILE` writes how long each frame took on this machine, and
+  `--input FILE` plays a replay, `--frame-times FILE` writes how long each frame took on this machine, and
   `--render-threads N` draws the 3D frame on N threads (the machine's performance cores by default; the frames are the
   same whatever N).
 - **The tests** that need your ROM skip without it ([tests/README.md](tests/README.md)). In an optimized build the
@@ -116,34 +115,6 @@ build/port/frigate-black2 --rom /c/Games/black2.nds                      # your 
 - **The ROM build** (`configure.py` and `ninja`) doesn't run on Windows: the decomp's tools for it are macOS's and
   Linux's. Nothing Frigate builds needs it, but the oracle's tests, which count the game's frames with its link map.
 
-### The test launcher
-
-The launcher was built to open apps while the field had no C. It now detects the imported
-`FIELDMAP_PROC_FUNCS` and steps aside; these commands document the earlier test path, and the field menu itself opens
-the apps now that the field does ([docs/STATUS.md](docs/STATUS.md)). On revisions with the placeholder, it opens apps in
-order at COUNT (at once without one):
-
-```sh
-build/port/frigate-black2 --save-dir SAVES --launch bag,card        # the bag, then the trainer card, after CONTINUE
-build/port/frigate-black2 --save-dir SAVES --launch party@4044,card@6974 --input FILE --headless
-```
-
-The apps are `party`, `pokedex`, `bag`, `card` and `summary`; each closed app prints its result. Without `--launch`
-nothing changes.
-
-Its exit status: 0 when every app opened and closed; 1 when the launch didn't finish (the run ended first, the game
-never asked for the field, the launcher stepped aside because the field's process table has C, or an app wanted the
-field); 2 when the `--launch` list isn't one it can read, or when the save's field menu doesn't offer an app, which it
-checks as the menu does (no Pokémon, no Pokédex, the Black Tower's or White Treehollow's menu without its BAG). A status
-of the run's own comes first, such as a trap's 70, a deadlock's 72, the watchdog's 73 or a 1 of the program's own (the
-window didn't open, a write to the run directory or the sound trace failed during the run or of `--frame-times`' file at
-its end, a module ran out of host memory or found a build that can't work). Each says why on a `port:` line; `--help`
-(from [app/main.c](app/main.c)) and [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md#how-a-run-ends) list every status.
-
-[docs/MODDING.md](docs/MODDING.md#reaching-the-field-menus-apps) says how to reach a menu with it, and where its saves
-come from; [ADR 0012](docs/adr/0012-test-launcher-for-the-field-menus-apps.md) says why it exists and when it goes;
-`oracle.py launch` checks the apps against melonDS through it ([tools/oracle/README.md](tools/oracle/README.md)).
-
 ## Directory map
 
 Each directory has a guide to what its files do, the part of the game each touches and its tests. Most guides list
@@ -154,7 +125,7 @@ asm oracle, each spike, the artwork) lists its files there.
 
 | Directory | What it is | Guide |
 | --- | --- | --- |
-| `app/` | The program: `main()` and its options, the SDL3 window, the keyboard, mouse and gamepads, presenting and pacing, replays, the oracle's run directory and the sound driver's trace, the test launcher (`--launch`), the macOS app's scripts, the Windows programs' manifest | [app/README.md](app/README.md) |
+| `app/` | The program: `main()` and its options, the SDL3 window, the keyboard, mouse and gamepads, presenting and pacing, replays, the oracle's run directory and the sound driver's trace, the macOS app's scripts, the Windows programs' manifest | [app/README.md](app/README.md) |
 | `hal/` | The platform layer: host C for the parts of the DS that the game reaches through Nintendo's SDK, one directory per SDK module or ARM7 service (threads and time, memory, VRAM, DMA, the ROM, files and overlays, saves and the cartridge's infrared chip, sound, touch, the clock, power, input, MSL's runtime division), and `host/`, the host operating system's services where macOS, Linux and Windows differ | [hal/README.md](hal/README.md) |
 | `gfx/` | The renderers: the 2D engines line by line, the geometry engine, the 3D rasterizer, display capture | [gfx/README.md](gfx/README.md) |
 | `audio/` | The sound output: the default device and the WAV dump | [audio/README.md](audio/README.md) |

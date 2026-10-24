@@ -9,9 +9,9 @@ Two limits shape everything below:
 
 - **The field opens; what lies beyond the house waits.** The field engine's C is in, and the host gives the field's
   heap the room its larger structs need ([ADR 0021](adr/0021-root-heaps-in-the-games-own-memory-from-host-memory.md)),
-  so CONTINUE and New Game go into the field and the house. Beyond the house, encounters and battles wait on more
-  fixes and on one table of overlay 167 that has no C yet. The test launcher steps aside automatically, so its earlier
-  app comparisons do not establish current field or app coverage. See [STATUS.md](STATUS.md).
+  so CONTINUE and New Game go into the field and the house, and the field menu opens its apps. Beyond the house,
+  encounters and battles wait on more fixes and on one table of overlay 167 that has no C yet. See
+  [STATUS.md](STATUS.md).
 - **Frigate reads the game's data from the player's ROM, and checks it.** The program accepts only a dump of the
   version it was built for, by its SHA-1 or by every NitroFS file's ([../hal/rom/port_rom.h](../hal/rom/port_rom.h)),
   so a patched ROM is refused. Changing data files (text, species, trainers, maps) needs the layered file system of
@@ -59,20 +59,19 @@ main and exit functions); what it draws, its backgrounds, windows, sprites and t
 in battle is another overlay's: `src/ov286/b_bag_main.c` and the other `b_bag_*.c` files there. To change what the bag
 shows, change those files' C: which items a pocket lists, in what order, which message each line uses. The words
 themselves are the ROM's message data, which a C change can pick between but not rewrite until the layered file system
-exists. The bag opens from the field's menu, now that the field opens; `--launch bag` steps aside because the field
-process table has C ([below](#reaching-the-field-menus-apps)).
+exists. The bag opens from the field's menu ([below](#reaching-the-field-menus-apps)).
 
 ## Reaching the field menu's apps
 
-The launcher is retained as a test tool from before the field engine's C arrived. It automatically steps aside
-when `FIELDMAP_PROC_FUNCS` exists, as it does now, so the following historical commands do not reach apps on the
-current build. Earlier comparisons against melonDS remain evidence for their recorded revisions, not current
-field or app coverage ([ADR 0012](adr/0012-test-launcher-for-the-field-menus-apps.md)).
+The field menu's apps, the party list and a Pokémon's summary, the Pokédex, the bag and the trainer card, open from the
+menu as on the DS: CONTINUE a saved game, and X opens the menu in the field. An input file plays the presses for you,
+the same every run; the oracle's `field_menus` and `party_menus` files (in [../tests/oracle](../tests/oracle)) open
+each app at the count their comments give, from the first save and the starter save:
 
 ```sh
-build/port/frigate-black2 --save-dir SAVES --launch bag                # the bag after CONTINUE, then stop
-build/port/frigate-black2 --save-dir SAVES --launch party,card         # the party list, then the trainer card
-build/port/frigate-black2 --save-dir SAVES --launch bag@4044 --input FILE --headless --screenshot bag.png
+build/port/frigate-black2 --save-dir SAVES          # CONTINUE, then X in the field
+build/port/frigate-black2 --save-dir SAVES --input port/tests/oracle/party_menus_b2_us.pbwinput \
+    --headless --frames 4250 --screenshot party.png  # the party list, Tepig at 21/21
 ```
 
 - **It needs a save to continue.** `SAVES` holds `IREO.sav` (Black 2) or `IRDO.sav` (White 2): your own save from a
@@ -93,19 +92,16 @@ build/port/frigate-black2 --save-dir SAVES --launch bag@4044 --input FILE --head
   The oracle counts game frames with the ROM build's link map, so run `python3 configure.py && ninja` first: without
   it the save command stops with "counts game frames, which need --counter". `--oracle BIN` names `pbw-oracle` when
   it isn't in `build/port-oracle/oracle/`, and `--rom PATH` the ROM. Both versions have both saves; the starter save
-  is made from the first save, so it costs the two oracle runs. Without a save there is no CONTINUE, the game never
-  asks for the field, and the run ends with status 1.
-- **It opens only what the save's field menu offers**, as the menu decides: no party list or summary without a
-  Pokémon, no Pokédex without the Pokédex, no bag in the Black Tower's or White Treehollow's menu. Asking for another
-  ends the run with status 2 before anything opens.
-- **Each app runs as the game runs it**, with your keys or an input file's presses. When it closes, the next one opens,
-  and after the last the program stops, saying how each closed (its result and event type). `APP@COUNT` opens an app
-  when GFL's frame count reaches COUNT, which lines it up with an input file's presses; without one it opens at once.
-- **What it can't do:** an app that wants the field (a field move, an item used in the field) ends the launch with
-  status 1. What the field leaves behind before an app opens (VRAM, palettes, the random numbers) isn't there.
-- **It is a test tool**, off without the option, and now steps aside because overlay 36 has landed. Earlier tests used it to hold each app
-  to melonDS's route through the real field menu, pass by pass (`oracle.py launch`,
-  [../tools/oracle/README.md](../tools/oracle/README.md#the-launch-checks)).
+  is made from the first save, so it costs the two oracle runs.
+- **The menu offers what the save allows**, as `FieldMenu_GetMenuType` (`src/ov036/field_menu.c`) decides: no
+  POKéMON (so no party list or summary) without a Pokémon, no POKéDEX without the Pokédex, no BAG in the Black Tower's
+  or White Treehollow's menu. The first save has neither a Pokémon nor the Pokédex; the starter save has both.
+- **The files pin the clock** (`clock pinned`), so the menu's clock shows 12:00 for the whole run, on the oracle too:
+  that is what lets the oracle's comparison hold the menu's bottom screen exact
+  ([../tools/oracle/README.md](../tools/oracle/README.md#input-files)).
+- **The oracle holds each app to melonDS** frame by frame on the same files (`oracle.py sequence field_menus` and
+  `party_menus`, the tests `oracle_field_menus` and `oracle_party_menus`;
+  [../tools/oracle/README.md](../tools/oracle/README.md#the-comparison-sequences)).
 
 ## When the game stops
 
@@ -156,14 +152,11 @@ which of these it was:
   `PLATFORM_PC` ([below](#changing-the-games-code-here)).
 - **Bad options (status 2).** An option the program doesn't know (`port: unknown option ...`) or a value it can't use,
   with the usage after it: among them a run directory, WAV dump, sound trace or `--frame-times` file that can't be
-  opened, and a `--launch` list the test launcher can't read. A `--launch` app that the save's field menu doesn't offer
-  ends the run with status 2 too, once CONTINUE asks for the field and before any app opens
-  (`port: --launch: APP: the field menu doesn't offer it in this save, ...`). `--help` says what each option takes.
+  opened. `--help` says what each option takes.
 - **Status 1, 65, 66, 67, 72, 73.** The program couldn't go on, and the message says why: the window didn't open, a
   write to the run directory or the sound trace failed during the run, `--frame-times`' file couldn't be written at its
-  end, the host ran out of memory, a module found a build that can't work, or the test launcher's launch didn't finish
-  (1); a save it can't use (65), no usable ROM (66), the PXI bus's arena check (67), every thread waiting for good (72),
-  or the watchdog (73).
+  end, the host ran out of memory, or a module found a build that can't work (1); a save it can't use (65), no usable
+  ROM (66), the PXI bus's arena check (67), every thread waiting for good (72), or the watchdog (73).
 
 ## Changing the game's code here
 
