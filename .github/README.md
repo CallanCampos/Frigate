@@ -20,10 +20,10 @@ that upstream turns into C reaches Frigate at the next sync.
 ## Status
 
 Frigate boots natively through the logos, opening, title screen and start menu, with sound, and into the field:
-CONTINUE and New Game go into the field and the house, held to melonDS. Tests compare these paths frame by frame with
-melonDS and check the sound driver, music and cries. Beyond the house, encounters and battles wait on more host fixes
-and on one table of overlay 167 that has no C yet, so the game isn't playable past it. The former test launcher now
-steps aside, so its earlier app comparisons do not establish current field or app coverage.
+CONTINUE and New Game go into the field and the house, and the field menu opens the party list and a Pokémon's
+summary, the Pokédex, the bag and the trainer card. Tests compare these paths frame by frame with melonDS and check the
+sound driver, music and cries. Beyond the house, encounters and battles wait on more host fixes and on one table of
+overlay 167 that has no C yet, so the game isn't playable past it.
 The log is [port/docs/STATUS.md](../port/docs/STATUS.md).
 
 The decomp's progress, from upstream's CI:

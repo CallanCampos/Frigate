@@ -73,8 +73,7 @@ endif()
 enable_testing()
 add_executable(port_nnsys_tests
     "${CMAKE_CURRENT_SOURCE_DIR}/tests/nnsys/test_nnsys.c" "${CMAKE_CURRENT_SOURCE_DIR}/tests/nnsys/test_g2d_rom.c"
-    $<TARGET_OBJECTS:pokebw2_game> $<TARGET_OBJECTS:port_hal> $<TARGET_OBJECTS:port_launcher> ${port_gfx_objects}
-    "${PORT_GEN}/stubs.c")
+    $<TARGET_OBJECTS:pokebw2_game> $<TARGET_OBJECTS:port_hal> ${port_gfx_objects} "${PORT_GEN}/stubs.c")
 target_link_libraries(port_nnsys_tests PRIVATE port_decomp_env SDL3::SDL3)
 target_include_directories(port_nnsys_tests PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/..")
 target_compile_options(port_nnsys_tests PRIVATE -std=gnu11 -Wall -Wextra -Wno-unused-parameter)
@@ -88,8 +87,7 @@ endforeach()
 # A query-only free-list fixture crosses a 4 GiB address boundary without allocating its synthetic payload.
 add_executable(port_expheap_capacity_tests
     "${CMAKE_CURRENT_SOURCE_DIR}/tests/nnsys/test_expheap_capacity.c"
-    $<TARGET_OBJECTS:pokebw2_game> $<TARGET_OBJECTS:port_hal> $<TARGET_OBJECTS:port_launcher> ${port_gfx_objects}
-    "${PORT_GEN}/stubs.c")
+    $<TARGET_OBJECTS:pokebw2_game> $<TARGET_OBJECTS:port_hal> ${port_gfx_objects} "${PORT_GEN}/stubs.c")
 target_link_libraries(port_expheap_capacity_tests PRIVATE port_decomp_env SDL3::SDL3)
 target_include_directories(port_expheap_capacity_tests PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/..")
 target_compile_options(port_expheap_capacity_tests PRIVATE -std=gnu11 -Wall -Wextra -Wno-unused-parameter)

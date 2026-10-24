@@ -7,14 +7,13 @@
 // (port/gfx/workers.h, --render-threads). The sound the ARM7's driver makes goes to the default playback device
 // (port/audio).
 //
-//   frigate-black2 [--help] [--headless] [--frames N] [--input FILE] [--save-dir PATH] [--launch APP[@COUNT],...] ...
+//   frigate-black2 [--help] [--headless] [--frames N] [--input FILE] [--save-dir PATH] ...
 //
 // Every option is in sOptions below, with what it does, and every exit status in sExitStatuses, with what it means:
 // --help prints both after the usage, and port/docs/ARCHITECTURE.md, "How a run ends", has the statuses' table. The
 // controls are in port/app/present.c. Run from an app with stderr on /dev/null, as the Finder opens it, the program
 // writes its messages to ~/Library/Logs/Frigate/<program>.log instead (port/app/message_log.h).
 
-#include "app/launcher.h"
 #include "app/message_log.h"
 #include "app/present.h"
 #include "app/replay.h"
@@ -69,9 +68,7 @@ static const Option sOptions[] = {
     { "help", NULL, 0,
       "prints what Frigate is, the usage, what each option does and what each exit status means, then exits" },
     { "headless", NULL, 0, "runs without a window, without pacing and without a sound device, for tests and CI" },
-    { "frames", "N", 0,
-      "runs N frames, then ends the run, with status 0 unless an exit status below says otherwise (such as 1 for a "
-      "--launch whose launch didn't finish)" },
+    { "frames", "N", 0, "runs N frames, then ends the run, with status 0 unless an exit status below says otherwise" },
     { "screenshot", "PATH", 0,
       "writes both screens as a PNG (top above bottom) when the run ends: after the last frame of --frames N, or when "
       "the window is closed" },
@@ -118,14 +115,6 @@ static const Option sOptions[] = {
       "how many times their DS size the game's root heaps get, 1 to 64 (4 by default, port/hal/gfl/heap_policy.c)" },
     { "heap-scale-child", "N", 0,
       "how many times their DS size the game's child heaps get, 1 to 64 (2 by default, port/hal/gfl/heap_policy.c)" },
-    { "launch", "APP[@COUNT],...", 0,
-      "Frigate's test launcher (port/app/launcher.h, ADR 0012): after CONTINUE, opens the field menu's apps (party, "
-      "pokedex, bag, card, summary) in place of the field, whose code (overlay 36) has no C yet, each when GFL's "
-      "frame count reaches COUNT (at once without one), then stops: status 0 when each app opened and closed, 1 when "
-      "the launch didn't finish (the run ended first, the game never asked for the field, the launcher stepped aside "
-      "because the field's process table has C, or an app wanted the field), 2 when the list isn't one it can read or "
-      "the save's field menu doesn't offer an app. A status of the run's own comes first, such as a trap's 70, a "
-      "deadlock's 72, the watchdog's 73 or a 1 of its own (any other cause of 1 below)" },
 };
 
 // What each exit status means, after the options in --help; port/docs/ARCHITECTURE.md, "How a run ends", has the same
@@ -137,19 +126,13 @@ typedef struct ExitStatus {
 
 static const ExitStatus sExitStatuses[] = {
     { 0, "the run ended normally" },
-    { 1,
-      "it can't go on or didn't do what it was asked, each cause with a \"port:\" line: the window didn't open, a "
-      "write to the run directory failed during the run (a frame's row in frames.tsv, a screen's PNG file or "
-      "memory.txt, which stops the run at once), a write to the sound trace or of --frame-times' file failed, a "
-      "module ran out of host memory "
-      "(an arena, the geometry engine or its command log, the files over memory) or found a build that can't work "
-      "(no overlay sections, an archive or a file over memory read through an address cut to 32 bits), or --launch's "
-      "launch didn't finish (the run ended first, the game never asked for the field, the launcher stepped aside, or "
-      "an app wanted the field: port/app/launcher.h)" },
-    { EXIT_BAD_OPTIONS,
-      "bad options, among them a run directory, WAV dump or sound trace that can't be opened and a --launch list the "
-      "launcher can't read; and a --launch app the save's field menu doesn't offer, found once CONTINUE asks for the "
-      "field" },
+    { 1, "it can't go on or didn't do what it was asked, each cause with a \"port:\" line: the window didn't open, a "
+         "write to the run directory failed during the run (a frame's row in frames.tsv, a screen's PNG file or "
+         "memory.txt, which stops the run at once), a write to the sound trace or of --frame-times' file failed, a "
+         "module ran out of host memory (an arena, the geometry engine or its command log, the files over memory) or "
+         "found a build that can't work (no overlay sections, an archive or a file over memory read through an "
+         "address cut to 32 bits)" },
+    { EXIT_BAD_OPTIONS, "bad options, among them a run directory, WAV dump or sound trace that can't be opened" },
     // 65 and 67 are PORT_CARD_EXIT_STATUS (hal/card/port_card.h) and PORT_PXI_EXIT_STATUS (hal/pxi/pxi_bus.h), whose
     // headers need the decomp's, which this file doesn't include
     { 65, "a save file Frigate can't use (the wrong size, a directory, another emulator's format)" },
@@ -174,8 +157,6 @@ static unsigned long sFrames;
 static const char *sScreenshotPath;
 static int sScreenshotWritten;
 static int sRunDirFailed;
-// Frigate's test launcher: whether it asked the program to stop
-static int sLauncherDone;
 static int sWindowOpen;
 // Pacing: the host time of the first paced frame, and the frames since
 static Uint64 sPaceStartNs;
@@ -396,7 +377,6 @@ static int OpenRunDir(const char *dir, const char *inputPath) {
     info.input = inputPath;
     info.inputFrames = port_replay_frames();
     info.frames = (uint32_t)sFrameLimit;
-    info.launch = port_app_option("launch");
     return port_run_dir_open(dir, port_app_option("run-screens"), port_present_screenshot, &info);
 }
 
@@ -453,11 +433,6 @@ static void AppFrame(void) {
         WriteScreenshot();
         port_os_stop();
     }
-    // Frigate's test launcher, once its last app closed
-    if (!sLauncherDone && port_launcher_finished()) {
-        sLauncherDone = 1;
-        port_os_stop();
-    }
     if (!sHeadless) {
         begin = port_frame_time_begin();
         Pace();
@@ -480,7 +455,6 @@ int main(int argc, char **argv) {
     const char *runDir;
     PortOsResult result;
     int status = 0;
-    int launchStatus;
     // Before anything is written: an app opened from the Finder writes its messages to a log (port/app/message_log.h)
     const char *logPath = port_message_log_open();
 
@@ -575,12 +549,6 @@ int main(int argc, char **argv) {
     if (arenaSize != 0) {
         port_os_set_main_arena_size((size_t)arenaSize);
     }
-    // A list the launcher can't open is a bad option, before the game starts
-    if (!port_launcher_configure(port_app_option("launch"))) {
-        port_run_dir_close(EXIT_BAD_OPTIONS);
-        Usage();
-        return EXIT_BAD_OPTIONS;
-    }
 
     port_hw_init();
     port_trap_protect_data();
@@ -659,11 +627,6 @@ int main(int argc, char **argv) {
     // --frame-times' file, written now that the run is over
     if (!port_frame_time_close()) {
         status = 1;
-    }
-    // Frigate's test launcher's status, when nothing else went wrong: whether the launch finished
-    launchStatus = port_launcher_end();
-    if (status == 0) {
-        status = launchStatus;
     }
     port_run_dir_close(status);
     port_replay_close();

@@ -38,9 +38,8 @@ build time; their output goes into the build directory, never into the repositor
 [oracle/](oracle/README.md) is the melonDS test oracle, `pbw-oracle`: the player's ROM on melonDS's emulation core,
 headless and deterministic, which plays an input file and writes screens and memory for `compare.py` to hold Frigate
 against (test level T4), and its sound, the mixer's output sample by sample and the ARM7 sound driver's state after each
-run, for `sound.py`. It also makes the saves the tests start from (a save with a Pokémon, made from the first save), and
-`oracle.py launch` holds the field menu's apps on Frigate's test launcher to the oracle's route through the field menu
-([ADR 0012](../docs/adr/0012-test-launcher-for-the-field-menus-apps.md)). It is a test tool only, never linked into or
+run, for `sound.py`. It also makes the saves the tests start from (a save with a Pokémon, made from the first save),
+which the comparison sequences of the field menu and its apps start from. It is a test tool only, never linked into or
 shipped with Frigate, and built only with `-DPORT_BUILD_ORACLE=ON`. Its README has the formats (input files, run
 directories, sound traces), how frames are aligned, the comparison sequences, saves, the sound and the known
 differences. `pbwinput.c` and `display3d.c` are plain C11 that the program's replays and the tests compile too, and

@@ -51,8 +51,7 @@ port_gx_rename(lib/nitro/src/gx/gx_load2d.c ${port_gx_renamed_gx_load2d})
 enable_testing()
 add_executable(port_gx_tests
     "${CMAKE_CURRENT_SOURCE_DIR}/tests/gx/test_gx.c"
-    $<TARGET_OBJECTS:pokebw2_game> $<TARGET_OBJECTS:port_hal> $<TARGET_OBJECTS:port_launcher> ${port_gfx_objects}
-    "${PORT_GEN}/stubs.c")
+    $<TARGET_OBJECTS:pokebw2_game> $<TARGET_OBJECTS:port_hal> ${port_gfx_objects} "${PORT_GEN}/stubs.c")
 target_link_libraries(port_gx_tests PRIVATE port_decomp_env SDL3::SDL3)
 target_include_directories(port_gx_tests PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/..")
 target_compile_options(port_gx_tests PRIVATE -std=gnu11 -Wall -Wextra -Wno-unused-parameter)

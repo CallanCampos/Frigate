@@ -1,8 +1,7 @@
 # Frigate's host build. The ROM build (configure.py and ninja) stays separate and untouched; this one compiles the same
 # decomp sources with the host's clang into one program, frigate-black2 or frigate-white2, with the platform layer in
 # port/: the whole game, from the decomp's src/ and lib/, on port/hal, port/gfx, port/audio and port/app
-# (port/docs/ARCHITECTURE.md), with Frigate's test launcher (port/app/launcher.c, ADR 0012), which opens the field
-# menu's apps for the tests while the field has no C, linked into every program that links the game.
+# (port/docs/ARCHITECTURE.md).
 #
 #   cmake -S port -B build/port -G Ninja
 #   cmake --build build/port
@@ -325,7 +324,7 @@ endif()
 # and Windows the compiler driver's libraries say what the C library provides too, read with the toolchain's nm (glibc
 # keeps atexit in libc_nonshared.a, where Python's ctypes doesn't see it; Windows' Python has no such view at all)
 set(port_stubs_objects "$<TARGET_OBJECTS:pokebw2_game>" "$<TARGET_OBJECTS:port_hal>" "$<TARGET_OBJECTS:port_app>"
-    "$<TARGET_OBJECTS:port_launcher>" ${port_gfx_objects})
+    ${port_gfx_objects})
 file(GENERATE OUTPUT "${PORT_GEN}/stubs_objects.txt" CONTENT "$<JOIN:${port_stubs_objects},\n>\n")
 set(port_stubs_host_options "")
 if(NOT APPLE)
@@ -340,7 +339,7 @@ add_custom_command(
         --version "${PORT_VERSION}" --out "${PORT_GEN}/stubs.c" --objects-file "${PORT_GEN}/stubs_objects.txt"
         ${port_stubs_host_options}
     # The objects themselves, not only their targets, so that the stubs follow every recompiled file
-    DEPENDS pokebw2_game port_hal port_app port_launcher ${port_gfx_targets} "${REPO_ROOT}/port/tools/gen_stubs.py"
+    DEPENDS pokebw2_game port_hal port_app ${port_gfx_targets} "${REPO_ROOT}/port/tools/gen_stubs.py"
         "${PORT_GEN}/stubs_objects.txt" ${port_stubs_objects}
     WORKING_DIRECTORY "${REPO_ROOT}"
     COMMAND_EXPAND_LISTS
@@ -353,26 +352,18 @@ target_include_directories(port_app PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
 target_compile_options(port_app PRIVATE -std=c11 -Wall -Wextra)
 target_link_libraries(port_app PRIVATE SDL3::SDL3)
 
-# Frigate's test launcher (port/app/launcher.c, ADR 0012): --launch opens the field menu's apps after CONTINUE while
-# overlay 36 has no C. It includes the decomp's headers, so it is a library of its own with their environment, and the
-# game's seam in src/ov035/event_mapchange.c calls it, so every program that links the game's objects links it too
-add_library(port_launcher OBJECT app/launcher.c app/launcher_spec.c)
-target_link_libraries(port_launcher PRIVATE port_decomp_env)
-target_include_directories(port_launcher PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
-target_compile_options(port_launcher PRIVATE -std=gnu11 -Wall -Wextra -Wno-unused-parameter)
-
 add_executable(${PORT_PROGRAM}
-    $<TARGET_OBJECTS:pokebw2_game> $<TARGET_OBJECTS:port_hal> $<TARGET_OBJECTS:port_app>
-    $<TARGET_OBJECTS:port_launcher> ${port_gfx_objects} "${PORT_GEN}/stubs.c")
+    $<TARGET_OBJECTS:pokebw2_game> $<TARGET_OBJECTS:port_hal> $<TARGET_OBJECTS:port_app> ${port_gfx_objects}
+    "${PORT_GEN}/stubs.c")
 target_include_directories(${PORT_PROGRAM} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
 target_link_libraries(${PORT_PROGRAM} PRIVATE SDL3::SDL3)
 
 # Labels, so that a part of the tests can be run by what it needs (ctest -L LABEL, or -LE LABEL to leave it out;
 # port/tests/README.md). A test gets its labels where it is defined, with port_test_labels(TEST LABEL...):
 #   route   the program runs the game from power-on on the player's ROM, and the test skips without it: the replays,
-#           the oracle's sequences and the port's checks of their hashes, the test launcher's routes, the smoke test
-#           (which passes without a ROM too, stopping where the program looks for one). In the sanitized build these
-#           are its routes (port/docs/sanitizers.md)
+#           the oracle's sequences and the port's checks of their hashes, the smoke test (which passes without a ROM
+#           too, stopping where the program looks for one). In the sanitized build these are its routes
+#           (port/docs/sanitizers.md)
 #   oracle  needs the melonDS oracle, or the saves it makes (skips without them). The routes that need no oracle are
 #           ctest -L route -LE oracle
 #   timing  a limit on the host's time, which a slow or loaded machine can fail: the frame_times_* routes, in an

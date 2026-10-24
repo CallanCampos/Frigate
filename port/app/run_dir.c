@@ -1,7 +1,7 @@
 // The port's run directory (port/app/run_dir.h), in the format pbw-oracle writes and compare.py reads
 // (port/tools/oracle/README.md, "Run directories"): frames.tsv with a row at every frame, the screens of chosen frames
-// as PNG, dumps of the game's globals at chosen frames, and run.txt (with the test launcher's --launch when the run has
-// one), so that a run of the game can be held against the melonDS oracle's. It reads the game's memory and screens and
+// as PNG, dumps of the game's globals at chosen frames, and run.txt, so that a run of the game can be held against the
+// melonDS oracle's. It reads the game's memory and screens and
 // changes neither. Its files are written in binary mode, so that their lines end with "\n" on Windows too, as the
 // oracle's do.
 #include "app/run_dir.h"
@@ -222,9 +222,6 @@ static void WriteRunTxt(int finished, int status) {
         fprintf(run, "time: %s\n", Text(sInfo.time));
         fprintf(run, "input: %s\n", Text(sInfo.input));
         fprintf(run, "input_frames: %s\n", Text(sInfo.inputFrames));
-        if (sInfo.launch != NULL) {
-            fprintf(run, "launch: %s\n", sInfo.launch);
-        }
         fprintf(run, "counter: sVBlankCount\n");
         if (finished) {
             fprintf(run, "status: %d\n", status);
