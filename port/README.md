@@ -14,11 +14,11 @@ This directory, `port/`, is Frigate's code. The rest of the repository is the de
 `fuddlesworth/pokebw2`: Frigate compiles the decomp's C with the host's compiler, gives it the parts of the DS a host
 doesn't have, and runs it as a program, with no emulator. The ROM is only where the game's files come from.
 
-**Where it stands:** Frigate boots natively through the logos, opening, title screen and start menu, with sound.
-Earlier tests compared these paths frame by frame with melonDS and checked the sound driver, music and cries. The
-latest sync includes the field engine's C, but field initialization is still blocked by a host memory allocation
-issue. The overworld is not yet playable. The former test launcher now steps aside, so its earlier app comparisons do
-not establish current field or app coverage.
+**Where it stands:** Frigate boots natively through the logos, opening, title screen and start menu, with sound, and
+into the field: CONTINUE and New Game go into the field and the house, held to melonDS. Tests compare these paths
+frame by frame with melonDS and check the sound driver, music and cries. Beyond the house, encounters and battles wait
+on more host fixes and on one table of overlay 167 that has no C yet, so the game isn't playable past it. The former
+test launcher now steps aside, so its earlier app comparisons do not establish current field or app coverage.
 [docs/STATUS.md](docs/STATUS.md) records the checks and remaining work.
 
 ## Contributing
@@ -119,8 +119,9 @@ build/port/frigate-black2 --rom /c/Games/black2.nds                      # your 
 ### The test launcher
 
 The launcher was built to open apps while the field had no C. It now detects the imported
-`FIELDMAP_PROC_FUNCS` and steps aside; these commands document the earlier test path and cannot bypass the current
-field-heap blocker. On revisions with the placeholder, it opens apps in order at COUNT (at once without one):
+`FIELDMAP_PROC_FUNCS` and steps aside; these commands document the earlier test path, and the field menu itself opens
+the apps now that the field does ([docs/STATUS.md](docs/STATUS.md)). On revisions with the placeholder, it opens apps in
+order at COUNT (at once without one):
 
 ```sh
 build/port/frigate-black2 --save-dir SAVES --launch bag,card        # the bag, then the trainer card, after CONTINUE
@@ -154,10 +155,10 @@ asm oracle, each spike, the artwork) lists its files there.
 | Directory | What it is | Guide |
 | --- | --- | --- |
 | `app/` | The program: `main()` and its options, the SDL3 window, the keyboard, mouse and gamepads, presenting and pacing, replays, the oracle's run directory and the sound driver's trace, the test launcher (`--launch`), the macOS app's scripts, the Windows programs' manifest | [app/README.md](app/README.md) |
-| `hal/` | The platform layer: host C for the parts of the DS that the game reaches through Nintendo's SDK, one directory per SDK module or ARM7 service (threads and time, memory, VRAM, DMA, the ROM, files and overlays, saves and the cartridge's infrared chip, sound, touch, the clock, power, input), and `host/`, the host operating system's services where macOS, Linux and Windows differ | [hal/README.md](hal/README.md) |
+| `hal/` | The platform layer: host C for the parts of the DS that the game reaches through Nintendo's SDK, one directory per SDK module or ARM7 service (threads and time, memory, VRAM, DMA, the ROM, files and overlays, saves and the cartridge's infrared chip, sound, touch, the clock, power, input, MSL's runtime division), and `host/`, the host operating system's services where macOS, Linux and Windows differ | [hal/README.md](hal/README.md) |
 | `gfx/` | The renderers: the 2D engines line by line, the geometry engine, the 3D rasterizer, display capture | [gfx/README.md](gfx/README.md) |
 | `audio/` | The sound output: the default device and the WAV dump | [audio/README.md](audio/README.md) |
-| `include/` | `port_host.h`, force-included into every decomp file of the host build | [include/README.md](include/README.md) |
+| `include/` | What the decomp's C needs to compile for a host: `port_host.h`, force-included into every decomp file of the host build; `wchar.h`, the DS's 16-bit wide strings in place of the C library's; and `port_wcm.h`, the Wi-Fi workspace's host size | [include/README.md](include/README.md) |
 | `cmake/` | The host build's fragments, one per module, with its tests, and the build's options | [cmake/README.md](cmake/README.md) |
 | `tests/` | Unit, integration, replay and oracle tests, one directory per module | [tests/README.md](tests/README.md) |
 | `tools/` | The build's generators, the upstream sync, the pointer cast guard, the macOS packaging, the melonDS oracle, the measurement scripts | [tools/README.md](tools/README.md) |
@@ -171,9 +172,9 @@ asm oracle, each spike, the artwork) lists its files there.
 [PLAN.md §4.3](docs/PLAN.md#43-directory-structure) also places `vfs/`, `save/`, `mod/`, `features/`, `net/`, `ui/`,
 `third_party/` and the GPU renderer's `gfx/gpu/` and `gfx/shaders/`, which appear as their phases start. Outside
 `port/`, Frigate's own files are `.github/README.md` (the repository's landing page), `.github/workflows/port-sync.yml`
-(the hourly upstream PR proposal) and `.github/workflows/port-ci.yml` (the host build and tests, plain and sanitized, and the
-macOS distribution build), plus `.github/CODEOWNERS`, `.github/CONTRIBUTING.md`, the port PR template and
-`port_*.yml` issue templates. Game-source changes outside these port-owned paths are listed in
+(the hourly upstream PR proposal) and `.github/workflows/port-ci.yml` (the host build and tests, plain and sanitized,
+the macOS distribution build and the sync tooling's tests), plus `.github/CODEOWNERS`, `.github/CONTRIBUTING.md`, the
+port PR template and `port_*.yml` issue templates. Game-source changes outside these port-owned paths are listed in
 [docs/game-changes.md](docs/game-changes.md).
 
 ## Where to go next
@@ -458,8 +459,9 @@ same as in the script:
 ### The write guard
 
 `port/tools/hooks/port_guard.py` refuses a Bash, Monitor or terminal panel command that would write to
-`fuddlesworth/pokebw2` or to the decomp fork `CallanCampos/pokebw2`, link an upstream issue from the port, or
-@-mention upstream's people ([ADR 0002](docs/adr/0002-solo-project-no-upstream-posts.md)):
+`fuddlesworth/pokebw2` or to the decomp fork `CallanCampos/pokebw2`, link an upstream issue from the port, @-mention
+upstream's people ([ADR 0002](docs/adr/0002-solo-project-no-upstream-posts.md)) or push Frigate's `main`
+([ADR 0018](docs/adr/0018-protected-main-and-sync-prs.md)):
 
 - a gh subcommand that writes (create, comment, close, edit, merge, review, fork, transfer and the rest) when `-R`,
   `GH_REPO` or a repository or URL argument names either repository, or when it names none and gh's default here
@@ -472,6 +474,20 @@ same as in the script:
 - `git push` to the `upstream` or `fork` remote, to a URL of either repository, or to a remote that pushes to one,
   including the branch's push remote when the command names none, and URLs that `git -c`, `git config` or
   `git remote` set earlier in the same command;
+- a `git push` to the port (`CallanCampos/Frigate`, its old name, or a URL that a `url.<base>.insteadOf` set by
+  `git -c` or an earlier `git config` rewrites to it) that would update or delete `main`. GitHub's rules refuse such a
+  push on the server; the guard refuses it before it runs, lets a dry run through, and works out the branches a push
+  updates as git does:
+  - a destination of `main`, `heads/main` or `refs/heads/main` (`HEAD:main`, `+topic:refs/heads/main`, `:main`,
+    `--delete main`);
+  - a refspec without a colon that is `main`, that is `HEAD`, `@` or `head` on `main`, or that `remote.<name>.push` or
+    `push.default=upstream` sends to `main`;
+  - the matching refspec `:`, `--all`, `--branches`, `--mirror`, a glob, or a destination the shell computes;
+  - with no refspec, the remote's push refspecs, else the branch that `push.default` sends;
+  - the settings come from `git -c`, from `git config` earlier in the command and from the checkout, and the current
+    branch and its upstream are as a `git switch`, `git checkout` or `git branch` earlier in the command leaves them.
+    Settings it can't read (`--config-env`, `GIT_CONFIG_PARAMETERS`, `GIT_CONFIG_COUNT`) and a branch it can't name
+    (`git switch -`) make it refuse;
 - a `git push` to GitHub that would add commits whose messages name an issue, pull request or discussion of any
   repository (`OWNER/REPO#N` or its URL), as `sync_upstream.sh` refuses them with exit status 5. The commits are those
   the pushed refs reach and the remote's tracking refs don't, with what a `git merge`, `rebase`, `reset`, `checkout`
@@ -485,7 +501,8 @@ same as in the script:
 Reads pass, and so does text that only mentions these names, such as a grep, an echo or a local file: the guard splits
 the command as a shell would, here-documents, `$(...)`, `bash -c` and `find -exec` included, and checks a write's own
 text, the files it reads and its here-document. It sees only the command, the files it names and the repository's
-commits, so a script that runs gh or git itself isn't checked; it backs up CLAUDE.md's rules and doesn't replace them.
+commits, so a script or a git alias that runs gh or git itself isn't checked; it backs up CLAUDE.md's rules and
+doesn't replace them.
 `python3 port/tools/hooks/port_guard.py --self-test` runs its test cases.
 
 ## Syncing with the decomp

@@ -1,3 +1,4 @@
+<!-- Records why Frigate's main changes only through reviewed pull requests, upstream syncs included. -->
 # 0018: Protected main and reviewed upstream syncs
 
 - **Status:** accepted; amends 0001 and 0017
