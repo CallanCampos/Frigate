@@ -32,11 +32,81 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
 
+## 2026-10-24: the field's pointer casts: overlay 137's Join Avenue types at full width
+
+- **Upstream:** `b62c655bfa` (upstream merge #481), as `main` has it since PR 16 (`6a1ace981b`); this branch merges no
+  upstream commit. Upstream's `main` has moved on (`e522642f9e`), for the sync to propose on its own.
+- **Port:** `PORT_SHA`, on the topic branch `port-field-ptrcasts` from `main` `1807efb68f` (PR 21): `ea262c5e76`
+  (overlay 137's get and set types and getters), then this records commit. The branch's first version, never
+  published, also carried the contributors' draft PR 19's lines for R02 and two R05 callers; after review that commit
+  was dropped (Work done).
+- **ROM:** T0 passes on `main` before the branch and on its head: Black 2 `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb`
+  and White 2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`. The change is a type's spelling that MWCC reads as before
+  (`uptr` is `u32` for it): `check_mwcc_neutral.py --base origin/main` on the 9 files that include
+  `include/field/resort.h` (`ninja -t deps`: `field_gimmick.c` of overlay 36, `scrcmd_medalinfo.c` and
+  `scrcmd_resort.c` of overlay 59, `scrcmd_resort_shop.c` of overlay 60, and overlay 137's `resort_data_manager.c`,
+  `resort_field.c`, `resort_npc.c`, `resort_people.c` and `resort_sys.c`) finds 18 of 18 file and version pairs
+  identical. The 9 are complete in both versions, so ninja proves them and no compiler probe applies.
+- **Host build:** T1 passes on macOS arm64, Apple clang 21, RelWithDebInfo, both versions (`build/port`,
+  `build/port-w2`), rebuilt incrementally over the branch's first version: 336 steps each (the files that include
+  `bmp_menulist.h`, back to `main`'s, and those that include `resort.h`), with 44 warnings each, the ones these files
+  gave before and none from the changed lines, so 723 in all, as the first version's builds from clean gave.
+  clang-format 23 is clean on the changed C files, and `tools/decomp/check_style.py` passes on them.
+- **Tests:** full `ctest -j4` on `ea262c5e76`, before this records commit (which changes no test input), both versions
+  at once, with the oracle, its cached saves copied from the verify tree and the clone's `build/port-venv`, under a load
+  average of 40 to 71 on the machine's 8 cores from other sessions: Black 2, 311 tests, 301 passed, 7 failed and 3
+  skipped (1,884 s); White 2, 308 tests, 299 passed, 7 failed and 2 skipped (1,728 s). The failures are the test
+  launcher's seven in both versions (`frame_times_party_menus`, `oracle_launch_field_menus`,
+  `oracle_launch_party_menus`, `launch_summary_standalone`, `launch_touch_then_party`, `launch_unfinished`,
+  `launch_not_offered`), which steps aside now that the field opens, as on `main` until its retirement (plan A-2).
+  Skipped: `app_universal_slices` in both, which only a distribution build has, and the timing gates
+  `frame_times_title` in both and `frame_times_new_game` in Black 2, over the load (`frame_times.py --max-load`); each
+  then passed alone (`ctest -R`), at a load of 15 to 25. `game_ptrcasts` and `game_ptrcasts_tool` pass in both versions
+  with this branch's baseline, and so do `asm_oracle`, `oracle_title`, `oracle_continue` and `oracle_continue_starter`
+  (T4), `replay_new_game_house` (T3) and `replay_same_save` (T6). T5 not run locally (no route reaches the changed
+  code; CI's sanitized jobs run on the PR); T7 not run.
+- **Tiers:** not remeasured: what MWCC compiles is `main`'s in every file (`check_mwcc_neutral.py`, above), so the tiers
+  are the last entry's: per version, a 37,546 functions, b 3,472 and c zero; code bytes Black 2 a 3,435,848, White 2 a
+  3,435,936, and b 414,418 in each.
+- **Trap stubs:** 30 function stubs and 22 data placeholders per version (`gen/stubs.c` in both builds), unchanged. The
+  first the game hits is still `data_ov167_021d7490`, the battle table, at Hugh's battle's first move on the Route 19
+  route (frame 7,623 in the last entry's run, both versions; not run again, since none of the route's code changed);
+  CONTINUE and New Game to the save reach none.
+- **64-bit warnings:** `check_ptrcasts: 422 sites in 269 keys (real 142, harmless 102, handled 141, unreachable 37),
+  1681 files, 0 not compiled`, the same in both versions, from the last entry's 429 sites and 150 real.
+  `check_ptrcasts.py --update` drops R05's 6 rows of `sFuncs` (8 `fn-cast` sites) and adds one, classed harmless: the
+  sum of two people's seeds in `ResortData_RollPair`, which `ResortData_GetParam`'s `uptr` now carries and the sum keeps
+  in 32 bits, as on the DS. The real sites by group: R02 5, R05 2, R06 12, R09 6, R11 4, R14 12, R15 2, R16 3, R17 4,
+  R21 14, R22 16, R23 50 and R24 12.
+- **Work done:** the field's real rows of the pointer cast guard that no open PR fixes, the Neutral way (PLAN.md §4.8,
+  rule 3), one row of [game-changes.md](game-changes.md). Overlay 137's `ResortPersonGetParamFunc` and
+  `ResortPersonSetParamFunc` return and take a `uptr`, as the Join Avenue getters and setters that its table casts to
+  them have since PR 14, so no call goes through the wrong function type. `ResortData_GetParam` and
+  `ResortPerson_GetParam` return a `uptr` too, since they return what those getters return, which for a person's two
+  raw messages is the message's address (ADR 0019's mixed getter; no caller asks for those today); the setters'
+  wrappers keep their `u32`, since every caller gives a number. R04, the cut-in's palette, was fixed by PR 21. R02 (the
+  shortcut menu's work through `BmpMenuList_GetParam`) and R05's two callers (the name the GTS negotiation and a Wi-Fi
+  battle give Join Avenue) stay in the baseline: the contributors' draft PR 19 fixes those very lines, and this branch
+  leaves them to it. Its first version applied PR 19's hunks from its diff; after review that commit was dropped, since
+  it would land a contributor's lines through the owner's review bypass without the owner's approval or credit, and PR
+  19 would still conflict on the baseline and game-changes.md. Two lessons in lessons.md: follow a mixed getter's
+  result up through the functions that return it, and leave an open PR's lines to it. The feature map's guard row has
+  the new counts. No route reaches Join Avenue yet, so nothing visible changed (T7 not run).
+- **Next:** for the phase, the launcher's retirement (plan A-2), then phase 3's exit route (A-3), as the last entry
+  says. For the guard, battle (R06), then the menus and apps (R09, R11, R14 to R17) and wireless (R21 to R24), each for
+  the sites the contributors' PR 19 doesn't fix, leaving its lines to it; R02 and R05's two callers go when PR 19
+  merges.
+- **Blockers:** `data_ov167_021d7490` (overlay 167's battle table, issue #120), which stops every battle at its first
+  move, as in the last entry: upstream's `main` (`e522642f9e`) has no C for it yet. The user's account claimed overlay
+  167 again on 2026-10-24 (UTC) and opened upstream PR #497, which gives `btl_pokeparam.c` the table and completes the
+  overlay; it is open, and the port waits for it to merge and reach `main` by sync. `src/ov036/enceff_data.c`'s four
+  entries that name another overlay's functions, the last entry's decomp finding, are still in upstream's `e522642f9e`.
+
 ## 2026-10-23: the battle path: the trainer cut-in and Hugh's battle to the first move
 
 - **Upstream:** `b62c655bfa` (upstream merge #481), as `main` has it since PR 16 (`6a1ace981b`); this branch merges no
   upstream commit. Upstream's `main` has moved on (`c9f0912d43`), for the sync to propose on its own.
-- **Port:** `PORT_SHA`, on the topic branch `port-battle-path`, [PR
+- **Port:** `1e80528149`, on the topic branch `port-battle-path`, [PR
   21](https://github.com/CallanCampos/Frigate/pull/21), from `port-field-entry` at `7f5cad4dd9` (PR 18), with the
   review's fixes (`dd153fea48`) and `main` merged at `00e3468c79` (`957b7931f4`: PRs 18, 20 and 17, the field's entry,
   the process docs and the pointer cast guard). The Route 19 route ran on the branch itself, with no scratch merge.

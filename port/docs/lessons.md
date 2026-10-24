@@ -3,6 +3,23 @@
 What port work taught that isn't obvious from the code, newest first. A lesson about MWCC or the decomp's own
 workflow goes in the decomp checkout instead; this file is the port's ([CLAUDE.md](../CLAUDE.md), the iteration loop).
 
+## 2026-10-24: the field's pointer casts
+
+- **A function that returns what a mixed getter returns is a mixed getter too.** Overlay 137's `ResortData_GetParam`
+  returns whatever Join Avenue's getters return: a number for most params, the address of a person's message for the
+  two raw ones. Retyping only the table's function types to `uptr` left its own `u32` return cutting that address, and
+  the guard can't see it, since it skips call results by design
+  ([ADR 0019](adr/0019-pointer-cast-guard-against-a-classified-baseline.md)). When a getter's return becomes a `uptr`,
+  follow its result up through every function that returns it (`ResortPerson_GetParam` returns
+  `ResortData_GetParam`'s) and retype those returns too; their callers that keep a number stay as they are, and only
+  arithmetic on the result becomes a row (`ResortData_RollPair`'s sum of two seeds, harmless).
+- **A contributor's open PR keeps its lines.** Applying its hunks from its diff, byte for byte, doesn't make the
+  later merge clean: the guard's baseline and game-changes.md conflict on the rows around them, and its own
+  game-changes row would cover the same files twice. And a feature PR that carries them lands the contributor's code
+  through the owner's review bypass, which is for owner-authored work, with no owner approval of those lines and no
+  credit ([REPOSITORY-POLICY.md](REPOSITORY-POLICY.md), [CONTRIBUTING.md](../CONTRIBUTING.md)). Leave the sites it
+  fixes in the baseline for that PR to remove, and fix what it doesn't cover around them.
+
 ## 2026-10-23: the battle path
 
 - **A byte array the DS's size of a type is that type: find its siblings.** `BtlFlowWorkFrame.monSets` was
