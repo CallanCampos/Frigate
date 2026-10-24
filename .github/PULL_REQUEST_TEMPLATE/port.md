@@ -8,7 +8,7 @@ Describe the problem, resulting behavior and affected part of the game or host p
 List commands and results, OS/architecture, and skipped or unrun checks with reasons:
 
 - T0: both ROM SHA1s (maintainer verification required before merge)
-- T1: host build
+- T1: host build, and the pointer cast guard's `--report` line (`port/tools/check_ptrcasts.py`)
 - T2/T6: unit and save tests
 - T3: relevant replays
 - Additional checks, if applicable:

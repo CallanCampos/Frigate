@@ -225,7 +225,7 @@ wire or in the save stay pointer-free and get host `_Static_assert`s.
 | Level | What | When |
 | --- | --- | --- |
 | T0 | ROM build, both SHA1s | before every maintainer push and PR merge |
-| T1 | Host build; the 64-bit warning count not above STATUS.md's last entry | before every push |
+| T1 | Host build; the pointer cast guard (`game_ptrcasts`) passes, its real sites not above STATUS.md's last entry | before every push |
 | T2, T6 | Unit tests; save round trips and ROM dump verification | before every push |
 | T3 | Replay tests: frame hashes and state checkpoints | short ones before every push, long ones nightly |
 | T4 | Oracle comparison with melonDS | nightly, and to close a milestone |

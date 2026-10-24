@@ -188,8 +188,9 @@ mods/examples/           sample mods, one per extension point
   (mandatory: the code puns types everywhere), `-ffp-contract=off`, no fast-math, `-ftrivial-auto-var-init=zero`
   (uninitialized locals read deterministic garbage on the DS), `-fno-common`. Errors on int-conversion, incompatible
   pointers, implicit declarations and missing returns from the start; the 64-bit warnings (`-Wpointer-to-int-cast`,
-  `-Wint-to-pointer-cast`, `-Wshorten-64-to-32`) are counted every build, must only go down, and become errors for
-  game code once clean.
+  `-Wint-to-pointer-cast`, `-Wshorten-64-to-32`) are held to a baseline by the pointer cast guard, a test in every
+  build, whose real rows must only go down ([SYNC.md](SYNC.md#when-the-pointer-cast-guard-fails),
+  [ADR 0019](adr/0019-pointer-cast-guard-against-a-classified-baseline.md)).
 - **Defines:** `PLATFORM_PC` on the host build; `BLACK2`/`WHITE2` as upstream; `BUGFIX` off by default, so vanilla
   gameplay can be compared with the reference. Memory-safety bugs are different: the documented out-of-bounds
   accesses, double frees and use-after-frees (about 18 of the decomp's `// BUG:` comments) hit different data once
@@ -386,7 +387,7 @@ Testing is how we know the port is the game. Each level runs automatically, from
 | Level | What | When |
 | --- | --- | --- |
 | T0 | ROM build: both SHA1s match, so port changes and upstream merges never alter the DS build | before every PR merge, including each upstream sync; the exact-head local verification status supplements ROM-free public CI |
-| T1 | Host build (macOS from phase 0; Linux and Windows from phase 5); the 64-bit warning count only goes down | every commit |
+| T1 | Host build (macOS from phase 0; Linux and Windows from phase 5); the pointer cast guard passes, and its real truncations only go down | every commit |
 | T2 | Unit tests: LZ, NitroFS and VFS, save CRC and slot choice, divider and sqrt bit-exactness, scheduler order, geometry engine maths, 2D renderer golden images from captured display state, SSEQ sequencer against recorded channel state | every commit |
 | T3 | Replay tests: recorded input played on the port with a virtual clock; frame hashes and game-state checkpoints against stored goldens | every commit (short), nightly (long) |
 | T4 | Oracle tests: the same inputs on melonDS with the real ROM; screens compared (2D exactly, 3D within a perceptual tolerance) and game state compared by decomp symbol (position, party, RNG, current proc and overlays) | nightly, and when a milestone closes |
@@ -482,7 +483,8 @@ Sessions working toward this plan follow one loop, so progress is measurable and
 
 1. **Update from reviewed main.** Fetch Frigate's `main` and branch from it. Review the pending upstream sync as
    a separate PR using [SYNC.md](SYNC.md). Then regenerate source lists and stubs, and record the decomp tiers,
-   trap-stub count, 64-bit warning count and test results in `port/docs/STATUS.md`.
+   trap-stub count, the pointer cast guard's 64-bit line (`check_ptrcasts.py --report`) and test results in
+   `port/docs/STATUS.md`.
 2. **Pick the next task:** the earliest unmet exit criterion of the current phase that the decomp's state allows. A
    task blocked on missing C waits for upstream (or is offered to the decomp session); it is never worked around with
    ARM code or a hack.

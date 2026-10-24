@@ -14,6 +14,7 @@ are read in one place.
 | [frame_times.cmake](frame_times.cmake) | The test of [../tools/frame_times.py](../tools/frame_times.py), the reader of `--frame-times`' files ([../hal/os/frame_time.h](../hal/os/frame_time.h)), and the timing routes, which play routes 3 times each and hold each scene's 95th percentile frame to a budget, skipping a scene over it while other programs load the machine (only in an optimized build: `Release`, `RelWithDebInfo` or `MinSizeRel`, and not the sanitized one) | How fast the game's frames are made on this machine: the title's 3D, New Game's intro and 3D flight, the field menu's apps | `frame_times_tool`, `frame_times_title`, `frame_times_new_game` (Black 2), `frame_times_party_menus` |
 | [fx_tests.cmake](fx_tests.cmake) | The decomp's libfx C built for a test | 3D maths (cameras, models) | `fx_libfx` |
 | [g3d.cmake](g3d.cmake) | The geometry engine and 3D renderer's tests, plain and sanitized (the renderer with its workers, [../gfx/workers.c](../gfx/workers.c), and the host's threads), and their timing gate | 3D scenes | `g3d_ge*`, `g3d_ds3d*`, `g3d_hal*`, `g3d_timing` |
+| [game.cmake](game.cmake) | Checks of the decomp's own C as this build compiles it: the pointer cast guard ([../tools/check_ptrcasts.py](../tools/check_ptrcasts.py)), which runs the game's compile commands again, syntax only, with the cast warnings on, against [../tools/ptrcast_baseline.tsv](../tools/ptrcast_baseline.tsv), and its own test; both labelled `static`, the guard skipping on Windows and without clang, and failing instead (`--require`) where this build can run it | Every part of the game: a cast that would cut an address to 32 bits on a host fails it ([../docs/SYNC.md](../docs/SYNC.md#when-the-pointer-cast-guard-fails)) | `game_ptrcasts`, `game_ptrcasts_tool` |
 | [gfx_tests.cmake](gfx_tests.cmake) | The 2D renderer and capture tests, plain and sanitized, and the renderer's timing gate | 2D screens, capture | `gfx_ds2d*`, `gfx_capture_*`, `gfx_ds2d_timing` |
 | [gx.cmake](gx.cmake) | The `port_sdk_` renames of `gx_vramcnt.c`, `gx_state.c`, `mi_wram.c` and `gx_load2d.c`, which [../hal/gx](../hal/README.md#the-modules) wraps, and their tests | VRAM banks, palette loads, the field's building transition's clear of LCDC VRAM | `gx_*` |
 | [hal_tests.cmake](hal_tests.cmake) | The known-vector tests of the SDK's assembly in C and of MSL's runtime division, the heaps' host sizes and the root heaps' host memory ([ADR 0021](../docs/adr/0021-root-heaps-in-the-games-own-memory-from-host-memory.md)), DWC's wide strings, the card slot's SPI bus and infrared chip, and the asm oracle (which skips without the extracted ROM, `build/port-venv` or a Ninja build directory) | Copies, fills, decompression, matrices, sorting, SHA-1, RC4, the field's lens flare data's division; every heap, the field's among them; Wi-Fi's authentication names; the genuine-card check | `hal_mi`, `hal_fx`, `hal_msl`, `hal_heap_policy`, `hal_wstring`, `hal_card_spi_*`, `asm_oracle` |
@@ -56,9 +57,10 @@ The sanitized build is a build directory of its own (`-DPORT_SANITIZE=ON`, in `b
 [sanitizer_ignorelist.txt](sanitizer_ignorelist.txt) lists, for clang, the checks it leaves out of the game's code, each
 with the reason it is safe on a host. The tests carry labels by what they need, which each fragment gives its tests
 where it defines them, with `port_test_labels(TEST LABEL...)` ([../CMakeLists.txt](../CMakeLists.txt)): `route` (the
-program runs the game from power-on on the player's ROM), `oracle` (the melonDS oracle or its saves) and `timing` (a
-limit on the host's time: the `frame_times_*` routes and the timing gates), so that `ctest -L route -LE oracle` runs the
-routes that need no oracle ([../tests/README.md](../tests/README.md)). A new fragment's test that runs the game from
+program runs the game from power-on on the player's ROM), `oracle` (the melonDS oracle or its saves), `timing` (a
+limit on the host's time: the `frame_times_*` routes and the timing gates) and `static` (the game's C read, not run:
+[game.cmake](game.cmake)'s pointer cast guard), so that `ctest -L route -LE oracle` runs the routes that need no
+oracle ([../tests/README.md](../tests/README.md)). A new fragment's test that runs the game from
 power-on gets `route` there, and `oracle` too when it needs the oracle.
 
 ## Adding a fragment

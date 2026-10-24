@@ -48,8 +48,10 @@ records keep what was decided or found at the time, and are added to, not rewrit
 | [adr/0013](adr/0013-windows-build-with-msys2-clang64.md) | Windows built with MSYS2's CLANG64, its differences behind `port/hal/host` |
 | [adr/0014](adr/0014-sanitized-build-game-heaps-poisoned-ds-isms-ignorelisted.md) | The sanitized build: the game's heaps poisoned in place, the DS-isms ignorelisted |
 | [adr/0015](adr/0015-universal-macos-app-for-macos-11.md) | A universal macOS app for macOS 11, with the pinned SDL3 linked statically |
+| [adr/0016](adr/0016-3d-frame-in-bands-on-worker-threads.md) | The 3D frame drawn in bands on worker threads, the game on one |
 | [adr/0017](adr/0017-external-contributions.md) | External contributions through forks and PRs, with maintainer sync and ROM verification |
 | [adr/0018](adr/0018-protected-main-and-sync-prs.md) | Protected main and reviewed upstream syncs |
+| [adr/0019](adr/0019-pointer-cast-guard-against-a-classified-baseline.md) | The pointer cast guard: the game's casts that cut an address, held to a classified baseline |
 | [adr/0021](adr/0021-root-heaps-in-the-games-own-memory-from-host-memory.md) | Root heaps in the game's own memory get host memory |
 | [RESEARCH.md](RESEARCH.md) | The research of 2026-10-16 behind the plan, summarized |
 | [research/README.md](research/README.md) | The full research reports, with what each covers |
@@ -75,13 +77,13 @@ Each directory of `port/` has a guide to its files: what each does, the part of 
 | [../hal/README.md](../hal/README.md) | The platform layer: one row per module with the SDK module it replaces, how decomp files are adapted, the names |
 | [../gfx/README.md](../gfx/README.md) | The renderers: 2D, the geometry engine, 3D, capture, the scanline hook |
 | [../audio/README.md](../audio/README.md) | The sound output |
-| [../include/README.md](../include/README.md) | `port_host.h`, force-included into the decomp's C |
+| [../include/README.md](../include/README.md) | `port_host.h`, force-included into the decomp's C, and the DS's wide strings and WCM workspace for the host |
 | [../cmake/README.md](../cmake/README.md) | The build's fragments, their tests, and the build's options |
 | [../tests/README.md](../tests/README.md) | The tests by directory, which need the ROM, how to write one |
 | [../tests/asm_oracle/README.md](../tests/asm_oracle/README.md) | The differential tests of the SDK's assembly in C against the ROM's code |
 | [../tools/README.md](../tools/README.md) | The generators, the sync, the packaging, the oracle, the measurement scripts |
 | [../tools/oracle/README.md](../tools/oracle/README.md) | The melonDS oracle: building and running it, input files, run directories, comparing, saves, the sound, the launch checks of the field menu's apps, known differences |
-| [../tools/compile-probe/README.md](../tools/compile-probe/README.md) | The host-compiler probe: 64-bit warnings and struct layouts |
+| [../tools/compile-probe/README.md](../tools/compile-probe/README.md) | The host-compiler probe: 64-bit warnings and struct layouts (the 64-bit metric is the pointer cast guard's, [SYNC.md](SYNC.md#when-the-pointer-cast-guard-fails)) |
 | [../assets/README.md](../assets/README.md) | Files that aren't code |
 | [../assets/branding/README.md](../assets/branding/README.md) | Frigate's logo and app icons: the files, colours, how the build uses them, how to change them, the license |
 | [../spikes/README.md](../spikes/README.md) | Phase 0's frozen experiments and where their live code is: [os-fibers](../spikes/os-fibers/README.md), [overlay-sections](../spikes/overlay-sections/README.md), [vram-alias](../spikes/vram-alias/README.md) |

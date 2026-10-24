@@ -1,9 +1,10 @@
 # Decomp findings
 
 Things the port found in the decomp's C that differ from the ROM, are unresolved, or behave in a way the decomp's
-documentation doesn't say. The port is a solo project and posts nothing upstream ([ADR 0002](adr/0002-solo-project-no-upstream-posts.md));
-the user decides whether a decomp session fixes a finding, as ordinary decomp work. The "equivalent" notes of
-[PLAN.md §6](PLAN.md#6-verification), one per nonmatching row the port checks, go here too.
+documentation doesn't say. Frigate posts nothing upstream ([ADR 0002](adr/0002-solo-project-no-upstream-posts.md),
+amended by [ADR 0017](adr/0017-external-contributions.md)); the user decides whether a decomp session fixes a
+finding, as ordinary decomp work. The "equivalent" notes of [PLAN.md §6](PLAN.md#6-verification), one per
+nonmatching row the port checks, go here too.
 
 | Where | What | How the port handles it | Found |
 | --- | --- | --- | --- |

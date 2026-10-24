@@ -11,6 +11,12 @@ the same commit as the work it records; a proposed hourly `port-sync` PR gets no
 Put the new entry above the newest one, under a heading `## YYYY-MM-DD: title`. Fill every field. A measure or test
 level that doesn't exist yet says "not yet"; no field is left out.
 
+Evidence is what someone else can open or run again: a commit, a pull request, a CI run, a commit status, or the
+command and the result it gave, in the entry. A log in `/tmp` or another temporary directory is not evidence, since
+no one else can read it and it doesn't outlive the machine's next restart: write the command and its result instead.
+Past entries are records, added to and never rewritten ([SYNC.md](SYNC.md#records-are-added-to)): the only edits an
+old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
+
 | Field | What to write |
 | --- | --- |
 | Date | The day of the sync or task, `YYYY-MM-DD`, in the heading |
@@ -21,7 +27,7 @@ level that doesn't exist yet says "not yet"; no field is left out.
 | Tests | Result of each level T2–T7 that ran, with counts; "not yet" for levels that don't exist |
 | Tiers | Functions and code bytes in tiers (a), (b) and (c) from `port/tools/progress/`, and the change since the last entry |
 | Trap stubs | How many functions the host build still stubs, and which the game hit first |
-| 64-bit warnings | The host build's pointer/int warning count, game and `lib/` apart; it must not rise |
+| 64-bit warnings | The pointer cast guard's line, `port/tools/check_ptrcasts.py --build-dir build/port --report` (T1; [SYNC.md](SYNC.md#when-the-pointer-cast-guard-fails)): its sites by class, the real ones not above the last entry's |
 | Work done | What changed, with ADRs and game changes by number |
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
@@ -92,6 +98,267 @@ level that doesn't exist yet says "not yet"; no field is left out.
   stand-in. `src/ov036/enceff_data.c` names four functions of another overlay at the same address (a decomp finding),
   which stopped the deep dive's route at a wild encounter later on (frame 20,077): overlay 36 is under the user's own
   decomp claim, so the fix is ordinary decomp work, which reaches the port by sync; the user decides.
+
+## 2026-10-23: the pointer cast guard, its baseline on main, and T1 measured by it
+
+- **Upstream:** `b62c655bfa` (upstream merge #481), as `main` has it since PR 16 (`6a1ace981b`); this work brings no
+  upstream commit.
+- **Port:** `2ea02e8f1c` on `port-ptrcast-guard`, [PR 17](https://github.com/CallanCampos/Frigate/pull/17), from `main`
+  `8ca29313d1`, with `main` merged in four times as it moved while the PR was open (`72749b5a0d`, `bfd5d788b5`,
+  `a4648fce71`, and `d0d20a4077`, which brought PRs 18 and 20, the field's entry and the process docs, after the
+  review's fixes).
+- **ROM:** `python3 configure.py && ninja` at each commit and after each merge of `main`, the review's fixes (which
+  change no game file) and the fourth merge included: both SHA1s match (Black 2 `e51e6dfb8`, White 2 `b5d7490be`). The
+  typedef change's proof is in [game-changes.md](game-changes.md): `check_mwcc_neutral.py` 3,556 of 3,556 file and
+  version pairs identical, and `compiler_probe.py --compilers 1.1p1 --mismatches` on the 94 incomplete files the same
+  before and after in both versions (273 mismatched functions in each), on `8ca29313d1` and again after the first three
+  merges of `main`. After the fourth, `check_mwcc_neutral.py --base origin/main` finds 3,556 of 3,556 file and version
+  pairs identical to `d0d20a4077`: what MWCC reads is main's in every file, so the incomplete files' code is main's
+  too.
+- **Host build:** macOS arm64, Apple clang 21, RelWithDebInfo, both versions (`build/port`, `build/port-w2`); a
+  configure-only tree with Homebrew clang 23 for the guard's keys. CI on PR 17: [run
+  40014141292](https://github.com/CallanCampos/Frigate/actions/runs/40014141292) at `0c643cb758`, the last head with
+  code, passes every job: the macOS, Linux and Windows host builds, both sanitized builds and the four macOS
+  distribution builds; `game_ptrcasts` passes in the macOS and Linux jobs (Apple clang 17 and 21, arm64 and x86_64, and
+  Ubuntu's clang 21.1.8) and skips on Windows, as designed. The first run, at `bb2fca07a8`, failed in the Windows job on
+  the guard's own test, which expected findings where the guard skips; `968fc4b556` makes it skip there too. Both
+  versions built again after the fourth merge, with no error. CI on the head with the fourth merge is in the PR.
+- **Tests:** full `ctest` on `0c643cb758` with the oracle and the cached saves copied from the verify tree. Black 2: 304
+  tests, 293 passed, 1 skipped (`app_universal_slices`), 10 failed, the 10 below that fail on `main` too. White 2: 301
+  tests, 290 passed, 1 skipped (`app_universal_slices`), the same 10 failed. `game_ptrcasts` and `game_ptrcasts_tool`
+  pass in both versions, and `upstream_sync.py`'s 14 tests pass. Earlier runs on this branch, before the merges of
+  `main`, gave the same failures; under a load of 40 to 60 the timing routes `frame_times_title` and
+  `frame_times_new_game` skipped as designed in some of them and passed in the others and alone. T3 is in that run; T4
+  is its oracle tests; T5 ran in CI's sanitized jobs only; T7 not run. Again after the review's fixes: Black 2, 304
+  tests, 292 passed, 2 skipped (`app_universal_slices`, and `frame_times_title` under a load of about 58, which passed
+  alone), the same 10 failed; White 2, 301 tests, 290 passed, 1 skipped, the same 10 failed. After the fourth merge,
+  whose conflicts were all in records and guides: `game_ptrcasts`, `game_ptrcasts_tool` and the tests of what `main`
+  brought (`asm_oracle`, `hal_msl`, `hal_heap_policy` and every `gx_*` test, `gx_lcdc_clear_*` among them) pass in both
+  versions, and `upstream_sync.py`'s 14 tests pass; the full suite on that head is `--verify-pr`'s, in the PR.
+- **Tiers:** not remeasured: no C that MWCC compiles changed (the typedefs are host-only).
+- **Trap stubs:** 31 functions and 22 data placeholders in each version (`gen/stubs.c`) before the fourth merge, and 30
+  and 22 after it, the same symbols in both versions: `main`'s `_u32_div_f` has its routine now.
+- **64-bit warnings:** the pointer cast guard, now T1's measurement: `check_ptrcasts: 431 sites in 276 keys (real 152,
+  harmless 101, handled 141, unreachable 37)`, the same in both versions and with Apple clang 21 and Homebrew clang 23,
+  and the same again in both versions after the fourth merge, with no row new or gone: `main`'s two game changes
+  (`heapsys.c`'s root memory hook, `field_transition.c`'s `HW_LCDC_VRAM`) add no cast the guard counts. Before the
+  review it was 389 sites in 250 keys (real 159): R13's 7 sites, GX's extended palettes, are `handled`, since
+  `port/cmake/gx.cmake` renames those functions and `port/hal/gx/gx_load2d_extpltt.c` replaces them; the 42 sites more
+  are the 13 decomp files that compile only through `port/hal`'s wrappers (`os_thread.c`, `nvram.c`,
+  `snd_interface.c`), handled, harmless or unreachable, none real.
+  The last entry's measure, reproduced with the configured commands and `-isystem` kept: on `8ca29313d1` the game 161
+  and the libraries 231 instances, as it said; on this head, after PRs 14, 15 and 16, 99 and 214. PR 7's "libraries'
+  218" was the same warnings counted as distinct sites on Linux at its base (its description: 452 to 379 distinct, the
+  game's 234 to 161); on `8ca29313d1` the distinct sites were 161 and 196, on this head 99 and 179. The guard's count is
+  higher because it sees the SDK headers' inline casts (`-I` for the decomp's headers), counts each site once, and adds
+  a `uptr` narrowed to 32 bits and callback casts; its `real` rows are the work list.
+- **Work done:** the guard of the stopped `port-64bit-sweep` branch, restarted on `main` ([ADR
+  0019](adr/0019-pointer-cast-guard-against-a-classified-baseline.md), accepted by this session on the developer's plan
+  of 2026-10-23, not by the developer in person). `uptr` and `sptr` are typedefs on hosts (a Platform row in
+  game-changes.md). `port/tools/check_ptrcasts.py` and the test `game_ptrcasts` (with `game_ptrcasts_tool`, label
+  `static`) hold the game's casts to `port/tools/ptrcast_baseline.tsv`, regenerated on `main` and each row classed with
+  a reason; the stopped branch's arena constraint is left out, since no row needs it. [SYNC.md](SYNC.md) says what to do
+  when it fails, and that on a sync PR the maintainer fixes it in a follow-up feature PR, never by editing the sync PR.
+  T1 is now the guard (port/CLAUDE.md, PLAN.md §6 and §8, CONTRIBUTING.md, the PR template, this file's "64-bit
+  warnings"), and `sync_upstream.sh` prints its line in the summary and in `--verify-pr`'s log. While the PR was open,
+  `main` took the sync of PR 16 and PRs 14 and 15, and the baseline followed each. The sync, checked beforehand in a
+  scratch copy with these typedefs, passed the guard with the first baseline, its typed `NameEntryParam` removing the
+  six R08 rows. PR 14 retyped Join Avenue's getters and setters to `uptr`, and the guard found what it left: overlay
+  137's function types still `u32` (8 `fn-cast` sites, real), two callers that still cut a name with `(u32)` (real), and
+  the setters' numbers and one sum (harmless). PR 15 fixed 30 rows and brought no new one, and PRs 18 and 20, merged in
+  after the review, changed none. After the PR's review: the
+  guard checks the decomp files that `port/hal`'s wrappers compile by `#include` (`gfl_use.c` and twelve SDK files,
+  which it didn't see), counts nothing in `port/`, first proves on a sample with each set of the build's flags that it
+  reads every kind back (a `-w` had left it passing with nothing found), fails rather than skips where the build can
+  run it (`--require`, from `port/cmake/game.cmake`), and pairs a rename only when the old name is gone, so that a cast
+  fixed in one function can't let a new one in another pass; its own test covers each, and the build's `-Wno-` flags
+  and `-isystem`. R13 is `handled`. ADR 0019 and SYNC.md say what it still can't see: an explicit `(u32)(uptr)p`, a
+  site moved within one key, a count a fix left until `--update`, and a cast under `WHITE2` alone in CI, which builds
+  Black 2 only.
+- **Next:** for the phase, the launcher's retirement (plan A-2), as the entry below says. For the guard, fix the
+  field's real rows, R02, R04 and R05 (17 sites: the shortcut menu, the field-move cut-in's palette,
+  overlay 137's `ResortPerson` function types and the two Join Avenue callers), in a feature PR with their game-changes
+  rows, leaving `fld3d_ci.c`'s cut-in palette to the battle-path track, which changes that file. Then battle (R06) and
+  the menus and apps (R09, R11, R14 to R17).
+- **Blockers:** none for the guard. Before the fourth merge, as on `main` then: the field heap stopped CONTINUE and New
+  Game at the field's entry (`OS_Terminate` in `FieldmapProc_Init` at frame 3436), so the oracle and launcher tests that
+  reach it failed (`oracle_continue`, `oracle_continue_starter`, `oracle_launch_field_menus`,
+  `oracle_launch_party_menus`, `launch_summary_standalone`, `launch_touch_then_party`, `launch_unfinished`,
+  `launch_not_offered` and `frame_times_party_menus`, in both versions, as the deep dive of 2026-10-23 found on `main`
+  in Black 2), and `asm_oracle` failed on SDK names that upstream changed (`MAT2_Scaling`, `MAT3_To4x4`,
+  `MI_CpuFill8`'s fill value). PR 18 (the field's entry) and PR 20 fixed those; what is left on `main`, the tests that
+  run `--launch` until the launcher's retirement, is the entry below's.
+
+## 2026-10-23: the process after the PR 12 sync written down, the guard refusing main, asm_oracle green again
+
+- **Upstream:** `b62c655bfa` (upstream merge #481), which main took in PR 16 (after PR 13's `0bed98c4c`) while this
+  change was under way; this change imports nothing of its own.
+- **Port:** `744175fe68`, the branch `port-process-docs` from main `8ca29313d1`, with main merged into it three times,
+  `6a1ace981b`, `a4648fce71` and, after the review's fixes (`0123c22721` for the guard, then this entry's),
+  `1c5f322b71` (PR 18, the field's entry), in the merge that brings this entry up to date.
+- **ROM:** T0 passes on the head: a full `python3 configure.py && ninja` (dsd `v0.12.1-dsi.6`) matches Black 2
+  `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb` and White 2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`, on main
+  `8ca29313d1` before the branch's commits, again after each merge of main into it, the third included, and on the
+  review's fixes; `ninja` had no work to do after each of the branch's own commits, none of which changes a file the
+  ROM build reads. No file outside `port/` and `.github/` changes, so there is no game change, no game-changes.md row
+  and no compiler probe to run.
+- **Host build:** T1 passes on macOS arm64 for both versions (`build/port`, `build/port-w2`, RelWithDebInfo), before and
+  after the merges; after the third, each full build has 723 warnings, as the field's entry's builds have. The one
+  header the game's code includes that changes is `port/include/port_wcm.h` (its include guard and its header
+  comment), included only under `PLATFORM_PC`.
+- **Tests:** T2, T3, T4 and T6 ran in full after the merge of `1c5f322b71`, with the melonDS oracle (`pbw-oracle` in
+  each build's `oracle/`), its cached saves and `build/port-venv`, two tests at a time in each version and both versions
+  at once: Black 2, 309 tests, 301 passed, 7 failed and 1 skipped (830 s); White 2, 306 tests, 298 passed, 7 failed and
+  1 skipped (791 s). The seven are the same in both versions and fail on main too, as the field's entry says:
+  `oracle_launch_field_menus`, `oracle_launch_party_menus`, `launch_summary_standalone`, `launch_touch_then_party`,
+  `launch_unfinished`, `launch_not_offered` and `frame_times_party_menus` run `--launch`, which steps aside now that the
+  field opens. `oracle_continue` and `oracle_continue_starter` pass in both versions, the field's entry's work, and so
+  do its `replay_new_game_house`, `hal_msl` and `hal_heap_policy`; `asm_oracle`, which fails on main on its stale names,
+  passes in both versions, main's `test_msl.py` with this change's `test_fx.py` and `test_mi.py`. Skipped:
+  `app_universal_slices` alone; every timing gate that ran passed but `frame_times_party_menus`, one of the seven.
+  Before that merge, the same levels ran in full, serially, on the head with the review's fixes: Black 2, 302 tests, 291
+  passed, 9 failed and 2 skipped (4,055 s); White 2, 299 tests, 288 passed, 9 failed and 2 skipped (3,985 s), with the
+  load average above 40 on 8 cores. The three runs before those, on main `8ca29313d1`, after merging `6a1ace981b` and
+  after merging `a4648fce71` (Black 2 291 passed and 2 skipped, White 2 289 passed and 1 skipped), failed the same nine
+  in each version. The nine were the same in both versions and failed on main too, since this branch changes none of
+  their code: `oracle_continue` and `oracle_continue_starter` waited for a stop on the trap of overlay 36's
+  `FIELDMAP_PROC_FUNCS` (`port/tools/oracle/oracle.py`'s CONTINUE sequences), which has C now, and the port stopped
+  instead at frame 3436 in `FieldmapProc_Init` (`OS_Terminate`, status 71), on the field's external heap; the seven that
+  run `--launch` stopped at the same frame. `asm_oracle`, which failed on main, passed in both versions in every run.
+  Skipped in those runs: `app_universal_slices`, which only a distribution build has, and a timing gate now and then
+  (`frame_times_title` in both versions on the head, `frame_times_new_game` after the second merge, `frame_times_title`
+  on main), over its budget while the load average was above the cores (`frame_times.py --max-load`); each passed in
+  another run. The sync tooling's 14 tests pass and `port_guard.py --self-test` passes 183 of 183, before the third
+  merge and after it, and actionlint finds nothing in `port-ci.yml` but its unknown `ubuntu-26.04` label. T5 not run
+  locally (no code a sanitizer checks changed; CI's sanitized jobs run on the PR); T7 not run (nothing visible changed).
+- **Tiers:** unchanged from the entry below, on the head too, before and after the third merge: per version, a 37,546
+  functions, b 3,472, c zero; code bytes Black 2 a 3,435,848, White 2 a 3,435,936, and b 414,418 in each; 2,384 veneers
+  left out and 178 inline-assembly functions among a and b (`port/tools/progress/progress.py --root . --version b2_us
+  --out DIR`, and `w2_us`, its `functions.tsv` summed by tier).
+- **Trap stubs:** after the merge of `1c5f322b71`, 30 function stubs and 22 data placeholders in each version
+  (`gen_stubs` in both builds): main's `_u32_div_f` has its routine now, and CONTINUE and New Game to the save reach no
+  stub, as the field's entry says. Before that merge, 31 and 22 in each version, before and after the first two
+  merges, and the game hit none of them: CONTINUE stopped before any, in `FieldmapProc_Init` at frame 3436, as the nine
+  failures above show, and so did New Game at frame 10,759 (Black 2's
+  `frigate-black2 --headless --frames 11000 --input port/tests/replay/new_game.pbwinput --save-dir DIR` exited 71,
+  `OS_Terminate` in `FieldmapProc_Init`). The first stub on the field's route after that heap was main's `_u32_div_f`,
+  as the entry below says.
+- **64-bit warnings:** not remeasured. The last figure is the field's entry's 278 (game 99, libraries 179), the
+  baseline it sets; before the merge of `1c5f322b71` it was the 2026-10-22 entry's 392 (game 161, libraries 231), from
+  an all-TU audit that isn't committed. The pointer-cast guard (ADR 0019, reserved) is to make the count reproducible.
+  No C that the host build compiles changed but `port_wcm.h`'s include guard and comment.
+- **Work done:**
+  - **STATUS.md:** the entry below, for the PR 12 sync that merged without one; the two `PORT_SHA`s of 2026-10-22 filled
+    (`88237af41d`, the last STATUS commit of PR 8's branch, and `e6becbc07c`, PR 9's), as earlier fills took a merged
+    branch's last STATUS commit; and two rules in "How to add an entry": a log in `/tmp` is not evidence, and past
+    entries are added to, never rewritten. STATUS.md, SYNC.md and CONTRIBUTING say the same of what a past record may
+    still get: its `PORT_SHA` filled in, and a typo or a broken link fixed.
+  - **`asm_oracle`:** `test_fx.py` names libfx's functions as the SDK does since PR 10's sync (`MTX_Scale22_`,
+    `MTX_Scale33_` and `MTX_Copy33To44_`, where it had swan's `MAT2_Scaling`, `MAT3_Scaling` and `MAT3_To4x4`, which the
+    ROM's symbols no longer have), and `test_mi.py` gives `MI_CpuFill8` its fill value as the `u8` it now takes, with
+    bytes whose high bit is set and clear.
+  - **The write guard:** `port_guard.py` refuses a push that would update or delete Frigate's `main` (ADR 0018), before
+    GitHub's rules refuse it on the server, and its docstring and message no longer call the port a solo project. Its
+    first version read only a refspec's literal destination, `HEAD` and the checkout's own settings; the review of this
+    change found pushes that git sends to `main` and it let through, each shown against a scratch bare repository with
+    git 2.50.1. It now works out a push's branches as `set_refspecs` in git's `builtin/push.c` does: the matching
+    refspec `:` and `+:`; `heads/main`, which git takes as `refs/heads/main`; `@` and, on macOS's file system, `head`
+    for `HEAD`; a refspec without a colon that `remote.<name>.push` or `push.default=upstream` maps to `main` (`HEAD`
+    and `@` it doesn't); settings from `git -c` and from `git config` earlier in the command, which it refuses when it
+    can't read them (`--config-env`, `GIT_CONFIG_PARAMETERS`, `GIT_CONFIG_COUNT`); a `url.<base>.insteadOf` toward the
+    port; and the branch and upstream that a `git switch`, `git checkout` or `git branch` earlier in the command
+    leaves, so `git switch main && git push origin HEAD` is refused. It doesn't expand git aliases, which the
+    docstring and README's guard section now say with the rest. The self-test has 58 more cases than main's 125
+    (183 of 183 pass). A differential run of 38 commands, each given to the guard and then run against a scratch
+    bare repository (git 2.50.1), found no push that updated `main` and that the guard let through. The guard refused
+    five that left `main` alone: two whose `git branch -m main` or `git checkout --track origin/main` failed because
+    `main` exists, a `--delete main` that the bare repository refuses for its current branch, and two after
+    `git switch -`, whose branch the guard can't name.
+  - **The sync:** the PR body that `upstream_sync.py` writes gives the verification's commands, `gh pr checkout N` and
+    `port/tools/sync_upstream.sh --verify-pr N`; `port-ci.yml`'s header says how the ROMs are checked under ADR 0018 and
+    names the sync-tooling job and the aggregate `Frigate CI`. SYNC.md and CONTRIBUTING: a sync's merge commit carries
+    only the sync's own resolutions, never feature work (`90ad973b12` carried a contribution policy, an ADR, a review
+    record and templates beside its native fixes), and records are added to, never rewritten.
+  - **The ADR index:** 0018 in its place and "accepted" like the others; 0001's and 0017's rows say "amended by 0018",
+    as the ADRs do; 0016 in docs/README.md; 0019, 0020 and 0021 reserved for the pointer-cast guard, one program for
+    both versions and root heaps in host memory, the next free number 0022. ADR 0018 opens with a header comment, as
+    0017 does. decomp-findings.md's introduction no longer calls the port a solo project.
+  - **Guides:** GLOSSARY's rows for the ruleset, Frigate local verification, the sync PR and sync App, and the owner
+    review exception, and its stale rows fixed (upstream "merged every hour" and "three files" under `.github/`, the
+    test launcher's field "with no C yet"); README's directory map and the include guide name all three headers of
+    `port/include`; `port_wcm.h` takes the `PORT_*_H` guard of its neighbours and says which game code uses it;
+    ARCHITECTURE.md's over-long feature-map line rewrapped, its "Contribution and upstream validation" section, which
+    followed the glossary, a rule at the boundaries now, and its plain-C rule saying that the test launcher steps aside
+    now that the field has C. GLOSSARY's row for Frigate local verification says that the status is posted by the
+    account gh is signed in with and that only CallanCampos's counts; the ADR index's row for D6 says 0020 is reserved
+    for it.
+  - **lessons.md:** never run lldb on this Mac (developer mode off, its password prompt hangs every `wibo` process,
+    other sessions' ROM builds included); use the sanitizers, the crash reports and logging. And a green `--verify-pr`
+    says nothing about T4.
+  - **The merge of `1c5f322b71`** (PR 18, the field's entry), whose conflicts were all in records and guides: this
+    change's two entries stay above the field's entry, since this one was brought up to date after it, and the field's
+    entry's `PORT_SHA` is filled with `7f5cad4dd9`, the last STATUS commit of PR 18's branch; the PR 12 sync's entry
+    names the 2026-10-22 entries that its "entry below" meant, now that the field's entry is below it, and the next task
+    that its "as the entry above says" meant, since this entry's Next has moved on. The ADR index keeps 0018's row in
+    its place and adds 0021's after it, its reservation line saying that 0021 was written first; ARCHITECTURE.md's
+    feature map opens with main's account of the field, which now opens; lessons.md keeps the three sections of
+    2026-10-23 in the order they were written, the field's review's first.
+- **Next:** the launcher's retirement (plan A-2), then phase 3's exit route (A-3), as the field's entry says. PR 13's
+  and PR 16's syncs merged without STATUS entries; each gets one, with its verification, as the PR 12 sync's below
+  does.
+- **Blockers:** the seven tests that run `--launch` fail on main in both versions until the launcher's retirement
+  (ADR 0012's note), so T4 is red on main until then, and `--verify-pr`, which builds no oracle, shows green. Before
+  the field's entry merged, the nine above failed, `oracle_continue` and `oracle_continue_starter` among them, on the
+  field's external heap (`g_FieldHeapMemory`, a 64 KiB root on a fixed buffer that `port_heap_size` didn't scale),
+  which ADR 0021 now gives host memory. Battles also wait on overlay 167's `data_ov167_021d7490`, which has no C and is
+  under another contributor's claim.
+
+## 2026-10-23: upstream sync `0a12a2bd3` merged (PR 12): the save's city state initialized by the game's own C
+
+This entry was added afterwards, by the entry above: the sync merged without one.
+
+- **Upstream:** `0a12a2bd3e` (upstream merge #480), four commits after `d4a30c66b0`.
+- **Port:** `8ca29313d1`, the merge of [PR 12](https://github.com/CallanCampos/Frigate/pull/12): the sync App's merge
+  `0222276d69` and the owner's follow-up `2575a61410`, the head that was verified and approved.
+- **ROM:** T0 passes on the exact head: `Frigate local verification` is `success` on `2575a61410`, posted by
+  CallanCampos after both SHA1s matched. The merge `8ca29313d1` has no status of its own; on 2026-10-23 a local
+  `python3 configure.py && ninja` in a fresh worktree of it matched both SHA1s again (Black 2
+  `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb`, White 2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`). The sync needs dsd
+  `v0.12.1-dsi.6`, since dsd now fills the overlay digests and defines NitroSDK's linker symbols; the older
+  `v0.12.1-dsi.4` fails at `dsd lcf --symbols`. `configure.py` downloads the pinned version whenever `tools/dsd.rev`
+  names another, but keeps a `tools/dsd` that has no `tools/dsd.rev`, whatever its version: prepare a worktree with
+  `port/tools/bootstrap_checkout.sh`, which leaves `tools/dsd` to `configure.py`, never by linking it by hand.
+- **Host build:** T1 passes on macOS arm64 for both versions in the exact-head verification, and every CI job on the
+  head passes: the macOS, Linux and Windows host builds, both sanitized builds, the four macOS distribution builds and
+  the sync tooling's tests (`Frigate CI`), with Compile and Code standards.
+- **Tests:** the exact-head verification passes T2, T3 and T6 with no failure: Black 2, 284 passed and 18 skipped
+  of 302; White 2, 281 passed and 18 skipped of 299; every timing gate that ran passes. That run builds no oracle and
+  has no port virtual environment, and its skips hide tests that fail on this main when both are there, in both
+  versions: the nine routes that the entry above lists, which stop on the field's heap, and `asm_oracle`, whose tests
+  named libfx's functions by names the ROM's symbols no longer have. None comes from this sync: the field's C arrived
+  with PR 5's sync (`83515e20ce`) and the SDK's names with PR 10's (`d4a30c66b`). T4 was not run; T5 runs only in CI
+  (macOS and Linux, passing); T7 not run.
+- **Tiers:** unchanged from the 2026-10-22 entry of the completed SDK sync: per version, a 37,546 functions, b 3,472, c
+  zero; code bytes Black 2 a 3,435,848, White 2 a 3,435,936, and b 414,418 in each; 2,384 veneers left out and 178
+  inline-assembly functions among a and b (`port/tools/progress/progress.py --root . --version b2_us --out DIR`, and
+  `w2_us`, on `8ca29313d1`). The sync names a call and types a save block's member; it adds no C.
+- **Trap stubs:** unchanged: 31 function stubs and 22 data placeholders per version, the same symbols in both. The two
+  on a route the game takes soon are main's `_u32_div_f` (MSL's division, which the field's lens-flare data calls at
+  each map change) and overlay 167's `data_ov167_021d7490` (a battle table). `ReshZekSave_UnresolvedInitTarget` was a
+  platform-layer no-op, not a stub, so its removal changes neither count.
+- **64-bit warnings:** not remeasured: the all-TU audit behind the 2026-10-22 entry's 392 isn't committed. The sync's
+  game changes take two `(u32 *)` casts between pointers away and add no cast between a pointer and an integer.
+- **Work done:** the App's merge had no conflicts. Upstream #480 finds `ReshZekSave_Init`'s call
+  (`src/system/resh_zek_savedata.c`): it is overlay 12's `CityState_Init`, not the placeholder
+  `ReshZekSave_UnresolvedInitTarget`; it types the save block's city state as `CityState`, drops
+  `tools/build/object_aliases.py` and its helpers, and lets dsd fill the overlay digests and define NitroSDK's linker
+  symbols. The owner's follow-up `2575a61410` removes `port/hal/stubs/unresolved.c`, the platform layer's no-op for the
+  placeholder, and corrects its row in decomp-findings.md (the call's target was read as overlay 11's
+  `WCM_RssiToQuality`, which shares its address, so the "no effect" reading was wrong) and the HAL guide. A save the
+  host creates now runs the game's `CityState_Init` (`initialized` 0, `city` 2); `CityState` stays four bytes in the
+  save. The owner approved the exact head once every required check had passed, and merged it with a merge commit.
+- **Next:** the field's entry (PR 18), then the test launcher's retirement.
+- **Blockers:** the field's external heap, unchanged; and the failures above, until the field opens on the host.
 
 ## 2026-10-23: the field's entry: root heaps in host memory, MSL's division, CONTINUE and New Game into the field
 
@@ -271,7 +538,7 @@ by the results here.
 ## 2026-10-22: automatic sync PR CI and dedicated App
 
 - **Upstream:** `fc478a9ee5`; no new decomp sync or game change.
-- **Port:** `PORT_SHA`, automatic-PR-CI implementation based on reviewed main `a3df47254b`.
+- **Port:** `e6becbc07c`, automatic-PR-CI implementation based on reviewed main `a3df47254b`.
 - **ROM:** exact-head T0 validation remains required before merge; results belong on the required local status.
 - **Host build:** both game versions remain required by local verification; no host code changed.
 - **Tests:** 14 isolated Git/shell/config fixtures pass, including App scope and absence of status/approval calls.
@@ -293,7 +560,7 @@ by the results here.
 ## 2026-10-22: protected main and reviewed sync proposals
 
 - **Upstream:** `fc478a9ee5`; this change imports no new decomp code.
-- **Port:** `PORT_SHA`, the contribution/sync hardening PR based on `9453d79234`.
+- **Port:** `88237af41d`, the contribution/sync hardening PR based on `9453d79234`.
 - **ROM:** T0 validation is required before this PR merges; the exact result is recorded by its required
   `Frigate local verification` status. No ROM/game source changed in this PR.
 - **Host build:** both versions are required by the new exact-head verifier; the public CI gate also covers the
