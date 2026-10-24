@@ -32,50 +32,63 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
 
-## 2026-10-24: the battle's run: every particle drawn, and Hugh's battle to its end with the table's bytes
+## 2026-10-24: the battle's run: SPL's particles drawn again, and Hugh's battle to its end with a local candidate
 
 - **Upstream:** `b62c655bfa` (upstream merge #481), as `main` has it; this branch merges no upstream commit. Upstream's
   `main` is at `e522642f9e`, for the sync to propose on its own.
-- **Port:** `PORT_SHA`, on the topic branch `port-battle-run` from `main` at `1807efb68f` (PR 21's merge). Not
-  published.
-- **ROM:** T0 passes on the branch: Black 2 `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb` and White 2
-  `b5d7490be7b415b8f1e672a53e978a9cc667e56a` (`python3 configure.py && ninja`, run twice, the second after the local
-  candidates below were put behind `PLATFORM_PC`, which MWCC never sees). The commit changes only `port/`.
+- **Port:** `PORT_SHA`, on the topic branch `port-battle-run` from `main` at `1807efb68f` (PR 21's merge): the
+  particles' fix (`942e275903`) and the review's round on it, this entry's commit, published together as one pull
+  request to `main`.
+- **ROM:** T0 passes on the branch's head: Black 2 `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb` and White 2
+  `b5d7490be7b415b8f1e672a53e978a9cc667e56a` (`python3 configure.py && ninja`). The first round ran it twice, the
+  second time with the local candidates below behind `PLATFORM_PC`, which MWCC never sees. The branch changes only
+  `port/`.
 - **Host build:** T1 passes on macOS arm64, Apple clang 21, RelWithDebInfo with the oracle (`-DPORT_BUILD_ORACLE=ON`),
-  both versions (`build/port`, `build/port-w2`). clang-format 23.1.1 is clean on both changed C files.
-- **Tests:** T2: every test that isn't a route or the oracle's, 282 of 282 in each version, `asm_oracle` and
-  `app_universal_slices` skipped (`ctest -LE "route|oracle"`), the new `gx_parameter_read_shm` and `_copy` among them;
-  without the fix the scenario fails three checks (two log counts, and no polygon from SPL's billboard). T3: the
-  `replay_*` tests, Black 2 8 of 8 and White 2 6 of 6. T2 and T3 ran twice, with the candidates below in the tree and
-  again on this commit's tree without them, with the same results. T4: `oracle_saves`, `oracle_opening`, `oracle_title`,
-  `oracle_continue` and `oracle_continue_starter` pass in both versions, 5 of 5 each. The Route 19 route by hand
-  (`frigate-black2 --headless --frames N --input port/tests/oracle/route19_save_b2_us.pbwinput --save-dir DIR` from the
-  starter save, White 2 with the same input and its version line changed, as on the last entry), against pbw-oracle's
-  runs of the same input: on this head, with no candidate, both versions still stop at frame 7,623 on
-  `data_ov167_021d7490` (status 70). With the table's 16 bytes from the ROM as a local, uncommitted candidate (`{ 3, 5,
-  4, 6 }`, the same in both versions), the battle plays to its end in both: Black 2's Tepig wins in three turns, "Tepig
-  gained 94 Exp. Points!", "Tepig grew to Lv. 6!", "Player defeated PKMN Trainer HughAAA!", "$500 for winning", the
-  screen black from frame 9,804 and the field from frame 9,871 (count 9,870), Hugh's words and his walk down the stairs
-  as the oracle shows them from its frame 12,593 (count 10,318; its battle a turn longer, its black as long, 67 counts);
-  White 2's in four turns, black from frame 10,012 and the field from 10,079. Compared on the game's count (`compare.py
-  screens --align counter`) at 649 Black 2 frames of the battle: before the fix, 353 matched; with it, 362, every top
-  screen of the cut-in and the battle's opening within the 3D tolerance to the first move's hit, the remaining failures
-  the bottom screen's clock (the DS lags, so at one count its clock is some 35 s later: a minute digit, then the colon's
-  blink) and, from count 7,704, the move's animations a frame or two apart and then the battle itself, whose damage
-  rolls differ by the random seed (`buildSeed`, [decomp-findings.md](decomp-findings.md)): three turns on the port
-  against the oracle's four. Every frame of the first turn pictured on both, side by side, shows the Tackle's hit, its
-  splash and its sparks in the same sequence. White 2's 648 frames: 277 match; its battle's opening runs a few frames
-  apart from the DS's at the same count from count 7,231: pictured densely on both, every 20th port frame from count
-  7,229 to 7,689 has an oracle picture 0 to 25 frames away within 1.7% of its pixels (sampled, without the 3D
-  tolerance), but for the throw's frames 7,305 to 7,310 and the idle camera's at 7,505 to 7,510 (4% to 9%), likely steps
-  that the DS's two-frame passes skip. With the encounter effects' four entries as a second candidate as well, both
-  versions play all 28,600 frames to the SAVE beside Route 19's grass (Route 19, Gym Badges 0, Pokédex 2, Time 0:10, as
-  the oracle's), through the Pokémon Center, the gate and Bianca's catching lesson with its wild Purrloin; the saves'
-  SHA-1s (Black 2 `e149f49292…`, White 2 `61bd81319d…`) are not the oracle's `826bc561a3…`, which the random seed and
-  the clock alone could explain, not yet checked. Without that second candidate Black 2 stops at frame 20,077, as the
-  deep dive did, on GFL's overlay collision assert, whose error screen spins until the watchdog ends the run (status
-  73). T5 and T7 not run.
-- **Tiers:** unchanged: the commit changes no game C (`port/tools/progress/progress.py` not run again).
+  both versions (`build/port`, `build/port-w2`). clang-format (Homebrew 23.1.3) is clean on the three changed C files.
+- **Tests:** full ctest on the branch's head (`ctest -j4`, on a load average of 40 to 66 on the machine's 8 cores):
+  Black 2, 304 passed, 7 failed and 1 skipped of 312; White 2, 301 passed, 7 failed and 1 skipped of 309. The failures
+  are the seven tests of the test launcher in both versions (`frame_times_party_menus`, `oracle_launch_field_menus`,
+  `oracle_launch_party_menus`, `launch_summary_standalone`, `launch_touch_then_party`, `launch_unfinished`,
+  `launch_not_offered`), which steps aside now that the field opens, as on the last entry and on `main` until its
+  retirement (plan A-2). Skipped: `app_universal_slices` in both, which only a distribution build has. `asm_oracle`
+  passes in both (with the clone's `build/port-venv`, linked into the worktree), and so do `game_ptrcasts` and
+  `game_ptrcasts_tool` (T1), the `replay_*` tests (T3), `replay_same_save` (T6), `oracle_continue` and
+  `oracle_continue_starter` (T4) and the new `gx_parameter_read` (T2). `gx_parameter_read` holds the log: without the
+  review's change to `port_hw_g3_send` its sends fail two checks (`count == 1` and `count == 2`: the write before the
+  send taken back), and without the merge in `port_hw_g3_port` the scenario fails three (two log counts, and no polygon
+  from SPL's billboard; the review's run). The Route 19 route by hand (T3; `frigate-black2 --headless --frames N --input
+  port/tests/oracle/route19_save_b2_us.pbwinput --save-dir DIR` from the starter save, White 2 with the same input and
+  its version line changed, as on the last entry), against pbw-oracle's runs of the same input, on this head with no
+  candidate: both versions stop at frame 7,623 on `data_ov167_021d7490` (status 70). Compared on the game's count
+  (`compare.py screens --align counter`) at the pictured frames up to there: Black 2, 312 of 376 match; of the others,
+  58 differ only on the bottom screen's clock (the DS lags, so at one count its clock is some 35 s later: a minute
+  digit, then the colon's blink), 5 pair with an oracle frame that has no picture, which a 3D screen needs, and one
+  (count 5,022) shows a text box printing a few letters ahead; one oracle frame (count 7,590) has no port frame with its
+  pictures. On the first round's run without the fix, 8 more failed, now within the 3D tolerance: the VS cut-in's sparks
+  (counts 6,451 to 6,471) and the burst of Hugh's Poké Ball at the send-out (7,374 to 7,414). White 2, 275 of 370, the
+  VS cut-in's frames among the matches; its battle's opening runs a few frames apart from the DS's at one count from
+  count 7,231 (below). Both versions' failures up to frame 7,623 are the same frames as on the first round's runs with
+  the candidates. The first round's results with the local, uncommitted candidates, kept as a patch outside the
+  repository, so not reproducible from this tree: with the table's 16 bytes from the ROM (`{ 3, 5, 4, 6 }`, the same in
+  both versions), the battle plays to its end in both: Black 2's Tepig wins in three turns, "Tepig gained 94 Exp.
+  Points!", "Tepig grew to Lv. 6!", "Player defeated PKMN Trainer HughAAA!", "$500 for winning", the screen black from
+  frame 9,804 and the field from frame 9,871 (count 9,870), Hugh's words and his walk down the stairs as the oracle
+  shows them from its frame 12,593 (count 10,318; its battle a turn longer, its black as long, 67 counts); White 2's in
+  four turns, black from frame 10,012 and the field from 10,079. At 649 Black 2 frames of the battle, compared on the
+  count: before the fix, 353 matched; with it, 362, the remaining failures the clock and, from count 7,704, the move's
+  animations a frame or two apart and then the battle itself, whose damage rolls differ by the random seed (`buildSeed`,
+  [decomp-findings.md](decomp-findings.md)): three turns on the port against the oracle's four. Every frame of the first
+  turn pictured on both, side by side, shows the Tackle's hit, its splash and its sparks in the same sequence. White 2's
+  648 frames: 277 match; pictured densely on both, every 20th port frame from count 7,229 to 7,689 has an oracle picture
+  0 to 25 frames away within 1.7% of its pixels (sampled, without the 3D tolerance), but for the throw's frames 7,305 to
+  7,310 and the idle camera's at 7,505 to 7,510 (4% to 9%), likely steps that the DS's two-frame passes skip. With the
+  encounter effects' four entries as a second candidate as well, both versions play all 28,600 frames to the SAVE beside
+  Route 19's grass (Route 19, Gym Badges 0, Pokédex 2, Time 0:10, as the oracle's), through the Pokémon Center, the gate
+  and Bianca's catching lesson with its wild Purrloin; the saves' SHA-1s (Black 2 `e149f49292…`, White 2 `61bd81319d…`)
+  are not the oracle's `826bc561a3…`, which the random seed and the clock alone could explain, not yet checked. Without
+  that second candidate Black 2 stops at frame 20,077, as the deep dive did, on GFL's overlay collision assert, whose
+  error screen spins until the watchdog ends the run (status 73). T5 and T7 not run.
+- **Tiers:** unchanged: the branch changes no game C (`port/tools/progress/progress.py` not run again).
 - **Trap stubs:** 30 function stubs and 22 data placeholders per version, unchanged, the same symbols in both. All 30
   functions have C in the decomp, in the nine files the host build replaces or leaves out (`port/hal/replaced.txt`,
   `port/hal/card/replaced.txt`), and so do two placeholders (`dwc_aoss_ap.c`'s `.bss`); 20 placeholders have no C:
@@ -83,25 +96,30 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
   `dwc_util_task.c`) and `download_play_wih.c`'s 17 strings and tables and its `gWork`. Only the battle table is on the
   Route 19 route.
 - **64-bit warnings:** `check_ptrcasts: 429 sites in 274 keys (real 150, harmless 101, handled 141, unreachable 37),
-  1681 files, 0 not compiled`, as on the last entry.
-- **Work done:** every SPL particle is drawn again. The host's register macros make each access to a geometry command
+  1681 files, 0 not compiled` in both versions, as on the last entry.
+- **Work done:** SPL's particles are drawn again. The host's register macros made each access to a geometry command
   port a logged command (`port_hw_g3_port`), and SPL reads POLYGON_ATTR back after each particle's write
   (`lib/spl/src/spl_draw.c`, eight sites, `(void)reg_G3_POLYGON_ATTR;`): on the DS a read of a command port does
   nothing, here it sent the geometry engine a POLYGON_ATTR of 0, which draws neither face, so the polygons never reached
   polygon RAM. `port/hal/hw/hw.c` now gives an access right after one to the same parameter port (POLYGON_ATTR,
   TEXIMAGE_PARAM, PLTT_BASE, whose commands only store their value) that access's entry, which is exact for two writes
-  and makes the read harmless. The trainer cut-in's sparks and the Poké Ball's burst now match the oracle's pictures.
-  The test `gx_parameter_read_*` (`port/tests/gx/test_gx.c`) holds the log and runs SPL's own billboard through the log
-  and the geometry engine. The HAL and tests guides, the feature map's particles and battles rows, decomp-findings.md's
-  two rows (the candidates' results) and lessons.md follow.
-- **Next:** the battle's route as a test once the table has C upstream: the Route 19 route's 28,600 frames in both
+  and makes the read harmless. The review's round: `port_hw_g3_send` took the log's last entry back as the slot its
+  caller's `&reg_G3_*` had logged, which a shared entry isn't, so a send of no words to a parameter port right after a
+  write to it would have dropped the write (no game code sends to those ports today); hw.c now records a shared entry
+  (`sG3LastShared`) and a send keeps it. [ADR 0004](adr/0004-ds-addresses-by-header-translation.md) gets a note on the
+  change to its "fresh slot" contract, and `port/hal/hw/hw.h` says it too. The test runs once, as `gx_parameter_read`
+  on the default backend, since it uses no VRAM bank, and holds the sends as well. The feature map's particles row says
+  what was compared, on which tree, and the battles row the blockers as they stand, with the candidates' results left
+  to this entry and decomp-findings.md; lessons.md's lesson is in the past tense, with the review's as a second.
+  The HAL and tests guides follow.
+- **Next:** the battle's route as a test once upstream's fixes are synced: the Route 19 route's 28,600 frames in both
   versions with T4 on the cut-in and the battle's first turn (by picture where the DS lags), and the saves' difference
   from the oracle's explained. Then the test launcher's retirement (plan A-2) and phase 3's exit route (A-3).
-- **Blockers:** `data_ov167_021d7490` (issue #120): no C upstream (`e522642f9e`); the overlay is under the user's own
-  decomp claim of 2026-10-24 04:59 UTC (`btl_client.c`'s last row) and another contributor's unreleased claim of
-  2026-10-18; its owner is `src/ov167/btl_pokeparam.c`, and its bytes are known. `src/ov036/enceff_data.c`'s four
-  entries (overlay 36, issue #83 closed, no claim): ordinary decomp work from the decomp checkout. Both are the user's
-  call; the port keeps no stand-in.
+- **Blockers:** the route waits for two upstream pull requests, both open at `e522642f9e`, to merge, and then for the
+  sync: #497, which gives `src/ov167/btl_pokeparam.c` the table `data_ov167_021d7490` and completes overlay 167
+  (closing #120), and #496, which names the loaded overlay's functions in `src/ov036/enceff_data.c`'s four entries. Both
+  came from the user's decomp checkout on 2026-10-24 (05:57 and 05:45 UTC); the user's claim of overlay 167 was
+  released at 07:36 UTC with #497 open ([decomp-findings.md](decomp-findings.md)). The port keeps no stand-in.
 
 ## 2026-10-23: the battle path: the trainer cut-in and Hugh's battle to the first move
 

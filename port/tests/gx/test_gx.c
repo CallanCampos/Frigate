@@ -1271,7 +1271,8 @@ static void scenario_fifo(void) {
 // (lib/spl/src/spl_draw.c, "(void)reg_G3_POLYGON_ATTR;"), and when the read was logged as a POLYGON_ATTR of 0, which
 // draws neither face, every particle of the game vanished (the trainers' cut-in sparks, the Poké Balls' bursts, the
 // moves' effects). The log keeps one POLYGON_ATTR with the value written, merges only accesses in a row to a port that
-// stores its parameter, and SPL's own billboard draw leaves its quad in the geometry engine
+// stores its parameter, keeps such a write when MI sends to the port right after it, and SPL's own billboard draw
+// leaves its quad in the geometry engine
 static void scenario_parameter_read(void) {
     static const MtxFx43 identity = { { { FX32_ONE, 0, 0 }, { 0, FX32_ONE, 0 }, { 0, 0, FX32_ONE }, { 0, 0, 0 } } };
     const u32 attr = GX_PACK_POLYGONATTR_PARAM(GX_LIGHTMASK_NONE, GX_POLYGONMODE_MODULATE, GX_CULL_NONE, 5, 31, 0);
@@ -1324,6 +1325,24 @@ static void scenario_parameter_read(void) {
     if (count == 5) {
         CHECK(log[0].port == 0x040004a4 && log[2].port == 0x040004a4 && log[2].value == attr);
         CHECK(log[3].port == 0x04000454 && log[4].port == 0x04000454);
+    }
+
+    // MI's send to the port right after a write to it: the port's access shares the write's entry, which the send
+    // keeps, so a send of no words leaves the write, and a send of one logs its word after it
+    G3_PolygonAttr(GX_LIGHTMASK_NONE, GX_POLYGONMODE_MODULATE, GX_CULL_NONE, 5, 31, 0);
+    MIi_CpuSend32(&attr, &reg_G3_POLYGON_ATTR, 0);
+    log = port_hw_g3_take(&count);
+    CHECK(count == 1);
+    if (count == 1) {
+        CHECK(log[0].port == 0x040004a4 && log[0].value == attr);
+    }
+    G3_PolygonAttr(GX_LIGHTMASK_NONE, GX_POLYGONMODE_MODULATE, GX_CULL_NONE, 1, 10, 0);
+    MIi_CpuSend32(&attr, &reg_G3_POLYGON_ATTR, sizeof(attr));
+    log = port_hw_g3_take(&count);
+    CHECK(count == 2);
+    if (count == 2) {
+        CHECK(log[0].port == 0x040004a4 && log[0].value != attr);
+        CHECK(log[1].port == 0x040004a4 && log[1].value == attr);
     }
 
     // SPL's billboard of one opaque particle at the origin, in front of an identity camera, through the engine

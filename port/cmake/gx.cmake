@@ -63,8 +63,7 @@ foreach(backend IN ITEMS shm mach-entry mach-remap copy)
     set_tests_properties(gx_backend_${backend} PROPERTIES SKIP_RETURN_CODE 77 TIMEOUT 120)
 endforeach()
 set(port_gx_scenarios
-    sdk_settings wrappers tex_upload texpltt_upload clear_image ext_palettes fill_source fifo cpu_pointer lcdc_clear
-    parameter_read)
+    sdk_settings wrappers tex_upload texpltt_upload clear_image ext_palettes fill_source fifo cpu_pointer lcdc_clear)
 # Each SDK scenario with an aliasing backend and with copying
 foreach(scenario IN LISTS port_gx_scenarios)
     foreach(backend IN ITEMS shm copy)
@@ -72,6 +71,9 @@ foreach(scenario IN LISTS port_gx_scenarios)
         set_tests_properties(gx_${scenario}_${backend} PROPERTIES SKIP_RETURN_CODE 77 TIMEOUT 60)
     endforeach()
 endforeach()
+# The scenarios that run once, on the default backend: the backend's choice, POWCNT1, and the geometry command log's
+# accesses to a parameter port with SPL's billboard through the geometry engine, which use no VRAM bank
 add_test(NAME gx_default_backend COMMAND port_gx_tests default_backend)
 add_test(NAME gx_display COMMAND port_gx_tests display)
-set_tests_properties(gx_default_backend gx_display PROPERTIES TIMEOUT 60)
+add_test(NAME gx_parameter_read COMMAND port_gx_tests parameter_read)
+set_tests_properties(gx_default_backend gx_display gx_parameter_read PROPERTIES TIMEOUT 60)

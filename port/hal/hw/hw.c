@@ -185,6 +185,10 @@ static size_t sG3Count;
 static size_t sG3Capacity;
 static PortG3Write *sG3Taken;
 static size_t sG3TakenCapacity;
+// Whether the last access to a command port shared the log's last entry with the access before it (port_hw_g3_port)
+// rather than logging one of its own. That entry then holds the earlier access's write, so a send to it
+// (port_hw_g3_send) logs its words after it instead of taking it back
+static int sG3LastShared;
 
 static void *log_g3_write(uint32_t port) {
     if (sG3Count == sG3Capacity) {
@@ -198,6 +202,7 @@ static void *log_g3_write(uint32_t port) {
     PortG3Write *entry = &sG3Log[sG3Count++];
     entry->port = port;
     entry->value = 0;
+    sG3LastShared = 0;
     return &entry->value;
 }
 
@@ -209,15 +214,16 @@ static int stores_parameter(uint32_t port) {
     return port == 0x040004a4 || port == 0x040004a8 || port == 0x040004ac;
 }
 
-// The ports are write-only: a read on the DS gets 0 and sends no command (GBATEK "DS 3D Overview"; melonDS's
-// GPU3D::Read32 does the same). Here the register macro's access can't tell a read from a write, and an entry of its
-// own would send the engine a command of 0. The game's C reads POLYGON_ATTR back right after writing it (each particle
-// of lib/spl/src/spl_draw.c: "(void)reg_G3_POLYGON_ATTR;", the ROM's load from the port), and a POLYGON_ATTR of 0
-// draws neither face, so every SPL particle vanished. An access right after one to the same parameter port therefore
-// reuses that access's entry: a read gets the value just written, which the game discards, and sends nothing more; a
-// second write replaces the first, as the engine would. A read with any other command before it still logs a 0
+// The ports are write-only (GBATEK's 3D I/O map marks them W), and a read sends no command: melonDS's GPU3D::Read32
+// gives 0 for them and queues nothing. Here the register macro's access can't tell a read from a write, and an entry
+// of its own would send the engine a command of 0. The game's C reads POLYGON_ATTR back right after writing it (each
+// particle of lib/spl/src/spl_draw.c: "(void)reg_G3_POLYGON_ATTR;", the ROM's load from the port), and a POLYGON_ATTR
+// of 0 draws neither face, so every SPL particle vanished. An access right after one to the same parameter port
+// therefore shares that access's entry: a read gets the value just written, which the game discards, and sends nothing
+// more; a second write replaces the first, as the engine would. A read with any other command before it still logs a 0
 void *port_hw_g3_port(uint32_t port) {
     if (stores_parameter(port) && sG3Count != 0 && sG3Log[sG3Count - 1].port == port) {
+        sG3LastShared = 1;
         return &sG3Log[sG3Count - 1].value;
     }
     return log_g3_write(port);
@@ -227,11 +233,16 @@ void *port_hw_gxfifo(void) {
     return log_g3_write(0x04000400);
 }
 
+// A dest that the port's access gave a fresh entry is that entry, logged only to pass its address, and is taken back; a
+// shared one holds the access before it, a real write, and stays, so a send of no words leaves that write in the log
 int port_hw_g3_send(volatile void *dest, const void *src, uint32_t count, uint32_t step) {
     if (sG3Count == 0 || dest != &sG3Log[sG3Count - 1].value) {
         return 0;
     }
-    uint32_t port = sG3Log[--sG3Count].port;
+    uint32_t port = sG3Log[sG3Count - 1].port;
+    if (!sG3LastShared) {
+        sG3Count--;
+    }
     for (uint32_t i = 0; i < count; i++) {
         uint32_t address = port + i * step;
         uint32_t value;
@@ -251,6 +262,7 @@ const PortG3Write *port_hw_g3_take(size_t *count) {
     sG3TakenCapacity = capacity;
     *count = sG3Count;
     sG3Count = 0;
+    sG3LastShared = 0;
     return sG3Taken;
 }
 
