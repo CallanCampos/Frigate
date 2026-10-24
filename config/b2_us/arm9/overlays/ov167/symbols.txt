@@ -4269,7 +4269,7 @@ data_ov167_021d7071 kind:data(any) addr:0x021d7071
 data_ov167_021d7074 kind:data(any) addr:0x021d7074
 data_ov167_021d7160 kind:data(any) addr:0x021d7160
 data_ov167_021d7448 kind:data(any) addr:0x021d7448 ambiguous
-data_ov167_021d7490 kind:data(any) addr:0x021d7490
+sSemiInvulnFlags kind:data(any) addr:0x021d7490
 data_ov167_021d74a0 kind:data(any) addr:0x021d74a0
 data_ov167_021d74a5 kind:data(any) addr:0x021d74a5
 data_ov167_021d74ab kind:data(any) addr:0x021d74ab

@@ -42,6 +42,7 @@ src/ov167/btl_server_cmd.c:
 src/ov167/btl_pokeparam.c:
     complete
     .text       start:0x021ba5c4 end:0x021bc6fc
+    .rodata     start:0x021d74d0 end:0x021d74e0
     .data       start:0x021dafbc end:0x021dafcc
     .bss        start:0x021db0b0 end:0x021db1d4
 
@@ -136,6 +137,7 @@ src/ov167/pokewood_cutin.c:
     .data       start:0x021db020 end:0x021db040
 
 src/ov167/btl_client.c:
+    complete
     .text       start:0x021b16b4 end:0x021b9990
     .rodata     start:0x021d6ef0 end:0x021d7488
     .data       start:0x021dafa0 end:0x021dafb0
