@@ -371,7 +371,7 @@ that bank in VRAM display mode (`bottom_3d` is 1; the top screen, engine B's log
 
 ## The comparison sequences
 
-Five input files on game frames for each version, `port/tests/oracle/<name>_<version>.pbwinput`, played by six
+Six input files on game frames for each version, `port/tests/oracle/<name>_<version>.pbwinput`, played by seven
 sequences, compared with `--align counter`, the movies by their pictures (`oracle.py`'s `SEQUENCES` says how):
 
 - **opening**: nothing pressed. Power-on, the boot screens, the Game Freak logo and the whole opening, the title and
@@ -407,6 +407,22 @@ sequences, compared with `--align counter`, the movies by their pictures (`oracl
   as in field_menus. These two were Frigate's test launcher's routes while the field had no C
   ([ADR 0012](../../docs/adr/0012-test-launcher-for-the-field-menus-apps.md)); every app screen they reach now comes
   through the field menu on both programs.
+- **aspertia**: phase 3's exit route ([PLAN.md §7](../../docs/PLAN.md#phase-3-new-game-to-the-overworld-m3-m4)), from a
+  blank save. The title sequence's presses, then NEW GAME at game frame 3400 and A twice a second through the intro
+  (overlay 294): Professor Juniper, Minccino out of its Poké Ball in a burst of particles, the player's and the rival's
+  names, the season's name and the 3D flight over Aspertia City (overlay 293), into the field in front of the player's
+  house and its first scripts there and in the house, to the player's room. Then the story's first steps as the starter
+  save's file takes them: Mom's scene and out of the door into Aspertia City. Then west along z = 762, short of Hugh's
+  scene, to a townsperson at (39,764) (npc 4 of `res/field/events/aspertia_city.json`) and his three lines, into the
+  house at (38,761) (zone 431), three tiles up, back out of its door and east: the player walks, talks, enters a
+  building and changes maps, three times after the intro's own change into the house. The port runs 15,800 frames, the
+  oracle 18,700, and the clock is pinned, as in field_menus. White 2's intro runs 60 passes longer from its gender
+  question to the room, and the route's presses from the room on line the two versions up again, so both files have
+  the same presses. NNS G3D's state is compared at every port frame from the title on, but the first frames of the DS's
+  passes that take several ([below](#known-differences-from-the-hardware)). Before it, no sequence had reached a
+  particle: run before the geometry command log's fix of the same day (`port/hal/hw/hw.c`, which the Route 19 route
+  found), it showed the burst missing on the port, SPL's read of POLYGON_ATTR having sent a POLYGON_ATTR of 0; with the
+  fix, the burst matches.
 
 A sequence can also allow the port to stop on code with no C yet: from a port frame (`stop_from`), on the trap stub
 it names (`stop_trap`, a pattern of the trap's message), with why (`stop`). A stop on any other trap fails, so the
@@ -431,9 +447,10 @@ party_menus), whose saves only the oracle can make, have only the first:
   too long, fails; in the movies, by their pictures in order. Screens without 3D must be exact at 6 bits, screens with
   3D within the tolerance, and every picture the oracle shows between two of the port's frames must be one the port
   shows (a skipped picture fails). It compares NNS G3D's state (`NNS_G3dGlb`) on the count at every frame of the title
-  too. It can't time the movies: there the DS's passes take 3 to 5 frames by its CPU's load, so only their pictures and
-  their order are held, and in the title sequence the oracle frames the press skips aren't compared. With `--update`
-  it writes the reference from a comparison that passes. Skipped (77) without the oracle or the ROM.
+  too, and of the exit route from the title on. It can't time the movies: there the DS's passes take 3 to 5 frames by
+  its CPU's load, so only their pictures and their order are held, and in the title sequence the oracle frames the
+  press skips aren't compared. With `--update` it writes the reference from a comparison that passes. Skipped (77)
+  without the oracle or the ROM.
 - `oracle_<name>_hashes` (`oracle.py sequence-check NAME --port BIN`), every build: runs the port alone and checks it
   against `port/tests/oracle/<name>_<version>.tsv`, the oracle's hashes at every 12th port frame and at each frame
   around a press, the title's start and the cry. Where the game counts passes, each row is the oracle frame at the
@@ -458,6 +475,8 @@ Results, every port frame but the known differences:
 | field_menus, White 2 | 5,200 | 5,171 | 2,171 | 3,000 | the title's 28 port frames and 3402, oracle frames 1260, 4852 | not compared |
 | party_menus, Black 2 | 8,500 | 8,190 | 4,250 | 3,940 | the title's 21 port frames, the summary's 289 (4534-4822), oracle frame 4920 | not compared |
 | party_menus, White 2 | 8,500 | 8,182 | 4,252 | 3,930 | the title's 28 port frames and 3402, the summary's 289, oracle frames 1260, 4852 | not compared |
+| aspertia, Black 2 | 15,800 | 15,706 | 5,833 | 9,873 | the title's 21 port frames, 7751, the lake's 2, Mom's balloon's 16, the zoom's 54, oracle frames 4943, 9841, 17462-17519 | 14,656 of 14,656, 29 left out |
+| aspertia, White 2 | 15,800 | 15,363 | 5,542 | 9,821 | the title's 28 port frames and 3402, Minccino's 335, 7811, the lake's 2, Mom's balloon's 16, the zoom's 54, oracle frames 1283, 4875, 9837-9838, 17401-17457 | 14,656 of 14,656, 29 left out |
 
 A screen with 3D has 6 to 17 pixels beyond the pixel tolerance at the median, by sequence and version, and 80 at most
 of the 245 allowed, nearly all on polygon edges (their coverage and fill). Inside polygons the pixels match: they
@@ -474,7 +493,13 @@ in both versions. These are the "18 pixels on the 3D edges behind the open menu"
 28 frames that failed failed on the bottom screen's clock alone, the top passing. Every frame of the apps is exact on
 the count, but the summary's ([below](#known-differences-from-the-hardware)). The menu's bottom screen shows the
 clock; pinned, it shows 12:00 on both, so that screen is held exact. The house replay, whose clock runs, holds it to
-the oracle's within its frame ranges ([port/tests/replay](../../tests/replay/check_screens.py)).
+the oracle's within its frame ranges ([port/tests/replay](../../tests/replay/check_screens.py)). In the exit route
+(aspertia) a screen with 3D has 24 pixels beyond the pixel tolerance at the median in Black 2 and 20 in White 2: about
+58 in front of the player's house, 18 in the house and on Aspertia City's street, 25 in the house the route enters and
+38 back on the street; at most 200 in the flight over the city, and 217 in White 2's intro as Minccino's idle animation
+ends (port frame 5008, beside the known frames of the next section). Minccino's Poké Ball burst, the first particles
+any sequence reached, matches within the tolerance in both versions, and NNS G3D's state matches at every frame
+compared.
 
 ## Saves
 
@@ -820,7 +845,19 @@ the screens; `known_oracle`, oracle frames no port frame can show; `known_state`
     pass's first frame, oracle 4942 (Black 2) and 4874 (White 2), still the title; its second, 4943 and 4875, is torn,
     the title above line 173 or so and white below, and no port frame shows it;
   - the opening's first frame in White 2, oracle 1283, black above line 77, which no port frame shows (in Black 2 it
-    comes whole).
+    comes whole);
+  - in the exit route (aspertia), the display turned off after the intro, late in a DS pass of some 30 frames (count
+    7750 in Black 2, 7810 in White 2): the port's frame at that count is white from its first line (port frame 7751,
+    7811), where the DS's is still the intro's black, and the DS tears a later frame, black above line 115 (oracle
+    9841, Black 2) or line 189 (oracle 9837, White 2, whose next frame is white), which no port frame shows.
+- **VRAM written after the beam has drawn it.** The same holds for VRAM: a pass that writes a part of the screen that
+  the DS has already drawn shows it a frame later there. In the exit route Mom's speech balloon, at the top of the
+  screen (lines 4 to 44), scrolls a line up 4 pixels a pass (`PrintStream_Task`, `src/system/printsys.c`), copying the
+  window's bitmap with the CPU before it flushes it to VRAM, which takes the DS milliseconds: each of the four steps
+  shows a frame later on the DS, its window region then equal to the port's frame before, pixel for pixel, with no torn
+  line (port frames 12911-12914, 13727-13730, 13967-13970 and 14223-14226, in both versions). The letters printed into
+  the same window, with no copy, and the townsperson's window at the bottom of the screen, drawn after the copy ends,
+  show on the same count on both.
 - **Memory the game reads past a heap block.** The copyright screen loads 0x8000 bytes of a smaller file's
   characters, so the tiles past them are whatever the heap held after the file's block
   ([../../docs/sanitizers.md](../../docs/sanitizers.md), H1), and the title's bottom screen shows them as a band over
@@ -851,6 +888,38 @@ the screens; `known_oracle`, oracle frames no port frame can show; `known_state`
   So its background is about 9 pixels further on on the DS for as long as it shows, port frames 4534-4822 (counts
   4533-4821) in both versions, while its text, Tepig and the rest of its screens are the port's (`SUMMARY_SCROLL`).
   The party list before and after it, Tepig's menu and every other app of the sequence match frame for frame.
+
+  The exit route's zoom into the house is the same kind: entering a building, the field captures the screen to BG 2 and
+  a VBlank callback scales it up at every VBlank (`src/ov012/building_enter_effect.c`) while the house loads and the
+  screens crossfade, and the DS spends some 45 VBlanks more than passes there (counts 15160 to 15190, from 79 VBlanks
+  against the port's 33), so at each count its zoom is further on, and it shows steps no port frame shows (port frames
+  15176-15229, oracle frames 17462-17519 in Black 2 and 17401-17457 in White 2). Leaving the house shows none: its
+  effect steps by passes.
+
+- **A save the DS writes in time, which the port writes at once.** New Game's intro saves its first data in the
+  background, and before it fades to the name entry it waits for that save to pause (`IntroCmd_SavePause`,
+  `src/ov294/intro_cmd.c`): the DS's flash writes take time, so it pauses a pass later there. From the fade on, the
+  port is a pass ahead (`--lag 5538=-1` in Black 2, `5598=-1` in White 2) until the name entry waits for its first
+  press, which both read on the same pass (`5577=0`, `5637=0`). The house replay's SAVE shows the same: the DS shows
+  more frames of its saving.
+- **The game's state in the middle of a long pass.** Where a DS pass takes several frames (loading the intro, the
+  season's name, the field and each map), NNS G3D's state at its first frame, which the comparison pairs with the
+  port's frame on the count, is the pass's work in progress; at its later frames it is the port's. In the exit route
+  these are 14 frames in each version (`MID_PASS`), each checked against the DS's later frames of the same count.
+- **Random numbers.** GFL seeds its random numbers from a hash that includes a buffer the DS's stack fills
+  ([../../docs/decomp-findings.md](../../docs/decomp-findings.md), `buildSeed`), so the port's differ from the DS's.
+  In the exit route, White 2's Minccino plays its idle animation after a random wait (`GFL_RandomMTRange` in
+  `src/ov294/intro_mcss.c`), at other moments on each program: port frames 4673-5007 differ beyond the tolerance and
+  are left out, and the frames on either side of them, 4668-4672 and 5008-5017, within it. Black 2's shows no
+  difference.
+  The route keeps to streets the city's wandering townspeople (npcs 9 to 12) don't reach on screen, and the lens flare
+  that a random choice picks on leaving a building (`src/ov036/field_goout_effect.c`) shows none.
+- **One 3D frame of the flight over Aspertia City (not traced yet).** At port frames 8064-8065 (8124-8125 in White 2),
+  one 3D frame shown twice, the lake below line 138, whose translucent water scrolls its texture 6/16 and 4/16 of a
+  texel each 3D frame, shows its ripples on other pixels than melonDS does: 301 pixels beyond the pixel tolerance,
+  where the flight's other frames have 17 to 38 and at most 245 may. The 3D frames before and after match to 3 pixels
+  in the lake, and NNS G3D's state is the same; where the rasterizer's sampling of the water parts from melonDS's is
+  the next thing to trace.
 
 - **Kyurem's cry starts later against the DS's passes (White 2).** The title waits for the cry it starts at START
   before it fades out (`STATE_WAIT_CRY`). The pass that starts it (count 3100) takes the DS two frames, loading the cry,
@@ -883,3 +952,7 @@ the screens; `known_oracle`, oracle frames no port frame can show; `known_state`
 
   Each dump is the count of finished commands (a word), the players' status (a word) and the channels' (a half-word),
   whose bit 15 is the cry's channel.
+
+  The exit route presses NEW GAME, the start menu's first item without a save, where continue presses CONTINUE: its
+  press ends the pulse the same way, and port frame 3402 shows the step after the DS's last one (top screen
+  `d3c85a7e`), which the DS shows at counts 3274, 3296, 3338 and 3360 but not on that count.

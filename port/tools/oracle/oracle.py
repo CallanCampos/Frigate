@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Runs the melonDS oracle and Frigate's program alike, for compare.py and sound.py, makes the saves the tests start
 from on the oracle, and compares the two programs on the comparison sequences, from power-on through the title and
-CONTINUE into the field, its menu and the apps it opens (port/tools/oracle/README.md).
+CONTINUE into the field, its menu and the apps it opens, and through New Game into Aspertia City
+(port/tools/oracle/README.md).
 
     oracle.py run --out DIR --frames N [--screens LIST] [--input FILE] [--dump SPEC]... [--time TIME]
                   [--version b2_us] [--rom PATH] [--oracle BIN] [--save FILE] [--save-out FILE] [--no-counter]
@@ -40,9 +41,11 @@ menu; continue, the same from first_save's save, the start menu's CONTINUE and t
 continue's presses from starter_save's, whose start menu shows the Pokédex; field_menus, continue's presses and then the
 field menu's bag and trainer card from first_save's, the card closed by the pen on its return button; party_menus, the
 same menu from starter_save's with the party list, Tepig's summary, the Pokédex and its entry, the card and the bag, the
-clock pinned for both), from the save the sequence names, made first on the oracle (or taken from --save-cache), and
-compares every frame the same way but the known differences, up to the frame where the port stops when the sequence
-allows it to stop on code with no C yet; with --update it writes port/tests/oracle/<name>_<version>.tsv, the oracle's
+clock pinned for both; aspertia, phase 3's exit route: New Game from a blank save through the intro into the field and
+the player's house, out into Aspertia City, a talk with a townsperson, into a house and out, the clock pinned), from
+the save the sequence names, if any, made first on the oracle (or taken from --save-cache), and compares every frame
+the same way but the known differences, up to the frame where the port stops when the sequence allows it to stop on
+code with no C yet; with --update it writes port/tests/oracle/<name>_<version>.tsv, the oracle's
 hashes at sampled frames. sequence-check runs the port alone on that input file and checks its counts and its screens
 without 3D against that reference. sound runs both programs on a sequence with their sound traces and WAV dumps
 (--sound-trace, --audio-dump) and compares the sound driver's state run by run, what the ARM9 sees of it frame by frame,
@@ -151,6 +154,32 @@ SUMMARY_SCROLL = ("the summary scrolls its background a pixel every 4 VBlanks si
                   "src/ov207/p_sta_sys.c:264-273), and the DS spends 38 VBlanks more than passes loading it (counts "
                   "4526-4531, in both versions), so its background is about 9 pixels further on there throughout; its "
                   "text, Tepig and the rest of its screens are the port's")
+BUILDING_ZOOM = ("the zoom into the house, a scale of BG 2 that a VBlank callback steps at every VBlank "
+                 "(src/ov012/building_enter_effect.c), while the DS spends some 45 VBlanks more than passes loading "
+                 "the house (counts 15160-15190), so its zoom is further on at each count and it shows steps no port "
+                 "frame shows; the crossfade over it ends on the same count on both")
+DISPLAY_OFF = ("after the intro the display turns off late in the DS's pass of some 30 frames (count 7750 in Black 2, "
+               "7810 in White 2), partway through a frame (black above line 115 in Black 2's last, above line 189 in "
+               "White 2's second-last, whose last is white); on the port, from the first line of the pass's frame")
+MINCCINO_IDLE = ("Minccino plays its idle animation after a random wait (GFL_RandomMTRange, src/ov294/intro_mcss.c), "
+                 "and GFL's random numbers are seeded differently on the port (port/docs/decomp-findings.md, "
+                 "buildSeed), so it moves at other moments on each")
+MID_PASS = ("the DS's pass at that count takes more than one frame, so NNS G3D's state at its first frame is the "
+            "pass's work in progress; at the pass's later frames it is the port's")
+LAKE_TEXELS = ("one 3D frame of the flight over Aspertia City, shown for two frames: below line 138 the lake's "
+               "translucent water, whose texture scrolls 6/16 and 4/16 of a texel each 3D frame, shows its ripples on "
+               "other pixels than melonDS does, 301 pixels beyond the pixel tolerance where the flight's other frames "
+               "have 17 to 38 (and at most 245 may); the 3D frames before and after match to 3 pixels in the lake, and "
+               "NNS G3D's state is the same; the rasterizer's sampling there is not traced yet")
+CURSOR_NEW_GAME = ("as CURSOR, with NEW GAME's press from a blank save in CONTINUE's place: the port's frame shows the "
+                   "step after the DS's last one (its top screen hashes d3c85a7e), which the DS shows at counts 3274, "
+                   "3296, 3338 and 3360 of the same run but not on that count")
+WINDOW_SCROLL = ("Mom's speech balloon, at the top of the screen (lines 4-44), scrolls a line up 4 pixels a pass "
+                 "(PrintStream_Task, src/system/printsys.c), and the DS's CPU takes milliseconds to copy the window's "
+                 "bitmap before it flushes it to VRAM, after the beam has drawn the window: the DS shows each step a "
+                 "frame later than the port, whose passes take no time (its window then equal to the port's frame "
+                 "before, pixel for pixel); the letters printed into it, with no copy, and the townsperson's window "
+                 "at the bottom of the screen show on the same count on both")
 # The frames held close, by kind
 TITLE_FADE = ("the title's bottom screen fading in over its 3D, where the copyright screen's tiles read past their "
               "file show as a band (port/docs/sanitizers.md, H1), a step or two from black: within the 3D's tolerance; "
@@ -268,6 +297,46 @@ SEQUENCES = {
         },
         known_oracle={"b2_us": {"4920": TORN_START}, "w2_us": {"1260": TORN_OPENING, "4852": TORN_START}},
         save="starter_save",
+    ),
+    # Phase 3's exit route (PLAN.md section 7), from a blank save: the title sequence's presses, NEW GAME at game frame
+    # 3400 and the intro with A twice a second (Minccino's Poké Ball burst, the names, the season's name, the flight
+    # over Aspertia City), the field in front of the player's house from count 9781 (9841 in White 2, whose intro runs
+    # 60 passes longer from its gender question to the room), the first scripts, the house; then Mom's scene, out of
+    # the door into Aspertia City from count 14538, west along z = 762 to the townsperson at (39,764) and his three
+    # lines, into the house at (38,761) from 15199, up and back out from 15444, and east. The intro saves New Game's first data
+    # in the background and waits for the save to pause before it fades to the name entry (IntroCmd_SavePause,
+    # src/ov294/intro_cmd.c): the DS's flash writes take time, so from that fade until the name entry waits for its
+    # first press the DS is a pass later (the lag of -1, port frames 5538-5576, 5598-5636 in White 2). The DS's passes
+    # take several frames where it loads (the intro, the season's name, each map), and NNS G3D's state is compared at
+    # every port frame from the title on but at the first frame of those passes (MID_PASS)
+    "aspertia": Sequence(
+        port_frames=15800,
+        oracle_frames=18700,
+        sample="1-15800/12,1096-1120,2870-2885,2996-3010,3096-3135,3215-3250,3396-3410",
+        clock="313-1108",
+        lags={"b2_us": "1109=0,5538=-1,5577=0", "w2_us": "1109=0,3241=-1,3403=0,5598=-1,5637=0"},
+        known={
+            "b2_us": {"2878": TORN_HIDE, "3001": TORN_BACK, "3101": TORN_START, "3112-3129": CAMERA,
+                      "7751": DISPLAY_OFF, "8064-8065": LAKE_TEXELS,
+                      "12911-12914,13727-13730,13967-13970,14223-14226": WINDOW_SCROLL,
+                      "15176-15229": BUILDING_ZOOM},
+            "w2_us": {"2878": TORN_HIDE, "3001": TORN_BACK, "3101": TORN_START, "3112-3128": CAMERA,
+                      "3219-3240/3": CRY, "3402": CURSOR_NEW_GAME, "4673-5007": MINCCINO_IDLE, "7811": DISPLAY_OFF,
+                      "8124-8125": LAKE_TEXELS, "12911-12914,13727-13730,13967-13970,14223-14226": WINDOW_SCROLL,
+                      "15176-15229": BUILDING_ZOOM},
+        },
+        known_oracle={"b2_us": {"4943": TORN_START, "9841": DISPLAY_OFF, "17462-17519": BUILDING_ZOOM},
+                      "w2_us": {"1283": TORN_OPENING, "4875": TORN_START, "9837-9838": DISPLAY_OFF,
+                                "17401-17457": BUILDING_ZOOM}},
+        close={"b2_us": {"1116-1149": TITLE_FADE}, "w2_us": {"1116-1149": TITLE_FADE}},
+        state_frames="1116-15800",
+        state_oracle="2800-18700",
+        known_state={
+            "b2_us": {"3110-3124": CAMERA,
+                      "3431,5818,6388,7751-7752,9770,9781,11561,11588,14508,14535,15187,15416,15443": MID_PASS},
+            "w2_us": {"3110-3124": CAMERA,
+                      "3431,5878,6448,7811-7812,9830,9841,11621,11648,14508,14535,15187,15416,15443": MID_PASS},
+        },
     ),
 }
 REFERENCE_COLUMNS = ["port", "oracle", "counter", "lag", "top", "bottom"]

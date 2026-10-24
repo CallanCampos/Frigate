@@ -1,6 +1,8 @@
 # The melonDS test oracle (port/tools/oracle, PLAN.md §6 T4) and its tests (port/tests/oracle), which hold Frigate's
 # run of the game to melonDS's: the screens and memory of the boot, the opening, the title and start menu, CONTINUE, the
-# field menu and its apps (the bag, the trainer card, the party list, the summary and the Pokédex) and a save; the
+# field menu and its apps (the bag, the trainer card, the party list, the summary and the Pokédex), New Game's intro
+# and its route through the field into Aspertia City (phase 3's exit: a walk, a talk, a house and four changes of map)
+# and a save; the
 # saves made on the oracle from saves (the first save, and the starter save with a Pokémon and the Pokédex), which the
 # sequences start from; and the sound of the opening and the title (the ARM7 sound driver run by run; its output: a
 # stream and a cry to the bit, the music by its envelope and levels).
@@ -112,7 +114,10 @@ port_test_labels(oracle_boot oracle)
 # the field menu, its bag and its trainer card, which a touch on its return button closes (the only sequence that
 # touches the screen); party_menus from continue_starter's lookout into the same menu with every item, the party list,
 # Tepig's summary, the Pokédex and Tepig's entry, the card and the bag. Their input files pin the clock, which the
-# menu's bottom screen shows, on both programs (port/tools/oracle/README.md, "Input files")
+# menu's bottom screen shows, on both programs (port/tools/oracle/README.md, "Input files"). aspertia, phase 3's exit
+# route, starts from a blank save, so it has a reference and both tests: New Game, the intro and its first scripts
+# into the player's house, Mom's scene, out into Aspertia City, a talk with a townsperson, into a house and out again,
+# 15,800 port frames and 18,700 of the oracle's, its clock pinned too
 set(port_oracle_saves "${CMAKE_BINARY_DIR}/oracle-saves")
 add_test(NAME oracle_saves
     COMMAND "${CMAKE_COMMAND}" -E env PYTHONDONTWRITEBYTECODE=1
@@ -122,7 +127,7 @@ add_test(NAME oracle_saves
 # Each save from scratch runs the oracle some 18,000 frames
 set_tests_properties(oracle_saves PROPERTIES SKIP_RETURN_CODE 77 TIMEOUT 3600 FIXTURES_SETUP oracle_saves)
 port_test_labels(oracle_saves oracle)
-foreach(sequence IN ITEMS opening title continue continue_starter field_menus party_menus)
+foreach(sequence IN ITEMS opening title continue continue_starter field_menus party_menus aspertia)
     if(EXISTS "${port_oracle_tests}/${sequence}_${PORT_VERSION}.tsv")
         add_test(NAME oracle_${sequence}_hashes
             COMMAND "${CMAKE_COMMAND}" -E env PYTHONDONTWRITEBYTECODE=1
@@ -147,6 +152,9 @@ endforeach()
 # The sequences from a save take it from oracle_saves; without the cache (a failed fixture) they would make it again
 set_tests_properties(oracle_continue oracle_continue_starter oracle_field_menus oracle_party_menus PROPERTIES
     FIXTURES_REQUIRED oracle_saves TIMEOUT 3600)
+# The exit route writes and compares a picture of every frame of both programs, some 34,500 in all: half an hour on a
+# loaded machine
+set_tests_properties(oracle_aspertia PROPERTIES TIMEOUT 5400)
 
 # The other way, a save from the port to melonDS (T6): the port's New Game formats the blank backup, and the oracle
 # boots that save to the start menu frame for frame as it boots its own save of the same moment, writing neither; the

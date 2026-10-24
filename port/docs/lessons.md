@@ -3,6 +3,20 @@
 What port work taught that isn't obvious from the code, newest first. A lesson about MWCC or the decomp's own
 workflow goes in the decomp checkout instead; this file is the port's ([CLAUDE.md](../CLAUDE.md), the iteration loop).
 
+## 2026-10-24: phase 3's exit route
+
+- **A route through the field keeps random numbers out of its way.** GFL's seed differs between the programs
+  (`buildSeed`), so a townsperson who wanders at random walks elsewhere on each, can block one program's player and
+  not the other's, and fails every frame it is on screen. The exit route's streets are out of the city's wanderers'
+  reach; White 2's intro still shows Minccino's random idle at other moments. And a version's intro can run longer
+  than the other's (White 2's, 60 passes): mash through it until both are certainly free, then give both the same
+  presses.
+- **A frame late on the DS is not always a pass late.** Mom's balloon scrolled a count later on the DS, which read
+  like the game logic running a pass apart; the window's region in the DS's frame was the port's previous frame pixel
+  for pixel, the letters printed into it were on time, and the townsperson's window at the bottom of the screen was
+  too: the DS's CPU wrote the scroll to VRAM after the beam had drawn the window. Compare the region against the
+  port's neighbouring frames, and an instrumented build's trace of the pass, before declaring a lag.
+
 ## 2026-10-24: the battle's run to its end
 
 - **A read through a write log is a write.** Before this day's fix, the host variants of the SDK's headers turned each
