@@ -7,7 +7,11 @@ has is the game's whole source, compiled into the program, so a change to the ga
 
 Two limits shape everything below:
 
-- **Field entry is still blocked.** The latest sync imports the field engine's C, including `FIELDMAP_PROC_FUNCS`. New Game's 10,600-frame replay passes; an extended trace reaches `FieldmapProc_Init` and stops at frame 10,759 because the external field heap is too small for the host's allocations. The test launcher now steps aside automatically, so its earlier app comparisons do not establish current field or app coverage. See [STATUS.md](STATUS.md).
+- **The field opens; what lies beyond the house waits.** The field engine's C is in, and the host gives the field's
+  heap the room its larger structs need ([ADR 0021](adr/0021-root-heaps-in-the-games-own-memory-from-host-memory.md)),
+  so CONTINUE and New Game go into the field and the house. Beyond the house, encounters and battles wait on more
+  fixes and on one table of overlay 167 that has no C yet. The test launcher steps aside automatically, so its earlier
+  app comparisons do not establish current field or app coverage. See [STATUS.md](STATUS.md).
 - **Frigate reads the game's data from the player's ROM, and checks it.** The program accepts only a dump of the
   version it was built for, by its SHA-1 or by every NitroFS file's ([../hal/rom/port_rom.h](../hal/rom/port_rom.h)),
   so a patched ROM is refused. Changing data files (text, species, trainers, maps) needs the layered file system of
@@ -55,8 +59,8 @@ main and exit functions); what it draws, its backgrounds, windows, sprites and t
 in battle is another overlay's: `src/ov286/b_bag_main.c` and the other `b_bag_*.c` files there. To change what the bag
 shows, change those files' C: which items a pocket lists, in what order, which message each line uses. The words
 themselves are the ROM's message data, which a C change can pick between but not rewrite until the layered file system
-exists. The bag opens from the field. Current field entry is blocked by heap capacity; `--launch bag` steps aside
-because the field process table now has C ([below](#reaching-the-field-menus-apps)).
+exists. The bag opens from the field's menu, now that the field opens; `--launch bag` steps aside because the field
+process table has C ([below](#reaching-the-field-menus-apps)).
 
 ## Reaching the field menu's apps
 

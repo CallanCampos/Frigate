@@ -5,8 +5,9 @@ ROM running on [melonDS](https://melonds.kuribo64.net)'s emulation core, headles
 file, writing both screens and named memory at chosen frames, and the sound: the mixer's output sample by sample and
 the ARM7 sound driver's state after each run of its thread. `compare.py` compares the screens and memory with the
 port's, `sound.py` the sound ([Sound](#sound)). It also makes the saves the tests start from ([Saves](#saves)), and
-holds the field menu's apps, which Frigate opens through its test launcher while the field has no C, to its own route
-through the field menu ([The launch checks](#the-launch-checks)).
+held the field menu's apps, which Frigate opened through its test launcher while the field had no C, to its own route
+through the field menu ([The launch checks](#the-launch-checks)); the field opens now, and those checks wait to be
+retired.
 
 It is a **test tool only**. It is never linked into or shipped with Frigate
 ([PLAN.md §1](../../docs/PLAN.md#1-goal-and-what-native-means)): it is a CMake project of its own, built only on
@@ -379,13 +380,17 @@ sequences, compared with `--align counter`, the movies by their pictures (`oracl
   opening to the other.
 - **continue**: the title's presses from a save, `first_save`'s ([below](#saves)), which the oracle makes first; the
   start menu then shows CONTINUE with the saved game, and A at game frame 3400 takes CONTINUE into the field. The port
-  runs to 3,600 frames, the oracle 6,000; the port may stop from frame 3425, once the start menu has wiped out to
-  black, on the trap stub the sequence names (`stop_trap`, a pattern of the trap's message): overlay 36's
-  `FIELDMAP_PROC_FUNCS`, in the field's first frames (below). A stop on any other trap fails, so the sequence says
-  which gap it stops on and changes when the decomp fills it.
+  runs 3,900 frames, the oracle 6,000 (count 3,955): the start menu wipes out to black from port frame 3,425, the
+  field loads behind the black, shows the season banner from 3,461 and fades in from 3,605 on the player in his room,
+  where the last 294 frames show the field's 3D.
 - **continue_starter**: continue's input file from the starter save ([below](#saves)): the start menu's saved game has
-  the Pokédex line (Pokédex: 1, time 0:04), and CONTINUE goes to the Aspertia City lookout. The port stops on the same
-  trap, in both versions, each from its own starter save.
+  the Pokédex line (Pokédex: 1, time 0:04), and CONTINUE goes to the Aspertia City lookout, in both versions, each
+  from its own starter save.
+
+A sequence can also allow the port to stop on code with no C yet: from a port frame (`stop_from`), on the trap stub
+it names (`stop_trap`, a pattern of the trap's message), with why (`stop`). A stop on any other trap fails, so the
+sequence says which gap it stops on and changes when the decomp fills it. The continue sequences stopped that way on
+overlay 36's `FIELDMAP_PROC_FUNCS` until its C arrived; none stops now.
 
 The opening and the title hold the title's first 34 frames of 3D close (their `close`, compare.py's `--close`): port
 frames 3527-3560 of the opening, 1116-1149 of the title. There the title's bottom screen fades in over its 3D, and the
@@ -424,15 +429,21 @@ Results, every port frame but the known differences:
 | opening, White 2 | 3,800 | 3,800 | 3,526 | 274 | oracle frame 1283 | 274 of 274 |
 | title, Black 2 | 3,600 | 3,579 | 1,474 | 2,105 | 21 port frames, oracle frame 4943 | 2,470 of 2,470, 15 left out |
 | title, White 2 | 3,600 | 3,572 | 1,477 | 2,095 | 28 port frames, oracle frames 1283, 4875 | 2,470 of 2,470, 15 left out |
-| continue, Black 2 | 3,436 (trap) | 3,415 | 1,310 | 2,105 | the title's 21 port frames, oracle frame 4920 | not compared |
-| continue, White 2 | 3,436 (trap) | 3,407 | 1,312 | 2,095 | the title's 28 port frames and 3402, oracle frames 1260, 4852 | not compared |
-| continue_starter, Black 2 | 3,436 (trap) | 3,415 | 1,310 | 2,105 | the title's 21 port frames, oracle frame 4920 | not compared |
-| continue_starter, White 2 | 3,436 (trap) | 3,407 | 1,312 | 2,095 | the title's 28 port frames and 3402, oracle frames 1260, 4852 | not compared |
+| continue, Black 2 | 3,900 | 3,879 | 1,480 | 2,399 | the title's 21 port frames, oracle frame 4920 | not compared |
+| continue, White 2 | 3,900 | 3,871 | 1,482 | 2,389 | the title's 28 port frames and 3402, oracle frames 1260, 4852 | not compared |
+| continue_starter, Black 2 | 3,900 | 3,879 | 1,479 | 2,400 | the title's 21 port frames, oracle frame 4920 | not compared |
+| continue_starter, White 2 | 3,900 | 3,871 | 1,481 | 2,390 | the title's 28 port frames and 3402, oracle frames 1260, 4852 | not compared |
 
 A screen with 3D has 6 to 17 pixels beyond the pixel tolerance at the median, by sequence and version, and 80 at most
 of the 245 allowed, nearly all on polygon edges (their coverage and fill). Inside polygons the pixels match: they
 didn't until the rasterizer took the values along an edge by line, as melonDS does, where it had taken them along an
-X-major edge's run, which put whole spans' colours a step apart (before, a median of 79 and at most 172).
+X-major edge's run, which put whole spans' colours a step apart (before, a median of 79 and at most 172). The field
+is no known difference: its 464 frames in each continue sequence match, the black of its load, the season banner and
+the bottom screen exactly (170 frames, 169 from the starter save) and its 3D within the tolerance. The player's room
+has 25 pixels beyond the pixel tolerance in every frame, in both versions; the Aspertia City lookout has 141 to 143,
+the edges of its trees and of the hills on the horizon, more than any scene before it but within the 245. Neither
+shows a clock; the field menu's bottom screen does, and the house replay holds it to the oracle's
+([port/tests/replay](../../tests/replay/check_screens.py)).
 
 ## Saves
 
@@ -499,8 +510,8 @@ save path that is a symbolic link stays one: the port writes the file it links t
 
 **The console in the save.** The adventure block (`AdventureSave`) keeps the clock offset, the MAC address and the
 owner's birthday of the console the game was last continued on. CONTINUE checks the offset against the console's
-(`EventFieldContinue_Create` in `event_mapchange.c`, `hasClockNotBeenTampered`), which the port reaches before its trap
-(a breakpoint there stops it on the first save's CONTINUE): another offset takes the path of a changed clock, a day's
+(`EventFieldContinue_Create` in `event_mapchange.c`, `hasClockNotBeenTampered`), on the way into the field: another
+offset takes the path of a changed clock, a day's
 wait for the daily events (`setNewDayForCountdown`), `func_ov012_02164428` on the party and the trainer card's time.
 Then `setAdvTimeBlkRtcOffsetOwnerMacBdayMonthDay` writes the console's offset, MAC and birthday over the save's, for the
 next save. The port's firmware and the oracle's are the same console (`port/hal/nvram/nvram7.c`, `oracle.cpp`'s
@@ -509,8 +520,8 @@ melonDS's own generated firmware has offset 0 too. A save from a DS whose owner 
 the port takes it as a changed clock, and the next save carries the port's console, so a dump moved from a DS to the
 port and back takes the changed clock's path on both. PLAN.md asks the import to take on the save's offset and MAC
 instead; with the console's Wi-Fi ID, which the port makes again at every launch since its firmware isn't kept between
-runs, that is the console the D7 sidecar would keep. None of it is built yet, and this path can't be shown in the port
-before overlay 36 lets a continued game into the field.
+runs, that is the console the D7 sidecar would keep. None of it is built yet; a continued game reaches the field on
+the port now, so the path can be shown there.
 
 **The first save** (`oracle.py save first_save`): the oracle plays `port/tests/oracle/first_save_<version>.pbwinput`
 from power-on with a blank save, 18,800 frames: NEW GAME and the intro as `new_game.pbwinput` plays them (the player
@@ -572,11 +583,13 @@ the input files and the SHA-1s.
 LINK, NINTENDO WFC SETTINGS and MIC TEST, and the saved game: the player's picture, AAAAAAA, Aspertia City, Badges: 0,
 Time: 0:01 (no Pokédex line: the player has none yet). Black 2's port frames 3,244 to 3,436 (the start menu from frame
 3,250, CONTINUE's press at 3,401, its blink, the wipe out from 3,419 and the black from 3,425) are exact at the DS's 6
-bits on the game's count, and White 2's are with the lag after the cry and one frame at the press (above). The DS
-then loads the field and shows the player in his room; the port stops after frame 3,436, in the black, on
-`FIELDMAP_PROC_FUNCS` (overlay 36's data at `0x021c9eb8` in Black 2, `0x021c9eec` in White 2), the field's process
-table, which has no C yet: overlay 36 (issue #83) is what stops a continued game, before it reaches overlay 12's script
-tables. The sequence holds the stop to that trap by its message.
+bits on the game's count, and White 2's are with the lag after the cry and one frame at the press (above). Both then
+load the field and show the player in his room, on the same count frame for frame (the DS takes 20 frames for its
+first pass there, port frame 3,438 against oracle frame 5,452, and the counts pair again). Overlay 36's C gave the
+field's process table in the sync of 2026-10-22; the port then stopped itself after frame 3,436 when the field's heap
+ran out, until [ADR 0021](../../docs/adr/0021-root-heaps-in-the-games-own-memory-from-host-memory.md) gave the root
+heaps in the game's own memory host memory, and it crashed three frames later until upstream typed
+`Field.colorPostFX` for the host (`b62c655bfa`, merged into Frigate by PR 16).
 
 ## Sound
 
@@ -729,6 +742,10 @@ Each sequence is two ctest tests:
   and the samples to the bit (wherever the loudest point's hash is, within two frames). Skipped (77) without the ROM.
 
 ## The launch checks
+
+Since the field opened (2026-10-23, [STATUS.md](../../docs/STATUS.md)), the launcher steps aside, as it was made to,
+and these checks fail on its notice: the plan of 2026-10-23 retires them next (its track A-2). This section describes
+them as they ran.
 
 The field menu's apps against melonDS while the port has no field ([ADR 0012](../../docs/adr/0012-test-launcher-for-the-field-menus-apps.md)):
 the oracle opens each app from the field menu, where the port's continued game stops on overlay 36's trap; the port

@@ -1,5 +1,6 @@
 // Tests of port/hal/gx: the VRAM banks in the region 0x06 window, the SDK's VRAMCNT functions through the HAL's
-// wrappers, the 3D and extended palette loads, the geometry FIFO copies and the renderer's source. The conformance
+// wrappers, the 3D and extended palette loads, the geometry FIFO copies, the renderer's source and the field's building
+// transition's clear of LCDC VRAM. The conformance
 // tests are the vram-alias spike's (port/spikes/vram-alias/test_vram.c), here on the real window, with the CPU views
 // at their DS addresses. Usage:
 //   port_gx_tests layout                 the layout against GBATEK's places, without the SDK
@@ -7,7 +8,7 @@
 //                                        and a reference model; exits 77 when the backend can't run here
 //   port_gx_tests <scenario> [backend]   an SDK scenario (sdk_settings, wrappers, tex_upload, texpltt_upload,
 //                                        clear_image, ext_palettes, fifo, fill_source, cpu_pointer, default_backend,
-//                                        display),
+//                                        display, lcdc_clear),
 //                                        run as the game's main() on the OS core, with the backend given or the
 //                                        default one
 #include "gfx/ref/ds2d.h"
@@ -1300,6 +1301,42 @@ static void scenario_cpu_pointer(void) {
     CHECK(port_vram_cpu_pointer(0x02000000) == port_hw_pointer(0x02000000));
 }
 
+// The building transition's second event (src/ov036/field_transition.c, func_ov036_021b8e10) gives bank D to LCDC,
+// clears 128 KiB from HW_LCDC_VRAM, turns LCDC off and gives D to BG. The decomp's literal there, 0x6800000, is no
+// host address (game-changes.md); HW_LCDC_VRAM is the same DS address, bank A's place in LCDC, not D's. So the clear
+// reaches A when A is in LCDC, and nothing otherwise, and leaves D as it was, on the DS and through the host's views
+static void BuildingTransitionClear(void) {
+    GX_SetBankForLCDC(8);
+    MIi_CpuClearFast(0, (void *)HW_LCDC_VRAM, 0x20000);
+    GX_DisableBankForLCDC();
+    GX_SetBankForBG(GX_VRAM_BG_128_D);
+}
+
+static void scenario_lcdc_clear(void) {
+    uint8_t *lcdcA = (uint8_t *)HW_LCDC_VRAM_A;
+
+    // A in a texture slot, D in BG, each with its pattern
+    sContext = "A elsewhere";
+    GX_InitGXState();
+    GX_SetBankForLCDC(GX_VRAM_A | GX_VRAM_D);
+    fill_pattern(lcdcA, 0x20000, 40);
+    fill_pattern((uint8_t *)HW_LCDC_VRAM_D, 0x20000, 41);
+    GX_SetBankForTex(GX_VRAM_TEX_0_A);
+    GX_SetBankForBG(GX_VRAM_BG_128_D);
+    BuildingTransitionClear();
+    CHECK(has_pattern((uint8_t *)HW_BG_VRAM, 0x20000, 41));
+    CHECK(GX_ResetBankForTex() == GX_VRAM_A);
+    CHECK(has_pattern(lcdcA, 0x20000, 40));
+
+    // A in LCDC: the clear is A's
+    sContext = "A in LCDC";
+    CHECK(GX_GetBankForLCDC() == GX_VRAM_A);
+    BuildingTransitionClear();
+    CHECK(has_pattern((uint8_t *)HW_BG_VRAM, 0x20000, 41));
+    GX_SetBankForLCDC(GX_VRAM_A);
+    CHECK(all_bytes(lcdcA, 0x20000, 0));
+}
+
 // With nothing set up, the first SDK call sets the views up with the default backend: shm where it runs
 static void scenario_default_backend(void) {
     sContext = "default backend";
@@ -1327,7 +1364,7 @@ static const Scenario sScenarios[] = {
     { "clear_image", scenario_clear_image },   { "ext_palettes", scenario_ext_palettes },
     { "fill_source", scenario_fill_source },   { "fifo", scenario_fifo },
     { "cpu_pointer", scenario_cpu_pointer },   { "default_backend", scenario_default_backend },
-    { "display", scenario_display },
+    { "display", scenario_display },           { "lcdc_clear", scenario_lcdc_clear },
 };
 
 static const Scenario *sRunning;

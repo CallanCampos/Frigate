@@ -14,11 +14,11 @@ This directory, `port/`, is Frigate's code. The rest of the repository is the de
 `fuddlesworth/pokebw2`: Frigate compiles the decomp's C with the host's compiler, gives it the parts of the DS a host
 doesn't have, and runs it as a program, with no emulator. The ROM is only where the game's files come from.
 
-**Where it stands:** Frigate boots natively through the logos, opening, title screen and start menu, with sound.
-Earlier tests compared these paths frame by frame with melonDS and checked the sound driver, music and cries. The
-latest sync includes the field engine's C, but field initialization is still blocked by a host memory allocation
-issue. The overworld is not yet playable. The former test launcher now steps aside, so its earlier app comparisons do
-not establish current field or app coverage.
+**Where it stands:** Frigate boots natively through the logos, opening, title screen and start menu, with sound, and
+into the field: CONTINUE and New Game go into the field and the house, held to melonDS. Tests compare these paths
+frame by frame with melonDS and check the sound driver, music and cries. Beyond the house, encounters and battles wait
+on more host fixes and on one table of overlay 167 that has no C yet, so the game isn't playable past it. The former
+test launcher now steps aside, so its earlier app comparisons do not establish current field or app coverage.
 [docs/STATUS.md](docs/STATUS.md) records the checks and remaining work.
 
 ## Contributing
@@ -119,8 +119,9 @@ build/port/frigate-black2 --rom /c/Games/black2.nds                      # your 
 ### The test launcher
 
 The launcher was built to open apps while the field had no C. It now detects the imported
-`FIELDMAP_PROC_FUNCS` and steps aside; these commands document the earlier test path and cannot bypass the current
-field-heap blocker. On revisions with the placeholder, it opens apps in order at COUNT (at once without one):
+`FIELDMAP_PROC_FUNCS` and steps aside; these commands document the earlier test path, and the field menu itself opens
+the apps now that the field does ([docs/STATUS.md](docs/STATUS.md)). On revisions with the placeholder, it opens apps in
+order at COUNT (at once without one):
 
 ```sh
 build/port/frigate-black2 --save-dir SAVES --launch bag,card        # the bag, then the trainer card, after CONTINUE
@@ -154,7 +155,7 @@ asm oracle, each spike, the artwork) lists its files there.
 | Directory | What it is | Guide |
 | --- | --- | --- |
 | `app/` | The program: `main()` and its options, the SDL3 window, the keyboard, mouse and gamepads, presenting and pacing, replays, the oracle's run directory and the sound driver's trace, the test launcher (`--launch`), the macOS app's scripts, the Windows programs' manifest | [app/README.md](app/README.md) |
-| `hal/` | The platform layer: host C for the parts of the DS that the game reaches through Nintendo's SDK, one directory per SDK module or ARM7 service (threads and time, memory, VRAM, DMA, the ROM, files and overlays, saves and the cartridge's infrared chip, sound, touch, the clock, power, input), and `host/`, the host operating system's services where macOS, Linux and Windows differ | [hal/README.md](hal/README.md) |
+| `hal/` | The platform layer: host C for the parts of the DS that the game reaches through Nintendo's SDK, one directory per SDK module or ARM7 service (threads and time, memory, VRAM, DMA, the ROM, files and overlays, saves and the cartridge's infrared chip, sound, touch, the clock, power, input, MSL's runtime division), and `host/`, the host operating system's services where macOS, Linux and Windows differ | [hal/README.md](hal/README.md) |
 | `gfx/` | The renderers: the 2D engines line by line, the geometry engine, the 3D rasterizer, display capture | [gfx/README.md](gfx/README.md) |
 | `audio/` | The sound output: the default device and the WAV dump | [audio/README.md](audio/README.md) |
 | `include/` | `port_host.h`, force-included into every decomp file of the host build | [include/README.md](include/README.md) |
