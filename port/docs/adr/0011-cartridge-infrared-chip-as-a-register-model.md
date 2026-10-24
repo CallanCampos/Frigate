@@ -4,6 +4,9 @@
 - **Date:** 2026-10-18
 - **Plan:** §4.5 (Stubs), D3
 - **Upstream:** `045e97b90` (merged by the port's `5ad9a1e1d`)
+- **Note (2026-10-24):** `src/ov338/ir_check.c` is complete in both versions since upstream's `9af3ac8172` (on
+  `main` since the merge of upstream's `993e6c49b`), so the ROM links its C; upstream has since named
+  `func_0202d6a8` `GameBeaconSys_CheckGenuineCard`.
 
 ## Context
 

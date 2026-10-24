@@ -10,8 +10,9 @@ Two limits shape everything below:
 - **The field opens; what lies beyond the house waits.** The field engine's C is in, and the host gives the field's
   heap the room its larger structs need ([ADR 0021](adr/0021-root-heaps-in-the-games-own-memory-from-host-memory.md)),
   so CONTINUE and New Game go into the field and the house, and the field menu opens its apps. Beyond the house,
-  encounters and battles wait on more fixes and on one table of overlay 167 that has no C yet. See
-  [STATUS.md](STATUS.md).
+  a run from a save with a starter Pokémon plays Hugh's battle on Route 19 to its end and stops at Bianca's wild
+  encounter, on four entries of the encounter effects' table that upstream has fixed and the next sync brings
+  ([decomp-findings.md](decomp-findings.md)). See [STATUS.md](STATUS.md).
 - **Frigate reads the game's data from the player's ROM, and checks it.** The program accepts only a dump of the
   version it was built for, by its SHA-1 or by every NitroFS file's ([../hal/rom/port_rom.h](../hal/rom/port_rom.h)),
   so a patched ROM is refused. Changing data files (text, species, trainers, maps) needs the layered file system of
@@ -48,7 +49,7 @@ the same. So Frigate runs C that no hash has proven: where it behaves differentl
 - **Names come from the ROM where it has them.** Many files pass their own name to an allocation or an assert, so the
   overlays embed strings such as `"startmenu.c"`, and [source files](../../docs/source-files.md) gives each file's
   evidence. `config/<version>/arm9/**/symbols.txt` maps names to addresses and back; a name made of an address,
-  such as `func_0204f980`, marks a function nobody has named yet.
+  such as `func_ov167_0219bdfc`, marks a function nobody has named yet.
 - **Run the game to the point you care about** and look: `--screenshot PATH` writes both screens when the run ends,
   `--run-dir DIR --run-dump LABEL=SYMBOL:SIZE@FRAMES` writes a global's memory at chosen frames, and a run that reaches
   code with no C stops with that function's name, address and caller ([below](#when-the-game-stops)).

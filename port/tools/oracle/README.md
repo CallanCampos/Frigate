@@ -586,17 +586,17 @@ save path that is a symbolic link stays one: the port writes the file it links t
 **The console in the save.** The adventure block (`AdventureSave`) keeps the clock offset, the MAC address and the
 owner's birthday of the console the game was last continued on. CONTINUE checks the offset against the console's
 (`EventFieldContinue_Create` in `event_mapchange.c`, `hasClockNotBeenTampered`), on the way into the field: another
-offset takes the path of a changed clock, a day's
-wait for the daily events (`setNewDayForCountdown`), `func_ov012_02164428` on the party and the trainer card's time.
-Then `setAdvTimeBlkRtcOffsetOwnerMacBdayMonthDay` writes the console's offset, MAC and birthday over the save's, for the
-next save. The port's firmware and the oracle's are the same console (`port/hal/nvram/nvram7.c`, `oracle.cpp`'s
+offset takes the path of a changed clock, a day's wait for the daily events (`setNewDayForCountdown`),
+`ShayminForm_RevertPartyAndRegister` on the party (Shaymin back to its Land Forme) and the trainer card's time. Then
+`setAdvTimeBlkRtcOffsetOwnerMacBdayMonthDay` writes the console's offset, MAC and birthday over the save's, for the next
+save. The port's firmware and the oracle's are the same console (`port/hal/nvram/nvram7.c`, `oracle.cpp`'s
 `MakeFirmware`: MAC `02:42:57:32:00:01`, owner Player, birthday 6/23, offset 0), so the saves here move without it, and
 melonDS's own generated firmware has offset 0 too. A save from a DS whose owner once set its clock has another offset:
 the port takes it as a changed clock, and the next save carries the port's console, so a dump moved from a DS to the
 port and back takes the changed clock's path on both. PLAN.md asks the import to take on the save's offset and MAC
 instead; with the console's Wi-Fi ID, which the port makes again at every launch since its firmware isn't kept between
-runs, that is the console the D7 sidecar would keep. None of it is built yet; a continued game reaches the field on
-the port now, so the path can be shown there.
+runs, that is the console the D7 sidecar would keep. None of it is built yet; a continued game reaches the field on the
+port now, so the path can be shown there.
 
 **The first save** (`oracle.py save first_save`): the oracle plays `port/tests/oracle/first_save_<version>.pbwinput`
 from power-on with a blank save, 18,800 frames: NEW GAME and the intro as `new_game.pbwinput` plays them (the player
