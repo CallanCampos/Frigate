@@ -32,11 +32,104 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
 
+## 2026-10-24: phase 3's exit: New Game into Aspertia City, a walk, a talk and a house, held to melonDS
+
+- **Upstream:** `b62c655bfa` (upstream merge #481), as `main` has it; this branch merges no upstream commit. Upstream's
+  `main` is at `53767c5a2c` (its merge of #497), for the sync to propose on its own.
+- **Port:** `PORT_SHA`, on the topic branch `port-phase3-route` from `main` at `e5508df96a` (PR 24's merge):
+  `705fc4151f` (the exit route as an oracle sequence) and this commit, its records and the T7 playtest. The battle run's
+  entry gets its `PORT_SHA`, `dcdc552ae4`. The branch was first cut from `main` at `65eae1f0a2` (PR 23), before PR 24
+  merged, and that version, never published, also left SPL's read of POLYGON_ATTR out of `lib/spl/src/spl_draw.c` under
+  `PLATFORM_PC`, with a game-changes row and a test of its eight draw functions, once the route found the intro's
+  particles missing. PR 24 fixed the same read in the geometry command log (`port/hal/hw/hw.c`) and merged meanwhile, so
+  the branch was cut again from its merge with the route's commit alone: it changes no file outside `port/` and
+  `.github/README.md`.
+- **ROM:** T0 passes on the branch's head: Black 2 `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb` and White 2
+  `b5d7490be7b415b8f1e672a53e978a9cc667e56a` (`python3 configure.py && ninja`). No game file changes.
+- **Host build:** T1 passes on macOS arm64, Apple clang 21, RelWithDebInfo, both versions (`build/port`,
+  `build/port-w2`), each with the oracle (`-DPORT_BUILD_ORACLE=ON`): from clean on `main` at `65eae1f0a2`, 723 warnings
+  each, as on the last entries; then incrementally on PR 24's merge, the rebuilt files with no new warning. The branch
+  changes no C file.
+- **Tests:** full `ctest -j4` on the route's commit, before this records commit (which changes no test input), both
+  versions at once, with the oracle and the cached oracle saves copied from the verify tree, under load averages of 20
+  to 72 on the machine's 8 cores from other sessions: Black 2, 304 passed and 2 skipped of 306 (1,688 s); White 2, 301
+  passed and 2 skipped of 303 (1,648 s); none failed. Skipped: `app_universal_slices` in both, which only a distribution
+  build has, and `asm_oracle`, the worktree having no `build/port-venv` then: with the clone's linked in and the builds
+  configured again, it passed alone in both (814 s in Black 2, 318 s in White 2). Every replay passes (T3:
+  `replay_start_menu`, `replay_new_game` in Black 2, `replay_new_game_house`; T6: `replay_same_save`), and so do every
+  oracle test (T4), `game_ptrcasts` and `game_ptrcasts_tool` (T1), T2 and the timing gates. T5 not run: the sanitized
+  build has run none of the field's oracle sequences yet (CI's job has no ROM), now `oracle_aspertia` with them (Next).
+  T4, the new route: `oracle_aspertia` (`oracle.py sequence aspertia`, both programs, 1,155 s and 1,158 s in the full
+  runs) matches 15,706 of 15,706 port frames in Black 2 (5,833 exact, 9,873 with 3D within the tolerance) and 15,363 of
+  15,363 in White 2 (5,542 and 9,821), NNS G3D's state 14,656 of 14,656 frames in each, every one of the 94 and 437
+  frames left out declared with its evidence in the oracle README; a screen with 3D has 24 (Black 2) and 20 (White 2)
+  pixels beyond the pixel tolerance at the median, 200 and 217 at most of the 245 allowed. `oracle_aspertia_hashes`
+  (`oracle.py sequence-check`, the port alone against `aspertia_<version>.tsv`, 76 s and 77 s) checks 1,421 rows in
+  Black 2, 1,342 of them on the count, with 0 failures (1,614 screens without 3D compared, 1,228 with 3D left to the
+  comparison), and 1,385 in White 2 (1,306; 0; 1,581 and 1,189). Each comparison was run on the port built from PR 24's
+  merge, against the oracle's runs of the same presses. T7, on macOS: both programs played their route windowed
+  (`frigate-black2 --input port/tests/oracle/aspertia_b2_us.pbwinput --frames 15800 --run-dir DIR --run-screens LIST
+  --screenshot PATH --audio-dump PATH --save-dir DIR`, the same for White 2), paced to the DS's rate, 4 minutes 25
+  seconds each, with the sound on the default device, status 0. Every frame's count and both screens' hashes were the
+  headless comparison runs' (15,800 of 15,800 frames in each version), and the screenshots at 19 checkpoints show, in
+  both versions, the start menu's NEW GAME, Professor Juniper, Minccino's Poké Ball burst with its particles, the name
+  entry with AAAAAAA, the season's name and the flight over Aspertia City, the field in front of the player's house and
+  its first script's balloon, the player's room, Mom's scene, the street outside the house, the walk west, the
+  townsperson's three lines, the zoom into the house, its room, the walk up it, the street again with the camera pulling
+  back, and the walk east. The sound dumps hold 264 seconds of sound. A capture of the window itself was refused: the
+  session has no permission to record the screen, and asking for it would change a setting, so the screenshots are the
+  program's own frames as it presented them.
+- **Tiers:** unchanged: the branch changes no game C (`port/tools/progress/progress.py` not run again).
+- **Trap stubs:** 30 function stubs and 22 data placeholders per version (`gen/stubs.c`), unchanged; the exit route
+  reaches none in either version.
+- **64-bit warnings:** `check_ptrcasts: 422 sites in 269 keys (real 142, harmless 102, handled 141, unreachable 37),
+  1681 files, 0 not compiled` in both versions, as on the last three entries: the branch changes no C.
+- **Work done:** phase 3's last exit criterion ([PLAN.md §7](PLAN.md#phase-3-new-game-to-the-overworld-m3-m4)): a new
+  game reaches Aspertia City, and the player walks, talks, enters a building and changes maps, in both versions, every
+  frame held to melonDS on the game's count. The route is one input file per version on game frames
+  (`port/tests/oracle/aspertia_<version>.pbwinput`, the clock pinned), 15,800 of the port's frames and 18,700 of the
+  oracle's: from a blank save, the title's presses, NEW GAME and the intro with A twice a second (Minccino's burst, the
+  names, the season's name, the flight over the city), the field in front of the player's house from count 9781 (9841 in
+  White 2) and its first scripts into the house and the room; then, as the starter save's file after CONTINUE, Mom's
+  scene and out of the door (Aspertia City, zone 427, from count 14538); west along z = 762, short of Hugh's scene's
+  trigger, to the man at (39,764) (npc 4) and his three lines; into the house at (38,761) (zone 431, from 15199), three
+  tiles up, back out (15444) and east. Four changes of map in all, the intro's into the house among them. The positions
+  are the oracle's, read from GameData's player state in its memory. White 2's intro runs 60 passes longer from its
+  gender question to the room, and both files have the same presses, the route's own starting from the room once both
+  versions are free. The route keeps out of the city's wanderers' reach, whose random walks differ between the programs.
+  `oracle.py`'s `SEQUENCES` declares what differs by construction, each with its evidence in the oracle README: the
+  display turned off late in the DS's long pass after the intro (a torn frame); Mom's balloon at the top of the screen,
+  whose scroll the DS's CPU writes to VRAM after the beam has drawn it, a frame late, where the letters and the
+  townsperson's balloon at the bottom are on time (shown by the window's pixels against the port's frames and by a trace
+  of the pass in an instrumented build); the zoom into the house, scaled at every VBlank while the DS spends some 45
+  VBlanks more than passes loading it; White 2's Minccino, idling after a random wait; NEW GAME's press ending the start
+  menu's cursor pulse in White 2 as CONTINUE's does; the DS a pass later from the fade to the name entry, its background
+  save pausing a pass later (a lag of -1, until the entry waits for a press); NNS G3D's state at the first frame of a DS
+  pass that takes several (14 frames in each version, each equal to the port's at the pass's later frames); and one 3D
+  frame of the flight where the lake's scrolled water shows its ripples on other pixels, 301 beyond the pixel tolerance,
+  not traced yet. The route found the intro's particles missing, the read of POLYGON_ATTR that PR 24 fixed in the
+  meantime from the Route 19 route; with that fix the burst matches. ctest's `oracle_aspertia` (its timeout 5,400
+  seconds) and `oracle_aspertia_hashes` run it, in both versions. The feature map's field and particles rows, the oracle
+  README (the sequence, its results, its known differences), the tests and CMake guides, the landing page and the README
+  say where it stands, and lessons.md has two lessons.
+
+  Every exit criterion of phase 3 holds on macOS: a new game reaches Aspertia; the player walks, talks, enters buildings
+  and changes maps (the route, against melonDS, and its playtest); the replays pass (every T3 test in both versions,
+  above). Phase 3 is closed. PLAN.md's list for the phase also names the C-Gear on the bottom screen and weather, which
+  its exit criterion doesn't require and which no test drives yet.
+- **Next:** phase 4 (battles, menus, saves), whose first gap is the battle: the Route 19 route as a test once the sync
+  brings upstream's two fixes, with T4 on the cut-in and the battle's first turn. For the field: T5 on
+  `oracle_aspertia`, `oracle_field_menus` and `oracle_party_menus` (a sanitized build with the oracle and `ctest -L
+  route`, in both versions; CI's job has no ROM), and the lake's 3D frame traced in the rasterizer.
+- **Blockers:** as the battle run's entry says: the Route 19 route waits for upstream's #497 (the battle table, merged
+  upstream at `53767c5a2c`) and #496 (the encounter effects' entries, open) to reach Frigate by sync. None for the
+  field.
+
 ## 2026-10-24: the battle's run: SPL's particles drawn again, and Hugh's battle to its end with a local candidate
 
 - **Upstream:** `b62c655bfa` (upstream merge #481), as `main` has it; this branch merges no upstream commit. Upstream's
   `main` is at `53767c5a2c` (its merge of #497, below), for the sync to propose on its own.
-- **Port:** `PORT_SHA`, on the topic branch `port-battle-run` from `main` at `1807efb68f` (PR 21's merge): the
+- **Port:** `dcdc552ae4`, on the topic branch `port-battle-run` from `main` at `1807efb68f` (PR 21's merge): the
   particles' fix (`942e275903`), the review's round on it (`4f096d8eb4`), `main` merged twice, at `2e510abc6d`
   (`c6868a5ec6`: PR 22, the field's pointer casts) and at `65eae1f0a2` (`70b1322063`: PR 23, the test launcher
   retired), and the records commits, published together as one pull request to `main`.
