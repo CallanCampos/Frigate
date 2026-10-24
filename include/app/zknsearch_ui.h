@@ -23,18 +23,23 @@ enum {
 
 // What ZknSearchUI_ListMain and ZknSearchUI_ShapeListMain return besides -1: the return button, a row from 1, the
 // cancel of a key and the reset of the criterion
-#define ZKNSEARCH_UI_LIST_RETURN 0
-#define ZKNSEARCH_UI_LIST_ROW 1
-#define ZKNSEARCH_UI_LIST_CANCEL 8
-#define ZKNSEARCH_UI_LIST_RESET 9
+enum {
+    ZKNSEARCH_UI_LIST_RETURN,
+    ZKNSEARCH_UI_LIST_ROW,
+    ZKNSEARCH_UI_LIST_CANCEL = 8,
+    ZKNSEARCH_UI_LIST_RESET,
+};
 
 // The palettes of a position of the main page's cursor
-#define ZKNSEARCH_UI_PALETTE_OFF 1
-#define ZKNSEARCH_UI_PALETTE_PRESSED 2
-#define ZKNSEARCH_UI_PALETTE_ON 3
+enum {
+    ZKNSEARCH_UI_PALETTE_OFF = 1,
+    ZKNSEARCH_UI_PALETTE_PRESSED,
+    ZKNSEARCH_UI_PALETTE_ON,
+};
 
 void ZknSearchUI_InitCursor(ZknSearchWork *wk, u32 pos);
 void ZknSearchUI_ExitCursor(ZknSearchWork *wk);
+// palette is a ZKNSEARCH_UI_PALETTE_*
 void ZknSearchUI_SetCursorPalette(ZknSearchWork *wk, u32 pos, u32 palette);
 // The main page: a position chosen, or a CURSOR_MOVE_* code
 u32 ZknSearchUI_Main(ZknSearchWork *wk);

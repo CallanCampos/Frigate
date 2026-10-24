@@ -78,7 +78,8 @@ static inline s16 process_sample_unroll(s16 spkSample) {
     return acc >> 15;
 }
 
-static s16 sInitialCoefficients[6] = { -5637, 16445, -14404, 11473, -12246, 892 };
+// The echo's impulse response in Q15; the filter has six taps and takes the first six
+static s16 sInitialCoefficients[8] = { -5637, 16445, -14404, 11473, -12246, 892, 2288, -2669 };
 
 void InitFIRFilter(void) {
     s16 *coeffs = sInitialCoefficients;

@@ -26,10 +26,10 @@
 void _start(void);
 static void INITi_CpuClear32(u32 value, void *dest, u32 size);
 static void boot_InitTCM(void);
-static void func_02004a98(void);
+static void INITi_InitRegion(void);
 static void boot_BootstrapExec(void);
-static void func_02004d50(const u32 *functions);
-static void func_02004da0(void);
+static void INITi_ShelterStaticInitializer(const u32 *functions);
+static void INITi_CallStaticInitializers(void);
 static void NitroStartUp(void);
 static BOOL asm_HWIsDSi(void);
 static void asm_MemCpy32Fast(void *dest, const void *src, u32 size);
@@ -113,7 +113,7 @@ asm void _start(void) {
     mov r1, #0x8
     blx r2
 @not_dsi:
-    bl func_02004a98
+    bl INITi_InitRegion
     // The IRQ stack below the supervisor's 0x40 bytes at the end of DTCM, then the system stack below the IRQ stack,
     // each 8-byte aligned
     mov r0, #0x13
@@ -163,7 +163,7 @@ asm void _start(void) {
     bl _fp_init
     bl NitroStartUp
     bl __call_static_initializers
-    bl func_02004da0
+    bl INITi_CallStaticInitializers
     // Start main at the start of a frame (when REG_VCOUNT is 0)
     ldr r1, =0x4000006
 @wait_vcount:
@@ -226,7 +226,7 @@ static asm void boot_InitTCM(void) {
 
 // Sets up the protection regions, their cache and write buffer bits and their access, for a DSi's memory map or a
 // DS's, and enables the protection unit and the caches
-static asm void func_02004a98(void) {
+static asm void INITi_InitRegion(void) {
     mov ip, lr
     ldr r0, =0x4000033
     mcr p15, 0, r0, c6, c0, 0
@@ -312,7 +312,7 @@ static asm void boot_BootstrapExec(void) {
     stmdb sp!, {r0, r1}
     ldr r0, [ip], #0x4
     stmdb sp!, {ip}
-    bl func_02004d50
+    bl INITi_ShelterStaticInitializer
     ldmia sp!, {ip}
     ldmia sp!, {r0}
     mov r1, #0x0
@@ -365,7 +365,7 @@ static asm void boot_BootstrapExec(void) {
     stmdb sp!, {r0, r1}
     ldr r0, [ip], #0x4
     stmdb sp!, {ip}
-    bl func_02004d50
+    bl INITi_ShelterStaticInitializer
     ldmia sp!, {ip}
     ldmia sp!, {r0}
     mov r1, #0x0
@@ -403,8 +403,8 @@ static asm void boot_BootstrapExec(void) {
 }
 
 // Appends a block's zero-terminated list of static initializers to the one kept below the IRQ stack, for
-// func_02004da0
-static asm void func_02004d50(const u32 *functions) {
+// INITi_CallStaticInitializers
+static asm void INITi_ShelterStaticInitializer(const u32 *functions) {
     cmp r0, #0x0
     bxeq lr
     ldr r1, =SDK_AUTOLOAD_DTCM_START
@@ -427,8 +427,8 @@ static asm void func_02004d50(const u32 *functions) {
     bx lr
 }
 
-// Calls each static initializer of the list func_02004d50 made, clearing its entry
-static asm void func_02004da0(void) {
+// Calls each static initializer of the list INITi_ShelterStaticInitializer made, clearing its entry
+static asm void INITi_CallStaticInitializers(void) {
     stmdb sp!, {lr}
     ldr r1, =SDK_AUTOLOAD_DTCM_START
     add r1, r1, #0x4000

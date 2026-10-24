@@ -40,9 +40,6 @@
 // icon, the names of the forms shown and a slider to pick the second one on the touch screen. The one in front is the
 // one that the Pokédex shows of the species
 
-// The Pokédex's shortcut for the Y button, which the touch bar's check box registers
-#define SHORTCUT_POKEDEX_FORM 23
-
 #define ARCID_POKEICON 7
 // For each species and form, the message of its next form's name in system message file 450
 #define ARCID_FORM_NAME_TABLE 97

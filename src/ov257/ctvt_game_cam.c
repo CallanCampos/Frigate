@@ -975,14 +975,14 @@ static void CtvtGameCam_SeqTakePicture(CtvtGameCamSeq *seq, int *state, CtvtGame
         task->camera.timer = 0;
         CtvtGameCamCamera_Stop(&task->camera);
         ClActor_SetVisible(CtvtGameCamActors_GetActor(&task->clact, 2), FALSE);
-        GFL_WipeSet(4, 0, 0, 0x7fff, 6, 2, task->heapId);
+        GFL_WipeSet(WIPE_MODE_SUB, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, 0x7fff, 6, 2, task->heapId);
         CtvtGameCamCamera_PlayShutterSound(&task->camera);
         *state = 2;
         break;
     }
     case 2:
         if (GFL_WipeIsFinished() == TRUE && !CtvtGameCamCamera_IsShutterSoundPlaying(&task->camera)) {
-            GFL_WipeSet(4, 1, 1, 0x7fff, 6, 2, task->heapId);
+            GFL_WipeSet(WIPE_MODE_SUB, WIPE_TYPE_FADE_IN, WIPE_TYPE_FADE_IN, 0x7fff, 6, 2, task->heapId);
             *state = 3;
         }
         break;

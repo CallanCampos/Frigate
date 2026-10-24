@@ -10,6 +10,8 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
+from tools.build import deadstrip
+from tools.build.test_deadstrip import caller, fixture
 from tools.decomp import compile_all
 from configure import SourceCompiler
 
@@ -88,6 +90,15 @@ class CompileAllTests(unittest.TestCase):
                 if not out:
                     self.assertNotIn('src/example.c', stdout)
 
+    def test_warning_on_success_fails(self):
+        for out, err in [('src/example.c:3: warning: implicit conversion\n', ''),
+                         ('', 'src/example.c:3: warning: implicit conversion\n')]:
+            with self.subTest(stdout=out, stderr=err):
+                code, stdout, stderr = self.run_main({('src/example.c', 'BLACK2'): (0, out, err)}, ['b2_us'])
+                self.assertEqual(code, 1)
+                self.assertIn('1 of 1 compiled (1 files, b2_us)', stdout)
+                self.assertIn('1 compiled with warnings, which fail the run', stderr)
+
     def test_failure_diagnostics_and_silent_failure(self):
         for out, err in [('compiler output\n', 'compiler error\n'), ('', '')]:
             with self.subTest(stdout=out, stderr=err):
@@ -147,6 +158,49 @@ class CompileAllTests(unittest.TestCase):
                 self.assertIsNot(run.call_args.kwargs['env'], os.environ)
                 self.assertEqual((result.source, result.version, result.returncode, result.stdout, result.stderr),
                                  (source, 'w2_us', 0, 'warning\n', 'diagnostic\n'))
+
+
+
+class DeadStripTests(unittest.TestCase):
+    """The build's dead-strip and reference check, run on the compiled objects of one version."""
+
+    def setUp(self):
+        temp = tempfile.TemporaryDirectory()
+        self.addCleanup(temp.cleanup)
+        self.out = Path(temp.name)
+        self.manifest = {'src/file.c': ['DeadFunc']}
+
+    def write(self, source, data):
+        obj = self.out / 'b2_us' / Path(source).with_suffix('.o')
+        obj.parent.mkdir(parents=True, exist_ok=True)
+        obj.write_bytes(data)
+        return obj
+
+    def run_strip(self, *sources):
+        return compile_all.deadstrip_errors(self.out, 'b2_us', [Path(s) for s in sources], self.manifest, set())
+
+    def test_listed_object_stripped_in_place(self):
+        obj = self.write('src/file.c', fixture())
+        self.write('src/other.c', caller('LiveFunc'))
+        self.assertEqual(self.run_strip('src/file.c', 'src/other.c'), [])
+        self.assertEqual(obj.read_bytes(), deadstrip.strip(fixture(), ['DeadFunc']).data)
+
+    def test_failed_strip_is_an_error(self):
+        self.write('src/file.c', fixture(live_calls_dead=True))
+        errors = self.run_strip('src/file.c')
+        self.assertEqual(len(errors), 1)
+        self.assertIn('src/file.c (b2_us): dead-strip: a section that stays refers to a listed symbol', errors[0])
+
+    def test_reference_from_another_object_is_an_error(self):
+        self.write('src/file.c', fixture())
+        self.write('src/other.c', caller('DeadFunc'))
+        self.assertEqual(self.run_strip('src/file.c', 'src/other.c'),
+                         ['src/other.c (b2_us): refers to DeadFunc, which config/deadstrip.toml lists as dead code '
+                          'of src/file.c'])
+
+    def test_listed_source_that_failed_to_compile_is_skipped(self):
+        self.write('src/other.c', caller('LiveFunc'))
+        self.assertEqual(self.run_strip('src/other.c'), [])
 
 
 if __name__ == '__main__':

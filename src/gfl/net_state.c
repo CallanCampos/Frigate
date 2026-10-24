@@ -113,7 +113,7 @@ static void NetState_WifiEndWaitIdle(NetState *state);
 static void NetState_WifiEndDisconnect(NetState *state);
 static void NetState_WifiLoggingIn(NetState *state);
 static void NetState_BeginWifiLogin(NetState *state);
-static void func_02042450(void);
+static void NetState_NoProc(void);
 static void NetState_WifiBattleError(NetState *state);
 
 static NetState *_pNetState;
@@ -244,7 +244,7 @@ BOOL NetState_Update(void) {
     if (_pNetState == NULL) {
         return TRUE;
     }
-    func_02042450();
+    NetState_NoProc();
     return FALSE;
 }
 
@@ -469,7 +469,7 @@ void NetState_StartChangeover(int a0, void (*callback)(void *work), int a2) {
 
     GFL_NetGetSys();
     NetState_InitChangeoverMode(0, a2, NULL);
-    if (ini->bNetType == 3 || ini->bNetType == 4) {
+    if (ini->bNetType == GFL_NET_TYPE_IRC || ini->bNetType == GFL_NET_TYPE_IRC_WIRELESS) {
         NetSystem_StartInfrared(0);
         _pNetState->connectCallback = callback;
         NetState_SetFuncLine(_pNetState, NetState_IrcConnect, MATH_Rand32(&_pNetState->rand, 30), 956);
@@ -539,7 +539,7 @@ static void NetState_ExitIfAlone(NetState *state) {
     GFLNetInitData *ini = GFL_NetGetInitData();
     GFLNetSys *sys = GFL_NetGetSys();
 
-    if (ini->bNetType == 3 || ini->bNetType == 4) {
+    if (ini->bNetType == GFL_NET_TYPE_IRC || ini->bNetType == GFL_NET_TYPE_IRC_WIRELESS) {
         if (!sys->pDevTable->isLinked()) {
             GFL_NetExit(0);
         }
@@ -881,7 +881,7 @@ void NetState_StartWifiLogin(void) {
     }
 }
 
-void func_02042410(u8 a0) {
+void NetState_SetAutoExit(u8 a0) {
     if (_pNetState != NULL) {
         _pNetState->unk4F = a0;
     }
@@ -896,7 +896,7 @@ void NetState_SetDisconnectError(int a0) {
     sys->pDevTable->setDisconnectError(a0);
 }
 
-static void func_02042450(void) {
+static void NetState_NoProc(void) {
 }
 
 BOOL NetState_SetError(u8 a0) {

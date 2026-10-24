@@ -46,7 +46,7 @@ typedef struct {
     u16 screen[2][6];
 } FaceUpAnim;
 
-typedef struct {
+struct FaceUpWork {
     u8 bgPriorities[4];
     u32 enabledBGs;
     GXBg23ControlText bg3Control;
@@ -64,7 +64,7 @@ typedef struct {
     BOOL endBlack;
     // No message has printed since the mouth was readied
     BOOL waitingForMsg;
-} FaceUpWork;
+};
 
 static GameEventReturnCode EventFaceUpStart_Callback(GameEvent *event, u32 *state, void *data);
 static void FaceUp_LoadGraphics(FaceUpWork *work, Field *field);
@@ -108,14 +108,14 @@ GameEvent *EventFaceUpStart_Create(u8 type, u8 unused, u16 endBlack, GameSystem 
     GameEvent *event;
 
     work = GFL_HeapAllocate(HEAPID_FIELD_PARTICLE, sizeof(FaceUpWork), TRUE, "fld_faceup.c", 162);
-    if (*(FaceUpWork **)Field_GetNDemoDataHandle(field) != NULL) {
+    if (*Field_GetNDemoDataHandle(field) != NULL) {
         // BUG: The work allocated above is never freed
 #ifdef BUGFIX
         GFL_HeapFree(work);
 #endif
         return NULL;
     }
-    *(FaceUpWork **)Field_GetNDemoDataHandle(field) = work;
+    *Field_GetNDemoDataHandle(field) = work;
     work->type = type;
     work->env = env;
     work->endBlack = endBlack;
@@ -143,7 +143,7 @@ GameEvent *EventFaceUpStart_Create(u8 type, u8 unused, u16 endBlack, GameSystem 
 
 static GameEventReturnCode EventFaceUpStart_Callback(GameEvent *event, u32 *state, void *data) {
     Field *field = GSYS_GetField(GameEvent_GetGameSystem(event));
-    FaceUpWork *work = *(FaceUpWork **)Field_GetNDemoDataHandle(field);
+    FaceUpWork *work = *Field_GetNDemoDataHandle(field);
 
     switch (*state) {
     case 0:
@@ -175,7 +175,7 @@ static GameEventReturnCode EventFaceUpStart_Callback(GameEvent *event, u32 *stat
 }
 
 static void FaceUp_LoadGraphics(FaceUpWork *work, Field *field) {
-    void *msgBGSys;
+    FieldMsgBG *msgBGSys;
     BGSetup setup;
     u32 charFile;
     u32 scrFile;
@@ -195,8 +195,8 @@ static void FaceUp_LoadGraphics(FaceUpWork *work, Field *field) {
     G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, GX_PLANEMASK_BG3, GX_PLANEMASK_BG2, 0, 16);
 
     msgBGSys = Field_GetMsgBGSys(field);
-    if (func_ov036_02187868(msgBGSys)) {
-        func_ov036_021879c0(msgBGSys);
+    if (MsgBGPrinter_ReleaseSysFrame(msgBGSys)) {
+        MsgBGPrinter_RequestSysFrame(msgBGSys);
     } else {
         GFL_BGSysReleaseBG(FACEUP_BG_FACE);
     }
@@ -252,20 +252,20 @@ static void FaceUp_LoadGraphics(FaceUpWork *work, Field *field) {
 }
 
 GameEvent *EventFaceUpEnd_Create(GameSystem *gsys) {
-    if (*(FaceUpWork **)Field_GetNDemoDataHandle(GSYS_GetField(gsys)) == NULL) {
+    if (*Field_GetNDemoDataHandle(GSYS_GetField(gsys)) == NULL) {
         return NULL;
     }
     return GameEvent_Create(gsys, NULL, EventFaceUpEnd_Callback, 0);
 }
 
 void FaceUp_FreeNow(Field *field) {
-    FaceUpWork *work = *(FaceUpWork **)Field_GetNDemoDataHandle(field);
+    FaceUpWork *work = *Field_GetNDemoDataHandle(field);
 
     FaceUp_Free(field, work);
 }
 
 void FaceUp_StartTalk(Field *field) {
-    FaceUpWork *work = *(FaceUpWork **)Field_GetNDemoDataHandle(field);
+    FaceUpWork *work = *Field_GetNDemoDataHandle(field);
 
     work->talkEnded = FALSE;
     work->waitingForMsg = TRUE;
@@ -273,7 +273,7 @@ void FaceUp_StartTalk(Field *field) {
 
 static GameEventReturnCode EventFaceUpEnd_Callback(GameEvent *event, u32 *state, void *data) {
     Field *field = GSYS_GetField(GameEvent_GetGameSystem(event));
-    FaceUpWork *work = *(FaceUpWork **)Field_GetNDemoDataHandle(field);
+    FaceUpWork *work = *Field_GetNDemoDataHandle(field);
     BOOL endBlack;
 
     switch (*state) {
@@ -321,12 +321,12 @@ static void FaceUp_Free(Field *field, FaceUpWork *work) {
     G2_SetBG3ControlText(work->bg3Control.screenSize, work->bg3Control.colorMode, work->bg3Control.screenBase,
                          work->bg3Control.charBase);
     func_ov036_021b5180(placeName);
-    func_ov036_021879c0(Field_GetMsgBGSys(field));
+    MsgBGPrinter_RequestSysFrame(Field_GetMsgBGSys(field));
     G2_BlendNone();
     FaceUp_RestoreBGPriorities(work);
     FaceUp_RestoreEnabledBGs(work);
     GFL_HeapFree(work);
-    *(FaceUpWork **)Field_GetNDemoDataHandle(field) = NULL;
+    *Field_GetNDemoDataHandle(field) = NULL;
 }
 
 static void FaceUp_SaveBGPriorities(FaceUpWork *work) {
@@ -367,12 +367,12 @@ static BOOL FaceUp_UpdateFadeIn(FaceUpWork *work) {
 
 static void FaceUp_Task(TCB *tcb, void *data) {
     FaceUpWork *work = data;
-    void *window;
+    InfoMsgWin *window;
     u32 msgState;
 
     if (!work->talkEnded && FieldScriptSubEvent_IsRegistered(SCRIPT_SUB_EVENT_MSG) &&
         (window = getMapDisplayInfoPtr(work->env)) != NULL) {
-        msgState = func_ov036_02188cbc(window);
+        msgState = MsgBGPrinter_GetPlainWinStreamState(window);
         if (msgState == 0) {
             work->mouth.stopped = FALSE;
             work->waitingForMsg = FALSE;

@@ -14,9 +14,9 @@ int DWC_BM_Init(void *work) {
 
     MI_CpuFill8(work, 0, DWC_BM_INIT_WORK_SIZE);
     if (OS_IsRunOnTwl()) {
-        result = func_0205e0f0(work);
+        result = NCFG_CheckConfigEx(work);
     } else {
-        result = func_0205e094(work);
+        result = NCFG_CheckConfig(work);
     }
     MI_CpuFill8(work, 0, DWC_BM_INIT_WORK_SIZE);
     if (!DWCBm_ReadAllNtrPages(work)) {

@@ -2443,13 +2443,13 @@ static BOOL UnionOneself_StepPartySelectRun(UnionSystem *unisys, UnionSelf *situ
             boxOk = FALSE;
         }
         unisys->alloc.boxParty = UnionOneself_CreateBoxParty(unisys);
-        unisys->alloc.partySelect = func_ov036_021c3180(field, GameData_GetParty(unisys->param->gameData),
-                                                        unisys->alloc.boxParty, partyOk, boxOk, 0x15);
+        unisys->alloc.partySelect = PartySelectList_Create(field, GameData_GetParty(unisys->param->gameData),
+                                                           unisys->alloc.boxParty, partyOk, boxOk, 0x15);
         (*seq)++;
         break;
     case 3:
-        if (func_ov036_021c3278(unisys->alloc.partySelect) == TRUE) {
-            result = func_ov036_021c3218(unisys->alloc.partySelect, &selected);
+        if (PartySelectList_Main(unisys->alloc.partySelect) == TRUE) {
+            result = PartySelectList_Delete(unisys->alloc.partySelect, &selected);
             unisys->alloc.partySelect = NULL;
             if (result == 2) {
                 UnionOneself_FreeBoxParty(unisys->alloc.boxParty);

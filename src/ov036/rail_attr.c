@@ -29,8 +29,8 @@ RailAttr *AllocateRailAttrBlock(u32 heapId) {
     return GFL_HeapAllocate(heapId, sizeof(RailAttr), TRUE, "rail_attr.c", 92);
 }
 
-void func_ov036_021b3a58(RailAttr *attr) {
-    func_ov036_021b3ad0(attr);
+void FieldRailTilemap_Delete(RailAttr *attr) {
+    FieldRailTilemap_Release(attr);
     GFL_HeapFree(attr);
 }
 
@@ -48,7 +48,7 @@ void FieldRailTilemap_Load(RailAttr *attr, u32 fileId, u32 heapId) {
     }
 }
 
-void func_ov036_021b3ad0(RailAttr *attr) {
+void FieldRailTilemap_Release(RailAttr *attr) {
     if (attr->data != NULL) {
         GFL_HeapFree(attr->tilemaps);
         GFL_HeapFree(attr->data);
@@ -74,56 +74,56 @@ u32 FieldRailTilemap_GetTileAtPos(RailAttr *attr, const RailPosition *pos) {
     return tile;
 }
 
-BOOL func_ov036_021b3b3c(u16 tileClass) {
+BOOL FieldRailTilemap_IsSignBoard(u16 tileClass) {
     if (tileClass == 0xa0 || tileClass == 0xa1) {
         return TRUE;
     }
     return FALSE;
 }
 
-BOOL func_ov036_021b3b54(u32 tileClass) {
+BOOL FieldRailTilemap_IsJumpStart(u32 tileClass) {
     if (tileClass == 0xa3 || tileClass == 0x28) {
         return TRUE;
     }
     return FALSE;
 }
 
-BOOL func_ov036_021b3b64(u32 tileClass) {
+BOOL FieldRailTilemap_IsForceMoveUp(u32 tileClass) {
     if (tileClass == 0xa5) {
         return TRUE;
     }
     return FALSE;
 }
 
-BOOL func_ov036_021b3b70(u32 tileClass) {
+BOOL FieldRailTilemap_IsForceMoveDown(u32 tileClass) {
     if (tileClass == 0xa4) {
         return TRUE;
     }
     return FALSE;
 }
 
-BOOL func_ov036_021b3b7c(u32 tileClass) {
+BOOL FieldRailTilemap_IsForceMoveLeft(u32 tileClass) {
     if (tileClass == 0xa7) {
         return TRUE;
     }
     return FALSE;
 }
 
-BOOL func_ov036_021b3b88(u32 tileClass) {
+BOOL FieldRailTilemap_IsForceMoveRight(u32 tileClass) {
     if (tileClass == 0xa6) {
         return TRUE;
     }
     return FALSE;
 }
 
-BOOL func_ov036_021b3b94(u32 tileClass) {
+BOOL FieldRailTilemap_IsForceMoveStop(u32 tileClass) {
     if (tileClass == 0xa8) {
         return TRUE;
     }
     return FALSE;
 }
 
-BOOL func_ov036_021b3ba0(u32 tileClass) {
+BOOL FieldRailTilemap_IsSlipDown(u32 tileClass) {
     if (tileClass == 0xb0) {
         return TRUE;
     }

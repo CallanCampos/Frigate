@@ -2188,7 +2188,7 @@ static void PkwdBriefing_React(PkwdBriefingWork *wk, BtlSetup *setup) {
     u32 result = 0;
 
     if (setup != NULL) {
-        result = setup->unk124;
+        result = setup->studioEnding;
     }
     switch (result) {
     case 0:

@@ -27,8 +27,9 @@ enum {
 
 // Where a balloon over an actor goes: the offset and window position of a MSG_WIN_POS_, and the position away from
 // where the player stands
-void func_ov036_021a8bec(const VecFx32 *pos, VecFx32 *offset, G3DCamera *g3dCamera, FieldCamera *camera, u8 winPos);
-void func_ov036_021a8c00(u32 winPos, u32 *type, u32 *tail);
+void ActorMsgWin_GetBalloonOffset(const VecFx32 *pos, VecFx32 *offset, G3DCamera *g3dCamera, FieldCamera *camera,
+                                  u8 winPos);
+void ActorMsgWin_GetBalloonTailParams(u32 winPos, u32 *type, u32 *tail);
 u8 ActorMsgWin_CalcWinPosAuto(FieldActor *player, const VecFx32 *pos);
 // Show a message, and have the script wait for it
 BOOL func_ov036_021a8eb4(VM *vm, FieldScriptEnv *env, StrBuf *message, u16 actorId, u16 pos, u32 frameType);
@@ -69,6 +70,6 @@ BOOL func_ov036_021a9350(FinishScriptSubEventsWork *work, u32 *state);
 BOOL func_ov036_021a9478(FinishScriptSubEventsWork *work, u32 *state);
 BOOL func_ov036_021a95ec(FinishScriptSubEventsWork *work, u32 *state);
 BOOL func_ov036_021a96ec(FinishScriptSubEventsWork *work, u32 *state);
-BOOL func_ov036_021a9808(FinishScriptSubEventsWork *work, u32 *state);
+BOOL ActorMsgWin_CleanupAutoMode(FinishScriptSubEventsWork *work, u32 *state);
 
 #endif // POKEBW2_FIELD_SCRCMD_MSG_H

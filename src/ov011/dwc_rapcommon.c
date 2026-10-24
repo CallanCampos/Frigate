@@ -163,7 +163,7 @@ static int DWCRapCommon_Init(HeapID heapId) {
     return result;
 }
 
-void DWCRapCommon_ResetUserData(void *userData) {
+void DWCRapCommon_ResetUserData(DWCUserData *userData) {
     MIi_CpuClearFast(0, userData, 0x40);
     if (!DWC_CheckUserData(userData)) {
         DWC_CreateUserData(userData);

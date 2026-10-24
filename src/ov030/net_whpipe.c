@@ -394,7 +394,7 @@ static void Update(u16 count) {
         }
     }
     if (WH_GetLastError() == 0x19) {
-        func_02042e30(0);
+        GflNet_CallErrorStateFunc(0);
     }
     switch (state) {
     case WH_SYSSTATE_STOP:

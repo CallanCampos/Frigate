@@ -26,14 +26,14 @@ GimmickChampion_SetOpen kind:function(thumb,size=0x4) addr:0x021ef220
 GimmickChampion_GetOpen kind:function(thumb,size=0x4) addr:0x021ef224
 GimmickChampion_CreateShakeTask kind:function(thumb,size=0x3c) addr:0x021ef228
 GimmickChampion_ShakeTask kind:function(thumb,size=0x148) addr:0x021ef264
-data_ov120_021ef36c kind:data(any) addr:0x021ef3ac
+sModel4Animations kind:data(any) addr:0x021ef3ac
 data_ov120_021ef36d kind:data(any) addr:0x021ef3ad ambiguous
-data_ov120_021ef374 kind:data(any) addr:0x021ef3b4
+sModel1Animations kind:data(any) addr:0x021ef3b4
 data_ov120_021ef379 kind:data(any) addr:0x021ef3b9 ambiguous
 sModel2And3Animations kind:data(any) addr:0x021ef3bc
-data_ov120_021ef388 kind:data(any) addr:0x021ef3c8
+sSceneSetup kind:data(any) addr:0x021ef3c8
 data_ov120_021ef395 kind:data(any) addr:0x021ef3d5 ambiguous
-data_ov120_021ef398 kind:data(any) addr:0x021ef3d8
+sActors kind:data(any) addr:0x021ef3d8
 data_ov120_021ef39d kind:data(any) addr:0x021ef3dd ambiguous
 data_ov120_021ef3b5 kind:data(any) addr:0x021ef3f5 ambiguous
-data_ov120_021ef3e8 kind:data(any) addr:0x021ef428
+sResources kind:data(any) addr:0x021ef428

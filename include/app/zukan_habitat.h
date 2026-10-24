@@ -14,9 +14,6 @@
 // Not from swan: the screen's heap
 #define HEAPID_ZUKAN_HABITAT 0xa5
 
-// The shortcut of the Habitat List that the Y button registers
-#define SHORTCUT_POKEDEX_HABITAT 32
-
 // What ZukanHabitatListParam's result is set to
 enum {
     // The player closed the Pokédex

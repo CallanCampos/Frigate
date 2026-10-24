@@ -20,7 +20,7 @@
 
 typedef struct {
     GameSystem *gsys;
-    void *saveIcon;
+    FieldSaveAnime *saveIcon;
     // Set to whether the save succeeded
     u16 *result;
     BOOL pokewood;
@@ -35,8 +35,8 @@ static GameEventReturnCode EventSaveData_Callback(GameEvent *event, u32 *state, 
 
     switch (*state) {
     case 0:
-        save->saveIcon = func_ov036_021c6cc8(heapId, field);
-        func_ov036_021c6d14(save->saveIcon);
+        save->saveIcon = FieldSaveanime_Create(heapId, field);
+        FieldSaveanime_Start(save->saveIcon);
         if (FieldSubscreen_GetScreenID(subscreen) == SUBSCREEN_CGEAR) {
             func_ov036_02198b10(subscreen);
             func_ov036_02198b1c(subscreen);
@@ -78,8 +78,8 @@ static GameEventReturnCode EventSaveData_Callback(GameEvent *event, u32 *state, 
         }
         break;
     case 4:
-        func_ov036_021c6d3c(save->saveIcon);
-        func_ov036_021c6cf8(save->saveIcon);
+        FieldSaveanime_Stop(save->saveIcon);
+        FieldSaveanime_Delete(save->saveIcon);
         *state = 5;
         break;
     case 5:

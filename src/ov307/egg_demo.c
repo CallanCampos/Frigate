@@ -325,7 +325,7 @@ static BOOL EggDemo_Main(GameProc *proc, u32 *state, void *param, void *work) {
         break;
     case EGG_DEMO_NAME_ENTRY:
         if (procRunning != TRUE) {
-            if (func_ov012_02165b0c(wk->nameEntryParam) == FALSE) {
+            if (NameEntryParam_IsCanceled(wk->nameEntryParam) == FALSE) {
                 name = GFL_StrBufCreate(32, wk->heapId);
                 oldName = GFL_StrBufCreate(32, wk->heapId);
                 NameEntryParam_GetName(wk->nameEntryParam, name);

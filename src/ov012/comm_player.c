@@ -51,7 +51,7 @@ void CommPlayer_Update(GameSystem *gsys, CommPlayerSys *cps) {
     if (GSYS_CheckField(cps->gsys) == TRUE) {
         for (i = 0; i < COMM_PLAYER_MAX; i++) {
             if (cps->players[i].active == TRUE && cps->players[i].actor != NULL &&
-                func_ov036_021b3fb4(cps->players[i].actor) == TRUE) {
+                FldeffGyoe_IsFinished(cps->players[i].actor) == TRUE) {
                 cps->players[i].actor = NULL;
             }
         }
@@ -144,7 +144,7 @@ BOOL CommPlayer_GetMyStatus(CommPlayerSys *cps, CommPlayerStatus *status) {
     }
     state = GameData_GetPlayerState(gameData);
     exState = FieldPlayerState_GetExState(state);
-    if (FieldStatus_GetBusyFlag(GameData_GetFieldStatus(gameData)) == 2) {
+    if (FieldStatus_GetBusyFlag(GameData_GetFieldStatus(gameData)) == FLD_STATUS_BUSY_LOADING) {
         dir = last->dir;
         pos = last->pos;
         busy = TRUE;

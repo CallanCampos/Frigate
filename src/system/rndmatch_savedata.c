@@ -5,15 +5,7 @@
 // The results of the random matches and the competitions, which the record block (records.h) holds at 0x5a: three
 // counts for each of 11 kinds of match. The ROM has no string for the file, so the name is a guess.
 
-#define RNDMATCH_TYPE_MAX 11
-#define RNDMATCH_FIELD_MAX 3
-#define RNDMATCH_VALUE_MAX 0xffff
-
-struct RndMatchData {
-    u16 values[RNDMATCH_TYPE_MAX][RNDMATCH_FIELD_MAX];
-};
-
-void RndMatchData_Init(void *results) {
+void RndMatchData_Init(RndMatchData *results) {
     MI_CpuFill8(results, 0, sizeof(RndMatchData));
 }
 

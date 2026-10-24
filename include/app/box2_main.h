@@ -28,9 +28,11 @@
 #define BOX2_BOXLIST_POS 36
 
 // The directions of a box change
-#define BOX2_TRAY_SCROLL_L 0
-#define BOX2_TRAY_SCROLL_R 1
-#define BOX2_TRAY_SCROLL_NONE 2
+enum {
+    BOX2_TRAY_SCROLL_L,
+    BOX2_TRAY_SCROLL_R,
+    BOX2_TRAY_SCROLL_NONE,
+};
 
 // The actors of the cursor and the item icon
 #define BOX2_ACTOR_CURSOR 4
@@ -42,14 +44,26 @@
 // The frames a Pokémon icon takes to move
 #define BOX2_POKEMOVE_CNT 8
 
-// Why a Pokémon can't be put where it was dropped
-#define BOX2_MOVE_ERR_NONE 0
-#define BOX2_MOVE_ERR_BOX_FULL 1
-#define BOX2_MOVE_ERR_MAIL 2
-#define BOX2_MOVE_ERR_LAST_BATTLER 3
+// Why a Pokémon can't be put where it was dropped, or picked, which Box2Bmp_PrintDenyMsg tells for some
+enum {
+    BOX2_MOVE_ERR_NONE,
+    BOX2_MOVE_ERR_BOX_FULL,
+    BOX2_MOVE_ERR_MAIL,
+    BOX2_MOVE_ERR_LAST_BATTLER,
+    // "Eggs cannot be selected!": the Battle Box takes no Eggs, nor does the Dream World
+    BOX2_MOVE_ERR_EGG,
+    BOX2_MOVE_ERR_BATTLE_BOX_LOCKED,
+    // "This Pokémon doesn't seem sleepy now.": a species that can't be sent to the Dream World
+    BOX2_MOVE_ERR_NOT_SLEEPY,
+    // The Pokémon moved as a group don't fit where they were dropped
+    BOX2_MOVE_ERR_GROUP,
+};
 
-#define BOX2_BTN_ANM_MODE_OBJ 0
-#define BOX2_BTN_ANM_MODE_BG 1
+// Where a button's press animation is: on an actor or on the BG
+enum {
+    BOX2_BTN_ANM_MODE_OBJ,
+    BOX2_BTN_ANM_MODE_BG,
+};
 
 // The Pokémon search's criteria, which the boxes' icons are filtered by
 typedef struct {
@@ -99,7 +113,7 @@ struct Box2SysWork {
 
 // A text object on OAM
 typedef struct {
-    void *oam;
+    BmpOamActor *oam;
     GFLBitmap *bitmap;
 } Box2FontOam;
 
@@ -116,6 +130,7 @@ typedef struct {
 
 // A button's press animation, on an actor or on the BG
 typedef struct {
+    // A BOX2_BTN_ANM_MODE_*
     u8 mode : 1;
     u8 id : 7;
     u8 pal1 : 4;
@@ -252,14 +267,14 @@ typedef struct {
 } Box2RangeSelect;
 
 struct Box2AppWork {
-    void *bmpOam;
+    BmpOamSys *bmpOam;
     Box2FontOam fontOam[10];
     u32 keyRepeatWait;
     u32 keyRepeatStart;
     TCB *vtask;
     Box2IrqWork vfunk;
     int vfuncNextSeq;
-    void *palFade;
+    PaletteFade *palFade;
     CursorMove *cursorMove;
     BGWinFrame *bgWinFrame;
     Font *font;

@@ -87,7 +87,7 @@ typedef struct {
     // Whether the player has pressed the switch to ride up
     BOOL elevatorSwitchPressed;
     // What the camera followed, while the freight elevator runs
-    void *cameraBind;
+    const VecFx32 *cameraBind;
 } DriftveilGymWork;
 
 // Where the pad slides the player to: how far it goes, which way, and the switch that it lands on
@@ -128,7 +128,7 @@ typedef struct {
     u8 toggle;
     fx32 amplitude;
     FieldCamera *camera;
-    void *bind;
+    const VecFx32 *bind;
     VecFx32 offset;
 } DriftveilGymShake;
 
@@ -503,14 +503,14 @@ static GameEventReturnCode DriftveilGym_SlideEventCallback(GameEvent *event, u32
 
     switch (*state) {
     case 0:
-        if (func_ov036_0219a870(ev->player)) {
+        if (FieldPlayer_CheckAnimePaused(ev->player)) {
             direction = FieldPlayer_GetFaceDir(ev->player);
             FldAct_SetAcmd(FieldPlayer_GetActor(ev->player), direction + ACMD_JUMP_1);
             *state = 1;
         }
         break;
     case 1:
-        if (func_ov036_0219a870(ev->player)) {
+        if (FieldPlayer_CheckAnimePaused(ev->player)) {
             switch (sPads[ev->pad].distance) {
             case 0:
                 tiles = 7;
@@ -566,14 +566,14 @@ static GameEventReturnCode DriftveilGym_SlideEventCallback(GameEvent *event, u32
         *state = 4;
         break;
     case 4:
-        if (func_ov036_0219a870(ev->player)) {
+        if (FieldPlayer_CheckAnimePaused(ev->player)) {
             direction = FieldPlayer_GetFaceDir(ev->player);
             FldAct_SetAcmd(FieldPlayer_GetActor(ev->player), direction + ACMD_JUMP_1);
             *state = STATE_END;
         }
         break;
     case STATE_END:
-        if (func_ov036_0219a870(ev->player)) {
+        if (FieldPlayer_CheckAnimePaused(ev->player)) {
             DriftveilGym_StopPadAnimation(work->expObj, ev->pad);
             return TRUE;
         }

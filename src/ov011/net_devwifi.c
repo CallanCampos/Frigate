@@ -19,7 +19,7 @@ typedef struct {
 static NetDevWifiWork *sNetDevWifiWork;
 
 static void NetDevWifi_Prepare(int a0, int a1);
-static BOOL NetDevWifi_Init(HeapID heapId, void *sys, BOOL (*callback)(BOOL success), void *work);
+static BOOL NetDevWifi_Init(HeapID heapId, GFLNetSys *sys, BOOL (*callback)(BOOL success), void *work);
 static BOOL NetDevWifi_Start(void (*callback)(BOOL ok));
 static int NetDevWifi_Update(u16 connectBits);
 static BOOL NetDevWifi_Unk10(int a0, int a1);
@@ -76,7 +76,7 @@ static void NetDevWifi_Prepare(int a0, int a1) {
     DWCRapCommon_StartLibrary(a0);
 }
 
-static BOOL NetDevWifi_Init(HeapID heapId, void *sys, BOOL (*callback)(BOOL success), void *work) {
+static BOOL NetDevWifi_Init(HeapID heapId, GFLNetSys *sys, BOOL (*callback)(BOOL success), void *work) {
     GFLNetInitData *pNetInit;
 
     if (sNetDevWifiWork != NULL) {
@@ -85,12 +85,12 @@ static BOOL NetDevWifi_Init(HeapID heapId, void *sys, BOOL (*callback)(BOOL succ
     pNetInit = GFL_NetGetInitData();
     DWCRapCommon_Create(pNetInit->wifiHeapId, pNetInit->wifiHeapSize);
     sNetDevWifiWork = GFL_HeapAllocate(heapId, sizeof(NetDevWifiWork), TRUE, "net_devwifi.c", 186);
-    sNetDevWifiWork->pNetInit = sys;
+    sNetDevWifiWork->pNetInit = &sys->aNetInit;
     return TRUE;
 }
 
 static BOOL NetDevWifi_Start(void (*callback)(BOOL ok)) {
-    BOOL result = DWCRap_Init((void *)GFL_NetGetUserData(), (DWCFriendData *)GFL_NetGetFriendData());
+    BOOL result = DWCRap_Init((DWCUserData *)GFL_NetGetUserData(), (DWCFriendData *)GFL_NetGetFriendData());
 
     if (callback != NULL) {
         callback(TRUE);

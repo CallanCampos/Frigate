@@ -134,7 +134,6 @@ sSegmentEnds kind:data(any) addr:0x021973e0
 sRequestTimeout kind:data(any) addr:0x02197400
 sVADInfo kind:data(any) addr:0x02197408
 sInitialCoefficients kind:data(any) addr:0x02197418
-data_ov029_02197424 kind:data(any) addr:0x02197424
 sVChatWork kind:bss addr:0x02197440
 sAudioSequence kind:bss addr:0x02197444
 sAdpcmState kind:bss addr:0x02197454

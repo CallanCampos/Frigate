@@ -35,6 +35,6 @@ FieldActor *EntreeForest_SpawnPkmActor(const EntreeForestSpawnContext *context, 
 void EntreeForest_SpawnAllPokemon(Field *field, u32 actorIdBase, const EntreeForestPokemon *pokemon, u32 unused,
                                   u32 area);
 
-PartyPkm *func_ov033_02176bd0(HeapID heapId, GameData *gameData, const EntreeForestPokemon *pokemon);
+PartyPkm *EntreeForest_CreateSymbolMon(HeapID heapId, GameData *gameData, const EntreeForestPokemon *pokemon);
 
 #endif // POKEBW2_FIELD_ENTREE_FOREST_H

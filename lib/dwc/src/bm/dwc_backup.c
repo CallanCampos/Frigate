@@ -55,7 +55,7 @@ static BOOL ReadNtrPages(DWCMemPage *pages, u32 first, u32 count) {
     u32 index;
 
     for (index = first; index < first + count; index++) {
-        if (func_0205dca4(&pages[index - first], sizeof(DWCMemPage), index) == -1) {
+        if (NCFG_ReadBackupMemory(&pages[index - first], sizeof(DWCMemPage), index) == -1) {
             return FALSE;
         }
     }
@@ -64,14 +64,14 @@ static BOOL ReadNtrPages(DWCMemPage *pages, u32 first, u32 count) {
 
 // The scratch buffer that the callers pass is not used
 static BOOL WriteNtrPage(const DWCMemPage *page, u32 index, void *scratch) {
-    return func_0205dd40(index, page, sizeof(DWCMemPage)) != -1;
+    return NCFG_WriteBackupMemory(index, page, sizeof(DWCMemPage)) != -1;
 }
 
 static BOOL ReadTwlPages(DWCBmTwlPage *pages, u32 first, u32 count) {
     u32 index;
 
     for (index = first; index < first + count; index++) {
-        if (func_0205dca4(&pages[index - first], sizeof(DWCBmTwlPage), index + 0x11) == -1) {
+        if (NCFG_ReadBackupMemory(&pages[index - first], sizeof(DWCBmTwlPage), index + 0x11) == -1) {
             return FALSE;
         }
     }
@@ -95,7 +95,7 @@ BOOL DWCi_BM_SetWiFiInfo(const DWCWiFiInfo *info, void *work) {
         while (!WriteNtrPage(&buf->mem, index, buf->work)) {
         }
     }
-    return func_02056e74() != 0;
+    return writeDisable() != 0;
 }
 
 BOOL DWCBm_ReadAllNtrPages(void *buf) {
@@ -112,7 +112,7 @@ BOOL DWCBm_WriteNtrPages(void *buf, const BOOL flags[4], void *scratch) {
             }
         }
     }
-    return func_02056e74() != 0;
+    return writeDisable() != 0;
 }
 
 void DWCi_BACKUPlSetWiFi(const u8 *packed) {
@@ -168,7 +168,7 @@ BOOL DWC_BACKUPlCheckAddress(const u8 *address) {
 }
 
 // Does nothing and says it did: the writes end by it, perhaps where a flush of the NVRAM once was
-BOOL func_02056e74(void) {
+BOOL writeDisable(void) {
     return TRUE;
 }
 

@@ -135,25 +135,22 @@ void DWCi_CELLlSetPalette(DWCUtilOamNode *node, int index, int mode, int cParam)
 }
 
 void DWCi_CELLlSetPosition(DWCUtilOamNode *node, int index, int x, int y) {
+    GXOamAttr *oam;
     int i;
-    int firstX;
-    int firstY;
-    DWCUtilOamAttr01 first;
-    GXOamAttr *oam = node->oam;
+    int firstX, firstY, entryX, entryY, dx, dy;
 
+    oam = node->oam;
     if (index >= 0) {
         DWCUtilOam_SetPosition(&oam[index], x, y);
-        return;
-    }
-    first = DWCUtilOam_ReadAttr01(&oam[0]);
-    firstX = (first.attr01 & GX_OAM_ATTR01_X_MASK) >> GX_OAM_ATTR01_X_SHIFT;
-    firstY = (u8)first.attr01;
-    DWCUtilOam_SetPosition(&oam[0], x, y);
-    for (i = 1; i < node->count; i++) {
-        DWCUtilOamAttr01 word = DWCUtilOam_ReadAttr01(&oam[i]);
-
-        DWCUtilOam_SetPosition(&oam[i], ((word.attr01 & GX_OAM_ATTR01_X_MASK) >> GX_OAM_ATTR01_X_SHIFT) + (x - firstX),
-                               (u8)word.attr01 + (y - firstY));
+    } else {
+        G2_GetOBJPosition(&oam[0], (u32 *)&firstX, (u32 *)&firstY);
+        DWCUtilOam_SetPosition(&oam[0], x, y);
+        dx = x - firstX;
+        dy = y - firstY;
+        for (i = 1; i < node->count; i++) {
+            G2_GetOBJPosition(&oam[i], (u32 *)&entryX, (u32 *)&entryY);
+            DWCUtilOam_SetPosition(&oam[i], entryX + dx, entryY + dy);
+        }
     }
 }
 
@@ -171,5 +168,5 @@ void DWCi_CELLlSetPriority(DWCUtilOamNode *node, int index, int priority) {
 }
 
 void DWCi_CELLlGetPosition(DWCUtilOamNode *node, int index, int *x, int *y) {
-    DWCUtilOam_GetPosition(&node->oam[index], x, y);
+    G2_GetOBJPosition(&node->oam[index], (u32 *)x, (u32 *)y);
 }

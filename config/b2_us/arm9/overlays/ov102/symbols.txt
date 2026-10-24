@@ -35,7 +35,7 @@ sSwitch2Animations kind:data(any) addr:0x021f01c4
 sSwitch1Animations kind:data(any) addr:0x021f01cc
 sSwitch3Animations kind:data(any) addr:0x021f01d4
 sSpotCars kind:data(any) addr:0x021f01dc
-data_ov102_021f01e8 kind:data(any) addr:0x021f01e8
+sSceneSetup kind:data(any) addr:0x021f01e8
 sStationSpots kind:data(any) addr:0x021f01f8
 sRideCurves kind:data(any) addr:0x021f0208
 data_ov102_021f021e kind:data(any) addr:0x021f021e ambiguous
@@ -60,5 +60,5 @@ data_ov102_021f0324 kind:data(any) addr:0x021f0324
 data_ov102_021f0330 kind:data(any) addr:0x021f0330
 data_ov102_021f033c kind:data(any) addr:0x021f033c
 sStationFrames kind:data(any) addr:0x021f0348
-data_ov102_021f0388 kind:data(any) addr:0x021f0388
-data_ov102_021f0448 kind:data(any) addr:0x021f0448
+sActors kind:data(any) addr:0x021f0388
+sResources kind:data(any) addr:0x021f0448

@@ -91,31 +91,31 @@ typedef struct {
     SplashTaskParams params;
 } SplashTask;
 
-static void func_ov036_021a43bc(FieldEffectNamipoke *namipoke);
-static void func_ov036_021a4458(FieldEffectNamipoke *namipoke);
-static fx32 func_ov036_021a4530(fx32 distance);
-static fx32 func_ov036_021a4550(const VecFx32 *actorPos, const VecFx32 *wakePos, u16 dir);
-static void func_ov036_021a4588(FieldEffectTask *task, void *work);
+static void FldeffNamipoke_LoadResources(FieldEffectNamipoke *namipoke);
+static void FldeffNamipoke_FreeResources(FieldEffectNamipoke *namipoke);
+static fx32 FldeffNamipoke_GetWakeScale(fx32 distance);
+static fx32 FldeffNamipoke_GetWakeLength(const VecFx32 *actorPos, const VecFx32 *wakePos, u16 dir);
+static void FldeffNamipoke_Init(FieldEffectTask *task, void *work);
 static void func_ov036_021a45f8(FieldEffectTask *task, void *work);
-static void func_ov036_021a45fc(FieldEffectTask *task, NamipokeTask *namiTask);
-static void func_ov036_021a4710(FieldEffectTask *task, void *work);
-static void func_ov036_021a4924(FieldEffectTask *task, void *work);
-static void func_ov036_021a4944(FieldEffectTask *task, void *work);
-static void func_ov036_021a4bc0(FieldEffectTask *task, void *work);
-static void func_ov036_021a4d5c(FieldEffectNamipokeSplash *splash);
-static void func_ov036_021a4e7c(FieldEffectNamipokeSplash *splash);
-static void func_ov036_021a4f2c(FieldEffectTask *task, void *work);
-static void func_ov036_021a4ff0(FieldEffectTask *task, void *work);
-static void func_ov036_021a5004(FieldEffectTask *task, void *work);
-static void func_ov036_021a5084(FieldEffectTask *task, void *work);
+static void FldeffNamipoke_PlaceObjects(FieldEffectTask *task, NamipokeTask *namiTask);
+static void FldeffNamipoke_UpdateGrid(FieldEffectTask *task, void *work);
+static void FldeffNamipoke_DrawGrid(FieldEffectTask *task, void *work);
+static void FldeffNamipoke_UpdateRail(FieldEffectTask *task, void *work);
+static void FldeffNamipoke_DrawRail(FieldEffectTask *task, void *work);
+static void FldeffNamipokeSplash_LoadResources(FieldEffectNamipokeSplash *splash);
+static void FldeffNamipokeSplash_FreeResources(FieldEffectNamipokeSplash *splash);
+static void FldeffNamipokeSplash_Init(FieldEffectTask *task, void *work);
+static void FldeffNamipokeSplash_Exit(FieldEffectTask *task, void *work);
+static void FldeffNamipokeSplash_Update(FieldEffectTask *task, void *work);
+static void FldeffNamipokeSplash_Draw(FieldEffectTask *task, void *work);
 
 // clang-format off
 static const FieldEffectTaskVTable SPLASH_TASK_VTABLE = {
     sizeof(SplashTask),
-    func_ov036_021a4f2c,
-    func_ov036_021a4ff0,
-    func_ov036_021a5004,
-    func_ov036_021a5084,
+    FldeffNamipokeSplash_Init,
+    FldeffNamipokeSplash_Exit,
+    FldeffNamipokeSplash_Update,
+    FldeffNamipokeSplash_Draw,
 };
 
 // clang-format on
@@ -124,10 +124,10 @@ static const FieldEffectTaskVTable SPLASH_TASK_VTABLE = {
 // clang-format off
 static const FieldEffectTaskVTable NAMIPOKE_TASK_VTABLE = {
     sizeof(NamipokeTask),
-    func_ov036_021a4588,
+    FldeffNamipoke_Init,
     func_ov036_021a45f8,
-    func_ov036_021a4710,
-    func_ov036_021a4924,
+    FldeffNamipoke_UpdateGrid,
+    FldeffNamipoke_DrawGrid,
 };
 
 // clang-format on
@@ -136,38 +136,38 @@ static const FieldEffectTaskVTable NAMIPOKE_TASK_VTABLE = {
 // clang-format off
 static const FieldEffectTaskVTable NAMIPOKE_RAIL_TASK_VTABLE = {
     sizeof(NamipokeTask),
-    func_ov036_021a4588,
+    FldeffNamipoke_Init,
     func_ov036_021a45f8,
-    func_ov036_021a4944,
-    func_ov036_021a4bc0,
+    FldeffNamipoke_UpdateRail,
+    FldeffNamipoke_DrawRail,
 };
 
 // clang-format on
 
-void *func_ov036_021a4384(FieldEffects *effects, HeapID heapId) {
+void *FldeffNamipoke_Create(FieldEffects *effects, HeapID heapId) {
     FieldEffectNamipoke *namipoke =
         GFL_HeapAllocate(heapId, sizeof(FieldEffectNamipoke), TRUE, "fldeff_namipoke.c", 172);
 
     namipoke->effects = effects;
-    func_ov036_021a43bc(namipoke);
+    FldeffNamipoke_LoadResources(namipoke);
     return namipoke;
 }
 
 void func_ov036_021a43a8(FieldEffects *effects, void *data) {
-    func_ov036_021a4458(data);
+    FldeffNamipoke_FreeResources(data);
     GFL_HeapFree(data);
 }
 
-static void func_ov036_021a43bc(FieldEffectNamipoke *namipoke) {
+static void FldeffNamipoke_LoadResources(FieldEffectNamipoke *namipoke) {
     FieldG3DObjResRequest request;
-    FieldG3DObjSystem *objSys = func_ov036_021a3724(namipoke->effects);
+    FieldG3DObjSystem *objSys = FieldEffects_GetFieldMapData(namipoke->effects);
     ArcTool *arc = FieldEffects_GetArc(namipoke->effects);
 
     FieldG3DObjResRequest_Clear(&request);
     FieldG3DObjResRequest_SetModel(&request, arc, 49);
     namipoke->pokeResGroup = FieldG3DObjSystem_AddResGroup(objSys, &request, FALSE);
     namipoke->pokeObj = FieldG3DObjSystem_AddObj(objSys, namipoke->pokeResGroup, 0, NULL);
-    func_ov036_021c02b4(objSys, namipoke->pokeObj, TRUE);
+    FieldG3DObjSystem_SetObjectManualDraw(objSys, namipoke->pokeObj, TRUE);
 
     FieldG3DObjResRequest_Clear(&request);
     FieldG3DObjResRequest_SetModel(&request, arc, 54);
@@ -176,11 +176,11 @@ static void func_ov036_021a43bc(FieldEffectNamipoke *namipoke) {
     FieldG3DObjResRequest_AddAnm(&request, 140);
     namipoke->wakeResGroup = FieldG3DObjSystem_AddResGroup(objSys, &request, FALSE);
     namipoke->wakeObj = FieldG3DObjSystem_AddObj(objSys, namipoke->wakeResGroup, 0, NULL);
-    func_ov036_021c02b4(objSys, namipoke->wakeObj, TRUE);
+    FieldG3DObjSystem_SetObjectManualDraw(objSys, namipoke->wakeObj, TRUE);
 }
 
-static void func_ov036_021a4458(FieldEffectNamipoke *namipoke) {
-    FieldG3DObjSystem *objSys = func_ov036_021a3724(namipoke->effects);
+static void FldeffNamipoke_FreeResources(FieldEffectNamipoke *namipoke) {
+    FieldG3DObjSystem *objSys = FieldEffects_GetFieldMapData(namipoke->effects);
 
     FieldG3DObjSystem_FreeObj(objSys, namipoke->pokeObj);
     FieldG3DObjSystem_FreeObj(objSys, namipoke->wakeObj);
@@ -188,7 +188,7 @@ static void func_ov036_021a4458(FieldEffectNamipoke *namipoke) {
     FieldG3DObjSystem_FreeResGroup(objSys, namipoke->wakeResGroup);
 }
 
-FieldEffectTask *func_ov036_021a4484(FieldEffects *effects, u16 dir, const VecFx32 *pos, FieldActor *actor, u32 mode) {
+FieldEffectTask *FldeffNamipoke_Start(FieldEffects *effects, u16 dir, const VecFx32 *pos, FieldActor *actor, u32 mode) {
     NamipokeTaskParams params;
 
     params.namipoke = FieldEffects_GetHandleData(effects, 3);
@@ -203,17 +203,17 @@ FieldEffectTask *func_ov036_021a4484(FieldEffects *effects, u16 dir, const VecFx
     return FieldEffects_TCBCreate(effects, &NAMIPOKE_TASK_VTABLE, &params.pos, mode, &params, 0);
 }
 
-void func_ov036_021a4504(FieldEffectTask *task, u8 mode) {
+void FldeffNamipoke_SetFollowMode(FieldEffectTask *task, u8 mode) {
     if (task != NULL) {
-        NamipokeTask *namiTask = func_ov036_021a3afc(task);
+        NamipokeTask *namiTask = FieldEffects_GetObjectWork(task);
 
         namiTask->mode = mode;
     }
 }
 
-void func_ov036_021a4514(FieldEffectTask *task, BOOL showWake) {
+void FldeffNamipoke_SetWakeEnabled(FieldEffectTask *task, BOOL showWake) {
     if (task != NULL) {
-        NamipokeTask *namiTask = func_ov036_021a3afc(task);
+        NamipokeTask *namiTask = FieldEffects_GetObjectWork(task);
 
         if (showWake == TRUE) {
             namiTask->hideWake = FALSE;
@@ -224,7 +224,7 @@ void func_ov036_021a4514(FieldEffectTask *task, BOOL showWake) {
 }
 
 // The wake's scale for its distance behind the Pokémon
-static fx32 func_ov036_021a4530(fx32 distance) {
+static fx32 FldeffNamipoke_GetWakeScale(fx32 distance) {
     if (distance > WAKE_MAX_DISTANCE) {
         distance = WAKE_MAX_DISTANCE;
     }
@@ -232,7 +232,7 @@ static fx32 func_ov036_021a4530(fx32 distance) {
 }
 
 // How far the wake is behind the actor, along the direction it faces
-static fx32 func_ov036_021a4550(const VecFx32 *actorPos, const VecFx32 *wakePos, u16 dir) {
+static fx32 FldeffNamipoke_GetWakeLength(const VecFx32 *actorPos, const VecFx32 *wakePos, u16 dir) {
     fx32 distance = 0;
 
     switch (dir) {
@@ -252,18 +252,18 @@ static fx32 func_ov036_021a4550(const VecFx32 *actorPos, const VecFx32 *wakePos,
     return distance;
 }
 
-static void func_ov036_021a4588(FieldEffectTask *task, void *work) {
+static void FldeffNamipoke_Init(FieldEffectTask *task, void *work) {
     NamipokeTask *namiTask = work;
-    NamipokeTaskParams *params = func_ov036_021a3ac8(task);
+    NamipokeTaskParams *params = FieldEffects_GetObjectParam(task);
     NamipokeWake *wake;
 
     namiTask->params = *params;
-    func_ov036_021a3ae8(task, &params->pos);
+    FieldEffects_SetObjectPos(task, &params->pos);
     namiTask->dir = params->dir;
     // The game fetches the 3D object system here and doesn't use it
-    func_ov036_021a3724(namiTask->params.namipoke->effects);
+    FieldEffects_GetFieldMapData(namiTask->params.namipoke->effects);
     namiTask->objIdx = namiTask->params.namipoke->pokeObj;
-    namiTask->mode = func_ov036_021a3abc(task);
+    namiTask->mode = FieldEffects_GetObjectMode(task);
     namiTask->bob = FX32_ONE;
     namiTask->bobSpeed = FX32_CONST(0.25);
     wake = &namiTask->wake;
@@ -273,14 +273,14 @@ static void func_ov036_021a4588(FieldEffectTask *task, void *work) {
     wake->scale.x = FX32_ONE;
     wake->scale.y = FX32_ONE;
     wake->scale.z = FX32_ONE;
-    func_ov036_021a3a94(task);
+    FieldEffects_UpdateObject(task);
 }
 
 static void func_ov036_021a45f8(FieldEffectTask *task, void *work) {
 }
 
 // Turn the Pokémon and its wake on the grid to the direction it faces, and put them where the task is
-static void func_ov036_021a45fc(FieldEffectTask *task, NamipokeTask *namiTask) {
+static void FldeffNamipoke_PlaceObjects(FieldEffectTask *task, NamipokeTask *namiTask) {
     u16 pokeRotations[4][3] = {
         { 0, 0x8000, 0 },
         { 0, 0, 0 },
@@ -288,11 +288,11 @@ static void func_ov036_021a45fc(FieldEffectTask *task, NamipokeTask *namiTask) {
         { 0, 0x4000, 0 },
     };
     u16 *rotation = pokeRotations[namiTask->dir];
-    FieldG3DObjSystem *objSys = func_ov036_021a3724(namiTask->params.namipoke->effects);
+    FieldG3DObjSystem *objSys = FieldEffects_GetFieldMapData(namiTask->params.namipoke->effects);
     SRTMatrix *transform = FieldG3DObjSystem_GetObjTransform(objSys, namiTask->objIdx);
 
     MAT3_RotationEulerZYX(rotation[0], rotation[1], rotation[2], &transform->rotation);
-    func_ov036_021a3ad4(task, &transform->translation);
+    FieldEffects_GetObjectPos(task, &transform->translation);
     if (namiTask->wake.hidden == FALSE) {
         NamipokeWake *wake = &namiTask->wake;
         VecFx32 wakeOffsets[4] = {
@@ -312,19 +312,19 @@ static void func_ov036_021a45fc(FieldEffectTask *task, NamipokeTask *namiTask) {
         rotation = wakeRotations[namiTask->dir];
         transform = FieldG3DObjSystem_GetObjTransform(objSys, wake->objIdx);
         MAT3_RotationEulerZYX(rotation[0], rotation[1], rotation[2], &transform->rotation);
-        func_ov036_021a3ad4(task, &transform->translation);
+        FieldEffects_GetObjectPos(task, &transform->translation);
         transform->translation.x += wake->offset.x + offset->x;
         transform->translation.y += wake->offset.y + offset->y;
         transform->translation.z += wake->offset.z + offset->z;
         transform->scale = wake->scale;
-        func_ov036_021c0154(objSys, wake->objIdx, FALSE);
+        FieldG3DObjSystem_SetObjectHidden(objSys, wake->objIdx, FALSE);
     } else {
-        func_ov036_021c0154(objSys, namiTask->wake.objIdx, TRUE);
+        FieldG3DObjSystem_SetObjectHidden(objSys, namiTask->wake.objIdx, TRUE);
     }
 }
 
 // On the grid: bob under the actor, and trail the wake behind it
-static void func_ov036_021a4710(FieldEffectTask *task, void *work) {
+static void FldeffNamipoke_UpdateGrid(FieldEffectTask *task, void *work) {
     VecFx32 offset = { 0, 0, 0 };
     VecFx32 pos;
     VecFx32 actorPos;
@@ -332,7 +332,7 @@ static void func_ov036_021a4710(FieldEffectTask *task, void *work) {
     u16 objCode;
 
     if (namiTask->mode == 0) {
-        func_ov036_021a45fc(task, namiTask);
+        FldeffNamipoke_PlaceObjects(task, namiTask);
         return;
     }
     namiTask->dir = GetActorFaceDir(namiTask->params.actor);
@@ -364,7 +364,7 @@ static void func_ov036_021a4710(FieldEffectTask *task, void *work) {
     if (namiTask->mode != 2) {
         pos.y += namiTask->bob - FX32_ONE;
     }
-    func_ov036_021a3ae8(task, &pos);
+    FieldEffects_SetObjectPos(task, &pos);
     if (namiTask->mode == 2 || namiTask->hideWake == TRUE) {
         NamipokeWake *wake = &namiTask->wake;
 
@@ -377,7 +377,7 @@ static void func_ov036_021a4710(FieldEffectTask *task, void *work) {
         fx32 distance;
         fx32 scale;
 
-        FieldG3DObjSystem_StepObjAnmLoop(func_ov036_021a3724(namiTask->params.namipoke->effects), wake->objIdx,
+        FieldG3DObjSystem_StepObjAnmLoop(FieldEffects_GetFieldMapData(namiTask->params.namipoke->effects), wake->objIdx,
                                          FX32_ONE);
         CopyActorWPos(namiTask->params.actor, &actorPos);
         if (namiTask->dir != wake->dir) {
@@ -412,7 +412,7 @@ static void func_ov036_021a4710(FieldEffectTask *task, void *work) {
                 break;
             }
         }
-        distance = func_ov036_021a4550(&actorPos, &wake->pos, wake->dir);
+        distance = FldeffNamipoke_GetWakeLength(&actorPos, &wake->pos, wake->dir);
         if (distance >= WAKE_MAX_DISTANCE) {
             switch (wake->dir) {
             case DIR_UP:
@@ -429,7 +429,7 @@ static void func_ov036_021a4710(FieldEffectTask *task, void *work) {
                 break;
             }
         }
-        scale = func_ov036_021a4530(distance);
+        scale = FldeffNamipoke_GetWakeScale(distance);
         if (scale < WAKE_MIN_SCALE) {
             wake->hidden = TRUE;
         } else {
@@ -440,19 +440,19 @@ static void func_ov036_021a4710(FieldEffectTask *task, void *work) {
         }
         wake->actorPos = actorPos;
     }
-    func_ov036_021a45fc(task, namiTask);
+    FldeffNamipoke_PlaceObjects(task, namiTask);
 }
 
-static void func_ov036_021a4924(FieldEffectTask *task, void *work) {
+static void FldeffNamipoke_DrawGrid(FieldEffectTask *task, void *work) {
     NamipokeTask *namiTask = work;
-    FieldG3DObjSystem *objSys = func_ov036_021a3724(namiTask->params.namipoke->effects);
+    FieldG3DObjSystem *objSys = FieldEffects_GetFieldMapData(namiTask->params.namipoke->effects);
 
     FieldG3DObjSystem_DrawObj(objSys, namiTask->objIdx);
     FieldG3DObjSystem_DrawObj(objSys, namiTask->wake.objIdx);
 }
 
 // On a rail: the same along the rail's directions
-static void func_ov036_021a4944(FieldEffectTask *task, void *work) {
+static void FldeffNamipoke_UpdateRail(FieldEffectTask *task, void *work) {
     VecFx32 offset = { 0, 0, 0 };
     VecFx32 pos;
     VecFx32 actorPos;
@@ -464,8 +464,8 @@ static void func_ov036_021a4944(FieldEffectTask *task, void *work) {
         return;
     }
     namiTask->dir = GetActorFaceDir(namiTask->params.actor);
-    func_ov036_02195a78(namiTask->params.actor, DIR_UP, &up);
-    func_ov036_02195a78(namiTask->params.actor, namiTask->dir, &forward);
+    RailActor_GetDrawOffsetByDir(namiTask->params.actor, DIR_UP, &up);
+    RailActor_GetDrawOffsetByDir(namiTask->params.actor, namiTask->dir, &forward);
     up.y = 0;
     VEC_Fx16Normalize(&up, &up);
     forward.y = 0;
@@ -489,7 +489,7 @@ static void func_ov036_021a4944(FieldEffectTask *task, void *work) {
     pos.y -= offset.y;
     pos.z -= offset.z;
     pos.y += namiTask->bob - FX32_ONE;
-    func_ov036_021a3ae8(task, &pos);
+    FieldEffects_SetObjectPos(task, &pos);
     if (namiTask->mode == 2 || namiTask->hideWake == TRUE) {
         NamipokeWake *wake = &namiTask->wake;
 
@@ -502,7 +502,7 @@ static void func_ov036_021a4944(FieldEffectTask *task, void *work) {
         fx32 distance;
         fx32 scale;
 
-        FieldG3DObjSystem_StepObjAnmLoop(func_ov036_021a3724(namiTask->params.namipoke->effects), wake->objIdx,
+        FieldG3DObjSystem_StepObjAnmLoop(FieldEffects_GetFieldMapData(namiTask->params.namipoke->effects), wake->objIdx,
                                          FX32_ONE);
         CopyActorWPos(namiTask->params.actor, &actorPos);
         if (namiTask->dir != wake->dir) {
@@ -537,7 +537,7 @@ static void func_ov036_021a4944(FieldEffectTask *task, void *work) {
             wake->pos.x = actorPos.x - FX_Mul(forward.x, WAKE_MAX_DISTANCE);
             wake->pos.z = actorPos.z - FX_Mul(forward.z, WAKE_MAX_DISTANCE);
         }
-        scale = func_ov036_021a4530(distance);
+        scale = FldeffNamipoke_GetWakeScale(distance);
         if (scale <= WAKE_MIN_SCALE) {
             wake->hidden = TRUE;
         } else {
@@ -550,7 +550,7 @@ static void func_ov036_021a4944(FieldEffectTask *task, void *work) {
     }
 }
 
-static void func_ov036_021a4bc0(FieldEffectTask *task, void *work) {
+static void FldeffNamipoke_DrawRail(FieldEffectTask *task, void *work) {
     VecFx32 forward;
     VecFx32 back;
     MtxFx33 pokeRotation;
@@ -561,7 +561,7 @@ static void func_ov036_021a4bc0(FieldEffectTask *task, void *work) {
     NamipokeTask *namiTask = work;
     NamipokeWake *wake = &namiTask->wake;
 
-    func_ov036_02195a78(namiTask->params.actor, namiTask->dir, &dir);
+    RailActor_GetDrawOffsetByDir(namiTask->params.actor, namiTask->dir, &dir);
     forward.x = dir.x;
     forward.y = 0;
     forward.z = dir.z;
@@ -570,43 +570,43 @@ static void func_ov036_021a4bc0(FieldEffectTask *task, void *work) {
     back.z = -dir.z;
     MAT3_RotationDir(&forward, &pokeRotation);
     MAT3_RotationDir(&back, &wakeRotation);
-    objSys = func_ov036_021a3724(namiTask->params.namipoke->effects);
+    objSys = FieldEffects_GetFieldMapData(namiTask->params.namipoke->effects);
     transform = FieldG3DObjSystem_GetObjTransform(objSys, namiTask->objIdx);
     transform->rotation = pokeRotation;
-    func_ov036_021a3ad4(task, &transform->translation);
+    FieldEffects_GetObjectPos(task, &transform->translation);
     if (namiTask->wake.hidden == FALSE) {
-        func_ov036_021c0154(objSys, wake->objIdx, FALSE);
+        FieldG3DObjSystem_SetObjectHidden(objSys, wake->objIdx, FALSE);
         transform = FieldG3DObjSystem_GetObjTransform(objSys, wake->objIdx);
         transform->rotation = wakeRotation;
-        func_ov036_021a3ad4(task, &transform->translation);
+        FieldEffects_GetObjectPos(task, &transform->translation);
         transform->translation.x += wake->offset.x - FX_Mul(forward.x, FX32_CONST(14));
         transform->translation.y += wake->offset.y - FX32_CONST(4) - FX_Mul(forward.y, FX32_CONST(14));
         transform->translation.z += wake->offset.z - FX_Mul(forward.z, FX32_CONST(14));
         transform->scale = wake->scale;
     } else {
-        func_ov036_021c0154(objSys, wake->objIdx, TRUE);
+        FieldG3DObjSystem_SetObjectHidden(objSys, wake->objIdx, TRUE);
     }
     FieldG3DObjSystem_DrawObj(objSys, namiTask->objIdx);
     FieldG3DObjSystem_DrawObj(objSys, wake->objIdx);
 }
 
-void *func_ov036_021a4d20(FieldEffects *effects, HeapID heapId) {
+void *FldeffNamipokeSplash_Create(FieldEffects *effects, HeapID heapId) {
     FieldEffectNamipokeSplash *splash =
         GFL_HeapAllocate(heapId, sizeof(FieldEffectNamipokeSplash), TRUE, "fldeff_namipoke.c", 975);
 
     splash->effects = effects;
-    func_ov036_021a4d5c(splash);
+    FldeffNamipokeSplash_LoadResources(splash);
     return splash;
 }
 
 void func_ov036_021a4d48(FieldEffects *effects, void *data) {
-    func_ov036_021a4e7c(data);
+    FldeffNamipokeSplash_FreeResources(data);
     GFL_HeapFree(data);
 }
 
-static void func_ov036_021a4d5c(FieldEffectNamipokeSplash *splash) {
+static void FldeffNamipokeSplash_LoadResources(FieldEffectNamipokeSplash *splash) {
     FieldG3DObjResRequest request;
-    FieldG3DObjSystem *objSys = func_ov036_021a3724(splash->effects);
+    FieldG3DObjSystem *objSys = FieldEffects_GetFieldMapData(splash->effects);
     ArcTool *arc = FieldEffects_GetArc(splash->effects);
 
     FieldG3DObjResRequest_Clear(&request);
@@ -645,8 +645,8 @@ static void func_ov036_021a4d5c(FieldEffectNamipokeSplash *splash) {
     splash->resGroup4 = FieldG3DObjSystem_AddResGroup(objSys, &request, FALSE);
 }
 
-static void func_ov036_021a4e7c(FieldEffectNamipokeSplash *splash) {
-    FieldG3DObjSystem *objSys = func_ov036_021a3724(splash->effects);
+static void FldeffNamipokeSplash_FreeResources(FieldEffectNamipokeSplash *splash) {
+    FieldG3DObjSystem *objSys = FieldEffects_GetFieldMapData(splash->effects);
 
     FieldG3DObjSystem_FreeResGroup(objSys, splash->resGroup0);
     FieldG3DObjSystem_FreeResGroup(objSys, splash->resGroup1);
@@ -655,7 +655,7 @@ static void func_ov036_021a4e7c(FieldEffectNamipokeSplash *splash) {
     FieldG3DObjSystem_FreeResGroup(objSys, splash->resGroup4);
 }
 
-FieldEffectTask *func_ov036_021a4eb0(FieldEffects *effects, u32 kind, FieldEffectTask *parent) {
+FieldEffectTask *FldeffNamipokeSplash_StartOnEffect(FieldEffects *effects, u32 kind, FieldEffectTask *parent) {
     SplashTaskParams params;
 
     params.splash = FieldEffects_GetHandleData(effects, 8);
@@ -665,7 +665,7 @@ FieldEffectTask *func_ov036_021a4eb0(FieldEffects *effects, u32 kind, FieldEffec
     return FieldEffects_TCBCreate(effects, &SPLASH_TASK_VTABLE, NULL, 0, &params, 1);
 }
 
-FieldEffectTask *func_ov036_021a4ee4(FieldEffects *effects, u32 kind, const VecFx32 *pos) {
+FieldEffectTask *FldeffNamipokeSplash_StartAtPos(FieldEffects *effects, u32 kind, const VecFx32 *pos) {
     SplashTaskParams params;
 
     params.splash = FieldEffects_GetHandleData(effects, 8);
@@ -675,22 +675,22 @@ FieldEffectTask *func_ov036_021a4ee4(FieldEffects *effects, u32 kind, const VecF
     return FieldEffects_TCBCreate(effects, &SPLASH_TASK_VTABLE, pos, 0, &params, 1);
 }
 
-BOOL func_ov036_021a4f18(FieldEffectTask *task) {
+BOOL FldeffNamipokeSplash_IsFinished(FieldEffectTask *task) {
     if (task != NULL) {
-        SplashTask *splashTask = func_ov036_021a3afc(task);
+        SplashTask *splashTask = FieldEffects_GetObjectWork(task);
 
         return splashTask->animEnded;
     }
     return TRUE;
 }
 
-static void func_ov036_021a4f2c(FieldEffectTask *task, void *work) {
+static void FldeffNamipokeSplash_Init(FieldEffectTask *task, void *work) {
     SplashTask *splashTask = work;
-    SplashTaskParams *params = func_ov036_021a3ac8(task);
+    SplashTaskParams *params = FieldEffects_GetObjectParam(task);
     FieldG3DObjSystem *objSys;
 
     splashTask->params = *params;
-    objSys = func_ov036_021a3724(splashTask->params.splash->effects);
+    objSys = FieldEffects_GetFieldMapData(splashTask->params.splash->effects);
     switch (splashTask->params.kind) {
     case 0:
         splashTask->objIdx = FieldG3DObjSystem_AddObj(objSys, splashTask->params.splash->resGroup0, 0, NULL);
@@ -715,31 +715,31 @@ static void func_ov036_021a4f2c(FieldEffectTask *task, void *work) {
         };
 
         splashTask->offset = offsets[splashTask->params.kind];
-        func_ov036_021a3ad4(splashTask->params.parent, &pos);
+        FieldEffects_GetObjectPos(splashTask->params.parent, &pos);
         pos.x += splashTask->offset.x;
         pos.y += splashTask->offset.y;
         pos.z += splashTask->offset.z;
-        func_ov036_021a3ae8(task, &pos);
+        FieldEffects_SetObjectPos(task, &pos);
     }
 }
 
-static void func_ov036_021a4ff0(FieldEffectTask *task, void *work) {
+static void FldeffNamipokeSplash_Exit(FieldEffectTask *task, void *work) {
     SplashTask *splashTask = work;
 
-    FieldG3DObjSystem_FreeObj(func_ov036_021a3724(splashTask->params.splash->effects), splashTask->objIdx);
+    FieldG3DObjSystem_FreeObj(FieldEffects_GetFieldMapData(splashTask->params.splash->effects), splashTask->objIdx);
 }
 
 // Play the animation, once for kind 0 and over and over for the others, and follow the Pokémon
-static void func_ov036_021a5004(FieldEffectTask *task, void *work) {
+static void FldeffNamipokeSplash_Update(FieldEffectTask *task, void *work) {
     VecFx32 pos;
     SplashTask *splashTask = work;
     FieldG3DObjSystem *objSys;
 
     if (splashTask->animEnded == TRUE && splashTask->params.endWithAnim == TRUE) {
-        func_ov036_021a3a70(task);
+        FieldEffects_DeleteObject(task);
         return;
     }
-    objSys = func_ov036_021a3724(splashTask->params.splash->effects);
+    objSys = FieldEffects_GetFieldMapData(splashTask->params.splash->effects);
     if (splashTask->params.kind == 0) {
         if (splashTask->animEnded == FALSE && !FieldG3DObjSystem_StepObjAnm(objSys, splashTask->objIdx, FX32_ONE)) {
             splashTask->animEnded = TRUE;
@@ -748,18 +748,18 @@ static void func_ov036_021a5004(FieldEffectTask *task, void *work) {
         FieldG3DObjSystem_StepObjAnmLoop(objSys, splashTask->objIdx, FX32_ONE);
     }
     if (splashTask->params.parent != NULL) {
-        func_ov036_021a3ad4(splashTask->params.parent, &pos);
+        FieldEffects_GetObjectPos(splashTask->params.parent, &pos);
         pos.x += splashTask->offset.x;
         pos.y += splashTask->offset.y;
         pos.z += splashTask->offset.z;
-        func_ov036_021a3ae8(task, &pos);
+        FieldEffects_SetObjectPos(task, &pos);
     }
 }
 
-static void func_ov036_021a5084(FieldEffectTask *task, void *work) {
+static void FldeffNamipokeSplash_Draw(FieldEffectTask *task, void *work) {
     SplashTask *splashTask = work;
-    SRTMatrix *transform =
-        FieldG3DObjSystem_GetObjTransform(func_ov036_021a3724(splashTask->params.splash->effects), splashTask->objIdx);
+    SRTMatrix *transform = FieldG3DObjSystem_GetObjTransform(
+        FieldEffects_GetFieldMapData(splashTask->params.splash->effects), splashTask->objIdx);
 
-    func_ov036_021a3ad4(task, &transform->translation);
+    FieldEffects_GetObjectPos(task, &transform->translation);
 }

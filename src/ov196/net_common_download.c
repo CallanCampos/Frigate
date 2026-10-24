@@ -51,7 +51,7 @@ struct NetCommonDownload {
     u32 update;
     u32 state;
     NetCommonDownloadSession session;
-    void *beacon;
+    DeliveryBeaconWork *beacon;
     BOOL stopBeacon;
     NetCommonDownloadHandler handler;
     union {

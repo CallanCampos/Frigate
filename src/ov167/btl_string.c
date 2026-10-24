@@ -56,7 +56,7 @@ static void FormatStatChange(StrBuf *strbuf, u16 message, const u32 *args);
 static void FormatStatLimit(StrBuf *strbuf, u16 message, const u32 *args);
 static void FormatClientSideMsg(StrBuf *strbuf, u16 message, const u32 *args);
 static void func_ov167_021d5778(StrBuf *strbuf, u16 message, const u32 *args);
-static void func_ov167_021d57b8(StrBuf *strbuf, u16 message, const u32 *args);
+static void BtlString_BuildTrainerStringBody(StrBuf *strbuf, u16 message, const u32 *args);
 
 // The message files, in the order of BtlStringWork's msgData
 static const u16 sMsgFiles[] = { 0x13, 0x12, 0x10, 0x14, 0x176, 0x191, 0x1b8, 0x178, 0x197 };
@@ -550,10 +550,10 @@ static void func_ov167_021d5778(StrBuf *strbuf, u16 message, const u32 *args) {
 }
 
 void func_ov167_021d57b0(StrBuf *strbuf, u16 message, const u32 *args) {
-    func_ov167_021d57b8(strbuf, message, args);
+    BtlString_BuildTrainerStringBody(strbuf, message, args);
 }
 
-static void func_ov167_021d57b8(StrBuf *strbuf, u16 message, const u32 *args) {
+static void BtlString_BuildTrainerStringBody(StrBuf *strbuf, u16 message, const u32 *args) {
     GFL_MsgDataLoadStrbuf(sWork.msgData[6], message, sWork.strbuf);
     RegisterArgWords(sWork.strbuf, args, sWork.wordSet);
     GFL_WordSetFormatStrbuf(sWork.wordSet, strbuf, sWork.strbuf);

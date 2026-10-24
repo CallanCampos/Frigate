@@ -31,7 +31,7 @@ struct Field {
     FieldMsgBG *msgBGSys;
     MoneyWin *moneyWin;
     PlaceName *placeName;
-    void *unk34;
+    FieldFMissionInfo *fmissionInfo;
     FesGimmick *fesGimmick;
     FieldExpObjSystem *expObjSystem;
     MMSys *actorSystem;
@@ -44,13 +44,13 @@ struct Field {
     FieldPlayer *player;
     EncountSystem *encountSystem;
     FieldEffects *fieldEffects;
-    void *unkA0;
+    UnionEffect *unionEffect;
     FieldPalaceSys *palaceSys;
     FieldColorPostFX colorPostFX;
     FieldSkillMapEff *skillMapEff;
     G3DCamera *g3dCamera;
     G3DLight *g3dLights;
-    void *asyncActorMatLoadTCB;
+    TCB *asyncActorMatLoadTCB;
     BlActSys *actorBlAct;
     BlActSys *effectBlAct;
     BlActSys *wildEffectBlAct;
@@ -70,6 +70,7 @@ struct Field {
     fx32 actorYOffset;
     fx32 objectProjectionMatrixOffset;
     const FieldmapCtrlVTable *ctrlVTable;
+    // The vtable's kind's controller: a FieldmapCtrlGrid, FieldmapCtrlNoGrid or FieldmapCtrlHybrid
     void *controller;
     TCBManager *tcbManager;
     void *tcbManagerHeap;
@@ -84,14 +85,15 @@ struct Field {
     EncEff *encEff;
     BOOL effectRunningFlag;
     BOOL seasonBannerOverdrawFlag;
-    void *nDemoData;
-    void *dispControl;
+    // The face-up of the scenes with N (fld_faceup.c)
+    FaceUpWork *nDemoData;
+    FieldDispControl *dispControl;
     CasteliaRush *casteliaRush;
     FieldLensFlare *lensFlare;
 };
 
-void *func_ov036_0218051c(Field *field);
-void func_ov036_02180fe4(FieldGimmickWorkBlock *block);
+UnionEffect *Field_GetUnionEff(Field *field);
+void Field_InitCommonWork(FieldGimmickWorkBlock *block);
 
 // The memory of the field's heap 0x89, in overlay 36's .bss (which file defines it isn't known yet)
 extern u8 g_FieldHeapMemory[0x10000];

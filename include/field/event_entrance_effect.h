@@ -9,9 +9,9 @@
 #include "struct_decls.h"
 
 // The position in front of the player, where an entrance the player walks into stands
-void func_ov036_0219f178(Field *field, VecFx32 *pos);
+void EntranceEffect_GetEntryPos(Field *field, VecFx32 *pos);
 // The events of the warp's entrance as the player comes out of it and goes into it
-GameEvent *func_ov036_0219f190(WarpSequence *warp);
-GameEvent *func_ov036_0219f4e0(WarpSequence *warp);
+GameEvent *EntranceEffect_CreateA(WarpSequence *warp);
+GameEvent *EntranceEffect_CreateB(WarpSequence *warp);
 
 #endif // POKEBW2_FIELD_EVENT_ENTRANCE_EFFECT_H

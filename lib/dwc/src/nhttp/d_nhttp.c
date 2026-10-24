@@ -130,9 +130,10 @@ int NHTTPSetBasicAuthorization(int connection, const char *user, const char *pas
         NHTTPi_memcpy(text + userLength, ":", 1);
         NHTTPi_memcpy(text + (userLength + 1), password, passwordLength);
         request->authorizationSize = NHTTPi_Base64Encode(request->authorization, text);
-        return 0;
+    } else {
+        return -1;
     }
-    return -1;
+    return 0;
 }
 
 int NHTTPSetRootCA(int connection, void *certificates, int count) {

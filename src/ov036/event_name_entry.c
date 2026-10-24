@@ -101,7 +101,8 @@ static GameEventReturnCode PokeNameEntry_Callback(GameEvent *event, u32 *state, 
 
     switch (*state) {
     case 0:
-        GameEvent_ChainNext(event, func_ov036_021bf890(work->gsys, work->field, work->nameEntry, work->transition));
+        GameEvent_ChainNext(
+            event, ReturnToField_CreateNameInEvent(work->gsys, work->field, work->nameEntry, work->transition));
         (*state)++;
         break;
     case 1:
@@ -151,12 +152,12 @@ GameEvent *JoinAvenueNameEntry_Create(u16 target, GameSystem *gsys, u16 *result,
     default:
         mode = NAME_ENTRY_AVENUE_NAME;
         maxLength = 10;
-        JoinAvenue_GetParam(info, 0, buffer);
+        JoinAvenue_GetParam(info, JOIN_AVE_INFO_NAME, buffer);
         break;
     case 1:
         mode = NAME_ENTRY_AVENUE_TITLE;
         maxLength = 10;
-        JoinAvenue_GetParam(info, 1, buffer);
+        JoinAvenue_GetParam(info, JOIN_AVE_INFO_TITLE, buffer);
         break;
     case 2:
         mode = NAME_ENTRY_FAVORITE_PHRASE;
@@ -196,7 +197,7 @@ static GameEventReturnCode JoinAvenueNameEntry_Callback(GameEvent *event, u32 *s
 
     switch (*state) {
     case 0:
-        GameEvent_ChainNext(event, func_ov036_021bf890(work->gsys, work->field, work->nameEntry, TRUE));
+        GameEvent_ChainNext(event, ReturnToField_CreateNameInEvent(work->gsys, work->field, work->nameEntry, TRUE));
         (*state)++;
         break;
     case 1:
@@ -209,10 +210,10 @@ static GameEventReturnCode JoinAvenueNameEntry_Callback(GameEvent *event, u32 *s
 
             switch (work->target) {
             case 0:
-                JoinAvenueInfo_SetParam(info, 0, (uptr)str);
+                JoinAvenueInfo_SetParam(info, JOIN_AVE_INFO_NAME, (uptr)str);
                 break;
             case 1:
-                JoinAvenueInfo_SetParam(info, 1, (uptr)str);
+                JoinAvenueInfo_SetParam(info, JOIN_AVE_INFO_TITLE, (uptr)str);
                 break;
             case 2:
                 JoinAvenuePerson_SetParam(person, JOIN_AVE_PARAM_MESSAGE1, (uptr)str);
@@ -231,7 +232,7 @@ static GameEventReturnCode JoinAvenueNameEntry_Callback(GameEvent *event, u32 *s
             msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_PLACE_NAMES, HEAPID_GAMEEVENT);
             GFL_MsgDataLoadRawStr(msgData, 0x79, name, 0x15);
             GFL_MsgDataFree(msgData);
-            JoinAvenueInfo_SetParam(info, 0, (uptr)name);
+            JoinAvenueInfo_SetParam(info, JOIN_AVE_INFO_NAME, (uptr)name);
         }
         if (work->result != NULL) {
             *work->result = (work->nameEntry->unk1C != 1);
@@ -261,7 +262,7 @@ static GameEventReturnCode RivalNameEntry_Callback(GameEvent *event, u32 *state,
 
     switch (*state) {
     case 0:
-        GameEvent_ChainNext(event, func_ov036_021bf890(work->gsys, work->field, work->nameEntry, TRUE));
+        GameEvent_ChainNext(event, ReturnToField_CreateNameInEvent(work->gsys, work->field, work->nameEntry, TRUE));
         (*state)++;
         break;
     case 1:
@@ -302,7 +303,7 @@ static GameEventReturnCode EventPokeNameWordSetInput_Callback(GameEvent *event, 
 
     switch (*state) {
     case 0:
-        GameEvent_ChainNext(event, func_ov036_021bf890(work->gsys, work->field, work->nameEntry, TRUE));
+        GameEvent_ChainNext(event, ReturnToField_CreateNameInEvent(work->gsys, work->field, work->nameEntry, TRUE));
         (*state)++;
         break;
     case 1:

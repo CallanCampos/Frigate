@@ -243,7 +243,7 @@ void CtvtCamera_Draw(CommTvtWork *sys, CtvtCamera *work) {
             }
             if (work->updateDisplay == TRUE) {
                 work->updateDisplay = FALSE;
-                func_ov257_021aad48(sys);
+                CommTvt_ClearAndTransferNameWindows(sys);
             }
             MIi_CpuClear32(0, G2_GetBG3ScrPtr(), CTVT_SCREEN_SIZE);
             work->redrawAll = FALSE;
@@ -367,7 +367,7 @@ static void CtvtCamera_OnFrame(void *frame, void *data) {
         return;
     }
 
-    if (func_ov257_021aab18(sys) == FALSE) {
+    if (CommTvt_GetViewSwapped(sys) == FALSE) {
         for (y = 0; y < 192; y++) {
             MIi_CpuCopy32((u16 *)frame + y * 256 + 64, work->frameCopy + y * 128, 256);
         }

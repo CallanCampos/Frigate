@@ -475,7 +475,7 @@ GameEventReturnCode EventMapChangeCore_Callback(GameEvent *event, u32 *state, vo
         FieldLensFlare *lensFlare;
         u32 fog;
 
-        FieldStatus_SetBusyFlag(GameData_GetFieldStatus(gameData), 2);
+        FieldStatus_SetBusyFlag(GameData_GetFieldStatus(gameData), FLD_STATUS_BUSY_LOADING);
         lensFlare = Field_GetLensFlare(field);
         fog = GetZoneFogIndexAll(field, wk->spawn.zoneId);
         FieldLensFlare_DecideForZoneTransit(lensFlare, wk->spawn.zoneId, Field_GetPlayerStateZoneID(field), fog);
@@ -759,7 +759,7 @@ GameEventReturnCode EventMapChangeEscapeRope_Callback(GameEvent *event, u32 *sta
         (*state)++;
         break;
     case 5:
-        func_ov036_021b50c8(Field_GetPlaceName(field), wk->spawn.zoneId);
+        PlaceName_OnZoneChange(Field_GetPlaceName(field), wk->spawn.zoneId);
         return GAMEEVENT_DONE;
     }
     return GAMEEVENT_CONTINUE;
@@ -793,12 +793,12 @@ GameEventReturnCode EventMapChangeDig_Callback(GameEvent *event, u32 *state, voi
         (*state)++;
         break;
     case 4:
-        GameEvent_ChainNext(event,
-                            func_ov036_021b95e0(event, gsys, field, wk->seasonChanged, wk->prevSeason, wk->season));
+        GameEvent_ChainNext(event, EventQuicksandArrive_CreateSpinZoomAlt(event, gsys, field, wk->seasonChanged,
+                                                                          wk->prevSeason, wk->season));
         (*state)++;
         break;
     case 5:
-        func_ov036_021b50c8(Field_GetPlaceName(field), wk->spawn.zoneId);
+        PlaceName_OnZoneChange(Field_GetPlaceName(field), wk->spawn.zoneId);
         return GAMEEVENT_DONE;
     }
     return GAMEEVENT_CONTINUE;
@@ -835,7 +835,7 @@ GameEventReturnCode EventMapChangeTeleport_Callback(GameEvent *event, u32 *state
         (*state)++;
         break;
     case 5:
-        func_ov036_021b50c8(Field_GetPlaceName(field), wk->spawn.zoneId);
+        PlaceName_OnZoneChange(Field_GetPlaceName(field), wk->spawn.zoneId);
         return GAMEEVENT_DONE;
     }
     return GAMEEVENT_CONTINUE;
@@ -867,7 +867,7 @@ GameEventReturnCode EventMapChangeDiveOut_Callback(GameEvent *event, u32 *state,
         (*state)++;
         break;
     case 4:
-        func_ov036_021b50c8(Field_GetPlaceName(field), wk->spawn.zoneId);
+        PlaceName_OnZoneChange(Field_GetPlaceName(field), wk->spawn.zoneId);
         return GAMEEVENT_DONE;
     }
     return GAMEEVENT_CONTINUE;
@@ -901,7 +901,7 @@ GameEventReturnCode EventMapChangeDiveIn_Callback(GameEvent *event, u32 *state, 
         (*state)++;
         break;
     case 4:
-        func_ov036_021b50c8(Field_GetPlaceName(field), wk->spawn.zoneId);
+        PlaceName_OnZoneChange(Field_GetPlaceName(field), wk->spawn.zoneId);
         return GAMEEVENT_DONE;
     }
     return GAMEEVENT_CONTINUE;
@@ -920,7 +920,7 @@ GameEventReturnCode EventMapChangeWarpPad_Callback(GameEvent *event, u32 *state,
         (*state)++;
         break;
     case 1:
-        GameEvent_ChainNext(event, func_ov036_021b9df8(event, gsys, field));
+        GameEvent_ChainNext(event, EventDig_CreateRisingSpin(event, gsys, field));
         (*state)++;
         break;
     case 2:
@@ -934,7 +934,7 @@ GameEventReturnCode EventMapChangeWarpPad_Callback(GameEvent *event, u32 *state,
         (*state)++;
         break;
     case 4:
-        func_ov036_021b50c8(Field_GetPlaceName(field), wk->spawn.zoneId);
+        PlaceName_OnZoneChange(Field_GetPlaceName(field), wk->spawn.zoneId);
         return GAMEEVENT_DONE;
     }
     return GAMEEVENT_CONTINUE;
@@ -1015,7 +1015,7 @@ void InitMapChangeEvent(EventMapChange *wk, GameSystem *gsys) {
     wk->seasonChanged = FALSE;
     wk->prevSeason = season;
     wk->season = season;
-    func_ov036_021a2398(Field_GetEncountSystem(wk->field), 1);
+    EffectEncount_SetEffectPaused(Field_GetEncountSystem(wk->field), 1);
 }
 
 GameEvent *EventMapChangeWarp_CreateGrid(GameSystem *gsys, Field *field, u16 zoneId, const VecFx32 *pos, u16 dir,
@@ -1065,7 +1065,7 @@ GameEvent *EventMapChangeQuicksand_Create(GameSystem *gsys, Field *field, const 
     EventMapChange *wk = GameEvent_GetData(event);
 
     InitMapChangeEvent(wk, gsys);
-    CreateZoneChangeData(&wk->spawn, zoneId, 1, pos->x, pos->y, pos->z);
+    CreateZoneChangeData(&wk->spawn, zoneId, WARP_DIR_UP, pos->x, pos->y, pos->z);
     VEC_Set(&wk->unk34, effectPos->x, effectPos->y, effectPos->z);
     wk->unk2C = 0;
     return event;
@@ -1218,7 +1218,7 @@ void EventEntralinkWarp_CreateReturnLocation(ZoneSpawnInfo *spawn, Field *field)
     } else {
         RailPosition railPos;
 
-        func_ov036_0219ad24(player, &railPos);
+        FieldPlayer_GetNogridNextRailLocation(player, &railPos);
         CreateZoneChangeDataRail(spawn, Field_GetPlayerStateZoneID(field), WARP_DIR_DOWN, railPos.componentId,
                                  railPos.posFront, railPos.posSide);
     }
@@ -1248,7 +1248,7 @@ GameEvent *EventMapChangeWarp_CreateFromEntity(GameSystem *gsys, Field *field, Z
         GameData_SetEscapeRopeZone(gameData, remember);
     }
     GameData_UpdateEscapeRopeZone(gameData, &wk->spawn);
-    FieldStatus_SetBusyFlag(GameData_GetFieldStatus(gameData), 2);
+    FieldStatus_SetBusyFlag(GameData_GetFieldStatus(gameData), FLD_STATUS_BUSY_LOADING);
     return event;
 }
 
@@ -1474,8 +1474,8 @@ void GameData_UpdateJoinAvenueForZone(GameData *gameData, u16 zoneId) {
     }
 
     if (IsZoneJoinAvenue(zoneId)) {
-        u16 param =
-            JoinAvenue_GetParam(JoinAvenue_GetInfo(SaveControl_GetJoinAvenue(GameData_GetSaveControl(gameData))), 5, 0);
+        u16 param = JoinAvenue_GetParam(
+            JoinAvenue_GetInfo(SaveControl_GetJoinAvenue(GameData_GetSaveControl(gameData))), JOIN_AVE_INFO_SEASON, 0);
         GameData_SetJoinAvenueSeason(gameData, param);
         JoinAvenue_RecordActivity(0x18);
     }
@@ -1520,9 +1520,9 @@ void GameData_UpdateFlashStatus(GameData *gameData, u16 zoneId) {
     FieldStatus *status = GameData_GetFieldStatus(gameData);
     u32 flags = GetZoneFlashFlags(zoneId);
 
-    if ((flags & 1) && FieldStatus_CheckFlashUsed(status)) {
-        flags &= ~1;
-        flags |= 2;
+    if ((flags & FLD_FLASH_ALLOW) && FieldStatus_CheckFlashUsed(status)) {
+        flags &= ~FLD_FLASH_ALLOW;
+        flags |= FLD_FLASH_ACTIVE;
     }
     FieldStatus_SetFlashPerms(status, flags);
 }
@@ -1640,7 +1640,7 @@ GameEventReturnCode EventEntralinkWarp_Callback(GameEvent *event, u32 *state, vo
 
     switch (*state) {
     case 0:
-        func_ov036_021b5168(Field_GetPlaceName(field));
+        PlaceName_Cancel(Field_GetPlaceName(field));
         if (wk->festMissionStatus != 0) {
             GFL_SndSEPlay(SEQ_SE_FLD_131);
             GameEvent_ChainNext(event, CallFieldMapEntranceOutTransition(gsys, field, 1, 0, 4));
@@ -1664,9 +1664,9 @@ GameEventReturnCode EventEntralinkWarp_Callback(GameEvent *event, u32 *state, vo
     }
     case 2:
         if (wk->festMissionStatus != 0) {
-            GameEvent_ChainNext(event, func_ov036_021b8850(gsys, field, 1, 0, 2));
+            GameEvent_ChainNext(event, EventGameTransition_CreateFadeInEventWithBgRestore(gsys, field, 1, 0, 2));
         } else {
-            GameEvent_ChainNext(event, func_ov036_021b8850(gsys, field, 0, 0, 2));
+            GameEvent_ChainNext(event, EventGameTransition_CreateFadeInEventWithBgRestore(gsys, field, 0, 0, 2));
         }
         (*state)++;
         break;

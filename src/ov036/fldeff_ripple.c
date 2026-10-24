@@ -78,7 +78,7 @@ static void FieldEffectRipple_FreeMaterial(FieldEffectRipple *ripple) {
 }
 
 // Start a ripple at the actor's feet, further back if big, and at its first tile if atInit
-void func_ov036_021be828(void *effects, FieldActor *actor, u32 big, u32 atInit) {
+void func_ov036_021be828(FieldEffects *effects, FieldActor *actor, u32 big, u32 atInit) {
     VecFx32 pos;
     RippleTaskParams params;
     GridPos gpos;
@@ -107,13 +107,13 @@ void func_ov036_021be828(void *effects, FieldActor *actor, u32 big, u32 atInit) 
 
 static void RippleTask_Init(FieldEffectTask *task, void *work) {
     RippleTask *rippleTask = work;
-    RippleTaskParams *params = func_ov036_021a3ac8(task);
+    RippleTaskParams *params = FieldEffects_GetObjectParam(task);
     BlActActorRequest request;
     BlActSys *blact;
     u16 actorIndex;
 
     rippleTask->ripple = params->ripple;
-    func_ov036_021a3ae8(task, &params->pos);
+    FieldEffects_SetObjectPos(task, &params->pos);
     blact = rippleTask->ripple->blact;
     request.texMat = rippleTask->ripple->matIndex;
     request.scaleX = FX32_CONST(1);
@@ -126,7 +126,7 @@ static void RippleTask_Init(FieldEffectTask *task, void *work) {
     request.callbackData = rippleTask;
     rippleTask->actorIndex = BlActSys_ExecActorRequests(blact, 0, &request, 1, 3);
     if (rippleTask->actorIndex == 0xffff) {
-        func_ov036_021a3a70(task);
+        FieldEffects_DeleteObject(task);
         return;
     }
     BlActSys_SetActorAnims(blact, rippleTask->actorIndex, RIPPLE_ANIMS, 1);
@@ -150,7 +150,7 @@ static void RippleTask_Update(FieldEffectTask *task, void *work) {
     u16 cmd;
 
     if (BlActSys_GetActorLastCmd(rippleTask->ripple->blact, rippleTask->actorIndex, &cmd)) {
-        func_ov036_021a3a70(task);
+        FieldEffects_DeleteObject(task);
     }
 }
 

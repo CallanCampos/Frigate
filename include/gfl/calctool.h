@@ -30,9 +30,11 @@ struct CalcHitResult {
 
 // A 2D affine matrix that rotates by a 16-bit angle and scales by the inverse of a scale on each axis, as a BG's
 // matrix maps the screen to the BG. MAT2_ROT_* says how the angle is given
-#define MAT2_ROT_IDX 0 // a 16-bit angle, 0x10000 for a full turn
-#define MAT2_ROT_256 1 // 256 for a full turn
-#define MAT2_ROT_DEG 2 // degrees
+enum {
+    MAT2_ROT_IDX, // a 16-bit angle, 0x10000 for a full turn
+    MAT2_ROT_256, // 256 for a full turn
+    MAT2_ROT_DEG, // degrees
+};
 void MAT2_SetScaleRot(MtxFx22 *mtx, u16 rotation, fx32 scaleX, fx32 scaleY, u8 rotationMode);
 void CalcSphere_Set(CalcSphere *sphere, const VecFx32 *center, fx32 radius);
 // Returns whether a capsule touches a sphere, and, if result is not NULL, the distance and direction between them

@@ -1446,7 +1446,7 @@ sMeFirstExcludedMoves kind:data(any) addr:0x0689e4a4
 sUncallableMoves kind:data(any) addr:0x0689e4b8
 sSleepTalkExcludedMoves kind:data(any) addr:0x0689e4ce
 sEffectIds kind:data(any) addr:0x0689e4e4
-data_ov169_0689e4fc kind:data(any) addr:0x0689e4fc
+sConditions kind:data(any) addr:0x0689e4fc
 sArceusPlates kind:data(any) addr:0x0689e514
 sCopycatExcludedMoves kind:data(any) addr:0x0689e534
 sAssistExcludedMoves kind:data(any) addr:0x0689e55c

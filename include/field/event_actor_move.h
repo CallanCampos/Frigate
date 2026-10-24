@@ -9,7 +9,7 @@
 #include "system/game_event.h"
 
 struct EventActorJumpWork {
-    void *effects;
+    FieldEffects *effects;
     FieldActor *actor;
     s16 frame;
     u16 pad0A;

@@ -29,15 +29,15 @@ typedef struct {
 
 typedef struct {
     G3DActor *actor;
-    void *anms[4];
+    G3DAnimation *anms[4];
     G3DModel *mdl;
 } EncountEffectObj;
 
 typedef struct {
     FieldEffects *effects;
     u32 unk04;
-    void *mdlRes[4];
-    void *anmRes[4];
+    G3DResource *mdlRes[4];
+    G3DResource *anmRes[4];
     EncountEffectObj objs[4];
     EncountEffectSpec spec;
 } FieldEffectEncount;
@@ -65,12 +65,12 @@ typedef struct {
     EncountSystem *system;
 } EncountTask;
 
-static void *func_ov036_021a5100(FieldEffects *effects, HeapID heapId, u32 kind);
-static void func_ov036_021a5130(FieldEffectEncount *effect, u32 kind);
+static FieldEffectEncount *EncountTask_Create(FieldEffects *effects, HeapID heapId, u32 kind);
+static void EncountTask_LoadKind(FieldEffectEncount *effect, u32 kind);
 static void EncountEffectObj_Create(EncountEffectObj *obj, FieldEffectEncount *effect, u8 variant);
 static void EncountEffectObj_Free(EncountEffectObj *obj, FieldEffectEncount *effect);
-static void func_ov036_021a5228(FieldEffectEncount *effect, EncountEffectSpec *spec, ArcTool *arc);
-static void func_ov036_021a52b8(FieldEffectEncount *effect, EncountEffectSpec *spec, ArcTool *arc);
+static void EncountTask_LoadKind0Models(FieldEffectEncount *effect, EncountEffectSpec *spec, ArcTool *arc);
+static void EncountTask_LoadModels(FieldEffectEncount *effect, EncountEffectSpec *spec, ArcTool *arc);
 static void EncountEffect_FreeResources(FieldEffectEncount *effect);
 static void EncountTask_Init(FieldEffectTask *task, void *work);
 static void func_ov036_021a54f8(FieldEffectTask *task, void *work);
@@ -108,27 +108,27 @@ static EncountEffectSpec ENCOUNT_EFFECT_SPECS[6] = {
 // clang-format on
 
 void *func_ov036_021a50a4(FieldEffects *effects, HeapID heapId) {
-    return func_ov036_021a5100(effects, heapId, 0);
+    return EncountTask_Create(effects, heapId, 0);
 }
 
 void *func_ov036_021a50b0(FieldEffects *effects, HeapID heapId) {
-    return func_ov036_021a5100(effects, heapId, 1);
+    return EncountTask_Create(effects, heapId, 1);
 }
 
 void *func_ov036_021a50bc(FieldEffects *effects, HeapID heapId) {
-    return func_ov036_021a5100(effects, heapId, 2);
+    return EncountTask_Create(effects, heapId, 2);
 }
 
 void *func_ov036_021a50c8(FieldEffects *effects, HeapID heapId) {
-    return func_ov036_021a5100(effects, heapId, 3);
+    return EncountTask_Create(effects, heapId, 3);
 }
 
 void *func_ov036_021a50d4(FieldEffects *effects, HeapID heapId) {
-    return func_ov036_021a5100(effects, heapId, 4);
+    return EncountTask_Create(effects, heapId, 4);
 }
 
 void *func_ov036_021a50e0(FieldEffects *effects, HeapID heapId) {
-    return func_ov036_021a5100(effects, heapId, 5);
+    return EncountTask_Create(effects, heapId, 5);
 }
 
 void func_ov036_021a50ec(FieldEffects *effects, void *data) {
@@ -136,23 +136,23 @@ void func_ov036_021a50ec(FieldEffects *effects, void *data) {
     GFL_HeapFree(data);
 }
 
-static void *func_ov036_021a5100(FieldEffects *effects, HeapID heapId, u32 kind) {
+static FieldEffectEncount *EncountTask_Create(FieldEffects *effects, HeapID heapId, u32 kind) {
     FieldEffectEncount *effect = GFL_HeapAllocate(heapId, sizeof(FieldEffectEncount), TRUE, "fldeff_encount.c", 286);
 
     effect->effects = effects;
-    func_ov036_021a5130(effect, kind);
+    EncountTask_LoadKind(effect, kind);
     return effect;
 }
 
-static void func_ov036_021a5130(FieldEffectEncount *effect, u32 kind) {
+static void EncountTask_LoadKind(FieldEffectEncount *effect, u32 kind) {
     ArcTool *arc;
 
     effect->spec = ENCOUNT_EFFECT_SPECS[kind];
     arc = FieldEffects_GetArc(effect->effects);
     if (kind == 0) {
-        func_ov036_021a5228(effect, &effect->spec, arc);
+        EncountTask_LoadKind0Models(effect, &effect->spec, arc);
     } else {
-        func_ov036_021a52b8(effect, &effect->spec, arc);
+        EncountTask_LoadModels(effect, &effect->spec, arc);
     }
 }
 
@@ -180,7 +180,7 @@ static void EncountEffectObj_Free(EncountEffectObj *obj, FieldEffectEncount *eff
 }
 
 // The grass of the first kind: this season's, the next variant's, and the first
-static void func_ov036_021a5228(FieldEffectEncount *effect, EncountEffectSpec *spec, ArcTool *arc) {
+static void EncountTask_LoadKind0Models(FieldEffectEncount *effect, EncountEffectSpec *spec, ArcTool *arc) {
     u32 season = FieldEffects_GetSeason(effect->effects);
 
     effect->mdlRes[0] = GFL_G3DSysReadArcToolResource(arc, spec->mdlId + season);
@@ -198,7 +198,7 @@ static void func_ov036_021a5228(FieldEffectEncount *effect, EncountEffectSpec *s
     EncountEffectObj_Create(&effect->objs[2], effect, 2);
 }
 
-static void func_ov036_021a52b8(FieldEffectEncount *effect, EncountEffectSpec *spec, ArcTool *arc) {
+static void EncountTask_LoadModels(FieldEffectEncount *effect, EncountEffectSpec *spec, ArcTool *arc) {
     int i;
     int j;
     u32 offset = 0;
@@ -236,8 +236,7 @@ static void EncountEffect_FreeResources(FieldEffectEncount *effect) {
 }
 
 // Start the phenomenon of the given kind on the tile, unless the controls are of another type
-FieldEffectTask *func_ov036_021a53f8(EncountSystem *system, FieldEffects *effects, u16 x, u16 z, fx32 height,
-                                     u32 kind) {
+FieldEffectTask *EncountTask_Start(EncountSystem *system, FieldEffects *effects, u16 x, u16 z, fx32 height, u32 kind) {
     Field *field = FieldEffects_GetField(effects);
     u32 effectIndex;
     FieldEffectEncount *effect;
@@ -269,17 +268,17 @@ FieldEffectTask *func_ov036_021a53f8(EncountSystem *system, FieldEffects *effect
     return FieldEffects_TCBCreate(effects, &ENCOUNT_TASK_VTABLE, NULL, TRUE, &params, 0);
 }
 
-void func_ov036_021a5498(FieldEffectTask *task, BOOL paused) {
+void EncountTask_SetPaused(FieldEffectTask *task, BOOL paused) {
     if (task != NULL) {
-        EncountTask *encountTask = func_ov036_021a3afc(task);
+        EncountTask *encountTask = FieldEffects_GetObjectWork(task);
 
         encountTask->paused = paused;
     }
 }
 
-void func_ov036_021a54a8(FieldEffectTask *task, BOOL hidden) {
+void EncountTask_SetDrawHidden(FieldEffectTask *task, BOOL hidden) {
     if (task != NULL) {
-        EncountTask *encountTask = func_ov036_021a3afc(task);
+        EncountTask *encountTask = FieldEffects_GetObjectWork(task);
 
         encountTask->hidden = hidden;
     }
@@ -287,15 +286,15 @@ void func_ov036_021a54a8(FieldEffectTask *task, BOOL hidden) {
 
 static void EncountTask_Init(FieldEffectTask *task, void *work) {
     EncountTask *encountTask = work;
-    EncountTaskParams *params = func_ov036_021a3ac8(task);
+    EncountTaskParams *params = FieldEffects_GetObjectParam(task);
 
     encountTask->system = params->system;
     encountTask->params = *params;
-    func_ov036_021a3ae8(task, &params->pos);
-    if (func_ov036_021a3abc(task) == FALSE) {
+    FieldEffects_SetObjectPos(task, &params->pos);
+    if (FieldEffects_GetObjectMode(task) == FALSE) {
         encountTask->unk00 = 1;
     }
-    func_ov036_021a3a94(task);
+    FieldEffects_UpdateObject(task);
 }
 
 static void func_ov036_021a54f8(FieldEffectTask *task, void *work) {
@@ -320,7 +319,7 @@ static void EncountTask_PlaySound(EncountTask *encountTask, FieldEffectEncount *
     fx32 frame;
 
     GFL_G3DActorGetAnmFrame(effect->objs[encountTask->params.variant].actor, 0, &frame);
-    if (frame == 0 && func_ov036_021a22f4(encountTask->system, &distance)) {
+    if (frame == 0 && EffectEncount_GetSpotDistance(encountTask->system, &distance)) {
         u8 volume;
         u16 se;
         FieldSound *sound;
@@ -343,7 +342,7 @@ static void EncountTask_Draw(FieldEffectTask *task, void *work) {
 
     if (!encountTask->hidden) {
         MTX_Identity33_(&srt.rotation);
-        func_ov036_021a3ad4(task, &srt.translation);
+        FieldEffects_GetObjectPos(task, &srt.translation);
         GFL_G3DSysDrawObjBBoxCull(effect->objs[encountTask->params.variant].actor, &srt);
     }
 }

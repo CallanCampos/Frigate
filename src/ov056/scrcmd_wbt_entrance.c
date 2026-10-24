@@ -99,7 +99,7 @@ BOOL WbtCmd_CallEntryPartySelect(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     u16 *var = ScriptReadVar(vm, env);
     HeapID heapId = FieldScriptEnv_GetHeapID(env);
-    GameEvent *event = func_ov036_021aebf0(gsys, 1, WbtSystem_GetRegulation(sys), var, heapId);
+    GameEvent *event = Regulation_CreatePartyCheckTask(gsys, 1, WbtSystem_GetRegulation(sys), var, heapId);
 
     if (event == NULL) {
         return FALSE;

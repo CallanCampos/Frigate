@@ -4,6 +4,7 @@
 #include "app/event_pdc_return.h"
 #include "app/name_entry.h"
 #include "app/zukan_toroku.h"
+#include "battle/btl_result.h"
 #include "battle/btl_setup.h"
 #include "constants/abilities.h"
 #include "constants/arc.h"
@@ -35,12 +36,10 @@
 #include "system/game_data.h"
 
 // The battle types of the field's wild and trainer battles
-#define BATTLE_TYPE_WILD 0
-#define BATTLE_TYPE_TRAINER 1
-
-// BtlSetup's unkA8: the player won, or caught the wild Pokémon
-#define BATTLE_RESULT_WIN 1
-#define BATTLE_RESULT_CAPTURE 5
+enum {
+    BATTLE_TYPE_WILD,
+    BATTLE_TYPE_TRAINER,
+};
 
 // The battle backgrounds, by BtlFieldEnv's bgType, with the terrain Burmy takes its form from for each of its
 // terrains
@@ -187,7 +186,7 @@ static BOOL EventBattleReturn_Main(GameProc *proc, u32 *state, void *param, void
             PokeParty_Copy(prm->setup->party[0], party);
             pokerusHandler(party);
             pokerusSpread(party);
-            if (prm->setup->unkA8 == BATTLE_RESULT_WIN) {
+            if (prm->setup->result == BTL_RESULT_VICTORY) {
                 EventBattleReturn_PickupItems(party);
             }
             EventBattleReturn_BurmyForms(prm, party,
@@ -201,7 +200,7 @@ static BOOL EventBattleReturn_Main(GameProc *proc, u32 *state, void *param, void
             }
         }
         EventBattleReturn_NaturalCure(party);
-        if (prm->setup->unkA8 == BATTLE_RESULT_CAPTURE) {
+        if (prm->setup->result == BTL_RESULT_CAPTURE) {
             wk->pkm = PokeParty_GetPkm(prm->setup->party[1], prm->setup->unkAC);
             if (PokeParty_GetPkmCount(party) >= PokeParty_GetCapacity(party)) {
                 box = BoxSaveAccessor_GetLastOpenedBox(boxes);
@@ -268,7 +267,7 @@ static BOOL EventBattleReturn_Main(GameProc *proc, u32 *state, void *param, void
         break;
     case 2:
         if (procRunning != TRUE) {
-            if (func_ov012_02165b0c(wk->nameEntry) == FALSE) {
+            if (NameEntryParam_IsCanceled(wk->nameEntry) == FALSE) {
                 oldName = GFL_StrBufCreate(32, wk->heapId);
                 NameEntryParam_GetName(wk->nameEntry, wk->name);
                 PokeParty_GetParam(wk->pkm, PKM_PARAM_NICKNAME, oldName);
@@ -297,7 +296,7 @@ static BOOL EventBattleReturn_Main(GameProc *proc, u32 *state, void *param, void
         break;
     case 4:
         if (!wk->musicDone) {
-            if (prm->setup->unkA8 == BATTLE_RESULT_CAPTURE && wk->evolveMask != 0) {
+            if (prm->setup->result == BTL_RESULT_CAPTURE && wk->evolveMask != 0) {
                 if (!wk->musicFading) {
                     GFL_SndBGMFadeOut(30);
                     wk->musicFading = TRUE;
@@ -368,10 +367,10 @@ static void EventBattleReturn_CheckLevelUps(EventBattleReturnWork *wk, EventBatt
     int i;
     u32 levelBefore;
 
-    switch (setup->unkA8) {
-    case BATTLE_RESULT_WIN:
-    case 3:
-    case BATTLE_RESULT_CAPTURE:
+    switch (setup->result) {
+    case BTL_RESULT_VICTORY:
+    case BTL_RESULT_FLEE:
+    case BTL_RESULT_CAPTURE:
         switch (setup->battleType) {
         case BATTLE_TYPE_WILD:
         case BATTLE_TYPE_TRAINER:

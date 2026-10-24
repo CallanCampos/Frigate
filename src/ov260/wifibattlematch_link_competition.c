@@ -109,7 +109,7 @@ typedef struct {
     PokeParty *party;
     BOOL hadExchangeResult;
     WifiBattleMatchLinkParam *param;
-    void *entry;
+    TournamentEntry *entry;
     TournamentEntry serverEntry;
     BOOL hadBattleBox;
 } WifiBattleMatchLinkCompetition;
@@ -406,7 +406,7 @@ static void WifiBattleMatchLink_CompetitionTaskAccount(WifiBattleMatchTask *task
 static void WifiBattleMatchLink_CompetitionTaskEntry(WifiBattleMatchTask *task, u32 *seq, void *work) {
     WifiBattleMatchLinkCompetition *link = work;
     WifiBattleMatchLinkParam *param = link->param;
-    void *entry = link->entry;
+    TournamentEntry *entry = link->entry;
     u32 ready;
     s32 selected;
     u32 state;
@@ -815,14 +815,14 @@ static void WifiBattleMatchLink_CompetitionTaskEntry(WifiBattleMatchTask *task, 
     case 43: {
         SaveControl *save = GameData_GetSaveControl(param->param->gameData);
         BattleBoxSave *battleBox = getBattleBox(save);
-        void *previous = TournamentBlock_GetTeam(getTournamentBlockAddress(save), 0);
+        TournamentTeam *previous = TournamentBlock_GetTeam(getTournamentBlockAddress(save), 0);
 
         MI_CpuCopy8(&link->serverEntry, link->entry, sizeof(link->serverEntry));
         BattleBoxSave_ClearFlags(battleBox, 1);
         TournamentEntry_SetField(link->entry, TOURNAMENT_FIELD_UNK15B, 1);
-        RndMatchData_SetParam(param->record, 10, 0, 0);
-        RndMatchData_SetParam(param->record, 10, 1, 0);
-        RndMatchData_SetParam(param->record, 10, 2, 0);
+        RndMatchData_SetParam(param->record, RNDMATCH_RECORD_COMPETITION, RNDMATCH_FIELD_RATING, 0);
+        RndMatchData_SetParam(param->record, RNDMATCH_RECORD_COMPETITION, RNDMATCH_FIELD_WIN, 0);
+        RndMatchData_SetParam(param->record, RNDMATCH_RECORD_COMPETITION, RNDMATCH_FIELD_LOSE, 0);
         TournamentTeam_Clear(previous);
         GameData_StartSave(param->param->gameData);
         *seq = 44;
@@ -871,7 +871,8 @@ static void WifiBattleMatchLink_CompetitionTaskEntry(WifiBattleMatchTask *task, 
         }
         break;
     case 49:
-        if (link->param->unk34->unk10 != RndMatchData_GetParam(param->record, 10, 0)) {
+        if (link->param->unk34->unk10 !=
+            RndMatchData_GetParam(param->record, RNDMATCH_RECORD_COMPETITION, RNDMATCH_FIELD_RATING)) {
             *seq = 50;
         } else {
             *seq = 55;
@@ -919,7 +920,7 @@ static void WifiBattleMatchLink_CompetitionTaskRegister(WifiBattleMatchTask *tas
     PokeParty *party;
     SaveControl *save;
     BattleBoxSave *battleBox;
-    void *previous;
+    TournamentTeam *previous;
     BOOL ready;
     u32 invalid;
     BOOL otherInvalid;
@@ -1348,7 +1349,7 @@ static void WifiBattleMatchLink_CompetitionTaskMatch(WifiBattleMatchTask *task, 
     WifiBattleMatchPlayer *player;
     WifiBattleMatchPlayer *otherPlayer;
     PokeParty *party;
-    void *entry;
+    TournamentEntry *entry;
     Regulation *regulation;
     BOOL countIdle = FALSE;
     BOOL canCancel = FALSE;
@@ -2411,7 +2412,7 @@ static void WifiBattleMatchLink_CompetitionTaskRelogin(WifiBattleMatchTask *task
 static void WifiBattleMatchLink_CompetitionTaskCheckPeriod(WifiBattleMatchTask *task, u32 *seq, void *work) {
     WifiBattleMatchLinkCompetition *link = work;
     WifiBattleMatchLinkParam *param = link->param;
-    void *entry;
+    TournamentEntry *entry;
     RTCDate startDate;
     RTCDate endDate;
     RTCDate date;
@@ -2734,8 +2735,8 @@ static void WifiBattleMatchLink_CompetitionCreateCard(WifiBattleMatchLinkCompeti
     WifiBattleMatchWifiCardInfo info;
     PlayerInfo *playerInfo;
     ClActUnit *unit;
-    void *previous;
-    void *entry;
+    TournamentTeam *previous;
+    TournamentEntry *entry;
     u32 first;
 
     if (link->card != NULL) {
@@ -2755,9 +2756,9 @@ static void WifiBattleMatchLink_CompetitionCreateCard(WifiBattleMatchLinkCompeti
                                                  TournamentEntry_GetField(entry, TOURNAMENT_FIELD_END_MONTH),
                                                  TournamentEntry_GetField(entry, TOURNAMENT_FIELD_END_DAY));
     info.look = PlayerInfo_GetUnionView(playerInfo);
-    info.unkA0 = RndMatchData_GetParam(link->param->record, 10, 0);
-    first = RndMatchData_GetParam(link->param->record, 10, 1);
-    info.unkA4 = first + RndMatchData_GetParam(link->param->record, 10, 2);
+    info.unkA0 = RndMatchData_GetParam(link->param->record, RNDMATCH_RECORD_COMPETITION, RNDMATCH_FIELD_RATING);
+    first = RndMatchData_GetParam(link->param->record, RNDMATCH_RECORD_COMPETITION, RNDMATCH_FIELD_WIN);
+    info.unkA4 = first + RndMatchData_GetParam(link->param->record, RNDMATCH_RECORD_COMPETITION, RNDMATCH_FIELD_LOSE);
     info.variant = TournamentEntry_GetField(entry, TOURNAMENT_FIELD_VARIANT);
     if (info.unkA4 == 0 && info.unkA0 == 0) {
         info.unkA0 = 1500;
@@ -2953,7 +2954,7 @@ static void WifiBattleMatchLink_CompetitionFillPlayer(WifiBattleMatchPlayer *pla
                                                       WifiBattleMatchLinkCompetition *link) {
     SaveControl *save = GameData_GetSaveControl(link->param->param->gameData);
     WifiBattleMatchLinkParam *param;
-    void *entry;
+    TournamentEntry *entry;
 
     PlayerInfo_Copy(GetGameDataPlayerInfo(link->param->param->gameData), &player->info);
     CGearPhrases_Get(CGearPhrases_GetBlock(save), 0, &player->sentence);
@@ -3084,13 +3085,14 @@ static BOOL WifiBattleMatchLink_CompetitionUpdateRecord(WifiBattleMatchLinkCompe
                                                         WifiBattleMatchLinkRanking *ranking) {
     BOOL changed = FALSE;
 
-    if (ranking->unk10 != RndMatchData_GetParam(link->param->record, 10, 0) ||
-        ranking->unk8 != RndMatchData_GetParam(link->param->record, 10, 1) ||
-        ranking->unkC != RndMatchData_GetParam(link->param->record, 10, 2)) {
+    if (ranking->unk10 !=
+            RndMatchData_GetParam(link->param->record, RNDMATCH_RECORD_COMPETITION, RNDMATCH_FIELD_RATING) ||
+        ranking->unk8 != RndMatchData_GetParam(link->param->record, RNDMATCH_RECORD_COMPETITION, RNDMATCH_FIELD_WIN) ||
+        ranking->unkC != RndMatchData_GetParam(link->param->record, RNDMATCH_RECORD_COMPETITION, RNDMATCH_FIELD_LOSE)) {
         changed = TRUE;
     }
-    RndMatchData_SetParam(link->param->record, 10, 0, ranking->unk10);
-    RndMatchData_SetParam(link->param->record, 10, 1, ranking->unk8);
-    RndMatchData_SetParam(link->param->record, 10, 2, ranking->unkC);
+    RndMatchData_SetParam(link->param->record, RNDMATCH_RECORD_COMPETITION, RNDMATCH_FIELD_RATING, ranking->unk10);
+    RndMatchData_SetParam(link->param->record, RNDMATCH_RECORD_COMPETITION, RNDMATCH_FIELD_WIN, ranking->unk8);
+    RndMatchData_SetParam(link->param->record, RNDMATCH_RECORD_COMPETITION, RNDMATCH_FIELD_LOSE, ranking->unkC);
     return changed;
 }

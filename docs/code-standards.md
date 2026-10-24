@@ -140,7 +140,9 @@ static const FieldMapConfig MAP_CONFIGS[] = { ... };
 ahead of its definition, which can keep its data order (the two shop scripts' window setups). Also the C library's
 string functions that a library declares in its own header (`dwc/ext.h`, `ssl_internal.h`) where its ROM calls them:
 the same declarations from a header named `string.h` change the code (`docs/matching.md`, "a header named
-`string.h`"); and MSL's `exit`, which `nitro/os.h` declares for the same reason.
+`string.h`"); MSL's `exit`, which `nitro/os.h` declares for the same reason; and the functions a file lists in
+`config/deadstrip.toml`, which it declares itself rather than in its header, so that no other file can call code the
+build removes, unless another file's removed code calls them (`docs/configs.md`, "Dead-stripped code").
 
 **Checked:** `extern` in a `.c` file, and a non-static prototype in a `.c` file that the file doesn't define.
 
@@ -277,5 +279,55 @@ void GFL_G3DResFree(G3DResource *resource);
 
 **Does not apply when:** a group of `#define`s are bits that combine (a flag set may be an enum with explicit values
 when a field holds the combination), or are generated constant lists (`generated/`).
+
+**Checked:** by review.
+
+## 16. Pointers and storage of one of several types
+
+A pointer keeps the type it evidently has: a pointer that only ever holds one type is that type, and a type is never
+stripped back to `void *`. Where it holds one of several types, how the code stores it decides, as in Game Freak's
+HGSS code and pret's decomps:
+
+- storage that holds one of several structs inline, in the struct that owns it, is a `union` of them, and pointers to
+  it take the union's type;
+- a pointer to one of several separately allocated structs, or a parameter whose type a kind picks, is `void *` with a
+  comment that lists the types it can hold, and each use takes a typed local from it, with no cast;
+- a union of pointers only where the same struct holds the mode field that picks the member.
+
+**Don't:** make a union of the structs that a `void *` points to, and cast each allocation to it.
+
+```c
+/* Wrong, in field_controller.h and fieldmap_ctrl_grid.c */
+typedef union {
+    FieldmapCtrlGrid grid;
+    FieldmapCtrlNoGrid noGrid;
+    FieldmapCtrlHybrid hybrid;
+} FieldmapCtrl;
+FieldmapCtrl *Field_GetController(Field *field);
+
+    FieldmapCtrlGrid *controller = &Field_GetController(field)->grid;
+    setMapDisplayInfoPtr(env, (ScriptMsgWin *)window);
+```
+
+**Do:** keep the `void *` with its types listed, take a typed local at each use, and keep a union for the storage a
+struct holds inline.
+
+```c
+/* Right, in field_controller.h, fieldmap_ctrl_grid.c and festival.h */
+// The field's controller: a FieldmapCtrlGrid, FieldmapCtrlNoGrid or FieldmapCtrlHybrid, by the kind of map
+void *Field_GetController(Field *field);
+
+    FieldmapCtrlGrid *controller = Field_GetController(field);
+
+union FestMissionWork {
+    RivalEntry hollows[224];
+    FesMissionWork people;
+    FestSparkleWork sparkle;
+};
+struct LinkFestival {
+    /* ... */
+    FestMissionWork missionWork;
+};
+```
 
 **Checked:** by review.

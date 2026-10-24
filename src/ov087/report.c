@@ -382,7 +382,7 @@ static void Report_PrintWindows(ReportScreen *wk) {
                 JoinAvenue_GetInfo(SaveControl_GetJoinAvenue(GameData_GetSaveControl(GSYS_GetGameData(wk->gsys))));
             StrBuf *name = GFL_StrBufCreate(64, wk->heapId);
 
-            GFL_StrBufLoadString(name, (const u16 *)JoinAvenue_GetParam(joinAvenueInfo, 0, 0));
+            GFL_StrBufLoadString(name, (const u16 *)JoinAvenue_GetParam(joinAvenueInfo, JOIN_AVE_INFO_NAME, 0));
             GFL_WordSetSetStrbuf(wordSet, 0, name, 2, 1, 2);
             GFL_StrBufFree(name);
         } else {

@@ -21,8 +21,8 @@
 
 typedef struct {
     FieldEffects *effects;
-    void *mdlRes;
-    void *anmRes[IAIGIRI_ANM_COUNT];
+    G3DResource *mdlRes;
+    G3DResource *anmRes[IAIGIRI_ANM_COUNT];
     u32 unk14;
     u32 unk18;
 } FieldEffectIaigiri;
@@ -35,34 +35,34 @@ typedef struct {
 typedef struct {
     FieldEffectIaigiri *effect;
     G3DActor *actor;
-    void *anms[IAIGIRI_ANM_COUNT];
+    G3DAnimation *anms[IAIGIRI_ANM_COUNT];
     G3DModel *mdl;
 } IaigiriTask;
 
-static void func_ov036_021c2e14(FieldEffectIaigiri *effect);
-static void func_ov036_021c2e4c(FieldEffectIaigiri *effect);
-static void func_ov036_021c2ef8(FieldEffectTask *task, void *data);
-static void func_ov036_021c2f5c(FieldEffectTask *task, void *data);
-static void func_ov036_021c2f80(FieldEffectTask *task, void *data);
+static void FldeffIaigiri_LoadResources(FieldEffectIaigiri *effect);
+static void FldeffIaigiri_FreeResources(FieldEffectIaigiri *effect);
+static void FldeffIaigiri_Init(FieldEffectTask *task, void *data);
+static void FldeffIaigiri_Exit(FieldEffectTask *task, void *data);
+static void FldeffIaigiri_Update(FieldEffectTask *task, void *data);
 static void func_ov036_021c2fb0(FieldEffectTask *task, void *data);
 
 static const FieldEffectTaskVTable IAIGIRI_TASK_VTABLE;
 static u32 IAIGIRI_ANM_FILE_IDS[IAIGIRI_ANM_COUNT];
 
-void *func_ov036_021c2ddc(FieldEffects *effects, HeapID heapId) {
+void *FldeffIaigiri_Create(FieldEffects *effects, HeapID heapId) {
     FieldEffectIaigiri *effect = GFL_HeapAllocate(heapId, sizeof(FieldEffectIaigiri), TRUE, "fldeff_iaigiri.c", 102);
 
     effect->effects = effects;
-    func_ov036_021c2e14(effect);
+    FldeffIaigiri_LoadResources(effect);
     return effect;
 }
 
 void func_ov036_021c2e00(FieldEffects *effects, void *effect) {
-    func_ov036_021c2e4c(effect);
+    FldeffIaigiri_FreeResources(effect);
     GFL_HeapFree(effect);
 }
 
-static void func_ov036_021c2e14(FieldEffectIaigiri *effect) {
+static void FldeffIaigiri_LoadResources(FieldEffectIaigiri *effect) {
     int i;
     ArcTool *arc = FieldEffects_GetArc(effect->effects);
 
@@ -73,7 +73,7 @@ static void func_ov036_021c2e14(FieldEffectIaigiri *effect) {
     }
 }
 
-static void func_ov036_021c2e4c(FieldEffectIaigiri *effect) {
+static void FldeffIaigiri_FreeResources(FieldEffectIaigiri *effect) {
     int i;
 
     for (i = 0; i < IAIGIRI_ANM_COUNT; i++) {
@@ -107,13 +107,13 @@ void func_ov036_021c2e70(FieldActor *actor, FieldEffects *effects) {
     FieldEffects_TCBCreate(effects, &IAIGIRI_TASK_VTABLE, NULL, 0, &params, 0);
 }
 
-static void func_ov036_021c2ef8(FieldEffectTask *task, void *data) {
+static void FldeffIaigiri_Init(FieldEffectTask *task, void *data) {
     IaigiriTask *work = data;
     int i;
-    IaigiriTaskParams *params = func_ov036_021a3ac8(task);
+    IaigiriTaskParams *params = FieldEffects_GetObjectParam(task);
 
     work->effect = params->effect;
-    func_ov036_021a3ae8(task, &params->pos);
+    FieldEffects_SetObjectPos(task, &params->pos);
     work->mdl = GFL_G3DMdlCreate(work->effect->mdlRes, 0, work->effect->mdlRes);
     for (i = 0; i < IAIGIRI_ANM_COUNT; i++) {
         work->anms[i] = GFL_G3DAnmCreate(work->mdl, work->effect->anmRes[i], 0);
@@ -124,7 +124,7 @@ static void func_ov036_021c2ef8(FieldEffectTask *task, void *data) {
     }
 }
 
-static void func_ov036_021c2f5c(FieldEffectTask *task, void *data) {
+static void FldeffIaigiri_Exit(FieldEffectTask *task, void *data) {
     IaigiriTask *work = data;
     int i;
 
@@ -136,7 +136,7 @@ static void func_ov036_021c2f5c(FieldEffectTask *task, void *data) {
 }
 
 // Steps the animations, and ends the task once every one has reached its end
-static void func_ov036_021c2f80(FieldEffectTask *task, void *data) {
+static void FldeffIaigiri_Update(FieldEffectTask *task, void *data) {
     IaigiriTask *work = data;
     int i;
     BOOL done = TRUE;
@@ -147,7 +147,7 @@ static void func_ov036_021c2f80(FieldEffectTask *task, void *data) {
         }
     }
     if (done) {
-        func_ov036_021a3a70(task);
+        FieldEffects_DeleteObject(task);
     }
 }
 
@@ -160,7 +160,7 @@ static void func_ov036_021c2fb0(FieldEffectTask *task, void *data) {
     };
 
     MTX_Identity33_(&mtx.rotation);
-    func_ov036_021a3ad4(task, &mtx.translation);
+    FieldEffects_GetObjectPos(task, &mtx.translation);
     GFL_G3DSysDrawObjBBoxCull(work->actor, &mtx);
 }
 
@@ -259,7 +259,7 @@ BOOL func_ov036_021c315c(VM *vm, FieldScriptEnv *env) {
 }
 
 static const FieldEffectTaskVTable IAIGIRI_TASK_VTABLE = {
-    sizeof(IaigiriTask), func_ov036_021c2ef8, func_ov036_021c2f5c, func_ov036_021c2f80, func_ov036_021c2fb0,
+    sizeof(IaigiriTask), FldeffIaigiri_Init, FldeffIaigiri_Exit, FldeffIaigiri_Update, func_ov036_021c2fb0,
 };
 
 static u32 IAIGIRI_ANM_FILE_IDS[IAIGIRI_ANM_COUNT] = { 0x76, 0x89, 0x9c };

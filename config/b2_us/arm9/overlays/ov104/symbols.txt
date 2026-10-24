@@ -68,9 +68,9 @@ GimmickGateBoardEntry_MatchesVersion kind:function(thumb,size=0x20) addr:0x021f0
 sWeatherZones kind:data(any) addr:0x021f039c
 sReportedWeathers kind:data(any) addr:0x021f039e
 sEntrySlots kind:data(any) addr:0x021f03a4
-data_ov104_021f03b0 kind:data(any) addr:0x021f03b0
-data_ov104_021f03c0 kind:data(any) addr:0x021f03c0
-data_ov104_021f03d0 kind:data(any) addr:0x021f03d0
+sScene0Actors kind:data(any) addr:0x021f03b0
+sScene1Actors kind:data(any) addr:0x021f03c0
+sSceneSetups kind:data(any) addr:0x021f03d0
 sScene0Animations kind:data(any) addr:0x021f03f0
 sScene1Animations kind:data(any) addr:0x021f0448
 sSceneResources kind:data(any) addr:0x021f04a0

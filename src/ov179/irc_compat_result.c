@@ -297,10 +297,10 @@ static BOOL IrcCompatResult_Init(GameProc *proc, u32 *state, void *param, void *
     BmpWin_DrawFrame(wk->windowA.window, 0, (u16)wk->graphic.frameChars, 6);
     IrcCompatWindow_InitWithColor(&wk->windowB, 7, 6, 3, 20, 5, 8, 1, TRUE, HEAPID_IRC_COMPAT);
     IrcCompatWindow_PrintMsgCentered(&wk->windowB, &wk->text, 1);
-    GFL_BGSysScaleBGReq(7, 3, 0x1000);
-    GFL_BGSysScaleBGReq(7, 6, 0x1000);
-    GFL_BGSysAdjustBGOriginReq(7, 9, 0x80);
-    GFL_BGSysAdjustBGOriginReq(7, 12, 0x28);
+    GFL_BGSysScaleBGReq(7, BG_SCALE_SET_X, 0x1000);
+    GFL_BGSysScaleBGReq(7, BG_SCALE_SET_Y, 0x1000);
+    GFL_BGSysAdjustBGOriginReq(7, BG_CENTER_SET_X, 0x80);
+    GFL_BGSysAdjustBGOriginReq(7, BG_CENTER_SET_Y, 0x28);
     IrcCompatDigits_Init(&wk->digits, &wk->graphic, wk->param->result);
     if (wk->param->gsys != NULL) {
         CompatibleIrcSys_BuildProfile(wk->param->gsys, &own);

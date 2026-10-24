@@ -276,7 +276,7 @@ static GFLNetInitData sMusCommInitData = {
     4,
     1,
     1,
-    0,
+    GFL_NET_TYPE_WIRELESS,
     1,
     0x11,
     {0x2c, 1, 0, 0},
@@ -308,9 +308,9 @@ void *MusComm_Init(u32 *seq, void *param) {
 
     work->playerInfo = GetGameDataPlayerInfo(work->gameData);
     if (work->netMode == 1) {
-        sMusCommInitData.bNetType = 4;
+        sMusCommInitData.bNetType = GFL_NET_TYPE_IRC_WIRELESS;
     } else {
-        sMusCommInitData.bNetType = 0;
+        sMusCommInitData.bNetType = GFL_NET_TYPE_WIRELESS;
         GFL_NetInit(&sMusCommInitData, MusComm_OnNetEnd, work);
     }
     PlayerInfo_Copy(work->playerInfo, &work->beacon.playerInfo);

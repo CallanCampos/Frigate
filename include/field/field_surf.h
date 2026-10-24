@@ -5,6 +5,6 @@
 #include "nitro/fx.h"
 #include "struct_decls.h"
 
-BOOL CreateSurfPos(void *context, Field *field, VecFx32 *position);
+BOOL CreateSurfPos(GameData *context, Field *field, VecFx32 *position);
 
 #endif // POKEBW2_FIELD_FIELD_SURF_H

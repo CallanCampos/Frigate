@@ -16,7 +16,7 @@ typedef __INTPTR_TYPE__ sptr;
 #define ulong32 unsigned int
 #else
 #define PORT_DS_ALIGN_64
-#define uptr u32
+// uptr's macro follows upstream's typedef of it, below
 #define sptr s32
 #define ulong32 unsigned long
 #endif
@@ -48,6 +48,14 @@ typedef volatile s32 vs32;
 
 typedef float f32;
 typedef double f64 PORT_DS_ALIGN_64;
+
+// An address held as an integer, which a native port widens to the size of a pointer
+#ifndef PLATFORM_PC
+typedef u32 uptr;
+// For MWCC uptr is then the macro u32, after the typedef so that the typedef keeps its tokens: each uptr the port put
+// in place of a u32 compiles token for token as it was
+#define uptr u32
+#endif
 
 typedef int BOOL;
 #define TRUE 1

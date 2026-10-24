@@ -870,7 +870,7 @@ static void DupFitting_InitItems(DupFittingWork *work) {
     work->itemSys = MusItemDraw_InitSystem(work->blact, 0x98, work->heapId);
     items = MusItemDraw_GetItemData(work->itemSys);
     for (n = 0; n < work->entryCount; n++) {
-        void *res;
+        G3DResource *res;
         NNSGfdTexKey texKey;
         NNSGfdPlttKey plttKey;
         NNSGfdPlttKey dimPlttKey;
@@ -931,7 +931,7 @@ static void DupFitting_InitItems(DupFittingWork *work) {
         u16 width;
         u16 height;
         u32 size;
-        void *res;
+        G3DResource *res;
 
         work->shadowItemId = 0;
         size = MusItemData_GetTexSize(MusItemData_GetItem(items, work->shadowItemId));

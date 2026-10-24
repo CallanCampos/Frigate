@@ -16,17 +16,17 @@ static const u32 UNOVA_LINK_DIFFICULTY_KEYS[KEY_INFO_DIFFICULTY_COUNT] = { 0x312
 static const u32 UNOVA_LINK_CITY_KEYS[KEY_INFO_CITY_COUNT] = { 0x34525, 0x11963 };
 static const u32 sChamberKeys[KEY_INFO_CHAMBER_COUNT] = { 0x94525, 0x81963, 0x38569 };
 
-void KeySystemData_Init(void *a0) {
-    MI_CpuFill8(a0, 0, sizeof(KeySystemData));
-    KeyInfoSave_Init(KeySystemData_GetKeyInfo(a0));
-    zero476Bytes(KeySystemData_GetMemoryLink(a0));
+void KeySystemData_Init(KeySystemData *data) {
+    MI_CpuFill8(data, 0, sizeof(KeySystemData));
+    KeyInfoSave_Init(KeySystemData_GetKeyInfo(data));
+    zero476Bytes(KeySystemData_GetMemoryLink(data));
 }
 
-KeyInfoSave *KeySystemData_GetKeyInfo(void *a0) {
-    return a0;
+KeyInfoSave *KeySystemData_GetKeyInfo(KeySystemData *data) {
+    return &data->keyInfo;
 }
 
-void *KeySystemData_GetMemoryLink(KeySystemData *data) {
+MemoryLinkSave *KeySystemData_GetMemoryLink(KeySystemData *data) {
     return &data->memoryLink;
 }
 

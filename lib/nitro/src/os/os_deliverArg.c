@@ -17,7 +17,7 @@
 #define OSi_DELIVER_ARG_FLAGS_DELIVERED 0x2
 #define OSi_DELIVER_ARG_FLAGS_PENDING 0x1
 
-static BOOL func_0207c6bc(void);
+static BOOL OS_IsValidDeliverArg(void);
 
 // A copy of the title ID of the program that sent the block
 static u64 OSi_deliverArgTitleId;
@@ -66,7 +66,7 @@ int OS_EncodeDeliverArg(void) {
 int OS_DecodeDeliverArg(void) {
     u16 crc;
 
-    if (!func_0207c6bc()) {
+    if (!OS_IsValidDeliverArg()) {
         return -1;
     }
     if (OSi_deliverArg.info == NULL) {
@@ -100,7 +100,7 @@ u64 OS_GetTitleIdFromDeliverArg(void) {
 }
 
 // Whether a program left a block for this one
-static BOOL func_0207c6bc(void) {
+static BOOL OS_IsValidDeliverArg(void) {
     OSDeliverArgInfo *info = (OSDeliverArgInfo *)HW_DELIVER_ARG_BUF;
 
     return (info->flags & OSi_DELIVER_ARG_FLAGS_DELIVERED) != 0;

@@ -8,7 +8,7 @@ TubelineBridge_LoadFrames kind:function(thumb,size=0x32) addr:0x021eeee4
 TubelineBridge_StartWait kind:function(thumb,size=0x22) addr:0x021eef18
 TubelineBridge_RestartTrain kind:function(thumb,size=0x10) addr:0x021eef3c
 data_ov110_021eef0c kind:data(any) addr:0x021eef4c
-data_ov110_021eef14 kind:data(any) addr:0x021eef54
-data_ov110_021eef20 kind:data(any) addr:0x021eef60
+sResources kind:data(any) addr:0x021eef54
+sActors kind:data(any) addr:0x021eef60
 data_ov110_021eef29 kind:data(any) addr:0x021eef69 ambiguous
-data_ov110_021eef60 kind:data(any) addr:0x021eefa0
+sSceneSetup kind:data(any) addr:0x021eefa0

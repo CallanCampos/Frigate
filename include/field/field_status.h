@@ -7,9 +7,12 @@
 #include "gfl/heap.h"
 #include "struct_decls.h"
 
-#define FLD_STATUS_BUSY_NONE 0x0
-#define FLD_STATUS_BUSY_BATTLE 0x1
-#define FLD_STATUS_BUSY_LOADING 0x2
+// What FieldStatus_SetBusyFlag records the field to be busy with: nothing, a battle, or loading a map
+enum {
+    FLD_STATUS_BUSY_NONE,
+    FLD_STATUS_BUSY_BATTLE,
+    FLD_STATUS_BUSY_LOADING,
+};
 
 #define FLD_FLASH_NONE 0x0
 #define FLD_FLASH_ALLOW 0x1

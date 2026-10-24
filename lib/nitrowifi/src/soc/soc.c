@@ -154,7 +154,9 @@ int SOC_GetSockName(int sock, void *sockAddr) {
 }
 
 long SOC_GetHostID(void) {
-    return (long)SOC_HtoNl(SOCL_GetHostID());
+    u32 hostId = SOCL_GetHostID();
+
+    return (long)SOC_HtoNl(hostId);
 }
 
 // The SDK's name, which is wrong: it sets the DNS servers

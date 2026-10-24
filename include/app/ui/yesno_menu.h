@@ -13,11 +13,13 @@
 typedef struct TwoChoiceMenu TwoChoiceMenu;
 
 // What TwoChoiceMenu_Main steps through
-#define TWO_CHOICE_MENU_STATE_CLOSED 0
-#define TWO_CHOICE_MENU_STATE_OPENING 1
-#define TWO_CHOICE_MENU_STATE_CHOOSING 2
-#define TWO_CHOICE_MENU_STATE_FLASHING 3
-#define TWO_CHOICE_MENU_STATE_DONE 4
+enum {
+    TWO_CHOICE_MENU_STATE_CLOSED,
+    TWO_CHOICE_MENU_STATE_OPENING,
+    TWO_CHOICE_MENU_STATE_CHOOSING,
+    TWO_CHOICE_MENU_STATE_FLASHING,
+    TWO_CHOICE_MENU_STATE_DONE,
+};
 
 #define TWO_CHOICE_MENU_ACTORS 4
 #define TWO_CHOICE_MENU_FLASH_STEPS 10
@@ -48,7 +50,9 @@ struct TwoChoiceMenu {
     // Whether the text of each window has been sent
     BOOL firstSent;
     BOOL secondSent;
+    // A TWO_CHOICE_MENU_STATE_*
     u32 state;
+    // TWO_CHOICE_MENU_FIRST, _SECOND or _NONE
     u32 result;
     ClActor *actors[TWO_CHOICE_MENU_ACTORS];
     UIObjRes objRes;
@@ -60,9 +64,11 @@ struct TwoChoiceMenu {
 };
 
 // What TwoChoiceMenu_GetResult returns
-#define TWO_CHOICE_MENU_SECOND 0
-#define TWO_CHOICE_MENU_FIRST 1
-#define TWO_CHOICE_MENU_NONE 2
+enum {
+    TWO_CHOICE_MENU_SECOND,
+    TWO_CHOICE_MENU_FIRST,
+    TWO_CHOICE_MENU_NONE,
+};
 
 // textBg is the BG of the text and priority its priority; the art is on the BG above it. Sub screen BGs are above 3
 TwoChoiceMenu *TwoChoiceMenu_Create(HeapID heapId, u32 textBg, u32 priority, u32 palette, u8 objPalette,

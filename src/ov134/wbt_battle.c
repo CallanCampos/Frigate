@@ -37,8 +37,8 @@
 struct WbtPartyList {
     FieldScriptEnv *env;
     WbtSystem *sys;
-    void *window;
-    void *msgBGSys;
+    MoneyWin *window;
+    FieldMsgBG *msgBGSys;
     MsgData *msgData;
     WordSet *wordSet;
     StrBuf *mainStrBuf;
@@ -147,7 +147,7 @@ u8 WbtBattle_GetPick(WbtSystem *sys, u32 index) {
     return sys->unk13C8[index];
 }
 
-void *WbtBattle_CreatePartyList(FieldScriptEnv *env, WbtSystem *sys) {
+WbtPartyList *WbtBattle_CreatePartyList(FieldScriptEnv *env, WbtSystem *sys) {
     ScriptWork *scriptWork = FieldScriptEnv_GetScriptWork(env);
     WbtPartyList *list =
         GFL_HeapAllocate(FieldScriptEnv_GetHeapID(env), sizeof(WbtPartyList), TRUE, "wbt_battle.c", 387);
@@ -184,18 +184,18 @@ void WbtBattle_ShowPartyList(WbtPartyList *list) {
         GFL_MsgDataLoadStrbuf(list->msgData, message, list->altStrBuf);
         setPartyPokemonSpeciesNameToStrbuf(list->wordSet, 0, pkm);
         GFL_WordSetFormatStrbuf(list->wordSet, list->mainStrBuf, list->altStrBuf);
-        func_ov036_02187c4c(list->window, 0, 14 * i, list->mainStrBuf);
+        MsgBGPrinter_MsgWinPrintStr(list->window, 0, 14 * i, list->mainStrBuf);
     }
-    GFL_BGSysLoadScr(BmpWin_GetBGIndex(func_ov036_02187c9c(list->window)));
+    GFL_BGSysLoadScr(BmpWin_GetBGIndex(MsgBGPrinter_GetMsgWinBmpWin(list->window)));
 }
 
 void WbtBattle_ClosePartyList(WbtPartyList *list) {
-    func_ov036_02187c7c(list->window);
-    func_ov036_02187c1c(list->window);
+    MsgBGPrinter_ClearMsgWin(list->window);
+    MsgBGPrinter_DeleteMsgWin(list->window);
     GFL_BGSysLoadScr(1);
 }
 
-void WbtBattle_FreePartyList(void *work) {
+void WbtBattle_FreePartyList(WbtPartyList *work) {
     GFL_HeapFree(work);
 }
 

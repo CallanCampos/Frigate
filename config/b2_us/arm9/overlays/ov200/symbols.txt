@@ -16,12 +16,12 @@ CGHelp_Init kind:function(thumb,size=0x70) addr:0x021b3760
 CGHelp_Exit kind:function(thumb,size=0x30) addr:0x021b37d0
 CGHelp_Main kind:function(thumb,size=0x2c) addr:0x021b3800
 sPageAnimations kind:data(any) addr:0x021b382c
-data_ov200_021b383c kind:data(any) addr:0x021b383c
+sLCDConfig kind:data(any) addr:0x021b383c
 sBGSetupFrame kind:data(any) addr:0x021b384c
 sBGSetupMessage kind:data(any) addr:0x021b386c
 sBGSetupScrolling kind:data(any) addr:0x021b388c
 sBGSetupText kind:data(any) addr:0x021b38ac
-data_ov200_021b38cc kind:data(any) addr:0x021b38cc
+sVRAMConfig kind:data(any) addr:0x021b38cc
 data_ov200_021b38cd kind:data(any) addr:0x021b38cd ambiguous
 sPageAnimationIndex kind:data(any) addr:0x021b38fc
 data_ov200_021b3938 kind:data(any) addr:0x021b3938

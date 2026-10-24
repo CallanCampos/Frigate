@@ -93,7 +93,7 @@ static void Colosseum_RecvMember(int netId, int size, const void *data, void *wo
     }
 }
 
-BOOL Colosseum_SendMember(const void *member, BOOL toParent) {
+BOOL Colosseum_SendMember(const ColosseumMember *member, BOOL toParent) {
     u32 sendId = 0;
 
     if (toParent != TRUE) {

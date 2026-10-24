@@ -6,6 +6,7 @@
 #include "app/pkwd_count.h"
 #include "battle/battle_proc.h"
 #include "battle/battle_rec_tool.h"
+#include "battle/btl_result.h"
 #include "battle/btl_setup.h"
 #include "constants/arc.h"
 #include "constants/flags.h"
@@ -379,7 +380,7 @@ static BtlSetup *EventPokewood_LoadDownloadedSetup(GameSystem *gsys, Field *fiel
         BtlSetup_Reset(setup);
         BtlSetup_InitForRecord(setup, gameData, heapId);
         BattleRec_LoadToolOverlay();
-        movie = Pokewood_GetLoadedMovieField(0, 0);
+        movie = Pokewood_GetLoadedMovieField(POKEWOOD_BLOCK_FIELD_UNKDF, 0);
         BattleRecTool_LoadSetup(setup, 1, heapId);
         BattleRec_UnloadToolOverlay();
         EventPokewood_FinishWatchSetup(gameData, setup, movie, heapId);
@@ -495,7 +496,7 @@ static void EventPokewood_InitTitleParam(PokewoodTitleParam *title, BtlSetup *se
     MsgData *msgData;
 
     BattleRec_LoadToolOverlay();
-    Pokewood_GetLoadedMovieField(2, (u32)pkm);
+    Pokewood_GetLoadedMovieField(POKEWOOD_BLOCK_FIELD_PKM_0, (u32)pkm);
     species = PokeParty_GetParam(pkm, PKM_PARAM_SPECIES, NULL);
     msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_SPECIES_NAMES, HEAPID_TAIL(HEAPID_GAMEEVENT));
     GFL_MsgDataLoadStrbuf(msgData, species, name);
@@ -617,13 +618,14 @@ static GameEventReturnCode EventPokewood_RunWatch(GameEvent *event, u32 *state, 
             sys = *GameData_GetPokewoodSystemPtr(gameData);
             var = PokewoodSystem_GetResultVar(sys);
             if (var != NULL) {
-                *var = (wk->setup->unkA8 != 3) ? TRUE : FALSE;
+                *var = (wk->setup->result != BTL_RESULT_FLEE) ? TRUE : FALSE;
                 if (*var != 0) {
-                    PokewoodSystem_SetResultFlag(sys, gameData, wk->setup->unkDF, wk->setup->unk124);
-                    PokewoodSystem_AddGradePoints(gameData, sys, wk->setup->unk124, param->slot);
+                    PokewoodSystem_SetResultFlag(sys, gameData, wk->setup->unkDF, wk->setup->studioEnding);
+                    PokewoodSystem_AddGradePoints(gameData, sys, wk->setup->studioEnding, param->slot);
                     PokewoodSave_SetFlag(save, 5, wk->setup->unkDF);
                     Pokewood_CheckMedals(gameData);
-                    EventPokewood_UnlockMovies(save, gameData, wk->setup->unkDF, wk->setup->unk124, wk->setup->unk130);
+                    EventPokewood_UnlockMovies(save, gameData, wk->setup->unkDF, wk->setup->studioEnding,
+                                               wk->setup->studioScore);
                 }
             }
         }
@@ -646,7 +648,7 @@ static void EventPokewood_LoadSlotInfo(GameData *gameData, HeapID heapId, Pokewo
     BattleRec_LoadToolOverlay();
     for (slot = 0; slot < 8; slot++) {
         if (Pokewood_LoadDownloadedMovie(saveControl, heapId, slot) == 1) {
-            param->slotInfo[slot] = sSlotInfo[Pokewood_GetLoadedMovieField(0, 0)] + 1;
+            param->slotInfo[slot] = sSlotInfo[Pokewood_GetLoadedMovieField(POKEWOOD_BLOCK_FIELD_UNKDF, 0)] + 1;
         } else {
             param->slotInfo[slot] = 0;
         }
@@ -683,7 +685,7 @@ static GameEventReturnCode EventPokewood_RunFilm(GameEvent *event, u32 *state, v
         (*state)++;
         break;
     case 4:
-        if (wk->setup->unkA8 != 3) {
+        if (wk->setup->result != BTL_RESULT_FLEE) {
             EventPokewood_LoadSlotInfo(gameData, param->heapId, param);
             EventPokewood_StoreRecordedSetup(gameData, wk->setup, param->heapId);
         }
@@ -714,7 +716,7 @@ static GameEventReturnCode EventPokewood_RunFilm(GameEvent *event, u32 *state, v
         GameData_GetRecords(gameData);
         var = PokewoodSystem_GetResultVar(sys);
         if (var != NULL) {
-            *var = (wk->setup->unkA8 != 3) ? TRUE : FALSE;
+            *var = (wk->setup->result != BTL_RESULT_FLEE) ? TRUE : FALSE;
         }
         PokewoodSystem_SetRecord(sys, wk->setup, wk->setup->unkDF);
         PokewoodSystem_SetSlotInfo(sys, param->slotInfo);

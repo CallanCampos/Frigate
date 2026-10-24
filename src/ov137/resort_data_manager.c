@@ -13,8 +13,8 @@
 #define RESORT_SLOT_NO_KIND 5
 #define RESORT_SLOT_NO_INDEX 0xff
 
-// The functions of a type of data, called with the data's person, entry or record. The people's functions take a
-// JoinAvenuePerson, so the table casts them
+// The functions of a type of data, called with the data's person, entry or record (a JoinAvenuePerson,
+// JoinAvenueEntry or JoinAvenueRecord). Each type's functions take their own, so the table casts them
 typedef void *(*ResortPersonCreateFunc)(HeapID heapId);
 typedef void (*ResortPersonFunc)(void *person);
 typedef BOOL (*ResortPersonIsEmptyFunc)(void *person);
@@ -34,6 +34,7 @@ typedef struct {
 } ResortPersonFuncs;
 
 struct ResortPersonData {
+    // A JoinAvenuePerson, JoinAvenueEntry or JoinAvenueRecord, by the type
     void *person;
     const ResortPersonFuncs *funcs;
     u32 kind;
@@ -200,9 +201,9 @@ u32 ResortSlots_FindEmpty(ResortSlots *slots, u32 row) {
     return 0xffff;
 }
 
-u16 ResortData_RaffleShopItem(ResortPersonData *data, void *a1, void *a2, JoinAvenueInfo *info) {
+u16 ResortData_RaffleShopItem(ResortPersonData *data, ResortBinary *a1, ResortBinary *a2, JoinAvenueInfo *info) {
     u32 value = ResortData_Roll(data, 0, 100);
-    u32 row = ResortBinary_FindRange(a2, JoinAvenue_GetParam(info, 2, 0));
+    u32 row = ResortBinary_FindRange(a2, JoinAvenue_GetParam(info, JOIN_AVE_INFO_RANK, 0));
     if (value < ResortBinary_Get(a2, row, 8)) {
         u16 shopRow = ResortBinary_Get(a2, row, 7);
         u32 prize = join_ave_raffle_shop(a1, shopRow, ResortData_Roll(data, 1, ResortBinary_Get(a1, shopRow, 0)));

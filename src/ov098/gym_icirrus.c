@@ -174,7 +174,7 @@ void GymIcirrus_ToggleMovementAtPlace(GameSystem *gsys, int place) {
 
     if (place < PLACE_COUNT && controllerType == CONTROLLER_TYPE_HYBRID) {
         if (GymIcirrus_IsPlaceSwitchReady(state, place)) {
-            func_ov036_0219e434(Field_GetController(field), field);
+            FieldmapCtrlHybrid_ReplacePlayer(Field_GetController(field), field);
         }
     }
 }

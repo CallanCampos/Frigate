@@ -33,8 +33,10 @@ enum {
 
 // What it leaves in IrcBattleMatchParam.result when it ends, other than the mode that was chosen: the players
 // quit or the link failed, or they went back to the infrared menu. The Battle Subway has these two only
-#define IRCBATTLEMATCH_RESULT_QUIT 12
-#define IRCBATTLEMATCH_RESULT_BACK 13
+enum {
+    IRCBATTLEMATCH_RESULT_QUIT = 12,
+    IRCBATTLEMATCH_RESULT_BACK,
+};
 
 typedef struct {
     GameData *gameData;

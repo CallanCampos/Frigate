@@ -103,7 +103,7 @@ void MusicalSystem_FreeProgramData(Ov210Work *work) {
 }
 
 void MusicalSystem_LoadProgramData(Ov210Work *work, SaveControl *save, GameData *gameData, u8 program, HeapID heapId) {
-    void *download;
+    MusicalDistWork *download;
     ArcTool *arc;
     u32 size0;
     u32 size1;

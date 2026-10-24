@@ -276,15 +276,11 @@ static BOOL VCTi_ReceiveAudioData(u8 *dst, int size, int slot, u32 *heardMask) {
 }
 
 // Mixes the voices that are due into a frame of samples, returning whether there is any, and sets the bits of the
-// machines heard
-BOOL VCT_ReceiveAudio(void *dst, u32 size, u32 *heardMask) {
-    BOOL heard;
+// machines heard (libVCT 1.3.1's name for it)
+static inline BOOL vct_receive_mixed_audio(void *dst, u32 size, u32 *heardMask) {
+    BOOL heard = FALSE;
     u32 slot;
 
-    if (heardMask != NULL) {
-        *heardMask = 0;
-    }
-    heard = FALSE;
     if (size == sAudioDataSize && sNumStream != 0) {
         for (slot = 0; slot < VCT_SLOT_MAX; slot++) {
             if (VCTi_ReceiveAudioData(dst, size, slot, heardMask) == TRUE) {
@@ -297,7 +293,7 @@ BOOL VCT_ReceiveAudio(void *dst, u32 size, u32 *heardMask) {
 
             if (next == VCT_SLOT_MAX) {
                 heard = TRUE;
-            } else if (next < VCT_SLOT_MAX) {
+            } else {
                 for (; next < VCT_SLOT_MAX; next++) {
                     if (VCTi_ReceiveAudioData((u8 *)sMixBuffer, size, next, heardMask) == TRUE) {
                         vct_mix_audio(dst, sMixBuffer, dst, size);
@@ -305,12 +301,23 @@ BOOL VCT_ReceiveAudio(void *dst, u32 size, u32 *heardMask) {
                 }
             }
         } else {
-            MIi_CpuClearFast(0, dst, size);
+            MI_CpuClearFast(dst, size);
         }
+        return heard;
     } else {
-        heard = FALSE;
-        MIi_CpuClearFast(0, dst, size);
+        MI_CpuClearFast(dst, size);
+        return FALSE;
     }
+}
+
+// Receives a frame of mixed voices and, with echo cancelling on, gives it to the canceller as the speaker's samples
+BOOL VCT_ReceiveAudio(void *dst, u32 size, u32 *heardMask) {
+    BOOL heard;
+
+    if (heardMask != NULL) {
+        *heardMask = 0;
+    }
+    heard = vct_receive_mixed_audio(dst, size, heardMask);
     if (sEnableEchoCancel) {
         vct_set_speaker_samples(dst, size);
     }

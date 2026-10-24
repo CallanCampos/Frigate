@@ -26,8 +26,10 @@ typedef struct {
 #define APP_TASKMENU_ITEM_MAX 8
 
 // Where a task menu's x and y put it: its top left corner, or its bottom right
-#define APP_TASKMENU_POS_TOP_LEFT 0
-#define APP_TASKMENU_POS_BOTTOM_RIGHT 1
+enum {
+    APP_TASKMENU_POS_TOP_LEFT,
+    APP_TASKMENU_POS_BOTTOM_RIGHT,
+};
 
 // A task menu's settings. A width or height of 0 gets the default, 13 by 3 tiles
 typedef struct {

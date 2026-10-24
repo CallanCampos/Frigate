@@ -33,9 +33,9 @@ BOOL s0136_FieldSetWeather(VM *vm, FieldScriptEnv *env) {
         weatherId = GetWeatherAll(gsys, Field_GetPlayerStateZoneID(field));
     }
     if (immediate) {
-        func_ov036_02199210(weather, weatherId);
+        FieldWeather_RequestChangeNoFade(weather, weatherId);
     } else {
-        func_ov036_02199208(weather, weatherId);
+        FieldWeather_RequestChange(weather, weatherId);
     }
     SetNowWeather(gameData, weatherId);
     return FALSE;

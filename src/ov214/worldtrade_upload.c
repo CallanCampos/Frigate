@@ -258,7 +258,7 @@ int WorldTrade_Upload_Init(WorldTradeWork *wk, int seq) {
     Upload_BgGraphicSet(wk);
     Upload_BmpWinInit(wk);
     WorldTrade_SetPartnerExchangePos(wk);
-    GFL_WipeSet(3, 1, 1, 0, 6, 1, HEAPID_WORLDTRADE);
+    GFL_WipeSet(WIPE_MODE_MAIN, WIPE_TYPE_FADE_IN, WIPE_TYPE_FADE_IN, 0, 6, 1, HEAPID_WORLDTRADE);
     WorldTrade_WifiIconAdd(wk);
     wk->subprocessSeq = UPLOAD_SEQ_START;
     wk->subLcdBgKeep = 0;
@@ -732,7 +732,8 @@ static int Upload_SubSeqDownloadResult(WorldTradeWork *wk) {
                 wk->subprocessSeq = UPLOAD_SEQ_SERVER_TRADE_CHECK;
             } else {
                 Upload_DownloadPokemonDataAdd(wk, WorldTradeData_GetPkmPtr(wk->param->worldtrade_data),
-                                              func_0200b4fc(wk->param->worldtrade_data), wk->uploadPokemonData.isTrade);
+                                              WorldTradeData_GetReturnBox(wk->param->worldtrade_data),
+                                              wk->uploadPokemonData.isTrade);
                 wk->subprocessSeq = UPLOAD_SEQ_SAVE;
             }
             break;
@@ -955,7 +956,7 @@ static int Upload_SubSeqServerTradeCheckResult(WorldTradeWork *wk) {
                 loadPokemonNicknameToStrbuf(wk->wordSet, 0, pkm);
                 wk->errorMesNo = 2;
                 wk->subprocessSeq = UPLOAD_SEQ_TIMEOUT_SAVE;
-                Upload_DownloadPokemonDataAdd(wk, pkm, func_0200b4fc(wk->param->worldtrade_data), FALSE);
+                Upload_DownloadPokemonDataAdd(wk, pkm, WorldTradeData_GetReturnBox(wk->param->worldtrade_data), FALSE);
                 WorldTradeData_SetFlag(wk->param->worldtrade_data, 0);
                 GFL_HeapFree(pkm);
             } else {
@@ -1153,14 +1154,15 @@ static int Upload_SubSeqCancelWait(WorldTradeWork *wk) {
 static int Upload_SubSeqServerServiceEnd(WorldTradeWork *wk) {
     DpwTr_End();
     WorldTrade_TimeIconDel(wk);
-    GFL_WipeSet(0, 0, 0, 0, 6, 1, HEAPID_WORLDTRADE);
+    GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, 0, 6, 1, HEAPID_WORLDTRADE);
     wk->subprocessSeq = UPLOAD_SEQ_START;
     return WT_SEQ_FADEOUT;
 }
 
 static int Upload_SubSeqDownloadExStart(WorldTradeWork *wk) {
     Upload_DownloadPokemonDataAdd(wk, (PartyPkm *)wk->uploadPokemonData.postData,
-                                  func_0200b4fc(wk->param->worldtrade_data), wk->uploadPokemonData.isTrade);
+                                  WorldTradeData_GetReturnBox(wk->param->worldtrade_data),
+                                  wk->uploadPokemonData.isTrade);
     Upload_WifiHistoryDataSet(wk->param->wifihistory, &wk->uploadPokemonData);
     Upload_MakeTradeExchangeInfo(wk, (PartyPkm *)wk->uploadPokemonData.postData, &wk->uploadPokemonData, NULL);
     WorldTradeData_SetFlag(wk->param->worldtrade_data, 0);
@@ -1442,12 +1444,12 @@ static int Upload_SubSeqEnd(WorldTradeWork *wk) {
     WorldTrade_TimeIconDel(wk);
     if (wk->subOutFlag == 1) {
         if (GXS_GetMasterBrightness() == -16) {
-            GFL_WipeSet(3, 0, 0, 0, 6, 1, HEAPID_WORLDTRADE);
+            GFL_WipeSet(WIPE_MODE_MAIN, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, 0, 6, 1, HEAPID_WORLDTRADE);
         } else {
-            GFL_WipeSet(0, 0, 0, 0, 6, 1, HEAPID_WORLDTRADE);
+            GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, 0, 6, 1, HEAPID_WORLDTRADE);
         }
     } else {
-        GFL_WipeSet(3, 0, 0, 0, 6, 1, HEAPID_WORLDTRADE);
+        GFL_WipeSet(WIPE_MODE_MAIN, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, 0, 6, 1, HEAPID_WORLDTRADE);
     }
     wk->subprocessSeq = UPLOAD_SEQ_START;
     return WT_SEQ_FADEOUT;
@@ -1579,7 +1581,7 @@ static void Upload_WifiHistoryDataSet(UnityTowerSurveySave *save, Dpw_Tr_Data *t
     u8 country = trData->countryCode;
 
     if (!UnityTower_GetRegionState(save, country, region)) {
-        UnityTower_SetRegionState(save, country, region, 1);
+        UnityTower_SetRegionState(save, country, region, UNITY_TOWER_REGION_TODAY);
     }
 }
 

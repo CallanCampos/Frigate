@@ -48,7 +48,7 @@ struct MusicalEventWork {
     GameCommSys *gameComm;
     Ov210Work *ov210;
     // Overlay 211's communication work
-    void *comm;
+    MusCommWork *comm;
     MusicalDressUpParam *dressUp;
     MusicalStageParam *stage;
     MusicalShotParam *shot;
@@ -492,7 +492,7 @@ static void MusicalEvent_TakeShot(MusicalEventWork *work) {
     work->shot->comm = work->comm;
     shot = work->shot->shot;
     RTC_GetCachedDate(&date);
-    shot->unk0_0 = func_ov012_02152614(work->program);
+    shot->unk0_0 = MusicalProgram_GetBaseProgramId(work->program);
     shot->year = date.year;
     shot->month = date.month;
     shot->day = date.day;

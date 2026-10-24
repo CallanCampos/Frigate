@@ -7,6 +7,25 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 ## Registers swapped
 
+- A constant kept in a saved register in one version and rebuilt at each use (`movs`) in the other, with a second constant doing the opposite: the allocator's spill-cost tie between them. Reorder the field stores between calls so a store through a large-offset address temporary ends a stretch that already holds the other stores, which costs that constant one reload less. (matching.md: "Which constant keeps a saved register")
+- A constant passed as a copy of a register that holds it (`adds r1, r7, #0`) from some statement on, where ours builds it (`movs r1, #1`): a basic-block cut before that statement (more than 100 PCode instructions since the last cut, kept only after a statement that ends in a discarded call's result). Change the instruction count before the run, or the call that ends the statement before it. (matching.md: "starts a new basic block before a statement")
+- Rebuilt hash-context offsets across a digest phase: borrow a typed context pointer for all its operations.
+  (matching.md: "one typed context pointer for a digest phase")
+- Adjacent scratch partitions in different saved registers: derive each typed region from its predecessor.
+  (matching.md: "derives each adjacent scratch region")
+- Missing digit reload after a byte store: check the inferred pointer qualification against mutable callers.
+  (matching.md: "observed MWCC alias behavior")
+
+- A numeric query field copied through an extra register: share the meaningful query-result local with the
+  count case (`DWCi_QR2ServerKeyCallback`). (matching.md: "shares an `int value`")
+- An alternating buffer's index reloaded after a byte copy: snapshot the selected index in its unsigned type and
+  use it for both the copy and return (`value_for_key`). (matching.md: "selected alternating buffer")
+- A by-value IPv4 formatter argument loaded differently from a struct field: name the `IN_ADDR` value before the
+  call (`ProcessPingPacket`). (matching.md: "before its second diagnostic")
+
+- A 64-bit product's masked high word in the wrong register: calculate the product in a local of its own, then
+  mask it (`gsiLargeIntInverseMod`). (matching.md: "64-bit product calculated before it is masked")
+
 - Saved-result lifetimes and widespread register differences in a nested check runner: recover its semantic
   inline boundaries and probe per-source `-ipa file`, including loader-owned constructor data.
   (matching.md: "Nested inline boundaries and file-level interprocedural analysis")
@@ -135,6 +154,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
   (matching.md: "array index that is a sum")
 - The operands of `*` are loaded in source order. A product assigned to its own variable gets a new register.
   (matching.md: "operands of `*`"), (matching.md: "A product assigned")
+- An `adds` emitted destination first (`adds x, x, y`) where the original has it second: the source's `x = y + x`
+  is rewritten to `x += y`; the original summed into a variable of its own that wasn't forward-substituted.
+  (matching.md: "An add whose destination is one of its operands")
 - A three-term `|` chain with its loads swapped: swap its first two terms. (matching.md: "three-term `|` chain")
 - Where a flag is first set decides which register builds its zero. The register a shared zero gets follows statement
   order, and stores of 0 before a loop take the zero of the variable its initializer sets first, as in
@@ -234,12 +256,17 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 ## Stack slots or frame size
 
+- A write result missing its store to a later read's output slot: use one transfer-length local for both operations
+  (`DWCi_Http_Thread`). (matching.md: "one transfer-length local")
+
 - Raw rail progress spilled as converted scalars: keep the signed position/length snapshot and let its ratio
   inline read through a `const` pointer. (matching.md: "a progress snapshot")
 - Edge and corner sums unexpectedly shared, with fewer spills: signed edge arithmetic can coexist with unsigned
   corner arithmetic; cast the operands, not only the result. (matching.md: "Signed and unsigned sums")
 - Spilled locals in reversed slots around an accessor's result: read the field directly, typed as the SDK has it.
   (matching.md: "A `static inline` accessor that returns a field cast")
+- SHA-1's five-round groups with separate index/counter spills: reuse the message-word index and round-group
+  counter across the stages (`CPSi_sha1_block`). (matching.md: "One word index `t` and one group counter `i`")
 - A hash's unrolled rounds spilled differently: write each round as statements, and the counter as `int`.
   (matching.md: "The rounds of a hash written as statements")
 - A local in a saved register where the original spills it and keeps a zero there for two field stores: put another
@@ -250,8 +277,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - An archive handle or other local in a low slot where the original has it above the optimizer's temporaries:
   move the block that uses it into a `static inline` that declares it. (matching.md: "A local of an inlined
   helper")
-- Rail movement's cached line/length allocation differs between caller snapshots passed as parameters and snapshots
-  owned by directional inlines; the latter improves the still-partial function. (matching.md: "snapshot ownership")
+- A dispatcher's `static inline` handlers allocating unlike the original: write them as the arms of the one function,
+  each arm's locals in its block. (matching.md: "Four `static inline` handlers")
 - A local slotted above the temporaries where the original's value sits among them: the expression written at each
   use, which CSE shares as a temporary. (matching.md: "expression written at two uses")
 - A NitroSystem (2.0/sp2) function's spill slots in another order: locals are slotted function scope first, then
@@ -323,6 +350,12 @@ text to `grep -n` there. Entries without a key come from later work and still be
   despite word-sized spill accesses. (matching.md: "source-availability mask in the parameter")
 
 ## Instructions in another order (scheduling)
+
+- A table index computed after a spill where the original computes it before: the table may be a function-local
+  `static` in an inline getter. (matching.md: "holds it as a function-local `static`")
+
+- Packet sequence stores in another order: snapshot the current sequence across the global increment.
+  (matching.md: "snapshots the current `u16` sequence")
 
 - Two field loads in the other order, with every other instruction right: the field the original loads first may be
   `volatile`; prove it by probing without it. (matching.md: "A `volatile` field is loaded in source order")
@@ -508,6 +541,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 ## An instruction too many or too few
 
+- Context snapshot copy calls differ: recover explicit SDK copies (`rcv_finished`).
+  (matching.md: "saves and restores whole transcript contexts")
+
 - A zero text-origin component missing from measured bounds: `CalcMsgWindowDimensions` shares a paired origin's
   field-by-field inline initializer with printer placement. (matching.md: "bounds include both components")
 - Cut-in text allocation heap IDs: pass `HEAPID_TAIL` at each call; saved `u32` and `HeapID` locals change
@@ -519,6 +555,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
   store, `d->a = s[0] & 0xf;`. (matching.md: "A mask written before a bit-field store")
 - A constant narrowed at a call after `movs` (`movs r3, #0x11; lsls; asrs`): an enum-typed local set at the top of
   the function, before the calls. (matching.md: "A constant narrowed at a call")
+- A constant offset of a pointer argument built after a call where ours builds it later, or with the sum's
+  registers swapped: an enum-typed local for the offset, assigned where the original builds it. (matching.md:
+  "A constant offset added to a pointer in a call's argument")
 - A table field's offset folded into a second literal (`ldr r1, =table+4`) where the original adds the element
   offset to the base after a plain read: read that field through an inline taking an `int` index.
   (matching.md: "Two fields of one element of a static table")
@@ -530,9 +569,10 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 - A narrowing before an `and` into a `u8` field: `x &= mask` narrows the mask, `x = x & mask` doesn't.
   (matching.md: "compound assignment to a narrow field")
-- `ldrb; lsls #n; beq` where ours has `cmp r0, #0`: a doubling such as `x * 2` in the source, not a bit field or a
-  shifted or masked `u16`, which load the whole container (`ldrh`); a `_Bool` tests with `cmp` too. (matching.md:
-  "A bit field is loaded at its container's width")
+- `ldrb; lsls #n; beq` where ours has `cmp r0, #0`: a doubling such as `x * 2` in the source, or `&a[x] != a` over
+  elements of `1 << n` bytes, which folds to it; not a bit field or a shifted or masked `u16`, which load the
+  whole container (`ldrh`); a `_Bool` tests with `cmp` too. (matching.md: "A bit field is loaded at its
+  container's width", "The doubling can also be an address")
 - A signed `/ 2` narrowed in separate steps before a loop (`asrs #1; lsls #0x10; asrs #0x10`, ours `lsls #0xf`):
   compute the value inside the loop body from a narrow local. (matching.md: "A signed halving kept apart")
 - A reload between two stores of one value: a chained `a = b = v;`; separate statements store the narrowed value
@@ -577,6 +617,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
   (matching.md: "The same goes for a returned flag")
 - A local loaded again for a call after tests of it that share one load: the local and the callee's parameter are
   an enum. (matching.md: "tests its stat")
+- A variadic function's named parameter read back from its stack slot for a call where ours keeps it in a register,
+  or two stores through out-parameters in an order ours can't give: the value is an enum at every step, the callee's
+  parameter and the field included. (matching.md: "typed so at every step")
 - A local array's element loaded again after a call: it was read through a pointer to the element, set in the
   loop. (matching.md: "A local array's element is never loaded again")
 - An `ands` with a run-time 0xffff before a `strh`, shared by two stores: a packed-byte expression in two inline
@@ -589,6 +632,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - MWCC doesn't propagate constants into enum-typed variables: a loop that checks its bound before the first pass, or
   a sum that adds a counter known to be 0, has an enum counter. `scReportSetPlayerData` keeps its known-zero error
   test with the real `SCResult` type. (matching.md: "enum type")
+- A constant kept in a saved register across a call for a later register use, where the original builds it again:
+  the back end shares a constant within an extended basic block, and only a join or a variable it doesn't
+  propagate into (an enum-typed one) stops it; no pragma or integer type does. (matching.md: "shares a constant")
 - A constant kept in a callee-saved register for calls, then reduced at run time before a field store
   (`subs r6, #0x20; str r6, [r5, #8]`), where ours folds it: assign the field, then update it in place,
   `p->size = size; p->size -= 0x20;`. (matching.md: "reduced at run time before a field store")
@@ -707,6 +753,11 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 ## Branches and block layout
 
+- A single conditional-branch byte differs: verify both destinations and return values before tuning allocation.
+  (matching.md: "A near match can still contain a wrong branch condition")
+
+- Each arm of an `if`/`else` ending in `ldr base; movs rN, #k; b` to a shared `str`: the field is stored in each
+  arm, not through a local stored after the join. (matching.md: "cross-jumped at its store")
 - An early exit 8 bytes short, or a call's result returned through another layout: give the exit its own call
   and return, or return through a `result` local. (matching.md: "An early exit with its own call")
 - A flag set in several cases and tested at the end to pick a shared block, where the original branches straight to
@@ -794,6 +845,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 ## Loops
 
+- A loop in the source that the original has as one `cmp; ble` of its bound: MWCC removes a loop whose body doesn't
+  depend on its counter. (matching.md: "doesn't depend on its counter")
 - An unrolled loop over tables with the wrong registers and spills: step the tables by pointer (`*p++`) instead of
   indexing them. (matching.md: "A table read in an unrolled loop")
 - `scSubmitReport` needs a `u32` digest-clear counter for `subs; bne`; its signed counter adds a compare.
@@ -816,9 +869,6 @@ text to `grep -n` there. Entries without a key come from later work and still be
   unsigned and keeps the loop. (matching.md: "loop that runs once")
 - A static's field loaded on each pass of a loop that stores through a pointer, where the original loads it
   once: a local read before the loop. (matching.md: "hoists a static's field load out of a loop")
-- A local struct's address passed to a call in a loop, where the original keeps it in one register: try the order of
-  the independent stores before the loop; a pointer local used only at the call names nothing. (matching.md: "The
-  order of independent stores before a loop")
 - `asr`/`ror` division of a parameter the callers pass as `u8` without conversion: a `u8` parameter copied to an
   `s32` local. (matching.md: "copied to an `s32` local")
 - An address or value an inner loop computes from the outer counter alone is hoisted into the inner preheader.
@@ -882,6 +932,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
   (`case 3: case 4: default:`). (matching.md: "the empty labels set the jump table's range")
 - An extra block that sets the default's value in a case: let the case fall through into `default`, and stack an
   empty case on `default:` where the SDK compiled out a warning. (matching.md: "A case that falls through")
+- A case's table entry at the `b` ending the case before it, where an empty case goes to the switch's end: the case held
+  a debug print compiled out; write `(void)0;` with a comment (2.0/sp2). (matching.md: "compiled out to `(void)0`")
 - Cases are laid out in source order, not by value. (matching.md: "Switch cases are laid out in source order")
 - `case -1:` tested on its own before a jump table the original folds it into (`adds r0, #1; cmp`): the switch is on
   a `u32`; make the value (or the function returning it) signed. (matching.md: "takes `-1` in")
@@ -944,6 +996,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 ## Data and sections
 
+- Duplicate protocol literals pooled once, with two independently grouped sets of globals: verify original
+  source boundaries (`dwc_main.c`/`dwc_match.c`). (matching.md: "boundary at `DWC_AddMatchKeyInt`")
 - MSL exception indices before ordinary rodata: restore `-Cpp_exceptions on` and register the emitted `.exceptix`.
   (matching.md: "`dsi/1.2` with `-Cpp_exceptions on` emits exception indices")
 - A live empty assertion filename before earlier allocation literals: recover its named data object and probe
@@ -958,8 +1012,16 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - Odd instructions at the end of a same-size diff (`add sp, #0`, `.byte 0xff`): literal pool words, which can be a
   wrong constant; decode them before blaming registers. (matching.md: "decode the words before counting")
 - Live `.data` statics separated by unused records: one initialized array retains every entry even when code indexes
-  only some of them, preserving the original element offsets; `wipe_sub.c`'s line patterns match at 0, 0x10, 0x20
-  and 0x28 this way. (matching.md: "One initialized array retains entries")
+  only some of them, preserving the original element offsets, but first check whether the records are the statics of
+  dead-stripped functions, as `wipe_sub.c`'s were (next entry). (matching.md: "One initialized array retains
+  entries")
+- Pooled `.data` or `.rodata` objects that nothing in the ROM reads, among a file's live statics, when the file's
+  library is known from another decomp: the function-local statics of functions the original link dead-stripped.
+  Ask before going further: writing those functions back, global so that MWCC emits them and flagged in the
+  file as unverifiable reconstructions, and listing them in `config/deadstrip.toml`, which strips their code and keeps
+  their statics, is an exception to "Write C from the asm", made for `wipe_sub.c`'s 31 handlers (with the two
+  `wipe_wnd.c` readers they call) alone; any other file is another exception for the maintainer to accept. Making the objects globals instead isn't kept.
+  (matching.md: "A function-local static of a function MWCC doesn't emit"; configs.md: "Dead-stripped code")
 - String literals in another order: MWCC lays them out in the order they first appear in the source; a `""` the
   game has before the file's name needs an earlier use. (matching.md: "String literals")
 - A literal laid out before every surviving use of it: code the original link dead-stripped. Each code literal has a
@@ -971,7 +1033,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - Static data is sorted by size by a heapsort. Objects of 64 bytes or more, local initializers and unreferenced
   globals get their own sections. Predict with `tools/decomp/rodata_order.py`; the object list must be complete, so
   `--from-object FILE.o` lists every object a compile made and `--check FILE.o` fails when the prediction and the
-  compiler disagree. A "no order works" verdict means nothing until `--check` passes. (matching.md: "Static data is sorted by size")
+  compiler disagree (for a file in `config/deadstrip.toml`, both read the unstripped object in place of the build's).
+  A "no order works" verdict means nothing until `--check` passes. (matching.md: "Static data is sorted by size")
 - On NitroSystem's `2.0/sp2`, initialized globals are ordered by size, smallest first, and objects of one size in the
   reverse of their declaration order (G3D's `anm.c`, `cgtool.c`). (matching.md: "gives each initialized global")
 - Stores at offsets from a static's own address (`ldr r1, =obj; str r3, [r1]`) where ours goes through the section's
@@ -1048,7 +1111,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
   32-aligned")
 - A literal of `SYM + bias` with the bias subtracted at run time: element-pointer arithmetic (`arr + 0x880`) puts
   the bias in the addend, byte arithmetic adds it at run time, and the subtraction stays when the result is the base
-  of a variable index. (matching.md: "A bias on a data symbol lands in the literal's addend")
+  of a variable index, or for a scalar read when the address is converted to `s32` rather than `u32`. (matching.md:
+  "A bias on a data symbol lands in the literal's addend")
 - `.bss` runs that are each sorted by size, with the same layout unreachable in one file: the range is several
   files, each with `-ipa file`; and sweep the declaration orders of the statics. (matching.md: "With `-ipa file` the
   order of a file's same-size statics")

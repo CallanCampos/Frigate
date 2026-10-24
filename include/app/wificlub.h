@@ -2,6 +2,7 @@
 #define POKEBW2_APP_WIFICLUB_H
 
 #include "types.h"
+#include "app/wifi_status.h"
 #include "gfl/overlay.h"
 #include "gfl/proc.h"
 #include "struct_decls.h"
@@ -11,7 +12,7 @@
 #define OVERLAY_WIFICLUB_MAIN OVERLAY_ID(173)
 
 typedef struct {
-    void *buffer;
+    WIFI_STATUS *buffer;
     GameData *gameData;
     SaveControl *save;
     // What the player chose in the Wi-Fi Club

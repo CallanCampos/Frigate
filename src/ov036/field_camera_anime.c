@@ -20,7 +20,7 @@ struct FieldCameraAnimationController {
     BOOL bound;
     u32 savedTransformType;
     BOOL savedBoundaryEnable;
-    void *savedBind;
+    const VecFx32 *savedBind;
     BOOL hasSavedBind;
 };
 
@@ -31,7 +31,7 @@ static void FieldCameraCalc_LerpVector(const VecFx32 *from, const VecFx32 *to, u
 static void FieldCamera_ClearAnimatorFunc(FieldCamera *camera);
 static void FieldCamera_GetAnimationCoords_(FieldCamera *camera, FieldCameraCoords *coords);
 static FieldCameraAnimationController *FieldCameraAnimationController_Create(HeapID heapId);
-static void FieldCameraAnimation_Free(void *animation);
+static void FieldCameraAnimation_Free(FieldCameraAnimationController *animation);
 static void FieldCameraAnimationController_SetField(FieldCameraAnimationController *controller, Field *field);
 static void FieldCameraAnimationController_SetupCameraBind(FieldCameraAnimationController *controller);
 static void FieldCameraAnimationController_AdjustTransform(FieldCameraAnimationController *controller);
@@ -306,7 +306,7 @@ static FieldCameraAnimationController *FieldCameraAnimationController_Create(Hea
     return GFL_HeapAllocate(heapId, sizeof(FieldCameraAnimationController), FALSE, "field_camera_anime.c", 238);
 }
 
-static void FieldCameraAnimation_Free(void *animation) {
+static void FieldCameraAnimation_Free(FieldCameraAnimationController *animation) {
     GFL_HeapFree(animation);
 }
 

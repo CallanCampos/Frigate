@@ -14,8 +14,8 @@ static MBWmConfig sWmConfig = {
     0x28, 0x28, 0xffff, 5, 1, sParentName, -1, -1,
 };
 
-// The parameters of the scan for parents
-static WMScanExParam sScanParam;
+// The parameters of the scan for parents, 32-aligned as the ROM places them
+static WMScanExParam sScanParam ATTRIBUTE_ALIGN(32);
 
 // What the library works with: the DMA channel and the buffer for the wireless manager, whether to filter the parents
 // by their game's ID, and the library's memory, all set by MB_Init
@@ -347,8 +347,8 @@ static void MBi_ChildPortCallback(void *arg) {
 
 // The callback of the scan for parents
 static void MBi_ChildCallback(void *arg) {
-    MBiParam *work = sWmWork;
     WMCallback *cb = arg;
+    MBiParam *const work = sWmWork;
 
     switch (cb->apiid) {
     case WM_APIID_INITIALIZE:
@@ -395,21 +395,17 @@ static void MBi_ChildCallback(void *arg) {
         case 3:
             return;
         case WM_STATECODE_PARENT_FOUND: {
-            u8 usable = 0;
             u8 i;
+            u8 usable;
+            WMBssDesc *desc;
+            ParentInfo *entries;
+            int k;
 
-            // The first parent found or added ends the walk. Both loops are entered at their test, as 0/1 tests give
-            for (i = 0; i < scan->bssDescCount ? TRUE : FALSE; i++) {
-                WMBssDesc *desc = scan->bssDesc[i];
-                ParentInfo *entries = work->parent_info;
-                BOOL valid;
-                int k;
-
-                valid = desc->gameInfoLength >= 0x10 && desc->gameInfoLength <= 0x80 &&
-                        desc->gameInfoLength == desc->gameInfo.userGameInfoLength + 0x10 &&
-                        desc->gameInfo.magicNumber == 1 &&
-                        desc->length == (desc->gameInfoLength + 1 + offsetof(WMBssDesc, gameInfo)) / sizeof(u16);
-                if (!valid || !MBWm_IsMultibootBeacon(desc)) {
+            usable = 0;
+            for (i = 0; i < scan->bssDescCount; i++) {
+                desc = scan->bssDesc[i];
+                entries = work->parent_info;
+                if (!WM_IsValidGameBeacon(desc) || !MBWm_IsMultibootBeacon(desc)) {
                     usable++;
                     continue;
                 }
@@ -418,16 +414,12 @@ static void MBi_ChildCallback(void *arg) {
                     usable++;
                     continue;
                 }
-                for (k = 0; k < work->found_parent_count ? TRUE : FALSE; k++) {
-                    BOOL same = desc->bssid[0] == entries[k].bssid[0] && desc->bssid[1] == entries[k].bssid[1] &&
-                                desc->bssid[2] == entries[k].bssid[2] && desc->bssid[3] == entries[k].bssid[3] &&
-                                desc->bssid[4] == entries[k].bssid[4] && desc->bssid[5] == entries[k].bssid[5];
-
-                    if (same) {
+                for (k = 0; k < work->found_parent_count; k++) {
+                    if (WM_IsBssidEqual(desc->bssid, entries[k].bssid)) {
                         entries[k].gameInfoLength = desc->gameInfoLength;
                         entries[k].gameInfo = desc->gameInfo;
                         DC_InvalidateRange(&work->parent_info[k], 0xc0);
-                        MIi_DmaCopy16(sDmaNo, desc, &work->parent_info[k], 0xc0, TRUE);
+                        MI_DmaCopy16(sDmaNo, desc, &work->parent_info[k], 0xc0);
                         work->last_found_parent_no = k;
                         work->callback(MB_CALLBACK_PARENT_FOUND, &scan->linkLevel[i]);
                         goto restart;
@@ -440,7 +432,7 @@ static void MBi_ChildCallback(void *arg) {
                     entries[k].linkLevel = scan->linkLevel[i];
                     MI_CpuCopy16(&desc->gameInfo, &entries[k].gameInfo, sizeof(WMGameInfo));
                     DC_InvalidateRange(&work->parent_info[k], 0xc0);
-                    MIi_DmaCopy16(sDmaNo, desc, &work->parent_info[k], 0xc0, TRUE);
+                    MI_DmaCopy16(sDmaNo, desc, &work->parent_info[k], 0xc0);
                     work->last_found_parent_no = k;
                     work->callback(MB_CALLBACK_PARENT_FOUND, &scan->linkLevel[i]);
                     goto restart;
@@ -450,21 +442,26 @@ static void MBi_ChildCallback(void *arg) {
                 work->callback(MB_CALLBACK_PARENT_NOT_FOUND, arg);
             }
         restart:
-            if (work->scanning_flag != 0) {
-                if (work->scan_channel_flag != 0 && !changeScanChannel(&sScanParam)) {
+            if (!work->scanning_flag) {
+                return;
+            }
+            if (work->scan_channel_flag) {
+                if (!changeScanChannel(&sScanParam)) {
                     MBi_CommEnd();
                 }
-                MBi_CheckWmErrcode(WM_APIID_START_SCAN_EX, WM_StartScanEx(MBi_ChildCallback, &sScanParam));
             }
+            MBi_CheckWmErrcode(WM_APIID_START_SCAN_EX, WM_StartScanEx(MBi_ChildCallback, &sScanParam));
             return;
         }
         case WM_STATECODE_PARENT_NOT_FOUND:
             work->callback(MB_CALLBACK_PARENT_NOT_FOUND, arg);
-            if (work->scanning_flag == 0) {
+            if (!work->scanning_flag) {
                 return;
             }
-            if (work->scan_channel_flag != 0 && !changeScanChannel(&sScanParam)) {
-                MBi_CommEnd();
+            if (work->scan_channel_flag) {
+                if (!changeScanChannel(&sScanParam)) {
+                    MBi_CommEnd();
+                }
             }
             MBi_CheckWmErrcode(WM_APIID_START_SCAN_EX, WM_StartScanEx(MBi_ChildCallback, &sScanParam));
             return;
@@ -478,7 +475,7 @@ static void MBi_ChildCallback(void *arg) {
             work->callback(MB_CALLBACK_ERROR, arg);
             return;
         }
-        MBi_CheckWmErrcode(WM_APIID_START_CONNECT, WM_StartConnectEx(MBi_ChildCallback, work->pInfo, NULL, TRUE, 0));
+        MBi_CheckWmErrcode(WM_APIID_START_CONNECT, WM_StartConnect(MBi_ChildCallback, work->pInfo, NULL));
         return;
     case WM_APIID_START_CONNECT: {
         WMStartConnectCallback *connect = arg;
@@ -497,17 +494,13 @@ static void MBi_ChildCallback(void *arg) {
             work->my_aid = connect->aid;
             work->callback(MB_CALLBACK_CONNECTED_TO_PARENT, arg);
             work->child_bitmap = 1;
-            if (WM_SetPortCallback(1, MBi_ChildPortCallback, NULL) == 0) {
-                BOOL singleMode = FALSE;
-
-                if (work->contSend == 0) {
-                    singleMode = TRUE;
-                }
-                MBi_CheckWmErrcode(WM_APIID_START_MP,
-                                   WM_StartMPEx(MBi_ChildCallback, (u16 *)work->recvBuf, work->recvBufSize,
-                                                (u16 *)work->sendBuf, work->sendBufSize, singleMode, 0, 0, 0, 1, 1));
+            if (WM_SetPortCallback(1, MBi_ChildPortCallback, NULL) != 0) {
                 return;
             }
+            MBi_CheckWmErrcode(WM_APIID_START_MP,
+                               WM_StartMPEx(MBi_ChildCallback, (u16 *)work->recvBuf, work->recvBufSize,
+                                            (u16 *)work->sendBuf, work->sendBufSize, work->contSend ? 0 : 1, 0, 0, 0, 1,
+                                            1));
             return;
         case WM_STATECODE_DISCONNECTED:
             work->callback(MB_CALLBACK_DISCONNECTED_FROM_PARENT, arg);
@@ -539,23 +532,19 @@ static void MBi_ChildCallback(void *arg) {
             return;
         }
     }
-    case WM_APIID_SET_MP_DATA: {
-        u16 event;
-
+    case WM_APIID_SET_MP_DATA:
         work->mpBusy = 0;
         if (cb->errcode == 0) {
-            event = MB_CALLBACK_MP_CHILD_SENT;
+            work->callback(MB_CALLBACK_MP_CHILD_SENT, arg);
         } else if (cb->errcode == 9) {
-            event = MB_CALLBACK_MP_CHILD_SENT_TIMEOUT;
+            work->callback(MB_CALLBACK_MP_CHILD_SENT_TIMEOUT, arg);
         } else {
-            event = MB_CALLBACK_MP_CHILD_SENT_ERR;
+            work->callback(MB_CALLBACK_MP_CHILD_SENT_ERR, arg);
         }
-        work->callback(event, arg);
         if (sWmWork->endReq == 0) {
             work->callback(MB_CALLBACK_MP_SEND_ENABLE, NULL);
         }
         return;
-    }
     case WM_APIID_RESET:
         if (cb->errcode != 0) {
             work->endReq = 0;

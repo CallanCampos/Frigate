@@ -36,7 +36,7 @@ struct KeySystemNet {
     u32 count;
     u32 timer;
     NHttpRap *http;
-    void *ov181Work;
+    MBDataConv *ov181Work;
     u16 heapId;
     BOOL error;
     u32 errorCode;
@@ -127,7 +127,7 @@ static GFLNetInitData sNetInitData = {
     0x10,
     1,
     0,
-    4,
+    GFL_NET_TYPE_IRC_WIRELESS,
     1,
     NET_COMMAND_BASE >> 8,
     { 0xfe, 0xff, 0, 0 },
@@ -395,7 +395,7 @@ static void KeySystemNet_SeqConnect(KeySystemSeq *seq, int *state, void *work) {
         net->timer = 0;
         NetCommand_AddTable(NET_COMMAND_BASE, sKeySystemNetCommands, 1, net);
         NetHandle_SendTimingPair(NetHandle_GetOwn(), 10, NET_COMMAND_BASE >> 8);
-        func_02042e94(TRUE);
+        GflNet_SetAutoExit(TRUE);
         GFL_NetSetDisconnectError(TRUE);
         (*state)++;
         break;
@@ -433,7 +433,7 @@ static void KeySystemNet_SeqDisconnect(KeySystemSeq *seq, int *state, void *work
         break;
     case 1:
         if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), 13, NET_COMMAND_BASE >> 8)) {
-            func_02042e94(FALSE);
+            GflNet_SetAutoExit(FALSE);
             GFL_NetSetDisconnectError(FALSE);
             (*state)++;
         }

@@ -5,6 +5,7 @@
 #include "battle/btl_handler.h"
 #include "battle/btl_pokeparam.h"
 #include "battle/btl_server_flow.h"
+#include "constants/battle.h"
 
 // One entry of the position effect table: an effect and the function that returns its handlers
 typedef struct PosEventAddEntry {
@@ -164,7 +165,7 @@ static void HandlerPosLunarDance(BattleEventItem *item, BtlServerFlow *flow, u8 
         if (!IsMonFullHP(mon)) {
             recover = BattleHandler_PushWork(flow, 5, monId);
             recover->targetIndex = monId;
-            recover->amount = GetBattleMonStat(mon, 0xe) - GetBattleMonStat(mon, 0xd);
+            recover->amount = GetBattleMonStat(mon, BATTLEMON_MAX_HP) - GetBattleMonStat(mon, BATTLEMON_HP);
             BattleHandler_PopWork(flow, recover);
         }
         if (GetBattleMonStatus(mon)) {
@@ -231,7 +232,7 @@ static void HandlerPosHealingWish(BattleEventItem *item, BtlServerFlow *flow, u8
         if (!IsMonFullHP(mon)) {
             recover = BattleHandler_PushWork(flow, 5, monId);
             recover->targetIndex = monId;
-            recover->amount = GetBattleMonStat(mon, 0xe) - GetBattleMonStat(mon, 0xd);
+            recover->amount = GetBattleMonStat(mon, BATTLEMON_MAX_HP) - GetBattleMonStat(mon, BATTLEMON_HP);
             BattleHandler_PopWork(flow, recover);
         }
         if (GetBattleMonStatus(mon)) {

@@ -226,7 +226,7 @@ data_ov142_021a10c0 kind:data(any) addr:0x021a10c0
 data_ov142_021a10e0 kind:data(any) addr:0x021a10e0
 data_ov142_021a1100 kind:data(any) addr:0x021a1100
 data_ov142_021a1120 kind:data(any) addr:0x021a1120
-data_ov142_021a1138 kind:data(any) addr:0x021a1138
+sItemNameOrder kind:data(any) addr:0x021a1138
 data_ov142_021a1640 kind:data(any) addr:0x021a1640
 sPocketTabPos kind:data(any) addr:0x021a164c
 sItemMenuVRAMConfig kind:data(any) addr:0x021a1664

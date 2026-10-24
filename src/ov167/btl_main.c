@@ -18,6 +18,7 @@
 #include "battle/pokewood_cutin.h"
 #include "constants/abilities.h"
 #include "constants/arc.h"
+#include "constants/battle.h"
 #include "constants/pokemon.h"
 #include "constants/species.h"
 #include "constants/text_banks.h"
@@ -391,7 +392,7 @@ void BtlMain_SetCleanupSeq(BtlMainSeq *seq, BtlMainModule *mainModule, BtlSetup 
     BtlMainSeq_Set(seq, BtlMain_Cleanup, mainModule);
 }
 
-u8 func_ov167_0219a004(BtlSetup *setup) {
+u8 BtlMain_IsCommCompetitor(BtlSetup *setup) {
     switch (setup->battleType) {
     case 0:
         return FALSE;
@@ -408,7 +409,7 @@ u8 func_ov167_0219a004(BtlSetup *setup) {
 
 void BtlMain_SetupPlayerAndParties(BtlMainModule *mainModule, BtlSetup *setup) {
     u32 i;
-    void *chatter;
+    PerapVoice *chatter;
     u8 chatterFlags[4];
 
     mainModule->playerClientId = setup->fieldSituation.unk19;
@@ -521,7 +522,7 @@ void BtlMain_CreateViewCore(BtlMainModule *mainModule, BtlSetup *setup, u32 arg2
 
 BOOL BtlMain_SetupAloneSingle(u32 *state, BtlMainModule *mainModule) {
     BtlSetup *setup = mainModule->setup;
-    u8 unk = func_ov167_0219a004(setup);
+    u8 unk = BtlMain_IsCommCompetitor(setup);
 
     mainModule->clientCount = 2;
     mainModule->posClientIds[0] = 0;
@@ -577,7 +578,7 @@ BOOL BtlMain_Cleanup(u32 *state, BtlMainModule *mainModule) {
 
 BOOL BtlMain_SetupAloneDouble(u32 *state, BtlMainModule *mainModule) {
     BtlSetup *setup = mainModule->setup;
-    u8 unk = func_ov167_0219a004(setup);
+    u8 unk = BtlMain_IsCommCompetitor(setup);
 
     mainModule->playerClientId = 0;
     mainModule->clientCount = 2;
@@ -613,7 +614,7 @@ BOOL BtlMain_SetupAloneDouble(u32 *state, BtlMainModule *mainModule) {
 
 BOOL BtlMain_SetupAloneMulti(u32 *state, BtlMainModule *mainModule) {
     BtlSetup *setup = mainModule->setup;
-    u8 unk = func_ov167_0219a004(setup);
+    u8 unk = BtlMain_IsCommCompetitor(setup);
     s32 i;
 
     mainModule->playerClientId = 0;
@@ -704,7 +705,7 @@ BOOL BtlMain_SetupAloneMulti(u32 *state, BtlMainModule *mainModule) {
 
 BOOL BtlMain_SetupAloneTriple(u32 *state, BtlMainModule *mainModule) {
     BtlSetup *setup = mainModule->setup;
-    u8 unk = func_ov167_0219a004(setup);
+    u8 unk = BtlMain_IsCommCompetitor(setup);
 
     mainModule->clientCount = 2;
     mainModule->unk46E = 1;
@@ -742,7 +743,7 @@ BOOL BtlMain_SetupAloneTriple(u32 *state, BtlMainModule *mainModule) {
 
 BOOL BtlMain_SetupAloneRotation(u32 *state, BtlMainModule *mainModule) {
     BtlSetup *setup = mainModule->setup;
-    u8 unk = func_ov167_0219a004(setup);
+    u8 unk = BtlMain_IsCommCompetitor(setup);
 
     mainModule->clientCount = 2;
     mainModule->posClientIds[0] = 0;
@@ -1199,7 +1200,7 @@ BOOL BtlMain_CommExchangeTrainers(BtlMainModule *mainModule, s32 *state) {
 BOOL BtlMain_CommExchangeChatter(BtlMainModule *mainModule, s32 *state) {
     BtlSetup *setup = mainModule->setup;
     u32 i;
-    void *chatter;
+    PerapVoice *chatter;
 
     if (BtlNet_CheckError()) {
         mainModule->unk473_0 = 1;
@@ -1246,7 +1247,7 @@ BOOL BtlMain_CommExchangeChatter(BtlMainModule *mainModule, s32 *state) {
 BOOL BtlMain_CommCreateSingle(BtlMainModule *mainModule, s32 *state) {
     BtlSetup *setup = mainModule->setup;
     u8 clientId = mainModule->playerClientId;
-    u8 unk = func_ov167_0219a004(setup);
+    u8 unk = BtlMain_IsCommCompetitor(setup);
     u32 opponent;
     u32 i;
 
@@ -1287,7 +1288,7 @@ BOOL BtlMain_CommCreateSingle(BtlMainModule *mainModule, s32 *state) {
 BOOL BtlMain_CommCreateDouble(BtlMainModule *mainModule, s32 *state) {
     BtlSetup *setup = mainModule->setup;
     u8 clientId = mainModule->playerClientId;
-    u8 unk = func_ov167_0219a004(setup);
+    u8 unk = BtlMain_IsCommCompetitor(setup);
     u8 posCount = setup->fieldSituation.unk1a == 0 ? 2 : 1;
     u8 ally;
     u32 i;
@@ -1343,7 +1344,7 @@ BOOL BtlMain_CommCreateDouble(BtlMainModule *mainModule, s32 *state) {
 BOOL BtlMain_CommCreateTriple(BtlMainModule *mainModule, s32 *state) {
     BtlSetup *setup = mainModule->setup;
     u8 clientId = mainModule->playerClientId;
-    u8 unk = func_ov167_0219a004(setup);
+    u8 unk = BtlMain_IsCommCompetitor(setup);
     u32 opponent;
     u32 i;
 
@@ -1384,7 +1385,7 @@ BOOL BtlMain_CommCreateTriple(BtlMainModule *mainModule, s32 *state) {
 BOOL BtlMain_CommCreateRotation(BtlMainModule *mainModule, s32 *state) {
     BtlSetup *setup = mainModule->setup;
     u8 clientId = mainModule->playerClientId;
-    u8 unk = func_ov167_0219a004(setup);
+    u8 unk = BtlMain_IsCommCompetitor(setup);
     u32 i;
 
     if (BtlNet_CheckError()) {
@@ -1430,8 +1431,9 @@ BOOL BtlMain_CommCreateViewCore(BtlMainModule *mainModule, s32 *state) {
     }
     switch (*state) {
     case 0:
-        mainModule->viewCore = BtlvCore_Create(mainModule, mainModule->clients[mainModule->playerClientId],
-                                               &mainModule->pokeCons[0], func_ov167_0219a004(mainModule->setup), 0x13);
+        mainModule->viewCore =
+            BtlvCore_Create(mainModule, mainModule->clients[mainModule->playerClientId], &mainModule->pokeCons[0],
+                            BtlMain_IsCommCompetitor(mainModule->setup), 0x13);
         BattleClient_SetViewCore(mainModule->clients[mainModule->playerClientId], mainModule->viewCore);
         if (mainModule->unk46E) {
             mainModule->mainFunc = BtlMain_MainLoopCommServer;
@@ -1582,7 +1584,7 @@ BOOL func_ov167_0219bdfc(BtlMainModule *mainModule) {
     return FALSE;
 }
 
-void *GetCommPlayerSupport(BtlMainModule *mainModule) {
+CommPlayerSupport *GetCommPlayerSupport(BtlMainModule *mainModule) {
     if (mainModule->setup->battleType <= 1) {
         return mainModule->setup->unk88;
     }
@@ -2156,7 +2158,7 @@ u8 ViewPosToBattlePos(BtlMainModule *mainModule, u8 index) {
     return playerSide + (index - 2);
 }
 
-BOOL func_ov167_0219c7a4(BtlMainModule *mainModule) {
+BOOL BtlMain_IsCommMulti(BtlMainModule *mainModule) {
     if (IsMultiMode(mainModule)) {
         u32 battleType = BtlSetup_GetBattleType(mainModule);
 
@@ -2261,7 +2263,7 @@ BagSave *GetBagSave(BtlMainModule *mainModule) {
     return mainModule->setup->bag;
 }
 
-void *GetBagCursor(BtlMainModule *mainModule) {
+BagCursor *GetBagCursor(BtlMainModule *mainModule) {
     return mainModule->setup->unk7C;
 }
 
@@ -2321,7 +2323,7 @@ u32 ReturnZero(BtlMainModule *mainModule, u32 flag) {
     return 0;
 }
 
-void func_ov167_0219c9fc(BtlMainModule *mainModule, u8 pos) {
+void BtlMain_StoreSlotNthResult(BtlMainModule *mainModule, u8 pos) {
     if (mainModule->setup->unkAC == 6) {
         mainModule->setup->unkAC = CountClientPosBefore(mainModule, pos);
     }
@@ -2512,7 +2514,7 @@ void PokeCon_CreateClientParty(BtlPokeCon *pokeCon, BtlMainModule *mainModule, u
     eligible = GetPartyPkmnEligibleForBattle(srcParty);
     if (eligible > 0) {
         for (monId = firstMonId, i = 0; i < eligible; monId++) {
-            if (GetBattleMonStat(pokeCon->mons[monId], 0x11) == ABILITY_ILLUSION) {
+            if (GetBattleMonStat(pokeCon->mons[monId], BATTLEMON_EFFECTIVE_ABILITY) == ABILITY_ILLUSION) {
                 SetIllusionDisguise(pokeCon->mons[monId], PokeParty_GetPkm(srcParty, eligible));
             }
             i++;
@@ -2521,7 +2523,8 @@ void PokeCon_CreateClientParty(BtlPokeCon *pokeCon, BtlMainModule *mainModule, u
     if (BtlSetup_GetBattleType(mainModule) == 0 && clientId == 1) {
         for (i = 0; i < count; firstMonId++) {
             mon = pokeCon->mons[firstMonId];
-            if (GetBattleMonSpecies(mon) == SPECIES_ZOROARK && GetBattleMonStat(mon, 0x11) == ABILITY_ILLUSION) {
+            if (GetBattleMonSpecies(mon) == SPECIES_ZOROARK &&
+                GetBattleMonStat(mon, BATTLEMON_EFFECTIVE_ABILITY) == ABILITY_ILLUSION) {
                 party = GetClientSrcParty(mainModule, 0, pokeCon->unkE4);
                 species = 0;
                 partyCount = PokeParty_GetPkmCount(party);
@@ -2543,8 +2546,8 @@ void PokeCon_CreateClientParty(BtlPokeCon *pokeCon, BtlMainModule *mainModule, u
                 }
                 if (species != 0) {
                     if (mainModule->unk2C0 == NULL) {
-                        mainModule->unk2C0 =
-                            PokeParty_NewTempPkm(species, GetBattleMonStat(mon, 0xf), 0, mainModule->heapId);
+                        mainModule->unk2C0 = PokeParty_NewTempPkm(species, GetBattleMonStat(mon, BATTLEMON_LEVEL), 0,
+                                                                  mainModule->heapId);
                     }
                     SetIllusionDisguise(mon, mainModule->unk2C0);
                 }
@@ -2711,7 +2714,7 @@ const BattleMon *GetPokeParamConst(const BtlPokeCon *pokeCon, u8 monId) {
     return pokeCon->mons[monId];
 }
 
-BOOL GetViewPosChatter(BtlMainModule *mainModule, u32 index, void **out) {
+BOOL GetViewPosChatter(BtlMainModule *mainModule, u32 index, PerapVoice **out) {
     u8 clientId = GetClientIDFromPos(mainModule, ViewPosToBattlePos(mainModule, index));
 
     if (mainModule->unk3E0[clientId] != NULL) {
@@ -3024,7 +3027,7 @@ void UpdatePartyIllusionDisguises(BtlMainModule *mainModule, BattleParty *party,
     }
     for (; i < party->count; i++) {
         mon = party->mons[i];
-        if (GetBattleMonStat(mon, 0x11) == ABILITY_ILLUSION) {
+        if (GetBattleMonStat(mon, BATTLEMON_EFFECTIVE_ABILITY) == ABILITY_ILLUSION) {
             if (i < last) {
                 SetIllusionDisguise(mon, GetSrcData(party->mons[last]));
             } else if (BattleMon_GetViewSrcData(mon) != mainModule->unk2C0) {
@@ -3286,14 +3289,14 @@ void AddRecord(BtlMainModule *mainModule, u32 record, u32 value) {
     }
 }
 
-void *func_ov167_0219db00(BtlMainModule *mainModule) {
+u8 *func_ov167_0219db00(BtlMainModule *mainModule) {
     return mainModule->setup->unk90;
 }
 
 BOOL func_ov167_0219db08(BtlMainModule *mainModule) {
     BOOL result = FALSE;
 
-    switch (func_ov167_0219a004(mainModule->setup)) {
+    switch (BtlMain_IsCommCompetitor(mainModule->setup)) {
     case 1:
         if (mainModule->setup->unk97 != 0) {
             result = TRUE;
@@ -3305,7 +3308,7 @@ BOOL func_ov167_0219db08(BtlMainModule *mainModule) {
 
 BOOL func_ov167_0219db28(BtlMainModule *mainModule) {
     if (!mainModule->setup->unkDD_5) {
-        if (func_ov167_0219a004(mainModule->setup) == 1) {
+        if (BtlMain_IsCommCompetitor(mainModule->setup) == 1) {
             return func_ov167_0219db08(mainModule);
         }
         switch (BtlSetup_GetBattleType(mainModule)) {
@@ -3417,8 +3420,8 @@ void BtlMain_StorePartiesToSetup(BtlMainModule *mainModule) {
             for (i = 0; i < monCount; i++) {
                 mon = BattleParty_GetMon(battleParty, i);
                 slot = GetMonID(mon) - firstMonId;
-                hp += GetBattleMonStat(mon, 13);
-                maxHP += GetBattleMonStat(mon, 14);
+                hp += GetBattleMonStat(mon, BATTLEMON_HP);
+                maxHP += GetBattleMonStat(mon, BATTLEMON_MAX_HP);
                 if (IsFainted(mon)) {
                     mainModule->setup->unkE7[index][slot] = 2;
                 } else if (GetBattleMonStatus(mon) != 0) {
@@ -3430,7 +3433,7 @@ void BtlMain_StorePartiesToSetup(BtlMainModule *mainModule) {
     }
 }
 
-BOOL func_ov167_0219de6c(BtlMainModule *mainModule) {
+BOOL BtlMain_IsCommTrainerBattle(BtlMainModule *mainModule) {
     switch (BtlSetup_GetBattleType(mainModule)) {
     case 2:
     case 3:
@@ -3458,7 +3461,7 @@ u32 BtlMain_DetermineResult(BtlMainModule *mainModule) {
         }
         result = mainModule->result;
     }
-    mainModule->setup->unkA8 = result;
+    mainModule->setup->result = result;
     return result;
 }
 
@@ -3480,7 +3483,7 @@ BOOL IsGameTimeUp(BtlMainModule *mainModule) {
     return BattleClient_IsGameTimeUp(mainModule->clients[mainModule->playerClientId]);
 }
 
-BOOL func_ov167_0219df50(BtlMainModule *mainModule) {
+BOOL BtlMain_CheckOwnWindowDone(BtlMainModule *mainModule) {
     BOOL result;
 
     if (mainModule->setup->fieldSituation.unk1b != 0) {
@@ -3549,7 +3552,7 @@ void BtlMain_StartRecSkip(BtlMainModule *mainModule, u32 arg1) {
     u8 unk;
     u32 i;
 
-    unk = func_ov167_0219a004(mainModule->setup);
+    unk = BtlMain_IsCommCompetitor(mainModule->setup);
     BtlCalc_ResetRand(&mainModule->rand);
     BtlMain_LoadSetupParties(mainModule, mainModule->setup);
     PokeCon_Clear(&mainModule->pokeCons[0]);
@@ -3619,7 +3622,7 @@ void BtlMain_StoreResultStats(BtlMainModule *mainModule) {
     setup->unkD6 = BtlServerFlow_GetPlayerNotVeryEffectiveHitCount(flow);
     setup->unkD7 = BtlServerFlow_GetFoeImmuneHitCount(flow);
     setup->unkD8 = BtlServerFlow_GetFoeNotVeryEffectiveHitCount(flow);
-    if (setup->unkA8 == 1) {
+    if (setup->result == BTL_RESULT_VICTORY) {
         setup->unkD9 = 1;
     }
     party = GetPartyData(&mainModule->pokeCons[1], 0);
@@ -3628,7 +3631,7 @@ void BtlMain_StoreResultStats(BtlMainModule *mainModule) {
     for (i = 0; i < count; i++) {
         mon = BattleParty_GetMon(party, i);
         setup->unkDC += BattleMon_GetUsedMoveKindCount(mon);
-        setup->unkD0 += GetBattleMonStat(mon, 13);
+        setup->unkD0 += GetBattleMonStat(mon, BATTLEMON_HP);
     }
     setup->unkDB = count - alive;
     party = GetPartyData(&mainModule->pokeCons[1], 1);
@@ -3679,7 +3682,7 @@ BtlScriptedRules *GetStudioRules(BtlMainModule *mainModule) {
     return mainModule->unk474;
 }
 
-void *func_ov167_0219e3ac(BtlMainModule *mainModule) {
+BtlMainUnk478 *func_ov167_0219e3ac(BtlMainModule *mainModule) {
     if (mainModule->unk478 == NULL) {
         return NULL;
     }
@@ -3690,5 +3693,5 @@ PokewoodCutin *GetPokewoodCutin(BtlMainModule *mainModule) {
     return mainModule->cutin;
 }
 
-void func_ov167_0219e3c8(void *data) {
+void func_ov167_0219e3c8(BtlScriptedRules *data) {
 }

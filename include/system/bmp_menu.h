@@ -16,9 +16,11 @@
 
 // The results of a menu's update while nothing is chosen and when it is cancelled, and the value of an option the
 // cursor skips
-#define BMPMENU_NULL (-1)
-#define BMPMENU_CANCEL (-2)
-#define BMPMENU_DUMMY (-3)
+enum {
+    BMPMENU_NULL = -1,
+    BMPMENU_CANCEL = -2,
+    BMPMENU_DUMMY = -3,
+};
 
 typedef struct {
     ListMenuOption *options;
@@ -41,8 +43,11 @@ typedef struct {
     BOOL printed;
 } BmpMenuHeader;
 
-#define BMPMENU_CURSOR_SHOW 0
-#define BMPMENU_CURSOR_HIDE 1
+// The header's cursorDisplay: whether the cursor is drawn
+enum {
+    BMPMENU_CURSOR_SHOW,
+    BMPMENU_CURSOR_HIDE,
+};
 
 // The directions the cursor moves in
 enum {

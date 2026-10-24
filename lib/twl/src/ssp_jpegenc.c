@@ -230,85 +230,82 @@ static BOOL JpegEnc_PutBits(u8 *dst, u32 *pos, u32 value, u32 count) {
 
 // Transforms an 8x8 block of samples with the AAN DCT in 8 bit fixed point, and quantizes the coefficients
 static void JpegEnc_ForwardDct(const u8 *block, const s32 *divisors, s16 *coefs) {
-    s32 tmp0, tmp1, tmp2, tmp3, tmp4, tmp5, tmp6, tmp7;
-    s32 tmp10, tmp11, tmp12, tmp13;
-    s32 tmp10b, tmp11b, tmp12b;
-    s32 z1, z3, z11, z13, z5;
     s32 workspace[64];
-    const u8 *in;
-    s32 *ws;
-    const s32 *div;
-    s16 *out;
-    int i, k;
+    s32 k;
+    s32 i;
+    s32 tmp0, tmp1, tmp2, tmp3, tmp4, tmp5, tmp6, tmp7;
+    s32 tmp10, tmp11, z1, z3, z5a, z5b, z6a, z6b;
 
     for (i = 0; i < 8; i++) {
-        in = block + i;
-        ws = &workspace[i];
-        tmp0 = in[0] + in[56] - 256;
-        tmp1 = in[8] + in[48] - 256;
-        tmp2 = in[16] + in[40] - 256;
-        tmp3 = in[24] + in[32] - 256;
-        tmp4 = in[24] - in[32];
-        tmp5 = in[16] - in[40];
-        tmp6 = in[8] - in[48];
-        tmp7 = in[0] - in[56];
+        tmp0 = block[i + 0] + block[i + 56] - 256;
+        tmp1 = block[i + 8] + block[i + 48] - 256;
+        tmp2 = block[i + 16] + block[i + 40] - 256;
+        tmp3 = block[i + 24] + block[i + 32] - 256;
+        tmp4 = block[i + 24] - block[i + 32];
+        tmp5 = block[i + 16] - block[i + 40];
+        tmp6 = block[i + 8] - block[i + 48];
+        tmp7 = block[i + 0] - block[i + 56];
 
         tmp10 = tmp0 + tmp3;
         tmp11 = tmp1 + tmp2;
-        tmp12 = tmp1 - tmp2;
-        tmp13 = tmp0 - tmp3;
-        ws[0] = (tmp10 + tmp11) << 8;
-        ws[32] = (tmp10 - tmp11) << 8;
-        z1 = (tmp12 + tmp13) * 181;
-        ws[16] = (tmp13 << 8) + z1;
-        ws[48] = (tmp13 << 8) - z1;
+        tmp1 = tmp1 - tmp2 + tmp0 - tmp3;
+        tmp0 = tmp0 - tmp3;
+        tmp2 = tmp5 + tmp6;
+        tmp6 = tmp6 + tmp7;
 
-        tmp10 = tmp4 + tmp5;
-        tmp11 = tmp5 + tmp6;
-        tmp12 = tmp6 + tmp7;
-        z5 = tmp10 + tmp12;
-        z3 = tmp11 * 181;
-        z11 = (tmp7 << 8) + z3;
-        z13 = (tmp7 << 8) - z3;
-        ws[8] = z11 + z5 * 98 + tmp12 * 139;
-        ws[40] = z13 + z5 * 237 - tmp12 * 334;
-        ws[24] = z13 - z5 * 237 + tmp12 * 334;
-        ws[56] = z11 - z5 * 98 - tmp12 * 139;
+        tmp5 = tmp4 + tmp5 + tmp6;
+
+        z1 = tmp1 * 181;
+        z3 = tmp2 * 181;
+        z5a = tmp5 * 98;
+        z5b = tmp5 * 237;
+        z6a = tmp6 * 139;
+        z6b = tmp6 * 334;
+
+        workspace[i + 0] = (tmp10 + tmp11) << 8;
+        workspace[i + 32] = (tmp10 - tmp11) << 8;
+        workspace[i + 16] = z1 + (tmp0 << 8);
+        workspace[i + 48] = (tmp0 << 8) - z1;
+        workspace[i + 8] = z3 + (tmp7 << 8) + z5a + z6a;
+        workspace[i + 40] = (tmp7 << 8) - z3 + z5b - z6b;
+        workspace[i + 24] = (tmp7 << 8) - z3 - z5b + z6b;
+        workspace[i + 56] = z3 + (tmp7 << 8) - z5a - z6a;
     }
 
-    for (k = 0, i = 0; i < 8; i++, k += 8) {
-        ws = &workspace[k];
-        div = &divisors[i * 8];
-        out = &coefs[k];
-        tmp0 = ws[0] + ws[7];
-        tmp7 = ws[0] - ws[7];
-        tmp1 = ws[1] + ws[6];
-        tmp6 = ws[1] - ws[6];
-        tmp2 = ws[2] + ws[5];
-        tmp5 = ws[2] - ws[5];
-        tmp3 = ws[3] + ws[4];
-        tmp4 = ws[3] - ws[4];
+    for (i = k = 0; i < 8; i++, k += 8) {
+        tmp0 = workspace[k + 0] + workspace[k + 7];
+        tmp1 = workspace[k + 1] + workspace[k + 6];
+        tmp2 = workspace[k + 2] + workspace[k + 5];
+        tmp3 = workspace[k + 3] + workspace[k + 4];
+        tmp4 = workspace[k + 3] - workspace[k + 4];
+        tmp5 = workspace[k + 2] - workspace[k + 5];
+        tmp6 = workspace[k + 1] - workspace[k + 6];
+        tmp7 = workspace[k + 0] - workspace[k + 7];
 
         tmp10 = tmp0 + tmp3;
         tmp11 = tmp1 + tmp2;
-        tmp12 = tmp1 - tmp2;
-        tmp13 = tmp0 - tmp3;
-        z1 = (tmp12 + tmp13) * 181;
-        tmp10b = tmp4 + tmp5;
-        tmp11b = tmp5 + tmp6;
-        tmp12b = tmp6 + tmp7;
-        z5 = tmp10b + tmp12b;
-        z3 = tmp11b * 181;
-        z11 = (tmp7 << 8) + z3;
-        z13 = (tmp7 << 8) - z3;
-        out[0] = (div[0] * ((tmp10 + tmp11 + 0x80) >> 8) + 0x800) >> 12;
-        out[1] = (div[1] * ((z11 + z5 * 98 + tmp12b * 139 + 0x8000) >> 16) + 0x800) >> 12;
-        out[2] = (div[2] * (((tmp13 << 8) + z1 + 0x8000) >> 16) + 0x800) >> 12;
-        out[3] = (div[3] * ((z13 - z5 * 237 + tmp12b * 334 + 0x8000) >> 16) + 0x800) >> 12;
-        out[4] = (div[4] * ((tmp10 - tmp11 + 0x80) >> 8) + 0x800) >> 12;
-        out[5] = (div[5] * ((z13 + z5 * 237 - tmp12b * 334 + 0x8000) >> 16) + 0x800) >> 12;
-        out[6] = (div[6] * (((tmp13 << 8) - z1 + 0x8000) >> 16) + 0x800) >> 12;
-        out[7] = (div[7] * ((z11 - z5 * 98 - tmp12b * 139 + 0x8000) >> 16) + 0x800) >> 12;
+        tmp1 = tmp1 - tmp2 + tmp0 - tmp3;
+        tmp0 = tmp0 - tmp3;
+        tmp2 = tmp5 + tmp6;
+        tmp6 = tmp6 + tmp7;
+
+        tmp5 = tmp4 + tmp5 + tmp6;
+
+        z1 = tmp1 * 181;
+        z3 = tmp2 * 181;
+        z5a = tmp5 * 98;
+        z5b = tmp5 * 237;
+        z6a = tmp6 * 139;
+        z6b = tmp6 * 334;
+
+        coefs[k + 0] = ((((tmp10 + tmp11) + 128) >> 8) * divisors[i * 8 + 0] + 0x800) >> 12;
+        coefs[k + 1] = (((z3 + (tmp7 << 8) + z5a + z6a + 0x8000) >> 16) * divisors[i * 8 + 1] + 0x800) >> 12;
+        coefs[k + 2] = (((z1 + (tmp0 << 8) + 0x8000) >> 16) * divisors[i * 8 + 2] + 0x800) >> 12;
+        coefs[k + 3] = ((((tmp7 << 8) - z3 - z5b + z6b + 0x8000) >> 16) * divisors[i * 8 + 3] + 0x800) >> 12;
+        coefs[k + 4] = ((((tmp10 - tmp11) + 128) >> 8) * divisors[i * 8 + 4] + 0x800) >> 12;
+        coefs[k + 5] = ((((tmp7 << 8) - z3 + z5b - z6b + 0x8000) >> 16) * divisors[i * 8 + 5] + 0x800) >> 12;
+        coefs[k + 6] = ((((tmp0 << 8) - z1 + 0x8000) >> 16) * divisors[i * 8 + 6] + 0x800) >> 12;
+        coefs[k + 7] = (((z3 + (tmp7 << 8) - z5a - z6a + 0x8000) >> 16) * divisors[i * 8 + 7] + 0x800) >> 12;
     }
 }
 

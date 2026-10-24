@@ -17,15 +17,19 @@
 
 // Which part of the intro runs, as the number of the script it starts from: ov162 runs the intro, then the player's
 // name entry, the intro again, the rival's name entry, and the intro once more
-#define INTRO_MODE_START 1
-#define INTRO_MODE_PLAYER_NAMED 7
-#define INTRO_MODE_RIVAL_NAMED 10
+enum {
+    INTRO_MODE_START = 1,
+    INTRO_MODE_PLAYER_NAMED = 7,
+    INTRO_MODE_RIVAL_NAMED = 10,
+};
 
 // What ov162 does once the intro ends: runs the name entry that the intro asked for, the rival's name entry, or starts
 // the game
-#define INTRO_RESULT_DONE 0
-#define INTRO_RESULT_ENTER_NAME 1
-#define INTRO_RESULT_ENTER_RIVAL_NAME 2
+enum {
+    INTRO_RESULT_DONE,
+    INTRO_RESULT_ENTER_NAME,
+    INTRO_RESULT_ENTER_RIVAL_NAME,
+};
 
 typedef struct {
     PlayerInfo *playerInfo;
@@ -75,9 +79,11 @@ typedef struct {
 } IntroMenuItem;
 
 // IntroMsg_GetMenuResult's results
-#define INTRO_MENU_NONE 0
-#define INTRO_MENU_CHOSEN 1
-#define INTRO_MENU_CANCELLED 2
+enum {
+    INTRO_MENU_NONE,
+    INTRO_MENU_CHOSEN,
+    INTRO_MENU_CANCELLED,
+};
 
 IntroMsg *IntroMsg_Create(HeapID heapId);
 void IntroMsg_Free(IntroMsg *msg);

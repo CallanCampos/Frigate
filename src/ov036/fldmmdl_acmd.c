@@ -138,42 +138,42 @@ static BOOL func_ov036_0218f0d0(FieldActor *actor);
 static BOOL func_ov036_0218f0dc(FieldActor *actor);
 static BOOL func_ov036_0218f0e8(FieldActor *actor);
 static BOOL func_ov036_0218f0f4(FieldActor *actor);
-static void func_ov036_0218f100(FieldActor *actor, u32 dir, fx32 speed, s16 frames, u16 state);
-static BOOL func_ov036_0218f14c(FieldActor *actor);
-static BOOL func_ov036_0218f1a0(FieldActor *actor);
-static BOOL func_ov036_0218f1b4(FieldActor *actor);
-static BOOL func_ov036_0218f1c8(FieldActor *actor);
-static BOOL func_ov036_0218f1dc(FieldActor *actor);
-static BOOL func_ov036_0218f1f0(FieldActor *actor);
-static BOOL func_ov036_0218f204(FieldActor *actor);
-static BOOL func_ov036_0218f21c(FieldActor *actor);
-static BOOL func_ov036_0218f230(FieldActor *actor);
-static BOOL func_ov036_0218f244(FieldActor *actor);
-static BOOL func_ov036_0218f25c(FieldActor *actor);
-static BOOL func_ov036_0218f274(FieldActor *actor);
-static BOOL func_ov036_0218f288(FieldActor *actor);
-static BOOL func_ov036_0218f29c(FieldActor *actor);
-static BOOL func_ov036_0218f2b0(FieldActor *actor);
-static BOOL func_ov036_0218f2c4(FieldActor *actor);
-static BOOL func_ov036_0218f2d8(FieldActor *actor);
-static BOOL func_ov036_0218f2ec(FieldActor *actor);
-static BOOL func_ov036_0218f304(FieldActor *actor);
-static BOOL func_ov036_0218f31c(FieldActor *actor);
-static BOOL func_ov036_0218f330(FieldActor *actor);
-static BOOL func_ov036_0218f348(FieldActor *actor);
-static BOOL func_ov036_0218f35c(FieldActor *actor);
-static BOOL func_ov036_0218f374(FieldActor *actor);
-static BOOL func_ov036_0218f388(FieldActor *actor);
-static BOOL func_ov036_0218f3a0(FieldActor *actor);
-static BOOL func_ov036_0218f3b8(FieldActor *actor);
-static BOOL func_ov036_0218f3d0(FieldActor *actor);
-static BOOL func_ov036_0218f3e4(FieldActor *actor);
-static BOOL func_ov036_0218f3fc(FieldActor *actor);
-static BOOL func_ov036_0218f414(FieldActor *actor);
-static BOOL func_ov036_0218f42c(FieldActor *actor);
-static BOOL func_ov036_0218f440(FieldActor *actor);
-static void func_ov036_0218f458(FieldActor *actor, u32 dir, s16 frames, u16 state);
-static BOOL func_ov036_0218f48c(FieldActor *actor);
+static void FieldAcmdTCB_WalkInit(FieldActor *actor, u32 dir, fx32 speed, s16 frames, u16 state);
+static BOOL FieldAcmdTCB_WalkMove(FieldActor *actor);
+static BOOL FieldAcmdTCB_WalkUp32F(FieldActor *actor);
+static BOOL FieldAcmdTCB_WalkDown32F(FieldActor *actor);
+static BOOL FieldAcmdTCB_WalkLeft32F(FieldActor *actor);
+static BOOL FieldAcmdTCB_WalkRight32F(FieldActor *actor);
+static BOOL FieldAcmdTCB_WalkUp16F(FieldActor *actor);
+static BOOL FieldAcmdTCB_WalkDown16F(FieldActor *actor);
+static BOOL FieldAcmdTCB_WalkLeft16F(FieldActor *actor);
+static BOOL FieldAcmdTCB_WalkRight16F(FieldActor *actor);
+static BOOL FieldAcmdTCB_WalkUp8F(FieldActor *actor);
+static BOOL FieldAcmdTCB_WalkDown8F(FieldActor *actor);
+static BOOL FieldAcmdTCB_WalkLeft8F(FieldActor *actor);
+static BOOL FieldAcmdTCB_WalkRight8F(FieldActor *actor);
+static BOOL FieldAcmdTCB_WalkUp4F(FieldActor *actor);
+static BOOL FieldAcmdTCB_WalkDown4F(FieldActor *actor);
+static BOOL FieldAcmdTCB_WalkLeft4F(FieldActor *actor);
+static BOOL FieldAcmdTCB_WalkRight4F(FieldActor *actor);
+static BOOL FieldAcmdTCB_WalkUp2F(FieldActor *actor);
+static BOOL FieldAcmdTCB_WalkDown2F(FieldActor *actor);
+static BOOL FieldAcmdTCB_WalkLeft2F(FieldActor *actor);
+static BOOL FieldAcmdTCB_WalkRight2F(FieldActor *actor);
+static BOOL FieldAcmdTCB_WalkUp1F(FieldActor *actor);
+static BOOL FieldAcmdTCB_WalkDown1F(FieldActor *actor);
+static BOOL FieldAcmdTCB_WalkLeft1F(FieldActor *actor);
+static BOOL FieldAcmdTCB_WalkRight1F(FieldActor *actor);
+static BOOL FieldAcmdTCB_DashUp4F(FieldActor *actor);
+static BOOL FieldAcmdTCB_DashDown4F(FieldActor *actor);
+static BOOL FieldAcmdTCB_DashLeft4F(FieldActor *actor);
+static BOOL FieldAcmdTCB_DashRight4F(FieldActor *actor);
+static BOOL FieldAcmdTCB_WalkUp16FFastAnime(FieldActor *actor);
+static BOOL FieldAcmdTCB_WalkDown16FFastAnime(FieldActor *actor);
+static BOOL FieldAcmdTCB_WalkLeft16FFastAnime(FieldActor *actor);
+static BOOL FieldAcmdTCB_WalkRight16FFastAnime(FieldActor *actor);
+static void FieldAcmdTCB_StayWalkInit(FieldActor *actor, u32 dir, s16 frames, u16 state);
+static BOOL FieldAcmdTCB_StayWalkMove(FieldActor *actor);
 static BOOL func_ov036_0218f4c0(FieldActor *actor);
 static BOOL func_ov036_0218f4d0(FieldActor *actor);
 static BOOL func_ov036_0218f4e0(FieldActor *actor);
@@ -195,21 +195,21 @@ static BOOL func_ov036_0218f5d0(FieldActor *actor);
 static BOOL func_ov036_0218f5e0(FieldActor *actor);
 static BOOL func_ov036_0218f5f0(FieldActor *actor);
 
-static void func_ov036_0218f600(FieldActor *actor, u32 dir, fx32 speed, u32 frames, u16 state, s16 heightTable,
-                                u16 heightStep, u32 se);
+static void FieldAcmdTCB_JumpInit(FieldActor *actor, u32 dir, fx32 speed, u32 frames, u16 state, s16 heightTable,
+                                  u16 heightStep, u32 se);
 
-static void func_ov036_0218f66c(FieldActor *actor, u32 dir, fx32 speed, u32 frames, u16 state, s16 heightTable,
-                                u16 heightStep);
+static void FieldAcmdTCB_JumpInitWithSe(FieldActor *actor, u32 dir, fx32 speed, u32 frames, u16 state, s16 heightTable,
+                                        u16 heightStep);
 
-static BOOL func_ov036_0218f690(FieldActor *actor);
-static BOOL func_ov036_0218f76c(FieldActor *actor);
-static BOOL func_ov036_0218f790(FieldActor *actor);
-static BOOL func_ov036_0218f7b4(FieldActor *actor);
-static BOOL func_ov036_0218f7d4(FieldActor *actor);
-static BOOL func_ov036_0218f7f8(FieldActor *actor);
-static BOOL func_ov036_0218f818(FieldActor *actor);
-static BOOL func_ov036_0218f838(FieldActor *actor);
-static BOOL func_ov036_0218f858(FieldActor *actor);
+static BOOL FieldAcmdTCB_JumpMove(FieldActor *actor);
+static BOOL FieldAcmdTCB_StayJumpUp16F(FieldActor *actor);
+static BOOL FieldAcmdTCB_StayJumpDown16F(FieldActor *actor);
+static BOOL FieldAcmdTCB_StayJumpLeft16F(FieldActor *actor);
+static BOOL FieldAcmdTCB_StayJumpRight16F(FieldActor *actor);
+static BOOL FieldAcmdTCB_StayJumpUp8F(FieldActor *actor);
+static BOOL FieldAcmdTCB_StayJumpDown8F(FieldActor *actor);
+static BOOL FieldAcmdTCB_StayJumpLeft8F(FieldActor *actor);
+static BOOL FieldAcmdTCB_StayJumpRight8F(FieldActor *actor);
 static BOOL func_ov036_0218f878(FieldActor *actor);
 static BOOL func_ov036_0218f898(FieldActor *actor);
 static BOOL func_ov036_0218f8bc(FieldActor *actor);
@@ -219,26 +219,26 @@ static BOOL func_ov036_0218f920(FieldActor *actor);
 static BOOL func_ov036_0218f944(FieldActor *actor);
 static BOOL func_ov036_0218f964(FieldActor *actor);
 static BOOL func_ov036_0218f988(FieldActor *actor);
-static BOOL func_ov036_0218f9a8(FieldActor *actor);
+static BOOL FieldAcmdTCB_JumpRight1G16F(FieldActor *actor);
 static BOOL func_ov036_0218f9c8(FieldActor *actor);
-static BOOL func_ov036_0218f9ec(FieldActor *actor);
+static BOOL FieldAcmdTCB_JumpRight3G12F(FieldActor *actor);
 static BOOL func_ov036_0218fa10(FieldActor *actor);
-static BOOL func_ov036_0218fa34(FieldActor *actor);
-static BOOL func_ov036_0218fa58(FieldActor *actor);
-static BOOL func_ov036_0218fa7c(FieldActor *actor);
-static void func_ov036_0218faa0(FieldActor *actor, u32 count);
-static BOOL func_ov036_0218fab8(FieldActor *actor);
+static BOOL FieldAcmdTCB_JumpDown3G24FNoSe(FieldActor *actor);
+static BOOL FieldAcmdTCB_JumpLeft3G24FNoSe(FieldActor *actor);
+static BOOL FieldAcmdTCB_JumpRight3G24FNoSe(FieldActor *actor);
+static void FieldAcmdTCB_WaitInit(FieldActor *actor, u32 count);
+static BOOL FieldAcmdTCB_WaitMove(FieldActor *actor);
 static BOOL func_ov036_0218fad8(FieldActor *actor);
 static BOOL func_ov036_0218fae4(FieldActor *actor);
-static BOOL func_ov036_0218faf0(FieldActor *actor);
-static BOOL func_ov036_0218fafc(FieldActor *actor);
-static BOOL func_ov036_0218fb08(FieldActor *actor);
-static BOOL func_ov036_0218fb14(FieldActor *actor);
-static BOOL func_ov036_0218fb20(FieldActor *actor);
-static BOOL func_ov036_0218fb2c(FieldActor *actor);
-static BOOL func_ov036_0218fb50(FieldActor *actor);
-static BOOL func_ov036_0218fb98(FieldActor *actor);
-static BOOL func_ov036_0218fbcc(FieldActor *actor);
+static BOOL FieldAcmdTCB_Wait4F(FieldActor *actor);
+static BOOL FieldAcmdTCB_Wait8F(FieldActor *actor);
+static BOOL FieldAcmdTCB_Wait15F(FieldActor *actor);
+static BOOL FieldAcmdTCB_Wait16F(FieldActor *actor);
+static BOOL FieldAcmdTCB_Wait32F(FieldActor *actor);
+static BOOL FieldAcmdTCB_RiseInit(FieldActor *actor);
+static BOOL FieldAcmdTCB_RiseMove(FieldActor *actor);
+static BOOL FieldAcmdTCB_FallInit(FieldActor *actor);
+static BOOL FieldAcmdTCB_FallMove(FieldActor *actor);
 static BOOL func_ov036_0218fc14(FieldActor *actor);
 static BOOL func_ov036_0218fc28(FieldActor *actor);
 static BOOL func_ov036_0218fc3c(FieldActor *actor);
@@ -246,7 +246,7 @@ static BOOL func_ov036_0218fc50(FieldActor *actor);
 static BOOL func_ov036_0218fc64(FieldActor *actor);
 static BOOL func_ov036_0218fc78(FieldActor *actor);
 static void func_ov036_0218fc8c(FieldActor *actor, u32 kind, u32 unused, BOOL playSE);
-static BOOL func_ov036_0218fcc0(FieldActor *actor);
+static BOOL FieldAcmdTCB_MarkWait(FieldActor *actor);
 static BOOL func_ov036_0218fce8(FieldActor *actor);
 static BOOL func_ov036_0218fcf8(FieldActor *actor);
 static BOOL func_ov036_0218fd08(FieldActor *actor);
@@ -255,16 +255,16 @@ static BOOL func_ov036_0218fd28(FieldActor *actor);
 static BOOL func_ov036_0218fd38(FieldActor *actor);
 static BOOL func_ov036_0218fd48(FieldActor *actor);
 static BOOL func_ov036_0218fd58(FieldActor *actor);
-static void func_ov036_0218fd68(FieldActor *actor, u32 dir, u32 steps, u32 state);
-static BOOL func_ov036_0218fdac(FieldActor *actor, const s32 *distances);
-static BOOL func_ov036_0218fe04(FieldActor *actor);
-static BOOL func_ov036_0218fe14(FieldActor *actor);
-static BOOL func_ov036_0218fe24(FieldActor *actor);
-static BOOL func_ov036_0218fe34(FieldActor *actor);
-static BOOL func_ov036_0218fe44(FieldActor *actor);
-static BOOL func_ov036_0218fe54(FieldActor *actor);
-static BOOL func_ov036_0218fe64(FieldActor *actor);
-static BOOL func_ov036_0218fe74(FieldActor *actor);
+static void FieldAcmdTCB_WalkTableInit(FieldActor *actor, u32 dir, u32 steps, u32 state);
+static BOOL FieldAcmdTCB_WalkTableMove(FieldActor *actor, const s32 *distances);
+static BOOL FieldAcmdTCB_WalkUp6F(FieldActor *actor);
+static BOOL FieldAcmdTCB_WalkDown6F(FieldActor *actor);
+static BOOL FieldAcmdTCB_WalkLeft6F(FieldActor *actor);
+static BOOL FieldAcmdTCB_WalkRight6F(FieldActor *actor);
+static BOOL FieldAcmdTCB_DashUp6F(FieldActor *actor);
+static BOOL FieldAcmdTCB_DashDown6F(FieldActor *actor);
+static BOOL FieldAcmdTCB_DashLeft6F(FieldActor *actor);
+static BOOL FieldAcmdTCB_DashRight6F(FieldActor *actor);
 static BOOL func_ov036_0218fe84(FieldActor *actor);
 static BOOL func_ov036_0218fe9c(FieldActor *actor);
 static BOOL func_ov036_0218feac(FieldActor *actor);
@@ -286,91 +286,91 @@ static BOOL func_ov036_0218ffc0(FieldActor *actor);
 static BOOL func_ov036_0218ffdc(FieldActor *actor);
 static BOOL func_ov036_0218fff8(FieldActor *actor);
 static BOOL func_ov036_02190010(FieldActor *actor);
-static BOOL func_ov036_02190028(FieldActor *actor);
-static BOOL func_ov036_02190080(FieldActor *actor);
-static BOOL func_ov036_021900c8(FieldActor *actor);
-static BOOL func_ov036_02190110(FieldActor *actor);
-static void func_ov036_02190194(FieldActor *actor, u32 value, u16 limit);
-static BOOL func_ov036_021901b0(FieldActor *actor);
-static BOOL func_ov036_021901d0(FieldActor *actor);
+static BOOL FieldAcmdTCB_AnimeWaitEndStop(FieldActor *actor);
+static BOOL FieldAcmdTCB_AnimeWaitEnd(FieldActor *actor);
+static BOOL FieldAcmdTCB_HideOffInit(FieldActor *actor);
+static BOOL FieldAcmdTCB_HideOffMove(FieldActor *actor);
+static void FieldAcmdTCB_StayInit(FieldActor *actor, u32 value, u16 limit);
+static BOOL FieldAcmdTCB_StayMove(FieldActor *actor);
+static BOOL FieldAcmdTCB_StayWalk32F40F(FieldActor *actor);
 static BOOL func_ov036_021901e8(FieldActor *actor);
 static BOOL func_ov036_02190200(FieldActor *actor);
 static BOOL func_ov036_02190218(FieldActor *actor);
 static BOOL func_ov036_02190234(FieldActor *actor);
 
-static void func_ov036_0219028c(FieldActor *actor, const VecFx32 *delta, u32 faceDir, u32 motionDir, u32 value,
-                                u8 param);
+static void FieldAcmdTCB_StepInit(FieldActor *actor, const VecFx32 *delta, u32 faceDir, u32 motionDir, u32 value,
+                                  u8 param);
 
-static BOOL func_ov036_02190350(FieldActor *actor);
-static BOOL func_ov036_02190394(FieldActor *actor);
-static BOOL func_ov036_021903c8(FieldActor *actor);
+static BOOL FieldAcmdTCB_StepMove(FieldActor *actor);
+static BOOL FieldAcmdTCB_StepUpFaceLeft8F(FieldActor *actor);
+static BOOL FieldAcmdTCB_StepDownFaceRight8F(FieldActor *actor);
 static BOOL func_ov036_021903f8(FieldActor *actor);
-static BOOL func_ov036_0219042c(FieldActor *actor);
-static BOOL func_ov036_0219045c(FieldActor *actor);
-static BOOL func_ov036_0219048c(FieldActor *actor);
-static BOOL func_ov036_021904c0(FieldActor *actor);
+static BOOL FieldAcmdTCB_StepRightFaceUp8F(FieldActor *actor);
+static BOOL FieldAcmdTCB_StepUpFaceRight8F(FieldActor *actor);
+static BOOL FieldAcmdTCB_StepDownFaceLeft8F(FieldActor *actor);
+static BOOL FieldAcmdTCB_StepLeftFaceUp8F(FieldActor *actor);
 static BOOL func_ov036_021904f4(FieldActor *actor);
-static BOOL func_ov036_02190528(FieldActor *actor);
-static BOOL func_ov036_0219055c(FieldActor *actor);
-static BOOL func_ov036_02190590(FieldActor *actor);
-static BOOL func_ov036_021905c0(FieldActor *actor);
-static BOOL func_ov036_021905f0(FieldActor *actor);
-static BOOL func_ov036_02190620(FieldActor *actor);
-static BOOL func_ov036_02190650(FieldActor *actor);
-static BOOL func_ov036_02190680(FieldActor *actor);
-static BOOL func_ov036_021906b0(FieldActor *actor);
-static BOOL func_ov036_021906e4(FieldActor *actor);
-static BOOL func_ov036_02190718(FieldActor *actor);
-static BOOL func_ov036_02190748(FieldActor *actor);
-static BOOL func_ov036_02190778(FieldActor *actor);
-static BOOL func_ov036_021907ac(FieldActor *actor);
+static BOOL FieldAcmdTCB_StepUpFaceDown8F(FieldActor *actor);
+static BOOL FieldAcmdTCB_StepDownFaceUp8F(FieldActor *actor);
+static BOOL FieldAcmdTCB_StepLeftFaceRight8F(FieldActor *actor);
+static BOOL FieldAcmdTCB_StepRightFaceLeft8F(FieldActor *actor);
+static BOOL FieldAcmdTCB_StepUpFaceDown4F(FieldActor *actor);
+static BOOL FieldAcmdTCB_StepDownFaceUp4F(FieldActor *actor);
+static BOOL FieldAcmdTCB_StepLeftFaceRight4F(FieldActor *actor);
+static BOOL FieldAcmdTCB_StepRightFaceLeft4F(FieldActor *actor);
+static BOOL FieldAcmdTCB_StepUpFaceDown2F(FieldActor *actor);
+static BOOL FieldAcmdTCB_StepDownFaceUp2F(FieldActor *actor);
+static BOOL FieldAcmdTCB_StepLeftFaceRight2F(FieldActor *actor);
+static BOOL FieldAcmdTCB_StepRightFaceLeft2F(FieldActor *actor);
+static BOOL FieldAcmdTCB_DashStepUpFaceLeft4F(FieldActor *actor);
+static BOOL FieldAcmdTCB_DashStepDownFaceRight4F(FieldActor *actor);
 static BOOL func_ov036_021907e0(FieldActor *actor);
-static BOOL func_ov036_02190814(FieldActor *actor);
-static BOOL func_ov036_02190848(FieldActor *actor);
-static BOOL func_ov036_0219087c(FieldActor *actor);
-static BOOL func_ov036_021908b0(FieldActor *actor);
+static BOOL FieldAcmdTCB_DashStepRightFaceUp4F(FieldActor *actor);
+static BOOL FieldAcmdTCB_DashStepUpFaceRight4F(FieldActor *actor);
+static BOOL FieldAcmdTCB_DashStepDownFaceLeft4F(FieldActor *actor);
+static BOOL FieldAcmdTCB_DashStepLeftFaceUp4F(FieldActor *actor);
 static BOOL func_ov036_021908e4(FieldActor *actor);
-static BOOL func_ov036_02190918(FieldActor *actor);
-static BOOL func_ov036_0219094c(FieldActor *actor);
-static BOOL func_ov036_02190980(FieldActor *actor);
-static BOOL func_ov036_021909b4(FieldActor *actor);
+static BOOL FieldAcmdTCB_DashStepUpFaceDown4F(FieldActor *actor);
+static BOOL FieldAcmdTCB_DashStepDownFaceUp4F(FieldActor *actor);
+static BOOL FieldAcmdTCB_DashStepLeftFaceRight4F(FieldActor *actor);
+static BOOL FieldAcmdTCB_DashStepRightFaceLeft4F(FieldActor *actor);
 
-static void func_ov036_021909e8(FieldActor *actor, s32 step, u32 faceDir, u32 motionDir, u8 frames, u8 anim, u8 axis,
-                                u8 bobAxis, u8 bobNegate);
+static void FieldAcmdTCB_HopInit(FieldActor *actor, s32 step, u32 faceDir, u32 motionDir, u8 frames, u8 anim, u8 axis,
+                                 u8 bobAxis, u8 bobNegate);
 
-static BOOL func_ov036_02190ad0(FieldActor *actor);
-static BOOL func_ov036_02190c4c(FieldActor *actor);
-static BOOL func_ov036_02190c70(FieldActor *actor);
+static BOOL FieldAcmdTCB_HopMove(FieldActor *actor);
+static BOOL FieldAcmdTCB_HopUpFaceLeft8F(FieldActor *actor);
+static BOOL FieldAcmdTCB_HopDownFaceRight8F(FieldActor *actor);
 static BOOL func_ov036_02190c98(FieldActor *actor);
-static BOOL func_ov036_02190cc0(FieldActor *actor);
-static BOOL func_ov036_02190ce8(FieldActor *actor);
-static BOOL func_ov036_02190d0c(FieldActor *actor);
-static BOOL func_ov036_02190d38(FieldActor *actor);
+static BOOL FieldAcmdTCB_HopRightFaceUp8F(FieldActor *actor);
+static BOOL FieldAcmdTCB_HopUpFaceRight8F(FieldActor *actor);
+static BOOL FieldAcmdTCB_HopDownFaceLeft8F(FieldActor *actor);
+static BOOL FieldAcmdTCB_HopLeftFaceUp8F(FieldActor *actor);
 static BOOL func_ov036_02190d60(FieldActor *actor);
-static BOOL func_ov036_02190d88(FieldActor *actor);
-static BOOL func_ov036_02190db0(FieldActor *actor);
-static BOOL func_ov036_02190ddc(FieldActor *actor);
-static BOOL func_ov036_02190e04(FieldActor *actor);
-static BOOL func_ov036_02190e28(FieldActor *actor);
-static BOOL func_ov036_02190e44(FieldActor *actor);
+static BOOL FieldAcmdTCB_HopUpFaceDown8F(FieldActor *actor);
+static BOOL FieldAcmdTCB_HopDownFaceUp8F(FieldActor *actor);
+static BOOL FieldAcmdTCB_HopLeftFaceRight8F(FieldActor *actor);
+static BOOL FieldAcmdTCB_HopRightFaceLeft8F(FieldActor *actor);
+static BOOL FieldAcmdTCB_StayWalk22FInit(FieldActor *actor);
+static BOOL FieldAcmdTCB_StayWalk22FMove(FieldActor *actor);
 static BOOL func_ov036_02190e60(FieldActor *actor);
-static BOOL func_ov036_02190e74(FieldActor *actor);
-static BOOL func_ov036_02190eac(FieldActor *actor);
-static BOOL func_ov036_02190eec(FieldActor *actor);
+static BOOL FieldAcmdTCB_DashLeft2F(FieldActor *actor);
+static BOOL FieldAcmdTCB_Dash2FMove(FieldActor *actor);
+static BOOL FieldAcmdTCB_FlyUpInit(FieldActor *actor);
 static BOOL func_ov036_02190f14(FieldActor *actor);
 static BOOL func_ov036_0219100c(FieldActor *actor);
 static BOOL func_ov036_02191020(FieldActor *actor);
-static BOOL func_ov036_02191034(FieldActor *actor);
-static BOOL func_ov036_02191090(FieldActor *actor);
-static BOOL func_ov036_021910b0(FieldActor *actor);
+static BOOL FieldAcmdTCB_AnimeWaitEndFaceDown(FieldActor *actor);
+static BOOL FieldAcmdTCB_ResetDrawOffset(FieldActor *actor);
+static BOOL FieldAcmdTCB_FlyReadyInit(FieldActor *actor);
 static BOOL func_ov036_021910f4(FieldActor *actor);
 static BOOL func_ov036_02191174(FieldActor *actor);
 static BOOL func_ov036_02191188(FieldActor *actor);
 static BOOL func_ov036_0219119c(FieldActor *actor);
 static BOOL func_ov036_021911b0(FieldActor *actor);
 static BOOL func_ov036_021911cc(FieldActor *actor);
-static BOOL func_ov036_021911e8(FieldActor *actor);
-static BOOL func_ov036_0219120c(FieldActor *actor);
+static BOOL FieldAcmdTCB_DrawReadyWaitStop(FieldActor *actor);
+static BOOL FieldAcmdTCB_DrawReadyWait(FieldActor *actor);
 
 static BOOL (*const ACMD_TCB_FUNCS[])(FieldAcmdWork *work) = { FieldAcmdTCB_Begin,        FieldAcmdTCB_WaitAcmdReady,
                                                                FieldAcmdTCB_CommitAcmd,   FieldAcmdTCB_CheckSeqPerms,
@@ -382,23 +382,23 @@ static const s32 data_ov036_021cb5ec[];
 static const s32 data_ov036_021cb608[];
 static const fx32 *data_ov036_021d4d34[];
 
-void func_ov036_0218ed18(MMSys *system) {
+void FieldAcmdTCB_DeleteDrawSys(MMSys *system) {
     if (FldActSys_GetFieldBlAct(system) != NULL) {
-        func_ov036_021937a4(system);
+        FldBlAct_Exit(system);
     }
     if (FldActSys_GetActorG3DSystem(system) != NULL) {
-        func_ov036_021946f4(system);
+        FieldActorG3DSystem_Delete(system);
     }
     FldActSys_SetDrawInited(system, FALSE);
 }
 
-void func_ov036_0218ed44(FieldActor *actor) {
+void FieldAcmdTCB_DrawIfInitialized(FieldActor *actor) {
     if (!CheckMMSysFlag(GetActorMModelSystem(actor), 4) && FldAct_IsDrawCreated(actor)) {
         FldAct_InvokeUpdateCallback(actor);
     }
 }
 
-BOOL func_ov036_0218ed68(FieldActor *actor) {
+BOOL FieldAcmdTCB_CheckAnimePaused(FieldActor *actor) {
     if (IsActorMovementDisabled(actor) && !FldAct_CheckAcmdSet(actor)) {
         return TRUE;
     }
@@ -548,7 +548,7 @@ u16 GetAcmdForDir(u16 dir, u16 acmd) {
     return acmd;
 }
 
-void func_ov036_0218eff4(FieldActor *actor) {
+void FieldAcmdTCB_RunCmds(FieldActor *actor) {
     u16 acmd;
 
     do {
@@ -559,9 +559,9 @@ void func_ov036_0218eff4(FieldActor *actor) {
     } while (FldAct_ExecAcmd(actor, acmd, FldAct_GetAcmdState(actor)));
 }
 
-BOOL func_ov036_0218f01c(FieldActor *actor) {
+BOOL FieldAcmdTCB_Update(FieldActor *actor) {
     if (FldAct_GetAcmd(actor) != 0xff) {
-        func_ov036_0218eff4(actor);
+        FieldAcmdTCB_RunCmds(actor);
         if (!CheckActorMovementFlag(actor, 0x400)) {
             return FALSE;
         }
@@ -611,8 +611,8 @@ static BOOL func_ov036_0218f0f4(FieldActor *actor) {
     return TRUE;
 }
 
-static void func_ov036_0218f100(FieldActor *actor, u32 dir, fx32 speed, s16 frames, u16 state) {
-    FieldAcmdWalkWork *work = func_ov012_0216713c(actor, sizeof(FieldAcmdWalkWork));
+static void FieldAcmdTCB_WalkInit(FieldActor *actor, u32 dir, fx32 speed, s16 frames, u16 state) {
+    FieldAcmdWalkWork *work = FldAct_InitMoveCmdWork(actor, sizeof(FieldAcmdWalkWork));
 
     work->state = state;
     work->frames = frames;
@@ -625,8 +625,8 @@ static void func_ov036_0218f100(FieldActor *actor, u32 dir, fx32 speed, s16 fram
     FieldActor_NextAcmdState(actor);
 }
 
-static BOOL func_ov036_0218f14c(FieldActor *actor) {
-    FieldAcmdWalkWork *work = func_ov012_02167154(actor);
+static BOOL FieldAcmdTCB_WalkMove(FieldActor *actor) {
+    FieldAcmdWalkWork *work = FldAct_GetMoveCmdWork(actor);
 
     FldAct_MoveWPosInDir(actor, work->dir, work->speed);
     CheckRecalcActorY(actor);
@@ -641,168 +641,168 @@ static BOOL func_ov036_0218f14c(FieldActor *actor) {
     return FALSE;
 }
 
-static BOOL func_ov036_0218f1a0(FieldActor *actor) {
-    func_ov036_0218f100(actor, DIR_UP, 0x800, 32, 1);
+static BOOL FieldAcmdTCB_WalkUp32F(FieldActor *actor) {
+    FieldAcmdTCB_WalkInit(actor, DIR_UP, 0x800, 32, 1);
     return TRUE;
 }
 
-static BOOL func_ov036_0218f1b4(FieldActor *actor) {
-    func_ov036_0218f100(actor, DIR_DOWN, 0x800, 32, 1);
+static BOOL FieldAcmdTCB_WalkDown32F(FieldActor *actor) {
+    FieldAcmdTCB_WalkInit(actor, DIR_DOWN, 0x800, 32, 1);
     return TRUE;
 }
 
-static BOOL func_ov036_0218f1c8(FieldActor *actor) {
-    func_ov036_0218f100(actor, DIR_LEFT, 0x800, 32, 1);
+static BOOL FieldAcmdTCB_WalkLeft32F(FieldActor *actor) {
+    FieldAcmdTCB_WalkInit(actor, DIR_LEFT, 0x800, 32, 1);
     return TRUE;
 }
 
-static BOOL func_ov036_0218f1dc(FieldActor *actor) {
-    func_ov036_0218f100(actor, DIR_RIGHT, 0x800, 32, 1);
+static BOOL FieldAcmdTCB_WalkRight32F(FieldActor *actor) {
+    FieldAcmdTCB_WalkInit(actor, DIR_RIGHT, 0x800, 32, 1);
     return TRUE;
 }
 
-static BOOL func_ov036_0218f1f0(FieldActor *actor) {
-    func_ov036_0218f100(actor, DIR_UP, 0x1000, 16, 2);
+static BOOL FieldAcmdTCB_WalkUp16F(FieldActor *actor) {
+    FieldAcmdTCB_WalkInit(actor, DIR_UP, 0x1000, 16, 2);
     return TRUE;
 }
 
-static BOOL func_ov036_0218f204(FieldActor *actor) {
-    func_ov036_0218f100(actor, DIR_DOWN, 0x1000, 16, 2);
+static BOOL FieldAcmdTCB_WalkDown16F(FieldActor *actor) {
+    FieldAcmdTCB_WalkInit(actor, DIR_DOWN, 0x1000, 16, 2);
     return TRUE;
 }
 
-static BOOL func_ov036_0218f21c(FieldActor *actor) {
-    func_ov036_0218f100(actor, DIR_LEFT, 0x1000, 16, 2);
+static BOOL FieldAcmdTCB_WalkLeft16F(FieldActor *actor) {
+    FieldAcmdTCB_WalkInit(actor, DIR_LEFT, 0x1000, 16, 2);
     return TRUE;
 }
 
-static BOOL func_ov036_0218f230(FieldActor *actor) {
-    func_ov036_0218f100(actor, DIR_RIGHT, 0x1000, 16, 2);
+static BOOL FieldAcmdTCB_WalkRight16F(FieldActor *actor) {
+    FieldAcmdTCB_WalkInit(actor, DIR_RIGHT, 0x1000, 16, 2);
     return TRUE;
 }
 
-static BOOL func_ov036_0218f244(FieldActor *actor) {
-    func_ov036_0218f100(actor, DIR_UP, 0x2000, 8, 3);
+static BOOL FieldAcmdTCB_WalkUp8F(FieldActor *actor) {
+    FieldAcmdTCB_WalkInit(actor, DIR_UP, 0x2000, 8, 3);
     return TRUE;
 }
 
-static BOOL func_ov036_0218f25c(FieldActor *actor) {
-    func_ov036_0218f100(actor, DIR_DOWN, 0x2000, 8, 3);
+static BOOL FieldAcmdTCB_WalkDown8F(FieldActor *actor) {
+    FieldAcmdTCB_WalkInit(actor, DIR_DOWN, 0x2000, 8, 3);
     return TRUE;
 }
 
-static BOOL func_ov036_0218f274(FieldActor *actor) {
-    func_ov036_0218f100(actor, DIR_LEFT, 0x2000, 8, 3);
+static BOOL FieldAcmdTCB_WalkLeft8F(FieldActor *actor) {
+    FieldAcmdTCB_WalkInit(actor, DIR_LEFT, 0x2000, 8, 3);
     return TRUE;
 }
 
-static BOOL func_ov036_0218f288(FieldActor *actor) {
-    func_ov036_0218f100(actor, DIR_RIGHT, 0x2000, 8, 3);
+static BOOL FieldAcmdTCB_WalkRight8F(FieldActor *actor) {
+    FieldAcmdTCB_WalkInit(actor, DIR_RIGHT, 0x2000, 8, 3);
     return TRUE;
 }
 
-static BOOL func_ov036_0218f29c(FieldActor *actor) {
-    func_ov036_0218f100(actor, DIR_UP, 0x4000, 4, 4);
+static BOOL FieldAcmdTCB_WalkUp4F(FieldActor *actor) {
+    FieldAcmdTCB_WalkInit(actor, DIR_UP, 0x4000, 4, 4);
     return TRUE;
 }
 
-static BOOL func_ov036_0218f2b0(FieldActor *actor) {
-    func_ov036_0218f100(actor, DIR_DOWN, 0x4000, 4, 4);
+static BOOL FieldAcmdTCB_WalkDown4F(FieldActor *actor) {
+    FieldAcmdTCB_WalkInit(actor, DIR_DOWN, 0x4000, 4, 4);
     return TRUE;
 }
 
-static BOOL func_ov036_0218f2c4(FieldActor *actor) {
-    func_ov036_0218f100(actor, DIR_LEFT, 0x4000, 4, 4);
+static BOOL FieldAcmdTCB_WalkLeft4F(FieldActor *actor) {
+    FieldAcmdTCB_WalkInit(actor, DIR_LEFT, 0x4000, 4, 4);
     return TRUE;
 }
 
-static BOOL func_ov036_0218f2d8(FieldActor *actor) {
-    func_ov036_0218f100(actor, DIR_RIGHT, 0x4000, 4, 4);
+static BOOL FieldAcmdTCB_WalkRight4F(FieldActor *actor) {
+    FieldAcmdTCB_WalkInit(actor, DIR_RIGHT, 0x4000, 4, 4);
     return TRUE;
 }
 
-static BOOL func_ov036_0218f2ec(FieldActor *actor) {
-    func_ov036_0218f100(actor, DIR_UP, 0x8000, 2, 5);
+static BOOL FieldAcmdTCB_WalkUp2F(FieldActor *actor) {
+    FieldAcmdTCB_WalkInit(actor, DIR_UP, 0x8000, 2, 5);
     return TRUE;
 }
 
-static BOOL func_ov036_0218f304(FieldActor *actor) {
-    func_ov036_0218f100(actor, DIR_DOWN, 0x8000, 2, 5);
+static BOOL FieldAcmdTCB_WalkDown2F(FieldActor *actor) {
+    FieldAcmdTCB_WalkInit(actor, DIR_DOWN, 0x8000, 2, 5);
     return TRUE;
 }
 
-static BOOL func_ov036_0218f31c(FieldActor *actor) {
-    func_ov036_0218f100(actor, DIR_LEFT, 0x8000, 2, 5);
+static BOOL FieldAcmdTCB_WalkLeft2F(FieldActor *actor) {
+    FieldAcmdTCB_WalkInit(actor, DIR_LEFT, 0x8000, 2, 5);
     return TRUE;
 }
 
-static BOOL func_ov036_0218f330(FieldActor *actor) {
-    func_ov036_0218f100(actor, DIR_RIGHT, 0x8000, 2, 5);
+static BOOL FieldAcmdTCB_WalkRight2F(FieldActor *actor) {
+    FieldAcmdTCB_WalkInit(actor, DIR_RIGHT, 0x8000, 2, 5);
     return TRUE;
 }
 
-static BOOL func_ov036_0218f348(FieldActor *actor) {
-    func_ov036_0218f100(actor, DIR_UP, 0x10000, 1, 0);
+static BOOL FieldAcmdTCB_WalkUp1F(FieldActor *actor) {
+    FieldAcmdTCB_WalkInit(actor, DIR_UP, 0x10000, 1, 0);
     return TRUE;
 }
 
-static BOOL func_ov036_0218f35c(FieldActor *actor) {
-    func_ov036_0218f100(actor, DIR_DOWN, 0x10000, 1, 0);
+static BOOL FieldAcmdTCB_WalkDown1F(FieldActor *actor) {
+    FieldAcmdTCB_WalkInit(actor, DIR_DOWN, 0x10000, 1, 0);
     return TRUE;
 }
 
-static BOOL func_ov036_0218f374(FieldActor *actor) {
-    func_ov036_0218f100(actor, DIR_LEFT, 0x10000, 1, 0);
+static BOOL FieldAcmdTCB_WalkLeft1F(FieldActor *actor) {
+    FieldAcmdTCB_WalkInit(actor, DIR_LEFT, 0x10000, 1, 0);
     return TRUE;
 }
 
-static BOOL func_ov036_0218f388(FieldActor *actor) {
-    func_ov036_0218f100(actor, DIR_RIGHT, 0x10000, 1, 0);
+static BOOL FieldAcmdTCB_WalkRight1F(FieldActor *actor) {
+    FieldAcmdTCB_WalkInit(actor, DIR_RIGHT, 0x10000, 1, 0);
     return TRUE;
 }
 
-static BOOL func_ov036_0218f3a0(FieldActor *actor) {
-    func_ov036_0218f100(actor, DIR_UP, 0x4000, 4, 10);
+static BOOL FieldAcmdTCB_DashUp4F(FieldActor *actor) {
+    FieldAcmdTCB_WalkInit(actor, DIR_UP, 0x4000, 4, 10);
     return TRUE;
 }
 
-static BOOL func_ov036_0218f3b8(FieldActor *actor) {
-    func_ov036_0218f100(actor, DIR_DOWN, 0x4000, 4, 10);
+static BOOL FieldAcmdTCB_DashDown4F(FieldActor *actor) {
+    FieldAcmdTCB_WalkInit(actor, DIR_DOWN, 0x4000, 4, 10);
     return TRUE;
 }
 
-static BOOL func_ov036_0218f3d0(FieldActor *actor) {
-    func_ov036_0218f100(actor, DIR_LEFT, 0x4000, 4, 10);
+static BOOL FieldAcmdTCB_DashLeft4F(FieldActor *actor) {
+    FieldAcmdTCB_WalkInit(actor, DIR_LEFT, 0x4000, 4, 10);
     return TRUE;
 }
 
-static BOOL func_ov036_0218f3e4(FieldActor *actor) {
-    func_ov036_0218f100(actor, DIR_RIGHT, 0x4000, 4, 10);
+static BOOL FieldAcmdTCB_DashRight4F(FieldActor *actor) {
+    FieldAcmdTCB_WalkInit(actor, DIR_RIGHT, 0x4000, 4, 10);
     return TRUE;
 }
 
-static BOOL func_ov036_0218f3fc(FieldActor *actor) {
-    func_ov036_0218f100(actor, DIR_UP, 0x1000, 16, 5);
+static BOOL FieldAcmdTCB_WalkUp16FFastAnime(FieldActor *actor) {
+    FieldAcmdTCB_WalkInit(actor, DIR_UP, 0x1000, 16, 5);
     return TRUE;
 }
 
-static BOOL func_ov036_0218f414(FieldActor *actor) {
-    func_ov036_0218f100(actor, DIR_DOWN, 0x1000, 16, 5);
+static BOOL FieldAcmdTCB_WalkDown16FFastAnime(FieldActor *actor) {
+    FieldAcmdTCB_WalkInit(actor, DIR_DOWN, 0x1000, 16, 5);
     return TRUE;
 }
 
-static BOOL func_ov036_0218f42c(FieldActor *actor) {
-    func_ov036_0218f100(actor, DIR_LEFT, 0x1000, 16, 5);
+static BOOL FieldAcmdTCB_WalkLeft16FFastAnime(FieldActor *actor) {
+    FieldAcmdTCB_WalkInit(actor, DIR_LEFT, 0x1000, 16, 5);
     return TRUE;
 }
 
-static BOOL func_ov036_0218f440(FieldActor *actor) {
-    func_ov036_0218f100(actor, DIR_RIGHT, 0x1000, 16, 5);
+static BOOL FieldAcmdTCB_WalkRight16FFastAnime(FieldActor *actor) {
+    FieldAcmdTCB_WalkInit(actor, DIR_RIGHT, 0x1000, 16, 5);
     return TRUE;
 }
 
-static void func_ov036_0218f458(FieldActor *actor, u32 dir, s16 frames, u16 state) {
-    FieldAcmdWalkWork *work = func_ov012_0216713c(actor, sizeof(FieldAcmdWalkWork));
+static void FieldAcmdTCB_StayWalkInit(FieldActor *actor, u32 dir, s16 frames, u16 state) {
+    FieldAcmdWalkWork *work = FldAct_InitMoveCmdWork(actor, sizeof(FieldAcmdWalkWork));
 
     work->state = state;
     work->frames = frames;
@@ -812,8 +812,8 @@ static void func_ov036_0218f458(FieldActor *actor, u32 dir, s16 frames, u16 stat
     FieldActor_NextAcmdState(actor);
 }
 
-static BOOL func_ov036_0218f48c(FieldActor *actor) {
-    FieldAcmdWalkWork *work = func_ov012_02167154(actor);
+static BOOL FieldAcmdTCB_StayWalkMove(FieldActor *actor) {
+    FieldAcmdWalkWork *work = FldAct_GetMoveCmdWork(actor);
 
     work->frames--;
     if (work->frames > 0) {
@@ -826,108 +826,108 @@ static BOOL func_ov036_0218f48c(FieldActor *actor) {
 }
 
 static BOOL func_ov036_0218f4c0(FieldActor *actor) {
-    func_ov036_0218f458(actor, DIR_UP, 32, 1);
+    FieldAcmdTCB_StayWalkInit(actor, DIR_UP, 32, 1);
     return TRUE;
 }
 
 static BOOL func_ov036_0218f4d0(FieldActor *actor) {
-    func_ov036_0218f458(actor, DIR_DOWN, 32, 1);
+    FieldAcmdTCB_StayWalkInit(actor, DIR_DOWN, 32, 1);
     return TRUE;
 }
 
 static BOOL func_ov036_0218f4e0(FieldActor *actor) {
-    func_ov036_0218f458(actor, DIR_LEFT, 32, 1);
+    FieldAcmdTCB_StayWalkInit(actor, DIR_LEFT, 32, 1);
     return TRUE;
 }
 
 static BOOL func_ov036_0218f4f0(FieldActor *actor) {
-    func_ov036_0218f458(actor, DIR_RIGHT, 32, 1);
+    FieldAcmdTCB_StayWalkInit(actor, DIR_RIGHT, 32, 1);
     return TRUE;
 }
 
 static BOOL func_ov036_0218f500(FieldActor *actor) {
-    func_ov036_0218f458(actor, DIR_UP, 16, 2);
+    FieldAcmdTCB_StayWalkInit(actor, DIR_UP, 16, 2);
     return TRUE;
 }
 
 static BOOL func_ov036_0218f510(FieldActor *actor) {
-    func_ov036_0218f458(actor, DIR_DOWN, 16, 2);
+    FieldAcmdTCB_StayWalkInit(actor, DIR_DOWN, 16, 2);
     return TRUE;
 }
 
 static BOOL func_ov036_0218f520(FieldActor *actor) {
-    func_ov036_0218f458(actor, DIR_LEFT, 16, 2);
+    FieldAcmdTCB_StayWalkInit(actor, DIR_LEFT, 16, 2);
     return TRUE;
 }
 
 static BOOL func_ov036_0218f530(FieldActor *actor) {
-    func_ov036_0218f458(actor, DIR_RIGHT, 16, 2);
+    FieldAcmdTCB_StayWalkInit(actor, DIR_RIGHT, 16, 2);
     return TRUE;
 }
 
 static BOOL func_ov036_0218f540(FieldActor *actor) {
-    func_ov036_0218f458(actor, DIR_UP, 8, 3);
+    FieldAcmdTCB_StayWalkInit(actor, DIR_UP, 8, 3);
     return TRUE;
 }
 
 static BOOL func_ov036_0218f550(FieldActor *actor) {
-    func_ov036_0218f458(actor, DIR_DOWN, 8, 3);
+    FieldAcmdTCB_StayWalkInit(actor, DIR_DOWN, 8, 3);
     return TRUE;
 }
 
 static BOOL func_ov036_0218f560(FieldActor *actor) {
-    func_ov036_0218f458(actor, DIR_LEFT, 8, 3);
+    FieldAcmdTCB_StayWalkInit(actor, DIR_LEFT, 8, 3);
     return TRUE;
 }
 
 static BOOL func_ov036_0218f570(FieldActor *actor) {
-    func_ov036_0218f458(actor, DIR_RIGHT, 8, 3);
+    FieldAcmdTCB_StayWalkInit(actor, DIR_RIGHT, 8, 3);
     return TRUE;
 }
 
 static BOOL func_ov036_0218f580(FieldActor *actor) {
-    func_ov036_0218f458(actor, DIR_UP, 4, 4);
+    FieldAcmdTCB_StayWalkInit(actor, DIR_UP, 4, 4);
     return TRUE;
 }
 
 static BOOL func_ov036_0218f590(FieldActor *actor) {
-    func_ov036_0218f458(actor, DIR_DOWN, 4, 4);
+    FieldAcmdTCB_StayWalkInit(actor, DIR_DOWN, 4, 4);
     return TRUE;
 }
 
 static BOOL func_ov036_0218f5a0(FieldActor *actor) {
-    func_ov036_0218f458(actor, DIR_LEFT, 4, 4);
+    FieldAcmdTCB_StayWalkInit(actor, DIR_LEFT, 4, 4);
     return TRUE;
 }
 
 static BOOL func_ov036_0218f5b0(FieldActor *actor) {
-    func_ov036_0218f458(actor, DIR_RIGHT, 4, 4);
+    FieldAcmdTCB_StayWalkInit(actor, DIR_RIGHT, 4, 4);
     return TRUE;
 }
 
 static BOOL func_ov036_0218f5c0(FieldActor *actor) {
-    func_ov036_0218f458(actor, DIR_UP, 2, 5);
+    FieldAcmdTCB_StayWalkInit(actor, DIR_UP, 2, 5);
     return TRUE;
 }
 
 static BOOL func_ov036_0218f5d0(FieldActor *actor) {
-    func_ov036_0218f458(actor, DIR_DOWN, 2, 5);
+    FieldAcmdTCB_StayWalkInit(actor, DIR_DOWN, 2, 5);
     return TRUE;
 }
 
 static BOOL func_ov036_0218f5e0(FieldActor *actor) {
-    func_ov036_0218f458(actor, DIR_LEFT, 2, 5);
+    FieldAcmdTCB_StayWalkInit(actor, DIR_LEFT, 2, 5);
     return TRUE;
 }
 
 static BOOL func_ov036_0218f5f0(FieldActor *actor) {
-    func_ov036_0218f458(actor, DIR_RIGHT, 2, 5);
+    FieldAcmdTCB_StayWalkInit(actor, DIR_RIGHT, 2, 5);
     return TRUE;
 }
 
-static void func_ov036_0218f600(FieldActor *actor, u32 dir, fx32 speed, u32 frames, u16 state, s16 heightTable,
-                                u16 heightStep, u32 se) {
-    FieldAcmdJumpWork *work = func_ov012_0216713c(actor, sizeof(FieldAcmdJumpWork));
+static void FieldAcmdTCB_JumpInit(FieldActor *actor, u32 dir, fx32 speed, u32 frames, u16 state, s16 heightTable,
+                                  u16 heightStep, u32 se) {
+    FieldAcmdJumpWork *work = FldAct_InitMoveCmdWork(actor, sizeof(FieldAcmdJumpWork));
 
     work->dir = dir;
     work->speed = speed;
@@ -949,13 +949,13 @@ static void func_ov036_0218f600(FieldActor *actor, u32 dir, fx32 speed, u32 fram
     }
 }
 
-static void func_ov036_0218f66c(FieldActor *actor, u32 dir, fx32 speed, u32 frames, u16 state, s16 heightTable,
-                                u16 heightStep) {
-    func_ov036_0218f600(actor, dir, speed, frames, state, heightTable, heightStep, SEQ_SE_DANSA);
+static void FieldAcmdTCB_JumpInitWithSe(FieldActor *actor, u32 dir, fx32 speed, u32 frames, u16 state, s16 heightTable,
+                                        u16 heightStep) {
+    FieldAcmdTCB_JumpInit(actor, dir, speed, frames, state, heightTable, heightStep, SEQ_SE_DANSA);
 }
 
-static BOOL func_ov036_0218f690(FieldActor *actor) {
-    FieldAcmdJumpWork *work = func_ov012_02167154(actor);
+static BOOL FieldAcmdTCB_JumpMove(FieldActor *actor) {
+    FieldAcmdJumpWork *work = FldAct_GetMoveCmdWork(actor);
     VecFx32 offset;
     fx32 speed;
     const fx32 *row;
@@ -999,135 +999,135 @@ static BOOL func_ov036_0218f690(FieldActor *actor) {
     return TRUE;
 }
 
-static BOOL func_ov036_0218f76c(FieldActor *actor) {
-    func_ov036_0218f66c(actor, DIR_UP, 0x0, 16, 2, 1, 0x100);
+static BOOL FieldAcmdTCB_StayJumpUp16F(FieldActor *actor) {
+    FieldAcmdTCB_JumpInitWithSe(actor, DIR_UP, 0x0, 16, 2, 1, 0x100);
     return TRUE;
 }
 
-static BOOL func_ov036_0218f790(FieldActor *actor) {
-    func_ov036_0218f66c(actor, DIR_DOWN, 0x0, 16, 2, 1, 0x100);
+static BOOL FieldAcmdTCB_StayJumpDown16F(FieldActor *actor) {
+    FieldAcmdTCB_JumpInitWithSe(actor, DIR_DOWN, 0x0, 16, 2, 1, 0x100);
     return TRUE;
 }
 
-static BOOL func_ov036_0218f7b4(FieldActor *actor) {
-    func_ov036_0218f66c(actor, DIR_LEFT, 0x0, 16, 2, 1, 0x100);
+static BOOL FieldAcmdTCB_StayJumpLeft16F(FieldActor *actor) {
+    FieldAcmdTCB_JumpInitWithSe(actor, DIR_LEFT, 0x0, 16, 2, 1, 0x100);
     return TRUE;
 }
 
-static BOOL func_ov036_0218f7d4(FieldActor *actor) {
-    func_ov036_0218f66c(actor, DIR_RIGHT, 0x0, 16, 2, 1, 0x100);
+static BOOL FieldAcmdTCB_StayJumpRight16F(FieldActor *actor) {
+    FieldAcmdTCB_JumpInitWithSe(actor, DIR_RIGHT, 0x0, 16, 2, 1, 0x100);
     return TRUE;
 }
 
-static BOOL func_ov036_0218f7f8(FieldActor *actor) {
-    func_ov036_0218f66c(actor, DIR_UP, 0x0, 8, 3, 1, 0x200);
+static BOOL FieldAcmdTCB_StayJumpUp8F(FieldActor *actor) {
+    FieldAcmdTCB_JumpInitWithSe(actor, DIR_UP, 0x0, 8, 3, 1, 0x200);
     return TRUE;
 }
 
-static BOOL func_ov036_0218f818(FieldActor *actor) {
-    func_ov036_0218f66c(actor, DIR_DOWN, 0x0, 8, 3, 1, 0x200);
+static BOOL FieldAcmdTCB_StayJumpDown8F(FieldActor *actor) {
+    FieldAcmdTCB_JumpInitWithSe(actor, DIR_DOWN, 0x0, 8, 3, 1, 0x200);
     return TRUE;
 }
 
-static BOOL func_ov036_0218f838(FieldActor *actor) {
-    func_ov036_0218f66c(actor, DIR_LEFT, 0x0, 8, 3, 1, 0x200);
+static BOOL FieldAcmdTCB_StayJumpLeft8F(FieldActor *actor) {
+    FieldAcmdTCB_JumpInitWithSe(actor, DIR_LEFT, 0x0, 8, 3, 1, 0x200);
     return TRUE;
 }
 
-static BOOL func_ov036_0218f858(FieldActor *actor) {
-    func_ov036_0218f66c(actor, DIR_RIGHT, 0x0, 8, 3, 1, 0x200);
+static BOOL FieldAcmdTCB_StayJumpRight8F(FieldActor *actor) {
+    FieldAcmdTCB_JumpInitWithSe(actor, DIR_RIGHT, 0x0, 8, 3, 1, 0x200);
     return TRUE;
 }
 
 static BOOL func_ov036_0218f878(FieldActor *actor) {
-    func_ov036_0218f66c(actor, DIR_UP, 0x2000, 8, 3, 0, 0x200);
+    FieldAcmdTCB_JumpInitWithSe(actor, DIR_UP, 0x2000, 8, 3, 0, 0x200);
     return TRUE;
 }
 
 static BOOL func_ov036_0218f898(FieldActor *actor) {
-    func_ov036_0218f66c(actor, DIR_DOWN, 0x2000, 8, 3, 0, 0x200);
+    FieldAcmdTCB_JumpInitWithSe(actor, DIR_DOWN, 0x2000, 8, 3, 0, 0x200);
     return TRUE;
 }
 
 static BOOL func_ov036_0218f8bc(FieldActor *actor) {
-    func_ov036_0218f66c(actor, DIR_LEFT, 0x2000, 8, 3, 0, 0x200);
+    FieldAcmdTCB_JumpInitWithSe(actor, DIR_LEFT, 0x2000, 8, 3, 0, 0x200);
     return TRUE;
 }
 
 static BOOL func_ov036_0218f8e0(FieldActor *actor) {
-    func_ov036_0218f66c(actor, DIR_RIGHT, 0x2000, 8, 3, 0, 0x200);
+    FieldAcmdTCB_JumpInitWithSe(actor, DIR_RIGHT, 0x2000, 8, 3, 0, 0x200);
     return TRUE;
 }
 
 static BOOL func_ov036_0218f900(FieldActor *actor) {
-    func_ov036_0218f66c(actor, DIR_UP, 0x2000, 16, 3, 0, 0x100);
+    FieldAcmdTCB_JumpInitWithSe(actor, DIR_UP, 0x2000, 16, 3, 0, 0x100);
     return TRUE;
 }
 
 static BOOL func_ov036_0218f920(FieldActor *actor) {
-    func_ov036_0218f66c(actor, DIR_DOWN, 0x2000, 16, 3, 0, 0x100);
+    FieldAcmdTCB_JumpInitWithSe(actor, DIR_DOWN, 0x2000, 16, 3, 0, 0x100);
     return TRUE;
 }
 
 static BOOL func_ov036_0218f944(FieldActor *actor) {
-    func_ov036_0218f66c(actor, DIR_LEFT, 0x2000, 16, 3, 0, 0x100);
+    FieldAcmdTCB_JumpInitWithSe(actor, DIR_LEFT, 0x2000, 16, 3, 0, 0x100);
     return TRUE;
 }
 
 static BOOL func_ov036_0218f964(FieldActor *actor) {
-    func_ov036_0218f66c(actor, DIR_RIGHT, 0x2000, 16, 3, 0, 0x100);
+    FieldAcmdTCB_JumpInitWithSe(actor, DIR_RIGHT, 0x2000, 16, 3, 0, 0x100);
     return TRUE;
 }
 
 static BOOL func_ov036_0218f988(FieldActor *actor) {
-    func_ov036_0218f66c(actor, DIR_LEFT, 0x1000, 16, 2, 0, 0xf0);
+    FieldAcmdTCB_JumpInitWithSe(actor, DIR_LEFT, 0x1000, 16, 2, 0, 0xf0);
     return TRUE;
 }
 
-static BOOL func_ov036_0218f9a8(FieldActor *actor) {
-    func_ov036_0218f66c(actor, DIR_RIGHT, 0x1000, 16, 2, 0, 0xf0);
+static BOOL FieldAcmdTCB_JumpRight1G16F(FieldActor *actor) {
+    FieldAcmdTCB_JumpInitWithSe(actor, DIR_RIGHT, 0x1000, 16, 2, 0, 0xf0);
     return TRUE;
 }
 
 static BOOL func_ov036_0218f9c8(FieldActor *actor) {
-    func_ov036_0218f66c(actor, DIR_LEFT, 0x4000, 12, 3, 0, 0x140);
+    FieldAcmdTCB_JumpInitWithSe(actor, DIR_LEFT, 0x4000, 12, 3, 0, 0x140);
     return TRUE;
 }
 
-static BOOL func_ov036_0218f9ec(FieldActor *actor) {
-    func_ov036_0218f66c(actor, DIR_RIGHT, 0x4000, 12, 3, 0, 0x140);
+static BOOL FieldAcmdTCB_JumpRight3G12F(FieldActor *actor) {
+    FieldAcmdTCB_JumpInitWithSe(actor, DIR_RIGHT, 0x4000, 12, 3, 0, 0x140);
     return TRUE;
 }
 
 static BOOL func_ov036_0218fa10(FieldActor *actor) {
-    func_ov036_0218f600(actor, DIR_UP, 0x2000, 24, 3, 0, 0xa0, 0);
+    FieldAcmdTCB_JumpInit(actor, DIR_UP, 0x2000, 24, 3, 0, 0xa0, 0);
     return TRUE;
 }
 
-static BOOL func_ov036_0218fa34(FieldActor *actor) {
-    func_ov036_0218f600(actor, DIR_DOWN, 0x2000, 24, 3, 0, 0xa0, 0);
+static BOOL FieldAcmdTCB_JumpDown3G24FNoSe(FieldActor *actor) {
+    FieldAcmdTCB_JumpInit(actor, DIR_DOWN, 0x2000, 24, 3, 0, 0xa0, 0);
     return TRUE;
 }
 
-static BOOL func_ov036_0218fa58(FieldActor *actor) {
-    func_ov036_0218f600(actor, DIR_LEFT, 0x2000, 24, 3, 0, 0xa0, 0);
+static BOOL FieldAcmdTCB_JumpLeft3G24FNoSe(FieldActor *actor) {
+    FieldAcmdTCB_JumpInit(actor, DIR_LEFT, 0x2000, 24, 3, 0, 0xa0, 0);
     return TRUE;
 }
 
-static BOOL func_ov036_0218fa7c(FieldActor *actor) {
-    func_ov036_0218f600(actor, DIR_RIGHT, 0x2000, 24, 3, 0, 0xa0, 0);
+static BOOL FieldAcmdTCB_JumpRight3G24FNoSe(FieldActor *actor) {
+    FieldAcmdTCB_JumpInit(actor, DIR_RIGHT, 0x2000, 24, 3, 0, 0xa0, 0);
     return TRUE;
 }
 
-static void func_ov036_0218faa0(FieldActor *actor, u32 count) {
-    u32 *work = func_ov012_0216713c(actor, 4);
+static void FieldAcmdTCB_WaitInit(FieldActor *actor, u32 count) {
+    u32 *work = FldAct_InitMoveCmdWork(actor, 4);
 
     *work = count;
     FieldActor_NextAcmdState(actor);
 }
 
-static BOOL func_ov036_0218fab8(FieldActor *actor) {
-    u32 *work = func_ov012_02167154(actor);
+static BOOL FieldAcmdTCB_WaitMove(FieldActor *actor) {
+    u32 *work = FldAct_GetMoveCmdWork(actor);
 
     if (*work != 0) {
         (*work)--;
@@ -1138,42 +1138,42 @@ static BOOL func_ov036_0218fab8(FieldActor *actor) {
 }
 
 static BOOL func_ov036_0218fad8(FieldActor *actor) {
-    func_ov036_0218faa0(actor, 1);
+    FieldAcmdTCB_WaitInit(actor, 1);
     return TRUE;
 }
 
 static BOOL func_ov036_0218fae4(FieldActor *actor) {
-    func_ov036_0218faa0(actor, 2);
+    FieldAcmdTCB_WaitInit(actor, 2);
     return TRUE;
 }
 
-static BOOL func_ov036_0218faf0(FieldActor *actor) {
-    func_ov036_0218faa0(actor, 4);
+static BOOL FieldAcmdTCB_Wait4F(FieldActor *actor) {
+    FieldAcmdTCB_WaitInit(actor, 4);
     return TRUE;
 }
 
-static BOOL func_ov036_0218fafc(FieldActor *actor) {
-    func_ov036_0218faa0(actor, 8);
+static BOOL FieldAcmdTCB_Wait8F(FieldActor *actor) {
+    FieldAcmdTCB_WaitInit(actor, 8);
     return TRUE;
 }
 
-static BOOL func_ov036_0218fb08(FieldActor *actor) {
-    func_ov036_0218faa0(actor, 15);
+static BOOL FieldAcmdTCB_Wait15F(FieldActor *actor) {
+    FieldAcmdTCB_WaitInit(actor, 15);
     return TRUE;
 }
 
-static BOOL func_ov036_0218fb14(FieldActor *actor) {
-    func_ov036_0218faa0(actor, 16);
+static BOOL FieldAcmdTCB_Wait16F(FieldActor *actor) {
+    FieldAcmdTCB_WaitInit(actor, 16);
     return TRUE;
 }
 
-static BOOL func_ov036_0218fb20(FieldActor *actor) {
-    func_ov036_0218faa0(actor, 32);
+static BOOL FieldAcmdTCB_Wait32F(FieldActor *actor) {
+    FieldAcmdTCB_WaitInit(actor, 32);
     return TRUE;
 }
 
-static BOOL func_ov036_0218fb2c(FieldActor *actor) {
-    AcmdPosSpeedWork *work = func_ov012_0216713c(actor, 8);
+static BOOL FieldAcmdTCB_RiseInit(FieldActor *actor) {
+    AcmdPosSpeedWork *work = FldAct_InitMoveCmdWork(actor, 8);
 
     work->speed = 8 << 13;
     FldAct_SetDrawStatus(actor, 0);
@@ -1181,8 +1181,8 @@ static BOOL func_ov036_0218fb2c(FieldActor *actor) {
     return TRUE;
 }
 
-static BOOL func_ov036_0218fb50(FieldActor *actor) {
-    AcmdPosSpeedWork *work = func_ov012_02167154(actor);
+static BOOL FieldAcmdTCB_RiseMove(FieldActor *actor) {
+    AcmdPosSpeedWork *work = FldAct_GetMoveCmdWork(actor);
 
     work->pos += work->speed;
     VecFx32 offset = { 0, 0, 0 };
@@ -1196,8 +1196,8 @@ static BOOL func_ov036_0218fb50(FieldActor *actor) {
     return TRUE;
 }
 
-static BOOL func_ov036_0218fb98(FieldActor *actor) {
-    AcmdPosSpeedWork *work = func_ov012_0216713c(actor, 8);
+static BOOL FieldAcmdTCB_FallInit(FieldActor *actor) {
+    AcmdPosSpeedWork *work = FldAct_InitMoveCmdWork(actor, 8);
 
     work->pos = 5 << 18;
     work->speed = -0x10000;
@@ -1207,8 +1207,8 @@ static BOOL func_ov036_0218fb98(FieldActor *actor) {
     return TRUE;
 }
 
-static BOOL func_ov036_0218fbcc(FieldActor *actor) {
-    AcmdPosSpeedWork *work = func_ov012_02167154(actor);
+static BOOL FieldAcmdTCB_FallMove(FieldActor *actor) {
+    AcmdPosSpeedWork *work = FldAct_GetMoveCmdWork(actor);
 
     work->pos += work->speed;
     if (work->pos < 0) {
@@ -1262,19 +1262,19 @@ static BOOL func_ov036_0218fc78(FieldActor *actor) {
 }
 
 static void func_ov036_0218fc8c(FieldActor *actor, u32 kind, u32 unused, BOOL playSE) {
-    AcmdEffectWork *work = func_ov012_0216713c(actor, 8);
+    AcmdEffectWork *work = FldAct_InitMoveCmdWork(actor, 8);
 
     work->kind = kind;
     work->task =
-        func_ov036_021b3f14(Field_GetFieldEffects(GetMMSysField(GetActorMModelSystem(actor))), actor, kind, playSE);
+        FldeffGyoe_SetMMdl(Field_GetFieldEffects(GetMMSysField(GetActorMModelSystem(actor))), actor, kind, playSE);
     FieldActor_NextAcmdState(actor);
 }
 
-static BOOL func_ov036_0218fcc0(FieldActor *actor) {
-    AcmdEffectWork *work = func_ov012_02167154(actor);
+static BOOL FieldAcmdTCB_MarkWait(FieldActor *actor) {
+    AcmdEffectWork *work = FldAct_GetMoveCmdWork(actor);
 
-    if (func_ov036_021b3fb4(work->task) == TRUE) {
-        func_ov036_021a3a70(work->task);
+    if (FldeffGyoe_IsFinished(work->task) == TRUE) {
+        FieldEffects_DeleteObject(work->task);
         FieldActor_NextAcmdState(actor);
         return TRUE;
     }
@@ -1321,8 +1321,8 @@ static BOOL func_ov036_0218fd58(FieldActor *actor) {
     return FALSE;
 }
 
-static void func_ov036_0218fd68(FieldActor *actor, u32 dir, u32 steps, u32 state) {
-    AcmdDirStepsWork *work = func_ov012_0216713c(actor, sizeof(AcmdDirStepsWork));
+static void FieldAcmdTCB_WalkTableInit(FieldActor *actor, u32 dir, u32 steps, u32 state) {
+    AcmdDirStepsWork *work = FldAct_InitMoveCmdWork(actor, sizeof(AcmdDirStepsWork));
 
     work->dir = dir;
     work->state = state;
@@ -1334,8 +1334,8 @@ static void func_ov036_0218fd68(FieldActor *actor, u32 dir, u32 steps, u32 state
     FieldActor_NextAcmdState(actor);
 }
 
-static BOOL func_ov036_0218fdac(FieldActor *actor, const s32 *distances) {
-    AcmdDirStepsWork *work = func_ov012_02167154(actor);
+static BOOL FieldAcmdTCB_WalkTableMove(FieldActor *actor, const s32 *distances) {
+    AcmdDirStepsWork *work = FldAct_GetMoveCmdWork(actor);
 
     FldAct_MoveWPosInDir(actor, work->dir, distances[work->index]);
     CheckRecalcActorY(actor);
@@ -1350,150 +1350,150 @@ static BOOL func_ov036_0218fdac(FieldActor *actor, const s32 *distances) {
     return TRUE;
 }
 
-static BOOL func_ov036_0218fe04(FieldActor *actor) {
-    func_ov036_0218fd68(actor, DIR_UP, 6, 6);
+static BOOL FieldAcmdTCB_WalkUp6F(FieldActor *actor) {
+    FieldAcmdTCB_WalkTableInit(actor, DIR_UP, 6, 6);
     return TRUE;
 }
 
-static BOOL func_ov036_0218fe14(FieldActor *actor) {
-    func_ov036_0218fd68(actor, DIR_DOWN, 6, 6);
+static BOOL FieldAcmdTCB_WalkDown6F(FieldActor *actor) {
+    FieldAcmdTCB_WalkTableInit(actor, DIR_DOWN, 6, 6);
     return TRUE;
 }
 
-static BOOL func_ov036_0218fe24(FieldActor *actor) {
-    func_ov036_0218fd68(actor, DIR_LEFT, 6, 6);
+static BOOL FieldAcmdTCB_WalkLeft6F(FieldActor *actor) {
+    FieldAcmdTCB_WalkTableInit(actor, DIR_LEFT, 6, 6);
     return TRUE;
 }
 
-static BOOL func_ov036_0218fe34(FieldActor *actor) {
-    func_ov036_0218fd68(actor, DIR_RIGHT, 6, 6);
+static BOOL FieldAcmdTCB_WalkRight6F(FieldActor *actor) {
+    FieldAcmdTCB_WalkTableInit(actor, DIR_RIGHT, 6, 6);
     return TRUE;
 }
 
-static BOOL func_ov036_0218fe44(FieldActor *actor) {
-    func_ov036_0218fd68(actor, DIR_UP, 6, 11);
+static BOOL FieldAcmdTCB_DashUp6F(FieldActor *actor) {
+    FieldAcmdTCB_WalkTableInit(actor, DIR_UP, 6, 11);
     return TRUE;
 }
 
-static BOOL func_ov036_0218fe54(FieldActor *actor) {
-    func_ov036_0218fd68(actor, DIR_DOWN, 6, 11);
+static BOOL FieldAcmdTCB_DashDown6F(FieldActor *actor) {
+    FieldAcmdTCB_WalkTableInit(actor, DIR_DOWN, 6, 11);
     return TRUE;
 }
 
-static BOOL func_ov036_0218fe64(FieldActor *actor) {
-    func_ov036_0218fd68(actor, DIR_LEFT, 6, 11);
+static BOOL FieldAcmdTCB_DashLeft6F(FieldActor *actor) {
+    FieldAcmdTCB_WalkTableInit(actor, DIR_LEFT, 6, 11);
     return TRUE;
 }
 
-static BOOL func_ov036_0218fe74(FieldActor *actor) {
-    func_ov036_0218fd68(actor, DIR_RIGHT, 6, 11);
+static BOOL FieldAcmdTCB_DashRight6F(FieldActor *actor) {
+    FieldAcmdTCB_WalkTableInit(actor, DIR_RIGHT, 6, 11);
     return TRUE;
 }
 
 static BOOL func_ov036_0218fe84(FieldActor *actor) {
-    if (func_ov036_0218fdac(actor, data_ov036_021cb5d4) == TRUE) {
+    if (FieldAcmdTCB_WalkTableMove(actor, data_ov036_021cb5d4) == TRUE) {
         return TRUE;
     }
     return FALSE;
 }
 
 static BOOL func_ov036_0218fe9c(FieldActor *actor) {
-    func_ov036_0218fd68(actor, DIR_UP, 3, 7);
+    FieldAcmdTCB_WalkTableInit(actor, DIR_UP, 3, 7);
     return TRUE;
 }
 
 static BOOL func_ov036_0218feac(FieldActor *actor) {
-    func_ov036_0218fd68(actor, DIR_DOWN, 3, 7);
+    FieldAcmdTCB_WalkTableInit(actor, DIR_DOWN, 3, 7);
     return TRUE;
 }
 
 static BOOL func_ov036_0218febc(FieldActor *actor) {
-    func_ov036_0218fd68(actor, DIR_LEFT, 3, 7);
+    FieldAcmdTCB_WalkTableInit(actor, DIR_LEFT, 3, 7);
     return TRUE;
 }
 
 static BOOL func_ov036_0218fecc(FieldActor *actor) {
-    func_ov036_0218fd68(actor, DIR_RIGHT, 3, 7);
+    FieldAcmdTCB_WalkTableInit(actor, DIR_RIGHT, 3, 7);
     return TRUE;
 }
 
 static BOOL func_ov036_0218fedc(FieldActor *actor) {
-    if (func_ov036_0218fdac(actor, data_ov036_021cb5b0) == TRUE) {
+    if (FieldAcmdTCB_WalkTableMove(actor, data_ov036_021cb5b0) == TRUE) {
         return TRUE;
     }
     return FALSE;
 }
 
 static BOOL func_ov036_0218fef4(FieldActor *actor) {
-    func_ov036_0218fd68(actor, DIR_UP, 7, 8);
+    FieldAcmdTCB_WalkTableInit(actor, DIR_UP, 7, 8);
     return TRUE;
 }
 
 static BOOL func_ov036_0218ff04(FieldActor *actor) {
-    func_ov036_0218fd68(actor, DIR_DOWN, 7, 8);
+    FieldAcmdTCB_WalkTableInit(actor, DIR_DOWN, 7, 8);
     return TRUE;
 }
 
 static BOOL func_ov036_0218ff14(FieldActor *actor) {
-    func_ov036_0218fd68(actor, DIR_LEFT, 7, 8);
+    FieldAcmdTCB_WalkTableInit(actor, DIR_LEFT, 7, 8);
     return TRUE;
 }
 
 static BOOL func_ov036_0218ff24(FieldActor *actor) {
-    func_ov036_0218fd68(actor, DIR_RIGHT, 7, 8);
+    FieldAcmdTCB_WalkTableInit(actor, DIR_RIGHT, 7, 8);
     return TRUE;
 }
 
 static BOOL func_ov036_0218ff34(FieldActor *actor) {
-    if (func_ov036_0218fdac(actor, data_ov036_021cb5ec) == TRUE) {
+    if (FieldAcmdTCB_WalkTableMove(actor, data_ov036_021cb5ec) == TRUE) {
         return TRUE;
     }
     return FALSE;
 }
 
 static BOOL func_ov036_0218ff4c(FieldActor *actor) {
-    func_ov036_0218fd68(actor, DIR_UP, 12, 9);
+    FieldAcmdTCB_WalkTableInit(actor, DIR_UP, 12, 9);
     return TRUE;
 }
 
 static BOOL func_ov036_0218ff5c(FieldActor *actor) {
-    func_ov036_0218fd68(actor, DIR_DOWN, 12, 9);
+    FieldAcmdTCB_WalkTableInit(actor, DIR_DOWN, 12, 9);
     return TRUE;
 }
 
 static BOOL func_ov036_0218ff6c(FieldActor *actor) {
-    func_ov036_0218fd68(actor, DIR_LEFT, 12, 9);
+    FieldAcmdTCB_WalkTableInit(actor, DIR_LEFT, 12, 9);
     return TRUE;
 }
 
 static BOOL func_ov036_0218ff7c(FieldActor *actor) {
-    func_ov036_0218fd68(actor, DIR_RIGHT, 12, 9);
+    FieldAcmdTCB_WalkTableInit(actor, DIR_RIGHT, 12, 9);
     return TRUE;
 }
 
 static BOOL func_ov036_0218ff8c(FieldActor *actor) {
-    if (func_ov036_0218fdac(actor, data_ov036_021cb608) == TRUE) {
+    if (FieldAcmdTCB_WalkTableMove(actor, data_ov036_021cb608) == TRUE) {
         return TRUE;
     }
     return FALSE;
 }
 
 static BOOL func_ov036_0218ffa4(FieldActor *actor) {
-    func_ov012_0216713c(actor, 4);
+    FldAct_InitMoveCmdWork(actor, 4);
     FldAct_SetDrawStatus(actor, 10);
     FieldActor_NextAcmdState(actor);
     return FALSE;
 }
 
 static BOOL func_ov036_0218ffc0(FieldActor *actor) {
-    func_ov012_0216713c(actor, 4);
+    FldAct_InitMoveCmdWork(actor, 4);
     FldAct_SetDrawStatus(actor, 11);
     FieldActor_NextAcmdState(actor);
     return FALSE;
 }
 
 static BOOL func_ov036_0218ffdc(FieldActor *actor) {
-    func_ov012_0216713c(actor, 4);
+    FldAct_InitMoveCmdWork(actor, 4);
     FldAct_SetDrawStatus(actor, 12);
     FieldActor_NextAcmdState(actor);
     return FALSE;
@@ -1509,11 +1509,11 @@ static BOOL func_ov036_02190010(FieldActor *actor) {
     return func_ov036_0218ffc0(actor);
 }
 
-static BOOL func_ov036_02190028(FieldActor *actor) {
+static BOOL FieldAcmdTCB_AnimeWaitEndStop(FieldActor *actor) {
     u16 cmd;
     u32 index;
 
-    func_ov012_02167154(actor);
+    FldAct_GetMoveCmdWork(actor);
     index = FldAct_GetBlActIdx(actor, 0);
     if (index != 0xffff) {
         if (BlActSys_GetActorLastCmd(FieldBlAct_GetBlActSys(FldActSys_GetFieldBlAct(GetActorMModelSystem(actor))),
@@ -1526,11 +1526,11 @@ static BOOL func_ov036_02190028(FieldActor *actor) {
     return FALSE;
 }
 
-static BOOL func_ov036_02190080(FieldActor *actor) {
+static BOOL FieldAcmdTCB_AnimeWaitEnd(FieldActor *actor) {
     u16 cmd;
     u32 index;
 
-    func_ov012_02167154(actor);
+    FldAct_GetMoveCmdWork(actor);
     index = FldAct_GetBlActIdx(actor, 0);
     if (index != 0xffff) {
         if (BlActSys_GetActorLastCmd(FieldBlAct_GetBlActSys(FldActSys_GetFieldBlAct(GetActorMModelSystem(actor))),
@@ -1542,13 +1542,13 @@ static BOOL func_ov036_02190080(FieldActor *actor) {
     return FALSE;
 }
 
-static BOOL func_ov036_021900c8(FieldActor *actor) {
+static BOOL FieldAcmdTCB_HideOffInit(FieldActor *actor) {
     FieldEffectTask *task;
 
-    func_ov012_0216713c(actor, 4);
-    task = func_ov036_0219311c(actor);
+    FldAct_InitMoveCmdWork(actor, 4);
+    task = FldmmdlMove_GetHideEffect(actor);
     if (task != NULL) {
-        func_ov036_021c6800(task);
+        HideTask_RequestEnd(task);
     }
     VecFx32 offset = { 0, 0, 0 };
 
@@ -1559,18 +1559,18 @@ static BOOL func_ov036_021900c8(FieldActor *actor) {
     return FALSE;
 }
 
-static BOOL func_ov036_02190110(FieldActor *actor) {
-    u32 *work = func_ov012_02167154(actor);
+static BOOL FieldAcmdTCB_HideOffMove(FieldActor *actor) {
+    u32 *work = FldAct_GetMoveCmdWork(actor);
     VecFx32 offset = { 0, 0, 0 };
     FieldEffectTask *task;
 
     offset.y = data_ov036_021d4d34[0][*work];
     SetActorWPosOffset(actor, &offset);
-    task = func_ov036_0219311c(actor);
+    task = FldmmdlMove_GetHideEffect(actor);
     if (task != NULL) {
-        if (func_ov036_021c6820(task) == TRUE) {
-            func_ov036_021a3a70(task);
-            func_ov036_02193110(actor, 0);
+        if (HideTask_IsFinished(task) == TRUE) {
+            FieldEffects_DeleteObject(task);
+            FldmmdlMove_SetHideEffect(actor, 0);
         }
     }
     *work += 2;
@@ -1580,20 +1580,20 @@ static BOOL func_ov036_02190110(FieldActor *actor) {
     offset.y = 0;
     SetActorWPosOffset(actor, &offset);
     SetActorMovementFlag(actor, 0x540);
-    func_ov036_02193128(actor);
+    FldmmdlMove_SetHideNoEffect(actor);
     FieldActor_NextAcmdState(actor);
     return TRUE;
 }
 
-static void func_ov036_02190194(FieldActor *actor, u32 value, u16 limit) {
-    AcmdWaitWork *work = func_ov012_0216713c(actor, 4);
+static void FieldAcmdTCB_StayInit(FieldActor *actor, u32 value, u16 limit) {
+    AcmdWaitWork *work = FldAct_InitMoveCmdWork(actor, 4);
 
     work->limit = limit;
     FldAct_SetDrawStatus(actor, value);
 }
 
-static BOOL func_ov036_021901b0(FieldActor *actor) {
-    AcmdWaitWork *work = func_ov012_02167154(actor);
+static BOOL FieldAcmdTCB_StayMove(FieldActor *actor) {
+    AcmdWaitWork *work = FldAct_GetMoveCmdWork(actor);
 
     work->count++;
     if (work->count >= work->limit) {
@@ -1602,26 +1602,26 @@ static BOOL func_ov036_021901b0(FieldActor *actor) {
     return FALSE;
 }
 
-static BOOL func_ov036_021901d0(FieldActor *actor) {
-    func_ov036_02190194(actor, 1, 40);
+static BOOL FieldAcmdTCB_StayWalk32F40F(FieldActor *actor) {
+    FieldAcmdTCB_StayInit(actor, 1, 40);
     FieldActor_NextAcmdState(actor);
     return FALSE;
 }
 
 static BOOL func_ov036_021901e8(FieldActor *actor) {
-    func_ov036_02190194(actor, 2, 41);
+    FieldAcmdTCB_StayInit(actor, 2, 41);
     FieldActor_NextAcmdState(actor);
     return FALSE;
 }
 
 static BOOL func_ov036_02190200(FieldActor *actor) {
-    func_ov036_02190194(actor, 0, 8);
+    FieldAcmdTCB_StayInit(actor, 0, 8);
     FieldActor_NextAcmdState(actor);
     return FALSE;
 }
 
 static BOOL func_ov036_02190218(FieldActor *actor) {
-    func_ov012_0216713c(actor, 4);
+    FldAct_InitMoveCmdWork(actor, 4);
     FldAct_SetDrawStatus(actor, 1);
     FieldActor_NextAcmdState(actor);
     return TRUE;
@@ -1633,7 +1633,7 @@ static BOOL func_ov036_02190234(FieldActor *actor) {
     s32 *work;
     s32 index;
 
-    work = func_ov012_02167154(actor);
+    work = FldAct_GetMoveCmdWork(actor);
     index = *work;
     if (index >= 10) {
         index = 9;
@@ -1647,9 +1647,9 @@ static BOOL func_ov036_02190234(FieldActor *actor) {
     return FALSE;
 }
 
-static void func_ov036_0219028c(FieldActor *actor, const VecFx32 *delta, u32 faceDir, u32 motionDir, u32 value,
-                                u8 param) {
-    AcmdShiftWork *work = func_ov012_0216713c(actor, 16);
+static void FieldAcmdTCB_StepInit(FieldActor *actor, const VecFx32 *delta, u32 faceDir, u32 motionDir, u32 value,
+                                  u8 param) {
+    AcmdShiftWork *work = FldAct_InitMoveCmdWork(actor, 16);
 
     work->frames = value;
     work->delta = *delta;
@@ -1678,8 +1678,8 @@ static void func_ov036_0219028c(FieldActor *actor, const VecFx32 *delta, u32 fac
     FieldActor_NextAcmdState(actor);
 }
 
-static BOOL func_ov036_02190350(FieldActor *actor) {
-    AcmdShiftWork *work = func_ov012_02167154(actor);
+static BOOL FieldAcmdTCB_StepMove(FieldActor *actor) {
+    AcmdShiftWork *work = FldAct_GetMoveCmdWork(actor);
 
     FldAct_AddWPos(actor, &work->delta);
     work->frames--;
@@ -1693,220 +1693,220 @@ static BOOL func_ov036_02190350(FieldActor *actor) {
     return TRUE;
 }
 
-static BOOL func_ov036_02190394(FieldActor *actor) {
+static BOOL FieldAcmdTCB_StepUpFaceLeft8F(FieldActor *actor) {
     VecFx32 delta = { 0, FX32_CONST(2), 0 };
 
-    func_ov036_0219028c(actor, &delta, DIR_LEFT, DIR_UP, 8, 3);
+    FieldAcmdTCB_StepInit(actor, &delta, DIR_LEFT, DIR_UP, 8, 3);
     return TRUE;
 }
 
-static BOOL func_ov036_021903c8(FieldActor *actor) {
+static BOOL FieldAcmdTCB_StepDownFaceRight8F(FieldActor *actor) {
     VecFx32 delta = { 0, FX32_CONST(-2), 0 };
 
-    func_ov036_0219028c(actor, &delta, DIR_RIGHT, DIR_DOWN, 8, 3);
+    FieldAcmdTCB_StepInit(actor, &delta, DIR_RIGHT, DIR_DOWN, 8, 3);
     return TRUE;
 }
 
 static BOOL func_ov036_021903f8(FieldActor *actor) {
     VecFx32 delta = { 0, 0, FX32_CONST(2) };
 
-    func_ov036_0219028c(actor, &delta, DIR_DOWN, DIR_LEFT, 8, 3);
+    FieldAcmdTCB_StepInit(actor, &delta, DIR_DOWN, DIR_LEFT, 8, 3);
     return TRUE;
 }
 
-static BOOL func_ov036_0219042c(FieldActor *actor) {
+static BOOL FieldAcmdTCB_StepRightFaceUp8F(FieldActor *actor) {
     VecFx32 delta = { 0, 0, FX32_CONST(-2) };
 
-    func_ov036_0219028c(actor, &delta, DIR_UP, DIR_RIGHT, 8, 3);
+    FieldAcmdTCB_StepInit(actor, &delta, DIR_UP, DIR_RIGHT, 8, 3);
     return TRUE;
 }
 
-static BOOL func_ov036_0219045c(FieldActor *actor) {
+static BOOL FieldAcmdTCB_StepUpFaceRight8F(FieldActor *actor) {
     VecFx32 delta = { 0, FX32_CONST(2), 0 };
 
-    func_ov036_0219028c(actor, &delta, DIR_RIGHT, DIR_UP, 8, 3);
+    FieldAcmdTCB_StepInit(actor, &delta, DIR_RIGHT, DIR_UP, 8, 3);
     return TRUE;
 }
 
-static BOOL func_ov036_0219048c(FieldActor *actor) {
+static BOOL FieldAcmdTCB_StepDownFaceLeft8F(FieldActor *actor) {
     VecFx32 delta = { 0, FX32_CONST(-2), 0 };
 
-    func_ov036_0219028c(actor, &delta, DIR_LEFT, DIR_DOWN, 8, 3);
+    FieldAcmdTCB_StepInit(actor, &delta, DIR_LEFT, DIR_DOWN, 8, 3);
     return TRUE;
 }
 
-static BOOL func_ov036_021904c0(FieldActor *actor) {
+static BOOL FieldAcmdTCB_StepLeftFaceUp8F(FieldActor *actor) {
     VecFx32 delta = { 0, 0, FX32_CONST(-2) };
 
-    func_ov036_0219028c(actor, &delta, DIR_UP, DIR_LEFT, 8, 3);
+    FieldAcmdTCB_StepInit(actor, &delta, DIR_UP, DIR_LEFT, 8, 3);
     return TRUE;
 }
 
 static BOOL func_ov036_021904f4(FieldActor *actor) {
     VecFx32 delta = { 0, 0, FX32_CONST(2) };
 
-    func_ov036_0219028c(actor, &delta, DIR_DOWN, DIR_LEFT, 8, 3);
+    FieldAcmdTCB_StepInit(actor, &delta, DIR_DOWN, DIR_LEFT, 8, 3);
     return TRUE;
 }
 
-static BOOL func_ov036_02190528(FieldActor *actor) {
+static BOOL FieldAcmdTCB_StepUpFaceDown8F(FieldActor *actor) {
     VecFx32 delta = { 0, 0, FX32_CONST(2) };
 
-    func_ov036_0219028c(actor, &delta, DIR_DOWN, DIR_UP, 8, 3);
+    FieldAcmdTCB_StepInit(actor, &delta, DIR_DOWN, DIR_UP, 8, 3);
     return TRUE;
 }
 
-static BOOL func_ov036_0219055c(FieldActor *actor) {
+static BOOL FieldAcmdTCB_StepDownFaceUp8F(FieldActor *actor) {
     VecFx32 delta = { 0, 0, FX32_CONST(-2) };
 
-    func_ov036_0219028c(actor, &delta, DIR_UP, DIR_DOWN, 8, 3);
+    FieldAcmdTCB_StepInit(actor, &delta, DIR_UP, DIR_DOWN, 8, 3);
     return TRUE;
 }
 
-static BOOL func_ov036_02190590(FieldActor *actor) {
+static BOOL FieldAcmdTCB_StepLeftFaceRight8F(FieldActor *actor) {
     VecFx32 delta = { FX32_CONST(-2), 0, 0 };
 
-    func_ov036_0219028c(actor, &delta, DIR_RIGHT, DIR_LEFT, 8, 3);
+    FieldAcmdTCB_StepInit(actor, &delta, DIR_RIGHT, DIR_LEFT, 8, 3);
     return TRUE;
 }
 
-static BOOL func_ov036_021905c0(FieldActor *actor) {
+static BOOL FieldAcmdTCB_StepRightFaceLeft8F(FieldActor *actor) {
     VecFx32 delta = { FX32_CONST(2), 0, 0 };
 
-    func_ov036_0219028c(actor, &delta, DIR_LEFT, DIR_RIGHT, 8, 3);
+    FieldAcmdTCB_StepInit(actor, &delta, DIR_LEFT, DIR_RIGHT, 8, 3);
     return TRUE;
 }
 
-static BOOL func_ov036_021905f0(FieldActor *actor) {
+static BOOL FieldAcmdTCB_StepUpFaceDown4F(FieldActor *actor) {
     VecFx32 delta = { 0, 0, FX32_CONST(4) };
 
-    func_ov036_0219028c(actor, &delta, DIR_DOWN, DIR_UP, 4, 4);
+    FieldAcmdTCB_StepInit(actor, &delta, DIR_DOWN, DIR_UP, 4, 4);
     return TRUE;
 }
 
-static BOOL func_ov036_02190620(FieldActor *actor) {
+static BOOL FieldAcmdTCB_StepDownFaceUp4F(FieldActor *actor) {
     VecFx32 delta = { 0, 0, FX32_CONST(-4) };
 
-    func_ov036_0219028c(actor, &delta, DIR_UP, DIR_DOWN, 4, 4);
+    FieldAcmdTCB_StepInit(actor, &delta, DIR_UP, DIR_DOWN, 4, 4);
     return TRUE;
 }
 
-static BOOL func_ov036_02190650(FieldActor *actor) {
+static BOOL FieldAcmdTCB_StepLeftFaceRight4F(FieldActor *actor) {
     VecFx32 delta = { FX32_CONST(-4), 0, 0 };
 
-    func_ov036_0219028c(actor, &delta, DIR_RIGHT, DIR_LEFT, 4, 4);
+    FieldAcmdTCB_StepInit(actor, &delta, DIR_RIGHT, DIR_LEFT, 4, 4);
     return TRUE;
 }
 
-static BOOL func_ov036_02190680(FieldActor *actor) {
+static BOOL FieldAcmdTCB_StepRightFaceLeft4F(FieldActor *actor) {
     VecFx32 delta = { FX32_CONST(4), 0, 0 };
 
-    func_ov036_0219028c(actor, &delta, DIR_LEFT, DIR_RIGHT, 4, 4);
+    FieldAcmdTCB_StepInit(actor, &delta, DIR_LEFT, DIR_RIGHT, 4, 4);
     return TRUE;
 }
 
-static BOOL func_ov036_021906b0(FieldActor *actor) {
+static BOOL FieldAcmdTCB_StepUpFaceDown2F(FieldActor *actor) {
     VecFx32 delta = { 0, 0, FX32_CONST(8) };
 
-    func_ov036_0219028c(actor, &delta, DIR_DOWN, DIR_UP, 2, 5);
+    FieldAcmdTCB_StepInit(actor, &delta, DIR_DOWN, DIR_UP, 2, 5);
     return TRUE;
 }
 
-static BOOL func_ov036_021906e4(FieldActor *actor) {
+static BOOL FieldAcmdTCB_StepDownFaceUp2F(FieldActor *actor) {
     VecFx32 delta = { 0, 0, FX32_CONST(-8) };
 
-    func_ov036_0219028c(actor, &delta, DIR_UP, DIR_DOWN, 2, 5);
+    FieldAcmdTCB_StepInit(actor, &delta, DIR_UP, DIR_DOWN, 2, 5);
     return TRUE;
 }
 
-static BOOL func_ov036_02190718(FieldActor *actor) {
+static BOOL FieldAcmdTCB_StepLeftFaceRight2F(FieldActor *actor) {
     VecFx32 step = { -0x8000, 0, 0 };
-    func_ov036_0219028c(actor, &step, DIR_RIGHT, DIR_LEFT, 2, 5);
+    FieldAcmdTCB_StepInit(actor, &step, DIR_RIGHT, DIR_LEFT, 2, 5);
     return TRUE;
 }
 
-static BOOL func_ov036_02190748(FieldActor *actor) {
+static BOOL FieldAcmdTCB_StepRightFaceLeft2F(FieldActor *actor) {
     VecFx32 step = { 0x8000, 0, 0 };
-    func_ov036_0219028c(actor, &step, DIR_LEFT, DIR_RIGHT, 2, 5);
+    FieldAcmdTCB_StepInit(actor, &step, DIR_LEFT, DIR_RIGHT, 2, 5);
     return TRUE;
 }
 
-static BOOL func_ov036_02190778(FieldActor *actor) {
+static BOOL FieldAcmdTCB_DashStepUpFaceLeft4F(FieldActor *actor) {
     VecFx32 step = { 0, 0x4000, 0 };
-    func_ov036_0219028c(actor, &step, DIR_LEFT, DIR_UP, 4, 10);
+    FieldAcmdTCB_StepInit(actor, &step, DIR_LEFT, DIR_UP, 4, 10);
     return TRUE;
 }
 
-static BOOL func_ov036_021907ac(FieldActor *actor) {
+static BOOL FieldAcmdTCB_DashStepDownFaceRight4F(FieldActor *actor) {
     VecFx32 step = { 0, -0x4000, 0 };
-    func_ov036_0219028c(actor, &step, DIR_RIGHT, DIR_DOWN, 4, 10);
+    FieldAcmdTCB_StepInit(actor, &step, DIR_RIGHT, DIR_DOWN, 4, 10);
     return TRUE;
 }
 
 static BOOL func_ov036_021907e0(FieldActor *actor) {
     VecFx32 step = { 0, 0, 0x4000 };
-    func_ov036_0219028c(actor, &step, DIR_DOWN, DIR_LEFT, 4, 10);
+    FieldAcmdTCB_StepInit(actor, &step, DIR_DOWN, DIR_LEFT, 4, 10);
     return TRUE;
 }
 
-static BOOL func_ov036_02190814(FieldActor *actor) {
+static BOOL FieldAcmdTCB_DashStepRightFaceUp4F(FieldActor *actor) {
     VecFx32 step = { 0, 0, -0x4000 };
-    func_ov036_0219028c(actor, &step, DIR_UP, DIR_RIGHT, 4, 10);
+    FieldAcmdTCB_StepInit(actor, &step, DIR_UP, DIR_RIGHT, 4, 10);
     return TRUE;
 }
 
-static BOOL func_ov036_02190848(FieldActor *actor) {
+static BOOL FieldAcmdTCB_DashStepUpFaceRight4F(FieldActor *actor) {
     VecFx32 step = { 0, 0x4000, 0 };
-    func_ov036_0219028c(actor, &step, DIR_RIGHT, DIR_UP, 4, 10);
+    FieldAcmdTCB_StepInit(actor, &step, DIR_RIGHT, DIR_UP, 4, 10);
     return TRUE;
 }
 
-static BOOL func_ov036_0219087c(FieldActor *actor) {
+static BOOL FieldAcmdTCB_DashStepDownFaceLeft4F(FieldActor *actor) {
     VecFx32 step = { 0, -0x4000, 0 };
-    func_ov036_0219028c(actor, &step, DIR_LEFT, DIR_DOWN, 4, 10);
+    FieldAcmdTCB_StepInit(actor, &step, DIR_LEFT, DIR_DOWN, 4, 10);
     return TRUE;
 }
 
-static BOOL func_ov036_021908b0(FieldActor *actor) {
+static BOOL FieldAcmdTCB_DashStepLeftFaceUp4F(FieldActor *actor) {
     VecFx32 step = { 0, 0, -0x4000 };
-    func_ov036_0219028c(actor, &step, DIR_UP, DIR_LEFT, 4, 10);
+    FieldAcmdTCB_StepInit(actor, &step, DIR_UP, DIR_LEFT, 4, 10);
     return TRUE;
 }
 
 static BOOL func_ov036_021908e4(FieldActor *actor) {
     VecFx32 step = { 0, 0, 0x4000 };
-    func_ov036_0219028c(actor, &step, DIR_DOWN, DIR_LEFT, 4, 10);
+    FieldAcmdTCB_StepInit(actor, &step, DIR_DOWN, DIR_LEFT, 4, 10);
     return TRUE;
 }
 
-static BOOL func_ov036_02190918(FieldActor *actor) {
+static BOOL FieldAcmdTCB_DashStepUpFaceDown4F(FieldActor *actor) {
     VecFx32 step = { 0, 0, 0x4000 };
-    func_ov036_0219028c(actor, &step, DIR_DOWN, DIR_UP, 4, 10);
+    FieldAcmdTCB_StepInit(actor, &step, DIR_DOWN, DIR_UP, 4, 10);
     return TRUE;
 }
 
-static BOOL func_ov036_0219094c(FieldActor *actor) {
+static BOOL FieldAcmdTCB_DashStepDownFaceUp4F(FieldActor *actor) {
     VecFx32 step = { 0, 0, -0x4000 };
-    func_ov036_0219028c(actor, &step, DIR_UP, DIR_DOWN, 4, 10);
+    FieldAcmdTCB_StepInit(actor, &step, DIR_UP, DIR_DOWN, 4, 10);
     return TRUE;
 }
 
-static BOOL func_ov036_02190980(FieldActor *actor) {
+static BOOL FieldAcmdTCB_DashStepLeftFaceRight4F(FieldActor *actor) {
     VecFx32 step = { -0x4000, 0, 0 };
-    func_ov036_0219028c(actor, &step, DIR_RIGHT, DIR_LEFT, 4, 10);
+    FieldAcmdTCB_StepInit(actor, &step, DIR_RIGHT, DIR_LEFT, 4, 10);
     return TRUE;
 }
 
-static BOOL func_ov036_021909b4(FieldActor *actor) {
+static BOOL FieldAcmdTCB_DashStepRightFaceLeft4F(FieldActor *actor) {
     VecFx32 step = { 0x4000, 0, 0 };
-    func_ov036_0219028c(actor, &step, DIR_LEFT, DIR_RIGHT, 4, 10);
+    FieldAcmdTCB_StepInit(actor, &step, DIR_LEFT, DIR_RIGHT, 4, 10);
     return TRUE;
 }
 
-static void func_ov036_021909e8(FieldActor *actor, s32 step, u32 faceDir, u32 motionDir, u8 frames, u8 anim, u8 axis,
-                                u8 bobAxis, u8 bobNegate) {
+static void FieldAcmdTCB_HopInit(FieldActor *actor, s32 step, u32 faceDir, u32 motionDir, u8 frames, u8 anim, u8 axis,
+                                 u8 bobAxis, u8 bobNegate) {
     s32 sign = 1;
-    SlideBobWork *work = func_ov012_0216713c(actor, sizeof(SlideBobWork));
+    SlideBobWork *work = FldAct_InitMoveCmdWork(actor, sizeof(SlideBobWork));
     work->frames = frames;
     work->step = step;
     work->axis = axis;
@@ -1945,8 +1945,8 @@ static void func_ov036_021909e8(FieldActor *actor, s32 step, u32 faceDir, u32 mo
     FieldActor_NextAcmdState(actor);
 }
 
-static BOOL func_ov036_02190ad0(FieldActor *actor) {
-    SlideBobWork *work = func_ov012_02167154(actor);
+static BOOL FieldAcmdTCB_HopMove(FieldActor *actor) {
+    SlideBobWork *work = FldAct_GetMoveCmdWork(actor);
     VecFx32 position;
     s32 bobValue;
     CopyActorWPos(actor, &position);
@@ -2028,75 +2028,75 @@ static BOOL func_ov036_02190ad0(FieldActor *actor) {
     return TRUE;
 }
 
-static BOOL func_ov036_02190c4c(FieldActor *actor) {
-    func_ov036_021909e8(actor, 0x2000, DIR_LEFT, DIR_UP, 8, 3, 1, 1, 0);
+static BOOL FieldAcmdTCB_HopUpFaceLeft8F(FieldActor *actor) {
+    FieldAcmdTCB_HopInit(actor, 0x2000, DIR_LEFT, DIR_UP, 8, 3, 1, 1, 0);
     return TRUE;
 }
 
-static BOOL func_ov036_02190c70(FieldActor *actor) {
-    func_ov036_021909e8(actor, -0x2000, DIR_RIGHT, DIR_DOWN, 8, 3, 1, 1, 0);
+static BOOL FieldAcmdTCB_HopDownFaceRight8F(FieldActor *actor) {
+    FieldAcmdTCB_HopInit(actor, -0x2000, DIR_RIGHT, DIR_DOWN, 8, 3, 1, 1, 0);
     return TRUE;
 }
 
 static BOOL func_ov036_02190c98(FieldActor *actor) {
-    func_ov036_021909e8(actor, 0x2000, DIR_DOWN, DIR_LEFT, 8, 3, 2, 1, 0);
+    FieldAcmdTCB_HopInit(actor, 0x2000, DIR_DOWN, DIR_LEFT, 8, 3, 2, 1, 0);
     return TRUE;
 }
 
-static BOOL func_ov036_02190cc0(FieldActor *actor) {
-    func_ov036_021909e8(actor, -0x2000, DIR_UP, DIR_RIGHT, 8, 3, 2, 1, 0);
+static BOOL FieldAcmdTCB_HopRightFaceUp8F(FieldActor *actor) {
+    FieldAcmdTCB_HopInit(actor, -0x2000, DIR_UP, DIR_RIGHT, 8, 3, 2, 1, 0);
     return TRUE;
 }
 
-static BOOL func_ov036_02190ce8(FieldActor *actor) {
-    func_ov036_021909e8(actor, 0x2000, DIR_RIGHT, DIR_UP, 8, 3, 1, 1, 0);
+static BOOL FieldAcmdTCB_HopUpFaceRight8F(FieldActor *actor) {
+    FieldAcmdTCB_HopInit(actor, 0x2000, DIR_RIGHT, DIR_UP, 8, 3, 1, 1, 0);
     return TRUE;
 }
 
-static BOOL func_ov036_02190d0c(FieldActor *actor) {
-    func_ov036_021909e8(actor, -0x2000, DIR_LEFT, DIR_DOWN, 8, 3, 1, 1, 0);
+static BOOL FieldAcmdTCB_HopDownFaceLeft8F(FieldActor *actor) {
+    FieldAcmdTCB_HopInit(actor, -0x2000, DIR_LEFT, DIR_DOWN, 8, 3, 1, 1, 0);
     return TRUE;
 }
 
-static BOOL func_ov036_02190d38(FieldActor *actor) {
-    func_ov036_021909e8(actor, -0x2000, DIR_UP, DIR_LEFT, 8, 3, 2, 1, 0);
+static BOOL FieldAcmdTCB_HopLeftFaceUp8F(FieldActor *actor) {
+    FieldAcmdTCB_HopInit(actor, -0x2000, DIR_UP, DIR_LEFT, 8, 3, 2, 1, 0);
     return TRUE;
 }
 
 static BOOL func_ov036_02190d60(FieldActor *actor) {
-    func_ov036_021909e8(actor, 0x2000, DIR_DOWN, DIR_LEFT, 8, 3, 2, 1, 0);
+    FieldAcmdTCB_HopInit(actor, 0x2000, DIR_DOWN, DIR_LEFT, 8, 3, 2, 1, 0);
     return TRUE;
 }
 
-static BOOL func_ov036_02190d88(FieldActor *actor) {
-    func_ov036_021909e8(actor, 0x2000, DIR_DOWN, DIR_UP, 8, 3, 2, 1, 0);
+static BOOL FieldAcmdTCB_HopUpFaceDown8F(FieldActor *actor) {
+    FieldAcmdTCB_HopInit(actor, 0x2000, DIR_DOWN, DIR_UP, 8, 3, 2, 1, 0);
     return TRUE;
 }
 
-static BOOL func_ov036_02190db0(FieldActor *actor) {
-    func_ov036_021909e8(actor, -0x2000, DIR_UP, DIR_DOWN, 8, 3, 2, 1, 0);
+static BOOL FieldAcmdTCB_HopDownFaceUp8F(FieldActor *actor) {
+    FieldAcmdTCB_HopInit(actor, -0x2000, DIR_UP, DIR_DOWN, 8, 3, 2, 1, 0);
     return TRUE;
 }
 
-static BOOL func_ov036_02190ddc(FieldActor *actor) {
-    func_ov036_021909e8(actor, -0x2000, DIR_RIGHT, DIR_LEFT, 8, 3, 0, 1, 0);
+static BOOL FieldAcmdTCB_HopLeftFaceRight8F(FieldActor *actor) {
+    FieldAcmdTCB_HopInit(actor, -0x2000, DIR_RIGHT, DIR_LEFT, 8, 3, 0, 1, 0);
     return TRUE;
 }
 
-static BOOL func_ov036_02190e04(FieldActor *actor) {
-    func_ov036_021909e8(actor, 0x2000, DIR_LEFT, DIR_RIGHT, 8, 3, 0, 1, 0);
+static BOOL FieldAcmdTCB_HopRightFaceLeft8F(FieldActor *actor) {
+    FieldAcmdTCB_HopInit(actor, 0x2000, DIR_LEFT, DIR_RIGHT, 8, 3, 0, 1, 0);
     return TRUE;
 }
 
-static BOOL func_ov036_02190e28(FieldActor *actor) {
-    func_ov012_0216713c(actor, 4);
+static BOOL FieldAcmdTCB_StayWalk22FInit(FieldActor *actor) {
+    FldAct_InitMoveCmdWork(actor, 4);
     FldAct_SetDrawStatus(actor, 1);
     FieldActor_NextAcmdState(actor);
     return FALSE;
 }
 
-static BOOL func_ov036_02190e44(FieldActor *actor) {
-    s32 *count = func_ov012_02167154(actor);
+static BOOL FieldAcmdTCB_StayWalk22FMove(FieldActor *actor) {
+    s32 *count = FldAct_GetMoveCmdWork(actor);
     (*count)++;
     if (*count >= 22) {
         FieldActor_NextAcmdState(actor);
@@ -2110,8 +2110,8 @@ static BOOL func_ov036_02190e60(FieldActor *actor) {
     return TRUE;
 }
 
-static BOOL func_ov036_02190e74(FieldActor *actor) {
-    WalkFramesWork *work = func_ov012_0216713c(actor, sizeof(WalkFramesWork));
+static BOOL FieldAcmdTCB_DashLeft2F(FieldActor *actor) {
+    WalkFramesWork *work = FldAct_InitMoveCmdWork(actor, sizeof(WalkFramesWork));
     work->anim = 12;
     work->frames = 2;
     work->dir = 2;
@@ -2122,8 +2122,8 @@ static BOOL func_ov036_02190e74(FieldActor *actor) {
     return TRUE;
 }
 
-static BOOL func_ov036_02190eac(FieldActor *actor) {
-    WalkFramesWork *work = func_ov012_02167154(actor);
+static BOOL FieldAcmdTCB_Dash2FMove(FieldActor *actor) {
+    WalkFramesWork *work = FldAct_GetMoveCmdWork(actor);
     FldAct_MoveWPosInDir(actor, work->dir, work->distance);
     CheckRecalcActorY(actor);
     work->frames--;
@@ -2135,8 +2135,8 @@ static BOOL func_ov036_02190eac(FieldActor *actor) {
     return TRUE;
 }
 
-static BOOL func_ov036_02190eec(FieldActor *actor) {
-    LiftWork *work = func_ov012_0216713c(actor, 0x10);
+static BOOL FieldAcmdTCB_FlyUpInit(FieldActor *actor) {
+    LiftWork *work = FldAct_InitMoveCmdWork(actor, 0x10);
     work->speed = 0x2000;
     work->time = 0;
     work->lastFrame = 0;
@@ -2146,10 +2146,10 @@ static BOOL func_ov036_02190eec(FieldActor *actor) {
 }
 
 static BOOL func_ov036_02190f14(FieldActor *actor) {
-    LiftWork *work = func_ov012_02167154(actor);
+    LiftWork *work = FldAct_GetMoveCmdWork(actor);
     u16 anim;
     u16 step;
-    if (func_ov036_02197060(actor, &anim, &step) != TRUE) {
+    if (RailActorAnim_GetBlactAnimeTypeA(actor, &anim, &step) != TRUE) {
         return FALSE;
     }
     work->time++;
@@ -2200,7 +2200,7 @@ static BOOL func_ov036_02191020(FieldActor *actor) {
     return FALSE;
 }
 
-static BOOL func_ov036_02191034(FieldActor *actor) {
+static BOOL FieldAcmdTCB_AnimeWaitEndFaceDown(FieldActor *actor) {
     BlActSys *blAct = FieldBlAct_GetBlActSys(FldActSys_GetFieldBlAct(GetActorMModelSystem(actor)));
     u32 blActIdx;
     u16 cmd;
@@ -2214,16 +2214,16 @@ static BOOL func_ov036_02191034(FieldActor *actor) {
     return TRUE;
 }
 
-static BOOL func_ov036_02191090(FieldActor *actor) {
+static BOOL FieldAcmdTCB_ResetDrawOffset(FieldActor *actor) {
     VecFx32 offset = { 0, 0, 0 };
     SetActorWPosOffset(actor, &offset);
     FieldActor_NextAcmdState(actor);
     return TRUE;
 }
 
-static BOOL func_ov036_021910b0(FieldActor *actor) {
+static BOOL FieldAcmdTCB_FlyReadyInit(FieldActor *actor) {
     VecFx32 offset = { 0, 0x8000, 0 };
-    ShiftWork *work = func_ov012_0216713c(actor, 6);
+    ShiftWork *work = FldAct_InitMoveCmdWork(actor, 6);
     work->time = 0;
     work->lastFrame = 0;
     SetActorWPosOffset(actor, &offset);
@@ -2233,10 +2233,10 @@ static BOOL func_ov036_021910b0(FieldActor *actor) {
 }
 
 static BOOL func_ov036_021910f4(FieldActor *actor) {
-    ShiftWork *work = func_ov012_02167154(actor);
+    ShiftWork *work = FldAct_GetMoveCmdWork(actor);
     u16 anim;
     u16 step;
-    if (func_ov036_021970b8(actor, &anim, &step) != TRUE) {
+    if (RailActorAnim_GetBlactAnimeTypeB(actor, &anim, &step) != TRUE) {
         return FALSE;
     }
     work->time++;
@@ -2291,8 +2291,8 @@ static BOOL func_ov036_021911cc(FieldActor *actor) {
     return FALSE;
 }
 
-static BOOL func_ov036_021911e8(FieldActor *actor) {
-    if (func_ov036_02197238(actor) == TRUE) {
+static BOOL FieldAcmdTCB_DrawReadyWaitStop(FieldActor *actor) {
+    if (RailActorAnim_CheckBlactReady(actor) == TRUE) {
         FldAct_SetDrawStatus(actor, 0);
         FieldActor_NextAcmdState(actor);
         return TRUE;
@@ -2300,8 +2300,8 @@ static BOOL func_ov036_021911e8(FieldActor *actor) {
     return FALSE;
 }
 
-static BOOL func_ov036_0219120c(FieldActor *actor) {
-    if (func_ov036_02197238(actor) == TRUE) {
+static BOOL FieldAcmdTCB_DrawReadyWait(FieldActor *actor) {
+    if (RailActorAnim_CheckBlactReady(actor) == TRUE) {
         FieldActor_NextAcmdState(actor);
         return TRUE;
     }
@@ -2321,151 +2321,155 @@ const ActorAcmdFunc data_ov036_021cad14[] = { func_ov036_0218f0e8, func_ov036_02
 
 const ActorAcmdFunc data_ov036_021caccc[] = { func_ov036_0218f0f4, func_ov036_0218f09c };
 
-const ActorAcmdFunc ACMD_WALK32_TABLE[] = { func_ov036_0218f1a0, func_ov036_0218f14c, func_ov036_0218f09c };
+const ActorAcmdFunc ACMD_WALK32_TABLE[] = { FieldAcmdTCB_WalkUp32F, FieldAcmdTCB_WalkMove, func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cb580[] = { func_ov036_0218f1b4, func_ov036_0218f14c, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb580[] = { FieldAcmdTCB_WalkDown32F, FieldAcmdTCB_WalkMove, func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cb574[] = { func_ov036_0218f1c8, func_ov036_0218f14c, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb574[] = { FieldAcmdTCB_WalkLeft32F, FieldAcmdTCB_WalkMove, func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cb568[] = { func_ov036_0218f1dc, func_ov036_0218f14c, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb568[] = { FieldAcmdTCB_WalkRight32F, FieldAcmdTCB_WalkMove, func_ov036_0218f09c };
 
-const ActorAcmdFunc ACMD_WALK16_TABLE[] = { func_ov036_0218f1f0, func_ov036_0218f14c, func_ov036_0218f09c };
+const ActorAcmdFunc ACMD_WALK16_TABLE[] = { FieldAcmdTCB_WalkUp16F, FieldAcmdTCB_WalkMove, func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cb550[] = { func_ov036_0218f204, func_ov036_0218f14c, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb550[] = { FieldAcmdTCB_WalkDown16F, FieldAcmdTCB_WalkMove, func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cb544[] = { func_ov036_0218f21c, func_ov036_0218f14c, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb544[] = { FieldAcmdTCB_WalkLeft16F, FieldAcmdTCB_WalkMove, func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cb538[] = { func_ov036_0218f230, func_ov036_0218f14c, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb538[] = { FieldAcmdTCB_WalkRight16F, FieldAcmdTCB_WalkMove, func_ov036_0218f09c };
 
-const ActorAcmdFunc ACMD_WALK8_TABLE[] = { func_ov036_0218f244, func_ov036_0218f14c, func_ov036_0218f09c };
+const ActorAcmdFunc ACMD_WALK8_TABLE[] = { FieldAcmdTCB_WalkUp8F, FieldAcmdTCB_WalkMove, func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cb520[] = { func_ov036_0218f25c, func_ov036_0218f14c, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb520[] = { FieldAcmdTCB_WalkDown8F, FieldAcmdTCB_WalkMove, func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cb514[] = { func_ov036_0218f274, func_ov036_0218f14c, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb514[] = { FieldAcmdTCB_WalkLeft8F, FieldAcmdTCB_WalkMove, func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cb508[] = { func_ov036_0218f288, func_ov036_0218f14c, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb508[] = { FieldAcmdTCB_WalkRight8F, FieldAcmdTCB_WalkMove, func_ov036_0218f09c };
 
-const ActorAcmdFunc ACMD_WALK4_TABLE[] = { func_ov036_0218f29c, func_ov036_0218f14c, func_ov036_0218f09c };
+const ActorAcmdFunc ACMD_WALK4_TABLE[] = { FieldAcmdTCB_WalkUp4F, FieldAcmdTCB_WalkMove, func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cb4f0[] = { func_ov036_0218f2b0, func_ov036_0218f14c, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb4f0[] = { FieldAcmdTCB_WalkDown4F, FieldAcmdTCB_WalkMove, func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cb4e4[] = { func_ov036_0218f2c4, func_ov036_0218f14c, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb4e4[] = { FieldAcmdTCB_WalkLeft4F, FieldAcmdTCB_WalkMove, func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cb4d8[] = { func_ov036_0218f2d8, func_ov036_0218f14c, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb4d8[] = { FieldAcmdTCB_WalkRight4F, FieldAcmdTCB_WalkMove, func_ov036_0218f09c };
 
-const ActorAcmdFunc ACMD_WALK2_TABLE[] = { func_ov036_0218f2ec, func_ov036_0218f14c, func_ov036_0218f09c };
+const ActorAcmdFunc ACMD_WALK2_TABLE[] = { FieldAcmdTCB_WalkUp2F, FieldAcmdTCB_WalkMove, func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cb4c0[] = { func_ov036_0218f304, func_ov036_0218f14c, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb4c0[] = { FieldAcmdTCB_WalkDown2F, FieldAcmdTCB_WalkMove, func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cb4b4[] = { func_ov036_0218f31c, func_ov036_0218f14c, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb4b4[] = { FieldAcmdTCB_WalkLeft2F, FieldAcmdTCB_WalkMove, func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cb4a8[] = { func_ov036_0218f330, func_ov036_0218f14c, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb4a8[] = { FieldAcmdTCB_WalkRight2F, FieldAcmdTCB_WalkMove, func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cb49c[] = { func_ov036_0218f348, func_ov036_0218f14c, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb49c[] = { FieldAcmdTCB_WalkUp1F, FieldAcmdTCB_WalkMove, func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cb490[] = { func_ov036_0218f35c, func_ov036_0218f14c, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb490[] = { FieldAcmdTCB_WalkDown1F, FieldAcmdTCB_WalkMove, func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cb484[] = { func_ov036_0218f374, func_ov036_0218f14c, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb484[] = { FieldAcmdTCB_WalkLeft1F, FieldAcmdTCB_WalkMove, func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cb478[] = { func_ov036_0218f388, func_ov036_0218f14c, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb478[] = { FieldAcmdTCB_WalkRight1F, FieldAcmdTCB_WalkMove, func_ov036_0218f09c };
 
-const ActorAcmdFunc ACMD_TURN32_TABLE[] = { func_ov036_0218f4c0, func_ov036_0218f48c, func_ov036_0218f09c };
+const ActorAcmdFunc ACMD_TURN32_TABLE[] = { func_ov036_0218f4c0, FieldAcmdTCB_StayWalkMove, func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cb460[] = { func_ov036_0218f4d0, func_ov036_0218f48c, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb460[] = { func_ov036_0218f4d0, FieldAcmdTCB_StayWalkMove, func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cb454[] = { func_ov036_0218f4e0, func_ov036_0218f48c, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb454[] = { func_ov036_0218f4e0, FieldAcmdTCB_StayWalkMove, func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cb448[] = { func_ov036_0218f4f0, func_ov036_0218f48c, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb448[] = { func_ov036_0218f4f0, FieldAcmdTCB_StayWalkMove, func_ov036_0218f09c };
 
-const ActorAcmdFunc ACMD_TURN16_TABLE[] = { func_ov036_0218f500, func_ov036_0218f48c, func_ov036_0218f09c };
+const ActorAcmdFunc ACMD_TURN16_TABLE[] = { func_ov036_0218f500, FieldAcmdTCB_StayWalkMove, func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cb430[] = { func_ov036_0218f510, func_ov036_0218f48c, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb430[] = { func_ov036_0218f510, FieldAcmdTCB_StayWalkMove, func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cb424[] = { func_ov036_0218f520, func_ov036_0218f48c, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb424[] = { func_ov036_0218f520, FieldAcmdTCB_StayWalkMove, func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cb418[] = { func_ov036_0218f530, func_ov036_0218f48c, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb418[] = { func_ov036_0218f530, FieldAcmdTCB_StayWalkMove, func_ov036_0218f09c };
 
-const ActorAcmdFunc ACMD_TURN8_TABLE[] = { func_ov036_0218f540, func_ov036_0218f48c, func_ov036_0218f09c };
+const ActorAcmdFunc ACMD_TURN8_TABLE[] = { func_ov036_0218f540, FieldAcmdTCB_StayWalkMove, func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cb400[] = { func_ov036_0218f550, func_ov036_0218f48c, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb400[] = { func_ov036_0218f550, FieldAcmdTCB_StayWalkMove, func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cb3f4[] = { func_ov036_0218f560, func_ov036_0218f48c, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb3f4[] = { func_ov036_0218f560, FieldAcmdTCB_StayWalkMove, func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cb3e8[] = { func_ov036_0218f570, func_ov036_0218f48c, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb3e8[] = { func_ov036_0218f570, FieldAcmdTCB_StayWalkMove, func_ov036_0218f09c };
 
-const ActorAcmdFunc ACMD_TURN4_TABLE[] = { func_ov036_0218f580, func_ov036_0218f48c, func_ov036_0218f09c };
+const ActorAcmdFunc ACMD_TURN4_TABLE[] = { func_ov036_0218f580, FieldAcmdTCB_StayWalkMove, func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cb010[] = { func_ov036_0218f590, func_ov036_0218f48c, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb010[] = { func_ov036_0218f590, FieldAcmdTCB_StayWalkMove, func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cb3c4[] = { func_ov036_0218f5a0, func_ov036_0218f48c, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb3c4[] = { func_ov036_0218f5a0, FieldAcmdTCB_StayWalkMove, func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cb3b8[] = { func_ov036_0218f5b0, func_ov036_0218f48c, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb3b8[] = { func_ov036_0218f5b0, FieldAcmdTCB_StayWalkMove, func_ov036_0218f09c };
 
-const ActorAcmdFunc ACMD_TURN2_TABLE[] = { func_ov036_0218f5c0, func_ov036_0218f48c, func_ov036_0218f09c };
+const ActorAcmdFunc ACMD_TURN2_TABLE[] = { func_ov036_0218f5c0, FieldAcmdTCB_StayWalkMove, func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cb3a0[] = { func_ov036_0218f5d0, func_ov036_0218f48c, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb3a0[] = { func_ov036_0218f5d0, FieldAcmdTCB_StayWalkMove, func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cb394[] = { func_ov036_0218f5e0, func_ov036_0218f48c, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb394[] = { func_ov036_0218f5e0, FieldAcmdTCB_StayWalkMove, func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cb388[] = { func_ov036_0218f5f0, func_ov036_0218f48c, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb388[] = { func_ov036_0218f5f0, FieldAcmdTCB_StayWalkMove, func_ov036_0218f09c };
 
-const ActorAcmdFunc ACMD_JUMP16F[] = { func_ov036_0218f76c, func_ov036_0218f690, func_ov036_0218f09c };
+const ActorAcmdFunc ACMD_JUMP16F[] = { FieldAcmdTCB_StayJumpUp16F, FieldAcmdTCB_JumpMove, func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cb370[] = { func_ov036_0218f790, func_ov036_0218f690, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb370[] = { FieldAcmdTCB_StayJumpDown16F, FieldAcmdTCB_JumpMove,
+                                              func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cb364[] = { func_ov036_0218f7b4, func_ov036_0218f690, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb364[] = { FieldAcmdTCB_StayJumpLeft16F, FieldAcmdTCB_JumpMove,
+                                              func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cb358[] = { func_ov036_0218f7d4, func_ov036_0218f690, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb358[] = { FieldAcmdTCB_StayJumpRight16F, FieldAcmdTCB_JumpMove,
+                                              func_ov036_0218f09c };
 
-const ActorAcmdFunc ACMD_JUMP8F[] = { func_ov036_0218f7f8, func_ov036_0218f690, func_ov036_0218f09c };
+const ActorAcmdFunc ACMD_JUMP8F[] = { FieldAcmdTCB_StayJumpUp8F, FieldAcmdTCB_JumpMove, func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cb340[] = { func_ov036_0218f818, func_ov036_0218f690, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb340[] = { FieldAcmdTCB_StayJumpDown8F, FieldAcmdTCB_JumpMove, func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cb334[] = { func_ov036_0218f838, func_ov036_0218f690, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb334[] = { FieldAcmdTCB_StayJumpLeft8F, FieldAcmdTCB_JumpMove, func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cb328[] = { func_ov036_0218f858, func_ov036_0218f690, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb328[] = { FieldAcmdTCB_StayJumpRight8F, FieldAcmdTCB_JumpMove,
+                                              func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cb31c[] = { func_ov036_0218f878, func_ov036_0218f690, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb31c[] = { func_ov036_0218f878, FieldAcmdTCB_JumpMove, func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cb310[] = { func_ov036_0218f898, func_ov036_0218f690, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb310[] = { func_ov036_0218f898, FieldAcmdTCB_JumpMove, func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cb304[] = { func_ov036_0218f8bc, func_ov036_0218f690, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb304[] = { func_ov036_0218f8bc, FieldAcmdTCB_JumpMove, func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cb2f8[] = { func_ov036_0218f8e0, func_ov036_0218f690, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb2f8[] = { func_ov036_0218f8e0, FieldAcmdTCB_JumpMove, func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cb2ec[] = { func_ov036_0218f900, func_ov036_0218f690, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb2ec[] = { func_ov036_0218f900, FieldAcmdTCB_JumpMove, func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cb2e0[] = { func_ov036_0218f920, func_ov036_0218f690, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb2e0[] = { func_ov036_0218f920, FieldAcmdTCB_JumpMove, func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cb2d4[] = { func_ov036_0218f944, func_ov036_0218f690, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb2d4[] = { func_ov036_0218f944, FieldAcmdTCB_JumpMove, func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cb2c8[] = { func_ov036_0218f964, func_ov036_0218f690, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb2c8[] = { func_ov036_0218f964, FieldAcmdTCB_JumpMove, func_ov036_0218f09c };
 
-const ActorAcmdFunc ACMD_JUMP3G16F_TABLE[] = { func_ov036_0218f988, func_ov036_0218f690, func_ov036_0218f09c };
+const ActorAcmdFunc ACMD_JUMP3G16F_TABLE[] = { func_ov036_0218f988, FieldAcmdTCB_JumpMove, func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cb1e4[] = { func_ov036_0218f9a8, func_ov036_0218f690, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb1e4[] = { FieldAcmdTCB_JumpRight1G16F, FieldAcmdTCB_JumpMove, func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cb2a4[] = { func_ov036_0218f9c8, func_ov036_0218f690, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb2a4[] = { func_ov036_0218f9c8, FieldAcmdTCB_JumpMove, func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cb298[] = { func_ov036_0218f9ec, func_ov036_0218f690, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb298[] = { FieldAcmdTCB_JumpRight3G12F, FieldAcmdTCB_JumpMove, func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cb28c[] = { func_ov036_0218fad8, func_ov036_0218fab8, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb28c[] = { func_ov036_0218fad8, FieldAcmdTCB_WaitMove, func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cb280[] = { func_ov036_0218fae4, func_ov036_0218fab8, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb280[] = { func_ov036_0218fae4, FieldAcmdTCB_WaitMove, func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cb250[] = { func_ov036_0218faf0, func_ov036_0218fab8, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb250[] = { FieldAcmdTCB_Wait4F, FieldAcmdTCB_WaitMove, func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cb25c[] = { func_ov036_0218fafc, func_ov036_0218fab8, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb25c[] = { FieldAcmdTCB_Wait8F, FieldAcmdTCB_WaitMove, func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cb274[] = { func_ov036_0218fb08, func_ov036_0218fab8, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb274[] = { FieldAcmdTCB_Wait15F, FieldAcmdTCB_WaitMove, func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cb2b0[] = { func_ov036_0218fb14, func_ov036_0218fab8, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb2b0[] = { FieldAcmdTCB_Wait16F, FieldAcmdTCB_WaitMove, func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cb244[] = { func_ov036_0218fb20, func_ov036_0218fab8, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb244[] = { FieldAcmdTCB_Wait32F, FieldAcmdTCB_WaitMove, func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cb238[] = { func_ov036_0218fb2c, func_ov036_0218fb50, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb238[] = { FieldAcmdTCB_RiseInit, FieldAcmdTCB_RiseMove, func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cb22c[] = { func_ov036_0218fb98, func_ov036_0218fbcc, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb22c[] = { FieldAcmdTCB_FallInit, FieldAcmdTCB_FallMove, func_ov036_0218f09c };
 
 const ActorAcmdFunc data_ov036_021cad04[] = { func_ov036_0218fc14, func_ov036_0218f09c };
 
@@ -2479,35 +2483,35 @@ const ActorAcmdFunc data_ov036_021cacd4[] = { func_ov036_0218fc64, func_ov036_02
 
 const ActorAcmdFunc data_ov036_021cacfc[] = { func_ov036_0218fc78, func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cadb8[] = { func_ov036_0218fce8, func_ov036_0218fcc0, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cadb8[] = { func_ov036_0218fce8, FieldAcmdTCB_MarkWait, func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cad28[] = { func_ov036_0218fcf8, func_ov036_0218fcc0, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cad28[] = { func_ov036_0218fcf8, FieldAcmdTCB_MarkWait, func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cb1c0[] = { func_ov036_0218fd08, func_ov036_0218fcc0, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb1c0[] = { func_ov036_0218fd08, FieldAcmdTCB_MarkWait, func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cb1b4[] = { func_ov036_0218fd18, func_ov036_0218fcc0, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb1b4[] = { func_ov036_0218fd18, FieldAcmdTCB_MarkWait, func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cb1a8[] = { func_ov036_0218fd38, func_ov036_0218fcc0, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb1a8[] = { func_ov036_0218fd38, FieldAcmdTCB_MarkWait, func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cb19c[] = { func_ov036_0218fd48, func_ov036_0218fcc0, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb19c[] = { func_ov036_0218fd48, FieldAcmdTCB_MarkWait, func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cb190[] = { func_ov036_0218fd58, func_ov036_0218fcc0, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb190[] = { func_ov036_0218fd58, FieldAcmdTCB_MarkWait, func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cb184[] = { func_ov036_0218fe04, func_ov036_0218fe84, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb184[] = { FieldAcmdTCB_WalkUp6F, func_ov036_0218fe84, func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cb178[] = { func_ov036_0218fe14, func_ov036_0218fe84, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb178[] = { FieldAcmdTCB_WalkDown6F, func_ov036_0218fe84, func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cb16c[] = { func_ov036_0218fe24, func_ov036_0218fe84, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb16c[] = { FieldAcmdTCB_WalkLeft6F, func_ov036_0218fe84, func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cb160[] = { func_ov036_0218fe34, func_ov036_0218fe84, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb160[] = { FieldAcmdTCB_WalkRight6F, func_ov036_0218fe84, func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cb154[] = { func_ov036_0218fe44, func_ov036_0218fe84, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb154[] = { FieldAcmdTCB_DashUp6F, func_ov036_0218fe84, func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cb148[] = { func_ov036_0218fe54, func_ov036_0218fe84, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb148[] = { FieldAcmdTCB_DashDown6F, func_ov036_0218fe84, func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cb13c[] = { func_ov036_0218fe64, func_ov036_0218fe84, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb13c[] = { FieldAcmdTCB_DashLeft6F, func_ov036_0218fe84, func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021caec0[] = { func_ov036_0218fe74, func_ov036_0218fe84, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021caec0[] = { FieldAcmdTCB_DashRight6F, func_ov036_0218fe84, func_ov036_0218f09c };
 
 const ActorAcmdFunc data_ov036_021cb124[] = { func_ov036_0218fe9c, func_ov036_0218fedc, func_ov036_0218f09c };
 
@@ -2517,13 +2521,13 @@ const ActorAcmdFunc data_ov036_021cb10c[] = { func_ov036_0218febc, func_ov036_02
 
 const ActorAcmdFunc data_ov036_021cb100[] = { func_ov036_0218fecc, func_ov036_0218fedc, func_ov036_0218f09c };
 
-const ActorAcmdFunc ACMD_RUN4F_TABLE[] = { func_ov036_0218f3a0, func_ov036_0218f14c, func_ov036_0218f09c };
+const ActorAcmdFunc ACMD_RUN4F_TABLE[] = { FieldAcmdTCB_DashUp4F, FieldAcmdTCB_WalkMove, func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cb0e8[] = { func_ov036_0218f3b8, func_ov036_0218f14c, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb0e8[] = { FieldAcmdTCB_DashDown4F, FieldAcmdTCB_WalkMove, func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cb0dc[] = { func_ov036_0218f3d0, func_ov036_0218f14c, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb0dc[] = { FieldAcmdTCB_DashLeft4F, FieldAcmdTCB_WalkMove, func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cb0d0[] = { func_ov036_0218f3e4, func_ov036_0218f14c, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb0d0[] = { FieldAcmdTCB_DashRight4F, FieldAcmdTCB_WalkMove, func_ov036_0218f09c };
 
 const ActorAcmdFunc data_ov036_021cb0c4[] = { func_ov036_0218fef4, func_ov036_0218ff34, func_ov036_0218f09c };
 
@@ -2541,163 +2545,207 @@ const ActorAcmdFunc data_ov036_021cb07c[] = { func_ov036_0218ff6c, func_ov036_02
 
 const ActorAcmdFunc data_ov036_021cb070[] = { func_ov036_0218ff7c, func_ov036_0218ff8c, func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cb064[] = { func_ov036_0218ffa4, func_ov036_02190028, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb064[] = { func_ov036_0218ffa4, FieldAcmdTCB_AnimeWaitEndStop, func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cb058[] = { func_ov036_0218ffa4, func_ov036_02190080, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb058[] = { func_ov036_0218ffa4, FieldAcmdTCB_AnimeWaitEnd, func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cb04c[] = { func_ov036_0218ffc0, func_ov036_02190028, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb04c[] = { func_ov036_0218ffc0, FieldAcmdTCB_AnimeWaitEndStop, func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cb040[] = { func_ov036_0218ffc0, func_ov036_02190080, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb040[] = { func_ov036_0218ffc0, FieldAcmdTCB_AnimeWaitEnd, func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cb034[] = { func_ov036_0218ffdc, func_ov036_02190028, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb034[] = { func_ov036_0218ffdc, FieldAcmdTCB_AnimeWaitEndStop, func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cb028[] = { func_ov036_0218ffdc, func_ov036_02190080, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb028[] = { func_ov036_0218ffdc, FieldAcmdTCB_AnimeWaitEnd, func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cb01c[] = { func_ov036_0218fff8, func_ov036_02190028, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb01c[] = { func_ov036_0218fff8, FieldAcmdTCB_AnimeWaitEndStop, func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cae30[] = { func_ov036_02190010, func_ov036_02190028, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cae30[] = { func_ov036_02190010, FieldAcmdTCB_AnimeWaitEndStop, func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cb004[] = { func_ov036_021900c8, func_ov036_02190110, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb004[] = { FieldAcmdTCB_HideOffInit, FieldAcmdTCB_HideOffMove, func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021caff8[] = { func_ov036_021901d0, func_ov036_021901b0, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021caff8[] = { FieldAcmdTCB_StayWalk32F40F, FieldAcmdTCB_StayMove, func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cafec[] = { func_ov036_021901e8, func_ov036_021901b0, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cafec[] = { func_ov036_021901e8, FieldAcmdTCB_StayMove, func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cafe0[] = { func_ov036_02190200, func_ov036_021901b0, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cafe0[] = { func_ov036_02190200, FieldAcmdTCB_StayMove, func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cafd4[] = { func_ov036_02190394, func_ov036_02190350, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cafd4[] = { FieldAcmdTCB_StepUpFaceLeft8F, FieldAcmdTCB_StepMove,
+                                              func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cafc8[] = { func_ov036_021903c8, func_ov036_02190350, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cafc8[] = { FieldAcmdTCB_StepDownFaceRight8F, FieldAcmdTCB_StepMove,
+                                              func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cafbc[] = { func_ov036_021903f8, func_ov036_02190350, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cafbc[] = { func_ov036_021903f8, FieldAcmdTCB_StepMove, func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cafb0[] = { func_ov036_0219042c, func_ov036_02190350, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cafb0[] = { FieldAcmdTCB_StepRightFaceUp8F, FieldAcmdTCB_StepMove,
+                                              func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021caf80[] = { func_ov036_0219045c, func_ov036_02190350, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021caf80[] = { FieldAcmdTCB_StepUpFaceRight8F, FieldAcmdTCB_StepMove,
+                                              func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021caf8c[] = { func_ov036_0219048c, func_ov036_02190350, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021caf8c[] = { FieldAcmdTCB_StepDownFaceLeft8F, FieldAcmdTCB_StepMove,
+                                              func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cafa4[] = { func_ov036_021904c0, func_ov036_02190350, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cafa4[] = { FieldAcmdTCB_StepLeftFaceUp8F, FieldAcmdTCB_StepMove,
+                                              func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cb1f0[] = { func_ov036_021904f4, func_ov036_02190350, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb1f0[] = { func_ov036_021904f4, FieldAcmdTCB_StepMove, func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cb208[] = { func_ov036_02190528, func_ov036_02190350, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb208[] = { FieldAcmdTCB_StepUpFaceDown8F, FieldAcmdTCB_StepMove,
+                                              func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cb214[] = { func_ov036_0219055c, func_ov036_02190350, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb214[] = { FieldAcmdTCB_StepDownFaceUp8F, FieldAcmdTCB_StepMove,
+                                              func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cb268[] = { func_ov036_02190590, func_ov036_02190350, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb268[] = { FieldAcmdTCB_StepLeftFaceRight8F, FieldAcmdTCB_StepMove,
+                                              func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cb3d0[] = { func_ov036_021905c0, func_ov036_02190350, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb3d0[] = { FieldAcmdTCB_StepRightFaceLeft8F, FieldAcmdTCB_StepMove,
+                                              func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021caf44[] = { func_ov036_021905f0, func_ov036_02190350, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021caf44[] = { FieldAcmdTCB_StepUpFaceDown4F, FieldAcmdTCB_StepMove,
+                                              func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021caf38[] = { func_ov036_02190620, func_ov036_02190350, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021caf38[] = { FieldAcmdTCB_StepDownFaceUp4F, FieldAcmdTCB_StepMove,
+                                              func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021caf2c[] = { func_ov036_02190650, func_ov036_02190350, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021caf2c[] = { FieldAcmdTCB_StepLeftFaceRight4F, FieldAcmdTCB_StepMove,
+                                              func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cadc4[] = { func_ov036_02190680, func_ov036_02190350, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cadc4[] = { FieldAcmdTCB_StepRightFaceLeft4F, FieldAcmdTCB_StepMove,
+                                              func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cb1d8[] = { func_ov036_021906b0, func_ov036_02190350, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb1d8[] = { FieldAcmdTCB_StepUpFaceDown2F, FieldAcmdTCB_StepMove,
+                                              func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cb1cc[] = { func_ov036_021906e4, func_ov036_02190350, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb1cc[] = { FieldAcmdTCB_StepDownFaceUp2F, FieldAcmdTCB_StepMove,
+                                              func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021caefc[] = { func_ov036_02190718, func_ov036_02190350, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021caefc[] = { FieldAcmdTCB_StepLeftFaceRight2F, FieldAcmdTCB_StepMove,
+                                              func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021caef0[] = { func_ov036_02190748, func_ov036_02190350, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021caef0[] = { FieldAcmdTCB_StepRightFaceLeft2F, FieldAcmdTCB_StepMove,
+                                              func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021caee4[] = { func_ov036_0218fa10, func_ov036_0218f690, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021caee4[] = { func_ov036_0218fa10, FieldAcmdTCB_JumpMove, func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021caed8[] = { func_ov036_0218fa34, func_ov036_0218f690, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021caed8[] = { FieldAcmdTCB_JumpDown3G24FNoSe, FieldAcmdTCB_JumpMove,
+                                              func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021caecc[] = { func_ov036_0218fa58, func_ov036_0218f690, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021caecc[] = { FieldAcmdTCB_JumpLeft3G24FNoSe, FieldAcmdTCB_JumpMove,
+                                              func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cad94[] = { func_ov036_0218fa7c, func_ov036_0218f690, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cad94[] = { FieldAcmdTCB_JumpRight3G24FNoSe, FieldAcmdTCB_JumpMove,
+                                              func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021caeb4[] = { func_ov036_02190778, func_ov036_02190350, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021caeb4[] = { FieldAcmdTCB_DashStepUpFaceLeft4F, FieldAcmdTCB_StepMove,
+                                              func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021caea8[] = { func_ov036_021907ac, func_ov036_02190350, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021caea8[] = { FieldAcmdTCB_DashStepDownFaceRight4F, FieldAcmdTCB_StepMove,
+                                              func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cae9c[] = { func_ov036_021907e0, func_ov036_02190350, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cae9c[] = { func_ov036_021907e0, FieldAcmdTCB_StepMove, func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cae90[] = { func_ov036_02190814, func_ov036_02190350, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cae90[] = { FieldAcmdTCB_DashStepRightFaceUp4F, FieldAcmdTCB_StepMove,
+                                              func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cae84[] = { func_ov036_02190848, func_ov036_02190350, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cae84[] = { FieldAcmdTCB_DashStepUpFaceRight4F, FieldAcmdTCB_StepMove,
+                                              func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cae78[] = { func_ov036_0219087c, func_ov036_02190350, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cae78[] = { FieldAcmdTCB_DashStepDownFaceLeft4F, FieldAcmdTCB_StepMove,
+                                              func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cae6c[] = { func_ov036_021908b0, func_ov036_02190350, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cae6c[] = { FieldAcmdTCB_DashStepLeftFaceUp4F, FieldAcmdTCB_StepMove,
+                                              func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cae60[] = { func_ov036_021908e4, func_ov036_02190350, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cae60[] = { func_ov036_021908e4, FieldAcmdTCB_StepMove, func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cae54[] = { func_ov036_02190918, func_ov036_02190350, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cae54[] = { FieldAcmdTCB_DashStepUpFaceDown4F, FieldAcmdTCB_StepMove,
+                                              func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cae48[] = { func_ov036_0219094c, func_ov036_02190350, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cae48[] = { FieldAcmdTCB_DashStepDownFaceUp4F, FieldAcmdTCB_StepMove,
+                                              func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cae3c[] = { func_ov036_02190980, func_ov036_02190350, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cae3c[] = { FieldAcmdTCB_DashStepLeftFaceRight4F, FieldAcmdTCB_StepMove,
+                                              func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cae00[] = { func_ov036_021909b4, func_ov036_02190350, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cae00[] = { FieldAcmdTCB_DashStepRightFaceLeft4F, FieldAcmdTCB_StepMove,
+                                              func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cae18[] = { func_ov036_02190c4c, func_ov036_02190ad0, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cae18[] = { FieldAcmdTCB_HopUpFaceLeft8F, FieldAcmdTCB_HopMove, func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cae24[] = { func_ov036_02190c70, func_ov036_02190ad0, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cae24[] = { FieldAcmdTCB_HopDownFaceRight8F, FieldAcmdTCB_HopMove,
+                                              func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021caf50[] = { func_ov036_02190c98, func_ov036_02190ad0, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021caf50[] = { func_ov036_02190c98, FieldAcmdTCB_HopMove, func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021caf5c[] = { func_ov036_02190cc0, func_ov036_02190ad0, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021caf5c[] = { FieldAcmdTCB_HopRightFaceUp8F, FieldAcmdTCB_HopMove,
+                                              func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021caf98[] = { func_ov036_02190ce8, func_ov036_02190ad0, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021caf98[] = { FieldAcmdTCB_HopUpFaceRight8F, FieldAcmdTCB_HopMove,
+                                              func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cb1fc[] = { func_ov036_02190d0c, func_ov036_02190ad0, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb1fc[] = { FieldAcmdTCB_HopDownFaceLeft8F, FieldAcmdTCB_HopMove,
+                                              func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cb220[] = { func_ov036_02190d38, func_ov036_02190ad0, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb220[] = { FieldAcmdTCB_HopLeftFaceUp8F, FieldAcmdTCB_HopMove, func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cb598[] = { func_ov036_02190d60, func_ov036_02190ad0, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb598[] = { func_ov036_02190d60, FieldAcmdTCB_HopMove, func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cadd0[] = { func_ov036_02190d88, func_ov036_02190ad0, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cadd0[] = { FieldAcmdTCB_HopUpFaceDown8F, FieldAcmdTCB_HopMove, func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cad1c[] = { func_ov036_02190db0, func_ov036_02190ad0, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cad1c[] = { FieldAcmdTCB_HopDownFaceUp8F, FieldAcmdTCB_HopMove, func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021caf08[] = { func_ov036_02190ddc, func_ov036_02190ad0, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021caf08[] = { FieldAcmdTCB_HopLeftFaceRight8F, FieldAcmdTCB_HopMove,
+                                              func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cadac[] = { func_ov036_02190e04, func_ov036_02190ad0, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cadac[] = { FieldAcmdTCB_HopRightFaceLeft8F, FieldAcmdTCB_HopMove,
+                                              func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cada0[] = { func_ov036_0218fd28, func_ov036_0218fcc0, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cada0[] = { func_ov036_0218fd28, FieldAcmdTCB_MarkWait, func_ov036_0218f09c };
 
 const ActorAcmdFunc data_ov036_021cad40[] = { func_ov036_02190218, func_ov036_02190234, func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cad88[] = { func_ov036_0218f3fc, func_ov036_0218f14c, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cad88[] = { FieldAcmdTCB_WalkUp16FFastAnime, FieldAcmdTCB_WalkMove,
+                                              func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cad7c[] = { func_ov036_0218f414, func_ov036_0218f14c, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cad7c[] = { FieldAcmdTCB_WalkDown16FFastAnime, FieldAcmdTCB_WalkMove,
+                                              func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cad70[] = { func_ov036_0218f42c, func_ov036_0218f14c, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cad70[] = { FieldAcmdTCB_WalkLeft16FFastAnime, FieldAcmdTCB_WalkMove,
+                                              func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021caddc[] = { func_ov036_0218f440, func_ov036_0218f14c, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021caddc[] = { FieldAcmdTCB_WalkRight16FFastAnime, FieldAcmdTCB_WalkMove,
+                                              func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cadf4[] = { func_ov036_02190e28, func_ov036_02190e44, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cadf4[] = { FieldAcmdTCB_StayWalk22FInit, FieldAcmdTCB_StayWalk22FMove,
+                                              func_ov036_0218f09c };
 
 const ActorAcmdFunc data_ov036_021cacbc[] = { func_ov036_02190e60, func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021caf20[] = { func_ov036_02190e74, func_ov036_02190eac, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021caf20[] = { FieldAcmdTCB_DashLeft2F, FieldAcmdTCB_Dash2FMove, func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021caf68[] = { func_ov036_02190eec, func_ov036_02190f14, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021caf68[] = { FieldAcmdTCB_FlyUpInit, func_ov036_02190f14, func_ov036_0218f09c };
 
 const ActorAcmdFunc data_ov036_021cacc4[] = { func_ov036_0219100c, func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cb5a4[] = { func_ov036_02191020, func_ov036_02191034, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb5a4[] = { func_ov036_02191020, FieldAcmdTCB_AnimeWaitEndFaceDown,
+                                              func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cace4[] = { func_ov036_02191090, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cace4[] = { FieldAcmdTCB_ResetDrawOffset, func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021caf14[] = { func_ov036_021910b0, func_ov036_021910f4, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021caf14[] = { FieldAcmdTCB_FlyReadyInit, func_ov036_021910f4, func_ov036_0218f09c };
 
 const ActorAcmdFunc data_ov036_021cacb4[] = { func_ov036_02191174, func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cad4c[] = { func_ov036_02191188, func_ov036_021911e8, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cad4c[] = { func_ov036_02191188, FieldAcmdTCB_DrawReadyWaitStop,
+                                              func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cade8[] = { func_ov036_0219119c, func_ov036_0219120c, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cade8[] = { func_ov036_0219119c, FieldAcmdTCB_DrawReadyWait, func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021cae0c[] = { func_ov036_021911b0, func_ov036_0219120c, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cae0c[] = { func_ov036_021911b0, FieldAcmdTCB_DrawReadyWait, func_ov036_0218f09c };
 
-const ActorAcmdFunc data_ov036_021caf74[] = { func_ov036_021911cc, func_ov036_0219120c, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021caf74[] = { func_ov036_021911cc, FieldAcmdTCB_DrawReadyWait, func_ov036_0218f09c };
 
 static const s32 data_ov036_021cb5b0[] = { 0x5000, 0x6000, 0x5000 };
 

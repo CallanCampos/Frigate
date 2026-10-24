@@ -9,9 +9,11 @@
 // bgwinfrm.c: frames of BG screen data that are put on a BG, cleared and slid across it. Names are ours
 
 // How the frames' changes reach the BG's screen: not at all, at once, or at the next VBlank
-#define BGWINFRAME_TRANSFER_NONE 0
-#define BGWINFRAME_TRANSFER_NOW 1
-#define BGWINFRAME_TRANSFER_VBLANK 2
+enum {
+    BGWINFRAME_TRANSFER_NONE,
+    BGWINFRAME_TRANSFER_NOW,
+    BGWINFRAME_TRANSFER_VBLANK,
+};
 
 BGWinFrame *BGWinFrame_Create(u32 transferMode, u32 count, HeapID heapId);
 void BGWinFrame_Delete(BGWinFrame *frames);

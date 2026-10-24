@@ -32,18 +32,18 @@ typedef struct {
 
 // The stage's work, 0xc4 bytes
 struct BtlvStage {
-    G3DResource *models[2];  // 0x00  the grounds' model resources, with their textures
-    u16 anmCount;            // 0x08
-    u16 anmResCount;         // 0x0a  how many of anmResources were allocated
-    BtlvStageAnm *anms[2];   // 0x0c
-    void **anmResources[2];  // 0x14  3 each
-    void **anmObjs[2];       // 0x1c  3 each
-    G3DModel *mdls[2];       // 0x24
-    G3DActor *actors[2];     // 0x2c
-    SRTMatrix srt[2];        // 0x34
-    BtlvTexPaletteFade fade; // 0xac
-    u32 hidden : 2;          // 0xbc  a bit by ground
-    HeapID heapId;           // 0xc0
+    G3DResource *models[2];        // 0x00  the grounds' model resources, with their textures
+    u16 anmCount;                  // 0x08
+    u16 anmResCount;               // 0x0a  how many of anmResources were allocated
+    BtlvStageAnm *anms[2];         // 0x0c
+    G3DResource **anmResources[2]; // 0x14  3 each
+    G3DAnimation **anmObjs[2];     // 0x1c  3 each
+    G3DModel *mdls[2];             // 0x24
+    G3DActor *actors[2];           // 0x2c
+    SRTMatrix srt[2];              // 0x34
+    BtlvTexPaletteFade fade;       // 0xac
+    u32 hidden : 2;                // 0xbc  a bit by ground
+    HeapID heapId;                 // 0xc0
 };
 
 static u32 BtlvStage_CountAnimations(const BtlvStageData *data, u32 stageId, u32 variant);
@@ -113,10 +113,10 @@ BtlvStage *BtlvStage_Create(u32 rule, u32 stageId, u8 variant, HeapID heapId, u3
     if (rule == 3) {
         stage->anmCount = 1;
         stage->anmResCount = 1;
-        stage->anmResources[0] = GFL_HeapAllocate(stage->heapId, 3 * sizeof(void *), TRUE, "btlv_stage.c", 0xd6);
+        stage->anmResources[0] = GFL_HeapAllocate(stage->heapId, 3 * sizeof(G3DResource *), TRUE, "btlv_stage.c", 0xd6);
         stage->anmResources[0][0] = GFL_G3DSysReadArcSysResource(ARCID_BTLV, 0x162);
         for (i = 0; i < 2; i++) {
-            stage->anmObjs[i] = GFL_HeapAllocate(stage->heapId, 3 * sizeof(void *), TRUE, "btlv_stage.c", 0xdb);
+            stage->anmObjs[i] = GFL_HeapAllocate(stage->heapId, 3 * sizeof(G3DAnimation *), TRUE, "btlv_stage.c", 0xdb);
             stage->anms[i] = GFL_HeapAllocate(stage->heapId, sizeof(BtlvStageAnm), TRUE, "btlv_stage.c", 0xdc);
             stage->anmObjs[i][0] = GFL_G3DAnmCreate(stage->mdls[i], stage->anmResources[0][0], 0);
             stage->anms[i][0].mode = 1;
@@ -126,10 +126,11 @@ BtlvStage *BtlvStage_Create(u32 rule, u32 stageId, u8 variant, HeapID heapId, u3
     } else if (stage->anmCount != 0) {
         stage->anmResCount = 2;
         for (i = 0; i < 2; i++) {
-            stage->anmResources[i] = GFL_HeapAllocate(stage->heapId, 3 * sizeof(void *), TRUE, "btlv_stage.c", 0xed);
+            stage->anmResources[i] =
+                GFL_HeapAllocate(stage->heapId, 3 * sizeof(G3DResource *), TRUE, "btlv_stage.c", 0xed);
         }
         for (i = 0; i < 2; i++) {
-            stage->anmObjs[i] = GFL_HeapAllocate(stage->heapId, 3 * sizeof(void *), TRUE, "btlv_stage.c", 0xf3);
+            stage->anmObjs[i] = GFL_HeapAllocate(stage->heapId, 3 * sizeof(G3DAnimation *), TRUE, "btlv_stage.c", 0xf3);
             stage->anms[i] = GFL_HeapAllocate(stage->heapId, 3 * sizeof(BtlvStageAnm), TRUE, "btlv_stage.c", 0xf4);
         }
         for (i = 1; i <= 3; i++) {
@@ -155,7 +156,7 @@ BtlvStage *BtlvStage_Create(u32 rule, u32 stageId, u8 variant, HeapID heapId, u3
     }
 
     size = NNS_G3dGetTex(GFL_G3DResGetResData(stage->models[0]))->plttInfo.sizePltt << 3;
-    stage->fade.resources = GFL_HeapAllocate(stage->heapId, sizeof(void *), TRUE, "btlv_stage.c", 0x120);
+    stage->fade.resources = GFL_HeapAllocate(stage->heapId, sizeof(G3DResource *), TRUE, "btlv_stage.c", 0x120);
     stage->fade.palettes = GFL_HeapAllocate(stage->heapId, sizeof(void *), TRUE, "btlv_stage.c", 0x121);
     stage->fade.resources[0] = stage->models[0];
     stage->fade.palettes[0] = GFL_HeapAllocate(stage->heapId, size, TRUE, "btlv_stage.c", 0x124);

@@ -9,9 +9,11 @@
 // the save. The accessors that overlay 332 uses are declared in save/dream_world.h and save/save_control.h
 
 // GetDreamRadarFlag's and SetDreamRadarFlag's values
-#define DREAM_RADAR_FLAG_READ 0
-#define DREAM_RADAR_FLAG_SEED 1
-#define DREAM_RADAR_FLAG_RECEIVED 2
+enum {
+    DREAM_RADAR_FLAG_READ,
+    DREAM_RADAR_FLAG_SEED,
+    DREAM_RADAR_FLAG_RECEIVED,
+};
 
 // Block 0x48
 struct DreamRadarSave {
@@ -27,11 +29,13 @@ struct DreamRadarSave {
 #define CYGNUS_DATA_WORD_MAX 32
 
 // ValidateDreamRadarSave's results
-#define CYGNUS_DATA_INVALID 0
-// The game marked the data read, and Dream Radar has not written since
-#define CYGNUS_DATA_READ 1
-#define CYGNUS_DATA_VALID 2
-#define CYGNUS_DATA_BROKEN 3
+enum {
+    CYGNUS_DATA_INVALID,
+    // The game marked the data read, and Dream Radar has not written since
+    CYGNUS_DATA_READ,
+    CYGNUS_DATA_VALID,
+    CYGNUS_DATA_BROKEN,
+};
 
 // The data on the card, at CYGNUS_DATA_CARD_OFFSET
 struct CygnusSaveData {

@@ -350,15 +350,15 @@ u32 BtlInst_MakeRomPokemon(BSubwayPokemon *pkm, u32 arcId, u16 file, u32 id, u32
     }
     pkm->ppUps = 0;
     pkm->region = 0;
-    ability = PML_PersonalGetParamSingle(pkm->species, 0, 0x1b);
+    ability = PML_PersonalGetParamSingle(pkm->species, 0, PERSONAL_ABILITY_2);
     if (ability != 0) {
         if (pkm->personality & 1) {
             pkm->ability = ability;
         } else {
-            pkm->ability = PML_PersonalGetParamSingle(pkm->species, 0, 0x1a);
+            pkm->ability = PML_PersonalGetParamSingle(pkm->species, 0, PERSONAL_ABILITY_1);
         }
     } else {
-        pkm->ability = PML_PersonalGetParamSingle(pkm->species, 0, 0x1a);
+        pkm->ability = PML_PersonalGetParamSingle(pkm->species, 0, PERSONAL_ABILITY_1);
     }
     pkm->happiness = happiness;
     msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_SPECIES_NAMES, heapId);
