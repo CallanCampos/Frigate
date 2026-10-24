@@ -3,10 +3,10 @@ pbwinput 1
 # Both programs play this file from the same save: the continue sequence's presses take CONTINUE into the field, the
 # player's room in Aspertia City; X opens the field menu, which without a Pokemon (event flag 0x961) and without the
 # Pokedex (0x962) has four items, BAG, the trainer card, SAVE and OPTIONS (FieldMenu_GetMenuType's type 3,
-# src/ov036/field_menu.c), and the menu opens the bag and the trainer card, each closed with B. The clock stays at its
-# time for the whole run on both (the "clock" line), since the menu's bottom screen shows it: running, it would show
-# each program's own time, which moves on with the video frames, and the DS takes some 2,000 more of them than the port
-# to reach the field. On game frames.
+# src/ov036/field_menu.c), and the menu opens the bag, closed with B, and the trainer card, closed by the pen on its
+# return button, the only touch of the comparison sequences. The clock stays at its time for the whole run on both (the
+# "clock" line), since the menu's bottom screen shows it: running, it would show each program's own time, which moves on
+# with the video frames, and the DS takes some 2,000 more of them than the port to reach the field. On game frames.
 # White 2: the same presses and counts as Black 2's file, measured again on White 2's oracle.
 version w2_us
 clock pinned
@@ -40,8 +40,9 @@ clock pinned
 # A: the trainer card on the bottom screen, from count 4596
 4540 A
 4546 -
-# B: back to the menu (count 4957)
-4900 B
+# The pen on the card's return button (its rect: lines 168-192, columns 228-252): back to the menu (count 4957),
+# whose cursor the touch hides (the card leaves the UI in its touch mode, src/ov186/trainer_card.c)
+4900 - 240,180
 4906 -
 # B: the menu closes (count 5136); the field as before from 5146
 5100 B

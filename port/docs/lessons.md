@@ -15,8 +15,13 @@ workflow goes in the decomp checkout instead; this file is the port's ([CLAUDE.m
   and the deep dive read the top screen's "18 beyond tolerance" as a difference to explain, where the top passed (the
   tolerance is 245) and the bottom screen's clock failed. The 18 were the room's 25 edge pixels, fewer because the game
   darkens the field behind the menu.
-- **A stand-in's ADR that lists what names it makes its retirement a checklist.** ADR 0012's note named every guide,
-  test and line that mentions the launcher; the retirement went down the list and grep found only records besides.
+- **A stand-in's ADR that lists what names it makes its retirement a checklist, not a complete one.** ADR 0012's note
+  named every guide, test and line that mentions the launcher, and the retirement went down the list, but it took
+  "ARCHITECTURE.md's feature map" for the field menu's row, while other features' rows named the launcher's tests
+  (`oracle_launch_*` under the HBlank effects, `launch_touch_then_party` under the touch screen), where a grep for
+  "launcher" doesn't reach. Grep every removed test's own name, and ask of each what else only it covered:
+  `launch_touch_then_party` was the only input file that touched the screen, so its touch on the trainer card's return
+  button moved into `field_menus`, against melonDS.
 
 ## 2026-10-24: the field's pointer casts
 

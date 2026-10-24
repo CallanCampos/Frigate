@@ -35,43 +35,56 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
 ## 2026-10-24: the test launcher retired; the field menu's apps held to melonDS through the menu, the clock pinned
 
 - **Upstream:** `b62c655bfa` (upstream merge #481), as `main` has it since PR 16 (`6a1ace981b`); this branch merges no
-  upstream commit. Upstream's `main` has moved on (`e522642f9e`), for the sync to propose on its own.
+  upstream commit. Upstream's `main` has moved on (`53767c5a2c`, upstream merge #497), for the sync to propose on its
+  own.
 - **Port:** `PORT_SHA`, on the topic branch `port-retire-launcher` from `main` at `1807efb68f` (PR 21): `0499fc07bb`
-  (the pinned clock), `145d776f17` (the field menu's routes as sequences), `a2fd007bf4` (the launcher retired) and this
-  records commit. The battle path's entry gets its `PORT_SHA`, `1e80528149`, and the seam's removal row in
-  game-changes.md `a2fd007bf4`.
-- **ROM:** T0 passes on `main` as the branch started from it and after the seam's removal (`a2fd007bf4`), the only
-  game file the branch changes: Black 2 `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb` and White 2
-  `b5d7490be7b415b8f1e672a53e978a9cc667e56a`. `src/ov035/event_mapchange.c` is complete in both versions, and
-  `check_mwcc_neutral.py` finds it identical to `origin/main` (`1807efb68f`) and to `b62c655bfa`, 2 of 2 pairs each:
-  the block was `PLATFORM_PC`-only. No header outside `port/` changes.
+  (the pinned clock), `145d776f17` (the field menu's routes as sequences), `a2fd007bf4` (the launcher retired),
+  `29d58ffe85` (its records), `e6a60804b8` (`main` merged in, with PR 22) and this commit, the review's fixes. The
+  battle path's entry gets its `PORT_SHA`, `1e80528149`, and PR 22's entry `83bd1c7dc8`.
+- **ROM:** T0 passes on `main` as the branch started from it, after the seam's removal (`a2fd007bf4`), the only game
+  file the branch changes, and on the merge with PR 22 (`e6a60804b8`; the review's fixes change no game file): Black 2
+  `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb` and White 2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`.
+  `src/ov035/event_mapchange.c` is complete in both versions, and `check_mwcc_neutral.py` finds it identical to `main`
+  (`1807efb68f`, and `2e510abc6d` after PR 22) and to `b62c655bfa`, 2 of 2 pairs each: the block was
+  `PLATFORM_PC`-only. No header outside `port/` changes.
 - **Host build:** T1 passes on macOS arm64, AppleClang 21, RelWithDebInfo, both versions (`build/port`,
-  `build/port-w2`), each with the oracle (`-DPORT_BUILD_ORACLE=ON`) and 723 warnings, as on the battle path, the
-  game rebuilt whole since `port/include/port_host.h` changed. clang-format 23 is clean on every changed C file.
-- **Tests:** full ctest on `a2fd007bf4` (this records commit changes documents and `oracle.py`'s docstring only), with
-  the oracle built and the cached oracle saves: Black 2, 301 passed, 1 failed and 1 skipped of 303; White 2, 298 passed
-  and 2 skipped of 300, none failed. Black 2's failure was `asm_oracle`, a timeout at 900 s on a load average of about
-  60 on the machine's 8 cores, which then passed alone (351 s). Skipped: `app_universal_slices` in both, which only a
-  distribution build has, and White 2's `frame_times_title`, over its budget while the load average was above the cores.
-  The launcher's eleven tests are gone (its seven that failed, `app_launcher_spec_*`, `integrate_launch_*` and
-  `integrate_launcher_off`), and three are new (`oracle_field_menus`, `oracle_party_menus`, `pxi_rtc_pinned`): 311 and
-  308 tests before, 303 and 300 now. T4: `oracle_field_menus` and `oracle_party_menus` pass in both versions, with
-  `oracle_continue`, `oracle_continue_starter` and every other oracle test; by `oracle.py sequence NAME --out DIR` (the
-  runs kept and compared again), field_menus matches 5,179 of 5,179 frames in Black 2 (2,169 exact, 3,010 with 3D within
-  the tolerance) and 5,171 of 5,171 in White 2, party_menus 8,190 of 8,190 (4,250 exact) and 8,182 of 8,182, the
-  summary's 289 frames left out; without them, 289 frames failed, all of them the summary's, and with the clock running
-  the deep dive saw 28 of the field menu's frames fail on the clock. T3: every replay passes, and
-  `frame_times_party_menus` passes through the field menu in both versions (its scene's 95th percentile 4.63 ms in Black
-  2, 6.87 ms in White 2, at load averages of 45 to 70). T2 passes, the reader's `clock` line and `pxi_rtc_pinned` among
-  it. T6: `replay_same_save` passes. T5 not run here (CI's sanitize job runs on the pull request); T7 not run.
+  `build/port-w2`), each with the oracle (`-DPORT_BUILD_ORACLE=ON`): from clean on `a2fd007bf4`, 723 warnings each, as
+  on the battle path, the game rebuilt whole since `port/include/port_host.h` changed; then incrementally on the merge
+  and the fixes, whose 19 warnings each are the ones `src/ov059/scrcmd_resort.c` gave before (it includes
+  `include/field/resort.h`, which PR 22 changed). clang-format 23 is clean on all 18 changed C and C++ files.
+- **Tests:** full `ctest -j4` on the review's fixes (this commit's tree before its records), both versions at once, with
+  the oracle, the cached oracle saves copied from the verify tree and the clone's `build/port-venv`, under load averages
+  of 72 falling to 10 on the machine's 8 cores from other sessions: Black 2, 302 passed and 1 skipped of 303 (1,172 s);
+  White 2, 299 passed and 1 skipped of 300 (1,120 s); none failed. Skipped: `app_universal_slices` in both, which only a
+  distribution build has. The launcher's eleven tests are gone: six of the seven that failed on `main`
+  (`oracle_launch_field_menus`, `oracle_launch_party_menus`, `launch_summary_standalone`, `launch_touch_then_party`,
+  `launch_unfinished` and `launch_not_offered`), `app_launcher_spec_plain` and `app_launcher_spec_sanitized`,
+  `integrate_launch_bad_option`, `integrate_launch_never_asked` and `integrate_launcher_off`; the seventh,
+  `frame_times_party_menus`, plays its file through the field menu now and passes. Three are new (`oracle_field_menus`,
+  `oracle_party_menus`, `pxi_rtc_pinned`): 311 and 308 tests before, 303 and 300 now. T4: `oracle_field_menus` and
+  `oracle_party_menus` pass in both versions, with `oracle_continue`, `oracle_continue_starter`, `asm_oracle` and every
+  other oracle test. By `oracle.py sequence NAME --out DIR` (the runs kept and compared again), field_menus with its
+  touch matches 5,179 of 5,179 frames in Black 2 (2,169 exact, 3,010 with 3D within the tolerance) and 5,171 of 5,171 in
+  White 2 (2,171 exact, 3,000), the menu's bottom screen after the touch exact on both programs, without its cursor: the
+  touch reached the game on melonDS too; party_menus matches 8,190 of 8,190 (4,250 exact) and 8,182 of 8,182 on
+  `a2fd007bf4`, the summary's 289 frames left out; without them, 289 frames failed, all of them the summary's, and with
+  the clock running the deep dive saw 28 of the field menu's frames fail on the clock. T3: every replay passes, and so
+  does every timing gate, `frame_times_party_menus` through the field menu among them: its scene's 95th percentile was
+  3.46 to 6.87 ms over six runs, never on an idle machine (4.63 ms in Black 2 and 6.87 ms in White 2 on `a2fd007bf4` at
+  load averages of 45 to 70; 4.64 and 3.98 ms in the full run; 3.46 and 5.46 ms alone at 9 to 19). T2 passes, the
+  reader's `clock` line and `pxi_rtc_pinned` among it. T6: `replay_same_save` passes. T5 not run: CI's `sanitize` job
+  runs `-LE route` and `-L route -LE oracle` without a ROM, so `oracle_field_menus` and `oracle_party_menus` have not
+  run under the sanitizers anywhere yet, where the launcher's routes to the same apps did (R5 and H4 were found there);
+  Next has it. T7 not run.
 - **Tiers:** per version, a 37,546 functions, b 3,472 and c zero; code bytes Black 2 a 3,435,848, White 2 a 3,435,936,
-  and b 414,418 in each; 2,384 veneers left out. Unchanged (`port/tools/progress/progress.py` on `a2fd007bf4`).
+  and b 414,418 in each; 2,384 veneers left out. Unchanged (`port/tools/progress/progress.py` on `a2fd007bf4`; PR 22
+  changes none, as its entry says).
 - **Trap stubs:** 30 function stubs and 22 data placeholders per version (`build/port*/gen/stubs.c`), unchanged. The
   field menu's routes reach none; the first on the story's path is still `data_ov167_021d7490`, at a battle's first
   move.
-- **64-bit warnings:** `check_ptrcasts: 429 sites in 274 keys (real 150, harmless 101, handled 141, unreachable 37),
-  1681 files, 0 not compiled` on `build/port`, the same as the battle path's: the seam held no cast, and the baseline
-  is unchanged.
+- **64-bit warnings:** `check_ptrcasts: 422 sites in 269 keys (real 142, harmless 102, handled 141, unreachable 37),
+  1681 files, 0 not compiled` on `build/port` and `build/port-w2`, PR 22's: the seam held no cast, and this branch
+  leaves `main`'s baseline as it is.
 - **Work done:** the plan's A-2. The pinned clock (`0499fc07bb`): an input file's new `clock` line (`running`, the
   default, or `pinned`), which pbw-oracle honours by cancelling melonDS's clock chip timer and Frigate by keeping its
   fixed clock at its start (`port_rtc_set_pinned`, set from a replay), with the reader's tests and `pxi_rtc_pinned`.
@@ -81,25 +94,37 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
   the `oracle_launch_*` and `launch_*` tests and `check_launch_smoke.py` are gone; `frame_times_party_menus` plays the
   party_menus file through the menu. The launcher's retirement (`a2fd007bf4`): what ADR 0012's note lists, with the
   `port_launcher` library, `--launch` and its statuses, the run directory's `launch:` line, the seam in
-  `src/ov035/event_mapchange.c` and its declaration (game-changes.md records the removal in a row of its own, a rule it
-  now states), `port_trap_is_placeholder`, the `app_launcher_spec_*`, `integrate_launch_*` and
-  `integrate_launcher_off` tests, and the launcher in every guide, ARCHITECTURE.md, GLOSSARY.md, MODDING.md,
-  port/CLAUDE.md, PLAN.md and the READMEs; ADR 0012 gets its note, "superseded: retired when the field opened". The
-  deep dive's two differences on the real menu's route are explained in the oracle README: the clock was the RTC
-  running with each program's video frames, the DS some 34 seconds ahead at the same count once the field opened,
-  which the pinned clock removes (the menu's bottom screen is exact on both); the "18 pixels on the 3D edges behind
-  the open menu" are the room's 25 polygon-edge pixels beyond the pixel tolerance, fewer because the game darkens the
-  field to about 5/8 behind the menu (the 18 are among the 25; the lookout's 142 become 110 to 112), each frame within
-  the 3D's tolerance, the deep dive's 28 failing frames having failed on the clock alone. The summary's background
-  stays the one known difference: the DS spends 38 VBlanks more than passes loading it, which step its scroll some 9
-  pixels on (port frames 4534-4822, both versions). This entry also adds the one that PRs 13 to 16 never got, below;
+  `src/ov035/event_mapchange.c` and its declaration (the seam's row of game-changes.md goes, as any row of a change
+  taken back; the file's history keeps it), `port_trap_is_placeholder`, the `app_launcher_spec_*`,
+  `integrate_launch_*` and `integrate_launcher_off` tests, and the launcher in every guide, ARCHITECTURE.md,
+  GLOSSARY.md, MODDING.md, port/CLAUDE.md, PLAN.md and the READMEs; ADR 0012 gets its note, "superseded: retired when
+  the field opened". The deep dive's two differences on the real menu's route are explained in the oracle README: the
+  clock was the RTC running with each program's video frames, the DS some 34 seconds ahead at the same count once the
+  field opened, which the pinned clock removes (the menu's bottom screen is exact on both); the "18 pixels on the 3D
+  edges behind the open menu" are the room's 25 polygon-edge pixels beyond the pixel tolerance, fewer because the game
+  darkens the field to about 5/8 behind the menu (the 18 are among the 25; the lookout's 142 become 110 to 112), each
+  frame within the 3D's tolerance, the deep dive's 28 failing frames having failed on the clock alone. The summary's
+  background stays the one known difference: the DS spends 38 VBlanks more than passes loading it (counts 4526 to
+  4531), which step its scroll some 9 pixels on (port frames 4534-4822, both versions). The review's fixes (this
+  commit): `field_menus` closes the trainer card with the pen on its return button (240,180), the touch of the deleted
+  `launch_touch_then_party`, which was the only input file that touched the screen, so a touch from an input file is
+  held to melonDS now, in both versions; the feature map's HBlank and touch screen rows name the sequences instead of
+  the launcher's tests, its frame times' claim is dated and the new scene's load-only measure said, and its sanitized
+  build's row says the sequences haven't run sanitized; game-changes.md has no row or rule for a removal; this
+  entry's counts and T5 line; ADR 0012's note names commits; long lines rewrapped and three opening comments say what
+  the clock line does. This entry also adds the one that PRs 13 to 16 never got, lower down where their merges fall;
   lessons.md has three lessons.
 - **Next:** phase 3's exit route (plan A-3): New Game to Aspertia, a walk, an NPC, a building and a change of map,
-  against melonDS at its checkpoints, and a T7 playtest on macOS. For battles, once overlay 167's table has C, the
-  Route 19 route as a test. For the guard, the field's other real rows (R02, R05), then battle (R06) and the menus.
-- **Blockers:** `data_ov167_021d7490` (overlay 167's battle table, issue #120), which stops every battle at its first
-  move, unchanged since the battle path's entry, and `src/ov036/enceff_data.c`'s four entries (a decomp finding). The
-  launcher's seven failing tests are gone, so T4 on `main` is no longer red for them.
+  against melonDS at its checkpoints, and a T7 playtest on macOS. T5 on the two field menu sequences (a sanitized
+  build with the oracle, `ctest -L route`, in both versions), which CI's job can't run without a ROM, and
+  `frame_times_party_menus` measured on an idle machine. For battles, once the sync brings overlay 167's table, the
+  Route 19 route as a test. For the guard, battle (R06), then the menus and apps (R09, R11, R14 to R17) and wireless
+  (R21 to R24), each for the sites the contributors' PR 19 doesn't fix; R02 and R05's two callers go when PR 19 merges.
+- **Blockers:** `data_ov167_021d7490` (overlay 167's battle table, issue #120) still stops every battle at its first
+  move on Frigate's `main`; upstream merge #497 gave it C (upstream's `53767c5a2c`), which reaches the port by the next
+  sync. `src/ov036/enceff_data.c`'s four entries are still a decomp finding. Of the launcher's seven tests that failed
+  on `main`, six are gone and the seventh, `frame_times_party_menus`, passes through the field menu, so T4 on `main` is
+  no longer red for them.
 
 ## 2026-10-24: the field's pointer casts: overlay 137's Join Avenue types at full width
 

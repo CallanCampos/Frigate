@@ -2,7 +2,9 @@
 // port/tools/oracle/README.md), given to the game in place of the window's input, so that a run reaches the same
 // moments of the game as the melonDS oracle given the same file (PLAN.md §6, T4). Frames count as the file says: game
 // frames by GFL's frame count (port/hal/gfl/gfl_frame.h), or video frames. The port's console never sleeps through a
-// VBlank (port/hal/pm wakes it at once), so every frame comes through port_replay_vblank. Plain C types only.
+// VBlank (port/hal/pm wakes it at once), so every frame comes through port_replay_vblank. The file's time and clock
+// lines set the real-time clock at power-on and can pin it there for the whole run (port/hal/rtc, from
+// port/app/main.c). Plain C types only.
 #ifndef PORT_APP_REPLAY_H
 #define PORT_APP_REPLAY_H
 

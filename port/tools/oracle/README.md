@@ -396,9 +396,11 @@ sequences, compared with `--align counter`, the movies by their pictures (`oracl
 - **field_menus**: continue's presses from the first save, then the field menu in the player's room, the real one,
   on both programs: X at game frame 3900 slides it in on the bottom screen (BAG, the trainer card, SAVE and OPTIONS,
   since the save has no Pokémon and no Pokédex yet), A on BAG opens the bag, its items pocket empty, B takes it back
-  to the menu, RIGHT and A open the trainer card, B again, and B closes the menu. The port runs 5,200 frames, the
-  oracle 7,400. Its file pins the clock ([Input files](#input-files)): the menu's bottom screen shows it, and
-  running it would show each program's own time there.
+  to the menu, RIGHT and A open the trainer card, the pen on the card's return button (240,180) takes it back to
+  the menu, which shows without its cursor since the touch leaves the UI in its touch mode, and B closes the menu.
+  It is the only sequence that touches the screen. The port runs 5,200 frames, the oracle 7,400. Its file pins the
+  clock ([Input files](#input-files)): the menu's bottom screen shows it, and running it would show each program's
+  own time there.
 - **party_menus**: the same presses from the starter save at the lookout, whose menu has every item: the party list,
   Tepig's menu, SUMMARY and its summary, back to the list and the menu; the Pokédex, its Unova list and Tepig's entry;
   the trainer card with its Pokédex line; the bag. The port runs 8,500 frames, the oracle 11,100. The clock is pinned
@@ -845,7 +847,7 @@ the screens; `known_oracle`, oracle frames no port frame can show; `known_state`
 
   The summary of party_menus is the same kind: it scrolls its background a pixel right and down every 4 VBlanks since
   it started (`PStatus_Main` in `src/ov207/p_sta_sys.c`), and the DS spends 38 VBlanks more than passes loading it
-  (counts 4526 to 4533 in both versions, by each program's VBlank count in `frames.tsv`), where the port spends none.
+  (counts 4526 to 4531 in both versions, by each program's VBlank count in `frames.tsv`), where the port spends none.
   So its background is about 9 pixels further on on the DS for as long as it shows, port frames 4534-4822 (counts
   4533-4821) in both versions, while its text, Tepig and the rest of its screens are the port's (`SUMMARY_SCROLL`).
   The party list before and after it, Tepig's menu and every other app of the sequence match frame for frame.

@@ -12,6 +12,10 @@
 // - Video frames: frame N ends with the N-th VBlank since power-on (on the port, since the game's main()).
 // Both programs apply a state at a VBlank, before the interrupt is taken, as pbw_input_frame_at_vblank says; the game
 // reads it at the start of its next pass (GCTX_HIDUpdate). The state of frame 1 also holds from power-on.
+//
+// A file also sets the real-time clock: its "time" line is the time at power-on, and its "clock" line says whether the
+// clock runs from there (the default) or stays pinned there for the whole run on both programs (PbwInputClock), for a
+// screen that shows the time, such as the field menu's.
 #ifndef PORT_TOOLS_ORACLE_PBWINPUT_H
 #define PORT_TOOLS_ORACLE_PBWINPUT_H
 

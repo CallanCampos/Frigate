@@ -15,13 +15,14 @@
 - **Note (2026-10-24):** superseded: retired when the field opened. `FIELDMAP_PROC_FUNCS` got its C by upstream sync,
   and the field opened on the host with [ADR 0021](0021-root-heaps-in-the-games-own-memory-from-host-memory.md) (PR
   18), so the launcher stepped aside, as its gate meant it to, and its seven tests failed on `main` in both versions.
-  The branch `port-retire-launcher` removed what the first note lists, with the `port_launcher` library and its link
-  lines, the seam in `src/ov035/event_mapchange.c` (game-changes.md records the removal), its declaration in
-  `port/include/port_host.h`, `port_trap_is_placeholder`, `--launch`'s option and exit statuses, and its tests
-  (`app_launcher_spec_*`, `integrate_launch_*`, `integrate_launcher_off`, `launch_*`, `oracle_launch_*`). The
-  routes `field_menus` and `party_menus` are comparison sequences now, which reach the same apps through the field
-  menu on both programs, the clock pinned on both, and `frame_times_party_menus` plays the party_menus file through
-  the field menu.
+  The port's `a2fd007bf4` removed what the first note lists, with the `port_launcher` library and its link lines, the
+  seam in `src/ov035/event_mapchange.c` and its row of game-changes.md, its declaration in `port/include/port_host.h`,
+  `port_trap_is_placeholder`, `--launch`'s option and exit statuses, and its tests (`app_launcher_spec_*`,
+  `integrate_launch_*`, `integrate_launcher_off`, `launch_*`, `oracle_launch_*`). Before it, `145d776f17` made the
+  routes `field_menus` and `party_menus` comparison sequences, which reach the same apps through the field menu on
+  both programs, the clock pinned on both, and `frame_times_party_menus` plays the party_menus file through the field
+  menu. `launch_touch_then_party`'s touch on the trainer card's return button, the only touch an input file played,
+  is in `field_menus` now, against melonDS.
 
 ## Context
 

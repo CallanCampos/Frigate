@@ -1,9 +1,8 @@
 // The port's run directory (port/app/run_dir.h), in the format pbw-oracle writes and compare.py reads
 // (port/tools/oracle/README.md, "Run directories"): frames.tsv with a row at every frame, the screens of chosen frames
 // as PNG, dumps of the game's globals at chosen frames, and run.txt, so that a run of the game can be held against the
-// melonDS oracle's. It reads the game's memory and screens and
-// changes neither. Its files are written in binary mode, so that their lines end with "\n" on Windows too, as the
-// oracle's do.
+// melonDS oracle's. It reads the game's memory and screens and changes neither. Its files are written in binary mode,
+// so that their lines end with "\n" on Windows too, as the oracle's do.
 #include "app/run_dir.h"
 #include "hal/host/host.h"
 #include "hal/rom/sha1.h"

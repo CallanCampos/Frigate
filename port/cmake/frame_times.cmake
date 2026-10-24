@@ -57,8 +57,8 @@ if(NOT PORT_SANITIZE AND port_frame_times_build_type MATCHES "^(RELEASE|RELWITHD
     # The title screen's 3D Kyurem, then the start menu over the title's last 3D frame
     port_frame_times_test(title 3600 "${CMAKE_CURRENT_SOURCE_DIR}/tests/oracle/title_${PORT_VERSION}.pbwinput"
         SCENES title=1110-3100 start_menu=3110-3599)
-    # The field menu and its apps from the starter save, which the oracle makes (the oracle_saves fixture): the menu over
-    # the lookout's 3D, the party list, Tepig's summary, the Pokédex, the card and the bag
+    # The field menu and its apps from the starter save, which the oracle makes (the oracle_saves fixture): the menu
+    # over the lookout's 3D, the party list, Tepig's summary, the Pokédex, the card and the bag
     port_frame_times_test(party_menus 8500
         "${CMAKE_CURRENT_SOURCE_DIR}/tests/oracle/party_menus_${PORT_VERSION}.pbwinput"
         SCENES menus=3900-8400 SAVE "${CMAKE_BINARY_DIR}/oracle-saves/starter_save_${PORT_VERSION}.sav" LABELS oracle)

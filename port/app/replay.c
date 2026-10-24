@@ -1,7 +1,9 @@
 // Input replays (--input FILE, port/app/replay.h): at each VBlank, the buttons, lid and touch an input file holds for
 // the frame go to the game in place of the window's (port/hal/input, port/hal/tp), with the file's frames counted in
-// the game's own passes (GFL's frame count, port/hal/gfl/gfl_frame.h) or in VBlanks. The replay tests and the
-// oracle's comparisons use it to bring a run to the same moments of the game as melonDS given the same file.
+// the game's own passes (GFL's frame count, port/hal/gfl/gfl_frame.h) or in VBlanks. It also gives port/app/main.c the
+// file's time and its clock line, which sets the real-time clock at power-on and can pin it there (port/hal/rtc). The
+// replay tests and the oracle's comparisons use it to bring a run to the same moments of the game as melonDS given the
+// same file.
 #include "app/replay.h"
 #include "hal/gfl/gfl_frame.h"
 #include "hal/input/port_input.h"

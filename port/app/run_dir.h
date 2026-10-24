@@ -1,8 +1,7 @@
 // The port's run directory, for comparing it with the melonDS oracle (port/tools/oracle/README.md, "Run directories"):
 // frames.tsv in its version 2 with a row at every frame hook, both screens as frame_NNNNNN.png at the frames of a list,
 // memory.txt with the memory dumps asked for, and run.txt, so that one run of the program gives compare.py every frame
-// it pairs. The program writes it with --run-dir,
-// --run-screens and --run-dump (port/app/main.c). Plain C types only.
+// it pairs. The program writes it with --run-dir, --run-screens and --run-dump (port/app/main.c). Plain C types only.
 #ifndef PORT_APP_RUN_DIR_H
 #define PORT_APP_RUN_DIR_H
 

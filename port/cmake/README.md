@@ -1,10 +1,10 @@
 # port/cmake/
 
 The host build's fragments. [../CMakeLists.txt](../CMakeLists.txt) sets up what everything shares (the version, the
-generated tree, SDL3, the decomp's language model, the four object libraries `pokebw2_game`, `port_hal`, `port_gfx`
-and `port_app`, the trap stubs and the program) and then includes every `*.cmake` here in name order. Each fragment holds one module's build
-rules (its per-file options, its generated inputs) and the tests of that module, so that a module's build and tests
-are read in one place.
+generated tree, SDL3, the decomp's language model, the four object libraries `pokebw2_game`, `port_hal`, `port_gfx` and
+`port_app`, the trap stubs and the program) and then includes every `*.cmake` here in name order. Each fragment holds
+one module's build rules (its per-file options, its generated inputs) and the tests of that module, so that a module's
+build and tests are read in one place.
 
 | Fragment | What it adds | Game functionality it serves | Tests it defines |
 | --- | --- | --- | --- |

@@ -37,21 +37,20 @@ movies by their pictures (compare.py), at the DS's 6 bits and at the palettes' 5
 sequence does both on a comparison sequence's input file, port/tests/oracle/<name>_<version>.pbwinput (SEQUENCES:
 opening, power-on to the title with nothing pressed; title, the opening skipped to the title and START to the start
 menu; continue, the same from first_save's save, the start menu's CONTINUE and the field it goes to; continue_starter,
-continue's presses from starter_save's, whose start menu shows the Pokédex; field_menus, continue's presses and then
-the field menu's bag and trainer card from first_save's; party_menus, the same menu from starter_save's with the party
-list, Tepig's summary, the Pokédex and its entry, the card and the bag, the clock pinned for both), from the save the
-sequence names, made first on the oracle (or taken from --save-cache), and compares every frame the same way but the
-known differences, up to the frame where the port stops when the sequence allows it to stop on code with no C yet;
-with --update it writes port/tests/oracle/<name>_<version>.tsv, the oracle's hashes at sampled frames. sequence-check runs the port alone on
-that input file and checks its counts and its screens without 3D against that reference. sound runs both programs
-on a sequence with their sound traces and WAV dumps (--sound-trace, --audio-dump) and compares the sound driver's state
-run by run, what the ARM9 sees of it frame by frame, and the sound by segment (sound.py, SOUND); with --update it
-writes port/tests/oracle/sound_<name>_<version>.tsv, the oracle's hashes and statistics. sound-check runs the port
-alone and checks it against that reference. check is the oracle's ctest test: the oracle runs the boot sequence twice
-with the same results (its screens, sound trace and WAV dump), and its screens match the hashes in
-port/tests/oracle/boot_<version>.tsv. save, port-save, sequence, sound and check exit 77 without the oracle or the
-ROM, sequence-check and sound-check without the ROM.
-
+continue's presses from starter_save's, whose start menu shows the Pokédex; field_menus, continue's presses and then the
+field menu's bag and trainer card from first_save's, the card closed by the pen on its return button; party_menus, the
+same menu from starter_save's with the party list, Tepig's summary, the Pokédex and its entry, the card and the bag, the
+clock pinned for both), from the save the sequence names, made first on the oracle (or taken from --save-cache), and
+compares every frame the same way but the known differences, up to the frame where the port stops when the sequence
+allows it to stop on code with no C yet; with --update it writes port/tests/oracle/<name>_<version>.tsv, the oracle's
+hashes at sampled frames. sequence-check runs the port alone on that input file and checks its counts and its screens
+without 3D against that reference. sound runs both programs on a sequence with their sound traces and WAV dumps
+(--sound-trace, --audio-dump) and compares the sound driver's state run by run, what the ARM9 sees of it frame by frame,
+and the sound by segment (sound.py, SOUND); with --update it writes port/tests/oracle/sound_<name>_<version>.tsv, the
+oracle's hashes and statistics. sound-check runs the port alone and checks it against that reference. check is the
+oracle's ctest test: the oracle runs the boot sequence twice with the same results (its screens, sound trace and WAV
+dump), and its screens match the hashes in port/tests/oracle/boot_<version>.tsv. save, port-save, sequence, sound and
+check exit 77 without the oracle or the ROM, sequence-check and sound-check without the ROM.
 Standard library only.
 """
 
@@ -150,7 +149,7 @@ CURSOR = ("the start menu's cursor pulses a step ahead on the port since the tit
           "3274, 3296, 3338 and 3360 from the first save) but not on that count")
 SUMMARY_SCROLL = ("the summary scrolls its background a pixel every 4 VBlanks since it started (PStatus_Main, "
                   "src/ov207/p_sta_sys.c:264-273), and the DS spends 38 VBlanks more than passes loading it (counts "
-                  "4526-4533, in both versions), so its background is about 9 pixels further on there throughout; its "
+                  "4526-4531, in both versions), so its background is about 9 pixels further on there throughout; its "
                   "text, Tepig and the rest of its screens are the port's")
 # The frames held close, by kind
 TITLE_FADE = ("the title's bottom screen fading in over its 3D, where the copyright screen's tiles read past their "
@@ -235,7 +234,8 @@ SEQUENCES = {
     ),
     # continue's presses from first_save's save with the clock pinned, then the field menu in the player's room: X
     # opens it (no Pokémon, no Pokédex: BAG, the trainer card, SAVE and OPTIONS), A on BAG opens the bag, its items
-    # pocket empty, and B closes it; RIGHT and A open the trainer card, B closes it, and B closes the menu
+    # pocket empty, and B closes it; RIGHT and A open the trainer card, the pen on its return button closes it (the only
+    # touch of the sequences), and B closes the menu
     "field_menus": Sequence(
         port_frames=5200,
         oracle_frames=7400,

@@ -109,9 +109,10 @@ port_test_labels(oracle_boot oracle)
 # the Pokédex line, into the field at the Aspertia City lookout. Only the oracle can make their saves, so they have no
 # reference and no _hashes test; the oracle_saves test makes the saves into the build tree first (a fixture), where a
 # later run reuses each while its SHA-1 is still the one oracle.py keeps. field_menus goes on from continue's room into
-# the field menu, its bag and its trainer card; party_menus from continue_starter's lookout into the same menu with every
-# item, the party list, Tepig's summary, the Pokédex and Tepig's entry, the card and the bag. Their input files pin the
-# clock, which the menu's bottom screen shows, on both programs (port/tools/oracle/README.md, "Input files")
+# the field menu, its bag and its trainer card, which a touch on its return button closes (the only sequence that
+# touches the screen); party_menus from continue_starter's lookout into the same menu with every item, the party list,
+# Tepig's summary, the Pokédex and Tepig's entry, the card and the bag. Their input files pin the clock, which the
+# menu's bottom screen shows, on both programs (port/tools/oracle/README.md, "Input files")
 set(port_oracle_saves "${CMAKE_BINARY_DIR}/oracle-saves")
 add_test(NAME oracle_saves
     COMMAND "${CMAKE_COMMAND}" -E env PYTHONDONTWRITEBYTECODE=1
