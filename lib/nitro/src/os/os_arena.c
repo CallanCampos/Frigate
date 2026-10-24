@@ -1,8 +1,8 @@
 // NitroSDK OS: memory arenas (os_arena.c, the SDK's name for the module). Thumb code. The limits of each arena are kept
 // in a table of the shared main memory (HW_ARENA_INFO_BUF), and this file also knows where the arenas begin and end
 // before the game moves them. The file has TwlSDK's DSi part too, what OS_InitArenaEx does on a DSi, in TwlSDK's
-// LTDMAIN section, which the LTD autoload's .ltdmain holds: dsd lists it as lib/twl/src/os/os_arena_twl.c, which
-// config/merged_sources.toml links from this file's object, as TwlSDK's os_arena.o holds both (aletheia's match of
+// LTDMAIN section, which the LTD autoload's .ltdmain holds: this file's entry in ARM9 main's delinks.txt lists it in
+// an .ltdmain section, as TwlSDK's os_arena.o holds both (aletheia's match of
 // Black 1's code to libos.TWL.HYB.a, which gives the DSi part's name).
 #include "nitro/os.h"
 #include "twl/os.h"

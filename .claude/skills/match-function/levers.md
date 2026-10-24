@@ -1101,9 +1101,10 @@ text to `grep -n` there. Entries without a key come from later work and still be
   another file's section, since the literal is `.bss` plus the offset rounded down to 0x80. (matching.md: "puts the
   static at a multiple of 0x80")
 - DSi code in the LTD autoload that reaches a main global at a pooled base plus an offset: it was compiled in that
-  global's file, in a `#pragma section` block for `.ltdmain`, and merged with it in `config/merged_sources.toml`.
+  global's file, in a `#pragma section` block for `.ltdmain`, which its entry lists in `.ltdmain` sections
+  (`docs/configs.md`, Migrated LTD sections).
   (matching.md: "objects defined between")
-- The main part of such a merged file reaching its statics at other offsets: move the DSi part's static
+- The main part of such a file reaching its statics at other offsets: move the DSi part's static
   declarations, in a `#pragma section` block of their own, among the main part's. (matching.md: "still take part
   in the size sort")
 - Two statics reached from one literal: `-ipa file` in `file_flags`, with the SDK's separate statics. (matching.md:

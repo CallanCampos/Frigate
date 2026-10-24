@@ -1,11 +1,11 @@
 // TwlSDK's shared WRAM manager (mi_sharedWram.c, TwlSDK's mi_sharedwram.o, which aletheia's match of Black 1's code to
 // libmi.TWL.HYB.a gives with its functions' names): in ARM9 main, the call into the LTD autoload on a DSi; in TwlSDK's
-// LTDMAIN section, which the LTD autoload's .ltdmain holds, the DSi part, which dsd lists as
-// lib/twl/src/mi/mi_sharedWram_twl.c and config/merged_sources.toml links from this file's object: the WRAM A, B and C
-// banks' registers, and the bookkeeping of which processor has each bank, or has reserved it, which the ARM7 asks for
-// through the PXI FIFO. The functions and the tables of functions have TwlSDK's names; the other statics have names of
-// ours. The ARM9's own requests besides the slot allocation and the release are not linked. The DSi part's statics are
-// in its section, where each has a section of its own and a literal of its own, as the original reaches them.
+// LTDMAIN section, which the LTD autoload's .ltdmain holds, the DSi part, which this file's entry in ARM9 main's
+// delinks.txt lists in .ltdmain sections: the WRAM A, B and C banks' registers, and the bookkeeping of which processor
+// has each bank, or has reserved it, which the ARM7 asks for through the PXI FIFO. The functions and the tables of
+// functions have TwlSDK's names; the other statics have names of ours. The ARM9's own requests besides the slot
+// allocation and the release are not linked. The DSi part's statics are in its section, where each has a section of its
+// own and a literal of its own, as the original reaches them.
 #include "nitro/mi.h"
 #include "nitro/os.h"
 #include "nitro/pxi.h"

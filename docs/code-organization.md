@@ -11,8 +11,8 @@ every section.
   its functions are written. The entry stays without `complete` until every function matches, and the original code
   is linked until then, as with `src/ov059/scrcmd_resort.c`. Never split a file into several entries to link the
   matching parts early, and never put two original files in one entry. An original file that the code shows in two
-  modules is one source file with an entry in each module's `delinks.txt`, the part's mapped to its whole in
-  `config/merged_sources.toml` (`docs/configs.md`, Merged files): NitroSDK's `card_rom.c` and `pm.c`, whose DSi parts in
+  modules is one source file with one entry, in ARM9 main's `delinks.txt`, which lists the LTD autoload's part in
+  `.ltdmain` sections (`docs/configs.md`, Migrated LTD sections): NitroSDK's `card_rom.c` and `pm.c`, whose DSi parts in
   the LTD autoload reach the main parts' statics from their pooled base, as only code of the same object does, and
   `mi_sharedWram.c`, `os_interrupt.c`, `os_arena.c`, `os_ownerInfoEx.c` and `os_application_jump.c`, which TwlSDK's
   library objects show as one object each with both parts (aletheia's match of Black 1's code to them).

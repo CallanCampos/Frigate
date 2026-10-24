@@ -2,9 +2,9 @@
 // ARM7's power management through the PXI FIFO, for the backlights and the screens' power, the battery, the sound
 // amplifier of the microphone, the sleep mode and the power-off. The file name is the SDK's, and the split is certain:
 // the functions come in the SDK's order, and the .bss and .data hold its statics. The file has TwlSDK's DSi part too,
-// in TwlSDK's LTDMAIN section, which the LTD autoload's .ltdmain holds: dsd lists it as lib/twl/src/spi/pm_twl.c, which
-// config/merged_sources.toml links from this file's object, since the parts share the object's statics, and the DSi
-// part's place among them sets the layout of the .bss. The main part calls the DSi part through the linker's veneers
+// in TwlSDK's LTDMAIN section, which the LTD autoload's .ltdmain holds: this file's entry in ARM9 main's delinks.txt
+// lists it in .ltdmain sections, since the parts share the object's statics, and the DSi part's place among them sets
+// the layout of the .bss. The main part calls the DSi part through the linker's veneers
 // (func_0207ece4/e8, func_0207f058/5c and func_0207f16c/70, after their callers), and the DSi part calls back through
 // veneers of its own. The functions of both parts have TwlSDK's names, which aletheia's match of Black 1's code to
 // TwlSDK's pm.o (libspi.TWL.HYB.a) gives in the same order, as does PMi_ResetLocked; the other statics have NitroSDK's

@@ -2,9 +2,9 @@
 // at a time with the CPU or with a DMA channel, and the setup of the reads. The file name is NitroSDK's (card_rom.c, as
 // ntrtwl's reconstruction of NitroSDK has it); the library has no file name string. The file has TwlSDK's DSi part
 // too, the secure ROM reader, which reads through the card's hash table, in TwlSDK's LTDMAIN section, which the LTD
-// autoload's .ltdmain holds: dsd lists it as lib/twl/src/card/card_rom_twl.c, which config/merged_sources.toml links
-// from this file's object. The DSi part's CARDi_InitRomHash reaches sRomReader from the base of the main part's pooled
-// .bss, as only code of the same object does. The functions have TwlSDK's names, which aletheia's match of Black 1's
+// autoload's .ltdmain holds: this file's entry in ARM9 main's delinks.txt lists it in .ltdmain sections. The DSi
+// part's CARDi_InitRomHash reaches sRomReader from the base of the main part's pooled .bss, as only code of the same
+// object does. The functions have TwlSDK's names, which aletheia's match of Black 1's
 // code to TwlSDK's card_rom.o (libcard.TWL.HYB.a) gives in the same order, as do CARDiDmaReadInfo, CARDiOwnSignature,
 // CARDi_cache_buf and CARDiEnableCacheInvalidationDC. CARDi_WaitRomTask and CARDi_GetRomAuthCode keep names of
 // ours: aletheia's names for them rest only on their eight bytes, which match card_pullout.o's too, and the second

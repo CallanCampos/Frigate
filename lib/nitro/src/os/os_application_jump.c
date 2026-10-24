@@ -2,8 +2,8 @@
 // of Black 1's code to libos.TWL.HYB.a gives with its functions' names). After the arguments of the program that ran
 // before are taken, it keeps the ID of the sender, and drops the sender and the arguments when the ID is not accepted.
 // The file has TwlSDK's DSi part too, the lookup in the system's list of titles, with the sender's ID, in TwlSDK's
-// LTDMAIN section, which the LTD autoload's .ltdmain holds: dsd lists it as lib/twl/src/os/os_application_jump_twl.c,
-// which config/merged_sources.toml links from this file's object. This file is ARM code. The ID's name, s_prevTitleId,
+// LTDMAIN section, which the LTD autoload's .ltdmain holds: this file's entry in ARM9 main's delinks.txt lists it in
+// .ltdmain sections. This file is ARM code. The ID's name, s_prevTitleId,
 // is aletheia's.
 #include "nitro/os.h"
 #include "twl/os.h"

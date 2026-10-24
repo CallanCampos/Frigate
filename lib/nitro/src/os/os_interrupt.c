@@ -1,8 +1,8 @@
 // NitroSDK OS: setting and changing the interrupt handlers and masks (os_interrupt.c). OS_SetIrqFunction and the
-// callbacks of DMA channels and timers share os_irqTable.c's table. The file has TwlSDK's DSi part too, the callback
-// of a new DMA channel's interrupt, in TwlSDK's LTDMAIN section, which the LTD autoload's .ltdmain holds: dsd lists it
-// as lib/twl/src/os/os_interrupt_twl.c, which config/merged_sources.toml links from this file's object, as TwlSDK's
-// os_interrupt.o holds both (aletheia's match of Black 1's code to libos.TWL.HYB.a, which gives the DSi part's name).
+// callbacks of DMA channels and timers share os_irqTable.c's table. The file has TwlSDK's DSi part too, the callback of
+// a new DMA channel's interrupt, in TwlSDK's LTDMAIN section, which the LTD autoload's .ltdmain holds: this file's
+// entry in ARM9 main's delinks.txt lists it in an .ltdmain section, as TwlSDK's os_interrupt.o holds both (aletheia's
+// match of Black 1's code to libos.TWL.HYB.a, which gives the DSi part's name).
 #include "nitro/os.h"
 #include "twl/os.h"
 

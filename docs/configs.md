@@ -75,9 +75,9 @@ script defines only `__OVERLAY_COUNT` of them. `config/linker_symbols.toml` give
 in both versions: the stack sizes, which `os_interrupt.c`, `os_thread.c`, `os_arena.c` and the startup code `crt0.c`
 (`_start`, `func_02004d50` and `func_02004da0`) read, and the start of the DSi's extended main memory arena, which
 `os_arena.c` reads. `dsd lcf --symbols config/linker_symbols.toml` defines them after `__OVERLAY_COUNT` as absolute
-symbols in the linker script it writes, `build/<version>/arm9.lcf`, which the link (or `--shift`'s padding) takes
-through `build/<version>/arm9_merged.lcf` (Merged files), as NitroSDK's template defines them in its own. Another one
-goes in the config when a file that reads it is written, with its value read from the pool word in both versions.
+symbols in the linker script it writes, `build/<version>/arm9.lcf`, which the link (or `--shift`'s padding) takes,
+as NitroSDK's template defines them in its own. Another one goes in the config when a file that reads it is written,
+with its value read from the pool word in both versions.
 
 ## Compiler exception indices
 
@@ -217,7 +217,8 @@ moves them to the end of the linker's object list, after `-overlaygroup LTD_AUTO
 which gives `wcm_dsi.c`'s 56 calls of `WCMi_SetPhase` their 56 veneers. TwlSDK's `.ltdmain` objects share one veneer per
 target, across files, as main's do: `card_hash.c`'s six calls of `OS_DisableInterrupts` go through one veneer, which
 `mi_ndma.c`, `mi_ndma_gxcommand.c` and the DSi parts of `mi_sharedWram.c` and `pm.c` call too, so the tool leaves the
-objects of `lib/twl/` with main's, and those of the merged files that hold a DSi part (below): `card_rom.c`'s DSi part
+objects of `lib/twl/` with main's, and those that the linker script places in another module too, the files with
+migrated LTD sections (below): `card_rom.c`'s DSi part
 calls `CARD_GetOwnRomHeaderTWL` twice through one veneer, `card_hash.c` calls `OS_Terminate` and `OS_GetBootType`
 through its veneers, and `mi_sharedWram.c`'s DSi part calls `OS_GetLockID` and `OS_ReleaseLockID` through them.
 
@@ -242,35 +243,40 @@ contiguous generated fragments, real Thumb mappings and each file's count of ven
 unexpected layouts and linker diagnostics fail with an error. Modified code that changes these
 invariants needs a new layout audit; do not change the count merely to bypass the check.
 
-## Merged files
+## Migrated LTD sections
 
-dsd lists each module's files in that module's `delinks.txt`, and a file name in one module only. TwlSDK compiled the
-DSi-only code of some NitroSDK files into the object of their NITRO code, in its LTDMAIN section, which the LTD
-autoload's `.ltdmain` holds, so one original file has a part in ARM9 main and a part in the LTD autoload. Both parts
-reach the object's pooled statics from one base, and the DSi part's statics, in `.ltdmain.bss`, take part in the size
-sort of the object's `.bss`, so they match only compiled as one file: `card_rom.c` and `pm.c`, whose DSi parts the LTD
-autoload's `delinks.txt` lists as `lib/twl/src/card/card_rom_twl.c` and `lib/twl/src/spi/pm_twl.c`. TwlSDK's library
-objects show five more with both parts, `mi_sharedwram.o`, `os_interrupt.o`, `os_arena.o`, `os_ownerinfoex.o` and
-`os_application_jump.o` (aletheia's match of Black 1's code to them), though no code of theirs reaches a static from a
-pooled base: `mi_sharedWram.c`, `os_interrupt.c`, `os_arena.c`, `os_ownerInfoEx.c` and `os_application_jump.c` hold
-their DSi parts, which the LTD autoload's `delinks.txt` lists under `lib/twl/src/mi/` and `lib/twl/src/os/` with `_twl`
-names. `mi_sharedWram.c`'s function tables, each in a section of its own, take the ROM's order when they are defined in
-it, and its statics are in the LTDMAIN section, where each is reached through a literal of its own, as the original
-does.
-`config/merged_sources.toml` maps each such part to its whole, whose source holds the part's code between
-`#pragma section LTDMAIN begin` and `end`. The part has no source and isn't compiled: `tools/build/merge_objects.py`
-rewrites dsd's linker script to place the part's sections from the whole's object, its `.bss` from the object's
-`.ltdmain.bss`, and stops the build for a part with any section but `.ltdmain` and `.bss`, which only the main part's
-sections of the object could fill; it lists the whole's object in the part's place in the object list. `mwldarm`
-makes the long-branch veneers object by object, in the list's order, and a later call in range shares an earlier veneer: at its ARM9 main
-place, `pm.o` came before `card_hash.o`, so `pm.c`'s DSi part made the veneers of `OS_DisableInterrupts` and
-`OS_RestoreInterrupts` that `card_hash.c` makes in the original, and `.ltdmain` moved by 0x10 from `card_hash.c` on.
-`compiler_probe.py`, `mark_complete.py`, `rename_symbol.py`, `check_nonmatching_rows.py` and the objdiff config find
-the part's code in its whole, and a row of `docs/nonmatching-functions.md` names the whole. The part and its whole are
-one object, so they are complete together, each marked with `mark_complete.py`: `merge_objects.py` stops the build when
-only one is, and leaves both to link their original code when neither is. `config/merged_sources.toml` is the same for
-both versions and changes no dsd config, so it has no script and is edited by hand when a part is found.
-`python3 -m unittest tools.build.test_merge_objects` tests the rewrite, and CI's Compile workflow runs it.
+TwlSDK compiled the DSi-only code of some NitroSDK files into the object of their NITRO code, in its LTDMAIN section,
+which the LTD autoload's `.ltdmain` holds, so one original file has a part in ARM9 main and a part in the LTD autoload.
+Both parts reach the object's pooled statics from one base, and the DSi part's statics, in `.ltdmain.bss`, take part in
+the size sort of the object's `.bss`, so they match only compiled as one file: `card_rom.c` and `pm.c`. TwlSDK's
+library objects show five more with both parts, `mi_sharedwram.o`, `os_interrupt.o`, `os_arena.o`, `os_ownerinfoex.o`
+and `os_application_jump.o` (aletheia's match of Black 1's code to them), though no code of theirs reaches a static
+from a pooled base. `mi_sharedWram.c`'s function tables, each in a section of its own, take the ROM's order when they
+are defined in it, and its statics are in the LTDMAIN section, where each is reached through a literal of its own, as
+the original does. The source holds the DSi part's code between `#pragma section LTDMAIN begin` and `end`.
+
+Such a file is one entry, in ARM9 main's `delinks.txt`, whose `.ltdmain` and `.ltdmain.bss` sections are at the LTD
+autoload's addresses:
+
+```
+lib/nitro/src/spi/pm.c:
+    complete
+    .text       start:0x0207eb24 end:0x0207f6cc
+    .data       start:0x0209b78c end:0x0209b794
+    .bss        start:0x0214e240 end:0x0214e280
+    .ltdmain    start:0x027693dc end:0x027696e8
+    .ltdmain.bss start:0x0276b0e4 end:0x0276b100
+```
+
+dsd (since v0.12.1-dsi.7) places those sections in the LTD autoload's `.ltdmain` and `.bss` from the file's one object,
+and lists the object once in `objects.txt`, at its LTD part's place. `mwldarm` makes the long-branch veneers object by
+object, in the list's order, and a later call in range shares an earlier veneer: at its ARM9 main place, `pm.o` would
+make the veneers of `OS_DisableInterrupts` and `OS_RestoreInterrupts` that `card_hash.c` makes in the original. The file
+is complete as one, and `mark_complete.py` checks its statics' references across both modules. `config_fixes.py
+add-section . FILE .ltdmain SIZE START` gives an entry such a section, its address placed in White 2 through the LTD
+autoload, and `config_fixes.py remove-file ltd_autoload_0 FILE START` deletes a part's own entry from the LTD
+autoload's `delinks.txt`; both are recorded in `config/fixes.txt`. `compiler_probe.py`, `rename_symbol.py` and
+`check_nonmatching_rows.py` find the file's DSi functions in the LTD autoload's symbols.
 
 ## Shifting
 

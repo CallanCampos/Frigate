@@ -2,8 +2,8 @@
 // code to libos.TWL.HYB.a gives with its functions' names). On a DSi the system leaves its own settings in the shared
 // main memory, and these functions give out what is in them, on top of the owner's settings that the DS has; each
 // checks OS_IsRunOnTwl first. The file has TwlSDK's DSi part too, the wireless settings, in TwlSDK's LTDMAIN section,
-// which the LTD autoload's .ltdmain holds: dsd lists it as lib/twl/src/os/os_ownerInfoEx_twl.c, which
-// config/merged_sources.toml links from this file's object. The main part calls it through linker veneers.
+// which the LTD autoload's .ltdmain holds: this file's entry in ARM9 main's delinks.txt lists it in an .ltdmain
+// section. The main part calls it through linker veneers.
 #include "nitro/mi.h"
 #include "nitro/os.h"
 #include "twl/os.h"

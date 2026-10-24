@@ -3713,7 +3713,7 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `card_rom.c` after `#pragma define_section LTDMAIN ".ltdmain" ".ltdmain.bss" ".ltdmain" abs32 RWX` (the other two
   spellings tried put the code or the statics in the wrong sections). Code in the LTD autoload that reaches a main
   global at a pooled base plus an offset was compiled in that global's file, and links from its object
-  (`docs/configs.md`, Merged files).
+  (`docs/configs.md`, Migrated LTD sections).
 - The block's statics, though in a section of their own, still take part in the size sort of the file's `.bss`, by
   their place among the file's other declarations. `pm.c`'s DSi part declares four; with them at the end of the file,
   before the DSi code, six of `pm.c`'s main functions reach their statics at other offsets. Declaring them, in one more
