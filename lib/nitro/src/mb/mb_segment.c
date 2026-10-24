@@ -128,7 +128,7 @@ BOOL MB_ReadSegment(FSFile *file, void *buf, u32 len) {
 
         if (remaining >= 0x88) {
             if (ownFile) {
-                MI_CpuCopy8(CARDi_GetRomCacheBuffer(), dst, 0x88);
+                MI_CpuCopy8(CARDi_GetRomAuthCode(), dst, 0x88);
             } else {
                 FS_SeekFile(file, pos + romSize, FS_SEEK_SET);
                 FS_ReadFile(file, dst, 0x88);

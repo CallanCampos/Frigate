@@ -6,8 +6,9 @@
 // from this file's object. The DSi part's CARDi_InitRomHash reaches sRomReader from the base of the main part's pooled
 // .bss, as only code of the same object does. The functions have TwlSDK's names, which aletheia's match of Black 1's
 // code to TwlSDK's card_rom.o (libcard.TWL.HYB.a) gives in the same order, as do CARDiDmaReadInfo, CARDiOwnSignature,
-// CARDi_cache_buf and CARDiEnableCacheInvalidationDC. CARD_WaitRomAsync and CARDi_GetRomCacheBuffer rest on weaker
-// evidence: their eight bytes match card_pullout.o's too. The other statics have names of ours.
+// CARDi_cache_buf and CARDiEnableCacheInvalidationDC. CARDi_WaitRomTask and CARDi_GetRomAuthCode keep names of
+// ours: aletheia's names for them rest only on their eight bytes, which match card_pullout.o's too, and the second
+// returns CARDiOwnSignature, not a cache buffer. The other statics have names of ours.
 #include "nitro/card.h"
 #include "nitro/hw.h"
 #include "nitro/mi.h"
@@ -53,7 +54,7 @@ static void CARDi_DmaReadPageCallback(void);
 static void CARDi_DmaReadDone(void *arg);
 static BOOL CARDi_IsRomDmaAvailable(u32 dma, u32 dst, u32 src, u32 len);
 static void CARDi_ReadRomSyncCore(CARDiCommon *p);
-static void CARD_WaitRomAsync(void);
+static void CARDi_WaitRomTask(void);
 static u32 CARDi_ReadCardWithHash(void *arg, void *dst, u32 src, u32 len);
 static u32 CARDi_ReadCardWithHashInternalAsync(void *arg, void *dst, u32 src, u32 len);
 
@@ -347,7 +348,7 @@ void CARDi_ReadRom(u32 dma, const void *src, void *dst, u32 len, MIDmaCallback c
         OS_RestoreInterrupts(irq);
         CARDi_ReadRomWithDMA(&CARDiDmaReadInfo);
         if (!async) {
-            CARD_WaitRomAsync();
+            CARDi_WaitRomTask();
         }
     } else {
         if (sInvalidateIC) {
@@ -376,12 +377,12 @@ void CARDi_InitRom(void) {
 }
 
 // Waits for the last task of the library, which is the one just started
-static void CARD_WaitRomAsync(void) {
+static void CARDi_WaitRomTask(void) {
     CARDi_WaitAsync();
 }
 
 // The 0x88 bytes that follow the ROM's program, as CARDi_InitRom read them
-const void *CARDi_GetRomCacheBuffer(void) {
+const void *CARDi_GetRomAuthCode(void) {
     return CARDiOwnSignature;
 }
 

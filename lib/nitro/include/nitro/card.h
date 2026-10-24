@@ -50,7 +50,7 @@ typedef struct CARDRomHeader {
 // bytes that the card read after the ROM header (card_rom.c)
 const CARDRomHeader *CARD_GetOwnRomHeader(void); // swan's rom_get_header
 const void *CARD_GetOwnRomHeaderTWL(void);
-const void *CARDi_GetRomCacheBuffer(void);
+const void *CARDi_GetRomAuthCode(void);
 
 typedef enum {
     CARD_RESULT_SUCCESS,

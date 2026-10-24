@@ -4198,8 +4198,8 @@
 . 0x0206fce8 CARDi_ReadRomSyncCore
 . 0x0206fd24 CARDi_ReadRom
 . 0x0206fe54 CARDi_InitRom
-. 0x0206fec8 CARD_WaitRomAsync
-. 0x0206fed0 CARDi_GetRomCacheBuffer
+. 0x0206fec8 CARDi_WaitRomTask
+. 0x0206fed0 CARDi_GetRomAuthCode
 . 0x0206fed8 CARD_InitPulledOutCallback
 . 0x0206fefc CARDi_PulledOutCallback
 . 0x0206ff50 CARD_SetPulledOutCallback
