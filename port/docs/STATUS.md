@@ -32,11 +32,109 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
 
+## 2026-10-24: upstream sync `53767c5a2c` prepared: 14 conflicts resolved, waiting for PR 25 and upstream's format
+
+- **Upstream:** `53767c5a2c` (upstream merge #497), 108 commits after `b62c655bfa`. This entry records a prepared
+  sync: it is not published and not on `main`. The hourly `port-sync` Action had stopped on its conflict since
+  2026-10-23 23:53 UTC.
+- **Port:** `PORT_SHA`, on the local topic `codex/upstream-sync-manual` from `main` at `e5508df96a` (PR 24's merge):
+  the merge `f99298de25` (its conflicts resolved and committed with `git commit --no-edit --cleanup=strip` after
+  `port/tools/sync_upstream.sh --branch codex/upstream-sync-manual --no-push` stopped on them) and this records
+  commit. The merge was first committed as `bf6d6cfd46` and amended, before anything was published, to rewrap the
+  comment its `include/types.h` fix adds (below). The pointer cast guard's new row is in its own pull request from
+  `main`, [PR 25](https://github.com/CallanCampos/Frigate/pull/25) (`port-sync-ptrcast-rows`), which lands
+  first ([SYNC.md](SYNC.md#when-the-pointer-cast-guard-fails)); `sync_upstream.sh` publishes this topic only once its
+  ctest passes, after that PR is on `main` and `main` is merged here.
+- **ROM:** T0 passes on `f99298de25`: `python3 configure.py && ninja`, both SHA1s match (Black 2
+  `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb`, White 2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`), no compiler warning;
+  on `bf6d6cfd46` too, where the full build compiled every file of both versions. This commit changes only `port/`.
+- **MWCC-neutrality:** `check_mwcc_neutral.py --base 53767c5a2c` on `bf6d6cfd46`, every file of both versions: 3,538 of
+  3,558 file and version pairs identical to upstream's. The other 20 are ten files complete in both versions, which the
+  SHA1s prove: the nine whose recorded changes aren't token for token (`field_fade.c`, `hiden_event.c`,
+  `scrcmd_survey.c` and `event_battle_lose.c`'s `sizeof`, `fld3d_ci.c`, `field_transition.c` and `cg_help.c`'s VRAM
+  spellings, `vct.c`'s `sptr`, `pokemontrade_2d.c`'s `(uptr)` casts) and `printsys.c`, whose `uptr` local is now the
+  macro's `u32` (below). The incomplete files among the resolved ones (`dwc_match.c`, `dwc_main.c`, and the users of
+  `ssl_internal.h` and `gamestats_internal.h`) are identical, so no compiler probe applies. The amend changes only a
+  comment: `check_mwcc_neutral.py --base bf6d6cfd46` on `f99298de25` finds all 3,558 file and version pairs identical.
+- **Code standards:** clang-format 23.1.1, the version CI's Standards workflow pins (`pip install
+  clang-format==23.1.1`), on the 875 C files of `src/`, `lib/` and `include/` that the sync changes against `main`, as
+  that workflow selects them: all pass but one, `lib/nitro/include/nitro/wm.h`, whose `#include <stddef.h>` upstream's
+  `84607012af` puts before `#include "types.h"`, where clang-format wants it after. The file is upstream's byte for
+  byte. Upstream's own Standards check failed on it, on #483's head and on its merge's push, and #483 merged anyway;
+  upstream's later pushes pass because each checks only its own files. The sync's `Code standards` check will fail on
+  it. The port can't change the file: an include order is none of the three kinds of change outside `port/`
+  ([game-changes.md](game-changes.md)). `tools/decomp/check_style.py --diff e5508df96a --strict` passes. The first
+  merge's comment in `include/types.h` was 121 columns, which clang-format rejected; the amend rewraps it.
+- **Host build:** T1 passes on macOS arm64, Apple clang 21, RelWithDebInfo, both versions (`build/port-verify-b2_us`,
+  `build/port-verify-w2_us`, configured as `sync_upstream.sh` configures them), on this commit's tree.
+- **Tests:** ctest on this commit's tree: Black 2, 289 passed, 14 skipped and 1 failed of 304; White 2, 286 passed,
+  14 skipped and 1 failed of 301. The failure in both is `game_ptrcasts`, below; every replay (T3, T6) passes. Skipped
+  in both: the 11 oracle tests that need the oracle, which `sync_upstream.sh`'s configuration doesn't build,
+  `frame_times_party_menus` (the oracle's save), `asm_oracle` (no Unicorn in this Python) and `app_universal_slices`
+  (a distribution build's). T4, T5 and T7 not run.
+- **Tiers:** per version, a 39,275 functions (+1,729), b 1,742 (-1,730) and c zero; code bytes Black 2 a 3,635,610,
+  White 2 a 3,635,698 (+199,762 each), and b 214,650 in each (-199,768); 2,385 veneers left out (+1)
+  (`port/tools/progress/progress.py` and `summarize.py` on `bf6d6cfd46`, whose C is this commit's). The script's
+  `--metrics` stops after them, in `compile_check.py`, which calls `compiler_probe.lib_compiler`, gone from
+  `tools/decomp/compiler_probe.py` before `b62c655bfa`: it fails on `main` too.
+- **Trap stubs:** 30 function stubs and 21 data placeholders per version (`build/port-verify-*/gen/stubs.c`), the
+  same symbols in both: `data_ov167_021d7490`, the battle table, has C now (#497 completes
+  `src/ov167/btl_pokeparam.c`).
+- **64-bit warnings:** with PR 25's baseline (`check_ptrcasts.py --baseline`), in both versions:
+  `check_ptrcasts: 422 sites in 269 keys (real 142, harmless 102, handled 141, unreachable 37), 1682 files, 0 not
+  compiled`, the real sites as the last entry's. Without it, `game_ptrcasts` fails in both on one new key: upstream's
+  `de6cd09688` casts `GFL_NetGetUserData()`'s int to `DWCUserData *` in `NetDevWifi_Start`
+  (`src/ov011/net_devwifi.c`), where it was `void *`, the R22 truncation of the `void *` row, which then passes as no
+  longer found. Two rows pass as renamed by upstream's `fbb1cb98a4`: `func_02079994`, now `NVRAMi_AlarmHandler`, and
+  `func_ov194_021bf868`, now `PoketradeSave_StepCheckEvolution`.
+- **Work done:** the merge's 14 conflicts, each resolved on upstream's structure with the port's change reapplied, and
+  their rows of [game-changes.md](game-changes.md) updated with the proofs above:
+  - `src/system/resonance_resort_data.c`, `include/save/join_avenue.h`, `src/ov036/event_name_entry.c`: upstream names
+    the Join Avenue info's params (`JOIN_AVE_INFO_*`) and its `title` (was `name2`); the Join Avenue row's `uptr`
+    return, value and casts reapplied at the new names.
+  - `include/gfl/graphics.h`, `src/ov012/g3d_text_draw.c`: upstream types the texture as `G3DResource *`; the palette's
+    `uptr a2` reapplied.
+  - `src/ov036/field_fade.c`: upstream names two events and their callbacks; their `sizeof` reapplied.
+  - `src/ov192/pokemontrade_demo_common_irc.c`, `src/ov193/pokemontrade_demo_common.c`,
+    `src/ov193/pokemontrade_demo_middle.c`, `src/ov194/pokemontrade_2d.c`: upstream names the trade's functions; the
+    animation callbacks' `uptr` and the plane mask's casts reapplied.
+  - `lib/dwc/src/match/dwc_match.c`: upstream moves the match control and `MatchCheckFunc` into the new
+    `lib/dwc/include/dwc/match_internal.h`, shared with the front end it splits into `dwc_main.c`; the host's
+    `MatchCheckFunc` and `uptr checkParam` reapplied there.
+  - `lib/dwc/src/bm/util_wifiidtool.c`: upstream's one `s64 seed`; the `PLATFORM_PC` tick address reapplied.
+  - `lib/nitrowifi/src/ssl/ssl_internal.h`: upstream's new comment; the host's `<string.h>` branch reapplied.
+  - `lib/dwc/src/gamestats/gamestats_internal.h`: upstream's version, which includes `<string.h>` for MWCC too in place
+    of its declarations, so the host's branch is unnecessary: the file matches upstream and leaves its row.
+
+  Two native fixes in the merge, each forced by an upstream commit: `include/types.h`, where upstream's `045d829ede`
+  adds `typedef u32 uptr;` (for `printsys.c`'s renderer address), which merged without a conflict but clashed with the
+  host's `uptr` and, after the port's macro, read `typedef u32 u32;` for MWCC: the typedef is MWCC's alone
+  (`#ifndef PLATFORM_PC`) and the macro follows it; and `port/hal/os/os_init.c` and `port/hal/os/os_emulator.c`, where
+  upstream's `fbb1cb98a4` names `func_02078000` `MI_InitWramManager`, `func_0207c888` `OSi_InitPrevTitleId` and
+  `func_0207acbc` `OSi_IsRunOnTwl`, which the HAL's `OS_Init` calls and its OS replaces (the host build failed on the
+  undeclared old names). This commit fills the rows' commit with the merge; retires the row of the battle flow's
+  `BtlMonSet` (`699a2e15de`), since upstream's `de6cd09688` makes the same change and both its files match upstream's;
+  and gives the building transition's event upstream's name, `EventGameTransition_RunDefaultFadeIn` (was
+  `func_ov036_021b8e10`), in its game-changes.md row and in `port/tests/gx/test_gx.c`'s comment, the only function
+  names upstream removed that the port's code and ledger still used outside the guard's baseline. The review of the
+  prepared merge found the `types.h` comment's width and that name; the rewrap went into the merge, which wasn't
+  published, and the name into this commit. `data_ov167_021d7490`, now `btl_pokeparam.c`'s `sSemiInvulnFlags`, keeps
+  its old name in decomp-findings.md's row, ARCHITECTURE.md's battles row and sanitizers.md's survey, which say what
+  the port saw without it, until the Route 19 route runs with it. Four of upstream's merges carry a closing keyword,
+  with upstream's issue numbers 78, 120, 163 and 192, which no issue or pull request of Frigate has.
+- **Next:** PR 25 verified and merged; then `main` merged into this topic, `sync_upstream.sh --branch
+  codex/upstream-sync-manual` run again, its ctest passing in both versions, and the sync published for the owner's
+  review. Then the Route 19 route, as the last entry says, with #497's table, and the three documents above brought up
+  to date by it.
+- **Blockers:** PR 25 before the sync. Then the sync's required `Code standards` check, which fails on upstream's
+  `wm.h` until upstream formats it: waiting for upstream, or the owner's decision. #496 is still open upstream at
+  `53767c5a2c`, so `src/ov036/enceff_data.c`'s four entries are not in this sync.
+
 ## 2026-10-24: the battle's run: SPL's particles drawn again, and Hugh's battle to its end with a local candidate
 
 - **Upstream:** `b62c655bfa` (upstream merge #481), as `main` has it; this branch merges no upstream commit. Upstream's
   `main` is at `53767c5a2c` (its merge of #497, below), for the sync to propose on its own.
-- **Port:** `PORT_SHA`, on the topic branch `port-battle-run` from `main` at `1807efb68f` (PR 21's merge): the
+- **Port:** `dcdc552ae4`, on the topic branch `port-battle-run` from `main` at `1807efb68f` (PR 21's merge): the
   particles' fix (`942e275903`), the review's round on it (`4f096d8eb4`), `main` merged twice, at `2e510abc6d`
   (`c6868a5ec6`: PR 22, the field's pointer casts) and at `65eae1f0a2` (`70b1322063`: PR 23, the test launcher
   retired), and the records commits, published together as one pull request to `main`.
