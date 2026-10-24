@@ -1,19 +1,34 @@
 #!/usr/bin/env python3
-"""PreToolUse guard for port sessions: nothing the port does may write to the decomp's repositories.
+"""PreToolUse guard for port sessions: nothing the port does may write to the decomp's repositories or push Frigate's
+main.
 
-The port is a solo project (port/docs/adr/0002-solo-project-no-upstream-posts.md). A port session never writes to
-fuddlesworth/pokebw2 (upstream) or to CallanCampos/pokebw2 (the user's decomp fork): no gh write, no gh api call that
-changes something, no git push. The port's own writes never link an upstream issue or pull request, because GitHub
-shows such a link on upstream's timeline, and never @-mention upstream's people (UPSTREAM_PEOPLE), because a mention
-can notify them. Commit messages name no issue, pull request or discussion of any repository (OWNER/REPO#N or its URL),
-and a push to GitHub that would add such a commit is refused, as port/tools/sync_upstream.sh refuses it (exit 5).
-Reading upstream stays allowed.
+Frigate takes the decomp's code by sync and posts nothing upstream; it accepts outside contributions through forks and
+pull requests (port/docs/adr/0002-solo-project-no-upstream-posts.md, amended by
+port/docs/adr/0017-external-contributions.md). A port session never writes to fuddlesworth/pokebw2 (upstream) or to
+CallanCampos/pokebw2 (the user's decomp fork): no gh write, no gh api call that changes something, no git push. The
+port's own writes never link an upstream issue or pull request, because GitHub shows such a link on upstream's
+timeline, and never @-mention upstream's people (UPSTREAM_PEOPLE), because a mention can notify them. Commit messages
+name no issue, pull request or discussion of any repository (OWNER/REPO#N or its URL), and a push to GitHub that would
+add such a commit is refused, as port/tools/sync_upstream.sh refuses it (exit 5). Reading upstream stays allowed.
+
+Frigate's main changes only through reviewed pull requests (port/docs/adr/0018-protected-main-and-sync-prs.md). GitHub's
+rules refuse a push to it on the server; the guard refuses it here first. It refuses a git push to the port
+(CallanCampos/Frigate, its old name, or a URL that a url.<base>.insteadOf from git -c or an earlier git config rewrites
+to it) that would update or delete main, and works out the branches a push updates as git's builtin/push.c does
+(Guard.check_main): a destination of main, heads/main or refs/heads/main (HEAD:main, +topic:refs/heads/main, :main,
+--delete main); a refspec without a colon that is main, that is HEAD, @ or head on main, or that remote.<name>.push or
+push.default=upstream maps to main; the matching refspec :, --all, --branches, --mirror, a glob, or a destination the
+shell computes; and with no refspec, the remote's push refspecs or the branch push.default sends. It reads those
+settings from git -c, from git config earlier in the command and from the checkout, and the current branch and its
+upstream as git switch, git checkout and git branch earlier in the command leave them. Settings it can't read
+(--config-env, GIT_CONFIG_PARAMETERS, GIT_CONFIG_COUNT) and a branch it can't name (git switch -) make it refuse. A dry
+run passes.
 
 The guard reads the shell command of a Bash, Monitor or terminal panel (mcp__terminal__run_in_terminal) call and
 refuses it when the command would do one of those. It splits the command the way a shell would (quotes, operators,
 here-documents, command substitutions, bash -c, find -exec), so a grep or a message that only mentions these names
 passes. It sees the command's own text, the files it names and the commits in the repository: a script that runs gh
-or git itself is not checked. It backs up port/CLAUDE.md's rules; it doesn't replace them.
+or git itself is not checked, and neither is a git alias. It backs up port/CLAUDE.md's rules; it doesn't replace them.
 
 Claude Code passes the tool call as JSON on stdin. Exit code 2 blocks the call and shows stderr to Claude; exit code 0
 lets it through. port/tools/bootstrap_checkout.sh registers it in .claude/settings.local.json.
@@ -29,6 +44,8 @@ import sys
 import tempfile
 
 PORT = "callancampos/frigate"
+# The port under both its names: GitHub redirects the old one, so a push to either reaches Frigate's main
+PORT_NAMES = {PORT, "callancampos/pokebw2-native"}
 FORBIDDEN = {
     "fuddlesworth/pokebw2": "upstream (fuddlesworth/pokebw2)",
     "callancampos/pokebw2": "the decomp fork (CallanCampos/pokebw2)",
@@ -162,6 +179,35 @@ def parse_repo(text):
 def computed(text):
     """Whether a word's value is only known when the shell runs it."""
     return "$" in text or "`" in text
+
+
+# How a push names Frigate's main: git takes heads/X as refs/heads/X, and refuses refs/heads//main or main/
+MAIN_NAMES = {"main", "heads/main", "refs/heads/main"}
+# The current branch after an earlier part of the command switched to one the guard can't name (git switch -)
+UNKNOWN = "an unknown branch"
+
+
+def config_key(key):
+    """A git config key as git compares it: its section and variable name ignore case, a subsection doesn't."""
+    section, _, rest = key.partition(".")
+    subsection, _, variable = rest.rpartition(".")
+    return ".".join(part for part in (section.lower(), subsection, variable.lower()) if part)
+
+
+def map_refspecs(items, ref):
+    """Where the first of a remote's push refspecs that has a destination sends ref, as git's query_refspecs finds
+    it (a glob's * carries over), or None."""
+    for item in items:
+        source, colon, destination = item.lstrip("+").partition(":")
+        if not colon or not destination or source.startswith("^"):
+            continue
+        if "*" in source:
+            prefix, _, suffix = source.partition("*")
+            if len(ref) >= len(prefix) + len(suffix) and ref.startswith(prefix) and ref.endswith(suffix):
+                return destination.replace("*", ref[len(prefix) : len(ref) - len(suffix)], 1)
+        elif source == ref:
+            return destination
+    return None
 
 
 def graphql_computed(text):
@@ -405,6 +451,8 @@ class Guard:
         self.added_remotes = {}  # push URLs that git remote add, git remote set-url or git config set earlier
         self.rewrites = []  # url.<base>.pushInsteadOf settings toward a forbidden repository set earlier
         self.pending = []  # revisions that git merge, rebase, reset, checkout or pull bring in before a push
+        self.config_writes = {}  # config_key -> the values that git config, switch, checkout or branch set earlier
+        self.heads = {}  # a checkout's git directory -> the branch an earlier switch left there (None: detached)
         self.written = set()  # files that redirections, tee, cp and mv write earlier; None when one can't be told
         self.redirs, self.material = [], ""  # the current simple command's redirections and its own text
         self.problems = []
@@ -929,6 +977,8 @@ class Guard:
     def git_command(self, args, env):
         cwd = self.cwd
         configs = []
+        # Settings the guard can't read: they come from the environment, not the command's words
+        hidden = next((name for name in ("GIT_CONFIG_PARAMETERS", "GIT_CONFIG_COUNT") if name in env), "")
         i = 0
         while i < len(args) and args[i].startswith("-"):
             arg = args[i]
@@ -943,10 +993,14 @@ class Guard:
                 cwd = None
                 i += 2
             elif arg in ("--namespace", "--config-env", "--super-prefix"):
+                if arg == "--config-env":
+                    hidden = arg
                 i += 2
             else:
                 if arg.startswith(("--git-dir=", "--work-tree=")):
                     cwd = None
+                if arg.startswith("--config-env="):
+                    hidden = "--config-env"
                 i += 1
         if "GIT_DIR" in env or "GIT_WORK_TREE" in env:
             cwd = None
@@ -962,7 +1016,7 @@ class Guard:
         elif sub == "config":
             self.git_config(rest)
         elif sub == "push":
-            self.git_push(rest, cwd, configs)
+            self.git_push(rest, cwd, configs, hidden)
         elif sub in ("commit", "merge"):
             self.git_message(sub, rest, cwd)
         elif sub in ("cherry-pick", "revert") and not {"--continue", "--abort", "--skip", "--quit"} & set(rest):
@@ -977,6 +1031,10 @@ class Guard:
             positional = self.revisions(sub, rest)
             if len(positional) >= 2:
                 self.pending += [f"{positional[0]}/{b.split(':', 1)[0]}" for b in positional[1:]]
+        if sub in ("switch", "checkout"):
+            self.note_switch(sub, rest, cwd)
+        elif sub == "branch":
+            self.note_branch(rest, cwd)
 
     @staticmethod
     def revisions(sub, rest):
@@ -1029,8 +1087,11 @@ class Guard:
         self.check_message(f"`git {sub}`'s message", files, extra, any_repository=True)
 
     def git_config(self, rest):
-        """Notes git config settings of push URLs and URL rewrites for the pushes after them."""
-        if {"--get", "--get-all", "--get-regexp", "--unset", "--unset-all", "-l", "--list"} & set(rest):
+        """Notes what git config sets for the pushes after it: push URLs and URL rewrites, and every other setting,
+        for the ones that decide where a push goes (push.default, remote.<name>.push, branch.<name>.merge)."""
+        reads = {"--get", "--get-all", "--get-regexp", "--get-urlmatch", "--unset", "--unset-all", "-l", "--list",
+                 "--remove-section", "--rename-section", "-e", "--edit"}
+        if reads & set(rest):
             return
         positional = [
             a for k, a in enumerate(rest)
@@ -1039,15 +1100,120 @@ class Guard:
         ]
         if positional[:1] == ["set"]:
             positional = positional[1:]
+        elif positional[:1] and positional[0] in ("get", "list", "unset", "rename-section", "remove-section", "edit"):
+            return
         if len(positional) < 2:
             return
         key, value = positional[0], positional[1]
+        self.config_writes.setdefault(config_key(key), []).append(value)
         remote = re.fullmatch(r"(?i)remote\.(.+)\.(?:push)?url", key)
         if remote:
             self.added_remotes.setdefault(remote[1], []).insert(0, value)
         rewrite = re.fullmatch(r"(?i)url\.(.+)\.(?:push)?insteadof", key)
         if rewrite and parse_repo(rewrite[1]) in FORBIDDEN:
             self.rewrites.append(rewrite[1])
+
+    def settings(self, cwd, key, configs):
+        """Every value git reads for a config key in cwd, in git's order: the checkout's, then those that the command
+        set earlier, then git -c's. A key that holds one value takes the last."""
+        key = config_key(key)
+        found = self.git(cwd, ["config", "--get-all", key]) if cwd else None
+        values = [*(found.splitlines() if found else []), *self.config_writes.get(key, [])]
+        for config in configs:
+            name, equals, value = config.partition("=")
+            if config_key(name) == key:
+                values.append(value if equals else "true")
+        return values
+
+    def setting(self, cwd, key, configs):
+        """The value git takes for a config key that holds one, or None."""
+        values = self.settings(cwd, key, configs)
+        return values[-1] if values else None
+
+    def head_key(self, cwd):
+        """What names cwd's HEAD in self.heads: its git directory, which each worktree has its own of, or cwd."""
+        return self.git(cwd, ["rev-parse", "--absolute-git-dir"]) or cwd
+
+    def current_branch(self, cwd):
+        """The branch checked out in cwd once the command's earlier git switch, git checkout and git branch -m have
+        run: None on a detached HEAD, UNKNOWN when they left one the guard can't name."""
+        if self.heads:
+            key = self.head_key(cwd)
+            if key in self.heads:
+                return self.heads[key]
+        return self.git(cwd, ["symbolic-ref", "--quiet", "--short", "HEAD"])
+
+    def note_upstream(self, cwd, branch, start, track):
+        """Notes the upstream that git gives branch when it is made from start, or given start with -u: a
+        remote-tracking branch's (origin/main tracks origin's main), or with --track a local branch's."""
+        if not branch or branch == UNKNOWN or computed(branch) or computed(start):
+            return
+        match = re.fullmatch(r"(?:refs/)?(?:remotes/)?([^/]+)/(.+)", start)
+        if match and self.remote_urls(match[1], cwd) is not None:
+            remote, merge = match[1], f"refs/heads/{match[2]}"
+        elif track:
+            remote, merge = ".", "refs/heads/" + start.removeprefix("refs/").removeprefix("heads/")
+        else:
+            return
+        self.config_writes.setdefault(config_key(f"branch.{branch}.remote"), []).append(remote)
+        self.config_writes.setdefault(config_key(f"branch.{branch}.merge"), []).append(merge)
+
+    def note_switch(self, sub, rest, cwd):
+        """Notes the branch that git switch or git checkout leaves checked out, and the upstream of a branch it makes,
+        for a push later in the same command."""
+        if cwd is None:
+            return
+        if sub == "checkout":
+            makes = {"-b", "-B", "--orphan"}
+        else:
+            makes = {"-c", "-C", "--create", "--force-create", "--orphan"}
+        made = None
+        for k, arg in enumerate(rest):
+            if arg == "--":
+                break
+            if arg in makes and k + 1 < len(rest):
+                made = rest[k + 1]
+            elif arg.startswith(tuple(f"{o}=" for o in makes if o.startswith("--"))):
+                made = arg.split("=", 1)[1]
+        positional = self.revisions(sub, rest)
+        track = any(a in ("-t", "--track") or a.startswith("--track=") for a in rest)
+        if made is None and positional and track:
+            # --track without a name makes the remote-tracking branch's own name: origin/main makes main
+            made = re.sub(r"^(?:refs/)?(?:remotes/)?[^/]+/", "", positional[0])
+        if made is None and sub == "checkout" and ("--" in rest or len(positional) > 1):
+            return  # git checkout [TREE] -- PATHS restores files and leaves HEAD alone
+        key = self.head_key(cwd)
+        if made is None and "-" in rest:
+            self.heads[key] = UNKNOWN  # the branch checked out before
+        elif made is not None:
+            self.heads[key] = UNKNOWN if computed(made) else made
+            if positional and "--no-track" not in rest:
+                self.note_upstream(cwd, made, positional[0], track)
+        elif {"--detach", "-d"} & set(rest):
+            self.heads[key] = None
+        elif positional:
+            target = positional[0]
+            unnamed = computed(target) or target == "-" or target.startswith("@{")
+            self.heads[key] = UNKNOWN if unnamed else target.removeprefix("refs/heads/")
+
+    def note_branch(self, rest, cwd):
+        """Notes what git branch changes that a later push reads: the current branch's new name (-m, -M), and the
+        upstream that -u or --set-upstream-to sets, or that a new branch takes from its start point."""
+        if cwd is None:
+            return
+        given = ("-u", "--set-upstream-to")
+        upstream = next((rest[k + 1] for k in range(len(rest) - 1) if rest[k] in given), None)
+        upstream = next((a.split("=", 1)[1] for a in rest if a.startswith("--set-upstream-to=")), upstream)
+        positional = [a for k, a in enumerate(rest) if not a.startswith("-") and (k == 0 or rest[k - 1] not in given)]
+        options = {a for a in rest if a.startswith("-")}
+        if upstream is not None:
+            self.note_upstream(cwd, positional[0] if positional else self.current_branch(cwd), upstream, True)
+        elif options & {"-m", "-M", "--move"} and positional:
+            # git branch -m NEW renames the current branch, and so does git branch -m OLD NEW when OLD is it
+            if len(positional) == 1 or positional[0] == self.current_branch(cwd):
+                self.heads[self.head_key(cwd)] = UNKNOWN if computed(positional[-1]) else positional[-1]
+        elif len(positional) == 2 and options <= {"-t", "--track", "-f", "--force", "-q", "--quiet"}:
+            self.note_upstream(cwd, positional[0], positional[1], bool(options & {"-t", "--track"}))
 
     def remote_urls(self, name, cwd):
         """The URLs git pushes to for a remote name, with those the command set earlier, or None when it isn't a
@@ -1056,7 +1222,7 @@ class Guard:
         urls = [*self.added_remotes.get(name, []), *(out.splitlines() if out else [])]
         return urls or None
 
-    def git_push(self, args, cwd, configs):
+    def git_push(self, args, cwd, configs, hidden=""):
         remote = repo_option = None
         refspecs, flags = [], set()
         i = 0
@@ -1098,10 +1264,11 @@ class Guard:
             if cwd is None:
                 self.block("`git push` without a remote, in a directory the guard can't tell; name the remote")
                 return
-            branch = self.git(cwd, ["symbolic-ref", "--quiet", "--short", "HEAD"])
+            branch = self.current_branch(cwd)
+            branch = None if branch == UNKNOWN else branch
             keys = [f"branch.{branch}.pushRemote", "remote.pushDefault", f"branch.{branch}.remote"]
             remote = next(
-                (r for r in (self.git(cwd, ["config", "--get", k]) for k in keys if branch or "branch" not in k) if r),
+                (r for r in (self.setting(cwd, k, configs) for k in keys if branch or "branch" not in k) if r),
                 "origin",
             )
         if computed(remote):
@@ -1128,7 +1295,127 @@ class Guard:
             if repo in FORBIDDEN:
                 self.block(f"`git push {remote}`: that remote pushes to {FORBIDDEN[repo]}")
                 return
+        self.check_main(remote, urls, refspecs, flags, cwd, configs, hidden)
         self.check_pushed_commits(remote, urls, refspecs, flags, cwd)
+
+    def current_destinations(self, cwd, configs):
+        """The branches of the remote that a git push with no refspec updates from cwd, as push.default sends the
+        current branch: its own name (simple, current), its upstream branch (upstream), or every branch (matching,
+        given as "*"); none on a detached HEAD, where git refuses such a push."""
+        branch = self.current_branch(cwd)
+        if not branch or branch == UNKNOWN:
+            return [branch] if branch else []
+        mode = (self.setting(cwd, "push.default", configs) or "simple").lower()
+        if mode == "nothing":
+            return []
+        if mode == "matching":
+            return ["*"]
+        if mode in ("upstream", "tracking"):
+            merge = self.setting(cwd, f"branch.{branch}.merge", configs)
+            return [merge] if merge else []
+        return [branch]
+
+    def push_destination(self, source, remote, cwd, configs):
+        """Where git push sends a refspec without a colon (set_refspecs in git's builtin/push.c): HEAD and @ (and
+        head, which macOS's file system takes as HEAD) to the current branch; a branch through the first of the
+        remote's push refspecs that maps it, else under push.default=upstream to the branch it tracks, if it tracks
+        one; anything else to its own name."""
+        if source == "@" or source.lower() == "head":
+            return "HEAD"
+        if computed(source):
+            return source
+        if source.startswith("refs/"):
+            ref = source
+        elif source.startswith("heads/"):
+            ref = "refs/" + source
+        else:
+            ref = "refs/heads/" + source  # a tag or a remote-tracking branch named this way isn't mapped to main
+        mapped = map_refspecs(self.settings(cwd, f"remote.{remote}.push", configs), ref)
+        if mapped:
+            return mapped
+        mode = (self.setting(cwd, "push.default", configs) or "simple").lower()
+        if mode in ("upstream", "tracking") and ref.startswith("refs/heads/"):
+            branch = ref.removeprefix("refs/heads/")
+            merge = self.setting(cwd, f"branch.{branch}.merge", configs)
+            if merge and self.setting(cwd, f"branch.{branch}.remote", configs):
+                return merge
+        return ref
+
+    def pushes_to_port(self, urls, configs):
+        """Whether a push to urls reaches the port, also through a url.<base>.insteadOf or pushInsteadOf rewrite that
+        git -c or an earlier git config sets (git remote get-url has applied the checkout's own)."""
+        given = [(name, value) for name, _, value in (config.partition("=") for config in configs)]
+        written = [(name, value) for name, values in self.config_writes.items() for value in values]
+        rewrites = [
+            (match[1], prefix) for name, prefix in given + written
+            if (match := re.fullmatch(r"(?i)url\.(.+)\.(?:push)?insteadof", name)) and prefix
+        ]
+        return any(
+            parse_repo(url) in PORT_NAMES
+            or any(url.startswith(prefix) and parse_repo(base) in PORT_NAMES for base, prefix in rewrites)
+            for url in urls
+        )
+
+    def check_main(self, remote, urls, refspecs, flags, cwd, configs, hidden):
+        """Refuses a push to the port that would update or delete its main, which changes only through a reviewed pull
+        request (ADR 0018). It works out the remote branches a push updates as git does: a refspec's destination
+        (main, heads/main or refs/heads/main), where push_destination sends a refspec without a colon, every branch
+        for --all, --branches, --mirror and the matching refspec :, the names --delete deletes, the remote's push
+        refspecs (remote.<name>.push) when the command gives none, and else the current branch's destination under
+        push.default. It reads the settings from git -c, from git config earlier in the command and from the
+        checkout, and the current branch and its upstream after git switch, git checkout and git branch earlier in
+        the command."""
+        if flags & {"--dry-run", "-n"} or not self.pushes_to_port(urls, configs):
+            return
+        shown = f"`git push {remote}`"
+        rule = ("Frigate's main changes only through a reviewed pull request "
+                "(port/docs/adr/0018-protected-main-and-sync-prs.md); push a topic branch and open one")
+        if hidden:
+            self.block(f"{shown} runs with git settings the guard can't read ({hidden}), which can send it to main; "
+                       f"give them with -c. {rule}")
+            return
+        if flags & {"--all", "--branches", "--mirror"}:
+            self.block(f"{shown} with {' '.join(sorted(flags & {'--all', '--branches', '--mirror'}))} pushes every "
+                       f"branch, main among them. {rule}")
+            return
+        deleting = bool(flags & {"--delete", "-d"})
+        specs = list(refspecs)
+        if not specs and not deleting:
+            specs = self.settings(cwd, f"remote.{remote}.push", configs) or None
+        if specs is None:
+            if cwd is None:
+                self.block(f"{shown} without a refspec, in a directory the guard can't tell; name the branch")
+                return
+            destinations = [(destination, False) for destination in self.current_destinations(cwd, configs)]
+        else:
+            destinations = []  # (the remote branch, whether the push deletes it)
+            for spec in specs:
+                source, colon, destination = spec.lstrip("+").partition(":")
+                if colon and not source and not destination:
+                    self.block(f"{shown} with the matching refspec `{spec}` pushes every branch that the remote also "
+                               f"has, main among them. {rule}")
+                    return
+                if deleting:
+                    destination = source
+                elif not colon:
+                    # The remote's own push refspecs are taken as written; the command's are mapped
+                    destination = self.push_destination(source, remote, cwd, configs) if refspecs else source
+                if destination == "HEAD":
+                    if cwd is None:
+                        self.block(f"{shown} pushes HEAD in a directory the guard can't tell; name the branch")
+                        return
+                    destination = self.current_branch(cwd) or ""
+                destinations.append((destination, deleting or (bool(colon) and not source)))
+        for destination, deletes in destinations:
+            if destination == UNKNOWN:
+                self.block(f"{shown} pushes the branch that an earlier part of the command checked out, which the "
+                           f"guard can't name; push in a command of its own. {rule}")
+            elif computed(destination):
+                self.block(f"{shown} names its destination through a variable ({destination}); write it out. {rule}")
+            elif "*" in destination:
+                self.block(f"{shown} pushes to {destination}, which matches main. {rule}")
+            elif destination in MAIN_NAMES:
+                self.block(f"{shown} {'deletes' if deletes else 'updates'} main. {rule}")
 
     def resolve(self, cwd, revision):
         """The commit a revision names in cwd, or None."""
@@ -1191,12 +1478,14 @@ class Guard:
             )
 
 
-MESSAGE = """port_guard refused this command. The port is a solo project: a port session never writes to
-fuddlesworth/pokebw2 (upstream) or CallanCampos/pokebw2 (the decomp fork), and the port's writes never link
-upstream issues or pull requests or @-mention upstream's people (port/docs/adr/0002-solo-project-no-upstream-posts.md).
+MESSAGE = """port_guard refused this command. A port session never writes to fuddlesworth/pokebw2 (upstream) or
+CallanCampos/pokebw2 (the decomp fork); the port's writes never link upstream issues or pull requests or @-mention
+upstream's people (port/docs/adr/0002-solo-project-no-upstream-posts.md, amended by ADR 0017); and Frigate's main
+changes only through reviewed pull requests (port/docs/adr/0018-protected-main-and-sync-prs.md).
 {reasons}
-Port writes name the port: gh ... -R CallanCampos/Frigate, git push origin. Decomp work, claims included,
-belongs to a session the user starts in the decomp checkout. Stop and tell the user; don't route around this guard."""
+Port writes name the port: gh ... -R CallanCampos/Frigate, git push origin TOPIC-BRANCH. Decomp work, claims
+included, belongs to a session the user starts in the decomp checkout. Stop and tell the user; don't route around
+this guard."""
 
 
 def main():
@@ -1253,6 +1542,25 @@ CHECKOUTS = {
         "branch.main.remote": "origin",
         "HEAD": "main",
     },
+    # A worktree on a topic branch, and one whose branch was made from origin/main and tracks it under
+    # push.default=upstream, where a git push with no refspec goes to main
+    "/w/port-topic": {
+        "remote.origin.url": PORT_URL,
+        "remote.origin.gh-resolved": "base",
+        "branch.topic.remote": "origin",
+        "branch.topic.merge": "refs/heads/topic",
+        "HEAD": "topic",
+        "refs": {"HEAD", "topic", "main"},
+    },
+    "/w/port-tracks-main": {
+        "remote.origin.url": PORT_URL,
+        "remote.origin.gh-resolved": "base",
+        "push.default": "upstream",
+        "branch.topic.remote": "origin",
+        "branch.topic.merge": "refs/heads/main",
+        "HEAD": "topic",
+        "refs": {"HEAD", "topic", "main"},
+    },
     "/w/decomp": {
         "remote.origin.url": UPSTREAM_URL,
         "remote.fork.url": FORK_URL,
@@ -1269,7 +1577,7 @@ def fake_git(cwd, args):
     if args[:2] == ["config", "--get-regexp"]:
         pattern = re.compile(args[2])
         return "\n".join(f"{k} {v}" for k, v in config.items() if isinstance(v, str) and pattern.search(k)) or None
-    if args[:2] == ["config", "--get"]:
+    if args[:2] in (["config", "--get"], ["config", "--get-all"]):
         return config.get(args[2])
     if args[0] == "symbolic-ref":
         return config.get("HEAD")
@@ -1303,6 +1611,7 @@ def self_test():
             f.write("query { viewer { login } }\n")
         missing = os.path.join(tmp, "missing.graphql")
         port, decomp, nodefault = "/w/port", "/w/decomp", "/w/port-nodefault"
+        topic, tracks_main = "/w/port-topic", "/w/port-tracks-main"
         upstream_env = {"GH_REPO": "fuddlesworth/pokebw2"}
         heredoc_link = 'git commit -m "$(cat <<\'EOF\'\nRecord the sync\n\nRefs fuddlesworth/pokebw2#315\nEOF\n)"'
         heredoc_text = (
@@ -1395,6 +1704,54 @@ def self_test():
             (True, port, "git merge --squash upstream/main", {}),
             (True, port, "git push origin linked:main", {}),
             (True, port, "git fetch upstream && git merge upstream/main && git push origin main", {}),
+            # Frigate's main changes only through pull requests (ADR 0018): a push that updates or deletes it
+            (True, port, "git push origin HEAD:main", {}),
+            (True, port, "git push origin main 2>&1 | tail -5", {}),
+            (True, port, "git push", {}),
+            (True, port, "git push origin", {}),
+            (True, port, "git push -u origin HEAD", {}),
+            (True, topic, "git push origin HEAD:refs/heads/main", {}),
+            (True, topic, "git push --force-with-lease origin +topic:main", {}),
+            (True, topic, "git push origin --delete main", {}),
+            (True, topic, "git push origin :main", {}),
+            (True, topic, "git push --all origin", {}),
+            (True, topic, "git push --mirror origin", {}),
+            (True, topic, "git push origin 'refs/heads/*:refs/heads/*'", {}),
+            (True, topic, "git push origin \"HEAD:$TARGET\"", {}),
+            (True, topic, "git push https://github.com/CallanCampos/Frigate.git topic:main", {}),
+            (True, topic, "git push git@github.com:CallanCampos/pokebw2-native.git HEAD:main", {}),
+            (True, topic, "git -C /w/port push origin topic:main", {}),
+            (True, tracks_main, "git push", {}),
+            # Forms that reach main less directly: git's matching refspec, heads/main, @ and head for HEAD, a
+            # branch that remote.<name>.push or push.default=upstream maps to main, settings that git -c or an
+            # earlier git config gives, a checkout or rename to main earlier in the command, and URL rewrites
+            (True, topic, "git push origin :", {}),
+            (True, topic, "git push origin +:", {}),
+            (True, topic, "git push origin +topic:heads/main", {}),
+            (True, port, "git push origin @", {}),
+            (True, port, "git push origin head", {}),
+            (True, tracks_main, "git push origin topic", {}),
+            (True, tracks_main, "git push origin refs/heads/topic", {}),
+            (True, topic, "git -c push.default=matching push origin", {}),
+            (True, topic, "git -c remote.origin.push=+refs/heads/topic:refs/heads/main push origin", {}),
+            (True, topic, "git -c remote.origin.push=refs/heads/topic:refs/heads/main push origin topic", {}),
+            (True, topic, "git -c remote.origin.push='refs/heads/t*:refs/heads/mai*' push origin tn", {}),
+            (True, topic, "git -c push.default=upstream -c branch.topic.merge=refs/heads/main push origin topic", {}),
+            (True, topic, "git config push.default matching && git push origin", {}),
+            (True, topic, "git config set branch.topic.merge refs/heads/main && git -c push.default=upstream push "
+             "origin topic", {}),
+            (True, topic, "git config remote.origin.push refs/heads/topic:refs/heads/main && git push", {}),
+            (True, topic, "git switch main && git push origin HEAD", {}),
+            (True, topic, "git checkout main && git push", {}),
+            (True, topic, "git checkout --track origin/main && git push origin HEAD", {}),
+            (True, topic, "git branch -m main && git push -u origin HEAD", {}),
+            (True, topic, "git switch - && git push", {}),
+            (True, topic, "git switch -c next origin/main && git -c push.default=upstream push origin next", {}),
+            (True, topic, "git branch -u origin/main && git -c push.default=upstream push origin topic", {}),
+            (True, topic, "git -c url.https://github.com/CallanCampos/Frigate.git.pushInsteadOf=../scratch.git "
+             "push ../scratch.git HEAD:main", {}),
+            (True, topic, "GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=push.default GIT_CONFIG_VALUE_0=matching git push", {}),
+            (True, topic, "git --config-env=push.default=MODE push origin", {}),
             (False, port, "gh issue view 80 -R fuddlesworth/pokebw2 --comments", {}),
             (False, port, "gh issue list --repo fuddlesworth/pokebw2 --state open --json number,title", {}),
             (False, port, "gh pr view 345 -R fuddlesworth/pokebw2 --json files", {}),
@@ -1433,12 +1790,28 @@ def self_test():
             (False, port, "curl -s -H \"Authorization: bearer $(gh auth token)\" https://api.github.com/graphql "
              "-d '{\"query\":\"query { viewer { login } }\"}'", {}),
             (False, port, "gh api repos/CallanCampos/Frigate/issues -f body=fuddlesworth/pokebw2@462e901", {}),
-            (False, port, "git push origin HEAD:main", {}),
-            (False, port, "git push", {}),
-            (False, port, "git push origin main 2>&1 | tail -5", {}),
+            (False, port, "git push origin HEAD:port-topic", {}),
+            (False, port, "git push origin main:port-topic 2>&1 | tail -5", {}),
             (False, port, "git push origin --delete old-branch", {}),
             (False, port, "git push --dry-run origin linked:main", {}),
             (False, port, "git checkout -b new-branch && git push -u origin new-branch", {}),
+            (False, topic, "git push", {}),
+            (False, topic, "git push -u origin HEAD", {}),
+            (False, topic, "git push origin topic:refs/heads/topic", {}),
+            (False, topic, "git push ../scratch.git HEAD:main", {}),
+            (False, topic, "git push origin topic", {}),
+            (False, topic, "git push origin +topic:remotes/main", {}),
+            (False, topic, "git -c push.default=upstream push origin topic", {}),
+            (False, topic, "git -c remote.origin.push=refs/heads/other:refs/heads/main push origin topic", {}),
+            (False, tracks_main, "git push origin HEAD", {}),
+            (False, tracks_main, "git push origin @", {}),
+            (False, tracks_main, "git push origin topic:topic", {}),
+            (False, port, "git switch -c next && git push -u origin HEAD", {}),
+            (False, port, "git checkout topic && git push origin HEAD", {}),
+            (False, port, "git checkout main -- port/README.md && git switch topic && git push", {}),
+            (False, topic, "git switch main && git pull && git switch -c next && git push -u origin next", {}),
+            (False, topic, "git switch --detach origin/main && git push origin HEAD:refs/heads/next", {}),
+            (False, topic, "git config push.default current && git push", {}),
             (False, port, "git fetch upstream && git merge upstream/main", {}),
             (False, port, "git remote set-url --push upstream DISABLED-port-never-pushes-upstream", {}),
             (False, port, "git log --oneline upstream/main | head -5", {}),

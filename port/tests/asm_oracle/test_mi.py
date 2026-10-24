@@ -333,20 +333,22 @@ def test_swap_word():
 
 
 def test_cpu_fill8():
+    """MI_CpuFill8 takes its fill value as a u8 (lib/nitro/include/nitro/mi.h), so the cases give it bytes, with the
+    high bit set and clear, where the word fills below take any word."""
     total = 0
 
     def generate(rng):
         size = size_for(rng)
-        return Case({"dst": rng.randbytes(size + 16)}, [Ptr("dst", rng.randrange(8)), value_for(rng), size])
+        return Case({"dst": rng.randbytes(size + 16)}, [Ptr("dst", rng.randrange(8)), rng.randrange(256), size])
 
     cases = []
     rng = random.Random("every fill8")
     for size in range(73):
         for dst in range(8):
-            for value in (0x5A, 0x1234ABCD):
+            for value in (0x5A, 0xCD):
                 cases.append(Case({"dst": rng.randbytes(size + 16)}, [Ptr("dst", dst), value, size]))
-    total += run("MI_CpuFill8", "void(ptr, u32, u32)", generate, count=4000)
-    total += run_all("MI_CpuFill8", "void(ptr, u32, u32)", cases)
+    total += run("MI_CpuFill8", "void(ptr, u8, u32)", generate, count=4000)
+    total += run_all("MI_CpuFill8", "void(ptr, u8, u32)", cases)
     return f"{total} cases"
 
 

@@ -6,8 +6,8 @@ casts, 64-to-32 shortening, alignment, library redeclarations and the rest), the
     table.py WORKDIR PASS...
 
 Reads WORKDIR/<pass>/diags.tsv and status.tsv (probe.py's). run_all.sh puts the table for i386, arm64, x86-64 Windows
-and the arm64 pass with the MWCC shim in metrics.txt: the game's count is the port's 64-bit warning metric, which must
-only go down (port/docs/research/compile-probe.md, "Host compile").
+and the arm64 pass with the MWCC shim in metrics.txt (port/docs/research/compile-probe.md, "Host compile"). The port's
+64-bit metric is no longer this count but the pointer cast guard's (port/tools/check_ptrcasts.py --report).
 """
 import sys, collections, pathlib
 w = pathlib.Path(sys.argv[1]); runs = sys.argv[2:]

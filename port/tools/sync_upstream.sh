@@ -231,10 +231,12 @@ host_result="not run"
 tests_result="not run"
 push_result="not pushed"
 metrics_result="not measured (run with --metrics)"
+ptrcasts_result="not measured"
 if [ "$build" = 0 ]; then
     rom_result="not run (--no-build)"
     host_result="not run (--no-build)"
     tests_result="not run (--no-build)"
+    ptrcasts_result="not measured (--no-build)"
 fi
 if [ "$build" = 0 ]; then
     push_result="not pushed (--no-build)"
@@ -258,7 +260,7 @@ summary() {
     esac
     upstream_now=$(git rev-parse --short=9 "$upstream_ref" 2>/dev/null || echo unknown)
     pr=$(git log -1 --format=%s "$upstream_ref" 2>/dev/null | sed -n 's/^Merge pull request #\([0-9]*\) .*/\1/p')
-    printf '\n---- for port/docs/STATUS.md; add Tiers, Trap stubs, 64-bit warnings, Work done, Next, Blockers ----\n'
+    printf '\n---- for port/docs/STATUS.md; add Tiers, Trap stubs, Work done, Next, Blockers ----\n'
     printf '## %s: upstream sync\n\n' "$sync_date"
     printf -- '- **Upstream:** `%s`' "$upstream_now"
     if [ -n "$pr" ]; then
@@ -274,6 +276,7 @@ summary() {
     printf -- '- **Host build:** %s\n' "$host_result"
     printf -- '- **Tests:** T0 as above; ctest: %s\n' "$tests_result"
     printf -- '- **Tiers:** %s\n' "$metrics_result"
+    printf -- '- **64-bit warnings:** the pointer cast guard: %s\n' "$ptrcasts_result"
     if [ -n "$workflow_changes" ]; then
         printf -- '- **Upstream workflows changed:** %s. Once pushed, check `gh workflow list --all -R %s`:' \
             "$workflow_changes" "$PORT_REPO"
@@ -512,7 +515,7 @@ rom_build() {
 
 host_built=""
 host_build() {
-    local version directory
+    local version directory report
     [ -f port/CMakeLists.txt ] || die 1 "host verification requires port/CMakeLists.txt"
     command -v cmake >/dev/null 2>&1 || die 1 "cmake is not installed"
     host_result="FAILED"
@@ -529,6 +532,14 @@ host_build() {
     done
     host_result="built b2_us and w2_us (build/port-verify-*)"
     tests_result="passed for b2_us and w2_us"
+    # T1's 64-bit measurement: the pointer cast guard's sites by class, which ctest's game_ptrcasts has just held to
+    # the baseline in both versions; both give the same findings, so Black 2's line is the one STATUS.md records
+    if report=$("$PYTHON" port/tools/check_ptrcasts.py --build-dir build/port-verify-b2_us --report 2>&1); then
+        ptrcasts_result=$(printf '%s\n' "$report" | tail -n 1)
+    else
+        ptrcasts_result="not measured: $(printf '%s\n' "$report" | tail -n 1)"
+    fi
+    say "Pointer cast guard (T1): $ptrcasts_result"
     host_built=$(git rev-parse 'HEAD^{tree}')
 }
 

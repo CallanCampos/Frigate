@@ -198,6 +198,12 @@ The decisions behind them are architecture decision records ([adr/](adr/README.m
   to the same bytes under MWCC, a hook macro that compiles away, a rare `#ifdef PLATFORM_PC` block), each proven
   neutral for the ROM build and listed in [game-changes.md](game-changes.md). Both ROMs still build byte for byte from
   this tree. Decomp files are never copied into `port/` ([ADR 0001](adr/0001-repository-and-upstream-sync.md)).
+- **Upstream and every other change reach `main` through reviewed pull requests**
+  ([ADR 0018](adr/0018-protected-main-and-sync-prs.md)). [upstream_sync.py](../tools/upstream_sync.py) proposes one
+  bounded upstream merge at a time that keeps its history, [sync_upstream.sh](../tools/sync_upstream.sh)
+  `--verify-pr` builds both ROMs and tests the host on a pull request's exact head, and the rulesets
+  ([../tools/main-ruleset.json](../tools/main-ruleset.json), [REPOSITORY-POLICY.md](REPOSITORY-POLICY.md)) keep
+  `main` to that path ([SYNC.md](SYNC.md)).
 - **Native means compiled from the C.** No ARM code from the ROM runs, and there is no CPU emulator. A function with
   no C yet is a trap stub that stops the game with its name; the C comes from the decomp, never from a stand-in in
   `port/`. The ROM is the player's, read at run time; nothing from it is committed (PLAN.md §1).
@@ -211,6 +217,11 @@ The decisions behind them are architecture decision records ([adr/](adr/README.m
 - **DS addresses go through the header translation** ([ADR 0004](adr/0004-ds-addresses-by-header-translation.md)):
   the build rewrites the SDK headers' fixed addresses into host memory windows, and the registers whose accesses act
   into accessor calls.
+- **An address keeps its width**: a value that carries one through an integer is a `uptr` or `sptr`, `u32` and `s32`
+  for MWCC ([PLAN.md §4.8](PLAN.md#48-64-bit-and-dual-target-rules)), and the pointer cast guard, a test in every
+  build, fails on a cast that would cut one that its baseline doesn't list
+  ([ADR 0019](adr/0019-pointer-cast-guard-against-a-classified-baseline.md),
+  [SYNC.md](SYNC.md#when-the-pointer-cast-guard-fails)).
 - **The ARM7 is replaced at the PXI protocol**, so the ARM9's libraries talk to it as to the DS's
   ([ADR 0005](adr/0005-platform-boundary-as-built.md)), and the sound driver is C written from the ARM7's code
   ([ADR 0006](adr/0006-sound-driver-as-built.md)).
@@ -222,7 +233,8 @@ The decisions behind them are architecture decision records ([adr/](adr/README.m
   draw only the bands of its frame, which make the same picture however many draw it
   ([ADR 0016](adr/0016-3d-frame-in-bands-on-worker-threads.md)).
 - **Plain-C interfaces**: `port/gfx`, `port/audio` and `port/app` never include the decomp's headers, except Frigate's
-  test launcher (`port/app/launcher.c`, the `port_launcher` library), which is test-only and goes when overlay 36 has C
+  test launcher (`port/app/launcher.c`, the `port_launcher` library), which is test-only, steps aside now that
+  overlay 36's field has C, and goes at its retirement
   ([ADR 0012](adr/0012-test-launcher-for-the-field-menus-apps.md)); a platform-layer header they use says
   "Plain C types only".
 - **The controls**: gamepads by position, one pad at a time
@@ -237,12 +249,14 @@ The decisions behind them are architecture decision records ([adr/](adr/README.m
 
 Each part of the game, the decomp's code that implements it, the port's code that serves it, and the tests that cover
 it. "Whole program" tests are the replays and oracle sequences, which run the game itself
-([../tests/README.md](../tests/README.md)). The field engine's C is in, `FIELDMAP_PROC_FUNCS` with it, and the field
-opens: the root heaps the game creates in its own memory get host memory
-([ADR 0021](adr/0021-root-heaps-in-the-games-own-memory-from-host-memory.md)), MSL's division has its routine
-([../hal/msl](../hal/msl/fp_fastI.c)), and upstream's `b62c655bfa` types `Field.colorPostFX` for the host. CONTINUE
-and New Game go into the field and the house, frame for frame against melonDS. The test launcher steps aside
-automatically, so its earlier app comparisons do not establish current field or app coverage.
+([../tests/README.md](../tests/README.md)).
+
+The field engine's C is in, `FIELDMAP_PROC_FUNCS` with it, and the field opens: the root heaps the game creates in its
+own memory get host memory ([ADR 0021](adr/0021-root-heaps-in-the-games-own-memory-from-host-memory.md)), MSL's
+division has its routine ([../hal/msl](../hal/msl/fp_fastI.c)), and upstream's `b62c655bfa` types `Field.colorPostFX`
+for the host. CONTINUE and New Game go into the field and the house, frame for frame against melonDS. The test
+launcher steps aside now that the field has C, so its earlier comparisons of the field menu's apps don't show where
+the field or the apps stand today.
 
 | Feature | Game code (decomp) | Port modules | Tests | Where it stands |
 | --- | --- | --- | --- | --- |
@@ -274,6 +288,7 @@ automatically, so its earlier app comparisons do not establish current field or 
 | **MSL case-blind comparisons** | `lib/msl/src/extras_string.c`, `file_io.c`; GameSpy server browser | [hal/stubs/extras_string.c](../hal/stubs/extras_string.c) (ASCII folding and MSL comparison results) | `hal_wstring` | Preserves the C locale, high bytes, and signed comparison bounds on every host |
 | **DS wide strings** | `lib/msl/src/wstring.c`, DWC authentication and profanity requests | [include/wchar.h](../include/wchar.h) (only supported 16-bit APIs), [hal/stubs/wstring_host.c](../hal/stubs/wstring_host.c) (the original MSL implementation with private names from `port_host.h`) | `hal_wstring` | Scans and copies DS code units without entering the host wide-character ABI |
 | **DS Protect, DSi features** | `lib/dsprot`; `src/system/dsi.c`, `lib/twl` | [hal/stubs/dsprot.c](../hal/stubs/dsprot.c) (a genuine cartridge), [hal/os/os_emulator.c](../hal/os/os_emulator.c) (`OS_IsRunOnTwl` is FALSE) | `os_console`, whole program | Every DSi path is skipped, as on a DS |
+| **Addresses on a 64-bit host** (the pointer cast guard) | `include/types.h` (`uptr`, `sptr`), the APIs, fields and casts that carry an address in an integer, retyped `uptr` (the Neutral rows of [game-changes.md](game-changes.md)); the rest are the `real` rows of the guard's baseline | [tools/check_ptrcasts.py](../tools/check_ptrcasts.py) and its baseline, [tools/ptrcast_baseline.tsv](../tools/ptrcast_baseline.tsv) ([ADR 0019](adr/0019-pointer-cast-guard-against-a-classified-baseline.md), [SYNC.md](SYNC.md#when-the-pointer-cast-guard-fails)); [cmake/game.cmake](../cmake/game.cmake) | `game_ptrcasts`, `game_ptrcasts_tool` (label `static`); CI's macOS and Linux host and sanitized jobs | Every cast the guard finds is classed in the baseline: 431 sites, 152 of them real truncations in the field (R02, R04, R05), battle (R06), the menus and apps (R09, R11, R14–R17) and wireless (R21–R24), which later PRs fix |
 | **Frame times** (how fast the frames are made) | — | [hal/os/frame_time.c](../hal/os/frame_time.c) (`--frame-times`: each frame's host time and parts, timed in [gfx/screens.c](../gfx/screens.c), [gfx/ge/ge_hal.c](../gfx/ge/ge_hal.c), [hal/pxi/arm7.c](../hal/pxi/arm7.c), [hal/os/core.c](../hal/os/core.c) and [app/main.c](../app/main.c)), [hal/host](../hal/host/host.h) (the clock), [tools/frame_times.py](../tools/frame_times.py) (scenes, each frame the least of several runs; the budget's check) | `frame_times_tool`; `frame_times_title`, `frame_times_new_game` (Black 2), `frame_times_party_menus` (label `timing`, each scene's 95th percentile within `PORT_FRAME_TIME_BUDGET_MS`, half a frame) | Every route's 95th percentile within 2.1 ms on an M2, an eighth of the DS's frame (4.7 ms before the hot paths' work of 2026-10-19), both versions; the program's start 0.25 s ([Where a frame's time goes](#where-a-frames-time-goes)) |
 | **Program options and messages** | — | [app/main.c](../app/main.c) (the options, `sOptions`, and the exit statuses, both in `--help`), [hal/os/app_options.c](../hal/os/app_options.c) (`port_app_option`), each module's reader; [app/message_log.c](../app/message_log.c) (the macOS app's log) | `integrate_unknown_option`, `integrate_launch_bad_option`, `app_about` (`--help` names Frigate as the build does and describes every option), `app_message_log` | No settings file yet; messages start with `port:` |
 | **The sanitized build** (T5) | `src/system/gf_font.c`, `src/system/printsys.c`, `src/gfl/arc_util.c`'s dynamic load (the game's three memory bugs it found, fixed under `PLATFORM_PC`), `src/system/scroll_bar.c` (a division by a list's zero `max`, given the DS's result under `PLATFORM_PC`), `src/gfl/arc_util.c`'s static load (the copyright screen's read past a heap block, which the title screen shows, kept as the DS's and let through) | `PORT_SANITIZE` ([../CMakeLists.txt](../CMakeLists.txt)), [cmake/sanitizer_ignorelist.txt](../cmake/sanitizer_ignorelist.txt) (the checks left out, and why), [hal/os/sanitizers.c](../hal/os/sanitizers.c) (UBSan's reports with stacks that follow the fibers), [hal/os/fiber.c](../hal/os/fiber.c) (the switches, fake stacks, LeakSanitizer's roots), [hal/nnsys/fnd_hooks.c](../hal/nnsys/fnd_hooks.c) (the game's heaps poisoned block by block, and the DS's one read past a block let through, once it is checked to stay in the game's heaps or the main arena), [hal/trap.c](../hal/trap.c) (the placeholders readable at exit, through [hal/host](../hal/host/host.h)), [tests/app/check_exit.py](../tests/app/check_exit.py) (a report fails a run whatever ending it wants; no test has `WILL_FAIL`), [tools/package_macos.sh](../tools/package_macos.sh) (no disk image of a sanitized build's app, which carries the runtime) | Every test in `build/port-san`; the routes are `ctest -L route`; `nnsys_ds_reads`, `nnsys_ds_read_outside`, `app_check_exit`, `app_package_macos_out`; CI's `sanitize` job (macOS and Linux) | Every route clean in both versions, the test launcher's Pokédex and White 2's routes from its starter save included; the distribution build's options build sanitized too, for testing, never packaged ([sanitizers.md](sanitizers.md)) |
@@ -288,10 +303,3 @@ The planned parts ([PLAN.md §4.3](PLAN.md#43-directory-structure)) have no dire
 ## Glossary
 
 The DS's hardware, Nintendo's libraries and Frigate's own terms, from ARM7 to VBlank: [GLOSSARY.md](GLOSSARY.md).
-
-## Contribution and upstream validation
-
-The source ownership boundaries above are maintained by [reviewed sync PRs](SYNC.md).
-[upstream_sync.py](../tools/upstream_sync.py) publishes bounded history-preserving proposals;
-[sync_upstream.sh](../tools/sync_upstream.sh) verifies ROMs and native tests on the exact proposed head.
-[The ruleset payloads](../tools/main-ruleset.json) and [review policy](REPOSITORY-POLICY.md) protect main.

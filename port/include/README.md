@@ -1,8 +1,10 @@
 # port/include/
 
-What every decomp C file needs to compile for a host. The host build force-includes the header here into each file of
+What the decomp's C files need to compile for a host. The host build force-includes `port_host.h` into each file of
 `src/` and `lib/` (`-include`, in `port_decomp_env` in [../CMakeLists.txt](../CMakeLists.txt)), so the decomp's files
-stay as upstream wrote them.
+stay as upstream wrote them. The same target puts this directory on the include path ahead of the C library, where
+`wchar.h` stands in for the C library's and MSL's, and where the few decomp files that need `port_wcm.h` find it under
+`PLATFORM_PC`.
 
 | File | What it does | Game functionality that depends on it | Tests |
 | --- | --- | --- | --- |
