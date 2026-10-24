@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 """Compile a C file with several CodeWarrior versions and compare each function against the original game code.
 
-Relocated bytes (calls and pointers) are ignored, since the probe objects are not linked.
+Relocated bytes (calls and pointers) are ignored, since the probe objects are not linked. For a file in
+config/deadstrip.toml, each object goes through the build's dead-strip first, so the functions the original link
+dropped, which the ROM has nothing to compare with, are left out with what only they used.
 """
 import argparse
 import difflib
@@ -22,6 +24,7 @@ ROOT = Path(__file__).resolve().parents[2]
 TOOLS = ROOT / "tools"
 sys.path.insert(0, str(ROOT))
 from configure import ENCODING_FLAG, INCLUDE_DIRS, source_compiler, mwcc_command  # noqa: E402
+from tools.build.deadstrip import DeadStripError, dead_symbols, strip  # noqa: E402
 
 # Preprocessor defines of each game version, as in configure.py
 VERSION_DEFINES = {"b2_us": ["BLACK2"], "w2_us": ["WHITE2"]}
@@ -239,6 +242,8 @@ def main():
     if args.flags is None:
         args.flags = flags
     functions = set(args.functions.split(",")) if args.functions else None
+    # The ROM has none of the code the original link dead-stripped
+    dead = dead_symbols(args.source)
 
     if args.opt:
         args.flags = args.flags.replace("-O4,p", args.opt)
@@ -267,16 +272,27 @@ def main():
                 print(f"{compiler}: compile failed\n{proc.stdout}{proc.stderr}", file=sys.stderr)
                 failed.append(compiler)
                 for name in defined_functions(args.source):
-                    if functions is None or name in functions:
+                    if name not in dead and (functions is None or name in functions):
                         results.setdefault(name, {})[compiler] = "no compile"
                 continue
+            gone = set(dead)
+            if dead:
+                # Compare what the link takes, without the dead code and what only it used
+                try:
+                    stripped = strip(obj.read_bytes(), dead)
+                except DeadStripError as error:
+                    print(f"{compiler}: dead-strip failed: {error}", file=sys.stderr)
+                    failed.append(compiler)
+                else:
+                    obj.write_bytes(stripped.data)
+                    gone |= stripped.symbols
             compiled = compiled_functions(obj)
             # MWCC drops a static function that nothing references, which would otherwise pass unnoticed
             for name in defined_functions(args.source):
-                if name not in compiled and (functions is None or name in functions):
+                if name not in compiled and name not in gone and (functions is None or name in functions):
                     results.setdefault(name, {})[compiler] = "not emitted"
             for name, (data, masked) in compiled.items():
-                if functions is not None and name not in functions:
+                if (functions is not None and name not in functions) or name in gone:
                     continue
                 try:
                     original = find_function(args.version, name, modules, args.source)
@@ -308,6 +324,9 @@ def main():
                         mark = " " if a.split(":", 1)[-1] == b.split(":", 1)[-1] else "*"
                         print(f"{mark} {a:45s} | {b}")
 
+    if dead:
+        print(f"left out the {len(dead)} dead-stripped symbol{'s' * (len(dead) != 1)} config/deadstrip.toml lists "
+              "for the file, and what only they use", file=sys.stderr)
     width = max((len(n) for n in results), default=8)
     print(f"{'function':{width}s}  " + "  ".join(f"{c:>12s}" for c in compilers))
     for name, row in results.items():
