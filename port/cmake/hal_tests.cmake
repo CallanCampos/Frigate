@@ -1,7 +1,7 @@
 # Tests of the platform layer's host versions of the SDK's asm functions (port/hal/mi, fx, math, crypto), of MSL's
 # runtime division (port/hal/msl), of the heaps' host sizes and the root heaps' host memory (port/hal/gfl/heap_policy.c),
-# of the random seeds an input file gives the game (port/hal/gfl/random_seed.c), of DWC's wide strings (port/hal/stubs)
-# and of the card's SPI bus (port/hal/card/card_spi.c):
+# of the random seeds an input file gives the game (port/hal/gfl/random_seed.c), of DWC's wide strings (port/hal/stubs),
+# of GameSpy's absent bucket-set functions (port/hal/stubs/gbucket.c), and of the card's SPI bus (port/hal/card/card_spi.c):
 # - C unit tests with known vectors, which need no ROM and run everywhere, CI included;
 # - the differential tests of port/tests/asm_oracle, which run the ROM's own machine code in a test-only CPU emulator
 #   and compare. They need the extracted ROM, build/port-venv and a build directory made with the Ninja generator,
@@ -71,3 +71,14 @@ add_executable(test_hal_wstring tests/hal/test_wstring.c hal/stubs/wstring_host.
 target_link_libraries(test_hal_wstring PRIVATE port_decomp_env)
 target_compile_options(test_hal_wstring PRIVATE -UNDEBUG)
 add_test(NAME hal_wstring COMMAND test_hal_wstring)
+
+# The GameSpy functions that gstats.c references but the ROM does not contain: each stops even on a NULL argument.
+add_executable(test_hal_gbucket tests/hal/test_gbucket.c hal/stubs/gbucket.c)
+target_link_libraries(test_hal_gbucket PRIVATE port_decomp_env)
+target_include_directories(test_hal_gbucket PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
+target_compile_options(test_hal_gbucket PRIVATE -Wall -Wextra -Werror)
+foreach(function IN ITEMS NewBucketSet FreeBucketSet DumpBucketSet)
+    add_test(NAME hal_gbucket_${function}
+        COMMAND "${PORT_PYTHON}" "${CMAKE_CURRENT_SOURCE_DIR}/tests/hal/check_gbucket.py"
+            "$<TARGET_FILE:test_hal_gbucket>" "${function}")
+endforeach()

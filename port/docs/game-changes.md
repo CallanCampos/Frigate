@@ -5,6 +5,12 @@ Every change the port makes outside `port/`, other than its own new files under 
 [§4.8](PLAN.md#48-64-bit-and-dual-target-rules)), so this list should stay short, and every row is something an
 upstream merge can conflict with. A change outside `port/` without a row here is a mistake.
 
+The sync of `be2c125a700c` also exposes three GameSpy SDK references in `lib/dwc/src/gstats/gstats.c` whose
+implementations are absent from the ROM, as `lib/dwc/include/dwc/gbucket.h` documents. This needs no source change
+outside `port/`: [../hal/stubs/gbucket.c](../hal/stubs/gbucket.c) makes `NewBucketSet`, `FreeBucketSet` and
+`DumpBucketSet` unconditional named traps ("not in ROM", exit 70), including a NULL free. It supplies no substitute
+bucket behavior or invented DS address; the host link failure is resolved without excluding the imported C.
+
 ## The three allowed kinds
 
 1. **Neutral:** a portability fix that compiles to the same bytes under MWCC, such as `uptr` for a value that carries
