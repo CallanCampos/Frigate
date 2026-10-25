@@ -108,6 +108,8 @@ lib/nitrowifi/src/wcm/wcm.c	WCM_NotifyResult	int-to-ptr	void * <- u32	1	real	R23
 lib/nitrowifi/src/wcm/wcm.c	WCM_NotifyResult	ptr-to-int	s32 <- void *	1	real	R23: Wi-Fi libraries: socket and HTTP handles as int, work carved through u32, WCM notices (phase 7)
 lib/nitrowifi/src/wcm/wcm.c	WcmWmcbScanEx	ptr-to-int	s32 <- WMBssDesc *	1	real	R23: Wi-Fi libraries: socket and HTTP handles as int, work carved through u32, WCM notices (phase 7)
 lib/nitrowifi/src/wcm/wcm_dsi.c	func_0276a3d4	ptr-to-int	s32 <- NWMBssDesc *	1	unreachable	the DSi's wireless (WCM's mode 2, through NWM): the host runs as a retail DS (OS_IsRunOnTwl is FALSE)
+lib/nitrowifi/src/wcm/wcm_system.c	WCMi_Notify	int-to-ptr	void * <- u32	1	real	R23: Wi-Fi libraries: socket and HTTP handles as int, work carved through u32, WCM notices (phase 7)
+lib/nitrowifi/src/wcm/wcm_system.c	WCMi_Notify	ptr-to-int	s32 <- void *	1	real	R23: Wi-Fi libraries: socket and HTTP handles as int, work carved through u32, WCM notices (phase 7)
 lib/nnsys/include/nnsys/fnd.h	NNS_FndGetMemBlockSizeForUnitHeap	ptr-to-int	u32 <- NNSFndHeapHandle	1	unreachable	the unit-heap allocator: nothing calls NNS_FndInitAllocatorForUnitHeap
 lib/nnsys/src/fnd/allocator.c	AllocatorAllocForSDKHeap	ptr-to-int	int <- void *	1	harmless	an int carried in a void * and back (the OS heap's handle)
 lib/nnsys/src/fnd/allocator.c	AllocatorFreeForSDKHeap	ptr-to-int	int <- void *	1	harmless	an int carried in a void * and back (the OS heap's handle)
@@ -172,6 +174,7 @@ lib/twl/src/dsp/dsp_pipe.c	func_027067b4	int-to-ptr	void * <- u32	1	unreachable	
 lib/twl/src/dsp/dsp_pipe.c	func_02706b60	int-to-ptr	OSMessage <- int	1	unreachable	TWL-only code: the host runs as a retail DS (OS_IsRunOnTwl is FALSE)
 lib/twl/src/dsp/dsp_process.c	DSPi_GetWramAddress	int-to-ptr	u8 * <- u32	1	unreachable	TWL-only code: the host runs as a retail DS (OS_IsRunOnTwl is FALSE)
 lib/twl/src/dsp/dsp_process.c	func_02705acc	int-to-ptr	void * <- u32	2	unreachable	TWL-only code: the host runs as a retail DS (OS_IsRunOnTwl is FALSE)
+lib/twl/src/dsp/dsp_util.c	DSPi_PlaySoundEx	ptr-to-int	u32 <- const void *	1	unreachable	TWL-only code: the host runs as a retail DS (OS_IsRunOnTwl is FALSE)
 lib/twl/src/fatfs/fatfs_api.c	func_027040b4	ptr-to-int	u32 <- FatfsRequest *	1	unreachable	TWL-only code: the host runs as a retail DS (OS_IsRunOnTwl is FALSE)
 lib/twl/src/mi/mi_ndma.c	MIi_NDmaAsync_withConfig_Dev	ptr-to-int	u32 <- const void *	1	unreachable	TWL-only code: the host runs as a retail DS (OS_IsRunOnTwl is FALSE)
 lib/twl/src/mi/mi_ndma.c	MIi_NDmaAsync_withConfig_Dev	ptr-to-int	u32 <- void *	1	unreachable	TWL-only code: the host runs as a retail DS (OS_IsRunOnTwl is FALSE)
