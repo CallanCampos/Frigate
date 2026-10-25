@@ -76,3 +76,24 @@ or completed owner review. Owner-authored local PRs request no self-review. File
 controls and backticks before entering Markdown code spans, so a filename cannot expose a cross-repository reference.
 The App's permission uncertainty above is still unverified: denied publication stays a visible failure and needs local
 resolution, never expanded automatic credentials.
+
+## Branch-publication probe (2026-10-25)
+
+The original permission caveat above records what was unknown when this decision was written. On 2026-10-25,
+[run 40233990444](https://github.com/CallanCampos/Frigate/actions/runs/40233990444), from the temporary workflow
+[83a3b6fc1843b668f4a836a52cfcc74867292120](https://github.com/CallanCampos/Frigate/commit/83a3b6fc1843b668f4a836a52cfcc74867292120),
+proved branch publication for the tested tree with the existing sync App (ID 5435198), its token restricted to
+Frigate with Contents and Pull requests write, without Workflows permission. It fetched frozen upstream
+`3af718cd9e775e46034ed0e7b8d056f1a9f99d28`, made the novel test-only commit
+`a8affefe59b50c3341777fac7246610a182bc449` with that commit as parent and exactly its tree, and pushed it to the
+previously absent `codex/app-permission-probe-40233990444-1`. The workflow checked tree/parent identity without
+checking out or executing incoming code. A novel commit avoided relying solely on acceptance of an existing object.
+
+The exact-target leased deletion succeeded, the always cleanup confirmed absence, and an independent ref query
+returned 404. The token action logged its revocation. The temporary workflow source branch was subsequently removed
+by the maintainer; no PR was created and neither test commit nor workflow is intended for main.
+
+This resolves the branch-publication uncertainty for that specific live test, not for every future GitHub policy or
+upstream tree. Actual conflicting draft-PR creation and promotion after local resolution have not been trialed live;
+fixtures cover their local orchestration. A future denied publication still fails visibly for local inspection,
+without expanding App permissions.

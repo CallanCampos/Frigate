@@ -184,8 +184,14 @@ STATUS.md entry its `PORT_SHA` filled in, as [STATUS.md](STATUS.md#how-to-add-an
   Before merging, the script checks that origin's branch of that name is in what its push will carry. When upstream
   rewrote the draft's commits, or the branch moved, it stops with exit 4 and merges nothing: close the draft, then
   resolve the next one the hourly sync opens (`gh workflow run port-sync.yml -R CallanCampos/Frigate` starts it now).
-  Should GitHub refuse the App's push of upstream's head, the run fails with the conflicting files in its error, and
-  the same local commands resolve it on a branch of any `codex/upstream-sync-` name.
+  On 2026-10-25, [probe run 40233990444](https://github.com/CallanCampos/Frigate/actions/runs/40233990444)
+  proved publication of a novel test commit whose tree exactly matched frozen upstream `3af718cd9e77`, with the
+  existing narrow sync App and no Workflows permission. Its unique ref was deleted and the token revoked; the full
+  evidence and limits are in [ADR 0024's dated amendment](adr/0024-a-conflicting-sync-proposes-a-draft-of-upstreams-head.md#branch-publication-probe-2026-10-25).
+  Actual conflicting draft-PR creation and promotion have not been trialed live. This branch-only test does not promise
+  acceptance of every future tree or policy: should GitHub refuse a later push, the run fails with the conflicting
+  files in its error, and the same local commands resolve it on a branch of any `codex/upstream-sync-` name. Do not
+  expand the App's permissions to bypass that failure.
 - **Merge conflict (local exit 3):** inspect every conflict. Use upstream's new structure, then reapply the port's
   documented adaptation from game-changes.md at its new location, or document why upstream makes it unnecessary.
   Stage only resolved files, commit the merge with `git commit --no-edit --cleanup=strip`, then rerun the local

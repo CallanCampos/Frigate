@@ -56,11 +56,17 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
   retryable without a push or pending-head update, preserving existing reviews and the local owner's self-review
   exception. This addresses run 40190195544, which created PR 37 before its GraphQL review request failed. Conflict
   filenames escape controls and backticks so blank lines cannot break Markdown protection. No App scope or rule changed;
-  publication permission uncertainty remains a visible failure requiring local inspection.
+  [Live probe 40233990444](https://github.com/CallanCampos/Frigate/actions/runs/40233990444), from temporary workflow
+  `83a3b6fc1843b668f4a836a52cfcc74867292120`, proved branch publication with the existing narrow sync App, without
+  Workflows permission: novel test-only commit `a8affefe59b50c3341777fac7246610a182bc449` had frozen upstream
+  `3af718cd9e775e46034ed0e7b8d056f1a9f99d28` as parent and exactly its tree. The unique probe ref was deleted with
+  an exact-target lease, independent absence confirmed, and token revocation logged; the maintainer removed the
+  temporary workflow source branch too. No PR was created. ADR 0024 preserves its original historical caveat and adds
+  the dated proof and limits; future denied publication still requires local inspection.
 - **Next:** exact-head ROM and native verification, required hosted checks, and review before PR 33 is merged; then
   the existing earliest unmet phase criterion recorded in main's entries below.
-- **Blockers:** full validation pending, not a new game-source blocker. No claim is made that GitHub has accepted the
-  App's raw-upstream conflict draft push in a real conflict.
+- **Blockers:** full validation pending, not a new game-source blocker. Branch publication was proved for the tested
+  tree only; actual conflicting draft-PR creation and promotion after resolution have not been trialed live.
 
 ## 2026-10-25: upstream sync `c127efd9fa` proposed as PR 35: three conflicts, three native fixes, PR 34's rows
 
