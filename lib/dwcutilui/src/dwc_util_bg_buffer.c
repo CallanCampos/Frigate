@@ -6,9 +6,9 @@
 #include "nitro/os.h"
 #include "task.h"
 
-static void DWCUtilBgBuffer_UploadTask(DWCUtilTask *task, void *arg);
-static void DWCUtilBgBuffer_LoadPaletteRowTask(DWCUtilTask *task, void *arg);
-static void DWCUtilBgBuffer_LoadPaletteTask(DWCUtilTask *task, void *arg);
+static void taskLoad(DWCUtilTask *task, void *arg);
+static void taskCopyPltt(DWCUtilTask *task, void *arg);
+static void taskSetPltt(DWCUtilTask *task, void *arg);
 
 typedef struct DWCUtilBgBuffer {
     // The VBlank task that loads the screen
@@ -27,7 +27,7 @@ static struct {
 void DWCi_SCREENlInit(const void *screen) {
     sBgBuffer.buffer = DWCi_HEAPlAllocEx(sizeof(DWCUtilBgBuffer), 4);
     MIi_CpuCopyFast(screen, sBgBuffer.buffer->screen, sizeof(sBgBuffer.buffer->screen));
-    sBgBuffer.buffer->task = DWCi_TSKlForm(1, DWCUtilBgBuffer_UploadTask, NULL, 120);
+    sBgBuffer.buffer->task = DWCi_TSKlForm(1, taskLoad, NULL, 120);
 }
 
 void DWCi_SCREENlEnd(void) {
@@ -50,7 +50,7 @@ void DWCi_SCREENlCopy(const u16 *src, int offset, int width, int rows) {
     }
 }
 
-static void DWCUtilBgBuffer_UploadTask(DWCUtilTask *task, void *arg) {
+static void taskLoad(DWCUtilTask *task, void *arg) {
     if (sBgBuffer.buffer->dirty) {
         DC_FlushRange(sBgBuffer.buffer->screen, sizeof(sBgBuffer.buffer->screen));
         GX_LoadBG2Scr(sBgBuffer.buffer->screen, 0, sizeof(sBgBuffer.buffer->screen));
@@ -61,20 +61,20 @@ static void DWCUtilBgBuffer_UploadTask(DWCUtilTask *task, void *arg) {
 void DWCi_SCREENlCopyPalette(const void *palette, int src, int dest) {
     sBgBuffer.paletteSrc = (const u8 *)palette + src * 32;
     sBgBuffer.paletteDest = (void *)(HW_BG_PLTT + dest * 32);
-    DWCi_TSKlForm(1, DWCUtilBgBuffer_LoadPaletteRowTask, NULL, 120);
+    DWCi_TSKlForm(1, taskCopyPltt, NULL, 120);
 }
 
-static void DWCUtilBgBuffer_LoadPaletteRowTask(DWCUtilTask *task, void *arg) {
+static void taskCopyPltt(DWCUtilTask *task, void *arg) {
     MI_CpuCopy16(sBgBuffer.paletteSrc, sBgBuffer.paletteDest, 32);
     DWCi_TSKlDelete(1, task);
 }
 
-void DWCUtilBgBuffer_LoadPalette(const void *palette) {
+void DWCi_SCREENlSetPalette(const void *palette) {
     sBgBuffer.paletteSrc = palette;
-    DWCi_TSKlForm(1, DWCUtilBgBuffer_LoadPaletteTask, NULL, 120);
+    DWCi_TSKlForm(1, taskSetPltt, NULL, 120);
 }
 
-static void DWCUtilBgBuffer_LoadPaletteTask(DWCUtilTask *task, void *arg) {
+static void taskSetPltt(DWCUtilTask *task, void *arg) {
     MI_CpuCopy16(sBgBuffer.paletteSrc, (void *)HW_BG_PLTT, 0x200);
     DWCi_TSKlDelete(1, task);
 }

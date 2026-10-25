@@ -25,7 +25,7 @@ void DWCi_FOCUSlDisp(int pair, int x0, int x1, int y) {
 
     DWCi_FOCUSlDelete();
     for (i = 0; i < 2; i++) {
-        sButtonSprites->sprites[i] = DWCUtilCell_AllocOamRun(0, sPairCells[pair][i], TRUE);
+        sButtonSprites->sprites[i] = DWCi_CEINlSetExCell(0, sPairCells[pair][i], TRUE);
         DWCi_CELLlSetPriority(sButtonSprites->sprites[i], -1, 1);
     }
     DWCi_CELLlSetPosition(sButtonSprites->sprites[0], -1, x0, y);
@@ -38,7 +38,7 @@ void DWCi_FOCUSlDisp4(int x0, int x1, int y0, int y1) {
 
     DWCi_FOCUSlDelete();
     for (i = 0; i < 4; i++) {
-        sButtonSprites->sprites[i] = DWCUtilCell_AllocOamRun(0, cell, TRUE);
+        sButtonSprites->sprites[i] = DWCi_CEINlSetExCell(0, cell, TRUE);
         DWCi_CELLlSetPriority(sButtonSprites->sprites[i], -1, 1);
         cell++;
     }

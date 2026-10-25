@@ -8,7 +8,7 @@
 // The file is the DWC utility library's sub.o (libdwcutil.TWL.HYB.a), as aletheia's map of Black 1's SDK code to that
 // library's objects (layout/symbols_sdk.txt) shows it.
 void DWCi_ClearVram(void);
-void DWCUtilBank_Exit(void);
+void DWCi_RepairVram(void);
 void clearVram(void);
 void DWCi_SetLedWireless(void);
 void DWCi_SetLedNormal(void);

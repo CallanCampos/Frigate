@@ -27,7 +27,7 @@ struct DWCUtilSettingsEdit {
 // Reads the console's Wi-Fi settings, and frees them
 void DWCi_SETTIGNlInit(void);
 void DWCi_SETTIGNlEnd(void);
-DWCUtilSettingsEdit *DWCUtilWifiSettings_GetEdit(void);
+DWCUtilSettingsEdit *DWCi_SETTIGNlGet(void);
 // Sets whether DHCP gives the address, the mask and the gateway, and the DNS servers, of the connection being edited
 void DWCi_SETTINGlSetIpAuto(BOOL autoAddress);
 void DWCi_SETTINGlSetDnsAuto(BOOL autoDns);
@@ -37,8 +37,8 @@ void DWCi_SETTINGlSetSsid(const u8 *ssid);
 void DWCi_SETTINGlSetWep(const u8 *key);
 // The addresses of the connection being edited (its IP address, subnet mask, gateway and two DNS servers) from 12
 // digits, each number right-aligned in three, and back
-void DWCUtilWifiSettings_SetIp(const u8 *digits);
-void DWCUtilWifiSettings_SetNetmask(const u8 *digits);
+void DWCi_SETTINGlSetIp(const u8 *digits);
+void DWCi_SETTINGlSetNetMask(const u8 *digits);
 void DWCi_SETTINGlSetGateway(const u8 *digits);
 void DWCi_SETTINGlSetDnsP(const u8 *digits);
 void DWCi_SETTINGlSetDnsS(const u8 *digits);

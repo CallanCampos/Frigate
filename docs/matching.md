@@ -1158,7 +1158,7 @@ Same code, other `sp` offsets or frame size.
 - A frame slot that no instruction touches, in a small function with no struct local, can be a struct an inline
   returned by value: MWCC reserves the return value's slot for each inlined call even when the value lives in a
   register. The DWC utility's menu and keyboard (overlay 182) have 8-byte frames that are never written in their key
-  position updates, `DWCUtilMenu_SlideInRow0Task` and its neighbours; they match only when `attr01` is read through
+  position updates, `keyboard10.c`'s `taskStart0` and its neighbours; they match only when `attr01` is read through
   `static inline DWCUtilOamAttr01 ReadAttr01(const GXOamAttr *oam)`,
   which returns a one-word struct, as in `(u8)ReadAttr01(sMenu->keyOams[0]).attr01 - 12`. Reading `oam->attr01`
   directly leaves no slot.
@@ -1242,7 +1242,7 @@ Same code, other `sp` offsets or frame size.
   function has the right instructions with the wrong slots or a hoisted constant. Related: a product shifted at each
   use (`target >> FX32_SHIFT` five times in `MedalBoxApp_UpdateSlider`) is computed once by CSE as a temporary the
   variable cannot absorb, where `target >>= FX32_SHIFT` once changes the registers.
-  The merge also needs each call where the original has it: the DWC utility's `DWCUtilMenu_HandleTouchHold` and
+  The merge also needs each call where the original has it: the DWC utility's `keyboard10.c`'s `touch` and
   `keyboard.c`'s `touch` move the held key into `r0` on each path to one shared call only with the held
   key's `SetPressedKey(i); goto clear;` inside the button loop, where the key loop's `goto held` joins it, and the
   release's own `SetPressedKey(-1)` after the loops; one call fed by `i`, or by a `key` set on each path, keeps the key
@@ -3512,7 +3512,7 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   holds; a range of four or more is a jump table; the tree is balanced over the items with its pivot at index
   (n - 1) / 2; a range after the first loses its first k cases to single compares, k being the number of extra cases
   in the ranges before it. Empty cases count as cases, so the number of them sets the ranges, not which ones:
-  `DWCUtilMove_UpdateTask` (`move.c`) has a table from 0 to 20 and compares for 23, 26, 29 and 34 only with
+  `taskFramework` (`move.c`) has a table from 0 to 20 and compares for 23, 26, 29 and 34 only with
   four empty labels between 1 and 20 beside its four handled cases there (8 in a span of 20); with every unhandled
   state listed the table took in 34, and with none there was no table.
 - A three-case `switch` is not range-folded where the `||` chain over the same values is, which frees a register:
@@ -4032,7 +4032,7 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   while a literal is 4-aligned. A path padded to a 4-byte boundary in the ROM's `.data` is a literal written at its
   call, and a run of strings with no padding between them is a set of arrays. The function matches either way, but
   the overlay links only with the original's form: twelve of overlay 182's DWC utility screens, such as
-  `sceneseterror.c`'s `DWCUtilGfxResource_Load("char/jb4Error.nsc.l", ...)`, link only with the literal, and
+  `sceneseterror.c`'s `DWCi_CMNlLoadResource("char/jb4Error.nsc.l", ...)`, link only with the literal, and
   `sceneinit.c`'s message paths, each padded to 4 bytes, are literals too.
 - MWCC shares a file's equal string literals, so one string in two places of what looks like one file's `.data`, each
   4-aligned, is a sign of two files. Overlay 182's `dwc_util_main_menu.c` and `dwc_util_info_menu.c` loaded the same

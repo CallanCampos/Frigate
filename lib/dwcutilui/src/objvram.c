@@ -31,7 +31,7 @@ void DWCi_OVRlInit(void) {
 }
 
 DWCUtilVramNode *DWCi_OVRlAlloc(int screen, int size, s16 fromFront, u32 *pos) {
-    DWCUtilVramNode *node = DWCi_QUElPopFront(sVramScreens[screen].freeNodes);
+    DWCUtilVramNode *node = DWCi_QUElPopBack(sVramScreens[screen].freeNodes);
     DWCUtilVramNode *position;
     int units = (size + 3 & ~3) >> 2;
     u32 irq;

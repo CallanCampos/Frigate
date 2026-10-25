@@ -8,6 +8,6 @@
 // Japanese only), and the settings by hand. B goes back to the first screen of the connection settings.
 // The file is the DWC utility library's scenesetselectway.o (libdwcutil.TWL.HYB.a), as aletheia's map of Black 1's SDK
 // code to that library's objects (layout/symbols_sdk.txt) shows it.
-void DWCUtilScreenWay_Init(void);
+void DWCi_SceneSetSelectWay(void);
 
 #endif // POKEBW2_DWCUTIL_SCENESETSELECTWAY_H

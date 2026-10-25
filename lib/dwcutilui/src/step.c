@@ -9,18 +9,18 @@
 #include "sound.h"
 #include "task.h"
 
-static void DWCUtilSubScreen_SlideInObject0Task(DWCUtilTask *task, void *arg);
-static void DWCUtilSubScreen_SlideInObject1Task(DWCUtilTask *task, void *arg);
-static void DWCUtilSubScreen_SlideInObject2Task(DWCUtilTask *task, void *arg);
-static void DWCUtilSubScreen_SlideInObject3Task(DWCUtilTask *task, void *arg);
-static void DWCUtilSubScreen_SlideInObject4Task(DWCUtilTask *task, void *arg);
-static void DWCUtilSubScreen_SlideInDoneTask(DWCUtilTask *task, void *arg);
-static void DWCUtilSubScreen_SlideOutObject4Task(DWCUtilTask *task, void *arg);
-static void DWCUtilSubScreen_SlideOutObject3Task(DWCUtilTask *task, void *arg);
-static void DWCUtilSubScreen_SlideOutObject2Task(DWCUtilTask *task, void *arg);
-static void DWCUtilSubScreen_SlideOutObject1Task(DWCUtilTask *task, void *arg);
-static void DWCUtilSubScreen_SlideOutObject0Task(DWCUtilTask *task, void *arg);
-static void DWCUtilSubScreen_LoadScreenTask(DWCUtilTask *task, void *arg);
+static void taskBegin0(DWCUtilTask *task, void *arg);
+static void taskBegin1(DWCUtilTask *task, void *arg);
+static void taskBegin2(DWCUtilTask *task, void *arg);
+static void taskBegin3(DWCUtilTask *task, void *arg);
+static void taskBegin4(DWCUtilTask *task, void *arg);
+static void taskBegin5(DWCUtilTask *task, void *arg);
+static void taskEnd0(DWCUtilTask *task, void *arg);
+static void taskEnd1(DWCUtilTask *task, void *arg);
+static void taskEnd2(DWCUtilTask *task, void *arg);
+static void taskEnd3(DWCUtilTask *task, void *arg);
+static void taskEnd4(DWCUtilTask *task, void *arg);
+static void taskChange(DWCUtilTask *task, void *arg);
 
 #define SUB_SCREEN_OBJECTS 5
 
@@ -54,23 +54,23 @@ static DWCUtilSubScreenRow *sSubScreenRow;
 // The screen that the VBlank task loads
 static void *sSubScreenData;
 
-void DWCUtilSubScreen_SlideInRow(int step) {
+void DWCi_STEPlBegin(int step) {
     int i;
 
     sSubScreenRow = DWCi_HEAPlAllocEx(sizeof(DWCUtilSubScreenRow), 4);
     for (i = 0; i < SUB_SCREEN_OBJECTS; i++) {
-        sSubScreenRow->objects[i] = DWCUtilCell_AllocOamRun(1, sSubScreenCells[step][i], TRUE);
+        sSubScreenRow->objects[i] = DWCi_CEINlSetExCell(1, sSubScreenCells[step][i], TRUE);
         DWCi_CELLlSetPriority(sSubScreenRow->objects[i], -1, 0);
         DWCi_CELLlSetPosition(sSubScreenRow->objects[i], -1, -42, sSubScreenPositions[i][1]);
         DWCi_CELLlSetPalette(sSubScreenRow->objects[i], -1, 0, sSubScreenPalettes[step][i]);
     }
-    sSubScreenRow->task = DWCi_TSKlForm(0, DWCUtilSubScreen_SlideInObject0Task, NULL, 120);
+    sSubScreenRow->task = DWCi_TSKlForm(0, taskBegin0, NULL, 120);
     DWCi_STEPlChangeScr(step);
-    DWCUtilSound_PlaySe(0xd);
+    DWCi_SNDlPlay(0xd);
 }
 
 // The slide in: the objects from the first that hasn't stopped on move 8 pixels a frame until it stops
-static void DWCUtilSubScreen_SlideInObject0Task(DWCUtilTask *task, void *arg) {
+static void taskBegin0(DWCUtilTask *task, void *arg) {
     int x;
     int y;
     int i;
@@ -86,11 +86,11 @@ static void DWCUtilSubScreen_SlideInObject0Task(DWCUtilTask *task, void *arg) {
         for (i = 0; i < SUB_SCREEN_OBJECTS; i++) {
             DWCi_CELLlSetPosition(sSubScreenRow->objects[i], -1, x, sSubScreenPositions[i][1]);
         }
-        DWCi_TSKlChangeFunc(task, DWCUtilSubScreen_SlideInObject1Task);
+        DWCi_TSKlChangeFunc(task, taskBegin1);
     }
 }
 
-static void DWCUtilSubScreen_SlideInObject1Task(DWCUtilTask *task, void *arg) {
+static void taskBegin1(DWCUtilTask *task, void *arg) {
     int x;
     int y;
     int i;
@@ -106,11 +106,11 @@ static void DWCUtilSubScreen_SlideInObject1Task(DWCUtilTask *task, void *arg) {
         for (i = 1; i < SUB_SCREEN_OBJECTS; i++) {
             DWCi_CELLlSetPosition(sSubScreenRow->objects[i], -1, x, sSubScreenPositions[i][1]);
         }
-        DWCi_TSKlChangeFunc(task, DWCUtilSubScreen_SlideInObject2Task);
+        DWCi_TSKlChangeFunc(task, taskBegin2);
     }
 }
 
-static void DWCUtilSubScreen_SlideInObject2Task(DWCUtilTask *task, void *arg) {
+static void taskBegin2(DWCUtilTask *task, void *arg) {
     int x;
     int y;
     int i;
@@ -126,11 +126,11 @@ static void DWCUtilSubScreen_SlideInObject2Task(DWCUtilTask *task, void *arg) {
         for (i = 2; i < SUB_SCREEN_OBJECTS; i++) {
             DWCi_CELLlSetPosition(sSubScreenRow->objects[i], -1, x, sSubScreenPositions[i][1]);
         }
-        DWCi_TSKlChangeFunc(task, DWCUtilSubScreen_SlideInObject3Task);
+        DWCi_TSKlChangeFunc(task, taskBegin3);
     }
 }
 
-static void DWCUtilSubScreen_SlideInObject3Task(DWCUtilTask *task, void *arg) {
+static void taskBegin3(DWCUtilTask *task, void *arg) {
     int x;
     int y;
     int i;
@@ -146,11 +146,11 @@ static void DWCUtilSubScreen_SlideInObject3Task(DWCUtilTask *task, void *arg) {
         for (i = 3; i < SUB_SCREEN_OBJECTS; i++) {
             DWCi_CELLlSetPosition(sSubScreenRow->objects[i], -1, x, sSubScreenPositions[i][1]);
         }
-        DWCi_TSKlChangeFunc(task, DWCUtilSubScreen_SlideInObject4Task);
+        DWCi_TSKlChangeFunc(task, taskBegin4);
     }
 }
 
-static void DWCUtilSubScreen_SlideInObject4Task(DWCUtilTask *task, void *arg) {
+static void taskBegin4(DWCUtilTask *task, void *arg) {
     int x;
     int y;
 
@@ -161,25 +161,25 @@ static void DWCUtilSubScreen_SlideInObject4Task(DWCUtilTask *task, void *arg) {
     } else {
         x = 0xb0;
         DWCi_CELLlSetPosition(sSubScreenRow->objects[4], -1, x, 0x21);
-        DWCi_TSKlChangeFunc(task, DWCUtilSubScreen_SlideInDoneTask);
+        DWCi_TSKlChangeFunc(task, taskBegin5);
     }
 }
 
-static void DWCUtilSubScreen_SlideInDoneTask(DWCUtilTask *task, void *arg) {
+static void taskBegin5(DWCUtilTask *task, void *arg) {
     DWCi_TSKlDelete(0, task);
     sSubScreenRow->task = NULL;
 }
 
 void DWCi_STEPlEnd(void) {
     sSubScreenRow->leaving = TRUE;
-    sSubScreenRow->task = DWCi_TSKlForm(0, DWCUtilSubScreen_SlideOutObject4Task, NULL, 120);
+    sSubScreenRow->task = DWCi_TSKlForm(0, taskEnd0, NULL, 120);
 }
 
 void DWCi_STEPlChange(int step) {
     int i;
 
     for (i = 0; i < SUB_SCREEN_OBJECTS; i += 2) {
-        DWCUtilCell_Copy(1, sSubScreenCells[step][i], DWCi_CELLlGetObj(sSubScreenRow->objects[i], 0));
+        DWCi_CEINlSet(1, sSubScreenCells[step][i], DWCi_CELLlGetObj(sSubScreenRow->objects[i], 0));
         DWCi_CELLlSetPriority(sSubScreenRow->objects[i], -1, 0);
         DWCi_CELLlSetPosition(sSubScreenRow->objects[i], -1, sSubScreenPositions[i][0], sSubScreenPositions[i][1]);
         DWCi_CELLlSetPalette(sSubScreenRow->objects[i], -1, 0, sSubScreenPalettes[step][i]);
@@ -196,7 +196,7 @@ BOOL DWCi_STEPlGet(void) {
 
 // The slide out: the objects from the last that hasn't stopped on move 8 pixels a frame to the left until it reaches
 // the stop of the one before it, and then all of them off the screen
-static void DWCUtilSubScreen_SlideOutObject4Task(DWCUtilTask *task, void *arg) {
+static void taskEnd0(DWCUtilTask *task, void *arg) {
     int x;
     int y;
 
@@ -207,11 +207,11 @@ static void DWCUtilSubScreen_SlideOutObject4Task(DWCUtilTask *task, void *arg) {
     } else {
         x = 0x98;
         DWCi_CELLlSetPosition(sSubScreenRow->objects[4], -1, x, 0x21);
-        DWCi_TSKlChangeFunc(task, DWCUtilSubScreen_SlideOutObject3Task);
+        DWCi_TSKlChangeFunc(task, taskEnd1);
     }
 }
 
-static void DWCUtilSubScreen_SlideOutObject3Task(DWCUtilTask *task, void *arg) {
+static void taskEnd1(DWCUtilTask *task, void *arg) {
     int x;
     int y;
     int i;
@@ -227,11 +227,11 @@ static void DWCUtilSubScreen_SlideOutObject3Task(DWCUtilTask *task, void *arg) {
         for (i = 3; i < SUB_SCREEN_OBJECTS; i++) {
             DWCi_CELLlSetPosition(sSubScreenRow->objects[i], -1, x, sSubScreenPositions[i][1]);
         }
-        DWCi_TSKlChangeFunc(task, DWCUtilSubScreen_SlideOutObject2Task);
+        DWCi_TSKlChangeFunc(task, taskEnd2);
     }
 }
 
-static void DWCUtilSubScreen_SlideOutObject2Task(DWCUtilTask *task, void *arg) {
+static void taskEnd2(DWCUtilTask *task, void *arg) {
     int x;
     int y;
     int i;
@@ -247,11 +247,11 @@ static void DWCUtilSubScreen_SlideOutObject2Task(DWCUtilTask *task, void *arg) {
         for (i = 2; i < SUB_SCREEN_OBJECTS; i++) {
             DWCi_CELLlSetPosition(sSubScreenRow->objects[i], -1, x, sSubScreenPositions[i][1]);
         }
-        DWCi_TSKlChangeFunc(task, DWCUtilSubScreen_SlideOutObject1Task);
+        DWCi_TSKlChangeFunc(task, taskEnd3);
     }
 }
 
-static void DWCUtilSubScreen_SlideOutObject1Task(DWCUtilTask *task, void *arg) {
+static void taskEnd3(DWCUtilTask *task, void *arg) {
     int x;
     int y;
     int i;
@@ -267,12 +267,12 @@ static void DWCUtilSubScreen_SlideOutObject1Task(DWCUtilTask *task, void *arg) {
         for (i = 1; i < SUB_SCREEN_OBJECTS; i++) {
             DWCi_CELLlSetPosition(sSubScreenRow->objects[i], -1, x, sSubScreenPositions[i][1]);
         }
-        DWCi_TSKlChangeFunc(task, DWCUtilSubScreen_SlideOutObject0Task);
+        DWCi_TSKlChangeFunc(task, taskEnd4);
     }
 }
 
 // Once the row is off the left of the screen (its x wraps to 0x100 and above), frees it
-static void DWCUtilSubScreen_SlideOutObject0Task(DWCUtilTask *task, void *arg) {
+static void taskEnd4(DWCUtilTask *task, void *arg) {
     int x;
     int y;
     int i;
@@ -304,11 +304,11 @@ BOOL DWCi_STEPlIsEnd(void) {
 }
 
 void DWCi_STEPlChangeScr(int screen) {
-    sSubScreenData = DWCUtilRomResource_LoadFile(DWCi_Char(sSubScreenNames[screen]), NULL, 4);
-    DWCi_TSKlForm(1, DWCUtilSubScreen_LoadScreenTask, NULL, 120);
+    sSubScreenData = DWCi_ARClReadEx(DWCi_Char(sSubScreenNames[screen]), NULL, 4);
+    DWCi_TSKlForm(1, taskChange, NULL, 120);
 }
 
-static void DWCUtilSubScreen_LoadScreenTask(DWCUtilTask *task, void *arg) {
+static void taskChange(DWCUtilTask *task, void *arg) {
     DC_FlushRange(sSubScreenData, 0x600);
     GXS_LoadBG1Scr(sSubScreenData, 0, 0x600);
     DWCi_ARClRelease(sSubScreenData);

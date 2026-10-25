@@ -9,6 +9,6 @@
 // the lid, back to the first screen of the connection settings.
 // The file is the DWC utility library's scenesetusbready1.o (libdwcutil.TWL.HYB.a), as aletheia's map of Black 1's SDK
 // code to that library's objects (layout/symbols_sdk.txt) shows it.
-void DWCUtilUsbSetup_Init(void);
+void DWCi_SceneSetUsbReady1(void);
 
 #endif // POKEBW2_DWCUTIL_SCENESETUSBREADY1_H

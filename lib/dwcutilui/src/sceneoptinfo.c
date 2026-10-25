@@ -38,7 +38,7 @@ void DWCi_SceneOptInfo(void) {
 }
 
 static void DWCUtilInfoMenu_LoadInfoGraphics(void) {
-    DWCUtilGfxResource_Load("char/jb5Info.nsc.l", GX_LoadBG2Scr);
+    DWCi_CMNlLoadResource("char/jb5Info.nsc.l", GX_LoadBG2Scr);
     G2S_SetBG0Priority(3);
     G2S_SetBG1Priority(3);
     G2_SetBG0Priority(3);
@@ -79,15 +79,15 @@ static void DWCUtilInfoMenu_DrawConsoleInfo(void) {
         DWCi_STRlConvertStringAsciiToUnicode(wide, (const u8 *)text, sizeof(text));
     }
     DWCi_FNTlDrawRect(textObj, 8, 0x78, 0xf0, 0x1c, 2, 0x480, wide);
-    DWCUtilText_MarkDirty(textObj);
+    DWCi_FNTlRenewBg(textObj);
 }
 
 static void DWCUtilInfoMenu_InfoFadeIn(void) {
     DWCi_EFFlFade(DWC_UTIL_FADE_FROM_WHITE, 1, GX_BLEND_PLANEMASK_BG0, 8);
     DWCi_EFFlFade(DWC_UTIL_FADE_FROM_WHITE, 0, GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ,
                   8);
-    DWCi_GXlInvisible(1, GX_PLANEMASK_BG0);
-    DWCi_GXlInvisible(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
+    DWCi_GXlVisible(1, GX_PLANEMASK_BG0);
+    DWCi_GXlVisible(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
     DWCi_ChangeScene(DWCUtilInfoMenu_InfoWaitFadeIn);
 }
 
@@ -122,7 +122,7 @@ static void func_ov182_021af19c(void) {
 
 static void DWCUtilInfoMenu_InfoHandleChoice(void) {
     if (DWCi_BTNlGet() == 0) {
-        DWCUtilSound_PlaySe(7);
+        DWCi_SNDlPlay(7);
         DWCi_ChangeScene(DWCUtilInfoMenu_InfoDisableButtons);
     }
 }
@@ -147,9 +147,9 @@ static void DWCUtilInfoMenu_InfoWaitFadeOut(void) {
     if (DWCi_EFFlCheck(1) == 0 && DWCi_EFFlCheck(0) == 0 && DWCi_BTNlIsEnd()) {
         DWCi_FNTlDeleteBgLcd(0);
         DWCi_COMMENTlDelete();
-        DWCUtilDisplay_HidePlanes(1, GX_PLANEMASK_BG0);
-        DWCUtilDisplay_HidePlanes(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
+        DWCi_GXlInvisible(1, GX_PLANEMASK_BG0);
+        DWCi_GXlInvisible(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
         DWCi_SetParam_(0, 1);
-        DWCi_ChangeScene(DWCUtilOptionMenu_Init);
+        DWCi_ChangeScene(DWCi_SceneOptMenu);
     }
 }

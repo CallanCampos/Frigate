@@ -14,7 +14,7 @@
 // the connection test.
 // The file is the DWC utility library's scenesetaosscomplete.o (libdwcutil.TWL.HYB.a), as aletheia's map of Black 1's
 // SDK code to that library's objects (layout/symbols_sdk.txt) shows it.
-void DWCUtilPageMulti4_Init(void);
+void DWCi_SceneSetAossComplete(void);
 
 // The end of the message once both screens have faded out: it goes on to the message of the connection test.
 // scenesetrakucomplete.c has the same function, endScene1
@@ -22,11 +22,11 @@ static inline void DWCUtilPageMulti4_WaitFadeOutInline(void) {
     if (DWCi_EFFlCheck(1) == 0 && DWCi_EFFlCheck(0) == 0) {
         DWCi_FNTlDeleteBgLcd(0);
         DWCi_COMMENTlDelete();
-        DWCUtilDisplay_HidePlanes(1, GX_PLANEMASK_BG0);
-        DWCUtilDisplay_HidePlanes(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
+        DWCi_GXlInvisible(1, GX_PLANEMASK_BG0);
+        DWCi_GXlInvisible(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
         DWCi_SetParam_(0, 0);
         DWCi_SetParam2_(0, 1);
-        DWCi_ChangeScene(DWCUtilAutoConnectIntro_Init);
+        DWCi_ChangeScene(DWCi_SceneSetTestConfirm);
     }
 }
 

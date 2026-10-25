@@ -29,6 +29,6 @@ void DWCi_ITRlEnd(void) {
 }
 
 void intrVBlank(void) {
-    DWCUtilTask_Run(1);
+    DWCi_TSKlAct(1);
     OS_SetIrqCheckFlag(OS_IE_V_BLANK);
 }

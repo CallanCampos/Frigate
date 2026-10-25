@@ -7,6 +7,6 @@
 // move again, no goes back to the options.
 // The file is the DWC utility library's sceneoptmovfailure.o (libdwcutil.TWL.HYB.a), as aletheia's map of Black 1's SDK
 // code to that library's objects (layout/symbols_sdk.txt) shows it.
-void DWCUtilNoticeScreen_Init(void);
+void DWCi_SceneOptMovFailure(void);
 
 #endif // POKEBW2_DWCUTIL_SCENEOPTMOVFAILURE_H

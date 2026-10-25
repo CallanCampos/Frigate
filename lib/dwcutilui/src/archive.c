@@ -19,12 +19,12 @@ typedef struct DWCUtilResource {
 static const char sArchiveName[] = "dwc";
 static DWCUtilResource *sResource;
 
-static FSResult DWCUtilRomResource_ArchiveProc(FSFile *file, FSCommandType command);
-static FSResult DWCUtilRomResource_ReadArchive(FSArchive *arc, void *buffer, u32 position, u32 length);
+static FSResult userProc(FSFile *file, FSCommandType command);
+static FSResult cbRead(FSArchive *arc, void *buffer, u32 position, u32 length);
 static void cbReadRom(void *arc);
 static FSResult DWCUtilRomResource_WriteArchive(FSArchive *arc, const void *buffer, u32 position, u32 length);
 
-void DWCUtilRomResource_Init(void) {
+void DWCi_ARClInit(void) {
     FSFile file;
     char path[0x80];
     u32 fnt[2];
@@ -46,9 +46,9 @@ void DWCUtilRomResource_Init(void) {
     if (!FS_RegisterArchiveName(&sResource->archive, sArchiveName, 3)) {
         OS_Terminate();
     }
-    FS_SetArchiveProc(&sResource->archive, DWCUtilRomResource_ArchiveProc,
+    FS_SetArchiveProc(&sResource->archive, userProc,
                       (1 << FS_COMMAND_WRITEFILE) | (1 << FS_COMMAND_ACTIVATE) | (1 << FS_COMMAND_IDLE));
-    if (!FS_LoadArchive(&sResource->archive, base, fat[0], fat[1], fnt[0], fnt[1], DWCUtilRomResource_ReadArchive,
+    if (!FS_LoadArchive(&sResource->archive, base, fat[0], fat[1], fnt[0], fnt[1], cbRead,
                         DWCUtilRomResource_WriteArchive)) {
         OS_Terminate();
     }
@@ -73,7 +73,7 @@ void DWCi_ARClEnd(void) {
 }
 
 // The archive's hook: the card is locked while the archive is active, and it can't be written
-static FSResult DWCUtilRomResource_ArchiveProc(FSFile *file, FSCommandType command) {
+static FSResult userProc(FSFile *file, FSCommandType command) {
     switch (command) {
     case FS_COMMAND_ACTIVATE:
         CARD_LockRom(sResource->lockId);
@@ -88,7 +88,7 @@ static FSResult DWCUtilRomResource_ArchiveProc(FSFile *file, FSCommandType comma
     }
 }
 
-static FSResult DWCUtilRomResource_ReadArchive(FSArchive *arc, void *buffer, u32 position, u32 length) {
+static FSResult cbRead(FSArchive *arc, void *buffer, u32 position, u32 length) {
     CARD_ReadRomAsync((u32)-1, (const void *)(position + FS_GetArchiveBase(arc)), buffer, length, cbReadRom, arc);
     return FS_RESULT_PROC_ASYNC;
 }
@@ -101,13 +101,13 @@ static FSResult DWCUtilRomResource_WriteArchive(FSArchive *arc, const void *buff
     return FS_RESULT_FAILURE;
 }
 
-void *DWCUtilRomResource_LoadFile(const char *path, u32 *size, int align) {
+void *DWCi_ARClReadEx(const char *path, u32 *size, int align) {
     FSFile file;
     void *data;
     u32 length;
     int alignment;
 
-    DWCi_QUElPopFront(sResource->openFileStack);
+    DWCi_QUElPopBack(sResource->openFileStack);
     FS_InitFile(&file);
     if (!FS_OpenFile(&file, path)) {
         OS_Terminate();

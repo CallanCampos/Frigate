@@ -38,9 +38,9 @@ DWCUtilMsg *DWCi_MSGlRead(const char *path) {
     u32 size;
     DWCUtilMsgFile *file;
     DWCUtilMsgInfo *info;
-    DWCUtilMsg *msg = DWCi_QUElPopFront(sMsgWork->freeMsgs);
+    DWCUtilMsg *msg = DWCi_QUElPopBack(sMsgWork->freeMsgs);
 
-    file = DWCUtilRomResource_LoadFile(path, &size, 4);
+    file = DWCi_ARClReadEx(path, &size, 4);
     msg->file = file;
     info = &file->info;
     msg->offsets = info->offsets;

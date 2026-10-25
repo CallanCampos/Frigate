@@ -57,12 +57,12 @@ static void dispCaret(void);
 static void procWin(void);
 static void procWin1(void);
 static BOOL isCorrect(void);
-static void DWCUtilWepKeyboard_WaitInvalidChoice(void);
-static void DWCUtilWepKeyboard_WaitInvalidClosed(void);
+static void procError(void);
+static void procError1(void);
 
 static DWCUtilWepKeyboard *sWepKeyboard;
 
-void DWCUtilWepKeyboard_Init(void) {
+void DWCi_SceneSetEdit32(void) {
     u8 msgIndices[2] = { 0x3e, 0x3d };
     int field;
     int fromList;
@@ -82,7 +82,7 @@ void DWCUtilWepKeyboard_Init(void) {
     }
     DWCi_CMNlStep(2);
     sWepKeyboard->text = DWCi_FNTlFormBgEx(0, 0);
-    sWepKeyboard->cursor = DWCUtilCell_AllocOam(0, 0x3e);
+    sWepKeyboard->cursor = DWCi_CEINlSetExObj(0, 0x3e);
     G2_SetOBJPriority(sWepKeyboard->cursor, 3);
     dispCaret();
     drawSsid();
@@ -97,10 +97,10 @@ static const u8 sWepKeyboardColumnX[16] = {
 };
 
 static void initGraphics(void) {
-    DWCUtilGfxResource_Load("char/ybObjKb.ncl.l", GX_LoadOBJPltt);
-    DWCUtilGfxResource_Load("char/jbBgStep3.ncg.l", GX_LoadBG2Char);
-    DWCUtilGfxResource_Load("char/ybBgStep3.ncl.l", GX_LoadBGPltt);
-    DWCUtilGfxResource_Load("char/xb4Edit.nsc.l", GX_LoadBG2Scr);
+    DWCi_CMNlLoadResource("char/ybObjKb.ncl.l", GX_LoadOBJPltt);
+    DWCi_CMNlLoadResource("char/jbBgStep3.ncg.l", GX_LoadBG2Char);
+    DWCi_CMNlLoadResource("char/ybBgStep3.ncl.l", GX_LoadBGPltt);
+    DWCi_CMNlLoadResource("char/xb4Edit.nsc.l", GX_LoadBG2Scr);
     G2S_SetBG0Priority(3);
     G2S_SetBG1Priority(3);
     G2_SetBG0Priority(2);
@@ -112,15 +112,15 @@ static void procInit(void) {
     DWCi_EFFlFade(DWC_UTIL_FADE_FROM_WHITE, 1, GX_BLEND_PLANEMASK_BG0, 8);
     DWCi_EFFlFade(DWC_UTIL_FADE_FROM_WHITE, 0, GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ,
                   8);
-    DWCi_GXlInvisible(1, GX_PLANEMASK_BG0);
-    DWCi_GXlInvisible(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
+    DWCi_GXlVisible(1, GX_PLANEMASK_BG0);
+    DWCi_GXlVisible(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
     DWCi_ChangeScene(procInit1);
 }
 
 static void procInit1(void) {
     if (DWCi_EFFlCheck(1) == 0 && DWCi_EFFlCheck(0) == 0) {
         DWCi_KBlInit();
-        DWCUtilSound_PlaySe(0x14);
+        DWCi_SNDlPlay(0x14);
         if (sWepKeyboard->length == 0) {
             DWCi_KBlSetErase(FALSE);
         }
@@ -150,7 +150,7 @@ static void input(void) {
         break;
     case 0x80:
         if (sWepKeyboard->length != 0) {
-            DWCUtilSound_PlaySe(3);
+            DWCi_SNDlPlay(3);
             sWepKeyboard->length--;
             sWepKeyboard->str[sWepKeyboard->length] = '\0';
             if (sWepKeyboard->length == 0) {
@@ -160,17 +160,17 @@ static void input(void) {
         }
         break;
     case 0x82:
-        DWCUtilSound_PlaySe(7);
+        DWCi_SNDlPlay(7);
         sWepKeyboard->result = WEP_KEYBOARD_CANCELLED;
         DWCi_ChangeScene(DWCUtilWepKeyboard_StartClose);
         return;
     case 0x83:
         if (isCorrect()) {
-            DWCUtilSound_PlaySe(6);
+            DWCi_SNDlPlay(6);
             sWepKeyboard->result = WEP_KEYBOARD_ENTERED;
         } else {
             sWepKeyboard->result = WEP_KEYBOARD_INVALID;
-            DWCUtilSound_PlaySe(9);
+            DWCi_SNDlPlay(9);
         }
         G2_SetOBJEffect(sWepKeyboard->cursor, GX_OAM_EFFECT_NODISPLAY, 0);
         DWCi_ChangeScene(DWCUtilWepKeyboard_StartClose);
@@ -178,7 +178,7 @@ static void input(void) {
     case WEP_KEYBOARD_SPACE:
     default:
         if (sWepKeyboard->length != WEP_KEYBOARD_LENGTH) {
-            DWCUtilSound_PlaySe(1);
+            DWCi_SNDlPlay(1);
             sWepKeyboard->str[sWepKeyboard->length] = key;
             sWepKeyboard->length++;
             DWCi_KBlSetErase(TRUE);
@@ -203,7 +203,7 @@ static void DWCUtilWepKeyboard_StartClose(void) {
 static void endScene1(void) {
     if (DWCi_EFFlCheck(1) == 0) {
         DWCi_KBlEnd();
-        DWCUtilSound_PlaySe(0x15);
+        DWCi_SNDlPlay(0x15);
         DWCi_ChangeScene(endScene2);
     }
 }
@@ -219,12 +219,12 @@ static void endScene2(void) {
             return;
         }
         if (sWepKeyboard->result == WEP_KEYBOARD_INVALID) {
-            DWCUtilDialog_Open(6, 3, 1, -1, 0);
-            DWCi_ChangeScene(DWCUtilWepKeyboard_WaitInvalidChoice);
+            DWCi_WINlInitEx(6, 3, 1, -1, 0);
+            DWCi_ChangeScene(procError);
             return;
         }
         DWCi_GetParam2_(NULL, &fromList);
-        DWCUtilDialog_Open(msgIndices[fromList], 2, 1, -1, 0);
+        DWCi_WINlInitEx(msgIndices[fromList], 2, 1, -1, 0);
         DWCi_ChangeScene(procWin);
     }
 }
@@ -238,9 +238,9 @@ static void endScene3(void) {
     DWCi_COMMENTlDelete();
     DWCi_OBJlDelete(sWepKeyboard->cursor);
     DWCi_FNTlDeleteBgLcd(0);
-    DWCUtilGfxResource_Load("char/ybObjMain.ncl.l", GX_LoadOBJPltt);
-    DWCUtilDisplay_HidePlanes(1, GX_PLANEMASK_BG0);
-    DWCUtilDisplay_HidePlanes(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
+    DWCi_CMNlLoadResource("char/ybObjMain.ncl.l", GX_LoadOBJPltt);
+    DWCi_GXlInvisible(1, GX_PLANEMASK_BG0);
+    DWCi_GXlInvisible(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
     DWCi_GetParam2_(&field, &fromList);
     if (fromList == 0) {
         DWCi_SetParam_(2, 1);
@@ -249,11 +249,11 @@ static void endScene3(void) {
     } else if (sWepKeyboard->result == WEP_KEYBOARD_CANCELLED) {
         DWCi_SetParam_(0, 1);
         DWCi_SetParam2_(1, 0);
-        DWCi_ChangeScene(DWCUtilPageApList_Init);
+        DWCi_ChangeScene(DWCi_SceneSetApList);
     } else {
         DWCi_SetParam_(0, 0);
         DWCi_SetParam2_(0, 1);
-        DWCi_ChangeScene(DWCUtilAutoConnectIntro_Init);
+        DWCi_ChangeScene(DWCi_SceneSetTestConfirm);
     }
     DWCi_HEAPlFree_(&sWepKeyboard);
 }
@@ -283,7 +283,7 @@ static void drawSsid(void) {
         rect[0] = sWepKeyboardColumnX[column];
         DWCi_FNTlDrawRect(sWepKeyboard->text, rect[0], rect[1], rect[2], rect[3], 2, 0x480, str);
     }
-    DWCUtilText_MarkDirty(sWepKeyboard->text);
+    DWCi_FNTlRenewBg(sWepKeyboard->text);
 }
 
 // Moves the cursor after the text
@@ -303,10 +303,10 @@ static void procWin(void) {
     sWepKeyboard->result = DWCi_WINlGet();
     switch (sWepKeyboard->result) {
     case 0:
-        DWCUtilSound_PlaySe(7);
+        DWCi_SNDlPlay(7);
         break;
     case 1:
-        DWCUtilSound_PlaySe(0xe);
+        DWCi_SNDlPlay(0xe);
         break;
     default:
         return;
@@ -377,15 +377,15 @@ static BOOL isCorrect(void) {
     }
 }
 
-static void DWCUtilWepKeyboard_WaitInvalidChoice(void) {
+static void procError(void) {
     if (DWCi_WINlGet() == 0) {
-        DWCUtilSound_PlaySe(6);
+        DWCi_SNDlPlay(6);
         DWCi_WINlEnd();
-        DWCi_ChangeScene(DWCUtilWepKeyboard_WaitInvalidClosed);
+        DWCi_ChangeScene(procError1);
     }
 }
 
-static void DWCUtilWepKeyboard_WaitInvalidClosed(void) {
+static void procError1(void) {
     if (!DWCi_WINlIsInit()) {
         G2_SetOBJEffect(sWepKeyboard->cursor, GX_OAM_EFFECT_NONE, 0);
         DWCi_ChangeScene(procInit1);

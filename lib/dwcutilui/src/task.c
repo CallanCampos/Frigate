@@ -51,7 +51,7 @@ void DWCi_TSKlEnd(void) {
     DWCi_HEAPlFree_(&sTaskLists);
 }
 
-void DWCUtilTask_Run(int list) {
+void DWCi_TSKlAct(int list) {
     DWCUtilTask *task;
     int i;
 
@@ -60,7 +60,7 @@ void DWCUtilTask_Run(int list) {
             task->callback(task, task->arg);
         }
         for (i = 0; i < sTaskLists[list].count; i++) {
-            task = DWCi_QUElPopFront(sTaskLists[list].removals);
+            task = DWCi_QUElPopBack(sTaskLists[list].removals);
             if (task == NULL) {
                 break;
             }
@@ -74,7 +74,7 @@ DWCUtilTask *DWCi_TSKlForm(int list, DWCUtilTaskCallback callback, void *arg, u8
 }
 
 DWCUtilTask *formTask(int list, DWCUtilTaskCallback callback, void *arg, u8 priority, u8 freeArg) {
-    DWCUtilTask *task = DWCi_QUElPopFront(sTaskLists[list].freeTasks);
+    DWCUtilTask *task = DWCi_QUElPopBack(sTaskLists[list].freeTasks);
     DWCUtilTask *position;
     u32 irq;
 

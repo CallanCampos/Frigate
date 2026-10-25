@@ -11,6 +11,6 @@
 // The message file of the utility's language, which this screen opens
 extern DWCUtilMsg *gDWCUtilMsg;
 
-void DWCUtilMainMenu_InitUtility(void);
+void DWCi_SceneInit(void);
 
 #endif // POKEBW2_DWCUTIL_SCENEINIT_H

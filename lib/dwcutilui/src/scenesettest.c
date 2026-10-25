@@ -23,7 +23,7 @@
 #include "task.h"
 
 static void initGraphics(void);
-static void DWCUtilAutoConnect_StartAutoConnect(void);
+static void initAc(void);
 static void procInit(void);
 static void procInit1(void);
 static void procScene(void);
@@ -33,17 +33,17 @@ static void button(void);
 static void DWCUtilAutoConnect_FadeOut(void);
 static void endScene1(void);
 static void endScene2(void);
-static void DWCUtilAutoConnect_ProcessTask(DWCUtilTask *task, void *arg);
-static void *DWCUtilAutoConnect_Alloc(u32 name, s32 size);
-static void DWCUtilAutoConnect_Free(u32 name, void *ptr, s32 size);
+static void taskAc(DWCUtilTask *task, void *arg);
+static void *acAlloc(u32 name, s32 size);
+static void acFree(u32 name, void *ptr, s32 size);
 
 // What auto-connect is started with: the utility's allocator, DMA channel 3 and the radio on
-static const DWCACConfig sAutoConnectParam = { DWCUtilAutoConnect_Alloc, DWCUtilAutoConnect_Free, 3, 1, 0, 0, 0, 0, 0 };
+static const DWCACConfig sAutoConnectParam = { acAlloc, acFree, 3, 1, 0, 0, 0, 0, 0 };
 
 // Whether the connection test succeeded
 static u8 sAutoConnectSucceeded;
 
-void DWCUtilAutoConnect_Init(void) {
+void DWCi_SceneSetTest(void) {
     int from;
 
     sAutoConnectSucceeded = FALSE;
@@ -58,16 +58,16 @@ void DWCUtilAutoConnect_Init(void) {
     }
     DWCi_CMNlMsgDraw(0x2c);
     DWCi_ANIMElInitEx(0);
-    DWCUtilAutoConnect_StartAutoConnect();
-    DWCUtilLinkIcon_Init(0);
-    DWCUtilSound_PlaySe(0xc);
+    initAc();
+    DWCi_ICONlInit(0);
+    DWCi_SNDlPlay(0xc);
     DWCi_ChangeScene(procInit);
 }
 
 static void initGraphics(void) {
-    DWCUtilGfxResource_Load("char/jbBgStep3.ncg.l", GX_LoadBG2Char);
-    DWCUtilGfxResource_Load("char/ybBgStep3.ncl.l", GX_LoadBGPltt);
-    DWCUtilGfxResource_Load("char/xb4Multi.nsc.l", GX_LoadBG2Scr);
+    DWCi_CMNlLoadResource("char/jbBgStep3.ncg.l", GX_LoadBG2Char);
+    DWCi_CMNlLoadResource("char/ybBgStep3.ncl.l", GX_LoadBGPltt);
+    DWCi_CMNlLoadResource("char/xb4Multi.nsc.l", GX_LoadBG2Scr);
     G2S_SetBG0Priority(3);
     G2S_SetBG1Priority(3);
     G2_SetBG0Priority(3);
@@ -77,8 +77,8 @@ static void initGraphics(void) {
 
 // Starts auto-connect with the connection being edited, or with the console's settings when the utility was started
 // for that, and the task that waits for its result
-static void DWCUtilAutoConnect_StartAutoConnect(void) {
-    DWCUtilSettingsEdit *edit = DWCUtilWifiSettings_GetEdit();
+static void initAc(void) {
+    DWCUtilSettingsEdit *edit = DWCi_SETTIGNlGet();
     DWCACConfig param;
     int from;
 
@@ -95,7 +95,7 @@ static void DWCUtilAutoConnect_StartAutoConnect(void) {
     if (from == 0) {
         DWCi_AC_InsertApInfo(edit->index, edit);
     }
-    DWCi_TSKlForm(0, DWCUtilAutoConnect_ProcessTask, NULL, 0x78);
+    DWCi_TSKlForm(0, taskAc, NULL, 0x78);
 }
 
 static void procInit(void) {
@@ -103,11 +103,11 @@ static void procInit(void) {
 
     DWCi_EFFlFade(DWC_UTIL_FADE_FROM_WHITE, 0, GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ,
                   8);
-    DWCi_GXlInvisible(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
+    DWCi_GXlVisible(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
     DWCi_GetParam2_(NULL, &from);
     if (from == 0) {
         DWCi_EFFlFade(DWC_UTIL_FADE_FROM_WHITE, 1, GX_BLEND_PLANEMASK_BG0, 8);
-        DWCi_GXlInvisible(1, GX_PLANEMASK_BG0);
+        DWCi_GXlVisible(1, GX_PLANEMASK_BG0);
     }
     DWCi_ChangeScene(procInit1);
 }
@@ -155,40 +155,40 @@ static void endScene2(void) {
         MI_CpuCopy8(DWCi_BACKUPlGetWifi(), pages[1].wifi, DWC_BM_PACKED_SIZE);
         DWCi_ANIMElEnd();
         DWCi_FNTlDeleteBgLcd(0);
-        DWCUtilDisplay_HidePlanes(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
+        DWCi_GXlInvisible(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
         if (!sAutoConnectSucceeded) {
             DWCi_SetParam_(0, 1);
-            DWCi_ChangeScene(DWCUtilError_Init);
+            DWCi_ChangeScene(DWCi_SceneSetError);
         } else {
             DWCi_SetParam_(0, 1);
-            DWCi_ChangeScene(DWCUtilAutoConnectOk_Init);
+            DWCi_ChangeScene(DWCi_SceneSetTestCompletet);
         }
     }
 }
 
 // Runs auto-connect until it connects or fails, which keeps the error code for the error screen
-static void DWCUtilAutoConnect_ProcessTask(DWCUtilTask *task, void *arg) {
+static void taskAc(DWCUtilTask *task, void *arg) {
     s32 result = DWC_AC_Process();
 
     if (result != 0) {
         DWCi_ICONlEnd();
-        DWCUtilSound_StopSe();
+        DWCi_SNDlStop();
         if (result > 0) {
             sAutoConnectSucceeded = TRUE;
-            DWCUtilSound_PlaySe(0x11);
+            DWCi_SNDlPlay(0x11);
         } else {
             DWCi_SetErrorCode(DWC_AC_GetStatus());
-            DWCUtilSound_PlaySe(0x12);
+            DWCi_SNDlPlay(0x12);
         }
         DWCi_ChangeScene(DWCUtilAutoConnect_FadeOut);
         DWCi_TSKlDelete(0, task);
     }
 }
 
-static void *DWCUtilAutoConnect_Alloc(u32 name, s32 size) {
+static void *acAlloc(u32 name, s32 size) {
     return DWCi_HEAPlAllocEx(size, 0x20);
 }
 
-static void DWCUtilAutoConnect_Free(u32 name, void *ptr, s32 size) {
+static void acFree(u32 name, void *ptr, s32 size) {
     DWCi_HEAPlFree2(ptr);
 }

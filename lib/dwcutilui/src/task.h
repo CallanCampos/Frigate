@@ -25,7 +25,7 @@ struct DWCUtilTask {
 void DWCi_TSKlInit(void);
 void DWCi_TSKlEnd(void);
 // Runs the list's tasks, then removes the ones queued for removal
-void DWCUtilTask_Run(int list);
+void DWCi_TSKlAct(int list);
 // Adds a task, after the list's tasks of the same or a lower priority value
 DWCUtilTask *DWCi_TSKlForm(int list, DWCUtilTaskCallback callback, void *arg, u8 priority);
 DWCUtilTask *formTask(int list, DWCUtilTaskCallback callback, void *arg, u8 priority, u8 freeArg);

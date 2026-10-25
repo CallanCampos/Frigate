@@ -45,10 +45,10 @@ static void procScene(void);
 static void input(void);
 static void draw(void);
 static void button(void);
-static void DWCUtilScreenWay_DisableButtons(void);
+static void endScene(void);
 static void endScene1(void);
 static void endScene2(void);
-static void DWCUtilScreenWay_MoveCursor(int direction);
+static void moveFocus(int direction);
 static void dispPush(void);
 
 // The slot of the prompt's number by language; for each layout, where the cursor goes from each button to the left,
@@ -70,8 +70,8 @@ static const u16 sScreenWayCursorRects[2][SCREEN_WAY_BUTTONS][4] = {
 
 static DWCUtilScreenWay sScreenWay;
 
-void DWCUtilScreenWay_Init(void) {
-    DWCUtilSettingsEdit *edit = DWCUtilWifiSettings_GetEdit();
+void DWCi_SceneSetSelectWay(void) {
+    DWCUtilSettingsEdit *edit = DWCi_SETTIGNlGet();
 
     sScreenWay.chosen = FALSE;
     if (sScreenWay.left == 0) {
@@ -99,10 +99,10 @@ void DWCUtilScreenWay_Init(void) {
 static void initGraphics(void) {
     char palettePath[] = "char/ybBgStep21.ncl.l";
 
-    DWCUtilGfxResource_Load("char/jbBgStep2.ncg.l", GX_LoadBG2Char);
-    DWCUtilGfxResource_Load("char/ybBgStep2.ncl.l", GX_LoadBGPltt);
-    DWCUtilGfxResource_Load("char/jb3Way.nsc.l", GX_LoadBG2Scr);
-    sScreenWay.palette = DWCUtilRomResource_LoadFile(DWCi_Char(palettePath), NULL, 4);
+    DWCi_CMNlLoadResource("char/jbBgStep2.ncg.l", GX_LoadBG2Char);
+    DWCi_CMNlLoadResource("char/ybBgStep2.ncl.l", GX_LoadBGPltt);
+    DWCi_CMNlLoadResource("char/jb3Way.nsc.l", GX_LoadBG2Scr);
+    sScreenWay.palette = DWCi_ARClReadEx(DWCi_Char(palettePath), NULL, 4);
     G2S_SetBG0Priority(3);
     G2S_SetBG1Priority(3);
     G2_SetBG1Priority(3);
@@ -112,8 +112,8 @@ static void initGraphics(void) {
 static void procInit(void) {
     DWCi_EFFlFade(DWC_UTIL_FADE_FROM_WHITE, 1, GX_BLEND_PLANEMASK_BG0, 8);
     DWCi_EFFlFade(DWC_UTIL_FADE_FROM_WHITE, 0, GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ, 8);
-    DWCi_GXlInvisible(1, GX_PLANEMASK_BG0);
-    DWCi_GXlInvisible(0, GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
+    DWCi_GXlVisible(1, GX_PLANEMASK_BG0);
+    DWCi_GXlVisible(0, GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
     DWCi_ChangeScene(procInit1);
 }
 
@@ -156,13 +156,13 @@ static void input(void) {
     } else if (DWCi_IPTlCheckTrigger(2)) {
         DWCi_BTNlSet(0);
     } else if (DWCi_IPTlCheckRepeat(0x40)) {
-        DWCUtilScreenWay_MoveCursor(1);
+        moveFocus(1);
     } else if (DWCi_IPTlCheckRepeat(0x80)) {
-        DWCUtilScreenWay_MoveCursor(3);
+        moveFocus(3);
     } else if (DWCi_IPTlCheckRepeat(0x20)) {
-        DWCUtilScreenWay_MoveCursor(0);
+        moveFocus(0);
     } else if (DWCi_IPTlCheckRepeat(0x10)) {
-        DWCUtilScreenWay_MoveCursor(2);
+        moveFocus(2);
     }
 }
 
@@ -172,20 +172,20 @@ static void draw(void) {
 static void button(void) {
     switch (DWCi_BTNlGet()) {
     case 0:
-        DWCUtilSound_PlaySe(7);
+        DWCi_SNDlPlay(7);
         break;
     case 1:
-        DWCUtilSound_PlaySe(6);
+        DWCi_SNDlPlay(6);
         dispPush();
         sScreenWay.chosen = TRUE;
         break;
     default:
         return;
     }
-    DWCi_ChangeScene(DWCUtilScreenWay_DisableButtons);
+    DWCi_ChangeScene(endScene);
 }
 
-static void DWCUtilScreenWay_DisableButtons(void) {
+static void endScene(void) {
     DWCi_BTNlDisable();
     DWCi_EFFlWait(8);
     DWCi_ChangeScene(endScene1);
@@ -212,21 +212,21 @@ static void endScene2(void) {
     DWCi_FOCUSlDelete();
     DWCi_COMMENTlDelete();
     DWCi_ARClRelease(sScreenWay.palette);
-    DWCUtilDisplay_HidePlanes(1, GX_PLANEMASK_BG0);
-    DWCUtilDisplay_HidePlanes(0, GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
+    DWCi_GXlInvisible(1, GX_PLANEMASK_BG0);
+    DWCi_GXlInvisible(0, GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
     if (!sScreenWay.chosen) {
         DWCi_SetParam_(2, 0);
-        DWCi_ChangeScene(DWCUtilScreenAp_Init);
+        DWCi_ChangeScene(DWCi_SceneSetSelectAp);
         return;
     }
     switch (sScreenWay.cursor) {
     case 0:
         DWCi_SetParam_(2, 1);
-        DWCi_ChangeScene(DWCUtilApSearch_Init);
+        DWCi_ChangeScene(DWCi_SceneSetSearch);
         break;
     case 1:
         DWCi_SetParam_(2, 1);
-        DWCi_ChangeScene(DWCUtilPageStep3_Init);
+        DWCi_ChangeScene(DWCi_SceneSetAossButton);
         break;
     case 2:
         DWCi_SetParam_(2, 1);
@@ -242,7 +242,7 @@ static void endScene2(void) {
 }
 
 // Moves the cursor left, up, right or down (0 to 3)
-static void DWCUtilScreenWay_MoveCursor(int direction) {
+static void moveFocus(int direction) {
     int cursor = sScreenWay.cursor;
     int next = sScreenWayMoves[DWCi_Flag(1)][cursor][direction];
 
@@ -257,7 +257,7 @@ static void DWCUtilScreenWay_MoveCursor(int direction) {
     } else {
         sScreenWay.cursor = next;
     }
-    DWCUtilSound_PlaySe(8);
+    DWCi_SNDlPlay(8);
     DWCi_FOCUSlDisp4(sScreenWayCursorRects[DWCi_Flag(1)][sScreenWay.cursor][0],
                      sScreenWayCursorRects[DWCi_Flag(1)][sScreenWay.cursor][2],
                      sScreenWayCursorRects[DWCi_Flag(1)][sScreenWay.cursor][1],

@@ -41,7 +41,7 @@ void DWCi_ClearVram(void) {
     clearVram();
 }
 
-void DWCUtilBank_Exit(void) {
+void DWCi_RepairVram(void) {
     GX_DisableBankForBG();
     GX_DisableBankForOBJ();
     GX_DisableBankForSubBG();

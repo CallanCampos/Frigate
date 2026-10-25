@@ -25,8 +25,8 @@ enum {
     MOVE_WAIT_EVENT,
 };
 
-static BOOL DWCUtilPageMulti5_IsLidClosed(void);
-static void DWCUtilPageMulti5_LoadGraphics(void);
+static BOOL DWCi_IsFold(void);
+static void initGraphics(void);
 static void procInit(void);
 static void procInit1(void);
 static void DWCUtilPageMulti5_WaitButtons(void);
@@ -42,25 +42,25 @@ static void DWCUtilPageMulti5_OnMoveEvent(int event);
 static u8 sMoveWaitEnd;
 
 // Whether the lid is closed
-static BOOL DWCUtilPageMulti5_IsLidClosed(void) {
+static BOOL DWCi_IsFold(void) {
     if (PAD_DetectFold()) {
         return TRUE;
     }
     return FALSE;
 }
 
-void DWCUtilPageMulti5_Init(void) {
+void DWCi_SceneOptMovWait(void) {
     DWCi_MOVlInit(DWCUtilPageMulti5_OnMoveEvent);
     sMoveWaitEnd = MOVE_WAIT_CANCELLED;
-    DWCUtilPageMulti5_LoadGraphics();
+    initGraphics();
     DWCi_CMNlMsgDraw(0x1c);
     DWCi_ANIMElInitEx(0);
-    DWCUtilSound_PlaySe(0xb);
+    DWCi_SNDlPlay(0xb);
     DWCi_ChangeScene(procInit);
 }
 
-static void DWCUtilPageMulti5_LoadGraphics(void) {
-    DWCUtilGfxResource_Load("char/yb5Multi.nsc.l", GX_LoadBG2Scr);
+static void initGraphics(void) {
+    DWCi_CMNlLoadResource("char/yb5Multi.nsc.l", GX_LoadBG2Scr);
     G2S_SetBG0Priority(3);
     G2S_SetBG1Priority(3);
     G2_SetBG0Priority(3);
@@ -71,7 +71,7 @@ static void DWCUtilPageMulti5_LoadGraphics(void) {
 static void procInit(void) {
     DWCi_EFFlFade(DWC_UTIL_FADE_FROM_WHITE, 0, GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ,
                   8);
-    DWCi_GXlInvisible(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
+    DWCi_GXlVisible(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
     DWCi_ChangeScene(procInit1);
 }
 
@@ -97,7 +97,7 @@ static void procScene(void) {
 static void DWCUtilPageMulti5_HandleInput(void) {
     if (DWCi_IPTlCheckTrigger(2)) {
         DWCi_BTNlSet(0);
-    } else if (DWCUtilPageMulti5_IsLidClosed()) {
+    } else if (DWCi_IsFold()) {
         DWCi_BTNlSet(0);
     }
 }
@@ -107,15 +107,15 @@ static void draw(void) {
 
 static void DWCUtilPageMulti5_HandleChoice(void) {
     if (DWCi_BTNlGet() == 0) {
-        DWCUtilSound_StopSe();
-        DWCUtilSound_PlaySe(7);
+        DWCi_SNDlStop();
+        DWCi_SNDlPlay(7);
         DWCi_ChangeScene(DWCUtilPageMulti5_DisableButtons);
     }
 }
 
 static void DWCUtilPageMulti5_DisableButtons(void) {
     if (sMoveWaitEnd == MOVE_WAIT_CANCELLED) {
-        DWCUtilMove_End();
+        DWCi_MOVlEnd();
     }
     DWCi_BTNlDisable();
     DWCi_EFFlWait(8);
@@ -155,29 +155,29 @@ static void DWCUtilPageMulti5_WaitFadeOut(void) {
     DWCi_FNTlDeleteBgLcd(0);
     if (sMoveWaitEnd == MOVE_WAIT_CANCELLED) {
         DWCi_COMMENTlDelete();
-        DWCUtilDisplay_HidePlanes(1, GX_PLANEMASK_BG0);
+        DWCi_GXlInvisible(1, GX_PLANEMASK_BG0);
     }
-    DWCUtilDisplay_HidePlanes(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
+    DWCi_GXlInvisible(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
     if (sMoveWaitEnd == MOVE_WAIT_CANCELLED) {
         DWCi_SetParam_(0, 1);
-        DWCi_ChangeScene(DWCUtilOptionMenu_Init);
+        DWCi_ChangeScene(DWCi_SceneOptMenu);
     } else if (sMoveWaitEnd == MOVE_WAIT_EVENT) {
         DWCi_SetParam_(0, 1);
-        DWCi_ChangeScene(DWCUtilNoticeScreen_Init);
+        DWCi_ChangeScene(DWCi_SceneOptMovFailure);
     } else {
         DWCi_SetParam_(0, 1);
-        DWCi_ChangeScene(DWCUtilPageMove_Init);
+        DWCi_ChangeScene(DWCi_SceneOptMovUser);
     }
 }
 
 static void DWCUtilPageMulti5_OnMoveEvent(int event) {
-    DWCUtilSound_StopSe();
+    DWCi_SNDlStop();
     if (event == 0) {
         sMoveWaitEnd = MOVE_WAIT_CONNECTED;
-        DWCUtilSound_PlaySe(0x10);
+        DWCi_SNDlPlay(0x10);
     } else {
         sMoveWaitEnd = MOVE_WAIT_EVENT;
-        DWCUtilSound_PlaySe(0x12);
+        DWCi_SNDlPlay(0x12);
     }
     DWCi_MOVlChangeCallback(NULL);
     DWCi_ChangeScene(DWCUtilPageMulti5_DisableButtons);

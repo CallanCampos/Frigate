@@ -9,6 +9,6 @@
 // closing the lid or the button end the test and go back to the choice of the setup of a connection.
 // The file is the DWC utility library's scenesetrakubutton1.o (libdwcutil.TWL.HYB.a), as aletheia's map of Black 1's
 // SDK code to that library's objects (layout/symbols_sdk.txt) shows it.
-void DWCUtilTestConnect_Init(void);
+void DWCi_SceneSetRakuButton1(void);
 
 #endif // POKEBW2_DWCUTIL_SCENESETRAKUBUTTON1_H

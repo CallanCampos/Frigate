@@ -8,6 +8,6 @@
 // characters, or 10, 26 or 32 hexadecimal digits; a confirmation takes the text into the connection.
 // The file is the DWC utility library's scenesetedit32.o (libdwcutil.TWL.HYB.a), as aletheia's map of Black 1's SDK
 // code to that library's objects (layout/symbols_sdk.txt) shows it.
-void DWCUtilWepKeyboard_Init(void);
+void DWCi_SceneSetEdit32(void);
 
 #endif // POKEBW2_DWCUTIL_SCENESETEDIT32_H

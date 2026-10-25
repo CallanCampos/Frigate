@@ -47,11 +47,11 @@ char *DWCi_Char(const char *path) {
     return sPath;
 }
 
-void DWCUtilGfxResource_Load(const char *path, void (*upload)(const void *, u32, u32)) {
+void DWCi_CMNlLoadResource(const char *path, void (*upload)(const void *, u32, u32)) {
     u32 size;
     void *data;
 
-    data = DWCUtilRomResource_LoadFile(DWCi_Char(path), &size, 4);
+    data = DWCi_ARClReadEx(DWCi_Char(path), &size, 4);
     DC_FlushRange(data, size);
     upload(data, 0, size);
     DWCi_ARClRelease(data);
@@ -62,7 +62,7 @@ void DWCi_CMNlStep(int variant) {
 
     DWCi_GetParam_(&layout, NULL);
     if (layout == 1) {
-        DWCUtilSubScreen_SlideInRow(variant);
+        DWCi_STEPlBegin(variant);
     } else if (layout == 2) {
         DWCi_STEPlChange(variant);
     }
@@ -82,7 +82,7 @@ void DWCi_CMNlMsgDraw(int msgIndex) {
     u16 *str = DWCi_MSGlGet(gDWCUtilMsg, msgIndex);
 
     DWCi_FNTlDrawRect(text, sMsgBox.x, sMsgBox.y, sMsgBox.width, sMsgBox.height, 2, DWCi_CMNlFontFlag(), str);
-    DWCUtilText_MarkDirty(text);
+    DWCi_FNTlRenewBg(text);
 }
 
 void DWCi_CMNlMsgNameDraw(const void *str, int msgIndex) {
@@ -92,7 +92,7 @@ void DWCi_CMNlMsgNameDraw(const void *str, int msgIndex) {
     DWCi_FNTlDrawRect(text, sStrMsgBox.x, sStrMsgBox.y, sStrMsgBox.width, sStrMsgBox.height, 2, DWCi_CMNlFontFlag(),
                       msg);
     DWCi_FNTlDraw(text, sStrPositions[DWCi_Language()].x, sStrPositions[DWCi_Language()].y, 2, 0x209, str);
-    DWCUtilText_MarkDirty(text);
+    DWCi_FNTlRenewBg(text);
 }
 
 u32 DWCi_CMNlFontFlag(void) {

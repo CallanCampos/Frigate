@@ -1,18 +1,18 @@
 #include "foundation.h"
 
-void DWCUtilDisplay_SetPoint(u16 x, u16 y, u16 *point) {
+void DWCi_InputCoord(u16 x, u16 y, u16 *point) {
     point[0] = x;
     point[1] = y;
 }
 
-void DWCUtilDisplay_SetRect(int left, int top, int right, int bottom, u16 *rect) {
+void DWCi_InputRect(int left, int top, int right, int bottom, u16 *rect) {
     rect[0] = left;
     rect[1] = top;
     rect[2] = right;
     rect[3] = bottom;
 }
 
-void DWCUtilDisplay_SetRectFromSize(const void *position, const void *size, void *rect) {
+void DWCi_Coord2Rect(const void *position, const void *size, void *rect) {
     const u16 *pos = position;
     const u16 *extent = size;
     u16 *out = rect;

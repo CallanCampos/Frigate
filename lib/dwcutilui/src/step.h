@@ -18,7 +18,7 @@ enum {
 };
 
 // Slides the row of a step in, and shows the row of another step in its place
-void DWCUtilSubScreen_SlideInRow(int step);
+void DWCi_STEPlBegin(int step);
 void DWCi_STEPlChange(int step);
 // Slides the row out and frees it; DWCi_STEPlGet is whether a slide runs, DWCi_STEPlIsEnd
 // whether no row is sliding out

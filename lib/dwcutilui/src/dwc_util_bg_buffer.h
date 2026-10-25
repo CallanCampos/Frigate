@@ -17,6 +17,6 @@ void DWCi_SCREENlCopy(const u16 *src, int offset, int width, int rows);
 // Copies row src of the palette to BG palette row dest of the main screen, and the whole palette as the main screen's
 // BG palettes
 void DWCi_SCREENlCopyPalette(const void *palette, int src, int dest);
-void DWCUtilBgBuffer_LoadPalette(const void *palette);
+void DWCi_SCREENlSetPalette(const void *palette);
 
 #endif // POKEBW2_DWCUTIL_DWC_UTIL_BG_BUFFER_H

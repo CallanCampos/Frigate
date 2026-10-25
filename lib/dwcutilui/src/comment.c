@@ -24,13 +24,13 @@ BOOL DWCi_COMMENTlDispEx(int msgIndex, int slot, int value) {
         return FALSE;
     }
 
-    DWCUtilGfxResource_Load(sBlankScreenPath, GXS_LoadBG0Scr);
+    DWCi_CMNlLoadResource(sBlankScreenPath, GXS_LoadBG0Scr);
     reg_G2S_DB_BG0OFS = 0x01920000;
     text = DWCi_FNTlFormBgEx(1, 0);
     str = DWCi_MSGlGetEx(gDWCUtilMsg, msgIndex, slot, value);
     flags = DWCi_CMNlFontFlag();
     DWCi_FNTlDrawRect(text, 0x14, 0, 0xd8, 0x40, 2, flags, str);
-    DWCUtilText_MarkDirty(text);
+    DWCi_FNTlRenewBg(text);
     sScreenActive = TRUE;
     return TRUE;
 }

@@ -8,6 +8,6 @@
 // digits. A confirmation takes the address into the connection, and the utility goes back to its settings.
 // The file is the DWC utility library's sceneseteditaddress.o (libdwcutil.TWL.HYB.a), as aletheia's map of Black 1's
 // SDK code to that library's objects (layout/symbols_sdk.txt) shows it.
-void DWCUtilAddressEdit_Init(void);
+void DWCi_SceneSetEditAddress(void);
 
 #endif // POKEBW2_DWCUTIL_SCENESETEDITADDRESS_H

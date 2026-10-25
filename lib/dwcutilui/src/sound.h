@@ -8,14 +8,14 @@
 // The file is the DWC utility library's sound.o (libdwcutil.TWL.HYB.a), as aletheia's map of Black 1's SDK code to that
 // library's objects (layout/symbols_sdk.txt) shows it.
 // Starts the sound and ends it, around the main loop
-void DWCUtilSound_Init(void);
+void DWCi_SNDlInit(void);
 void DWCi_SNDlEnd(void);
 // Starts a sound effect
-void DWCUtilSound_PlaySe(int seq);
+void DWCi_SNDlPlay(int seq);
 // Sets the volume and the pitch of the tracks of a mask of the sound effect that plays
-void DWCUtilSound_SetVolume(int volume);
-void DWCUtilSound_SetTrackPitch(u16 trackMask, int pitch);
+void DWCi_SNDlSetVolume(int volume);
+void DWCi_SNDlSetPitch(u16 trackMask, int pitch);
 // Stops the sound effect
-void DWCUtilSound_StopSe(void);
+void DWCi_SNDlStop(void);
 
 #endif // POKEBW2_DWCUTIL_SOUND_H

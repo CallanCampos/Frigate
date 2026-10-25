@@ -22,7 +22,7 @@ static void DWCUtilTopMenu_InstructionsDisableButtons(void);
 static void DWCUtilTopMenu_InstructionsFadeOut(void);
 static void DWCUtilTopMenu_InstructionsWaitFadeOut(void);
 
-void DWCUtilTopMenu_InitInstructions(void) {
+void DWCi_SceneOptMovConfirm(void) {
     DWCUtilTopMenu_SetInstructionsPriorities();
     DWCi_CMNlMsgDraw(0x1a);
     DWCi_ChangeScene(DWCUtilTopMenu_InstructionsFadeIn);
@@ -39,7 +39,7 @@ static void DWCUtilTopMenu_SetInstructionsPriorities(void) {
 static void DWCUtilTopMenu_InstructionsFadeIn(void) {
     DWCi_EFFlFade(DWC_UTIL_FADE_FROM_WHITE, 0, GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ,
                   8);
-    DWCi_GXlInvisible(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
+    DWCi_GXlVisible(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
     DWCi_ChangeScene(DWCUtilTopMenu_InstructionsWaitFadeIn);
 }
 
@@ -74,7 +74,7 @@ static void func_ov182_021afb0c(void) {
 
 static void DWCUtilTopMenu_InstructionsHandleChoice(void) {
     if (DWCi_BTNlGet() == 0) {
-        DWCUtilSound_PlaySe(6);
+        DWCi_SNDlPlay(6);
         DWCi_ChangeScene(DWCUtilTopMenu_InstructionsDisableButtons);
     }
 }
@@ -97,8 +97,8 @@ static void DWCUtilTopMenu_InstructionsFadeOut(void) {
 static void DWCUtilTopMenu_InstructionsWaitFadeOut(void) {
     if (DWCi_EFFlCheck(0) == 0 && DWCi_BTNlIsEnd()) {
         DWCi_FNTlDeleteBgLcd(0);
-        DWCUtilDisplay_HidePlanes(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
+        DWCi_GXlInvisible(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
         DWCi_SetParam_(0, 1);
-        DWCi_ChangeScene(DWCUtilPageMulti5_Init);
+        DWCi_ChangeScene(DWCi_SceneOptMovWait);
     }
 }

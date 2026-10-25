@@ -34,7 +34,7 @@ void DWCi_SETTIGNlEnd(void) {
     DWCi_HEAPlFree_(&sWifiSettings);
 }
 
-DWCUtilSettingsEdit *DWCUtilWifiSettings_GetEdit(void) {
+DWCUtilSettingsEdit *DWCi_SETTIGNlGet(void) {
     return &sWifiSettings->edit;
 }
 
@@ -93,11 +93,11 @@ void DWCi_SETTINGlSetWep(const u8 *key) {
     }
 }
 
-void DWCUtilWifiSettings_SetIp(const u8 *digits) {
+void DWCi_SETTINGlSetIp(const u8 *digits) {
     DWCi_SETTINGlConvAddress(digits, sWifiSettings->edit.connection.ip);
 }
 
-void DWCUtilWifiSettings_SetNetmask(const u8 *digits) {
+void DWCi_SETTINGlSetNetMask(const u8 *digits) {
     DWCi_SETTINGlConvAddress(digits, sWifiSettings->edit.netmask);
 }
 

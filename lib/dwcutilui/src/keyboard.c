@@ -145,17 +145,17 @@ void DWCi_KBlInit(void) {
     sKeyboard->backspaceEnabled = TRUE;
     sKeyboard->charsEnabled = TRUE;
     for (i = 0; i < KEYBOARD_CHAR_KEYS; i++) {
-        sKeyboard->charOams[i] = DWCUtilCell_AllocOam(0, 0x34);
+        sKeyboard->charOams[i] = DWCi_CEINlSetExObj(0, 0x34);
         G2_SetOBJEffect(sKeyboard->charOams[i], GX_OAM_EFFECT_NODISPLAY, 0);
         G2_SetOBJPriority(sKeyboard->charOams[i], 3);
     }
     for (i = 0; i < KEYBOARD_SPECIAL_KEYS; i++) {
-        sKeyboard->specialOams[i] = DWCUtilCell_AllocOam(0, sSpecialCells[i]);
+        sKeyboard->specialOams[i] = DWCi_CEINlSetExObj(0, sSpecialCells[i]);
         G2_SetOBJEffect(sKeyboard->specialOams[i], GX_OAM_EFFECT_NODISPLAY, 0);
         G2_SetOBJPriority(sKeyboard->specialOams[i], 3);
     }
     for (i = 0; i < 2; i++) {
-        sKeyboard->buttons[i] = DWCUtilCell_AllocOamRun(0, sButtonCells[i], TRUE);
+        sKeyboard->buttons[i] = DWCi_CEINlSetExCell(0, sButtonCells[i], TRUE);
         DWCi_CELLlSetEffect(sKeyboard->buttons[i], -1, 0x200, 0);
         DWCi_CELLlSetPriority(sKeyboard->buttons[i], -1, 3);
     }
@@ -177,7 +177,7 @@ void DWCi_KBlInit(void) {
             }
         }
     }
-    sKeyboard->cursor = DWCUtilCell_AllocOamRun(0, 0x40, TRUE);
+    sKeyboard->cursor = DWCi_CEINlSetExCell(0, 0x40, TRUE);
     DWCi_CELLlSetEffect(sKeyboard->cursor, -1, 0x200, 0);
     DWCi_CELLlSetPriority(sKeyboard->cursor, -1, 2);
     sKeyboard->task = DWCi_TSKlForm(0, taskStart0, NULL, 0x78);
@@ -310,33 +310,33 @@ static void touchTriger(void) {
     if (DWCi_TPlCheckTrigger(gDWCUtilTouchScreenRect)) {
         sKeyboard->touched = -1;
         for (i = 0; i < KEYBOARD_CHAR_KEYS; i++) {
-            DWCUtilDisplay_SetRectFromSize(&sCharKeyPositions[i], sCharKeySize, rect);
+            DWCi_Coord2Rect(&sCharKeyPositions[i], sCharKeySize, rect);
             if (DWCi_TPlCheckTrigger(rect)) {
                 if (!sKeyboard->charsEnabled) {
-                    DWCUtilSound_PlaySe(9);
+                    DWCi_SNDlPlay(9);
                     return;
                 }
-                DWCUtilSound_PlaySe(0);
+                DWCi_SNDlPlay(0);
                 sKeyboard->touched = i;
                 return;
             }
         }
         for (i = 0; i < KEYBOARD_SPECIAL_KEYS; i++) {
-            DWCUtilDisplay_SetRectFromSize(&sSpecialPositions[i], &sSpecialSizes[i], rect);
+            DWCi_Coord2Rect(&sSpecialPositions[i], &sSpecialSizes[i], rect);
             if (DWCi_TPlCheckTrigger(rect)) {
                 if ((i == 3 && !sKeyboard->backspaceEnabled) || (i == 2 && !sKeyboard->charsEnabled)) {
-                    DWCUtilSound_PlaySe(9);
+                    DWCi_SNDlPlay(9);
                     return;
                 }
-                DWCUtilSound_PlaySe(sSpecialSounds[i]);
+                DWCi_SNDlPlay(sSpecialSounds[i]);
                 sKeyboard->touched = i + KEYBOARD_FIRST_SPECIAL;
                 return;
             }
         }
         for (i = 0; i < 2; i++) {
-            DWCUtilDisplay_SetRectFromSize(&sButtonPositions[i], sButtonSize, rect);
+            DWCi_Coord2Rect(&sButtonPositions[i], sButtonSize, rect);
             if (DWCi_TPlCheckTrigger(rect)) {
-                DWCUtilSound_PlaySe(0);
+                DWCi_SNDlPlay(0);
                 sKeyboard->touched = i + KEYBOARD_FIRST_BUTTON;
                 return;
             }
@@ -355,7 +355,7 @@ static void touchRelease(void) {
         return;
     }
     do {
-        DWCUtilDisplay_SetRectFromSize(&sCharKeyPositions[i], sCharKeySize, rect);
+        DWCi_Coord2Rect(&sCharKeyPositions[i], sCharKeySize, rect);
         if (DWCi_TPlCheckRelease(rect)) {
             if (sKeyboard->touched != i) {
                 return;
@@ -372,7 +372,7 @@ static void touchRelease(void) {
     } while (i < KEYBOARD_CHAR_KEYS);
     j = 2;
     do {
-        DWCUtilDisplay_SetRectFromSize(&sSpecialPositions[j], &sSpecialSizes[j], rect);
+        DWCi_Coord2Rect(&sSpecialPositions[j], &sSpecialSizes[j], rect);
         if (DWCi_TPlCheckRelease(rect)) {
             if (sKeyboard->touched != j + KEYBOARD_FIRST_SPECIAL) {
                 return;
@@ -389,7 +389,7 @@ static void touchRelease(void) {
     } while (j < KEYBOARD_SPECIAL_KEYS);
     j = 0;
     do {
-        DWCUtilDisplay_SetRectFromSize(&sButtonPositions[j], sButtonSize, rect);
+        DWCi_Coord2Rect(&sButtonPositions[j], sButtonSize, rect);
         if (DWCi_TPlCheckRelease(rect)) {
             if (sKeyboard->touched != j + KEYBOARD_FIRST_BUTTON) {
                 return;
@@ -401,7 +401,7 @@ static void touchRelease(void) {
         }
         j++;
     } while (j < 2);
-    DWCUtilDisplay_SetRectFromSize(&sSpecialPositions[0], &sSpecialSizes[0], rect);
+    DWCi_Coord2Rect(&sSpecialPositions[0], &sSpecialSizes[0], rect);
     if (DWCi_TPlCheckRelease(rect)) {
         if (sKeyboard->touched == KEYBOARD_FIRST_SPECIAL) {
             pushCaps();
@@ -410,7 +410,7 @@ static void touchRelease(void) {
             return;
         }
     } else {
-        DWCUtilDisplay_SetRectFromSize(&sSpecialPositions[1], &sSpecialSizes[1], rect);
+        DWCi_Coord2Rect(&sSpecialPositions[1], &sSpecialSizes[1], rect);
         if (DWCi_TPlCheckRelease(rect) && sKeyboard->touched == KEYBOARD_FIRST_SPECIAL + 1) {
             pushShift();
             sKeyboard->cursorPos = KEYBOARD_FIRST_SPECIAL + 1;
@@ -421,12 +421,12 @@ static void touchRelease(void) {
 
 static void pushCaps(void) {
     changePage(sKeyboard->mode == 2 ? 0 : 2);
-    DWCUtilSound_PlaySe(1);
+    DWCi_SNDlPlay(1);
 }
 
 static void pushShift(void) {
     changePage(sKeyboard->mode == 1 ? 0 : 1);
-    DWCUtilSound_PlaySe(1);
+    DWCi_SNDlPlay(1);
 }
 
 static void touch(void) {
@@ -435,7 +435,7 @@ static void touch(void) {
 
     if (DWCi_TPlCheck(gDWCUtilTouchScreenRect)) {
         for (i = 0; i < KEYBOARD_CHAR_KEYS; i++) {
-            DWCUtilDisplay_SetRectFromSize(&sCharKeyPositions[i], sCharKeySize, rect);
+            DWCi_Coord2Rect(&sCharKeyPositions[i], sCharKeySize, rect);
             if (DWCi_TPlCheck(rect)) {
                 if (sKeyboard->touched != i) {
                     goto release;
@@ -444,7 +444,7 @@ static void touch(void) {
             }
         }
         for (i = 2; i < KEYBOARD_SPECIAL_KEYS; i++) {
-            DWCUtilDisplay_SetRectFromSize(&sSpecialPositions[i], &sSpecialSizes[i], rect);
+            DWCi_Coord2Rect(&sSpecialPositions[i], &sSpecialSizes[i], rect);
             if (DWCi_TPlCheck(rect)) {
                 if (sKeyboard->touched == i + KEYBOARD_FIRST_SPECIAL) {
                     exchangeBack(i + KEYBOARD_FIRST_SPECIAL);
@@ -456,7 +456,7 @@ static void touch(void) {
                         return;
                     }
                     if (!sKeyboard->backspaceEnabled) {
-                        DWCUtilSound_PlaySe(9);
+                        DWCi_SNDlPlay(9);
                         sKeyboard->touched = -1;
                         return;
                     }
@@ -468,7 +468,7 @@ static void touch(void) {
             }
         }
         for (i = 0; i < 2; i++) {
-            DWCUtilDisplay_SetRectFromSize(&sButtonPositions[i], sButtonSize, rect);
+            DWCi_Coord2Rect(&sButtonPositions[i], sButtonSize, rect);
             if (DWCi_TPlCheck(rect)) {
                 i += KEYBOARD_FIRST_BUTTON;
                 if (sKeyboard->touched == i) {
@@ -515,7 +515,7 @@ static void key(void) {
         key = sKeyboard->cursorPos;
         if (key < KEYBOARD_CHAR_KEYS) {
             if (!sKeyboard->charsEnabled) {
-                DWCUtilSound_PlaySe(9);
+                DWCi_SNDlPlay(9);
                 return;
             }
             sKeyboard->key = sKeyCodes[sKeyboard->mode][key];
@@ -535,13 +535,13 @@ static void key(void) {
                 return;
             case 2:
                 if (!sKeyboard->charsEnabled) {
-                    DWCUtilSound_PlaySe(9);
+                    DWCi_SNDlPlay(9);
                     return;
                 }
                 break;
             case 3:
                 if (!sKeyboard->backspaceEnabled) {
-                    DWCUtilSound_PlaySe(9);
+                    DWCi_SNDlPlay(9);
                     return;
                 }
                 break;
@@ -559,7 +559,7 @@ static void key(void) {
             if (sKeyboard->errorPlayed) {
                 return;
             }
-            DWCUtilSound_PlaySe(9);
+            DWCi_SNDlPlay(9);
             sKeyboard->errorPlayed = TRUE;
             return;
         }
@@ -658,7 +658,7 @@ static void dispFocus(void) {
         cell = 0x40;
         break;
     }
-    DWCUtilCell_Copy(0, cell, DWCi_CELLlGetObj(sKeyboard->cursor, 0));
+    DWCi_CEINlSet(0, cell, DWCi_CELLlGetObj(sKeyboard->cursor, 0));
     DWCi_CELLlSetPriority(sKeyboard->cursor, -1, 2);
     DWCi_CELLlSetPosition(sKeyboard->cursor, -1, sCursorPositions[sKeyboard->cursorPos].x,
                           sCursorPositions[sKeyboard->cursorPos].y);
@@ -815,7 +815,7 @@ static void moveFocus(int direction) {
         }
     }
     dispFocus();
-    DWCUtilSound_PlaySe(8);
+    DWCi_SNDlPlay(8);
 }
 
 static void taskEnd0(DWCUtilTask *task, void *arg) {

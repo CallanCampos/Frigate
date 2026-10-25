@@ -34,12 +34,12 @@ static const u8 sPosIndex[7][2] = { { 0, 1 }, { 0, 0 }, { 0, 0 }, { 0, 1 }, { 1,
 static DWCUtilUiObject *sUiObject;
 
 static void disp(int y);
-static void DWCUtilUiObject_Raise(DWCUtilTask *task, void *arg);
-static void DWCUtilUiObject_RaiseDone(DWCUtilTask *task, void *arg);
-static void DWCUtilUiObject_Select(DWCUtilTask *task, void *arg);
-static void DWCUtilUiObject_Lower(DWCUtilTask *task, void *arg);
-static void DWCUtilUiObject_Destroy(DWCUtilTask *task, void *arg);
-static void DWCUtilUiObject_Revert(DWCUtilTask *task, void *arg);
+static void taskStart(DWCUtilTask *task, void *arg);
+static void taskStart1(DWCUtilTask *task, void *arg);
+static void taskMain(DWCUtilTask *task, void *arg);
+static void taskEnd(DWCUtilTask *task, void *arg);
+static void taskEnd1(DWCUtilTask *task, void *arg);
+static void taskRelease(DWCUtilTask *task, void *arg);
 
 void DWCi_BTNlInit(int variant) {
     int count = sCounts[variant];
@@ -49,18 +49,18 @@ void DWCi_BTNlInit(int variant) {
     sUiObject->state = -2;
     sUiObject->variant = variant;
     for (i = 0; i < count; i++) {
-        sUiObject->objects[i] = DWCUtilCell_AllocOamRun(0, sUiResources[variant][i], 1);
+        sUiObject->objects[i] = DWCi_CEINlSetExCell(0, sUiResources[variant][i], 1);
         DWCi_CELLlSetPriority(sUiObject->objects[i], -1, 1);
     }
-    sUiObject->objects[2] = DWCUtilCell_AllocOamRun(0, 1, 1);
+    sUiObject->objects[2] = DWCi_CEINlSetExCell(0, 1, 1);
     DWCi_CELLlSetPriority(sUiObject->objects[2], -1, 1);
     disp(0xc0);
-    sUiObject->task = DWCi_TSKlForm(0, DWCUtilUiObject_Raise, NULL, 0x78);
+    sUiObject->task = DWCi_TSKlForm(0, taskStart, NULL, 0x78);
 }
 
 void DWCi_BTNlEnd(void) {
     sUiObject->exiting = TRUE;
-    DWCi_TSKlChangeFunc(sUiObject->task, DWCUtilUiObject_Lower);
+    DWCi_TSKlChangeFunc(sUiObject->task, taskEnd);
 }
 
 int DWCi_BTNlGet(void) {
@@ -105,7 +105,7 @@ static void disp(int y) {
     }
 }
 
-static void DWCUtilUiObject_Raise(DWCUtilTask *task, void *arg) {
+static void taskStart(DWCUtilTask *task, void *arg) {
     int x;
     int y;
 
@@ -114,20 +114,20 @@ static void DWCUtilUiObject_Raise(DWCUtilTask *task, void *arg) {
     disp(y);
     if (y <= 0xa8) {
         disp(0xa8);
-        DWCi_TSKlChangeFunc(task, DWCUtilUiObject_RaiseDone);
+        DWCi_TSKlChangeFunc(task, taskStart1);
     }
 }
 
-static void DWCUtilUiObject_RaiseDone(DWCUtilTask *task, void *arg) {
+static void taskStart1(DWCUtilTask *task, void *arg) {
     sUiObject->state = -1;
     sUiObject->counter++;
     if (sUiObject->counter >= 4) {
         sUiObject->counter = 0;
-        DWCi_TSKlChangeFunc(task, DWCUtilUiObject_Select);
+        DWCi_TSKlChangeFunc(task, taskMain);
     }
 }
 
-static void DWCUtilUiObject_Select(DWCUtilTask *task, void *arg) {
+static void taskMain(DWCUtilTask *task, void *arg) {
     int count = sCounts[sUiObject->variant];
     int i;
     u16 rect[4];
@@ -138,7 +138,7 @@ static void DWCUtilUiObject_Select(DWCUtilTask *task, void *arg) {
             return;
         }
         for (i = 0; i < count; i++) {
-            DWCUtilDisplay_SetRectFromSize(&sPositions[sPosIndex[sUiObject->variant][i]], sHitSize, rect);
+            DWCi_Coord2Rect(&sPositions[sPosIndex[sUiObject->variant][i]], sHitSize, rect);
             if (!DWCi_TPlCheckTrigger(rect)) {
                 continue;
             }
@@ -146,11 +146,11 @@ static void DWCUtilUiObject_Select(DWCUtilTask *task, void *arg) {
                 break;
             }
             resource = sUiResources[sUiObject->variant][i];
-            DWCUtilCell_Copy(0, resource + 1, DWCi_CELLlGetObj(sUiObject->objects[i], 0));
+            DWCi_CEINlSet(0, resource + 1, DWCi_CELLlGetObj(sUiObject->objects[i], 0));
             DWCi_CELLlSetPosition(sUiObject->objects[i], -1, sPositions[sPosIndex[sUiObject->variant][i]].x,
                                   sPositions[sPosIndex[sUiObject->variant][i]].y);
             DWCi_CELLlSetPriority(sUiObject->objects[i], -1, 1);
-            sUiObject->selectTask = DWCi_TSKlForm(0, DWCUtilUiObject_Revert, NULL, 0x6e);
+            sUiObject->selectTask = DWCi_TSKlForm(0, taskRelease, NULL, 0x6e);
             sUiObject->state = i;
             return;
         }
@@ -158,7 +158,7 @@ static void DWCUtilUiObject_Select(DWCUtilTask *task, void *arg) {
     sUiObject->state = -1;
 }
 
-static void DWCUtilUiObject_Lower(DWCUtilTask *task, void *arg) {
+static void taskEnd(DWCUtilTask *task, void *arg) {
     int x;
     int y;
 
@@ -166,11 +166,11 @@ static void DWCUtilUiObject_Lower(DWCUtilTask *task, void *arg) {
     y += 4;
     disp(y);
     if (y >= 0xc0) {
-        DWCi_TSKlChangeFunc(task, DWCUtilUiObject_Destroy);
+        DWCi_TSKlChangeFunc(task, taskEnd1);
     }
 }
 
-static void DWCUtilUiObject_Destroy(DWCUtilTask *task, void *arg) {
+static void taskEnd1(DWCUtilTask *task, void *arg) {
     int i;
 
     DWCi_TSKlDelete(0, task);
@@ -186,7 +186,7 @@ static void DWCUtilUiObject_Destroy(DWCUtilTask *task, void *arg) {
     DWCi_HEAPlFree_(&sUiObject);
 }
 
-static void DWCUtilUiObject_Revert(DWCUtilTask *task, void *arg) {
+static void taskRelease(DWCUtilTask *task, void *arg) {
     int i;
     int count;
     int resource;
@@ -198,7 +198,7 @@ static void DWCUtilUiObject_Revert(DWCUtilTask *task, void *arg) {
     count = sCounts[sUiObject->variant];
     for (i = 0; i < count; i++) {
         resource = sUiResources[sUiObject->variant][i];
-        DWCUtilCell_Copy(0, resource, DWCi_CELLlGetObj(sUiObject->objects[i], 0));
+        DWCi_CEINlSet(0, resource, DWCi_CELLlGetObj(sUiObject->objects[i], 0));
         DWCi_CELLlSetPriority(sUiObject->objects[i], -1, 1);
     }
     disp(0xa8);

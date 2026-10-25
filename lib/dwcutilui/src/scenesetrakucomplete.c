@@ -21,17 +21,17 @@ static void wait(void);
 // The frames since the message appeared
 static u8 sTestDoneFrames;
 
-void DWCUtilTestDone_Init(void) {
+void DWCi_SceneSetRakuComplete(void) {
     sTestDoneFrames = 0;
     initGraphics();
     DWCi_HLlLoadSet();
     DWCi_CMNlMsgDraw(0x26);
-    DWCUtilSound_PlaySe(0x10);
+    DWCi_SNDlPlay(0x10);
     DWCi_ChangeScene(procInit);
 }
 
 static void initGraphics(void) {
-    DWCUtilGfxResource_Load("char/xb4Multi.nsc.l", GX_LoadBG2Scr);
+    DWCi_CMNlLoadResource("char/xb4Multi.nsc.l", GX_LoadBG2Scr);
     G2S_SetBG0Priority(3);
     G2S_SetBG1Priority(3);
     G2_SetBG0Priority(3);
@@ -42,7 +42,7 @@ static void initGraphics(void) {
 static void procInit(void) {
     DWCi_EFFlFade(DWC_UTIL_FADE_FROM_WHITE, 0, GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ,
                   8);
-    DWCi_GXlInvisible(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
+    DWCi_GXlVisible(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
     DWCi_ChangeScene(DWCUtilTestDone_WaitFadeIn);
 }
 

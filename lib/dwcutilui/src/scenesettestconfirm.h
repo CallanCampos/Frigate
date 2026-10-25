@@ -7,6 +7,6 @@
 // dialog that the player closes, after the scan for access points is stopped.
 // The file is the DWC utility library's scenesettestconfirm.o (libdwcutil.TWL.HYB.a), as aletheia's map of Black 1's
 // SDK code to that library's objects (layout/symbols_sdk.txt) shows it.
-void DWCUtilAutoConnectIntro_Init(void);
+void DWCi_SceneSetTestConfirm(void);
 
 #endif // POKEBW2_DWCUTIL_SCENESETTESTCONFIRM_H

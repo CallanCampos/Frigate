@@ -21,6 +21,6 @@ DWCUtilStack *DWCi_QUElFormEx(int count, u8 *first, int stride);
 void DWCi_QUElDelete(DWCUtilStack *stack);
 void DWCi_QUElPushBack(DWCUtilStack *stack, void *item);
 // The last item pushed, or NULL
-void *DWCi_QUElPopFront(DWCUtilStack *stack);
+void *DWCi_QUElPopBack(DWCUtilStack *stack);
 
 #endif // POKEBW2_DWCUTIL_DEQUE_H

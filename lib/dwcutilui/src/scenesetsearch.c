@@ -24,7 +24,7 @@ typedef struct DWCUtilApSearch {
     u16 frames;
 } DWCUtilApSearch;
 
-static void DWCUtilApSearch_LoadGraphics(void);
+static void initGraphics(void);
 static void procInit(void);
 static void procInit1(void);
 static void procInit2(void);
@@ -35,16 +35,16 @@ static void draw(void);
 static void DWCUtilApSearch_HandleChoice(void);
 static void DWCUtilApSearch_DisableButtons(void);
 static void endScene1(void);
-static void DWCUtilApSearch_WaitFadeOut(void);
-static void DWCUtilApSearch_WaitDialog(void);
-static void DWCUtilApSearch_WaitDialogClosed(void);
+static void endScene2(void);
+static void procError(void);
+static void procError1(void);
 
 static DWCUtilApSearch sApSearch;
 
-void DWCUtilApSearch_Init(void) {
+void DWCi_SceneSetSearch(void) {
     sApSearch.frames = 0;
     sApSearch.result = 0;
-    DWCUtilApSearch_LoadGraphics();
+    initGraphics();
     DWCi_COMMENTlDispEx(0x33, -1, 0);
     DWCi_HLlLoadSet();
     DWCi_CMNlStep(2);
@@ -52,14 +52,14 @@ void DWCUtilApSearch_Init(void) {
     DWCi_ANIMElInitEx(0);
     DWCi_SEARCHlInit();
     DWCi_SEARCHlBegin();
-    DWCUtilSound_PlaySe(0xa);
+    DWCi_SNDlPlay(0xa);
     DWCi_ChangeScene(procInit);
 }
 
-static void DWCUtilApSearch_LoadGraphics(void) {
-    DWCUtilGfxResource_Load("char/jbBgStep3.ncg.l", GX_LoadBG2Char);
-    DWCUtilGfxResource_Load("char/ybBgStep3.ncl.l", GX_LoadBGPltt);
-    DWCUtilGfxResource_Load("char/xb4Multi.nsc.l", GX_LoadBG2Scr);
+static void initGraphics(void) {
+    DWCi_CMNlLoadResource("char/jbBgStep3.ncg.l", GX_LoadBG2Char);
+    DWCi_CMNlLoadResource("char/ybBgStep3.ncl.l", GX_LoadBGPltt);
+    DWCi_CMNlLoadResource("char/xb4Multi.nsc.l", GX_LoadBG2Scr);
     G2S_SetBG0Priority(3);
     G2S_SetBG1Priority(3);
     G2_SetBG0Priority(3);
@@ -71,8 +71,8 @@ static void procInit(void) {
     DWCi_EFFlFade(DWC_UTIL_FADE_FROM_WHITE, 1, GX_BLEND_PLANEMASK_BG0, 8);
     DWCi_EFFlFade(DWC_UTIL_FADE_FROM_WHITE, 0, GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ,
                   8);
-    DWCi_GXlInvisible(1, GX_PLANEMASK_BG0);
-    DWCi_GXlInvisible(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
+    DWCi_GXlVisible(1, GX_PLANEMASK_BG0);
+    DWCi_GXlVisible(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
     DWCi_ChangeScene(procInit1);
 }
 
@@ -107,14 +107,14 @@ static void DWCUtilApSearch_CheckScan(void) {
     if (sApSearch.frames < 300) {
         return;
     }
-    DWCUtilSound_StopSe();
+    DWCi_SNDlStop();
     count = DWCi_SEARCHlGetApInfo(&entries);
     if (count == 0) {
         sApSearch.result = 2;
-        DWCUtilDialog_Open(0xf, 1, 1, -1, 0);
-        DWCUtilSound_PlaySe(0x12);
+        DWCi_WINlInitEx(0xf, 1, 1, -1, 0);
+        DWCi_SNDlPlay(0x12);
         DWCi_BTNlDisable();
-        DWCi_ChangeScene(DWCUtilApSearch_WaitDialog);
+        DWCi_ChangeScene(procError);
         return;
     }
     for (i = 0; i < count; i++) {
@@ -124,20 +124,20 @@ static void DWCUtilApSearch_CheckScan(void) {
     }
     if (i == count) {
         sApSearch.result = 3;
-        DWCUtilDialog_Open(0xe, 1, 1, -1, 0);
-        DWCUtilSound_PlaySe(0x12);
+        DWCi_WINlInitEx(0xe, 1, 1, -1, 0);
+        DWCi_SNDlPlay(0x12);
         DWCi_BTNlDisable();
-        DWCi_ChangeScene(DWCUtilApSearch_WaitDialog);
+        DWCi_ChangeScene(procError);
         return;
     }
     sApSearch.result = 1;
-    DWCUtilSound_PlaySe(0xf);
+    DWCi_SNDlPlay(0xf);
     DWCi_ChangeScene(DWCUtilApSearch_DisableButtons);
 }
 
 static void DWCUtilApSearch_HandleInput(void) {
     if (DWCi_IPTlCheckTrigger(2)) {
-        DWCUtilSound_StopSe();
+        DWCi_SNDlStop();
         DWCi_BTNlSet(0);
     }
 }
@@ -148,8 +148,8 @@ static void draw(void) {
 // The button ends the search
 static void DWCUtilApSearch_HandleChoice(void) {
     if (DWCi_BTNlGet() == 0) {
-        DWCUtilSound_StopSe();
-        DWCUtilSound_PlaySe(7);
+        DWCi_SNDlStop();
+        DWCi_SNDlPlay(7);
         DWCi_ChangeScene(DWCUtilApSearch_DisableButtons);
     }
 }
@@ -166,41 +166,41 @@ static void endScene1(void) {
         DWCi_EFFlFade(DWC_UTIL_FADE_TO_WHITE, 1, GX_BLEND_PLANEMASK_BG0, 8);
         DWCi_EFFlFade(DWC_UTIL_FADE_TO_WHITE, 0,
                       GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ, 8);
-        DWCi_ChangeScene(DWCUtilApSearch_WaitFadeOut);
+        DWCi_ChangeScene(endScene2);
     }
 }
 
-static void DWCUtilApSearch_WaitFadeOut(void) {
+static void endScene2(void) {
     if (DWCi_EFFlCheck(1) == 0 && DWCi_EFFlCheck(0) == 0 && DWCi_BTNlIsEnd()) {
         while (!DWCi_SEARCHlStop()) {
         }
         DWCi_ANIMElEnd();
         DWCi_FNTlDeleteBgLcd(0);
         DWCi_COMMENTlDelete();
-        DWCUtilDisplay_HidePlanes(1, GX_PLANEMASK_BG0);
-        DWCUtilDisplay_HidePlanes(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
+        DWCi_GXlInvisible(1, GX_PLANEMASK_BG0);
+        DWCi_GXlInvisible(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
         if (sApSearch.result != 1) {
             DWCi_SEARCHlEnd();
-            DWCi_SETTINGlSetSetting(DWCUtilWifiSettings_GetEdit()->index);
+            DWCi_SETTINGlSetSetting(DWCi_SETTIGNlGet()->index);
             DWCi_SetParam_(2, 1);
-            DWCi_ChangeScene(DWCUtilScreenWay_Init);
+            DWCi_ChangeScene(DWCi_SceneSetSelectWay);
         } else {
             DWCi_SetParam_(0, 1);
             DWCi_SetParam2_(0, 0);
-            DWCi_ChangeScene(DWCUtilPageApList_Init);
+            DWCi_ChangeScene(DWCi_SceneSetApList);
         }
     }
 }
 
-static void DWCUtilApSearch_WaitDialog(void) {
+static void procError(void) {
     if (DWCi_WINlGet() == 0) {
-        DWCUtilSound_PlaySe(6);
+        DWCi_SNDlPlay(6);
         DWCi_WINlEnd();
-        DWCi_ChangeScene(DWCUtilApSearch_WaitDialogClosed);
+        DWCi_ChangeScene(procError1);
     }
 }
 
-static void DWCUtilApSearch_WaitDialogClosed(void) {
+static void procError1(void) {
     if (!DWCi_WINlIsInit()) {
         DWCi_ChangeScene(DWCUtilApSearch_DisableButtons);
     }

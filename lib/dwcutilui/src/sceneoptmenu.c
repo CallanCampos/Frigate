@@ -43,10 +43,10 @@ static void procScene(void);
 static void input(void);
 static void draw(void);
 static void button(void);
-static void DWCUtilOptionMenu_DisableButtons(void);
+static void endScene(void);
 static void endScene1(void);
 static void endScene2(void);
-static void DWCUtilOptionMenu_MoveCursor(int direction);
+static void moveFocus(int direction);
 static void dispPush(void);
 
 // The palette rows that light up each button
@@ -65,7 +65,7 @@ static const u16 sCursorRects[3][4] = {
 
 static DWCUtilOptionMenu sOptionMenu;
 
-void DWCUtilOptionMenu_Init(void) {
+void DWCi_SceneOptMenu(void) {
     // The cursor sprite's position
     static const u16 cursorPos[2] = { 0xe0, 0x84 };
 
@@ -74,7 +74,7 @@ void DWCUtilOptionMenu_Init(void) {
     DWCi_HLlLoad(0x10);
     DWCi_STEPlChangeScr(3);
     DWCi_COMMENTlDispEx(0x39, -1, 0);
-    sOptionMenu.cursor = DWCUtilCell_AllocOam(0, 0x5b);
+    sOptionMenu.cursor = DWCi_CEINlSetExObj(0, 0x5b);
     G2_SetOBJPosition(sOptionMenu.cursor, cursorPos[0], cursorPos[1]);
     G2_SetOBJPriority(sOptionMenu.cursor, 3);
     DWCi_FOCUSlDisp4(sCursorRects[sOptionMenu.selection][0], sCursorRects[sOptionMenu.selection][2],
@@ -90,10 +90,10 @@ static void initGraphics(void) {
     DWCWiFiInfo info;
     int i;
 
-    DWCUtilGfxResource_Load("char/jbBgOption.ncg.l", GX_LoadBG2Char);
-    DWCUtilGfxResource_Load("char/jb5OptMenu.nsc.l", GX_LoadBG2Scr);
-    sOptionMenu.palette = DWCUtilRomResource_LoadFile(DWCi_Char(rowsPlttPath), NULL, 4);
-    pltt = DWCUtilRomResource_LoadFile(DWCi_Char(plttPath), NULL, 4);
+    DWCi_CMNlLoadResource("char/jbBgOption.ncg.l", GX_LoadBG2Char);
+    DWCi_CMNlLoadResource("char/jb5OptMenu.nsc.l", GX_LoadBG2Scr);
+    sOptionMenu.palette = DWCi_ARClReadEx(DWCi_Char(rowsPlttPath), NULL, 4);
+    pltt = DWCi_ARClReadEx(DWCi_Char(plttPath), NULL, 4);
     DWCi_BM_GetWiFiInfo(&info);
     if (info.attestedUserId == 0) {
         u8 *src = pltt + 0xc0;
@@ -117,8 +117,8 @@ static void initGraphics(void) {
 static void procInit(void) {
     DWCi_EFFlFade(DWC_UTIL_FADE_FROM_WHITE, 1, GX_BLEND_PLANEMASK_BG0, 8);
     DWCi_EFFlFade(DWC_UTIL_FADE_FROM_WHITE, 0, GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ, 8);
-    DWCi_GXlInvisible(1, GX_PLANEMASK_BG0);
-    DWCi_GXlInvisible(0, GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
+    DWCi_GXlVisible(1, GX_PLANEMASK_BG0);
+    DWCi_GXlVisible(0, GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
     DWCi_ChangeScene(procInit1);
 }
 
@@ -159,9 +159,9 @@ static void input(void) {
     } else if (DWCi_IPTlCheckTrigger(2)) {
         DWCi_BTNlSet(0);
     } else if (DWCi_IPTlCheckRepeat(0x40)) {
-        DWCUtilOptionMenu_MoveCursor(1);
+        moveFocus(1);
     } else if (DWCi_IPTlCheckRepeat(0x80)) {
-        DWCUtilOptionMenu_MoveCursor(3);
+        moveFocus(3);
     }
 }
 
@@ -174,26 +174,26 @@ static void button(void) {
 
     switch (DWCi_BTNlGet()) {
     case 0:
-        DWCUtilSound_PlaySe(7);
+        DWCi_SNDlPlay(7);
         break;
     case 1:
         DWCi_BM_GetWiFiInfo(&info);
         if (sOptionMenu.selection != 0 && info.attestedUserId == 0) {
-            DWCUtilSound_PlaySe(9);
+            DWCi_SNDlPlay(9);
             DWCi_BTNlSetForce(-1);
             return;
         }
-        DWCUtilSound_PlaySe(6);
+        DWCi_SNDlPlay(6);
         dispPush();
         sOptionMenu.started = TRUE;
         break;
     default:
         return;
     }
-    DWCi_ChangeScene(DWCUtilOptionMenu_DisableButtons);
+    DWCi_ChangeScene(endScene);
 }
 
-static void DWCUtilOptionMenu_DisableButtons(void) {
+static void endScene(void) {
     DWCi_BTNlDisable();
     DWCi_EFFlWait(8);
     DWCi_ChangeScene(endScene1);
@@ -216,8 +216,8 @@ static void endScene2(void) {
         DWCi_FOCUSlDelete();
         DWCi_COMMENTlDelete();
         DWCi_ARClRelease(sOptionMenu.palette);
-        DWCUtilDisplay_HidePlanes(1, GX_PLANEMASK_BG0);
-        DWCUtilDisplay_HidePlanes(0, GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
+        DWCi_GXlInvisible(1, GX_PLANEMASK_BG0);
+        DWCi_GXlInvisible(0, GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
         if (!sOptionMenu.started) {
             DWCi_SetParam_(0, 0);
             DWCi_ChangeScene(DWCi_SceneMenu);
@@ -229,11 +229,11 @@ static void endScene2(void) {
                 break;
             case 1:
                 DWCi_SetParam_(0, 1);
-                DWCi_ChangeScene(DWCUtilInfoMenu_InitErase);
+                DWCi_ChangeScene(DWCi_SceneOptErase);
                 break;
             case 2:
                 DWCi_SetParam_(0, 1);
-                DWCi_ChangeScene(DWCUtilPromptYesNo_Init);
+                DWCi_ChangeScene(DWCi_SceneOptMovConfirm1);
                 break;
             }
         }
@@ -241,13 +241,13 @@ static void endScene2(void) {
 }
 
 // Up and down move the cursor through the three buttons, wrapping around
-static void DWCUtilOptionMenu_MoveCursor(int direction) {
+static void moveFocus(int direction) {
     if (direction == 1) {
         sOptionMenu.selection = FX_ModS32(sOptionMenu.selection + 2, 3);
     } else {
         sOptionMenu.selection = FX_ModS32(sOptionMenu.selection + 1, 3);
     }
-    DWCUtilSound_PlaySe(8);
+    DWCi_SNDlPlay(8);
     DWCi_FOCUSlDisp4(sCursorRects[sOptionMenu.selection][0], sCursorRects[sOptionMenu.selection][2],
                      sCursorRects[sOptionMenu.selection][1], sCursorRects[sOptionMenu.selection][3]);
 }

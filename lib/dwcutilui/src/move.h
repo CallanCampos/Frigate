@@ -23,7 +23,7 @@ typedef void (*DWCUtilMoveCallback)(int event);
 
 void DWCi_MOVlInit(DWCUtilMoveCallback callback);
 // Ends the move; DWCi_MOVlIsEnd says when it has ended
-void DWCUtilMove_End(void);
+void DWCi_MOVlEnd(void);
 BOOL DWCi_MOVlIsEnd(void);
 void DWCi_MOVlChangeCallback(DWCUtilMoveCallback callback);
 void DWCi_MOVlAdmitChild(void);

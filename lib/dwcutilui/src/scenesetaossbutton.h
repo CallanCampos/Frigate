@@ -8,6 +8,6 @@
 // test (scenesetaosscomplete.h). A failure shows a dialog, and the utility goes back to the choice of the setup.
 // The file is the DWC utility library's scenesetaossbutton.o (libdwcutil.TWL.HYB.a), as aletheia's map of Black 1's
 // SDK code to that library's objects (layout/symbols_sdk.txt) shows it.
-void DWCUtilPageStep3_Init(void);
+void DWCi_SceneSetAossButton(void);
 
 #endif // POKEBW2_DWCUTIL_SCENESETAOSSBUTTON_H

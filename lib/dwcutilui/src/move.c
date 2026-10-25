@@ -23,8 +23,8 @@ typedef struct DWCUtilMove {
     u8 ended;
 } DWCUtilMove;
 
-static void DWCUtilMove_EndTask(DWCUtilTask *task, void *arg);
-static void DWCUtilMove_UpdateTask(DWCUtilTask *task, void *arg);
+static void taskEnd(DWCUtilTask *task, void *arg);
+static void taskFramework(DWCUtilTask *task, void *arg);
 
 static DownloadPlaySysGame sGame = {
     "dwc:/move/child.srl", NULL, NULL, "dwc:/move/banner.char", "dwc:/move/banner.plt", 0x159, 0,
@@ -42,19 +42,19 @@ void DWCi_MOVlInit(DWCUtilMoveCallback callback) {
     game.gameNamep = DWCi_MSGlGet(gDWCUtilMsg, 0);
     game.gameIntroductionp = DWCi_MSGlGet(gDWCUtilMsg, 1);
     game.maxPlayerNum = kDWCi_Language();
-    func_ov182_021ba768(&sMove->context, &game);
-    if (!func_ov182_021ba918()) {
+    DWCi_MOVInit(&sMove->context, &game);
+    if (!DWCi_MOVStartAdmitChild()) {
         OS_Terminate();
     }
-    sMove->task = DWCi_TSKlForm(0, DWCUtilMove_UpdateTask, NULL, 0x78);
+    sMove->task = DWCi_TSKlForm(0, taskFramework, NULL, 0x78);
 }
 
-void DWCUtilMove_End(void) {
-    DWCi_TSKlForm(0, DWCUtilMove_EndTask, NULL, 0x78);
+void DWCi_MOVlEnd(void) {
+    DWCi_TSKlForm(0, taskEnd, NULL, 0x78);
 }
 
-static void DWCUtilMove_EndTask(DWCUtilTask *task, void *arg) {
-    if (func_ov182_021ba81c()) {
+static void taskEnd(DWCUtilTask *task, void *arg) {
+    if (DWCi_MOVFinalize()) {
         sMove->ended = TRUE;
         DWCi_TSKlDelete(0, task);
     }
@@ -72,18 +72,18 @@ void DWCi_MOVlChangeCallback(DWCUtilMoveCallback callback) {
 }
 
 void DWCi_MOVlAdmitChild(void) {
-    func_ov182_021ba950();
+    DWCi_MOVStartDownloadandBootChild();
 }
 
 const MBUserInfo *DWCi_MOVlGetChild(void) {
     return &sMove->user;
 }
 
-static void DWCUtilMove_UpdateTask(DWCUtilTask *task, void *arg) {
+static void taskFramework(DWCUtilTask *task, void *arg) {
     u8 state;
     u8 changed;
 
-    func_ov182_021ba974();
+    DWCi_MOVFramework();
     if (sMove->pending && !sMove->ended) {
         if (sMove->callback == NULL) {
             return;
@@ -91,13 +91,13 @@ static void DWCUtilMove_UpdateTask(DWCUtilTask *task, void *arg) {
         sMove->callback(DWC_UTIL_MOVE_EVENT_ENTERED);
         return;
     }
-    func_ov182_021babdc(&state, &changed);
+    DWCi_MOVGetStatus(&state, &changed);
     switch (state) {
     case DOWNLOAD_PLAY_SYS_STATE_CHILD_ENTERED:
         if (!changed) {
             return;
         }
-        MI_CpuCopy16(func_ov182_021bac14(), &sMove->user, sizeof(MBUserInfo));
+        MI_CpuCopy16(DWCi_GetChildInfo(), &sMove->user, sizeof(MBUserInfo));
         if (sMove->callback != NULL) {
             sMove->callback(DWC_UTIL_MOVE_EVENT_ENTERED);
             return;

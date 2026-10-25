@@ -52,7 +52,7 @@ static DWCUtilMain sMain;
 static BOOL checkParam(int language, int param);
 static void initGame(void);
 static void initGraph(void);
-static void DWCUtilMain_Exit(void);
+static void procEnd(void);
 
 int DWC_StartUtility(void *work, int language, int param) {
     const char *nasUrl;
@@ -69,17 +69,17 @@ int DWC_StartUtility(void *work, int language, int param) {
     sMain.finished = FALSE;
     initGame();
     initGraph();
-    DWCUtilSound_Init();
-    DWCi_ChangeScene(DWCUtilMainMenu_InitUtility);
+    DWCi_SNDlInit();
+    DWCi_ChangeScene(DWCi_SceneInit);
     do {
         DWCi_IPTlRead();
         sMain.update();
-        DWCUtilTask_Run(0);
-        DWCUtilTouch_UpdateLid();
+        DWCi_TSKlAct(0);
+        DWCi_IPTlCheckFold();
         DWCi_SetLedWireless();
         OS_WaitVBlankIntr();
     } while (!sMain.finished);
-    DWCUtilMain_Exit();
+    procEnd();
     DWC_Auth_SetCustomNas(nasUrl);
     return 0;
 }
@@ -128,7 +128,7 @@ static void initGame(void) {
     DWCi_HEAPlInit(sMain.work);
     DWCi_ITRlIntr();
     DWCi_TSKlInit();
-    DWCUtilRomResource_Init();
+    DWCi_ARClInit();
     DWCi_IPTlInit();
     DWCi_EFFlInit();
     work = DWCi_HEAPlAllocEx(DWC_BM_INIT_WORK_SIZE, 0x20);
@@ -194,7 +194,7 @@ static void initGraph(void) {
     GX_VBlankIntr(TRUE);
 }
 
-static void DWCUtilMain_Exit(void) {
+static void procEnd(void) {
     GX_DispOff();
     GXS_DispOff();
     DWCi_SetLedNormal();
@@ -209,7 +209,7 @@ static void DWCUtilMain_Exit(void) {
     DWCi_ARClEnd();
     DWCi_TSKlEnd();
     DWCi_HEAPlEnd();
-    DWCUtilBank_Exit();
+    DWCi_RepairVram();
 }
 
 void DWCi_ChangeScene(void (*update)(void)) {

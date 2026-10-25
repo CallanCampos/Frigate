@@ -2,7 +2,7 @@
 #include "nitro/gx.h"
 
 // Adds the planes to the screen's visible ones
-void DWCi_GXlInvisible(int screen, int planes) {
+void DWCi_GXlVisible(int screen, int planes) {
     if (screen == 1) {
         GXS_SetVisiblePlane(planes | GXS_GetVisiblePlane());
     } else {
@@ -11,7 +11,7 @@ void DWCi_GXlInvisible(int screen, int planes) {
 }
 
 // Hides the planes on the screen
-void DWCUtilDisplay_HidePlanes(int screen, int planes) {
+void DWCi_GXlInvisible(int screen, int planes) {
     if (screen == 1) {
         GXS_SetVisiblePlane(GXS_GetVisiblePlane() & ~planes);
     } else {

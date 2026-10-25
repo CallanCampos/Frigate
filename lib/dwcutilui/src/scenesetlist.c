@@ -138,19 +138,19 @@ static void setOffset(void);
 static int isPush(void);
 static int calcColumnIdx(int index);
 static int calcIdxColumn(int row);
-static void DWCUtilAddressSettings_ScrollUpTask(DWCUtilTask *task, void *arg);
-static void DWCUtilAddressSettings_ScrollDownTask(DWCUtilTask *task, void *arg);
-static void DWCUtilAddressSettings_ScrollBgTask(DWCUtilTask *task, void *arg);
-static void DWCUtilAddressSettings_ShowCursor(void);
+static void taskUp(DWCUtilTask *task, void *arg);
+static void taskDown(DWCUtilTask *task, void *arg);
+static void taskVBlank(DWCUtilTask *task, void *arg);
+static void dispFocus(void);
 static void applyForcus(void);
 static void applyForcus1(int item);
-static void DWCUtilAddressSettings_MoveCursor(int direction);
-static void DWCUtilAddressSettings_LightButton(void);
-static void DWCUtilAddressSettings_UpdateLitTask(DWCUtilTask *task, void *arg);
+static void moveFocus(int direction);
+static void dispPushButton(void);
+static void taskPushCount(DWCUtilTask *task, void *arg);
 static void pushButtonYesNo(void);
-static BOOL DWCUtilAddressSettings_IsValid(void);
-static void DWCUtilAddressSettings_WaitInvalidDialog(void);
-static void DWCUtilAddressSettings_WaitInvalidClosed(void);
+static BOOL isCorrect(void);
+static void procError(void);
+static void procError1(void);
 
 static DWCUtilAddressSettingsState sAddressSettings;
 
@@ -190,7 +190,7 @@ static const DWCUtilAddressRect sAddressCursorRects[6] = {
 };
 
 void DWCUtilAddressSettings_Init(void) {
-    DWCUtilSettingsEdit *edit = DWCUtilWifiSettings_GetEdit();
+    DWCUtilSettingsEdit *edit = DWCi_SETTIGNlGet();
     int i;
 
     sAddressSettings.work = DWCi_HEAPlAllocEx(sizeof(DWCUtilAddressSettings), 4);
@@ -205,25 +205,25 @@ void DWCUtilAddressSettings_Init(void) {
     }
     DWCi_CMNlStep(1);
     DWCi_HLlLoadList();
-    DWCUtilScrollbar_Create(2, 0x55, 0xf1, 0x41, sAddressSettings.scroll * ADDRESS_BAR_LENGTH / ADDRESS_SCROLL_MAX);
+    DWCi_SBlInit(2, 0x55, 0xf1, 0x41, sAddressSettings.scroll * ADDRESS_BAR_LENGTH / ADDRESS_SCROLL_MAX);
     sAddressSettings.work->text = DWCi_FNTlFormBgEx(0, 1);
     for (i = 0; i < 7; i++) {
-        sAddressSettings.work->marks[i] = DWCUtilCell_AllocOam(0, 0x29);
+        sAddressSettings.work->marks[i] = DWCi_CEINlSetExObj(0, 0x29);
     }
     switch (edit->connection.setType) {
     case 1:
-        sAddressSettings.work->setupIcon = DWCUtilCell_AllocOam(0, 0x50);
+        sAddressSettings.work->setupIcon = DWCi_CEINlSetExObj(0, 0x50);
         G2_SetOBJPriority(sAddressSettings.work->setupIcon, 3);
         break;
     case 2:
-        sAddressSettings.work->setupIcon = DWCUtilCell_AllocOam(0, 0x51);
+        sAddressSettings.work->setupIcon = DWCi_CEINlSetExObj(0, 0x51);
         G2_SetOBJPriority(sAddressSettings.work->setupIcon, 3);
         break;
     }
-    sAddressSettings.work->vblankTask = DWCi_TSKlForm(1, DWCUtilAddressSettings_ScrollBgTask, NULL, 0x6e);
-    sAddressSettings.work->task = DWCi_TSKlForm(0, DWCUtilAddressSettings_UpdateLitTask, NULL, 0x78);
+    sAddressSettings.work->vblankTask = DWCi_TSKlForm(1, taskVBlank, NULL, 0x6e);
+    sAddressSettings.work->task = DWCi_TSKlForm(0, taskPushCount, NULL, 0x78);
     DWCUtilAddressSettings_DrawRows();
-    DWCUtilAddressSettings_ShowCursor();
+    dispFocus();
     DWCi_ChangeScene(DWCUtilAddressSettings_FadeIn);
 }
 
@@ -233,16 +233,16 @@ static void DWCUtilAddressSettings_LoadGraphics(void) {
     char litPalettePath[] = "char/ybBgStep21.ncl.l";
 
     G2_SetBG2ControlText(GX_BG_SCRSIZE_TEXT_256x256, GX_BG_COLORMODE_16, GX_BG_SCRBASE_0x7000, GX_BG_CHARBASE(0x18000));
-    DWCUtilGfxResource_Load("char/ybObjKb.ncl.l", GX_LoadOBJPltt);
-    DWCUtilGfxResource_Load("char/jbBgStep2.ncg.l", GX_LoadBG3Char);
-    DWCUtilGfxResource_Load("char/jbBgStep21.ncg.l", GX_LoadBG2Char);
-    DWCUtilGfxResource_Load(palettePath, GX_LoadBGPltt);
-    DWCUtilGfxResource_Load("char/jb3List.nsc.l", GX_LoadBG3Scr);
-    sAddressSettings.work->backScreen = DWCUtilRomResource_LoadFile(DWCi_Char(backPath), NULL, 4);
+    DWCi_CMNlLoadResource("char/ybObjKb.ncl.l", GX_LoadOBJPltt);
+    DWCi_CMNlLoadResource("char/jbBgStep2.ncg.l", GX_LoadBG3Char);
+    DWCi_CMNlLoadResource("char/jbBgStep21.ncg.l", GX_LoadBG2Char);
+    DWCi_CMNlLoadResource(palettePath, GX_LoadBGPltt);
+    DWCi_CMNlLoadResource("char/jb3List.nsc.l", GX_LoadBG3Scr);
+    sAddressSettings.work->backScreen = DWCi_ARClReadEx(DWCi_Char(backPath), NULL, 4);
     DWCi_SCREENlInit(sAddressSettings.work->backScreen);
     DWCi_SCREENlRenew();
-    sAddressSettings.work->palettes[0] = DWCUtilRomResource_LoadFile(DWCi_Char(palettePath), NULL, 4);
-    sAddressSettings.work->palettes[1] = DWCUtilRomResource_LoadFile(DWCi_Char(litPalettePath), NULL, 4);
+    sAddressSettings.work->palettes[0] = DWCi_ARClReadEx(DWCi_Char(palettePath), NULL, 4);
+    sAddressSettings.work->palettes[1] = DWCi_ARClReadEx(DWCi_Char(litPalettePath), NULL, 4);
     G2S_SetBG0Priority(3);
     G2S_SetBG1Priority(3);
     G2_SetBG0Priority(3);
@@ -255,7 +255,7 @@ static void DWCUtilAddressSettings_LoadGraphics(void) {
 static void DWCUtilAddressSettings_InitCursor(void) {
     int again;
 
-    DWCUtilWifiSettings_GetEdit();
+    DWCi_SETTIGNlGet();
     DWCi_GetParam2_(NULL, &again);
     if (again == 0) {
         sAddressSettings.scroll = 0;
@@ -268,8 +268,8 @@ static void DWCUtilAddressSettings_FadeIn(void) {
     DWCi_EFFlFade(DWC_UTIL_FADE_FROM_WHITE, 1, GX_BLEND_PLANEMASK_BG0, 8);
     DWCi_EFFlFade(DWC_UTIL_FADE_FROM_WHITE, 0,
                   GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_BG3 | GX_BLEND_PLANEMASK_OBJ, 8);
-    DWCi_GXlInvisible(1, GX_PLANEMASK_BG0);
-    DWCi_GXlInvisible(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_BG3 | GX_PLANEMASK_OBJ);
+    DWCi_GXlVisible(1, GX_PLANEMASK_BG0);
+    DWCi_GXlVisible(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_BG3 | GX_PLANEMASK_OBJ);
     DWCi_ChangeScene(DWCUtilAddressSettings_WaitFadeIn);
 }
 
@@ -294,7 +294,7 @@ static void DWCUtilAddressSettings_HandleInput(void) {
         return;
     }
     if (DWCi_IPTlCheckTrigger(2)) {
-        DWCUtilSound_PlaySe(7);
+        DWCi_SNDlPlay(7);
         sAddressSettings.work->chosen = ADDRESS_ITEM_BACK;
         DWCi_ChangeScene(DWCUtilAddressSettings_StartExit);
         return;
@@ -302,13 +302,13 @@ static void DWCUtilAddressSettings_HandleInput(void) {
     if (DWCi_IPTlCheckRepeat(0x200)) {
         if (sAddressSettings.scroll == ADDRESS_SCROLL_MAX) {
             if (!sAddressSettings.work->atEnd) {
-                DWCUtilSound_PlaySe(9);
+                DWCi_SNDlPlay(9);
                 sAddressSettings.work->atEnd = TRUE;
             }
             return;
         }
-        DWCUtilSound_PlaySe(0x13);
-        sAddressSettings.work->scrollTask = DWCi_TSKlForm(0, DWCUtilAddressSettings_ScrollDownTask, NULL, 0x78);
+        DWCi_SNDlPlay(0x13);
+        sAddressSettings.work->scrollTask = DWCi_TSKlForm(0, taskDown, NULL, 0x78);
         return;
     }
     if (DWCi_IPTlCheckRelease(0x200)) {
@@ -318,13 +318,13 @@ static void DWCUtilAddressSettings_HandleInput(void) {
     if (DWCi_IPTlCheckRepeat(0x100)) {
         if (sAddressSettings.scroll == 0) {
             if (!sAddressSettings.work->atEnd) {
-                DWCUtilSound_PlaySe(9);
+                DWCi_SNDlPlay(9);
                 sAddressSettings.work->atEnd = TRUE;
             }
             return;
         }
-        DWCUtilSound_PlaySe(0x13);
-        sAddressSettings.work->scrollTask = DWCi_TSKlForm(0, DWCUtilAddressSettings_ScrollUpTask, NULL, 0x78);
+        DWCi_SNDlPlay(0x13);
+        sAddressSettings.work->scrollTask = DWCi_TSKlForm(0, taskUp, NULL, 0x78);
         return;
     }
     if (DWCi_IPTlCheckRelease(0x100)) {
@@ -332,7 +332,7 @@ static void DWCUtilAddressSettings_HandleInput(void) {
         return;
     }
     if (DWCi_IPTlCheckRepeat(0x40)) {
-        DWCUtilAddressSettings_MoveCursor(1);
+        moveFocus(1);
         return;
     }
     if (DWCi_IPTlCheckRelease(0x40)) {
@@ -340,7 +340,7 @@ static void DWCUtilAddressSettings_HandleInput(void) {
         return;
     }
     if (DWCi_IPTlCheckRepeat(0x80)) {
-        DWCUtilAddressSettings_MoveCursor(3);
+        moveFocus(3);
         return;
     }
     if (DWCi_IPTlCheckRelease(0x80)) {
@@ -348,11 +348,11 @@ static void DWCUtilAddressSettings_HandleInput(void) {
         return;
     }
     if (DWCi_IPTlCheckRepeat(0x20)) {
-        DWCUtilAddressSettings_MoveCursor(0);
+        moveFocus(0);
         return;
     }
     if (DWCi_IPTlCheckRepeat(0x10)) {
-        DWCUtilAddressSettings_MoveCursor(2);
+        moveFocus(2);
     }
 }
 
@@ -360,13 +360,13 @@ static void DWCUtilAddressSettings_HandleInput(void) {
 static BOOL DWCUtilAddressSettings_HandleTouch(void) {
     int item;
 
-    DWCUtilWifiSettings_GetEdit();
+    DWCi_SETTIGNlGet();
     item = isPush();
     if (item == ADDRESS_ITEM_NONE) {
         return FALSE;
     }
     if (!DWCUtilAddressSettings_IsItemEnabled(item)) {
-        DWCUtilSound_PlaySe(9);
+        DWCi_SNDlPlay(9);
         return TRUE;
     }
     applyForcus1(item);
@@ -385,41 +385,41 @@ static BOOL DWCUtilAddressSettings_HandleTouch(void) {
 // back
 static void DWCUtilAddressSettings_ChooseItem(int item) {
     if (!DWCUtilAddressSettings_IsItemEnabled(item)) {
-        DWCUtilSound_PlaySe(9);
+        DWCi_SNDlPlay(9);
         return;
     }
     // The answers of a row of DHCP are yes (0) and no (1), the one chosen turns DHCP on when it is not no
     switch (item) {
     case ADDRESS_ITEM_AUTO_ADDRESS_YES:
     case ADDRESS_ITEM_AUTO_ADDRESS_NO:
-        DWCUtilSound_PlaySe(6);
+        DWCi_SNDlPlay(6);
         DWCUtilAddressSettings_SetAutoAddress(((item - ADDRESS_ITEM_AUTO_ADDRESS_YES) ^ 1) != 0);
         return;
     case ADDRESS_ITEM_AUTO_DNS_YES:
     case ADDRESS_ITEM_AUTO_DNS_NO:
-        DWCUtilSound_PlaySe(6);
+        DWCi_SNDlPlay(6);
         DWCUtilAddressSettings_SetAutoDns(((item - ADDRESS_ITEM_AUTO_DNS_YES) ^ 1) != 0);
         return;
     }
     sAddressSettings.work->chosen = item;
     if (item == ADDRESS_ITEM_TEST || item == ADDRESS_ITEM_SAVE) {
-        DWCUtilAddressSettings_LightButton();
-        if (!DWCUtilAddressSettings_IsValid()) {
-            DWCUtilSound_PlaySe(9);
-            DWCUtilDialog_Open(6, 1, 1, -1, 0);
-            DWCi_ChangeScene(DWCUtilAddressSettings_WaitInvalidDialog);
+        dispPushButton();
+        if (!isCorrect()) {
+            DWCi_SNDlPlay(9);
+            DWCi_WINlInitEx(6, 1, 1, -1, 0);
+            DWCi_ChangeScene(procError);
             return;
         }
         if (item == ADDRESS_ITEM_TEST) {
-            DWCUtilSound_PlaySe(6);
+            DWCi_SNDlPlay(6);
         } else {
-            DWCUtilSound_PlaySe(0xe);
+            DWCi_SNDlPlay(0xe);
         }
     } else if (item == ADDRESS_ITEM_BACK) {
-        DWCUtilAddressSettings_LightButton();
-        DWCUtilSound_PlaySe(7);
+        dispPushButton();
+        DWCi_SNDlPlay(7);
     } else {
-        DWCUtilSound_PlaySe(6);
+        DWCi_SNDlPlay(6);
         DWCUtilAddressSettings_ShowMark(0, 1, calcColumnIdx(sAddressItemRows[item]));
         setOffset();
     }
@@ -430,7 +430,7 @@ static void DWCUtilAddressSettings_ChooseItem(int item) {
 // DHCP for the address: without it, DHCP can't give the DNS servers either; with it, they come from DHCP again if
 // they did
 static void DWCUtilAddressSettings_SetAutoAddress(BOOL autoAddress) {
-    DWCUtilSettingsEdit *edit = DWCUtilWifiSettings_GetEdit();
+    DWCUtilSettingsEdit *edit = DWCi_SETTIGNlGet();
     BOOL autoDns;
 
     if (edit->autoAddress == autoAddress) {
@@ -448,7 +448,7 @@ static void DWCUtilAddressSettings_SetAutoAddress(BOOL autoAddress) {
 }
 
 static void DWCUtilAddressSettings_SetAutoDns(BOOL autoDns) {
-    DWCUtilSettingsEdit *edit = DWCUtilWifiSettings_GetEdit();
+    DWCUtilSettingsEdit *edit = DWCi_SETTIGNlGet();
 
     if (edit->autoDns != autoDns) {
         sAddressSettings.work->savedAutoDns = autoDns;
@@ -482,37 +482,37 @@ static void DWCUtilAddressSettings_HandleScrollbar(void) {
     case 3:
         sAddressSettings.work->dragging = FALSE;
         sAddressSettings.scroll = DWCi_SBlGet() * ADDRESS_SCROLL_MAX / ADDRESS_BAR_LENGTH;
-        DWCUtilSound_PlaySe(0x13);
+        DWCi_SNDlPlay(0x13);
         DWCUtilAddressSettings_DrawRows();
         offset = FX_ModS32(sAddressSettings.scroll, ADDRESS_ROW_HEIGHT);
         if (offset == 0) {
             applyForcus();
         } else if (offset < 16) {
-            sAddressSettings.work->scrollTask = DWCi_TSKlForm(0, DWCUtilAddressSettings_ScrollUpTask, NULL, 0x78);
+            sAddressSettings.work->scrollTask = DWCi_TSKlForm(0, taskUp, NULL, 0x78);
         } else {
-            sAddressSettings.work->scrollTask = DWCi_TSKlForm(0, DWCUtilAddressSettings_ScrollDownTask, NULL, 0x78);
+            sAddressSettings.work->scrollTask = DWCi_TSKlForm(0, taskDown, NULL, 0x78);
         }
         break;
     case 4:
         if (sAddressSettings.scroll == 0) {
             if (!sAddressSettings.work->barAtEnd) {
-                DWCUtilSound_PlaySe(9);
+                DWCi_SNDlPlay(9);
                 sAddressSettings.work->barAtEnd = TRUE;
             }
         } else {
-            DWCUtilSound_PlaySe(0x13);
-            sAddressSettings.work->scrollTask = DWCi_TSKlForm(0, DWCUtilAddressSettings_ScrollUpTask, NULL, 0x78);
+            DWCi_SNDlPlay(0x13);
+            sAddressSettings.work->scrollTask = DWCi_TSKlForm(0, taskUp, NULL, 0x78);
         }
         break;
     case 6:
         if (sAddressSettings.scroll == ADDRESS_SCROLL_MAX) {
             if (!sAddressSettings.work->barAtEnd) {
-                DWCUtilSound_PlaySe(9);
+                DWCi_SNDlPlay(9);
                 sAddressSettings.work->barAtEnd = TRUE;
             }
         } else {
-            DWCUtilSound_PlaySe(0x13);
-            sAddressSettings.work->scrollTask = DWCi_TSKlForm(0, DWCUtilAddressSettings_ScrollDownTask, NULL, 0x78);
+            DWCi_SNDlPlay(0x13);
+            sAddressSettings.work->scrollTask = DWCi_TSKlForm(0, taskDown, NULL, 0x78);
         }
         break;
     case 5:
@@ -566,9 +566,9 @@ static void DWCUtilAddressSettings_WaitFadeOut(void) {
     for (i = 0; i < 2; i++) {
         DWCi_ARClRelease(sAddressSettings.work->palettes[i]);
     }
-    DWCUtilGfxResource_Load("char/ybObjMain.ncl.l", GX_LoadOBJPltt);
-    DWCUtilDisplay_HidePlanes(1, GX_PLANEMASK_BG0);
-    DWCUtilDisplay_HidePlanes(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_BG3 | GX_PLANEMASK_OBJ);
+    DWCi_CMNlLoadResource("char/ybObjMain.ncl.l", GX_LoadOBJPltt);
+    DWCi_GXlInvisible(1, GX_PLANEMASK_BG0);
+    DWCi_GXlInvisible(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_BG3 | GX_PLANEMASK_OBJ);
     G2_SetBG0Offset(0, 0);
     G2_SetBG2Offset(0, 0);
     G2_SetBG2ControlText(GX_BG_SCRSIZE_TEXT_256x256, GX_BG_COLORMODE_16, GX_BG_SCRBASE_0x7000, GX_BG_CHARBASE_0x10000);
@@ -577,7 +577,7 @@ static void DWCUtilAddressSettings_WaitFadeOut(void) {
     case ADDRESS_ITEM_WEP_KEY:
         DWCi_SetParam2_(sAddressSettings.work->chosen, 0);
         DWCi_SetParam_(2, 0);
-        next = DWCUtilWepKeyboard_Init;
+        next = DWCi_SceneSetEdit32;
         break;
     case ADDRESS_ITEM_IP:
     case ADDRESS_ITEM_NETMASK:
@@ -590,10 +590,10 @@ static void DWCUtilAddressSettings_WaitFadeOut(void) {
         }
         DWCi_SetParam_(2, 0);
         DWCi_SetParam2_(i, 0);
-        next = DWCUtilAddressEdit_Init;
+        next = DWCi_SceneSetEditAddress;
         break;
     case ADDRESS_ITEM_TEST:
-        edit = DWCUtilWifiSettings_GetEdit();
+        edit = DWCi_SETTIGNlGet();
         edit->connection.netmask = DWCi_BACKUPlConvMaskCidr(edit->netmask);
         if (edit->autoAddress) {
             MI_CpuFill8(edit->connection.ip, 0, sizeof(edit->connection.ip));
@@ -606,21 +606,21 @@ static void DWCUtilAddressSettings_WaitFadeOut(void) {
         }
         DWCi_SetParam_(2, 0);
         DWCi_SetParam2_(0, 0);
-        next = DWCUtilAutoConnect_Init;
+        next = DWCi_SceneSetTest;
         break;
     case ADDRESS_ITEM_SAVE:
         DWCi_SetParam_(0, 0);
-        next = DWCUtilSaveSettings_Init;
+        next = DWCi_SceneSetListSave;
         break;
     case ADDRESS_ITEM_BACK:
         if (sAddressSettings.from == 0) {
             DWCi_SetParam_(2, 1);
-            next = DWCUtilScreenAp_Init;
+            next = DWCi_SceneSetSelectAp;
         } else {
-            edit = DWCUtilWifiSettings_GetEdit();
+            edit = DWCi_SETTIGNlGet();
             DWCi_SETTINGlSetSetting(edit->index);
             DWCi_SetParam_(0, 1);
-            next = DWCUtilScreenWay_Init;
+            next = DWCi_SceneSetSelectWay;
         }
         break;
     default:
@@ -646,13 +646,13 @@ static void DWCUtilAddressSettings_DrawRows(void) {
         DWCUtilAddressSettings_DrawRowMarks(top, i);
     }
     DWCi_SCREENlRenew();
-    DWCUtilText_MarkDirty(sAddressSettings.work->text);
+    DWCi_FNTlRenewBg(sAddressSettings.work->text);
     setOffset();
 }
 
 // The text of a row: the SSID, the WEP key as stars, or an address of the connection's own
 static void DWCUtilAddressSettings_DrawRowText(int index, int row) {
-    DWCUtilSettingsEdit *edit = DWCUtilWifiSettings_GetEdit();
+    DWCUtilSettingsEdit *edit = DWCi_SETTIGNlGet();
     u8 stars[33];
     int length;
 
@@ -709,7 +709,7 @@ static void DWCUtilAddressSettings_DrawRowText(int index, int row) {
 
 // The marks of a row: its arrow, or its two answers lit as they were touched and greyed when they can't be chosen
 static void DWCUtilAddressSettings_DrawRowMarks(int index, int row) {
-    DWCUtilSettingsEdit *edit = DWCUtilWifiSettings_GetEdit();
+    DWCUtilSettingsEdit *edit = DWCi_SETTIGNlGet();
     int mark;
     int frame;
     int other;
@@ -793,7 +793,7 @@ static void DWCUtilAddressSettings_DrawRowMarks(int index, int row) {
 
 // Whether an item can be chosen: not the SSID or the key of a connection that a setup made, nor what DHCP gives
 static BOOL DWCUtilAddressSettings_IsItemEnabled(int item) {
-    DWCUtilSettingsEdit *edit = DWCUtilWifiSettings_GetEdit();
+    DWCUtilSettingsEdit *edit = DWCi_SETTIGNlGet();
     BOOL result = TRUE;
 
     switch (item) {
@@ -844,7 +844,7 @@ static void DWCUtilAddressSettings_ShowMark(int mark, int frame, int row) {
         }
     }
     if (sAddressMarkCells[mark][frame] != 0) {
-        DWCUtilCell_Copy(0, sAddressMarkCells[mark][frame], *oam);
+        DWCi_CEINlSet(0, sAddressMarkCells[mark][frame], *oam);
         DWCUtilOam_SetPosition(*oam, x[mark], 0);
         G2_SetOBJPriority(*oam, 3);
         return;
@@ -1022,7 +1022,7 @@ static int calcIdxColumn(int row) {
 }
 
 // Scrolls the list up by 6 pixels a frame, until it rests on a row
-static void DWCUtilAddressSettings_ScrollUpTask(DWCUtilTask *task, void *arg) {
+static void taskUp(DWCUtilTask *task, void *arg) {
     int offset;
 
     DWCi_SBlDisable();
@@ -1052,7 +1052,7 @@ static void DWCUtilAddressSettings_ScrollUpTask(DWCUtilTask *task, void *arg) {
 }
 
 // Scrolls the list down by 6 pixels a frame, until it rests on a row
-static void DWCUtilAddressSettings_ScrollDownTask(DWCUtilTask *task, void *arg) {
+static void taskDown(DWCUtilTask *task, void *arg) {
     int offset;
 
     DWCi_SBlDisable();
@@ -1072,7 +1072,7 @@ static void DWCUtilAddressSettings_ScrollDownTask(DWCUtilTask *task, void *arg) 
     DWCi_TSKlDelete(0, task);
 }
 
-static void DWCUtilAddressSettings_ScrollBgTask(DWCUtilTask *task, void *arg) {
+static void taskVBlank(DWCUtilTask *task, void *arg) {
     int top;
     int offset;
 
@@ -1086,7 +1086,7 @@ static void DWCUtilAddressSettings_ScrollBgTask(DWCUtilTask *task, void *arg) {
 }
 
 // Frames the item the cursor is on
-static void DWCUtilAddressSettings_ShowCursor(void) {
+static void dispFocus(void) {
     u8 rects[14] = { 0, 0, 1, 2, 0, 0, 0, 1, 2, 0, 0, 3, 4, 5 };
     DWCUtilAddressRect rect;
     int index = rects[sAddressSettings.cursor];
@@ -1108,10 +1108,10 @@ static void applyForcus(void) {
 
     if (sAddressSettings.cursor == ADDRESS_ITEM_TEST || sAddressSettings.cursor == ADDRESS_ITEM_SAVE ||
         sAddressSettings.cursor == ADDRESS_ITEM_BACK) {
-        DWCUtilAddressSettings_ShowCursor();
+        dispFocus();
         return;
     }
-    edit = DWCUtilWifiSettings_GetEdit();
+    edit = DWCi_SETTIGNlGet();
     index = sAddressSettings.row + FX_DivS32(sAddressSettings.scroll, ADDRESS_ROW_HEIGHT);
     switch (index) {
     case ADDRESS_ROW_AUTO_ADDRESS:
@@ -1132,18 +1132,18 @@ static void applyForcus(void) {
         sAddressSettings.cursor = sAddressRowItems[index];
         break;
     }
-    DWCUtilAddressSettings_ShowCursor();
+    dispFocus();
 }
 
 static void applyForcus1(int item) {
     sAddressSettings.cursor = item;
     sAddressSettings.row = calcColumnIdx(sAddressItemRows[item]);
-    DWCUtilAddressSettings_ShowCursor();
+    dispFocus();
 }
 
 // Moves the cursor: right (0), up (1), left (2) or down (3), scrolling the list at its ends
-static void DWCUtilAddressSettings_MoveCursor(int direction) {
-    DWCUtilSettingsEdit *edit = DWCUtilWifiSettings_GetEdit();
+static void moveFocus(int direction) {
+    DWCUtilSettingsEdit *edit = DWCi_SETTIGNlGet();
     u8 cursor = sAddressSettings.cursor;
     int moved = 0;
 
@@ -1179,7 +1179,7 @@ static void DWCUtilAddressSettings_MoveCursor(int direction) {
             if (sAddressSettings.work->atEnd) {
                 return;
             }
-            DWCUtilSound_PlaySe(9);
+            DWCi_SNDlPlay(9);
             sAddressSettings.work->atEnd = TRUE;
             return;
         }
@@ -1206,7 +1206,7 @@ static void DWCUtilAddressSettings_MoveCursor(int direction) {
             if (sAddressSettings.work->atEnd) {
                 return;
             }
-            DWCUtilSound_PlaySe(9);
+            DWCi_SNDlPlay(9);
             sAddressSettings.work->atEnd = TRUE;
             return;
         } else if (cursor == ADDRESS_ITEM_SAVE) {
@@ -1220,16 +1220,16 @@ static void DWCUtilAddressSettings_MoveCursor(int direction) {
             if (sAddressSettings.row != 0) {
                 sAddressSettings.row--;
             } else {
-                DWCUtilSound_PlaySe(0x13);
-                sAddressSettings.work->scrollTask = DWCi_TSKlForm(0, DWCUtilAddressSettings_ScrollUpTask, NULL, 0x78);
+                DWCi_SNDlPlay(0x13);
+                sAddressSettings.work->scrollTask = DWCi_TSKlForm(0, taskUp, NULL, 0x78);
                 return;
             }
         } else if (direction == 3) {
             if (sAddressSettings.row < 3) {
                 sAddressSettings.row++;
             } else {
-                DWCUtilSound_PlaySe(0x13);
-                sAddressSettings.work->scrollTask = DWCi_TSKlForm(0, DWCUtilAddressSettings_ScrollDownTask, NULL, 0x78);
+                DWCi_SNDlPlay(0x13);
+                sAddressSettings.work->scrollTask = DWCi_TSKlForm(0, taskDown, NULL, 0x78);
                 return;
             }
         } else {
@@ -1245,13 +1245,13 @@ static void DWCUtilAddressSettings_MoveCursor(int direction) {
             } else {
                 break;
             }
-            DWCUtilSound_PlaySe(8);
-            DWCUtilAddressSettings_ShowCursor();
+            DWCi_SNDlPlay(8);
+            dispFocus();
         }
         break;
     }
     if (moved != 2) {
-        DWCUtilSound_PlaySe(8);
+        DWCi_SNDlPlay(8);
         if (moved == 0) {
             applyForcus();
         }
@@ -1259,13 +1259,13 @@ static void DWCUtilAddressSettings_MoveCursor(int direction) {
 }
 
 // Lights up the chosen button: its row of the palette
-static void DWCUtilAddressSettings_LightButton(void) {
+static void dispPushButton(void) {
     DWCi_SCREENlCopyPalette(sAddressSettings.work->palettes[1], sAddressButtonPalettes[sAddressSettings.cursor - 0xb],
                             sAddressButtonPalettes[sAddressSettings.cursor - 0xb]);
 }
 
 // Counts down the frames that the answers stay lit
-static void DWCUtilAddressSettings_UpdateLitTask(DWCUtilTask *task, void *arg) {
+static void taskPushCount(DWCUtilTask *task, void *arg) {
     int i;
 
     for (i = 0; i < 4; i++) {
@@ -1299,8 +1299,8 @@ static void pushButtonYesNo(void) {
 
 // Whether the settings can be saved: an SSID, a usable DNS server unless DHCP gives them, and a usable address and
 // gateway that suit the mask unless DHCP gives them
-static BOOL DWCUtilAddressSettings_IsValid(void) {
-    DWCUtilSettingsEdit *edit = DWCUtilWifiSettings_GetEdit();
+static BOOL isCorrect(void) {
+    DWCUtilSettingsEdit *edit = DWCi_SETTIGNlGet();
 
     if (edit->connection.ssid[0] == 0) {
         return FALSE;
@@ -1323,16 +1323,16 @@ static BOOL DWCUtilAddressSettings_IsValid(void) {
     return TRUE;
 }
 
-static void DWCUtilAddressSettings_WaitInvalidDialog(void) {
+static void procError(void) {
     if (DWCi_WINlGet() == 0) {
-        DWCUtilSound_PlaySe(6);
+        DWCi_SNDlPlay(6);
         DWCi_WINlEnd();
-        DWCUtilBgBuffer_LoadPalette(sAddressSettings.work->palettes[0]);
-        DWCi_ChangeScene(DWCUtilAddressSettings_WaitInvalidClosed);
+        DWCi_SCREENlSetPalette(sAddressSettings.work->palettes[0]);
+        DWCi_ChangeScene(procError1);
     }
 }
 
-static void DWCUtilAddressSettings_WaitInvalidClosed(void) {
+static void procError1(void) {
     if (!DWCi_WINlIsInit()) {
         DWCi_ChangeScene(DWCUtilAddressSettings_Main);
     }

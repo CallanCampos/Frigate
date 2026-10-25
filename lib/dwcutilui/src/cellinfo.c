@@ -13,18 +13,18 @@ typedef struct DWCUtilCell {
 
 static DWCUtilCell *sCells[2];
 
-void DWCUtilCell_Load(int screen, const char *path) {
+void DWCi_CEINlRead(int screen, const char *path) {
     u32 size;
 
-    sCells[screen] = DWCUtilRomResource_LoadFile(path, &size, 4);
+    sCells[screen] = DWCi_ARClReadEx(path, &size, 4);
 }
 
-void DWCUtilCell_Unload(int screen) {
+void DWCi_CEINlRelease(int screen) {
     DWCi_ARClRelease(sCells[screen]);
     sCells[screen] = NULL;
 }
 
-void DWCUtilCell_Copy(int screen, int cell, GXOamAttr *oam) {
+void DWCi_CEINlSet(int screen, int cell, GXOamAttr *oam) {
     DWCUtilCell *cells = sCells[screen];
     const u16 *attrs = (const u16 *)((const u8 *)cells + cells[cell].offset);
     u16 count = cells[cell].count;
@@ -38,16 +38,16 @@ void DWCUtilCell_Copy(int screen, int cell, GXOamAttr *oam) {
     }
 }
 
-GXOamAttr *DWCUtilCell_AllocOam(int screen, int cell) {
+GXOamAttr *DWCi_CEINlSetExObj(int screen, int cell) {
     GXOamAttr *oam = DWCi_OBJlFormGx(screen);
 
-    DWCUtilCell_Copy(screen, cell, oam);
+    DWCi_CEINlSet(screen, cell, oam);
     return oam;
 }
 
-DWCUtilOamNode *DWCUtilCell_AllocOamRun(int screen, int cell, BOOL fromFront) {
+DWCUtilOamNode *DWCi_CEINlSetExCell(int screen, int cell, BOOL fromFront) {
     DWCUtilOamNode *node = DWCi_CELLlForm(screen, sCells[screen][cell].count, fromFront);
 
-    DWCUtilCell_Copy(screen, cell, DWCi_CELLlGetObj(node, 0));
+    DWCi_CEINlSet(screen, cell, DWCi_CELLlGetObj(node, 0));
     return node;
 }

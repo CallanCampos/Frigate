@@ -8,6 +8,6 @@
 // the move reports an event meanwhile, it ends, and the move's notice follows (sceneoptmovfailure.h).
 // The file is the DWC utility library's sceneoptmovuser.o (libdwcutil.TWL.HYB.a), as aletheia's map of Black 1's SDK
 // code to that library's objects (layout/symbols_sdk.txt) shows it.
-void DWCUtilPageMove_Init(void);
+void DWCi_SceneOptMovUser(void);
 
 #endif // POKEBW2_DWCUTIL_SCENEOPTMOVUSER_H

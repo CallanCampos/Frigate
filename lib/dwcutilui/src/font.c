@@ -67,12 +67,12 @@ void DWCi_FNTlInit(void) {
     sTextWork->freeObjTexts = DWCi_QUElFormEx(0x20, sTextWork->objTexts[0], sizeof(DWCUtilText));
     if (DWCi_Language() == 6) {
         for (i = 0; i < 2; i++) {
-            sTextWork->fontFiles[i] = DWCUtilRomResource_LoadFile(sKcFontPaths[i], NULL, 4);
+            sTextWork->fontFiles[i] = DWCi_ARClReadEx(sKcFontPaths[i], NULL, 4);
             NNS_G2dFontInitUTF16(&sTextWork->fonts[i], sTextWork->fontFiles[i]);
         }
     } else {
         for (i = 0; i < 2; i++) {
-            sTextWork->fontFiles[i] = DWCUtilRomResource_LoadFile(sFontPaths[i], NULL, 4);
+            sTextWork->fontFiles[i] = DWCi_ARClReadEx(sFontPaths[i], NULL, 4);
             NNS_G2dFontInitUTF16(&sTextWork->fonts[i], sTextWork->fontFiles[i]);
         }
     }
@@ -93,7 +93,7 @@ DWCUtilText *DWCi_FNTlFormEx(int screen, int width, int height, s16 fromFront, i
     u8 *base;
     u32 charName;
 
-    text = DWCi_QUElPopFront(sTextWork->freeObjTexts);
+    text = DWCi_QUElPopBack(sTextWork->freeObjTexts);
     text->u.obj.width = width;
     text->u.obj.height = height;
     text->buffer = DWCi_OVRlAlloc(screen, width * height, fromFront, &charName);
@@ -205,7 +205,7 @@ void DWCi_FNTlDisp(DWCUtilText *text, int x, int y, DWCUtilOamNode *node, int pr
     NNS_G2dArrangeOBJ1D(oam, text->u.obj.width, text->u.obj.height, x, y, 0, text->u.obj.charName, 2);
 }
 
-void DWCUtilText_MarkDirty(DWCUtilText *text) {
+void DWCi_FNTlRenewBg(DWCUtilText *text) {
     if (text == &sTextWork->bgTexts[0]) {
         sTextWork->dirty[0] = TRUE;
     } else {

@@ -29,13 +29,13 @@ static void procScene(void);
 static void input(void);
 static void draw(void);
 static void button(void);
-static void DWCUtilNoticeScreen_DisableButtons(void);
+static void endScene(void);
 static void endScene1(void);
 static void endScene2(void);
 
 static DWCUtilNoticeScreen sNoticeScreen;
 
-void DWCUtilNoticeScreen_Init(void) {
+void DWCi_SceneOptMovFailure(void) {
     initGraphics();
     DWCi_CMNlMsgDraw(0x20);
     sNoticeScreen.subScreen = DWCi_COMMENTlDispEx(0x3c, -1, 0);
@@ -43,7 +43,7 @@ void DWCUtilNoticeScreen_Init(void) {
 }
 
 static void initGraphics(void) {
-    DWCUtilGfxResource_Load("char/yb5Multi.nsc.l", GX_LoadBG2Scr);
+    DWCi_CMNlLoadResource("char/yb5Multi.nsc.l", GX_LoadBG2Scr);
     G2S_SetBG0Priority(3);
     G2S_SetBG1Priority(3);
     G2_SetBG0Priority(3);
@@ -54,10 +54,10 @@ static void initGraphics(void) {
 static void procInit(void) {
     DWCi_EFFlFade(DWC_UTIL_FADE_FROM_WHITE, 0, GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ,
                   8);
-    DWCi_GXlInvisible(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
+    DWCi_GXlVisible(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
     if (sNoticeScreen.subScreen) {
         DWCi_EFFlFade(DWC_UTIL_FADE_FROM_WHITE, 1, GX_BLEND_PLANEMASK_BG0, 8);
-        DWCi_GXlInvisible(1, GX_PLANEMASK_BG0);
+        DWCi_GXlVisible(1, GX_PLANEMASK_BG0);
     }
     DWCi_ChangeScene(procInit1);
 }
@@ -93,19 +93,19 @@ static void button(void) {
     switch (DWCi_BTNlGet()) {
     case 1:
         sNoticeScreen.yes = TRUE;
-        DWCUtilSound_PlaySe(6);
+        DWCi_SNDlPlay(6);
         break;
     case 0:
         sNoticeScreen.yes = FALSE;
-        DWCUtilSound_PlaySe(7);
+        DWCi_SNDlPlay(7);
         break;
     default:
         return;
     }
-    DWCi_ChangeScene(DWCUtilNoticeScreen_DisableButtons);
+    DWCi_ChangeScene(endScene);
 }
 
-static void DWCUtilNoticeScreen_DisableButtons(void) {
+static void endScene(void) {
     DWCi_BTNlDisable();
     DWCi_EFFlWait(8);
     DWCi_ChangeScene(endScene1);
@@ -128,15 +128,15 @@ static void endScene2(void) {
         DWCi_FNTlDeleteBgLcd(0);
         if (!sNoticeScreen.yes) {
             DWCi_COMMENTlDelete();
-            DWCUtilDisplay_HidePlanes(1, GX_PLANEMASK_BG0);
+            DWCi_GXlInvisible(1, GX_PLANEMASK_BG0);
         }
-        DWCUtilDisplay_HidePlanes(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
+        DWCi_GXlInvisible(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
         if (!sNoticeScreen.yes) {
             DWCi_SetParam_(0, 1);
-            DWCi_ChangeScene(DWCUtilOptionMenu_Init);
+            DWCi_ChangeScene(DWCi_SceneOptMenu);
         } else {
             DWCi_SetParam_(0, 1);
-            DWCi_ChangeScene(DWCUtilPageMulti5_Init);
+            DWCi_ChangeScene(DWCi_SceneOptMovWait);
         }
     }
 }

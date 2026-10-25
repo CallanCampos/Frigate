@@ -42,7 +42,7 @@ void DWCi_CELLlEnd(void) {
 }
 
 DWCUtilOamNode *DWCi_CELLlForm(int screen, int count, BOOL fromFront) {
-    DWCUtilOamNode *node = DWCi_QUElPopFront(sScreens[screen].freeNodes);
+    DWCUtilOamNode *node = DWCi_QUElPopBack(sScreens[screen].freeNodes);
     DWCUtilOamNode *position;
     u32 irq = OS_DisableIrqMask(OS_IE_V_BLANK);
 

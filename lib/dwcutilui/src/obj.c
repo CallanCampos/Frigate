@@ -41,7 +41,7 @@ void DWCi_OBJlEnd(void) {
 }
 
 GXOamAttr *DWCi_OBJlFormGx(int screen) {
-    return DWCi_QUElPopFront(sOamBuf->freeOam[screen]);
+    return DWCi_QUElPopBack(sOamBuf->freeOam[screen]);
 }
 
 void DWCi_OBJlDelete(GXOamAttr *oam) {

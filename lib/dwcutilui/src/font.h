@@ -33,7 +33,7 @@ void DWCi_FNTlEnd(void);
 // A canvas of OBJ characters, width by height characters, on the screen, and the number of OAM entries it needs
 DWCUtilText *DWCi_FNTlFormEx(int screen, int width, int height, s16 fromFront, int *objCount, int font);
 void DWCi_FNTlDelete(DWCUtilText *text);
-// The screen's BG 0 canvas, uploaded at the next VBlank after each DWCUtilText_MarkDirty
+// The screen's BG 0 canvas, uploaded at the next VBlank after each DWCi_FNTlRenewBg
 DWCUtilText *DWCi_FNTlFormBgEx(int screen, int font);
 void DWCUtilText_UploadTask(DWCUtilTask *task, void *arg);
 void DWCi_FNTlDeleteBg(DWCUtilText *text);
@@ -46,6 +46,6 @@ void DWCi_FNTlDrawRect(DWCUtilText *text, int x, int y, int w, int h, int cl, u3
 void DWCi_FNTlClear(DWCUtilText *text, int cl);
 // Shows the OBJ canvas at x, y in the run of OAM entries
 void DWCi_FNTlDisp(DWCUtilText *text, int x, int y, DWCUtilOamNode *node, int priority);
-void DWCUtilText_MarkDirty(DWCUtilText *text);
+void DWCi_FNTlRenewBg(DWCUtilText *text);
 
 #endif // POKEBW2_DWCUTIL_FONT_H

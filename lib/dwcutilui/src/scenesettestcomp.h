@@ -9,6 +9,6 @@
 // (layout/symbols_sdk.txt) shows as scenesettestcomp (libdwcutil.TWL.HYB.a), its name cut to 16 characters; its scene
 // is DWCi_SceneSetTestCompletet, as the SDK spells it, so the rest of the name is not certain and the file keeps the
 // part the map shows.
-void DWCUtilAutoConnectOk_Init(void);
+void DWCi_SceneSetTestCompletet(void);
 
 #endif // POKEBW2_DWCUTIL_SCENESETTESTCOMP_H

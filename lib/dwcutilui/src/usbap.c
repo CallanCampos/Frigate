@@ -6,11 +6,11 @@
 #include "nitro/wm.h"
 #include "task.h"
 
-static BOOL DWCUtilUsbScan_StartScan(void);
+static BOOL startScan(void);
 static void cbWm(void *arg);
 static void scanFirst(const WMStartScanExCallback *cb);
 static void scanWait(const WMStartScanExCallback *cb);
-static void DWCUtilUsbScan_FirstResultTask(DWCUtilTask *task, void *arg);
+static void taskFirst(DWCUtilTask *task, void *arg);
 
 #define USB_SCAN_CONNECTORS 16
 // How long the first scan lists the connectors before it gives a result
@@ -72,8 +72,8 @@ BOOL DWCi_USBAPlBegin(DWCUtilUsbScanCallback callback) {
         MI_CpuCopy8(sUsbScanSsid, sUsbScan->param.ssid, 8);
         sUsbScan->param.ssid[9] = TRUE;
         MI_CpuCopy8(info.nickName, &sUsbScan->param.ssid[12], info.nickNameLength * 2);
-        if (DWCUtilUsbScan_StartScan()) {
-            sUsbScan->task = DWCi_TSKlForm(0, DWCUtilUsbScan_FirstResultTask, NULL, 120);
+        if (startScan()) {
+            sUsbScan->task = DWCi_TSKlForm(0, taskFirst, NULL, 120);
             return TRUE;
         }
     }
@@ -81,7 +81,7 @@ BOOL DWCi_USBAPlBegin(DWCUtilUsbScanCallback callback) {
     return FALSE;
 }
 
-static BOOL DWCUtilUsbScan_StartScan(void) {
+static BOOL startScan(void) {
     if (WM_StartScanEx(cbWm, &sUsbScan->param) == WM_ERRCODE_OPERATING) {
         return TRUE;
     }
@@ -132,10 +132,10 @@ static void cbWm(void *arg) {
                 } else {
                     scanFirst(cb);
                 }
-                DWCUtilUsbScan_StartScan();
+                startScan();
                 break;
             case WM_STATECODE_PARENT_NOT_FOUND:
-                DWCUtilUsbScan_StartScan();
+                startScan();
                 break;
             default:
                 OS_Terminate();
@@ -228,7 +228,7 @@ static void scanWait(const WMStartScanExCallback *cb) {
 
 // The result of the first scan, once it has run for USB_SCAN_TIME: a connector that takes the console, some that do
 // and some that don't, or none; with only connectors that don't, the scans go on
-static void DWCUtilUsbScan_FirstResultTask(DWCUtilTask *task, void *arg) {
+static void taskFirst(DWCUtilTask *task, void *arg) {
     DWCUtilUsbScan *scan;
     OSTick now = OS_GetTick();
     BOOL ready;

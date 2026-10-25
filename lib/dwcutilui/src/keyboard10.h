@@ -9,7 +9,7 @@
 // the keypad is up. The digits, the left arrow and the right arrow can each be disabled, which makes them buzz.
 // The file is the DWC utility library's keyboard10.o (libdwcutil.TWL.HYB.a), as aletheia's map of Black 1's SDK code to
 // that library's objects (layout/symbols_sdk.txt) shows it.
-void DWCUtilMenu_Open(void);
+void DWCi_KB10lInit(void);
 // Slides the keypad down and frees it
 void DWCi_KB10lEnd(void);
 u8 DWCi_KB10lGet(void);

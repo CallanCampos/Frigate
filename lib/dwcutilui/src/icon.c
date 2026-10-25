@@ -13,22 +13,22 @@ typedef struct DWCUtilLinkIcon {
     s8 set;
 } DWCUtilLinkIcon;
 
-static void DWCUtilLinkIcon_UpdateTask(DWCUtilTask *task, void *arg);
+static void taskRenew(DWCUtilTask *task, void *arg);
 
 // The cell of each link level, from none to the strongest
 static const u8 sLevelCells[2][4] = { { 0x18, 0x17, 0x16, 0x15 }, { 0x5f, 0x5e, 0x5d, 0x5c } };
 static DWCUtilLinkIcon *sLinkIcon;
 
-void DWCUtilLinkIcon_Init(int set) {
+void DWCi_ICONlInit(int set) {
     if (sLinkIcon != NULL) {
         return;
     }
     sLinkIcon = DWCi_HEAPlAllocEx(sizeof(DWCUtilLinkIcon), 4);
     sLinkIcon->set = set;
-    sLinkIcon->oam = DWCUtilCell_AllocOam(0, sLevelCells[set][0]);
+    sLinkIcon->oam = DWCi_CEINlSetExObj(0, sLevelCells[set][0]);
     G2_SetOBJPosition(sLinkIcon->oam, 0xe5, 0x26);
     G2_SetOBJPriority(sLinkIcon->oam, 2);
-    sLinkIcon->task = DWCi_TSKlForm(0, DWCUtilLinkIcon_UpdateTask, NULL, 0x78);
+    sLinkIcon->task = DWCi_TSKlForm(0, taskRenew, NULL, 0x78);
 }
 
 void DWCi_ICONlEnd(void) {
@@ -39,7 +39,7 @@ void DWCi_ICONlEnd(void) {
     }
 }
 
-static void DWCUtilLinkIcon_UpdateTask(DWCUtilTask *task, void *arg) {
+static void taskRenew(DWCUtilTask *task, void *arg) {
     WMLinkLevel level = WM_LINK_LEVEL_0;
     BOOL enabled = OS_DisableIrq();
 
@@ -47,7 +47,7 @@ static void DWCUtilLinkIcon_UpdateTask(DWCUtilTask *task, void *arg) {
         level = WM_GetLinkLevel();
     }
     OS_RestoreIrq(enabled);
-    DWCUtilCell_Copy(0, sLevelCells[sLinkIcon->set][level], sLinkIcon->oam);
+    DWCi_CEINlSet(0, sLevelCells[sLinkIcon->set][level], sLinkIcon->oam);
     G2_SetOBJPosition(sLinkIcon->oam, 0xe5, 0x26);
     G2_SetOBJPriority(sLinkIcon->oam, 2);
 }

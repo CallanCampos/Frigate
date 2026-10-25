@@ -137,13 +137,13 @@ typedef struct {
 } DownloadPlaySysGame;
 
 // What the overlay's screens file calls
-void func_ov182_021ba768(DownloadPlaySysContext *context, const DownloadPlaySysGame *registry);
-BOOL func_ov182_021ba81c(void);
-BOOL func_ov182_021ba918(void);
-BOOL func_ov182_021ba950(void);
-void func_ov182_021ba974(void);
-void func_ov182_021babdc(u8 *state, u8 *changed);
-const MBUserInfo *func_ov182_021bac14(void);
+void DWCi_MOVInit(DownloadPlaySysContext *context, const DownloadPlaySysGame *registry);
+BOOL DWCi_MOVFinalize(void);
+BOOL DWCi_MOVStartAdmitChild(void);
+BOOL DWCi_MOVStartDownloadandBootChild(void);
+void DWCi_MOVFramework(void);
+void DWCi_MOVGetStatus(u8 *state, u8 *changed);
+const MBUserInfo *DWCi_GetChildInfo(void);
 
 // Not written yet: the function that fills the parent's copy of the game registry, which the overlay's unassigned
 // screens range owns

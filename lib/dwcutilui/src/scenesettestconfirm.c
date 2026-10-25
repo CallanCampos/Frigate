@@ -22,7 +22,7 @@ static void func_ov182_021b66d4(void);
 static void endScene1(void);
 static void DWCUtilAutoConnectIntro_WaitFadeOut(void);
 
-void DWCUtilAutoConnectIntro_Init(void) {
+void DWCi_SceneSetTestConfirm(void) {
     int from;
 
     DWCi_SEARCHlEnd();
@@ -39,7 +39,7 @@ void DWCUtilAutoConnectIntro_Init(void) {
 }
 
 static void initGraphics(void) {
-    DWCUtilGfxResource_Load("char/xb4None.nsc.l", GX_LoadBG2Scr);
+    DWCi_CMNlLoadResource("char/xb4None.nsc.l", GX_LoadBG2Scr);
     G2S_SetBG0Priority(3);
     G2S_SetBG1Priority(3);
     G2_SetBG1Priority(3);
@@ -49,8 +49,8 @@ static void initGraphics(void) {
 static void procInit(void) {
     DWCi_EFFlFade(DWC_UTIL_FADE_FROM_WHITE, 1, GX_BLEND_PLANEMASK_BG0, 8);
     DWCi_EFFlFade(DWC_UTIL_FADE_FROM_WHITE, 0, GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ, 8);
-    DWCi_GXlInvisible(1, GX_PLANEMASK_BG0);
-    DWCi_GXlInvisible(0, GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
+    DWCi_GXlVisible(1, GX_PLANEMASK_BG0);
+    DWCi_GXlVisible(0, GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
     DWCi_ChangeScene(procInit1);
 }
 
@@ -61,7 +61,7 @@ static void procInit1(void) {
 
     if (DWCi_EFFlCheck(1) == 0 && DWCi_EFFlCheck(0) == 0) {
         DWCi_GetParam2_(NULL, &from);
-        DWCUtilDialog_Open(msgIndices[from], 1, 1, -1, 0);
+        DWCi_WINlInitEx(msgIndices[from], 1, 1, -1, 0);
         DWCi_ChangeScene(DWCUtilAutoConnectIntro_WaitDialog);
     }
 }
@@ -70,9 +70,9 @@ static void DWCUtilAutoConnectIntro_WaitDialog(void) {
     draw();
     func_ov182_021b66d4();
     if (DWCi_WINlGet() == 0) {
-        DWCUtilSound_PlaySe(6);
+        DWCi_SNDlPlay(6);
         DWCi_WINlEnd();
-        DWCUtilSound_PlaySe(6);
+        DWCi_SNDlPlay(6);
         DWCi_ChangeScene(endScene1);
     }
 }
@@ -92,8 +92,8 @@ static void endScene1(void) {
 
 static void DWCUtilAutoConnectIntro_WaitFadeOut(void) {
     if (DWCi_EFFlCheck(0) == 0) {
-        DWCUtilDisplay_HidePlanes(0, GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
+        DWCi_GXlInvisible(0, GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
         DWCi_SetParam_(0, 1);
-        DWCi_ChangeScene(DWCUtilAutoConnect_Init);
+        DWCi_ChangeScene(DWCi_SceneSetTest);
     }
 }

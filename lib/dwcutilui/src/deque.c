@@ -41,7 +41,7 @@ void DWCi_QUElPushBack(DWCUtilStack *stack, void *item) {
     OS_EnableIrqMask(irq);
 }
 
-void *DWCi_QUElPopFront(DWCUtilStack *stack) {
+void *DWCi_QUElPopBack(DWCUtilStack *stack) {
     void *item = NULL;
     u32 irq = OS_DisableIrqMask(OS_IE_V_BLANK);
 

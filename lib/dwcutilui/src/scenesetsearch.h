@@ -8,6 +8,6 @@
 // the utility can't set; B or the button end it and go back to the choice of the setup of a connection.
 // The file is the DWC utility library's scenesetsearch.o (libdwcutil.TWL.HYB.a), as aletheia's map of Black 1's SDK
 // code to that library's objects (layout/symbols_sdk.txt) shows it.
-void DWCUtilApSearch_Init(void);
+void DWCi_SceneSetSearch(void);
 
 #endif // POKEBW2_DWCUTIL_SCENESETSEARCH_H

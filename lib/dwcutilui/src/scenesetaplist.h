@@ -9,6 +9,6 @@
 // has no security; an access point with a security the utility can't set shows a dialog.
 // The file is the DWC utility library's scenesetaplist.o (libdwcutil.TWL.HYB.a), as aletheia's map of Black 1's SDK
 // code to that library's objects (layout/symbols_sdk.txt) shows it.
-void DWCUtilPageApList_Init(void);
+void DWCi_SceneSetApList(void);
 
 #endif // POKEBW2_DWCUTIL_SCENESETAPLIST_H

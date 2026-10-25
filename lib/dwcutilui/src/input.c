@@ -123,7 +123,7 @@ void readTouch(void) {
         if (sample->touch == 1 && sample->validity == TP_VALIDITY_VALID) {
             touching = TRUE;
             TP_GetCalibratedPoint(&point, sample);
-            DWCUtilDisplay_SetPoint(point.x, point.y, &sTouch.input->point.x);
+            DWCi_InputCoord(point.x, point.y, &sTouch.input->point.x);
             break;
         }
     }
@@ -303,7 +303,7 @@ BOOL DWCi_TPlGet(u16 *point) {
     return TRUE;
 }
 
-void DWCUtilTouch_UpdateLid(void) {
+void DWCi_IPTlCheckFold(void) {
     if (sTouch.lidClosed) {
         if (!PAD_DetectFold()) {
             if (PM_SetLCDPower(TRUE)) {

@@ -18,7 +18,7 @@
 #include "str.h"
 
 static void initGraphics(void);
-static void DWCUtilError_DrawMessage(void);
+static void drawMessage(void);
 static void procInit(void);
 static void procInit1(void);
 static void procInit2(void);
@@ -26,7 +26,7 @@ static void procScene(void);
 static void input(void);
 static void draw(void);
 static void button(void);
-static void DWCUtilError_DisableButtons(void);
+static void endScene(void);
 static void endScene1(void);
 static void endScene2(void);
 
@@ -41,14 +41,14 @@ static const u16 sErrorCodePos[7][2] = {
 // The DWC error code that the screen shows
 static int sErrorCode;
 
-void DWCUtilError_Init(void) {
+void DWCi_SceneSetError(void) {
     initGraphics();
-    DWCUtilError_DrawMessage();
+    drawMessage();
     DWCi_ChangeScene(procInit);
 }
 
 static void initGraphics(void) {
-    DWCUtilGfxResource_Load("char/jb4Error.nsc.l", GX_LoadBG2Scr);
+    DWCi_CMNlLoadResource("char/jb4Error.nsc.l", GX_LoadBG2Scr);
     G2S_SetBG0Priority(3);
     G2S_SetBG1Priority(3);
     G2_SetBG0Priority(3);
@@ -57,7 +57,7 @@ static void initGraphics(void) {
 }
 
 // Draws the error code and the message of its kind
-static void DWCUtilError_DrawMessage(void) {
+static void drawMessage(void) {
     int type = 0;
     int from;
     int code;
@@ -157,13 +157,13 @@ static void DWCUtilError_DrawMessage(void) {
     DWCi_FNTlDrawStringEx(text, x, y, 2, 10, str, 0);
     DWCi_FNTlDrawRect(text, sErrorMsgRect[0], sErrorMsgRect[1], sErrorMsgRect[2], sErrorMsgRect[3], 2,
                       DWCi_CMNlFontFlag(), msg);
-    DWCUtilText_MarkDirty(text);
+    DWCi_FNTlRenewBg(text);
 }
 
 static void procInit(void) {
     DWCi_EFFlFade(DWC_UTIL_FADE_FROM_WHITE, 0, GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ,
                   8);
-    DWCi_GXlInvisible(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
+    DWCi_GXlVisible(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
     DWCi_ChangeScene(procInit1);
 }
 
@@ -198,12 +198,12 @@ static void draw(void) {
 
 static void button(void) {
     if (DWCi_BTNlGet() == 0) {
-        DWCUtilSound_PlaySe(6);
-        DWCi_ChangeScene(DWCUtilError_DisableButtons);
+        DWCi_SNDlPlay(6);
+        DWCi_ChangeScene(endScene);
     }
 }
 
-static void DWCUtilError_DisableButtons(void) {
+static void endScene(void) {
     DWCi_BTNlDisable();
     DWCi_EFFlWait(8);
     DWCi_ChangeScene(endScene1);
@@ -226,12 +226,12 @@ static void endScene2(void) {
     if (DWCi_EFFlCheck(1) == 0 && DWCi_EFFlCheck(0) == 0 && DWCi_BTNlIsEnd()) {
         DWCi_FNTlDeleteBgLcd(0);
         DWCi_COMMENTlDelete();
-        DWCUtilDisplay_HidePlanes(1, GX_PLANEMASK_BG0);
-        DWCUtilDisplay_HidePlanes(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
+        DWCi_GXlInvisible(1, GX_PLANEMASK_BG0);
+        DWCi_GXlInvisible(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
         DWCi_GetParam2_(NULL, &from);
         if (from != 0) {
             DWCi_SetParam_(2, 1);
-            DWCi_ChangeScene(DWCUtilScreenAp_Init);
+            DWCi_ChangeScene(DWCi_SceneSetSelectAp);
         } else {
             DWCi_SetParam_(2, 0);
             DWCi_SetParam2_(0, 0);

@@ -17,12 +17,12 @@ typedef struct DWCUtilSound {
 
 static DWCUtilSound *sSound;
 
-void DWCUtilSound_Init(void) {
+void DWCi_SNDlInit(void) {
     u32 size;
     int i;
 
     sSound = DWCi_HEAPlAllocEx(sizeof(DWCUtilSound), 4);
-    sSound->data = DWCUtilRomResource_LoadFile("sound/sound_data.sdat.l", &size, 32);
+    sSound->data = DWCi_ARClReadEx("sound/sound_data.sdat.l", &size, 32);
     NNS_SndInit();
     NNS_SndArcInitOnMemory(&sSound->arc, sSound->data);
     NNS_SndArcPlayerSetup(NULL);
@@ -40,19 +40,19 @@ void DWCi_SNDlEnd(void) {
     DWCi_HEAPlFree_(&sSound);
 }
 
-void DWCUtilSound_PlaySe(int seq) {
+void DWCi_SNDlPlay(int seq) {
     NNS_SndArcPlayerStartSeqArc(&sSound->handle, 0, seq);
 }
 
-void DWCUtilSound_SetVolume(int volume) {
+void DWCi_SNDlSetVolume(int volume) {
     NNS_SndPlayerSetVolume(&sSound->handle, volume);
 }
 
-void DWCUtilSound_SetTrackPitch(u16 trackMask, int pitch) {
+void DWCi_SNDlSetPitch(u16 trackMask, int pitch) {
     NNS_SndPlayerSetTrackPitch(&sSound->handle, trackMask, pitch);
 }
 
-void DWCUtilSound_StopSe(void) {
+void DWCi_SNDlStop(void) {
     NNS_SndPlayerStopSeq(&sSound->handle, 0);
 }
 

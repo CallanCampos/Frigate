@@ -8,6 +8,6 @@
 // event, its notice (sceneoptmovfailure.h). B or closing the lid ends the move and goes back to the options. The file
 // is the DWC utility library's sceneoptmovwait.o (libdwcutil.TWL.HYB.a), as aletheia's map of Black 1's SDK code to
 // that library's objects (layout/symbols_sdk.txt) shows it.
-void DWCUtilPageMulti5_Init(void);
+void DWCi_SceneOptMovWait(void);
 
 #endif // POKEBW2_DWCUTIL_SCENEOPTMOVWAIT_H

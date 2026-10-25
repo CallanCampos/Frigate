@@ -40,7 +40,7 @@ void DWCi_AOSSlInit(void) {
     }
 }
 
-void DWCUtilAossSession_Exit(BOOL saveKeys) {
+void DWCi_AOSSlEnd(BOOL saveKeys) {
     AOSSi_EndLocal();
     if (saveKeys && sAoss.param->aossResult == 0 && sAoss.done == TRUE) {
         DWCi_SETTINGlSetAoss(&sAoss.param->secureInfo);
@@ -48,7 +48,7 @@ void DWCUtilAossSession_Exit(BOOL saveKeys) {
     DWCi_HEAPlFree_(&sAoss.param);
 }
 
-int DWCUtilAossSession_Run(void) {
+int DWCi_AOSSlStart(void) {
     u8 error;
 
     if (AOSSi_Init(sAoss.param) == 0) {

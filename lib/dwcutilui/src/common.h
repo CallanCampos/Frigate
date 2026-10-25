@@ -12,7 +12,7 @@
 // isn't 0
 char *DWCi_Char(const char *path);
 // Reads the file, localized, and hands it to upload, a GX_Load function
-void DWCUtilGfxResource_Load(const char *path, void (*upload)(const void *, u32, u32));
+void DWCi_CMNlLoadResource(const char *path, void (*upload)(const void *, u32, u32));
 // Shows the buttons of the layout set through DWCi_SetParam_
 void DWCi_CMNlStep(int variant);
 void DWCi_CMNlButton(int variant);

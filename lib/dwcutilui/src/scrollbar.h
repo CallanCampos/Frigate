@@ -19,7 +19,7 @@ enum {
 // one that can't be dragged for 0) that travels range pixels down from x, y, an arrow above and an arrow below.
 // The file is the DWC utility library's scrollbar.o (libdwcutil.TWL.HYB.a), as aletheia's map of Black 1's SDK code to
 // that library's objects (layout/symbols_sdk.txt) shows it.
-void DWCUtilScrollbar_Create(int kind, int range, u16 x, u16 y, int pos);
+void DWCi_SBlInit(int kind, int range, u16 x, u16 y, int pos);
 void DWCi_SBlEnd(void);
 // The handle's position, in pixels from the top of the bar, and the event of this frame
 u8 DWCi_SBlGet(void);

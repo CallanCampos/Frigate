@@ -7,6 +7,6 @@
 // move's instructions (sceneoptmovconfirm.h), no back to the options.
 // The file is the DWC utility library's sceneoptmovconfirm1.o (libdwcutil.TWL.HYB.a), as aletheia's map of Black 1's
 // SDK code to that library's objects (layout/symbols_sdk.txt) shows it.
-void DWCUtilPromptYesNo_Init(void);
+void DWCi_SceneOptMovConfirm1(void);
 
 #endif // POKEBW2_DWCUTIL_SCENEOPTMOVCONFIRM1_H

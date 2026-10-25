@@ -15,7 +15,7 @@
 #include "sound.h"
 #include "task.h"
 
-static void DWCUtilTopMenu_LoadMoveGraphics(void);
+static void initGraphics(void);
 static void procInit(void);
 static void procInit1(void);
 static void DWCUtilTopMenu_MoveMain(void);
@@ -28,17 +28,17 @@ static void DWCUtilTopMenu_OnMoveEvent(int event);
 // How the move went: 0 when it failed, 1 once it sent the settings, 2 when it ended without sending them
 static u8 sMoveResult;
 
-void DWCUtilTopMenu_InitMove(void) {
-    DWCUtilTopMenu_LoadMoveGraphics();
+void DWCi_SceneOptMovComm(void) {
+    initGraphics();
     DWCi_CMNlMsgDraw(0x1e);
     DWCi_ANIMElInitEx(0);
-    DWCUtilLinkIcon_Init(1);
-    DWCUtilSound_PlaySe(0xb);
+    DWCi_ICONlInit(1);
+    DWCi_SNDlPlay(0xb);
     DWCi_ChangeScene(procInit);
 }
 
-static void DWCUtilTopMenu_LoadMoveGraphics(void) {
-    DWCUtilGfxResource_Load("char/yb5Multi.nsc.l", GX_LoadBG2Scr);
+static void initGraphics(void) {
+    DWCi_CMNlLoadResource("char/yb5Multi.nsc.l", GX_LoadBG2Scr);
     G2S_SetBG0Priority(3);
     G2S_SetBG1Priority(3);
     G2_SetBG0Priority(3);
@@ -49,7 +49,7 @@ static void DWCUtilTopMenu_LoadMoveGraphics(void) {
 static void procInit(void) {
     DWCi_EFFlFade(DWC_UTIL_FADE_FROM_WHITE, 0, GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ,
                   8);
-    DWCi_GXlInvisible(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
+    DWCi_GXlVisible(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
     DWCi_ChangeScene(procInit1);
 }
 
@@ -82,14 +82,14 @@ static void DWCUtilTopMenu_MoveWaitFadeOut(void) {
         DWCi_ICONlEnd();
         DWCi_ANIMElEnd();
         DWCi_FNTlDeleteBgLcd(0);
-        DWCUtilDisplay_HidePlanes(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
+        DWCi_GXlInvisible(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
         DWCi_SetParam_(0, 1);
         if (sMoveResult == 0) {
-            DWCi_ChangeScene(DWCUtilNoticeScreen_Init);
+            DWCi_ChangeScene(DWCi_SceneOptMovFailure);
         } else if (sMoveResult == 2) {
-            DWCi_ChangeScene(DWCUtilTimedNotice_Init);
+            DWCi_ChangeScene(DWCi_SceneOptMovDisconnect);
         } else {
-            DWCi_ChangeScene(DWCi_SceneOptMovConfirm);
+            DWCi_ChangeScene(DWCi_SceneOptMovComplete);
         }
     }
 }
@@ -99,18 +99,18 @@ static void DWCUtilTopMenu_OnMoveEvent(int event) {
     if (event == DWC_UTIL_MOVE_EVENT_DONE) {
         DWCi_SETTINGlEraseAll();
         sMoveResult = 1;
-        DWCUtilSound_StopSe();
-        DWCUtilSound_PlaySe(0x10);
+        DWCi_SNDlStop();
+        DWCi_SNDlPlay(0x10);
     } else {
         if (event == DWC_UTIL_MOVE_EVENT_ENDED) {
             sMoveResult = 2;
         } else {
             sMoveResult = 0;
         }
-        DWCUtilSound_StopSe();
-        DWCUtilSound_PlaySe(0x12);
+        DWCi_SNDlStop();
+        DWCi_SNDlPlay(0x12);
     }
     DWCi_MOVlChangeCallback(NULL);
-    DWCUtilMove_End();
+    DWCi_MOVlEnd();
     DWCi_ChangeScene(DWCUtilTopMenu_MoveFadeOut);
 }

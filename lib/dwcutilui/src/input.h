@@ -27,6 +27,6 @@ BOOL DWCi_TPlCheckATrigger(const u16 *area);
 // Whether the panel is touched, with the point touched, or the last one if it isn't
 BOOL DWCi_TPlGet(u16 *point);
 // Turns the screens off while the lid is closed, and back on when it opens
-void DWCUtilTouch_UpdateLid(void);
+void DWCi_IPTlCheckFold(void);
 
 #endif // POKEBW2_DWCUTIL_INPUT_H

@@ -7,6 +7,6 @@
 // with the console's settings, then the message of a success or the error screen.
 // The file is the DWC utility library's scenesettest.o (libdwcutil.TWL.HYB.a), as aletheia's map of Black 1's SDK code
 // to that library's objects (layout/symbols_sdk.txt) shows it.
-void DWCUtilAutoConnect_Init(void);
+void DWCi_SceneSetTest(void);
 
 #endif // POKEBW2_DWCUTIL_SCENESETTEST_H

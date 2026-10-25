@@ -32,7 +32,7 @@ void DWCUtilInfoMenu_EraseSettings(void) {
 }
 
 static void DWCUtilInfoMenu_LoadErasedGraphics(void) {
-    DWCUtilGfxResource_Load("char/yb5Multi.nsc.l", GX_LoadBG2Scr);
+    DWCi_CMNlLoadResource("char/yb5Multi.nsc.l", GX_LoadBG2Scr);
     G2S_SetBG0Priority(3);
     G2S_SetBG1Priority(3);
     G2_SetBG0Priority(3);
@@ -43,7 +43,7 @@ static void DWCUtilInfoMenu_LoadErasedGraphics(void) {
 static void DWCUtilInfoMenu_ErasedFadeIn(void) {
     DWCi_EFFlFade(DWC_UTIL_FADE_FROM_WHITE, 0, GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ,
                   8);
-    DWCi_GXlInvisible(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
+    DWCi_GXlVisible(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
     DWCi_ChangeScene(DWCUtilInfoMenu_ErasedWaitFadeIn);
 }
 
@@ -78,7 +78,7 @@ static void func_ov182_021aeea4(void) {
 
 static void DWCUtilInfoMenu_ErasedHandleChoice(void) {
     if (DWCi_BTNlGet() == 0) {
-        DWCUtilSound_PlaySe(6);
+        DWCi_SNDlPlay(6);
         DWCi_ChangeScene(DWCUtilInfoMenu_ErasedDisableButtons);
     }
 }
