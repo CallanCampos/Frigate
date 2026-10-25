@@ -919,6 +919,7 @@ overlays/ov011 0x0218df7c section_end lib/nitrowifi/src/wcm/wcm_system.c:.bss
 overlays/ov011 0x0218dfd0 section_end lib/dwc/src/base/dwc_nonport.c:.bss
 overlays/ov011 0x0218e1c0 section_start lib/dwc/src/match/dwc_match.c:.bss
 overlays/ov011 0x0218e91c add_data sSendPoolSize
+overlays/ov011 0x02190898 add_data sLastError
 overlays/ov012 0x02150aa0 overlay_id 36
 overlays/ov012 0x02150aa4 reloc_module overlay(36)
 overlays/ov012 0x02150aa8 overlay_id 174

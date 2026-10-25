@@ -189,6 +189,7 @@ lib/dwc/src/gp/gpiBuddy.c:
     .data       start:0x02187a14 end:0x02187c9c
 
 lib/dwc/src/gp/gpiBuffer.c:
+    complete
     .text       start:0x02174e14 end:0x02175498
     .data       start:0x02187c9c end:0x02187d9c
     .bss        start:0x021917a8 end:0x021917b0
@@ -281,6 +282,7 @@ lib/dwc/src/gscommon/gsMemory.c:
     .data       start:0x02186f04 end:0x02186f14
 
 lib/dwc/src/gscommon/gsPlatformSocket.c:
+    complete
     .text       start:0x0216de50 end:0x0216e244
     .data       start:0x02186f14 end:0x02186f9c
     .bss        start:0x021908d4 end:0x02190944

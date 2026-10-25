@@ -2763,10 +2763,11 @@ gTimers kind:bss addr:0x02190804
 data_ov011_02190808 kind:bss addr:0x02190808
 data_ov011_0219080c kind:bss addr:0x0219080c
 data_ov011_02190810 kind:bss addr:0x02190810
-sSocketState kind:bss addr:0x02190894
-data_ov011_0219089c kind:bss addr:0x0219089c
-data_ov011_021908ac kind:bss addr:0x021908ac
-data_ov011_021908c0 kind:bss addr:0x021908c0
+sAliases kind:bss addr:0x02190894
+sLastError kind:bss addr:0x02190898
+sHostEnt kind:bss addr:0x0219089c
+sIps kind:bss addr:0x021908ac
+sIpPtrs kind:bss addr:0x021908c0
 tb kind:bss addr:0x02190904
 aUdpObject kind:bss addr:0x02190928
 gPos kind:bss addr:0x02190964
