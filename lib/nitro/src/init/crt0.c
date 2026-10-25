@@ -9,8 +9,8 @@
 // names, or ours, or their addresses.
 //
 // The module parameters among the code, BuildInfo and the LTD module's, hold the addresses of the two modules'
-// autoload lists, which the build writes after each module and dsd's linker script has no symbols for, so the file
-// isn't linked yet.
+// autoload lists, which the build writes after each module's autoload blocks, and the modules' bounds: dsd's linker
+// script defines them under NitroSDK's and TwlSDK's names, as NitroSDK's linker script template does.
 #include "nitro/mi.h"
 #include "nitro/os.h"
 #include "system/main.h"
@@ -596,7 +596,8 @@ static asm void boot_MemSet32Fast(void *dest, u32 value, u32 size) {
 // clang-format on
 
 // The module parameters of the LTD module, which only a DSi loads: its autoload list and its end, where its blocks
-// start, the end of the compressed module (0 until the compressor writes it) and TwlSDK's two magic numbers
+// start, the end of the compressed module (0 until the ROM build compresses it and writes it) and TwlSDK's two magic
+// numbers
 __declspec(section "textdata") void *const LtdModuleParams[6] = {
     SDK_LTDAUTOLOAD_LIST, SDK_LTDAUTOLOAD_LIST_END, SDK_LTDAUTOLOAD_START, (void *)0,
     (void *)0xdec01463,   (void *)0x6314c0de,
@@ -620,9 +621,9 @@ static asm void WaitForHalfword(vu16 *address, u16 value) {
 
 // The module parameters, in the code (NitroSDK's _start_ModuleParams, under dsd's name): the static module's autoload
 // list and its end, where the autoload blocks start, the static .bss, the end of the compressed module (0 until the
-// compressor writes it), the SDK's version and the two magic numbers that the build tools look for
+// ROM build compresses it and writes it), the SDK's version and the two magic numbers that the build tools look for
 __declspec(section "textdata") void *const BuildInfo[9] = {
-    SDK_AUTOLOAD_LIST, SDK_AUTOLOAD_LIST_END, ARM9_DATA_END,      ARM9_BSS_START,     ARM9_BSS_END,
+    SDK_AUTOLOAD_LIST, SDK_AUTOLOAD_LIST_END, SDK_AUTOLOAD_START, SDK_STATIC_BSS_START, SDK_STATIC_BSS_END,
     (void *)0,         (void *)0x0503757c,    (void *)0xdec00621, (void *)0x2106c0de,
 };
 

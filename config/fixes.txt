@@ -1,9 +1,17 @@
 # Fixes to dsd's analysis, applied by tools/decomp/config_fixes.py
 # module address(b2_us) action [argument]
 . 0x02004f7c add_data LtdModuleParams
+. 0x02004f7c link_time_const SDK_LTDAUTOLOAD_LIST
+. 0x02004f80 link_time_const SDK_LTDAUTOLOAD_LIST_END
+. 0x02004f84 link_time_const SDK_LTDAUTOLOAD_START
 . 0x02004f94 add_function WaitForHalfword:arm:0x1c
 . 0x02004fb0 reloc_addend 0x948
+. 0x02004fb0 link_time_const SDK_AUTOLOAD_LIST
 . 0x02004fb4 reloc_addend 0x988
+. 0x02004fb4 link_time_const SDK_AUTOLOAD_LIST_END
+. 0x02004fb8 link_time_const SDK_AUTOLOAD_START
+. 0x02004fbc link_time_const SDK_STATIC_BSS_START
+. 0x02004fc0 link_time_const SDK_STATIC_BSS_END
 . 0x02005040 add_data TaggedParams
 . 0x02005050 add_data DWCi_Signature
 . 0x02005094 add_data CARDi_BackupSignature

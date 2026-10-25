@@ -73,11 +73,33 @@ NitroSDK's code reads a few numbers, such as `SDK_IRQ_STACKSIZE`, as the address
 script defines, so the ROM has them as plain words in the literal pools that load them, with no relocation. dsd's linker
 script defines only `__OVERLAY_COUNT` of them. `config/linker_symbols.toml` gives the others and their values, the same
 in both versions: the stack sizes, which `os_interrupt.c`, `os_thread.c`, `os_arena.c` and the startup code `crt0.c`
-(`_start`, `func_02004d50` and `func_02004da0`) read, and the start of the DSi's extended main memory arena, which
-`os_arena.c` reads. `dsd lcf --symbols config/linker_symbols.toml` defines them after `__OVERLAY_COUNT` as absolute
-symbols in the linker script it writes, `build/<version>/arm9.lcf`, which the link (or `--shift`'s padding) takes,
-as NitroSDK's template defines them in its own. Another one goes in the config when a file that reads it is written,
-with its value read from the pool word in both versions.
+(`_start`, `INITi_ShelterStaticInitializer` and `INITi_CallStaticInitializers`) read, and the start of the DSi's
+extended main memory arena, which `os_arena.c` reads. `dsd lcf --symbols config/linker_symbols.toml` defines them after
+`__OVERLAY_COUNT` as absolute symbols in the linker script it writes, `build/<version>/arm9.lcf`, which the link (or
+`--shift`'s padding) takes, as NitroSDK's template defines them in its own. Another one goes in the config when a file
+that reads it is written, with its value read from the pool word in both versions.
+
+`crt0.c`'s module parameters, `BuildInfo` (NitroSDK's `_start_ModuleParams`) and `LtdModuleParams` (TwlSDK's
+`_start_LtdModuleParams`), hold the places of the modules, which dsd's linker script defines after the modules under
+the SDK's names, from the modules' section symbols, as NitroSDK's template does:
+
+| Symbol | Black 2 / White 2 | Value |
+| --- | --- | --- |
+| `SDK_AUTOLOAD_START` | `0x0209d740` / `0x0209d780` | the end of ARM9 main's initialized data, where the autoload blocks start |
+| `SDK_STATIC_BSS_START`, `SDK_STATIC_BSS_END` | `0x0209d740`-`0x0214f500` / `0x0209d780`-`0x0214f540` | ARM9 main's `.bss` |
+| `SDK_AUTOLOAD_LIST` | `0x0209ebc0` / `0x0209ec00` | after the blocks: `SDK_AUTOLOAD_START` plus the size of each autoload's initialized data |
+| `SDK_AUTOLOAD_LIST_END` | `0x0209ec00` / `0x0209ec40` | the list plus its size, 16 bytes for each of the 4 autoloads in TwlSDK's format |
+| `SDK_LTDAUTOLOAD_START` | `0x02400004` | the ARM9i program's base plus its static part, the 4-byte word that TwlSDK writes when the LTD module has no static code |
+| `SDK_LTDAUTOLOAD_LIST` | `0x0246aee4` | after the LTD autoload's block |
+| `SDK_LTDAUTOLOAD_LIST_END` | `0x0246aef4` | the list plus its one entry |
+
+The lists' sizes and the LTD module's static part come from the ROM, the rest from the link. `rom build` writes the same
+values again when it puts the modules and their lists together, and fills in the words that are 0 in the C: the end of
+each compressed module, which only the compression gives, as NitroSDK's compressor does. The static module's end is 0
+in the extracted program too, as dsd decompresses it, but the LTD module's (`0x02421c40` / `0x02421c38`) is kept there,
+so `dsd check modules` takes that word from the extracted program, as it does the overlay digests. The words point at
+the symbols through `link_time_const` relocations, `config_fixes.py link-time-const . SDK_AUTOLOAD_LIST 0x02004fb0`,
+so that the original's objects link to them as the C does.
 
 ## Compiler exception indices
 
