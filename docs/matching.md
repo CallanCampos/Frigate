@@ -3752,6 +3752,8 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   of that size that nothing reads, which `-ipa function` keeps (`-ipa file` drops it): NitroWiFi's `soc.c` has three,
   of 8, 4 and 0x10 bytes at +0x10, +8 and +0x40 among its statics, and with them, defined first, and every static
   zero-initialized, its four functions that reach the statics from the base match and so does the file's `.bss`.
+  Such a static goes first in `.bss`, ahead of the tentative ones, wherever it is defined: `dwc_aoss_ap.c`'s `sBss =
+  { 0 }` sat at `.bss + 0` defined just above its function, below other functions, and as a global alike.
 - A zero-initialized static is reached from the section's pooled base, and so is a struct of statics, but the two
   compile differently: the struct's member is a field of one object, which MWCC loads again at other points (after a
   64-bit store, before a zero, across a loop), while a static of its own is known and scheduled freely. Statics that the
