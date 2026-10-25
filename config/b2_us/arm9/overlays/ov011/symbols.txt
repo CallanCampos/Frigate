@@ -1756,7 +1756,8 @@ SOCLSocketParamUDPSend kind:data(any) addr:0x021854a8
 data_ov011_021854c0 kind:data(any) addr:0x021854c0
 sOidCommonName kind:data(any) addr:0x021854cc
 sOid0 kind:data(any) addr:0x021854d0
-sConfig kind:data(any) addr:0x021854d4
+sCipherSuites kind:data(any) addr:0x021854d4
+sHandshakePriority kind:data(any) addr:0x021854d8
 sOids kind:data(any) addr:0x021854dc
 sOid2 kind:data(any) addr:0x021854f4
 sOidRsaEncryption kind:data(any) addr:0x021854fc
@@ -2696,7 +2697,8 @@ data_ov011_0218dc8c kind:bss addr:0x0218dc8c
 data_ov011_0218dcac kind:bss addr:0x0218dcac
 data_ov011_0218dcdc kind:bss addr:0x0218dcdc
 sHostName kind:bss addr:0x0218dce4
-data_ov011_0218dde8 kind:bss addr:0x0218dde8
+sPoolSeeded kind:bss addr:0x0218dde8
+sUnused kind:bss addr:0x0218ddec
 sPool kind:bss addr:0x0218ddf0
 sSessionCache kind:bss addr:0x0218de04
 WCMi_OverridedDeviceId kind:bss addr:0x0218df74

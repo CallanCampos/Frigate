@@ -908,11 +908,13 @@ overlays/ov011 0x0216fbe0 section_end lib/dwc/src/gt2/gsUdpEngine.c:.text
 overlays/ov011 0x0216fbe0 section_start lib/dwc/src/gscommon/gsXML.c:.text
 overlays/ov011 0x021722c4 remove_reloc
 overlays/ov011 0x02185004 section_end lib/nitrowifi/src/wcm/wcm_system.c:.rodata
+overlays/ov011 0x021854d8 add_data sHandshakePriority
 overlays/ov011 0x02185568 remove_reloc
 overlays/ov011 0x02185700 section_end lib/dwc/src/base/dwc_nonport.c:.data
 overlays/ov011 0x021857d0 section_start lib/dwc/src/match/dwc_match.c:.data
 overlays/ov011 0x0218dc4c add_section lib/nitrowifi/src/soc/socl_misc.c:.bss:0x8
 overlays/ov011 0x0218dc54 section_start lib/nitrowifi/src/soc/socl_list.c:.bss
+overlays/ov011 0x0218ddec add_data sUnused
 overlays/ov011 0x0218df7c section_end lib/nitrowifi/src/wcm/wcm_system.c:.bss
 overlays/ov011 0x0218dfd0 section_end lib/dwc/src/base/dwc_nonport.c:.bss
 overlays/ov011 0x0218e1c0 section_start lib/dwc/src/match/dwc_match.c:.bss

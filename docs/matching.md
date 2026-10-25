@@ -3878,7 +3878,14 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   order. The bitmap table is all zeros, which goes to `.bss` unless `#pragma explicit_zero_data on` covers it; in
   `.data` it is the shared section's smallest object, which the ROM sorts between two 24-byte strings. The pragma
   covers that table alone: over the whole file, `DWCi_MOV_MBP_Init`'s zeroed compound literal becomes a `.rodata`
-  template that the ROM doesn't have.
+  template that the ROM doesn't have. Only an initializer above the file's first function sorts this way; below a
+  function its literals come out in source order. NitroWiFi's `ssl.c` matches its `.data` with its OID table as six
+  string literals at the top of the file, sorted among its named objects, as in Black 1's version.
+- A ROM literal that points into the middle of a group of small objects marks where one of MWCC's sections starts,
+  since MWCC reaches a known static's field from its shared section's base and folds the offset (`ldr r0, =.data;
+  ldr r0, [r0, #0xc]`). `ssl.c`'s handshake priority is read through its own address (`=0x021854d4; [r0, #4]`), so
+  the original's 8-byte config was two statics, `sHandshakePriority` and `sCipherSuites`, which open their section
+  ahead of the 5-byte OID; as one struct behind the two 4-byte OIDs, three functions differed.
 - A function-local `const` scalar with an initializer, `static` or not, is emitted in `.rodata` even when every read
   of it folds (`const u32 n = 11;` gives a 4-byte `_ZZ...E1n_0`), while a file-scope `static const` scalar that code
   only reads is dropped.
