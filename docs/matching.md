@@ -3914,6 +3914,11 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   template that the ROM doesn't have. Only an initializer above the file's first function sorts this way; below a
   function its literals come out in source order. NitroWiFi's `ssl.c` matches its `.data` with its OID table as six
   string literals at the top of the file, sorted among its named objects, as in Black 1's version.
+- A zero-initialized static too far from its section's base for the load's immediate (`ldrh` reaches 0x3e) gets a
+  section-relative pool word of its own, apart from the symbol's literal, so one object shows two literal words.
+  `dwc_aoss_ap.c`'s successor `aosslink.c` (DWC utility, 2.0/sp1p2) matches `AOSSi_WLANConnect` with `sBss = { 0 }` at
+  `.bss + 0x40`, its queue and messages zero-initialized too and the globals defined in the order that lays them out
+  as the ROM's, where its loop reads `[lit, #0xa]` from a `.bss + 0x40` word.
 - Two literals of one function that hold the same `.bss` address can be the section's base and a zero-initialized
   static at offset 0 of it, reached once as a field from the base and once through its own address (`&static`). DWC's
   `DWCs_AddToSendPool` (`dwc_transport.c`) matches with its send pool as two statics, `sSendPoolHead = NULL` then
