@@ -143,7 +143,9 @@ The no-upstream-posts and reference rules below still apply to every contributor
   [game-changes.md](docs/game-changes.md). Resolve conflicts by taking upstream's updated structure and reapplying
   the documented port adaptation. Both ROMs and host tests must pass after resolution.
 - **Stops stay visible.** Conflicts, history rewrites, cross-repository references and upstream workflow changes
-  require local inspection. Only the user authorizes `--allow-rewrite` or `--allow-references`. Never silently
+  require local inspection. The hourly sync shows a conflict as a draft PR of upstream's head, merging nothing,
+  which a maintainer resolves locally ([SYNC.md](docs/SYNC.md#conflicts-and-stopped-syncs)); the other three stop the
+  run before it pushes anything. Only the user authorizes `--allow-rewrite` or `--allow-references`. Never silently
   resolve conflicts or modify decomp configs to get a sync through. Check that upstream's ROM-dependent `build.yml`
   stays disabled after workflow imports; Compile and Standards remain enabled.
 

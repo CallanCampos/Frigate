@@ -16,22 +16,33 @@ as an automatic first step of unrelated feature work. Review the pending sync in
 `.github/workflows/port-sync.yml` runs hourly and manually, only in `CallanCampos/Frigate`. Its trusted helper
 [upstream_sync.py](../tools/upstream_sync.py):
 
-1. Leaves an existing canonical `codex/upstream-sync-*` PR unchanged. This bounds review work to one proposal and
-   avoids dismissing approvals whenever upstream advances.
+1. Leaves an existing canonical `codex/upstream-sync-*` PR's head and body unchanged, a draft conflict proposal
+   included. It retries a missing owner review request on a ready bot proposal; an existing request or completed owner
+   review is left alone. This bounds review work to one proposal and avoids dismissing approvals whenever upstream advances.
 2. Fetches upstream `main`, verifies continuity against the last recorded upstream parent, and checks incoming
    messages for cross-repository issue references. It stops on upstream workflow changes, including add/revert
-   pairs, because the sync App deliberately has no Workflows permission.
-3. Creates a fresh branch from reviewed Frigate `main` and performs a real `--no-ff` merge. A conflict stops the run;
-   it never chooses upstream's version automatically or discards port changes.
-4. Pushes only the topic branch, opens a PR and requests CallanCampos review. Local verification stays missing
-   until a maintainer runs the verifier; a missing required status blocks merging.
+   pairs, because the sync App deliberately has no Workflows permission. These three stops come before anything is
+   pushed, a draft included.
+3. Merges upstream into reviewed Frigate `main` in Git's object store first (`git merge-tree --write-tree`, git 2.38
+   or later, which changes no file or branch). If that conflicts, it merges nothing: it pushes upstream's head, unchanged, to a fresh topic branch and
+   opens a **draft conflict proposal**, a draft PR that lists the conflicting files and the commands that resolve it
+   ([below](#conflicts-and-stopped-syncs)). It never commits conflict markers, chooses upstream's version
+   automatically or discards port changes. Otherwise it creates a fresh branch from `main` and performs a real
+   `--no-ff` merge.
+4. Pushes only the topic branch and opens a PR, recovering its URL if creation succeeded but its response failed.
+   It requests CallanCampos review separately: a failure warns and the next scheduled run retries the request without
+   pushing or changing the PR. Owner-authored local proposals request no self-review. A draft requests none; GitHub notifies
+   its code owners when its resolved merge makes it ready. Local verification stays missing until a maintainer runs the verifier; a
+   missing required status blocks merging.
 
 The publishing job runs trusted git/gh logic from Frigate's base, disables Git hooks, and never executes incoming
 build scripts with its write token. The usual PR workflows perform compilation and host tests on separate hosted
 runners with read-only permissions. The dedicated App token allows PR CI to start automatically, without the
 default token's workflow-approval restriction. Human code review and local ROM verification remain required. No ROMs
-or game assets are uploaded. A failed proposal is visible as a failed Actions run; inspect its error and use the local
-path below. No issue or comment is posted upstream. New proposals wait until the current sync PR is merged or closed.
+or game assets are uploaded. A conflict is a draft PR; the three stops (a history rewrite, a cross-repository
+reference, upstream workflow changes) are visible only as a failed Actions run, so inspect its error and use the local
+path below. No issue or comment is posted upstream. New proposals wait until the current sync PR, draft or not, is
+merged or closed.
 
 ### Set up the dedicated sync App
 
@@ -62,7 +73,8 @@ code never runs in that job, and separate PR CI receives no App key or token. Th
 Missing variables/secrets or an invalid installation make the scheduled run visibly fail. There is no
 `GITHUB_TOKEN` or PAT fallback. After setup, dispatch `port-sync.yml` manually and confirm the bounded PR has the
 App as author, PR checks start automatically, CallanCampos review is requested, and local verification remains
-required. If the run stops on workflow imports or another safeguard, inspect that blocker and use the documented
+required (a draft conflict proposal starts no checks and requests no review until its resolved merge makes it ready,
+as below). If the run stops on workflow imports or another safeguard, inspect that blocker and use the documented
 local procedure. Do not expand App permissions to get past it.
 
 ## Validate and approve a proposed PR
@@ -108,10 +120,11 @@ port/tools/sync_upstream.sh --branch codex/upstream-sync-manual
 
 The tool fetches Frigate and upstream, merges them without rewriting history, runs local validation, then publishes
 only the topic branch and opens a PR. It refuses `--branch main`. When you are repairing an existing pending sync,
-check out that branch and pass its exact name. Do not start a second sync while one is pending. A locally prepared
-sync still requires the owner's explicit human review before merge, even when owner credentials created its PR.
-Automation must not treat it as ordinary owner-authored feature work and merge it under the solo exception without
-that review. Prefer an App-authored proposal so GitHub can record the owner's approval.
+check out that branch and pass its exact name; a draft conflict proposal is the exception, resolved from a branch of
+its name made from `main` ([below](#conflicts-and-stopped-syncs)). Do not start a second sync while one is pending.
+A locally prepared sync still requires the owner's explicit human review before merge, even when owner credentials
+created its PR. Automation must not treat it as ordinary owner-authored feature work and merge it under the solo
+exception without that review. Prefer an App-authored proposal so GitHub can record the owner's approval.
 
 Useful options:
 
@@ -150,6 +163,35 @@ STATUS.md entry its `PORT_SHA` filled in, as [STATUS.md](STATUS.md#how-to-add-an
 
 ## Conflicts and stopped syncs
 
+- **Draft conflict proposal (the hourly sync):** the draft's branch holds upstream's head alone: no merge, no Frigate
+  commit, no `port/`. GitHub shows it as conflicting and runs no PR checks on it, and a draft can't be merged. Resolve
+  it locally on a branch of the draft's name made from `main`, not by checking the draft out:
+
+  ```sh
+  git fetch origin
+  git switch --no-track -c codex/upstream-sync-NAME origin/main
+  port/tools/sync_upstream.sh --branch codex/upstream-sync-NAME
+  ```
+
+  The script merges upstream's newest head, which may be newer than the draft's, and stops at the conflicts (exit 3);
+  resolve them as the next item says. Once both ROMs and the host pass, its push is a fast-forward of the draft's
+  branch, since the draft's upstream head is among the merge's ancestors, and the publishing helper retitles the PR,
+  gives it the ordinary proposal's text and marks it ready for review, which notifies its code owners. The PR keeps
+  its author, the sync App, so the owner approves it as any App proposal. The hourly sync leaves the draft alone
+  meanwhile, as it does any pending proposal. Don't press GitHub's Update branch on a draft: it would merge `main`
+  into upstream's head there, and the resolved merge would no longer fast-forward the branch.
+
+  Before merging, the script checks that origin's branch of that name is in what its push will carry. When upstream
+  rewrote the draft's commits, or the branch moved, it stops with exit 4 and merges nothing: close the draft, then
+  resolve the next one the hourly sync opens (`gh workflow run port-sync.yml -R CallanCampos/Frigate` starts it now).
+  On 2026-10-25, [probe run 40233990444](https://github.com/CallanCampos/Frigate/actions/runs/40233990444)
+  proved publication of a novel test commit whose tree exactly matched frozen upstream `3af718cd9e77`, with the
+  existing narrow sync App and no Workflows permission. Its unique ref was deleted and the token revoked; the full
+  evidence and limits are in [ADR 0024's dated amendment](adr/0024-a-conflicting-sync-proposes-a-draft-of-upstreams-head.md#branch-publication-probe-2026-10-25).
+  Actual conflicting draft-PR creation and promotion have not been trialed live. This branch-only test does not promise
+  acceptance of every future tree or policy: should GitHub refuse a later push, the run fails with the conflicting
+  files in its error, and the same local commands resolve it on a branch of any `codex/upstream-sync-` name. Do not
+  expand the App's permissions to bypass that failure.
 - **Merge conflict (local exit 3):** inspect every conflict. Use upstream's new structure, then reapply the port's
   documented adaptation from game-changes.md at its new location, or document why upstream makes it unnecessary.
   Stage only resolved files, commit the merge with `git commit --no-edit --cleanup=strip`, then rerun the local

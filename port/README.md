@@ -479,12 +479,15 @@ doesn't replace them.
 
 ## Syncing with the decomp
 
-The hourly `port-sync` Action proposes one upstream merge PR and leaves it unchanged for the owner's review.
+The hourly `port-sync` Action proposes one upstream merge PR and leaves it unchanged for the owner's review. When
+upstream conflicts with `main`, it merges nothing and opens a draft PR of upstream's head instead, listing the
+conflicting files, which a maintainer resolves locally ([SYNC.md](docs/SYNC.md#conflicts-and-stopped-syncs)).
 Public PR CI checks compilation and native builds; a local maintainer verifies both ROM SHA1s and host tests before
 merging. Neither automation nor the local sync script pushes `main`. Contributors update from Frigate's reviewed
 `main`, while maintainers use `port/tools/sync_upstream.sh` for dedicated sync PRs and
 `port/tools/sync_upstream.sh --verify-pr NUMBER` to validate a checked-out PR head.
 
-[docs/SYNC.md](docs/SYNC.md) describes the commands, conflict handling and validation. The decision is
-[ADR 0018](docs/adr/0018-protected-main-and-sync-prs.md); actual GitHub settings are documented in
+[docs/SYNC.md](docs/SYNC.md) describes the commands, conflict handling and validation. The decisions are
+[ADR 0018](docs/adr/0018-protected-main-and-sync-prs.md) and
+[ADR 0024](docs/adr/0024-a-conflicting-sync-proposes-a-draft-of-upstreams-head.md); actual GitHub settings are documented in
 [repository policy](docs/REPOSITORY-POLICY.md). Record each local sync in [docs/STATUS.md](docs/STATUS.md).

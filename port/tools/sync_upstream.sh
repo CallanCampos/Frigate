@@ -4,10 +4,14 @@
 # Usage: port/tools/sync_upstream.sh [--branch codex/upstream-sync-NAME] [--no-build]
 #        [--no-push] [--metrics] [--abort-on-conflict] [--allow-rewrite] [--allow-references]
 # --verify-pr NUMBER verifies the checked-out exact PR head and records local verification.
-# --branch selects the topic destination (default: current sync branch or a fresh one).
+# --branch selects the topic destination (default: current sync branch or a fresh one). A draft conflict proposal's
+# branch holds upstream's head alone, with no port/: resolve it from a branch of that name made from origin/main
+# (git switch --no-track -c NAME origin/main); the merge's push fast-forwards the draft, and the helper marks it ready
+# for review. Before merging, the script stops (exit 4) when origin's branch of that name couldn't take the push.
 # --no-build implies --no-push; --no-push leaves the merge for local inspection.
 # Rewrite and reference overrides require the user's explicit decision (SYNC.md).
-# Exit status: 0 done, 1 failed, 2 invalid origin/destination, 3 conflict, 4 rewrite, 5 references.
+# Exit status: 0 done, 1 failed, 2 invalid origin/destination, 3 conflict, 4 rewrite (of upstream, or of a draft's
+# upstream head), 5 references.
 set -euo pipefail
 
 PORT_REPO=CallanCampos/Frigate
@@ -422,6 +426,19 @@ if [ "$current" != "$branch" ]; then
     say "On branch $current: syncing it with origin/$branch and publishing it there"
 fi
 update_from_origin
+# Before merging and building: origin's branch of this name, when there is one, must be in what the push carries, so
+# that the push is a fast-forward. A draft conflict proposal's upstream head is in upstream's newest one unless upstream
+# rewrote it; a topic being repaired is checked out here.
+topic_status=0
+"$PYTHON" "$publish_helper" --check-topic "$branch" "$upstream_ref" || topic_status=$?
+case "$topic_status" in
+    0) ;;
+    4) die 4 "origin's $branch is at a commit that neither upstream's $UPSTREAM_BRANCH nor this branch contains, so the" \
+        "push couldn't be a fast-forward: upstream rewrote a draft conflict proposal's commits, or the branch moved." \
+        "Nothing was merged. Close that PR and resolve the sync on a new codex/upstream-sync- name ('Draft conflict" \
+        "proposal' in port/docs/SYNC.md)." ;;
+    *) die 1 "could not read origin's $branch; the publishing helper's message is above" ;;
+esac
 merge_upstream
 local_commits=$(git rev-list --count "$origin_ref..HEAD")
 if [ "$local_commits" -gt 0 ]; then
