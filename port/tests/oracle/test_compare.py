@@ -1308,7 +1308,7 @@ class OracleScriptTests(unittest.TestCase):
         for frame in range(1, 5):
             runs.frame(runs.oracle, frame, black, counter=frame - 1, three_d=False)
             runs.frame(runs.port, frame, black, counter=frame - 1)
-        label, size = oracle.STATE[0]
+        label, size = oracle.STATE[0].label, oracle.STATE[0].size
         state = (bytes(range(256)) * (size // 256 + 1))[:size]
         other = bytes([state[0] ^ 1]) + state[1:]
         runs.memory(runs.oracle, [f"{frame} {label} 0x02000000 {size} {state.hex()}" for frame in (2, 3, 4)])
@@ -1386,8 +1386,11 @@ class OracleScriptTests(unittest.TestCase):
                                 set(range(1, sequence.oracle_frames + 1)), name)
                 for version, table in sequence.known_state.items():
                     self.assertTrue(set(oracle.by_frame(table)) <= state, name)
-            # It plays its own input file or another sequence's
-            self.assertTrue(not sequence.input or sequence.input in oracle.SEQUENCES, name)
+                for version, table in sequence.known_random.items():
+                    self.assertTrue(set(oracle.by_frame(table)) <= state, name)
+            # It plays its own input file, another sequence's or a save's
+            self.assertTrue(not sequence.input or sequence.input in oracle.SEQUENCES or sequence.input in oracle.SAVES,
+                            name)
             for version in ("b2_us", "w2_us"):
                 self.assertTrue(os.path.exists(os.path.join(oracle.REPO_ROOT, oracle.SEQUENCE_INPUT.format(
                     name=sequence.input or name, version=version))), (name, version))
@@ -1410,6 +1413,70 @@ class OracleScriptTests(unittest.TestCase):
                     name=name, version=version))), (name, version))
                 self.assertRegex(digest, "^[0-9a-f]{40}$", (name, version))
                 self.assertIsNone(oracle.save_kept(name, version), (name, version))
+        # A round trip continues the save its maker makes with the sequence that starts from that save, and the port
+        # makes its own within the frames the oracle takes
+        for name, trip in oracle.ROUND_TRIPS.items():
+            self.assertIn(trip.maker, oracle.SAVES, name)
+            self.assertIn(trip.continued, oracle.SEQUENCES, name)
+            self.assertEqual(oracle.SEQUENCES[trip.continued].save, trip.maker, name)
+            self.assertTrue(0 < trip.port_frames <= oracle.SAVES[trip.maker].frames, name)
+            # The bytes it declares are the chip's, each with why
+            for version, table in trip.known.items():
+                self.assertIn(version, ("b2_us", "w2_us"))
+                for spans, why in table.items():
+                    offsets = oracle.parse_offsets(spans)
+                    self.assertTrue(offsets and all(0 <= i < oracle.BACKUP_SIZE for i in offsets), (name, spans))
+                    self.assertTrue(why, (name, spans))
+        # A sequence's state has a label of its own for each part, and a dump for each program
+        for name, sequence in oracle.SEQUENCES.items():
+            labels = [dump.label for dump in sequence.state]
+            self.assertEqual(len(labels), len(set(labels)), name)
+            self.assertTrue(all(dump.oracle and dump.port and dump.size > 0 for dump in sequence.state), name)
+
+    def test_save_differences(self):
+        # The spans where two saves differ, bytes 8 or less apart joined
+        a = bytes(64)
+        b = bytearray(a)
+        for i in (3, 4, 12, 30, 63):
+            b[i] = 1
+        self.assertEqual(oracle.save_differences(a, bytes(b)), [(3, 12), (30, 30), (63, 63)])
+        self.assertEqual(oracle.save_differences(a, a), [])
+
+    def test_declared_save_bytes(self):
+        # Offsets and spans, the main save's second copy, and the differences outside what a round trip declares
+        self.assertEqual(oracle.parse_offsets("0x19427,0x18fa2-0x18fa3"), [0x19427, 0x18FA2, 0x18FA3])
+        self.assertEqual(oracle.both_copies("0x10,0x20-0x21"), "0x10,0x20-0x21,0x26010,0x26020-0x26021")
+        a = bytes(64)
+        b = bytearray(a)
+        for i in (3, 4, 12, 30, 63):
+            b[i] = 1
+        self.assertEqual(oracle.undeclared_differences(a, bytes(b), {"0x3-0x4,0x1e": "declared"}), [(12, 12), (63, 63)])
+        self.assertEqual(oracle.undeclared_differences(a, bytes(b), {"0x0-0x3f": "all of it"}), [])
+        self.assertEqual(oracle.undeclared_differences(a, bytes(b), {}), oracle.save_differences(a, bytes(b)))
+
+    def test_state_dumps(self):
+        # Each program's dump of a part of the game's state, by the same label; none for a sequence that compares none
+        dump = oracle.StateDump("gfl", "*gfl_use.c/sWork", "**port_gfl_use_work", 8)
+        self.assertEqual(dump.spec("oracle", "1-4"), "gfl=*gfl_use.c/sWork:8@1-4")
+        self.assertEqual(dump.spec("port", "2"), "gfl=**port_gfl_use_work:8@2")
+        self.assertEqual(oracle.state_dumps(oracle.Sequence(4, 4, "", "9")), ([], []))
+        sequence = oracle.Sequence(4, 6, "", "9", state_frames="2-3", state_oracle="3-5", state=(dump,))
+        self.assertEqual(oracle.state_dumps(sequence),
+                         (["gfl=*gfl_use.c/sWork:8@3-5"], ["gfl=**port_gfl_use_work:8@2-3"]))
+        self.assertEqual(oracle.STATE[0].spec("port", "7"), "NNS_G3dGlb=NNS_G3dGlb:612@7")
+        # GFL's random state is left out at known_random's frames as well as known_state's, the rest only at the latter
+        sequence = oracle.Sequence(4, 6, "", "9", state_frames="1-6", state_oracle="1-6",
+                                   known_state={"b2_us": {"2": "a known state"}},
+                                   known_random={"b2_us": {"4-5": "a known random state"}},
+                                   state=oracle.STATE + oracle.RANDOM_STATE)
+        self.assertEqual(oracle.compared_state_frames(sequence, "b2_us"), [1, 3, 4, 5, 6])
+        self.assertEqual(oracle.compared_state_frames(sequence, "b2_us", random=True), [1, 3, 6])
+        self.assertEqual(oracle.compared_state_frames(sequence, "w2_us", random=True), [1, 2, 3, 4, 5, 6])
+
+    def test_round_trip_skips_without_the_oracle(self):
+        with tempfile.TemporaryDirectory() as d:
+            status = quiet(oracle.main, ["round-trip", "catch", "--port", "x", "--oracle", os.path.join(d, "missing")])
+        self.assertEqual(status, oracle.SKIP)
 
     def test_check_skips_without_the_oracle(self):
         with tempfile.TemporaryDirectory() as d:

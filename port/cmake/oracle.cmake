@@ -1,10 +1,12 @@
 # The melonDS test oracle (port/tools/oracle, PLAN.md §6 T4) and its tests (port/tests/oracle), which hold Frigate's
 # run of the game to melonDS's: the screens and memory of the boot, the opening, the title and start menu, CONTINUE, the
 # field menu and its apps (the bag, the trainer card, the party list, the summary and the Pokédex), New Game's intro
-# and its route through the field into Aspertia City (phase 3's exit: a walk, a talk, a house and four changes of map)
-# and a save; the saves made on the oracle from saves (the first save, and the starter save with a Pokémon and the
-# Pokédex), which the sequences start from; and the sound of the opening and the title (the ARM7 sound driver run by
-# run; its output: a stream and a cry to the bit, the music by its envelope and levels).
+# and its route through the field into Aspertia City (phase 3's exit: a walk, a talk, a house and four changes of map),
+# phase 4's route (Hugh's trainer battle, Route 19, a wild Pokémon caught, the game saved and continued, and that save
+# continued by each program from the other's) and a save; the saves made on the oracle from saves (the first save, the
+# starter save with a Pokémon and the Pokédex, and the route's), which the sequences start from; and the sound of the
+# opening and the title (the ARM7 sound driver run by run; its output: a stream and a cry to the bit, the music by its
+# envelope and levels).
 #
 # The input file reader (pbwinput.c, which the port can compile as it is), the per-screen 3D decision (display3d.c),
 # compare.py and sound.py are tested in every build: they need neither melonDS nor a ROM. The oracle itself is a test
@@ -121,17 +123,25 @@ port_test_labels(oracle_boot oracle)
 # into the player's house, Mom's scene, out into Aspertia City, a talk with a townsperson, into a house and out again,
 # 15,800 port frames and 18,700 of the oracle's, its clock pinned too. Its reference holds the walk and the changes of
 # map without the oracle by NNS G3D's state; the talk shows only on the top screen, over the field's 3D, so only
-# oracle_aspertia holds it
+# oracle_aspertia holds it. Phase 4's route is four sequences, each from melonDS's save of the one before, which
+# oracle_saves makes (center_save, route19_save, catch_save), so no reference: hugh, from the starter save, Hugh's
+# trainer battle to the second turn's rolls, where his AI's time a pass parts it from melonDS's by construction;
+# route19, from the save in the Pokemon Center after that battle, Mom's scene, the gate and Bianca's catching lesson
+# with her capture demo, to SAVE beside Route 19's grass; catch, from there, a wild Purrloin caught with a Poke Ball and
+# SAVE; catch_continue, that save continued in a new run, into the party list with Tepig and Purrloin. Their input
+# files pin the clock and give the random seeds the DS builds there (port/tools/oracle/README.md, "Random seeds"), and
+# each compares NNS G3D's state and GFL's random state with the DS's at every count but the passes it declares
 set(port_oracle_saves "${CMAKE_BINARY_DIR}/oracle-saves")
 add_test(NAME oracle_saves
     COMMAND "${CMAKE_COMMAND}" -E env PYTHONDONTWRITEBYTECODE=1
-        "${PORT_PYTHON}" "${port_oracle_dir}/oracle.py" save first_save starter_save
-            --oracle "${port_oracle_binary}" --version "${PORT_VERSION}" --save-cache "${port_oracle_saves}"
+        "${PORT_PYTHON}" "${port_oracle_dir}/oracle.py" save first_save starter_save center_save route19_save
+            catch_save --oracle "${port_oracle_binary}" --version "${PORT_VERSION}" --save-cache "${port_oracle_saves}"
     WORKING_DIRECTORY "${REPO_ROOT}")
-# Each save from scratch runs the oracle some 18,000 frames
-set_tests_properties(oracle_saves PROPERTIES SKIP_RETURN_CODE 77 TIMEOUT 3600 FIXTURES_SETUP oracle_saves)
+# Each save from scratch runs the oracle 13,700 to 19,000 frames, five of them in a row from a blank cache
+set_tests_properties(oracle_saves PROPERTIES SKIP_RETURN_CODE 77 TIMEOUT 7200 FIXTURES_SETUP oracle_saves)
 port_test_labels(oracle_saves oracle)
-foreach(sequence IN ITEMS opening title continue continue_starter field_menus party_menus aspertia)
+foreach(sequence IN ITEMS opening title continue continue_starter field_menus party_menus aspertia hugh route19 catch
+                         catch_continue)
     if(EXISTS "${port_oracle_tests}/${sequence}_${PORT_VERSION}.tsv")
         add_test(NAME oracle_${sequence}_hashes
             COMMAND "${CMAKE_COMMAND}" -E env PYTHONDONTWRITEBYTECODE=1
@@ -154,11 +164,26 @@ foreach(sequence IN ITEMS opening title continue continue_starter field_menus pa
     port_test_labels(oracle_${sequence} route oracle)
 endforeach()
 # The sequences from a save take it from oracle_saves; without the cache (a failed fixture) they would make it again
-set_tests_properties(oracle_continue oracle_continue_starter oracle_field_menus oracle_party_menus PROPERTIES
-    FIXTURES_REQUIRED oracle_saves TIMEOUT 3600)
+set_tests_properties(oracle_continue oracle_continue_starter oracle_field_menus oracle_party_menus oracle_hugh
+    oracle_route19 oracle_catch oracle_catch_continue PROPERTIES FIXTURES_REQUIRED oracle_saves TIMEOUT 3600)
 # The exit route writes and compares a picture of every frame of both programs, some 34,500 in all: half an hour on a
 # loaded machine
 set_tests_properties(oracle_aspertia PROPERTIES TIMEOUT 5400)
+
+# Phase 4's exit (T6): the port plays the catch save's input file from melonDS's Route 19 save and saves the game it
+# caught a wild Purrloin in; melonDS continues that save frame for frame as it continues its own, and the port
+# continues it in a new run, held to melonDS's continuing its own as oracle_catch_continue holds the port on melonDS's,
+# its state too; the two saves may differ only in the bytes the trip declares, each with its cause (oracle.py
+# round-trip catch). Skipped (77) without the oracle or the ROM
+add_test(NAME oracle_round_trip_catch
+    COMMAND "${CMAKE_COMMAND}" -E env PYTHONDONTWRITEBYTECODE=1
+        "${PORT_PYTHON}" "${port_oracle_dir}/oracle.py" round-trip catch
+            --oracle "${port_oracle_binary}" --port "$<TARGET_FILE:${PORT_PROGRAM}>" --version "${PORT_VERSION}"
+            --save-cache "${port_oracle_saves}"
+    WORKING_DIRECTORY "${REPO_ROOT}")
+set_tests_properties(oracle_round_trip_catch PROPERTIES SKIP_RETURN_CODE 77 TIMEOUT 3600
+    FIXTURES_REQUIRED oracle_saves)
+port_test_labels(oracle_round_trip_catch route oracle)
 
 # The other way, a save from the port to melonDS (T6): the port's New Game formats the blank backup, and the oracle
 # boots that save to the start menu frame for frame as it boots its own save of the same moment, writing neither; the

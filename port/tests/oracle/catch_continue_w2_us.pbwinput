@@ -1,0 +1,29 @@
+pbwinput 1
+# Phase 4's route, its last piece (oracle.py's SEQUENCES: catch_continue): the catch save, the game the route saved
+# after catching a wild Purrloin on Route 19 (catch_save_w2_us.pbwinput), continued in a new run of each program. The
+# start menu shows the saved game (Route 19, badges 0, Pokedex 3, time 0:13), CONTINUE goes to the grass where it was
+# saved, and the field menu's POKEMON shows the party with the Pokemon caught: Tepig, level 6, and Purrloin, level 4.
+# oracle.py round-trip catch also continues the port's own save with it, on the port and on the oracle. The clock is
+# pinned, and the seed line is the random seed the DS builds at start-up (oracle.py seeds catch_continue). Counts are
+# GFL's frame count (sVBlankCount). On game frames. White 2, with Black 2's presses.
+version w2_us
+clock pinned
+seed 0x270fd5258c56ebe3  # GFL's, at start-up (oracle frame 20)
+1100 START  # START in the opening skips it to the title (count 1115 on both)
+1101 -
+3000 START  # START brings back the layers the title hid at count 2877
+3001 -
+3100 START  # START leaves for the start menu and its saved game, which shows from count 3249
+3101 -
+3400 A  # CONTINUE: Route 19 (zone 437), in the grass where the game was saved
+3401 -
+3800 X  # X: the field menu
+3806 -
+3860 A  # the first key shows the cursor, on POKEMON
+3866 -
+3920 A  # POKEMON: the party list, Tepig and Purrloin
+3926 -
+4400 B  # back to the field menu
+4406 -
+4460 B  # the field
+4466 -

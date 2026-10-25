@@ -232,11 +232,12 @@ its encounters and battles track:
 | H6 | `lib/nnsys/src/gfd/gfd_VramTransferManager.c:327`, `NNS_GfdDoVramTransfer`, from the main loop (`src/system/main.c`) in the field | A transfer reads its source from memory of the game's heap that is no longer allocated (ASan, use-after-poison, twice) | Fixed in the game's file under `PLATFORM_PC` on 2026-10-24, with its cause traced ([below](#the-fields-sequences-under-the-strict-build)) |
 
 The battles' track ran the same survey build on 2026-10-23 on the Route 19 route from the starter save (the oracle's
-`route19_save_b2_us.pbwinput`, port frames 0 to 7,623: CONTINUE, Route 19, the trainer's VS cut-in and Hugh's battle to
-the first move's menu, where `data_ov167_021d7490` stops the program; [STATUS.md](STATUS.md)). The deep dive's survey of
-the same route, on its scratch build, showed R6 to R10 and H6; after the track's fixes it shows only H6 and R10, and
-`replay_new_game_house` in the survey build runs all 18,800 frames with only H5 and H6 (H5, at the change of map into
-the house, is now its first report, where the strict build would stop; the strict build wasn't run):
+`route19_save_b2_us.pbwinput` as it was then, whose presses to Hugh's second turn are now `hugh_b2_us.pbwinput`'s, port
+frames 0 to 7,623: CONTINUE, Route 19, the trainer's VS cut-in and Hugh's battle to the first move's menu, where
+`data_ov167_021d7490` stops the program; [STATUS.md](STATUS.md)). The deep dive's survey of the same route, on its
+scratch build, showed R6 to R10 and H6; after the track's fixes it shows only H6 and R10, and `replay_new_game_house` in
+the survey build runs all 18,800 frames with only H5 and H6 (H5, at the change of map into the house, is now its first
+report, where the strict build would stop; the strict build wasn't run):
 
 | Report | Where | What the sanitizer saw | What the host does |
 | --- | --- | --- | --- |

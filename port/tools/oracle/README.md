@@ -299,9 +299,11 @@ What `pbw-oracle` and `oracle.py port` write, and `compare.py` reads:
   ARM7 side counts each VBlank at the VBlank itself, so it is the frame's number), GFL's frame count, the game frame
   and each screen's hash and blank, `-` for `keyread`, `top_3d` and `bottom_3d` (compare.py takes 3D from the
   oracle's run); PNG files at the frames of LIST, as `--screens` takes it; `memory.txt` with each `--run-dump`
-  (`[LABEL=][*]SYMBOL[+OFFSET]:SIZE[@LIST]`: a global of the program by name, which the program finds with `dlsym`, so
-  not a static; a size, which the host doesn't know; `*` for the bytes where the pointer at SYMBOL points, the
-  oracle's `--dump` of the address that pointer holds there; the last frame of `--frames` without a list); and
+  (`[LABEL=][*[*]]SYMBOL[+OFFSET]:SIZE[@LIST]`: a global of the program by name, which the program finds with `dlsym`,
+  so not a static; a size, which the host doesn't know; `*` for the bytes where the pointer at SYMBOL points, the
+  oracle's `--dump` of the address that pointer holds there; `**` for the bytes where the pointer that one points at
+  points, so that a host file's global holding a static's address reads what the static points at, as the oracle's `*`
+  of the static's name does (`port/hal/gfl/random_state.h`); the last frame of `--frames` without a list); and
   `run.txt`, written at the start and again at the end with the frames completed, the exit status and the random seeds
   the game used (`seeds`, then `seed_N: 0x... given` for one the input file gave, `built` for its own), so that a run a
   trap stub ends keeps its frames and says it didn't finish. A dump's ADDRESS is the host's, and its bytes are too: only
@@ -400,9 +402,10 @@ clock's, and its stack holds its own frames ([../../docs/decomp-findings.md](../
   before its first roll. The instrumented build's seeds and these are the same: the start-up's and each battle's of the
   Route 19 route in both versions.
 - **With the DS's seeds the port draws the DS's numbers** wherever its passes draw as the DS's do: New Game's day care
-  egg seed, which it writes into the save, is the DS's (`replay_same_save`), and on the Route 19 route GFL's linear
-  generator's state and the twister's index were the DS's count for count, through the title, CONTINUE and the field, to
-  Hugh's battle, in a trace with scratch instrumentation that no test holds yet. Where the CPU's time decides when the
+  egg seed, which it writes into the save, is the DS's (`replay_same_save`), and phase 4's route's sequences hold GFL's
+  random state, its linear generator's state and the twister's first word and index, to the DS's at every count they
+  compare ([The comparison sequences](#the-comparison-sequences)), from the title through CONTINUE, the field and the
+  battles, but at the passes each declares with its cause. Where the CPU's time decides when the
   game draws they part: the trainers' AI ([below](#known-differences-from-the-hardware)).
 
 ## The boot sequence (Black 2, no input, blank save)
@@ -431,7 +434,7 @@ that bank in VRAM display mode (`bottom_3d` is 1; the top screen, engine B's log
 
 ## The comparison sequences
 
-Six input files on game frames for each version, `port/tests/oracle/<name>_<version>.pbwinput`, played by seven
+Ten input files on game frames for each version, `port/tests/oracle/<name>_<version>.pbwinput`, played by eleven
 sequences, compared with `--align counter`, the movies by their pictures (`oracle.py`'s `SEQUENCES` says how):
 
 - **opening**: nothing pressed. Power-on, the boot screens, the Game Freak logo and the whole opening, the title and
@@ -491,6 +494,37 @@ sequences, compared with `--align counter`, the movies by their pictures (`oracl
   measurements). Since `port/gfx/ge/ge.c`'s `ToScreen` divides that way (with `g3d_ge`'s cases) those frames have 18
   pixels beyond the tolerance in both versions, like the frames around them, and the flight 80 at most, where it had
   200.
+- **Phase 4's route** ([PLAN.md §7](../../docs/PLAN.md#phase-4-battles-menus-saves-m5m7): catch a Pokémon, save, quit,
+  reload, and a save that continues from melonDS in the port and back), in four sequences, each from melonDS's save of
+  the piece before ([Saves](#saves)), so that each starts as the DS does; their files pin the clock and give the random
+  seeds the DS builds there ([Random seeds](#random-seeds)). Both versions play Black 2's presses.
+  - **hugh**: from the starter save, continue's presses, then down from the lookout to Hugh's arrival, his challenge
+    and his trainer battle, Tepig against Oshawott, A every 16 frames for FIGHT and Tackle: the cut-in, the send-outs,
+    the first turn's moves, damage and messages, and the second turn's choices, to its rolls (count 8193). There the
+    battle parts from melonDS's by construction: Hugh's AI picks its second move with another number, having thought
+    two passes less than on the DS ([below](#known-differences-from-the-hardware)), so the sequence ends there. The
+    port runs 8,200 frames, the oracle 10,450. GFL's random state holds the AI's time a pass: at each of Hugh's turns
+    the port's twister is one draw ahead for two passes, from the port's pick to the DS's, and the DS's again from
+    there (Black 2's counts 7500-7501 and 7969-7970, White 2's 7496-7497 and 7969-7970). The sequence found the
+    lookout's railing missing a line on the port as the player walks down to Hugh, beyond the 3D's tolerance in 12
+    frames of each version: the same polygon lists on both programs, and the railing's top line two units of depth
+    nearer on melonDS, whose model of the 3D engine's arithmetic interpolates depth from the nearer end with a
+    reciprocal and so wins a tie with a strip drawn first; `port/gfx/ref/ds3d.c` does it the same way now (its
+    `DepthLine`, derived from melonDS's code; `g3d_ds3d`'s depth interpolation case).
+  - **route19**: from the Pokémon Center save, made after Hugh's battle on melonDS: CONTINUE in the Pokémon Center,
+    out into Aspertia City, Mom's scene, the gate to Route 19 and its guard's gift, Bianca's catching lesson with her
+    capture demo, a battle in which her Lillipup weakens a wild Purrloin and her Poké Ball catches it, and the field
+    menu's SAVE beside Route 19's grass. The port runs 15,400 frames, the oracle 18,200.
+  - **catch**: from the Route 19 save: into the grass and up and down a tile at a time until a wild Pokémon appears,
+    a Purrloin, level 4, met at count 4929 on both programs in both versions, its battle opening at count 4946 in
+    Black 2 and 5050 in White 2; the bag's Poké Balls pocket and a Poké Ball, its three shakes and "Gotcha! Purrloin
+    was caught!", the Pokédex's new entry, B for no nickname, and SAVE. The port runs 11,600 frames, the oracle 14,200.
+    In White 2 the DS sees Purrloin's cry end a pass later, and the battle's top screen is left out from then on
+    ([below](#known-differences-from-the-hardware)).
+  - **catch_continue**: the catch save continued in a new run of each program: the start menu with the saved game
+    (Route 19, Pokédex 3, time 0:13), CONTINUE into the grass, and the field menu's POKéMON with the party, Tepig, level
+    6, and Purrloin, level 4. The port runs 4,700 frames, the oracle 6,900. `oracle.py round-trip catch` also plays it
+    from the port's own catch save on both programs ([Saves](#saves)).
 
 A sequence can also allow the port to stop on code with no C yet: from a port frame (`stop_from`), on the trap stub
 it names (`stop_trap`, a pattern of the trap's message), with why (`stop`). A stop on any other trap fails, so the
@@ -506,8 +540,8 @@ differed in 14,330 at the first frame, 1,823 at the fourth, and passed the toler
 start from a save, which leaves other bytes after the copyright screen's file on the port than on the DS
 ([below](#known-differences-from-the-hardware)), so they don't hold those frames close.
 
-Each is two ctest tests, but the four that start from a save (continue, continue_starter, field_menus and
-party_menus), whose saves only the oracle can make, have only the first:
+Each is two ctest tests, but the eight that start from a save (continue, continue_starter, field_menus, party_menus
+and the four of phase 4's route), whose saves only the oracle can make, have only the first:
 
 - `oracle_<name>` (`oracle.py sequence NAME --port BIN`), with the oracle built: runs both programs and compares every
   port frame but the known differences ([below](#known-differences-from-the-hardware)): where the game counts passes,
@@ -515,7 +549,9 @@ party_menus), whose saves only the oracle can make, have only the first:
   too long, fails; in the movies, by their pictures in order. Screens without 3D must be exact at 6 bits, screens with
   3D within the tolerance, and every picture the oracle shows between two of the port's frames must be one the port
   shows (a skipped picture fails). It compares NNS G3D's state (`NNS_G3dGlb`) on the count at every frame of the title
-  too, and of the exit route from the title on. It can't time the movies: there the DS's passes take 3 to 5 frames by
+  too, and of the exit route from the title on, and phase 4's route's four with GFL's random state too (`RANDOM_STATE`:
+  the linear generator's state, the twister's first word and its index), from the title on, but its `known_state` and,
+  for the random state alone, its `known_random`. It can't time the movies: there the DS's passes take 3 to 5 frames by
   its CPU's load, so only their pictures and their order are held, and in the title sequence the oracle frames the
   press skips aren't compared. With `--update` it writes the reference from a comparison that passes. Skipped (77)
   without the oracle or the ROM.
@@ -534,7 +570,7 @@ party_menus), whose saves only the oracle can make, have only the first:
 
 Results, every port frame but the known differences:
 
-| Sequence | Port frames | Match | Exact | 3D within the tolerance | Known differences | NNS_G3dGlb equal |
+| Sequence | Port frames | Match | Exact | 3D within the tolerance | Known differences | Game state equal: NNS_G3dGlb (and, in phase 4's route, GFL's random state) |
 | --- | --- | --- | --- | --- | --- | --- |
 | opening, Black 2 | 3,800 | 3,800 | 3,526 | 274 | none | 274 of 274 |
 | opening, White 2 | 3,800 | 3,800 | 3,526 | 274 | oracle frame 1283 | 274 of 274 |
@@ -550,6 +586,14 @@ Results, every port frame but the known differences:
 | party_menus, White 2 | 8,500 | 8,182 | 4,252 | 3,930 | the title's 28 port frames and 3402, the summary's 289, oracle frames 1260, 4852 | not compared |
 | aspertia, Black 2 | 15,800 | 15,708 | 8,469 | 6,846 | the title's 21 port frames, 7751, Mom's balloon's 16, the zoom's 54, oracle frames 4943, 9841, 17462-17519; the top screen of Minccino's 393 (its bottom screen exact) | 14,656 of 14,656, 29 left out |
 | aspertia, White 2 | 15,800 | 15,700 | 8,531 | 6,776 | the title's 28 port frames and 3402, 7811, Mom's balloon's 16, the zoom's 54, oracle frames 1283, 4875, 9837-9838, 17401-17457; the top screen of Minccino's 393 (its bottom screen exact) | 14,656 of 14,656, 29 left out |
+| hugh, Black 2 | 8,200 | 8,165 | 1,680 | 6,485 | the title's 21 port frames, the balloons' 12, the move menu's 2, oracle frames 4920, 9742, 10331 | 7,043 of 7,043, 42 left out; 7,039 of 7,039, 46 left out |
+| hugh, White 2 | 8,200 | 8,157 | 1,682 | 6,475 | the title's 28 port frames and 3402, the balloons' 12, the move menu's 2, oracle frames 1260, 4852, 9679, 10268 | 7,043 of 7,043, 42 left out; 7,039 of 7,039, 46 left out |
+| route19, Black 2 | 15,400 | 14,846 | 6,951 | 7,895 | the title's 21 port frames, the balloons' 8, the wipes' 2, the banner's 1, the fade's 6, the move menu's 1, the save's 515, oracle frames 4920, 12714 | 14,130 of 14,130, 155 left out; 13,336 of 13,336, 949 left out |
+| route19, White 2 | 15,400 | 14,345 | 6,953 | 7,392 | the title's 28 port frames and 3402, the balloons' 8, the wipes' 2, the banner's 1, the fade's 6, the move menu's 1, the play time's 545, the save's 463, oracle frames 1260, 4852, 7060, 12659 | 14,122 of 14,122, 163 left out; 13,356 of 13,356, 929 left out |
+| catch, Black 2 | 11,600 | 10,988 | 2,084 | 8,904 | the title's 21 port frames, the save's 591, oracle frame 4920 | 10,323 of 10,323, 162 left out; 9,292 of 9,292, 1,193 left out |
+| catch, White 2 | 11,600 | 10,481 | 2,007 | 5,499 | the title's 28 port frames and 3402, the battle's 10, the play time's 481, the save's 599, oracle frames 1260, 4852; the top screen of the battle's 2,975 (its bottom screen exact) | 9,561 of 9,561, 924 left out; 4,164 of 4,164, 6,321 left out |
+| catch_continue, Black 2 | 4,700 | 4,679 | 1,967 | 2,712 | the title's 21 port frames, oracle frame 4920 | 3,562 of 3,562, 23 left out; 3,562 of 3,562, 23 left out |
+| catch_continue, White 2 | 4,700 | 4,671 | 1,969 | 2,702 | the title's 28 port frames and 3402, oracle frames 1260, 4852 | 3,562 of 3,562, 23 left out; 3,562 of 3,562, 23 left out |
 
 Each comparison's summary gives its screens with 3D, compared by their pictures, and their pixels beyond the pixel
 tolerance at the median and at most: 5 to 18 at the median by sequence and version, 0 in the exit route, and in
@@ -580,6 +624,16 @@ the route enters and 38 back on the street, and at most 80 in the flight and 89 
 both versions; the flight had up to 200 before the divider. Outside Minccino's idle, whose top screen is left out, the
 intro's 3D is exact in both versions, Minccino's Poké Ball burst, the first particles any sequence reached, among it.
 NNS G3D's state matches at every frame compared.
+
+Phase 4's route holds every port frame it runs on the count but the declared ones, from the title through its battles,
+the catch, the saves and the continued game: a screen with 3D has 0 to 13 pixels beyond the pixel tolerance at the
+median by sequence and version, and at most 54 to 114 (the title's 80 at port frame 2144 in hugh and Black 2's
+catch_continue, the battle's 84 and 81 at 7182 in route19, the field after the catch's save 114 at port frame 11159 in
+Black 2 and 107 at 11211 in White 2). The lookout's frames as the player walks down to Hugh are within the tolerance
+since the depth change (at most 65, where both versions had up to 359 beyond it). The game's state matches at every
+frame it compares (the table's last column): NNS G3D's but in the DS's long passes, the save's dialog (below) and, in
+White 2's catch, the battle's camera after Purrloin's cry; GFL's random state but there and at Hugh's AI's two passes a
+turn, after each save's dialog and, in White 2's catch, from Purrloin's cry on.
 
 ## Saves
 
@@ -674,9 +728,8 @@ It is made at test time and never committed.
 
 **Saves made from saves.** A save in `SAVES` can name the save it starts from (`start`): `oracle.py` makes or takes
 that one first, checks its SHA-1, and gives it to the oracle with `--save` for the next input file. Each step is held
-to its own SHA-1, so a chain is the same at every run or fails at the step that changed. Black 2 has two, measured
-with the pinned melonDS, and White 2 the first of them; White 2's Route 19 save, which no test uses, is still to be
-measured:
+to its own SHA-1, so a chain is the same at every run or fails at the step that changed. Both versions have four,
+measured with the pinned melonDS: the starter save, and phase 4's route's three after it.
 
 - **The starter save** (`starter_save`, from `first_save`, `port/tests/oracle/starter_save_b2_us.pbwinput`, 17,000
   frames, SHA-1 `ce71fe0b8c1d`): CONTINUE as the continue sequence presses it, then the story from the player's room:
@@ -703,17 +756,66 @@ measured:
   from `first_save` on, in both versions). The game's passes take two frames or more while it saves, from frame 15,802
   to 16,067, and the menu closes at 16,695 (count 14,394); the two copies are the same, and 2,080 bytes differ from
   White 2's `first_save`.
-- **The Route 19 save** (`route19_save`, from `starter_save`, 28,600 frames, SHA-1 `826bc561a328`): Hugh's trainer
-  battle (FIGHT, Tackle: Tepig grows to level 6, 229 experience), the Pokémon Center's scene, Mom's, the gate's gift
-  and Bianca's catching lesson, B through each, then SAVE beside the grass at (56, 696). It is for the battles, which
-  no test runs yet.
+- **Phase 4's route's saves**, each the start of the route's next piece ([above](#the-comparison-sequences)), all with
+  the clock pinned and made from the save before, so that each piece starts as the DS left the one before it:
+  - **The Pokémon Center save** (`center_save`, from `starter_save`, 19,000 frames; Black 2 `a74d51fa94d9`, White 2
+    `ee13618f8def`): CONTINUE at the lookout, Hugh's arrival and challenge, his trainer battle with A every 16 frames
+    (Tepig grows to level 6), B through his words and the Pokémon Center's scene (healing, the PC, the Mart, 10 Poké
+    Balls), then SAVE in the Pokémon Center once the player is free (Aspertia City, Pokédex 2, time 0:08). White 2 plays
+    Black 2's presses. Its input file gives the DS's seeds, the hugh sequence's, whose presses it plays to the battle,
+    so that the port can play Hugh's battle from them too: from melonDS's starter save, `frigate-black2 --headless
+    --frames 19000 --save-dir DIR --input port/tests/oracle/center_save_b2_us.pbwinput` with the starter save in DIR as
+    `IREO.sav` plays the battle to its end on the port, past the AI's cut, the Pokémon Center's scene and SAVE there
+    (2026-10-24). The save it writes differs from melonDS's in the play time's seconds, the mystery gift block, which
+    the game encrypts again with a key seeded by the VBlank count each time it reads it (`mgEncryptData`,
+    `src/system/mystery_data.c`), a Pokémon Center townsperson's direction and turn timer, which GFL's linear generator
+    draws (`FldmmdlMovecode_MoveTurnRandom`, `src/ov036/fldmmdl_movecode.c`), and the CRCs over those; Tepig's party
+    data, the money and the bag are melonDS's. In White 2 the port's battle, Hugh's AI picking other moves, ends later
+    than the DS's did for these presses, which then miss the field menu's SAVE (the port is still in the Pokémon
+    Center's scene at frame 13,000). No test holds this yet: a round trip for a trainer battle needs its own presses
+    after the battle. It is where the route starts again after Hugh's battle, which parts from melonDS's at his second
+    move ([Known differences](#known-differences-from-the-hardware)).
+  - **The Route 19 save** (`route19_save`, from `center_save`, 17,800 frames; Black 2 `26d75e2638a6`, White 2
+    `12b20ac0dd82`): the route19 sequence's input file, then SAVE beside Route 19's grass at (56, 696) (Route 19,
+    Pokédex 2, time 0:11). Its presses are the ones the older Route 19 save, made from the starter save through Hugh's
+    battle, had from the Pokémon Center on, with 170 more counts of B through the gate guard's words, which end later
+    when the route starts in the Pokémon Center.
+  - **The catch save** (`catch_save`, from `route19_save`, 13,700 frames; Black 2 `baf426358777`, White 2
+    `64960699601c`): the catch sequence's input file: a wild Purrloin, level 4, caught with the first Poké Ball, then
+    SAVE in the grass (Route 19, Pokédex 3, time 0:13).
 
-`oracle.py save NAME... --save-cache DIR` makes each save into DIR as `NAME_VERSION.sav`, with the saves it starts
-from, and a later run takes a file from there only while its SHA-1 is still the one kept: anything else is made again.
-`--out FILE` writes one save, made fresh. ctest's `oracle_saves` test makes `first_save` and `starter_save` into
-`<build>/oracle-saves` before the sequences that start from them (a fixture), so they cost their oracle runs once a
-build tree; without `--save-cache`, as before, every save is made fresh. Nothing the game writes is committed: only
-the input files and the SHA-1s.
+`oracle.py save NAME... --save-cache DIR` makes each save into DIR as `NAME_VERSION.sav`, with the saves it starts from,
+and a later run takes a file from there only while its SHA-1 is still the one kept: anything else is made again. `--out
+FILE` writes one save, made fresh. ctest's `oracle_saves` test makes `first_save`, `starter_save` and the route's three
+into `<build>/oracle-saves` before the sequences that start from them (a fixture), so they cost their oracle runs once a
+build tree; without `--save-cache`, as before, every save is made fresh. Nothing the game writes is committed: only the
+input files and the SHA-1s.
+
+**The round trip** (`oracle.py round-trip catch`, ctest `oracle_round_trip_catch`): phase 4's exit, a save that
+continues from melonDS in the port and back. The port plays the catch save's input file from melonDS's Route 19 save,
+11,600 frames, catches the same Purrloin and saves the game; both saves are then continued on the oracle with
+catch_continue's input file, in new runs, and the port continues its own in a new run of its own. In both versions
+the oracle's run on the port's save is its run on its own save, count and both screens, at each of its 6,900 frames,
+and writes neither save; the port's run on its own save matches the oracle's on the oracle's save as the
+catch_continue sequence holds it (4,679 of 4,679 frames in Black 2, 4,671 of 4,671 in White 2, the same known
+differences), and leaves it as it was. The two saves differ in 34 bytes, 17 in each copy of the main save, at the same
+places in both versions, each traced:
+
+- 6 bytes of Purrloin's party data (`0x18fa2`, `0x18faa`, `0x18fb2`), encrypted with its personality value: in its
+  mail, the `id` of each of its three sentences. `PokeParty_CreatePkm` (`src/system/poke_tool.c`) copies in a mail
+  that `CreateMailData` allocates from the system heap without clearing it, and `PMSData_Clear`
+  (`src/system/pms_data.c`) sets a sentence's type and words but not its `id`, so the `id` is what the heap held
+  there: the DS's leftovers (`0x0000`, `0xfb5b`, `0xff8b`) and the port's (`0xbf83`, `0xcbde`, `0x0000`), the same
+  in both versions. The game never reads it while the type is empty. Tepig's mail has the DS's leftovers on both, from
+  the starter save.
+- 1 byte of the play time's seconds (`0x19427`): 0:13:11 on the DS and 0:13:05 on the port in Black 2, 0:13:08 and
+  0:13:02 in White 2, each counting its own clock's ticks ([Known differences](#known-differences-from-the-hardware)).
+- 10 bytes of CRCs over those: the party block's (`0x19336`) and the trainer's (`0x194b2`), their entries in the table
+  of the blocks' CRCs (`0x25f34`, `0x25f36`), and the footer's CRC of that table (`0x25fa2`, `src/gfl/backup_system.c`).
+
+The second copy (`0x26000` on) differs in the same 17 places; the rest of the chip is the same. The round trip
+declares these bytes, each span with its cause (`ROUND_TRIPS` in `oracle.py`), and fails on a byte that differs
+anywhere else.
 
 **Continuing it** (the continue sequence): the start menu shows CONTINUE first, then NEW GAME, MYSTERY GIFT, UNOVA
 LINK, NINTENDO WFC SETTINGS and MIC TEST, and the saved game: the player's picture, AAAAAAA, Aspertia City, Badges: 0,
@@ -893,8 +995,9 @@ What the port needs to compare itself frame by frame:
   `oracle.py port --input` passes `--fixed-time` only when it is given `--time`, as `oracle.py run` does with the
   oracle.
 - **Memory dumps** by name, written as `memory.txt` (done for globals: `--run-dump`, `oracle.py port --dump`). The
-  game's statics have no name the program can look up; a static the comparisons need will need the port to export
-  its address.
+  game's statics have no name the program can look up: a static the comparisons need gets a global holding its
+  address in the host file its decomp file is compiled through, read with `**` (GFL's random state's two,
+  `port/hal/gfl/random_state.h`).
 - **The sound** (done: `--sound-trace`, `port/app/sound_trace.c`, and `--audio-dump`, [Sound](#sound)): the sound
   driver's state after each run, which no dump at a VBlank can give the DS's of (the driver's runs fall at other
   moments of the frame on each program), and its samples.
@@ -931,7 +1034,19 @@ failure to fix, never a known difference. By kind:
   - in the exit route (aspertia), the display turned off after the intro, late in a DS pass of some 30 frames (count
     7750 in Black 2, 7810 in White 2): the port's frame at that count is white from its first line (port frame 7751,
     7811), where the DS's is still the intro's black, and the DS tears a later frame, black above line 115 (oracle
-    9841, Black 2) or line 189 (oracle 9837, White 2, whose next frame is white), which no port frame shows.
+    9841, Black 2) or line 189 (oracle 9837, White 2, whose next frame is white), which no port frame shows;
+  - in phase 4's route, in both versions: a wipe's first frame, into the gate to Route 19 and out of it (route19's
+    port frames 7623 and 8791), whose second step the game sets in the same pass as its first: the DS's frame is the
+    port's on lines 0 to 31 and from 64 on and the port's frame before on lines 32 to 63, the second step's window
+    written after the beam has drawn them, so 32 lines are black (or still black) where the port's frame has 64; Route
+    19's place name banner going away (8864), the DS's frame the port's frame before on lines 0 to about 20 and the
+    port's below; and as Bianca's capture demo opens, the lower part of the top screen darkening a step a pass
+    (9795-9800), the DS's frames the port's frame before from about line 146 down and the port's above;
+  - and a DS pass of two frames whose picture changes between them, which the count pairs by its first: after a move
+    is chosen the move menu goes away on the bottom screen, and the DS's first frame shows it partway (the moves'
+    names cleared, their buttons still there) and its second the port's picture of that count, its 3D within the
+    tolerance (hugh's port frames 7591 and 8167, route19's 10274; the second frames, oracle frames 9742 and 10331,
+    12714 in Black 2 and 9679, 10268 and 12659 in White 2, show no picture the check of missing pictures can pair).
 - **VRAM written after the beam has drawn it.** The same holds for VRAM: a pass that writes a part of the screen that
   the DS has already drawn shows it a frame later there. In the exit route Mom's speech balloon, at the top of the
   screen (lines 4 to 44), scrolls a line up 4 pixels a pass (`PrintStream_Task`, `src/system/printsys.c`), copying the
@@ -939,7 +1054,11 @@ failure to fix, never a known difference. By kind:
   shows a frame later on the DS, its window region then equal to the port's frame before, pixel for pixel, with no torn
   line (port frames 12911-12914, 13727-13730, 13967-13970 and 14223-14226, in both versions). The letters printed into
   the same window, with no copy, and the townsperson's window at the bottom of the screen, drawn after the copy ends,
-  show on the same count on both.
+  show on the same count on both. Phase 4's route has the same, Hugh's balloon at the lookout and on the stairs
+  (hugh's port frames 5023-5026, 5359-5362 and 5887-5890) and Mom's and Bianca's on the way to Route 19 (route19's
+  4969-4972 and 9305-9308), in both versions, each DS frame's balloon equal to the port's frame before pixel for pixel
+  and the port's to the DS's frame after; where the DS's pass takes two frames (White 2, count 4963), its second shows
+  the step on time, which only the port's frame of that count shows (oracle frame 7060).
 - **Memory the game reads past a heap block.** The copyright screen loads 0x8000 bytes of a smaller file's
   characters, so the tiles past them are whatever the heap held after the file's block
   ([../../docs/sanitizers.md](../../docs/sanitizers.md), H1), and the title's bottom screen shows them as a band over
@@ -980,30 +1099,51 @@ failure to fix, never a known difference. By kind:
 
 - **A save the DS writes in time, which the port writes at once.** New Game's intro saves its first data in the
   background, and before it fades to the name entry it waits for that save to pause (`IntroCmd_SavePause`,
-  `src/ov294/intro_cmd.c`): the DS's flash writes take time, so it pauses a pass later there. From the fade on, the
-  port is a pass ahead (`--lag 5538=-1` in Black 2, `5598=-1` in White 2) until the name entry waits for its first
-  press, which both read on the same pass (`5577=0`, `5637=0`). The house replay's SAVE shows the same: the DS shows
-  more frames of its saving.
+  `src/ov294/intro_cmd.c`): the DS's flash writes take time, so it pauses a pass later there. From the fade on, the port
+  is a pass ahead (`--lag 5538=-1` in Black 2, `5598=-1` in White 2) until the name entry waits for its first press,
+  which both read on the same pass (`5577=0`, `5637=0`). The house replay's SAVE shows the same: the DS shows more
+  frames of its saving. So does every SAVE of phase 4's route: the game writes the save in steps and waits for each
+  (GFL's backup system over CARD's backup commands, `src/gfl/backup_system.c`), and the DS's flash takes time for each,
+  so the dialog's progress dots move on later, its "saved the game." comes later and the dialog closes 192 passes
+  (route19) and 228 (catch) after the port's, whose chip is written at once (`port/hal/card`). In between both show the
+  message frame for frame, and once the DS's dialog has closed both show the field again on the same count: those
+  sequences leave out the frames from the first dot to the port's message and from the port's dialog closing to the
+  DS's: route19's port frames 14129-14447 and 14563-14758 in Black 2, 14129-14419 and 14559-14730 in White 2; catch's
+  10102-10460 and 10540-10771 in Black 2, 10102-10464 and 10540-10775 in White 2. The saves they make are compared as
+  saves instead ([Saves](#saves)). Their state differs there too, by the same cause: from a step of the dialog on, the
+  field's passes alternate between ending with NNS G3D's camera at the field's and at a 2D one, and the port reaches
+  that step first, some 230 counts before the DS in the catch (`SAVE_CAMERA`); and the field's townspeople who walk or
+  turn at random draw their waits and directions from GFL's linear generator (`FldmmdlMovecode_GetRandomTableEntry` and
+  `_GetRandomDirFromSet`, `src/ov036/fldmmdl_movecode.c`) when their timers, which wait while the dialog shows, run out,
+  so from the port's dialog closing the DS makes each of the port's draws as many counts later as its dialog closes
+  later, 192 and 168 in route19, 228 and 232 in catch (`SAVE_RANDOM`).
+- **The play time.** It counts ticks from CONTINUE on (`GameSystemTimer_Start` in `src/system/playtime_ctrl.c`, from
+  `EventFieldContinue_Create`): on the DS its CPU's, through the passes of several frames it takes while it loads, on
+  the port its virtual clock's (`port/hal/os/core.c`), which moves with each frame and in the busy loops it models
+  (`OS_GetTick`'s among them). The two part by seconds: Black 2's catch saves hold 0:13:11 (the DS's) and 0:13:05 (the
+  port's). Where a minute turns between them, the save dialog shows it, for as long as it shows on both: in White 2,
+  route19's 0:11 on the DS and 0:10 on the port (port frames 13723-14128 and 14420-14558, around the save's own) and
+  catch's 0:13 and 0:12 (9696-10101 and 10465-10539); in Black 2 both show the same minute.
 - **The game's state in the middle of a long pass.** Where a DS pass takes several frames (loading the intro, the
-  season's name, the field and each map), NNS G3D's state at its first frame, which the comparison pairs with the
-  port's frame on the count, is the pass's work in progress; at its later frames it is the port's. In the exit route
-  these are 14 frames in each version (`MID_PASS`), each checked against the DS's later frames of the same count.
+  season's name, the field and each map, a battle's scenes), the game's state at its first frame, which the comparison
+  pairs with the port's frame on the count, is the pass's work in progress, NNS G3D's or GFL's random state while the
+  pass draws; at its later frames it is the port's. In the exit route these are 14 frames in each version (`MID_PASS`),
+  and in phase 4's route 8 to 62 a sequence, each checked against the DS's later frames of the same count.
 - **A budget of the CPU's time a pass.** The trainers' AI runs its scripts for at most 500 ticks of `OS_GetTick` a pass,
   about a millisecond, and goes on where it stopped at the next (`TRAI_TIME_LIMIT`, `TrAI_RunScripts` in
   `src/ov170/tr_ai.c`). On the DS the scripts take the CPU's time; on the port each `OS_GetTick` moves the virtual clock
-  a tick, so the AI runs 500 of its checks a pass and thinks in one. The battle's view draws two numbers a pass from
-  GFL's Mersenne Twister (`BtlvMcss_Main`'s blinks, `src/ov168/btlv_mcss.c`), and the AI picks among its best moves with
-  the next number (`TrAI_ChooseMove`), so its pick depends on how many passes it thought. Traced by the twister's
-  callers on both programs, with the DS's seeds (Black 2, the Route 19 route from the starter save): GFL's linear
-  generator's state and the twister's index are the DS's at every count to Hugh's battle; at each of his turns his AI's
-  setup draws in the same pass on both (count 7495 for the first), and the port's AI picks at the next pass, the DS's
-  two passes later, the seventh number after the setup where the port's is the third. Oshawott's first pick is the same
-  by chance, its second (count 7969 on the port) is another, and the battle differs from that turn's rolls on (count
-  8193) ([../../docs/decomp-findings.md](../../docs/decomp-findings.md)). The trace was made with scratch
-  instrumentation (a log of `GFL_RandomMT`'s callers in a scratch build of the port and a PC hook in a scratch build of
-  melonDS), which no test holds yet. No host has the DS's time, so a trainer battle is held to melonDS only while the AI
-  thinks within a pass there: a sequence stops before the AI's first decision that the DS's time moves, and the route
-  goes on from melonDS's save made after the battle ([ADR
+  a tick, so the AI runs 500 of its checks a pass and thinks in one. The battle's view draws from GFL's Mersenne Twister
+  at every pass (`BtlvMcss_Main`'s blinks, `src/ov168/btlv_mcss.c`), and the AI picks among its best moves with the next
+  number (`TrAI_ChooseMove`), so its pick depends on how many passes it thought. The hugh sequence holds it as GFL's
+  random state, with the DS's seeds: the linear generator's state and the twister's first word and index are the DS's at
+  every count of the title, CONTINUE, the field and Hugh's battle but two passes at each of his turns, where the port's
+  twister index is one ahead, the port having picked and the DS not yet, and the DS's again from its pick on (`AI_TIME`:
+  Black 2's counts 7500-7501 and 7969-7970, White 2's 7496-7497 and 7969-7970). So the DS's AI picks with another of the
+  twister's numbers than the port's. Oshawott's first pick is the same move by chance, its second another, and from that
+  turn's rolls (count 8193) the battle parts from melonDS's, where the sequence ends
+  ([../../docs/decomp-findings.md](../../docs/decomp-findings.md)). No host has the DS's time, so a trainer battle is
+  held to melonDS only while the AI thinks within a pass there: a sequence stops before the AI's first decision that the
+  DS's time moves, and the route goes on from melonDS's save made after the battle ([ADR
   0023](../../docs/adr/0023-oracle-routes-part-where-the-ds-cpu-time-decides.md)). A wild Pokémon has no AI scripts (no
   AI flags, `GetClientAIFlags` in `src/ov167/btl_main.c`) and picks at once.
 - **Random numbers.** GFL seeds its random numbers from a hash that includes a buffer the DS's stack fills
@@ -1057,3 +1197,26 @@ failure to fix, never a known difference. By kind:
   The exit route presses NEW GAME, the start menu's first item without a save, where continue presses CONTINUE: its
   press ends the pulse the same way, and port frame 3402 shows the step after the DS's last one (top screen
   `d3c85a7e`), which the DS shows at counts 3274, 3296, 3338 and 3360 but not on that count.
+
+  White 2's catch meets the same with the wild Purrloin's cry. The battle waits for the cry as Purrloin appears (the
+  effect VM's wait for the voices, `BtlvEffvm_WaitNative` in `src/ov168/btlv_effvm.c`), and the cry's channel stops in
+  the frame of count 5135 on both programs (bit 15 of the channels' status at that frame's end). The port's pass of that
+  count sees it stopped and lets the cry go (`PokeVoice_Update` in `src/system/pm_voice.c`; a scratch trace of the port
+  showed the release there and the wait ending at the next pass), where the DS's still has it playing at the frame's end
+  (`pm_voice.c`'s `sSystem`, at `0x0213b2b8` in White 2, its first entry's `playing` 1 at count 5135 and 0 at 5136): the
+  DS read the channel before its ARM7 stopped it and goes on a pass later. Its battle scene then shows the port's frame
+  before (port frames 5152 to 5450, the DS's top screen within a few hundred pixels of the port's frame before and
+  10,000 to 30,000 from the port's own), and the command menu slides in a pass later on the bottom screen (5580-5590,
+  the DS's equal to the port's frame before). The sprites' idle animations and the battle's idle camera moves draw their
+  waits and their picks from the twister at the pass they start (`BtlvMcss_OnAnimationEnd` in `src/ov168/btlv_mcss.c`,
+  `BtlvEffect_UpdateIdleEffect` in `btlv_effect.c`), so from then on they start at other passes and play other moves
+  (Purrloin's tail at another point of its animation, another camera move); the twister's index is the same on both at
+  every count from the battle's start to count 5333, so it is which number each one draws, not how many are drawn, that
+  differs. catch holds that as the game's state: GFL's random state is the DS's at every count to 5333 and is left out
+  from port frame 5337 (`CRY_RANDOM`; the linear generator's too after the save, `SAVE_RANDOM`), and NNS G3D's state is
+  the DS's but where the idle camera moves differ (port frames 5300-5332, 5519-5523, 5537-5549, 5579-5586, 6483-7101,
+  7254-7310 and 8017-8056, `CRY_BATTLE`). The menus, the messages and the bottom screen are the port's from 5591, and
+  the top screen is the port's again once the battle ends (port frame 8137). catch leaves out the top screen of port
+  frames 5152-8136 (`known_top`, the bottom screen still compared) and both screens of 5580-5588 and 5590
+  (`CRY_BATTLE`). In Black 2 the DS's pass reads the channel after the stop, as the port's does, and the battle is the
+  port's frame for frame.

@@ -41,10 +41,12 @@ dozens of trainer battles.
   oracle, from the save before, and saves (`oracle.py`'s `SAVES`, held to its SHA-1); the next sequence starts from
   that save, with the seeds the DS builds there. A route is then a chain of sequences, each from the save the oracle
   made at the end of the piece before.
-- **The port's own play past the cut is held by what the CPU's time doesn't decide.** The port plays the same input
-  file from the same save; where it saves, its save is compared with melonDS's byte by byte, each difference declared
-  with its traced cause, and melonDS continues the port's save as it continues its own (`oracle.py round-trip`). A trap,
-  a crash or a watchdog in the port's run fails it.
+- **The port's own play past the cut is held by what the CPU's time doesn't decide.** The port plays the piece from the
+  same save, with the oracle's input file where its own course takes the same passes, else with presses of its own after
+  the cut (a trainer battle the port plays as its own can take another number of turns, and the oracle's presses then
+  miss what follows: White 2's Hugh, 2026-10-24); where it saves, its save is compared with melonDS's byte by byte, each
+  difference declared with its traced cause, and melonDS continues the port's save as it continues its own (`oracle.py
+  round-trip`). A trap, a crash or a watchdog in the port's run fails it.
 
 ## Alternatives
 

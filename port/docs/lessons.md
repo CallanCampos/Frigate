@@ -15,6 +15,35 @@ workflow goes in the decomp checkout instead; this file is the port's ([CLAUDE.m
   fix writes melonDS's Z interpolation again step for step, and melonDS's own comment there says it doesn't match the
   hardware exactly yet. So the code says it is derived from melonDS 1.1 (GPLv3 or later, which Frigate's GPLv3 can
   take) and names the function, and the records call it alignment with the oracle, not the DS's arithmetic.
+- **Cut a route where the programs must part, and start the next piece from the oracle's save.** Hugh's AI picks
+  another move on the port by construction, so a route through his battle can't be held past his second turn. Ending
+  that piece there and starting the next from the save melonDS makes after the battle (a `SAVES` step held to its
+  SHA-1) lets everything after it be held frame by frame again; each piece's own save starts the one after it.
+- **Presses moved to another start need their waits measured again.** The Route 19 presses, shifted by a fixed count
+  to start in the Pokémon Center, went astray in the gate, where the guard's words end later than they did after the
+  battle; B mashed over the span where they can end puts every later press back on its count.
+- **A frame half the port's frame before is a write after the beam.** Where a DS frame equals the port's frame before
+  above some line and the port's own below it (a wipe's first step, the place name's banner, the capture demo's fade),
+  or the other way round, find the line, and the write the pass makes when the beam is there: that names the cause,
+  where a frame count alone says only that the frame differs.
+- **The DS's backup chip takes time, so a save's dialog does too.** Its progress dots, its message and its close all
+  come later on the DS, and in between both programs show the same frames: declare only the spans that differ, and
+  compare the save files byte by byte instead. The play time, counted in ticks, is in both the dialog and the file,
+  and the two clocks part by seconds, enough to move a minute.
+- **A screen that is the port's frame before points at a wait, and the twister's index tells logic from luck.** White
+  2's wild battle showed the DS's whole scene a pass behind from Purrloin's appearance: the battle waits for the cry,
+  and the DS's pass read the channel just before its ARM7 stopped it, as with Kyurem's cry at the title. Dumping the
+  twister's index by count on both (the oracle's memory, the port's trace) showed the same number of draws at each
+  count of the intro, so what then differed for the rest of the battle was which animation drew which number, not the
+  generator.
+- **A claim about state is a test, not a log.** The review found "GFL's state is the DS's count for count" resting on
+  scratch traces. Dumping the random state with the sequence (`RANDOM_STATE`) made it a check at every count, and the
+  check found what the traces had only sampled: the AI's two passes at each turn, where they fall in each version, and
+  every save's townspeople drawing the same numbers 168 to 232 counts later on the DS. When a static has no name the
+  port can look up, give the host file that compiles it a global holding its address and dump through it (`**`).
+- **Declare a state's parts apart when their causes are apart.** GFL's random state differs for reasons NNS G3D's
+  doesn't (the AI's time, the save's dialog, White 2's battle after the cry), so it has its own declarations
+  (`known_random`), and NNS G3D's state is still held at those frames.
 
 ## 2026-10-24: the DS's random seeds, and what they don't fix
 

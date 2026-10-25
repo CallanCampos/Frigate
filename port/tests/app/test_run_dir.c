@@ -311,6 +311,8 @@ static void TestRun(void) {
 static uint8_t sBlock[16] = { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77,
                               0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff };
 static uint8_t *sPointer;
+// A global that points at the pointer, as a host file gives one to a static pointer (**)
+static uint8_t **const sHandle = &sPointer;
 
 static void *Resolve(const char *name) {
     if (strcmp(name, "block") == 0) {
@@ -318,6 +320,9 @@ static void *Resolve(const char *name) {
     }
     if (strcmp(name, "pointer") == 0) {
         return &sPointer;
+    }
+    if (strcmp(name, "handle") == 0) {
+        return (void *)&sHandle;
     }
     return NULL;
 }
@@ -358,16 +363,19 @@ static void TestDumps(void) {
     CHECK(DumpRejected("9block:4", "\"9block\" isn't a symbol"));
     CHECK(DumpRejected("bl-ock:4", "\"bl-ock\" isn't a symbol"));
     CHECK(DumpRejected("*:4", "\"\" isn't a symbol"));
+    CHECK(DumpRejected("***handle:4", "\"*handle\" isn't a symbol"));
     CHECK(DumpRejected("nothing:4", "no global nothing"));
     CHECK(DumpRejected("a b=block:4", "without spaces"));
     CHECK(DumpRejected("=block:4", "without spaces"));
     CHECK(DumpRejected("block:4@0", "\"0\" isn't N, A-B"));
 
     // Two bytes from the third at frame 2; where the pointer points, plus one, at frames 1 and 4 (1-4/3); the
-    // pointer's NULL at frame 3, where its dump writes nothing; the run's last frame (4) without a list
+    // pointer's NULL at frame 3, where its dump writes nothing, through the handle (**) too; the run's last frame (4)
+    // without a list
     CHECK(port_run_dir_add_dump("block+2:3@2", Resolve, error, sizeof(error)));
     CHECK(port_run_dir_add_dump("p=*pointer+0x1:2@1-4/3", Resolve, error, sizeof(error)));
     CHECK(port_run_dir_add_dump("*pointer:1@3", Resolve, error, sizeof(error)));
+    CHECK(port_run_dir_add_dump("h=**handle+3:1@2-3", Resolve, error, sizeof(error)));
     CHECK(port_run_dir_add_dump("last=block:1", Resolve, error, sizeof(error)));
     Fill(sTop, 0xffffffffu);
     Fill(sBottom, 0xffffffffu);
@@ -381,10 +389,12 @@ static void TestDumps(void) {
              "#pbwmem 1\n"
              "1 p 0x%llx 2 99aa\n"
              "2 block+2 0x%llx 3 223344\n"
+             "2 h 0x%llx 1 bb\n"
              "4 p 0x%llx 2 99aa\n"
              "4 last 0x%llx 1 00\n",
              (unsigned long long)(uintptr_t)(sBlock + 9), (unsigned long long)(uintptr_t)(sBlock + 2),
-             (unsigned long long)(uintptr_t)(sBlock + 9), (unsigned long long)(uintptr_t)sBlock);
+             (unsigned long long)(uintptr_t)(sBlock + 11), (unsigned long long)(uintptr_t)(sBlock + 9),
+             (unsigned long long)(uintptr_t)sBlock);
     text = ReadFile("memory.txt");
     CHECK(text != NULL && strcmp(text, expected) == 0);
     free(text);
