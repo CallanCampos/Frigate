@@ -1269,7 +1269,9 @@ Same code, other `sp` offsets or frame size.
 
 - A `volatile` field is loaded in source order and never reused: NitroWiFi's `SOCLi_GetWriteBufferFreeSize` loads
   `write_pos` before `read_pos`, as the original does, only with `write_pos` `volatile` (the writers move it while the
-  pipe's thread reads it); `read_pos` needs none.
+  pipe's thread reads it); `read_pos` needs none. DWC's `DWCi_SBUpdateAsync` (`dwc_match.c`) loads `profileID`,
+  `qr2NumEntry` and `qr2MatchType` for `DWCi_GetDefaultMatchFilter`'s arguments in source order, where ours sank the
+  `profileID` load after the others, only with those fields of `DWCMatchControl` `volatile`.
 - `#pragma scheduling off` and `#pragma peephole off` leave 1.1p1's Thumb code as it is, and its ARM code:
   `p_sta_sub.c`, `ctvt_talk.c` and libVCT's ARM `vct_dsp.c` compile to the same bytes under either, so neither tells an
   order the scheduler chose from one the code generator did. `#pragma optimization_level 1` does change the order: there

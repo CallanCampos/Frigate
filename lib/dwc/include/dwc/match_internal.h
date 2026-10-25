@@ -50,7 +50,8 @@ typedef struct DWCMatchControl {
     volatile u8 mode;
     volatile u8 qr2MatchType;
     u8 hostState;
-    u8 qr2NumEntry;
+    // Read in source order beside mode and qr2MatchType, as the GameSpy callbacks change it
+    volatile u8 qr2NumEntry;
     u8 qr2IsReserved;
     u8 unk_19;
     u8 unk_1a[0x2];
@@ -114,7 +115,8 @@ typedef struct DWCMatchControl {
     u64 lastCancelSynSent;
     u64 closedTime;
     u64 unk_670;
-    s32 profileID;
+    // Read in source order beside mode and qr2MatchType, as the GameSpy callbacks change it
+    volatile s32 profileID;
     s32 reqProfileID;
     s32 cbEventPid;
     char *gameName;

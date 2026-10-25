@@ -469,6 +469,7 @@ lib/dwc/src/auth/dwc_rootcert_rsa_secure_server.c:
     .data       start:0x02186de0 end:0x02186ebc
 
 lib/dwc/src/match/dwc_match.c:
+    complete
     .text       start:0x02160e50 end:0x02168858
     .rodata     start:0x02185054 end:0x0218506c
     .data       start:0x02185810 end:0x02185b18

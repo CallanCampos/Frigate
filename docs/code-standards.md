@@ -151,9 +151,10 @@ build removes, unless another file's removed code calls them (`docs/configs.md`,
 **Do:** keep a `volatile` only when the original's code needs it (removing it changes a function that matches), and
 say in one line what changes the value behind the compiler's back: an interrupt, another thread, the other CPU.
 A library's state that its API, its state machine and its network callbacks all share may be `volatile` with no second
-thread when the original reloads the field at every test, another decompilation of the library has the same
-`volatile`, and no other spelling gives the reloads: DWC's `DWCMatchControl.mode` and `qr2MatchType`
-(`match_internal.h`), which the user accepted on 2026-10-25.
+thread when the original reloads the field at every test or loads it in source order where MWCC would move the load,
+another decompilation of the library has the same `volatile`, and no other spelling gives that: DWC's
+`DWCMatchControl` `mode`, `qr2MatchType`, `qr2NumEntry` and `profileID` (`match_internal.h`), a case the user
+accepted on 2026-10-25.
 
 **Checked:** a `volatile` with no comment on its line or the line before (register macros are exempt).
 

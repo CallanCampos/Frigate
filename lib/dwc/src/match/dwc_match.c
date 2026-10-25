@@ -1438,7 +1438,7 @@ void DWCi_CloseMatching(void) {
 }
 
 static int DWCi_SBUpdateAsync(u32 pid) {
-    int flag = 1;
+    int flag;
     char text[0x200];
     u8 list[0xcc];
     int i;
@@ -1449,15 +1449,17 @@ static int DWCi_SBUpdateAsync(u32 pid) {
     int len;
 
     count = 6;
+    flag = 1;
     list[0] = 8;
     list[1] = 10;
     list[2] = 50;
     list[3] = 51;
     list[4] = 52;
     list[5] = 53;
-    list[count++] = 54;
-    list[count++] = 55;
-    list[count++] = 56;
+    list[count] = 54;
+    list[count + 1] = 55;
+    list[count + 2] = 56;
+    count += 3;
     if (DWCi_GetMatchCnt()->qr2MatchType == 0 || DWCi_GetMatchCnt()->qr2MatchType == 1) {
         for (i = 0; i < 0x9a; i++) {
             if (sKeys[i].id != 0) {
