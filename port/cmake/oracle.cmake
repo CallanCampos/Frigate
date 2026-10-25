@@ -99,12 +99,13 @@ port_test_labels(oracle_boot oracle)
 #   the oracle's at those frames, bit for bit (in the field, the camera that follows the player). It can't judge a
 #   screen with 3D nor the frames between the ones it keeps. Skipped (77) without the ROM; only for a version that has a
 #   reference
-# - oracle_<name>, with the oracle built: both programs, every frame of the port but the known differences compared,
-#   on the game's count (by their pictures in the movies), the 3D within compare.py's tolerance, with every picture
-#   the oracle shows between two of the port's frames shown by one of them, and NNS G3D's state compared on the count
-#   at the frames the sequence names. It can't time the movies: there the DS's passes take 3 to 5 frames by its CPU's
-#   load, so only the pictures and their order are held. A failure keeps the runs and the difference images and says
-#   where. Skipped (77) without the oracle or the ROM
+# - oracle_<name>, with the oracle built: the random seeds the input file gives the port, if it gives any, checked
+#   against the ones the DS builds in the oracle's run (oracle.py seeds); then both programs, every frame of the port
+#   but the known differences compared, on the game's count (by their pictures in the movies), the 3D within
+#   compare.py's tolerance, with every picture the oracle shows between two of the port's frames shown by one of them,
+#   and NNS G3D's state compared on the count at the frames the sequence names. It can't time the movies: there the DS's
+#   passes take 3 to 5 frames by its CPU's load, so only the pictures and their order are held. A failure keeps the runs
+#   and the difference images and says where. Skipped (77) without the oracle or the ROM
 # The continue sequence starts from a save that the oracle makes first, from power-on through New Game into the field
 # and its SAVE (oracle.py save first_save, checked against the SHA-1 oracle.py keeps): the start menu's CONTINUE with
 # the saved game, then the field, the player's room, to port frame 3,900. continue_starter plays the same presses from

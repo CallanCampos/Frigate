@@ -251,6 +251,46 @@ static void TestDepth(void) {
     CHECK_PX(95, 15, OUT(63, 0, 0, 31));
 }
 
+// Z-buffer depth across a polygon is linear in screen space, interpolated as melonDS 1.1's renderer does it (ds3d.c's
+// DepthLine, derived from melonDS's code): from the nearer end by the reciprocal of the length, the difference's low
+// bits dropped first. So the top line of an edge from depth 0xff5c00 down to 0xff5600 over 6 lines is at 0xff5bfe,
+// nearer than its own top vertices: worked out as 0xff5600 + (((0x600 >> 1) * 6 * ((1 << 22) / 6)) >> 22 << 1) =
+// 0xff5600 + 0x5fe. A strip one line high at 0xff5c00 drawn before it (polygons draw by their lines, the strip's first)
+// then loses that line to it, as the railing of the Aspertia City lookout does on melonDS. Exact interpolation would
+// leave the strip there, its depth equal. Along a span the difference loses its low 9 bits and the reciprocal its
+// fraction: from 0x7ffe00 to 0x800c00 over 7 pixels, the pixel 1 in is 0x7ffe00 + (((0xe00 >> 9) * 1 * ((1 << 22) /
+// 7)) >> 13) = 0x7ffe00 + 0x1ff, where exact interpolation gives 0x200
+static void TestDepthInterpolation(void) {
+    Start("depth interpolation");
+    ProjectionW4();
+    PolygonAttr(ATTR(31, 1));
+    // The strip: four vertices on line 10, at depth (0x3faf + 0x3fff) * 0x200 = 0xff5c00
+    Color(Rgb(0, 31, 0));
+    Begin(1);
+    Vtx16(SX(10), SY(10), 0x3faf);
+    Vtx16(SX(40), SY(10), 0x3faf);
+    Vtx16(SX(40), SY(10), 0x3faf);
+    Vtx16(SX(10), SY(10), 0x3faf);
+    // The quad below it, from 0xff5c00 at line 10 to 0xff5600 (z 0x3fac) at line 16
+    Color(Rgb(31, 0, 0));
+    Begin(1);
+    Vtx16(SX(10), SY(16), 0x3fac);
+    Vtx16(SX(40), SY(16), 0x3fac);
+    Vtx16(SX(40), SY(10), 0x3faf);
+    Vtx16(SX(10), SY(10), 0x3faf);
+    // A quad 7 pixels wide, from 0x7ffe00 (z 0) at x 50 to 0x800c00 (z 7) at x 57
+    Begin(1);
+    Vtx16(SX(50), SY(30), 0);
+    Vtx16(SX(57), SY(30), 7);
+    Vtx16(SX(57), SY(20), 7);
+    Vtx16(SX(50), SY(20), 0);
+    Render(0);
+    CHECK_PX(20, 10, OUT(63, 0, 0, 31));
+    CHECK_HEX(port_ds3d_depth(20, 10), 0xff5bfe);
+    CHECK_HEX(port_ds3d_depth(20, 15), 0xff5600 + (((0x600 >> 1) * 1 * ((1 << 22) / 6)) >> 22 << 1));
+    CHECK_HEX(port_ds3d_depth(51, 25), 0x7ffe00 + 0x1ff);
+}
+
 // Translucent polygons: (source * (alpha + 1) + destination * (31 - alpha)) / 32 and the larger alpha; nothing over
 // a translucent pixel of the same polygon ID; the alpha test passes alphas above the reference only
 static void TestTranslucent(void) {
@@ -1098,6 +1138,7 @@ int main(void) {
         TestCoverage();
         TestSharedEdge();
         TestDepth();
+        TestDepthInterpolation();
         TestTranslucent();
         TestTextures();
         TestModes();

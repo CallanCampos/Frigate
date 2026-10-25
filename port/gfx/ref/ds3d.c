@@ -12,7 +12,8 @@
 // bands draw it, and this file is the hot path of every 3D scene (port/docs/ARCHITECTURE.md, "Where a frame's time
 // goes").
 //
-// Facts are GBATEK's unless a comment says they are melonDS's measured behaviour or the port's choice.
+// Facts are GBATEK's unless a comment says they are melonDS's measured behaviour, its arithmetic written again from its
+// code (DepthLine, which says where from), or the port's choice.
 #include "gfx/ref/ds3d.h"
 #include "gfx/workers.h"
 #include <stdlib.h>
@@ -347,6 +348,74 @@ static int32_t LinearValue(int32_t a0, int32_t a1, int32_t x, int32_t len) {
     return a1 + (int32_t)((int64_t)(a0 - a1) * (len - x) / len);
 }
 
+// Z-buffer depth along an edge (from line to line) or along a span (from pixel to pixel): linear in screen space, and
+// interpolated as melonDS 1.1's software renderer does it, so that a depth tie between two polygons falls as it does on
+// the oracle. Derived from melonDS 1.1, licensed GPLv3 or later (Frigate is GPLv3): Interpolator::InterpolateZ's
+// Z-buffering branch in its src/GPU3D_Soft.h (Interpolator<1> along an edge, Interpolator<0> along a span), with the
+// reciprocal Interpolator::Setup makes, written again here step for step. From the nearer end, by the reciprocal of the
+// length with 22 fractional bits, rounded down, the difference's low bits dropped first: 9 of them along a span and,
+// along an edge, as many as keep it within 10 bits, put back by a shift after the product. That is melonDS's model of
+// the 3D engine's arithmetic, which its own comment there says doesn't match the hardware exactly yet: the port follows
+// the oracle here, not a measurement of the DS. So a polygon's depth along an edge can fall short of its far vertex's:
+// an edge from depth 0xff5c00 down to 0xff5600 over 6 lines starts at 0xff5bfe, where exact interpolation gives
+// 0xff5c00
+typedef struct DepthLine {
+    int32_t base;   // the nearer end's depth
+    int64_t scaled; // the difference, its low bits dropped, times the reciprocal of the length
+    int32_t len;
+    int fromStart; // the nearer end is the start, so the factor is x; else it is len - x
+    int down;      // the product's fractional bits: 22 along an edge, 13 along a span (whose difference lost 9)
+    int up;        // along an edge, the difference's bits dropped, put back
+} DepthLine;
+
+// Sets d up for depths between z0 at 0 and z1 at len, once per edge line or span: the division is here, not per pixel
+static void DepthSetup(DepthLine *d, int32_t z0, int32_t z1, int32_t len, int alongEdge) {
+    int32_t disp;
+
+    d->base = z0;
+    d->scaled = 0;
+    d->len = len;
+    d->fromStart = 1;
+    d->down = 0;
+    d->up = 0;
+    if (len <= 0 || z0 == z1) {
+        return;
+    }
+    if (z0 < z1) {
+        disp = z1 - z0;
+    } else {
+        d->base = z1;
+        disp = z0 - z1;
+        d->fromStart = 0;
+    }
+    if (alongEdge) {
+        while (disp > 0x3ff) {
+            disp >>= 1;
+            d->up++;
+        }
+        d->down = 22;
+    } else {
+        disp >>= 9;
+        d->down = 13;
+    }
+    // melonDS multiplies the difference by the factor, then by the reciprocal; the product is the same integer in any
+    // order, since it stays below 2^46 (a difference below 2^15, a factor of at most 256, a reciprocal of at most 2^22)
+    d->scaled = (int64_t)disp * ((1 << 22) / len);
+}
+
+// The depth at x, 0 to len
+static int32_t DepthAt(const DepthLine *d, int32_t x) {
+    int32_t factor = d->fromStart ? x : d->len - x;
+    return d->base + (int32_t)(((d->scaled * factor) >> d->down) << d->up);
+}
+
+// The Z-buffer depth at x of an edge from z0 to z1 over len lines (DepthLine)
+static int32_t EdgeDepth(int32_t z0, int32_t z1, int32_t x, int32_t len) {
+    DepthLine d;
+    DepthSetup(&d, z0, z1, len, 1);
+    return DepthAt(&d, x);
+}
+
 // LinearValue at x, x + 1, ... without a division at each step: a quotient and a remainder carried along
 typedef struct Lerp {
     int32_t value;
@@ -558,8 +627,8 @@ static uint32_t RunCoverage(const EdgeLine *l, int right, int32_t k) {
     return part > FULL_COVERAGE ? FULL_COVERAGE : part;
 }
 
-// The edge's values on line y. Z-buffer depth is interpolated linearly in screen space and everything else
-// perspective-correctly, W-buffer depth included
+// The edge's values on line y. Z-buffer depth is interpolated linearly in screen space, as melonDS does it
+// (DepthLine), and everything else perspective-correctly, W-buffer depth included
 static void EdgeValues(const Frame *f, const Edge *e, int32_t y, Side *s) {
     const Vertex *a = e->v0;
     const Vertex *b = e->v1;
@@ -574,7 +643,7 @@ static void EdgeValues(const Frame *f, const Edge *e, int32_t y, Side *s) {
     }
     if (e->persp.linear) {
         s->w = a->w;
-        s->depth = LinearValue(a->depth, b->depth, pos, len);
+        s->depth = f->wBuffer ? LinearValue(a->depth, b->depth, pos, len) : EdgeDepth(a->depth, b->depth, pos, len);
         for (int i = 0; i < VALUES; i++) {
             s->a[i] = LinearValue(a->a[i], b->a[i], pos, len);
         }
@@ -582,7 +651,7 @@ static void EdgeValues(const Frame *f, const Edge *e, int32_t y, Side *s) {
     }
     int32_t factor = PerspFactor(&e->persp, pos);
     s->w = PerspValue(a->w, b->w, factor, 9);
-    s->depth = f->wBuffer ? PerspValue(a->depth, b->depth, factor, 9) : LinearValue(a->depth, b->depth, pos, len);
+    s->depth = f->wBuffer ? PerspValue(a->depth, b->depth, factor, 9) : EdgeDepth(a->depth, b->depth, pos, len);
     for (int i = 0; i < VALUES; i++) {
         s->a[i] = PerspValue(a->a[i], b->a[i], factor, 9);
     }
@@ -799,7 +868,8 @@ static void DrawSpan(Frame *f, const Poly *poly, int32_t y, const Span *span, ui
     Persp persp;
     Lerp lerp[VALUES];
     Lerp depthLerp;
-    int depthLinear;
+    DepthLine depthLine;
+    int depthLerped;
     Side sl;
     Side sr;
 
@@ -811,13 +881,18 @@ static void DrawSpan(Frame *f, const Poly *poly, int32_t y, const Span *span, ui
     EdgeValues(f, span->el, y, &sl);
     EdgeValues(f, span->er, y, &sr);
     PerspSetup(&persp, len, sl.w, sr.w, 0);
-    depthLinear = persp.linear || !f->wBuffer;
+    // Z-buffer depth is linear in screen space, as melonDS interpolates it (DepthLine, set up once for the span);
+    // W-buffer depth goes as the other values do, perspective-correctly unless the span is linear
+    depthLerped = f->wBuffer && persp.linear;
+    if (!f->wBuffer) {
+        DepthSetup(&depthLine, sl.depth, sr.depth, len, 0);
+    }
     if (persp.linear) {
         for (int i = 0; i < VALUES; i++) {
             LerpStart(&lerp[i], sl.a[i], sr.a[i], len, x0 - left);
         }
     }
-    if (depthLinear) {
+    if (depthLerped) {
         LerpStart(&depthLerp, sl.depth, sr.depth, len, x0 - left);
     }
     for (int32_t x = x0; x < x1; x++) {
@@ -836,11 +911,13 @@ static void DrawSpan(Frame *f, const Poly *poly, int32_t y, const Span *span, ui
             for (int i = 0; i < VALUES; i++) {
                 values[i] = PerspValue(sl.a[i], sr.a[i], factor, 8);
             }
-            if (!depthLinear) {
+            if (f->wBuffer) {
                 depth = (uint32_t)PerspValue(sl.depth, sr.depth, factor, 8);
             }
         }
-        if (depthLinear) {
+        if (!f->wBuffer) {
+            depth = (uint32_t)DepthAt(&depthLine, x - left);
+        } else if (depthLerped) {
             depth = (uint32_t)depthLerp.value;
             LerpStep(&depthLerp);
         }

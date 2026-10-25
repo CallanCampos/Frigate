@@ -27,7 +27,7 @@ A bug fix, a refactor or anything one comment explains needs no ADR.
   that those branches don't collide when they merge: 0019 for the pointer-cast guard against a classified baseline,
   0020 for one program for both versions (D6) and 0021 for root heaps in host memory, which was written first. A
   branch whose ADR took another number before the reservation renumbers it when it merges. The next free number is
-  0022.
+  0024.
 - An accepted ADR isn't rewritten. Only its status line changes: to "superseded by NNNN" when a later ADR replaces
   it, to "accepted; amended by NNNN" when a later ADR changes part of it, or to "accepted; superseded: retired when
   ..." when what it decided is removed with no later decision in its place, with a dated note that says what went.
@@ -87,6 +87,8 @@ What becomes easier, what becomes harder, what must be watched, and what would m
 | [0018](0018-protected-main-and-sync-prs.md) | Protected main and reviewed upstream syncs | D1, §4.1, §8 | accepted |
 | [0019](0019-pointer-cast-guard-against-a-classified-baseline.md) | The pointer cast guard: the game's casts that cut an address, held to a classified baseline | D5, §4.4, §4.8, §6 | accepted |
 | [0021](0021-root-heaps-in-the-games-own-memory-from-host-memory.md) | Root heaps in the game's own memory get host memory | D5, §4.5, §4.8 | proposed |
+| [0022](0022-the-ds-random-seeds-given-by-input-files.md) | The DS's random seeds given by input files, through a wrapper of `buildSeed` | §1, §4.5, §6 | proposed |
+| [0023](0023-oracle-routes-part-where-the-ds-cpu-time-decides.md) | Oracle routes part where the DS's CPU time decides, and go on from melonDS's save | §1, §6, §7 phases 4 and 5 | proposed |
 
 ## Decisions waiting for an ADR
 

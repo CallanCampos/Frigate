@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 """Tests of the oracle's Python side (port/tools/oracle): compare.py's PNG reader and writer, frames.tsv's versions,
 screen comparisons exact and with the 3D tolerance screen by screen, comparisons by hash, frame alignment, memory
-comparisons, symbols.py's map parser and name lookup, and oracle.py's handling of the port's runs (with a stand-in
-program), of the clock, of the saves made on the oracle from saves and their cache, of the comparison sequences and
-their references, and of a missing oracle or ROM. They make up their own runs and need neither melonDS nor a ROM.
+comparisons, symbols.py's map parser and name lookup, seeds.py's reading of the random seeds the DS built from its
+memory and oracle.py's check of an input file's seeds against them, and oracle.py's handling of the port's runs (with a
+stand-in program), of the clock, of the saves made on the oracle from saves and their cache, of the comparison sequences
+and their references, and of a missing oracle or ROM. They make up their own runs and need neither melonDS nor a ROM.
 Standard library only.
 """
 
@@ -27,6 +28,7 @@ sys.path.insert(0, os.path.abspath(TOOLS))
 
 import compare  # noqa: E402
 import oracle  # noqa: E402
+import seeds  # noqa: E402
 import symbols  # noqa: E402
 
 W = compare.SCREEN_WIDTH
@@ -699,6 +701,88 @@ class MemoryTests(unittest.TestCase):
         runs = Runs(self)
         runs.memory(runs.port, ["10 sVBlankCount 0x0209da64 4 0500"])
         self.assertEqual(quiet(compare.main, ["memory", runs.oracle, runs.port]), 2)
+
+
+def rand_context(state: int) -> bytes:
+    """A MATHRandContext32 as MATH_InitRand32 sets it up, at a state: x, the multiplier and the increment"""
+    return (state.to_bytes(8, "little") + seeds.RAND_MUL.to_bytes(8, "little")
+            + seeds.RAND_ADD.to_bytes(8, "little"))
+
+
+class SeedTests(unittest.TestCase):
+    """seeds.py, which reads the seeds the DS built from the oracle's dumps, and oracle.py's check of an input file's
+    seed lines against them, on made-up dumps of the game's random state"""
+
+    def test_steps(self):
+        self.assertEqual(seeds.step(0xEA56A175A2FFFC8A), 0x1A1EABA06D111B35)  # melonDS's, Black 2 at start-up
+        self.assertEqual(seeds.unstep(seeds.step(12345)), 12345)
+        self.assertIsNone(seeds.context(bytes(24)))
+        self.assertEqual(seeds.context(rand_context(7)), 7)
+
+    def boot_memory(self, seed: int, draws: int, mti: int = seeds.MT_FILLED) -> dict:
+        # GFL_RandomInit: the seed, one draw for the twister (its first word, the draw's high half), then more draws
+        # before the frame the dumps are taken at
+        state = seeds.step(seed)
+        first = state >> 32
+        for _ in range(draws):
+            state = seeds.step(state)
+        return {(20, "seed_gfl"): (0x021FFC18, rand_context(state)),
+                (20, "seed_mt"): (0x021FED28, first.to_bytes(4, "little")),
+                (20, "seed_mti"): (0x021FF6E8, mti.to_bytes(4, "little"))}
+
+    def test_boot_seed(self):
+        memory = {(19, "seed_gfl"): (0, bytes(24))}  # a frame before GFL's work has a context
+        memory.update(self.boot_memory(0xEA56A175A2FFFC8A, 0))
+        self.assertEqual(seeds.boot_seed(memory), (0xEA56A175A2FFFC8A, 20))
+        self.assertEqual(seeds.boot_seed(self.boot_memory(0x0123456789ABCDEF, 500)), (0x0123456789ABCDEF, 20))
+        # The twister drawn from already: its first word is gone, so no frame tells the seed
+        self.assertIsNone(seeds.boot_seed(self.boot_memory(5, 0, mti=3)))
+        self.assertIsNone(seeds.boot_seed({}))
+        memory = self.boot_memory(5, 0)
+        memory[(20, "seed_mt")] = (0, (0xFFFFFFFF).to_bytes(4, "little"))
+        with self.assertRaises(ValueError):
+            seeds.boot_seed(memory)
+
+    def test_battle_seeds(self):
+        memory = {}
+        frame = 100
+
+        def at(data: bytes):
+            nonlocal frame
+            memory[(frame, "seed_battle")] = (0x021DD844, bytes(8) + data)
+            frame += 1
+
+        at(bytes(24))  # overlay 167 loaded and cleared
+        at(rand_context(0x636F996EF8FDEEAC))  # Hugh's battle's start
+        state = 0x636F996EF8FDEEAC
+        for _ in range(37):  # a turn's rolls
+            state = seeds.step(state)
+        at(rand_context(state))
+        at(rand_context(0x636F996EF8FDEEAC))  # the server's reset to the seed
+        at(rand_context(seeds.step(0x636F996EF8FDEEAC)))
+        at(b"\x12" * 24)  # another overlay's memory
+        at(rand_context(0x24BB0C0C34923FE4))  # the next battle
+        at(rand_context(0x1111111111111111))  # a third without the overlay loaded again: no step leads there
+        self.assertEqual(seeds.battle_seeds(memory), [(0x636F996EF8FDEEAC, 101), (0x24BB0C0C34923FE4, 106),
+                                                      (0x1111111111111111, 107)])
+        memory.update(self.boot_memory(0xEA56A175A2FFFC8A, 0))
+        self.assertEqual(seeds.ds_seeds(memory)[:2], [(0xEA56A175A2FFFC8A, 20, "start-up"),
+                                                      (0x636F996EF8FDEEAC, 101, "battle")])
+
+    def test_input_file_seeds(self):
+        built = [(0xEA56A175A2FFFC8A, 20, "start-up"), (0x636F996EF8FDEEAC, 8778, "battle")]
+        with tempfile.TemporaryDirectory() as d:
+            path = os.path.join(d, "x.pbwinput")
+            with open(path, "w") as f:
+                f.write("pbwinput 1\nversion b2_us\nseed 0xea56a175a2fffc8a  # GFL's\nseed 0x636F996EF8FDEEAC\n"
+                        "1 A\n")
+            self.assertEqual(oracle.input_seeds(path), [0xEA56A175A2FFFC8A, 0x636F996EF8FDEEAC])
+        self.assertIsNone(oracle.check_seeds([0xEA56A175A2FFFC8A, 0x636F996EF8FDEEAC], built))
+        # A file without seeds lets the port build its own; one with some must have every seed the DS built, in order
+        self.assertIsNone(oracle.check_seeds([], built))
+        self.assertIn("oracle.py seeds", oracle.check_seeds([0xEA56A175A2FFFC8A], built))
+        self.assertIsNotNone(oracle.check_seeds([0x636F996EF8FDEEAC, 0xEA56A175A2FFFC8A], built))
+        self.assertIsNotNone(oracle.check_seeds([1], []))
 
 
 class SymbolTests(unittest.TestCase):
