@@ -34,6 +34,9 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
 
 ## 2026-10-25: PR 33 reconciled with reviewed main; durable sync proposals and safe conflict notices
 
+This entry is a preparation snapshot. Final validation and merge results are recorded in
+[PR 33 and its checks](https://github.com/CallanCampos/Frigate/pull/33); pending labels below refer to this snapshot.
+
 - **Upstream:** unchanged from reviewed `main` at `ae7f39f4f9`; this task imports no additional upstream sync.
 - **Port:** `PORT_SHA`, on `codex/review-conflict-syncs`, PR 33's `ddc4ff6048` merged with reviewed `main` at
   `ae7f39f4f9`. Both histories' STATUS entries are retained, with main's newer entries above PR 33's historical task
