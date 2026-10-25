@@ -52,3 +52,6 @@
 ]
 # The window readers that only wipe_sub.c's dead-stripped plane swap called
 "src/system/wipe_wnd.c" = ["WipeWnd_GetInsidePlane", "WipeWnd_GetOutsidePlane"]
+# The list of the key names GSI_UNICODE builds allocate, which only the two functions that keep it use; GameSpy's SDK
+# (UniSpySDK's copy) has them, and qr2.c's shutdown doesn't call qr2_internal_key_list_free
+"lib/dwc/src/qr2/qr2regkeys.c" = ["qr2_internal_key_list_append", "qr2_internal_key_list_free"]

@@ -191,7 +191,7 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 | `NATify.c` | `0x0217ee90`–`0x0217f490` | 7 | complete | descriptive |
 | `natneg.c` | `0x0217f490`–`0x02180774` | 29 | complete | descriptive |
 | `qr2.c` | `0x02180774`–`0x02181fb0` | 35 | complete | descriptive |
-| `qr2regkeys.c` | `0x02181fb0`–`0x02182040` | 2 | partial | descriptive |
+| `qr2regkeys.c` | `0x02181fb0`–`0x02182040` | 2 | complete | descriptive |
 | `sb_crypt.c` | `0x02182040`–`0x02182220` | 5 | complete | descriptive |
 | `sb_queryengine.c` | `0x02182220`–`0x021828c4` | 20 | complete | descriptive |
 | `sb_server.c` | `0x021828c4`–`0x02182f64` | 36 | complete | descriptive |

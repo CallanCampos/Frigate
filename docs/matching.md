@@ -4048,6 +4048,12 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   the list after everything else, so their position among the tables doesn't matter but their order among
   themselves can swap strings of equal size: `mbp.c`'s state names come out in the original's order only with
   `sCWork` declared after `childInfo`.
+- A zero-initialized static that only dead-stripped code uses still takes its place in the heapsort, and when it is
+  the file's only `.bss` object its section is reached only from that code, so `config/deadstrip.toml`'s strip drops
+  it with the code. `qr2regkeys.c`'s 7-byte key names (`score_`, `team_t`, `skill_`, `region`) come out in the ROM's
+  order only with one more object of up to 4 bytes after them: GameSpy's `static QR2KeyList qr2_internal_key_list =
+  { NULL }` (4 bytes, in `.bss`) with its two functions, listed as dead, gives every byte of the file's `.data` with
+  no `.bss` left, where a 4-byte initialized static adds its word to the shared `.data`.
 - Initialized `.data` statics join the same heapsort as the `.rodata` local initializers, though they land in
   another section, so their declaration order can reorder the locals' tables. `wifilogin_disp.c`'s sixteen 32-byte
   `BGSetup` locals came out in the original's order only with the 48-byte `BGSysVRAMConfig` declared before the

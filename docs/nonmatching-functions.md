@@ -39,18 +39,6 @@ in both versions.
 
 ## Matching, but not linkable as is
 
-- `lib/dwc/src/qr2/qr2regkeys.c` (overlay 11) matches both its functions in both versions, but its `.data` doesn't: MWCC
-  lays out the key names with a heap sort by size of the reverse of their definitions, and among the strings of
-  7 bytes the ROM's order (`score_`, `team_t`, `skill_`, `region`) is one that the sort gives only with one more
-  initialized object of up to 4 bytes defined after the names, which the ROM's `.data` and `.bss` don't have room for:
-  most likely the later SDK's `qr2_internal_key_list`, whose code the linker stripped. The file stays incomplete.
-  A 4-byte `static int` defined after the names gives the ROM's order of all 33 strings, but adds its word to the
-  shared section (1020 bytes against the ROM's 1016), and nothing that is listed in the sort emits no bytes: a
-  `static const` scalar, read or not, is folded and not listed, and an unread static or static table is kept under
-  `-ipa function` and dropped and not listed under `-ipa file` (which changes nothing else here). The ROM has no room
-  for the word: overlay 11's `.rodata` ends at 0x021851c0 with qr2.c's 6 bytes and their 2 bytes of padding, and its
-  `.bss` runs from qr2.c's straight into sb_server.c's.
-
 - `lib/dwc/src/auth/dwc_profanity.c` (overlay 11), DWC's profanity check, matches its 6 functions in both versions,
   and with `-ipa file` its `.data` up to the strings of `DWCi_CheckProfanityAsync`, but the ROM has 4 zero bytes between
   `"/ac"` and `"/pr"` that nothing references: most likely a literal `""` of code that the linker stripped, which MWCC
