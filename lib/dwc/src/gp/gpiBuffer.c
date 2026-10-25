@@ -256,19 +256,19 @@ GPResult gpiSendFromBuffer(GPConnection *connection, SOCKET sock, GPIBuffer *out
 
 GPResult gpiSendBufferToPeer(GPConnection *connection, unsigned int ip, unsigned short port, GPIBuffer *outputBuffer,
                              GPIBool *connClosed, GPIBool clipSentData) {
-    int len;
+    GPIConnection *iconnection = *connection;
     int remaining;
     char *buffer;
     int pos;
+    int len;
     int total;
     gsi_u32 freeSpace;
     GSUdpPeerState state;
-    GPIConnection *iconnection = *connection;
 
     buffer = outputBuffer->buffer;
     len = outputBuffer->len;
-    pos = outputBuffer->pos;
     total = 0;
+    pos = outputBuffer->pos;
     remaining = len - pos;
     if (remaining == 0) {
         return 0;

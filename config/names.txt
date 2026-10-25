@@ -7949,7 +7949,10 @@ overlays/ov011 0x0219071c AC
 overlays/ov011 0x02190774 gStaticCore
 overlays/ov011 0x021907a0 gGSIDebugInstance
 overlays/ov011 0x02190804 gTimers
-overlays/ov011 0x02190894 sSocketState
+overlays/ov011 0x02190894 sAliases
+overlays/ov011 0x0219089c sHostEnt
+overlays/ov011 0x021908ac sIps
+overlays/ov011 0x021908c0 sIpPtrs
 overlays/ov011 0x02190904 tb
 overlays/ov011 0x02190928 aUdpObject
 overlays/ov011 0x02190964 gPos

@@ -39,6 +39,7 @@ lib/dpw/src/dpw_battle_tower.c:
     .bss        start:0x021b2c7c end:0x021b2fa8
 
 lib/dwc/src/enc/dwc_encsession.c:
+    complete
     .text       start:0x021a897c end:0x021a9130
     .rodata     start:0x021aceb8 end:0x021acee0
     .data       start:0x021ae53c end:0x021ae6c4
@@ -155,8 +156,9 @@ lib/dwc/src/nhttp/nhttp_thread.c:
     .data       start:0x021ad1b8 end:0x021ad2d0
 
 lib/dwc/src/nhttp/d_nhttp_common.c:
+    complete
     .text       start:0x021a0a78 end:0x021a0e5c
-    .bss        start:0x021ae704 end:0x021b2880
+    .bss        start:0x021ae704 end:0x021b2890
 
 lib/dwc/src/ghttp/ghttpEncryption.c:
     complete
