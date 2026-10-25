@@ -1,6 +1,6 @@
 #include "input.h"
-#include "dwc_util_display.h"
 #include "dwc_util_heap.h"
+#include "foundation.h"
 #include "nitro/fx.h"
 #include "nitro/gx.h"
 #include "nitro/hw.h"

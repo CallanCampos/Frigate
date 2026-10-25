@@ -1,9 +1,9 @@
 #include "scrollbar.h"
 #include "cell.h"
-#include "dwc_util_cell.h"
-#include "dwc_util_display.h"
+#include "cellinfo.h"
 #include "dwc_util_heap.h"
 #include "dwc_util_shared.h"
+#include "foundation.h"
 #include "input.h"
 #include "nitro/fx.h"
 #include "sound.h"
@@ -268,7 +268,7 @@ static int DWCUtilScrollbar_GetHeldArrow(int part) {
     return SCROLLBAR_PART_NONE;
 }
 
-// The rectangle of a part, as in dwc_util_display.c
+// The rectangle of a part, as in foundation.c
 static void calcRect(int part, u16 *rect) {
     u16 top;
 

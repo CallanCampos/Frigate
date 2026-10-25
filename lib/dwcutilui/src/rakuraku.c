@@ -9,9 +9,6 @@ static void cbConfig(const ATERMApConfigState *status);
 static void *memAlloc(u32 size);
 static void memFree(void *ptr);
 
-// Defined in this file, which doesn't read it, since dwc_util_main_menu.c reaches its own .bss from the address of
-// its first static
-DWCUtilMsg *gDWCUtilMsg;
 static ATERMApConfigState *sStatus;
 
 void DWCi_RAKUlInit(void) {

@@ -1,5 +1,5 @@
 #include "icon.h"
-#include "dwc_util_cell.h"
+#include "cellinfo.h"
 #include "dwc_util_heap.h"
 #include "nitro/gx.h"
 #include "nitro/hw.h"

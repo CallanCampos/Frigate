@@ -3,7 +3,7 @@
 #include "dwc_util_shared.h"
 #include "message.h"
 #include "nitro/gx.h"
-#include "rakuraku.h"
+#include "sceneinit.h"
 
 // The three functions and their data occupy one original object, the DWC utility library's comment.o
 // (libdwcutil.TWL.HYB.a), as aletheia's map of Black 1's SDK code to that library's objects (layout/symbols_sdk.txt)

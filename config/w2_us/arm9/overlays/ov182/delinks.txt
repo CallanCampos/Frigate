@@ -78,14 +78,14 @@ lib/dwcutilui/src/cell.c:
     .text       start:0x021bb4c0 end:0x021bb91c
     .bss        start:0x021c41d0 end:0x021c41d4
 
-lib/dwcutilui/src/dwc_util_cell.c:
+lib/dwcutilui/src/cellinfo.c:
     complete
-    .text       start:0x021bb91c end:0x021bbaac
+    .text       start:0x021bb91c end:0x021bb9ec
     .bss        start:0x021c41d4 end:0x021c41dc
 
-lib/dwcutilui/src/dwc_util_display.c:
+lib/dwcutilui/src/foundation.c:
     complete
-    .text       start:0x021bc1e8 end:0x021bc4a8
+    .text       start:0x021bc1e8 end:0x021bc21c
 
 lib/dwcutilui/src/dwc_util_heap.c:
     complete
@@ -207,18 +207,19 @@ lib/dwcutilui/src/move.c:
 lib/dwcutilui/src/rakuraku.c:
     complete
     .text       start:0x021ae418 end:0x021ae534
-    .bss        start:0x021c40f4 end:0x021c40fc
+    .bss        start:0x021c40f4 end:0x021c40f8
 
-lib/dwcutilui/src/dwc_util_main_menu.c:
-    .text       start:0x021ae534 end:0x021aeb3c
+lib/dwcutilui/src/scenemenu.c:
+    complete
+    .text       start:0x021ae788 end:0x021aeb3c
     .rodata     start:0x021bffd4 end:0x021c0010
-    .data       start:0x021c0c2c end:0x021c0e14
+    .data       start:0x021c0dd0 end:0x021c0e14
     .bss        start:0x021c40fc end:0x021c4104
 
-lib/dwcutilui/src/dwc_util_info_menu.c:
+lib/dwcutilui/src/sceneopterase.c:
     complete
-    .text       start:0x021aeb3c end:0x021af29c
-    .data       start:0x021c0e14 end:0x021c0e98
+    .text       start:0x021aeb3c end:0x021aedf0
+    .data       start:0x021c0e14 end:0x021c0e28
     .bss        start:0x021c4104 end:0x021c4108
 
 lib/dwcutilui/src/sceneoptmenu.c:
@@ -228,9 +229,9 @@ lib/dwcutilui/src/sceneoptmenu.c:
     .data       start:0x021c0e98 end:0x021c0ec8
     .bss        start:0x021c4108 end:0x021c4114
 
-lib/dwcutilui/src/dwc_util_top_menu.c:
+lib/dwcutilui/src/sceneoptmovcomm.c:
     complete
-    .text       start:0x021af754 end:0x021afbe4
+    .text       start:0x021af754 end:0x021af8fc
     .data       start:0x021c0ec8 end:0x021c0edc
     .bss        start:0x021c4114 end:0x021c4118
 
@@ -444,3 +445,39 @@ lib/dwcutilui/src/window.c:
     .text       start:0x021b8d30 end:0x021b9428
     .rodata     start:0x021c04fc end:0x021c05c0
     .bss        start:0x021c41b8 end:0x021c41bc
+
+lib/dwcutilui/src/deque.c:
+    complete
+    .text       start:0x021bb9ec end:0x021bbaac
+
+lib/dwcutilui/src/graphics.c:
+    complete
+    .text       start:0x021bc21c end:0x021bc4a8
+
+lib/dwcutilui/src/sceneend.c:
+    complete
+    .text       start:0x021ae534 end:0x021ae5b4
+
+lib/dwcutilui/src/sceneinit.c:
+    complete
+    .text       start:0x021ae5b4 end:0x021ae788
+    .data       start:0x021c0c2c end:0x021c0dd0
+    .bss        start:0x021c40f8 end:0x021c40fc
+
+lib/dwcutilui/src/sceneopterase1.c:
+    complete
+    .text       start:0x021aedf0 end:0x021aef74
+    .data       start:0x021c0e28 end:0x021c0e3c
+
+lib/dwcutilui/src/sceneoptinfo.c:
+    complete
+    .text       start:0x021aef74 end:0x021af29c
+    .data       start:0x021c0e3c end:0x021c0e98
+
+lib/dwcutilui/src/sceneoptmovcomplete.c:
+    complete
+    .text       start:0x021af8fc end:0x021afa68
+
+lib/dwcutilui/src/sceneoptmovconfirm.c:
+    complete
+    .text       start:0x021afa68 end:0x021afbe4

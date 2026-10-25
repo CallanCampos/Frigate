@@ -5,7 +5,7 @@
 
 // The connection utility's input: the keys and the touch panel, sampled once a frame, with a held key or touch
 // repeating after 40 frames and then every 7. While the lid is closed, every test reports nothing. A rectangle is
-// left, top, right and bottom, as in dwc_util_display.c.
+// left, top, right and bottom, as in foundation.c.
 // The file is the DWC utility library's input.o (libdwcutil.TWL.HYB.a), as aletheia's map of Black 1's SDK code to that
 // library's objects (layout/symbols_sdk.txt) shows it.
 void DWCi_IPTlInit(void);

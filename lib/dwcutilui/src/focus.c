@@ -1,6 +1,6 @@
 #include "focus.h"
 #include "cell.h"
-#include "dwc_util_cell.h"
+#include "cellinfo.h"
 #include "dwc_util_heap.h"
 
 typedef struct DWCUtilButtonSprites {

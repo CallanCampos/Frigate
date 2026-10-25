@@ -6,7 +6,7 @@
 #include "font.h"
 #include "message.h"
 #include "nitro/os.h"
-#include "rakuraku.h"
+#include "sceneinit.h"
 #include "step.h"
 #include <string.h>
 

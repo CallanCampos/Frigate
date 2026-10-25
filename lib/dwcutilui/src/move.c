@@ -7,7 +7,7 @@
 #include "nitro/mb.h"
 #include "nitro/mi.h"
 #include "nitro/os.h"
-#include "rakuraku.h"
+#include "sceneinit.h"
 #include "task.h"
 
 typedef struct DWCUtilMove {

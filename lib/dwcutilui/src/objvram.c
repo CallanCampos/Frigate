@@ -1,5 +1,5 @@
 #include "objvram.h"
-#include "dwc_util_cell.h"
+#include "deque.h"
 #include "dwc_util_heap.h"
 #include "dwc_util_list.h"
 #include "nitro/os.h"

@@ -9,9 +9,6 @@
 // The file is the DWC utility library's rakuraku.o (libdwcutil.TWL.HYB.a), as aletheia's map of Black 1's SDK code to
 // that library's objects (layout/symbols_sdk.txt) shows it.
 
-// The message file of the utility's language, which the first screen opens (dwc_util_main_menu.c)
-extern DWCUtilMsg *gDWCUtilMsg;
-
 void DWCi_RAKUlInit(void);
 void DWCi_RAKUlEnd(void);
 // 0 while the test works, 1 and 2 at its two steps, 3 once it connected with a WEP key or none, 4 when it failed, 5

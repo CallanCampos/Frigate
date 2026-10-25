@@ -4,7 +4,7 @@
 #include "types.h"
 
 // The connection utility's confirmation before the move of the settings to another console: yes goes on to the
-// move's instructions (dwc_util_top_menu.h), no back to the options.
+// move's instructions (sceneoptmovconfirm.h), no back to the options.
 // The file is the DWC utility library's sceneoptmovconfirm1.o (libdwcutil.TWL.HYB.a), as aletheia's map of Black 1's
 // SDK code to that library's objects (layout/symbols_sdk.txt) shows it.
 void DWCUtilPromptYesNo_Init(void);

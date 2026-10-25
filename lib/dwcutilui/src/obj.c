@@ -1,5 +1,5 @@
 #include "obj.h"
-#include "dwc_util_cell.h"
+#include "deque.h"
 #include "dwc_util_heap.h"
 #include "dwc_util_shared.h"
 #include "nitro/mi.h"
