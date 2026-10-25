@@ -290,8 +290,8 @@ file name from a copy named after its path, `build/<version>/link/lib/dwcutilui/
 `dsd json delinks` gives each file's `link_object` beside its `object_to_link`, and `configure.py` makes the copy when
 they differ. The name of an object doesn't reach the ROM, and the sources, the configs and the objects that objdiff and
 the tools read keep their paths. `dsd lcf` still refuses two files of one name in one module, a file listed in two
-modules, and a file named like another's copy (`src_gfl_heap.c`). DSD_VERSION's release predates this and refuses any
-shared name, so until a release has it, build with `--dsd` and a dsd built from the fork's `dup-basenames` branch.
+modules, and a file named like another's copy (`src_gfl_heap.c`). dsd has done this since v0.12.1-dsi.8; earlier
+releases refuse any shared name.
 
 ## Shifting
 
