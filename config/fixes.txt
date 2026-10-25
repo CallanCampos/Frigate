@@ -880,6 +880,9 @@ overlays/ov011 0x0215a5fc add_reloc load,main,0x020050f0
 overlays/ov011 0x0215c594 section_end lib/nitrowifi/src/wcm/wcm_system.c:.text
 overlays/ov011 0x0215dda8 section_end lib/dwc/src/base/dwc_nonport.c:.text
 overlays/ov011 0x02160e10 section_start lib/dwc/src/match/dwc_match.c:.text
+overlays/ov011 0x02161808 remove_reloc
+overlays/ov011 0x02161816 remove_reloc
+overlays/ov011 0x02161a9a remove_reloc
 overlays/ov011 0x0216c7ea reloc_module overlay(189)
 overlays/ov011 0x0216eba2 reloc_module overlay(189)
 overlays/ov011 0x0216ebe8 reloc_module overlay(189)
