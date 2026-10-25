@@ -1,5 +1,8 @@
-#include "dwc/gsLargeInt.h"
+#include <string.h>
+// Before dwc/ext.h: MWCC clears the local large integers and work buffers in place, as the ROM does, only when
+// <string.h> declares memset first
 #include "dwc/ext.h"
+#include "dwc/gsLargeInt.h"
 #include "nitro/std.h"
 
 // GameSpy's large integers (gsLargeInt.c). The ROM names neither the file nor its functions: the file and most
@@ -245,16 +248,18 @@ static gsi_bool gsLargeIntDiv(const gsLargeInt_t *a, const gsLargeInt_t *b, gsLa
 // Divides a number by another one, giving the quotient and the remainder (either may be NULL)
 static gsi_bool gsiLargeIntDiv(const gsi_u32 *a, gsi_u32 aLength, const gsLargeInt_t *b, gsLargeInt_t *quotient,
                                gsLargeInt_t *remainder) {
+    int bit = 31;
+    gsi_u32 top;
+    int offset;
+    int length;
+    gsLargeInt_t quotientWork;
+    gsi_u32 work[0x80];
     const gsi_u32 *bData = b->mData;
     gsi_u32 bLength = b->mLength;
     int done = 0;
-    int bit = 31;
-    int offset;
-    gsi_u32 length;
-    int top;
 
     gsiLargeIntTimerStart(GSLintTimerDiv);
-    gsi_u32 work[0x80] = { 0 };
+    memset(work, 0, sizeof(work));
     if (aLength > 0x40 && quotient != NULL) {
         return gsi_false;
     }
@@ -265,7 +270,7 @@ static gsi_bool gsiLargeIntDiv(const gsi_u32 *a, gsi_u32 aLength, const gsLargeI
         bLength--;
     }
     memcpy(work, a, aLength * 4);
-    gsLargeInt_t quotientWork = { 0 };
+    memset(&quotientWork, 0, sizeof(quotientWork));
     if (aLength == 0 || bLength == 0) {
         if (quotient != NULL) {
             quotient->mData[0] = 0;
@@ -276,7 +281,10 @@ static gsi_bool gsiLargeIntDiv(const gsi_u32 *a, gsi_u32 aLength, const gsLargeI
             remainder->mLength = 0;
         }
         gsiLargeIntTimerStop(GSLintTimerDiv);
-        return bLength != 0;
+        if (bLength == 0) {
+            return gsi_false;
+        }
+        return gsi_true;
     }
     if (gsiLargeIntCompare(work, aLength, bData, bLength) == -1) {
         if (quotient != NULL) {
@@ -288,18 +296,24 @@ static gsi_bool gsiLargeIntDiv(const gsi_u32 *a, gsi_u32 aLength, const gsLargeI
         gsiLargeIntTimerStop(GSLintTimerDiv);
         return gsi_true;
     }
-    while ((1 << bit & bData[bLength - 1]) == 0 && bit >= 0) {
-        bit--;
+    {
+        gsi_u32 word;
+        gsi_u32 last = bLength - 1;
+
+        word = bData[last];
+        while ((word & (1 << bit)) == 0 && bit >= 0) {
+            bit--;
+        }
+        if (bit == -1) {
+            gsiLargeIntTimerStop(GSLintTimerDiv);
+            return gsi_false;
+        }
+        top = bit + last * 32;
     }
-    if (bit == -1) {
-        gsiLargeIntTimerStop(GSLintTimerDiv);
-        return gsi_false;
-    }
-    top = (bLength - 1) * 32 + bit;
     offset = aLength - bLength;
     length = bLength;
     while (done == 0) {
-        int compare = gsiLargeIntCompare(work + offset, length, bData, bLength);
+        int compare = gsiLargeIntCompare(&work[offset], length, bData, bLength);
 
         if (compare == -1) {
             if (offset > 0) {
@@ -309,10 +323,8 @@ static gsi_bool gsiLargeIntDiv(const gsi_u32 *a, gsi_u32 aLength, const gsLargeI
                 done = 1;
             }
         } else if (compare == 0) {
-            gsi_u32 *at = work + offset;
-
-            memset(at, 0, length * 4);
-            quotientWork.mData[offset]++;
+            memset(&work[offset], 0, length * 4);
+            quotientWork.mData[offset] += 1;
             if (quotientWork.mLength < offset + length) {
                 quotientWork.mLength = offset + length;
             }
@@ -324,7 +336,7 @@ static gsi_bool gsiLargeIntDiv(const gsi_u32 *a, gsi_u32 aLength, const gsLargeI
         } else {
             gsi_u32 digit = 0;
 
-            if (!gsiLargeIntSubDivide(work + offset, length, bData, bLength, top, &digit)) {
+            if (!gsiLargeIntSubDivide(&work[offset], length, bData, bLength, top, &digit)) {
                 gsiLargeIntTimerStop(GSLintTimerDiv);
                 return gsi_false;
             }
@@ -335,13 +347,13 @@ static gsi_bool gsiLargeIntDiv(const gsi_u32 *a, gsi_u32 aLength, const gsLargeI
             while (work[offset + length - 1] == 0 && length > 1) {
                 length--;
             }
-            while (work[length + offset - 1] == 0 && offset > 1) {
+            while (work[offset + length - 1] == 0 && offset > 1) {
                 offset--;
             }
         }
     }
     if (offset >= 0) {
-        memcpy(remainder->mData, work + offset, length * 4);
+        memcpy(remainder->mData, &work[offset], length * 4);
         remainder->mLength = length;
     } else {
         remainder->mData[0] = 0;
@@ -438,24 +450,27 @@ static gsi_bool gsLargeIntSquareMod(const gsLargeInt_t *value, const gsLargeInt_
 // Raises a number to a power modulo an odd modulus, working with Montgomery products
 gsi_bool gsLargeIntPowerMod(const gsLargeInt_t *base, const gsLargeInt_t *exponent, const gsLargeInt_t *modulus,
                             gsLargeInt_t *result) {
-    gsi_u32 inverse;
-    int bits;
     int bit;
-    int top;
-    gsi_bool ok;
-
-    gsiLargeIntTimerStart(GSLintTimerPowerMod);
-    gsLargeInt_t radix = { 0 };
-    gsLargeInt_t radixMod = { 0 };
-    gsLargeInt_t radixSquare = { 0 };
-    gsLargeInt_t one = { 0 };
-    gsLargeInt_t baseMont = { 0 };
+    gsi_u32 inverse;
+    gsi_u32 top;
+    gsLargeInt_t radix;
+    gsLargeInt_t radixMod;
+    gsLargeInt_t radixSquare;
+    gsLargeInt_t one;
+    gsLargeInt_t baseMont;
     gsLargeInt_t b;
     gsLargeInt_t e;
     gsLargeInt_t m;
-    memcpy(&b, base, sizeof(gsLargeInt_t));
-    memcpy(&e, exponent, sizeof(gsLargeInt_t));
-    memcpy(&m, modulus, sizeof(gsLargeInt_t));
+
+    gsiLargeIntTimerStart(GSLintTimerPowerMod);
+    memset(&radix, 0, sizeof(radix));
+    memset(&radixMod, 0, sizeof(radixMod));
+    memset(&radixSquare, 0, sizeof(radixSquare));
+    memset(&one, 0, sizeof(one));
+    memset(&baseMont, 0, sizeof(baseMont));
+    memcpy(&b, base, sizeof(b));
+    memcpy(&e, exponent, sizeof(e));
+    memcpy(&m, modulus, sizeof(m));
     gsiLargeIntStripLeadingZeroes(&b);
     gsiLargeIntStripLeadingZeroes(&e);
     gsiLargeIntStripLeadingZeroes(&m);
@@ -491,40 +506,37 @@ gsi_bool gsLargeIntPowerMod(const gsLargeInt_t *base, const gsLargeInt_t *expone
         gsiLargeIntTimerStop(GSLintTimerPowerMod);
         return gsi_true;
     }
-    e.mLength--;
-    bits = 32;
-    if ((e.mData[e.mLength] & 0x80000000) == 0) {
-        do {
-            bits--;
-        } while (((1 << (bits - 1)) & e.mData[e.mLength]) == 0);
+    top = 32;
+    while (((1 << (top - 1)) & e.mData[e.mLength - 1]) == 0) {
+        top--;
     }
-    top = bits + e.mLength * 32;
+    top += (e.mLength - 1) * 32;
+    memset(&radix, 0, sizeof(radix));
     radix.mLength = m.mLength + 1;
     if (radix.mLength > 0x40) {
         return gsi_false;
     }
     radix.mData[radix.mLength - 1] = 1;
     gsiLargeIntInverseMod(&m, &inverse);
-    ok = gsi_false;
     if (!gsLargeIntDiv(&radix, &m, NULL, &radixMod)) {
         gsiLargeIntTimerStop(GSLintTimerPowerMod);
-        return ok;
+        return gsi_false;
     }
     if (!gsLargeIntSquareMod(&radixMod, &m, &radixSquare)) {
         gsiLargeIntTimerStop(GSLintTimerPowerMod);
-        return ok;
+        return gsi_false;
     }
     if (!gsiLargeIntMultM(&b, &radixSquare, &m, inverse, &baseMont)) {
         gsiLargeIntTimerStop(GSLintTimerPowerMod);
-        return ok;
+        return gsi_false;
     }
     memcpy(result, &radixMod, sizeof(gsLargeInt_t));
     for (bit = top - 1; bit >= 0; bit--) {
         gsi_u32 mask;
 
         gsiLargeIntMultM(result, result, &m, inverse, result);
-        mask = 1 << (bit & 0x1f);
-        if (mask == (e.mData[bit >> 5] & mask)) {
+        mask = 1 << (bit % GS_LARGEINT_DIGIT_SIZE_BITS);
+        if (mask == (e.mData[bit / GS_LARGEINT_DIGIT_SIZE_BITS] & mask)) {
             gsiLargeIntMultM(result, &baseMont, &m, inverse, result);
         }
     }
@@ -539,15 +551,15 @@ gsi_bool gsLargeIntPowerMod(const gsLargeInt_t *base, const gsLargeInt_t *expone
 static gsi_bool gsiLargeIntMultM(gsLargeInt_t *a, gsLargeInt_t *b, const gsLargeInt_t *modulus, gsi_u32 inverse,
                                  gsLargeInt_t *result) {
     gsi_u32 length = 0;
-    int count = modulus->mLength;
-    gsi_u32 work[0x80] = { 0 };
+    gsi_u32 *workLast;
+    const gsi_u32 *modulusLast;
     gsi_u32 *p;
     gsi_u32 *q;
     const gsi_u32 *m;
-    gsi_u32 *workLast;
-    const gsi_u32 *modulusLast;
     gsi_u64 carry;
     gsi_u32 factor;
+    int count = modulus->mLength;
+    gsi_u32 work[0x80] = { 0 };
 
     if (!gsiLargeIntMult(a->mData, a->mLength, b->mData, b->mLength, work, &length, 0x80)) {
         return gsi_false;
@@ -568,20 +580,17 @@ static gsi_bool gsiLargeIntMultM(gsLargeInt_t *a, gsLargeInt_t *b, const gsLarge
         if (m <= modulusLast) {
             for (; m <= modulusLast; m++) {
                 product = (gsi_u64)factor * *m;
-                product = carry + ((gsi_u64)*q + product);
-                *q = (gsi_u32)product;
-                carry = product >> 32;
+                carry = (gsi_u32)(carry >> 32) + ((gsi_u64)*q + product);
+                *q = (gsi_u32)carry;
                 q++;
             }
         }
-        for (; carry != 0 && q <= work + length - 1; q++) {
-            gsi_u64 sum = (gsi_u64)*q + carry;
-
-            *q = (gsi_u32)sum;
-            carry = sum >> 32;
+        for (; (carry >> 32) != 0 && q <= &work[length - 1]; q++) {
+            carry = (gsi_u64)*q + (gsi_u32)(carry >> 32);
+            *q = (gsi_u32)carry;
         }
-        if (carry != 0) {
-            *q = carry;
+        if ((carry >> 32) != 0) {
+            *q = (gsi_u32)(carry >> 32);
             length++;
         }
     }

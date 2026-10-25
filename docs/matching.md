@@ -342,6 +342,10 @@ Same instructions, registers swapped.
   `gsi_u64 product = (gsi_u64)modulus->mData[0] * y;`, compared as `x < (product & mask)`. With the multiplication
   and mask in the comparison, the high-word `and` copies the mask into its destination; the separate product copies
   the product's high word instead, as the original does under `dsi/1.2`.
+- A carry kept in a `gsi_u64` and added as its own high word, `carry = (gsi_u32)(carry >> 32) + ((gsi_u64)*q +
+  product)`, lets MWCC build the sum's high half from a constant 0 (`ldr rX, =0; adcs`), where a carry shifted down when
+  it is stored keeps that high word in a register. DWC's `gsiLargeIntMultM` (`gsLargeInt.c`) matches the first way,
+  with the store `*q = (gsi_u32)carry` and the loop's test `(carry >> 32) != 0`.
 - GameSpy's `value_for_key` keeps the selected alternating buffer in a `gsi_u32 index`, read from `valueindex`
   before the byte-copy loop and used for both the copy destination and the return value. This keeps the scaled
   index and array base across the copy and matches the original final address calculation; an `int` snapshot
