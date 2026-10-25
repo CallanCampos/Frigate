@@ -300,7 +300,7 @@ static void endScene3(void) {
     int field;
 
     DWCi_COMMENTlDelete();
-    DWCi_MOV_MBP_GetChildBmp(sAddressEdit->cursor);
+    DWCi_OBJlDelete(sAddressEdit->cursor);
     DWCi_FNTlDeleteBgLcd(0);
     DWCUtilGfxResource_Load("char/ybObjMain.ncl.l", GX_LoadOBJPltt);
     DWCUtilDisplay_HidePlanes(1, GX_PLANEMASK_BG0);

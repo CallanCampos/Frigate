@@ -86,10 +86,10 @@ static BOOL dhcp_discover_server(void);
 static BOOL dhcp_request_server(u32 *timer, int mode);
 static void dhcp_release_server(void);
 static u8 *dns_skipname(u8 *p);
-static s32 resolve_common(const u8 *name, u32 type, u16 id, u8 *result, u32 resultSize);
+static s32 resolve_common(u8 *name, u32 type, u16 id, u8 *result, u32 resultSize);
 static u32 strtol10(const u8 *text, const u8 **end);
 static BOOL rawip(const u8 *text, CPSInAddr *addr);
-static s32 resolve_sub(const u8 *name, CPSInAddr server, u16 id);
+static s32 resolve_sub(u8 *name, CPSInAddr server, u16 id);
 
 #define CPS_STACK_SIZE 0x800
 #define CPS_ARP_CACHE_SIZE 8
@@ -2800,7 +2800,7 @@ static u8 *dns_skipname(u8 *p) {
 
 // resolve_common: asks the bound server about a name, returning an address, 1 or 2 for a name that did or didn't fit
 // in result, -1 for no such name, or 0 when no answer came
-static s32 resolve_common(const u8 *name, u32 type, u16 id, u8 *result, u32 resultSize) {
+static s32 resolve_common(u8 *name, u32 type, u16 id, u8 *result, u32 resultSize) {
     u8 query[0x44];
     u8 *reply;
     u8 *p;
@@ -2931,7 +2931,7 @@ static BOOL rawip(const u8 *text, CPSInAddr *addr) {
 }
 
 // resolve_sub: asks a server for a name's address
-static s32 resolve_sub(const u8 *name, CPSInAddr server, u16 id) {
+static s32 resolve_sub(u8 *name, CPSInAddr server, u16 id) {
     s32 result;
 
     if (server == 0) {
@@ -2975,7 +2975,7 @@ CPSInAddr CPS_Resolve(const char *name) {
                 usable[i] = FALSE;
                 continue;
             }
-            result = resolve_sub((const u8 *)name, CPSDnsIp[i], id[i]);
+            result = resolve_sub((u8 *)name, CPSDnsIp[i], id[i]);
             if (result != 0 && result != -1) {
                 goto done;
             }

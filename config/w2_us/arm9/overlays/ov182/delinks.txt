@@ -51,13 +51,13 @@ lib/dwcutilui/src/dwc_util_ui_object.c:
     .rodata     start:0x021bfb64 end:0x021bfb94
     .bss        start:0x021c4068 end:0x021c406c
 
-src/ov182/download_play.c:
+lib/dwcutil/src/dwc_mov_mbp.c:
     complete
     .text       start:0x021b9428 end:0x021b9bfc
     .data       start:0x021c14c4 end:0x021c17b0
     .bss        start:0x021c41bc end:0x021c41c0
 
-src/ov182/download_play_wih.c:
+lib/dwcutil/src/dwc_mov_wh.c:
     .text       start:0x021b9bfc end:0x021ba7a8
     .data       start:0x021c17b0 end:0x021c1b18
     .bss        start:0x021c41c0 end:0x021c41c8

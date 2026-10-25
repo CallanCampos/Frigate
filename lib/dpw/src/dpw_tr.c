@@ -1,6 +1,6 @@
 #include "dpw/dpw_tr.h"
 #include "dpw_internal.h"
-#include "dwc/gamestats.h"
+#include "dwc/dwc_encsession.h"
 #include "nitro/os.h"
 
 // The Global Trade Station's client, see dpw_tr.h. Every call fills the request that the game statistics client sends
@@ -64,16 +64,16 @@ void DpwTr_Process(void) {
 
     switch (sDpwTrWork.state) {
     case 2:
-        switch (Gamestats_Poll()) {
+        switch (DWCi_EncSessionProcess()) {
         case GAMESTATS_STATE_FAILED:
             sDpwTrWork.state = 0x18;
             DWC_GetLastErrorEx(&type, &group);
             sDpwTrWork.result = DpwTrMapGamestatsError(group);
-            Gamestats_Close();
+            DWCi_EncSessionShutdown();
             break;
         case GAMESTATS_STATE_DONE:
             sDpwTrWork.state = 0x18;
-            answer = Gamestats_GetBody(&size);
+            answer = DWCi_EncSessionGetResponse(&size);
             __memcpy(sDpwTrWork.code, answer, sizeof(sDpwTrWork.code));
             switch (sDpwTrWork.code[0]) {
             case 1:
@@ -113,21 +113,21 @@ void DpwTr_Process(void) {
                 sDpwTrWork.result = -13;
                 break;
             }
-            Gamestats_Close();
+            DWCi_EncSessionShutdown();
             break;
         }
         break;
     case 4:
-        switch (Gamestats_Poll()) {
+        switch (DWCi_EncSessionProcess()) {
         case GAMESTATS_STATE_FAILED:
             sDpwTrWork.state = 0x18;
             DWC_GetLastErrorEx(&type, &group);
             sDpwTrWork.result = DpwTrMapGamestatsError(group);
-            Gamestats_Close();
+            DWCi_EncSessionShutdown();
             break;
         case GAMESTATS_STATE_DONE:
             sDpwTrWork.state = 0x18;
-            answer = Gamestats_GetBody(&size);
+            answer = DWCi_EncSessionGetResponse(&size);
             __memcpy(sDpwTrWork.code, answer, sizeof(sDpwTrWork.code));
             switch (sDpwTrWork.code[0]) {
             case 1:
@@ -149,21 +149,21 @@ void DpwTr_Process(void) {
                 sDpwTrWork.result = -13;
                 break;
             }
-            Gamestats_Close();
+            DWCi_EncSessionShutdown();
             break;
         }
         break;
     case 6:
-        switch (Gamestats_Poll()) {
+        switch (DWCi_EncSessionProcess()) {
         case GAMESTATS_STATE_FAILED:
             sDpwTrWork.state = 0x18;
             DWC_GetLastErrorEx(&type, &group);
             sDpwTrWork.result = DpwTrMapGamestatsError(group);
-            Gamestats_Close();
+            DWCi_EncSessionShutdown();
             break;
         case GAMESTATS_STATE_DONE:
             sDpwTrWork.state = 0x18;
-            answer = Gamestats_GetBody(&size);
+            answer = DWCi_EncSessionGetResponse(&size);
             memcpy(sDpwTrWork.resultData, answer, 0x128);
             if (size == 0x128) {
                 sDpwTrWork.result = 0;
@@ -183,21 +183,21 @@ void DpwTr_Process(void) {
                     break;
                 }
             }
-            Gamestats_Close();
+            DWCi_EncSessionShutdown();
             break;
         }
         break;
     case 8:
-        switch (Gamestats_Poll()) {
+        switch (DWCi_EncSessionProcess()) {
         case GAMESTATS_STATE_FAILED:
             sDpwTrWork.state = 0x18;
             DWC_GetLastErrorEx(&type, &group);
             sDpwTrWork.result = DpwTrMapGamestatsError(group);
-            Gamestats_Close();
+            DWCi_EncSessionShutdown();
             break;
         case GAMESTATS_STATE_DONE:
             sDpwTrWork.state = 0x18;
-            answer = Gamestats_GetBody(&size);
+            answer = DWCi_EncSessionGetResponse(&size);
             memcpy(sDpwTrWork.resultData, answer, 0x128);
             if (size == 0x128) {
                 sDpwTrWork.result = 1;
@@ -220,21 +220,21 @@ void DpwTr_Process(void) {
                     break;
                 }
             }
-            Gamestats_Close();
+            DWCi_EncSessionShutdown();
             break;
         }
         break;
     case 10:
-        switch (Gamestats_Poll()) {
+        switch (DWCi_EncSessionProcess()) {
         case GAMESTATS_STATE_FAILED:
             sDpwTrWork.state = 0x18;
             DWC_GetLastErrorEx(&type, &group);
             sDpwTrWork.result = DpwTrMapGamestatsError(group);
-            Gamestats_Close();
+            DWCi_EncSessionShutdown();
             break;
         case GAMESTATS_STATE_DONE:
             sDpwTrWork.state = 0x18;
-            answer = Gamestats_GetBody(&size);
+            answer = DWCi_EncSessionGetResponse(&size);
             __memcpy(sDpwTrWork.code, answer, sizeof(sDpwTrWork.code));
             switch (sDpwTrWork.code[0]) {
             case 1:
@@ -253,21 +253,21 @@ void DpwTr_Process(void) {
                 sDpwTrWork.result = -13;
                 break;
             }
-            Gamestats_Close();
+            DWCi_EncSessionShutdown();
             break;
         }
         break;
     case 12:
-        switch (Gamestats_Poll()) {
+        switch (DWCi_EncSessionProcess()) {
         case GAMESTATS_STATE_FAILED:
             sDpwTrWork.state = 0x18;
             DWC_GetLastErrorEx(&type, &group);
             sDpwTrWork.result = DpwTrMapGamestatsError(group);
-            Gamestats_Close();
+            DWCi_EncSessionShutdown();
             break;
         case GAMESTATS_STATE_DONE:
             sDpwTrWork.state = 0x18;
-            answer = Gamestats_GetBody(&size);
+            answer = DWCi_EncSessionGetResponse(&size);
             __memcpy(sDpwTrWork.code, answer, sizeof(sDpwTrWork.code));
             switch (sDpwTrWork.code[0]) {
             case 1:
@@ -289,21 +289,21 @@ void DpwTr_Process(void) {
                 sDpwTrWork.result = -13;
                 break;
             }
-            Gamestats_Close();
+            DWCi_EncSessionShutdown();
             break;
         }
         break;
     case 14:
-        switch (Gamestats_Poll()) {
+        switch (DWCi_EncSessionProcess()) {
         case GAMESTATS_STATE_FAILED:
             sDpwTrWork.state = 0x18;
             DWC_GetLastErrorEx(&type, &group);
             sDpwTrWork.result = DpwTrMapGamestatsError(group);
-            Gamestats_Close();
+            DWCi_EncSessionShutdown();
             break;
         case GAMESTATS_STATE_DONE:
             sDpwTrWork.state = 0x18;
-            answer = Gamestats_GetBody(&size);
+            answer = DWCi_EncSessionGetResponse(&size);
             __memcpy(sDpwTrWork.resultData, answer, 2);
             switch (*(u8 *)sDpwTrWork.resultData) {
             case 1:
@@ -321,21 +321,21 @@ void DpwTr_Process(void) {
                 sDpwTrWork.result = -13;
                 break;
             }
-            Gamestats_Close();
+            DWCi_EncSessionShutdown();
             break;
         }
         break;
     case 16:
-        switch (Gamestats_Poll()) {
+        switch (DWCi_EncSessionProcess()) {
         case GAMESTATS_STATE_FAILED:
             sDpwTrWork.state = 0x18;
             DWC_GetLastErrorEx(&type, &group);
             sDpwTrWork.result = DpwTrMapGamestatsError(group);
-            Gamestats_Close();
+            DWCi_EncSessionShutdown();
             break;
         case GAMESTATS_STATE_DONE:
             sDpwTrWork.state = 0x18;
-            answer = Gamestats_GetBody(&size);
+            answer = DWCi_EncSessionGetResponse(&size);
             memcpy(sDpwTrWork.resultData, answer, 0x128);
             if (size == 0x128) {
                 sDpwTrWork.result = 0;
@@ -370,21 +370,21 @@ void DpwTr_Process(void) {
                     break;
                 }
             }
-            Gamestats_Close();
+            DWCi_EncSessionShutdown();
             break;
         }
         break;
     case 18:
-        switch (Gamestats_Poll()) {
+        switch (DWCi_EncSessionProcess()) {
         case GAMESTATS_STATE_FAILED:
             sDpwTrWork.state = 0x18;
             DWC_GetLastErrorEx(&type, &group);
             sDpwTrWork.result = DpwTrMapGamestatsError(group);
-            Gamestats_Close();
+            DWCi_EncSessionShutdown();
             break;
         case GAMESTATS_STATE_DONE:
             sDpwTrWork.state = 0x18;
-            answer = Gamestats_GetBody(&size);
+            answer = DWCi_EncSessionGetResponse(&size);
             __memcpy(sDpwTrWork.code, answer, sizeof(sDpwTrWork.code));
             switch (sDpwTrWork.code[0]) {
             case 1:
@@ -397,21 +397,21 @@ void DpwTr_Process(void) {
                 sDpwTrWork.result = -2;
                 break;
             }
-            Gamestats_Close();
+            DWCi_EncSessionShutdown();
             break;
         }
         break;
     case 20:
-        switch (Gamestats_Poll()) {
+        switch (DWCi_EncSessionProcess()) {
         case GAMESTATS_STATE_FAILED:
             sDpwTrWork.state = 0x18;
             DWC_GetLastErrorEx(&type, &group);
             sDpwTrWork.result = DpwTrMapGamestatsError(group);
-            Gamestats_Close();
+            DWCi_EncSessionShutdown();
             break;
         case GAMESTATS_STATE_DONE:
             sDpwTrWork.state = 0x18;
-            answer = Gamestats_GetBody(&size);
+            answer = DWCi_EncSessionGetResponse(&size);
             __memcpy(sDpwTrWork.code, answer, sizeof(sDpwTrWork.code));
             switch (sDpwTrWork.code[0]) {
             case 1:
@@ -430,21 +430,21 @@ void DpwTr_Process(void) {
                 sDpwTrWork.result = -13;
                 break;
             }
-            Gamestats_Close();
+            DWCi_EncSessionShutdown();
             break;
         }
         break;
     case 22:
-        switch (Gamestats_Poll()) {
+        switch (DWCi_EncSessionProcess()) {
         case GAMESTATS_STATE_FAILED:
             sDpwTrWork.state = 0x18;
             DWC_GetLastErrorEx(&type, &group);
             sDpwTrWork.result = DpwTrMapGamestatsError(group);
-            Gamestats_Close();
+            DWCi_EncSessionShutdown();
             break;
         case GAMESTATS_STATE_DONE:
             sDpwTrWork.state = 0x18;
-            answer = Gamestats_GetBody(&size);
+            answer = DWCi_EncSessionGetResponse(&size);
             __memcpy(sDpwTrWork.resultData, answer, 2);
             if (size == 8) {
                 sDpwTrWork.result = 0;
@@ -467,7 +467,7 @@ void DpwTr_Process(void) {
                     break;
                 }
             }
-            Gamestats_Close();
+            DWCi_EncSessionShutdown();
             break;
         }
         break;
@@ -488,7 +488,7 @@ void DpwTr_Process(void) {
     case 23:
         sDpwTrWork.state = 0x18;
         sDpwTrWork.result = -12;
-        Gamestats_Close();
+        DWCi_EncSessionShutdown();
         break;
     }
 }
@@ -518,71 +518,74 @@ void DpwTr_Upload(const Dpw_Tr_Data *data, const void *sign, u32 size) {
     sDpwTrWork.requestId = 0;
     memcpy(sDpwTrWork.signature, sign, size);
     sDpwTrWork.signatureSize = size;
-    Gamestats_Start(sDpwTrServerType, DPW_GAMESTATS_KEY);
-    if (Gamestats_Send("/web/worldexchange/post.asp", sDpwTrWork.pid, sDpwTrWork.request, 0x1b0, NULL) == 0) {
+    DWCi_EncSessionInitialize(sDpwTrServerType, DPW_GAMESTATS_KEY);
+    if (DWCi_EncSessionGetAsync("/web/worldexchange/post.asp", sDpwTrWork.pid, sDpwTrWork.request, 0x1b0, NULL) == 0) {
         sDpwTrWork.state = 2;
     } else {
         sDpwTrWork.state = 0x18;
         sDpwTrWork.result = -13;
-        Gamestats_Close();
+        DWCi_EncSessionShutdown();
     }
 }
 
 void DpwTr_UploadFinish(void) {
     __memcpy(sDpwTrWork.request, &sDpwTrWork.friendKey, sizeof(sDpwTrWork.friendKey));
-    Gamestats_Start(sDpwTrServerType, DPW_GAMESTATS_KEY);
-    if (Gamestats_Send("/web/worldexchange/post_finish.asp", sDpwTrWork.pid, sDpwTrWork.request, 8, NULL) == 0) {
+    DWCi_EncSessionInitialize(sDpwTrServerType, DPW_GAMESTATS_KEY);
+    if (DWCi_EncSessionGetAsync("/web/worldexchange/post_finish.asp", sDpwTrWork.pid, sDpwTrWork.request, 8, NULL) ==
+        0) {
         sDpwTrWork.state = 4;
     } else {
         sDpwTrWork.state = 0x18;
         sDpwTrWork.result = -13;
-        Gamestats_Close();
+        DWCi_EncSessionShutdown();
     }
 }
 
 void DpwTr_Download(Dpw_Tr_Data *result) {
     sDpwTrWork.resultData = result;
-    Gamestats_Start(sDpwTrServerType, DPW_GAMESTATS_KEY);
-    if (Gamestats_Send("/web/worldexchange/get.asp", sDpwTrWork.pid, sDpwTrWork.request, 0x1b0, NULL) == 0) {
+    DWCi_EncSessionInitialize(sDpwTrServerType, DPW_GAMESTATS_KEY);
+    if (DWCi_EncSessionGetAsync("/web/worldexchange/get.asp", sDpwTrWork.pid, sDpwTrWork.request, 0x1b0, NULL) == 0) {
         sDpwTrWork.state = 6;
     } else {
         sDpwTrWork.state = 0x18;
         sDpwTrWork.result = -13;
-        Gamestats_Close();
+        DWCi_EncSessionShutdown();
     }
 }
 
 void DpwTr_GetTradeResult(Dpw_Tr_Data *result) {
     sDpwTrWork.resultData = result;
-    Gamestats_Start(sDpwTrServerType, DPW_GAMESTATS_KEY);
-    if (Gamestats_Send("/web/worldexchange/result.asp", sDpwTrWork.pid, sDpwTrWork.request, 0x1b0, NULL) == 0) {
+    DWCi_EncSessionInitialize(sDpwTrServerType, DPW_GAMESTATS_KEY);
+    if (DWCi_EncSessionGetAsync("/web/worldexchange/result.asp", sDpwTrWork.pid, sDpwTrWork.request, 0x1b0, NULL) ==
+        0) {
         sDpwTrWork.state = 8;
     } else {
         sDpwTrWork.state = 0x18;
         sDpwTrWork.result = -13;
-        Gamestats_Close();
+        DWCi_EncSessionShutdown();
     }
 }
 
 void DpwTr_DeleteFinish(void) {
-    Gamestats_Start(sDpwTrServerType, DPW_GAMESTATS_KEY);
-    if (Gamestats_Send("/web/worldexchange/delete.asp", sDpwTrWork.pid, sDpwTrWork.request, 0x1b0, NULL) == 0) {
+    DWCi_EncSessionInitialize(sDpwTrServerType, DPW_GAMESTATS_KEY);
+    if (DWCi_EncSessionGetAsync("/web/worldexchange/delete.asp", sDpwTrWork.pid, sDpwTrWork.request, 0x1b0, NULL) ==
+        0) {
         sDpwTrWork.state = 10;
     } else {
         sDpwTrWork.state = 0x18;
         sDpwTrWork.result = -13;
-        Gamestats_Close();
+        DWCi_EncSessionShutdown();
     }
 }
 
 void DpwTr_ReturnFinish(void) {
-    Gamestats_Start(sDpwTrServerType, DPW_GAMESTATS_KEY);
-    if (Gamestats_Send("/web/worldexchange/return.asp", sDpwTrWork.pid, sDpwTrWork.request, 0, NULL) == 0) {
+    DWCi_EncSessionInitialize(sDpwTrServerType, DPW_GAMESTATS_KEY);
+    if (DWCi_EncSessionGetAsync("/web/worldexchange/return.asp", sDpwTrWork.pid, sDpwTrWork.request, 0, NULL) == 0) {
         sDpwTrWork.state = 12;
     } else {
         sDpwTrWork.state = 0x18;
         sDpwTrWork.result = -13;
-        Gamestats_Close();
+        DWCi_EncSessionShutdown();
     }
 }
 
@@ -590,47 +593,47 @@ void DpwTr_ReturnFinish(void) {
 void DpwTr_Cancel(void) {
     switch (sDpwTrWork.state) {
     case 2:
-        Gamestats_Abort();
+        DWCi_EncSessionCancel();
         sDpwTrWork.state = 3;
         break;
     case 4:
-        Gamestats_Abort();
+        DWCi_EncSessionCancel();
         sDpwTrWork.state = 5;
         break;
     case 6:
-        Gamestats_Abort();
+        DWCi_EncSessionCancel();
         sDpwTrWork.state = 7;
         break;
     case 8:
-        Gamestats_Abort();
+        DWCi_EncSessionCancel();
         sDpwTrWork.state = 9;
         break;
     case 10:
-        Gamestats_Abort();
+        DWCi_EncSessionCancel();
         sDpwTrWork.state = 11;
         break;
     case 12:
-        Gamestats_Abort();
+        DWCi_EncSessionCancel();
         sDpwTrWork.state = 13;
         break;
     case 14:
-        Gamestats_Abort();
+        DWCi_EncSessionCancel();
         sDpwTrWork.state = 15;
         break;
     case 16:
-        Gamestats_Abort();
+        DWCi_EncSessionCancel();
         sDpwTrWork.state = 17;
         break;
     case 18:
-        Gamestats_Abort();
+        DWCi_EncSessionCancel();
         sDpwTrWork.state = 19;
         break;
     case 20:
-        Gamestats_Abort();
+        DWCi_EncSessionCancel();
         sDpwTrWork.state = 21;
         break;
     case 22:
-        Gamestats_Abort();
+        DWCi_EncSessionCancel();
         sDpwTrWork.state = 23;
         break;
     }
@@ -640,26 +643,26 @@ void DpwTr_Search(const Dpw_Tr_PokemonSearchData *search, s32 maxNum, Dpw_Tr_Dat
     sDpwTrWork.resultData = result;
     __memcpy(sDpwTrWork.request, search, sizeof(*search));
     sDpwTrWork.request[6] = maxNum;
-    Gamestats_Start(sDpwTrServerType, DPW_GAMESTATS_KEY);
-    if (Gamestats_Send("/web/worldexchange/search.asp", sDpwTrWork.pid, sDpwTrWork.request, 7, NULL) == 0) {
+    DWCi_EncSessionInitialize(sDpwTrServerType, DPW_GAMESTATS_KEY);
+    if (DWCi_EncSessionGetAsync("/web/worldexchange/search.asp", sDpwTrWork.pid, sDpwTrWork.request, 7, NULL) == 0) {
         sDpwTrWork.state = 14;
     } else {
         sDpwTrWork.state = 0x18;
         sDpwTrWork.result = -13;
-        Gamestats_Close();
+        DWCi_EncSessionShutdown();
     }
 }
 
 void DpwTr_SearchEx(const Dpw_Tr_PokemonSearchDataEx *search, Dpw_Tr_Data *result) {
     sDpwTrWork.resultData = result;
     __memcpy(sDpwTrWork.request, search, sizeof(*search));
-    Gamestats_Start(sDpwTrServerType, DPW_GAMESTATS_KEY);
-    if (Gamestats_Send("/web/worldexchange/search.asp", sDpwTrWork.pid, sDpwTrWork.request, 8, NULL) == 0) {
+    DWCi_EncSessionInitialize(sDpwTrServerType, DPW_GAMESTATS_KEY);
+    if (DWCi_EncSessionGetAsync("/web/worldexchange/search.asp", sDpwTrWork.pid, sDpwTrWork.request, 8, NULL) == 0) {
         sDpwTrWork.state = 14;
     } else {
         sDpwTrWork.state = 0x18;
         sDpwTrWork.result = -13;
-        Gamestats_Close();
+        DWCi_EncSessionShutdown();
     }
 }
 
@@ -669,36 +672,38 @@ void DpwTr_Exchange(s32 id, const Dpw_Tr_Data *upload, Dpw_Tr_Data *result, cons
     sDpwTrWork.requestId = id;
     memcpy(sDpwTrWork.signature, sign, size);
     sDpwTrWork.signatureSize = size;
-    Gamestats_Start(sDpwTrServerType, DPW_GAMESTATS_KEY);
-    if (Gamestats_Send("/web/worldexchange/exchange.asp", sDpwTrWork.pid, sDpwTrWork.request, 0x1b0, NULL) == 0) {
+    DWCi_EncSessionInitialize(sDpwTrServerType, DPW_GAMESTATS_KEY);
+    if (DWCi_EncSessionGetAsync("/web/worldexchange/exchange.asp", sDpwTrWork.pid, sDpwTrWork.request, 0x1b0, NULL) ==
+        0) {
         sDpwTrWork.state = 16;
     } else {
         sDpwTrWork.state = 0x18;
         sDpwTrWork.result = -13;
-        Gamestats_Close();
+        DWCi_EncSessionShutdown();
     }
 }
 
 void DpwTr_ExchangeFinish(void) {
     __memcpy(sDpwTrWork.request, &sDpwTrWork.friendKey, sizeof(sDpwTrWork.friendKey));
-    Gamestats_Start(sDpwTrServerType, DPW_GAMESTATS_KEY);
-    if (Gamestats_Send("/web/worldexchange/exchange_finish.asp", sDpwTrWork.pid, sDpwTrWork.request, 8, NULL) == 0) {
+    DWCi_EncSessionInitialize(sDpwTrServerType, DPW_GAMESTATS_KEY);
+    if (DWCi_EncSessionGetAsync("/web/worldexchange/exchange_finish.asp", sDpwTrWork.pid, sDpwTrWork.request, 8,
+                                NULL) == 0) {
         sDpwTrWork.state = 18;
     } else {
         sDpwTrWork.state = 0x18;
         sDpwTrWork.result = -13;
-        Gamestats_Close();
+        DWCi_EncSessionShutdown();
     }
 }
 
 void DpwTr_GetServerState(void) {
-    Gamestats_Start(sDpwTrServerType, DPW_GAMESTATS_KEY);
-    if (Gamestats_Send("/web/worldexchange/info.asp", sDpwTrWork.pid, sDpwTrWork.request, 0, NULL) == 0) {
+    DWCi_EncSessionInitialize(sDpwTrServerType, DPW_GAMESTATS_KEY);
+    if (DWCi_EncSessionGetAsync("/web/worldexchange/info.asp", sDpwTrWork.pid, sDpwTrWork.request, 0, NULL) == 0) {
         sDpwTrWork.state = 20;
     } else {
         sDpwTrWork.state = 0x18;
         sDpwTrWork.result = -13;
-        Gamestats_Close();
+        DWCi_EncSessionShutdown();
     }
 }
 
@@ -706,13 +711,13 @@ void DpwTr_SetProfile(Dpw_Common_Profile *profile, Dpw_Common_ProfileResult *res
     OS_GetMacAddress(profile->macAddress);
     memcpy(sDpwTrWork.request, profile, 0x64);
     sDpwTrWork.resultData = result;
-    Gamestats_Start(sDpwTrServerType, DPW_GAMESTATS_KEY);
-    if (Gamestats_Send("/web/common/setProfile.asp", sDpwTrWork.pid, sDpwTrWork.request, 0x64, NULL) == 0) {
+    DWCi_EncSessionInitialize(sDpwTrServerType, DPW_GAMESTATS_KEY);
+    if (DWCi_EncSessionGetAsync("/web/common/setProfile.asp", sDpwTrWork.pid, sDpwTrWork.request, 0x64, NULL) == 0) {
         sDpwTrWork.state = 22;
     } else {
         sDpwTrWork.state = 0x18;
         sDpwTrWork.result = -13;
-        Gamestats_Close();
+        DWCi_EncSessionShutdown();
     }
 }
 

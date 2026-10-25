@@ -430,10 +430,10 @@ static void endScene2(void) {
     DWCi_TSKlDeleteEx(1, sApList->vblankTask);
     for (i = 0; i < AP_LIST_ROWS + 1; i++) {
         if (sApList->securityOams[i] != NULL) {
-            DWCi_MOV_MBP_GetChildBmp(sApList->securityOams[i]);
+            DWCi_OBJlDelete(sApList->securityOams[i]);
         }
         if (sApList->signalOams[i] != NULL) {
-            DWCi_MOV_MBP_GetChildBmp(sApList->signalOams[i]);
+            DWCi_OBJlDelete(sApList->signalOams[i]);
         }
     }
     DWCi_FNTlDeleteBg(sApList->text);
@@ -495,7 +495,7 @@ static void drawApInfo(void) {
 
 // The access point's SSID, on two lines when it is longer than 16 characters
 static void drawAp(int index, int row) {
-    int length = DWCi_MOV_WH_SetUserGameInfo(sApList->entries[index].ssid, sizeof(sApList->entries[index].ssid));
+    int length = DWCi_STRlNLen(sApList->entries[index].ssid, sizeof(sApList->entries[index].ssid));
     int y = row * AP_LIST_ROW_HEIGHT;
     u16 line[17];
     int count;

@@ -32,6 +32,506 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
 
+## 2026-10-25: PR 33 reconciled with reviewed main; durable sync proposals and safe conflict notices
+
+- **Upstream:** unchanged from reviewed `main` at `ae7f39f4f9`; this task imports no additional upstream sync.
+- **Port:** `PORT_SHA`, on `codex/review-conflict-syncs`, PR 33's `ddc4ff6048` merged with reviewed `main` at
+  `ae7f39f4f9`. Both histories' STATUS entries are retained, with main's newer entries above PR 33's historical task
+  entry; main's pointer-offset audit documentation is retained too.
+- **ROM:** T0 not rerun at this focused review stage; the original PR 33 entry below records its earlier results.
+  Exact-head ROM verification remains required before merge.
+- **MWCC-neutrality:** no additional change outside `port/` compared with reviewed main.
+- **Code standards:** no new C change; focused shell syntax, actionlint and whitespace checks are recorded below.
+- **Host build:** T1 not rerun at this stage; full native verification waits for the separate current sync validation.
+- **Tests:** `python3 -m unittest discover -s port/tools/tests -p test_upstream_sync.py`: 41 passed, including real
+  isolated Git merge/preservation/conflict fixtures and six publication/security regression tests. `bash -n
+  port/tools/sync_upstream.sh`, actionlint on `.github/workflows/port-sync.yml` and `port-ci.yml`, and `git diff --check`
+  pass (actionlint uses a narrow ignore for its outdated `ubuntu-26.04` runner-label catalogue; no other diagnostic).
+  T2–T7 not rerun at this stage; no new result is claimed for the original PR's full suites.
+- **Tiers:** unchanged from reviewed main: this task adds or removes no game implementation.
+- **Trap stubs:** unchanged from reviewed main; this task changes no game or HAL source or generator.
+- **64-bit warnings:** unchanged from reviewed main; the pointer-cast guard has not been rerun for this tooling change.
+- **Work done:** reconciled PR 33 ([ADR 0024](adr/0024-a-conflicting-sync-proposes-a-draft-of-upstreams-head.md)).
+  PR creation recovers an existing canonical proposal after an ambiguous failure. Review requests are separate and
+  retryable without a push or pending-head update, preserving existing reviews and the local owner's self-review
+  exception. This addresses run 40190195544, which created PR 37 before its GraphQL review request failed. Conflict
+  filenames escape controls and backticks so blank lines cannot break Markdown protection. No App scope or rule changed;
+  publication permission uncertainty remains a visible failure requiring local inspection.
+- **Next:** exact-head ROM and native verification, required hosted checks, and review before PR 33 is merged; then
+  the existing earliest unmet phase criterion recorded in main's entries below.
+- **Blockers:** full validation pending, not a new game-source blocker. No claim is made that GitHub has accepted the
+  App's raw-upstream conflict draft push in a real conflict.
+
+## 2026-10-25: upstream sync `c127efd9fa` proposed as PR 35: three conflicts, three native fixes, PR 34's rows
+
+- **Upstream:** `c127efd9fa` ("DWC: match DWCs_AddToSendPool"), 60 commits after `629a53cccb`.
+  Six merges: #505 (`e4fab0935a`, `wcm.c` split into NitroWiFi's five WCM files and `socl_misc.c`'s address checks moved
+  out of `socl_list.c`), #506 (`9c52b5d237`, overlay 182's Download Play parent and wireless helper moved to
+  `lib/dwcutil`, DWC's game statistics client renamed `dwc_encsession.c`, and the SDKs' names for the DWC utility's,
+  TwlSDK SSP's and DSP's code), #496 (`b962ecf040`, the encounter effects' four create functions named from the overlays
+  they load, the fix that phase 4's route waits for, and the Funfest mission events' relocations pinned to overlay 157),
+  #498 (`e1edad921f`, the LTD autoload's TwlSDK code complete: the DSi parts of `card_rom.c`, `pm.c`, `mi_sharedWram.c`
+  and four OS files merged into their NitroSDK files, through dsd's migrated `.ltdmain` sections), #499 (`cd23a9981d`,
+  `btlv_effect.c` complete) and #500 (`b67985f98f`, `ica_anime.c` complete). Then six commits on upstream's `main`, all
+  DWC: `9b80beac29` (nine NHTTP and GHTTP files of overlay 189 complete, with `NHTTPRes.contentLength` volatile),
+  `8717781533` (`dwc_main.c` complete, with `DWCMatchControl`'s `mode` and `qr2MatchType` volatile), `dc4518af06`
+  (overlay 11's `friend.c` split into TWL-DWC's six files, `dwc_nonport.c`, `dwc_nasfunc.c`, `dwc_nastime.c`,
+  `dwc_common.c`, `dwc_friend.c` and `dwc_login.c`, five of them complete; `auth/dwc_nasfunc.c` renamed `dwc_auth.c`,
+  ARM9 main's `base/dwc_common.c` renamed `dwc_base64.c`, and the game's `src/system/dwc_friend.c` renamed
+  `wifi_friend.c`), `a834403085` and `e9db4f7bb4` (two of `dwc_match.c`'s functions matched, with dsd's relocations of
+  their own branches dropped) and `65cf903b70` (`dwc_match.c` complete, with the match control's `profileID` and
+  `qr2NumEntry` volatile too). Then six more, DWC's and NitroWiFi's: `c22e511d1a` (`dwc_conntest.c` complete, with
+  `DWCi_Netcheck_Thread` matched), `3f9bb5b53c` (a row of `docs/nonmatching-functions.md` alone, `DWCi_Http_Thread`'s),
+  `617238bfb8` (`gsLargeInt.c`'s `gsLargeIntPowerMod` and `gsiLargeIntMultM` matched, with GameSpy's two word-size
+  macros in `dwc/gsLargeInt.h`), `60afdfdae6` (`cps.c`'s `resolve_common` matched: `cps_internal.h`'s `CPS_BE16` casts
+  its argument to a byte pointer, and the resolver's name is a `u8 *`), `452dcf19d5` (`soc.c` complete: its statics
+  defined with zero initializers, three that no code reads added, and overlay 11's `.bss` symbols at their names,
+  `sHostAddr` where the configs had `sHostName` and `sHostName` for `data_ov011_0218dce4`) and `9f317ea244` (`ssl.c`'s
+  `make_plaintext` and `send_client_hello` matched; the file stays partial for its data). Then two more, upstream's
+  `main` from 06:47 UTC until after the tool merged it: `03a4db98b0` (`ssl.c` complete, its constants in `.data` as
+  the ROM has them: the OID table six string literals, the key-derivation labels literals at their calls, the 8-byte
+  config the two statics `sCipherSuites` and `sHandshakePriority`, and a 4-byte `.bss` static that nothing reads) and
+  `c127efd9fa` (`dwc_transport.c`'s `DWCs_AddToSendPool` matched, the send pool's head and size the two statics
+  `sSendPoolHead` and `sSendPoolSize`; the file stays partial). This entry records the sync that `sync_upstream.sh`
+  validated and published as PR 35 for the owner's review; it is not on `main`. The hourly `port-sync` Action stopped
+  on it four times with "Upstream workflow changes require local sync with maintainer credentials" (runs 40132135150,
+  40142482549, 40150273898 and 40168613080, the last at 06:18 UTC on `abf834a3a3`), since the sync App has no
+  Workflows permission.
+- **Port:** `PORT_SHA`, on the topic `codex/upstream-sync-manual` from `main` at `abf834a3a3` (PR 32's merge): the merge
+  `ac06c5c88e` of `b67985f98f`, its two conflicts resolved and committed after `port/tools/sync_upstream.sh --branch
+  codex/upstream-sync-manual --no-push` stopped on them (its message, the tool's first line and `Upstream-Commit`
+  trailer, also names each resolution, where SYNC.md says `git commit --no-edit`); the merge `f193d8a5ca` of
+  `65cf903b70`, its one conflict resolved and committed with `git commit --no-edit --cleanup=strip`; the records commit
+  `e40220b8d7`, which also filled PR 32's entry's `PORT_SHA`, `1e107c917e`, as PR 34 did on `main`; the merge
+  `e02d58bbff` of `main` at `a5dc06ff82` (PR 34's merge), whose one conflict, in this file, keeps both entries, this one
+  above PR 34's, and fills that entry's `PORT_SHA`, `676a894d74`; the merge `f53520d24d` of `9f317ea244`, which
+  `sync_upstream.sh --branch codex/upstream-sync-manual --no-build` made without a conflict; the records commit
+  `96d5c17fc3`, which brought this entry to that merge; the merge `5d32b558ea` of `c127efd9fa`, which
+  `sync_upstream.sh --branch codex/upstream-sync-manual` made without a conflict, validated as below and published: it
+  pushed the topic branch, opened PR 35 and posted `Frigate local verification` (success) on `5d32b558ea`; the records
+  commit `45a7cf6505`, which brought this entry to that merge, pushed to the topic with a normal push; the merge
+  `67988cee7c` of `main` at `f6200135f9` (PR 29's merge, after PR 35 was opened, which left it behind `main`), without
+  a conflict: PR 29 signs the field script's jump and call offsets in `scrcmd_vm.c`, `scrcmd_fldmmdl.c` and
+  `script_sys.c`, with its row in game-changes.md, files that none of the sync's upstream commits change; and this
+  records commit, which names that merge, after which `sync_upstream.sh --verify-pr 35`, in a separate worktree,
+  verifies the PR's final head, the merge of `main` with it. Set aside unpublished on the way, as upstream moved on: an
+  earlier records commit, `4857da5259`, which recorded the merge of `b67985f98f` alone, before its review; and
+  `3a89648cdf`, which `sync_upstream.sh --branch codex/upstream-sync-manual --no-build` made of `8717781533` without a
+  conflict, validated as below, before upstream's next four commits. `f193d8a5ca`'s tree differs from `3a89648cdf`'s
+  only in the files those four commits change and the resolution of `friend.c`.
+- **ROM:** T0 passes. On `ac06c5c88e`, `sync_upstream.sh`'s `configure.py b2_us w2_us` and `ninja` (10,625 steps, every
+  C file of both versions compiled), both SHA1s match (Black 2 `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb`, White 2
+  `b5d7490be7b415b8f1e672a53e978a9cc667e56a`), no compiler warning. On `3a89648cdf` with `e40220b8d7`'s comments,
+  `python3 configure.py b2_us w2_us && ninja -j4`: 55 steps, the 16 C files that `9b80beac29` and `8717781533` change or
+  whose headers they change compiled in both versions, no compiler warning, both SHA1s as above. On `f193d8a5ca` with
+  `e40220b8d7`'s comments: 297 steps, the 137 C files that the merge changes or whose headers it changes (DWC's files
+  and the game's files that include its headers) compiled in both versions, no compiler warning, both SHA1s as above.
+  On `f53520d24d`, the same command: 265 steps, the 121 C files that the merge of `9f317ea244` changes or whose headers
+  it changes (`dwc/gsLargeInt.h`'s and `cps_internal.h`'s users among them) compiled in both versions, no compiler
+  warning, both SHA1s as above. On `5d32b558ea`, whose tree differs from this commit's only in this file,
+  `sync_upstream.sh`'s `configure.py b2_us w2_us` and `ninja` (four jobs): 27 steps, `ssl.c` and `dwc_transport.c`, the
+  two C files that the merge of `c127efd9fa` changes (it changes no header), compiled in both versions, overlay 11
+  delinked again for its new symbols, no compiler warning, both SHA1s as above.
+- **MWCC-neutrality:** `port/tools/check_mwcc_neutral.py --base c127efd9fa` on `5d32b558ea`'s tree, every file of
+  both versions: 2,990 of 3,562 file and version pairs preprocess identically to upstream's head, as with `--base
+  9f317ea244` on `f53520d24d`'s tree and `--base 65cf903b70` on `f193d8a5ca`'s tree with `e40220b8d7`'s comments
+  before. The other 572 are 286 files in each version, the same 286 as against `b67985f98f`, `8717781533`,
+  `65cf903b70` and `9f317ea244` (`src/system/dwc_friend.c` under its new name, `wifi_friend.c`), each first differing
+  where it did before, at a change that `main`'s rows already have: the 279 units that include `gfl/net.h`, each first
+  differing at the `net.h` row's `int` made `s32` (`sptr`), the 279 that PR 19's
+  entry counts, and seven complete files whose rows aren't token for token (`vct.c`'s `sptr`; the `sizeof` of
+  `event_battle_lose.c`, `hiden_event.c`, `scrcmd_survey.c`, `field_fade.c` and `fld3d_ci.c`; `field_transition.c`'s
+  VRAM spelling). The tool prints each file's first difference only, so the review of the first merge diffed all 286
+  token streams in full against `b67985f98f`: of their 2,346 differences, 2,262 are `net.h`'s and `vct.c`'s `int` made
+  `s32`, and the other 84 are in complete files whose rows have them, `cg_help.c`, `pokemontrade_2d.c` and `printsys.c`
+  among them, behind a `net.h` first difference. The sync's own files preprocess identically: `wcm_system.c` with the
+  reapplied WCM changes, the other WCM files, `card_rom.c`, `pm.c` and the other merged LTD files, the moved DWC utility
+  files, `btlv_effect.c`, `ica_anime.c`, `enceff_data.c`, `dwc_friend.c` with the reapplied friend list change,
+  `dwc_auth.c`, `dwc_match.c`, `dwc_main.c` and the NHTTP and GHTTP files, and the third merge's `dwc_conntest.c`,
+  `gsLargeInt.c`, `cps.c` with its row's casts, `soc.c` and `ssl.c`, and the fourth merge's `ssl.c` and
+  `dwc_transport.c`. One of the 286 is incomplete, `src/ov260/wifibattlematch_net.c`, in both versions. Upstream
+  doesn't change it, but the DWC and NitroWiFi commits change headers it includes (`dwc/gsLargeInt.h` and
+  `cps_internal.h` among them, in the third merge): `tools/decomp/compiler_probe.py --compilers 1.1p1`, on
+  `f193d8a5ca`'s tree, on `f53520d24d`'s and again on `5d32b558ea`'s, 100 of 100 functions MATCH in each version, as
+  PR 19's entry and the review of the first merge record.
+- **Code standards:** the Standards workflow's steps on `f53520d24d` against its merge base with `main`, `a5dc06ff82`,
+  all pass: clang-format 23.1.1, the version `.github/workflows/standards.yml` pins (`build/port-venv-cf`), `--dry-run
+  --Werror` on the 110 C files of `src/`, `lib/` and `include/` that the branch changes; `tools/decomp/check_style.py
+  --diff a5dc06ff82 --strict`, its fixtures, the skills' and hooks' Codex copies, `apply_names.py --dry-run` and
+  `check_nonmatching_rows.py`; and the Compile workflow's `tools.build.test_deadstrip` (26 tests). On `f193d8a5ca`
+  against `abf834a3a3` before, the same, with 103 C files. On `5d32b558ea`, PR 35's CI ran the same steps: the
+  Standards workflow's `Code standards` job (Actions run 40171976299) and the Compile workflow's `Compile src/ and lib/`
+  (run 40171976197), which compiles every C file of both versions with no warning, both pass.
+- **Host build:** T1 passes on macOS arm64, Apple clang 21, RelWithDebInfo, both versions, in `build/port-verify-b2_us`
+  and `build/port-verify-w2_us`, configured fresh with `sync_upstream.sh`'s options (`-DPORT_SANITIZE_RECOVER=OFF
+  -DPORT_FRAME_TIME_REPORT_ONLY=OFF`) and built with `--parallel 4`, on `5d32b558ea`'s tree, by `sync_upstream.sh` with
+  `CMAKE_BUILD_PARALLEL_LEVEL=4`, as on `f53520d24d`'s, `f193d8a5ca`'s and `3a89648cdf`'s before it: 732 compiler
+  warnings in each, five more than `main`'s 727, the five `pm_host.c`'s `-Wunknown-pragmas` (below).
+- **Tests:** ctest at `-j2` on `5d32b558ea`'s tree, by `sync_upstream.sh` with `CTEST_PARALLEL_LEVEL=2` (load averages 7
+  to 13 on 8 cores, from other sessions), as on `f53520d24d`'s before it: Black 2, 293 passed and 15 skipped of 308;
+  White 2, 290 passed and 15 skipped of 305; none failed. `game_ptrcasts` passes in
+  both, on `main`'s baseline with PR 34's rows (below); every replay passed (T3, T6), and so did `os_wcm_workspace`,
+  which holds the reapplied WCM changes, Black 2's `frame_times_title` and `frame_times_new_game` and White 2's
+  `frame_times_title`. Skipped in both: the 12 oracle tests that need the oracle, which this configuration doesn't
+  build, `frame_times_party_menus` (the oracle's save), `asm_oracle` (no Unicorn in this Python) and
+  `app_universal_slices` (a distribution build's). T4, T5 and T7 not run. Before PR 34, on `f193d8a5ca`'s tree with
+  `e40220b8d7`'s comments (load averages 20 to 90): Black 2, 292 passed, 15 skipped and 1 failed of 308; White 2, 289
+  passed, 15 skipped and 1 failed of 305, the failure in both `game_ptrcasts`, on the three findings that PR 34's rows
+  hold; on `3a89648cdf` the same, but for White 2's `frame_times_title`, which skipped a scene over its budget while the
+  load average was above the cores (`port/cmake/frame_times.cmake`).
+- **Tiers:** not measured: no `--metrics`.
+- **Trap stubs:** 32 function stubs and 22 data placeholders per version (`build/port-verify-*/gen/stubs.c`), the same
+  symbols in both; were 30 and 21. New: `CARDi_InitRomHash`, `OSi_InitArenaEx_ltdmain`, `OSi_EnterNDmaCallback_ltdmain`
+  and the placeholder `CARDi_NdmaInterface`, DSi code that #498 moves into `card_rom.c`, `os_arena.c` and
+  `os_interrupt.c`, files the host replaces (`port/hal/card/card_rom.c`, `port/hal/os/os_arena.c`,
+  `port/hal/os/os_interrupt.c`). The platform layer calls `CARDi_InitRomHash` and `OSi_InitArenaEx_ltdmain` only when
+  `OS_IsRunOnTwl()` holds, which it never does on the host. It calls `OSi_EnterNDmaCallback_ltdmain` with no such test,
+  from its `OSi_EnterNDmaCallback`, which TwlSDK's new DMA (`lib/twl/src/mi/mi_ndma.c`) calls for a transfer with a
+  callback; the host never reaches that either, for another reason: GX's transfers use DMA channel `GX_DEFAULT_DMAID`, 3
+  (`lib/nitro/src/gx/gx.c`; nothing sets another), never one of the DSi's new channels, and the new DMA's other users
+  are DSi-only. Before the sync the function it called, `OSi_EnterNDmaCallbackCore`, was C on the host; now that path
+  stops at the trap. `card_task.c` takes the placeholder's address only on a DSi. `CARDi_ReadRomWithDMA` is no longer
+  stubbed: only `card_rom_twl.c` called it. The fourteen DWC and NitroWiFi commits after `b67985f98f` change no stub:
+  on `f53520d24d` and again on `5d32b558ea`, the same 32 and 22, the same symbols in both versions.
+- **64-bit warnings:** `check_ptrcasts: 359 sites in 223 keys (real 66, harmless 117, handled 141, unreachable 35),
+  1684 files, 0 not compiled` on both builds of `5d32b558ea`, as on `f53520d24d`'s, on `main`'s baseline
+  (`sync_upstream.sh`'s `port/tools/check_ptrcasts.py --build-dir build/port-verify-b2_us --report`, and
+  `--build-dir build/port-verify-w2_us --report --require`, exit 0, and ctest's `game_ptrcasts` passes in both): the
+  real sites as the last entry's, two unreachable fewer, and the eight commits after `65cf903b70` change no count, so
+  the sync needs no new row. Before PR 34, `game_ptrcasts` failed in both versions on
+  `f193d8a5ca`, on three findings that `main`'s baseline didn't allow. Each is a cast that a baseline row already held,
+  renamed with both its file and its function, which the guard doesn't pair: `WCM_NotifyResult`'s two casts in `wcm.c`
+  are `WCMi_Notify`'s in `wcm_system.c` (`df847de7d1`), in
+  `WCMi_NotifyEx(notify, result, (s32)parameter, (void *)detail, line)`, `real` (R23); and `func_027060b4`'s in
+  `dsp_audio.c` is `DSPi_PlaySoundEx`'s in `dsp_util.c` (`1574db16fe`), `DSPi_SwapHalves((u32)src)`, `unreachable`
+  (TWL-only). PR 34 gave `main`'s baseline the three rows, in the old rows' classes and notes. `WcmWmcbScanEx`'s row
+  passes as renamed, into `wcm_wmif.c`, and five pass as no longer found: the two `WCM_NotifyResult` rows,
+  `dsp_audio.c`'s, and those of `card_rom_twl.c` and `os_arena_twl.c`, whose code the host no longer compiles.
+- **Work done:** upstream's workflows, reviewed for the stop: the merged tree changes nothing under `.github/` (`git
+  diff 629a53cccb c127efd9fa -- .github` and `git diff origin/main HEAD -- .github` print nothing). In its history,
+  `b26dec09d0` adds a step to `compile.yml`, `python -m unittest tools.build.test_merge_objects`, and `a4bd33457c`
+  removes it with `merge_objects.py`. Six merges show in a log of `.github/` only because one side predates
+  `2bff75ab16`'s dead-strip step, which `main` has since PR 27: five of upstream's main into topic branches
+  (`19e9aa784f`, `71fe4adb5d`, `3ca31c060c`, `e2ab645c98`, `ed0dcf8652`) and `b962ecf040`, whose topic predates it. The
+  fourteen commits after `b67985f98f` touch nothing in `.github/`. No trigger, permission, secret, action or pinned
+  version changes, and no workflow is added; `build.yml`, `compile.yml` and `standards.yml` are upstream's byte for
+  byte, and `port-ci.yml` and `port-sync.yml`, which upstream doesn't have, are unchanged. `gh workflow list --all -R
+  CallanCampos/Frigate`: Build disabled, and Compile, Frigate CI, Frigate upstream sync and Standards active. Three
+  conflicts, all modify/delete, resolved on upstream's structure ([SYNC.md](SYNC.md#conflicts-and-stopped-syncs)):
+  - `lib/nitrowifi/src/wcm/wcm.c` (first merge), which `df847de7d1` splits into five files: the WCM row's changes (the
+    work's alignment test through `uptr`, the host's refusal of a negative size, `PORT_WCM_DS_WORK_SIZE` and the AP-list
+    header's host alignment) reapplied in `wcm_system.c`, in `WCM_InitEx`, `WCM_GetWorkSize` and `WcmConfigure`, the
+    functions' new names, with `port_wcm.h` included under `PLATFORM_PC` as `wcm.c` included it.
+  - `lib/twl/src/card/card_rom_twl.c` (first merge), which `b2e9e3c1da` merges into `lib/nitro/src/card/card_rom.c`: not
+    reapplied, since the host replaces `card_rom.c`, so it compiles none of the secure-area code whose arena addresses
+    the row made `uptr`. Its row ([game-changes.md](game-changes.md)) drops the file and says why.
+  - `lib/dwc/src/base/friend.c` (second merge), which `dc4518af06` splits into six files: the DWC match row's change to
+    it, the buddy index passed to `gpProfileSearchA` as `(void *)(uptr)` and read back with `(int)(uptr)param` in
+    `DWCi_GPProfileSearchCallback`, under `PLATFORM_PC`, reapplied in `dwc_friend.c`, where the friend list's control is
+    `sFriendControl`, no longer `sFriend.control`.
+
+  Three native fixes in the first merge, each forced by an upstream commit: `port/include/port_wcm.h` includes
+  `wcm_internal.h` from `lib/nitrowifi/src/wcm`, where `df847de7d1` moves it out of the include directory; and the
+  platform layer calls the new names of the DSi functions it calls, `CARDi_InitRomHash` (`CARDi_InitTwlRom` before
+  `0df4968f2d`) in `port/hal/card/card_rom.c`, and `OSi_InitArenaEx_ltdmain` and `OSi_EnterNDmaCallback_ltdmain`
+  (`OSi_InitArenaExTwl` and `OSi_EnterNDmaCallbackCore` before `ff00b40907`) in `port/hal/os/os_arena.c` and
+  `os_interrupt.c`. The second, third and fourth upstream merges need none. Upstream's other changes to files that
+  hold port changes merge without a conflict and keep their rows' changes: `wm_system.c` and `ssp_exifdec.c` in the
+  first merge; `dwc/match_internal.h`, `dwc_match.c`, `dwc/nasfunc.h`, `nd_internal.h` and `dwc_auth.c` (git follows
+  the rename of `dwc_nasfunc.c`) in the second; `cps.c` in the third, where `60afdfdae6` changes `resolve_common`'s
+  and `resolve_sub`'s parameters, far from the row's `(uptr)` casts in `calc_checksum_do`; none in the fourth. Of the
+  188 files outside `port/` and `.github/` with port changes, 187 carry the same changes against `65cf903b70` as
+  `main`'s against `629a53cccb` (after the renames), and `dwc_friend.c` carries `friend.c`'s, at the new field's name;
+  all 188 carry the same changed lines against `9f317ea244` as against `65cf903b70`, and against `c127efd9fa` as
+  against `9f317ea244` (`git diff -U0` of each file, before and after the third and the fourth merge). The fourth
+  merge, `5d32b558ea`, adds to its first parent exactly upstream's change from `9f317ea244` to `c127efd9fa` (the two
+  diffs have the same `git patch-id`).
+  `configure.py`'s `DSD_VERSION` goes from `v0.12.1-dsi.6` to `v0.12.1-dsi.7` (#498): the local ROM build downloads that
+  dsd from the ds-decomp fork's releases, with no checksum, and runs it, as every pin before it; the hosted workflows
+  don't fetch dsd.
+
+  `e40220b8d7`'s records: the WCM row names `wcm_system.c` and the merge `ac06c5c88e`; the card row drops
+  `card_rom_twl.c` and says why; the DWC match row names `dwc_auth.c` and `dwc_friend.c`, its proof against `65cf903b70`
+  and the merge `f193d8a5ca`; the `nd_internal.h` row names what upstream now calls `gamestats_internal.h`,
+  `lib/dwc/src/enc/enc_internal.h` (`87bd0558c2`); and the `net.h` row names `wifi_friend.c`. Every file outside `port/`
+  and `.github/` that differs from upstream is in a row, and no row has all its files matching upstream's. Of the names
+  that upstream removes (the `symbols.txt` files, the identifiers of `src/`, `lib/` and `include/`, and their file
+  names, at `629a53cccb` and `65cf903b70`), `port/` named, outside the past records, the research notes and the guard's
+  baseline, the three DSi functions above, four names in comments and one in a finding, which `e40220b8d7` updates:
+  `WCM_GetRequiredWorkSize` (now `WCM_GetWorkSize`, in `port_wcm.h`, with `wcm.c`), `PMi_SendPxiDataSync` (now
+  `PMi_TryToSendPxiDataTillSuccess`, in `port/hal/os/os_system.c` and `port/tests/os/test_os.c`), `card_rom.c`'s
+  `sRomAuthCode` (now `CARDiOwnSignature`, in `port/hal/card/card_rom.c`'s comment), `auth/dwc_nasfunc.c` (now
+  `dwc_auth.c`, in `port/hal/stubs/wstring_host.c`) and overlay 11's `WcmGetLinkLevel` (now `WCM_CalcLinkLevel`,
+  `df847de7d1`, in decomp-findings.md's `ReshZekSave_Init` row). The platform layer's own statics `CARDi_ReadRomTask`
+  and `sRomAuthCode` in `port/hal/card/card_rom.c` keep names that upstream's `card_rom.c` now gives as
+  `CARDi_ReadRomSyncCore` and `CARDiOwnSignature`, and the research notes and spikes keep the names of their time.
+  `pm.c`'s `.ltdmain` pragmas, compiled through `port/hal/pm/pm_host.c` with the platform layer's flags, add five
+  `-Wunknown-pragmas` warnings to the host build; the game's own files silence them. Upstream's `cd23a9981d` carries a
+  closing keyword with upstream's issue 121, which no issue or pull request of Frigate has; no incoming commit names
+  another repository's issue.
+
+  The six commits after `65cf903b70`, reviewed as SYNC.md asks before the tool merged them: they change no workflow; no
+  message names an issue, pull request or discussion of any repository or has a closing keyword, and
+  `sync_upstream.sh`'s reference check passed, warning again only of `cd23a9981d`; of the files with port changes they
+  change only `cps.c` (above). The names they remove are overlay 11's `data_ov011_0218dce4` and `sHostName` at its old
+  address, now `sHostAddr`: `port/` names neither (`port/tests/hal/test_wstring.c`'s `sHostName` is the test's own
+  string), and no identifier of `src/`, `lib/` or `include/` goes. decomp-findings.md and game-changes.md have no row
+  for the files they complete, `dwc_conntest.c` and `soc.c`, or for `gsLargeInt.c` and `ssl.c`. They add no cast that
+  the pointer cast guard counts (below).
+
+  The two commits after `9f317ea244`, `03a4db98b0` and `c127efd9fa`, reviewed as SYNC.md asks right before
+  `sync_upstream.sh` merged them, and again on the merged head `5d32b558ea`: they change no workflow (nothing under
+  `.github/`); neither message names an issue, pull request or discussion of any repository or has a closing keyword,
+  and the tool's reference check passed, warning again only of `cd23a9981d`; they change ten files, `ssl.c`,
+  `dwc_transport.c`, overlay 11's `delinks.txt` and `symbols.txt` in both versions, `config/fixes.txt`,
+  `config/names.txt`, `docs/matching.md` and `docs/nonmatching-functions.md`, none of which has a port change, and no
+  header; `ssl.c` is now complete in both versions, so ninja's SHA1s prove its compile with `ssl_internal.h`'s row, and
+  `dwc_transport.c` stays partial. The names they remove: overlay 11's symbols `sConfig` (now `sCipherSuites`, with
+  `sHandshakePriority` after it), `data_ov011_0218dde8` (now `sPoolSeeded`), `data_ov011_0218e918` (now
+  `sSendPoolHead`) and `data_ov011_0218e920` (now `sTransport`), and the C's `ssl.c` statics `sConfig`, `sOid0`,
+  `sOid2`, `sOidCommonName`, `sOidMd5WithRsa`, `sOidRsaEncryption`, `sOidSha1WithRsa` and the five `sLabel*`, and
+  `dwc_transport.c`'s `sSendPool`: `port/` names none of them outside this entry; no file of `src/`, `lib/` or
+  `include/` is added, removed or renamed. decomp-findings.md and game-changes.md have no row for `ssl.c` or
+  `dwc_transport.c`. They add no cast that the pointer cast guard counts (below), and change no trap stub.
+  game-changes.md needs no change for the sync: every file outside `port/` and `.github/` that differs from `c127efd9fa` is in a row,
+  the same 188 on `5d32b558ea`, and no row has all its files matching upstream's. The merge of `main` at `f6200135f9`
+  adds PR 29's row and two of its files to them, `scrcmd_vm.c` and `scrcmd_fldmmdl.c` (`script_sys.c` was one of the
+  188, in the VM row), 190 in all: `check_mwcc_neutral.py --base c127efd9fa` on its three files differs in both
+  versions only at PR 29's six `u32` made `s32` and, in `script_sys.c`, at the `net.h` row's first difference, as
+  before; the three are complete in both versions, so ninja's SHA1s prove them. The records commits `45a7cf6505` and
+  this one bring this entry to `5d32b558ea` and to the merge of `main` after it.
+- **Next:** the owner's review of PR 35, once its CI and `Frigate local verification` (`sync_upstream.sh --verify-pr
+  35`, in a separate worktree) pass on its final head. Upstream's `main` has moved on since the merge, to `4b1d064408`
+  at 07:30 UTC (`9427662efc`, DWC's `gsPlatformSocket.c` and `gpiBuffer.c` complete, and `4b1d064408`, a row's tries
+  in `docs/nonmatching-functions.md`): not in this sync, they wait for the next one, after this one merges. After the
+  sync merges: the `--update` PR (the five rows no longer found, `WcmWmcbScanEx`'s rename), the platform layer's two
+  statics at upstream's names, `pm_host.c`'s pragmas, and phase 4's route with #496's encounter effects, which brings
+  decomp-findings.md's `enceff_data.c` row up to date.
+- **Blockers:** none upstream. PRs 34 and 29 are merged (`a5dc06ff82`, `f6200135f9`) and in this branch; the sync
+  waits for the owner's review and approval of PR 35.
+
+## 2026-10-25: the contributor's PR 29, the field script's offsets signed, and the starter's scene under test
+
+- **Upstream:** `629a53cccb` (upstream merge #504), as `main` has it since PR 27; neither PR 29 nor this branch merges
+  an upstream commit.
+- **Port:** `90097f6d84`, on the topic branch `port-script-offsets-tests` from `main` at `f6200135f9` (PR 29's merge), not
+  published yet: `dae7ef786d` (the tests), `bf8f9688fa` (the scene change table's offset and the ledger row),
+  `6fd585e5b5` (the audit, the lesson and this entry) and this commit (the review's corrections). The first three were
+  reworded before publishing, with the trees they had but for this entry's SHAs: the review checked them as
+  `229cdda01a`, `26beeda2be` and `efc98fc8cd`. PR 29 is the contributor's `3651ca9d10` (the change and its row of
+  [game-changes.md](game-changes.md)), with the branch's merges of `main` up to `d0607a36c2` and the owner's update
+  `72fd5072f7` from `main` at `a5dc06ff82` (PR 34's merge), merged with a merge commit pinned to that head, after its CI
+  and its local verification passed there (the `Frigate local verification` status: both SHA1s, Black 2 308 of 308 and
+  White 2 305 of 305 host tests). It fills the last entry's `PORT_SHA`, `676a894d74`.
+- **ROM:** T0 passes on each commit's tree, the first three before the review and this commit's after it: `python3
+  configure.py && ninja` with no compiler warning, and both SHA1s match (Black 2
+  `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb`, White 2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`); `bf8f9688fa` compiles
+  `src/ov012/script_sys.c` again in both versions.
+- **MWCC-neutrality:** the three files that PR 29 and `bf8f9688fa` change are complete in both versions, so ninja is the
+  proof. Against `main` before PR 29, `a5dc06ff82`, MWCC's preprocessed tokens of the three files
+  (`check_mwcc_neutral.py`'s preprocessor, the streams compared whole) differ in both versions only at the six `u32` now
+  `s32` (four in `scrcmd_vm.c`, one in each of the others) and the one `(s32)` cast; no header changes.
+- **Code standards:** clang-format 23.1.1 `--dry-run --Werror` passes on `src/ov012/script_sys.c` and on
+  `port/tests/integrate/script_offsets.c` and `test_integrate.c`, at each commit; `tools/decomp/check_style.py --diff
+  f6200135f9 --strict` passes.
+- **Host build:** T1 passes on macOS arm64, AppleClang 21.0.0, RelWithDebInfo, both versions (`build/port`,
+  `build/port-w2`, configured fresh with `sync_upstream.sh`'s options and built again at each commit), with no warning
+  in the files the branch adds or changes. The oracle, for the reference saves, the seeds and the traces, is built alone
+  in `build/port-oracle` (`-DPORT_BUILD_ORACLE=ON`, its target only).
+- **Tests:** ctest `-j2` on each commit's tree: Black 2, 295 passed and 15 skipped of 310; White 2, 292 passed and 15
+  skipped of 307; none failed. Skipped in both: the 12 oracle tests (no oracle in these builds),
+  `frame_times_party_menus` (the oracle's save), `asm_oracle` (no Unicorn in this Python) and `app_universal_slices` (a
+  distribution build's). The new `integrate_script_offsets` and `replay_starter_save` pass in both versions, the latter
+  in 49 to 84 s; on `main` before PR 29 (`a5dc06ff82`'s three game files built into this tree) both fail in both
+  versions. With `a5dc06ff82`'s `scrcmd_vm.c` alone built in (Black 2), `replay_starter_save` passes (48.9 s) and
+  `integrate_script_offsets` fails its four checks of the jumps back. T4: the oracle made `first_save` and
+  `starter_save` in both versions with the SHA-1s `SAVES` keeps, from the input files with their new `seed` lines, and
+  `oracle.py seeds starter_save` finds those seeds the DS's; no oracle sequence ran. T5 (the sanitized build, which CI
+  runs, its UBSan alignment check over the test's stand-in among it) and T7 not run.
+- **Tiers:** unchanged: the branch changes one token of game C.
+- **Trap stubs:** 30 function stubs and 21 data placeholders per version (`build/port*/gen/stubs.c`), as the last
+  entry's.
+- **64-bit warnings:** `check_ptrcasts: 361 sites in 225 keys (real 66, harmless 117, handled 141, unreachable 37), 1682
+  files, 0 not compiled` in both versions, as on the last entry. The case PR 29 fixed is one the guard can't see, a
+  `u32` offset added to a pointer, with no cast; the audit below covers it.
+- **Work done:**
+  - **PR 29**, the contributor's: the field script read the relative offsets of its four jump and call commands
+    (`s0004_VMCall`, `s001E_VMJump`, `s001F_VMJumpIf`, `s0020_VMCallIf` in `src/ov012/scrcmd_vm.c`), of
+    `s0064_ActorCmdExec`'s movement (`src/ov036/scrcmd_fldmmdl.c`) and of the script's start (`FieldScript_CreateVM`,
+    `src/ov012/script_sys.c`) as `u32` and added them to its pointer: on the DS the 32-bit sum wraps and an offset back
+    goes back, on a host it goes 4 GiB forward, and the next read faults. Black 2 stopped so in the starter's scene on
+    Windows and on Linux. PR 29 reads them as `s32`, a Neutral change with its row in
+    [game-changes.md](game-changes.md); the owner reviewed it, updated it with `main`, verified its head and merged it.
+    The review listed the follow-ups below.
+  - **The tests that would have caught it** (`dae7ef786d`), both failing on `main` before PR 29 (`a5dc06ff82`'s three
+    files, the rest of the tree this branch's) and passing after, in both versions:
+    - `integrate_script_offsets` ([../tests/integrate/script_offsets.c](../tests/integrate/script_offsets.c)), without
+      the ROM: each command runs alone over the bytes the starter scene's commands read, at the offsets the script has
+      them (`res/field/scripts/aspertia_city.s`): the nickname loop's `VMJump L_06D2`, 134 bytes back, the conditional
+      jump and call written in its place, the `VMCall L_06C6`, 128 bytes forward, and `ActorCmdExec 2, Movement_0528`,
+      314 bytes back, an animation of Bianca's in place (its one action, 100, sets her draw status to 10 and waits for
+      the animation's end), whose actor, actor system, task manager and GFL heap the scenario makes with the game's
+      layouts and whose action task's first pass must give the actor that action. On the parent the four jumps back fail
+      their checks, and the action task reads 4 GiB forward: Black 2 stopped with SIGBUS and White 2 got the wrong
+      action, as the memory lay there.
+    - `replay_starter_save` ([../tests/replay/check_oracle_save.py](../tests/replay/check_oracle_save.py)): the port
+      plays `first_save`'s input file from a blank save, then `starter_save`'s from the save it made, 35,800 frames
+      through Bianca's scene, and its save is held to the oracle's starter save block by block, by the SHA-1s of
+      `starter_save_<version>.save.tsv` (written from the oracle's save, hashes only), with the bytes that differ by
+      construction declared with their causes, as ADR 0023 has the port's own play compared. The input files give the
+      DS's start-up seed (`oracle.py seeds starter_save`: Black 2 `0xea56a175a2fffc8a`, White 2 `0x81d63ca2c9f3143e`);
+      the oracle reads the line only as part of the file, and still makes the saves SAVES keeps. On the parent the
+      second run crashes, with SIGSEGV or SIGBUS by where the read 4 GiB on lands (here Black 2 SIGSEGV and White 2
+      SIGBUS; the review's White 2 run got SIGSEGV); without the seed the starter's personality and the townspeople
+      differ, and the check fails on them. The route answers NO to the nickname (line 783 of Black 2's input file, 784
+      of White 2's), so the replay holds `s0064_ActorCmdExec`'s half alone: the nickname loop's jump back, which only
+      YES takes, and the other jumps and calls are `integrate_script_offsets`'s. Neither test holds
+      `FieldScript_CreateVM`'s cast or the scene change table's offset: the scripts' header tables and the zones'
+      scene-change tables point only forward.
+  - **What the port's save differs in, traced**, the same in both versions: the four blocks New Game set up on the
+    port's own first save (the mystery gift, the trainer card's records and the symbol encounters, encrypted with keys
+    seeded with the VBlank count, and DWC's random player ID), as [the oracle's guide](../tools/oracle/README.md#saves)
+    has them; the play time, which counts the CPU's time (`OS_GetTick`, `src/system/playtime_ctrl.c`), and the clock's
+    times of the save and of its last check, which run with the video frames; 12 bytes of Tepig's mail, which
+    `PokeParty_CreatePkm` takes from the system heap uncleared (`CreateMailData`; `ResetMailData` sets neither its
+    `unk18` nor the messages' `id`s), so they hold what each heap left there; and the state of the four townspeople who
+    walk at random. GFL's linear generator, dumped at every frame on both programs (`--dump`, the port's through a
+    static made global in a scratch build only), is the DS's at the end of every pass but counts 12134 to 12181 and from
+    13232; a log of the draws' callers names the first stretch Tepig's creation, which the port makes 48 passes sooner,
+    and the second the walkers' draws. The cause, from the sound system's fade dumped on both: after Bianca's first talk
+    the field loads the city's music again in GFL's sound thread (`GFL_SndBGMLoadStep`, `src/system/snd_sys.c`), whose
+    card reads take the DS 56 passes (counts 11257 to 11313 in Black 2) and the port 6, and the field waits for its
+    fade-in before the starter's selection (`EventFieldClose_Callback`, `src/system/field_event.c`), so the rest of the
+    scene runs about 50 passes later on the DS; B, mashed, absorbs it, and the walkers the scene paused walk again from
+    another count.
+  - **The ledger row** (`bf8f9688fa`), as the review asked: `FieldScript_CreateVM`, not `FieldScript_Create`; five `u32`
+    made `s32` and one `(s32)` cast, now six with the scene change table's; one base commit for the proof, `main` before
+    PR 29; Linux as well as Windows; and that `s0064_ActorCmdExec`'s half is what `Movement_0528`, an animation of
+    Bianca's, needs after either answer to the nickname.
+  - **`FieldScript_GetSceneChangeSCRID`'s offset signed too** (`bf8f9688fa`): the offset from a zone's scene-change
+    entry to its table of conditions, the last `u32` offset of the field script's system. All 67 point forward in each
+    version (2 to 20 bytes, read from the ROM's zone files, `a/1/2/6`, and laid out so by `tools/data/event_data.py`),
+    so the host's results are the same, and a table a mod puts before its entry works as on the DS. Neutral, in the same
+    row.
+  - **The audit the review did, kept** (`6fd585e5b5`, widened by this commit):
+    [../tools/pointer_offsets.query](../tools/pointer_offsets.query), clang-query matchers for every pointer or `uptr`
+    plus or minus a `u32`, and since this commit every pointer subscripted by one, in the files its command names: the
+    script interpreters (the 77 files that include `system/vm.h`), NitroSystem's resource readers (the 78 files of
+    `lib/nnsys/src` and `hal/nnsys`) and, since this commit, 30 other readers of offsets from data, of the kinds the
+    review named: SPL (`lib/spl/src`, 8), the 18 files of NitroSDK's `snd`, `gx` and `fs` that the host compiles, GFL's
+    `arc_tool.c`, `arc_util.c` and `msgdata.c`, and the zone's event data, `src/ov012/eventdata_system.c`. Its row is in
+    the tools guide; SYNC.md's list of what the pointer cast guard doesn't see names the case, and lessons.md has the
+    lesson. Run with `-p build/port` and `-p build/port-w2` (Homebrew LLVM 23.1.3) over those 185 files, it finds the
+    same 342 sites in both versions (540 matches, a header's once for each file that includes it), none an offset that
+    counts from the reader's place; the interpreters' own relative offsets, every jump and call of the field script, the
+    trainers' AI and the battle's effect scripts, are `s32` or `int`, which it doesn't list. Before this commit, over
+    the first 155 files and without subscripts, it found 130 (320 matches); the review's own run over 97 such readers
+    found 160 more sites of the first three kinds, each an offset from a start, an index or a size. The 342 sites:
+    - **A pointer plus or minus a `u32`:** 144 sites. In the interpreters 10, each an offset from the start of its file
+      or block: the battle's effect scripts (`btlv_effvm.c`, 8: the file's header and its table of offsets, and the
+      table's index times 4), a texture's palette in the battle's fades (`btlv_effect.c`, 1, NNS's offset from the
+      texture block) and the musical's scripts (`sta_act_script.c`, 1, a script's offset from its file's start). In
+      NitroSystem's readers 90: 30 offsets from the start of a file, a block or a resource (G3D's texture and palette
+      data in `kernel.c`, 4; a joint animation's rotation tables in `nsbca.c`, 16; a material's and a texture's
+      animation data in `nsbma.c` and `nsbta.c`, 2 each; a model's command list and envelope matrices in `sbc.c`, 2; a
+      sound archive's file and a stream's data, 1 each; a cell transfer's source, 1; the port's G2D animation frames in
+      `hal/nnsys/g2d_load.c`, 1), and 60 indexes, counts and sizes. In the other readers 44, each an offset from a
+      start: the 2D loaders' characters and screens from the start of their VRAM (`gx_load2d.c`, 18), a particle
+      resource's parts from its start (`spl_manager.c`, 13), the message data's block, entries and strings from the
+      file's and the block's start (`msgdata.c`, 6), the zone's init script, entities, NPCs, warps and triggers from the
+      start of its event data (`eventdata_system.c`, 5), a palette's colors from its data's start (`arc_util.c`, 1) and
+      a sound channel from the driver's work (`snd_work.c`, 1).
+    - **A pointer moved by a `u32`:** 8 sites, each a size or an index: G3D's commands' sizes (`sbc.c`, 6), a G2D
+      block's (`hal/nnsys/g2d_load.c`, 1) and the field script's start, its index times 4 (`script_sys.c`, 1). Before
+      `bf8f9688fa` there were 9: the ninth was `FieldScript_GetSceneChangeSCRID`'s `script += offset`, the one offset
+      that counts from the reader's place.
+    - **An address held in an integer plus or minus a `u32`:** 57 sites, none an offset back: NitroSystem's heaps' block
+      sizes and alignments (`expheap.c` 10, `frameheap.c` 3, `hal/nnsys/fnd_hooks.c` 1), offsets from OAM's start
+      (`g2d_OAM.c`, 2), a stream's sizes and buffer offsets (`snd_arc_stream.c` and `snd_stream.c`, 1 each), the port's
+      G2D relocation from a file's start (`hal/nnsys/g2d_load.c`'s `Rel`, 1) and a size there (1), Join Avenue's numbers
+      summed from a `uptr` getter (`scrcmd_resort.c`, 2), BG screens' and characters' addresses from the start of BG
+      VRAM (`gx_bgcnt.c`, 20), palettes', OAM's and LCDC VRAM's from theirs (`gx_load2d.c`, 8), file positions from a
+      file's or its FAT's start (`msgdata.c` 3, `arc_tool.c` 1) and the sizes of the zone's event data
+      (`eventdata_system.c`, 3).
+    - **A pointer subscripted by a `u32`:** 133 sites, each an index: frames and indexes in G3D's animation data
+      (`nsbca.c` 42, `nsbma.c` 13, `nsbta.c` 11, `res_struct_accessor_anm.c` 3); IDs, handles and loop counters
+      elsewhere in NitroSystem (`g2d_CellTransferManager.c` 7, `sbc.c` 4, `gfdi_LinkedListVramMan_Common.c` 4,
+      `kernel.c` 2, `g2d_NAN_load.c` 2, `g2d_MultiCellAnimation.c` 1, `hal/nnsys/g2d_load.c` 3); the field script's
+      commands' tables (`scrcmd_misc.c` 8, `script_sys.c` 7, `scrcmd_shop.c` 4, `scrcmd_encount.c` 1,
+      `scrcmd_pokemon_center.c` 1); an extra command's number less the first's, checked before (`vm.c`, 1); the battle's
+      background type (`btlv_effect.c`, 5) and a handler's flag (`battle/btl_handler.h`, 1); the musical's script number
+      (`sta_act_script.c`, 1); GFL's archive IDs, entries and characters (`arc_tool.c` 4, `msgdata.c` 3, `arc_util.c`
+      2); and the zone's NPC and entity numbers (`eventdata_system.c`, 3).
+  - **The review's corrections** (this commit), each checked against the code or a run:
+    - `Movement_0528` is no walk: its one action, 100, is `ACTOR_ACTION_COMMAND_TABLES[100]`
+      (`src/ov036/fldmmdl_movedata.c`), whose commands set Bianca's draw status to 10 and wait for its animation's end
+      (`src/ov036/fldmmdl_acmd.c`); walks go through `FieldAcmdTCB_WalkInit`. The test's names and messages, the ledger
+      row, this entry, SYNC.md, the oracle's guide, `app.cmake` and the first three commits' messages say so now.
+    - Which half each test holds: the run above, with `a5dc06ff82`'s `scrcmd_vm.c` alone, shows that the replay holds
+      `s0064_ActorCmdExec`'s alone. The ledger row, `app.cmake`, the oracle's guide, lessons.md and this entry say which
+      test holds which, and that none holds `FieldScript_CreateVM`'s cast or the scene change table's offset.
+    - The ledger row's commit is `PORT_SHA` alone: `d0607a36c2` is a merge of `main` into the contributor's branch,
+      whose diff doesn't hold the row, which came from `3651ca9d10`; the row changes again on this branch, so its commit
+      is this branch's, as for any row changed again.
+    - The audit's header claims only the files its command names, the command takes in the other readers above, and a
+      fourth matcher lists the pointers subscripted by a `u32`, which have the same 4 GiB reach.
+    - The test's stand-in for `GameData` is an array of `uptr`, so that it is aligned for the event work pointer
+      `ScriptWork_GetWkAddr` reads in it; as a `u32` array it was 8-aligned only by where the linker put it.
+    - `app.cmake`'s comment gives the replay's measured time, and this entry the play time's clock and the crash signals
+      as they are.
+  - Guides: the tests guide's integrate and replay rows, the cmake guide's, ARCHITECTURE.md's field, saves and guard
+    rows, the tools guide's row of the query, and the oracle's guide on the port's play of the starter route.
+- **Next:** this branch published as a pull request to `main`, the owner's review and `--verify-pr` on its head; then
+  the sync of upstream `65cf903b70`, as the last entry says.
+- **Blockers:** none.
+
+## 2026-10-25: the pointer cast guard's rows for the sync of upstream `65cf903b70`
+
+- **Upstream:** `629a53cccb` (upstream merge #504), as `main` has it since PR 27; this branch merges no upstream commit.
+  The sync of upstream's `main`, at `65cf903b70` when it was validated, is prepared on the local topic
+  `codex/upstream-sync-manual` and needs these rows first.
+- **Port:** `676a894d74`, on the topic branch `port-sync-ptrcast-rows-wcm-dsp` from `main` at `abf834a3a3` (PR 32's
+  merge), one commit, published as one pull request to `main`. It fills the last entry's `PORT_SHA`, `1e107c917e`.
+- **ROM:** T0 passes: `python3 configure.py b2_us w2_us && ninja`, from an empty build directory in a new worktree of
+  `main`, compiled every C file of both versions with no compiler warning, and both SHA1s match (Black 2
+  `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb`, White 2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`). The branch changes
+  only `port/`.
+- **Host build:** T1 passes on macOS arm64, Apple clang 21, RelWithDebInfo, both versions (`build/port-verify-b2_us`,
+  `build/port-verify-w2_us`, configured fresh as `sync_upstream.sh` configures them), 727 compiler warnings in each, as
+  `main` has.
+- **Tests:** ctest at `-j2`: Black 2, 293 passed and 15 skipped of 308; White 2, 289 passed and 16 skipped of 305; none
+  failed. Skipped in both: the 12 oracle tests that need the oracle, which that configuration doesn't build,
+  `frame_times_party_menus` (the oracle's save), `asm_oracle` (no Unicorn in this Python) and `app_universal_slices` (a
+  distribution build's); in White 2 also `frame_times_title`, which skips a scene over its budget while the load average
+  is above the cores (`port/cmake/frame_times.cmake`). `game_ptrcasts` passes in both; T4, T5 and T7 not run.
+- **Tiers:** unchanged: the branch changes no game C.
+- **Trap stubs:** 30 function stubs and 21 data placeholders per version, unchanged.
+- **64-bit warnings:** `check_ptrcasts: 361 sites in 225 keys (real 66, harmless 117, handled 141, unreachable 37), 1682
+  files, 0 not compiled` in both versions, as on the last entry; the three new rows pass as no longer found, since
+  `main` doesn't have their code yet. On the sync's merge of `65cf903b70` (`f193d8a5ca`, with its records' comments),
+  with this baseline (`check_ptrcasts.py --baseline`), both versions give `check_ptrcasts: 359 sites in 223 keys (real
+  66, harmless 117, handled 141, unreachable 35), 1684 files, 0 not compiled`, exit 0, and the same on the merge of
+  `8717781533` before it, with 1679 files; with `main`'s, `game_ptrcasts` fails there on these three findings and
+  nothing else.
+- **Work done:** the guard's baseline ([../tools/ptrcast_baseline.tsv](../tools/ptrcast_baseline.tsv)) gets the three
+  rows that the sync of `65cf903b70` needs, as [SYNC.md](SYNC.md#when-the-pointer-cast-guard-fails) says for a sync's
+  new sites. Each is a cast that a row already holds, which upstream renamed with both its file and its function, so the
+  guard can't pair it with its old row:
+  - `df847de7d1` splits NitroWiFi's `wcm.c` into five files, and `WCM_NotifyResult`'s call `WCMi_NotifyEx(notify,
+    result, (s32)parameter, (void *)detail, line)` is `WCMi_Notify`'s in `wcm_system.c`: its `ptr-to-int` (`s32 <- void
+    *`) and `int-to-ptr` (`void * <- u32`) rows, `real` in R23 (the Wi-Fi libraries' handles and notices carried as
+    integers, until phase 7), as the old rows are.
+  - `1574db16fe` gives TwlSDK's DSP code the SDK's names, and `dsp_audio.c`'s `func_027060b4` is `DSPi_PlaySoundEx` in
+    `dsp_util.c`: its `ptr-to-int` (`u32 <- const void *`) row, `DSPi_SwapHalves((u32)src)`, `unreachable` (TwlSDK code;
+    the host runs as a retail DS), as the old row is.
+
+  On the sync's head the old rows pass as no longer found, with `card_rom_twl.c`'s and `os_arena_twl.c`'s, whose code
+  the host no longer compiles, and `WcmWmcbScanEx`'s passes as renamed into `wcm_wmif.c`, until a PR after the sync runs
+  `--update`.
+- **Next:** the sync: `main` merged into `codex/upstream-sync-manual`, `sync_upstream.sh --branch
+  codex/upstream-sync-manual` run again to validate its head and publish it, and the owner's review.
+- **Blockers:** none.
+
 ## 2026-10-25: a conflicting upstream sync proposes a draft of upstream's head
 
 - **Upstream:** `629a53cccb` (upstream merge #504), as `main` has it since PR 27; this branch merges no upstream commit.

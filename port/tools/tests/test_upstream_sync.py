@@ -260,7 +260,8 @@ class SyncTests(GitFixture):
             sync.propose_conflict(branch, base, upstream, ['game.c', 'src/x.c'])
         commands.assert_called_once_with(['git', 'push', 'origin', upstream + ':refs/heads/' + branch])
         create = gh.call_args.args
-        self.assertEqual(create[:3], ('pr', 'create', '--draft'))
+        self.assertEqual(create[:2], ('pr', 'create'))
+        self.assertIn('--draft', create)
         self.assertNotIn('--reviewer', create)
         self.assertEqual(create[create.index('--title') + 1], sync.CONFLICT_TITLE)
         body = create[create.index('--body') + 1]
@@ -272,7 +273,7 @@ class SyncTests(GitFixture):
 
     def test_draft_keeps_file_names_in_code_spans(self):
         body = sync.conflict_body(sync.PREFIX + 'fixture', 'a' * 40, 'b' * 40, ['docs/see owner/repo#12`.md'])
-        self.assertIn('- `docs/see owner/repo#12.md`\n', body)
+        self.assertIn('- `docs/see owner/repo#12' + r'\u0060' + '.md`\n', body)
 
     def test_draft_lists_a_bounded_number_of_files(self):
         files = [f'src/f{i}.c' for i in range(sync.LISTED_FILES + 7)]
@@ -345,11 +346,12 @@ class SyncTests(GitFixture):
             commands.assert_called_once_with(['git', 'push', 'origin', 'HEAD:refs/heads/' + branch], check=True)
 
     def test_app_publisher_never_requests_status_or_user_privileges(self):
-        with patch.dict(os.environ, {'GITHUB_ACTIONS': 'true'}), patch.object(sync, 'git'), patch.object(sync, 'pending', return_value=[]), patch.object(sync, 'gh', return_value='created') as gh, patch.object(sync, 'run', side_effect=AssertionError('unexpected API call')), patch.object(sync.subprocess, 'run'):
+        with patch.dict(os.environ, {'GITHUB_ACTIONS': 'true'}), patch.object(sync, 'git'), patch.object(sync, 'pending', return_value=[]), patch.object(sync, 'gh', return_value='created') as gh, patch.object(sync, 'request_review') as review, patch.object(sync, 'run', side_effect=AssertionError('unexpected API call')), patch.object(sync.subprocess, 'run'):
             sync.publish(sync.PREFIX + 'app-fixture')
             create = gh.call_args.args
             self.assertEqual(create[:2], ('pr', 'create'))
-            self.assertIn('--reviewer', create)
+            self.assertNotIn('--reviewer', create)
+            review.assert_called_once_with({'url': 'created'})
             self.assertNotIn('--approve', create)
 
     def test_workflow_uses_repository_scoped_revoked_app_token(self):
@@ -379,15 +381,16 @@ class SyncTests(GitFixture):
 
     def test_open_sync_is_frozen(self):
         for proposal in ({'url': 'pending'}, {'url': 'draft', 'isDraft': True, 'number': 7}):
-            with self.subTest(proposal=proposal), patch.object(sync, 'pending', return_value=[proposal]), patch.object(sync, 'git') as git, patch.object(sync.subprocess, 'run') as commands:
+            with self.subTest(proposal=proposal), patch.object(sync, 'pending', return_value=[proposal]), patch.object(sync, 'request_review') as review, patch.object(sync, 'git') as git, patch.object(sync.subprocess, 'run') as commands:
                 sync.prepare()
                 git.assert_not_called()
                 commands.assert_not_called()
+                review.assert_called_once_with(proposal)
 
     def publish_over(self, proposal):
         branch = sync.PREFIX + 'fixture'
         proposal = dict(proposal, headRefName=branch, headRepositoryOwner={'login': 'CallanCampos'})
-        with patch.object(sync, 'git', return_value='a' * 40), patch.object(sync, 'pending', return_value=[proposal]), patch.object(sync, 'gh', return_value='') as gh, patch.object(sync, 'run', return_value='CallanCampos'), patch.object(sync.subprocess, 'run') as commands:
+        with patch.object(sync, 'git', return_value='a' * 40), patch.object(sync, 'pending', return_value=[proposal]), patch.object(sync, 'request_review'), patch.object(sync, 'gh', return_value='') as gh, patch.object(sync, 'run', return_value='CallanCampos'), patch.object(sync.subprocess, 'run') as commands:
             sync.publish(branch)
         commands.assert_called_once_with(['git', 'push', 'origin', 'HEAD:refs/heads/' + branch], check=True)
         return [call.args for call in gh.call_args_list]
@@ -417,6 +420,69 @@ class SyncTests(GitFixture):
             with self.assertRaisesRegex(RuntimeError, 'already pending'):
                 sync.publish(sync.PREFIX + 'mine')
         commands.assert_not_called()
+
+
+class PublicationRecoveryTests(unittest.TestCase):
+    def proposal(self):
+        return {'number': 37, 'url': 'https://github.com/CallanCampos/Frigate/pull/37',
+                'headRefName': sync.PREFIX + 'fixture', 'isDraft': False}
+
+    def details(self, **changes):
+        details = dict(author={'login': 'frigate-upstream-sync[bot]'}, isDraft=False,
+                       reviewRequests=[], reviews=[])
+        details.update(changes)
+        return details
+
+    def test_creation_response_failure_recovers_existing_pr_without_push(self):
+        proposal = self.proposal()
+        with patch.object(sync, 'gh', side_effect=subprocess.CalledProcessError(1, ['gh'])), \
+                patch.object(sync, 'pending', return_value=[proposal]), patch.object(sync, 'git') as git:
+            self.assertEqual(sync.create_proposal(proposal['headRefName'], 'title', 'body'), proposal)
+        git.assert_not_called()
+
+    def test_real_creation_failure_stays_failed(self):
+        with patch.object(sync, 'gh', side_effect=subprocess.CalledProcessError(1, ['gh'])), \
+                patch.object(sync, 'pending', return_value=[]):
+            with self.assertRaises(subprocess.CalledProcessError):
+                sync.create_proposal(sync.PREFIX + 'fixture', 'title', 'body')
+
+    def test_review_failure_warns_and_next_pending_run_repairs_only_metadata(self):
+        proposal = self.proposal()
+        details = json.dumps(self.details())
+        responses = [details, subprocess.CalledProcessError(1, ['gh']), details, '']
+        with patch.object(sync, 'gh', side_effect=responses) as gh, \
+                patch.object(sync, 'pending', return_value=[proposal]), \
+                patch.object(sync, 'git') as git, patch.object(sync.subprocess, 'run') as commands, \
+                patch('sys.stderr') as stderr:
+            sync.prepare()
+            self.assertIn('next scheduled run retries', ''.join(c.args[0] for c in stderr.write.call_args_list))
+            sync.prepare()
+        git.assert_not_called()
+        commands.assert_not_called()
+        self.assertEqual(gh.call_args_list[1].args, ('pr', 'edit', '37', '--add-reviewer', 'CallanCampos'))
+        self.assertEqual(gh.call_args_list[3].args, gh.call_args_list[1].args)
+
+    def test_existing_request_review_and_owner_author_do_not_request_again(self):
+        for changes in ({'reviewRequests': [{'login': 'CallanCampos'}]},
+                        {'reviews': [{'author': {'login': 'CallanCampos'}, 'state': 'APPROVED'}]},
+                        {'reviews': [{'author': {'login': 'CallanCampos'}, 'state': 'CHANGES_REQUESTED'}]},
+                        {'author': {'login': 'CallanCampos'}}, {'isDraft': True}):
+            with self.subTest(changes=changes), patch.object(sync, 'gh', return_value=json.dumps(self.details(**changes))) as gh:
+                sync.request_review(self.proposal())
+                self.assertEqual(gh.call_count, 1)
+
+    def test_draft_never_requests_review(self):
+        with patch.object(sync, 'gh') as gh:
+            sync.request_review(dict(self.proposal(), isDraft=True))
+        gh.assert_not_called()
+
+    def test_filename_controls_cannot_end_markdown_paragraph_or_span(self):
+        name = 'source\n\nowner/repo#123`\r\t\x1b.c'
+        rendered = sync.display_filename(name)
+        self.assertEqual(rendered, r'source\n\nowner/repo#123\u0060\r\t\u001b.c')
+        body = sync.conflict_body(sync.PREFIX + 'fixture', 'a' * 40, 'b' * 40, [name])
+        listed = body.split('Conflicting files:\n\n', 1)[1].split('\n\nTo resolve', 1)[0]
+        self.assertEqual(listed, '- `' + rendered + '`')
 
 
 class ShellVerificationTests(GitFixture):

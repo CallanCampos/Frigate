@@ -16,8 +16,9 @@ as an automatic first step of unrelated feature work. Review the pending sync in
 `.github/workflows/port-sync.yml` runs hourly and manually, only in `CallanCampos/Frigate`. Its trusted helper
 [upstream_sync.py](../tools/upstream_sync.py):
 
-1. Leaves an existing canonical `codex/upstream-sync-*` PR unchanged, a draft conflict proposal included. This bounds
-   review work to one proposal and avoids dismissing approvals whenever upstream advances.
+1. Leaves an existing canonical `codex/upstream-sync-*` PR's head and body unchanged, a draft conflict proposal
+   included. It retries a missing owner review request on a ready bot proposal; an existing request or completed owner
+   review is left alone. This bounds review work to one proposal and avoids dismissing approvals whenever upstream advances.
 2. Fetches upstream `main`, verifies continuity against the last recorded upstream parent, and checks incoming
    messages for cross-repository issue references. It stops on upstream workflow changes, including add/revert
    pairs, because the sync App deliberately has no Workflows permission. These three stops come before anything is
@@ -28,8 +29,10 @@ as an automatic first step of unrelated feature work. Review the pending sync in
    ([below](#conflicts-and-stopped-syncs)). It never commits conflict markers, chooses upstream's version
    automatically or discards port changes. Otherwise it creates a fresh branch from `main` and performs a real
    `--no-ff` merge.
-4. Pushes only the topic branch, opens a PR and requests CallanCampos review (a draft requests none; GitHub notifies
-   its code owners when its resolved merge makes it ready). Local verification stays missing until a maintainer runs the verifier; a
+4. Pushes only the topic branch and opens a PR, recovering its URL if creation succeeded but its response failed.
+   It requests CallanCampos review separately: a failure warns and the next scheduled run retries the request without
+   pushing or changing the PR. Owner-authored local proposals request no self-review. A draft requests none; GitHub notifies
+   its code owners when its resolved merge makes it ready. Local verification stays missing until a maintainer runs the verifier; a
    missing required status blocks merging.
 
 The publishing job runs trusted git/gh logic from Frigate's base, disables Git hooks, and never executes incoming
@@ -294,9 +297,15 @@ sites not above the last entry's, and `sync_upstream.sh` prints it in its summar
 It skips (77) on Windows, whose LLP64 (a 32-bit `long`) gives other findings than macOS's and Linux's, without clang,
 and without the compile database; with `--require`, which the build passes where it can run the check, each of those
 fails instead. What it doesn't see: a pointer written into a union's integer member, which has no cast
-(`port/tools/compile-probe/scripts/unions.py` lists the unions that mix pointers and integers); an explicit cast from an
-integer that carries an address to a narrower one, such as `(u32)(uptr)p` or `(u32)` of a `uptr` value, for which
-clang has no warning; a compound assignment such as `dst += (uptr)p` on a `u32 dst`, whose read back is flagged
+(`port/tools/compile-probe/scripts/unions.py` lists the unions that mix pointers and integers); a 32-bit unsigned offset
+added to a pointer or a `uptr`, such as `vm->pc + offset` with a `u32 offset`, which has no cast either: the DS's 32-bit
+sum wraps, so a negative offset read as a `u32` goes back there, and a host's goes 4 GiB forward, as the field script's
+jumps back and its actor command's movement back (an animation of Bianca's in the starter scene) did until PR 29
+([../tools/pointer_offsets.query](../tools/pointer_offsets.query) lists such sums, and pointers subscripted by a `u32`,
+in the script interpreters and the readers of offsets from data that its header names, and [STATUS.md](STATUS.md)'s
+entry for PR 29's follow-up has their reading); an explicit
+cast from an integer that carries an address to a narrower one, such as `(u32)(uptr)p` or `(u32)` of a `uptr` value, for
+which clang has no warning; a compound assignment such as `dst += (uptr)p` on a `u32 dst`, whose read back is flagged
 instead; a pointer cast to `long` or `unsigned long`, which [PLAN.md §4.8](PLAN.md#48-64-bit-and-dual-target-rules)'s
 rule 6 forbids; a site moved within one key, a cast fixed and another of the same types added in the same function; a
 cast under `WHITE2` alone in CI, which builds Black 2 only (the White 2 builds of `--verify-pr` and of each session

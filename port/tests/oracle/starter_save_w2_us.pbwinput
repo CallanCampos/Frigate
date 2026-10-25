@@ -10,6 +10,10 @@ pbwinput 1
 # the player is left in front of the Trainers' School without a Pokemon. x = 40 is out of that walker's reach and eight
 # tiles shorter; the presses from the stairs on are Black 2's, 124 frames sooner.
 version w2_us
+# GFL's random seed as the DS builds it at start-up (oracle.py seeds starter_save): the port's game takes it in
+# place of its own, so that the starter and the townspeople's walks are the DS's when the port plays this file
+# from its own first save (ctest replay_starter_save); the oracle reads the line only as part of the file
+seed 0x81d63ca2c9f3143e
 1100 START  # START in the opening skips it to the title (count 1115 on both)
 1101 -
 3000 START  # START brings back the layers the title hid at count 2877

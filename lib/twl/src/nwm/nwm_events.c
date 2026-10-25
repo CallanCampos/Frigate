@@ -161,7 +161,7 @@ u16 NWM_GetDispersionScanPeriod(u16 scanType) {
 // Puts the callback that exits the application before the console sleeps (the wireless would be on)
 void func_02702a40(void) {
     PM_SetSleepCallbackInfo(&sNwmSleepCallback, func_02702a8c, NULL);
-    PM_InsertPreSleepCallback(&sNwmSleepCallback, NWM_PM_PRIORITY);
+    PMi_InsertPreSleepCallbackEx(&sNwmSleepCallback, NWM_PM_PRIORITY);
 }
 
 static void func_02702a78(void) {

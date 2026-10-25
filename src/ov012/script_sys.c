@@ -494,7 +494,7 @@ u16 FieldScript_GetSceneChangeSCRID(GameData *gameData, const u8 *script, u32 mo
     u16 type;
     u16 workId;
     u16 value;
-    u32 offset;
+    s32 offset;
 
     while (TRUE) {
         type = script[0] + (script[1] << 8);
@@ -571,7 +571,7 @@ VM *FieldScript_CreateVM(HeapID heapId, ScriptWork *work, u16 zoneId, u16 script
     }
     VM_LoadScript(vm, (void *)vm->unk38);
     vm->pc += scriptOffset * 4;
-    vm->pc += VM_Read32(vm);
+    vm->pc += (s32)VM_Read32(vm);
     FieldScript_AttachOpcodeGuard(vm);
     return vm;
 }

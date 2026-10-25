@@ -9,7 +9,6 @@ of upstream's head alone, which a maintainer's resolved merge later fast-forward
 """
 import argparse
 import json
-import os
 import re
 import subprocess
 import sys
@@ -65,15 +64,48 @@ def publish(branch):
             except subprocess.CalledProcessError:
                 print(f'warning: the merge is pushed, but PR {number} is still the draft; retitle it "{TITLE}" and run: '
                       f'gh pr ready {number} --repo {REPO}', file=sys.stderr)
+        request_review(dict(proposal, isDraft=False) if proposal.get('isDraft') else proposal)
         print(proposal['url'])
         return
-    print(gh('pr', 'create', '--base', 'main', '--head', branch, *reviewer(), '--title', TITLE, '--body', merge_body()))
+    proposal = create_proposal(branch, TITLE, merge_body())
+    request_review(proposal)
+    print(proposal['url'])
 
 
-def reviewer():
-    if os.environ.get('GITHUB_ACTIONS') != 'true' and run('gh', 'api', 'user', '--jq', '.login').lower() == 'callancampos':
-        return []
-    return ['--reviewer', 'CallanCampos']
+def create_proposal(branch, title, body, draft=False):
+    """Recover a PR that GitHub created even if the response was lost; never push again."""
+    args = ['pr', 'create', '--base', 'main', '--head', branch, '--title', title, '--body', body]
+    if draft:
+        args.append('--draft')
+    try:
+        url = gh(*args)
+    except subprocess.CalledProcessError:
+        proposals = [p for p in pending() if p['headRefName'] == branch]
+        if not proposals:
+            raise
+        print('warning: PR creation response failed; recovered ' + proposals[0]['url'], file=sys.stderr)
+        return proposals[0]
+    return {'url': url}
+
+
+def request_review(proposal):
+    """Retry only missing review metadata, without changing a proposal's commits or body."""
+    if proposal.get('isDraft'):
+        return
+    target = str(proposal.get('number') or proposal['url'])
+    try:
+        details = json.loads(gh('pr', 'view', target, '--json', 'author,isDraft,reviewRequests,reviews'))
+        if details['isDraft'] or details['author']['login'].lower() == 'callancampos':
+            return  # GitHub cannot request a self-review on an owner-authored local proposal.
+        if any(r.get('login', '').lower() == 'callancampos' for r in details['reviewRequests']):
+            return
+        if any(r['author']['login'].lower() == 'callancampos' and r['state'] in ('APPROVED', 'CHANGES_REQUESTED')
+               for r in details['reviews']):
+            return  # Never dismiss/re-request an owner's completed review on an unchanged proposal.
+        gh('pr', 'edit', target, '--add-reviewer', 'CallanCampos')
+    except (subprocess.CalledProcessError, ValueError, KeyError, TypeError):
+        print(f'warning: PR {target} exists, but owner review could not be requested; the next scheduled run retries. '
+              'Owner approval and exact-head local verification remain required before merge.', file=sys.stderr)
 
 
 def merge_body():
@@ -102,9 +134,14 @@ def conflicting_files(base, upstream):
     return files
 
 
+def display_filename(name):
+    return json.dumps(name, ensure_ascii=True)[1:-1].replace('`', r'\u0060')
+
+
 def conflict_body(branch, base, upstream, files):
-    # Each name in a code span, where GitHub links no issue or pull request, with no backtick to end the span early.
-    listed = ''.join('- `' + name.replace('`', '') + '`\n' for name in files[:LISTED_FILES])
+    # JSON escapes controls (including newlines); escape backticks too, so a filename cannot end the code span
+    # or its paragraph and cause GitHub to link an issue in another repository.
+    listed = ''.join('- `' + display_filename(name) + '`\n' for name in files[:LISTED_FILES])
     if len(files) > LISTED_FILES:
         listed += f'- and {len(files) - LISTED_FILES} more\n'
     return (f'Upstream `{upstream[:12]}` conflicts with Frigate\'s `main` at `{base[:12]}`, so nothing is merged yet. '
@@ -126,11 +163,11 @@ def propose_conflict(branch, base, upstream, files):
     # merge that a maintainer pushes later has it among its ancestors, so that push is a fast-forward
     # (topic_fast_forwards checks it before the merge).
     if subprocess.run(['git', 'push', 'origin', f'{upstream}:refs/heads/{branch}']).returncode:
-        raise RuntimeError('upstream conflicts in ' + ', '.join(files[:LISTED_FILES]) +
+        raise RuntimeError('upstream conflicts in ' + ', '.join(display_filename(name) for name in files[:LISTED_FILES]) +
                            ', and pushing its head for a draft proposal failed; resolve it locally (port/docs/SYNC.md)')
     # No review request on a draft: GitHub notifies the code owners when the resolved merge makes it ready (publish).
-    print(gh('pr', 'create', '--draft', '--base', 'main', '--head', branch, '--title', CONFLICT_TITLE, '--body',
-             conflict_body(branch, base, upstream, files)))
+    proposal = create_proposal(branch, CONFLICT_TITLE, conflict_body(branch, base, upstream, files), draft=True)
+    print(proposal['url'])
 
 
 def topic_fast_forwards(branch, upstream):
@@ -166,6 +203,8 @@ def last_upstream(upstream):
 def prepare():
     existing = pending()
     if existing:
+        for proposal in existing:
+            request_review(proposal)
         print('Pending sync left unchanged: ' + existing[0]['url'])
         return
     base = git('rev-parse', 'HEAD')

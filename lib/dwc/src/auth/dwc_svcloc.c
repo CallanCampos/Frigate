@@ -1,8 +1,7 @@
-#include "dwc/common.h"
 #include "dwc/error.h"
 #include "dwc/ext.h"
-#include "dwc/friend.h"
 #include "dwc/nasfunc.h"
+#include "dwc/nastime.h"
 #include "nitro/mi.h"
 #include "nitro/os.h"
 #include <errno.h>
@@ -139,7 +138,7 @@ static BOOL DWCi_Svl_ParseHttp(void) {
     }
     date = DWC_Http_GetResult(http, "Date");
     if (date != NULL) {
-        DWCi_SetNasTimeFromDateHeader(date);
+        DWC_Auth_SetNasTimeDiff(date);
     }
     httpResult = DWC_Http_GetResult(http, "httpresult");
     if (httpResult == NULL) {

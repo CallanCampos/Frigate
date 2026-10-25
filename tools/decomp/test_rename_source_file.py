@@ -41,6 +41,25 @@ class PlanTest(unittest.TestCase):
             with self.assertRaises(ValueError):
                 plan("lib/msl/src/fp/other.c", "lib/msl/src/fp/other.s", root)
 
+    def test_renames_the_path_in_section_fixes(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            self.config(root, "b2_us", ENTRY)
+            fixes = root / "config" / "fixes.txt"
+            fixes.write_text("# header\n"
+                             ". 0x0208ecd8 section_end lib/msl/src/fp/fp_fastI.c:.text\n"
+                             ". 0x0208ecd8 add_section lib/msl/src/fp/fp_fastI.c:.bss:0x4\n"
+                             ". 0x0208ecd8 section_end lib/msl/src/fp/fp_fastI.cc:.text\n"
+                             ". 0x0208ecd8 add_label lib/msl/src/fp/fp_fastI.c:x\n")
+            planned = dict(plan("lib/msl/src/fp/fp_fastI.c", "lib/msl/src/fp/fp_fastI.s", root))
+            self.assertEqual(planned[fixes].splitlines(), [
+                "# header",
+                ". 0x0208ecd8 section_end lib/msl/src/fp/fp_fastI.s:.text",
+                ". 0x0208ecd8 add_section lib/msl/src/fp/fp_fastI.s:.bss:0x4",
+                ". 0x0208ecd8 section_end lib/msl/src/fp/fp_fastI.cc:.text",
+                ". 0x0208ecd8 add_label lib/msl/src/fp/fp_fastI.c:x",
+            ])
+
     def test_does_not_rename_a_path_that_only_contains_the_old_one(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)

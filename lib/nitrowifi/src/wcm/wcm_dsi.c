@@ -1,14 +1,14 @@
 // NitroWiFi's WCM, its backend for the DSi's wireless (mode 2), in the LTD autoload's .ltdmain: the steps that
-// wcm.c's calls take through TwlSDK's NWM where the DS's take them through WM, and NWM's callbacks, which move WCM's
-// state machine and notify WCM's user. It mirrors wcm.c's WM backend step for step. The ROM names none of it: the
-// file's name is descriptive, and the functions keep their default names.
+// wcm_system.c's calls take through TwlSDK's NWM where the DS's take them through WM, and NWM's callbacks, which move
+// WCM's state machine and notify WCM's user. It mirrors wcm_wmif.c, the WM backend, step for step. The ROM names none
+// of it: the file's name is descriptive, and the functions keep their default names.
 #include "nitrowifi/wcm_dsi.h"
 #include "nitro/math.h"
 #include "nitro/mi.h"
 #include "nitro/os.h"
 #include "nitrowifi/wcm.h"
-#include "nitrowifi/wcm_internal.h"
 #include "twl/nwm.h"
+#include "wcm_internal.h"
 
 // The index of the command 8's connection, from the access point's capability bits
 static u8 sConnectIndex;
@@ -38,27 +38,27 @@ s32 func_02769930(void) {
     case 0:
         break;
     case 3:
-        WcmSetPhase(11);
+        WCMi_SetPhase(11);
         return 7;
     case 4:
         return 5;
     case 5:
     default:
-        WcmSetPhase(11);
+        WCMi_SetPhase(11);
         return 7;
     }
     work->nwmConnectionFailureReason = 0;
     switch (NWM_LoadDevice(func_0276a0ac)) {
     case 2:
-        WcmSetPhase(2);
+        WCMi_SetPhase(2);
         work->pendingNotify = 1;
         break;
     case 6:
-        WcmSetPhase(12);
+        WCMi_SetPhase(12);
         return 1;
     case 3:
     default:
-        WcmSetPhase(11);
+        WCMi_SetPhase(11);
         return 7;
     }
     return 3;
@@ -69,14 +69,14 @@ s32 func_02769a30(void) {
 
     switch (NWM_Close(func_0276a0ac)) {
     case 2:
-        WcmSetPhase(4);
+        WCMi_SetPhase(4);
         work->pendingNotify = 2;
         break;
     case 6:
         return 4;
     case 3:
     default:
-        WcmSetPhase(11);
+        WCMi_SetPhase(11);
         return 7;
     }
     return 3;
@@ -102,14 +102,14 @@ s32 func_02769aa4(const u8 *bssid, const u8 *essid, u32 option) {
     work->nwmScanCount++;
     switch (NWM_StartScanEx(func_0276a3d4, &work->nwmScanRequest)) {
     case 2:
-        WcmSetPhase(5);
+        WCMi_SetPhase(5);
         work->pendingNotify = 3;
         break;
     case 6:
         return 4;
     case 3:
     default:
-        WcmSetPhase(11);
+        WCMi_SetPhase(11);
         return 7;
     }
     return 3;
@@ -145,14 +145,14 @@ s32 func_02769b80(void) {
     }
     switch (result) {
     case 2:
-        WcmSetPhase(8);
+        WCMi_SetPhase(8);
         work->pendingNotify = 5;
         break;
     case 6:
         return 4;
     case 3:
     default:
-        WcmSetPhase(11);
+        WCMi_SetPhase(11);
         return 7;
     }
     return 3;
@@ -163,14 +163,14 @@ s32 func_02769c70(void) {
 
     switch (NWM_UnsetReceivingFrameBuffer(func_0276ab40, 0)) {
     case 2:
-        WcmSetPhase(10);
+        WCMi_SetPhase(10);
         work->pendingNotify = 6;
         break;
     case 6:
         return 4;
     case 3:
     default:
-        WcmSetPhase(11);
+        WCMi_SetPhase(11);
         return 7;
     }
     return 3;
@@ -185,7 +185,7 @@ s32 func_02769ce8(void) {
     case 1:
         result = NWM_End();
         if (result == 0) {
-            WcmSetPhase(1);
+            WCMi_SetPhase(1);
             work->pendingNotify = 0;
             return 0;
         }
@@ -206,21 +206,21 @@ s32 func_02769ce8(void) {
     }
     switch (result) {
     case 2:
-        WcmSetPhase(13);
+        WCMi_SetPhase(13);
         work->pendingNotify = 9;
         break;
     case 6:
         return 4;
     case 3:
     default:
-        WcmSetPhase(11);
+        WCMi_SetPhase(11);
         return 7;
     }
     return 3;
 }
 
 s32 func_02769dc4(const u8 *dst, const void *buffer, u16 byteLength, void (*completion)(s32 result)) {
-    WCMCpsifWork *global = WCM_GetGlobal();
+    WCMCpsifWork *global = WCMi_GetCpsifWork();
     NWMCallbackFunc callback;
 
     if (completion == NULL) {
@@ -256,7 +256,7 @@ s32 func_02769e54(void) {
     return (u16)(func_02702980() >> 1);
 }
 
-// What wcm.c's reset request and its completion do, at once, since NWM has no reset command: ends the operation of
+// What wcm_wmif.c's reset request and its completion do, at once, since NWM has no reset command: ends the operation of
 // the state WCM is in
 static void func_02769e60(void) {
     WCMWork *work = WCMi_GetSystemWork();
@@ -269,48 +269,48 @@ static void func_02769e60(void) {
         switch (work->state) {
         case 5:
         case 6:
-            WcmSetPhase(3);
-            WCM_NotifyResult(1, NULL, 0, 0x29b);
+            WCMi_SetPhase(3);
+            WCMi_Notify(1, NULL, 0, 0x29b);
             break;
         case 7:
-            WcmSetPhase(3);
-            WCM_NotifyResult(0, NULL, 0, 0x2a1);
+            WCMi_SetPhase(3);
+            WCMi_Notify(0, NULL, 0, 0x2a1);
             break;
         case 8: {
             u16 reason = work->nwmConnectionFailureReason;
 
             work->nwmConnectionFailureReason = 0;
-            WcmSetPhase(3);
-            WCM_NotifyResult(1, &work->connectBss, reason, 0x2ab);
+            WCMi_SetPhase(3);
+            WCMi_Notify(1, &work->connectBss, reason, 0x2ab);
             break;
         }
         case 9:
         case 12:
-            WcmSetPhase(3);
-            WCM_NotifyResult(0, &work->connectBss, 1, 0x2b3);
+            WCMi_SetPhase(3);
+            WCMi_Notify(0, &work->connectBss, 1, 0x2b3);
             break;
         case 10:
-            WcmSetPhase(3);
-            WCM_NotifyResult(0, &work->connectBss, 0, 0x2ba);
+            WCMi_SetPhase(3);
+            WCMi_Notify(0, &work->connectBss, 0, 0x2ba);
             break;
         case 13:
             switch (NWM_Close(func_0276a0ac)) {
             case 2:
                 break;
             case 6:
-                WcmSetPhase(12);
-                WCM_NotifyResult(1, NULL, 0, 0x2c8);
+                WCMi_SetPhase(12);
+                WCMi_Notify(1, NULL, 0, 0x2c8);
                 break;
             case 3:
             default:
-                WcmSetPhase(11);
-                WCM_NotifyResult(7, NULL, 0, 0x2d1);
+                WCMi_SetPhase(11);
+                WCMi_Notify(7, NULL, 0, 0x2d1);
                 break;
             }
             break;
         default:
-            WcmSetPhase(11);
-            WCM_NotifyResult(7, NULL, work->state, 0x2d7);
+            WCMi_SetPhase(11);
+            WCMi_Notify(7, NULL, work->state, 0x2d7);
             break;
         }
     }
@@ -333,13 +333,13 @@ static void func_0276a0ac(void *arg) {
             result = NWM_End();
             switch (result) {
             case 0:
-                WcmSetPhase(1);
-                WCM_NotifyResult(0, NULL, 0, 0x300);
+                WCMi_SetPhase(1);
+                WCMi_Notify(0, NULL, 0, 0x300);
                 break;
             case 4:
             default:
-                WcmSetPhase(11);
-                WCM_NotifyResult(7, NULL, 0, 0x309);
+                WCMi_SetPhase(11);
+                WCMi_Notify(7, NULL, 0, 0x309);
                 break;
             }
             return;
@@ -347,10 +347,10 @@ static void func_0276a0ac(void *arg) {
             u8 mac[6];
 
             OS_GetMacAddress(mac);
-            WCM_SetMacAddress(mac);
+            WCMi_CpsifSetMacAddress(mac);
         }
-            WcmSetPhase(3);
-            WCM_NotifyResult(0, NULL, 0, 0x316);
+            WCMi_SetPhase(3);
+            WCMi_Notify(0, NULL, 0, 0x316);
             return;
         case 6:
             result = NWM_UnloadDevice(func_0276a0ac);
@@ -370,29 +370,29 @@ static void func_0276a0ac(void *arg) {
         case 2:
             break;
         case 6:
-            WcmSetPhase(12);
-            WCM_NotifyResult(1, work->pendingNotify == WCM_NOTIFY_CONNECT ? &work->connectBss : NULL, 0, 0x34a);
+            WCMi_SetPhase(12);
+            WCMi_Notify(1, work->pendingNotify == WCM_NOTIFY_CONNECT ? &work->connectBss : NULL, 0, 0x34a);
             break;
         case 3:
         default:
-            WcmSetPhase(11);
-            WCM_NotifyResult(7, work->pendingNotify == WCM_NOTIFY_CONNECT ? &work->connectBss : NULL, 0, 0x353);
+            WCMi_SetPhase(11);
+            WCMi_Notify(7, work->pendingNotify == WCM_NOTIFY_CONNECT ? &work->connectBss : NULL, 0, 0x353);
             break;
         }
         break;
     case 1:
-        WcmSetPhase(12);
-        WCM_NotifyResult(1, work->pendingNotify == WCM_NOTIFY_CONNECT ? &work->connectBss : NULL, 0, 0x372);
+        WCMi_SetPhase(12);
+        WCMi_Notify(1, work->pendingNotify == WCM_NOTIFY_CONNECT ? &work->connectBss : NULL, 0, 0x372);
         break;
     case 10:
-        WcmSetPhase(11);
-        WCM_NotifyResult(7, work->pendingNotify == WCM_NOTIFY_CONNECT ? &work->connectBss : NULL, 0, 0x378);
+        WCMi_SetPhase(11);
+        WCMi_Notify(7, work->pendingNotify == WCM_NOTIFY_CONNECT ? &work->connectBss : NULL, 0, 0x378);
         break;
     case 3:
     case 4:
     default:
-        WcmSetPhase(11);
-        WCM_NotifyResult(7, work->pendingNotify == WCM_NOTIFY_CONNECT ? &work->connectBss : NULL, 0, 0x385);
+        WCMi_SetPhase(11);
+        WCMi_Notify(7, work->pendingNotify == WCM_NOTIFY_CONNECT ? &work->connectBss : NULL, 0, 0x385);
         break;
     }
 }
@@ -406,8 +406,8 @@ static void func_0276a3d4(void *arg) {
     switch (event->header.retcode) {
     case 0:
         if (work->state == 5) {
-            WcmSetPhase(6);
-            WCM_NotifyResult(0, NULL, 0, 0x3a3);
+            WCMi_SetPhase(6);
+            WCMi_Notify(0, NULL, 0, 0x3a3);
         }
         switch (work->state) {
         case 6:
@@ -418,7 +418,7 @@ static void func_0276a3d4(void *arg) {
                 DC_InvalidateRange(work->nwmScanRequest.scanBuf, work->nwmScanRequest.scanBufSize);
                 for (i = 0; i < event->bssDescCount; i++) {
                     WCMi_EntryApList((const WMBssDesc *)event->bssDesc[i], event->linkLevel[i]);
-                    WcmNotifyEx(7, 0, (s32)event->bssDesc[i], arg, 0x3b9);
+                    WCMi_NotifyEx(7, 0, (s32)event->bssDesc[i], arg, 0x3b9);
                 }
             }
             if ((work->searchOption & 0xc00000) == 0xc00000) {
@@ -426,20 +426,20 @@ static void func_0276a3d4(void *arg) {
 
                 if (count > 0) {
                     if (work->nwmScanCount % count == 0) {
-                        WcmNotifyEx(8, 0, work->nwmScanCount, NULL, 0x3c7);
+                        WCMi_NotifyEx(8, 0, work->nwmScanCount, NULL, 0x3c7);
                     }
                 }
             }
             work->nwmScanRequest.channelList =
-                (u16)((1 << WcmGetNextScanChannel((u16)(32 - MATH_CountLeadingZerosFunc(event->channelList)))) >> 1);
+                (u16)((1 << WCMi_GetNextScanChannel((u16)(32 - MATH_CountLeadingZerosFunc(event->channelList)))) >> 1);
             DC_StoreRange(work->nwmScanRequest.scanBuf, work->nwmScanRequest.scanBufSize);
             work->nwmScanCount++;
             result = NWM_StartScanEx(func_0276a3d4, &work->nwmScanRequest);
             break;
         case 7:
             result = 2;
-            WcmSetPhase(3);
-            WCM_NotifyResult(0, NULL, 0, 0x3d7);
+            WCMi_SetPhase(3);
+            WCMi_Notify(0, NULL, 0, 0x3d7);
             break;
         case 13:
             func_02769e60();
@@ -449,13 +449,13 @@ static void func_0276a3d4(void *arg) {
         case 2:
             break;
         case 6:
-            WcmSetPhase(12);
-            WCM_NotifyResult(1, NULL, 0, 0x3f3);
+            WCMi_SetPhase(12);
+            WCMi_Notify(1, NULL, 0, 0x3f3);
             break;
         case 3:
         default:
-            WcmSetPhase(11);
-            WCM_NotifyResult(7, NULL, 0, 0x3fc);
+            WCMi_SetPhase(11);
+            WCMi_Notify(7, NULL, 0, 0x3fc);
             break;
         }
         break;
@@ -465,8 +465,8 @@ static void func_0276a3d4(void *arg) {
     case 3:
     case 4:
     default:
-        WcmSetPhase(11);
-        WCM_NotifyResult(7, NULL, 0, 0x40d);
+        WCMi_SetPhase(11);
+        WCMi_Notify(7, NULL, 0, 0x40d);
         break;
     }
 }
@@ -481,16 +481,16 @@ static void func_0276a6b4(void *arg) {
     case 0:
         if (nwmState == 4) {
             if (work->state == 12) {
-                WcmSetPhase(8);
+                WCMi_SetPhase(8);
                 func_02769e60();
                 return;
             }
             work->nwmAssociationId = event->aid;
-            WcmSetPhase(9);
-            WCM_NotifyResult(0, &work->connectBss, 0, 0x436);
+            WCMi_SetPhase(9);
+            WCMi_Notify(0, &work->connectBss, 0, 0x436);
         } else {
-            WcmSetPhase(11);
-            WCM_NotifyResult(7, &work->connectBss, 0, 0x43c);
+            WCMi_SetPhase(11);
+            WCMi_Notify(7, &work->connectBss, 0, 0x43c);
         }
         break;
     case 1:
@@ -537,20 +537,20 @@ static void func_0276a6b4(void *arg) {
             }
             break;
         default:
-            WcmSetPhase(11);
-            WCM_NotifyResult(7, &work->connectBss, event->reason, 0x481);
+            WCMi_SetPhase(11);
+            WCMi_Notify(7, &work->connectBss, event->reason, 0x481);
             break;
         }
         break;
     case 5:
-        WcmSetPhase(8);
+        WCMi_SetPhase(8);
         func_02769e60();
         break;
     case 3:
     case 4:
     default:
-        WcmSetPhase(11);
-        WCM_NotifyResult(7, &work->connectBss, 0, 0x495);
+        WCMi_SetPhase(11);
+        WCMi_Notify(7, &work->connectBss, 0, 0x495);
         break;
     }
 }
@@ -563,25 +563,25 @@ static void func_0276a8dc(void *arg) {
     switch (event->retcode) {
     case 0:
         if (work->state == 12) {
-            WcmSetPhase(10);
+            WCMi_SetPhase(10);
             func_02769e60();
         } else if (work->state == 13) {
             func_02769e60();
         } else {
             work->nwmAssociationId = 0;
-            WcmSetPhase(3);
-            WCM_NotifyResult(0, &work->connectBss, 0, 0x4bd);
+            WCMi_SetPhase(3);
+            WCMi_Notify(0, &work->connectBss, 0, 0x4bd);
         }
         break;
     case 1:
     case 3:
-        WcmSetPhase(10);
+        WCMi_SetPhase(10);
         func_02769e60();
         break;
     case 4:
     default:
-        WcmSetPhase(11);
-        WCM_NotifyResult(7, &work->connectBss, 0, 0x4cf);
+        WCMi_SetPhase(11);
+        WCMi_Notify(7, &work->connectBss, 0, 0x4cf);
         break;
     }
 }
@@ -594,7 +594,7 @@ static void func_0276a9e4(void *arg) {
     switch (event->header.retcode) {
     case 0:
         if (work->state == 12) {
-            WcmSetPhase(8);
+            WCMi_SetPhase(8);
             func_02769e60();
             return;
         }
@@ -607,13 +607,13 @@ static void func_0276a9e4(void *arg) {
         case 2:
             break;
         case 6:
-            WcmSetPhase(12);
-            WCM_NotifyResult(1, &work->connectBss, 0, 0x506);
+            WCMi_SetPhase(12);
+            WCMi_Notify(1, &work->connectBss, 0, 0x506);
             break;
         case 3:
         default:
-            WcmSetPhase(11);
-            WCM_NotifyResult(7, &work->connectBss, 0, 0x50f);
+            WCMi_SetPhase(11);
+            WCMi_Notify(7, &work->connectBss, 0, 0x50f);
             break;
         }
         break;
@@ -643,25 +643,25 @@ static void func_0276ab40(void *arg) {
     switch (event->retcode) {
     case 0:
         if (work->state == 12) {
-            WcmSetPhase(10);
+            WCMi_SetPhase(10);
             func_02769e60();
         } else {
             switch (NWM_Disconnect(func_0276a8dc)) {
             case 2:
-                WcmSetPhase(10);
+                WCMi_SetPhase(10);
                 work->pendingNotify = 6;
                 break;
             case 6:
-                WcmSetPhase(12);
-                WCM_NotifyResult(1, &work->connectBss, 0, 0x555);
+                WCMi_SetPhase(12);
+                WCMi_Notify(1, &work->connectBss, 0, 0x555);
                 break;
             case 3:
-                WcmSetPhase(10);
+                WCMi_SetPhase(10);
                 func_02769e60();
                 break;
             default:
-                WcmSetPhase(11);
-                WCM_NotifyResult(7, &work->connectBss, 0, 0x562);
+                WCMi_SetPhase(11);
+                WCMi_Notify(7, &work->connectBss, 0, 0x562);
                 break;
             }
         }
@@ -669,8 +669,8 @@ static void func_0276ab40(void *arg) {
     case 1:
     case 3:
     default:
-        WcmSetPhase(11);
-        WCM_NotifyResult(7, &work->connectBss, 0, 0x56e);
+        WCMi_SetPhase(11);
+        WCMi_Notify(7, &work->connectBss, 0, 0x56e);
         break;
     }
 }
@@ -683,7 +683,7 @@ static void func_0276ac94(const u8 *bssid, const u8 *essid, u32 option) {
     WCM_UpdateOption(option);
     work->nwmScanRequest.scanBuf = (NWMBssDesc *)work->ioBuffer.nwm;
     work->nwmScanRequest.scanBufSize = sizeof(work->ioBuffer.nwm);
-    work->nwmScanRequest.channelList = (u16)((1 << WcmGetNextScanChannel(0)) >> 1);
+    work->nwmScanRequest.channelList = (u16)((1 << WCMi_GetNextScanChannel(0)) >> 1);
     work->nwmScanRequest.scanType = (work->searchOption & 0x300000) == 0x300000;
     channelTime = work->scanChannelTime;
     if (channelTime == 0) {
@@ -716,7 +716,7 @@ static void func_0276ac94(const u8 *bssid, const u8 *essid, u32 option) {
 
 // The callback of a frame sent while the sender waits for it
 static void func_0276adcc(void *arg) {
-    WCMCpsifWork *global = WCM_GetGlobal();
+    WCMCpsifWork *global = WCMi_GetCpsifWork();
     const NWMCallback *event = arg;
 
     if (event->apiid != 11) {
@@ -731,7 +731,7 @@ static void func_0276adcc(void *arg) {
 
 // The callback of a frame sent with a completion function, which it runs
 static void func_0276ae24(void *arg) {
-    WCMCpsifWork *global = WCM_GetGlobal();
+    WCMCpsifWork *global = WCMi_GetCpsifWork();
     const NWMCallback *event = arg;
     s32 status;
     void (*completion)(s32);
@@ -754,7 +754,7 @@ static void func_0276ae24(void *arg) {
     }
     completion = global->sendCompletion;
     global->sendCompletion = NULL;
-    WcmCpsifUnlockMutexInIRQ(&global->mutex);
+    WCMi_CpsifUnlockMutexInIRQ(&global->mutex);
     completion(status);
 }
 

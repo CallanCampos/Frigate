@@ -40,11 +40,11 @@ typedef enum {
     MI_WRAM_SIZE_256KB,
 } MIWramSize;
 
-// mi_sharedWram_twl.c: the DSi part of the shared WRAM manager
+// mi_sharedWram.c's DSi part: the shared WRAM manager
 
 // The setup of the shared WRAM's manager, which NitroSDK's MI_Init (mi_sharedWram.c's MI_InitWramManager) calls on a
 // DSi
-void MIi_InitWramManagerCore(void);
+void MIi_InitWramManager(void);
 // The banks' registers: the processor that each bank is given to and whether it is enabled, by WRAM and for each
 void MIi_SetWramBankMaster_A(int bank, MIWramProc proc);
 void MIi_SetWramBankMaster_B(int bank, MIWramProc proc);

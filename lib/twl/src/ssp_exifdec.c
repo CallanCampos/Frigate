@@ -4,8 +4,9 @@
 
 // The EXIF reader of TwlSDK's JPEG decoder (ssp_jpegdec.c): it walks the TIFF structure of a JPEG's APP1 segment for
 // its date and software, the DSi's maker note, which holds the signature and two blocks of the application's, and the
-// thumbnail. The game links only what the decoder calls; the getters were dead-stripped. The file's name is a guess
-// after TwlSDK's ssp/exifdec.h, and so are the names of its functions and data.
+// thumbnail. The game links only what the decoder calls; the getters were dead-stripped. It is libssp.TWL.HYB.a's
+// exifdec.o, and its functions have the SDK's names, which Black 1's decompilation (aletheia) gives the same functions;
+// the names of its data are ours.
 
 // The tags of the TIFF structure that the reader looks for
 #define EXIF_TAG_SOFTWARE 0x131

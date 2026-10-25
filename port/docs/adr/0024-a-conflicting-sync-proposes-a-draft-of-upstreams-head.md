@@ -65,3 +65,14 @@ branch of that name is in what the push carries, and stops with exit 4 when upst
 - The three stops are still visible only as a failed run. A notice for them needs the App's Issues permission and a
   `permission-issues: write` line in `port-sync.yml`, both the owner's call.
 - Revisit if GitHub refuses the draft's push, or if the frozen draft's list goes stale often enough to matter.
+
+## Review follow-up (2026-10-25)
+
+PR creation and the owner review request are separate operations. Run 40190195544 created PR 37, then failed when
+GitHub's GraphQL review-request mutation failed. A failed creation response is checked for an already-created
+canonical PR; review-request failures warn without losing the successful proposal. Subsequent scheduled runs retry
+only missing review metadata, leaving the pending head and body frozen, and never re-requesting an existing request
+or completed owner review. Owner-authored local PRs request no self-review. Filenames in a conflict notice escape
+controls and backticks before entering Markdown code spans, so a filename cannot expose a cross-repository reference.
+The App's permission uncertainty above is still unverified: denied publication stays a visible failure and needs local
+resolution, never expanded automatic credentials.

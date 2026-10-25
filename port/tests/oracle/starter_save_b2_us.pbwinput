@@ -5,6 +5,10 @@ pbwinput 1
 # city's story variable 0x40a1 at 4, before Hugh's battle (res/field/scripts/aspertia_city.s, Script_33 and
 # Script_8). Positions are zone (x, z) tiles; counts are GFL's frame count (sVBlankCount). On game frames. Black 2.
 version b2_us
+# GFL's random seed as the DS builds it at start-up (oracle.py seeds starter_save): the port's game takes it in
+# place of its own, so that the starter and the townspeople's walks are the DS's when the port plays this file
+# from its own first save (ctest replay_starter_save); the oracle reads the line only as part of the file
+seed 0xea56a175a2fffc8a
 1100 START  # START in the opening skips it to the title (count 1115 on both)
 1101 -
 3000 START  # START brings back the layers the title hid at count 2877

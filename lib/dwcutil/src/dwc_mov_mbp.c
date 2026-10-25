@@ -1,17 +1,19 @@
 #include "types.h"
-#include "app/download_play.h"
+#include "dwcutil/dwc_mov_mbp.h"
 #include "gfl/std.h"
 #include "nitro/fs.h"
 #include "nitro/mb.h"
 #include "nitro/os.h"
 #include "nitro/wm.h"
 
-// The parent of a DS Download Play session (download_play.c is a descriptive name: the ROM embeds no file name for
-// this file). It hands the child program's ROM file to NitroSDK's multiboot library through MB_RegisterFile and sends
-// it in segments, tracking each child's state in bitmaps by AID. It is a second copy of the DS Download Play parent in
-// src/ov181/mbp.c, adapted without the heap, the asserts or the started flag, and with the state moved into the
-// caller's work, which is why the child bitmap table below is filled at run time. The functions the two copies share
-// unchanged are written as ov181 writes them.
+// The DWC utility's parent of a DS Download Play session, libdwcutil.TWL.HYB.a's dwc_mov_mbp.o, as Black 1's
+// decompilation (aletheia) has the same functions in the same order; the ROM embeds no file name, and the state names
+// below are DWCi_MOV_MBP_STATE_*. The functions have those SDK names (ParentStateCallback and MBPi_CheckAllReboot among
+// them); the types, the constants, the tables and the helpers without symbols are ours. It hands the child program's
+// ROM file to NitroSDK's multiboot library through MB_RegisterFile and sends it in segments, tracking each child's
+// state in bitmaps by AID. It is a second copy of the DS Download Play parent in src/ov181/mbp.c, adapted without the
+// heap, the asserts or the started flag, and with the state moved into the caller's work, which is why the child bitmap
+// table below is filled at run time. The functions the two copies share unchanged are written as ov181 writes them.
 
 // The console's settings, which the system leaves in main memory for the ARM9: the firmware's user data, whose name
 // field sits at 6 and whose length byte follows it. This file reads those two and nothing else
@@ -19,32 +21,32 @@ typedef struct {
     u8 unk_00[6];
     u16 nickName[MB_USER_NAME_LENGTH];
     u8 nickNameLength;
-} DownloadPlayUserSettings;
+} MovMbpUserSettings;
 
-#define DOWNLOAD_PLAY_USER_SETTINGS ((const DownloadPlayUserSettings *)0x02fffc80)
+#define MOV_MBP_USER_SETTINGS ((const MovMbpUserSettings *)0x02fffc80)
 
 // The DMA channel the library uses (src/ov181/mbp.c passes 1)
-#define DOWNLOAD_PLAY_DMA_NO 2
+#define MOV_MBP_DMA_NO 2
 
 // The state of each child, by AID
 enum {
-    DOWNLOAD_PLAY_CHILD_NONE,
-    DOWNLOAD_PLAY_CHILD_CONNECTING,
-    DOWNLOAD_PLAY_CHILD_REQUEST,
-    DOWNLOAD_PLAY_CHILD_ENTRY,
-    DOWNLOAD_PLAY_CHILD_DOWNLOADING,
-    DOWNLOAD_PLAY_CHILD_BOOTABLE,
-    DOWNLOAD_PLAY_CHILD_REBOOT,
+    MOV_MBP_CHILD_NONE,
+    MOV_MBP_CHILD_CONNECTING,
+    MOV_MBP_CHILD_REQUEST,
+    MOV_MBP_CHILD_ENTRY,
+    MOV_MBP_CHILD_DOWNLOADING,
+    MOV_MBP_CHILD_BOOTABLE,
+    MOV_MBP_CHILD_REBOOT,
 };
 
-static DownloadPlayWork *sWork;
+static MovMbpWork *sWork;
 
 // The callback and state names and the children's bitmaps by state, the three tables of src/ov181/mbp.c. That file
 // initializes the bitmaps with the addresses of its own state; this file's state is in its caller's work, so the
-// bitmap table starts out zero and DownloadPlay_GetChildBmp fills it. The original has that table in .data, as an
-// explicit zero. The pragma covers it alone: over DownloadPlay_Init it would copy the zeroed state from a .rodata
+// bitmap table starts out zero and DWCi_MOV_MBP_GetChildBmp fills it. The original has that table in .data, as an
+// explicit zero. The pragma covers it alone: over DWCi_MOV_MBP_Init it would copy the zeroed state from a .rodata
 // template, which the ROM doesn't have. The tables' order sets the order of their strings in .data, which are the ROM's
-const char *DownloadPlay_CallbackNames[] = {
+const char *MovMbp_CallbackNames[] = {
     "MB_COMM_PSTATE_NONE",         "MB_COMM_PSTATE_INIT_COMPLETE",
     "MB_COMM_PSTATE_CONNECTED",    "MB_COMM_PSTATE_DISCONNECTED",
     "MB_COMM_PSTATE_KICKED",       "MB_COMM_PSTATE_REQ_ACCEPTED",
@@ -55,38 +57,38 @@ const char *DownloadPlay_CallbackNames[] = {
     "MB_COMM_PSTATE_WAIT_TO_SEND",
 };
 
-const char *DownloadPlay_StateNames[] = {
+const char *MovMbp_StateNames[] = {
     "DWCi_MOV_MBP_STATE_STOP",        "DWCi_MOV_MBP_STATE_IDLE",      "DWCi_MOV_MBP_STATE_ENTRY",
     "DWCi_MOV_MBP_STATE_DATASENDING", "DWCi_MOV_MBP_STATE_REBOOTING", "DWCi_MOV_MBP_STATE_COMPLETE",
     "DWCi_MOV_MBP_STATE_CANCEL",      "DWCi_MOV_MBP_STATE_ERROR",
 };
 
 #pragma explicit_zero_data on
-u16 *DownloadPlay_ChildBmps[6] = { NULL, NULL, NULL, NULL, NULL, NULL };
+u16 *MovMbp_ChildBmps[6] = { NULL, NULL, NULL, NULL, NULL, NULL };
 #pragma explicit_zero_data reset
 
-static void DownloadPlay_ChangeState(u16 state);
-static BOOL DownloadPlay_RegistFile(const MBGameRegistry *gameInfo);
-static void DownloadPlay_AcceptChild(u16 childAid);
-static void DownloadPlay_KickChild(u16 childAid);
-static void DownloadPlay_StartDownload(u16 childAid);
-static void DownloadPlay_CheckRebootEnd(void);
-static void DownloadPlay_ParentStateCallback(u16 childAid, u32 status, void *arg);
-static int DownloadPlay_GetChildState(u16 childAid);
+static void DWCi_MOV_MBP_ChangeState(u16 state);
+static BOOL DWCi_MOV_MBP_RegistFile(const MBGameRegistry *gameInfo);
+static void DWCi_MOV_MBP_AcceptChild(u16 childAid);
+static void DWCi_MOV_MBP_KickChild(u16 childAid);
+static void DWCi_MOV_MBP_StartDownload(u16 childAid);
+static void MBPi_CheckAllReboot(void);
+static void ParentStateCallback(u16 childAid, u32 status, void *arg);
+static int DWCi_MOV_MBP_GetChildState(u16 childAid);
 
 // Accessors of the name tables, which nothing calls, so MWCC doesn't emit them. As in src/ov181/mbp.c, they stand for
 // functions the linker dropped from the ROM: reading the tables keeps them in the file's .data, as the ROM has them.
 // Their bodies are guesses
-static const char *DownloadPlay_GetStateName(u16 state) {
-    return DownloadPlay_StateNames[state];
+static const char *MovMbp_GetStateName(u16 state) {
+    return MovMbp_StateNames[state];
 }
 
-static const char *DownloadPlay_GetCallbackName(u32 status) {
-    return DownloadPlay_CallbackNames[status];
+static const char *MovMbp_GetCallbackName(u32 status) {
+    return MovMbp_CallbackNames[status];
 }
 
 // Takes a child out of every state's bitmap, with the interrupts off while the six words change
-static inline void DownloadPlay_DisconnectChildFromBmp(u16 childAid) {
+static inline void MovMbp_DisconnectChildFromBmp(u16 childAid) {
     u16 aidMask = ~(1 << childAid);
     u32 enabled = OS_DisableInterrupts();
 
@@ -99,48 +101,48 @@ static inline void DownloadPlay_DisconnectChildFromBmp(u16 childAid) {
     OS_RestoreInterrupts(enabled);
 }
 
-static inline void DownloadPlay_DisconnectChild(u16 childAid) {
-    DownloadPlay_DisconnectChildFromBmp(childAid);
+static inline void MovMbp_DisconnectChild(u16 childAid) {
+    MovMbp_DisconnectChildFromBmp(childAid);
     MB_DisconnectChild(childAid);
 }
 
-void DownloadPlay_SetWork(DownloadPlayWork *work) {
+void DWCi_MOV_MBP_MemInit(MovMbpWork *work) {
     sWork = work;
-    func_ov182_021b9bbc(work->loaderContext);
+    DWCi_MOV_WH_MemInit(work->loaderContext);
     sWork->mbWorkp = NULL;
     sWork->fileBufp = NULL;
 }
 
-void DownloadPlay_Init(u32 ggid, u32 tgid) {
-    const DownloadPlayUserSettings *settings = DOWNLOAD_PLAY_USER_SETTINGS;
+void DWCi_MOV_MBP_Init(u32 ggid, u32 tgid) {
+    const MovMbpUserSettings *settings = MOV_MBP_USER_SETTINGS;
     MBUserInfo user;
 
     user.favoriteColor = 1;
     user.nameLength = settings->nickNameLength;
     MI_CpuCopy8(settings->nickName, user.name, MB_USER_NAME_LENGTH * 2);
     user.playerNo = 0;
-    sWork->state = (const DownloadPlayState){ 0 };
+    sWork->state = (const MovMbpState){ 0 };
     sWork->mbWorkp = sWork->mbWork;
-    if (MB_Init(sWork->mbWorkp, &user, ggid, tgid, DOWNLOAD_PLAY_DMA_NO) != MB_ERRCODE_SUCCESS) {
+    if (MB_Init(sWork->mbWorkp, &user, ggid, tgid, MOV_MBP_DMA_NO) != MB_ERRCODE_SUCCESS) {
         OS_Terminate();
     }
-    MB_SetParentCommParam(MB_COMM_PARENT_SEND_MIN, DOWNLOAD_PLAY_CHILD_MAX);
-    MB_CommSetParentStateCallback(DownloadPlay_ParentStateCallback);
-    DownloadPlay_ChangeState(DOWNLOAD_PLAY_STATE_IDLE);
+    MB_SetParentCommParam(MB_COMM_PARENT_SEND_MIN, MOV_MBP_CHILD_MAX);
+    MB_CommSetParentStateCallback(ParentStateCallback);
+    DWCi_MOV_MBP_ChangeState(DWCi_MOV_MBP_STATE_IDLE);
 }
 
-void DownloadPlay_Start(const MBGameRegistry *gameInfo, u16 channel) {
-    DownloadPlay_ChangeState(DOWNLOAD_PLAY_STATE_ENTRY);
+void DWCi_MOV_MBP_Start(const MBGameRegistry *gameInfo, u16 channel) {
+    DWCi_MOV_MBP_ChangeState(DWCi_MOV_MBP_STATE_ENTRY);
     if (MB_StartParent(channel) != MB_ERRCODE_SUCCESS) {
-        DownloadPlay_ChangeState(DOWNLOAD_PLAY_STATE_ERROR);
+        DWCi_MOV_MBP_ChangeState(DWCi_MOV_MBP_STATE_ERROR);
         return;
     }
-    if (!DownloadPlay_RegistFile(gameInfo)) {
+    if (!DWCi_MOV_MBP_RegistFile(gameInfo)) {
         OS_Terminate();
     }
 }
 
-static BOOL DownloadPlay_RegistFile(const MBGameRegistry *gameInfo) {
+static BOOL DWCi_MOV_MBP_RegistFile(const MBGameRegistry *gameInfo) {
     FSFile file;
     FSFile *p_file;
     BOOL ret = FALSE;
@@ -157,7 +159,7 @@ static BOOL DownloadPlay_RegistFile(const MBGameRegistry *gameInfo) {
     if (MB_GetSegmentLength(p_file) != 0) {
         sWork->fileBufp = sWork->fileBuf;
         if (sWork->fileBufp != NULL) {
-            if (MB_ReadSegment(p_file, sWork->fileBufp, DOWNLOAD_PLAY_FILE_BUF_SIZE) &&
+            if (MB_ReadSegment(p_file, sWork->fileBufp, MOV_MBP_FILE_BUF_SIZE) &&
                 MB_RegisterFile(gameInfo, sWork->fileBufp)) {
                 ret = TRUE;
             }
@@ -169,15 +171,15 @@ static BOOL DownloadPlay_RegistFile(const MBGameRegistry *gameInfo) {
     return ret;
 }
 
-static void DownloadPlay_AcceptChild(u16 childAid) {
+static void DWCi_MOV_MBP_AcceptChild(u16 childAid) {
     if (!MB_CommResponseRequest(childAid, MB_COMM_RESPONSE_REQUEST_ACCEPT)) {
-        DownloadPlay_DisconnectChild(childAid);
+        MovMbp_DisconnectChild(childAid);
     }
 }
 
-static void DownloadPlay_KickChild(u16 childAid) {
+static void DWCi_MOV_MBP_KickChild(u16 childAid) {
     if (!MB_CommResponseRequest(childAid, MB_COMM_RESPONSE_REQUEST_KICK)) {
-        DownloadPlay_DisconnectChild(childAid);
+        MovMbp_DisconnectChild(childAid);
         return;
     }
     {
@@ -189,9 +191,9 @@ static void DownloadPlay_KickChild(u16 childAid) {
     }
 }
 
-static void DownloadPlay_StartDownload(u16 childAid) {
+static void DWCi_MOV_MBP_StartDownload(u16 childAid) {
     if (!MB_CommResponseRequest(childAid, MB_COMM_RESPONSE_REQUEST_DOWNLOAD)) {
-        DownloadPlay_DisconnectChild(childAid);
+        MovMbp_DisconnectChild(childAid);
         return;
     }
     {
@@ -205,10 +207,10 @@ static void DownloadPlay_StartDownload(u16 childAid) {
 
 // Starts sending the program: every connected child that is in the entry bitmap gets its download started, and a
 // child that is connected without having asked for one is dropped
-void DownloadPlay_StartSending(void) {
+void DWCi_MOV_MBP_StartDownloadAll(void) {
     u16 childAid;
 
-    DownloadPlay_ChangeState(DOWNLOAD_PLAY_STATE_DATASENDING);
+    DWCi_MOV_MBP_ChangeState(DWCi_MOV_MBP_STATE_DATASENDING);
     for (childAid = 1; childAid < 16; childAid++) {
         if (!(sWork->state.connectChildBmp & (1 << childAid))) {
             continue;
@@ -217,14 +219,14 @@ void DownloadPlay_StartSending(void) {
             continue;
         }
         if (!(sWork->state.entryChildBmp & (1 << childAid))) {
-            DownloadPlay_DisconnectChild(childAid);
+            MovMbp_DisconnectChild(childAid);
             continue;
         }
-        DownloadPlay_StartDownload(childAid);
+        DWCi_MOV_MBP_StartDownload(childAid);
     }
 }
 
-BOOL DownloadPlay_IsBootableAll(void) {
+BOOL DWCi_MOV_MBP_IsBootableAll(void) {
     u16 childAid;
 
     if (sWork->state.connectChildBmp == 0) {
@@ -241,7 +243,7 @@ BOOL DownloadPlay_IsBootableAll(void) {
     return TRUE;
 }
 
-void DownloadPlay_StartRebootAll(void) {
+void DWCi_MOV_MBP_StartRebootAll(void) {
     u16 childAid;
     u16 sentChild = 0;
 
@@ -250,39 +252,39 @@ void DownloadPlay_StartRebootAll(void) {
             continue;
         }
         if (!MB_CommBootRequest(childAid)) {
-            DownloadPlay_DisconnectChild(childAid);
+            MovMbp_DisconnectChild(childAid);
             continue;
         }
         sentChild |= 1 << childAid;
     }
     if (sentChild == 0) {
-        DownloadPlay_ChangeState(DOWNLOAD_PLAY_STATE_ERROR);
+        DWCi_MOV_MBP_ChangeState(DWCi_MOV_MBP_STATE_ERROR);
         return;
     }
-    DownloadPlay_ChangeState(DOWNLOAD_PLAY_STATE_REBOOTING);
+    DWCi_MOV_MBP_ChangeState(DWCi_MOV_MBP_STATE_REBOOTING);
 }
 
-void DownloadPlay_Cancel(void) {
-    DownloadPlay_ChangeState(DOWNLOAD_PLAY_STATE_CANCEL);
+void DWCi_MOV_MBP_Cancel(void) {
+    DWCi_MOV_MBP_ChangeState(DWCi_MOV_MBP_STATE_CANCEL);
     MB_End();
 }
 
 // Ends the library once every child has rebooted into the downloaded program
-static void DownloadPlay_CheckRebootEnd(void) {
-    if (sWork->state.state == DOWNLOAD_PLAY_STATE_REBOOTING &&
+static void MBPi_CheckAllReboot(void) {
+    if (sWork->state.state == DWCi_MOV_MBP_STATE_REBOOTING &&
         sWork->state.connectChildBmp == sWork->state.rebootChildBmp) {
         MB_End();
     }
 }
 
-static void DownloadPlay_ParentStateCallback(u16 childAid, u32 status, void *arg) {
+static void ParentStateCallback(u16 childAid, u32 status, void *arg) {
     switch (status) {
     case MB_COMM_PSTATE_INIT_COMPLETE:
         break;
     case MB_COMM_PSTATE_CONNECTED: {
         WMStartParentCallback *p = arg;
 
-        if (DownloadPlay_GetState() != DOWNLOAD_PLAY_STATE_ENTRY) {
+        if (DWCi_MOV_MBP_GetState() != DWCi_MOV_MBP_STATE_ENTRY) {
             break;
         }
         // The original takes the bitmap's address before turning the interrupts off, and copies the MAC address
@@ -308,9 +310,9 @@ static void DownloadPlay_ParentStateCallback(u16 childAid, u32 status, void *arg
         break;
     }
     case MB_COMM_PSTATE_DISCONNECTED:
-        if (DownloadPlay_GetChildState(childAid) != DOWNLOAD_PLAY_CHILD_REBOOT) {
-            DownloadPlay_DisconnectChildFromBmp(childAid);
-            DownloadPlay_CheckRebootEnd();
+        if (DWCi_MOV_MBP_GetChildState(childAid) != MOV_MBP_CHILD_REBOOT) {
+            MovMbp_DisconnectChildFromBmp(childAid);
+            MBPi_CheckAllReboot();
         }
         break;
     case MB_COMM_PSTATE_KICKED:
@@ -318,12 +320,12 @@ static void DownloadPlay_ParentStateCallback(u16 childAid, u32 status, void *arg
     case MB_COMM_PSTATE_REQUESTED: {
         const MBUserInfo *userInfo;
 
-        if (DownloadPlay_GetState() != DOWNLOAD_PLAY_STATE_ENTRY) {
-            DownloadPlay_KickChild(childAid);
+        if (DWCi_MOV_MBP_GetState() != DWCi_MOV_MBP_STATE_ENTRY) {
+            DWCi_MOV_MBP_KickChild(childAid);
             break;
         }
         sWork->state.requestChildBmp |= 1 << childAid;
-        DownloadPlay_AcceptChild(childAid);
+        DWCi_MOV_MBP_AcceptChild(childAid);
         userInfo = MB_CommGetChildUser(childAid);
         if (userInfo != NULL) {
             MI_CpuCopy8(userInfo, &sWork->childInfo[childAid - 1].user, sizeof(MBUserInfo));
@@ -335,8 +337,8 @@ static void DownloadPlay_ParentStateCallback(u16 childAid, u32 status, void *arg
     case MB_COMM_PSTATE_WAIT_TO_SEND:
         sWork->state.requestChildBmp &= ~(1 << childAid);
         sWork->state.entryChildBmp |= 1 << childAid;
-        if (DownloadPlay_GetState() == DOWNLOAD_PLAY_STATE_DATASENDING) {
-            DownloadPlay_StartDownload(childAid);
+        if (DWCi_MOV_MBP_GetState() == DWCi_MOV_MBP_STATE_DATASENDING) {
+            DWCi_MOV_MBP_StartDownload(childAid);
         }
         break;
     case MB_COMM_PSTATE_SEND_PROCEED:
@@ -350,15 +352,15 @@ static void DownloadPlay_ParentStateCallback(u16 childAid, u32 status, void *arg
     case MB_COMM_PSTATE_BOOT_STARTABLE:
         sWork->state.bootableChildBmp &= ~(1 << childAid);
         sWork->state.rebootChildBmp |= 1 << childAid;
-        DownloadPlay_CheckRebootEnd();
+        MBPi_CheckAllReboot();
         break;
     case MB_COMM_PSTATE_MEMBER_FULL:
         break;
     case MB_COMM_PSTATE_END:
-        if (DownloadPlay_GetState() == DOWNLOAD_PLAY_STATE_REBOOTING) {
-            DownloadPlay_ChangeState(DOWNLOAD_PLAY_STATE_COMPLETE);
+        if (DWCi_MOV_MBP_GetState() == DWCi_MOV_MBP_STATE_REBOOTING) {
+            DWCi_MOV_MBP_ChangeState(DWCi_MOV_MBP_STATE_COMPLETE);
         } else {
-            DownloadPlay_ChangeState(DOWNLOAD_PLAY_STATE_STOP);
+            DWCi_MOV_MBP_ChangeState(DWCi_MOV_MBP_STATE_STOP);
         }
         if (sWork->fileBufp != NULL) {
             sWork->fileBufp = NULL;
@@ -376,7 +378,7 @@ static void DownloadPlay_ParentStateCallback(u16 childAid, u32 status, void *arg
         case MB_ERRCODE_INVALID_PARAM:
         case MB_ERRCODE_INVALID_STATE:
         case MB_ERRCODE_FATAL:
-            DownloadPlay_ChangeState(DOWNLOAD_PLAY_STATE_ERROR);
+            DWCi_MOV_MBP_ChangeState(DWCi_MOV_MBP_STATE_ERROR);
             break;
         }
         break;
@@ -386,64 +388,64 @@ static void DownloadPlay_ParentStateCallback(u16 childAid, u32 status, void *arg
     }
 }
 
-static void DownloadPlay_ChangeState(u16 state) {
+static void DWCi_MOV_MBP_ChangeState(u16 state) {
     sWork->state.state = state;
 }
 
-u16 DownloadPlay_GetState(void) {
+u16 DWCi_MOV_MBP_GetState(void) {
     return sWork->state.state;
 }
 
-u16 DownloadPlay_GetChildBmp(DownloadPlayBmpType bmpType) {
-    DownloadPlay_ChildBmps[DOWNLOAD_PLAY_BMP_CONNECT] = &sWork->state.connectChildBmp;
-    DownloadPlay_ChildBmps[DOWNLOAD_PLAY_BMP_REQUEST] = &sWork->state.requestChildBmp;
-    DownloadPlay_ChildBmps[DOWNLOAD_PLAY_BMP_ENTRY] = &sWork->state.entryChildBmp;
-    DownloadPlay_ChildBmps[DOWNLOAD_PLAY_BMP_DOWNLOAD] = &sWork->state.downloadChildBmp;
-    DownloadPlay_ChildBmps[DOWNLOAD_PLAY_BMP_BOOTABLE] = &sWork->state.bootableChildBmp;
-    DownloadPlay_ChildBmps[DOWNLOAD_PLAY_BMP_REBOOT] = &sWork->state.rebootChildBmp;
-    return *DownloadPlay_ChildBmps[bmpType];
+u16 DWCi_MOV_MBP_GetChildBmp(MovMbpBmpType bmpType) {
+    MovMbp_ChildBmps[MOV_MBP_BMP_CONNECT] = &sWork->state.connectChildBmp;
+    MovMbp_ChildBmps[MOV_MBP_BMP_REQUEST] = &sWork->state.requestChildBmp;
+    MovMbp_ChildBmps[MOV_MBP_BMP_ENTRY] = &sWork->state.entryChildBmp;
+    MovMbp_ChildBmps[MOV_MBP_BMP_DOWNLOAD] = &sWork->state.downloadChildBmp;
+    MovMbp_ChildBmps[MOV_MBP_BMP_BOOTABLE] = &sWork->state.bootableChildBmp;
+    MovMbp_ChildBmps[MOV_MBP_BMP_REBOOT] = &sWork->state.rebootChildBmp;
+    return *MovMbp_ChildBmps[bmpType];
 }
 
-static int DownloadPlay_GetChildState(u16 childAid) {
-    DownloadPlayState tmpState;
+static int DWCi_MOV_MBP_GetChildState(u16 childAid) {
+    MovMbpState tmpState;
     u16 bitmap = 1 << childAid;
     u32 enabled = OS_DisableInterrupts();
 
     if ((sWork->state.connectChildBmp & bitmap) == 0) {
         OS_RestoreInterrupts(enabled);
-        return DOWNLOAD_PLAY_CHILD_NONE;
+        return MOV_MBP_CHILD_NONE;
     }
-    MI_CpuCopy8(&sWork->state, &tmpState, sizeof(DownloadPlayState));
+    MI_CpuCopy8(&sWork->state, &tmpState, sizeof(MovMbpState));
     OS_RestoreInterrupts(enabled);
     if (tmpState.requestChildBmp & bitmap) {
-        return DOWNLOAD_PLAY_CHILD_REQUEST;
+        return MOV_MBP_CHILD_REQUEST;
     }
     if (tmpState.entryChildBmp & bitmap) {
-        return DOWNLOAD_PLAY_CHILD_ENTRY;
+        return MOV_MBP_CHILD_ENTRY;
     }
     if (tmpState.downloadChildBmp & bitmap) {
-        return DOWNLOAD_PLAY_CHILD_DOWNLOADING;
+        return MOV_MBP_CHILD_DOWNLOADING;
     }
     if (tmpState.bootableChildBmp & bitmap) {
-        return DOWNLOAD_PLAY_CHILD_BOOTABLE;
+        return MOV_MBP_CHILD_BOOTABLE;
     }
     if (tmpState.rebootChildBmp & bitmap) {
-        return DOWNLOAD_PLAY_CHILD_REBOOT;
+        return MOV_MBP_CHILD_REBOOT;
     }
-    return DOWNLOAD_PLAY_CHILD_CONNECTING;
+    return MOV_MBP_CHILD_CONNECTING;
 }
 
-DownloadPlayChildInfo *DownloadPlay_GetChildInfo(u16 childAid) {
+MovMbpChildInfo *DWCi_MOV_MBP_GetChildInfo(u16 childAid) {
     if (!(sWork->state.connectChildBmp & (1 << childAid))) {
         return NULL;
     }
     return &sWork->childInfo[childAid - 1];
 }
 
-u16 DownloadPlay_GetPlayerNoByMac(const u8 *macAddress) {
+u16 DWCi_MOV_MBP_GetPlayerNo(const u8 *macAddress) {
     u16 childAid;
 
-    for (childAid = 1; childAid < DOWNLOAD_PLAY_CHILD_MAX + 1; childAid++) {
+    for (childAid = 1; childAid < MOV_MBP_CHILD_MAX + 1; childAid++) {
         const u8 *childMac;
 
         if (!(sWork->state.connectChildBmp & (1 << childAid))) {

@@ -6,8 +6,9 @@
 
 // TwlSDK's JPEG decoder (the SSP library's), which decodes a baseline JPEG of three components, sampled 1x1, 2x1, 1x2
 // or 2x2, into an RGB555 bitmap, after checking the DSi's signature in its maker note. A small one-pass decoder after
-// the IJG library: Huffman tables with 8-bit lookahead, the AAN fast integer IDCT and IJG's color tables. The file's
-// name is a guess after TwlSDK's ssp/jpegdec.h; the names of its functions and data are guesses too.
+// the IJG library: Huffman tables with 8-bit lookahead, the AAN fast integer IDCT and IJG's color tables;
+// libssp.TWL.HYB.a's jpegdec.o. The functions have the SDK's names, which Black 1's decompilation (aletheia) gives the
+// same functions in the same order; the names of the data are ours.
 
 // The Huffman tables' work area: the BITS and HUFFVAL of the four tables, then each one's derived table
 #define HUFF_WORK_SIZE 0x1800

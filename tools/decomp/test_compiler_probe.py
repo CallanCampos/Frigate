@@ -73,6 +73,22 @@ class OriginalLookupTests(unittest.TestCase):
         self.assertEqual(compiler_probe.find_function("w2_us", "Local", self.modules, Path("src/second.c")),
                          (b"WHITE2!!", 0x2200000, True))
 
+    def test_migrated_ltdmain_section_is_found_in_the_ltd_autoload(self):
+        # An ARM9 main file whose entry has a migrated .ltdmain section: its DSi part's functions are the LTD autoload's
+        binary = self.config / "arm9.bin"
+        binary.write_bytes(b"mainpart")
+        self.modules[str(self.config)] = (binary, 0x2000000)
+        (self.config / "symbols.txt").write_text("Local kind:function(thumb,size=0x8) addr:0x02000000\n")
+        (self.config / "delinks.txt").write_text(
+            "src/whole.c:\n    .text start:0x02000000 end:0x02000008\n    .ltdmain start:0x02700000 end:0x02700008\n")
+        ltd = self.module("ltd_autoload_0", 0x2700000, b"dsi_part")
+        (ltd / "symbols.txt").write_text("Part kind:function(thumb,size=0x8) addr:0x02700000\n")
+        (ltd / "delinks.txt").write_text("")
+        self.assertEqual(compiler_probe.source_ranges(self.root, "b2_us", Path("src/whole.c")),
+                         {self.config: ((0x2000000, 0x2000008),), ltd: ((0x2700000, 0x2700008),)})
+        self.assertEqual(compiler_probe.find_function("b2_us", "Part", self.modules, Path("src/whole.c")),
+                         (b"dsi_part", 0x2700000, True))
+
     def test_encrypted_duplicate_uses_its_owners_delinked_object(self):
         (self.first / "symbols.txt").write_text(
             "Local kind:function(thumb,size=0x8) addr:0x02100000\n"
