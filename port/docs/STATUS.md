@@ -38,37 +38,42 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
 - **Port:** `PORT_SHA`, on the topic `port-hygiene-oct24` from `main` at `dd98d585e6` (PR 30's merge): `559ae5b099`,
   `compile_check.py` on upstream's compile probe, with its test; `dbaba7f321`, the ledger, the findings and the guides
   at the decomp's present names and states; `a34e7c249b`, the platform layer's comments; `6b42b332de`, the records:
-  this entry, which fills PR 30's entry's `PORT_SHA`, `36a6447c16`, the lessons and SYNC.md's review step; and this
-  commit, the review's round (below). No commit changes a file outside `port/`
+  this entry, which filled PR 30's entry's `PORT_SHA`, `36a6447c16`, as PR 31 did too, the lessons and SYNC.md's
+  review step; `d2636d01f5`, the review's round (below); and this commit, the merge of `main` at `949379c195` (PR 31's
+  merge), which keeps both sides: this entry above PR 31's, whose `PORT_SHA` it fills, `90e837daad`; this branch's
+  lessons above PR 31's two; and decomp-findings.md's rows with both sides' changes (PR 31's trainers' AI row and
+  `buildSeed` row, this branch's `ir_check.c` and `ReshZekSave_Init` rows). No commit changes a file outside `port/`
   (`git diff --stat origin/main -- . ':!port'` prints nothing).
 - **ROM:** T0 passes: `python3 configure.py && ninja`, from an empty build directory on `main`'s `dd98d585e6`, compiled
   every C file of both versions with no compiler warning, and both SHA1s match (Black 2
   `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb`, White 2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`). Before the first
-  two commits and again on the final tree, `python3 configure.py && ninja` had no work but checking both ROMs, which
-  match: the commits change only `port/`.
+  two commits, again on `6b42b332de`'s tree and on this merge's, `python3 configure.py && ninja` had no work but
+  checking both ROMs, which match: neither side changes a file outside `port/`.
 - **MWCC-neutrality:** nothing to prove: no file outside `port/` changes.
 - **Code standards:** clang-format 23.1.1 `--dry-run --Werror` passes on the 17 C files the branch changes (static
-  names in seven, `test_g2d_rom.c`'s one wrap, comments in the rest) and on every C file of `port/`.
+  names in seven, `test_g2d_rom.c`'s one wrap, comments in the rest) and, on this merge, on every C file of `port/`.
 - **Host build:** T1 passes on macOS arm64, AppleClang 21.0.0, RelWithDebInfo, both versions (`build/port`,
-  `build/port-w2`, configured fresh on this branch).
-- **Tests:** ctest `-j2` on the final tree: Black 2, 292 passed and 15 skipped of 307; White 2, 289 passed and 15
-  skipped of 304; none failed. The new `progress_compile_check` passes in both, and so do `game_ptrcasts`,
-  `game_ptrcasts_tool`, the replays (T3) and the timing routes that run (`frame_times_title` in both,
-  `frame_times_new_game` in Black 2). Skipped in both: the 12 oracle tests (no oracle in these builds),
-  `frame_times_party_menus` (the oracle's save), `asm_oracle` (no Unicorn in this Python) and `app_universal_slices`
-  (a distribution build's). A first full run, before one comment of `particle_work.c` changed, gave the same counts.
-  T4, T5 and T7 not run.
+  `build/port-w2`, configured fresh on this branch, built again on this merge with no warning from `port/`).
+- **Tests:** ctest `-j2` on `6b42b332de`'s tree: Black 2, 292 passed and 15 skipped of 307; White 2, 289 passed and 15
+  skipped of 304. On this merge, with PR 31's `hal_random_seed`: Black 2, 293 passed and 15 skipped of 308; White 2,
+  290 passed and 15 skipped of 305; none failed either time. The new `progress_compile_check` passes in both, and so
+  do `game_ptrcasts`, `game_ptrcasts_tool`, `nnsys_ds_layout`, the replays (T3) and the timing routes that run
+  (`frame_times_title` in both, `frame_times_new_game` in Black 2). Skipped in both: the 12 oracle tests (no oracle in
+  these builds), `frame_times_party_menus` (the oracle's save), `asm_oracle` (no Unicorn in this Python) and
+  `app_universal_slices` (a distribution build's). T4, T5 and T7 not run.
 - **Tiers:** unchanged, the branch adds and removes no game C: Black 2, from `port/tools/progress/progress.py` on this
   branch, a 39,366 functions and 3,649,440 code bytes, b 1,651 and 200,820, c zero, 2,385 veneers left out, as the
   sync's entry measured; White 2 not measured again. The compile step that `sync_upstream.sh --metrics` runs, which
   stopped on `main`, now compiles all 56 incomplete files of Black 2 (`compile_check.py`, none failed: their C emits
-  193,264 of their ranges' 195,704 code bytes), and `summarize.py` writes its tables from it; the rest of `run_all.sh`
-  (the decomp's issues, the history, ByteMatch's measures) wasn't run.
+  193,264 of their ranges' 195,704 code bytes), and `summarize.py` writes its tables from it; on this merge, `--all`
+  compiles or assembles all 1,780 files of Black 2's delinks with none failed, `fp_fastI.s` among them, and gives the
+  same figures for the 56. The rest of `run_all.sh` (the decomp's issues, the history, ByteMatch's measures) wasn't
+  run.
 - **Trap stubs:** 30 function stubs and 21 data placeholders per version (`build/port*/gen/stubs.c`), the same symbols
-  in both, as the last entry's.
+  in both, as the last entries', on this merge too.
 - **64-bit warnings:** `check_ptrcasts: 361 sites in 225 keys (real 66, harmless 117, handled 141, unreachable 37), 1682
-  files, 0 not compiled` in both versions, as the last entry's, the real sites not above its 66; `--update` drops,
-  renames and adds nothing.
+  files, 0 not compiled` in both versions, as the last entry's, the real sites not above its 66, and again on this
+  merge; `--update` drops, renames and adds nothing.
 - **Work done:** the follow-ups the last entries' Next listed that the sync's review found and didn't cause, and what a
   pass over `port/` for names and states the decomp has moved past found besides.
   - **The metrics' compile step.** `port/tools/progress/compile_check.py` called `compiler_probe.lib_compiler` and
@@ -151,10 +156,95 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
     - `test_g2d_rom.c` gets clang-format 23.1.1's wrap of one call, the only format difference in `port/`'s C, which
       `main` had too.
 - **Next:** this branch's PR, its checks and local verification (`port/tools/sync_upstream.sh --verify-pr`), and its
-  merge. Then phase 4's battle, as the last entries say: the Route 19 route as a test, which plays Hugh's battle to its
-  end on `main` and, once the sync brings #496 (upstream's `b962ecf040`), goes on past Bianca's wild encounter.
-- **Blockers:** none for this branch. Past Bianca's wild encounter, the Route 19 route waits for the sync of upstream's
-  `b962ecf040` (#496, the encounter effects' entries).
+  merge. Then phase 4's route, as PR 31's entry below says: it waits for the sync of upstream's `b962ecf040` (#496,
+  the encounter effects' entries), then T5 on its sequences and T7 on the catch and its save.
+- **Blockers:** none for this branch. Phase 4's route waits for the sync of upstream's `b962ecf040` (#496), and Hugh's
+  AI can't match melonDS past the first decision its CPU budget moves (ADR 0023).
+
+## 2026-10-24: the DS's random seeds from input files, and Z-buffer depth as melonDS interpolates it
+
+- **Upstream:** `629a53cccb` (upstream merge #504), as `main` has it since PR 27; this branch merges no upstream commit.
+  Upstream's `main` has moved on to `cd23a9981d`, past `b962ecf040` (upstream merge #496), for the sync to propose on
+  its own.
+- **Port:** `90e837daad`, on the topic branch `port-phase4-fixes` from `main` at `dd98d585e6` (PR 30's merge):
+  `10122e796e` (the DS's random seeds from input files, and why trainer battles still part), `9081c716c8` (Z-buffer
+  depth interpolated as melonDS 1.1 does it, derived from its code) and this commit (ADRs 0022 and 0023 and the
+  records), published together as one pull request to `main`. It fills the last entry's `PORT_SHA`, `36a6447c16`. The
+  first two are cherry-picked from the local, unpublished branch `port-phase4-route` (`369f85dae3` and `83b0f398d6`),
+  the second with the review's changes folded in (below); that branch's route, Hugh's battle, Route 19, the catch and
+  the round trip, waits there for the sync of upstream's `b962ecf040` (Next).
+- **ROM:** T0 passes on `9081c716c8`'s tree, which this commit's matches outside `port/docs/`, `port/hal/README.md` and
+  `port/tools/oracle/README.md`: Black 2 `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb` and White 2
+  `b5d7490be7b415b8f1e672a53e978a9cc667e56a` (`python3 configure.py && ninja`, whose regenerated `build.ninja` ran all
+  10,535 steps, with no compiler warning). No commit changes a file outside `port/`.
+- **Host build:** T1 passes on macOS arm64, AppleClang 21.0.0, RelWithDebInfo, both versions, each with the oracle
+  (`-DPORT_BUILD_ORACLE=ON`, `build/port` and `build/port-w2`), built on `9081c716c8`'s tree from the objects of the
+  route's earlier tree: 1,853 steps each, 727 warnings in each, as on the last entries, all in the game's and the
+  libraries' C, none in `port/`. clang-format (Homebrew 23.1.3) is clean on the two commits' C and C++ files.
+  `gen_stubs`: 30 function stubs and 21 data placeholders per version.
+- **Tests:** full `ctest -j2` with the oracle, the cached oracle saves and the clone's `build/port-venv` (Unicorn) for
+  `asm_oracle`, both versions at once, on `9081c716c8`'s tree, under load averages of 10 to 67 on the machine's 8 cores
+  from other sessions: Black 2, 306 passed and 1 skipped of 307 (2,091 s); White 2, 303 passed and 1 skipped of 304
+  (2,038 s); none failed. Skipped: `app_universal_slices`, which only a distribution build has. The timing gates
+  (`frame_times_*`) pass. T2: `g3d_ds3d` with the depth case and `g3d_ds3d_bands` (the bands against one band) on the
+  span's reciprocal now divided once; `hal_random_seed`, `oracle_pbwinput_plain` and `_sanitized` with the `seed`
+  lines, `app_run_dir_plain` and `_sanitized` with the seeds in `run.txt`, `oracle_compare` with `seeds.py`'s and the
+  seed check's cases. T3 and T6: every replay, `replay_same_save` with the DS's day care egg seed in both versions, and
+  `oracle_port_save`. T4: every oracle sequence passes on the same frames as on the last entries; with the depth
+  change the exit route (`oracle_aspertia`) matches 15,708 of 15,708 port frames in Black 2 (8,469 exact, 6,846 with 3D
+  within the tolerance, 393 with the top screen left out) and 15,700 of 15,700 in White 2 (8,531, 6,776 and 393), where
+  5,446 and 5,508 were exact, 0 pixels beyond the pixel tolerance at the median in both and 80 at most; NNS G3D's state
+  14,656 of 14,656 dumps in each. The field's figures are in the oracle README's results. T5 and T7 not run: no game
+  file changes, and the depth change's frames are held against melonDS by T4.
+- **Tiers:** unchanged: no game C changes (`port/tools/progress/progress.py` not run again).
+- **Trap stubs:** 30 function stubs and 21 data placeholders per version (`build/port*/gen/stubs.c`), as the last
+  entry's.
+- **64-bit warnings:** `check_ptrcasts: 361 sites in 225 keys (real 66, harmless 117, handled 141, unreachable 37), 1682
+  files, 0 not compiled` in both versions (`game_ptrcasts`), as the last entry's: the branch adds no game C.
+- **Work done:** the parts of phase 4's route that stand without upstream's fixes, after the review of the branch
+  `port-phase4-route` (its first four findings and the eighth's depth figure; the rest are the route's).
+  - **The DS's random seeds (`10122e796e`).** `buildSeed` (`src/gfl/gf_standard.c`) hashes the DS's CPU timing and 20
+    bytes of its stack's leftovers into GFL's seed at start-up and each battle's at its start, which no host has. An
+    input file now gives the port the DS's seeds (`seed` lines), read from the oracle's memory (`seeds.py`) and checked
+    once against an instrumented melonDS that logged `buildSeed`'s result; `oracle.py sequence` fails when a file's
+    seeds aren't the DS's, and `run.txt` lists the seeds a run used. `gf_standard.c` compiles unchanged through
+    `port/hal/gfl/gf_standard_host.c`, whose `buildSeed` runs the decomp's and then takes the given seed
+    ([ADR 0022](adr/0022-the-ds-random-seeds-given-by-input-files.md)). With the DS's start-up seed, New Game's day care
+    egg seed is the DS's (`replay_same_save`). The trainers' AI, which thinks for 500 ticks of `OS_GetTick` a pass
+    (`TRAI_TIME_LIMIT`, `src/ov170/tr_ai.c`), takes the DS more passes than the port and so picks with another number;
+    [decomp-findings.md](decomp-findings.md) and the oracle README record it, from a trace made with scratch
+    instrumentation that no test holds yet (the route's sequences will hold GFL's random state at each count).
+  - **Where oracle routes part ([ADR 0023](adr/0023-oracle-routes-part-where-the-ds-cpu-time-decides.md)).** A
+    sequence holds the port to melonDS up to the first decision the DS's CPU time moves and stops there, and the route
+    goes on from melonDS's save made after it; the port's own play past the cut is held by its save and the runs that
+    continue it. The review asked for this ADR, since it sets how every trainer battle of phase 5's routes is tested,
+    and for ADR 0022.
+  - **Z-buffer depth (`9081c716c8`).** The Aspertia City lookout's railing lost its top line on the port, beyond the
+    tolerance in 12 frames of the walk down to Hugh in each version, up to 359 pixels: the polygon lists were the same
+    on both programs, and melonDS interpolates Z-buffer depth from the nearer end with a reciprocal and the difference's
+    low bits dropped, which lands the railing's top line two units nearer and wins a tie with a flat strip drawn first.
+    `port/gfx/ref/ds3d.c`'s `DepthLine` does the same now. It is derived from melonDS 1.1's code
+    (`Interpolator::InterpolateZ`'s Z-buffering branch in `src/GPU3D_Soft.h`, GPLv3 or later; Frigate is GPLv3), which
+    the code says, and it is alignment with the oracle's model, which melonDS's own comment says doesn't match the
+    hardware exactly yet, not a measurement of the DS. A span's reciprocal is divided once, where the span is set up. A
+    `g3d_ds3d` case fails four checks without it. The exit route gains 3,023 exact frames in each version.
+  - **The review's findings for these commits:** the depth commit's title and message, the code's comment, the
+    renderer's guide row, the feature map's row, the tests guide and the lesson said the hardware's arithmetic and now
+    say melonDS's model, with the code's origin; its message said 342 pixels in White 2, and it was 359 in both
+    versions. The branch's records commit described the route, whose commit isn't on this branch: this entry records
+    only what is, and the route's commit gets its own. Its message and the route's named upstream's pull requests by
+    a bare number, which GitHub links to Frigate's own: this branch's messages name none.
+  - **Records:** this entry, which fills the last entry's `PORT_SHA`; ADRs 0022 and 0023 with their index rows, linked
+    from the oracle README, the feature map's random numbers row, the platform layer's guide, decomp-findings.md's AI
+    row and the lessons; the oracle README's results table and the figures under it after the depth change.
+- **Next:** this branch's PR, its checks, local verification (`port/tools/sync_upstream.sh --verify-pr`) and merge.
+  Then phase 4's route (the local branch `port-phase4-route`): it waits for the next sync to bring upstream's
+  `b962ecf040` (#496, the encounter effects' entries); `main` has the semi-invulnerable table (#497) since PR 27. Its
+  review's other findings are fixed on that branch (the route's own STATUS entry, the round trip's declared save bytes,
+  GFL's random state and NNS G3D's held as sequence state, the README's figures). Then T5 on the route's sequences and
+  T7 on the catch and its save, which phase 4's close needs.
+- **Blockers:** phase 4's route waits for the sync of upstream's `b962ecf040` (#496). Hugh's AI can't match melonDS
+  past the first decision its CPU budget moves (ADR 0023).
 
 ## 2026-10-24: the battle handlers' message string at pointer width, the pointer cast guard's R06
 

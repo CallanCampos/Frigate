@@ -2,3 +2,4 @@
 # port/hal/replaced.txt: a glob pattern, " # " and the reason.
 
 src/system/gfl_use.c # compiled through port/hal/gfl/gfl_use_host.c, which reads GFL's frame count for input replays
+src/gfl/gf_standard.c # compiled through port/hal/gfl/gf_standard_host.c, which gives buildSeed's seed an input file's in its place

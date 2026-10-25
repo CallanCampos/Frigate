@@ -8,6 +8,10 @@ pbwinput 1
 # formats the blank backup, up to the field's first script (oracle.py port-save, ctest replay_same_save).
 version b2_us
 frames video
+# GFL's random seed as the DS builds it at start-up (oracle.py seeds first_save): the port's game takes it in
+# place of its own, so that the random numbers New Game draws are the DS's, the day care's egg seed that it
+# writes into the save among them (ctest replay_same_save)
+seed 0xea56a175a2fffc8a
 # The title, NEW GAME, then A twice a second through the talk, the choices and the name entries, as in
 # new_game.pbwinput, until the DS is past the intro
 3900 START

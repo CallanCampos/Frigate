@@ -1,6 +1,7 @@
 // Tests of the port's run directory (port/app/run_dir.c): frame lists as pbw-oracle's --screens takes them, each
 // screen's hash and blank decision as pbw-oracle and compare.py make them, and the files a run writes: frames.tsv in
-// its version 2, the PNG files of the listed frames, and run.txt while the run goes on and after it. The screen hashes
+// its version 2, the PNG files of the listed frames, and run.txt while the run goes on and after it, with the random
+// seeds the game built (port/hal/gfl/random_seed.c, linked in). The screen hashes
 // expected are the oracle's own (port/tests/oracle/boot_b2_us.tsv: frame 1 shows both displays off, white, and frame
 // 400 both screens black). And memory.txt, from dump specs as --run-dump takes them, over globals of the test that a
 // resolver names. The files go in a directory named after the program (argv[0] plus ".tmp"), so that the plain and
@@ -10,6 +11,7 @@
 #define _POSIX_C_SOURCE 200809L
 
 #include "app/run_dir.h"
+#include "hal/gfl/random_seed.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -222,7 +224,8 @@ static void TestRun(void) {
                                       "input: -\n"
                                       "input_frames: -\n"
                                       "counter: sVBlankCount\n"
-                                      "status: 0\n";
+                                      "status: 0\n"
+                                      "seeds: 0\n";
     const PortRunDirInfo info = { "frigate-black2", "rom.nds", "2012-10-07 12:00:00", NULL, "", 4 };
     const PortRunDirFrame frames[] = { { 1, 1, 0, 1 }, { 2, 2, 1, 2 }, { 3, 3, 1, 2 }, { 4, 4, 2, 3 } };
     char expected[sizeof(tsvHead) + sizeof(rows)];
@@ -277,6 +280,22 @@ static void TestRun(void) {
     CHECK(text != NULL && strncmp(text, tsvHead, strlen(tsvHead)) == 0 && strlen(text) > strlen(tsvHead) &&
           strstr(text + strlen(tsvHead), "\n2\t") == NULL);
     free(text);
+
+    // A finished run lists the random seeds the game built, each given by the input file or built by the game
+    // (port/hal/gfl/random_seed.h)
+    {
+        const uint64_t given = 0xea56a175a2fffc8aull;
+
+        CHECK(port_random_seed_give(&given, 1));
+        CHECK(port_random_seed_take(1) == given);
+        CHECK(port_random_seed_take(0x0123456789abcdefull) == 0x0123456789abcdefull);
+        CHECK(port_run_dir_open(sDir, "none", RecordPng, &info));
+        port_run_dir_close(0);
+        text = ReadFile("run.txt");
+        CHECK(text != NULL && strstr(text, "status: 0\nseeds: 2\nseed_1: 0xea56a175a2fffc8a given\n"
+                                           "seed_2: 0x0123456789abcdef built\n") != NULL);
+        free(text);
+    }
     RemoveDir();
 
     // A bad list or a directory that can't be made opens nothing

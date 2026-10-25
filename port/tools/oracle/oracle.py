@@ -12,6 +12,7 @@ CONTINUE into the field, its menu and the apps it opens, and through New Game in
     oracle.py port-save --port BIN [--oracle BIN] [--version b2_us] [--work DIR]
     oracle.py boot --out DIR [--port BIN] [--frames LIST] [--version b2_us]
     oracle.py sequence NAME --port BIN [--out DIR] [--update] [--save-cache DIR] [--oracle BIN] [--version b2_us]
+    oracle.py seeds NAME [--frames N] [--save-cache DIR] [--work DIR] [--oracle BIN] [--version b2_us]
     oracle.py sequence-check NAME --port BIN [--work DIR] [--version b2_us]
     oracle.py sound NAME --port BIN [--out DIR] [--update] [--oracle BIN] [--version b2_us]
     oracle.py sound-check NAME --port BIN [--work DIR] [--version b2_us]
@@ -45,16 +46,20 @@ clock pinned for both; aspertia, phase 3's exit route: New Game from a blank sav
 the player's house, out into Aspertia City, a talk with a townsperson, into a house and out, the clock pinned), from the
 save the sequence names, if any, made first on the oracle (or taken from --save-cache), and compares every frame the
 same way but the known differences, up to the frame where the port stops when the sequence allows it to stop on code
-with no C yet; with --update it writes port/tests/oracle/<name>_<version>.tsv, the oracle's hashes at sampled frames, of
-its screens and, where the sequence compares it, of the game's state (STATE). sequence-check runs the port alone on that
-input file and checks its counts, its screens without 3D and its state against that reference. sound runs both programs
+with no C yet, after checking that the random seeds the input file gives the port are the ones the DS built in the
+oracle's run (seeds.py; a file without seeds leaves the port its own); with --update it writes
+port/tests/oracle/<name>_<version>.tsv, the oracle's hashes at sampled frames, of its screens and, where the sequence
+compares it, of the game's state (STATE). seeds plays a sequence's or a save's input file on the oracle, from the save
+it starts from, and prints the random seeds the DS built as the file's seed lines (README.md, "Random seeds").
+sequence-check runs the port alone on that input file and checks its counts, its screens without 3D and its state
+against that reference. sound runs both programs
 on a sequence with their sound traces and WAV dumps (--sound-trace, --audio-dump) and compares the sound driver's state
 run by run, what the ARM9 sees of it frame by frame, and the sound by segment (sound.py, SOUND); with --update it writes
 port/tests/oracle/sound_<name>_<version>.tsv, the oracle's hashes and statistics. sound-check runs the port alone and
 checks it against that reference. check is the oracle's ctest test: the oracle runs the boot sequence twice with the
 same results (its screens, sound trace and WAV dump), and its screens match the hashes in
-port/tests/oracle/boot_<version>.tsv. save, port-save, sequence, sound and check exit 77 without the oracle or the ROM,
-sequence-check and sound-check without the ROM.
+port/tests/oracle/boot_<version>.tsv. save, port-save, sequence, seeds, sound and check exit 77 without the oracle or
+the ROM, sequence-check and sound-check without the ROM.
 Standard library only.
 """
 
@@ -74,6 +79,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 
 import compare  # noqa: E402
+import seeds  # noqa: E402
 import sound  # noqa: E402
 import symbols  # noqa: E402
 
@@ -1090,6 +1096,40 @@ def sequence_paths(args) -> tuple[str, str, str]:
             rom_path(args.version, args.rom))
 
 
+def input_seeds(path: str) -> list[int]:
+    """An input file's "seed" lines, in order (pbwinput.h): the seeds a DS built, which the port's game takes in place
+    of its own"""
+    found = []
+    with open(path) as f:
+        for line in f:
+            words = line.split("#", 1)[0].split()
+            if len(words) == 2 and words[0] == "seed":
+                found.append(int(words[1], 16))
+    return found
+
+
+def check_seeds(given: list[int], built: list[tuple[int, int, str]]) -> str | None:
+    """None when an input file's seeds are every seed the oracle's DS built in its run, in order, or when the file
+    gives none (the port then builds its own, and random outcomes differ by construction); else why they aren't"""
+    if not given or given == [seed for seed, _, _ in built]:
+        return None
+    lines = "; ".join(f"{seed:#018x} ({kind}, oracle frame {frame})" for seed, frame, kind in built) or "none"
+    return (f"the input file gives the seeds {', '.join(f'{seed:#018x}' for seed in given)}, and the DS built "
+            f"{lines}: write the DS's (oracle.py seeds)")
+
+
+def report_seeds(input_path: str, oracle_dir: str) -> str | None:
+    """Prints the seeds the oracle's DS built in a run that dumped seeds.DUMPS and those the input file gives; returns
+    check_seeds' answer"""
+    built = seeds.ds_seeds(compare.load_memory(compare.load_run(oracle_dir)))
+    given = input_seeds(input_path)
+    for seed, frame, kind in built:
+        print(f"the DS built the seed {seed:#018x} ({kind}, read at oracle frame {frame})")
+    if not given:
+        print("the input file gives no seeds: the port builds its own, so random outcomes differ from the DS's")
+    return check_seeds(given, built)
+
+
 def stop_allowed(sequence: Sequence, status: int | None, last: int, message: str) -> bool:
     """Whether a port run that didn't end with status 0 ended as the sequence allows: on the trap stub it names (code
     or data with no C yet), its message matching stop_trap, after the frame from which the sequence allows it"""
@@ -1130,9 +1170,14 @@ def command_sequence(args) -> int:
     args.input = input_path
     oracle_dumps = [f"{name}:{size}@{sequence.state_oracle}" for name, size in STATE] if sequence.state_frames else []
     port_dumps = [f"{name}:{size}@{sequence.state_frames}" for name, size in STATE] if sequence.state_frames else []
-    status = run_oracle(args, oracle_dir, sequence.oracle_frames, "all", oracle_dumps, quiet=True)
+    status = run_oracle(args, oracle_dir, sequence.oracle_frames, "all", oracle_dumps + seeds.DUMPS, quiet=True)
     if status != 0:
         print(f"oracle.py sequence: the oracle failed (status {status})")
+        return 1
+    # The random seeds the input file gives the port must be the ones the DS built here
+    reason = report_seeds(input_path, oracle_dir)
+    if reason:
+        print(f"oracle.py sequence: {reason}")
         return 1
     status, message = run_port(args.port, port_dir, sequence.port_frames, "all", rom, args.time, input_path,
                                dumps=port_dumps, save=args.save)
@@ -1196,6 +1241,53 @@ def command_sequence(args) -> int:
         else:
             print(f"the runs and the difference images are in {work}")
     return result
+
+
+def command_seeds(args) -> int:
+    """The seeds the DS builds playing an input file, a sequence's or a save's, from the save it starts from: printed as
+    the file's "seed" lines, and checked against the lines the file has"""
+    binary = args.oracle or DEFAULT_ORACLE
+    if not os.path.exists(binary):
+        print(f"oracle.py seeds: skipped: no oracle at {binary} (configure with -DPORT_BUILD_ORACLE=ON)")
+        return SKIP
+    reason = rom_matches(args.version, rom_path(args.version, args.rom))
+    if reason:
+        print(f"oracle.py seeds: skipped: {reason}")
+        return SKIP
+    if args.name in SEQUENCES:
+        sequence = SEQUENCES[args.name]
+        played, start, frames = sequence.input or args.name, sequence.save, sequence.oracle_frames
+    else:
+        played, start, frames = args.name, SAVES[args.name].start, SAVES[args.name].frames
+    input_path = os.path.join(REPO_ROOT, SEQUENCE_INPUT.format(name=played, version=args.version))
+    if not os.path.exists(input_path):
+        print(f"oracle.py seeds: no input file {os.path.relpath(input_path, REPO_ROOT)} for {args.version}")
+        return 1
+    args.oracle = binary
+    work = args.work or tempfile.mkdtemp(prefix=f"oracle-seeds-{args.name}-")
+    args.save = None
+    if start:
+        args.save, reason = obtain_save(args, start, work, args.save_cache)
+        if reason:
+            print(f"oracle.py seeds: {start}: {reason}")
+            return 1
+    args.input = input_path
+    oracle_dir = os.path.join(work, "oracle")
+    shutil.rmtree(oracle_dir, ignore_errors=True)
+    status = run_oracle(args, oracle_dir, args.frames or frames, "none", seeds.DUMPS, quiet=True)
+    if status != 0:
+        print(f"oracle.py seeds: the oracle failed (status {status})")
+        return 1
+    reason = report_seeds(input_path, oracle_dir)
+    print(f"\n{os.path.relpath(input_path, REPO_ROOT)}'s lines for them:")
+    for seed, frame, kind in seeds.ds_seeds(compare.load_memory(compare.load_run(oracle_dir))):
+        print(f"seed {seed:#018x}  # {'GFL' if kind == 'start-up' else 'a battle'}'s, oracle frame {frame}")
+    if not args.work:
+        shutil.rmtree(work, ignore_errors=True)
+    if reason:
+        print(f"oracle.py seeds: {reason}")
+        return 1
+    return 0
 
 
 def check_reference(rows: dict[int, tuple[int, int | None, int | None, str, str, str | None]],
@@ -1435,6 +1527,16 @@ def main(argv: list[str] | None = None) -> int:
     sequence.add_argument("--save-cache", help="take the save the sequence starts from from this directory, or make "
                           "it there (oracle.py save --save-cache)")
 
+    seeds_parser = commands.add_parser("seeds", help="the random seeds the DS builds playing a sequence's or a save's "
+                                       "input file, as the file's seed lines")
+    seeds_parser.add_argument("name", choices=sorted(set(SEQUENCES) | set(SAVES)))
+    common(seeds_parser)
+    seeds_parser.add_argument("--frames", type=int, help="how far the oracle runs (the sequence's or the save's frames "
+                              "by default)")
+    seeds_parser.add_argument("--save-cache", help="take the save the input file starts from from this directory, or "
+                              "make it there (oracle.py save --save-cache)")
+    seeds_parser.add_argument("--work", help="keep the oracle's run here")
+
     sequence_check = commands.add_parser("sequence-check", help="the port on a sequence against its reference")
     sequence_check.add_argument("name", choices=sorted(SEQUENCES))
     common(sequence_check, oracle=False)
@@ -1469,6 +1571,8 @@ def main(argv: list[str] | None = None) -> int:
             return command_boot(args)
         if args.command == "sequence":
             return command_sequence(args)
+        if args.command == "seeds":
+            return command_seeds(args)
         if args.command == "sequence-check":
             return command_sequence_check(args)
         if args.command == "sound":

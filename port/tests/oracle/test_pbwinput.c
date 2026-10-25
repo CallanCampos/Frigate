@@ -1,7 +1,8 @@
 // Tests of the input file reader and writer (port/tools/oracle/pbwinput.c): the format's rules as
-// port/tools/oracle/README.md gives them, the states each frame gets, every error a file can have, a round trip
-// through the writer, and the game clock that turns GFL's frame count into game frames. The round trip writes a file
-// named after the program (argv[0] plus ".tmp"), so that the plain and sanitized builds can run at the same time.
+// port/tools/oracle/README.md gives them, the states each frame gets, the random seeds a file gives, every error a file
+// can have, a round trip through the writer, and the game clock that turns GFL's frame count into game frames. The
+// round trip writes a file named after the program (argv[0] plus ".tmp"), so that the plain and sanitized builds can
+// run at the same time.
 #include "pbwinput.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -36,6 +37,9 @@ static void TestValidFile(void) {
                                "version b2_us\n"
                                "frames video\n"
                                "clock pinned  # stays at the time\n"
+                               "seed 0xEA56A175A2FFFC8A  # GFL's at start-up\n"
+                               "seed 0x1\n"
+                               "seed\t0xffffffffffffffff\n"
                                "1 -\n"
                                "120\tA\n"
                                "121 -   -\n"
@@ -58,6 +62,8 @@ static void TestValidFile(void) {
     CHECK(strcmp(input.version, "b2_us") == 0);
     CHECK(input.frames == PBW_INPUT_VIDEO_FRAMES);
     CHECK(input.clock == PBW_INPUT_CLOCK_PINNED);
+    CHECK(input.seedCount == 3);
+    CHECK(input.seeds[0] == 0xea56a175a2fffc8aull && input.seeds[1] == 1 && input.seeds[2] == 0xffffffffffffffffull);
     CHECK(input.count == 9);
 
     state = pbw_input_state(&input, 1);
@@ -94,6 +100,8 @@ static void TestStatesBeforeTheFirstChange(void) {
     // Game frames and a running clock unless the file says otherwise
     CHECK(input.frames == PBW_INPUT_GAME_FRAMES);
     CHECK(input.clock == PBW_INPUT_CLOCK_RUNNING);
+    // and no seeds: the game builds its own
+    CHECK(input.seedCount == 0);
     pbw_input_free(&input);
     CHECK(Parse(&input, "pbwinput 1\nframes game\nclock running\n10 A\n", error, sizeof(error)));
     CHECK(input.frames == PBW_INPUT_GAME_FRAMES && input.clock == PBW_INPUT_CLOCK_RUNNING && input.count == 1);
@@ -166,6 +174,14 @@ static void TestErrors(void) {
         { "pbwinput 1\nclock pinned running\n", "running or pinned" },
         { "pbwinput 1\nclock pinned\nclock pinned\n", "one \"clock\" line" },
         { "pbwinput 1\n1 A\nclock pinned\n", "one \"clock\" line" },
+        { "pbwinput 1\nseed\n", "64-bit number in hexadecimal" },
+        { "pbwinput 1\nseed 12\n", "64-bit number in hexadecimal" },
+        { "pbwinput 1\nseed 0x\n", "64-bit number in hexadecimal" },
+        { "pbwinput 1\nseed 0x12g4\n", "64-bit number in hexadecimal" },
+        { "pbwinput 1\nseed 0x10000000000000000\n", "64-bit number in hexadecimal" },
+        { "pbwinput 1\nseed -0x1\n", "64-bit number in hexadecimal" },
+        { "pbwinput 1\nseed 0x1 0x2\n", "64-bit number in hexadecimal" },
+        { "pbwinput 1\n1 A\nseed 0x1\n", "before the first frame" },
         { "pbwinput 1\n10 AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\n",
           "longer than" },
     };
@@ -193,6 +209,23 @@ static void TestErrors(void) {
         CHECK(!pbw_input_parse(&input, text, sizeof(text) - 1, error, sizeof(error)));
         CHECK(strstr(error, "NUL") != NULL);
         CHECK(strstr(error, "line 2") != NULL);
+    }
+    // As many seeds as the reader holds, and one more
+    {
+        char text[32 + (PBW_INPUT_MAX_SEEDS + 1) * 16];
+        size_t used = (size_t)snprintf(text, sizeof(text), "pbwinput 1\n");
+        PbwInput input;
+        char error[256] = "";
+
+        for (i = 0; i < PBW_INPUT_MAX_SEEDS; i++) {
+            used += (size_t)snprintf(text + used, sizeof(text) - used, "seed 0x%zx\n", i + 1);
+        }
+        CHECK(Parse(&input, text, error, sizeof(error)));
+        CHECK(input.seedCount == PBW_INPUT_MAX_SEEDS && input.seeds[PBW_INPUT_MAX_SEEDS - 1] == PBW_INPUT_MAX_SEEDS);
+        pbw_input_free(&input);
+        snprintf(text + used, sizeof(text) - used, "seed 0x%x\n", PBW_INPUT_MAX_SEEDS + 1);
+        CHECK(!Parse(&input, text, error, sizeof(error)));
+        CHECK(strstr(error, "more than") != NULL && input.seedCount == 0);
     }
     // A small error buffer still ends with a NUL; none at all is fine
     {
@@ -311,6 +344,9 @@ static void TestFormatAndRoundTrip(const char *program) {
     memcpy(input.version, "w2_us", 6);
     input.frames = PBW_INPUT_VIDEO_FRAMES;
     input.clock = PBW_INPUT_CLOCK_PINNED;
+    input.seeds[0] = 0xea56a175a2fffc8aull;
+    input.seeds[1] = 7;
+    input.seedCount = 2;
     memset(&state, 0, sizeof(state));
     CHECK(pbw_input_append(&input, 1, &state));
     CHECK(input.count == 0);
@@ -353,6 +389,7 @@ static void TestFormatAndRoundTrip(const char *program) {
     CHECK(strcmp(back.version, input.version) == 0);
     CHECK(back.frames == PBW_INPUT_VIDEO_FRAMES);
     CHECK(back.clock == PBW_INPUT_CLOCK_PINNED);
+    CHECK(back.seedCount == 2 && back.seeds[0] == input.seeds[0] && back.seeds[1] == 7);
     for (i = 0; i < input.count && i < back.count; i++) {
         CHECK(back.changes[i].frame == input.changes[i].frame);
         CHECK(SameState(back.changes[i].state, input.changes[i].state));
