@@ -224,6 +224,11 @@ Same instructions, registers swapped.
   other (`movs r6, #0` ... `subs r4, r6, #1` for `-1`), declare the locals without initializers and assign them in the
   original's order. The phrase select's `PMSSelect_SeqSelect` needs `BOOL end; int touch;` then `touch = -1;
   end = FALSE;`.
+- A constant stored to a spilled local can be built and stored before a call although the C assigns it after the
+  call's failure test, and where the assignment stands still picks the register it is built in. DWC's
+  `NHTTP_CreateRequest` (`nhttp_request.c`) has `movs r2, #8; str r2, [sp, #8]` ahead of its `"https://"` compare:
+  `schemeLength = 8;` written after `if (NHTTPi_strnicmp(text, "https://", 8) != 0) { ...; goto fail; }` gives that
+  r2, and written before the call, or as the call's argument, builds the 8 in r0.
 - A pointer that must have the earlier declaration's slot but a later store is declared without an initializer and
   assigned after the other pointers. This matches the item-base spills in `GetWEPData` and `GetWPAData` in
   `dwc_aoss.c`.
@@ -1923,7 +1928,9 @@ Same instructions, scheduled in another order.
   task queue (`mb_task.c`) keeps `MBiTaskInfo *volatile head`, which the task thread and the threads adding jobs share;
   with it `MBi_TaskThread` and `MBi_SetTask` match. The same goes for DWC's HTTP client (`nhttp_internal.h`): the response's `headerSize`, which the receiving thread
   stores and reloads at once, and the request list's `count`, whose `id = info->count++` loads the field twice, once
-  for the result and once for the increment, as only a `volatile` lvalue does.
+  for the result and once for the increment, as only a `volatile` lvalue does. The response's `contentLength` is the
+  same: `NHTTPGetProgress` tests it and then stores it, and the original builds its -1 before the first load and loads
+  the field again for the store, which no ternary, early return or `goto` gives and `volatile` does.
 - A global reached through a cast to a derived struct, `((Derived *)gBase)->arr[n].f`, is addressed as
   `(base + n * size) + offsetof(f)`, where the global's own type folds the constants first. Multiboot's work global
   is the parent's and child's shared part, which the parent's code casts to its extension (`pPwork`), and
@@ -2717,6 +2724,11 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   on, where `if (!f()) { return FALSE; } n++;` puts it before. In a loop the `else` lands after the whole body, just
   before the rotated loop's bottom test: libVCT's `VCTi_ReceiveAudioData` (`vct_audio.c`) has its empty-queue exit there and
   matches with the body wrapped as `if (packet != NULL) { ... } else { receiver->queuedCount = count; return FALSE; }`.
+  An `else` comes right after its then-block, before what follows the `if`, so a return that the asm puts after the
+  next test's return is the `else` of a negated test whose then-block holds only that next test. GameSpy's
+  `ghiTrySendThenBuffer` (`ghttpCommon.c`) tests -2 first and has `return 2` after `return 0`: it matches as
+  `if (sent != -2) { if (sent == -1) { return 0; } } else { return 2; }` and then `if (sent == size)`, where also
+  putting the size test inside the then-block moves `return 2` past it (11 bytes).
 - Every `return` gets its own epilogue. Failures that all branch to one block that sets a saved register and jumps
   to a shared `mov r0, rN` exit can be a `static inline`'s early returns, which inlining turns into stores to one
   result and jumps to its end. `mystery_gift_pokemon.c`'s `CreateMysteryGiftPokemon` is

@@ -245,6 +245,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 - A struct field loaded again for each of several tests in a row, where ours reuses one load: the field is shared
   with other threads and `volatile`. (matching.md: "A field that other threads change")
+- A constant built and spilled before a call, in the wrong register: move its assignment past the call's failure test.
+  (matching.md: "A constant stored to a spilled local")
 - An RC4 swap with the wrong registers: write it through one temporary, and group a masked sum as
   `(table[i] + (j + key[k])) & 0xff`. A named `in = src + i` pointer that takes the counter's register: index
   `src[i + k]` directly. (matching.md: "An RC4 key schedule's swap")
@@ -786,6 +788,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
   two comparisons, as in a touch hit test. (matching.md: "joined by a bitwise `&`")
 - Blocks are laid out in source order. A switch whose `default` code comes first had `default:` written first, and
   `if (!f()) return FALSE; n++;` puts the return before the code that goes on. (matching.md: "Blocks are laid out in source order")
+- A return that the asm puts after the next test's return: write the test negated, that return in its `else`, and only
+  the next test in the then-block. (matching.md: "An `else` comes right after its then-block")
 - A loop's early exit placed after the whole body, just before the bottom test: wrap the body in `if (p != NULL) {
   ... } else { exit }`. (matching.md: "In a loop the `else` lands after the whole body")
 - Identical statements in different branches are merged, so a jump into the middle of another block means the same
