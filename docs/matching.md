@@ -3628,7 +3628,7 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   previous file's range.
 - A string that the ROM has twice in one file's range, a few hundred bytes apart, is two files: MWCC pools a file's
   equal literals. DWC's `"httpresult"`, `"returncd"` and `"Date"` in overlay 11 split its login range into the login,
-  the HTTP client, the connection test, the profanity check and the service locator (`dwc_nasfunc.c`,
+  the HTTP client, the connection test, the profanity check and the service locator (`dwc_auth.c`,
   `dwc_http_client.c`, `dwc_conntest.c`, `dwc_profanity.c`, `dwc_svcloc.c`), and only the split laid each one's `.data`
   out as the ROM's. The 13 root certificates after them are each a data-only file under `-ipa file`, whose name and key
   of 64 bytes or more and unreferenced global struct get 4-aligned sections of their own, which one file of all 13
@@ -3724,6 +3724,20 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   a definition in `.data` instead: `socl_startup.c`'s `SOCLiConfigPtr = NULL`, which the ROM has in `.data` before
   the 0x4000 default, takes it, and with the zeroed `.bss` globals in ntrtwl's definition order its four functions
   match (33 bytes to 0x2c off otherwise).
+- A zero-initialized static is reached from the section's pooled base, and so is a struct of statics, but the two
+  compile differently: the struct's member is a field of one object, which MWCC loads again at other points (after a
+  64-bit store, before a zero, across a loop), while a static of its own is known and scheduled freely. Statics that the
+  asm reaches as one base are therefore separate `= 0` statics, in the order whose size sort gives the ROM's addresses.
+  DWC's friend list kept its five words as one static struct, and `DWCi_FriendInit`, `DWCi_FriendProcess` and
+  `DWCi_GetFriendBuddyStatus` each differed where the control was loaded; as `static DWCFriendControl *sFriendControl =
+  NULL; static u32 sUnk08 = 0; static BOOL sInPersistThink = FALSE; static BOOL sCloseStats = FALSE; static BOOL
+  sInCloseStats = FALSE;` (at 0xc, 8, 4, 0 and 0x10) all three match. A file whose statics need two layouts that
+  contradict each other, as the friend list's, the server date's three globals and `DWCi_GetMathRand32`'s generator
+  did in one file, is several original files: split as TWL-DWC's `dwc_nastime.c`, `dwc_common.c` (the generator a
+  `static` inside the function) and `dwc_friend.c`, `DWC_Auth_SetNasTimeDiff`, `DWCi_GetMathRand32` and the friend
+  list's functions match. Such `= 0` `.bss` objects still join the `.data` size sort where they are defined:
+  `dwc_nastime.c`'s month names come out in the ROM's order (`Jun`, `Jul`, `Dec`, `Sep` and on) only with its three
+  globals defined before the table, offset, local seconds and valid flag, which `rodata_order.py` predicts.
 - In Thumb code a word of a known static at section offset `off` is read through the literal `.bss` plus `off` rounded
   down to a multiple of 0x80, with the rest in the load's offset: in the unsplit `card_common.c` a static at 0x584 is
   read as `.bss+0x580` and `#4`, at 0x5a0 as `.bss+0x580` and `#0x20`, and at 0x600 as `.bss+0x600` and `[r0]`. A read

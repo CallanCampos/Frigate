@@ -535,7 +535,7 @@ DWC_SVLGetTokenAsync kind:function(thumb,size=0x64) addr:0x0215de44
 DWC_SVLProcess kind:function(thumb,size=0x16) addr:0x0215dea8
 DWC_NASLoginAsync kind:function(thumb,size=0x80) addr:0x0215dec0
 DWC_NASLoginProcess kind:function(thumb,size=0xbc) addr:0x0215df40
-DWCi_SetNasTimeFromDateHeader kind:function(thumb,size=0x164) addr:0x0215dffc
+DWC_Auth_SetNasTimeDiff kind:function(thumb,size=0x164) addr:0x0215dffc
 DWC_SetCommonKeyValueString kind:function(thumb,size=0x28) addr:0x0215e160
 DWC_AddCommonKeyValueString kind:function(thumb,size=0x26) addr:0x0215e188
 DWC_GetCommonValueString kind:function(thumb,size=0xaa) addr:0x0215e1b0
@@ -549,7 +549,7 @@ DWC_SetOwnStatusData kind:function(thumb,size=0x58) addr:0x0215e47c
 DWC_SetBuddyFriendCallback kind:function(thumb,size=0x1c) addr:0x0215e4d4
 DWCi_FriendInit kind:function(thumb,size=0x94) addr:0x0215e4f0
 DWCi_FriendProcess kind:function(thumb,size=0x190) addr:0x0215e584
-DWCi_IsUpdatingServers kind:function(thumb,size=0x18) addr:0x0215e714
+DWCi_IsServerUpdating kind:function(thumb,size=0x18) addr:0x0215e714
 DWCi_UpdateServersAsync kind:function(thumb,size=0x58) addr:0x0215e72c
 DWCi_StopFriendProcess kind:function(thumb,size=0x4c) addr:0x0215e784
 DWCi_GPRecvBuddyRequestCallback kind:function(thumb,size=0x2c) addr:0x0215e7d0
@@ -577,7 +577,7 @@ DWCi_GPGetInfoCallback_RecvAuthMessage kind:function(thumb,size=0x11c) addr:0x02
 DWCi_GetPersCallbackLevel kind:function(thumb,size=0xc) addr:0x0215f2b4
 DWCi_BeginCloseStatsConnection kind:function(thumb,size=0xc) addr:0x0215f2c0
 DWCi_EndCloseStatsConnection kind:function(thumb,size=0xc) addr:0x0215f2cc
-DWCi_GPGetReverseBuddiesListCallback kind:function(thumb,size=0x138) addr:0x0215f2d8
+DWCi_GetReverseBuddiesCallback kind:function(thumb,size=0x138) addr:0x0215f2d8
 DWCi_LoginInit kind:function(thumb,size=0x4c) addr:0x0215f410
 DWCi_LoginAsync kind:function(thumb,size=0x24) addr:0x0215f45c
 DWCi_LoginProcess kind:function(thumb,size=0x9c) addr:0x0215f480
@@ -1787,7 +1787,7 @@ data_ov011_0218572c kind:data(any) addr:0x0218572c
 data_ov011_02185730 kind:data(any) addr:0x02185730
 data_ov011_02185734 kind:data(any) addr:0x02185734
 data_ov011_02185738 kind:data(any) addr:0x02185738
-data_ov011_0218573c kind:data(any) addr:0x0218573c
+sMonthNames kind:data(any) addr:0x0218573c
 data_ov011_0218576c kind:data(any) addr:0x0218576c
 data_ov011_0218578c kind:data(any) addr:0x0218578c
 data_ov011_02185798 kind:data(any) addr:0x02185798
@@ -2706,13 +2706,13 @@ data_ov011_0218dfac kind:bss addr:0x0218dfac
 sWcmRssiCursor kind:bss addr:0x0218dfb4
 sWcmRssiSamples kind:bss addr:0x0218dfb5
 data_ov011_0218dfc8 kind:bss addr:0x0218dfc8
-data_ov011_0218dfd0 kind:bss addr:0x0218dfd0
-data_ov011_0218dfd4 kind:bss addr:0x0218dfd4
-data_ov011_0218dfd8 kind:bss addr:0x0218dfd8
-data_ov011_0218dfe0 kind:bss addr:0x0218dfe0
+sNasLogin kind:bss addr:0x0218dfd0
+DWCi_NasTimeValid kind:bss addr:0x0218dfd4
+DWCi_NasTimeLocalSeconds kind:bss addr:0x0218dfd8
+DWCi_NasTimeOffset kind:bss addr:0x0218dfe0
 data_ov011_0218dfe8 kind:bss addr:0x0218dfe8
-data_ov011_0218e000 kind:bss addr:0x0218e000
-data_ov011_0218e014 kind:bss addr:0x0218e014
+sCloseStats kind:bss addr:0x0218e000
+sLogin kind:bss addr:0x0218e014
 sMatchRoot kind:bss addr:0x0218e018
 sNetIds kind:bss addr:0x0218e020
 sConnections kind:bss addr:0x0218e040

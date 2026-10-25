@@ -378,17 +378,18 @@ lib/dwc/src/serverbrowsing/sb_serverlist.c:
     .data       start:0x0218b9b0 end:0x0218ba00
     .bss        start:0x021922a4 end:0x021922c0
 
-lib/dwc/src/base/friend.c:
-    .text       start:0x0215dd74 end:0x0215fa0c
-    .data       start:0x021856fc end:0x021857bc
-    .bss        start:0x0218dfc8 end:0x0218e018
+lib/dwc/src/base/dwc_nonport.c:
+    complete
+    .text       start:0x0215dd74 end:0x0215dda8
+    .data       start:0x021856fc end:0x02185700
+    .bss        start:0x0218dfc8 end:0x0218dfd0
 
 lib/dwc/src/transport/dwc_transport.c:
     .text       start:0x02168818 end:0x021694d4
     .data       start:0x02185ad8 end:0x02185ae8
     .bss        start:0x0218e918 end:0x0218e924
 
-lib/dwc/src/auth/dwc_nasfunc.c:
+lib/dwc/src/auth/dwc_auth.c:
     complete
     .text       start:0x021694d4 end:0x0216a408
     .data       start:0x02185ae8 end:0x02185d24
@@ -497,3 +498,32 @@ lib/nitrowifi/src/wcm/wcm_util.c:
 lib/nitrowifi/src/wcm/wcm_wmif.c:
     complete
     .text       start:0x0215ce88 end:0x0215dd74
+
+lib/dwc/src/base/dwc_nasfunc.c:
+    complete
+    .text       start:0x0215dda8 end:0x0215dffc
+    .data       start:0x02185700 end:0x0218570c
+    .bss        start:0x0218dfd0 end:0x0218dfd4
+
+lib/dwc/src/base/dwc_nastime.c:
+    complete
+    .text       start:0x0215dffc end:0x0215e160
+    .data       start:0x0218570c end:0x0218578c
+    .bss        start:0x0218dfd4 end:0x0218dfe8
+
+lib/dwc/src/base/dwc_common.c:
+    .text       start:0x0215e160 end:0x0215e344
+    .data       start:0x0218578c end:0x02185798
+    .bss        start:0x0218dfe8 end:0x0218e000
+
+lib/dwc/src/base/dwc_friend.c:
+    complete
+    .text       start:0x0215e344 end:0x0215f410
+    .data       start:0x02185798 end:0x021857b0
+    .bss        start:0x0218e000 end:0x0218e014
+
+lib/dwc/src/base/dwc_login.c:
+    complete
+    .text       start:0x0215f410 end:0x0215fa0c
+    .data       start:0x021857b0 end:0x021857bc
+    .bss        start:0x0218e014 end:0x0218e018

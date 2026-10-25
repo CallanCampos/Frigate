@@ -100,12 +100,12 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 
 ### Overlay 11
 
-1506 of 1688 functions are in source files.
+1688 of 1688 functions are in source files.
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
 | `net_devwifi.c` | `0x021503c0`–`0x021505d4` | 26 | complete | string at `0x021852ac` |
-| `dwc_rap.c` | `0x021505d4`–`0x02152078` | 77 | partial | string at `0x021852d0` |
+| `dwc_rap.c` | `0x021505d4`–`0x02152078` | 77 | complete | string at `0x021852d0` |
 | `dwc_rapcommon.c` | `0x02152078`–`0x0215251c` | 14 | complete | string at `0x021853f0` |
 | `cps.c` | `0x0215251c`–`0x02155e34` | 113 | partial | descriptive |
 | `socl_startup.c` | `0x02155e34`–`0x02156000` | 6 | complete | descriptive |
@@ -126,15 +126,22 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 | `md5.c` | `0x0215a6b4`–`0x0215ab04` | 6 | complete | descriptive |
 | `sha1.c` | `0x0215ab04`–`0x0215b1d8` | 8 | complete | descriptive |
 | `ssl_rc4.c` | `0x0215b1d8`–`0x0215b274` | 2 | complete | descriptive |
-| `biginteger.c` | `0x0215b274`–`0x0215bbec` | 19 | partial | descriptive |
+| `biginteger.c` | `0x0215b274`–`0x0215bbec` | 19 | complete | descriptive |
 | `wcm_system.c` | `0x0215bbec`–`0x0215c594` | 39 | complete | descriptive |
 | `wcm_aplist.c` | `0x0215c594`–`0x0215cac4` | 14 | complete | descriptive |
 | `wcm_cpsif.c` | `0x0215cac4`–`0x0215cd28` | 13 | complete | descriptive |
 | `wcm_util.c` | `0x0215cd28`–`0x0215ce88` | 6 | complete | descriptive |
 | `wcm_wmif.c` | `0x0215ce88`–`0x0215dd74` | 21 | complete | descriptive |
-| `dwc_main.c` | `0x0215fa0c`–`0x02160e10` | 49 | partial | descriptive |
+| `dwc_nonport.c` | `0x0215dd74`–`0x0215dda8` | 3 | complete | descriptive |
+| `dwc_nasfunc.c` | `0x0215dda8`–`0x0215dffc` | 5 | complete | descriptive |
+| `dwc_nastime.c` | `0x0215dffc`–`0x0215e160` | 1 | complete | descriptive |
+| `dwc_common.c` | `0x0215e160`–`0x0215e344` | 5 | partial | descriptive |
+| `dwc_friend.c` | `0x0215e344`–`0x0215f410` | 37 | complete | descriptive |
+| `dwc_login.c` | `0x0215f410`–`0x0215fa0c` | 16 | complete | descriptive |
+| `dwc_main.c` | `0x0215fa0c`–`0x02160e10` | 49 | complete | descriptive |
 | `dwc_match.c` | `0x02160e10`–`0x02168818` | 161 | partial | descriptive |
-| `dwc_nasfunc.c` | `0x021694d4`–`0x0216a408` | 30 | complete | descriptive |
+| `dwc_transport.c` | `0x02168818`–`0x021694d4` | 41 | partial | descriptive |
+| `dwc_auth.c` | `0x021694d4`–`0x0216a408` | 30 | complete | descriptive |
 | `dwc_http_client.c` | `0x0216a408`–`0x0216b14c` | 25 | partial | descriptive |
 | `dwc_conntest.c` | `0x0216b14c`–`0x0216bbe4` | 8 | partial | descriptive |
 | `dwc_profanity.c` | `0x0216bbe4`–`0x0216c154` | 6 | partial | descriptive |
@@ -150,7 +157,7 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 | `gsPlatformUtil.c` | `0x0216e250`–`0x0216ea4c` | 25 | complete | descriptive |
 | `gsSoap.c` | `0x0216ea4c`–`0x0216ec58` | 9 | complete | descriptive |
 | `gsStringUtil.c` | `0x0216ec58`–`0x0216eea8` | 7 | complete | descriptive |
-| `gsUdpEngine.c` | `0x0216eea8`–`0x0216fbe0` | 26 | partial | descriptive |
+| `gsUdpEngine.c` | `0x0216eea8`–`0x0216fbe0` | 26 | complete | descriptive |
 | `gsXML.c` | `0x0216fbe0`–`0x021713e0` | 50 | complete | descriptive |
 | `screen.c` | `0x021713e0`–`0x021714cc` | 4 | complete | descriptive |
 | `darray.c` | `0x021714cc`–`0x02171818` | 20 | complete | descriptive |
@@ -167,7 +174,7 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 | `gpiOperation.c` | `0x02178084`–`0x02178458` | 7 | complete | descriptive |
 | `gpiPeer.c` | `0x02178458`–`0x02179220` | 24 | complete | descriptive |
 | `gpiProfile.c` | `0x02179220`–`0x02179834` | 20 | complete | descriptive |
-| `gpiSearch.c` | `0x02179834`–`0x0217b5fc` | 7 | partial | descriptive |
+| `gpiSearch.c` | `0x02179834`–`0x0217b5fc` | 7 | complete | descriptive |
 | `gpiTransfer.c` | `0x0217b5fc`–`0x0217b6a8` | 2 | complete | descriptive |
 | `gpiUnique.c` | `0x0217b6a8`–`0x0217b7e0` | 2 | complete | descriptive |
 | `gpiUtility.c` | `0x0217b7e0`–`0x0217bb30` | 9 | complete | descriptive |

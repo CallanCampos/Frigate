@@ -11,6 +11,7 @@
 #include "dwc/gstats.h"
 #include "dwc/gt2Main.h"
 #include "dwc/gt2Utility.h"
+#include "dwc/login.h"
 #include "dwc/match.h"
 #include "dwc/match_internal.h"
 #include "dwc/memfunc.h"
@@ -254,7 +255,7 @@ BOOL DWC_LoginAsync(const u16 *name, const char *reserved, DWCLoginCallback call
 BOOL DWC_UpdateServersAsync(const char *name, DWCUpdateServersCallback callback, void *userData,
                             DWCFriendStatusCallback statusCallback, void *statusParam,
                             DWCDeleteFriendListCallback deleteCallback, void *deleteParam) {
-    if (DWCi_IsError() || sMatchRoot.fm->state < 3 || DWCi_IsUpdatingServers()) {
+    if (DWCi_IsError() || sMatchRoot.fm->state < 3 || DWCi_IsServerUpdating()) {
         return FALSE;
     }
     sMatchRoot.fm->updateServersCallback = callback;

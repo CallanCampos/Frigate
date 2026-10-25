@@ -1,6 +1,7 @@
 #ifndef POKEBW2_DWC_MATCH_INTERNAL_H
 #define POKEBW2_DWC_MATCH_INTERNAL_H
 
+#include "dwc/login.h"
 #include "dwc/match.h"
 #include "dwc/qr2.h"
 #include "dwc/sb_serverbrowsing.h"

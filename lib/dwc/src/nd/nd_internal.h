@@ -3,8 +3,8 @@
 
 #include "types.h"
 #include "dwc/apinfo.h"
+#include "dwc/base64.h"
 #include "dwc/bm.h"
-#include "dwc/common.h"
 #include "dwc/error.h"
 #include "dwc/memfunc.h"
 #include "dwc/nhttp.h"

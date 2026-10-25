@@ -1015,6 +1015,10 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - A `.bss` static reached through a literal of its own where the original reaches it from the section's base: give
   it a zero initializer (`= 0`, `= NULL`, `= { 0 }`); one the ROM has in `.data` takes `#pragma explicit_zero_data on`.
   (matching.md: "the same holds for zero")
+- A static struct's member loaded again where the original keeps it (after a 64-bit store, before a zero, across a
+  loop), with the struct reached from the section's base: make each member a separate `= 0` static, in the order whose
+  size sort gives the ROM's addresses. Statics that need two contradictory layouts are several original files.
+  (matching.md: "a struct of statics, but the two")
 - Odd instructions at the end of a same-size diff (`add sp, #0`, `.byte 0xff`): literal pool words, which can be a
   wrong constant; decode them before blaming registers. (matching.md: "decode the words before counting")
 - Live `.data` statics separated by unused records: one initialized array retains every entry even when code indexes

@@ -1427,7 +1427,7 @@ src/system/net_define.c:
     .text       start:0x020116ac end:0x02011890
     .bss        start:0x02141050 end:0x02141054
 
-src/system/dwc_friend.c:
+src/system/wifi_friend.c:
     complete
     .text       start:0x02011890 end:0x02011bdc
 
@@ -1800,7 +1800,7 @@ lib/dwc/src/base/dwc_account.c:
     .text       start:0x020575fc end:0x020580e4
     .data       start:0x0209b09c end:0x0209b0d0
 
-lib/dwc/src/base/dwc_common.c:
+lib/dwc/src/base/dwc_base64.c:
     complete
     .text       start:0x020580e4 end:0x020583bc
     .data       start:0x0209b0d0 end:0x0209b118

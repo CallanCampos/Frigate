@@ -5,7 +5,7 @@
 #include "nitro/os.h"
 #include "nitrowifi/cps.h"
 
-// DWC's login to the Nintendo authentication server (overlay 11): the login's thread (dwc_nasfunc.c), the HTTP client
+// DWC's login to the Nintendo authentication server (overlay 11): the login's thread (dwc_auth.c), the HTTP client
 // that it and the other requests to the server use (dwc_http_client.c), the connection test (dwc_conntest.c), the
 // profanity check (dwc_profanity.c), the service locator (dwc_svcloc.c) and the root certificates (dwc_rootcert_*.c).
 // The ROM names none of it: the file names are ours, from what each file does and the strings it sends, and so are the
@@ -205,7 +205,7 @@ BOOL DWC_Svl_GetTokenAsync(char *service, DWCSvlResult *result);
 DWCSvlState DWC_Svl_Process(void);
 
 // The login's HTTP client and helpers that the connection test (dwc_conntest.c), the profanity check
-// (dwc_profanity.c) and the service locator (dwc_svcloc.c) share with dwc_nasfunc.c
+// (dwc_profanity.c) and the service locator (dwc_svcloc.c) share with dwc_auth.c
 // What the requests to the server tell about the player and the console, as the form fields are made from them
 typedef struct DWCCalInfo {
     char userid[0xe];

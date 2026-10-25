@@ -1,12 +1,11 @@
 #include "dwc/ac.h"
 #include "dwc/bm.h"
-#include "dwc/common.h"
 #include "dwc/dwc.h"
 #include "dwc/error.h"
 #include "dwc/ext.h"
-#include "dwc/friend.h"
 #include "dwc/memfunc.h"
 #include "dwc/nasfunc.h"
+#include "dwc/nastime.h"
 #include "nitro/hw.h"
 #include "nitro/mi.h"
 #include "nitro/os.h"
@@ -17,10 +16,13 @@
 #include <wchar.h>
 
 // DWC's login to the Nintendo authentication server (overlay 11, Thumb): the "ac" requests and the worker thread that
-// runs them, and the form fields that the requests share. The ROM embeds no name for the file, so the name is a guess
-// from what the code does. The HTTP client, the connection test, the profanity check, the service locator and the root
-// certificates follow it in files of their own (dwc_http_client.c, dwc_conntest.c, dwc_profanity.c, dwc_svcloc.c and
-// dwc_rootcert_*.c). See dwc/nasfunc.h for the layouts that the friends' match shares.
+// runs them, and the form fields that the requests share. The ROM embeds no name for the file. Black 1's DWC, whose
+// functions aletheia matched to TWL-DWC's library objects (layout/symbols_sdk.txt), has its first functions, from
+// DWC_Auth_SetCustomNas to DWCi_Auth_SetError, in libdwcauth's dwc_auth.o, which names the file, and those from
+// DWCi_Auth_InitInterface and DWC_Auth_GetCalInfoFromNVRAM on in dwc_auth_interface.o and dwc_cal.o, files of their
+// own that this one still holds. The HTTP client, the connection test, the profanity check, the service locator and the
+// root certificates follow it in files of their own (dwc_http_client.c, dwc_conntest.c, dwc_profanity.c, dwc_svcloc.c
+// and dwc_rootcert_*.c). See dwc/nasfunc.h for the layouts that the friends' match shares.
 
 // The game's code and the maker's code, in the ROM header that the card leaves in main memory
 #define ROM_GAME_CODE ((const u8 *)(HW_ROM_HEADER_BUF + 0xc))
@@ -336,7 +338,7 @@ static int DWCi_Auth_FillResult(void) {
 
     end = (char *)DWC_Http_GetResult(sNas.work->http, "Date");
     if (end != NULL) {
-        DWCi_SetNasTimeFromDateHeader(end);
+        DWC_Auth_SetNasTimeDiff(end);
     }
     end = NULL;
     errno = 0;
