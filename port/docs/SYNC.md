@@ -264,9 +264,10 @@ fails instead. What it doesn't see: a pointer written into a union's integer mem
 (`port/tools/compile-probe/scripts/unions.py` lists the unions that mix pointers and integers); a 32-bit unsigned offset
 added to a pointer or a `uptr`, such as `vm->pc + offset` with a `u32 offset`, which has no cast either: the DS's 32-bit
 sum wraps, so a negative offset read as a `u32` goes back there, and a host's goes 4 GiB forward, as the field script's
-jumps back and Bianca's walk in the starter scene did until PR 29
-([../tools/pointer_offsets.query](../tools/pointer_offsets.query) lists such sums in the script interpreters and
-NitroSystem's resource readers, and [STATUS.md](STATUS.md)'s entry for PR 29's follow-up has their reading); an explicit
+jumps back and its actor command's movement back (an animation of Bianca's in the starter scene) did until PR 29
+([../tools/pointer_offsets.query](../tools/pointer_offsets.query) lists such sums, and pointers subscripted by a `u32`,
+in the script interpreters and the readers of offsets from data that its header names, and [STATUS.md](STATUS.md)'s
+entry for PR 29's follow-up has their reading); an explicit
 cast from an integer that carries an address to a narrower one, such as `(u32)(uptr)p` or `(u32)` of a `uptr` value, for
 which clang has no warning; a compound assignment such as `dst += (uptr)p` on a `u32 dst`, whose read back is flagged
 instead; a pointer cast to `long` or `unsigned long`, which [PLAN.md §4.8](PLAN.md#48-64-bit-and-dual-target-rules)'s

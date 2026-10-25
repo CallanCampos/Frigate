@@ -736,8 +736,11 @@ Bianca's scene from another count: after her first talk the field loads the city
 (Tepig is made at count 12182 against the port's 12134) and B, mashed, absorbs it. Traced by GFL's linear generator on
 both programs, dumped at every frame: at the end of each pass it is the DS's at every count but 12134 to 12181, where
 the port has made Tepig and the DS not yet, and from 13232, when the walkers' draws come at other passes. Before PR 29
-the port crashed in Bianca's scene, at her walk to the player, which the script reaches 314 bytes back
-([../../docs/game-changes.md](../../docs/game-changes.md)), and the test failed there in both versions.
+the port crashed in Bianca's scene at `ActorCmdExec 2, Movement_0528` after the answer to the nickname, an animation of
+hers that the script reaches 314 bytes back ([../../docs/game-changes.md](../../docs/game-changes.md)), and the test
+failed there in both versions. The route answers NO to the nickname, so the test holds that actor command's offset
+alone; the nickname loop's jump back, which only YES takes, is `integrate_script_offsets`'s
+([../../tests/integrate/script_offsets.c](../../tests/integrate/script_offsets.c)).
 
 **Continuing it** (the continue sequence): the start menu shows CONTINUE first, then NEW GAME, MYSTERY GIFT, UNOVA
 LINK, NINTENDO WFC SETTINGS and MIC TEST, and the saved game: the player's picture, AAAAAAA, Aspertia City, Badges: 0,

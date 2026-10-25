@@ -27,7 +27,10 @@
 // The bytes the commands read stand for the aspertia_city script (res/field/scripts/aspertia_city.s, where each label
 // is named after its offset; Black 2's build/b2_us/res/field/scripts/aspertia_city.bin has them so) from offset 0x500
 // on, at the offsets the script has them, each offset argument where its command reads it:
-// - Movement_0528, Bianca's walk to the player in the starter scene: one step (action 100), then the end;
+// - Movement_0528, an animation of Bianca's in place: one action, 100, then the end. Action 100's commands
+//   (ACTOR_ACTION_COMMAND_TABLES[100], src/ov036/fldmmdl_movedata.c, run by src/ov036/fldmmdl_acmd.c) set her draw
+//   status to 10 and wait for its animation to end, without moving her. The scene plays it twice: after "You're
+//   ex-act-ly like what I heard!", from before it, and after the answer to the nickname;
 // - the VMCall L_06C6 at 0x640, which the YES to the nickname takes, 128 bytes forward;
 // - the ActorCmdExec 2, Movement_0528 at 0x65a, after L_0658's MsgWinCloseAll, which both answers reach, 314 bytes
 //   back;
@@ -38,12 +41,12 @@
 #define MOVEMENT 0x528
 #define NICKNAME_CALL 0x642
 #define NICKNAME_ROUTINE 0x6c6
-#define BIANCA_WALK 0x65c
+#define BIANCA_ANIMATION 0x65c
 #define NICKNAME_JUMP 0x754
 #define NICKNAME_LOOP 0x6d2
-// Bianca's actor in the scene, and her walk's action: a step towards the player
+// Bianca's actor in the scene, and her animation's action
 #define BIANCA 2
-#define WALK_ACTION 100
+#define ANIMATION_ACTION 100
 
 // An actor's flag that its slot is in use (src/ov012/fldmmdl.c, NextActor)
 #define ACTOR_FLAG_USED 0x1
@@ -57,7 +60,7 @@
 // GameData's layout is game_data.c's own (src/system/game_data.c), 936 bytes on a 64-bit host when this was written.
 // The actor command reads its actor's ID through ScriptReadAny, which reads the game data's event work pointer and uses
 // it only for an ID of 0x4000 or more (script_work.c, ScriptWork_GetWkAddr), so zeroed memory larger than the struct
-// stands in for it
+// stands in for it, in pointer-sized words so that it is aligned as that pointer needs
 #define GAME_DATA_STAND_IN_SIZE 0x1000
 
 static union {
@@ -66,7 +69,7 @@ static union {
 } sScript;
 static uptr sStack[8];
 static VM sVm;
-static u32 sGameDataStandIn[GAME_DATA_STAND_IN_SIZE / 4];
+static uptr sGameDataStandIn[GAME_DATA_STAND_IN_SIZE / sizeof(uptr)];
 
 // Where the script's offset at is in the buffer
 static u8 *At(u32 offset) {
@@ -171,18 +174,18 @@ static void TestActorMovement(void (*check)(int ok, const char *what)) {
     memset(&env, 0, sizeof(env));
     env.subwork = &subwork;
 
-    sScript.words[(MOVEMENT - SCRIPT_BASE) / 4] = ACMD(WALK_ACTION, 1);
+    sScript.words[(MOVEMENT - SCRIPT_BASE) / 4] = ACMD(ANIMATION_ACTION, 1);
     sScript.words[(MOVEMENT - SCRIPT_BASE) / 4 + 1] = ACMD_END;
-    Write16(BIANCA_WALK, BIANCA);
-    WriteOffset(BIANCA_WALK + 2, MOVEMENT);
-    vm = VmAt(BIANCA_WALK);
+    Write16(BIANCA_ANIMATION, BIANCA);
+    WriteOffset(BIANCA_ANIMATION + 2, MOVEMENT);
+    vm = VmAt(BIANCA_ANIMATION);
     s0064_ActorCmdExec(vm, &env);
-    check(vm->pc == At(BIANCA_WALK + 6), "s0064_ActorCmdExec goes on after its actor and offset");
+    check(vm->pc == At(BIANCA_ANIMATION + 6), "s0064_ActorCmdExec goes on after its actor and offset");
     check(subwork.acmdTasks[0] != NULL, "and gives the actor an action task");
     // The task's first pass commits the movement's first action to the actor (FieldAcmdTCB_CommitAcmd): the movement
     // the command found, 314 bytes back. Read 4 GiB forward, it would fault here
     GFL_TCBMgrUpdate(actors.tcbMgr);
-    check(actor.nextAcmd == WALK_ACTION, "whose first pass gives the actor Bianca's walk, 314 bytes back");
+    check(actor.nextAcmd == ANIMATION_ACTION, "whose first pass gives Bianca her animation's action, 314 bytes back");
     GFL_TCBMgrDelete(actors.tcbMgr);
     free(taskMemory);
 }

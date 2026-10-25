@@ -217,9 +217,11 @@ port_test_labels(replay_same_save route)
 # save to the field menu's SAVE (the adventure's first save, made on the port as replay_same_save and oracle.py
 # port-save make theirs), then starter_save_<version>.pbwinput from that save (port/tests/oracle): CONTINUE, the story
 # to the Aspertia City lookout, Bianca's starter scene and the field menu's SAVE, 35,800 frames in all. The scene's
-# script reaches back with relative offsets, its nickname loop's jump and Bianca's walk to the player 314 bytes back
-# after either answer, which a 64-bit host once read 4 GiB forward (port/docs/game-changes.md, the field script's
-# offsets). check_oracle_save.py holds the save the port writes to the oracle's starter save block by block
+# script reaches back with relative offsets, which a 64-bit host once read 4 GiB forward (port/docs/game-changes.md,
+# the field script's offsets). The route answers NO to the nickname, so it holds the actor command's offset alone:
+# ActorCmdExec 2, Movement_0528, an animation of Bianca's 314 bytes back. The nickname loop's jump back, which only
+# YES takes, and the other jumps and calls are integrate_script_offsets' (port/tests/integrate/script_offsets.c).
+# check_oracle_save.py holds the save the port writes to the oracle's starter save block by block
 # (port/tests/replay/starter_save_<version>.save.tsv, its hashes): Tepig, the story's flags and variables, the party,
 # the bag and the Pokedex are the oracle's, and the bytes that differ by construction are declared with their causes
 # in the script (ADR 0023). Without the player's ROM the program exits 66 and the test is skipped
@@ -231,7 +233,8 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/tests/replay/starter_save_${PORT_VERSION}
             --run "18800:${CMAKE_CURRENT_SOURCE_DIR}/tests/oracle/first_save_${PORT_VERSION}.pbwinput"
             --run "17000:${CMAKE_CURRENT_SOURCE_DIR}/tests/oracle/starter_save_${PORT_VERSION}.pbwinput" --
             $<TARGET_FILE:${PORT_PROGRAM}> --headless --watchdog 30)
-    # Two routes of some 18,000 frames each: a quarter of an hour on a loaded machine
+    # Two routes of some 18,000 frames each, about a minute on a Mac (49 to 84 s measured); the timeout, twice
+    # replay_new_game_house's for twice its frames, leaves room for a loaded machine
     set_tests_properties(replay_starter_save PROPERTIES SKIP_RETURN_CODE 66 TIMEOUT 4800)
     port_test_labels(replay_starter_save route)
 endif()

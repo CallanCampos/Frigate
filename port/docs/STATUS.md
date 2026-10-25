@@ -37,22 +37,25 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
 - **Upstream:** `629a53cccb` (upstream merge #504), as `main` has it since PR 27; neither PR 29 nor this branch merges
   an upstream commit.
 - **Port:** `PORT_SHA`, on the topic branch `port-script-offsets-tests` from `main` at `f6200135f9` (PR 29's merge), not
-  published yet: `dae7ef786d` (the tests), `bf8f9688fa` (the scene change table's offset and the ledger row) and this
-  commit (the audit, the lesson and this entry). PR 29 is the contributor's `3651ca9d10` (the change and its row of
+  published yet: `dae7ef786d` (the tests), `bf8f9688fa` (the scene change table's offset and the ledger row),
+  `6fd585e5b5` (the audit, the lesson and this entry) and this commit (the review's corrections). The first three were
+  reworded before publishing, with the trees they had but for this entry's SHAs: the review checked them as
+  `229cdda01a`, `26beeda2be` and `efc98fc8cd`. PR 29 is the contributor's `3651ca9d10` (the change and its row of
   [game-changes.md](game-changes.md)), with the branch's merges of `main` up to `d0607a36c2` and the owner's update
   `72fd5072f7` from `main` at `a5dc06ff82` (PR 34's merge), merged with a merge commit pinned to that head, after its CI
   and its local verification passed there (the `Frigate local verification` status: both SHA1s, Black 2 308 of 308 and
   White 2 305 of 305 host tests). It fills the last entry's `PORT_SHA`, `676a894d74`.
-- **ROM:** T0 passes on each commit's tree: `python3 configure.py && ninja` with no compiler warning, and both SHA1s
-  match (Black 2 `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb`, White 2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`);
-  `bf8f9688fa` compiles `src/ov012/script_sys.c` again in both versions.
+- **ROM:** T0 passes on each commit's tree, the first three before the review and this commit's after it: `python3
+  configure.py && ninja` with no compiler warning, and both SHA1s match (Black 2
+  `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb`, White 2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`); `bf8f9688fa` compiles
+  `src/ov012/script_sys.c` again in both versions.
 - **MWCC-neutrality:** the three files that PR 29 and `bf8f9688fa` change are complete in both versions, so ninja is the
   proof. Against `main` before PR 29, `a5dc06ff82`, MWCC's preprocessed tokens of the three files
   (`check_mwcc_neutral.py`'s preprocessor, the streams compared whole) differ in both versions only at the six `u32` now
   `s32` (four in `scrcmd_vm.c`, one in each of the others) and the one `(s32)` cast; no header changes.
 - **Code standards:** clang-format 23.1.1 `--dry-run --Werror` passes on `src/ov012/script_sys.c` and on
-  `port/tests/integrate/script_offsets.c` and `test_integrate.c`; `tools/decomp/check_style.py --diff f6200135f9
-  --strict` passes.
+  `port/tests/integrate/script_offsets.c` and `test_integrate.c`, at each commit; `tools/decomp/check_style.py --diff
+  f6200135f9 --strict` passes.
 - **Host build:** T1 passes on macOS arm64, AppleClang 21.0.0, RelWithDebInfo, both versions (`build/port`,
   `build/port-w2`, configured fresh with `sync_upstream.sh`'s options and built again at each commit), with no warning
   in the files the branch adds or changes. The oracle, for the reference saves, the seeds and the traces, is built alone
@@ -61,10 +64,12 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
   skipped of 307; none failed. Skipped in both: the 12 oracle tests (no oracle in these builds),
   `frame_times_party_menus` (the oracle's save), `asm_oracle` (no Unicorn in this Python) and `app_universal_slices` (a
   distribution build's). The new `integrate_script_offsets` and `replay_starter_save` pass in both versions, the latter
-  in about 70 s; on `main` before PR 29 (`a5dc06ff82`'s three game files built into this tree) both fail in both
-  versions. T4: the oracle made `first_save` and `starter_save` in both versions with the SHA-1s `SAVES` keeps, from the
-  input files with their new `seed` lines, and `oracle.py seeds starter_save` finds those seeds the DS's; no oracle
-  sequence ran. T5 (the sanitized build, which CI runs) and T7 not run.
+  in 49 to 84 s; on `main` before PR 29 (`a5dc06ff82`'s three game files built into this tree) both fail in both
+  versions. With `a5dc06ff82`'s `scrcmd_vm.c` alone built in (Black 2), `replay_starter_save` passes (48.9 s) and
+  `integrate_script_offsets` fails its four checks of the jumps back. T4: the oracle made `first_save` and
+  `starter_save` in both versions with the SHA-1s `SAVES` keeps, from the input files with their new `seed` lines, and
+  `oracle.py seeds starter_save` finds those seeds the DS's; no oracle sequence ran. T5 (the sanitized build, which CI
+  runs, its UBSan alignment check over the test's stand-in among it) and T7 not run.
 - **Tiers:** unchanged: the branch changes one token of game C.
 - **Trap stubs:** 30 function stubs and 21 data placeholders per version (`build/port*/gen/stubs.c`), as the last
   entry's.
@@ -86,10 +91,11 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
       the ROM: each command runs alone over the bytes the starter scene's commands read, at the offsets the script has
       them (`res/field/scripts/aspertia_city.s`): the nickname loop's `VMJump L_06D2`, 134 bytes back, the conditional
       jump and call written in its place, the `VMCall L_06C6`, 128 bytes forward, and `ActorCmdExec 2, Movement_0528`,
-      Bianca's walk, 314 bytes back, whose actor, actor system, task manager and GFL heap the scenario makes with the
-      game's layouts and whose action task's first pass must give the actor the walk's first action. On the parent the
-      four jumps back fail their checks, and the action task reads 4 GiB forward (Black 2: SIGBUS; White 2: the wrong
-      action).
+      314 bytes back, an animation of Bianca's in place (its one action, 100, sets her draw status to 10 and waits for
+      the animation's end), whose actor, actor system, task manager and GFL heap the scenario makes with the game's
+      layouts and whose action task's first pass must give the actor that action. On the parent the four jumps back fail
+      their checks, and the action task reads 4 GiB forward: Black 2 stopped with SIGBUS and White 2 got the wrong
+      action, as the memory lay there.
     - `replay_starter_save` ([../tests/replay/check_oracle_save.py](../tests/replay/check_oracle_save.py)): the port
       plays `first_save`'s input file from a blank save, then `starter_save`'s from the save it made, 35,800 frames
       through Bianca's scene, and its save is held to the oracle's starter save block by block, by the SHA-1s of
@@ -97,41 +103,53 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
       construction declared with their causes, as ADR 0023 has the port's own play compared. The input files give the
       DS's start-up seed (`oracle.py seeds starter_save`: Black 2 `0xea56a175a2fffc8a`, White 2 `0x81d63ca2c9f3143e`);
       the oracle reads the line only as part of the file, and still makes the saves SAVES keeps. On the parent the
-      second run crashes (Black 2 SIGSEGV, White 2 SIGBUS); without the seed the starter's personality and the
-      townspeople differ, and the check fails on them.
+      second run crashes, with SIGSEGV or SIGBUS by where the read 4 GiB on lands (here Black 2 SIGSEGV and White 2
+      SIGBUS; the review's White 2 run got SIGSEGV); without the seed the starter's personality and the townspeople
+      differ, and the check fails on them. The route answers NO to the nickname (line 783 of Black 2's input file, 784
+      of White 2's), so the replay holds `s0064_ActorCmdExec`'s half alone: the nickname loop's jump back, which only
+      YES takes, and the other jumps and calls are `integrate_script_offsets`'s. Neither test holds
+      `FieldScript_CreateVM`'s cast or the scene change table's offset: the scripts' header tables and the zones'
+      scene-change tables point only forward.
   - **What the port's save differs in, traced**, the same in both versions: the four blocks New Game set up on the
     port's own first save (the mystery gift, the trainer card's records and the symbol encounters, encrypted with keys
     seeded with the VBlank count, and DWC's random player ID), as [the oracle's guide](../tools/oracle/README.md#saves)
-    has them; the play time and the clock's times of the save and of its last check, which run with the video frames; 12
-    bytes of Tepig's mail, which `PokeParty_CreatePkm` takes from the system heap uncleared (`CreateMailData`;
-    `ResetMailData` sets neither its `unk18` nor the messages' `id`s), so they hold what each heap left there; and the
-    state of the four townspeople who walk at random. GFL's linear generator, dumped at every frame on both programs
-    (`--dump`, the port's through a static made global in a scratch build only), is the DS's at the end of every pass
-    but counts 12134 to 12181 and from 13232; a log of the draws' callers names the first stretch Tepig's creation,
-    which the port makes 48 passes sooner, and the second the walkers' draws. The cause, from the sound system's fade
-    dumped on both: after Bianca's first talk the field loads the city's music again in GFL's sound thread
-    (`GFL_SndBGMLoadStep`, `src/system/snd_sys.c`), whose card reads take the DS 56 passes (counts 11257 to 11313 in
-    Black 2) and the port 6, and the field waits for its fade-in before the starter's selection
-    (`EventFieldClose_Callback`, `src/system/field_event.c`), so the rest of the scene runs about 50 passes later on the
-    DS; B, mashed, absorbs it, and the walkers the scene paused walk again from another count.
+    has them; the play time, which counts the CPU's time (`OS_GetTick`, `src/system/playtime_ctrl.c`), and the clock's
+    times of the save and of its last check, which run with the video frames; 12 bytes of Tepig's mail, which
+    `PokeParty_CreatePkm` takes from the system heap uncleared (`CreateMailData`; `ResetMailData` sets neither its
+    `unk18` nor the messages' `id`s), so they hold what each heap left there; and the state of the four townspeople who
+    walk at random. GFL's linear generator, dumped at every frame on both programs (`--dump`, the port's through a
+    static made global in a scratch build only), is the DS's at the end of every pass but counts 12134 to 12181 and from
+    13232; a log of the draws' callers names the first stretch Tepig's creation, which the port makes 48 passes sooner,
+    and the second the walkers' draws. The cause, from the sound system's fade dumped on both: after Bianca's first talk
+    the field loads the city's music again in GFL's sound thread (`GFL_SndBGMLoadStep`, `src/system/snd_sys.c`), whose
+    card reads take the DS 56 passes (counts 11257 to 11313 in Black 2) and the port 6, and the field waits for its
+    fade-in before the starter's selection (`EventFieldClose_Callback`, `src/system/field_event.c`), so the rest of the
+    scene runs about 50 passes later on the DS; B, mashed, absorbs it, and the walkers the scene paused walk again from
+    another count.
   - **The ledger row** (`bf8f9688fa`), as the review asked: `FieldScript_CreateVM`, not `FieldScript_Create`; five `u32`
     made `s32` and one `(s32)` cast, now six with the scene change table's; one base commit for the proof, `main` before
-    PR 29; Linux as well as Windows; and that `s0064_ActorCmdExec`'s half is what Bianca's walk needs after either
-    answer to the nickname.
+    PR 29; Linux as well as Windows; and that `s0064_ActorCmdExec`'s half is what `Movement_0528`, an animation of
+    Bianca's, needs after either answer to the nickname.
   - **`FieldScript_GetSceneChangeSCRID`'s offset signed too** (`bf8f9688fa`): the offset from a zone's scene-change
     entry to its table of conditions, the last `u32` offset of the field script's system. All 67 point forward in each
     version (2 to 20 bytes, read from the ROM's zone files, `a/1/2/6`, and laid out so by `tools/data/event_data.py`),
     so the host's results are the same, and a table a mod puts before its entry works as on the DS. Neutral, in the same
     row.
-  - **The audit the review did, kept** (this commit): [../tools/pointer_offsets.query](../tools/pointer_offsets.query),
-    clang-query matchers for every pointer or `uptr` plus or minus a `u32` in the script interpreters (the 77 files that
-    include `system/vm.h`) and NitroSystem's resource readers (the 78 files of `lib/nnsys/src` and `hal/nnsys`), with
-    its row in the tools guide; SYNC.md's list of what the pointer cast guard doesn't see names the case, and lessons.md
-    has the lesson. Run with `-p build/port` and `-p build/port-w2` (Homebrew LLVM 23.1.3) over those 77 and 78 files,
-    it finds the same 130 sites in both versions (320 matches, a header's once for each file that includes it), none an
-    offset that counts from the reader's place; the interpreters' own relative offsets, every jump and call of the field
-    script, the trainers' AI and the battle's effect scripts, are `s32` or `int`, which it doesn't list:
-    - **A pointer plus or minus a `u32`:** 100 sites. In the interpreters 10, each an offset from the start of its file
+  - **The audit the review did, kept** (`6fd585e5b5`, widened by this commit):
+    [../tools/pointer_offsets.query](../tools/pointer_offsets.query), clang-query matchers for every pointer or `uptr`
+    plus or minus a `u32`, and since this commit every pointer subscripted by one, in the files its command names: the
+    script interpreters (the 77 files that include `system/vm.h`), NitroSystem's resource readers (the 78 files of
+    `lib/nnsys/src` and `hal/nnsys`) and, since this commit, 30 other readers of offsets from data, of the kinds the
+    review named: SPL (`lib/spl/src`, 8), the 18 files of NitroSDK's `snd`, `gx` and `fs` that the host compiles, GFL's
+    `arc_tool.c`, `arc_util.c` and `msgdata.c`, and the zone's event data, `src/ov012/eventdata_system.c`. Its row is in
+    the tools guide; SYNC.md's list of what the pointer cast guard doesn't see names the case, and lessons.md has the
+    lesson. Run with `-p build/port` and `-p build/port-w2` (Homebrew LLVM 23.1.3) over those 185 files, it finds the
+    same 342 sites in both versions (540 matches, a header's once for each file that includes it), none an offset that
+    counts from the reader's place; the interpreters' own relative offsets, every jump and call of the field script, the
+    trainers' AI and the battle's effect scripts, are `s32` or `int`, which it doesn't list. Before this commit, over
+    the first 155 files and without subscripts, it found 130 (320 matches); the review's own run over 97 such readers
+    found 160 more sites of the first three kinds, each an offset from a start, an index or a size. The 342 sites:
+    - **A pointer plus or minus a `u32`:** 144 sites. In the interpreters 10, each an offset from the start of its file
       or block: the battle's effect scripts (`btlv_effvm.c`, 8: the file's header and its table of offsets, and the
       table's index times 4), a texture's palette in the battle's fades (`btlv_effect.c`, 1, NNS's offset from the
       texture block) and the musical's scripts (`sta_act_script.c`, 1, a script's offset from its file's start). In
@@ -139,18 +157,52 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
       data in `kernel.c`, 4; a joint animation's rotation tables in `nsbca.c`, 16; a material's and a texture's
       animation data in `nsbma.c` and `nsbta.c`, 2 each; a model's command list and envelope matrices in `sbc.c`, 2; a
       sound archive's file and a stream's data, 1 each; a cell transfer's source, 1; the port's G2D animation frames in
-      `hal/nnsys/g2d_load.c`, 1), and 60 indexes, counts and sizes.
+      `hal/nnsys/g2d_load.c`, 1), and 60 indexes, counts and sizes. In the other readers 44, each an offset from a
+      start: the 2D loaders' characters and screens from the start of their VRAM (`gx_load2d.c`, 18), a particle
+      resource's parts from its start (`spl_manager.c`, 13), the message data's block, entries and strings from the
+      file's and the block's start (`msgdata.c`, 6), the zone's init script, entities, NPCs, warps and triggers from the
+      start of its event data (`eventdata_system.c`, 5), a palette's colors from its data's start (`arc_util.c`, 1) and
+      a sound channel from the driver's work (`snd_work.c`, 1).
     - **A pointer moved by a `u32`:** 8 sites, each a size or an index: G3D's commands' sizes (`sbc.c`, 6), a G2D
       block's (`hal/nnsys/g2d_load.c`, 1) and the field script's start, its index times 4 (`script_sys.c`, 1). Before
       `bf8f9688fa` there were 9: the ninth was `FieldScript_GetSceneChangeSCRID`'s `script += offset`, the one offset
       that counts from the reader's place.
-    - **An address held in an integer plus or minus a `u32`:** 22 sites, none an offset back: NitroSystem's heaps' block
+    - **An address held in an integer plus or minus a `u32`:** 57 sites, none an offset back: NitroSystem's heaps' block
       sizes and alignments (`expheap.c` 10, `frameheap.c` 3, `hal/nnsys/fnd_hooks.c` 1), offsets from OAM's start
       (`g2d_OAM.c`, 2), a stream's sizes and buffer offsets (`snd_arc_stream.c` and `snd_stream.c`, 1 each), the port's
-      G2D relocation from a file's start (`hal/nnsys/g2d_load.c`'s `Rel`, 1) and a size there (1), and Join Avenue's
-      numbers summed from a `uptr` getter (`scrcmd_resort.c`, 2).
+      G2D relocation from a file's start (`hal/nnsys/g2d_load.c`'s `Rel`, 1) and a size there (1), Join Avenue's numbers
+      summed from a `uptr` getter (`scrcmd_resort.c`, 2), BG screens' and characters' addresses from the start of BG
+      VRAM (`gx_bgcnt.c`, 20), palettes', OAM's and LCDC VRAM's from theirs (`gx_load2d.c`, 8), file positions from a
+      file's or its FAT's start (`msgdata.c` 3, `arc_tool.c` 1) and the sizes of the zone's event data
+      (`eventdata_system.c`, 3).
+    - **A pointer subscripted by a `u32`:** 133 sites, each an index: frames and indexes in G3D's animation data
+      (`nsbca.c` 42, `nsbma.c` 13, `nsbta.c` 11, `res_struct_accessor_anm.c` 3); IDs, handles and loop counters
+      elsewhere in NitroSystem (`g2d_CellTransferManager.c` 7, `sbc.c` 4, `gfdi_LinkedListVramMan_Common.c` 4,
+      `kernel.c` 2, `g2d_NAN_load.c` 2, `g2d_MultiCellAnimation.c` 1, `hal/nnsys/g2d_load.c` 3); the field script's
+      commands' tables (`scrcmd_misc.c` 8, `script_sys.c` 7, `scrcmd_shop.c` 4, `scrcmd_encount.c` 1,
+      `scrcmd_pokemon_center.c` 1); an extra command's number less the first's, checked before (`vm.c`, 1); the battle's
+      background type (`btlv_effect.c`, 5) and a handler's flag (`battle/btl_handler.h`, 1); the musical's script number
+      (`sta_act_script.c`, 1); GFL's archive IDs, entries and characters (`arc_tool.c` 4, `msgdata.c` 3, `arc_util.c`
+      2); and the zone's NPC and entity numbers (`eventdata_system.c`, 3).
+  - **The review's corrections** (this commit), each checked against the code or a run:
+    - `Movement_0528` is no walk: its one action, 100, is `ACTOR_ACTION_COMMAND_TABLES[100]`
+      (`src/ov036/fldmmdl_movedata.c`), whose commands set Bianca's draw status to 10 and wait for its animation's end
+      (`src/ov036/fldmmdl_acmd.c`); walks go through `FieldAcmdTCB_WalkInit`. The test's names and messages, the ledger
+      row, this entry, SYNC.md, the oracle's guide, `app.cmake` and the first three commits' messages say so now.
+    - Which half each test holds: the run above, with `a5dc06ff82`'s `scrcmd_vm.c` alone, shows that the replay holds
+      `s0064_ActorCmdExec`'s alone. The ledger row, `app.cmake`, the oracle's guide, lessons.md and this entry say which
+      test holds which, and that none holds `FieldScript_CreateVM`'s cast or the scene change table's offset.
+    - The ledger row's commit is `PORT_SHA` alone: `d0607a36c2` is a merge of `main` into the contributor's branch,
+      whose diff doesn't hold the row, which came from `3651ca9d10`; the row changes again on this branch, so its commit
+      is this branch's, as for any row changed again.
+    - The audit's header claims only the files its command names, the command takes in the other readers above, and a
+      fourth matcher lists the pointers subscripted by a `u32`, which have the same 4 GiB reach.
+    - The test's stand-in for `GameData` is an array of `uptr`, so that it is aligned for the event work pointer
+      `ScriptWork_GetWkAddr` reads in it; as a `u32` array it was 8-aligned only by where the linker put it.
+    - `app.cmake`'s comment gives the replay's measured time, and this entry the play time's clock and the crash signals
+      as they are.
   - Guides: the tests guide's integrate and replay rows, the cmake guide's, ARCHITECTURE.md's field, saves and guard
-    rows, and the oracle's guide on the port's play of the starter route.
+    rows, the tools guide's row of the query, and the oracle's guide on the port's play of the starter route.
 - **Next:** this branch published as a pull request to `main`, the owner's review and `--verify-pr` on its head; then
   the sync of upstream `65cf903b70`, as the last entry says.
 - **Blockers:** none.

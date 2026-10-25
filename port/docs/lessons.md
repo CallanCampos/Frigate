@@ -10,13 +10,17 @@ workflow goes in the decomp checkout instead; this file is the port's ([CLAUDE.m
   goes 134 bytes back, on a host 4 GiB forward. There is no cast for `check_ptrcasts.py` to warn about, so every sync
   passed, and a contributor found the crash by playing. An offset that counts from the reader's own place can be
   negative and is read as an `s32`; one from the start of a file or a block, an index or a size can't be.
-  [../tools/pointer_offsets.query](../tools/pointer_offsets.query) lists every `u32` added to an address in the script
-  interpreters and NitroSystem's resource readers; read each new site it shows.
+  [../tools/pointer_offsets.query](../tools/pointer_offsets.query) lists every `u32` added to an address, and every
+  pointer subscripted by one, in the script interpreters and the other readers of offsets from data that its header
+  names; read each new site it shows, and add a reader it doesn't name yet when one is suspected.
 - **A route that only the oracle plays hides the port's crashes in it.** melonDS made the starter save and the port
   only continued from it, so no test ran Bianca's scene on the port until a contributor played it. Play each route the
   oracle saves on the port too, from the port's own save before it, and hold its save to the oracle's block by block
-  (`replay_starter_save`): a crash fails it, and so does any of the story's state that differs. Give the file the
-  DS's seeds first (`oracle.py seeds NAME`): without them the starter's personality and the townspeople's walks differ.
+  (`replay_starter_save`): a crash fails it, and so does any of the story's state that differs. It holds only the
+  branches the route takes: the starter route answers NO to the nickname, so the jump back that YES takes, where the
+  contributor's crash came from, is held by `integrate_script_offsets`, which runs the scene's commands on its bytes
+  without the ROM. Give the file the DS's seeds first (`oracle.py seeds NAME`): without them the starter's personality
+  and the townspeople's walks differ.
 - **Trace a save's difference to the pass where the programs part.** The port's starter save was the oracle's but for
   bytes of six kinds. Four were known (New Game's VBlank-keyed blocks, DWC's random ID, the play time and the clock's
   times); the starter's mail held what each heap left there; and the townspeople stood elsewhere. Dumping GFL's random
