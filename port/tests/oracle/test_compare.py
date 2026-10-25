@@ -1202,7 +1202,9 @@ class OracleScriptTests(unittest.TestCase):
         self.assertEqual(oracle.compare_boots(a, a), (3, None))
         self.assertEqual(oracle.compare_boots(a, b)[0], 2)
         self.assertIn("frame 3", oracle.compare_boots(a, b)[1])
-
+        # Up to a count, the frames after it are left out of both (a round trip's continued_last)
+        self.assertEqual(oracle.compare_boots(a, b, last_count=2), (2, None))
+        self.assertEqual(oracle.compare_boots(a, b, last_count=3)[0], 2)
     def test_port_save_skips_without_the_rom_or_the_oracle(self):
         with tempfile.TemporaryDirectory() as d:
             status = quiet(oracle.main, ["port-save", "--port", "x", "--oracle", os.path.join(d, "missing")])
@@ -1420,6 +1422,28 @@ class OracleScriptTests(unittest.TestCase):
             self.assertIn(trip.continued, oracle.SEQUENCES, name)
             self.assertEqual(oracle.SEQUENCES[trip.continued].save, trip.maker, name)
             self.assertTrue(0 < trip.port_frames <= oracle.SAVES[trip.maker].frames, name)
+            # A cut is a sequence from the save the maker starts from, and the input file the port plays, the maker's
+            # or its own, starts with the cut's lines, so that the cut's comparison holds the port's run up to it
+            if trip.cut:
+                self.assertIn(trip.cut, oracle.SEQUENCES, name)
+                self.assertEqual(oracle.SEQUENCES[trip.cut].save, oracle.SAVES[trip.maker].start, name)
+            self.assertTrue(set(trip.port_input) <= {"b2_us", "w2_us"}, name)
+            # The continued run's random state left out where the port's save differs is within the frames whose state
+            # the continued sequence compares, each with why
+            continued_state = set(compare.parse_frames(oracle.SEQUENCES[trip.continued].state_frames))
+            for version, table in trip.continued_random.items():
+                self.assertIn(version, ("b2_us", "w2_us"))
+                self.assertTrue(set(oracle.by_frame(table)) <= continued_state, (name, version))
+                self.assertTrue(all(table.values()), (name, version))
+            self.assertTrue(trip.continued_last >= 0, name)
+            for version in oracle.SAVES[trip.maker].sha1:
+                for played in {trip.maker, trip.port_input.get(version, trip.maker)}:
+                    path = os.path.join(oracle.REPO_ROOT, oracle.SEQUENCE_INPUT.format(name=played, version=version))
+                    self.assertTrue(os.path.exists(path), (name, played, version))
+                    if trip.cut:
+                        cut = os.path.join(oracle.REPO_ROOT, oracle.SEQUENCE_INPUT.format(name=trip.cut,
+                                                                                          version=version))
+                        self.assertTrue(oracle.input_starts_with(path, cut), (name, played, version))
             # The bytes it declares are the chip's, each with why
             for version, table in trip.known.items():
                 self.assertIn(version, ("b2_us", "w2_us"))
@@ -1453,6 +1477,27 @@ class OracleScriptTests(unittest.TestCase):
         self.assertEqual(oracle.undeclared_differences(a, bytes(b), {"0x3-0x4,0x1e": "declared"}), [(12, 12), (63, 63)])
         self.assertEqual(oracle.undeclared_differences(a, bytes(b), {"0x0-0x3f": "all of it"}), [])
         self.assertEqual(oracle.undeclared_differences(a, bytes(b), {}), oracle.save_differences(a, bytes(b)))
+
+    def test_input_starts_with(self):
+        # An input file starts with another's lines as a program reads them: comments, blank lines and spacing aside
+        with tempfile.TemporaryDirectory() as d:
+            files = {"cut": "pbwinput 1\n# the cut\nversion b2_us\nseed 0x1  # GFL's\n100 A\n104 -\n",
+                     "longer": "pbwinput 1\nversion  b2_us\n\nseed 0x1\n100 A  # pressed\n104 -\n200 B\n204 -\n",
+                     "other": "pbwinput 1\nversion b2_us\nseed 0x2\n100 A\n104 -\n200 B\n",
+                     "before": "pbwinput 1\nversion b2_us\nseed 0x1\n50 B\n100 A\n104 -\n"}
+            paths = {}
+            for name, text in files.items():
+                paths[name] = os.path.join(d, f"{name}.pbwinput")
+                with open(paths[name], "w") as f:
+                    f.write(text)
+            self.assertEqual(oracle.input_lines(paths["longer"]),
+                             ["pbwinput 1", "version b2_us", "seed 0x1", "100 A", "104 -", "200 B", "204 -"])
+            self.assertTrue(oracle.input_starts_with(paths["longer"], paths["cut"]))
+            self.assertTrue(oracle.input_starts_with(paths["cut"], paths["cut"]))
+            # Another seed, a press of its own before the cut's end, or a file shorter than the cut: not its start
+            self.assertFalse(oracle.input_starts_with(paths["other"], paths["cut"]))
+            self.assertFalse(oracle.input_starts_with(paths["before"], paths["cut"]))
+            self.assertFalse(oracle.input_starts_with(paths["cut"], paths["longer"]))
 
     def test_state_dumps(self):
         # Each program's dump of a part of the game's state, by the same label; none for a sequence that compares none

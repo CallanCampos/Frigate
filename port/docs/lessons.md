@@ -3,7 +3,7 @@
 What port work taught that isn't obvious from the code, newest first. A lesson about MWCC or the decomp's own
 workflow goes in the decomp checkout instead; this file is the port's ([CLAUDE.md](../CLAUDE.md), the iteration loop).
 
-## 2026-10-25: phase 4's PC
+## 2026-10-25: phase 4's PC, and Hugh's battle to its end
 
 - **An unsigned offset added to a pointer wraps on the DS and moves 4 GiB on a host.** The field script VM read its
   jumps' offsets as `u32` (`src/ov012/scrcmd_vm.c`): a jump back, a negative offset, came out right on the DS, whose
@@ -15,6 +15,11 @@ workflow goes in the decomp checkout instead; this file is the port's ([CLAUDE.m
   in the gate on the way to the PC (a word-at-a-time `STD_GetStringLength` reading past the board's date string)
   before the crash; a scratch print in `VM_Run`, never committed, of the position against the script's base showed
   the base plus 4 GiB at the first command after a jump back.
+- **A trainer battle's save made past the cut differs where the battle's length shows.** The port's own battle reaches
+  the Pokémon Center at another count than the DS's, so a townsperson who turns at random has another wait and
+  direction when the game saves, and the mystery gift block, which the Pokémon Center's deliveryman reads and so
+  encrypts again with a key from the VBlank count, comes out as other bytes; Tepig's data, the money, the bag and the
+  flags are melonDS's. White 2's battle takes more turns, and its presses after the cut are the port's own.
 
 ## 2026-10-24: phase 4's route
 

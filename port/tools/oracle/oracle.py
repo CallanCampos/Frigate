@@ -37,11 +37,13 @@ FILE, or with --save-cache every save into DIR as NAME_VERSION.sav, where a late
 is still the one kept.
 port-save takes a save the other way: the port's New Game writes one, and the oracle boots it to the start menu frame
 for frame as it boots its own save of the same moment, without writing either, and the console's Wi-Fi ID that New Game
-copied into it is the oracle's. round-trip does it for a save of phase 4's route (ROUND_TRIPS: catch): the port plays
-the input file the oracle made the kept save with, from the same start, and saves; the oracle continues that save as it
-continues its own, frame for frame, and the port continues it in a new run, compared with the oracle's continuing its
-own as sequence compares. boot does both for the boot sequence and compares them on the game's count, the movies by
-their pictures (compare.py), at the DS's 6 bits and at the palettes' 5.
+copied into it is the oracle's. round-trip does it for a save of phase 4's route (ROUND_TRIPS: catch, a wild Purrloin
+caught; hugh, Hugh's trainer battle to its end): the port plays the input file the oracle made the kept save with, from
+the same start, or its own where its course past a cut takes other passes (ADR 0023), and saves, its run up to the cut
+held to the oracle's as the cut's sequence holds it; the two saves differ only in the bytes the trip declares; the
+oracle continues the port's save as it continues its own, frame for frame, and the port continues it in a new run,
+compared with the oracle's continuing its own as sequence compares. boot does both for the boot sequence and compares
+them on the game's count, the movies by their pictures (compare.py), at the DS's 6 bits and at the palettes' 5.
 sequence does both on a comparison sequence's input file, port/tests/oracle/<name>_<version>.pbwinput (SEQUENCES:
 opening, power-on to the title with nothing pressed; title, the opening skipped to the title and START to the start
 menu; continue, the same from first_save's save, the start menu's CONTINUE and the field it goes to; continue_starter,
@@ -52,22 +54,23 @@ clock pinned for both; aspertia, phase 3's exit route: New Game from a blank sav
 the player's house, out into Aspertia City, a talk with a townsperson, into a house and out, the clock pinned; and phase
 4's route, each piece from the oracle's save of the one before: hugh, Hugh's trainer battle from the starter save to his
 second move; route19, from the Pokémon Center to Bianca's capture demo and SAVE on Route 19; catch, a wild Purrloin
-caught and SAVE; catch_continue, that save continued), from the save the sequence names, if any, made first on the
-oracle (or taken from --save-cache), and compares every frame the same way but the known differences, up to the frame
-where the port stops when the sequence allows it to stop on code with no C yet, after checking that the random seeds the
-input file gives the port are the ones the DS built in the oracle's run (seeds.py; a file without seeds leaves the port
-its own); with --update it writes port/tests/oracle/<name>_<version>.tsv, the oracle's hashes at sampled frames, of its
-screens and, where the sequence compares it, of the game's state (STATE). seeds plays a sequence's or a save's input
-file on the oracle, from the save it starts from, and prints the random seeds the DS built as the file's seed lines
-(README.md, "Random seeds"). sequence-check runs the port alone on that input file and checks its counts, its screens
-without 3D and its state against that reference. sound runs both programs on a sequence with their sound traces and WAV
-dumps (--sound-trace, --audio-dump) and compares the sound driver's state run by run, what the ARM9 sees of it frame by
-frame, and the sound by segment (sound.py, SOUND); with --update it writes
-port/tests/oracle/sound_<name>_<version>.tsv, the oracle's hashes and statistics. sound-check runs the port alone and
-checks it against that reference. check is the oracle's ctest test: the oracle runs the boot sequence twice with the
-same results (its screens, sound trace and WAV dump), and its screens match the hashes in
-port/tests/oracle/boot_<version>.tsv. save, port-save, round-trip, sequence, seeds, sound and check exit 77 without
-the oracle or the ROM, sequence-check and sound-check without the ROM.
+caught and SAVE; catch_continue, that save continued; center_continue, the save after Hugh's battle continued to the
+field),
+from the save the sequence names, if any, made first on the oracle (or taken from --save-cache), and compares every
+frame the same way but the known differences, up to the frame where the port stops when the sequence allows it to stop
+on code with no C yet, after checking that the random seeds the input file gives the port are the ones the DS built in
+the oracle's run (seeds.py; a file without seeds leaves the port its own); with --update it writes
+port/tests/oracle/<name>_<version>.tsv, the oracle's hashes at sampled frames, of its screens and, where the sequence
+compares it, of the game's state (STATE). seeds plays a sequence's or a save's input file on the oracle, from the save
+it starts from, and prints the random seeds the DS built as the file's seed lines (README.md, "Random seeds").
+sequence-check runs the port alone on that input file and checks its counts, its screens without 3D and its state
+against that reference. sound runs both programs on a sequence with their sound traces and WAV dumps (--sound-trace,
+--audio-dump) and compares the sound driver's state run by run, what the ARM9 sees of it frame by frame, and the sound
+by segment (sound.py, SOUND); with --update it writes port/tests/oracle/sound_<name>_<version>.tsv, the oracle's hashes
+and statistics. sound-check runs the port alone and checks it against that reference. check is the oracle's ctest test:
+the oracle runs the boot sequence twice with the same results (its screens, sound trace and WAV dump), and its screens
+match the hashes in port/tests/oracle/boot_<version>.tsv. save, port-save, round-trip, sequence, seeds, sound and check
+exit 77 without the oracle or the ROM, sequence-check and sound-check without the ROM.
 Standard library only.
 """
 
@@ -81,7 +84,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
@@ -584,6 +587,29 @@ SEQUENCES = {
         state=STATE + RANDOM_STATE,
         save="catch_save",
     ),
+    # center_continue: the Pokemon Center save, made after Hugh's battle, continued in a new run to the last frame
+    # before the field fades in (oracle.py round-trip hugh also plays it from the port's own save): the start menu
+    # with the saved game, CONTINUE, the black and the season's banner. The field would show the townsperson whose
+    # turn the two saves hold differently (README.md, "Saves")
+    "center_continue": Sequence(
+        port_frames=3610,
+        oracle_frames=5700,
+        sample="",
+        clock="313-1108",
+        lags={"b2_us": "1109=0", "w2_us": "1109=0,3241=-1,3403=0"},
+        known={
+            "b2_us": {"2878": TORN_HIDE, "3001": TORN_BACK, "3101": TORN_START, "3112-3129": CAMERA},
+            "w2_us": {"2878": TORN_HIDE, "3001": TORN_BACK, "3101": TORN_START, "3112-3128": CAMERA,
+                      "3219-3240/3": CRY, "3402": CURSOR},
+        },
+        known_oracle={"b2_us": {"4920": TORN_START}, "w2_us": {"1260": TORN_OPENING, "4852": TORN_START}},
+        state_frames="1116-3610",
+        state_oracle="2800-5700",
+        known_state={"b2_us": {"3110-3124": CAMERA, "3432,3447,3454,3461,3600,3607": MID_PASS},
+                     "w2_us": {"3110-3124": CAMERA, "3432,3447,3454,3461,3600,3607": MID_PASS}},
+        state=STATE + RANDOM_STATE,
+        save="center_save",
+    ),
 }
 REFERENCE_COLUMNS = ["port", "oracle", "counter", "lag", "top", "bottom", "state"]
 # The exit status of a port run that reached a function or data with no C yet (port/hal/trap.c)
@@ -987,17 +1013,26 @@ def is_blank(path: str) -> bool:
         return f.read() == b"\xff" * BACKUP_SIZE
 
 
-def compare_boots(port_run: compare.Run, oracle_run: compare.Run) -> tuple[int, str | None]:
-    """How many frames two oracle runs share, and the first where their counts or screens differ (None if none)"""
+def compare_boots(port_run: compare.Run, oracle_run: compare.Run, last_count: int = 0) -> tuple[int, str | None]:
+    """How many frames two oracle runs share, and the first where their counts or screens differ (None if none); with
+    last_count, only the frames up to the last of that count, the frames after it left out of both (before the game
+    sets the count up at start-up, its word holds whatever the memory did, so the frames end only once it has been
+    reached)"""
     if sorted(port_run.frames) != sorted(oracle_run.frames):
         return 0, f"the runs have {len(port_run.frames)} and {len(oracle_run.frames)} frames"
+    same = 0
+    reached = False
     for frame in sorted(port_run.frames):
         a = port_run.frames[frame]
         b = oracle_run.frames[frame]
+        reached = reached or (bool(last_count) and a.counter == last_count)
+        if reached and a.counter is not None and a.counter > last_count:
+            break
         if (a.counter, a.top, a.bottom) != (b.counter, b.top, b.bottom):
-            return frame - 1, (f"frame {frame}: count {a.counter} against {b.counter}, top {a.top[:8]} against "
-                               f"{b.top[:8]}, bottom {a.bottom[:8]} against {b.bottom[:8]}")
-    return len(port_run.frames), None
+            return same, (f"frame {frame}: count {a.counter} against {b.counter}, top {a.top[:8]} against "
+                          f"{b.top[:8]}, bottom {a.bottom[:8]} against {b.bottom[:8]}")
+        same += 1
+    return same, None
 
 
 def command_port_save(args) -> int:
@@ -1096,11 +1131,45 @@ class RoundTrip:
     as the sequence holds the port on the oracle's save, its game state too. known: by version, the bytes where the two
     saves differ by construction (save offsets, "0x19427" or "0x18fa2-0x18fa3", comma-separated), each with why
     (README.md, "Saves"), a cause traced; a byte that differs anywhere else fails the trip, as an undeclared frame fails
-    a sequence"""
+    a sequence. A piece whose course the DS's CPU time decides (ADR 0023) names its cut, the sequence that holds the
+    piece frame by frame up to that point, from the same start save: the port's run of the piece is compared with the
+    oracle's run of the cut's input file as that sequence compares it, up to its last port frame, the cut's input file
+    being the start of the port's, line for line; past it the port plays its own course. Where that course takes other
+    passes than the DS's, so that the oracle's presses would miss what follows (another number of turns in a trainer
+    battle), port_input names, by version, the input file the port plays instead
+    (port/tests/oracle/<name>_<version>.pbwinput), the maker's with presses of its own after the cut. continued_random:
+    by version, the port frames of the continued sequence where GFL's random state of the port's run on its own save
+    differs from the oracle's on the oracle's save by a byte the trip declares, with why (a townsperson's timer the
+    two saves hold differently draws at other counts); the oracle continuing the port's save draws as the port does.
+    continued_last: the last count at which the oracle's runs on the two saves are compared frame for frame, where
+    what follows shows a declared byte (0 for all their frames)"""
     maker: str
     port_frames: int
     continued: str
     known: dict[str, dict[str, str]] = field(default_factory=dict)
+    cut: str = ""
+    port_input: dict[str, str] = field(default_factory=dict)
+    continued_random: dict[str, dict[str, str]] = field(default_factory=dict)
+    continued_last: int = 0
+
+
+def input_lines(path: str) -> list[str]:
+    """An input file's lines without comments and blank lines, each with its words joined by one space: what a program
+    reads of it"""
+    lines = []
+    with open(path) as f:
+        for line in f:
+            words = line.split("#", 1)[0].split()
+            if words:
+                lines.append(" ".join(words))
+    return lines
+
+
+def input_starts_with(path: str, start: str) -> bool:
+    """Whether the input file at path holds the one at start line for line before any line of its own: its header, its
+    seeds and its presses, so that a program playing it plays start's presses to start's end"""
+    head = input_lines(start)
+    return input_lines(path)[:len(head)] == head
 
 
 # The main save's second copy, at this offset of the chip, holds the same bytes as its first (README.md, "Saves")
@@ -1137,10 +1206,55 @@ CATCH_SAVE_BYTES = {
     both_copies("0x19427"): PLAY_SECONDS,
     both_copies("0x19336-0x19337,0x194b2-0x194b3,0x25f34-0x25f37,0x25fa2-0x25fa3"): SAVE_CRCS,
 }
+# The Pokemon Center saves' bytes that differ by construction after Hugh's battle, the same places in both versions
+# (README.md, "Saves")
+CENTER_PLAY_SECONDS = ("the play time's seconds, which each program counts with its own clock's ticks (PLAY_TIME): "
+                       "Black 2's saves hold 0:08:01 on the port and 0:08:09 on the DS, White 2's 0:08:10 and 0:08:06, "
+                       "the port's battle ending 560 counts later than the DS's in Black 2 and 704 in White 2")
+MYSTERY_KEY = ("the mystery gift block and its footer: the Pokemon Center's deliveryman's scripts "
+               "(res/field/scripts/global_10395.s, Cmd_01DB, PdwPostman's func_ov033_02177d78 in "
+               "src/ov033/pdw_postman.c) read the block as the player enters, and every read decrypts it and encrypts "
+               "it again with a key that mgEncryptData (src/system/mystery_data.c) seeds with the VBlank count, "
+               "(OS_GetVBlankCount() << 8) | OS_GetVBlankCount(): the DS's count runs ahead of the game's passes "
+               "(its dropped frames and long loads) and the port's doesn't, so the same contents come out as other "
+               "bytes; the catch saves, made without entering a Pokemon Center, hold the block as the start save has "
+               "it")
+TURN_TIMER = ("the Pokemon Center's townsperson at (3,15) who turns at random (npc 9 of "
+              "res/field/events/aspertia_city_pokemon_center.json, movement code 13, FldmmdlMovecode_MoveTurnRandom in "
+              "src/ov036/fldmmdl_movecode.c), the seventh actor of the field actors' block: his direction (+0xd, Black "
+              "2's alone) and his turn's timer (+0x32, RailWanderWork.timer in the movement code's work). The timer "
+              "counts down at each step of the field's actors, every other pass, and, run out, draws a new wait and "
+              "direction from GFL's linear generator; past ADR 0023's cut the port's battle is its own, so it reaches "
+              "the Pokemon Center at another count than the DS's and the save finds him at another point of his wait")
+TURN_DRAWS = ("as TURN_TIMER: the townsperson's timer runs on as the Pokemon Center loads behind the season's banner, "
+              "and the two saves hold it otherwise (21 on the port's save and 28 on the DS's in Black 2, 19 and 4 in "
+              "White 2), so his draws from GFL's linear generator come at other counts: 14 counts sooner on the "
+              "port's save in Black 2 (counts 3485, 3549 and 3581 against 3499, 3563 and 3595), 30 later in White 2 "
+              "(3481 and 3577 against 3451 and 3547); melonDS continuing the port's save draws on the port's counts")
+CENTER_CRCS = ("the CRCs over those: the trainer block's, the field actors' block's, their entries and the mystery "
+               "gift block's in the table of the blocks' CRCs, and the footer's CRC of that table "
+               "(src/gfl/backup_system.c)")
+CENTER_SAVE_BYTES = {
+    both_copies("0x19427"): CENTER_PLAY_SECONDS,
+    both_copies("0x1c800-0x1d297"): MYSTERY_KEY,
+    both_copies("0x1e3ed,0x1e412"): TURN_TIMER,
+    both_copies("0x194b2-0x194b3,0x1f602-0x1f603,0x25f36-0x25f37,0x25f44-0x25f45,0x25f52-0x25f53,0x25fa2-0x25fa3"):
+        CENTER_CRCS,
+}
 ROUND_TRIPS = {
     # Phase 4's exit: the wild Purrloin caught on Route 19 and the game saved, then quit, and continued from the save
     "catch": RoundTrip("catch_save", 11600, "catch_continue",
                        known={"b2_us": CATCH_SAVE_BYTES, "w2_us": CATCH_SAVE_BYTES}),
+    # A trainer battle to its end: Hugh's, from the starter save, held to melonDS frame by frame up to his AI's second
+    # move (the hugh sequence, ADR 0023's cut), the port's own past it, to the Pokemon Center's scene and SAVE there.
+    # Its save is held to melonDS's byte by byte (Tepig's party data, the money, the bag, the flags and the rest), but
+    # the declared bytes; both saves continue on the oracle to the field, and the port's in a new run of its own. In
+    # White 2 the port's battle takes more turns, so the port plays presses of its own past the cut
+    "hugh": RoundTrip("center_save", 19000, "center_continue",
+                      known={"b2_us": CENTER_SAVE_BYTES, "w2_us": CENTER_SAVE_BYTES}, cut="hugh",
+                      port_input={"w2_us": "hugh_port"},
+                      continued_random={"b2_us": {"3493-3610": TURN_DRAWS}, "w2_us": {"3459-3610": TURN_DRAWS}},
+                      continued_last=3602),
 }
 
 
@@ -1181,10 +1295,21 @@ def command_round_trip(args) -> int:
         return SKIP
     args.oracle = binary
     make_input = os.path.join(REPO_ROOT, SEQUENCE_INPUT.format(name=trip.maker, version=args.version))
+    # The port plays the oracle's input file, or its own where its course past the cut takes other passes
+    port_input = os.path.join(REPO_ROOT, SEQUENCE_INPUT.format(name=trip.port_input.get(args.version, trip.maker),
+                                                               version=args.version))
     continue_input = os.path.join(REPO_ROOT, SEQUENCE_INPUT.format(name=trip.continued, version=args.version))
-    for path in (make_input, continue_input):
-        if not os.path.exists(path):
+    cut = SEQUENCES[trip.cut] if trip.cut else None
+    cut_input = os.path.join(REPO_ROOT, SEQUENCE_INPUT.format(name=trip.cut, version=args.version)) if cut else None
+    for path in (make_input, port_input, continue_input, cut_input):
+        if path and not os.path.exists(path):
             print(f"oracle.py round-trip: no input file {os.path.relpath(path, REPO_ROOT)} for {args.version}")
+            return 1
+    # Up to the cut, the port plays the cut sequence's presses, as the oracle did making its save
+    for path in (make_input, port_input) if cut_input else ():
+        if not input_starts_with(path, cut_input):
+            print(f"oracle.py round-trip: {os.path.relpath(path, REPO_ROOT)} doesn't start with "
+                  f"{os.path.relpath(cut_input, REPO_ROOT)}'s lines, so the cut doesn't hold the port's run")
             return 1
     work = args.work or tempfile.mkdtemp(prefix=f"oracle-round-trip-{args.name}-")
     start, reason = obtain_save(args, maker.start, work, args.save_cache)
@@ -1195,14 +1320,45 @@ def command_round_trip(args) -> int:
         return 1
     saves = {"port": os.path.join(work, "port.sav"), "oracle": oracle_save}
 
-    # The port makes its own save, playing the input file the oracle made the kept one with
-    status, message = run_port(args.port, os.path.join(work, "port-make"), trip.port_frames, "none", rom, args.time,
-                               make_input, save=start, save_out=saves["port"])
-    described = describe_port_run(status, message, trip.port_frames, os.path.join(work, "port-make"))
-    print(f"port, {trip.maker}: {described}")
+    # The oracle's run of the piece up to the cut, from the same start save, with the dumps the cut sequence compares
+    # and the random seeds the DS builds, which must be the ones the port's input file gives
+    port_dumps = []
+    if cut:
+        oracle_cut_dir = os.path.join(work, "oracle-cut")
+        shutil.rmtree(oracle_cut_dir, ignore_errors=True)
+        cut_args = argparse.Namespace(**vars(args))
+        cut_args.input = cut_input
+        cut_args.save = start
+        cut_args.save_out = None
+        cut_oracle_dumps, port_dumps = state_dumps(cut)
+        status = run_oracle(cut_args, oracle_cut_dir, cut.oracle_frames, "all", cut_oracle_dumps + seeds.DUMPS,
+                            quiet=True)
+        if status != 0:
+            print(f"oracle.py round-trip: the oracle failed on {trip.cut}'s input file (status {status})")
+            return 1
+        reason = report_seeds(port_input, oracle_cut_dir)
+        if reason:
+            print(f"oracle.py round-trip: {reason}")
+            return 1
+
+    # The port makes its own save, playing the input file the oracle made the kept one with (or its own past the
+    # cut), with a picture of each frame up to the cut
+    make_dir = os.path.join(work, "port-make")
+    status, message = run_port(args.port, make_dir, trip.port_frames, f"1-{cut.port_frames}" if cut else "none", rom,
+                               args.time, port_input, timeout=3600, dumps=port_dumps, save=start,
+                               save_out=saves["port"])
+    described = describe_port_run(status, message, trip.port_frames, make_dir)
+    print(f"port, {os.path.basename(port_input)}: {described}")
     if status != 0 or file_sha1(saves["port"]) == file_sha1(start):
         print(f"oracle.py round-trip: the port's run left no save of its own; the runs are in {work}")
         return 1
+    failed = False
+    if cut:
+        print(f"\nthe port's run up to the cut, held as {trip.cut} holds it ({cut.port_frames} port frames):")
+        if compare_sequence(cut, args.version, oracle_cut_dir, make_dir, os.path.join(work, "report-cut"),
+                            cut.port_frames) != 0:
+            failed = True
+        print()
     contents = {}
     for name, path in saves.items():
         with open(path, "rb") as f:
@@ -1217,7 +1373,6 @@ def command_round_trip(args) -> int:
     for text, why in known.items():
         print(f"may differ, bytes {text}: {why}")
     undeclared = undeclared_differences(contents["port"], contents["oracle"], known)
-    failed = False
     if undeclared:
         print("the saves differ where the trip declares nothing: "
               + ", ".join(f"{first:#x}-{last:#x}" for first, last in undeclared))
@@ -1242,9 +1397,10 @@ def command_round_trip(args) -> int:
             print(f"the oracle wrote the {name}'s save while continuing it")
             failed = True
         runs[name] = compare.load_run(out)
-    same, difference = compare_boots(runs["port"], runs["oracle"])
-    print(f"continued on the oracle: {same} of {len(runs['oracle'].frames)} frames the same (count and both screens)"
-          + (f"; first difference at {difference}" if difference else ""))
+    same, difference = compare_boots(runs["port"], runs["oracle"], trip.continued_last)
+    upto = f" up to count {trip.continued_last}" if trip.continued_last else ""
+    print(f"continued on the oracle: {same} of {len(runs['oracle'].frames)} frames the same{upto} (count and both "
+          "screens)" + (f"; first difference at {difference}" if difference else ""))
     failed = failed or difference is not None
 
     # The port continues its own save in a new run, held to the oracle's continuing its own
@@ -1259,6 +1415,10 @@ def command_round_trip(args) -> int:
         print("the port wrote its save while continuing it")
         failed = True
     port_run = compare.load_run(port_dir)
+    # Where the port's save holds a declared byte otherwise, GFL's random state may part from the oracle's own run
+    random = dict(sequence.known_random)
+    random[args.version] = {**random.get(args.version, {}), **trip.continued_random.get(args.version, {})}
+    sequence = replace(sequence, known_random=random)
     result = compare_sequence(sequence, args.version, os.path.join(work, "oracle-oracle"), port_dir,
                               os.path.join(work, "report"), max(port_run.frames) if port_run.frames else 0)
     if failed or result != 0:

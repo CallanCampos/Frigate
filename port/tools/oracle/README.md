@@ -434,7 +434,7 @@ that bank in VRAM display mode (`bottom_3d` is 1; the top screen, engine B's log
 
 ## The comparison sequences
 
-Ten input files on game frames for each version, `port/tests/oracle/<name>_<version>.pbwinput`, played by eleven
+Eleven input files on game frames for each version, `port/tests/oracle/<name>_<version>.pbwinput`, played by twelve
 sequences, compared with `--align counter`, the movies by their pictures (`oracle.py`'s `SEQUENCES` says how):
 
 - **opening**: nothing pressed. Power-on, the boot screens, the Game Freak logo and the whole opening, the title and
@@ -496,8 +496,9 @@ sequences, compared with `--align counter`, the movies by their pictures (`oracl
   200.
 - **Phase 4's route** ([PLAN.md §7](../../docs/PLAN.md#phase-4-battles-menus-saves-m5m7): catch a Pokémon, save, quit,
   reload, and a save that continues from melonDS in the port and back), in four sequences, each from melonDS's save of
-  the piece before ([Saves](#saves)), so that each starts as the DS does; their files pin the clock and give the random
-  seeds the DS builds there ([Random seeds](#random-seeds)). Both versions play Black 2's presses.
+  the piece before ([Saves](#saves)), so that each starts as the DS does, and a fifth that continues the save made
+  after Hugh's battle; their files pin the clock and give the random seeds the DS builds there
+  ([Random seeds](#random-seeds)). Both versions play Black 2's presses.
   - **hugh**: from the starter save, continue's presses, then down from the lookout to Hugh's arrival, his challenge
     and his trainer battle, Tepig against Oshawott, A every 16 frames for FIGHT and Tackle: the cut-in, the send-outs,
     the first turn's moves, damage and messages, and the second turn's choices, to its rolls (count 8193). There the
@@ -525,6 +526,11 @@ sequences, compared with `--align counter`, the movies by their pictures (`oracl
     (Route 19, Pokédex 3, time 0:13), CONTINUE into the grass, and the field menu's POKéMON with the party, Tepig, level
     6, and Purrloin, level 4. The port runs 4,700 frames, the oracle 6,900. `oracle.py round-trip catch` also plays it
     from the port's own catch save on both programs ([Saves](#saves)).
+  - **center_continue**: the Pokémon Center save, made after Hugh's battle, continued in a new run of each program:
+    the start menu with the saved game (Aspertia City, Pokédex 2, time 0:08), CONTINUE, the black and the season's
+    banner, to the last frame before the Pokémon Center fades in. The port runs 3,610 frames, the oracle 5,700.
+    `oracle.py round-trip hugh` also plays it from the port's own save of Hugh's battle on both programs, and stops
+    before the field because the field shows a townsperson whose turn the two saves hold differently ([Saves](#saves)).
 
 A sequence can also allow the port to stop on code with no C yet: from a port frame (`stop_from`), on the trap stub
 it names (`stop_trap`, a pattern of the trap's message), with why (`stop`). A stop on any other trap fails, so the
@@ -540,8 +546,8 @@ differed in 14,330 at the first frame, 1,823 at the fourth, and passed the toler
 start from a save, which leaves other bytes after the copyright screen's file on the port than on the DS
 ([below](#known-differences-from-the-hardware)), so they don't hold those frames close.
 
-Each is two ctest tests, but the eight that start from a save (continue, continue_starter, field_menus, party_menus
-and the four of phase 4's route), whose saves only the oracle can make, have only the first:
+Each is two ctest tests, but the nine that start from a save (continue, continue_starter, field_menus, party_menus
+and the five of phase 4's route), whose saves only the oracle can make, have only the first:
 
 - `oracle_<name>` (`oracle.py sequence NAME --port BIN`), with the oracle built: runs both programs and compares every
   port frame but the known differences ([below](#known-differences-from-the-hardware)): where the game counts passes,
@@ -594,6 +600,8 @@ Results, every port frame but the known differences:
 | catch, White 2 | 11,600 | 10,481 | 2,007 | 5,499 | the title's 28 port frames and 3402, the battle's 10, the play time's 481, the save's 599, oracle frames 1260, 4852; the top screen of the battle's 2,975 (its bottom screen exact) | 9,561 of 9,561, 924 left out; 4,164 of 4,164, 6,321 left out |
 | catch_continue, Black 2 | 4,700 | 4,679 | 1,967 | 2,712 | the title's 21 port frames, oracle frame 4920 | 3,562 of 3,562, 23 left out; 3,562 of 3,562, 23 left out |
 | catch_continue, White 2 | 4,700 | 4,671 | 1,969 | 2,702 | the title's 28 port frames and 3402, oracle frames 1260, 4852 | 3,562 of 3,562, 23 left out; 3,562 of 3,562, 23 left out |
+| center_continue, Black 2 | 3,610 | 3,589 | 1,484 | 2,105 | the title's 21 port frames, oracle frame 4920 | 2,474 of 2,474, 21 left out; 2,474 of 2,474, 21 left out |
+| center_continue, White 2 | 3,610 | 3,581 | 1,486 | 2,095 | the title's 28 port frames and 3402, oracle frames 1260, 4852 | 2,474 of 2,474, 21 left out; 2,474 of 2,474, 21 left out |
 
 Each comparison's summary gives its screens with 3D, compared by their pictures, and their pixels beyond the pixel
 tolerance at the median and at most: 5 to 18 at the median by sequence and version, 0 in the exit route, and in
@@ -763,18 +771,12 @@ measured with the pinned melonDS: the starter save, and phase 4's route's three 
     (Tepig grows to level 6), B through his words and the Pokémon Center's scene (healing, the PC, the Mart, 10 Poké
     Balls), then SAVE in the Pokémon Center once the player is free (Aspertia City, Pokédex 2, time 0:08). White 2 plays
     Black 2's presses. Its input file gives the DS's seeds, the hugh sequence's, whose presses it plays to the battle,
-    so that the port can play Hugh's battle from them too: from melonDS's starter save, `frigate-black2 --headless
-    --frames 19000 --save-dir DIR --input port/tests/oracle/center_save_b2_us.pbwinput` with the starter save in DIR as
-    `IREO.sav` plays the battle to its end on the port, past the AI's cut, the Pokémon Center's scene and SAVE there
-    (2026-10-24). The save it writes differs from melonDS's in the play time's seconds, the mystery gift block, which
-    the game encrypts again with a key seeded by the VBlank count each time it reads it (`mgEncryptData`,
-    `src/system/mystery_data.c`), a Pokémon Center townsperson's direction and turn timer, which GFL's linear generator
-    draws (`FldmmdlMovecode_MoveTurnRandom`, `src/ov036/fldmmdl_movecode.c`), and the CRCs over those; Tepig's party
-    data, the money and the bag are melonDS's. In White 2 the port's battle, Hugh's AI picking other moves, ends later
-    than the DS's did for these presses, which then miss the field menu's SAVE (the port is still in the Pokémon
-    Center's scene at frame 13,000). No test holds this yet: a round trip for a trainer battle needs its own presses
-    after the battle. It is where the route starts again after Hugh's battle, which parts from melonDS's at his second
-    move ([Known differences](#known-differences-from-the-hardware)).
+    so that the port can play Hugh's battle from them too, past the AI's cut, to its end, the Pokémon Center's scene
+    and SAVE there: `oracle.py round-trip hugh` holds that save to this one byte by byte, but the bytes it declares
+    (the play time's seconds, the mystery gift block's key, a townsperson's turn and the CRCs), and plays presses of
+    its own past the cut in White 2, where the port's battle ends later than these presses allow (below). It is where
+    the route starts again after Hugh's battle, which parts from melonDS's at his second move
+    ([Known differences](#known-differences-from-the-hardware)).
   - **The Route 19 save** (`route19_save`, from `center_save`, 17,800 frames; Black 2 `26d75e2638a6`, White 2
     `12b20ac0dd82`): the route19 sequence's input file, then SAVE beside Route 19's grass at (56, 696) (Route 19,
     Pokédex 2, time 0:11). Its presses are the ones the older Route 19 save, made from the starter save through Hugh's
@@ -816,6 +818,56 @@ places in both versions, each traced:
 The second copy (`0x26000` on) differs in the same 17 places; the rest of the chip is the same. The round trip
 declares these bytes, each span with its cause (`ROUND_TRIPS` in `oracle.py`), and fails on a byte that differs
 anywhere else.
+
+**A trainer battle to its end** (`oracle.py round-trip hugh`, ctest `oracle_round_trip_hugh`;
+[ADR 0023](../../docs/adr/0023-oracle-routes-part-where-the-ds-cpu-time-decides.md)): Hugh's battle, which the hugh
+sequence holds frame by frame only to his AI's second move, played to its end on the port and held past that point by
+what the DS's CPU time doesn't decide. From melonDS's starter save the port plays the Pokémon Center save's input file,
+19,000 frames, with the DS's seeds: CONTINUE, Hugh's arrival and challenge, his battle with A every 16 frames, his
+words, the walk down to the Pokémon Center, its scene and SAVE there. Its frames up to the cut (8,200 port frames) are
+compared with the oracle's run of the hugh sequence's input file from the same save as the hugh sequence compares them,
+that file being the start of the one the port plays, line for line (checked: `RoundTrip.cut`); past the cut the battle
+is the port's own. Hugh's AI picks other moves there, and the port's battle ends 560 counts later than the DS's in Black
+2 (the field back at count 10,302 against 9,742, the Pokémon Center's door at 11,885 against 11,325) and 704 later in
+White 2 (10,558 against 9,854; 12,141 against 11,437). In Black 2 melonDS's presses still fit: B through the Pokémon
+Center's scene ends before the field menu's X at count 14,420. In White 2 the scene runs on to count 15,100 on the
+port, where those presses would open the field menu in the middle of it and miss SAVE, so the port plays
+`hugh_port_w2_us.pbwinput` instead (`RoundTrip.port_input`): melonDS's file to the end of its B presses, then B on
+through the scene and SAVE at the port's own counts. The port's save is then held to melonDS's `center_save` byte by
+byte. They differ in 2,722 bytes of each copy of the main save in Black 2 and 2,715 in White 2, all declared
+(`CENTER_SAVE_BYTES`), each traced; Tepig's party data, the money, the bag, the event flags and variables and every
+other block are melonDS's:
+
+- 1 byte of the play time's seconds (`0x19427`): 0:08:01 on the port and 0:08:09 on the DS in Black 2, 0:08:10 and
+  0:08:06 in White 2, each counting its own clock's ticks ([Known differences](#known-differences-from-the-hardware)).
+- The mystery gift block and its footer (`0x1c800`-`0x1d297`, 2,712 bytes): the Pokémon Center's deliveryman's scripts
+  (`res/field/scripts/global_10395.s`, `Cmd_01DB`; `func_ov033_02177d78` in `src/ov033/pdw_postman.c`) read the block
+  as the player enters, and every read decrypts it and encrypts it again with a key that `mgEncryptData`
+  (`src/system/mystery_data.c`) seeds with the VBlank count, `(OS_GetVBlankCount() << 8) | OS_GetVBlankCount()`. The
+  DS's count runs ahead of its passes (its dropped frames and long loads) and the port's doesn't, so the same contents
+  come out as other bytes. The catch saves, made without entering a Pokémon Center, hold the block as the start save has
+  it.
+- 1 or 2 bytes of the field actors' block: the Pokémon Center's townsperson at (3,15) who turns at random (npc 9 of
+  `res/field/events/aspertia_city_pokemon_center.json`, movement code 13, `FldmmdlMovecode_MoveTurnRandom` in
+  `src/ov036/fldmmdl_movecode.c`), its seventh actor: his turn's timer (`0x1e412`, `RailWanderWork.timer` in the
+  movement code's work, 21 on the port and 28 on the DS in Black 2, 19 and 4 in White 2) and, in Black 2, his direction
+  (`0x1e3ed`, left on the port and right on the DS). The timer counts down at each step of the field's actors, every
+  other pass, and, run out, draws a new wait and direction from GFL's linear generator; the port reaches the Pokémon Center 560 or 704 counts
+  later, so the save, made on the same count on both, finds him at another point of his waits.
+- 14 bytes of CRCs over those: the trainer block's (`0x194b2`), the field actors' block's (`0x1f602`), their entries
+  and the mystery gift block's in the table of the blocks' CRCs (`0x25f36`, `0x25f52`, `0x25f44`), and the footer's
+  CRC of that table (`0x25fa2`, `src/gfl/backup_system.c`).
+
+melonDS then continues both saves with center_continue's input file in new runs, the same frame for frame, count and
+both screens, writing neither, and the port continues its own as melonDS continues its (3,589 of 3,589 frames in Black
+2, 3,581 of 3,581 in White 2, NNS G3D's state and GFL's random state compared as the sequence compares them): the
+start menu with the saved game, the same on both (the play time's minute is), CONTINUE and the season's banner. The
+runs are compared to count 3,602, the last before the Pokémon Center fades in (`RoundTrip.continued_last`): from there
+the field fades in on the townsperson as each save holds him, and the two runs differ from count 3,613 in White 2 and
+3,679 in Black 2. His timer runs on as the field loads behind the banner, so GFL's linear generator draws for him at other
+counts on the port's save than on melonDS's (14 counts sooner in Black 2, 30 later in White 2), which the trip declares
+for the port's continued run (`RoundTrip.continued_random`); melonDS continuing the port's save draws on the port's
+counts.
 
 **Continuing it** (the continue sequence): the start menu shows CONTINUE first, then NEW GAME, MYSTERY GIFT, UNOVA
 LINK, NINTENDO WFC SETTINGS and MIC TEST, and the saved game: the player's picture, AAAAAAA, Aspertia City, Badges: 0,

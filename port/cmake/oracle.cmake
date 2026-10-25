@@ -130,7 +130,9 @@ port_test_labels(oracle_boot oracle)
 # with her capture demo, to SAVE beside Route 19's grass; catch, from there, a wild Purrloin caught with a Poke Ball and
 # SAVE; catch_continue, that save continued in a new run, into the party list with Tepig and Purrloin. Their input
 # files pin the clock and give the random seeds the DS builds there (port/tools/oracle/README.md, "Random seeds"), and
-# each compares NNS G3D's state and GFL's random state with the DS's at every count but the passes it declares
+# each compares NNS G3D's state and GFL's random state with the DS's at every count but the passes it declares.
+# center_continue plays the save made after Hugh's battle (center_save) to the start menu and CONTINUE, up to the field
+# (oracle_round_trip_hugh continues the port's own save with it)
 set(port_oracle_saves "${CMAKE_BINARY_DIR}/oracle-saves")
 add_test(NAME oracle_saves
     COMMAND "${CMAKE_COMMAND}" -E env PYTHONDONTWRITEBYTECODE=1
@@ -141,7 +143,7 @@ add_test(NAME oracle_saves
 set_tests_properties(oracle_saves PROPERTIES SKIP_RETURN_CODE 77 TIMEOUT 7200 FIXTURES_SETUP oracle_saves)
 port_test_labels(oracle_saves oracle)
 foreach(sequence IN ITEMS opening title continue continue_starter field_menus party_menus aspertia hugh route19 catch
-                         catch_continue)
+                         catch_continue center_continue)
     if(EXISTS "${port_oracle_tests}/${sequence}_${PORT_VERSION}.tsv")
         add_test(NAME oracle_${sequence}_hashes
             COMMAND "${CMAKE_COMMAND}" -E env PYTHONDONTWRITEBYTECODE=1
@@ -165,7 +167,8 @@ foreach(sequence IN ITEMS opening title continue continue_starter field_menus pa
 endforeach()
 # The sequences from a save take it from oracle_saves; without the cache (a failed fixture) they would make it again
 set_tests_properties(oracle_continue oracle_continue_starter oracle_field_menus oracle_party_menus oracle_hugh
-    oracle_route19 oracle_catch oracle_catch_continue PROPERTIES FIXTURES_REQUIRED oracle_saves TIMEOUT 3600)
+    oracle_route19 oracle_catch oracle_catch_continue oracle_center_continue
+    PROPERTIES FIXTURES_REQUIRED oracle_saves TIMEOUT 3600)
 # The exit route writes and compares a picture of every frame of both programs, some 34,500 in all: half an hour on a
 # loaded machine
 set_tests_properties(oracle_aspertia PROPERTIES TIMEOUT 5400)
@@ -184,6 +187,24 @@ add_test(NAME oracle_round_trip_catch
 set_tests_properties(oracle_round_trip_catch PROPERTIES SKIP_RETURN_CODE 77 TIMEOUT 3600
     FIXTURES_REQUIRED oracle_saves)
 port_test_labels(oracle_round_trip_catch route oracle)
+
+# A trainer battle to its end (T6): the port plays Hugh's battle from melonDS's starter save, held frame by frame to
+# melonDS's run up to his AI's second move as oracle_hugh holds it (ADR 0023's cut), then its own battle, the Pokemon
+# Center's scene and SAVE there, with the center save's input file, or in White 2 presses of its own past the cut
+# (hugh_port_w2_us.pbwinput); its save may differ from melonDS's only in the bytes the trip declares (the play time, the
+# mystery gift block's key, a townsperson's turn and the CRCs), so Tepig's party data, the money, the bag and the flags
+# are melonDS's; melonDS continues both saves the same to the field, and the port continues its own as melonDS
+# continues its (oracle.py round-trip hugh). Skipped (77) without the oracle or the ROM. It runs both programs through
+# Hugh's battle with a picture of every frame up to the cut, and the continuations: an hour on a loaded machine
+add_test(NAME oracle_round_trip_hugh
+    COMMAND "${CMAKE_COMMAND}" -E env PYTHONDONTWRITEBYTECODE=1
+        "${PORT_PYTHON}" "${port_oracle_dir}/oracle.py" round-trip hugh
+            --oracle "${port_oracle_binary}" --port "$<TARGET_FILE:${PORT_PROGRAM}>" --version "${PORT_VERSION}"
+            --save-cache "${port_oracle_saves}"
+    WORKING_DIRECTORY "${REPO_ROOT}")
+set_tests_properties(oracle_round_trip_hugh PROPERTIES SKIP_RETURN_CODE 77 TIMEOUT 5400
+    FIXTURES_REQUIRED oracle_saves)
+port_test_labels(oracle_round_trip_hugh route oracle)
 
 # The other way, a save from the port to melonDS (T6): the port's New Game formats the blank backup, and the oracle
 # boots that save to the start menu frame for frame as it boots its own save of the same moment, writing neither; the
