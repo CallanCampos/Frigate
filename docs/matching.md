@@ -228,7 +228,13 @@ Same instructions, registers swapped.
   call's failure test, and where the assignment stands still picks the register it is built in. DWC's
   `NHTTP_CreateRequest` (`nhttp_request.c`) has `movs r2, #8; str r2, [sp, #8]` ahead of its `"https://"` compare:
   `schemeLength = 8;` written after `if (NHTTPi_strnicmp(text, "https://", 8) != 0) { ...; goto fail; }` gives that
-  r2, and written before the call, or as the call's argument, builds the 8 in r0.
+  r2, and written before the call, or as the call's argument, builds the 8 in r0. NitroWiFi's `make_plaintext`
+  (`ssl.c`) is the same with a hash's length: `macLen = 0x10;` written after the first `CPSi_md5_calc` that takes
+  `0x10` as a literal is still stored right after the init call, but built in r2, that argument's register; written
+  before that call it is built in r0.
+- A store through a post-increment, `*p++ = x`, is scheduled after the pointer's advance: `send_client_hello`
+  (`ssl.c`) writes the session ID's length byte as `p += 0x22; ... *p++ = 0;` and gets the original's `adds r5, #0x23`
+  before the `strb`, where `p[0x22] = 0; p += 0x23` or `*(p + 0x22) = 0` store first (4 bytes off).
 - A pointer that must have the earlier declaration's slot but a later store is declared without an initializer and
   assigned after the other pointers. This matches the item-base spills in `GetWEPData` and `GetWPAData` in
   `dwc_aoss.c`.
