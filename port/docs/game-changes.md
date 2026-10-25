@@ -11,6 +11,15 @@ outside `port/`: [../hal/stubs/gbucket.c](../hal/stubs/gbucket.c) makes `NewBuck
 `DumpBucketSet` unconditional named traps ("not in ROM", exit 70), including a NULL free. It supplies no substitute
 bucket behavior or invented DS address; the host link failure is resolved without excluding the imported C.
 
+The same sync removes the obsolete native exclusion of `lib/dwcutil/src/aosslink.c` (formerly `dwc_aoss_ap.c`).
+The strict pointer guard then reports six newly compiled casts: one `int` to `OSMessage` in `aoss_apc_callback`, and
+one `OSMessage` to `int` each in `AOSSi_InitLocal`, `AOSSi_EndLocal`, `AOSSi_Disconnect`, `AOSSi_WLANGetBSSList` and
+`AOSSi_WLANConnect`. Each has one site, classified harmless in `port/tools/ptrcast_baseline.tsv`: the private
+`sAossApQueue` has only two senders, the APC callback's event code (`apc.h`'s enum, 1 through 0x14) and the alarm
+callback's tokens 0x12/0x13 (the two `OS_SetAlarm` calls). No address enters this queue or is dereferenced through
+these casts. No source change, broad baseline update or guard relaxation is needed; existing baseline rows retain
+their counts and classifications.
+
 ## The three allowed kinds
 
 1. **Neutral:** a portability fix that compiles to the same bytes under MWCC, such as `uptr` for a value that carries
