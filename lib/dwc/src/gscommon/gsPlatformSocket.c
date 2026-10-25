@@ -10,19 +10,18 @@
 static int CheckRcode(int result, int error);
 
 // The state of the sockets: the aliases of the console's host entry (none), the error of the last call that failed,
-// and the host entry with the console's address
-static struct {
-    char *aliases;
-    int lastError;
-    HOSTENT hostEnt;
-    gsi_u32 ips[5];
-    gsi_u8 *ipPtrs[17];
-} sSocketState;
+// and the host entry with the console's address. Each is a static of its own defined with a zero initializer, which
+// the functions reach from the section's base while getlocalhost takes each address through a literal of its own
+static char *sAliases = NULL;
+static int sLastError = 0;
+static HOSTENT sHostEnt = { 0 };
+static gsi_u32 sIps[5] = { 0 };
+static gsi_u8 *sIpPtrs[17] = { 0 };
 
 // Keeps the error of a call that failed and returns the error value, or returns the result
 static int CheckRcode(int result, int error) {
     if (result < 0) {
-        sSocketState.lastError = result;
+        sLastError = result;
         return error;
     }
     return result;
@@ -117,7 +116,7 @@ unsigned long inet_addr(const char *host) {
 }
 
 int GOAGetLastError(SOCKET sock) {
-    return sSocketState.lastError;
+    return sLastError;
 }
 
 int GSISocketSelect(SOCKET sock, int *readable, int *writable, int *failed) {
@@ -208,20 +207,20 @@ int CanSendOnSocket(SOCKET sock) {
 }
 
 HOSTENT *getlocalhost(void) {
-    sSocketState.hostEnt.name = "localhost";
-    sSocketState.hostEnt.aliases = &sSocketState.aliases;
-    sSocketState.hostEnt.addrType = 2;
-    sSocketState.hostEnt.addrLength = 0;
-    sSocketState.hostEnt.addrList = sSocketState.ipPtrs;
-    sSocketState.ips[0] = 0;
-    SOC_U32to4U8(SOCL_GetHostID(), (gsi_u8 *)&sSocketState.ips[0]);
-    if (sSocketState.ips[0] == 0) {
+    sHostEnt.name = "localhost";
+    sHostEnt.aliases = &sAliases;
+    sHostEnt.addrType = 2;
+    sHostEnt.addrLength = 0;
+    sHostEnt.addrList = sIpPtrs;
+    sIps[0] = 0;
+    SOC_U32to4U8(SOCL_GetHostID(), (gsi_u8 *)&sIps[0]);
+    if (sIps[0] == 0) {
         return NULL;
     }
-    sSocketState.ipPtrs[0] = (gsi_u8 *)&sSocketState.ips[0];
-    sSocketState.hostEnt.addrLength = 4;
-    sSocketState.ipPtrs[1] = NULL;
-    return &sSocketState.hostEnt;
+    sIpPtrs[0] = (gsi_u8 *)&sIps[0];
+    sHostEnt.addrLength = 4;
+    sIpPtrs[1] = NULL;
+    return &sHostEnt;
 }
 
 int IsPrivateIP(IN_ADDR *address) {

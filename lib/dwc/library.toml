@@ -51,6 +51,9 @@ flags = [
 "nhttp/nhttp_thread.c" = ["-ipa file"]
 # So does the file of DWC that wraps the GameSpy HTTP client (overlay 189)
 "ghttp/dwc_ghttp.c" = ["-ipa file"]
+# So does the encrypted session (overlay 189): its 160-byte client has a .data section of its own after the base URL,
+# reached through a literal of its own, which only -ipa file gives an object of 64 bytes or more
+"enc/dwc_encsession.c" = ["-ipa file"]
 # ghttpEncryption.c's function names (__FUNCTION__) are sorted by size ahead of its other data, as -ipa file sorts them
 "ghttp/ghttpEncryption.c" = ["-ipa file"]
 # The authentication service (overlay 260) has its 257-byte RSA modulus in a section of its own, 4-aligned after the

@@ -83,12 +83,12 @@ void readKey(void) {
     int i;
     u16 pad;
 
-    pad = PAD_Read();
     held = &sTouch.input->held;
+    pad = PAD_Read();
     // Up hides down, and left hides right
     pad = pad & ~((pad & 0x40) << 1) & ~((pad & 0x20) >> 1);
     sTouch.input->pressed = (*held ^ pad) & pad;
-    sTouch.input->released = (*held ^ pad) & *held;
+    sTouch.input->released = (pad ^ *held) & *held;
     sTouch.input->held = pad;
     sTouch.input->repeated = sTouch.input->pressed;
     for (i = 0; i < DWC_UTIL_KEY_COUNT; i++) {

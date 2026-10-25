@@ -820,6 +820,9 @@ Same instructions, registers swapped.
 
 ## Stack slots
 
+- A local used only inside one straight-line block takes the temporaries' slot, above every named one, whatever
+  its declaration position: TwlSDK's `Yos_JPEGEncode` (`ssp_jpegenc.c`) spills `chromBlocksX` to sp+0x58 in all 24
+  declaration orders tried, where the original has it among the named slots, so the original used it beyond that block.
 - NitroWiFi's `CPSi_sha1_block` runs its rounds in groups of five, rotating the arguments of a two-statement
   round macro (`SHA1_ROUND`) instead of copying the five state words after each round. The first fifteen rounds use
   direct words, followed by word 15 and four expanded words; the later stages each run four groups over the circular
@@ -3085,6 +3088,9 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 
 ## Loops
 
+- Two increments in a `for` step, `h++, q++`, can emit two `ble` in a row at the loop's bottom, where one of them
+  written as the body's last statement emits one: TwlSDK's `Mel_JPEGDecode` (`ssp_jpegdec.c`) copies its Huffman
+  values with `q++;` in the body.
 - A field that the loop's test reads, kept in a register for the body where the original loads it again, can be an
   enum: MWCC reuses a loaded `int` field across the loop's head, but not an enum-typed one passed to a function whose
   parameter has that enum type. GameSpy's `qr_build_split_query_reply` (`qr2.c`, overlay 11) matched only with its
@@ -3663,7 +3669,9 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   boundary) shows the file was built with `-ipa file`: DWC's `nhttp_thread.c` has its 76-byte content type string
   apart, 2 bytes after the other strings, and links from C only with `-ipa file` in `lib/dwc/library.toml`, and
   `AuthService.c` has its 257-byte RSA modulus 1 byte after the 7-byte exponent. libVCT's `vct_session.c` has its four
-  66-byte transition tables 0x44 apart, where one shared section packs them 0x42 apart.
+  66-byte transition tables 0x44 apart, where one shared section packs them 0x42 apart. Code shows it too: a large
+  static reached through a literal to its own address rather than from the section's base is in a section of its own,
+  as `dwc_encsession.c`'s 160-byte `sClient` is with `-ipa file`, which also puts its `.data` in the ROM's order.
 - `-ipa file` and `-ipa function` address statics differently, which tells a library file's setting. With
   `-ipa file`, a file's `.bss` and `.data` objects share one section, are reached from its base (one literal, then
   `[r0, #off]`, shared by every object a function touches) and are dropped when no code reads them. With
@@ -3752,6 +3760,8 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   of that size that nothing reads, which `-ipa function` keeps (`-ipa file` drops it): NitroWiFi's `soc.c` has three,
   of 8, 4 and 0x10 bytes at +0x10, +8 and +0x40 among its statics, and with them, defined first, and every static
   zero-initialized, its four functions that reach the statics from the base match and so does the file's `.bss`.
+  Such a static goes first in `.bss`, ahead of the tentative ones, wherever it is defined: `dwc_aoss_ap.c`'s `sBss =
+  { 0 }` sat at `.bss + 0` defined just above its function, below other functions, and as a global alike.
 - A zero-initialized static is reached from the section's pooled base, and so is a struct of statics, but the two
   compile differently: the struct's member is a field of one object, which MWCC loads again at other points (after a
   64-bit store, before a zero, across a loop), while a static of its own is known and scheduled freely. Statics that the
@@ -3890,6 +3900,11 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   ldr r0, [r0, #0xc]`). `ssl.c`'s handshake priority is read through its own address (`=0x021854d4; [r0, #4]`), so
   the original's 8-byte config was two statics, `sHandshakePriority` and `sCipherSuites`, which open their section
   ahead of the 5-byte OID; as one struct behind the two 4-byte OIDs, three functions differed.
+- MWCC creates a local array initializer's template in `.rodata` when it parses the function's definition, even
+  in a `static inline` that is only expanded later, but a string literal when it generates the code that uses it, in
+  the order the function bodies are generated, so an inline's literals come where it is expanded. GameSpy's
+  `gstats.c` (in DWC) shows both: a template moves with the inline that holds it, and its literals keep their
+  callers' order.
 - A function-local `const` scalar with an initializer, `static` or not, is emitted in `.rodata` even when every read
   of it folds (`const u32 n = 11;` gives a 4-byte `_ZZ...E1n_0`), while a file-scope `static const` scalar that code
   only reads is dropped.

@@ -869,7 +869,7 @@ data_ov189_021b0905 kind:bss addr:0x021b0905 ambiguous
 data_ov189_021b0d03 kind:bss addr:0x021b0d03 ambiguous
 data_ov189_021b0fdc kind:bss addr:0x021b0fdc ambiguous
 data_ov189_021b26bc kind:bss addr:0x021b26bc ambiguous
-data_ov189_021b2840 kind:bss addr:0x021b2840
+data_ov189_021b2850 kind:bss addr:0x021b2850
 sGHTTPStartCount kind:bss addr:0x021b2860
 ghiProxyPort kind:bss addr:0x021b2868
 ghiProxyAddress kind:bss addr:0x021b286c
