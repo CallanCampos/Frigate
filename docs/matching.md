@@ -1362,6 +1362,12 @@ Same code, other `sp` offsets or frame size.
   them; MWCC won't convert between function pointer types that differ only in a parameter's `const`. NitroWiFi's
   `resolve_common` (`cps.c`) is the same with a string: through `const u8 *name` MWCC moves the first character's
   `ldrb` above the query's `strh` stores, and with `u8 *name`, as in Black 1's version, the load stays after them.
+- A cast of one operand to its own type keeps MWCC from merging two copies of an expression, and a cast of an array
+  to its own element type makes it compute an element's address again rather than reuse a hoisted base. Neither is
+  natural C; this project takes them only under the maintainer's 2026-10-25 ruling, with a comment: NitroWiFi's
+  `SOCLi_IsIPv4ValidDNSAddr` (`socl_misc.c`) computes `(my_ip ^ ip) & net_mask` twice through `(unsigned int)my_ip`,
+  and the DWC utility's `scanFirst` (`usbap.c`) recomputes the BSSID copy's destination through
+  `((DWCUtilUsbConnector *)scan->connectors + j)`.
 - A pointer cast, even to the type the pointer already has, stops MWCC from reassociating a sum under it: `p + 6 +
   count` read as `((const u8 *)(p + 6 + count))[0]` stays `adds r4, r0, #6; ldrb r4, [r4, r2]`, where without the
   cast MWCC adds `count` once and reads at offsets 6 to 9. `resolve_common`'s record reads match through
