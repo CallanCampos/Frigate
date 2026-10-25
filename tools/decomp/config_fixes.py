@@ -9,6 +9,7 @@ after importing names from swan.
 
     config_fixes.py reloc-module overlays/ov035 'overlay(12)' 0x0217c9e8    # an ambiguous destination module
     config_fixes.py overlay-id overlays/ov035 279 0x0217cbe4                 # a literal that is an overlay ID
+    config_fixes.py link-time-const . SDK_AUTOLOAD_LIST 0x02004fb0          # a word of a linker script's symbol
     config_fixes.py remove-reloc overlays/ov035 0x0217f540                   # a relocation that is not one
     config_fixes.py remove-orphan-reloc overlays/ov011 --source-module . 0x020050c4  # filed in the wrong module
     config_fixes.py reloc-addend overlays/ov036 2 0x021841e8                 # a relocation to inside an object
@@ -347,6 +348,17 @@ def plan_fix(version: str, module: str, addr: int, action: str, argument: str):
         else:
             position = next((i for i, l in enumerate(lines) if int(RELOC_RE.match(l).group(1), 16) > addr), len(lines))
             lines.insert(position, line)
+    elif action == "link_time_const":
+        # A word that holds a symbol that dsd's linker script defines, such as crt0's module parameters, which NitroSDK's
+        # linker script gives: dsd took it for a pointer to whatever is at the address, or for a plain word
+        line = f"from:{addr:#010x} kind:link_time_const({argument})"
+        if index is not None:
+            if lines[index] == line:
+                return
+            lines[index] = line
+        else:
+            position = next((i for i, l in enumerate(lines) if int(RELOC_RE.match(l).group(1), 16) > addr), len(lines))
+            lines.insert(position, line)
     elif action == "add_reloc":
         # A pointer that dsd left as a plain word, such as one into an overlay that is not loaded with this module, or a
         # code address with no symbol. Unrelocated, it keeps its address when the code before its target grows
@@ -466,6 +478,10 @@ def main():
     command.add_argument("module")
     command.add_argument("overlay", type=int)
     command.add_argument("addresses", nargs="+")
+    command = commands.add_parser("link-time-const", help="point words at a symbol of dsd's linker script")
+    command.add_argument("module")
+    command.add_argument("symbol", help="the symbol, e.g. SDK_AUTOLOAD_LIST (dsd's LinkTimeConst names)")
+    command.add_argument("addresses", nargs="+")
     command = commands.add_parser("remove-reloc", help="remove relocations")
     command.add_argument("module")
     command.add_argument("addresses", nargs="+")
@@ -545,6 +561,7 @@ def main():
 
     action = args.command.replace("-", "_")
     argument = {"reloc_module": getattr(args, "destination", ""), "overlay_id": str(getattr(args, "overlay", "")),
+                "link_time_const": getattr(args, "symbol", ""),
                 "remove_orphan_reloc": getattr(args, "source_module", ""),
                 "reloc_addend": getattr(args, "addend", ""), "add_label": getattr(args, "name", ""),
                 "remove_label": getattr(args, "name", ""), "add_data": getattr(args, "name", ""),

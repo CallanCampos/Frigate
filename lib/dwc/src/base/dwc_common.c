@@ -6,6 +6,9 @@
 // and dwc_nastime.o, and libdwcmatch's dwc_common.o, dwc_friend.o and dwc_login.o, in this order and with the same
 // functions, and each file's .data and .bss follow in the same order.
 
+#include <string.h>
+// Before dwc/ext.h, as in ntrtwl's NitroDWC: only with <string.h>'s declarations does DWC_GetCommonValueString add
+// the key's length to the pointer in the ROM's order
 #include "dwc/common.h"
 #include "dwc/ext.h"
 #include "nitro/math.h"

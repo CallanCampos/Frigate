@@ -10,42 +10,42 @@ src/ov182/dwc_raputil.c:
     .rodata     start:0x021bd30c end:0x021bd324
     .data       start:0x021c0600 end:0x021c0610
 
-lib/dwcutil/src/dwc_wcm.c:
+lib/dwcutil/src/apc.c:
     complete
     .text       start:0x021a723c end:0x021a7898
     .bss        start:0x021c2ae0 end:0x021c2b30
 
-lib/dwcutil/src/dwc_aoss.c:
+lib/dwcutil/src/aoss.c:
     complete
     .text       start:0x021a4a10 end:0x021a6c5c
     .rodata     start:0x021bd324 end:0x021bd328
     .data       start:0x021c0610 end:0x021c0688
     .bss        start:0x021c1ba0 end:0x021c2980
 
-lib/dwcutil/src/dwc_aoss_ap.c:
+lib/dwcutil/src/aosslink.c:
     .text       start:0x021a6c5c end:0x021a723c
     .data       start:0x021c0688 end:0x021c06b8
     .bss        start:0x021c2980 end:0x021c2ae0
 
-lib/dwcutil/src/dwcutil_ac.c:
+lib/dwcutil/src/atermset.c:
     .text       start:0x021a7898 end:0x021ab080
     .rodata     start:0x021bd328 end:0x021bfb58
     .data       start:0x021c06b8 end:0x021c0780
     .bss        start:0x021c2b30 end:0x021c4064
 
-lib/dwcutilui/src/dwc_util_screen.c:
+lib/dwcutilui/src/comment.c:
     complete
     .text       start:0x021ab5c8 end:0x021ab67c
     .data       start:0x021c0780 end:0x021c0794
     .bss        start:0x021c406c end:0x021c4070
 
-lib/dwcutilui/src/dwc_util_ui_effect.c:
+lib/dwcutilui/src/anime.c:
     complete
     .text       start:0x021ab080 end:0x021ab1bc
     .rodata     start:0x021bfb58 end:0x021bfb64
     .bss        start:0x021c4064 end:0x021c4068
 
-lib/dwcutilui/src/dwc_util_ui_object.c:
+lib/dwcutilui/src/button.c:
     complete
     .text       start:0x021ab1bc end:0x021ab5c8
     .rodata     start:0x021bfb64 end:0x021bfb94
@@ -62,385 +62,423 @@ lib/dwcutil/src/dwc_mov_wh.c:
     .data       start:0x021c17b0 end:0x021c1b18
     .bss        start:0x021c41c0 end:0x021c41c8
 
-src/ov182/download_play_sys.c:
+lib/dwcutil/src/dwc_moveid.c:
     complete
     .text       start:0x021ba7a8 end:0x021bb1cc
     .bss        start:0x021c41c8 end:0x021c41cc
-lib/dwcutilui/src/dwc_util_rom_resource.c:
+
+lib/dwcutilui/src/archive.c:
     complete
     .text       start:0x021bb1cc end:0x021bb4c0
     .rodata     start:0x021c05c0 end:0x021c05c4
     .data       start:0x021c1b18 end:0x021c1b44
     .bss        start:0x021c41cc end:0x021c41d0
 
-lib/dwcutilui/src/dwc_util_oam.c:
+lib/dwcutilui/src/cell.c:
     complete
     .text       start:0x021bb4c0 end:0x021bb91c
     .bss        start:0x021c41d0 end:0x021c41d4
 
-lib/dwcutilui/src/dwc_util_cell.c:
+lib/dwcutilui/src/cellinfo.c:
     complete
-    .text       start:0x021bb91c end:0x021bbaac
+    .text       start:0x021bb91c end:0x021bb9ec
     .bss        start:0x021c41d4 end:0x021c41dc
 
-lib/dwcutilui/src/dwc_util_display.c:
+lib/dwcutilui/src/foundation.c:
     complete
-    .text       start:0x021bc1e8 end:0x021bc4a8
+    .text       start:0x021bc1e8 end:0x021bc21c
 
-lib/dwcutilui/src/dwc_util_heap.c:
+lib/dwcutilui/src/heap.c:
     complete
     .text       start:0x021bc4a8 end:0x021bc584
     .bss        start:0x021c41e4 end:0x021c41e8
 
-lib/dwcutilui/src/dwc_util_fade.c:
+lib/dwcutilui/src/effect.c:
     complete
     .text       start:0x021bbaac end:0x021bbc90
     .rodata     start:0x021c05c4 end:0x021c05d0
     .bss        start:0x021c41dc end:0x021c41e0
 
-lib/dwcutilui/src/dwc_util_text.c:
+lib/dwcutilui/src/font.c:
     complete
     .text       start:0x021bbc90 end:0x021bc1e8
     .rodata     start:0x021c05d0 end:0x021c05dc
     .data       start:0x021c1b44 end:0x021c1ba0
     .bss        start:0x021c41e0 end:0x021c41e4
 
-lib/dwcutilui/src/dwc_util_touch.c:
+lib/dwcutilui/src/input.c:
     complete
     .text       start:0x021bc584 end:0x021bcaec
     .bss        start:0x021c41e8 end:0x021c4200
 
-lib/dwcutilui/src/dwc_util_irq.c:
+lib/dwcutilui/src/interrupt.c:
     complete
     .text       start:0x021bcaec end:0x021bcb7c
     .bss        start:0x021c4200 end:0x021c4208
 
-lib/dwcutilui/src/dwc_util_list.c:
+lib/dwcutilui/src/list.c:
     complete
     .text       start:0x021bcb7c end:0x021bcc08
 
-lib/dwcutilui/src/dwc_util_oam_buf.c:
+lib/dwcutilui/src/obj.c:
     complete
     .text       start:0x021bcc08 end:0x021bcd2c
     .bss        start:0x021c4208 end:0x021c420c
 
-lib/dwcutilui/src/dwc_util_vram_alloc.c:
+lib/dwcutilui/src/objvram.c:
     complete
     .text       start:0x021bcd2c end:0x021bcf38
     .bss        start:0x021c420c end:0x021c4210
 
-lib/dwcutilui/src/dwc_util_string.c:
+lib/dwcutilui/src/str.c:
     complete
     .text       start:0x021bcf38 end:0x021bcf78
 
-lib/dwcutilui/src/dwc_util_bank.c:
+lib/dwcutilui/src/sub.c:
     complete
     .text       start:0x021bcf78 end:0x021bd114
     .bss        start:0x021c4210 end:0x021c4244
 
-lib/dwcutilui/src/dwc_util_task.c:
+lib/dwcutilui/src/task.c:
     complete
     .text       start:0x021bd114 end:0x021bd30c
     .rodata     start:0x021c05e4 end:0x021c05e8
     .bss        start:0x021c4244 end:0x021c4260
 
-lib/dwcutilui/src/dwc_util_gfx_resource.c:
+lib/dwcutilui/src/common.c:
     complete
     .text       start:0x021ab67c end:0x021ab808
     .rodata     start:0x021bfb94 end:0x021bfbe4
     .bss        start:0x021c4070 end:0x021c40b0
 
-lib/dwcutilui/src/dwc_util_button_sprites.c:
+lib/dwcutilui/src/focus.c:
     complete
     .text       start:0x021ab808 end:0x021ab94c
     .rodata     start:0x021bfbe4 end:0x021bfbf0
     .bss        start:0x021c40b0 end:0x021c40b4
 
-lib/dwcutilui/src/dwc_util_bg_overlay.c:
+lib/dwcutilui/src/headline.c:
     complete
     .text       start:0x021ab94c end:0x021aba3c
     .data       start:0x021c0794 end:0x021c09c8
     .bss        start:0x021c40b4 end:0x021c40b8
 
-lib/dwcutilui/src/dwc_util_link_icon.c:
+lib/dwcutilui/src/icon.c:
     complete
     .text       start:0x021aba3c end:0x021abb50
     .rodata     start:0x021bfbf0 end:0x021bfbf8
     .bss        start:0x021c40b8 end:0x021c40bc
 
-lib/dwcutilui/src/dwc_util_keyboard.c:
+lib/dwcutilui/src/keyboard.c:
     complete
     .text       start:0x021abb50 end:0x021acdc0
     .rodata     start:0x021bfbf8 end:0x021bfebc
     .data       start:0x021c09c8 end:0x021c0bac
     .bss        start:0x021c40bc end:0x021c40c0
 
-lib/dwcutilui/src/dwc_util_menu.c:
+lib/dwcutilui/src/keyboard10.c:
     complete
     .text       start:0x021acdc0 end:0x021adad4
     .rodata     start:0x021bfebc end:0x021bffc8
     .bss        start:0x021c40c0 end:0x021c40c4
 
-lib/dwcutilui/src/dwc_util_aoss_session.c:
+lib/dwcutilui/src/libaoss.c:
     complete
     .text       start:0x021adad4 end:0x021adc00
     .rodata     start:0x021bffc8 end:0x021bffd4
     .bss        start:0x021c40c4 end:0x021c40cc
 
-lib/dwcutilui/src/dwc_util_main.c:
+lib/dwcutilui/src/main.c:
     complete
     .text       start:0x021adc00 end:0x021ae0c4
     .data       start:0x021c0bac end:0x021c0bcc
     .bss        start:0x021c40cc end:0x021c40ec
 
-lib/dwcutilui/src/dwc_util_msg_resource.c:
+lib/dwcutilui/src/message.c:
     complete
     .text       start:0x021ae0c4 end:0x021ae174
     .bss        start:0x021c40ec end:0x021c40f0
 
-lib/dwcutilui/src/dwc_util_move.c:
+lib/dwcutilui/src/move.c:
     complete
     .text       start:0x021ae174 end:0x021ae418
     .data       start:0x021c0bcc end:0x021c0c2c
     .bss        start:0x021c40f0 end:0x021c40f4
 
-lib/dwcutilui/src/dwc_util_connection.c:
+lib/dwcutilui/src/rakuraku.c:
     complete
     .text       start:0x021ae418 end:0x021ae534
-    .bss        start:0x021c40f4 end:0x021c40fc
+    .bss        start:0x021c40f4 end:0x021c40f8
 
-lib/dwcutilui/src/dwc_util_main_menu.c:
-    .text       start:0x021ae534 end:0x021aeb3c
+lib/dwcutilui/src/scenemenu.c:
+    complete
+    .text       start:0x021ae788 end:0x021aeb3c
     .rodata     start:0x021bffd4 end:0x021c0010
-    .data       start:0x021c0c2c end:0x021c0e14
+    .data       start:0x021c0dd0 end:0x021c0e14
     .bss        start:0x021c40fc end:0x021c4104
 
-lib/dwcutilui/src/dwc_util_info_menu.c:
+lib/dwcutilui/src/sceneopterase.c:
     complete
-    .text       start:0x021aeb3c end:0x021af29c
-    .data       start:0x021c0e14 end:0x021c0e98
+    .text       start:0x021aeb3c end:0x021aedf0
+    .data       start:0x021c0e14 end:0x021c0e28
     .bss        start:0x021c4104 end:0x021c4108
 
-lib/dwcutilui/src/dwc_util_option_menu.c:
+lib/dwcutilui/src/sceneoptmenu.c:
     complete
     .text       start:0x021af29c end:0x021af754
     .rodata     start:0x021c0010 end:0x021c0078
     .data       start:0x021c0e98 end:0x021c0ec8
     .bss        start:0x021c4108 end:0x021c4114
 
-lib/dwcutilui/src/dwc_util_top_menu.c:
+lib/dwcutilui/src/sceneoptmovcomm.c:
     complete
-    .text       start:0x021af754 end:0x021afbe4
+    .text       start:0x021af754 end:0x021af8fc
     .data       start:0x021c0ec8 end:0x021c0edc
     .bss        start:0x021c4114 end:0x021c4118
 
-lib/dwcutilui/src/dwc_util_prompt_yes_no.c:
+lib/dwcutilui/src/sceneoptmovconfirm1.c:
     complete
     .text       start:0x021afbe4 end:0x021afe2c
     .data       start:0x021c0edc end:0x021c0ef0
     .bss        start:0x021c4118 end:0x021c411c
 
-lib/dwcutilui/src/dwc_util_timed_notice.c:
+lib/dwcutilui/src/sceneoptmovdisconnect.c:
     complete
     .text       start:0x021afe2c end:0x021aff7c
     .data       start:0x021c0ef0 end:0x021c0f04
     .bss        start:0x021c411c end:0x021c4120
 
-lib/dwcutilui/src/dwc_util_notice_screen.c:
+lib/dwcutilui/src/sceneoptmovfailure.c:
     complete
     .text       start:0x021aff7c end:0x021b01d8
     .data       start:0x021c0f04 end:0x021c0f18
     .bss        start:0x021c4120 end:0x021c4124
 
-lib/dwcutilui/src/dwc_util_page_move.c:
+lib/dwcutilui/src/sceneoptmovuser.c:
     complete
     .text       start:0x021b01d8 end:0x021b0460
     .data       start:0x021c0f18 end:0x021c0f2c
     .bss        start:0x021c4124 end:0x021c4128
 
-lib/dwcutilui/src/dwc_util_page_multi5.c:
+lib/dwcutilui/src/sceneoptmovwait.c:
     complete
     .text       start:0x021b0460 end:0x021b0718
     .data       start:0x021c0f2c end:0x021c0f40
     .bss        start:0x021c4128 end:0x021c412c
 
-lib/dwcutilui/src/dwc_util_page_step3.c:
+lib/dwcutilui/src/scenesetaossbutton.c:
     complete
     .text       start:0x021b0718 end:0x021b0b10
     .data       start:0x021c0f40 end:0x021c0f84
     .bss        start:0x021c412c end:0x021c4134
 
-lib/dwcutilui/src/dwc_util_page_multi4.c:
+lib/dwcutilui/src/scenesetaosscomplete.c:
     complete
     .text       start:0x021b0b10 end:0x021b0c68
     .data       start:0x021c0f84 end:0x021c0f98
     .bss        start:0x021c4134 end:0x021c4138
 
-lib/dwcutilui/src/dwc_util_page_ap_list.c:
+lib/dwcutilui/src/scenesetaplist.c:
     complete
     .text       start:0x021b0c68 end:0x021b1a34
     .rodata     start:0x021c0078 end:0x021c0108
     .data       start:0x021c0f98 end:0x021c0fb0
     .bss        start:0x021c4138 end:0x021c4140
 
-lib/dwcutilui/src/dwc_util_wep_keyboard.c:
+lib/dwcutilui/src/scenesetedit32.c:
     complete
     .text       start:0x021b1a34 end:0x021b2160
     .rodata     start:0x021c0108 end:0x021c012c
     .data       start:0x021c0fb0 end:0x021c1028
     .bss        start:0x021c4140 end:0x021c4144
 
-lib/dwcutilui/src/dwc_util_address_edit.c:
+lib/dwcutilui/src/sceneseteditaddress.c:
     complete
     .text       start:0x021b2160 end:0x021b297c
     .rodata     start:0x021c012c end:0x021c0150
     .data       start:0x021c1028 end:0x021c10c8
     .bss        start:0x021c4144 end:0x021c4148
 
-lib/dwcutilui/src/dwc_util_error.c:
+lib/dwcutilui/src/sceneseterror.c:
     complete
     .text       start:0x021b297c end:0x021b2d88
     .rodata     start:0x021c0150 end:0x021c017c
     .data       start:0x021c10c8 end:0x021c10e0
     .bss        start:0x021c4148 end:0x021c414c
 
-lib/dwcutilui/src/dwc_util_address_settings.c:
+lib/dwcutilui/src/scenesetlist.c:
     complete
     .text       start:0x021b2d88 end:0x021b4444
     .rodata     start:0x021c017c end:0x021c0280
     .data       start:0x021c10e0 end:0x021c1160
     .bss        start:0x021c414c end:0x021c4158
 
-lib/dwcutilui/src/dwc_util_save_settings.c:
+lib/dwcutilui/src/scenesetlistsave.c:
     complete
     .text       start:0x021b4444 end:0x021b45c8
     .data       start:0x021c1160 end:0x021c11a4
 
-lib/dwcutilui/src/dwc_util_test_progress.c:
+lib/dwcutilui/src/scenesetrakubutton.c:
     complete
     .text       start:0x021b45c8 end:0x021b48a4
     .data       start:0x021c11a4 end:0x021c11b8
     .bss        start:0x021c4158 end:0x021c415c
 
-lib/dwcutilui/src/dwc_util_test_connect.c:
+lib/dwcutilui/src/scenesetrakubutton1.c:
     complete
     .text       start:0x021b48a4 end:0x021b4ba8
     .data       start:0x021c11b8 end:0x021c11cc
     .bss        start:0x021c415c end:0x021c4160
 
-lib/dwcutilui/src/dwc_util_test_done.c:
+lib/dwcutilui/src/scenesetrakucomplete.c:
     complete
     .text       start:0x021b4ba8 end:0x021b4d08
     .data       start:0x021c11cc end:0x021c11e0
     .bss        start:0x021c4160 end:0x021c4164
 
-lib/dwcutilui/src/dwc_util_test_start.c:
+lib/dwcutilui/src/scenesetrakuready.c:
     complete
     .text       start:0x021b4d08 end:0x021b5040
     .data       start:0x021c11e0 end:0x021c1224
     .bss        start:0x021c4164 end:0x021c4168
 
-lib/dwcutilui/src/dwc_util_ap_search.c:
+lib/dwcutilui/src/scenesetsearch.c:
     complete
     .text       start:0x021b5040 end:0x021b53ac
     .data       start:0x021c1224 end:0x021c1268
     .bss        start:0x021c4168 end:0x021c416c
 
-lib/dwcutilui/src/dwc_util_screen_ap.c:
+lib/dwcutilui/src/scenesetselectap.c:
     complete
     .text       start:0x021b53ac end:0x021b5bf8
     .rodata     start:0x021c0280 end:0x021c0334
     .data       start:0x021c1268 end:0x021c12d8
     .bss        start:0x021c416c end:0x021c4174
 
-lib/dwcutilui/src/dwc_util_screen_way.c:
+lib/dwcutilui/src/scenesetselectway.c:
     complete
     .text       start:0x021b5bf8 end:0x021b6144
     .rodata     start:0x021c0334 end:0x021c03f8
     .data       start:0x021c12d8 end:0x021c131c
     .bss        start:0x021c4174 end:0x021c417c
 
-lib/dwcutilui/src/dwc_util_auto_connect.c:
+lib/dwcutilui/src/scenesettest.c:
     complete
     .text       start:0x021b6144 end:0x021b641c
     .rodata     start:0x021c03f8 end:0x021c040c
     .data       start:0x021c131c end:0x021c1360
     .bss        start:0x021c417c end:0x021c4180
 
-lib/dwcutilui/src/dwc_util_auto_connect_ok.c:
+lib/dwcutilui/src/scenesettestcomp.c:
     complete
     .text       start:0x021b641c end:0x021b65c8
     .data       start:0x021c1360 end:0x021c1374
     .bss        start:0x021c4180 end:0x021c4184
 
-lib/dwcutilui/src/dwc_util_auto_connect_intro.c:
+lib/dwcutilui/src/scenesettestconfirm.c:
     complete
     .text       start:0x021b65c8 end:0x021b6768
     .rodata     start:0x021c040c end:0x021c0418
     .data       start:0x021c1374 end:0x021c1388
 
-lib/dwcutilui/src/dwc_util_usb_done.c:
+lib/dwcutilui/src/scenesetusbcomplete.c:
     complete
     .text       start:0x021b6768 end:0x021b68cc
     .data       start:0x021c1388 end:0x021c139c
     .bss        start:0x021c4184 end:0x021c4188
 
-lib/dwcutilui/src/dwc_util_usb_intro.c:
+lib/dwcutilui/src/scenesetusbready.c:
     complete
     .text       start:0x021b68cc end:0x021b6b40
     .data       start:0x021c139c end:0x021c13e0
     .bss        start:0x021c4188 end:0x021c418c
 
-lib/dwcutilui/src/dwc_util_usb_setup.c:
+lib/dwcutilui/src/scenesetusbready1.c:
     complete
     .text       start:0x021b6b40 end:0x021b6f78
     .data       start:0x021c13e0 end:0x021c1424
     .bss        start:0x021c418c end:0x021c4190
 
-lib/dwcutilui/src/dwc_util_bg_buffer.c:
+lib/dwcutilui/src/screen.c:
     complete
     .text       start:0x021b6f78 end:0x021b70e0
     .bss        start:0x021c4190 end:0x021c419c
 
-lib/dwcutilui/src/dwc_util_scrollbar.c:
+lib/dwcutilui/src/scrollbar.c:
     complete
     .text       start:0x021b70e0 end:0x021b7514
     .rodata     start:0x021c0418 end:0x021c0420
     .bss        start:0x021c419c end:0x021c41a0
 
-lib/dwcutilui/src/dwc_util_ap_scan.c:
+lib/dwcutilui/src/search.c:
     complete
     .text       start:0x021b7514 end:0x021b781c
     .rodata     start:0x021c0420 end:0x021c0470
     .bss        start:0x021c41a0 end:0x021c41a4
 
-lib/dwcutilui/src/dwc_util_wifi_settings.c:
+lib/dwcutilui/src/setting.c:
     complete
     .text       start:0x021b781c end:0x021b8090
     .rodata     start:0x021c0470 end:0x021c0474
     .data       start:0x021c1424 end:0x021c1434
     .bss        start:0x021c41a4 end:0x021c41a8
 
-lib/dwcutilui/src/dwc_util_sound.c:
+lib/dwcutilui/src/sound.c:
     complete
     .text       start:0x021b8090 end:0x021b8194
     .data       start:0x021c1434 end:0x021c144c
     .bss        start:0x021c41a8 end:0x021c41ac
 
-lib/dwcutilui/src/dwc_util_sub_screen.c:
+lib/dwcutilui/src/step.c:
     complete
     .text       start:0x021b8194 end:0x021b8874
     .rodata     start:0x021c0474 end:0x021c04a8
     .data       start:0x021c144c end:0x021c14c4
     .bss        start:0x021c41ac end:0x021c41b4
 
-lib/dwcutilui/src/dwc_util_usb_scan.c:
+lib/dwcutilui/src/usbap.c:
     .text       start:0x021b8874 end:0x021b8d30
     .rodata     start:0x021c04a8 end:0x021c04fc
     .bss        start:0x021c41b4 end:0x021c41b8
 
-lib/dwcutilui/src/dwc_util_dialog.c:
+lib/dwcutilui/src/window.c:
     complete
     .text       start:0x021b8d30 end:0x021b9428
     .rodata     start:0x021c04fc end:0x021c05c0
     .bss        start:0x021c41b8 end:0x021c41bc
+
+lib/dwcutilui/src/deque.c:
+    complete
+    .text       start:0x021bb9ec end:0x021bbaac
+
+lib/dwcutilui/src/graphics.c:
+    complete
+    .text       start:0x021bc21c end:0x021bc4a8
+
+lib/dwcutilui/src/sceneend.c:
+    complete
+    .text       start:0x021ae534 end:0x021ae5b4
+
+lib/dwcutilui/src/sceneinit.c:
+    complete
+    .text       start:0x021ae5b4 end:0x021ae788
+    .data       start:0x021c0c2c end:0x021c0dd0
+    .bss        start:0x021c40f8 end:0x021c40fc
+
+lib/dwcutilui/src/sceneopterase1.c:
+    complete
+    .text       start:0x021aedf0 end:0x021aef74
+    .data       start:0x021c0e28 end:0x021c0e3c
+
+lib/dwcutilui/src/sceneoptinfo.c:
+    complete
+    .text       start:0x021aef74 end:0x021af29c
+    .data       start:0x021c0e3c end:0x021c0e98
+
+lib/dwcutilui/src/sceneoptmovcomplete.c:
+    complete
+    .text       start:0x021af8fc end:0x021afa68
+
+lib/dwcutilui/src/sceneoptmovconfirm.c:
+    complete
+    .text       start:0x021afa68 end:0x021afbe4

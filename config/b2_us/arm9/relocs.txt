@@ -31,10 +31,14 @@ from:0x02004cd4 kind:arm_call to:0x02004f20 module:main
 from:0x02004d44 kind:load to:0x02fe0000 module:dtcm
 from:0x02004d98 kind:load to:0x02fe0000 module:dtcm
 from:0x02004dec kind:load to:0x02fe0000 module:dtcm
-from:0x02004fb0 kind:load to:0x0209e278 add:0x948 module:main
-from:0x02004fb4 kind:load to:0x0209e278 add:0x988 module:main
-from:0x02004fb8 kind:load to:0x0209d740 module:main
-from:0x02004fbc kind:load to:0x0209d740 module:main
+from:0x02004f7c kind:link_time_const(SDK_LTDAUTOLOAD_LIST)
+from:0x02004f80 kind:link_time_const(SDK_LTDAUTOLOAD_LIST_END)
+from:0x02004f84 kind:link_time_const(SDK_LTDAUTOLOAD_START)
+from:0x02004fb0 kind:link_time_const(SDK_AUTOLOAD_LIST)
+from:0x02004fb4 kind:link_time_const(SDK_AUTOLOAD_LIST_END)
+from:0x02004fb8 kind:link_time_const(SDK_AUTOLOAD_START)
+from:0x02004fbc kind:link_time_const(SDK_STATIC_BSS_START)
+from:0x02004fc0 kind:link_time_const(SDK_STATIC_BSS_END)
 from:0x02005126 kind:thumb_call to:0x02005364 module:main
 from:0x0200512a kind:thumb_call to:0x020054b8 module:main
 from:0x02005132 kind:thumb_call to:0x02079d20 module:main

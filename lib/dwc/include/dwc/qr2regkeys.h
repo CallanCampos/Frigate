@@ -10,6 +10,11 @@
 
 extern const char *qr2_registered_key_list[MAX_REGISTERED_KEYS];
 
+// Keep and free the key names that qr2_register_keyW allocates. Reconstructed from GameSpy's SDK (UniSpySDK's copy):
+// the original link dead-stripped both (config/deadstrip.toml)
+void qr2_internal_key_list_append(char *theKey);
+void qr2_internal_key_list_free(void);
+
 // Whether a key's name is one that only the master server gives, the country's or the region's
 gsi_bool qr2_internal_is_master_only_key(const char *key);
 void qr2_register_keyA(int keyid, const char *key);

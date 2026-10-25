@@ -28,10 +28,12 @@ static BOOL SOCLi_IsIPv4ValidDNSAddr(u32 net_mask, u32 ip, u32 my_ip) {
 
     if (ip != 0xffffffff && ip != 0 && my_ip != ip) {
         if (((my_ip ^ ip) & net_mask) != 0 || (ip & ~net_mask) != 0) {
-            BOOL unicast = TRUE;
+            BOOL unicast;
 
-            if (((my_ip ^ ip) & net_mask) == 0 && (ip & ~net_mask) == ~net_mask) {
+            if (((my_ip ^ ip) & net_mask) == 0 && ((ip & ~net_mask) ^ ~net_mask) == 0) {
                 unicast = FALSE;
+            } else {
+                unicast = TRUE;
             }
             if (unicast) {
                 ok = TRUE;

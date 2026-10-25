@@ -44,4 +44,4 @@ The answer or the change first, in a few lines. Then the evidence, then open que
 - `f32 zero` kept a 0.0 in a register for a later argument (building_enter_effect.c): not acceptable; the row stays.
 - Four of fx_vec.c's functions matched only once their square sums were built with `+=`.
 - `vct_init_packet_buffer` matched with `(base + count - 1)->free`, a pointer sum that folds the `- 1`.
-- `dwc_util_ui_object.c` matched 15 of 15 only under the game's compiler and flags, not DWC's 2.0.
+- The DWC utility's `button.c` (lib/dwcutilui) matched 15 of 15 only under the game's compiler and flags, not DWC's 2.0.

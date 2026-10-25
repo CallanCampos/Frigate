@@ -43,10 +43,12 @@ typedef struct {
     s32 RecvResult;
     s32 RecvOffset;
     BOOL RecvDone;
+    // The connection's SSL state. As the last member it sets the struct's size, under which POKE_NET_Connecting
+    // loads ServerPort and ServerAddr above its stores
+    CPSSslConnection SslConnection;
 } POKE_NET_CONTROL;
 
 // The compiler lays these out from the last to the first: the stacks come first in the ROM
-static CPSSslConnection sPOKE_NET_SslConnection;
 static POKE_NET_CONTROL gPOKE_NET_Control;
 static u8 sPOKE_NET_RecvThreadStack[POKE_NET_THREAD_STACK_SIZE];
 static u8 sPOKE_NET_ThreadStack[POKE_NET_THREAD_STACK_SIZE];
@@ -429,8 +431,8 @@ BOOL POKE_NET_Setup(void) {
         return FALSE;
     }
     gPOKE_NET_Control.ServerAddr = POKE_NET_Swap32(CPS_Resolve(address));
-    POKE_NET_SSL_StartConnection(gPOKE_NET_Control.ServerURL, &sPOKE_NET_SslConnection);
-    if (SOCL_EnableSsl(gPOKE_NET_Control.Socket, &sPOKE_NET_SslConnection) < 0) {
+    POKE_NET_SSL_StartConnection(gPOKE_NET_Control.ServerURL, &gPOKE_NET_Control.SslConnection);
+    if (SOCL_EnableSsl(gPOKE_NET_Control.Socket, &gPOKE_NET_Control.SslConnection) < 0) {
         gPOKE_NET_Control.LastErrorCode = POKE_NET_GDS_LASTERROR_SSL;
         return FALSE;
     }
@@ -444,7 +446,7 @@ void POKE_NET_CloseSocket(void) {
     SOC_Shutdown(gPOKE_NET_Control.Socket, SOC_SHUT_RDWR);
     SOC_Close(gPOKE_NET_Control.Socket);
     gPOKE_NET_Control.Socket = -1;
-    POKE_NET_SSL_EndConnection(&sPOKE_NET_SslConnection);
+    POKE_NET_SSL_EndConnection(&gPOKE_NET_Control.SslConnection);
 }
 
 BOOL POKE_NET_Connecting(void) {
@@ -453,8 +455,8 @@ BOOL POKE_NET_Connecting(void) {
     int result;
 
     address.len = sizeof(SOCSockAddrIn);
-    address.port = POKE_NET_Swap16(gPOKE_NET_Control.ServerPort);
     address.family = SOC_AF_INET;
+    address.port = POKE_NET_Swap16(gPOKE_NET_Control.ServerPort);
     address.addr.addr = gPOKE_NET_Control.ServerAddr;
     start = POKE_NET_GetTime();
 

@@ -21,7 +21,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
-from configure import (GENERATED_INCLUDE_DIR, INCLUDE_DIRS, ROM_BLOBS, TEXT_ARCHIVES,  # noqa: E402
+from configure import (GENERATED_INCLUDE_DIR, INCLUDE_DIRS, ROM_BLOBS, ROM_RANGES, TEXT_ARCHIVES,  # noqa: E402
                        VERSIONS, download_tools, source_assembler, source_compiler, mwcc_command)
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from tools.build import deadstrip, rom_blob  # noqa: E402
@@ -47,7 +47,9 @@ def compile_file(source: Path, version: str, out_dir: Path) -> CompileResult:
     if source.suffix == ".s":
         compiler, flags = source_assembler(source)
         command = [*mwcc_command(TOOLS / "mwccarm" / compiler / "mwasmarm.exe"),
-                   *(arg for flag in flags for arg in shlex.split(flag)), "-o", str(obj), str(source)]
+                   *(arg for flag in flags for arg in shlex.split(flag)),
+                   *(arg for define in VERSIONS[version]["defines"] for arg in ("-d", define)),
+                   *(arg for d in INCLUDE_DIRS for arg in ("-i", d)), "-o", str(obj), str(source)]
         proc = subprocess.run(command, cwd=ROOT, capture_output=True, text=True)
         return CompileResult(source, version, proc.returncode, proc.stdout, proc.stderr)
     settings = source_compiler(source)
@@ -99,8 +101,8 @@ def write_header(header: Path, text: str):
 
 def generate_constants():
     """Writes the headers that ninja generates, since the sources include them: the constants of generated/,
-    each message file's message IDs, the easy chat words, the embedded binaries and the overlay digests, which are
-    zeros without an extracted ROM."""
+    each message file's message IDs, the easy chat words, the embedded binaries, each version's ROM ranges and the
+    overlay digests, which are zeros without an extracted ROM."""
     out_dir = ROOT / GENERATED_INCLUDE_DIR
     for source in sorted((ROOT / "generated").glob("*.txt")):
         write_header(out_dir / "constants" / source.with_suffix(".h").name, generate(source))
@@ -118,6 +120,15 @@ def generate_constants():
         data = rom_blob.blob(ROOT / "extract" / version / module,
                              ROOT / "config" / version / "arm9" / config_dir / "symbols.txt", name, allow_missing=True)
         write_header(out_dir / include, rom_blob.initializer(data))
+    for include, (module, start, end, macro) in ROM_RANGES.items():
+        # Each version's from its own extracted ROM, or zeros
+        for version in VERSIONS:
+            output = out_dir / include.format(version=version)
+            extracted = ROOT / "extract" / version / module
+            if not extracted.exists() and output.exists():
+                continue
+            data = rom_blob.module_bytes(extracted, start, end - start, allow_missing=True)
+            write_header(output, rom_blob.range_macro(data, macro))
 
 
 def main():
