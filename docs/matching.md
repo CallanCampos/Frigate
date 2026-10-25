@@ -3581,7 +3581,11 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   retain their matches, apart from `POKE_NET_Connecting`'s documented scheduling difference. DWC's `dwc_encsession.c`
   includes it for its 20-byte secret: `DWCi_EncSessionCompleteCallback` copies it in place as the ROM does with
   `memcpy` into a `char` array, where a struct copy of a 20-byte struct gave the same loop with the source and
-  destination registers swapped, and its 0x20- and 0x28-byte `memcpy`s stay calls, as in the ROM.
+  destination registers swapped, and its 0x20- and 0x28-byte `memcpy`s stay calls, as in the ROM. A function with no
+  string copy at all can need it: DWC's `DWCi_Netcheck_Thread` (`dwc_conntest.c`) hoists the work's field offsets and
+  its -3, -4 and -5 into stack slots at entry, in the ROM's order and frame, and keeps a pointer across `strlen`, only
+  with `<string.h>` first, since only that `strlen` writes no memory; without it the thread was 8 bytes short, and the
+  `switch` forms of its error tests that its exits need looked 0x1c to 0x2c bytes too long.
 - In the same way, MWCC takes the `exit` that a header named `stdlib.h` declares for a function that doesn't return,
   and drops the code after a call of it: `gfl/heap.c`'s `GFL_HeapDumpOnFailure` calls `exit(1)` and goes on, and comes
   out 0x22 bytes against 0x3c with `<stdlib.h>`. It gets `exit` from `nitro/os.h` instead.

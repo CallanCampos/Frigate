@@ -1,3 +1,6 @@
+#include <string.h>
+// Before dwc/ext.h: MWCC treats strlen as writing no memory only when <string.h> declares it first, and only then
+// does the thread hoist the work's field offsets into stack slots and keep a pointer across strlen, as the ROM does
 #include "dwc/ac.h"
 #include "dwc/bm.h"
 #include "dwc/ext.h"
@@ -137,22 +140,22 @@ static void DWCi_Netcheck_StartThread(void) {
 }
 
 static void DWCi_Netcheck_Thread(void *arg) {
+    int status;
+    DWCWiFiInfo userInfo;
+    DWCAuthResult nasStatus;
     DWCAuthAlloc alloc = DWCi_ConnTestWork->param.alloc;
     DWCAuthFree free = DWCi_ConnTestWork->param.free;
-    char *url = NULL;
-    char *data = NULL;
-    char *waitText = NULL;
-    int waitMs;
-    int status;
-    int length;
-    int dataLength;
-    int waitLength;
-    int returnCode;
-    char returnText[4];
     char *location;
-    DWCWiFiInfo userInfo;
+    char returnText[4];
+    int returnCode;
+    char *url = NULL;
+    int length;
+    char *data = NULL;
+    int dataLength;
+    char *waitText = NULL;
+    int waitLength;
+    int waitMs;
     DWCCalInfo info;
-    DWCAuthResult nasStatus;
 
     for (;;) {
         DWCi_ConnTestConfig.url = sConnTest.url;
@@ -176,13 +179,12 @@ static void DWCi_Netcheck_Thread(void *arg) {
         if (DWCi_ConnTestHttp->thread.id != 0 && !OS_IsThreadTerminated(&DWCi_ConnTestHttp->thread)) {
             OS_JoinThread(&DWCi_ConnTestHttp->thread);
         }
-        if (DWCi_ConnTestHttp->error == 2) {
+        switch (DWCi_ConnTestHttp->error) {
+        case 8:
+            break;
+        case 2:
             DWCi_ConnTestWork->returncode = -1;
-            DWC_Http_Destroy(DWCi_ConnTestHttp);
-            DWCi_Netcheck_SetError(3);
-            goto done;
-        }
-        if (DWCi_ConnTestHttp->error != 8) {
+        default:
             DWC_Http_Destroy(DWCi_ConnTestHttp);
             DWCi_Netcheck_SetError(3);
             goto done;
@@ -197,9 +199,11 @@ static void DWCi_Netcheck_Thread(void *arg) {
             DWCi_Netcheck_SetError(2);
             goto done;
         }
-        if (status == 200) {
+        switch (status) {
+        case 200:
             DWCi_ConnTestIp = DWCi_ConnTestHttp->hostip;
-        } else if (status == 302) {
+            break;
+        case 302:
             DWCishotspot = 1;
             if (DWCi_ConnTestWork->body_wayport != NULL) {
                 DWCi_ConnTestWork->returncode = -6;
@@ -223,12 +227,8 @@ static void DWCi_Netcheck_Thread(void *arg) {
                     DWCi_Netcheck_SetError(8);
                     goto done;
                 }
-                if (DWC_Http_Add_PostBase64Item(DWCi_ConnTestHttp, "action", "message", 7) != 0) {
-                    DWC_Http_Destroy(DWCi_ConnTestHttp);
-                    DWCi_Netcheck_SetError(8);
-                    goto done;
-                }
-                if (DWC_Http_Add_PostBase64Item(DWCi_ConnTestHttp, "HotSpotResponse", DWCi_ConnTestWork->body_wayport,
+                if (DWC_Http_Add_PostBase64Item(DWCi_ConnTestHttp, "action", "message", 7) != 0 ||
+                    DWC_Http_Add_PostBase64Item(DWCi_ConnTestHttp, "HotSpotResponse", DWCi_ConnTestWork->body_wayport,
                                                 strlen(DWCi_ConnTestWork->body_wayport)) != 0) {
                     DWC_Http_Destroy(DWCi_ConnTestHttp);
                     DWCi_Netcheck_SetError(8);
@@ -245,32 +245,34 @@ static void DWCi_Netcheck_Thread(void *arg) {
                 if (DWCi_ConnTestHttp->thread.id != 0 && !OS_IsThreadTerminated(&DWCi_ConnTestHttp->thread)) {
                     OS_JoinThread(&DWCi_ConnTestHttp->thread);
                 }
-                if (DWCi_ConnTestHttp->error == 2) {
+                switch (DWCi_ConnTestHttp->error) {
+                case 2:
                     DWCi_ConnTestWork->returncode = -1;
-                } else if (DWCi_ConnTestHttp->error == 8) {
+                default:
+                    DWC_Http_Destroy(DWCi_ConnTestHttp);
+                    DWCi_Netcheck_SetError(3);
+                    goto done;
+                case 8:
                     DWC_Http_Destroy(DWCi_ConnTestHttp);
                     DWCi_Netcheck_SetError(7);
                     goto done;
                 }
-                DWC_Http_Destroy(DWCi_ConnTestHttp);
-                DWCi_Netcheck_SetError(3);
-                goto done;
-            } else {
-                location = DWCi_ConnTestHttp->rep.buffer;
-                if (location == NULL) {
-                    DWC_Http_Destroy(DWCi_ConnTestHttp);
-                    DWCi_Netcheck_SetError(2);
-                    goto done;
-                }
-                DWCi_ConnTestWork->body_302 = alloc(0, strlen(location) + 1);
-                if (DWCi_ConnTestWork->body_302 == NULL) {
-                    DWC_Http_Destroy(DWCi_ConnTestHttp);
-                    DWCi_Netcheck_SetError(4);
-                    goto done;
-                }
-                strncpy(DWCi_ConnTestWork->body_302, location, strlen(location) + 1);
             }
-        } else {
+            location = DWCi_ConnTestHttp->rep.buffer;
+            if (location == NULL) {
+                DWC_Http_Destroy(DWCi_ConnTestHttp);
+                DWCi_Netcheck_SetError(2);
+                goto done;
+            }
+            DWCi_ConnTestWork->body_302 = alloc(0, strlen(location) + 1);
+            if (DWCi_ConnTestWork->body_302 == NULL) {
+                DWC_Http_Destroy(DWCi_ConnTestHttp);
+                DWCi_Netcheck_SetError(4);
+                goto done;
+            }
+            strncpy(DWCi_ConnTestWork->body_302, location, strlen(location) + 1);
+            break;
+        default:
             DWC_Http_Destroy(DWCi_ConnTestHttp);
             DWCi_Netcheck_SetError(10);
             goto done;
@@ -290,7 +292,7 @@ static void DWCi_Netcheck_Thread(void *arg) {
             DWC_Auth_Join();
             if (DWC_Auth_GetError() != 0x15) {
                 if (DWC_Auth_GetError() == 9) {
-                    nasStatus.returncode = -1;
+                    DWCi_ConnTestWork->returncode = -1;
                 } else {
                     DWC_Auth_GetResult(&nasStatus);
                     if (DWCi_ConnTestAllow302 == 1 && (nasStatus.returncode == -23302 || DWC_Auth_GetError() == 0xb)) {
@@ -299,8 +301,8 @@ static void DWCi_Netcheck_Thread(void *arg) {
                         DWCi_Netcheck_SetError(0xb);
                         goto done;
                     }
+                    DWCi_ConnTestWork->returncode = nasStatus.returncode;
                 }
-                DWCi_ConnTestWork->returncode = nasStatus.returncode;
                 DWC_Auth_Destroy();
                 DWCi_Netcheck_SetError(6);
                 goto done;
@@ -327,13 +329,13 @@ static void DWCi_Netcheck_Thread(void *arg) {
             DWCi_Netcheck_SetError(1);
             goto done;
         }
-        if (!DWC_Auth_GetCalInfoFromNVRAM(&info) || !DWC_Auth_SetCalInfoToHttp(DWCi_ConnTestHttp, &info, 1) ||
-            DWC_Http_Add_PostBase64Item(DWCi_ConnTestHttp, "action", "parse", 5) != 0) {
+        if (!DWC_Auth_GetCalInfoFromNVRAM(&info) || !DWC_Auth_SetCalInfoToHttp(DWCi_ConnTestHttp, &info, 1)) {
             DWC_Http_Destroy(DWCi_ConnTestHttp);
             DWCi_Netcheck_SetError(8);
             goto done;
         }
-        if (DWC_Http_Add_PostBase64Item(DWCi_ConnTestHttp, "HTML", DWCi_ConnTestWork->body_302,
+        if (DWC_Http_Add_PostBase64Item(DWCi_ConnTestHttp, "action", "parse", 5) != 0 ||
+            DWC_Http_Add_PostBase64Item(DWCi_ConnTestHttp, "HTML", DWCi_ConnTestWork->body_302,
                                         strlen(DWCi_ConnTestWork->body_302)) != 0) {
             DWC_Http_Destroy(DWCi_ConnTestHttp);
             DWCi_Netcheck_SetError(8);
@@ -350,24 +352,21 @@ static void DWCi_Netcheck_Thread(void *arg) {
         if (DWCi_ConnTestHttp->thread.id != 0 && !OS_IsThreadTerminated(&DWCi_ConnTestHttp->thread)) {
             OS_JoinThread(&DWCi_ConnTestHttp->thread);
         }
-        status = DWCi_ConnTestHttp->error;
-        if (status == 2) {
-            DWCi_ConnTestWork->returncode = -1;
-            DWC_Http_Destroy(DWCi_ConnTestHttp);
-            DWCi_Netcheck_SetError(3);
-            goto done;
-        }
-        if (status == 3) {
+        switch (DWCi_ConnTestHttp->error) {
+        case 8:
+            break;
+        case 3:
             DWC_Http_Destroy(DWCi_ConnTestHttp);
             if (DWCi_ConnTestAllow302 == 1) {
                 DWCi_ConnTestWork->returncode = 0;
                 DWCi_Netcheck_SetError(0xb);
-            } else {
-                DWCi_Netcheck_SetError(3);
+                goto done;
             }
+            DWCi_Netcheck_SetError(3);
             goto done;
-        }
-        if (status != 8) {
+        case 2:
+            DWCi_ConnTestWork->returncode = -1;
+        default:
             DWC_Http_Destroy(DWCi_ConnTestHttp);
             DWCi_Netcheck_SetError(3);
             goto done;
@@ -454,22 +453,22 @@ static void DWCi_Netcheck_Thread(void *arg) {
             goto done;
         }
         url[length] = 0;
-        length = DWC_Http_GetBase64DecodedResult(DWCi_ConnTestHttp, "data", data, dataLength + 1);
-        if (length < 0) {
+        dataLength = DWC_Http_GetBase64DecodedResult(DWCi_ConnTestHttp, "data", data, dataLength + 1);
+        if (dataLength < 0) {
             DWC_Http_Destroy(DWCi_ConnTestHttp);
             DWCi_Netcheck_SetError(9);
             goto done;
         }
-        data[length] = 0;
+        data[dataLength] = 0;
         waitMs = 0;
         if (waitLength > 0) {
-            length = DWC_Http_GetBase64DecodedResult(DWCi_ConnTestHttp, "wait", waitText, waitLength + 1);
-            if (length < 0) {
+            waitLength = DWC_Http_GetBase64DecodedResult(DWCi_ConnTestHttp, "wait", waitText, waitLength + 1);
+            if (waitLength < 0) {
                 DWC_Http_Destroy(DWCi_ConnTestHttp);
                 DWCi_Netcheck_SetError(9);
                 goto done;
             }
-            waitText[length] = 0;
+            waitText[waitLength] = 0;
             waitMs = atol(waitText);
             if (errno == ERANGE) {
                 DWC_Http_Destroy(DWCi_ConnTestHttp);
@@ -508,13 +507,12 @@ static void DWCi_Netcheck_Thread(void *arg) {
         if (DWCi_ConnTestHttp->thread.id != 0 && !OS_IsThreadTerminated(&DWCi_ConnTestHttp->thread)) {
             OS_JoinThread(&DWCi_ConnTestHttp->thread);
         }
-        if (DWCi_ConnTestHttp->error == 2) {
+        switch (DWCi_ConnTestHttp->error) {
+        case 8:
+            break;
+        case 2:
             DWCi_ConnTestWork->returncode = -1;
-            DWC_Http_Destroy(DWCi_ConnTestHttp);
-            DWCi_Netcheck_SetError(3);
-            goto done;
-        }
-        if (DWCi_ConnTestHttp->error != 8) {
+        default:
             DWC_Http_Destroy(DWCi_ConnTestHttp);
             DWCi_Netcheck_SetError(3);
             goto done;
