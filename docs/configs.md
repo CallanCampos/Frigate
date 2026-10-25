@@ -278,6 +278,21 @@ autoload, and `config_fixes.py remove-file ltd_autoload_0 FILE START` deletes a 
 autoload's `delinks.txt`; both are recorded in `config/fixes.txt`. `compiler_probe.py`, `rename_symbol.py` and
 `check_nonmatching_rows.py` find the file's DSi functions in the LTD autoload's symbols.
 
+## Files of one name
+
+A file is named after its original object, even when another module's file has the same name: the DWC utility's
+`lib/dwcutilui/src/heap.c` is libdwcutil's `heap.o`, and `src/gfl/heap.c` is the game's. The linker script can't tell
+such objects apart, since it names an object by its file name alone: `heap.o(.text)` places the first `heap.o` of the
+object list, and `mwldarm` takes no path there (`src/gfl/heap.o(.text)` reads as an object named `src`, and a quoted
+name may not hold a `/` or `\`), nor does an object's `-overlay` group scope it. So dsd links each object of a shared
+file name from a copy named after its path, `build/<version>/link/lib/dwcutilui/src/lib_dwcutilui_src_heap.o` and
+`build/<version>/link/src/gfl/src_gfl_heap.o`, which the linker script and `objects.txt` give in place of `heap.o`.
+`dsd json delinks` gives each file's `link_object` beside its `object_to_link`, and `configure.py` makes the copy when
+they differ. The name of an object doesn't reach the ROM, and the sources, the configs and the objects that objdiff and
+the tools read keep their paths. `dsd lcf` still refuses two files of one name in one module, a file listed in two
+modules, and a file named like another's copy (`src_gfl_heap.c`). DSD_VERSION's release predates this and refuses any
+shared name, so until a release has it, build with `--dsd` and a dsd built from the fork's `dup-basenames` branch.
+
 ## Shifting
 
 A mod that changes code sizes moves everything after the change, so it only works if every pointer to code or data

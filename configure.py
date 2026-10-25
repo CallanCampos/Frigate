@@ -586,7 +586,11 @@ def add_version(n: Writer, version: str, dsd: Path, bugfix: bool, shift: int) ->
             n.build([obj], f"mwasm_{LIBRARY_COMPILERS.index(compiler)}", [source],
                     variables={"flags": " ".join(asm_flags)})
             compiled.append(obj)
-        objects.append(f["object_to_link"])
+        # The linker script names an object by its file name alone, so dsd links the objects of files of one name
+        # from copies named after their paths (docs/configs.md, "Files of one name")
+        if f["link_object"] != f["object_to_link"]:
+            n.build([f["link_object"]], "link_copy", [f["object_to_link"]])
+        objects.append(f["link_object"])
     # An entry for a file the version doesn't compile would strip nothing, unnoticed
     unbuilt = sorted(set(DEADSTRIP) - deadstripped)
     if unbuilt:
@@ -823,6 +827,7 @@ def main():
            rspfile_content="$in_newline")
     n.rule("shift_lcf", "$python tools/build/shift_lcf.py $in $out $amount", "Shifting $in")
     n.rule("ltd_objects", "$python tools/build/ltd_objects.py $in $out", "Grouping the LTD autoload's objects in $out")
+    n.rule("link_copy", "cp $in $out", "Copying $in for the link")
     n.rule("mwld", f"$wine {shlex.quote(str(mwld))} {' '.join(LD_FLAGS)} @$objects $lcf -o $out", "Linking $out")
     # Pass the runner as one executable path and the normal flags as argv data.
     # The helper changes -proc only for its private prelink.
