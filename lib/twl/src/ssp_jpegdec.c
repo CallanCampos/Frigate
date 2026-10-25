@@ -514,10 +514,10 @@ static u32 Mel_JPEGDecode(u8 *dest, u8 *data, u32 size, s32 maxWidth, s32 maxHei
                         sQuant[0][j + sZigzag[i]] = ((data[q + 1] + (data[q] << 8)) * sAanScales[i] + 0x800) >> 12;
                     }
                 } else {
+                    g = s << 6;
                     if (q + 0x41 >= sDataSize) {
                         return 0;
                     }
-                    g = s << 6;
                     q++;
                     for (j = 0; j < 64; j++, q++) {
                         if (g + sZigzag[j] > 127) {
