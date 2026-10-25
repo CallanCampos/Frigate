@@ -1,6 +1,6 @@
 #include "effect.h"
-#include "dwc_util_heap.h"
 #include "dwc_util_shared.h"
+#include "heap.h"
 #include "nitro/fx.h"
 #include "nitro/gx.h"
 #include "nitro/hw.h"

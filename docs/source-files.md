@@ -1823,7 +1823,7 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 | `keyboard.c` | `0x021abb10`–`0x021acd80` | 30 | complete | descriptive |
 | `keyboard10.c` | `0x021acd80`–`0x021ada94` | 28 | complete | descriptive |
 | `libaoss.c` | `0x021ada94`–`0x021adbc0` | 5 | complete | descriptive |
-| `dwc_util_main.c` | `0x021adbc0`–`0x021ae084` | 15 | complete | descriptive |
+| `main.c` | `0x021adbc0`–`0x021ae084` | 15 | complete | descriptive |
 | `message.c` | `0x021ae084`–`0x021ae134` | 6 | complete | descriptive |
 | `move.c` | `0x021ae134`–`0x021ae3d8` | 8 | complete | descriptive |
 | `rakuraku.c` | `0x021ae3d8`–`0x021ae4f4` | 7 | complete | descriptive |
@@ -1863,7 +1863,7 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 | `scenesetusbcomplete.c` | `0x021b6728`–`0x021b688c` | 9 | complete | descriptive |
 | `scenesetusbready.c` | `0x021b688c`–`0x021b6b00` | 12 | complete | descriptive |
 | `scenesetusbready1.c` | `0x021b6b00`–`0x021b6f38` | 18 | complete | descriptive |
-| `dwc_util_bg_buffer.c` | `0x021b6f38`–`0x021b70a0` | 9 | complete | descriptive |
+| `screen.c` | `0x021b6f38`–`0x021b70a0` | 9 | complete | descriptive |
 | `scrollbar.c` | `0x021b70a0`–`0x021b74d4` | 16 | complete | descriptive |
 | `search.c` | `0x021b74d4`–`0x021b77dc` | 8 | complete | descriptive |
 | `setting.c` | `0x021b77dc`–`0x021b8050` | 29 | complete | descriptive |
@@ -1882,10 +1882,10 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 | `font.c` | `0x021bbc50`–`0x021bc1a8` | 15 | complete | descriptive |
 | `foundation.c` | `0x021bc1a8`–`0x021bc1dc` | 3 | complete | descriptive |
 | `graphics.c` | `0x021bc1dc`–`0x021bc468` | 4 | complete | descriptive |
-| `dwc_util_heap.c` | `0x021bc468`–`0x021bc544` | 6 | complete | descriptive |
+| `heap.c` | `0x021bc468`–`0x021bc544` | 6 | complete | descriptive |
 | `input.c` | `0x021bc544`–`0x021bcaac` | 15 | partial | descriptive |
 | `interrupt.c` | `0x021bcaac`–`0x021bcb3c` | 3 | complete | descriptive |
-| `dwc_util_list.c` | `0x021bcb3c`–`0x021bcbc8` | 6 | complete | descriptive |
+| `list.c` | `0x021bcb3c`–`0x021bcbc8` | 6 | complete | descriptive |
 | `obj.c` | `0x021bcbc8`–`0x021bccec` | 6 | complete | descriptive |
 | `objvram.c` | `0x021bccec`–`0x021bcef8` | 3 | complete | descriptive |
 | `str.c` | `0x021bcef8`–`0x021bcf38` | 2 | complete | descriptive |

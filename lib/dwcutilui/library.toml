@@ -3,13 +3,11 @@
 # helpers under them (its resource archive, message files, heap, OAM allocator and buffers, sprite cells, fades, text,
 # input, interrupts, lists, OBJ characters, strings, VRAM banks, tasks and display registers). The library's name is
 # ours; its files are named after the objects of libdwcutil.TWL.HYB.a that they are, as aletheia's map of Black 1's SDK
-# code to that library's objects (layout/symbols_sdk.txt) shows them, but for dwc_util_main.c, dwc_util_bg_buffer.c,
-# dwc_util_heap.c and dwc_util_list.c, whose objects' names (main.o, screen.o, heap.o and list.o) other files have. These
-# files were built with the game's compiler and flags, not with the 2.0 that the rest of the utility (lib/dwcutil:
-# apc.c and the AOSS files) needs: button.c matches 15 of 15 functions with them against 10 of 15 under
-# 2.0/sp2p2, and -ipa file is what gives button.c's taskEnd1 its second literal of the object's address. The one
-# difference is that char is unsigned, the compiler's default: DWCi_Char loads a path's sixth character with
-# ldrb and no sign extension.
+# code to that library's objects (layout/symbols_sdk.txt) shows them. These files were built with the game's compiler
+# and flags, not with the 2.0 that the rest of the utility (lib/dwcutil: apc.c and the AOSS files) needs: button.c
+# matches 15 of 15 functions with them against 10 of 15 under 2.0/sp2p2, and -ipa file is what gives button.c's
+# taskEnd1 its second literal of the object's address. The one difference is that char is unsigned, the compiler's
+# default: DWCi_Char loads a path's sixth character with ldrb and no sign extension.
 compiler = "dsi/1.1p1"
 flags = [
     "-O4,p",               # Optimize for speed

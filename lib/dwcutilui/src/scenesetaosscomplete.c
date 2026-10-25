@@ -1,12 +1,12 @@
 #include "scenesetaosscomplete.h"
 #include "comment.h"
 #include "common.h"
-#include "dwc_util_main.h"
 #include "dwc_util_shared.h"
 #include "effect.h"
 #include "font.h"
 #include "graphics.h"
 #include "headline.h"
+#include "main.h"
 #include "nitro/gx.h"
 #include "sound.h"
 

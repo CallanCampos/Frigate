@@ -1,8 +1,8 @@
 #include "cell.h"
 #include "deque.h"
-#include "dwc_util_heap.h"
 #include "dwc_util_oam_attr.h"
 #include "dwc_util_shared.h"
+#include "heap.h"
 #include "nitro/os.h"
 
 // Each screen has 32 nodes, a list of the runs in use between a head and a tail node that bracket the screen's range

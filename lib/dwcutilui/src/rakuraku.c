@@ -1,7 +1,7 @@
 #include "rakuraku.h"
-#include "dwc_util_heap.h"
 #include "dwc_util_shared.h"
 #include "dwcutil/atermset.h"
+#include "heap.h"
 #include "nitro/os.h"
 #include "setting.h"
 

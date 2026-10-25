@@ -1,13 +1,13 @@
-#ifndef POKEBW2_DWCUTIL_DWC_UTIL_HEAP_H
-#define POKEBW2_DWCUTIL_DWC_UTIL_HEAP_H
+#ifndef POKEBW2_DWCUTIL_HEAP_H
+#define POKEBW2_DWCUTIL_HEAP_H
 
 #include "types.h"
 
 // The connection utility's memory: an expanded heap in the 256 KB that the caller gives it, which the utility's
 // allocations come from with the VBlank interrupt held off. Every allocation failure stops the game.
 // The file is the DWC utility library's heap.o (libdwcutil.TWL.HYB.a), as aletheia's map of Black 1's SDK code to that
-// library's objects (layout/symbols_sdk.txt) shows it; it keeps a name of ours, since dsd takes each file name once and
-// src/gfl/heap.c has heap.c.
+// library's objects (layout/symbols_sdk.txt) shows it. src/gfl/heap.c has its name too, so the link takes their objects
+// under names of their paths (docs/configs.md, "Files of one name").
 void DWCi_HEAPlInit(void *memory);
 void DWCi_HEAPlEnd(void);
 void *DWCi_HEAPlAlloc(int size, int align);
@@ -17,4 +17,4 @@ void *DWCi_HEAPlAllocEx(int size, int align);
 void DWCi_HEAPlFree_(void *pointer);
 void DWCi_HEAPlFree2(void *block);
 
-#endif // POKEBW2_DWCUTIL_DWC_UTIL_HEAP_H
+#endif // POKEBW2_DWCUTIL_HEAP_H

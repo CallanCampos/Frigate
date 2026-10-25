@@ -1,5 +1,5 @@
 #include "deque.h"
-#include "dwc_util_heap.h"
+#include "heap.h"
 #include "nitro/fx.h"
 #include "nitro/os.h"
 

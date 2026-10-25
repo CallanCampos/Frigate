@@ -1,7 +1,7 @@
 #include "message.h"
 #include "archive.h"
 #include "deque.h"
-#include "dwc_util_heap.h"
+#include "heap.h"
 
 // The INF1 block, which follows the file's 0x20-byte header, and the DAT1 block after it, whose text starts 8 bytes in
 typedef struct DWCUtilMsgInfo {

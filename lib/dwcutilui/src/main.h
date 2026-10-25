@@ -1,5 +1,5 @@
-#ifndef POKEBW2_DWCUTIL_DWC_UTIL_MAIN_H
-#define POKEBW2_DWCUTIL_DWC_UTIL_MAIN_H
+#ifndef POKEBW2_DWCUTIL_MAIN_H
+#define POKEBW2_DWCUTIL_MAIN_H
 
 #include "types.h"
 
@@ -7,8 +7,8 @@
 // function runs once a frame until a screen ends the utility. The screens hand each other two pairs of values, and
 // read the language and the starting screen they were started with and the flags.
 // The file is the DWC utility library's main.o (libdwcutil.TWL.HYB.a), as aletheia's map of Black 1's SDK code to that
-// library's objects (layout/symbols_sdk.txt) shows it; it keeps a name of ours, since dsd takes each file name once and
-// src/system/main.c has main.c.
+// library's objects (layout/symbols_sdk.txt) shows it. src/system/main.c has its name too, so the link takes their
+// objects under names of their paths (docs/configs.md, "Files of one name").
 
 // Sets the function that runs each frame
 void DWCi_ChangeScene(void (*update)(void));
@@ -27,4 +27,4 @@ BOOL DWCi_Flag(u32 mask);
 void DWCi_EndUtility(void);
 u8 kDWCi_Language(void);
 
-#endif // POKEBW2_DWCUTIL_DWC_UTIL_MAIN_H
+#endif // POKEBW2_DWCUTIL_MAIN_H

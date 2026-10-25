@@ -1,7 +1,7 @@
 #include "setting.h"
 #include "dwc/ext.h"
-#include "dwc_util_heap.h"
 #include "dwcutil/dwc_moveid.h"
+#include "heap.h"
 #include "nitro/math.h"
 #include "nitro/mi.h"
 #include "nitro/os.h"

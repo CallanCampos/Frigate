@@ -1,6 +1,6 @@
 #include "icon.h"
 #include "cellinfo.h"
-#include "dwc_util_heap.h"
+#include "heap.h"
 #include "nitro/gx.h"
 #include "nitro/hw.h"
 #include "nitro/wm.h"

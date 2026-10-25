@@ -1,7 +1,7 @@
 #include "task.h"
 #include "deque.h"
-#include "dwc_util_heap.h"
-#include "dwc_util_list.h"
+#include "heap.h"
+#include "list.h"
 #include "nitro/os.h"
 
 typedef struct DWCUtilTaskList {

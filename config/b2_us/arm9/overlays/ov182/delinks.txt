@@ -88,7 +88,7 @@ lib/dwcutilui/src/foundation.c:
     complete
     .text       start:0x021bc1a8 end:0x021bc1dc
 
-lib/dwcutilui/src/dwc_util_heap.c:
+lib/dwcutilui/src/heap.c:
     complete
     .text       start:0x021bc468 end:0x021bc544
     .bss        start:0x021c41a4 end:0x021c41a8
@@ -116,7 +116,7 @@ lib/dwcutilui/src/interrupt.c:
     .text       start:0x021bcaac end:0x021bcb3c
     .bss        start:0x021c41c0 end:0x021c41c8
 
-lib/dwcutilui/src/dwc_util_list.c:
+lib/dwcutilui/src/list.c:
     complete
     .text       start:0x021bcb3c end:0x021bcbc8
 
@@ -188,7 +188,7 @@ lib/dwcutilui/src/libaoss.c:
     .rodata     start:0x021bff88 end:0x021bff94
     .bss        start:0x021c4084 end:0x021c408c
 
-lib/dwcutilui/src/dwc_util_main.c:
+lib/dwcutilui/src/main.c:
     complete
     .text       start:0x021adbc0 end:0x021ae084
     .data       start:0x021c0b6c end:0x021c0b8c
@@ -399,7 +399,7 @@ lib/dwcutilui/src/scenesetusbready1.c:
     .data       start:0x021c13a0 end:0x021c13e4
     .bss        start:0x021c414c end:0x021c4150
 
-lib/dwcutilui/src/dwc_util_bg_buffer.c:
+lib/dwcutilui/src/screen.c:
     complete
     .text       start:0x021b6f38 end:0x021b70a0
     .bss        start:0x021c4150 end:0x021c415c

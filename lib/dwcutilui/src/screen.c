@@ -1,5 +1,5 @@
-#include "dwc_util_bg_buffer.h"
-#include "dwc_util_heap.h"
+#include "screen.h"
+#include "heap.h"
 #include "nitro/gx.h"
 #include "nitro/hw.h"
 #include "nitro/mi.h"

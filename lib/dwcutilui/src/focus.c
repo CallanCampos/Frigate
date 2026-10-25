@@ -1,7 +1,7 @@
 #include "focus.h"
 #include "cell.h"
 #include "cellinfo.h"
-#include "dwc_util_heap.h"
+#include "heap.h"
 
 typedef struct DWCUtilButtonSprites {
     DWCUtilOamNode *sprites[4];

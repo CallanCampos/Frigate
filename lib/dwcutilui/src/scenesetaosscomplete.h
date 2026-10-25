@@ -3,11 +3,11 @@
 
 #include "types.h"
 #include "comment.h"
-#include "dwc_util_main.h"
 #include "dwc_util_shared.h"
 #include "effect.h"
 #include "font.h"
 #include "graphics.h"
+#include "main.h"
 #include "scenesettestconfirm.h"
 
 // The connection utility's message after a successful AOSS setup, which stays for 120 frames, before the message of

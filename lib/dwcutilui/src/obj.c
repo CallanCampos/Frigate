@@ -1,7 +1,7 @@
 #include "obj.h"
 #include "deque.h"
-#include "dwc_util_heap.h"
 #include "dwc_util_shared.h"
+#include "heap.h"
 #include "nitro/mi.h"
 #include "nitro/os.h"
 

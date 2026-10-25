@@ -1,7 +1,7 @@
 #include "objvram.h"
 #include "deque.h"
-#include "dwc_util_heap.h"
-#include "dwc_util_list.h"
+#include "heap.h"
+#include "list.h"
 #include "nitro/os.h"
 
 // Each screen has 32 nodes, a list of the blocks in use between a head and a tail node that bracket the screen's

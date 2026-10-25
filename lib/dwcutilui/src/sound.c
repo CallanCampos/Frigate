@@ -1,6 +1,6 @@
 #include "sound.h"
 #include "archive.h"
-#include "dwc_util_heap.h"
+#include "heap.h"
 #include "nnsys/snd.h"
 #include "task.h"
 

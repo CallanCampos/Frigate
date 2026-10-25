@@ -1,7 +1,7 @@
 #include "libaoss.h"
-#include "dwc_util_heap.h"
 #include "dwc_util_shared.h"
 #include "dwcutil/aoss.h"
+#include "heap.h"
 #include "nitro/mi.h"
 #include "nitro/os.h"
 #include "setting.h"

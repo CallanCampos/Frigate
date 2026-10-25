@@ -1,6 +1,6 @@
 #include "usbap.h"
 #include "dwc/ext.h"
-#include "dwc_util_heap.h"
+#include "heap.h"
 #include "nitro/mi.h"
 #include "nitro/os.h"
 #include "nitro/wm.h"

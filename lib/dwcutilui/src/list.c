@@ -1,5 +1,5 @@
-#include "dwc_util_list.h"
-#include "dwc_util_heap.h"
+#include "list.h"
+#include "heap.h"
 #include "nitro/os.h"
 
 DWCUtilList *DWCi_LSTlForm(void) {

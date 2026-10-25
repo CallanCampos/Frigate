@@ -1,7 +1,7 @@
 #include "archive.h"
 #include "deque.h"
 #include "dwc/ext.h"
-#include "dwc_util_heap.h"
+#include "heap.h"
 #include "nitro/card.h"
 #include "nitro/fs.h"
 #include "nitro/mi.h"

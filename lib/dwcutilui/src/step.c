@@ -3,7 +3,7 @@
 #include "cell.h"
 #include "cellinfo.h"
 #include "common.h"
-#include "dwc_util_heap.h"
+#include "heap.h"
 #include "nitro/gx.h"
 #include "nitro/os.h"
 #include "sound.h"

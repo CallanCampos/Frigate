@@ -1,4 +1,4 @@
-#include "dwc_util_heap.h"
+#include "heap.h"
 #include "nitro/mi.h"
 #include "nitro/os.h"
 #include "nnsys/fnd.h"
