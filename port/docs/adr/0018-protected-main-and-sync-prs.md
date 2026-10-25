@@ -1,7 +1,7 @@
 <!-- Records why Frigate's main changes only through reviewed pull requests, upstream syncs included. -->
 # 0018: Protected main and reviewed upstream syncs
 
-- **Status:** accepted; amends 0001 and 0017
+- **Status:** accepted; amends 0001 and 0017; amended by [0024](0024-a-conflicting-sync-proposes-a-draft-of-upstreams-head.md)
 - **Date:** 2026-10-22
 - **Plan:** D1, §4.1 and §8
 - **Upstream:** `fc478a9ee5`

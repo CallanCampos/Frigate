@@ -1,7 +1,8 @@
 """Isolated Git fixtures for Frigate upstream PR sync; no network or ROMs.
 
-Exercises preservation of native port changes and the upstream history/reference
-boundaries implemented by port/tools/upstream_sync.py.
+Exercises preservation of native port changes, the draft proposal of a conflicting
+upstream head and the upstream history/reference boundaries implemented by
+port/tools/upstream_sync.py.
 """
 import importlib.util
 import json
@@ -58,19 +59,23 @@ class GitFixture(unittest.TestCase):
             self.git('commit', '-m', 'Port game edit')
         return incoming
 
+    def in_repo(self):
+        real_run = subprocess.run
+        def run(args, **kwargs):
+            return real_run(args, cwd=self.root, **kwargs)
+        return patch.object(sync.subprocess, 'run', side_effect=run)
+
     def prepare(self, incoming):
+        """Runs prepare() with both publishers replaced; returns the merge's branch (None for a draft)."""
         real_git = self.git
         def fake_git(*args):
             if args[0] == 'fetch':
                 real_git('fetch', '.', 'upstream')
                 return ''
             return real_git(*args)
-        real_run = subprocess.run
-        def in_repo(args, **kwargs):
-            return real_run(args, cwd=self.root, **kwargs)
-        with patch.object(sync, 'git', side_effect=fake_git), patch.object(sync, 'pending', return_value=[]), patch.object(sync, 'publish') as published, patch.object(sync.subprocess, 'run', side_effect=in_repo):
+        with patch.object(sync, 'git', side_effect=fake_git), patch.object(sync, 'pending', return_value=[]), patch.object(sync, 'publish') as self.published, patch.object(sync, 'propose_conflict') as self.drafted, self.in_repo():
             sync.prepare()
-            return published.call_args.args[0]
+            return self.published.call_args.args[0] if self.published.called else None
 
 
 class SyncTests(GitFixture):
@@ -84,9 +89,221 @@ class SyncTests(GitFixture):
         self.assertEqual((self.root / 'port/native.c').read_text(), 'native port\n')
         self.assertEqual(self.git('rev-parse', 'main'), before)
 
-    def test_conflict_never_publishes(self):
-        with self.assertRaises(subprocess.CalledProcessError):
-            self.prepare(self.incoming(conflict=True))
+    def test_clean_merge_proposes_no_draft(self):
+        self.assertIsNotNone(self.prepare(self.incoming()))
+        self.drafted.assert_not_called()
+
+    def test_conflict_proposes_a_draft_of_upstream_head_and_merges_nothing(self):
+        incoming = self.incoming(conflict=True)
+        before = self.git('rev-parse', 'main')
+        self.assertIsNone(self.prepare(incoming))
+        self.published.assert_not_called()
+        branch, base, upstream, files = self.drafted.call_args.args
+        self.assertTrue(branch.startswith(sync.PREFIX))
+        self.assertEqual((base, upstream, files), (before, incoming, ['game.c']))
+        # No topic branch, no merge in progress, no file changed
+        self.assertEqual(self.git('branch', '--show-current'), 'main')
+        self.assertEqual(self.git('rev-parse', 'HEAD'), before)
+        self.assertEqual(self.git('status', '--porcelain'), '')
+        self.assertFalse((self.root / '.git/MERGE_HEAD').exists())
+        self.assertEqual(self.git('branch', '--list', sync.PREFIX + '*'), '')
+
+    def test_reference_stops_before_a_draft(self):
+        with self.assertRaisesRegex(RuntimeError, 'reference'):
+            self.prepare(self.incoming('See another/project#42', conflict=True))
+        self.drafted.assert_not_called()
+
+    def test_workflow_changes_stop_before_a_draft(self):
+        self.git('checkout', 'upstream')
+        self.write('game.c', 'upstream\n')
+        self.write('.github/workflows/changed.yml', 'name: incoming\n')
+        self.git('add', '.')
+        self.git('commit', '-m', 'Workflow update')
+        incoming = self.git('rev-parse', 'HEAD')
+        self.git('checkout', 'main')
+        self.write('game.c', 'port game edit\n')
+        self.git('add', '.')
+        self.git('commit', '-m', 'Port game edit')
+        with self.assertRaisesRegex(RuntimeError, 'workflow changes'):
+            self.prepare(incoming)
+        self.drafted.assert_not_called()
+
+    def test_rewrite_stops_before_a_draft(self):
+        incoming = self.incoming(conflict=True)
+        before = self.git('rev-parse', 'HEAD')
+        merge = self.git('commit-tree', 'HEAD^{tree}', '-p', before, '-p', incoming,
+                         '-m', 'Merge upstream fuddlesworth/pokebw2@' + incoming[:9] + '\n\nUpstream-Commit: ' + incoming)
+        self.git('reset', '--hard', merge)
+        self.git('branch', '-f', 'upstream', self.base)
+        self.git('checkout', 'upstream')
+        self.write('game.c', 'rewritten upstream\n')
+        self.git('commit', '-am', 'Rewritten history')
+        rewritten = self.git('rev-parse', 'HEAD')
+        self.git('checkout', 'main')
+        with self.assertRaisesRegex(RuntimeError, 'rewritten'):
+            self.prepare(rewritten)
+        self.drafted.assert_not_called()
+
+    def test_workflow_in_an_upstream_merge_stops_before_a_draft(self):
+        # A merge commit that adds a workflow file itself, which git log lists without a diff unless asked for one
+        self.git('checkout', 'upstream')
+        self.write('game.c', 'upstream\n')
+        self.git('commit', '-am', 'Upstream game edit')
+        self.git('checkout', '-b', 'side', 'upstream~1')
+        self.write('side.c', 'side\n')
+        self.git('add', 'side.c')
+        self.git('commit', '-m', 'Side')
+        self.git('checkout', 'upstream')
+        self.git('merge', '--no-ff', '--no-commit', 'side')
+        self.write('.github/workflows/evil.yml', 'on: push\n')
+        self.git('add', '.github/workflows/evil.yml')
+        self.git('commit', '-m', 'Merge side')
+        incoming = self.git('rev-parse', 'HEAD')
+        self.git('checkout', 'main')
+        self.write('game.c', 'port game edit\n')
+        self.git('commit', '-am', 'Port game edit')
+        with self.assertRaisesRegex(RuntimeError, 'workflow changes'):
+            self.prepare(incoming)
+        self.drafted.assert_not_called()
+
+    def test_conflicting_files_names_unusual_paths_as_they_are(self):
+        self.git('checkout', 'upstream')
+        self.write('dir é/a file.c', 'upstream\n')
+        self.git('add', '.')
+        self.git('commit', '-m', 'Upstream file')
+        incoming = self.git('rev-parse', 'HEAD')
+        self.git('checkout', 'main')
+        self.write('dir é/a file.c', 'port\n')
+        self.git('add', '.')
+        self.git('commit', '-m', 'Port file')
+        with self.in_repo():
+            self.assertEqual(sync.conflicting_files(self.git('rev-parse', 'HEAD'), incoming), ['dir é/a file.c'])
+
+    def test_conflicting_files_failure_stops(self):
+        with self.in_repo(), self.assertRaisesRegex(RuntimeError, 'merge-tree failed'):
+            sync.conflicting_files(self.git('rev-parse', 'HEAD'), '0' * 40)
+
+    def test_pending_asks_for_draft_state_and_keeps_canonical_topics(self):
+        pulls = [
+            {'number': 1, 'url': 'a', 'headRefName': sync.PREFIX + 'x', 'headRepositoryOwner': {'login': 'CallanCampos'}, 'isDraft': True},
+            {'number': 2, 'url': 'b', 'headRefName': sync.PREFIX + 'y', 'headRepositoryOwner': {'login': 'someone'}, 'isDraft': False},
+            {'number': 3, 'url': 'c', 'headRefName': 'feature', 'headRepositoryOwner': {'login': 'CallanCampos'}, 'isDraft': False},
+        ]
+        with patch.object(sync, 'gh', return_value=json.dumps(pulls)) as gh:
+            self.assertEqual(sync.pending(), pulls[:1])
+        fields = gh.call_args.args[gh.call_args.args.index('--json') + 1].split(',')
+        self.assertIn('isDraft', fields)
+        self.assertIn('number', fields)
+
+    def remote(self):
+        """A bare repository as origin, outside the work tree, holding nothing yet."""
+        remote = tempfile.TemporaryDirectory()
+        self.addCleanup(remote.cleanup)
+        origin = Path(remote.name) / 'origin.git'
+        subprocess.run(['git', 'init', '--bare', '-q', str(origin)], check=True)
+        self.git('remote', 'add', 'origin', str(origin))
+        return origin
+
+    def fast_forwards(self, branch, upstream):
+        with patch.object(sync, 'git', side_effect=self.git), self.in_repo():
+            return sync.topic_fast_forwards(branch, upstream)
+
+    def test_topic_check_passes_a_draft_upstream_moved_past(self):
+        self.remote()
+        branch = sync.PREFIX + 'draft'
+        draft = self.incoming(conflict=True)
+        self.git('push', '-q', 'origin', f'{draft}:refs/heads/{branch}')
+        self.assertTrue(self.fast_forwards(sync.PREFIX + 'unpublished', draft))
+        self.git('checkout', 'upstream')
+        self.write('more.c', 'more\n')
+        self.git('add', 'more.c')
+        self.git('commit', '-m', 'More upstream')
+        newer = self.git('rev-parse', 'HEAD')
+        self.git('checkout', 'main')
+        self.assertTrue(self.fast_forwards(branch, newer))
+
+    def test_topic_check_stops_a_draft_upstream_rewrote(self):
+        self.remote()
+        branch = sync.PREFIX + 'draft'
+        draft = self.incoming(conflict=True)
+        self.git('push', '-q', 'origin', f'{draft}:refs/heads/{branch}')
+        self.git('checkout', '-B', 'upstream', self.base)
+        self.write('game.c', 'rewritten upstream\n')
+        self.git('commit', '-am', 'Rewritten upstream')
+        rewritten = self.git('rev-parse', 'HEAD')
+        self.git('checkout', 'main')
+        self.assertFalse(self.fast_forwards(branch, rewritten))
+
+    def test_topic_check_passes_a_checked_out_topic(self):
+        self.remote()
+        branch = sync.PREFIX + 'topic'
+        self.git('push', '-q', 'origin', f'HEAD:refs/heads/{branch}')
+        self.assertTrue(self.fast_forwards(branch, self.base))
+
+    def test_conflicting_files_changes_nothing(self):
+        clean = self.incoming()
+        head = self.git('rev-parse', 'HEAD')
+        with self.in_repo():
+            self.assertEqual(sync.conflicting_files(head, clean), [])
+        self.write('game.c', 'port game edit\n')
+        self.git('add', '.')
+        self.git('commit', '-m', 'Port game edit')
+        head = self.git('rev-parse', 'HEAD')
+        with self.in_repo():
+            self.assertEqual(sync.conflicting_files(head, clean), ['game.c'])
+        self.assertEqual(self.git('rev-parse', 'HEAD'), head)
+        self.assertEqual(self.git('status', '--porcelain'), '')
+
+    def test_draft_pushes_upstream_head_without_force(self):
+        branch, base, upstream = sync.PREFIX + 'fixture', 'a' * 40, 'b' * 40
+        with patch.object(sync.subprocess, 'run', return_value=subprocess.CompletedProcess([], 0)) as commands, patch.object(sync, 'gh', return_value='created') as gh:
+            sync.propose_conflict(branch, base, upstream, ['game.c', 'src/x.c'])
+        commands.assert_called_once_with(['git', 'push', 'origin', upstream + ':refs/heads/' + branch])
+        create = gh.call_args.args
+        self.assertEqual(create[:3], ('pr', 'create', '--draft'))
+        self.assertNotIn('--reviewer', create)
+        self.assertEqual(create[create.index('--title') + 1], sync.CONFLICT_TITLE)
+        body = create[create.index('--body') + 1]
+        for text in ('`game.c`', '`src/x.c`', f'git switch --no-track -c {branch} origin/main', f'--branch {branch}', upstream[:12]):
+            self.assertIn(text, body)
+        # A draft's text names no issue or pull request, here or in another repository
+        self.assertIsNone(sync.REFERENCE.search(body))
+        self.assertNotIn('#', body.replace('```', ''))
+
+    def test_draft_keeps_file_names_in_code_spans(self):
+        body = sync.conflict_body(sync.PREFIX + 'fixture', 'a' * 40, 'b' * 40, ['docs/see owner/repo#12`.md'])
+        self.assertIn('- `docs/see owner/repo#12.md`\n', body)
+
+    def test_draft_lists_a_bounded_number_of_files(self):
+        files = [f'src/f{i}.c' for i in range(sync.LISTED_FILES + 7)]
+        body = sync.conflict_body(sync.PREFIX + 'fixture', 'a' * 40, 'b' * 40, files)
+        self.assertIn(f'`src/f{sync.LISTED_FILES - 1}.c`', body)
+        self.assertNotIn(f'`src/f{sync.LISTED_FILES}.c`', body)
+        self.assertIn('and 7 more', body)
+
+    def test_failed_draft_push_names_the_conflicts(self):
+        with patch.object(sync.subprocess, 'run', return_value=subprocess.CompletedProcess([], 1)), patch.object(sync, 'gh') as gh:
+            with self.assertRaisesRegex(RuntimeError, 'game.c'):
+                sync.propose_conflict(sync.PREFIX + 'fixture', 'a' * 40, 'b' * 40, ['game.c'])
+        gh.assert_not_called()
+
+    def test_resolved_merge_fast_forwards_the_draft_and_records_upstream(self):
+        incoming = self.incoming(conflict=True)
+        before = self.git('rev-parse', 'main')
+        # What a maintainer's local sync makes: from main, the merge with its trailer, the conflict resolved
+        self.git('checkout', '-b', sync.PREFIX + 'fixture')
+        message = f'Merge upstream fuddlesworth/pokebw2@{incoming[:9]}\n\nUpstream-Commit: {incoming}'
+        self.assertNotEqual(subprocess.run(['git', '-C', str(self.root), 'merge', '--no-ff', '-m', message, incoming],
+                                           capture_output=True).returncode, 0)
+        self.write('game.c', 'resolved\n')
+        self.git('add', 'game.c')
+        self.git('commit', '--no-edit', '--cleanup=strip')
+        merge = self.git('rev-parse', 'HEAD')
+        # The draft's branch holds incoming: pushing the merge over it is a fast-forward
+        self.assertEqual(subprocess.run(['git', '-C', str(self.root), 'merge-base', '--is-ancestor', incoming, merge]).returncode, 0)
+        self.assertEqual(self.git('rev-parse', 'HEAD^1'), before)
+        with patch.object(sync, 'git', side_effect=self.git):
+            self.assertEqual(sync.last_upstream(incoming), incoming)
 
     def test_reference_stops_before_merge(self):
         with self.assertRaisesRegex(RuntimeError, 'reference'):
@@ -161,9 +378,45 @@ class SyncTests(GitFixture):
         self.assertEqual(rules['bypass_actors'], [{'actor_id': 145432210, 'actor_type': 'User', 'bypass_mode': 'pull_request'}])
 
     def test_open_sync_is_frozen(self):
-        with patch.object(sync, 'pending', return_value=[{'url': 'pending'}]), patch.object(sync, 'git') as git:
-            sync.prepare()
-            git.assert_not_called()
+        for proposal in ({'url': 'pending'}, {'url': 'draft', 'isDraft': True, 'number': 7}):
+            with self.subTest(proposal=proposal), patch.object(sync, 'pending', return_value=[proposal]), patch.object(sync, 'git') as git, patch.object(sync.subprocess, 'run') as commands:
+                sync.prepare()
+                git.assert_not_called()
+                commands.assert_not_called()
+
+    def publish_over(self, proposal):
+        branch = sync.PREFIX + 'fixture'
+        proposal = dict(proposal, headRefName=branch, headRepositoryOwner={'login': 'CallanCampos'})
+        with patch.object(sync, 'git', return_value='a' * 40), patch.object(sync, 'pending', return_value=[proposal]), patch.object(sync, 'gh', return_value='') as gh, patch.object(sync, 'run', return_value='CallanCampos'), patch.object(sync.subprocess, 'run') as commands:
+            sync.publish(branch)
+        commands.assert_called_once_with(['git', 'push', 'origin', 'HEAD:refs/heads/' + branch], check=True)
+        return [call.args for call in gh.call_args_list]
+
+    def test_resolved_draft_becomes_the_ordinary_proposal(self):
+        calls = self.publish_over({'url': 'draft', 'isDraft': True, 'number': 7})
+        self.assertEqual(calls[0][:5], ('pr', 'edit', '7', '--title', sync.TITLE))
+        self.assertEqual(calls[0][6], sync.merge_body())
+        self.assertEqual(calls[1], ('pr', 'ready', '7'))
+        self.assertEqual(len(calls), 2)
+
+    def test_ready_proposal_left_as_it_is(self):
+        self.assertEqual(self.publish_over({'url': 'pending', 'isDraft': False, 'number': 7}), [])
+
+    def test_draft_left_as_it_is_when_its_text_fails_after_the_push(self):
+        branch = sync.PREFIX + 'fixture'
+        draft = {'url': 'draft', 'isDraft': True, 'number': 7, 'headRefName': branch, 'headRepositoryOwner': {'login': 'CallanCampos'}}
+        failure = subprocess.CalledProcessError(1, ['gh'])
+        with patch.object(sync, 'git'), patch.object(sync, 'pending', return_value=[draft]), patch.object(sync, 'gh', side_effect=failure), patch.object(sync.subprocess, 'run') as commands, patch('sys.stderr') as stderr:
+            sync.publish(branch)
+        commands.assert_called_once()
+        self.assertIn('gh pr ready 7', ''.join(call.args[0] for call in stderr.write.call_args_list))
+
+    def test_another_pending_topic_refuses_publication(self):
+        other = {'url': 'other', 'isDraft': True, 'number': 7, 'headRefName': sync.PREFIX + 'other', 'headRepositoryOwner': {'login': 'CallanCampos'}}
+        with patch.object(sync, 'git'), patch.object(sync, 'pending', return_value=[other]), patch.object(sync.subprocess, 'run') as commands:
+            with self.assertRaisesRegex(RuntimeError, 'already pending'):
+                sync.publish(sync.PREFIX + 'mine')
+        commands.assert_not_called()
 
 
 class ShellVerificationTests(GitFixture):

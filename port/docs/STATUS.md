@@ -32,10 +32,62 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
 
+## 2026-10-25: a conflicting upstream sync proposes a draft of upstream's head
+
+- **Upstream:** `629a53cccb` (upstream merge #504), as `main` has it since PR 27; this branch merges no upstream commit.
+  Upstream's `main` has moved on with workflow changes, which the hourly sync still stops on, so the next sync is a
+  local one.
+- **Port:** `PORT_SHA`, on the topic `port-sync-conflict-drafts` from `main` at `abf834a3a3` (PR 32's merge), one
+  commit. It fills the last entry's `PORT_SHA`, `1e107c917e`. No file outside `port/` changes
+  (`git diff --stat origin/main -- . ':!port'` prints nothing).
+- **ROM:** T0 passes: `python3 configure.py && ninja` from an empty build directory compiled every C file of both
+  versions with no compiler warning, and both SHA1s match (Black 2 `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb`, White 2
+  `b5d7490be7b415b8f1e672a53e978a9cc667e56a`).
+- **MWCC-neutrality:** nothing to prove: no file outside `port/` changes.
+- **Code standards:** no C file changes; the branch changes Python, a shell script and documents.
+- **Host build:** T1 passes on macOS arm64, AppleClang 21.0.0, RelWithDebInfo, both versions (`build/port`,
+  `build/port-w2`, configured fresh), with no warning from `port/`.
+- **Tests:** the sync tooling tests (`python3 -m unittest discover -s port/tools/tests -p test_upstream_sync.py`, as
+  the `Sync tooling tests` job runs them): 35 of 35 pass, 14 before, with `test_conflict_never_publishes` replaced by
+  the draft's tests and 22 new ones: the draft of a conflicting head that merges and changes nothing, its push of
+  upstream's commit without force, its text (file names in code spans, no reference to any issue or pull request, a
+  bounded list), its failed push naming the conflicts, the three stops before a draft (an upstream merge commit that
+  adds a workflow file itself among them, which fails on `main`'s check), `conflicting_files` on unusual paths and on a
+  failure, `pending()`'s fields, the resolved merge's fast-forward and its `Upstream-Commit` trailer, the draft made
+  ready, and the topic check before a local merge. ctest `-j2`: Black 2, 293 passed and 15 skipped of 308; White 2, 290
+  passed and 15 skipped of 305; none failed. Skipped in both: the 12 oracle tests (no oracle in these builds),
+  `frame_times_party_menus` (the oracle's save), `asm_oracle` (no Unicorn in this Python) and `app_universal_slices` (a
+  distribution build's). T3's replays and the timing gates that run pass. T4, T5 and T7 not run; nothing they cover
+  changes.
+- **Tiers:** unchanged, the branch adds and removes no game C, as the last entry measured.
+- **Trap stubs:** 30 function stubs and 21 data placeholders per version (`build/port*/gen/stubs.c`), the same symbols
+  in both, as the last entry's.
+- **64-bit warnings:** `check_ptrcasts: 361 sites in 225 keys (real 66, harmless 117, handled 141, unreachable 37), 1682
+  files, 0 not compiled` in both versions, as the last entry's.
+- **Work done:** at the owner's request, the hourly sync no longer only fails its run on a conflict, which left one
+  unseen for about 17 hours on 2026-10-23 and 24 ([ADR 0024](adr/0024-a-conflicting-sync-proposes-a-draft-of-upstreams-head.md),
+  amending 0018). After the three stops, `port/tools/upstream_sync.py` checks the merge with `git merge-tree`; on a
+  conflict it merges nothing, pushes upstream's head unchanged to a fresh topic and opens a draft PR that lists the
+  conflicting files and the commands that resolve it. The maintainer's local sync on a branch of the draft's name,
+  from `main`, fast-forwards it with the real merge, and the publishing helper makes it the ordinary proposal, ready
+  for review. The workflow stop now also reads a merge commit's own changes and compares upstream's tree with the last
+  synced one, which the review found an upstream merge could slip past on the draft's path, where no merged tree is
+  checked. `port/tools/sync_upstream.sh` checks before merging that origin's branch of the topic's name is in what its
+  push carries, and stops with exit 4 when upstream rewrote a draft's commits, before any build. SYNC.md, port
+  CLAUDE.md, README.md, ARCHITECTURE.md, the glossary, the ADR index and both tools guides say so. The App's
+  permissions and `port-sync.yml` are unchanged. Not shown yet: whether GitHub lets the App push a branch of
+  upstream's tree, which lacks Frigate's own workflows, without the Workflows permission it doesn't have; if not, the
+  run fails as before, now naming the conflicting files, and the first real conflict shows which.
+- **Next:** this branch's PR, its checks and local verification, and its merge. Then what the last entries' Next
+  lists: the local sync of upstream's head, past its workflow changes, which brings the encounter effects' fix that
+  phase 4's route waits for, then that route.
+- **Blockers:** none for this change. A notice for the three stops, which push nothing, would need the sync App's
+  Issues permission and a `permission-issues: write` line in `port-sync.yml`, both the owner's decision.
+
 ## 2026-10-24: the follow-ups' hygiene: the metrics' compile step on upstream's probe, the records at the decomp's names
 
 - **Upstream:** `629a53cccb` (upstream merge #504), as `main` has it since PR 27; this branch merges no upstream commit.
-- **Port:** `PORT_SHA`, on the topic `port-hygiene-oct24` from `main` at `dd98d585e6` (PR 30's merge): `559ae5b099`,
+- **Port:** `1e107c917e`, on the topic `port-hygiene-oct24` from `main` at `dd98d585e6` (PR 30's merge): `559ae5b099`,
   `compile_check.py` on upstream's compile probe, with its test; `dbaba7f321`, the ledger, the findings and the guides
   at the decomp's present names and states; `a34e7c249b`, the platform layer's comments; `6b42b332de`, the records:
   this entry, which filled PR 30's entry's `PORT_SHA`, `36a6447c16`, as PR 31 did too, the lessons and SYNC.md's

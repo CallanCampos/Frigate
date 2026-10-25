@@ -197,8 +197,9 @@ The decisions behind them are architecture decision records ([adr/](adr/README.m
   neutral for the ROM build and listed in [game-changes.md](game-changes.md). Both ROMs still build byte for byte from
   this tree. Decomp files are never copied into `port/` ([ADR 0001](adr/0001-repository-and-upstream-sync.md)).
 - **Upstream and every other change reach `main` through reviewed pull requests**
-  ([ADR 0018](adr/0018-protected-main-and-sync-prs.md)). [upstream_sync.py](../tools/upstream_sync.py) proposes one
-  bounded upstream merge at a time that keeps its history, [sync_upstream.sh](../tools/sync_upstream.sh)
+  ([ADR 0018](adr/0018-protected-main-and-sync-prs.md), [ADR 0024](adr/0024-a-conflicting-sync-proposes-a-draft-of-upstreams-head.md)).
+  [upstream_sync.py](../tools/upstream_sync.py) proposes one bounded upstream merge at a time that keeps its history
+  (a draft of upstream's head when it conflicts, which a maintainer resolves), [sync_upstream.sh](../tools/sync_upstream.sh)
   `--verify-pr` builds both ROMs and tests the host on a pull request's exact head, and the rulesets
   ([../tools/main-ruleset.json](../tools/main-ruleset.json), [REPOSITORY-POLICY.md](REPOSITORY-POLICY.md)) keep
   `main` to that path ([SYNC.md](SYNC.md)).

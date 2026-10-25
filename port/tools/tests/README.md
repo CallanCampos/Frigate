@@ -1,7 +1,8 @@
 # Sync tooling tests
 
-`test_upstream_sync.py` creates isolated Git repositories to check upstream merge preservation, conflict/history/reference
-stops, frozen pending proposals and publication behavior. It makes no real GitHub writes and needs no ROM.
+`test_upstream_sync.py` creates isolated Git repositories to check upstream merge preservation, the draft proposal of a
+conflicting upstream head and its resolution's fast-forward, the history/reference/workflow stops, frozen pending
+proposals and publication behavior. It makes no real GitHub writes and needs no ROM.
 
 Run from the repository root:
 
