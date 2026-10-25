@@ -62,7 +62,7 @@ BOOL DWC_CheckProfanityExAsync(const u16 **words, int count, const char *reserve
                                int *badWordCount, DWCProfRegion region);
 DWCProfState DWC_CheckProfanityProcess(void);
 
-// Overlay 11's friend list (friend.c, whose other functions are in dwc/friend.h)
+// Overlay 11's friend list (dwc_friend.c, whose other functions are in dwc/friend.h)
 BOOL DWC_SetBuddyFriendCallback(DWCBuddyFriendCallback callback, void *param);
 u8 DWC_GetFriendStatusData(const DWCFriendData *friendData, char *statusData, int *size);
 BOOL DWC_SetOwnStatusData(const char *statusData, u32 size);
@@ -88,7 +88,7 @@ BOOL DWC_SetUserRecvTimeoutCallback(DWCUserRecvTimeoutCallback func, void *param
 // dwc/gsMemory.h's gsiMemoryCallbacksSet
 BOOL DWCi_Auth_InitInterface(int server);
 
-// Overlay 11's dwc_nasfunc.c (see dwc/nasfunc.h): sets the URL of the Nintendo authentication server, and reads it.
+// Overlay 11's dwc_auth.c (see dwc/nasfunc.h): sets the URL of the Nintendo authentication server, and reads it.
 // The settings utility (overlay 182) sets its own for as long as it runs
 void DWC_Auth_SetCustomNas(const char *url);
 const char *DWCi_Auth_GetCustomNas(void);

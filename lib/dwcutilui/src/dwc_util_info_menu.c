@@ -302,7 +302,7 @@ static void DWCUtilInfoMenu_DrawConsoleInfo(void) {
     textObj = DWCi_FNTlFormBgEx(0, 0);
     OS_GetMacAddress(mac);
     OS_SNPrintf(text, sizeof(text), "%02X-%02X-%02X-%02X-%02X-%02X", mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
-    DWCUtilString_Widen(wide, (const u8 *)text, sizeof(text));
+    DWCi_STRlConvertStringAsciiToUnicode(wide, (const u8 *)text, sizeof(text));
     DWCi_FNTlDrawRect(textObj, 8, 0x40, 0xf0, 0x1c, 2, 0x480, wide);
     DWCi_BM_GetWiFiInfo(&info);
     id = info.attestedUserId;
@@ -314,10 +314,10 @@ static void DWCUtilInfoMenu_DrawConsoleInfo(void) {
             id /= 10000;
         }
         OS_SNPrintf(text, sizeof(text), "%04d-%04d-%04d-%04d", groups[0], groups[1], groups[2], groups[3]);
-        DWCUtilString_Widen(wide, (const u8 *)text, sizeof(text));
+        DWCi_STRlConvertStringAsciiToUnicode(wide, (const u8 *)text, sizeof(text));
     } else {
         OS_SNPrintf(text, sizeof(text), "-------------------");
-        DWCUtilString_Widen(wide, (const u8 *)text, sizeof(text));
+        DWCi_STRlConvertStringAsciiToUnicode(wide, (const u8 *)text, sizeof(text));
     }
     DWCi_FNTlDrawRect(textObj, 8, 0x78, 0xf0, 0x1c, 2, 0x480, wide);
     DWCUtilText_MarkDirty(textObj);

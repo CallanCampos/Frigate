@@ -9,23 +9,23 @@ NitroWiFi's SSL, SOCL/SOC and WCM layers. Their remaining reconstruction differe
 
 [`ssl.c`](../lib/nitrowifi/src/ssl/ssl.c)'s `CPSSslConnection` mixes pointers with fields recovered at original ARM32
 offsets. Its `key_storage` union overlays generated key bytes with pointer slots assigned after generation.
-[`wcm.c`](../lib/nitrowifi/src/wcm/wcm.c)'s work, global and AP-list structures also contain pointers, thread queues,
-alarms and mutexes. Their recovered DS sizes and offsets do not establish a native 64-bit layout. Host object
-representations and any original binary layouts remain separate porting questions.
+WCM's work, global and AP-list structures ([`wcm_internal.h`](../lib/nitrowifi/src/wcm/wcm_internal.h)) also
+contain pointers, thread queues, alarms and mutexes. Their recovered DS sizes and offsets do not establish a native
+64-bit layout. Host object representations and any original binary layouts remain separate porting questions.
 
 [`soc.c`](../lib/nitrowifi/src/soc/soc.c)'s public socket handles are `int` values carrying `SOCLSocket *` pointers
 on the DS. Their representation and conversion to host socket handles need a separate audit before a native port;
 the recovered SDK declarations retain their original ABI.
 
-`WCM_NotifyResult` forwards mixed pointer/integer payloads through 32-bit words. `WcmNotifyEx` assembles its notice
+`WCMi_Notify` forwards mixed pointer/integer payloads through 32-bit words. `WCMi_NotifyEx` assembles its notice
 and extra payload fields on the stack, then calls the registered callback synchronously. A wider pointer
 representation alone would not extend that temporary notice's lifetime. The declarations and lifetime contract
-are in [`wcm_internal.h`](../lib/nitrowifi/include/nitrowifi/wcm_internal.h).
+are in [`wcm_internal.h`](../lib/nitrowifi/src/wcm/wcm_internal.h).
 
 ## Hardware and synchronization
 
-`WcmSetPhase` masks IRQs around state/alarm transitions and rearms the alarm for requested state 9.
-`WcmCpsifUnlockMutexInIRQ` recognizes the address of `OS_IrqHandler` as an owner marker, decrements the recursion
+`WCMi_SetPhase` masks IRQs around state/alarm transitions and rearms the alarm for requested state 9.
+`WCMi_CpsifUnlockMutexInIRQ` recognizes the address of `OS_IrqHandler` as an owner marker, decrements the recursion
 count, and wakes the queue when ownership clears. That marker cannot be treated as an ordinary thread object.
 The mapping of these operations to host synchronization and timers is unresolved.
 
@@ -34,7 +34,7 @@ work-storage tail remains unmapped. These recovered calls do not identify a host
 
 ## Storage and lifetimes
 
-`WcmConfigure` borrows and aligns the caller's AP-list allocation. `WCM_FillApEntry` copies a descriptor prefix
+`WcmConfigure` borrows and aligns the caller's AP-list allocation. `WCMi_BssDescCopy` copies a descriptor prefix
 and selected information elements into a record. The connected SSID and AP-MAC getters return interior pointers
 into connection storage; the SSID has a separate length and need not be NUL-terminated. AP-list clearing
 invalidates borrowed list records. These contracts are described in

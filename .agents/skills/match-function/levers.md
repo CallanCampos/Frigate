@@ -245,6 +245,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 - A struct field loaded again for each of several tests in a row, where ours reuses one load: the field is shared
   with other threads and `volatile`. (matching.md: "A field that other threads change")
+- A constant built and spilled before a call, in the wrong register: move its assignment past the call's failure test.
+  (matching.md: "A constant stored to a spilled local")
 - An RC4 swap with the wrong registers: write it through one temporary, and group a masked sum as
   `(table[i] + (j + key[k])) & 0xff`. A named `in = src + i` pointer that takes the counter's register: index
   `src[i + k]` directly. (matching.md: "An RC4 key schedule's swap")
@@ -786,6 +788,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
   two comparisons, as in a touch hit test. (matching.md: "joined by a bitwise `&`")
 - Blocks are laid out in source order. A switch whose `default` code comes first had `default:` written first, and
   `if (!f()) return FALSE; n++;` puts the return before the code that goes on. (matching.md: "Blocks are laid out in source order")
+- A return that the asm puts after the next test's return: write the test negated, that return in its `else`, and only
+  the next test in the then-block. (matching.md: "An `else` comes right after its then-block")
 - A loop's early exit placed after the whole body, just before the bottom test: wrap the body in `if (p != NULL) {
   ... } else { exit }`. (matching.md: "In a loop the `else` lands after the whole body")
 - Identical statements in different branches are merged, so a jump into the middle of another block means the same
@@ -888,9 +892,11 @@ text to `grep -n` there. Entries without a key come from later work and still be
   `while (box < n) { ...; break; }`, with a comment. (matching.md: "stops after its first pass")
 - A load hoisted one loop level only: it was in the middle loop's body. (matching.md: "middle loop's body")
 - `p + v * 4` kept in a register with reads at `#4` and `#8`, where the original computes `(v + k) << 2` for each
-  read: a pointer conversion around the element's whole address (`*(f32 *)&words[v + k]`), only where the buffer's
-  type calls for one; even a cast to the element's own type hides it. (matching.md: "hides the address from that
-  pass")
+  read: the original's read had a pointer conversion around the element's whole address (`*(f32 *)&words[v + k]`), a
+  `volatile` address, an index sum converted to the other signedness or narrowed (also implicitly, through a `u32`
+  index parameter), or a variable subscript. Use the one the code's types call for: a file's floats read from a `u8 *`
+  buffer of its bytes, `*(f32 *)(bytes + (v + k) * sizeof(f32))`, in `ica_anime.c`; never a cast to the type the
+  buffer already has. (matching.md: "only when one of these holds")
 - The loop passes off for a whole file, as a test: `-flag no-opt_loop_invariants` and
   `-flag no-opt_strength_reduction` in `--extra-flags`; the `-opt` sub-options do nothing after `-O4,p`.
   (matching.md: "takes a pragma's name")
@@ -1009,6 +1015,10 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - A `.bss` static reached through a literal of its own where the original reaches it from the section's base: give
   it a zero initializer (`= 0`, `= NULL`, `= { 0 }`); one the ROM has in `.data` takes `#pragma explicit_zero_data on`.
   (matching.md: "the same holds for zero")
+- A static struct's member loaded again where the original keeps it (after a 64-bit store, before a zero, across a
+  loop), with the struct reached from the section's base: make each member a separate `= 0` static, in the order whose
+  size sort gives the ROM's addresses. Statics that need two contradictory layouts are several original files.
+  (matching.md: "a struct of statics, but the two")
 - Odd instructions at the end of a same-size diff (`add sp, #0`, `.byte 0xff`): literal pool words, which can be a
   wrong constant; decode them before blaming registers. (matching.md: "decode the words before counting")
 - Live `.data` statics separated by unused records: one initialized array retains every entry even when code indexes
@@ -1101,7 +1111,12 @@ text to `grep -n` there. Entries without a key come from later work and still be
   another file's section, since the literal is `.bss` plus the offset rounded down to 0x80. (matching.md: "puts the
   static at a multiple of 0x80")
 - DSi code in the LTD autoload that reaches a main global at a pooled base plus an offset: it was compiled in that
-  global's file, in a `#pragma section` block for `.ltdmain`. (matching.md: "objects defined between")
+  global's file, in a `#pragma section` block for `.ltdmain`, which its entry lists in `.ltdmain` sections
+  (`docs/configs.md`, Migrated LTD sections).
+  (matching.md: "objects defined between")
+- The main part of such a file reaching its statics at other offsets: move the DSi part's static
+  declarations, in a `#pragma section` block of their own, among the main part's. (matching.md: "still take part
+  in the size sort")
 - Two statics reached from one literal: `-ipa file` in `file_flags`, with the SDK's separate statics. (matching.md:
   "ask for `-ipa file` before anything else")
 - A constant loaded from the pool with no relocation where MWCC folds it or builds it with `mov`/`lsl`: a linker
@@ -1126,6 +1141,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - Identical Thumb code that the probe calls 2 bytes short, before an ARM veneer: the symbol includes the linker's
   `mov r8, r8` pad; size it without the pad with `config_fixes.py add-function`. (matching.md: "a pad that belongs
   to no function")
+- The probe says MATCH but objdiff scores the function under 100%, with `thumb_call` relocations in its module's
+  `relocs.txt` from the function to labels inside it: dsd's records for a `bl` within the function, which MWCC
+  resolves itself; remove them with `config_fixes.py remove-reloc` (`DWCi_MatchProcess`, `DWCi_ProcessRecvMatchCommand`).
 
 - SDK assembly in an `asm` function: pre-UAL spellings, `@name:` labels, `dcd`, `ldr rX, =value`, and one `asm`
   function per entry point, falling into the next; no `entry`, so a second name comes from the configs or the linker.

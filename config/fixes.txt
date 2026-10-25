@@ -105,6 +105,7 @@
 . 0x02014b14 overlay_id 25
 . 0x02014b18 overlay_id 26
 . 0x020168e8 reloc_addend 4
+. 0x0201707a reloc_module overlay(12)
 . 0x0201880c reloc_addend 2
 . 0x02019f78 reloc_addend 0x4c
 . 0x02019f84 reloc_addend 0x240
@@ -714,6 +715,17 @@
 . 0x0214e31c remove_symbol
 . 0x0214e338 remove_symbol
 . 0x0214edc4 remove_symbol
+. 0x027674a0 add_section lib/nitro/src/card/card_rom.c:.ltdmain:0x1d4
+. 0x02768614 add_section lib/nitro/src/mi/mi_sharedWram.c:.ltdmain:0xca4
+. 0x027692b8 add_section lib/nitro/src/os/os_interrupt.c:.ltdmain:0x34
+. 0x027692ec add_section lib/nitro/src/os/os_arena.c:.ltdmain:0x2c
+. 0x02769318 add_section lib/nitro/src/os/os_ownerInfoEx.c:.ltdmain:0x34
+. 0x0276934c add_section lib/nitro/src/os/os_application_jump.c:.ltdmain:0x90
+. 0x027693dc add_section lib/nitro/src/spi/pm.c:.ltdmain:0x30c
+. 0x0276aee0 add_section lib/nitro/src/card/card_rom.c:.ltdmain.bss:0x94
+. 0x0276b09c add_section lib/nitro/src/mi/mi_sharedWram.c:.ltdmain.bss:0x40
+. 0x0276b0dc add_section lib/nitro/src/os/os_application_jump.c:.ltdmain.bss:0x8
+. 0x0276b0e4 add_section lib/nitro/src/spi/pm.c:.ltdmain.bss:0x1c
 ltd_autoload_0 0x02700228 reloc_addend 0x1000
 ltd_autoload_0 0x0270022c reloc_addend 0x11b4
 ltd_autoload_0 0x027007bc reloc_addend 0x1000
@@ -759,6 +771,7 @@ ltd_autoload_0 0x027052fc add_function func_027052fc:arm:0x24
 ltd_autoload_0 0x0270531c remove_symbol
 ltd_autoload_0 0x027674a0 add_data CARDi_NdmaInterface
 ltd_autoload_0 0x027674a0 add_reloc load,ltd_autoload(0),0x02768371
+ltd_autoload_0 0x027674a0 remove_file lib/twl/src/card/card_rom_twl.c
 ltd_autoload_0 0x027674a4 add_reloc load,ltd_autoload(0),0x02768271
 ltd_autoload_0 0x027674fc reloc_addend 0x500
 ltd_autoload_0 0x027675cc reloc_addend 0x500
@@ -766,6 +779,7 @@ ltd_autoload_0 0x02767674 add_data sDigestKey
 ltd_autoload_0 0x027676ae remove_symbol
 ltd_autoload_0 0x02767bec add_reloc load,ltd_autoload(0),0x02767674
 ltd_autoload_0 0x02768614 add_data sGetWramBankOwnerFuncs
+ltd_autoload_0 0x02768614 remove_file lib/twl/src/mi/mi_sharedWram_twl.c
 ltd_autoload_0 0x02768620 add_data sGetWramBaseFuncs
 ltd_autoload_0 0x0276862c add_data sEnableWramBankFuncs
 ltd_autoload_0 0x02768638 add_data sGiveWramBankFuncs
@@ -773,10 +787,14 @@ ltd_autoload_0 0x027686c4 add_reloc load,ltd_autoload(0),0x02768638
 ltd_autoload_0 0x0276873c add_reloc load,ltd_autoload(0),0x0276862c
 ltd_autoload_0 0x02768780 add_reloc load,ltd_autoload(0),0x02768614
 ltd_autoload_0 0x027687e4 add_reloc load,ltd_autoload(0),0x02768620
+ltd_autoload_0 0x027692b8 remove_file lib/twl/src/os/os_interrupt_twl.c
 ltd_autoload_0 0x027692e0 reloc_addend 0x30
 ltd_autoload_0 0x027692e4 reloc_addend 0x38
 ltd_autoload_0 0x027692e8 reloc_addend 0x34
-ltd_autoload_0 0x0276b100 section_end lib/twl/src/spi/pm_twl.c:.bss
+ltd_autoload_0 0x027692ec remove_file lib/twl/src/os/os_arena_twl.c
+ltd_autoload_0 0x02769318 remove_file lib/twl/src/os/os_ownerInfoEx_twl.c
+ltd_autoload_0 0x0276934c remove_file lib/twl/src/os/os_application_jump_twl.c
+ltd_autoload_0 0x027693dc remove_file lib/twl/src/spi/pm_twl.c
 ltd_autoload_0 0x0276b108 add_data data_0276b108
 ltd_autoload_0 0x0276b13c remove_symbol
 ltd_autoload_0 0x0276b14c remove_symbol
@@ -855,18 +873,52 @@ overlays/ov011 0x020050c4 remove_orphan_reloc .
 overlays/ov011 0x0215208e reloc_module overlay(32)
 overlays/ov011 0x02152708 add_reloc load,main,0x020050ac
 overlays/ov011 0x02155e68 add_reloc load,main,0x020050c4
+overlays/ov011 0x02157af0 section_start lib/nitrowifi/src/soc/socl_list.c:.text
+overlays/ov011 0x02157af0 section_end lib/nitrowifi/src/soc/socl_misc.c:.text
 overlays/ov011 0x02158b58 add_function compare_fqdn:thumb:0x48
 overlays/ov011 0x0215a5fc add_reloc load,main,0x020050f0
+overlays/ov011 0x0215c594 section_end lib/nitrowifi/src/wcm/wcm_system.c:.text
+overlays/ov011 0x0215dda8 section_end lib/dwc/src/base/dwc_nonport.c:.text
 overlays/ov011 0x02160e10 section_start lib/dwc/src/match/dwc_match.c:.text
+overlays/ov011 0x02161808 remove_reloc
+overlays/ov011 0x02161816 remove_reloc
+overlays/ov011 0x02161a9a remove_reloc
+overlays/ov011 0x02163a90 remove_reloc
+overlays/ov011 0x02163a9a remove_reloc
+overlays/ov011 0x02163aa2 remove_reloc
+overlays/ov011 0x02163ada remove_reloc
+overlays/ov011 0x02163ae2 remove_reloc
+overlays/ov011 0x02163ae6 remove_reloc
+overlays/ov011 0x02163af0 remove_reloc
+overlays/ov011 0x02163afa remove_reloc
+overlays/ov011 0x02163afe remove_reloc
+overlays/ov011 0x02163b06 remove_reloc
+overlays/ov011 0x02163b0a remove_reloc
+overlays/ov011 0x02163b14 remove_reloc
+overlays/ov011 0x02163b18 remove_reloc
+overlays/ov011 0x02163b20 remove_reloc
+overlays/ov011 0x02163b24 remove_reloc
+overlays/ov011 0x02163d90 remove_reloc
+overlays/ov011 0x02163f10 remove_reloc
+overlays/ov011 0x02163f24 remove_reloc
 overlays/ov011 0x0216c7ea reloc_module overlay(189)
 overlays/ov011 0x0216eba2 reloc_module overlay(189)
 overlays/ov011 0x0216ebe8 reloc_module overlay(189)
 overlays/ov011 0x0216fbe0 section_end lib/dwc/src/gt2/gsUdpEngine.c:.text
 overlays/ov011 0x0216fbe0 section_start lib/dwc/src/gscommon/gsXML.c:.text
 overlays/ov011 0x021722c4 remove_reloc
+overlays/ov011 0x02185004 section_end lib/nitrowifi/src/wcm/wcm_system.c:.rodata
+overlays/ov011 0x021854d8 add_data sHandshakePriority
 overlays/ov011 0x02185568 remove_reloc
+overlays/ov011 0x02185700 section_end lib/dwc/src/base/dwc_nonport.c:.data
 overlays/ov011 0x021857d0 section_start lib/dwc/src/match/dwc_match.c:.data
+overlays/ov011 0x0218dc4c add_section lib/nitrowifi/src/soc/socl_misc.c:.bss:0x8
+overlays/ov011 0x0218dc54 section_start lib/nitrowifi/src/soc/socl_list.c:.bss
+overlays/ov011 0x0218ddec add_data sUnused
+overlays/ov011 0x0218df7c section_end lib/nitrowifi/src/wcm/wcm_system.c:.bss
+overlays/ov011 0x0218dfd0 section_end lib/dwc/src/base/dwc_nonport.c:.bss
 overlays/ov011 0x0218e1c0 section_start lib/dwc/src/match/dwc_match.c:.bss
+overlays/ov011 0x0218e91c add_data sSendPoolSize
 overlays/ov012 0x02150aa0 overlay_id 36
 overlays/ov012 0x02150aa4 reloc_module overlay(36)
 overlays/ov012 0x02150aa8 overlay_id 174
@@ -1261,6 +1313,22 @@ overlays/ov023 0x0216f418 reloc_module overlay(322)
 overlays/ov023 0x0216f4b8 reloc_module overlay(323)
 overlays/ov023 0x0216f534 reloc_module overlay(62)
 overlays/ov023 0x0216f720 reloc_module overlay(325)
+overlays/ov024 0x0216f948 reloc_module overlay(12)
+overlays/ov024 0x0216fa06 reloc_module overlay(12)
+overlays/ov024 0x0216fa42 reloc_module overlay(12)
+overlays/ov024 0x0216faa0 reloc_module overlay(12)
+overlays/ov025 0x0216f95c reloc_module overlay(12)
+overlays/ov025 0x0216fc5a reloc_module overlay(12)
+overlays/ov025 0x0216fc8c reloc_module overlay(12)
+overlays/ov025 0x0216fd3a reloc_module overlay(12)
+overlays/ov025 0x0216fd8a reloc_module overlay(12)
+overlays/ov025 0x0216fd98 reloc_module overlay(12)
+overlays/ov025 0x0216fdd6 reloc_module overlay(12)
+overlays/ov025 0x0216fde6 reloc_module overlay(12)
+overlays/ov025 0x0216fe1c reloc_module overlay(12)
+overlays/ov025 0x0216fe8c reloc_module overlay(12)
+overlays/ov025 0x0216fedc reloc_module overlay(12)
+overlays/ov025 0x0216ff24 reloc_module overlay(12)
 overlays/ov026 0x0216f926 reloc_module overlay(12)
 overlays/ov028 0x02171cfa reloc_module overlay(69)
 overlays/ov028 0x021723e8 reloc_module overlay(167)
@@ -1286,7 +1354,9 @@ overlays/ov033 0x02179584 reloc_module overlay(12)
 overlays/ov033 0x021798f8 reloc_module overlay(256)
 overlays/ov033 0x02179e7c reloc_module overlay(319)
 overlays/ov033 0x0217a18e reloc_module overlay(131)
+overlays/ov033 0x0217ae4c reloc_module overlay(12)
 overlays/ov033 0x0217c094 section_end src/ov033/bsubway_scr.c:.text
+overlays/ov033 0x0217c27e reloc_module overlay(12)
 overlays/ov033 0x0217c5b8 section_end src/ov033/bsubway_scr.c:.rodata
 overlays/ov033 0x0217c5b8 add_data sSuperTopTrainerRange
 overlays/ov035 0x0217c9e8 reloc_module overlay(12)
@@ -1317,6 +1387,8 @@ overlays/ov036 0x02181530 reloc_module overlay(94)
 overlays/ov036 0x021818ba reloc_module overlay(121)
 overlays/ov036 0x02181a4e reloc_module overlay(121)
 overlays/ov036 0x02182588 reloc_module overlay(156)
+overlays/ov036 0x021825e0 reloc_module overlay(157)
+overlays/ov036 0x021825e4 reloc_module overlay(157)
 overlays/ov036 0x021828c8 reloc_module overlay(107)
 overlays/ov036 0x02182990 reloc_module overlay(101)
 overlays/ov036 0x02182f08 reloc_addend 6
@@ -1324,9 +1396,32 @@ overlays/ov036 0x02183a18 reloc_addend 4
 overlays/ov036 0x02183ca8 reloc_addend 8
 overlays/ov036 0x021841e8 reloc_addend 2
 overlays/ov036 0x02184440 reloc_module overlay(12)
+overlays/ov036 0x0218a802 reloc_module overlay(12)
+overlays/ov036 0x0218a902 reloc_module overlay(12)
+overlays/ov036 0x0218aa86 reloc_module overlay(12)
+overlays/ov036 0x0218ab72 reloc_module overlay(12)
 overlays/ov036 0x0218d0e8 section_end src/ov036/talkmsgwin.c:.text
 overlays/ov036 0x0218d0e8 section_start src/ov036/ircbattlemenu.c:.text
+overlays/ov036 0x0218ee9a reloc_module overlay(12)
+overlays/ov036 0x0218f0c2 reloc_module overlay(12)
+overlays/ov036 0x0218f188 reloc_module overlay(12)
+overlays/ov036 0x0218f480 reloc_module overlay(12)
+overlays/ov036 0x0218f62c reloc_module overlay(12)
+overlays/ov036 0x0218f744 reloc_module overlay(12)
+overlays/ov036 0x0218fdee reloc_module overlay(12)
+overlays/ov036 0x0219037c reloc_module overlay(12)
+overlays/ov036 0x02190c30 reloc_module overlay(12)
+overlays/ov036 0x02190ede reloc_module overlay(12)
 overlays/ov036 0x02191228 section_end src/ov036/fldmmdl_acmd.c:.text
+overlays/ov036 0x0219136c reloc_module overlay(12)
+overlays/ov036 0x02191570 reloc_module overlay(12)
+overlays/ov036 0x021916d6 reloc_module overlay(12)
+overlays/ov036 0x02191752 reloc_module overlay(12)
+overlays/ov036 0x02191ab0 reloc_module overlay(12)
+overlays/ov036 0x02191d44 reloc_module overlay(12)
+overlays/ov036 0x02191d76 reloc_module overlay(12)
+overlays/ov036 0x02192082 reloc_module overlay(12)
+overlays/ov036 0x021920b6 reloc_module overlay(12)
 overlays/ov036 0x02194b68 reloc_module overlay(12)
 overlays/ov036 0x02194bc8 reloc_module overlay(12)
 overlays/ov036 0x02194c34 reloc_module overlay(12)
@@ -1335,6 +1430,7 @@ overlays/ov036 0x02194cdc reloc_module overlay(12)
 overlays/ov036 0x02194f1a reloc_module overlay(12)
 overlays/ov036 0x0219515c reloc_module overlay(12)
 overlays/ov036 0x02195308 reloc_module overlay(12)
+overlays/ov036 0x02195458 reloc_module overlay(12)
 overlays/ov036 0x02195590 section_end src/ov036/fld_act_rail.c:.text
 overlays/ov036 0x0219749c section_end src/ov036/field_rail_loader.c:.text
 overlays/ov036 0x021981e8 reloc_addend 4
@@ -1673,7 +1769,33 @@ overlays/ov036 0x021d1610 reloc_module overlay(129)
 overlays/ov036 0x021d1618 reloc_module overlay(132)
 overlays/ov036 0x021d161c reloc_module overlay(132)
 overlays/ov036 0x021d1620 reloc_module overlay(132)
+overlays/ov036 0x021d25ec reloc_module overlay(149)
+overlays/ov036 0x021d25f0 reloc_module overlay(149)
+overlays/ov036 0x021d2600 reloc_module overlay(149)
+overlays/ov036 0x021d2604 reloc_module overlay(149)
 overlays/ov036 0x021d2614 reloc_module overlay(151)
+overlays/ov036 0x021d263c reloc_module overlay(146)
+overlays/ov036 0x021d2650 reloc_module overlay(149)
+overlays/ov036 0x021d2654 reloc_module overlay(149)
+overlays/ov036 0x021d2664 reloc_module overlay(149)
+overlays/ov036 0x021d2668 reloc_module overlay(149)
+overlays/ov036 0x021d2678 reloc_module overlay(152)
+overlays/ov036 0x021d268c reloc_module overlay(154)
+overlays/ov036 0x021d26a0 reloc_module overlay(153)
+overlays/ov036 0x021d26c8 reloc_module overlay(146)
+overlays/ov036 0x021d2718 reloc_module overlay(146)
+overlays/ov036 0x021d272c reloc_module overlay(146)
+overlays/ov036 0x021d2740 reloc_module overlay(146)
+overlays/ov036 0x021d2754 reloc_module overlay(146)
+overlays/ov036 0x021d277c reloc_module overlay(146)
+overlays/ov036 0x021d2790 reloc_module overlay(146)
+overlays/ov036 0x021d27cc reloc_module overlay(146)
+overlays/ov036 0x021d281c reloc_module overlay(146)
+overlays/ov036 0x021d2830 reloc_module overlay(146)
+overlays/ov036 0x021d2870 reloc_module overlay(149)
+overlays/ov036 0x021d28a8 reloc_module overlay(146)
+overlays/ov036 0x021d28bc reloc_module overlay(149)
+overlays/ov036 0x021d28c0 reloc_module overlay(149)
 overlays/ov036 0x021d28d0 reloc_module overlay(151)
 overlays/ov036 0x021d28e4 section_start src/ov036/enceff.c:.rodata
 overlays/ov036 0x021d2c44 remove_reloc
@@ -2739,7 +2861,7 @@ overlays/ov189 0x021aa6ec add_function MulWords:arm:0xf0
 overlays/ov189 0x021aa7d8 remove_symbol
 overlays/ov189 0x021acd84 add_data sBase64Pad
 overlays/ov189 0x021acd85 add_data sActionCount
-overlays/ov189 0x021acea0 section_end lib/dwc/src/gamestats/gamestats.c:.rodata
+overlays/ov189 0x021acea0 section_end lib/dwc/src/enc/dwc_encsession.c:.rodata
 overlays/ov189 0x021acea0 section_start lib/dwc/src/crypt/crypt.c:.rodata
 overlays/ov189 0x021b2840 add_data data_ov189_021b2840
 overlays/ov190 0x021b5144 remove_reloc

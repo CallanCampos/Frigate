@@ -61,33 +61,32 @@ typedef struct TransportRelayHeader {
     u32 aids;
 } TransportRelayHeader;
 
-// The data that GT2 could not take, and its total size
-static struct {
-    TransportSendNode *head;
-    int size;
-} sSendPool;
+// The data that GT2 could not take, and its total size. Two zero-initialized statics, which the functions reach from
+// the section's base, as DWCs_AddToSendPool does for the size while it takes the head's own address for its walk
+static TransportSendNode *sSendPoolHead = NULL;
+static int sSendPoolSize = 0;
 static DWCTransportInfo *sTransport;
 
 void DWCs_InitSendPool(void) {
-    sSendPool.head = NULL;
-    sSendPool.size = 0;
+    sSendPoolHead = NULL;
+    sSendPoolSize = 0;
 }
 
 void DWCs_ClearSendPool(void) {
-    TransportSendNode *node = sSendPool.head;
+    TransportSendNode *node = sSendPoolHead;
 
     while (node != NULL) {
-        sSendPool.head = node->next;
+        sSendPoolHead = node->next;
         DWC_Free(4, node->data, node->size);
         DWC_Free(4, node, 0);
-        node = sSendPool.head;
+        node = sSendPoolHead;
     }
-    sSendPool.head = NULL;
-    sSendPool.size = 0;
+    sSendPoolHead = NULL;
+    sSendPoolSize = 0;
 }
 
 BOOL DWCs_HasSendPoolSpace(void) {
-    if (sSendPool.size < 0x6000) {
+    if (sSendPoolSize < 0x6000) {
         return TRUE;
     }
     return FALSE;
@@ -98,13 +97,13 @@ BOOL DWCs_FlushSendPool(void) {
 }
 
 BOOL DWCs_FlushSendPoolWith(DWCTransportSendFunc send) {
-    TransportSendNode *node = sSendPool.head;
+    TransportSendNode *node = sSendPoolHead;
     int tries;
 
     while (node != NULL) {
         for (tries = 0; tries < 3; tries++) {
             if (!send(node->connection, node->data, node->size, TRUE)) {
-                sSendPool.size -= node->size;
+                sSendPoolSize -= node->size;
                 DWC_Free(4, node->data, node->size);
                 node->data = NULL;
                 node->size = 0;
@@ -117,28 +116,28 @@ BOOL DWCs_FlushSendPoolWith(DWCTransportSendFunc send) {
         }
         node = node->next;
     }
-    node = sSendPool.head;
+    node = sSendPoolHead;
     if (node != NULL) {
         do {
             if (node->data != NULL) {
                 break;
             }
-            sSendPool.head = node->next;
+            sSendPoolHead = node->next;
             DWC_Free(4, node, 0);
-            node = sSendPool.head;
+            node = sSendPoolHead;
         } while (node != NULL);
     }
     return node == NULL;
 }
 
 BOOL DWCs_AddToSendPool(GT2Connection connection, const void *data, int size) {
-    TransportSendNode **link = &sSendPool.head;
+    TransportSendNode **link = &sSendPoolHead;
     TransportSendNode *node;
 
-    if (sSendPool.size + size > 0x8000) {
+    if (sSendPoolSize + size > 0x8000) {
         return FALSE;
     }
-    for (node = sSendPool.head; node != NULL; node = node->next) {
+    for (node = sSendPoolHead; node != NULL; node = node->next) {
         link = &node->next;
     }
     *link = DWC_Alloc(4, sizeof(TransportSendNode));
@@ -155,7 +154,7 @@ BOOL DWCs_AddToSendPool(GT2Connection connection, const void *data, int size) {
     (*link)->size = size;
     (*link)->next = NULL;
     MIi_CpuCopy32(data, (*link)->data, size);
-    sSendPool.size += size;
+    sSendPoolSize += size;
     return TRUE;
 }
 

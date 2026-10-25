@@ -5,9 +5,8 @@
 
 // NitroSDK's power management (TwlSDK's libspi pm.c, whose ARM9 part is lib/nitro/src/spi/pm.c): the backlights, the
 // battery, the sound amplifier of the microphone, the sleep mode and the power-off. Each call sends the ARM7 a request
-// through the PXI FIFO and returns a result, PM_RESULT_SUCCESS or why not. The functions have NitroSDK's names, as
-// ntrtwl's reconstruction of NitroSDK has them, where it has the code, and the SDK's names by what the code does
-// elsewhere
+// through the PXI FIFO and returns a result, PM_RESULT_SUCCESS or why not. The functions have TwlSDK's names, which
+// aletheia's match of Black 1's code to TwlSDK's pm.o gives
 
 #define PM_RESULT_SUCCESS 0
 // The ARM7 is still on a request
@@ -58,17 +57,13 @@ typedef enum {
 void PM_Init(void);
 
 // Sends the ARM7 a request with a number and a halfword, waits for the answer and returns its result. A request that
-// reads gives the ARM7's answer in *result. pret's pokeheartgold calls it PMi_ReadRegister, after the register reads
-// that it is mostly used for; NitroSDK 4.2's PMi_ReadRegister is another call
-u32 PMi_ReadRegister(u8 request, u16 data, u16 *result);
+// reads gives the ARM7's answer in *result. TwlSDK's name; pret's pokeheartgold calls it PMi_ReadRegister, after the
+// register reads that it is mostly used for
+u32 PM_SendUtilityCommand(u8 request, u16 data, u16 *result);
 // The cycles of the system clock that the retries of a request wait for (about 10 ms)
 #define PM_RETRY_CYCLES 0x51d23
 // A word of the shared memory that the exit notifications set and PM_Init clears
 #define HW_PM_EXIT_FLAG 0x02fff684
-// Why the system is exiting, and whether it exits once the exit callbacks have run, which pm.c keeps for TwlSDK's
-// exit sequence in the LTD autoload (twl/pm.h)
-extern u32 PMi_ExitType;
-extern BOOL PMi_AutoExitFlag;
 
 // PM_SetBackLight sends the request and waits for the answer, PM_SetBackLightAsync calls back
 u32 PM_SetBackLightAsync(PMLCDTarget target, PMBackLightSwitch backlight, PMCallback callback, void *arg);
@@ -92,7 +87,7 @@ BOOL PM_SetLCDPower(BOOL on);
 // Two more settings of the ARM7 (the request 0x12, and the read of the register 8)
 u32 PMi_SendLEDPatternCommand(u32 value);
 u32 PM_GetLEDPattern(u32 *value);
-// NitroSDK's PMi_SetDispOffCount (the name is recalled, not shown): records the vertical blank count at which the
+// TwlSDK's PMi_SetDispOffCount: records the vertical blank count at which the
 // display went off, which the screens' power waits two frames from
 void PMi_SetDispOffCount(void);
 void PM_GoSleepMode(u32 trigger, u32 logic, u16 keyPattern);
@@ -122,7 +117,8 @@ static inline void PM_SetSleepCallbackInfo(PMSleepCallbackInfo *info, PMGenCallb
 #define PM_INSERT_APPEND 0
 #define PM_INSERT_PREPEND 1
 
-// PMi_InsertList, PMi_DeleteList and PMi_ExecuteList, which TwlSDK's exit callbacks (the LTD autoload) use too
+// PMi_InsertList, PMi_DeleteList and PMi_ExecuteList, which pm.c's DSi part, in the LTD autoload, uses for its exit
+// callbacks too
 void PMi_InsertList(PMGenCallbackInfo **list, PMGenCallbackInfo *info, int priority, int insertType);
 void PMi_DeleteList(PMGenCallbackInfo **list, PMGenCallbackInfo *info);
 void PMi_ExecuteList(PMGenCallbackInfo *list);
@@ -130,7 +126,7 @@ void PMi_ExecuteList(PMGenCallbackInfo *list);
 void PM_PrependPreSleepCallback(PMSleepCallbackInfo *info);
 void PM_AppendPostSleepCallback(PMSleepCallbackInfo *info);
 // The pre-sleep callback with its priority, after those of the same one
-void PM_InsertPreSleepCallback(PMSleepCallbackInfo *info, int priority);
+void PMi_InsertPreSleepCallbackEx(PMSleepCallbackInfo *info, int priority);
 void PM_DeletePreSleepCallback(PMSleepCallbackInfo *info);
 void PM_DeletePostSleepCallback(PMSleepCallbackInfo *info);
 

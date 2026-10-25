@@ -298,9 +298,9 @@ extern const char cardi_backup_assert[];
 
 // What card_rom.c gives card_common.c: the object that holds the ROM's base address, and the setup of the ROM reads
 extern u32 cardi_rom_base;
-// The ROM reader switches to TwlSDK's secure reader during DSi card initialization.
+// What reads the ROM, as CARDi_ReadRomWithCPU does: len bytes from the offset src into dst. The first parameter is for
+// the argument of a callback, which a reader by DMA gives the read
 typedef u32 (*CARDiRomReader)(void *arg, void *dst, u32 src, u32 len);
-extern CARDiRomReader sRomReader;
 void CARDi_InitRom(void);
 
 // A ROM read by DMA, which the card-data interrupt moves on a page at a time. The callback is called with the argument

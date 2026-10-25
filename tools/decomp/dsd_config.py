@@ -9,6 +9,18 @@ from pathlib import Path
 import yaml
 
 ROOT = Path(__file__).resolve().parents[2]
+# The sections that an ARM9 main file's entry in delinks.txt may give the LTD autoload, each with the LTD autoload's
+# section that holds it: TwlSDK's LTDMAIN section puts a NitroSDK file's DSi-only code in .ltdmain and its statics in
+# .ltdmain.bss, and dsd (since v0.12.1-dsi.7) places them in that module's .ltdmain and .bss, from the file's one
+# object (docs/configs.md, "Migrated LTD sections")
+LTD_MODULE = "ltd_autoload_0"
+MIGRATED_SECTIONS = {".ltdmain": ".ltdmain", ".ltdmain.bss": ".bss"}
+
+
+def section_module(module: str, section: str) -> str:
+    """The module, as a directory under a version's arm9 config ("." for ARM9 main), whose addresses a file's section
+    is at: a migrated section of an ARM9 main file is the LTD autoload's."""
+    return LTD_MODULE if module == "." and section in MIGRATED_SECTIONS else module
 
 
 @contextlib.contextmanager

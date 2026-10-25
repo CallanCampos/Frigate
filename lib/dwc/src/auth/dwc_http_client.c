@@ -1,4 +1,4 @@
-#include "dwc/common.h"
+#include "dwc/base64.h"
 #include "dwc/ext.h"
 #include "dwc/memfunc.h"
 #include "dwc/nasfunc.h"

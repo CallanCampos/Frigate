@@ -11,6 +11,6 @@ extern BOOL ExifEnc_SignMode;
 
 // Writes the SOI and the APP1 segment with the EXIF data of a width x height image, and its thumbnail if there is one,
 // to dst; returns the number of bytes written
-u32 ExifEnc_WriteHeader(u8 *dst, u32 width, u32 height, const u8 *thumbnail, u32 thumbnailSize);
+u32 SSP_ExifEncode(u8 *dst, u32 width, u32 height, const u8 *thumbnail, u32 thumbnailSize);
 
 #endif // POKEBW2_TWL_SSP_EXIFENC_H

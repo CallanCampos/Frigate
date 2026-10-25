@@ -1,5 +1,5 @@
-#ifndef POKEBW2_DWC_GAMESTATS_INTERNAL_H
-#define POKEBW2_DWC_GAMESTATS_INTERNAL_H
+#ifndef POKEBW2_DWC_ENC_INTERNAL_H
+#define POKEBW2_DWC_ENC_INTERNAL_H
 
 #include "types.h"
 #include "dwc/dwc_ghttp.h"
@@ -18,4 +18,4 @@
 
 // The front half of overlay 189, DWC's use of the HTTP client, is in dwc/dwc_ghttp.h
 
-#endif // POKEBW2_DWC_GAMESTATS_INTERNAL_H
+#endif // POKEBW2_DWC_ENC_INTERNAL_H

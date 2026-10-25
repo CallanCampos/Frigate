@@ -550,10 +550,10 @@ static void DWCUtilAddressSettings_WaitFadeOut(void) {
     DWCi_TSKlDeleteEx(0, sAddressSettings.work->task);
     DWCi_TSKlDeleteEx(1, sAddressSettings.work->vblankTask);
     for (i = 0; i < 7; i++) {
-        DWCi_MOV_MBP_GetChildBmp(sAddressSettings.work->marks[i]);
+        DWCi_OBJlDelete(sAddressSettings.work->marks[i]);
     }
     if (sAddressSettings.work->setupIcon != NULL) {
-        DWCi_MOV_MBP_GetChildBmp(sAddressSettings.work->setupIcon);
+        DWCi_OBJlDelete(sAddressSettings.work->setupIcon);
     }
     DWCi_SBlEnd();
     DWCi_FNTlDeleteBgLcd(0);
@@ -861,7 +861,7 @@ static void DWCUtilAddressSettings_DrawString(const u8 *str, int row) {
     int y;
 
     MI_CpuFill8(line, 0, sizeof(line));
-    length = DWCi_MOV_WH_SetUserGameInfo(str, 32);
+    length = DWCi_STRlNLen(str, 32);
     count = length;
     if (count > 16) {
         count = 16;
@@ -897,7 +897,7 @@ static void DWCUtilAddressSettings_DrawAddress(const u8 *address, int row) {
     char digits[16];
 
     OS_SNPrintf(digits, sizeof(digits), "%3d.%3d.%3d.%3d", address[0], address[1], address[2], address[3]);
-    DWCUtilString_Widen(str, (u8 *)digits, 16);
+    DWCi_STRlConvertStringAsciiToUnicode(str, (u8 *)digits, 16);
     DWCi_FNTlDrawStringEx(sAddressSettings.work->text, 0x5f, row * ADDRESS_ROW_HEIGHT + 8, 2, 7, str, 1);
 }
 

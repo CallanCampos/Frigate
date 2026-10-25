@@ -64,6 +64,7 @@ src/ov168/btlv_timer.c:
     .data       start:0x021f41f8 end:0x021f4208
 
 src/ov168/btlv_effect.c:
+    complete
     .text       start:0x021dec68 end:0x021e0de4
     .data       start:0x021f3f50 end:0x021f3fac
     .bss        start:0x021f4240 end:0x021f4260

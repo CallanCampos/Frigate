@@ -6,8 +6,10 @@
 #include "nitro/std.h"
 
 // The EXIF writer of TwlSDK's JPEG encoder: the SOI and APP1 segment that start a photo, with its 0th IFD, Exif IFD,
-// MakerNote IFD (which holds what the DSi signs), Interoperability IFD and the 1st IFD of its thumbnail. The file name
-// is a guess after TwlSDK's ssp/exifenc.h; the date, software and maker note setters were dead-stripped from the game
+// MakerNote IFD (which holds what the DSi signs), Interoperability IFD and the 1st IFD of its thumbnail;
+// libssp.TWL.HYB.a's exifenc.o. The functions have the SDK's names that Black 1's decompilation (aletheia) gives the
+// same functions in the same order; the names of the data are ours. The date, software and maker note setters were
+// dead-stripped from the game
 
 // EXIF types
 enum {
@@ -100,16 +102,16 @@ typedef struct {
     u32 thumbnailSize;
 } ExifIfdSet;
 
-static void ExifEnc_SetDateTime(const char *dateTime);
-static BOOL ExifEnc_GetDateTime(RTCDate *date, RTCTime *time);
-static BOOL ExifEnc_SetCurrentDateTime(void);
-static void ExifEnc_SetSoftware(const char *software);
-static u32 ExifEnc_GetValueSize(const ExifEntry *entry);
-static void ExifEnc_WriteValue(ExifEntry *entry);
-static void ExifEnc_WriteMakerNoteIfd(ExifIfdSet *set, ExifIfd *ifd, u8 last);
-static void ExifEnc_WriteIfd(ExifIfdSet *set, ExifIfd *ifd, u8 last);
-static BOOL ExifEnc_WriteApp1(ExifIfdSet *set, u8 noThumbnail, const u8 *thumbnail, u32 thumbnailSize);
-static BOOL ExifEnc_BuildIfds(s16 width, s16 height, BOOL thumbnail, const u8 *thumbnailData, u32 thumbnailSize);
+static void SSP_SetJpegEncoderDateTime(const char *dateTime);
+static BOOL SSP_GetDateTime(RTCDate *date, RTCTime *time);
+static BOOL SSP_SetJpegEncoderDateTimeNow(void);
+static void SSP_SetJpegEncoderSoftware(const char *software);
+static u32 jpeg_exif_get_tag_size(const ExifEntry *entry);
+static void jpeg_exif_set_tag_value(ExifEntry *entry);
+static void jpeg_encode_ifd_direct(ExifIfdSet *set, ExifIfd *ifd, u8 last);
+static void jpeg_encode_ifd(ExifIfdSet *set, ExifIfd *ifd, u8 last);
+static BOOL jpeg_encode_exif(ExifIfdSet *set, u8 noThumbnail, const u8 *thumbnail, u32 thumbnailSize);
+static BOOL jpeg_encode_main(s16 width, s16 height, BOOL thumbnail, const u8 *thumbnailData, u32 thumbnailSize);
 
 // The file's variables, declared in an order that lays them out as the game has them: MWCC sorts them by size
 static u32 sExifEncMakerNoteData1Size;
@@ -139,44 +141,44 @@ static inline void SetSignMode(BOOL sign) {
 
 #define WRITE_BYTE(value) (sExifEncWriteBuffer[sExifEncWritePos++] = (value))
 
-static void ExifEnc_SetDateTime(const char *dateTime) {
+static void SSP_SetJpegEncoderDateTime(const char *dateTime) {
     MI_CpuCopy(dateTime, sExifEncDateTime, 19);
     sExifEncDateTime[19] = '\0';
     sExifEncDateTimeSet = TRUE;
 }
 
-static BOOL ExifEnc_GetDateTime(RTCDate *date, RTCTime *time) {
+static BOOL SSP_GetDateTime(RTCDate *date, RTCTime *time) {
     if (RTC_GetDateTime(date, time) == 0) {
         return TRUE;
     }
     return FALSE;
 }
 
-static BOOL ExifEnc_SetCurrentDateTime(void) {
+static BOOL SSP_SetJpegEncoderDateTimeNow(void) {
     RTCDate date;
     RTCTime time;
     char dateTime[20];
 
-    if (ExifEnc_GetDateTime(&date, &time) == TRUE) {
+    if (SSP_GetDateTime(&date, &time) == TRUE) {
         STD_TSPrintf(dateTime, "%04d:%02d:%02d %02d:%02d:%02d", date.year + 2000, date.month, date.day, time.hour,
                      time.minute, time.second);
-        ExifEnc_SetDateTime(dateTime);
+        SSP_SetJpegEncoderDateTime(dateTime);
         return TRUE;
     }
     return FALSE;
 }
 
-static void ExifEnc_SetSoftware(const char *software) {
+static void SSP_SetJpegEncoderSoftware(const char *software) {
     sExifEncSoftwareLength = STD_CopyLString(sExifEncSoftware, software, EXIF_VALUE_MAX) + 1;
 }
 
-static u32 ExifEnc_GetValueSize(const ExifEntry *entry) {
+static u32 jpeg_exif_get_tag_size(const ExifEntry *entry) {
     s8 typeSizes[] = { 0, 1, 1, 2, 4, 8, 0, 1, 0, 4, 8 };
 
     return typeSizes[entry->type] * entry->count;
 }
 
-static void ExifEnc_WriteValue(ExifEntry *entry) {
+static void jpeg_exif_set_tag_value(ExifEntry *entry) {
     u32 size;
     u32 i;
 
@@ -212,7 +214,7 @@ static void ExifEnc_WriteValue(ExifEntry *entry) {
         WRITE_BYTE(entry->denominator);
         break;
     case EXIF_TYPE_UNDEFINED:
-        size = ExifEnc_GetValueSize(entry);
+        size = jpeg_exif_get_tag_size(entry);
         for (i = 0; i < size; i++) {
             WRITE_BYTE(entry->undefinedValue[i]);
         }
@@ -221,7 +223,7 @@ static void ExifEnc_WriteValue(ExifEntry *entry) {
         }
         break;
     case EXIF_TYPE_ASCII:
-        size = ExifEnc_GetValueSize(entry);
+        size = jpeg_exif_get_tag_size(entry);
         for (i = 0; i < size; i++) {
             WRITE_BYTE(entry->asciiValue[i]);
         }
@@ -232,7 +234,7 @@ static void ExifEnc_WriteValue(ExifEntry *entry) {
     }
 }
 
-static void ExifEnc_WriteMakerNoteIfd(ExifIfdSet *set, ExifIfd *ifd, u8 last) {
+static void jpeg_encode_ifd_direct(ExifIfdSet *set, ExifIfd *ifd, u8 last) {
     ExifEntry *entry;
     s8 i;
     u32 size;
@@ -252,7 +254,7 @@ static void ExifEnc_WriteMakerNoteIfd(ExifIfdSet *set, ExifIfd *ifd, u8 last) {
         WRITE_BYTE((entry->count & 0xff0000) >> 16);
         WRITE_BYTE((entry->count & 0xff00) >> 8);
         WRITE_BYTE(entry->count);
-        size = ExifEnc_GetValueSize(entry);
+        size = jpeg_exif_get_tag_size(entry);
         if (size <= 4) {
             if (size == 2) {
                 WRITE_BYTE(0);
@@ -303,10 +305,10 @@ static void ExifEnc_WriteMakerNoteIfd(ExifIfdSet *set, ExifIfd *ifd, u8 last) {
 
     entry = ifd->entries;
     for (i = 0; i < ifd->count; i++) {
-        size = ExifEnc_GetValueSize(entry);
+        size = jpeg_exif_get_tag_size(entry);
         if (size > 4) {
             if (entry->tag == MAKER_NOTE_TAG_SIGNATURE) {
-                ExifEnc_WriteValue(entry);
+                jpeg_exif_set_tag_value(entry);
                 if (size & 1) {
                     WRITE_BYTE(0);
                 }
@@ -324,7 +326,7 @@ static void ExifEnc_WriteMakerNoteIfd(ExifIfdSet *set, ExifIfd *ifd, u8 last) {
     }
 }
 
-static void ExifEnc_WriteIfd(ExifIfdSet *set, ExifIfd *ifd, u8 last) {
+static void jpeg_encode_ifd(ExifIfdSet *set, ExifIfd *ifd, u8 last) {
     ExifEntry *entry;
     s8 i;
     s32 next;
@@ -366,8 +368,8 @@ static void ExifEnc_WriteIfd(ExifIfdSet *set, ExifIfd *ifd, u8 last) {
         WRITE_BYTE((entry->count & 0xff0000) >> 16);
         WRITE_BYTE((entry->count & 0xff00) >> 8);
         WRITE_BYTE(entry->count);
-        if (ExifEnc_GetValueSize(entry) <= 4) {
-            ExifEnc_WriteValue(entry);
+        if (jpeg_exif_get_tag_size(entry) <= 4) {
+            jpeg_exif_set_tag_value(entry);
         } else {
             WRITE_BYTE((entry->offset & 0xff000000) >> 24);
             WRITE_BYTE((entry->offset & 0xff0000) >> 16);
@@ -391,9 +393,9 @@ static void ExifEnc_WriteIfd(ExifIfdSet *set, ExifIfd *ifd, u8 last) {
 
     entry = ifd->entries;
     for (i = 0; i < ifd->count; i++) {
-        size = ExifEnc_GetValueSize(entry);
+        size = jpeg_exif_get_tag_size(entry);
         if (size > 4 && entry->tag != EXIF_TAG_MAKER_NOTE) {
-            ExifEnc_WriteValue(entry);
+            jpeg_exif_set_tag_value(entry);
             if (size & 1) {
                 WRITE_BYTE(0);
             }
@@ -402,7 +404,7 @@ static void ExifEnc_WriteIfd(ExifIfdSet *set, ExifIfd *ifd, u8 last) {
     }
 }
 
-static BOOL ExifEnc_WriteApp1(ExifIfdSet *set, u8 noThumbnail, const u8 *thumbnail, u32 thumbnailSize) {
+static BOOL jpeg_encode_exif(ExifIfdSet *set, u8 noThumbnail, const u8 *thumbnail, u32 thumbnailSize) {
     ExifIfd *ifd;
     int i;
     ExifEntry *entry;
@@ -427,7 +429,7 @@ static BOOL ExifEnc_WriteApp1(ExifIfdSet *set, u8 noThumbnail, const u8 *thumbna
             entry = ifd->entries;
             for (j = 0; j < ifd->count; j++) {
                 entry->offset = 0;
-                size = ExifEnc_GetValueSize(entry);
+                size = jpeg_exif_get_tag_size(entry);
                 if (size > 4 && entry->tag != EXIF_TAG_MAKER_NOTE) {
                     entry->offset = set->size - 8;
                     if (size & 1) {
@@ -470,25 +472,25 @@ static BOOL ExifEnc_WriteApp1(ExifIfdSet *set, u8 noThumbnail, const u8 *thumbna
     WRITE_BYTE(0);
     WRITE_BYTE(8);
 
-    ExifEnc_WriteIfd(set, &set->ifd[EXIF_IFD_0TH], noThumbnail);
+    jpeg_encode_ifd(set, &set->ifd[EXIF_IFD_0TH], noThumbnail);
     if (set->ifd[EXIF_IFD_EXIF].count > 0) {
-        ExifEnc_WriteIfd(set, &set->ifd[EXIF_IFD_EXIF], TRUE);
+        jpeg_encode_ifd(set, &set->ifd[EXIF_IFD_EXIF], TRUE);
     }
     if (set->ifd[EXIF_IFD_MAKER_NOTE].count > 0) {
-        ExifEnc_WriteMakerNoteIfd(set, &set->ifd[EXIF_IFD_MAKER_NOTE], TRUE);
+        jpeg_encode_ifd_direct(set, &set->ifd[EXIF_IFD_MAKER_NOTE], TRUE);
     }
     if (set->ifd[EXIF_IFD_INTEROP].count > 0) {
-        ExifEnc_WriteIfd(set, &set->ifd[EXIF_IFD_INTEROP], TRUE);
+        jpeg_encode_ifd(set, &set->ifd[EXIF_IFD_INTEROP], TRUE);
     }
     if (!noThumbnail) {
-        ExifEnc_WriteIfd(set, &set->ifd[EXIF_IFD_1ST], TRUE);
+        jpeg_encode_ifd(set, &set->ifd[EXIF_IFD_1ST], TRUE);
         MI_CpuCopy(thumbnail, sExifEncWriteBuffer + sExifEncWritePos, thumbnailSize);
         sExifEncWritePos += thumbnailSize;
     }
     return TRUE;
 }
 
-static BOOL ExifEnc_BuildIfds(s16 width, s16 height, BOOL thumbnail, const u8 *thumbnailData, u32 thumbnailSize) {
+static BOOL jpeg_encode_main(s16 width, s16 height, BOOL thumbnail, const u8 *thumbnailData, u32 thumbnailSize) {
     ExifIfdSet *set = &sExifEncIfdSet;
     s16 hasThumbnail;
     ExifEntry *entry;
@@ -939,11 +941,11 @@ static BOOL ExifEnc_BuildIfds(s16 width, s16 height, BOOL thumbnail, const u8 *t
     WRITE_BYTE(0xff);
     WRITE_BYTE(0xd8);
     if (hasThumbnail) {
-        if (!ExifEnc_WriteApp1(set, FALSE, thumbnailData, thumbnailSize)) {
+        if (!jpeg_encode_exif(set, FALSE, thumbnailData, thumbnailSize)) {
             return FALSE;
         }
     } else {
-        if (!ExifEnc_WriteApp1(set, TRUE, thumbnailData, thumbnailSize)) {
+        if (!jpeg_encode_exif(set, TRUE, thumbnailData, thumbnailSize)) {
             return FALSE;
         }
     }
@@ -953,7 +955,7 @@ static BOOL ExifEnc_BuildIfds(s16 width, s16 height, BOOL thumbnail, const u8 *t
     return TRUE;
 }
 
-u32 ExifEnc_WriteHeader(u8 *dst, u32 width, u32 height, const u8 *thumbnail, u32 thumbnailSize) {
+u32 SSP_ExifEncode(u8 *dst, u32 width, u32 height, const u8 *thumbnail, u32 thumbnailSize) {
     u32 titleId;
     char software[32];
 
@@ -978,21 +980,21 @@ u32 ExifEnc_WriteHeader(u8 *dst, u32 width, u32 height, const u8 *thumbnail, u32
     }
     MI_CpuCopy8(&titleId, software, 4);
     software[4] = '\0';
-    ExifEnc_SetSoftware(software);
+    SSP_SetJpegEncoderSoftware(software);
 
     if (!sExifEncDateTimeSet) {
-        while (!ExifEnc_SetCurrentDateTime()) {
+        while (!SSP_SetJpegEncoderDateTimeNow()) {
             OS_SpinWaitSysCycles(5);
         }
     }
 
     sExifEncWritePos = 0;
     if (thumbnailSize == 0) {
-        if (ExifEnc_BuildIfds(width, height, FALSE, thumbnail, thumbnailSize) != TRUE) {
+        if (jpeg_encode_main(width, height, FALSE, thumbnail, thumbnailSize) != TRUE) {
             OS_Terminate();
         }
     } else {
-        if (ExifEnc_BuildIfds(width, height, TRUE, thumbnail, thumbnailSize) != TRUE) {
+        if (jpeg_encode_main(width, height, TRUE, thumbnail, thumbnailSize) != TRUE) {
             OS_Terminate();
         }
     }

@@ -74,14 +74,16 @@ lib/nitrowifi/src/soc/socl_poll.c:
     .text       start:0x021578d4 end:0x021579b8
 
 lib/nitrowifi/src/soc/socl_misc.c:
-    complete
-    .text       start:0x021579b8 end:0x021579c0
+    .text       start:0x021579b8 end:0x02157b30
+    .bss        start:0x0218dc8c end:0x0218dc94
 
 lib/nitrowifi/src/soc/socl_list.c:
-    .text       start:0x021579c0 end:0x02157c10
-    .bss        start:0x0218dc8c end:0x0218dc9c
+    complete
+    .text       start:0x02157b30 end:0x02157c10
+    .bss        start:0x0218dc94 end:0x0218dc9c
 
 lib/nitrowifi/src/soc/soc.c:
+    complete
     .text       start:0x02157c10 end:0x021581b4
     .data       start:0x021854b8 end:0x0218550c
     .bss        start:0x0218dc9c end:0x0218de28
@@ -91,6 +93,7 @@ lib/nitrowifi/src/soc/socl_ssl.c:
     .text       start:0x021581b4 end:0x02158290
 
 lib/nitrowifi/src/ssl/ssl.c:
+    complete
     .text       start:0x02158290 end:0x0215a6f4
     .rodata     start:0x02185014 end:0x0218501c
     .data       start:0x0218550c end:0x0218557c
@@ -114,10 +117,11 @@ lib/nitrowifi/src/ssl/biginteger.c:
     complete
     .text       start:0x0215b2b4 end:0x0215bc2c
 
-lib/nitrowifi/src/wcm/wcm.c:
-    .text       start:0x0215bc2c end:0x0215ddb4
-    .rodata     start:0x0218501c end:0x02185054
-    .bss        start:0x0218dfb4 end:0x0218e008
+lib/nitrowifi/src/wcm/wcm_system.c:
+    complete
+    .text       start:0x0215bc2c end:0x0215c5d4
+    .rodata     start:0x0218501c end:0x02185044
+    .bss        start:0x0218dfb4 end:0x0218dfbc
 
 lib/dwc/src/gt2/gsUdpEngine.c:
     complete
@@ -376,17 +380,18 @@ lib/dwc/src/serverbrowsing/sb_serverlist.c:
     .data       start:0x0218b9f0 end:0x0218ba40
     .bss        start:0x021922e4 end:0x02192300
 
-lib/dwc/src/base/friend.c:
-    .text       start:0x0215ddb4 end:0x0215fa4c
-    .data       start:0x0218573c end:0x021857fc
-    .bss        start:0x0218e008 end:0x0218e058
+lib/dwc/src/base/dwc_nonport.c:
+    complete
+    .text       start:0x0215ddb4 end:0x0215dde8
+    .data       start:0x0218573c end:0x02185740
+    .bss        start:0x0218e008 end:0x0218e010
 
 lib/dwc/src/transport/dwc_transport.c:
     .text       start:0x02168858 end:0x02169514
     .data       start:0x02185b18 end:0x02185b28
     .bss        start:0x0218e958 end:0x0218e964
 
-lib/dwc/src/auth/dwc_nasfunc.c:
+lib/dwc/src/auth/dwc_auth.c:
     complete
     .text       start:0x02169514 end:0x0216a448
     .data       start:0x02185b28 end:0x02185d64
@@ -398,6 +403,7 @@ lib/dwc/src/auth/dwc_http_client.c:
     .bss        start:0x02190638 end:0x0219063c
 
 lib/dwc/src/auth/dwc_conntest.c:
+    complete
     .text       start:0x0216b18c end:0x0216bc24
     .data       start:0x02185ea8 end:0x02185f50
     .bss        start:0x0219063c end:0x021906d0
@@ -466,12 +472,62 @@ lib/dwc/src/auth/dwc_rootcert_rsa_secure_server.c:
     .data       start:0x02186de0 end:0x02186ebc
 
 lib/dwc/src/match/dwc_match.c:
+    complete
     .text       start:0x02160e50 end:0x02168858
     .rodata     start:0x02185054 end:0x0218506c
     .data       start:0x02185810 end:0x02185b18
     .bss        start:0x0218e200 end:0x0218e958
 
 lib/dwc/src/base/dwc_main.c:
+    complete
     .text       start:0x0215fa4c end:0x02160e50
     .data       start:0x021857fc end:0x02185810
     .bss        start:0x0218e058 end:0x0218e200
+
+lib/nitrowifi/src/wcm/wcm_aplist.c:
+    complete
+    .text       start:0x0215c5d4 end:0x0215cb04
+    .rodata     start:0x02185044 end:0x02185054
+
+lib/nitrowifi/src/wcm/wcm_cpsif.c:
+    complete
+    .text       start:0x0215cb04 end:0x0215cd68
+    .bss        start:0x0218dfbc end:0x0218dff4
+
+lib/nitrowifi/src/wcm/wcm_util.c:
+    complete
+    .text       start:0x0215cd68 end:0x0215cec8
+    .bss        start:0x0218dff4 end:0x0218e008
+
+lib/nitrowifi/src/wcm/wcm_wmif.c:
+    complete
+    .text       start:0x0215cec8 end:0x0215ddb4
+
+lib/dwc/src/base/dwc_nasfunc.c:
+    complete
+    .text       start:0x0215dde8 end:0x0215e03c
+    .data       start:0x02185740 end:0x0218574c
+    .bss        start:0x0218e010 end:0x0218e014
+
+lib/dwc/src/base/dwc_nastime.c:
+    complete
+    .text       start:0x0215e03c end:0x0215e1a0
+    .data       start:0x0218574c end:0x021857cc
+    .bss        start:0x0218e014 end:0x0218e028
+
+lib/dwc/src/base/dwc_common.c:
+    .text       start:0x0215e1a0 end:0x0215e384
+    .data       start:0x021857cc end:0x021857d8
+    .bss        start:0x0218e028 end:0x0218e040
+
+lib/dwc/src/base/dwc_friend.c:
+    complete
+    .text       start:0x0215e384 end:0x0215f450
+    .data       start:0x021857d8 end:0x021857f0
+    .bss        start:0x0218e040 end:0x0218e054
+
+lib/dwc/src/base/dwc_login.c:
+    complete
+    .text       start:0x0215f450 end:0x0215fa4c
+    .data       start:0x021857f0 end:0x021857fc
+    .bss        start:0x0218e054 end:0x0218e058

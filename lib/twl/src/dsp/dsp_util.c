@@ -4,11 +4,12 @@
 #include "twl/dsp.h"
 #include "twl/sndex.h"
 
-// TwlSDK's DSP library, the shutter sound (guessed file name; dsp_shutter.c and dsp_sound.c are alternatives): plays a
-// WAV file from memory through the audio component that the first DSP process runs, and tells whether it still plays.
-// The ARM9 talks to the component over pipe 2 of that process, in messages of four 32-bit words that the DSP reads as
-// two 16-bit halves each, the high half first. ARM code in the DSi-only LTD autoload. The ROM names none of it; the
-// functions have the SDK's names where twl/dsp.h knows them, and keep their default names otherwise.
+// TwlSDK's DSP library, the shutter sound: plays a WAV file from memory through the audio component that the first DSP
+// process runs, and tells whether it still plays. The ARM9 talks to the component over pipe 2 of that process, in
+// messages of four 32-bit words that the DSP reads as two 16-bit halves each, the high half first. ARM code in the
+// DSi-only LTD autoload. The ROM names none of it: the file and the functions have the SDK's names that Black 1's
+// decompilation (aletheia) gives the same code at the same addresses, libdsp.TWL.HYB.a's dsp_util.o, including
+// DSPiShutterPostProcessCallback without its underscore and sound_handler in lower case.
 
 #define SHUTTER_PIPE_PORT 2
 
@@ -48,10 +49,10 @@
 // A wait before the request to the ARM7, in cycles (about 30 milliseconds of the 67 MHz clock)
 #define SHUTTER_REQUEST_DELAY_CYCLES 2010000
 
-static void func_02705f64(SNDEXResult result, void *arg);
-static void func_02705f98(void *arg);
-static void func_02705fac(void *userData, int port, int direction);
-static void func_027060b4(const void *src, u32 length, int mode, int priority);
+static void DSPiShutterPostProcessCallback(SNDEXResult result, void *arg);
+static void sound_handler(void *arg);
+static void DSPi_PipeCallbackForSound(void *userData, int port, int direction);
+static void DSPi_PlaySoundEx(const void *src, u32 length, int mode, int priority);
 
 static struct {
     u16 status;       // what the component last reported
@@ -72,7 +73,7 @@ static inline u32 ReadU32(const u8 *p) {
 }
 
 // The answer to the ARM7's request that ends the shutter sound
-static void func_02705f64(SNDEXResult result, void *arg) {
+static void DSPiShutterPostProcessCallback(SNDEXResult result, void *arg) {
     if (result == SNDEX_RESULT_EXCLUSIVE) {
         OS_Terminate();
     }
@@ -83,12 +84,12 @@ static void func_02705f64(SNDEXResult result, void *arg) {
 }
 
 // After the component reported that it stopped
-static void func_02705f98(void *arg) {
+static void sound_handler(void *arg) {
     sShutter.playing = FALSE;
 }
 
 // The pipe's callback: the component's reports
-static void func_02705fac(void *userData, int port, int direction) {
+static void DSPi_PipeCallbackForSound(void *userData, int port, int direction) {
     DSPPipe pipe;
     u32 message[2];
 
@@ -104,9 +105,9 @@ static void func_02705fac(void *userData, int port, int direction) {
     message[1] = DSPi_SwapHalves(message[1]);
     if ((message[0] & AUDIO_GROUP_MASK) == AUDIO_GROUP_PLAYBACK && (message[0] & AUDIO_KIND_MASK) == AUDIO_KIND_STOP) {
         OS_CreateAlarm(&sShutter.stopAlarm);
-        OS_SetAlarm(&sShutter.stopAlarm, OS_MilliSecondsToTicks(SHUTTER_STOP_DELAY), func_02705f98, NULL);
+        OS_SetAlarm(&sShutter.stopAlarm, OS_MilliSecondsToTicks(SHUTTER_STOP_DELAY), sound_handler, NULL);
         if (sPriority == AUDIO_PRIORITY_HIGHEST) {
-            SNDEXi_PostProcessForShutterSound(func_02705f64, NULL);
+            SNDEXi_PostProcessForShutterSound(DSPiShutterPostProcessCallback, NULL);
         }
         sPriority = AUDIO_PRIORITY_IDLE;
     }
@@ -117,7 +118,7 @@ static void func_02705fac(void *userData, int port, int direction) {
 
 // Sends the play command for length bytes of 16-bit samples at src to the first process, unless something of a higher
 // priority plays
-static void func_027060b4(const void *src, u32 length, int mode, int priority) {
+static void DSPi_PlaySoundEx(const void *src, u32 length, int mode, int priority) {
     u32 message[4];
     DSPProcessContext *context = DSP_FindProcess(NULL);
 
@@ -128,7 +129,7 @@ static void func_027060b4(const void *src, u32 length, int mode, int priority) {
         return;
     }
     sPriority = priority;
-    DSP_SetPipeCallback(SHUTTER_PIPE_PORT, func_02705fac, NULL);
+    DSP_SetPipeCallback(SHUTTER_PIPE_PORT, DSPi_PipeCallbackForSound, NULL);
     sShutter.playing = TRUE;
     message[0] = DSPi_SwapHalves(mode | AUDIO_COMMAND_PLAY);
     message[1] = DSPi_SwapHalves((u32)src);
@@ -165,7 +166,7 @@ BOOL DSPi_PlayShutterSoundCore(const void *src, u32 length) {
     while (SNDEXi_PreProcessForShutterSound() != SNDEX_RESULT_SUCCESS) {
         OS_Sleep(1);
     }
-    func_027060b4(file + WAV_HEADER_SIZE, dataSize, AUDIO_PLAY_MODE_ONCE, AUDIO_PRIORITY_HIGHEST);
+    DSPi_PlaySoundEx(file + WAV_HEADER_SIZE, dataSize, AUDIO_PLAY_MODE_ONCE, AUDIO_PRIORITY_HIGHEST);
     sShutter.requestOn = TRUE;
     return TRUE;
 }

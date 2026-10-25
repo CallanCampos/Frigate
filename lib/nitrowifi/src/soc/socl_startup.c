@@ -31,7 +31,7 @@ int SOCL_Startup(const SOCLConfig *config) {
     if (SOCLiConfigPtr != NULL) {
         return 0;
     }
-    SOCLi_ResetSocketCount();
+    SOCLi_InitResource();
     SOCLiConfigPtr = config;
     SOCLi_StartupCPS();
     result = SOCLi_StartupSOCL();
@@ -103,7 +103,7 @@ static void SOCLi_StartupCPS(void) {
     CPS_SetThreadPriority(config->cps_thread_prio ? config->cps_thread_prio : 11);
     WCM_SetRecvDCFCallback(CPSi_RecvCallbackFunc);
     CPS_SetScavengerCallback(SOCLi_TrashSocket);
-    CPS_SetAddressCheckCallback(SOCLi_AddressCheckCallback);
+    CPS_SetAddressCheckCallback(SOCLi_CheckNConfig);
     CPS_Startup(cps);
 }
 

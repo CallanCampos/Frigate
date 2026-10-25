@@ -9,7 +9,7 @@
 // screens file hands it, starts the wireless, steps the download-play parent and the data sharing that the children
 // read their records from, and ends both. Overlay 181's src/ov181/mb_parent_sys.c drives the same kind of flow over
 // the MBComm_* layer with a different state machine; it is a role reference only, and no function of it is a copy of
-// one here. The overlay's file before this one, src/ov182/download_play_wih.c, owns the wireless work.
+// one here. The overlay's file before this one, lib/dwcutil/src/dwc_mov_wh.c, owns the wireless work.
 
 static void func_ov182_021ba8bc(void);
 static void func_ov182_021bac20(void);
@@ -35,7 +35,7 @@ static DownloadPlaySysWork *sDownloadPlaySysWork;
 // registry is copied with the player count it carries, and the console's backup pages are read
 void func_ov182_021ba768(DownloadPlaySysContext *context, const DownloadPlaySysGame *registry) {
     sDownloadPlaySysWork = &context->sys;
-    DownloadPlay_SetWork(&context->play);
+    DWCi_MOV_MBP_MemInit(&context->play);
     sDownloadPlaySysWork->tgid = 0;
     sDownloadPlaySysWork->channel = 0;
     sDownloadPlaySysWork->state = DOWNLOAD_PLAY_SYS_STATE_READY;
@@ -97,7 +97,7 @@ BOOL func_ov182_021ba81c(void) {
 
 // Brings the wireless up under the game's id and a new session id, with the data the parent sends ready to go
 static void func_ov182_021ba8bc(void) {
-    func_ov182_021ba180(sDownloadPlaySysWork->registry.ggid);
+    DWCi_MOV_WH_SetGgid(sDownloadPlaySysWork->registry.ggid);
     sDownloadPlaySysWork->state = DOWNLOAD_PLAY_SYS_STATE_READY;
     sDownloadPlaySysWork->tgid = WM_GetNextTgid();
     MI_CpuCopy8(sDownloadPlaySysWork->sendData, sDownloadPlaySysWork->gameData, sizeof(sDownloadPlaySysWork->gameData));
@@ -112,7 +112,7 @@ BOOL func_ov182_021ba918(void) {
         sDownloadPlaySysWork->state == DOWNLOAD_PLAY_SYS_STATE_ENDED_CANCEL ||
         sDownloadPlaySysWork->state == DOWNLOAD_PLAY_SYS_STATE_ENDED_ERROR) {
         func_ov182_021ba8bc();
-        func_ov182_021ba42c();
+        DWCi_MOV_WH_Initialize();
         sDownloadPlaySysWork->state = DOWNLOAD_PLAY_SYS_STATE_START_WIRELESS;
         return TRUE;
     }
@@ -124,7 +124,7 @@ BOOL func_ov182_021ba918(void) {
 BOOL func_ov182_021ba950(void) {
     if (sDownloadPlaySysWork->state == DOWNLOAD_PLAY_SYS_STATE_CHILD_ENTERED) {
         sDownloadPlaySysWork->state = DOWNLOAD_PLAY_SYS_STATE_SENDING;
-        DownloadPlay_StartSending();
+        DWCi_MOV_MBP_StartDownloadAll();
         return TRUE;
     }
 
@@ -196,71 +196,75 @@ void func_ov182_021ba974(void) {
         break;
 
     case DOWNLOAD_PLAY_SYS_STATE_WAIT_END_WIRELESS:
-        if (sDownloadPlaySysWork->timer++ > DOWNLOAD_PLAY_SYS_TIMEOUT && func_ov182_021ba19c() == WIH_STATE_IDLE) {
-            func_ov182_021ba730();
+        if (sDownloadPlaySysWork->timer++ > DOWNLOAD_PLAY_SYS_TIMEOUT &&
+            DWCi_MOV_WH_GetSystemState() == WIH_STATE_IDLE) {
+            DWCi_MOV_WH_End();
             sDownloadPlaySysWork->state = DOWNLOAD_PLAY_SYS_STATE_ENDED_WIRELESS;
         }
         break;
 
     case DOWNLOAD_PLAY_SYS_STATE_PEER_END:
-        func_ov182_021ba67c();
+        DWCi_MOV_WH_Finalize();
         sDownloadPlaySysWork->timer = 0;
         sDownloadPlaySysWork->state = DOWNLOAD_PLAY_SYS_STATE_WAIT_END_PEER;
         break;
 
     case DOWNLOAD_PLAY_SYS_STATE_WAIT_END_PEER:
-        if (sDownloadPlaySysWork->timer++ > DOWNLOAD_PLAY_SYS_TIMEOUT && func_ov182_021ba19c() == WIH_STATE_IDLE) {
-            func_ov182_021ba730();
+        if (sDownloadPlaySysWork->timer++ > DOWNLOAD_PLAY_SYS_TIMEOUT &&
+            DWCi_MOV_WH_GetSystemState() == WIH_STATE_IDLE) {
+            DWCi_MOV_WH_End();
             sDownloadPlaySysWork->state = DOWNLOAD_PLAY_SYS_STATE_ENDED_PEER;
         }
         break;
 
     case DOWNLOAD_PLAY_SYS_STATE_PEER_CANCEL:
-        func_ov182_021ba67c();
+        DWCi_MOV_WH_Finalize();
         sDownloadPlaySysWork->timer = 0;
         sDownloadPlaySysWork->state = DOWNLOAD_PLAY_SYS_STATE_WAIT_END_CANCEL;
         break;
 
     case DOWNLOAD_PLAY_SYS_STATE_WAIT_END_CANCEL:
-        if (sDownloadPlaySysWork->timer++ > DOWNLOAD_PLAY_SYS_TIMEOUT && func_ov182_021ba19c() == WIH_STATE_IDLE) {
-            func_ov182_021ba730();
+        if (sDownloadPlaySysWork->timer++ > DOWNLOAD_PLAY_SYS_TIMEOUT &&
+            DWCi_MOV_WH_GetSystemState() == WIH_STATE_IDLE) {
+            DWCi_MOV_WH_End();
             sDownloadPlaySysWork->state = DOWNLOAD_PLAY_SYS_STATE_ENDED_CANCEL;
         }
         break;
 
     case DOWNLOAD_PLAY_SYS_STATE_ERROR:
-        func_ov182_021ba67c();
+        DWCi_MOV_WH_Finalize();
         sDownloadPlaySysWork->timer = 0;
         sDownloadPlaySysWork->state = DOWNLOAD_PLAY_SYS_STATE_WAIT_END_ERROR;
         break;
 
     case DOWNLOAD_PLAY_SYS_STATE_WAIT_END_ERROR:
         if (sDownloadPlaySysWork->timer++ > DOWNLOAD_PLAY_SYS_TIMEOUT) {
-            if (func_ov182_021ba19c() == WIH_STATE_IDLE) {
-                func_ov182_021ba730();
+            if (DWCi_MOV_WH_GetSystemState() == WIH_STATE_IDLE) {
+                DWCi_MOV_WH_End();
                 sDownloadPlaySysWork->state = DOWNLOAD_PLAY_SYS_STATE_ENDED_ERROR;
             } else if (sDownloadPlaySysWork->timer % DOWNLOAD_PLAY_SYS_TIMEOUT == 1 &&
                        sDownloadPlaySysWork->timer > 55) {
-                func_ov182_021ba67c();
+                DWCi_MOV_WH_Finalize();
             }
         }
         break;
 
     case DOWNLOAD_PLAY_SYS_STATE_END_CONNECT:
-        func_ov182_021ba67c();
+        DWCi_MOV_WH_Finalize();
         sDownloadPlaySysWork->timer = 0;
         sDownloadPlaySysWork->state = DOWNLOAD_PLAY_SYS_STATE_WAIT_END_CONNECT;
         break;
 
     case DOWNLOAD_PLAY_SYS_STATE_WAIT_END_CONNECT:
-        if (sDownloadPlaySysWork->timer++ > DOWNLOAD_PLAY_SYS_TIMEOUT && func_ov182_021ba19c() == WIH_STATE_IDLE) {
-            func_ov182_021ba730();
+        if (sDownloadPlaySysWork->timer++ > DOWNLOAD_PLAY_SYS_TIMEOUT &&
+            DWCi_MOV_WH_GetSystemState() == WIH_STATE_IDLE) {
+            DWCi_MOV_WH_End();
             sDownloadPlaySysWork->state = DOWNLOAD_PLAY_SYS_STATE_ENDED;
         }
         break;
 
     case DOWNLOAD_PLAY_SYS_STATE_DISCONNECT:
-        func_ov182_021ba67c();
+        DWCi_MOV_WH_Finalize();
         break;
 
     case DOWNLOAD_PLAY_SYS_STATE_ENDED:
@@ -282,13 +286,13 @@ const MBUserInfo *func_ov182_021bac14(void) {
 
 // Brings the wireless up: it measures the channels from idle, and the parent may start once it has the channel
 static void func_ov182_021bac20(void) {
-    switch (func_ov182_021ba19c()) {
+    switch (DWCi_MOV_WH_GetSystemState()) {
     case WIH_STATE_IDLE:
-        func_ov182_021ba1a8();
+        DWCi_MOV_WH_StartMeasureChannel();
         break;
 
     case WIH_STATE_MEASURECHANNEL:
-        sDownloadPlaySysWork->channel = func_ov182_021ba350();
+        sDownloadPlaySysWork->channel = DWCi_MOV_WH_GetMeasureChannel();
         sDownloadPlaySysWork->entryFrames = 0;
         sDownloadPlaySysWork->state = DOWNLOAD_PLAY_SYS_STATE_INIT_PARENT;
         break;
@@ -299,7 +303,7 @@ static void func_ov182_021bac20(void) {
         break;
 
     case WIH_STATE_ERROR:
-        func_ov182_021ba668();
+        DWCi_MOV_WH_Reset();
         break;
 
     case WIH_STATE_BUSY:
@@ -312,52 +316,51 @@ static void func_ov182_021bac20(void) {
 
 // Hands the download-play parent the game's id and the session's
 static void func_ov182_021bac9c(void) {
-    DownloadPlay_Init(sDownloadPlaySysWork->registry.ggid, sDownloadPlaySysWork->tgid);
+    DWCi_MOV_MBP_Init(sDownloadPlaySysWork->registry.ggid, sDownloadPlaySysWork->tgid);
 }
 
 // Steps the download-play parent: it starts the parent, follows the children through the entry and the download,
 // reboots them once all can, and ends the wireless once the parent has stopped
 static void func_ov182_021bacbc(void) {
-    switch (DownloadPlay_GetState()) {
-    case DOWNLOAD_PLAY_STATE_IDLE:
-        DownloadPlay_Start(&sDownloadPlaySysWork->registry, sDownloadPlaySysWork->channel);
+    switch (DWCi_MOV_MBP_GetState()) {
+    case DWCi_MOV_MBP_STATE_IDLE:
+        DWCi_MOV_MBP_Start(&sDownloadPlaySysWork->registry, sDownloadPlaySysWork->channel);
         break;
 
-    case DOWNLOAD_PLAY_STATE_ENTRY:
-        if (DownloadPlay_GetChildBmp(DOWNLOAD_PLAY_BMP_ENTRY)) {
+    case DWCi_MOV_MBP_STATE_ENTRY:
+        if (DWCi_MOV_MBP_GetChildBmp(MOV_MBP_BMP_ENTRY)) {
             sDownloadPlaySysWork->state = DOWNLOAD_PLAY_SYS_STATE_CHILD_ENTERED;
-        } else if (DownloadPlay_GetChildBmp(DOWNLOAD_PLAY_BMP_DOWNLOAD) ||
-                   DownloadPlay_GetChildBmp(DOWNLOAD_PLAY_BMP_BOOTABLE)) {
+        } else if (DWCi_MOV_MBP_GetChildBmp(MOV_MBP_BMP_DOWNLOAD) || DWCi_MOV_MBP_GetChildBmp(MOV_MBP_BMP_BOOTABLE)) {
             sDownloadPlaySysWork->state = DOWNLOAD_PLAY_SYS_STATE_SENDING;
         } else if (sDownloadPlaySysWork->state == DOWNLOAD_PLAY_SYS_STATE_CHILD_ENTERED &&
-                   !DownloadPlay_GetChildBmp(DOWNLOAD_PLAY_BMP_ENTRY)) {
+                   !DWCi_MOV_MBP_GetChildBmp(MOV_MBP_BMP_ENTRY)) {
             sDownloadPlaySysWork->state = DOWNLOAD_PLAY_SYS_STATE_CHILD_LEFT;
         }
         break;
 
-    case DOWNLOAD_PLAY_STATE_DATASENDING:
-        if (DownloadPlay_IsBootableAll()) {
-            DownloadPlay_StartRebootAll();
+    case DWCi_MOV_MBP_STATE_DATASENDING:
+        if (DWCi_MOV_MBP_IsBootableAll()) {
+            DWCi_MOV_MBP_StartRebootAll();
         } else if ((sDownloadPlaySysWork->state == DOWNLOAD_PLAY_SYS_STATE_SENDING ||
                     sDownloadPlaySysWork->state == DOWNLOAD_PLAY_SYS_STATE_START_CONNECT) &&
-                   !DownloadPlay_GetChildBmp(DOWNLOAD_PLAY_BMP_DOWNLOAD)) {
+                   !DWCi_MOV_MBP_GetChildBmp(MOV_MBP_BMP_DOWNLOAD)) {
             sDownloadPlaySysWork->state = DOWNLOAD_PLAY_SYS_STATE_SENT;
         }
         break;
 
-    case DOWNLOAD_PLAY_STATE_COMPLETE:
+    case DWCi_MOV_MBP_STATE_COMPLETE:
         sDownloadPlaySysWork->state = DOWNLOAD_PLAY_SYS_STATE_START_CONNECT;
         break;
 
-    case DOWNLOAD_PLAY_STATE_ERROR:
-        DownloadPlay_Cancel();
+    case DWCi_MOV_MBP_STATE_ERROR:
+        DWCi_MOV_MBP_Cancel();
         sDownloadPlaySysWork->state = DOWNLOAD_PLAY_SYS_STATE_READY;
         break;
 
-    case DOWNLOAD_PLAY_STATE_STOP:
-        switch (func_ov182_021ba19c()) {
+    case DWCi_MOV_MBP_STATE_STOP:
+        switch (DWCi_MOV_WH_GetSystemState()) {
         case WIH_STATE_IDLE:
-            func_ov182_021ba730();
+            DWCi_MOV_WH_End();
             break;
 
         case WIH_STATE_STOP:
@@ -379,7 +382,7 @@ static void func_ov182_021bacbc(void) {
 // takes only the children the parent knows
 static void func_ov182_021badd4(void) {
     func_ov182_021baf9c();
-    func_ov182_021ba5d0(func_ov182_021baf70);
+    DWCi_MOV_WH_SetJudgeAcceptFunc(func_ov182_021baf70);
     sDownloadPlaySysWork->state = DOWNLOAD_PLAY_SYS_STATE_CONNECT;
 }
 
@@ -387,9 +390,10 @@ static void func_ov182_021badd4(void) {
 // once connected it sends the step's data, reads the frames, gives up after 480 frames without an answer, and moves
 // on by the code the peer's frame carries
 static void func_ov182_021badf8(void) {
-    switch (func_ov182_021ba19c()) {
+    switch (DWCi_MOV_WH_GetSystemState()) {
     case WIH_STATE_IDLE:
-        func_ov182_021ba4f8(WIH_CONNECTMODE_DS_PARENT, sDownloadPlaySysWork->tgid + 1, sDownloadPlaySysWork->channel);
+        DWCi_MOV_WH_ParentConnect(WIH_CONNECTMODE_DS_PARENT, sDownloadPlaySysWork->tgid + 1,
+                                  sDownloadPlaySysWork->channel);
         break;
 
     case WIH_STATE_CONNECTED:
@@ -438,8 +442,8 @@ static void func_ov182_021baf38(void) {
 
 // Ends the parent's wireless once it is idle and takes the flow back to ready, and says whether it did
 static BOOL func_ov182_021baf4c(void) {
-    if (func_ov182_021ba19c() == WIH_STATE_IDLE) {
-        func_ov182_021ba730();
+    if (DWCi_MOV_WH_GetSystemState() == WIH_STATE_IDLE) {
+        DWCi_MOV_WH_End();
         sDownloadPlaySysWork->state = DOWNLOAD_PLAY_SYS_STATE_READY;
         return TRUE;
     }
@@ -450,13 +454,13 @@ static BOOL func_ov182_021baf4c(void) {
 // The scan filter the flow installs: the child that connected is looked up by its MAC address, kept by its player
 // number, and let in only if the parent knows it
 static BOOL func_ov182_021baf70(WMStartParentCallback *callback) {
-    u16 playerNo = DownloadPlay_GetPlayerNoByMac(callback->macAddress);
+    u16 playerNo = DWCi_MOV_MBP_GetPlayerNo(callback->macAddress);
 
     if (playerNo == 0) {
         return FALSE;
     }
 
-    sDownloadPlaySysWork->childInfo[playerNo - 1] = DownloadPlay_GetChildInfo(playerNo);
+    sDownloadPlaySysWork->childInfo[playerNo - 1] = DWCi_MOV_MBP_GetChildInfo(playerNo);
     return TRUE;
 }
 
@@ -483,11 +487,11 @@ static void func_ov182_021bafc8(u16 code, u16 arg, const u8 *data) {
         sDownloadPlaySysWork->sendFramep->data[0] = sDownloadPlaySysWork->playerCount;
     }
 
-    if (func_ov182_021ba19c() != WIH_STATE_DATASHARING) {
+    if (DWCi_MOV_WH_GetSystemState() != WIH_STATE_DATASHARING) {
         return;
     }
 
-    if (!func_ov182_021ba5fc((u8 *)&sDownloadPlaySysWork->sendFrame)) {
+    if (!DWCi_MOV_WH_StepDS((u8 *)&sDownloadPlaySysWork->sendFrame)) {
         sDownloadPlaySysWork->msgCounter += 4;
         return;
     }
@@ -496,14 +500,14 @@ static void func_ov182_021bafc8(u16 code, u16 arg, const u8 *data) {
         sDownloadPlaySysWork->msgCounter++;
     } else {
         sDownloadPlaySysWork->msgCounter = 0;
-        if (func_ov182_021ba18c() != 3) {
+        if (DWCi_MOV_WH_GetBitmap() != 3) {
             sDownloadPlaySysWork->state = DOWNLOAD_PLAY_SYS_STATE_ERROR;
             return;
         }
     }
 
     for (i = 0; i < 2; i++) {
-        u8 *address = func_ov182_021ba5dc(i);
+        u8 *address = DWCi_MOV_WH_GetSharedDataAdr(i);
 
         if (address != NULL) {
             MI_CpuCopy8(address, &sDownloadPlaySysWork->recvFrames[i], sizeof(DownloadPlaySysFrame));

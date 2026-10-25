@@ -67,11 +67,11 @@ NHTTPReq *NHTTP_CreateRequest(NHttpState *state, const char *url, int method, vo
     request->port = 80;
     schemeLength = 7;
     if (NHTTPi_strnicmp(text, "http://", 7) != 0) {
-        schemeLength = 8;
         if (NHTTPi_strnicmp(text, "https://", 8) != 0) {
             NHTTPi_SetError(state, NHTTP_ERROR_BAD_URL);
             goto fail;
         }
+        schemeLength = 8;
         request->isSSL = 1;
         request->port = 443;
     }

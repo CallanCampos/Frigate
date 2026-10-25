@@ -88,7 +88,7 @@ NWMRetCode NWM_LoadDevice(NWMCallbackFunc callback) {
     func_02702a40();
     info = &NWMi_UnloadOnExit;
     PM_SetExitCallbackInfo(info, func_02702d7c, NULL);
-    PM_InsertPostExitCallback(info, NWM_PM_PRIORITY);
+    PMi_InsertPostExitCallbackEx(info, NWM_PM_PRIORITY);
     result = NWMi_SendCommand(NWM_APIID_LOAD_DEVICE, 4, sys->info, sys->status, sys->event, 0);
     if (result == NWM_RETCODE_SUCCESS || result == NWM_RETCODE_OPERATING) {
         result = NWM_RETCODE_OPERATING;

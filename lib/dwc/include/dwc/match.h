@@ -7,6 +7,7 @@
 #include "dwc/friend.h"
 #include "dwc/gp.h"
 #include "dwc/gt2Main.h"
+#include "dwc/login.h"
 
 // DWC's friends-match front end (dwc_main.c) and matching core (dwc_match.c), in overlay 11: login, friends, matching
 // and the machines of a match, each with its ID (its aid). The file names are guesses based on the SDK and the

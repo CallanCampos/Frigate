@@ -64,38 +64,36 @@ enum {
 // 4 entries, cleared by CPSi_SslCleanup
 static CPSSslSession sSessionCache[4];
 
-// set_random's pool: a running SHA1 digest that CPS_SslAddRandomSeed stirs entropy into
-static u8 sPoolSeeded;
+// set_random's pool: a running SHA1 digest that CPS_SslAddRandomSeed stirs entropy into. MWCC lays out these
+// tentative statics in the reverse of their definitions, the flag first; between it and the pool the ROM has 4 bytes
+// that no code in it reads, likely a static of functions the linker dropped. Its name and type are ours.
 static u8 sPool[0x14];
+static u32 sUnused;
+static u8 sPoolSeeded;
+
+// The thread priority applied during selected crypto operations, set by CPS_SetSslHandshakePriority; -1 (or any
+// value of 0x20 or more) leaves the priority alone
+static u32 sHandshakePriority = (u32)-1;
+
+// The cipher suites CPS_Sslconnect offers: SSL_RSA_WITH_RC4_128_MD5 and SSL_RSA_WITH_RC4_128_SHA
+static u16 sCipherSuites[2] = { 4, 5 };
+
+// X.509 attribute and algorithm OIDs cert_item recognizes while walking a certificate, as C strings, and one sentinel
+// that never matches: rsaEncryption, X.500's id-ea-rsa, md5WithRSAEncryption, sha1WithRSAEncryption and commonName.
+// MWCC sorts these strings by size together with the statics above: the two 4-byte ones, then the section of the
+// statics, opened by the cipher suites, then the rest.
+static char *sOids[6] = {
+    "\xff\xff\xff",
+    "\x2a\x86\x48\x86\xf7\x0d\x01\x01\x01",
+    "\x55\x08\x01\x01",
+    "\x2a\x86\x48\x86\xf7\x0d\x01\x01\x04",
+    "\x2a\x86\x48\x86\xf7\x0d\x01\x01\x05",
+    "\x55\x04\x03",
+};
 
 // The record CPSi_SslWrite2 sends before ClientKeyExchange when the server asked for a certificate and the caller has
 // none to offer: alert(fatal, no_certificate)
 static const u8 sNoCertificateAlert[7] = { 0x15, 0x03, 0x00, 0x00, 0x02, 0x01, 0x29 };
-
-// X.509 attribute and algorithm OIDs cert_item recognizes while walking a certificate, and one sentinel
-// that never matches
-static const u8 sOid0[4] = { 0xff, 0xff, 0xff, 0 };
-static const u8 sOidRsaEncryption[10] = { 0x2a, 0x86, 0x48, 0x86, 0xf7, 0x0d, 0x01, 0x01, 0x01, 0 };
-static const u8 sOid2[5] = { 0x55, 0x08, 0x01, 0x01, 0 };
-static const u8 sOidMd5WithRsa[10] = { 0x2a, 0x86, 0x48, 0x86, 0xf7, 0x0d, 0x01, 0x01, 0x04, 0 };
-static const u8 sOidSha1WithRsa[10] = { 0x2a, 0x86, 0x48, 0x86, 0xf7, 0x0d, 0x01, 0x01, 0x05, 0 };
-static const u8 sOidCommonName[4] = { 0x55, 0x04, 0x03, 0 };
-
-static const u8 *const sOids[6] = { sOid0, sOidRsaEncryption, sOid2, sOidMd5WithRsa, sOidSha1WithRsa, sOidCommonName };
-
-// The cipher suites CPS_Sslconnect offers, and the priority applied during selected crypto operations.
-// CPS_SetSslHandshakePriority configures it; -1 disables priority changes until set.
-static struct {
-    u16 cipher_suites[2]; // SSL_RSA_WITH_RC4_128_MD5, SSL_RSA_WITH_RC4_128_SHA
-    u32 max_priority;
-} sConfig = { { 4, 5 }, (u32)-1 };
-
-// The 3 labels generate_key_material concatenates into the master secret, and the 2 that pick a side's Finished MAC
-static const u8 sLabelA[4] = "A";
-static const u8 sLabelBB[4] = "BB";
-static const u8 sLabelCCC[4] = "CCC";
-static const u8 sLabelServer[4] = "SRVR";
-static const u8 sLabelClient[4] = "CLNT";
 
 static void find_session_from_id(CPSSslConnection *ctx);
 static void find_session_from_IP(CPSSslConnection *ctx, CPSInAddr ip, u16 port);
@@ -121,7 +119,7 @@ static BOOL version_ok(int major, int minor);
 static void client_hello_v2(CPSSslConnection *ctx, u8 *msg);
 static void client_hello(CPSSslConnection *ctx, u8 *msg);
 static void decrypt_premaster_secret(CPSSslConnection *ctx, u8 *encrypted, void *params);
-static void create_ms_sub(u8 *out, const u8 *label, CPSSslConnection *ctx);
+static void create_ms_sub(u8 *out, const char *label, CPSSslConnection *ctx);
 static void create_master_secret(CPSSslConnection *ctx);
 static void create_key_block(CPSSslConnection *ctx);
 static void rcv_client_key_exchange(CPSSslConnection *ctx, u8 *msg);
@@ -251,12 +249,12 @@ static u32 date2sec(void) {
 
 // CPS_GetSslHandshakePriority's role: the priority CPS_SetSslHandshakePriority last gave, or -1
 u32 CPS_GetSslHandshakePriority(void) {
-    return sConfig.max_priority;
+    return sHandshakePriority;
 }
 
 // Configures the priority applied unconditionally during selected crypto operations; values >= 32 disable it.
 void CPS_SetSslHandshakePriority(u32 priority) {
-    sConfig.max_priority = priority;
+    sHandshakePriority = priority;
 }
 
 // Applies the configured priority without comparing it to the thread's current priority, returning the old value.
@@ -265,10 +263,10 @@ static u32 enter_computebound(void) {
     u32 old;
     OSThread *thread;
 
-    if (sConfig.max_priority < 0x20) {
+    if (sHandshakePriority < 0x20) {
         thread = OS_GetCurrentThread();
         old = OS_GetThreadPriority(thread);
-        OS_SetThreadPriority(thread, sConfig.max_priority);
+        OS_SetThreadPriority(thread, sHandshakePriority);
         return old;
     }
     return (u32)-1;
@@ -450,7 +448,7 @@ static int cert_item(CPSSslConnection *ctx, const u8 **cursor, int depth, int in
         break;
     case 6:
         for (i = 0; i < 6; i++) {
-            if (memcmp(value, sOids[i], strlen((const char *)sOids[i])) == 0) {
+            if (memcmp(value, sOids[i], strlen(sOids[i])) == 0) {
                 switch (i) {
                 case 1:
                 case 2:
@@ -810,8 +808,8 @@ static int select_method(const u8 *data, int count, int width) {
     u32 i;
 
     for (i = 0; i < 2; i++) {
-        if (has_method(data, count, width, sConfig.cipher_suites[i])) {
-            return sConfig.cipher_suites[i];
+        if (has_method(data, count, width, sCipherSuites[i])) {
+            return sCipherSuites[i];
         }
     }
     return 0;
@@ -939,14 +937,14 @@ static void decrypt_premaster_secret(CPSSslConnection *ctx, u8 *encrypted, void 
 
 // One block of SSLv3's key material generation: MD5(secret + SHA1(label + secret + client_random + server_random)),
 // reusing the handshake hash snapshot slots as scratch since they aren't needed yet this early
-static void create_ms_sub(u8 *out, const u8 *label, CPSSslConnection *ctx) {
+static void create_ms_sub(u8 *out, const char *label, CPSSslConnection *ctx) {
     u8 digest[20];
     CPSSha1Ctx *sha1;
     CPSMd5Ctx *md5;
 
     sha1 = &ctx->handshake_sha1_snapshot;
     CPSi_sha1_init(sha1);
-    CPSi_sha1_calc(sha1, label, strlen((const char *)label));
+    CPSi_sha1_calc(sha1, (const u8 *)label, strlen(label));
     CPSi_sha1_calc(sha1, ctx->secret, 0x30);
     CPSi_sha1_calc(sha1, ctx->client_random, 0x40);
     CPSi_sha1_result(sha1, digest);
@@ -962,9 +960,9 @@ static void create_ms_sub(u8 *out, const u8 *label, CPSSslConnection *ctx) {
 static void create_master_secret(CPSSslConnection *ctx) {
     u8 block[0x30];
 
-    create_ms_sub(block, sLabelA, ctx);
-    create_ms_sub(block + 0x10, sLabelBB, ctx);
-    create_ms_sub(block + 0x20, sLabelCCC, ctx);
+    create_ms_sub(block, "A", ctx);
+    create_ms_sub(block + 0x10, "BB", ctx);
+    create_ms_sub(block + 0x20, "CCC", ctx);
     MI_CpuCopy8(block, ctx->secret, 0x30);
 }
 
@@ -1048,9 +1046,9 @@ static void finished_md5(CPSSslConnection *ctx, u8 *out, int sender) {
 
     // The caller restores the transcript after this destructive computation.
     if ((ctx->is_server ^ sender) != 0) {
-        CPSi_md5_calc(md5, sLabelServer, 4);
+        CPSi_md5_calc(md5, (const u8 *)"SRVR", 4);
     } else {
-        CPSi_md5_calc(md5, sLabelClient, 4);
+        CPSi_md5_calc(md5, (const u8 *)"CLNT", 4);
     }
     CPSi_md5_calc(md5, ctx->secret, 0x30);
     MI_CpuFill8(pad, 0x36, 0x30);
@@ -1070,9 +1068,9 @@ static void finished_sha1(CPSSslConnection *ctx, u8 *out, int sender) {
     CPSSha1Ctx *sha1 = &ctx->handshake_sha1;
 
     if ((ctx->is_server ^ sender) != 0) {
-        CPSi_sha1_calc(sha1, sLabelServer, 4);
+        CPSi_sha1_calc(sha1, (const u8 *)"SRVR", 4);
     } else {
-        CPSi_sha1_calc(sha1, sLabelClient, 4);
+        CPSi_sha1_calc(sha1, (const u8 *)"CLNT", 4);
     }
     CPSi_sha1_calc(sha1, ctx->secret, 0x30);
     MI_CpuFill8(pad, 0x36, 0x28);
@@ -1144,8 +1142,7 @@ static u32 make_plaintext(CPSSslConnection *ctx, u8 *hdr) {
         hdr[3] = len >> 8;
         hdr[4] = len;
         CPSi_md5_init(&ctx->handshake_md5_snapshot);
-        macLen = 0x10;
-        CPSi_md5_calc(&ctx->handshake_md5_snapshot, ctx->read_mac_secret, macLen);
+        CPSi_md5_calc(&ctx->handshake_md5_snapshot, ctx->read_mac_secret, 0x10);
         MI_CpuFill8(pad, 0x36, 0x30);
         CPSi_md5_calc(&ctx->handshake_md5_snapshot, pad, 0x30);
         CPSi_md5_calc(&ctx->handshake_md5_snapshot, ctx->read_seq_num, 8);
@@ -1153,19 +1150,19 @@ static u32 make_plaintext(CPSSslConnection *ctx, u8 *hdr) {
         CPSi_md5_calc(&ctx->handshake_md5_snapshot, hdr + 3, len + 2);
         CPSi_md5_result(&ctx->handshake_md5_snapshot, mac);
         CPSi_md5_init(&ctx->handshake_md5_snapshot);
-        CPSi_md5_calc(&ctx->handshake_md5_snapshot, ctx->read_mac_secret, macLen);
+        CPSi_md5_calc(&ctx->handshake_md5_snapshot, ctx->read_mac_secret, 0x10);
         MI_CpuFill8(pad, 0x5c, 0x30);
         CPSi_md5_calc(&ctx->handshake_md5_snapshot, pad, 0x30);
-        CPSi_md5_calc(&ctx->handshake_md5_snapshot, mac, macLen);
+        CPSi_md5_calc(&ctx->handshake_md5_snapshot, mac, 0x10);
         CPSi_md5_result(&ctx->handshake_md5_snapshot, mac);
+        macLen = 0x10;
         break;
     case 5:
         len -= 0x14;
         hdr[3] = len >> 8;
         hdr[4] = len;
         CPSi_sha1_init(&ctx->handshake_sha1_snapshot);
-        macLen = 0x14;
-        CPSi_sha1_calc(&ctx->handshake_sha1_snapshot, ctx->read_mac_secret, macLen);
+        CPSi_sha1_calc(&ctx->handshake_sha1_snapshot, ctx->read_mac_secret, 0x14);
         MI_CpuFill8(pad, 0x36, 0x28);
         CPSi_sha1_calc(&ctx->handshake_sha1_snapshot, pad, 0x28);
         CPSi_sha1_calc(&ctx->handshake_sha1_snapshot, ctx->read_seq_num, 8);
@@ -1173,11 +1170,12 @@ static u32 make_plaintext(CPSSslConnection *ctx, u8 *hdr) {
         CPSi_sha1_calc(&ctx->handshake_sha1_snapshot, hdr + 3, len + 2);
         CPSi_sha1_result(&ctx->handshake_sha1_snapshot, mac);
         CPSi_sha1_init(&ctx->handshake_sha1_snapshot);
-        CPSi_sha1_calc(&ctx->handshake_sha1_snapshot, ctx->read_mac_secret, macLen);
+        CPSi_sha1_calc(&ctx->handshake_sha1_snapshot, ctx->read_mac_secret, 0x14);
         MI_CpuFill8(pad, 0x5c, 0x28);
         CPSi_sha1_calc(&ctx->handshake_sha1_snapshot, pad, 0x28);
-        CPSi_sha1_calc(&ctx->handshake_sha1_snapshot, mac, macLen);
+        CPSi_sha1_calc(&ctx->handshake_sha1_snapshot, mac, 0x14);
         CPSi_sha1_result(&ctx->handshake_sha1_snapshot, mac);
+        macLen = 0x14;
         break;
     }
     if (memcmp(hdr + 5 + len, mac, macLen) != 0) {
@@ -1601,19 +1599,19 @@ static void send_client_hello(CPSSoc *soc) {
     set_random(ctx->client_random + 4, 0x1c);
     MI_CpuCopy8(ctx->client_random, p + 2, 0x20);
     find_session_from_IP(ctx, soc->remote_ip, soc->remote_port);
+    p += 0x22;
     if (ctx->resumed) {
-        p[0x22] = 0x20;
-        MI_CpuCopy8(ctx->key_storage.fields.session_id, p + 0x23, 0x20);
-        p += 0x43;
+        *p++ = 0x20;
+        MI_CpuCopy8(ctx->key_storage.fields.session_id, p, 0x20);
+        p += 0x20;
     } else {
-        p[0x22] = 0;
-        p += 0x23;
+        *p++ = 0;
     }
     *p++ = 0;
     *p++ = 4;
-    for (i = 0; i < NELEMS(sConfig.cipher_suites); i++) {
-        *p++ = sConfig.cipher_suites[i] >> 8;
-        *p++ = sConfig.cipher_suites[i];
+    for (i = 0; i < NELEMS(sCipherSuites); i++) {
+        *p++ = sCipherSuites[i] >> 8;
+        *p++ = sCipherSuites[i];
     }
     *p++ = 1;
     *p++ = 0;
