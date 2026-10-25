@@ -57,4 +57,8 @@ The caller applies your fixes without re-deriving them, so a confident wrong cla
 - Statics still named `func_ovNNN_...`, or whose symbol wasn't renamed to the C name (ov118, btl_tables.c).
 - A function kept matching with a workaround in a file marked complete: the natural C wins and the file goes back to
   partial, with a row.
+- Another overlay's function named after the first candidate of an ambiguous relocation (`module:overlays(146,149)`)
+  instead of the overlay the code loads: `ENC_EFFECT_CONTROLLERS` (enceff_data.c) named overlay 146's cut-ins and 152's
+  `EncEffCells_Create` for entries that load overlays 149, 153 and 154. The entry's overlay field, or the overlay
+  loaded before the call, says which, and `config_fixes.py reloc-module` pins the relocation to it.
 """

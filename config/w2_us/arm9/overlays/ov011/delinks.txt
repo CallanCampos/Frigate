@@ -74,12 +74,13 @@ lib/nitrowifi/src/soc/socl_poll.c:
     .text       start:0x021578d4 end:0x021579b8
 
 lib/nitrowifi/src/soc/socl_misc.c:
-    complete
-    .text       start:0x021579b8 end:0x021579c0
+    .text       start:0x021579b8 end:0x02157b30
+    .bss        start:0x0218dc8c end:0x0218dc94
 
 lib/nitrowifi/src/soc/socl_list.c:
-    .text       start:0x021579c0 end:0x02157c10
-    .bss        start:0x0218dc8c end:0x0218dc9c
+    complete
+    .text       start:0x02157b30 end:0x02157c10
+    .bss        start:0x0218dc94 end:0x0218dc9c
 
 lib/nitrowifi/src/soc/soc.c:
     .text       start:0x02157c10 end:0x021581b4
@@ -114,10 +115,11 @@ lib/nitrowifi/src/ssl/biginteger.c:
     complete
     .text       start:0x0215b2b4 end:0x0215bc2c
 
-lib/nitrowifi/src/wcm/wcm.c:
-    .text       start:0x0215bc2c end:0x0215ddb4
-    .rodata     start:0x0218501c end:0x02185054
-    .bss        start:0x0218dfb4 end:0x0218e008
+lib/nitrowifi/src/wcm/wcm_system.c:
+    complete
+    .text       start:0x0215bc2c end:0x0215c5d4
+    .rodata     start:0x0218501c end:0x02185044
+    .bss        start:0x0218dfb4 end:0x0218dfbc
 
 lib/dwc/src/gt2/gsUdpEngine.c:
     complete
@@ -475,3 +477,22 @@ lib/dwc/src/base/dwc_main.c:
     .text       start:0x0215fa4c end:0x02160e50
     .data       start:0x021857fc end:0x02185810
     .bss        start:0x0218e058 end:0x0218e200
+
+lib/nitrowifi/src/wcm/wcm_aplist.c:
+    complete
+    .text       start:0x0215c5d4 end:0x0215cb04
+    .rodata     start:0x02185044 end:0x02185054
+
+lib/nitrowifi/src/wcm/wcm_cpsif.c:
+    complete
+    .text       start:0x0215cb04 end:0x0215cd68
+    .bss        start:0x0218dfbc end:0x0218dff4
+
+lib/nitrowifi/src/wcm/wcm_util.c:
+    complete
+    .text       start:0x0215cd68 end:0x0215cec8
+    .bss        start:0x0218dff4 end:0x0218e008
+
+lib/nitrowifi/src/wcm/wcm_wmif.c:
+    complete
+    .text       start:0x0215cec8 end:0x0215ddb4

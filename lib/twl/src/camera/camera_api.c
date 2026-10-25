@@ -525,9 +525,9 @@ CAMERAResult CAMERA_InitCore(void) {
     CAMERA_StopCaptureCore();
     CAMERA_ClearBufferCore();
     PM_SetSleepCallbackInfo(&sCameraWork.sleepInfo, func_02702070, NULL);
-    PM_InsertPreSleepCallback(&sCameraWork.sleepInfo, CAMERA_PM_CALLBACK_PRIORITY);
+    PMi_InsertPreSleepCallbackEx(&sCameraWork.sleepInfo, CAMERA_PM_CALLBACK_PRIORITY);
     PM_SetExitCallbackInfo(&sCameraWork.exitInfo, func_02702070, NULL);
-    PM_InsertPostExitCallback(&sCameraWork.exitInfo, CAMERA_PM_CALLBACK_PRIORITY);
+    PMi_InsertPostExitCallbackEx(&sCameraWork.exitInfo, CAMERA_PM_CALLBACK_PRIORITY);
     CAMERA_SetVsyncInterruptCore(CAMERA_INTR_VSYNC_NEGATIVE_EDGE);
     CAMERA_SetBufferErrorInterruptCore(TRUE);
     CAMERA_SetMasterInterruptCore(TRUE);

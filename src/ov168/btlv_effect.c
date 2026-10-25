@@ -256,12 +256,8 @@ BtlvEffectSetup *BtlvEffect_CreateSetup(BtlMainModule *mainModule, BtlvScu *scu,
                              scu, heapId);
 }
 
-// NONMATCHING: 2 bytes. The seasonal test is `cmp r0, #0` where the game has `lsls r0, r0, #1` after the `ldrb`:
-// the flags come from the expression's last operation, and only a doubling of the flag gives them, such as
-// `seasonal * 2` or `&u16s[seasonal] != u16s` (which folds to it), and the function has no reason for one. Its row in
-// docs/nonmatching-functions.md lists what was tried.
-// `setup` must not be `const`: with it, the loads from `setup` move above the stack-argument stores of
-// BtlvStage_Create and FieldLightStatus_Get, 34 bytes.
+// `setup` isn't `const`: with it, the loads from `setup` move above the stack-argument stores of BtlvStage_Create
+// and FieldLightStatus_Get
 void BtlvEffect_Init(BtlvEffectSetup *setup, Font *font, HeapID heapId) {
     BtlvEffectBgData *bgData;
     u8 season;
@@ -289,7 +285,7 @@ void BtlvEffect_Init(BtlvEffectSetup *setup, Font *font, HeapID heapId) {
 
     bgData = GFL_ArcSysReadHeapNew(0x97, 0, HEAPID_TAIL(sBtlvEffect->heapId));
     season = 0;
-    if (bgData[setup->fieldEnv.bgType].seasonal) {
+    if (bgData[setup->fieldEnv.bgType].seasonal * 2) {
         season = setup->fieldEnv.season;
     }
     sBtlvEffect->stage =

@@ -2,8 +2,8 @@
 #define POKEBW2_APP_DOWNLOAD_PLAY_SYS_H
 
 #include "types.h"
-#include "app/download_play.h"
-#include "app/download_play_wih.h"
+#include "dwcutil/dwc_mov_mbp.h"
+#include "dwcutil/dwc_mov_wh.h"
 #include "nitro/mb.h"
 
 // The parent's own flow for the DS Download Play range of overlay 182 (src/ov182/download_play_sys.c). The ROM
@@ -70,7 +70,7 @@ typedef struct {
 } DownloadPlaySysFrame;
 
 // The parent's flow work, the first 0xb00 bytes of the block the overlay's screens file hands the flow: the
-// download-play parent's work (DownloadPlayWork) follows it
+// download-play parent's work (MovMbpWork) follows it
 typedef struct {
     // The frame this console sends, and the frames the data sharing received from the two consoles
     DownloadPlaySysFrame sendFrame;
@@ -103,7 +103,7 @@ typedef struct {
     // How long the current state has waited, which the states that end the wireless count
     u32 timer;
     // The child that connected, by player number less one
-    DownloadPlayChildInfo *childInfo[DOWNLOAD_PLAY_CHILD_MAX];
+    MovMbpChildInfo *childInfo[MOV_MBP_CHILD_MAX];
     // The data the parent sends, 0x40 bytes per step of the data sharing
     u8 *sendData;
     u8 unk_aa8[4];
@@ -120,7 +120,7 @@ typedef struct {
 // The block the overlay's screens file hands the flow: the flow's own work, then the download-play parent's
 typedef struct {
     DownloadPlaySysWork sys;
-    DownloadPlayWork play;
+    MovMbpWork play;
 } DownloadPlaySysContext;
 
 // The game that the overlay's screens file hands the flow to offer: an MBGameRegistry up to its player count, without

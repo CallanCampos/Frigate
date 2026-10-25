@@ -21,6 +21,8 @@ after importing names from swan.
     config_fixes.py section-end overlays/ov310 src/ov310/research_list.c .rodata 0x021a7028  # move a file's boundary
     config_fixes.py section-start overlays/ov310 src/ov310/research_common.c .rodata 0x021a773c
     config_fixes.py add-section . lib/nnsys/src/g2d/g2di_Mtx32.c .bss 0x408 0x021435d8  # give a file a section
+    config_fixes.py add-section . lib/nitro/src/spi/pm.c .ltdmain 0x30c 0x027693dc  # a section dsd migrates to LTD
+    config_fixes.py remove-file ltd_autoload_0 lib/twl/src/spi/pm_twl.c 0x027693dc  # an entry another file holds
     config_fixes.py split-section-prefix . .rodata .exceptix 0x30 0x0208ee28  # recover a compiler section
     config_fixes.py apply
 """
@@ -30,7 +32,8 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
-from tools.decomp.dsd_config import ROOT, config_lock, load_modules, parse_sections, reloc_module_names  # noqa: E402
+from tools.decomp.dsd_config import (  # noqa: E402
+    LTD_MODULE, MIGRATED_SECTIONS, ROOT, config_lock, load_modules, parse_sections, reloc_module_names, section_module)
 from tools.decomp.version_addresses import (  # noqa: E402
     OTHERS, PRIMARY, ModulePlacer, Unplaced, function_ends, load_pairs)
 
@@ -41,6 +44,7 @@ HEADER = (
     "# module address(b2_us) action [argument]\n"
 )
 RELOC_RE = re.compile(r"^from:(0x[0-9a-f]+) ")
+SECTION_ACTIONS = ("section_start", "section_end", "remove_section", "add_section")
 SYMBOL_ADDR_RE = re.compile(r" addr:(0x[0-9a-f]+)")
 
 
@@ -74,6 +78,12 @@ class AddressMapper:
 
 def config_dir(version: str, module: str) -> Path:
     return ROOT / "config" / version / "arm9" / module
+
+
+def address_module(module: str, action: str, argument: str) -> str:
+    """The module whose addresses a fix's address is in: a file's section that dsd migrates from ARM9 main is the LTD
+    autoload's."""
+    return section_module(module, argument.split(":")[1]) if action in SECTION_ACTIONS else module
 
 
 def load_fixes() -> list[tuple[str, int, str, str]]:
@@ -279,7 +289,14 @@ def plan_fix(version: str, module: str, addr: int, action: str, argument: str):
             start = lines.index(f"{source}:")
         except ValueError:
             sys.exit(f"{version} {module}: {source} is not registered")
-        order = [".text", ".init", ".rodata", ".ctor", ".data", ".bss"]
+        end = addr + int(size, 0)
+        if address_module(module, action, argument) != module:
+            # A migrated section must lie in the LTD autoload's section that dsd places it in
+            held = parse_sections(config_dir(version, LTD_MODULE) / "delinks.txt").get(MIGRATED_SECTIONS[section])
+            if held is None or not held[0] <= addr < end <= held[1]:
+                sys.exit(f"{version} {module}: {section} {addr:#010x}-{end:#010x} is outside {LTD_MODULE}'s "
+                         f"{MIGRATED_SECTIONS[section]}")
+        order = [".text", ".init", ".rodata", ".ctor", ".data", ".bss", ".ltdmain", ".ltdmain.bss"]
         at = start + 1
         while at < len(lines) and lines[at].startswith(" "):
             name = lines[at].split()[0]
@@ -288,8 +305,31 @@ def plan_fix(version: str, module: str, addr: int, action: str, argument: str):
             if name in order and section in order and order.index(name) > order.index(section):
                 break
             at += 1
-        end = addr + int(size, 0)
         lines.insert(at, f"    {section:<11} start:{addr:#010x} end:{end:#010x}")
+        return path, "\n".join(lines) + "\n"
+
+    if action == "remove_file":
+        # A file's entry that another entry now holds, such as a DSi part of a NitroSDK file, whose sections move to
+        # the whole's entry in ARM9 main as migrated sections. The address is the start of one of its sections, and
+        # an entry already gone is left so
+        path = config_dir(version, module) / "delinks.txt"
+        lines = path.read_text().splitlines()
+        try:
+            start = lines.index(f"{argument}:")
+        except ValueError:
+            return
+        end = start + 1
+        while end < len(lines) and lines[end].startswith(" "):
+            end += 1
+        starts = {int(m.group(1), 16) for line in lines[start + 1:end] if (m := re.search(r"start:(0x[0-9a-f]+)", line))}
+        if addr not in starts:
+            sys.exit(f"{version} {module}: {argument} has no section at {addr:#010x}")
+        # The entry's blank line goes with it
+        if end < len(lines) and not lines[end].strip():
+            end += 1
+        elif start and not lines[start - 1].strip():
+            start -= 1
+        del lines[start:end]
         return path, "\n".join(lines) + "\n"
 
     path = config_dir(version, module) / "relocs.txt"
@@ -403,7 +443,10 @@ def apply_everywhere(mapper: AddressMapper, module: str, addr: int, action: str,
             other_argument = ",".join([kind, destination, f"{mapped:#010x}", *addend])
         # A moved boundary names its section, so that one at the section's end is placed as that
         section = argument.rsplit(":", 1)[1] if action in ("section_start", "section_end") else None
-        plan.append((other, mapper.map(module, addr, other, section=section), other_argument))
+        placed = address_module(module, action, argument)
+        if placed != module and section is not None:
+            section = MIGRATED_SECTIONS[section]
+        plan.append((other, mapper.map(placed, addr, other, section=section), other_argument))
     changes = [plan_fix(version, module, mapped, action, mapped_argument)
                for version, mapped, mapped_argument in plan]
     for change in changes:
@@ -479,6 +522,10 @@ def main():
     command.add_argument("source", help="the source file as delinks.txt names it")
     command.add_argument("section", help="e.g. .bss")
     command.add_argument("addresses", nargs="+", help="the section's original start")
+    command = commands.add_parser("remove-file", help="remove a file's entry that another entry now holds")
+    command.add_argument("module")
+    command.add_argument("source", help="the source file as delinks.txt names it")
+    command.add_argument("addresses", nargs="+", help="the start of one of its sections")
     command = commands.add_parser("split-section-prefix", help="split a compiler section from a module section prefix")
     command.add_argument("module")
     command.add_argument("section", help="the existing module section")
@@ -508,6 +555,7 @@ def main():
                 "section_start": f"{getattr(args, 'source', '')}:{getattr(args, 'section', '')}",
                 "section_end": f"{getattr(args, 'source', '')}:{getattr(args, 'section', '')}",
                 "remove_section": f"{getattr(args, 'source', '')}:{getattr(args, 'section', '')}",
+                "remove_file": getattr(args, "source", ""),
                 "add_section": f"{getattr(args, 'source', '')}:{getattr(args, 'section', '')}:{getattr(args, 'size', '')}"}
     argument["split_section_prefix"] = f"{getattr(args, 'section', '')}:{getattr(args, 'target_section', '')}:{getattr(args, 'size', '')}"
     argument = argument.get(action, "")
@@ -515,6 +563,8 @@ def main():
         # A command may name several sources. Validate all of them before changing any relocation file or fix record.
         for address in args.addresses:
             orphan_reloc_plan(mapper, args.module, int(address, 16), argument)
+    if action == "remove_file" and f"{argument}:" not in (config_dir(PRIMARY, args.module) / "delinks.txt").read_text().splitlines():
+        sys.exit(f"{PRIMARY} {args.module}: {argument} is not registered")
     for address in args.addresses:
         addr = int(address, 16)
         apply_everywhere(mapper, args.module, addr, action, argument)
@@ -527,6 +577,10 @@ def main():
         # Removing a label that a recorded fix added drops both records: dsd never makes such a label itself
         if action == "remove_label" and (args.module, addr, "add_label", argument) in fixes:
             fixes = [f for f in fixes if f not in ((args.module, addr, "add_label", argument), (args.module, addr, action, argument))]
+        # Removing a file's entry drops the recorded fixes of its sections, which would name an entry that is gone
+        if action == "remove_file":
+            fixes = [f for f in fixes if not (f[0] == args.module and f[2] in SECTION_ACTIONS
+                                              and f[3].startswith(f"{argument}:"))]
         print(f"{action} {args.module} {addr:#010x} {argument}".rstrip())
     save_fixes(fixes)
 

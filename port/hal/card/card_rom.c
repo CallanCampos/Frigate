@@ -89,7 +89,7 @@ void CARDi_InitRom(void) {
         }
     }
     if (OS_IsRunOnTwl()) {
-        CARDi_InitTwlRom();
+        CARDi_InitRomHash();
     }
 }
 

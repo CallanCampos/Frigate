@@ -103,7 +103,7 @@ void OSi_EnterDmaCallback(u32 dmaNo, OSIrqCallback callback, void *arg) {
 
 // NitroSDK's OSi_EnterNDmaCallback, which the DSi's OS code in the LTD autoload implements
 void OSi_EnterNDmaCallback(u32 ndmaNo, OSIrqCallback callback, void *arg) {
-    OSi_EnterNDmaCallbackCore(ndmaNo, callback, arg);
+    OSi_EnterNDmaCallback_ltdmain(ndmaNo, callback, arg);
 }
 
 void OSi_EnterTimerCallback(u32 timerNo, OSIrqCallback callback, void *arg) {

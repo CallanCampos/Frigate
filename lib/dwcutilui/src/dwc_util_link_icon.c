@@ -34,7 +34,7 @@ void DWCUtilLinkIcon_Init(int set) {
 void DWCi_ICONlEnd(void) {
     if (sLinkIcon != NULL) {
         DWCi_TSKlDeleteEx(0, sLinkIcon->task);
-        DWCi_MOV_MBP_GetChildBmp(sLinkIcon->oam);
+        DWCi_OBJlDelete(sLinkIcon->oam);
         DWCi_HEAPlFree_(&sLinkIcon);
     }
 }

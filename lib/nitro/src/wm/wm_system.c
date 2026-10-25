@@ -442,7 +442,7 @@ u16 WM_GetConnectedAIDs(void) {
 
 void WMi_RegisterSleepCallback(void) {
     PM_SetSleepCallbackInfo(&sWm.sleepCallbackInfo, WmSleepCallback, NULL);
-    PM_InsertPreSleepCallback(&sWm.sleepCallbackInfo, 1000);
+    PMi_InsertPreSleepCallbackEx(&sWm.sleepCallbackInfo, 1000);
 }
 
 void WMi_DeleteSleepCallback(void) {

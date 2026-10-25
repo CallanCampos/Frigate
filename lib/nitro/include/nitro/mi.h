@@ -18,7 +18,7 @@ typedef enum {
     MI_WRAM_ARM7_ALL,
 } MIWram;
 
-// On a DSi, sets up TwlSDK's shared WRAM manager, which is in the LTD autoload (MIi_InitWramManagerCore). OS_Init calls
+// On a DSi, sets up TwlSDK's shared WRAM manager, which is in the LTD autoload (MIi_InitWramManager). OS_Init calls
 // it
 void MI_InitWramManager(void);
 void MI_SetWramBank(MIWram bank);

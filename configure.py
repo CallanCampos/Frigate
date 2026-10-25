@@ -66,7 +66,7 @@ MWCCARM_URL = "https://decomp.aetias.com/files/mwccarm.zip"
 # changes are upstreamed. Its dsi-hybrid branch is released as DSD_VERSION; after a new release, bump it and
 # configure.py replaces tools/dsd.
 DSD_REPO = "https://github.com/fuddlesworth/ds-decomp"
-DSD_VERSION = "v0.12.1-dsi.6"
+DSD_VERSION = "v0.12.1-dsi.7"
 # Release binary of each platform, by (sys.platform, machine)
 DSD_BINARIES = {
     ("linux", "x86_64"): "dsd-linux-x86_64",
@@ -920,7 +920,8 @@ def main():
 
     # objdiff.json covers one version, the primary one if it is being built
     objdiff_version = versions[0]
-    n.build(["objdiff.json"], "objdiff_config", configs, implicit=["tools/build/objdiff_config.py", "configure.py", "config/compiler_flags.toml"],
+    n.build(["objdiff.json"], "objdiff_config", configs,
+            implicit=["tools/build/objdiff_config.py", "configure.py", "config/compiler_flags.toml"],
             variables={"version": objdiff_version})
     n.build(["report"], "phony", [Path("build") / objdiff_version / "report.json"])
     n.build(["progress"], "phony", [f"{objdiff_version}_progress"])

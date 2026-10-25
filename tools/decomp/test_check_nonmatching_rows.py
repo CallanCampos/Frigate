@@ -31,7 +31,7 @@ class NonmatchingRowsTests(unittest.TestCase):
             replacement.start()
             self.addCleanup(replacement.stop)
 
-    def run_checker(self, text, fix=False, shared_aliases=False, divergent_white=False):
+    def run_checker(self, text, fix=False, shared_aliases=False, divergent_white=False, migrated=False):
         self.doc.write_text(text)
         output = io.StringIO()
         symbols = {".": {"first": {0x100}, "second": {0x110}}}
@@ -41,8 +41,14 @@ class NonmatchingRowsTests(unittest.TestCase):
             white["."]["second"] = {0x200}
         if divergent_white:
             white["."]["second"] = {0x210}
+        if migrated:
+            # The DSi part of an ARM9 main file, in a migrated .ltdmain section, has its symbols in the LTD autoload
+            symbols["ltd_autoload_0"] = {"second": {symbols["."].pop("second").pop()}}
+            white["ltd_autoload_0"] = {"second": {white["."].pop("second").pop()}}
         with patch.object(rows, "modules_by_file", return_value={"src/example.c": "."}), \
                 patch.object(rows, "symbols_by_module", side_effect=[symbols, white]), \
+                patch.object(rows, "migrated_modules",
+                             return_value={"src/example.c": {"ltd_autoload_0"}} if migrated else {}), \
                 patch.object(rows.sys, "argv", ["check_nonmatching_rows.py"] + (["--fix"] if fix else [])), \
                 contextlib.redirect_stdout(output), self.assertRaises(SystemExit) as result:
             rows.main()
@@ -89,6 +95,13 @@ class NonmatchingRowsTests(unittest.TestCase):
         self.assertEqual(code, 0)
         self.assertIn("fixed 1 White 2 address", output)
         self.assertIn("`0x100` / `0x00000200`", self.doc.read_text())
+
+    def test_migrated_section_functions_are_found_in_the_ltd_autoload(self):
+        code, output = self.run_checker(row("`first`, `second`", "`0x100` / `0x200`, `0x110` / `0x210`"), migrated=True)
+        self.assertEqual(code, 0, output)
+        code, output = self.run_checker(row("`second`", "`0x120` / `0x210`"), migrated=True)
+        self.assertEqual(code, 1)
+        self.assertIn("second is not at 0x00000120 in b2_us", output)
 
     def test_shared_pair_checks_every_named_function(self):
         code, output = self.run_checker(row("`first`, `second`"))

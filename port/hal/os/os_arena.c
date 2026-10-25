@@ -151,7 +151,7 @@ void OS_InitArenaEx(void) {
         OS_SetProtectionRegion(1, 0x02000000, HW_C6_PR_4MB);
         OS_SetProtectionRegion(2, 0x027ff000, HW_C6_PR_4KB);
     } else {
-        OSi_InitArenaExTwl();
+        OSi_InitArenaEx_ltdmain();
     }
 }
 

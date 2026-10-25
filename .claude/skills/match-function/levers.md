@@ -888,9 +888,11 @@ text to `grep -n` there. Entries without a key come from later work and still be
   `while (box < n) { ...; break; }`, with a comment. (matching.md: "stops after its first pass")
 - A load hoisted one loop level only: it was in the middle loop's body. (matching.md: "middle loop's body")
 - `p + v * 4` kept in a register with reads at `#4` and `#8`, where the original computes `(v + k) << 2` for each
-  read: a pointer conversion around the element's whole address (`*(f32 *)&words[v + k]`), only where the buffer's
-  type calls for one; even a cast to the element's own type hides it. (matching.md: "hides the address from that
-  pass")
+  read: the original's read had a pointer conversion around the element's whole address (`*(f32 *)&words[v + k]`), a
+  `volatile` address, an index sum converted to the other signedness or narrowed (also implicitly, through a `u32`
+  index parameter), or a variable subscript. Use the one the code's types call for: a file's floats read from a `u8 *`
+  buffer of its bytes, `*(f32 *)(bytes + (v + k) * sizeof(f32))`, in `ica_anime.c`; never a cast to the type the
+  buffer already has. (matching.md: "only when one of these holds")
 - The loop passes off for a whole file, as a test: `-flag no-opt_loop_invariants` and
   `-flag no-opt_strength_reduction` in `--extra-flags`; the `-opt` sub-options do nothing after `-O4,p`.
   (matching.md: "takes a pragma's name")
@@ -1101,7 +1103,12 @@ text to `grep -n` there. Entries without a key come from later work and still be
   another file's section, since the literal is `.bss` plus the offset rounded down to 0x80. (matching.md: "puts the
   static at a multiple of 0x80")
 - DSi code in the LTD autoload that reaches a main global at a pooled base plus an offset: it was compiled in that
-  global's file, in a `#pragma section` block for `.ltdmain`. (matching.md: "objects defined between")
+  global's file, in a `#pragma section` block for `.ltdmain`, which its entry lists in `.ltdmain` sections
+  (`docs/configs.md`, Migrated LTD sections).
+  (matching.md: "objects defined between")
+- The main part of such a file reaching its statics at other offsets: move the DSi part's static
+  declarations, in a `#pragma section` block of their own, among the main part's. (matching.md: "still take part
+  in the size sort")
 - Two statics reached from one literal: `-ipa file` in `file_flags`, with the SDK's separate statics. (matching.md:
   "ask for `-ipa file` before anything else")
 - A constant loaded from the pool with no relocation where MWCC folds it or builds it with `mov`/`lsl`: a linker

@@ -492,5 +492,73 @@ class BoundaryRecordTests(unittest.TestCase):
         self.assertEqual(self.snapshot(), before)
 
 
+class LtdMigrationTests(ConfigFixFixture):
+    """A DSi part's entry in the LTD autoload moves into its whole's entry in ARM9 main as migrated sections."""
+
+    PART = "lib/twl/part_twl.c"
+    WHOLE = "lib/nitro/whole.c"
+
+    def setUp(self):
+        super().setUp()
+        # White 2's LTD autoload sits 0x800 higher, so a migrated section's address is placed through that module
+        for addr in (0x7010, 0x7410, 0x7420):
+            self.mapper.addresses[(fixes.LTD_MODULE, addr, "w2_us")] = addr + 0x800
+        for version, main, ltd in [("b2_us", 0x1000, 0x7000), ("w2_us", 0x2000, 0x7800)]:
+            path = fixes.config_dir(version, ".") / "delinks.txt"
+            path.write_text(path.read_text() + f"\n{self.WHOLE}:\n    complete\n"
+                            f"    .text       start:{main:#010x} end:{main + 0x80:#010x}\n")
+            self.sections(version, fixes.LTD_MODULE, [(".ltdmain", ltd, ltd + 0x400), (".bss", ltd + 0x400, ltd + 0x500)])
+            path = fixes.config_dir(version, fixes.LTD_MODULE) / "delinks.txt"
+            header = path.read_text().split("\n\n")[0]
+            path.write_text(
+                f"{header}\n\nlib/twl/before.c:\n    complete\n    .ltdmain    start:{ltd:#010x} end:{ltd + 0x10:#010x}\n"
+                f"\n{self.PART}:\n    complete\n    .ltdmain    start:{ltd + 0x10:#010x} end:{ltd + 0x40:#010x}\n"
+                f"    .bss        start:{ltd + 0x410:#010x} end:{ltd + 0x420:#010x}\n"
+                f"\nlib/twl/after.c:\n    complete\n    .ltdmain    start:{ltd + 0x40:#010x} end:{ltd + 0x50:#010x}\n")
+
+    def delinks(self, version, module):
+        return (fixes.config_dir(version, module) / "delinks.txt").read_text()
+
+    def test_migrated_sections_are_placed_through_the_ltd_autoload(self):
+        self.cli("add-section", ".", self.WHOLE, ".ltdmain", "0x30", "0x7010")
+        self.cli("add-section", ".", self.WHOLE, ".ltdmain.bss", "0x10", "0x7410")
+        for version, main, ltd in [("b2_us", 0x1000, 0x7000), ("w2_us", 0x2000, 0x7800)]:
+            self.assertIn(f"{self.WHOLE}:\n    complete\n    .text       start:{main:#010x} end:{main + 0x80:#010x}\n"
+                          f"    .ltdmain    start:{ltd + 0x10:#010x} end:{ltd + 0x40:#010x}\n"
+                          f"    .ltdmain.bss start:{ltd + 0x410:#010x} end:{ltd + 0x420:#010x}\n",
+                          self.delinks(version, "."))
+        self.assertIn((fixes.LTD_MODULE, 0x7410, "w2_us"), self.mapper.calls)
+        after = self.snapshot()
+        self.cli("apply")
+        self.assertEqual(self.snapshot(), after)
+
+    def test_migrated_section_outside_its_ltd_section_is_rejected(self):
+        self.mapper.addresses[(fixes.LTD_MODULE, 0x7020, "w2_us")] = 0x7820
+        # .ltdmain.bss lies in the LTD autoload's .bss, not in its .ltdmain
+        self.assert_rejected_without_changes(
+            lambda: self.cli("add-section", ".", self.WHOLE, ".ltdmain.bss", "0x10", "0x7020"), "outside")
+
+    def test_remove_file_deletes_the_entry_in_both_versions_and_replays(self):
+        self.cli("section-end", fixes.LTD_MODULE, self.PART, ".bss", "0x7420")
+        self.cli("remove-file", fixes.LTD_MODULE, self.PART, "0x7010")
+        for version, ltd in [("b2_us", 0x7000), ("w2_us", 0x7800)]:
+            self.assertIn(f"end:{ltd + 0x10:#010x}\n\nlib/twl/after.c:\n", self.delinks(version, fixes.LTD_MODULE))
+            self.assertNotIn(self.PART, self.delinks(version, fixes.LTD_MODULE))
+        # The section fix of the removed entry would name an entry that is gone
+        self.assertEqual(fixes.load_fixes(), [(fixes.LTD_MODULE, 0x7010, "remove_file", self.PART)])
+        after = self.snapshot()
+        self.cli("apply")
+        self.assertEqual(self.snapshot(), after)
+
+    def test_remove_file_rejects_an_address_not_of_its_sections(self):
+        self.mapper.addresses[(fixes.LTD_MODULE, 0x7020, "w2_us")] = 0x7820
+        self.assert_rejected_without_changes(
+            lambda: self.cli("remove-file", fixes.LTD_MODULE, self.PART, "0x7020"), "no section at")
+
+    def test_remove_file_rejects_an_unregistered_file(self):
+        self.assert_rejected_without_changes(
+            lambda: self.cli("remove-file", fixes.LTD_MODULE, "lib/twl/missing.c", "0x7010"), "not registered")
+
+
 if __name__ == "__main__":
     unittest.main()

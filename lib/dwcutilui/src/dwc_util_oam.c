@@ -24,8 +24,8 @@ void DWCi_CELLlInit(void) {
     for (i = 0; i < 2; i++) {
         sScreens[i].freeNodes = DWCi_QUElFormEx(32, (u8 *)sScreens[i].nodes, sizeof(DWCUtilOamNode));
         sScreens[i].list = DWCi_LSTlForm();
-        sScreens[i].head.oam = DWCUtilOamBuf_GetEntry(i, 64);
-        sScreens[i].tail.oam = DWCUtilOamBuf_GetEntry(i, 127) + 1;
+        sScreens[i].head.oam = DWCi_OBJlGetOam(i, 64);
+        sScreens[i].tail.oam = DWCi_OBJlGetOam(i, 127) + 1;
         DWCi_LSTlPushFront(sScreens[i].list, &sScreens[i].head);
         DWCi_LSTlPushBack(sScreens[i].list, &sScreens[i].tail);
     }

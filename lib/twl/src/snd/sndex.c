@@ -133,9 +133,9 @@ void SNDEXi_Init(void) {
     PXI_SetFifoRecvCallback(PXI_FIFO_TAG_SNDEX, func_027049b0);
 
     PM_SetExitCallbackInfo(&sExitInfo, func_02704d64, NULL);
-    PM_InsertPostExitCallback(&sExitInfo, SNDEX_PM_PRIORITY);
+    PMi_InsertPostExitCallbackEx(&sExitInfo, SNDEX_PM_PRIORITY);
     PM_SetSleepCallbackInfo(&sSleepInfo, func_02704d64, NULL);
-    PM_InsertPreSleepCallback(&sSleepInfo, SNDEX_PM_PRIORITY);
+    PMi_InsertPreSleepCallbackEx(&sSleepInfo, SNDEX_PM_PRIORITY);
     sState = SNDEX_STATE_IDLE;
 }
 

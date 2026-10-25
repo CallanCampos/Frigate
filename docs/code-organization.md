@@ -10,7 +10,12 @@ every section.
 - An original file is one entry in `delinks.txt`, covering its whole range in each section, even while only some of
   its functions are written. The entry stays without `complete` until every function matches, and the original code
   is linked until then, as with `src/ov059/scrcmd_resort.c`. Never split a file into several entries to link the
-  matching parts early, and never put two original files in one entry.
+  matching parts early, and never put two original files in one entry. An original file that the code shows in two
+  modules is one source file with one entry, in ARM9 main's `delinks.txt`, which lists the LTD autoload's part in
+  `.ltdmain` sections (`docs/configs.md`, Migrated LTD sections): NitroSDK's `card_rom.c` and `pm.c`, whose DSi parts in
+  the LTD autoload reach the main parts' statics from their pooled base, as only code of the same object does, and
+  `mi_sharedWram.c`, `os_interrupt.c`, `os_arena.c`, `os_ownerInfoEx.c` and `os_application_jump.c`, which TwlSDK's
+  library objects show as one object each with both parts (aletheia's match of Black 1's code to them).
 - The C file holds its functions in address order. A function that doesn't match yet stays in the file as the closest
   C found, so objdiff shows how far off it is. Library code built with another compiler can differ: SPL's compiler
   emits a file's functions in reverse source order, so `lib/spl/src/` files hold theirs in reverse address order.
@@ -31,11 +36,14 @@ every section.
   (Nintendo's SPL particle library), `lib/dsprot/` (Nintendo's DS Protect, in overlays 165 and 337), `lib/nitro/`
   (NitroSDK: in ARM9 main its startup code, its system call stubs, its card, cartridge, file system, graphics,
   memory, NVRAM, OS, PXI, RTC, sound, SPI (microphone, power and touch panel), STD and wireless libraries, its
-  fixed-point math and libmath, and libcrypto's RC4; in overlay 181 the multiboot library), `lib/nnsys/` (NitroSystem: FND, G2D, G3D, GFD and sound), `lib/twl/`
+  fixed-point math and libmath, and libcrypto's RC4; in the LTD autoload's `.ltdmain`, the DSi parts of its card ROM,
+  PM and OS files and of TwlSDK's shared WRAM manager, in `card_rom.c`, `pm.c`, `os_interrupt.c`, `os_arena.c`,
+  `os_ownerInfoEx.c`, `os_application_jump.c` and `mi_sharedWram.c`; in overlay 181 the multiboot library),
+  `lib/nnsys/` (NitroSystem: FND, G2D, G3D, GFD and sound), `lib/twl/`
   (TwlSDK's DSi libraries: SCFG and the DSi system calls in ARM9 main; in the LTD autoload the camera, the DSP, the
   microphone, NWM, FATFS and the sound and RTC extensions, beside the DSi's photo signature code (names guessed), and
-  in `.ltdmain` the card's hashed ROM reads, the new DMA, the shared WRAM manager and the DSi parts of NitroSDK's card
-  ROM, OS and PM files; and in `lib/twl/src/`, the SSP JPEG encoder and decoder with their EXIF writer and reader,
+  in `.ltdmain` the card's hashed ROM reads and the new DMA; and in `lib/twl/src/`, the SSP JPEG encoder and decoder
+  with their EXIF writer and reader,
   linked into overlay 257 and built as Thumb with the game's compiler, `-ipa file` and `-inline on,noauto`), `lib/dwc/`
   (Nintendo's Wi-Fi Connection library, TWL-DWC: its account, auto-connect, backup and WDS code in ARM9 main, ARM
   code; the rest in overlays 11, 29, 189 and 260, mostly Thumb), `lib/msl/` (Metrowerks' MSL C library for NITRO, the
@@ -44,7 +52,9 @@ every section.
   backend in the LTD autoload's `.ltdmain`, Thumb with the game's compiler), `lib/dpw/` (the Global Trade Station's
   and the Battle Subway's Wi-Fi library in overlay 189, ARM),
   `lib/poke_net/` (the Global Data Server client at the end of overlay 201, ARM), `lib/dwcutil/` (the DWC utility, the
-  Wi-Fi Connection settings in overlay 182, built with MWCC 2.0), `lib/dwcutilui/` (that utility's main loop, screens,
+  Wi-Fi Connection settings in overlay 182, built with MWCC 2.0, but for its DS Download Play parent and wireless
+  helper, `dwc_mov_mbp.c` and `dwc_mov_wh.c`, built with the game's compiler and flags through `file_compilers` and
+  `file_flags`), `lib/dwcutilui/` (that utility's main loop, screens,
   keyboards and selectable objects, and the helpers under them: resources, messages, heap, OAM, cells, fades, text,
   input, interrupts, lists, OBJ characters, strings, VRAM banks, tasks and display, built with the game's compiler and
   flags but unsigned `char`; the name is ours) and `lib/irc/` (the infrared link, overlay 31's last two files, built
@@ -92,8 +102,8 @@ every section.
   `lib/dsprot/include/dsprot/`, `lib/dwc/include/dwc/` (Nintendo's Wi-Fi Connection library),
   `lib/nitrowifi/include/nitrowifi/` (NitroWiFi, under DWC), `lib/twl/include/twl/` (TwlSDK),
   `lib/dpw/include/dpw/` (the Global Trade Station's server library), `lib/poke_net/include/poke_net/` (the Global
-  Data Server client), `lib/dwcutil/include/dwcutil/` (the DWC utility's AOSS client and connection test, which its
-  screens call) and `lib/irc/include/irc/` (the infrared link).
+  Data Server client), `lib/dwcutil/include/dwcutil/` (the DWC utility's AOSS client, connection test and
+  DS Download Play parent and wireless helper, which its screens and overlay 182's Download Play flow call) and `lib/irc/include/irc/` (the infrared link).
   A header is named after the original file that owns its declarations, or after swan's header for it, such as
   `field/field_3dci.h`.
 - Put functions, data and callback tables used across source files or overlays in the owning file's header. Declare
