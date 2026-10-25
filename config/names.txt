@@ -7909,7 +7909,8 @@ overlays/ov011 0x0218dc44 SOCLi_CheckCount
 overlays/ov011 0x0218dc4c SOCLiSocketCount
 overlays/ov011 0x0218dc54 SOCLiSocketList
 overlays/ov011 0x0218dc58 SOCLiSocketListTrash
-overlays/ov011 0x0218dc5c sHostName
+overlays/ov011 0x0218dc5c sHostAddr
+overlays/ov011 0x0218dce4 sHostName
 overlays/ov011 0x0218ddf0 sPool
 overlays/ov011 0x0218de04 sSessionCache
 overlays/ov011 0x0218df74 WCMi_OverridedDeviceId

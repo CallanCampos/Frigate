@@ -34,16 +34,25 @@ SOCLSocketParam SOCLSocketParamUDPSend = {
 };
 // clang-format on
 
+// The file's statics are defined with zero initializers, as WCM's are: MWCC then knows them in the functions below and
+// reaches them as offsets from the start of the file's .bss, while an address passed on still gets a literal of its
+// own (&sSoclConfig in SOC_Startup). It lays them out sorted by size, which this order of definitions gives.
+// Three objects that no code in the ROM reads, at .bss+8, +0x10 and +0x40, sizes 4, 8 and 0x10, likely belonged to
+// functions the linker dropped; MWCC keeps an unread static of this kind, and the ROM has them. Their names are ours
+// and their types a guess from their sizes, a second host address, address list and host entry.
+static u8 *sUnusedHostAddrList[2] = { NULL };
+static u32 sUnusedHostAddr = 0;
+static SOCHostEnt sUnusedHostEnt = { 0 };
 // The allocator and deallocator that SOC_Startup was given
-static SocFreeFunc FreeFunc_SOC;
-static SocAllocFunc AllocFunc_SOC;
-static SOCHostEnt sHostEnt;
+static SocFreeFunc FreeFunc_SOC = NULL;
+static SocAllocFunc AllocFunc_SOC = NULL;
+static SOCHostEnt sHostEnt = { 0 };
 // What SOC_GetHostByName gives: the address, the list of addresses (one, and NULL), and the name
-static u32 sHostAddr;
-static u8 *sHostAddrList[2];
-static char sInetNtoABuffer[16];
-static SOCLConfig sSoclConfig;
-static char sHostName[0x104];
+static u32 sHostAddr = 0;
+static u8 *sHostAddrList[2] = { NULL };
+static char sInetNtoABuffer[16] = { 0 };
+static SOCLConfig sSoclConfig = { 0 };
+static char sHostName[0x104] = { 0 };
 
 static void *AllocFunc_SOCL(u32 size);
 static void FreeFunc_SOCL(void *ptr);

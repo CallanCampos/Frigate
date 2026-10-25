@@ -2689,13 +2689,13 @@ SOCLi_CheckCount kind:bss addr:0x0218dc44
 SOCLiSocketCount kind:bss addr:0x0218dc4c
 SOCLiSocketList kind:bss addr:0x0218dc54
 SOCLiSocketListTrash kind:bss addr:0x0218dc58
-sHostName kind:bss addr:0x0218dc5c
+sHostAddr kind:bss addr:0x0218dc5c
 data_ov011_0218dc74 kind:bss addr:0x0218dc74
 data_ov011_0218dc7c kind:bss addr:0x0218dc7c
 data_ov011_0218dc8c kind:bss addr:0x0218dc8c
 data_ov011_0218dcac kind:bss addr:0x0218dcac
 data_ov011_0218dcdc kind:bss addr:0x0218dcdc
-data_ov011_0218dce4 kind:bss addr:0x0218dce4
+sHostName kind:bss addr:0x0218dce4
 data_ov011_0218dde8 kind:bss addr:0x0218dde8
 sPool kind:bss addr:0x0218ddf0
 sSessionCache kind:bss addr:0x0218de04

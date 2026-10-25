@@ -3742,7 +3742,10 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   (`socl_command.c`) matches only with both of its statics zero-initialized. `#pragma explicit_zero_data on` puts such
   a definition in `.data` instead: `socl_startup.c`'s `SOCLiConfigPtr = NULL`, which the ROM has in `.data` before
   the 0x4000 default, takes it, and with the zeroed `.bss` globals in ntrtwl's definition order its four functions
-  match (33 bytes to 0x2c off otherwise).
+  match (33 bytes to 0x2c off otherwise). A gap in such a file's `.bss` that nothing reads is a zero-initialized static
+  of that size that nothing reads, which `-ipa function` keeps (`-ipa file` drops it): NitroWiFi's `soc.c` has three,
+  of 8, 4 and 0x10 bytes at +0x10, +8 and +0x40 among its statics, and with them, defined first, and every static
+  zero-initialized, its four functions that reach the statics from the base match and so does the file's `.bss`.
 - A zero-initialized static is reached from the section's pooled base, and so is a struct of statics, but the two
   compile differently: the struct's member is a field of one object, which MWCC loads again at other points (after a
   64-bit store, before a zero, across a loop), while a static of its own is known and scheduled freely. Statics that the
