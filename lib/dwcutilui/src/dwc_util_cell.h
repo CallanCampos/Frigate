@@ -2,7 +2,7 @@
 #define POKEBW2_DWCUTIL_DWC_UTIL_CELL_H
 
 #include "types.h"
-#include "dwc_util_oam.h"
+#include "cell.h"
 #include "nitro/gx.h"
 #include "struct_decls.h"
 

@@ -5,7 +5,9 @@
 
 // The connection utility's copy of a screen of BG 2 of the main screen, which a task loads at the next VBlank once it
 // is marked (DWCi_SCREENlRenew), and its loads of BG palettes of the main screen at the next VBlank.
-// The ROM does not embed this source file's name; dwc_util_bg_buffer.c is descriptive.
+// The file is the DWC utility library's screen.o (libdwcutil.TWL.HYB.a), as aletheia's map of Black 1's SDK code to
+// that library's objects (layout/symbols_sdk.txt) shows it; it keeps a name of ours, since dsd takes each file name
+// once and lib/dwc/src/gscommon/screen.c, GameSpy's has screen.c.
 // Allocates the copy from a screen, and frees it
 void DWCi_SCREENlInit(const void *screen);
 void DWCi_SCREENlEnd(void);

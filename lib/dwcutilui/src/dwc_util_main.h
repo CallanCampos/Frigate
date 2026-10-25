@@ -6,7 +6,9 @@
 // The connection utility's entry point, DWC_StartUtility (dwc/utility.h), and its main loop: the screen's update
 // function runs once a frame until a screen ends the utility. The screens hand each other two pairs of values, and
 // read the language and the starting screen they were started with and the flags.
-// The ROM does not embed this source file's name; dwc_util_main.c is descriptive.
+// The file is the DWC utility library's main.o (libdwcutil.TWL.HYB.a), as aletheia's map of Black 1's SDK code to that
+// library's objects (layout/symbols_sdk.txt) shows it; it keeps a name of ours, since dsd takes each file name once and
+// src/system/main.c has main.c.
 
 // Sets the function that runs each frame
 void DWCi_ChangeScene(void (*update)(void));

@@ -6,7 +6,9 @@
 
 // The connection utility's doubly linked lists: a head and a tail node bracket the nodes of a list, and every node
 // starts with its links. Linking and unlinking hold off the VBlank interrupt.
-// The ROM does not embed this source file's name; dwc_util_list.c is descriptive.
+// The file is the DWC utility library's list.o (libdwcutil.TWL.HYB.a), as aletheia's map of Black 1's SDK code to that
+// library's objects (layout/symbols_sdk.txt) shows it; it keeps a name of ours, since dsd takes each file name once and
+// lib/nnsys/src/fnd/list.c, NitroSystem's has list.c.
 
 struct DWCUtilNode {
     DWCUtilNode *prev;

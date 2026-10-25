@@ -1,9 +1,12 @@
 # The user interface of Nintendo's DWC utility (libdwcutil), the Wi-Fi Connection settings in overlay 182: its entry
 # point and main loop, its screens, keyboard and keypad, its row of selectable objects and their effects, and the
 # helpers under them (its resource archive, message files, heap, OAM allocator and buffers, sprite cells, fades, text,
-# input, interrupts, lists, OBJ characters, strings, VRAM banks, tasks and display registers). The name is ours. These
+# input, interrupts, lists, OBJ characters, strings, VRAM banks, tasks and display registers). The library's name is
+# ours; its files are named after the objects of libdwcutil.TWL.HYB.a that they are, as aletheia's map of Black 1's SDK
+# code to that library's objects (layout/symbols_sdk.txt) shows them, but for dwc_util_main.c, dwc_util_bg_buffer.c,
+# dwc_util_heap.c and dwc_util_list.c, whose objects' names (main.o, screen.o, heap.o and list.o) other files have. These
 # files were built with the game's compiler and flags, not with the 2.0 that the rest of the utility (lib/dwcutil:
-# apc.c and the AOSS files) needs: dwc_util_ui_object.c matches 15 of 15 functions with them against 10 of 15 under
+# apc.c and the AOSS files) needs: button.c matches 15 of 15 functions with them against 10 of 15 under
 # 2.0/sp2p2, and -ipa file is what gives DWCUtilUiObject_Destroy its second literal of the object's address. The one
 # difference is that char is unsigned, the compiler's default: DWCi_Char loads a path's sixth character with
 # ldrb and no sign extension.
@@ -30,7 +33,7 @@ flags = [
 
 # dwc_util_main_menu.c loads char/jbBgStep1.ncg.l and char/jbBgStep1.ncl.l in two functions, and dwc_util_info_menu.c
 # char/yb5Multi.nsc.l, and the ROM has a copy of each for each function, where MWCC shares a file's equal string
-# literals: these files are built with -str noreuse. dwc_util_text.c's two font tables share one string.
+# literals: these files are built with -str noreuse. font.c's two font tables share one string.
 [file_flags]
 "dwc_util_main_menu.c" = ["-str noreuse"]
 "dwc_util_info_menu.c" = ["-str noreuse"]

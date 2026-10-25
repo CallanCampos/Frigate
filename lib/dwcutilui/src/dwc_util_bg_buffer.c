@@ -1,10 +1,10 @@
 #include "dwc_util_bg_buffer.h"
 #include "dwc_util_heap.h"
-#include "dwc_util_task.h"
 #include "nitro/gx.h"
 #include "nitro/hw.h"
 #include "nitro/mi.h"
 #include "nitro/os.h"
+#include "task.h"
 
 static void DWCUtilBgBuffer_UploadTask(DWCUtilTask *task, void *arg);
 static void DWCUtilBgBuffer_LoadPaletteRowTask(DWCUtilTask *task, void *arg);
