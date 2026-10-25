@@ -1350,7 +1350,13 @@ Same code, other `sp` offsets or frame size.
   constant ones. `musical_mcss.c`'s `MusicalMcss_Load` builds the `compressed` argument first, as the original does,
   only with its `info` not `const`. And a `const` parameter is what counts: a `const` local copy of a plain pointer
   parameter doesn't schedule like it, so the `NetCommand` callbacks take `const void *data`, which matched four of
-  them; MWCC won't convert between function pointer types that differ only in a parameter's `const`.
+  them; MWCC won't convert between function pointer types that differ only in a parameter's `const`. NitroWiFi's
+  `resolve_common` (`cps.c`) is the same with a string: through `const u8 *name` MWCC moves the first character's
+  `ldrb` above the query's `strh` stores, and with `u8 *name`, as in Black 1's version, the load stays after them.
+- A pointer cast, even to the type the pointer already has, stops MWCC from reassociating a sum under it: `p + 6 +
+  count` read as `((const u8 *)(p + 6 + count))[0]` stays `adds r4, r0, #6; ldrb r4, [r4, r2]`, where without the
+  cast MWCC adds `count` once and reads at offsets 6 to 9. `resolve_common`'s record reads match through
+  `cps_internal.h`'s `CPS_BE16`, which casts its argument as `CPS_PUT16` does; a `static inline` reader doesn't.
 - A spilled value reloaded before a call's result is stored, where the original stores the result first, can need
   the result in a local and the stores in field order: `key_system_util.c`'s `KeySystemAccelMove_Init` stores
   `speed` and then `accel = FX_Div(...)`.
