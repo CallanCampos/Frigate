@@ -1144,8 +1144,7 @@ static u32 make_plaintext(CPSSslConnection *ctx, u8 *hdr) {
         hdr[3] = len >> 8;
         hdr[4] = len;
         CPSi_md5_init(&ctx->handshake_md5_snapshot);
-        macLen = 0x10;
-        CPSi_md5_calc(&ctx->handshake_md5_snapshot, ctx->read_mac_secret, macLen);
+        CPSi_md5_calc(&ctx->handshake_md5_snapshot, ctx->read_mac_secret, 0x10);
         MI_CpuFill8(pad, 0x36, 0x30);
         CPSi_md5_calc(&ctx->handshake_md5_snapshot, pad, 0x30);
         CPSi_md5_calc(&ctx->handshake_md5_snapshot, ctx->read_seq_num, 8);
@@ -1153,19 +1152,19 @@ static u32 make_plaintext(CPSSslConnection *ctx, u8 *hdr) {
         CPSi_md5_calc(&ctx->handshake_md5_snapshot, hdr + 3, len + 2);
         CPSi_md5_result(&ctx->handshake_md5_snapshot, mac);
         CPSi_md5_init(&ctx->handshake_md5_snapshot);
-        CPSi_md5_calc(&ctx->handshake_md5_snapshot, ctx->read_mac_secret, macLen);
+        CPSi_md5_calc(&ctx->handshake_md5_snapshot, ctx->read_mac_secret, 0x10);
         MI_CpuFill8(pad, 0x5c, 0x30);
         CPSi_md5_calc(&ctx->handshake_md5_snapshot, pad, 0x30);
-        CPSi_md5_calc(&ctx->handshake_md5_snapshot, mac, macLen);
+        CPSi_md5_calc(&ctx->handshake_md5_snapshot, mac, 0x10);
         CPSi_md5_result(&ctx->handshake_md5_snapshot, mac);
+        macLen = 0x10;
         break;
     case 5:
         len -= 0x14;
         hdr[3] = len >> 8;
         hdr[4] = len;
         CPSi_sha1_init(&ctx->handshake_sha1_snapshot);
-        macLen = 0x14;
-        CPSi_sha1_calc(&ctx->handshake_sha1_snapshot, ctx->read_mac_secret, macLen);
+        CPSi_sha1_calc(&ctx->handshake_sha1_snapshot, ctx->read_mac_secret, 0x14);
         MI_CpuFill8(pad, 0x36, 0x28);
         CPSi_sha1_calc(&ctx->handshake_sha1_snapshot, pad, 0x28);
         CPSi_sha1_calc(&ctx->handshake_sha1_snapshot, ctx->read_seq_num, 8);
@@ -1173,11 +1172,12 @@ static u32 make_plaintext(CPSSslConnection *ctx, u8 *hdr) {
         CPSi_sha1_calc(&ctx->handshake_sha1_snapshot, hdr + 3, len + 2);
         CPSi_sha1_result(&ctx->handshake_sha1_snapshot, mac);
         CPSi_sha1_init(&ctx->handshake_sha1_snapshot);
-        CPSi_sha1_calc(&ctx->handshake_sha1_snapshot, ctx->read_mac_secret, macLen);
+        CPSi_sha1_calc(&ctx->handshake_sha1_snapshot, ctx->read_mac_secret, 0x14);
         MI_CpuFill8(pad, 0x5c, 0x28);
         CPSi_sha1_calc(&ctx->handshake_sha1_snapshot, pad, 0x28);
-        CPSi_sha1_calc(&ctx->handshake_sha1_snapshot, mac, macLen);
+        CPSi_sha1_calc(&ctx->handshake_sha1_snapshot, mac, 0x14);
         CPSi_sha1_result(&ctx->handshake_sha1_snapshot, mac);
+        macLen = 0x14;
         break;
     }
     if (memcmp(hdr + 5 + len, mac, macLen) != 0) {
@@ -1601,13 +1601,13 @@ static void send_client_hello(CPSSoc *soc) {
     set_random(ctx->client_random + 4, 0x1c);
     MI_CpuCopy8(ctx->client_random, p + 2, 0x20);
     find_session_from_IP(ctx, soc->remote_ip, soc->remote_port);
+    p += 0x22;
     if (ctx->resumed) {
-        p[0x22] = 0x20;
-        MI_CpuCopy8(ctx->key_storage.fields.session_id, p + 0x23, 0x20);
-        p += 0x43;
+        *p++ = 0x20;
+        MI_CpuCopy8(ctx->key_storage.fields.session_id, p, 0x20);
+        p += 0x20;
     } else {
-        p[0x22] = 0;
-        p += 0x23;
+        *p++ = 0;
     }
     *p++ = 0;
     *p++ = 4;

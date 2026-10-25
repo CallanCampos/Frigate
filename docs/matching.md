@@ -228,7 +228,13 @@ Same instructions, registers swapped.
   call's failure test, and where the assignment stands still picks the register it is built in. DWC's
   `NHTTP_CreateRequest` (`nhttp_request.c`) has `movs r2, #8; str r2, [sp, #8]` ahead of its `"https://"` compare:
   `schemeLength = 8;` written after `if (NHTTPi_strnicmp(text, "https://", 8) != 0) { ...; goto fail; }` gives that
-  r2, and written before the call, or as the call's argument, builds the 8 in r0.
+  r2, and written before the call, or as the call's argument, builds the 8 in r0. NitroWiFi's `make_plaintext`
+  (`ssl.c`) is the same with a hash's length: `macLen = 0x10;` written after the first `CPSi_md5_calc` that takes
+  `0x10` as a literal is still stored right after the init call, but built in r2, that argument's register; written
+  before that call it is built in r0.
+- A store through a post-increment, `*p++ = x`, is scheduled after the pointer's advance: `send_client_hello`
+  (`ssl.c`) writes the session ID's length byte as `p += 0x22; ... *p++ = 0;` and gets the original's `adds r5, #0x23`
+  before the `strb`, where `p[0x22] = 0; p += 0x23` or `*(p + 0x22) = 0` store first (4 bytes off).
 - A pointer that must have the earlier declaration's slot but a later store is declared without an initializer and
   assigned after the other pointers. This matches the item-base spills in `GetWEPData` and `GetWPAData` in
   `dwc_aoss.c`.
@@ -342,6 +348,10 @@ Same instructions, registers swapped.
   `gsi_u64 product = (gsi_u64)modulus->mData[0] * y;`, compared as `x < (product & mask)`. With the multiplication
   and mask in the comparison, the high-word `and` copies the mask into its destination; the separate product copies
   the product's high word instead, as the original does under `dsi/1.2`.
+- A carry kept in a `gsi_u64` and added as its own high word, `carry = (gsi_u32)(carry >> 32) + ((gsi_u64)*q +
+  product)`, lets MWCC build the sum's high half from a constant 0 (`ldr rX, =0; adcs`), where a carry shifted down when
+  it is stored keeps that high word in a register. DWC's `gsiLargeIntMultM` (`gsLargeInt.c`) matches the first way,
+  with the store `*q = (gsi_u32)carry` and the loop's test `(carry >> 32) != 0`.
 - GameSpy's `value_for_key` keeps the selected alternating buffer in a `gsi_u32 index`, read from `valueindex`
   before the byte-copy loop and used for both the copy destination and the return value. This keeps the scaled
   index and array base across the copy and matches the original final address calculation; an `int` snapshot
@@ -1346,7 +1356,13 @@ Same code, other `sp` offsets or frame size.
   constant ones. `musical_mcss.c`'s `MusicalMcss_Load` builds the `compressed` argument first, as the original does,
   only with its `info` not `const`. And a `const` parameter is what counts: a `const` local copy of a plain pointer
   parameter doesn't schedule like it, so the `NetCommand` callbacks take `const void *data`, which matched four of
-  them; MWCC won't convert between function pointer types that differ only in a parameter's `const`.
+  them; MWCC won't convert between function pointer types that differ only in a parameter's `const`. NitroWiFi's
+  `resolve_common` (`cps.c`) is the same with a string: through `const u8 *name` MWCC moves the first character's
+  `ldrb` above the query's `strh` stores, and with `u8 *name`, as in Black 1's version, the load stays after them.
+- A pointer cast, even to the type the pointer already has, stops MWCC from reassociating a sum under it: `p + 6 +
+  count` read as `((const u8 *)(p + 6 + count))[0]` stays `adds r4, r0, #6; ldrb r4, [r4, r2]`, where without the
+  cast MWCC adds `count` once and reads at offsets 6 to 9. `resolve_common`'s record reads match through
+  `cps_internal.h`'s `CPS_BE16`, which casts its argument as `CPS_PUT16` does; a `static inline` reader doesn't.
 - A spilled value reloaded before a call's result is stored, where the original stores the result first, can need
   the result in a local and the stores in field order: `key_system_util.c`'s `KeySystemAccelMove_Init` stores
   `speed` and then `accel = FX_Div(...)`.
@@ -3581,7 +3597,11 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   retain their matches, apart from `POKE_NET_Connecting`'s documented scheduling difference. DWC's `dwc_encsession.c`
   includes it for its 20-byte secret: `DWCi_EncSessionCompleteCallback` copies it in place as the ROM does with
   `memcpy` into a `char` array, where a struct copy of a 20-byte struct gave the same loop with the source and
-  destination registers swapped, and its 0x20- and 0x28-byte `memcpy`s stay calls, as in the ROM.
+  destination registers swapped, and its 0x20- and 0x28-byte `memcpy`s stay calls, as in the ROM. A function with no
+  string copy at all can need it: DWC's `DWCi_Netcheck_Thread` (`dwc_conntest.c`) hoists the work's field offsets and
+  its -3, -4 and -5 into stack slots at entry, in the ROM's order and frame, and keeps a pointer across `strlen`, only
+  with `<string.h>` first, since only that `strlen` writes no memory; without it the thread was 8 bytes short, and the
+  `switch` forms of its error tests that its exits need looked 0x1c to 0x2c bytes too long.
 - In the same way, MWCC takes the `exit` that a header named `stdlib.h` declares for a function that doesn't return,
   and drops the code after a call of it: `gfl/heap.c`'s `GFL_HeapDumpOnFailure` calls `exit(1)` and goes on, and comes
   out 0x22 bytes against 0x3c with `<stdlib.h>`. It gets `exit` from `nitro/os.h` instead.
@@ -3728,7 +3748,10 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   (`socl_command.c`) matches only with both of its statics zero-initialized. `#pragma explicit_zero_data on` puts such
   a definition in `.data` instead: `socl_startup.c`'s `SOCLiConfigPtr = NULL`, which the ROM has in `.data` before
   the 0x4000 default, takes it, and with the zeroed `.bss` globals in ntrtwl's definition order its four functions
-  match (33 bytes to 0x2c off otherwise).
+  match (33 bytes to 0x2c off otherwise). A gap in such a file's `.bss` that nothing reads is a zero-initialized static
+  of that size that nothing reads, which `-ipa function` keeps (`-ipa file` drops it): NitroWiFi's `soc.c` has three,
+  of 8, 4 and 0x10 bytes at +0x10, +8 and +0x40 among its statics, and with them, defined first, and every static
+  zero-initialized, its four functions that reach the statics from the base match and so does the file's `.bss`.
 - A zero-initialized static is reached from the section's pooled base, and so is a struct of statics, but the two
   compile differently: the struct's member is a field of one object, which MWCC loads again at other points (after a
   64-bit store, before a zero, across a loop), while a static of its own is known and scheduled freely. Statics that the

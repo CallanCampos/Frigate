@@ -83,6 +83,7 @@ lib/nitrowifi/src/soc/socl_list.c:
     .bss        start:0x0218dc54 end:0x0218dc5c
 
 lib/nitrowifi/src/soc/soc.c:
+    complete
     .text       start:0x02157bd0 end:0x02158174
     .data       start:0x02185478 end:0x021854cc
     .bss        start:0x0218dc5c end:0x0218dde8
@@ -401,6 +402,7 @@ lib/dwc/src/auth/dwc_http_client.c:
     .bss        start:0x021905f8 end:0x021905fc
 
 lib/dwc/src/auth/dwc_conntest.c:
+    complete
     .text       start:0x0216b14c end:0x0216bbe4
     .data       start:0x02185e68 end:0x02185f10
     .bss        start:0x021905fc end:0x02190690

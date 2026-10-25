@@ -8,6 +8,10 @@
 // GameSpy's large integers (gsLargeInt.c), in overlay 11, which the signature check (dwc/gsCrypt.h) and the
 // authentication's keys are made of
 
+// The size of a number's word, in bytes and in bits; the sizeof makes a bit index divided by it unsigned
+#define GS_LARGEINT_DIGIT_SIZE_BYTES (sizeof(gsi_u32))
+#define GS_LARGEINT_DIGIT_SIZE_BITS (GS_LARGEINT_DIGIT_SIZE_BYTES * 8)
+
 // A number of up to 64 words, the lowest first, and how many of them it uses (GameSpy's gsLargeInt_t)
 typedef struct gsLargeInt_s {
     gsi_u32 mLength;
