@@ -3,9 +3,10 @@
 # compile_check.py, compiles the decomp's C with the ROM's compilers through the repository's own compile probe
 # (tools/decomp/compiler_probe.py, configure.py, tools/build/deadstrip.py), which upstream changes; its test
 # (port/tests/progress/test_compile_check.py) holds it to them in this build's version: the build's compiler and flags
-# for a game file, a game file with its own flags and two libraries with their own compilers, and the functions and
-# bytes of five complete files, one of them dead-stripped, against the ROM's. It skips (77) without the decomp's .venv
-# (PORT_PYTHON is the system's then) and, after the settings, without wibo, sjiswrap or the compilers in tools/.
+# for a game file, a game file with its own flags and two libraries with their own compilers, the functions and
+# bytes of five complete files, one of them dead-stripped, against the ROM's, and MSL's assembly runtime's code. It
+# skips (77) without the decomp's .venv (PORT_PYTHON is the system's then) and, after the settings, without wibo,
+# sjiswrap or the compilers and assembler in tools/.
 # Labelled static: it reads the game's C, with MWCC, and runs nothing of the game
 add_test(NAME progress_compile_check
     COMMAND "${CMAKE_COMMAND}" -E env PYTHONDONTWRITEBYTECODE=1 "${PORT_PYTHON}"

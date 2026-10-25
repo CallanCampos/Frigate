@@ -1,7 +1,7 @@
 // NitroSDK's waits on the host (os_system.c and os_irqHandler.c, and the BIOS's SVC_WaitByLoop). The CPSR functions of
 // os_system.c are in core.c, with the rest of the CPU's state.
 //
-// The busy loops of the DS (OSi_SpinWaitCpuCycles under OS_SpinWaitSysCycles, and the BIOS's WaitByLoop) are modelled
+// The busy loops of the DS (OS_SpinWait under OS_SpinWaitSysCycles, and the BIOS's WaitByLoop) are modelled
 // ones here: each moves the virtual clock by its length, and the events and interrupts on the way come as they would.
 // A no-op would hang their callers, which wait for state that an interrupt delivers (PMi_SendPxiDataSync, PM_Init,
 // OSi_DoLockByWord, CARD's pull-out check).

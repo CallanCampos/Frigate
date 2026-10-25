@@ -15,7 +15,9 @@ workflow goes in the decomp checkout instead; this file is the port's ([CLAUDE.m
 - **A port tool that imports upstream's scripts needs a test that runs it.** compile_check.py called
   `compiler_probe.lib_compiler`, which upstream replaced with `probe_defaults` in `6cc15d4d69`, on `main` since the
   merge of `aae2a03f6` on 2026-10-17; nothing ran the tool but `sync_upstream.sh --metrics`, so every sync since then
-  measured its tiers with progress.py alone. `progress_compile_check` now runs it at every ctest.
+  measured its tiers with progress.py alone. `progress_compile_check` now runs it at every ctest of a checkout that
+  has the decomp's `.venv` and compilers, as the local verification's (`sync_upstream.sh --verify-pr`) has; Frigate CI's
+  Python has no pyelftools, so there it skips.
 
 ## 2026-10-24: T5 on the field's sequences
 

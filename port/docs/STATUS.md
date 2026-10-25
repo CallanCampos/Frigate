@@ -37,17 +37,18 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
 - **Upstream:** `629a53cccb` (upstream merge #504), as `main` has it since PR 27; this branch merges no upstream commit.
 - **Port:** `PORT_SHA`, on the topic `port-hygiene-oct24` from `main` at `dd98d585e6` (PR 30's merge): `559ae5b099`,
   `compile_check.py` on upstream's compile probe, with its test; `dbaba7f321`, the ledger, the findings and the guides
-  at the decomp's present names and states; `a34e7c249b`, the platform layer's comments; and this commit, the records:
-  this entry, which fills PR 30's entry's `PORT_SHA`, `36a6447c16`, the lessons and SYNC.md's review step. No commit
-  changes a file outside `port/` (`git diff --stat origin/main -- . ':!port'` prints nothing).
+  at the decomp's present names and states; `a34e7c249b`, the platform layer's comments; `6b42b332de`, the records:
+  this entry, which fills PR 30's entry's `PORT_SHA`, `36a6447c16`, the lessons and SYNC.md's review step; and this
+  commit, the review's round (below). No commit changes a file outside `port/`
+  (`git diff --stat origin/main -- . ':!port'` prints nothing).
 - **ROM:** T0 passes: `python3 configure.py && ninja`, from an empty build directory on `main`'s `dd98d585e6`, compiled
   every C file of both versions with no compiler warning, and both SHA1s match (Black 2
   `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb`, White 2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`). Before the first
   two commits and again on the final tree, `python3 configure.py && ninja` had no work but checking both ROMs, which
   match: the commits change only `port/`.
 - **MWCC-neutrality:** nothing to prove: no file outside `port/` changes.
-- **Code standards:** clang-format 23.1.1 `--dry-run --Werror` passes on the eight C files the branch changes, in
-  comments only.
+- **Code standards:** clang-format 23.1.1 `--dry-run --Werror` passes on the 17 C files the branch changes (static
+  names in seven, `test_g2d_rom.c`'s one wrap, comments in the rest) and on every C file of `port/`.
 - **Host build:** T1 passes on macOS arm64, AppleClang 21.0.0, RelWithDebInfo, both versions (`build/port`,
   `build/port-w2`, configured fresh on this branch).
 - **Tests:** ctest `-j2` on the final tree: Black 2, 292 passed and 15 skipped of 307; White 2, 289 passed and 15
@@ -74,9 +75,10 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
     `DEFAULT_FLAGS`, which upstream's `6cc15d4d69` replaced with `probe_defaults` (on `main` since the merge of
     `aae2a03f6`, 2026-10-17), so `--metrics` stopped there with an `AttributeError`. It now takes each file's compiler
     and flags from `probe_defaults`, the build's own compiler for a game file, where the probe tries every one, and
-    dead-strips a file that `config/deadstrip.toml` lists, as the probe and the link do, so that `wipe_sub.c`'s 31
-    handlers the original link dropped aren't measured (134 functions and 12,432 code bytes without the strip, 51 and
-    5,196 with it, the ROM's). Its new test, `progress_compile_check`
+    dead-strips a file that `config/deadstrip.toml` lists, as the probe and the link do, so that the code the original
+    link dropped from `wipe_sub.c` isn't measured: the 31 handlers the list names and the 52 static functions only they
+    reach, 83 of the file's 134 functions (12,432 code bytes without the strip; 51 functions and 5,196 bytes with it,
+    the ROM's). Its new test, `progress_compile_check`
     ([port/tests/progress](../tests/progress/test_compile_check.py), in
     [port/cmake/progress.cmake](../cmake/progress.cmake), labelled `static`), holds it to the repository's tools: the
     build's compiler and flags for `printsys.c`, `ctvt_draw.c`'s `-ipa function`, `lib/spl`'s 1.2/base and `lib/nnsys`'s
@@ -117,6 +119,37 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
     (`func_ov012_0216a000`, a name no symbol has, standing for any other trap), and the research script
     `port/tools/research/sdk-surface/classify.py`'s `func_01ff8ce0`, which it checks only for ITCM code with no source
     file, as it was at the research; the ITCM handlers have one now.
+  - **The review's round.** The review of the four commits above found these, and this round fixes them:
+    - decomp-findings.md's `g2d_RendererCore.c` row named the wrong upstream commit. The file is complete in both
+      versions since `6e1b07c2aa`, a merge into upstream's `sdk-types` branch that reached upstream's `main` with #468
+      (`7ffb7a6e11`, 2026-10-22), and neither of its parents has it complete; `de051e695e`, which the row named, keeps
+      both files partial.
+    - Names the pass missed, which upstream changed before `b62c655bfa`, where its diff of `config/names.txt` began:
+      `WcmGetLinkLevel` (decomp-findings.md's `ReshZekSave_Init` row), `snd_arc_stream.c`'s `StrmCallback` (the
+      oracle's README), `OS_SpinWait` (`os_system.c`), `mystrlen` and `gsUnicodeStringLen` (the `-fno-builtin-wcslen`
+      note of `port/CMakeLists.txt`), `sSubBGExtPltt` and `sSubOBJExtPltt` (`gx_load2d_extpltt.c`), and
+      `NNS_G2D_UNPACK_OFFSET_PTR`, which was `NNSi_G2dUnpackOffset` (`g2d_file.h`, `g2d_load.c`, `test_g2d_rom.c`).
+    - The platform layer's copies of decomp files whose statics and helpers kept names the decomp has dropped now
+      have its names, NitroSDK's and NitroSystem's: `gx_load3d.c`'s tables and statics (`sTexPlttStartAddrTable`,
+      `sTexStartAddrTable`, `sClrImg` and the rest), `gx_load2d_extpltt.c`'s (`sBGExtPltt` and the rest),
+      `os_vramExclusive.c`'s `OsCountZeroBits` and bank constants, `pxi_fifo.c`'s `FifoRecvCallbackTable` and
+      `FifoCtrlInit`, `os_spinLock.c`'s `isInitialized`, `fs_overlay.c`'s `fsi_ovt9` and `fsi_ovt7`, and `g2d_load.c`'s
+      `NNS_G2dIsBinFileValid`. A scan of `port/` outside the records, for every name that the decomp's `symbols.txt`
+      files have lost in its history and that its C and configs no longer have, found these and nothing else stale:
+      the rest of what it finds are names of the port's own that a former decomp name shared (`core.c`'s `sTimers`,
+      the ARM7 driver's ADPCM tables), ADRs with their dated notes, and rows that give a former name beside the
+      present one. `g2d_file.h`'s fields keep their own names, which `port/tests/nnsys/ds_layout_probe.c` pairs with
+      g2d.h's, and its comment says so.
+    - lessons.md said `progress_compile_check` runs at every ctest. It runs where the decomp's `.venv` and compilers
+      are, as in `--verify-pr`'s checkout; Frigate CI's Python has no pyelftools, so it skips there.
+    - `compile_check.py --all` passed MSL's `fp_fastI.s` to mwccarm, which failed on it. It now assembles an assembly
+      source as the build and `tools/decomp/compile_all.py` do (`configure.py`'s `source_assembler`), and the test
+      checks that `fp_fastI.s` assembles to its range's 10,940 code bytes in the build's version; it fails on the
+      previous `compile_check.py`.
+    - Wording: what the strip drops from `wipe_sub.c` (the metrics' paragraph above), the `g2d_OAM.c` row's two
+      parentheses, MODDING.md's first limit's heading, which said that what lies beyond the house waits.
+    - `test_g2d_rom.c` gets clang-format 23.1.1's wrap of one call, the only format difference in `port/`'s C, which
+      `main` had too.
 - **Next:** this branch's PR, its checks and local verification (`port/tools/sync_upstream.sh --verify-pr`), and its
   merge. Then phase 4's battle, as the last entries say: the Route 19 route as a test, which plays Hugh's battle to its
   end on `main` and, once the sync brings #496 (upstream's `b962ecf040`), goes on past Bianca's wild encounter.

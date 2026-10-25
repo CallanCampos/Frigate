@@ -141,7 +141,7 @@ static void W32(Compare *c, u32 address, u32 value) {
     }
 }
 
-// NNSi_G2dUnpackOffset on the DS: the field, a u32, plus the base, wrapping at 32 bits
+// NNS_G2D_UNPACK_OFFSET_PTR on the DS: the field, a u32, plus the base, wrapping at 32 bits
 static void UnpackOffset(Compare *c, u32 field, u32 base) {
     W32(c, field, R32(c, field) + base);
 }
@@ -784,8 +784,7 @@ static void CheckFile(const u8 *bytes, u32 size, BOOL compressed) {
         break;
     case FORMAT_NCLR:
         ok = CheckBlock(&c, format, PORT_RELOC_G2D_PALETTE, NNS_G2D_BINBLK_SIG_PALETTEDATA, hostFile, fileSize) &&
-             CheckBlock(&c, format, PORT_RELOC_G2D_PALETTE_CMP, NNS_G2D_BINBLK_SIG_PALETTECOMPINFO, hostFile,
-                        fileSize);
+             CheckBlock(&c, format, PORT_RELOC_G2D_PALETTE_CMP, NNS_G2D_BINBLK_SIG_PALETTECOMPINFO, hostFile, fileSize);
         break;
     case FORMAT_NCER:
         ok = CheckBlock(&c, format, PORT_RELOC_G2D_CELL_BANK, NNS_G2D_BLKSIG_CELLBANK, hostFile, fileSize);

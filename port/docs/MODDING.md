@@ -7,12 +7,13 @@ has is the game's whole source, compiled into the program, so a change to the ga
 
 Two limits shape everything below:
 
-- **The field opens; what lies beyond the house waits.** The field engine's C is in, and the host gives the field's
-  heap the room its larger structs need ([ADR 0021](adr/0021-root-heaps-in-the-games-own-memory-from-host-memory.md)),
-  so CONTINUE and New Game go into the field and the house, and the field menu opens its apps. Beyond the house,
-  a run from a save with a starter Pokémon plays Hugh's battle on Route 19 to its end and stops at Bianca's wild
-  encounter, on four entries of the encounter effects' table that upstream has fixed and the next sync brings
-  ([decomp-findings.md](decomp-findings.md)). See [STATUS.md](STATUS.md).
+- **The field opens; a run beyond the house stops at Route 19's wild encounter.** The field engine's C is in, and
+  the host gives the field's heap the room its larger structs need
+  ([ADR 0021](adr/0021-root-heaps-in-the-games-own-memory-from-host-memory.md)), so CONTINUE and New Game go into the
+  field and the house, and the field menu opens its apps. Beyond the house, a run from a save with a starter Pokémon
+  plays Hugh's battle on Route 19 to its end and stops at Bianca's wild encounter, on four entries of the encounter
+  effects' table that upstream has fixed and the next sync brings ([decomp-findings.md](decomp-findings.md)). See
+  [STATUS.md](STATUS.md).
 - **Frigate reads the game's data from the player's ROM, and checks it.** The program accepts only a dump of the
   version it was built for, by its SHA-1 or by every NitroFS file's ([../hal/rom/port_rom.h](../hal/rom/port_rom.h)),
   so a patched ROM is refused. Changing data files (text, species, trainers, maps) needs the layered file system of

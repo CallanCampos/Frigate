@@ -755,10 +755,11 @@ What the comparison found in the port, each fixed in `port/hal` with a test:
 - **The stream dropped a block every 7 frames or so.** The driver ran lazily, at each VBlank and each word of the
   ARM9, so its alarms' words (2.14 a frame at the title stream's 256 samples a block) reached the ARM9 in twos and
   threes at the VBlank; NitroSystem's stream player queues a block to read at each alarm and drops the oldest when a
-  third comes before its thread has read one (`ArcStrmCallback`), which zeroed a block and played the rest of the
-  stream a block later: the title's music lost 27 frames against the DS's in 420. The next alarm is now the OS core's
-  timed work, so each word comes when its alarm goes off (`snd_pxi_alarm_timing`, `os_timed_work`). An alarm set for
-  no ticks, due at once, went off only at the next VBlank until review found it; it now goes off at once too.
+  third comes before its thread has read one (`snd_arc_stream.c`'s `StrmCallback`), which zeroed a block and played
+  the rest of the stream a block later: the title's music lost 27 frames against the DS's in 420. The next alarm is now
+  the OS core's timed work, so each word comes when its alarm goes off (`snd_pxi_alarm_timing`, `os_timed_work`). An
+  alarm set for no ticks, due at once, went off only at the next VBlank until review found it; it now goes off at once
+  too.
 - **The sound unit started its sounds at once.** On melonDS a PCM sound's first sample comes on the channel's third
   timer step, an IMA-ADPCM one's on its eleventh, a square wave's or noise's on its first, so a one-shot sound ends that
   much later: one channel of the Game Freak logo's ended a run earlier on the port. And a channel reads its sound ahead

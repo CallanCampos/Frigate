@@ -1,9 +1,10 @@
 // The DS layouts of the G2D structs that NitroSystem's file loaders relocate in place (lib/nnsys/src/g2d/*_load.c and
-// g2d_Load.c, through NNSi_G2dUnpackOffset). In a file each pointer field holds a u32 offset from the start of some
-// struct, and the DS adds that struct's address to it, so the file's bytes become the runtime struct. On a 64-bit host
-// the runtime structs of nnsys/g2d.h hold 8-byte pointers and no longer match the file: these are the file's view, a
-// u32 where g2d.h has a pointer, field for field, read from the file by port/hal/nnsys/g2d_load.c to build the host's
-// structs.
+// g2d_Load.c, through g2di_load.h's NNS_G2D_UNPACK_OFFSET_PTR). In a file each pointer field holds a u32 offset from
+// the start of some struct, and the DS adds that struct's address to it, so the file's bytes become the runtime struct.
+// On a 64-bit host the runtime structs of nnsys/g2d.h hold 8-byte pointers and no longer match the file: these are the
+// file's view, a u32 where g2d.h has a pointer, field for field, read from the file by port/hal/nnsys/g2d_load.c to
+// build the host's structs. Some fields have names of their own (rawData for g2d.h's pRawData, size for szByte), which
+// port/tests/nnsys/ds_layout_probe.c pairs with g2d.h's.
 //
 // The sizes and offsets are MWCC's, which i386 SysV reproduces exactly (port/docs/research/compile-probe.md): the
 // asserts below are the decomp's structs compiled for i386. Plain C types besides nnsys/g2d.h's pointer-free ones, so

@@ -235,9 +235,9 @@ endif()
 # the code puns types, no float contraction, and zeroed locals, since uninitialized reads gave deterministic values on
 # the DS; PLAN.md §4.4), the version, and the include path with the host variants of the headers that name DS
 # addresses first (ADR 0004). The decomp's headers are system headers here, so their warnings stay out of port code.
-# With 16-bit wchar_t, clang would turn a loop that counts a u16 string (NitroSDK's MBGameInfo_CountChars, GameSpy's
-# Gt2_WStrLen) into a call of the C library's wcslen, whose wchar_t is 32-bit on macOS and Linux: -fno-builtin-wcslen
-# keeps the loop, on every host (port/tools/gen_stubs.py warns of any such call)
+# With 16-bit wchar_t, clang would turn a loop that counts a u16 string (NitroSDK's mystrlen in mb_gameinfo.c, GameSpy's
+# gsUnicodeStringLen in gsXML.c) into a call of the C library's wcslen, whose wchar_t is 32-bit on macOS and Linux:
+# -fno-builtin-wcslen keeps the loop, on every host (port/tools/gen_stubs.py warns of any such call)
 add_library(port_decomp_env INTERFACE)
 target_compile_definitions(port_decomp_env INTERFACE PLATFORM_PC ${PORT_VERSION_DEFINE})
 file(GLOB library_includes LIST_DIRECTORIES true "${REPO_ROOT}/lib/*/include")

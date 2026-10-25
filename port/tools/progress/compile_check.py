@@ -13,11 +13,13 @@ Each file is compiled as the repository's own compile probe compiles it (<repo>/
 probe_defaults gives the build's compiler and flags for the file (configure.py's source_compiler: a library's from its
 library.toml, a game file's with config/compiler_flags.toml's overrides) with the probe's warning policy, and for a game
 file, where the probe tries every compiler, this takes the build's own. MWCC runs under wibo through sjiswrap
-(configure.py's mwcc_command), with the version's defines and the include directories. A file that
-config/deadstrip.toml lists goes through the build's dead-strip (tools/build/deadstrip.py) before it is measured, as
-the probe and the link do, since the ROM has none of the code the original link dropped. A failed strip is reported
-as a failed compile, which summarize.py counts with them. port/tests/progress/test_compile_check.py (ctest
-progress_compile_check) checks this against the repository's tools.
+(configure.py's mwcc_command), with the version's defines and the include directories. A library's hand-written
+assembly (MSL's fp_fastI.s, which --all reaches) is assembled as the build and tools/decomp/compile_all.py assemble
+it, by the mwasmarm of its compiler's version with library.toml's asm_flags (configure.py's source_assembler). A file
+that config/deadstrip.toml lists goes through the build's dead-strip (tools/build/deadstrip.py) before it is
+measured, as the probe and the link do, since the ROM has none of the code the original link dropped. A failed strip
+is reported as a failed compile, which summarize.py counts with them. port/tests/progress/test_compile_check.py
+(ctest progress_compile_check) checks this against the repository's tools.
 """
 import argparse
 import bisect
@@ -64,7 +66,14 @@ class Tools:
         return compiler or self.configure.source_compiler(source).compiler, flags
 
     def command(self, source: Path, version: str, obj: Path) -> list[str]:
-        """The command that compiles the file for the version into obj."""
+        """The command that compiles the file for the version into obj, or assembles it for an assembly source."""
+        if source.suffix == ".s":
+            # The build's assembler for the library: tools/mwccarm/<compiler>/mwasmarm.exe, under wibo and sjiswrap as
+            # tools/decomp/compile_all.py runs it. Assembly has no version defines or include directories
+            compiler, asm_flags = self.configure.source_assembler(source)
+            mwasm = self.probe.TOOLS / "mwccarm" / compiler / "mwasmarm.exe"
+            return [*self.probe.mwcc_command(mwasm), *(arg for flag in asm_flags for arg in shlex.split(flag)), "-o",
+                    str(obj), str(source)]
         compiler, flags = self.settings(source)
         # tools/mwccarm/<compiler>, where a bare version (1.1p1) is one of the dsi builds, as in the probe
         compilers = self.probe.TOOLS / "mwccarm"
