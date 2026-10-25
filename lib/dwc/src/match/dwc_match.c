@@ -1,6 +1,7 @@
 #include <string.h>
 // Before dwc/ext.h: MWCC builds the copies of the packets' magic and of the machines' connection user data in place, as
 // the ROM does, only when <string.h> declares strcpy and memcpy
+#include "dwc/base64.h"
 #include "dwc/common.h"
 #include "dwc/dwc.h"
 #include "dwc/ext.h"
@@ -11,6 +12,7 @@
 #include "dwc/gstats.h"
 #include "dwc/gt2Main.h"
 #include "dwc/gt2Utility.h"
+#include "dwc/login.h"
 #include "dwc/match.h"
 #include "dwc/match_internal.h"
 #include "dwc/memfunc.h"
@@ -1436,7 +1438,7 @@ void DWCi_CloseMatching(void) {
 }
 
 static int DWCi_SBUpdateAsync(u32 pid) {
-    int flag = 1;
+    int flag;
     char text[0x200];
     u8 list[0xcc];
     int i;
@@ -1447,15 +1449,17 @@ static int DWCi_SBUpdateAsync(u32 pid) {
     int len;
 
     count = 6;
+    flag = 1;
     list[0] = 8;
     list[1] = 10;
     list[2] = 50;
     list[3] = 51;
     list[4] = 52;
     list[5] = 53;
-    list[count++] = 54;
-    list[count++] = 55;
-    list[count++] = 56;
+    list[count] = 54;
+    list[count + 1] = 55;
+    list[count + 2] = 56;
+    count += 3;
     if (DWCi_GetMatchCnt()->qr2MatchType == 0 || DWCi_GetMatchCnt()->qr2MatchType == 1) {
         for (i = 0; i < 0x9a; i++) {
             if (sKeys[i].id != 0) {
@@ -1733,7 +1737,7 @@ static int DWCi_SendGPBuddyMsgCommand(void *gp, u8 command, int id, const char *
 
 static int DWCi_ProcessRecvMatchCommand(int type, s32 profileId, u32 ip, u16 port, const u32 *data, int count) {
     int n = 0;
-    u32 reply[0x40];
+    u32 reply[0x41];
     DWCNodeInfo request;
     DWCNodeInfo accepted;
     SOCSockAddrIn address;
@@ -1754,7 +1758,7 @@ static int DWCi_ProcessRecvMatchCommand(int type, s32 profileId, u32 ip, u16 por
     u32 code;
     u64 now;
     u32 word;
-    u32 hostPort;
+    u16 hostPort;
     int conn;
     u32 id;
     u8 aid;
@@ -1767,6 +1771,8 @@ static int DWCi_ProcessRecvMatchCommand(int type, s32 profileId, u32 ip, u16 por
     u8 mode;
     u8 value;
     u8 flag;
+    s32 token;
+    s32 pendingId;
 
     if (DWCi_GetMatchCnt() == NULL || DWCi_GetMatchCnt()->state == 0) {
         return 1;
@@ -1777,9 +1783,9 @@ static int DWCi_ProcessRecvMatchCommand(int type, s32 profileId, u32 ip, u16 por
     }
     switch (type) {
     case 1: {
-        blocked = 0;
         requestType = data[0];
         MI_CpuFill8(&request, 0, sizeof(DWCNodeInfo));
+        blocked = 0;
         request.profileId = profileId;
         request.aid = 0xff;
         request.publicIp = data[1];
@@ -1851,7 +1857,8 @@ static int DWCi_ProcessRecvMatchCommand(int type, s32 profileId, u32 ip, u16 por
             break;
         }
         word = data[11];
-        if (DWCi_GetMatchCnt()->resvToken != word) {
+        token = DWCi_GetMatchCnt()->resvToken;
+        if (token != word) {
             break;
         }
         if (count >= 14 && (data[13] == 1) != DWCi_GetMatchCnt()->memberConnecting) {
@@ -1941,7 +1948,7 @@ static int DWCi_ProcessRecvMatchCommand(int type, s32 profileId, u32 ip, u16 por
                 DWCi_GetMatchCnt()->sbUpdateTick = now;
             } else if (DWCi_GetMatchCnt()->qr2MatchType == 1) {
                 DWCi_ClearTargetNodeInfo();
-                DWCi_SendResvCommandToFriend(1, profileId, profileId);
+                DWCi_SendResvCommandToFriend(1, 0, 0);
             } else if (DWCi_GetMatchCnt()->qr2MatchType == 3) {
                 DWCi_GetMatchCnt()->scResvRetryMax = 1;
                 DWCi_GetMatchCnt()->scResvRetryCount = 0;
@@ -2107,7 +2114,8 @@ static int DWCi_ProcessRecvMatchCommand(int type, s32 profileId, u32 ip, u16 por
             node = DWCi_GetNodeInfoByProfileID(data[k]);
             if (node == NULL) {
                 id = data[k];
-                if (DWCi_GetMatchCnt()->pending.profileId == id) {
+                pendingId = DWCi_GetMatchCnt()->pending.profileId;
+                if (pendingId == id) {
                     DWCi_CloseConnectionHard(DWCi_GetMatchCnt()->pending.aid);
                     DWCi_GetMatchCnt()->pending.profileId = 0;
                     continue;

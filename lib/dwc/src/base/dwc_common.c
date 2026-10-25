@@ -1,113 +1,87 @@
+// DWC's common helpers of the friends' match (TWL-DWC's dwc_common.c, overlay 11, Thumb): the key-value texts of the
+// friends' statuses, the random numbers of the match and the length of a text of u16 characters. Its .data holds the
+// key-value format and its .bss DWCi_GetMathRand32's generator.
+// The ROM names none of DWC's files. Black 1's DWC, whose functions aletheia matched to TWL-DWC's library objects
+// (layout/symbols_sdk.txt), has overlay 11's run of them in libdwcnonport's dwc_nonport.o, libdwcnas's dwc_nasfunc.o
+// and dwc_nastime.o, and libdwcmatch's dwc_common.o, dwc_friend.o and dwc_login.o, in this order and with the same
+// functions, and each file's .data and .bss follow in the same order.
+
 #include "dwc/common.h"
-#include "nitro/mi.h"
+#include "dwc/ext.h"
+#include "nitro/math.h"
+#include "nitro/os.h"
 
-// DWC's common code (TWL-DWC 5.3's dwc_common.c, a guessed name; the ROM names none of it, and the file is ARM code in
-// ARM9 main like the rest of the library's base): its Base64 coding, with '.' and '-' as the last two characters and
-// '*' to pad. The download of files (overlay 189) and overlay 11 call it.
-
-static const char *sBase64Chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789.-";
-
-// Encodes the bytes in groups of three, each as four characters
-int DWC_Base64Encode(const char *src, const u32 srcLen, char *dst, const u32 dstLen) {
-    u32 count;
-    const char *end;
-    char *out;
-    u32 outLen = srcLen / 3 * 4 + (srcLen % 3 != 0 ? 4 : 0);
-
-    if (dst == NULL) {
-        return outLen;
-    }
-    if (dstLen < outLen) {
-        return -1;
-    }
-
-    end = src + srcLen;
-    out = dst;
-    while (src != end) {
-        u8 group[3];
-        int size = end - src;
-        u32 bits = size * 8;
-
-        count = bits / 6 + (bits % 6 != 0 ? 1 : 0);
-        size = size < 3 ? size : 3;
-        MI_CpuFill8(group, 0, 3);
-        MI_CpuCopy8(src, group, size);
-
-        out[0] = sBase64Chars[group[0] >> 2];
-        out[1] = count >= 2 ? sBase64Chars[((group[0] << 4) & 0x3f) | (group[1] >> 4)] : '*';
-        out[2] = count >= 3 ? sBase64Chars[((group[1] << 2) & 0x3f) | (group[2] >> 6)] : '*';
-        out[3] = count >= 4 ? sBase64Chars[group[2] & 0x3f] : '*';
-        src += size;
-        out += 4;
-    }
-    return out - dst;
+int DWC_SetCommonKeyValueString(const char *key, const char *value, char *out, char sep) {
+    OS_SNPrintf(out, 0x1000, "%c%s%c%s", sep, key, sep, value);
+    return strlen(out);
 }
 
-// Decodes the text in groups of four characters, each as three bytes
-int DWC_Base64Decode(const char *src, int srcLen, char *dst, const u32 dstLen) {
-    int bits;
-    int i;
-    int outLen;
-    char *out;
-    int size;
+int DWC_AddCommonKeyValueString(const char *key, const char *value, char *out, char sep) {
+    DWC_SetCommonKeyValueString(key, value, strchr(out, 0), sep);
+    return strlen(out);
+}
 
-    if (srcLen & 3) {
+int DWC_GetCommonValueString(const char *key, char *dest, const char *text, char sep) {
+    char *pair = strchr(text, sep);
+
+    if (pair == NULL) {
         return -1;
     }
+    for (;;) {
+        char *next;
 
-    bits = 0;
-    for (i = 0; i < srcLen; i++) {
-        if (src[i] != '*') {
-            bits += 6;
+        if (strncmp(pair + 1, key, strlen(key)) == 0 && sep == pair[strlen(key) + 1]) {
+            break;
+        }
+        next = strchr(pair + 1, sep);
+        if (next == NULL) {
+            return -1;
+        }
+        pair = strchr(next + 1, sep);
+        if (pair == NULL) {
+            return -1;
         }
     }
-    outLen = bits / 8;
-    if (dst == NULL) {
-        return outLen;
-    }
-    if (dstLen < outLen) {
+    pair = strchr(pair + 1, sep);
+    if (pair == NULL) {
         return -1;
     }
-    if (srcLen == 0) {
-        return 0;
+    {
+        char *end = strchr(pair + 1, sep);
+        int length;
+
+        if (end != NULL) {
+            length = end - (pair + 1);
+        } else {
+            length = strlen(pair + 1);
+        }
+        if (dest == NULL) {
+            return length;
+        }
+        strncpy(dest, pair + 1, length);
+        dest[length] = 0;
+        return length;
     }
+}
 
-    out = dst;
-    do {
-        char group[4];
+u32 DWCi_GetMathRand32(u32 max) {
+    static MATHRandContext32 sRandom;
 
-        for (i = 0; i < 4; i++) {
-            char c = src[i];
+    if (sRandom.x == 0 && sRandom.mul == 0 && sRandom.add == 0) {
+        u64 seed;
 
-            if (c >= 'A' && c <= 'Z') {
-                group[i] = c - 'A';
-            } else if (c >= 'a' && c <= 'z') {
-                group[i] = c - 'a' + 26;
-            } else if (c >= '0' && c <= '9') {
-                group[i] = c - '0' + 52;
-            } else if (c == '.') {
-                group[i] = 62;
-            } else if (c == '-') {
-                group[i] = 63;
-            } else {
-                group[i] = 0;
-            }
-        }
-        src += 4;
+        OS_GetMacAddress((u8 *)&seed);
+        seed = (seed >> 24 & 0xffffff) | OS_GetTick() << 24;
+        MATH_InitRand32(&sRandom, seed);
+    }
+    return MATH_Rand32(&sRandom, max);
+}
 
-        out[0] = (group[0] << 2) | (group[1] >> 4);
-        size = out + 1 - dst;
-        if (size >= outLen) {
-            break;
-        }
-        out[1] = (group[1] << 4) | (group[2] >> 2);
-        size = out + 2 - dst;
-        if (size >= outLen) {
-            break;
-        }
-        out[2] = (group[2] << 6) | group[3];
-        out += 3;
-        size = out - dst;
-    } while (size < outLen);
-    return size;
+u32 DWCi_WStrLen(const u16 *str) {
+    u32 length = 0;
+
+    while (str[length] != 0) {
+        length++;
+    }
+    return length;
 }

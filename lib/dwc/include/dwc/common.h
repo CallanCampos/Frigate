@@ -3,16 +3,19 @@
 
 #include "types.h"
 
-// The Base64 coding of DWC (TWL-DWC 5.3, ARM9 main), from lib/dwc/src/base/dwc_common.c. The ROM names none of it; the
-// SDK's names are in the comments.
+// DWC's common helpers of the friends' match (overlay 11's dwc_common.c): the key-value texts of the friends'
+// statuses, the match's random numbers and the length of a text of u16 characters. The functions carry the SDK's
+// names (see dwc_common.c).
 
-// DWC_Base64Encode of the SDK. Writes the bytes at src as text to dst, in groups of four characters with '*' to pad the
-// last, and returns the number of characters, or -1 if dstLen is too small. A dst of NULL writes nothing and returns
-// the number that it would write
-int DWC_Base64Encode(const char *src, const u32 srcLen, char *dst, const u32 dstLen);
-// DWC_Base64Decode of the SDK. Reads srcLen characters of text at src, which must be a multiple of four, and writes
-// the bytes that they stand for to dst; returns the number of bytes, or -1 if srcLen is not a multiple of four or
-// dstLen is too small. A dst of NULL writes nothing and returns the number that it would write
-int DWC_Base64Decode(const char *src, int srcLen, char *dst, const u32 dstLen);
+// The texts of the statuses: a text of sep, key, sep and value written to out, or appended to it, both returning the
+// text's length, and the value of a key read to dest (only measured if dest is NULL), returning its length or -1
+int DWC_SetCommonKeyValueString(const char *key, const char *value, char *out, char sep);
+int DWC_AddCommonKeyValueString(const char *key, const char *value, char *out, char sep);
+int DWC_GetCommonValueString(const char *key, char *dest, const char *text, char sep);
+
+// A random number below max (all 32 bits if max is 0), from a generator seeded with the console's address and clock
+u32 DWCi_GetMathRand32(u32 max);
+// The length of a text of u16 characters
+u32 DWCi_WStrLen(const u16 *str);
 
 #endif // POKEBW2_DWC_COMMON_H

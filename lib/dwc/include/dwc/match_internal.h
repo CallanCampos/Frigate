@@ -1,6 +1,7 @@
 #ifndef POKEBW2_DWC_MATCH_INTERNAL_H
 #define POKEBW2_DWC_MATCH_INTERNAL_H
 
+#include "dwc/login.h"
 #include "dwc/match.h"
 #include "dwc/qr2.h"
 #include "dwc/sb_serverbrowsing.h"
@@ -49,10 +50,13 @@ typedef struct DWCMatchControl {
     u8 matched;
     u8 unk_0e[0x2];
     qr2_t qr2Obj;
-    u8 mode;
-    u8 qr2MatchType;
+    // The API, the match state machine and the GameSpy callbacks (GP buddy messages, GT2 closes, qr2 keys) share
+    // these, and the original loads them again at every test
+    volatile u8 mode;
+    volatile u8 qr2MatchType;
     u8 hostState;
-    u8 qr2NumEntry;
+    // Read in source order beside mode and qr2MatchType, as the GameSpy callbacks change it
+    volatile u8 qr2NumEntry;
     u8 qr2IsReserved;
     u8 unk_19;
     u8 unk_1a[0x2];
@@ -116,7 +120,8 @@ typedef struct DWCMatchControl {
     u64 lastCancelSynSent;
     u64 closedTime;
     u64 unk_670;
-    s32 profileID;
+    // Read in source order beside mode and qr2MatchType, as the GameSpy callbacks change it
+    volatile s32 profileID;
     s32 reqProfileID;
     s32 cbEventPid;
     char *gameName;

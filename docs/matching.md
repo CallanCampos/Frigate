@@ -224,6 +224,11 @@ Same instructions, registers swapped.
   other (`movs r6, #0` ... `subs r4, r6, #1` for `-1`), declare the locals without initializers and assign them in the
   original's order. The phrase select's `PMSSelect_SeqSelect` needs `BOOL end; int touch;` then `touch = -1;
   end = FALSE;`.
+- A constant stored to a spilled local can be built and stored before a call although the C assigns it after the
+  call's failure test, and where the assignment stands still picks the register it is built in. DWC's
+  `NHTTP_CreateRequest` (`nhttp_request.c`) has `movs r2, #8; str r2, [sp, #8]` ahead of its `"https://"` compare:
+  `schemeLength = 8;` written after `if (NHTTPi_strnicmp(text, "https://", 8) != 0) { ...; goto fail; }` gives that
+  r2, and written before the call, or as the call's argument, builds the 8 in r0.
 - A pointer that must have the earlier declaration's slot but a later store is declared without an initializer and
   assigned after the other pointers. This matches the item-base spills in `GetWEPData` and `GetWPAData` in
   `dwc_aoss.c`.
@@ -1264,7 +1269,9 @@ Same code, other `sp` offsets or frame size.
 
 - A `volatile` field is loaded in source order and never reused: NitroWiFi's `SOCLi_GetWriteBufferFreeSize` loads
   `write_pos` before `read_pos`, as the original does, only with `write_pos` `volatile` (the writers move it while the
-  pipe's thread reads it); `read_pos` needs none.
+  pipe's thread reads it); `read_pos` needs none. DWC's `DWCi_SBUpdateAsync` (`dwc_match.c`) loads `profileID`,
+  `qr2NumEntry` and `qr2MatchType` for `DWCi_GetDefaultMatchFilter`'s arguments in source order, where ours sank the
+  `profileID` load after the others, only with those fields of `DWCMatchControl` `volatile`.
 - `#pragma scheduling off` and `#pragma peephole off` leave 1.1p1's Thumb code as it is, and its ARM code:
   `p_sta_sub.c`, `ctvt_talk.c` and libVCT's ARM `vct_dsp.c` compile to the same bytes under either, so neither tells an
   order the scheduler chose from one the code generator did. `#pragma optimization_level 1` does change the order: there
@@ -1305,6 +1312,9 @@ Same code, other `sp` offsets or frame size.
 - In `call() != x`, MWCC compares the call's result second (`cmp r1, r0`). The result first (`cmp r0, r1`) is the
   result assigned to a local as its own statement and then compared: `snd_arc.c`'s `NNS_SndArcSetup` matches with
   `readSize = FS_ReadFile(...); if (readSize != arc->header.infoSize)`, where every cast on either side kept the order.
+  A field read through a call's result is the same: DWC's `DWCi_ProcessRecvMatchCommand` (`dwc_match.c`) compares
+  `cmp field, local` only as `token = DWCi_GetMatchCnt()->resvToken; if (token != word)`, while the read in place
+  puts the register local first whatever the types.
 - An argument of a call compared again unchanged after it is kept in a stack slot over the call; the original working
   it out again means its comparison was another expression. `snd_arc_loader.c`'s `LoadWaveArcTable` reads
   `sizeof(SNDWaveArc) + tableSize` bytes and matches only comparing `result != (int)sizeof(SNDWaveArc) + tableSize`,
@@ -1923,7 +1933,12 @@ Same instructions, scheduled in another order.
   task queue (`mb_task.c`) keeps `MBiTaskInfo *volatile head`, which the task thread and the threads adding jobs share;
   with it `MBi_TaskThread` and `MBi_SetTask` match. The same goes for DWC's HTTP client (`nhttp_internal.h`): the response's `headerSize`, which the receiving thread
   stores and reloads at once, and the request list's `count`, whose `id = info->count++` loads the field twice, once
-  for the result and once for the increment, as only a `volatile` lvalue does.
+  for the result and once for the increment, as only a `volatile` lvalue does. The response's `contentLength` is the
+  same: `NHTTPGetProgress` tests it and then stores it, and the original builds its -1 before the first load and loads
+  the field again for the store, which no ternary, early return or `goto` gives and `volatile` does. A test
+  `x == 2 || x == 3` that loads the byte again for the second comparison, from the same address registers and with no
+  range test, is the same: DWC's `DWC_ProcessFriendsMatch` and `DWCi_HandleClosedConnection` (`dwc_main.c`) match
+  only with `DWCMatchControl.mode` and `qr2MatchType` `volatile`.
 - A global reached through a cast to a derived struct, `((Derived *)gBase)->arr[n].f`, is addressed as
   `(base + n * size) + offsetof(f)`, where the global's own type folds the constants first. Multiboot's work global
   is the parent's and child's shared part, which the parent's code casts to its extension (`pPwork`), and
@@ -2717,6 +2732,11 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   on, where `if (!f()) { return FALSE; } n++;` puts it before. In a loop the `else` lands after the whole body, just
   before the rotated loop's bottom test: libVCT's `VCTi_ReceiveAudioData` (`vct_audio.c`) has its empty-queue exit there and
   matches with the body wrapped as `if (packet != NULL) { ... } else { receiver->queuedCount = count; return FALSE; }`.
+  An `else` comes right after its then-block, before what follows the `if`, so a return that the asm puts after the
+  next test's return is the `else` of a negated test whose then-block holds only that next test. GameSpy's
+  `ghiTrySendThenBuffer` (`ghttpCommon.c`) tests -2 first and has `return 2` after `return 0`: it matches as
+  `if (sent != -2) { if (sent == -1) { return 0; } } else { return 2; }` and then `if (sent == size)`, where also
+  putting the size test inside the then-block moves `return 2` past it (11 bytes).
 - Every `return` gets its own epilogue. Failures that all branch to one block that sets a saved register and jumps
   to a shared `mov r0, rN` exit can be a `static inline`'s early returns, which inlining turns into stores to one
   result and jumps to its end. `mystery_gift_pokemon.c`'s `CreateMysteryGiftPokemon` is
@@ -3613,7 +3633,7 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   previous file's range.
 - A string that the ROM has twice in one file's range, a few hundred bytes apart, is two files: MWCC pools a file's
   equal literals. DWC's `"httpresult"`, `"returncd"` and `"Date"` in overlay 11 split its login range into the login,
-  the HTTP client, the connection test, the profanity check and the service locator (`dwc_nasfunc.c`,
+  the HTTP client, the connection test, the profanity check and the service locator (`dwc_auth.c`,
   `dwc_http_client.c`, `dwc_conntest.c`, `dwc_profanity.c`, `dwc_svcloc.c`), and only the split laid each one's `.data`
   out as the ROM's. The 13 root certificates after them are each a data-only file under `-ipa file`, whose name and key
   of 64 bytes or more and unreferenced global struct get 4-aligned sections of their own, which one file of all 13
@@ -3709,6 +3729,20 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   a definition in `.data` instead: `socl_startup.c`'s `SOCLiConfigPtr = NULL`, which the ROM has in `.data` before
   the 0x4000 default, takes it, and with the zeroed `.bss` globals in ntrtwl's definition order its four functions
   match (33 bytes to 0x2c off otherwise).
+- A zero-initialized static is reached from the section's pooled base, and so is a struct of statics, but the two
+  compile differently: the struct's member is a field of one object, which MWCC loads again at other points (after a
+  64-bit store, before a zero, across a loop), while a static of its own is known and scheduled freely. Statics that the
+  asm reaches as one base are therefore separate `= 0` statics, in the order whose size sort gives the ROM's addresses.
+  DWC's friend list kept its five words as one static struct, and `DWCi_FriendInit`, `DWCi_FriendProcess` and
+  `DWCi_GetFriendBuddyStatus` each differed where the control was loaded; as `static DWCFriendControl *sFriendControl =
+  NULL; static u32 sUnk08 = 0; static BOOL sInPersistThink = FALSE; static BOOL sCloseStats = FALSE; static BOOL
+  sInCloseStats = FALSE;` (at 0xc, 8, 4, 0 and 0x10) all three match. A file whose statics need two layouts that
+  contradict each other, as the friend list's, the server date's three globals and `DWCi_GetMathRand32`'s generator
+  did in one file, is several original files: split as TWL-DWC's `dwc_nastime.c`, `dwc_common.c` (the generator a
+  `static` inside the function) and `dwc_friend.c`, `DWC_Auth_SetNasTimeDiff`, `DWCi_GetMathRand32` and the friend
+  list's functions match. Such `= 0` `.bss` objects still join the `.data` size sort where they are defined:
+  `dwc_nastime.c`'s month names come out in the ROM's order (`Jun`, `Jul`, `Dec`, `Sep` and on) only with its three
+  globals defined before the table, offset, local seconds and valid flag, which `rodata_order.py` predicts.
 - In Thumb code a word of a known static at section offset `off` is read through the literal `.bss` plus `off` rounded
   down to a multiple of 0x80, with the rest in the load's offset: in the unsplit `card_common.c` a static at 0x584 is
   read as `.bss+0x580` and `#4`, at 0x5a0 as `.bss+0x580` and `#0x20`, and at 0x600 as `.bss+0x600` and `[r0]`. A read

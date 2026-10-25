@@ -202,11 +202,14 @@ GHITrySendResult ghiTrySendThenBuffer(GHIConnection *connection, const char *dat
 
     if (connection->sendBuffer.pos >= connection->sendBuffer.len) {
         sent = ghiDoSend(connection, data, size);
-        if (sent == -2) {
+        if (sent != -2) {
+            if (sent == -1) {
+                return 0;
+            }
+        } else {
             return 2;
-        } else if (sent == -1) {
-            return 0;
-        } else if (sent == size) {
+        }
+        if (sent == size) {
             return 1;
         }
     }

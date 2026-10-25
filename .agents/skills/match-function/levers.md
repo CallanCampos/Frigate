@@ -245,6 +245,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 - A struct field loaded again for each of several tests in a row, where ours reuses one load: the field is shared
   with other threads and `volatile`. (matching.md: "A field that other threads change")
+- A constant built and spilled before a call, in the wrong register: move its assignment past the call's failure test.
+  (matching.md: "A constant stored to a spilled local")
 - An RC4 swap with the wrong registers: write it through one temporary, and group a masked sum as
   `(table[i] + (j + key[k])) & 0xff`. A named `in = src + i` pointer that takes the counter's register: index
   `src[i + k]` directly. (matching.md: "An RC4 key schedule's swap")
@@ -786,6 +788,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
   two comparisons, as in a touch hit test. (matching.md: "joined by a bitwise `&`")
 - Blocks are laid out in source order. A switch whose `default` code comes first had `default:` written first, and
   `if (!f()) return FALSE; n++;` puts the return before the code that goes on. (matching.md: "Blocks are laid out in source order")
+- A return that the asm puts after the next test's return: write the test negated, that return in its `else`, and only
+  the next test in the then-block. (matching.md: "An `else` comes right after its then-block")
 - A loop's early exit placed after the whole body, just before the bottom test: wrap the body in `if (p != NULL) {
   ... } else { exit }`. (matching.md: "In a loop the `else` lands after the whole body")
 - Identical statements in different branches are merged, so a jump into the middle of another block means the same
@@ -1011,6 +1015,10 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - A `.bss` static reached through a literal of its own where the original reaches it from the section's base: give
   it a zero initializer (`= 0`, `= NULL`, `= { 0 }`); one the ROM has in `.data` takes `#pragma explicit_zero_data on`.
   (matching.md: "the same holds for zero")
+- A static struct's member loaded again where the original keeps it (after a 64-bit store, before a zero, across a
+  loop), with the struct reached from the section's base: make each member a separate `= 0` static, in the order whose
+  size sort gives the ROM's addresses. Statics that need two contradictory layouts are several original files.
+  (matching.md: "a struct of statics, but the two")
 - Odd instructions at the end of a same-size diff (`add sp, #0`, `.byte 0xff`): literal pool words, which can be a
   wrong constant; decode them before blaming registers. (matching.md: "decode the words before counting")
 - Live `.data` statics separated by unused records: one initialized array retains every entry even when code indexes
@@ -1133,6 +1141,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - Identical Thumb code that the probe calls 2 bytes short, before an ARM veneer: the symbol includes the linker's
   `mov r8, r8` pad; size it without the pad with `config_fixes.py add-function`. (matching.md: "a pad that belongs
   to no function")
+- The probe says MATCH but objdiff scores the function under 100%, with `thumb_call` relocations in its module's
+  `relocs.txt` from the function to labels inside it: dsd's records for a `bl` within the function, which MWCC
+  resolves itself; remove them with `config_fixes.py remove-reloc` (`DWCi_MatchProcess`, `DWCi_ProcessRecvMatchCommand`).
 
 - SDK assembly in an `asm` function: pre-UAL spellings, `@name:` labels, `dcd`, `ldr rX, =value`, and one `asm`
   function per entry point, falling into the next; no `entry`, so a second name comes from the configs or the linker.

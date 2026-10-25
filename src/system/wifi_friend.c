@@ -10,7 +10,7 @@
 #include "system/net_define.h"
 
 // Checks of a friend's data or friend key against the friends known, and adding a friend to the Friend Roster.
-// The ROM has no string for the file, so the name is a guess.
+// The ROM has no string for the file, so the name is a guess; DWC's own dwc_friend.c is in overlay 11.
 
 // What addFriend does with the place
 enum {

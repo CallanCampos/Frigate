@@ -137,7 +137,8 @@ struct NHTTPRes {
     volatile int headerSize;
     int bufferUsed;
     int bodyReceived;
-    int contentLength;
+    // Written by the receiving thread while NHTTPGetProgress reads it
+    volatile int contentLength;
     BOOL succeeded;
     BOOL headerDone;
     int statusCode;

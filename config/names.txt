@@ -6620,7 +6620,7 @@ overlays/ov011 0x0215de44 DWC_SVLGetTokenAsync
 overlays/ov011 0x0215dea8 DWC_SVLProcess
 overlays/ov011 0x0215dec0 DWC_NASLoginAsync
 overlays/ov011 0x0215df40 DWC_NASLoginProcess
-overlays/ov011 0x0215dffc DWCi_SetNasTimeFromDateHeader
+overlays/ov011 0x0215dffc DWC_Auth_SetNasTimeDiff
 overlays/ov011 0x0215e160 DWC_SetCommonKeyValueString
 overlays/ov011 0x0215e188 DWC_AddCommonKeyValueString
 overlays/ov011 0x0215e1b0 DWC_GetCommonValueString
@@ -6634,7 +6634,7 @@ overlays/ov011 0x0215e47c DWC_SetOwnStatusData
 overlays/ov011 0x0215e4d4 DWC_SetBuddyFriendCallback
 overlays/ov011 0x0215e4f0 DWCi_FriendInit
 overlays/ov011 0x0215e584 DWCi_FriendProcess
-overlays/ov011 0x0215e714 DWCi_IsUpdatingServers
+overlays/ov011 0x0215e714 DWCi_IsServerUpdating
 overlays/ov011 0x0215e72c DWCi_UpdateServersAsync
 overlays/ov011 0x0215e784 DWCi_StopFriendProcess
 overlays/ov011 0x0215e7d0 DWCi_GPRecvBuddyRequestCallback
@@ -6662,7 +6662,7 @@ overlays/ov011 0x0215f198 DWCi_GPGetInfoCallback_RecvAuthMessage
 overlays/ov011 0x0215f2b4 DWCi_GetPersCallbackLevel
 overlays/ov011 0x0215f2c0 DWCi_BeginCloseStatsConnection
 overlays/ov011 0x0215f2cc DWCi_EndCloseStatsConnection
-overlays/ov011 0x0215f2d8 DWCi_GPGetReverseBuddiesListCallback
+overlays/ov011 0x0215f2d8 DWCi_GetReverseBuddiesCallback
 overlays/ov011 0x0215f410 DWCi_LoginInit
 overlays/ov011 0x0215f45c DWCi_LoginAsync
 overlays/ov011 0x0215f480 DWCi_LoginProcess
@@ -7797,6 +7797,7 @@ overlays/ov011 0x0218553c sMD5WordIndex
 overlays/ov011 0x0218557c sMD5Padding
 overlays/ov011 0x021855bc sMD5Constants
 overlays/ov011 0x021856bc sSha1Padding
+overlays/ov011 0x0218573c sMonthNames
 overlays/ov011 0x021857d0 sMatchChance
 overlays/ov011 0x02185aec DWCauthhttpparam
 overlays/ov011 0x02185b08 sDefaultUrl
@@ -7915,6 +7916,12 @@ overlays/ov011 0x0218df74 WCMi_OverridedDeviceId
 overlays/ov011 0x0218df7c sWcmGlobal
 overlays/ov011 0x0218dfb4 sWcmRssiCursor
 overlays/ov011 0x0218dfb5 sWcmRssiSamples
+overlays/ov011 0x0218dfd0 sNasLogin
+overlays/ov011 0x0218dfd4 DWCi_NasTimeValid
+overlays/ov011 0x0218dfd8 DWCi_NasTimeLocalSeconds
+overlays/ov011 0x0218dfe0 DWCi_NasTimeOffset
+overlays/ov011 0x0218e000 sCloseStats
+overlays/ov011 0x0218e014 sLogin
 overlays/ov011 0x0218e018 sMatchRoot
 overlays/ov011 0x0218e020 sNetIds
 overlays/ov011 0x0218e040 sConnections

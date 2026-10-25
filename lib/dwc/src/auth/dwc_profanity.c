@@ -1,11 +1,10 @@
 #include "dwc/ac.h"
-#include "dwc/common.h"
 #include "dwc/dwc.h"
 #include "dwc/error.h"
 #include "dwc/ext.h"
-#include "dwc/friend.h"
 #include "dwc/memfunc.h"
 #include "dwc/nasfunc.h"
+#include "dwc/nastime.h"
 #include "nitro/hw.h"
 #include "nitro/mi.h"
 #include "nitro/os.h"
@@ -208,7 +207,7 @@ static BOOL DWCi_Prof_ParseResponse(void) {
     if (DWC_Http_ParseResult(http, 0) != 0) {
         text = DWC_Http_GetResult(http, "Date");
         if (text != NULL) {
-            DWCi_SetNasTimeFromDateHeader(text);
+            DWC_Auth_SetNasTimeDiff(text);
         }
         text = DWC_Http_GetResult(http, "httpresult");
         if (text != NULL) {
