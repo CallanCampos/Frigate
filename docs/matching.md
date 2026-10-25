@@ -3887,7 +3887,9 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   in its order and just before the object it initializes, and `rodata_order.py`'s `heapsort` then places them, each
   in a section of its own (fitted on 30 random files and on the six orders of `dwc_mov_mbp.c`'s tables). A
   tentative `.bss` definition is listed after everything else, and a `const` scalar whose address code takes comes
-  after that, wherever it is defined: `wifibattlematch_net.c`'s `sCmd2402Data` reorders every 4-byte tie. Overlay
+  after that, wherever it is defined: `wifibattlematch_net.c`'s `sCmd2402Data` reorders every 4-byte tie. A
+  function-local static with an initializer is listed after the file-scope initialized ones and before the tentative
+  ones: NitroSDK's `mb_wm.c` (under `-ipa file`) lays out `MB_Init`'s `static const u16 *game` that way. Overlay
   182's `dwc_mov_mbp.c` matches with its callback names, state names and child bitmaps as three tables in that
   order. The bitmap table is all zeros, which goes to `.bss` unless `#pragma explicit_zero_data on` covers it; in
   `.data` it is the shared section's smallest object, which the ROM sorts between two 24-byte strings. The pragma

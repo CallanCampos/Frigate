@@ -1,29 +1,34 @@
 // The multiboot library's use of the wireless manager: the setup of the parent (MB_Init, MB_StartParent), its callbacks
 // for the manager's replies, the scan that the child side of the library starts, and the sending of frames (libmb).
 // It is the SDK's mb_wm_base.c, as ntrtwl's reconstruction of NitroSDK has it. The names are NitroSDK's, as that
-// reconstruction has them, except MBWm_IsMultibootBeacon and the file's objects (sParentName and the rest), which are
-// ours
+// reconstruction has them, except MBWm_IsMultibootBeacon and the file's objects other than the lifetimes and the
+// power-save flag (sParentName and the rest), which are ours
 #include "mb_private.h"
 #include "nitro/os.h"
 #include "nitro/pxi.h"
 
-// What the wireless manager is set up with: how long a connection may be silent, for the manager's four lifetimes
-// (table, cam, frame and mp), whether to start in power-save, and the parent's name (a wide string)
+// What the wireless manager is set up with: the parent's name (a wide string), whether to start in power-save, how
+// long a connection may be silent, for the manager's four lifetimes (frame, cam, table and mp), and the game ID that
+// the scan's filter compares, through its mask. They are separate statics, as in ntrtwl's NitroSDK: under -ipa file
+// MWCC sorts a file's statics by size, and this declaration order is the one whose sort gives the ROM's layout
 static u16 sParentName[24] = L"multiboot";
-static MBWmConfig sWmConfig = {
-    0x28, 0x28, 0xffff, 5, 1, sParentName, -1, -1,
-};
+static BOOL mbi_power_save_mode = TRUE;
+static u16 mbi_life_frame = 5;
+static u16 mbi_life_cam = 0x28;
+static u16 mbi_life_table_no = 0xffff;
+static u16 mbi_life_mp = 0x28;
+static u32 sParentGgid = 0xffffffff;
+static u32 sParentGgidMask = 0xffffffff;
 
-// The parameters of the scan for parents, 32-aligned as the ROM places them
+// The parameters of the scan for parents, 32-aligned as the ROM places them, then what the library works with: its
+// memory, the DMA channel and the buffer for the wireless manager, and whether to filter the parents by their game's
+// ID, all set by MB_Init. The order is again the one that the size sort turns into the ROM's
 static WMScanExParam sScanParam ATTRIBUTE_ALIGN(32);
-
-// What the library works with: the DMA channel and the buffer for the wireless manager, whether to filter the parents
-// by their game's ID, and the library's memory, all set by MB_Init
-static u16 sDmaNo;
-static void *sWmBuf;
-static u32 sFilterGgid;
-static MBiParam *sWmWork;
 MB_CommCommonWork *mbc;
+static u16 sDmaNo;
+static MBiParam *sWmWork;
+static u32 sFilterGgid;
+static void *sWmBuf;
 
 static BOOL MBWm_IsMultibootBeacon(const WMBssDesc *desc);
 static int changeScanChannel(WMScanExParam *param);
@@ -99,8 +104,7 @@ static void MBi_OnInitializeDone(void) {
 
     result = WM_SetIndCallback(MBi_ParentCallback);
     MBi_CheckWmErrcode(WM_APIID_INDICATION, result);
-    result = WM_SetLifeTime(MBi_ParentCallback, sWmConfig.lifeTable, sWmConfig.lifeCam, sWmConfig.lifeFrame,
-                            sWmConfig.lifeMp);
+    result = WM_SetLifeTime(MBi_ParentCallback, mbi_life_table_no, mbi_life_cam, mbi_life_frame, mbi_life_mp);
     MBi_CheckWmErrcode(WM_APIID_SET_LIFETIME, result);
 }
 
@@ -142,7 +146,7 @@ static void MBi_ParentCallback(void *arg) {
                 sWmWork->callback(MB_CALLBACK_ERROR, arg);
                 return;
             }
-            MBi_CheckWmErrcode(WM_APIID_START_PARENT, WMi_StartParentEx(MBi_ParentCallback, sWmConfig.powerOn));
+            MBi_CheckWmErrcode(WM_APIID_START_PARENT, WMi_StartParentEx(MBi_ParentCallback, mbi_power_save_mode));
             return;
         } else {
             if (cb->errcode != 0) {
@@ -357,9 +361,8 @@ static void MBi_ChildCallback(void *arg) {
             return;
         }
         work->callback(MB_CALLBACK_INIT_COMPLETE, arg);
-        MBi_CheckWmErrcode(WM_APIID_SET_LIFETIME,
-                           WM_SetLifeTime(MBi_ChildCallback, sWmConfig.lifeTable, sWmConfig.lifeCam,
-                                          sWmConfig.lifeFrame, sWmConfig.lifeMp));
+        MBi_CheckWmErrcode(WM_APIID_SET_LIFETIME, WM_SetLifeTime(MBi_ChildCallback, mbi_life_table_no, mbi_life_cam,
+                                                                 mbi_life_frame, mbi_life_mp));
         return;
     case WM_APIID_SET_LIFETIME:
         if (cb->errcode != 0) {
@@ -409,8 +412,7 @@ static void MBi_ChildCallback(void *arg) {
                     usable++;
                     continue;
                 }
-                if (sFilterGgid == 1 &&
-                    (desc->gameInfo.ggid & sWmConfig.ggidMask) == (sWmConfig.ggid & sWmConfig.ggidMask)) {
+                if (sFilterGgid == 1 && (desc->gameInfo.ggid & sParentGgidMask) == (sParentGgid & sParentGgidMask)) {
                     usable++;
                     continue;
                 }
@@ -602,7 +604,6 @@ int MB_Init(void *work, const MBUserInfo *user, u32 ggid, u32 tgid, u32 dma) {
     OSIntrMode irq;
     u16 *name;
     int i;
-    const u16 *src;
 
     if (mbc != NULL && mbc->isMbInitialized != 0) {
         return MB_ERRCODE_INVALID_STATE;
@@ -613,11 +614,11 @@ int MB_Init(void *work, const MBUserInfo *user, u32 ggid, u32 tgid, u32 dma) {
         tgid = WM_GetNextTgid();
     }
     irq = OS_DisableInterrupts();
-    sWmConfig.lifeTable = 0xffff;
-    sWmConfig.lifeFrame = 5;
-    sWmConfig.lifeCam = 0x28;
-    sWmConfig.lifeMp = 0x28;
-    sWmConfig.powerOn = 1;
+    mbi_life_table_no = 0xffff;
+    mbi_life_frame = 5;
+    mbi_life_cam = 0x28;
+    mbi_life_mp = 0x28;
+    mbi_power_save_mode = 1;
     sDmaNo = dma;
     sWmWork = wmWork;
     mbc = commWork;
@@ -627,14 +628,21 @@ int MB_Init(void *work, const MBUserInfo *user, u32 ggid, u32 tgid, u32 dma) {
     for (i = 0; i < user->nameLength; i++) {
         *name++ = user->name[i];
     }
-    name = wmWork->gameName;
-    src = sWmConfig.name;
-    for (i = 0; i < 16; i++) {
-        if (*src == 0) {
-            break;
+    {
+        // The cursor is a static, as in ntrtwl's NitroSDK
+        static const u16 *game = sParentName;
+
+        // BUG: the static cursor stays at the name's end after the first call, so a second MB_Init copies no name
+#ifdef BUGFIX
+        game = sParentName;
+#endif
+        name = wmWork->gameName;
+        for (i = 0; i < 16; i++) {
+            if (*game == 0) {
+                break;
+            }
+            *name++ = *game++;
         }
-        *name++ = *src++;
-        sWmConfig.name = src;
     }
     MI_CpuCopy8(user, &commWork->user, sizeof(MBUserInfo));
     if (user->nameLength < MB_USER_NAME_LENGTH) {
