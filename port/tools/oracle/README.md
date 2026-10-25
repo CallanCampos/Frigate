@@ -715,6 +715,33 @@ from, and a later run takes a file from there only while its SHA-1 is still the 
 build tree; without `--save-cache`, as before, every save is made fresh. Nothing the game writes is committed: only
 the input files and the SHA-1s.
 
+**The port plays the starter route too** (ctest `replay_starter_save`,
+[../../tests/replay/check_oracle_save.py](../../tests/replay/check_oracle_save.py)): `first_save`'s input file from a
+blank save to its 18,800th frame, the field menu's SAVE, then `starter_save`'s from the save it made, 17,000 frames,
+each with the DS's start-up seed (the files' `seed` lines, which the oracle reads only as part of the file). Its save is
+held to the oracle's starter save block by block, by the SHA-1s of `port/tests/replay/starter_save_<version>.save.tsv`
+(written from the oracle's save by `check_oracle_save.py --update`; hashes only), and each block's CRC to its data. The
+story's state is the oracle's: Tepig, its personality, stats and moves, the party, the bag, the Pokédex, every event
+flag and variable, the day care's egg seed and the console's Wi-Fi ID. What differs is declared in the script with its
+traced cause, in both versions alike: the four blocks New Game set up on the port's own first save (the mystery gift,
+the trainer card's records and the symbol encounters, encrypted with keys seeded with the VBlank count, and DWC's random
+player ID, as [above](#saves)); the play time, which counts the CPU's time, and the clock's times of the save and of its
+last check, which run with the video frames; 12 bytes of Tepig's mail, which `PokeParty_CreatePkm` takes from the system
+heap uncleared (`CreateMailData`; `ResetMailData` sets neither its `unk18` nor the messages' `id`s), so they hold what
+each program's heap left there; and the state of the four townspeople who walk at random. Those wander again after
+Bianca's scene from another count: after her first talk the field loads the city's music again in GFL's sound thread
+(`GFL_SndBGMLoadStep`, `src/system/snd_sys.c`), whose card reads take the DS 56 passes (counts 11257 to 11313 in Black
+2) and the port 6, and the field waits for the music's fade-in before the starter's selection
+(`EventFieldClose_Callback`, `src/system/field_event.c`), so the rest of the scene runs some 50 passes later on the DS
+(Tepig is made at count 12182 against the port's 12134) and B, mashed, absorbs it. Traced by GFL's linear generator on
+both programs, dumped at every frame: at the end of each pass it is the DS's at every count but 12134 to 12181, where
+the port has made Tepig and the DS not yet, and from 13232, when the walkers' draws come at other passes. Before PR 29
+the port crashed in Bianca's scene at `ActorCmdExec 2, Movement_0528` after the answer to the nickname, an animation of
+hers that the script reaches 314 bytes back ([../../docs/game-changes.md](../../docs/game-changes.md)), and the test
+failed there in both versions. The route answers NO to the nickname, so the test holds that actor command's offset
+alone; the nickname loop's jump back, which only YES takes, is `integrate_script_offsets`'s
+([../../tests/integrate/script_offsets.c](../../tests/integrate/script_offsets.c)).
+
 **Continuing it** (the continue sequence): the start menu shows CONTINUE first, then NEW GAME, MYSTERY GIFT, UNOVA
 LINK, NINTENDO WFC SETTINGS and MIC TEST, and the saved game: the player's picture, AAAAAAA, Aspertia City, Badges: 0,
 Time: 0:01 (no Pokédex line: the player has none yet). Black 2's port frames 3,244 to 3,436 (the start menu from frame

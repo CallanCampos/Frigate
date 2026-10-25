@@ -261,9 +261,15 @@ sites not above the last entry's, and `sync_upstream.sh` prints it in its summar
 It skips (77) on Windows, whose LLP64 (a 32-bit `long`) gives other findings than macOS's and Linux's, without clang,
 and without the compile database; with `--require`, which the build passes where it can run the check, each of those
 fails instead. What it doesn't see: a pointer written into a union's integer member, which has no cast
-(`port/tools/compile-probe/scripts/unions.py` lists the unions that mix pointers and integers); an explicit cast from an
-integer that carries an address to a narrower one, such as `(u32)(uptr)p` or `(u32)` of a `uptr` value, for which
-clang has no warning; a compound assignment such as `dst += (uptr)p` on a `u32 dst`, whose read back is flagged
+(`port/tools/compile-probe/scripts/unions.py` lists the unions that mix pointers and integers); a 32-bit unsigned offset
+added to a pointer or a `uptr`, such as `vm->pc + offset` with a `u32 offset`, which has no cast either: the DS's 32-bit
+sum wraps, so a negative offset read as a `u32` goes back there, and a host's goes 4 GiB forward, as the field script's
+jumps back and its actor command's movement back (an animation of Bianca's in the starter scene) did until PR 29
+([../tools/pointer_offsets.query](../tools/pointer_offsets.query) lists such sums, and pointers subscripted by a `u32`,
+in the script interpreters and the readers of offsets from data that its header names, and [STATUS.md](STATUS.md)'s
+entry for PR 29's follow-up has their reading); an explicit
+cast from an integer that carries an address to a narrower one, such as `(u32)(uptr)p` or `(u32)` of a `uptr` value, for
+which clang has no warning; a compound assignment such as `dst += (uptr)p` on a `u32 dst`, whose read back is flagged
 instead; a pointer cast to `long` or `unsigned long`, which [PLAN.md §4.8](PLAN.md#48-64-bit-and-dual-target-rules)'s
 rule 6 forbids; a site moved within one key, a cast fixed and another of the same types added in the same function; a
 cast under `WHITE2` alone in CI, which builds Black 2 only (the White 2 builds of `--verify-pr` and of each session

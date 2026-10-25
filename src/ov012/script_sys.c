@@ -494,7 +494,7 @@ u16 FieldScript_GetSceneChangeSCRID(GameData *gameData, const u8 *script, u32 mo
     u16 type;
     u16 workId;
     u16 value;
-    u32 offset;
+    s32 offset;
 
     while (TRUE) {
         type = script[0] + (script[1] << 8);
