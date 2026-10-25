@@ -86,7 +86,10 @@ superseded. For changed incomplete C or shared headers, supply the matching-neut
 rebuilding the ROM alone cannot prove C that the ROM does not link. Run relevant replay, sanitizer and oracle checks
 when those systems change. Public CI does not replace local ROM or gameplay validation. A sync PR whose host jobs
 fail the pointer cast guard (`game_ptrcasts`) waits for a follow-up feature PR
-([below](#when-the-pointer-cast-guard-fails)).
+([below](#when-the-pointer-cast-guard-fails)). No build fails on a name that only a document, a comment or the
+sanitizer ignorelist holds, so also look in `port/` for the names the sync removes (the `symbols.txt` files' and the
+C's identifiers at the two upstream commits), and in decomp-findings.md and game-changes.md for the files it
+completes; the follow-up that brings them up to date says what upstream now calls them ([lessons.md](lessons.md)).
 
 When all four required checks pass on an up-to-date branch, approve contributor/bot PRs and merge using **Create a
 merge commit**. No auto-merge is enabled. The owner-authored exception is review-only; it still requires the PR,

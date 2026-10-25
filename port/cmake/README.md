@@ -25,6 +25,7 @@ build and tests are read in one place.
 | [oracle.cmake](oracle.cmake) | The melonDS test oracle as an external project (only with `PORT_BUILD_ORACLE`), and its tests: the saves made on the oracle (`oracle_saves`, a fixture the others start from), the screens' and the sound's comparisons, the field menu and its apps and phase 3's exit route among the screens' | Every screen, and the sound, held against melonDS; saves with a Pokémon; the field menu's apps; New Game into Aspertia City, its walks, talks, house and changes of map | `oracle_*` (`oracle_aspertia`, `oracle_aspertia_hashes`) |
 | [os.cmake](os.cmake) | minicoro, the OS core's per-file options and stack probes, and its tests, again on ASan's fake stacks in the sanitized build | Threads, interrupts, timing, the HBlank interrupt the screen wipes need | `os_*` |
 | [overlay_sections.cmake](overlay_sections.cmake) | The per-overlay forced includes that put each overlay's writable statics in its own sections (and `integrate_overlay_sections`'s probe in overlay 162's), and the link's section check on macOS | Overlays | `overlay_sections_image_*`, `overlay_sections_budget`, `overlay_sections_leaks` |
+| [progress.cmake](progress.cmake) | The test of the port-readiness measurement's compile step ([../tools/progress/compile_check.py](../tools/progress/compile_check.py)), which compiles the game's C with the ROM's compilers through the repository's compile probe; labelled `static`, it skips without the decomp's `.venv`, and its measure without wibo, sjiswrap or the compilers | None: how much of the game is C ([../docs/STATUS.md](../docs/STATUS.md)'s Tiers, `sync_upstream.sh --metrics`) | `progress_compile_check` |
 | [pxi.cmake](pxi.cmake) | The per-file options of the decomp files the ARM7's services compile through | Everything the ARM7 serves | `pxi_*` |
 | [rom.cmake](rom.cmake) | The ROM manifest (`gen/rom/rom_manifest.c`, from `<version>.sha1` and the NitroFS manifest), the development ROM path, the backup's forced include, and the tests of the ROM, the card and the file system as the game links them | Every file read, saves, the genuine-card check | `rom_*`, `card_backup_*`, `rom_game_*` (`rom_game_ir_genuine_card` among them) |
 | [sound.cmake](sound.cmake) | `audio/audio.c` into the program, and the sound driver's and sound unit's tests, one scenario a process | Music, sound effects, cries | `snd_*` |
@@ -58,8 +59,9 @@ with the reason it is safe on a host. The tests carry labels by what they need, 
 where it defines them, with `port_test_labels(TEST LABEL...)` ([../CMakeLists.txt](../CMakeLists.txt)): `route` (the
 program runs the game from power-on on the player's ROM), `oracle` (the melonDS oracle or its saves), `timing` (a
 limit on the host's time: the `frame_times_*` routes and the timing gates) and `static` (the game's C read, not run:
-[game.cmake](game.cmake)'s pointer cast guard), so that `ctest -L route -LE oracle` runs the routes that need no
-oracle ([../tests/README.md](../tests/README.md)). A new fragment's test that runs the game from
+[game.cmake](game.cmake)'s pointer cast guard and [progress.cmake](progress.cmake)'s measure), so that
+`ctest -L route -LE oracle` runs the routes that need no oracle ([../tests/README.md](../tests/README.md)). A new
+fragment's test that runs the game from
 power-on gets `route` there, and `oracle` too when it needs the oracle.
 
 ## Adding a fragment

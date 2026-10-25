@@ -24,6 +24,7 @@
 #include "gfx/screens.h"
 #include "gfx/workers.h"
 #include "hal/gfl/gfl_frame.h"
+#include "hal/gfl/random_seed.h"
 #include "hal/host/host.h"
 #include "hal/hw/hw.h"
 #include "hal/input/port_input.h"
@@ -452,6 +453,8 @@ int main(int argc, char **argv) {
     const char *soundTrace;
     const char *frameTimes;
     const char *inputPath;
+    const uint64_t *seeds;
+    size_t seedCount;
     const char *runDir;
     PortOsResult result;
     int status = 0;
@@ -534,6 +537,10 @@ int main(int argc, char **argv) {
             return EXIT_BAD_OPTIONS;
         }
         port_rtc_set_pinned(port_replay_clock_pinned());
+        // The DS's seeds, which the game takes in place of the ones it builds; a file holds no more than the platform
+        // layer takes (port/app/replay.c checks it)
+        seedCount = port_replay_seeds(&seeds);
+        port_random_seed_give(seeds, seedCount);
     }
     runDir = port_app_option("run-dir");
     if ((runDir != NULL && *runDir == '\0') ||

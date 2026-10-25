@@ -1,15 +1,15 @@
 // NitroSDK's waits on the host (os_system.c and os_irqHandler.c, and the BIOS's SVC_WaitByLoop). The CPSR functions of
 // os_system.c are in core.c, with the rest of the CPU's state.
 //
-// The busy loops of the DS (OSi_SpinWaitCpuCycles under OS_SpinWaitSysCycles, and the BIOS's WaitByLoop) are modelled
+// The busy loops of the DS (OS_SpinWait under OS_SpinWaitSysCycles, and the BIOS's WaitByLoop) are modelled
 // ones here: each moves the virtual clock by its length, and the events and interrupts on the way come as they would.
 // A no-op would hang their callers, which wait for state that an interrupt delivers (PMi_SendPxiDataSync, PM_Init,
 // OSi_DoLockByWord, CARD's pull-out check).
 //
-// OS_WaitIrq is the decomp's lib/nitro/src/os/os_irqHandler.c (whose ITCM handlers have no C; core.c has them) and
-// OS_WaitInterrupt the decomp's os_system.c, with OS_SetIrqCheckFlag's word reached through the host's DTCM: os.h's
-// HW_INTR_CHECK_BUF truncates its 64-bit address (see os_irqTable.c). port/hal/os/replaced.txt keeps
-// os_irqHandler.c out of the game's sources.
+// OS_WaitIrq is the decomp's lib/nitro/src/os/os_irqHandler.c (whose ITCM handlers, os_irqHandler_itcm.c's asm
+// functions, core.c replaces) and OS_WaitInterrupt the decomp's os_system.c, with OS_SetIrqCheckFlag's word reached
+// through the host's DTCM: os.h's HW_INTR_CHECK_BUF truncates its 64-bit address (see os_irqTable.c).
+// port/hal/os/replaced.txt keeps os_irqHandler.c out of the game's sources.
 #include "hal/os/os_internal.h"
 #include "nitro/os.h"
 #include "nitro/svc.h"

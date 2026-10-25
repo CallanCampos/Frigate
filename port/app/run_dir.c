@@ -1,9 +1,11 @@
 // The port's run directory (port/app/run_dir.h), in the format pbw-oracle writes and compare.py reads
 // (port/tools/oracle/README.md, "Run directories"): frames.tsv with a row at every frame, the screens of chosen frames
-// as PNG, dumps of the game's globals at chosen frames, and run.txt, so that a run of the game can be held against the
-// melonDS oracle's. It reads the game's memory and screens and changes neither. Its files are written in binary mode,
-// so that their lines end with "\n" on Windows too, as the oracle's do.
+// as PNG, dumps of the game's globals at chosen frames, and run.txt (with, once the run ends, the random seeds the game
+// used, port/hal/gfl/random_seed.h), so that a run of the game can be held against the melonDS oracle's. It reads the
+// game's memory and screens and changes neither. Its files are written in binary mode, so that their lines end with
+// "\n" on Windows too, as the oracle's do.
 #include "app/run_dir.h"
+#include "hal/gfl/random_seed.h"
 #include "hal/host/host.h"
 #include "hal/rom/sha1.h"
 #include <errno.h>
@@ -203,6 +205,19 @@ static const char *Text(const char *value) {
     return value != NULL && *value != '\0' ? value : "-";
 }
 
+// The random seeds the game built (port/hal/gfl/random_seed.h): how many, then each one kept, from 1, with whether the
+// input file gave it ("given") or the game's own hash made it ("built")
+static void WriteSeeds(FILE *run) {
+    size_t i;
+    uint64_t seed;
+    int given;
+
+    fprintf(run, "seeds: %zu\n", port_random_seed_count());
+    for (i = 0; port_random_seed_at(i, &seed, &given); i++) {
+        fprintf(run, "seed_%zu: 0x%016llx %s\n", i + 1, (unsigned long long)seed, given ? "given" : "built");
+    }
+}
+
 // run.txt; finished is 0 while the run goes on, when the frames completed and the status aren't known yet
 static void WriteRunTxt(int finished, int status) {
     char *path = JoinPath("run.txt");
@@ -226,6 +241,9 @@ static void WriteRunTxt(int finished, int status) {
             fprintf(run, "status: %d\n", status);
         } else {
             fprintf(run, "status: -\n");
+        }
+        if (finished) {
+            WriteSeeds(run);
         }
         fclose(run);
     }

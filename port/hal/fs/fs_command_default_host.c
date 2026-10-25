@@ -2,15 +2,15 @@
 // it is from its own path through this file (port/hal/fs/replaced.txt keeps it out of the game's own sources). Two of
 // its functions keep memory addresses in 32-bit words, which cut a 64-bit host pointer, so they are renamed out of the
 // way before the include and written again below:
-//   - FS_LoadArchiveTables copies an archive's tables into the memory given and from then on reads them through
-//     32-bit positions (FSArchiveTables' fat and fnt, FSTableReader's position, FSDirPos' position). On the host the
-//     tables stay in the archive's storage, which for the ROM archive is the memory-mapped ROM (port/hal/rom): the
-//     function returns the size the DS's needs, so that the game sets the same memory aside (SystemInit's
-//     FS_LoadTable), and the archive goes on reading its tables through its read function, as every DS game does before
-//     it loads them. What the game reads is the same; FS_UnloadArchiveTables, the decomp's, finds nothing loaded;
+//   - FS_LoadArchiveTables copies an archive's tables into the memory given and from then on reads them through 32-bit
+//     positions (FSArchiveTables' fat and fnt, FSTableReader's position, FSDirPos' position). On the host the tables
+//     stay in the archive's storage, which for the ROM archive is the memory-mapped ROM (port/hal/rom): the function
+//     returns the size the DS's needs, so that the game sets the same memory aside (SystemInit's FS_TryLoadTable), and
+//     the archive goes on reading its tables through its read function, as every DS game does before it loads them.
+//     What the game reads is the same; FS_UnloadArchiveTables, the decomp's, finds nothing loaded;
 //   - FS_LoadArchive gives an archive without a read or write function of its own the defaults that read and write
-//     memory at its base plus a position (func_02071ff8), a 32-bit address. The one such archive, the memory archive of
-//     FS_CreateFileFromMemory, is read and written by the host's hook with the game's whole pointer
+//     memory at its base plus a position (FS_GetArchiveOffset), a 32-bit address. The one such archive, the memory
+//     archive of FS_CreateFileFromMemory, is read and written by the host's hook with the game's whole pointer
 //     (port/hal/fs/fs_memfile_host.c) and never reaches them. The host's defaults stop the program with a message,
 //     since the pointer that such an address was cut from is gone.
 #include "nitro/fs.h"

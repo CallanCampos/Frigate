@@ -15,7 +15,9 @@
 //
 // A file also sets the real-time clock: its "time" line is the time at power-on, and its "clock" line says whether the
 // clock runs from there (the default) or stays pinned there for the whole run on both programs (PbwInputClock), for a
-// screen that shows the time, such as the field menu's.
+// screen that shows the time, such as the field menu's. And its "seed" lines give the random seeds the DS's game built
+// from its console's entropy, which the port's game takes in their place, so that random outcomes (a battle's rolls, a
+// wild Pokémon) are the DS's on both programs.
 #ifndef PORT_TOOLS_ORACLE_PBWINPUT_H
 #define PORT_TOOLS_ORACLE_PBWINPUT_H
 
@@ -83,6 +85,9 @@ typedef enum PbwInputClock {
     PBW_INPUT_CLOCK_PINNED = 1,
 } PbwInputClock;
 
+// The most "seed" lines a file may have
+#define PBW_INPUT_MAX_SEEDS 64
+
 typedef struct PbwInput {
     PbwInputChange *changes; // in increasing frame order
     size_t count;
@@ -95,6 +100,12 @@ typedef struct PbwInput {
     PbwInputFrames frames;
     // The "clock" line: PBW_INPUT_CLOCK_RUNNING when the file has none
     PbwInputClock clock;
+    // The "seed" lines, in the file's order: the seeds the DS's game built from its console's entropy
+    // (src/gfl/gf_standard.c's buildSeed: GFL's at start-up, then each battle's), which the port's game takes in
+    // place of the ones it builds, the n-th line for the n-th seed (port/hal/gfl/random_seed.h). melonDS builds the
+    // DS's own, so the oracle reads them only to check the file
+    uint64_t seeds[PBW_INPUT_MAX_SEEDS];
+    size_t seedCount;
 } PbwInput;
 
 // Counts game frames from GFL's frame count as a program reads it at each VBlank

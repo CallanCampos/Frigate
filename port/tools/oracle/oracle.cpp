@@ -17,9 +17,11 @@
 //                    --counter, and a file's "version" must be the ROM's
 //   --screens LIST   the frames to write as frame_NNNNNN.png (both screens, top above bottom): N, A-B, A-B/STEP,
 //                    "all" or "none", comma-separated; "none" by default
-//   --dump SPEC      [LABEL=]TARGET[:SIZE][@LIST]: memory to write to memory.txt at the frames of LIST (the last frame
-//                    by default). TARGET is a symbol, MODULE/NAME or FILE.c/NAME, with an optional +OFFSET, or an
-//                    address 0x...; SIZE defaults to the symbol's
+//   --dump SPEC      [LABEL=][*]TARGET[:SIZE][@LIST]: memory to write to memory.txt at the frames of LIST (the last
+//                    frame by default). TARGET is a symbol, MODULE/NAME or FILE.c/NAME, with an optional +OFFSET, or an
+//                    address 0x...; SIZE defaults to the symbol's. With *, the SIZE bytes (which it then needs) from
+//                    the address that the 32-bit pointer at the symbol holds at that frame, plus OFFSET, as the port's
+//                    --run-dump has it: a frame where they aren't memory a dump can read (a NULL pointer) has none
 //   --config DIR     the decomp's symbols: every symbols.txt under DIR (config/b2_us/arm9)
 //   --symbols FILE   more symbols in the same format (symbols.py's statics)
 //   --counter TARGET a 32-bit counter recorded for every frame in frames.tsv: the game's own frame count
@@ -218,10 +220,14 @@ class FrameSet {
 struct Dump {
     std::string label;
     std::string target;
-    uint32_t address = 0;
+    uint32_t address = 0; // with indirect, the pointer's
+    uint32_t offset = 0;  // with indirect, added to the pointer's value
     uint32_t size = 0;
+    bool indirect = false;
+    bool warned = false; // a frame without the memory to read was reported
     FrameSet frames;
     std::vector<uint8_t> bytes; // the bytes taken at this frame's VBlank
+    uint32_t takenAddress = 0;  // where they were taken
     bool taken = false;
 };
 
@@ -417,14 +423,41 @@ bool ParseDump(const std::string &spec, const SymbolTable &symbols, Dump &dump, 
         error = "a dump's label can't have spaces";
         return false;
     }
-    if (!ResolveTarget(rest, symbols, dump.address, dump.size, error)) {
-        return false;
+    if (!rest.empty() && rest[0] == '*') {
+        // The pointer at the symbol, and the offset from where it points, which is added at each frame
+        std::string pointer = rest.substr(1);
+        size_t plus = pointer.find('+');
+        uint32_t pointerSize = 0;
+
+        dump.indirect = true;
+        if (plus != std::string::npos) {
+            if (!ParseNumber(pointer.substr(plus + 1), dump.offset)) {
+                error = "\"" + pointer.substr(plus + 1) + "\" isn't an offset";
+                return false;
+            }
+            pointer = pointer.substr(0, plus);
+        }
+        if (!ResolveTarget(pointer, symbols, dump.address, pointerSize, error)) {
+            return false;
+        }
+        if (!Readable(dump.address, 4)) {
+            error = "the pointer at \"" + pointer + "\" is outside the memory a dump can read";
+            return false;
+        }
+        if (size.empty() || !ParseNumber(size, dump.size) || dump.size == 0) {
+            error = "a dump through a pointer needs a size";
+            return false;
+        }
+    } else {
+        if (!ResolveTarget(rest, symbols, dump.address, dump.size, error)) {
+            return false;
+        }
+        if (!size.empty() && (!ParseNumber(size, dump.size) || dump.size == 0)) {
+            error = "\"" + size + "\" isn't a size";
+            return false;
+        }
     }
-    if (!size.empty() && (!ParseNumber(size, dump.size) || dump.size == 0)) {
-        error = "\"" + size + "\" isn't a size";
-        return false;
-    }
-    if (!Readable(dump.address, dump.size)) {
+    if (!dump.indirect && !Readable(dump.address, dump.size)) {
         char text[96];
         std::snprintf(text, sizeof(text), "0x%08x+0x%x is outside the memory a dump can read", dump.address, dump.size);
         error = text;
@@ -1067,10 +1100,19 @@ void Oracle::OnVBlank(uint32_t frame) {
     SampleDisplay();
     for (Dump &dump : dumps_) {
         dump.taken = dump.frames.Contains(frame, options_.frames);
+        dump.takenAddress = dump.indirect ? Peek32(dump.address) + dump.offset : dump.address;
+        if (dump.taken && dump.indirect && !Readable(dump.takenAddress, dump.size)) {
+            if (!dump.warned) {
+                Fail("warning: --dump %s: the pointer holds 0x%08x at frame %u, where a dump can't read; no dump there",
+                     dump.label.c_str(), Peek32(dump.address), frame);
+                dump.warned = true;
+            }
+            dump.taken = false;
+        }
         if (dump.taken) {
             dump.bytes.resize(dump.size);
             for (uint32_t i = 0; i < dump.size; i++) {
-                dump.bytes[i] = Peek(dump.address + i);
+                dump.bytes[i] = Peek(dump.takenAddress + i);
             }
         }
     }
@@ -1155,7 +1197,7 @@ bool Oracle::WriteFrame(uint32_t frame) {
         if (!dump.taken || !vblankSeen_) {
             continue;
         }
-        std::fprintf(memoryTxt_, "%u %s 0x%08x %u ", frame, dump.label.c_str(), dump.address, dump.size);
+        std::fprintf(memoryTxt_, "%u %s 0x%08x %u ", frame, dump.label.c_str(), dump.takenAddress, dump.size);
         for (uint8_t byte : dump.bytes) {
             std::fprintf(memoryTxt_, "%02x", byte);
         }

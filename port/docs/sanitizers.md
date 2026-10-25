@@ -138,7 +138,7 @@ there: it is fixed (below).
 
 | Check | Function | Why it is safe |
 | --- | --- | --- |
-| `alignment` | `ApplyCurrentAnimResult_` (`lib/nnsys/src/g2d/g2d_CellAnimation.c`), `SetCurrentFrameMultiCell_` (`g2d_MultiCellAnimation.c`) | NitroSystem reads an animation frame's cell index, a `u16` and the first field of every element type, through a pointer to the largest type, `NNSG2dAnimDataSRT`, which needs 4-byte alignment. An index-only animation's NANR file packs 2-byte elements, so the element is 2-aligned: a 2-byte load from a 2-aligned address, which arm64 and x86-64 make (and the DS's ARM9) |
+| `alignment` | `ApplyCurrentAnimResult_`, a static of the same name in `lib/nnsys/src/g2d/g2d_CellAnimation.c` and in `g2d_MultiCellAnimation.c` | NitroSystem reads an animation frame's cell index, a `u16` and the first field of every element type, through a pointer to the largest type, `NNSG2dAnimDataSRT`, which needs 4-byte alignment. An index-only animation's NANR file packs 2-byte elements, so the element is 2-aligned: a 2-byte load from a 2-aligned address, which arm64 and x86-64 make (and the DS's ARM9) |
 | `function` | `runSaveBlkInitializers` (`src/gfl/savedata.c`) | Each save block's initializer is called through `SaveBlockDef.init`, a `void (*)(void *)`, to which `src/system/save_table.c` casts the 56 initializers, each taking a pointer to its own block. The call passes one pointer, in the same register whatever its type, in every host ABI. Fixing it would take a wrapper for each of the 56 in a game file, for no change in what runs |
 
 The game's one read past a heap block whose bytes it uses, the copyright screen's (H1), isn't left out by the
@@ -211,7 +211,7 @@ has its row in [game-changes.md](game-changes.md) and its finding in [decomp-fin
 | --- | --- | --- | --- |
 | H1 | `src/gfl/arc_util.c`, `GFL_BGSysLoadNCGRStaticCore`, from the copyright screen (`src/ov162/boot_screens.c`): every route | Loads 0x8000 bytes of a file's characters, more than the file has, reading past its heap block into what follows it in the heap. Those tiles stay in VRAM, and the title screen's bottom screen shows them as it fades in, a lighter band over its lines 38 to 95 (the opening sequence's port frames 3527 to 3536 in Black 2) | The same read, which the hooks tell ASan is the DS's ([above](#what-frigate-tells-the-sanitizers)). From a blank save the host's heap holds there what the DS's does, and frame 3527's bottom screen differs from melonDS's in 8 pixels; from a save it holds other bytes there, and the band's noise differs from the DS's (10,764 pixels at its first frame, within the 3D's tolerance). A first fix loaded the characters alone and drew the background there (14,330 pixels apart from a blank save); the oracle comparison's 3D tolerance let it through, so the opening's and the title's first 34 frames of 3D are now held close (a sequence's `close` in [../tools/oracle/oracle.py](../tools/oracle/oracle.py), [../tools/oracle/README.md](../tools/oracle/README.md#comparing)) |
 | H2 | `src/system/gf_font.c`, `GFL_FontBitmapCopy_16x16` and the bit reader, at the title screen's first text: every route past it | The glyph copy reads 16 rows of a 15-row font's cell, and the byte after its last bits: 4 bytes past the cell's block (the 16th row is never drawn) | The host's cell has room for every row the copy reads, zeroed |
-| H3 | `src/system/printsys.c`, `func_020223cc`, New Game's intro | Ends a print stream's task, which frees the stream when the task's data was allocated, then clears the stream's task field: a write to freed memory | The host clears the field first |
+| H3 | `src/system/printsys.c`, `PrintStream_Delete`, New Game's intro | Ends a print stream's task, which frees the stream when the task's data was allocated, then clears the stream's task field: a write to freed memory | The host clears the field first |
 | H4 | `src/gfl/arc_util.c`, `GFL_BGSysLoadNCGRDynamicCore`, from the touch bars (`src/ov139/touchbar.c`, `src/ov298/zknd_tbar.c`): the test launcher's Pokédex, where the bytes after the file were free, found on the merged tree of 2026-10-19 | Asks for 32 * 64 bytes of the touch bar's characters, a file of 4 (128 bytes), reserving 64 characters and copying the file's last 16 bytes and 1,904 past its block into the 60 after the file's, which the bar's screen never shows | The host reserves the same characters and copies the file's alone; the others keep what VRAM held |
 
 The field's first survey, on 2026-10-23, ran `replay_new_game_house` (New Game through the field and the house to the
@@ -233,10 +233,13 @@ its encounters and battles track:
 
 The battles' track ran the same survey build on 2026-10-23 on the Route 19 route from the starter save (the oracle's
 `route19_save_b2_us.pbwinput`, port frames 0 to 7,623: CONTINUE, Route 19, the trainer's VS cut-in and Hugh's battle to
-the first move's menu, where `data_ov167_021d7490` stops the program; [STATUS.md](STATUS.md)). The deep dive's survey of
-the same route, on its scratch build, showed R6 to R10 and H6; after the track's fixes it shows only H6 and R10, and
-`replay_new_game_house` in the survey build runs all 18,800 frames with only H5 and H6 (H5, at the change of map into
-the house, is now its first report, where the strict build would stop; the strict build wasn't run):
+the first move's menu, where the battle's table of semi-invulnerable conditions, which had no C then
+(`data_ov167_021d7490`), stopped the program; [STATUS.md](STATUS.md)). The table is C since the sync of `629a53cccb`
+(`btl_pokeparam.c`'s `sSemiInvulnFlags`), and the survey build runs all 7,700 frames of the route's input with H7 and
+R10 alone ([below](#the-fields-sequences-under-the-strict-build); STATUS.md's T5 entry of 2026-10-24). The deep dive's
+survey of the same route, on its scratch build, showed R6 to R10 and H6; after the track's fixes it shows only H6 and
+R10, and `replay_new_game_house` in the survey build runs all 18,800 frames with only H5 and H6 (H5, at the change of
+map into the house, is now its first report, where the strict build would stop; the strict build wasn't run):
 
 | Report | Where | What the sanitizer saw | What the host does |
 | --- | --- | --- | --- |

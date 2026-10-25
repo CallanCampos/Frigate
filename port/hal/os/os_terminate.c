@@ -1,6 +1,6 @@
 // How the game stops, on the host: NitroSDK's OS_Terminate and OSi_TerminateCore (os_terminate_proc.c, whose halt is
-// assembly in the SDK) and the end of OS_ResetSystem in ITCM (OSi_DoResetSystem, assembly with no C). OS_Halt, the
-// rest of os_terminate_proc.c, is in core.c with the CPU's state.
+// assembly in the SDK) and the end of OS_ResetSystem in ITCM (OSi_DoResetSystem, in os_reset_itcm.c, which
+// port/hal/replaced.txt keeps out). OS_Halt, the rest of os_terminate_proc.c, is in core.c with the CPU's state.
 //
 // On the DS, OS_Terminate halts the CPU for good after the game's fatal error path, and OSi_DoResetSystem has the ARM7
 // restart the console. The host ends the program instead: a terminate with PORT_OS_TERMINATE_STATUS and a backtrace,
