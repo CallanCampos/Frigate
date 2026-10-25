@@ -2725,8 +2725,9 @@ data_ov011_0218e1e1 kind:bss addr:0x0218e221
 data_ov011_0218e1e2 kind:bss addr:0x0218e222
 data_ov011_0218e1e4 kind:bss addr:0x0218e224
 data_ov011_0218e1e8 kind:bss addr:0x0218e228
-data_ov011_0218e918 kind:bss addr:0x0218e958
-data_ov011_0218e920 kind:bss addr:0x0218e960
+sSendPoolHead kind:bss addr:0x0218e958
+sSendPoolSize kind:bss addr:0x0218e95c
+sTransport kind:bss addr:0x0218e960
 sNas kind:bss addr:0x0218e964
 data_ov011_0218e928 kind:bss addr:0x0218e968
 data_ov011_0218e930 kind:bss addr:0x0218e970

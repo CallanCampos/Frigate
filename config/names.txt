@@ -7930,6 +7930,8 @@ overlays/ov011 0x0218e040 sConnections
 overlays/ov011 0x0218e0c0 sConnectionInfos
 overlays/ov011 0x0218e1c0 sMatchState
 overlays/ov011 0x0218e1e0 sKeys
+overlays/ov011 0x0218e918 sSendPoolHead
+overlays/ov011 0x0218e920 sTransport
 overlays/ov011 0x0218e924 sNas
 overlays/ov011 0x0218e944 sResult
 overlays/ov011 0x0218e960 sInit
