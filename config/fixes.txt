@@ -883,6 +883,24 @@ overlays/ov011 0x02160e10 section_start lib/dwc/src/match/dwc_match.c:.text
 overlays/ov011 0x02161808 remove_reloc
 overlays/ov011 0x02161816 remove_reloc
 overlays/ov011 0x02161a9a remove_reloc
+overlays/ov011 0x02163a90 remove_reloc
+overlays/ov011 0x02163a9a remove_reloc
+overlays/ov011 0x02163aa2 remove_reloc
+overlays/ov011 0x02163ada remove_reloc
+overlays/ov011 0x02163ae2 remove_reloc
+overlays/ov011 0x02163ae6 remove_reloc
+overlays/ov011 0x02163af0 remove_reloc
+overlays/ov011 0x02163afa remove_reloc
+overlays/ov011 0x02163afe remove_reloc
+overlays/ov011 0x02163b06 remove_reloc
+overlays/ov011 0x02163b0a remove_reloc
+overlays/ov011 0x02163b14 remove_reloc
+overlays/ov011 0x02163b18 remove_reloc
+overlays/ov011 0x02163b20 remove_reloc
+overlays/ov011 0x02163b24 remove_reloc
+overlays/ov011 0x02163d90 remove_reloc
+overlays/ov011 0x02163f10 remove_reloc
+overlays/ov011 0x02163f24 remove_reloc
 overlays/ov011 0x0216c7ea reloc_module overlay(189)
 overlays/ov011 0x0216eba2 reloc_module overlay(189)
 overlays/ov011 0x0216ebe8 reloc_module overlay(189)

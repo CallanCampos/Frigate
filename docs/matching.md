@@ -1310,6 +1310,9 @@ Same code, other `sp` offsets or frame size.
 - In `call() != x`, MWCC compares the call's result second (`cmp r1, r0`). The result first (`cmp r0, r1`) is the
   result assigned to a local as its own statement and then compared: `snd_arc.c`'s `NNS_SndArcSetup` matches with
   `readSize = FS_ReadFile(...); if (readSize != arc->header.infoSize)`, where every cast on either side kept the order.
+  A field read through a call's result is the same: DWC's `DWCi_ProcessRecvMatchCommand` (`dwc_match.c`) compares
+  `cmp field, local` only as `token = DWCi_GetMatchCnt()->resvToken; if (token != word)`, while the read in place
+  puts the register local first whatever the types.
 - An argument of a call compared again unchanged after it is kept in a stack slot over the call; the original working
   it out again means its comparison was another expression. `snd_arc_loader.c`'s `LoadWaveArcTable` reads
   `sizeof(SNDWaveArc) + tableSize` bytes and matches only comparing `result != (int)sizeof(SNDWaveArc) + tableSize`,

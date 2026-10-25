@@ -1735,7 +1735,7 @@ static int DWCi_SendGPBuddyMsgCommand(void *gp, u8 command, int id, const char *
 
 static int DWCi_ProcessRecvMatchCommand(int type, s32 profileId, u32 ip, u16 port, const u32 *data, int count) {
     int n = 0;
-    u32 reply[0x40];
+    u32 reply[0x41];
     DWCNodeInfo request;
     DWCNodeInfo accepted;
     SOCSockAddrIn address;
@@ -1756,7 +1756,7 @@ static int DWCi_ProcessRecvMatchCommand(int type, s32 profileId, u32 ip, u16 por
     u32 code;
     u64 now;
     u32 word;
-    u32 hostPort;
+    u16 hostPort;
     int conn;
     u32 id;
     u8 aid;
@@ -1769,6 +1769,8 @@ static int DWCi_ProcessRecvMatchCommand(int type, s32 profileId, u32 ip, u16 por
     u8 mode;
     u8 value;
     u8 flag;
+    s32 token;
+    s32 pendingId;
 
     if (DWCi_GetMatchCnt() == NULL || DWCi_GetMatchCnt()->state == 0) {
         return 1;
@@ -1779,9 +1781,9 @@ static int DWCi_ProcessRecvMatchCommand(int type, s32 profileId, u32 ip, u16 por
     }
     switch (type) {
     case 1: {
-        blocked = 0;
         requestType = data[0];
         MI_CpuFill8(&request, 0, sizeof(DWCNodeInfo));
+        blocked = 0;
         request.profileId = profileId;
         request.aid = 0xff;
         request.publicIp = data[1];
@@ -1853,7 +1855,8 @@ static int DWCi_ProcessRecvMatchCommand(int type, s32 profileId, u32 ip, u16 por
             break;
         }
         word = data[11];
-        if (DWCi_GetMatchCnt()->resvToken != word) {
+        token = DWCi_GetMatchCnt()->resvToken;
+        if (token != word) {
             break;
         }
         if (count >= 14 && (data[13] == 1) != DWCi_GetMatchCnt()->memberConnecting) {
@@ -1943,7 +1946,7 @@ static int DWCi_ProcessRecvMatchCommand(int type, s32 profileId, u32 ip, u16 por
                 DWCi_GetMatchCnt()->sbUpdateTick = now;
             } else if (DWCi_GetMatchCnt()->qr2MatchType == 1) {
                 DWCi_ClearTargetNodeInfo();
-                DWCi_SendResvCommandToFriend(1, profileId, profileId);
+                DWCi_SendResvCommandToFriend(1, 0, 0);
             } else if (DWCi_GetMatchCnt()->qr2MatchType == 3) {
                 DWCi_GetMatchCnt()->scResvRetryMax = 1;
                 DWCi_GetMatchCnt()->scResvRetryCount = 0;
@@ -2109,7 +2112,8 @@ static int DWCi_ProcessRecvMatchCommand(int type, s32 profileId, u32 ip, u16 por
             node = DWCi_GetNodeInfoByProfileID(data[k]);
             if (node == NULL) {
                 id = data[k];
-                if (DWCi_GetMatchCnt()->pending.profileId == id) {
+                pendingId = DWCi_GetMatchCnt()->pending.profileId;
+                if (pendingId == id) {
                     DWCi_CloseConnectionHard(DWCi_GetMatchCnt()->pending.aid);
                     DWCi_GetMatchCnt()->pending.profileId = 0;
                     continue;

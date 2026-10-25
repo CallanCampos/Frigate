@@ -1141,6 +1141,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - Identical Thumb code that the probe calls 2 bytes short, before an ARM veneer: the symbol includes the linker's
   `mov r8, r8` pad; size it without the pad with `config_fixes.py add-function`. (matching.md: "a pad that belongs
   to no function")
+- The probe says MATCH but objdiff scores the function under 100%, with `thumb_call` relocations in its module's
+  `relocs.txt` from the function to labels inside it: dsd's records for a `bl` within the function, which MWCC
+  resolves itself; remove them with `config_fixes.py remove-reloc` (`DWCi_MatchProcess`, `DWCi_ProcessRecvMatchCommand`).
 
 - SDK assembly in an `asm` function: pre-UAL spellings, `@name:` labels, `dcd`, `ldr rX, =value`, and one `asm`
   function per entry point, falling into the next; no `entry`, so a second name comes from the configs or the linker.
