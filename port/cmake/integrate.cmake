@@ -1,14 +1,17 @@
 # The integration tests (port/tests/integrate), written in phase 1: the host DMA (VRAM and palette uploads, the 3D
 # display lists), the OS allocator's whole addresses and the main arena (the game's heaps), the buttons and lid, the
 # screens drawn by the scanline hook and the PNG screenshot, and the overlays' sections (with a probe file that
-# port/cmake/overlay_sections.cmake compiles as an overlay's), each run as the game's main() would on the whole
-# program's objects; and the program's own option checks (tests/app/check_exit.py).
+# port/cmake/overlay_sections.cmake compiles as an overlay's); and the field script's relative jumps, calls and actor
+# movements, back and forward (script_offsets.c: the starter scene's offsets, which a 64-bit host once read 4 GiB
+# forward); each run as the game's main() would on the whole program's objects; and the program's own option checks
+# (tests/app/check_exit.py).
 enable_testing()
 add_executable(port_integrate_tests
     "${CMAKE_CURRENT_SOURCE_DIR}/tests/integrate/test_integrate.c" "${CMAKE_CURRENT_SOURCE_DIR}/app/present.c"
     "${CMAKE_CURRENT_SOURCE_DIR}/app/gamepad.c" "${CMAKE_CURRENT_SOURCE_DIR}/app/window_icon.c"
     "${PORT_GEN}/window_icon_pixels.c" "${CMAKE_CURRENT_SOURCE_DIR}/app/run_dir.c"
     "${CMAKE_CURRENT_SOURCE_DIR}/tests/integrate/ovsec_probe.c"
+    "${CMAKE_CURRENT_SOURCE_DIR}/tests/integrate/script_offsets.c"
     $<TARGET_OBJECTS:pokebw2_game> $<TARGET_OBJECTS:port_hal> ${port_gfx_objects} "${PORT_GEN}/stubs.c")
 target_link_libraries(port_integrate_tests PRIVATE port_decomp_env SDL3::SDL3)
 target_include_directories(port_integrate_tests PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/..")
@@ -17,7 +20,8 @@ if(port_os_stack_probes)
     target_compile_options(port_integrate_tests PRIVATE ${port_os_stack_probes})
 endif()
 
-foreach(scenario IN ITEMS dma_copies dma_async dma_gx_command os_alloc main_arena input screens overlay_sections)
+foreach(scenario IN ITEMS dma_copies dma_async dma_gx_command os_alloc main_arena input screens overlay_sections
+                         script_offsets)
     add_test(NAME integrate_${scenario} COMMAND port_integrate_tests ${scenario})
     set_tests_properties(integrate_${scenario} PROPERTIES TIMEOUT 60)
 endforeach()

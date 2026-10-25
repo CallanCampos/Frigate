@@ -1,8 +1,10 @@
 // Tests of phase 1's integration: the host DMA (port/hal/dma), the OS allocator's 64-bit addresses
 // (port/hal/os/os_alloc_host.c) and the main arena's placement, the buttons and lid (port/hal/input), the screens drawn
 // by the scanline hook (port/gfx/screens.c), the PNG screenshot (port/app/present.c), and the overlays' sections,
-// which a load sets back (port/hal/fs/ovsec.c, with ovsec_probe.c). Each scenario runs as the game's main() would, as
-// the launcher of port_os_run, on the whole program's objects.
+// which a load sets back (port/hal/fs/ovsec.c, with ovsec_probe.c); and the game's own C where a host's 64-bit
+// pointers change what it computes: the field script's relative offsets (script_offsets.c, src/ov012/scrcmd_vm.c and
+// src/ov036/scrcmd_fldmmdl.c). Each scenario runs as the game's main() would, as the launcher of port_os_run, on the
+// whole program's objects.
 //
 //   port_integrate_tests NAME | all
 #include "app/present.h"
@@ -370,6 +372,14 @@ static void TestOverlaySections(void) {
     Check(port_test_ovsec_set[0] == 1 && port_test_ovsec_set[2] == 3, "and sets the set one back");
 }
 
+// The field script's relative offsets, back and forward, in its jumps and calls and in the movement an actor command
+// hands its actor (script_offsets.c)
+void port_test_script_offsets(void (*check)(int ok, const char *what));
+
+static void TestScriptOffsets(void) {
+    port_test_script_offsets(Check);
+}
+
 static const Test sTests[] = {
     { "dma_copies", TestDmaCopies },
     { "dma_async", TestDmaAsync },
@@ -379,6 +389,7 @@ static const Test sTests[] = {
     { "input", TestInput },
     { "screens", TestScreens },
     { "overlay_sections", TestOverlaySections },
+    { "script_offsets", TestScriptOffsets },
 };
 
 int main(int argc, char **argv) {
