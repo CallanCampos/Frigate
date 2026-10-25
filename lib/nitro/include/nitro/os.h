@@ -112,12 +112,12 @@ extern u32 SDK_AUTOLOAD_DTCM_START[];
 // over after that many bytes at the start of it)
 extern u8 SDK_IRQ_STACKSIZE[];
 extern u8 SDK_SYS_STACKSIZE[];
-// The module parameters' addresses in crt0.c: the static module's .bss and where its autoload blocks start (the end
-// of its .data), which are symbols of dsd's linker script, and NitroSDK's and TwlSDK's symbols for the two modules'
-// autoload lists and where the LTD module's blocks start, which the build writes and dsd's linker script lacks
-extern u8 ARM9_DATA_END[];
-extern u8 ARM9_BSS_START[];
-extern u8 ARM9_BSS_END[];
+// The module parameters' addresses in crt0.c, symbols of the linker script under NitroSDK's and TwlSDK's names:
+// where the static module's autoload blocks start (the end of its .data), its .bss, the two modules' autoload lists,
+// which the build writes after each module's blocks, and where the LTD module's blocks start
+extern u8 SDK_AUTOLOAD_START[];
+extern u8 SDK_STATIC_BSS_START[];
+extern u8 SDK_STATIC_BSS_END[];
 extern u8 SDK_AUTOLOAD_LIST[];
 extern u8 SDK_AUTOLOAD_LIST_END[];
 extern u8 SDK_LTDAUTOLOAD_LIST[];
