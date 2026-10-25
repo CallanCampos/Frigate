@@ -745,7 +745,7 @@ static void TestIrqOnSwitchIn(void) {
 //     inside the request: the wakeup preempts the caller and the flag is set when the call returns;
 //   - as a later interrupt (a timer here, as a PXI or DMA completion would be): the pure loop spins without end,
 //     since only a call into the HAL moves the clock. A loop that waits through the HAL (OS_SpinWaitSysCycles and
-//     SVC_WaitByLoop, as in PMi_SendPxiDataSync) does see it.
+//     SVC_WaitByLoop, as in PMi_TryToSendPxiDataTillSuccess) does see it.
 static BOOL sWriteDone; // plain, like backup_card.c's sWriteDone
 static void (*sTaskCallback)(void *);
 static OSAlarm sReplyAlarm;

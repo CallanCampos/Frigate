@@ -20,7 +20,7 @@
 #include "nitro/os.h"
 #include "twl/card.h"
 
-// The 0x88 bytes that follow the ROM's program (card_rom.c's sRomAuthCode)
+// The 0x88 bytes that follow the ROM's program (card_rom.c's CARDiOwnSignature)
 #define CARD_ROM_AUTH_CODE_SIZE 0x88
 
 static void CARDi_ReadRomTask(CARDiCommon *p);

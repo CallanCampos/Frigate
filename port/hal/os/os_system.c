@@ -3,8 +3,8 @@
 //
 // The busy loops of the DS (OS_SpinWait under OS_SpinWaitSysCycles, and the BIOS's WaitByLoop) are modelled
 // ones here: each moves the virtual clock by its length, and the events and interrupts on the way come as they would.
-// A no-op would hang their callers, which wait for state that an interrupt delivers (PMi_SendPxiDataSync, PM_Init,
-// OSi_DoLockByWord, CARD's pull-out check).
+// A no-op would hang their callers, which wait for state that an interrupt delivers (PMi_TryToSendPxiDataTillSuccess,
+// PM_Init, OSi_DoLockByWord, CARD's pull-out check).
 //
 // OS_WaitIrq is the decomp's lib/nitro/src/os/os_irqHandler.c (whose ITCM handlers, os_irqHandler_itcm.c's asm
 // functions, core.c replaces) and OS_WaitInterrupt the decomp's os_system.c, with OS_SetIrqCheckFlag's word reached

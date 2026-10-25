@@ -1,8 +1,9 @@
 // The host's size of the workspace that NitroWiFi's WCM (lib/nitrowifi/src/wcm) needs for its DS wireless backend,
 // which the game's Wi-Fi connection (Nintendo Wi-Fi Connection's access-point search, through DWC) sets up. Native
-// pointers enlarge WCMWork beyond the original WCM_WORK_SIZE, so under PLATFORM_PC WCM_GetRequiredWorkSize's DS case
-// (lib/nitrowifi/src/wcm/wcm.c) and DWC's two wrappers (lib/dwcutil/src/dwc_wcm.c, dwcutil_ac.c) use this extent,
-// and place their access-point descriptors after it; the test os_wcm_workspace (port/tests/os) checks it.
+// pointers enlarge WCMWork beyond the original WCM_WORK_SIZE, so under PLATFORM_PC WCM_GetWorkSize's DS case
+// (lib/nitrowifi/src/wcm/wcm_system.c) and DWC's two wrappers (lib/dwcutil/src/dwc_wcm.c, dwcutil_ac.c) use this
+// extent, and place their access-point descriptors after it; the test os_wcm_workspace (port/tests/os) checks it.
+// WCMWork is WCM's private type, in the header its files share (lib/nitrowifi/src/wcm/wcm_internal.h).
 #ifndef PORT_WCM_H
 #define PORT_WCM_H
 
