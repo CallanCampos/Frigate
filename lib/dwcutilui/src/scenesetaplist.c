@@ -1,0 +1,729 @@
+#include "scenesetaplist.h"
+#include "archive.h"
+#include "button.h"
+#include "cellinfo.h"
+#include "comment.h"
+#include "common.h"
+#include "dwc_util_oam_attr.h"
+#include "dwc_util_shared.h"
+#include "effect.h"
+#include "focus.h"
+#include "font.h"
+#include "graphics.h"
+#include "headline.h"
+#include "heap.h"
+#include "input.h"
+#include "main.h"
+#include "nitro/fx.h"
+#include "nitro/gx.h"
+#include "nitro/mi.h"
+#include "obj.h"
+#include "scenesetedit32.h"
+#include "scenesetsearch.h"
+#include "scenesetselectway.h"
+#include "scenesettestconfirm.h"
+#include "screen.h"
+#include "scrollbar.h"
+#include "search.h"
+#include "setting.h"
+#include "sound.h"
+#include "str.h"
+#include "task.h"
+#include "window.h"
+
+// The rows of the list on the screen, the height of a row, and the cursor's place on the button above the list
+#define AP_LIST_ROWS 4
+#define AP_LIST_ROW_HEIGHT 28
+#define AP_LIST_BUTTON 4
+
+// The list of the access points that the scan found
+typedef struct DWCUtilApList {
+    DWCUtilApEntry *entries;
+    // The screen behind the rows, and the palette whose row lights up the button
+    void *backScreen;
+    void *palette;
+    DWCUtilText *text;
+    // The icons of each row on the screen: the access point's security and its signal
+    GXOamAttr *securityOams[AP_LIST_ROWS + 1];
+    GXOamAttr *signalOams[AP_LIST_ROWS + 1];
+    // The task that scrolls the list by a row, and the VBlank task that scrolls the BGs
+    DWCUtilTask *scrollTask;
+    DWCUtilTask *vblankTask;
+    u16 scrollMax;
+    u16 securityChars[3];
+    u16 signalChars[4];
+    s8 touched;
+    u8 count;
+    u8 chosen;
+    // The scroll bar's travel
+    u8 barLength;
+    u8 confirmed;
+    u8 dragDelay;
+    u8 moved;
+    u8 dragging;
+    // Whether the end of the list has played its sound, for the scroll bar's arrows and for the buttons
+    u8 barAtEnd;
+    u8 atEnd;
+} DWCUtilApList;
+
+// The cursor and the scroll of the list, in pixels, which stay for the next visit
+typedef struct DWCUtilApListPos {
+    u8 cursor;
+    u16 scroll;
+} DWCUtilApListPos;
+
+static void initGraphics(void);
+static void initScrollBar(void);
+static void getCharName(void);
+static void procInit(void);
+static void procInit1(void);
+static void procInit2(void);
+static void procScene(void);
+static void input(void);
+static void draw(void);
+static void button(void);
+static void endScene(void);
+static void endScene1(void);
+static void endScene2(void);
+static void drawApInfo(void);
+static void drawAp(int index, int row);
+static void drapApObj(int index, int row);
+static void setOffset(void);
+static void taskUp(DWCUtilTask *task, void *arg);
+static void taskDown(DWCUtilTask *task, void *arg);
+static void taskVBlank(DWCUtilTask *task, void *arg);
+static void dispFocus(void);
+static void moveFocus(int direction);
+static void scrollUp(void);
+static void scrollDown(void);
+static void dispPushButton(void);
+static void procError(void);
+static void procError1(void);
+
+// The cells of the security icons, by the access point's security, and of the signal icons, by its link level
+static const u8 sApListSecurityCells[3] = { 0x2e, 0x2d, 0x33 };
+static const u8 sApListSignalCells[4] = { 0x18, 0x17, 0x16, 0x15 };
+// Where the rows and the button are touched, and where the cursor frames them: left, top, right and bottom
+static const u16 sApListRowRects[AP_LIST_ROWS + 1][4] = {
+    { 7, 0x32, 0xd0, 0x4c }, { 7, 0x4e, 0xd0, 0x68 },    { 7, 0x6a, 0xd0, 0x84 },
+    { 7, 0x86, 0xd0, 0xa0 }, { 0x85, 0x1b, 0xfd, 0x2c },
+};
+static const u16 sApListCursorRects[AP_LIST_ROWS + 1][4] = {
+    { 4, 0x2e, 0xdb, 0x3f }, { 4, 0x4a, 0xdb, 0x5b },    { 4, 0x66, 0xdb, 0x77 },
+    { 4, 0x82, 0xdb, 0x93 }, { 0x82, 0x18, 0xf0, 0x2c },
+};
+
+static DWCUtilApListPos sApListPos;
+static DWCUtilApList *sApList;
+
+void DWCi_SceneSetApList(void) {
+    int again;
+
+    sApList = DWCi_HEAPlAllocEx(sizeof(DWCUtilApList), 4);
+    DWCi_GetParam2_(&again, NULL);
+    if (again == 0) {
+        sApListPos.cursor = 0;
+        sApListPos.scroll = 0;
+    }
+    sApList->count = DWCi_SEARCHlGetApInfo(&sApList->entries);
+    initGraphics();
+    DWCi_HLlLoadSet();
+    DWCi_COMMENTlDispEx(0x34, -1, 0);
+    DWCi_CMNlStep(2);
+    initScrollBar();
+    getCharName();
+    sApList->text = DWCi_FNTlFormBgEx(0, 0);
+    sApList->vblankTask = DWCi_TSKlForm(1, taskVBlank, NULL, 0x6e);
+    drawApInfo();
+    dispFocus();
+    DWCi_ChangeScene(procInit);
+}
+
+static void initGraphics(void) {
+    char backPath[] = "char/xb4ApListBack.nsc.l";
+    char palettePath[] = "char/ybBgStep31.ncl.l";
+
+    DWCi_CMNlLoadResource("char/jb4ApList.nsc.l", GX_LoadBG3Scr);
+    sApList->backScreen = DWCi_ARClReadEx(DWCi_Char(backPath), NULL, 4);
+    DWCi_SCREENlInit(sApList->backScreen);
+    DWCi_SCREENlRenew();
+    sApList->palette = DWCi_ARClReadEx(DWCi_Char(palettePath), NULL, 4);
+    G2S_SetBG0Priority(3);
+    G2S_SetBG1Priority(3);
+    G2_SetBG0Priority(3);
+    G2_SetBG1Priority(2);
+    G2_SetBG2Priority(3);
+    G2_SetBG3Priority(2);
+}
+
+// The scroll bar, with a handle for the lists of up to 8 and of more access points
+static void initScrollBar(void) {
+    int pos = 0;
+    int kind;
+
+    sApList->scrollMax = (sApList->count - AP_LIST_ROWS) * AP_LIST_ROW_HEIGHT;
+    if (sApList->count <= AP_LIST_ROWS) {
+        kind = 0;
+        sApList->barLength = 0;
+    } else if (sApList->count <= AP_LIST_ROWS * 2) {
+        kind = 1;
+        sApList->barLength = 0x1f;
+    } else {
+        kind = 2;
+        sApList->barLength = 0x37;
+    }
+    if (kind != 0) {
+        pos = FX_DivS32(sApListPos.scroll * sApList->barLength, sApList->scrollMax);
+    }
+    DWCi_SBlInit(kind, 0x55, 0xec, 0x3f, pos);
+}
+
+static void getCharName(void) {
+    int rows = sApList->count;
+    int i;
+    u32 kind;
+    u32 level;
+
+    if (rows > AP_LIST_ROWS + 1) {
+        rows = AP_LIST_ROWS + 1;
+    }
+    for (i = 0; i < rows; i++) {
+        sApList->securityOams[i] = DWCi_CEINlSetExObj(0, 0x2e);
+        sApList->signalOams[i] = DWCi_CEINlSetExObj(0, 0x18);
+    }
+    for (kind = 0; kind < NELEMS(sApListSecurityCells); kind++) {
+        DWCi_CEINlSet(0, sApListSecurityCells[kind], sApList->securityOams[0]);
+        sApList->securityChars[kind] = sApList->securityOams[0]->attr2 & GX_OAM_ATTR2_NAME_MASK;
+    }
+    for (level = 0; level < NELEMS(sApListSignalCells); level++) {
+        DWCi_CEINlSet(0, sApListSignalCells[level], sApList->signalOams[0]);
+        sApList->signalChars[level] = sApList->signalOams[0]->attr2 & GX_OAM_ATTR2_NAME_MASK;
+    }
+    for (i = 0; i < rows; i++) {
+        G2_SetOBJPriority(sApList->securityOams[i], 3);
+        G2_SetOBJPriority(sApList->signalOams[i], 3);
+    }
+}
+
+static void procInit(void) {
+    DWCi_EFFlFade(DWC_UTIL_FADE_FROM_WHITE, 1, GX_BLEND_PLANEMASK_BG0, 8);
+    DWCi_EFFlFade(DWC_UTIL_FADE_FROM_WHITE, 0,
+                  GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_BG3 | GX_BLEND_PLANEMASK_OBJ, 8);
+    DWCi_GXlVisible(1, GX_PLANEMASK_BG0);
+    DWCi_GXlVisible(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_BG3 | GX_PLANEMASK_OBJ);
+    DWCi_ChangeScene(procInit1);
+}
+
+static void procInit1(void) {
+    if (DWCi_EFFlCheck(1) == 0 && DWCi_EFFlCheck(0) == 0) {
+        DWCi_CMNlButton(0);
+        DWCi_ChangeScene(procInit2);
+    }
+}
+
+static void procInit2(void) {
+    if (DWCi_BTNlGet() != -2) {
+        DWCi_BTNlEnable();
+        DWCi_ChangeScene(procScene);
+    }
+}
+
+static void procScene(void) {
+    input();
+    draw();
+    button();
+}
+
+static void input(void) {
+    int i;
+
+    if (sApList->scrollTask != NULL || sApList->dragging) {
+        return;
+    }
+    if (DWCi_TPlCheckTrigger(gDWCUtilTouchScreenRect)) {
+        sApList->touched = -1;
+        for (i = 0; i < NELEMS(sApListRowRects); i++) {
+            if (DWCi_TPlCheckTrigger(sApListRowRects[i])) {
+                if (i < AP_LIST_ROWS) {
+                    sApList->touched = i;
+                    break;
+                }
+                DWCi_BTNlSet(1);
+                sApListPos.cursor = i;
+                dispFocus();
+                return;
+            }
+        }
+    }
+    if (DWCi_TPlCheckRelease(gDWCUtilTouchScreenRect)) {
+        for (i = 0; i < AP_LIST_ROWS; i++) {
+            if (DWCi_TPlCheckRelease(sApListRowRects[i])) {
+                if (sApList->touched != i) {
+                    break;
+                }
+                if (i >= sApList->count) {
+                    DWCi_SNDlPlay(9);
+                    break;
+                }
+                DWCi_BTNlSet(1);
+                sApListPos.cursor = i;
+                dispFocus();
+                return;
+            }
+        }
+    }
+    if (DWCi_IPTlCheckTrigger(1)) {
+        DWCi_BTNlSet(1);
+        DWCi_SBlDisable();
+    } else if (DWCi_IPTlCheckTrigger(2)) {
+        DWCi_BTNlSet(0);
+    } else if (DWCi_IPTlCheckRepeat(0x200)) {
+        scrollDown();
+    } else if (DWCi_IPTlCheckRelease(0x200)) {
+        sApList->atEnd = FALSE;
+    } else if (DWCi_IPTlCheckRepeat(0x100)) {
+        scrollUp();
+    } else if (DWCi_IPTlCheckRelease(0x100)) {
+        sApList->atEnd = FALSE;
+    } else if (DWCi_IPTlCheckRepeat(0x40)) {
+        moveFocus(1);
+    } else if (DWCi_IPTlCheckRelease(0x40)) {
+        sApList->atEnd = FALSE;
+    } else if (DWCi_IPTlCheckRepeat(0x80)) {
+        moveFocus(3);
+    } else if (DWCi_IPTlCheckRelease(0x80)) {
+        sApList->atEnd = FALSE;
+    }
+}
+
+// The scroll bar: its handle dragged, or its arrows
+static void draw(void) {
+    int offset;
+
+    if (sApList->scrollTask != NULL) {
+        return;
+    }
+    if (sApList->dragDelay != 0) {
+        sApList->dragDelay--;
+    }
+    switch (DWCi_SBlGetState()) {
+    case 1:
+        sApList->dragging = TRUE;
+        DWCi_BTNlDisable();
+        break;
+    case 2:
+        if (sApList->dragDelay == 0) {
+            DWCi_FOCUSlDelete();
+            sApListPos.scroll = FX_DivS32(DWCi_SBlGet() * sApList->scrollMax, sApList->barLength);
+            drawApInfo();
+            sApList->dragDelay = 4;
+        }
+        break;
+    case 3:
+        sApList->dragging = FALSE;
+        DWCi_BTNlEnable();
+        sApListPos.scroll = FX_DivS32(DWCi_SBlGet() * sApList->scrollMax, sApList->barLength);
+        DWCi_SNDlPlay(0x13);
+        drawApInfo();
+        offset = FX_ModS32(sApListPos.scroll, AP_LIST_ROW_HEIGHT);
+        if (offset == 0) {
+            dispFocus();
+        } else if (offset < AP_LIST_ROW_HEIGHT / 2) {
+            sApList->scrollTask = DWCi_TSKlForm(0, taskUp, NULL, 0x78);
+        } else {
+            sApList->scrollTask = DWCi_TSKlForm(0, taskDown, NULL, 0x78);
+        }
+        break;
+    case 4:
+        if (sApListPos.scroll == 0) {
+            if (!sApList->barAtEnd) {
+                DWCi_SNDlPlay(9);
+                sApList->barAtEnd = TRUE;
+            }
+        } else {
+            DWCi_SNDlPlay(0x13);
+            sApList->scrollTask = DWCi_TSKlForm(0, taskUp, NULL, 0x78);
+        }
+        break;
+    case 6:
+        if (sApList->count <= AP_LIST_ROWS || sApListPos.scroll == sApList->scrollMax) {
+            if (!sApList->barAtEnd) {
+                DWCi_SNDlPlay(9);
+                sApList->barAtEnd = TRUE;
+            }
+        } else {
+            DWCi_SNDlPlay(0x13);
+            sApList->scrollTask = DWCi_TSKlForm(0, taskDown, NULL, 0x78);
+        }
+        break;
+    case 5:
+    case 7:
+        sApList->barAtEnd = FALSE;
+        break;
+    }
+}
+
+static void button(void) {
+    int index;
+
+    if (sApList->scrollTask != NULL || sApList->dragging) {
+        return;
+    }
+    switch (DWCi_BTNlGet()) {
+    case 0:
+        DWCi_SNDlPlay(7);
+        break;
+    case 1:
+        if (sApListPos.cursor == AP_LIST_BUTTON) {
+            sApList->confirmed = TRUE;
+            DWCi_SNDlPlay(6);
+            dispPushButton();
+        } else {
+            index = sApListPos.cursor + FX_DivS32(sApListPos.scroll, AP_LIST_ROW_HEIGHT);
+            if (sApList->entries[index].security == 2) {
+                DWCi_SNDlPlay(9);
+                DWCi_SBlDisable();
+                DWCi_BTNlDisable();
+                DWCi_WINlInitEx(0xe, 1, 1, -1, 0);
+                DWCi_ChangeScene(procError);
+                return;
+            }
+            sApList->confirmed = TRUE;
+            sApList->chosen = index;
+            DWCi_SNDlPlay(6);
+        }
+        break;
+    default:
+        return;
+    }
+    DWCi_ChangeScene(endScene);
+}
+
+static void endScene(void) {
+    DWCi_BTNlDisable();
+    DWCi_EFFlWait(8);
+    DWCi_ChangeScene(endScene1);
+}
+
+static void endScene1(void) {
+    if (DWCi_EFFlCheck(1) == 0) {
+        if (sApList->confirmed) {
+            DWCi_BTNlEnd();
+        } else {
+            DWCi_BTNlDisable();
+        }
+        DWCi_EFFlFade(DWC_UTIL_FADE_TO_WHITE, 1, GX_BLEND_PLANEMASK_BG0, 8);
+        DWCi_EFFlFade(DWC_UTIL_FADE_TO_WHITE, 0,
+                      GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_BG3 | GX_BLEND_PLANEMASK_OBJ,
+                      8);
+        DWCi_ChangeScene(endScene2);
+    }
+}
+
+// Frees the list and goes on: back, to the button's screen, or to the chosen access point's security key
+static void endScene2(void) {
+    int i;
+
+    if (DWCi_EFFlCheck(1) != 0 || DWCi_EFFlCheck(0) != 0 || !DWCi_BTNlIsEnd()) {
+        return;
+    }
+    DWCi_TSKlDeleteEx(1, sApList->vblankTask);
+    for (i = 0; i < AP_LIST_ROWS + 1; i++) {
+        if (sApList->securityOams[i] != NULL) {
+            DWCi_OBJlDelete(sApList->securityOams[i]);
+        }
+        if (sApList->signalOams[i] != NULL) {
+            DWCi_OBJlDelete(sApList->signalOams[i]);
+        }
+    }
+    DWCi_FNTlDeleteBg(sApList->text);
+    DWCi_SBlEnd();
+    DWCi_FOCUSlDelete();
+    DWCi_COMMENTlDelete();
+    DWCi_SCREENlEnd();
+    DWCi_ARClRelease(sApList->backScreen);
+    DWCi_ARClRelease(sApList->palette);
+    DWCi_GXlInvisible(1, GX_PLANEMASK_BG0);
+    DWCi_GXlInvisible(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_BG3 | GX_PLANEMASK_OBJ);
+    G2_SetBG0Offset(0, 0);
+    G2_SetBG2Offset(0, 0);
+    if (!sApList->confirmed) {
+        DWCi_SEARCHlEnd();
+        DWCi_SETTINGlSetSetting(DWCi_SETTIGNlGet()->index);
+        DWCi_SetParam_(2, 0);
+        DWCi_ChangeScene(DWCi_SceneSetSelectWay);
+    } else if (sApListPos.cursor == AP_LIST_BUTTON) {
+        DWCi_SEARCHlEnd();
+        DWCi_SetParam_(0, 1);
+        DWCi_ChangeScene(DWCi_SceneSetSearch);
+    } else {
+        DWCi_SETTINGlSetSsid(sApList->entries[sApList->chosen].ssid);
+        DWCi_SetParam_(0, 0);
+        if (sApList->entries[sApList->chosen].security != 0) {
+            DWCi_SetParam_(0, 1);
+            DWCi_SetParam2_(1, 1);
+            DWCi_ChangeScene(DWCi_SceneSetEdit32);
+        } else {
+            DWCi_SetParam_(0, 1);
+            DWCi_SetParam2_(0, 1);
+            DWCi_ChangeScene(DWCi_SceneSetTestConfirm);
+        }
+    }
+    DWCi_HEAPlFree_(&sApList);
+}
+
+// Draws the rows on the screen from the scroll
+static void drawApInfo(void) {
+    int top = FX_DivS32(sApListPos.scroll, AP_LIST_ROW_HEIGHT);
+    int rows = sApList->count;
+    int row;
+    int index;
+
+    DWCi_FNTlClear(sApList->text, 0);
+    if (rows > AP_LIST_ROWS + 1) {
+        rows = AP_LIST_ROWS + 1;
+    }
+    for (row = 0, index = top; row < rows; row++) {
+        drawAp(index++, row);
+    }
+    for (row = 0; row < rows; row++) {
+        drapApObj(top++, row);
+    }
+    DWCi_FNTlRenewBg(sApList->text);
+    setOffset();
+}
+
+// The access point's SSID, on two lines when it is longer than 16 characters
+static void drawAp(int index, int row) {
+    int length = DWCi_STRlNLen(sApList->entries[index].ssid, sizeof(sApList->entries[index].ssid));
+    int y = row * AP_LIST_ROW_HEIGHT;
+    u16 line[17];
+    int count;
+    int i;
+
+    if (index >= sApList->count) {
+        return;
+    }
+    if (length <= 16) {
+        y += 6;
+    }
+    MI_CpuFill8(line, 0, sizeof(line));
+    count = length <= 16 ? length : 16;
+    for (i = 0; i < count; i++) {
+        line[i] = sApList->entries[index].ssid[i];
+    }
+    DWCi_FNTlDrawStringEx(sApList->text, 10, y, 2, 10, line, 1);
+    if (length > 16) {
+        MI_CpuFill8(line, 0, sizeof(line));
+        for (i = 0; i < length - 16; i++) {
+            line[i] = sApList->entries[index].ssid[16 + i];
+        }
+        y += 12;
+        DWCi_FNTlDrawStringEx(sApList->text, 10, y, 2, 10, line, 1);
+    }
+}
+
+static void drapApObj(int index, int row) {
+    if (index >= sApList->count) {
+        return;
+    }
+    G2_SetOBJCharName(sApList->securityOams[row], sApList->securityChars[sApList->entries[index].security]);
+    G2_SetOBJCharName(sApList->signalOams[row], sApList->signalChars[sApList->entries[index].linkLevel]);
+}
+
+// Moves the icons to the rows' places from the scroll, and has the BGs follow at the next VBlank
+static void setOffset(void) {
+    int y = 0x36 - FX_ModS32(sApListPos.scroll, AP_LIST_ROW_HEIGHT);
+    int rows = sApList->count;
+    int row;
+
+    if (rows > AP_LIST_ROWS + 1) {
+        rows = AP_LIST_ROWS + 1;
+    }
+    for (row = 0; row < rows; row++) {
+        DWCUtilOam_SetPosition(sApList->securityOams[row], 0xb3, y - 2);
+        DWCUtilOam_SetPosition(sApList->signalOams[row], 0xd2, y + 1);
+        y += AP_LIST_ROW_HEIGHT;
+    }
+    sApList->moved = TRUE;
+}
+
+// Scrolls the list up by 4 pixels a frame, until it rests on a row
+static void taskUp(DWCUtilTask *task, void *arg) {
+    int offset;
+
+    DWCi_SBlDisable();
+    DWCi_FOCUSlDelete();
+    if (sApListPos.scroll > 4) {
+        sApListPos.scroll -= 4;
+    } else {
+        sApListPos.scroll = 0;
+    }
+    offset = FX_ModS32(sApListPos.scroll, AP_LIST_ROW_HEIGHT);
+    if (offset == AP_LIST_ROW_HEIGHT - 4) {
+        drawApInfo();
+        return;
+    }
+    if (offset > AP_LIST_ROW_HEIGHT - 4) {
+        sApListPos.scroll += AP_LIST_ROW_HEIGHT - offset;
+        offset = 0;
+    }
+    setOffset();
+    if (offset == 0) {
+        DWCi_SBlSet(FX_DivS32(sApListPos.scroll * sApList->barLength, sApList->scrollMax));
+        DWCi_SBlEnable();
+        dispFocus();
+        sApList->scrollTask = NULL;
+        DWCi_TSKlDelete(0, task);
+    }
+}
+
+// Scrolls the list down by 4 pixels a frame, until it rests on a row
+static void taskDown(DWCUtilTask *task, void *arg) {
+    int offset;
+
+    DWCi_SBlDisable();
+    DWCi_FOCUSlDelete();
+    sApListPos.scroll += 4;
+    offset = FX_ModS32(sApListPos.scroll, AP_LIST_ROW_HEIGHT);
+    if (offset >= 4) {
+        setOffset();
+        return;
+    }
+    sApListPos.scroll -= offset;
+    drawApInfo();
+    DWCi_SBlSet(FX_DivS32(sApListPos.scroll * sApList->barLength, sApList->scrollMax));
+    DWCi_SBlEnable();
+    dispFocus();
+    sApList->scrollTask = NULL;
+    DWCi_TSKlDelete(0, task);
+}
+
+static void taskVBlank(DWCUtilTask *task, void *arg) {
+    if (sApList->moved) {
+        int y = FX_ModS32(sApListPos.scroll, AP_LIST_ROW_HEIGHT) - 0x32;
+
+        G2_SetBG0Offset(0, y);
+        G2_SetBG2Offset(0, y);
+        sApList->moved = FALSE;
+    }
+}
+
+static void dispFocus(void) {
+    u8 cursor = sApListPos.cursor;
+    int pair = 2;
+
+    if (cursor >= AP_LIST_ROWS) {
+        pair = 3;
+    }
+    DWCi_FOCUSlDisp(pair, sApListCursorRects[cursor][0], sApListCursorRects[cursor][2], sApListCursorRects[cursor][1]);
+}
+
+// Moves the cursor up (1) or down (3), scrolling the list at its ends
+static void moveFocus(int direction) {
+    BOOL moved = TRUE;
+
+    switch (sApListPos.cursor) {
+    case 0:
+        if (direction == 1) {
+            if (sApListPos.scroll == 0) {
+                sApListPos.cursor = AP_LIST_BUTTON;
+            } else {
+                DWCi_SNDlPlay(0x13);
+                sApList->scrollTask = DWCi_TSKlForm(0, taskUp, NULL, 0x78);
+                return;
+            }
+        } else if (sApList->count > 1) {
+            sApListPos.cursor++;
+        } else {
+            moved = FALSE;
+        }
+        break;
+    case 1:
+    case 2:
+        if (direction == 1) {
+            sApListPos.cursor--;
+        } else if (sApList->count > sApListPos.cursor + 1) {
+            sApListPos.cursor++;
+        } else {
+            moved = FALSE;
+        }
+        break;
+    case 3:
+        if (direction == 1) {
+            sApListPos.cursor--;
+        } else {
+            scrollDown();
+            return;
+        }
+        break;
+    case AP_LIST_BUTTON:
+        if (direction == 1) {
+            moved = FALSE;
+        } else {
+            sApListPos.scroll = 0;
+            sApListPos.cursor = 0;
+            drawApInfo();
+            DWCi_SBlSet(0);
+        }
+        break;
+    }
+    if (!moved) {
+        if (!sApList->atEnd) {
+            DWCi_SNDlPlay(9);
+            sApList->atEnd = TRUE;
+        }
+    } else {
+        DWCi_SNDlPlay(8);
+        dispFocus();
+    }
+}
+
+// Scrolls the list up by a row
+static void scrollUp(void) {
+    if (sApListPos.scroll == 0) {
+        if (!sApList->atEnd) {
+            DWCi_SNDlPlay(9);
+            sApList->atEnd = TRUE;
+        }
+    } else {
+        DWCi_SNDlPlay(0x13);
+        sApList->scrollTask = DWCi_TSKlForm(0, taskUp, NULL, 0x78);
+    }
+}
+
+// Scrolls the list down by a row
+static void scrollDown(void) {
+    if (sApListPos.scroll == sApList->scrollMax || sApList->count <= AP_LIST_ROWS) {
+        if (!sApList->atEnd) {
+            DWCi_SNDlPlay(9);
+            sApList->atEnd = TRUE;
+        }
+    } else {
+        DWCi_SNDlPlay(0x13);
+        sApList->scrollTask = DWCi_TSKlForm(0, taskDown, NULL, 0x78);
+    }
+}
+
+// Lights up the button: its row of the palette
+static void dispPushButton(void) {
+    u8 rows[] = { 2 };
+
+    DWCi_SCREENlCopyPalette(sApList->palette, rows[0], rows[0]);
+}
+
+static void procError(void) {
+    if (DWCi_WINlGet() == 0) {
+        DWCi_SNDlPlay(6);
+        DWCi_WINlEnd();
+        DWCi_ChangeScene(procError1);
+    }
+}
+
+static void procError1(void) {
+    if (!DWCi_WINlIsInit()) {
+        DWCi_BTNlEnable();
+        DWCi_SBlEnable();
+        DWCi_ChangeScene(procScene);
+    }
+}

@@ -408,18 +408,6 @@ typedef struct {
 
 typedef void (*MBCallbackFunc)(u16 event, void *arg);
 
-// What the wireless manager is set up with
-typedef struct {
-    u16 lifeMp;
-    u16 lifeCam;
-    u16 lifeTable;
-    u16 lifeFrame;
-    u32 powerOn;
-    const u16 *name;
-    u32 ggid;
-    u32 ggidMask;
-} MBWmConfig;
-
 // A parent that the scan found
 typedef struct {
     u8 desc[0xc0];

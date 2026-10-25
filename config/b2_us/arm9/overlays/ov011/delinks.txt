@@ -323,6 +323,7 @@ lib/dwc/src/gstats/gbucket.c:
     .bss        start:0x02191770 end:0x02191780
 
 lib/dwc/src/gstats/gstats.c:
+    complete
     .text       start:0x0217beac end:0x0217c788
     .rodata     start:0x021850a8 end:0x021851b8
     .data       start:0x02188f5c end:0x021890b0
@@ -353,6 +354,7 @@ lib/dwc/src/qr2/qr2.c:
     .bss        start:0x02192140 end:0x02192298
 
 lib/dwc/src/qr2/qr2regkeys.c:
+    complete
     .text       start:0x02181fb0 end:0x02182040
     .data       start:0x0218b2d0 end:0x0218b87c
 
@@ -389,6 +391,7 @@ lib/dwc/src/base/dwc_nonport.c:
     .bss        start:0x0218dfc8 end:0x0218dfd0
 
 lib/dwc/src/transport/dwc_transport.c:
+    complete
     .text       start:0x02168818 end:0x021694d4
     .data       start:0x02185ad8 end:0x02185ae8
     .bss        start:0x0218e918 end:0x0218e924
@@ -518,6 +521,7 @@ lib/dwc/src/base/dwc_nastime.c:
     .bss        start:0x0218dfd4 end:0x0218dfe8
 
 lib/dwc/src/base/dwc_common.c:
+    complete
     .text       start:0x0215e160 end:0x0215e344
     .data       start:0x0218578c end:0x02185798
     .bss        start:0x0218dfe8 end:0x0218e000

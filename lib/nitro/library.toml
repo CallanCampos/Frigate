@@ -22,6 +22,9 @@ flags = [
     "-nolink",
     "-msgstyle gcc",
 ]
+# syscall/secure_area.s, the system call library's BIOS stubs, hand-written assembly, with mwasmarm of the same version
+# for ARMv5TE, the ARM946E-S's architecture; the file switches to Thumb itself
+asm_flags = ["-proc arm5TE", "-msgstyle gcc"]
 
 # The multiboot library (libmb), which overlay 181 links for the parent of DS Download Play, is Thumb code like the
 # game's, with -ipa file (its statics and the globals it defines are reached from one base) and -inline on,noauto
@@ -142,6 +145,3 @@ flags = [
 "wm/wm_common.c" = ["-thumb"]
 "ctrdg/ctrdg.c" = ["-thumb"]
 "ctrdg/ctrdg_proc.c" = ["-thumb"]
-
-# The system call library's BIOS stubs, Thumb asm functions
-"syscall/secure_area.c" = ["-thumb"]

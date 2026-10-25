@@ -35,9 +35,12 @@ flagged exception.
 
 The exception departs from three rules: the listed code is written from another decomp with no asm to check it
 against, it has no address to be placed by, and its file is marked complete although that code was never compared.
-It is used for `src/system/wipe_sub.c` alone, whose 31 dead wipe handlers and their engines come from pret's
-pokeplatinum and pokeheartgold, with the two window readers `wipe_wnd.c` lost with them. Any other entry is another
-exception for the maintainer to accept.
+It is used for `src/system/wipe_sub.c`, whose 31 dead wipe handlers and their engines come from pret's
+pokeplatinum and pokeheartgold, with the two window readers `wipe_wnd.c` lost with them, and, by the maintainer's
+ruling of 2026-10-25, for GameSpy code that GameSpy's SDK (UniSpySDK's copy) shows: `qr2regkeys.c`'s key list,
+whose 4-byte `.bss` static the strip drops with its two functions while its place in MWCC's size heapsort gives the key
+names the ROM's order, and `gstats.c`'s 23 functions the game doesn't call, whose statics, local initializers and
+first `""` give the file's data the ROM's layout. Any other entry is another exception for the maintainer to accept.
 
 The strip drops each listed symbol's section, every allocated section that only dropped code reaches (a static
 function, a string, an unpooled static), the exception indices of dropped code, the relocations of what stays (the
@@ -73,11 +76,33 @@ NitroSDK's code reads a few numbers, such as `SDK_IRQ_STACKSIZE`, as the address
 script defines, so the ROM has them as plain words in the literal pools that load them, with no relocation. dsd's linker
 script defines only `__OVERLAY_COUNT` of them. `config/linker_symbols.toml` gives the others and their values, the same
 in both versions: the stack sizes, which `os_interrupt.c`, `os_thread.c`, `os_arena.c` and the startup code `crt0.c`
-(`_start`, `func_02004d50` and `func_02004da0`) read, and the start of the DSi's extended main memory arena, which
-`os_arena.c` reads. `dsd lcf --symbols config/linker_symbols.toml` defines them after `__OVERLAY_COUNT` as absolute
-symbols in the linker script it writes, `build/<version>/arm9.lcf`, which the link (or `--shift`'s padding) takes,
-as NitroSDK's template defines them in its own. Another one goes in the config when a file that reads it is written,
-with its value read from the pool word in both versions.
+(`_start`, `INITi_ShelterStaticInitializer` and `INITi_CallStaticInitializers`) read, and the start of the DSi's
+extended main memory arena, which `os_arena.c` reads. `dsd lcf --symbols config/linker_symbols.toml` defines them after
+`__OVERLAY_COUNT` as absolute symbols in the linker script it writes, `build/<version>/arm9.lcf`, which the link (or
+`--shift`'s padding) takes, as NitroSDK's template defines them in its own. Another one goes in the config when a file
+that reads it is written, with its value read from the pool word in both versions.
+
+`crt0.c`'s module parameters, `BuildInfo` (NitroSDK's `_start_ModuleParams`) and `LtdModuleParams` (TwlSDK's
+`_start_LtdModuleParams`), hold the places of the modules, which dsd's linker script defines after the modules under
+the SDK's names, from the modules' section symbols, as NitroSDK's template does:
+
+| Symbol | Black 2 / White 2 | Value |
+| --- | --- | --- |
+| `SDK_AUTOLOAD_START` | `0x0209d740` / `0x0209d780` | the end of ARM9 main's initialized data, where the autoload blocks start |
+| `SDK_STATIC_BSS_START`, `SDK_STATIC_BSS_END` | `0x0209d740`-`0x0214f500` / `0x0209d780`-`0x0214f540` | ARM9 main's `.bss` |
+| `SDK_AUTOLOAD_LIST` | `0x0209ebc0` / `0x0209ec00` | after the blocks: `SDK_AUTOLOAD_START` plus the size of each autoload's initialized data |
+| `SDK_AUTOLOAD_LIST_END` | `0x0209ec00` / `0x0209ec40` | the list plus its size, 16 bytes for each of the 4 autoloads in TwlSDK's format |
+| `SDK_LTDAUTOLOAD_START` | `0x02400004` | the ARM9i program's base plus its static part, the 4-byte word that TwlSDK writes when the LTD module has no static code |
+| `SDK_LTDAUTOLOAD_LIST` | `0x0246aee4` | after the LTD autoload's block |
+| `SDK_LTDAUTOLOAD_LIST_END` | `0x0246aef4` | the list plus its one entry |
+
+The lists' sizes and the LTD module's static part come from the ROM, the rest from the link. `rom build` writes the same
+values again when it puts the modules and their lists together, and fills in the words that are 0 in the C: the end of
+each compressed module, which only the compression gives, as NitroSDK's compressor does. The static module's end is 0
+in the extracted program too, as dsd decompresses it, but the LTD module's (`0x02421c40` / `0x02421c38`) is kept there,
+so `dsd check modules` takes that word from the extracted program, as it does the overlay digests. The words point at
+the symbols through `link_time_const` relocations, `config_fixes.py link-time-const . SDK_AUTOLOAD_LIST 0x02004fb0`,
+so that the original's objects link to them as the C does.
 
 ## Compiler exception indices
 
@@ -186,6 +211,17 @@ Black 2 is an NDS/DSi hybrid built with the TWL-SDK, which differs from DS-only 
   program. The build recomputes all of these.
 - The digests of the ARM9 secure area are computed over its encrypted form. Without an ARM7 BIOS the build reuses
   the original values, which stay valid as long as the secure area is unchanged.
+- The secure area, `0x02004000` to `0x02004800`, is NitroSDK's system call library, which Nintendo builds for each
+  game: 18 Thumb BIOS stubs at places of the game's own among filler bytes, in another order in each version
+  (`lib/nitro/src/syscall/secure_area.s`). The stubs are assembled, and the filler comes from the base ROM like the
+  DSP's images (`ROM_BLOBS`, in `docs/code-organization.md`), but for each version from its own: `ROM_RANGES` in
+  `configure.py` has `tools/build/rom_blob.py range` write `rom/syscall/secure_area_<version>.inc` of the generated
+  headers, an assembler macro `FILLER start, end` that gives the version's bytes from one offset of the secure area to
+  another as `.byte` directives, and the source includes the one of its version (`BLACK2` or `WHITE2`) and calls it
+  between its stubs. mwasmarm's `.incbin` is no help: it reads the file as text and turns each lone line feed (`0x0a`)
+  into a carriage return. The mwasmarm rule passes the version's defines and the include paths and writes a dependency
+  file as mwccarm's does, so the source is assembled again when its include changes. Without a ROM, `compile_all.py`
+  writes zeros. The bytes come out the same as the ROM's, so its secure-area CRC stays valid.
 - The DSi-only LTD ("limited") module is compressed inside ARM9i and loaded to `0x02700000` in DSi mode. ARM9 main
   calls into it. Extraction splits ARM9i into this module (`dsi/ltd_autoload_0.bin`), and the build links, recompresses
   and reinserts it. It has two code regions, which dsd since v0.12.1-dsi.3 lays out as:
@@ -277,6 +313,21 @@ add-section . FILE .ltdmain SIZE START` gives an entry such a section, its addre
 autoload, and `config_fixes.py remove-file ltd_autoload_0 FILE START` deletes a part's own entry from the LTD
 autoload's `delinks.txt`; both are recorded in `config/fixes.txt`. `compiler_probe.py`, `rename_symbol.py` and
 `check_nonmatching_rows.py` find the file's DSi functions in the LTD autoload's symbols.
+
+## Files of one name
+
+A file is named after its original object, even when another module's file has the same name: the DWC utility's
+`lib/dwcutilui/src/heap.c` is libdwcutil's `heap.o`, and `src/gfl/heap.c` is the game's. The linker script can't tell
+such objects apart, since it names an object by its file name alone: `heap.o(.text)` places the first `heap.o` of the
+object list, and `mwldarm` takes no path there (`src/gfl/heap.o(.text)` reads as an object named `src`, and a quoted
+name may not hold a `/` or `\`), nor does an object's `-overlay` group scope it. So dsd links each object of a shared
+file name from a copy named after its path, `build/<version>/link/lib/dwcutilui/src/lib_dwcutilui_src_heap.o` and
+`build/<version>/link/src/gfl/src_gfl_heap.o`, which the linker script and `objects.txt` give in place of `heap.o`.
+`dsd json delinks` gives each file's `link_object` beside its `object_to_link`, and `configure.py` makes the copy when
+they differ. The name of an object doesn't reach the ROM, and the sources, the configs and the objects that objdiff and
+the tools read keep their paths. `dsd lcf` still refuses two files of one name in one module, a file listed in two
+modules, and a file named like another's copy (`src_gfl_heap.c`). dsd has done this since v0.12.1-dsi.8; earlier
+releases refuse any shared name.
 
 ## Shifting
 

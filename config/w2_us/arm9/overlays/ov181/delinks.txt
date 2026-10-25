@@ -53,6 +53,7 @@ lib/nitro/src/mb/mb_gameinfo.c:
     .bss        start:0x021a4818 end:0x021a48d0
 
 lib/nitro/src/mb/mb_wm.c:
+    complete
     .text       start:0x021a2678 end:0x021a3b68
     .data       start:0x021a4778 end:0x021a47c0
     .bss        start:0x021a48d0 end:0x021a4944

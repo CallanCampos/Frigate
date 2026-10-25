@@ -2574,10 +2574,12 @@ lib/msl/src/runtime/global_destructor_chain.c:
     .text       start:0x0208ee08 end:0x0208ee28
     .bss        start:0x0214f4f8 end:0x0214f500
 
-lib/nitro/src/syscall/secure_area.c:
+lib/nitro/src/syscall/secure_area.s:
+    complete
     .text       start:0x02004000 end:0x02004800
 
 lib/nitro/src/init/crt0.c:
+    complete
     .text       start:0x02004800 end:0x02005050
 
 lib/dwc/src/base/dwc_init_version.c:

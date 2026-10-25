@@ -66,7 +66,7 @@ MWCCARM_URL = "https://decomp.aetias.com/files/mwccarm.zip"
 # changes are upstreamed. Its dsi-hybrid branch is released as DSD_VERSION; after a new release, bump it and
 # configure.py replaces tools/dsd.
 DSD_REPO = "https://github.com/fuddlesworth/ds-decomp"
-DSD_VERSION = "v0.12.1-dsi.7"
+DSD_VERSION = "v0.12.1-dsi.9"
 # Release binary of each platform, by (sys.platform, machine)
 DSD_BINARIES = {
     ("linux", "x86_64"): "dsd-linux-x86_64",
@@ -216,6 +216,15 @@ INCLUDE_DIRS = ["include", *(p.relative_to(ROOT).as_posix() for p in sorted(LIB_
 ROM_BLOBS = {
     "rom/dsp/dsp_g711_image.inc": ("dsi/ltd_autoload_0.bin", "ltd_autoload_0", "DSP_G711Image"),
     "rom/dsp/dsp_graphics_image.inc": ("dsi/ltd_autoload_0.bin", "ltd_autoload_0", "DSP_GraphicsImage"),
+}
+# Bytes that each version has at its own place, and that no source gives: the filler that Nintendo's build of the
+# system call library for each game put around the BIOS stubs in ARM9 main's secure area. The build takes each
+# version's from its own base ROM (rom_blob.py range) into an include file under rom/ of the generated headers, named
+# with the version, which defines an assembler macro that gives the bytes from one offset of the range to another, for
+# the assembly source (lib/nitro/src/syscall/secure_area.s) to lay out the filler around its stubs. Each maps that
+# include file, with {version} in its name, to the extracted module, the address range and the macro's name.
+ROM_RANGES = {
+    "rom/syscall/secure_area_{version}.inc": ("arm9/arm9.bin", 0x02004000, 0x02004800, "FILLER"),
 }
 
 
@@ -584,9 +593,14 @@ def add_version(n: Writer, version: str, dsd: Path, bugfix: bool, shift: int) ->
             obj = build_dir / source.with_suffix(".o")
             compiler, asm_flags = source_assembler(source)
             n.build([obj], f"mwasm_{LIBRARY_COMPILERS.index(compiler)}", [source],
-                    variables={"flags": " ".join(asm_flags)})
+                    variables={"flags": " ".join(asm_flags), "defines": defines, "dep": obj.with_suffix(".d")},
+                    order_only=["constants_headers"])
             compiled.append(obj)
-        objects.append(f["object_to_link"])
+        # The linker script names an object by its file name alone, so dsd links the objects of files of one name
+        # from copies named after their paths (docs/configs.md, "Files of one name")
+        if f["link_object"] != f["object_to_link"]:
+            n.build([f["link_object"]], "link_copy", [f["object_to_link"]])
+        objects.append(f["link_object"])
     # An entry for a file the version doesn't compile would strip nothing, unnoticed
     unbuilt = sorted(set(DEADSTRIP) - deadstripped)
     if unbuilt:
@@ -811,11 +825,13 @@ def main():
         n.rule(f"mwcc_{i}", f"mkdir -p $$(dirname $out) && MWCIncludes=. $wine $sjiswrap {shlex.quote(str(lib_mwcc))} "
                "$flags $defines -gccdep -MD $includes -o $out $in && $python tools/build/fix_depfile.py $dep",
                "Compiling $in", depfile="$dep", deps="gcc")
-    # A library's assembly sources, with the mwasmarm of its compiler's version
+    # A library's assembly sources, with the mwasmarm of its compiler's version, which has the C preprocessor and
+    # writes the dependency file as mwccarm does
     for i, compiler in enumerate(LIBRARY_COMPILERS):
         lib_mwasm = tools_dir / "mwccarm" / compiler / "mwasmarm.exe"
-        n.rule(f"mwasm_{i}", f"mkdir -p $$(dirname $out) && $wine {shlex.quote(str(lib_mwasm))} $flags -o $out $in",
-               "Assembling $in")
+        n.rule(f"mwasm_{i}", f"mkdir -p $$(dirname $out) && $wine {shlex.quote(str(lib_mwasm))} $flags "
+               "$defines -gccdep -MD $includes -o $out $in && $python tools/build/fix_depfile.py $dep",
+               "Assembling $in", depfile="$dep", deps="gcc")
     # Drops the code the original link dead-stripped from a listed source's object (config/deadstrip.toml)
     n.rule("deadstrip", "$python tools/build/deadstrip.py --source $source $in $out", "Dead-stripping $out")
     n.rule("check_deadstrip", "$python tools/build/check_deadstrip.py --config $config --unstripped $unstripped $out "
@@ -823,6 +839,7 @@ def main():
            rspfile_content="$in_newline")
     n.rule("shift_lcf", "$python tools/build/shift_lcf.py $in $out $amount", "Shifting $in")
     n.rule("ltd_objects", "$python tools/build/ltd_objects.py $in $out", "Grouping the LTD autoload's objects in $out")
+    n.rule("link_copy", "cp $in $out", "Copying $in for the link")
     n.rule("mwld", f"$wine {shlex.quote(str(mwld))} {' '.join(LD_FLAGS)} @$objects $lcf -o $out", "Linking $out")
     # Pass the runner as one executable path and the normal flags as argv data.
     # The helper changes -proc only for its private prelink.
@@ -902,7 +919,7 @@ def main():
             implicit=["tools/text/pms_words.py", *text_tools, *from_data])
     constant_headers.append(pms_words_header)
     # The embedded binaries, from the first version's extracted ROM
-    n.rule("rom_blob", "$python tools/build/rom_blob.py $module $in $name $out", "Generating $out", restat="1")
+    n.rule("rom_blob", "$python tools/build/rom_blob.py array $module $in $name $out", "Generating $out", restat="1")
     for include, (module, config_dir, name) in ROM_BLOBS.items():
         output = Path(GENERATED_INCLUDE_DIR) / include
         symbols = Path("config") / versions[0] / "arm9" / config_dir / "symbols.txt"
@@ -910,6 +927,17 @@ def main():
                 implicit=["tools/build/rom_blob.py", Path("extract") / versions[0] / "config.yaml"],
                 variables={"module": str(Path("extract") / versions[0] / module), "name": name})
         constant_headers.append(output)
+    # The bytes that each version has at its own place, from that version's extracted ROM
+    n.rule("rom_range", "$python tools/build/rom_blob.py range $module $start $end $macro $out", "Generating $out",
+           restat="1")
+    for version in versions:
+        for include, (module, start, end, macro) in ROM_RANGES.items():
+            output = Path(GENERATED_INCLUDE_DIR) / include.format(version=version)
+            n.build([output], "rom_range", [],
+                    implicit=["tools/build/rom_blob.py", Path("extract") / version / "config.yaml"],
+                    variables={"module": str(Path("extract") / version / module), "start": hex(start),
+                               "end": hex(end), "macro": macro})
+            constant_headers.append(output)
     n.build(["constants_headers"], "phony", constant_headers)
 
     checks, configs = [], []

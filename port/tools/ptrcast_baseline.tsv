@@ -32,8 +32,8 @@ lib/dwc/src/nhttp/d_nhttp_private.c	NHTTPGetProgress	int-to-ptr	NHttpConnection 
 lib/dwc/src/nhttp/d_nhttp_private.c	NHTTPGetUserParam	int-to-ptr	NHttpConnection * <- int	1	real	R23: Wi-Fi libraries: socket and HTTP handles as int, work carved through u32, WCM notices (phase 7)
 lib/dwc/src/nhttp/d_nhttp_private.c	NHTTPStartConnection	int-to-ptr	NHttpConnection * <- int	1	real	R23: Wi-Fi libraries: socket and HTTP handles as int, work carved through u32, WCM notices (phase 7)
 lib/dwc/src/nhttp/d_nhttp_private.c	NHTTPi_WaitForConnection	ptr-to-int	int <- NHttpConnection *	2	real	R23: Wi-Fi libraries: socket and HTTP handles as int, work carved through u32, WCM notices (phase 7)
-lib/dwcutil/src/dwc_wcm.c	APC_Init	narrow	s32 <- sptr	1	harmless	a difference of two addresses in one block (the BSS description buffer's end and start)
-lib/dwcutilui/src/dwc_util_rom_resource.c	DWCUtilRomResource_ReadArchive	int-to-ptr	const void * <- u32	1	handled	a 32-bit cartridge offset carried in CARD_ReadRomAsync's const void *, which CARDi_ReadRom (port/hal/card/card_rom.c) takes back as an offset
+lib/dwcutil/src/apc.c	APC_Init	narrow	s32 <- sptr	1	harmless	a difference of two addresses in one block (the BSS description buffer's end and start)
+lib/dwcutilui/src/archive.c	cbRead	int-to-ptr	const void * <- u32	1	handled	a 32-bit cartridge offset carried in CARD_ReadRomAsync's const void *, which CARDi_ReadRom (port/hal/card/card_rom.c) takes back as an offset
 lib/nitro/include/nitro/card.h	CARD_ReadBackup	ptr-to-int	u32 <- void *	1	handled	port/hal/card/card_backup_calls.h redirects the three inline calls (port/hal/card/card_backup_host.c)
 lib/nitro/include/nitro/card.h	CARD_ReadBackupAsync	ptr-to-int	u32 <- void *	1	handled	port/hal/card/card_backup_calls.h redirects the three inline calls (port/hal/card/card_backup_host.c)
 lib/nitro/include/nitro/card.h	CARD_WriteAndVerifyBackupAsync	ptr-to-int	u32 <- const void *	1	handled	port/hal/card/card_backup_calls.h redirects the three inline calls (port/hal/card/card_backup_host.c)

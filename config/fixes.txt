@@ -1,9 +1,17 @@
 # Fixes to dsd's analysis, applied by tools/decomp/config_fixes.py
 # module address(b2_us) action [argument]
 . 0x02004f7c add_data LtdModuleParams
+. 0x02004f7c link_time_const SDK_LTDAUTOLOAD_LIST
+. 0x02004f80 link_time_const SDK_LTDAUTOLOAD_LIST_END
+. 0x02004f84 link_time_const SDK_LTDAUTOLOAD_START
 . 0x02004f94 add_function WaitForHalfword:arm:0x1c
 . 0x02004fb0 reloc_addend 0x948
+. 0x02004fb0 link_time_const SDK_AUTOLOAD_LIST
 . 0x02004fb4 reloc_addend 0x988
+. 0x02004fb4 link_time_const SDK_AUTOLOAD_LIST_END
+. 0x02004fb8 link_time_const SDK_AUTOLOAD_START
+. 0x02004fbc link_time_const SDK_STATIC_BSS_START
+. 0x02004fc0 link_time_const SDK_STATIC_BSS_END
 . 0x02005040 add_data TaggedParams
 . 0x02005050 add_data DWCi_Signature
 . 0x02005094 add_data CARDi_BackupSignature
@@ -2701,18 +2709,25 @@ overlays/ov181 0x021a40e8 remove_reloc
 overlays/ov181 0x021a4894 add_data sMBWmBuf
 overlays/ov181 0x021a4898 add_data sMBFilterGgid
 overlays/ov181 0x021a489c add_data sMBWmWork
+overlays/ov182 0x021ae748 section_start lib/dwcutilui/src/scenemenu.c:.text
+overlays/ov182 0x021aedb0 section_end lib/dwcutilui/src/sceneopterase.c:.text
+overlays/ov182 0x021af8bc section_end lib/dwcutilui/src/sceneoptmovcomm.c:.text
 overlays/ov182 0x021b9496 reloc_module overlay(181)
 overlays/ov182 0x021b94c6 reloc_module overlay(181)
 overlays/ov182 0x021b9782 reloc_module overlay(181)
 overlays/ov182 0x021b9960 reloc_module overlay(181)
 overlays/ov182 0x021bac1c reloc_module overlay(181)
+overlays/ov182 0x021bb9ac section_end lib/dwcutilui/src/cellinfo.c:.text
+overlays/ov182 0x021bc1dc section_end lib/dwcutilui/src/foundation.c:.text
 overlays/ov182 0x021bd8e4 remove_symbol
 overlays/ov182 0x021bdaf9 remove_symbol
 overlays/ov182 0x021bdb41 remove_symbol
 overlays/ov182 0x021bfb54 add_data data_ov182_021bfb54
 overlays/ov182 0x021c04bc add_data data_ov182_021c04bc
-overlays/ov182 0x021c40bc section_end lib/dwcutilui/src/dwc_util_connection.c:.bss
-overlays/ov182 0x021c40bc section_start lib/dwcutilui/src/dwc_util_main_menu.c:.bss
+overlays/ov182 0x021c0d90 section_start lib/dwcutilui/src/scenemenu.c:.data
+overlays/ov182 0x021c0de8 section_end lib/dwcutilui/src/sceneopterase.c:.data
+overlays/ov182 0x021c40b8 section_end lib/dwcutilui/src/rakuraku.c:.bss
+overlays/ov182 0x021c40bc section_start lib/dwcutilui/src/scenemenu.c:.bss
 overlays/ov185 0x0219e83c reloc_module overlay(139)
 overlays/ov185 0x0219ea34 reloc_module overlay(139)
 overlays/ov185 0x0219eb18 reloc_addend 2

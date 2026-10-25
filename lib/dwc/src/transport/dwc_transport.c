@@ -663,6 +663,9 @@ void DWCs_RecvDataHeader(u8 aid, const void *data, int size) {
             return;
         }
         MI_CpuCopy8(data, &header, sizeof(DWCTransportHeader));
+        // The size goes back to the header, as Black 1's version of this function writes it through a copy, and as the
+        // ROM's store of it to its own slot shows; MWCC keeps the store only for a conversion
+        header.size = (u32)header.size;
         connection->requestRecvSize = header.size;
         connection->recvingSize = 0;
         if (connection->recvBuffer != NULL && connection->recvBufferSize >= connection->requestRecvSize) {

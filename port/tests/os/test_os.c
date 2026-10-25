@@ -14,7 +14,7 @@
 #include "hal/os/fiber.h"
 #include "hal/os/os_internal.h"
 #include "hal/os/port_os.h"
-#include "lib/dwcutil/src/dwc_wcm.h"
+#include "lib/dwcutil/src/apc.h"
 #include "nitro/gx.h"
 #include "nitro/os.h"
 #include "nitro/svc.h"

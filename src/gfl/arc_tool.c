@@ -91,8 +91,8 @@ static u32 ArchiveMoveImageTop(FSFile *file, u32 fileId, u32 offset, u32 size) {
     NarcFATBEntry entry;
     NarcFATBHeader fatb;
     u32 value = 0;
-    u32 fimgOffset;
     u32 fntbOffset;
+    u32 fimgOffset;
     u32 fatbOffset;
 
     FS_SeekFile(file, NARC_HEADER_SIZE_OFFSET, FS_SEEK_SET);
@@ -107,8 +107,8 @@ static u32 ArchiveMoveImageTop(FSFile *file, u32 fileId, u32 offset, u32 size) {
     fimgOffset = fntbOffset + value;
     FS_SeekFile(file, fatbOffset + NARC_FATB_ENTRIES_OFFSET + fileId * sizeof(NarcFATBEntry), FS_SEEK_SET);
     FS_ReadFile(file, &entry, sizeof(NarcFATBEntry));
-    fimgOffset += NARC_FIMG_DATA_OFFSET;
-    FS_SeekFile(file, offset + (fimgOffset + entry.start), FS_SEEK_SET);
+    fimgOffset += NARC_FIMG_DATA_OFFSET + entry.start;
+    FS_SeekFile(file, offset + fimgOffset, FS_SEEK_SET);
     if (size == 0) {
         size = entry.end - entry.start;
     }

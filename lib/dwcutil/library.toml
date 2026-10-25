@@ -1,12 +1,14 @@
 # Nintendo's DWC utility (libdwcutil), the Wi-Fi Connection settings that overlay 182 runs through DWC_StartUtility
 # (lib/dwc/include/dwc/utility.h). It was built apart from the rest of DWC: with MWCC 2.0, which keeps reloading a
-# static's address where dsi/1.1p1 keeps it in a register. Its first file, dwc_wcm.c, went from 1 to 6 of 9 functions
-# matching on the compiler alone, with DWC's own flags (Thumb, -O4,p). dwcutil_ac.c's MD5Transform has no branch, so its
+# static's address where dsi/1.1p1 keeps it in a register. Its first file, apc.c, went from 1 to 6 of 9 functions
+# matching on the compiler alone, with DWC's own flags (Thumb, -O4,p). atermset.c's MD5Transform has no branch, so its
 # literal pool island sits where the compiler's pool margin alone puts it (docs/matching.md, the bullet on
 # ConstantPools.c): it matches under 2.0/sp1 to sp2 and under no later build. Of those, 2.0/sp1 to sp1p5 compile
-# the library alike, and only they match dwcutil_ac.c's CheckAccessPoint and dwc_aoss.c's AOSS_seq_data_copy, which
+# the library alike, and only they match atermset.c's CheckAccessPoint and aoss.c's AOSS_seq_data_copy, which
 # sp1p6 to sp2 schedule otherwise. 2.0/sp1p2 is named, the build that Black 1's decompilation (aletheia) gives the same
-# objects (its aoss.c, aosslink.c, atermset.c and apc.c).
+# objects (its aoss.c, aosslink.c, atermset.c and apc.c). The files are named after the library's objects
+# (libdwcutil.TWL.HYB.a's aoss.o to dwc_moveid.o), as aletheia's map of Black 1's SDK code to them
+# (layout/symbols_sdk.txt) shows them, with the same functions in the same order.
 compiler = "2.0/sp1p2"
 flags = [
     "-O4,p",               # Optimize for speed
@@ -26,14 +28,17 @@ flags = [
     "-msgstyle gcc",
 ]
 
-# The DS Download Play parent and its wireless helper (dwc_mov_mbp.c and dwc_mov_wh.c, Black 1's dwc_mov_mbp.o and
-# dwc_mov_wh.o of this library) were built with the game's compiler and flags, like lib/dwcutilui: under 2.0/sp1p2 or
-# 2.0/sp2 with this library's flags DWCi_MOV_MBP_StartRebootAll and DWCi_MOV_WH_StepDS grow by 4 bytes, and
-# DWCi_MOV_WH_StartMeasureChannel, GetMeasureChannel and Initialize differ, where dsi/1.1p1 matches them all.
+# The DS Download Play parent, its wireless helper and the flow over them (dwc_mov_mbp.c, dwc_mov_wh.c and
+# dwc_moveid.c, Black 1's dwc_mov_mbp.o, dwc_mov_wh.o and dwc_moveid.o of this library) were built with the game's
+# compiler and flags, like lib/dwcutilui: under 2.0/sp1p2 or 2.0/sp2 with this library's flags
+# DWCi_MOV_MBP_StartRebootAll and DWCi_MOV_WH_StepDS grow by 4 bytes, and DWCi_MOV_WH_StartMeasureChannel,
+# GetMeasureChannel and Initialize differ, where dsi/1.1p1 matches them all.
 [file_compilers]
 "dwc_mov_mbp.c" = "dsi/1.1p1"
 "dwc_mov_wh.c" = "dsi/1.1p1"
+"dwc_moveid.c" = "dsi/1.1p1"
 
 [file_flags]
 "dwc_mov_mbp.c" = ["-inline on,noauto", "-ipa file"]
 "dwc_mov_wh.c" = ["-inline on,noauto", "-ipa file"]
+"dwc_moveid.c" = ["-inline on,noauto", "-ipa file"]
