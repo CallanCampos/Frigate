@@ -1,28 +1,30 @@
 #include <string.h>
 // Before dwc/ext.h: MWCC copies and clears the blocks of a size it knows in place, as the ROM does, only when
 // <string.h> declares memcpy and memset first
+#include "apc.h"
 #include "dwc/ext.h"
 #include "dwc/md5.h"
-#include "dwc_wcm.h"
-#include "dwcutil/dwcutil_ac.h"
+#include "dwcutil/atermset.h"
 #include "nitro/mi.h"
 #include "nitro/os.h"
 #include "nitro/wm.h"
 #include "nitrowifi/soc.h"
 #include "nitrowifi/wcm.h"
 
-// The access point setup of DWC's settings (see dwcutil_ac.h). A thread scans until an access point opens its setup,
+// The access point setup of DWC's settings (see atermset.h). A thread scans until an access point opens its setup,
 // joins it, and over UDP broadcasts on port 486 trades a hello and a session key for the settings of the network,
-// each message encrypted with AES key wrap. Under it are a second copy of the wrapper around the WCM (dwc_wcm.c), with
+// each message encrypted with AES key wrap. Under it are a second copy of the wrapper around the WCM (apc.c), with
 // its events in a ring of four, and in the middle Rijndael's reference AES (rijndael-alg-fst.c) and RFC 1321's MD5.
 // The original has all of it in one object: the AES's tables sort among the setup's state and the MD5's padding sits
-// among the other code's data. The ROM names none of it: the names are the DWC utility library's own, as that library's
-// symbols and debug information have them (its atermset.c), where the code shows them, and ours elsewhere, those of the
-// AES and MD5 code after their references. Its copies of the APC_ functions of dwc_wcm.c keep names of ours, since the
-// copies in dwc_wcm.c have them in the same overlay, and so do Free and alarmCallback, which dwc_aoss.c and
-// dwc_aoss_ap.c have
+// among the other code's data. The file is the library's atermset.o (libdwcutil.TWL.HYB.a), which aletheia's map of
+// Black 1's SDK code to the library's objects (layout/symbols_sdk.txt) shows with the same functions in the same order.
+// The ROM names none of it: the names are the DWC utility library's own, as that library's symbols and debug
+// information have them, where the code shows them, and ours elsewhere, those of the
+// AES and MD5 code after their references. Its copies of the APC_ functions of apc.c keep names of ours, since the
+// copies in apc.c have them in the same overlay, and so do Free and alarmCallback, which aoss.c and
+// aosslink.c have
 
-// Where the wrapper is (the same numbers as in dwc_wcm.c)
+// Where the wrapper is (the same numbers as in apc.c)
 enum {
     STATE_OFF,
     STATE_INITIALIZED,

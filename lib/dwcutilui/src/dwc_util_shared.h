@@ -13,8 +13,8 @@
 #include "dwc_util_text.h"
 #include "dwc_util_touch.h"
 #include "dwc_util_vram_alloc.h"
-#include "dwcutil/dwc_aoss.h"
-#include "dwcutil/dwcutil_ac.h"
+#include "dwcutil/aoss.h"
+#include "dwcutil/atermset.h"
 #include "nitro/gx.h"
 #include "struct_decls.h"
 

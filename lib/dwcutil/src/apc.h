@@ -1,5 +1,5 @@
-#ifndef POKEBW2_DWCUTIL_DWC_WCM_H
-#define POKEBW2_DWCUTIL_DWC_WCM_H
+#ifndef POKEBW2_DWCUTIL_APC_H
+#define POKEBW2_DWCUTIL_APC_H
 
 #include "types.h"
 
@@ -12,7 +12,7 @@
 enum {
     DWC_WCM_EVENT_UNKNOWN = 1,
     DWC_WCM_EVENT_FAILED,
-    // These two only from the copy of the wrapper in dwcutil_ac.c: the WCM ended, and a search went once through the
+    // These two only from the copy of the wrapper in atermset.c: the WCM ended, and a search went once through the
     // channels
     DWC_WCM_EVENT_TERMINATED,
     DWC_WCM_EVENT_SEARCH_AROUND,
@@ -48,4 +48,4 @@ BOOL APC_End(void);
 // Connects to the access point with the description and the WEP key
 BOOL APC_Connect(const void *bssDesc, const void *wepDesc, u32 option);
 
-#endif // POKEBW2_DWCUTIL_DWC_WCM_H
+#endif // POKEBW2_DWCUTIL_APC_H

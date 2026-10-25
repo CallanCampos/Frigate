@@ -1,10 +1,10 @@
-#ifndef POKEBW2_DWCUTIL_DWC_AOSS_AP_H
-#define POKEBW2_DWCUTIL_DWC_AOSS_AP_H
+#ifndef POKEBW2_DWCUTIL_AOSSLINK_H
+#define POKEBW2_DWCUTIL_AOSSLINK_H
 
 #include "types.h"
-#include "dwcutil/dwc_aoss.h"
+#include "dwcutil/aoss.h"
 
-// The access point layer of the AOSS client (dwc_aoss_ap.c): it scans, connects and disconnects through APC_*, one
+// The access point layer of the AOSS client (aosslink.c): it scans, connects and disconnects through APC_*, one
 // operation at a time, and holds the memory functions that the client allocates with. The ROM names none of it; the
 // names are the DWC utility library's own, as that library's symbols and debug information have them, where the code
 // shows them, and ours elsewhere
@@ -59,4 +59,4 @@ void AOSSi_Sleep(u32 milliseconds);
 // Tells that the client went to a mode (an SetMode value)
 int AOSSi_Status(int mode);
 
-#endif // POKEBW2_DWCUTIL_DWC_AOSS_AP_H
+#endif // POKEBW2_DWCUTIL_AOSSLINK_H

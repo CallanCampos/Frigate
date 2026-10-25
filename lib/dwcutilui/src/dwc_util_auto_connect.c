@@ -1,5 +1,4 @@
 #include "dwc_util_auto_connect.h"
-#include "app/download_play_sys.h"
 #include "dwc/ac.h"
 #include "dwc/bm.h"
 #include "dwc_util_auto_connect_ok.h"
@@ -18,6 +17,7 @@
 #include "dwc_util_text.h"
 #include "dwc_util_ui_effect.h"
 #include "dwc_util_wifi_settings.h"
+#include "dwcutil/dwc_moveid.h"
 #include "nitro/gx.h"
 #include "nitro/mi.h"
 #include "nitro/os.h"

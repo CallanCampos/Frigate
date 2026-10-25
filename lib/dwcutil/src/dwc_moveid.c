@@ -1,15 +1,17 @@
-#include "app/download_play_sys.h"
+#include "dwcutil/dwc_moveid.h"
 #include "dwc/bm.h"
 #include "nitro/mi.h"
 #include "nitro/os.h"
 #include "nitro/wm.h"
 
-// The parent's own flow for the DS Download Play range of overlay 182 (download_play_sys.c is a descriptive name: the
-// ROM embeds no file name for this file). It drives the parent as a state machine: it takes the work the overlay's
-// screens file hands it, starts the wireless, steps the download-play parent and the data sharing that the children
-// read their records from, and ends both. Overlay 181's src/ov181/mb_parent_sys.c drives the same kind of flow over
-// the MBComm_* layer with a different state machine; it is a role reference only, and no function of it is a copy of
-// one here. The overlay's file before this one, lib/dwcutil/src/dwc_mov_wh.c, owns the wireless work.
+// The parent's own flow for the DS Download Play range of overlay 182: the DWC utility library's dwc_moveid.o
+// (libdwcutil.TWL.HYB.a), which aletheia's map of Black 1's SDK code to the library's objects (layout/symbols_sdk.txt)
+// shows with the same 20 functions in the same order, after dwc_mov_wh.o. It drives the parent as a state machine: it
+// takes the work the overlay's screens file hands it, starts the wireless, steps the download-play parent and the data
+// sharing that the children read their records from, and ends both. Overlay 181's src/ov181/mb_parent_sys.c drives the
+// same kind of flow over the MBComm_* layer with a different state machine; it is a role reference only, and no
+// function of it is a copy of one here. The overlay's file before this one, lib/dwcutil/src/dwc_mov_wh.c, owns the
+// wireless work.
 
 static void func_ov182_021ba8bc(void);
 static void func_ov182_021bac20(void);

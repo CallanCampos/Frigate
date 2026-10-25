@@ -10,24 +10,24 @@ src/ov182/dwc_raputil.c:
     .rodata     start:0x021bd30c end:0x021bd324
     .data       start:0x021c0600 end:0x021c0610
 
-lib/dwcutil/src/dwc_wcm.c:
+lib/dwcutil/src/apc.c:
     complete
     .text       start:0x021a723c end:0x021a7898
     .bss        start:0x021c2ae0 end:0x021c2b30
 
-lib/dwcutil/src/dwc_aoss.c:
+lib/dwcutil/src/aoss.c:
     complete
     .text       start:0x021a4a10 end:0x021a6c5c
     .rodata     start:0x021bd324 end:0x021bd328
     .data       start:0x021c0610 end:0x021c0688
     .bss        start:0x021c1ba0 end:0x021c2980
 
-lib/dwcutil/src/dwc_aoss_ap.c:
+lib/dwcutil/src/aosslink.c:
     .text       start:0x021a6c5c end:0x021a723c
     .data       start:0x021c0688 end:0x021c06b8
     .bss        start:0x021c2980 end:0x021c2ae0
 
-lib/dwcutil/src/dwcutil_ac.c:
+lib/dwcutil/src/atermset.c:
     .text       start:0x021a7898 end:0x021ab080
     .rodata     start:0x021bd328 end:0x021bfb58
     .data       start:0x021c06b8 end:0x021c0780
@@ -62,7 +62,7 @@ lib/dwcutil/src/dwc_mov_wh.c:
     .data       start:0x021c17b0 end:0x021c1b18
     .bss        start:0x021c41c0 end:0x021c41c8
 
-src/ov182/download_play_sys.c:
+lib/dwcutil/src/dwc_moveid.c:
     complete
     .text       start:0x021ba7a8 end:0x021bb1cc
     .bss        start:0x021c41c8 end:0x021c41cc

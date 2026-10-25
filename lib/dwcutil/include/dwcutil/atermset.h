@@ -1,9 +1,9 @@
-#ifndef POKEBW2_DWCUTIL_DWCUTIL_AC_H
-#define POKEBW2_DWCUTIL_DWCUTIL_AC_H
+#ifndef POKEBW2_DWCUTIL_ATERMSET_H
+#define POKEBW2_DWCUTIL_ATERMSET_H
 
 #include "types.h"
 
-// The access point setup of DWC's settings in overlay 182 (dwcutil_ac.c): on a thread of its own it waits for an
+// The access point setup of DWC's settings in overlay 182 (atermset.c): on a thread of its own it waits for an
 // access point to open its setup, joins it, and takes the name of its network and its keys over UDP. The ROM names
 // none of it, and the file name is a guess from the range it covers; the utility's, because ARM9 main has a dwc_ac.c
 // of its own
@@ -42,4 +42,4 @@ int ATERMi_ApConfigEnd(void);
 // Copies the settings that the setup took; TRUE
 BOOL ATERMi_ApConfigGetResult(ATERMApConfigParam *result);
 
-#endif // POKEBW2_DWCUTIL_DWCUTIL_AC_H
+#endif // POKEBW2_DWCUTIL_ATERMSET_H

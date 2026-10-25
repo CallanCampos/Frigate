@@ -5,7 +5,7 @@
 #include "nitro/mb.h"
 
 // The connection utility's move of the Wi-Fi settings to another console: it offers dwc:/move/child.srl through DS
-// Download Play (app/download_play_sys.h) and reports the flow's progress to a callback, with an event of
+// Download Play (dwcutil/dwc_moveid.h) and reports the flow's progress to a callback, with an event of
 // DWC_UTIL_MOVE_EVENT_*.
 // The ROM does not embed this source file's name; dwc_util_move.c is descriptive.
 

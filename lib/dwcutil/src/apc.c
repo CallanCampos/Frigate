@@ -1,12 +1,14 @@
-#include "dwc_wcm.h"
+#include "apc.h"
 #include "dwc/wcm.h"
 #include "nitro/mi.h"
 #include "nitro/os.h"
 
 // The wrapper that DWC's settings put around the wireless connection manager (WCM, see wcm.h): one operation runs at a
-// time, a state says which, and a callback is told how each ends. The ROM names none of it; the names are
-// the DWC utility library's own, as that library's symbols and debug information have them (its apc.c), where the code
-// shows them, and ours elsewhere.
+// time, a state says which, and a callback is told how each ends. The file is the library's apc.o
+// (libdwcutil.TWL.HYB.a), which aletheia's map of Black 1's SDK code to the library's objects (layout/symbols_sdk.txt)
+// shows with the same nine functions in the same order. The ROM names none of it; the names are the DWC utility
+// library's own, as that library's symbols and debug information have them, where the code shows them, and ours
+// elsewhere.
 
 // Where the wrapper is
 enum {

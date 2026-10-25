@@ -1,12 +1,12 @@
-#ifndef POKEBW2_DWCUTIL_DWC_AOSS_H
-#define POKEBW2_DWCUTIL_DWC_AOSS_H
+#ifndef POKEBW2_DWCUTIL_AOSS_H
+#define POKEBW2_DWCUTIL_AOSS_H
 
 #include "types.h"
 
-// The AOSS client of DWC's settings in overlay 182 (dwc_aoss.c): Buffalo's one-touch setup, which finds the access
-// point named ESSID-AOSS, talks to it in UDP packets and gets the keys of its network. The ROM names none of it; the
-// names are the DWC utility library's own, as that library's symbols and debug information have them, where the code
-// shows them, and ours elsewhere. The caller gives the request and takes the keys from the same struct
+// The AOSS client of DWC's settings in overlay 182 (aoss.c, the library's aoss.o): Buffalo's one-touch setup, which
+// finds the access point named ESSID-AOSS, talks to it in UDP packets and gets the keys of its network. The ROM names
+// none of it; the names are the DWC utility library's own, as that library's symbols and debug information have them,
+// where the code shows them, and ours elsewhere. The caller gives the request and takes the keys from the same struct
 
 // The types of security of the keys in AOSS_INFO.types
 #define AOSS_TYPE_WEP40 0x1
@@ -59,4 +59,4 @@ int AOSSi_InitLocal(DWCAossAllocFunc alloc, DWCAossFreeFunc free);
 // Stops it and gives the memory back; returns 0, or -1 if it was not running
 int AOSSi_EndLocal(void);
 
-#endif // POKEBW2_DWCUTIL_DWC_AOSS_H
+#endif // POKEBW2_DWCUTIL_AOSS_H

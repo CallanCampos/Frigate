@@ -2,7 +2,7 @@
 #include "dwc_util_heap.h"
 #include "dwc_util_shared.h"
 #include "dwc_util_wifi_settings.h"
-#include "dwcutil/dwcutil_ac.h"
+#include "dwcutil/atermset.h"
 #include "nitro/os.h"
 
 static void cbConfig(const ATERMApConfigState *status);

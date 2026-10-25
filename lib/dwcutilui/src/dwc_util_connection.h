@@ -4,7 +4,7 @@
 #include "types.h"
 #include "struct_decls.h"
 
-// The connection utility's connection test (dwcutil/dwcutil_ac.h), and what it found, saved into the connection
+// The connection utility's connection test (dwcutil/atermset.h), and what it found, saved into the connection
 // being edited.
 // The ROM does not embed this source file's name; dwc_util_connection.c is descriptive.
 

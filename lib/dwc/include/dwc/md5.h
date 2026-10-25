@@ -20,7 +20,7 @@ typedef struct {
 void MD5Init(MD5_CTX *context);
 void MD5Update(MD5_CTX *context, unsigned char *input, unsigned int inputLen);
 void MD5Final(unsigned char digest[16], MD5_CTX *context);
-// MD5Init's body, which the DWC utility's own copy of RFC 1321's MD5 (lib/dwcutil/src/dwcutil_ac.c) also has
+// MD5Init's body, which the DWC utility's own copy of RFC 1321's MD5 (lib/dwcutil/src/atermset.c) also has
 static inline void MD5InitInline(MD5_CTX *context) {
     context->count[0] = context->count[1] = 0;
     context->state[0] = 0x67452301;

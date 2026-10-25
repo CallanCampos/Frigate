@@ -1809,10 +1809,10 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
 | `dwc_raputil.c` | `0x021a4920`–`0x021a49d0` | 5 | complete | string at `0x021c05c0` |
-| `dwc_aoss.c` | `0x021a49d0`–`0x021a6c1c` | 71 | complete | descriptive |
-| `dwc_aoss_ap.c` | `0x021a6c1c`–`0x021a71fc` | 12 | partial | descriptive |
-| `dwc_wcm.c` | `0x021a71fc`–`0x021a7858` | 9 | complete | descriptive |
-| `dwcutil_ac.c` | `0x021a7858`–`0x021ab040` | 66 | partial | descriptive |
+| `aoss.c` | `0x021a49d0`–`0x021a6c1c` | 71 | complete | descriptive |
+| `aosslink.c` | `0x021a6c1c`–`0x021a71fc` | 12 | partial | descriptive |
+| `apc.c` | `0x021a71fc`–`0x021a7858` | 9 | complete | descriptive |
+| `atermset.c` | `0x021a7858`–`0x021ab040` | 66 | partial | descriptive |
 | `dwc_util_ui_effect.c` | `0x021ab040`–`0x021ab17c` | 3 | complete | descriptive |
 | `dwc_util_ui_object.c` | `0x021ab17c`–`0x021ab588` | 15 | complete | descriptive |
 | `dwc_util_screen.c` | `0x021ab588`–`0x021ab63c` | 3 | complete | descriptive |
@@ -1867,7 +1867,7 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 | `dwc_util_dialog.c` | `0x021b8cf0`–`0x021b93e8` | 15 | complete | descriptive |
 | `dwc_mov_mbp.c` | `0x021b93e8`–`0x021b9bbc` | 19 | complete | descriptive |
 | `dwc_mov_wh.c` | `0x021b9bbc`–`0x021ba768` | 45 | partial | descriptive |
-| `download_play_sys.c` | `0x021ba768`–`0x021bb18c` | 20 | complete | descriptive |
+| `dwc_moveid.c` | `0x021ba768`–`0x021bb18c` | 20 | complete | descriptive |
 | `dwc_util_rom_resource.c` | `0x021bb18c`–`0x021bb480` | 9 | complete | descriptive |
 | `dwc_util_oam.c` | `0x021bb480`–`0x021bb8dc` | 11 | complete | descriptive |
 | `dwc_util_cell.c` | `0x021bb8dc`–`0x021bba6c` | 10 | complete | descriptive |

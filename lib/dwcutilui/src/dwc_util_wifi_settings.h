@@ -3,13 +3,13 @@
 
 #include "types.h"
 #include "dwc/bm.h"
-#include "dwcutil/dwc_aoss.h"
-#include "dwcutil/dwcutil_ac.h"
+#include "dwcutil/aoss.h"
+#include "dwcutil/atermset.h"
 #include "struct_decls.h"
 
 // The connection utility's copy of the console's Wi-Fi settings (the four pages of dwc/bm.h's NTR settings), and of
 // the one connection that its screens edit, which is saved back into its page and written to the NVRAM.
-// The ROM does not embed this source file's name; dwc_util_wifi_settings.c is descriptive. app/download_play_sys.h
+// The ROM does not embed this source file's name; dwc_util_wifi_settings.c is descriptive. dwcutil/dwc_moveid.h
 // declares this file's DWCi_SETTINGlGetMemMap, the pages.
 
 // The copy of a connection of the console's Wi-Fi settings that the screens edit: the connection, its subnet mask as

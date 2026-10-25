@@ -1,20 +1,21 @@
-#include "dwcutil/dwc_aoss.h"
+#include "dwcutil/aoss.h"
+#include "aosslink.h"
+#include "apc.h"
 #include "dwc/ext.h"
-#include "dwc_aoss_ap.h"
-#include "dwc_wcm.h"
 #include "nitro/mi.h"
 #include "nitro/os.h"
 #include "nitro/rtc.h"
 #include "nitro/wm.h"
 
-// The AOSS client of DWC's settings (see dwc_aoss.h): Buffalo's one-touch setup. It looks for the access point named
+// The AOSS client of DWC's settings (see aoss.h): Buffalo's one-touch setup. It looks for the access point named
 // ESSID-AOSS, joins it with a fixed WEP key, takes an address in its subnet and talks to it in UDP packets on port
 // 22416 in three stages, each answered by the access point: the hello (0x1000), the security settings that it offers
 // (0x2000) and the end (0x3000). The packets are encrypted with RC4 under the id of the access point. It ends with the
 // keys of the network. The file also has the small network helpers that it works with; the Wi-Fi scan and connect are
-// in dwc_aoss_ap.c. The ROM names none of it; the names are
-// the DWC utility library's own, as that library's symbols and debug information have them, where the code shows them,
-// and ours elsewhere.
+// in aosslink.c. The file is the library's aoss.o (libdwcutil.TWL.HYB.a), which aletheia's map of Black 1's SDK code
+// to the library's objects (layout/symbols_sdk.txt) shows with the same functions in the same order. The ROM names none
+// of it; the names are the DWC utility library's own, as that library's symbols and debug information have them, where
+// the code shows them, and ours elsewhere.
 //
 // MWCC 2.0 lays the statics out in the reverse of their definition order
 

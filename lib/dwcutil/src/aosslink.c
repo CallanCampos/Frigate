@@ -1,15 +1,17 @@
-#include "dwc_aoss_ap.h"
+#include "aosslink.h"
+#include "apc.h"
 #include "dwc/ext.h"
-#include "dwc_wcm.h"
 #include "nitro/mi.h"
 #include "nitro/os.h"
 #include "nitro/wm.h"
 #include "nitrowifi/wcm.h"
 
-// The access point layer of the AOSS client (see dwc_aoss_ap.h): the scan for the access points, the connection to one
-// with a WEP key, and the disconnection, over APC_*. A message queue turns the WCM's events into waits. The ROM
-// names none of it; the names are the DWC utility library's own, as that library's symbols and debug information have
-// them, where the code shows them, and ours elsewhere.
+// The access point layer of the AOSS client (see aosslink.h): the scan for the access points, the connection to one
+// with a WEP key, and the disconnection, over APC_*. A message queue turns the WCM's events into waits. The file is the
+// library's aosslink.o (libdwcutil.TWL.HYB.a), which aletheia's map of Black 1's SDK code to the library's objects
+// (layout/symbols_sdk.txt) shows with the same functions in the same order. The ROM names none of it; the names are
+// the DWC utility library's own, as that library's symbols and debug information have them, where the code shows them,
+// and ours elsewhere.
 //
 // MWCC 2.0 lays the statics out in the reverse of their definition order. The four globals are defined with an
 // initializer, which lets the functions below reach them from one base.

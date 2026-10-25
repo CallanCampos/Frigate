@@ -106,10 +106,10 @@ tools that show the differences.
   (`movs r1, #0x1f; adds r2, r0, r1; adds r0, r1, #0; subs r0, #0x3f; ands r3, r0`), where every 32-bit spelling
   gives `adds r0, #0x1f` and `bics` (`& ~0x1f`, `& -32`, `/ 32 * 32`, `>> 5 << 5`, locals, inline helpers), is the
   sum done in 64 bits: MWCC folds 64-bit constants only after its 32-bit passes, so both stay values in registers.
-  `dwcutil_ac.c`'s `InitAtermApcNetwork` matches with `(void *)(((u64)sAcBlock + 0x1f) & ~0x1f)` (a `0x1fULL` literal
+  `atermset.c`'s `InitAtermApcNetwork` matches with `(void *)(((u64)sAcBlock + 0x1f) & ~0x1f)` (a `0x1fULL` literal
   or an `s64` cast compile the same), while `UtilAcWcm_Start` in the same file rounds in 32 bits with `bics`.
 - A `char` read into an `int` local declared first at the top (`int c; int value = 0; int i;`, `c = text[i];` in
-  the loop) takes another register than a `char` declared in the loop or an `int` declared later: `dwcutil_ac.c`'s
+  the loop) takes another register than a `char` declared in the loop or an `int` declared later: `atermset.c`'s
   `AsciiToHex` swapped its character and index between `r1` and `r3` with every other order and type.
 - One swap temporary declared first and shared by two swaps gets other registers than one in each swap's block:
   `clact.c`'s `ClAct_IsCellInViewTransformed`. A pointer local to a copy loop's source array, `const u16 *name = src->nickname;`,
@@ -237,7 +237,7 @@ Same instructions, registers swapped.
   before the `strb`, where `p[0x22] = 0; p += 0x23` or `*(p + 0x22) = 0` store first (4 bytes off).
 - A pointer that must have the earlier declaration's slot but a later store is declared without an initializer and
   assigned after the other pointers. This matches the item-base spills in `GetWEPData` and `GetWPAData` in
-  `dwc_aoss.c`.
+  `aoss.c`.
 - Of two variables that compete for the same register, the one used more gets it: one use of the Battle Subway
   command's result variable too many gave its register to the command ID. A single `*var = cond ? a : b;` counts as
   one use where an `if`/`else` with a store in each counts as two. Measured on small functions, the count is of
@@ -380,7 +380,7 @@ Same instructions, registers swapped.
   spills, is the address passed to the helper: `CtvtCall_CreateActor(sys, &call->rows[i].frame, ...)` stores through
   a `ClActor **`, where `call->rows[i].frame = CtvtCall_CreateActor(...)` computes the address after the call.
 - A spilled counter in the lowest named slot, below the loop-invariant temporaries, can be a counter whose other
-  pieces live in registers: `dwcutil_ac.c`'s `CheckAccessPoint` counts its first and last loops with `i`, which
+  pieces live in registers: `atermset.c`'s `CheckAccessPoint` counts its first and last loops with `i`, which
   stays on the stack for the `*index = i` after them, and puts `i` at `sp+0xc` only when the loop between them, kept
   in `r6`, counts with `i` too; that loop counting with `j` or a counter of its own leaves `i` among the declared
   locals in every declaration order.
@@ -445,7 +445,7 @@ Same instructions, registers swapped.
   while calls in the loop still rebuild it from `sp`, is a pointer to the buffer assigned in the loop body. MWCC folds
   `text`, `&text[0]` and an inline helper's pointer parameter back into `sp`-relative addresses, but hoists
   `char *key = text;` declared in the loop, and the hoisted pointer then outranks a result that the original keeps on
-  the stack. The DWC utility's `StoreNetParam` (`dwcutil_ac.c`) matches with the WEP key switch in the loop and
+  the stack. The DWC utility's `StoreNetParam` (`atermset.c`) matches with the WEP key switch in the loop and
   every use of the key text through `key`; the same pointer at function scope is hoisted to the function's start
   instead (59 bytes), and an inline helper taking the text, the key and the result in any shape keeps the result in
   `r7` (292 to 300 bytes).
@@ -774,7 +774,7 @@ Same instructions, registers swapped.
   overlay 12's `MusicalEvent_RecordShow`, `s0249_GetRandomDistinctSix` and `MusicalProgram_Create` matched that way.
   Under 2.0/sp2 a clear in place by a down-counting byte loop (`movs r1, #0x22; movs r0, #0; strb r0, [r2];
   adds r2, #1; subs r1, #1; bne`), where `memset` gives a call, is such an initializer, `char name[0x22] = { 0 };`, which
-  runs again on each pass when the array is declared in a loop's body (`dwcutil_ac.c`'s `CheckAccessPoint`). A constant
+  runs again on each pass when the array is declared in a loop's body (`atermset.c`'s `CheckAccessPoint`). A constant
   the retail game fixes but the code still tests or passes as a variable is held in an enum-typed local, which MWCC
   does not fold (`FieldScript_LoadData`'s source, `CallTrialHouseBattle`'s battle type,
   `s01D6_MoveReminderCallMoveSelect`'s mode). An offset that adds zero is such a constant too: `field_msgbg.c`'s
@@ -792,12 +792,12 @@ Same instructions, registers swapped.
   returns the xor and stores the encrypted byte into the state, which splits their live ranges so that the first
   lands in `r7` and the next two in `fp`.
 - Under MWCC 2.0 a loop over an allocation that is freed after it walks the pointer itself when the source does: in
-  `AOSSi_WLANGetBSSList` (`dwc_aoss_ap.c`) `Set_WLLA_BSS_INFO(descs, &scanList->ap[i]); descs++;`, with the start kept in a
+  `AOSSi_WLANGetBSSList` (`aosslink.c`) `Set_WLLA_BSS_INFO(descs, &scanList->ap[i]); descs++;`, with the start kept in a
   second local (`buffer = descs;` before the search) for the free, steps `descs` in its saved register
   (`adds r4, #0xc0`) and spills `buffer`; indexing `&descs[i]` makes a new induction pointer and keeps `descs` on the
   stack, 4 bytes over.
 - A parameter reused as a loop counter is allocated apart from a local counter, even when the parameter is otherwise
-  dead: `dwc_aoss.c`'s `make_crc_table(int i, u32 *table)` with `for (i = 0; ...)` swaps its two counters' registers
+  dead: `aoss.c`'s `make_crc_table(int i, u32 *table)` with `for (i = 0; ...)` swaps its two counters' registers
   (`r2`/`r0`) under MWCC 2.0, and matches with the caller's argument as a parameter it doesn't read (`int ready`) and
   `u32 value; int i; int bit;` declared in that order.
 - Instruction selection starts a new basic block before a statement once the current block holds more than 100 PCode
@@ -2778,7 +2778,7 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   original's out-of-range branches share the `b` after an `if` body, that `if`'s test still branched to it, because
   the block after the `if` held another instruction at that stage that the final code no longer has: a copy between
   two variables that end up in one register or stack slot. A `static inline` that takes a variable by value and
-  returns it makes that copy: `dwcutil_ac.c`'s `AutoConfigThreadEx` matches with its session key taken by
+  returns it makes that copy: `atermset.c`'s `AutoConfigThreadEx` matches with its session key taken by
   `retries = UtilAc_TakeSessionKey(sAcMessage, retries);`, whose `if (type == 0x101)` sets `retries = 0;` among the
   key's stores and ends in `return retries;`. The parameter and the result share `retries`'s stack slot, so the copy
   back after the `if` leaves no code, but the type test's `bne` still went to it, and case 4's two failed tests then
@@ -3003,7 +3003,7 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `u32 corner = place * 4 + i; s16 index = sBScenarioCursorPositions[corner];` MWCC hoists only `place * 4` and loads
   the table's address on every pass, as `BScenarioGraphic_SetCursor` does in the ROM. With a `[5][4]` table or `int`
   operands the row's address is hoisted.
-  An unsigned factor does the same for a pointer: under MWCC 2.0, `out + i * sizeof(u64)` in `dwcutil_ac.c`'s AES key
+  An unsigned factor does the same for a pointer: under MWCC 2.0, `out + i * sizeof(u64)` in `atermset.c`'s AES key
   wrap keeps `i` in a register and computes the address on each pass, as the ROM does, where `out + i * 8` steps an
   offset of its own and spills `i`.
 - A loop's two increments are emitted in the order written: `PkwdCount_CreateActors` has `entries++, i++`, and
@@ -3291,7 +3291,7 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   reads. Under the attribute `IrcLink_Poll` matches with `if (IrcLink.connectCallback)`, while `!= NULL` compares with
   the zero it has just stored (`cmp r2, r1` for the original's `cmp r2, #0`; An instruction too many or too few:
   "A pointer compared with `NULL`").
-  The DWC utility's `AOSSi_WLANConnect` (`dwc_aoss_ap.c`, 2.0/sp2) is the same case: its empty loop over the SSID,
+  The DWC utility's `AOSSi_WLANConnect` (`aosslink.c`, 2.0/sp2) is the same case: its empty loop over the SSID,
   entered with a `b`, and its `connected` flag kept in a register from its first 0 (where MWCC otherwise folds the 0
   into the stores) come only with its file statics `sWep` and `sBss`, both on 32-byte boundaries in the ROM, declared
   `ATTRIBUTE_ALIGN(32)`: 335 bytes became 31.
@@ -3355,7 +3355,7 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   G.711's `search(val, table, size)` as a `static inline` (its row).
 - A counted loop that reads through a post-incremented pointer copies the counter's start into a register of its own
   after the guard and loads from the stepped pointer indexed by that copy (`adds r7, r6, #0`, then
-  `ldrsb r1, [r5, r7]; adds r5, r5, #1` beside the load), and only when the counter's test is signed. `dwcutil_ac.c`'s
+  `ldrsb r1, [r5, r7]; adds r5, r5, #1` beside the load), and only when the counter's test is signed. `atermset.c`'s
   `GetWLanSetElement` matches with `p += PutHex(p, *data++);` under `i < (int)length`: `data[i]` (or
   `((const s8 *)data)[i]`) indexes by the counter and steps the pointer after the call, and the `u32` length's
   unsigned test (`bcc`) gives no copy at all. The copy's register can push a value that the loop doesn't use onto the
@@ -3363,10 +3363,10 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `NHTTPi_getUrlEncodedSize2` (`c = *s++;` under `i < length`) shows the same copy.
 - Two identical conditional branches in a row ahead of a loop (`cmp r4, #0; ble end; ble end`) are an `if (n > 0)`
   around a `for` whose counter was set before the `if`: `int i = 0; ... if (length > 0) { for (; i < length; i++) ... }`
-  in NHTTP's `NHTTPi_getUrlEncodedSize2`, and the copy loop of `dwcutil_ac.c`'s `ScanAP` (still in its row). A
+  in NHTTP's `NHTTPi_getUrlEncodedSize2`, and the copy loop of `atermset.c`'s `ScanAP` (still in its row). A
   bare `for`, or the `if` without the earlier start, gives one branch.
 - MWCC 2.0 drops a loop counter that only indexes what the loop steps by pointer, with all its stores and steps, unless
-  the same variable is read as a value elsewhere before the loop. `dwcutil_ac.c`'s `ScanAP` copies the access
+  the same variable is read as a value elsewhere before the loop. `atermset.c`'s `ScanAP` copies the access
   points with `for (; j < count; j++)`, storing to `scan->Bssid[i]` and stepping `i` after `bss++`; the original
   zeroes, stores and steps `i` without reading it, and so does ours once the same `i` holds the AP list's length in the
   event loop before (`i = UtilAcWcm_GetApList(...); if (i > count) { count = i; ... }`). Assigned in the `if`'s
@@ -3466,7 +3466,7 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 - A case whose jump-table entry points at the `b` that ends the case before it (where an empty case goes straight to the
   switch's end) held a debug print compiled out to `(void)0`, the statement a print macro leaves in a release build.
   Under 2.0/sp2 that statement survives until the blocks are made and keeps the case apart, where `;` and `{}` are
-  removed first. `dwc_aoss_ap.c`'s `AOSSi_WLANConnect` gives the scan alarm's case its entry with `(void)0;` (31 bytes
+  removed first. `aosslink.c`'s `AOSSi_WLANConnect` gives the scan alarm's case its entry with `(void)0;` (31 bytes
   to 30), and the function's empty loop over the SSID is another print compiled out; the scan function itself puts the
   connection's alarm among the events it ignores, with no case of its own.
 - An empty `if` whose condition has three or more `&&` operands is not removed with the other empty statements: its
@@ -3708,7 +3708,7 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 - A field offset that ours loads from the literal pool where the ROM builds it with `movs`/`lsls`, in every function
   that touches the struct, is a wrong offset, not a code generation choice: read our pool word. An offset that is an
   8-bit value shifted (0xa90 = 0xa9 << 4) is built with `movs`/`lsls`, and one that isn't (0xea8) goes to the pool, so
-  a layout off by 0x418 showed as one extra instruction in six small functions of `download_play_sys.c`. Rebuilding
+  a layout off by 0x418 showed as one extra instruction in six small functions of `dwc_moveid.c`. Rebuilding
   the struct from the asm's offsets matched 18 of the file's 20 functions at once.
 - Lines at the end of a same-size diff that `--align` shows as odd instructions (`add sp, #0`, `.byte 0xff`) are the
   literal pool: decode the words before counting the difference as registers. `ctvt_game.c`'s
@@ -3760,7 +3760,7 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   of that size that nothing reads, which `-ipa function` keeps (`-ipa file` drops it): NitroWiFi's `soc.c` has three,
   of 8, 4 and 0x10 bytes at +0x10, +8 and +0x40 among its statics, and with them, defined first, and every static
   zero-initialized, its four functions that reach the statics from the base match and so does the file's `.bss`.
-  Such a static goes first in `.bss`, ahead of the tentative ones, wherever it is defined: `dwc_aoss_ap.c`'s `sBss =
+  Such a static goes first in `.bss`, ahead of the tentative ones, wherever it is defined: `aosslink.c`'s `sBss =
   { 0 }` sat at `.bss + 0` defined just above its function, below other functions, and as a global alike.
 - A zero-initialized static is reached from the section's pooled base, and so is a struct of statics, but the two
   compile differently: the struct's member is a field of one object, which MWCC loads again at other points (after a
@@ -3807,7 +3807,7 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `.rodata` and `.bss` are the original's with four tables inside their functions, `sXItems` and `sCureItems` at
   file scope before theirs, and `sSelectSeq` declared before the first function that uses it.
 - MWCC 2.0 lays a file's `.bss` statics out without the size sort, in an order of their definitions that depends on
-  `-ipa`. Without `-ipa file` it is the reverse of their definition order: the DWC utility's `dwc_wcm.c` (overlay 182)
+  `-ipa`. Without `-ipa file` it is the reverse of their definition order: the DWC utility's `apc.c` (overlay 182)
   matched every function with `sWcm` (0x28 bytes), `sBssid[6]` and `sEssid[0x20]` defined in that order, but the
   module check failed until they were defined as `sEssid`, `sBssid`, `sWcm`, the ROM's order backwards. The symptom is
   literal pool addresses off by another static's size: DPW's `dpw_tr.c` (overlay 189) differed in 61 bytes, each
@@ -3827,12 +3827,12 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   file's global by its own address. It lays the initialized ones out first in `.bss`, in the size heapsort of every
   initialized object defined above the first function (`.data` and `.rodata` ones included), which
   `rodata_order.py`'s `heapsort` of the reversed list predicts. A "struct" of words reached from that anchor, laid out
-  in size order in the ROM, is separate statics: `dwc_aoss_ap.c`'s `gAossApAlloc`, `gAossApOnModeChange`,
+  in size order in the ROM, is separate statics: `aosslink.c`'s `gAossApAlloc`, `gAossApOnModeChange`,
   `gAossApBlock` and `gAossApFree`, four `= NULL` globals, give `AOSSi_InitLocal` its one literal for `0x021c2940` and
-  the free callback at + 0xc, while `dwc_aoss.c` loads the callback by its own address; `dwcutil_ac.c`'s work area is
+  the free callback at + 0xc, while `aoss.c` loads the callback by its own address; `atermset.c`'s work area is
   32 such statics, which matched `ATERMi_ApConfigStart`. A `static const u8 *p = NULL;` goes to `.data` under 2.0, where
   `static u8 *p = NULL;` stays in `.bss`. It emits a jump table only when every value of the range has a case label,
-  so `dwc_aoss.c`'s switches list the empty cases too, and so does `dwcutil_ac.c`'s `ScanAP`.
+  so `aoss.c`'s switches list the empty cases too, and so does `atermset.c`'s `ScanAP`.
 - A static that a function stores to at offsets from its own address (`ldr r1, =obj; str r3, [r1]; str r2,
   [r1, #0x14]`, then the same `r1` passed to a call) is one that the function doesn't know. Under `-ipa file` every
   object of the file is known and reached from its section's base rounded down to 0x80 (`[r1, #0x30]` for an object at
@@ -3846,14 +3846,14 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 - MWCC 2.0 sorts only that list: an object defined after the first function is written out, unsorted and in
   declaration order, with the next function, ahead of its string literals. So a ROM whose tables sort by size among the
   file's initialized statics had them above the first function, and data that sits between two functions' literals
-  was defined between them. `dwcutil_ac.c`'s ten 1024-byte AES tables come out in the ROM's heapsort order (Td2 to Td4,
+  was defined between them. `atermset.c`'s ten 1024-byte AES tables come out in the ROM's heapsort order (Td2 to Td4,
   Te0 to Te4, Td0, Td1, after `rcon`) only defined among the setup's state statics, in the order that the forced
   assignment ("invert the model", below) gives, and its host name and MD5 padding sit after
   `CheckAccessPoint`'s literal and before `GetMacEncKey'`, so they are defined between those functions, the name
   forward-declared (`static char sAcHostName[12];`) for the SOC configuration that points to it.
 - Under MWCC 2.0 without `-ipa file`, a tentative static of struct type joins the shared `.bss` section after the
   initialized statics, while a tentative byte array gets a section of its own, in the reverse of the definitions:
-  `dwcutil_ac.c`'s key of the first exchange, a 16-byte struct of two MAC addresses and a tag, came out ahead of the
+  `atermset.c`'s key of the first exchange, a 16-byte struct of two MAC addresses and a tag, came out ahead of the
   file's other buffers, where the ROM has it among them by size, until it was a `u8[0x10]`.
 - A function-local static of a function MWCC doesn't emit is dropped, while a global read only by an unemitted
   static function stays in the shared section. So the C alone can't reproduce, under `-nodead`, data that outlived
@@ -4404,7 +4404,7 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 
 - MWCC 2.0/sp2 (`-O4,p`) ignores the `register` storage class: `register` on any local or parameter leaves the code
   byte-identical, with or without register pressure, and a `register` counter that is stepped but never read is
-  dropped like any other. `dwcutil_ac.c`'s `CheckAccessPoint` and `ScanAP` gave the same bytes with it on every
+  dropped like any other. `atermset.c`'s `CheckAccessPoint` and `ScanAP` gave the same bytes with it on every
   local and parameter, alone and in pairs. A top-level `const` on an `int` or pointer parameter changes nothing either,
   but a `const` on an initialized local can: `ScanAP`'s `const int size` swaps `size`'s stack slot with the copy
   loop's entry pointer.

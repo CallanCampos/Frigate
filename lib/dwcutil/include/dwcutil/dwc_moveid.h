@@ -1,14 +1,14 @@
-#ifndef POKEBW2_APP_DOWNLOAD_PLAY_SYS_H
-#define POKEBW2_APP_DOWNLOAD_PLAY_SYS_H
+#ifndef POKEBW2_DWCUTIL_DWC_MOVEID_H
+#define POKEBW2_DWCUTIL_DWC_MOVEID_H
 
 #include "types.h"
 #include "dwcutil/dwc_mov_mbp.h"
 #include "dwcutil/dwc_mov_wh.h"
 #include "nitro/mb.h"
 
-// The parent's own flow for the DS Download Play range of overlay 182 (src/ov182/download_play_sys.c). The ROM
-// embeds no file name for it, so the name is ours; it names overlay 181's src/ov181/mb_parent_sys.c, which drives
-// the same kind of flow over the MBComm_* layer, as its role counterpart. The offsets and the states are ours
+// The parent's own flow for the DS Download Play range of overlay 182 (lib/dwcutil/src/dwc_moveid.c, the DWC utility
+// library's dwc_moveid.o by aletheia's map of Black 1's SDK code). Overlay 181's src/ov181/mb_parent_sys.c drives the
+// same kind of flow over the MBComm_* layer. The offsets and the states are ours
 
 // What the parent's flow is doing, the byte the flow itself and the overlay's screens file both read. The numbers are
 // the original's; the names say what each state does in this file
@@ -149,4 +149,4 @@ const MBUserInfo *func_ov182_021bac14(void);
 // screens range owns
 u8 *DWCi_SETTINGlGetMemMap(void);
 
-#endif // POKEBW2_APP_DOWNLOAD_PLAY_SYS_H
+#endif // POKEBW2_DWCUTIL_DWC_MOVEID_H
