@@ -647,17 +647,17 @@ save path that is a symbolic link stays one: the port writes the file it links t
 **The console in the save.** The adventure block (`AdventureSave`) keeps the clock offset, the MAC address and the
 owner's birthday of the console the game was last continued on. CONTINUE checks the offset against the console's
 (`EventFieldContinue_Create` in `event_mapchange.c`, `hasClockNotBeenTampered`), on the way into the field: another
-offset takes the path of a changed clock, a day's
-wait for the daily events (`setNewDayForCountdown`), `func_ov012_02164428` on the party and the trainer card's time.
-Then `setAdvTimeBlkRtcOffsetOwnerMacBdayMonthDay` writes the console's offset, MAC and birthday over the save's, for the
-next save. The port's firmware and the oracle's are the same console (`port/hal/nvram/nvram7.c`, `oracle.cpp`'s
+offset takes the path of a changed clock, a day's wait for the daily events (`setNewDayForCountdown`),
+`ShayminForm_RevertPartyAndRegister` on the party (Shaymin back to its Land Forme) and the trainer card's time. Then
+`setAdvTimeBlkRtcOffsetOwnerMacBdayMonthDay` writes the console's offset, MAC and birthday over the save's, for the next
+save. The port's firmware and the oracle's are the same console (`port/hal/nvram/nvram7.c`, `oracle.cpp`'s
 `MakeFirmware`: MAC `02:42:57:32:00:01`, owner Player, birthday 6/23, offset 0), so the saves here move without it, and
 melonDS's own generated firmware has offset 0 too. A save from a DS whose owner once set its clock has another offset:
 the port takes it as a changed clock, and the next save carries the port's console, so a dump moved from a DS to the
 port and back takes the changed clock's path on both. PLAN.md asks the import to take on the save's offset and MAC
 instead; with the console's Wi-Fi ID, which the port makes again at every launch since its firmware isn't kept between
-runs, that is the console the D7 sidecar would keep. None of it is built yet; a continued game reaches the field on
-the port now, so the path can be shown there.
+runs, that is the console the D7 sidecar would keep. None of it is built yet; a continued game reaches the field on the
+port now, so the path can be shown there.
 
 **The first save** (`oracle.py save first_save`): the oracle plays `port/tests/oracle/first_save_<version>.pbwinput`
 from power-on with a blank save, 18,800 frames: NEW GAME and the intro as `new_game.pbwinput` plays them (the player
@@ -816,10 +816,11 @@ What the comparison found in the port, each fixed in `port/hal` with a test:
 - **The stream dropped a block every 7 frames or so.** The driver ran lazily, at each VBlank and each word of the
   ARM9, so its alarms' words (2.14 a frame at the title stream's 256 samples a block) reached the ARM9 in twos and
   threes at the VBlank; NitroSystem's stream player queues a block to read at each alarm and drops the oldest when a
-  third comes before its thread has read one (`ArcStrmCallback`), which zeroed a block and played the rest of the
-  stream a block later: the title's music lost 27 frames against the DS's in 420. The next alarm is now the OS core's
-  timed work, so each word comes when its alarm goes off (`snd_pxi_alarm_timing`, `os_timed_work`). An alarm set for
-  no ticks, due at once, went off only at the next VBlank until review found it; it now goes off at once too.
+  third comes before its thread has read one (`snd_arc_stream.c`'s `StrmCallback`), which zeroed a block and played
+  the rest of the stream a block later: the title's music lost 27 frames against the DS's in 420. The next alarm is now
+  the OS core's timed work, so each word comes when its alarm goes off (`snd_pxi_alarm_timing`, `os_timed_work`). An
+  alarm set for no ticks, due at once, went off only at the next VBlank until review found it; it now goes off at once
+  too.
 - **The sound unit started its sounds at once.** On melonDS a PCM sound's first sample comes on the channel's third
   timer step, an IMA-ADPCM one's on its eleventh, a square wave's or noise's on its first, so a one-shot sound ends that
   much later: one channel of the Game Freak logo's ended a run earlier on the port. And a channel reads its sound ahead

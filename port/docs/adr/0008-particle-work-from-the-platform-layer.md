@@ -4,6 +4,9 @@
 - **Date:** 2026-10-17
 - **Plan:** D5, §4.5, §4.8 (rule 7)
 - **Upstream:** `e484d5011` (merge of PR #353)
+- **Note (2026-10-24):** upstream has since named the functions this record calls by address, in
+  `src/gfl/particle.c`: `func_0204f980` is `Particle_CreateSystemEx`, `func_0204fa84` `Particle_DeleteSystem` and
+  `func_020500c8` `Particle_GetWork`.
 
 ## Context
 

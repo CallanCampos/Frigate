@@ -12,10 +12,11 @@
 # alignment, for its first field, the cell's u16 index. An index-only animation's NANR file packs its elements in 2
 # bytes, so the element is only 2-aligned (the pointer points into the file itself): the read is a u16 load from a
 # 2-aligned address, which arm64 and x86-64 make, as the DS's ARM9 does. Reports R1 (every route that reaches the title
-# screen) and R2 (the intro's Professor and Pokemon, New Game)
+# screen) and R2 (the intro's Professor and Pokemon, New Game). Both files' functions are static and named
+# ApplyCurrentAnimResult_ (the multi-cell one was SetCurrentFrameMultiCell_ before upstream's bc99248206), so the one
+# entry names both
 [alignment]
 fun:ApplyCurrentAnimResult_
-fun:SetCurrentFrameMultiCell_
 
 # GFL's save data (src/gfl/savedata.c): runSaveBlkInitializers calls each save block's initializer through
 # SaveBlockDef.init, a void (*)(void *), to which src/system/save_table.c casts the 56 initializers, each taking a

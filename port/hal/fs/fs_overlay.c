@@ -33,8 +33,8 @@ typedef struct FSOverlayTable {
     u32 size;
 } FSOverlayTable;
 
-static FSOverlayTable sArm9Overlays;
-static FSOverlayTable sArm7Overlays;
+static FSOverlayTable fsi_ovt9;
+static FSOverlayTable fsi_ovt7;
 static FSArchive *sRomArchive;
 
 static u32 FSi_ReadWord(const u8 *data) {
@@ -61,15 +61,15 @@ static void FSi_ReadOverlayHeader(FSOverlayInfo *info, const u8 *header) {
 // snapshot, once per process, before any overlay can have run: an overlay's code runs only once the game loaded it
 void FSi_InitOverlay(void) {
     if (OS_GetBootType() == OS_BOOTTYPE_DOWNLOAD_MB) {
-        sArm9Overlays.address = (const u8 *)-1;
-        sArm9Overlays.size = 0;
-        sArm7Overlays.address = (const u8 *)-1;
-        sArm7Overlays.size = 0;
+        fsi_ovt9.address = (const u8 *)-1;
+        fsi_ovt9.size = 0;
+        fsi_ovt7.address = (const u8 *)-1;
+        fsi_ovt7.size = 0;
     } else {
-        sArm9Overlays.address = NULL;
-        sArm9Overlays.size = 0;
-        sArm7Overlays.address = NULL;
-        sArm7Overlays.size = 0;
+        fsi_ovt9.address = NULL;
+        fsi_ovt9.size = 0;
+        fsi_ovt7.address = NULL;
+        fsi_ovt7.size = 0;
     }
     sRomArchive = FS_FindArchive("rom", 3);
     port_ovsec_init();
@@ -112,11 +112,11 @@ FSFileID FS_GetOverlayFileID(const FSOverlayInfo *info) {
 BOOL FS_LoadOverlayInfo(FSOverlayInfo *info, MIProcessor target, u32 id) {
     BOOL result = FALSE;
     u32 offset = id * FS_OVERLAY_HEADER_SIZE;
-    const FSOverlayTable *table = &sArm9Overlays;
+    const FSOverlayTable *table = &fsi_ovt9;
     u8 header[FS_OVERLAY_HEADER_SIZE];
 
     if (target != MI_PROCESSOR_ARM9) {
-        table = &sArm7Overlays;
+        table = &fsi_ovt7;
     }
     if (table->address != NULL) {
         if (offset < table->size) {

@@ -12,6 +12,8 @@
   `port --launch`, `check_launch_smoke.py`, and the run directory's `launch:` line.
 - **Note (2026-10-18):** the Pokédex's trap in the Consequences is gone since the port's `1f0c184f6` (upstream's C of
   `NNSi_objSizeHTbl` and `NNSi_objSizeWTbl`): `party_menus` launches the Pokédex, and it matches the oracle.
+- **Note (2026-10-24):** upstream has since named the table and the function this record calls by address:
+  `data_ov036_021d0054` is `FIELD_MENU_ITEMS` and `func_0203d564` `GCTX_HIDSetUsingTouch`.
 - **Note (2026-10-24):** superseded: retired when the field opened. `FIELDMAP_PROC_FUNCS` got its C by upstream sync,
   and the field opened on the host with [ADR 0021](0021-root-heaps-in-the-games-own-memory-from-host-memory.md) (PR
   18), so the launcher stepped aside, as its gate meant it to, and its seven tests failed on `main` in both versions.

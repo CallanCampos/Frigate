@@ -1,8 +1,8 @@
 // Host versions of NitroSystem's G2D file loaders (lib/nnsys/src/g2d/g2d_NCG_load.c, g2d_NCL_load.c, g2d_NCE_load.c,
 // g2d_NMC_load.c, g2d_NAN_load.c, g2d_NFT_load.c and g2d_Load.c's NNSi_G2dUnpackUserExCellAttrBank). On the DS each
-// turns a loaded file's offsets into pointers in place (NNSi_G2dUnpackOffset), so the file's bytes become the runtime
-// structs of nnsys/g2d.h. A host's runtime structs hold 8-byte pointers, so each function here reads the file through
-// its DS layout (port/hal/nnsys/g2d_file.h) and builds a tree of host structs instead:
+// turns a loaded file's offsets into pointers in place (NNS_G2D_UNPACK_OFFSET_PTR), so the file's bytes become the
+// runtime structs of nnsys/g2d.h. A host's runtime structs hold 8-byte pointers, so each function here reads the file
+// through its DS layout (port/hal/nnsys/g2d_file.h) and builds a tree of host structs instead:
 //   - every value is copied as it is, and each pointer is set where the DS's relocation would point it;
 //   - a pointer to raw data (pixels, palettes, OAM attributes, hierarchy nodes, transfer entries, animation frames'
 //     contents, user attributes, glyphs) points into the file's bytes, as on the DS, since those keep their layout;
@@ -108,8 +108,8 @@ static _Noreturn void OutOfMemory(size_t size) {
     abort();
 }
 
-// The address offset bytes past base, as NNSi_G2dUnpackOffset makes it (without the DS's 32-bit wrap, which no file
-// relies on: the sum stays inside the file)
+// The address offset bytes past base, as NNS_G2D_UNPACK_OFFSET_PTR makes it (without the DS's 32-bit wrap, which no
+// file relies on: the sum stays inside the file)
 static void *Rel(const void *base, u32 offset) {
     return (void *)((uintptr_t)base + offset);
 }
@@ -1040,9 +1040,10 @@ void NNS_G2dUnpackNAN(NNSG2dAnimBankData *bank) {
     UnpackOrStop(PORT_RELOC_G2D_ANIM_BANK, NULL, 0, bank, __func__);
 }
 
-// g2d_NFT_load.c. The header checks are the file's inlines: the signature, and a version at least the one asked for
+// g2d_NFT_load.c. The header checks are the file's inline, NNS_G2dIsBinFileValid: the signature, and a version at
+// least the one asked for
 
-static BOOL IsBinFileValid(const NNSG2dBinaryFileHeader *header, u32 signature, u16 version) {
+static BOOL NNS_G2dIsBinFileValid(const NNSG2dBinaryFileHeader *header, u32 signature, u16 version) {
     return header != NULL && header->signature == signature && header->version >= version;
 }
 
@@ -1051,9 +1052,9 @@ BOOL NNSi_G2dGetUnpackedFont(void *pNftrFile, NNSG2dFontInformation **ppFont) {
     BOOL bOldVer = FALSE;
     PortG2dFont *font;
 
-    if (!IsBinFileValid(pNftrFile, NNS_G2D_BINFILE_SIG_FONTDATA, 0x102) &&
-        !IsBinFileValid(pNftrFile, NNS_G2D_BINFILE_SIG_FONTDATA, 0x101)) {
-        if (!IsBinFileValid(pNftrFile, NNS_G2D_BINFILE_SIG_FONTDATA, 0x100)) {
+    if (!NNS_G2dIsBinFileValid(pNftrFile, NNS_G2D_BINFILE_SIG_FONTDATA, 0x102) &&
+        !NNS_G2dIsBinFileValid(pNftrFile, NNS_G2D_BINFILE_SIG_FONTDATA, 0x101)) {
+        if (!NNS_G2dIsBinFileValid(pNftrFile, NNS_G2D_BINFILE_SIG_FONTDATA, 0x100)) {
             OS_Terminate();
         }
         bOldVer = TRUE;

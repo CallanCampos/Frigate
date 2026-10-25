@@ -5,7 +5,8 @@
 //   - the contexts: OS_InitContext, OS_SaveContext and OS_LoadContext (os_context.c, assembly in the SDK);
 //   - the CPSR: OS_EnableInterrupts, OS_DisableInterrupts, OS_RestoreInterrupts, their IrqAndFiq pair,
 //     OS_GetCpsrIrq and OS_GetProcMode (os_system.c, assembly), and OS_Halt (os_terminate_proc.c, assembly);
-//   - the IRQ handler in ITCM and its thread-switch tail (OS_IrqHandler and func_01ff8ce0, assembly with no C);
+//   - the IRQ handler in ITCM and its thread-switch tail (OS_IrqHandler and OS_IrqHandler_ThreadSwitch, the SDK's
+//     assembly, the asm functions of the decomp's os_irqHandler_itcm.c, which port/hal/replaced.txt keeps out);
 //   - the display's timing (VBlank, HBlank, V-count, VCOUNT and DISPSTAT's flags, the HBlank interrupt as its flag
 //     sets, which the screen wipes that cover lines one by one need), the hardware timers and the other modules' timed
 //     work (port_os_set_timed_work), on a virtual clock;
@@ -601,12 +602,12 @@ void port_osi_tick_step(void) {
     PollIrq();
 }
 
-// NitroSDK's OS_IrqHandler_ThreadSwitch (func_01ff8ce0 in ITCM), from its assembly: wakes every thread that waits in
-// OS_WaitIrq and asks for a switch, then, when a switch was asked for (by that, or by a wakeup in a handler while
-// OSi_RescheduleThread saw the IRQ mode), makes the first ready thread of the list the running one, calling the
-// thread info's switch callback first. Like the assembly, it doesn't look at OS_DisableScheduler's count and doesn't
-// call the system callback that OSi_RescheduleThread also calls. The dispatcher then resumes that thread's fiber; the
-// interrupted thread's fiber stays where it yielded, which is its saved context
+// NitroSDK's OS_IrqHandler_ThreadSwitch (in ITCM, lib/nitro/src/os/os_irqHandler_itcm.c), from its assembly: wakes
+// every thread that waits in OS_WaitIrq and asks for a switch, then, when a switch was asked for (by that, or by a
+// wakeup in a handler while OSi_RescheduleThread saw the IRQ mode), makes the first ready thread of the list the
+// running one, calling the thread info's switch callback first. Like the assembly, it doesn't look at
+// OS_DisableScheduler's count and doesn't call the system callback that OSi_RescheduleThread also calls. The dispatcher
+// then resumes that thread's fiber; the interrupted thread's fiber stays where it yielded, which is its saved context
 static void IrqThreadSwitch(void) {
     OSThread *thread = OSi_IrqThreadQueue.head;
     OSThread *next;

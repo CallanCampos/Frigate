@@ -6,7 +6,8 @@
 //
 // The functions are the decomp's with the addresses kept as DS addresses, and with the copy that the SDK starts on GX's
 // DMA channel made at once by port_gx_load_copy (port/hal/gx/gx_load3d.c says why), so the End has no DMA to wait for.
-// g_GfxVRAMUploadBanksBGExtPltB, which only the sub engine's loads use, stays the decomp's
+// The sub engine's banks, sSubBGExtPltt (swan's g_GfxVRAMUploadBanksBGExtPltB) and sSubOBJExtPltt, which only its loads
+// use, stay the decomp's statics in gx_load2d.c
 #include "hal/gx/gx_internal.h"
 #include "nitro/gx.h"
 
@@ -16,68 +17,69 @@
 #define LCDC_VRAM_G 0x06894000u
 
 // The extended palette being loaded. The banks are what a Begin took from the engine (0 when it took none) and the End
-// gives back; dest is the DS address of the first of them in the CPU's view, and offset where in the extended palette
-// that bank starts, which is not 0 when only bank G holds the BGs' palette: it starts at its third slot
-static u32 sObjExtPlttDestA;
-static u32 sObjExtPlttBanksA;
-static u32 sBGExtPlttOffsetA;
-static u32 sBGExtPlttDestA;
-static u32 sBGExtPlttBanksA;
+// gives back; the LCDCBlk words are the DS address of the first of them in the CPU's view, and sBGExtPlttLCDCOffset
+// where in the extended palette that bank starts, which is not 0 when only bank G holds the BGs' palette: it starts at
+// its third slot. They have the names of gx_load2d.c's, NitroSDK's, which stay there, unused
+static u32 sOBJExtPlttLCDCBlk;
+static u32 sOBJExtPltt;
+static u32 sBGExtPlttLCDCOffset;
+static u32 sBGExtPlttLCDCBlk;
+static u32 sBGExtPltt;
 
 void GX_BeginLoadBGExtPltt(void) {
     GXVRamBGExtPltt banks = GX_ResetBankForBGExtPltt();
-    sBGExtPlttBanksA = banks;
+    sBGExtPltt = banks;
     switch (banks) {
     case GX_VRAM_BGEXTPLTT_NONE:
         break;
     case GX_VRAM_BGEXTPLTT_0123_E:
-        sBGExtPlttDestA = LCDC_VRAM_E;
-        sBGExtPlttOffsetA = 0;
+        sBGExtPlttLCDCBlk = LCDC_VRAM_E;
+        sBGExtPlttLCDCOffset = 0;
         break;
     case GX_VRAM_BGEXTPLTT_23_G:
-        sBGExtPlttDestA = LCDC_VRAM_G;
-        sBGExtPlttOffsetA = 0x4000;
+        sBGExtPlttLCDCBlk = LCDC_VRAM_G;
+        sBGExtPlttLCDCOffset = 0x4000;
         break;
     case GX_VRAM_BGEXTPLTT_01_F:
     case GX_VRAM_BGEXTPLTT_0123_FG:
-        sBGExtPlttDestA = LCDC_VRAM_F;
-        sBGExtPlttOffsetA = 0;
+        sBGExtPlttLCDCBlk = LCDC_VRAM_F;
+        sBGExtPlttLCDCOffset = 0;
         break;
     }
 }
 
 void GX_LoadBGExtPltt(const void *src, u32 offset, u32 size) {
-    port_gx_load_copy(sBGExtPlttDestA + offset - sBGExtPlttOffsetA, src, size);
+    port_gx_load_copy(sBGExtPlttLCDCBlk + offset - sBGExtPlttLCDCOffset, src, size);
 }
 
 void GX_EndLoadBGExtPltt(void) {
-    GX_SetBankForBGExtPltt(sBGExtPlttBanksA);
-    sBGExtPlttBanksA = 0;
-    sBGExtPlttDestA = 0;
-    sBGExtPlttOffsetA = 0;
+    GX_SetBankForBGExtPltt(sBGExtPltt);
+    sBGExtPltt = 0;
+    sBGExtPlttLCDCBlk = 0;
+    sBGExtPlttLCDCOffset = 0;
 }
 
 void GX_BeginLoadOBJExtPltt(void) {
     GXVRamOBJExtPltt banks = GX_ResetBankForOBJExtPltt();
-    sObjExtPlttBanksA = banks;
+    sOBJExtPltt = banks;
     switch (banks) {
     case GX_VRAM_OBJEXTPLTT_NONE:
         break;
     case GX_VRAM_OBJEXTPLTT_0_F:
-        sObjExtPlttDestA = LCDC_VRAM_F;
+        sOBJExtPlttLCDCBlk = LCDC_VRAM_F;
         break;
     case GX_VRAM_OBJEXTPLTT_0_G:
-        sObjExtPlttDestA = LCDC_VRAM_G;
+        sOBJExtPlttLCDCBlk = LCDC_VRAM_G;
         break;
     }
 }
 
 void GX_LoadOBJExtPltt(const void *src, u32 offset, u32 size) {
-    port_gx_load_copy(sObjExtPlttDestA + offset, src, size);
+    port_gx_load_copy(sOBJExtPlttLCDCBlk + offset, src, size);
 }
 
 void GX_EndLoadOBJExtPltt(void) {
-    GX_SetBankForOBJExtPltt(sObjExtPlttBanksA);
-    sObjExtPlttBanksA = 0;
-    sObjExtPlttDestA = 0;
+    GX_SetBankForOBJExtPltt(sOBJExtPltt);
+    sOBJExtPltt = 0;
+    sOBJExtPlttLCDCBlk = 0;
 }

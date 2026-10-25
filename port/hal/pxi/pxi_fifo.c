@@ -24,8 +24,8 @@
 #define RECEIVE_CAPACITY 4096
 
 // The ARM9's callback for each tag, and whether the FIFO was set up (the SDK's statics)
-static PXIFifoCallback sFifoCallbacks[PXI_MAX_FIFO_TAG];
-static u16 sFifoInitialized;
+static PXIFifoCallback FifoRecvCallbackTable[PXI_MAX_FIFO_TAG];
+static u16 FifoCtrlInit;
 
 // The ARM7's service for each tag, and the words it sent that the ARM9 hasn't read, a ring
 static PortPxiService sServices[PXI_MAX_FIFO_TAG];
@@ -92,10 +92,10 @@ void port_pxi_reset(void) {
     int i;
 
     for (i = 0; i < PXI_MAX_FIFO_TAG; i++) {
-        sFifoCallbacks[i] = NULL;
+        FifoRecvCallbackTable[i] = NULL;
         sServices[i] = NULL;
     }
-    sFifoInitialized = FALSE;
+    FifoCtrlInit = FALSE;
     sReceiveHead = 0;
     sReceiveCount = 0;
     sReceiveIrqEnabled = FALSE;
@@ -128,13 +128,13 @@ void PXI_InitFifo(void) {
     OSSystemWork *work = OS_GetSystemWork();
     u32 enabled = OS_DisableInterrupts();
 
-    if (!sFifoInitialized) {
+    if (!FifoCtrlInit) {
         int i;
 
-        sFifoInitialized = TRUE;
+        FifoCtrlInit = TRUE;
         work->pxiHandleChecker[MI_PROCESSOR_ARM9] = 0;
         for (i = 0; i < PXI_MAX_FIFO_TAG; i++) {
-            sFifoCallbacks[i] = NULL;
+            FifoRecvCallbackTable[i] = NULL;
         }
 
         OS_ResetRequestIrqMask(OS_IE_FIFO_RECV);
@@ -154,7 +154,7 @@ void PXI_SetFifoRecvCallback(int fifoTag, PXIFifoCallback callback) {
     u32 enabled = OS_DisableInterrupts();
 
     port_pxi_observe_arena();
-    sFifoCallbacks[fifoTag] = callback;
+    FifoRecvCallbackTable[fifoTag] = callback;
     if (callback != NULL) {
         work->pxiHandleChecker[MI_PROCESSOR_ARM9] |= 1u << fifoTag;
     } else {
@@ -207,8 +207,8 @@ void PXIi_HandlerRecvFifoNotEmpty(void) {
         if (message.e.tag == PXI_FIFO_TAG_EX) {
             continue;
         }
-        if (sFifoCallbacks[message.e.tag] != NULL) {
-            sFifoCallbacks[message.e.tag](message.e.tag, message.e.data, message.e.err);
+        if (FifoRecvCallbackTable[message.e.tag] != NULL) {
+            FifoRecvCallbackTable[message.e.tag](message.e.tag, message.e.data, message.e.err);
         } else if (!message.e.err) {
             message.e.err = TRUE;
             DeliverToArm7(message.raw);
