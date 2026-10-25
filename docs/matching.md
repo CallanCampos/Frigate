@@ -820,6 +820,9 @@ Same instructions, registers swapped.
 
 ## Stack slots
 
+- A local used only inside one straight-line block takes the temporaries' slot, above every named one, whatever
+  its declaration position: TwlSDK's `Yos_JPEGEncode` (`ssp_jpegenc.c`) spills `chromBlocksX` to sp+0x58 in all 24
+  declaration orders tried, where the original has it among the named slots, so the original used it beyond that block.
 - NitroWiFi's `CPSi_sha1_block` runs its rounds in groups of five, rotating the arguments of a two-statement
   round macro (`SHA1_ROUND`) instead of copying the five state words after each round. The first fifteen rounds use
   direct words, followed by word 15 and four expanded words; the later stages each run four groups over the circular
@@ -3085,6 +3088,9 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 
 ## Loops
 
+- Two increments in a `for` step, `h++, q++`, can emit two `ble` in a row at the loop's bottom, where one of them
+  written as the body's last statement emits one: TwlSDK's `Mel_JPEGDecode` (`ssp_jpegdec.c`) copies its Huffman
+  values with `q++;` in the body.
 - A field that the loop's test reads, kept in a register for the body where the original loads it again, can be an
   enum: MWCC reuses a loaded `int` field across the loop's head, but not an enum-typed one passed to a function whose
   parameter has that enum type. GameSpy's `qr_build_split_query_reply` (`qr2.c`, overlay 11) matched only with its
