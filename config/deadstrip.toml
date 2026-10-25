@@ -82,3 +82,22 @@
     "SetPersistDataValuesA",
     "StatsThink",
 ]
+# The multiboot child's reception of the beacon and the setters nothing calls, which the parent of overlay 181 doesn't
+# link, from ntrtwl's NitroSDK: they keep the receive side's four pointers in the file's pooled .bss, ahead of the
+# send state, where the ROM has them
+"lib/nitro/src/mb/mb_gameinfo.c" = [
+    "MB_GetBeaconRecvStatus",
+    "MBi_SetBeaconRecvStatusBufferDefault",
+    "MBi_SetBeaconRecvStatusBuffer",
+    "MBi_SetScanLockFunc",
+    "MB_DeleteGameInfo",
+    "MB_InitRecvGameInfoStatus",
+    "MB_RecvGameInfoBeacon",
+    "MB_CountGameInfoLifetime",
+    "MB_DeleteRecvGameInfo",
+    "MB_DeleteRecvGameInfoWithoutBssdesc",
+    "MB_GetGameInfoRecvList",
+    "MB_SetSendVolatCallback",
+    "MB_SetUserVolatData",
+    "MB_GetUserVolatData",
+]

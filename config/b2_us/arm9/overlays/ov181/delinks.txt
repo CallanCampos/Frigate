@@ -43,18 +43,19 @@ lib/nitro/src/mb/mb_comm.c:
 
 lib/nitro/src/mb/mb_segment.c:
     complete
-    .text       start:0x021a1698 end:0x021a2040
+    .text       start:0x021a1698 end:0x021a2018
     .rodata     start:0x021a4254 end:0x021a4290
     .data       start:0x021a4730 end:0x021a4738
     .bss        start:0x021a47d4 end:0x021a47d8
 
 lib/nitro/src/mb/mb_gameinfo.c:
-    .text       start:0x021a2040 end:0x021a2638
+    complete
+    .text       start:0x021a2070 end:0x021a2654
     .bss        start:0x021a47d8 end:0x021a4890
 
 lib/nitro/src/mb/mb_wm.c:
     complete
-    .text       start:0x021a2638 end:0x021a3b28
+    .text       start:0x021a2654 end:0x021a3b28
     .data       start:0x021a4738 end:0x021a4780
     .bss        start:0x021a4890 end:0x021a4904
 
@@ -71,3 +72,7 @@ lib/nitro/src/mb/mb_frame.c:
     complete
     .text       start:0x021a3e44 end:0x021a4040
     .bss        start:0x021a4908 end:0x021a4920
+
+lib/nitro/src/mb/mb_common.c:
+    complete
+    .text       start:0x021a2018 end:0x021a2070

@@ -1794,10 +1794,11 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 | `mb_comm_sys.c` | `0x0219f580`–`0x0219fc0c` | 47 | complete | string at `0x021a46a8` |
 | `mb_util_msg.c` | `0x0219fc0c`–`0x021a039c` | 26 | complete | string at `0x021a46b8` |
 | `mb_parent_dataconv_sys.c` | `0x021a039c`–`0x021a092c` | 15 | complete | string at `0x021a46c8` |
-| `mb_comm.c` | `0x021a092c`–`0x021a1698` | 18 | partial | descriptive |
-| `mb_segment.c` | `0x021a1698`–`0x021a2040` | 11 | complete | descriptive |
-| `mb_gameinfo.c` | `0x021a2040`–`0x021a2638` | 14 | partial | descriptive |
-| `mb_wm.c` | `0x021a2638`–`0x021a3b28` | 28 | partial | descriptive |
+| `mb_comm.c` | `0x021a092c`–`0x021a1698` | 18 | complete | descriptive |
+| `mb_segment.c` | `0x021a1698`–`0x021a2018` | 10 | complete | descriptive |
+| `mb_common.c` | `0x021a2018`–`0x021a2070` | 2 | complete | descriptive |
+| `mb_gameinfo.c` | `0x021a2070`–`0x021a2654` | 14 | complete | descriptive |
+| `mb_wm.c` | `0x021a2654`–`0x021a3b28` | 27 | complete | descriptive |
 | `mb_cache.c` | `0x021a3b28`–`0x021a3bd4` | 3 | complete | descriptive |
 | `mb_task.c` | `0x021a3bd4`–`0x021a3e44` | 7 | complete | descriptive |
 | `mb_frame.c` | `0x021a3e44`–`0x021a4040` | 7 | complete | descriptive |

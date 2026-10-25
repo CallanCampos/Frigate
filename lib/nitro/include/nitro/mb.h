@@ -34,6 +34,18 @@ typedef struct {
     u8 userParam[MB_DOWNLOAD_PARAMETER_SIZE];
 } MBGameRegistry;
 
+// The bytes of a program's game info that the program sets and the beacon carries to the children
+#define MB_USER_VOLAT_DATA_SIZE 8
+// How many parents a child keeps track of
+#define MB_GAME_INFO_RECV_LIST_NUM 16
+
+// What is called when the beacon sends a program's players, before or after them (MB_SetSendVolatCallback)
+typedef void (*MBSendVolatCallbackFunc)(u32 ggid);
+enum {
+    MB_SEND_VOLAT_CALLBACK_TIMMING_BEFORE,
+    MB_SEND_VOLAT_CALLBACK_TIMMING_AFTER,
+};
+
 // The smallest packet the parent sends
 #define MB_COMM_PARENT_SEND_MIN 256
 

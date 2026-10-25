@@ -1939,9 +1939,6 @@ Same instructions, scheduled in another order.
   `BtlvEffvm_WindowTask` writes its window bounds with `G2_SetWnd0Position` and `G2_SetWnd1Position`, which match
   only in NitroSDK's own form, `((y1 << 8) & 0xff00) | (y2 & 0xff)`; with `(u8)y2` the mask folds, and no direct
   store to `reg_G2_WIN0V` keeps it. When an SDK inline won't give the original's code, compare it with the SDK's text.
-- Two loops in a row that share one counter can swap the second loop's counter with another local; a counter of its
-  own, declared before that local, fixes it where no declaration order with the shared one does
-  (`MBi_SendVolatBeacon`, `mb_gameinfo.c`).
 - MWCC folds `x | 2 | 1` into one OR. Two ORs in the original come from an inline that ORs its `u32` parameter with
   one flag, called with the other already in: multiboot's `MBGameInfo_SetBeacon` (`mb_gameinfo.c`). An `int`
   parameter still folds, since the argument expression is substituted, and a `u8`/`u16` one adds a narrowing.
@@ -3295,6 +3292,11 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   reads. Under the attribute `IrcLink_Poll` matches with `if (IrcLink.connectCallback)`, while `!= NULL` compares with
   the zero it has just stored (`cmp r2, r1` for the original's `cmp r2, #0`; An instruction too many or too few:
   "A pointer compared with `NULL`").
+  Multiboot's beacon `bsendBuff` (`mb_gameinfo.c`, at `0x021a4820` after a 0x1c-byte gap) is another: with it aligned,
+  as ntrtwl's NitroSDK declares it, `MBi_SendFixedBeacon`, which has no loop, loses a 41-byte difference in its spills
+  and registers, and `MBi_SendVolatBeacon` matches with plain `i < 8` and `i < 15` loops and `&& sSendVolatCallback`,
+  where `!= NULL` shares a zero; unaligned, they had needed `?:` tests and a second counter and still stayed 41 and 7
+  bytes off.
   The DWC utility's `AOSSi_WLANConnect` (`aosslink.c`, 2.0/sp2) is the same case: its empty loop over the SSID,
   entered with a `b`, and its `connected` flag kept in a register from its first 0 (where MWCC otherwise folds the 0
   into the stores) come only with its file statics `sWep` and `sBss`, both on 32-byte boundaries in the ROM, declared
@@ -3780,6 +3782,15 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   list's functions match. Such `= 0` `.bss` objects still join the `.data` size sort where they are defined:
   `dwc_nastime.c`'s month names come out in the ROM's order (`Jun`, `Jul`, `Dec`, `Sep` and on) only with its three
   globals defined before the table, offset, local seconds and valid flag, which `rodata_order.py` predicts.
+- A struct that covers a file's whole `.bss` range can hold bytes that are not its own: in front, statics that only
+  dead-stripped code used, and behind, the gap that the linker leaves before the next 32-aligned section. Multiboot's
+  `mb_gameinfo.c` had one 0x48-byte struct. As ntrtwl's NitroSDK declares them, the file's pooled `.bss` (its statics
+  under 64 bytes, `-ipa file`) is the child side's four pointers, the send callback's timing and the callback, then the
+  0x14-byte send state: 0x2c bytes, and the beacon, `ATTRIBUTE_ALIGN(32)`, starts at 0x48. The child side, rebuilt for
+  its statics and dropped through `config/deadstrip.toml`, gives that layout (its 0x5910-byte list and 0xc0-byte beacon
+  copy are sections of their own and go with it). The tail was the sign to look for: an object right after a gap that
+  ends on a 32-byte boundary is aligned, and the alignment is what changed the code (Loops: "An explicit alignment");
+  the split itself changes none of it.
 - In Thumb code a word of a known static at section offset `off` is read through the literal `.bss` plus `off` rounded
   down to a multiple of 0x80, with the rest in the load's offset: in the unsplit `card_common.c` a static at 0x584 is
   read as `.bss+0x580` and `#4`, at 0x5a0 as `.bss+0x580` and `#0x20`, and at 0x600 as `.bss+0x600` and `[r0]`. A read

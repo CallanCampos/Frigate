@@ -40,7 +40,10 @@ pokeplatinum and pokeheartgold, with the two window readers `wipe_wnd.c` lost wi
 ruling of 2026-10-25, for GameSpy code that GameSpy's SDK (UniSpySDK's copy) shows: `qr2regkeys.c`'s key list,
 whose 4-byte `.bss` static the strip drops with its two functions while its place in MWCC's size heapsort gives the key
 names the ROM's order, and `gstats.c`'s 23 functions the game doesn't call, whose statics, local initializers and
-first `""` give the file's data the ROM's layout. Any other entry is another exception for the maintainer to accept.
+first `""` give the file's data the ROM's layout, and, by the same ruling, for NitroSDK code that ntrtwl's
+reconstruction shows: multiboot's `mb_gameinfo.c`, whose child side and unused setters (26 functions, 14 of them listed)
+give the four words at the head of its `.bss` that the parent never reads. Any other entry is another
+exception for the maintainer to accept.
 
 The strip drops each listed symbol's section, every allocated section that only dropped code reaches (a static
 function, a string, an unpooled static), the exception indices of dropped code, the relocations of what stays (the

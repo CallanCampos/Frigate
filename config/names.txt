@@ -21478,7 +21478,7 @@ overlays/ov181 0x021a2338 MBi_InitSendFixedBeacon
 overlays/ov181 0x021a2374 MBi_SendFixedBeacon
 overlays/ov181 0x021a246c MBi_InitSendVolatBeacon
 overlays/ov181 0x021a2490 MBi_SendVolatBeacon
-overlays/ov181 0x021a2638 MBWm_IsMultibootBeacon
+overlays/ov181 0x021a2638 MBi_CheckMBParent
 overlays/ov181 0x021a2654 changeScanChannel
 overlays/ov181 0x021a2698 MBi_IsSendEnabled
 overlays/ov181 0x021a26e8 MBi_OnInitializeDone
@@ -21544,7 +21544,7 @@ overlays/ov181 0x021a47c8 sMBCommBeaconData
 overlays/ov181 0x021a47cc sMBDataConvWirelessDone
 overlays/ov181 0x021a47d0 any_recv_bitmap
 overlays/ov181 0x021a47d4 sRegisteredCount
-overlays/ov181 0x021a47d8 sSender
+overlays/ov181 0x021a47d8 sUnlockFunc
 overlays/ov181 0x021a4820 bsendBuff
 overlays/ov181 0x021a4890 sDmaNo
 overlays/ov181 0x021a4894 sWmBuf
