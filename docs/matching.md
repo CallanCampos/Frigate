@@ -1930,7 +1930,10 @@ Same instructions, scheduled in another order.
   stores and reloads at once, and the request list's `count`, whose `id = info->count++` loads the field twice, once
   for the result and once for the increment, as only a `volatile` lvalue does. The response's `contentLength` is the
   same: `NHTTPGetProgress` tests it and then stores it, and the original builds its -1 before the first load and loads
-  the field again for the store, which no ternary, early return or `goto` gives and `volatile` does.
+  the field again for the store, which no ternary, early return or `goto` gives and `volatile` does. A test
+  `x == 2 || x == 3` that loads the byte again for the second comparison, from the same address registers and with no
+  range test, is the same: DWC's `DWC_ProcessFriendsMatch` and `DWCi_HandleClosedConnection` (`dwc_main.c`) match
+  only with `DWCMatchControl.mode` and `qr2MatchType` `volatile`.
 - A global reached through a cast to a derived struct, `((Derived *)gBase)->arr[n].f`, is addressed as
   `(base + n * size) + offsetof(f)`, where the global's own type folds the constants first. Multiboot's work global
   is the parent's and child's shared part, which the parent's code casts to its extension (`pPwork`), and

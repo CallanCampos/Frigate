@@ -44,8 +44,10 @@ typedef struct DWCMatchControl {
     u8 matched;
     u8 unk_0e[0x2];
     qr2_t qr2Obj;
-    u8 mode;
-    u8 qr2MatchType;
+    // The API, the match state machine and the GameSpy callbacks (GP buddy messages, GT2 closes, qr2 keys) share
+    // these, and the original loads them again at every test
+    volatile u8 mode;
+    volatile u8 qr2MatchType;
     u8 hostState;
     u8 qr2NumEntry;
     u8 qr2IsReserved;
