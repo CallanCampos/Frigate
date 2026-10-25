@@ -1525,6 +1525,10 @@ Same instructions, scheduled in another order.
   has it), and with the message built in the function; with the work 0x24 bytes and the alarm a static of its own,
   `playing` was stored before the argument setup (44 bytes), and with the alarm in the work but the message built in a
   `static inline`, 10 bytes of registers still differed.
+  The bound holds in Thumb too, for a static's field loads moving above stores into an address-taken stack local:
+  PokeNet's `POKE_NET_Connecting` (`poke_net.c`) loads the server port and address (0x240, 0x264) above its
+  socket address's stores only when the control struct is larger than twice that, which it is with the 0x830-byte
+  SSL connection that follows it in `.bss` as its last member, not a static of its own.
 - Stores to `volatile` fields are scheduled apart from the instructions around them even when they are written in order:
   NitroSDK's `SNDi_InitSharedWork` (`snd_work.c`) copies its parameter to a saved register before it builds the zero it
   stores (`adds r4, r0, #0; movs r1, #0`) only with `SNDSharedWork`'s status words `volatile`, as NitroSDK declares the

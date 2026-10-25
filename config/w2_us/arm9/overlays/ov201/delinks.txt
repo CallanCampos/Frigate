@@ -20,6 +20,7 @@ src/ov201/battle_rec_ov.c:
     .text       start:0x021b635c end:0x021b6528
 
 lib/poke_net/src/poke_net.c:
+    complete
     .text       start:0x021b6528 end:0x021b73b4
     .data       start:0x021b7bd4 end:0x021b7bd8
     .bss        start:0x021b7ce0 end:0x021b9928
