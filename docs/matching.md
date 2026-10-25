@@ -4394,6 +4394,16 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   or Thumb type, so mwldarm links a Thumb `bl` to it unchanged where an ARM routine needs a `blx` (and crashes,
   `ELF_ARM.c, line 3817`, on one assigned outside a section).
 
+- mwasmarm places code at any halfword, so an assembly file gives Thumb functions that start 2 bytes past a multiple
+  of 4, which MWCC's `asm` functions can't (it aligns each to 4): NitroSDK's system call library in the secure area,
+  `lib/nitro/src/syscall/secure_area.s`, has its stubs at the ROM's addresses that way. mwasmarm runs the C
+  preprocessor (`#ifdef BLACK2`, `#include`, `-d` and `-i` as mwccarm's) and writes a dependency file with
+  `-gccdep -MD`. Its `.incbin "file", offset, length` takes a range of a binary but reads it as text, turning each lone
+  line feed (`0x0a`) into a carriage return (`0x0d`) and keeping `0x0d 0x0a`, so bytes from the ROM go in as `.byte`
+  directives; an `#include` inside a `.macro` fails (`End of file encountered but still in macro definition`), so a
+  generated file defines the whole macro. A label `F0` (most likely taken for the FPA register) is refused as an
+  `incompatible duplicate declaration`.
+
 - An `asm {}` block inside a C function keeps the compiler's prologue, epilogue and addressing around it, which an `asm`
   function can't give: `os_exception.c`'s `OSi_DisplayExContext` tests the handler and returns early in C, then switches
   modes and calls it in the SDK's assembly.

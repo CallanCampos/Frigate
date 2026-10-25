@@ -84,7 +84,9 @@ every section.
   `lib/twl/src/dsp/dsp_g711_image.c` and `dsp_graphics_image.c`. `ROM_BLOBS` in `configure.py` names each include file
   under `rom/` of the generated headers with its module and symbol, and `tools/build/rom_blob.py` writes it from the
   extracted module, with the symbol's address and size from `symbols.txt`. The bytes are never committed. Without a
-  ROM, `compile_all.py` writes zeros of the same size.
+  ROM, `compile_all.py` writes zeros of the same size. The filler of the system call library in the secure area, which
+  differs in each version, comes the same way from each version's ROM, as an assembler macro (`ROM_RANGES`,
+  `docs/configs.md`).
 - The digests of the ARM9 overlays at the end of ARM9 main's `.data`, which NitroSDK's tools write after the link,
   are written the same way: `lib/nitro/src/fs/fs_overlay_digest.c` leaves their room as zeros, `dsd rom config` finds
   its `SDK_OVERLAY_DIGEST` in the linked program, and `dsd rom build` fills it with the HMAC-SHA1 of each overlay

@@ -211,6 +211,17 @@ Black 2 is an NDS/DSi hybrid built with the TWL-SDK, which differs from DS-only 
   program. The build recomputes all of these.
 - The digests of the ARM9 secure area are computed over its encrypted form. Without an ARM7 BIOS the build reuses
   the original values, which stay valid as long as the secure area is unchanged.
+- The secure area, `0x02004000` to `0x02004800`, is NitroSDK's system call library, which Nintendo builds for each
+  game: 18 Thumb BIOS stubs at places of the game's own among filler bytes, in another order in each version
+  (`lib/nitro/src/syscall/secure_area.s`). The stubs are assembled, and the filler comes from the base ROM like the
+  DSP's images (`ROM_BLOBS`, in `docs/code-organization.md`), but for each version from its own: `ROM_RANGES` in
+  `configure.py` has `tools/build/rom_blob.py range` write `rom/syscall/secure_area_<version>.inc` of the generated
+  headers, an assembler macro `FILLER start, end` that gives the version's bytes from one offset of the secure area to
+  another as `.byte` directives, and the source includes the one of its version (`BLACK2` or `WHITE2`) and calls it
+  between its stubs. mwasmarm's `.incbin` is no help: it reads the file as text and turns each lone line feed (`0x0a`)
+  into a carriage return. The mwasmarm rule passes the version's defines and the include paths and writes a dependency
+  file as mwccarm's does, so the source is assembled again when its include changes. Without a ROM, `compile_all.py`
+  writes zeros. The bytes come out the same as the ROM's, so its secure-area CRC stays valid.
 - The DSi-only LTD ("limited") module is compressed inside ARM9i and loaded to `0x02700000` in DSi mode. ARM9 main
   calls into it. Extraction splits ARM9i into this module (`dsi/ltd_autoload_0.bin`), and the build links, recompresses
   and reinserts it. It has two code regions, which dsd since v0.12.1-dsi.3 lays out as:

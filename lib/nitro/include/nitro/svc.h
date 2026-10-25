@@ -5,7 +5,7 @@
 #include "nitro/mi.h"
 
 // The BIOS calls (NitroSDK's SVC_* functions, its libsyscall), Thumb stubs at the start of ARM9 main that each run one
-// SWI (secure_area.c). swan's names are noted at each
+// SWI (secure_area.s). swan's names are noted at each
 
 // SVC_WaitByLoop (swan's WaitByLoop): the BIOS's busy wait, for a number of turns of its loop
 void SVC_WaitByLoop(u32 cycles);
