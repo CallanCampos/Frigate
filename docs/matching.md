@@ -3669,7 +3669,9 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   boundary) shows the file was built with `-ipa file`: DWC's `nhttp_thread.c` has its 76-byte content type string
   apart, 2 bytes after the other strings, and links from C only with `-ipa file` in `lib/dwc/library.toml`, and
   `AuthService.c` has its 257-byte RSA modulus 1 byte after the 7-byte exponent. libVCT's `vct_session.c` has its four
-  66-byte transition tables 0x44 apart, where one shared section packs them 0x42 apart.
+  66-byte transition tables 0x44 apart, where one shared section packs them 0x42 apart. Code shows it too: a large
+  static reached through a literal to its own address rather than from the section's base is in a section of its own,
+  as `dwc_encsession.c`'s 160-byte `sClient` is with `-ipa file`, which also puts its `.data` in the ROM's order.
 - `-ipa file` and `-ipa function` address statics differently, which tells a library file's setting. With
   `-ipa file`, a file's `.bss` and `.data` objects share one section, are reached from its base (one literal, then
   `[r0, #off]`, shared by every object a function touches) and are dropped when no code reads them. With

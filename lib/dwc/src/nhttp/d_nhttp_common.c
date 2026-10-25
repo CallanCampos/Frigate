@@ -7,7 +7,8 @@
 static NHttpConnection *sConnectionList;
 static NHttpRoot *sRoot;
 static NHttpWaitInfo sWaitInfo;
-static NHttpRoot sRootStorage;
+// On a 32-byte boundary, as Black 1's is too
+static NHttpRoot sRootStorage ATTRIBUTE_ALIGN(32);
 
 static NHttpWaitInfo *NHTTPi_GetWaitInfoP(void);
 static void NHTTPi_InitSystemInfo(NHttpRoot *root);
@@ -262,7 +263,7 @@ static void NHTTPi_InitSystemInfo(NHttpRoot *root) {
 NHttpRoot *NHTTPi_GetSystemInfoP(void) {
     NHttpRoot *root = sRoot;
 
-    if (root == NULL) {
+    if (!root) {
         root = &sRootStorage;
         sRoot = root;
         NHTTPi_InitSystemInfo(root);
