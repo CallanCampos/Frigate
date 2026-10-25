@@ -3,6 +3,33 @@
 What port work taught that isn't obvious from the code, newest first. A lesson about MWCC or the decomp's own
 workflow goes in the decomp checkout instead; this file is the port's ([CLAUDE.md](../CLAUDE.md), the iteration loop).
 
+## 2026-10-25: the field script's offsets, after PR 29
+
+- **A `u32` offset that the DS's 32-bit sum wraps is a truncation the pointer cast guard can't see.** The field script
+  read its jumps' and its actors' movements' relative offsets as `u32` and added them to `pc`: on the DS `0xffffff7a`
+  goes 134 bytes back, on a host 4 GiB forward. There is no cast for `check_ptrcasts.py` to warn about, so every sync
+  passed, and a contributor found the crash by playing. An offset that counts from the reader's own place can be
+  negative and is read as an `s32`; one from the start of a file or a block, an index or a size can't be.
+  [../tools/pointer_offsets.query](../tools/pointer_offsets.query) lists every `u32` added to an address, and every
+  pointer subscripted by one, in the script interpreters and the other readers of offsets from data that its header
+  names; read each new site it shows, and add a reader it doesn't name yet when one is suspected.
+- **A route that only the oracle plays hides the port's crashes in it.** melonDS made the starter save and the port
+  only continued from it, so no test ran Bianca's scene on the port until a contributor played it. Play each route the
+  oracle saves on the port too, from the port's own save before it, and hold its save to the oracle's block by block
+  (`replay_starter_save`): a crash fails it, and so does any of the story's state that differs. It holds only the
+  branches the route takes: the starter route answers NO to the nickname, so the jump back that YES takes, where the
+  contributor's crash came from, is held by `integrate_script_offsets`, which runs the scene's commands on its bytes
+  without the ROM. Give the file the DS's seeds first (`oracle.py seeds NAME`): without them the starter's personality
+  and the townspeople's walks differ.
+- **Trace a save's difference to the pass where the programs part.** The port's starter save was the oracle's but for
+  bytes of six kinds. Four were known (New Game's VBlank-keyed blocks, DWC's random ID, the play time and the clock's
+  times); the starter's mail held what each heap left there; and the townspeople stood elsewhere. Dumping GFL's random
+  state at every frame on both programs (`--dump`, through a static made global in a scratch build only) showed the
+  count they parted at, logging the draws' callers named Tepig's creation, and dumping the sound system's fade named the
+  cause: the DS's card took 56 passes to load the city's music again where the port's took 6, and the field waits for
+  the music before the starter's selection. A wait on the card is a wait on the DS's time, as a wait on `OS_GetTick` is
+  ([ADR 0023](adr/0023-oracle-routes-part-where-the-ds-cpu-time-decides.md)).
+
 ## 2026-10-24: names the decomp moved past
 
 - **A name that only a list, a row or a comment holds goes stale without a failure.** Upstream renames functions and
