@@ -3898,6 +3898,11 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   ldr r0, [r0, #0xc]`). `ssl.c`'s handshake priority is read through its own address (`=0x021854d4; [r0, #4]`), so
   the original's 8-byte config was two statics, `sHandshakePriority` and `sCipherSuites`, which open their section
   ahead of the 5-byte OID; as one struct behind the two 4-byte OIDs, three functions differed.
+- MWCC creates a local array initializer's template in `.rodata` when it parses the function's definition, even
+  in a `static inline` that is only expanded later, but a string literal when it generates the code that uses it, in
+  the order the function bodies are generated, so an inline's literals come where it is expanded. GameSpy's
+  `gstats.c` (in DWC) shows both: a template moves with the inline that holds it, and its literals keep their
+  callers' order.
 - A function-local `const` scalar with an initializer, `static` or not, is emitted in `.rodata` even when every read
   of it folds (`const u32 n = 11;` gives a 4-byte `_ZZ...E1n_0`), while a file-scope `static const` scalar that code
   only reads is dropped.
