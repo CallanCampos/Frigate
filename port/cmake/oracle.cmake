@@ -132,7 +132,9 @@ port_test_labels(oracle_boot oracle)
 # files pin the clock and give the random seeds the DS builds there (port/tools/oracle/README.md, "Random seeds"), and
 # each compares NNS G3D's state and GFL's random state with the DS's at every count but the passes it declares.
 # center_continue plays the save made after Hugh's battle (center_save) to the start menu and CONTINUE, up to the field
-# (oracle_round_trip_hugh continues the port's own save with it)
+# (oracle_round_trip_hugh continues the port's own save with it); pc goes on from the catch save back to the Pokemon
+# Center's PC, deposits the Pokemon caught, looks at the box, withdraws it, swaps it with Tepig and saves, the PC Box's
+# first three apps against melonDS frame by frame
 set(port_oracle_saves "${CMAKE_BINARY_DIR}/oracle-saves")
 add_test(NAME oracle_saves
     COMMAND "${CMAKE_COMMAND}" -E env PYTHONDONTWRITEBYTECODE=1
@@ -143,7 +145,7 @@ add_test(NAME oracle_saves
 set_tests_properties(oracle_saves PROPERTIES SKIP_RETURN_CODE 77 TIMEOUT 7200 FIXTURES_SETUP oracle_saves)
 port_test_labels(oracle_saves oracle)
 foreach(sequence IN ITEMS opening title continue continue_starter field_menus party_menus aspertia hugh route19 catch
-                         catch_continue center_continue)
+                         catch_continue center_continue pc)
     if(EXISTS "${port_oracle_tests}/${sequence}_${PORT_VERSION}.tsv")
         add_test(NAME oracle_${sequence}_hashes
             COMMAND "${CMAKE_COMMAND}" -E env PYTHONDONTWRITEBYTECODE=1
@@ -167,7 +169,7 @@ foreach(sequence IN ITEMS opening title continue continue_starter field_menus pa
 endforeach()
 # The sequences from a save take it from oracle_saves; without the cache (a failed fixture) they would make it again
 set_tests_properties(oracle_continue oracle_continue_starter oracle_field_menus oracle_party_menus oracle_hugh
-    oracle_route19 oracle_catch oracle_catch_continue oracle_center_continue
+    oracle_route19 oracle_catch oracle_catch_continue oracle_center_continue oracle_pc
     PROPERTIES FIXTURES_REQUIRED oracle_saves TIMEOUT 3600)
 # The exit route writes and compares a picture of every frame of both programs, some 34,500 in all: half an hour on a
 # loaded machine

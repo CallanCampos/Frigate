@@ -15,6 +15,14 @@ workflow goes in the decomp checkout instead; this file is the port's ([CLAUDE.m
   in the gate on the way to the PC (a word-at-a-time `STD_GetStringLength` reading past the board's date string)
   before the crash; a scratch print in `VM_Run`, never committed, of the position against the script's base showed
   the base plus 4 GiB at the first command after a jump back.
+- **Find a game object in melonDS's memory by its fields, then dump only it.** The PC's log-off left a townsperson's
+  turns 2 counts apart, and neither the screens nor the sound traces said where. One oracle run dumped the 4 MiB of
+  main RAM at one frame (`--dump ram=0x02000000:0x400000@F`), a search for the actor's known fields (uid, zone,
+  movement code, script) gave its address, and a second run dumped its 4 bytes of wait at every frame; with a scratch
+  trace of the port's, it put the difference at the script's end, where the first guess had put it at its start.
+- **A DS pass that draws a window over several frames shows it partway on each but the last.** The PC's menus and the
+  deposit screen redraw in passes of 2 to 6 frames on the DS; the count pairs the port's finished picture with the
+  first, so check the pass's last frame against the port's before calling it anything but `PC_WINDOW`'s kind.
 - **A trainer battle's save made past the cut differs where the battle's length shows.** The port's own battle reaches
   the Pokémon Center at another count than the DS's, so a townsperson who turns at random has another wait and
   direction when the game saves, and the mystery gift block, which the Pokémon Center's deliveryman reads and so

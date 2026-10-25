@@ -55,7 +55,7 @@ the player's house, out into Aspertia City, a talk with a townsperson, into a ho
 4's route, each piece from the oracle's save of the one before: hugh, Hugh's trainer battle from the starter save to his
 second move; route19, from the Pokémon Center to Bianca's capture demo and SAVE on Route 19; catch, a wild Purrloin
 caught and SAVE; catch_continue, that save continued; center_continue, the save after Hugh's battle continued to the
-field),
+field; pc, from the catch save back to the Pokémon Center's PC, the PC Box's deposit, withdrawal and swap, and SAVE),
 from the save the sequence names, if any, made first on the oracle (or taken from --save-cache), and compares every
 frame the same way but the known differences, up to the frame where the port stops when the sequence allows it to stop
 on code with no C yet, after checking that the random seeds the input file gives the port are the ones the DS built in
@@ -255,6 +255,40 @@ WIPE_STEP = ("a wipe's first frame (into the gate, out of it onto Route 19): the
              "frame before, black where the port's frame has them covered or not yet uncovered, and lines 0 to 31 and "
              "64 on as the port's: the wipe's second step, set in the same pass as its first, written after the beam "
              "has drawn those lines; every frame after is the port's")
+WIPE_LINES = ("a wipe's step that the DS's pass sets while the beam draws the frame, into the gate from Route 19 and "
+              "out of it into Aspertia City: the window that ends each line (WipeLineWnd_HBlank, "
+              "src/system/wipe_sub.c) is the step before on the lines the beam has drawn by then, so those lines are "
+              "the port's frame before (4 to 10 lines from line 64 at a step whose edge is there, lines 1 to 31 at the "
+              "last step of the wipe into the gate and the first of the wipe out of it) and the rest the port's; every "
+              "other frame of the wipes is the port's")
+CENTER_ZOOM = ("as BUILDING_ZOOM, the zoom into the Pokemon Center, a scale of BG 2 that a VBlank callback steps at "
+               "every VBlank (src/ov012/building_enter_effect.c): the DS spends 79 VBlanks more than passes loading "
+               "the Pokemon Center in Black 2 and 80 in White 2 (counts 5183-5232), so its zoom is further on at each "
+               "count and it shows steps no port frame shows; the crossfade over it ends on the same count on both "
+               "(port frame 5273)")
+PC_WINDOW = ("the DS's pass that changes one of the PC's windows takes 2 to 6 frames: its first menu closed for "
+             "Someone's PC and shown again after B, the storage system's menu shown and shown again after each app of "
+             "the PC Box, its cursor moved down it with the message under it, and the deposit screen's top screen "
+             "when the cursor moves to Purrloin. The pass's frames but the last show the windows partway (a list's "
+             "frame without its text, the message before) or the screen before, its last the port's picture (within "
+             "the 3D's tolerance), and the count pairs the port's frame with the first; the last frame of the deposit "
+             "screen's pass (count 6400) shows a picture that neither pair of port frames shows")
+PC_LOGOFF = ("the PC's script lets the townspeople move again once its log-off sound has ended (pcLogOffSound, "
+             "src/ov033/event_pc.c, waits on GFL_SndPlayerIsActive before ActorsUnpauseAll). Both ARM7s end the sound "
+             "in the same frame (count 9940; the sound traces), and the DS's script goes on a field pass sooner, as "
+             "with Purrloin's cry (CRY_BATTLE) the other way round: the DS's pass reads the players' status at "
+             "another moment of its frame than the port's, which reads it at the VBlank. So the townsperson by the "
+             "counter who turns at random, paused through the PC with the same wait on both, waits on from count 9944 "
+             "on the DS and 9946 on the port, and each of his next turns, a draw from GFL's linear generator, comes "
+             "2 counts sooner on the DS (counts 9971 and 10035 against 9973 and 10037), the second one seen (Black 2; "
+             "White 2's DS goes on on the port's pass)")
+SAVE_GLOBE = ("as SAVE_CAMERA: the field draws its 3D again from a step of the save's dialog on, and its map's "
+              "animated props move with it: the Pokemon Center's Geonet globe (top right), which stands still while "
+              "the game writes, turns again from count 10711 on the port and from 10855 on the DS, whose write takes "
+              "longer (SAVE_WRITES), and stays 144 counts ahead on the port after both dialogs close; with the "
+              "townsperson by the counter who turns at random, whose turns the DS makes 126 counts later after the "
+              "save (SAVE_RANDOM), the Pokemon Center's 3D is beyond the tolerance in some frames after the DS's "
+              "dialog closes (up to 565 pixels, where its frames before the save have 12 to 16)")
 BANNER = ("the place name's banner at the top of the screen goes away in a pass whose write the DS makes after the "
           "beam has drawn lines 0 to about 20: there its frame is the port's frame before, below it the port's (Route "
           "19's banner)")
@@ -291,7 +325,8 @@ SAVE_RANDOM = ("the field's townspeople who walk or turn at random draw their wa
                "FldmmdlMovecode_GetRandomDirFromSet, src/ov036/fldmmdl_movecode.c), and their timers wait while the "
                "save's dialog shows, which on the DS closes later (SAVE_WRITES): from the port's first draw after its "
                "close, the DS makes each draw of the port's, the same number, later by as many counts (192 for Black "
-               "2's Route 19 save and 168 for White 2's, 228 for Black 2's catch and 232 for White 2's)")
+               "2's Route 19 save and 168 for White 2's, 228 for Black 2's catch and 232 for White 2's, 126 for the "
+               "PC's save in both)")
 CRY_RANDOM = ("as CRY_BATTLE: from Purrloin's cry's end the sprites' idle animations and the battle's idle camera "
               "moves draw from GFL's twister at other passes on the two programs, so the twister's index differs, "
               "equal again only by chance, for the rest of the battle and after it (its first word too where it is "
@@ -609,6 +644,54 @@ SEQUENCES = {
                      "w2_us": {"3110-3124": CAMERA, "3432,3447,3454,3461,3600,3607": MID_PASS}},
         state=STATE + RANDOM_STATE,
         save="center_save",
+    ),
+    # pc: from the catch save, back through the gate to the Pokemon Center's PC and the PC Box's first three apps:
+    # Purrloin deposited into Box 1, the box looked at and Purrloin withdrawn, Tepig and Purrloin swapped in the party;
+    # the PC switched off and the field menu's SAVE
+    "pc": Sequence(
+        port_frames=11600,
+        oracle_frames=15000,
+        sample="",
+        clock="313-1108",
+        lags={"b2_us": "1109=0", "w2_us": "1109=0,3241=-1,3403=0"},
+        known={
+            "b2_us": {"2878": TORN_HIDE, "3001": TORN_BACK, "3101": TORN_START, "3112-3129": CAMERA,
+                      "4123,4125,4539": WIPE_LINES, "5187-5272": CENTER_ZOOM,
+                      "5871,6057,6403,7198,7304,8148,8304,8334,9718,9868": PC_WINDOW, "10040-10041": PC_LOGOFF,
+                      "10654-10663,10666-10908,11088-11219": SAVE_WRITES,
+                      "11403-11406,11469-11472,11485-11498,11533-11600": SAVE_GLOBE},
+            "w2_us": {"2878": TORN_HIDE, "3001": TORN_BACK, "3101": TORN_START, "3112-3128": CAMERA,
+                      "3219-3240/3": CRY, "3402": CURSOR, "4107,4109,4537,4539": WIPE_LINES, "5187-5272": CENTER_ZOOM,
+                      "5871,6057,6403,7198,7304,8148,8304,8334,9718,9868": PC_WINDOW,
+                      "10654-10663,10666-10908,11088-11219": SAVE_WRITES,
+                      "11243-11272,11469-11594,11597-11600": SAVE_GLOBE},
+        },
+        known_oracle={
+            "b2_us": {"4920": TORN_START,
+                      "7431-7435,7438-7456,7459,7461-7464,7466-7471,7473-7474,7476-7485,7487,7491-7512,7550-7558":
+                          CENTER_ZOOM,
+                      "8795": PC_WINDOW},
+            "w2_us": {"1260": TORN_OPENING, "4852": TORN_START,
+                      "7365-7369,7372-7390,7393,7395-7398,7400-7405,7407-7408,7410-7419,7421,7425-7447,7485-7493":
+                          CENTER_ZOOM,
+                      "8321,8730,9583,10653,12350": PC_WINDOW},
+        },
+        state_frames="1116-11600",
+        state_oracle="2800-15000",
+        known_state={
+            "b2_us": {"3110-3124": CAMERA,
+                      "3432,3447,3454,3600,4150,4165,4491,4532,5198,5871,6057,7171,7180,7198,7304,8121,8130,8148,8304,"
+                      "8334,9691,9700,9718,9868,10056,10240,10246,10502,11217": MID_PASS,
+                      "10714-10856/2": SAVE_CAMERA},
+            "w2_us": {"3110-3124": CAMERA,
+                      "3432,3447,3454,3600,4134,4149,4491,4532,5198,5871,6057,7171,7180,7198,7304,8121,8130,8148,8304,"
+                      "8334,9691,9700,9718,9868,10056,10240,10246,10502,11217": MID_PASS,
+                      "10714-10856/2": SAVE_CAMERA},
+        },
+        known_random={"b2_us": {"9974-9975,10038-10039": PC_LOGOFF, "11147-11600": SAVE_RANDOM},
+                      "w2_us": {"11115-11600": SAVE_RANDOM}},
+        state=STATE + RANDOM_STATE,
+        save="catch_save",
     ),
 }
 REFERENCE_COLUMNS = ["port", "oracle", "counter", "lag", "top", "bottom", "state"]

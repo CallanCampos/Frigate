@@ -32,6 +32,99 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
 
+## 2026-10-25: phase 4's PC and a trainer battle to its end, held to melonDS; the field script VM's jumps back
+
+- **Upstream:** `629a53cccb` (upstream merge #504), as `main` has it; this branch merges no upstream commit. Like
+  `port-phase4-route`, which it continues, it needs upstream's encounter effects' entries (`b962ecf040`), which only
+  the next sync brings, and was verified with them as the same local, uncommitted candidate, never committed.
+- **Port:** `PORT_SHA`, on the topic branch `port-phase4-coverage`, local and not published, from `port-phase4-route`
+  at `0fcafe6757`: `5e838b5724` (the field script VM's jumps back, signed offsets), `14a6b68aa5` (Hugh's battle to its
+  end, held by its save) and this commit (the PC). It fills the last entry's `PORT_SHA`, `0fcafe6757`, and
+  game-changes.md's, `5e838b5724`. It lands after `port-phase4-route`: once that branch has merged `main` past the sync
+  and is published, this one merges it and follows as its own pull request.
+- **ROM:** T0 passes on this commit's tree with the candidate: Black 2 `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb`, White
+  2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a` (`python3 configure.py && ninja`, which recompiled
+  `src/ov012/scrcmd_vm.c` and `src/ov036/scrcmd_fldmmdl.c` for both versions, the two complete files the jumps' fix
+  changes, and matched both SHA1s). The candidate is inside `#ifdef PLATFORM_PC`, which MWCC never sees.
+- **Host build:** T1 passes on macOS arm64, AppleClang 21.0.0, RelWithDebInfo with the oracle, both versions
+  (`build/port`, `build/port-w2`), incrementally from `0fcafe6757`'s objects, with the candidate: no warning in the
+  changed C (`scrcmd_vm.c`, `scrcmd_fldmmdl.c`, `port/tests/game/test_script_vm.c`); clang-format (Homebrew 23.1.3) is
+  clean on them. `gen_stubs`: 30 function stubs and 21 data placeholders per version.
+- **Tests:** full `ctest -j2` with the oracle, the cached oracle saves and the clone's `build/port-venv` (Unicorn), on
+  this commit's tree but this file, with the encounter effects' candidate, both versions at once, under load averages of
+  5 to 11 on the machine's 8 cores from other sessions where sampled: Black 2, 316 passed and 1 skipped of 317
+  (2,526 s); White 2, 313 passed and 1 skipped of 314 (2,470 s); none failed. Skipped: `app_universal_slices`, which
+  only a distribution build has; `asm_oracle` ran and passed, and so did every timing gate. The candidate is the last
+  entry's, and without it the three tests it names stop at Bianca's wild encounter as it says; this branch's new tests
+  weren't run without it. T2: `game_script_vm` (new: the VM's jumps and calls, back and forward, on the whole program's
+  objects), `oracle_compare` (also the round trips' cut, port input, continued random state and last count,
+  `input_starts_with` and `compare_boots`' last count), `app_run_dir_plain` and `_sanitized`. T4 and T6, the new
+  sequences and the round trip, every port frame but the declared ones and the game's state at every frame it compares:
+
+  | Test | Black 2 | White 2 |
+  | --- | --- | --- |
+  | `oracle_pc` | 11,003 of 11,003 (4,941 exact); NNS G3D's state 10,369 of 10,369 frames, GFL's random state 9,912 of 9,912 | 10,926 of 10,926 (4,937); 10,369, 9,884 |
+  | `oracle_center_continue` | 3,589 of 3,589 (1,484); 2,474, 2,474 | 3,581 of 3,581 (1,486); 2,474, 2,474 |
+  | `oracle_round_trip_hugh` | up to the cut as `oracle_hugh`, 8,165 of 8,165, its state too; the saves 2,722 bytes of each copy apart, all declared; melonDS 5,671 frames the same on either save, up to count 3602; the port's own continued 3,589 of 3,589, its state as `center_continue`'s | 8,157 of 8,157; 2,715 bytes of each copy; 5,606 frames; 3,581 of 3,581 |
+
+  The oracle README's results give the frames left out of each, and the state's. `oracle_hugh`, `oracle_route19`,
+  `oracle_catch`, `oracle_catch_continue`, `oracle_round_trip_catch`, the exit route and the field sequences pass as the
+  last entry gives them. T5 and T7 not run (Next).
+- **Tiers:** unchanged: the jumps' fix retypes five locals of two complete files, which compile to the same code.
+- **Trap stubs:** 30 function stubs and 21 data placeholders per version (`build/port*/gen/stubs.c`), as the last
+  entry's; none on the new routes.
+- **64-bit warnings:** `check_ptrcasts: 361 sites in 225 keys (real 66, harmless 117, handled 141, unreachable 37), 1682
+  files, 0 not compiled` in both versions (`game_ptrcasts`), as the last entry's: the jumps' fix retypes integers, no
+  pointer cast.
+- **Work done:** phase 4's coverage (PLAN.md §7: the PC among the battles, menus and saves; ADR 0023's trainer battle
+  past the cut), in both versions, and a port defect the PC found.
+  - **The field script VM's jumps back (`5e838b5724`).** `VMCall`, `VMJump`, `VMJumpIf` and `VMCallIf`
+    (`src/ov012/scrcmd_vm.c`) and `ActorCmdExec`'s movement data (`src/ov036/scrcmd_fldmmdl.c`) read their offset as a
+    `u32`: a jump back, which the DS's 32-bit sum wraps, moved a 64-bit position 4 GiB on, and the port crashed in
+    `VM_Run` when the PC Box closed and the storage system's menu jumped back to show itself again. The offsets are
+    `s32` now, a neutral change with its row in game-changes.md, both files complete. `game_script_vm`
+    (`port/tests/game/test_script_vm.c`) runs the four jumps and calls on the whole program's objects: with the old
+    `u32` its five jumps back land 4 GiB on and it fails; with the fix it passes.
+  - **A trainer battle to its end (`14a6b68aa5`).** `oracle.py round-trip hugh` (`oracle_round_trip_hugh`) has the
+    port play Hugh's battle from melonDS's starter save with the DS's seeds, to the Pokémon Center's scene and SAVE
+    there. Up to ADR 0023's cut it is held frame by frame and by the game's state as the hugh sequence holds it, the
+    hugh sequence's input file checked to be the start of the one the port plays (`RoundTrip.cut`); past it the battle
+    is the port's own, which ends 560 counts later than the DS's in Black 2 and 704 in White 2, and the port's save is
+    held to melonDS's `center_save` byte by byte: 2,722 bytes of each copy apart in Black 2 and 2,715 in White 2, all
+    declared with their traced causes (the play time's seconds; the mystery gift block, which the Pokémon Center's
+    deliveryman reads and so encrypts again with a key from the VBlank count; the Pokémon Center's random-turning
+    townsperson's timer, and in Black 2 his direction; the CRCs). Tepig's data, the money, the bag and the flags are
+    melonDS's. melonDS continues both saves the same frame for frame up to the field's fade-in, and the port continues
+    its own as melonDS continues its, in a new sequence, `center_continue` (`RoundTrip.continued_last`, and
+    `continued_random` for the townsperson's draws as the field loads). White 2's port battle takes more turns, so the
+    port plays `hugh_port_w2_us.pbwinput`, melonDS's presses with its own past the cut (`RoundTrip.port_input`).
+  - **The PC (this commit).** The `pc` sequence goes on from the catch save back through the gate into Aspertia City
+    and the Pokémon Center, to its PC: Someone's PC, the Pokémon Storage System, and the PC Box's deposit (Purrloin
+    into Box 1), withdrawal (the box looked at, Purrloin taken back) and move (Tepig and Purrloin swapped in the
+    party), the PC switched off, and SAVE. Every port frame matches melonDS on the count, with the game's state, in
+    both versions but the declared differences, each traced: the DS's passes of 2 to 6 frames that redraw the PC's
+    windows (`PC_WINDOW`), two gate wipes' steps set while the beam draws (`WIPE_LINES`), the zoom into the Pokémon
+    Center (`CENTER_ZOOM`), the save's dialog and, after it, the Pokémon Center's globe and townsperson (`SAVE_GLOBE`),
+    and in Black 2 the townsperson's two turns after the PC switches off, 2 counts sooner on the DS, whose script goes
+    on a field pass sooner after the log-off sound ends in the same frame on both (`PC_LOGOFF`, traced with both
+    programs' sound traces, the DS's actor dumped from melonDS's memory and a scratch trace of the port's).
+  - **Records:** this entry, which fills the last entry's `PORT_SHA`; game-changes.md's row for the jumps (its
+    `PORT_SHA` filled here); the oracle README (the sequences, the results, the round trip and its bytes, the saves,
+    the known differences); oracle.cmake's and game.cmake's comments; the feature map's field, battles and new PC rows;
+    the tests and CMake guides; the glossary's round trip and cut; decomp-findings.md's AI row; the lessons.
+- **Next:** the sync of upstream's `b962ecf040`, then `port-phase4-route` merged with `main` and published, then this
+  branch merged with it and published as its own pull request. T5 (the sanitized build) on phase 4's route and the PC:
+  on the way to the PC it stops in the Aspertia gate, which route19 also passes, on a global-buffer-overflow report in
+  `STD_GetStringLength` (`lib/nitro/src/std/std_string.c:116`, NitroSDK's word-at-a-time string length), which reads
+  the last aligned word of an 11-byte string literal of `src/ov104/field_gimmick_gate.c` (the gate's electronic board,
+  `GimmickGate_AddDateMessage` → `G3DTextDraw_CreateResource`); a read that holds the terminator and never leaves its
+  word, a candidate for the sanitizer ignorelist with its report in sanitizers.md, not yet handled. T7 (a windowed
+  playtest of the catch, its save and the PC) is not run yet. The PC's other apps (the items, the Battle Box) and
+  the box's own menus have no route yet, and the PC's save isn't held as a save (a round trip from the catch save).
+- **Blockers:** upstream's `b962ecf040` reaching `main` by sync, before `port-phase4-route` and then this branch can be
+  published. Hugh's AI can't match melonDS past the first decision its CPU budget moves
+  ([ADR 0023](adr/0023-oracle-routes-part-where-the-ds-cpu-time-decides.md)).
+
 ## 2026-10-24: phase 4's route held to melonDS: Hugh's battle, Route 19, a catch, its save and the round trip
 
 - **Upstream:** `629a53cccb` (upstream merge #504), as `main` has it; this branch merges no upstream commit. The
@@ -39,7 +132,7 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
   has had since the sync of `629a53cccb`, and the encounter effects' entries of `src/ov036/enceff_data.c`, which
   upstream merged at `b962ecf040` after it and which only the next sync brings. This branch was verified with those
   entries as a local, uncommitted candidate (upstream's four entries under `PLATFORM_PC`), never committed.
-- **Port:** `PORT_SHA`, on the topic branch `port-phase4-route`, local and not published, from `main`'s PR 31
+- **Port:** `0fcafe6757`, on the topic branch `port-phase4-route`, local and not published, from `main`'s PR 31
   (`90e837daad`, merged at `949379c195`). It fills the last entry's `PORT_SHA`, `90e837daad`. The branch was first
   written as four commits on `def88de18f`; after its review, the stand-alone three went to `main` through PR 31, and
   this commit is the route's, its review's fixes folded in. It waits for the sync of upstream's `b962ecf040`; then it

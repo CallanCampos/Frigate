@@ -434,7 +434,7 @@ that bank in VRAM display mode (`bottom_3d` is 1; the top screen, engine B's log
 
 ## The comparison sequences
 
-Eleven input files on game frames for each version, `port/tests/oracle/<name>_<version>.pbwinput`, played by twelve
+Twelve input files on game frames for each version, `port/tests/oracle/<name>_<version>.pbwinput`, played by thirteen
 sequences, compared with `--align counter`, the movies by their pictures (`oracle.py`'s `SEQUENCES` says how):
 
 - **opening**: nothing pressed. Power-on, the boot screens, the Game Freak logo and the whole opening, the title and
@@ -531,6 +531,20 @@ sequences, compared with `--align counter`, the movies by their pictures (`oracl
     banner, to the last frame before the Pokémon Center fades in. The port runs 3,610 frames, the oracle 5,700.
     `oracle.py round-trip hugh` also plays it from the port's own save of Hugh's battle on both programs, and stops
     before the field because the field shows a townsperson whose turn the two saves hold differently ([Saves](#saves)).
+- **pc**: phase 4's PC ([PLAN.md §7](../../docs/PLAN.md#phase-4-battles-menus-saves-m5m7)), from the catch save:
+  CONTINUE in Route 19's grass, out of it and back through the gate into Aspertia City, into the Pokémon Center and up
+  to its PC, the tile left of the counter at (4,11) (`MapTile_IsPC`, read facing up). Someone's PC and the Pokémon
+  Storage System (`res/field/scripts/global_10090.s`), then the PC Box's first three apps (overlay 255,
+  `src/ov255/box2_seq.c`): Deposit Pokémon, Purrloin from the party into Box 1; Withdraw Pokémon, Box 1 with Purrloin in
+  it and Purrloin back into the party; Move Pokémon, the party opened from the box and Tepig put down on Purrloin,
+  which swaps them. Each app ends with B and NO to "Continue Box operations?", back to the storage system's menu; then
+  B out of both menus, the PC switched off, and the field menu's SAVE, whose dialog shows Purrloin first (Aspertia
+  City, Pokédex 3, time 0:15). The port runs 11,600 frames, the oracle 15,000; the file pins the clock and gives the
+  DS's seed at start-up, the only one it builds. White 2 plays Black 2's presses but one: its catch save leaves the
+  player a tile lower, at (58,694), so its LEFT in the gate is shorter. The sequence found the field script VM's
+  jumps back 4 GiB off on the port: the storage system's menu shows itself again with one when an app closes, and the
+  port crashed in `VM_Run` there until the jumps' offsets were read as `s32` (`game_script_vm`,
+  [../../docs/game-changes.md](../../docs/game-changes.md)).
 
 A sequence can also allow the port to stop on code with no C yet: from a port frame (`stop_from`), on the trap stub
 it names (`stop_trap`, a pattern of the trap's message), with why (`stop`). A stop on any other trap fails, so the
@@ -546,8 +560,8 @@ differed in 14,330 at the first frame, 1,823 at the fourth, and passed the toler
 start from a save, which leaves other bytes after the copyright screen's file on the port than on the DS
 ([below](#known-differences-from-the-hardware)), so they don't hold those frames close.
 
-Each is two ctest tests, but the nine that start from a save (continue, continue_starter, field_menus, party_menus
-and the five of phase 4's route), whose saves only the oracle can make, have only the first:
+Each is two ctest tests, but the ten that start from a save (continue, continue_starter, field_menus, party_menus,
+the five of phase 4's route and pc), whose saves only the oracle can make, have only the first:
 
 - `oracle_<name>` (`oracle.py sequence NAME --port BIN`), with the oracle built: runs both programs and compares every
   port frame but the known differences ([below](#known-differences-from-the-hardware)): where the game counts passes,
@@ -602,6 +616,8 @@ Results, every port frame but the known differences:
 | catch_continue, White 2 | 4,700 | 4,671 | 1,969 | 2,702 | the title's 28 port frames and 3402, oracle frames 1260, 4852 | 3,562 of 3,562, 23 left out; 3,562 of 3,562, 23 left out |
 | center_continue, Black 2 | 3,610 | 3,589 | 1,484 | 2,105 | the title's 21 port frames, oracle frame 4920 | 2,474 of 2,474, 21 left out; 2,474 of 2,474, 21 left out |
 | center_continue, White 2 | 3,610 | 3,581 | 1,486 | 2,095 | the title's 28 port frames and 3402, oracle frames 1260, 4852 | 2,474 of 2,474, 21 left out; 2,474 of 2,474, 21 left out |
+| pc, Black 2 | 11,600 | 11,003 | 4,941 | 6,062 | the title's 21 port frames, the wipes' 3, the zoom into the Pokémon Center's 86, the PC's windows' 10, the log-off's 2, the save's 385, the globe's 90, oracle frames 4920, the zoom's 79, 8795 | 10,369 of 10,369, 116 left out; 9,912 of 9,912, 573 left out |
+| pc, White 2 | 11,600 | 10,926 | 4,937 | 5,989 | the title's 28 port frames and 3402, the wipes' 4, the zoom's 86, the PC's windows' 10, the save's 385, the globe's 160, oracle frames 1260, 4852, the zoom's 80, the PC's windows' 5 | 10,369 of 10,369, 116 left out; 9,884 of 9,884, 601 left out |
 
 Each comparison's summary gives its screens with 3D, compared by their pictures, and their pixels beyond the pixel
 tolerance at the median and at most: 5 to 18 at the median by sequence and version, 0 in the exit route, and in
@@ -642,6 +658,15 @@ since the depth change (at most 65, where both versions had up to 359 beyond it)
 frame it compares (the table's last column): NNS G3D's but in the DS's long passes, the save's dialog (below) and, in
 White 2's catch, the battle's camera after Purrloin's cry; GFL's random state but there and at Hugh's AI's two passes a
 turn, after each save's dialog and, in White 2's catch, from Purrloin's cry on.
+
+pc holds the PC the same way, from the catch save through the gate and the Pokémon Center to the PC Box's deposit,
+withdrawal and swap and the save: every port frame on the count but the declared ones, a screen with 3D 5 pixels
+beyond the pixel tolerance at the median in both versions and at most 245 (Black 2's port frame 11475) and 243 (White
+2's 11273), after the save, where the Pokémon Center's globe and townsperson move apart; every frame of the PC Box's
+apps, which have no 3D, is exact but the deposit screen's as the cursor moves to Purrloin (`PC_WINDOW`). The game's
+state matches at every frame it compares: NNS G3D's but in the DS's long
+passes and the save's dialog, GFL's random state but after the save and, in Black 2, at the townsperson's two turns
+after the PC switches off.
 
 ## Saves
 
@@ -1094,11 +1119,25 @@ failure to fix, never a known difference. By kind:
     19's place name banner going away (8864), the DS's frame the port's frame before on lines 0 to about 20 and the
     port's below; and as Bianca's capture demo opens, the lower part of the top screen darkening a step a pass
     (9795-9800), the DS's frames the port's frame before from about line 146 down and the port's above;
+    and on the way to the PC, the wipes into the gate from Route 19 and out of it into Aspertia City
+    (`WIPE_LINES`): each pass moves the wipe's edge by 32 lines, and the window that ends each line is drawn from the
+    edge the pass sets (`WipeLineWnd_HBlank`, `src/system/wipe_sub.c`), which the DS sets while the beam is drawing:
+    the lines it has drawn by then show the step before, the port's frame before, 4 to 10 lines from line 64 at a step
+    whose edge is there and lines 1 to 31 at the last step into the gate and the first out of it, the rest the port's
+    (pc's port frames 4123, 4125 and 4539 in Black 2, 4107, 4109, 4537 and 4539 in White 2, whose catch save leaves the
+    player a tile nearer the gate);
   - and a DS pass of two frames whose picture changes between them, which the count pairs by its first: after a move
     is chosen the move menu goes away on the bottom screen, and the DS's first frame shows it partway (the moves'
     names cleared, their buttons still there) and its second the port's picture of that count, its 3D within the
     tolerance (hugh's port frames 7591 and 8167, route19's 10274; the second frames, oracle frames 9742 and 10331,
     12714 in Black 2 and 9679, 10268 and 12659 in White 2, show no picture the check of missing pictures can pair).
+    The PC's windows are the same kind with longer passes (`PC_WINDOW`): the DS's pass that closes its first menu for
+    Someone's PC, shows the storage system's menu and shows it again after each app of the PC Box, moves the cursor
+    down it with the message under it, shows the first menu again after B, or redraws the deposit screen's top screen
+    for Purrloin takes 2 to 6 frames, all but the last showing the windows partway (a list's frame without its text,
+    the message before) or the screen before, the last the port's picture of that count (pc's port frames 5871, 6057,
+    6403, 7198, 7304, 8148, 8304, 8334, 9718 and 9868 in both versions; the last frames that neither pair shows,
+    oracle frame 8795 in Black 2 and 8321, 8730, 9583, 10653 and 12350 in White 2).
 - **VRAM written after the beam has drawn it.** The same holds for VRAM: a pass that writes a part of the screen that
   the DS has already drawn shows it a frame later there. In the exit route Mom's speech balloon, at the top of the
   screen (lines 4 to 44), scrolls a line up 4 pixels a pass (`PrintStream_Task`, `src/system/printsys.c`), copying the
@@ -1147,7 +1186,10 @@ failure to fix, never a known difference. By kind:
   screens crossfade, and the DS spends some 45 VBlanks more than passes there (counts 15160 to 15190, from 79 VBlanks
   against the port's 33), so at each count its zoom is further on, and it shows steps no port frame shows (port frames
   15176-15229, oracle frames 17462-17519 in Black 2 and 17401-17457 in White 2). Leaving the house shows none: its
-  effect steps by passes.
+  effect steps by passes. The zoom into the Pokémon Center on the way to the PC is the same (`CENTER_ZOOM`): the DS
+  spends 79 VBlanks more than passes loading it in Black 2 and 80 in White 2 (counts 5183 to 5232), and the crossfade
+  ends on the same count on both (pc's port frames 5187-5272; oracle frames 7431-7558 in Black 2 and 7365-7493 in
+  White 2 show steps no port frame shows).
 
 - **A save the DS writes in time, which the port writes at once.** New Game's intro saves its first data in the
   background, and before it fades to the name entry it waits for that save to pause (`IntroCmd_SavePause`,
@@ -1157,18 +1199,26 @@ failure to fix, never a known difference. By kind:
   frames of its saving. So does every SAVE of phase 4's route: the game writes the save in steps and waits for each
   (GFL's backup system over CARD's backup commands, `src/gfl/backup_system.c`), and the DS's flash takes time for each,
   so the dialog's progress dots move on later, its "saved the game." comes later and the dialog closes 192 passes
-  (route19) and 228 (catch) after the port's, whose chip is written at once (`port/hal/card`). In between both show the
-  message frame for frame, and once the DS's dialog has closed both show the field again on the same count: those
-  sequences leave out the frames from the first dot to the port's message and from the port's dialog closing to the
-  DS's: route19's port frames 14129-14447 and 14563-14758 in Black 2, 14129-14419 and 14559-14730 in White 2; catch's
-  10102-10460 and 10540-10771 in Black 2, 10102-10464 and 10540-10775 in White 2. The saves they make are compared as
+  (route19), 228 (catch) and 128 (pc) after the port's, whose chip is written at once (`port/hal/card`). In between
+  both show the message frame for frame, and once the DS's dialog has closed both show the field again on the same
+  count: those sequences leave out the frames from the first dot to the port's message and from the port's dialog
+  closing to the DS's: route19's port frames 14129-14447 and 14563-14758 in Black 2, 14129-14419 and 14559-14730 in
+  White 2; catch's 10102-10460 and 10540-10771 in Black 2, 10102-10464 and 10540-10775 in White 2; pc's 10654-10663,
+  10666-10908 and 11088-11219 in both. The saves they make are compared as
   saves instead ([Saves](#saves)). Their state differs there too, by the same cause: from a step of the dialog on, the
   field's passes alternate between ending with NNS G3D's camera at the field's and at a 2D one, and the port reaches
   that step first, some 230 counts before the DS in the catch (`SAVE_CAMERA`); and the field's townspeople who walk or
   turn at random draw their waits and directions from GFL's linear generator (`FldmmdlMovecode_GetRandomTableEntry` and
   `_GetRandomDirFromSet`, `src/ov036/fldmmdl_movecode.c`) when their timers, which wait while the dialog shows, run out,
   so from the port's dialog closing the DS makes each of the port's draws as many counts later as its dialog closes
-  later, 192 and 168 in route19, 228 and 232 in catch (`SAVE_RANDOM`).
+  later, 192 and 168 in route19, 228 and 232 in catch, 126 in pc in both versions (`SAVE_RANDOM`). In the Pokémon
+  Center, where pc saves, both show on screen (`SAVE_GLOBE`): the field draws its 3D again from that step of the
+  dialog, and its Geonet globe at the top right, which stands still while the game writes, turns again from count
+  10711 on the port and from 10855 on the DS, and stays 144 counts ahead on the port once both dialogs have closed;
+  with the townsperson by the counter who turns at random, the Pokémon Center's 3D is beyond the tolerance in some of
+  the frames after the DS's dialog closes, up to 565 pixels where its frames before the save have 12 to 16 (pc's port
+  frames 11403-11406, 11469-11472, 11485-11498 and 11533-11600 in Black 2, 11243-11272, 11469-11594 and 11597-11600 in
+  White 2).
 - **The play time.** It counts ticks from CONTINUE on (`GameSystemTimer_Start` in `src/system/playtime_ctrl.c`, from
   `EventFieldContinue_Create`): on the DS its CPU's, through the passes of several frames it takes while it loads, on
   the port its virtual clock's (`port/hal/os/core.c`), which moves with each frame and in the busy loops it models
@@ -1272,3 +1322,13 @@ failure to fix, never a known difference. By kind:
   frames 5152-8136 (`known_top`, the bottom screen still compared) and both screens of 5580-5588 and 5590
   (`CRY_BATTLE`). In Black 2 the DS's pass reads the channel after the stop, as the port's does, and the battle is the
   port's frame for frame.
+
+  Black 2's pc meets it the other way round at the PC's log-off sound (`PC_LOGOFF`). The PC's script pauses the field's
+  townspeople while it runs and lets them go again once that sound has ended (`pcLogOffSound` in
+  `src/ov033/event_pc.c` waits on `GFL_SndPlayerIsActive` before `ActorsUnpauseAll`). Both ARM7s end the sound in the
+  same frame (count 9940, the sound traces of both programs), and the DS's script goes on a field pass sooner: the
+  townsperson by the counter who turns at random, whose wait both programs hold at 14 through the PC (the DS's actor
+  dumped from melonDS's memory, the port's from a scratch trace), waits on from count 9944 on the DS and 9946 on the
+  port, so each of his next turns, a draw from GFL's linear generator, comes 2 counts sooner on the DS (9971 and 10035
+  against 9973 and 10037). pc leaves out GFL's random state at the two draws and the screens of the second, where he
+  turns in view (port frames 10040-10041). In White 2 the DS goes on on the port's pass, and nothing differs there.
