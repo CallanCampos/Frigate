@@ -66,6 +66,7 @@ lib/dwcutil/src/dwc_moveid.c:
     complete
     .text       start:0x021ba7a8 end:0x021bb1cc
     .bss        start:0x021c41c8 end:0x021c41cc
+
 lib/dwcutilui/src/archive.c:
     complete
     .text       start:0x021bb1cc end:0x021bb4c0
