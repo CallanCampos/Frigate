@@ -83,6 +83,7 @@ extern SOCLSocketParam SOCLSocketParamUDPSend;
 #define SOC_EWOULDBLOCK (-6)
 #define SOC_EINPROGRESS (-26)
 #define SOC_EISCONN (-30)
+#define SOC_ETIMEDOUT (-76)
 
 // Network order (big-endian) to the host's and back
 #define SOC_NtoHl(netlong)                                                                                             \

@@ -48,6 +48,12 @@ void *BucketDiv(bucketset_t set, char *name, void *value);
 void *BucketConcat(bucketset_t set, char *name, void *value);
 // Averages the value in, counting the values the bucket has had since it was set
 void *BucketAvg(bucketset_t set, char *name, void *value);
+// A new set, freeing one, and its buckets as "\\name\\value" pairs. gstats.c's dead-stripped code calls them, and
+// the ROM has none of them: GameSpy's SDK (UniSpySDK's copy) has them in gbucket.c
+bucketset_t NewBucketSet(void);
+void FreeBucketSet(bucketset_t set);
+char *DumpBucketSet(bucketset_t set);
+
 // The address of a copy of an int or a double, for the functions above
 void *bint(int i);
 void *bfloat(double f);

@@ -3903,8 +3903,18 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 - MWCC creates a local array initializer's template in `.rodata` when it parses the function's definition, even
   in a `static inline` that is only expanded later, but a string literal when it generates the code that uses it, in
   the order the function bodies are generated, so an inline's literals come where it is expanded. GameSpy's
-  `gstats.c` (in DWC) shows both: a template moves with the inline that holds it, and its literals keep their
-  callers' order.
+  `gstats.c` (in DWC) shows both when it is built without `-ipa file`: a template moves with the inline that holds it,
+  and its literals keep their callers' order. That holds without `-ipa file`, where each template's section comes in
+  the order of its function; under `-ipa file` the templates go in the file's size sort, ahead of the code, so a
+  16-byte template comes before a 256-byte one wherever their functions are. `gstats.c`'s `ClosePendingCallbacks`
+  message lies ahead of `value_for_key`'s key buffer, defined before it, only so.
+- Code the original link dead-stripped still shaped the file's data, and GameSpy's SDK shows it. `gstats.c` matches
+  whole with `-ipa file` and its 23 dead functions rebuilt from GameSpy's SDK (UniSpySDK's copy) and listed in
+  `config/deadstrip.toml`: under `-ipa file` MWCC drops the statics no code reads, and the ROM's five words and
+  9-byte buffer that no live code reads are the SDK's `connid`, `sesskey`, `internal_init`, `gameport`, `initstart`
+  and `GetChallenge`'s `challenge`, which the dead code reads; its local initializers and function-local statics
+  (`challengestr`, `sesskeystr`) join the size sort, and `GetPersistData`'s `""` comes before `value_for_key`'s
+  `"\\"`. Without the dead code, three placeholder words and an unused inline stood in for them.
 - A function-local `const` scalar with an initializer, `static` or not, is emitted in `.rodata` even when every read
   of it folds (`const u32 n = 11;` gives a 4-byte `_ZZ...E1n_0`), while a file-scope `static const` scalar that code
   only reads is dropped.

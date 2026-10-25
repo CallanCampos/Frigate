@@ -55,3 +55,30 @@
 # The list of the key names GSI_UNICODE builds allocate, which only the two functions that keep it use; GameSpy's SDK
 # (UniSpySDK's copy) has them, and qr2.c's shutdown doesn't call qr2_internal_key_list_free
 "lib/dwc/src/qr2/qr2regkeys.c" = ["qr2_internal_key_list_append", "qr2_internal_key_list_free"]
+# GameSpy's stats and persistent data functions the game doesn't call, from GameSpy's SDK (UniSpySDK's copy): their
+# statics, function-local statics and local initializers give the file's data, built with -ipa file, the ROM's layout
+"lib/dwc/src/gstats/gstats.c" = [
+    "GenerateAuthA",
+    "InitStatsAsync",
+    "InitStatsThink",
+    "InitStatsConnection",
+    "GetChallenge",
+    "NewGame",
+    "FreeGame",
+    "SendGameSnapShotA",
+    "NewPlayerA",
+    "RemovePlayer",
+    "NewTeamA",
+    "RemoveTeam",
+    "PreAuthenticatePlayerPartner",
+    "PreAuthenticatePlayerPM",
+    "PreAuthenticatePlayerCDA",
+    "GetProfileIDFromCDA",
+    "GetPersistData",
+    "GetPersistDataModified",
+    "SetPersistData",
+    "GetPersistDataValuesModifiedA",
+    "GetPersistDataValuesA",
+    "SetPersistDataValuesA",
+    "StatsThink",
+]

@@ -179,7 +179,7 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 | `gpiUnique.c` | `0x0217b6a8`–`0x0217b7e0` | 2 | complete | descriptive |
 | `gpiUtility.c` | `0x0217b7e0`–`0x0217bb30` | 9 | complete | descriptive |
 | `gbucket.c` | `0x0217bb30`–`0x0217beac` | 14 | complete | descriptive |
-| `gstats.c` | `0x0217beac`–`0x0217c788` | 28 | partial | descriptive |
+| `gstats.c` | `0x0217beac`–`0x0217c788` | 28 | complete | descriptive |
 | `gt2Auth.c` | `0x0217c788`–`0x0217c944` | 4 | complete | descriptive |
 | `gt2Buffer.c` | `0x0217c944`–`0x0217c9f4` | 6 | complete | descriptive |
 | `gt2Callback.c` | `0x0217c9f4`–`0x0217ce00` | 10 | complete | descriptive |
