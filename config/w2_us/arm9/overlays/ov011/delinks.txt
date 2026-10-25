@@ -389,6 +389,7 @@ lib/dwc/src/base/dwc_nonport.c:
     .bss        start:0x0218e008 end:0x0218e010
 
 lib/dwc/src/transport/dwc_transport.c:
+    complete
     .text       start:0x02168858 end:0x02169514
     .data       start:0x02185b18 end:0x02185b28
     .bss        start:0x0218e958 end:0x0218e964

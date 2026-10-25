@@ -61,7 +61,9 @@ BOOL DWCi_USBAPlBegin(DWCUtilUsbScanCallback callback) {
     sUsbScan->callback = callback;
     startTick = OS_GetTick();
     sUsbScan->startTick = startTick;
-    if (WM_Initialize(sUsbScan, cbWm, 3) == WM_ERRCODE_OPERATING) {
+    // The work is read again for WM_Initialize, through a volatile read, as Black 1's version of this function writes
+    // it; the ROM loads it again there where every plain form reuses the stored pointer
+    if (WM_Initialize(*(DWCUtilUsbScan *volatile *)&sUsbScan, cbWm, 3) == WM_ERRCODE_OPERATING) {
         do {
             WM_ReadStatus(&sUsbScan->status);
         } while (sUsbScan->status.state != WM_STATE_IDLE);

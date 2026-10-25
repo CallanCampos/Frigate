@@ -124,7 +124,8 @@ static BOOL DWCi_NdStartup(NHTTPAlloc alloc, NHTTPFree free, const char *url, co
                            const char *password, DWCNdCallback onResult);
 static void nhttpCleanupCallback(void);
 static void DWCi_NdCleanupAsync(void (*onCleanedUp)(void));
-static BOOL ReleaseRequest(int request);
+// Volatile as in the definition below: the ROM reloads it at each use
+static BOOL ReleaseRequest(volatile int request);
 static void SetWifiError(int error, int serverError);
 static BOOL DWCi_NdCancelAsync(void);
 static BOOL DWCi_Ndi_getApInfo(char *dest);
@@ -697,7 +698,9 @@ static void DWCi_NdCleanupAsync(void (*onCleanedUp)(void)) {
 }
 
 // Destroys a request; the answer is FALSE when it could not
-static BOOL ReleaseRequest(int request) {
+// The request is volatile, as Black 1's version of this function has it: the ROM reloads it from its stack slot at
+// each use and keeps the dead store of 0
+static BOOL ReleaseRequest(volatile int request) {
     BOOL result = TRUE;
 
     DWCi_Ndi_lockGlobal();
