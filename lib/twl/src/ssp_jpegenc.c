@@ -864,8 +864,12 @@ static u32 Yos_JPEGEncode(const void *src, u8 *dst, u32 limit, JpegEncWork *work
                           JpegEncConvertFunc convert) {
     JpegEncComponent components[3];
     u32 pos;
-    u32 cbOffset, crOffset, yOffset;
-    u32 chromBlocksX, chromBlocksY;
+    u32 cbOffset;
+    u32 yOffset;
+    u32 crOffset;
+    u32 chromBlocksX;
+    u32 chromBlocksY;
+    u32 chromSize;
     u32 blocksX, blocksY;
     u32 mcusX, mcusY;
     u32 hFactor = 1;
@@ -874,8 +878,6 @@ static u32 Yos_JPEGEncode(const void *src, u8 *dst, u32 limit, JpegEncWork *work
     u32 i;
     u32 x;
     u32 dhtLength;
-    u32 coefOffset;
-    u32 size;
     u8(*quant)[64];
     JpegEncHuffTable *dcLum;
     JpegEncHuffTable *dcChrom;
@@ -907,23 +909,22 @@ static u32 Yos_JPEGEncode(const void *src, u8 *dst, u32 limit, JpegEncWork *work
     huffWork = &work->huffWork;
     chromBlocksX = blocksX / hFactor;
     chromBlocksY = blocksY / vFactor;
-    coefOffset = sizeof(JpegEncWork) + blocksX * blocksY * 128;
-    components[0].coefs = (s16 *)((u8 *)work + sizeof(JpegEncWork));
     components[0].blocksX = blocksX;
     components[0].blocksY = blocksY;
-    components[0].lastDc = 0;
-    components[1].coefs = (s16 *)((u8 *)work + coefOffset);
-    components[1].blocksX = chromBlocksX;
-    components[1].blocksY = chromBlocksY;
-    components[1].lastDc = 0;
-    components[2].coefs = (s16 *)((u8 *)work + (coefOffset + chromBlocksX * chromBlocksY * 128));
-    components[2].blocksX = chromBlocksX;
-    components[2].blocksY = chromBlocksY;
-    components[2].lastDc = 0;
-    yOffset = coefOffset + chromBlocksX * chromBlocksY * 128 * 2;
-    size = width * height;
-    cbOffset = yOffset + size;
-    crOffset = yOffset + size * 2;
+    components[1].blocksX = components[2].blocksX = chromBlocksX;
+    components[1].blocksY = components[2].blocksY = chromBlocksY;
+    components[0].coefs = (s16 *)((u8 *)work + sizeof(JpegEncWork));
+    // yOffset is the chroma coefficients' offset until it passes them, and pos the size of a plane until the header,
+    // as the SDK reuses them
+    yOffset = blocksX * blocksY * 128 + sizeof(JpegEncWork);
+    chromSize = chromBlocksX * chromBlocksY * 128;
+    components[1].coefs = (s16 *)((u8 *)work + yOffset);
+    components[2].coefs = (s16 *)((u8 *)work + (yOffset + chromSize));
+    yOffset += chromSize * 2;
+    components[0].lastDc = components[1].lastDc = components[2].lastDc = 0;
+    pos = width * height;
+    cbOffset = yOffset + pos;
+    crOffset = (pos << 1) + yOffset;
 
     // Scale the quantization tables as IJG's libjpeg does
     if (quality < 50) {

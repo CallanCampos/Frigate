@@ -52,7 +52,7 @@ static int DWCi_EncSessionGetPrivateAsync(const char *page, int pid, const void 
                                           GamestatsCheckFunc check, BOOL useHash);
 
 static int sRandomState;
-static const char *sBaseUrl;
+static const char *sBaseUrl = NULL;
 static GamestatsClient sClient = { 2 };
 
 // The size of size bytes in base64

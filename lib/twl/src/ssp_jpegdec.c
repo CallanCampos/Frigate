@@ -293,36 +293,29 @@ static s32 Mel_JPEGDecodeExif(u8 *data, u32 size, u32 option) {
 
 // Decodes a JPEG into dest, and returns its height and width, or 0
 static u32 Mel_JPEGDecode(u8 *dest, u8 *data, u32 size, s32 maxWidth, s32 maxHeight, u32 option) {
-    s32 p;
-    u8 marker;
-    int len;
-    int result;
-    u8 sampling;
-    u8 info;
-    s32 bitsOffset;
-    s32 tblOffset;
-    u8 *bits;
-    int count;
+    // The SDK reuses a few ints from one marker's code to the next (q is the position in a segment, s a length and
+    // then a value or a counter, m the sampling and then a table's offset), and its registers follow from that reuse
+    int width;
+    int height;
+    int h;
+    int g;
     int i;
-    int k;
-    s32 code;
-    s32 si;
-    s32 lookbits;
-    int n;
-    int base;
-    u8 z;
-    s32 end;
-    int l;
-    s32 x;
-    s32 y;
+    int j;
+    int m;
+    int pos;
+    int q;
+    int s;
+    int x;
+    int y;
+    int restartInterval;
+    int restartCount;
+    u8 b;
     u16 huffcode[257];
     s8 huffsize[257];
-    int pos;
-    s32 width = 0;
-    s32 height = 0;
-    s32 restartInterval;
-    s32 restartCount;
+    s32 result;
 
+    width = 0;
+    height = 0;
     sStuffed = 0;
     sBitsLeft = 0;
     sBlocks[BLOCK_Y][0] = sBlocks[BLOCK_CB][0] = sBlocks[BLOCK_CR][0] = 0;
@@ -339,223 +332,210 @@ static u32 Mel_JPEGDecode(u8 *dest, u8 *data, u32 size, s32 maxWidth, s32 maxHei
 
     pos = 2;
     while (pos + 1 < sDataSize) {
-        if (data[pos++] == 0xff) {
-            marker = data[pos++];
-            if (marker == 0xd9) {
-                break;
-            }
-            if (pos + 1 >= sDataSize) {
+        if (data[pos++] != 0xff) {
+            continue;
+        }
+        b = data[pos++];
+        if (b == 0xd9) {
+            break;
+        }
+        if (pos + 1 >= sDataSize) {
+            return 0;
+        }
+        s = (data[pos] << 8) | data[pos + 1];
+        if (b == 0xe1) {
+            result = SSP_ExifDecode(data, sDataSize, &pos, option);
+            if (result != 0 && result != 1) {
                 return 0;
             }
-            len = (data[pos] << 8) | data[pos + 1];
-            if (marker == 0xe1) {
-                result = SSP_ExifDecode(data, sDataSize, &pos, option);
-                if (result != 0 && result != 1) {
-                    return 0;
-                }
-            } else if (marker == 0xc0 || marker == 0xc1) {
-                if (pos + 9 >= sDataSize) {
-                    return 0;
-                }
-                height = (data[pos + 3] << 8) | data[pos + 4];
-                width = (data[pos + 5] << 8) | data[pos + 6];
-                sampling = data[pos + 9];
-                pos += len;
-                if (sampling != 0x11 && sampling != 0x21 && sampling != 0x12 && sampling != 0x22) {
-                    return 0;
-                }
-                sHSamp = sampling >> 4;
-                sVSamp = sampling & 0xf;
-                sMcuWidth = sHSamp * 8;
-                sMcuHeight = (sampling & 0xf) * 8;
-                if (width > maxWidth || height > maxHeight) {
-                    return 0;
-                }
-            } else if (marker == 0xc4) {
-                p = pos + 2;
-                if (p >= sDataSize) {
-                    return 0;
-                }
-                pos += len;
-                while (p < pos) {
-                    if (p + 17 >= sDataSize) {
-                        return 0;
-                    }
-                    info = data[p++];
-                    bitsOffset = 0;
-                    tblOffset = 0;
-                    if (info & 1) {
-                        tblOffset += HUFF_DERIVED_C;
-                        bitsOffset += HUFF_BITS_C;
-                    }
-                    if (info & 0x10) {
-                        bitsOffset += HUFF_BITS_AC;
-                        tblOffset += HUFF_DERIVED_AC;
-                    }
-                    sDerivedTbl16 = (s16 *)&sHuffWork[tblOffset + HUFF_DERIVED];
-                    sDerivedTbl32 = (s32 *)&sHuffWork[tblOffset + HUFF_DERIVED];
-                    bits = &sHuffWork[bitsOffset];
-                    sHuffWork[bitsOffset] = 0;
-                    count = 0;
-                    for (i = 1; i <= 16; i++) {
-                        bits[i] = data[p];
-                        count += bits[i];
-                        p++;
-                    }
-                    if (p + count >= sDataSize) {
-                        return 0;
-                    }
-                    for (i = 0; i < count; i++) {
-                        bits[HUFF_VALS + i] = data[p];
-                        p++;
-                    }
-
-                    k = 0;
-                    for (l = 1; l <= 16; l++) {
-                        for (i = 1; i <= bits[l] && k <= 256; i++, k++) {
-                            huffsize[k] = l;
-                        }
-                    }
-                    if (k >= 257) {
-                        sError = 1;
-                        return 0;
-                    }
-                    huffsize[k] = 0;
-
-                    code = 0;
-                    k = 0;
-                    si = huffsize[0];
-                    while (huffsize[k] != 0) {
-                        while (huffsize[k] == si) {
-                            huffcode[k++] = code;
-                            code++;
-                            if (k >= 257) {
-                                sError = 1;
-                                return 0;
-                            }
-                        }
-                        code <<= 1;
-                        si++;
-                    }
-
-                    k = 0;
-                    for (l = 1; l <= 16; l++) {
-                        if (bits[l] != 0) {
-                            sDerivedTbl16[HUFF_VALPTR + l] = k;
-                            sDerivedTbl32[l] = huffcode[k];
-                            k += bits[l];
-                            if (k >= 257) {
-                                sError = 1;
-                                return 0;
-                            }
-                            sDerivedTbl32[HUFF_MAXCODE + l] = huffcode[k - 1];
-                        } else {
-                            sDerivedTbl32[HUFF_MAXCODE + l] = -1;
-                        }
-                    }
-                    sDerivedTbl32[HUFF_MAXCODE + 17] = 0xfffff;
-
-                    k = 0;
-                    for (l = 1; l <= 8; l++) {
-                        for (i = 1; i <= bits[l]; i++, k++) {
-                            if (k >= 257) {
-                                sError = 1;
-                                return 0;
-                            }
-                            lookbits = huffcode[k] << (8 - l);
-                            if (lookbits < -0xc2e || lookbits + (1 << (8 - l)) >= 0xbd3) {
-                                sError = 1;
-                                return 0;
-                            }
-                            for (n = 1 << (8 - l); n > 0; n--) {
-                                if (tblOffset + HUFF_DERIVED + HUFF_LOOK_NBITS + lookbits < 0 ||
-                                    tblOffset + HUFF_DERIVED + HUFF_LOOK_SYM + lookbits >= HUFF_WORK_SIZE) {
-                                    sError = 1;
-                                    return 0;
-                                }
-                                sHuffWork[tblOffset + HUFF_DERIVED + HUFF_LOOK_NBITS + lookbits] = l;
-                                sHuffWork[tblOffset + HUFF_DERIVED + HUFF_LOOK_SYM + lookbits] = bits[HUFF_VALS + k];
-                                lookbits++;
-                            }
-                        }
-                    }
-                }
-            } else if (marker == 0xd8) {
-            } else if (marker == 0xda) {
-                if (pos + 12 >= sDataSize) {
-                    return 0;
-                }
-                pos += 12;
-                for (y = 0; y < height; y += sMcuHeight) {
-                    for (x = 0; x < width; x += sMcuWidth) {
-                        if (restartInterval != 0 && --restartCount == 0) {
-                            restartCount = restartInterval;
-                            if (sBitsLeft > 7) {
-                                pos = pos - sStuffed - 1;
-                            }
-                            pos += 2;
-                            sBitsLeft = 0;
-                            sBlocks[BLOCK_Y][0] = sBlocks[BLOCK_CB][0] = sBlocks[BLOCK_CR][0] = 0;
-                        }
-                        for (i = 0; i < sHSamp * sVSamp; i++) {
-                            getmatrix(data, sBlocks[BLOCK_Y], &pos, HUFF_TBL_DC_Y);
-                            decode_block(sY[i], BLOCK_Y);
-                        }
-                        getmatrix(data, sBlocks[BLOCK_CB], &pos, HUFF_TBL_DC_C);
-                        decode_block(sCb, BLOCK_CB);
-                        getmatrix(data, sBlocks[BLOCK_CR], &pos, HUFF_TBL_DC_C);
-                        decode_block(sCr, BLOCK_CR);
-                        writeblock(dest, x, y, width, height);
-                    }
-                }
-                break;
-            } else if (marker == 0xdb) {
-                end = pos + len;
-                p = pos + 2;
-
-                pos = end;
-                while (p < end) {
-                    info = data[p];
-                    if (info & 0xf0) {
-                        if (p + 0x82 >= sDataSize) {
-                            return 0;
-                        }
-                        base = (info & 0xf) * 64;
-                        p++;
-                        for (i = 0; i < 64; i++) {
-                            z = sZigzag[i];
-                            if (base + z > 127) {
-                                return 0;
-                            }
-                            sQuant[0][base + z] = ((data[p + 1] + (data[p] << 8)) * sAanScales[i] + 0x800) >> 12;
-                            p += 2;
-                        }
-                    } else {
-                        if (p + 0x41 >= sDataSize) {
-                            return 0;
-                        }
-                        base = info * 64;
-                        p++;
-                        for (i = 0; i < 64; i++) {
-                            z = sZigzag[i];
-                            if (base + z > 127) {
-                                return 0;
-                            }
-                            sQuant[0][base + z] = (data[p] * sAanScales[i] + 0x800) >> 12;
-                            p++;
-                        }
-                    }
-                }
-            } else if (marker == 0xdd) {
-                if (pos + 3 >= sDataSize) {
-                    return 0;
-                }
-                restartInterval = (data[pos + 2] << 8) | data[pos + 3];
-                pos += len;
-                restartCount = restartInterval + 1;
-            } else {
-                pos += len;
+        } else if (b == 0xc0 || b == 0xc1) {
+            if (pos + 9 >= sDataSize) {
+                return 0;
             }
+            height = (data[pos + 3] << 8) | data[pos + 4];
+            width = (data[pos + 5] << 8) | data[pos + 6];
+            m = data[pos + 9];
+            pos += s;
+            if (m != 0x11 && m != 0x21 && m != 0x12 && m != 0x22) {
+                return 0;
+            }
+            sHSamp = m >> 4;
+            sVSamp = m & 0xf;
+            sMcuWidth = sHSamp * 8;
+            sMcuHeight = (m & 0xf) * 8;
+            if (width > maxWidth || height > maxHeight) {
+                return 0;
+            }
+        } else if (b == 0xc4) {
+            q = pos + 2;
+            if (q >= sDataSize) {
+                return 0;
+            }
+            pos += s;
+            while (q < pos) {
+                if (q + 17 >= sDataSize) {
+                    return 0;
+                }
+                b = data[q++];
+                i = 0;
+                m = 0;
+                if (b & 1) {
+                    m += HUFF_DERIVED_C;
+                    i += HUFF_BITS_C;
+                }
+                if (b & 0x10) {
+                    m += HUFF_DERIVED_AC;
+                    i += HUFF_BITS_AC;
+                }
+                sDerivedTbl16 = (s16 *)&sHuffWork[m + HUFF_DERIVED];
+                sDerivedTbl32 = (s32 *)&sHuffWork[m + HUFF_DERIVED];
+                sHuffWork[i] = 0;
+                for (h = 1, j = 0; h <= 16; h++, q++) {
+                    b = data[q];
+                    sHuffWork[i + h] = b;
+                    j += b;
+                }
+                if (q + j >= sDataSize) {
+                    return 0;
+                }
+                for (h = 0; h < j; h++) {
+                    sHuffWork[i + HUFF_VALS + h] = data[q];
+                    q++;
+                }
+                g = 0;
+                for (h = 1; h <= 16; h++) {
+                    for (j = 1; j <= sHuffWork[i + h] && g <= 256; j++, g++) {
+                        huffsize[g] = h;
+                    }
+                }
+                if (g >= 257) {
+                    sError = 1;
+                    return 0;
+                }
+                huffsize[g] = 0;
+                j = 0;
+                g = huffsize[0];
+                s = 0;
+                while (huffsize[s] != 0) {
+                    while (huffsize[s] == g) {
+                        huffcode[s++] = j++;
+                        if (s >= 257) {
+                            sError = 1;
+                            return 0;
+                        }
+                    }
+                    j <<= 1;
+                    g++;
+                }
+                g = 0;
+                for (j = 1; j <= 16; j++) {
+                    if (sHuffWork[i + j] != 0) {
+                        sDerivedTbl16[HUFF_VALPTR + j] = g;
+                        sDerivedTbl32[j] = huffcode[g];
+                        g += sHuffWork[i + j];
+                        if (g >= 257) {
+                            sError = 1;
+                            return 0;
+                        }
+                        sDerivedTbl32[HUFF_MAXCODE + j] = huffcode[g - 1];
+                    } else {
+                        sDerivedTbl32[HUFF_MAXCODE + j] = -1;
+                    }
+                }
+                sDerivedTbl32[HUFF_MAXCODE + 17] = 0xfffff;
+                g = 0;
+                for (h = 1; h <= 8; h++) {
+                    for (j = 1; j <= sHuffWork[i + h]; j++, g++) {
+                        if (g >= 257) {
+                            sError = 1;
+                            return 0;
+                        }
+                        x = huffcode[g] << (8 - h);
+                        if (x < -0xc2e || x + (1 << (8 - h)) >= 0xbd3) {
+                            sError = 1;
+                            return 0;
+                        }
+                        for (y = 1 << (8 - h); y > 0; y--, x++) {
+                            if (m + HUFF_DERIVED + HUFF_LOOK_NBITS + x < 0 ||
+                                m + HUFF_DERIVED + HUFF_LOOK_SYM + x >= HUFF_WORK_SIZE) {
+                                sError = 1;
+                                return 0;
+                            }
+                            sHuffWork[m + HUFF_DERIVED + HUFF_LOOK_NBITS + x] = h;
+                            sHuffWork[m + HUFF_DERIVED + HUFF_LOOK_SYM + x] = sHuffWork[i + HUFF_VALS + g];
+                        }
+                    }
+                }
+            }
+        } else if (b == 0xd8) {
+        } else if (b == 0xda) {
+            if (pos + 12 >= sDataSize) {
+                return 0;
+            }
+            pos += 12;
+            for (y = 0; y < height; y += sMcuHeight) {
+                for (x = 0; x < width; x += sMcuWidth) {
+                    if (restartInterval != 0 && --restartCount == 0) {
+                        restartCount = restartInterval;
+                        if (sBitsLeft > 7) {
+                            pos = pos - sStuffed - 1;
+                        }
+                        pos += 2;
+                        sBitsLeft = 0;
+                        sBlocks[BLOCK_Y][0] = sBlocks[BLOCK_CB][0] = sBlocks[BLOCK_CR][0] = 0;
+                    }
+                    for (i = 0; i < sHSamp * sVSamp; i++) {
+                        getmatrix(data, sBlocks[BLOCK_Y], &pos, HUFF_TBL_DC_Y);
+                        decode_block(sY[i], BLOCK_Y);
+                    }
+                    getmatrix(data, sBlocks[BLOCK_CB], &pos, HUFF_TBL_DC_C);
+                    decode_block(sCb, BLOCK_CB);
+                    getmatrix(data, sBlocks[BLOCK_CR], &pos, HUFF_TBL_DC_C);
+                    decode_block(sCr, BLOCK_CR);
+                    writeblock(dest, x, y, width, height);
+                }
+            }
+            break;
+        } else if (b == 0xdb) {
+            q = pos + 2;
+            pos += s;
+            while (q < pos) {
+                s = data[q];
+                if (s & 0xf0) {
+                    if (q + 0x82 >= sDataSize) {
+                        return 0;
+                    }
+                    j = (s & 0xf) << 6;
+                    q++;
+                    for (i = 0; i < 64; i++, q += 2) {
+                        if (j + sZigzag[i] > 127) {
+                            return 0;
+                        }
+                        sQuant[0][j + sZigzag[i]] = ((data[q + 1] + (data[q] << 8)) * sAanScales[i] + 0x800) >> 12;
+                    }
+                } else {
+                    if (q + 0x41 >= sDataSize) {
+                        return 0;
+                    }
+                    g = s << 6;
+                    q++;
+                    for (j = 0; j < 64; j++, q++) {
+                        if (g + sZigzag[j] > 127) {
+                            return 0;
+                        }
+                        sQuant[0][g + sZigzag[j]] = (data[q] * sAanScales[j] + 0x800) >> 12;
+                    }
+                }
+            }
+        } else if (b == 0xdd) {
+            if (pos + 3 >= sDataSize) {
+                return 0;
+            }
+            restartInterval = (data[pos + 2] << 8) | data[pos + 3];
+            pos += s;
+            restartCount = restartInterval + 1;
+        } else {
+            pos += s;
         }
     }
     if (pos > sDataSize) {

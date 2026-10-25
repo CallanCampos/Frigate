@@ -106,6 +106,7 @@ lib/dwcutilui/src/dwc_util_text.c:
     .bss        start:0x021c41e0 end:0x021c41e4
 
 lib/dwcutilui/src/dwc_util_touch.c:
+    complete
     .text       start:0x021bc584 end:0x021bcaec
     .bss        start:0x021c41e8 end:0x021c4200
 
