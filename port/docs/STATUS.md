@@ -32,10 +32,57 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
 
+## 2026-10-25: the pointer cast guard's rows for the sync of upstream `65cf903b70`
+
+- **Upstream:** `629a53cccb` (upstream merge #504), as `main` has it since PR 27; this branch merges no upstream commit.
+  The sync of upstream's `main`, at `65cf903b70` when it was validated, is prepared on the local topic
+  `codex/upstream-sync-manual` and needs these rows first.
+- **Port:** `PORT_SHA`, on the topic branch `port-sync-ptrcast-rows-wcm-dsp` from `main` at `abf834a3a3` (PR 32's
+  merge), one commit, published as one pull request to `main`. It fills the last entry's `PORT_SHA`, `1e107c917e`.
+- **ROM:** T0 passes: `python3 configure.py b2_us w2_us && ninja`, from an empty build directory in a new worktree of
+  `main`, compiled every C file of both versions with no compiler warning, and both SHA1s match (Black 2
+  `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb`, White 2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`). The branch changes
+  only `port/`.
+- **Host build:** T1 passes on macOS arm64, Apple clang 21, RelWithDebInfo, both versions (`build/port-verify-b2_us`,
+  `build/port-verify-w2_us`, configured fresh as `sync_upstream.sh` configures them), 727 compiler warnings in each, as
+  `main` has.
+- **Tests:** ctest at `-j2`: Black 2, 293 passed and 15 skipped of 308; White 2, 289 passed and 16 skipped of 305; none
+  failed. Skipped in both: the 12 oracle tests that need the oracle, which that configuration doesn't build,
+  `frame_times_party_menus` (the oracle's save), `asm_oracle` (no Unicorn in this Python) and `app_universal_slices` (a
+  distribution build's); in White 2 also `frame_times_title`, which skips a scene over its budget while the load average
+  is above the cores (`port/cmake/frame_times.cmake`). `game_ptrcasts` passes in both; T4, T5 and T7 not run.
+- **Tiers:** unchanged: the branch changes no game C.
+- **Trap stubs:** 30 function stubs and 21 data placeholders per version, unchanged.
+- **64-bit warnings:** `check_ptrcasts: 361 sites in 225 keys (real 66, harmless 117, handled 141, unreachable 37), 1682
+  files, 0 not compiled` in both versions, as on the last entry; the three new rows pass as no longer found, since
+  `main` doesn't have their code yet. On the sync's merge of `65cf903b70` (`f193d8a5ca`, with its records' comments),
+  with this baseline (`check_ptrcasts.py --baseline`), both versions give `check_ptrcasts: 359 sites in 223 keys (real
+  66, harmless 117, handled 141, unreachable 35), 1684 files, 0 not compiled`, exit 0, and the same on the merge of
+  `8717781533` before it, with 1679 files; with `main`'s, `game_ptrcasts` fails there on these three findings and
+  nothing else.
+- **Work done:** the guard's baseline ([../tools/ptrcast_baseline.tsv](../tools/ptrcast_baseline.tsv)) gets the three
+  rows that the sync of `65cf903b70` needs, as [SYNC.md](SYNC.md#when-the-pointer-cast-guard-fails) says for a sync's
+  new sites. Each is a cast that a row already holds, which upstream renamed with both its file and its function, so the
+  guard can't pair it with its old row:
+  - `df847de7d1` splits NitroWiFi's `wcm.c` into five files, and `WCM_NotifyResult`'s call `WCMi_NotifyEx(notify,
+    result, (s32)parameter, (void *)detail, line)` is `WCMi_Notify`'s in `wcm_system.c`: its `ptr-to-int` (`s32 <- void
+    *`) and `int-to-ptr` (`void * <- u32`) rows, `real` in R23 (the Wi-Fi libraries' handles and notices carried as
+    integers, until phase 7), as the old rows are.
+  - `1574db16fe` gives TwlSDK's DSP code the SDK's names, and `dsp_audio.c`'s `func_027060b4` is `DSPi_PlaySoundEx` in
+    `dsp_util.c`: its `ptr-to-int` (`u32 <- const void *`) row, `DSPi_SwapHalves((u32)src)`, `unreachable` (TwlSDK code;
+    the host runs as a retail DS), as the old row is.
+
+  On the sync's head the old rows pass as no longer found, with `card_rom_twl.c`'s and `os_arena_twl.c`'s, whose code
+  the host no longer compiles, and `WcmWmcbScanEx`'s passes as renamed into `wcm_wmif.c`, until a PR after the sync runs
+  `--update`.
+- **Next:** the sync: `main` merged into `codex/upstream-sync-manual`, `sync_upstream.sh --branch
+  codex/upstream-sync-manual` run again to validate its head and publish it, and the owner's review.
+- **Blockers:** none.
+
 ## 2026-10-24: the follow-ups' hygiene: the metrics' compile step on upstream's probe, the records at the decomp's names
 
 - **Upstream:** `629a53cccb` (upstream merge #504), as `main` has it since PR 27; this branch merges no upstream commit.
-- **Port:** `PORT_SHA`, on the topic `port-hygiene-oct24` from `main` at `dd98d585e6` (PR 30's merge): `559ae5b099`,
+- **Port:** `1e107c917e`, on the topic `port-hygiene-oct24` from `main` at `dd98d585e6` (PR 30's merge): `559ae5b099`,
   `compile_check.py` on upstream's compile probe, with its test; `dbaba7f321`, the ledger, the findings and the guides
   at the decomp's present names and states; `a34e7c249b`, the platform layer's comments; `6b42b332de`, the records:
   this entry, which filled PR 30's entry's `PORT_SHA`, `36a6447c16`, as PR 31 did too, the lessons and SYNC.md's
