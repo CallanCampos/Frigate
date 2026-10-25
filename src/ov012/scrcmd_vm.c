@@ -889,7 +889,7 @@ BOOL s0003_VMSleep(VM *vm, FieldScriptEnv *env) {
 }
 
 BOOL s0004_VMCall(VM *vm, FieldScriptEnv *env) {
-    u32 offset = VM_Read32(vm);
+    s32 offset = VM_Read32(vm);
 
     VM_Call(vm, vm->pc + offset);
     return FALSE;
@@ -1137,7 +1137,7 @@ BOOL s001D_RTEndGlobal(VM *vm, FieldScriptEnv *env) {
 }
 
 BOOL s001E_VMJump(VM *vm, FieldScriptEnv *env) {
-    u32 offset = VM_Read32(vm);
+    s32 offset = VM_Read32(vm);
 
     VM_Jump(vm, vm->pc + offset);
     return FALSE;
@@ -1145,7 +1145,7 @@ BOOL s001E_VMJump(VM *vm, FieldScriptEnv *env) {
 
 BOOL s001F_VMJumpIf(VM *vm, FieldScriptEnv *env) {
     u8 condition = VM_Read8(vm);
-    u32 offset = VM_Read32(vm);
+    s32 offset = VM_Read32(vm);
 
     if (condition == 0xff) {
         if (VM_StackPop(vm) != 1) {
@@ -1159,7 +1159,7 @@ BOOL s001F_VMJumpIf(VM *vm, FieldScriptEnv *env) {
 
 BOOL s0020_VMCallIf(VM *vm, FieldScriptEnv *env) {
     u8 condition = VM_Read8(vm);
-    u32 offset = VM_Read32(vm);
+    s32 offset = VM_Read32(vm);
 
     if (VM_CMP_LUT[condition][vm->cmpResult] == 1) {
         VM_Call(vm, vm->pc + offset);
