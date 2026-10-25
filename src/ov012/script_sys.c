@@ -571,7 +571,7 @@ VM *FieldScript_CreateVM(HeapID heapId, ScriptWork *work, u16 zoneId, u16 script
     }
     VM_LoadScript(vm, (void *)vm->unk38);
     vm->pc += scriptOffset * 4;
-    vm->pc += VM_Read32(vm);
+    vm->pc += (s32)VM_Read32(vm);
     FieldScript_AttachOpcodeGuard(vm);
     return vm;
 }
