@@ -7782,7 +7782,7 @@ overlays/ov011 0x02185490 SOCLSocketParamTCP
 overlays/ov011 0x021854a8 SOCLSocketParamUDPSend
 overlays/ov011 0x021854cc sOidCommonName
 overlays/ov011 0x021854d0 sOid0
-overlays/ov011 0x021854d4 sConfig
+overlays/ov011 0x021854d4 sCipherSuites
 overlays/ov011 0x021854dc sOids
 overlays/ov011 0x021854f4 sOid2
 overlays/ov011 0x021854fc sOidRsaEncryption
@@ -7911,6 +7911,7 @@ overlays/ov011 0x0218dc54 SOCLiSocketList
 overlays/ov011 0x0218dc58 SOCLiSocketListTrash
 overlays/ov011 0x0218dc5c sHostAddr
 overlays/ov011 0x0218dce4 sHostName
+overlays/ov011 0x0218dde8 sPoolSeeded
 overlays/ov011 0x0218ddf0 sPool
 overlays/ov011 0x0218de04 sSessionCache
 overlays/ov011 0x0218df74 WCMi_OverridedDeviceId
@@ -7929,6 +7930,8 @@ overlays/ov011 0x0218e040 sConnections
 overlays/ov011 0x0218e0c0 sConnectionInfos
 overlays/ov011 0x0218e1c0 sMatchState
 overlays/ov011 0x0218e1e0 sKeys
+overlays/ov011 0x0218e918 sSendPoolHead
+overlays/ov011 0x0218e920 sTransport
 overlays/ov011 0x0218e924 sNas
 overlays/ov011 0x0218e944 sResult
 overlays/ov011 0x0218e960 sInit
