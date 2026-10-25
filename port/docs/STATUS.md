@@ -78,10 +78,14 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
   `sync_upstream.sh --branch codex/upstream-sync-manual --no-build` made without a conflict; the records commit
   `96d5c17fc3`, which brought this entry to that merge; the merge `5d32b558ea` of `c127efd9fa`, which
   `sync_upstream.sh --branch codex/upstream-sync-manual` made without a conflict, validated as below and published: it
-  pushed the topic branch, opened PR 35 and posted `Frigate local verification` (success) on `5d32b558ea`; and this
-  records commit, which brings this entry to that head, pushed to the topic with a normal push, after which
-  `sync_upstream.sh --verify-pr 35` verifies the PR's final head. Set aside unpublished on the way, as upstream moved
-  on: an earlier records commit, `4857da5259`, which recorded the merge of `b67985f98f` alone, before its review; and
+  pushed the topic branch, opened PR 35 and posted `Frigate local verification` (success) on `5d32b558ea`; the records
+  commit `45a7cf6505`, which brought this entry to that merge, pushed to the topic with a normal push; the merge
+  `67988cee7c` of `main` at `f6200135f9` (PR 29's merge, after PR 35 was opened, which left it behind `main`), without
+  a conflict: PR 29 signs the field script's jump and call offsets in `scrcmd_vm.c`, `scrcmd_fldmmdl.c` and
+  `script_sys.c`, with its row in game-changes.md, files that none of the sync's upstream commits change; and this
+  records commit, which names that merge, after which `sync_upstream.sh --verify-pr 35`, in a separate worktree,
+  verifies the PR's final head, the merge of `main` with it. Set aside unpublished on the way, as upstream moved on: an
+  earlier records commit, `4857da5259`, which recorded the merge of `b67985f98f` alone, before its review; and
   `3a89648cdf`, which `sync_upstream.sh --branch codex/upstream-sync-manual --no-build` made of `8717781533` without a
   conflict, validated as below, before upstream's next four commits. `f193d8a5ca`'s tree differs from `3a89648cdf`'s
   only in the files those four commits change and the resolution of `friend.c`.
@@ -258,10 +262,14 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
   `sOid2`, `sOidCommonName`, `sOidMd5WithRsa`, `sOidRsaEncryption`, `sOidSha1WithRsa` and the five `sLabel*`, and
   `dwc_transport.c`'s `sSendPool`: `port/` names none of them outside this entry; no file of `src/`, `lib/` or
   `include/` is added, removed or renamed. decomp-findings.md and game-changes.md have no row for `ssl.c` or
-  `dwc_transport.c`. They add no cast that the pointer cast guard counts (below), and change no trap stub. This
-  commit's records: this entry, brought to `5d32b558ea`. game-changes.md needs no change: every file outside `port/`
-  and `.github/` that differs from `c127efd9fa` is in a row, the same 188, and no row has all its files matching
-  upstream's.
+  `dwc_transport.c`. They add no cast that the pointer cast guard counts (below), and change no trap stub.
+  game-changes.md needs no change for the sync: every file outside `port/` and `.github/` that differs from `c127efd9fa` is in a row,
+  the same 188 on `5d32b558ea`, and no row has all its files matching upstream's. The merge of `main` at `f6200135f9`
+  adds PR 29's row and two of its files to them, `scrcmd_vm.c` and `scrcmd_fldmmdl.c` (`script_sys.c` was one of the
+  188, in the VM row), 190 in all: `check_mwcc_neutral.py --base c127efd9fa` on its three files differs in both
+  versions only at PR 29's six `u32` made `s32` and, in `script_sys.c`, at the `net.h` row's first difference, as
+  before; the three are complete in both versions, so ninja's SHA1s prove them. The records commits `45a7cf6505` and
+  this one bring this entry to `5d32b558ea` and to the merge of `main` after it.
 - **Next:** the owner's review of PR 35, once its CI and `Frigate local verification` (`sync_upstream.sh --verify-pr
   35`, in a separate worktree) pass on its final head. Upstream's `main` has moved on since the merge, to `4b1d064408`
   at 07:30 UTC (`9427662efc`, DWC's `gsPlatformSocket.c` and `gpiBuffer.c` complete, and `4b1d064408`, a row's tries
@@ -269,8 +277,8 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
   sync merges: the `--update` PR (the five rows no longer found, `WcmWmcbScanEx`'s rename), the platform layer's two
   statics at upstream's names, `pm_host.c`'s pragmas, and phase 4's route with #496's encounter effects, which brings
   decomp-findings.md's `enceff_data.c` row up to date.
-- **Blockers:** none upstream. PR 34 is merged (`a5dc06ff82`); the sync waits for the owner's review and approval of
-  PR 35.
+- **Blockers:** none upstream. PRs 34 and 29 are merged (`a5dc06ff82`, `f6200135f9`) and in this branch; the sync
+  waits for the owner's review and approval of PR 35.
 
 ## 2026-10-25: the pointer cast guard's rows for the sync of upstream `65cf903b70`
 
