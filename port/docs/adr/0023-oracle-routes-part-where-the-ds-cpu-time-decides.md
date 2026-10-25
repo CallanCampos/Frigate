@@ -10,7 +10,9 @@ melonDS's save made after it. -->
 - **Upstream:** `629a53cccb` (upstream merge #504), as Frigate's `main` has it
 - **Note (2026-10-24):** proposed by the session that made the change, in the pull request that brings it (the review
   of phase 4's route asked for it, since it sets how every trainer battle of phase 5's routes is tested). It stays
-  proposed until the developer reviews it; the next change to this file sets the status line to accepted.
+  proposed until the developer reviews it; the change that records that review sets the status line to accepted.
+- **Note (2026-10-25):** the third decision's wording follows the round trips before review: the port plays the
+  oracle's presses where they still meet its course (Black 2's Hugh), not only where its course takes the same passes.
 
 ## Context
 
@@ -42,11 +44,15 @@ dozens of trainer battles.
   that save, with the seeds the DS builds there. A route is then a chain of sequences, each from the save the oracle
   made at the end of the piece before.
 - **The port's own play past the cut is held by what the CPU's time doesn't decide.** The port plays the piece from the
-  same save, with the oracle's input file where its own course takes the same passes, else with presses of its own after
-  the cut (a trainer battle the port plays as its own can take another number of turns, and the oracle's presses then
-  miss what follows: White 2's Hugh, 2026-10-24); where it saves, its save is compared with melonDS's byte by byte, each
-  difference declared with its traced cause, and melonDS continues the port's save as it continues its own (`oracle.py
-  round-trip`). A trap, a crash or a watchdog in the port's run fails it.
+  same save, with the oracle's input file where those presses still reach the steps of its own course they reached on
+  the DS, else with presses of its own after the cut. A trainer battle the port plays as its own can take another number
+  of turns: Black 2's Hugh ends 560 counts later on the port, and its scene there still ends within the oracle's presses
+  (2026-10-25: at count 14,370, between the oracle's last two B presses and 50 counts before its field menu's X); White
+  2's ends 704 counts later, and the oracle's presses would open the field menu in the middle of its scene and miss SAVE
+  (2026-10-24). Where it saves, its save is compared with melonDS's byte by byte, each difference declared with its
+  traced cause, and melonDS continues the port's save as it continues its own (`oracle.py round-trip`); a press that
+  missed shows there, as no save or as bytes no cause declares. A trap, a crash or a watchdog in the port's run fails
+  it.
 
 ## Alternatives
 

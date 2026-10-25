@@ -32,12 +32,84 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
 
+## 2026-10-25: phase 4's coverage reviewed: the mystery gift block decrypted, continued saves held to the same save
+
+- **Upstream:** `629a53cccb` (upstream merge #504), as `main` has it; this branch merges no upstream commit, and still
+  needs upstream's encounter effects' entries (`b962ecf040`), verified as the same local, uncommitted candidate.
+- **Port:** `PORT_SHA`, on the topic branch `port-phase4-coverage`, local and not published, after `4ca0b4fd39`, whose
+  entry's `PORT_SHA` it fills: the fixes of that branch's review. It lands as that entry says, after
+  `port-phase4-route`.
+- **ROM:** T0 passes on this commit's tree with the candidate: Black 2 `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb`,
+  White 2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a` (`python3 configure.py && ninja`, which recompiled
+  `src/ov036/fldmmdl_movecode.c`, touched and restored by the scratch trace, and matched both SHA1s).
+- **Host build:** T1 passes on macOS arm64, AppleClang 21.0.0, RelWithDebInfo with the oracle, both versions: this
+  commit changes no C and no CMake target, only `port/`'s Python, documents and comments; `build/port` and
+  `build/port-w2` configured again and rebuilt incrementally (`ninja -j4`) with the candidate, no warning. White 2's
+  program was built once with a scratch print in `FldmmdlMovecode_MoveTurnRandom` for the townsperson's trace, never
+  committed, and rebuilt from the restored file before any test below.
+- **Tests:** `ctest -j2` of the tests this commit touches, with the oracle and the cached oracle saves, on this
+  commit's tree but this file, with the candidate, both versions at once under load averages of 27 to 48 from other
+  sessions; every one passed: `oracle_compare` (56 unit tests, the new ones the mystery gift block's decryption, the
+  trips' declared bytes outside its encrypted contents and `compare_boots`' start-up count), `oracle_saves`,
+  `oracle_pc`, `oracle_center_continue`, `oracle_round_trip_catch`, `oracle_round_trip_hugh`, `game_script_vm` and
+  `game_ptrcasts`, in each version. T4 and T6:
+
+  | Test | Black 2 | White 2 |
+  | --- | --- | --- |
+  | `oracle_round_trip_hugh` | up to the cut 8,165 of 8,165, its state too; the saves 2,722 bytes of each copy apart as written, 19 decrypted, all declared; melonDS 5,671 frames the same on either save, up to count 3602; the port's continuation held to melonDS's on the port's save, 3,589 of 3,589, state at 2,474 frames, none apart | 8,157 of 8,157; 2,715 and 18 bytes; 5,606 frames; 3,581 of 3,581, 2,474 |
+  | `oracle_round_trip_catch` | the saves 17 bytes of each copy apart, written and decrypted; melonDS 6,900 of 6,900 frames the same on either save; the port's continuation held to melonDS's on the port's save, 4,679 of 4,679, state at 3,562 frames, none apart | 17 bytes; 6,900; 4,671 of 4,671, 3,562 |
+
+  `oracle_pc` and `oracle_center_continue` give the last entry's counts. The rest of the suite, which this commit
+  doesn't touch, passed in the last entry's full run. T5 and T7 not run (Next).
+- **Tiers:** unchanged: no game code changes.
+- **Trap stubs:** unchanged, 30 function stubs and 21 data placeholders per version.
+- **64-bit warnings:** unchanged: no C changes (the last entry's line).
+- **Work done:** the review of the last entry's three commits found the branch sound and nine problems; each is fixed,
+  but one taken as information:
+  - **The mystery gift block is compared by what it holds.** The hugh trip declared the whole block (2,712 bytes a
+    copy) because the Pokémon Center's deliveryman encrypts it again with a key from the VBlank count, so any change
+    to the gift data would have passed. `oracle.py` now decrypts each save's block with the key it keeps
+    (`mystery_gift_decrypted`, as `mgDecryptData` does), checks that its contents add up to its checksum, and compares
+    the saves so: the contents are the same in both versions, and only the key (`0x1d292`) and the block's CRC
+    (`0x1d296`) are declared, 19 bytes a copy in Black 2 and 18 in White 2 where 2,722 and 2,715 differ as written.
+    `oracle_compare` checks the decryption and that no trip declares the block's encrypted bytes.
+  - **The port's continuation is held to melonDS's run on the same save.** The round trips compared the port's run on
+    its own save with melonDS's on melonDS's save, which for hugh needed GFL's random state left out where the two
+    saves' townsperson draws apart (`continued_random`). They now compare it with melonDS's run on the port's save,
+    which `compare_boots` holds to melonDS's own up to `continued_last`, and `continued_random` is gone: no stretch of
+    state is declared for it.
+  - **`SAVE_RANDOM`'s 126 counts for the PC's save are traced.** The PC's dialog closes 128 counts later on the DS in
+    both versions, and the townsperson by the counter draws 126 later: the PC's log-off let him take up his wait a
+    field pass sooner on the DS in both versions (the DS's actor dumped from melonDS's memory, White 2's port from a
+    scratch trace), so the field menu stops him with one step less to go (25 against 26 in Black 2, 9 against 10 in
+    White 2). `PC_LOGOFF` said White 2's DS went on on the port's pass; it doesn't, but the lead shows only after the
+    save. `SAVE_WRITES`, `SAVE_CAMERA` and the README give each save's figures, the PC's 128 and 144 among them.
+  - **Cause texts corrected:** the play time's seconds (`CENTER_PLAY_SECONDS`: the DS's clock some 8 seconds ahead of
+    the port's at the same count in both versions; Black 2's saves on the same count, White 2's port saving 740 counts
+    later) and the townsperson's (the save isn't on the same count in White 2); `PC_WINDOW` (oracle frame 8795, 8730 in
+    White 2, is port frame 6403's picture, which the check of missing pictures names since it holds a frame to the
+    DS's own frames, and White 2's four fifth frames of six, a step further partway).
+  - **ADR 0023's third decision reworded before its review:** the port plays the oracle's presses where they still
+    reach its own course (Black 2's Hugh, whose scene ends at count 14,370, between melonDS's last two B presses and
+    50 counts before its X, measured from the port's running event), else presses of its own (White 2's).
+  - **Smaller:** `port/cmake/README.md`'s `oracle.cmake` row names phase 4's tests and the round trips; oracle.cmake's
+    comments, the glossary, the tests guide and the feature map say how the trips compare; `test_compare.py`'s blank
+    line is back and `compare_boots`' last count has its start-up case (a count past the last before the game sets it
+    up); three lessons.
+  - **Taken as information:** `ActorCmdExec`'s `s32` offset has no test of its own; the docs say `game_script_vm`
+    covers the four VM commands, and a test of it needs a field with an actor system, which the line's sum, the same
+    as the VM commands', doesn't justify.
+- **Next:** as the last entry gives it: the sync of upstream's `b962ecf040`, `port-phase4-route` published, then this
+  branch merged with it and published as its own pull request; T5 on phase 4's route and the PC (the gate's
+  `STD_GetStringLength` report), T7, the PC's other apps and a round trip of the PC's save.
+- **Blockers:** as the last entry gives them.
+
 ## 2026-10-25: phase 4's PC and a trainer battle to its end, held to melonDS; the field script VM's jumps back
 
 - **Upstream:** `629a53cccb` (upstream merge #504), as `main` has it; this branch merges no upstream commit. Like
   `port-phase4-route`, which it continues, it needs upstream's encounter effects' entries (`b962ecf040`), which only
   the next sync brings, and was verified with them as the same local, uncommitted candidate, never committed.
-- **Port:** `PORT_SHA`, on the topic branch `port-phase4-coverage`, local and not published, from `port-phase4-route`
+- **Port:** `4ca0b4fd39`, on the topic branch `port-phase4-coverage`, local and not published, from `port-phase4-route`
   at `0fcafe6757`: `5e838b5724` (the field script VM's jumps back, signed offsets), `14a6b68aa5` (Hugh's battle to its
   end, held by its save) and this commit (the PC). It fills the last entry's `PORT_SHA`, `0fcafe6757`, and
   game-changes.md's, `5e838b5724`. It lands after `port-phase4-route`: once that branch has merged `main` past the sync

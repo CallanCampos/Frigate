@@ -3,10 +3,10 @@
 # field menu and its apps (the bag, the trainer card, the party list, the summary and the Pokédex), New Game's intro
 # and its route through the field into Aspertia City (phase 3's exit: a walk, a talk, a house and four changes of map),
 # phase 4's route (Hugh's trainer battle, Route 19, a wild Pokémon caught, the game saved and continued, and that save
-# continued by each program from the other's) and a save; the saves made on the oracle from saves (the first save, the
-# starter save with a Pokémon and the Pokédex, and the route's), which the sequences start from; and the sound of the
-# opening and the title (the ARM7 sound driver run by run; its output: a stream and a cry to the bit, the music by its
-# envelope and levels).
+# continued by each program from the other's; Hugh's battle played to its end and its save; the PC's storage system)
+# and a save; the saves made on the oracle from saves (the first save, the starter save with a Pokémon and the
+# Pokédex, and the route's), which the sequences start from; and the sound of the opening and the title (the ARM7 sound
+# driver run by run; its output: a stream and a cry to the bit, the music by its envelope and levels).
 #
 # The input file reader (pbwinput.c, which the port can compile as it is), the per-screen 3D decision (display3d.c),
 # compare.py and sound.py are tested in every build: they need neither melonDS nor a ROM. The oracle itself is a test
@@ -177,8 +177,8 @@ set_tests_properties(oracle_aspertia PROPERTIES TIMEOUT 5400)
 
 # Phase 4's exit (T6): the port plays the catch save's input file from melonDS's Route 19 save and saves the game it
 # caught a wild Purrloin in; melonDS continues that save frame for frame as it continues its own, and the port
-# continues it in a new run, held to melonDS's continuing its own as oracle_catch_continue holds the port on melonDS's,
-# its state too; the two saves may differ only in the bytes the trip declares, each with its cause (oracle.py
+# continues it in a new run, held to melonDS's run on that same save as oracle_catch_continue holds the port on
+# melonDS's, its state too; the two saves may differ only in the bytes the trip declares, each with its cause (oracle.py
 # round-trip catch). Skipped (77) without the oracle or the ROM
 add_test(NAME oracle_round_trip_catch
     COMMAND "${CMAKE_COMMAND}" -E env PYTHONDONTWRITEBYTECODE=1
@@ -194,10 +194,11 @@ port_test_labels(oracle_round_trip_catch route oracle)
 # melonDS's run up to his AI's second move as oracle_hugh holds it (ADR 0023's cut), then its own battle, the Pokemon
 # Center's scene and SAVE there, with the center save's input file, or in White 2 presses of its own past the cut
 # (hugh_port_w2_us.pbwinput); its save may differ from melonDS's only in the bytes the trip declares (the play time, the
-# mystery gift block's key, a townsperson's turn and the CRCs), so Tepig's party data, the money, the bag and the flags
-# are melonDS's; melonDS continues both saves the same to the field, and the port continues its own as melonDS
-# continues its (oracle.py round-trip hugh). Skipped (77) without the oracle or the ROM. It runs both programs through
-# Hugh's battle with a picture of every frame up to the cut, and the continuations: an hour on a loaded machine
+# mystery gift block's key, its block compared decrypted, a townsperson's turn and the CRCs), so Tepig's party data,
+# the money, the bag, the flags and the mystery gifts are melonDS's; melonDS continues both saves the same to the
+# field, and the port continues its own, held to melonDS's run on that same save (oracle.py round-trip hugh). Skipped
+# (77) without the oracle or the ROM. It runs both programs through Hugh's battle with a picture of every frame up to
+# the cut, and the continuations: an hour on a loaded machine
 add_test(NAME oracle_round_trip_hugh
     COMMAND "${CMAKE_COMMAND}" -E env PYTHONDONTWRITEBYTECODE=1
         "${PORT_PYTHON}" "${port_oracle_dir}/oracle.py" round-trip hugh

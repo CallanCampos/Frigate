@@ -4,7 +4,8 @@ screen comparisons exact and with the 3D tolerance screen by screen, comparisons
 comparisons, symbols.py's map parser and name lookup, seeds.py's reading of the random seeds the DS built from its
 memory and oracle.py's check of an input file's seeds against them, and oracle.py's handling of the port's runs (with a
 stand-in program), of the clock, of the saves made on the oracle from saves and their cache, of the comparison sequences
-and their references, and of a missing oracle or ROM. They make up their own runs and need neither melonDS nor a ROM.
+and their references, of the round trips' save comparison (the bytes they declare, the mystery gift block decrypted)
+and of a missing oracle or ROM. They make up their own runs and need neither melonDS nor a ROM.
 Standard library only.
 """
 
@@ -1205,6 +1206,17 @@ class OracleScriptTests(unittest.TestCase):
         # Up to a count, the frames after it are left out of both (a round trip's continued_last)
         self.assertEqual(oracle.compare_boots(a, b, last_count=2), (2, None))
         self.assertEqual(oracle.compare_boots(a, b, last_count=3)[0], 2)
+        # Before the game sets the count up, its word holds whatever the memory did, a value past the last count among
+        # them, so the frames end only once the count has reached it: the start-up's 99999, then counts 1 to 5, count
+        # 3 for two frames (a pass of two), and a difference at count 4 that the frames up to count 3 leave out
+        c = compare.Run("c", {i: compare.Frame(i, i, count, i, None, None, None, "c" * 40, "d" * 40, False, False)
+                              for i, count in enumerate((99999, 1, 2, 3, 3, 4, 5), 1)})
+        d = compare.Run("d", dict(c.frames))
+        d.frames[6] = compare.Frame(6, 6, 4, 6, None, None, None, "e" * 40, "d" * 40, False, False)
+        self.assertEqual(oracle.compare_boots(c, d, last_count=3), (5, None))
+        self.assertEqual(oracle.compare_boots(c, d)[0], 5)
+        self.assertIn("frame 6", oracle.compare_boots(c, d)[1])
+
     def test_port_save_skips_without_the_rom_or_the_oracle(self):
         with tempfile.TemporaryDirectory() as d:
             status = quiet(oracle.main, ["port-save", "--port", "x", "--oracle", os.path.join(d, "missing")])
@@ -1428,13 +1440,6 @@ class OracleScriptTests(unittest.TestCase):
                 self.assertIn(trip.cut, oracle.SEQUENCES, name)
                 self.assertEqual(oracle.SEQUENCES[trip.cut].save, oracle.SAVES[trip.maker].start, name)
             self.assertTrue(set(trip.port_input) <= {"b2_us", "w2_us"}, name)
-            # The continued run's random state left out where the port's save differs is within the frames whose state
-            # the continued sequence compares, each with why
-            continued_state = set(compare.parse_frames(oracle.SEQUENCES[trip.continued].state_frames))
-            for version, table in trip.continued_random.items():
-                self.assertIn(version, ("b2_us", "w2_us"))
-                self.assertTrue(set(oracle.by_frame(table)) <= continued_state, (name, version))
-                self.assertTrue(all(table.values()), (name, version))
             self.assertTrue(trip.continued_last >= 0, name)
             for version in oracle.SAVES[trip.maker].sha1:
                 for played in {trip.maker, trip.port_input.get(version, trip.maker)}:
@@ -1444,12 +1449,16 @@ class OracleScriptTests(unittest.TestCase):
                         cut = os.path.join(oracle.REPO_ROOT, oracle.SEQUENCE_INPUT.format(name=trip.cut,
                                                                                           version=version))
                         self.assertTrue(oracle.input_starts_with(path, cut), (name, played, version))
-            # The bytes it declares are the chip's, each with why
+            # The bytes it declares are the chip's, each with why, and none of the mystery gift block's contents,
+            # which the trip compares decrypted
+            encrypted = {copy + oracle.MYSTERY_GIFT_BLOCK + i for copy in (0, oracle.SECOND_COPY)
+                         for i in range(oracle.MYSTERY_GIFT_SIZE - 4)}
             for version, table in trip.known.items():
                 self.assertIn(version, ("b2_us", "w2_us"))
                 for spans, why in table.items():
                     offsets = oracle.parse_offsets(spans)
                     self.assertTrue(offsets and all(0 <= i < oracle.BACKUP_SIZE for i in offsets), (name, spans))
+                    self.assertFalse(encrypted & set(offsets), (name, spans))
                     self.assertTrue(why, (name, spans))
         # A sequence's state has a label of its own for each part, and a dump for each program
         for name, sequence in oracle.SEQUENCES.items():
@@ -1477,6 +1486,42 @@ class OracleScriptTests(unittest.TestCase):
         self.assertEqual(oracle.undeclared_differences(a, bytes(b), {"0x3-0x4,0x1e": "declared"}), [(12, 12), (63, 63)])
         self.assertEqual(oracle.undeclared_differences(a, bytes(b), {"0x0-0x3f": "all of it"}), [])
         self.assertEqual(oracle.undeclared_differences(a, bytes(b), {}), oracle.save_differences(a, bytes(b)))
+
+    def test_mystery_gift_decrypted(self):
+        # A save's mystery gift blocks, encrypted as mgEncryptData encrypts them (src/system/mystery_data.c), come out
+        # as their contents; the same contents under two keys differ only in the key once decrypted
+        def encrypted(contents: bytes, key: int) -> bytes:
+            checksum = sum(contents) & 0xFFFF
+            out = bytearray(contents)
+            seed = checksum + (key << 16)
+            for i in range(0, len(out), 2):
+                seed = (seed * 1103515245 + 24691) & 0xFFFFFFFF
+                struct.pack_into("<H", out, i, struct.unpack_from("<H", out, i)[0] ^ (seed >> 16))
+            return bytes(out) + struct.pack("<HH", checksum, key)
+
+        def save(block: bytes) -> bytes:
+            out = bytearray(b"\xff" * oracle.BACKUP_SIZE)
+            for copy in (0, oracle.SECOND_COPY):
+                out[copy + oracle.MYSTERY_GIFT_BLOCK:copy + oracle.MYSTERY_GIFT_BLOCK + len(block)] = block
+            return bytes(out)
+
+        contents = bytes((i * 7) & 0xFF for i in range(oracle.MYSTERY_GIFT_SIZE - 4))
+        a, b = save(encrypted(contents, 0x7F7F)), save(encrypted(contents, 0x7560))
+        plain_a, problems_a = oracle.mystery_gift_decrypted(a)
+        plain_b, problems_b = oracle.mystery_gift_decrypted(b)
+        self.assertEqual((problems_a, problems_b), ([], []))
+        block = slice(oracle.MYSTERY_GIFT_BLOCK, oracle.MYSTERY_GIFT_BLOCK + oracle.MYSTERY_GIFT_SIZE - 4)
+        self.assertEqual(plain_a[block], contents)
+        key = oracle.MYSTERY_GIFT_BLOCK + oracle.MYSTERY_GIFT_SIZE - 2
+        self.assertEqual(oracle.save_differences(plain_a, plain_b), [(key, key + 1), (key + oracle.SECOND_COPY,
+                                                                                     key + oracle.SECOND_COPY + 1)])
+        self.assertGreater(len(oracle.save_differences(a, b)), 0)
+        # Contents that changed under the encryption don't add up to the checksum
+        damaged = bytearray(a)
+        damaged[oracle.MYSTERY_GIFT_BLOCK + 8] ^= 0x10
+        _, problems = oracle.mystery_gift_decrypted(bytes(damaged))
+        self.assertEqual(len(problems), 1)
+        self.assertIn(f"{oracle.MYSTERY_GIFT_BLOCK:#x}", problems[0])
 
     def test_input_starts_with(self):
         # An input file starts with another's lines as a program reads them: comments, blank lines and spacing aside

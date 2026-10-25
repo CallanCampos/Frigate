@@ -28,6 +28,19 @@ workflow goes in the decomp checkout instead; this file is the port's ([CLAUDE.m
   direction when the game saves, and the mystery gift block, which the Pokémon Center's deliveryman reads and so
   encrypts again with a key from the VBlank count, comes out as other bytes; Tepig's data, the money, the bag and the
   flags are melonDS's. White 2's battle takes more turns, and its presses after the cut are the port's own.
+- **Compare an encrypted block by what it holds, and declare only its key.** The mystery gift block was first declared
+  whole, 2,712 bytes a copy, because every read encrypts it again under a key from the VBlank count; that let any
+  change to the gift data pass. Decrypted with the key each save keeps (`mystery_gift_decrypted`), the two blocks were
+  the same, contents and checksum, and only the key's 2 bytes and the block's CRC are declared now.
+- **Hold a continued run to the oracle's run on the same save.** The port's continuation of its own save was first
+  compared with melonDS's continuation of melonDS's save, which needed a stretch of random state declared where the
+  two saves' townsperson draws apart; compared with melonDS's continuation of the port's save, every frame and state
+  matched with the sequence's own declarations and nothing more.
+- **A timer's lead can hide until it runs out.** The PC's log-off let the townsperson by the counter take up his wait
+  a field pass sooner on the DS in both versions, but in White 2 his wait didn't run out before the field menu stopped
+  him, so nothing differed, and the lead showed only after the save, as draws 126 counts later where the dialog closed
+  128 later. Before a count goes into a known difference's cause, trace the timer on both programs (the DS's object
+  dumped from melonDS's memory, the port's from a scratch print) rather than infer it from the draws.
 
 ## 2026-10-24: phase 4's route
 

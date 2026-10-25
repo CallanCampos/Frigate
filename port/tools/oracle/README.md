@@ -823,10 +823,11 @@ continues from melonDS in the port and back. The port plays the catch save's inp
 11,600 frames, catches the same Purrloin and saves the game; both saves are then continued on the oracle with
 catch_continue's input file, in new runs, and the port continues its own in a new run of its own. In both versions
 the oracle's run on the port's save is its run on its own save, count and both screens, at each of its 6,900 frames,
-and writes neither save; the port's run on its own save matches the oracle's on the oracle's save as the
-catch_continue sequence holds it (4,679 of 4,679 frames in Black 2, 4,671 of 4,671 in White 2, the same known
-differences), and leaves it as it was. The two saves differ in 34 bytes, 17 in each copy of the main save, at the same
-places in both versions, each traced:
+and writes neither save; the port's run on its own save matches the oracle's run on that same save as the
+catch_continue sequence holds it (4,679 of 4,679 frames in Black 2, 4,671 of 4,671 in White 2, the game's state at
+3,562 frames, the same known differences), and leaves it as it was. The two saves differ in 34 bytes, 17 in each copy
+of the main save, at the same places in both versions, each traced (the mystery gift block, which the trip compares
+decrypted, is the same in both, written and decrypted):
 
 - 6 bytes of Purrloin's party data (`0x18fa2`, `0x18faa`, `0x18fb2`), encrypted with its personality value: in its
   mail, the `id` of each of its three sentences. `PokeParty_CreatePkm` (`src/system/poke_tool.c`) copies in a mail
@@ -842,7 +843,8 @@ places in both versions, each traced:
 
 The second copy (`0x26000` on) differs in the same 17 places; the rest of the chip is the same. The round trip
 declares these bytes, each span with its cause (`ROUND_TRIPS` in `oracle.py`), and fails on a byte that differs
-anywhere else.
+anywhere else, the mystery gift block's contents compared decrypted with each save's own key
+(`mystery_gift_decrypted`), so that a trip can declare the block's key but never what it encrypts.
 
 **A trainer battle to its end** (`oracle.py round-trip hugh`, ctest `oracle_round_trip_hugh`;
 [ADR 0023](../../docs/adr/0023-oracle-routes-part-where-the-ds-cpu-time-decides.md)): Hugh's battle, which the hugh
@@ -854,45 +856,56 @@ compared with the oracle's run of the hugh sequence's input file from the same s
 that file being the start of the one the port plays, line for line (checked: `RoundTrip.cut`); past the cut the battle
 is the port's own. Hugh's AI picks other moves there, and the port's battle ends 560 counts later than the DS's in Black
 2 (the field back at count 10,302 against 9,742, the Pokémon Center's door at 11,885 against 11,325) and 704 later in
-White 2 (10,558 against 9,854; 12,141 against 11,437). In Black 2 melonDS's presses still fit: B through the Pokémon
-Center's scene ends before the field menu's X at count 14,420. In White 2 the scene runs on to count 15,100 on the
-port, where those presses would open the field menu in the middle of it and miss SAVE, so the port plays
+White 2 (10,558 against 9,854; 12,141 against 11,437). In Black 2 melonDS's presses still fit, with little to
+spare: the port's Pokémon Center scene, its last event (`GameSystem.event`, dumped from the port's run), ends at count
+14,370, between melonDS's last two B presses (14,360 and 14,376) and 50 counts before its field menu's X at 14,420, so
+the port plays melonDS's file to its end; a port battle whose scene outlasted those B presses would leave the trip
+without a save of the port's, which fails it, and would need presses of its own. In White 2 the scene runs on to count
+15,100 on the port, where those presses would open the field menu in the middle of it and miss SAVE, so the port plays
 `hugh_port_w2_us.pbwinput` instead (`RoundTrip.port_input`): melonDS's file to the end of its B presses, then B on
 through the scene and SAVE at the port's own counts. The port's save is then held to melonDS's `center_save` byte by
-byte. They differ in 2,722 bytes of each copy of the main save in Black 2 and 2,715 in White 2, all declared
-(`CENTER_SAVE_BYTES`), each traced; Tepig's party data, the money, the bag, the event flags and variables and every
-other block are melonDS's:
+byte, each save's mystery gift block decrypted with its own key first (`mystery_gift_decrypted`, below). They differ
+in 2,722 bytes of each copy of the main save in Black 2 and 2,715 in White 2 as written, and in 19 and 18 once
+decrypted, all declared (`CENTER_SAVE_BYTES`), each traced; Tepig's party data, the money, the bag, the event flags
+and variables, the mystery gifts and every other block are melonDS's:
 
-- 1 byte of the play time's seconds (`0x19427`): 0:08:01 on the port and 0:08:09 on the DS in Black 2, 0:08:10 and
-  0:08:06 in White 2, each counting its own clock's ticks ([Known differences](#known-differences-from-the-hardware)).
-- The mystery gift block and its footer (`0x1c800`-`0x1d297`, 2,712 bytes): the Pokémon Center's deliveryman's scripts
-  (`res/field/scripts/global_10395.s`, `Cmd_01DB`; `func_ov033_02177d78` in `src/ov033/pdw_postman.c`) read the block
-  as the player enters, and every read decrypts it and encrypts it again with a key that `mgEncryptData`
-  (`src/system/mystery_data.c`) seeds with the VBlank count, `(OS_GetVBlankCount() << 8) | OS_GetVBlankCount()`. The
-  DS's count runs ahead of its passes (its dropped frames and long loads) and the port's doesn't, so the same contents
-  come out as other bytes. The catch saves, made without entering a Pokémon Center, hold the block as the start save has
-  it.
+- 1 byte of the play time's seconds (`0x19427`), each program counting its own clock's ticks
+  ([Known differences](#known-differences-from-the-hardware)), the DS's some 8 seconds ahead of the port's at the same
+  count by this save in both versions: Black 2's saves, made on the same count, hold 0:08:01 on the port and 0:08:09
+  on the DS; White 2's port saves 740 counts later than the DS (X at count 15,160 against 14,420), and holds 0:08:10
+  against 0:08:06.
+- 2 bytes of the mystery gift block's key (`0x1d292`, `MysteryGiftSaveData.key` at the end of the block at
+  `0x1c800`). The Pokémon Center's deliveryman's scripts (`res/field/scripts/global_10395.s`, `Cmd_01DB`;
+  `func_ov033_02177d78` in `src/ov033/pdw_postman.c`) read the block as the player enters, and every read decrypts it
+  and encrypts it again with a key that `mgEncryptData` (`src/system/mystery_data.c`) takes from the VBlank count,
+  `(OS_GetVBlankCount() << 8) | OS_GetVBlankCount()`. The DS's count runs ahead of its passes (its dropped frames and
+  long loads) and the port's doesn't, so the same contents come out as other bytes: as written, the whole block
+  differs (`0x1c800`-`0x1d297`, 2,712 bytes with its footer). The trip decrypts each save's block as `mgDecryptData`
+  does, with the key it keeps, checks that the contents add up to the block's checksum, and compares them: in both
+  versions the contents are the same (no gift, all zero) under the same checksum (`0x0000`), and only the key differs,
+  `0x7f7f` on the port against the DS's `0x7560` (Black 2) and `0xb793` (White 2). A change to the gift data would
+  fail the trip. The catch saves, made without entering a Pokémon Center, hold the block as the start save has it.
 - 1 or 2 bytes of the field actors' block: the Pokémon Center's townsperson at (3,15) who turns at random (npc 9 of
   `res/field/events/aspertia_city_pokemon_center.json`, movement code 13, `FldmmdlMovecode_MoveTurnRandom` in
   `src/ov036/fldmmdl_movecode.c`), its seventh actor: his turn's timer (`0x1e412`, `RailWanderWork.timer` in the
   movement code's work, 21 on the port and 28 on the DS in Black 2, 19 and 4 in White 2) and, in Black 2, his direction
   (`0x1e3ed`, left on the port and right on the DS). The timer counts down at each step of the field's actors, every
-  other pass, and, run out, draws a new wait and direction from GFL's linear generator; the port reaches the Pokémon Center 560 or 704 counts
-  later, so the save, made on the same count on both, finds him at another point of his waits.
-- 14 bytes of CRCs over those: the trainer block's (`0x194b2`), the field actors' block's (`0x1f602`), their entries
-  and the mystery gift block's in the table of the blocks' CRCs (`0x25f36`, `0x25f52`, `0x25f44`), and the footer's
-  CRC of that table (`0x25fa2`, `src/gfl/backup_system.c`).
+  other pass, and, run out, draws a new wait and direction from GFL's linear generator. The port reaches the Pokémon
+  Center 560 counts after the DS in Black 2 and 704 in White 2, and saves on the DS's count in Black 2 and 740 counts
+  after it in White 2, so its save finds him at another point of his waits.
+- 14 bytes of CRCs over those: the trainer block's (`0x194b2`), the mystery gift block's (`0x1d296`, in its footer),
+  the field actors' block's (`0x1f602`), their entries in the table of the blocks' CRCs (`0x25f36`, `0x25f44`,
+  `0x25f52`), and the footer's CRC of that table (`0x25fa2`, `src/gfl/backup_system.c`).
 
 melonDS then continues both saves with center_continue's input file in new runs, the same frame for frame, count and
-both screens, writing neither, and the port continues its own as melonDS continues its (3,589 of 3,589 frames in Black
-2, 3,581 of 3,581 in White 2, NNS G3D's state and GFL's random state compared as the sequence compares them): the
-start menu with the saved game, the same on both (the play time's minute is), CONTINUE and the season's banner. The
-runs are compared to count 3,602, the last before the Pokémon Center fades in (`RoundTrip.continued_last`): from there
-the field fades in on the townsperson as each save holds him, and the two runs differ from count 3,613 in White 2 and
-3,679 in Black 2. His timer runs on as the field loads behind the banner, so GFL's linear generator draws for him at other
-counts on the port's save than on melonDS's (14 counts sooner in Black 2, 30 later in White 2), which the trip declares
-for the port's continued run (`RoundTrip.continued_random`); melonDS continuing the port's save draws on the port's
-counts.
+both screens, writing neither, to count 3,602, the last before the Pokémon Center fades in
+(`RoundTrip.continued_last`): from there the field fades in on the townsperson as each save holds him, and the two runs
+differ from count 3,613 in White 2 and 3,679 in Black 2. The port continues its own save in a new run, held to
+melonDS's run on that same save as the center_continue sequence holds the port to melonDS's own (3,589 of 3,589
+frames in Black 2, 3,581 of 3,581 in White 2, NNS G3D's state and GFL's random state at 2,474 frames each, none apart,
+the sequence's known differences and no others): the start menu with the saved game, the same on both (the play
+time's minute is), CONTINUE and the season's banner, behind which the field loads and the townsperson draws his turns
+from GFL's linear generator, on the same counts on both programs, since both continue the same save.
 
 **Continuing it** (the continue sequence): the start menu shows CONTINUE first, then NEW GAME, MYSTERY GIFT, UNOVA
 LINK, NINTENDO WFC SETTINGS and MIC TEST, and the saved game: the player's picture, AAAAAAA, Aspertia City, Badges: 0,
@@ -1136,8 +1149,15 @@ failure to fix, never a known difference. By kind:
     down it with the message under it, shows the first menu again after B, or redraws the deposit screen's top screen
     for Purrloin takes 2 to 6 frames, all but the last showing the windows partway (a list's frame without its text,
     the message before) or the screen before, the last the port's picture of that count (pc's port frames 5871, 6057,
-    6403, 7198, 7304, 8148, 8304, 8334, 9718 and 9868 in both versions; the last frames that neither pair shows,
-    oracle frame 8795 in Black 2 and 8321, 8730, 9583, 10653 and 12350 in White 2).
+    6403, 7198, 7304, 8148, 8304, 8334, 9718 and 9868 in both versions). The check of missing pictures holds each DS
+    frame between two counts' first frames to those two frames' pictures, not to the port's, so it names the frames of
+    these passes that show neither, which `known_oracle` declares: the deposit screen's pass at count 6400, whose last
+    frame (oracle 8795 in Black 2, 8730 in White 2) is port frame 6403's picture, both screens the same by hash, where
+    its first frame shows the top screen before (port frame 6402's) and count 6401's first frame already the next
+    change (port frame 6404's); and in White 2 the fifth frame of the passes of six frames at counts 6054, 7195, 8145
+    and 9715 (oracle frames 8321, 9583, 10653 and 12350, the top screen with 3D), which shows the message before with
+    13 pixels of the next at lines 181-182 (x 82-108), the window a step further partway, a picture no port frame
+    shows. Black 2's same passes show one picture until their last frame.
 - **VRAM written after the beam has drawn it.** The same holds for VRAM: a pass that writes a part of the screen that
   the DS has already drawn shows it a frame later there. In the exit route Mom's speech balloon, at the top of the
   screen (lines 4 to 44), scrolls a line up 4 pixels a pass (`PrintStream_Task`, `src/system/printsys.c`), copying the
@@ -1198,20 +1218,25 @@ failure to fix, never a known difference. By kind:
   which both read on the same pass (`5577=0`, `5637=0`). The house replay's SAVE shows the same: the DS shows more
   frames of its saving. So does every SAVE of phase 4's route: the game writes the save in steps and waits for each
   (GFL's backup system over CARD's backup commands, `src/gfl/backup_system.c`), and the DS's flash takes time for each,
-  so the dialog's progress dots move on later, its "saved the game." comes later and the dialog closes 192 passes
-  (route19), 228 (catch) and 128 (pc) after the port's, whose chip is written at once (`port/hal/card`). In between
-  both show the message frame for frame, and once the DS's dialog has closed both show the field again on the same
-  count: those sequences leave out the frames from the first dot to the port's message and from the port's dialog
-  closing to the DS's: route19's port frames 14129-14447 and 14563-14758 in Black 2, 14129-14419 and 14559-14730 in
-  White 2; catch's 10102-10460 and 10540-10771 in Black 2, 10102-10464 and 10540-10775 in White 2; pc's 10654-10663,
-  10666-10908 and 11088-11219 in both. The saves they make are compared as
-  saves instead ([Saves](#saves)). Their state differs there too, by the same cause: from a step of the dialog on, the
-  field's passes alternate between ending with NNS G3D's camera at the field's and at a 2D one, and the port reaches
-  that step first, some 230 counts before the DS in the catch (`SAVE_CAMERA`); and the field's townspeople who walk or
-  turn at random draw their waits and directions from GFL's linear generator (`FldmmdlMovecode_GetRandomTableEntry` and
-  `_GetRandomDirFromSet`, `src/ov036/fldmmdl_movecode.c`) when their timers, which wait while the dialog shows, run out,
-  so from the port's dialog closing the DS makes each of the port's draws as many counts later as its dialog closes
-  later, 192 and 168 in route19, 228 and 232 in catch, 126 in pc in both versions (`SAVE_RANDOM`). In the Pokémon
+  so the dialog's progress dots move on later, its "saved the game." comes later and the dialog closes later than the
+  port's, whose chip is written at once (`port/hal/card`): 192 counts in Black 2's route19 and 168 in White 2's, 228
+  and 232 in catch, 128 in pc in both versions. In between both show the message frame for frame, and once the DS's
+  dialog has closed both show the field again on the same count: those sequences leave out the frames from the first
+  dot to the port's message and from the port's dialog closing to the DS's: route19's port frames 14129-14447 and
+  14563-14758 in Black 2, 14129-14419 and 14559-14730 in White 2; catch's 10102-10460 and 10540-10771 in Black 2,
+  10102-10464 and 10540-10775 in White 2; pc's 10654-10663, 10666-10908 and 11088-11219 in both. The saves they make
+  are compared as saves instead ([Saves](#saves)). Their state differs there too, by the same cause: from a step of
+  the dialog on, the field's passes alternate between ending with NNS G3D's camera at the field's and at a 2D one, and
+  the port reaches that step first, 232 counts before the DS in Black 2's catch and 144 in pc (`SAVE_CAMERA`); and the
+  field's townspeople who walk or turn at random draw their waits and directions from GFL's linear generator
+  (`FldmmdlMovecode_GetRandomTableEntry` and `_GetRandomDirFromSet`, `src/ov036/fldmmdl_movecode.c`) when their timers,
+  which wait while the field menu and the dialog show, run out, so from the port's dialog closing the DS makes each of
+  the port's draws as many counts later as its dialog closes later, 192 and 168 in route19, 228 and 232 in catch
+  (`SAVE_RANDOM`). In pc the draws come 126 counts later in both versions, a field pass less than the dialog's 128: the
+  townsperson by the counter, the one who draws there, took up his wait again a field pass sooner on the DS after the
+  PC's log-off (`PC_LOGOFF`, below), so when the field menu stops him he has one step less to go on the DS (25 against
+  26 in Black 2, 9 against 10 in White 2), and from the dialog's close (his wait taken up again at count 11,220 on the
+  DS, 11,092 on the port) each of his draws comes 2 counts sooner than the close alone would put it. In the Pokémon
   Center, where pc saves, both show on screen (`SAVE_GLOBE`): the field draws its 3D again from that step of the
   dialog, and its Geonet globe at the top right, which stands still while the game writes, turns again from count
   10711 on the port and from 10855 on the DS, and stays 144 counts ahead on the port once both dialogs have closed;
@@ -1331,4 +1356,6 @@ failure to fix, never a known difference. By kind:
   dumped from melonDS's memory, the port's from a scratch trace), waits on from count 9944 on the DS and 9946 on the
   port, so each of his next turns, a draw from GFL's linear generator, comes 2 counts sooner on the DS (9971 and 10035
   against 9973 and 10037). pc leaves out GFL's random state at the two draws and the screens of the second, where he
-  turns in view (port frames 10040-10041). In White 2 the DS goes on on the port's pass, and nothing differs there.
+  turns in view (port frames 10040-10041). White 2's DS goes on a field pass sooner too (his wait, 62, taken up again
+  at count 9944 against the port's 9946, traced the same way), but it doesn't run out before the field menu stops him,
+  so nothing differs there; his lead shows after the save, as `SAVE_RANDOM`'s 126 counts in both versions (above).

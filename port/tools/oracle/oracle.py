@@ -39,11 +39,12 @@ port-save takes a save the other way: the port's New Game writes one, and the or
 for frame as it boots its own save of the same moment, without writing either, and the console's Wi-Fi ID that New Game
 copied into it is the oracle's. round-trip does it for a save of phase 4's route (ROUND_TRIPS: catch, a wild Purrloin
 caught; hugh, Hugh's trainer battle to its end): the port plays the input file the oracle made the kept save with, from
-the same start, or its own where its course past a cut takes other passes (ADR 0023), and saves, its run up to the cut
-held to the oracle's as the cut's sequence holds it; the two saves differ only in the bytes the trip declares; the
-oracle continues the port's save as it continues its own, frame for frame, and the port continues it in a new run,
-compared with the oracle's continuing its own as sequence compares. boot does both for the boot sequence and compares
-them on the game's count, the movies by their pictures (compare.py), at the DS's 6 bits and at the palettes' 5.
+the same start, or its own where its course past a cut would outlast those presses (ADR 0023), and saves, its run up to
+the cut held to the oracle's as the cut's sequence holds it; the two saves differ only in the bytes the trip declares,
+their mystery gift blocks compared decrypted; the oracle continues the port's save as it continues its own, frame for
+frame, and the port continues it in a new run, compared with the oracle's continuing the same save as sequence
+compares. boot does both for the boot sequence and compares them on the game's count, the movies by their pictures
+(compare.py), at the DS's 6 bits and at the palettes' 5.
 sequence does both on a comparison sequence's input file, port/tests/oracle/<name>_<version>.pbwinput (SEQUENCES:
 opening, power-on to the title with nothing pressed; title, the opening skipped to the title and START to the start
 menu; continue, the same from first_save's save, the start menu's CONTINUE and the field it goes to; continue_starter,
@@ -81,10 +82,11 @@ import hashlib
 import os
 import re
 import shutil
+import struct
 import subprocess
 import sys
 import tempfile
-from dataclasses import dataclass, field, replace
+from dataclasses import dataclass, field
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
@@ -271,8 +273,15 @@ PC_WINDOW = ("the DS's pass that changes one of the PC's windows takes 2 to 6 fr
              "the PC Box, its cursor moved down it with the message under it, and the deposit screen's top screen "
              "when the cursor moves to Purrloin. The pass's frames but the last show the windows partway (a list's "
              "frame without its text, the message before) or the screen before, its last the port's picture (within "
-             "the 3D's tolerance), and the count pairs the port's frame with the first; the last frame of the deposit "
-             "screen's pass (count 6400) shows a picture that neither pair of port frames shows")
+             "the 3D's tolerance), and the count pairs the port's frame with the first. The check of missing "
+             "pictures holds each DS frame between two counts' first frames to those two frames' pictures, not to "
+             "the port's, so it names these passes' frames that show neither: the deposit screen's at count 6400, "
+             "whose last frame (oracle 8795 in Black 2, 8730 in White 2) is port frame 6403's picture, both screens "
+             "the same by hash, where its first frame shows the top screen before and count 6401's first frame "
+             "already the next change; and in White 2 the fifth frame of the passes of six frames at counts 6054, "
+             "7195, 8145 and 9715 (oracle 8321, 9583, 10653 and 12350, the top screen with 3D), which shows the "
+             "message before with 13 pixels of the next at lines 181-182 (x 82-108), the window a step further "
+             "partway, a picture no port frame shows; Black 2's same passes show one picture until their last frame")
 PC_LOGOFF = ("the PC's script lets the townspeople move again once its log-off sound has ended (pcLogOffSound, "
              "src/ov033/event_pc.c, waits on GFL_SndPlayerIsActive before ActorsUnpauseAll). Both ARM7s end the sound "
              "in the same frame (count 9940; the sound traces), and the DS's script goes on a field pass sooner, as "
@@ -280,8 +289,10 @@ PC_LOGOFF = ("the PC's script lets the townspeople move again once its log-off s
              "another moment of its frame than the port's, which reads it at the VBlank. So the townsperson by the "
              "counter who turns at random, paused through the PC with the same wait on both, waits on from count 9944 "
              "on the DS and 9946 on the port, and each of his next turns, a draw from GFL's linear generator, comes "
-             "2 counts sooner on the DS (counts 9971 and 10035 against 9973 and 10037), the second one seen (Black 2; "
-             "White 2's DS goes on on the port's pass)")
+             "2 counts sooner on the DS (counts 9971 and 10035 against 9973 and 10037), the second one seen (Black "
+             "2). White 2's DS goes on a pass sooner too (his wait taken up at count 9944 against 9946: the DS's "
+             "actor dumped from melonDS's memory, the port's from a scratch trace), but his wait, 62, doesn't run out "
+             "before the field menu stops him, so nothing differs there; his lead shows after the save (SAVE_RANDOM)")
 SAVE_GLOBE = ("as SAVE_CAMERA: the field draws its 3D again from a step of the save's dialog on, and its map's "
               "animated props move with it: the Pokemon Center's Geonet globe (top right), which stands still while "
               "the game writes, turns again from count 10711 on the port and from 10855 on the DS, whose write takes "
@@ -304,9 +315,10 @@ PLAY_TIME = ("the save dialog shows the play time, which counts ticks from CONTI
              "both")
 SAVE_WRITES = ("the game writes the save in steps, waiting for the backup chip's each (GFL's backup system over "
                "CARD's backup commands, src/gfl/backup_system.c): the DS's flash takes time for each, so its progress "
-               "dots move on later, its message that the game is saved comes later and its dialog closes some 200 "
-               "passes after the port's (192 for the Route 19 save, 228 for the catch), whose chip is written at once "
-               "(port/hal/card); between, both show the message frame for frame")
+               "dots move on later, its message that the game is saved comes later and its dialog closes later than "
+               "the port's, whose chip is written at once (port/hal/card): 192 counts for Black 2's Route 19 save and "
+               "168 for White 2's, 228 and 232 for the catch's, 128 for the PC's in both; between, both show the "
+               "message frame for frame")
 CRY_BATTLE = ("as Kyurem's cry at the title (CRY): the wild Purrloin's cry, which the battle waits for as Purrloin "
               "appears (BtlvEffvm_WaitNative's wait for the voices, src/ov168/btlv_effvm.c), stops in the frame of "
               "count 5135 on both, and that frame's pass reads the channel (PokeVoice_Update, src/system/pm_voice.c) "
@@ -317,16 +329,23 @@ CRY_BATTLE = ("as Kyurem's cry at the title (CRY): the wild Purrloin's cry, whic
               "differ for the rest of the battle, its menus and messages on the same count as the port's (White 2)")
 SAVE_CAMERA = ("as SAVE_WRITES: from a step of the save's dialog on, the field's passes alternate between ending with "
                "NNS G3D's camera at the field's and at a 2D one (no rotation, 128 units back), and the port, whose "
-               "chip is written at once, reaches that step some 230 counts before the DS (count 10174 against 10406 in "
-               "Black 2's catch): until the DS gets there, every other pass of the port's ends with the 2D camera where "
-               "the DS's ends with the field's; from there both alternate on the same counts")
+               "chip is written at once, reaches that step before the DS (232 counts in Black 2's catch, count 10174 "
+               "against 10406; 144 in the PC's save in both versions, 10711 against 10855): until the DS gets there, "
+               "every other pass of the port's ends with the 2D camera where the DS's ends with the field's; from "
+               "there both alternate on the same counts")
 SAVE_RANDOM = ("the field's townspeople who walk or turn at random draw their waits and directions from GFL's linear "
                "generator when their timers run out (FldmmdlMovecode_GetRandomTableEntry and "
                "FldmmdlMovecode_GetRandomDirFromSet, src/ov036/fldmmdl_movecode.c), and their timers wait while the "
-               "save's dialog shows, which on the DS closes later (SAVE_WRITES): from the port's first draw after its "
-               "close, the DS makes each draw of the port's, the same number, later by as many counts (192 for Black "
-               "2's Route 19 save and 168 for White 2's, 228 for Black 2's catch and 232 for White 2's, 126 for the "
-               "PC's save in both)")
+               "field menu and the save's dialog show (DisableAllActorsMovement as the menu opens, "
+               "src/ov012/event_field_menu.c), which on the DS closes later (SAVE_WRITES): from the port's first draw "
+               "after its close, the DS makes each draw of the port's, the same number, later by as many counts (192 "
+               "for Black 2's Route 19 save and 168 for White 2's, 228 for Black 2's catch and 232 for White 2's), "
+               "less a field pass for a timer that ran a pass ahead on the DS before the menu stopped it: the PC's "
+               "save closes 128 counts later in both versions, and the townsperson by the counter, whose wait the DS "
+               "took up again a field pass sooner after the PC's log-off (PC_LOGOFF), draws 126 counts later, his "
+               "wait taken up again at count 11220 on the DS and 11092 on the port with one step less to go on the DS "
+               "(25 against 26 in Black 2, 9 against 10 in White 2: the DS's actor dumped from melonDS's memory, the "
+               "port's from a scratch trace)")
 CRY_RANDOM = ("as CRY_BATTLE: from Purrloin's cry's end the sprites' idle animations and the battle's idle camera "
               "moves draw from GFL's twister at other passes on the two programs, so the twister's index differs, "
               "equal again only by chance, for the rest of the battle and after it (its first word too where it is "
@@ -1210,29 +1229,26 @@ class RoundTrip:
     """A save that both programs make and that each continues in a new run (README.md, "Saves"): maker, the SAVES name
     whose input file both play from its start save, the port to port_frames, by when the game has saved; continued,
     the sequence whose input file continues the save, from power-on. The oracle continues the port's save as it
-    continues its own, frame for frame, and the port continues its own save as the oracle continues the oracle's, held
-    as the sequence holds the port on the oracle's save, its game state too. known: by version, the bytes where the two
-    saves differ by construction (save offsets, "0x19427" or "0x18fa2-0x18fa3", comma-separated), each with why
-    (README.md, "Saves"), a cause traced; a byte that differs anywhere else fails the trip, as an undeclared frame fails
-    a sequence. A piece whose course the DS's CPU time decides (ADR 0023) names its cut, the sequence that holds the
-    piece frame by frame up to that point, from the same start save: the port's run of the piece is compared with the
-    oracle's run of the cut's input file as that sequence compares it, up to its last port frame, the cut's input file
-    being the start of the port's, line for line; past it the port plays its own course. Where that course takes other
-    passes than the DS's, so that the oracle's presses would miss what follows (another number of turns in a trainer
-    battle), port_input names, by version, the input file the port plays instead
-    (port/tests/oracle/<name>_<version>.pbwinput), the maker's with presses of its own after the cut. continued_random:
-    by version, the port frames of the continued sequence where GFL's random state of the port's run on its own save
-    differs from the oracle's on the oracle's save by a byte the trip declares, with why (a townsperson's timer the
-    two saves hold differently draws at other counts); the oracle continuing the port's save draws as the port does.
-    continued_last: the last count at which the oracle's runs on the two saves are compared frame for frame, where
-    what follows shows a declared byte (0 for all their frames)"""
+    continues its own, frame for frame, and the port continues its own save in a new run, held to the oracle's run on
+    that same save as the sequence holds the port to the oracle on the oracle's save, its game state too. known: by
+    version, the bytes where the two saves differ by construction (save offsets, "0x19427" or "0x18fa2-0x18fa3",
+    comma-separated), each with why (README.md, "Saves"), a cause traced; the saves are compared with their mystery
+    gift blocks decrypted (mystery_gift_decrypted), so that only the block's key, not its encrypted contents, can be
+    declared, and a byte that differs anywhere else fails the trip, as an undeclared frame fails a sequence. A piece
+    whose course the DS's CPU time decides (ADR 0023) names its cut, the sequence that holds the piece frame by frame
+    up to that point, from the same start save: the port's run of the piece is compared with the oracle's run of the
+    cut's input file as that sequence compares it, up to its last port frame, the cut's input file being the start of
+    the port's, line for line; past it the port plays its own course. Where the oracle's presses would miss what that
+    course shows at them (a trainer battle whose turns, and so its scenes, outlast the presses), port_input names, by
+    version, the input file the port plays instead (port/tests/oracle/<name>_<version>.pbwinput), the maker's with
+    presses of its own after the cut. continued_last: the last count at which the oracle's runs on the two saves are
+    compared frame for frame, where what follows shows a declared byte (0 for all their frames)"""
     maker: str
     port_frames: int
     continued: str
     known: dict[str, dict[str, str]] = field(default_factory=dict)
     cut: str = ""
     port_input: dict[str, str] = field(default_factory=dict)
-    continued_random: dict[str, dict[str, str]] = field(default_factory=dict)
     continued_last: int = 0
 
 
@@ -1275,6 +1291,37 @@ def both_copies(text: str) -> str:
     return ",".join([text] + second)
 
 
+# The mystery gift block (MysteryGiftSaveData, include/save/mystery_gift.h) at this offset of the main save's first
+# copy, and its size: the received gifts' flags and the cards, then a checksum of them and the key mgEncryptData
+# (src/system/mystery_data.c) encrypted them with, from the VBlank count
+MYSTERY_GIFT_BLOCK = 0x1c800
+MYSTERY_GIFT_SIZE = 0xa94
+
+
+def mystery_gift_decrypted(contents: bytes) -> tuple[bytes, list[str]]:
+    """A save with the mystery gift block of each copy of its main save decrypted, as mgDecryptData decrypts it
+    (src/system/mystery_data.c, with decryptData's generator in src/gfl/gf_standard.c), its checksum and key left as
+    the save holds them: two saves whose blocks hold the same contents under other keys then differ only in the key.
+    With why a copy's block doesn't decrypt (its contents don't add up to its checksum), for each that doesn't"""
+    out = bytearray(contents)
+    problems = []
+    for copy in (0, SECOND_COPY):
+        start = MYSTERY_GIFT_BLOCK + copy
+        end = start + MYSTERY_GIFT_SIZE - 4
+        if start + MYSTERY_GIFT_SIZE > len(out):
+            problems.append(f"the save ends before the mystery gift block at {start:#x}")
+            continue
+        checksum, key = struct.unpack_from("<HH", out, end)
+        seed = checksum + (key << 16)
+        for offset in range(start, end, 2):
+            seed = (seed * 1103515245 + 24691) & 0xFFFFFFFF
+            struct.pack_into("<H", out, offset, struct.unpack_from("<H", out, offset)[0] ^ (seed >> 16))
+        if sum(out[start:end]) & 0xFFFF != checksum:
+            problems.append(f"the mystery gift block at {start:#x} doesn't add up to its checksum ({checksum:#06x}) "
+                            f"decrypted with its key ({key:#06x})")
+    return bytes(out), problems
+
+
 # The catch saves' bytes that differ by construction, the same in both versions (README.md, "Saves")
 MAIL_IDS = ("the caught Purrloin's mail's three sentence ids, encrypted with its personality value: "
             "PokeParty_CreatePkm (src/system/poke_tool.c) copies in a mail that CreateMailData allocates from the "
@@ -1291,38 +1338,38 @@ CATCH_SAVE_BYTES = {
 }
 # The Pokemon Center saves' bytes that differ by construction after Hugh's battle, the same places in both versions
 # (README.md, "Saves")
-CENTER_PLAY_SECONDS = ("the play time's seconds, which each program counts with its own clock's ticks (PLAY_TIME): "
-                       "Black 2's saves hold 0:08:01 on the port and 0:08:09 on the DS, White 2's 0:08:10 and 0:08:06, "
-                       "the port's battle ending 560 counts later than the DS's in Black 2 and 704 in White 2")
-MYSTERY_KEY = ("the mystery gift block and its footer: the Pokemon Center's deliveryman's scripts "
-               "(res/field/scripts/global_10395.s, Cmd_01DB, PdwPostman's func_ov033_02177d78 in "
-               "src/ov033/pdw_postman.c) read the block as the player enters, and every read decrypts it and encrypts "
-               "it again with a key that mgEncryptData (src/system/mystery_data.c) seeds with the VBlank count, "
-               "(OS_GetVBlankCount() << 8) | OS_GetVBlankCount(): the DS's count runs ahead of the game's passes "
-               "(its dropped frames and long loads) and the port's doesn't, so the same contents come out as other "
-               "bytes; the catch saves, made without entering a Pokemon Center, hold the block as the start save has "
-               "it")
+CENTER_PLAY_SECONDS = ("the play time's seconds, which each program counts with its own clock's ticks (PLAY_TIME), "
+                       "the DS's some 8 seconds ahead of the port's at the same count by this save in both versions: "
+                       "Black 2's saves, made on the same count, hold 0:08:01 on the port and 0:08:09 on the DS; "
+                       "White 2's port saves 740 counts (12 seconds of passes) after the DS, past the cut on presses "
+                       "of its own, and holds 0:08:10 against the DS's 0:08:06")
+MYSTERY_KEY = ("the mystery gift block's key (MysteryGiftSaveData.key, include/save/mystery_gift.h): the Pokemon "
+               "Center's deliveryman's scripts (res/field/scripts/global_10395.s, Cmd_01DB, PdwPostman's "
+               "func_ov033_02177d78 in src/ov033/pdw_postman.c) read the block as the player enters, and every read "
+               "decrypts it and encrypts it again with a key that mgEncryptData (src/system/mystery_data.c) takes "
+               "from the VBlank count, (OS_GetVBlankCount() << 8) | OS_GetVBlankCount(): the DS's count runs ahead of "
+               "the game's passes (its dropped frames and long loads) and the port's doesn't, so the same contents "
+               "come out as other bytes. The trip compares the blocks decrypted, each with its own key "
+               "(mystery_gift_decrypted): their contents and checksums are the same, and only the key differs (the "
+               "port's 0x7f7f; the DS's 0x7560 in Black 2 and 0xb793 in White 2); the catch saves, made without "
+               "entering a Pokemon Center, hold the block as the start save has it")
 TURN_TIMER = ("the Pokemon Center's townsperson at (3,15) who turns at random (npc 9 of "
               "res/field/events/aspertia_city_pokemon_center.json, movement code 13, FldmmdlMovecode_MoveTurnRandom in "
               "src/ov036/fldmmdl_movecode.c), the seventh actor of the field actors' block: his direction (+0xd, Black "
               "2's alone) and his turn's timer (+0x32, RailWanderWork.timer in the movement code's work). The timer "
               "counts down at each step of the field's actors, every other pass, and, run out, draws a new wait and "
               "direction from GFL's linear generator; past ADR 0023's cut the port's battle is its own, so it reaches "
-              "the Pokemon Center at another count than the DS's and the save finds him at another point of his wait")
-TURN_DRAWS = ("as TURN_TIMER: the townsperson's timer runs on as the Pokemon Center loads behind the season's banner, "
-              "and the two saves hold it otherwise (21 on the port's save and 28 on the DS's in Black 2, 19 and 4 in "
-              "White 2), so his draws from GFL's linear generator come at other counts: 14 counts sooner on the "
-              "port's save in Black 2 (counts 3485, 3549 and 3581 against 3499, 3563 and 3595), 30 later in White 2 "
-              "(3481 and 3577 against 3451 and 3547); melonDS continuing the port's save draws on the port's counts")
-CENTER_CRCS = ("the CRCs over those: the trainer block's, the field actors' block's, their entries and the mystery "
-               "gift block's in the table of the blocks' CRCs, and the footer's CRC of that table "
+              "the Pokemon Center at another count than the DS's (560 counts later in Black 2, 704 in White 2) and "
+              "the save finds him at another point of his wait")
+CENTER_CRCS = ("the CRCs over those: the trainer block's, the mystery gift block's and the field actors' block's, "
+               "their entries in the table of the blocks' CRCs, and the footer's CRC of that table "
                "(src/gfl/backup_system.c)")
 CENTER_SAVE_BYTES = {
     both_copies("0x19427"): CENTER_PLAY_SECONDS,
-    both_copies("0x1c800-0x1d297"): MYSTERY_KEY,
+    both_copies("0x1d292-0x1d293"): MYSTERY_KEY,
     both_copies("0x1e3ed,0x1e412"): TURN_TIMER,
-    both_copies("0x194b2-0x194b3,0x1f602-0x1f603,0x25f36-0x25f37,0x25f44-0x25f45,0x25f52-0x25f53,0x25fa2-0x25fa3"):
-        CENTER_CRCS,
+    both_copies("0x194b2-0x194b3,0x1d296-0x1d297,0x1f602-0x1f603,0x25f36-0x25f37,0x25f44-0x25f45,0x25f52-0x25f53,"
+                "0x25fa2-0x25fa3"): CENTER_CRCS,
 }
 ROUND_TRIPS = {
     # Phase 4's exit: the wild Purrloin caught on Route 19 and the game saved, then quit, and continued from the save
@@ -1335,9 +1382,7 @@ ROUND_TRIPS = {
     # White 2 the port's battle takes more turns, so the port plays presses of its own past the cut
     "hugh": RoundTrip("center_save", 19000, "center_continue",
                       known={"b2_us": CENTER_SAVE_BYTES, "w2_us": CENTER_SAVE_BYTES}, cut="hugh",
-                      port_input={"w2_us": "hugh_port"},
-                      continued_random={"b2_us": {"3493-3610": TURN_DRAWS}, "w2_us": {"3459-3610": TURN_DRAWS}},
-                      continued_last=3602),
+                      port_input={"w2_us": "hugh_port"}, continued_last=3602),
 }
 
 
@@ -1443,19 +1488,27 @@ def command_round_trip(args) -> int:
             failed = True
         print()
     contents = {}
+    plain = {}
     for name, path in saves.items():
         with open(path, "rb") as f:
             contents[name] = f.read()
         print(f"{name}'s save: SHA-1 {file_sha1(path)}")
-    spans = save_differences(contents["port"], contents["oracle"])
-    differing = [i for i, (x, y) in enumerate(zip(contents["port"], contents["oracle"])) if x != y]
-    print(f"the saves differ in {len(differing)} bytes, in {len(spans)} spans: "
-          + ", ".join(f"{first:#x}-{last:#x}" for first, last in spans))
-    # Every byte that differs is one the trip declares, with its cause
+        # The mystery gift block is compared by what it holds, each save's decrypted with its own key
+        plain[name], problems = mystery_gift_decrypted(contents[name])
+        for problem in problems:
+            print(f"the {name}'s save: {problem}")
+            failed = True
+    for label, a, b in (("the saves", contents["port"], contents["oracle"]),
+                        ("with their mystery gift blocks decrypted, the saves", plain["port"], plain["oracle"])):
+        spans = save_differences(a, b)
+        differing = sum(1 for x, y in zip(a, b) if x != y)
+        print(f"{label} differ in {differing} bytes, in {len(spans)} spans: "
+              + ", ".join(f"{first:#x}-{last:#x}" for first, last in spans))
+    # Every byte that differs, the mystery gift blocks decrypted, is one the trip declares, with its cause
     known = trip.known.get(args.version, {})
     for text, why in known.items():
         print(f"may differ, bytes {text}: {why}")
-    undeclared = undeclared_differences(contents["port"], contents["oracle"], known)
+    undeclared = undeclared_differences(plain["port"], plain["oracle"], known)
     if undeclared:
         print("the saves differ where the trip declares nothing: "
               + ", ".join(f"{first:#x}-{last:#x}" for first, last in undeclared))
@@ -1486,7 +1539,7 @@ def command_round_trip(args) -> int:
           "screens)" + (f"; first difference at {difference}" if difference else ""))
     failed = failed or difference is not None
 
-    # The port continues its own save in a new run, held to the oracle's continuing its own
+    # The port continues its own save in a new run, held to the oracle's continuing the same save
     port_dir = os.path.join(work, "port-continue")
     status, message = run_port(args.port, port_dir, sequence.port_frames, "all", rom, args.time, continue_input,
                                dumps=port_dumps, save=saves["port"], save_out=os.path.join(work, "port-after.sav"))
@@ -1498,11 +1551,9 @@ def command_round_trip(args) -> int:
         print("the port wrote its save while continuing it")
         failed = True
     port_run = compare.load_run(port_dir)
-    # Where the port's save holds a declared byte otherwise, GFL's random state may part from the oracle's own run
-    random = dict(sequence.known_random)
-    random[args.version] = {**random.get(args.version, {}), **trip.continued_random.get(args.version, {})}
-    sequence = replace(sequence, known_random=random)
-    result = compare_sequence(sequence, args.version, os.path.join(work, "oracle-oracle"), port_dir,
+    # Held to the oracle's run on the same save, the port's, which the oracle's run on its own matches as far as
+    # compare_boots compared them
+    result = compare_sequence(sequence, args.version, os.path.join(work, "oracle-port"), port_dir,
                               os.path.join(work, "report"), max(port_run.frames) if port_run.frames else 0)
     if failed or result != 0:
         print(f"oracle.py round-trip: FAIL; the runs are in {work}")
