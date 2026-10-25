@@ -1,0 +1,45 @@
+# The audit of 32-bit unsigned offsets added to an address on a 64-bit host, as clang-query matchers. On the DS a
+# pointer is 32 bits, so a u32 added to it wraps: an offset of 0xffffff00 moves it 256 bytes back. On a host the
+# pointer is 64 bits and the u32 is zero-extended, so the same offset moves it 4 GiB forward. There is no cast, so the
+# pointer cast guard (check_ptrcasts.py) can't see it. The field script read its jump, call and movement offsets so
+# until PR 29 (src/ov012/scrcmd_vm.c, src/ov036/scrcmd_fldmmdl.c and src/ov012/script_sys.c, the row of
+# port/docs/game-changes.md), and Black 2's starter scene crashed at its first offset back.
+#
+# An offset is safe as a u32 when it can't be negative: one that counts from the start of its file or of a block, an
+# index, a size. One that counts from the reader's own place, as a script's jumps do, can point back, and is read as an
+# s32 (an sptr where it is added to an address held in an integer). The matchers list every such sum in the code that
+# reads offsets from data: the script interpreters, the files that include system/vm.h (the field script's commands
+# and system, the trainers' AI, the battle's effect scripts, the musical's scripts), and NitroSystem's resource readers,
+# lib/nnsys/src and port/hal/nnsys (the G2D loaders that build the host's structs, which the guard doesn't compile).
+# port/docs/STATUS.md's entry for PR 29's follow-up has the counts and the reading of each site; run it again after a
+# change to one of those files or a new interpreter, and read each new site.
+#
+# Run it from the repository's root on a host build's compile database (Homebrew LLVM's clang-query), and again with
+# -p build/port-w2:
+#
+#   clang-query -p build/port -f port/tools/pointer_offsets.query \
+#       $(git grep -l -e '"system/vm.h"' -- src) $(git ls-files 'lib/nnsys/src/*.c' 'port/hal/nnsys/*.c')
+#
+# Each match prints its site and then its count ("N matches."), in the order of the matchers below. A site in a header
+# shows once for each file that includes it.
+
+set output diag
+set bind-root false
+
+# A 32-bit unsigned value (u32 is unsigned int on every host), a pointer, and an address held in an integer: uptr is
+# unsigned long on macOS and Linux, where the audit runs. sizeof's results, which are unsigned long too, are sizes
+let u32Value ignoringParenImpCasts(expr(hasType(qualType(hasCanonicalType(asString("unsigned int"))))))
+let pointerValue ignoringParenImpCasts(expr(hasType(pointerType())))
+let addressValue ignoringParenImpCasts(expr(hasType(qualType(hasCanonicalType(asString("unsigned long")))),
+    unless(unaryExprOrTypeTraitExpr())))
+
+# 1. A pointer plus or minus a u32
+match binaryOperator(hasAnyOperatorName("+", "-"), hasEitherOperand(pointerValue),
+    hasEitherOperand(u32Value)).bind("pointer")
+
+# 2. A pointer moved by a u32
+match binaryOperator(hasAnyOperatorName("+=", "-="), hasLHS(pointerValue), hasRHS(u32Value)).bind("step")
+
+# 3. An address held in an integer, plus, minus or moved by a u32
+match binaryOperator(hasAnyOperatorName("+", "-", "+=", "-="), hasEitherOperand(addressValue),
+    hasEitherOperand(u32Value)).bind("address")
