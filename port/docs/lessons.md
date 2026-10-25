@@ -3,6 +3,19 @@
 What port work taught that isn't obvious from the code, newest first. A lesson about MWCC or the decomp's own
 workflow goes in the decomp checkout instead; this file is the port's ([CLAUDE.md](../CLAUDE.md), the iteration loop).
 
+## 2026-10-25: phase 4's PC
+
+- **An unsigned offset added to a pointer wraps on the DS and moves 4 GiB on a host.** The field script VM read its
+  jumps' offsets as `u32` (`src/ov012/scrcmd_vm.c`): a jump back, a negative offset, came out right on the DS, whose
+  32-bit sum wraps, and 4 GiB on on a 64-bit host, where `VM_Run` then crashed on the next command. Nothing is cast,
+  so the pointer cast guard can't see it, and no route had taken a script's jump back until the PC's menu, which
+  shows itself again with one when the PC Box closes. Where a `u32` from a script, a file or a table is added to a
+  pointer, ask whether it can be negative; the trainer AI's and the battle effects' VMs read theirs as `s32` already.
+- **When the sanitized build stops first on another report, a print in the loop finds a crash sooner.** ASan stopped
+  in the gate on the way to the PC (a word-at-a-time `STD_GetStringLength` reading past the board's date string)
+  before the crash; a scratch print in `VM_Run`, never committed, of the position against the script's base showed
+  the base plus 4 GiB at the first command after a jump back.
+
 ## 2026-10-24: phase 4's route
 
 - **Compare the polygon lists, then one pixel's history.** A one-line seam on the Aspertia City lookout's railing,

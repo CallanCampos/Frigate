@@ -96,7 +96,7 @@ static FieldActor *FindScriptActor(FieldScriptEnv *env, u16 id) {
 BOOL s0064_ActorCmdExec(VM *vm, FieldScriptEnv *env) {
     FieldScriptEnv_GetScriptWork(env);
     u16 id = ScriptReadAny(vm, env);
-    u32 offset = VM_Read32(vm);
+    s32 offset = VM_Read32(vm);
     FieldActor *actor = FindScriptActor(env, id);
 
     if (actor == NULL) {
