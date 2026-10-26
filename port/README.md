@@ -18,9 +18,12 @@ doesn't have, and runs it as a program, with no emulator. The ROM is only where 
 into the field: a new game goes through the intro into Aspertia City, where the player walks, talks to a townsperson
 and goes into a house and out again (phase 3's exit, met on 2026-10-24), CONTINUE goes into the field too, and the field
 menu opens the party list and a Pokémon's summary, the Pokédex, the bag and the trainer card. Tests compare these paths
-frame by frame with melonDS and check the sound driver, music and cries. Battles wait for two fixes of the decomp to
-reach Frigate (a table of overlay 167 and the encounter effects' entries), so the game isn't playable past the first
-one. [docs/STATUS.md](docs/STATUS.md) records the checks and remaining work.
+frame by frame with melonDS and check the sound driver, music and cries. Phase 4's integrated route adds Hugh's
+battle, Bianca's capture demo, a wild catch, PC deposit/withdraw/swap and save continuations. The imported branch
+records both-version oracle results; this integration's final verification is pending. Hugh's CPU-time-dependent
+AI decision is an explicit comparison cut, followed by save-state and same-save continuation checks rather than a
+claim of an identical battle. Both upstream encounter fixes are already included.
+[docs/STATUS.md](docs/STATUS.md) records the checks and remaining work.
 
 ## Contributing
 

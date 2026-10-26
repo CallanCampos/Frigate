@@ -232,7 +232,7 @@ its encounters and battles track:
 | H6 | `lib/nnsys/src/gfd/gfd_VramTransferManager.c:327`, `NNS_GfdDoVramTransfer`, from the main loop (`src/system/main.c`) in the field | A transfer reads its source from memory of the game's heap that is no longer allocated (ASan, use-after-poison, twice) | Fixed in the game's file under `PLATFORM_PC` on 2026-10-24, with its cause traced ([below](#the-fields-sequences-under-the-strict-build)) |
 
 The battles' track ran the same survey build on 2026-10-23 on the Route 19 route from the starter save (the oracle's
-`route19_save_b2_us.pbwinput`, port frames 0 to 7,623: CONTINUE, Route 19, the trainer's VS cut-in and Hugh's battle to
+`route19_save_b2_us.pbwinput` as it was then (now `hugh_b2_us.pbwinput`), port frames 0 to 7,623: CONTINUE, Route 19, the trainer's VS cut-in and Hugh's battle to
 the first move's menu, where the battle's table of semi-invulnerable conditions, which had no C then
 (`data_ov167_021d7490`), stopped the program; [STATUS.md](STATUS.md)). The table is C since the sync of `629a53cccb`
 (`btl_pokeparam.c`'s `sSemiInvulnFlags`), and the survey build runs all 7,700 frames of the route's input with H7 and
@@ -246,7 +246,18 @@ map into the house, is now its first report, where the strict build would stop; 
 | R7 | `src/system/printsys.c:247` to `464`, `PrintQueue_Main`, and `:1164`, `PrintQueue_GetNextJob`: the field's queued text on Route 19 | The print queue keeps a copy of the renderer after each string, and a string rounded to the DS's 4 bytes left the renderer, which holds pointers, 4 bytes past an 8-byte boundary (UBSan, misaligned) | Fixed in the game's file under `PLATFORM_PC`: on a host the queue moves its write position on to an 8-byte boundary after each string, and copies no more of the string than the DS does, so a read past a `GFL_StrBufClone`'s buffer can't follow ([game-changes.md](game-changes.md)) |
 | R8 | `src/ov167/btlv_scu.c:2407`, `BtlvScu_InitGauges`, from `BtlvScu_Setup` at every battle's start | The marked `// BUG:`: the loop clears one gauge past `gauges[6]` (UBSan, out-of-bounds index); its writes land on `abilityWins[0]`'s `scu` and `bg`, which `BtlvScu_InitAbilityWins` sets right after | Fixed under `PLATFORM_PC`, which takes the `BUGFIX` loop; the battle is unchanged |
 | R9 | `src/ov169/btl_monset.c:15` to `84`, from `ServerControl_AfterSwitchIn` at the battle's first switch-in | `BtlServerFlow.unk1A68`, a mon set kept as `u8 [0x48]`, lies 4 bytes past an 8-byte boundary (UBSan, misaligned); it is also 24 bytes short of a host's set, which the clear overruns | Fixed in the game's header: the flow's mon sets are `BtlMonSet` (`include/battle/btl_handler.h`, [game-changes.md](game-changes.md)) |
-| R10 | `lib/nitro/src/std/std_string.c:116`, `STD_GetStringLength`, from `G3DTextDraw_CreateResource` (`src/ov012/g3d_text_draw.c:91`) for the trainer cut-in's texture names (`src/ov036/fld3d_ci.c`) | NitroSDK's string length reads a word at a time once the address is aligned, so it reads up to 3 bytes past a string literal's end (`"name_up_pl"`, 11 bytes) (ASan, global-buffer-overflow, a read of 4) | Nothing yet: open. The read stays in the aligned word, which never crosses a page, so it is safe on every host as on the DS's ARM9: a candidate for the ignorelist's `[address]` section, as R1 is for alignment |
+| R10 | `lib/nitro/src/std/std_string.c:116`, `STD_GetStringLength`, from `G3DTextDraw_CreateResource` (`src/ov012/g3d_text_draw.c:91`) for the trainer cut-in's texture names (`src/ov036/fld3d_ci.c`) | NitroSDK's string length reads a word at a time once the address is aligned, so it reads up to 3 bytes past a string literal's end (`"name_up_pl"`, 11 bytes) (ASan, global-buffer-overflow, a read of 4) | Implemented a bounded byte scan under `PLATFORM_PC`; the original word scan stays unchanged under `#else` ([game-changes.md](game-changes.md)). A mapped word may extend beyond the string's C object, so this is fixed rather than excluded from ASan. Focused regression and full route/T0 validation pending on the preparation head |
+
+### R10: string length respects the host object's bounds
+
+`STD_GetStringLength` now reads one byte at a time through the terminator on a host. The test
+[../tests/hal/test_std_string.c](../tests/hal/test_std_string.c) calls the actual NitroSDK implementation and header:
+empty and 11-byte literals, exact-sized allocations with lengths 0–33 at all four starting alignments, non-ASCII bytes,
+and strings ending at a guarded page. Its plain and sanitized targets are `hal_std_string_plain` and
+`hal_std_string_sanitized`; execution and both ROM SHA1s are pending on this preparation head. ASan's object redzones
+are the regression for the original word overread: a guarded-page case alone can pass the original implementation
+because aligned words remain inside the page. An isolated old-code ASan failure is also pending. No ignorelist entry
+is added; the unchanged `#else` body remains the ROM implementation.
 
 ### The field's sequences under the strict build
 

@@ -102,6 +102,16 @@ char *STD_SearchString(const char *str, const char *sub) {
 }
 
 int STD_GetStringLength(const char *str) {
+#ifdef PLATFORM_PC
+    // The DS's aligned word load can read beyond the terminator's C object (R10: the gate's 11-byte literal).
+    // Read only through the terminator on a host, where adjacent bytes can be poisoned or inaccessible.
+    int len = 0;
+
+    while (str[len] != '\0') {
+        len++;
+    }
+    return len;
+#else
     int len = 0;
     const u32 *p;
 
@@ -125,6 +135,7 @@ int STD_GetStringLength(const char *str) {
         len++;
     }
     return len;
+#endif
 }
 
 int STD_GetStringNLength(const char *str, int maxlen) {

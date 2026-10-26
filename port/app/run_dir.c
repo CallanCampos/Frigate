@@ -26,8 +26,9 @@
 typedef struct Dump {
     char *label;
     const uint8_t *symbol;
-    int follow;      // the bytes are where the pointer at symbol points
-    uint32_t offset; // from the symbol, or from where it points
+    int follow;      // how many pointers lead to the bytes: 0, 1 (*, the pointer at symbol) or 2 (**, the pointer
+                     // that one points at)
+    uint32_t offset; // from the symbol, or from where the last pointer points
     uint32_t size;
     int lastFrame; // no list: the run's last frame
     PortFrameList frames;
@@ -375,8 +376,10 @@ int port_run_dir_add_dump(const char *spec, PortRunDirResolver resolve, char *er
         FreeDump(&dump);
         return 0;
     }
-    if (*target == '*') {
-        dump.follow = 1;
+    // * follows the pointer at the symbol, ** the pointer that one points at: a static that a host file gives a global
+    // pointer to (port/hal/gfl's port_gfl_use_work and port_gfl_std_tables), when the static is a pointer itself
+    while (*target == '*' && dump.follow < 2) {
+        dump.follow++;
         target++;
     }
     plus = memchr(target, '+', (size_t)(colon - target));
@@ -434,16 +437,19 @@ static int WriteDumps(uint32_t frame) {
         if (dump->lastFrame ? frame != sInfo.frames : !port_frame_list_contains(&dump->frames, frame)) {
             continue;
         }
-        if (dump->follow) {
-            memcpy(&from, dump->symbol, sizeof(from));
-            if (from == NULL) {
-                if (!dump->warnedNull) {
-                    fprintf(stderr, "port: --run-dump %s: the pointer is NULL at frame %u; no dump there\n",
-                            dump->label, frame);
-                    dump->warnedNull = 1;
-                }
-                continue;
+        // Each * reads the pointer stored where the last one led
+        for (int k = 0; k < dump->follow && from != NULL; k++) {
+            const uint8_t *next;
+            memcpy(&next, from, sizeof(next));
+            from = next;
+        }
+        if (from == NULL) {
+            if (!dump->warnedNull) {
+                fprintf(stderr, "port: --run-dump %s: the pointer is NULL at frame %u; no dump there\n", dump->label,
+                        frame);
+                dump->warnedNull = 1;
             }
+            continue;
         }
         from += dump->offset;
         fprintf(sMemoryTxt, "%u %s 0x%llx %u ", frame, dump->label, (unsigned long long)(uintptr_t)from, dump->size);

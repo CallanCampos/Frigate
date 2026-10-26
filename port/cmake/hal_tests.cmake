@@ -82,3 +82,21 @@ foreach(function IN ITEMS NewBucketSet FreeBucketSet DumpBucketSet)
         COMMAND "${PORT_PYTHON}" "${CMAKE_CURRENT_SOURCE_DIR}/tests/hal/check_gbucket.py"
             "$<TARGET_FILE:test_hal_gbucket>" "${function}")
 endforeach()
+
+# R10: the actual NitroSDK string-length function must not read past the NUL's C object or a readable page.
+foreach(variant IN ITEMS plain sanitized)
+    set(target test_hal_std_string_${variant})
+    add_executable(${target} tests/hal/test_std_string.c
+        "${REPO_ROOT}/lib/nitro/src/std/std_string.c" hal/mi/mi_memory.c hal/hw/hw.c)
+    target_link_libraries(${target} PRIVATE port_decomp_env)
+    target_include_directories(${target} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
+    if(NOT WIN32)
+        target_compile_definitions(${target} PRIVATE _DEFAULT_SOURCE)
+    endif()
+    if(variant STREQUAL "sanitized")
+        target_compile_options(${target} PRIVATE
+            -fsanitize=address,undefined -fno-sanitize-recover=all -fno-omit-frame-pointer)
+        target_link_options(${target} PRIVATE -fsanitize=address,undefined)
+    endif()
+    add_test(NAME hal_std_string_${variant} COMMAND ${target})
+endforeach()
