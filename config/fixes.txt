@@ -2884,16 +2884,28 @@ overlays/ov186 0x021ad1fc remove_symbol
 overlays/ov186 0x021ad1fe remove_symbol
 overlays/ov186 0x021ad3c8 remove_reloc
 overlays/ov186 0x021ad448 remove_reloc
+overlays/ov189 0x021a59c4 section_start lib/dwc/src/nd/nd.c:.text
+overlays/ov189 0x021a59e4 reloc_addend 0x3c
+overlays/ov189 0x021a5a64 reloc_addend 0x3c
+overlays/ov189 0x021a5de8 reloc_addend 0x31
+overlays/ov189 0x021a6520 reloc_addend 0x28
+overlays/ov189 0x021a6540 reloc_addend 0x31
 overlays/ov189 0x021aa6ec add_function MulWords:arm:0xf0
 overlays/ov189 0x021aa7d8 remove_symbol
 overlays/ov189 0x021acd84 add_data sBase64Pad
 overlays/ov189 0x021acd85 add_data sActionCount
+overlays/ov189 0x021acda4 section_start lib/dwc/src/nd/nd.c:.rodata
 overlays/ov189 0x021acea0 section_end lib/dwc/src/enc/dwc_encsession.c:.rodata
 overlays/ov189 0x021acea0 section_start lib/dwc/src/crypt/crypt.c:.rodata
+overlays/ov189 0x021ae0cc section_start lib/dwc/src/nd/nd.c:.data
 overlays/ov189 0x021b2840 add_data data_ov189_021b2840
 overlays/ov189 0x021b2840 remove_symbol
 overlays/ov189 0x021b2850 section_end lib/dwc/src/nhttp/d_nhttp_common.c:.bss
 overlays/ov189 0x021b2850 add_data data_ov189_021b2850
+overlays/ov189 0x021b2904 remove_symbol
+overlays/ov189 0x021b290d remove_symbol
+overlays/ov189 0x021b2918 remove_symbol
+overlays/ov189 0x021b2924 section_start lib/dwc/src/nd/nd.c:.bss
 overlays/ov190 0x021b5144 remove_reloc
 overlays/ov190 0x021b5244 remove_reloc
 overlays/ov190 0x021b5308 reloc_module overlay(184)
