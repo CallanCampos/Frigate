@@ -1141,6 +1141,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
   "ask for `-ipa file` before anything else")
 - A constant loaded from the pool with no relocation where MWCC folds it or builds it with `mov`/`lsl`: a linker
   symbol, `extern u8 SYM[]` cast at the use. (matching.md: "is a linker symbol")
+- A gap after an aligned struct can be a missing member: `NHttpRoot` has eight trailing padding halfwords.
+  (matching.md: "root storage has an explicit")
 - A gap in `.bss` before a 32-aligned object: the previous file ends there, unless it is built with `-ipa file`, which
   gives each object of 64 bytes or more a section of its own. (matching.md: "makes its file's whole `.bss` section
   32-aligned")

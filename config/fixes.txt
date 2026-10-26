@@ -2905,8 +2905,8 @@ overlays/ov189 0x021acea0 section_start lib/dwc/src/crypt/crypt.c:.rodata
 overlays/ov189 0x021ae0cc section_start lib/dwc/src/nd/nd.c:.data
 overlays/ov189 0x021b2840 add_data data_ov189_021b2840
 overlays/ov189 0x021b2840 remove_symbol
-overlays/ov189 0x021b2850 section_end lib/dwc/src/nhttp/d_nhttp_common.c:.bss
 overlays/ov189 0x021b2850 add_data data_ov189_021b2850
+overlays/ov189 0x021b2860 section_end lib/dwc/src/nhttp/d_nhttp_common.c:.bss
 overlays/ov189 0x021b2904 remove_symbol
 overlays/ov189 0x021b290d remove_symbol
 overlays/ov189 0x021b2918 remove_symbol

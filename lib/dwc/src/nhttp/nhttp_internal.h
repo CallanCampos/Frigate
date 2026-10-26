@@ -238,6 +238,8 @@ typedef struct NHttpRoot {
     NHttpReqInfo req;
     NHttpMutexInfo mutexInfo;
     NHttpThreadInfo threadInfo;
+    // Keeps the root storage's size a multiple of the 32-byte cache-line size
+    u16 padding[8];
 } NHttpRoot;
 
 // What the thread keeps on its stack while it runs requests: the request that it takes from the list, the host of the

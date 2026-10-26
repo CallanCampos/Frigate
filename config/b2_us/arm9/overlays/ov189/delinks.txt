@@ -158,7 +158,7 @@ lib/dwc/src/nhttp/nhttp_thread.c:
 lib/dwc/src/nhttp/d_nhttp_common.c:
     complete
     .text       start:0x021a0a38 end:0x021a0e1c
-    .bss        start:0x021ae6c4 end:0x021b2850
+    .bss        start:0x021ae6c4 end:0x021b2860
 
 lib/dwc/src/ghttp/ghttpEncryption.c:
     complete

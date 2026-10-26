@@ -4243,6 +4243,9 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   ROM, the aligned buffer is larger than its use: the LTD's `photo_sign.c` sizes its random buffer, which the ARM7
   writes, to a whole 32-byte cache line though each fill uses 16. Aligning the next file's object instead gave the
   right size but changed how its code addresses it.
+- `d_nhttp_common.c`'s root storage has an explicit `u16 padding[8]` member after its thread state. A reference object's
+  debug layout records that member at `0x4150` and the complete type's size as `0x4160`. Restoring it recovers the
+  sixteen-byte `.bss` gap without changing any function; aligning the shorter object alone cannot supply that member.
 - One `ATTRIBUTE_ALIGN(32)` object makes its file's whole `.bss` section 32-aligned, and the linker starts the section
   on a 32-byte boundary, so a gap in the ROM's `.bss` before a 32-aligned object can be the end of the previous file:
   NitroSDK's `snd_command.c` starts at `0x0214c700` with its 32-aligned command array, and the queue before the gap is
