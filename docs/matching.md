@@ -2057,6 +2057,11 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `rtc_cache.c`'s `*(sDaysBeforeMonth + date->month - 1)`, `plist_sys.c`'s `*(sHidenMoves + hiden - 11)` (the
   literal is `sHidenMoves - 22`), `strbuf.c`, `startmenu.c` and others. A local `u8 *p = data + pos` read as `p[0]`,
   `p[1]` doesn't give it either.
+- Parentheses that group a pointer sum count too: a macro that writes its second half at `(u8 *)(p) + 2` makes the
+  whole of `p` one subexpression, computed before the value, where `p + 2` written flat is computed after it. NitroWiFi's
+  `send_tcp` (`cps.c`) builds each SACK edge's high half and swaps it before it adds `blocks * 8` to the header, and
+  `&soc->ooo[best]` stays in r0: `CPS_PUT32(tcp + 24 + blocks * 8, v)` adds first (the sum in r1, the run in r3, 59
+  bytes), while four `CPS_PUT16(tcp + 24 + blocks * 8 + k, ...)` with k of 0, 2, 4 and 6 match.
 - The reverse holds for addresses passed to calls: `text + i` given to several calls is computed once and kept in a
   saved register, and `&text[i]` is recomputed at each call (`adds r0, r5, r4`), with `&text[i + 3]` keeping `i + 3`
   (on the stack across calls) rather than the address. GameSpy's `gsiXmlUtilDecodeString` (`gsXML.c`) matches only

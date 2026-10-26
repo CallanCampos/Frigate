@@ -362,6 +362,10 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 ## Instructions in another order (scheduling)
 
+- An address sum computed before a stored value where the original computes it after (or the reverse): a macro's
+  `(u8 *)(p) + 2` groups `p`; write the halves' addresses flat (`tcp + 24 + blocks * 8 + 2`). (matching.md:
+  "Parentheses that group a pointer sum")
+
 - A table index computed after a spill where the original computes it before: the table may be a function-local
   `static` in an inline getter. (matching.md: "holds it as a function-local `static`")
 

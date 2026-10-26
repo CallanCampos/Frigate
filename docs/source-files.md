@@ -107,7 +107,7 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 | `net_devwifi.c` | `0x021503c0`–`0x021505d4` | 26 | complete | string at `0x021852ac` |
 | `dwc_rap.c` | `0x021505d4`–`0x02152078` | 77 | complete | string at `0x021852d0` |
 | `dwc_rapcommon.c` | `0x02152078`–`0x0215251c` | 14 | complete | string at `0x021853f0` |
-| `cps.c` | `0x0215251c`–`0x02155e34` | 113 | partial | descriptive |
+| `cps.c` | `0x0215251c`–`0x02155e34` | 113 | complete | descriptive |
 | `socl_startup.c` | `0x02155e34`–`0x02156000` | 6 | complete | descriptive |
 | `socl_command.c` | `0x02156000`–`0x02156200` | 13 | complete | descriptive |
 | `socl_create.c` | `0x02156200`–`0x021564cc` | 8 | complete | descriptive |
