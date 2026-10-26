@@ -278,6 +278,50 @@ seed 0xea56a175a2fffc8a       # optional, repeated: the random seeds the DS buil
   to 191.
 - Columns are separated by spaces or tabs; lines may end with CR LF. Anything else is an error that names the line.
 
+### Recordings
+
+`--record FILE` isn't in the program yet: this is its format, for review before its code. The port writes the run's
+input as an input file that `--input FILE` replays to the same frames, given the same ROM, the same starting save (the
+save directory's contents) and a compatible build. It writes the input the game reads, not the window's events: the
+buttons and lid held and the touch state as the program's frame hook leaves them for the game (`port_input.h`,
+`tp_host.h`), at each VBlank.
+
+```
+pbwinput 1
+# Recorded by Frigate: frigate-black2 <commit>, ROM <the dump's SHA-1>
+version b2_us
+frames game
+time 2026-10-25 14:03:27      # the clock at power-on, captured once
+clock running
+seed 0x...                    # 64 lines, declared before the game starts
+# FRAME BUTTONS [TOUCH]
+...
+```
+
+- **The clock.** `time` is `--fixed-time`'s, or the host's local time when the program starts, and the run's clock
+  starts there and runs with the virtual clock, as `--fixed-time` makes it (`port/hal/rtc/rtc7.c`). Without
+  `--record` the clock reads the host's time at each request, which no file can replay; while recording it follows the
+  frames the game plays, behind the wall clock while the program is paused or slower than the DS, ahead while it runs
+  faster.
+- **The seeds.** A file's `seed` lines come before its first frame and number 64 at most, and a battle's seed is built
+  when the battle starts, after many frames have been written. So the recorder declares the run's seeds up front: it
+  draws 64 from the host's random source, writes them, and gives them to the game as a replay's are given
+  (`port/hal/gfl/random_seed.h`), so the recorded run and its replay take the same seeds in the same order, GFL's at
+  start-up and one per battle. After 63 battles the game builds its own, which on a host depend only on the clock and
+  the input ([Random seeds](#random-seeds)). `run.txt` lists the seeds a run used and whether each was given.
+- **The frames** are game frames, by `pbw_input_frame_at_vblank`: the state goes with the frame whose pass reads it
+  next, which is the frame a replay applies it at. Several VBlanks share a frame when a pass takes longer than a frame.
+  For the buttons and the lid the last of them wins, since the game reads them once, at the start of its pass. The
+  touch is sampled at every VBlank while the game samples automatically (`port/hal/tp/tp7.c`), so a pen down at any
+  VBlank of a frame is written as down for the frame, at its last position, and its release in the next frame: a tap
+  can last a frame longer in the replay, never vanish. A frame's line is written, and the file flushed, when the frame
+  number moves on, and only when the state changed; a run that crashes leaves a file that ends at the last complete
+  frame.
+- **With `--input FILE`** the recording is of what the file plays, with the file's `time`, `clock` and `seed` lines
+  instead of new ones, so that it replays the same. Handing the controls to the window when the file ends is for later.
+- A file that can't be created is a bad option (status 2) before the game starts; a write that fails during the run
+  stops it with status 1, as `--run-dir`'s do.
+
 ## Run directories
 
 What `pbw-oracle` and `oracle.py port` write, and `compare.py` reads:
