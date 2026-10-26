@@ -1362,6 +1362,10 @@ Same code, other `sp` offsets or frame size.
   them; MWCC won't convert between function pointer types that differ only in a parameter's `const`. NitroWiFi's
   `resolve_common` (`cps.c`) is the same with a string: through `const u8 *name` MWCC moves the first character's
   `ldrb` above the query's `strh` stores, and with `u8 *name`, as in Black 1's version, the load stays after them.
+- `volatile` can't stand in for a variable the original keeps in a register and spills: it makes the variable a
+  memory local, placed by declaration order among the memory locals (not the spill slot) and reloaded after every
+  store. `ArchiveMoveImageTop`'s `fimgOffset` went to sp+0xc and `Yos_JPEGEncode`'s `chromBlocksX` to sp+0x64 that way.
+  It works where the original reloads a local it never kept in a register: `gti2HandleNack`'s `first`.
 - A cast of one operand to its own type keeps MWCC from merging two copies of an expression, and a cast of an array
   to its own element type makes it compute an element's address again rather than reuse a hoisted base. Neither is
   natural C; this project takes them only under the maintainer's 2026-10-25 ruling, with a comment: NitroWiFi's
