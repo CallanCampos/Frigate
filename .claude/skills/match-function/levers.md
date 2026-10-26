@@ -264,6 +264,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 ## Stack slots or frame size
 
+- A 0 stored to a flag's slot before the loads of a 64-bit compare, where the original stores it after them: clear the
+  flags inside the block, after the compare. (matching.md: "A flag cleared inside the block")
+
 - A write result missing its store to a later read's output slot: use one transfer-length local for both operations
   (`DWCi_Http_Thread`). (matching.md: "one transfer-length local")
 

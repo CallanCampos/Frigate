@@ -1870,7 +1870,7 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 | `setting.c` | `0x021b77dc`–`0x021b8050` | 29 | complete | descriptive |
 | `sound.c` | `0x021b8050`–`0x021b8154` | 7 | complete | descriptive |
 | `step.c` | `0x021b8154`–`0x021b8834` | 18 | complete | descriptive |
-| `usbap.c` | `0x021b8834`–`0x021b8cf0` | 8 | partial | descriptive |
+| `usbap.c` | `0x021b8834`–`0x021b8cf0` | 8 | complete | descriptive |
 | `window.c` | `0x021b8cf0`–`0x021b93e8` | 15 | complete | descriptive |
 | `dwc_mov_mbp.c` | `0x021b93e8`–`0x021b9bbc` | 19 | complete | descriptive |
 | `dwc_mov_wh.c` | `0x021b9bbc`–`0x021ba768` | 45 | partial | descriptive |

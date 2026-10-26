@@ -438,6 +438,7 @@ lib/dwcutilui/src/step.c:
     .bss        start:0x021c416c end:0x021c4174
 
 lib/dwcutilui/src/usbap.c:
+    complete
     .text       start:0x021b8834 end:0x021b8cf0
     .rodata     start:0x021c0468 end:0x021c04bc
     .bss        start:0x021c4174 end:0x021c4178

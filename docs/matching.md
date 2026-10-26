@@ -838,6 +838,14 @@ Same instructions, registers swapped.
 - A local used only inside one straight-line block takes the temporaries' slot, above every named one, whatever
   its declaration position: TwlSDK's `Yos_JPEGEncode` (`ssp_jpegenc.c`) spills `chromBlocksX` to sp+0x58 in all 24
   declaration orders tried, where the original has it among the named slots, so the original used it beyond that block.
+  Held in `x`, which also takes both MCU divisors (`x = hFactor * 8; ...; x = vFactor * 8;`), it takes sp+0x4c below
+  the named offsets, as in the original.
+- A flag cleared inside the block after a 64-bit compare can share its slot with the compare's high-word 0: value
+  numbering gives the clear the same 0, which is spilled once at the compare and reloaded for the flag, the other
+  flag and the loop counter. The DWC utility's `taskFirst` (`usbap.c`) builds that 0 in r4 after loading both words of
+  the start tick and stores it to the flag's slot; `notReady = FALSE;` before the `if` builds it first, in r2, and
+  stores it before the loads, while `notReady = FALSE; ready = FALSE;` as the block's first statements match, with
+  both flags `_Bool` (as `BOOL` the function is 2 bytes further off).
 - NitroWiFi's `CPSi_sha1_block` runs its rounds in groups of five, rotating the arguments of a two-statement
   round macro (`SHA1_ROUND`) instead of copying the five state words after each round. The first fifteen rounds use
   direct words, followed by word 15 and four expanded words; the later stages each run four groups over the circular
