@@ -758,4 +758,6 @@ typedef struct ZoneWarp ZoneWarp;
 typedef struct ZoneWarpGridPosition ZoneWarpGridPosition;
 typedef struct ZoneWarpRailPosition ZoneWarpRailPosition;
 
+typedef struct NdContext NdContext;
+
 #endif // POKEBW2_STRUCT_DECLS_H
