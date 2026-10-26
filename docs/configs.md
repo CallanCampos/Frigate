@@ -45,6 +45,11 @@ reconstruction shows: multiboot's `mb_gameinfo.c`, whose child side and unused s
 give the four words at the head of its `.bss` that the parent never reads. Any other entry is another
 exception for the maintainer to accept.
 
+`AuthService.c` also restores two password-login entry points with their callbacks and password helper. These five
+functions are checked against a reference object's assembly; the game's eight surviving functions and all of its
+data are checked against both ROMs. Removing the restored entry points retains the shared XML field names in their
+original order. Their declarations stay in the source file, since they are absent from the linked game.
+
 The strip drops each listed symbol's section, every allocated section that only dropped code reaches (a static
 function, a string, an unpooled static), the exception indices of dropped code, the relocations of what stays (the
 debug information) into dropped sections, and undefined symbols only dropped code called. A global the list doesn't

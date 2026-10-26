@@ -3987,6 +3987,11 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   and `GetChallenge`'s `challenge`, which the dead code reads; its local initializers and function-local statics
   (`challengestr`, `sesskeystr`) join the size sort, and `GetPersistData`'s `""` comes before `value_for_key`'s
   `"\\"`. Without the dead code, three placeholder words and an unused inline stood in for them.
+- A reference object's assembly can identify the dead functions behind a surviving string order. `AuthService.c`'s
+  profile and unique-nick logins, their callbacks and their password helper match that assembly; stripping their two
+  public entry points puts nine shared XML field names before the remote-login strings, matching the ROM's data and
+  relocations in both versions. The eight live functions already match with either IPA mode, but `-ipa file` is still
+  necessary for the RSA constants' section alignment. A function-only probe cannot settle the file's IPA setting.
 - A function-local `const` scalar with an initializer, `static` or not, is emitted in `.rodata` even when every read
   of it folds (`const u32 n = 11;` gives a 4-byte `_ZZ...E1n_0`), while a file-scope `static const` scalar that code
   only reads is dropped.

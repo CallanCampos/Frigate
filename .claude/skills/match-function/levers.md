@@ -1172,6 +1172,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
   (matching.md: "An `asm {}` block inside a C function")
 - SPL's `1.2/base` compiler emits a file's functions in reverse source order.
 - The MWCC linker here doesn't dead-strip unreferenced global functions.
+- Code matches under both IPA modes but data does not: compare section alignment and shared strings; a reference
+  object can identify dead functions that introduce live strings (`AuthService.c`).
+  (matching.md: "A reference object's assembly")
 - A static function whose symbol isn't renamed to its C name shows as "unknown" in the probe.
 - TwlSDK code that resists respellings: rebuild it in the shape of cybervisi0n/libntr's reconstruction (its
   `static inline` setters and wrappers, `if (n > 0) { ... }` blocks with their locals, cursor layouts), in our own

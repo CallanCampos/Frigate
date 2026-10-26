@@ -72,6 +72,7 @@ lib/dwc/src/gdb/gdb.c:
     .bss        start:0x021c2454 end:0x021c24dc
 
 lib/dwc/src/auth/AuthService.c:
+    complete
     .text       start:0x021bf63c end:0x021bfcd8
     .rodata     start:0x021bfd38 end:0x021bfe44
     .data       start:0x021c1ab8 end:0x021c1ca0

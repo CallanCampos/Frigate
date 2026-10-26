@@ -15,6 +15,10 @@
 # doesn't name. The strip fails if code of the object that stays refers to a listed symbol, and
 # tools/build/check_deadstrip.py if any other object of the link does.
 [deadstrip]
+# AuthService's password logins, recovered from the SDK object's Thumb assembly: their callbacks and requests
+# introduce shared XML field names before the remote login. All five reconstructed routines match the SDK object;
+# the game keeps only their shared strings, so the two public entry points are stripped with their private helpers.
+"lib/dwc/src/auth/AuthService.c" = ["wsLoginProfile", "wsLoginUnique"]
 # The wipe handlers the game's table doesn't use, whose function-local statics are the rest of the file's .rodata
 # and .data
 "src/system/wipe_sub.c" = [
