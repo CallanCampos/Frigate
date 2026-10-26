@@ -528,7 +528,10 @@ static GT2Bool gti2HandleAck(GT2Connection connection, const GT2Byte *data, int 
 
 // Resends the messages from the first serial number to the last
 static GT2Bool gti2HandleNack(GT2Connection connection, const GT2Byte *data, int length) {
-    int first = gti2UShortFromBuffer(data, 0);
+    // Volatile stands in for code MWCC won't otherwise give (the maintainer's 2026-10-25 ruling): the original reloads
+    // the first serial number from its stack slot for `last = first` instead of copying it, which no other form tried
+    // reproduces
+    volatile int first = gti2UShortFromBuffer(data, 0);
     int last;
     int count;
     int i;
