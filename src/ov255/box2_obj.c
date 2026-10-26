@@ -1808,7 +1808,13 @@ void Box2Obj_UpdateRangeDots(Box2SysWork *syswk) {
         bottom = top + height;
     }
     for (i = 0; i < 16; i++) {
+#ifdef PLATFORM_PC
+        // The inactive selection starts with a zero perimeter. MSL's DS division returns remainder 0 for a
+        // divisor of 0; C leaves it undefined and x86 faults. Keep that result without dividing on the host.
+        pos = length == 0 ? 0 : (rs->anmCnt + i * 24) * length / rs->anmMax % length;
+#else
         pos = (rs->anmCnt + i * 24) * length / rs->anmMax % length;
+#endif
         if (pos < half) {
             if (pos < width) {
                 px = left + pos;

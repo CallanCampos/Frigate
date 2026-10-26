@@ -826,6 +826,83 @@ static void TestLockStops(void) {
     CHECK_EQ(channel->prio, 0);
 }
 
+// H8: a wave invalidation arrives after ExChannelMain queued register writes but before UpdateExChannel applies
+// them. It must cancel a pending start as well as stop an already playing voice, so neither can read freed samples.
+// Another software voice outside the invalidated range must keep its pending start and continue playing normally.
+static void TestInvalidateWave(void) {
+    Snd7WaveParam wave = { SND7_FORMAT_PCM8, 1, 32728, WAVE_TIMER, 1, 15 };
+
+    for (int alreadyStarted = 0; alreadyStarted < 2; alreadyStarted++) {
+        u8 *disposed = malloc(64);
+        // The driver's invalidation end is inclusive. A plain allocator can place another 64-byte block
+        // exactly at disposed + 64; keep this payload inside a larger owner so it is strictly outside.
+        u8 *keptOwner = malloc(128);
+        u8 *kept = keptOwner != NULL ? keptOwner + 32 : NULL;
+        Snd7ExChannel *victim;
+        Snd7ExChannel *other;
+        Snd7HwPeek peek;
+        s16 samples[2];
+        u32 pending;
+        u32 otherPending;
+
+        CHECK(disposed != NULL && kept != NULL);
+        if (disposed == NULL || kept == NULL) {
+            free(disposed);
+            free(keptOwner);
+            return;
+        }
+        memset(disposed, 0x30, 64);
+        memset(kept, 0x50, 64);
+        BootDriver();
+        victim = snd7_alloc_exchannel(1u << 4, 64, FALSE, NULL, NULL);
+        other = snd7_alloc_exchannel(1u << 5, 64, FALSE, NULL, NULL);
+        CHECK(victim != NULL && other != NULL);
+        if (victim == NULL || other == NULL) {
+            free(disposed);
+            free(keptOwner);
+            return;
+        }
+        snd7_set_exchannel_attack(victim, 127);
+        snd7_set_exchannel_attack(other, 127);
+        snd7_set_exchannel_sustain(victim, 127);
+        snd7_set_exchannel_sustain(other, 127);
+        CHECK(snd7_start_exchannel_pcm(victim, &wave, disposed, disposed + 64, -1));
+        CHECK(snd7_start_exchannel_pcm(other, &wave, kept, kept + 64, -1));
+        snd7_exchannel_main(TRUE);
+        CHECK(snd7_sync(victim) & SND7_SYNC_START);
+        CHECK(!(victim->flags & SND7_EXCHANNEL_START));
+        if (alreadyStarted) {
+            snd7_update_exchannel();
+            for (int i = 0; i < 4; i++) {
+                snd7_hw_mix(samples);
+            }
+            CHECK(snd7_is_channel_active(4));
+            CHECK(snd7_is_channel_active(5));
+        }
+        pending = snd7_sync(victim);
+        otherPending = snd7_sync(other);
+        snd7_invalidate_wave(disposed, disposed + 64);
+        CHECK_EQ(snd7_sync(victim), pending & ~SND7_SYNC_START);
+        CHECK_EQ(snd7_sync(other), otherPending);
+        CHECK(!snd7_is_channel_active(4));
+        free(disposed);
+        // The actual periodic driver updates and hardware mixer run after release: ASan catches any stale restart.
+        RunUpdates(2);
+        RunToNextUpdate();
+        for (int i = 0; i < 32; i++) {
+            snd7_hw_mix(samples);
+        }
+        CHECK(!snd7_is_channel_active(4));
+        CHECK(!snd7_is_exchannel_active(victim));
+        CHECK(snd7_is_channel_active(5));
+        snd7_hw_peek(5, &peek);
+        CHECK(peek.sad == kept);
+        CHECK(peek.sample != 0);
+        snd7_lock_channel(1u << 5, 0);
+        free(keptOwner);
+    }
+}
+
 // Sequences: a note, update by update
 
 // A note of key 60 at velocity 100 that lasts 48 ticks, then the end. At tempo 120 a tick comes every other update
@@ -2074,6 +2151,7 @@ static const Test sTests[] = {
     { "calc_timer", TestCalcTimer },
     { "alloc", TestAlloc },
     { "lock_stops", TestLockStops },
+    { "invalidate_wave", TestInvalidateWave },
     { "seq_note", TestSeqNote },
     { "seq_params", TestSeqParams },
     { "seq_programs", TestSeqPrograms },

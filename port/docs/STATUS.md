@@ -32,6 +32,35 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
 
+## 2026-10-26: Phase 4 recovered and hardened; final validation running
+
+Preparation checkpoint, not a completed milestone or upstream sync. Final results follow in a later entry.
+
+- **Upstream:** unchanged, `deb044db2d3d` from reviewed main `f786fed993` (PR 41).
+- **Port:** `PORT_SHA`, `codex/phase4-route`, after integration `91d0874aa9`; original worktrees and their dirty
+  patches remain untouched and independently backed up in a verified self-contained Git bundle.
+- **ROM:** configure/Ninja passes both SHA1s (T0): B2 `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb`,
+  W2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`. All eight changed game/SDK files preprocess identically
+  to `f786fed993` in both versions (`check_mwcc_neutral.py --base f786fed993 --jobs 2`: 16/16).
+- **Host build:** both ordinary all-target builds and strict LLVM ASan/UBSan game builds pass on arm64 macOS.
+- **Tests:** T2 focused ordinary tests: 12 pass, two explicit Apple-clang function-check skips/version; upstream
+  LLVM runs all four VM cases. Audio selection: 24/24 across both ordinary versions and strict B2; 56 oracle
+  helper tests pass. T3/T4 final eight-route suites are running. T5 characterization passes Hugh, Route 19,
+  catch, produced-save continuations and PC after each applicable fix in both games; final single-binary batch
+  pending. T6 native saves change and reload unchanged; final oracle round trips pending. T7 final both-game
+  windowed runs pending. No interrupted or partly failing batch is counted as a full pass.
+- **Tiers:** unchanged: 40,440 matching functions, 509 present/nonmatching, 68 missing (excluding 2,385 veneers);
+  code bytes a/b/c: B2 3,769,504/76,454/4,302; W2 3,769,592/76,454/4,302.
+- **Trap stubs:** 25 functions, 20 data placeholders/build; none hit in native route characterization.
+- **64-bit warnings:** last strict guard: 365 sites/229 keys, real 66, harmless 123, handled 141, unreachable 35;
+  no uncompiled input. Final rerun pending.
+- **Work done:** integrated preserved Phase 4 history and dirty oracle fixes; retained current-main starter and
+  VM fixes. Fixed R10, H7, R12, H8, R14, R15 and R16; isolated R13's audited context-erasure exception to two VM
+  table calls, leaving native/verifier checks active. Added actual-SDK/driver regressions, guides and lessons.
+  The obsolete encounter experiment was not reapplied. ADR 0023 remains proposed for owner review.
+- **Next:** final T4/T5/T7, ordinary/timing checks, final record, ready PR and exact-head local verification.
+- **Blockers:** no known source blocker; validation is still required. Later PC apps and story routes remain.
+
 ## 2026-10-25: PR 33 reconciled with reviewed main; durable sync proposals and safe conflict notices
 
 This entry is a preparation snapshot. Final validation and merge results are recorded in

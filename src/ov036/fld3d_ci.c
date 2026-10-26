@@ -47,6 +47,11 @@
 #include "system/wordset.h"
 #include "text/system/0368.h"
 
+#ifdef PLATFORM_PC
+#include <stdio.h>
+#include <stdlib.h>
+#endif
+
 // The field effects of the 3D scenes of archive 0x76 (fld3d_ci.c, after the file name that its allocations pass): the
 // Pokemon's sprite of a field move, the battle cut-ins and Alder's flight, with their particles, sounds and screen
 // fades. Function names from swan (https://github.com/ds-pokemon-hacking/swan, GPL-3.0); the layouts are ours
@@ -1290,6 +1295,44 @@ static GameEventReturnCode EventFieldEffectCutinSub_Callback(GameEvent *event, u
     return FALSE;
 }
 
+#ifdef PLATFORM_PC
+// The texture queue borrows these buffers until SystemUpdateVBlank has uploaded them. Capture each conversion's
+// owners independently: ci's fields are reused for the next picture. The parent keeps the effect's heap alive
+// through its animation, and GameUpdateVBlank drains the queue before GFL_VBlankUpdate runs this one-shot task.
+typedef struct {
+    void *charData;
+    void *paletteData;
+    GFLBitmap *bitmap;
+} Fld3DCiBitmapUpload;
+
+static void Fld3DCi_FreeBitmapUpload(TCB *tcb, void *data) {
+    Fld3DCiBitmapUpload *upload = data;
+
+    GFL_TCBRemove(tcb);
+    GFL_HeapFree(upload->charData);
+    GFL_HeapFree(upload->paletteData);
+    GFL_BitmapFree(upload->bitmap);
+    GFL_HeapFree(upload);
+}
+
+static void Fld3DCi_DeferBitmapFree(Fld3DCi *ci) {
+    Fld3DCiBitmapUpload *upload = GFL_HeapAllocate(ci->heapId, sizeof(Fld3DCiBitmapUpload), FALSE, "fld3d_ci.c", 0);
+
+    if (upload == NULL) {
+        fputs("port: trainer cut-in: cannot retain queued texture buffers\n", stderr);
+        abort();
+    }
+    upload->charData = ci->charData;
+    upload->paletteData = ci->paletteData;
+    upload->bitmap = ci->bitmap;
+    if (GFL_VBlankTCBAdd(Fld3DCi_FreeBitmapUpload, upload, 0) == NULL) {
+        // Freeing now would invalidate the queued transfers; the game's assertion handler can return.
+        fputs("port: trainer cut-in: no VBlank task for texture cleanup\n", stderr);
+        abort();
+    }
+}
+#endif
+
 static GameEventReturnCode EventFld3DCiBitmapConv_Callback(GameEvent *event, u32 *state, void *work) {
     Fld3DCiEvent *data = GameEvent_GetData(GameEvent_GetReturnEvent(event));
     Fld3DCi *ci = data->ci;
@@ -1323,9 +1366,15 @@ static GameEventReturnCode EventFld3DCiBitmapConv_Callback(GameEvent *event, u32
         entry = (Fld3DCiBitmapEntry *)((u8 *)param->entries + offset);
         Fld3DCi_ConvG2DToG3D(ci, entry->texName, entry->palName, entry->charFile, entry->palFile, width, height,
                              srcStride, srcOffset, entry->resource, entry->palOffset);
+#ifdef PLATFORM_PC
+        // H7: the DS frees the texture and palette before their VBlank transfers read them. Retain them on a host
+        // until those same queued transfers complete, without adding a game-event pass or changing upload timing.
+        Fld3DCi_DeferBitmapFree(ci);
+#else
         GFL_HeapFree(ci->charData);
         GFL_HeapFree(ci->paletteData);
         GFL_BitmapFree(ci->bitmap);
+#endif
         param->index++;
         if (param->index == param->count) {
             GFL_HeapFree(param->entries);

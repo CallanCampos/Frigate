@@ -155,7 +155,7 @@ version, to find the file. `replaced.txt` in a module lists the decomp files tha
 | [snd7/snd7_internal.h](snd7/snd7_internal.h) | What the sound driver's files share, and the list of the ARM7's functions each is written from |
 | [snd7/snd7.c](snd7/snd7.c) | The sound driver's thread, written from the ARM7's: the ARM9's commands, its periodic work caught up to the virtual clock, its alarms as the OS core's timed work, and the trace's record of the driver's work in the DS's layout (`port_snd7_trace_record`) |
 | [snd7/snd7_seq.c](snd7/snd7_seq.c) | The sequencer: 16 players and 32 tracks reading sequences |
-| [snd7/snd7_exchannel.c](snd7/snd7_exchannel.c) | The driver's channels: allocation, envelopes, sweep and LFO |
+| [snd7/snd7_exchannel.c](snd7/snd7_exchannel.c) | The driver's channels: allocation, envelopes, sweep and LFO; invalidation cancels matching PCM voices' queued starts before their waves are released (`snd_invalidate_wave`) |
 | [snd7/snd7_hw.c](snd7/snd7_hw.c), [snd7/snd7_output.h](snd7/snd7_output.h) | The sound unit: 16 hardware channels (their timers, start delays and FIFO as the hardware and melonDS have them) mixed to stereo at GBATEK's widths; its output for `port/audio`, and the driver's trace for `port/app/sound_trace.c` |
 | [snd7/snd7_tables.c](snd7/snd7_tables.c) | The decibel and pitch tables |
 | [snd7/snd_bank_host.c](snd7/snd_bank_host.c), [snd7/snd_handle.h](snd7/snd_handle.h) | Banks and wave archives on the ARM9's side, with 32-bit handles for host pointers |

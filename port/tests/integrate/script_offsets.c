@@ -116,8 +116,7 @@ static void TestJumpsAndCalls(void (*check)(int ok, const char *what)) {
     vm = VmAt(NICKNAME_CALL);
     s0004_VMCall(vm, NULL);
     check(vm->pc == At(NICKNAME_ROUTINE), "s0004_VMCall goes 128 bytes forward, to the nickname's routine");
-    check(vm->stackPos == 1 && sStack[0] == (uptr)At(NICKNAME_CALL + 4),
-          "and pushes the exact return position");
+    check(vm->stackPos == 1 && sStack[0] == (uptr)At(NICKNAME_CALL + 4), "and pushes the exact return position");
     s0005_VMReturn(vm, NULL);
     check(vm->pc == At(NICKNAME_CALL + 4), "and returns after its offset");
     check(vm->stackPos == 0, "s0005_VMReturn consumes the return position");

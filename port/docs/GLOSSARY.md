@@ -59,6 +59,7 @@ and Frigate itself. [ARCHITECTURE.md](ARCHITECTURE.md) shows how the parts fit.
 | --- | --- |
 | **NitroSDK, TwlSDK** | Nintendo's DS and DSi SDKs (`lib/nitro`, `lib/twl`): OS, GX, FS, CARD, SND, PXI, MI, FX and the rest |
 | **NitroSystem, NNS** | Nintendo's middleware above the SDK (`lib/nnsys`): FND heaps, G2D, G3D, GFD VRAM transfers, the sound players |
+| **NODEMIX, normal matrix** | A NitroSystem G3D skeletal-model command that blends joint matrices by weight. Its normal matrix transforms surface directions and uses nine words; its position matrix also includes translation. Frigate keeps the SDK's 12-word load bounded with a complete temporary ([game-changes.md](game-changes.md)) |
 | **SPL** | Nintendo's particle library (`lib/spl`) |
 | **DWC** | Nintendo Wi-Fi Connection (`lib/dwc`), the online library |
 | **DS Protect** | Nintendo's anti-piracy library (`lib/dsprot`); Frigate's stub passes its checks as on a genuine cartridge |

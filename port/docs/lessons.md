@@ -3,6 +3,18 @@
 What port work taught that isn't obvious from the code, newest first. A lesson about MWCC or the decomp's own
 workflow goes in the decomp checkout instead; this file is the port's ([CLAUDE.md](../CLAUDE.md), the iteration loop).
 
+## 2026-10-26: owners, queued starts and complete packets
+
+- A stopped audio voice can restart when its pending register writes run. Invalidation must cancel its queued
+  START as well as stop hardware; heap disposal must wait while wave owners remain live. Test later updates
+  after release, not just the synchronous stop (`snd_invalidate_wave`).
+- Closed-range fixtures need payloads strictly outside the end. Adjacent ordinary allocations exposed a test
+  assumption ASan's redzones hid; keep the control inside a larger allocation rather than change the protocol.
+- NODEMIX needs twelve packet words although only nine normal words matter. A complete host temporary fixes
+  bounds; shortening the packet breaks geometry. Check the real SDK, FIFO and resulting matrices.
+- Apple clang emits no C function-type sanitizer check. Use upstream LLVM and an explicit capability probe:
+  the VM table exception must still leave native and verifier callbacks checked.
+
 ## 2026-10-25: the field script's offsets, after PR 29
 
 - **A `u32` offset that the DS's 32-bit sum wraps is a truncation the pointer cast guard can't see.** The field script

@@ -3,7 +3,6 @@
 // expose that load under ASan; all four starting alignments, high-bit bytes and strings ending at an inaccessible
 // page check that the host reads only through the terminator. Plain and sanitized targets compile the actual SDK C.
 #include "nitro/std.h"
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

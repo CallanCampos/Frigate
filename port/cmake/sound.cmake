@@ -22,8 +22,8 @@ endif()
 
 set(port_snd_scenarios
     adpcm_decoder adpcm_channel pcm8_loop short_sound fifo psg_duty timer_write noise mixer calc_timer alloc
-    lock_stops seq_note seq_params seq_programs seq_envelope seq_tie seq_sweep seq_modulation seq_flow seq_variables
-    seq_mute seq_outside seq_nothing player_controls driver_info trace_layout bank_host pxi_wave_out pxi_sequence
+    lock_stops invalidate_wave seq_note seq_params seq_programs seq_envelope seq_tie seq_sweep seq_modulation seq_flow
+    seq_variables seq_mute seq_outside seq_nothing player_controls driver_info trace_layout bank_host pxi_wave_out pxi_sequence
     pxi_wake_ups pxi_alarm_timing audio_dump)
 foreach(scenario IN LISTS port_snd_scenarios)
     add_test(NAME snd_${scenario} COMMAND port_snd_tests ${scenario})
@@ -32,4 +32,12 @@ endforeach()
 foreach(scenario rom_sequences rom_every_sequence)
     add_test(NAME snd_${scenario} COMMAND port_snd_tests ${scenario})
     set_tests_properties(snd_${scenario} PROPERTIES TIMEOUT 1200 SKIP_RETURN_CODE 77)
+endforeach()
+
+# H8: actual SDK sound-heap disposal must finish queued ARM7 invalidation before releasing/reusing wave owners.
+add_executable(port_snd_heap_tests tests/snd/test_heap_disposal.c
+    "${REPO_ROOT}/lib/nnsys/src/snd/snd_heap.c" "${REPO_ROOT}/lib/nnsys/src/fnd/list.c")
+target_link_libraries(port_snd_heap_tests PRIVATE port_decomp_env)
+foreach(scenario IN ITEMS clear-callback load-callback clear-plain load-plain)
+    add_test(NAME snd_heap_disposal_${scenario} COMMAND port_snd_heap_tests ${scenario})
 endforeach()
