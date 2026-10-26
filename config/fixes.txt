@@ -528,6 +528,7 @@
 . 0x02093376 remove_symbol
 . 0x02093378 add_data sDaysBeforeMonth
 . 0x02093e0c add_data data_02093e0c
+. 0x02093e0c section_start src/gfl/arc_util.c:.rodata
 . 0x02093e44 add_data data_02093e44
 . 0x020940b8 add_data WifiIdTool_InverseNibbleSubstitution
 . 0x020941b8 add_data NNSi_FndUnitHeapAllocatorFuncs

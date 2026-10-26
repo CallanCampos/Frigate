@@ -3741,7 +3741,9 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   packed against the next with no 4-byte gap: overlay 257's `ctvt_draw.c` starts with the 10 unread bytes of
   `sUnusedColors`, then 2-byte tables, which no `-ipa file` layout gives, and matches whole with `-ipa function` and its
   tables defined just above `CtvtDraw_UpdateDraw`, their first user (`config/compiler_flags.toml` records the flag).
-  With every table above the first function the colors sort after the 2-byte tables again. `.data` is written out
+  With every table above the first function the colors sort after the 2-byte tables again. `arc_util.c` likewise
+  starts with an unused 16-byte image-loader table ahead of its 8-byte OBJ and 32-byte palette dispatch tables when
+  those two tables are defined just above their first users; all 39 functions stay unchanged. `.data` is written out
   the same way: the ROM has the 16-byte `sVADInfo` ahead of the 12-byte `sInitialCoefficients`, which no declaration
   order gives in one file while both are defined above the first function. They belong to two files (`vct_vad.c` and
   `vct_dsp.c`), each laid out on its own, which is why the order looked unreachable.

@@ -8047,7 +8047,7 @@ sDefaultFont kind:data(any) addr:0x02093390
 DEFAULT_GX_LIGHT kind:data(any) addr:0x02093dc0
 DEFAULT_CAMERA_PROJECTION kind:data(any) addr:0x02093dc8
 DEFAULT_LOOKAT kind:data(any) addr:0x02093de8
-data_02093e0c kind:data(any) addr:0x02093e0c
+sOBJImageLoadFuncs kind:data(any) addr:0x02093e0c
 obj_char_lut kind:data(any) addr:0x02093e1c
 pltt_type_lut kind:data(any) addr:0x02093e24
 data_02093e44 kind:data(any) addr:0x02093e44

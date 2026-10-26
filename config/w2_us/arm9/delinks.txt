@@ -58,7 +58,7 @@ src/gfl/arc_tool.c:
 src/gfl/arc_util.c:
     complete
     .text       start:0x0204adb4 end:0x0204b6d4
-    .rodata     start:0x02093e48 end:0x02093e70
+    .rodata     start:0x02093e38 end:0x02093e70
     .data       start:0x0209afc4 end:0x0209afd0
 
 src/gfl/textprint.c:

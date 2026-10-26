@@ -5350,6 +5350,7 @@
 . 0x020932f0 sBaseCommands
 . 0x02093378 sDaysBeforeMonth
 . 0x02093390 sDefaultFont
+. 0x02093e0c sOBJImageLoadFuncs
 . 0x02093e48 sSurfaceTypes
 . 0x02093e4c sTransferFuncs
 . 0x02093e54 sAnimSetFrameFuncs
