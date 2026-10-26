@@ -21,13 +21,6 @@ in both versions.
 | `lib/dwc/src/auth/AuthService.c` | (`.data` order) | `0x021c1ab8` / `0x021c1af8` | Every function matches in both versions. With `-ipa file` (the ROM has the 257-byte RSA modulus in a section of its own, 4-aligned after the exponent) the file links byte for byte but for the order of its code's string literals, and the pool words that point at them: the ROM has `responseCode`, `certificate`, `peerkeyprivate`, `ns1`, `version`, `partnercode`, `namespaceid`, `profilenick` and `uniquenick` ahead of `LoginRemoteAuthResult`, the first string `Auth_OnResponse` uses, where ours has each string at its first use in the live functions. MWCC puts a literal before the first function that uses it, and those nine are in the order of their first uses in GameSpy's profile and unique-nick logins (`wsLoginProfile`, `wsLoginUnique` and their response callbacks), which GameSpy's authentication code has before the remote login: most likely functions of this file that the original link dead-stripped with their own strings, which `-nodead` can't reproduce. BW1's `authservice.c` (another decomp, ARM at dsi/1.1p1 where ours is Thumb at dsi/1.2) has the same eight live functions and the nine strings in the same order ahead of `LoginRemoteAuthResult`, which supports the dead-stripped logins, and keeps every string as extern data. |
 | `lib/dwc/src/nd/nd.c` | `ReleaseRequest` | `0x021a5e3c` / `0x021a5e7c` | Natural nonvolatile parameter: 0x28 bytes against 0x36 in both versions. The original reloads the by-value request from the stack for each use and retains its final zero store. The inherited `volatile int` reproduces that output, but no thread, interrupt or callback can change this local, so it is rejected. The recovered API/engine file boundary and engine `-ipa file` setting resolve the data layout; `nd_api.c` is complete, while the engine stays partial for this function. |
 
-## Matching, but not linkable as is
-
-- `lib/dwc/src/auth/dwc_profanity.c` (overlay 11), DWC's profanity check, matches its 6 functions in both versions,
-  and with `-ipa file` its `.data` up to the strings of `DWCi_CheckProfanityAsync`, but the ROM has 4 zero bytes between
-  `"/ac"` and `"/pr"` that nothing references: most likely a literal `""` of code that the linker stripped, which MWCC
-  lays out only for a function it emits. The file stays incomplete.
-
 ## Keeping this list current
 
 After changing a source file, run `compiler_probe.py` on it for both versions, and add, update or remove its rows. A file

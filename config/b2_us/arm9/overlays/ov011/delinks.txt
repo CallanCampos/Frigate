@@ -417,6 +417,7 @@ lib/dwc/src/auth/dwc_conntest.c:
     .bss        start:0x021905fc end:0x02190690
 
 lib/dwc/src/auth/dwc_profanity.c:
+    complete
     .text       start:0x0216bbe4 end:0x0216c154
     .data       start:0x02185f10 end:0x02185fd4
     .bss        start:0x02190690 end:0x02190694

@@ -4078,6 +4078,10 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   itself prove that code was dead-stripped: inline linkage and named metadata can place strings in the shared data
   section before the separate code-literal sections. Overlay 28's separate groups of empty strings still need their
   own boundary/emission explanation.
+- `dwc_profanity.c`'s apparent four-byte gap between `"/ac"` and `"/pr"` belongs to the authentication-path literal:
+  a reference object records five bytes, `"/ac\0"` including the implicit terminator. Four-byte section alignment
+  places `"/pr"` eight bytes after its start. Restoring the explicit zero matches the full file in both versions with
+  its existing `-ipa file` setting; no extra object or dead function is needed.
 - Ordinary code literals are created during code generation, for references that survive optimization, so they come
   after a file's shared file-scope data. Dead code, unused locals and folded asserts create none. A literal earlier
   than every surviving ordinary code reference can come from code the original linker stripped, but shared inline

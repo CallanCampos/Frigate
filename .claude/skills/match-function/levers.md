@@ -1050,6 +1050,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
   their statics, is an exception to "Write C from the asm", made for `wipe_sub.c`'s 31 handlers (with the two
   `wipe_wnd.c` readers they call) alone; any other file is another exception for the maintainer to accept. Making the objects globals instead isn't kept.
   (matching.md: "A function-local static of a function MWCC doesn't emit"; configs.md: "Dead-stripped code")
+- A four-byte gap after a string can be its explicit extra terminator plus alignment (`dwc_profanity.c`'s `"/ac\0"`).
+  Check the literal's recorded size before adding an object. (matching.md: "apparent four-byte gap")
 - String literals in another order: MWCC lays them out in the order they first appear in the source; a `""` the
   game has before the file's name needs an earlier use. (matching.md: "String literals")
 - A literal laid out before every surviving use of it: code the original link dead-stripped. Each code literal has a
