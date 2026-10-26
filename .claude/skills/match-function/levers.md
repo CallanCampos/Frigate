@@ -257,6 +257,10 @@ text to `grep -n` there. Entries without a key come from later work and still be
   initialized local can move its stack slot. (matching.md: "ignores the `register` storage class")
 - A byte tested, then used in both branches, in the wrong register: read it from the array again in each branch
   (`if (data[q] & 0xf0)`, `g = data[q++] << 6`) instead of through a variable. (matching.md: "read again from the array")
+- A commutative `adds` with its operands swapped: build the sum in two statements, the first operand assigned first
+  (`c4 = d - e; c4 = c4 + a5 + c6;`). (matching.md: "follow how the sum was built")
+- A divisor loaded into r1 and shifted in place where the original loads r0 and shifts into r1: compute it into a
+  variable first (`x = hFactor * 8; mcusX = width / x;`). (matching.md: "A divisor computed into a variable")
 
 ## Stack slots or frame size
 

@@ -822,6 +822,16 @@ Same instructions, registers swapped.
   the variable. `Mel_JPEGDecode` (`ssp_jpegdec.c`) loads a DQT table's precision byte into r2 for `tst` and shifts it
   into the table offset in each branch; `s = data[q]; if (s & 0xf0)` loads it into r0 and moves the size check's
   temporaries, while `if (data[q] & 0xf0)` with `j = (data[q++] & 0xf) << 6` and `g = data[q++] << 6` matches.
+- The operands of a commutative `adds` follow how the sum was built, not the order it is written in. The SSP
+  encoder's `Yos_JpegEncoderForwardDct` (`ssp_jpegenc.c`) adds a sample difference and `a5` as `adds r3, r4, r3`, the
+  difference first; `c4 = block[i + 24] - block[i + 32] + a5 + c6` in any grouping gives `adds r3, r3, r4`, while the
+  difference assigned first, `c4 = block[i + 24] - block[i + 32]; c4 = c4 + a5 + c6;`, matches. In the same function
+  a product assigned back to its operand (`c2 = c2 * 181`) is multiplied in a copy, as the original does, where a
+  product into a variable of its own was not.
+- A divisor computed into a variable of its own (`x = hFactor * 8; mcusX = width / x;`) is loaded into one register
+  and shifted into the argument register (`ldr r0; lsls r1, r0, #3`); written inline, `width / (hFactor * 8)` loads
+  into r1 and shifts in place, and the load is scheduled before the previous result's store. `Yos_JPEGEncode`
+  (`ssp_jpegenc.c`) needs it for both of its MCU divisions.
 
 ## Stack slots
 
