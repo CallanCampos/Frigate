@@ -2318,7 +2318,7 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 | `ctvt_game_cam.c` | `0x021a8090`–`0x021a9704` | 67 | complete | string at `0x021b2694` |
 | `ctvt_game_cam_graphic.c` | `0x021a9704`–`0x021a98d4` | 8 | complete | string at `0x021b26a4` |
 | `comm_tvt_sys.c` | `0x021a98d4`–`0x021aafdc` | 75 | complete | string at `0x021b26c8` |
-| `ssp_jpegdec.c` | `0x021aafdc`–`0x021ac664` | 12 | partial | descriptive |
+| `ssp_jpegdec.c` | `0x021aafdc`–`0x021ac664` | 12 | complete | descriptive |
 | `ssp_exifdec.c` | `0x021ac664`–`0x021acc64` | 4 | complete | descriptive |
 | `ssp_jpegenc.c` | `0x021acc64`–`0x021ae378` | 21 | partial | descriptive |
 | `ssp_exifenc.c` | `0x021ae378`–`0x021af740` | 11 | complete | descriptive |

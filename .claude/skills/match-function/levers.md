@@ -255,6 +255,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
   `int c;` declared first at the top. (matching.md: "declared first at the top")
 - Don't try `register` for allocation or a counter that nothing reads: MWCC 2.0/sp2 ignores it. A `const` on an
   initialized local can move its stack slot. (matching.md: "ignores the `register` storage class")
+- A byte tested, then used in both branches, in the wrong register: read it from the array again in each branch
+  (`if (data[q] & 0xf0)`, `g = data[q++] << 6`) instead of through a variable. (matching.md: "read again from the array")
 
 ## Stack slots or frame size
 

@@ -817,6 +817,11 @@ Same instructions, registers swapped.
   written in struct order: `voiceIconState` (at 0xac) stored after `state` and `waitSound` ends a stretch that already
   holds them, the shared 0 costs one reload less and ties with the 1, and the 0 is spilled and rebuilt as `movs` in each
   group, as in the original.
+- A byte tested and then used in both branches can be read again from the array in each branch rather than kept in a
+  variable: value numbering shares the one load, and the shared load, a temporary of its own, colours differently from
+  the variable. `Mel_JPEGDecode` (`ssp_jpegdec.c`) loads a DQT table's precision byte into r2 for `tst` and shifts it
+  into the table offset in each branch; `s = data[q]; if (s & 0xf0)` loads it into r0 and moves the size check's
+  temporaries, while `if (data[q] & 0xf0)` with `j = (data[q++] & 0xf) << 6` and `g = data[q++] << 6` matches.
 
 ## Stack slots
 
