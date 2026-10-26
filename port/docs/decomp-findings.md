@@ -29,7 +29,7 @@ nonmatching row the port checks, go here too.
 | `src/ov036/field_buildmodel.c` (`FieldPropSystem_Free`, `FieldPropHandle_Free`; complete), with `src/ov036/field_g3d_mapper.c` (`FieldG3DMapper_Free`; complete) | A memory bug of the game, unmarked: the mapper frees the map's chunks, and with them their prop instances (`FieldChunk_Free`, `src/ov012/field_g3d_map.c`), before the prop system, whose handles that still hold a prop then show it again (`FieldChunkPropHolder_SetVisible`) by a write of 4 bytes into the freed instances. A handle that a script made (`s0127_BMCreateHandleByGPos`) and didn't release reaches it at the field's end: New Game's intro, at its change of map into the player's house. The write lands inside the freed block, past the heap's heads, and `oracle_aspertia` matches melonDS across it; the same in the ROM | Fixed under `PLATFORM_PC`: the system's handles let go of their holders before they are freed (H5 of [sanitizers.md](sanitizers.md)). The decomp could mark it `// BUG:` | 2026-10-24, the sanitized build's field sequences |
 | `src/system/app_taskmenu.c` (`AppTaskMenu_PulseCursorColor`, `AppTaskMenuWin_PulseColor`; complete), called through `AppTaskMenu_Update` by `src/ov012/report_event.c` (`Report_UpdateYesNoMenu`) | A memory bug of the game, unmarked: a task menu's update queues the VBlank transfer of its cursor's pulsing color from the menu itself (`NNS_GfdRegisterNewVramTransferTask`), and the report frees the menu in the same pass, once its flash ends, so the VBlank's copy reads freed memory. It still holds the color unless the pass allocates over it first; the same in the ROM. Any caller that frees a menu in the pass of its last update does the same | Fixed under `PLATFORM_PC`: the color is transferred from a slot of its screen and palette that outlives the menu, holding the same color (H6). The decomp could mark it `// BUG:` | 2026-10-24, the sanitized build's field sequences |
 | `src/ov036/field_camera.c` (`FieldCamera_RefineDerivedAngles`; complete) | A bug of the game, unmarked: the angles a degree either side of the yaw and pitch (`yaw - DEG_TO_IDX(1)` and the rest) aren't wrapped to 16 bits, so within a degree of a full turn `FX_SinIdx` and `FX_CosIdx` index outside `FX_SinCosTable_`. The ROM reads its neighbours: zeros before the table (the end of `FS_VTABLE_BASE` in `lib/nitro/src/fs/fs_command_default.c`, `0x0209468c` to `0x020946bb` in Black 2, `0x020946b8` to `0x020946e7` in White 2) and `FX_AtanIdxTable_` after it (`lib/nitro/src/fx/fx_atanidx.c`). The entrance camera reaches it at a yaw of 0, as the player arrives in the house in New Game's intro. With those zeros, a yaw under 16 and a direction whose x is above 0 make one division's divisor 0, which the ROM's `_s32_div_f` answers with the dividend; no route reaches that | Fixed under `PLATFORM_PC`: the six reads give the ROM's values, and that division the dividend for a divisor of 0 (R11). The decomp could mark it `// BUG:` | 2026-10-24, the sanitized build's field sequences |
-| `src/ov036/fld3d_ci.c` (`EventFld3DCiBitmapConv_Callback`, with `Fld3DCi_ConvG2DToG3D`) | A memory bug of the game, unmarked: the trainer cut-in converts each of its 2D pictures to a texture in a bitmap, queues the VBlank transfers of the texture from the bitmap and of its palette from the palette file, and frees both in the same pass (`GFL_BitmapFree`, `GFL_HeapFree(ci->paletteData)`), so the VBlank's copies read freed memory (3,856 bytes of the texture), which on the DS still holds them unless the pass allocates over it first; the same in the ROM. The palette's copy reports at the texture's place, so the survey shows the texture's alone | Implemented under `PLATFORM_PC`: each conversion retains its character data, palette data and bitmap in an independent record until a one-shot VBlank task runs after the upload queue is drained. The scene's heap remains alive through its animation. Allocation/task exhaustion stops with a diagnostic; no game pass is added. H7 of [sanitizers.md](sanitizers.md) reproduces in strict LLVM at frame 6,410; post-fix validation pending | 2026-10-24, the sanitized build's survey of the Route 19 route |
+| `src/ov036/fld3d_ci.c` (`EventFld3DCiBitmapConv_Callback`, with `Fld3DCi_ConvG2DToG3D`) | A memory bug of the game, unmarked: the trainer cut-in converts each of its 2D pictures to a texture in a bitmap, queues the VBlank transfers of the texture from the bitmap and of its palette from the palette file, and frees both in the same pass (`GFL_BitmapFree`, `GFL_HeapFree(ci->paletteData)`), so the VBlank's copies read freed memory (3,856 bytes of the texture), which on the DS still holds them unless the pass allocates over it first; the same in the ROM. The palette's copy reports at the texture's place, so the survey shows the texture's alone | Implemented under `PLATFORM_PC`: each conversion retains its character data, palette data and bitmap in an independent record until a one-shot VBlank task runs after the upload queue is drained. The scene's heap remains alive through its animation. Allocation/task exhaustion stops with a diagnostic; no game pass is added. H7 of [sanitizers.md](sanitizers.md) reproduces in strict LLVM at frame 6,410; both complete strict route batches pass | 2026-10-24, the sanitized build's survey of the Route 19 route |
 
 ## Field step-sound callback prototype (R12)
 
@@ -39,7 +39,7 @@ Strict LLVM UBSan on the native early Hugh route stopped after 3,809 frames in
 difference. The host now uses a `BOOL(u32)` wrapper with an explicit `(u16)` argument, preserving the low-half tile
 class that the caller already passes. The original DS tokens stay under `#else`; no sanitizer check is disabled.
 Both-version MWCC tokens match `f786fed` (2/2). Replaying the same Hugh input and seed passes this earlier stop at
-3,809 frames, then stops at frame 3,873 on a separate typed-context mismatch in `VM_Run`; full T5 remains pending.
+3,809 frames, then stops at frame 3,873 on a separate typed-context mismatch in `VM_Run`; both complete six-case strict batches now pass.
 
 ## Field VM's erased context callback type (R13)
 
@@ -51,7 +51,7 @@ the field, trainer-AI, battle-effect and Musical constructors; native registrati
 Only a host `VM_CallCommand` around the two command-table calls receives the function-type exception, following R3's
 existing erased-context policy. `VM_Run`, its native callbacks and four-argument verifier remain checked. R12's
 numeric mismatch is fixed with a typed wrapper, not exempted. Both-version MWCC tokens match `f786fed` (2/2);
-post-fix replay remains pending.
+both complete six-case strict batches now pass.
 
 ## Sound heap disposal before ARM7 invalidation completes (H8)
 
@@ -63,14 +63,13 @@ The narrow host fix waits while owners are still alive, then releases them, in b
 the original DS order under `#else` and changes no hardware FIFO timing, sound data, poisoning or check coverage.
 Actual SDK heap/list functions with a mock queued command verify ownership during the wait and zero-callback
 behavior: all four new cases pass. With isolated old `f786fed` SDK source and the same driver/list implementation,
-both callback cases fail and both zero-callback cases pass. Both-version MWCC neutrality and full post-fix gameplay
-remain pending.
+both callback cases fail and both zero-callback cases pass. Both-version MWCC neutrality and both complete strict native replay batches now pass.
 
 The remaining H8 host failure was traced separately: the packet-first sound service invalidated an active PCM
 voice after `ExChannelMain` had already queued `SND7_SYNC_START`. The subsequent register update stopped and then
 restarted it from the disposed range. Invalidation now cancels that pending start as well as the existing start
 flag and hardware stop. Other pending updates and voices outside the range are preserved; no FIFO timing or wave
-snapshots change. The new strict audio regression and seven existing fidelity scenarios pass; full replay pending.
+snapshots change. The new strict audio regression and seven existing fidelity scenarios pass; both full strict route batches pass.
 
 ## Encounter callback prototypes (R14)
 
@@ -80,7 +79,7 @@ constructors take `BOOL` and five ripple/grid constructors have no third argumen
 erasure, separate from the previously corrected encounter-table addresses. Host-only typed adapters in
 `src/ov036/enceff_data.c` preserve each real constructor and parameter. All 27 cut-in creators stay unchanged,
 and the DS macro retains every original cast. The actual-table regression invokes all 38 entries with
-unsuppressed UBSan and passes; full route validation and final ROM neutrality are pending.
+unsuppressed UBSan and passes; both strict/oracle route suites and both-version ROM neutrality pass.
 
 ## NODEMIX normal-matrix load bounds (R15)
 
@@ -90,7 +89,7 @@ The three extra stack words affect only translation that the following position-
 separate from the geometry HAL, whose 12-word packet is correct. The host copies the nine used words into a
 complete zero-initialized `MtxFx43`; the DS retains its original call. The actual-SDK geometry regression checks
 all 35 emitted words and the resulting weighted normal and position matrices under ASan/UBSan and passes.
-Final route and ROM-neutrality validation are pending.
+Both strict/oracle route suites and both-version ROM neutrality pass.
 
 ## PC inactive-selection remainder (R16)
 
@@ -98,4 +97,12 @@ Both strict PC routes stop at frame 6,120 in `Box2Obj_UpdateRangeDots` (`src/ov2
 starts with all four coordinates zero, so its perimeter is zero even while hidden; its animation divisor is
 initialized to 384. MSL's DS `_s32_div_f` returns a zero remainder for a zero divisor, but host C modulo zero
 is undefined and x86 faults. The host now explicitly gives zero position for that perimeter, preserving all
-nonzero arithmetic and the original DS expression. Full PC replay and final neutrality validation are pending.
+nonzero arithmetic and the original DS expression. Both full strict/oracle PC routes and both-version ROM neutrality pass.
+
+### PC save repeatability within the tested route
+
+Repeated native PC saves can differ in the first party member's third unused empty-mail sentence ID
+(`0x18ed6`, mirrored in the second copy) and derived CRCs. After withdraw/swap this is Purrloin: the same
+`CreateMailData` / `PMSData_Clear` initialization gap documented for the catch, now in another party slot.
+All block CRCs remain valid. No new comparison mask is added: the PC route has frame/state and strict native
+coverage, while an independent PC-produced-save DS round trip remains future coverage.

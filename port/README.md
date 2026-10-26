@@ -20,7 +20,8 @@ and goes into a house and out again (phase 3's exit, met on 2026-10-24), CONTINU
 menu opens the party list and a Pokémon's summary, the Pokédex, the bag and the trainer card. Tests compare these paths
 frame by frame with melonDS and check the sound driver, music and cries. Phase 4's integrated route adds Hugh's
 battle, Bianca's capture demo, a wild catch, PC deposit/withdraw/swap and save continuations. The imported branch
-records both-version oracle results; this integration's final verification is pending. Hugh's CPU-time-dependent
+records both-version results; the integrated route now passes all eight fresh oracle cases and strict native replays
+in each version, including catch/save/new-process reload. Hugh's CPU-time-dependent
 AI decision is an explicit comparison cut, followed by save-state and same-save continuation checks rather than a
 claim of an identical battle. Both upstream encounter fixes are already included.
 [docs/STATUS.md](docs/STATUS.md) records the checks and remaining work.

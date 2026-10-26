@@ -32,12 +32,75 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
 
+## 2026-10-26: Phase 4 catch, save, quit and reload validated in both games
+
+Completed local validation of the recovered route, not a completed upstream sync or a release. The ready PR and its
+exact-head local/hosted checks are the publication record. ADR 0023 remains **proposed** for owner review.
+
+- **Upstream:** unchanged, `deb044db2d3d` from reviewed main `f786fed993` (PR 41); no pending upstream changes imported.
+- **Port:** `PORT_SHA`, on `codex/phase4-route`. Integration `91d0874aa9` retains reviewed main and the original
+  Phase 4 history as parents. Runtime fixes are `9a8d4f2a0c`; this entry and the final proof updates change records
+  only. Original `wt-p4` and `wt-p4b` HEADs, staged patches and working patches were rechecked unchanged; a separate
+  verified self-contained history bundle and binary patches preserve the unfinished work.
+- **ROM (T0):** `.venv/bin/python configure.py b2_us w2_us && ninja -j2`, with Homebrew LLVM first on `PATH`:
+  both SHA1s match, B2 `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb`,
+  W2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`. All eight changed game/SDK files preprocess identically
+  to reviewed main in both versions: `check_mwcc_neutral.py --base f786fed993 --jobs 2`, 16/16.
+- **Host build (T1):** ordinary Apple-clang and strict Homebrew LLVM all-target builds pass in both versions on
+  arm64 macOS. Sanitizer recovery and frame-time report-only mode remain off.
+- **Tests (T2/T3):** `ctest --test-dir build/p4-<version> --output-on-failure --no-tests=error -j1 -LE oracle`:
+  B2 310 pass, three explicit skips of 313; W2 307 pass, three explicit skips of 310. Each includes five real
+  assembly-oracle cases (5/5, no skips), the pointer guard and short replay/hash regressions. The three skips are
+  the two negative C-function-sanitizer probes unsupported by Apple clang and the single-architecture build's
+  universal-slice check. Homebrew LLVM passes all four VM dispatch cases, including both negatives. The separate
+  strict core suites pass 295 with one universal-slice skip of 296/version (route/timing/oracle, pointer guard and
+  assembly oracle excluded there). Oracle helper unit tests pass 56/56.
+- **Timing (T3):** ordinary title/start-menu checks in both versions and B2 New Game pass the existing 8.36 ms
+  p95 budget. Separately, `ctest -R '^frame_times_party_menus$' -j1` passes in both versions (including the save
+  fixture, 2/2 each, zero skips). Report-only mode stays off; there are no load-related skips.
+- **Oracle (T4):** fresh saves and `oracle_hugh`, `oracle_route19`, `oracle_catch`, `oracle_catch_continue`,
+  `oracle_center_continue`, `oracle_pc`, `oracle_round_trip_catch`, `oracle_round_trip_hugh` all pass: 9/9 including
+  `oracle_saves` per version, zero skips. The final batches take 2,415.80 s B2 and 2,382.20 s W2. Runtime source
+  and binary hashes remain unchanged through both batches and the windowed tests. Hugh's comparison ends before
+  the CPU-time-dependent AI decision: 8,165 B2/8,157 W2 matched frames, then the completed native battle's save
+  and continuation. Catch compares 10,988 B2/10,481 W2 and PC 11,003 B2/10,926 W2 frames, with only the existing
+  documented tolerances and exclusions; this is not a claim of identical pixels on every pass.
+- **Sanitizers (T5):** six full strict ASan/UBSan native cases pass per game: Hugh 19,000 frames, its own-save
+  continuation 3,610, Route 19 15,400, catch/SAVE 11,600, its own-save continuation 4,700 and PC 11,600.
+  Each uses its named committed `pbwinput`, an isolated save directory and fatal sanitizer diagnostics. All reach
+  their final frame and exit zero without an ASan, UBSan or leak report. No recovery or broader suppression added.
+- **Saves (T6):** eight produced saves (Hugh, Route 19, catch and PC per version) have all 70 CRC blocks valid in
+  each copy and valid decrypted gift checksums. Hugh/catch have no undeclared decrypted differences against fresh
+  DS saves; existing narrowly traced byte declarations are unchanged. Both engines continue the same native catch
+  save; the native continuations match DS on 4,679 B2/4,671 W2 frames. The catch-save differences are 34 declared
+  bytes total across both copies (17/copy). Both own-save continuations leave the input save byte-identical.
+- **Playtest (T7):** both windowed, paced catch/SAVE runs exit, then a new process reloads that produced save and
+  opens the party. Screens inspected at battle, Gotcha, SAVE, CONTINUE and the party show Tepig and caught Lv4
+  Purrloin in both games. Produced SHA1s are B2 `7dccc2407c3c2093cd32a51353d50e69887133b5`,
+  W2 `3ab0a1aa07b16a677293a072bf7a8792efadd116`, identical to the T4 saves successfully continued by melonDS;
+  reload leaves them unchanged. These are local artifacts only; no saves, ROMs or captures are published.
+- **Tiers:** unchanged: 40,440 matching functions, 509 present/nonmatching, 68 missing (excluding 2,385 veneers);
+  code bytes a/b/c: B2 3,769,504/76,454/4,302; W2 3,769,592/76,454/4,302.
+- **Trap stubs:** unchanged, 25 functions and 20 data placeholders/build; none hit by these routes.
+- **64-bit warnings:** strict guard in both ordinary suites: 365 sites/229 keys, real 66, harmless 123, handled
+  141, unreachable 35; 1,701 compiled inputs, zero uncompiled. The classified baseline is unchanged.
+- **Work done:** recovered Phase 4 routes/coverage and dirty oracle fixes while preserving current-main fixes.
+  Added bounded SDK string/NODEMIX reads, typed encounter/tile callbacks, cut-in upload owners, safe sound-heap
+  invalidation and queued-start cancellation, and the PC zero-perimeter guard. Only the audited two VM command-table
+  calls gain a function-sanitizer exception; native/verifier callbacks stay checked. Actual SDK/driver regressions,
+  guides, findings and lessons document each fix ([game-changes.md](game-changes.md), R10/R12–R16/H7/H8).
+- **Next:** review ADR 0023 and the ready Phase 4 PR, then Phase 5's first story-progression route beyond this
+  coverage, retained as an oracle/sanitizer regression. Other PC apps, items/Battle Box and an independently
+  produced PC save's DS round trip remain additional coverage.
+- **Blockers:** no remaining source blocker for the Phase 4 exit route. Trainer AI's CPU-time divergence remains
+  explicitly bounded by the proposed ADR; whole-story progression and release readiness are not established.
+
 ## 2026-10-26: Phase 4 recovered and hardened; final validation running
 
 Preparation checkpoint, not a completed milestone or upstream sync. Final results follow in a later entry.
 
 - **Upstream:** unchanged, `deb044db2d3d` from reviewed main `f786fed993` (PR 41).
-- **Port:** `PORT_SHA`, `codex/phase4-route`, after integration `91d0874aa9`; original worktrees and their dirty
+- **Port:** `9a8d4f2a0c`, `codex/phase4-route`, after integration `91d0874aa9`; original worktrees and their dirty
   patches remain untouched and independently backed up in a verified self-contained Git bundle.
 - **ROM:** configure/Ninja passes both SHA1s (T0): B2 `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb`,
   W2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`. All eight changed game/SDK files preprocess identically
