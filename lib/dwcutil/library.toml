@@ -39,6 +39,8 @@ flags = [
 "dwc_moveid.c" = "dsi/1.1p1"
 
 [file_flags]
+# atermset.c's data sits in the ROM in one sort by size across .bss, .data and .rodata, as -ipa file lays it out
+"atermset.c" = ["-ipa file"]
 "dwc_mov_mbp.c" = ["-inline on,noauto", "-ipa file"]
 "dwc_mov_wh.c" = ["-inline on,noauto", "-ipa file"]
 "dwc_moveid.c" = ["-inline on,noauto", "-ipa file"]

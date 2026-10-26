@@ -3407,15 +3407,17 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `NHTTPi_getUrlEncodedSize2` (`c = *s++;` under `i < length`) shows the same copy.
 - Two identical conditional branches in a row ahead of a loop (`cmp r4, #0; ble end; ble end`) are an `if (n > 0)`
   around a `for` whose counter was set before the `if`: `int i = 0; ... if (length > 0) { for (; i < length; i++) ... }`
-  in NHTTP's `NHTTPi_getUrlEncodedSize2`, and the copy loop of `atermset.c`'s `ScanAP` (still in its row). A
-  bare `for`, or the `if` without the earlier start, gives one branch.
+  in NHTTP's `NHTTPi_getUrlEncodedSize2`. A bare `for`, or the `if` without the earlier start, gives one branch.
 - MWCC 2.0 drops a loop counter that only indexes what the loop steps by pointer, with all its stores and steps, unless
   the same variable is read as a value elsewhere before the loop. `atermset.c`'s `ScanAP` copies the access
   points with `for (; j < count; j++)`, storing to `scan->Bssid[i]` and stepping `i` after `bss++`; the original
   zeroes, stores and steps `i` without reading it, and so does ours once the same `i` holds the AP list's length in the
   event loop before (`i = UtilAcWcm_GetApList(...); if (i > count) { count = i; ... }`). Assigned in the `if`'s
   condition, read only by a `switch`, or read after the loop, it is dropped. The loop's part of a variable reused this
-  way is spilled to the lowest slot, below the loop's temporaries.
+  way is spilled to the lowest slot, below the loop's temporaries. Under `-ipa file`, which the file turned out to be
+  built with (below), the counter is kept without that read: `ScanAP` matches with the length in a local of its own
+  (`found`), `for (j = 0, bss = (WMBssDesc *)sAcApList; j < count; j++, bss++)` and `i++` as the body's last
+  statement.
 
 ## Switches
 
@@ -3899,11 +3901,17 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 - MWCC 2.0 sorts only that list: an object defined after the first function is written out, unsorted and in
   declaration order, with the next function, ahead of its string literals. So a ROM whose tables sort by size among the
   file's initialized statics had them above the first function, and data that sits between two functions' literals
-  was defined between them. `atermset.c`'s ten 1024-byte AES tables come out in the ROM's heapsort order (Td2 to Td4,
-  Te0 to Te4, Td0, Td1, after `rcon`) only defined among the setup's state statics, in the order that the forced
-  assignment ("invert the model", below) gives, and its host name and MD5 padding sit after
-  `CheckAccessPoint`'s literal and before `GetMacEncKey'`, so they are defined between those functions, the name
-  forward-declared (`static char sAcHostName[12];`) for the SOC configuration that points to it.
+  was defined between them.
+- Under `-ipa file`, MWCC 2.0 writes every object of the file ahead of its functions in one heapsort by size, the
+  objects of 4 bytes or less in one `.bss` and one `.data` section and each other one in a section of its own, and
+  only function-local literals with their functions; objects of one size come out in an order that depends only on
+  the sequence of sizes defined, so reordering the definitions of one size, with the sizes in place, places them.
+  The DWC utility's `atermset.c` has that layout: its ROM `.data` starts with five words and the SOC configuration,
+  then a 7-byte string ahead of the `.rodata` whose first object is 7 bytes, a 12-byte one and the MD5 padding. Its
+  file matches under the flag with the configuration as five word statics (a struct of them sorts as its 20 bytes),
+  the `"******"` SSID a named `char[]`, the host name a literal in the SOC configuration, the hello's seven bytes a
+  local array's initializer (`u8 id[7] = { ... }`, in `.rodata`), and the statics of each size reordered so that the
+  sort puts them where the ROM has them; without the flag, `ScanAP` keeps 28 bytes of stack slots off.
 - Under MWCC 2.0 without `-ipa file`, a tentative static of struct type joins the shared `.bss` section after the
   initialized statics, while a tentative byte array gets a section of its own, in the reverse of the definitions:
   `atermset.c`'s key of the first exchange, a 16-byte struct of two MAC addresses and a tag, came out ahead of the

@@ -1015,6 +1015,11 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 ## Data and sections
 
+- A file whose data sits ahead of all its functions, sorted by size across `.bss`, `.data` and `.rodata`: build it with
+  `-ipa file`, write word "structs" as separate statics and strings as the literals or arrays they are, and reorder
+  the definitions of each size until the sort places them. (matching.md: "Under `-ipa file`, MWCC 2.0 writes every
+  object")
+
 - Duplicate protocol literals pooled once, with two independently grouped sets of globals: verify original
   source boundaries (`dwc_main.c`/`dwc_match.c`). (matching.md: "boundary at `DWC_AddMatchKeyInt`")
 - MSL exception indices before ordinary rodata: restore `-Cpp_exceptions on` and register the emitted `.exceptix`.

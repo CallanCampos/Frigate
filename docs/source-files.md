@@ -1813,7 +1813,7 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 | `aoss.c` | `0x021a49d0`–`0x021a6c1c` | 71 | complete | descriptive |
 | `aosslink.c` | `0x021a6c1c`–`0x021a71fc` | 12 | partial | descriptive |
 | `apc.c` | `0x021a71fc`–`0x021a7858` | 9 | complete | descriptive |
-| `atermset.c` | `0x021a7858`–`0x021ab040` | 66 | partial | descriptive |
+| `atermset.c` | `0x021a7858`–`0x021ab040` | 66 | complete | descriptive |
 | `anime.c` | `0x021ab040`–`0x021ab17c` | 3 | complete | descriptive |
 | `button.c` | `0x021ab17c`–`0x021ab588` | 15 | complete | descriptive |
 | `comment.c` | `0x021ab588`–`0x021ab63c` | 3 | complete | descriptive |
