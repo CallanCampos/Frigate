@@ -23,6 +23,7 @@ lib/dwcutil/src/aoss.c:
     .bss        start:0x021c1ba0 end:0x021c2980
 
 lib/dwcutil/src/aosslink.c:
+    complete
     .text       start:0x021a6c5c end:0x021a723c
     .data       start:0x021c0688 end:0x021c06b8
     .bss        start:0x021c2980 end:0x021c2ae0

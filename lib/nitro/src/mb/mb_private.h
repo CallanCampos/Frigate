@@ -100,6 +100,12 @@ enum {
 #define WM_ATTR_FLAG_MB 2
 // A beacon that says there is no game to offer
 #define WM_ATTR_FLAG_CS 8
+// What a beacon's game info starts with when a NitroSDK program set it
+#define WM_GAMEINFO_MAGIC_NUMBER 1
+
+// How long a child's scan stays on a channel, in milliseconds, and while it is locked on a parent
+#define MB_SCAN_TIME_NORMAL 10
+#define MB_SCAN_TIME_LOCKING 220
 
 // The digest areas of the TWL header: the offsets and sizes of the regions of the ROM
 typedef struct {
@@ -227,7 +233,7 @@ struct MBGameInfo {
     u16 memberMask;
     u16 changedMask;
     MBUserInfo members[MB_MAX_CHILD];
-    u8 params[8];
+    u8 params[MB_USER_VOLAT_DATA_SIZE];
     u16 broadcastedPlayerFlag;
     u8 dataAttr;
     u8 seqNoFixed;
@@ -242,8 +248,11 @@ struct MBGameInfo {
 #define MB_BEACON_FIXED_DATA_SIZE 0x62
 // The part of the beacon that its checksum covers, from the checksum on
 #define MB_BEACON_DATA_SIZE 0x68
+// What a beacon carries: a piece of a program's whole record, of its record without the picture, or its players
 enum {
-    MB_BEACON_DATA_ATTR_VOLAT = 2,
+    MB_BEACON_DATA_ATTR_FIXED_NORMAL,
+    MB_BEACON_DATA_ATTR_FIXED_NO_ICON,
+    MB_BEACON_DATA_ATTR_VOLAT,
 };
 
 typedef struct {
@@ -259,16 +268,16 @@ typedef struct {
             u8 index;
             u8 count;
             u8 length;
-            u8 unk_0d;
+            u8 rsv;
             u8 data[MB_BEACON_FIXED_DATA_SIZE];
         } fragment;
         struct {
             u8 playerCount;
-            u8 unk_0b;
+            u8 pad;
             u16 memberMask;
             u16 changedMask;
             MBUserInfo users[4];
-            u8 params[8];
+            u8 params[MB_USER_VOLAT_DATA_SIZE];
         } members;
     } data;
 } MbBeacon;
@@ -281,14 +290,12 @@ enum {
     MB_BEACON_STATE_FIXED,
     MB_BEACON_STATE_VOLAT_START,
     MB_BEACON_STATE_VOLAT,
+    MB_BEACON_STATE_NEXT_GAME,
 };
 
+// What the beacon sends: the list of programs, the one being sent, and how far it is
 typedef struct {
-    u8 unk_00[0x10];
-    u32 mode;
-    void (*callback)(u32 ggid);
-    // The first program, which registering a program changes while the beacon is sent from the list
-    MBGameInfo *volatile gameInfoListTop;
+    MBGameInfo *gameInfoListTop;
     MBGameInfo *nowGameInfop;
     const u8 *srcp;
     u8 state;
@@ -297,8 +304,48 @@ typedef struct {
     u8 flagmentNo;
     u8 flagmentMaxNum;
     u8 beaconNo;
-    u8 unk_2a[0x1e];
+    u8 pad[2];
 } MbBeaconSendStatus;
+
+// The child's side of the beacon, which the game doesn't link (mb_gameinfo.c rebuilds it from ntrtwl's NitroSDK): a
+// parent that a child heard, with the pieces of its program's record that came in so far
+typedef struct {
+    MBGameInfo gameInfo;
+    WMBssDesc bssDesc;
+    u32 getFlagmentFlag;
+    u32 allFlagmentFlag;
+    u16 getPlayerFlag;
+    s16 lifetimeCount;
+    u16 linkLevel;
+    u8 beaconNo;
+    u8 sameBeaconRecvCount;
+} MBGameInfoRecvList;
+
+// The parents that a child heard, and the one its scan is locked on
+typedef struct {
+    u16 usingGameInfoFlag;
+    u16 usefulGameInfoFlag;
+    u16 validGameInfoFlag;
+    u16 nowScanTargetFlag;
+    s16 nowLockTimeCount;
+    s16 notFoundLockTargetCount;
+    u16 scanCountUnit;
+    u8 pad[2];
+    MBGameInfoRecvList list[MB_GAME_INFO_RECV_LIST_NUM];
+} MbBeaconRecvStatus;
+
+// What the reception tells its callback about a parent's record
+typedef enum {
+    MB_BC_MSG_GINFO_VALIDATED = 1,
+    MB_BC_MSG_GINFO_INVALIDATED,
+    MB_BC_MSG_GINFO_LOST,
+    MB_BC_MSG_GINFO_LIST_FULL,
+    MB_BC_MSG_GINFO_BEACON,
+} MbBeaconMsg;
+
+typedef void (*MBBeaconMsgCallback)(MbBeaconMsg msg, MBGameInfoRecvList *info, int index);
+typedef void (*MbScanLockFunc)(u8 *macAddress);
+typedef void (*MbScanUnlockFunc)(void);
 
 // A frame that the parent sends to the children: a type and what goes with it
 typedef struct {
@@ -479,7 +526,10 @@ void MBi_CommParentCallback(u16 event, void *arg);
 // mb_segment.c
 BOOL MBi_MakeBlockInfoTable(MB_BlockInfoTable *layout, const MBCommFile *file);
 BOOL MBi_get_blockinfo(MB_BlockInfo *source, const MB_BlockInfoTable *layout, u16 block, MBCommFile *file);
+
+// mb_common.c
 int MBi_BlockHeaderEnd(u32 length, u16 aidBitmap, void *buf);
+u16 MBi_calc_cksum(const u16 *data, int length);
 
 // mb_gameinfo.c
 void MBi_MakeGameInfo(MBGameInfo *record, const MBGameRegistry *reg, const MBUserInfo *parentUser);
@@ -487,6 +537,7 @@ void MB_UpdateGameInfoMember(MBGameInfo *record, const MBUserInfo *users, u16 me
 void MB_AddGameInfo(MBGameInfo *record);
 void MB_InitSendGameInfoStatus(void);
 void MB_SendGameInfoBeacon(u32 ggid, u16 tgid, u8 attr);
+BOOL MBi_CheckMBParent(const WMBssDesc *bssDesc);
 
 // mb_wm.c
 int MBi_SendMP(const void *data, u32 size, u32 aidBitmap);

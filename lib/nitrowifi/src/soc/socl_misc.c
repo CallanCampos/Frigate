@@ -26,29 +26,18 @@ static BOOL SOCLi_IsIPv4ValidDNSAddr(u32 net_mask, u32 ip, u32 my_ip) {
     BOOL not_loopback = FALSE;
     BOOL ok = FALSE;
 
-    if (ip != 0xffffffff && ip != 0 && my_ip != ip) {
-        if (((my_ip ^ ip) & net_mask) != 0 || (ip & ~net_mask) != 0) {
-            BOOL unicast;
-
-            if (((my_ip ^ ip) & net_mask) == 0 && ((ip & ~net_mask) ^ ~net_mask) == 0) {
-                unicast = FALSE;
-            } else {
-                unicast = TRUE;
-            }
-            if (unicast) {
-                ok = TRUE;
-            }
-        }
+    // The (unsigned int) cast stands in for code MWCC won't otherwise give: it keeps the compiler from sharing the two
+    // (my_ip ^ ip) & net_mask, which the original computes twice
+    if (ip != 0xffffffff && ip != 0 && my_ip != ip &&
+        ((((unsigned int)my_ip ^ ip) & net_mask) != 0 || (ip & ~net_mask) != 0) &&
+        (((((my_ip ^ ip) & net_mask) != 0) || (~net_mask ^ (ip & ~net_mask)) != 0) ? TRUE : FALSE)) {
+        ok = TRUE;
     }
-    if (ok) {
-        if (((ip & 0xff000000) ^ 0x7f000000) != 0) {
-            not_loopback = TRUE;
-        }
+    if (ok && ((ip & 0xff000000) ^ 0x7f000000) != 0) {
+        not_loopback = TRUE;
     }
-    if (not_loopback) {
-        if (((ip & 0xf0000000) ^ 0xe0000000) != 0) {
-            not_multicast = TRUE;
-        }
+    if (not_loopback && ((ip & 0xf0000000) ^ 0xe0000000) != 0) {
+        not_multicast = TRUE;
     }
     return not_multicast;
 }

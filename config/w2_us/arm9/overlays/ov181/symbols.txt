@@ -173,7 +173,7 @@ MBi_InitSendFixedBeacon kind:function(thumb,size=0x3c) addr:0x021a2378
 MBi_SendFixedBeacon kind:function(thumb,size=0xf8) addr:0x021a23b4
 MBi_InitSendVolatBeacon kind:function(thumb,size=0x24) addr:0x021a24ac
 MBi_SendVolatBeacon kind:function(thumb,size=0x1a8) addr:0x021a24d0
-MBWm_IsMultibootBeacon kind:function(thumb,size=0x1c) addr:0x021a2678
+MBi_CheckMBParent kind:function(thumb,size=0x1c) addr:0x021a2678
 changeScanChannel kind:function(thumb,size=0x42) addr:0x021a2694
 MBi_IsSendEnabled kind:function(thumb,size=0x50) addr:0x021a26d8
 MBi_OnInitializeDone kind:function(thumb,size=0x3c) addr:0x021a2728
@@ -313,7 +313,13 @@ sMBCommBeaconData kind:bss addr:0x021a4808
 sMBDataConvWirelessDone kind:bss addr:0x021a480c
 any_recv_bitmap kind:bss addr:0x021a4810
 sRegisteredCount kind:bss addr:0x021a4814
-sSender kind:bss addr:0x021a4818
+sUnlockFunc kind:bss addr:0x021a4818
+sLockFunc kind:bss addr:0x021a481c
+brecvBuffp kind:bss addr:0x021a4820
+mbrsp kind:bss addr:0x021a4824
+sSendVolatCallbackTimming kind:bss addr:0x021a4828
+sSendVolatCallback kind:bss addr:0x021a482c
+mbss kind:bss addr:0x021a4830
 data_ov181_021a47f8 kind:bss addr:0x021a4838
 bsendBuff kind:bss addr:0x021a4860
 data_ov181_021a4828 kind:bss addr:0x021a4868

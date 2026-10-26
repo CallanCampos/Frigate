@@ -1,8 +1,8 @@
 // The multiboot library's use of the wireless manager: the setup of the parent (MB_Init, MB_StartParent), its callbacks
 // for the manager's replies, the scan that the child side of the library starts, and the sending of frames (libmb).
 // It is the SDK's mb_wm_base.c, as ntrtwl's reconstruction of NitroSDK has it. The names are NitroSDK's, as that
-// reconstruction has them, except MBWm_IsMultibootBeacon and the file's objects other than the lifetimes and the
-// power-save flag (sParentName and the rest), which are ours
+// reconstruction has them, except the file's objects other than the lifetimes and the power-save flag (sParentName and
+// the rest), which are ours
 #include "mb_private.h"
 #include "nitro/os.h"
 #include "nitro/pxi.h"
@@ -30,7 +30,6 @@ static MBiParam *sWmWork;
 static u32 sFilterGgid;
 static void *sWmBuf;
 
-static BOOL MBWm_IsMultibootBeacon(const WMBssDesc *desc);
 static int changeScanChannel(WMScanExParam *param);
 static BOOL MBi_IsSendEnabled(void);
 static void MBi_OnInitializeDone(void);
@@ -48,14 +47,6 @@ static BOOL MBi_CommEnd(void);
 static void MBi_SetMaxScanTime(u16 time);
 static int MBi_SetMPData(WMCallbackFunc callback, const void *data, u16 size, u16 unused, u16 aidBitmap);
 static void MBi_CheckWmErrcode(u16 apiid, int result);
-
-// Whether a beacon is one of a program that offers a multiboot download
-static BOOL MBWm_IsMultibootBeacon(const WMBssDesc *desc) {
-    if (desc->gameInfo.magicNumber != 1 || !(desc->gameInfo.gameNameCount_attribute & WM_ATTR_FLAG_MB)) {
-        return FALSE;
-    }
-    return TRUE;
-}
 
 // Moves the scan on to the next channel that is allowed
 static int changeScanChannel(WMScanExParam *param) {
@@ -408,7 +399,7 @@ static void MBi_ChildCallback(void *arg) {
             for (i = 0; i < scan->bssDescCount; i++) {
                 desc = scan->bssDesc[i];
                 entries = work->parent_info;
-                if (!WM_IsValidGameBeacon(desc) || !MBWm_IsMultibootBeacon(desc)) {
+                if (!WM_IsValidGameBeacon(desc) || !MBi_CheckMBParent(desc)) {
                     usable++;
                     continue;
                 }

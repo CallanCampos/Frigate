@@ -13,19 +13,15 @@
 // the DWC utility library's own, as that library's symbols and debug information have them, where the code shows them,
 // and ours elsewhere.
 //
-// MWCC 2.0 lays the statics out in the reverse of their definition order. The four globals are defined with an
-// initializer, which lets the functions below reach them from one base.
+// MWCC 2.0 lays the statics with an initializer out before the others, which follow in the reverse of their definition
+// order; the order of the definitions below gives the ROM's layout. The four globals are defined with an initializer,
+// which lets the functions below reach them from one base, and so are the queue, its messages and the access point's
+// description, which puts the description at its offset from that base (0x40), where AOSSi_WLANConnect reads its SSID
+// length through a pool word of its own.
 
 // The messages of the alarm
 #define WIFI_ALARM_SCAN 0x13
 #define WIFI_ALARM_CONNECT 0x12
-
-typedef struct WCMWepDesc {
-    u8 mode;
-    u8 keyId;
-    u8 key[4][20];
-    u8 padding[14];
-} WCMWepDesc;
 
 static void Set_WLLA_BSS_INFO(const WMBssDesc *bss, WLLA_BSS_INFO *ap);
 static void Get_WLLA_SSID_PARAM(const WLLA_CONNECT_PARAM *param, WMBssDesc *bss);
@@ -33,15 +29,17 @@ static void Set_WLLA_LINK_STAT(WLLA_LINK_STAT *result, const WMBssDesc *bss, int
 static void aoss_apc_callback(int event, int param);
 static void alarmCallback(void *arg);
 
-// 32-byte aligned, as the ROM places them, which also keeps AOSSi_WLANConnect's empty loop
-static WCMWepDesc sWep ATTRIBUTE_ALIGN(32);
-static WMBssDesc sBss ATTRIBUTE_ALIGN(32);
-static OSMessageQueue sAossApQueue;
-static OSMessage sAossApMessages[4];
+// 32-byte aligned, as the ROM places them, which also keeps AOSSi_WLANConnect's empty loop. The WEP settings that
+// APC_Connect takes are bytes, as Black 1's version of the file writes them: the mode, the key's index, and from byte 2
+// the four keys of 20 bytes.
+static u8 sWep[0x60] ATTRIBUTE_ALIGN(32);
+static WMBssDesc sBss ATTRIBUTE_ALIGN(32) = { 0 };
+static OSMessageQueue sAossApQueue = { 0 };
+static OSMessage sAossApMessages[4] = { 0 };
 DWCAossFreeFunc gAossApFree = NULL;
-void *gAossApBlock = NULL;
-void (*gAossApOnModeChange)(int mode) = NULL;
 DWCAossAllocFunc gAossApAlloc = NULL;
+void (*gAossApOnModeChange)(int mode) = NULL;
+void *gAossApBlock = NULL;
 
 // The WM's description of an access point to ours
 static void Set_WLLA_BSS_INFO(const WMBssDesc *bss, WLLA_BSS_INFO *ap) {
@@ -348,18 +346,18 @@ int AOSSi_WLANConnect(const WLLA_CONNECT_PARAM *param, WLLA_LINK_STAT *result) {
         option = 3 << 18;
     }
     option |= 3 << 16;
-    MI_CpuFill8(&sWep, 0, sizeof(sWep));
+    MI_CpuFill8(sWep, 0, sizeof(sWep));
     if (param->keyLength == 5) {
-        sWep.mode = 1;
+        sWep[0] = 1;
     } else if (param->keyLength == 13) {
-        sWep.mode = 2;
+        sWep[0] = 2;
     } else if (param->keyLength == 16) {
-        sWep.mode = 3;
+        sWep[0] = 3;
     } else {
         return -1;
     }
-    sWep.keyId = connected;
-    MI_CpuCopy8(param->key, sWep.key[connected], param->keyLength);
+    sWep[1] = connected;
+    MI_CpuCopy8(param->key, &sWep[connected * 20 + 2], param->keyLength);
     WCM_ClearApList();
     if (APC_SearchStart(NULL, param->ssid, param->ssidLength, 0x30bffe)) {
         tries = 0;
@@ -391,7 +389,7 @@ int AOSSi_WLANConnect(const WLLA_CONNECT_PARAM *param, WLLA_LINK_STAT *result) {
                     Get_WLLA_SSID_PARAM(param, &sBss);
                     for (i = 0; i < sBss.ssidLength; i++) {
                     }
-                    if (!APC_Connect(&sBss, &sWep, option)) {
+                    if (!APC_Connect(&sBss, sWep, option)) {
                         running = FALSE;
                     } else {
                         connected = 1;
@@ -400,7 +398,7 @@ int AOSSi_WLANConnect(const WLLA_CONNECT_PARAM *param, WLLA_LINK_STAT *result) {
                 break;
             case DWC_WCM_EVENT_SEARCH_ENDED:
                 Get_WLLA_SSID_PARAM(param, &sBss);
-                if (!APC_Connect(&sBss, &sWep, option)) {
+                if (!APC_Connect(&sBss, sWep, option)) {
                     running = FALSE;
                 }
                 break;
@@ -411,7 +409,7 @@ int AOSSi_WLANConnect(const WLLA_CONNECT_PARAM *param, WLLA_LINK_STAT *result) {
             case DWC_WCM_EVENT_CONNECT_FAILED:
                 tries++;
                 if (tries < 3) {
-                    if (!APC_Connect(&sBss, &sWep, option)) {
+                    if (!APC_Connect(&sBss, sWep, option)) {
                         running = FALSE;
                     }
                 } else {

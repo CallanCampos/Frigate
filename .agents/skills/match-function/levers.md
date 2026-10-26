@@ -1182,8 +1182,9 @@ may be one the original's global optimizer gave up on, or one that reads an obje
 `WorldTrade_NationSortListMake` matched with its table aligned (with no address evidence that the original aligned it),
 as did `NNS_SndArcStrmInit` with its decode buffer aligned and `BtlvInput_DrawMoveTiles` with its palette table aligned
 (the alignment gave its loop entry and the reloads after each call; inline getters gave the order of its call
-arguments), and `MBi_SendVolatBeacon` shows the same symptom in its row. The lever never applies to a function
-whose original rotates its loops, since the attribute enters every loop of the function with a `b`: `MCSS_MakeMosaic`,
+arguments), as did multiboot's `MBi_SendVolatBeacon` and the loop-free `MBi_SendFixedBeacon` with their beacon
+aligned, 32 bytes as the SDK declares it. The lever never applies to a function whose original rotates its loops,
+since the attribute enters every loop of the function with a `b`: `MCSS_MakeMosaic`,
 `addToDex` and libVCT's five rows reload and recompute like the aligned cases but rotate their loops, and no
 placement helps them. A loop-free function shows it too: the attribute stops a field's offset folding into the
 literal (`&G.field` as one pool word) and keeps two reads of a field apart, so an original with such a pool word or

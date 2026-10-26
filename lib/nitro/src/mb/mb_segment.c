@@ -520,10 +520,3 @@ static BOOL IsAbleToLoad(u32 index, u32 addr, u32 size) {
     }
     return FALSE;
 }
-
-// Sends a frame that is in memory to the children in a bitmap
-int MBi_BlockHeaderEnd(u32 length, u16 aidBitmap, void *buf) {
-    DC_FlushRange(buf, (length + 0x1f) & ~0x1f);
-    DC_WaitWriteBufferEmpty();
-    return MBi_SendMP(buf, length, aidBitmap);
-}
