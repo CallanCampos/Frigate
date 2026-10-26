@@ -835,11 +835,13 @@ Same instructions, registers swapped.
 
 ## Stack slots
 
-- A local used only inside one straight-line block takes the temporaries' slot, above every named one, whatever
-  its declaration position: TwlSDK's `Yos_JPEGEncode` (`ssp_jpegenc.c`) spills `chromBlocksX` to sp+0x58 in all 24
-  declaration orders tried, where the original has it among the named slots, so the original used it beyond that block.
-  Held in `x`, which also takes both MCU divisors (`x = hFactor * 8; ...; x = vFactor * 8;`), it takes sp+0x4c below
-  the named offsets, as in the original.
+- Named locals that are spilled whole take their slots in the reverse of their declarations, below the temporaries,
+  and a reused variable's later spilled stretch is placed with the temporaries, in the order they arise. TwlSDK's
+  `Yos_JPEGEncode` (`ssp_jpegenc.c`) spills four values in the order it computes them (the chroma blocks across, then
+  the Y, Cb and Cr planes' offsets): with the offsets as named `u32`s, they come first whatever the chroma value is
+  held in. It matches with the chroma blocks in `x` (reused), the Y plane's offset in `i` (reused), and the planes as
+  pointers, `yPlane = (u8 *)work + i; cbPlane = (u8 *)work + (i + pos); crPlane = (u8 *)work + ((pos << 1) + i);`,
+  whose offsets MWCC keeps as temporaries and adds to `work` at each use.
 - A flag cleared inside the block after a 64-bit compare can share its slot with the compare's high-word 0: value
   numbering gives the clear the same 0, which is spilled once at the compare and reloaded for the flag, the other
   flag and the loop counter. The DWC utility's `taskFirst` (`usbap.c`) builds that 0 in r4 after loading both words of

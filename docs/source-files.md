@@ -2320,7 +2320,7 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 | `comm_tvt_sys.c` | `0x021a98d4`–`0x021aafdc` | 75 | complete | string at `0x021b26c8` |
 | `ssp_jpegdec.c` | `0x021aafdc`–`0x021ac664` | 12 | complete | descriptive |
 | `ssp_exifdec.c` | `0x021ac664`–`0x021acc64` | 4 | complete | descriptive |
-| `ssp_jpegenc.c` | `0x021acc64`–`0x021ae378` | 21 | partial | descriptive |
+| `ssp_jpegenc.c` | `0x021acc64`–`0x021ae378` | 21 | complete | descriptive |
 | `ssp_exifenc.c` | `0x021ae378`–`0x021af740` | 11 | complete | descriptive |
 
 ### Overlay 258

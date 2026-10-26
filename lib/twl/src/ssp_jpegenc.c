@@ -869,9 +869,7 @@ static u32 Yos_JPEGEncode(const void *src, u8 *dst, u32 limit, JpegEncWork *work
                           JpegEncConvertFunc convert) {
     JpegEncComponent components[3];
     u32 pos;
-    u32 cbOffset;
-    u32 yOffset;
-    u32 crOffset;
+    u32 chromOffset;
     u32 blocksX, blocksY;
     u32 mcusX, mcusY;
     u32 hFactor = 1;
@@ -882,6 +880,7 @@ static u32 Yos_JPEGEncode(const void *src, u8 *dst, u32 limit, JpegEncWork *work
     u32 y;
     u32 dhtLength;
     u8(*quant)[64];
+    u8 *yPlane, *cbPlane, *crPlane;
     JpegEncHuffTable *dcLum;
     JpegEncHuffTable *dcChrom;
     JpegEncHuffTable *acLum;
@@ -921,17 +920,18 @@ static u32 Yos_JPEGEncode(const void *src, u8 *dst, u32 limit, JpegEncWork *work
     components[1].blocksX = components[2].blocksX = x;
     components[1].blocksY = components[2].blocksY = y;
     components[0].coefs = (s16 *)((u8 *)work + sizeof(JpegEncWork));
-    // yOffset is the chroma coefficients' offset until it passes them, and pos the size of a plane until the header,
-    // as the SDK reuses them
-    yOffset = blocksX * blocksY * 128 + sizeof(JpegEncWork);
+    // The coefficients follow the work memory, the chroma components' after the luminance's (chromOffset), and the
+    // planes follow them (from i); pos is a plane's size until the header
+    chromOffset = blocksX * blocksY * 128 + sizeof(JpegEncWork);
     y = x * y * 128;
-    components[1].coefs = (s16 *)((u8 *)work + yOffset);
-    components[2].coefs = (s16 *)((u8 *)work + (yOffset + y));
-    yOffset += y * 2;
+    components[1].coefs = (s16 *)((u8 *)work + chromOffset);
+    components[2].coefs = (s16 *)((u8 *)work + (chromOffset + y));
+    i = chromOffset + y * 2;
+    yPlane = (u8 *)work + i;
     components[0].lastDc = components[1].lastDc = components[2].lastDc = 0;
     pos = width * height;
-    cbOffset = yOffset + pos;
-    crOffset = (pos << 1) + yOffset;
+    cbPlane = (u8 *)work + (i + pos);
+    crPlane = (u8 *)work + ((pos << 1) + i);
 
     // Scale the quantization tables as IJG's libjpeg does
     if (quality < 50) {
@@ -961,22 +961,22 @@ static u32 Yos_JPEGEncode(const void *src, u8 *dst, u32 limit, JpegEncWork *work
     }
 
     if (convert != NULL) {
-        convert(src, width, height, (u8 *)work + yOffset);
+        convert(src, width, height, yPlane);
     }
-    Yos_JpegEncodeSample1to1Component((u8 *)work + yOffset, work->divisors[0], &components[0], width);
+    Yos_JpegEncodeSample1to1Component(yPlane, work->divisors[0], &components[0], width);
     if (sampling == SSP_JPEG_OUTPUT_YUV444) {
-        Yos_JpegEncodeSample1to1Component((u8 *)work + cbOffset, work->divisors[1], &components[1], width);
+        Yos_JpegEncodeSample1to1Component(cbPlane, work->divisors[1], &components[1], width);
     } else if (sampling == SSP_JPEG_OUTPUT_YUV420) {
-        Yos_JpegEncodeSample2to2Component((u8 *)work + cbOffset, work->divisors[1], &components[1], width);
+        Yos_JpegEncodeSample2to2Component(cbPlane, work->divisors[1], &components[1], width);
     } else {
-        Yos_JpegEncodeSample2to1Component((u8 *)work + cbOffset, work->divisors[1], &components[1], width);
+        Yos_JpegEncodeSample2to1Component(cbPlane, work->divisors[1], &components[1], width);
     }
     if (sampling == SSP_JPEG_OUTPUT_YUV444) {
-        Yos_JpegEncodeSample1to1Component((u8 *)work + crOffset, work->divisors[1], &components[2], width);
+        Yos_JpegEncodeSample1to1Component(crPlane, work->divisors[1], &components[2], width);
     } else if (sampling == SSP_JPEG_OUTPUT_YUV420) {
-        Yos_JpegEncodeSample2to2Component((u8 *)work + crOffset, work->divisors[1], &components[2], width);
+        Yos_JpegEncodeSample2to2Component(crPlane, work->divisors[1], &components[2], width);
     } else {
-        Yos_JpegEncodeSample2to1Component((u8 *)work + crOffset, work->divisors[1], &components[2], width);
+        Yos_JpegEncodeSample2to1Component(crPlane, work->divisors[1], &components[2], width);
     }
 
     // SOI, or the EXIF data, and SOF0
