@@ -2057,6 +2057,8 @@ lib/nitro/src/os/os_irqTable.c:
     .text       start:0x02079c50 end:0x02079d3c
     .data       start:0x0209b734 end:0x0209b74c
     .bss        start:0x0214c1b8 end:0x0214c248
+    .dtcm.data  start:0x02fe0020 end:0x02fe00a0
+    .dtcm.bss   start:0x02fe00a0 end:0x02fe00a8
 
 lib/nitro/src/os/os_interrupt.c:
     complete
