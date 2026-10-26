@@ -5600,6 +5600,7 @@
 . 0x021435d8 mcRenderState_
 . 0x021439e0 s_pTaskRegisterFunc
 . 0x021439ec s_pUVFlipCorrectFunc
+. 0x021439f8 softwareSpreiteParamCache_
 . 0x02143a08 pTheInstance_
 . 0x02143a0c NNS_G3dGlb
 . 0x02143c70 NNS_G3dRS

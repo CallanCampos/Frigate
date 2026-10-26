@@ -9136,7 +9136,7 @@ mtxCacheBuffer_ kind:bss addr:0x02143218
 mcRenderState_ kind:bss addr:0x02143618
 s_pTaskRegisterFunc kind:bss addr:0x02143a20
 s_pUVFlipCorrectFunc kind:bss addr:0x02143a2c
-data_021439f8 kind:bss addr:0x02143a38
+softwareSpreiteParamCache_ kind:bss addr:0x02143a38
 pTheInstance_ kind:bss addr:0x02143a48
 NNS_G3dGlb kind:bss addr:0x02143a4c
 NNS_G3dRS kind:bss addr:0x02143cb0

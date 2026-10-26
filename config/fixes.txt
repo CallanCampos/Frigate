@@ -631,6 +631,7 @@
 . 0x021435dc remove_symbol
 . 0x021439d8 remove_symbol
 . 0x021439f8 add_data data_021439f8
+. 0x02143a08 section_end lib/nnsys/src/g2d/g2d_OamSoftwareSpriteDraw.c:.bss
 . 0x02143a10 remove_symbol
 . 0x02143a14 remove_symbol
 . 0x02143a58 remove_symbol
