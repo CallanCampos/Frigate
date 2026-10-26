@@ -53,6 +53,25 @@ def source_modules(version: str) -> dict[str, str]:
     return modules
 
 
+def preserve_dtcm_sections(config: dict, version: str):
+    """Keep a source's migrated DTCM data and BSS separate in objdiff.
+
+    objdiff's section combining groups both .dtcm.data and .dtcm.bss under .dtcm, mixing initialized bytes with BSS.
+    Disable that operation only for their owning units; all sections still participate in the comparison and report.
+    """
+    owners = set()
+    source = None
+    delinks = ROOT / "config" / version / "arm9" / "delinks.txt"
+    for line in delinks.read_text().splitlines():
+        if line.endswith(":") and not line[0].isspace():
+            source = line[:-1]
+        elif source and line.split() and line.split()[0] in (".dtcm.data", ".dtcm.bss"):
+            owners.add(source)
+    for unit in config.get("units", []):
+        if unit.get("metadata", {}).get("source_path") in owners:
+            unit.setdefault("options", {})["combine_data_sections"] = False
+
+
 def categorize(config: dict, version: str):
     """Gives every unit its progress categories and lists them in the config."""
     modules = source_modules(version)
@@ -112,6 +131,7 @@ def main():
             settings = source_compiler(Path(source))
             unit["scratch"]["c_flags"] = " ".join(flag for flag in settings.flags if flag != ENCODING_FLAG)
     categorize(config, args.version)
+    preserve_dtcm_sections(config, args.version)
     args.output.write_text(json.dumps(config, indent=2) + "\n")
 
 

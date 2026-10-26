@@ -64,9 +64,9 @@ DECOMP_ME_COMPILER = "mwcc_40_1024"
 MWCCARM_URL = "https://decomp.aetias.com/files/mwccarm.zip"
 # dsd with DSi hybrid ROM support comes from a fork of ds-decomp (and of ds-rom, which its Cargo.toml pins) until the
 # changes are upstreamed. Its dsi-hybrid branch is released as DSD_VERSION; after a new release, bump it and
-# configure.py replaces tools/dsd.
+# configure.py replaces tools/dsd. v0.12.1-dsi.10 adds initialized-data and BSS migrations into DTCM.
 DSD_REPO = "https://github.com/fuddlesworth/ds-decomp"
-DSD_VERSION = "v0.12.1-dsi.9"
+DSD_VERSION = "v0.12.1-dsi.10"
 # Release binary of each platform, by (sys.platform, machine)
 DSD_BINARIES = {
     ("linux", "x86_64"): "dsd-linux-x86_64",

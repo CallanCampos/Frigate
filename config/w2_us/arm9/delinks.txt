@@ -58,7 +58,7 @@ src/gfl/arc_tool.c:
 src/gfl/arc_util.c:
     complete
     .text       start:0x0204adb4 end:0x0204b6d4
-    .rodata     start:0x02093e48 end:0x02093e70
+    .rodata     start:0x02093e38 end:0x02093e70
     .data       start:0x0209afc4 end:0x0209afd0
 
 src/gfl/textprint.c:
@@ -2057,6 +2057,8 @@ lib/nitro/src/os/os_irqTable.c:
     .text       start:0x02079c50 end:0x02079d3c
     .data       start:0x0209b734 end:0x0209b74c
     .bss        start:0x0214c1b8 end:0x0214c248
+    .dtcm.data  start:0x02fe0020 end:0x02fe00a0
+    .dtcm.bss   start:0x02fe00a0 end:0x02fe00a8
 
 lib/nitro/src/os/os_interrupt.c:
     complete

@@ -317,6 +317,24 @@ autoload, and `config_fixes.py remove-file ltd_autoload_0 FILE START` deletes a 
 autoload's `delinks.txt`; both are recorded in `config/fixes.txt`. `compiler_probe.py`, `rename_symbol.py` and
 `check_nonmatching_rows.py` find the file's DSi functions in the LTD autoload's symbols.
 
+## Migrated DTCM data
+
+A main SDK object can also hold initialized data and zero-initialized state that the linker places in DTCM.
+`lib/nitro/src/os/os_irqTable.c` defines the 32 interrupt-handler pointers (`OS_IRQTable`, 0x80 bytes) and the waiting
+thread queue (`OSi_IrqThreadQueue`, 8 bytes) between `#pragma section DTCM begin` and `end`. Its compiler section names
+are `.dtcm.data` and `.dtcm.bss`; its functions, callback indexes and callback state remain in the main module.
+
+The one source entry in main's `delinks.txt` owns `.dtcm.data:0x02fe0020-0x02fe00a0` and
+`.dtcm.bss:0x02fe00a0-0x02fe00a8` in both games. DTCM's `.data` and `.bss` receive these sections from the same object.
+The existing `.dtcm` migration spelling keeps its zero-initialized meaning. The `config_fixes.py add-section` helper
+validates each range in its DTCM target section, and `bss-size dtcm 8 0x02fe00a0` records the queue's recovered size so
+that the module's 24 trailing alignment bytes are not mistaken for part of the queue.
+
+The empty-initializer prefix and trailing alignment fill remain separate from these typed objects. They are not
+C filler arrays, and adding the objects does not change the original data denominator or relocation destinations.
+Objdiff compares these owners with `combine_data_sections` disabled, because its default grouping would merge the
+initialized `.dtcm.data` with the zero-initialized `.dtcm.bss`. Both sections still contribute their full sizes.
+
 ## Files of one name
 
 A file is named after its original object, even when another module's file has the same name: the DWC utility's
