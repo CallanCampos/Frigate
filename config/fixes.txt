@@ -2739,6 +2739,7 @@ overlays/ov182 0x021bdaf9 remove_symbol
 overlays/ov182 0x021bdb41 remove_symbol
 overlays/ov182 0x021bfb54 add_data data_ov182_021bfb54
 overlays/ov182 0x021c04bc add_data data_ov182_021c04bc
+overlays/ov182 0x021c059c add_section lib/dwcutilui/src/foundation.c:.rodata:8
 overlays/ov182 0x021c0d90 section_start lib/dwcutilui/src/scenemenu.c:.data
 overlays/ov182 0x021c0de8 section_end lib/dwcutilui/src/sceneopterase.c:.data
 overlays/ov182 0x021c40b8 section_end lib/dwcutilui/src/rakuraku.c:.bss

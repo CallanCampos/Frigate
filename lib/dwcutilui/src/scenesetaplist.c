@@ -240,7 +240,7 @@ static void input(void) {
     if (sApList->scrollTask != NULL || sApList->dragging) {
         return;
     }
-    if (DWCi_TPlCheckTrigger(gDWCUtilTouchScreenRect)) {
+    if (DWCi_TPlCheckTrigger(DWCi_R_SCR)) {
         sApList->touched = -1;
         for (i = 0; i < NELEMS(sApListRowRects); i++) {
             if (DWCi_TPlCheckTrigger(sApListRowRects[i])) {
@@ -255,7 +255,7 @@ static void input(void) {
             }
         }
     }
-    if (DWCi_TPlCheckRelease(gDWCUtilTouchScreenRect)) {
+    if (DWCi_TPlCheckRelease(DWCi_R_SCR)) {
         for (i = 0; i < AP_LIST_ROWS; i++) {
             if (DWCi_TPlCheckRelease(sApListRowRects[i])) {
                 if (sApList->touched != i) {

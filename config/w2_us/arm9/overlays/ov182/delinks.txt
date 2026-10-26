@@ -89,6 +89,7 @@ lib/dwcutilui/src/cellinfo.c:
 lib/dwcutilui/src/foundation.c:
     complete
     .text       start:0x021bc1e8 end:0x021bc21c
+    .rodata     start:0x021c05dc end:0x021c05e4
 
 lib/dwcutilui/src/heap.c:
     complete

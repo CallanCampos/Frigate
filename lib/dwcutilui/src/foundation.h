@@ -3,6 +3,9 @@
 
 #include "types.h"
 
+// The whole touch screen: left, top, right and bottom
+extern const u16 DWCi_R_SCR[4];
+
 // The connection utility's points and rectangles (u16 x and y; left, top, right and bottom). The file is the DWC
 // utility library's foundation.o (libdwcutil.TWL.HYB.a), as aletheia's map of Black 1's SDK code to that library's
 // objects (layout/symbols_sdk.txt) shows it: its three functions, then graphics.o's.

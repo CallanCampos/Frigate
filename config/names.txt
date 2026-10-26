@@ -22779,7 +22779,7 @@ overlays/ov182 0x021c054e sDialogButtonPositions
 overlays/ov182 0x021c0580 sArchiveName
 overlays/ov182 0x021c0590 sBgCharNames
 overlays/ov182 0x021c0594 sBgSizes
-overlays/ov182 0x021c059c gDWCUtilTouchScreenRect
+overlays/ov182 0x021c059c DWCi_R_SCR
 overlays/ov182 0x021c05a4 sTaskCounts
 overlays/ov182 0x021c05d0 sRecordType
 overlays/ov182 0x021c05d4 sNet

@@ -1315,7 +1315,7 @@ data_ov182_021c058c kind:data(any) addr:0x021c058c
 sBgCharNames kind:data(any) addr:0x021c0590
 sBgSizes kind:data(any) addr:0x021c0594
 data_ov182_021c0596 kind:data(any) addr:0x021c0596
-gDWCUtilTouchScreenRect kind:data(any) addr:0x021c059c
+DWCi_R_SCR kind:data(any) addr:0x021c059c
 sTaskCounts kind:data(any) addr:0x021c05a4
 data_ov182_021c05c0 kind:data(any) addr:0x021c05c0
 sRecordType kind:data(any) addr:0x021c05d0
