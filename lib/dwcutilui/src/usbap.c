@@ -235,14 +235,12 @@ static void scanWait(const WMStartScanExCallback *cb) {
 static void taskFirst(DWCUtilTask *task, void *arg) {
     DWCUtilUsbScan *scan;
     OSTick now = OS_GetTick();
-    BOOL ready;
-    BOOL notReady;
+    int i;
+    _Bool ready, notReady;
 
     scan = sUsbScan;
-    notReady = FALSE;
     if (now >= scan->startTick + USB_SCAN_TIME) {
-        int i;
-
+        notReady = FALSE;
         ready = FALSE;
 
         for (i = 0; i < USB_SCAN_CONNECTORS; i++) {

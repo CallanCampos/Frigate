@@ -107,7 +107,7 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 | `net_devwifi.c` | `0x021503c0`–`0x021505d4` | 26 | complete | string at `0x021852ac` |
 | `dwc_rap.c` | `0x021505d4`–`0x02152078` | 77 | complete | string at `0x021852d0` |
 | `dwc_rapcommon.c` | `0x02152078`–`0x0215251c` | 14 | complete | string at `0x021853f0` |
-| `cps.c` | `0x0215251c`–`0x02155e34` | 113 | partial | descriptive |
+| `cps.c` | `0x0215251c`–`0x02155e34` | 113 | complete | descriptive |
 | `socl_startup.c` | `0x02155e34`–`0x02156000` | 6 | complete | descriptive |
 | `socl_command.c` | `0x02156000`–`0x02156200` | 13 | complete | descriptive |
 | `socl_create.c` | `0x02156200`–`0x021564cc` | 8 | complete | descriptive |
@@ -1813,7 +1813,7 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 | `aoss.c` | `0x021a49d0`–`0x021a6c1c` | 71 | complete | descriptive |
 | `aosslink.c` | `0x021a6c1c`–`0x021a71fc` | 12 | partial | descriptive |
 | `apc.c` | `0x021a71fc`–`0x021a7858` | 9 | complete | descriptive |
-| `atermset.c` | `0x021a7858`–`0x021ab040` | 66 | partial | descriptive |
+| `atermset.c` | `0x021a7858`–`0x021ab040` | 66 | complete | descriptive |
 | `anime.c` | `0x021ab040`–`0x021ab17c` | 3 | complete | descriptive |
 | `button.c` | `0x021ab17c`–`0x021ab588` | 15 | complete | descriptive |
 | `comment.c` | `0x021ab588`–`0x021ab63c` | 3 | complete | descriptive |
@@ -1870,7 +1870,7 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 | `setting.c` | `0x021b77dc`–`0x021b8050` | 29 | complete | descriptive |
 | `sound.c` | `0x021b8050`–`0x021b8154` | 7 | complete | descriptive |
 | `step.c` | `0x021b8154`–`0x021b8834` | 18 | complete | descriptive |
-| `usbap.c` | `0x021b8834`–`0x021b8cf0` | 8 | partial | descriptive |
+| `usbap.c` | `0x021b8834`–`0x021b8cf0` | 8 | complete | descriptive |
 | `window.c` | `0x021b8cf0`–`0x021b93e8` | 15 | complete | descriptive |
 | `dwc_mov_mbp.c` | `0x021b93e8`–`0x021b9bbc` | 19 | complete | descriptive |
 | `dwc_mov_wh.c` | `0x021b9bbc`–`0x021ba768` | 45 | partial | descriptive |
@@ -2318,9 +2318,9 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 | `ctvt_game_cam.c` | `0x021a8090`–`0x021a9704` | 67 | complete | string at `0x021b2694` |
 | `ctvt_game_cam_graphic.c` | `0x021a9704`–`0x021a98d4` | 8 | complete | string at `0x021b26a4` |
 | `comm_tvt_sys.c` | `0x021a98d4`–`0x021aafdc` | 75 | complete | string at `0x021b26c8` |
-| `ssp_jpegdec.c` | `0x021aafdc`–`0x021ac664` | 12 | partial | descriptive |
+| `ssp_jpegdec.c` | `0x021aafdc`–`0x021ac664` | 12 | complete | descriptive |
 | `ssp_exifdec.c` | `0x021ac664`–`0x021acc64` | 4 | complete | descriptive |
-| `ssp_jpegenc.c` | `0x021acc64`–`0x021ae378` | 21 | partial | descriptive |
+| `ssp_jpegenc.c` | `0x021acc64`–`0x021ae378` | 21 | complete | descriptive |
 | `ssp_exifenc.c` | `0x021ae378`–`0x021af740` | 11 | complete | descriptive |
 
 ### Overlay 258

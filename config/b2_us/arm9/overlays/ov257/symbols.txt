@@ -777,6 +777,7 @@ data_ov257_021b34a8 kind:data(any) addr:0x021b34a8
 data_ov257_021b3528 kind:data(any) addr:0x021b3528
 data_ov257_021b37f9 kind:data(any) addr:0x021b37f9 ambiguous
 data_ov257_021b38cd kind:data(any) addr:0x021b38cd ambiguous
+data_ov257_021b3928 kind:data(any) addr:0x021b3928
 sJpegEncSosHeader kind:data(any) addr:0x021b3940
 sJpegEncSofHeader kind:data(any) addr:0x021b394e
 data_ov257_021b3960 kind:data(any) addr:0x021b3960 ambiguous

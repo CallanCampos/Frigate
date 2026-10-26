@@ -817,12 +817,37 @@ Same instructions, registers swapped.
   written in struct order: `voiceIconState` (at 0xac) stored after `state` and `waitSound` ends a stretch that already
   holds them, the shared 0 costs one reload less and ties with the 1, and the 0 is spilled and rebuilt as `movs` in each
   group, as in the original.
+- A byte tested and then used in both branches can be read again from the array in each branch rather than kept in a
+  variable: value numbering shares the one load, and the shared load, a temporary of its own, colours differently from
+  the variable. `Mel_JPEGDecode` (`ssp_jpegdec.c`) loads a DQT table's precision byte into r2 for `tst` and shifts it
+  into the table offset in each branch; `s = data[q]; if (s & 0xf0)` loads it into r0 and moves the size check's
+  temporaries, while `if (data[q] & 0xf0)` with `j = (data[q++] & 0xf) << 6` and `g = data[q++] << 6` matches.
+- The operands of a commutative `adds` follow how the sum was built, not the order it is written in. The SSP
+  encoder's `Yos_JpegEncoderForwardDct` (`ssp_jpegenc.c`) adds a sample difference and `a5` as `adds r3, r4, r3`, the
+  difference first; `c4 = block[i + 24] - block[i + 32] + a5 + c6` in any grouping gives `adds r3, r3, r4`, while the
+  difference assigned first, `c4 = block[i + 24] - block[i + 32]; c4 = c4 + a5 + c6;`, matches. In the same function
+  a product assigned back to its operand (`c2 = c2 * 181`) is multiplied in a copy, as the original does, where a
+  product into a variable of its own was not.
+- A divisor computed into a variable of its own (`x = hFactor * 8; mcusX = width / x;`) is loaded into one register
+  and shifted into the argument register (`ldr r0; lsls r1, r0, #3`); written inline, `width / (hFactor * 8)` loads
+  into r1 and shifts in place, and the load is scheduled before the previous result's store. `Yos_JPEGEncode`
+  (`ssp_jpegenc.c`) needs it for both of its MCU divisions.
 
 ## Stack slots
 
-- A local used only inside one straight-line block takes the temporaries' slot, above every named one, whatever
-  its declaration position: TwlSDK's `Yos_JPEGEncode` (`ssp_jpegenc.c`) spills `chromBlocksX` to sp+0x58 in all 24
-  declaration orders tried, where the original has it among the named slots, so the original used it beyond that block.
+- Named locals that are spilled whole take their slots in the reverse of their declarations, below the temporaries,
+  and a reused variable's later spilled stretch is placed with the temporaries, in the order they arise. TwlSDK's
+  `Yos_JPEGEncode` (`ssp_jpegenc.c`) spills four values in the order it computes them (the chroma blocks across, then
+  the Y, Cb and Cr planes' offsets): with the offsets as named `u32`s, they come first whatever the chroma value is
+  held in. It matches with the chroma blocks in `x` (reused), the Y plane's offset in `i` (reused), and the planes as
+  pointers, `yPlane = (u8 *)work + i; cbPlane = (u8 *)work + (i + pos); crPlane = (u8 *)work + ((pos << 1) + i);`,
+  whose offsets MWCC keeps as temporaries and adds to `work` at each use.
+- A flag cleared inside the block after a 64-bit compare can share its slot with the compare's high-word 0: value
+  numbering gives the clear the same 0, which is spilled once at the compare and reloaded for the flag, the other
+  flag and the loop counter. The DWC utility's `taskFirst` (`usbap.c`) builds that 0 in r4 after loading both words of
+  the start tick and stores it to the flag's slot; `notReady = FALSE;` before the `if` builds it first, in r2, and
+  stores it before the loads, while `notReady = FALSE; ready = FALSE;` as the block's first statements match, with
+  both flags `_Bool` (as `BOOL` the function is 2 bytes further off).
 - NitroWiFi's `CPSi_sha1_block` runs its rounds in groups of five, rotating the arguments of a two-statement
   round macro (`SHA1_ROUND`) instead of copying the five state words after each round. The first fifteen rounds use
   direct words, followed by word 15 and four expanded words; the later stages each run four groups over the circular
@@ -2034,6 +2059,11 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `rtc_cache.c`'s `*(sDaysBeforeMonth + date->month - 1)`, `plist_sys.c`'s `*(sHidenMoves + hiden - 11)` (the
   literal is `sHidenMoves - 22`), `strbuf.c`, `startmenu.c` and others. A local `u8 *p = data + pos` read as `p[0]`,
   `p[1]` doesn't give it either.
+- Parentheses that group a pointer sum count too: a macro that writes its second half at `(u8 *)(p) + 2` makes the
+  whole of `p` one subexpression, computed before the value, where `p + 2` written flat is computed after it. NitroWiFi's
+  `send_tcp` (`cps.c`) builds each SACK edge's high half and swaps it before it adds `blocks * 8` to the header, and
+  `&soc->ooo[best]` stays in r0: `CPS_PUT32(tcp + 24 + blocks * 8, v)` adds first (the sum in r1, the run in r3, 59
+  bytes), while four `CPS_PUT16(tcp + 24 + blocks * 8 + k, ...)` with k of 0, 2, 4 and 6 match.
 - The reverse holds for addresses passed to calls: `text + i` given to several calls is computed once and kept in a
   saved register, and `&text[i]` is recomputed at each call (`adds r0, r5, r4`), with `&text[i + 3]` keeping `i + 3`
   (on the stack across calls) rather than the address. GameSpy's `gsiXmlUtilDecodeString` (`gsXML.c`) matches only
@@ -3379,15 +3409,17 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `NHTTPi_getUrlEncodedSize2` (`c = *s++;` under `i < length`) shows the same copy.
 - Two identical conditional branches in a row ahead of a loop (`cmp r4, #0; ble end; ble end`) are an `if (n > 0)`
   around a `for` whose counter was set before the `if`: `int i = 0; ... if (length > 0) { for (; i < length; i++) ... }`
-  in NHTTP's `NHTTPi_getUrlEncodedSize2`, and the copy loop of `atermset.c`'s `ScanAP` (still in its row). A
-  bare `for`, or the `if` without the earlier start, gives one branch.
+  in NHTTP's `NHTTPi_getUrlEncodedSize2`. A bare `for`, or the `if` without the earlier start, gives one branch.
 - MWCC 2.0 drops a loop counter that only indexes what the loop steps by pointer, with all its stores and steps, unless
   the same variable is read as a value elsewhere before the loop. `atermset.c`'s `ScanAP` copies the access
   points with `for (; j < count; j++)`, storing to `scan->Bssid[i]` and stepping `i` after `bss++`; the original
   zeroes, stores and steps `i` without reading it, and so does ours once the same `i` holds the AP list's length in the
   event loop before (`i = UtilAcWcm_GetApList(...); if (i > count) { count = i; ... }`). Assigned in the `if`'s
   condition, read only by a `switch`, or read after the loop, it is dropped. The loop's part of a variable reused this
-  way is spilled to the lowest slot, below the loop's temporaries.
+  way is spilled to the lowest slot, below the loop's temporaries. Under `-ipa file`, which the file turned out to be
+  built with (below), the counter is kept without that read: `ScanAP` matches with the length in a local of its own
+  (`found`), `for (j = 0, bss = (WMBssDesc *)sAcApList; j < count; j++, bss++)` and `i++` as the body's last
+  statement.
 
 ## Switches
 
@@ -3871,11 +3903,17 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 - MWCC 2.0 sorts only that list: an object defined after the first function is written out, unsorted and in
   declaration order, with the next function, ahead of its string literals. So a ROM whose tables sort by size among the
   file's initialized statics had them above the first function, and data that sits between two functions' literals
-  was defined between them. `atermset.c`'s ten 1024-byte AES tables come out in the ROM's heapsort order (Td2 to Td4,
-  Te0 to Te4, Td0, Td1, after `rcon`) only defined among the setup's state statics, in the order that the forced
-  assignment ("invert the model", below) gives, and its host name and MD5 padding sit after
-  `CheckAccessPoint`'s literal and before `GetMacEncKey'`, so they are defined between those functions, the name
-  forward-declared (`static char sAcHostName[12];`) for the SOC configuration that points to it.
+  was defined between them.
+- Under `-ipa file`, MWCC 2.0 writes every object of the file ahead of its functions in one heapsort by size, the
+  objects of 4 bytes or less in one `.bss` and one `.data` section and each other one in a section of its own, and
+  only function-local literals with their functions; objects of one size come out in an order that depends only on
+  the sequence of sizes defined, so reordering the definitions of one size, with the sizes in place, places them.
+  The DWC utility's `atermset.c` has that layout: its ROM `.data` starts with five words and the SOC configuration,
+  then a 7-byte string ahead of the `.rodata` whose first object is 7 bytes, a 12-byte one and the MD5 padding. Its
+  file matches under the flag with the configuration as five word statics (a struct of them sorts as its 20 bytes),
+  the `"******"` SSID a named `char[]`, the host name a literal in the SOC configuration, the hello's seven bytes a
+  local array's initializer (`u8 id[7] = { ... }`, in `.rodata`), and the statics of each size reordered so that the
+  sort puts them where the ROM has them; without the flag, `ScanAP` keeps 28 bytes of stack slots off.
 - Under MWCC 2.0 without `-ipa file`, a tentative static of struct type joins the shared `.bss` section after the
   initialized statics, while a tentative byte array gets a section of its own, in the reverse of the definitions:
   `atermset.c`'s key of the first exchange, a 16-byte struct of two MAC addresses and a tag, came out ahead of the

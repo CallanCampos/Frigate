@@ -103,14 +103,16 @@ lib/twl/src/ssp_exifenc.c:
     .bss        start:0x021b62cc end:0x021b7a20
 
 lib/twl/src/ssp_jpegenc.c:
+    complete
     .text       start:0x021acca0 end:0x021ae3b4
     .rodata     start:0x021b2580 end:0x021b25c4
-    .data       start:0x021b3980 end:0x021b3d34
+    .data       start:0x021b3968 end:0x021b3d34
     .bss        start:0x021b62c0 end:0x021b62cc
 
 lib/twl/src/ssp_jpegdec.c:
+    complete
     .text       start:0x021ab018 end:0x021ac6a0
-    .data       start:0x021b2718 end:0x021b3980
+    .data       start:0x021b2718 end:0x021b3968
     .bss        start:0x021b3dcc end:0x021b6278
 
 lib/twl/src/ssp_exifdec.c:

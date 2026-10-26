@@ -29,6 +29,7 @@ lib/dwcutil/src/aosslink.c:
     .bss        start:0x021c2940 end:0x021c2aa0
 
 lib/dwcutil/src/atermset.c:
+    complete
     .text       start:0x021a7858 end:0x021ab040
     .rodata     start:0x021bd2e8 end:0x021bfb18
     .data       start:0x021c0678 end:0x021c0740
@@ -438,6 +439,7 @@ lib/dwcutilui/src/step.c:
     .bss        start:0x021c416c end:0x021c4174
 
 lib/dwcutilui/src/usbap.c:
+    complete
     .text       start:0x021b8834 end:0x021b8cf0
     .rodata     start:0x021c0468 end:0x021c04bc
     .bss        start:0x021c4174 end:0x021c4178

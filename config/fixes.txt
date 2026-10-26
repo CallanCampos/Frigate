@@ -2278,6 +2278,7 @@ overlays/ov129 0x021efc40 reloc_module overlay(36)
 overlays/ov132 0x021eee32 reloc_module overlay(36)
 overlays/ov132 0x021ef184 reloc_module overlay(36)
 overlays/ov133 0x021eedca reloc_module overlay(36)
+overlays/ov134 0x021efdf0 reloc_module overlay(12)
 overlays/ov134 0x021f0278 reloc_module overlay(55)
 overlays/ov134 0x021f0774 reloc_module overlay(55)
 overlays/ov134 0x021f08cc reloc_module overlay(55)
@@ -3450,6 +3451,9 @@ overlays/ov257 0x021b2220 remove_symbol
 overlays/ov257 0x021b223c add_data data_ov257_021b223c
 overlays/ov257 0x021b2464 remove_reloc
 overlays/ov257 0x021b2504 remove_reloc
+overlays/ov257 0x021b3928 section_end lib/twl/src/ssp_jpegdec.c:.data
+overlays/ov257 0x021b3928 section_start lib/twl/src/ssp_jpegenc.c:.data
+overlays/ov257 0x021b3928 add_data data_ov257_021b3928
 overlays/ov258 0x0219a2cc reloc_addend 4
 overlays/ov258 0x0219b3d0 overlay_id 207
 overlays/ov258 0x0219ba04 remove_symbol

@@ -255,8 +255,17 @@ text to `grep -n` there. Entries without a key come from later work and still be
   `int c;` declared first at the top. (matching.md: "declared first at the top")
 - Don't try `register` for allocation or a counter that nothing reads: MWCC 2.0/sp2 ignores it. A `const` on an
   initialized local can move its stack slot. (matching.md: "ignores the `register` storage class")
+- A byte tested, then used in both branches, in the wrong register: read it from the array again in each branch
+  (`if (data[q] & 0xf0)`, `g = data[q++] << 6`) instead of through a variable. (matching.md: "read again from the array")
+- A commutative `adds` with its operands swapped: build the sum in two statements, the first operand assigned first
+  (`c4 = d - e; c4 = c4 + a5 + c6;`). (matching.md: "follow how the sum was built")
+- A divisor loaded into r1 and shifted in place where the original loads r0 and shifts into r1: compute it into a
+  variable first (`x = hFactor * 8; mcusX = width / x;`). (matching.md: "A divisor computed into a variable")
 
 ## Stack slots or frame size
+
+- A 0 stored to a flag's slot before the loads of a 64-bit compare, where the original stores it after them: clear the
+  flags inside the block, after the compare. (matching.md: "A flag cleared inside the block")
 
 - A write result missing its store to a later read's output slot: use one transfer-length local for both operations
   (`DWCi_Http_Thread`). (matching.md: "one transfer-length local")
@@ -352,6 +361,10 @@ text to `grep -n` there. Entries without a key come from later work and still be
   despite word-sized spill accesses. (matching.md: "source-availability mask in the parameter")
 
 ## Instructions in another order (scheduling)
+
+- An address sum computed before a stored value where the original computes it after (or the reverse): a macro's
+  `(u8 *)(p) + 2` groups `p`; write the halves' addresses flat (`tcp + 24 + blocks * 8 + 2`). (matching.md:
+  "Parentheses that group a pointer sum")
 
 - A table index computed after a spill where the original computes it before: the table may be a function-local
   `static` in an inline getter. (matching.md: "holds it as a function-local `static`")
@@ -1001,6 +1014,11 @@ text to `grep -n` there. Entries without a key come from later work and still be
   `CP_SetDiv64_32` and `CP_GetDivResult32`. (matching.md: "A divide by the hardware divider")
 
 ## Data and sections
+
+- A file whose data sits ahead of all its functions, sorted by size across `.bss`, `.data` and `.rodata`: build it with
+  `-ipa file`, write word "structs" as separate statics and strings as the literals or arrays they are, and reorder
+  the definitions of each size until the sort places them. (matching.md: "Under `-ipa file`, MWCC 2.0 writes every
+  object")
 
 - Duplicate protocol literals pooled once, with two independently grouped sets of globals: verify original
   source boundaries (`dwc_main.c`/`dwc_match.c`). (matching.md: "boundary at `DWC_AddMatchKeyInt`")

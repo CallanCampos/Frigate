@@ -226,8 +226,8 @@ static u8 sRangeLimit[0x580] = {
 
 static s16 sCb[64];
 static s16 sCr[64];
-// The quantization tables, by table number
-static s16 sQuant[2][64];
+// The quantization tables, 64 entries each, a table starting at its number times 64
+static s16 sQuant[128];
 // The coefficients of a Y, Cb and Cr block, whose first is the DC prediction, and the IDCT's input and work area
 static s16 sBlocks[5][64];
 static s16 sY[16][64];
@@ -292,9 +292,9 @@ static s32 Mel_JPEGDecodeExif(u8 *data, u32 size, u32 option) {
 }
 
 // Decodes a JPEG into dest, and returns its height and width, or 0
-static u32 Mel_JPEGDecode(u8 *dest, u8 *data, u32 size, s32 maxWidth, s32 maxHeight, u32 option) {
+static int Mel_JPEGDecode(u8 *dest, u8 *data, u32 size, s32 maxWidth, s32 maxHeight, u32 option) {
     // The SDK reuses a few ints from one marker's code to the next (q is the position in a segment, s a length and
-    // then a value or a counter, m the sampling and then a table's offset), and its registers follow from that reuse
+    // then a counter, m the sampling and then a table's offset), and its registers follow from that reuse
     int width;
     int height;
     int h;
@@ -311,8 +311,7 @@ static u32 Mel_JPEGDecode(u8 *dest, u8 *data, u32 size, s32 maxWidth, s32 maxHei
     int restartCount;
     u8 b;
     u16 huffcode[257];
-    s8 huffsize[257];
-    s32 result;
+    char huffsize[257];
 
     width = 0;
     height = 0;
@@ -344,7 +343,7 @@ static u32 Mel_JPEGDecode(u8 *dest, u8 *data, u32 size, s32 maxWidth, s32 maxHei
         }
         s = (data[pos] << 8) | data[pos + 1];
         if (b == 0xe1) {
-            result = SSP_ExifDecode(data, sDataSize, &pos, option);
+            s32 result = SSP_ExifDecode(data, sDataSize, &pos, option);
             if (result != 0 && result != 1) {
                 return 0;
             }
@@ -500,30 +499,27 @@ static u32 Mel_JPEGDecode(u8 *dest, u8 *data, u32 size, s32 maxWidth, s32 maxHei
             q = pos + 2;
             pos += s;
             while (q < pos) {
-                s = data[q];
-                if (s & 0xf0) {
+                if (data[q] & 0xf0) {
                     if (q + 0x82 >= sDataSize) {
                         return 0;
                     }
-                    j = (s & 0xf) << 6;
-                    q++;
+                    j = (data[q++] & 0xf) << 6;
                     for (i = 0; i < 64; i++, q += 2) {
                         if (j + sZigzag[i] > 127) {
                             return 0;
                         }
-                        sQuant[0][j + sZigzag[i]] = ((data[q + 1] + (data[q] << 8)) * sAanScales[i] + 0x800) >> 12;
+                        sQuant[j + sZigzag[i]] = ((data[q + 1] + (data[q] << 8)) * sAanScales[i] + 0x800) >> 12;
                     }
                 } else {
-                    g = s << 6;
                     if (q + 0x41 >= sDataSize) {
                         return 0;
                     }
-                    q++;
+                    g = data[q++] << 6;
                     for (j = 0; j < 64; j++, q++) {
                         if (g + sZigzag[j] > 127) {
                             return 0;
                         }
-                        sQuant[0][g + sZigzag[j]] = (data[q] * sAanScales[j] + 0x800) >> 12;
+                        sQuant[g + sZigzag[j]] = (data[q] * sAanScales[j] + 0x800) >> 12;
                     }
                 }
             }
@@ -649,7 +645,7 @@ static void decode_block_sub(const s16 *in, s16 *out, int quant) {
     s32 z5, z10, z11, z12, z13;
 
     i = 0;
-    quantPtr = &sQuant[0][quant];
+    quantPtr = &sQuant[quant];
     for (; i < 8; i++) {
         if ((in[i + 8] | in[i + 16] | in[i + 24] | in[i + 32] | in[i + 40] | in[i + 48] | in[i + 56]) == 0) {
             s32 dc = in[i] * quantPtr[i];
