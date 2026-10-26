@@ -1362,6 +1362,16 @@ Same code, other `sp` offsets or frame size.
   them; MWCC won't convert between function pointer types that differ only in a parameter's `const`. NitroWiFi's
   `resolve_common` (`cps.c`) is the same with a string: through `const u8 *name` MWCC moves the first character's
   `ldrb` above the query's `strh` stores, and with `u8 *name`, as in Black 1's version, the load stays after them.
+- `volatile` can't stand in for a variable the original keeps in a register and spills: it makes the variable a
+  memory local, placed by declaration order among the memory locals (not the spill slot) and reloaded after every
+  store. `ArchiveMoveImageTop`'s `fimgOffset` went to sp+0xc and `Yos_JPEGEncode`'s `chromBlocksX` to sp+0x64 that way.
+  It works where the original reloads a local it never kept in a register: `gti2HandleNack`'s `first`.
+- A cast of one operand to its own type keeps MWCC from merging two copies of an expression, and a cast of an array
+  to its own element type makes it compute an element's address again rather than reuse a hoisted base. Neither is
+  natural C; this project takes them only under the maintainer's 2026-10-25 ruling, with a comment: NitroWiFi's
+  `SOCLi_IsIPv4ValidDNSAddr` (`socl_misc.c`) computes `(my_ip ^ ip) & net_mask` twice through `(unsigned int)my_ip`,
+  and the DWC utility's `scanFirst` (`usbap.c`) recomputes the BSSID copy's destination through
+  `((DWCUtilUsbConnector *)scan->connectors + j)`.
 - A pointer cast, even to the type the pointer already has, stops MWCC from reassociating a sum under it: `p + 6 +
   count` read as `((const u8 *)(p + 6 + count))[0]` stays `adds r4, r0, #6; ldrb r4, [r4, r2]`, where without the
   cast MWCC adds `count` once and reads at offsets 6 to 9. `resolve_common`'s record reads match through
@@ -1939,9 +1949,6 @@ Same instructions, scheduled in another order.
   `BtlvEffvm_WindowTask` writes its window bounds with `G2_SetWnd0Position` and `G2_SetWnd1Position`, which match
   only in NitroSDK's own form, `((y1 << 8) & 0xff00) | (y2 & 0xff)`; with `(u8)y2` the mask folds, and no direct
   store to `reg_G2_WIN0V` keeps it. When an SDK inline won't give the original's code, compare it with the SDK's text.
-- Two loops in a row that share one counter can swap the second loop's counter with another local; a counter of its
-  own, declared before that local, fixes it where no declaration order with the shared one does
-  (`MBi_SendVolatBeacon`, `mb_gameinfo.c`).
 - MWCC folds `x | 2 | 1` into one OR. Two ORs in the original come from an inline that ORs its `u32` parameter with
   one flag, called with the other already in: multiboot's `MBGameInfo_SetBeacon` (`mb_gameinfo.c`). An `int`
   parameter still folds, since the argument expression is substituted, and a `u8`/`u16` one adds a narrowing.
@@ -3295,6 +3302,11 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   reads. Under the attribute `IrcLink_Poll` matches with `if (IrcLink.connectCallback)`, while `!= NULL` compares with
   the zero it has just stored (`cmp r2, r1` for the original's `cmp r2, #0`; An instruction too many or too few:
   "A pointer compared with `NULL`").
+  Multiboot's beacon `bsendBuff` (`mb_gameinfo.c`, at `0x021a4820` after a 0x1c-byte gap) is another: with it aligned,
+  as ntrtwl's NitroSDK declares it, `MBi_SendFixedBeacon`, which has no loop, loses a 41-byte difference in its spills
+  and registers, and `MBi_SendVolatBeacon` matches with plain `i < 8` and `i < 15` loops and `&& sSendVolatCallback`,
+  where `!= NULL` shares a zero; unaligned, they had needed `?:` tests and a second counter and still stayed 41 and 7
+  bytes off.
   The DWC utility's `AOSSi_WLANConnect` (`aosslink.c`, 2.0/sp2) is the same case: its empty loop over the SSID,
   entered with a `b`, and its `connected` flag kept in a register from its first 0 (where MWCC otherwise folds the 0
   into the stores) come only with its file statics `sWep` and `sBss`, both on 32-byte boundaries in the ROM, declared
@@ -3780,6 +3792,15 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   list's functions match. Such `= 0` `.bss` objects still join the `.data` size sort where they are defined:
   `dwc_nastime.c`'s month names come out in the ROM's order (`Jun`, `Jul`, `Dec`, `Sep` and on) only with its three
   globals defined before the table, offset, local seconds and valid flag, which `rodata_order.py` predicts.
+- A struct that covers a file's whole `.bss` range can hold bytes that are not its own: in front, statics that only
+  dead-stripped code used, and behind, the gap that the linker leaves before the next 32-aligned section. Multiboot's
+  `mb_gameinfo.c` had one 0x48-byte struct. As ntrtwl's NitroSDK declares them, the file's pooled `.bss` (its statics
+  under 64 bytes, `-ipa file`) is the child side's four pointers, the send callback's timing and the callback, then the
+  0x14-byte send state: 0x2c bytes, and the beacon, `ATTRIBUTE_ALIGN(32)`, starts at 0x48. The child side, rebuilt for
+  its statics and dropped through `config/deadstrip.toml`, gives that layout (its 0x5910-byte list and 0xc0-byte beacon
+  copy are sections of their own and go with it). The tail was the sign to look for: an object right after a gap that
+  ends on a 32-byte boundary is aligned, and the alignment is what changed the code (Loops: "An explicit alignment");
+  the split itself changes none of it.
 - In Thumb code a word of a known static at section offset `off` is read through the literal `.bss` plus `off` rounded
   down to a multiple of 0x80, with the rest in the load's offset: in the unsplit `card_common.c` a static at 0x584 is
   read as `.bss+0x580` and `#4`, at 0x5a0 as `.bss+0x580` and `#0x20`, and at 0x600 as `.bss+0x600` and `[r0]`. A read
@@ -3897,6 +3918,11 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   template that the ROM doesn't have. Only an initializer above the file's first function sorts this way; below a
   function its literals come out in source order. NitroWiFi's `ssl.c` matches its `.data` with its OID table as six
   string literals at the top of the file, sorted among its named objects, as in Black 1's version.
+- A zero-initialized static too far from its section's base for the load's immediate (`ldrh` reaches 0x3e) gets a
+  section-relative pool word of its own, apart from the symbol's literal, so one object shows two literal words.
+  `dwc_aoss_ap.c`'s successor `aosslink.c` (DWC utility, 2.0/sp1p2) matches `AOSSi_WLANConnect` with `sBss = { 0 }` at
+  `.bss + 0x40`, its queue and messages zero-initialized too and the globals defined in the order that lays them out
+  as the ROM's, where its loop reads `[lit, #0xa]` from a `.bss + 0x40` word.
 - Two literals of one function that hold the same `.bss` address can be the section's base and a zero-initialized
   static at offset 0 of it, reached once as a field from the base and once through its own address (`&static`). DWC's
   `DWCs_AddToSendPool` (`dwc_transport.c`) matches with its send pool as two statics, `sSendPoolHead = NULL` then

@@ -2704,8 +2704,18 @@ overlays/ov181 0x0219def8 overlay_id 30
 overlays/ov181 0x0219fd24 overlay_id 36
 overlays/ov181 0x0219fdbc overlay_id 36
 overlays/ov181 0x021a05c8 overlay_id 30
+overlays/ov181 0x021a2018 section_end lib/nitro/src/mb/mb_segment.c:.text
+overlays/ov181 0x021a2070 section_start lib/nitro/src/mb/mb_gameinfo.c:.text
+overlays/ov181 0x021a2654 section_end lib/nitro/src/mb/mb_gameinfo.c:.text
+overlays/ov181 0x021a2654 section_start lib/nitro/src/mb/mb_wm.c:.text
 overlays/ov181 0x021a4068 remove_reloc
 overlays/ov181 0x021a40e8 remove_reloc
+overlays/ov181 0x021a47dc add_data sLockFunc
+overlays/ov181 0x021a47e0 add_data brecvBuffp
+overlays/ov181 0x021a47e4 add_data mbrsp
+overlays/ov181 0x021a47e8 add_data sSendVolatCallbackTimming
+overlays/ov181 0x021a47ec add_data sSendVolatCallback
+overlays/ov181 0x021a47f0 add_data mbss
 overlays/ov181 0x021a4894 add_data sMBWmBuf
 overlays/ov181 0x021a4898 add_data sMBFilterGgid
 overlays/ov181 0x021a489c add_data sMBWmWork

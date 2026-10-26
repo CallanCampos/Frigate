@@ -151,16 +151,16 @@ static void cbWm(void *arg) {
 // starts to
 static void scanFirst(const WMStartScanExCallback *cb) {
     int i;
+    WMBssDesc *desc;
     int j;
+    DWCUtilUsbScan *scan;
 
     for (i = 0; i < cb->bssDescCount; i++) {
-        WMBssDesc *desc = cb->bssDesc[i];
+        desc = cb->bssDesc[i];
 
         DC_InvalidateRange(desc, sizeof(WMBssDesc));
         if (memcmp(desc->ssid, sUsbScanSsid, 8) == 0) {
-            DWCUtilUsbScan *scan = sUsbScan;
-
-            for (j = 0; j < USB_SCAN_CONNECTORS; j++) {
+            for (j = 0, scan = sUsbScan; j < USB_SCAN_CONNECTORS; j++) {
                 if (memcmp(desc->bssid, scan->connectors[j].bssid, 6) == 0) {
                     if (!scan->connectors[j].ready && (desc->ssid[9] & 1)) {
                         if (scan->callback == NULL) {
@@ -169,19 +169,21 @@ static void scanFirst(const WMStartScanExCallback *cb) {
                         scan->callback(DWC_UTIL_USB_SCAN_FOUND);
                         return;
                     }
+                    // The original goes on to the next connector here without the search for a free entry
+                    goto next; // style-ok: goto-return skips the search for a free entry
+                }
+            }
+            for (j = 0; j < USB_SCAN_CONNECTORS; j++) {
+                if (memcmp(scan->connectors[j].bssid, sUsbScanNoBssid, 6) == 0) {
+                    // The array is cast to its own element type: MWCC otherwise reuses the hoisted scan->connectors
+                    // where the original computes the destination again
+                    MI_CpuCopy8(desc->bssid, ((DWCUtilUsbConnector *)scan->connectors + j)->bssid, 6);
+                    sUsbScan->connectors[j].ready = (desc->ssid[9] & 1) != 0;
                     break;
                 }
             }
-            if (j == USB_SCAN_CONNECTORS) {
-                for (j = 0; j < USB_SCAN_CONNECTORS; j++) {
-                    if (memcmp(scan->connectors[j].bssid, sUsbScanNoBssid, 6) == 0) {
-                        MI_CpuCopy8(desc->bssid, scan->connectors[j].bssid, 6);
-                        sUsbScan->connectors[j].ready = (desc->ssid[9] & 1) != 0;
-                        break;
-                    }
-                }
-            }
         }
+    next:;
     }
 }
 
