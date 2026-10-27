@@ -4328,11 +4328,11 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   where `gsync_disp.c` has `sActorPositions`. Look at the sibling file a copy was made from for the missing object.
   Nothing the compiler drops itself is listed, so this can't be reproduced under `-nodead`. A zero-size global,
   `const char *x[] = {};` (GCC's empty initializer), is listed where it is defined and emits nothing, so it tests a
-  place for such an object without adding bytes; it is placeholder data and stays out of the source. One before
-  `wifibattlematch_net_fields.c`'s tables gives the ROM's `.data` exactly. When a run of equal-size objects that stay
-  together comes out in an order no arrangement gives, enumerate the arrangements by how many listed objects are
-  smaller and larger than the run: `wifibattlematch_net.c`'s six 15-byte `RECORD_DATA` strings, just before their
-  table, need at least two objects more than the file has, one of them larger.
+  place for such an object without adding bytes; it is placeholder data and stays out of the source. When a run of
+  equal-size objects that stay together comes out in an order no arrangement gives, enumerate the arrangements by how
+  many listed objects are smaller and larger than the run before concluding that an object is missing:
+  `wifibattlematch_net.c`'s six 15-byte `RECORD_DATA` strings looked like that until the designator order below
+  placed them.
 - A small table that the ROM has after a 64-byte-or-larger table of the same file, where the size sort can only put
   it before, belongs to the next file. Overlay 290's 12-byte battle proc table sits after the 0x90-byte step table:
   no layout of one file gives that (`rodata_order.py`: G:12! S:144 B:12 is always B G S or G B S). Its three
@@ -4350,6 +4350,12 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   order that reaches `wifibattlematch_net_fields.c`'s `.data`: its 1,644 bytes and 29 relocations match the ROM with
   `sArenaFieldNames`' 21 lines listed in another order (the Wi-Fi cup's table needs no designator, as its own order is
   the one the sort wants). No plain order of the entries gives it, which is the "no declaration order" of its old row.
+- The same freedom places literals among the file's 4-byte statics: the shared `.data` section sits where its smallest
+  object sorts, so both the order of the lines and the order of the table definitions move it. `wifibattlematch_net.c`
+  keeps `"ver"` and `"dis"` as literals of `sMatchKeyNames` rather than two `static char[]` (which would put 8 bytes
+  into the shared section and make it 76), and declares `sLastLoginTable`, `sRecordIdTable`, `sRecordDataTables`,
+  `sWifiCupPartyTable` and `sMatchKeyNames` in that order, which sorts the 68-byte section after the two 4-byte
+  literals; its `.data` (628 bytes, 17 relocations) and `.rodata` then match both versions.
 - A second `""` in what was taken for one file's `.data` is a file boundary: MWCC pools equal string literals within
   a translation unit, so each run of functions that shares one `""` is a file of its own. Overlay 28's `union_main.c`
   and `colosseum.c` were five files (`union_main.c`, `union_receive.c`, `union_subproc.c`, `colosseum_comm.c`,

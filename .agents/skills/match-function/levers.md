@@ -1060,6 +1060,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - A table's equal-length literals in an order no plain entry order gives: list the table with C99 designators,
   `[i] = "..."`, in the order the size sort needs; the index keeps the table's meaning.
   (matching.md: "A table's literals can be listed in an order other than the table's")
+- A shared `.data` section in the wrong place among 4-byte literals: its position is its smallest object's, so move
+  it with the order the tables are declared in, and keep the 4-byte strings as literals rather than `char[]` statics.
+  (matching.md: "The same freedom places literals among the file's 4-byte statics")
 - A literal laid out before every surviving use of it: code the original link dead-stripped. Each code literal has a
   section of its own, and a static called from code the optimizer removes is still emitted with its literals.
   (matching.md: "Each literal that code creates")

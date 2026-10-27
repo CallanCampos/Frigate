@@ -2363,7 +2363,7 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 | `wifibattlematch_link.c` | `0x021b2f80`–`0x021b3064` | 3 | complete | descriptive |
 | `wifibattlematch_link_random.c` | `0x021b3064`–`0x021b57dc` | 44 | complete | descriptive |
 | `wifibattlematch_link_competition.c` | `0x021b57dc`–`0x021b8cc8` | 46 | complete | descriptive |
-| `wifibattlematch_net.c` | `0x021b8cc8`–`0x021bc058` | 100 | partial | string at `0x021bff6c` |
+| `wifibattlematch_net.c` | `0x021b8cc8`–`0x021bc058` | 100 | complete | string at `0x021bff6c` |
 | `wifibattlematch_net_fields.c` | `0x021bc058`–`0x021bc218` | 5 | complete | descriptive |
 | `sakeMain.c` | `0x021bc218`–`0x021bc478` | 16 | complete | descriptive |
 | `sakeRequest.c` | `0x021bc478`–`0x021bc82c` | 8 | complete | descriptive |
