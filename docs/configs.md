@@ -42,8 +42,10 @@ whose 4-byte `.bss` static the strip drops with its two functions while its plac
 names the ROM's order, and `gstats.c`'s 23 functions the game doesn't call, whose statics, local initializers and
 first `""` give the file's data the ROM's layout, and, by the same ruling, for NitroSDK code that ntrtwl's
 reconstruction shows: multiboot's `mb_gameinfo.c`, whose child side and unused setters (26 functions, 14 of them listed)
-give the four words at the head of its `.bss` that the parent never reads. Any other entry is another
-exception for the maintainer to accept.
+give the four words at the head of its `.bss` that the parent never reads. Overlay 182's `dwc_mov_wh.c` lists a
+child connection reconstructed from the two buffer-size messages it shares with the parent's, whose first use puts
+them where the ROM's `.data` has them; nothing else of it is known. Any other entry is another exception for the
+maintainer to accept.
 
 `AuthService.c` also restores two password-login entry points with their callbacks and password helper. These five
 functions are checked against a reference object's assembly; the game's eight surviving functions and all of its

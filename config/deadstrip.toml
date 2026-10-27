@@ -105,3 +105,7 @@
     "MB_SetUserVolatData",
     "MB_GetUserVolatData",
 ]
+# The Download Play wireless helper's child connection, which the game doesn't call: the first use of the two buffer
+# size messages it shares with the parent's connection, which puts them ahead of the channel measurement's messages
+# in the file's .data, where the ROM has them. Reconstructed from those messages alone
+"lib/dwcutil/src/dwc_mov_wh.c" = ["DWCi_MOV_WH_ChildConnect"]

@@ -60,6 +60,7 @@ lib/dwcutil/src/dwc_mov_mbp.c:
     .bss        start:0x021c417c end:0x021c4180
 
 lib/dwcutil/src/dwc_mov_wh.c:
+    complete
     .text       start:0x021b9bbc end:0x021ba768
     .data       start:0x021c1770 end:0x021c1ad8
     .bss        start:0x021c4180 end:0x021c4188

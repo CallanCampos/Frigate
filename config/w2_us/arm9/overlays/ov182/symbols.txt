@@ -1667,7 +1667,7 @@ sSubScreenRow kind:bss addr:0x021c41b0
 sUsbScan kind:bss addr:0x021c41b4
 sDialog kind:bss addr:0x021c41b8
 data_ov182_021c417c kind:bss addr:0x021c41bc
-gWork kind:bss addr:0x021c41c0
+sLogPrint kind:bss addr:0x021c41c0
 sDownloadPlaySysWork kind:bss addr:0x021c41c8
 sResource kind:bss addr:0x021c41cc
 sScreens kind:bss addr:0x021c41d0

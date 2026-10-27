@@ -1957,6 +1957,18 @@ Same instructions, scheduled in another order.
 
 ## An instruction too many or too few
 
+- A dead `movs rN, #0` right after a call, which no later code reads and nothing branches to, can be the `0` of an
+  assert's `(exp) || (OS_Terminate(), 0)`. MWCC tests the `||`'s right operand for its truth with `cmp rN, #0`, drops
+  the branch because both of its targets are the next statement, and keeps the constant alive for the compare that is
+  left; the Thumb peephole then folds `mov rN, #0; cmp rN, #0` into the flag-setting `movs rN, #0`, deleting the
+  compare and leaving the move. At -O4 the IR's copy propagation and dead-assignment removal delete the constant
+  before code generation, so the move survives only with both passes off: overlay 182's `DWCi_MOV_WH_ParentConnect`
+  (`dwc_mov_wh.c`) matches under `#pragma opt_dead_assignments off` and `#pragma opt_propagation off` around it alone
+  (the whole file in `dsi/1.1p1` through `1.3p1`). Neither pragma alone keeps the move, nor do the pair over the
+  whole file (`SelectChannel` grows to 0x94), `-opt nodeadstore,noprop` or any `if`, flag or inline form. With a
+  non-constant operand the orphaned compare stays visible: `(OS_Terminate(), x)` leaves `cmp rN, #0` after the call.
+  Nothing shows the original source had the pragmas, so the file says why they are there.
+
 - NitroWiFi's `rcv_finished` saves and restores whole transcript contexts with explicit `MI_CpuCopy8` calls.
   Structure assignment changes the runtime-copy shape and frame even though it expresses the same snapshot.
 
@@ -3977,6 +3989,14 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   template that the ROM doesn't have. Only an initializer above the file's first function sorts this way; below a
   function its literals come out in source order. NitroWiFi's `ssl.c` matches its `.data` with its OID table as six
   string literals at the top of the file, sorted among its named objects, as in Black 1's version.
+- A function's string literals go out as MWCC generates its code, each at its first use, so two strings of one function
+  laid out apart, with another function's between them, were first used higher in the file by a function the original
+  link dropped. Overlay 182's `dwc_mov_wh.c` has `DWCi_MOV_WH_ParentConnect`'s two buffer-size messages ahead of the
+  channel measurement's and its `"unknown connect mode %d\n"` after them; a global defined above the measurement that
+  logs the two sizes, listed in `config/deadstrip.toml`, gives the ROM's order, and an unreferenced `static` doesn't,
+  as MWCC doesn't generate it. The same file's state names sort by size ahead of their table only with the work
+  pointer and the log function as two statics initialized to `NULL` above the table: as one 8-byte struct, or left
+  tentative, the three 26-byte names come out in another order (`rodata_order.py` gives the same).
 - A zero-initialized static too far from its section's base for the load's immediate (`ldrh` reaches 0x3e) gets a
   section-relative pool word of its own, apart from the symbol's literal, so one object shows two literal words.
   `dwc_aoss_ap.c`'s successor `aosslink.c` (DWC utility, 2.0/sp1p2) matches `AOSSi_WLANConnect` with `sBss = { 0 }` at
