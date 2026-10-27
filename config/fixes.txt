@@ -1523,6 +1523,10 @@ overlays/ov036 0x021bb774 reloc_addend 0x380
 overlays/ov036 0x021bf910 reloc_module overlay(280)
 overlays/ov036 0x021c73dc section_end src/ov036/scrcmd_field.c:.text
 overlays/ov036 0x021c8cd0 section_start src/ov036/scrcmd_hidden_hollow.c:.text
+overlays/ov036 0x021c9282 reloc_module overlay(12)
+overlays/ov036 0x021c928e reloc_module overlay(12)
+overlays/ov036 0x021c9298 reloc_module overlay(12)
+overlays/ov036 0x021c92a2 reloc_module overlay(12)
 overlays/ov036 0x021c9eb8 add_section src/ov036/fieldmap.c:.rodata:0x98c
 overlays/ov036 0x021c9ec4 section_start src/ov036/fieldmap.c:.rodata
 overlays/ov036 0x021ca058 remove_symbol

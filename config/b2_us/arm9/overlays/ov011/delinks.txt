@@ -406,6 +406,7 @@ lib/dwc/src/auth/dwc_auth.c:
     .bss        start:0x0218e924 end:0x021905f8
 
 lib/dwc/src/auth/dwc_http_client.c:
+    complete
     .text       start:0x0216a408 end:0x0216b14c
     .data       start:0x02185d24 end:0x02185e68
     .bss        start:0x021905f8 end:0x021905fc
