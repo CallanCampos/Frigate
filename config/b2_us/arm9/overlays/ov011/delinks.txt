@@ -275,6 +275,7 @@ lib/dwc/src/gscommon/gsDebug.c:
     .bss        start:0x021907a0 end:0x02190804
 
 lib/dwc/src/gscommon/gsLargeInt.c:
+    complete
     .text       start:0x0216cd94 end:0x0216dd9c
     .data       start:0x02186eb4 end:0x02186ec4
     .bss        start:0x02190804 end:0x02190894
