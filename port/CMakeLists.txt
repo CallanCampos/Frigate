@@ -254,6 +254,13 @@ target_compile_options(port_decomp_env INTERFACE
     # decomp does it where the original did, so that part of the group stays a warning
     -Werror=implicit-function-declaration -Werror=int-conversion -Werror=incompatible-pointer-types
     -Wno-error=incompatible-pointer-types-discards-qualifiers)
+# The decomp's C calls the C library's math (sqrt, which clang turns into sqrtf where its argument and result are
+# float), which glibc keeps in libm. The pinned SDL3 brings it on its link line, a distribution's shared SDL3 doesn't,
+# so on Linux it is linked by name; macOS's and MSYS2's C libraries have it already
+if(UNIX AND NOT APPLE)
+    set(PORT_LIBM m)
+endif()
+target_link_libraries(port_decomp_env INTERFACE ${PORT_LIBM})
 
 add_library(pokebw2_game OBJECT ${game_sources})
 target_link_libraries(pokebw2_game PRIVATE port_decomp_env)
@@ -356,7 +363,7 @@ add_executable(${PORT_PROGRAM}
     $<TARGET_OBJECTS:pokebw2_game> $<TARGET_OBJECTS:port_hal> $<TARGET_OBJECTS:port_app> ${port_gfx_objects}
     "${PORT_GEN}/stubs.c")
 target_include_directories(${PORT_PROGRAM} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
-target_link_libraries(${PORT_PROGRAM} PRIVATE SDL3::SDL3)
+target_link_libraries(${PORT_PROGRAM} PRIVATE SDL3::SDL3 ${PORT_LIBM})
 
 # Labels, so that a part of the tests can be run by what it needs (ctest -L LABEL, or -LE LABEL to leave it out;
 # port/tests/README.md). A test gets its labels where it is defined, with port_test_labels(TEST LABEL...):
