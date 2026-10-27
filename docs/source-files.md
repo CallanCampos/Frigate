@@ -118,11 +118,11 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 | `socl_close.c` | `0x021572f4`–`0x02157620` | 7 | complete | descriptive |
 | `socl_cleanup.c` | `0x02157620`–`0x02157894` | 8 | complete | descriptive |
 | `socl_poll.c` | `0x02157894`–`0x02157978` | 2 | complete | descriptive |
-| `socl_misc.c` | `0x02157978`–`0x02157af0` | 5 | partial | descriptive |
+| `socl_misc.c` | `0x02157978`–`0x02157af0` | 5 | complete | descriptive |
 | `socl_list.c` | `0x02157af0`–`0x02157bd0` | 9 | complete | descriptive |
-| `soc.c` | `0x02157bd0`–`0x02158174` | 23 | partial | descriptive |
+| `soc.c` | `0x02157bd0`–`0x02158174` | 23 | complete | descriptive |
 | `socl_ssl.c` | `0x02158174`–`0x02158250` | 3 | complete | descriptive |
-| `ssl.c` | `0x02158250`–`0x0215a6b4` | 60 | partial | descriptive |
+| `ssl.c` | `0x02158250`–`0x0215a6b4` | 60 | complete | descriptive |
 | `md5.c` | `0x0215a6b4`–`0x0215ab04` | 6 | complete | descriptive |
 | `sha1.c` | `0x0215ab04`–`0x0215b1d8` | 8 | complete | descriptive |
 | `ssl_rc4.c` | `0x0215b1d8`–`0x0215b274` | 2 | complete | descriptive |
@@ -135,16 +135,16 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 | `dwc_nonport.c` | `0x0215dd74`–`0x0215dda8` | 3 | complete | descriptive |
 | `dwc_nasfunc.c` | `0x0215dda8`–`0x0215dffc` | 5 | complete | descriptive |
 | `dwc_nastime.c` | `0x0215dffc`–`0x0215e160` | 1 | complete | descriptive |
-| `dwc_common.c` | `0x0215e160`–`0x0215e344` | 5 | partial | descriptive |
+| `dwc_common.c` | `0x0215e160`–`0x0215e344` | 5 | complete | descriptive |
 | `dwc_friend.c` | `0x0215e344`–`0x0215f410` | 37 | complete | descriptive |
 | `dwc_login.c` | `0x0215f410`–`0x0215fa0c` | 16 | complete | descriptive |
 | `dwc_main.c` | `0x0215fa0c`–`0x02160e10` | 49 | complete | descriptive |
-| `dwc_match.c` | `0x02160e10`–`0x02168818` | 161 | partial | descriptive |
-| `dwc_transport.c` | `0x02168818`–`0x021694d4` | 41 | partial | descriptive |
+| `dwc_match.c` | `0x02160e10`–`0x02168818` | 161 | complete | descriptive |
+| `dwc_transport.c` | `0x02168818`–`0x021694d4` | 41 | complete | descriptive |
 | `dwc_auth.c` | `0x021694d4`–`0x0216a408` | 30 | complete | descriptive |
 | `dwc_http_client.c` | `0x0216a408`–`0x0216b14c` | 25 | complete | descriptive |
-| `dwc_conntest.c` | `0x0216b14c`–`0x0216bbe4` | 8 | partial | descriptive |
-| `dwc_profanity.c` | `0x0216bbe4`–`0x0216c154` | 6 | partial | descriptive |
+| `dwc_conntest.c` | `0x0216b14c`–`0x0216bbe4` | 8 | complete | descriptive |
+| `dwc_profanity.c` | `0x0216bbe4`–`0x0216c154` | 6 | complete | descriptive |
 | `dwc_svcloc.c` | `0x0216c154`–`0x0216c520` | 5 | complete | descriptive |
 | `gsAvailable.c` | `0x0216c520`–`0x0216c764` | 5 | complete | descriptive |
 | `gsCore.c` | `0x0216c764`–`0x0216cac0` | 11 | complete | descriptive |
@@ -152,7 +152,7 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 | `gsDebug.c` | `0x0216cc2c`–`0x0216cd94` | 5 | complete | descriptive |
 | `gsLargeInt.c` | `0x0216cd94`–`0x0216dd9c` | 18 | complete | descriptive |
 | `gsMemory.c` | `0x0216dd9c`–`0x0216de10` | 8 | complete | descriptive |
-| `gsPlatformSocket.c` | `0x0216de10`–`0x0216e204` | 22 | partial | descriptive |
+| `gsPlatformSocket.c` | `0x0216de10`–`0x0216e204` | 22 | complete | descriptive |
 | `gsPlatformThread.c` | `0x0216e204`–`0x0216e250` | 6 | complete | descriptive |
 | `gsPlatformUtil.c` | `0x0216e250`–`0x0216ea4c` | 25 | complete | descriptive |
 | `gsSoap.c` | `0x0216ea4c`–`0x0216ec58` | 9 | complete | descriptive |
@@ -166,7 +166,7 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 | `gp.c` | `0x0217241c`–`0x02172d68` | 21 | complete | descriptive |
 | `gpi.c` | `0x02172d68`–`0x02173504` | 6 | complete | descriptive |
 | `gpiBuddy.c` | `0x02173504`–`0x02174dd4` | 12 | complete | descriptive |
-| `gpiBuffer.c` | `0x02174dd4`–`0x02175458` | 13 | partial | descriptive |
+| `gpiBuffer.c` | `0x02174dd4`–`0x02175458` | 13 | complete | descriptive |
 | `gpiCallback.c` | `0x02175458`–`0x02175750` | 4 | complete | descriptive |
 | `gpiConnect.c` | `0x02175750`–`0x0217688c` | 10 | complete | descriptive |
 | `gpiInfo.c` | `0x0217688c`–`0x02177cc0` | 13 | complete | descriptive |
@@ -185,7 +185,7 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 | `gt2Callback.c` | `0x0217c9f4`–`0x0217ce00` | 10 | complete | descriptive |
 | `gt2Connection.c` | `0x0217ce00`–`0x0217d144` | 14 | complete | descriptive |
 | `gt2Main.c` | `0x0217d144`–`0x0217d3ac` | 22 | complete | descriptive |
-| `gt2Message.c` | `0x0217d3ac`–`0x0217e768` | 51 | partial | descriptive |
+| `gt2Message.c` | `0x0217d3ac`–`0x0217e768` | 51 | complete | descriptive |
 | `gt2Socket.c` | `0x0217e768`–`0x0217ed14` | 15 | complete | descriptive |
 | `gt2Utility.c` | `0x0217ed14`–`0x0217ee90` | 3 | complete | descriptive |
 | `NATify.c` | `0x0217ee90`–`0x0217f490` | 7 | complete | descriptive |
@@ -1811,7 +1811,7 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 | --- | --- | --- | --- | --- |
 | `dwc_raputil.c` | `0x021a4920`–`0x021a49d0` | 5 | complete | string at `0x021c05c0` |
 | `aoss.c` | `0x021a49d0`–`0x021a6c1c` | 71 | complete | descriptive |
-| `aosslink.c` | `0x021a6c1c`–`0x021a71fc` | 12 | partial | descriptive |
+| `aosslink.c` | `0x021a6c1c`–`0x021a71fc` | 12 | complete | descriptive |
 | `apc.c` | `0x021a71fc`–`0x021a7858` | 9 | complete | descriptive |
 | `atermset.c` | `0x021a7858`–`0x021ab040` | 66 | complete | descriptive |
 | `anime.c` | `0x021ab040`–`0x021ab17c` | 3 | complete | descriptive |
@@ -1884,7 +1884,7 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 | `foundation.c` | `0x021bc1a8`–`0x021bc1dc` | 3 | complete | descriptive |
 | `graphics.c` | `0x021bc1dc`–`0x021bc468` | 4 | complete | descriptive |
 | `heap.c` | `0x021bc468`–`0x021bc544` | 6 | complete | descriptive |
-| `input.c` | `0x021bc544`–`0x021bcaac` | 15 | partial | descriptive |
+| `input.c` | `0x021bc544`–`0x021bcaac` | 15 | complete | descriptive |
 | `interrupt.c` | `0x021bcaac`–`0x021bcb3c` | 3 | complete | descriptive |
 | `list.c` | `0x021bcb3c`–`0x021bcbc8` | 6 | complete | descriptive |
 | `obj.c` | `0x021bcbc8`–`0x021bccec` | 6 | complete | descriptive |
@@ -1949,32 +1949,33 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 | `nhttp_rap.c` | `0x0219ce80`–`0x0219d410` | 25 | complete | string at `0x021acffc` |
 | `nhttp_rap_evilcheck.c` | `0x0219d410`–`0x0219d504` | 6 | complete | string at `0x021ad0ac` |
 | `dpw_profile.c` | `0x0219d504`–`0x0219d550` | 1 | complete | descriptive |
-| `nhttp_os.c` | `0x0219d550`–`0x0219d60c` | 8 | partial | descriptive |
-| `nhttp_socket.c` | `0x0219d60c`–`0x0219d954` | 14 | partial | descriptive |
+| `nhttp_os.c` | `0x0219d550`–`0x0219d60c` | 8 | complete | descriptive |
+| `nhttp_socket.c` | `0x0219d60c`–`0x0219d954` | 14 | complete | descriptive |
 | `nhttp_stdlib.c` | `0x0219d954`–`0x0219dd94` | 16 | complete | descriptive |
-| `nhttp_bgnend.c` | `0x0219dd94`–`0x0219df00` | 9 | partial | descriptive |
-| `nhttp_control.c` | `0x0219df00`–`0x0219e0d8` | 6 | partial | descriptive |
+| `nhttp_bgnend.c` | `0x0219dd94`–`0x0219df00` | 9 | complete | descriptive |
+| `nhttp_control.c` | `0x0219df00`–`0x0219e0d8` | 6 | complete | descriptive |
 | `nhttp_list.c` | `0x0219e0d8`–`0x0219e1f8` | 6 | complete | descriptive |
 | `nhttp_recvbuf.c` | `0x0219e1f8`–`0x0219e538` | 9 | complete | descriptive |
-| `nhttp_request.c` | `0x0219e538`–`0x0219ea14` | 8 | partial | descriptive |
+| `nhttp_request.c` | `0x0219e538`–`0x0219ea14` | 8 | complete | descriptive |
 | `nhttp_response.c` | `0x0219ea14`–`0x0219ec24` | 4 | complete | descriptive |
 | `nhttp_thread.c` | `0x0219ec24`–`0x021a076c` | 30 | complete | descriptive |
 | `d_nhttp.c` | `0x021a076c`–`0x021a0a38` | 15 | complete | descriptive |
-| `d_nhttp_common.c` | `0x021a0a38`–`0x021a0e1c` | 35 | partial | descriptive |
-| `d_nhttp_private.c` | `0x021a0e1c`–`0x021a1160` | 11 | partial | descriptive |
+| `d_nhttp_common.c` | `0x021a0a38`–`0x021a0e1c` | 35 | complete | descriptive |
+| `d_nhttp_private.c` | `0x021a0e1c`–`0x021a1160` | 11 | complete | descriptive |
 | `dwc_ghttp.c` | `0x021a1160`–`0x021a154c` | 15 | complete | descriptive |
 | `ghttpBuffer.c` | `0x021a154c`–`0x021a1980` | 11 | complete | descriptive |
-| `ghttpCallbacks.c` | `0x021a1980`–`0x021a1a44` | 3 | partial | descriptive |
-| `ghttpCommon.c` | `0x021a1a44`–`0x021a1e0c` | 8 | partial | descriptive |
+| `ghttpCallbacks.c` | `0x021a1980`–`0x021a1a44` | 3 | complete | descriptive |
+| `ghttpCommon.c` | `0x021a1a44`–`0x021a1e0c` | 8 | complete | descriptive |
 | `ghttpConnection.c` | `0x021a1e0c`–`0x021a23d8` | 10 | complete | descriptive |
 | `ghttpEncryption.c` | `0x021a23d8`–`0x021a2c50` | 17 | complete | descriptive |
-| `ghttpMain.c` | `0x021a2c50`–`0x021a3074` | 16 | partial | descriptive |
+| `ghttpMain.c` | `0x021a2c50`–`0x021a3074` | 16 | complete | descriptive |
 | `ghttpPost.c` | `0x021a3074`–`0x021a4114` | 21 | complete | descriptive |
 | `ghttpProcess.c` | `0x021a4114`–`0x021a54b4` | 18 | complete | descriptive |
-| `nd.c` | `0x021a54b4`–`0x021a6c84` | 61 | partial | descriptive |
+| `nd_api.c` | `0x021a54b4`–`0x021a59c4` | 13 | complete | descriptive |
+| `nd.c` | `0x021a59c4`–`0x021a6c84` | 48 | partial | descriptive |
 | `dpw_tr.c` | `0x021a6c84`–`0x021a8010` | 19 | complete | descriptive |
 | `dpw_battle_tower.c` | `0x021a8010`–`0x021a893c` | 12 | complete | descriptive |
-| `dwc_encsession.c` | `0x021a893c`–`0x021a90f0` | 16 | partial | descriptive |
+| `dwc_encsession.c` | `0x021a893c`–`0x021a90f0` | 16 | complete | descriptive |
 | `crypt.c` | `0x021a90f0`–`0x021ac838` | 67 | complete | descriptive |
 
 ### Overlay 190
@@ -2059,7 +2060,7 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 | `mystery.c` | `0x021b5420`–`0x021b8348` | 57 | complete | string at `0x021be980` |
 | `mystery_graphic.c` | `0x021b8348`–`0x021b876c` | 23 | complete | string at `0x021be98c` |
 | `mystery_util.c` | `0x021b876c`–`0x021b99e0` | 56 | complete | string at `0x021be9a0` |
-| `mystery_album.c` | `0x021b99e0`–`0x021bd068` | 59 | partial | string at `0x021be9b0` |
+| `mystery_album.c` | `0x021b99e0`–`0x021bd068` | 59 | complete | string at `0x021be9b0` |
 | `mystery_net.c` | `0x021bd068`–`0x021bdd34` | 40 | complete | string at `0x021be9c0` |
 | `mystery_check.c` | `0x021bdd34`–`0x021be2dc` | 2 | complete | descriptive |
 
@@ -2103,7 +2104,7 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 | `gds_rap.c` | `0x021b5420`–`0x021b6104` | 24 | complete | string at `0x021b7ae0` |
 | `gds_rap_response.c` | `0x021b6104`–`0x021b631c` | 10 | complete | descriptive |
 | `battle_rec_ov.c` | `0x021b631c`–`0x021b64e8` | 7 | complete | descriptive |
-| `poke_net.c` | `0x021b64e8`–`0x021b7374` | 31 | partial | descriptive |
+| `poke_net.c` | `0x021b64e8`–`0x021b7374` | 31 | complete | descriptive |
 | `poke_net_gds.c` | `0x021b7374`–`0x021b7918` | 18 | complete | descriptive |
 | `poke_net_ssl.c` | `0x021b7918`–`0x021b7a5c` | 7 | complete | descriptive |
 
@@ -2308,7 +2309,7 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 | `draw_system.c` | `0x0219a550`–`0x0219a850` | 12 | complete | string at `0x021b25b0` |
 | `ctvt_camera.c` | `0x0219a850`–`0x0219b5b8` | 29 | complete | string at `0x021b25c0` |
 | `ctvt_comm.c` | `0x0219b5b8`–`0x0219cd74` | 69 | complete | string at `0x021b25f8` |
-| `ctvt_talk.c` | `0x0219cd74`–`0x0219ef4c` | 40 | partial | string at `0x021b2604` |
+| `ctvt_talk.c` | `0x0219cd74`–`0x0219ef4c` | 40 | complete | string at `0x021b2604` |
 | `ctvt_mic.c` | `0x0219ef4c`–`0x0219f234` | 24 | complete | string at `0x021b261c` |
 | `ctvt_draw.c` | `0x0219f234`–`0x021a0ac4` | 15 | complete | string at `0x021b264c` |
 | `ctvt_call.c` | `0x021a0ac4`–`0x021a22bc` | 16 | complete | string at `0x021b2658` |
@@ -3024,7 +3025,7 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 | `data_convert_flow.c` | `0x021c53dc`–`0x021c6e14` | 38 | complete | string at `0x021c944c` |
 | `wb_save_block.c` | `0x021c6e14`–`0x021c6e80` | 4 | complete | descriptive |
 | `wb_save_convert.c` | `0x021c6e80`–`0x021c7028` | 3 | complete | string at `0x021c9468` |
-| `cygnus_flow.c` | `0x021c7028`–`0x021c8b34` | 66 | partial | string at `0x021c947c` |
+| `cygnus_flow.c` | `0x021c7028`–`0x021c8b34` | 66 | complete | string at `0x021c947c` |
 
 ### Overlay 338
 
@@ -3033,3 +3034,4 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
 | `ir_check.c` | `0x0217c940`–`0x0217cb10` | 6 | complete | descriptive |
+
