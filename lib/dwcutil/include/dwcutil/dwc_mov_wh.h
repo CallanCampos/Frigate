@@ -111,4 +111,7 @@ void DWCi_MOV_WH_Reset(void);
 void DWCi_MOV_WH_Finalize(void);
 BOOL DWCi_MOV_WH_End(void);
 
+// The child's connection, which nothing in the game calls (see dwc_mov_wh.c)
+void DWCi_MOV_WH_ChildConnect(void);
+
 #endif // POKEBW2_DWCUTIL_DWC_MOV_WH_H

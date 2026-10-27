@@ -356,6 +356,19 @@ static void DWCi_MOV_WH_StateOutEndParent(void *arg) {
     DWCi_MOV_WH_ChangeSysState(WIH_STATE_IDLE);
 }
 
+// The child's connection, which the game doesn't call, so the original link dropped it (config/deadstrip.toml). The
+// ROM keeps only its two messages, pooled with DWCi_MOV_WH_ParentConnect's: they come ahead of the channel
+// measurement's messages in the file's .data, so their first use is above it. The body is reconstructed from those
+// messages alone and can't be checked against the original
+void DWCi_MOV_WH_ChildConnect(void) {
+    if (sLogPrint != NULL) {
+        sLogPrint(0x08000000, "recv buffer size = %d\n", sWork->recvBufSize);
+    }
+    if (sLogPrint != NULL) {
+        sLogPrint(0x08000000, "send buffer size = %d\n", sWork->sendBufSize);
+    }
+}
+
 // The key sharing end, only when the helper is sharing keys
 static BOOL DWCi_MOV_WH_StateInEndChildKeyShare(void) {
     WMErrCode result;
