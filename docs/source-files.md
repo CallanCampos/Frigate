@@ -2376,7 +2376,7 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 | `sciSerialize.c` | `0x021be340`–`0x021be474` | 4 | complete | descriptive |
 | `sciWebServices.c` | `0x021be474`–`0x021beaa0` | 10 | complete | descriptive |
 | `gdb.c` | `0x021beaa0`–`0x021bf63c` | 26 | complete | descriptive |
-| `AuthService.c` | `0x021bf63c`–`0x021bfcd8` | 8 | partial | descriptive |
+| `AuthService.c` | `0x021bf63c`–`0x021bfcd8` | 8 | complete | descriptive |
 
 ### Overlay 261
 
