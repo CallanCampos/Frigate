@@ -860,7 +860,16 @@ Same instructions, registers swapped.
 - DWC's `DWCi_Http_Thread` uses one transfer-length local for `CPS_SocWrite`'s result and the later
   `CPS_SocRead` output. Keeping the write result in a separate `sent` local drops the original's store to the
   address-taken length slot. The shared `u32 length`, with `(s32)length <= 0` for the write error check, restores
-  that store and reduces the difference from 242 bytes to 37; the remaining stack slots still differ.
+  that store and reduces the difference from 242 bytes to 37.
+- An `int` compared with a `u64` keeps its sign word, hoisted before the loop, in the high half of an 8-byte slot
+  whose low half is never accessed when the `int` is assigned in both arms of an `if`/`else` (or a ternary), and in a
+  4-byte slot when it has a default and an `if` that overrides it; the code is the same. `DWCi_Http_Thread` sets its
+  timeout with `if (http->param.timeout > 0) { timeout = http->param.timeout; } else { timeout = 60000; }` for the
+  original's 0x3c frame and `{r4-r7, lr}` (ours pushed `r3` too and reserved 0x38), where `int timeout =
+  http->param.timeout;` and `if (timeout <= 0) { timeout = 60000; }` give the compare `OS_TicksToMilliSeconds(...) >
+  timeout` a 4-byte sign slot. Its `CPSSoc *soc` is declared first, for the slot above `ip`, and assigned after
+  `headersDone`'s initializer (`soc = &http->soc;` as the first statement), which keeps the original's store order;
+  an initializer stores it first.
 
 - `RailMath_RailToWorldSlerpXZ` keeps raw signed position and length at the original stack slots when they form
   a progress snapshot and an inline reads that snapshot through a `const` pointer to compute its fixed-point ratio.

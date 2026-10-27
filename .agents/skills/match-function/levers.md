@@ -269,6 +269,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 - A write result missing its store to a later read's output slot: use one transfer-length local for both operations
   (`DWCi_Http_Thread`). (matching.md: "one transfer-length local")
+- A frame one word short (an extra `r3` in the push) with a sign word hoisted for a 64-bit compare in a 4-byte
+  slot, where the original's sits in the high half of an 8-byte one: assign the `int` in both arms of an `if`/`else`,
+  not as a default and an override (`DWCi_Http_Thread`). (matching.md: "keeps its sign word")
 
 - Raw rail progress spilled as converted scalars: keep the signed position/length snapshot and let its ratio
   inline read through a `const` pointer. (matching.md: "a progress snapshot")
