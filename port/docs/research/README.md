@@ -23,6 +23,7 @@ recommendations: macOS builds are ad-hoc signed and never notarized.
 | [sdk-surface.md](sdk-surface.md) | Library layering, game-side SDK surface, hardware access, boundary options, HAL table |
 | [compile-probe.md](compile-probe.md) | Host compile results, 64-bit sites, struct layouts, undefined behaviour, fix effort |
 | [assets-arm7-sound.md](assets-arm7-sound.md) | ROM layout, file formats, `data/`, ARM7, sound, saves, DSi, IR, first-launch design |
+| [es-rom-support.md](es-rom-support.md) | The Spanish ROM (IRES) against the US one: header, overlays, NitroFS, text, the US code's English logic, options (2026-10-26) |
 | [platinum-port.md](platinum-port.md) | The Pokémon Platinum PC port's game-side changes, history, quality and lessons |
 | [libntr.md](libntr.md) | libntr's architecture, coverage, renderer, licensing, macOS blockers and BW2 gaps |
 | [platinum-mods-alternatives.md](platinum-mods-alternatives.md) | Widescreen and single-screen mods, Gen4Recomp, other DS ports, multiplayer |

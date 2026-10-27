@@ -7,10 +7,10 @@
 #   cmake --build build/port
 #   ctest --test-dir build/port
 #
-# Options: -DPORT_VERSION=b2_us|w2_us (default b2_us), -DPORT_FETCH_SDL3, -DPORT_MACOS_DISTRIBUTION, and -DPORT_SANITIZE
-# with -DPORT_SANITIZE_RECOVER (the sanitized build) here; the others are in the fragments of port/cmake/, included at
-# the end, and port/cmake/README.md lists them all. Each fragment labels its tests where it defines them
-# (port_test_labels).
+# Options: -DPORT_VERSION=b2_us|w2_us (default b2_us), -DPORT_ROM_LANGUAGE=us|es (default us), -DPORT_FETCH_SDL3,
+# -DPORT_MACOS_DISTRIBUTION, and -DPORT_SANITIZE with -DPORT_SANITIZE_RECOVER (the sanitized build) here; the others
+# are in the fragments of port/cmake/, included at the end, and port/cmake/README.md lists them all. Each fragment
+# labels its tests where it defines them (port_test_labels).
 cmake_minimum_required(VERSION 3.28)
 
 # The macOS build for other Macs than the one that builds it (ADR 0015): one universal program, arm64 and x86_64, for
@@ -105,6 +105,20 @@ elseif(PORT_VERSION STREQUAL "w2_us")
     set(PORT_WINDOW_ICON "${CMAKE_CURRENT_SOURCE_DIR}/assets/branding/window-white2-32.png")
 else()
     message(FATAL_ERROR "PORT_VERSION must be b2_us or w2_us, not ${PORT_VERSION}")
+endif()
+
+# The language of the ROM the program plays: us, the dump the decomp builds, or es, a Spanish dump of the same version
+# (IRES for Black 2), whose files the US code reads instead, by the manifest that
+# port/tools/research/assets/rom_manifest.py writes from that dump (port/cmake/rom.cmake). The game's code stays the
+# decomp's US C, with English game logic where it has any (port/docs/research/es-rom-support.md, section 4)
+set(PORT_ROM_LANGUAGE "us" CACHE STRING "The language of the ROM to play: us (the decomp's) or es (Spanish)")
+set_property(CACHE PORT_ROM_LANGUAGE PROPERTY STRINGS us es)
+if(PORT_ROM_LANGUAGE STREQUAL "us")
+    set(PORT_ROM_REGION "US")
+elseif(PORT_ROM_LANGUAGE STREQUAL "es")
+    set(PORT_ROM_REGION "Spain")
+else()
+    message(FATAL_ERROR "PORT_ROM_LANGUAGE must be us or es, not ${PORT_ROM_LANGUAGE}")
 endif()
 
 get_filename_component(REPO_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/.." ABSOLUTE)

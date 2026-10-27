@@ -47,6 +47,20 @@ ctest --test-dir build/port -j4 --output-on-failure                      # test
 
 - **White 2** is a build directory of its own: `cmake -S port -B build/port-w2 -G Ninja -DPORT_VERSION=w2_us`, which
   makes `frigate-white2`. The other options are in [cmake/README.md](cmake/README.md#options).
+- **A Spanish Black 2 (`IRES`)** is a build directory of its own too. First write its manifest from your dump, hashes
+  only, then build with `PORT_ROM_LANGUAGE=es`:
+
+  ```sh
+  python3 port/tools/research/assets/rom_manifest.py ~/Games/negra2.nds \
+      port/tools/research/assets/nitrofs_manifest_languages.json
+  cmake -S port -B build/port-es -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo -DPORT_ROM_LANGUAGE=es
+  cmake --build build/port-es
+  build/port-es/frigate-black2 --rom ~/Games/negra2.nds
+  ```
+
+  The text and graphics are Spanish, but the game's code is the decomp's US code, with the English logic that
+  [ADR 0025](docs/adr/0025-a-spanish-rom-by-a-manifest-of-its-own.md) lists (Pokémon tagged English, English Easy
+  Chat lists).
 - **The program's options** are in `frigate-black2 --help`, which says what each does and what each exit status means,
   from `sOptions` in [app/main.c](app/main.c): `--headless` runs without a window or pacing, `--frames N` stops after N
   frames, `--screenshot PATH` writes both screens at the end, `--save-dir PATH` keeps the saves elsewhere,
