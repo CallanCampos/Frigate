@@ -150,7 +150,7 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 | `gsCore.c` | `0x0216c764`–`0x0216cac0` | 11 | complete | descriptive |
 | `gsCrypt.c` | `0x0216cac0`–`0x0216cc2c` | 1 | complete | descriptive |
 | `gsDebug.c` | `0x0216cc2c`–`0x0216cd94` | 5 | complete | descriptive |
-| `gsLargeInt.c` | `0x0216cd94`–`0x0216dd9c` | 18 | partial | descriptive |
+| `gsLargeInt.c` | `0x0216cd94`–`0x0216dd9c` | 18 | complete | descriptive |
 | `gsMemory.c` | `0x0216dd9c`–`0x0216de10` | 8 | complete | descriptive |
 | `gsPlatformSocket.c` | `0x0216de10`–`0x0216e204` | 22 | partial | descriptive |
 | `gsPlatformThread.c` | `0x0216e204`–`0x0216e250` | 6 | complete | descriptive |

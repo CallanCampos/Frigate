@@ -126,6 +126,12 @@ tools that show the differences.
 - Compound assignments add in another order than one expression: `mystery_net.c`'s `Mystery_ParseHex` adds the
   shifted value first, as the original does, only as `value <<= 4; value += digit;`, not as
   `value = value * 16 + digit`.
+- An element updated through a cast of its own type, `a[i] = (T)(a[i] + d)`, is a load and a separate store, where
+  `a[i] += d` and `a[i] = a[i] + d` are one update that shares `i * 4` with the other uses of `i` around it. In
+  `gsLargeInt.c`'s `gsiLargeIntDiv`, GameSpy's `quotientWork.mData[offset] = (gsi_u32)(quotientWork.mData[offset] +
+  digit)` leaves `r7` free in the loop and spills the `offset * 4` temporaries, as the original does; without the
+  cast, `r7` holds one `offset * 4` for the whole loop (12 bytes short). `top` declared after `done` then puts the
+  two spilled locals in the original's slots.
 - An array element's address kept as `base + i * size` and read as `[base, offset]`, where ours keeps `&p[i]`, comes
   from a pointer to `const`: `pdw_postman.c`'s `FindMysteryGiftDeliveryManNPCID` and `scrcmd_medal.c`'s
   `GetMrMedalActorUID` declare `const ZoneNPC *npcs;`.
