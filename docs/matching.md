@@ -4345,6 +4345,11 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   declared directly before `sBoardPlNames`. A static table that nothing reads is dropped and a literal only it has is
   not listed, but one that a later table repeats is listed where the dropped table stood: an unused
   `static const char *s[] = { "recordid" };` ahead of `wifibattlematch_net_fields.c`'s tables moves that string.
+- A table's literals can be listed in an order other than the table's: a C99 designator gives an element's index and
+  the literal is listed where the line is, so `[6] = "CHEATS_COUNTER"` may sit above `[4] = "..."`. That is the only
+  order that reaches `wifibattlematch_net_fields.c`'s `.data`: its 1,644 bytes and 29 relocations match the ROM with
+  `sArenaFieldNames`' 21 lines listed in another order (the Wi-Fi cup's table needs no designator, as its own order is
+  the one the sort wants). No plain order of the entries gives it, which is the "no declaration order" of its old row.
 - A second `""` in what was taken for one file's `.data` is a file boundary: MWCC pools equal string literals within
   a translation unit, so each run of functions that shares one `""` is a file of its own. Overlay 28's `union_main.c`
   and `colosseum.c` were five files (`union_main.c`, `union_receive.c`, `union_subproc.c`, `colosseum_comm.c`,

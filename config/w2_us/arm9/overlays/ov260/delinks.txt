@@ -28,6 +28,7 @@ src/ov260/wifibattlematch_net.c:
     .bss        start:0x021c1ce0 end:0x021c1ce8
 
 src/ov260/wifibattlematch_net_fields.c:
+    complete
     .text       start:0x021bc098 end:0x021bc258
     .data       start:0x021c0124 end:0x021c0790
 

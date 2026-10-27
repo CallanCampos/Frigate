@@ -1057,6 +1057,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
   Check the literal's recorded size before adding an object. (matching.md: "apparent four-byte gap")
 - String literals in another order: MWCC lays them out in the order they first appear in the source; a `""` the
   game has before the file's name needs an earlier use. (matching.md: "String literals")
+- A table's equal-length literals in an order no plain entry order gives: list the table with C99 designators,
+  `[i] = "..."`, in the order the size sort needs; the index keeps the table's meaning.
+  (matching.md: "A table's literals can be listed in an order other than the table's")
 - A literal laid out before every surviving use of it: code the original link dead-stripped. Each code literal has a
   section of its own, and a static called from code the optimizer removes is still emitted with its literals.
   (matching.md: "Each literal that code creates")
