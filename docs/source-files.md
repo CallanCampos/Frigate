@@ -142,7 +142,7 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 | `dwc_match.c` | `0x02160e10`–`0x02168818` | 161 | partial | descriptive |
 | `dwc_transport.c` | `0x02168818`–`0x021694d4` | 41 | partial | descriptive |
 | `dwc_auth.c` | `0x021694d4`–`0x0216a408` | 30 | complete | descriptive |
-| `dwc_http_client.c` | `0x0216a408`–`0x0216b14c` | 25 | partial | descriptive |
+| `dwc_http_client.c` | `0x0216a408`–`0x0216b14c` | 25 | complete | descriptive |
 | `dwc_conntest.c` | `0x0216b14c`–`0x0216bbe4` | 8 | partial | descriptive |
 | `dwc_profanity.c` | `0x0216bbe4`–`0x0216c154` | 6 | partial | descriptive |
 | `dwc_svcloc.c` | `0x0216c154`–`0x0216c520` | 5 | complete | descriptive |
