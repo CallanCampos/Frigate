@@ -7,6 +7,18 @@
 // (aletheia) has the same functions in the same order, and they have those SDK names (WHi_MeasureChannel and
 // SelectChannel among them), which follow overlay 30's WH_* helper (src/ov030/wih.c) state for state.
 
+// The helper's work, which DWCi_MOV_WH_MemInit takes from the parent, and what it logs through
+static WHWork *sWork = NULL;
+static WHLogPrint sLogPrint = NULL;
+
+// The state names, one per state before WIH_STATE_FATAL, which the state change passes to the log
+static const char *stateNames[] = {
+    "DWCi_MOV_WH_SYSSTATE_STOP",       "DWCi_MOV_WH_SYSSTATE_IDLE",           "DWCi_MOV_WH_SYSSTATE_SCANNING",
+    "DWCi_MOV_WH_SYSSTATE_BUSY",       "DWCi_MOV_WH_SYSSTATE_CONNECTED",      "DWCi_MOV_WH_SYSSTATE_DATASHARING",
+    "DWCi_MOV_WH_SYSSTATE_KEYSHARING", "DWCi_MOV_WH_SYSSTATE_MEASURECHANNEL", "DWCi_MOV_WH_SYSSTATE_CONNECT_FAIL",
+    "DWCi_MOV_WH_SYSSTATE_ERROR",
+};
+
 static void DWCi_MOV_WH_ChangeSysState(WIHState state);
 static void DWCi_MOV_WH_SetError(int errcode);
 static BOOL DWCi_MOV_WH_StateInSetParentParam(void);
@@ -42,29 +54,29 @@ static void DWCi_MOV_WH_StateOutInitialize(void *arg);
 // Takes the work that the parent's DWCi_MOV_MBP_MemInit hands over and starts it out at state 0, with the three words
 // at the end of it cleared
 void DWCi_MOV_WH_MemInit(void *loaderContext) {
-    gWork.work = loaderContext;
-    gWork.work->sysState = WIH_STATE_STOP;
-    gWork.work->unk_13a8 = 0;
-    gWork.work->unk_13ac = NULL;
-    gWork.work->unk_13b0 = 0;
+    sWork = loaderContext;
+    sWork->sysState = WIH_STATE_STOP;
+    sWork->unk_13a8 = 0;
+    sWork->unk_13ac = NULL;
+    sWork->unk_13b0 = 0;
 }
 
-// Moves to the state given, logging the state it moves from and the one it moves to through the work pointer's log,
+// Moves to the state given, logging the state it moves from and the one it moves to through the log,
 // which nothing in this build sets
 static void DWCi_MOV_WH_ChangeSysState(WIHState state) {
-    if (gWork.logPrint != NULL) {
-        gWork.logPrint(0x08000000, data_ov182_021c18d4, stateNames[gWork.work->sysState]);
+    if (sLogPrint != NULL) {
+        sLogPrint(0x08000000, "%s -> ", stateNames[sWork->sysState]);
     }
-    gWork.work->sysState = state;
-    if (gWork.logPrint != NULL) {
-        gWork.logPrint(0x08000000, data_ov182_021c18dc, stateNames[gWork.work->sysState]);
+    sWork->sysState = state;
+    if (sLogPrint != NULL) {
+        sLogPrint(0x08000000, "%s\n", stateNames[sWork->sysState]);
     }
 }
 
 // Keeps the first error, until the state is that of an error
 static void DWCi_MOV_WH_SetError(int errcode) {
-    if ((u32)(gWork.work->sysState - WIH_STATE_ERROR) > 1) {
-        gWork.work->lastError = errcode;
+    if ((u32)(sWork->sysState - WIH_STATE_ERROR) > 1) {
+        sWork->lastError = errcode;
     }
 }
 
@@ -73,7 +85,7 @@ static BOOL DWCi_MOV_WH_StateInSetParentParam(void) {
     WMErrCode result;
 
     DWCi_MOV_WH_ChangeSysState(WIH_STATE_BUSY);
-    result = WM_SetParentParameter(DWCi_MOV_WH_StateOutSetParentParam, &gWork.work->sParentParam);
+    result = WM_SetParentParameter(DWCi_MOV_WH_StateOutSetParentParam, &sWork->sParentParam);
     if (result != WM_ERRCODE_OPERATING) {
         DWCi_MOV_WH_SetError(result);
         DWCi_MOV_WH_ChangeSysState(WIH_STATE_ERROR);
@@ -92,7 +104,7 @@ static void DWCi_MOV_WH_StateOutSetParentParam(void *arg) {
         DWCi_MOV_WH_ChangeSysState(WIH_STATE_ERROR);
         return;
     }
-    if (gWork.work->unk_13ac != NULL) {
+    if (sWork->unk_13ac != NULL) {
         if (!DWCi_MOV_WH_StateInSetParentWEPKey()) {
             DWCi_MOV_WH_ChangeSysState(WIH_STATE_ERROR);
         }
@@ -109,8 +121,8 @@ static BOOL DWCi_MOV_WH_StateInSetParentWEPKey(void) {
     WMErrCode result;
 
     DWCi_MOV_WH_ChangeSysState(WIH_STATE_BUSY);
-    wepMode = gWork.work->unk_13ac(gWork.work->wepKey, &gWork.work->sParentParam);
-    result = WM_SetWEPKey(DWCi_MOV_WH_StateOutSetParentWEPKey, wepMode, gWork.work->wepKey);
+    wepMode = sWork->unk_13ac(sWork->wepKey, &sWork->sParentParam);
+    result = WM_SetWEPKey(DWCi_MOV_WH_StateOutSetParentWEPKey, wepMode, sWork->wepKey);
     if (result != WM_ERRCODE_OPERATING) {
         DWCi_MOV_WH_SetError(result);
         DWCi_MOV_WH_ChangeSysState(WIH_STATE_ERROR);
@@ -137,8 +149,8 @@ static void DWCi_MOV_WH_StateOutSetParentWEPKey(void *arg) {
 static BOOL DWCi_MOV_WH_StateInStartParent(void) {
     WMErrCode result;
 
-    if (gWork.work->sysState == WIH_STATE_CONNECTED || gWork.work->sysState == WIH_STATE_DATASHARING ||
-        gWork.work->sysState == WIH_STATE_KEYSHARING) {
+    if (sWork->sysState == WIH_STATE_CONNECTED || sWork->sysState == WIH_STATE_DATASHARING ||
+        sWork->sysState == WIH_STATE_KEYSHARING) {
         return TRUE;
     }
     result = WM_StartParent(DWCi_MOV_WH_StateOutStartParent);
@@ -146,8 +158,8 @@ static BOOL DWCi_MOV_WH_StateInStartParent(void) {
         DWCi_MOV_WH_SetError(result);
         return FALSE;
     }
-    gWork.work->sAid = 0;
-    gWork.work->sBitmap = 1;
+    sWork->sAid = 0;
+    sWork->sBitmap = 1;
     return TRUE;
 }
 
@@ -167,10 +179,10 @@ static void DWCi_MOV_WH_StateOutStartParent(void *arg) {
     }
     switch (cb->state) {
     case WM_STATECODE_CONNECTED:
-        if (gWork.logPrint != NULL) {
-            gWork.logPrint(0x08000000, data_ov182_021c18e0, aid);
+        if (sLogPrint != NULL) {
+            sLogPrint(0x08000000, "StartParent - new child (aid %x) connected\n", aid);
         }
-        if (gWork.work->sScanFilter != NULL && !gWork.work->sScanFilter(cb)) {
+        if (sWork->sScanFilter != NULL && !sWork->sScanFilter(cb)) {
             WMErrCode result = WM_Disconnect(NULL, cb->aid);
 
             if (result != WM_ERRCODE_OPERATING) {
@@ -179,13 +191,13 @@ static void DWCi_MOV_WH_StateOutStartParent(void *arg) {
             }
             return;
         }
-        gWork.work->sBitmap |= bit;
+        sWork->sBitmap |= bit;
         return;
     case WM_STATECODE_DISCONNECTED:
-        if (gWork.logPrint != NULL) {
-            gWork.logPrint(0x08000000, data_ov182_021c190c, aid);
+        if (sLogPrint != NULL) {
+            sLogPrint(0x08000000, "StartParent - child (aid %x) disconnected\n", aid);
         }
-        gWork.work->sBitmap &= ~bit;
+        sWork->sBitmap &= ~bit;
         return;
     case WM_STATECODE_PARENT_START:
         if (!DWCi_MOV_WH_StateInStartParentMP()) {
@@ -195,8 +207,8 @@ static void DWCi_MOV_WH_StateOutStartParent(void *arg) {
     case WM_STATECODE_BEACON_SENT:
         return;
     }
-    if (gWork.logPrint != NULL) {
-        gWork.logPrint(0x08000000, data_ov182_021c1938, cb->state);
+    if (sLogPrint != NULL) {
+        sLogPrint(0x08000000, "unknown indicate, state = %d\n", cb->state);
     }
 }
 
@@ -204,13 +216,13 @@ static void DWCi_MOV_WH_StateOutStartParent(void *arg) {
 static BOOL DWCi_MOV_WH_StateInStartParentMP(void) {
     WMErrCode result;
 
-    if (gWork.work->sysState == WIH_STATE_CONNECTED || gWork.work->sysState == WIH_STATE_DATASHARING ||
-        gWork.work->sysState == WIH_STATE_KEYSHARING) {
+    if (sWork->sysState == WIH_STATE_CONNECTED || sWork->sysState == WIH_STATE_DATASHARING ||
+        sWork->sysState == WIH_STATE_KEYSHARING) {
         return TRUE;
     }
     DWCi_MOV_WH_ChangeSysState(WIH_STATE_CONNECTED);
-    result = WM_StartMP(DWCi_MOV_WH_StateOutStartParentMP, (u16 *)gWork.work->recvBuf, gWork.work->recvBufSize,
-                        (u16 *)gWork.work->sendBuf, gWork.work->sendBufSize, 1);
+    result = WM_StartMP(DWCi_MOV_WH_StateOutStartParentMP, (u16 *)sWork->recvBuf, sWork->recvBufSize,
+                        (u16 *)sWork->sendBuf, sWork->sendBufSize, 1);
     if (result != WM_ERRCODE_OPERATING) {
         DWCi_MOV_WH_SetError(result);
         return FALSE;
@@ -229,22 +241,22 @@ static void DWCi_MOV_WH_StateOutStartParentMP(void *arg) {
     }
     switch (cb->state) {
     case WM_STATECODE_MP_START:
-        if (gWork.work->sConnectMode == WIH_CONNECTMODE_KS_PARENT) {
-            if (gWork.work->sysState == WIH_STATE_CONNECTED) {
+        if (sWork->sConnectMode == WIH_CONNECTMODE_KS_PARENT) {
+            if (sWork->sysState == WIH_STATE_CONNECTED) {
                 if (DWCi_MOV_WH_StateInStartParentKeyShare()) {
                     return;
                 }
-                if (gWork.logPrint != NULL) {
-                    gWork.logPrint(0x08000000, data_ov182_021c1958);
+                if (sLogPrint != NULL) {
+                    sLogPrint(0x08000000, "DWCi_MOV_WH_StateInStartParentKeyShare failed\n");
                 }
                 DWCi_MOV_WH_ChangeSysState(WIH_STATE_ERROR);
                 return;
             }
-            if (gWork.work->sysState == WIH_STATE_KEYSHARING) {
+            if (sWork->sysState == WIH_STATE_KEYSHARING) {
                 return;
             }
-        } else if (gWork.work->sConnectMode == WIH_CONNECTMODE_DS_PARENT) {
-            WMErrCode result = WM_StartDataSharing(&gWork.work->dataSharing, 13, 7, 0x44, TRUE);
+        } else if (sWork->sConnectMode == WIH_CONNECTMODE_DS_PARENT) {
+            WMErrCode result = WM_StartDataSharing(&sWork->dataSharing, 13, 7, 0x44, TRUE);
 
             if (result != WM_ERRCODE_SUCCESS) {
                 DWCi_MOV_WH_SetError(result);
@@ -261,8 +273,8 @@ static void DWCi_MOV_WH_StateOutStartParentMP(void *arg) {
     case WM_STATECODE_MP_IND:
     case WM_STATECODE_MPACK_IND:
     default:
-        if (gWork.logPrint != NULL) {
-            gWork.logPrint(0x08000000, data_ov182_021c1938, cb->state);
+        if (sLogPrint != NULL) {
+            sLogPrint(0x08000000, "unknown indicate, state = %d\n", cb->state);
         }
         break;
     }
@@ -273,7 +285,7 @@ static BOOL DWCi_MOV_WH_StateInStartParentKeyShare(void) {
     WMErrCode result;
 
     DWCi_MOV_WH_ChangeSysState(WIH_STATE_KEYSHARING);
-    result = WM_StartKeySharing(&gWork.work->keySharing, 13);
+    result = WM_StartKeySharing(&sWork->keySharing, 13);
     if (result != WM_ERRCODE_OPERATING) {
         DWCi_MOV_WH_SetError(result);
         return FALSE;
@@ -283,7 +295,7 @@ static BOOL DWCi_MOV_WH_StateInStartParentKeyShare(void) {
 
 // The key sharing end
 static BOOL DWCi_MOV_WH_StateInEndParentKeyShare(void) {
-    WMErrCode result = WM_EndKeySharing(&gWork.work->keySharing);
+    WMErrCode result = WM_EndKeySharing(&sWork->keySharing);
 
     if (result != WM_ERRCODE_OPERATING) {
         DWCi_MOV_WH_SetError(result);
@@ -315,8 +327,8 @@ static void DWCi_MOV_WH_StateOutEndParentMP(void *arg) {
         return;
     }
     if (!DWCi_MOV_WH_StateInEndParent()) {
-        if (gWork.logPrint != NULL) {
-            gWork.logPrint(0x08000000, data_ov182_021c1988);
+        if (sLogPrint != NULL) {
+            sLogPrint(0x08000000, "DWCi_MOV_WH_StateInEndParent failed\n");
         }
         DWCi_MOV_WH_Reset();
     }
@@ -348,11 +360,11 @@ static void DWCi_MOV_WH_StateOutEndParent(void *arg) {
 static BOOL DWCi_MOV_WH_StateInEndChildKeyShare(void) {
     WMErrCode result;
 
-    if (gWork.work->sysState != WIH_STATE_KEYSHARING) {
+    if (sWork->sysState != WIH_STATE_KEYSHARING) {
         return FALSE;
     }
     DWCi_MOV_WH_ChangeSysState(WIH_STATE_BUSY);
-    result = WM_EndKeySharing(&gWork.work->keySharing);
+    result = WM_EndKeySharing(&sWork->keySharing);
     if (result != WM_ERRCODE_OPERATING) {
         DWCi_MOV_WH_SetError(result);
         return FALSE;
@@ -450,17 +462,17 @@ static void DWCi_MOV_WH_StateOutEnd(void *arg) {
 
 // WH_SetGgid
 void DWCi_MOV_WH_SetGgid(u32 ggid) {
-    gWork.work->sParentParam.ggid = ggid;
+    sWork->sParentParam.ggid = ggid;
 }
 
 // WH_GetBitmap
 u16 DWCi_MOV_WH_GetBitmap(void) {
-    return gWork.work->sBitmap;
+    return sWork->sBitmap;
 }
 
 // WH_GetSystemState
 int DWCi_MOV_WH_GetSystemState(void) {
-    return gWork.work->sysState;
+    return sWork->sysState;
 }
 
 // WH_StartMeasureChannel: measures how busy each channel is, one after the other
@@ -469,10 +481,10 @@ BOOL DWCi_MOV_WH_StartMeasureChannel(void) {
     u16 result;
 
     OS_GetMacAddress((u8 *)mac);
-    gWork.work->seed = OS_GetVBlankCount() + mac[0] + mac[1] + mac[2];
-    gWork.work->seed = gWork.work->seed * 69069 + 12345;
-    gWork.work->channel = 0;
-    gWork.work->minBusy = 101;
+    sWork->seed = OS_GetVBlankCount() + mac[0] + mac[1] + mac[2];
+    sWork->seed = sWork->seed * 69069 + 12345;
+    sWork->channel = 0;
+    sWork->minBusy = 101;
     DWCi_MOV_WH_ChangeSysState(WIH_STATE_BUSY);
     result = DWCi_MOV_WH_StateInMeasureChannel(1);
     if (result == WIH_ERRCODE_NOMORE_CHANNEL) {
@@ -524,15 +536,15 @@ static void DWCi_MOV_WH_StateOutMeasureChannel(void *arg) {
         DWCi_MOV_WH_ChangeSysState(WIH_STATE_ERROR);
         return;
     }
-    if (gWork.logPrint != NULL) {
-        gWork.logPrint(0x08000000, data_ov182_021c19e0, cb->channel, cb->ccaBusyRatio);
+    if (sLogPrint != NULL) {
+        sLogPrint(0x08000000, "channel %d bratio = %x\n", cb->channel, cb->ccaBusyRatio);
     }
     channel = cb->channel;
-    if (gWork.work->minBusy > cb->ccaBusyRatio) {
-        gWork.work->minBusy = cb->ccaBusyRatio;
-        gWork.work->bestBitmap = 1 << (channel - 1);
-    } else if (gWork.work->minBusy == cb->ccaBusyRatio) {
-        gWork.work->bestBitmap |= 1 << (channel - 1);
+    if (sWork->minBusy > cb->ccaBusyRatio) {
+        sWork->minBusy = cb->ccaBusyRatio;
+        sWork->bestBitmap = 1 << (channel - 1);
+    } else if (sWork->minBusy == cb->ccaBusyRatio) {
+        sWork->bestBitmap |= 1 << (channel - 1);
     }
     next = DWCi_MOV_WH_StateInMeasureChannel(channel + 1);
     if (next == WIH_ERRCODE_NOMORE_CHANNEL) {
@@ -548,15 +560,15 @@ static int WHi_MeasureChannel(WMCallbackFunc callback, u16 channel) {
 
 // WH_GetMeasureChannel: the channel to use, one of the least busy ones, chosen at random
 u16 DWCi_MOV_WH_GetMeasureChannel(void) {
-    if (gWork.work->sysState != WIH_STATE_MEASURECHANNEL) {
+    if (sWork->sysState != WIH_STATE_MEASURECHANNEL) {
         OS_Terminate();
     }
     DWCi_MOV_WH_ChangeSysState(WIH_STATE_IDLE);
-    gWork.work->channel = SelectChannel(gWork.work->bestBitmap);
-    if (gWork.logPrint != NULL) {
-        gWork.logPrint(0x08000000, data_ov182_021c19f8, gWork.work->channel);
+    sWork->channel = SelectChannel(sWork->bestBitmap);
+    if (sLogPrint != NULL) {
+        sLogPrint(0x08000000, "decided channel = %d\n", sWork->channel);
     }
-    return gWork.work->channel;
+    return sWork->channel;
 }
 
 static s16 SelectChannel(u16 bitmap) {
@@ -572,8 +584,8 @@ static s16 SelectChannel(u16 bitmap) {
         }
     }
     if (count > 1) {
-        gWork.work->seed = gWork.work->seed * 69069 + 12345;
-        pick = (count * (u8)gWork.work->seed) >> 8;
+        sWork->seed = sWork->seed * 69069 + 12345;
+        pick = (count * (u8)sWork->seed) >> 8;
         for (i = 0; i < 16; i++) {
             if (bitmap & 1) {
                 if (pick == 0) {
@@ -590,15 +602,15 @@ static s16 SelectChannel(u16 bitmap) {
 
 // WH_Initialize: starts the wireless, which the parent has already given the work to
 BOOL DWCi_MOV_WH_Initialize(void) {
-    gWork.work->recvBufSize = 0;
-    gWork.work->sendBufSize = 0;
-    gWork.work->unk_48 = 0;
-    gWork.work->sAid = 0;
-    gWork.work->sBitmap = 1;
-    gWork.work->lastError = WM_ERRCODE_SUCCESS;
-    gWork.work->sParentParam.userGameInfo = NULL;
-    gWork.work->sParentParam.userGameInfoLength = 0;
-    gWork.work->sScanFilter = NULL;
+    sWork->recvBufSize = 0;
+    sWork->sendBufSize = 0;
+    sWork->unk_48 = 0;
+    sWork->sAid = 0;
+    sWork->sBitmap = 1;
+    sWork->lastError = WM_ERRCODE_SUCCESS;
+    sWork->sParentParam.userGameInfo = NULL;
+    sWork->sParentParam.userGameInfoLength = 0;
+    sWork->sScanFilter = NULL;
     switch (DWCi_MOV_WH_StateInInitialize()) {
     case FALSE:
         return FALSE;
@@ -622,7 +634,7 @@ static BOOL DWCi_MOV_WH_StateInInitialize(void) {
     WMErrCode result;
 
     DWCi_MOV_WH_ChangeSysState(WIH_STATE_BUSY);
-    result = WM_Initialize(gWork.work->wmBuf, DWCi_MOV_WH_StateOutInitialize, 2);
+    result = WM_Initialize(sWork->wmBuf, DWCi_MOV_WH_StateOutInitialize, 2);
     if (result != WM_ERRCODE_OPERATING) {
         DWCi_MOV_WH_SetError(result);
         DWCi_MOV_WH_ChangeSysState(WIH_STATE_FATAL);
@@ -653,61 +665,61 @@ static void DWCi_MOV_WH_StateOutInitialize(void *arg) {
 // WH_ParentConnect: starts as a parent, in the mode of the connection (the multi-point mode, the keys or the data
 // shared)
 BOOL DWCi_MOV_WH_ParentConnect(u16 mode, u16 tgid, u16 channel) {
-    if (gWork.work->sysState != WIH_STATE_IDLE) {
+    if (sWork->sysState != WIH_STATE_IDLE) {
         OS_Terminate();
     }
-    gWork.work->recvBufSize = 0x180;
-    gWork.work->sendBufSize = 0xe0;
-    if (gWork.logPrint != NULL) {
-        gWork.logPrint(0x08000000, data_ov182_021c19b0, gWork.work->recvBufSize);
+    sWork->recvBufSize = 0x180;
+    sWork->sendBufSize = 0xe0;
+    if (sLogPrint != NULL) {
+        sLogPrint(0x08000000, "recv buffer size = %d\n", sWork->recvBufSize);
     }
-    if (gWork.logPrint != NULL) {
-        gWork.logPrint(0x08000000, data_ov182_021c19c8, gWork.work->sendBufSize);
+    if (sLogPrint != NULL) {
+        sLogPrint(0x08000000, "send buffer size = %d\n", sWork->sendBufSize);
     }
-    gWork.work->sConnectMode = mode;
+    sWork->sConnectMode = mode;
     DWCi_MOV_WH_ChangeSysState(WIH_STATE_BUSY);
-    gWork.work->sParentParam.tgid = tgid;
-    gWork.work->sParentParam.channel = channel;
-    gWork.work->sParentParam.beaconPeriod = WM_GetDispersionBeaconPeriod();
-    gWork.work->sParentParam.parentMaxSize = 0xd0;
-    gWork.work->sParentParam.childMaxSize = 0x44;
-    gWork.work->sParentParam.maxEntry = 2;
-    gWork.work->sParentParam.CS_Flag = 0;
-    gWork.work->sParentParam.multiBootFlag = 0;
-    gWork.work->sParentParam.entryFlag = 1;
-    gWork.work->sParentParam.KS_Flag = mode == WIH_CONNECTMODE_KS_PARENT;
+    sWork->sParentParam.tgid = tgid;
+    sWork->sParentParam.channel = channel;
+    sWork->sParentParam.beaconPeriod = WM_GetDispersionBeaconPeriod();
+    sWork->sParentParam.parentMaxSize = 0xd0;
+    sWork->sParentParam.childMaxSize = 0x44;
+    sWork->sParentParam.maxEntry = 2;
+    sWork->sParentParam.CS_Flag = 0;
+    sWork->sParentParam.multiBootFlag = 0;
+    sWork->sParentParam.entryFlag = 1;
+    sWork->sParentParam.KS_Flag = mode == WIH_CONNECTMODE_KS_PARENT;
     if (mode == WIH_CONNECTMODE_MP_PARENT || mode == WIH_CONNECTMODE_KS_PARENT || mode == WIH_CONNECTMODE_DS_PARENT) {
         return DWCi_MOV_WH_StateInSetParentParam();
     }
-    if (gWork.logPrint != NULL) {
-        gWork.logPrint(0x08000000, data_ov182_021c1a10, mode);
+    if (sLogPrint != NULL) {
+        sLogPrint(0x08000000, "unknown connect mode %d\n", mode);
     }
     return FALSE;
 }
 
 // WH_SetScanFilter
 void DWCi_MOV_WH_SetJudgeAcceptFunc(WHScanFilter filter) {
-    gWork.work->sScanFilter = filter;
+    sWork->sScanFilter = filter;
 }
 
 // WH_GetSharedDataAdr: the data of the machine of the AID, from the last step of the data sharing
 u8 *DWCi_MOV_WH_GetSharedDataAdr(u16 netId) {
-    return (u8 *)WM_GetSharedDataAddress(&gWork.work->dataSharing, &gWork.work->dataSet, netId);
+    return (u8 *)WM_GetSharedDataAddress(&sWork->dataSharing, &sWork->dataSet, netId);
 }
 
 // WH_StepDS: shares the data given, for the machines to read the next step
 BOOL DWCi_MOV_WH_StepDS(u8 *data) {
-    WMErrCode result = WM_StepDataSharing(&gWork.work->dataSharing, (const u16 *)data, &gWork.work->dataSet);
+    WMErrCode result = WM_StepDataSharing(&sWork->dataSharing, (const u16 *)data, &sWork->dataSet);
 
     if (result == WM_ERRCODE_NO_CHILD) {
-        if (gWork.logPrint != NULL) {
-            gWork.logPrint(0x08000000, data_ov182_021c1a2c);
+        if (sLogPrint != NULL) {
+            sLogPrint(0x08000000, "DWCi_MOV_WH_StepDataSharing - Warning No Child\n");
         }
         return FALSE;
     }
     if (result == WM_ERRCODE_NO_DATASET) {
-        if (gWork.logPrint != NULL) {
-            gWork.logPrint(0x08000000, data_ov182_021c1a5c);
+        if (sLogPrint != NULL) {
+            sLogPrint(0x08000000, "DWCi_MOV_WH_StepDataSharing - Warning No DataSet\n");
         }
         DWCi_MOV_WH_SetError(result);
         return FALSE;
@@ -728,23 +740,23 @@ void DWCi_MOV_WH_Reset(void) {
 
 // WH_Finalize: ends whatever the machine is doing, back to idle
 void DWCi_MOV_WH_Finalize(void) {
-    if (gWork.work->sysState == WIH_STATE_IDLE) {
-        if (gWork.logPrint != NULL) {
-            gWork.logPrint(0x08000000, data_ov182_021c1a90);
+    if (sWork->sysState == WIH_STATE_IDLE) {
+        if (sLogPrint != NULL) {
+            sLogPrint(0x08000000, "already DWCi_MOV_WH_SYSSTATE_IDLE\n");
         }
         return;
     }
-    if (gWork.logPrint != NULL) {
-        gWork.logPrint(0x08000000, data_ov182_021c1ab4, gWork.work->sysState);
+    if (sLogPrint != NULL) {
+        sLogPrint(0x08000000, "DWCi_MOV_WH_Finalize, state = %d\n", sWork->sysState);
     }
-    if (gWork.work->sysState != WIH_STATE_KEYSHARING && gWork.work->sysState != WIH_STATE_DATASHARING &&
-        gWork.work->sysState != WIH_STATE_CONNECTED) {
+    if (sWork->sysState != WIH_STATE_KEYSHARING && sWork->sysState != WIH_STATE_DATASHARING &&
+        sWork->sysState != WIH_STATE_CONNECTED) {
         DWCi_MOV_WH_ChangeSysState(WIH_STATE_BUSY);
         DWCi_MOV_WH_Reset();
         return;
     }
     DWCi_MOV_WH_ChangeSysState(WIH_STATE_BUSY);
-    switch (gWork.work->sConnectMode) {
+    switch (sWork->sConnectMode) {
     case WIH_CONNECTMODE_KS_CHILD:
         if (!DWCi_MOV_WH_StateInEndChildKeyShare()) {
             DWCi_MOV_WH_Reset();
@@ -772,7 +784,7 @@ void DWCi_MOV_WH_Finalize(void) {
 
 // WH_End: ends the wireless
 BOOL DWCi_MOV_WH_End(void) {
-    if (gWork.work->sysState != WIH_STATE_IDLE) {
+    if (sWork->sysState != WIH_STATE_IDLE) {
         OS_Terminate();
     }
     DWCi_MOV_WH_ChangeSysState(WIH_STATE_BUSY);

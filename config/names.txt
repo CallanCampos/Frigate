@@ -22887,7 +22887,7 @@ overlays/ov182 0x021c416c sSubScreenData
 overlays/ov182 0x021c4170 sSubScreenRow
 overlays/ov182 0x021c4174 sUsbScan
 overlays/ov182 0x021c4178 sDialog
-overlays/ov182 0x021c4180 gWork
+overlays/ov182 0x021c4180 sLogPrint
 overlays/ov182 0x021c4188 sDownloadPlaySysWork
 overlays/ov182 0x021c418c sResource
 overlays/ov182 0x021c4190 sScreens
