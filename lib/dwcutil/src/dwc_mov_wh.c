@@ -662,12 +662,21 @@ static void DWCi_MOV_WH_StateOutInitialize(void *arg) {
     DWCi_MOV_WH_ChangeSysState(WIH_STATE_IDLE);
 }
 
+// Two optimizer passes are off for DWCi_MOV_WH_ParentConnect alone. Nothing shows the original source had these
+// pragmas, and they may stand for a difference in how it was built. Its state check is an assert,
+// `(exp) || (OS_Terminate(), 0)`, and the original keeps a dead `movs r0, #0` after the call to OS_Terminate: the `0`
+// of the `||`'s right operand. MWCC tests that operand with a `cmp r0, #0` whose branch it removes, since both targets
+// are the next statement, and the orphaned compare keeps the constant alive until the Thumb peephole folds the pair
+// into the flag-setting `movs`, which deletes the compare and leaves the move. At -O4, IR copy propagation and IR
+// dead-assignment removal delete the constant first, so the move is there only with both passes off; over the whole
+// file they change other functions (docs/matching.md)
+#pragma push
+#pragma opt_dead_assignments off
+#pragma opt_propagation off
 // WH_ParentConnect: starts as a parent, in the mode of the connection (the multi-point mode, the keys or the data
 // shared)
 BOOL DWCi_MOV_WH_ParentConnect(u16 mode, u16 tgid, u16 channel) {
-    if (sWork->sysState != WIH_STATE_IDLE) {
-        OS_Terminate();
-    }
+    (void)((sWork->sysState == WIH_STATE_IDLE) || (OS_Terminate(), 0));
     sWork->recvBufSize = 0x180;
     sWork->sendBufSize = 0xe0;
     if (sLogPrint != NULL) {
@@ -696,6 +705,7 @@ BOOL DWCi_MOV_WH_ParentConnect(u16 mode, u16 tgid, u16 channel) {
     }
     return FALSE;
 }
+#pragma pop
 
 // WH_SetScanFilter
 void DWCi_MOV_WH_SetJudgeAcceptFunc(WHScanFilter filter) {

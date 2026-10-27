@@ -1951,6 +1951,18 @@ Same instructions, scheduled in another order.
 
 ## An instruction too many or too few
 
+- A dead `movs rN, #0` right after a call, which no later code reads and nothing branches to, can be the `0` of an
+  assert's `(exp) || (OS_Terminate(), 0)`. MWCC tests the `||`'s right operand for its truth with `cmp rN, #0`, drops
+  the branch because both of its targets are the next statement, and keeps the constant alive for the compare that is
+  left; the Thumb peephole then folds `mov rN, #0; cmp rN, #0` into the flag-setting `movs rN, #0`, deleting the
+  compare and leaving the move. At -O4 the IR's copy propagation and dead-assignment removal delete the constant
+  before code generation, so the move survives only with both passes off: overlay 182's `DWCi_MOV_WH_ParentConnect`
+  (`dwc_mov_wh.c`) matches under `#pragma opt_dead_assignments off` and `#pragma opt_propagation off` around it alone
+  (the whole file in `dsi/1.1p1` through `1.3p1`). Neither pragma alone keeps the move, nor do the pair over the
+  whole file (`SelectChannel` grows to 0x94), `-opt nodeadstore,noprop` or any `if`, flag or inline form. With a
+  non-constant operand the orphaned compare stays visible: `(OS_Terminate(), x)` leaves `cmp rN, #0` after the call.
+  Nothing shows the original source had the pragmas, so the file says why they are there.
+
 - NitroWiFi's `rcv_finished` saves and restores whole transcript contexts with explicit `MI_CpuCopy8` calls.
   Structure assignment changes the runtime-copy shape and frame even though it expresses the same snapshot.
 
