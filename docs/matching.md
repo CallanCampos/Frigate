@@ -1406,6 +1406,11 @@ Same code, other `sp` offsets or frame size.
   memory local, placed by declaration order among the memory locals (not the spill slot) and reloaded after every
   store. `ArchiveMoveImageTop`'s `fimgOffset` went to sp+0xc and `Yos_JPEGEncode`'s `chromBlocksX` to sp+0x64 that way.
   It works where the original reloads a local it never kept in a register: `gti2HandleNack`'s `first`.
+- A by-value parameter that the original keeps in its stack slot and reloads at every use, even where no call comes
+  between, is `volatile` where it is declared: `ReleaseRequest` (`nd.c`) reads `[sp, #8]` before the test, before each
+  of the two calls, and stores 0 back to it at the end, and Black 1's decomp has the same `void *volatile handle`.
+  No other thread can write that slot, so the qualifier isn't a claim about sharing: it is the SDK source's own
+  spelling, and with it the engine matches byte for byte.
 - A cast of one operand to its own type keeps MWCC from merging two copies of an expression, and a cast of an array
   to its own element type makes it compute an element's address again rather than reuse a hoisted base. Neither is
   natural C; this project takes them only under the maintainer's 2026-10-25 ruling, with a comment: NitroWiFi's

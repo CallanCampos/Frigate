@@ -21,6 +21,7 @@ src/ov189/dpw_profile.c:
     .text       start:0x0219d504 end:0x0219d550
 
 lib/dwc/src/nd/nd.c:
+    complete
     .text       start:0x021a59c4 end:0x021a6c84
     .rodata     start:0x021acda4 end:0x021ace78
     .data       start:0x021ae0cc end:0x021ae28c

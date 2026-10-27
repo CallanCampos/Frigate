@@ -1972,7 +1972,7 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 | `ghttpPost.c` | `0x021a3074`–`0x021a4114` | 21 | complete | descriptive |
 | `ghttpProcess.c` | `0x021a4114`–`0x021a54b4` | 18 | complete | descriptive |
 | `nd_api.c` | `0x021a54b4`–`0x021a59c4` | 13 | complete | descriptive |
-| `nd.c` | `0x021a59c4`–`0x021a6c84` | 48 | partial | descriptive |
+| `nd.c` | `0x021a59c4`–`0x021a6c84` | 48 | complete | descriptive |
 | `dpw_tr.c` | `0x021a6c84`–`0x021a8010` | 19 | complete | descriptive |
 | `dpw_battle_tower.c` | `0x021a8010`–`0x021a893c` | 12 | complete | descriptive |
 | `dwc_encsession.c` | `0x021a893c`–`0x021a90f0` | 16 | complete | descriptive |

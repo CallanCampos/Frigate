@@ -630,6 +630,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - A sum truncated to `s16` before a comparison was stored in an `s16` local. (matching.md: "truncates to `s16`")
 - A narrowing again after a clamp is `MATH_CLAMP`, a conditional expression. (matching.md: "narrowed again after it is clamped")
 - A local reloaded from its stack slot before each use can be a `u8` flag, not `volatile`.
+- A by-value parameter reloaded from `[sp, #n]` at each use, even with no call between, is `volatile` at its
+  declaration, where the original source had it: `ReleaseRequest`'s handle, as Black 1's decomp also has it.
+  (matching.md: "A by-value parameter that the original keeps in its stack slot")
 - The reverse: a zero loaded back from a spilled `u8` flag's slot for a later zero store, where the original stores
   one register again, is a `BOOL` flag, with the return and the caller's parameter it ends in.
   (matching.md: "The same goes for a returned flag")

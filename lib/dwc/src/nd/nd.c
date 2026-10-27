@@ -96,14 +96,14 @@ static int DWCi_Ndi_strToInt(const char *text, int size);
 static int DWCi_Ndi_intToStr(char *dest, u32 value);
 static int DWCi_Ndi_intToStrFigure(char *dest, u64 value, int minDigits);
 static int DWCi_Ndi_hexToStrFigure(char *dest, u32 value, int digits);
-static char sNdLogDataParam[0x59];
+static char sNdLogDataParam[0x5c];
 static DWCApInfo sNdApInfo;
-static char sNdUserAgent[0x21];
+static char sNdUserAgent[0x23];
 static char sNdPasswordParam[25];
 static OSMutex sNdAttrMutex;
 static OSMutex sNdRequestMutex;
 static char sNdApInfoParam[21];
-static char sNdUserIdParam[21];
+static char sNdUserIdParam[22];
 static char sNdMacParam[17];
 
 static void DWCi_Ndi_freeAttr(void) {
@@ -369,7 +369,10 @@ void DWCi_NdCleanupAsync(void (*onCleanedUp)(void)) {
 }
 
 // Destroys a request; the answer is FALSE when it could not
-static BOOL ReleaseRequest(int request) {
+// The original keeps the handle in its stack slot and reloads it at every use, including right after the `cmp`, which
+// only `volatile` reproduces; Black 1's decomp has the same `void *volatile handle` in this function. Nothing can
+// change the value here, so it is the original's spelling, not a workaround
+static BOOL ReleaseRequest(volatile int request) {
     BOOL result = TRUE;
 
     DWCi_Ndi_lockGlobal();
