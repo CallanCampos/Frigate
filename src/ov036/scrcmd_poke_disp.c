@@ -321,9 +321,7 @@ BOOL s02BD_TVGenCommercialMsgID(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-GameEvent *EventEvCameraShake_Create(GameSystem *gsys, FieldEvCameraShake *shake) {
-    // The script's shake is the camera task's setup
-    FieldCameraShakeSetup *setup = (FieldCameraShakeSetup *)shake;
+GameEvent *EventEvCameraShake_Create(GameSystem *gsys, FieldCameraShakeSetup *setup) {
     GameEvent *event;
     EventEvCameraShake *data;
 

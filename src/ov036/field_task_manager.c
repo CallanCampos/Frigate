@@ -983,14 +983,14 @@ static BOOL FieldCameraShakeTask_Callback(void *work) {
     case 2: {
         u16 angle;
 
-        setup->unk18++;
-        angle = (setup->unk18 << 16) / setup->period;
-        if (setup->unkA != 0 && setup->unk10 - setup->steps >= setup->unkA) {
-            setup->unkC++;
-            if (setup->unkC >= setup->unkE) {
-                setup->unkC = 0;
-                setup->amplitudeY -= setup->unk8;
-                setup->amplitudeX -= setup->unk6;
+        setup->frame++;
+        angle = (setup->frame << 16) / setup->period;
+        if (setup->decayStart != 0 && setup->totalSteps - setup->steps >= setup->decayStart) {
+            setup->decayTimer++;
+            if (setup->decayTimer >= setup->decayInterval) {
+                setup->decayTimer = 0;
+                setup->amplitudeY -= setup->decayY;
+                setup->amplitudeX -= setup->decayX;
                 if (setup->amplitudeY <= 0) {
                     setup->amplitudeY = 1;
                 }
@@ -999,12 +999,12 @@ static BOOL FieldCameraShakeTask_Callback(void *work) {
                 }
             }
         }
-        if (setup->unk18 >= setup->period) {
+        if (setup->frame >= setup->period) {
             setup->steps--;
-            setup->unk18 = 0;
+            setup->frame = 0;
         }
         if (setup->steps == 0) {
-            setup->unk18 = 0;
+            setup->frame = 0;
             finished = TRUE;
         }
         if (finished) {
