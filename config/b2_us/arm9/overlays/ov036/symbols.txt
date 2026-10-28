@@ -4375,7 +4375,7 @@ data_ov036_021caa14 kind:data(any) addr:0x021caa14
 data_ov036_021caa34 kind:data(any) addr:0x021caa34
 data_ov036_021caa54 kind:data(any) addr:0x021caa54
 data_ov036_021caa74 kind:data(any) addr:0x021caa74
-data_ov036_021caa94 kind:data(any) addr:0x021caa94
+sYesNoMenuRequest kind:data(any) addr:0x021caa94
 FIELD_COMM_ACTOR_NPC kind:data(any) addr:0x021caab4
 data_ov036_021caad8 kind:data(any) addr:0x021caad8
 data_ov036_021caadc kind:data(any) addr:0x021caadc
