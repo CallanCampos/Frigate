@@ -93,3 +93,22 @@ add_test(NAME integrate_archive_seek_assert
         "${CMAKE_CURRENT_SOURCE_DIR}/tests/app/check_exit.py" --status 70
         --expect "ArchiveMoveImageTop fileCnt=2, datID=2" -- "$<TARGET_FILE:port_archive_seek_tests>" invalid)
 set_tests_properties(integrate_archive_seek integrate_archive_seek_assert PROPERTIES TIMEOUT 30)
+
+# Exact actual trainer-AI definitions, without the unrelated callback table retained by ELF ASan/COFF linkers.
+# The generator fails closed on source-boundary changes; selected command bodies and the VM keep all sanitizers.
+set(tr_ai_projection "${PORT_GEN}/tr_ai_tables_source.inc")
+add_custom_command(OUTPUT "${tr_ai_projection}"
+    COMMAND "${CMAKE_COMMAND}" -E env PYTHONDONTWRITEBYTECODE=1 "${PORT_PYTHON}"
+        "${CMAKE_CURRENT_SOURCE_DIR}/tools/project_tr_ai_tables.py"
+        --source "${REPO_ROOT}/src/ov170/tr_ai.c" --out "${tr_ai_projection}"
+    DEPENDS "${REPO_ROOT}/src/ov170/tr_ai.c" "${CMAKE_CURRENT_SOURCE_DIR}/tools/project_tr_ai_tables.py"
+    VERBATIM)
+add_executable(port_tr_ai_tables_tests tests/integrate/tr_ai_tables.c "${REPO_ROOT}/src/system/vm.c"
+    "${tr_ai_projection}")
+target_link_libraries(port_tr_ai_tables_tests PRIVATE port_decomp_env)
+target_include_directories(port_tr_ai_tables_tests PRIVATE "${PORT_GEN}")
+add_test(NAME integrate_tr_ai_tables COMMAND port_tr_ai_tables_tests)
+add_test(NAME integrate_tr_ai_projection
+    COMMAND "${CMAKE_COMMAND}" -E env PYTHONDONTWRITEBYTECODE=1 "${PORT_PYTHON}"
+        "${CMAKE_CURRENT_SOURCE_DIR}/tests/tools/test_project_tr_ai_tables.py")
+set_tests_properties(integrate_tr_ai_tables integrate_tr_ai_projection PROPERTIES TIMEOUT 30)
