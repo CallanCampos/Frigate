@@ -507,7 +507,14 @@ typedef struct {
 void FldAct_InitMoveProcGrid(FieldActor *actor);
 void FldAct_UpdateMoveProcGrid(FieldActor *actor);
 void ActorTerrainEffect_ApplyAll(FieldActor *actor);
-// The collision flags at a grid position, with the world position's y
+// The collision flags at a grid position, with the world position's y: the position is outside the actor's walk area,
+// the way there is blocked, another actor stands there, its height is too far from y or the map has none there, and
+// it is out of the map's bounds
+#define ACTOR_COLL_WALK_AREA 0x1
+#define ACTOR_COLL_BLOCKED 0x2
+#define ACTOR_COLL_ACTOR 0x4
+#define ACTOR_COLL_HEIGHT 0x8
+#define ACTOR_COLL_OUT_OF_BOUNDS 0x10
 u32 ActorRouteCollCheckCore(FieldActor *actor, const VecFx32 *position, s16 x, s16 y, s16 z, u16 dir);
 u32 ActorRouteCollCheck(FieldActor *actor, s16 x, s16 y, s16 z, u16 dir);
 BOOL CheckActorNewPosOtherActorCollision(const FieldActor *actor, s16 x, s16 y, s16 z);
@@ -654,7 +661,12 @@ const FieldActorResGroup *GetNPCMdlInfoG2DRscGroup(const FieldActorConfig *confi
 const FieldActorResGroup *GetNPCMdlInfoG3DRscGroup(const FieldActorConfig *config);
 // The object code that an object code stands for, through the work values of WKOBJCODE00 and on
 u16 ResolvePossibleWKOBJCODE(EventWork *eventWork, u16 objCode);
-// How an actor of the event type looks for the player: the types that see only the way they face give 1
+enum {
+    TRAINER_SIGHT_FACING = 1,
+    TRAINER_SIGHT_ALL_DIRS = 2,
+};
+// How an actor of the event type looks for the player: the types that see only the way they face give
+// TRAINER_SIGHT_FACING, and the others their own type, of which TRAINER_SIGHT_ALL_DIRS looks every way
 u16 EvType_GetSightType(u16 type);
 void MoveCodeNone_Init(FieldActor *actor);
 void MoveCodeNone_Move(FieldActor *actor);
