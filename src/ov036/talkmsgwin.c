@@ -310,14 +310,14 @@ void TalkMsgWin_Close(TalkMsgWinSys *sys, u32 index) {
     TalkMsgWin_RequestClose(&sys->windows[index]);
 }
 
-BOOL func_ov036_0218b4e8(TalkMsgWinSys *sys, u32 index) {
+BOOL TalkMsgWin_IsWindowFree(TalkMsgWinSys *sys, u32 index) {
     if (sys->windows[index].state == TALKMSG_WIN_STATE_FREE) {
         return TRUE;
     }
     return FALSE;
 }
 
-BOOL func_ov036_0218b4fc(TalkMsgWinSys *sys, u32 index) {
+BOOL TalkMsgWin_IsWindowShown(TalkMsgWinSys *sys, u32 index) {
     return TalkMsgWin_IsShown(&sys->windows[index]);
 }
 

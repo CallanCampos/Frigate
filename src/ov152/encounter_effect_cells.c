@@ -5,7 +5,7 @@
 GameEvent *EncEffCells_Create(GameSystem *gsys, Field *field) {
     VecFx32 pos = { 0, 0, FX32_CONST(264) };
 
-    func_ov036_021c5ea0(Field_GetEncEff(field));
+    EncEff_LoadCaptureGridSubOvls(Field_GetEncEff(field));
     return EncEffCapture_CreateFlashEvent(gsys, &pos, EncEffCells_CreateGridEvent, EncEffGrid_Draw);
 }
 

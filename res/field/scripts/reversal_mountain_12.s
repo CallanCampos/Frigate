@@ -8,7 +8,7 @@ Script_1:
     VMStackPushConst 1
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_001F
-    HollowRivalCmd_0262 3, 4
+    HollowRivalSetValue 3, 4
 
 L_001F:
     VMHalt

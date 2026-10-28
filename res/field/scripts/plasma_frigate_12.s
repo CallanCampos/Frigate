@@ -43,10 +43,10 @@ L_0067:
     VMStackPushConst 1
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_0092
-    Plugin12_Cmd1006 0, 1
-    Plugin12_Cmd1006 1, 1
-    Plugin12_Cmd1006 2, 1
-    Plugin12_Cmd1006 3, 1
+    PlasmaFrigateCmd_SetSwitchLightState 0, 1
+    PlasmaFrigateCmd_SetSwitchLightState 1, 1
+    PlasmaFrigateCmd_SetSwitchLightState 2, 1
+    PlasmaFrigateCmd_SetSwitchLightState 3, 1
 
 L_0092:
     VMReturn
@@ -221,13 +221,13 @@ L_02C9:
     SEWait
     MsgWaitAdvance
     MsgWinCloseAll
-    Plugin12_Cmd1008 0
+    PlasmaFrigateCmd_PlaySwitchLightAnim 0
     VMSleep 8
-    Plugin12_Cmd1008 1
+    PlasmaFrigateCmd_PlaySwitchLightAnim 1
     VMSleep 8
-    Plugin12_Cmd1008 2
+    PlasmaFrigateCmd_PlaySwitchLightAnim 2
     VMSleep 8
-    Plugin12_Cmd1008 3
+    PlasmaFrigateCmd_PlaySwitchLightAnim 3
     // "All the barriers were deactivated,\nand now you can proceed!"
     SystemMsg PlasmaFrigate12_Text_AllBarriersWereDeactivated, 2
     LastKeyWait

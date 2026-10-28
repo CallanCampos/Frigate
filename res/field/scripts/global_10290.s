@@ -53,7 +53,7 @@ L_008F:
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_0199
     WorkSetConst 0x8021, 0
-    Cmd_01DD 5, 0, 0
+    BroadcastGameBeacon 5, 0, 0
     BoxGetCount 0x8021, 5
     VMStackPush 0x8021
     VMStackPushConst 6

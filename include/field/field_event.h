@@ -86,12 +86,12 @@ GameEvent *EventFieldEffect_Create(GameSystem *gsys, Fld3DCi *ci, u8 effectId);
 // The fade out of the field before flying
 GameEvent *EventGameTransition_CreateFadeOutEvent(GameSystem *gsys, Field *field, u32 a2, u32 a3);
 GameEvent *EventGameTransition_CreateFadeInEventWithBgRestore(GameSystem *gsys, Field *field, u32 a2, u32 a3, u32 a4);
-GameEvent *func_ov036_021b95ac(GameEvent *event, GameSystem *gsys, Field *field, BOOL seasonChanged, u32 prevSeason,
-                               u32 season);
+GameEvent *EventQuicksandArrive_CreateSpinZoom(GameEvent *event, GameSystem *gsys, Field *field, BOOL seasonChanged,
+                                               u32 prevSeason, u32 season);
 GameEvent *EventQuicksandArrive_CreateSpinZoomAlt(GameEvent *event, GameSystem *gsys, Field *field, BOOL seasonChanged,
                                                   u32 prevSeason, u32 season);
-GameEvent *func_ov036_021b9614(GameEvent *event, GameSystem *gsys, Field *field);
-GameEvent *func_ov036_021b9664(GameEvent *event, GameSystem *gsys, Field *field);
+GameEvent *EventQuicksandArrive_CreateSpinZoomSmoke(GameEvent *event, GameSystem *gsys, Field *field);
+GameEvent *EventQuicksandArrive_CreateMoveAnime(GameEvent *event, GameSystem *gsys, Field *field);
 GameEvent *EventDig_CreateRisingSpin(GameEvent *event, GameSystem *gsys, Field *field);
 GameEvent *EventWarpSequence_CreateIn(WarpSequence *warp);
 GameEvent *EventWarpSequence_CreateOut(WarpSequence *warp);

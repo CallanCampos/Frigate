@@ -85,8 +85,8 @@ L_00FC:
     FlagSet EVENT_FLAG_0x0309
     WorkSetConst EVENT_WORK_0x40cb, 2
     WorkSetConst EVENT_WORK_0x4120, 1
-    HollowRivalCmd_0262 3, 4
-    HollowRivalCmd_0262 0, 4
+    HollowRivalSetValue 3, 4
+    HollowRivalSetValue 0, 4
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt

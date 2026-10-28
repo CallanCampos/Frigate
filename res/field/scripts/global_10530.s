@@ -69,7 +69,7 @@ L_00F5:
     VMJump L_011E
 
 L_0108:
-    Cmd_02C5 10
+    JoinAvenueRecordActivity 10
     VMCall L_01BB
     WorkGet 0x8024, 0x8020
     VMJump L_013D
@@ -140,7 +140,7 @@ L_01EE:
     WorkSetConst 0x8026, 0
     WorkSetConst 0x8027, 0
     RecordAdd 23, 1
-    HollowRivalCmd_022A 0x8021, 0x8026
+    HollowRivalGenMsgID 0x8021, 0x8026
     SystemMsg 0x8026, 2
     LastKeyWait
     TVCheckCommercial 0x8022, 0x8027

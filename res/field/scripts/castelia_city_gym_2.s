@@ -194,7 +194,7 @@ L_0228:
     FlagSet EVENT_FLAG_0x0970
     WorkSetConst EVENT_WORK_0x40b4, 1
     FlagReset EVENT_FLAG_0x02f4
-    HollowRivalCmd_0262 1, 5
+    HollowRivalSetValue 1, 5
     FlagSet EVENT_FLAG_0x02f1
     WorkSetConst EVENT_WORK_0x40b2, 4
     TrainerFlagSet TRAINER_HARLEQUIN_ANDERS

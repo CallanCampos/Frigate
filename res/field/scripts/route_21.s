@@ -147,7 +147,7 @@ L_0242:
     // "???: Hold up![f000]븁\u0000"
     InfoMsg Route21_Text_HoldUp, 2
     MsgWinCloseAll
-    Cmd_02E8 1, 1
+    CallFieldFadeOut 1, 1
     SEPlay SEQ_SE_SW_RENBU_02
     // "A heavy gangplank fell\nwith a solid thud...[f000]븁\u0000"
     InfoMsg Route21_Text_HeavyGangplankFellSolid, 2
@@ -206,7 +206,7 @@ Movement_02F4:
 
 Script_7:
     ActorsPauseAll
-    Cmd_02E9 1, 1
+    CallFieldFadeIn 1, 1
     WordSetPlayerName 0
     WordSetLoadRivalName 1
     ActorCmdExec 10, Movement_04BC
@@ -280,7 +280,7 @@ Script_7:
     FlagSet EVENT_FLAG_0x033f
     FlagSet EVENT_FLAG_0x033d
     FlagReset EVENT_FLAG_0x03ea
-    HollowRivalCmd_0262 1, 30
+    HollowRivalSetValue 1, 30
     GameGetVersion 0x8020
     VMStackPush 0x8020
     VMStackPushConst 23
@@ -378,11 +378,11 @@ Script_5:
     WorkSetConst EVENT_WORK_0x4070, 1
     FlagSet EVENT_FLAG_0x0357
     FlagSet EVENT_FLAG_0x016c
-    HollowRivalCmd_0262 2, 9
-    HollowRivalCmd_0262 1, 32
-    HollowRivalCmd_0262 3, 7
-    HollowRivalCmd_0262 0, 6
-    HollowRivalCmd_0262 4, 0
+    HollowRivalSetValue 2, 9
+    HollowRivalSetValue 1, 32
+    HollowRivalSetValue 3, 7
+    HollowRivalSetValue 0, 6
+    HollowRivalSetValue 4, 0
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt

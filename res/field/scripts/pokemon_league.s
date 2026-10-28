@@ -89,7 +89,7 @@ L_00F9:
     // "The Pokémon League is a place where you\nboth pursue strength and express it.[f000]븁\u0000\nThe way to express it is simple...[f000]븁\u0000\nYou just have to beat the Elite Four and\nthe Champion![f000]븁\u0000\nYou can start your challenge by battling\nany of the Elite Four, and if you defeat[f000]븀\u0000\nthem all, you can challenge the Champion![f000]븁\u0000\nHowever! I warn you, once you start\nyour challenge, there's no turning back.[f000]븁\u0000\nYou must keep battling until you defeat\nthem all...or are defeated yourself.[f000]븁\u0000\nDo you want to go in?"
     ActorMsg MSGFILE_SCRIPT, PokemonLeague_Text_PokemonLeaguePlaceWhere, 1, 5, 0
     FlagSet EVENT_FLAG_0x016e
-    HollowRivalCmd_0262 1, 39
+    HollowRivalSetValue 1, 39
     VMJump L_0134
 
 L_0128:

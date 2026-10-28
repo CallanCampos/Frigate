@@ -213,7 +213,7 @@ L_0324:
     VMJump L_0347
 
 L_033B:
-    Cmd_0209 0, 1
+    SurveyCmd_WriteOwnAnswer 0, 1
     VMJump L_0366
 
 L_0347:
@@ -222,7 +222,7 @@ L_0347:
     VMJump L_0366
 
 L_035A:
-    Cmd_0209 0, 2
+    SurveyCmd_WriteOwnAnswer 0, 2
     VMJump L_0366
 
 L_0366:
@@ -232,7 +232,7 @@ L_0366:
     VMJump L_0389
 
 L_037D:
-    Cmd_0209 1, 1
+    SurveyCmd_WriteOwnAnswer 1, 1
     VMJump L_03A8
 
 L_0389:
@@ -241,11 +241,11 @@ L_0389:
     VMJump L_03A8
 
 L_039C:
-    Cmd_0209 1, 2
+    SurveyCmd_WriteOwnAnswer 1, 2
     VMJump L_03A8
 
 L_03A8:
-    Cmd_0209 29, 1
+    SurveyCmd_WriteOwnAnswer 29, 1
     VMReturn
 
 Script_3:
@@ -477,11 +477,11 @@ L_06DB:
 
 L_06DD:
     FlagSet EVENT_FLAG_0x0960
-    HollowRivalCmd_0262 0, 0
-    HollowRivalCmd_0262 1, 40
-    HollowRivalCmd_0262 2, 14
-    HollowRivalCmd_0262 3, 0
-    HollowRivalCmd_0262 4, 0
+    HollowRivalSetValue 0, 0
+    HollowRivalSetValue 1, 40
+    HollowRivalSetValue 2, 14
+    HollowRivalSetValue 3, 0
+    HollowRivalSetValue 4, 0
     FlagSet EVENT_FLAG_0x02ce
     WorkSetConst EVENT_WORK_0x40c4, 1
     FlagReset EVENT_FLAG_0x01bc
@@ -507,7 +507,7 @@ L_06DD:
     WorkSetConst EVENT_WORK_0x414e, 1
     WorkSetConst EVENT_WORK_0x4149, 2
     FlagSet EVENT_FLAG_0x0373
-    Cmd_00E4 1
+    BoxUnlockWallpapers 1
     FlagSet EVENT_FLAG_0x0388
     FlagReset EVENT_FLAG_0x0395
     WorkSetConst EVENT_WORK_0x411c, 1

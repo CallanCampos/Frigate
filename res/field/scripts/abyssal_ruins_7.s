@@ -52,7 +52,7 @@ L_00B5:
 
 L_00B7:
     SEPlay SEQ_SE_MESSAGE
-    Cmd_0230 0x8020, 0
+    MsgPlaceSignFont4 0x8020, 0
     VMStackPush EVENT_WORK_0x418f
     VMStackPushConst 2
     VMStackCmp CMP_GE

@@ -310,15 +310,15 @@ Movement_046C:
     MoveEnd
 
 L_0474:
-    Cmd_020E 0, 18, 0, 36, 3, 8
-    Cmd_020F 0, 18, 0, 36
-    Cmd_0211 0
+    SpPokeJump 0, 18, 0, 36, 3, 8
+    SpPokeAppear 0, 18, 0, 36
+    SpPokeWaitFrame 0
     FadeEx 12, 0, 16, 2
     FadeExWait
     ActorAdd 1
     FadeEx 12, 16, 0, 2
     FadeExWait
-    Cmd_0210 0
+    SpPokeWaitAnimEnd 0
     VMReturn
 
 Script_2:

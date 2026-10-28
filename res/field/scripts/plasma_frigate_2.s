@@ -46,44 +46,44 @@ L_0073:
     VMStackPushConst 0
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_0092
-    Plugin12_Cmd1006 0, 0
+    PlasmaFrigateCmd_SetSwitchLightState 0, 0
     VMJump L_0098
 
 L_0092:
-    Plugin12_Cmd1006 0, 1
+    PlasmaFrigateCmd_SetSwitchLightState 0, 1
 
 L_0098:
     VMStackPush EVENT_WORK_0x40f6
     VMStackPushConst 0
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_00B7
-    Plugin12_Cmd1006 1, 0
+    PlasmaFrigateCmd_SetSwitchLightState 1, 0
     VMJump L_00BD
 
 L_00B7:
-    Plugin12_Cmd1006 1, 1
+    PlasmaFrigateCmd_SetSwitchLightState 1, 1
 
 L_00BD:
     VMStackPush EVENT_WORK_0x40f7
     VMStackPushConst 0
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_00DC
-    Plugin12_Cmd1006 2, 0
+    PlasmaFrigateCmd_SetSwitchLightState 2, 0
     VMJump L_00E2
 
 L_00DC:
-    Plugin12_Cmd1006 2, 1
+    PlasmaFrigateCmd_SetSwitchLightState 2, 1
 
 L_00E2:
     VMStackPush EVENT_WORK_0x40f8
     VMStackPushConst 0
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_0101
-    Plugin12_Cmd1006 3, 0
+    PlasmaFrigateCmd_SetSwitchLightState 3, 0
     VMJump L_0107
 
 L_0101:
-    Plugin12_Cmd1006 3, 1
+    PlasmaFrigateCmd_SetSwitchLightState 3, 1
 
 L_0107:
     VMReturn
@@ -240,8 +240,8 @@ L_0350:
 L_0352:
     MsgWinCloseAll
     SEWait
-    Plugin12_Cmd1007 0
-    Plugin12_Cmd1008 0
+    PlasmaFrigateCmd_PlaySwitchAnim 0
+    PlasmaFrigateCmd_PlaySwitchLightAnim 0
     VMStackPush EVENT_WORK_0x40f5
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -299,8 +299,8 @@ L_040C:
 L_040E:
     MsgWinCloseAll
     SEWait
-    Plugin12_Cmd1007 1
-    Plugin12_Cmd1008 1
+    PlasmaFrigateCmd_PlaySwitchAnim 1
+    PlasmaFrigateCmd_PlaySwitchLightAnim 1
     VMStackPush EVENT_WORK_0x40f5
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -358,8 +358,8 @@ L_04C8:
 L_04CA:
     MsgWinCloseAll
     SEWait
-    Plugin12_Cmd1007 2
-    Plugin12_Cmd1008 2
+    PlasmaFrigateCmd_PlaySwitchAnim 2
+    PlasmaFrigateCmd_PlaySwitchLightAnim 2
     VMStackPush EVENT_WORK_0x40f5
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -417,8 +417,8 @@ L_0584:
 L_0586:
     MsgWinCloseAll
     SEWait
-    Plugin12_Cmd1007 3
-    Plugin12_Cmd1008 3
+    PlasmaFrigateCmd_PlaySwitchAnim 3
+    PlasmaFrigateCmd_PlaySwitchLightAnim 3
     VMStackPush EVENT_WORK_0x40f5
     VMStackPushConst 1
     VMStackCmp CMP_EQ

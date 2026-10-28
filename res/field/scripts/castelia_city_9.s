@@ -12,7 +12,7 @@ Script_2:
     ActorSetEyeToEye
     WorkSetConst 0x8020, 0
     WorkSetConst 0x8021, 0
-    UnityTowerCmd_02D7 0, 0x8008
+    Scrcmd_GetWifiHistoryCountryCount 0, 0x8008
     UnityTowerGetVisitorCountry 0x8009
     VMStackPush 0x8008
     VMStackPushConst 0

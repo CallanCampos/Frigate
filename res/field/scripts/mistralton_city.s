@@ -32,7 +32,7 @@ Script_21:
     VMHalt
 
 Script_7:
-    Cmd_02B2 13, EVENT_WORK_0x400f
+    MemoryLinkCheckFlag 13, EVENT_WORK_0x400f
     VMStackPush EVENT_WORK_0x400f
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -78,7 +78,7 @@ L_0116:
     VMHalt
 
 L_0122:
-    Cmd_02B2 13, EVENT_WORK_0x400f
+    MemoryLinkCheckFlag 13, EVENT_WORK_0x400f
     VMStackPush EVENT_WORK_0x400f
     VMStackPushConst 0
     VMStackCmp CMP_EQ
@@ -98,7 +98,7 @@ L_0165:
     VMReturn
 
 L_0167:
-    Cmd_02B2 13, EVENT_WORK_0x400f
+    MemoryLinkCheckFlag 13, EVENT_WORK_0x400f
     VMStackPush EVENT_WORK_0x400f
     VMStackPushConst 0
     VMStackCmp CMP_EQ
@@ -373,7 +373,7 @@ L_0550:
     ActorDelete 3
     FlagSet EVENT_FLAG_0x02fd
     FlagSet EVENT_FLAG_0x02bb
-    HollowRivalCmd_0262 0, 2
+    HollowRivalSetValue 0, 2
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt
@@ -695,7 +695,7 @@ Script_18:
     // "Know what?\nMy Pokémon loves Berries![f000]븁\u0000\nThat's why I'm wandering all over,\nlooking for Berries![f000]븁\u0000\nI dream about a wonderful city somewhere\nthat is overflowing with Berries...[f000]븁\u0000"
     ParentActorMsg MSGFILE_SCRIPT, MistraltonCity_Text_KnowWhatPokemonLoves, 0, 0
     MsgWinCloseAll
-    Cmd_0275 0, 20, 0
+    WordSetFunfestMission 0, 20, 0
     SEPlay SEQ_SE_FLD_133
     // "The Funfest Mission\n“[f000]ŀ\u0001\u0000\"[f000]븀\u0000\nhas been added to the Entralink."
     SystemMsg MistraltonCity_Text_FunfestMissionHasBeen, 0

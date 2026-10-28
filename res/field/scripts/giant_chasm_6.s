@@ -126,12 +126,12 @@ L_0143:
     PVWait
     MsgWaitAdvance
     InfoMsgClose_0039
-    Plugin14_Cmd1002 0
+    Plugin14Cmd_PlayGC6Model 0
     VMSleep 300
     EvCameraMoveTo 9688, 0, 0xed000, 0xf8000, 0, 0x13d000, 40
     VMSleep 200
     EvCameraWait
-    Cmd_02E8 2, 0
+    CallFieldFadeOut 2, 0
     BGMFadeOutAll 1
     VMSleep 20
     GameGetVersion 0x8020
@@ -150,8 +150,8 @@ L_025D:
 L_0262:
     VMSleep 60
     InfoMsgClose_0039
-    Plugin14_Cmd1001 1
-    Cmd_02E9 2, 0
+    Plugin14Cmd_ShowGC6Model 1
+    CallFieldFadeIn 2, 0
     VMStackPush 0x8020
     VMStackPushConst 23
     VMStackCmp CMP_EQ
@@ -163,7 +163,7 @@ L_028F:
     PlayFieldEffect 108
 
 L_0293:
-    Plugin14_Cmd1002 1
+    Plugin14Cmd_PlayGC6Model 1
     VMSleep 50
     EvCameraMoveTo 9688, 0, 0xed000, 0xf8000, 0, 0x108000, 20
     EvCameraWait
@@ -173,7 +173,7 @@ L_0293:
     BGMPlay SEQ_BGM_EV_GIANTHOLE_01
     FlagSet EVENT_FLAG_0x09fc
     BGMAmbienceResume
-    Plugin14_Cmd1004 1
+    Plugin14Cmd_PlayGC6Model23 1
     VMSleep 100
     FadeOutBlack
     FadeWait
@@ -319,7 +319,7 @@ L_0536:
 
 L_0544:
     Plugin14Cmd_ShiftActor 251, 0, 8
-    Plugin14_Cmd1003 251
+    Plugin14Cmd_StartActorHover 251
     FadeInBlackQ
     BGMPop 0, 60
     FadeWait
@@ -468,7 +468,7 @@ L_0750:
 L_0755:
     MsgWaitAdvance
     InfoMsgClose_0039
-    Cmd_02E9 1, 0
+    CallFieldFadeIn 1, 0
     ActorCmdExec 255, Movement_1190
     ActorCmdWait
     // "Ghetsis: I can't believe it!\nThe White Kyurem I went to[f000]븀\u0000\nall the trouble of preparing![f000]븁\u0000\nHow irritating![f000]븁\u0000\nNow I have to go recapture\nKyurem, don't I?[f000]븁\u0000\nBut first, I'll take down this disgusting\nTrainer with my own hand![f000]븁\u0000\nThis time I WILL succeed!\nNo matter what they try,[f000]븀\u0000\nno one will be able to stop me![f000]븁\u0000"
@@ -689,12 +689,12 @@ L_0A74:
     VMSleep 30
     ActorCmdExec 4, Movement_1178
     ActorCmdWait
-    Cmd_02B4 0, EVENT_WORK_0x400f
+    MemoryLinkIsPlayerLinked 0, EVENT_WORK_0x400f
     VMStackPush EVENT_WORK_0x400f
     VMStackPushConst 1
     VMStackCmp CMP_GE
     VMJumpIf CMP_STACK, L_0AD7
-    Cmd_02B5 0, 1
+    WordSetMemoryLinkPlayerName 0, 1
     // "[f000]븉\u0001\u0001On that day two years ago, [f000]Ā\u0001\u0001\nand Alder taught me something...[f000]븁\u0000\nBy accepting different ideas, this world\ncreates a chemical reaction...[f000]븁\u0000\nSo I met many different Pokémon\nand people and heard so much...[f000]븁\u0000\nAnd that's how my world\nquietly grew bigger...[f000]븉\u0001\u0000[f000]븁\u0000"
     ActorMsg MSGFILE_SCRIPT, GiantChasm6_Text_DayTwoYearsAgo_2, 4, 6, 0
     VMJump L_0AE3
@@ -725,11 +725,11 @@ L_0AE3:
     ActorDelete 3
     ActorSetGPos 255, 17, 0, 18, 2
     FadeEx 3, 16, 0, 4
-    Plugin14_Cmd1004 0
+    Plugin14Cmd_PlayGC6Model23 0
     VMSleep 10
     FadeExWait
     VMSleep 160
-    Plugin14_Cmd1005
+    Plugin14Cmd_HideGC6Model3
     FlagReset EVENT_FLAG_0x09fb
     FlagReset EVENT_FLAG_0x0407
     ActorAdd 11
@@ -779,11 +779,11 @@ L_0BC9:
     FlagSet EVENT_FLAG_0x0376
     FlagSet EVENT_FLAG_0x0378
     FlagSet EVENT_FLAG_0x0356
-    HollowRivalCmd_0262 0, 6
-    HollowRivalCmd_0262 1, 36
-    HollowRivalCmd_0262 2, 12
-    HollowRivalCmd_0262 3, 7
-    HollowRivalCmd_0262 4, 0
+    HollowRivalSetValue 0, 6
+    HollowRivalSetValue 1, 36
+    HollowRivalSetValue 2, 12
+    HollowRivalSetValue 3, 7
+    HollowRivalSetValue 4, 0
     VMReturn
     .balign 4, 0
 
@@ -935,7 +935,7 @@ L_0DCA:
     ActorSetGPos 0, 17, 0, 16, 2
     ActorCmdExec 4, Movement_1158
     ActorCmdWait
-    Plugin14_Cmd1007
+    Plugin14Cmd_ResetLCDToBlack
     VMJump L_0E87
 
 L_0E58:
@@ -1066,7 +1066,7 @@ L_0FB7:
 
 L_0FCE:
     FlagSet EVENT_FLAG_0x00f9
-    Cmd_00E4 2
+    BoxUnlockWallpapers 2
     VMJump L_100C
 
 L_0FDC:

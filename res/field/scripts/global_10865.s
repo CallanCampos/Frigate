@@ -188,7 +188,7 @@ L_02CC:
     FadeWait
     BMReleaseHandle 0x8025
     PokewoodCmd_Create
-    Plugin10_Cmd1026
+    PokewoodCmd_WatchBlock
     PokewoodCmd_Free
     PlayerGetGPos 0x8027, 0x8028
     BMCreateHandleByGPos 0x8025, 1, 0x8027, 0x8028
@@ -381,7 +381,7 @@ L_05F3:
     // "Please select the movie\nyou'd like to watch.[f000]븁\u0000"
     ActorMsg MSGFILE_SCRIPT, Global10865_Text_PleaseSelectMovieYoud, 0x8011, 2, 0
     MsgWinCloseAll
-    Plugin10_Cmd1003 0, 0x8023
+    PokewoodCmd_OpenMenu 0, 0x8023
     DebugPrint 0x8023
     VMStackPush 0x8023
     VMStackPushConst 8
@@ -413,8 +413,8 @@ L_0632:
     FadeOutBlackQ
     FadeWait
     BMReleaseHandle 0x8025
-    Plugin10_Cmd1001 0x8023, 0x8026
-    Plugin10_Cmd1017 0x8023, 0x8010
+    PokewoodCmd_WatchSlot 0x8023, 0x8026
+    PokewoodCmd_GetSlotFlag 0x8023, 0x8010
     VMStackPush 0x8026
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -478,7 +478,7 @@ Movement_075C:
     MoveEnd
 
 L_0764:
-    Cmd_02CB 0x8010
+    PokewoodGetLevel 0x8010
     DebugPrint 0x8010
     VMStackPush 0x8010
     VMStackPush 0
@@ -572,8 +572,8 @@ L_0887:
     VMReturn
 
 L_08D1:
-    Plugin10_Cmd1017 0x8023, 0x8010
-    Plugin10_Cmd1022 0x8023
+    PokewoodCmd_GetSlotFlag 0x8023, 0x8010
+    PokewoodCmd_SetSlotFlag 0x8023
     VMStackPush 0x8010
     VMStackPushConst 0
     VMStackCmp CMP_EQ
@@ -643,7 +643,7 @@ L_09BA:
 
 L_09D4:
     WordSetPlayerName 0
-    Plugin10_Cmd1010 EVENT_WORK_0x4001, 0x8010
+    PokewoodCmd_GetDownloadedMovieResult EVENT_WORK_0x4001, 0x8010
     WorkCmpConst 0x8010, 1
     VMJumpIf CMP_EQ, L_09F0
     VMJump L_0A02
@@ -755,7 +755,7 @@ Script_2:
     VMStackCmp CMP_GT
     VMJumpIf CMP_STACK, L_0B53
     SEPlay SEQ_SE_MESSAGE
-    Plugin10_Cmd1023 0x8010
+    PokewoodCmd_OpenRecordMonitor 0x8010
     VMJump L_0B5D
 
 L_0B53:

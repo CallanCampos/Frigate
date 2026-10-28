@@ -737,7 +737,7 @@ L_09AD:
     VMReturn
 
 L_09AF:
-    UnityTowerCmd_02D7 1, 0x8028
+    Scrcmd_GetWifiHistoryCountryCount 1, 0x8028
     VMStackPush 0x8028
     VMStackPushConst 130
     VMStackCmp CMP_GE

@@ -292,7 +292,7 @@ static GameEventReturnCode EventFestMissionStart_Callback(GameEvent *event, u32 
     case 2:
         MsgBGPrinter_ClearInfoMsgWin(work->window);
         MsgBGPrinter_DeleteInfoMsgWin(work->window);
-        func_ov036_021b65e8(Field_GetFesGimmick(work->field));
+        FesGimmick_StartMission(Field_GetFesGimmick(work->field));
         FestMission_OnZoneEnter(work->gsys, Field_GetPlayerStateZoneID(work->field));
         if (!work->joined) {
             *state = 6;
@@ -412,7 +412,7 @@ static GameEventReturnCode EventFestMissionEnd_Callback(GameEvent *event, u32 *s
         (*state)++;
         break;
     case 2:
-        func_ov036_021b6690(Field_GetFesGimmick(work->field));
+        FesGimmick_EndMission(Field_GetFesGimmick(work->field));
         bgm = LinkFestival_GetNormalChangeBGMID(work->festival);
         if (bgm != (u32)-1) {
             GameEvent_ChainNext(event, EventBGMChange_Create(work->gsys, bgm, 60, 60));

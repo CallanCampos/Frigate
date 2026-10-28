@@ -24,7 +24,7 @@ Script_11:
     VMStackPushConst 0
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_0065
-    HollowRivalCmd_0262 2, 14
+    HollowRivalSetValue 2, 14
 
 L_0065:
     VMHalt
@@ -110,7 +110,7 @@ Script_4:
     WorkSetConst EVENT_WORK_0x4111, 1
     FlagSet EVENT_FLAG_0x038c
     FlagSet EVENT_FLAG_0x03e7
-    HollowRivalCmd_0262 2, 0
+    HollowRivalSetValue 2, 0
     FlagReset EVENT_FLAG_0x03e8
     FinishAllEvents
     ActorsUnpauseAll

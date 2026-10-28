@@ -227,11 +227,11 @@ L_02EE:
     WorkSetConst EVENT_WORK_0x4071, 1
     WorkSetConst EVENT_WORK_0x4072, 1
     FlagSet EVENT_FLAG_0x03cf
-    HollowRivalCmd_0262 0, 6
-    HollowRivalCmd_0262 1, 35
-    HollowRivalCmd_0262 2, 9
-    HollowRivalCmd_0262 3, 7
-    HollowRivalCmd_0262 4, 0
+    HollowRivalSetValue 0, 6
+    HollowRivalSetValue 1, 35
+    HollowRivalSetValue 2, 9
+    HollowRivalSetValue 3, 7
+    HollowRivalSetValue 4, 0
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt

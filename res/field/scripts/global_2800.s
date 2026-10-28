@@ -138,7 +138,7 @@ Script_12:
     VMJumpIf CMP_STACK, L_01E1
     FlagSet 0x8002
     RecordAdd 44, 1
-    Cmd_02C5 14
+    JoinAvenueRecordActivity 14
 
 L_01E1:
     RTEndGlobal
@@ -163,7 +163,7 @@ L_01E5:
 L_022E:
     VMCall L_030F
     ItemAdd 0x8000, 0x8001, 0x8010
-    Cmd_01DD 0, 0x8000, 0
+    BroadcastGameBeacon 0, 0x8000, 0
     VMCall L_0489
 
 L_024A:
@@ -195,7 +195,7 @@ L_0262:
 L_02AB:
     VMCall L_030F
     ItemAdd 0x8000, 0x8001, 0x8010
-    Cmd_01DD 0, 0x8000, 0
+    BroadcastGameBeacon 0, 0x8000, 0
     VMCall L_04A5
 
 L_02C7:
@@ -232,7 +232,7 @@ L_030F:
     WorkSetConst 0x8022, 0
     VMCall L_04C9
     VMSleep 4
-    Cmd_0239 0x8022
+    ScriptNative_CheckPlayerFormModel 0x8022
     VMStackPush 0x8022
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -482,7 +482,7 @@ Script_13:
 L_063B:
     VMCall L_030F
     ItemAdd 0x8000, 1, 0x8010
-    Cmd_01DD 0, 0x8000, 0
+    BroadcastGameBeacon 0, 0x8000, 0
     WordSetPlayerName 0
     WordSetItemName 1, 0x8000
     WordSetItemPocketName 2, 0x8008
@@ -520,7 +520,7 @@ Script_16:
 L_06CB:
     MEPlay SEQ_ME_ITEM
     VMSleep 4
-    Cmd_0239 0x8028
+    ScriptNative_CheckPlayerFormModel 0x8028
     VMStackPush 0x8028
     VMStackPushConst 1
     VMStackCmp CMP_EQ

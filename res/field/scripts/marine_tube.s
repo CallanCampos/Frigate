@@ -17,7 +17,7 @@
     WorkSetConst 0x8024, 0
 
 Script_1:
-    Cmd_02C4
+    HiddenHollowSetPeriod
     VMHalt
 
 Script_2:

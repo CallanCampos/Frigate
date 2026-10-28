@@ -18,7 +18,7 @@ Script_9:
     VMHalt
 
 Script_8:
-    Cmd_02B2 0, 0x8020
+    MemoryLinkCheckFlag 0, 0x8020
     VMStackPush 0x8020
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -38,7 +38,7 @@ L_0079:
     VMHalt
 
 L_0081:
-    Cmd_02B2 0, EVENT_WORK_0x400f
+    MemoryLinkCheckFlag 0, EVENT_WORK_0x400f
     VMStackPush EVENT_WORK_0x400f
     VMStackPushConst 0
     VMStackCmp CMP_EQ
@@ -112,12 +112,12 @@ Script_4:
 
 Script_5:
     ActorsPauseAll
-    Cmd_02B2 0, 0x8020
+    MemoryLinkCheckFlag 0, 0x8020
     VMStackPush 0x8020
     VMStackPushConst 1
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_019B
-    Cmd_02B5 0, 0
+    WordSetMemoryLinkPlayerName 0, 0
     SEPlay SEQ_SE_MESSAGE
     ActorSetEyeToEye
     // "Two years ago, [f000]Ā\u0001\u0000, a Trainer\nfrom Nuvema did some amazing things,[f000]븀\u0000\nincluding battling Team Plasma[f000]븀\u0000\nand saving Unova![f000]븁\u0000\nI was the one who told that Trainer that\nwild Pokémon are hiding in the tall grass.[f000]븁\u0000\nAnd that you can battle\nor capture wild Pokémon there![f000]븁\u0000\nSo, you could say that I'm one\nof the people who saved Unova, too!"
@@ -306,7 +306,7 @@ L_03E3:
     MsgWinCloseAll
     ActorCmdExec 251, Movement_05D8
     ActorCmdWait
-    Cmd_02B5 0, 1
+    WordSetMemoryLinkPlayerName 0, 1
     // "One day...[f000]븁\u0000\n[f000]Ā\u0001\u0001, Cheren, and I\nall gathered right here and took[f000]븀\u0000\nthe first step of our adventure.[f000]븁\u0000\nIt's a very special spot.[f000]븁\u0000"
     ActorMsg MSGFILE_SCRIPT, Route1_Text_OneDayCherenAll, 251, 0, 0
     MsgWinCloseAll
@@ -314,7 +314,7 @@ L_03E3:
     VMSleep 15
     ActorCmdExec 255, Movement_05E8
     ActorCmdWait
-    Cmd_02B5 0, 1
+    WordSetMemoryLinkPlayerName 0, 1
     ActorCmdExec 251, Movement_05E0
     ActorCmdWait
     // "Bianca: Hey, [f000]Ā\u0001\u0001![f000]븁\u0000\nLet's all take our first step\non Route 1 together![f000]븁\u0000"
@@ -334,13 +334,13 @@ L_03E3:
     VMSleep 10
     ActorCmdExec 255, Movement_05E8
     ActorCmdWait
-    Cmd_02B5 0, 1
+    WordSetMemoryLinkPlayerName 0, 1
     // "Ha ha! That's what I said.[f000]븁\u0000\nHey, while we're here,\nhave a Pokémon battle with me![f000]븁\u0000\nTalking about [f000]Ā\u0001\u0001 put me\nin the mood for a Pokémon battle![f000]븁\u0000"
     ActorMsg MSGFILE_SCRIPT, Route1_Text_HaHaThatsWhat, 251, 0, 0
     MsgWinCloseAll
     WorkSetConst 0x8023, 0
     WorkSetConst 0x8024, 0
-    Cmd_02B3 0, 0x8023
+    MemoryLinkGetVar 0, 0x8023
     WorkCmpConst 0x8023, 0
     VMJumpIf CMP_EQ, L_04DA
     VMJump L_04E6
@@ -381,7 +381,7 @@ L_054B:
     CallTrainerLose
 
 L_054D:
-    Cmd_02B5 0, 1
+    WordSetMemoryLinkPlayerName 0, 1
     // "Tee-hee! You're so tough!\nYou're just like [f000]Ā\u0001\u0001![f000]븁\u0000\nOK![f000]븁\u0000\nI just have to remember what\nI felt like back then and work hard, too![f000]븁\u0000\nThanks!\nSee you![f000]븁\u0000"
     ActorMsg MSGFILE_SCRIPT, Route1_Text_TeeHeeYoureTough, 251, 0, 0
     MsgWinCloseAll

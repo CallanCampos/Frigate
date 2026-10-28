@@ -44,7 +44,7 @@ Script_2:
     FlagSet EVENT_FLAG_0x0198
 
 L_0095:
-    Cmd_0240 64, 30
+    ScriptWork_FadeBgmVolume 64, 30
     SEPlay SEQ_SE_FLD_151
     // "[f000]Ā\u0001\u0000 rang the bell..."
     InfoMsg CelestialTower_Text_RangBell, 2
@@ -54,7 +54,7 @@ L_0095:
     BMHndAnmWait 0x8023
     BMReleaseHandle 0x8023
     SEWait
-    Cmd_0241 60
+    ScriptWork_RestoreBgmVolume 60
     // "The sound of the bell\nreverberates through the area..."
     InfoMsg CelestialTower_Text_SoundBellReverberatesThrough, 2
     LastKeyWait

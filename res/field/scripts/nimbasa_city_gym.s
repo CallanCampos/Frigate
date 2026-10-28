@@ -127,7 +127,7 @@ Script_13:
     VMStackPushConst 1
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_0210
-    Cmd_025B
+    GymElecReapplyProgress
 
 L_0210:
     VMStackPush EVENT_WORK_0x409b
@@ -138,7 +138,7 @@ L_0210:
     VMStackPushConst 1
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_023A
-    Cmd_025F 6
+    GymElecSetStage 6
 
 L_023A:
     VMHalt
@@ -232,8 +232,8 @@ L_0333:
     ActorCmdExec 3, Movement_124C
     ActorCmdExec 0, Movement_124C
     ActorCmdWait
-    Cmd_025F 4
-    Cmd_025F 5
+    GymElecSetStage 4
+    GymElecSetStage 5
     CallTrainerBattleEnd
     VMJump L_039A
 
@@ -262,7 +262,7 @@ L_03DB:
 L_03DF:
     MEWait
     WorkSetConst 0x8021, 0
-    Cmd_025F 2
+    GymElecSetStage 2
     WordSetPlayerName 0
     // "[f000]Ā\u0001\u0000 received the\nBolt Badge from Elesa![f000]븁\u0000"
     SystemMsg NimbasaCityGym_Text_ReceivedBoltBadgeFrom, 2
@@ -270,7 +270,7 @@ L_03DF:
     // "If you have four Badges, including this\nBolt Badge, Pokémon up to Lv. 50,[f000]븀\u0000\nincluding traded Pokémon, will obey you.[f000]븁\u0000\nAlso, here's this move I like.\nFeel free to use it, um, if you want to.[f000]븁\u0000"
     ActorMsg MSGFILE_SCRIPT, NimbasaCityGym_Text_IfHaveFourBadges, 4, 2, 0
     ActorMsgClose
-    Cmd_025F 0
+    GymElecSetStage 0
     VMStackPush 0x8000
     VMStackPush 0x8001
     WorkSet 0x8000, 399
@@ -278,7 +278,7 @@ L_03DF:
     RTCallGlobal 2805
     VMStackPop 0x8001
     VMStackPop 0x8000
-    Cmd_025F 2
+    GymElecSetStage 2
     // "Volt Switch lets the Pokémon switch with\na different Pokémon after attacking.[f000]븁\u0000\nOf course, if you don't have another\nPokémon in your party, you can't switch."
     ActorMsg MSGFILE_SCRIPT, NimbasaCityGym_Text_VoltSwitchLetsPokemon, 4, 2, 0
     MsgWaitAdvance
@@ -287,19 +287,19 @@ L_03DF:
     EvCameraWait
     EvCameraRebind
     EvCameraEnd
-    Cmd_025F 0
+    GymElecSetStage 0
     FlagSet EVENT_FLAG_0x0971
     FlagSet EVENT_FLAG_0x0108
     WorkSetConst EVENT_WORK_0x409c, 1
     WorkSetConst EVENT_WORK_0x40c0, 1
     FlagReset EVENT_FLAG_0x02f9
     FlagReset EVENT_FLAG_0x02fa
-    HollowRivalCmd_0262 1, 6
+    HollowRivalSetValue 1, 6
     VMReturn
 
 Script_4:
     ActorsPauseAll
-    Cmd_025C 1, 2, 0
+    GymElecSetFollower 1, 2, 0
     VMSleep 16
     VMStackPushFlag EVENT_FLAG_0x0108
     VMStackPushConst 0
@@ -368,10 +368,10 @@ L_055F:
     ActorCmdWait
 
 L_0569:
-    Cmd_025C 0, 2, 0
-    Cmd_025F 1
-    Cmd_025D 1
-    Cmd_025F 0
+    GymElecSetFollower 0, 2, 0
+    GymElecSetStage 1
+    GymElecSetProgress 1
+    GymElecSetStage 0
     VMStackPushFlag EVENT_FLAG_0x0108
     VMStackPushConst 0
     VMStackCmp CMP_EQ
@@ -427,7 +427,7 @@ L_0613:
 
 Script_5:
     ActorsPauseAll
-    Cmd_025C 1, 3, 0
+    GymElecSetFollower 1, 3, 0
     VMSleep 16
     VMStackPushFlag EVENT_FLAG_0x0108
     VMStackPushConst 0
@@ -496,10 +496,10 @@ L_0728:
     ActorCmdWait
 
 L_0732:
-    Cmd_025C 0, 3, 0
-    Cmd_025F 1
-    Cmd_025D 2
-    Cmd_025F 0
+    GymElecSetFollower 0, 3, 0
+    GymElecSetStage 1
+    GymElecSetProgress 2
+    GymElecSetStage 0
     VMStackPushFlag EVENT_FLAG_0x0108
     VMStackPushConst 0
     VMStackCmp CMP_EQ
@@ -555,7 +555,7 @@ L_07DC:
 
 Script_6:
     ActorsPauseAll
-    Cmd_025C 1, 0, 0
+    GymElecSetFollower 1, 0, 0
     VMSleep 16
     VMStackPushFlag EVENT_FLAG_0x0108
     VMStackPushConst 0
@@ -658,7 +658,7 @@ L_0964:
     ActorCmdWait
 
 L_096E:
-    Cmd_025C 0, 0, 0
+    GymElecSetFollower 0, 0, 0
     ActorSetGPos 0, 21, 6, 2, 2
     VMCall L_0E38
     BGMAmbienceResume
@@ -1004,15 +1004,15 @@ L_0E38:
     EvCameraMoveTo 3672, 0, 0xed000, 0xf8000, 0x6802f, 0x3f000, 70
     EvCameraWait
     BGMPlay SEQ_BGM_ERECTRIC_GYM_02
-    Cmd_025C 1, 4, 3
+    GymElecSetFollower 1, 4, 3
     VMSleep 12
-    Cmd_025C 1, 4, 1
+    GymElecSetFollower 1, 4, 1
     VMSleep 12
-    Cmd_025C 1, 4, 2
+    GymElecSetFollower 1, 4, 2
     VMSleep 12
     ActorCmdExec 4, Movement_0F0C
     ActorCmdWait
-    Cmd_025F 3
+    GymElecSetStage 3
     FadeEx 12, 0, 16, 2
     FadeExWait
     FadeEx 12, 16, 0, 2
@@ -1022,19 +1022,19 @@ L_0E38:
     FadeExWait
     FadeEx 12, 16, 0, 2
     FadeExWait
-    Cmd_025C 0, 4, 3
-    Cmd_025C 0, 4, 1
-    Cmd_025C 0, 4, 2
+    GymElecSetFollower 0, 4, 3
+    GymElecSetFollower 0, 4, 1
+    GymElecSetFollower 0, 4, 2
     VMStackPushFlag EVENT_FLAG_0x0108
     VMStackPushConst 1
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_0EF3
-    Cmd_025F 5
+    GymElecSetStage 5
 
 L_0EF3:
-    Cmd_025F 1
-    Cmd_025D 3
-    Cmd_025F 0
+    GymElecSetStage 1
+    GymElecSetProgress 3
+    GymElecSetStage 0
     EvCameraMoveToDefault 90
     EvCameraWait
     EvCameraRebind
@@ -1115,7 +1115,7 @@ L_1032:
     ActorCmdWait
 
 L_1048:
-    Cmd_025F 2
+    GymElecSetStage 2
     MultiMsg 25, 3, 5, 1
     VMSleep 10
     MultiMsg 26, 19, 8, 2
@@ -1192,7 +1192,7 @@ L_11A5:
     ActorMsg MSGFILE_SCRIPT, NimbasaCityGym_Text_ShiningExampleTrainerSince, 4, 0, 0
     LastKeyWait
     ActorMsgClose
-    Cmd_025F 0
+    GymElecSetStage 0
     WorkSetConst EVENT_WORK_0x409c, 2
     WorkSetConst EVENT_WORK_0x4001, 1
     WorkSetConst 0x8029, 0

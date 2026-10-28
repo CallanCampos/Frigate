@@ -38,7 +38,7 @@ L_004F:
     VMJump L_006C
 
 L_0062:
-    Plugin16_Cmd1000 3
+    Plugin16Cmd_ShowRuinsModel 3
     VMJump L_00C7
 
 L_006C:
@@ -47,7 +47,7 @@ L_006C:
     VMJump L_0089
 
 L_007F:
-    Plugin16_Cmd1000 0
+    Plugin16Cmd_ShowRuinsModel 0
     VMJump L_00C7
 
 L_0089:
@@ -56,7 +56,7 @@ L_0089:
     VMJump L_00A6
 
 L_009C:
-    Plugin16_Cmd1000 1
+    Plugin16Cmd_ShowRuinsModel 1
     VMJump L_00C7
 
 L_00A6:
@@ -65,11 +65,11 @@ L_00A6:
     VMJump L_00C3
 
 L_00B9:
-    Plugin16_Cmd1000 2
+    Plugin16Cmd_ShowRuinsModel 2
     VMJump L_00C7
 
 L_00C3:
-    Plugin16_Cmd1000 3
+    Plugin16Cmd_ShowRuinsModel 3
 
 L_00C7:
     VMReturn
@@ -120,8 +120,8 @@ L_0161:
     EvCameraUnbind
     EvCameraMoveTo 5720, 0, 0xed000, 0xf8000, 0, 0x15000, 40
     EvCameraWait
-    Plugin16_Cmd1001 0
-    Plugin16_Cmd1002 1
+    Plugin16Cmd_SetRuinsAnimFrame 0
+    Plugin16Cmd_PlayRuinsAnim 1
     SEPlay SEQ_SE_SW_RELIC_02
     VMSleep 30
     ActorCmdExec 255, Movement_0290
@@ -216,7 +216,7 @@ Movement_02BC:
 
 L_02C8:
     WorkSetConst 0x8022, 0
-    KeysCmd_02B1 0x8022
+    KeyInfoGetChamberKey 0x8022
     RTCGetTime 0x8008, 0x8009
     VMStackPush EVENT_WORK_0x4001
     VMStackPushConst 1
@@ -263,7 +263,7 @@ L_036A:
 
 Script_5:
     ActorsPauseAll
-    Plugin16_Cmd1001 1
+    Plugin16Cmd_SetRuinsAnimFrame 1
     EvCameraInit
     EvCameraUnbind
     EvCameraMoveTo 5720, 0, 0xed000, 0xf8000, 0, 0x15000, 1
@@ -271,7 +271,7 @@ Script_5:
     FadeInBlack
     ActorCmdExec 255, Movement_03CC
     VMSleep 20
-    Plugin16_Cmd1002 0
+    Plugin16Cmd_PlayRuinsAnim 0
     SEPlay SEQ_SE_SW_RELIC_03
     ActorCmdWait
     FadeWait
@@ -305,7 +305,7 @@ Script_6:
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_047C
     WorkSetConst 0x8023, 0
-    KeysCmd_02B1 0x8023
+    KeyInfoGetChamberKey 0x8023
     SEPlay SEQ_SE_FLD_44
     SEWait
     VMStackPush 0x8023
@@ -317,7 +317,7 @@ Script_6:
     EvCameraShake 6, 0, 3, 10, 1, 0, 1, 3
     FadeEx 3, 0, 16, 4
     FadeExWait
-    Plugin16_Cmd1000 0
+    Plugin16Cmd_ShowRuinsModel 0
     VMSleep 60
     FadeEx 3, 16, 0, 4
     FadeExWait

@@ -55,7 +55,7 @@ L_00AE:
     WorkSetConst EVENT_WORK_0x4121, 3
     FlagSet EVENT_FLAG_0x03bf
     FlagReset EVENT_FLAG_0x03c0
-    HollowRivalCmd_0262 3, 0
+    HollowRivalSetValue 3, 0
     ActorAdd 0
     ActorDelete 254
     VMJump L_0116

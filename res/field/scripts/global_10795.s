@@ -35,7 +35,7 @@ L_0058:
     VMStackPushConst 0
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_0089
-    Cmd_02C5 27
+    JoinAvenueRecordActivity 27
     SEPlay SEQ_SE_KAIDAN
     HiddenHollowCallWarpIn 0x8020
 

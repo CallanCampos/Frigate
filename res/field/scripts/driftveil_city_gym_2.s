@@ -10,9 +10,9 @@
 
 Script_2:
     ActorsPauseAll
-    Cmd_0187 0
+    DriftveilLiftPlaceAtBottom 0
     FadeInBlack
-    Cmd_018E 0
+    DriftveilLiftCallMove 0
     FadeWait
     FinishAllEvents
     ActorsUnpauseAll
@@ -21,10 +21,10 @@ Script_2:
 Script_3:
     ActorsPauseAll
     ActorNew 7, 4, 1, 251, 227, 0
-    Cmd_0187 1
+    DriftveilLiftPlaceAtBottom 1
     FadeInBlack
     FadeWait
-    Cmd_018E 2
+    DriftveilLiftCallMove 2
     WorkSetConst EVENT_WORK_0x4000, 1
     ActorCmdExec 251, Movement_01A0
     VMSleep 20
@@ -41,7 +41,7 @@ Script_3:
     WorkSetConst EVENT_WORK_0x40c3, 4
     FlagReset EVENT_FLAG_0x02cd
     ObjInitPointGPos 2, 31, 0, 0
-    HollowRivalCmd_0262 1, 11
+    HollowRivalSetValue 1, 11
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt
@@ -67,7 +67,7 @@ Script_1:
     MsgWaitAdvance
     MsgWinCloseAll
     FadeOutBlack
-    Cmd_018E 1
+    DriftveilLiftCallMove 1
     FadeWait
     RTReserveScript 2
     MapChangeCore ZONE_DRIFTVEIL_CITY_GYM, 12, 0, 87, 0

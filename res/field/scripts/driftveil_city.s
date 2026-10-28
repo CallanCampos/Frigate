@@ -137,7 +137,7 @@ Script_14:
     FlagSet EVENT_FLAG_0x02c4
     FlagSet EVENT_FLAG_0x03e9
     WorkSetConst EVENT_WORK_0x40c5, 1
-    HollowRivalCmd_0262 1, 12
+    HollowRivalSetValue 1, 12
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt
@@ -261,7 +261,7 @@ L_0304:
     FlagSet EVENT_FLAG_0x02c3
     WorkSetConst EVENT_WORK_0x40c3, 1
     FlagSet EVENT_FLAG_ARRIVED_DRIFTVEIL_CITY
-    HollowRivalCmd_0262 1, 9
+    HollowRivalSetValue 1, 9
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt

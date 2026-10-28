@@ -26,7 +26,7 @@
 Script_1:
     ActorsPauseAll
     WorkSetConst 0x8022, 0
-    Cmd_0167 0, 0, 0, 0
+    MusicalComm 0, 0, 0, 0
     SEPlay SEQ_SE_MESSAGE
     ActorSetEyeToEye
     // "Welcome to the Pokémon Musical![f000]븁\u0000\nHere you can participate in\na musical alone.[f000]븁\u0000\nWould you like to participate?"
@@ -57,14 +57,14 @@ L_00DF:
     // "Great! Please walk this way![f000]븁\u0000"
     ActorMsg MSGFILE_SCRIPT, Global10450_Text_GreatPleaseWalkWay, 0x8011, 2, 0
     ActorMsgClose
-    Cmd_02C5 5
+    JoinAvenueRecordActivity 5
     FunfestBGMReturn
     VMCall L_0B9C
     SEPlay SEQ_SE_KAIDAN
     FadeOutBlackQ
     SEWait
     FadeWait
-    MusicalCmd_0163 0x8021, 0
+    MusicalCall 0x8021, 0
 
 L_0108:
     VMJump L_0114
@@ -80,7 +80,7 @@ L_0114:
 Script_2:
     ActorsPauseAll
     WorkSetConst 0x8022, 0
-    Cmd_0167 0, 0, 0, 0
+    MusicalComm 0, 0, 0, 0
     SEPlay SEQ_SE_MESSAGE
     ActorSetEyeToEye
     VMCall L_0206
@@ -91,7 +91,7 @@ Script_2:
 Script_3:
     ActorsPauseAll
     WorkSetConst 0x8022, 1
-    Cmd_0167 0, 0, 0, 0
+    MusicalComm 0, 0, 0, 0
     SEPlay SEQ_SE_MESSAGE
     ActorSetEyeToEye
     // "Welcome to the Pokémon Musical![f000]븁\u0000\nThis is a changing room for Dress Up only.\nWould you like to Dress Up your Pokémon?"
@@ -117,7 +117,7 @@ Script_3:
     FadeWait
     SEWait
     FieldClose
-    MusicalCmd_0164 0x8021
+    MusicalCallDressUp 0x8021
     FieldOpen
     VMCall L_0BDE
     FadeInWhiteQ
@@ -135,7 +135,7 @@ Script_5:
     FadeInBlackQ
     FadeWait
     MsgSetAutoscrolls 0
-    Cmd_0167 21, 0, 0, 0x8010
+    MusicalComm 21, 0, 0, 0x8010
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt
@@ -328,8 +328,8 @@ L_04A7:
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_0556
     ActorMsgClose
-    Cmd_0167 10, 1, 0, 0
-    Cmd_0167 16, 1, 0, 0
+    MusicalComm 10, 1, 0, 0
+    MusicalComm 16, 1, 0, 0
     VMStackPush 0x8024
     VMStackPushConst 0
     VMStackCmp CMP_EQ
@@ -345,7 +345,7 @@ L_0508:
     VMStackPushConst 0
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_0550
-    Cmd_0167 11, 1, 0, 0
+    MusicalComm 11, 1, 0, 0
     // "Would you like to launch\nInfrared Communication and[f000]븀\u0000\nDS Wireless Communications?"
     ActorMsg MSGFILE_SCRIPT, Global10450_Text_WouldLikeLaunchInfrared, 0x8011, 2, 0
     YesNoWin 0x8010
@@ -365,8 +365,8 @@ L_0556:
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_060F
     ActorMsgClose
-    Cmd_0167 10, 0, 0, 0
-    Cmd_0167 16, 0, 0, 0
+    MusicalComm 10, 0, 0, 0
+    MusicalComm 16, 0, 0, 0
     VMStackPush 0x8024
     VMStackPushConst 0
     VMStackCmp CMP_EQ
@@ -382,7 +382,7 @@ L_05A4:
     VMStackPushConst 0
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_05F2
-    Cmd_0167 11, 0, 0, 0
+    MusicalComm 11, 0, 0, 0
     // "Launch DS Wireless Communications?"
     ActorMsg MSGFILE_SCRIPT, Global10450_Text_LaunchDsWirelessCommunications, 0x8011, 2, 0
     YesNoWin 0x8010
@@ -401,7 +401,7 @@ L_05F2:
     VMStackPushConst 2
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_060F
-    Cmd_0167 11, 0, 0, 0
+    MusicalComm 11, 0, 0, 0
 
 L_060F:
     VMStackPush 0x8010
@@ -411,7 +411,7 @@ L_060F:
     WorkSetConst 0x8026, 0
 
 L_0628:
-    Cmd_0167 22, 0, 0, 0x8010
+    MusicalComm 22, 0, 0, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -425,7 +425,7 @@ L_064D:
 L_0653:
     WorkSetConst 0x8027, 0
     WorkSetConst 0x8026, 0
-    Cmd_0167 21, 0, 0, 0x8010
+    MusicalComm 21, 0, 0, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -436,22 +436,22 @@ L_0682:
     // "Thank you for waiting.\nThis way, please![f000]븂\u0001<"
     ActorMsg MSGFILE_SCRIPT, Global10450_Text_ThankWaitingWayPlease, 0x8011, 2, 0
     ActorMsgClose
-    Cmd_0167 14, 10, 0, 0
-    Cmd_02C5 5
+    MusicalComm 14, 10, 0, 0
+    JoinAvenueRecordActivity 5
     FunfestBGMReturn
     VMCall L_0BB2
     SEPlay SEQ_SE_KAIDAN
     FadeOutBlackQ
     SEWait
     FadeWait
-    MusicalCmd_0163 0x8021, 1
+    MusicalCall 0x8021, 1
     VMCall L_0804
 
 L_06BB:
     VMReturn
 
 L_06BD:
-    Cmd_0167 18, 0, 0, 0x8010
+    MusicalComm 18, 0, 0, 0x8010
     WorkCmpConst 0x8010, 5
     VMJumpIf CMP_EQ, L_06DA
     VMJump L_06E6
@@ -473,7 +473,7 @@ L_0705:
     VMReturn
 
 L_0707:
-    Cmd_0167 18, 1, 0, 0x8010
+    MusicalComm 18, 1, 0, 0x8010
     WorkCmpConst 0x8010, 5
     VMJumpIf CMP_EQ, L_0724
     VMJump L_0730
@@ -495,7 +495,7 @@ L_074F:
     VMReturn
 
 L_0751:
-    Cmd_0167 12, 0, 0, 0x8010
+    MusicalComm 12, 0, 0, 0x8010
     WorkCmpConst 0x8010, 0
     VMJumpIf CMP_EQ, L_076E
     VMJump L_077A
@@ -526,7 +526,7 @@ L_07B8:
     VMReturn
 
 L_07BA:
-    Cmd_0167 13, 0, 0, 0x8010
+    MusicalComm 13, 0, 0, 0x8010
     WorkCmpConst 0x8010, 3
     VMJumpIf CMP_EQ, L_07D7
     VMJump L_07E3
@@ -548,12 +548,12 @@ L_0802:
     VMReturn
 
 L_0804:
-    Cmd_0167 11, 0, 0, 0
+    MusicalComm 11, 0, 0, 0
     VMCall L_0816
     VMReturn
 
 L_0816:
-    Cmd_0167 22, 0, 0, 0x8010
+    MusicalComm 22, 0, 0, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 0
     VMStackCmp CMP_EQ
@@ -564,8 +564,8 @@ L_0816:
     ActorMsgClose
 
 L_0843:
-    Cmd_0167 1, 0, 0, 0
-    Cmd_013C
+    MusicalComm 1, 0, 0, 0
+    GameCommTryBoot
     VMReturn
 
 L_0851:
@@ -701,7 +701,7 @@ L_0A72:
 
 L_0A74:
     WorkSetConst 0x802a, 0
-    MusicalCmd_0165 11, 0, 0x802a
+    MusicalGetInfo 11, 0, 0x802a
     VMStackPush 0x802a
     VMStackPushConst 0
     VMStackCmp CMP_EQ
@@ -717,7 +717,7 @@ L_0AA8:
     // "Please choose the Pokémon that\nwill participate.[f000]븁\u0000"
     ActorMsg MSGFILE_SCRIPT, Global10450_Text_PleaseChoosePokemonWill, 0x8011, 2, 0
     ActorMsgClose
-    Cmd_016A 0x802b, 0x8021
+    MusicalSelectPoke 0x802b, 0x8021
     VMStackPush 0x802b
     VMStackPushConst 0
     VMStackCmp CMP_EQ
@@ -732,7 +732,7 @@ L_0AE3:
 
 L_0AF1:
     WorkSetConst 0x802c, 0
-    MusicalCmd_0165 14, 0, 0x802c
+    MusicalGetInfo 14, 0, 0x802c
     // "Which show would you like\nto participate in?"
     ActorMsg MSGFILE_SCRIPT, Global10450_Text_WhichShowWouldLike, 0x8011, 2, 0
     ListMenu_AnchorTopRight 31, 1, 0, 1, 32784
@@ -762,7 +762,7 @@ L_0B54:
     VMJump L_0B9A
 
 L_0B8D:
-    MusicalCmd_0165 5, 0x8010, 0
+    MusicalGetInfo 5, 0x8010, 0
     WorkSetConst 0x8010, 1
 
 L_0B9A:
@@ -859,7 +859,7 @@ Script_4:
     VMJump L_0CEB
 
 L_0CE4:
-    MusicalCmd_0165 5, 0x8010, 0
+    MusicalGetInfo 5, 0x8010, 0
 
 L_0CEB:
     FinishAllEvents
@@ -873,7 +873,7 @@ L_0CF1:
     WorkSetConst 0x8030, 0
     SEPlay SEQ_SE_MESSAGE
     ActorSetEyeToEye
-    MusicalCmd_0166 0x8020, 0, 0x802d
+    MusicalGetAudienceGift 0x8020, 0, 0x802d
     VMStackPush 0x802d
     VMStackPushConst 0
     VMStackCmp CMP_EQ
@@ -885,14 +885,14 @@ L_0CF1:
     VMJump L_0DE2
 
 L_0D3D:
-    MusicalCmd_0166 0x8020, 3, 0x802f
-    MusicalCmd_0166 0x8020, 4, 0x8030
+    MusicalGetAudienceGift 0x8020, 3, 0x802f
+    MusicalGetAudienceGift 0x8020, 4, 0x8030
     WorkCmpConst 0x802f, 0
     VMJumpIf CMP_EQ, L_0D5E
     VMJump L_0D7C
 
 L_0D5E:
-    MusicalCmd_0166 0x8020, 1, 0x802e
+    MusicalGetAudienceGift 0x8020, 1, 0x802e
     WordSetPlayerName 0
     ParentActorMsg MSGFILE_SCRIPT, 0x802e, 0, 0
     LastKeyWait
@@ -905,7 +905,7 @@ L_0D7C:
     VMJump L_0DC5
 
 L_0D8F:
-    MusicalCmd_0166 0x8020, 2, 0x802e
+    MusicalGetAudienceGift 0x8020, 2, 0x802e
     WordSetPlayerName 0
     WordSetMusicalInfo 1, 1, 0x8030
     ParentActorMsg MSGFILE_SCRIPT, 0x802e, 0, 0
@@ -913,7 +913,7 @@ L_0D8F:
     WorkGet 0x8008, 0x8030
     WorkSetConst 0x8009, 0
     RTCallGlobal 10466
-    MusicalCmd_0169 0x8020
+    MusicalClearAudienceGift 0x8020
     VMJump L_0DE2
 
 L_0DC5:
@@ -922,7 +922,7 @@ L_0DC5:
     VMJump L_0DE2
 
 L_0DD8:
-    MusicalCmd_0169 0x8020
+    MusicalClearAudienceGift 0x8020
     VMJump L_0DE2
 
 L_0DE2:
@@ -1036,7 +1036,7 @@ L_0EFC:
 
 L_0F04:
     InfoMsgClose
-    MusicalCmd_0168 0x8008
+    MusicalAddProp 0x8008
     RTEndGlobal
     FinishAllEvents
     ActorsUnpauseAll

@@ -27,7 +27,7 @@ BOOL s0279_FunfestBGMReturn(VM *vm, FieldScriptEnv *env) {
     if (getStatusOfFesMission(festival) == 0) {
         return TRUE;
     }
-    func_ov036_021b6690(gimmick);
+    FesGimmick_EndMission(gimmick);
     bgm = LinkFestival_GetNormalChangeBGMID(festival);
     if (bgm != 0xffffffff) {
         ScriptWork_CallEvent(scriptWork, EventBGMPlay_Create(gsys, bgm));

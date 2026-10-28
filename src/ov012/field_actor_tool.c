@@ -340,14 +340,14 @@ void ActorTerrainEffect_Footmark(FieldActor *actor, ActorTerrainEffectParam *par
 
 void ActorTerrainEffect_FallenLeaves(FieldActor *actor, ActorTerrainEffectParam *param) {
     if (MapTile_IsFallenLeaves(param->tileClassOrigY) == TRUE) {
-        func_ov036_021c94e0(param->effects, actor);
+        FldeffOchiba_Start(param->effects, actor);
     }
 }
 
 void ActorTerrainEffect_Splash(FieldActor *actor, ActorTerrainEffectParam *param) {
     if (MapTile_IsSplashWater(param->tileClass) == TRUE) {
         if (FldAct_IsSplashed(actor) == FALSE) {
-            func_ov036_021bea3c(param->effects, actor);
+            FldeffSplash_AddModel(param->effects, actor);
             FldAct_SetSplashed(actor, TRUE);
         }
     } else {
@@ -358,11 +358,11 @@ void ActorTerrainEffect_Splash(FieldActor *actor, ActorTerrainEffectParam *param
 void ActorTerrainEffect_SplashOrSwamp(FieldActor *actor, ActorTerrainEffectParam *param) {
     if (MapTile_IsSplashWater(param->tileClass) == TRUE) {
         if (FldAct_IsSplashed(actor) == FALSE) {
-            func_ov036_021bea3c(param->effects, actor);
+            FldeffSplash_AddModel(param->effects, actor);
             FldAct_SetSplashed(actor, TRUE);
         }
     } else if (MapTile_IsSwamp(param->tileClass) == TRUE) {
-        func_ov036_021be828(param->effects, actor, 1, 0);
+        FldeffRipple_Start(param->effects, actor, 1, 0);
     } else {
         FldAct_SetSplashed(actor, FALSE);
     }
@@ -415,13 +415,13 @@ void ActorTerrainEffect_LandingDust(FieldActor *actor, ActorTerrainEffectParam *
 
 void ActorTerrainEffect_RippleOrigY(FieldActor *actor, ActorTerrainEffectParam *param) {
     if (MapTile_IsRippleWater(param->tileClassOrigY) == TRUE) {
-        func_ov036_021be828(param->effects, actor, 0, 1);
+        FldeffRipple_Start(param->effects, actor, 0, 1);
     }
 }
 
 void ActorTerrainEffect_Ripple(FieldActor *actor, ActorTerrainEffectParam *param) {
     if (MapTile_IsRippleWater(param->tileClass) == TRUE) {
-        func_ov036_021be828(param->effects, actor, 0, 0);
+        FldeffRipple_Start(param->effects, actor, 0, 0);
     }
 }
 
@@ -470,7 +470,7 @@ void ActorTerrainEffect_UpdateReflection(FieldActor *actor, ActorTerrainEffectPa
 
 void ActorTerrainEffect_ElectricField(FieldActor *actor, ActorTerrainEffectParam *param) {
     if (MapTile_IsElectricField(param->tileClass) == TRUE) {
-        func_ov036_021c289c(actor, param->effects);
+        D06Denki_StartSpark(actor, param->effects);
     }
 }
 

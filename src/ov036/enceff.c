@@ -139,12 +139,12 @@ static void EncEff_LoadSubOvl(EncEff *encEff, u32 overlayId) {
     encEff->overlays[encEff->overlayCount++] = overlayId;
 }
 
-void func_ov036_021c5ea0(EncEff *encEff) {
+void EncEff_LoadCaptureGridSubOvls(EncEff *encEff) {
     EncEff_LoadSubOvl(encEff, OVERLAY_ID(148));
     EncEff_LoadSubOvl(encEff, OVERLAY_ID(150));
 }
 
-void func_ov036_021c5ebc(EncEff *encEff) {
+void EncEff_LoadCaptureSubOvl(EncEff *encEff) {
     EncEff_LoadSubOvl(encEff, OVERLAY_ID(148));
 }
 

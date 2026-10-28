@@ -66,7 +66,7 @@ L_00E5:
     EvCameraMoveTo 9688, 0, 0xed000, 0x108000, 0, 0xa8000, 30
     EvCameraWait
     VMSleep 8
-    Plugin14_Cmd1012
+    Plugin14Cmd_CallDT9ReleaseEvent
     BGMPlayEx 1002, 6
     FlagReset EVENT_FLAG_0x029b
     WorkSetConst EVENT_WORK_0x411b, 2
@@ -118,7 +118,7 @@ L_01B2:
     EvCameraMoveTo 9688, 0, 0xed000, 0x108000, 0, 0xa8000, 30
     EvCameraWait
     VMSleep 8
-    Plugin14_Cmd1012
+    Plugin14Cmd_CallDT9ReleaseEvent
     BGMPlayEx 1002, 6
     FlagReset EVENT_FLAG_0x029b
     WorkSetConst EVENT_WORK_0x411b, 2

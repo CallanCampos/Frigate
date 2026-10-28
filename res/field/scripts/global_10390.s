@@ -6,7 +6,7 @@
     ScriptEntriesEnd
 
 Script_1:
-    DreamWorldCmd_01DC 0, 0x8010
+    DreamWorldItems 0, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -31,7 +31,7 @@ Script_2:
     WorkSetConst 0x8020, 0
 
 L_004D:
-    DreamWorldCmd_01DC 0, 0x8010
+    DreamWorldItems 0, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 0
     VMStackCmp CMP_EQ
@@ -48,7 +48,7 @@ L_007C:
     // "This is a remnant of your\nPokémon's dream.[f000]븀\u0000\nHere, take it.[f000]븁\u0000"
     ActorMsg MSGFILE_SCRIPT, Global10390_Text_RemnantPokemonsDreamHere, 0x8011, 2, 0
     ActorMsgClose
-    DreamWorldCmd_01DC 1, 0x8010
+    DreamWorldItems 1, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -59,11 +59,11 @@ L_007C:
     MEWait
     MsgWaitAdvance
     InfoMsgClose
-    DreamWorldCmd_01DC 2, 0x8010
-    DreamWorldCmd_01DC 3, 0x8010
+    DreamWorldItems 2, 0x8010
+    DreamWorldItems 3, 0x8010
 
 L_00C2:
-    DreamWorldCmd_01DC 4, 0x8020
+    DreamWorldItems 4, 0x8020
     VMStackPush 0x8020
     VMStackPushConst 0
     VMStackCmp CMP_GT
@@ -75,7 +75,7 @@ L_00E1:
     VMStackPush 0x8020
     VMStackCmp CMP_LT
     VMJumpIf CMP_STACK, L_0112
-    DreamWorldCmd_01DC 5, 0x8010
+    DreamWorldItems 5, 0x8010
     // "You have no more room in your Bag\nfor [f000]ĉ\u0001\u0000. If you remove some,[f000]븀\u0000\nI'll give you the rest.[f000]븁\u0000"
     ActorMsg MSGFILE_SCRIPT, Global10390_Text_HaveNoMoreRoom, 0x8011, 2, 0
     WorkAdd 0x8010, 1

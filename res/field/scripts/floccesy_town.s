@@ -337,7 +337,7 @@ L_04EE:
     ActorCmdWait
     ActorDelete 251
     WorkSetConst EVENT_WORK_0x4153, 2
-    HollowRivalCmd_0262 3, 0
+    HollowRivalSetValue 3, 0
     FlagSet EVENT_FLAG_0x02e6
     FlagSet EVENT_FLAG_0x02e5
     WorkSetConst EVENT_WORK_0x40a8, 4

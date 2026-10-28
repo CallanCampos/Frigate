@@ -45,7 +45,7 @@ L_0083:
     VMStackCmp CMP_EQ
     VMStackCmp CMP_AND
     VMJumpIf CMP_STACK, L_00B2
-    HollowRivalCmd_0262 2, 14
+    HollowRivalSetValue 2, 14
     VMJump L_00DB
 
 L_00B2:
@@ -57,7 +57,7 @@ L_00B2:
     VMStackCmp CMP_EQ
     VMStackCmp CMP_AND
     VMJumpIf CMP_STACK, L_00DB
-    HollowRivalCmd_0262 2, 0
+    HollowRivalSetValue 2, 0
 
 L_00DB:
     VMHalt

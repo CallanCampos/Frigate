@@ -10,7 +10,7 @@
 
 Script_5:
     WorkSetConst 0x8020, 0
-    Cmd_02B3 2, 0x8020
+    MemoryLinkGetVar 2, 0x8020
     VMStackPush 0x8020
     VMStackPushConst 1
     VMStackCmp CMP_EQ

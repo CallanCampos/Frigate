@@ -44,9 +44,9 @@ typedef struct {
 
 extern const HabitatListHeader HABITAT_LIST_HEADERS[57];
 
-void func_ov036_021c97b8(OchibaEffectArgs *args);
-void func_ov036_021c9870(TCB *tcb, void *data);
-u8 func_ov036_021c98f4(const WbtSystem *wbt);
+void OchibaEffect_Start(OchibaEffectArgs *args);
+void OchibaEffect_UpdateTCB(TCB *tcb, void *data);
+u8 GetPWTSeason(const WbtSystem *wbt);
 BOOL CheckHabitatList(const HabitatList *list, PokeDexSave *pokedex, u8 time, u32 caught);
 
 #endif // POKEBW2_FIELD_SCRCMD_OCHIBA_H

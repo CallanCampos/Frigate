@@ -228,7 +228,7 @@ L_0339:
     VMStackCmp CMP_AND
     VMJumpIf CMP_STACK, L_0366
     FlagReset EVENT_FLAG_0x03b0
-    HollowRivalCmd_0262 1, 41
+    HollowRivalSetValue 1, 41
 
 L_0366:
     WorkSetConst 0x8026, 0
@@ -321,7 +321,7 @@ L_04A9:
     SEWait
     BGMChangeMap
     WorkSetConst EVENT_WORK_0x40cd, 1
-    HollowRivalCmd_0262 1, 21
+    HollowRivalSetValue 1, 21
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt
@@ -371,7 +371,7 @@ Script_5:
 
 Script_6:
     ActorsPauseAll
-    Cmd_02D5 18, EVENT_WORK_0x400f
+    WbtIsTrainerBeaten 18, EVENT_WORK_0x400f
     VMStackPush EVENT_WORK_0x400f
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -582,7 +582,7 @@ L_07B0:
     FlagSet EVENT_FLAG_0x01a1
     FlagSet EVENT_FLAG_0x03b0
     FlagReset EVENT_FLAG_0x03ce
-    HollowRivalCmd_0262 1, 42
+    HollowRivalSetValue 1, 42
     VMCall L_093B
     VMJump L_07FA
 
@@ -667,7 +667,7 @@ L_08EB:
     FlagSet EVENT_FLAG_0x01a1
     FlagSet EVENT_FLAG_0x03b0
     FlagReset EVENT_FLAG_0x03ce
-    HollowRivalCmd_0262 1, 42
+    HollowRivalSetValue 1, 42
     VMCall L_093B
     VMJump L_0935
 

@@ -113,27 +113,27 @@ L_0199:
     VMReturn
 
 L_01A1:
-    Cmd_020E 0, 15, 3, 15, 3, 8
-    Cmd_020F 0, 15, 3, 15
-    Cmd_0211 0
+    SpPokeJump 0, 15, 3, 15, 3, 8
+    SpPokeAppear 0, 15, 3, 15
+    SpPokeWaitFrame 0
     FadeEx 12, 0, 16, 2
     FadeExWait
     ActorNew 15, 15, 1, 251, 122, 0
     FadeEx 12, 16, 0, 2
     FadeExWait
-    Cmd_0210 0
+    SpPokeWaitAnimEnd 0
     VMReturn
 
 L_01E9:
-    Cmd_020F 1, 15, 4, 13
-    Cmd_0211 1
+    SpPokeAppear 1, 15, 4, 13
+    SpPokeWaitFrame 1
     FadeEx 12, 0, 16, 2
     FadeExWait
     ActorDelete 251
     FadeEx 12, 16, 0, 2
     FadeExWait
-    Cmd_0210 1
-    Cmd_020E 1, 15, 0, 15, 3, 8
+    SpPokeWaitAnimEnd 1
+    SpPokeJump 1, 15, 0, 15, 3, 8
     VMReturn
 
 L_0227:
@@ -144,10 +144,10 @@ L_0227:
     // "What?\n[f000]Ă\u0001\u0000 is...[f000]븁\u0000"
     InfoMsg PledgeGrove_Text_What, 2
     InfoMsgClose_0039
-    Plugin16_Cmd1003
+    Plugin16Cmd_CallFormEvent
     FadeEx 12, 0, 16, 4
     FadeExWait
-    Plugin16_Cmd1004
+    Plugin16Cmd_HideActor2
     ActorDelete 251
     ActorNew 15, 13, 1, 251, 373, 0
     PlayFieldEffect 115

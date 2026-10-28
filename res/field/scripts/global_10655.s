@@ -25,7 +25,7 @@ L_003D:
     VMHalt
 
 L_0045:
-    Plugin6_Cmd1016 0x8010
+    WbtCmd_GetCategory 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -59,7 +59,7 @@ L_00A9:
     VMReturn
 
 L_00BE:
-    Plugin6_Cmd1023 EVENT_WORK_0x4020, EVENT_WORK_0x4021, EVENT_WORK_0x4022
+    WbtCmd_GetSlotTrainerObjCodes_1023 EVENT_WORK_0x4020, EVENT_WORK_0x4021, EVENT_WORK_0x4022
     VMStackPush EVENT_WORK_0x4020
     VMStackPushConst 0
     VMStackCmp CMP_NE
@@ -128,7 +128,7 @@ Script_1:
 
 L_0197:
     WbtCmd_Create
-    Plugin6_Cmd1015 1
+    WbtCmd_SetCategory 1
     VMCall L_01EC
 
 L_01A3:
@@ -145,7 +145,7 @@ Script_3:
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_01D6
     WbtCmd_Create
-    Plugin6_Cmd1015 2
+    WbtCmd_SetCategory 2
     VMCall L_01EC
     VMJump L_01E6
 
@@ -295,7 +295,7 @@ L_03CF:
 L_03E2:
     WorkSetConst 0x8022, 0
     VMCall L_0EAF
-    Plugin6_Cmd1026 0x8022
+    WbtCmd_SetDownloadSlot 0x8022
     VMStackPush 0x8028
     VMStackPushConst 0
     VMStackCmp CMP_EQ
@@ -371,7 +371,7 @@ L_04F1:
     VMStackPushConst 1
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_0528
-    Plugin6_Cmd1005
+    WbtCmd_MakeMatch
     WbtCmd_SetRound 1
     VMCall L_0A17
     WorkSetConst 0x8020, 8
@@ -450,7 +450,7 @@ L_0614:
     VMReturn
 
 L_0616:
-    Plugin6_Cmd1006 11, 0x8010
+    WbtCmd_IsTournamentAvailable 11, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -458,7 +458,7 @@ L_0616:
     ListMenuAdd 26, 65535, 11
 
 L_0637:
-    Plugin6_Cmd1006 4, 0x8010
+    WbtCmd_IsTournamentAvailable 4, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -466,7 +466,7 @@ L_0637:
     ListMenuAdd 26, 65535, 4
 
 L_0658:
-    Plugin6_Cmd1006 5, 0x8010
+    WbtCmd_IsTournamentAvailable 5, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -474,7 +474,7 @@ L_0658:
     ListMenuAdd 27, 65535, 5
 
 L_0679:
-    Plugin6_Cmd1006 6, 0x8010
+    WbtCmd_IsTournamentAvailable 6, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -482,7 +482,7 @@ L_0679:
     ListMenuAdd 28, 65535, 6
 
 L_069A:
-    Plugin6_Cmd1006 7, 0x8010
+    WbtCmd_IsTournamentAvailable 7, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -490,7 +490,7 @@ L_069A:
     ListMenuAdd 29, 65535, 7
 
 L_06BB:
-    Plugin6_Cmd1006 8, 0x8010
+    WbtCmd_IsTournamentAvailable 8, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -498,7 +498,7 @@ L_06BB:
     ListMenuAdd 30, 65535, 8
 
 L_06DC:
-    Plugin6_Cmd1006 9, 0x8010
+    WbtCmd_IsTournamentAvailable 9, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -506,7 +506,7 @@ L_06DC:
     ListMenuAdd 31, 65535, 9
 
 L_06FD:
-    Plugin6_Cmd1006 10, 0x8010
+    WbtCmd_IsTournamentAvailable 10, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -514,7 +514,7 @@ L_06FD:
     ListMenuAdd 32, 65535, 10
 
 L_071E:
-    Plugin6_Cmd1006 1, 0x8010
+    WbtCmd_IsTournamentAvailable 1, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -522,7 +522,7 @@ L_071E:
     ListMenuAdd 23, 65535, 1
 
 L_073F:
-    Plugin6_Cmd1006 13, 0x8010
+    WbtCmd_IsTournamentAvailable 13, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -530,7 +530,7 @@ L_073F:
     ListMenuAdd 35, 65535, 13
 
 L_0760:
-    Plugin6_Cmd1006 15, 0x8010
+    WbtCmd_IsTournamentAvailable 15, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -538,7 +538,7 @@ L_0760:
     ListMenuAdd 36, 65535, 15
 
 L_0781:
-    Plugin6_Cmd1006 2, 0x8010
+    WbtCmd_IsTournamentAvailable 2, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -546,7 +546,7 @@ L_0781:
     ListMenuAdd 24, 65535, 2
 
 L_07A2:
-    Plugin6_Cmd1006 12, 0x8010
+    WbtCmd_IsTournamentAvailable 12, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -554,7 +554,7 @@ L_07A2:
     ListMenuAdd 33, 65535, 12
 
 L_07C3:
-    Plugin6_Cmd1006 14, 0x8010
+    WbtCmd_IsTournamentAvailable 14, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -562,7 +562,7 @@ L_07C3:
     ListMenuAdd 34, 65535, 14
 
 L_07E4:
-    Plugin6_Cmd1006 3, 0x8010
+    WbtCmd_IsTournamentAvailable 3, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -612,8 +612,8 @@ L_0890:
     MsgWinCloseAll
 
 L_08A5:
-    Plugin6_Cmd1046 0x8010
-    Plugin6_Cmd1028 0x8010
+    WbtCmd_CallEntryPartySelect 0x8010
+    WbtCmd_SetUseBattleBox 0x8010
     DebugPrint 0x8010
     VMStackPush 0x8010
     VMStackPushConst 2
@@ -658,7 +658,7 @@ L_093E:
 
 L_0952:
     SystemMsg 0x8010, 2
-    Plugin6_Cmd1057 0x8026
+    WbtCmd_GetRegulationId 0x8026
     VMStackPush 0x8000
     WorkSet 0x8000, 0x8026
     RTCallGlobal 10261
@@ -701,7 +701,7 @@ L_09E6:
 
 L_09F4:
     PokePartyRecoverAll
-    Plugin6_Cmd1048 0x8010
+    WbtCmd_CallPokeSelect 0x8010
     VMStackPush 0x8010
     VMStackPushConst 0
     VMStackCmp CMP_EQ
@@ -714,7 +714,7 @@ L_0A0F:
 
 L_0A17:
     FunfestBGMReturn
-    Plugin6_Cmd1007 6, 0x8010
+    WbtCmd_WouldOpenTournament 6, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -723,7 +723,7 @@ L_0A17:
     ActorMsg MSGFILE_SCRIPT, Global10655_Text_VictoryUnovaLeadersTournament, 0x8011, 4, 0
 
 L_0A3E:
-    Plugin6_Cmd1007 10, 0x8010
+    WbtCmd_WouldOpenTournament 10, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -732,7 +732,7 @@ L_0A3E:
     ActorMsg MSGFILE_SCRIPT, Global10655_Text_HaveAnnouncementMakeWin, 0x8011, 4, 0
 
 L_0A63:
-    Plugin6_Cmd1007 1, 0x8010
+    WbtCmd_WouldOpenTournament 1, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -741,7 +741,7 @@ L_0A63:
     ActorMsg MSGFILE_SCRIPT, Global10655_Text_OneMoreWinWorld, 0x8011, 4, 0
 
 L_0A88:
-    Plugin6_Cmd1007 13, 0x8010
+    WbtCmd_WouldOpenTournament 13, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -750,7 +750,7 @@ L_0A88:
     ActorMsg MSGFILE_SCRIPT, Global10655_Text_WhenWinAllRegional, 0x8011, 4, 0
 
 L_0AAD:
-    Plugin6_Cmd1007 15, 0x8010
+    WbtCmd_WouldOpenTournament 15, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -762,7 +762,7 @@ L_0AD2:
     // "Done!\nYour registration is complete.[f000]븀\u0000\nRight this way, please.[f000]븁\u0000"
     ActorMsg MSGFILE_SCRIPT, Global10655_Text_DoneRegistrationCompleteRight, 0x8011, 4, 0
     MsgWinCloseAll
-    Plugin6_Cmd1016 0x8010
+    WbtCmd_GetCategory 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -782,8 +782,8 @@ L_0B11:
     FadeWait
     MapChangeCore ZONE_PWT_3, 31, 0, 15, 2
     RTReserveScript 10665
-    Cmd_02C5 23
-    Cmd_01DD 9, 0x8021, 0
+    JoinAvenueRecordActivity 23
+    BroadcastGameBeacon 9, 0x8021, 0
     VMReturn
     .balign 4, 0
 
@@ -1009,7 +1009,7 @@ L_0EAD:
     VMReturn
 
 L_0EAF:
-    Plugin6_Cmd1025 0x8028
+    WbtCmd_CountDownloads 0x8028
     VMStackPush 0x8028
     VMStackPushConst 0
     VMStackCmp CMP_EQ
@@ -1020,14 +1020,14 @@ L_0EAF:
 
 L_0ED8:
     MsgWinCloseAll
-    Plugin6_Cmd1049 0x8010, 0x8022
+    WbtCmd_ShowDownloads 0x8010, 0x8022
 
 L_0EE0:
     VMReturn
 
 Script_4:
     ActorsPauseAll
-    Plugin6_Cmd1016 0x8010
+    WbtCmd_GetCategory 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -1091,7 +1091,7 @@ L_0FCD:
 
 L_0FE0:
     WbtCmd_GetTournament 0x8021
-    Plugin6_Cmd1044 0, 0x8021
+    WbtCmd_SetTournamentNameWord 0, 0x8021
     // "Congratulations on winning the\n[f000]Ļ\u0001\u0000![f000]븁\u0000"
     ActorMsg MSGFILE_SCRIPT, Global10655_Text_CongratulationsWinning, 0x8011, 4, 0
     VMCall L_1068
@@ -1391,7 +1391,7 @@ L_13D5:
     VMJump L_13DF
 
 L_13DF:
-    Plugin6_Cmd1007 6, 0x8010
+    WbtCmd_WouldOpenTournament 6, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -1404,51 +1404,51 @@ L_13DF:
     ActorMsg MSGFILE_SCRIPT, Global10655_Text_WowCanNowParticipate, 0x8011, 4, 0
 
 L_1414:
-    Plugin6_Cmd1007 10, 0x8010
+    WbtCmd_WouldOpenTournament 10, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_1442
     MedalDiscover 141
-    Plugin6_Cmd1044 0, 10
+    WbtCmd_SetTournamentNameWord 0, 10
     // "You can now participate in the\n[f000]Ļ\u0001\u0000![f000]븁\u0000"
     ActorMsg MSGFILE_SCRIPT, Global10655_Text_CanNowParticipate, 0x8011, 4, 0
 
 L_1442:
-    Plugin6_Cmd1007 13, 0x8010
+    WbtCmd_WouldOpenTournament 13, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_1470
     MedalDiscover 143
-    Plugin6_Cmd1044 0, 13
+    WbtCmd_SetTournamentNameWord 0, 13
     // "You can now participate in the\n[f000]Ļ\u0001\u0000![f000]븁\u0000"
     ActorMsg MSGFILE_SCRIPT, Global10655_Text_CanNowParticipate, 0x8011, 4, 0
 
 L_1470:
-    Plugin6_Cmd1007 15, 0x8010
+    WbtCmd_WouldOpenTournament 15, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_149E
     MedalDiscover 144
-    Plugin6_Cmd1044 0, 15
+    WbtCmd_SetTournamentNameWord 0, 15
     // "You can now participate in the\n[f000]Ļ\u0001\u0000![f000]븁\u0000"
     ActorMsg MSGFILE_SCRIPT, Global10655_Text_CanNowParticipate, 0x8011, 4, 0
 
 L_149E:
-    Plugin6_Cmd1007 2, 0x8010
+    WbtCmd_WouldOpenTournament 2, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_14CC
     MedalDiscover 145
-    Plugin6_Cmd1044 0, 2
+    WbtCmd_SetTournamentNameWord 0, 2
     // "You can now participate in the\n[f000]Ļ\u0001\u0000![f000]븁\u0000"
     ActorMsg MSGFILE_SCRIPT, Global10655_Text_CanNowParticipate, 0x8011, 4, 0
 
 L_14CC:
-    Plugin6_Cmd1006 1, 0x8010
+    WbtCmd_IsTournamentAvailable 1, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 0
     VMStackCmp CMP_EQ
@@ -1457,13 +1457,13 @@ L_14CC:
     VMStackCmp CMP_EQ
     VMStackCmp CMP_AND
     VMJumpIf CMP_STACK, L_1550
-    Plugin6_Cmd1007 1, 0x8010
+    WbtCmd_WouldOpenTournament 1, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_1529
     MedalDiscover 142
-    Plugin6_Cmd1044 0, 1
+    WbtCmd_SetTournamentNameWord 0, 1
     // "You can now participate in the\n[f000]Ļ\u0001\u0000![f000]븁\u0000"
     ActorMsg MSGFILE_SCRIPT, Global10655_Text_CanNowParticipate, 0x8011, 4, 0
     VMJump L_1550
@@ -1553,7 +1553,7 @@ L_164B:
     // "Tournament Records\nwere accessed.[f000]븁\u0000"
     SystemMsg Global10655_Text_TournamentRecordsWereAccessed, 2
     InfoMsgClose
-    Plugin6_Cmd1050 0x8010
+    WbtCmd_ShowWinRecord 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ

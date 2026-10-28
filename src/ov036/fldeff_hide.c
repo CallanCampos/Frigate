@@ -58,7 +58,7 @@ static const FieldEffectTaskVTable HIDE_TASK_VTABLE = {
     sizeof(HideTask), HideTask_Init, HideTask_Exit, HideTask_UpdatePosition, HideTask_Draw,
 };
 
-void *func_ov036_021c66e8(FieldEffects *effects, HeapID heapId) {
+void *Hide_CreateResources(FieldEffects *effects, HeapID heapId) {
     FieldEffectHide *effect = GFL_HeapAllocate(heapId, sizeof(FieldEffectHide), TRUE, "fldeff_hide.c", 107);
 
     effect->effects = effects;
@@ -66,7 +66,7 @@ void *func_ov036_021c66e8(FieldEffects *effects, HeapID heapId) {
     return effect;
 }
 
-void func_ov036_021c670c(FieldEffects *effects, void *data) {
+void Hide_DeleteResources(FieldEffects *effects, void *data) {
     Hide_FreeObjects(data);
     GFL_HeapFree(data);
 }

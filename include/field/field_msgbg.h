@@ -212,8 +212,9 @@ void CalcMsgWindowDimensions(FieldMsgBG *sys, StrBuf *str, u8 *width, u8 *height
 // a frame style (TALKMSG_WIN_FRAME_), close the user's, close all, and whether any is open
 void MsgBGPrinter_AddSubMsgWinMsg(FieldMsgBG *sys, MsgData *msgData, u32 msgId, u16 userId, u8 x, u8 y, u8 width,
                                   u8 height);
-void func_ov036_02188ddc(FieldMsgBG *sys, StrBuf *strbuf, u16 userId, u8 x, u8 y, u8 width, u8 height);
-void func_ov036_02188dfc(FieldMsgBG *sys, StrBuf *strbuf, u16 userId, u8 x, u8 y, u8 width, u8 height, u32 frameType);
+void MsgBGPrinter_AddSubMsgWinStr(FieldMsgBG *sys, StrBuf *strbuf, u16 userId, u8 x, u8 y, u8 width, u8 height);
+void MsgBGPrinter_AddSubMsgWinStrFrame(FieldMsgBG *sys, StrBuf *strbuf, u16 userId, u8 x, u8 y, u8 width, u8 height,
+                                       u32 frameType);
 void MsgBGPrinter_DeleteSubMsgWin(FieldMsgBG *sys, u16 userId);
 void MsgBGPrinter_DeleteAllSubMsgWin(FieldMsgBG *sys);
 BOOL MsgBGPrinter_ExistsSubMsgWin(FieldMsgBG *sys);

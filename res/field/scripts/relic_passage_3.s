@@ -16,7 +16,7 @@ Script_1:
     ParentActorMsg MSGFILE_SCRIPT, RelicPassage3_Text_ImHereCollectingShards, 0, 0
     MsgWaitAdvance
     MsgWinCloseAll
-    Cmd_0275 0, 15, 0
+    WordSetFunfestMission 0, 15, 0
     SEPlay SEQ_SE_FLD_133
     // "The Funfest Mission\n“[f000]ŀ\u0001\u0000\"[f000]븀\u0000\nhas been added to the Entralink."
     SystemMsg RelicPassage3_Text_FunfestMissionHasBeen, 0

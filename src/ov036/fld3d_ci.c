@@ -298,8 +298,8 @@ static BOOL EventFieldEffectPokeSpriteSub_ControlEffect(GameEvent *event, Fld3DC
 static GameEventReturnCode EventFieldEffectFadeOutWhite_Callback(GameEvent *event, u32 *state, void *work);
 static GameEventReturnCode EventFieldEffectFadeInWhiteTop_Callback(GameEvent *event, u32 *state, void *work);
 static GameEventReturnCode EventFieldEffectFadeInAllBlack_Callback(GameEvent *event, u32 *state, void *work);
-static BOOL func_ov036_021bc828(u16 effectId);
-static BOOL func_ov036_021bc838(u16 effectId);
+static BOOL Fld3DCi_IsFlyArrivalEffect(u16 effectId);
+static BOOL Fld3DCi_IsNoFadeOutEffect(u16 effectId);
 static u32 Fld3DCi_GetTexDataOffset(const NNSG3dResTex *tex, const NNSG3dResDictTexData *data);
 static u32 Fld3DCi_GetPlttDataOffset(const NNSG3dResTex *tex, const NNSG3dResDictPlttData *data);
 static u32 NNS_G3DResTexGetTexRAMAddress(const NNSG3dResTex *tex, const char *name);
@@ -484,7 +484,7 @@ static GameEventReturnCode EventFieldEffect_Callback(GameEvent *event, u32 *stat
         }
         Fld3DCi_BackupBGPriorities(ci);
         Fld3DCi_BackupScreenDispA(ci);
-        if (!func_ov036_021bc828(ci->effectId) && !func_ov036_021bc838(ci->effectId)) {
+        if (!Fld3DCi_IsFlyArrivalEffect(ci->effectId) && !Fld3DCi_IsNoFadeOutEffect(ci->effectId)) {
             GameEvent_ChainNext(event, GameEvent_Create(gsys, event, EventFieldEffectFadeOutWhite_Callback, 0));
         }
         (*state)++;
@@ -555,7 +555,7 @@ static GameEventReturnCode EventFieldEffect_Callback(GameEvent *event, u32 *stat
         (*state)++;
         break;
     case 7:
-        if (func_ov036_021bc828(ci->effectId)) {
+        if (Fld3DCi_IsFlyArrivalEffect(ci->effectId)) {
             GameEvent_ChainNext(event, GameEvent_Create(gsys, event, EventFieldEffectFadeInAllBlack_Callback, 0));
         } else {
             GameEvent_ChainNext(event, GameEvent_Create(gsys, event, EventFieldEffectFadeInWhiteTop_Callback, 0));
@@ -606,7 +606,7 @@ static GameEventReturnCode EventFieldEffect_Callback(GameEvent *event, u32 *stat
         Field_SetRenderMode(field, 0);
         Fld3DCi_FreeG3D(ci, &data->scene);
         Fld3DCiFade_Free(ci->fade);
-        if (func_ov036_021bc828(ci->effectId)) {
+        if (Fld3DCi_IsFlyArrivalEffect(ci->effectId)) {
             FieldActor *player = FieldPlayer_GetActor(Field_GetPlayer(field));
 
             SetActorHidden(player, FALSE);
@@ -1146,14 +1146,14 @@ static GameEventReturnCode EventFieldEffectFadeInAllBlack_Callback(GameEvent *ev
     return FALSE;
 }
 
-static BOOL func_ov036_021bc828(u16 effectId) {
+static BOOL Fld3DCi_IsFlyArrivalEffect(u16 effectId) {
     if (effectId == 12 || effectId == 32) {
         return TRUE;
     }
     return FALSE;
 }
 
-static BOOL func_ov036_021bc838(u16 effectId) {
+static BOOL Fld3DCi_IsNoFadeOutEffect(u16 effectId) {
     if (effectId == 115) {
         return TRUE;
     }

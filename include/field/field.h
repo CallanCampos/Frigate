@@ -92,19 +92,19 @@ void Field_DeleteGimmickWorkBlock(Field *field, u32 id);
 // A list of areas of the map, which the list's entry index sets: a grid rectangle, a value and flags
 HeightExList *HeightEx_CreateTable(u32 count, u8 heapId);
 void HeightEx_SetArea(u8 index, u32 x, u32 z, u32 width, u32 depth, u32 value, u32 flags, HeightExList *list);
-void func_ov036_021ba670(HeightExList *list);
+void HeightEx_FreeTable(HeightExList *list);
 u32 HeightEx_GetAreaCount(HeightExList *list);
 BOOL HeightEx_IsPointInAreaAt(s32 x, s32 z, HeightExList *list, u8 index);
 u32 HeightEx_GetAreaHeight(u8 index, HeightExList *list);
 u32 HeightEx_GetAreaAttr(u8 index, HeightExList *list);
 // Sets whether the entry at index is in use, which HeightEx_SetArea checks before it fills one in
-void func_ov036_021ba6bc(u8 index, BOOL inUse, HeightExList *list);
+void HeightEx_SetAreaInUse(u8 index, BOOL inUse, HeightExList *list);
 // Overlay 36's field_fade.c: whether a grid position is in the rectangle of an entry of the list
 BOOL HeightEx_IsPointInArea(s32 x, s32 z, const HeightExEntry *entry);
 // The mapper's WFBC work
-FieldWFBC *func_ov036_0218adac(HeapID heapId);
-void func_ov036_0218add0(FieldWFBC *wfbc);
-void func_ov036_0218ade0(FieldWFBC *wfbc, CityState *city, BOOL isOther, HeapID heapId);
+FieldWFBC *FieldWFBC_Create(HeapID heapId);
+void FieldWFBC_Free(FieldWFBC *wfbc);
+void FieldWFBC_Setup(FieldWFBC *wfbc, CityState *city, BOOL isOther, HeapID heapId);
 void FieldSubscreen_ChangeImm(FieldSubscreen *subscreen, u32 mode);
 BOOL FieldTaskManager_IsIdle(FieldTaskManager *taskManager);
 u32 FieldTaskManager_GetActiveTaskCount(FieldTaskManager *taskManager);
@@ -162,9 +162,9 @@ FieldG3DObjSystem *Field_GetG3DObjSys(Field *field);
 u32 GetZoneFogIndex(u16 zoneId);
 u32 ZoneData_GetObjectProjectionMatrixType(u16 zoneId);
 u32 GetObjectProjectionMatrixOffset(u16 zoneId);
-BOOL func_ov036_021813b8(u16 zoneId);
+BOOL IsZoneShadowsEnabled(u16 zoneId);
 BOOL IsZoneTwoPassLoad(u16 zoneId);
-BOOL func_ov036_0218141c(u16 zoneId);
+BOOL IsZoneFirstBlackTowerOrWhiteTreehollow(u16 zoneId);
 u32 GetZoneMapType(u16 zoneId);
 u32 GetZoneMapType2(u16 zoneId);
 void SetupLoadZoneMapTypeData(u16 zoneId, AreaData *area, FieldG3DMapperConfig *config, MapMatrix *matrix);
@@ -187,7 +187,7 @@ void Field_Free(Field *field);
 void Field_RenderStart(Field *field);
 BOOL Field_CallRoutines(GameSystem *gsys, Field *field);
 void FieldG2D_Init(Field *field);
-void func_ov036_02180630(Field *field);
+void FieldG2D_Prepare3DSurfaceDelayed(Field *field);
 void Field_FreeGraphicsSystems(Field *field);
 void FieldG3D_InitCallback(void);
 void FieldG3D_Init(Field *field);

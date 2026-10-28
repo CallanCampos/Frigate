@@ -25,7 +25,7 @@ L_004D:
 
 L_005F:
     SystemMsg 0x8024, 2
-    Cmd_01AF 0x8022, 0x8023
+    Regulation_RegisterAllowedSpecies 0x8022, 0x8023
     WorkSetConst 0x8024, 13
     WorkAdd 0x8024, 0x8023
     SystemMsg 0x8024, 2
@@ -42,7 +42,7 @@ Script_2:
     WorkSetConst 0x8026, 0
     WorkSetConst 0x8027, 0
     WorkGet 0x8025, 0x8000
-    Cmd_01AF 0x8025, 0x8026
+    Regulation_RegisterAllowedSpecies 0x8025, 0x8026
     WorkSetConst 0x8027, 13
     WorkAdd 0x8027, 0x8026
     SystemMsg 0x8027, 2

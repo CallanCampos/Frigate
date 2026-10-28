@@ -437,7 +437,7 @@ static void GymOpelucid_ShowState(OpelucidGymWork *work) {
 
 static void GymOpelucid_PlacePlates(Field *field) {
     u32 i;
-    HeightExList *list = func_ov036_02184590(Field_GetG3DMapper(field));
+    HeightExList *list = FieldG3DMapper_GetHeightEx(Field_GetG3DMapper(field));
 
     for (i = 0; i < PLATE_COUNT; i++) {
         HeightEx_SetArea(i, sPlates[i].x, sPlates[i].z, sPlates[i].width, sPlates[i].depth, sPlates[i].value, 0x800000,

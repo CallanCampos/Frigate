@@ -94,7 +94,7 @@ L_00F9:
 L_0105:
     WorkSetConst 0x8021, 0
     FlagSet EVENT_FLAG_0x0964
-    Cmd_01DD 1, 70, 0
+    BroadcastGameBeacon 1, 70, 0
     PokePartyHasMoveAny 0x8021, 70
     WordSetPartyPokeName 0, 0x8021
     // "[f000]Ă\u0001\u0000 used Strength![f000]븁\u0000"
@@ -122,7 +122,7 @@ Script_2:
 
 L_0173:
     FlagSet EVENT_FLAG_0x0964
-    Cmd_01DD 1, 70, 0
+    BroadcastGameBeacon 1, 70, 0
     WordSetPartyPokeName 0, 0x8000
     // "[f000]Ă\u0001\u0000 used Strength![f000]븁\u0000"
     SystemMsg Global10000_Text_UsedStrength, 2
@@ -194,7 +194,7 @@ L_0232:
     PlayHMCutInEffect 0x8008
     PlayerSetSpecialSequence 1
     CallSurf
-    Cmd_01DD 1, 57, 0
+    BroadcastGameBeacon 1, 57, 0
     VMReturn
 
 Script_4:
@@ -207,7 +207,7 @@ Script_4:
     PlayHMCutInEffect 0x8000
     VMCall L_006C
     CallSurf
-    Cmd_01DD 1, 57, 0
+    BroadcastGameBeacon 1, 57, 0
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt
@@ -260,7 +260,7 @@ L_02FC:
     PlayHMCutInEffect 0x8008
     VMCall L_006C
     CallCut
-    Cmd_01DD 1, 15, 0
+    BroadcastGameBeacon 1, 15, 0
     VMSleep 3
     ActorDelete 0x8011
     SEPlay SEQ_SE_FLD_02
@@ -278,7 +278,7 @@ Script_6:
     PlayHMCutInEffect 0x8000
     VMCall L_006C
     CallCut
-    Cmd_01DD 1, 15, 0
+    BroadcastGameBeacon 1, 15, 0
     VMSleep 3
     WorkSetConst 0x8022, 0
     WorkSetConst 0x8023, 0
@@ -351,7 +351,7 @@ L_0437:
     PlayHMCutInEffect 0x8024
     VMCall L_006C
     CallWaterfall 0x8024
-    Cmd_01DD 1, 127, 0
+    BroadcastGameBeacon 1, 127, 0
     WorkSetConst 0x8024, 0
     VMReturn
 
@@ -363,7 +363,7 @@ Script_8:
     InfoMsgClose
     PlayHMCutInEffect 0x8000
     CallWaterfall 0x8000
-    Cmd_01DD 1, 127, 0
+    BroadcastGameBeacon 1, 127, 0
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt
@@ -463,7 +463,7 @@ L_059F:
     PlayHMCutInEffect 0x8008
     VMCall L_006C
     CallDiving 0
-    Cmd_01DD 1, 291, 0
+    BroadcastGameBeacon 1, 291, 0
     VMReturn
 
 Script_13:

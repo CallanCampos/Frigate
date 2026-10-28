@@ -109,11 +109,11 @@ Script_5:
     VMStackPushConst 23
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_016D
-    Cmd_0275 0, 9, 0
+    WordSetFunfestMission 0, 9, 0
     VMJump L_0174
 
 L_016D:
-    Cmd_0275 0, 10, 0
+    WordSetFunfestMission 0, 10, 0
 
 L_0174:
     SEPlay SEQ_SE_FLD_133

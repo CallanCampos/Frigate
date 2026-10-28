@@ -29,26 +29,26 @@ Script_1:
     VMStackCmp CMP_NE
     VMJumpIf CMP_STACK, L_008F
     WbtCmd_GetTournament 0x8010
-    Cmd_01DD 11, 0x8010, 0
+    BroadcastGameBeacon 11, 0x8010, 0
     VMCall L_0139
     VMJump L_0131
 
 L_008F:
     WbtCmd_GetTournament 0x8010
-    Cmd_01DD 10, 0x8010, 1
+    BroadcastGameBeacon 10, 0x8010, 1
     VMCall L_053D
     VMStackPush 0x8027
     VMStackPushConst 1
     VMStackCmp CMP_NE
     VMJumpIf CMP_STACK, L_00CC
     WbtCmd_GetTournament 0x8010
-    Cmd_01DD 11, 0x8010, 1
+    BroadcastGameBeacon 11, 0x8010, 1
     VMCall L_0139
     VMJump L_0131
 
 L_00CC:
     WbtCmd_GetTournament 0x8010
-    Cmd_01DD 10, 0x8010, 2
+    BroadcastGameBeacon 10, 0x8010, 2
     VMCall L_07E0
     VMStackPush 0x8027
     VMStackPushConst 1
@@ -57,7 +57,7 @@ L_00CC:
     WorkSetConst 0x8027, 0
     VMCall L_0B14
     WbtCmd_GetTournament 0x8010
-    Cmd_01DD 11, 0x8010, 2
+    BroadcastGameBeacon 11, 0x8010, 2
     VMJump L_012B
 
 L_010F:
@@ -65,7 +65,7 @@ L_010F:
     VMCall L_0B14
     WbtCmd_SetRound 5
     WbtCmd_GetTournament 0x8010
-    Cmd_01DD 10, 0x8010, 3
+    BroadcastGameBeacon 10, 0x8010, 3
 
 L_012B:
     VMCall L_0139
@@ -80,7 +80,7 @@ L_0139:
     BGMChangeMap
     SEStop
     RTReserveScript 10658
-    Plugin7_Cmd1016 0x8010
+    WbtCmd_GetCategory 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -104,8 +104,8 @@ Script_2:
     WbtCmd_SetTournament 4
     WbtCmd_SetStyle 0
     WbtCmd_SetRound 2
-    Plugin7_Cmd1005
-    Plugin7_Cmd1040 EVENT_WORK_0x4020
+    WbtCmd_MakeMatch
+    WbtCmd_GetOpponentObjCode EVENT_WORK_0x4020
     ActorNew 21, 15, 3, 251, 162, 0
     EvCameraInit
     EvCameraUnbind
@@ -125,8 +125,8 @@ Script_3:
     WbtCmd_SetTournament 4
     WbtCmd_SetStyle 0
     WbtCmd_SetRound 3
-    Plugin7_Cmd1005
-    Plugin7_Cmd1040 EVENT_WORK_0x4020
+    WbtCmd_MakeMatch
+    WbtCmd_GetOpponentObjCode EVENT_WORK_0x4020
     ActorNew 21, 15, 3, 251, 162, 0
     VMCall L_07E0
     VMStackPush 0x8027
@@ -151,20 +151,20 @@ L_0240:
 
 L_0256:
     SEPlay SEQ_SE_SW_WBT_07
-    Plugin7_Cmd1047 0
+    WbtCmd_ShowTrainerList 0
     WbtCmd_SetRound 2
     WbtCmd_GetTournament 0x8029
     VMStackPush 0x8029
     VMStackPushConst 11
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_0315
-    Plugin7_Cmd1040 EVENT_WORK_0x4020
+    WbtCmd_GetOpponentObjCode EVENT_WORK_0x4020
     ActorNew 3, 15, 3, 251, 162, 0
     ActorSetGPos 255, 42, 0, 15, 2
     ActorCmdExec 251, Movement_0AD4
     ActorCmdExec 255, Movement_0AD4
     ActorCmdWait
-    Plugin7_Cmd1052 3
+    WbtCmd_ShowPortraits 3
     EvCameraInit
     EvCameraUnbind
     EvCameraMoveTo 3544, 0, 0xed000, 0x2ac000, 0x2001f, 0x108000, 1
@@ -186,7 +186,7 @@ L_0256:
     VMJump L_037F
 
 L_0315:
-    Plugin7_Cmd1040 EVENT_WORK_0x4020
+    WbtCmd_GetOpponentObjCode EVENT_WORK_0x4020
     ActorNew 3, 15, 3, 251, 162, 0
     ActorCmdExec 251, Movement_0AD4
     ActorCmdWait
@@ -194,7 +194,7 @@ L_0315:
     EvCameraUnbind
     EvCameraMoveTo 2008, 0, 0xfd000, 0x172000, 0x4a5bf, 0xe7000, 1
     EvCameraWait
-    Plugin7_Cmd1052 3
+    WbtCmd_ShowPortraits 3
     FadeInBlack
     EvCameraMoveTo 2008, 0, 0xfd000, 0x172000, 0x2001f, 0xe7000, 48
     ActorCmdExec 255, Movement_0A84
@@ -210,7 +210,7 @@ L_037F:
     VMSleep 60
     FadeEx 3, 16, 0, 2
     FadeExWait
-    Plugin7_Cmd1043 1
+    WbtCmd_ShowOpponentLine7 1
     MsgWinCloseAll
     ActorCmdExec 251, Movement_0ADC
     ActorCmdWait
@@ -219,7 +219,7 @@ L_037F:
     VMSleep 20
     FadeEx 3, 0, 16, 2
     FadeExWait
-    Plugin7_Cmd1060 0
+    WbtCmd_SetNamePlates 0
     VMSleep 50
     FadeEx 3, 16, 0, 2
     FadeExWait
@@ -237,27 +237,27 @@ L_037F:
     VMCall L_0BDD
 
 L_0436:
-    Plugin7_Cmd1045 0
+    WbtCmd_WordSetOpponentName 0
     WordSetPlayerName 1
     // "The first round!\n[f000]Ā\u0001\u0000 vs. [f000]Ā\u0001\u0001.[f000]븁\u0000"
     InfoMsg Global10665_Text_FirstRoundVs, 1
     InfoMsgClose_0039
     SEPlay SEQ_SE_SW_WBT_16
-    Plugin7_Cmd1052 0
+    WbtCmd_ShowPortraits 0
     VMSleep 29
     SEPlay SEQ_SE_SW_WBT_21
     VMSleep 31
     SEPlay SEQ_SE_SW_WBT_22
     VMSleep 30
-    Plugin7_Cmd1041 0, 251
+    WbtCmd_ShowOpponentLine 0, 251
     ActorMsgClose
     SEStop
     ActorCmdExec 255, Movement_0B08
     ActorCmdExec 251, Movement_0AFC
     ActorCmdWait
-    Plugin7_Cmd1042 0x8027
+    WbtCmd_CallBattle 0x8027
     SEPlay SEQ_SE_SW_WBT_07
-    Plugin7_Cmd1052 3
+    WbtCmd_ShowPortraits 3
     EvCameraInit
     EvCameraUnbind
     EvCameraMoveTo 2008, 0, 0xfd000, 0x172000, 0x2001f, 0xe7000, 1
@@ -284,7 +284,7 @@ L_0436:
 
 L_04F1:
     InfoMsgClose_0039
-    Plugin7_Cmd1041 5, 251
+    WbtCmd_ShowOpponentLine 5, 251
     ActorMsgClose
     ActorCmdExec 251, Movement_0A9C
     ActorCmdWait
@@ -294,12 +294,12 @@ L_04F1:
     VMJump L_0539
 
 L_0519:
-    Plugin7_Cmd1045 0
+    WbtCmd_WordSetOpponentName 0
     SEPlay SEQ_SE_SW_WBT_02
     // "The winner of the first round is...\n[f000]Ā\u0001\u0000![f000]븁\u0000"
     ScreamMsg Global10665_Text_WinnerFirstRound, 1
     InfoMsgClose_0039
-    Plugin7_Cmd1041 6, 251
+    WbtCmd_ShowOpponentLine 6, 251
     ActorMsgClose
     ActorCmdExec 255, Movement_0AF4
     ActorCmdWait
@@ -317,9 +317,9 @@ L_053D:
     EvCameraMoveTo 3554, 0, 0xecf4c, 0x170000, 0x2a01f, 0x56000, 18
     FadeWait
     EvCameraWait
-    Plugin7_Cmd1047 1
+    WbtCmd_ShowTrainerList 1
     WbtCmd_SetRound 3
-    Plugin7_Cmd1040 EVENT_WORK_0x4020
+    WbtCmd_GetOpponentObjCode EVENT_WORK_0x4020
     ActorNew 3, 15, 3, 251, 162, 0
     ActorSetGPos 255, 31, 0, 15, 2
     ActorCmdExec 251, Movement_0AD4
@@ -328,7 +328,7 @@ L_053D:
     EvCameraUnbind
     EvCameraMoveTo 2008, 0, 0xfd000, 0x172000, 0x4a5bf, 0xe7000, 1
     EvCameraWait
-    Plugin7_Cmd1052 3
+    WbtCmd_ShowPortraits 3
     FadeInBlack
     SEPlay SEQ_SE_SW_WBT_02
     EvCameraMoveTo 2008, 0, 0xfd000, 0x172000, 0x2001f, 0xe7000, 30
@@ -345,7 +345,7 @@ L_053D:
     VMSleep 60
     FadeEx 3, 16, 0, 2
     FadeExWait
-    Plugin7_Cmd1043 1
+    WbtCmd_ShowOpponentLine7 1
     MsgWinCloseAll
     ActorCmdExec 251, Movement_0ADC
     ActorCmdWait
@@ -355,7 +355,7 @@ L_053D:
     VMSleep 20
     FadeEx 3, 0, 16, 2
     FadeExWait
-    Plugin7_Cmd1060 0
+    WbtCmd_SetNamePlates 0
     VMSleep 50
     FadeEx 3, 16, 0, 2
     FadeExWait
@@ -375,28 +375,28 @@ L_053D:
     VMCall L_0BDD
 
 L_06BB:
-    Plugin7_Cmd1045 0
+    WbtCmd_WordSetOpponentName 0
     WordSetPlayerName 1
     VMSleep 30
     // "The second round!\n[f000]Ā\u0001\u0000 vs. [f000]Ā\u0001\u0001.[f000]븁\u0000"
     InfoMsg Global10665_Text_SecondRoundVs, 1
     InfoMsgClose_0039
     SEPlay SEQ_SE_SW_WBT_16
-    Plugin7_Cmd1052 0
+    WbtCmd_ShowPortraits 0
     VMSleep 29
     SEPlay SEQ_SE_SW_WBT_21
     VMSleep 31
     SEPlay SEQ_SE_SW_WBT_22
     VMSleep 30
-    Plugin7_Cmd1041 1, 251
+    WbtCmd_ShowOpponentLine 1, 251
     ActorMsgClose
     SEStop
     ActorCmdExec 255, Movement_0B08
     ActorCmdExec 251, Movement_0AFC
     ActorCmdWait
-    Plugin7_Cmd1042 0x8027
+    WbtCmd_CallBattle 0x8027
     SEPlay SEQ_SE_SW_WBT_07
-    Plugin7_Cmd1052 3
+    WbtCmd_ShowPortraits 3
     EvCameraInit
     EvCameraUnbind
     EvCameraMoveTo 2008, 0, 0xfd000, 0x172000, 0x2001f, 0xe7000, 1
@@ -425,9 +425,9 @@ L_06BB:
 L_077E:
     InfoMsgClose_0039
     SEPlay SEQ_SE_SW_WBT_17
-    Plugin7_Cmd1056 2
+    WbtCmd_PlayCrowd 2
     VMSleep 60
-    Plugin7_Cmd1041 5, 251
+    WbtCmd_ShowOpponentLine 5, 251
     ActorMsgClose
     ActorCmdExec 251, Movement_0AC4
     ActorCmdWait
@@ -437,15 +437,15 @@ L_077E:
     VMJump L_07DE
 
 L_07B2:
-    Plugin7_Cmd1045 0
+    WbtCmd_WordSetOpponentName 0
     SEPlay SEQ_SE_SW_WBT_02
     // "The winner of the second round is...\n[f000]Ā\u0001\u0000![f000]븁\u0000"
     ScreamMsg Global10665_Text_WinnerSecondRound, 1
     InfoMsgClose_0039
     SEPlay SEQ_SE_SW_WBT_17
-    Plugin7_Cmd1056 2
+    WbtCmd_PlayCrowd 2
     VMSleep 60
-    Plugin7_Cmd1041 6, 251
+    WbtCmd_ShowOpponentLine 6, 251
     ActorMsgClose
     ActorCmdExec 255, Movement_0AF4
     ActorCmdWait
@@ -462,16 +462,16 @@ L_07E0:
     EvCameraMoveTo 3554, 0, 0xecf4c, 0x170000, 0x2a01f, 0x56000, 18
     FadeWait
     EvCameraWait
-    Plugin7_Cmd1047 2
+    WbtCmd_ShowTrainerList 2
     WbtCmd_SetRound 4
-    Plugin7_Cmd1040 EVENT_WORK_0x4020
+    WbtCmd_GetOpponentObjCode EVENT_WORK_0x4020
     ActorNew 3, 15, 3, 251, 162, 0
     ActorSetGPos 255, 42, 0, 15, 2
     ActorCmdExec 251, Movement_0AD4
     ActorCmdExec 255, Movement_0AD4
     ActorCmdWait
-    Plugin7_Cmd1052 3
-    Plugin7_Cmd1055 0, 1
+    WbtCmd_ShowPortraits 3
+    WbtCmd_SwitchLights 0, 1
     EvCameraInit
     EvCameraUnbind
     EvCameraMoveTo 3544, 0, 0xed000, 0x2ac000, 0x2001f, 0x108000, 1
@@ -485,10 +485,10 @@ L_07E0:
     SEPlay SEQ_SE_SW_WBT_07
     ActorCmdExec 255, Movement_0ADC
     ActorCmdWait
-    Plugin7_Cmd1055 1, 1
+    WbtCmd_SwitchLights 1, 1
     BGMChangeMap
     VMCall L_17EE
-    Plugin7_Cmd1053 0x802a, 1
+    WbtCmd_LoadPortraitScene 0x802a, 1
     VMStackPush 0x8029
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -503,29 +503,29 @@ L_08B6:
     ActorCmdWait
     EvCameraWait
     SEPlay SEQ_SE_SW_WBT_18
-    Plugin7_Cmd1056 1
+    WbtCmd_PlayCrowd 1
     VMSleep 60
     WbtCmd_GetTournament 0x8010
-    Plugin7_Cmd1044 0, 0x8010
+    WbtCmd_SetTournamentNameWord 0, 0x8010
     // "[f000]Ļ\u0001\u0000!\nThe final round![f000]븀\u0000\nThe opponent is entering the arena![f000]븁\u0000"
     InfoMsg Global10665_Text_FinalRoundOpponentEntering, 1
     InfoMsgClose_0039
     EvCameraMoveTo 3544, 0, 0xed000, 0x33000, 0x2001f, 0x108000, 60
     FadeEx 3, 0, 16, 2
     FadeExWait
-    Plugin7_Cmd1060 0
+    WbtCmd_SetNamePlates 0
     VMSleep 60
-    Plugin7_Cmd1055 0, 0
+    WbtCmd_SwitchLights 0, 0
     SEStop
     FadeEx 3, 16, 0, 2
     FadeExWait
-    Plugin7_Cmd1043 1
+    WbtCmd_ShowOpponentLine7 1
     MsgWinCloseAll
     ActorCmdExec 251, Movement_0ADC
     ActorCmdWait
-    Plugin7_Cmd1055 1, 0
+    WbtCmd_SwitchLights 1, 0
     VMCall L_17EE
-    Plugin7_Cmd1053 0x802a, 0
+    WbtCmd_LoadPortraitScene 0x802a, 0
     VMStackPush 0x8029
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -540,7 +540,7 @@ L_0979:
     ActorCmdWait
     EvCameraWait
     SEPlay SEQ_SE_SW_WBT_18
-    Plugin7_Cmd1056 0
+    WbtCmd_PlayCrowd 0
     VMSleep 60
     WbtCmd_MakeOpponentParty
     VMStackPush 0x8029
@@ -554,31 +554,31 @@ L_0979:
     VMCall L_0BDD
 
 L_09DE:
-    Plugin7_Cmd1045 0
+    WbtCmd_WordSetOpponentName 0
     WordSetPlayerName 1
     // "The final round!\n[f000]Ā\u0001\u0000 vs. [f000]Ā\u0001\u0001.[f000]븁\u0000"
     InfoMsg Global10665_Text_FinalRoundVs, 1
     InfoMsgClose_0039
     SEPlay SEQ_SE_SW_WBT_16
-    Plugin7_Cmd1052 0
+    WbtCmd_ShowPortraits 0
     VMSleep 29
     SEPlay SEQ_SE_SW_WBT_21
     VMSleep 31
     SEPlay SEQ_SE_SW_WBT_22
     VMSleep 30
-    Plugin7_Cmd1041 2, 251
+    WbtCmd_ShowOpponentLine 2, 251
     ActorMsgClose
     SEStop
     ActorCmdExec 255, Movement_0B08
     ActorCmdExec 251, Movement_0AFC
     ActorCmdWait
     SEPlay SEQ_SE_SW_WBT_19
-    Plugin7_Cmd1056 3
+    WbtCmd_PlayCrowd 3
     VMSleep 30
     SEWait
-    Plugin7_Cmd1042 0x8027
+    WbtCmd_CallBattle 0x8027
     BGMFadeOutAll 1
-    Plugin7_Cmd1052 3
+    WbtCmd_ShowPortraits 3
     EvCameraInit
     EvCameraUnbind
     EvCameraMoveTo 2008, 0, 0xfd000, 0x172000, 0x2001f, 0xe7000, 1
@@ -587,11 +587,11 @@ L_09DE:
     VMStackPushConst 1
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_0A78
-    Plugin7_Cmd1060 1
+    WbtCmd_SetNamePlates 1
     VMJump L_0A7C
 
 L_0A78:
-    Plugin7_Cmd1060 2
+    WbtCmd_SetNamePlates 2
 
 L_0A7C:
     FadeInBlackQ_
@@ -678,7 +678,7 @@ L_0B14:
     VMJump L_0B3E
 
 L_0B3B:
-    Plugin7_Cmd1045 0
+    WbtCmd_WordSetOpponentName 0
 
 L_0B3E:
     SEPlay SEQ_SE_SW_WBT_15
@@ -686,14 +686,14 @@ L_0B3E:
     VMStackPushConst 1
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_0B5F
-    Plugin7_Cmd1052 1
+    WbtCmd_ShowPortraits 1
     VMJump L_0B63
 
 L_0B5F:
-    Plugin7_Cmd1052 2
+    WbtCmd_ShowPortraits 2
 
 L_0B63:
-    Plugin7_Cmd1054
+    WbtCmd_PlayStadiumIntro
     VMSleep 80
     SEPlay SEQ_SE_SW_WBT_07
     SEPlay SEQ_SE_SW_WBT_03
@@ -707,16 +707,16 @@ L_0B63:
     VMStackPushConst 1
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_0BA1
-    Plugin7_Cmd1041 5, 251
+    WbtCmd_ShowOpponentLine 5, 251
     VMJump L_0BA7
 
 L_0BA1:
-    Plugin7_Cmd1041 6, 251
+    WbtCmd_ShowOpponentLine 6, 251
 
 L_0BA7:
     ActorMsgClose
     WbtCmd_GetTournament 0x8010
-    Plugin7_Cmd1044 0, 0x8010
+    WbtCmd_SetTournamentNameWord 0, 0x8010
     // "This concludes the\n[f000]Ļ\u0001\u0000![f000]븀\u0000\nSee you in the next tournament![f000]븁\u0000"
     InfoMsg Global10665_Text_ConcludesSeeNextTournament, 1
     InfoMsgClose_0039
@@ -729,7 +729,7 @@ L_0BA7:
     WorkSetConst 0x8031, 0
 
 L_0BDD:
-    Plugin7_Cmd1031
+    WbtCmd_ResetPicks_1031
     // "How strong are your Pokémon\nwhen they face your own party?[f000]븁\u0000\nLet's mix them![f000]븁\u0000"
     ScreamMsg Global10665_Text_HowStrongPokemonWhen, 1
     SEPlay SEQ_SE_SW_WBT_01
@@ -753,13 +753,13 @@ L_0BDD:
     VMCall L_0C3C
 
 L_0C38:
-    Plugin7_Cmd1037
+    WbtCmd_SwapPickedPokemon
     VMReturn
 
 L_0C3C:
-    Plugin7_Cmd1032 0x8030
-    Plugin7_Cmd1045 0
-    Plugin7_Cmd1034 1, 0x8030
+    WbtCmd_RandomPick 0x8030
+    WbtCmd_WordSetOpponentName 0
+    WbtCmd_WordSetPickSpecies 1, 0x8030
     // "[f000]Ā\u0001\u0000 chose\n[f000]ā\u0001\u0001.[f000]븁\u0000"
     SystemMsg Global10665_Text_Chose, 1
     WorkSetConst 0x802d, 1
@@ -769,22 +769,22 @@ L_0C54:
     VMStackPushConst 1
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_0CE9
-    Plugin7_Cmd1029
+    WbtCmd_ShowPartyList
     // "Select one Pokémon\nfrom the opponent's party."
     SystemMsg Global10665_Text_SelectOnePokemonFrom, 1
     ListMenu_AnchorTopRight 31, 7, 0, 0, 32815
-    Plugin7_Cmd1035
+    WbtCmd_ListPartyPokemon
     ListMenuShow
-    Plugin7_Cmd1030
-    Plugin7_Cmd1024 0x802e
+    WbtCmd_ClosePartyList
+    WbtCmd_GetEntryCount 0x802e
     DebugPrint 0x802f
     DebugPrint 0x802e
     VMStackPush 0x802f
     VMStackPush 0x802e
     VMStackCmp CMP_LT
     VMJumpIf CMP_STACK, L_0CDD
-    Plugin7_Cmd1033 0x8031, 0x802f
-    Plugin7_Cmd1034 0, 0x8031
+    WbtCmd_SetPick 0x8031, 0x802f
+    WbtCmd_WordSetPickSpecies 0, 0x8031
     // "Are you OK with [f000]ā\u0001\u0000?"
     SystemMsg Global10665_Text_Ok, 1
     YesNoWin 0x8010
@@ -796,7 +796,7 @@ L_0C54:
     VMJump L_0CD7
 
 L_0CD1:
-    Plugin7_Cmd1033 0x8031, 0x802e
+    WbtCmd_SetPick 0x8031, 0x802e
 
 L_0CD7:
     VMJump L_0CE3
@@ -816,9 +816,9 @@ L_0CE9:
     ActorCmdExec 251, Movement_0D80
     ActorCmdExec 255, Movement_0D78
     ActorCmdWait
-    Plugin7_Cmd1034 0, 0x8030
+    WbtCmd_WordSetPickSpecies 0, 0x8030
     MultiMsg 56, 3, 3, 1
-    Plugin7_Cmd1034 0, 0x8031
+    WbtCmd_WordSetPickSpecies 0, 0x8031
     MultiMsg 56, 19, 16, 2
     VMSleep 60
     MsgWinCloseNo 1
@@ -827,9 +827,9 @@ L_0CE9:
     ActorCmdExec 255, Movement_0D88
     ActorCmdWait
     WordSetPlayerName 0
-    Plugin7_Cmd1034 1, 0x8030
-    Plugin7_Cmd1045 2
-    Plugin7_Cmd1034 3, 0x8031
+    WbtCmd_WordSetPickSpecies 1, 0x8030
+    WbtCmd_WordSetOpponentName 2
+    WbtCmd_WordSetPickSpecies 3, 0x8031
     // "[f000]ā\u0001\u0001 from [f000]Ā\u0001\u0000's party\nand [f000]ā\u0001\u0003 from [f000]Ā\u0001\u0002's party[f000]븀\u0000\nhave been swapped.[f000]븁\u0000"
     SystemMsg Global10665_Text_FromSPartyFrom, 1
     InfoMsgClose
@@ -885,7 +885,7 @@ Movement_0D98:
     MoveEnd
 
 L_0DA8:
-    Plugin7_Cmd1019 0x8010
+    WbtCmd_GetRoundRemaining 0x8010
     VMStackPush 0x8010
     VMStackPushConst 255
     VMStackCmp CMP_EQ
@@ -994,7 +994,7 @@ L_0F20:
     VMJump L_0F3C
 
 L_0F33:
-    Plugin7_Cmd1045 0
+    WbtCmd_WordSetOpponentName 0
     VMJump L_0F3C
 
 L_0F3C:
@@ -1025,7 +1025,7 @@ L_0F93:
     VMJump L_0FAF
 
 L_0FA6:
-    Plugin7_Cmd1045 0
+    WbtCmd_WordSetOpponentName 0
     VMJump L_0FAF
 
 L_0FAF:
@@ -1182,7 +1182,7 @@ L_11F8:
 
 L_11FA:
     WorkSetConst 0x8023, 99
-    Plugin7_Cmd1045 0
+    WbtCmd_WordSetOpponentName 0
     Random 0x8021, 100
     VMStackPush 0x8023
     VMStackPush 0x8021
