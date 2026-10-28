@@ -261,7 +261,7 @@ BOOL MapTile_IsSurfEdge(u32 tileClass) {
     return FALSE;
 }
 
-BOOL func_ov036_021a2bf4(u32 tileClass) {
+BOOL MapTile_IsRippleWater(u32 tileClass) {
     switch (tileClass) {
     case 0x14:
     case 0x15:
@@ -354,7 +354,7 @@ BOOL IsTileSurfWater(u16 tileClass) {
     return FALSE;
 }
 
-BOOL func_ov036_021a2cd4(u32 tileClass) {
+BOOL MapTile_IsFallenLeaves(u32 tileClass) {
     if (tileClass == 0x25) {
         return TRUE;
     }

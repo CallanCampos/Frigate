@@ -2,7 +2,8 @@
 #define POKEBW2_FIELD_SCRCMD_WORD_H
 
 // Overlay 36's scrcmd_word.c: the script commands that set the words of messages. Names from swan
-// (https://github.com/ds-pokemon-hacking/swan, GPL-3.0)
+// (https://github.com/ds-pokemon-hacking/swan, GPL-3.0), except our descriptive ones of commands 0x207, 0x208, 0x275
+// and 0x298
 
 #include "types.h"
 #include "struct_decls.h"
@@ -32,14 +33,14 @@ BOOL s0063_WordSetSurveyAnswer(VM *vm, FieldScriptEnv *env);
 BOOL s0060_WordSetPassPowerName(VM *vm, FieldScriptEnv *env);
 BOOL s0061_WordSetTrainerClassName(VM *vm, FieldScriptEnv *env);
 BOOL s0062_WordSetTrainerClassNameWithArticle(VM *vm, FieldScriptEnv *env);
-BOOL func_ov036_021a7c64(VM *vm, FieldScriptEnv *env);
-BOOL func_ov036_021a7cb4(VM *vm, FieldScriptEnv *env);
+BOOL s0207_WordSetPasserbyCount(VM *vm, FieldScriptEnv *env);
+BOOL s0208_WordSetThankedCount(VM *vm, FieldScriptEnv *env);
 BOOL s026C_WordSetMedalName(VM *vm, FieldScriptEnv *env);
 BOOL s026D_WordSetMedalRank(VM *vm, FieldScriptEnv *env);
-BOOL func_ov036_021a7d70(VM *vm, FieldScriptEnv *env);
+BOOL s0298_WordSetEmptyFileMessage(VM *vm, FieldScriptEnv *env);
 BOOL s0299_WordSetLoadAbility(VM *vm, FieldScriptEnv *env);
 BOOL s029A_WordSetLoadNature(VM *vm, FieldScriptEnv *env);
-BOOL func_ov036_021a7e04(VM *vm, FieldScriptEnv *env);
+BOOL s0275_WordSetFunfestMission(VM *vm, FieldScriptEnv *env);
 BOOL s029B_WordSetLoadJoinAvenueName(VM *vm, FieldScriptEnv *env);
 
 #endif // POKEBW2_FIELD_SCRCMD_WORD_H

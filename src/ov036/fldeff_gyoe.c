@@ -49,7 +49,7 @@ typedef struct {
 static void FldeffGyoe_InitResource(FieldEffectGyoe *gyoe);
 static void FldeffGyoe_DeleteResource(FieldEffectGyoe *gyoe);
 static void FldeffGyoe_InitHeldTask(FieldEffectTask *task, void *work);
-static void func_ov036_021b3ff4(FieldEffectTask *task, void *work);
+static void FldeffGyoe_DeleteTask(FieldEffectTask *task, void *work);
 static void FldeffGyoe_UpdateHeldTask(FieldEffectTask *task, void *work);
 static void FldeffGyoe_UpdateTask(FieldEffectTask *task, void *work);
 static void FldeffGyoe_DrawTask(FieldEffectTask *task, void *work);
@@ -65,7 +65,7 @@ static const u32 GYOE_MODEL_FILES[GYOE_KIND_COUNT] = { 50, 51, 52, 53 };
 static const FieldEffectTaskVTable GYOE_TASK_VTABLE = {
     sizeof(GyoeTask),
     FldeffGyoe_InitHeldTask,
-    func_ov036_021b3ff4,
+    FldeffGyoe_DeleteTask,
     FldeffGyoe_UpdateHeldTask,
     FldeffGyoe_DrawTask,
 };
@@ -77,14 +77,14 @@ static const FieldEffectTaskVTable GYOE_TASK_VTABLE = {
 static const FieldEffectTaskVTable GYOE_AUTO_END_TASK_VTABLE = {
     sizeof(GyoeTask),
     FldeffGyoe_InitHeldTask,
-    func_ov036_021b3ff4,
+    FldeffGyoe_DeleteTask,
     FldeffGyoe_UpdateTask,
     FldeffGyoe_DrawTask,
 };
 
 // clang-format on
 
-void *func_ov036_021b3e50(FieldEffects *effects, HeapID heapId) {
+void *FldeffGyoe_Create(FieldEffects *effects, HeapID heapId) {
     FieldEffectGyoe *gyoe = GFL_HeapAllocate(heapId, sizeof(FieldEffectGyoe), TRUE, "fldeff_gyoe.c", 111);
     int i;
 
@@ -96,7 +96,7 @@ void *func_ov036_021b3e50(FieldEffects *effects, HeapID heapId) {
     return gyoe;
 }
 
-void func_ov036_021b3e94(FieldEffects *effects, void *data) {
+void FldeffGyoe_Delete(FieldEffects *effects, void *data) {
     FldeffGyoe_DeleteResource(data);
     GFL_HeapFree(data);
 }
@@ -172,7 +172,7 @@ static void FldeffGyoe_InitHeldTask(FieldEffectTask *task, void *work) {
     FieldEffects_UpdateObject(task);
 }
 
-static void func_ov036_021b3ff4(FieldEffectTask *task, void *work) {
+static void FldeffGyoe_DeleteTask(FieldEffectTask *task, void *work) {
 }
 
 // Follow the actor; when it is gone, the bubble is done

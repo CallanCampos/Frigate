@@ -2,7 +2,7 @@
 #define POKEBW2_FIELD_SCRCMD_FADE_H
 
 // Overlay 36's scrcmd_fade.c: the script commands that fade the screens. Names from swan
-// (https://github.com/ds-pokemon-hacking/swan, GPL-3.0)
+// (https://github.com/ds-pokemon-hacking/swan, GPL-3.0), except our descriptive ones of commands 0x2E8 and 0x2E9
 
 #include "types.h"
 #include "struct_decls.h"
@@ -21,7 +21,7 @@ BOOL s01AD_FadeInWhite(VM *vm, FieldScriptEnv *env);
 BOOL s01AE_FadeOutWhite(VM *vm, FieldScriptEnv *env);
 BOOL s00B4_FadeExWait(VM *vm, FieldScriptEnv *env);
 BOOL s01A7_FadeWait(VM *vm, FieldScriptEnv *env);
-BOOL func_ov036_021ab498(VM *vm, FieldScriptEnv *env);
-BOOL func_ov036_021ab50c(VM *vm, FieldScriptEnv *env);
+BOOL s02E8_CallFieldFadeOut(VM *vm, FieldScriptEnv *env);
+BOOL s02E9_CallFieldFadeIn(VM *vm, FieldScriptEnv *env);
 
 #endif // POKEBW2_FIELD_SCRCMD_FADE_H

@@ -320,7 +320,7 @@ static void FaceUp_Free(Field *field, FaceUpWork *work) {
     GFL_BGSysClearBG(FACEUP_BG_FACE);
     G2_SetBG3ControlText(work->bg3Control.screenSize, work->bg3Control.colorMode, work->bg3Control.screenBase,
                          work->bg3Control.charBase);
-    func_ov036_021b5180(placeName);
+    PlaceName_RestoreWindow(placeName);
     MsgBGPrinter_RequestSysFrame(Field_GetMsgBGSys(field));
     G2_BlendNone();
     FaceUp_RestoreBGPriorities(work);

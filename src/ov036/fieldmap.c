@@ -536,7 +536,7 @@ u32 FieldRoutine_RunAltFrame(GameSystem *gsys, Field *field) {
         MsgBGPrinter_Main(field->msgBGSys);
     }
     if (field->placeName != NULL) {
-        func_ov036_021b5064(field->placeName);
+        PlaceName_Draw(field->placeName);
     }
     if (field->fmissionInfo != NULL) {
         FieldFMissionInfo_UpdateDisplay(field->fmissionInfo);

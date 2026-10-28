@@ -31,7 +31,7 @@ typedef struct {
 static void FldeffFishing_LoadResources(FieldEffectFishing *effect);
 static void FldeffFishing_FreeResources(FieldEffectFishing *effect);
 static void FldeffFishing_Init(FieldEffectTask *task, void *work);
-static void func_ov036_021a5998(FieldEffectTask *task, void *work);
+static void FldeffFishing_Exit(FieldEffectTask *task, void *work);
 static void FldeffFishing_Update(FieldEffectTask *task, void *work);
 static void FldeffFishing_Draw(FieldEffectTask *task, void *work);
 
@@ -39,7 +39,7 @@ static void FldeffFishing_Draw(FieldEffectTask *task, void *work);
 static const FieldEffectTaskVTable FISHING_TASK_VTABLE = {
     sizeof(FishingTask),
     FldeffFishing_Init,
-    func_ov036_021a5998,
+    FldeffFishing_Exit,
     FldeffFishing_Update,
     FldeffFishing_Draw,
 };
@@ -48,7 +48,7 @@ static const FieldEffectTaskVTable FISHING_TASK_VTABLE = {
 
 static u16 FISHING_ANM_ID = 107;
 
-void *func_ov036_021a5828(FieldEffects *effects, HeapID heapId) {
+void *FldeffFishing_Create(FieldEffects *effects, HeapID heapId) {
     FieldEffectFishing *effect = GFL_HeapAllocate(heapId, sizeof(FieldEffectFishing), TRUE, "fldeff_fishing.c", 96);
 
     effect->effects = effects;
@@ -56,7 +56,7 @@ void *func_ov036_021a5828(FieldEffects *effects, HeapID heapId) {
     return effect;
 }
 
-void func_ov036_021a584c(FieldEffects *effects, void *data) {
+void FldeffFishing_Delete(FieldEffects *effects, void *data) {
     FldeffFishing_FreeResources(data);
     GFL_HeapFree(data);
 }
@@ -83,7 +83,7 @@ static void FldeffFishing_FreeResources(FieldEffectFishing *effect) {
 }
 
 // Ripples at the end of the line, cast in dir from pos, a little further away when the water is lower
-FieldEffectTask *func_ov036_021a58e0(FieldEffects *effects, const VecFx32 *pos, u32 dir, u32 sameHeight) {
+FieldEffectTask *FldeffFishing_Start(FieldEffects *effects, const VecFx32 *pos, u32 dir, u32 sameHeight) {
     u8 zOffsets[2][4] = { { 0, 0, 0, 0 }, { 0, 0, 3, 3 } };
     FishingTaskParams params;
 
@@ -110,7 +110,7 @@ static void FldeffFishing_Init(FieldEffectTask *task, void *work) {
     FieldEffects_SetObjectPos(task, &params->pos);
 }
 
-static void func_ov036_021a5998(FieldEffectTask *task, void *work) {
+static void FldeffFishing_Exit(FieldEffectTask *task, void *work) {
 }
 
 static void FldeffFishing_Update(FieldEffectTask *task, void *work) {

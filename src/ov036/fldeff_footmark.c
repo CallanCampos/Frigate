@@ -43,7 +43,7 @@ static u32 Footmark_GetTexture(FieldEffectFootmark *footmark, u32 kind, u32 dir,
 static void FootmarkTask_Init(FieldEffectTask *task, void *work);
 static void FootmarkTask_Delete(FieldEffectTask *task, void *work);
 static void FootmarkTask_Update(FieldEffectTask *task, void *work);
-static void func_ov036_021b4968(FieldEffectTask *task, void *work);
+static void FootmarkTask_Draw(FieldEffectTask *task, void *work);
 
 // The tracks' texture, from 4, by the direction the actor came from and the one it goes to
 static const u8 FOOTMARK_TRACK_TEXTURES[4][4] = {
@@ -59,7 +59,7 @@ static const FieldEffectTaskVTable FOOTMARK_TASK_VTABLE = {
     FootmarkTask_Init,
     FootmarkTask_Delete,
     FootmarkTask_Update,
-    func_ov036_021b4968,
+    FootmarkTask_Draw,
 };
 
 // clang-format on
@@ -80,7 +80,7 @@ void *Footmark_Init(FieldEffects *effects, HeapID heapId) {
     return footmark;
 }
 
-void func_ov036_021b46ec(FieldEffects *effects, void *data) {
+void Footmark_Delete(FieldEffects *effects, void *data) {
     Footmark_FreeTextures(data);
     GFL_HeapFree(data);
 }
@@ -224,5 +224,5 @@ static void FootmarkTask_Update(FieldEffectTask *task, void *work) {
     }
 }
 
-static void func_ov036_021b4968(FieldEffectTask *task, void *work) {
+static void FootmarkTask_Draw(FieldEffectTask *task, void *work) {
 }

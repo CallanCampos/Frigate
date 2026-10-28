@@ -66,39 +66,39 @@ struct PlaceName {
 
 BOOL isGameVerWhite2(void);
 void endColorBlending(PlaceName *wk);
-void func_ov036_021b5194(PlaceName *wk);
-void func_ov036_021b51bc(PlaceName *wk);
-void func_ov036_021b51d0(PlaceName *wk);
-void func_ov036_021b51e0(PlaceName *wk, u32 fileId);
+void PlaceName_SetupWindow(PlaceName *wk);
+void PlaceName_ReleaseWindow(PlaceName *wk);
+void PlaceName_ResetWindow(PlaceName *wk);
+void PlaceName_LoadPaletteFile(PlaceName *wk, u32 fileId);
 void PlaceName_FreePaletteFile(PlaceName *wk);
-void func_ov036_021b521c(PlaceName *wk);
-void func_ov036_021b5230(PlaceName *wk, u32 fileId);
+void PlaceName_TransferPalette(PlaceName *wk);
+void PlaceName_LoadCharFile(PlaceName *wk, u32 fileId);
 void PlaceName_FreeCharFile(PlaceName *wk);
-void func_ov036_021b5270(PlaceName *wk);
-void func_ov036_021b5284(PlaceName *wk, u32 fileId);
+void PlaceName_TransferChars(PlaceName *wk);
+void PlaceName_LoadScreenFile(PlaceName *wk, u32 fileId);
 void PlaceName_FreeScreenFile(PlaceName *wk);
-void func_ov036_021b52c4(PlaceName *wk);
-void func_ov036_021b52e0(PlaceName *wk);
-void func_ov036_021b52fc(PlaceName *wk);
-void func_ov036_021b5318(PlaceName *wk);
+void PlaceName_TransferScreen(PlaceName *wk);
+void PlaceName_AllocBgChars(PlaceName *wk);
+void PlaceName_FreeBgChars(PlaceName *wk);
+void PlaceName_CreateRenderer(PlaceName *wk);
 void PlaceName_FreeRenderer(PlaceName *wk);
-void func_ov036_021b5344(PlaceName *wk);
-void func_ov036_021b53a8(PlaceName *wk);
-void func_ov036_021b53cc(PlaceName *wk);
-void func_ov036_021b53e8(PlaceName *wk);
-void func_ov036_021b53f4(PlaceName *wk, u32 index);
-void func_ov036_021b540c(PlaceName *wk);
+void PlaceName_LoadClActResources(PlaceName *wk);
+void PlaceName_FreeClActResources(PlaceName *wk);
+void PlaceName_CreateClActUnit(PlaceName *wk);
+void PlaceName_FreeClActUnit(PlaceName *wk);
+void PlaceName_SetClActUnitRenderer(PlaceName *wk, u32 index);
+void PlaceName_CreateArchive(PlaceName *wk);
 void PlaceName_FreeArchive(PlaceName *wk);
-void func_ov036_021b5434(PlaceName *wk);
-void func_ov036_021b54e0(PlaceName *wk);
-void func_ov036_021b5500(PlaceName *wk);
-void func_ov036_021b5550(PlaceName *wk);
+void PlaceName_CreateLetters(PlaceName *wk);
+void PlaceName_FreeLetters(PlaceName *wk);
+void PlaceName_SetupLetters(PlaceName *wk);
+void PlaceName_HideLetters(PlaceName *wk);
 void PlaceName_UpdateLetters(PlaceName *wk);
 BOOL PlaceName_IsAllSpawned(PlaceName *wk);
-void func_ov036_021b55ac(PlaceName *wk);
-void func_ov036_021b55cc(PlaceName *wk);
-void func_ov036_021b55ec(PlaceName *wk);
-void func_ov036_021b5600(PlaceName *wk);
+void PlaceName_SlideInLetters(PlaceName *wk);
+void PlaceName_SlideOutLetters(PlaceName *wk);
+void PlaceName_CreateBmpOam(PlaceName *wk);
+void PlaceName_FreeBmpOam(PlaceName *wk);
 void PlaceName_RequestForceShow(PlaceName *wk);
 void PlaceName_ClearForceShowRequest(PlaceName *wk);
 u32 PlaceName_GetZoneChangeRequest(PlaceName *wk);
@@ -116,22 +116,22 @@ void PlaceName_StateFadeInWait(PlaceName *wk);
 void PlaceName_StateLettersLaunch(PlaceName *wk);
 void PlaceName_StateLettersLand(PlaceName *wk);
 void PlaceName_StateFadeOut(PlaceName *wk);
-void func_ov036_021b5994(PlaceName *wk);
-void func_ov036_021b5998(PlaceName *wk);
+void PlaceName_DrawIdle(PlaceName *wk);
+void PlaceName_DrawPrepare(PlaceName *wk);
 void __endColorBlending(PlaceName *wk);
-void func_ov036_021b59a4(PlaceName *wk);
-void func_ov036_021b59a8(PlaceName *wk);
-void func_ov036_021b59ac(PlaceName *wk);
+void PlaceName_DrawFadeInWait(PlaceName *wk);
+void PlaceName_DrawLettersLaunch(PlaceName *wk);
+void PlaceName_DrawLettersLand(PlaceName *wk);
 void _endColorBlending(PlaceName *wk);
 PlaceName *FieldPlaceName_Alloc(HeapID heapId);
-void func_ov036_021b59d4(PlaceName *wk, GameSystem *gsys);
-void func_ov036_021b5a0c(PlaceName *wk);
-void func_ov036_021b5a14(PlaceName *wk);
-void func_ov036_021b5a2c(PlaceName *wk);
-void func_ov036_021b5a44(PlaceName *wk);
-void func_ov036_021b5a58(PlaceName *wk);
-void func_ov036_021b5a6c(PlaceName *wk);
-void func_ov036_021b5a80(PlaceName *wk);
+void PlaceName_InitWork(PlaceName *wk, GameSystem *gsys);
+void PlaceName_FreeWork(PlaceName *wk);
+void PlaceName_CreatePrintQueue(PlaceName *wk);
+void PlaceName_CreateMsgData(PlaceName *wk);
+void PlaceName_CreateName(PlaceName *wk);
+void PlaceName_FreePrintQueue(PlaceName *wk);
+void PlaceName_FreeMsgData(PlaceName *wk);
+void PlaceName_FreeName(PlaceName *wk);
 HeapID FieldPlaceName_GetHeapID(PlaceName *wk);
 ArcTool *FieldPlaceName_GetArc(PlaceName *wk);
 Font *PlaceName_GetFont(PlaceName *wk);
@@ -144,8 +144,8 @@ void PlaceName_IncrementTimer(PlaceName *wk);
 u8 PlaceName_GetState(PlaceName *wk);
 void PlaceName_ResetState(PlaceName *wk);
 void PlaceName_NextState(PlaceName *wk);
-void func_ov036_021b5ae8(PlaceName *wk);
-void func_ov036_021b5b04(PlaceName *wk);
+void PlaceName_LoadZoneFromSave(PlaceName *wk);
+void PlaceName_SaveZoneToSave(PlaceName *wk);
 u16 PlaceName_GetReqZoneID(PlaceName *wk);
 void SetPlaceNameDispZone(PlaceName *wk, u16 zoneId);
 StrBuf *PlaceName_GetName(PlaceName *wk);
@@ -164,52 +164,52 @@ BOOL isGameVerWhite2(void) {
 
 PlaceName *FieldPlaceName_Create(GameSystem *gsys, HeapID heapId, FieldMsgBG *msgBGSys) {
     PlaceName *wk = FieldPlaceName_Alloc(heapId);
-    func_ov036_021b59d4(wk, gsys);
-    func_ov036_021b5ae8(wk);
-    func_ov036_021b540c(wk);
-    func_ov036_021b5a14(wk);
-    func_ov036_021b5a2c(wk);
-    func_ov036_021b5a44(wk);
+    PlaceName_InitWork(wk, gsys);
+    PlaceName_LoadZoneFromSave(wk);
+    PlaceName_CreateArchive(wk);
+    PlaceName_CreatePrintQueue(wk);
+    PlaceName_CreateMsgData(wk);
+    PlaceName_CreateName(wk);
     PlaceName_SetHeapID(wk, heapId);
     PlaceName_SetFont(wk, MsgBGPrinter_GetFont(msgBGSys));
-    func_ov036_021b5318(wk);
-    func_ov036_021b5344(wk);
-    func_ov036_021b53cc(wk);
-    func_ov036_021b53f4(wk, 0);
-    func_ov036_021b55ec(wk);
-    func_ov036_021b5434(wk);
+    PlaceName_CreateRenderer(wk);
+    PlaceName_LoadClActResources(wk);
+    PlaceName_CreateClActUnit(wk);
+    PlaceName_SetClActUnitRenderer(wk, 0);
+    PlaceName_CreateBmpOam(wk);
+    PlaceName_CreateLetters(wk);
     GFL_BGSysCreateBG(3, &sPlaceNameBGSetup, BGMODE_TEXT);
     if (isGameVerWhite2()) {
-        func_ov036_021b51e0(wk, 4);
-        func_ov036_021b5230(wk, 3);
-        func_ov036_021b5284(wk, 5);
+        PlaceName_LoadPaletteFile(wk, 4);
+        PlaceName_LoadCharFile(wk, 3);
+        PlaceName_LoadScreenFile(wk, 5);
     } else {
-        func_ov036_021b51e0(wk, 1);
-        func_ov036_021b5230(wk, 0);
-        func_ov036_021b5284(wk, 2);
+        PlaceName_LoadPaletteFile(wk, 1);
+        PlaceName_LoadCharFile(wk, 0);
+        PlaceName_LoadScreenFile(wk, 2);
     }
-    func_ov036_021b52e0(wk);
+    PlaceName_AllocBgChars(wk);
     PlaceName_SetState(wk, 0);
     return wk;
 }
 
 void FieldPlaceName_Free(PlaceName *wk) {
-    func_ov036_021b5b04(wk);
+    PlaceName_SaveZoneToSave(wk);
     PlaceName_FreeScreenFile(wk);
     PlaceName_FreeCharFile(wk);
     PlaceName_FreePaletteFile(wk);
-    func_ov036_021b54e0(wk);
-    func_ov036_021b5a80(wk);
-    func_ov036_021b5600(wk);
-    func_ov036_021b53e8(wk);
-    func_ov036_021b53a8(wk);
+    PlaceName_FreeLetters(wk);
+    PlaceName_FreeName(wk);
+    PlaceName_FreeBmpOam(wk);
+    PlaceName_FreeClActUnit(wk);
+    PlaceName_FreeClActResources(wk);
     PlaceName_FreeRenderer(wk);
-    func_ov036_021b5a58(wk);
-    func_ov036_021b5a6c(wk);
-    func_ov036_021b52fc(wk);
+    PlaceName_FreePrintQueue(wk);
+    PlaceName_FreeMsgData(wk);
+    PlaceName_FreeBgChars(wk);
     PlaceName_FreeArchive(wk);
     GFL_BGSysReleaseBG(3);
-    func_ov036_021b5a0c(wk);
+    PlaceName_FreeWork(wk);
 }
 
 void PlaceName_Main(PlaceName *wk) {
@@ -240,25 +240,25 @@ void PlaceName_Main(PlaceName *wk) {
     PlaceName_UpdateLetters(wk);
 }
 
-void func_ov036_021b5064(PlaceName *wk) {
+void PlaceName_Draw(PlaceName *wk) {
     switch (PlaceName_GetMode(wk)) {
     case 0:
-        func_ov036_021b5994(wk);
+        PlaceName_DrawIdle(wk);
         break;
     case 1:
-        func_ov036_021b5998(wk);
+        PlaceName_DrawPrepare(wk);
         break;
     case 2:
         __endColorBlending(wk);
         break;
     case 3:
-        func_ov036_021b59a4(wk);
+        PlaceName_DrawFadeInWait(wk);
         break;
     case 4:
-        func_ov036_021b59a8(wk);
+        PlaceName_DrawLettersLaunch(wk);
         break;
     case 5:
-        func_ov036_021b59ac(wk);
+        PlaceName_DrawLettersLand(wk);
         break;
     case 6:
         _endColorBlending(wk);
@@ -303,33 +303,33 @@ void PlaceName_Cancel(PlaceName *wk) {
     PlaceName_ClearForceShowRequest(wk);
 }
 
-void func_ov036_021b5180(PlaceName *wk) {
-    func_ov036_021b51d0(wk);
+void PlaceName_RestoreWindow(PlaceName *wk) {
+    PlaceName_ResetWindow(wk);
 }
 
 void endColorBlending(PlaceName *wk) {
     G2_BlendNone();
 }
 
-void func_ov036_021b5194(PlaceName *wk) {
-    func_ov036_021b521c(wk);
-    func_ov036_021b52e0(wk);
+void PlaceName_SetupWindow(PlaceName *wk) {
+    PlaceName_TransferPalette(wk);
+    PlaceName_AllocBgChars(wk);
     GFL_BGSysSetBGPriority(3, 1);
     GFL_BGSysSetBGEnabled(3, 0);
     endColorBlending(wk);
 }
 
-void func_ov036_021b51bc(PlaceName *wk) {
+void PlaceName_ReleaseWindow(PlaceName *wk) {
     GFL_BGSysClearBG(3);
-    func_ov036_021b52fc(wk);
+    PlaceName_FreeBgChars(wk);
 }
 
-void func_ov036_021b51d0(PlaceName *wk) {
-    func_ov036_021b51bc(wk);
-    func_ov036_021b5194(wk);
+void PlaceName_ResetWindow(PlaceName *wk) {
+    PlaceName_ReleaseWindow(wk);
+    PlaceName_SetupWindow(wk);
 }
 
-void func_ov036_021b51e0(PlaceName *wk, u32 fileId) {
+void PlaceName_LoadPaletteFile(PlaceName *wk, u32 fileId) {
     HeapID heapId = FieldPlaceName_GetHeapID(wk);
     wk->paletteFile = GFL_G2DIOReadNCLRArc(FieldPlaceName_GetArc(wk), fileId, &wk->paletteData, heapId);
 }
@@ -342,11 +342,11 @@ void PlaceName_FreePaletteFile(PlaceName *wk) {
     }
 }
 
-void func_ov036_021b521c(PlaceName *wk) {
+void PlaceName_TransferPalette(PlaceName *wk) {
     GFL_BGSysUploadStdPalette(3, wk->paletteData->pRawData, 0x20, 0);
 }
 
-void func_ov036_021b5230(PlaceName *wk, u32 fileId) {
+void PlaceName_LoadCharFile(PlaceName *wk, u32 fileId) {
     HeapID heapId = FieldPlaceName_GetHeapID(wk);
     wk->charFile = GFL_G2DIOReadBGNCGRArc(FieldPlaceName_GetArc(wk), fileId, FALSE, &wk->charData, heapId);
 }
@@ -359,11 +359,11 @@ void PlaceName_FreeCharFile(PlaceName *wk) {
     }
 }
 
-void func_ov036_021b5270(PlaceName *wk) {
+void PlaceName_TransferChars(PlaceName *wk) {
     GFL_BGSysLoadChar(3, wk->charData->pRawData, wk->charData->szByte, 0);
 }
 
-void func_ov036_021b5284(PlaceName *wk, u32 fileId) {
+void PlaceName_LoadScreenFile(PlaceName *wk, u32 fileId) {
     HeapID heapId = FieldPlaceName_GetHeapID(wk);
     wk->screenFile = GFL_G2DIOReadNSCRArc(FieldPlaceName_GetArc(wk), fileId, FALSE, &wk->screenData, heapId);
 }
@@ -376,25 +376,25 @@ void PlaceName_FreeScreenFile(PlaceName *wk) {
     }
 }
 
-void func_ov036_021b52c4(PlaceName *wk) {
+void PlaceName_TransferScreen(PlaceName *wk) {
     GFL_BGSysBufferScr(3, wk->screenData->rawData, wk->screenData->szByte, 0);
     GFL_BGSysQueueScrLoad(3);
 }
 
-void func_ov036_021b52e0(PlaceName *wk) {
+void PlaceName_AllocBgChars(PlaceName *wk) {
     if (wk->charPos == (u32)-1) {
         wk->charPos = GFL_BGSysAllocChar(3, 0x20, 0);
     }
 }
 
-void func_ov036_021b52fc(PlaceName *wk) {
+void PlaceName_FreeBgChars(PlaceName *wk) {
     if (wk->charPos != (u32)-1) {
         GFL_BGSysFreeCharMemory(3, wk->charPos, 0x20);
         wk->charPos = -1;
     }
 }
 
-void func_ov036_021b5318(PlaceName *wk) {
+void PlaceName_CreateRenderer(PlaceName *wk) {
     wk->renderer = ClActRenderer_Create(&sPlaceNameSurfaceSetup, 1, wk->heapId);
 }
 
@@ -405,7 +405,7 @@ void PlaceName_FreeRenderer(PlaceName *wk) {
     }
 }
 
-void func_ov036_021b5344(PlaceName *wk) {
+void PlaceName_LoadClActResources(PlaceName *wk) {
     HeapID heapId = FieldPlaceName_GetHeapID(wk);
     ArcTool *arc = FieldPlaceName_GetArc(wk);
     wk->palettes[0] = ClActSys_LoadPlttRange(arc, 10, 0, 0x20, 0, 1, heapId);
@@ -414,7 +414,7 @@ void func_ov036_021b5344(PlaceName *wk) {
     wk->cellAnims = ClActSys_LoadCellAnims(arc, 7, 6, heapId);
 }
 
-void func_ov036_021b53a8(PlaceName *wk) {
+void PlaceName_FreeClActResources(PlaceName *wk) {
     int i;
     ClActSys_FreeChars(wk->chars);
     ClActSys_FreeCellAnims(wk->cellAnims);
@@ -423,22 +423,22 @@ void func_ov036_021b53a8(PlaceName *wk) {
     }
 }
 
-void func_ov036_021b53cc(PlaceName *wk) {
+void PlaceName_CreateClActUnit(PlaceName *wk) {
     wk->clactUnit = ClActUnit_Create(0x20, 1, FieldPlaceName_GetHeapID(wk));
     ClActUnit_SetActive(wk->clactUnit, TRUE);
 }
 
-void func_ov036_021b53e8(PlaceName *wk) {
+void PlaceName_FreeClActUnit(PlaceName *wk) {
     ClActUnit_Delete(wk->clactUnit);
 }
 
-void func_ov036_021b53f4(PlaceName *wk, u32 index) {
+void PlaceName_SetClActUnitRenderer(PlaceName *wk, u32 index) {
     if (wk->renderer != NULL) {
         ClActUnit_SetRenderer((&wk->clactUnit)[index], wk->renderer);
     }
 }
 
-void func_ov036_021b540c(PlaceName *wk) {
+void PlaceName_CreateArchive(PlaceName *wk) {
     wk->arc = GFL_ArcSysCreateFileHandle(ARCID_FIELD_PLACE_NAME, FieldPlaceName_GetHeapID(wk));
 }
 
@@ -449,7 +449,7 @@ void PlaceName_FreeArchive(PlaceName *wk) {
     }
 }
 
-void func_ov036_021b5434(PlaceName *wk) {
+void PlaceName_CreateLetters(PlaceName *wk) {
     PlaceNameTextSetup text;
     PlaceNameFrameSetup frame;
     HeapID heapId;
@@ -473,7 +473,7 @@ void func_ov036_021b5434(PlaceName *wk) {
         func_ov036_021b6824(heapId, 1, &frame, wk->clactUnit, arc, 0, wk->palettes[0], wk->chars, wk->cellAnims);
 }
 
-void func_ov036_021b54e0(PlaceName *wk) {
+void PlaceName_FreeLetters(PlaceName *wk) {
     int i;
     for (i = 0; i < 2; i++) {
         if (wk->objects[i] != NULL) {
@@ -483,7 +483,7 @@ void func_ov036_021b54e0(PlaceName *wk) {
     }
 }
 
-void func_ov036_021b5500(PlaceName *wk) {
+void PlaceName_SetupLetters(PlaceName *wk) {
     PlaceNameTextParam text;
     u32 season;
 
@@ -497,7 +497,7 @@ void func_ov036_021b5500(PlaceName *wk) {
     func_ov036_021b68d8(wk->objects[1], &season);
 }
 
-void func_ov036_021b5550(PlaceName *wk) {
+void PlaceName_HideLetters(PlaceName *wk) {
     int i;
     for (i = 0; i < 2; i++) {
         func_ov036_021b6920(wk->objects[i]);
@@ -524,25 +524,25 @@ BOOL PlaceName_IsAllSpawned(PlaceName *wk) {
     return done;
 }
 
-void func_ov036_021b55ac(PlaceName *wk) {
+void PlaceName_SlideInLetters(PlaceName *wk) {
     int i;
     for (i = 0; i < 2; i++) {
         func_ov036_021b6900(wk->objects[i], wk->timer, 10);
     }
 }
 
-void func_ov036_021b55cc(PlaceName *wk) {
+void PlaceName_SlideOutLetters(PlaceName *wk) {
     int i;
     for (i = 0; i < 2; i++) {
         func_ov036_021b6910(wk->objects[i], 0, 12);
     }
 }
 
-void func_ov036_021b55ec(PlaceName *wk) {
+void PlaceName_CreateBmpOam(PlaceName *wk) {
     wk->bmpOam = BmpOam_Init(FieldPlaceName_GetHeapID(wk), wk->clactUnit);
 }
 
-void func_ov036_021b5600(PlaceName *wk) {
+void PlaceName_FreeBmpOam(PlaceName *wk) {
     if (wk->bmpOam != NULL) {
         BmpOam_Exit(wk->bmpOam);
         wk->bmpOam = NULL;
@@ -609,7 +609,7 @@ void PlaceName_SetState(PlaceName *wk, u32 mode) {
     PlaceName_ResetTimer(wk);
     PlaceName_ResetState(wk);
     if (mode == 0) {
-        func_ov036_021b5550(wk);
+        PlaceName_HideLetters(wk);
         GX_SetVisibleWnd(GX_WNDMASK_NONE);
     }
 }
@@ -670,15 +670,15 @@ void PlaceName_StatePrepare(PlaceName *wk) {
         PlaceName_NextState(wk);
         break;
     case 3:
-        func_ov036_021b521c(wk);
+        PlaceName_TransferPalette(wk);
         PlaceName_NextState(wk);
         break;
     case 4:
-        func_ov036_021b5270(wk);
+        PlaceName_TransferChars(wk);
         PlaceName_NextState(wk);
         break;
     case 5:
-        func_ov036_021b52c4(wk);
+        PlaceName_TransferScreen(wk);
         PlaceName_NextState(wk);
         break;
     case 6:
@@ -694,7 +694,7 @@ void PlaceName_StatePrepare(PlaceName *wk) {
         PlaceName_NextState(wk);
         break;
     case 7:
-        func_ov036_021b5500(wk);
+        PlaceName_SetupLetters(wk);
         PlaceName_NextState(wk);
         break;
     case 8:
@@ -710,7 +710,7 @@ void PlaceName_StateFadeIn(PlaceName *wk) {
     case 0:
         __endColorBlending(wk);
         GFL_BGSysSetBGEnabled(3, 1);
-        func_ov036_021b55ac(wk);
+        PlaceName_SlideInLetters(wk);
         PlaceName_NextState(wk);
         break;
     case 1:
@@ -741,7 +741,7 @@ void PlaceName_StateLettersLaunch(PlaceName *wk) {
 void PlaceName_StateLettersLand(PlaceName *wk) {
     switch (PlaceName_GetState(wk)) {
     case 0:
-        func_ov036_021b55cc(wk);
+        PlaceName_SlideOutLetters(wk);
         PlaceName_NextState(wk);
         break;
     case 1:
@@ -755,27 +755,27 @@ void PlaceName_StateLettersLand(PlaceName *wk) {
 void PlaceName_StateFadeOut(PlaceName *wk) {
     if (wk->timer > 5) {
         PlaceName_SetState(wk, 0);
-        func_ov036_021b5550(wk);
+        PlaceName_HideLetters(wk);
     }
 }
 
-void func_ov036_021b5994(PlaceName *wk) {
+void PlaceName_DrawIdle(PlaceName *wk) {
 }
 
-void func_ov036_021b5998(PlaceName *wk) {
+void PlaceName_DrawPrepare(PlaceName *wk) {
 }
 
 void __endColorBlending(PlaceName *wk) {
     endColorBlending(wk);
 }
 
-void func_ov036_021b59a4(PlaceName *wk) {
+void PlaceName_DrawFadeInWait(PlaceName *wk) {
 }
 
-void func_ov036_021b59a8(PlaceName *wk) {
+void PlaceName_DrawLettersLaunch(PlaceName *wk) {
 }
 
-void func_ov036_021b59ac(PlaceName *wk) {
+void PlaceName_DrawLettersLand(PlaceName *wk) {
 }
 
 void _endColorBlending(PlaceName *wk) {
@@ -786,7 +786,7 @@ PlaceName *FieldPlaceName_Alloc(HeapID heapId) {
     return GFL_HeapAllocate(heapId, sizeof(PlaceName), TRUE, "field_place_name.c", 1927);
 }
 
-void func_ov036_021b59d4(PlaceName *wk, GameSystem *gsys) {
+void PlaceName_InitWork(PlaceName *wk, GameSystem *gsys) {
     MI_CpuFill8(wk, 0, sizeof(PlaceName));
     wk->gsys = gsys;
     wk->gameData = GSYS_GetGameData(gsys);
@@ -797,38 +797,38 @@ void func_ov036_021b59d4(PlaceName *wk, GameSystem *gsys) {
     wk->reqZoneId = 0x267;
 }
 
-void func_ov036_021b5a0c(PlaceName *wk) {
+void PlaceName_FreeWork(PlaceName *wk) {
     GFL_HeapFree(wk);
 }
 
-void func_ov036_021b5a14(PlaceName *wk) {
+void PlaceName_CreatePrintQueue(PlaceName *wk) {
     wk->printQueue = PrintQueue_CreateDefault(FieldPlaceName_GetHeapID(wk));
     PrintQueue_SetQueueAlways(wk->printQueue, TRUE);
 }
 
-void func_ov036_021b5a2c(PlaceName *wk) {
+void PlaceName_CreateMsgData(PlaceName *wk) {
     wk->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_PLACE_NAMES, FieldPlaceName_GetHeapID(wk));
 }
 
-void func_ov036_021b5a44(PlaceName *wk) {
+void PlaceName_CreateName(PlaceName *wk) {
     wk->name = GFL_StrBufCreate(0x1d, FieldPlaceName_GetHeapID(wk));
 }
 
-void func_ov036_021b5a58(PlaceName *wk) {
+void PlaceName_FreePrintQueue(PlaceName *wk) {
     if (wk->printQueue != NULL) {
         PrintQueue_Free(wk->printQueue);
         wk->printQueue = NULL;
     }
 }
 
-void func_ov036_021b5a6c(PlaceName *wk) {
+void PlaceName_FreeMsgData(PlaceName *wk) {
     if (wk->msgData != NULL) {
         GFL_MsgDataFree(wk->msgData);
         wk->msgData = NULL;
     }
 }
 
-void func_ov036_021b5a80(PlaceName *wk) {
+void PlaceName_FreeName(PlaceName *wk) {
     if (wk->name != NULL) {
         GFL_StrBufFree(wk->name);
         wk->name = NULL;
@@ -883,12 +883,12 @@ void PlaceName_NextState(PlaceName *wk) {
     wk->state++;
 }
 
-void func_ov036_021b5ae8(PlaceName *wk) {
+void PlaceName_LoadZoneFromSave(PlaceName *wk) {
     wk->reqZoneId =
         PlayerSave_GetPlaceNameZoneID(SaveControl_GetPlayerSave(GameData_GetSaveControl(GSYS_GetGameData(wk->gsys))));
 }
 
-void func_ov036_021b5b04(PlaceName *wk) {
+void PlaceName_SaveZoneToSave(PlaceName *wk) {
     PlayerSave_SetPlaceNameZoneID(SaveControl_GetPlayerSave(GameData_GetSaveControl(GSYS_GetGameData(wk->gsys))),
                                   wk->reqZoneId);
 }

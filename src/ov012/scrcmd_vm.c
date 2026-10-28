@@ -85,21 +85,11 @@ static const u8 VM_CMP_LUT[][3] = {
 
 // What finishes each of the script's sub events when it ends, by the IDs of FieldScriptSubEvent_Register
 const FieldScriptSubEventFinishFunc FIELD_SCRIPT_SUB_EVENT_FINISH_FUNCS[SCRIPT_SUB_EVENT_MAX] = {
-    FieldScriptSubEventFinish_EvCamera,
-    func_ov036_021a8844,
-    func_ov036_021a90fc,
-    func_ov036_021a9350,
-    func_ov036_021a95ec,
-    func_ov036_021a9478,
-    func_ov036_021a96ec,
-    FieldScriptSubEventFinish_NDemo,
-    FieldScriptSubEventFinish_Subscreen,
-    ActorMsgWin_CleanupAutoMode,
-    FieldScriptSubEventFinish_MEPlayback,
-    GameCommPause_Finish,
-    ScriptWork_RestoreBgmVolumeEvent,
-    FieldScriptSubEventFinish_BGMPlayback,
-    NULL,
+    FieldScriptSubEventFinish_EvCamera,   FieldScriptSubEventFinish_SystemMsg,   FieldScriptSubEventFinish_ActorMsg,
+    FieldScriptSubEventFinish_InfoMsg,    FieldScriptSubEventFinish_Sign,        FieldScriptSubEventFinish_MultiMsg,
+    FieldScriptSubEventFinish_CheckerMsg, FieldScriptSubEventFinish_NDemo,       FieldScriptSubEventFinish_Subscreen,
+    ActorMsgWin_CleanupAutoMode,          FieldScriptSubEventFinish_MEPlayback,  GameCommPause_Finish,
+    ScriptWork_RestoreBgmVolumeEvent,     FieldScriptSubEventFinish_BGMPlayback, NULL,
 };
 
 // The field script commands, by their IDs. An ID with no command is NULL: EVCMD_PERM_TABLE allows it at no level, so
@@ -452,8 +442,8 @@ const FieldScriptCommand EVCMD_TABLE[] = {
     s0158_ActorAnimationFree,                         // 0x158
     s0159_ActorAnimationPlay,                         // 0x159
     s015A_ActorAnimationWait,                         // 0x15a
-    func_ov036_021adc94,                              // 0x15b
-    func_ov036_021adcb4,                              // 0x15c
+    s015B_WifiListHasValidProfile,                    // 0x15b
+    s015C_WifiListCountFriends,                       // 0x15c
     s015D_NetConnectWiFiClub,                         // 0x15d
     s015E_NetConnectGTS,                              // 0x15e
     s015F_Nop,                                        // 0x15f
@@ -485,7 +475,7 @@ const FieldScriptCommand EVCMD_TABLE[] = {
     s0179_CallCaptureDemo,                            // 0x179
     GimmickGateCmd_ViewBoard,                         // 0x17a
     func_ov012_02157bdc,                              // 0x17b
-    func_ov036_021ab1a8,                              // 0x17c
+    s017C_RollerCoasterCallSwitch,                    // 0x17c
     ScrcmdFieldGimmickCartLanes_UnlockLaneFromScript, // 0x17d
     NULL,                                             // 0x17e
     NULL,                                             // 0x17f
@@ -495,18 +485,18 @@ const FieldScriptCommand EVCMD_TABLE[] = {
     NULL,                                             // 0x183
     NULL,                                             // 0x184
     NULL,                                             // 0x185
-    func_ov036_021aaf78,                              // 0x186
-    func_ov036_021aaf88,                              // 0x187
+    s0186_DriftveilGymPrepareFreight,                 // 0x186
+    s0187_DriftveilLiftPlaceAtBottom,                 // 0x187
     NULL,                                             // 0x188
     NULL,                                             // 0x189
     NULL,                                             // 0x18a
     NULL,                                             // 0x18b
     ScrcmdFieldGimmickPlateDoors_StartDoorEvent,      // 0x18c
-    func_ov036_021aaec8,                              // 0x18d
-    func_ov036_021aaf1c,                              // 0x18e
-    func_ov036_021ab004,                              // 0x18f
-    func_ov036_021ab03c,                              // 0x190
-    func_ov036_021ab074,                              // 0x191
+    s018D_DriftveilGymCallFreight,                    // 0x18d
+    s018E_DriftveilLiftCallMove,                      // 0x18e
+    s018F_IcirrusGymCallSwitchAnim,                   // 0x18f
+    s0190_IcirrusGymCallFlipSwitch,                   // 0x190
+    s0191_IcirrusGymToggleMovementAtPlace,            // 0x191
     NULL,                                             // 0x192
     NULL,                                             // 0x193
     NULL,                                             // 0x194
@@ -624,8 +614,8 @@ const FieldScriptCommand EVCMD_TABLE[] = {
     s0204_SurveyGetTime,                              // 0x204
     s0205_CallGreetingPhraseInput,                    // 0x205
     s0206_CallThanksPhraseInput,                      // 0x206
-    func_ov036_021a7c64,                              // 0x207
-    func_ov036_021a7cb4,                              // 0x208
+    s0207_WordSetPasserbyCount,                       // 0x207
+    s0208_WordSetThankedCount,                        // 0x208
     SurveyCmd_WriteOwnAnswer,                         // 0x209
     SurveyCmd_ShowRankMessage,                        // 0x20a
     SurveyCmd_GetRank,                                // 0x20b
@@ -665,8 +655,8 @@ const FieldScriptCommand EVCMD_TABLE[] = {
     func_ov036_021c2010,                              // 0x22d
     ScriptNative_SetMmdlZoneDeleteOff,                // 0x22e
     s022F_WordSetLoadPastTradePkmName,                // 0x22f
-    func_ov036_021a9554,                              // 0x230
-    func_ov036_021ae0cc,                              // 0x231
+    s0230_MsgPlaceSignFont4,                          // 0x230
+    s0231_CallGameManual,                             // 0x231
     PokeParty_ControlLegendMon,                       // 0x232
     Scrcmd_HasPlayerLanguage,                         // 0x233
     s0234_ActorFallDownToXZ,                          // 0x234
@@ -694,7 +684,7 @@ const FieldScriptCommand EVCMD_TABLE[] = {
     s024A_FieldSubscreenIsEnabled,                    // 0x24a
     s024B_FieldSubscreenDisable,                      // 0x24b
     s024C_BGMAmbienceResume,                          // 0x24c
-    func_ov036_021ab208,                              // 0x24d
+    s024D_RollerCoasterAmbienceStart,                 // 0x24d
     s024E_PokePartyIsFullPP,                          // 0x24e
     s024F_ActorWalkRoute,                             // 0x24f
     s0250_ActorPairSet,                               // 0x250
@@ -708,21 +698,21 @@ const FieldScriptCommand EVCMD_TABLE[] = {
     NULL,                                             // 0x258
     NULL,                                             // 0x259
     func_ov012_02157b7c,                              // 0x25a
-    func_ov036_021aad44,                              // 0x25b
-    func_ov036_021aad58,                              // 0x25c
-    func_ov036_021aad90,                              // 0x25d
+    s025B_GymElecReapplyProgress,                     // 0x25b
+    s025C_GymElecSetFollower,                         // 0x25c
+    s025D_GymElecSetProgress,                         // 0x25d
     NULL,                                             // 0x25e
-    func_ov036_021aadc8,                              // 0x25f
+    s025F_GymElecSetStage,                            // 0x25f
     NULL,                                             // 0x260
     NULL,                                             // 0x261
     s0262_HollowRivalSetValue,                        // 0x262
     s0263_HollowRivalSetFlag,                         // 0x263
     func_ov012_0216a748,                              // 0x264
-    func_ov036_021ae18c,                              // 0x265
+    s0265_CallXTransceiverSecret,                     // 0x265
     s0266_HollowRivalGetCounter,                      // 0x266
     func_ov012_0216a7cc,                              // 0x267
-    func_ov036_021aae48,                              // 0x268
-    func_ov036_021aae74,                              // 0x269
+    s0268_GymInsectPlayObject,                        // 0x268
+    s0269_GymInsectShowEffect,                        // 0x269
     NULL,                                             // 0x26a
     NULL,                                             // 0x26b
     s026C_WordSetMedalName,                           // 0x26c
@@ -734,7 +724,7 @@ const FieldScriptCommand EVCMD_TABLE[] = {
     s0272_MedalGetGuruActor,                          // 0x272
     s0273_MedalGive,                                  // 0x273
     s0274_FunfestMissionStart,                        // 0x274
-    func_ov036_021a7e04,                              // 0x275
+    s0275_WordSetFunfestMission,                      // 0x275
     s0276_FunfestMissionBroadcast,                    // 0x276
     s0277_FunfestActorDelete,                         // 0x277
     s0278_FunfestDispSalesmanMessage,                 // 0x278
@@ -759,17 +749,17 @@ const FieldScriptCommand EVCMD_TABLE[] = {
     s028B_CallEntralinkWarpOut,                       // 0x28b
     NULL,                                             // 0x28c
     NULL,                                             // 0x28d
-    func_ov036_021aafa8,                              // 0x28e
-    func_ov036_021ae300,                              // 0x28f
+    s028E_MistraltonGymFireCannon,                    // 0x28e
+    s028F_CallRivalNameInput,                         // 0x28f
     s0290_WordSetLoadRivalName,                       // 0x290
-    func_ov036_021ab134,                              // 0x291
-    func_ov036_021ab158,                              // 0x292
+    s0291_VirbankGymStopModelAnimations,              // 0x291
+    s0292_VirbankGymSetActorFlag,                     // 0x292
     s0293_HiddenHollowCallWarpIn,                     // 0x293
     s0294_HiddenHollowGetParam,                       // 0x294
     s0295_HiddenHollowReset,                          // 0x295
     s0296_HiddenHollowCallWarpOut,                    // 0x296
     s0297_CallWildBattleEx,                           // 0x297
-    func_ov036_021a7d70,                              // 0x298
+    s0298_WordSetEmptyFileMessage,                    // 0x298
     s0299_WordSetLoadAbility,                         // 0x299
     s029A_WordSetLoadNature,                          // 0x29a
     s029B_WordSetLoadJoinAvenueName,                  // 0x29b
@@ -779,14 +769,14 @@ const FieldScriptCommand EVCMD_TABLE[] = {
     s029F_MedalDiscover,                              // 0x29f
     s02A0_MedalIsObtained,                            // 0x2a0
     s02A1_MedalGetMostCompleteCategory,               // 0x2a1
-    func_ov036_021ab178,                              // 0x2a2
-    func_ov036_021ab190,                              // 0x2a3
+    s02A2_HumilauGymPlayLeaderSplash,                 // 0x2a2
+    s02A3_HumilauGymPlayLeaderWaves,                  // 0x2a3
     func_ov012_02157bb4,                              // 0x2a4
-    func_ov036_021ab094,                              // 0x2a5
-    func_ov036_021ab104,                              // 0x2a6
-    func_ov036_021ab0cc,                              // 0x2a7
-    func_ov036_021ab114,                              // 0x2a8
-    func_ov036_021ab124,                              // 0x2a9
+    s02A5_OpelucidGymCallMove,                        // 0x2a5
+    s02A6_OpelucidGymRefreshVars,                     // 0x2a6
+    s02A7_OpelucidGymCallButton,                      // 0x2a7
+    s02A8_OpelucidGymFreeHeap,                        // 0x2a8
+    s02A9_OpelucidGymCreateHeap,                      // 0x2a9
     NULL,                                             // 0x2aa
     NULL,                                             // 0x2ab
     s02AC_CallLeafPileStuck,                          // 0x2ac
@@ -849,8 +839,8 @@ const FieldScriptCommand EVCMD_TABLE[] = {
     s02E5_HiddenHollowSet,                            // 0x2e5
     s02E6_HiddenHollowCreateEvents,                   // 0x2e6
     NULL,                                             // 0x2e7
-    func_ov036_021ab498,                              // 0x2e8
-    func_ov036_021ab50c,                              // 0x2e9
+    s02E8_CallFieldFadeOut,                           // 0x2e8
+    s02E9_CallFieldFadeIn,                            // 0x2e9
     s02EA_PokePartyAddNPoke,                          // 0x2ea
     NULL,                                             // 0x2eb
     NULL,                                             // 0x2ec

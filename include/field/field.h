@@ -69,7 +69,7 @@ GameEvent *JoinAvenueNameEntry_Create(u16 target, GameSystem *gsys, u16 *result,
 // the player choose between them, or NULL when neither can enter
 GameEvent *Regulation_CreatePartyCheckTask(GameSystem *gsys, u32 a1, Regulation *regulation, u16 *result,
                                            HeapID heapId);
-u32 func_ov036_021aece0(GameSystem *gsys, u32 a1, Regulation *regulation, HeapID heapId);
+u32 Regulation_CheckTeams(GameSystem *gsys, u32 a1, Regulation *regulation, HeapID heapId);
 // The screen that picks the party or the Battle Box for a battle, whether it is done, and the choice
 PartySelectList *PartySelectList_Create(Field *field, PokeParty *party, PokeParty *battleBoxParty, u8 partyOk,
                                         u32 battleBoxOk, HeapID heapId);
@@ -173,12 +173,12 @@ u32 GetFieldmapZoneHeapSize(u16 zoneId);
 PlaceName *FieldPlaceName_Create(GameSystem *gsys, HeapID heapId, FieldMsgBG *msgBGSys);
 void FieldPlaceName_Free(PlaceName *placeName);
 void PlaceName_Main(PlaceName *placeName);
-void func_ov036_021b5064(PlaceName *placeName);
+void PlaceName_Draw(PlaceName *placeName);
 void Field_InitGimmick(Field *field);
 void Field_TerminateGimmick(Field *field);
 void Field_UpdateGimmick(Field *field);
 BOOL Field_CheckGimmickID(Field *field, u32 id);
-void func_ov036_021b5180(PlaceName *placeName);
+void PlaceName_RestoreWindow(PlaceName *placeName);
 BOOL FieldmapProc_Init(GameProc *proc, u32 *seq, void *param, void *work);
 BOOL FieldmapProc_Update(GameProc *proc, u32 *seq, void *param, void *work);
 BOOL FieldmapProc_End(GameProc *proc, u32 *seq, void *param, void *work);

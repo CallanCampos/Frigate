@@ -96,7 +96,7 @@ static void FldeffNamipoke_FreeResources(FieldEffectNamipoke *namipoke);
 static fx32 FldeffNamipoke_GetWakeScale(fx32 distance);
 static fx32 FldeffNamipoke_GetWakeLength(const VecFx32 *actorPos, const VecFx32 *wakePos, u16 dir);
 static void FldeffNamipoke_Init(FieldEffectTask *task, void *work);
-static void func_ov036_021a45f8(FieldEffectTask *task, void *work);
+static void FldeffNamipoke_Exit(FieldEffectTask *task, void *work);
 static void FldeffNamipoke_PlaceObjects(FieldEffectTask *task, NamipokeTask *namiTask);
 static void FldeffNamipoke_UpdateGrid(FieldEffectTask *task, void *work);
 static void FldeffNamipoke_DrawGrid(FieldEffectTask *task, void *work);
@@ -125,7 +125,7 @@ static const FieldEffectTaskVTable SPLASH_TASK_VTABLE = {
 static const FieldEffectTaskVTable NAMIPOKE_TASK_VTABLE = {
     sizeof(NamipokeTask),
     FldeffNamipoke_Init,
-    func_ov036_021a45f8,
+    FldeffNamipoke_Exit,
     FldeffNamipoke_UpdateGrid,
     FldeffNamipoke_DrawGrid,
 };
@@ -137,7 +137,7 @@ static const FieldEffectTaskVTable NAMIPOKE_TASK_VTABLE = {
 static const FieldEffectTaskVTable NAMIPOKE_RAIL_TASK_VTABLE = {
     sizeof(NamipokeTask),
     FldeffNamipoke_Init,
-    func_ov036_021a45f8,
+    FldeffNamipoke_Exit,
     FldeffNamipoke_UpdateRail,
     FldeffNamipoke_DrawRail,
 };
@@ -153,7 +153,7 @@ void *FldeffNamipoke_Create(FieldEffects *effects, HeapID heapId) {
     return namipoke;
 }
 
-void func_ov036_021a43a8(FieldEffects *effects, void *data) {
+void FldeffNamipoke_Delete(FieldEffects *effects, void *data) {
     FldeffNamipoke_FreeResources(data);
     GFL_HeapFree(data);
 }
@@ -276,7 +276,7 @@ static void FldeffNamipoke_Init(FieldEffectTask *task, void *work) {
     FieldEffects_UpdateObject(task);
 }
 
-static void func_ov036_021a45f8(FieldEffectTask *task, void *work) {
+static void FldeffNamipoke_Exit(FieldEffectTask *task, void *work) {
 }
 
 // Turn the Pokémon and its wake on the grid to the direction it faces, and put them where the task is
@@ -599,7 +599,7 @@ void *FldeffNamipokeSplash_Create(FieldEffects *effects, HeapID heapId) {
     return splash;
 }
 
-void func_ov036_021a4d48(FieldEffects *effects, void *data) {
+void FldeffNamipokeSplash_Delete(FieldEffects *effects, void *data) {
     FldeffNamipokeSplash_FreeResources(data);
     GFL_HeapFree(data);
 }

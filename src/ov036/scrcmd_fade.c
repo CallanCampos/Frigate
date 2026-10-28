@@ -1,7 +1,7 @@
 // The script commands that fade the screens: to and from black or white, quickly or slowly, and their waits. The ROM
 // has no name for the file; scrcmd_fade.c is descriptive. Function names from swan
 // (https://github.com/ds-pokemon-hacking/swan, GPL-3.0)
-// Additional helper and table names are our descriptive guesses.
+// Additional helper and table names, and those of commands 0x2E8 and 0x2E9, are our descriptive guesses.
 #include "types.h"
 #include "field/field.h"
 #include "field/field_event.h"
@@ -152,7 +152,7 @@ BOOL s01A7_FadeWait(VM *vm, FieldScriptEnv *env) {
 }
 
 // Fades out to black when black is 1, otherwise white
-BOOL func_ov036_021ab498(VM *vm, FieldScriptEnv *env) {
+BOOL s02E8_CallFieldFadeOut(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     Field *field = GSYS_GetField(gsys);
@@ -178,7 +178,7 @@ BOOL func_ov036_021ab498(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL func_ov036_021ab50c(VM *vm, FieldScriptEnv *env) {
+BOOL s02E9_CallFieldFadeIn(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     Field *field = GSYS_GetField(gsys);

@@ -1,7 +1,8 @@
 // The script commands that open other screens from the field: the PC Box, phrase inputs, the Hall of Fame after the
 // game is cleared, the C-Gear, Geonet, the options, the Xtransceiver, the town map and name inputs. The name is the
 // ROM's own, from GFL_HeapAllocate's file argument. Function names from swan
-// (https://github.com/ds-pokemon-hacking/swan, GPL-3.0)
+// (https://github.com/ds-pokemon-hacking/swan, GPL-3.0), except our descriptive ones of commands 0x231, 0x265 and
+// 0x28F and of the ScrcmdProcFld_ helpers.
 #include "types.h"
 #include "app/box2.h"
 #include "app/geonet.h"
@@ -45,8 +46,8 @@ typedef struct {
     TownMapParam *param;
 } PlaceSelectWork;
 
-static void func_ov036_021ae21c(void *work);
-static void func_ov036_021ae38c(void *work);
+static void ScrcmdProcFld_FinishPlaceSelect(void *work);
+static void ScrcmdProcFld_FreeXTransceiverParam(void *work);
 
 // Store the Battle Box's team when it was edited, and whether the player picked a Pokémon
 static void ScrcmdProcFld_FinishOv170Event(void *data) {
@@ -195,7 +196,7 @@ BOOL s014D_CallRecordSystem(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL func_ov036_021ae0cc(VM *vm, FieldScriptEnv *env) {
+BOOL s0231_CallGameManual(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
 
@@ -218,11 +219,11 @@ BOOL s0155_CallXTransceiver(VM *vm, FieldScriptEnv *env) {
     param->gsys = gsys;
     ScriptWork_CallEvent(work, EventFieldSubprocessCall_CreateWithCallback(gsys, field, OVERLAY_XTRANSCEIVER,
                                                                            &XTRANSCEIVER_PROC_FUNCTIONS, param,
-                                                                           func_ov036_021ae38c, param));
+                                                                           ScrcmdProcFld_FreeXTransceiverParam, param));
     return TRUE;
 }
 
-BOOL func_ov036_021ae18c(VM *vm, FieldScriptEnv *env) {
+BOOL s0265_CallXTransceiverSecret(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     Field *field = GSYS_GetField(gsys);
@@ -238,11 +239,11 @@ BOOL func_ov036_021ae18c(VM *vm, FieldScriptEnv *env) {
     param->gsys = gsys;
     ScriptWork_CallEvent(work, EventFieldSubprocessCall_CreateWithCallback(gsys, field, OVERLAY_XTRANSCEIVER,
                                                                            &XTRANSCEIVER_PROC_FUNCTIONS, param,
-                                                                           func_ov036_021ae38c, param));
+                                                                           ScrcmdProcFld_FreeXTransceiverParam, param));
     return TRUE;
 }
 
-static void func_ov036_021ae21c(void *data) {
+static void ScrcmdProcFld_FinishPlaceSelect(void *data) {
     PlaceSelectWork *work = data;
 
     if (work->param->result == TOWNMAP_RESULT_FLY) {
@@ -274,13 +275,13 @@ BOOL s0284_CallPlaceSelect(VM *vm, FieldScriptEnv *env) {
     selectWork->picked = picked;
     selectWork->zoneId = zoneId;
     selectWork->param = param;
-    ScriptWork_CallEvent(work, EventFieldSubprocessCall_CreateWithCallback(gsys, field, OVERLAY_TOWNMAP,
-                                                                           &TOWNMAP_PROC_FUNCTIONS, param,
-                                                                           func_ov036_021ae21c, selectWork));
+    ScriptWork_CallEvent(
+        work, EventFieldSubprocessCall_CreateWithCallback(gsys, field, OVERLAY_TOWNMAP, &TOWNMAP_PROC_FUNCTIONS, param,
+                                                          ScrcmdProcFld_FinishPlaceSelect, selectWork));
     return TRUE;
 }
 
-BOOL func_ov036_021ae300(VM *vm, FieldScriptEnv *env) {
+BOOL s028F_CallRivalNameInput(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
 
@@ -299,6 +300,6 @@ BOOL s0285_CallWordSetPokeNameInput(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-static void func_ov036_021ae38c(void *work) {
+static void ScrcmdProcFld_FreeXTransceiverParam(void *work) {
     GFL_HeapFree(work);
 }
