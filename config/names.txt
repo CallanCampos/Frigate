@@ -11323,7 +11323,7 @@ overlays/ov036 0x021a203c EffectEncount_LoadSetting
 overlays/ov036 0x021a22f4 EffectEncount_GetSpotDistance
 overlays/ov036 0x021a2364 EffectEncount_ConsumeSpot
 overlays/ov036 0x021a2398 EffectEncount_SetEffectPaused
-overlays/ov036 0x021a23c4 EffectEncount_SetEffectFlag
+overlays/ov036 0x021a23c4 EffectEncount_SetEffectHidden
 overlays/ov036 0x021a23f0 EffectEncount_GetItemId
 overlays/ov036 0x021a23fc EffectEncount_SuspendSpot
 overlays/ov036 0x021a241c EffectEncount_ResumeSpot

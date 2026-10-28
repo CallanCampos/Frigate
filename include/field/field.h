@@ -135,7 +135,7 @@ void ShutdownFollowWork(GameData *gameData);
 void EvTime_Update(GameData *gameData);
 void FestMission_OnZoneEnter(GameSystem *gsys, u16 zoneId);
 void FieldPlayer_GetNogridNextRailLocation(FieldPlayer *player, RailPosition *pos);
-void EffectEncount_SetEffectPaused(EncountSystem *encount, u32 a1);
+void EffectEncount_SetEffectPaused(EncountSystem *encount, u32 paused);
 
 // One of N's Pokémon, which createNPkm makes
 typedef struct {

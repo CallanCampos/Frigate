@@ -22,7 +22,7 @@ typedef struct {
     s16 y;
     s16 z;
     fx32 height;
-    // The kind of tile, as MapTile_GetEncounterEffectKind gives it
+    // The phenomenon, an ENCOUNT_EFFECT_ value that MapTile_GetEncounterEffectKind gives
     u8 kind;
     u8 active : 4;
     u8 suspended : 2;
@@ -109,7 +109,8 @@ BOOL EncountSystem_CancelPhenomenonIfActorHit(EncountSystem *system);
 GameEvent *CreateRandomPhenomenonEvent(EncountSystem *system);
 // The distance to the phenomenon, along the axis it is farther on, and whether there is one
 BOOL EffectEncount_GetSpotDistance(EncountSystem *system, u16 *distance);
-void EffectEncount_SetEffectFlag(EncountSystem *system, u32 a1);
+// Hides or shows the phenomenon's effect
+void EffectEncount_SetEffectHidden(EncountSystem *system, u32 hidden);
 // The item the phenomenon gave
 u16 EffectEncount_GetItemId(EncountSystem *system);
 // The wild encounters of field_encount.c

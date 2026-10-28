@@ -191,6 +191,21 @@ BOOL MapTile_IsElectricRock(u32 tileClass);
 BOOL MapTile_IsCatwalkBody_(u32 tileClass);
 BOOL MapTile_IsCatwalkEntryPoint(u32 tileClass);
 BOOL MapTile_IsHiddenGrottoEntranceGrass(u32 tileClass);
+// The phenomena that MapTile_GetEncounterEffectKind finds on a tile, by the effects that fldeff_encount.c makes for
+// them: three kinds of grass, which share one effect, really tall grass, a dust cloud, two kinds of water and a flying
+// Pokémon's shadow, or none
+enum {
+    ENCOUNT_EFFECT_GRASS,
+    ENCOUNT_EFFECT_GRASS_B,
+    ENCOUNT_EFFECT_GRASS_C,
+    ENCOUNT_EFFECT_REALLY_TALL_GRASS,
+    ENCOUNT_EFFECT_DUST_CLOUD,
+    ENCOUNT_EFFECT_WATER_0,
+    ENCOUNT_EFFECT_WATER_1,
+    ENCOUNT_EFFECT_FLYING_SHADOW,
+    ENCOUNT_EFFECT_NONE,
+};
+
 u32 MapTile_GetEncounterEffectKind(u32 tileType);
 BOOL CheckSurfBeginTiles(u32 tileType, u32 frontTileType);
 

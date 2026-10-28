@@ -351,7 +351,7 @@ static void FieldSurfTCB_Callback(TCB *tcb, void *work) {
         gridPos[1] = HEIGHT_TO_GRID(pos.y);
         gridPos[2] = HEIGHT_TO_GRID(pos.z);
         if (EncountState_CheckSpecialEncountPos(encounter, gridPos)) {
-            EffectEncount_SetEffectFlag(encounter, 1);
+            EffectEncount_SetEffectHidden(encounter, 1);
         }
         surf->state++;
         break;
