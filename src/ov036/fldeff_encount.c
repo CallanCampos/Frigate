@@ -6,13 +6,26 @@
 #include "constants/sound.h"
 #include "field/encounter.h"
 #include "field/field.h"
+#include "field/field_controller.h"
 #include "field/field_effect.h"
+#include "field/field_map.h"
 #include "field/field_sound.h"
 #include "gfl/g3d.h"
 #include "gfl/heap.h"
 #include "gfl/std.h"
 #include "nitro/fx.h"
 #include "system/game_data.h"
+
+// The effects of the phenomena, the slots of ENCOUNT_EFFECT_SPECS, in the order of field_effect.h's FLDEFF_ENCOUNT_*
+enum {
+    ENCOUNT_SPEC_GRASS,
+    ENCOUNT_SPEC_REALLY_TALL_GRASS,
+    ENCOUNT_SPEC_DUST_CLOUD,
+    ENCOUNT_SPEC_WATER_0,
+    ENCOUNT_SPEC_WATER_1,
+    ENCOUNT_SPEC_FLYING_SHADOW,
+    ENCOUNT_SPEC_MAX,
+};
 
 // The models and animations of one kind of phenomenon. A kind can have variants, such as one per season, whose files
 // follow the first at variantStep apart
@@ -82,7 +95,10 @@ static void EncountTask_Draw(FieldEffectTask *task, void *work);
 static const u8 ENCOUNT_EFFECT_VOLUMES[4] = { 127, 90, 60, 40 };
 
 // The effect of each kind of phenomenon; the first three are variants of the first effect
-static const u8 ENCOUNT_EFFECT_INDICES[8] = { 0, 0, 0, 1, 2, 3, 4, 5 };
+static const u8 ENCOUNT_EFFECT_INDICES[ENCOUNT_EFFECT_NONE] = {
+    ENCOUNT_SPEC_GRASS,      ENCOUNT_SPEC_GRASS,   ENCOUNT_SPEC_GRASS,   ENCOUNT_SPEC_REALLY_TALL_GRASS,
+    ENCOUNT_SPEC_DUST_CLOUD, ENCOUNT_SPEC_WATER_0, ENCOUNT_SPEC_WATER_1, ENCOUNT_SPEC_FLYING_SHADOW,
+};
 
 // clang-format off
 static const FieldEffectTaskVTable ENCOUNT_TASK_VTABLE = {
@@ -96,7 +112,7 @@ static const FieldEffectTaskVTable ENCOUNT_TASK_VTABLE = {
 // clang-format on
 
 // clang-format off
-static EncountEffectSpec ENCOUNT_EFFECT_SPECS[6] = {
+static EncountEffectSpec ENCOUNT_EFFECT_SPECS[ENCOUNT_SPEC_MAX] = {
     { 1, 3, 4, TRUE, FALSE, SEQ_SE_FLD_70, 60, { 141, 0, 0, 0 } },
     { 1, 1, 4, TRUE, FALSE, SEQ_SE_FLD_70, 68, { 149, 0, 0, 0 } },
     { 2, 1, 1, FALSE, FALSE, SEQ_SE_FLD_73, 76, { 154, 123, 0, 0 } },
@@ -108,27 +124,27 @@ static EncountEffectSpec ENCOUNT_EFFECT_SPECS[6] = {
 // clang-format on
 
 void *EncountTask_CreateGrass(FieldEffects *effects, HeapID heapId) {
-    return EncountTask_Create(effects, heapId, 0);
+    return EncountTask_Create(effects, heapId, ENCOUNT_SPEC_GRASS);
 }
 
 void *EncountTask_CreateReallyTallGrass(FieldEffects *effects, HeapID heapId) {
-    return EncountTask_Create(effects, heapId, 1);
+    return EncountTask_Create(effects, heapId, ENCOUNT_SPEC_REALLY_TALL_GRASS);
 }
 
 void *EncountTask_CreateDustCloud(FieldEffects *effects, HeapID heapId) {
-    return EncountTask_Create(effects, heapId, 2);
+    return EncountTask_Create(effects, heapId, ENCOUNT_SPEC_DUST_CLOUD);
 }
 
 void *EncountTask_CreateWater0(FieldEffects *effects, HeapID heapId) {
-    return EncountTask_Create(effects, heapId, 3);
+    return EncountTask_Create(effects, heapId, ENCOUNT_SPEC_WATER_0);
 }
 
 void *EncountTask_CreateWater1(FieldEffects *effects, HeapID heapId) {
-    return EncountTask_Create(effects, heapId, 4);
+    return EncountTask_Create(effects, heapId, ENCOUNT_SPEC_WATER_1);
 }
 
 void *EncountTask_CreateFlyingShadow(FieldEffects *effects, HeapID heapId) {
-    return EncountTask_Create(effects, heapId, 5);
+    return EncountTask_Create(effects, heapId, ENCOUNT_SPEC_FLYING_SHADOW);
 }
 
 void EncountTask_Delete(FieldEffects *effects, void *data) {
@@ -149,7 +165,7 @@ static void EncountTask_LoadKind(FieldEffectEncount *effect, u32 kind) {
 
     effect->spec = ENCOUNT_EFFECT_SPECS[kind];
     arc = FieldEffects_GetArc(effect->effects);
-    if (kind == 0) {
+    if (kind == ENCOUNT_SPEC_GRASS) {
         EncountTask_LoadKind0Models(effect, &effect->spec, arc);
     } else {
         EncountTask_LoadModels(effect, &effect->spec, arc);
@@ -235,18 +251,18 @@ static void EncountEffect_FreeResources(FieldEffectEncount *effect) {
     }
 }
 
-// Start the phenomenon of the given kind on the tile, unless the controls are of another type
+// Start the phenomenon of the given kind on the tile, only on the grid
 FieldEffectTask *EncountTask_Start(EncountSystem *system, FieldEffects *effects, u16 x, u16 z, fx32 height, u32 kind) {
     Field *field = FieldEffects_GetField(effects);
     u32 effectIndex;
     FieldEffectEncount *effect;
     EncountTaskParams params;
 
-    if (Field_GetResolvedControllerTypeID(field) != 0) {
+    if (Field_GetResolvedControllerTypeID(field) != FIELDMAP_CTRL_TYPE_GRID) {
         return NULL;
     }
     effectIndex = ENCOUNT_EFFECT_INDICES[kind];
-    effect = FieldEffects_GetHandleData(effects, effectIndex + 19);
+    effect = FieldEffects_GetHandleData(effects, FLDEFF_ENCOUNT_GRASS + effectIndex);
     if (effect == NULL) {
         return NULL;
     }
@@ -257,7 +273,7 @@ FieldEffectTask *EncountTask_Start(EncountSystem *system, FieldEffects *effects,
     params.x = x;
     params.z = z;
     params.effectIndex = effectIndex;
-    if (effectIndex == 0) {
+    if (effectIndex == ENCOUNT_SPEC_GRASS) {
         params.variant = kind;
     } else {
         params.variant = 0;
