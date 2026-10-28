@@ -112,6 +112,9 @@ void GameData_SetEventMapReplace(GameData *gameData, u16 uid, BOOL set);
 BOOL GameData_IsMapReplaceEventSet(GameData *gameData, u16 uid);
 void MapReplace_LoadVariables(MapReplaceVariables *variables, GameSystem *gsys);
 void MapMatrix_Patch(MapMatrix *matrix, GameSystem *gsys, HeapID heapId);
+// What GetTileTypeAtPos returns where there is no terrain
+#define TILE_TYPE_NONE 0xffffffff
+
 u32 GetTileTypeAtPos(FieldG3DMapper *mapper, const VecFx32 *position);
 u32 GetTileFlags(u32 tileType);
 u16 GetAbyssalRuinsDiveZoneID(Field *field, u16 *zoneId);

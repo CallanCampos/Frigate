@@ -178,6 +178,13 @@ void Field_InitGimmick(Field *field);
 void Field_TerminateGimmick(Field *field);
 void Field_UpdateGimmick(Field *field);
 BOOL Field_CheckGimmickID(Field *field, u32 id);
+// Gimmick IDs that Field_CheckGimmickID checks for
+#define GIMMICK_MISTRALTON_GYM 5
+#define GIMMICK_CASTELIA_GYM 6
+#define GIMMICK_DRIFTVEIL_GYM 7
+#define GIMMICK_CHARGESTONE_CAVE 13
+#define GIMMICK_HUMILAU_GYM 38
+#define GIMMICK_ROLLER_COASTER 48
 void PlaceName_RestoreWindow(PlaceName *placeName);
 BOOL FieldmapProc_Init(GameProc *proc, u32 *seq, void *param, void *work);
 BOOL FieldmapProc_Update(GameProc *proc, u32 *seq, void *param, void *work);

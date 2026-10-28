@@ -102,14 +102,6 @@
 #define SCRID_ASSORTMENT_C 0x9cb
 #define SCRID_VENDING_MACHINE 0x28a0
 
-// The gimmicks of the zones whose tiles start events
-#define GIMMICK_MISTRALTON_GYM 5
-#define GIMMICK_CASTELIA_GYM 6
-#define GIMMICK_DRIFTVEIL_GYM 7
-#define GIMMICK_CHARGESTONE_CAVE 13
-#define GIMMICK_HUMILAU_GYM 38
-#define GIMMICK_ROLLER_COASTER 48
-
 // A grid tile's side, in world units and in fx32
 #define GRID_UNITS 16
 #define GRID_SIZE FX32_CONST(GRID_UNITS)
