@@ -7,12 +7,38 @@
 #include "nitro/fx.h"
 #include "struct_decls.h"
 
+// The most resource infos a prop system has, which is also what resIdToIndex holds for a resource it has none of
+#define FIELD_PROP_RES_INFO_MAX 0x80
+// A resource info without a door, an animation slot without an animation, and a resource instance without a resource
+#define FIELD_PROP_DOOR_NONE 0xffff
+#define FIELD_PROP_ANM_NONE 0xffffffff
+#define FIELD_PROP_RES_INDEX_NONE 0xffffffff
+
+// What each of a prop's animations is doing, its animationState
+enum {
+    FIELD_PROP_ANM_STATE_STOPPED,
+    FIELD_PROP_ANM_STATE_LOOP,
+    // Paused, or played to its end
+    FIELD_PROP_ANM_STATE_PAUSED,
+    FIELD_PROP_ANM_STATE_PLAY,
+    FIELD_PROP_ANM_STATE_PLAY_INV,
+};
+
+// The commands of a dynamic prop's animations
+enum {
+    FIELD_PROP_ANM_CMD_PLAY,
+    FIELD_PROP_ANM_CMD_PLAY_INV,
+    FIELD_PROP_ANM_CMD_LOOP,
+    FIELD_PROP_ANM_CMD_PAUSE,
+    FIELD_PROP_ANM_CMD_STOP,
+};
+
 // A prop of a chunk's or a land data patch's file: where it is, and its models
 struct FieldPropSourceInfo {
     s32 x;
     s32 y;
     s32 z;
-    u16 unkC;
+    u16 rotationY;
     u8 highResId;
     u8 lowResId;
 };

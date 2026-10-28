@@ -143,7 +143,7 @@ BOOL FieldPropSystem_CheckCreateDoorReq(FieldPropSystem *system, u32 resId, VecF
     FieldPropResInfo *info;
 
     info = FieldPropSystem_FindResInfo(system, resId);
-    if (info->doorResId == 0xffff) {
+    if (info->doorResId == FIELD_PROP_DOOR_NONE) {
         return FALSE;
     }
     *resIndex = FieldPropSystem_ConvResIDToIndex(system, info->doorResId);
@@ -164,7 +164,7 @@ s32 FieldPropSystem_InstantiateProps(FieldPropSystem *system, FieldChunk *chunk,
         FieldPropSystem_InstantiateFromInfo(system, chunk, &infos[i], n);
         resId = infos[i].lowResId + (infos[i].highResId << 8);
         if (FieldPropSystem_CheckCreateDoorReq(system, resId, &instance.pos.position, &instance.resIndex) == TRUE) {
-            instance.pos.rotationY = infos[i].unkC;
+            instance.pos.rotationY = infos[i].rotationY;
             n++;
             instance.pos.position.x += infos[i].x;
             instance.pos.position.y += infos[i].y;
@@ -189,7 +189,7 @@ void FieldPropSystem_InstantiateFromInfo(FieldPropSystem *system, FieldChunk *ch
     resId = info->lowResId + (info->highResId << 8);
     instance.resIndex = FieldPropSystem_ConvResIDToIndex(system, resId);
     VEC_Set(&instance.pos.position, info->x, info->y, -info->z);
-    instance.pos.rotationY = info->unkC;
+    instance.pos.rotationY = info->rotationY;
     FieldPropSystem_LinkPropToChunk(system, chunk, &instance, propIndex);
 }
 
@@ -260,7 +260,7 @@ void FieldPropSystem_LoadResBundle(FieldPropSystem *system, u16 arcId, u32 fileI
     count = (u32)system->resBundle->countFlags >> 1;
     system->resInfoCount = count;
     if (count > 0x200) {
-        system->resInfoCount = 0x80;
+        system->resInfoCount = FIELD_PROP_RES_INFO_MAX;
     }
     GFL_ArcToolFree(arc);
 }
@@ -276,14 +276,14 @@ void FieldPropSystem_BuildResIDLUT(FieldPropSystem *system, u32 defaultResId) {
     s32 j;
     FieldPropResInfo *info;
 
-    MI_CpuFill8(system->resIdToIndex, 0x80, 0x200);
+    MI_CpuFill8(system->resIdToIndex, FIELD_PROP_RES_INFO_MAX, 0x200);
     for (i = 0; i < system->resInfoCount; i++) {
         info = FieldPropSystem_GetResInfo(system, i);
         system->resIdToIndex[info->resId] = i;
     }
     defaultIndex = system->resIdToIndex[defaultResId];
     for (j = 0; j < 0x200; j++) {
-        if (system->resIdToIndex[j] == 0x80) {
+        if (system->resIdToIndex[j] == FIELD_PROP_RES_INFO_MAX) {
             system->resIdToIndex[j] = defaultIndex;
         }
     }
@@ -296,7 +296,7 @@ u32 FieldPropSystem_ConvResIDToIndex(const FieldPropSystem *system, u32 resId) {
         resId = 0;
     }
     index = system->resIdToIndex[resId];
-    if (index >= 0x80 || index >= system->resInfoCount) {
+    if (index >= FIELD_PROP_RES_INFO_MAX || index >= system->resInfoCount) {
         index = 0;
     }
     return index;
@@ -340,7 +340,7 @@ u32 FieldPropResAnmHeader_GetAnmCount(const FieldPropResAnmHeader *header) {
     u32 count = 0;
 
     for (; i < 4; i++) {
-        if (header->animationIds[i] != 0xffffffff) {
+        if (header->animationIds[i] != FIELD_PROP_ANM_NONE) {
             count++;
         }
     }
@@ -512,7 +512,7 @@ void FieldPropAnmController_Static_Init(FieldPropSystem *system, FieldPropResIns
     s32 i;
 
     for (i = 0; i < 4; i++) {
-        instance->animationState[i] = 0;
+        instance->animationState[i] = FIELD_PROP_ANM_STATE_STOPPED;
     }
 }
 
@@ -526,10 +526,10 @@ void FieldPropAnmController_Ambient_Init(FieldPropSystem *system, FieldPropResIn
     for (i = 0; i < 4 && i < count; i++) {
         GFL_G3DActorBindAnm(instance->actor, i);
         GFL_G3DActorResetAnmFrame(instance->actor, i);
-        instance->animationState[i] = 1;
+        instance->animationState[i] = FIELD_PROP_ANM_STATE_LOOP;
     }
     for (; i < 4; i++) {
-        instance->animationState[i] = 0;
+        instance->animationState[i] = FIELD_PROP_ANM_STATE_STOPPED;
     }
 }
 
@@ -541,11 +541,11 @@ void FieldPropAnmController_RTC_Init(FieldPropSystem *system, FieldPropResInstan
     animation = FieldPropRTCState_GetPlayAnmIndex(&system->rtcState);
     for (i = 0; i < 4; i++) {
         if (i != animation) {
-            instance->animationState[i] = 0;
+            instance->animationState[i] = FIELD_PROP_ANM_STATE_STOPPED;
         } else {
             GFL_G3DActorBindAnm(instance->actor, i);
             GFL_G3DActorResetAnmFrame(instance->actor, i);
-            instance->animationState[i] = 1;
+            instance->animationState[i] = FIELD_PROP_ANM_STATE_LOOP;
         }
     }
 }
@@ -594,7 +594,7 @@ void FieldPropAnmController_RTC_Update(FieldPropSystem *system, FieldPropResInst
         FieldPropResInstance_AnmStopAll(instance);
         GFL_G3DActorBindAnm(instance->actor, animation);
         GFL_G3DActorResetAnmFrame(instance->actor, animation);
-        instance->animationState[animation] = 1;
+        instance->animationState[animation] = FIELD_PROP_ANM_STATE_LOOP;
     } else {
         GFL_G3DActorStepAnmFrameLoop(instance->actor, animation, FX32_ONE);
     }
@@ -616,15 +616,15 @@ void FieldPropAnmController_Dynamic_Update(FieldPropSystem *system, FieldPropRes
     i = 0;
     for (; i < 4; i++) {
         switch (instance->animationState[i]) {
-        case 0:
-        case 2:
+        case FIELD_PROP_ANM_STATE_STOPPED:
+        case FIELD_PROP_ANM_STATE_PAUSED:
             break;
-        case 3:
+        case FIELD_PROP_ANM_STATE_PLAY:
             if (!GFL_G3DActorStepAnmFrame(instance->actor, i, step)) {
-                instance->animationState[i] = 2;
+                instance->animationState[i] = FIELD_PROP_ANM_STATE_PAUSED;
             }
             break;
-        case 4:
+        case FIELD_PROP_ANM_STATE_PLAY_INV:
             if (!GFL_G3DActorStepAnmFrame(instance->actor, i, -step)) {
                 // BUG: The frame setter dereferences its frame pointer.
 #ifdef BUGFIX
@@ -633,10 +633,10 @@ void FieldPropAnmController_Dynamic_Update(FieldPropSystem *system, FieldPropRes
 #else
                 GFL_G3DActorSetAnmFrame(instance->actor, i, NULL);
 #endif
-                instance->animationState[i] = 2;
+                instance->animationState[i] = FIELD_PROP_ANM_STATE_PAUSED;
             }
             break;
-        case 1:
+        case FIELD_PROP_ANM_STATE_LOOP:
             GFL_G3DActorStepAnmFrameLoop(instance->actor, i, step);
             break;
         }
@@ -657,7 +657,7 @@ void FieldPropResInstance_AnmSetPlay(FieldPropResInstance *instance, u32 animati
         index = offset + i;
         GFL_G3DActorBindAnm(instance->actor, index);
         GFL_G3DActorResetAnmFrame(instance->actor, index);
-        instance->animationState[offset + i] = 3;
+        instance->animationState[offset + i] = FIELD_PROP_ANM_STATE_PLAY;
     }
 }
 
@@ -675,7 +675,7 @@ void FieldPropResInstance_AnmSetPlayLoop(FieldPropResInstance *instance, u32 ani
         index = offset + i;
         GFL_G3DActorBindAnm(instance->actor, index);
         GFL_G3DActorResetAnmFrame(instance->actor, index);
-        instance->animationState[offset + i] = 1;
+        instance->animationState[offset + i] = FIELD_PROP_ANM_STATE_LOOP;
     }
 }
 
@@ -699,7 +699,7 @@ void FieldPropResInstance_AnmSetPlayInv(FieldPropResInstance *instance, u32 anim
         renderObj = GFL_G3DAnmGetRenderObj(animationObj);
         frame = NNS_G3dAnmObjGetNumFrame(renderObj);
         GFL_G3DActorSetAnmFrame(instance->actor, index, &frame);
-        instance->animationState[offset + i] = 4;
+        instance->animationState[offset + i] = FIELD_PROP_ANM_STATE_PLAY_INV;
     }
 }
 
@@ -713,8 +713,8 @@ void FieldPropResInstance_AnmSetPause(FieldPropResInstance *instance, u32 animat
     count = header->ambientAnimationCount;
     offset = count * animation;
     for (i = 0; i < header->ambientAnimationCount; i++) {
-        if (instance->animationState[offset + i] != 0) {
-            instance->animationState[offset + i] = 2;
+        if (instance->animationState[offset + i] != FIELD_PROP_ANM_STATE_STOPPED) {
+            instance->animationState[offset + i] = FIELD_PROP_ANM_STATE_PAUSED;
         }
     }
 }
@@ -723,9 +723,9 @@ void FieldPropResInstance_AnmStopAll(FieldPropResInstance *instance) {
     s32 i;
 
     for (i = 0; i < 4; i++) {
-        if (instance->animationState[i] != 0) {
+        if (instance->animationState[i] != FIELD_PROP_ANM_STATE_STOPPED) {
             GFL_G3DActorUnbindAnm(instance->actor, i);
-            instance->animationState[i] = 0;
+            instance->animationState[i] = FIELD_PROP_ANM_STATE_STOPPED;
         }
     }
 }
@@ -746,22 +746,22 @@ void FieldPropResInstance_CallAnmCmd(FieldPropResInstance *instance, u32 animati
 
 void FieldPropAnmController_Dynamic_ExecCommand(FieldPropResInstance *instance, u32 animation, u32 command) {
     switch (command) {
-    case 0:
+    case FIELD_PROP_ANM_CMD_PLAY:
         FieldPropResInstance_AnmStopAll(instance);
         FieldPropResInstance_AnmSetPlay(instance, animation);
         break;
-    case 1:
+    case FIELD_PROP_ANM_CMD_PLAY_INV:
         FieldPropResInstance_AnmStopAll(instance);
         FieldPropResInstance_AnmSetPlayInv(instance, animation);
         break;
-    case 2:
+    case FIELD_PROP_ANM_CMD_LOOP:
         FieldPropResInstance_AnmStopAll(instance);
         FieldPropResInstance_AnmSetPlayLoop(instance, animation);
         break;
-    case 3:
+    case FIELD_PROP_ANM_CMD_PAUSE:
         FieldPropResInstance_AnmSetPause(instance, animation);
         break;
-    case 4:
+    case FIELD_PROP_ANM_CMD_STOP:
         FieldPropResInstance_AnmStopAll(instance);
         break;
     }
@@ -778,14 +778,14 @@ BOOL FieldPropResInstance_IsAnmIdle(FieldPropResInstance *instance, u32 animatio
         index = 0;
     }
     switch (instance->animationState[index]) {
-    case 0:
+    case FIELD_PROP_ANM_STATE_STOPPED:
         return TRUE;
-    case 1:
+    case FIELD_PROP_ANM_STATE_LOOP:
         return FALSE;
-    case 2:
+    case FIELD_PROP_ANM_STATE_PAUSED:
         return TRUE;
-    case 3:
-    case 4:
+    case FIELD_PROP_ANM_STATE_PLAY:
+    case FIELD_PROP_ANM_STATE_PLAY_INV:
         return FALSE;
     default:
         break;
@@ -841,7 +841,7 @@ void FieldPropSystem_ReleaseChunkPropHolder(FieldPropSystem *system, FieldChunkP
 }
 
 u8 FieldChunkPropHolder_GetResIndex(FieldChunkPropHolder *holder) {
-    if (holder->instance->resIndex == 0xffffffff) {
+    if (holder->instance->resIndex == FIELD_PROP_RES_INDEX_NONE) {
         return holder->savedResIndex;
     }
     return holder->instance->resIndex;
@@ -854,7 +854,7 @@ void FieldChunkPropHolder_SetVisible(FieldChunkPropHolder *holder, BOOL visible)
         holder->visible = 1;
     } else {
         holder->savedResIndex = holder->instance->resIndex;
-        holder->instance->resIndex = 0xffffffff;
+        holder->instance->resIndex = FIELD_PROP_RES_INDEX_NONE;
         holder->visible = 0;
     }
 }
@@ -917,7 +917,7 @@ FieldChunkPropHolder *FieldPropSystem_FindPropAtPos(FieldPropSystem *system, u32
 
 u8 FieldChunkPropHolder_GetPropType(FieldPropSystem *system, FieldChunkPropHolder *holder) {
     u32 index = FieldChunkPropHolder_GetResIndex(holder);
-    if (index >= 0x80 || index >= system->resInfoCount) {
+    if (index >= FIELD_PROP_RES_INFO_MAX || index >= system->resInfoCount) {
         index = 0;
     }
     return FieldPropResInfo_GetTypeConv(FieldPropSystem_GetResInfo(system, index));
@@ -926,7 +926,7 @@ u8 FieldChunkPropHolder_GetPropType(FieldPropSystem *system, FieldChunkPropHolde
 void FieldChunkPropHolder_CallAnmCmd(FieldPropSystem *system, FieldChunkPropHolder *holder, u32 animation,
                                      u32 command) {
     u32 index = FieldChunkPropHolder_GetResIndex(holder);
-    if (index >= 0x80 || index >= system->resInfoCount) {
+    if (index >= FIELD_PROP_RES_INFO_MAX || index >= system->resInfoCount) {
         index = 0;
     }
     FieldPropResInstance_CallAnmCmd(&system->resInstances[index], animation, command);
