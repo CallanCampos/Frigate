@@ -45,6 +45,15 @@ add_test(NAME oracle_compare
     WORKING_DIRECTORY "${REPO_ROOT}")
 set_tests_properties(oracle_compare PROPERTIES TIMEOUT 300)
 
+# The two main save copies' complete 73-block/table/footer integrity, including corrupt one-bank recovery cases.
+# Synthetic byte images exercise the production checker; no game, ROM or oracle required.
+add_test(NAME oracle_save_image
+    COMMAND "${CMAKE_COMMAND}" -E env PYTHONDONTWRITEBYTECODE=1
+        "${PORT_PYTHON}" "${port_oracle_tests}/test_saveimage.py"
+    WORKING_DIRECTORY "${REPO_ROOT}")
+set_tests_properties(oracle_save_image PROPERTIES TIMEOUT 120)
+port_test_labels(oracle_save_image static)
+
 # sound.py, the sound comparison, on made-up sound traces and WAV dumps
 add_test(NAME oracle_sound_tool
     COMMAND "${CMAKE_COMMAND}" -E env PYTHONDONTWRITEBYTECODE=1
@@ -145,7 +154,7 @@ add_test(NAME oracle_saves
 set_tests_properties(oracle_saves PROPERTIES SKIP_RETURN_CODE 77 TIMEOUT 7200 FIXTURES_SETUP oracle_saves)
 port_test_labels(oracle_saves oracle)
 foreach(sequence IN ITEMS opening title continue continue_starter field_menus party_menus aspertia hugh route19 catch
-                         catch_continue center_continue pc)
+                         catch_continue center_continue pc floccesy floccesy_continue)
     if(EXISTS "${port_oracle_tests}/${sequence}_${PORT_VERSION}.tsv")
         add_test(NAME oracle_${sequence}_hashes
             COMMAND "${CMAKE_COMMAND}" -E env PYTHONDONTWRITEBYTECODE=1
@@ -169,11 +178,37 @@ foreach(sequence IN ITEMS opening title continue continue_starter field_menus pa
 endforeach()
 # The sequences from a save take it from oracle_saves; without the cache (a failed fixture) they would make it again
 set_tests_properties(oracle_continue oracle_continue_starter oracle_field_menus oracle_party_menus oracle_hugh
-    oracle_route19 oracle_catch oracle_catch_continue oracle_center_continue oracle_pc
+    oracle_route19 oracle_catch oracle_catch_continue oracle_center_continue oracle_pc oracle_floccesy
     PROPERTIES FIXTURES_REQUIRED oracle_saves TIMEOUT 3600)
 # The exit route writes and compares a picture of every frame of both programs, some 34,500 in all: half an hour on a
 # loaded machine
 set_tests_properties(oracle_aspertia PROPERTIES TIMEOUT 5400)
+
+# Phase 5's first story leg starts from the existing catch save. Its later save has a fixture of its own, so a
+# request for an earlier route does not also run Floccesy. The shared cache checks every parent's examined SHA1.
+add_test(NAME oracle_floccesy_save
+    COMMAND "${CMAKE_COMMAND}" -E env PYTHONDONTWRITEBYTECODE=1
+        "${PORT_PYTHON}" "${port_oracle_dir}/oracle.py" save floccesy_save
+            --oracle "${port_oracle_binary}" --version "${PORT_VERSION}" --save-cache "${port_oracle_saves}"
+    WORKING_DIRECTORY "${REPO_ROOT}")
+set_tests_properties(oracle_floccesy_save PROPERTIES SKIP_RETURN_CODE 77 TIMEOUT 3600
+    FIXTURES_REQUIRED oracle_saves FIXTURES_SETUP oracle_floccesy_save)
+port_test_labels(oracle_floccesy_save oracle)
+set_tests_properties(oracle_floccesy PROPERTIES TIMEOUT 7200)
+set_tests_properties(oracle_floccesy_continue PROPERTIES FIXTURES_REQUIRED oracle_floccesy_save)
+
+# The whole story up to SAVE is held frame for frame by oracle_floccesy. This separate trip plays SAVE to completion,
+# checks every save byte except the traced clock/CRC bytes, and continues both saves on the DS and in a fresh native
+# process. Neither an AI cut nor a shortened continuation is used.
+add_test(NAME oracle_round_trip_floccesy
+    COMMAND "${CMAKE_COMMAND}" -E env PYTHONDONTWRITEBYTECODE=1
+        "${PORT_PYTHON}" "${port_oracle_dir}/oracle.py" round-trip floccesy
+            --oracle "${port_oracle_binary}" --port "$<TARGET_FILE:${PORT_PROGRAM}>" --version "${PORT_VERSION}"
+            --save-cache "${port_oracle_saves}"
+    WORKING_DIRECTORY "${REPO_ROOT}")
+set_tests_properties(oracle_round_trip_floccesy PROPERTIES SKIP_RETURN_CODE 77 TIMEOUT 3600
+    FIXTURES_REQUIRED oracle_floccesy_save)
+port_test_labels(oracle_round_trip_floccesy route oracle)
 
 # Phase 4's exit (T6): the port plays the catch save's input file from melonDS's Route 19 save and saves the game it
 # caught a wild Purrloin in; melonDS continues that save frame for frame as it continues its own, and the port

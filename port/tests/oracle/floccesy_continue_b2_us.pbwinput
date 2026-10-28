@@ -1,0 +1,27 @@
+pbwinput 1
+# Phase 5: a new process continues the Route 20 save after Alder's Floccesy Town scenes.
+# The start menu, CONTINUE, the field, POKEMON (Tepig and the caught Purrloin), then back to the field.
+# oracle.py sequence floccesy_continue checks the DS save; round-trip floccesy also checks the native save
+# continued on the DS and in a fresh native process. Same tested boot/party controls as catch_continue.
+# Game frames (sVBlankCount), pinned clock and the DS's startup seed.
+version b2_us
+clock pinned
+seed 0x5a0af77416c50a14
+1100 START
+1101 -
+3000 START
+3001 -
+3100 START
+3101 -
+3400 A
+3401 -
+3800 X
+3806 -
+3860 A
+3866 -
+3920 A
+3926 -
+4400 B
+4406 -
+4460 B
+4466 -

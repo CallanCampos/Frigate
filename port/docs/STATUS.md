@@ -32,13 +32,78 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
 
+## 2026-10-28: Alder, Floccesy and Route 20 save/reload in both games
+
+- **Upstream:** `0f7a44e4315bde2140da62518dfad80819127a6e`. PR 49 merged as `21221ad250` after delegated
+  owner review, both ROM hashes, both full native suites (B2 316 passed/24 skipped of 340; W2 313/24 of 337) and
+  all 14 hosted checks passed on exact head `c0183d1f6d`. Its eleven naming commits preserve function addresses,
+  sizes and instruction modes in both versions. All 26 affected source/header files have identical tokens after
+  their 74 function names are normalized, both in pure upstream and in Frigate's adapted tree. No conflict,
+  workflow change or reference exception; documented port guards remain. Newer upstream commits are separate
+  reviewed sync work, not implicitly part of this feature.
+- **Port:** `PORT_SHA`, on `codex/phase5-floccesy`, from reviewed main `21221ad250`. No game C or HAL change.
+- **ROM (T0):** `PATH=/opt/homebrew/opt/llvm/bin:$PATH .venv/bin/python configure.py b2_us w2_us`, then `ninja`
+  passes all 351 incremental steps; both original SHA1s match: B2 `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb`,
+  W2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`. Publication rechecks these hashes.
+- **Host build (T1):** all targets build for both games on arm64 macOS, RelWithDebInfo, with the test-only oracle
+  enabled. Strict builds use Homebrew LLVM with ASan/UBSan, recovery off and frame-time report-only off. No
+  runtime source changes or new suppressions. The published PR's exact-head local verifier runs fresh canonical
+  ordinary builds and full native suites separately; its status records those final results.
+- **Tests (T2/T3):** `port/tests/oracle/test_saveimage.py`: 18 ROM-free corruption/integration tests pass, including
+  the real round-trip command rejecting a corrupt permitted CRC before decryption or boot, and the reference
+  writer accepting a valid wrapped zero counter. `test_compare.py`: 58 tests pass; replay screen tooling: 9 pass.
+  Both actual `replay_starter_save` tests pass with the last three content rows added to the SHA-checked DS
+  references. Existing 70-row references remain readable; all image integrity checks now cover 73 blocks.
+- **Oracle (T4):** the complete pre-SAVE route is compared through 31,900 native / 40,000 DS frames, from the
+  SHA-pinned `catch_save`, with authentic DS seeds. Examined capture comparisons pass 31,879/31,879 Black 2 and
+  31,871/31,871 White 2 screen frames at the existing tolerances. B2 compares 92,295 random-state and 30,765 NNS
+  dumps; W2 compares 92,211 and 30,747 respectively, zero differences. Another 42 W2 random-state dumps on NNS-only
+  excluded frames were checked separately and match. Nine top-only presentation frames per game are precisely
+  traced (initial InfoMsg and two four-pixel text scrolls); bottom screens and game state remain checked. Every
+  new state exclusion matches a later DS frame at the same counter. No trainer-AI cut or broader tolerance.
+- **Sanitizers and visual play (T5/T7):** both strict binaries on reviewed main `21221ad250` play all 34,600 frames
+  through SAVE with zero errors and exit zero; their saves match the ordinary native saves exactly. Actual
+  windowed apps continue isolated copies for 4,700 frames, open the party and return to Route 20, exit zero and
+  leave the input saves unchanged. Both party and final-field captures were inspected. New Route 20 performance
+  measurements are not yet claimed; existing canonical frame-time gates remain required without report-only.
+- **Saves (T6):** both canonical round trips complete: the DS continues native and DS saves for 6,900/6,900 identical
+  frames, then a fresh native process continues its own save for 4,700 frames (4,671 compared screens, 3,562 NNS
+  and 10,686 random-state dumps, zero differences). The checkpoint is zone 446, grid `(130,661)`, event work
+  `40a3=2`, `40a5=2`. Every byte agrees except play-time seconds and the CRCs derived from them (14 bytes total
+  across both banks); decrypted gifts, party, position and story flags agree. All 73 main blocks, padded 148-byte
+  CRC table and footer size/magic/checksum must pass in each bank before masking or reload. Actual DS/native/strict
+  checkpoint images and all twelve SHA-checked DS fixtures pass this complete validation. The save-image validator
+  does not claim coverage of independently loaded extra-save contents elsewhere on the card.
+- **Tiers:** unchanged from corrected source ownership: both games 41,017 tier (a), zero (b), zero (c), plus 2,385
+  veneers (16,906 bytes). Code bytes a/b/c: B2 3,850,260/0/0; W2 3,850,348/0/0. Tier-(a) data 1,824,388 bytes,
+  unowned data 168 per game. Source coverage is separate from native support and whole-game play coverage.
+- **Trap stubs:** unchanged at 25 functions plus one data placeholder per game: 15 networking/HTTP/crypto SDK,
+  ten DS boot/DSi/BIOS, and `CARDi_NdmaInterface`. No trap is reached on this route.
+- **64-bit warnings:** unchanged baseline: 365 sites/229 keys, real 66, harmless 123, handled 141, unreachable 35;
+  1,703 compiled inputs and zero uncompiled. No baseline or suppression edits. Remaining real sites were audited
+  as networking/Union Room/Download Play; they still need fixes before those features are promised.
+- **Work done:** reproducible ordinary-input story and continuation fixtures, separate later-save CTest dependency,
+  a full pre-SAVE comparison plus save/reload regression, and shared complete save-integrity validation. The old
+  helper's 70-block limit missed Funfest, Pokéstar Studios and Dream Radar; references and guides now cover all 73.
+  The save tools use linear CRC discovery and the trusted DS image's extents for native comparison. Current guides
+  distinguish verified checkpoints from the remaining game. ADR 0023 remains proposed; its new note and
+  decomp-findings qualify the actual AI budget and identify missing native CPU/I/O elapsed-time modeling.
+- **Next:** Phase 5's story criterion continues from Route 20 through Floccesy Ranch, Hugh's Town Map delivery and
+  the lost Lillipup, then the first gym. Before extending trainer-AI comparison cuts, measure script-load/opcode
+  timing and suspension boundaries on DS/native: correct CARD latency if it explains the missing time, otherwise
+  evaluate a measured work-cost model while preserving original AI/scripts/shared RNG.
+- **Blockers:** no missing game C blocks the next story leg. Full trainer-AI fidelity remains unresolved; a fixed
+  two-pass final-choice delay is not a faithful solution because AI commands also draw shared MT numbers. Later
+  story, native networking, distribution, controllers and the future mod platform remain unfinished. Issue 38's
+  recorder is unimplemented. Issue 45 needs Spanish Black 2 gameplay/save evidence; the owner has no such dump.
+
 ## 2026-10-28: corrected source ownership and reviewed field movement sync
 
 - **Upstream:** `ee0a7531a022ea6515e640e0d36dc8dfc537b81b`, two naming commits after `dae88ff545`.
   PR 47 merged as `96d846a593` after delegated owner review, both ROM hashes, both native suites and all hosted
   checks passed on exact head `8c75102430`. Its 38 function renames and one private structure rename normalize to
   otherwise identical C tokens in all four affected source/header files. No port conflict or workflow change.
-- **Port:** `PORT_SHA`, on `codex/progress-section-ownership`, from that reviewed main. No game or HAL code changes.
+- **Port:** `c443858af5`, on `codex/progress-section-ownership`, from that reviewed main. No game or HAL code changes.
 - **ROM (T0):** configure/Ninja completes all 2,853 steps; both original SHA1s match: B2
   `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb`, W2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`.
 - **Host build (T1):** both fresh canonical arm64 macOS RelWithDebInfo all-target builds pass, with sanitizer

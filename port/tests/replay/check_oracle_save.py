@@ -44,18 +44,10 @@ sys.path.insert(0, os.path.join(HERE, "..", "..", "tools", "oracle"))
 import oracle  # noqa: E402 - port/tools/oracle/oracle.py's SAVES, the oracle's saves and their SHA-1s
 
 NO_ROM = 66
-# The card's save memory, BW2's 4 Mbit flash, and the main save's two copies in it (src/system/save_table.c): each
-# ends with the CRC-16 of each block, in the order of the blocks, then a footer of 16 bytes
-BACKUP_SIZE = 0x80000
-COPY_SIZE = 0x26000
-COPIES = (0, COPY_SIZE)
-AFTER_COPIES = 2 * COPY_SIZE
-CRC_TABLE = 0x25f00
-BLOCK_COUNT = 70
-# A block starts 0x100-aligned, and its data is followed by its footer, a u16 count of its saves and the u16 CRC of
-# its data (src/gfl/backup_system.c, BlockFooter)
-BLOCK_ALIGN = 0x100
-BLOCK_FOOTER_SIZE = 4
+# Re-export these names for existing replay callers. Old 70-row content references remain readable; new
+# references cover all 73 blocks, and every image has both copies checked in full.
+from saveimage import (AFTER_COPIES, BACKUP_SIZE, BLOCK_ALIGN, BLOCK_COUNT, BLOCK_FOOTER_SIZE, COPIES, COPY_SIZE,
+                       CRC_TABLE, crc16_ccitt, find_blocks, validate_image)  # noqa: E402
 
 # The bytes of the port's save that differ from the oracle's by construction, by block (port/tools/oracle/README.md,
 # "Saves"), each with its traced cause: the block's index (save_control.h's SAVE_BLOCK_ order), the ranges as (offset
@@ -105,36 +97,6 @@ KNOWN_BLOCKS = {
 }
 
 
-def crc16_ccitt(data: bytes) -> int:
-    """The CRC the save puts after each block: CRC-16/CCITT-FALSE, as NitroSDK's MATH_CalcCRC16CCITT computes it"""
-    crc = 0xffff
-    for byte in data:
-        crc ^= byte << 8
-        for _ in range(8):
-            crc = ((crc << 1) ^ 0x1021) & 0xffff if crc & 0x8000 else (crc << 1) & 0xffff
-    return crc
-
-
-def find_blocks(save: bytes) -> list[tuple[int, int]]:
-    """Each block's offset and size in the first copy, found from the table of CRCs: a block's data runs from its
-    0x100-aligned start to the footer whose CRC is the table's and the data's"""
-    blocks = []
-    start = 0
-    for index in range(BLOCK_COUNT):
-        crc = struct.unpack_from("<H", save, CRC_TABLE + 2 * index)[0]
-        size = 0
-        while True:
-            if start + size + BLOCK_FOOTER_SIZE > CRC_TABLE:
-                raise ValueError(f"block {index}: no footer with its CRC {crc:#06x} after {start:#x}")
-            footer = struct.unpack_from("<HH", save, start + size)
-            if footer[1] == crc and footer[0] != 0 and crc16_ccitt(save[start:start + size]) == crc:
-                break
-            size += 4
-        blocks.append((start, size))
-        start = (start + size + BLOCK_FOOTER_SIZE + BLOCK_ALIGN - 1) // BLOCK_ALIGN * BLOCK_ALIGN
-    return blocks
-
-
 def masked_sha1(data: bytes, ranges: tuple[tuple[int, int], ...]) -> str:
     """The SHA-1 of a block's data with the ranges declared different zeroed"""
     data = bytearray(data)
@@ -174,6 +136,10 @@ def write_reference(path: str, oracle_save: str) -> int:
         print(f"check_oracle_save.py: {oracle_save} has the SHA-1 {digest}, not that of oracle.py's {name} for "
               f"{version} ({wanted})")
         return 1
+    problems = validate_image(save)
+    if problems:
+        print("check_oracle_save.py: invalid save image: " + "; ".join(problems))
+        return 1
     blocks = find_blocks(save)
     with open(path, "w") as f:
         f.write(f"# The oracle's {name} save of {version}, block by block (port/tools/oracle/oracle.py's SAVES,\n"
@@ -210,9 +176,9 @@ def run_chain(command: list[str], runs: list[tuple[int, str]], directory: str) -
 
 
 def check_save(save: bytes, reference: list[tuple[str, int, int, str]]) -> list[str]:
-    failures = []
     if len(save) != BACKUP_SIZE:
         return [f"the save is {len(save)} bytes, not the card's {BACKUP_SIZE}"]
+    failures = validate_image(save)
     for block, start, size, wanted in reference:
         if block == "after":
             if hashlib.sha1(save[start:start + size]).hexdigest() != wanted:

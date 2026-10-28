@@ -92,6 +92,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 
 import compare  # noqa: E402
+import saveimage  # noqa: E402
 import seeds  # noqa: E402
 import sound  # noqa: E402
 import symbols  # noqa: E402
@@ -249,6 +250,11 @@ BALLOON_SCROLL = ("a speech balloon at the top of the screen scrolls a line up 4
                   "lookout, Mom's and Bianca's on the way to Route 19, in both versions); where the DS's pass takes "
                   "two frames (White 2, count 4963), the first shows the step late and the second on time, which only "
                   "the port's frame of that count shows")
+FIELD_WINDOW_OPEN = ("Route 19's first InfoMsg window has reached VRAM after the DS has drawn its top-screen "
+                     "region: the whole main BG VRAM, palette and OAM are identical at the ends of DS frames 6588 "
+                     "and 6589, but the window appears on the LCD only in the latter. The native window equals "
+                     "that next frame exactly (the same InfoMsg/flush path in White 2). Only this top-screen "
+                     "presentation frame is omitted; the bottom screen, NNS and random state remain compared")
 MOVE_MENU = ("the DS's pass that takes the move menu down after a move is chosen takes two frames, the first showing "
              "it partway down (the moves' names cleared, their buttons still there) and the second the port's picture "
              "of that count: the count pairs the port's frame with the first, and the check of pictures no port frame "
@@ -641,6 +647,55 @@ SEQUENCES = {
         state=STATE + RANDOM_STATE,
         save="catch_save",
     ),
+    # Phase 5's first story leg: Alder on Route 19 and in Floccesy Town, then the road to Route 20. Compare the
+    # whole route before SAVE; round-trip floccesy checks the actual write and fresh-process continuations.
+    "floccesy": Sequence(
+        port_frames=31900,
+        oracle_frames=40000,
+        sample="",
+        clock="313-1108",
+        lags={"b2_us": "1109=0", "w2_us": "1109=0,3241=-1,3403=0"},
+        known={
+            "b2_us": {"2878": TORN_HIDE, "3001": TORN_BACK, "3101": TORN_START, "3112-3129": CAMERA},
+            "w2_us": {"2878": TORN_HIDE, "3001": TORN_BACK, "3101": TORN_START, "3112-3128": CAMERA,
+                      "3219-3240/3": CRY, "3402": CURSOR},
+        },
+        known_oracle={"b2_us": {"4920": TORN_START}, "w2_us": {"1260": TORN_OPENING, "4852": TORN_START}},
+        known_top={"b2_us": {"4530": FIELD_WINDOW_OPEN, "4983-4986,5063-5066": BALLOON_SCROLL},
+                   "w2_us": {"17230": FIELD_WINDOW_OPEN, "17987-17990,18067-18070": BALLOON_SCROLL}},
+        state_frames="1116-31900",
+        state_oracle="2800-40000",
+        known_state={"b2_us": {"3110-3124": CAMERA, "3432,3447,3454,3600,18524": MID_PASS},
+                     "w2_us": {"3110-3124": CAMERA,
+                               "3432,3447,3454,3600,4248,4302,4370,4376,4613,4892,5739,5764,10204,10258,"
+                               "10326,10332,10579,10864,12495,12758,12889,12914,31528": MID_PASS}},
+        known_random={"w2_us": {"4386,4613,4650,4751,4892,5725,10342,10579,10616,10717,10864,12059,"
+                                  "12196,12495,12875": MID_PASS}},
+        state=STATE + RANDOM_STATE,
+        save="catch_save",
+        input="floccesy_save",
+    ),
+    # A new process continues the Route 20 save, opens the party and returns to the field. These are the same
+    # controls as catch_continue, checked again on the new map by the sequence and the complete round trip.
+    "floccesy_continue": Sequence(
+        port_frames=4700,
+        oracle_frames=6900,
+        sample="",
+        clock="313-1108",
+        lags={"b2_us": "1109=0", "w2_us": "1109=0,3241=-1,3403=0"},
+        known={
+            "b2_us": {"2878": TORN_HIDE, "3001": TORN_BACK, "3101": TORN_START, "3112-3129": CAMERA},
+            "w2_us": {"2878": TORN_HIDE, "3001": TORN_BACK, "3101": TORN_START, "3112-3128": CAMERA,
+                      "3219-3240/3": CRY, "3402": CURSOR},
+        },
+        known_oracle={"b2_us": {"4920": TORN_START}, "w2_us": {"1260": TORN_OPENING, "4852": TORN_START}},
+        state_frames="1116-4700",
+        state_oracle="2800-6900",
+        known_state={"b2_us": {"3110-3124": CAMERA, "3432,3447,3454,3600,3804,4440,4443,4497": MID_PASS},
+                     "w2_us": {"3110-3124": CAMERA, "3432,3447,3454,3600,3804,4440,4443,4497": MID_PASS}},
+        state=STATE + RANDOM_STATE,
+        save="floccesy_save",
+    ),
     # center_continue: the Pokemon Center save, made after Hugh's battle, continued in a new run to the last frame
     # before the field fades in (oracle.py round-trip hugh also plays it from the port's own save): the start menu
     # with the saved game, CONTINUE, the black and the season's banner. The field would show the townsperson whose
@@ -758,6 +813,10 @@ SAVES = {
     # piece (catch), whose input file this is
     "catch_save": SaveMaker(13700, {"b2_us": "baf426358777119d6a3f22faaed08ca1270ada98",
                                     "w2_us": "64960699601c9f9a3409f5a0325af080f11dc325"}, start="route19_save"),
+    # Catch save through Alder's Route 19 introduction and both Floccesy scenes to Route 20, then SAVE at 32000.
+    # Both copies have 73 valid block CRCs, zone 446 at grid (130,661), and event work 40a3=2 / 40a5=2.
+    "floccesy_save": SaveMaker(40000, {"b2_us": "07d26e593786080b3a50f4d2afecd276bfed50b8",
+                                      "w2_us": "26ef0ed2e6cae38298b5543580e64172556e52dc"}, start="catch_save"),
 }
 
 # How each sequence's sound is compared (sound.py, README.md "Sound"): its segments of port frames, each with the range
@@ -1371,10 +1430,20 @@ CENTER_SAVE_BYTES = {
     both_copies("0x194b2-0x194b3,0x1d296-0x1d297,0x1f602-0x1f603,0x25f36-0x25f37,0x25f44-0x25f45,0x25f52-0x25f53,"
                 "0x25fa2-0x25fa3"): CENTER_CRCS,
 }
+# The Floccesy route starts from the same examined DS catch save on both programs. All party data, flags and
+# decrypted gifts agree; only play-time seconds and the CRCs that cover them differ. No mail or gift bytes omitted.
+FLOCCESY_SAVE_BYTES = {
+    both_copies("0x19427"): ("the play time's seconds, counted with each program's own clock ticks "
+                             "(src/system/playtime_ctrl.c, PLAY_TIME)"),
+    both_copies("0x194b2-0x194b3,0x25f36-0x25f37,0x25fa2-0x25fa3"):
+        "the trainer block's CRC, its CRC-table entry and the table footer's CRC over those play-time seconds",
+}
 ROUND_TRIPS = {
     # Phase 4's exit: the wild Purrloin caught on Route 19 and the game saved, then quit, and continued from the save
     "catch": RoundTrip("catch_save", 11600, "catch_continue",
                        known={"b2_us": CATCH_SAVE_BYTES, "w2_us": CATCH_SAVE_BYTES}),
+    "floccesy": RoundTrip("floccesy_save", 34600, "floccesy_continue",
+                          known={"b2_us": FLOCCESY_SAVE_BYTES, "w2_us": FLOCCESY_SAVE_BYTES}),
     # A trainer battle to its end: Hugh's, from the starter save, held to melonDS frame by frame up to his AI's second
     # move (the hugh sequence, ADR 0023's cut), the port's own past it, to the Pokemon Center's scene and SAVE there.
     # Its save is held to melonDS's byte by byte (Tepig's party data, the money, the bag, the flags and the rest), but
@@ -1498,6 +1567,19 @@ def command_round_trip(args) -> int:
         with open(path, "rb") as f:
             contents[name] = f.read()
         print(f"{name}'s save: SHA-1 {file_sha1(path)}")
+    # A CRC byte allowed to differ is still required to be correct. Validate both copies before masking or
+    # booting: the DS can otherwise recover from one good bank and hide a corrupt other bank. Native extents come
+    # from the examined DS image, never from potentially corrupt native footers.
+    for name in ("oracle", "port"):
+        reference = contents["oracle"] if name == "port" else None
+        problems = saveimage.validate_image(contents[name], reference=reference)
+        if problems:
+            for problem in problems:
+                print(f"the {name}'s save: {problem}")
+            print(f"oracle.py round-trip: FAIL; invalid save image; the runs are in {work}")
+            return 1
+        print(f"the {name}'s save: both copies' 73 block CRCs, checksum tables and footers valid")
+    for name in saves:
         # The mystery gift block is compared by what it holds, each save's decrypted with its own key
         plain[name], problems = mystery_gift_decrypted(contents[name])
         for problem in problems:
