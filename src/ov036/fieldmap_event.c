@@ -1317,7 +1317,7 @@ static GameEvent *CheckCallRandomEncounter(FieldInteractWk *wk, GameSystem *gsys
     EncountSystem *encounter = Field_GetEncountSystem(field);
 
     if (wk->walking) {
-        return EventWildBattleCall_CreateRandom(encounter, 0);
+        return EventWildBattleCall_CreateRandom(encounter, ENCOUNT_MODE_NORMAL);
     }
     return NULL;
 }

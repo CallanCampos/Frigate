@@ -7,6 +7,7 @@
 #include "battle/btl_result.h"
 #include "battle/btl_setup.h"
 #include "battle/trainer_data.h"
+#include "constants/battle.h"
 #include "constants/moves.h"
 #include "constants/pokemon.h"
 #include "constants/species.h"
@@ -17,6 +18,7 @@
 #include "field/event_battle.h"
 #include "field/event_battle_lose.h"
 #include "field/event_sound.h"
+#include "field/event_wild_battle.h"
 #include "field/festival.h"
 #include "field/field.h"
 #include "field/field_actor.h"
@@ -139,7 +141,7 @@ static GameEventReturnCode EventWildBattleCall_Callback(GameEvent *event, u32 *s
         species = PokeParty_GetParam(pkm, PKM_PARAM_SPECIES, NULL);
         form = PokeParty_GetParam(pkm, PKM_PARAM_FORM, NULL);
         field = GSYS_GetField(gsys);
-        EventBattleCall_DecideEnvWild(species, form, wk->unk0C, wk->setup->battleStyle == 1, field,
+        EventBattleCall_DecideEnvWild(species, form, wk->unk0C, wk->setup->battleStyle == BTL_STYLE_DOUBLE, field,
                                       &battleWork->encEffect, &battleWork->setup->fieldSituation.bgm);
         GameEvent_ChainNext(event, battle);
         (*state)++;
@@ -198,7 +200,7 @@ GameEvent *EventWildBattleCall_CreateCore(GameSystem *gsys, Field *field, BtlSet
     work->unk0C = a4;
     work->specialIndex = specialIndex;
     work->unk0A = BtlSetup_CheckFlag(setup, 1);
-    if (a4 == 1) {
+    if (a4 == ENCOUNT_MODE_EFFECT) {
         BtlSetup_SetFlag(setup, 1 << 14);
     }
     EventBattleCall_BroadcastWildBattle(setup, 0);
