@@ -210,7 +210,7 @@ u32 FieldPlayer_GetMoveStatus(FieldPlayer *player) {
 }
 
 u32 FieldPlayer_GetMoveObserveStatus(FieldPlayer *player) {
-    return func_ov036_0219afd8(player->core);
+    return FieldPlayerCore_GetMoveObserveStatus(player->core);
 }
 
 u32 FieldPlayer_GetExState(FieldPlayer *player) {

@@ -253,7 +253,7 @@ static BOOL FesMissionGimmick_IsRailPlaceBlocked(FesGimmick *gimmick, FesMission
                                                  const RailPosition *position) {
     BOOL result = FALSE;
 
-    if (func_ov036_0219584c(gimmick->actors, position, FALSE, work->actors[index]) != NULL) {
+    if (FindActorByRailPosExcluding(gimmick->actors, position, FALSE, work->actors[index]) != NULL) {
         return TRUE;
     }
     if (GetTriggerSCRIDAtPosRail(gimmick->eventData, gimmick->eventWork, position) != 0xffff) {

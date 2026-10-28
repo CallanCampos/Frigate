@@ -2279,14 +2279,14 @@ static BOOL FieldAcmdTCB_DrawReadyWaitInit11(FieldActor *actor) {
 
 static BOOL FieldAcmdTCB_DrawReadyWaitInit12(FieldActor *actor) {
     FldAct_SetDrawStatus(actor, 12);
-    func_ov036_02197288(actor);
+    RailActorAnim_ResetBlactAnime(actor);
     FieldActor_NextAcmdState(actor);
     return FALSE;
 }
 
 static BOOL FieldAcmdTCB_DrawReadyWaitInit13(FieldActor *actor) {
     FldAct_SetDrawStatus(actor, 13);
-    func_ov036_02197288(actor);
+    RailActorAnim_ResetBlactAnime(actor);
     FieldActor_NextAcmdState(actor);
     return FALSE;
 }

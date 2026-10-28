@@ -34,17 +34,17 @@ u32 FieldSubscreen_GetReturnSubscreen(FieldSubscreen *subscreen);
 void FieldSubscreen_ResetReturnSubscreen(FieldSubscreen *subscreen);
 void FieldSubscreen_SetMenuSelectedButton(FieldSubscreen *subscreen, u32 param);
 BOOL FieldSubscreen_IsReady(FieldSubscreen *subscreen);
-// The report's subscreen
 void FieldSubscreen_ResumeField(FieldSubscreen *subscreen, HeapID heapId);
 // Sets the subscreen to change to once the field menu closes
 void FieldSubscreen_SaveReturnSubscreen(FieldSubscreen *subscreen, u32 screenId);
 void FieldSubscreen_LoadBackdrop(FieldSubscreen *subscreen, HeapID heapId);
-BOOL func_ov036_02198b04(FieldSubscreen *subscreen);
-void func_ov036_02198b10(FieldSubscreen *subscreen);
-void func_ov036_02198b1c(FieldSubscreen *subscreen);
-BOOL func_ov036_02198b28(FieldSubscreen *subscreen);
-void func_ov036_02198b34(FieldSubscreen *subscreen);
-BOOL func_ov036_02198b40(FieldSubscreen *subscreen);
+// The report subscreen's save and its bar, through report.h's functions
+BOOL FieldSubscreen_Report_IsReady(FieldSubscreen *subscreen);
+void FieldSubscreen_Report_InitSave(FieldSubscreen *subscreen);
+void FieldSubscreen_Report_StartBar(FieldSubscreen *subscreen);
+BOOL FieldSubscreen_Report_IsBarFull(FieldSubscreen *subscreen);
+void FieldSubscreen_Report_StopBar(FieldSubscreen *subscreen);
+BOOL FieldSubscreen_Report_IsLargeSave(FieldSubscreen *subscreen);
 u32 FieldSubscreen_GetMenuSelectedButton(FieldSubscreen *subscreen);
 // heapId is a u32, not a HeapID: the original keeps the whole word and only truncates it to 16 bits where it passes it
 // to GFL_HeapAllocate and stores it

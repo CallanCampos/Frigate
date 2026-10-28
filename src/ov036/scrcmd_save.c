@@ -38,8 +38,8 @@ static GameEventReturnCode EventSaveData_Callback(GameEvent *event, u32 *state, 
         save->saveIcon = FieldSaveanime_Create(heapId, field);
         FieldSaveanime_Start(save->saveIcon);
         if (FieldSubscreen_GetScreenID(subscreen) == SUBSCREEN_CGEAR) {
-            func_ov036_02198b10(subscreen);
-            func_ov036_02198b1c(subscreen);
+            FieldSubscreen_Report_InitSave(subscreen);
+            FieldSubscreen_Report_StartBar(subscreen);
         }
         RecordAddOne(GameData_GetRecords(gameData), 1);
         if (!save->pokewood) {
@@ -68,12 +68,12 @@ static GameEventReturnCode EventSaveData_Callback(GameEvent *event, u32 *state, 
         break;
     case 2:
         if (*save->result == FALSE && FieldSubscreen_GetScreenID(subscreen) == SUBSCREEN_CGEAR) {
-            func_ov036_02198b34(subscreen);
+            FieldSubscreen_Report_StopBar(subscreen);
         }
         *state = 3;
         break;
     case 3:
-        if (FieldSubscreen_GetScreenID(subscreen) != SUBSCREEN_CGEAR || func_ov036_02198b28(subscreen)) {
+        if (FieldSubscreen_GetScreenID(subscreen) != SUBSCREEN_CGEAR || FieldSubscreen_Report_IsBarFull(subscreen)) {
             *state = 4;
         }
         break;

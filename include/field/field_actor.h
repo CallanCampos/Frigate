@@ -173,8 +173,8 @@ void FldBlAct_DeleteActorMmdl(FieldActor *actor, u32 index);
 // The creation of a billboard actor of an object code at a position, into out[1] with the material's flags in out[0],
 // calling back once a material that has to be loaded first is there; its deletion; and the scale of an actor's
 // billboard
-BOOL func_ov036_02193b14(MMSys *system, const FieldActorConfig *config, u16 *out, VecFx32 *pos,
-                         void (*callback)(u16 index, void *data), void *callbackData, u32 lights);
+BOOL FldBlAct_AddActorPosOrReserve(MMSys *system, const FieldActorConfig *config, u16 *out, VecFx32 *pos,
+                                   void (*callback)(u16 index, void *data), void *callbackData, u32 lights);
 void FldBlAct_DeleteActorPos(MMSys *system, u16 *out);
 void FldBlAct_GetActorSize(FieldActor *actor, u16 *scaleX, u16 *scaleY);
 // Overlay 36's field_rail_loader.c: sets a flag of the actor's rail billboard work
@@ -187,7 +187,7 @@ GameEvent *CreatePlayerXActorScriptCall(GameSystem *gsys, Field *field, u32 scri
 BOOL RailActorAnim_GetBlactAnimeTypeA(FieldActor *actor, u16 *anim, u16 *step);
 BOOL RailActorAnim_GetBlactAnimeTypeB(FieldActor *actor, u16 *anim, u16 *step);
 BOOL RailActorAnim_CheckBlactReady(FieldActor *actor);
-void func_ov036_02197288(FieldActor *actor);
+void RailActorAnim_ResetBlactAnime(FieldActor *actor);
 // The functions that run an action command: what to do on the first frame, each frame and at the end
 typedef BOOL (*ActorAcmdFunc)(FieldActor *actor);
 
@@ -279,33 +279,35 @@ void RailActor_UpdateRailWork(FieldActor *actor);
 void RailActor_SetMoveRequest(FieldActor *actor, u16 dir, u32 speed);
 u32 RailActor_GetHitBitsDirNoAttr(FieldActor *actor, u16 dir);
 u32 RailActor_GetHitBitsDir(FieldActor *actor, u16 dir, u32 *tile);
-FieldActor *func_ov036_0219584c(MMSys *system, const RailPosition *position, BOOL checkInit, FieldActor *exclude);
+FieldActor *FindActorByRailPosExcluding(MMSys *system, const RailPosition *position, BOOL checkInit,
+                                        FieldActor *exclude);
 void RailActor_SetGridPosByDir(FieldActor *actor, u16 dir);
-// The move codes of the rail actors: their init, update and delete functions
+// The move codes of the rail actors (0x45 to 0x54): their init, move, delete and recover functions; the waits turn to
+// a random direction of a set of DIR_LISTS, the walks step to one, and the patrol walks back and forth
 void RailActor_StayInit(FieldActor *actor);
-void func_ov036_02195b28(FieldActor *actor);
-void func_ov036_02195b38(FieldActor *actor);
-void func_ov036_02195b48(FieldActor *actor);
-void func_ov036_02195b58(FieldActor *actor);
-void func_ov036_02195b64(FieldActor *actor);
-void func_ov036_02195b70(FieldActor *actor);
-void func_ov036_02195b7c(FieldActor *actor);
-void func_ov036_02195b88(FieldActor *actor);
-void func_ov036_02195b94(FieldActor *actor);
-void func_ov036_02195ba0(FieldActor *actor);
-void func_ov036_02195bac(FieldActor *actor);
-void func_ov036_02195bb8(FieldActor *actor);
-void func_ov036_02195bc4(FieldActor *actor);
-void func_ov036_02195bd0(FieldActor *actor);
-void func_ov036_02195bdc(FieldActor *actor);
-void func_ov036_02195be4(FieldActor *actor);
-void func_ov036_02195bec(FieldActor *actor);
-void func_ov036_02195bf8(FieldActor *actor);
-void func_ov036_02195c04(FieldActor *actor);
-void func_ov036_02195c0c(FieldActor *actor);
-void func_ov036_02195c14(FieldActor *actor);
-void func_ov036_02195c1c(FieldActor *actor);
-void func_ov036_02195c24(FieldActor *actor);
+void RailActor_StayMove(FieldActor *actor);
+void RailActor_StayDelete(FieldActor *actor);
+void RailActor_Recover(FieldActor *actor);
+void RailActor_WaitInitAll(FieldActor *actor);
+void RailActor_WaitInitUpLeft(FieldActor *actor);
+void RailActor_WaitInitUpRight(FieldActor *actor);
+void RailActor_WaitInitDownLeft(FieldActor *actor);
+void RailActor_WaitInitDownRight(FieldActor *actor);
+void RailActor_WaitInitUpDownLeft(FieldActor *actor);
+void RailActor_WaitInitUpDownRight(FieldActor *actor);
+void RailActor_WaitInitUpLeftRight(FieldActor *actor);
+void RailActor_WaitInitDownLeftRight(FieldActor *actor);
+void RailActor_WaitInitUpDown(FieldActor *actor);
+void RailActor_WaitInitLeftRight(FieldActor *actor);
+void RailActor_WaitMove(FieldActor *actor);
+void RailActor_WaitDelete(FieldActor *actor);
+void RailActor_WalkInitAll(FieldActor *actor);
+void RailActor_WalkInitUpDown(FieldActor *actor);
+void RailActor_WalkMove(FieldActor *actor);
+void RailActor_WalkDelete(FieldActor *actor);
+void RailActor_PatrolInit(FieldActor *actor);
+void RailActor_PatrolMove(FieldActor *actor);
+void RailActor_PatrolDelete(FieldActor *actor);
 // Overlay 36's rail_data_handle.c: clears the rail data to no points, with the curves' and cameras' function tables
 void RailDataHandle_Reset(RailDataHandle *handle);
 u32 GetIndexOfObjID(u16 objCode);

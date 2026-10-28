@@ -94,7 +94,7 @@ u32 EventSave_Update(EventSaveWork *work, u32 *state) {
         break;
     case 1:
         if (FieldSubscreen_IsReady(Field_GetSubscreen(work->field)) == TRUE &&
-            func_ov036_02198b04(Field_GetSubscreen(work->field)) == TRUE) {
+            FieldSubscreen_Report_IsReady(Field_GetSubscreen(work->field)) == TRUE) {
             work->report = GFL_HeapAllocate(work->heapId, sizeof(ReportWork), FALSE, "report_event.c", 159);
             work->report->msgData =
                 GFL_MsgSysLoadData(FALSE, ARCID_SCRIPT_MESSAGE, SCRIPT_TEXT_GLOBAL_10520, work->heapId);
@@ -136,8 +136,8 @@ u32 EventSave_Update(EventSaveWork *work, u32 *state) {
         break;
     case 5:
         RecordAddOne(GameData_GetRecords(GSYS_GetGameData(work->gameSystem)), 1);
-        func_ov036_02198b10(Field_GetSubscreen(work->field));
-        if (func_ov036_02198b40(Field_GetSubscreen(work->field)) == TRUE) {
+        FieldSubscreen_Report_InitSave(Field_GetSubscreen(work->field));
+        if (FieldSubscreen_Report_IsLargeSave(Field_GetSubscreen(work->field)) == TRUE) {
             Report_PrintMessageInstant(work, 10);
         } else {
             Report_PrintMessageInstant(work, 4);
@@ -159,7 +159,7 @@ u32 EventSave_Update(EventSaveWork *work, u32 *state) {
         if (Report_IsAvatarReady(work)) {
             work->report->waitIcon =
                 WaitIcon_Create(GFL_VBlankGetTCBMgr(), work->report->window.window, 0xf, 0x10, work->heapId);
-            func_ov036_02198b1c(Field_GetSubscreen(work->field));
+            FieldSubscreen_Report_StartBar(Field_GetSubscreen(work->field));
             Report_StartSaveIcon(work);
             GameData_StartSave(GSYS_GetGameData(work->gameSystem));
             *state = 9;
@@ -174,7 +174,7 @@ u32 EventSave_Update(EventSaveWork *work, u32 *state) {
             *state = 10;
             break;
         case 3:
-            func_ov036_02198b34(Field_GetSubscreen(work->field));
+            FieldSubscreen_Report_StopBar(Field_GetSubscreen(work->field));
             Report_EndSaveIcon(work);
             Report_EndPlayerSaveSeq(work);
             Report_PrintMessage(work, 7);
@@ -184,7 +184,7 @@ u32 EventSave_Update(EventSaveWork *work, u32 *state) {
         }
         break;
     case 10:
-        if (func_ov036_02198b28(Field_GetSubscreen(work->field)) == TRUE) {
+        if (FieldSubscreen_Report_IsBarFull(Field_GetSubscreen(work->field)) == TRUE) {
             GFL_SndSEPlay(SEQ_SE_SAVE);
             Report_EndSaveIcon(work);
             Report_EndPlayerSaveSeq(work);

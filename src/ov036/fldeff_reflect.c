@@ -34,7 +34,7 @@ typedef struct {
     u8 created;
     u8 initialized;
     ReflectTaskParams params;
-    // The material's flags and the reflection's billboard actor, as func_ov036_02193b14 gives them
+    // The material's flags and the reflection's billboard actor, as FldBlAct_AddActorPosOrReserve gives them
     u16 blAct[2];
     FieldActorIdentity identity;
 } ReflectTask;
@@ -131,8 +131,8 @@ static void ReflectTask_Update(FieldEffectTask *task, void *data) {
             // Created at the origin; ReflectTask_UpdateBillboard places it below the actor
             VecFx32 pos = { 0, 0, 0 };
 
-            func_ov036_02193b14(work->params.mmSys, GetActorMdlInfo(work->params.actor), work->blAct, &pos,
-                                ReflectTask_UpdateBillboard, work, func_ov012_02166fc0(work->params.mmSys));
+            FldBlAct_AddActorPosOrReserve(work->params.mmSys, GetActorMdlInfo(work->params.actor), work->blAct, &pos,
+                                          ReflectTask_UpdateBillboard, work, func_ov012_02166fc0(work->params.mmSys));
         }
         work->created = TRUE;
     }

@@ -273,7 +273,7 @@ void FieldPlayerCore_ForceMoveObserveStatus(FieldPlayerCore *core, u32 status) {
     core->observeStatus = status;
 }
 
-u32 func_ov036_0219afd8(FieldPlayerCore *core) {
+u32 FieldPlayerCore_GetMoveObserveStatus(FieldPlayerCore *core) {
     return core->observeStatus;
 }
 

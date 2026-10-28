@@ -22,7 +22,7 @@ Field *FieldPlayerCore_GetField(FieldPlayerCore *core);
 FieldActor *FieldPlayerCore_GetActor(FieldPlayerCore *core);
 u32 FieldPlayerCore_GetMoveStatus(FieldPlayerCore *core);
 void FieldPlayerCore_ForceMoveObserveStatus(FieldPlayerCore *core, u32 status);
-u32 func_ov036_0219afd8(FieldPlayerCore *core);
+u32 FieldPlayerCore_GetMoveObserveStatus(FieldPlayerCore *core);
 u32 FieldPlayerCore_GetExState(FieldPlayerCore *core);
 void FieldPlayerCore_SetExState(FieldPlayerCore *core, u32 state);
 u32 FieldPlayerCore_GetSex(FieldPlayerCore *core);

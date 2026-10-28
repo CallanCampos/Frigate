@@ -653,27 +653,27 @@ static void FieldSubscreen_Report_UpdateAltFrame(FieldSubscreen *subscreen, BOOL
     Report_UpdateAltFrame(subscreen->work);
 }
 
-BOOL func_ov036_02198b04(FieldSubscreen *subscreen) {
+BOOL FieldSubscreen_Report_IsReady(FieldSubscreen *subscreen) {
     return Report_IsReady(subscreen->work);
 }
 
-void func_ov036_02198b10(FieldSubscreen *subscreen) {
+void FieldSubscreen_Report_InitSave(FieldSubscreen *subscreen) {
     Report_InitSave(subscreen->work);
 }
 
-void func_ov036_02198b1c(FieldSubscreen *subscreen) {
+void FieldSubscreen_Report_StartBar(FieldSubscreen *subscreen) {
     Report_StartBar(subscreen->work);
 }
 
-BOOL func_ov036_02198b28(FieldSubscreen *subscreen) {
+BOOL FieldSubscreen_Report_IsBarFull(FieldSubscreen *subscreen) {
     return Report_IsBarFull(subscreen->work);
 }
 
-void func_ov036_02198b34(FieldSubscreen *subscreen) {
+void FieldSubscreen_Report_StopBar(FieldSubscreen *subscreen) {
     Report_StopBar(subscreen->work);
 }
 
-BOOL func_ov036_02198b40(FieldSubscreen *subscreen) {
+BOOL FieldSubscreen_Report_IsLargeSave(FieldSubscreen *subscreen) {
     return Report_IsLargeSave(subscreen->work);
 }
 

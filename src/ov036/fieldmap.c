@@ -366,7 +366,7 @@ u32 FieldRoutine_MapLoad(GameSystem *gsys, Field *field) {
             field->lightSystem = FieldLight_Create(lightsId, daySeconds, GameSystem_GetSeason(gsys), field->fog,
                                                    field->g3dLights, field->heapId);
         }
-        field->weatherSystem = func_ov036_02199004(field->cameraSystem, field->lightSystem, field->fog, field->fogCtrl,
+        field->weatherSystem = FieldWeather_Create(field->cameraSystem, field->lightSystem, field->fog, field->fogCtrl,
                                                    GameData_GetFieldSoundSystem(field->gameData),
                                                    GameSystem_GetSeason(gsys), HEAPID_FIELD_WEATHER);
         SetWeatherInit(field->weatherSystem, GetNowWeather(field->gameData), HEAPID_FIELD_WEATHER);

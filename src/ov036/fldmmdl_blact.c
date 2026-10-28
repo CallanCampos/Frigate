@@ -371,8 +371,8 @@ void FldBlAct_DeleteActorMmdl(FieldActor *actor, u32 index) {
     }
 }
 
-BOOL func_ov036_02193b14(MMSys *system, const FieldActorConfig *config, u16 *out, VecFx32 *pos,
-                         void (*callback)(u16 index, void *data), void *callbackData, u32 lights) {
+BOOL FldBlAct_AddActorPosOrReserve(MMSys *system, const FieldActorConfig *config, u16 *out, VecFx32 *pos,
+                                   void (*callback)(u16 index, void *data), void *callbackData, u32 lights) {
     FieldBlAct *blact = FldActSys_GetFieldBlAct(system);
     u16 mat;
 

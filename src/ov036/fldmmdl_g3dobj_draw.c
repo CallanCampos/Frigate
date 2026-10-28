@@ -33,20 +33,20 @@ static void FldmmdlDraw_DrawEffect(FieldActor *actor) {
     }
 }
 
-static void func_ov036_02197510(FieldActor *actor) {
+static void FldmmdlDraw_DeleteEffect(FieldActor *actor) {
     u16 *work = FldAct_GetBlActWorkPtr(actor);
 
     FieldActorG3DSystem_DelObj(actor, *work);
 }
 
-static void func_ov036_02197524(FieldActor *actor) {
-    func_ov036_02197510(actor);
+static void FldmmdlDraw_SuspendEffect(FieldActor *actor) {
+    FldmmdlDraw_DeleteEffect(actor);
 }
 
-static void func_ov036_0219752c(FieldActor *actor) {
+static void FldmmdlDraw_WakeUpEffect(FieldActor *actor) {
     FldmmdlDraw_InitBlactId(actor);
 }
 
-const FieldActorSceneNodeVTable data_ov036_021cf9a0 = { FldmmdlDraw_InitBlactId, FldmmdlDraw_DrawEffect,
-                                                        func_ov036_02197510,     func_ov036_02197524,
-                                                        func_ov036_0219752c,     NULL };
+const FieldActorSceneNodeVTable data_ov036_021cf9a0 = { FldmmdlDraw_InitBlactId,  FldmmdlDraw_DrawEffect,
+                                                        FldmmdlDraw_DeleteEffect, FldmmdlDraw_SuspendEffect,
+                                                        FldmmdlDraw_WakeUpEffect, NULL };
