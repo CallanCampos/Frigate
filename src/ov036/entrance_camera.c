@@ -39,6 +39,17 @@ struct EntranceCamera {
     BOOL hasArrivalAnimation;
 };
 
+// The events of a warp, which index the callbacks that EventWarpSequence_CreateOut and EventWarpSequence_CreateIn
+// pick by its transition type
+enum {
+    WARP_EVENT_PLAIN,
+    WARP_EVENT_GROUND_ANIME,
+    WARP_EVENT_OBJECT_ANIME,
+    WARP_EVENT_APPEAR,
+    WARP_EVENT_CAMERA,
+    WARP_EVENT_FADE_SE,
+};
+
 // The data of the events that play the entrance when the player goes out of a zone and into one
 typedef struct {
     u32 unk0;
@@ -73,30 +84,30 @@ GameEvent *EventWarpSequence_CreateOut(WarpSequence *warp) {
     GameEvent *event;
     WarpOutData *data;
 
-    switch (warp->unk10) {
+    switch (warp->departureTransitionType) {
     case 0:
-        index = 0;
+        index = WARP_EVENT_PLAIN;
         break;
     case 1:
-        index = 0;
+        index = WARP_EVENT_PLAIN;
         break;
     case 2:
-        index = 2;
+        index = WARP_EVENT_OBJECT_ANIME;
         break;
     case 3:
-        index = 1;
+        index = WARP_EVENT_GROUND_ANIME;
         break;
     case 4:
-        index = 2;
+        index = WARP_EVENT_OBJECT_ANIME;
         break;
     case 5:
-        index = 3;
+        index = WARP_EVENT_APPEAR;
         break;
     case 6:
-        index = 5;
+        index = WARP_EVENT_FADE_SE;
         break;
     default:
-        index = 4;
+        index = WARP_EVENT_CAMERA;
         break;
     }
     event = GameEvent_Create(warp->gsys, warp->parent, callbacks[index], sizeof(WarpOutData));
@@ -324,7 +335,7 @@ static void EventWarpSequenceOut_FadeOutBGM(WarpOutData *out, GameEvent *event) 
     WarpSequence *warp = out->warp;
 
     GameEvent_ChainNext(event, EventBGMFadeOut_Create(warp->gsys, 30));
-    warp->unk4C = 1;
+    warp->bgmFadedOut = TRUE;
 }
 
 static void EventWarpSequenceOut_PlayTransition(WarpOutData *out, GameEvent *event) {
@@ -350,34 +361,34 @@ GameEvent *EventWarpSequence_CreateIn(WarpSequence *warp) {
 
     switch (warp->transitionType) {
     case 0:
-        index = 0;
+        index = WARP_EVENT_PLAIN;
         break;
     case 1:
-        index = 0;
+        index = WARP_EVENT_PLAIN;
         break;
     case 2:
-        index = 2;
+        index = WARP_EVENT_OBJECT_ANIME;
         break;
     case 3:
-        index = 1;
+        index = WARP_EVENT_GROUND_ANIME;
         break;
     case 4:
-        index = 2;
+        index = WARP_EVENT_OBJECT_ANIME;
         break;
     case 5:
-        index = 3;
+        index = WARP_EVENT_APPEAR;
         break;
     case 6:
-        index = 5;
+        index = WARP_EVENT_FADE_SE;
         break;
     default:
-        index = 4;
+        index = WARP_EVENT_CAMERA;
         break;
     }
     event = GameEvent_Create(warp->gsys, warp->parent, callbacks[index], sizeof(WarpInData));
     data = GameEvent_GetData(event);
     data->warp = warp;
-    if (index == 2) {
+    if (index == WARP_EVENT_OBJECT_ANIME) {
         TryRespawnFollowActor(warp->gameData, TRUE);
     } else {
         TryRespawnFollowActor(warp->gameData, FALSE);
@@ -434,7 +445,7 @@ GameEventReturnCode EventWarpSequenceIn_RunObjectAnime(GameEvent *event, u32 *st
     case 1:
         if (warp->zoneBGMChanged != 0) {
             EventWarpSequenceIn_FadeInBGM(in);
-        } else if (warp->unk4C != 0) {
+        } else if (warp->bgmFadedOut != 0) {
             EventWarpSequenceIn_ChainBGMFadeIn(in, event);
         }
         (*state)++;

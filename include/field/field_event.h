@@ -26,7 +26,9 @@ struct WarpSequence {
     GameSystem *gsys;
     GameData *gameData;
     Field *field;
-    u32 unk10;
+    // The transition types of the warps the player leaves by and arrives at, 0 for a move to a position, which pick the
+    // warp's events
+    u32 departureTransitionType;
     u32 transitionType;
     u16 zoneId;
     ZoneSpawnInfo spawn;
@@ -37,7 +39,8 @@ struct WarpSequence {
     u8 endSeason;
     // Whether the departure changed to the next zone's BGM, which the arrival then fades in
     u32 zoneBGMChanged;
-    u32 unk4C;
+    // Whether the departure faded the BGM out to keep it, which the arrival then fades back in
+    u32 bgmFadedOut;
     // The task that walks the player one tile, which the entrance events start
     FieldAcmdTCB *walkTask;
 };

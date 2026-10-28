@@ -426,7 +426,7 @@ void EventMapChange_SetupWarpSequenceOut(EventMapChange *wk, GameEvent *parent) 
     warp->gsys = wk->gsys;
     warp->gameData = wk->gameData;
     warp->field = wk->field;
-    warp->unk10 = wk->unk2C;
+    warp->departureTransitionType = wk->unk2C;
     warp->parent = parent;
     warp->zoneId = wk->zoneId;
     warp->spawn = wk->spawn;
@@ -436,7 +436,7 @@ void EventMapChange_SetupWarpSequenceOut(EventMapChange *wk, GameEvent *parent) 
     warp->startSeason = Season_GetNext(wk->prevSeason);
     warp->endSeason = wk->season;
     warp->zoneBGMChanged = 0;
-    warp->unk4C = 0;
+    warp->bgmFadedOut = 0;
 }
 
 void EventMapChange_SetupWarpSequenceIn(EventMapChange *wk, GameEvent *parent) {
@@ -445,7 +445,7 @@ void EventMapChange_SetupWarpSequenceIn(EventMapChange *wk, GameEvent *parent) {
     warp->gsys = wk->gsys;
     warp->gameData = wk->gameData;
     warp->field = wk->field;
-    warp->unk10 = wk->unk2C;
+    warp->departureTransitionType = wk->unk2C;
     warp->parent = parent;
     warp->zoneId = wk->zoneId;
     warp->spawn = wk->spawn;

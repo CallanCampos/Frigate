@@ -298,13 +298,13 @@ GameEvent *EntranceEffect_CreateB(WarpSequence *warp) {
     work->dir = Field_GetPlayerDirection(warp->field);
     work->stepIndex = 0;
     work->camera = EntranceCamera_Create(warp->field);
-    work->cameraParam.transitionType = warp->unk10;
+    work->cameraParam.transitionType = warp->departureTransitionType;
     work->cameraParam.isArrival = FALSE;
     work->cameraParam.isDeparture = TRUE;
     EntranceEffect_GetFrontPosition(warp->field, &work->pos);
     EntranceEffect_CreateDoorHandle(work);
     EntranceEffect_SetDepartureSteps(work);
-    if (CityState_IsSlotIndexOutOfRange(warp->unk10)) {
+    if (CityState_IsSlotIndexOutOfRange(warp->departureTransitionType)) {
         work->continueDirect = TRUE;
     } else {
         work->continueDirect = FALSE;
