@@ -146,6 +146,8 @@ void SetZoneNPCMdlID(EventData *eventData, u16 npcId, u16 objCode);
 void SetZoneNPCSCRID(EventData *eventData, u16 npcId, u16 scriptId);
 void GetNPCMdlInfoForOBJCODE(const MMSys *actorSystem, u16 objCode, FieldActorConfig *config);
 void LoadMModelSystemInfoCache(MMSys *mmSys, s32 index);
+// The flag that keeps an actor's face direction, which CheckSetActorFaceDir leaves alone while it is set
+#define ACTOR_FLAG_FACE_DIR_LOCK 0x8
 // The flag of an actor that moves on rails, which SetRailActorFlag sets
 #define ACTOR_FLAG_RAIL 0x2000
 void SetActorFlag(FieldActor *actor, u32 flag);
