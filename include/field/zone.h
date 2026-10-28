@@ -133,6 +133,8 @@ extern const u16 GEAR_STATION_PLATFORM_ZONES[9];
 // What GetRailIDForZone and GetCameraIDForZone return for a zone without one
 #define ZONE_RAIL_NONE 0xffffffff
 #define ZONE_CAMERA_NONE 0xffff
+// What GetZoneMatrixCamBoundIdx returns for a zone without a camera boundary
+#define ZONE_CAMERA_BOUNDARY_NONE 0xffff
 
 // ZoneSpawnInfo's changeType: a spawn at the warp warpId, or at a position with warpId -1. SetupZoneWarpArrival sets
 // the arrival at a warp's destination, or 3 for a warp whose destId is 0x100

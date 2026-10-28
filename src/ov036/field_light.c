@@ -64,6 +64,23 @@ typedef struct {
     u16 color;
 } FieldLightFlashInfo;
 
+// FieldLightFlashInfo's state: none, about to fade to the color, fading to it, fading back
+enum {
+    FLASH_STATE_NONE,
+    FLASH_STATE_START,
+    FLASH_STATE_TO_COLOR,
+    FLASH_STATE_RETURN,
+};
+
+// The returnFrames of a flash that stays on its color
+#define FLASH_NO_RETURN 0xffff
+
+// FieldLight's state: follow the time of day, or run a flash
+enum {
+    FIELD_LIGHT_STATE_TIME,
+    FIELD_LIGHT_STATE_FLASH,
+};
+
 struct FieldLight {
     u16 state;
     u16 season;
@@ -131,7 +148,7 @@ void FieldLight_Free(FieldLight *light) {
 void FieldLight_Update(FieldLight *light, s32 daySeconds) {
     if (light->count) {
         switch (light->state) {
-        case 0: {
+        case FIELD_LIGHT_STATE_TIME: {
             s32 endSeconds = FieldLight_GetLightEndSecond(light->season, &light->entries[light->index]);
             BOOL wrapped = FALSE;
             s32 prevIndex = light->index - 1;
@@ -156,10 +173,10 @@ void FieldLight_Update(FieldLight *light, s32 daySeconds) {
             }
             break;
         }
-        case 1:
+        case FIELD_LIGHT_STATE_FLASH:
             if (FieldLight_UpdateFlash(&light->flash, &light->interpolator, &light->current,
                                        &light->entries[light->index])) {
-                light->state = 0;
+                light->state = FIELD_LIGHT_STATE_TIME;
             }
             break;
         }
@@ -195,12 +212,12 @@ void FieldLight_ChangeDataDefault(FieldLight *light) {
 
 void FieldLight_StartFlash(FieldLight *light, u16 color, u32 frames, u32 returnFrames) {
     FieldLightFlashInfo_Set(&light->flash, frames, returnFrames, color);
-    light->state = 1;
+    light->state = FIELD_LIGHT_STATE_FLASH;
 }
 
 void FieldLight_StartFlashOneWay(FieldLight *light, u16 color, u32 frames) {
     FieldLightFlashInfo_SetOneWay(&light->flash, frames, color);
-    light->state = 1;
+    light->state = FIELD_LIGHT_STATE_FLASH;
 }
 
 BOOL FieldLight_IsFlashRunning(FieldLight *light) {
@@ -402,47 +419,47 @@ static void FieldLightInterpolator_Apply(const FieldLightInterpolator *interpola
 }
 
 static void FieldLightFlashInfo_Set(FieldLightFlashInfo *info, u16 frames, u16 returnFrames, u16 color) {
-    info->state = 1;
+    info->state = FLASH_STATE_START;
     info->frames = frames;
     info->returnFrames = returnFrames;
     info->color = color;
 }
 
 static void FieldLightFlashInfo_SetOneWay(FieldLightFlashInfo *info, u16 frames, u16 color) {
-    info->state = 1;
+    info->state = FLASH_STATE_START;
     info->frames = frames;
     info->color = color;
-    info->returnFrames = 0xffff;
+    info->returnFrames = FLASH_NO_RETURN;
 }
 
 static BOOL FieldLight_UpdateFlash(FieldLightFlashInfo *info, FieldLightInterpolator *interpolator,
                                    FieldLightEntry *current, const FieldLightEntry *target) {
     switch (info->state) {
-    case 1:
+    case FLASH_STATE_START:
         FieldLightInterpolator_BeginToConstColor(interpolator, current, info->color, info->frames);
-        info->state = 2;
+        info->state = FLASH_STATE_TO_COLOR;
         break;
-    case 2:
+    case FLASH_STATE_TO_COLOR:
         if (!FieldLightInterpolator_IsRunning(interpolator)) {
-            if (info->returnFrames != 0xffff) {
+            if (info->returnFrames != FLASH_NO_RETURN) {
                 FieldLightInterpolator_Begin(interpolator, current, target, info->returnFrames);
             }
-            info->state = 3;
+            info->state = FLASH_STATE_RETURN;
         }
         break;
-    case 3:
+    case FLASH_STATE_RETURN:
         if (!FieldLightInterpolator_IsRunning(interpolator)) {
-            info->state = 0;
+            info->state = FLASH_STATE_NONE;
         }
         break;
-    case 0:
+    case FLASH_STATE_NONE:
         return TRUE;
     }
     return FALSE;
 }
 
 static BOOL FieldLightFlashInfo_IsRunning(const FieldLightFlashInfo *info) {
-    if (info->state) {
+    if (info->state != FLASH_STATE_NONE) {
         return TRUE;
     }
     return FALSE;

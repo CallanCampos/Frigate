@@ -97,6 +97,9 @@ u16 GetTrainerClassEyeBGMID(u32 trainerClass);
 // The class's index among the classes with a battle BGM or pedestal of their own, or TRAINER_CLASS_SPECIAL_COUNT
 u8 GetTrainerClassSpecialId(u32 trainerClass);
 u32 GetTrainerClassBGMGroupId(u32 trainerClass);
+// What GetTrainerClassBattlePedestal returns for a class without a pedestal of its own
+#define TRAINER_PEDESTAL_NONE 20
+
 u32 GetTrainerClassBattlePedestal(u32 trainerClass);
 // The class's own battle background, or bg if it has none
 u32 CheckOverridenTrainerBattleBG(u32 trainerClass, u32 bg);

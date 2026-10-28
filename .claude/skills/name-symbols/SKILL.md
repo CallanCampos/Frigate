@@ -72,7 +72,9 @@ new names; the build checks that the scripts assemble to the same bytes.
 - **Parameters and locals** (`a0`, `param1`, `var2`) take the name of what they hold, from their uses and their callers'
   arguments; the prototype in the header changes with the definition.
 - **Accessors named after an offset** (`Btlv_GetUnk2E4`) are renamed with the field they read.
-- No tool renames these: edit them by hand, then let the build and `check_style.py` check you.
+- No tool renames these: edit them by hand, then let the build and `check_style.py` check you. A field can be set
+  in modules far from its struct's (a camera animation's flags are set by the field's fades, its entrances and an
+  overlay 12 event): `ninja -k 0` compiles everything and lists each `'unk48' is not a member` that is left.
 
 ## 6. Numbers
 

@@ -4,6 +4,7 @@
 #include "types.h"
 #include "battle/btl_setup.h"
 #include "battle/trainer_data.h"
+#include "constants/battle.h"
 #include "constants/species.h"
 #include "field/enc_pokeset.h"
 #include "field/encounter.h"
@@ -26,6 +27,7 @@
 #include "save/records.h"
 #include "system/game_data.h"
 #include "system/game_system.h"
+#include "system/zone_weather.h"
 
 static int FieldEncount_DecideTypeByTerrain(u32 tileType, u32 mode);
 static const EncountRateConfig *EncSys_GetEncountRateConfig(EncountSystem *system, int encType);
@@ -103,7 +105,7 @@ GameEvent *EventWildBattleCall_CreateRandom(EncountSystem *system, u32 mode) {
     int encType;
     BOOL forced = FALSE;
     BtlSetup *setup;
-    u8 nIndex = 0xff;
+    u8 nIndex = N_POKE_NONE;
     RoamingPkm *roamingPkm = NULL;
     EncountState *state;
     FieldPlayer *player;
@@ -111,7 +113,7 @@ GameEvent *EventWildBattleCall_CreateRandom(EncountSystem *system, u32 mode) {
     player = Field_GetPlayer(system->field);
     state = GameData_GetEncountState(system->gameData);
 
-    if (mode == 1 || mode == 2) {
+    if (mode == ENCOUNT_MODE_EFFECT || mode == ENCOUNT_MODE_SWEET_SCENT) {
         forced = TRUE;
     }
     if (!EncSys_IsActive(system, 1)) {
@@ -128,7 +130,7 @@ GameEvent *EventWildBattleCall_CreateRandom(EncountSystem *system, u32 mode) {
             system, state, FieldEncount_CalcEncountRate(&manager, system->gameData, state->encountRate), encType)) {
         return NULL;
     }
-    if (mode == 1) {
+    if (mode == ENCOUNT_MODE_EFFECT) {
         RecordAddOne(GameData_GetRecords(system->gameData), 0x70);
     } else {
         u16 zoneId = Field_GetPlayerStateZoneID(system->field);
@@ -139,7 +141,7 @@ GameEvent *EventWildBattleCall_CreateRandom(EncountSystem *system, u32 mode) {
     if (roamingPkm != NULL) {
         setup = BtlSetup_Create(4);
         FieldEncount_SetupRoaming(system, &manager, setup, 4, roamingPkm);
-    } else if (nIndex != 0xff) {
+    } else if (nIndex != N_POKE_NONE) {
         setup = BtlSetup_Create(4);
         FieldEncount_SetupNPoke(system, &manager, setup, 4, nIndex);
     } else {
@@ -171,30 +173,30 @@ GameEvent *EventWildBattleCall_CreateStatic(EncountSystem *system, u16 species, 
     WildPkmParam *param;
 
     Field_GetPlayer(system->field);
-    CreateEncountManager(&manager, system->gameData, 0xff, 0,
+    CreateEncountManager(&manager, system->gameData, ENCTYPE_NONE, ENCOUNT_MODE_NORMAL,
                          FieldWeather_GetWeatherId(Field_GetWeatherSystem(system->field)));
     param = &params[0];
     MI_CpuFill8(params, 0, sizeof(params));
     param->species = species;
     param->level = level;
     param->form = form;
-    if (flags & 4) {
+    if (flags & STATIC_ENC_FLAG_NO_ITEM) {
         param->item = 0xffff;
     }
-    if (flags & 2) {
-        param->shinyLock = 1;
-    } else if (flags & 0x10) {
-        param->shinyLock = 2;
+    if (flags & STATIC_ENC_FLAG_SHINY) {
+        param->shinyLock = WILD_SHINY_FORCED;
+    } else if (flags & STATIC_ENC_FLAG_NOT_SHINY) {
+        param->shinyLock = WILD_SHINY_NEVER;
     } else {
-        param->shinyLock = 0;
+        param->shinyLock = WILD_SHINY_RANDOM;
     }
-    if (flags & 8) {
+    if (flags & STATIC_ENC_FLAG_HIDDEN_ABILITY) {
         param->hiddenAbility = TRUE;
     }
-    if (flags & 0x20) {
-        param->sex = 1;
-    } else if (flags & 0x40) {
-        param->sex = 2;
+    if (flags & STATIC_ENC_FLAG_MALE) {
+        param->sex = WILD_SEX_MALE;
+    } else if (flags & STATIC_ENC_FLAG_FEMALE) {
+        param->sex = WILD_SEX_FEMALE;
     }
     setup = BtlSetup_Create(4);
     FieldEncount_SetupNormal(system, &manager, setup, 4, params);
@@ -282,20 +284,20 @@ static int FieldEncount_DecideTypeByTerrain(u32 tileType, u32 mode) {
     u32 tileClass;
 
     if (!MapTile_IsValid(tileType)) {
-        return 0xff;
+        return ENCTYPE_NONE;
     }
     flags = GetTileFlags(tileType);
-    if (mode != 1 && !(flags & 4)) {
-        return 0xff;
+    if (mode != ENCOUNT_MODE_EFFECT && !(flags & TILE_FLAG_ENCOUNT)) {
+        return ENCTYPE_NONE;
     }
     tileClass = GetTileClass(tileType);
-    if (flags & 2) {
-        if (mode == 1) {
+    if (flags & TILE_FLAG_WATER) {
+        if (mode == ENCOUNT_MODE_EFFECT) {
             return ENCTYPE_SURF_RARE;
         }
         return ENCTYPE_SURF;
     }
-    if (mode == 1) {
+    if (mode == ENCOUNT_MODE_EFFECT) {
         return ENCTYPE_GRASS_SHAKING;
     }
     if (MapTile_IsTallGrassDoubleBtl(tileClass)) {
@@ -399,29 +401,29 @@ void BtlSetup_SetTrainerLocal(EncountSystem *encountSystem, BtlSetup *setup, u32
     BtlSetup_Reset(setup);
     SaveBtlFieldStatus(&status, encountSystem->gameData, encountSystem->field);
     terrain = GetTrainerClassBattlePedestal(TrainerData_GetParam(trainerId, TRAINER_PARAM_CLASS));
-    if (terrain != 0x14) {
+    if (terrain != TRAINER_PEDESTAL_NONE) {
         status.terrain = terrain;
     }
     status.bgId = CheckOverridenTrainerBattleBG(TrainerData_GetParam(trainerId, TRAINER_PARAM_CLASS), status.bgId);
     switch (style) {
-    case 1:
+    case BTL_STYLE_DOUBLE:
         if (partnerId) {
             BtlSetup_SetTrainer2v2(setup, gameData, &status, partnerId, trainerId, trainerId2, heapId);
             return;
         }
         BtlSetup_SetTrainer1v1Double(setup, gameData, &status, trainerId, heapId);
         return;
-    case 0:
+    case BTL_STYLE_SINGLE:
         if (trainerId2) {
             BtlSetup_SetTrainer1v2(setup, gameData, &status, trainerId, trainerId2, heapId);
             return;
         }
         BtlSetup_SetTrainer1v1Single(setup, gameData, &status, trainerId, heapId);
         return;
-    case 2:
+    case BTL_STYLE_TRIPLE:
         BtlSetup_SetTrainer3v3(setup, gameData, &status, trainerId, heapId);
         return;
-    case 3:
+    case BTL_STYLE_ROTATION:
         BtlSetup_SetTrainerRotation(setup, gameData, &status, trainerId, heapId);
         break;
     }
@@ -429,18 +431,18 @@ void BtlSetup_SetTrainerLocal(EncountSystem *encountSystem, BtlSetup *setup, u32
 
 u32 ConvFieldWeatherToBtl(Field *field) {
     switch (FieldWeather_GetWeatherId(Field_GetWeatherSystem(field))) {
-    case 2:
-    case 6:
-    case 7:
-        return 2;
-    case 3:
-    case 12:
-        return 4;
-    case 4:
-    case 5:
-        return 3;
+    case WEATHER_RAIN:
+    case WEATHER_THUNDERSTORM:
+    case WEATHER_GUSTY_RAIN:
+        return BTL_WEATHER_RAIN;
+    case WEATHER_SANDSTORM:
+    case WEATHER_SANDSTORM_2:
+        return BTL_WEATHER_SANDSTORM;
+    case WEATHER_BLIZZARD:
+    case WEATHER_FLUTTER:
+        return BTL_WEATHER_HAIL;
     default:
-        return 0;
+        return BTL_WEATHER_NONE;
     }
 }
 
@@ -455,11 +457,11 @@ static void EncountState_SyncToPlayer(EncountState *state, FieldPlayer *player) 
 }
 
 static void EncountState_UpdateTerrain(EncountState *state, u32 tileType) {
-    u32 grass = GetTileFlags(tileType) & 4;
+    u32 grass = GetTileFlags(tileType) & TILE_FLAG_ENCOUNT;
     u32 tileClass;
     u32 oldClass;
 
-    if (grass != (GetTileFlags(state->terrain) & 4)) {
+    if (grass != (GetTileFlags(state->terrain) & TILE_FLAG_ENCOUNT)) {
         EncountState_SetTerrain(state, tileType);
         return;
     }
@@ -479,10 +481,10 @@ static void EncountState_UpdateTerrain(EncountState *state, u32 tileType) {
 }
 
 static void EncSys_UpdateEncountRate(EncountSystem *system, EncountState *state, u32 tileType) {
-    int encType = FieldEncount_DecideTypeByTerrain(tileType, 0);
+    int encType = FieldEncount_DecideTypeByTerrain(tileType, ENCOUNT_MODE_NORMAL);
     const EncountRateConfig *config = EncSys_GetEncountRateConfig(system, encType);
 
-    if (config == NULL || state->rateStepCounter >= 10 * FX32_ONE || encType == 0xff) {
+    if (config == NULL || state->rateStepCounter >= 10 * FX32_ONE || encType == ENCTYPE_NONE) {
         return;
     }
     state->rateStepCounter++;

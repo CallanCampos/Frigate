@@ -31,8 +31,9 @@ typedef struct {
     u32 frames;
     BOOL hasDepartureAnimation;
     BOOL hasArrivalAnimation;
-    BOOL unk48;
-    BOOL unk4C;
+    // The camera animation's releaseBind and disableBoundary
+    BOOL releaseBind;
+    BOOL disableBoundary;
 } EntranceCameraFile;
 
 // The events of a warp's ways out of a zone and into one, which EventWarpSequence_CreateOut and

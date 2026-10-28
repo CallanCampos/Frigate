@@ -13,6 +13,7 @@
 #include "field/field_player_core.h"
 #include "field/field_player_nogrid.h"
 #include "field/field_rail.h"
+#include "field/player_state.h"
 #include "field/zone.h"
 #include "gfl/heap.h"
 #include "gfl/key.h"
@@ -47,6 +48,20 @@ enum {
 #define NOGRID_FLAG_SLIDE_C 0x20
 #define NOGRID_FLAG_SLIDE_PENDING 0x40
 
+// The forced moves of the tiles under the player, which FieldPlayerRail_GetForcedMoveKind returns: by the tile checks
+// that find them, ice, the four ways that force a move, the tile that stops it, and the slope down
+enum {
+    FORCED_MOVE_NONE,
+    FORCED_MOVE_ICE,
+    FORCED_MOVE_UP,
+    FORCED_MOVE_DOWN,
+    FORCED_MOVE_LEFT,
+    FORCED_MOVE_RIGHT,
+    FORCED_MOVE_STOP,
+    FORCED_MOVE_SLIP_DOWN,
+    FORCED_MOVE_MAX,
+};
+
 #define NOGRID_MOVE_CODE 0x45 // Guessed name: the player rail movement callback set.
 
 typedef struct {
@@ -75,82 +90,85 @@ struct FieldPlayerNoGrid {
     RailUnit *railUnit;
 };
 
-typedef u16 (*SlideFunc)(FieldPlayerNoGrid *nogrid, u16 dir, u32 a2);
+typedef u16 (*SlideFunc)(FieldPlayerNoGrid *nogrid, u16 dir, u32 skipForcedMove);
 
 static BOOL FieldPlayerRail_CheckAllowUpdate(FieldPlayerNoGrid *nogrid, u16 dir);
-static u32 FieldPlayerRail_CheckAction(FieldPlayerNoGrid *nogrid, u32 dir, u32 pressedKeys, u32 heldKeys, BOOL a4);
+static u32 FieldPlayerRail_CheckAction(FieldPlayerNoGrid *nogrid, u32 dir, u32 pressedKeys, u32 heldKeys, BOOL force);
 static void FieldPlayerRail_StartAction(FieldPlayerNoGrid *nogrid, u32 command, u32 dir, u32 pressedKeys, u32 heldKeys,
-                                        BOOL a5);
+                                        BOOL force);
 static void FieldPlayerRail_UpdateFlagsAfterCheck(FieldPlayerNoGrid *nogrid, u32 heldKeys, u32 command);
 static u32 FieldPlayerRail_GetHitBits(FieldPlayerNoGrid *nogrid, FieldActor *actor, u16 dir, u32 *tileType);
 static void FieldPlayerRail_UpdateSpin(FieldPlayerNoGrid *nogrid);
 static void FieldPlayerRail_StartActionWalk(FieldPlayerNoGrid *nogrid, u32 command, u32 pressedKeys, u32 heldKeys,
-                                            u16 dir, BOOL a5);
-static u32 FieldPlayerRail_CheckActionWalk(FieldPlayerNoGrid *nogrid, u32 pressedKeys, u32 heldKeys, u16 dir, BOOL a4);
+                                            u16 dir, BOOL force);
+static u32 FieldPlayerRail_CheckActionWalk(FieldPlayerNoGrid *nogrid, u32 pressedKeys, u32 heldKeys, u16 dir,
+                                           BOOL force);
 static u32 FieldPlayerRail_CheckWalkFromStand(FieldPlayerNoGrid *nogrid, FieldActor *actor, u32 pressedKeys,
-                                              u32 heldKeys, u16 dir, BOOL a5);
+                                              u32 heldKeys, u16 dir, BOOL force);
 static u32 FieldPlayerRail_CheckWalkStep(FieldPlayerNoGrid *nogrid, FieldActor *actor, u32 pressedKeys, u32 heldKeys,
-                                         u16 dir, BOOL a5);
+                                         u16 dir, BOOL force);
 static u32 FieldPlayerRail_CheckWalkFromTurn(FieldPlayerNoGrid *nogrid, FieldActor *actor, u32 pressedKeys,
-                                             u32 heldKeys, u16 dir, BOOL a5);
+                                             u32 heldKeys, u16 dir, BOOL force);
 static u32 FieldPlayerRail_CheckWalkFromBlocked(FieldPlayerNoGrid *nogrid, FieldActor *actor, u32 pressedKeys,
-                                                u32 heldKeys, u16 dir, BOOL a5);
+                                                u32 heldKeys, u16 dir, BOOL force);
 static void FieldPlayerRail_StartWalkNone(FieldPlayerNoGrid *nogrid, FieldActor *actor, u32 pressedKeys, u32 heldKeys,
-                                          u16 dir, BOOL a5);
+                                          u16 dir, BOOL force);
 static void FieldPlayerRail_StartWalkStand(FieldPlayerNoGrid *nogrid, FieldActor *actor, u32 pressedKeys, u32 heldKeys,
-                                           u16 dir, BOOL a5);
+                                           u16 dir, BOOL force);
 static void FieldPlayerRail_StartWalkStep(FieldPlayerNoGrid *nogrid, FieldActor *actor, u32 pressedKeys, u32 heldKeys,
-                                          u16 dir, BOOL a5);
+                                          u16 dir, BOOL force);
 static void FieldPlayerRail_StartWalkTurn(FieldPlayerNoGrid *nogrid, FieldActor *actor, u32 pressedKeys, u32 heldKeys,
-                                          u16 dir, BOOL a5);
+                                          u16 dir, BOOL force);
 static void FieldPlayerRail_StartWalkBlocked(FieldPlayerNoGrid *nogrid, FieldActor *actor, u32 pressedKeys,
-                                             u32 heldKeys, u16 dir, BOOL a5);
+                                             u32 heldKeys, u16 dir, BOOL force);
 static void FieldPlayerRail_StartWalkLedgeJump(FieldPlayerNoGrid *nogrid, FieldActor *actor, u32 pressedKeys,
-                                               u32 heldKeys, u16 dir, BOOL a5);
+                                               u32 heldKeys, u16 dir, BOOL force);
 static void FieldPlayerRail_StartActionSlow(FieldPlayerNoGrid *nogrid, u32 command, u32 pressedKeys, u32 heldKeys,
-                                            u16 dir, BOOL a5);
-static u32 FieldPlayerRail_CheckActionSlow(FieldPlayerNoGrid *nogrid, u32 pressedKeys, u32 heldKeys, u16 dir, BOOL a4);
+                                            u16 dir, BOOL force);
+static u32 FieldPlayerRail_CheckActionSlow(FieldPlayerNoGrid *nogrid, u32 pressedKeys, u32 heldKeys, u16 dir,
+                                           BOOL force);
 static u32 FieldPlayerRail_CheckSlowFromStand(FieldPlayerNoGrid *nogrid, FieldActor *actor, u32 pressedKeys,
-                                              u32 heldKeys, u16 dir, BOOL a5);
+                                              u32 heldKeys, u16 dir, BOOL force);
 static u32 FieldPlayerRail_CheckSlowStep(FieldPlayerNoGrid *nogrid, FieldActor *actor, u32 pressedKeys, u32 heldKeys,
-                                         u16 dir, BOOL a5);
+                                         u16 dir, BOOL force);
 static u32 FieldPlayerRail_CheckSlowFromTurn(FieldPlayerNoGrid *nogrid, FieldActor *actor, u32 pressedKeys,
-                                             u32 heldKeys, u16 dir, BOOL a5);
+                                             u32 heldKeys, u16 dir, BOOL force);
 static u32 FieldPlayerRail_CheckSlowFromBlocked(FieldPlayerNoGrid *nogrid, FieldActor *actor, u32 pressedKeys,
-                                                u32 heldKeys, u16 dir, BOOL a5);
+                                                u32 heldKeys, u16 dir, BOOL force);
 static void FieldPlayerRail_StartSlowNone(FieldPlayerNoGrid *nogrid, FieldActor *actor, u32 pressedKeys, u32 heldKeys,
-                                          u16 dir, BOOL a5);
+                                          u16 dir, BOOL force);
 static void FieldPlayerRail_StartSlowStand(FieldPlayerNoGrid *nogrid, FieldActor *actor, u32 pressedKeys, u32 heldKeys,
-                                           u16 dir, BOOL a5);
+                                           u16 dir, BOOL force);
 static void FieldPlayerRail_StartSlowStep(FieldPlayerNoGrid *nogrid, FieldActor *actor, u32 pressedKeys, u32 heldKeys,
-                                          u16 dir, BOOL a5);
+                                          u16 dir, BOOL force);
 static void FieldPlayerRail_StartSlowTurn(FieldPlayerNoGrid *nogrid, FieldActor *actor, u32 pressedKeys, u32 heldKeys,
-                                          u16 dir, BOOL a5);
+                                          u16 dir, BOOL force);
 static void FieldPlayerRail_StartSlowBlocked(FieldPlayerNoGrid *nogrid, FieldActor *actor, u32 pressedKeys,
-                                             u32 heldKeys, u16 dir, BOOL a5);
+                                             u32 heldKeys, u16 dir, BOOL force);
 static void FieldPlayerRail_StartSlowLedgeJump(FieldPlayerNoGrid *nogrid, FieldActor *actor, u32 pressedKeys,
-                                               u32 heldKeys, u16 dir, BOOL a5);
+                                               u32 heldKeys, u16 dir, BOOL force);
 static void FieldPlayerRail_StartActionRail(FieldPlayerNoGrid *nogrid, u32 command, u32 pressedKeys, u32 heldKeys,
-                                            u16 dir, BOOL a5);
+                                            u16 dir, BOOL force);
 static void FieldPlayerRail_StartRailNone(FieldPlayerNoGrid *nogrid, FieldActor *actor, u32 pressedKeys, u32 heldKeys,
-                                          u16 dir, BOOL a5);
+                                          u16 dir, BOOL force);
 static void FieldPlayerRail_StartRailStand(FieldPlayerNoGrid *nogrid, FieldActor *actor, u32 pressedKeys, u32 heldKeys,
-                                           u16 dir, BOOL a5);
+                                           u16 dir, BOOL force);
 static void FieldPlayerRail_StartRailStep(FieldPlayerNoGrid *nogrid, FieldActor *actor, u32 pressedKeys, u32 heldKeys,
-                                          u16 dir, BOOL a5);
+                                          u16 dir, BOOL force);
 static void FieldPlayerRail_StartRailTurn(FieldPlayerNoGrid *nogrid, FieldActor *actor, u32 pressedKeys, u32 heldKeys,
-                                          u16 dir, BOOL a5);
+                                          u16 dir, BOOL force);
 static void FieldPlayerRail_StartRailBlocked(FieldPlayerNoGrid *nogrid, FieldActor *actor, u32 pressedKeys,
-                                             u32 heldKeys, u16 dir, BOOL a5);
-static u32 FieldPlayerRail_CheckActionRail(FieldPlayerNoGrid *nogrid, u32 pressedKeys, u32 heldKeys, u16 dir, BOOL a4);
+                                             u32 heldKeys, u16 dir, BOOL force);
+static u32 FieldPlayerRail_CheckActionRail(FieldPlayerNoGrid *nogrid, u32 pressedKeys, u32 heldKeys, u16 dir,
+                                           BOOL force);
 static u32 FieldPlayerRail_CheckRailFromStand(FieldPlayerNoGrid *nogrid, FieldActor *actor, u32 pressedKeys,
-                                              u32 heldKeys, u16 dir, BOOL a5);
+                                              u32 heldKeys, u16 dir, BOOL force);
 static u32 FieldPlayerRail_CheckRailStep(FieldPlayerNoGrid *nogrid, FieldActor *actor, u32 pressedKeys, u32 heldKeys,
-                                         u16 dir, BOOL a5);
+                                         u16 dir, BOOL force);
 static u32 FieldPlayerRail_CheckRailFromTurn(FieldPlayerNoGrid *nogrid, FieldActor *actor, u32 pressedKeys,
-                                             u32 heldKeys, u16 dir, BOOL a5);
+                                             u32 heldKeys, u16 dir, BOOL force);
 static u32 FieldPlayerRail_CheckRailFromBlocked(FieldPlayerNoGrid *nogrid, FieldActor *actor, u32 pressedKeys,
-                                                u32 heldKeys, u16 dir, BOOL a5);
+                                                u32 heldKeys, u16 dir, BOOL force);
 static void FieldPlayerRail_SetFlags(FieldPlayerNoGrid *nogrid, u32 flag);
 static void FieldPlayerRail_ClearFlags(FieldPlayerNoGrid *nogrid, u32 flag);
 static BOOL FieldPlayerRail_HasFlags(FieldPlayerNoGrid *nogrid, u32 flag);
@@ -168,15 +186,15 @@ static void FieldPlayerRail_ClearFaceRight(FieldPlayerNoGrid *nogrid);
 static void FieldPlayerRail_SetInputHold(FieldPlayerNoGrid *nogrid);
 static void FieldPlayerRail_ClearInputHold(FieldPlayerNoGrid *nogrid);
 static u32 FieldPlayerRail_GetForcedMoveKind(FieldPlayerNoGrid *nogrid);
-static u16 FieldPlayerRail_RunForcedMove(FieldPlayerNoGrid *nogrid, u16 dir, u32 a2);
+static u16 FieldPlayerRail_RunForcedMove(FieldPlayerNoGrid *nogrid, u16 dir, u32 skipForcedMove);
 static void FieldPlayerRail_EndForcedMove(FieldPlayerNoGrid *nogrid);
-static u16 FieldPlayerRail_ForcedSlide(FieldPlayerNoGrid *nogrid, u16 dir, u32 a2);
-static u16 FieldPlayerRail_ForcedSlideSpinA(FieldPlayerNoGrid *nogrid, u16 dir, u32 a2);
-static u16 FieldPlayerRail_ForcedSlideSpinB(FieldPlayerNoGrid *nogrid, u16 dir, u32 a2);
-static u16 FieldPlayerRail_ForcedSlideWarnDir2(FieldPlayerNoGrid *nogrid, u16 dir, u32 a2);
-static u16 FieldPlayerRail_ForcedSlideWarnDir3(FieldPlayerNoGrid *nogrid, u16 dir, u32 a2);
-static u16 FieldPlayerRail_ForcedSlideFaceRight(FieldPlayerNoGrid *nogrid, u16 dir, u32 a2);
-static u16 FieldPlayerRail_ForcedInputHold(FieldPlayerNoGrid *nogrid, u16 dir, u32 a2);
+static u16 FieldPlayerRail_ForcedSlide(FieldPlayerNoGrid *nogrid, u16 dir, u32 skipForcedMove);
+static u16 FieldPlayerRail_ForcedSlideSpinA(FieldPlayerNoGrid *nogrid, u16 dir, u32 skipForcedMove);
+static u16 FieldPlayerRail_ForcedSlideSpinB(FieldPlayerNoGrid *nogrid, u16 dir, u32 skipForcedMove);
+static u16 FieldPlayerRail_ForcedSlideWarnDir2(FieldPlayerNoGrid *nogrid, u16 dir, u32 skipForcedMove);
+static u16 FieldPlayerRail_ForcedSlideWarnDir3(FieldPlayerNoGrid *nogrid, u16 dir, u32 skipForcedMove);
+static u16 FieldPlayerRail_ForcedSlideFaceRight(FieldPlayerNoGrid *nogrid, u16 dir, u32 skipForcedMove);
+static u16 FieldPlayerRail_ForcedInputHold(FieldPlayerNoGrid *nogrid, u16 dir, u32 skipForcedMove);
 static void FieldPlayerRail_StartSpin(StepSound *sound, u32 kind);
 static void FieldPlayerRail_StopSpin(StepSound *sound);
 static void FieldPlayerRail_AdvanceSpin(StepSound *sound, FieldActor *actor);
@@ -196,7 +214,7 @@ static const u8 SPIN_FACE_DIRS[2][4] = {
 };
 
 // What the player does on each kind of slide, by FieldPlayerRail_GetForcedMoveKind's result
-static const SlideFunc SLIDE_FUNCS[8] = {
+static const SlideFunc SLIDE_FUNCS[FORCED_MOVE_MAX] = {
     NULL,
     FieldPlayerRail_ForcedSlide,
     FieldPlayerRail_ForcedSlideSpinA,
@@ -229,11 +247,11 @@ FieldPlayerNoGrid *FieldPlayerRail_Create(FieldPlayerCore *core, HeapID heapId) 
     FieldPlayerRail_InitInputHold(&nogrid->slide);
 
     switch (FieldPlayerCore_GetExState(nogrid->core)) {
-    case 2:
+    case FLD_PLAYER_EXSTATE_SURF:
         FieldPlayerCore_SetSpecialSeq(nogrid->core, 4);
         FieldPlayerCore_FinishFormChange(nogrid->core);
         break;
-    case 3:
+    case FLD_PLAYER_EXSTATE_DIVE:
         FieldPlayerCore_SetSpecialSeq(nogrid->core, 0x100);
         FieldPlayerCore_FinishFormChange(nogrid->core);
         break;
@@ -318,36 +336,36 @@ void FieldPlayerRail_EndBlockedWalk(FieldPlayerNoGrid *nogrid) {
     }
 }
 
-static u32 FieldPlayerRail_CheckAction(FieldPlayerNoGrid *nogrid, u32 dir, u32 pressedKeys, u32 heldKeys, BOOL a4) {
+static u32 FieldPlayerRail_CheckAction(FieldPlayerNoGrid *nogrid, u32 dir, u32 pressedKeys, u32 heldKeys, BOOL force) {
     u32 command;
 
     switch (FieldPlayerCore_GetExState(nogrid->core)) {
     case 0:
-        command = FieldPlayerRail_CheckActionWalk(nogrid, pressedKeys, heldKeys, dir, a4);
+        command = FieldPlayerRail_CheckActionWalk(nogrid, pressedKeys, heldKeys, dir, force);
         break;
     case 1:
-        command = FieldPlayerRail_CheckActionSlow(nogrid, pressedKeys, heldKeys, dir, a4);
+        command = FieldPlayerRail_CheckActionSlow(nogrid, pressedKeys, heldKeys, dir, force);
         break;
     case 2:
     case 3:
-        command = FieldPlayerRail_CheckActionRail(nogrid, pressedKeys, heldKeys, dir, a4);
+        command = FieldPlayerRail_CheckActionRail(nogrid, pressedKeys, heldKeys, dir, force);
         break;
     }
     return command;
 }
 
 static void FieldPlayerRail_StartAction(FieldPlayerNoGrid *nogrid, u32 command, u32 dir, u32 pressedKeys, u32 heldKeys,
-                                        BOOL a5) {
+                                        BOOL force) {
     switch (FieldPlayerCore_GetExState(nogrid->core)) {
     case 0:
-        FieldPlayerRail_StartActionWalk(nogrid, command, pressedKeys, heldKeys, dir, a5);
+        FieldPlayerRail_StartActionWalk(nogrid, command, pressedKeys, heldKeys, dir, force);
         break;
     case 1:
-        FieldPlayerRail_StartActionSlow(nogrid, command, pressedKeys, heldKeys, dir, a5);
+        FieldPlayerRail_StartActionSlow(nogrid, command, pressedKeys, heldKeys, dir, force);
         break;
     case 2:
     case 3:
-        FieldPlayerRail_StartActionRail(nogrid, command, pressedKeys, heldKeys, dir, a5);
+        FieldPlayerRail_StartActionRail(nogrid, command, pressedKeys, heldKeys, dir, force);
         break;
     }
 }
@@ -391,60 +409,61 @@ static BOOL FieldPlayerRail_CheckAllowUpdate(FieldPlayerNoGrid *nogrid, u16 dir)
 }
 
 static void FieldPlayerRail_StartActionWalk(FieldPlayerNoGrid *nogrid, u32 command, u32 pressedKeys, u32 heldKeys,
-                                            u16 dir, BOOL a5) {
+                                            u16 dir, BOOL force) {
     FieldActor *actor = nogrid->actor;
 
     switch (command) {
     case NOGRID_COMMAND_NONE:
-        FieldPlayerRail_StartWalkNone(nogrid, actor, pressedKeys, heldKeys, dir, a5);
+        FieldPlayerRail_StartWalkNone(nogrid, actor, pressedKeys, heldKeys, dir, force);
         break;
     case NOGRID_COMMAND_IDLE:
-        FieldPlayerRail_StartWalkStand(nogrid, actor, pressedKeys, heldKeys, dir, a5);
+        FieldPlayerRail_StartWalkStand(nogrid, actor, pressedKeys, heldKeys, dir, force);
         break;
     case NOGRID_COMMAND_MOVE:
-        FieldPlayerRail_StartWalkStep(nogrid, actor, pressedKeys, heldKeys, dir, a5);
+        FieldPlayerRail_StartWalkStep(nogrid, actor, pressedKeys, heldKeys, dir, force);
         break;
     case NOGRID_COMMAND_TURN:
-        FieldPlayerRail_StartWalkTurn(nogrid, actor, pressedKeys, heldKeys, dir, a5);
+        FieldPlayerRail_StartWalkTurn(nogrid, actor, pressedKeys, heldKeys, dir, force);
         break;
     case NOGRID_COMMAND_BRAKE:
-        FieldPlayerRail_StartWalkBlocked(nogrid, actor, pressedKeys, heldKeys, dir, a5);
+        FieldPlayerRail_StartWalkBlocked(nogrid, actor, pressedKeys, heldKeys, dir, force);
         break;
     case NOGRID_COMMAND_JUMP:
-        FieldPlayerRail_StartWalkLedgeJump(nogrid, actor, pressedKeys, heldKeys, dir, a5);
+        FieldPlayerRail_StartWalkLedgeJump(nogrid, actor, pressedKeys, heldKeys, dir, force);
         break;
     }
 }
 
-static u32 FieldPlayerRail_CheckActionWalk(FieldPlayerNoGrid *nogrid, u32 pressedKeys, u32 heldKeys, u16 dir, BOOL a4) {
+static u32 FieldPlayerRail_CheckActionWalk(FieldPlayerNoGrid *nogrid, u32 pressedKeys, u32 heldKeys, u16 dir,
+                                           BOOL force) {
     u32 command = NOGRID_COMMAND_NONE;
     FieldActor *actor = nogrid->actor;
 
     switch (nogrid->state) {
     case NOGRID_STATE_IDLE:
-        command = FieldPlayerRail_CheckWalkFromStand(nogrid, actor, pressedKeys, heldKeys, dir, a4);
+        command = FieldPlayerRail_CheckWalkFromStand(nogrid, actor, pressedKeys, heldKeys, dir, force);
         break;
     case NOGRID_STATE_MOVE:
-        command = FieldPlayerRail_CheckWalkStep(nogrid, actor, pressedKeys, heldKeys, dir, a4);
+        command = FieldPlayerRail_CheckWalkStep(nogrid, actor, pressedKeys, heldKeys, dir, force);
         break;
     case NOGRID_STATE_TURN:
-        command = FieldPlayerRail_CheckWalkFromTurn(nogrid, actor, pressedKeys, heldKeys, dir, a4);
+        command = FieldPlayerRail_CheckWalkFromTurn(nogrid, actor, pressedKeys, heldKeys, dir, force);
         break;
     case NOGRID_STATE_BRAKE:
-        command = FieldPlayerRail_CheckWalkFromBlocked(nogrid, actor, pressedKeys, heldKeys, dir, a4);
+        command = FieldPlayerRail_CheckWalkFromBlocked(nogrid, actor, pressedKeys, heldKeys, dir, force);
         break;
     }
     return command;
 }
 
 static u32 FieldPlayerRail_CheckWalkFromStand(FieldPlayerNoGrid *nogrid, FieldActor *actor, u32 pressedKeys,
-                                              u32 heldKeys, u16 dir, BOOL a5) {
+                                              u32 heldKeys, u16 dir, BOOL force) {
     if (IsAllActorAcmdFinished(actor) == TRUE) {
         if (dir != DIR_NONE) {
-            if (dir != GetActorFaceDir(actor) && a5 == FALSE) {
+            if (dir != GetActorFaceDir(actor) && force == FALSE) {
                 return NOGRID_COMMAND_TURN;
             }
-            return FieldPlayerRail_CheckWalkStep(nogrid, actor, pressedKeys, heldKeys, dir, a5);
+            return FieldPlayerRail_CheckWalkStep(nogrid, actor, pressedKeys, heldKeys, dir, force);
         }
         return NOGRID_COMMAND_IDLE;
     }
@@ -452,18 +471,18 @@ static u32 FieldPlayerRail_CheckWalkFromStand(FieldPlayerNoGrid *nogrid, FieldAc
 }
 
 static u32 FieldPlayerRail_CheckWalkStep(FieldPlayerNoGrid *nogrid, FieldActor *actor, u32 pressedKeys, u32 heldKeys,
-                                         u16 dir, BOOL a5) {
+                                         u16 dir, BOOL force) {
     u32 hit;
 
     if (!IsAllActorAcmdFinished(actor)) {
         return NOGRID_COMMAND_NONE;
     }
     if (dir == DIR_NONE) {
-        return FieldPlayerRail_CheckWalkFromStand(nogrid, actor, pressedKeys, heldKeys, dir, a5);
+        return FieldPlayerRail_CheckWalkFromStand(nogrid, actor, pressedKeys, heldKeys, dir, force);
     }
 
     hit = FieldPlayerRail_GetHitBits(nogrid, actor, dir, NULL);
-    if (a5 == TRUE && (hit & 2)) {
+    if (force == TRUE && (hit & 2)) {
         hit = 0;
     }
     if (hit == 0) {
@@ -497,39 +516,39 @@ static u32 FieldPlayerRail_CheckWalkStep(FieldPlayerNoGrid *nogrid, FieldActor *
 }
 
 static u32 FieldPlayerRail_CheckWalkFromTurn(FieldPlayerNoGrid *nogrid, FieldActor *actor, u32 pressedKeys,
-                                             u32 heldKeys, u16 dir, BOOL a5) {
+                                             u32 heldKeys, u16 dir, BOOL force) {
     if (!IsAllActorAcmdFinished(actor)) {
         return NOGRID_COMMAND_NONE;
     }
     if (dir == DIR_NONE) {
-        return FieldPlayerRail_CheckWalkFromStand(nogrid, actor, pressedKeys, heldKeys, dir, a5);
+        return FieldPlayerRail_CheckWalkFromStand(nogrid, actor, pressedKeys, heldKeys, dir, force);
     }
-    return FieldPlayerRail_CheckWalkStep(nogrid, actor, pressedKeys, heldKeys, dir, a5);
+    return FieldPlayerRail_CheckWalkStep(nogrid, actor, pressedKeys, heldKeys, dir, force);
 }
 
 static u32 FieldPlayerRail_CheckWalkFromBlocked(FieldPlayerNoGrid *nogrid, FieldActor *actor, u32 pressedKeys,
-                                                u32 heldKeys, u16 dir, BOOL a5) {
+                                                u32 heldKeys, u16 dir, BOOL force) {
     u16 faceDir = GetActorFaceDir(actor);
 
     if (dir != DIR_NONE && dir != faceDir) {
         FldAct_FreeAcmd(actor);
-        return FieldPlayerRail_CheckWalkStep(nogrid, actor, pressedKeys, heldKeys, dir, a5);
+        return FieldPlayerRail_CheckWalkStep(nogrid, actor, pressedKeys, heldKeys, dir, force);
     }
     if (!IsAllActorAcmdFinished(actor)) {
         return NOGRID_COMMAND_NONE;
     }
     if (dir == DIR_NONE) {
-        return FieldPlayerRail_CheckWalkFromStand(nogrid, actor, pressedKeys, heldKeys, dir, a5);
+        return FieldPlayerRail_CheckWalkFromStand(nogrid, actor, pressedKeys, heldKeys, dir, force);
     }
-    return FieldPlayerRail_CheckWalkStep(nogrid, actor, pressedKeys, heldKeys, dir, a5);
+    return FieldPlayerRail_CheckWalkStep(nogrid, actor, pressedKeys, heldKeys, dir, force);
 }
 
 static void FieldPlayerRail_StartWalkNone(FieldPlayerNoGrid *nogrid, FieldActor *actor, u32 pressedKeys, u32 heldKeys,
-                                          u16 dir, BOOL a5) {
+                                          u16 dir, BOOL force) {
 }
 
 static void FieldPlayerRail_StartWalkStand(FieldPlayerNoGrid *nogrid, FieldActor *actor, u32 pressedKeys, u32 heldKeys,
-                                           u16 dir, BOOL a5) {
+                                           u16 dir, BOOL force) {
     if (dir == DIR_NONE) {
         dir = GetActorFaceDir(actor);
     }
@@ -539,10 +558,10 @@ static void FieldPlayerRail_StartWalkStand(FieldPlayerNoGrid *nogrid, FieldActor
 }
 
 static void FieldPlayerRail_StartWalkStep(FieldPlayerNoGrid *nogrid, FieldActor *actor, u32 pressedKeys, u32 heldKeys,
-                                          u16 dir, BOOL a5) {
+                                          u16 dir, BOOL force) {
     u16 acmd;
 
-    if (a5 == TRUE) {
+    if (force == TRUE) {
         acmd = ACMD_WALK_2F;
     } else if (heldKeys & PAD_BUTTON_B) {
         acmd = ACMD_DASH;
@@ -555,14 +574,14 @@ static void FieldPlayerRail_StartWalkStep(FieldPlayerNoGrid *nogrid, FieldActor 
 }
 
 static void FieldPlayerRail_StartWalkTurn(FieldPlayerNoGrid *nogrid, FieldActor *actor, u32 pressedKeys, u32 heldKeys,
-                                          u16 dir, BOOL a5) {
+                                          u16 dir, BOOL force) {
     FldAct_SetAcmd(actor, GetAcmdForDir(dir, ACMD_STAY_WALK_2F));
     nogrid->state = NOGRID_STATE_TURN;
     FieldPlayerCore_SetMoveStatus(nogrid->core, PLAYER_MOVE_STATUS_TURN);
 }
 
 static void FieldPlayerRail_StartWalkBlocked(FieldPlayerNoGrid *nogrid, FieldActor *actor, u32 pressedKeys,
-                                             u32 heldKeys, u16 dir, BOOL a5) {
+                                             u32 heldKeys, u16 dir, BOOL force) {
     FldAct_SetAcmd(actor, GetAcmdForDir(dir, ACMD_STAY_WALK_16F));
     nogrid->state = NOGRID_STATE_BRAKE;
     FieldPlayerCore_SetMoveStatus(nogrid->core, PLAYER_MOVE_STATUS_NONE);
@@ -572,67 +591,68 @@ static void FieldPlayerRail_StartWalkBlocked(FieldPlayerNoGrid *nogrid, FieldAct
 }
 
 static void FieldPlayerRail_StartWalkLedgeJump(FieldPlayerNoGrid *nogrid, FieldActor *actor, u32 pressedKeys,
-                                               u32 heldKeys, u16 dir, BOOL a5) {
+                                               u32 heldKeys, u16 dir, BOOL force) {
     FldAct_SetAcmd(actor, GetAcmdForDir(dir, ACMD_JUMP_2));
     nogrid->state = NOGRID_STATE_MOVE;
     FieldPlayerCore_SetMoveStatus(nogrid->core, PLAYER_MOVE_STATUS_MOVE);
 }
 
 static void FieldPlayerRail_StartActionSlow(FieldPlayerNoGrid *nogrid, u32 command, u32 pressedKeys, u32 heldKeys,
-                                            u16 dir, BOOL a5) {
+                                            u16 dir, BOOL force) {
     FieldActor *actor = nogrid->actor;
 
     switch (command) {
     case NOGRID_COMMAND_NONE:
-        FieldPlayerRail_StartSlowNone(nogrid, actor, pressedKeys, heldKeys, dir, a5);
+        FieldPlayerRail_StartSlowNone(nogrid, actor, pressedKeys, heldKeys, dir, force);
         break;
     case NOGRID_COMMAND_IDLE:
-        FieldPlayerRail_StartSlowStand(nogrid, actor, pressedKeys, heldKeys, dir, a5);
+        FieldPlayerRail_StartSlowStand(nogrid, actor, pressedKeys, heldKeys, dir, force);
         break;
     case NOGRID_COMMAND_MOVE:
-        FieldPlayerRail_StartSlowStep(nogrid, actor, pressedKeys, heldKeys, dir, a5);
+        FieldPlayerRail_StartSlowStep(nogrid, actor, pressedKeys, heldKeys, dir, force);
         break;
     case NOGRID_COMMAND_TURN:
-        FieldPlayerRail_StartSlowTurn(nogrid, actor, pressedKeys, heldKeys, dir, a5);
+        FieldPlayerRail_StartSlowTurn(nogrid, actor, pressedKeys, heldKeys, dir, force);
         break;
     case NOGRID_COMMAND_BRAKE:
-        FieldPlayerRail_StartSlowBlocked(nogrid, actor, pressedKeys, heldKeys, dir, a5);
+        FieldPlayerRail_StartSlowBlocked(nogrid, actor, pressedKeys, heldKeys, dir, force);
         break;
     case NOGRID_COMMAND_JUMP:
-        FieldPlayerRail_StartSlowLedgeJump(nogrid, actor, pressedKeys, heldKeys, dir, a5);
+        FieldPlayerRail_StartSlowLedgeJump(nogrid, actor, pressedKeys, heldKeys, dir, force);
         break;
     }
 }
 
-static u32 FieldPlayerRail_CheckActionSlow(FieldPlayerNoGrid *nogrid, u32 pressedKeys, u32 heldKeys, u16 dir, BOOL a4) {
+static u32 FieldPlayerRail_CheckActionSlow(FieldPlayerNoGrid *nogrid, u32 pressedKeys, u32 heldKeys, u16 dir,
+                                           BOOL force) {
     u32 command = NOGRID_COMMAND_NONE;
     FieldActor *actor = nogrid->actor;
 
     switch (nogrid->state) {
     case NOGRID_STATE_IDLE:
-        command = FieldPlayerRail_CheckSlowFromStand(nogrid, actor, pressedKeys, heldKeys, dir, a4);
+        command = FieldPlayerRail_CheckSlowFromStand(nogrid, actor, pressedKeys, heldKeys, dir, force);
         break;
     case NOGRID_STATE_MOVE:
-        command = FieldPlayerRail_CheckSlowStep(nogrid, actor, pressedKeys, heldKeys, dir, a4);
+        command = FieldPlayerRail_CheckSlowStep(nogrid, actor, pressedKeys, heldKeys, dir, force);
         break;
     case NOGRID_STATE_TURN:
-        command = FieldPlayerRail_CheckSlowFromTurn(nogrid, actor, pressedKeys, heldKeys, dir, a4);
+        command = FieldPlayerRail_CheckSlowFromTurn(nogrid, actor, pressedKeys, heldKeys, dir, force);
         break;
     case NOGRID_STATE_BRAKE:
-        command = FieldPlayerRail_CheckSlowFromBlocked(nogrid, actor, pressedKeys, heldKeys, dir, a4);
+        command = FieldPlayerRail_CheckSlowFromBlocked(nogrid, actor, pressedKeys, heldKeys, dir, force);
         break;
     }
     return command;
 }
 
 static u32 FieldPlayerRail_CheckSlowFromStand(FieldPlayerNoGrid *nogrid, FieldActor *actor, u32 pressedKeys,
-                                              u32 heldKeys, u16 dir, BOOL a5) {
+                                              u32 heldKeys, u16 dir, BOOL force) {
     if (IsAllActorAcmdFinished(actor) == TRUE) {
         if (dir != DIR_NONE) {
-            if (dir != GetActorFaceDir(actor) && a5 == FALSE) {
+            if (dir != GetActorFaceDir(actor) && force == FALSE) {
                 return NOGRID_COMMAND_TURN;
             }
-            return FieldPlayerRail_CheckSlowStep(nogrid, actor, pressedKeys, heldKeys, dir, a5);
+            return FieldPlayerRail_CheckSlowStep(nogrid, actor, pressedKeys, heldKeys, dir, force);
         }
         return NOGRID_COMMAND_IDLE;
     }
@@ -640,18 +660,18 @@ static u32 FieldPlayerRail_CheckSlowFromStand(FieldPlayerNoGrid *nogrid, FieldAc
 }
 
 static u32 FieldPlayerRail_CheckSlowStep(FieldPlayerNoGrid *nogrid, FieldActor *actor, u32 pressedKeys, u32 heldKeys,
-                                         u16 dir, BOOL a5) {
+                                         u16 dir, BOOL force) {
     u32 hit;
 
     if (!IsAllActorAcmdFinished(actor)) {
         return NOGRID_COMMAND_NONE;
     }
     if (dir == DIR_NONE) {
-        return FieldPlayerRail_CheckSlowFromStand(nogrid, actor, pressedKeys, heldKeys, dir, a5);
+        return FieldPlayerRail_CheckSlowFromStand(nogrid, actor, pressedKeys, heldKeys, dir, force);
     }
 
     hit = FieldPlayerRail_GetHitBits(nogrid, actor, dir, NULL);
-    if (a5 == TRUE && (hit & 2)) {
+    if (force == TRUE && (hit & 2)) {
         hit = 0;
     }
     if (hit == 0) {
@@ -685,39 +705,39 @@ static u32 FieldPlayerRail_CheckSlowStep(FieldPlayerNoGrid *nogrid, FieldActor *
 }
 
 static u32 FieldPlayerRail_CheckSlowFromTurn(FieldPlayerNoGrid *nogrid, FieldActor *actor, u32 pressedKeys,
-                                             u32 heldKeys, u16 dir, BOOL a5) {
+                                             u32 heldKeys, u16 dir, BOOL force) {
     if (!IsAllActorAcmdFinished(actor)) {
         return NOGRID_COMMAND_NONE;
     }
     if (dir == DIR_NONE) {
-        return FieldPlayerRail_CheckSlowFromStand(nogrid, actor, pressedKeys, heldKeys, dir, a5);
+        return FieldPlayerRail_CheckSlowFromStand(nogrid, actor, pressedKeys, heldKeys, dir, force);
     }
-    return FieldPlayerRail_CheckSlowStep(nogrid, actor, pressedKeys, heldKeys, dir, a5);
+    return FieldPlayerRail_CheckSlowStep(nogrid, actor, pressedKeys, heldKeys, dir, force);
 }
 
 static u32 FieldPlayerRail_CheckSlowFromBlocked(FieldPlayerNoGrid *nogrid, FieldActor *actor, u32 pressedKeys,
-                                                u32 heldKeys, u16 dir, BOOL a5) {
+                                                u32 heldKeys, u16 dir, BOOL force) {
     u16 faceDir = GetActorFaceDir(actor);
 
     if (dir != DIR_NONE && dir != faceDir) {
         FldAct_FreeAcmd(actor);
-        return FieldPlayerRail_CheckSlowStep(nogrid, actor, pressedKeys, heldKeys, dir, a5);
+        return FieldPlayerRail_CheckSlowStep(nogrid, actor, pressedKeys, heldKeys, dir, force);
     }
     if (!IsAllActorAcmdFinished(actor)) {
         return NOGRID_COMMAND_NONE;
     }
     if (dir == DIR_NONE) {
-        return FieldPlayerRail_CheckSlowFromStand(nogrid, actor, pressedKeys, heldKeys, dir, a5);
+        return FieldPlayerRail_CheckSlowFromStand(nogrid, actor, pressedKeys, heldKeys, dir, force);
     }
-    return FieldPlayerRail_CheckSlowStep(nogrid, actor, pressedKeys, heldKeys, dir, a5);
+    return FieldPlayerRail_CheckSlowStep(nogrid, actor, pressedKeys, heldKeys, dir, force);
 }
 
 static void FieldPlayerRail_StartSlowNone(FieldPlayerNoGrid *nogrid, FieldActor *actor, u32 pressedKeys, u32 heldKeys,
-                                          u16 dir, BOOL a5) {
+                                          u16 dir, BOOL force) {
 }
 
 static void FieldPlayerRail_StartSlowStand(FieldPlayerNoGrid *nogrid, FieldActor *actor, u32 pressedKeys, u32 heldKeys,
-                                           u16 dir, BOOL a5) {
+                                           u16 dir, BOOL force) {
     if (dir == DIR_NONE) {
         dir = GetActorFaceDir(actor);
     }
@@ -727,21 +747,21 @@ static void FieldPlayerRail_StartSlowStand(FieldPlayerNoGrid *nogrid, FieldActor
 }
 
 static void FieldPlayerRail_StartSlowStep(FieldPlayerNoGrid *nogrid, FieldActor *actor, u32 pressedKeys, u32 heldKeys,
-                                          u16 dir, BOOL a5) {
+                                          u16 dir, BOOL force) {
     FldAct_SetAcmd(actor, GetAcmdForDir(dir, ACMD_WALK_2F));
     nogrid->state = NOGRID_STATE_MOVE;
     FieldPlayerCore_SetMoveStatus(nogrid->core, PLAYER_MOVE_STATUS_MOVE);
 }
 
 static void FieldPlayerRail_StartSlowTurn(FieldPlayerNoGrid *nogrid, FieldActor *actor, u32 pressedKeys, u32 heldKeys,
-                                          u16 dir, BOOL a5) {
+                                          u16 dir, BOOL force) {
     FldAct_SetAcmd(actor, GetAcmdForDir(dir, ACMD_STAY_WALK_2F));
     nogrid->state = NOGRID_STATE_TURN;
     FieldPlayerCore_SetMoveStatus(nogrid->core, PLAYER_MOVE_STATUS_TURN);
 }
 
 static void FieldPlayerRail_StartSlowBlocked(FieldPlayerNoGrid *nogrid, FieldActor *actor, u32 pressedKeys,
-                                             u32 heldKeys, u16 dir, BOOL a5) {
+                                             u32 heldKeys, u16 dir, BOOL force) {
     FldAct_SetAcmd(actor, GetAcmdForDir(dir, ACMD_STAY_WALK_16F));
     nogrid->state = NOGRID_STATE_BRAKE;
     FieldPlayerCore_SetMoveStatus(nogrid->core, PLAYER_MOVE_STATUS_NONE);
@@ -751,41 +771,41 @@ static void FieldPlayerRail_StartSlowBlocked(FieldPlayerNoGrid *nogrid, FieldAct
 }
 
 static void FieldPlayerRail_StartSlowLedgeJump(FieldPlayerNoGrid *nogrid, FieldActor *actor, u32 pressedKeys,
-                                               u32 heldKeys, u16 dir, BOOL a5) {
+                                               u32 heldKeys, u16 dir, BOOL force) {
     FldAct_SetAcmd(actor, GetAcmdForDir(dir, ACMD_JUMP_2));
     nogrid->state = NOGRID_STATE_MOVE;
     FieldPlayerCore_SetMoveStatus(nogrid->core, PLAYER_MOVE_STATUS_MOVE);
 }
 
 static void FieldPlayerRail_StartActionRail(FieldPlayerNoGrid *nogrid, u32 command, u32 pressedKeys, u32 heldKeys,
-                                            u16 dir, BOOL a5) {
+                                            u16 dir, BOOL force) {
     FieldActor *actor = FieldPlayerCore_GetActor(nogrid->core);
 
     switch (command) {
     case NOGRID_COMMAND_NONE:
-        FieldPlayerRail_StartRailNone(nogrid, actor, pressedKeys, heldKeys, dir, a5);
+        FieldPlayerRail_StartRailNone(nogrid, actor, pressedKeys, heldKeys, dir, force);
         break;
     case NOGRID_COMMAND_IDLE:
-        FieldPlayerRail_StartRailStand(nogrid, actor, pressedKeys, heldKeys, dir, a5);
+        FieldPlayerRail_StartRailStand(nogrid, actor, pressedKeys, heldKeys, dir, force);
         break;
     case NOGRID_COMMAND_MOVE:
-        FieldPlayerRail_StartRailStep(nogrid, actor, pressedKeys, heldKeys, dir, a5);
+        FieldPlayerRail_StartRailStep(nogrid, actor, pressedKeys, heldKeys, dir, force);
         break;
     case NOGRID_COMMAND_TURN:
-        FieldPlayerRail_StartRailTurn(nogrid, actor, pressedKeys, heldKeys, dir, a5);
+        FieldPlayerRail_StartRailTurn(nogrid, actor, pressedKeys, heldKeys, dir, force);
         break;
     case NOGRID_COMMAND_BRAKE:
-        FieldPlayerRail_StartRailBlocked(nogrid, actor, pressedKeys, heldKeys, dir, a5);
+        FieldPlayerRail_StartRailBlocked(nogrid, actor, pressedKeys, heldKeys, dir, force);
         break;
     }
 }
 
 static void FieldPlayerRail_StartRailNone(FieldPlayerNoGrid *nogrid, FieldActor *actor, u32 pressedKeys, u32 heldKeys,
-                                          u16 dir, BOOL a5) {
+                                          u16 dir, BOOL force) {
 }
 
 static void FieldPlayerRail_StartRailStand(FieldPlayerNoGrid *nogrid, FieldActor *actor, u32 pressedKeys, u32 heldKeys,
-                                           u16 dir, BOOL a5) {
+                                           u16 dir, BOOL force) {
     if (dir == DIR_NONE) {
         dir = GetActorFaceDir(actor);
     }
@@ -795,10 +815,10 @@ static void FieldPlayerRail_StartRailStand(FieldPlayerNoGrid *nogrid, FieldActor
 }
 
 static void FieldPlayerRail_StartRailStep(FieldPlayerNoGrid *nogrid, FieldActor *actor, u32 pressedKeys, u32 heldKeys,
-                                          u16 dir, BOOL a5) {
+                                          u16 dir, BOOL force) {
     u16 acmd;
 
-    if (a5 == TRUE) {
+    if (force == TRUE) {
         acmd = ACMD_WALK_2F;
     } else {
         acmd = ACMD_WALK_4F;
@@ -809,14 +829,14 @@ static void FieldPlayerRail_StartRailStep(FieldPlayerNoGrid *nogrid, FieldActor 
 }
 
 static void FieldPlayerRail_StartRailTurn(FieldPlayerNoGrid *nogrid, FieldActor *actor, u32 pressedKeys, u32 heldKeys,
-                                          u16 dir, BOOL a5) {
+                                          u16 dir, BOOL force) {
     FldAct_SetAcmd(actor, GetAcmdForDir(dir, ACMD_STAY_WALK_2F));
     nogrid->state = NOGRID_STATE_TURN;
     FieldPlayerCore_SetMoveStatus(nogrid->core, PLAYER_MOVE_STATUS_TURN);
 }
 
 static void FieldPlayerRail_StartRailBlocked(FieldPlayerNoGrid *nogrid, FieldActor *actor, u32 pressedKeys,
-                                             u32 heldKeys, u16 dir, BOOL a5) {
+                                             u32 heldKeys, u16 dir, BOOL force) {
     FldAct_SetAcmd(actor, GetAcmdForDir(dir, ACMD_STAY_WALK_16F));
     nogrid->state = NOGRID_STATE_BRAKE;
     FieldPlayerCore_SetMoveStatus(nogrid->core, PLAYER_MOVE_STATUS_NONE);
@@ -825,35 +845,36 @@ static void FieldPlayerRail_StartRailBlocked(FieldPlayerNoGrid *nogrid, FieldAct
     }
 }
 
-static u32 FieldPlayerRail_CheckActionRail(FieldPlayerNoGrid *nogrid, u32 pressedKeys, u32 heldKeys, u16 dir, BOOL a4) {
+static u32 FieldPlayerRail_CheckActionRail(FieldPlayerNoGrid *nogrid, u32 pressedKeys, u32 heldKeys, u16 dir,
+                                           BOOL force) {
     FieldActor *actor = FieldPlayerCore_GetActor(nogrid->core);
     u32 command = NOGRID_COMMAND_NONE;
 
     switch (nogrid->state) {
     case NOGRID_STATE_IDLE:
-        command = FieldPlayerRail_CheckRailFromStand(nogrid, actor, pressedKeys, heldKeys, dir, a4);
+        command = FieldPlayerRail_CheckRailFromStand(nogrid, actor, pressedKeys, heldKeys, dir, force);
         break;
     case NOGRID_STATE_MOVE:
-        command = FieldPlayerRail_CheckRailStep(nogrid, actor, pressedKeys, heldKeys, dir, a4);
+        command = FieldPlayerRail_CheckRailStep(nogrid, actor, pressedKeys, heldKeys, dir, force);
         break;
     case NOGRID_STATE_TURN:
-        command = FieldPlayerRail_CheckRailFromTurn(nogrid, actor, pressedKeys, heldKeys, dir, a4);
+        command = FieldPlayerRail_CheckRailFromTurn(nogrid, actor, pressedKeys, heldKeys, dir, force);
         break;
     case NOGRID_STATE_BRAKE:
-        command = FieldPlayerRail_CheckRailFromBlocked(nogrid, actor, pressedKeys, heldKeys, dir, a4);
+        command = FieldPlayerRail_CheckRailFromBlocked(nogrid, actor, pressedKeys, heldKeys, dir, force);
         break;
     }
     return command;
 }
 
 static u32 FieldPlayerRail_CheckRailFromStand(FieldPlayerNoGrid *nogrid, FieldActor *actor, u32 pressedKeys,
-                                              u32 heldKeys, u16 dir, BOOL a5) {
+                                              u32 heldKeys, u16 dir, BOOL force) {
     if (IsAllActorAcmdFinished(actor) == TRUE) {
         if (dir != DIR_NONE) {
-            if (dir != GetActorFaceDir(actor) && a5 == FALSE) {
+            if (dir != GetActorFaceDir(actor) && force == FALSE) {
                 return NOGRID_COMMAND_TURN;
             }
-            return FieldPlayerRail_CheckRailStep(nogrid, actor, pressedKeys, heldKeys, dir, a5);
+            return FieldPlayerRail_CheckRailStep(nogrid, actor, pressedKeys, heldKeys, dir, force);
         }
         return NOGRID_COMMAND_IDLE;
     }
@@ -861,7 +882,7 @@ static u32 FieldPlayerRail_CheckRailFromStand(FieldPlayerNoGrid *nogrid, FieldAc
 }
 
 static u32 FieldPlayerRail_CheckRailStep(FieldPlayerNoGrid *nogrid, FieldActor *actor, u32 pressedKeys, u32 heldKeys,
-                                         u16 dir, BOOL a5) {
+                                         u16 dir, BOOL force) {
     u32 hit;
     u32 tile;
 
@@ -869,11 +890,11 @@ static u32 FieldPlayerRail_CheckRailStep(FieldPlayerNoGrid *nogrid, FieldActor *
         return NOGRID_COMMAND_NONE;
     }
     if (dir == DIR_NONE) {
-        return FieldPlayerRail_CheckRailFromStand(nogrid, actor, pressedKeys, heldKeys, dir, a5);
+        return FieldPlayerRail_CheckRailFromStand(nogrid, actor, pressedKeys, heldKeys, dir, force);
     }
 
     hit = FieldPlayerRail_GetHitBits(nogrid, actor, dir, &tile);
-    if (a5 == TRUE && hit != 0 && !(hit & 0x10)) {
+    if (force == TRUE && hit != 0 && !(hit & 0x10)) {
         hit = 0;
     }
     if (tile != -1) {
@@ -885,7 +906,7 @@ static u32 FieldPlayerRail_CheckRailStep(FieldPlayerNoGrid *nogrid, FieldActor *
             if (flags & 2) {
                 return NOGRID_COMMAND_MOVE;
             }
-            if (a5 == TRUE) {
+            if (force == TRUE) {
                 return NOGRID_COMMAND_MOVE;
             }
         }
@@ -894,31 +915,31 @@ static u32 FieldPlayerRail_CheckRailStep(FieldPlayerNoGrid *nogrid, FieldActor *
 }
 
 static u32 FieldPlayerRail_CheckRailFromTurn(FieldPlayerNoGrid *nogrid, FieldActor *actor, u32 pressedKeys,
-                                             u32 heldKeys, u16 dir, BOOL a5) {
+                                             u32 heldKeys, u16 dir, BOOL force) {
     if (!IsAllActorAcmdFinished(actor)) {
         return NOGRID_COMMAND_NONE;
     }
     if (dir == DIR_NONE) {
-        return FieldPlayerRail_CheckRailFromStand(nogrid, actor, pressedKeys, heldKeys, dir, a5);
+        return FieldPlayerRail_CheckRailFromStand(nogrid, actor, pressedKeys, heldKeys, dir, force);
     }
-    return FieldPlayerRail_CheckRailStep(nogrid, actor, pressedKeys, heldKeys, dir, a5);
+    return FieldPlayerRail_CheckRailStep(nogrid, actor, pressedKeys, heldKeys, dir, force);
 }
 
 static u32 FieldPlayerRail_CheckRailFromBlocked(FieldPlayerNoGrid *nogrid, FieldActor *actor, u32 pressedKeys,
-                                                u32 heldKeys, u16 dir, BOOL a5) {
+                                                u32 heldKeys, u16 dir, BOOL force) {
     u16 faceDir = GetActorFaceDir(actor);
 
     if (dir != DIR_NONE && dir != faceDir) {
         FldAct_FreeAcmd(actor);
-        return FieldPlayerRail_CheckRailStep(nogrid, actor, pressedKeys, heldKeys, dir, a5);
+        return FieldPlayerRail_CheckRailStep(nogrid, actor, pressedKeys, heldKeys, dir, force);
     }
     if (!IsAllActorAcmdFinished(actor)) {
         return NOGRID_COMMAND_NONE;
     }
     if (dir == DIR_NONE) {
-        return FieldPlayerRail_CheckRailFromStand(nogrid, actor, pressedKeys, heldKeys, dir, a5);
+        return FieldPlayerRail_CheckRailFromStand(nogrid, actor, pressedKeys, heldKeys, dir, force);
     }
-    return FieldPlayerRail_CheckRailStep(nogrid, actor, pressedKeys, heldKeys, dir, a5);
+    return FieldPlayerRail_CheckRailStep(nogrid, actor, pressedKeys, heldKeys, dir, force);
 }
 
 static void FieldPlayerRail_SetFlags(FieldPlayerNoGrid *nogrid, u32 flag) {
@@ -995,38 +1016,38 @@ static u32 FieldPlayerRail_GetForcedMoveKind(FieldPlayerNoGrid *nogrid) {
     if (!FieldPlayerRail_HasFlags(nogrid, NOGRID_FLAG_SLIDE_END_SPOT)) {
         tileClass = GetTileClass(tile);
         if (IsTileSlidingIce(tileClass) == TRUE) {
-            return 1;
+            return FORCED_MOVE_ICE;
         }
         if (FieldRailTilemap_IsForceMoveUp(tileClass) == TRUE) {
-            return 2;
+            return FORCED_MOVE_UP;
         }
         if (FieldRailTilemap_IsForceMoveDown(tileClass) == TRUE) {
-            return 3;
+            return FORCED_MOVE_DOWN;
         }
         if (FieldRailTilemap_IsForceMoveLeft(tileClass) == TRUE) {
-            return 4;
+            return FORCED_MOVE_LEFT;
         }
         if (FieldRailTilemap_IsForceMoveRight(tileClass) == TRUE) {
-            return 5;
+            return FORCED_MOVE_RIGHT;
         }
         if (FieldRailTilemap_IsForceMoveStop(tileClass) == TRUE) {
-            return 6;
+            return FORCED_MOVE_STOP;
         }
         if (FieldRailTilemap_IsSlipDown(tileClass) == TRUE) {
-            return 7;
+            return FORCED_MOVE_SLIP_DOWN;
         }
     }
-    return 0;
+    return FORCED_MOVE_NONE;
 }
 
-static u16 FieldPlayerRail_RunForcedMove(FieldPlayerNoGrid *nogrid, u16 dir, u32 a2) {
+static u16 FieldPlayerRail_RunForcedMove(FieldPlayerNoGrid *nogrid, u16 dir, u32 skipForcedMove) {
     u32 slide;
 
     if (!IsAllActorAcmdFinished(nogrid->actor)) {
         return dir;
     }
-    if (a2 == 0 && (slide = FieldPlayerRail_GetForcedMoveKind(nogrid)) != 0) {
-        return SLIDE_FUNCS[slide](nogrid, dir, a2);
+    if (skipForcedMove == 0 && (slide = FieldPlayerRail_GetForcedMoveKind(nogrid)) != FORCED_MOVE_NONE) {
+        return SLIDE_FUNCS[slide](nogrid, dir, skipForcedMove);
     }
     FieldPlayerRail_EndForcedMove(nogrid);
     return dir;
@@ -1059,7 +1080,7 @@ static void FieldPlayerRail_EndForcedMove(FieldPlayerNoGrid *nogrid) {
     }
 }
 
-static u16 FieldPlayerRail_ForcedSlide(FieldPlayerNoGrid *nogrid, u16 dir, u32 a2) {
+static u16 FieldPlayerRail_ForcedSlide(FieldPlayerNoGrid *nogrid, u16 dir, u32 skipForcedMove) {
     FieldActor *actor = nogrid->actor;
     u16 motionDir = GetActorMotionDir(actor);
 
@@ -1078,7 +1099,7 @@ static u16 FieldPlayerRail_ForcedSlide(FieldPlayerNoGrid *nogrid, u16 dir, u32 a
     return motionDir;
 }
 
-static u16 FieldPlayerRail_ForcedSlideSpinA(FieldPlayerNoGrid *nogrid, u16 dir, u32 a2) {
+static u16 FieldPlayerRail_ForcedSlideSpinA(FieldPlayerNoGrid *nogrid, u16 dir, u32 skipForcedMove) {
     FieldActor *actor = nogrid->actor;
     u16 motionDir = GetActorMotionDir(actor);
 
@@ -1096,7 +1117,7 @@ static u16 FieldPlayerRail_ForcedSlideSpinA(FieldPlayerNoGrid *nogrid, u16 dir, 
     return motionDir;
 }
 
-static u16 FieldPlayerRail_ForcedSlideSpinB(FieldPlayerNoGrid *nogrid, u16 dir, u32 a2) {
+static u16 FieldPlayerRail_ForcedSlideSpinB(FieldPlayerNoGrid *nogrid, u16 dir, u32 skipForcedMove) {
     FieldActor *actor = nogrid->actor;
     u16 motionDir = GetActorMotionDir(actor);
 
@@ -1114,28 +1135,28 @@ static u16 FieldPlayerRail_ForcedSlideSpinB(FieldPlayerNoGrid *nogrid, u16 dir, 
     return motionDir;
 }
 
-static u16 FieldPlayerRail_ForcedSlideWarnDir2(FieldPlayerNoGrid *nogrid, u16 dir, u32 a2) {
+static u16 FieldPlayerRail_ForcedSlideWarnDir2(FieldPlayerNoGrid *nogrid, u16 dir, u32 skipForcedMove) {
     if (GetActorMotionDir(nogrid->actor) == DIR_LEFT) {
         GFL_SndSEPlay(SEQ_SE_DANSA);
     }
-    return FieldPlayerRail_ForcedSlide(nogrid, dir, a2);
+    return FieldPlayerRail_ForcedSlide(nogrid, dir, skipForcedMove);
 }
 
-static u16 FieldPlayerRail_ForcedSlideWarnDir3(FieldPlayerNoGrid *nogrid, u16 dir, u32 a2) {
+static u16 FieldPlayerRail_ForcedSlideWarnDir3(FieldPlayerNoGrid *nogrid, u16 dir, u32 skipForcedMove) {
     if (GetActorMotionDir(nogrid->actor) == DIR_RIGHT) {
         GFL_SndSEPlay(SEQ_SE_DANSA);
     }
-    return FieldPlayerRail_ForcedSlide(nogrid, dir, a2);
+    return FieldPlayerRail_ForcedSlide(nogrid, dir, skipForcedMove);
 }
 
-static u16 FieldPlayerRail_ForcedSlideFaceRight(FieldPlayerNoGrid *nogrid, u16 dir, u32 a2) {
-    u16 result = FieldPlayerRail_ForcedSlide(nogrid, dir, a2);
+static u16 FieldPlayerRail_ForcedSlideFaceRight(FieldPlayerNoGrid *nogrid, u16 dir, u32 skipForcedMove) {
+    u16 result = FieldPlayerRail_ForcedSlide(nogrid, dir, skipForcedMove);
 
     FieldPlayerRail_SetFaceRight(nogrid);
     return result;
 }
 
-static u16 FieldPlayerRail_ForcedInputHold(FieldPlayerNoGrid *nogrid, u16 dir, u32 a2) {
+static u16 FieldPlayerRail_ForcedInputHold(FieldPlayerNoGrid *nogrid, u16 dir, u32 skipForcedMove) {
     u16 result;
 
     if (!FieldPlayerRail_HasFlags(nogrid, NOGRID_FLAG_SLIDE_PENDING)) {

@@ -14,7 +14,7 @@
 #include "gfl/random.h"
 
 // The facing a walking code keeps for actors that turn and then restore it: the facing before, a row of
-// data_ov036_021cbb44 and whether movement flag 8 was set
+// sMirrorTurnOrders and whether movement flag 8 was set
 typedef struct {
     u8 dir;
     s8 row;
@@ -163,104 +163,104 @@ static void FieldActorMovecode_EndMirrorTurn(FieldActor *actor, ActorFaceMemory 
 
 // The tables are declared in this order because MWCC lays out objects of the same size by where each was declared:
 // it is one that gives the ROM's .rodata (found with tools/decomp/rodata_order.py's model), not the original's, which
-// is unknown. data_ov036_021cb8d8, data_ov036_021cbb64 and data_ov036_021cbc70 follow
+// is unknown. sBackForthSteps, sPlayerSightMoveCodes and sDirSets follow
 // FieldActorMovecode_SwingStepRotateDir for the same reason
-static BOOL (*const data_ov036_021cb87c[])(FieldActor *actor,
-                                           ActorRoundWork *work) = { FieldActorMovecode_RoutePatrolStepWalk,
-                                                                     FieldActorMovecode_RoutePatrolStepWaitWalk };
+static BOOL (*const sRoutePatrolSteps[])(FieldActor *actor,
+                                         ActorRoundWork *work) = { FieldActorMovecode_RoutePatrolStepWalk,
+                                                                   FieldActorMovecode_RoutePatrolStepWaitWalk };
 
-static const s32 data_ov036_021cb9f0[] = { DIR_LEFT, DIR_UP, DIR_DOWN, DIR_RIGHT };
+static const s32 sDirSet22[] = { DIR_LEFT, DIR_UP, DIR_DOWN, DIR_RIGHT };
 
-static const s32 data_ov036_021cb8e4[] = { DIR_UP, DIR_DOWN, DIR_NONE };
+static const s32 sDirSet9[] = { DIR_UP, DIR_DOWN, DIR_NONE };
 
-static const s32 data_ov036_021cb8b4[] = { DIR_DOWN, DIR_RIGHT, DIR_NONE };
+static const s32 sDirSet4[] = { DIR_DOWN, DIR_RIGHT, DIR_NONE };
 
-static const s32 data_ov036_021cb884[] = { DIR_UP, DIR_LEFT, DIR_NONE };
+static const s32 sDirSet1[] = { DIR_UP, DIR_LEFT, DIR_NONE };
 
-static const s32 data_ov036_021cb8cc[] = { DIR_LEFT, DIR_RIGHT, DIR_NONE };
+static const s32 sDirSet10[] = { DIR_LEFT, DIR_RIGHT, DIR_NONE };
 
-static const s32 data_ov036_021cb890[] = { DIR_DOWN, DIR_LEFT, DIR_NONE };
+static const s32 sDirSet3[] = { DIR_DOWN, DIR_LEFT, DIR_NONE };
 
-static const s32 data_ov036_021cb9c0[] = { DIR_UP, DIR_RIGHT, DIR_LEFT, DIR_DOWN };
+static const s32 sDirSet14[] = { DIR_UP, DIR_RIGHT, DIR_LEFT, DIR_DOWN };
 
-static const s32 data_ov036_021cb8a8[] = { DIR_UP, DIR_RIGHT, DIR_NONE };
+static const s32 sDirSet2[] = { DIR_UP, DIR_RIGHT, DIR_NONE };
 
-static const s32 data_ov036_021cb89c[] = { DIR_LEFT, DIR_RIGHT, DIR_NONE };
+static const s32 sDirSet13[] = { DIR_LEFT, DIR_RIGHT, DIR_NONE };
 
-static const s32 data_ov036_021cb990[] = { DIR_UP, DIR_LEFT, DIR_DOWN, DIR_RIGHT };
+static const s32 sDirSet30[] = { DIR_UP, DIR_LEFT, DIR_DOWN, DIR_RIGHT };
 
-static const s32 data_ov036_021cb950[] = { DIR_DOWN, DIR_UP, DIR_LEFT, DIR_RIGHT };
+static const s32 sDirSet20[] = { DIR_DOWN, DIR_UP, DIR_LEFT, DIR_RIGHT };
 
-static const s32 data_ov036_021cb8c0[] = { DIR_UP, DIR_DOWN, DIR_NONE };
+static const s32 sDirSet12[] = { DIR_UP, DIR_DOWN, DIR_NONE };
 
-static const s32 data_ov036_021cb980[] = { DIR_LEFT, DIR_UP, DIR_RIGHT, DIR_DOWN };
+static const s32 sDirSet36[] = { DIR_LEFT, DIR_UP, DIR_RIGHT, DIR_DOWN };
 
-static const s32 data_ov036_021cb9b0[] = { DIR_DOWN, DIR_LEFT, DIR_RIGHT, DIR_UP };
+static const s32 sDirSet29[] = { DIR_DOWN, DIR_LEFT, DIR_RIGHT, DIR_UP };
 
-static const s32 data_ov036_021cbb1c[] = { 0x10, 0x20, 0x30, 0x40, -1 };
+static const s32 sTurnWaitTimes[] = { 0x10, 0x20, 0x30, 0x40, -1 };
 
-static const s32 data_ov036_021cba90[] = { DIR_RIGHT, DIR_UP, DIR_LEFT, DIR_DOWN };
+static const s32 sDirSet33[] = { DIR_RIGHT, DIR_UP, DIR_LEFT, DIR_DOWN };
 
-static const s32 data_ov036_021cba80[] = { DIR_DOWN, DIR_RIGHT, DIR_LEFT, DIR_UP };
+static const s32 sDirSet25[] = { DIR_DOWN, DIR_RIGHT, DIR_LEFT, DIR_UP };
 
-static const s32 data_ov036_021cba00[] = { DIR_UP, DIR_DOWN, DIR_RIGHT, DIR_LEFT };
+static const s32 sDirSet23[] = { DIR_UP, DIR_DOWN, DIR_RIGHT, DIR_LEFT };
 
-static const s32 data_ov036_021cba40[] = { DIR_UP, DIR_LEFT, DIR_RIGHT, DIR_NONE };
+static const s32 sDirSet7[] = { DIR_UP, DIR_LEFT, DIR_RIGHT, DIR_NONE };
 
-static const s32 data_ov036_021cba50[] = { DIR_RIGHT, DIR_LEFT, DIR_UP, DIR_DOWN };
+static const s32 sDirSet24[] = { DIR_RIGHT, DIR_LEFT, DIR_UP, DIR_DOWN };
 
-static const s32 data_ov036_021cba70[] = { DIR_UP, DIR_DOWN, DIR_LEFT, DIR_NONE };
+static const s32 sDirSet5[] = { DIR_UP, DIR_DOWN, DIR_LEFT, DIR_NONE };
 
-static const s32 data_ov036_021cbab0[] = { DIR_LEFT, DIR_DOWN, DIR_UP, DIR_RIGHT };
+static const s32 sDirSet17[] = { DIR_LEFT, DIR_DOWN, DIR_UP, DIR_RIGHT };
 
-static const s32 data_ov036_021cba20[] = { DIR_LEFT, DIR_DOWN, DIR_RIGHT, DIR_UP };
+static const s32 sDirSet32[] = { DIR_LEFT, DIR_DOWN, DIR_RIGHT, DIR_UP };
 
-static const s32 data_ov036_021cba10[] = { DIR_RIGHT, DIR_UP, DIR_DOWN, DIR_LEFT };
+static const s32 sDirSet26[] = { DIR_RIGHT, DIR_UP, DIR_DOWN, DIR_LEFT };
 
-static const s32 data_ov036_021cb910[] = { DIR_UP, DIR_DOWN, DIR_LEFT, DIR_RIGHT };
+static const s32 sDirSet27[] = { DIR_UP, DIR_DOWN, DIR_LEFT, DIR_RIGHT };
 
-static BOOL (*const data_ov036_021cb8f0[])(FieldActor *actor, ActorPatrolWork *work) = {
+static BOOL (*const sRoutePatrolSwapSteps[])(FieldActor *actor, ActorPatrolWork *work) = {
     FieldActorMovecode_RoutePatrolSwapStepLookForPlayer, FieldActorMovecode_RoutePatrolSwapStepSwapMoveCode,
     FieldActorMovecode_RoutePatrolSwapStepWalk, FieldActorMovecode_RoutePatrolSwapStepWaitWalk
 };
 
-static const s32 data_ov036_021cb9e0[] = { DIR_DOWN, DIR_UP, DIR_RIGHT, DIR_LEFT };
+static const s32 sDirSet16[] = { DIR_DOWN, DIR_UP, DIR_RIGHT, DIR_LEFT };
 
-static const s32 data_ov036_021cb9d0[] = { DIR_RIGHT, DIR_LEFT, DIR_DOWN, DIR_UP };
+static const s32 sDirSet15[] = { DIR_RIGHT, DIR_LEFT, DIR_DOWN, DIR_UP };
 
-static const s32 data_ov036_021cbb44[][4] = { { DIR_UP, DIR_LEFT, DIR_DOWN, DIR_RIGHT },
-                                              { DIR_UP, DIR_RIGHT, DIR_DOWN, DIR_LEFT } };
+static const s32 sMirrorTurnOrders[][4] = { { DIR_UP, DIR_LEFT, DIR_DOWN, DIR_RIGHT },
+                                            { DIR_UP, DIR_RIGHT, DIR_DOWN, DIR_LEFT } };
 
-static const s32 data_ov036_021cb940[] = { DIR_LEFT, DIR_RIGHT, DIR_DOWN, DIR_UP };
+static const s32 sDirSet19[] = { DIR_LEFT, DIR_RIGHT, DIR_DOWN, DIR_UP };
 
-static const s32 data_ov036_021cb9a0[] = { DIR_LEFT, DIR_RIGHT, DIR_DOWN, DIR_UP };
+static const s32 sDirSet18[] = { DIR_LEFT, DIR_RIGHT, DIR_DOWN, DIR_UP };
 
-static BOOL (*const data_ov036_021cb960[])(FieldActor *actor, RailTurnWork *work) = {
+static BOOL (*const sSpinSteps[])(FieldActor *actor, RailTurnWork *work) = {
     FieldActorMovecode_SpinStepTurn,
     FieldActorMovecode_SpinStepWaitTurn,
     FieldActorMovecode_SpinStepWaitInterval,
     FieldActorMovecode_SpinStepRotateDir,
 };
 
-static const s32 data_ov036_021cb970[] = { DIR_DOWN, DIR_LEFT, DIR_UP, DIR_RIGHT };
+static const s32 sDirSet35[] = { DIR_DOWN, DIR_LEFT, DIR_UP, DIR_RIGHT };
 
-static const s32 data_ov036_021cbaf4[] = { DIR_UP, DIR_DOWN, DIR_LEFT, DIR_RIGHT, DIR_NONE };
+static const s32 sDirSet38[] = { DIR_UP, DIR_DOWN, DIR_LEFT, DIR_RIGHT, DIR_NONE };
 
-static const s32 data_ov036_021cbaa0[] = { DIR_RIGHT, DIR_DOWN, DIR_LEFT, DIR_UP };
+static const s32 sDirSet37[] = { DIR_RIGHT, DIR_DOWN, DIR_LEFT, DIR_UP };
 
-static const s32 data_ov036_021cba30[] = { DIR_UP, DIR_DOWN, DIR_RIGHT, DIR_NONE };
+static const s32 sDirSet6[] = { DIR_UP, DIR_DOWN, DIR_RIGHT, DIR_NONE };
 
-static const s32 data_ov036_021cba60[] = { DIR_DOWN, DIR_LEFT, DIR_RIGHT, DIR_NONE };
+static const s32 sDirSet8[] = { DIR_DOWN, DIR_LEFT, DIR_RIGHT, DIR_NONE };
 
-static const s32 data_ov036_021cbac0[] = { DIR_RIGHT, DIR_DOWN, DIR_UP, DIR_LEFT };
+static const s32 sDirSet21[] = { DIR_RIGHT, DIR_DOWN, DIR_UP, DIR_LEFT };
 
-static const s32 data_ov036_021cb920[] = { DIR_UP, DIR_RIGHT, DIR_DOWN, DIR_LEFT };
+static const s32 sDirSet34[] = { DIR_UP, DIR_RIGHT, DIR_DOWN, DIR_LEFT };
 
-static const s32 data_ov036_021cbae0[] = { DIR_UP, DIR_DOWN, DIR_LEFT, DIR_RIGHT, DIR_NONE };
+static const s32 sDirSet11[] = { DIR_UP, DIR_DOWN, DIR_LEFT, DIR_RIGHT, DIR_NONE };
 
-static const s32 data_ov036_021cb900[] = { DIR_LEFT, DIR_RIGHT, DIR_UP, DIR_DOWN };
+static const s32 sDirSet28[] = { DIR_LEFT, DIR_RIGHT, DIR_UP, DIR_DOWN };
 
-static BOOL (*const data_ov036_021cb930[])(FieldActor *actor, RailTurnWork *work) = {
+static BOOL (*const sSwingSteps[])(FieldActor *actor, RailTurnWork *work) = {
     FieldActorMovecode_SwingStepTurn,
     FieldActorMovecode_SwingStepWaitTurn,
     FieldActorMovecode_SwingStepWaitInterval,
@@ -269,7 +269,7 @@ static BOOL (*const data_ov036_021cb930[])(FieldActor *actor, RailTurnWork *work
 
 // The directions that each move code turns between, in turn, after the move code and ended by DIR_NONE. A move code
 // of 0xff ends the table
-static const u16 data_ov036_021cbbec[][6] = {
+static const u16 sMoveCodeTurnDirs[][6] = {
     { 4, DIR_UP, DIR_DOWN, DIR_NONE },
     { 5, DIR_LEFT, DIR_RIGHT, DIR_NONE },
     { 6, DIR_UP, DIR_LEFT, DIR_NONE },
@@ -283,17 +283,17 @@ static const u16 data_ov036_021cbbec[][6] = {
     { 0xff },
 };
 
-static const ActorMoveCodePair data_ov036_021cbb08[] = {
+static const ActorMoveCodePair sPatrolSwapMoveCodes[] = {
     { 0x25, 0x2b }, { 0x26, 0x2c }, { 0x27, 0x2a }, { 0x28, 0x29 }, { 0xff, 0xff },
 };
 
-static const s32 data_ov036_021cbb30[] = { DIR_UP, DIR_DOWN, DIR_LEFT, DIR_RIGHT, DIR_NONE };
+static const s32 sDirSet0[] = { DIR_UP, DIR_DOWN, DIR_LEFT, DIR_RIGHT, DIR_NONE };
 
-static const s32 data_ov036_021cbad0[] = { DIR_DOWN, DIR_RIGHT, DIR_UP, DIR_LEFT };
+static const s32 sDirSet31[] = { DIR_DOWN, DIR_RIGHT, DIR_UP, DIR_LEFT };
 
 static void FieldActorMovecode_InitTurnRandom(FieldActor *actor, u32 mask) {
     RailWanderWork *work = ClearActorPositionBlock(actor, sizeof(RailWanderWork));
-    work->timer = FieldActorMovecode_GetRandomTableEntry(data_ov036_021cbb1c, -1);
+    work->timer = FieldActorMovecode_GetRandomTableEntry(sTurnWaitTimes, -1);
     work->mask = mask;
     FldAct_SetDrawStatus(actor, 0);
     FldAct_ClearMoving(actor);
@@ -360,7 +360,7 @@ void FieldActorMovecode_MoveTurnRandom(FieldActor *actor) {
         } else if (work->pause == 0) {
             work->timer--;
             if (work->timer <= 0) {
-                work->timer = FieldActorMovecode_GetRandomTableEntry(data_ov036_021cbb1c, -1);
+                work->timer = FieldActorMovecode_GetRandomTableEntry(sTurnWaitTimes, -1);
                 dir = FieldActorMovecode_GetRandomDirFromSet(work->mask, DIR_NONE);
                 CheckSetActorFaceDir(actor, dir);
             }
@@ -372,11 +372,11 @@ void FieldActorMovecode_MoveTurnRandom(FieldActor *actor) {
 static u16 FieldActorMovecode_GetNextDirInRotation(u16 moveCode, u16 faceDir) {
     s32 i = 0;
     do {
-        if (moveCode == data_ov036_021cbbec[i][0]) {
+        if (moveCode == sMoveCodeTurnDirs[i][0]) {
             const u16 *entry;
             s32 j = 1;
 
-            entry = data_ov036_021cbbec[i];
+            entry = sMoveCodeTurnDirs[i];
             if (entry[1] != DIR_NONE) {
                 while (TRUE) {
                     if (faceDir == entry[j]) {
@@ -395,7 +395,7 @@ static u16 FieldActorMovecode_GetNextDirInRotation(u16 moveCode, u16 faceDir) {
             return DIR_NONE;
         }
         i++;
-    } while (data_ov036_021cbbec[i][0] != 0xff);
+    } while (sMoveCodeTurnDirs[i][0] != 0xff);
     return DIR_NONE;
 }
 
@@ -445,7 +445,7 @@ void FieldActorMovecode_MoveWalkRandom(FieldActor *actor) {
         if (!FieldAcmdTCB_Update(actor)) {
             break;
         }
-        work->timer = FieldActorMovecode_GetRandomTableEntry(data_ov036_021cbb1c, -1);
+        work->timer = FieldActorMovecode_GetRandomTableEntry(sTurnWaitTimes, -1);
         work->state++;
     case 2:
         work->timer--;
@@ -617,7 +617,7 @@ void FieldActorMovecode_InitSpinCounterClockwise(FieldActor *actor) {
 
 void FieldActorMovecode_MoveSpin(FieldActor *actor) {
     RailTurnWork *work = GetNPCRailPosPtrAddr(actor);
-    while (data_ov036_021cb960[work->state](actor, work) == TRUE) {
+    while (sSpinSteps[work->state](actor, work) == TRUE) {
     }
 }
 
@@ -701,7 +701,7 @@ void FieldActorMovecode_InitSwing(FieldActor *actor) {
 
 void FieldActorMovecode_MoveSwing(FieldActor *actor) {
     RailTurnWork *work = GetNPCRailPosPtrAddr(actor);
-    while (data_ov036_021cb930[work->state](actor, work) == TRUE) {
+    while (sSwingSteps[work->state](actor, work) == TRUE) {
     }
 }
 
@@ -758,27 +758,24 @@ static BOOL FieldActorMovecode_SwingStepRotateDir(FieldActor *actor, RailTurnWor
     return TRUE;
 }
 
-static BOOL (*const data_ov036_021cb8d8[])(FieldActor *actor, RailPaceWork *work) = {
+static BOOL (*const sBackForthSteps[])(FieldActor *actor, RailPaceWork *work) = {
     FieldActorMovecode_BackForthStepFaceDir,
     FieldActorMovecode_BackForthStepWalk,
     FieldActorMovecode_BackForthStepWaitWalk,
 };
 
-static const u32 data_ov036_021cbb64[] = {
+static const u32 sPlayerSightMoveCodes[] = {
     0x2, 0x6, 0x7, 0x8, 0x9, 0xa, 0xb, 0xc, 0xd, 0x2d, 0x2e, 0x12, 0x13, 0xff,
 };
 
-static const ActorDirTableEntry data_ov036_021cbc70[] = {
-    { 0, data_ov036_021cbb30 },  { 1, data_ov036_021cb884 },  { 2, data_ov036_021cb8a8 },  { 3, data_ov036_021cb890 },
-    { 4, data_ov036_021cb8b4 },  { 5, data_ov036_021cba70 },  { 6, data_ov036_021cba30 },  { 7, data_ov036_021cba40 },
-    { 8, data_ov036_021cba60 },  { 9, data_ov036_021cb8e4 },  { 10, data_ov036_021cb8cc }, { 11, data_ov036_021cbae0 },
-    { 12, data_ov036_021cb8c0 }, { 13, data_ov036_021cb89c }, { 14, data_ov036_021cb9c0 }, { 15, data_ov036_021cb9d0 },
-    { 16, data_ov036_021cb9e0 }, { 17, data_ov036_021cbab0 }, { 18, data_ov036_021cb9a0 }, { 19, data_ov036_021cb940 },
-    { 20, data_ov036_021cb950 }, { 21, data_ov036_021cbac0 }, { 22, data_ov036_021cb9f0 }, { 23, data_ov036_021cba00 },
-    { 24, data_ov036_021cba50 }, { 25, data_ov036_021cba80 }, { 26, data_ov036_021cba10 }, { 27, data_ov036_021cb910 },
-    { 28, data_ov036_021cb900 }, { 29, data_ov036_021cb9b0 }, { 30, data_ov036_021cb990 }, { 31, data_ov036_021cbad0 },
-    { 32, data_ov036_021cba20 }, { 33, data_ov036_021cba90 }, { 34, data_ov036_021cb920 }, { 35, data_ov036_021cb970 },
-    { 36, data_ov036_021cb980 }, { 37, data_ov036_021cbaa0 }, { 38, data_ov036_021cbaf4 }, { 0x27, NULL },
+static const ActorDirTableEntry sDirSets[] = {
+    { 0, sDirSet0 },   { 1, sDirSet1 },   { 2, sDirSet2 },   { 3, sDirSet3 },   { 4, sDirSet4 },   { 5, sDirSet5 },
+    { 6, sDirSet6 },   { 7, sDirSet7 },   { 8, sDirSet8 },   { 9, sDirSet9 },   { 10, sDirSet10 }, { 11, sDirSet11 },
+    { 12, sDirSet12 }, { 13, sDirSet13 }, { 14, sDirSet14 }, { 15, sDirSet15 }, { 16, sDirSet16 }, { 17, sDirSet17 },
+    { 18, sDirSet18 }, { 19, sDirSet19 }, { 20, sDirSet20 }, { 21, sDirSet21 }, { 22, sDirSet22 }, { 23, sDirSet23 },
+    { 24, sDirSet24 }, { 25, sDirSet25 }, { 26, sDirSet26 }, { 27, sDirSet27 }, { 28, sDirSet28 }, { 29, sDirSet29 },
+    { 30, sDirSet30 }, { 31, sDirSet31 }, { 32, sDirSet32 }, { 33, sDirSet33 }, { 34, sDirSet34 }, { 35, sDirSet35 },
+    { 36, sDirSet36 }, { 37, sDirSet37 }, { 38, sDirSet38 }, { 0x27, NULL },
 };
 
 void FieldActorMovecode_InitBackForth(FieldActor *actor) {
@@ -790,7 +787,7 @@ void FieldActorMovecode_InitBackForth(FieldActor *actor) {
 
 void FieldActorMovecode_MoveBackForth(FieldActor *actor) {
     RailPaceWork *work = GetNPCRailPosPtrAddr(actor);
-    while (data_ov036_021cb8d8[work->state](actor, work) == TRUE) {
+    while (sBackForthSteps[work->state](actor, work) == TRUE) {
     }
 }
 
@@ -942,7 +939,7 @@ void FieldActorMovecode_InitRoutePatrolSet29(FieldActor *actor) {
 void FieldActorMovecode_MoveRoutePatrol(FieldActor *actor) {
     ActorRoundWork *work = GetNPCRailPosPtrAddr(actor);
 
-    while (data_ov036_021cb87c[work->state](actor, work) == TRUE) {
+    while (sRoutePatrolSteps[work->state](actor, work) == TRUE) {
     }
 }
 
@@ -1065,7 +1062,7 @@ void FieldActorMovecode_InitRoutePatrolSwapSet37(FieldActor *actor) {
 void FieldActorMovecode_MoveRoutePatrolSwap(FieldActor *actor) {
     ActorPatrolWork *work = GetNPCRailPosPtrAddr(actor);
 
-    while (data_ov036_021cb8f0[work->state](actor, work) == TRUE) {
+    while (sRoutePatrolSwapSteps[work->state](actor, work) == TRUE) {
     }
 }
 
@@ -1101,7 +1098,7 @@ static BOOL FieldActorMovecode_RoutePatrolSwapStepSwapMoveCode(FieldActor *actor
         u16 moveCode = GetActorMoveCode(actor);
         const ActorMoveCodePair *pair;
 
-        for (pair = data_ov036_021cbb08; pair->first != 0xff; pair++) {
+        for (pair = sPatrolSwapMoveCodes; pair->first != 0xff; pair++) {
             if (pair->first == moveCode) {
                 other = pair->second;
             } else if (pair->second == moveCode) {
@@ -1247,7 +1244,7 @@ static s32 FieldActorMovecode_GetRandomDirFromSet(u32 index, u32 end) {
 }
 
 static const s32 *FieldActorMovecode_GetDirSet(u32 index) {
-    const ActorDirTableEntry *entry = data_ov036_021cbc70;
+    const ActorDirTableEntry *entry = sDirSets;
 
     for (; entry->key != 0x27; entry++) {
         if (entry->key == index) {
@@ -1282,7 +1279,7 @@ static u32 FieldActorMovecode_GetSightDirToPlayer(FieldActor *actor) {
     i = 0;
     moveCode = GetActorMoveCode(actor);
     do {
-        entry = data_ov036_021cbb64[i];
+        entry = sPlayerSightMoveCodes[i];
         i++;
     } while (entry != moveCode && entry != 0xff);
     if (moveCode != entry) {
@@ -1436,13 +1433,13 @@ static void FieldActorMovecode_StartMirrorTurn(FieldActor *actor, ActorFaceMemor
     s32 nextDir;
 
     i = 0;
-    while (i < 4 && dir != data_ov036_021cbb44[face->row][i]) {
+    while (i < 4 && dir != sMirrorTurnOrders[face->row][i]) {
         i++;
     }
     i++;
     face->dir = dir;
     i %= 4;
-    nextDir = data_ov036_021cbb44[face->row][i];
+    nextDir = sMirrorTurnOrders[face->row][i];
     if (CheckActorFlag(actor, 8)) {
         face->hadFlag8 = 1;
     } else {

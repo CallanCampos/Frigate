@@ -1,6 +1,7 @@
 #include "types.h"
 #include "field/field.h"
 #include "field/field_camera.h"
+#include "field/field_controller.h"
 #include "field/field_nogrid_mapper.h"
 #include "field/field_scene_area.h"
 #include "field/field_task.h"
@@ -326,15 +327,15 @@ static void FieldCameraAnimationController_SetupCameraBind(FieldCameraAnimationC
     FieldCamera *camera = controller->camera;
     const FieldCameraAnimation *animation = FieldCameraAnimationController_GetAnimation(controller);
 
-    if (Field_GetResolvedControllerTypeID(field) == 1) {
+    if (Field_GetResolvedControllerTypeID(field) == FIELDMAP_CTRL_TYPE_NOGRID) {
         FieldNoGridMapper_SetCameraAreaEnabled(Field_GetNoGridMapper(field), FALSE);
     }
-    if (animation->unk48 && FieldCamera_GetBind(controller->camera)) {
+    if (animation->releaseBind && FieldCamera_GetBind(controller->camera)) {
         controller->hasSavedBind = TRUE;
         controller->savedBind = FieldCamera_GetBind(camera);
         FieldCamera_ClearBind(camera);
     }
-    if (animation->unk4C) {
+    if (animation->disableBoundary) {
         controller->savedBoundaryEnable = FieldCamera_IsUseBoundaryEnable(camera);
         FieldCamera_SetUseBoundaryEnable(camera, FALSE);
     }
@@ -355,14 +356,14 @@ static void FieldCameraAnimationController_ResetCameraBind(FieldCameraAnimationC
     const FieldCameraAnimation *animation = FieldCameraAnimationController_GetAnimation(controller);
 
     SetFieldSceneAreaCameraAreaEnable(Field_GetSceneArea(field), TRUE);
-    if (animation->unk4C) {
+    if (animation->disableBoundary) {
         FieldCamera_SetUseBoundaryEnable(camera, controller->savedBoundaryEnable);
     }
     if (controller->hasSavedBind) {
         FieldCamera_SetBind(camera, controller->savedBind);
     }
     FieldCamera_ChangeTransformType(camera, controller->savedTransformType);
-    if (Field_GetResolvedControllerTypeID(field) == 1) {
+    if (Field_GetResolvedControllerTypeID(field) == FIELDMAP_CTRL_TYPE_NOGRID) {
         FieldNoGridMapper_SetCameraAreaEnabled(Field_GetNoGridMapper(field), TRUE);
     }
 }

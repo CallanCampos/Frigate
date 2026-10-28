@@ -86,7 +86,6 @@ enum {
 #define CATWALK_BALANCE_TIME 60
 
 #define KEY_B 0x2
-#define MOVE_FLAG_CAN_RUN 0x1
 
 struct FieldPlayerGrid {
     u32 state;
@@ -549,7 +548,7 @@ static u32 FieldPlayerGrid_DecideCommandNormalMoving(FieldPlayerGrid *grid, Fiel
     if (input->force == TRUE && hit != 0 && !(hit & 0x10)) {
         hit = 0;
     }
-    if (tileType != 0xffffffff) {
+    if (tileType != TILE_TYPE_NONE) {
         tileClass = GetTileClass(tileType);
         tileFlags = GetTileFlags(tileType);
         if (hit & 2) {
@@ -666,7 +665,7 @@ static u32 FieldPlayerGrid_DecideCommandCatwalkMove(FieldPlayerGrid *grid, Field
         return FieldPlayerGrid_DecideCommandCatwalkIdle(grid, actor, input);
     }
     hit = PlayerMoveCollCheckCatwalk(grid, actor, input->dir, &tileType);
-    if (tileType != 0xffffffff) {
+    if (tileType != TILE_TYPE_NONE) {
         if (hit & COLL_CATWALK) {
             if (!(hit & ~COLL_CATWALK)) {
                 return GRID_COMMAND_MOVE;
@@ -780,7 +779,7 @@ static u32 FieldPlayerGrid_DecideCommandBikeMoving(FieldPlayerGrid *grid, FieldA
     if (input->force == TRUE && hit != 0 && !(hit & 0x10)) {
         hit = 0;
     }
-    if (tileType != 0xffffffff) {
+    if (tileType != TILE_TYPE_NONE) {
         tileClass = GetTileClass(tileType);
         tileFlags = GetTileFlags(tileType);
         if (hit & 2) {
@@ -889,7 +888,7 @@ static u32 FieldPlayerGrid_DecideCommandSurfMoving(FieldPlayerGrid *grid, FieldA
     if (input->force == TRUE && hit != 0 && !(hit & 0x10)) {
         hit = 0;
     }
-    if (tileType != 0xffffffff) {
+    if (tileType != TILE_TYPE_NONE) {
         GetTileClass(tileType);
         tileFlags = GetTileFlags(tileType);
         if (hit == 0) {
@@ -1252,7 +1251,7 @@ static void FieldPlayerGrid_UpdateSurfBrake(FieldPlayerGrid *grid, FieldActor *a
     }
 }
 
-// ActorRouteCollCheck for a step in a direction, and the tile type there, 0xffffffff if there is none. A boulder in
+// ActorRouteCollCheck for a step in a direction, and the tile type there, TILE_TYPE_NONE if there is none. A boulder in
 // a hole ahead makes the hole passable
 static u32 PlayerMoveCollCheck(FieldPlayerGrid *grid, FieldActor *actor, u16 dir, u32 *tileType) {
     VecFx32 pos;
@@ -1267,7 +1266,7 @@ static u32 PlayerMoveCollCheck(FieldPlayerGrid *grid, FieldActor *actor, u16 dir
     CopyActorWPos(actor, &pos);
     ExpandVecInGridDir(dir, &pos, GRID_SIZE);
     if (GetTileTypeAtPosByActor(actor, &pos, tileType) == FALSE) {
-        *tileType = 0xffffffff;
+        *tileType = TILE_TYPE_NONE;
     }
     if ((hit & 2) && MapTile_IsStrengthHole(GetTileClass(*tileType)) == TRUE &&
         IsSavedStrengthRockAtPos(GetActorMModelSystem(actor), &pos) == TRUE) {
@@ -1629,10 +1628,10 @@ static BOOL FieldPlayerGrid_CheckWarpAtHitWall(FieldPlayerGrid *grid, u16 dir) {
     EventData *eventData = GameData_GetEventData(GSYS_GetGameData(gsys));
 
     CopyActorWPos(actor, &pos);
-    if (GetWarpIDByPlayerPos(eventData, &pos, dir) != 0xffff) {
+    if (GetWarpIDByPlayerPos(eventData, &pos, dir) != WARP_ID_NONE) {
         return TRUE;
     }
-    if (Field_CheckGimmickID(grid->field, 6) && GymInsect_IsRideAhead(gsys, dir)) {
+    if (Field_CheckGimmickID(grid->field, GIMMICK_CASTELIA_GYM) && GymInsect_IsRideAhead(gsys, dir)) {
         return TRUE;
     }
     return FALSE;

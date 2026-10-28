@@ -18,6 +18,14 @@ typedef struct EventFieldMenuReturn {
     u8 seq;
 } EventFieldMenuReturn;
 
+// The steps of the return from the field menu: change the touch screen once it is ready, remember it once the
+// change is done, and let the actors move again
+enum {
+    MENU_RETURN_CHANGE_SCREEN,
+    MENU_RETURN_SAVE_SCREEN,
+    MENU_RETURN_END,
+};
+
 static GameEventReturnCode EventFieldMenuReturn_Callback(GameEvent *event, u32 *state, void *data);
 
 GameEvent *EventFieldMenuReturn_Create(GameSystem *gsys, Field *field, u32 screenId) {

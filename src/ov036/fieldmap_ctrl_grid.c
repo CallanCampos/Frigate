@@ -21,7 +21,8 @@ static void FieldmapCtrlGrid_Update(Field *field, VecFx32 *pos);
 static VecFx32 *FieldmapCtrlGrid_GetPos(Field *field);
 
 const FieldmapCtrlVTable FIELDMAP_CTRL_GRID = {
-    0, FieldmapCtrlGrid_Create, FieldmapCtrlGrid_Update, FieldmapCtrlGrid_Free, FieldmapCtrlGrid_GetPos,
+    FIELDMAP_CTRL_TYPE_GRID, FieldmapCtrlGrid_Create, FieldmapCtrlGrid_Update,
+    FieldmapCtrlGrid_Free,   FieldmapCtrlGrid_GetPos,
 };
 
 static void FieldmapCtrlGrid_Create(Field *field, VecFx32 *pos, u16 dir) {

@@ -42,6 +42,7 @@
 #define BATTLEMON_STAT_STAGE_NEUTRAL 6
 
 // Weather, from GetFieldWeather. The AI scripts tell which is which
+#define BTL_WEATHER_NONE 0
 #define BTL_WEATHER_SUN 1
 #define BTL_WEATHER_RAIN 2
 #define BTL_WEATHER_HAIL 3

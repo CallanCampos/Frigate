@@ -276,8 +276,8 @@ static void EventQuicksandArrive_StartZoomOut(SpinEventWork *wk) {
     FieldCameraAnimationController *controller = Field_CreateCameraAnimationController(wk->field);
 
     wk->anim.frames = 0x3c;
-    wk->anim.unk48 = TRUE;
-    wk->anim.unk4C = TRUE;
+    wk->anim.releaseBind = TRUE;
+    wk->anim.disableBoundary = TRUE;
     wk->controller = controller;
     FieldCameraAnimationController_SetAnimation(controller, &wk->anim);
     FieldCameraAnimationController_PrepareCamera(wk->controller);
@@ -369,8 +369,8 @@ static void EventQuicksandArrive_StartZoomOutAlt(SpinEventWork *wk) {
     FieldCameraAnimationController *controller = Field_CreateCameraAnimationController(wk->field);
 
     wk->anim.frames = 0x3c;
-    wk->anim.unk48 = TRUE;
-    wk->anim.unk4C = TRUE;
+    wk->anim.releaseBind = TRUE;
+    wk->anim.disableBoundary = TRUE;
     wk->controller = controller;
     FieldCameraAnimationController_SetAnimation(controller, &wk->anim);
     FieldCameraAnimationController_PrepareCamera(wk->controller);
@@ -436,8 +436,8 @@ static GameEventReturnCode EventQuicksandArrive_RunSpinZoomSmoke(GameEvent *even
         FieldTaskManager_AddTask(taskManager, FieldActorSpinTask_CreatePlayerDeaccel(field, 0x3c, 8, 1), 0);
         controller = Field_CreateCameraAnimationController(field);
         wk->anim.frames = 0x3c;
-        wk->anim.unk48 = TRUE;
-        wk->anim.unk4C = TRUE;
+        wk->anim.releaseBind = TRUE;
+        wk->anim.disableBoundary = TRUE;
         wk->controller = controller;
         FieldCameraAnimationController_SetAnimation(controller, &wk->anim);
         FieldCameraAnimationController_PrepareCamera(wk->controller);
@@ -820,8 +820,8 @@ static void EventEscapeRope_StartCameraAnimation(EffectEventWork *wk) {
     FieldCameraAnimationController *controller = Field_CreateCameraAnimationController(wk->field);
 
     wk->anim.frames = 0x3c;
-    wk->anim.unk48 = TRUE;
-    wk->anim.unk4C = TRUE;
+    wk->anim.releaseBind = TRUE;
+    wk->anim.disableBoundary = TRUE;
     wk->controller = controller;
     FieldCameraAnimationController_SetAnimation(controller, &wk->anim);
     FieldCameraAnimationController_PrepareCamera(wk->controller);
@@ -894,8 +894,8 @@ static void EventDig_StartCameraAnimation(EffectEventWork *wk) {
     FieldCameraAnimationController *controller = Field_CreateCameraAnimationController(wk->field);
 
     wk->anim.frames = 0x3c;
-    wk->anim.unk48 = TRUE;
-    wk->anim.unk4C = TRUE;
+    wk->anim.releaseBind = TRUE;
+    wk->anim.disableBoundary = TRUE;
     wk->controller = controller;
     FieldCameraAnimationController_SetAnimation(controller, &wk->anim);
     FieldCameraAnimationController_PrepareCamera(wk->controller);
@@ -949,8 +949,8 @@ static GameEventReturnCode EventTeleportEffect_Callback(GameEvent *event, u32 *s
         }
         controller = Field_CreateCameraAnimationController(field);
         wk->anim.frames = 0x3c;
-        wk->anim.unk48 = TRUE;
-        wk->anim.unk4C = TRUE;
+        wk->anim.releaseBind = TRUE;
+        wk->anim.disableBoundary = TRUE;
         wk->controller = controller;
         FieldCameraAnimationController_SetAnimation(controller, &wk->anim);
         FieldCameraAnimationController_PrepareCamera(wk->controller);

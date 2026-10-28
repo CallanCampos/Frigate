@@ -5,6 +5,7 @@
 // Additional helper and table names are our descriptive guesses.
 #include "types.h"
 #include "constants/arc.h"
+#include "constants/directions.h"
 #include "constants/obj_codes.h"
 #include "field/field.h"
 #include "field/field_actor.h"
@@ -202,9 +203,9 @@ void RailActorAnim_GetBillboardActorAnime(FieldActor *actor, u16 *anim, u16 *ste
     *step = 0;
 }
 
-const FieldActorSceneNodeVTable data_ov036_021cf868 = { FieldActorMove_VanishProc,   FieldActorMove_VanishDraw,
-                                                        FieldActorMove_VanishDelete, FieldActorMove_VanishSuspend,
-                                                        FieldActorMove_VanishWakeUp, NULL };
+const FieldActorSceneNodeVTable FIELD_ACTOR_VTABLE_VANISH = { FieldActorMove_VanishProc,   FieldActorMove_VanishDraw,
+                                                              FieldActorMove_VanishDelete, FieldActorMove_VanishSuspend,
+                                                              FieldActorMove_VanishWakeUp, NULL };
 
 void RailActorAnim_SetBillboardActorAnime(FieldActor *actor, u16 anim, u16 step) {
     if (GetActorMdlInfo(actor)->entityType == 1) {
@@ -247,11 +248,11 @@ static void RailActorAnim_DrawDirAnime(FieldActor *actor) {
     }
 }
 
-const FieldActorSceneNodeVTable data_ov036_021cf940 = {
+const FieldActorSceneNodeVTable FIELD_ACTOR_VTABLE_DIR_ANIME_1 = {
     RailActorAnim_InitDirAnime,   RailActorAnim_DrawDirAnime, RailActorAnim_DeleteDirAnime,
     RailActorAnim_DeleteDirAnime, RailActorAnim_InitDirAnime, RailActorAnim_GetBillboardActorIdDirAnime
 };
-const FieldActorSceneNodeVTable data_ov036_021cf928 = {
+const FieldActorSceneNodeVTable FIELD_ACTOR_VTABLE_DIR_ANIME_3 = {
     RailActorAnim_InitDirAnime,   RailActorAnim_DrawDirAnime, RailActorAnim_DeleteDirAnime,
     RailActorAnim_DeleteDirAnime, RailActorAnim_InitDirAnime, RailActorAnim_GetBillboardActorIdDirAnime
 };
@@ -290,7 +291,7 @@ static void RailActorAnim_DrawDirAnimeMoving(FieldActor *actor) {
     }
 }
 
-const FieldActorSceneNodeVTable data_ov036_021cf850 = {
+const FieldActorSceneNodeVTable FIELD_ACTOR_VTABLE_DIR_ANIME_MOVING = {
     RailActorAnim_InitDirAnime,   RailActorAnim_DrawDirAnimeMoving, RailActorAnim_DeleteDirAnime,
     RailActorAnim_DeleteDirAnime, RailActorAnim_InitDirAnime,       RailActorAnim_GetBillboardActorIdDirAnime
 };
@@ -323,7 +324,7 @@ static void RailActorAnim_DrawDirAnimeB(FieldActor *actor) {
     }
 }
 
-const FieldActorSceneNodeVTable data_ov036_021cf8f8 = {
+const FieldActorSceneNodeVTable FIELD_ACTOR_VTABLE_DIR_ANIME_B = {
     RailActorAnim_InitDirAnimeB,   RailActorAnim_DrawDirAnimeB, RailActorAnim_DeleteDirAnimeB,
     RailActorAnim_DeleteDirAnimeB, RailActorAnim_InitDirAnimeB, RailActorAnim_GetBillboardActorIdWalkAnime
 };
@@ -365,7 +366,7 @@ static void RailActorAnim_DrawDirAnimeSized(FieldActor *actor) {
     }
 }
 
-const FieldActorSceneNodeVTable data_ov036_021cf8e0 = {
+const FieldActorSceneNodeVTable FIELD_ACTOR_VTABLE_DIR_ANIME_SIZED = {
     RailActorAnim_InitDirAnimeB,   RailActorAnim_DrawDirAnimeSized, RailActorAnim_DeleteDirAnimeB,
     RailActorAnim_DeleteDirAnimeB, RailActorAnim_InitDirAnimeB,     RailActorAnim_GetBillboardActorIdWalkAnime
 };
@@ -401,7 +402,7 @@ static void RailActorAnim_DrawWalkAnime(FieldActor *actor) {
     }
 }
 
-const FieldActorSceneNodeVTable data_ov036_021cf8c8 = {
+const FieldActorSceneNodeVTable FIELD_ACTOR_VTABLE_WALK_ANIME = {
     RailActorAnim_InitDirAnimeB,   RailActorAnim_DrawWalkAnime, RailActorAnim_DeleteDirAnimeB,
     RailActorAnim_DeleteDirAnimeB, RailActorAnim_InitDirAnimeB, RailActorAnim_GetBillboardActorIdWalkAnime
 };
@@ -434,7 +435,7 @@ static void RailActorAnim_DrawWalkAnimeB(FieldActor *actor) {
     }
 }
 
-const FieldActorSceneNodeVTable data_ov036_021cf8b0 = {
+const FieldActorSceneNodeVTable FIELD_ACTOR_VTABLE_WALK_ANIME_B = {
     RailActorAnim_InitDirAnimeB,   RailActorAnim_DrawWalkAnimeB, RailActorAnim_DeleteDirAnimeB,
     RailActorAnim_DeleteDirAnimeB, RailActorAnim_InitDirAnimeB,  RailActorAnim_GetBillboardActorIdWalkAnime
 };
@@ -471,7 +472,7 @@ static void RailActorAnim_DrawTwoFrame(FieldActor *actor) {
     }
 }
 
-const FieldActorSceneNodeVTable data_ov036_021cf898 = {
+const FieldActorSceneNodeVTable FIELD_ACTOR_VTABLE_TWO_FRAME = {
     RailActorAnim_InitDirAnime,   RailActorAnim_DrawTwoFrame, RailActorAnim_DeleteDirAnime,
     RailActorAnim_DeleteDirAnime, RailActorAnim_InitDirAnime, RailActorAnim_GetBillboardActorIdDirAnime
 };
@@ -502,7 +503,7 @@ static void RailActorAnim_DrawThreeFrame(FieldActor *actor) {
     }
 }
 
-const FieldActorSceneNodeVTable data_ov036_021cf880 = {
+const FieldActorSceneNodeVTable FIELD_ACTOR_VTABLE_THREE_FRAME = {
     RailActorAnim_InitDirAnime,   RailActorAnim_DrawThreeFrame, RailActorAnim_DeleteDirAnime,
     RailActorAnim_DeleteDirAnime, RailActorAnim_InitDirAnime,   RailActorAnim_GetBillboardActorIdDirAnime
 };
@@ -577,7 +578,7 @@ static void RailActorAnim_DrawBillboardOffset(FieldActor *actor) {
     }
 }
 
-const FieldActorSceneNodeVTable data_ov036_021cf838 = {
+const FieldActorSceneNodeVTable FIELD_ACTOR_VTABLE_BILLBOARD_OFFSET = {
     RailActorAnim_InitDirAnime,   RailActorAnim_DrawBillboardOffset, RailActorAnim_DeleteDirAnime,
     RailActorAnim_DeleteDirAnime, RailActorAnim_InitDirAnime,        RailActorAnim_GetBillboardActorIdDirAnime
 };
@@ -602,7 +603,7 @@ static void RailActorAnim_DrawStatic(FieldActor *actor) {
     }
 }
 
-const FieldActorSceneNodeVTable data_ov036_021cf910 = {
+const FieldActorSceneNodeVTable FIELD_ACTOR_VTABLE_STATIC = {
     RailActorAnim_InitDirAnime,   RailActorAnim_DrawStatic,   RailActorAnim_DeleteDirAnime,
     RailActorAnim_DeleteDirAnime, RailActorAnim_InitDirAnime, RailActorAnim_GetBillboardActorIdDirAnime
 };
@@ -671,7 +672,7 @@ static void RailActorAnim_DrawPositionOnly(FieldActor *actor) {
     }
 }
 
-const FieldActorSceneNodeVTable data_ov036_021cf820 = {
+const FieldActorSceneNodeVTable FIELD_ACTOR_VTABLE_POSITION_ONLY = {
     RailActorAnim_InitDirAnimeB,   RailActorAnim_DrawPositionOnly, RailActorAnim_DeleteDirAnimeB,
     RailActorAnim_DeleteDirAnimeB, RailActorAnim_InitDirAnimeB,    RailActorAnim_GetBillboardActorIdWalkAnime
 };
@@ -718,7 +719,7 @@ static void RailActorAnim_DrawWalking(FieldActor *actor) {
     }
 }
 
-const FieldActorSceneNodeVTable data_ov036_021cf808 = {
+const FieldActorSceneNodeVTable FIELD_ACTOR_VTABLE_WALKING = {
     RailActorAnim_InitFixedState,   RailActorAnim_DrawWalking,    RailActorAnim_DeleteFixedState,
     RailActorAnim_DeleteFixedState, RailActorAnim_InitFixedState, RailActorAnim_GetBillboardActorIdFixedState
 };
@@ -747,7 +748,7 @@ static void RailActorAnim_UpdateWalkOffset(FieldActor *actor, RailNpcWork *work,
     gx = GetGPosX(actor);
     zone = GetActorZoneID(actor);
     uid = GetActorUID(actor);
-    if (uid == 0xff) {
+    if (uid == ACTOR_UID_PLAYER) {
         isPlayer = TRUE;
     }
     isPuppet = uid == 0xfc ? TRUE : FALSE;
@@ -792,10 +793,10 @@ static void RailActorAnim_UpdateWalkOffset(FieldActor *actor, RailNpcWork *work,
 static void RailActorAnim_ShiftOffsetByDir(FieldActor *actor, u32 dir, const FieldActorConfig *config,
                                            VecFx32 *offset) {
     switch (dir) {
-    case 2:
+    case DIR_LEFT:
         offset->x -= 0x2000;
         break;
-    case 3:
+    case DIR_RIGHT:
         offset->x += 0x2000;
         break;
     }
@@ -806,7 +807,7 @@ static BOOL RailActorAnim_CheckStepFrame(RailNpcWork *work, u32 dir, const Field
 
     work->frame = frame;
     if (config->sceneNodeType == 11) {
-        if (dir == 1) {
+        if (dir == DIR_DOWN) {
             if (frame < 5 || frame >= 15) {
                 return TRUE;
             }
@@ -910,9 +911,9 @@ static void RailActorAnim_DrawMultiPattern(FieldActor *actor) {
                     anim = 3;
                     break;
                 default:
-                    if (dir == 0) {
+                    if (dir == DIR_UP) {
                         anim = 0;
-                    } else if (dir == 1) {
+                    } else if (dir == DIR_DOWN) {
                         anim = 1;
                     }
                     break;
@@ -921,9 +922,9 @@ static void RailActorAnim_DrawMultiPattern(FieldActor *actor) {
             case 3:
                 if (state == 10) {
                     anim = 2;
-                } else if (dir == 0) {
+                } else if (dir == DIR_UP) {
                     anim = 1;
-                } else if (dir == 1) {
+                } else if (dir == DIR_DOWN) {
                     anim = 0;
                 }
                 break;
@@ -949,7 +950,7 @@ static void RailActorAnim_DrawMultiPattern(FieldActor *actor) {
     }
 }
 
-const FieldActorSceneNodeVTable data_ov036_021cf958 = {
+const FieldActorSceneNodeVTable FIELD_ACTOR_VTABLE_MULTI_PATTERN = {
     RailActorAnim_InitDirAnimeC,   RailActorAnim_DrawMultiPattern, RailActorAnim_DeleteDirAnimeC,
     RailActorAnim_DeleteDirAnimeC, RailActorAnim_InitDirAnimeC,    RailActorAnim_GetBillboardActorIdMultiPattern
 };
@@ -1021,7 +1022,7 @@ static void RailActorAnim_DrawTwoPattern(FieldActor *actor) {
     }
 }
 
-const FieldActorSceneNodeVTable data_ov036_021cf7d8 = {
+const FieldActorSceneNodeVTable FIELD_ACTOR_VTABLE_TWO_PATTERN = {
     RailActorAnim_InitDirAnimeB,   RailActorAnim_DrawTwoPattern, RailActorAnim_DeleteDirAnimeB,
     RailActorAnim_DeleteDirAnimeB, RailActorAnim_InitDirAnimeB,  RailActorAnim_GetBillboardActorIdWalkAnime
 };
@@ -1065,7 +1066,7 @@ static void RailActorAnim_DrawThreePattern(FieldActor *actor) {
     }
 }
 
-const FieldActorSceneNodeVTable data_ov036_021cf7f0 = {
+const FieldActorSceneNodeVTable FIELD_ACTOR_VTABLE_THREE_PATTERN = {
     RailActorAnim_InitDirAnimeB,   RailActorAnim_DrawThreePattern, RailActorAnim_DeleteDirAnimeB,
     RailActorAnim_DeleteDirAnimeB, RailActorAnim_InitDirAnimeB,    RailActorAnim_GetBillboardActorIdWalkAnime
 };

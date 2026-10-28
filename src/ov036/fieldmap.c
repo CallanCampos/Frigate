@@ -91,7 +91,33 @@
 #include "system/season.h"
 #include "system/zone_weather.h"
 
-static const u8 sResolvedControllerTypes[4] = { 0, 1, 2, 0 };
+// What a field routine returns: run on, with the other of its pair next frame; go on to the next routine; or end the
+// field
+enum {
+    FIELD_ROUTINE_CONTINUE,
+    FIELD_ROUTINE_NEXT,
+    FIELD_ROUTINE_END,
+};
+
+// The phases of FieldRoutine_MapLoad, by what they make
+enum {
+    MAP_LOAD_CAMERA,
+    MAP_LOAD_MAPPERS,
+    MAP_LOAD_MAP,
+    MAP_LOAD_ACTORS,
+    MAP_LOAD_PLAYER,
+    MAP_LOAD_SUBSCREEN,
+    MAP_LOAD_SYSTEMS,
+};
+
+// The phases of FieldRoutine_MapSpawnFinish: the map's first frame, then the zone's scripts
+enum {
+    MAP_SPAWN_FIRST_FRAME,
+    MAP_SPAWN_SCRIPTS,
+};
+
+static const u8 sResolvedControllerTypes[4] = { FIELDMAP_CTRL_TYPE_GRID, FIELDMAP_CTRL_TYPE_NOGRID,
+                                                FIELDMAP_CTRL_TYPE_HYBRID, FIELDMAP_CTRL_TYPE_GRID };
 
 // A kind of map: the setup of its mapper and its controller, whether it takes its chunks from the zone's map matrix,
 // and the size of its heap
@@ -274,7 +300,7 @@ u32 FieldRoutine_Open(GameSystem *gsys, Field *field) {
         GFL_OvlLoad(OVERLAY_ID(33));
     }
     GCTX_HIDChangeFPS(30);
-    return 1;
+    return FIELD_ROUTINE_NEXT;
 }
 
 u32 FieldRoutine_MapLoad(GameSystem *gsys, Field *field) {
@@ -282,7 +308,7 @@ u32 FieldRoutine_MapLoad(GameSystem *gsys, Field *field) {
     BOOL loading = TRUE;
 
     switch (field->subroutinePhase) {
-    case 0:
+    case MAP_LOAD_CAMERA:
         ZoneChange_OnFieldLoad(gameData, field->zoneId);
         field->msgBGSys = CreateFieldMsgBGSystem(field->heapId, field->g3dCamera);
         field->moneyWin = NULL;
@@ -295,7 +321,7 @@ u32 FieldRoutine_MapLoad(GameSystem *gsys, Field *field) {
         field->sceneArea = FieldSceneArea_Create(field->heapId, field->cameraSystem, field);
         field->sceneAreaLoader = FieldSceneAreaLoader_Create(field->heapId);
         break;
-    case 1: {
+    case MAP_LOAD_MAPPERS: {
         FieldPropSystem *propSystem;
 
         field->noGridMapper =
@@ -312,14 +338,14 @@ u32 FieldRoutine_MapLoad(GameSystem *gsys, Field *field) {
         Field_LoadJoinAvenue(gameData, field, field->zoneId);
         break;
     }
-    case 2: {
+    case MAP_LOAD_MAP: {
         u32 railId;
 
         SetupZoneWarpArrivalGrid(&field->playerZoneState, field->zoneId, 0, 0, 0, field->playerPos.x,
                                  field->playerPos.y, field->playerPos.z);
         FieldG3DMapper_CreateMap(field->g3DMapper, &field->mapperConfig, &field->colorPostFX);
         railId = GetRailIDForZone(field->zoneId);
-        if (railId != 0xffffffff) {
+        if (railId != ZONE_RAIL_NONE) {
             FieldNoGridMapper_LoadByHeader(field->noGridMapper, railId, field->heapId);
         }
         field->objectProjectionMatrixOffset = GetObjectProjectionMatrixOffset(field->zoneId);
@@ -327,7 +353,7 @@ u32 FieldRoutine_MapLoad(GameSystem *gsys, Field *field) {
         field->fesGimmick = FesGimmick_Create(gsys, field, field->heapId);
         break;
     }
-    case 3:
+    case MAP_LOAD_ACTORS:
         Field_InitActorSystem(field);
         field->fieldEffects = FieldEffects_Create(field, 0x19, field->heapId);
         FieldEffects_TCBManagerInit(field->fieldEffects, 0x5e);
@@ -337,7 +363,7 @@ u32 FieldRoutine_MapLoad(GameSystem *gsys, Field *field) {
             field->unionEffect = UnionEff_Create(field->heapId);
         }
         break;
-    case 4: {
+    case MAP_LOAD_PLAYER: {
         PlayerState *playerState = GSYS_GetPlayerState(gsys);
         u16 dir = PlayerState_CalcDirection(playerState);
         VecFx32 *pos = &playerState->position;
@@ -379,10 +405,10 @@ u32 FieldRoutine_MapLoad(GameSystem *gsys, Field *field) {
         LoadScrPluginOverlays(field->gameData);
         break;
     }
-    case 5:
+    case MAP_LOAD_SUBSCREEN:
         field->subscreen = FieldSubscreen_Create(field->heapId, field, GameData_GetLastSubscreen(gameData));
         break;
-    case 6:
+    case MAP_LOAD_SYSTEMS:
         field->encountSystem = EncSys_Create(field);
         GameCommSys_FieldCreate(GSYS_GetGameCommSystem(gsys), field);
         field->asyncProcManager = FieldAsyncProcManager_Create(field, field->heapId, 0x20);
@@ -399,14 +425,14 @@ u32 FieldRoutine_MapLoad(GameSystem *gsys, Field *field) {
     field->subroutinePhase++;
     field->renderMode = 0;
     if (!loading) {
-        return 1;
+        return FIELD_ROUTINE_NEXT;
     }
-    return 0;
+    return FIELD_ROUTINE_CONTINUE;
 }
 
 u32 FieldRoutine_MapSpawnFinish(GameSystem *gsys, Field *field) {
     switch (field->subroutinePhase) {
-    case 0:
+    case MAP_SPAWN_FIRST_FRAME:
         FieldG3DMapper_UpdateSync(field->g3DMapper);
         if (field->actorSystem != NULL) {
             do {
@@ -427,10 +453,10 @@ u32 FieldRoutine_MapSpawnFinish(GameSystem *gsys, Field *field) {
         FieldEffects_Update(field->fieldEffects);
         FieldAsyncProcManager_Update(field->asyncProcManager);
         field->subroutinePhase++;
-    case 1:
+    case MAP_SPAWN_SCRIPTS:
         if (FieldStatus_CheckContinueFlag(GameData_GetFieldStatus(field->gameData)) == TRUE &&
             IsZoneTwoPassLoad(field->zoneId) == TRUE && GFL_SndIsLoadThreadRunning()) {
-            return 0;
+            return FIELD_ROUTINE_CONTINUE;
         }
         if (FieldStatus_GetNewLoadFlag(GameData_GetFieldStatus(field->gameData))) {
             FieldScript_CallOnZoneReload(field->gameSystem, field->heapId);
@@ -443,9 +469,9 @@ u32 FieldRoutine_MapSpawnFinish(GameSystem *gsys, Field *field) {
         FesGimmick_OnZoneEnter(field->fesGimmick);
         if (GetZoneIsUnionRoom(field->zoneId) == TRUE || IsZone150Or151(field->zoneId) == TRUE) {
             GSYS_SetEventProvider(gsys, FieldEventProvider_UnionRoom, field);
-        } else if (Field_GetControllerTypeID(field) == 1) {
+        } else if (Field_GetControllerTypeID(field) == FIELDMAP_CTRL_TYPE_NOGRID) {
             GSYS_SetEventProvider(gsys, FieldEventProvider_NoGrid, field);
-        } else if (Field_GetControllerTypeID(field) == 2) {
+        } else if (Field_GetControllerTypeID(field) == FIELDMAP_CTRL_TYPE_HYBRID) {
             GSYS_SetEventProvider(gsys, FieldEventProvider_Hybrid, field);
         } else {
             GSYS_SetEventProvider(gsys, FieldEventProvider_Grid, field);
@@ -454,7 +480,7 @@ u32 FieldRoutine_MapSpawnFinish(GameSystem *gsys, Field *field) {
         GameData_Set30FPSMode(GSYS_GetGameData(gsys), TRUE);
         break;
     }
-    return 1;
+    return FIELD_ROUTINE_NEXT;
 }
 
 u32 FieldRoutine_Run(GameSystem *gsys, Field *field) {
@@ -462,12 +488,12 @@ u32 FieldRoutine_Run(GameSystem *gsys, Field *field) {
         FieldStatus_SetBusyFlag(GameData_GetFieldStatus(field->gameData), FLD_STATUS_BUSY_NONE);
     }
     if (GameData_CheckEventsPaused(field->gameData)) {
-        return 0;
+        return FIELD_ROUTINE_CONTINUE;
     }
     if (field->effectRunningFlag) {
         Field_RenderStart(field);
         ClActSys_Draw();
-        return 0;
+        return FIELD_ROUTINE_CONTINUE;
     }
     GCTX_HIDResetFrameCount();
     Field_CheckDoRealTimeLoad(field);
@@ -511,7 +537,7 @@ u32 FieldRoutine_Run(GameSystem *gsys, Field *field) {
     PleasureBoat_AckEvent(*GameData_GetPleasureBoatPtr(field->gameData));
     ClActSys_Draw();
     Field_RenderStart(field);
-    return 0;
+    return FIELD_ROUTINE_CONTINUE;
 }
 
 void Field_RenderStart(Field *field) {
@@ -526,7 +552,7 @@ void Field_RenderStart(Field *field) {
 u32 FieldRoutine_RunAltFrame(GameSystem *gsys, Field *field) {
     if (GameData_CheckEventsPaused(field->gameData)) {
         GameData_ResetSkipFrame(GSYS_GetGameData(gsys));
-        return 0;
+        return FIELD_ROUTINE_CONTINUE;
     }
     MI_SetMainMemoryPriority(MI_PROCESSOR_ARM9);
     FieldG3DMapper_CallAllLoaderUpdate(field->g3DMapper);
@@ -545,7 +571,7 @@ u32 FieldRoutine_RunAltFrame(GameSystem *gsys, Field *field) {
     FieldG3D_RenderPhase2(field);
     MI_SetMainMemoryPriority(MI_PROCESSOR_ARM7);
     GameData_ResetSkipFrame(GSYS_GetGameData(gsys));
-    return 0;
+    return FIELD_ROUTINE_CONTINUE;
 }
 
 u32 FieldRoutine_MapUnload(GameSystem *gsys, Field *field) {
@@ -603,7 +629,7 @@ u32 FieldRoutine_MapUnload(GameSystem *gsys, Field *field) {
     GCTX_HIDChangeFPS(60);
     DayCare_Free(field->dayCare);
     FieldSkillMapEff_Free(field->skillMapEff);
-    return 1;
+    return FIELD_ROUTINE_NEXT;
 }
 
 u32 FieldRoutine_Close(GameSystem *gsys, Field *field) {
@@ -623,7 +649,7 @@ u32 FieldRoutine_Close(GameSystem *gsys, Field *field) {
     } else {
         GFL_OvlUnload(OVERLAY_ID(33));
     }
-    return 2;
+    return FIELD_ROUTINE_END;
 }
 
 BOOL Field_CallRoutines(GameSystem *gsys, Field *field) {
@@ -636,15 +662,15 @@ BOOL Field_CallRoutines(GameSystem *gsys, Field *field) {
         result = routine(gsys, field);
     }
     switch (result) {
-    case 0:
+    case FIELD_ROUTINE_CONTINUE:
         field->routineAlternator = field->routineAlternator == 0 ? 1 : 0;
         break;
-    case 1:
+    case FIELD_ROUTINE_NEXT:
         field->routineID++;
         field->subroutinePhase = 0;
         field->routineAlternator = 0;
         break;
-    case 2:
+    case FIELD_ROUTINE_END:
         return TRUE;
     }
     return FALSE;
@@ -781,7 +807,7 @@ u32 Field_GetControllerTypeID(Field *field) {
 
 u32 Field_GetResolvedControllerTypeID(Field *field) {
     u32 type = sResolvedControllerTypes[field->ctrlVTable->typeId];
-    if (type == 2) {
+    if (type == FIELDMAP_CTRL_TYPE_HYBRID) {
         type = FieldmapCtrlHybrid_GetActiveTypeID(field->controller);
     }
     return type;
@@ -993,7 +1019,7 @@ void FldActSys_VRAMUploadFunc(BOOL type, u32 dest, void *src, u32 size) {
 void Field_LoadEdgeColorTable(AreaData *area, u16 zoneId) {
     u32 tableId = AreaData_GetEdgeColorTableID(area);
 
-    if (tableId == 0xff) {
+    if (tableId == AREA_EDGE_COLOR_TABLE_NONE) {
         G3X_EdgeMarking(FALSE);
         return;
     }
@@ -1080,7 +1106,7 @@ BOOL Field_ShouldSwapZone(Field *field) {
     if (RangeCheckChunkCoordinateWorld(matrix, pos.x, pos.z) == TRUE) {
         u16 zoneId = GetZoneIDAtMatrixXZWorld(matrix, pos.x, pos.z);
 
-        if (zoneId != 0xffff && zoneId != zoneState->zoneId) {
+        if (zoneId != MATRIX_ZONE_NONE && zoneId != zoneState->zoneId) {
             return TRUE;
         }
     }
@@ -1157,13 +1183,13 @@ void Field_SwapWeather(Field *field, u32 zoneId) {
 
     ResetWeather(field->gameSystem, zoneId);
     weatherId = GetNowWeather(field->gameData);
-    if (weatherId != 15) {
+    if (weatherId != WEATHER_MAX) {
         FieldWeather_RequestChange(weather, weatherId);
     }
 }
 
 void Field_CheckGiveDiamondDustMedal(Field *field) {
-    if (GetNowWeather(field->gameData) == 8) {
+    if (GetNowWeather(field->gameData) == WEATHER_DIAMOND_DUST) {
         MedalBox_GiveMedal(SaveControl_GetMedalBox(GameData_GetSaveControl(field->gameData)), 0x65);
     }
 }
@@ -1191,7 +1217,7 @@ void Field_ResetController(Field *field) {
 void FieldCameraBoundary_ChangeZone(Field *field, u32 zoneId, HeapID heapId) {
     u16 boundaryId = GetZoneMatrixCamBoundIdx(zoneId);
 
-    if (boundaryId != 0xffff) {
+    if (boundaryId != ZONE_CAMERA_BOUNDARY_NONE) {
         FieldCameraBoundary_ChangeID(field->cameraSystem, boundaryId, heapId);
     } else {
         FieldCameraBoundary_LoadDummy(field->cameraSystem);
@@ -1229,7 +1255,7 @@ void Field_LoadJoinAvenue(GameData *gameData, Field *field, u32 zoneId) {
 void Field_LoadSceneArea(Field *field, u32 zoneId) {
     u16 cameraId = GetCameraIDForZone(zoneId);
 
-    if (cameraId != 0xffff) {
+    if (cameraId != ZONE_CAMERA_NONE) {
         CameraArea *cameraData;
         u32 count;
 
@@ -1252,21 +1278,21 @@ u32 Field_GetCommKind(GameCommSys *comm) {
     u32 state = GameCommSys_BootCheck(comm);
 
     switch (state) {
-    case 0:
+    case GAME_COMM_NO_NULL:
         if (GFL_NetErrCheck()) {
             state = GameCommSys_GetLastCommNo(comm);
         }
         return state;
-    case 1:
-    case 2:
-    case 5:
+    case GAME_COMM_NO_BEACON_SEARCH:
+    case GAME_COMM_NO_INTRUDE:
+    case GAME_COMM_NO_UNK5:
         return state;
     }
-    return 2;
+    return GAME_COMM_NO_INTRUDE;
 }
 
 BOOL Field_CheckCommExit(GameCommSys *comm) {
-    if (GameCommSys_BootCheck(comm) == 0) {
+    if (GameCommSys_BootCheck(comm) == GAME_COMM_NO_NULL) {
         return TRUE;
     }
     if (!GameCommSys_IsTransitioning(comm)) {
@@ -1276,17 +1302,17 @@ BOOL Field_CheckCommExit(GameCommSys *comm) {
 }
 
 void Field_InitCommonWork(FieldGimmickWorkBlock *block) {
-    block->password = 0xffffffff;
+    block->password = FIELD_GIMMICK_PASSWORD_NONE;
     block->work = NULL;
 }
 
 void *Field_AllocGimmickWorkBlock(Field *field, u32 password, HeapID heapId, u32 size) {
     FieldGimmickWorkBlock *block = &field->gimmickWork;
 
-    if (password == 0xffffffff) {
+    if (password == FIELD_GIMMICK_PASSWORD_NONE) {
         return NULL;
     }
-    if (block->password != 0xffffffff) {
+    if (block->password != FIELD_GIMMICK_PASSWORD_NONE) {
         return NULL;
     }
     block->password = password;
@@ -1297,9 +1323,9 @@ void *Field_AllocGimmickWorkBlock(Field *field, u32 password, HeapID heapId, u32
 void Field_DeleteGimmickWorkBlock(Field *field, u32 password) {
     FieldGimmickWorkBlock *block = &field->gimmickWork;
 
-    if (password != 0xffffffff) {
+    if (password != FIELD_GIMMICK_PASSWORD_NONE) {
         GFL_HeapFree(block->work);
-        block->password = 0xffffffff;
+        block->password = FIELD_GIMMICK_PASSWORD_NONE;
     }
 }
 
@@ -1313,7 +1339,7 @@ BOOL Field_CheckGimmickWorkPassword(Field *field, u32 password) {
 void *Field_GetGimmickWorkBlock(Field *field, u32 password) {
     FieldGimmickWorkBlock *block = &field->gimmickWork;
 
-    if (password == 0xffffffff) {
+    if (password == FIELD_GIMMICK_PASSWORD_NONE) {
         return NULL;
     }
     if (password != block->password) {

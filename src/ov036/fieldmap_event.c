@@ -102,21 +102,9 @@
 #define SCRID_ASSORTMENT_C 0x9cb
 #define SCRID_VENDING_MACHINE 0x28a0
 
-// The gimmicks of the zones whose tiles start events
-#define GIMMICK_MISTRALTON_GYM 5
-#define GIMMICK_CASTELIA_GYM 6
-#define GIMMICK_DRIFTVEIL_GYM 7
-#define GIMMICK_CHARGESTONE_CAVE 13
-#define GIMMICK_HUMILAU_GYM 38
-#define GIMMICK_ROLLER_COASTER 48
-
 // A grid tile's side, in world units and in fx32
 #define GRID_UNITS 16
 #define GRID_SIZE FX32_CONST(GRID_UNITS)
-// The tile flag that MapTile_BlocksCollision tests, and the one of water, which the player can't jump onto from the
-// water and which gives battles their water music
-#define TILE_FLAG_COLLISION 0x1
-#define TILE_FLAG_WATER 0x2
 
 // The steps that the step counter of the game data counts to
 #define STEP_TOTAL_MAX 9999
@@ -1371,6 +1359,14 @@ static BOOL CanMoveOnRail(FieldPlayer *player, FieldInteractWk *wk) {
     return FALSE;
 }
 
+// The steps of the surf exit: face the shore, jump to it, land and change back, and let the actors move again
+enum {
+    SURF_EXIT_FACE,
+    SURF_EXIT_JUMP,
+    SURF_EXIT_LAND,
+    SURF_EXIT_END,
+};
+
 static GameEventReturnCode EventSurfExit_Callback(GameEvent *event, u32 *state, void *data) {
     SurfExitWork *work = data;
     FieldPlayer *player = Field_GetPlayer(work->field);
@@ -1380,12 +1376,12 @@ static GameEventReturnCode EventSurfExit_Callback(GameEvent *event, u32 *state, 
     FieldPlayer_GetExState(player);
     actor = FieldPlayer_GetActor(player);
     switch (*state) {
-    case 0:
+    case SURF_EXIT_FACE:
         DisableAllActorsMovement(GetActorMModelSystem(actor));
         CheckSetActorFaceDir(actor, work->dir);
         (*state)++;
         break;
-    case 1: {
+    case SURF_EXIT_JUMP: {
         u16 acmd;
 
         FldeffSurfPokemon_SetFollowMode(FieldPlayer_GetRideEffect(player), 0);
@@ -1399,13 +1395,13 @@ static GameEventReturnCode EventSurfExit_Callback(GameEvent *event, u32 *state, 
         (*state)++;
         break;
     }
-    case 2:
+    case SURF_EXIT_LAND:
         if (FldAct_CheckAcmdEnd(actor) == TRUE) {
             FieldPlayer_ChangeToNormalForm(player);
             (*state)++;
         }
         break;
-    case 3:
+    case SURF_EXIT_END:
         EnableAllActorsMovement(GetActorMModelSystem(actor));
         FieldPlayer_SetGridHopLanded(player);
         return GAMEEVENT_DONE;

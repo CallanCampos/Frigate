@@ -12,7 +12,10 @@
 typedef struct FieldTerrainAnimator FieldTerrainAnimator;
 typedef struct FieldTerrainSRTAnimatorChunkState FieldTerrainSRTAnimatorChunkState;
 
-// The animation files of an area, 0xffffffff for none
+// An area without that kind of terrain animation
+#define FIELD_TERRAIN_ANM_NONE 0xffffffff
+
+// The animation files of an area, FIELD_TERRAIN_ANM_NONE for none
 typedef struct {
     u32 srtAnimeId;
     u32 patAnimeId;

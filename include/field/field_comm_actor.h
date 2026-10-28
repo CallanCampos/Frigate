@@ -9,7 +9,7 @@
 #include "nitro/fx.h"
 #include "struct_decls.h"
 
-FldCommActSys *FldCommActSys_Create(u8 count, MMSys *actorSystem, HeapID heapId, BOOL a3);
+FldCommActSys *FldCommActSys_Create(u8 count, MMSys *actorSystem, HeapID heapId, BOOL allowRun);
 void FldCommActSys_Free(FldCommActSys *sys);
 void FldCommActSys_CreateActor(FldCommActSys *sys, u32 netId, u16 modelId, const u16 *dir, const VecFx32 *pos,
                                const u32 *hidden);

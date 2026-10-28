@@ -30,6 +30,9 @@ void FieldPlayer_CreateNogrid(FieldPlayer *player, HeapID heapId);
 u16 FieldPlayer_GetMoveDirByKey(FieldPlayer *player, u32 heldKeys);
 BOOL FieldPlayer_CheckMoveBusy(FieldPlayer *player);
 BOOL FieldPlayer_CheckRunningShoesFlag(FieldPlayer *player);
+// The flags of FieldPlayer_UpdateGridMovement: the player has the running shoes, and runs with B held
+#define MOVE_FLAG_CAN_RUN 0x1
+
 void FieldPlayer_UpdateGridMovement(FieldPlayer *player, u32 pressedKeys, u32 heldKeys, u32 flags);
 void FieldPlayer_UpdateRailMovement(FieldPlayer *player, u32 pressedKeys, u32 heldKeys);
 void FieldPlayer_AttachNogridActor(FieldPlayer *player, const RailPosition *pos);
@@ -79,7 +82,10 @@ GameSystem *FieldPlayer_GetGameSystem(FieldPlayer *player);
 // The tile type under the player (PLAYER_DIR_NONE) or a step in the direction, and its height. 0xffffffff if there is
 // no terrain
 u32 FieldPlayer_GetTileTypeInDirEx(FieldPlayer *player, u16 direction, fx32 *height);
-// The form with the object code, 10 if it isn't one of the player's
+// The player's forms, the hero's and heroine's models
+#define PLAYER_FORM_COUNT 10
+
+// The form with the object code, PLAYER_FORM_COUNT if it isn't one of the player's
 u32 FieldPlayer_GetExStateByObjCode(u32 objCode);
 void FieldPlayer_ForceObjCode(FieldPlayer *player, u16 objCode);
 void FieldPlayer_ClearObjCode(FieldPlayer *player);

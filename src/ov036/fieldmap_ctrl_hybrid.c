@@ -1,4 +1,5 @@
 #include "types.h"
+#include "constants/obj_codes.h"
 #include "field/field.h"
 #include "field/field_actor.h"
 #include "field/field_camera.h"
@@ -24,6 +25,8 @@
 // The controller types
 #define HYBRID_GRID 0
 #define HYBRID_RAIL 1
+// The type before the first is set
+#define HYBRID_NONE 2
 
 void FieldmapCtrlHybrid_ReplacePlayer(FieldmapCtrlHybrid *controller, Field *field);
 void FieldmapCtrlHybrid_UpdateGrid(Field *field, FieldmapCtrlHybrid *controller);
@@ -35,7 +38,7 @@ void FieldmapCtrlHybrid_SwitchToGrid(Field *field, FieldmapCtrlHybrid *controlle
 BOOL FieldmapCtrlHybrid_FindGridPos(Field *field, FieldmapCtrlHybrid *controller, VecFx32 *pos, u16 dir);
 BOOL FieldmapCtrlHybrid_FindRailLocation(Field *field, FieldmapCtrlHybrid *controller, RailPosition *railPos, u16 dir);
 void FieldmapCtrlHybrid_SetMode(Field *field, FieldmapCtrlHybrid *controller, u32 type, const void *pos, u16 dir,
-                                u16 a5, u16 a6);
+                                u16 anim, u16 step);
 
 // The update of each controller type
 static void (*sUpdateFuncs[2])(Field *field, FieldmapCtrlHybrid *controller) = {
@@ -44,7 +47,7 @@ static void (*sUpdateFuncs[2])(Field *field, FieldmapCtrlHybrid *controller) = {
 };
 
 // The player's actor on the grid, whose object code is filled in
-static ZoneNPC sGridPlayer = { 0xff, 0xe7, 0, 0, 0, 0, 0, 0, 0, 0, 0xffff, 0xffff, FALSE };
+static ZoneNPC sGridPlayer = { 0xff, OBJ_CODE_HERO, 0, 0, 0, 0, 0, 0, 0, 0, 0xffff, 0xffff, FALSE };
 
 u32 FieldmapCtrlHybrid_GetActiveTypeID(FieldmapCtrlHybrid *controller) {
     return controller->activeType;
@@ -63,7 +66,7 @@ void FieldmapCtrlHybrid_ReplacePlayer(FieldmapCtrlHybrid *controller, Field *fie
     } else if (FieldmapCtrlHybrid_FindGridPos(field, controller, &pos, dir)) {
         FieldmapCtrlHybrid_SwitchToGrid(field, controller, dir, FALSE, &pos, 0, 0);
     }
-    controller->unk08 = 0;
+    controller->forcedMove = 0;
 }
 
 void FieldmapCtrlHybrid_Create(Field *field, VecFx32 *pos, u16 dir) {
@@ -73,27 +76,27 @@ void FieldmapCtrlHybrid_Create(Field *field, VecFx32 *pos, u16 dir) {
         GFL_HeapAllocate(heapId, sizeof(FieldmapCtrlHybrid), TRUE, "fieldmap_ctrl_hybrid.c", 189);
     u32 isRail;
     FieldActor *actor;
-    u16 a6;
-    u16 a5;
+    u16 step;
+    u16 anim;
     RailPosition *railPos;
 
     Field_SetController(field, controller);
     controller->player = Field_GetPlayer(field);
     isRail = PlayerState_IsRail(playerState);
-    controller->activeType = 2;
+    controller->activeType = HYBRID_NONE;
     actor = FieldPlayer_GetActor(controller->player);
-    RailActorAnim_GetBillboardActorAnime(actor, &a5, &a6);
+    RailActorAnim_GetBillboardActorAnime(actor, &anim, &step);
     if (isRail == FALSE) {
         FieldPlayer_InitGrid(controller->player, heapId);
         FieldPlayer_CreateNogrid(controller->player, heapId);
         FieldPlayer_SetDirection(controller->player, dir);
-        FieldmapCtrlHybrid_SetMode(field, controller, isRail, pos, dir, a5, a6);
+        FieldmapCtrlHybrid_SetMode(field, controller, isRail, pos, dir, anim, step);
     } else {
         railPos = PlayerState_GetRailPos(playerState);
         FieldPlayer_CreateNogrid(controller->player, heapId);
         FieldPlayer_InitGrid(controller->player, heapId);
         FieldPlayer_SetDirection(controller->player, dir);
-        FieldmapCtrlHybrid_SetMode(field, controller, isRail, railPos, dir, a5, a6);
+        FieldmapCtrlHybrid_SetMode(field, controller, isRail, railPos, dir, anim, step);
     }
     Field_SetPlayerPosPtr(field, GetMModelWPosPtr(actor));
     FieldPlayer_GetWPos(controller->player, pos);
@@ -136,7 +139,7 @@ void FieldmapCtrlHybrid_UpdateGrid(Field *field, FieldmapCtrlHybrid *controller)
         }
     }
     if (FieldPlayer_CheckRunningShoesFlag(controller->player) == TRUE) {
-        flags |= 1;
+        flags |= MOVE_FLAG_CAN_RUN;
     }
     FieldPlayer_UpdateGridMovement(controller->player, pressedKeys, heldKeys, flags);
 }
@@ -152,7 +155,7 @@ void FieldmapCtrlHybrid_UpdateNogrid(Field *field, FieldmapCtrlHybrid *controlle
     u32 tileAhead;
     VecFx32 pos;
 
-    if (controller->unk08 == 0) {
+    if (controller->forcedMove == 0) {
         dir = FieldPlayer_GetMoveDirByKey(controller->player, heldKeys);
         keyDir = TRUE;
     } else {
@@ -166,26 +169,26 @@ void FieldmapCtrlHybrid_UpdateNogrid(Field *field, FieldmapCtrlHybrid *controlle
         if (FieldRailTilemap_IsJumpStart(GetTileClass(tileUnder)) && MapTile_BlocksCollision(tileAhead) &&
             FieldmapCtrlHybrid_FindGridPos(field, controller, &pos, dir)) {
             FieldmapCtrlHybrid_SwitchToGrid(field, controller, dir, keyDir, &pos, pressedKeys, heldKeys);
-            controller->unk08 = 0;
+            controller->forcedMove = 0;
             return;
         }
     }
-    controller->unk08 = FieldPlayer_IsNogridForcedMove(controller->player);
+    controller->forcedMove = FieldPlayer_IsNogridForcedMove(controller->player);
     FieldPlayer_UpdateRailMovement(controller->player, pressedKeys, heldKeys);
 }
 
 void FieldmapCtrlHybrid_SwitchToNogrid(Field *field, FieldmapCtrlHybrid *controller, u16 dir, BOOL keyDir,
                                        const RailPosition *railPos, u32 pressedKeys, u32 heldKeys) {
     FieldActor *actor = FieldPlayer_GetActor(controller->player);
-    u16 a6;
-    u16 a5;
+    u16 step;
+    u16 anim;
 
-    RailActorAnim_GetBillboardActorAnime(actor, &a5, &a6);
+    RailActorAnim_GetBillboardActorAnime(actor, &anim, &step);
     FieldPlayer_UpdateGridMovement(controller->player, 0, 0, 0);
     if (!keyDir) {
         dir = GetActorFaceDir(actor);
     }
-    FieldmapCtrlHybrid_SetMode(field, controller, HYBRID_RAIL, railPos, dir, a5, a6);
+    FieldmapCtrlHybrid_SetMode(field, controller, HYBRID_RAIL, railPos, dir, anim, step);
     FieldPlayer_UpdateRailMovement(controller->player, pressedKeys, heldKeys);
 }
 
@@ -193,17 +196,17 @@ void FieldmapCtrlHybrid_SwitchToGrid(Field *field, FieldmapCtrlHybrid *controlle
                                      const VecFx32 *pos, u32 pressedKeys, u32 heldKeys) {
     u32 flags = 0;
     FieldActor *actor = FieldPlayer_GetActor(controller->player);
-    u16 a6;
-    u16 a5;
+    u16 step;
+    u16 anim;
 
-    RailActorAnim_GetBillboardActorAnime(actor, &a5, &a6);
+    RailActorAnim_GetBillboardActorAnime(actor, &anim, &step);
     FieldPlayer_UpdateRailMovement(controller->player, 0, 0);
     if (!keyDir) {
         dir = GetActorFaceDir(actor);
     }
-    FieldmapCtrlHybrid_SetMode(field, controller, HYBRID_GRID, pos, dir, a5, a6);
+    FieldmapCtrlHybrid_SetMode(field, controller, HYBRID_GRID, pos, dir, anim, step);
     if (FieldPlayer_CheckRunningShoesFlag(controller->player) == TRUE) {
-        flags |= 1;
+        flags |= MOVE_FLAG_CAN_RUN;
     }
     FieldPlayer_UpdateGridMovement(controller->player, pressedKeys, heldKeys, flags);
 }
@@ -247,7 +250,7 @@ BOOL FieldmapCtrlHybrid_FindRailLocation(Field *field, FieldmapCtrlHybrid *contr
 
 // Switches the player to the controller type at the position, a VecFx32 for the grid and a RailPosition for a rail
 void FieldmapCtrlHybrid_SetMode(Field *field, FieldmapCtrlHybrid *controller, u32 type, const void *pos, u16 dir,
-                                u16 a5, u16 a6) {
+                                u16 anim, u16 step) {
     NoGridMapper *mapper = Field_GetNoGridMapper(field);
     FieldCamera *camera = Field_GetCameraSystem(field);
     FieldActor *actor;
@@ -281,6 +284,6 @@ void FieldmapCtrlHybrid_SetMode(Field *field, FieldmapCtrlHybrid *controller, u3
     }
     CheckSetActorFaceDir(actor, dir);
     SetActorMotionDir(actor, dir);
-    RailActorAnim_SetBillboardActorAnime(actor, a5, a6);
+    RailActorAnim_SetBillboardActorAnime(actor, anim, step);
     controller->activeType = type;
 }

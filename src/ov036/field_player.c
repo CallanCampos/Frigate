@@ -31,8 +31,6 @@ struct FieldPlayer {
 // The controller types that Field_GetResolvedControllerTypeID returns
 #define CONTROLLER_GRID 0
 
-#define PLAYER_FORM_COUNT 10
-
 #define GRID_TO_FX32(n) ((n) * FX32_CONST(16))
 
 // How far below the player the water may be for them to start surfing

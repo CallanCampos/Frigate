@@ -575,7 +575,7 @@ u32 GetTrainerClassBattlePedestal(u32 trainerClass) {
     u8 id = GetTrainerClassSpecialId(trainerClass);
 
     if (id >= TRAINER_CLASS_SPECIAL_COUNT) {
-        return 20;
+        return TRAINER_PEDESTAL_NONE;
     }
     return SPECIAL_TRAINER_CLASSES[id].pedestal;
 }

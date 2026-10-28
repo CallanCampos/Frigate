@@ -10,13 +10,14 @@
 typedef struct {
     u32 netId;
     u16 actorDeleted;
-    u16 unk6;
+    // Whether a player's actor that moves far in a frame is drawn running
+    u16 allowRun;
     FieldActor *actor;
 } FldCommActEntry;
 
 struct FldCommActSys {
     u16 count;
-    u16 unk2;
+    u16 allowRun;
     MMSys *actorSystem;
     FldCommActEntry *entries;
 };
@@ -36,11 +37,11 @@ static void FieldCommActor_SetMoveWork(FieldActor *actor, const u16 *dir, const 
                                        FldCommActEntry *entry);
 static u16 FieldCommActor_ConvertDir(u16 dir);
 
-FldCommActSys *FldCommActSys_Create(u8 count, MMSys *actorSystem, HeapID heapId, BOOL a3) {
+FldCommActSys *FldCommActSys_Create(u8 count, MMSys *actorSystem, HeapID heapId, BOOL allowRun) {
     FldCommActSys *sys = GFL_HeapAllocate(heapId, sizeof(FldCommActSys), TRUE, "field_comm_actor.c", 93);
 
     sys->count = count;
-    sys->unk2 = a3;
+    sys->allowRun = allowRun;
     sys->actorSystem = actorSystem;
     sys->entries = GFL_HeapAllocate(heapId, sizeof(FldCommActEntry) * count, TRUE, "field_comm_actor.c", 99);
     return sys;
@@ -69,7 +70,7 @@ void FldCommActSys_CreateActor(FldCommActSys *sys, u32 netId, u16 modelId, const
         if (entry->actor == NULL) {
             entry->actor = FieldCommActor_Add(sys, modelId, dir, pos, hidden, entry);
             entry->netId = netId;
-            entry->unk6 = sys->unk2;
+            entry->allowRun = sys->allowRun;
             return;
         }
     }
@@ -171,7 +172,7 @@ void FieldCommActor_Move(FieldActor *actor) {
     if (pos.x != link->pos->x || pos.y != link->pos->y || pos.z != link->pos->z) {
         SetActorWPosAll(actor, link->pos, GetActorFaceDir(actor));
         state = 3;
-        if (link->entry->unk6 != 0) {
+        if (link->entry->allowRun != 0) {
             u16 objCode = FldAct_GetObjCode(actor);
 
             if (objCode == OBJ_CODE_HERO || objCode == OBJ_CODE_HEROINE) {

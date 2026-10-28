@@ -32,7 +32,7 @@ struct ActorG3DSystem {
 
 // What an animation command with a wait keeps in the actor's work
 typedef struct {
-    s16 unk0;
+    s16 drawStatus;
     s16 wait;
 } ActorWaitWork;
 
@@ -68,10 +68,10 @@ static void RailActor_ClearReflectionIfOffTile(FieldActor *actor, u32 tile, u32 
 static void RailActor_UpdateShadowGroup(FieldActor *actor, u32 tile, u32 origYTile, const FieldActorConfig *info);
 static FieldEffects *FldAct_GetFieldEffects(FieldActor *actor);
 static void RailActorAcmd_InitTurn(FieldActor *actor, u32 dir);
-static void RailActorAcmd_InitMove(FieldActor *actor, u32 dir, u32 speed, u32 frames);
-static void RailActorAcmd_InitWait(FieldActor *actor, u32 dir, u32 speed, u32 frames);
-static void RailActorAcmd_InitJump(FieldActor *actor, u32 dir, u32 speed, u32 timer, u16 frame, s16 height, u16 step,
-                                   u32 se);
+static void RailActorAcmd_InitMove(FieldActor *actor, u32 dir, u32 speed, u32 drawStatus);
+static void RailActorAcmd_InitWait(FieldActor *actor, u32 dir, u32 frames, u32 drawStatus);
+static void RailActorAcmd_InitJump(FieldActor *actor, u32 dir, u32 speed, u32 timer, u16 drawStatus, s16 height,
+                                   u16 step, u32 se);
 
 // The direction an actor on the rails faces, by the sixteenth of a turn from the camera angle to its way along the rail
 static const u8 FACE_DIRS_BY_ANGLE[16] = { 1, 3, 3, 3, 3, 3, 3, 0, 0, 2, 2, 2, 2, 2, 2, 1 };
@@ -510,11 +510,11 @@ BOOL RailActor_AcFaceR(FieldActor *actor) {
     return TRUE;
 }
 
-static void RailActorAcmd_InitMove(FieldActor *actor, u32 dir, u32 speed, u32 frames) {
+static void RailActorAcmd_InitMove(FieldActor *actor, u32 dir, u32 speed, u32 drawStatus) {
     RailActor_SetMoveRequest(actor, dir, speed);
     RailActor_SetGridPosByDir(actor, dir);
     ChangeActorDirection(actor, dir);
-    FldAct_SetDrawStatus(actor, frames);
+    FldAct_SetDrawStatus(actor, drawStatus);
     SetActorMovementFlag(actor, 0x20);
     FieldActor_NextAcmdState(actor);
 }
@@ -541,92 +541,92 @@ BOOL RailActor_AcWalkEnd(FieldActor *actor) {
 }
 
 BOOL RailActor_AcWalkU16F0(FieldActor *actor) {
-    RailActorAcmd_InitMove(actor, 0, 16, 2);
+    RailActorAcmd_InitMove(actor, DIR_UP, 16, 2);
     return TRUE;
 }
 BOOL RailActor_AcWalkD16F0(FieldActor *actor) {
-    RailActorAcmd_InitMove(actor, 1, 16, 2);
+    RailActorAcmd_InitMove(actor, DIR_DOWN, 16, 2);
     return TRUE;
 }
 BOOL RailActor_AcWalkL16F0(FieldActor *actor) {
-    RailActorAcmd_InitMove(actor, 2, 16, 2);
+    RailActorAcmd_InitMove(actor, DIR_LEFT, 16, 2);
     return TRUE;
 }
 BOOL RailActor_AcWalkR16F0(FieldActor *actor) {
-    RailActorAcmd_InitMove(actor, 3, 16, 2);
+    RailActorAcmd_InitMove(actor, DIR_RIGHT, 16, 2);
     return TRUE;
 }
 BOOL RailActor_AcWalkU8F0(FieldActor *actor) {
-    RailActorAcmd_InitMove(actor, 0, 8, 3);
+    RailActorAcmd_InitMove(actor, DIR_UP, 8, 3);
     return TRUE;
 }
 BOOL RailActor_AcWalkD8F0(FieldActor *actor) {
-    RailActorAcmd_InitMove(actor, 1, 8, 3);
+    RailActorAcmd_InitMove(actor, DIR_DOWN, 8, 3);
     return TRUE;
 }
 BOOL RailActor_AcWalkL8F0(FieldActor *actor) {
-    RailActorAcmd_InitMove(actor, 2, 8, 3);
+    RailActorAcmd_InitMove(actor, DIR_LEFT, 8, 3);
     return TRUE;
 }
 BOOL RailActor_AcWalkR8F0(FieldActor *actor) {
-    RailActorAcmd_InitMove(actor, 3, 8, 3);
+    RailActorAcmd_InitMove(actor, DIR_RIGHT, 8, 3);
     return TRUE;
 }
 BOOL RailActor_AcWalkU4F0(FieldActor *actor) {
-    RailActorAcmd_InitMove(actor, 0, 4, 4);
+    RailActorAcmd_InitMove(actor, DIR_UP, 4, 4);
     return TRUE;
 }
 BOOL RailActor_AcWalkD4F0(FieldActor *actor) {
-    RailActorAcmd_InitMove(actor, 1, 4, 4);
+    RailActorAcmd_InitMove(actor, DIR_DOWN, 4, 4);
     return TRUE;
 }
 BOOL RailActor_AcWalkL4F0(FieldActor *actor) {
-    RailActorAcmd_InitMove(actor, 2, 4, 4);
+    RailActorAcmd_InitMove(actor, DIR_LEFT, 4, 4);
     return TRUE;
 }
 BOOL RailActor_AcWalkR4F0(FieldActor *actor) {
-    RailActorAcmd_InitMove(actor, 3, 4, 4);
+    RailActorAcmd_InitMove(actor, DIR_RIGHT, 4, 4);
     return TRUE;
 }
 BOOL RailActor_AcWalkU2F0(FieldActor *actor) {
-    RailActorAcmd_InitMove(actor, 0, 2, 5);
+    RailActorAcmd_InitMove(actor, DIR_UP, 2, 5);
     return TRUE;
 }
 BOOL RailActor_AcWalkD2F0(FieldActor *actor) {
-    RailActorAcmd_InitMove(actor, 1, 2, 5);
+    RailActorAcmd_InitMove(actor, DIR_DOWN, 2, 5);
     return TRUE;
 }
 BOOL RailActor_AcWalkL2F0(FieldActor *actor) {
-    RailActorAcmd_InitMove(actor, 2, 2, 5);
+    RailActorAcmd_InitMove(actor, DIR_LEFT, 2, 5);
     return TRUE;
 }
 BOOL RailActor_AcWalkR2F0(FieldActor *actor) {
-    RailActorAcmd_InitMove(actor, 3, 2, 5);
+    RailActorAcmd_InitMove(actor, DIR_RIGHT, 2, 5);
     return TRUE;
 }
 BOOL RailActor_AcDashU4F0(FieldActor *actor) {
-    RailActorAcmd_InitMove(actor, 0, 4, 10);
+    RailActorAcmd_InitMove(actor, DIR_UP, 4, 10);
     return TRUE;
 }
 BOOL RailActor_AcDashD4F0(FieldActor *actor) {
-    RailActorAcmd_InitMove(actor, 1, 4, 10);
+    RailActorAcmd_InitMove(actor, DIR_DOWN, 4, 10);
     return TRUE;
 }
 BOOL RailActor_AcDashL4F0(FieldActor *actor) {
-    RailActorAcmd_InitMove(actor, 2, 4, 10);
+    RailActorAcmd_InitMove(actor, DIR_LEFT, 4, 10);
     return TRUE;
 }
 BOOL RailActor_AcDashR4F0(FieldActor *actor) {
-    RailActorAcmd_InitMove(actor, 3, 4, 10);
+    RailActorAcmd_InitMove(actor, DIR_RIGHT, 4, 10);
     return TRUE;
 }
-static void RailActorAcmd_InitWait(FieldActor *actor, u32 dir, u32 speed, u32 frames) {
+static void RailActorAcmd_InitWait(FieldActor *actor, u32 dir, u32 frames, u32 drawStatus) {
     ActorWaitWork *work = FldAct_InitMoveCmdWork(actor, sizeof(ActorWaitWork));
 
-    work->unk0 = frames;
-    work->wait = speed;
+    work->drawStatus = drawStatus;
+    work->wait = frames;
     CheckSetActorFaceDir(actor, dir);
-    FldAct_SetDrawStatus(actor, frames);
+    FldAct_SetDrawStatus(actor, drawStatus);
     SetActorInitialGPosToNowGPos(actor);
     FieldActor_NextAcmdState(actor);
 }
@@ -643,93 +643,93 @@ BOOL RailActor_AcStayWalk1(FieldActor *actor) {
     return TRUE;
 }
 BOOL RailActor_AcStayWalkU32F0(FieldActor *actor) {
-    RailActorAcmd_InitWait(actor, 0, 32, 1);
+    RailActorAcmd_InitWait(actor, DIR_UP, 32, 1);
     return TRUE;
 }
 BOOL RailActor_AcStayWalkD32F0(FieldActor *actor) {
-    RailActorAcmd_InitWait(actor, 1, 32, 1);
+    RailActorAcmd_InitWait(actor, DIR_DOWN, 32, 1);
     return TRUE;
 }
 BOOL RailActor_AcStayWalkL32F0(FieldActor *actor) {
-    RailActorAcmd_InitWait(actor, 2, 32, 1);
+    RailActorAcmd_InitWait(actor, DIR_LEFT, 32, 1);
     return TRUE;
 }
 BOOL RailActor_AcStayWalkR32F0(FieldActor *actor) {
-    RailActorAcmd_InitWait(actor, 3, 32, 1);
+    RailActorAcmd_InitWait(actor, DIR_RIGHT, 32, 1);
     return TRUE;
 }
 BOOL RailActor_AcStayWalkU16F0(FieldActor *actor) {
-    RailActorAcmd_InitWait(actor, 0, 16, 2);
+    RailActorAcmd_InitWait(actor, DIR_UP, 16, 2);
     return TRUE;
 }
 BOOL RailActor_AcStayWalkD16F0(FieldActor *actor) {
-    RailActorAcmd_InitWait(actor, 1, 16, 2);
+    RailActorAcmd_InitWait(actor, DIR_DOWN, 16, 2);
     return TRUE;
 }
 BOOL RailActor_AcStayWalkL16F0(FieldActor *actor) {
-    RailActorAcmd_InitWait(actor, 2, 16, 2);
+    RailActorAcmd_InitWait(actor, DIR_LEFT, 16, 2);
     return TRUE;
 }
 BOOL RailActor_AcStayWalkR16F0(FieldActor *actor) {
-    RailActorAcmd_InitWait(actor, 3, 16, 2);
+    RailActorAcmd_InitWait(actor, DIR_RIGHT, 16, 2);
     return TRUE;
 }
 BOOL RailActor_AcStayWalkU8F0(FieldActor *actor) {
-    RailActorAcmd_InitWait(actor, 0, 8, 3);
+    RailActorAcmd_InitWait(actor, DIR_UP, 8, 3);
     return TRUE;
 }
 BOOL RailActor_AcStayWalkD8F0(FieldActor *actor) {
-    RailActorAcmd_InitWait(actor, 1, 8, 3);
+    RailActorAcmd_InitWait(actor, DIR_DOWN, 8, 3);
     return TRUE;
 }
 BOOL RailActor_AcStayWalkL8F0(FieldActor *actor) {
-    RailActorAcmd_InitWait(actor, 2, 8, 3);
+    RailActorAcmd_InitWait(actor, DIR_LEFT, 8, 3);
     return TRUE;
 }
 BOOL RailActor_AcStayWalkR8F0(FieldActor *actor) {
-    RailActorAcmd_InitWait(actor, 3, 8, 3);
+    RailActorAcmd_InitWait(actor, DIR_RIGHT, 8, 3);
     return TRUE;
 }
 BOOL RailActor_AcStayWalkU2F0(FieldActor *actor) {
-    RailActorAcmd_InitWait(actor, 0, 2, 5);
+    RailActorAcmd_InitWait(actor, DIR_UP, 2, 5);
     return TRUE;
 }
 BOOL RailActor_AcStayWalkD2F0(FieldActor *actor) {
-    RailActorAcmd_InitWait(actor, 1, 2, 5);
+    RailActorAcmd_InitWait(actor, DIR_DOWN, 2, 5);
     return TRUE;
 }
 BOOL RailActor_AcStayWalkL2F0(FieldActor *actor) {
-    RailActorAcmd_InitWait(actor, 2, 2, 5);
+    RailActorAcmd_InitWait(actor, DIR_LEFT, 2, 5);
     return TRUE;
 }
 BOOL RailActor_AcStayWalkR2F0(FieldActor *actor) {
-    RailActorAcmd_InitWait(actor, 3, 2, 5);
+    RailActorAcmd_InitWait(actor, DIR_RIGHT, 2, 5);
     return TRUE;
 }
 BOOL RailActor_AcStayWalkU4F0(FieldActor *actor) {
-    RailActorAcmd_InitWait(actor, 0, 4, 4);
+    RailActorAcmd_InitWait(actor, DIR_UP, 4, 4);
     return TRUE;
 }
 BOOL RailActor_AcStayWalkD4F0(FieldActor *actor) {
-    RailActorAcmd_InitWait(actor, 1, 4, 4);
+    RailActorAcmd_InitWait(actor, DIR_DOWN, 4, 4);
     return TRUE;
 }
 BOOL RailActor_AcStayWalkL4F0(FieldActor *actor) {
-    RailActorAcmd_InitWait(actor, 2, 4, 4);
+    RailActorAcmd_InitWait(actor, DIR_LEFT, 4, 4);
     return TRUE;
 }
 BOOL RailActor_AcStayWalkR4F0(FieldActor *actor) {
-    RailActorAcmd_InitWait(actor, 3, 4, 4);
+    RailActorAcmd_InitWait(actor, DIR_RIGHT, 4, 4);
     return TRUE;
 }
-static void RailActorAcmd_InitJump(FieldActor *actor, u32 dir, u32 speed, u32 timer, u16 frame, s16 height, u16 step,
-                                   u32 se) {
+static void RailActorAcmd_InitJump(FieldActor *actor, u32 dir, u32 speed, u32 timer, u16 drawStatus, s16 height,
+                                   u16 step, u32 se) {
     ActorRailJumpWork *work = FldAct_InitMoveCmdWork(actor, sizeof(ActorRailJumpWork));
 
     work->dir = dir;
     work->speed = speed;
     work->timer = timer;
-    work->unkE = frame;
+    work->drawStatus = drawStatus;
     work->height = height;
     work->step = step;
     if (speed == 0) {
@@ -740,13 +740,14 @@ static void RailActorAcmd_InitJump(FieldActor *actor, u32 dir, u32 speed, u32 ti
     }
     SetActorMovementFlag(actor, 0xa0);
     ChangeActorDirection(actor, dir);
-    FldAct_SetDrawStatus(actor, frame);
+    FldAct_SetDrawStatus(actor, drawStatus);
     FieldActor_NextAcmdState(actor);
     if (se != 0) {
         GFL_SndSEPlay(se);
     }
 }
 
-void RailActorAcmd_InitJumpWithSe(FieldActor *actor, u16 dir, u32 speed, u32 timer, u16 frame, s16 height, u16 step) {
-    RailActorAcmd_InitJump(actor, dir, speed, timer, frame, height, step, SEQ_SE_DANSA);
+void RailActorAcmd_InitJumpWithSe(FieldActor *actor, u16 dir, u32 speed, u32 timer, u16 drawStatus, s16 height,
+                                  u16 step) {
+    RailActorAcmd_InitJump(actor, dir, speed, timer, drawStatus, height, step, SEQ_SE_DANSA);
 }

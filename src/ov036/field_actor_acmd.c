@@ -376,11 +376,11 @@ static BOOL (*const ACMD_TCB_FUNCS[])(FieldAcmdWork *work) = { FieldAcmdTCB_Begi
                                                                FieldAcmdTCB_CommitAcmd,   FieldAcmdTCB_CheckSeqPerms,
                                                                FieldAcmdTCB_AdvanceQueue, FieldAcmdTCB_End };
 
-static const s32 data_ov036_021cb5b0[];
-static const s32 data_ov036_021cb5d4[];
-static const s32 data_ov036_021cb5ec[];
-static const s32 data_ov036_021cb608[];
-static const fx32 *data_ov036_021d4d34[];
+static const s32 sWalk3FSteps[];
+static const s32 sWalk6FSteps[];
+static const s32 sWalk7FSteps[];
+static const s32 sWalk12FSteps[];
+static const fx32 *sJumpHeightTables[];
 
 void FieldAcmdTCB_DeleteDrawSys(MMSys *system) {
     if (FldActSys_GetFieldBillboardActor(system) != NULL) {
@@ -429,7 +429,7 @@ void FieldAcmdSyncBillboardPos(FieldActor *actor) {
     VecFx32 pos;
     u32 idx = FldAct_GetBillboardActorIdx(actor, 0);
 
-    if (idx != 0xffff) {
+    if (idx != BILLBOARD_ACTOR_NONE) {
         BillboardActorSys *sys = FieldBillboardActor_GetBillboardActorSys(FldAct_GetFieldBillboardActor(actor));
 
         CopyActorPosAllAdd(actor, &pos);
@@ -512,7 +512,7 @@ static BOOL FieldAcmdTCB_AdvanceQueue(FieldAcmdWork *work) {
         return TRUE;
     }
     work->cursor = cursor + 1;
-    if (cursor[1].code == 0xfd) {
+    if (cursor[1].code == ACMD_END_KEEP) {
         work->ended = TRUE;
         work->state = ACMD_TCB_STATE_END;
         return FALSE;
@@ -553,14 +553,14 @@ void FieldAcmdTCB_RunCmds(FieldActor *actor) {
 
     do {
         acmd = FldAct_GetAcmd(actor);
-        if (acmd == 0xff) {
+        if (acmd == ACMD_NONE) {
             break;
         }
     } while (FldAct_ExecAcmd(actor, acmd, FldAct_GetAcmdState(actor)));
 }
 
 BOOL FieldAcmdTCB_Update(FieldActor *actor) {
-    if (FldAct_GetAcmd(actor) != 0xff) {
+    if (FldAct_GetAcmd(actor) != ACMD_NONE) {
         FieldAcmdTCB_RunCmds(actor);
         if (!CheckActorMovementFlag(actor, 0x400)) {
             return FALSE;
@@ -980,7 +980,7 @@ static BOOL FieldAcmdTCB_JumpMove(FieldActor *actor) {
         work->height = 0xf00;
     }
     index = work->height / 256;
-    row = data_ov036_021d4d34[work->heightTable];
+    row = sJumpHeightTables[work->heightTable];
     offset.x = 0;
     offset.y = row[index];
     offset.z = 0;
@@ -1391,7 +1391,7 @@ static BOOL FieldAcmdTCB_DashRight6F(FieldActor *actor) {
 }
 
 static BOOL FieldAcmdTCB_Walk6FMove(FieldActor *actor) {
-    if (FieldAcmdTCB_WalkTableMove(actor, data_ov036_021cb5d4) == TRUE) {
+    if (FieldAcmdTCB_WalkTableMove(actor, sWalk6FSteps) == TRUE) {
         return TRUE;
     }
     return FALSE;
@@ -1418,7 +1418,7 @@ static BOOL FieldAcmdTCB_WalkRight3F(FieldActor *actor) {
 }
 
 static BOOL FieldAcmdTCB_Walk3FMove(FieldActor *actor) {
-    if (FieldAcmdTCB_WalkTableMove(actor, data_ov036_021cb5b0) == TRUE) {
+    if (FieldAcmdTCB_WalkTableMove(actor, sWalk3FSteps) == TRUE) {
         return TRUE;
     }
     return FALSE;
@@ -1445,7 +1445,7 @@ static BOOL FieldAcmdTCB_WalkRight7F(FieldActor *actor) {
 }
 
 static BOOL FieldAcmdTCB_Walk7FMove(FieldActor *actor) {
-    if (FieldAcmdTCB_WalkTableMove(actor, data_ov036_021cb5ec) == TRUE) {
+    if (FieldAcmdTCB_WalkTableMove(actor, sWalk7FSteps) == TRUE) {
         return TRUE;
     }
     return FALSE;
@@ -1472,7 +1472,7 @@ static BOOL FieldAcmdTCB_WalkRight12F(FieldActor *actor) {
 }
 
 static BOOL FieldAcmdTCB_Walk12FMove(FieldActor *actor) {
-    if (FieldAcmdTCB_WalkTableMove(actor, data_ov036_021cb608) == TRUE) {
+    if (FieldAcmdTCB_WalkTableMove(actor, sWalk12FSteps) == TRUE) {
         return TRUE;
     }
     return FALSE;
@@ -1515,7 +1515,7 @@ static BOOL FieldAcmdTCB_AnimeWaitEndStop(FieldActor *actor) {
 
     FldAct_GetMoveCmdWork(actor);
     index = FldAct_GetBillboardActorIdx(actor, 0);
-    if (index != 0xffff) {
+    if (index != BILLBOARD_ACTOR_NONE) {
         if (BillboardActorSys_GetActorLastCmd(
                 FieldBillboardActor_GetBillboardActorSys(FldActSys_GetFieldBillboardActor(GetActorMModelSystem(actor))),
                 (u16)index, &cmd) == TRUE) {
@@ -1533,7 +1533,7 @@ static BOOL FieldAcmdTCB_AnimeWaitEnd(FieldActor *actor) {
 
     FldAct_GetMoveCmdWork(actor);
     index = FldAct_GetBillboardActorIdx(actor, 0);
-    if (index != 0xffff) {
+    if (index != BILLBOARD_ACTOR_NONE) {
         if (BillboardActorSys_GetActorLastCmd(
                 FieldBillboardActor_GetBillboardActorSys(FldActSys_GetFieldBillboardActor(GetActorMModelSystem(actor))),
                 (u16)index, &cmd) == TRUE) {
@@ -1566,7 +1566,7 @@ static BOOL FieldAcmdTCB_HideOffMove(FieldActor *actor) {
     VecFx32 offset = { 0, 0, 0 };
     FieldEffectTask *task;
 
-    offset.y = data_ov036_021d4d34[0][*work];
+    offset.y = sJumpHeightTables[0][*work];
     SetActorWPosOffset(actor, &offset);
     task = FieldActorMove_GetHideEffect(actor);
     if (task != NULL) {
@@ -1971,7 +1971,7 @@ static BOOL FieldAcmdTCB_HopMove(FieldActor *actor) {
     }
     VecFx32 bob = { 0, 0, 0 };
     u16 index = work->angle / 256;
-    bobValue = data_ov036_021d4d34[1][index];
+    bobValue = sJumpHeightTables[1][index];
     if (work->bobNegate == 1) {
         bobValue = -bobValue;
     }
@@ -2208,7 +2208,7 @@ static BOOL FieldAcmdTCB_AnimeWaitEndFaceDown(FieldActor *actor) {
     u32 billboardActorIdx;
     u16 cmd;
     billboardActorIdx = FldAct_GetBillboardActorIdx(actor, 0);
-    if (billboardActorIdx != 0xffff &&
+    if (billboardActorIdx != BILLBOARD_ACTOR_NONE &&
         !BillboardActorSys_GetActorLastCmd(billboardActor, (u16)billboardActorIdx, &cmd)) {
         return FALSE;
     }
@@ -2319,587 +2319,612 @@ static BOOL FieldAcmdTCB_DrawReadyWait(FieldActor *actor) {
 // 144's. The tables the functions read come last, declared at the top.
 const ActorAcmdFunc ACMD_DIR_TABLE[] = { FieldAcmdTCB_FaceUp, FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cad0c[] = { FieldAcmdTCB_FaceDown, FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_FACE_DOWN_TABLE[] = { FieldAcmdTCB_FaceDown, FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cad14[] = { FieldAcmdTCB_FaceLeft, FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_FACE_LEFT_TABLE[] = { FieldAcmdTCB_FaceLeft, FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021caccc[] = { FieldAcmdTCB_FaceRight, FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_FACE_RIGHT_TABLE[] = { FieldAcmdTCB_FaceRight, FieldAcmdTCB_SetAcmdEnd };
 
 const ActorAcmdFunc ACMD_WALK32_TABLE[] = { FieldAcmdTCB_WalkUp32F, FieldAcmdTCB_WalkMove, FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb580[] = { FieldAcmdTCB_WalkDown32F, FieldAcmdTCB_WalkMove,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_WALK_DOWN32_F_TABLE[] = { FieldAcmdTCB_WalkDown32F, FieldAcmdTCB_WalkMove,
+                                                   FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb574[] = { FieldAcmdTCB_WalkLeft32F, FieldAcmdTCB_WalkMove,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_WALK_LEFT32_F_TABLE[] = { FieldAcmdTCB_WalkLeft32F, FieldAcmdTCB_WalkMove,
+                                                   FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb568[] = { FieldAcmdTCB_WalkRight32F, FieldAcmdTCB_WalkMove,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_WALK_RIGHT32_F_TABLE[] = { FieldAcmdTCB_WalkRight32F, FieldAcmdTCB_WalkMove,
+                                                    FieldAcmdTCB_SetAcmdEnd };
 
 const ActorAcmdFunc ACMD_WALK16_TABLE[] = { FieldAcmdTCB_WalkUp16F, FieldAcmdTCB_WalkMove, FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb550[] = { FieldAcmdTCB_WalkDown16F, FieldAcmdTCB_WalkMove,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_WALK_DOWN16_F_TABLE[] = { FieldAcmdTCB_WalkDown16F, FieldAcmdTCB_WalkMove,
+                                                   FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb544[] = { FieldAcmdTCB_WalkLeft16F, FieldAcmdTCB_WalkMove,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_WALK_LEFT16_F_TABLE[] = { FieldAcmdTCB_WalkLeft16F, FieldAcmdTCB_WalkMove,
+                                                   FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb538[] = { FieldAcmdTCB_WalkRight16F, FieldAcmdTCB_WalkMove,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_WALK_RIGHT16_F_TABLE[] = { FieldAcmdTCB_WalkRight16F, FieldAcmdTCB_WalkMove,
+                                                    FieldAcmdTCB_SetAcmdEnd };
 
 const ActorAcmdFunc ACMD_WALK8_TABLE[] = { FieldAcmdTCB_WalkUp8F, FieldAcmdTCB_WalkMove, FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb520[] = { FieldAcmdTCB_WalkDown8F, FieldAcmdTCB_WalkMove, FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_WALK_DOWN8_F_TABLE[] = { FieldAcmdTCB_WalkDown8F, FieldAcmdTCB_WalkMove,
+                                                  FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb514[] = { FieldAcmdTCB_WalkLeft8F, FieldAcmdTCB_WalkMove, FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_WALK_LEFT8_F_TABLE[] = { FieldAcmdTCB_WalkLeft8F, FieldAcmdTCB_WalkMove,
+                                                  FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb508[] = { FieldAcmdTCB_WalkRight8F, FieldAcmdTCB_WalkMove,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_WALK_RIGHT8_F_TABLE[] = { FieldAcmdTCB_WalkRight8F, FieldAcmdTCB_WalkMove,
+                                                   FieldAcmdTCB_SetAcmdEnd };
 
 const ActorAcmdFunc ACMD_WALK4_TABLE[] = { FieldAcmdTCB_WalkUp4F, FieldAcmdTCB_WalkMove, FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb4f0[] = { FieldAcmdTCB_WalkDown4F, FieldAcmdTCB_WalkMove, FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_WALK_DOWN4_F_TABLE[] = { FieldAcmdTCB_WalkDown4F, FieldAcmdTCB_WalkMove,
+                                                  FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb4e4[] = { FieldAcmdTCB_WalkLeft4F, FieldAcmdTCB_WalkMove, FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_WALK_LEFT4_F_TABLE[] = { FieldAcmdTCB_WalkLeft4F, FieldAcmdTCB_WalkMove,
+                                                  FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb4d8[] = { FieldAcmdTCB_WalkRight4F, FieldAcmdTCB_WalkMove,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_WALK_RIGHT4_F_TABLE[] = { FieldAcmdTCB_WalkRight4F, FieldAcmdTCB_WalkMove,
+                                                   FieldAcmdTCB_SetAcmdEnd };
 
 const ActorAcmdFunc ACMD_WALK2_TABLE[] = { FieldAcmdTCB_WalkUp2F, FieldAcmdTCB_WalkMove, FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb4c0[] = { FieldAcmdTCB_WalkDown2F, FieldAcmdTCB_WalkMove, FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_WALK_DOWN2_F_TABLE[] = { FieldAcmdTCB_WalkDown2F, FieldAcmdTCB_WalkMove,
+                                                  FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb4b4[] = { FieldAcmdTCB_WalkLeft2F, FieldAcmdTCB_WalkMove, FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_WALK_LEFT2_F_TABLE[] = { FieldAcmdTCB_WalkLeft2F, FieldAcmdTCB_WalkMove,
+                                                  FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb4a8[] = { FieldAcmdTCB_WalkRight2F, FieldAcmdTCB_WalkMove,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_WALK_RIGHT2_F_TABLE[] = { FieldAcmdTCB_WalkRight2F, FieldAcmdTCB_WalkMove,
+                                                   FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb49c[] = { FieldAcmdTCB_WalkUp1F, FieldAcmdTCB_WalkMove, FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_WALK_UP1_F_TABLE[] = { FieldAcmdTCB_WalkUp1F, FieldAcmdTCB_WalkMove, FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb490[] = { FieldAcmdTCB_WalkDown1F, FieldAcmdTCB_WalkMove, FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_WALK_DOWN1_F_TABLE[] = { FieldAcmdTCB_WalkDown1F, FieldAcmdTCB_WalkMove,
+                                                  FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb484[] = { FieldAcmdTCB_WalkLeft1F, FieldAcmdTCB_WalkMove, FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_WALK_LEFT1_F_TABLE[] = { FieldAcmdTCB_WalkLeft1F, FieldAcmdTCB_WalkMove,
+                                                  FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb478[] = { FieldAcmdTCB_WalkRight1F, FieldAcmdTCB_WalkMove,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_WALK_RIGHT1_F_TABLE[] = { FieldAcmdTCB_WalkRight1F, FieldAcmdTCB_WalkMove,
+                                                   FieldAcmdTCB_SetAcmdEnd };
 
 const ActorAcmdFunc ACMD_TURN32_TABLE[] = { FieldAcmdTCB_StayWalkUp32F, FieldAcmdTCB_StayWalkMove,
                                             FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb460[] = { FieldAcmdTCB_StayWalkDown32F, FieldAcmdTCB_StayWalkMove,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_STAY_WALK_DOWN32_F_TABLE[] = { FieldAcmdTCB_StayWalkDown32F, FieldAcmdTCB_StayWalkMove,
+                                                        FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb454[] = { FieldAcmdTCB_StayWalkLeft32F, FieldAcmdTCB_StayWalkMove,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_STAY_WALK_LEFT32_F_TABLE[] = { FieldAcmdTCB_StayWalkLeft32F, FieldAcmdTCB_StayWalkMove,
+                                                        FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb448[] = { FieldAcmdTCB_StayWalkRight32F, FieldAcmdTCB_StayWalkMove,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_STAY_WALK_RIGHT32_F_TABLE[] = { FieldAcmdTCB_StayWalkRight32F, FieldAcmdTCB_StayWalkMove,
+                                                         FieldAcmdTCB_SetAcmdEnd };
 
 const ActorAcmdFunc ACMD_TURN16_TABLE[] = { FieldAcmdTCB_StayWalkUp16F, FieldAcmdTCB_StayWalkMove,
                                             FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb430[] = { FieldAcmdTCB_StayWalkDown16F, FieldAcmdTCB_StayWalkMove,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_STAY_WALK_DOWN16_F_TABLE[] = { FieldAcmdTCB_StayWalkDown16F, FieldAcmdTCB_StayWalkMove,
+                                                        FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb424[] = { FieldAcmdTCB_StayWalkLeft16F, FieldAcmdTCB_StayWalkMove,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_STAY_WALK_LEFT16_F_TABLE[] = { FieldAcmdTCB_StayWalkLeft16F, FieldAcmdTCB_StayWalkMove,
+                                                        FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb418[] = { FieldAcmdTCB_StayWalkRight16F, FieldAcmdTCB_StayWalkMove,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_STAY_WALK_RIGHT16_F_TABLE[] = { FieldAcmdTCB_StayWalkRight16F, FieldAcmdTCB_StayWalkMove,
+                                                         FieldAcmdTCB_SetAcmdEnd };
 
 const ActorAcmdFunc ACMD_TURN8_TABLE[] = { FieldAcmdTCB_StayWalkUp8F, FieldAcmdTCB_StayWalkMove,
                                            FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb400[] = { FieldAcmdTCB_StayWalkDown8F, FieldAcmdTCB_StayWalkMove,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_STAY_WALK_DOWN8_F_TABLE[] = { FieldAcmdTCB_StayWalkDown8F, FieldAcmdTCB_StayWalkMove,
+                                                       FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb3f4[] = { FieldAcmdTCB_StayWalkLeft8F, FieldAcmdTCB_StayWalkMove,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_STAY_WALK_LEFT8_F_TABLE[] = { FieldAcmdTCB_StayWalkLeft8F, FieldAcmdTCB_StayWalkMove,
+                                                       FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb3e8[] = { FieldAcmdTCB_StayWalkRight8F, FieldAcmdTCB_StayWalkMove,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_STAY_WALK_RIGHT8_F_TABLE[] = { FieldAcmdTCB_StayWalkRight8F, FieldAcmdTCB_StayWalkMove,
+                                                        FieldAcmdTCB_SetAcmdEnd };
 
 const ActorAcmdFunc ACMD_TURN4_TABLE[] = { FieldAcmdTCB_StayWalkUp4F, FieldAcmdTCB_StayWalkMove,
                                            FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb010[] = { FieldAcmdTCB_StayWalkDown4F, FieldAcmdTCB_StayWalkMove,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_STAY_WALK_DOWN4_F_TABLE[] = { FieldAcmdTCB_StayWalkDown4F, FieldAcmdTCB_StayWalkMove,
+                                                       FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb3c4[] = { FieldAcmdTCB_StayWalkLeft4F, FieldAcmdTCB_StayWalkMove,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_STAY_WALK_LEFT4_F_TABLE[] = { FieldAcmdTCB_StayWalkLeft4F, FieldAcmdTCB_StayWalkMove,
+                                                       FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb3b8[] = { FieldAcmdTCB_StayWalkRight4F, FieldAcmdTCB_StayWalkMove,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_STAY_WALK_RIGHT4_F_TABLE[] = { FieldAcmdTCB_StayWalkRight4F, FieldAcmdTCB_StayWalkMove,
+                                                        FieldAcmdTCB_SetAcmdEnd };
 
 const ActorAcmdFunc ACMD_TURN2_TABLE[] = { FieldAcmdTCB_StayWalkUp2F, FieldAcmdTCB_StayWalkMove,
                                            FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb3a0[] = { FieldAcmdTCB_StayWalkDown2F, FieldAcmdTCB_StayWalkMove,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_STAY_WALK_DOWN2_F_TABLE[] = { FieldAcmdTCB_StayWalkDown2F, FieldAcmdTCB_StayWalkMove,
+                                                       FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb394[] = { FieldAcmdTCB_StayWalkLeft2F, FieldAcmdTCB_StayWalkMove,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_STAY_WALK_LEFT2_F_TABLE[] = { FieldAcmdTCB_StayWalkLeft2F, FieldAcmdTCB_StayWalkMove,
+                                                       FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb388[] = { FieldAcmdTCB_StayWalkRight2F, FieldAcmdTCB_StayWalkMove,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_STAY_WALK_RIGHT2_F_TABLE[] = { FieldAcmdTCB_StayWalkRight2F, FieldAcmdTCB_StayWalkMove,
+                                                        FieldAcmdTCB_SetAcmdEnd };
 
 const ActorAcmdFunc ACMD_JUMP16F[] = { FieldAcmdTCB_StayJumpUp16F, FieldAcmdTCB_JumpMove, FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb370[] = { FieldAcmdTCB_StayJumpDown16F, FieldAcmdTCB_JumpMove,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_STAY_JUMP_DOWN16_F_TABLE[] = { FieldAcmdTCB_StayJumpDown16F, FieldAcmdTCB_JumpMove,
+                                                        FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb364[] = { FieldAcmdTCB_StayJumpLeft16F, FieldAcmdTCB_JumpMove,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_STAY_JUMP_LEFT16_F_TABLE[] = { FieldAcmdTCB_StayJumpLeft16F, FieldAcmdTCB_JumpMove,
+                                                        FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb358[] = { FieldAcmdTCB_StayJumpRight16F, FieldAcmdTCB_JumpMove,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_STAY_JUMP_RIGHT16_F_TABLE[] = { FieldAcmdTCB_StayJumpRight16F, FieldAcmdTCB_JumpMove,
+                                                         FieldAcmdTCB_SetAcmdEnd };
 
 const ActorAcmdFunc ACMD_JUMP8F[] = { FieldAcmdTCB_StayJumpUp8F, FieldAcmdTCB_JumpMove, FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb340[] = { FieldAcmdTCB_StayJumpDown8F, FieldAcmdTCB_JumpMove,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_STAY_JUMP_DOWN8_F_TABLE[] = { FieldAcmdTCB_StayJumpDown8F, FieldAcmdTCB_JumpMove,
+                                                       FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb334[] = { FieldAcmdTCB_StayJumpLeft8F, FieldAcmdTCB_JumpMove,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_STAY_JUMP_LEFT8_F_TABLE[] = { FieldAcmdTCB_StayJumpLeft8F, FieldAcmdTCB_JumpMove,
+                                                       FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb328[] = { FieldAcmdTCB_StayJumpRight8F, FieldAcmdTCB_JumpMove,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_STAY_JUMP_RIGHT8_F_TABLE[] = { FieldAcmdTCB_StayJumpRight8F, FieldAcmdTCB_JumpMove,
+                                                        FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb31c[] = { FieldAcmdTCB_JumpUp1G8F, FieldAcmdTCB_JumpMove, FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_JUMP_UP1_G8_F_TABLE[] = { FieldAcmdTCB_JumpUp1G8F, FieldAcmdTCB_JumpMove,
+                                                   FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb310[] = { FieldAcmdTCB_JumpDown1G8F, FieldAcmdTCB_JumpMove,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_JUMP_DOWN1_G8_F_TABLE[] = { FieldAcmdTCB_JumpDown1G8F, FieldAcmdTCB_JumpMove,
+                                                     FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb304[] = { FieldAcmdTCB_JumpLeft1G8F, FieldAcmdTCB_JumpMove,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_JUMP_LEFT1_G8_F_TABLE[] = { FieldAcmdTCB_JumpLeft1G8F, FieldAcmdTCB_JumpMove,
+                                                     FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb2f8[] = { FieldAcmdTCB_JumpRight1G8F, FieldAcmdTCB_JumpMove,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_JUMP_RIGHT1_G8_F_TABLE[] = { FieldAcmdTCB_JumpRight1G8F, FieldAcmdTCB_JumpMove,
+                                                      FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb2ec[] = { FieldAcmdTCB_JumpUp2G16F, FieldAcmdTCB_JumpMove,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_JUMP_UP2_G16_F_TABLE[] = { FieldAcmdTCB_JumpUp2G16F, FieldAcmdTCB_JumpMove,
+                                                    FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb2e0[] = { FieldAcmdTCB_JumpDown2G16F, FieldAcmdTCB_JumpMove,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_JUMP_DOWN2_G16_F_TABLE[] = { FieldAcmdTCB_JumpDown2G16F, FieldAcmdTCB_JumpMove,
+                                                      FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb2d4[] = { FieldAcmdTCB_JumpLeft2G16F, FieldAcmdTCB_JumpMove,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_JUMP_LEFT2_G16_F_TABLE[] = { FieldAcmdTCB_JumpLeft2G16F, FieldAcmdTCB_JumpMove,
+                                                      FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb2c8[] = { FieldAcmdTCB_JumpRight2G16F, FieldAcmdTCB_JumpMove,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_JUMP_RIGHT2_G16_F_TABLE[] = { FieldAcmdTCB_JumpRight2G16F, FieldAcmdTCB_JumpMove,
+                                                       FieldAcmdTCB_SetAcmdEnd };
 
 const ActorAcmdFunc ACMD_JUMP3G16F_TABLE[] = { FieldAcmdTCB_JumpLeft1G16F, FieldAcmdTCB_JumpMove,
                                                FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb1e4[] = { FieldAcmdTCB_JumpRight1G16F, FieldAcmdTCB_JumpMove,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_JUMP_RIGHT1_G16_F_TABLE[] = { FieldAcmdTCB_JumpRight1G16F, FieldAcmdTCB_JumpMove,
+                                                       FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb2a4[] = { FieldAcmdTCB_JumpLeft3G12F, FieldAcmdTCB_JumpMove,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_JUMP_LEFT3_G12_F_TABLE[] = { FieldAcmdTCB_JumpLeft3G12F, FieldAcmdTCB_JumpMove,
+                                                      FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb298[] = { FieldAcmdTCB_JumpRight3G12F, FieldAcmdTCB_JumpMove,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_JUMP_RIGHT3_G12_F_TABLE[] = { FieldAcmdTCB_JumpRight3G12F, FieldAcmdTCB_JumpMove,
+                                                       FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb28c[] = { FieldAcmdTCB_Wait1F, FieldAcmdTCB_WaitMove, FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_WAIT1_F_TABLE[] = { FieldAcmdTCB_Wait1F, FieldAcmdTCB_WaitMove, FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb280[] = { FieldAcmdTCB_Wait2F, FieldAcmdTCB_WaitMove, FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_WAIT2_F_TABLE[] = { FieldAcmdTCB_Wait2F, FieldAcmdTCB_WaitMove, FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb250[] = { FieldAcmdTCB_Wait4F, FieldAcmdTCB_WaitMove, FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_WAIT4_F_TABLE[] = { FieldAcmdTCB_Wait4F, FieldAcmdTCB_WaitMove, FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb25c[] = { FieldAcmdTCB_Wait8F, FieldAcmdTCB_WaitMove, FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_WAIT8_F_TABLE[] = { FieldAcmdTCB_Wait8F, FieldAcmdTCB_WaitMove, FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb274[] = { FieldAcmdTCB_Wait15F, FieldAcmdTCB_WaitMove, FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_WAIT15_F_TABLE[] = { FieldAcmdTCB_Wait15F, FieldAcmdTCB_WaitMove, FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb2b0[] = { FieldAcmdTCB_Wait16F, FieldAcmdTCB_WaitMove, FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_WAIT16_F_TABLE[] = { FieldAcmdTCB_Wait16F, FieldAcmdTCB_WaitMove, FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb244[] = { FieldAcmdTCB_Wait32F, FieldAcmdTCB_WaitMove, FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_WAIT32_F_TABLE[] = { FieldAcmdTCB_Wait32F, FieldAcmdTCB_WaitMove, FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb238[] = { FieldAcmdTCB_RiseInit, FieldAcmdTCB_RiseMove, FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_RISE_INIT_TABLE[] = { FieldAcmdTCB_RiseInit, FieldAcmdTCB_RiseMove, FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb22c[] = { FieldAcmdTCB_FallInit, FieldAcmdTCB_FallMove, FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_FALL_INIT_TABLE[] = { FieldAcmdTCB_FallInit, FieldAcmdTCB_FallMove, FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cad04[] = { FieldAcmdTCB_SetHiddenFlag, FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_SET_HIDDEN_FLAG_TABLE[] = { FieldAcmdTCB_SetHiddenFlag, FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cacec[] = { FieldAcmdTCB_ClearHiddenFlag, FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_CLEAR_HIDDEN_FLAG_TABLE[] = { FieldAcmdTCB_ClearHiddenFlag, FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cacac[] = { FieldAcmdTCB_SetFaceDirLockFlag, FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_SET_FACE_DIR_LOCK_FLAG_TABLE[] = { FieldAcmdTCB_SetFaceDirLockFlag, FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cacdc[] = { FieldAcmdTCB_ClearFaceDirLockFlag, FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_CLEAR_FACE_DIR_LOCK_FLAG_TABLE[] = { FieldAcmdTCB_ClearFaceDirLockFlag,
+                                                              FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cacd4[] = { FieldAcmdTCB_SetAnimePauseFlag, FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_SET_ANIME_PAUSE_FLAG_TABLE[] = { FieldAcmdTCB_SetAnimePauseFlag, FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cacfc[] = { FieldAcmdTCB_ClearAnimePauseFlag, FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_CLEAR_ANIME_PAUSE_FLAG_TABLE[] = { FieldAcmdTCB_ClearAnimePauseFlag, FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cadb8[] = { FieldAcmdTCB_MarkWaitExcl, FieldAcmdTCB_MarkWait,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_MARK_WAIT_EXCL_TABLE[] = { FieldAcmdTCB_MarkWaitExcl, FieldAcmdTCB_MarkWait,
+                                                    FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cad28[] = { FieldAcmdTCB_MarkWaitExclNoSe, FieldAcmdTCB_MarkWait,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_MARK_WAIT_EXCL_NO_SE_TABLE[] = { FieldAcmdTCB_MarkWaitExclNoSe, FieldAcmdTCB_MarkWait,
+                                                          FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb1c0[] = { FieldAcmdTCB_MarkWaitNoteNoSe, FieldAcmdTCB_MarkWait,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_MARK_WAIT_NOTE_NO_SE_TABLE[] = { FieldAcmdTCB_MarkWaitNoteNoSe, FieldAcmdTCB_MarkWait,
+                                                          FieldAcmdTCB_SetAcmdEnd };
 
 const ActorAcmdFunc data_ov036_021cb1b4[] = { func_ov036_0218fd18, FieldAcmdTCB_MarkWait, FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb1a8[] = { FieldAcmdTCB_MarkWaitQuestion, FieldAcmdTCB_MarkWait,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_MARK_WAIT_QUESTION_TABLE[] = { FieldAcmdTCB_MarkWaitQuestion, FieldAcmdTCB_MarkWait,
+                                                        FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb19c[] = { FieldAcmdTCB_MarkWaitNote, FieldAcmdTCB_MarkWait,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_MARK_WAIT_NOTE_TABLE[] = { FieldAcmdTCB_MarkWaitNote, FieldAcmdTCB_MarkWait,
+                                                    FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb190[] = { FieldAcmdTCB_MarkWaitEllipsis, FieldAcmdTCB_MarkWait,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_MARK_WAIT_ELLIPSIS_TABLE[] = { FieldAcmdTCB_MarkWaitEllipsis, FieldAcmdTCB_MarkWait,
+                                                        FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb184[] = { FieldAcmdTCB_WalkUp6F, FieldAcmdTCB_Walk6FMove, FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_WALK_UP6_F_TABLE[] = { FieldAcmdTCB_WalkUp6F, FieldAcmdTCB_Walk6FMove,
+                                                FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb178[] = { FieldAcmdTCB_WalkDown6F, FieldAcmdTCB_Walk6FMove,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_WALK_DOWN6_F_TABLE[] = { FieldAcmdTCB_WalkDown6F, FieldAcmdTCB_Walk6FMove,
+                                                  FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb16c[] = { FieldAcmdTCB_WalkLeft6F, FieldAcmdTCB_Walk6FMove,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_WALK_LEFT6_F_TABLE[] = { FieldAcmdTCB_WalkLeft6F, FieldAcmdTCB_Walk6FMove,
+                                                  FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb160[] = { FieldAcmdTCB_WalkRight6F, FieldAcmdTCB_Walk6FMove,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_WALK_RIGHT6_F_TABLE[] = { FieldAcmdTCB_WalkRight6F, FieldAcmdTCB_Walk6FMove,
+                                                   FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb154[] = { FieldAcmdTCB_DashUp6F, FieldAcmdTCB_Walk6FMove, FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_DASH_UP6_F_TABLE[] = { FieldAcmdTCB_DashUp6F, FieldAcmdTCB_Walk6FMove,
+                                                FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb148[] = { FieldAcmdTCB_DashDown6F, FieldAcmdTCB_Walk6FMove,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_DASH_DOWN6_F_TABLE[] = { FieldAcmdTCB_DashDown6F, FieldAcmdTCB_Walk6FMove,
+                                                  FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb13c[] = { FieldAcmdTCB_DashLeft6F, FieldAcmdTCB_Walk6FMove,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_DASH_LEFT6_F_TABLE[] = { FieldAcmdTCB_DashLeft6F, FieldAcmdTCB_Walk6FMove,
+                                                  FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021caec0[] = { FieldAcmdTCB_DashRight6F, FieldAcmdTCB_Walk6FMove,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_DASH_RIGHT6_F_TABLE[] = { FieldAcmdTCB_DashRight6F, FieldAcmdTCB_Walk6FMove,
+                                                   FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb124[] = { FieldAcmdTCB_WalkUp3F, FieldAcmdTCB_Walk3FMove, FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_WALK_UP3_F_TABLE[] = { FieldAcmdTCB_WalkUp3F, FieldAcmdTCB_Walk3FMove,
+                                                FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb118[] = { FieldAcmdTCB_WalkDown3F, FieldAcmdTCB_Walk3FMove,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_WALK_DOWN3_F_TABLE[] = { FieldAcmdTCB_WalkDown3F, FieldAcmdTCB_Walk3FMove,
+                                                  FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb10c[] = { FieldAcmdTCB_WalkLeft3F, FieldAcmdTCB_Walk3FMove,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_WALK_LEFT3_F_TABLE[] = { FieldAcmdTCB_WalkLeft3F, FieldAcmdTCB_Walk3FMove,
+                                                  FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb100[] = { FieldAcmdTCB_WalkRight3F, FieldAcmdTCB_Walk3FMove,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_WALK_RIGHT3_F_TABLE[] = { FieldAcmdTCB_WalkRight3F, FieldAcmdTCB_Walk3FMove,
+                                                   FieldAcmdTCB_SetAcmdEnd };
 
 const ActorAcmdFunc ACMD_RUN4F_TABLE[] = { FieldAcmdTCB_DashUp4F, FieldAcmdTCB_WalkMove, FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb0e8[] = { FieldAcmdTCB_DashDown4F, FieldAcmdTCB_WalkMove, FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_DASH_DOWN4_F_TABLE[] = { FieldAcmdTCB_DashDown4F, FieldAcmdTCB_WalkMove,
+                                                  FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb0dc[] = { FieldAcmdTCB_DashLeft4F, FieldAcmdTCB_WalkMove, FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_DASH_LEFT4_F_TABLE[] = { FieldAcmdTCB_DashLeft4F, FieldAcmdTCB_WalkMove,
+                                                  FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb0d0[] = { FieldAcmdTCB_DashRight4F, FieldAcmdTCB_WalkMove,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_DASH_RIGHT4_F_TABLE[] = { FieldAcmdTCB_DashRight4F, FieldAcmdTCB_WalkMove,
+                                                   FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb0c4[] = { FieldAcmdTCB_WalkUp7F, FieldAcmdTCB_Walk7FMove, FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_WALK_UP7_F_TABLE[] = { FieldAcmdTCB_WalkUp7F, FieldAcmdTCB_Walk7FMove,
+                                                FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb0b8[] = { FieldAcmdTCB_WalkDown7F, FieldAcmdTCB_Walk7FMove,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_WALK_DOWN7_F_TABLE[] = { FieldAcmdTCB_WalkDown7F, FieldAcmdTCB_Walk7FMove,
+                                                  FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb0ac[] = { FieldAcmdTCB_WalkLeft7F, FieldAcmdTCB_Walk7FMove,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_WALK_LEFT7_F_TABLE[] = { FieldAcmdTCB_WalkLeft7F, FieldAcmdTCB_Walk7FMove,
+                                                  FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb0a0[] = { FieldAcmdTCB_WalkRight7F, FieldAcmdTCB_Walk7FMove,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_WALK_RIGHT7_F_TABLE[] = { FieldAcmdTCB_WalkRight7F, FieldAcmdTCB_Walk7FMove,
+                                                   FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb094[] = { FieldAcmdTCB_WalkUp12F, FieldAcmdTCB_Walk12FMove,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_WALK_UP12_F_TABLE[] = { FieldAcmdTCB_WalkUp12F, FieldAcmdTCB_Walk12FMove,
+                                                 FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb088[] = { FieldAcmdTCB_WalkDown12F, FieldAcmdTCB_Walk12FMove,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_WALK_DOWN12_F_TABLE[] = { FieldAcmdTCB_WalkDown12F, FieldAcmdTCB_Walk12FMove,
+                                                   FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb07c[] = { FieldAcmdTCB_WalkLeft12F, FieldAcmdTCB_Walk12FMove,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_WALK_LEFT12_F_TABLE[] = { FieldAcmdTCB_WalkLeft12F, FieldAcmdTCB_Walk12FMove,
+                                                   FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb070[] = { FieldAcmdTCB_WalkRight12F, FieldAcmdTCB_Walk12FMove,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_WALK_RIGHT12_F_TABLE[] = { FieldAcmdTCB_WalkRight12F, FieldAcmdTCB_Walk12FMove,
+                                                    FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb064[] = { FieldAcmdTCB_AnimeWaitEndInit10, FieldAcmdTCB_AnimeWaitEndStop,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_ANIME_WAIT_END_INIT10_ANIME_WAIT_END_STOP_TABLE[] = { FieldAcmdTCB_AnimeWaitEndInit10,
+                                                                               FieldAcmdTCB_AnimeWaitEndStop,
+                                                                               FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb058[] = { FieldAcmdTCB_AnimeWaitEndInit10, FieldAcmdTCB_AnimeWaitEnd,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_ANIME_WAIT_END_INIT10_ANIME_WAIT_END_TABLE[] = { FieldAcmdTCB_AnimeWaitEndInit10,
+                                                                          FieldAcmdTCB_AnimeWaitEnd,
+                                                                          FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb04c[] = { FieldAcmdTCB_AnimeWaitEndInit11, FieldAcmdTCB_AnimeWaitEndStop,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_ANIME_WAIT_END_INIT11_ANIME_WAIT_END_STOP_TABLE[] = { FieldAcmdTCB_AnimeWaitEndInit11,
+                                                                               FieldAcmdTCB_AnimeWaitEndStop,
+                                                                               FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb040[] = { FieldAcmdTCB_AnimeWaitEndInit11, FieldAcmdTCB_AnimeWaitEnd,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_ANIME_WAIT_END_INIT11_ANIME_WAIT_END_TABLE[] = { FieldAcmdTCB_AnimeWaitEndInit11,
+                                                                          FieldAcmdTCB_AnimeWaitEnd,
+                                                                          FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb034[] = { FieldAcmdTCB_AnimeWaitEndInit12, FieldAcmdTCB_AnimeWaitEndStop,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_ANIME_WAIT_END_INIT12_ANIME_WAIT_END_STOP_TABLE[] = { FieldAcmdTCB_AnimeWaitEndInit12,
+                                                                               FieldAcmdTCB_AnimeWaitEndStop,
+                                                                               FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb028[] = { FieldAcmdTCB_AnimeWaitEndInit12, FieldAcmdTCB_AnimeWaitEnd,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_ANIME_WAIT_END_INIT12_ANIME_WAIT_END_TABLE[] = { FieldAcmdTCB_AnimeWaitEndInit12,
+                                                                          FieldAcmdTCB_AnimeWaitEnd,
+                                                                          FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb01c[] = { FieldAcmdTCB_AnimeWaitEndInit10Se, FieldAcmdTCB_AnimeWaitEndStop,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_ANIME_WAIT_END_INIT10_SE_TABLE[] = { FieldAcmdTCB_AnimeWaitEndInit10Se,
+                                                              FieldAcmdTCB_AnimeWaitEndStop, FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cae30[] = { FieldAcmdTCB_AnimeWaitEndInit11Se, FieldAcmdTCB_AnimeWaitEndStop,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_ANIME_WAIT_END_INIT11_SE_TABLE[] = { FieldAcmdTCB_AnimeWaitEndInit11Se,
+                                                              FieldAcmdTCB_AnimeWaitEndStop, FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb004[] = { FieldAcmdTCB_HideOffInit, FieldAcmdTCB_HideOffMove,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_HIDE_OFF_INIT_TABLE[] = { FieldAcmdTCB_HideOffInit, FieldAcmdTCB_HideOffMove,
+                                                   FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021caff8[] = { FieldAcmdTCB_StayWalk32F40F, FieldAcmdTCB_StayMove,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_STAY_WALK32_F40_F_TABLE[] = { FieldAcmdTCB_StayWalk32F40F, FieldAcmdTCB_StayMove,
+                                                       FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cafec[] = { FieldAcmdTCB_StayWalk16F41F, FieldAcmdTCB_StayMove,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_STAY_WALK16_F41_F_TABLE[] = { FieldAcmdTCB_StayWalk16F41F, FieldAcmdTCB_StayMove,
+                                                       FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cafe0[] = { FieldAcmdTCB_StayIdle8F, FieldAcmdTCB_StayMove, FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_STAY_IDLE8_F_TABLE[] = { FieldAcmdTCB_StayIdle8F, FieldAcmdTCB_StayMove,
+                                                  FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cafd4[] = { FieldAcmdTCB_StepUpFaceLeft8F, FieldAcmdTCB_StepMove,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_STEP_UP_FACE_LEFT8_F_TABLE[] = { FieldAcmdTCB_StepUpFaceLeft8F, FieldAcmdTCB_StepMove,
+                                                          FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cafc8[] = { FieldAcmdTCB_StepDownFaceRight8F, FieldAcmdTCB_StepMove,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_STEP_DOWN_FACE_RIGHT8_F_TABLE[] = { FieldAcmdTCB_StepDownFaceRight8F, FieldAcmdTCB_StepMove,
+                                                             FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cafbc[] = { FieldAcmdTCB_StepLeftFaceDown8F, FieldAcmdTCB_StepMove,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_STEP_LEFT_FACE_DOWN8_F_TABLE[] = { FieldAcmdTCB_StepLeftFaceDown8F, FieldAcmdTCB_StepMove,
+                                                            FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cafb0[] = { FieldAcmdTCB_StepRightFaceUp8F, FieldAcmdTCB_StepMove,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_STEP_RIGHT_FACE_UP8_F_TABLE[] = { FieldAcmdTCB_StepRightFaceUp8F, FieldAcmdTCB_StepMove,
+                                                           FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021caf80[] = { FieldAcmdTCB_StepUpFaceRight8F, FieldAcmdTCB_StepMove,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_STEP_UP_FACE_RIGHT8_F_TABLE[] = { FieldAcmdTCB_StepUpFaceRight8F, FieldAcmdTCB_StepMove,
+                                                           FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021caf8c[] = { FieldAcmdTCB_StepDownFaceLeft8F, FieldAcmdTCB_StepMove,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_STEP_DOWN_FACE_LEFT8_F_TABLE[] = { FieldAcmdTCB_StepDownFaceLeft8F, FieldAcmdTCB_StepMove,
+                                                            FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cafa4[] = { FieldAcmdTCB_StepLeftFaceUp8F, FieldAcmdTCB_StepMove,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_STEP_LEFT_FACE_UP8_F_TABLE[] = { FieldAcmdTCB_StepLeftFaceUp8F, FieldAcmdTCB_StepMove,
+                                                          FieldAcmdTCB_SetAcmdEnd };
 
 const ActorAcmdFunc data_ov036_021cb1f0[] = { func_ov036_021904f4, FieldAcmdTCB_StepMove, FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb208[] = { FieldAcmdTCB_StepUpFaceDown8F, FieldAcmdTCB_StepMove,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_STEP_UP_FACE_DOWN8_F_TABLE[] = { FieldAcmdTCB_StepUpFaceDown8F, FieldAcmdTCB_StepMove,
+                                                          FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb214[] = { FieldAcmdTCB_StepDownFaceUp8F, FieldAcmdTCB_StepMove,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_STEP_DOWN_FACE_UP8_F_TABLE[] = { FieldAcmdTCB_StepDownFaceUp8F, FieldAcmdTCB_StepMove,
+                                                          FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb268[] = { FieldAcmdTCB_StepLeftFaceRight8F, FieldAcmdTCB_StepMove,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_STEP_LEFT_FACE_RIGHT8_F_TABLE[] = { FieldAcmdTCB_StepLeftFaceRight8F, FieldAcmdTCB_StepMove,
+                                                             FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb3d0[] = { FieldAcmdTCB_StepRightFaceLeft8F, FieldAcmdTCB_StepMove,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_STEP_RIGHT_FACE_LEFT8_F_TABLE[] = { FieldAcmdTCB_StepRightFaceLeft8F, FieldAcmdTCB_StepMove,
+                                                             FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021caf44[] = { FieldAcmdTCB_StepUpFaceDown4F, FieldAcmdTCB_StepMove,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_STEP_UP_FACE_DOWN4_F_TABLE[] = { FieldAcmdTCB_StepUpFaceDown4F, FieldAcmdTCB_StepMove,
+                                                          FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021caf38[] = { FieldAcmdTCB_StepDownFaceUp4F, FieldAcmdTCB_StepMove,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_STEP_DOWN_FACE_UP4_F_TABLE[] = { FieldAcmdTCB_StepDownFaceUp4F, FieldAcmdTCB_StepMove,
+                                                          FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021caf2c[] = { FieldAcmdTCB_StepLeftFaceRight4F, FieldAcmdTCB_StepMove,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_STEP_LEFT_FACE_RIGHT4_F_TABLE[] = { FieldAcmdTCB_StepLeftFaceRight4F, FieldAcmdTCB_StepMove,
+                                                             FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cadc4[] = { FieldAcmdTCB_StepRightFaceLeft4F, FieldAcmdTCB_StepMove,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_STEP_RIGHT_FACE_LEFT4_F_TABLE[] = { FieldAcmdTCB_StepRightFaceLeft4F, FieldAcmdTCB_StepMove,
+                                                             FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb1d8[] = { FieldAcmdTCB_StepUpFaceDown2F, FieldAcmdTCB_StepMove,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_STEP_UP_FACE_DOWN2_F_TABLE[] = { FieldAcmdTCB_StepUpFaceDown2F, FieldAcmdTCB_StepMove,
+                                                          FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb1cc[] = { FieldAcmdTCB_StepDownFaceUp2F, FieldAcmdTCB_StepMove,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_STEP_DOWN_FACE_UP2_F_TABLE[] = { FieldAcmdTCB_StepDownFaceUp2F, FieldAcmdTCB_StepMove,
+                                                          FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021caefc[] = { FieldAcmdTCB_StepLeftFaceRight2F, FieldAcmdTCB_StepMove,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_STEP_LEFT_FACE_RIGHT2_F_TABLE[] = { FieldAcmdTCB_StepLeftFaceRight2F, FieldAcmdTCB_StepMove,
+                                                             FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021caef0[] = { FieldAcmdTCB_StepRightFaceLeft2F, FieldAcmdTCB_StepMove,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_STEP_RIGHT_FACE_LEFT2_F_TABLE[] = { FieldAcmdTCB_StepRightFaceLeft2F, FieldAcmdTCB_StepMove,
+                                                             FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021caee4[] = { FieldAcmdTCB_JumpUp3G24FNoSe, FieldAcmdTCB_JumpMove,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_JUMP_UP3_G24_F_NO_SE_TABLE[] = { FieldAcmdTCB_JumpUp3G24FNoSe, FieldAcmdTCB_JumpMove,
+                                                          FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021caed8[] = { FieldAcmdTCB_JumpDown3G24FNoSe, FieldAcmdTCB_JumpMove,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_JUMP_DOWN3_G24_F_NO_SE_TABLE[] = { FieldAcmdTCB_JumpDown3G24FNoSe, FieldAcmdTCB_JumpMove,
+                                                            FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021caecc[] = { FieldAcmdTCB_JumpLeft3G24FNoSe, FieldAcmdTCB_JumpMove,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_JUMP_LEFT3_G24_F_NO_SE_TABLE[] = { FieldAcmdTCB_JumpLeft3G24FNoSe, FieldAcmdTCB_JumpMove,
+                                                            FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cad94[] = { FieldAcmdTCB_JumpRight3G24FNoSe, FieldAcmdTCB_JumpMove,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_JUMP_RIGHT3_G24_F_NO_SE_TABLE[] = { FieldAcmdTCB_JumpRight3G24FNoSe, FieldAcmdTCB_JumpMove,
+                                                             FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021caeb4[] = { FieldAcmdTCB_DashStepUpFaceLeft4F, FieldAcmdTCB_StepMove,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_DASH_STEP_UP_FACE_LEFT4_F_TABLE[] = { FieldAcmdTCB_DashStepUpFaceLeft4F, FieldAcmdTCB_StepMove,
+                                                               FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021caea8[] = { FieldAcmdTCB_DashStepDownFaceRight4F, FieldAcmdTCB_StepMove,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_DASH_STEP_DOWN_FACE_RIGHT4_F_TABLE[] = { FieldAcmdTCB_DashStepDownFaceRight4F,
+                                                                  FieldAcmdTCB_StepMove, FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cae9c[] = { FieldAcmdTCB_DashStepLeftFaceDown4F, FieldAcmdTCB_StepMove,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_DASH_STEP_LEFT_FACE_DOWN4_F_TABLE[] = { FieldAcmdTCB_DashStepLeftFaceDown4F,
+                                                                 FieldAcmdTCB_StepMove, FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cae90[] = { FieldAcmdTCB_DashStepRightFaceUp4F, FieldAcmdTCB_StepMove,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_DASH_STEP_RIGHT_FACE_UP4_F_TABLE[] = { FieldAcmdTCB_DashStepRightFaceUp4F,
+                                                                FieldAcmdTCB_StepMove, FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cae84[] = { FieldAcmdTCB_DashStepUpFaceRight4F, FieldAcmdTCB_StepMove,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_DASH_STEP_UP_FACE_RIGHT4_F_TABLE[] = { FieldAcmdTCB_DashStepUpFaceRight4F,
+                                                                FieldAcmdTCB_StepMove, FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cae78[] = { FieldAcmdTCB_DashStepDownFaceLeft4F, FieldAcmdTCB_StepMove,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_DASH_STEP_DOWN_FACE_LEFT4_F_TABLE[] = { FieldAcmdTCB_DashStepDownFaceLeft4F,
+                                                                 FieldAcmdTCB_StepMove, FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cae6c[] = { FieldAcmdTCB_DashStepLeftFaceUp4F, FieldAcmdTCB_StepMove,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_DASH_STEP_LEFT_FACE_UP4_F_TABLE[] = { FieldAcmdTCB_DashStepLeftFaceUp4F, FieldAcmdTCB_StepMove,
+                                                               FieldAcmdTCB_SetAcmdEnd };
 
 const ActorAcmdFunc data_ov036_021cae60[] = { func_ov036_021908e4, FieldAcmdTCB_StepMove, FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cae54[] = { FieldAcmdTCB_DashStepUpFaceDown4F, FieldAcmdTCB_StepMove,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_DASH_STEP_UP_FACE_DOWN4_F_TABLE[] = { FieldAcmdTCB_DashStepUpFaceDown4F, FieldAcmdTCB_StepMove,
+                                                               FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cae48[] = { FieldAcmdTCB_DashStepDownFaceUp4F, FieldAcmdTCB_StepMove,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_DASH_STEP_DOWN_FACE_UP4_F_TABLE[] = { FieldAcmdTCB_DashStepDownFaceUp4F, FieldAcmdTCB_StepMove,
+                                                               FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cae3c[] = { FieldAcmdTCB_DashStepLeftFaceRight4F, FieldAcmdTCB_StepMove,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_DASH_STEP_LEFT_FACE_RIGHT4_F_TABLE[] = { FieldAcmdTCB_DashStepLeftFaceRight4F,
+                                                                  FieldAcmdTCB_StepMove, FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cae00[] = { FieldAcmdTCB_DashStepRightFaceLeft4F, FieldAcmdTCB_StepMove,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_DASH_STEP_RIGHT_FACE_LEFT4_F_TABLE[] = { FieldAcmdTCB_DashStepRightFaceLeft4F,
+                                                                  FieldAcmdTCB_StepMove, FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cae18[] = { FieldAcmdTCB_HopUpFaceLeft8F, FieldAcmdTCB_HopMove,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_HOP_UP_FACE_LEFT8_F_TABLE[] = { FieldAcmdTCB_HopUpFaceLeft8F, FieldAcmdTCB_HopMove,
+                                                         FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cae24[] = { FieldAcmdTCB_HopDownFaceRight8F, FieldAcmdTCB_HopMove,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_HOP_DOWN_FACE_RIGHT8_F_TABLE[] = { FieldAcmdTCB_HopDownFaceRight8F, FieldAcmdTCB_HopMove,
+                                                            FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021caf50[] = { FieldAcmdTCB_HopLeftFaceDown8F, FieldAcmdTCB_HopMove,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_HOP_LEFT_FACE_DOWN8_F_TABLE[] = { FieldAcmdTCB_HopLeftFaceDown8F, FieldAcmdTCB_HopMove,
+                                                           FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021caf5c[] = { FieldAcmdTCB_HopRightFaceUp8F, FieldAcmdTCB_HopMove,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_HOP_RIGHT_FACE_UP8_F_TABLE[] = { FieldAcmdTCB_HopRightFaceUp8F, FieldAcmdTCB_HopMove,
+                                                          FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021caf98[] = { FieldAcmdTCB_HopUpFaceRight8F, FieldAcmdTCB_HopMove,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_HOP_UP_FACE_RIGHT8_F_TABLE[] = { FieldAcmdTCB_HopUpFaceRight8F, FieldAcmdTCB_HopMove,
+                                                          FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb1fc[] = { FieldAcmdTCB_HopDownFaceLeft8F, FieldAcmdTCB_HopMove,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_HOP_DOWN_FACE_LEFT8_F_TABLE[] = { FieldAcmdTCB_HopDownFaceLeft8F, FieldAcmdTCB_HopMove,
+                                                           FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb220[] = { FieldAcmdTCB_HopLeftFaceUp8F, FieldAcmdTCB_HopMove,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_HOP_LEFT_FACE_UP8_F_TABLE[] = { FieldAcmdTCB_HopLeftFaceUp8F, FieldAcmdTCB_HopMove,
+                                                         FieldAcmdTCB_SetAcmdEnd };
 
 const ActorAcmdFunc data_ov036_021cb598[] = { func_ov036_02190d60, FieldAcmdTCB_HopMove, FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cadd0[] = { FieldAcmdTCB_HopUpFaceDown8F, FieldAcmdTCB_HopMove,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_HOP_UP_FACE_DOWN8_F_TABLE[] = { FieldAcmdTCB_HopUpFaceDown8F, FieldAcmdTCB_HopMove,
+                                                         FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cad1c[] = { FieldAcmdTCB_HopDownFaceUp8F, FieldAcmdTCB_HopMove,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_HOP_DOWN_FACE_UP8_F_TABLE[] = { FieldAcmdTCB_HopDownFaceUp8F, FieldAcmdTCB_HopMove,
+                                                         FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021caf08[] = { FieldAcmdTCB_HopLeftFaceRight8F, FieldAcmdTCB_HopMove,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_HOP_LEFT_FACE_RIGHT8_F_TABLE[] = { FieldAcmdTCB_HopLeftFaceRight8F, FieldAcmdTCB_HopMove,
+                                                            FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cadac[] = { FieldAcmdTCB_HopRightFaceLeft8F, FieldAcmdTCB_HopMove,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_HOP_RIGHT_FACE_LEFT8_F_TABLE[] = { FieldAcmdTCB_HopRightFaceLeft8F, FieldAcmdTCB_HopMove,
+                                                            FieldAcmdTCB_SetAcmdEnd };
 
 const ActorAcmdFunc data_ov036_021cada0[] = { func_ov036_0218fd28, FieldAcmdTCB_MarkWait, FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cad40[] = { FieldAcmdTCB_StayWalkBobInit, FieldAcmdTCB_StayWalkBobMove,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_STAY_WALK_BOB_INIT_TABLE[] = { FieldAcmdTCB_StayWalkBobInit, FieldAcmdTCB_StayWalkBobMove,
+                                                        FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cad88[] = { FieldAcmdTCB_WalkUp16FFastAnime, FieldAcmdTCB_WalkMove,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_WALK_UP16_F_FAST_ANIME_TABLE[] = { FieldAcmdTCB_WalkUp16FFastAnime, FieldAcmdTCB_WalkMove,
+                                                            FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cad7c[] = { FieldAcmdTCB_WalkDown16FFastAnime, FieldAcmdTCB_WalkMove,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_WALK_DOWN16_F_FAST_ANIME_TABLE[] = { FieldAcmdTCB_WalkDown16FFastAnime, FieldAcmdTCB_WalkMove,
+                                                              FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cad70[] = { FieldAcmdTCB_WalkLeft16FFastAnime, FieldAcmdTCB_WalkMove,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_WALK_LEFT16_F_FAST_ANIME_TABLE[] = { FieldAcmdTCB_WalkLeft16FFastAnime, FieldAcmdTCB_WalkMove,
+                                                              FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021caddc[] = { FieldAcmdTCB_WalkRight16FFastAnime, FieldAcmdTCB_WalkMove,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_WALK_RIGHT16_F_FAST_ANIME_TABLE[] = { FieldAcmdTCB_WalkRight16FFastAnime,
+                                                               FieldAcmdTCB_WalkMove, FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cadf4[] = { FieldAcmdTCB_StayWalk22FInit, FieldAcmdTCB_StayWalk22FMove,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_STAY_WALK22_F_INIT_TABLE[] = { FieldAcmdTCB_StayWalk22FInit, FieldAcmdTCB_StayWalk22FMove,
+                                                        FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cacbc[] = { FieldAcmdTCB_SetAnime10, FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_SET_ANIME10_TABLE[] = { FieldAcmdTCB_SetAnime10, FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021caf20[] = { FieldAcmdTCB_DashLeft2F, FieldAcmdTCB_Dash2FMove,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_DASH_LEFT2_F_TABLE[] = { FieldAcmdTCB_DashLeft2F, FieldAcmdTCB_Dash2FMove,
+                                                  FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021caf68[] = { FieldAcmdTCB_FlyUpInit, FieldAcmdTCB_FlyUpMove, FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_FLY_UP_INIT_TABLE[] = { FieldAcmdTCB_FlyUpInit, FieldAcmdTCB_FlyUpMove,
+                                                 FieldAcmdTCB_SetAcmdEnd };
 
 const ActorAcmdFunc data_ov036_021cacc4[] = { func_ov036_0219100c, FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb5a4[] = { FieldAcmdTCB_AnimeWaitEndFaceDownInit, FieldAcmdTCB_AnimeWaitEndFaceDown,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_ANIME_WAIT_END_FACE_DOWN_INIT_TABLE[] = { FieldAcmdTCB_AnimeWaitEndFaceDownInit,
+                                                                   FieldAcmdTCB_AnimeWaitEndFaceDown,
+                                                                   FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cace4[] = { FieldAcmdTCB_ResetDrawOffset, FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_RESET_DRAW_OFFSET_TABLE[] = { FieldAcmdTCB_ResetDrawOffset, FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021caf14[] = { FieldAcmdTCB_FlyReadyInit, FieldAcmdTCB_FlyReadyMove,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_FLY_READY_INIT_TABLE[] = { FieldAcmdTCB_FlyReadyInit, FieldAcmdTCB_FlyReadyMove,
+                                                    FieldAcmdTCB_SetAcmdEnd };
 
 const ActorAcmdFunc data_ov036_021cacb4[] = { func_ov036_02191174, FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cad4c[] = { FieldAcmdTCB_DrawReadyWaitInit10, FieldAcmdTCB_DrawReadyWaitStop,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_DRAW_READY_WAIT_INIT10_TABLE[] = { FieldAcmdTCB_DrawReadyWaitInit10,
+                                                            FieldAcmdTCB_DrawReadyWaitStop, FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cade8[] = { FieldAcmdTCB_DrawReadyWaitInit11, FieldAcmdTCB_DrawReadyWait,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_DRAW_READY_WAIT_INIT11_TABLE[] = { FieldAcmdTCB_DrawReadyWaitInit11,
+                                                            FieldAcmdTCB_DrawReadyWait, FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cae0c[] = { FieldAcmdTCB_DrawReadyWaitInit12, FieldAcmdTCB_DrawReadyWait,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_DRAW_READY_WAIT_INIT12_TABLE[] = { FieldAcmdTCB_DrawReadyWaitInit12,
+                                                            FieldAcmdTCB_DrawReadyWait, FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021caf74[] = { FieldAcmdTCB_DrawReadyWaitInit13, FieldAcmdTCB_DrawReadyWait,
-                                              FieldAcmdTCB_SetAcmdEnd };
+const ActorAcmdFunc ACMD_DRAW_READY_WAIT_INIT13_TABLE[] = { FieldAcmdTCB_DrawReadyWaitInit13,
+                                                            FieldAcmdTCB_DrawReadyWait, FieldAcmdTCB_SetAcmdEnd };
 
-static const s32 data_ov036_021cb5b0[] = { 0x5000, 0x6000, 0x5000 };
+static const s32 sWalk3FSteps[] = { 0x5000, 0x6000, 0x5000 };
 
-static const fx32 data_ov036_021cb7bc[] = { 0,
-                                            FX32_CONST(2),
-                                            FX32_CONST(3),
-                                            FX32_CONST(4),
-                                            FX32_CONST(5),
-                                            FX32_CONST(6),
-                                            FX32_CONST(6),
-                                            FX32_CONST(6),
-                                            FX32_CONST(5),
-                                            FX32_CONST(5),
-                                            FX32_CONST(4),
-                                            FX32_CONST(3),
-                                            FX32_CONST(2),
-                                            0,
-                                            0,
-                                            0 };
+static const fx32 sJumpHeights1[] = { 0,
+                                      FX32_CONST(2),
+                                      FX32_CONST(3),
+                                      FX32_CONST(4),
+                                      FX32_CONST(5),
+                                      FX32_CONST(6),
+                                      FX32_CONST(6),
+                                      FX32_CONST(6),
+                                      FX32_CONST(5),
+                                      FX32_CONST(5),
+                                      FX32_CONST(4),
+                                      FX32_CONST(3),
+                                      FX32_CONST(2),
+                                      0,
+                                      0,
+                                      0 };
 
-static const s32 data_ov036_021cb5d4[] = { 0x2000, 0x3000, 0x3000, 0x2000, 0x3000, 0x3000 };
+static const s32 sWalk6FSteps[] = { 0x2000, 0x3000, 0x3000, 0x2000, 0x3000, 0x3000 };
 
-static const s32 data_ov036_021cb608[] = { 0x1000, 0x1000, 0x2000, 0x1000, 0x1000, 0x2000,
-                                           0x1000, 0x1000, 0x2000, 0x1000, 0x1000, 0x2000 };
+static const s32 sWalk12FSteps[] = { 0x1000, 0x1000, 0x2000, 0x1000, 0x1000, 0x2000,
+                                     0x1000, 0x1000, 0x2000, 0x1000, 0x1000, 0x2000 };
 
-static const s32 data_ov036_021cb5ec[] = { 0x2500, 0x2480, 0x2480, 0x2480, 0x2480, 0x2480, 0x2480 };
+static const s32 sWalk7FSteps[] = { 0x2500, 0x2480, 0x2480, 0x2480, 0x2480, 0x2480, 0x2480 };
 
-static const fx32 data_ov036_021cb7fc[] = { FX32_CONST(2),
-                                            FX32_CONST(4),
-                                            FX32_CONST(6),
-                                            FX32_CONST(8),
-                                            FX32_CONST(9),
-                                            FX32_CONST(10),
-                                            FX32_CONST(10),
-                                            FX32_CONST(10),
-                                            FX32_CONST(9),
-                                            FX32_CONST(8),
-                                            FX32_CONST(6),
-                                            FX32_CONST(5),
-                                            FX32_CONST(3),
-                                            FX32_CONST(2),
-                                            0,
-                                            0 };
+static const fx32 sJumpHeights2[] = { FX32_CONST(2),
+                                      FX32_CONST(4),
+                                      FX32_CONST(6),
+                                      FX32_CONST(8),
+                                      FX32_CONST(9),
+                                      FX32_CONST(10),
+                                      FX32_CONST(10),
+                                      FX32_CONST(10),
+                                      FX32_CONST(9),
+                                      FX32_CONST(8),
+                                      FX32_CONST(6),
+                                      FX32_CONST(5),
+                                      FX32_CONST(3),
+                                      FX32_CONST(2),
+                                      0,
+                                      0 };
 
-static const fx32 data_ov036_021cb83c[] = { FX32_CONST(4),
-                                            FX32_CONST(6),
-                                            FX32_CONST(8),
-                                            FX32_CONST(10),
-                                            FX32_CONST(11),
-                                            FX32_CONST(12),
-                                            FX32_CONST(12),
-                                            FX32_CONST(12),
-                                            FX32_CONST(11),
-                                            FX32_CONST(10),
-                                            FX32_CONST(9),
-                                            FX32_CONST(8),
-                                            FX32_CONST(6),
-                                            FX32_CONST(4),
-                                            0,
-                                            0 };
+static const fx32 sJumpHeights0[] = { FX32_CONST(4),
+                                      FX32_CONST(6),
+                                      FX32_CONST(8),
+                                      FX32_CONST(10),
+                                      FX32_CONST(11),
+                                      FX32_CONST(12),
+                                      FX32_CONST(12),
+                                      FX32_CONST(12),
+                                      FX32_CONST(11),
+                                      FX32_CONST(10),
+                                      FX32_CONST(9),
+                                      FX32_CONST(8),
+                                      FX32_CONST(6),
+                                      FX32_CONST(4),
+                                      0,
+                                      0 };
 
-static const fx32 *data_ov036_021d4d34[] = { data_ov036_021cb83c, data_ov036_021cb7bc, data_ov036_021cb7fc };
+static const fx32 *sJumpHeightTables[] = { sJumpHeights0, sJumpHeights1, sJumpHeights2 };
