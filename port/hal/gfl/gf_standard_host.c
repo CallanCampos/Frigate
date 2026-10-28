@@ -22,6 +22,7 @@ void buildSeed(MATHRandContext32 *context);
 // gf_standard.c's buildSeed, then the seed it built or the one given in its place, set up as MATH_InitRand32 sets up a
 // seed (the multiplier and the increment are the same for every seed)
 void buildSeed(MATHRandContext32 *context) {
+    port_random_seed_check();
     buildSeed_ds(context);
     MATH_InitRand32(context, port_random_seed_take(context->x));
 }

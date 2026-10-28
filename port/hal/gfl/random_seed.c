@@ -3,6 +3,8 @@
 // every seed the game used, which the run directory reports (port/app/run_dir.c) so that a test can see which seeds a
 // run took and how many it built.
 #include "hal/gfl/random_seed.h"
+#include <stdio.h>
+#include <stdlib.h>
 
 static uint64_t sGiven[PORT_RANDOM_SEED_MAX_GIVEN];
 static size_t sGivenCount;
@@ -10,6 +12,11 @@ static size_t sGivenCount;
 static uint64_t sUsed[PORT_RANDOM_SEED_MAX_KEPT];
 static uint8_t sUsedGiven[PORT_RANDOM_SEED_MAX_KEPT];
 static size_t sCount;
+static void (*sExhausted)(void);
+
+void port_random_seed_on_exhaustion(void (*handler)(void)) {
+    sExhausted = handler;
+}
 
 int port_random_seed_give(const uint64_t *seeds, size_t count) {
     size_t i;
@@ -24,9 +31,19 @@ int port_random_seed_give(const uint64_t *seeds, size_t count) {
     return 1;
 }
 
+void port_random_seed_check(void) {
+    if (sCount >= sGivenCount && sExhausted != NULL) {
+        fprintf(stderr, "port: --record: declared random seeds exhausted before request %zu\n", sCount + 1);
+        sExhausted();
+        exit(1);
+    }
+}
+
 uint64_t port_random_seed_take(uint64_t built) {
     int given = sCount < sGivenCount;
-    uint64_t seed = given ? sGiven[sCount] : built;
+    uint64_t seed;
+    port_random_seed_check();
+    seed = given ? sGiven[sCount] : built;
 
     if (sCount < PORT_RANDOM_SEED_MAX_KEPT) {
         sUsed[sCount] = seed;

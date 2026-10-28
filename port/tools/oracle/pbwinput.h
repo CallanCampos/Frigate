@@ -106,6 +106,9 @@ typedef struct PbwInput {
     // DS's own, so the oracle reads them only to check the file
     uint64_t seeds[PBW_INPUT_MAX_SEEDS];
     size_t seedCount;
+    // Optional preboot state. Legacy files hold frame 1 at boot; explicit initial separates boot from VBlank 1.
+    PbwInputState initial;
+    int hasInitial;
 } PbwInput;
 
 // Counts game frames from GFL's frame count as a program reads it at each VBlank
@@ -123,8 +126,12 @@ int pbw_input_parse(PbwInput *input, const char *text, size_t length, char *erro
 // Reads and parses a file
 int pbw_input_load(PbwInput *input, const char *path, char *error, size_t errorSize);
 
-// The state of a frame (1 or more): the last change at or before it, or nothing held before the first change
+// The state of a frame (1 or more): the last change at or before it; before the first change, explicit initial
+// holds when present, otherwise nothing is held. Explicit-initial frame rows require a committing newline; only an
+// unterminated trailing numeric FRAME row is ignored, so killed recordings retain complete samples.
 PbwInputState pbw_input_state(const PbwInput *input, uint32_t frame);
+// Explicit initial state, or frame 1 for legacy files.
+PbwInputState pbw_input_initial_state(const PbwInput *input);
 
 // Adds a change at the end, for a recorder: frame must be after the last change's. A state equal to the one that holds
 // already is dropped. Returns 0 when frame is out of order or memory runs out
@@ -132,6 +139,9 @@ int pbw_input_append(PbwInput *input, uint32_t frame, const PbwInputState *state
 
 // Writes input in the file format. Returns 1, or 0 on a write error
 int pbw_input_write(const PbwInput *input, FILE *file);
+// Streaming pieces: no flush; the caller commits complete lines and handles errors.
+int pbw_input_write_header(const PbwInput *input, FILE *file);
+int pbw_input_write_change(FILE *file, uint32_t frame, const PbwInputState *state);
 
 // The state's columns as a file line writes them ("A+START -", "- 128,96"); returns 0 when they don't fit
 int pbw_input_format_state(const PbwInputState *state, char *out, size_t size);

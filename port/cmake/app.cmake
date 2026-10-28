@@ -4,7 +4,7 @@
 # screens they show are drawn by port/gfx/screens.c, which the port_gfx target builds. Their tests are here too, with
 # those of check_exit.py, the checker of the tests of the program's endings.
 target_sources(port_app PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/app/present.c" "${CMAKE_CURRENT_SOURCE_DIR}/app/gamepad.c"
-    "${CMAKE_CURRENT_SOURCE_DIR}/app/message_log.c" "${CMAKE_CURRENT_SOURCE_DIR}/app/replay.c"
+    "${CMAKE_CURRENT_SOURCE_DIR}/app/record.c" "${CMAKE_CURRENT_SOURCE_DIR}/app/message_log.c" "${CMAKE_CURRENT_SOURCE_DIR}/app/replay.c"
     "${CMAKE_CURRENT_SOURCE_DIR}/app/run_dir.c" "${CMAKE_CURRENT_SOURCE_DIR}/app/sound_trace.c"
     "${CMAKE_CURRENT_SOURCE_DIR}/tools/oracle/pbwinput.c")
 # The version an input file's "version" line must name
@@ -238,3 +238,37 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/tests/replay/starter_save_${PORT_VERSION}
     set_tests_properties(replay_starter_save PROPERTIES SKIP_RETURN_CODE 66 TIMEOUT 4800)
     port_test_labels(replay_starter_save route)
 endif()
+
+# The bounded recording stream's real file/parser behavior, including partial writes and detected I/O failures.
+foreach(variant IN ITEMS plain sanitized)
+    set(target port_test_record_${variant})
+    add_executable(${target} tests/app/test_record.c app/record.c tools/oracle/pbwinput.c)
+    target_include_directories(${target} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
+    target_compile_definitions(${target} PRIVATE PORT_RECORD_TEST)
+    target_compile_options(${target} PRIVATE -std=gnu11 -Wall -Wextra -Werror)
+    if(variant STREQUAL "sanitized")
+        target_compile_options(${target} PRIVATE -fsanitize=address,undefined -fno-sanitize-recover=all -fno-omit-frame-pointer)
+        target_link_options(${target} PRIVATE -fsanitize=address,undefined)
+    endif()
+    add_test(NAME app_record_${variant} COMMAND ${target} "${CMAKE_CURRENT_BINARY_DIR}/record-${variant}")
+endforeach()
+
+# Recorder acceptance on the actual game: isolated input/save directories, frame/state/save equality; no ROM in CI.
+add_test(NAME replay_recording_tool COMMAND "${CMAKE_COMMAND}" -E env PYTHONDONTWRITEBYTECODE=1 "${PORT_PYTHON}"
+    "${CMAKE_CURRENT_SOURCE_DIR}/tests/replay/test_check_recording.py")
+add_test(NAME replay_recording COMMAND "${CMAKE_COMMAND}" -E env PYTHONDONTWRITEBYTECODE=1 "${PORT_PYTHON}"
+    "${CMAKE_CURRENT_SOURCE_DIR}/tests/replay/check_recording.py" --binary "$<TARGET_FILE:${PORT_PROGRAM}>"
+    --version "${PORT_VERSION}" --input "${CMAKE_CURRENT_SOURCE_DIR}/tests/oracle/first_save_${PORT_VERSION}.pbwinput"
+    --frames 5600 --require-save)
+add_test(NAME replay_recording_live COMMAND "${CMAKE_COMMAND}" -E env PYTHONDONTWRITEBYTECODE=1 "${PORT_PYTHON}"
+    "${CMAKE_CURRENT_SOURCE_DIR}/tests/replay/check_recording.py" --binary "$<TARGET_FILE:${PORT_PROGRAM}>"
+    --version "${PORT_VERSION}" --frames 1800)
+set_tests_properties(replay_recording replay_recording_live PROPERTIES SKIP_RETURN_CODE 66 TIMEOUT 1200)
+port_test_labels(replay_recording route)
+port_test_labels(replay_recording_live route)
+
+foreach(mode IN ITEMS strict64 strict-short)
+    add_test(NAME recording_seed_${mode}
+        COMMAND "${PORT_PYTHON}" "${CMAKE_CURRENT_SOURCE_DIR}/tests/app/check_exit.py"
+            --status 1 --expect "declared random seeds exhausted" -- $<TARGET_FILE:test_hal_random_seed> ${mode})
+endforeach()

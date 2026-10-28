@@ -235,6 +235,7 @@ static void WriteRunTxt(int finished, int status) {
             fprintf(run, "completed: -\n");
         }
         fprintf(run, "time: %s\n", Text(sInfo.time));
+        fprintf(run, "clock: %s\n", Text(sInfo.clock));
         fprintf(run, "input: %s\n", Text(sInfo.input));
         fprintf(run, "input_frames: %s\n", Text(sInfo.inputFrames));
         fprintf(run, "counter: sVBlankCount\n");

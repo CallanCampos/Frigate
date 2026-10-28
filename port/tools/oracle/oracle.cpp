@@ -854,7 +854,8 @@ bool Oracle::Boot() {
 
 // Holds the state of the input file's frame, on the file's count, until the next call
 void Oracle::ApplyInput(uint32_t frame) {
-    PbwInputState state = haveInput_ ? pbw_input_state(&input_, frame) : PbwInputState{};
+    PbwInputState state = haveInput_ ? (frame == 0 ? pbw_input_initial_state(&input_) : pbw_input_state(&input_, frame))
+                                     : PbwInputState{};
     // melonDS's mask has a bit set for each button released: KEYINPUT's ten, then X and Y
     melonDS::u32 released = ~state.buttons & 0xfffu;
 
@@ -1220,7 +1221,7 @@ int Oracle::Run() {
     }
 
     // The state of frame 1 holds from power-on
-    ApplyInput(1);
+    ApplyInput(0);
     for (frame = 1; frame <= options_.frames; frame++) {
         // The LCD's last event was the end of the previous frame, which is where this one's line 0 starts
         melonDS::u64 lineZero = nds_->SchedList[melonDS::Event_LCD].Timestamp;
