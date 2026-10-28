@@ -187,7 +187,7 @@ GameEvent *CreatePlayerXActorScriptCall(GameSystem *gsys, Field *field, u32 scri
 BOOL RailActorAnim_GetBlactAnimeTypeA(FieldActor *actor, u16 *anim, u16 *step);
 BOOL RailActorAnim_GetBlactAnimeTypeB(FieldActor *actor, u16 *anim, u16 *step);
 BOOL RailActorAnim_CheckBlactReady(FieldActor *actor);
-void func_ov036_02197288(FieldActor *actor);
+void RailActorAnim_ResetBlactAnime(FieldActor *actor);
 // The functions that run an action command: what to do on the first frame, each frame and at the end
 typedef BOOL (*ActorAcmdFunc)(FieldActor *actor);
 
