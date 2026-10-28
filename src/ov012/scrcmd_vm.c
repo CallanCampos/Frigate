@@ -572,9 +572,9 @@ const FieldScriptCommand EVCMD_TABLE[] = {
     s01DA_CallPhraseSelect,                           // 0x1da
     func_ov033_02177d78,                              // 0x1db
     s01DC_DreamWorldItems,                            // 0x1dc
-    func_ov036_021c3018,                              // 0x1dd
+    s01DD_BroadcastGameBeacon,                        // 0x1dd
     s01DE_PassPowerPopDepletedID,                     // 0x1de
-    func_ov036_021c315c,                              // 0x1df
+    s01DF_CallPassPowerFlash,                         // 0x1df
     s01E0_StadiumSetupActorsDouble,                   // 0x1e0
     s01E1_StadiumLoadTrainerTable,                    // 0x1e1
     s01E2_StadiumFreeTrainerTable,                    // 0x1e2

@@ -2533,7 +2533,7 @@
     .2byte \a1
     .endm
 
-    // func_ov036_021c3018
+    // s01DD_BroadcastGameBeacon
     .macro Cmd_01DD a0, a1, a2
     FieldCommand 477
     .2byte \a0
@@ -2547,7 +2547,7 @@
     .2byte \a1
     .endm
 
-    // func_ov036_021c315c
+    // s01DF_CallPassPowerFlash
     .macro Cmd_01DF
     FieldCommand 479
     .endm

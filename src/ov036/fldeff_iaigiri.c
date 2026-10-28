@@ -1,6 +1,7 @@
 // The slash that Cut leaves, and the script commands of the League's lift, the beacons and the Pass Powers that share
 // its range. The name is the ROM's own, from GFL_HeapAllocate's file argument; the commands' names are from swan
-// (https://github.com/ds-pokemon-hacking/swan, GPL-3.0)
+// (https://github.com/ds-pokemon-hacking/swan, GPL-3.0), except s01DD_BroadcastGameBeacon and s01DF_CallPassPowerFlash,
+// which are ours
 #include "types.h"
 #include "field/event_league_lift.h"
 #include "field/field_actor.h"
@@ -44,7 +45,7 @@ static void FldeffIaigiri_FreeResources(FieldEffectIaigiri *effect);
 static void FldeffIaigiri_Init(FieldEffectTask *task, void *data);
 static void FldeffIaigiri_Exit(FieldEffectTask *task, void *data);
 static void FldeffIaigiri_Update(FieldEffectTask *task, void *data);
-static void func_ov036_021c2fb0(FieldEffectTask *task, void *data);
+static void FldeffIaigiri_Draw(FieldEffectTask *task, void *data);
 
 static const FieldEffectTaskVTable IAIGIRI_TASK_VTABLE;
 static u32 IAIGIRI_ANM_FILE_IDS[IAIGIRI_ANM_COUNT];
@@ -57,7 +58,7 @@ void *FldeffIaigiri_Create(FieldEffects *effects, HeapID heapId) {
     return effect;
 }
 
-void func_ov036_021c2e00(FieldEffects *effects, void *effect) {
+void FldeffIaigiri_Delete(FieldEffects *effects, void *effect) {
     FldeffIaigiri_FreeResources(effect);
     GFL_HeapFree(effect);
 }
@@ -83,7 +84,7 @@ static void FldeffIaigiri_FreeResources(FieldEffectIaigiri *effect) {
     GFL_G3DResFree(effect->mdlRes);
 }
 
-void func_ov036_021c2e70(FieldActor *actor, FieldEffects *effects) {
+void FldeffIaigiri_Start(FieldActor *actor, FieldEffects *effects) {
     VecFx32 pos;
     IaigiriTaskParams params;
 
@@ -151,7 +152,7 @@ static void FldeffIaigiri_Update(FieldEffectTask *task, void *data) {
     }
 }
 
-static void func_ov036_021c2fb0(FieldEffectTask *task, void *data) {
+static void FldeffIaigiri_Draw(FieldEffectTask *task, void *data) {
     IaigiriTask *work = data;
     SRTMatrix mtx = {
         { 0, 0, 0 },
@@ -172,7 +173,7 @@ BOOL s01B1_CallLeagueLiftWarp(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL func_ov036_021c3018(VM *vm, FieldScriptEnv *env) {
+BOOL s01DD_BroadcastGameBeacon(VM *vm, FieldScriptEnv *env) {
     u16 command = ScriptReadAny(vm, env);
     u16 value = ScriptReadAny(vm, env);
     u16 extra = ScriptReadAny(vm, env);
@@ -251,7 +252,7 @@ BOOL s01DE_PassPowerPopDepletedID(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL func_ov036_021c315c(VM *vm, FieldScriptEnv *env) {
+BOOL s01DF_CallPassPowerFlash(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
 
     ScriptWork_CallEvent(work, EventPassPowerFlash_Create(FieldScriptEnv_GetGameSystem(env)));
@@ -259,7 +260,7 @@ BOOL func_ov036_021c315c(VM *vm, FieldScriptEnv *env) {
 }
 
 static const FieldEffectTaskVTable IAIGIRI_TASK_VTABLE = {
-    sizeof(IaigiriTask), FldeffIaigiri_Init, FldeffIaigiri_Exit, FldeffIaigiri_Update, func_ov036_021c2fb0,
+    sizeof(IaigiriTask), FldeffIaigiri_Init, FldeffIaigiri_Exit, FldeffIaigiri_Update, FldeffIaigiri_Draw,
 };
 
 static u32 IAIGIRI_ANM_FILE_IDS[IAIGIRI_ANM_COUNT] = { 0x76, 0x89, 0x9c };

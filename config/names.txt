@@ -12038,11 +12038,16 @@ overlays/ov036 0x021c2c80 MarkTask_Draw
 overlays/ov036 0x021c2d04 LandDataPatch_OverwriteAttr
 overlays/ov036 0x021c2dcc LandDataPatch_GetAttrBlock
 overlays/ov036 0x021c2ddc FldeffIaigiri_Create
+overlays/ov036 0x021c2e00 FldeffIaigiri_Delete
 overlays/ov036 0x021c2e14 FldeffIaigiri_LoadResources
 overlays/ov036 0x021c2e4c FldeffIaigiri_FreeResources
+overlays/ov036 0x021c2e70 FldeffIaigiri_Start
 overlays/ov036 0x021c2ef8 FldeffIaigiri_Init
 overlays/ov036 0x021c2f5c FldeffIaigiri_Exit
 overlays/ov036 0x021c2f80 FldeffIaigiri_Update
+overlays/ov036 0x021c2fb0 FldeffIaigiri_Draw
+overlays/ov036 0x021c3018 s01DD_BroadcastGameBeacon
+overlays/ov036 0x021c315c s01DF_CallPassPowerFlash
 overlays/ov036 0x021c3180 PartySelectList_Create
 overlays/ov036 0x021c3218 PartySelectList_Delete
 overlays/ov036 0x021c3278 PartySelectList_Main

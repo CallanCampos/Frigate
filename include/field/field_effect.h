@@ -165,7 +165,7 @@ void FldeffIwakudaki_Delete(FieldEffects *effects, void *data);
 void *StoneTask_Create(FieldEffects *effects, HeapID heapId);
 void D06Denki_Delete(FieldEffects *effects, void *data);
 void *FldeffIaigiri_Create(FieldEffects *effects, HeapID heapId);
-void func_ov036_021c2e00(FieldEffects *effects, void *data);
+void FldeffIaigiri_Delete(FieldEffects *effects, void *data);
 void *FldeffFishing_Create(FieldEffects *effects, HeapID heapId);
 void FldeffFishing_Delete(FieldEffects *effects, void *data);
 void *FieldEffect_BTrain_Create(FieldEffects *effects, HeapID heapId);
