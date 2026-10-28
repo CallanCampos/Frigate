@@ -41,7 +41,7 @@ typedef struct {
 } BubbleTask;
 
 void FldeffBubble_Init(FieldEffectTask *task, BubbleTask *work);
-void func_ov036_021c6aa8(FieldEffectTask *task, BubbleTask *work);
+void FldeffBubble_Exit(FieldEffectTask *task, BubbleTask *work);
 void FldeffBubble_Update(FieldEffectTask *task, BubbleTask *work);
 void FldeffBubble_Draw(FieldEffectTask *task, BubbleTask *work);
 void FldeffBubble_ClearBubble(Bubble *bubble);
@@ -72,7 +72,7 @@ void *FldeffBubble_CreateRes(FieldEffects *effects, HeapID heapId) {
     return effect;
 }
 
-void func_ov036_021c6990(FieldEffects *effects, void *effect) {
+void FldeffBubble_DeleteRes(FieldEffects *effects, void *effect) {
     FldeffBubble_FreeResources(effect);
     GFL_HeapFree(effect);
 }
@@ -122,7 +122,7 @@ void FldeffBubble_Init(FieldEffectTask *task, BubbleTask *work) {
     work->turnTimer = 5;
 }
 
-void func_ov036_021c6aa8(FieldEffectTask *task, BubbleTask *work) {
+void FldeffBubble_Exit(FieldEffectTask *task, BubbleTask *work) {
 }
 
 Bubble *FldeffBubble_FindFreeBubble(BubbleTask *work);
@@ -253,7 +253,7 @@ static const u32 BUBBLE_FILE_IDS[BUBBLE_RES_COUNT] = { 0x53, 0x9d, 0x8a };
 static const FieldEffectTaskVTable BUBBLE_TASK_VTABLE = {
     0x84,
     (FieldEffectTaskFunc)FldeffBubble_Init,
-    (FieldEffectTaskFunc)func_ov036_021c6aa8,
+    (FieldEffectTaskFunc)FldeffBubble_Exit,
     (FieldEffectTaskFunc)FldeffBubble_Update,
     (FieldEffectTaskFunc)FldeffBubble_Draw,
 };

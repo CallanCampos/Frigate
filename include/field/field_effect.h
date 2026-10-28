@@ -180,7 +180,7 @@ u16 HideTask_IsFinished(FieldEffectTask *task);
 // The bubbles that rise from an actor in the water
 void FldeffBubble_Start(FieldActor *actor, FieldEffects *effects);
 void *FldeffBubble_CreateRes(FieldEffects *effects, HeapID heapId);
-void func_ov036_021c6990(FieldEffects *effects, void *data);
+void FldeffBubble_DeleteRes(FieldEffects *effects, void *data);
 void *FldeffSplash_CreateModelRes(FieldEffects *effects, HeapID heapId);
 void FldeffSplash_DeleteModelRes(FieldEffects *effects, void *data);
 void *func_ov036_021c944c(FieldEffects *effects, HeapID heapId);

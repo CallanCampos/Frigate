@@ -12184,9 +12184,11 @@ overlays/ov036 0x021c687c HideTask_UpdatePosition
 overlays/ov036 0x021c68c4 HideTask_Draw
 overlays/ov036 0x021c6934 FldeffBubble_Start
 overlays/ov036 0x021c696c FldeffBubble_CreateRes
+overlays/ov036 0x021c6990 FldeffBubble_DeleteRes
 overlays/ov036 0x021c69a4 FldeffBubble_LoadResources
 overlays/ov036 0x021c6a3c FldeffBubble_FreeResources
 overlays/ov036 0x021c6a88 FldeffBubble_Init
+overlays/ov036 0x021c6aa8 FldeffBubble_Exit
 overlays/ov036 0x021c6aac FldeffBubble_Update
 overlays/ov036 0x021c6b34 FldeffBubble_Draw
 overlays/ov036 0x021c6b58 FldeffBubble_FindFreeBubble
