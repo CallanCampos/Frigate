@@ -420,7 +420,7 @@ static BOOL ProbeElectricRock(StoneWork *work, StoneSlot *slot, u16 dir, u16 max
                 ConvGXZToVector(x, z, &pos);
                 pos.y = GetActorPosY(actor);
                 tileType = GetTileTypeAtPos(mapper, &pos);
-                if (tileType != -1 && MapTile_IsElectricRock(GetTileClass(tileType)) == TRUE) {
+                if (tileType != TILE_TYPE_NONE && MapTile_IsElectricRock(GetTileClass(tileType)) == TRUE) {
                     found = TRUE;
                 }
             }

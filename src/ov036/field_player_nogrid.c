@@ -897,7 +897,7 @@ static u32 FieldPlayerRail_CheckRailStep(FieldPlayerNoGrid *nogrid, FieldActor *
     if (force == TRUE && hit != 0 && !(hit & 0x10)) {
         hit = 0;
     }
-    if (tile != -1) {
+    if (tile != TILE_TYPE_NONE) {
         u32 flags;
 
         GetTileClass(tile);

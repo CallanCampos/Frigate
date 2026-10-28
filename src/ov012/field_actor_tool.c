@@ -129,11 +129,11 @@ void ActorTerrainEffect_InitParam(FieldActor *actor, ActorTerrainEffectParam *pa
     MI_CpuFill(param, 0, sizeof(ActorTerrainEffectParam));
     param->tileTypeOrigY = GetCachedOrigYTileUnderActor(actor);
     param->tileType = GetCachedTileUnderActor(actor);
-    if (param->tileType != -1) {
+    if (param->tileType != TILE_TYPE_NONE) {
         param->tileClass = GetTileClass(param->tileType);
         param->tileFlags = GetTileFlags(param->tileType);
     }
-    if (param->tileTypeOrigY != -1) {
+    if (param->tileTypeOrigY != TILE_TYPE_NONE) {
         param->tileClassOrigY = GetTileClass(param->tileTypeOrigY);
         param->tileFlagsOrigY = GetTileFlags(param->tileTypeOrigY);
     }
@@ -433,7 +433,7 @@ void ActorTerrainEffect_Reflection(FieldActor *actor, ActorTerrainEffectParam *p
     MMSys *system;
 
     if (param->config->enableReflections && FldAct_CheckReflectingFlag(actor) == FALSE) {
-        tileType = -1;
+        tileType = TILE_TYPE_NONE;
         if (param->tileFlags & 0x40) {
             tileType = param->tileType;
         } else {
@@ -442,7 +442,7 @@ void ActorTerrainEffect_Reflection(FieldActor *actor, ActorTerrainEffectParam *p
                 tileType = nextTileType;
             }
         }
-        if (tileType != -1) {
+        if (tileType != TILE_TYPE_NONE) {
             kind = 1;
             tileClass = GetTileClass(tileType);
             system = GetActorMModelSystem(actor);
@@ -460,7 +460,7 @@ void ActorTerrainEffect_UpdateReflection(FieldActor *actor, ActorTerrainEffectPa
 
     if (param->config->enableReflections && FldAct_CheckReflectingFlag(actor)) {
         tileType = FldAct_GetTileTypeInDir(actor, DIR_DOWN);
-        if (tileType == -1) {
+        if (tileType == TILE_TYPE_NONE) {
             FldAct_SetReflectingFlag(actor, FALSE);
         } else if (!(GetTileFlags(tileType) & 0x40)) {
             FldAct_SetReflectingFlag(actor, FALSE);
@@ -726,7 +726,7 @@ u32 FldAct_GetTileTypeInDir(FieldActor *actor, u16 dir) {
     u32 tileType;
     VecFx32 position;
 
-    tileType = -1;
+    tileType = TILE_TYPE_NONE;
     ConvGXZToVector(GetGPosX(actor), GetGPosZ(actor), &position);
     position.y = GetActorPosY(actor);
     ExpandVecInGridDir(dir, &position, FX32_CONST(16));
@@ -805,8 +805,8 @@ BOOL FldAct_CacheTerrainInfo(FieldActor *actor) {
 
     foundOrigY = FALSE;
     found = FALSE;
-    tileTypeOrigY = -1;
-    tileType = -1;
+    tileTypeOrigY = TILE_TYPE_NONE;
+    tileType = TILE_TYPE_NONE;
     if (FldAct_IsMapAttrDisabled(actor) == FALSE) {
         x = FldAct_GetInitGPosX(actor);
         y = FldAct_GetInitGPosY(actor);
