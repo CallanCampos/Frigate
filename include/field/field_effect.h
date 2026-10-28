@@ -170,8 +170,8 @@ void *FldeffFishing_Create(FieldEffects *effects, HeapID heapId);
 void FldeffFishing_Delete(FieldEffects *effects, void *data);
 void *FieldEffect_BTrain_Create(FieldEffects *effects, HeapID heapId);
 void FieldEffect_BTrain_Free(FieldEffects *effects, void *data);
-void *func_ov036_021c66e8(FieldEffects *effects, HeapID heapId);
-void func_ov036_021c670c(FieldEffects *effects, void *data);
+void *Hide_CreateResources(FieldEffects *effects, HeapID heapId);
+void Hide_DeleteResources(FieldEffects *effects, void *data);
 // fldeff_hide.c: the object an actor hides in, of a kind (0 to 2); the start of its animation and sound; and whether
 // its animation has ended, which it has for a NULL task
 FieldEffectTask *HideTask_Start(FieldEffects *effects, FieldActor *actor, u32 kind);

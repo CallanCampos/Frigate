@@ -12171,6 +12171,8 @@ overlays/ov036 0x021c65f8 FldeffBtrain_Init
 overlays/ov036 0x021c6664 FldeffBtrain_Exit
 overlays/ov036 0x021c6684 FldeffBtrain_Update
 overlays/ov036 0x021c66a8 FldeffBtrain_Draw
+overlays/ov036 0x021c66e8 Hide_CreateResources
+overlays/ov036 0x021c670c Hide_DeleteResources
 overlays/ov036 0x021c6720 Hide_LoadObjects
 overlays/ov036 0x021c679c Hide_FreeObjects
 overlays/ov036 0x021c67c8 HideTask_Start
