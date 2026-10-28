@@ -272,7 +272,8 @@ target_include_directories(port_card_hardware_tests PRIVATE "${CMAKE_CURRENT_SOU
 if(port_os_stack_probes)
     target_compile_options(port_card_hardware_tests PRIVATE ${port_os_stack_probes})
 endif()
-foreach(scenario pacing absolute own_work masked timer_stall equal_cycle irq_spin halt bounds cancel inactive reset)
+foreach(scenario pacing absolute own_work masked timer_stall equal_cycle irq_spin halt bounds cancel inactive reset
+    cpu_pacing cpu_irq cpu_ownership cpu_reset cpu_failure cpu_irq_reader)
     add_test(NAME card_hardware_${scenario} COMMAND port_card_hardware_tests ${scenario})
     set_tests_properties(card_hardware_${scenario} PROPERTIES TIMEOUT 60)
 endforeach()

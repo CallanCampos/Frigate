@@ -1,5 +1,6 @@
 // Physical CARD READY/DMA COMMIT events through the actual NitroSDK OS scheduler and native core, not a scheduler mock.
-// Synthetic immutable bytes exercise one-word service, IRQ/mask context, CPU stalls, bounds and stop/reset ownership.
+// Synthetic immutable bytes exercise one-word service, CPU latch consumption, IRQ/masks, bounds and stop/reset
+// ownership.
 #include "hal/card/port_card_hardware.h"
 #include "hal/dma/card_dma.h"
 #include "hal/os/os_internal.h"
@@ -24,10 +25,15 @@ static unsigned sReads, sIrqs, sGeneric, sNested;
 static u64 sIrqAt, sGenericAt, sStart;
 static BOOL sInside;
 static BOOL sObserveTimer;
+static bool sBackendFailure;
 static u64 sTimerLatchedAt;
+static void Nested(void);
 static bool Read(void *context, uint32_t address, uint8_t bytes[4]) {
     CHECK(context == sBytes && address <= sizeof(sBytes) - 4);
     ++sReads;
+    if (sBackendFailure) {
+        return false;
+    }
     if (sObserveTimer) {
         CHECK((port_os_get_if() & TIMER3_IRQ) && sIrqs == 0 && sGeneric == 0);
         sTimerLatchedAt = port_os_cycles();
@@ -37,6 +43,9 @@ static bool Read(void *context, uint32_t address, uint8_t bytes[4]) {
 }
 static bool Id(void *context, uint32_t *value) {
     CHECK(context == sBytes);
+    if (sBackendFailure) {
+        return false;
+    }
     *value = 0x1fc2;
     return true;
 }
@@ -108,6 +117,183 @@ static void CardIrq(void) {
     CHECK(OS_GetProcMode() == OS_PROCMODE_IRQ);
     sIrqAt = port_os_cycles();
     ++sIrqs;
+}
+static PortCardBusRequest CpuRequest(u32 length) {
+    return (PortCardBusRequest){ PORT_CARD_BUS_READ, 256, length, 0, 0, 5, true };
+}
+static void CpuPacing(void) {
+    Boot();
+    PortCardBusRequest request = CpuRequest(512);
+    request.latency1 = 3;
+    request.latency2 = 2;
+    uint64_t token;
+    uint32_t word = 0xdeadbeef;
+    CHECK(port_card_hardware_start_cpu(&request, &token) == PORT_CARD_BUS_OK);
+    CHECK(port_card_hardware_read_cpu(token, &word) == PORT_CARD_BUS_OK && word == 0 && sReads == 0);
+    CHECK(port_os_wait_until(sStart + 85));
+    CHECK(sReads == 1 && port_card_hardware_state().ready && !port_card_hardware_stalled());
+    CHECK(port_os_wait_until(sStart + 100)); // Unread READY holds; no second fetch or DMA demand.
+    CHECK(sReads == 1 && sOut[0] == 0xaa);
+    for (unsigned i = 0; i < 128; ++i) {
+        if (i) {
+            uint32_t previous = word;
+            CHECK(port_card_hardware_read_cpu(token, &word) == PORT_CARD_BUS_OK && word == previous);
+            CHECK(sReads == i && port_card_hardware_deadline() == sStart + 100 + i * 20);
+            CHECK(port_os_wait_until(port_card_hardware_deadline()));
+        }
+        CHECK(sReads == i + 1 && !(port_os_get_if() & OS_IE_CARD_DATA));
+        CHECK(port_card_hardware_read_cpu(token, &word) == PORT_CARD_BUS_OK);
+        if (i == 127) {
+            // Transfer IF belongs to data consumption, before the CPU's subsequent destination store.
+            CHECK(port_os_get_if() & OS_IE_CARD_DATA);
+            CHECK(sOut[508] == 0xaa && !port_card_hardware_state().busy);
+        }
+        for (unsigned byte = 0; byte < 4; ++byte) {
+            sOut[i * 4 + byte] = (u8)(word >> (byte * 8));
+        }
+    }
+    CHECK(!memcmp(sOut, sBytes + 256, 512) && sOut[512] == 0xaa);
+    CHECK(port_os_cycles() == sStart + 2640 && port_os_stats().deviceStallCycles == 0);
+    CHECK(port_card_hardware_state().owner == PORT_CARD_OWNER_NONE);
+    CHECK(port_card_hardware_deadline() == UINT64_MAX);
+}
+static void CpuIrq(void) {
+    Boot();
+    sIrqs = 0;
+    OS_SetIrqFunction(OS_IE_CARD_DATA, CardIrq);
+    OS_EnableIrqMask(OS_IE_CARD_DATA);
+    u32 saved = OS_DisableInterrupts();
+    PortCardBusRequest request = CpuRequest(4);
+    uint64_t token;
+    uint32_t word;
+    CHECK(port_card_hardware_start_cpu(&request, &token) == PORT_CARD_BUS_OK);
+    CHECK(port_os_wait_until(sStart + 100));
+    CHECK(port_card_hardware_state().ready && sReads == 1 && sIrqs == 0);
+    CHECK(!(port_os_get_if() & OS_IE_CARD_DATA));
+    CHECK(port_card_hardware_read_cpu(token, &word) == PORT_CARD_BUS_OK);
+    CHECK((port_os_get_if() & OS_IE_CARD_DATA) && sIrqs == 0 && sOut[0] == 0xaa);
+    for (unsigned byte = 0; byte < 4; ++byte) {
+        sOut[byte] = (u8)(word >> (byte * 8));
+    }
+    OS_RestoreInterrupts(saved);
+    port_os_poll_irq();
+    CHECK(sIrqs == 1 && sIrqAt == sStart + 100 && !memcmp(sOut, sBytes + 256, 4));
+}
+static void CpuOwnership(void) {
+    Boot();
+    PortCardBusRequest request = CpuRequest(4);
+    uint64_t old = 0, current = 0xdeadbeef;
+    uint32_t word = 0x11223344;
+    CHECK(port_card_hardware_start_cpu(&request, NULL) == PORT_CARD_BUS_INVALID);
+    CHECK(!port_card_hardware_configure((PortCardBusBackend){ 0 }));
+    CHECK(port_card_dma_arm_main(1, sOut, 4));
+    CHECK(port_card_hardware_start_cpu(&request, &current) == PORT_CARD_BUS_BUSY && current == 0xdeadbeef);
+    MI_StopDma(1);
+    CHECK(port_card_hardware_start_cpu(&request, &old) == PORT_CARD_BUS_OK);
+    CHECK(!port_card_hardware_configure((PortCardBusBackend){ sBytes, Read, Id }));
+    CHECK(!port_card_dma_arm_main(1, sOut, 4));
+    CHECK(port_card_hardware_test_start(&request, port_os_cycles()) == PORT_CARD_BUS_BUSY);
+    CHECK(port_card_hardware_read_cpu(old, NULL) == PORT_CARD_BUS_INVALID);
+    CHECK(port_card_hardware_cancel_cpu(old));
+    CHECK(port_card_hardware_start_cpu(&request, &current) == PORT_CARD_BUS_OK && current != old);
+    CHECK(port_os_wait_until(sStart + 60));
+    CHECK(port_card_hardware_read_cpu(old, &word) == PORT_CARD_BUS_BUSY && word == 0x11223344);
+    CHECK(!port_card_hardware_cancel_cpu(old) && port_card_hardware_state().ready);
+    CHECK(port_card_hardware_read_cpu(current, &word) == PORT_CARD_BUS_OK);
+    CHECK(sReads == 1 && sOut[0] == 0xaa);
+    // A later ID command has the same owner but a different token; it retains the previous latch until READY.
+    uint32_t previous = word;
+    request = (PortCardBusRequest){ PORT_CARD_BUS_ID, 0, 4, 0, 1, 5, false };
+    CHECK(port_card_hardware_start_cpu(&request, &old) == PORT_CARD_BUS_OK && current != old);
+    CHECK(port_card_hardware_read_cpu(old, &word) == PORT_CARD_BUS_OK && word == previous);
+    CHECK(port_os_wait_until(sStart + 125));
+    CHECK(port_card_hardware_read_cpu(old, &word) == PORT_CARD_BUS_OK && word == 0x1fc2);
+    // Zero-data commands end at their physical deadline, with no CPU consume or destination write.
+    request = CpuRequest(0);
+    OS_ResetRequestIrqMask(OS_IE_CARD_DATA);
+    CHECK(port_card_hardware_start_cpu(&request, &current) == PORT_CARD_BUS_OK);
+    CHECK(port_os_wait_until(sStart + 165));
+    CHECK(!port_card_hardware_state().busy && port_card_hardware_state().owner == PORT_CARD_OWNER_NONE);
+    CHECK((port_os_get_if() & OS_IE_CARD_DATA) && sReads == 1 && sOut[0] == 0xaa);
+}
+static void CpuReset(void) {
+    Boot();
+    PortCardBusRequest request = CpuRequest(4);
+    uint64_t old, current;
+    uint32_t word = 0x11223344;
+    CHECK(port_card_hardware_start_cpu(&request, &old) == PORT_CARD_BUS_OK);
+    port_card_hardware_reset();
+    CHECK(port_card_hardware_read_cpu(old, &word) == PORT_CARD_BUS_BUSY && word == 0x11223344);
+    CHECK(port_card_hardware_configure((PortCardBusBackend){ sBytes, Read, Id }));
+    CHECK(port_card_hardware_start_cpu(&request, &current) == PORT_CARD_BUS_OK && current != old);
+    CHECK(port_os_wait_until(sStart + 100));
+    CHECK(port_card_hardware_read_cpu(old, &word) == PORT_CARD_BUS_BUSY && word == 0x11223344);
+    CHECK(!port_card_hardware_cancel_cpu(old));
+    CHECK(port_card_hardware_read_cpu(current, &word) == PORT_CARD_BUS_OK);
+    CHECK(sReads == 1 && sOut[0] == 0xaa && port_os_stats().deviceStallCycles == 0);
+}
+static void CpuFailure(void) {
+    Boot();
+    for (unsigned id = 0; id < 2; ++id) {
+        InitDevice();
+        OS_ResetRequestIrqMask(OS_IE_CARD_DATA);
+        sBackendFailure = true;
+        PortCardBusRequest request = CpuRequest(4);
+        request.command = id ? PORT_CARD_BUS_ID : PORT_CARD_BUS_READ;
+        uint64_t old, current;
+        uint32_t word = 0x11223344;
+        CHECK(port_card_hardware_start_cpu(&request, &old) == PORT_CARD_BUS_OK);
+        CHECK(port_os_wait_until(port_os_cycles() + 100));
+        PortCardHardwareState state = port_card_hardware_state();
+        CHECK(state.result == PORT_CARD_BUS_IO && state.generation != old);
+        CHECK(!state.busy && !state.ready && state.owner == PORT_CARD_OWNER_NONE);
+        CHECK(state.event == PORT_CARD_HW_NONE && state.deadline == UINT64_MAX);
+        CHECK(!(port_os_get_if() & OS_IE_CARD_DATA) && sOut[0] == 0xaa);
+        CHECK(port_card_hardware_read_cpu(old, &word) == PORT_CARD_BUS_BUSY && word == 0x11223344);
+        sBackendFailure = false;
+        CHECK(port_card_hardware_start_cpu(&request, &current) == PORT_CARD_BUS_OK && current != old);
+        CHECK(port_os_wait_until(port_os_cycles() + 100));
+        CHECK(port_card_hardware_read_cpu(current, &word) == PORT_CARD_BUS_OK);
+        CHECK((port_os_get_if() & OS_IE_CARD_DATA) && sOut[0] == 0xaa);
+        if (id) {
+            CHECK(word == 0x1fc2);
+        }
+    }
+}
+static void CpuIdInIrq(void) {
+    port_osi_stop_timer(3);
+    CHECK(OS_GetProcMode() == OS_PROCMODE_IRQ);
+    sInside = TRUE;
+    u64 start = port_os_cycles();
+    PortCardBusRequest request = { PORT_CARD_BUS_ID, 0, 4, 0, 1, 5, true };
+    uint64_t old, current;
+    uint32_t word = 0x11223344;
+    CHECK(port_card_hardware_start_cpu(&request, &old) == PORT_CARD_BUS_OK);
+    CHECK(port_card_hardware_cancel_cpu(old));
+    CHECK(port_card_hardware_start_cpu(&request, &current) == PORT_CARD_BUS_OK && current != old);
+    port_osi_start_timer(2, 0x10000 - 20, 1, TRUE);
+    CHECK(port_os_wait_until(start + 65));
+    CHECK(OS_GetProcMode() == OS_PROCMODE_IRQ && sNested == 0 && (port_os_get_if() & TIMER2_IRQ));
+    CHECK(!(port_os_get_if() & OS_IE_CARD_DATA) && port_card_hardware_state().ready);
+    CHECK(port_card_hardware_read_cpu(old, &word) == PORT_CARD_BUS_BUSY && word == 0x11223344);
+    CHECK(!port_card_hardware_cancel_cpu(old));
+    CHECK(port_card_hardware_read_cpu(current, &word) == PORT_CARD_BUS_OK && word == 0x1fc2);
+    CHECK(port_os_cycles() == start + 65 && (port_os_get_if() & OS_IE_CARD_DATA) && sNested == 0);
+    sIrqAt = port_os_cycles();
+    ++sIrqs;
+    sInside = FALSE;
+}
+static void CpuIrqReader(void) {
+    Boot();
+    sIrqs = sNested = 0;
+    sInside = FALSE;
+    OS_SetIrqFunction(TIMER3_IRQ, CpuIdInIrq);
+    OS_SetIrqFunction(TIMER2_IRQ, Nested);
+    OS_EnableIrqMask(TIMER3_IRQ | TIMER2_IRQ);
+    port_osi_start_timer(3, 0x10000 - 100, 1, TRUE);
+    CHECK(port_os_wait_until(sStart + 1000));
+    CHECK(sIrqs == 1 && sNested == 1 && sIrqAt == sStart + 165);
+    CHECK(port_os_cycles() == sStart + 1000 && port_os_stats().deviceStallCycles == 0);
 }
 static void Masked(void) {
     Boot();
@@ -348,6 +534,18 @@ int main(int argc, char **argv) {
         run = Inactive;
     } else if (!strcmp(name, "generic_conflict")) {
         run = GenericConflict;
+    } else if (!strcmp(name, "cpu_pacing")) {
+        run = CpuPacing;
+    } else if (!strcmp(name, "cpu_irq")) {
+        run = CpuIrq;
+    } else if (!strcmp(name, "cpu_ownership")) {
+        run = CpuOwnership;
+    } else if (!strcmp(name, "cpu_reset")) {
+        run = CpuReset;
+    } else if (!strcmp(name, "cpu_failure")) {
+        run = CpuFailure;
+    } else if (!strcmp(name, "cpu_irq_reader")) {
+        run = CpuIrqReader;
     }
     if (!strcmp(name, "reset")) {
         CHECK(port_os_run(StopBoot) == PORT_OS_STOPPED);

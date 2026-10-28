@@ -32,11 +32,48 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
 
+## 2026-10-28: share physical CARD ownership with a bounded CPU latch interface
+
+- **Upstream:** `fd3b9e600d`, contained in reviewed main `71eabc1eb0`; the separate naming-sync proposal is not
+  imported into this feature. PR 58 merged normally after all 14 checks, owner approval and exact-head verification.
+- **Port:** `PORT_SHA`, on `codex/card-cpu-controller`. The production `card_rom.c` reader and SDK selection remain
+  unchanged. This extends the independent physical foundation of ADR 0028; it does not activate gameplay timing.
+- **ROM (T0):** fresh configure/Ninja passes both original hashes with zero warnings: B2
+  `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb`, W2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`.
+- **Host build/tests (T1/T2):** complete arm64 macOS RelWithDebInfo builds and suites pass: B2 353 passed/28 explicit
+  fixture/platform-dependent skips of 381; W2 350/28 of 378; zero failures. All 20 wire/physical cases pass per game
+  in ordinary and LLVM 23 fatal ASan/UBSan builds, recovery OFF. The actual Ninja compile/link flags instrument the
+  standalone wire test as well as the shared controller. An initially unbuilt standalone sanitizer test executable
+  was built and the complete focused suite rerun; its prior Not Run result is not counted as a pass.
+- **Replay/oracle/play (T3/T4/T7):** applicable existing replays, including both exact New Game house checks, pass
+  with the production reader unchanged. Private original-DS CPU observers preserve all 11,000 frames and 56,086
+  semantic payloads per game. Both first AI loads use 19 pages/four IDs and retain an extra final old-control poll on
+  all 19 pages. Observed B2 238,780/W2 241,502 system-cycle totals include wire waiting/IRQ/SDK work, not CPU constants.
+- **Sanitizers/performance (T5/T6):** no suppression, mask, seed, input, golden or budget changes. Tests cover CPU
+  held/early reads and all 128 page words; IF before final store and deferred delivery; CPU/DMA exclusion; stale token
+  and cancel/reset ABA; zero-data completion; READ/ID backend error and recovery; actual IRQ-handler ID service with
+  pending timer IF and no nested IRQ. CPU consumption adds no invented own-work or DMA-stall cost.
+- **Tiers/trap stubs:** no new tier scan; this changes no game source or completed native feature. Existing matching
+  coverage and unsupported SDK paths remain separate from this controller-boundary proof.
+- **64-bit warnings:** both complete-suite pointer guards pass; no new game cast or source-list change. The prior
+  baseline remains 365 sites/229 keys, real 66, with all 1,707 inputs compiled.
+- **Work done:** one bus now accepts generation-scoped CPU commands; idle-only backend configuration cannot steal
+  active ownership. READY belongs to CPU or DMA explicitly. CPU read consumes the latch, schedules the next physical
+  deadline and publishes final IF before the caller stores data. Reset/cancel never reuse epochs; backend IO failure
+  cancels, invalidates the token and preserves its result. An independent read-only review found no actionable API
+  bug; its two requested error/IRQ coverage gaps are exercised. Guides, feature map and ADR note describe the scope.
+- **Next:** integrate reviewed main and publish this support change through protected review. Adapt the original SDK
+  CPU page/cache/task algorithm to this shared controller only after resolving the preserved runtime prototype's
+  New Game regression and validating genuine AI choices. Continue Ranch/Hugh/Herdier afterward.
+- **Blockers:** no human action blocks this support change. The archived timing prototype still misses the authentic
+  name-confirmation golden with the same genuine seed; passive source-state comparison remains in progress. No
+  gameplay timing activation or AI parity is claimed. Spanish issue 45 still lacks gameplay/save evidence.
+
 ## 2026-10-28: combine the contributor's LLD follow-up with namespace regression coverage
 
 - **Upstream:** reviewed main remains `3ea5609ea3`, containing `fd3b9e600d`; the separate naming proposal is still
   local. This merges the contributor's concurrently published `6241265c6c` normally, preserving all their commits.
-- **Port:** `PORT_SHA`, after maintainer candidate `cd4588750f`. Retain the contributor's hidden-global regression
+- **Port:** `b9020ba00b`, after maintainer candidate `cd4588750f`. Retain the contributor's hidden-global regression
   and optional Clang/LLD target, plus the independent actual-policy host and executable/DSO tests. No force push.
 - **ROM (T0):** fresh configure/Ninja after combining the changes passes both original hashes with zero warnings.
   No source outside `port/` changes; all source/test evidence is retained separately from ROMs and saves.
