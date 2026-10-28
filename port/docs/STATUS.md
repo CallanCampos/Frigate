@@ -32,11 +32,54 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
 
+## 2026-10-28: preserve the backup WRITE initial service wait
+
+- **Upstream:** reviewed Frigate main `43eaf0429a`, upstream `f71f5fe61d`. Pending sync PR 62 and the unfinished
+  ROM reader remain separate; any later base integration requires renewed verification.
+- **Port:** `PORT_SHA`, native backup service, game-wrapper waiting and authentic save checkpoints;
+  [ADR 0029](adr/0029-backup-write-service-wait.md) accepts this narrow policy.
+- **ROM (T0):** fresh signed configure and 18 Ninja steps after the native-only game-wrapper change pass both
+  original US hashes with zero warnings: B2 `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb`,
+  W2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`. Default DS code remains unchanged.
+- **Host build/tests (T1/T2):** fresh arm64 macOS RelWithDebInfo all-target builds pass. Full suites complete
+  B2 370 passed/28 explicit skips of 398 and W2 367/28 of 395, zero failures. Both actual assembly oracles pass
+  five of five without skips. All 22 candidate source/record hashes remain fixed throughout both suites.
+- **Replay/oracle/performance/save (T3/T4/T6):** all registered replay, reference-hash, timing and save checks pass.
+  The original DS is incomplete at video 5600 in both games: first identity/egg values are present, secondary
+  ranges remain FF and full CRC validation fails. At 7800 both games' saves validate all 73 blocks, both banks and
+  table/footer CRCs. Each original 5600 run matches every frame and all 23,486 payload rows of its 7800 prefix.
+  The early native checkpoint retains those four byte assertions; the new complete checkpoint requires two
+  byte-identical, fully CRC-valid saves at 7800. Recording also requires the valid 7800 checkpoint and matches
+  all 7800 frames/26,740 payloads and its save in each game. The unchanged immediate-reply baseline fails the new
+  early-state check for the intended second-bank values. Inputs, seeds, goldens, masks and performance budgets stay fixed.
+- **Sanitizers/play (T5/T7):** final-source ordinary/fatal LLVM 23.1.3 configurations pass 27 backup tests plus
+  actual `rom_game_backup` per game/configuration: 112 executions, no skips or failures. Actual buffers exceed
+  4 GiB. ROM manifest checks pass 14/14; valid/corrupt/optional-image checker controls pass. No new whole-app
+  fatal-sanitizer or windowed-play claim follows. Private archived SDK `6721a18b76` SAVE experiments preserve
+  the first 32,000 frames and payloads and prior native saves/all 73 CRCs; unique-counter camera differences
+  fall 110 to 18 in B2 and 109 to 17 in W2, retaining every residual and ambiguous/missing/DS-only group.
+  Captured LC 8-byte, MT first-word 4-byte and index 4-byte values match at unique counters; this is neither
+  full-MT-state proof nor feature-head/whole-game timing parity.
+- **Tiers/trap stubs:** no new progress scan or game implementation.
+- **64-bit warnings:** both guards pass; 365 sites/229 keys (real 66, harmless 123, handled 141, unreachable 35),
+  all 1,711 files compiled, zero missing. No baseline edit.
+- **Work done:** successful nonempty WRITE image bytes precede the SDK initial wait and deferred result/ACK;
+  actual B2 and W2 first-WRITE controls load 25/300 and schedule 13,091 ticks, exactly 837,824 system cycles.
+  Reset/boot/path changes retire pending replies; existing path image-discard and host flush-error policies stay
+  distinct from cartridge results. Sound, real SDK page/task ownership, cancellation and errors retain coverage.
+  Native `writeFlashWaitSuccess` waits through the genuine SDK while its finisher owns errors and lock release.
+  Initial B2 diagnostics found six failures of 395 (361 pass/28 skips); the real busy loop, false 5600 completed-save
+  assumption and CMake target-metadata fixture omission are corrected and full suites now pass. No failure was masked.
+- **Next:** publish a separate topic PR, verify its exact head, then require all hosted checks and the configured
+  owner-authored review exception before normal protected merge. Reverify if reviewed main changes.
+- **Blockers:** serial transport, other ARM7 work, the separate ROM-reader experiment and later story coverage
+  remain unfinished. ADR 0023 remains proposed. Spanish issue 45 still lacks a locally available dump.
+
 ## 2026-10-28: integrate the reviewed controller into the bounded field sync
 
 - **Upstream:** frozen `f71f5fe61d`, still the same 36 commits in PR 60. Reviewed main is now `ad54a31b4f`,
   the normal PR 61 merge after all 14 checks passed. No later upstream commits or experimental SDK reader enter.
-- **Port:** `PORT_SHA`, a real merge of that reviewed main into companion `1b76a05ca0` on the App's original
+- **Port:** `0d11d8e74e`, a real merge of that reviewed main into companion `1b76a05ca0` on the App's original
   two-parent proposal. The separately preserved private 25-commit merge remains outside this graph.
 - **ROM (T0):** fresh combined-tree signed-runtime configure/Ninja passes both original US hashes, zero warnings:
   B2 `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb`, W2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`.

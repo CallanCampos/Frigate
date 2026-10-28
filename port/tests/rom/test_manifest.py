@@ -174,7 +174,7 @@ class ManifestTests(unittest.TestCase):
             output = root / 'gen/rom'
             output.mkdir(parents=True)
             probe = root / 'probe.cmake'
-            ignored = ('set_property', 'set_target_properties', 'target_sources', 'add_executable', 'target_link_libraries',
+            ignored = ('set_property', 'set_target_properties', 'target_sources', 'add_library', 'add_executable', 'target_link_libraries',
                        'target_include_directories', 'target_compile_options', 'target_compile_definitions', 'add_test',
                        'set_tests_properties', 'enable_testing')
             prefix = ''.join(f'function({name})\nendfunction()\n' for name in ignored)

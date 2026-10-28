@@ -15,7 +15,8 @@
 // The chip: 4 Mbit of flash, as BW2 identifies it (src/gfl/backup_card.c). A page write (CARD_REQ_WRITE_BACKUP) erases
 // and programs, a page program (CARD_REQ_PROGRAM_BACKUP) can only clear bits, and the erases set bytes to 0xff.
 // Addresses wrap at the chip's size, as the chip ignores the address bits above it. The work takes no time on the
-// virtual clock: a request ends before the PXI word that started it is delivered back.
+// virtual clock for most commands. Successful WRITE_BACKUP bytes are followed by the original ARM7 service
+// wait (spec.writePage milliseconds), then its result and PXI acknowledgment. This is SDK policy, not flash busy.
 #include "hal/card/card_internal.h"
 #include "hal/card/port_card.h"
 #include "hal/os/port_app.h"
@@ -73,6 +74,22 @@ static struct {
     char path[PATH_LENGTH];
 } sCard;
 
+// One outstanding ARM7 service request: the genuine SDK serializes this command block. Bytes are already written;
+// only publication/acknowledgment waits. No source-page pointer survives the request handler.
+static struct {
+    CARDiCommandArg *cmd;
+    uint64_t deadline;
+} sWriteReply;
+
+static void CompleteWrite(void);
+
+void port_card_backup_reset(void) {
+    // A queued old callback may still run: it sees no owner (or a new owner's later deadline), never stale storage.
+    sWriteReply.cmd = NULL;
+    sWriteReply.deadline = 0;
+    port_os_set_timed_work(CompleteWrite, UINT64_MAX);
+}
+
 // --- The save file ------------------------------------------------------------------------------------------------
 
 // The save directory, without the file's name: --save-dir, else the user's own (port_card.h)
@@ -114,6 +131,7 @@ const char *port_card_save_path(void) {
 }
 
 void port_card_set_save_path(const char *path) {
+    port_card_backup_reset();
     free(sCard.image);
     sCard.image = NULL;
     sCard.dirty = FALSE;
@@ -536,7 +554,7 @@ static uint8_t *Arm9Memory(u32 address, u32 length) {
 // Whether the backup type is the chip the host has: a flash (the device, in the low byte) of 1 << 19 bytes (the size's
 // shift, in the next byte); the vendor, in the third, doesn't matter
 static BOOL IsHostChip(CARDBackupType type) {
-    return (type & 0xff) == CARD_BACKUP_TYPE_DEVICE_FLASH && 1u << ((type >> 8) & 0xff) == PORT_CARD_BACKUP_SIZE;
+    return (type & 0xff) == CARD_BACKUP_TYPE_DEVICE_FLASH && ((type >> 8) & 0xff) == 19;
 }
 
 static CARDResult Read(CARDiCommandArg *cmd) {
@@ -609,7 +627,7 @@ static CARDResult Execute(CARDiCommandArg *cmd, u32 request) {
     if (!sCard.identified) {
         return CARD_RESULT_NO_RESPONSE;
     }
-    if ((cmd->spec.caps & CARD_CAPS(request)) == 0) {
+    if (request >= 32 || (cmd->spec.caps & (UINT32_C(1) << request)) == 0) {
         return CARD_RESULT_UNSUPPORTED;
     }
     switch (request) {
@@ -646,6 +664,20 @@ static void Acknowledge(u32 request) {
 #endif
 }
 
+static void CompleteWrite(void) {
+    CARDiCommandArg *cmd = sWriteReply.cmd;
+
+    if (cmd == NULL || port_os_cycles() < sWriteReply.deadline) {
+        return;
+    }
+    sWriteReply.cmd = NULL;
+    if (cardi_common.cmd != cmd) {
+        return;
+    }
+    cmd->result = CARD_RESULT_SUCCESS;
+    Acknowledge(CARD_REQ_WRITE_BACKUP);
+}
+
 void port_card_on_fs_word(uint32_t tag, uint32_t data, int err) {
     CARDiCommandArg *cmd = cardi_common.cmd;
 
@@ -668,10 +700,31 @@ void port_card_on_fs_word(uint32_t tag, uint32_t data, int err) {
         return;
     }
     if (data == CARD_REQ_INIT) {
+        port_card_backup_reset();
         sCard.expectingBlock = TRUE;
         return;
     }
-    cmd->result = Execute(cmd, data);
+    if (sWriteReply.cmd != NULL) {
+        fprintf(stderr, "port: card: overlapping backup request while a write service reply is pending\n");
+        exit(PORT_CARD_EXIT_STATUS);
+    }
+    CARDResult result = Execute(cmd, data);
+    if (data == CARD_REQ_WRITE_BACKUP && result == CARD_RESULT_SUCCESS && cmd->len != 0 && cmd->spec.writePage != 0) {
+        // The original ARM7 loads writePage after programming each shared page, sleeps by this SDK conversion,
+        // then polls status. Only the initial wait is modeled here; no READ/VERIFY/PROGRAM/ERASE cost is invented.
+        uint64_t wait = OS_MilliSecondsToTicks(cmd->spec.writePage) * 64;
+        uint64_t now = port_os_cycles();
+        if (wait >= UINT64_MAX - now) {
+            // UINT64_MAX is the timed-work cancellation sentinel. Bytes have changed; never pretend to undo them.
+            result = CARD_RESULT_ERROR;
+        } else {
+            sWriteReply.cmd = cmd;
+            sWriteReply.deadline = now + wait;
+            port_os_set_timed_work(CompleteWrite, sWriteReply.deadline);
+            return;
+        }
+    }
+    cmd->result = result;
     Acknowledge(data);
 }
 
@@ -688,6 +741,7 @@ static void OnCardWord(uint32_t tag, uint32_t data, int err) {
 // The services are registered at every call, since a reset of the PXI bus (port_pxi_reset) takes them away; the frame
 // hook and the write at exit are the process's, once
 void port_card_boot(void) {
+    port_card_backup_reset();
     sCard.expectingBlock = FALSE;
     sCard.identified = FALSE;
 #if PORT_CARD_PXI_BUS

@@ -94,6 +94,7 @@ What becomes easier, what becomes harder, what must be watched, and what would m
 | [0026](0026-native-archive-table-caches.md) | Keep archive offsets and resolve cached tables through the native pointer | §4.5, §4.8, §6 | accepted |
 | [0027](0027-recorded-input-streams.md) | Record effective video input with explicit initial state, clock and bounded seeds | §4.5, §6 | accepted |
 | [0028](0028-card-wire-and-physical-dma-progress.md) | Keep the CARD physical model separate from production SDK integration | §4.5, §6 | accepted (physical foundation only) |
+| [0029](0029-backup-write-service-wait.md) | Preserve the backup WRITE service initial SDK wait | §4.5, §6 | proposed |
 
 ## Decisions waiting for an ADR
 

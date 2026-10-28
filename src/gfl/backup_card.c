@@ -32,6 +32,11 @@ BOOL writeFlashWaitSuccess(u32 dest, const void *src, u32 size, BackupWriteError
     u16 lockId = startWriteFlash(dest, src, size, callback);
 
     while (!finishBackupGetResult(lockId, &result, callback)) {
+#ifdef PLATFORM_PC
+        // Native cooperative execution must yield while the genuine CARD task awaits its service reply.
+        // The finisher remains responsible for errors and releasing the backup lock.
+        CARD_WaitBackupAsync();
+#endif
     }
     return result;
 }
