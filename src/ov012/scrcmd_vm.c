@@ -839,8 +839,8 @@ const FieldScriptCommand EVCMD_TABLE[] = {
     s02E5_HiddenHollowSet,                            // 0x2e5
     s02E6_HiddenHollowCreateEvents,                   // 0x2e6
     NULL,                                             // 0x2e7
-    func_ov036_021ab498,                              // 0x2e8
-    func_ov036_021ab50c,                              // 0x2e9
+    s02E8_CallFieldFadeOut,                           // 0x2e8
+    s02E9_CallFieldFadeIn,                            // 0x2e9
     s02EA_PokePartyAddNPoke,                          // 0x2ea
     NULL,                                             // 0x2eb
     NULL,                                             // 0x2ec

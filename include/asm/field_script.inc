@@ -3834,14 +3834,14 @@
     FieldCommand 742
     .endm
 
-    // func_ov036_021ab498
+    // s02E8_CallFieldFadeOut
     .macro Cmd_02E8 a0, a1
     FieldCommand 744
     .2byte \a0
     .2byte \a1
     .endm
 
-    // func_ov036_021ab50c
+    // s02E9_CallFieldFadeIn
     .macro Cmd_02E9 a0, a1
     FieldCommand 745
     .2byte \a0

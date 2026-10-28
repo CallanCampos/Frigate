@@ -11418,6 +11418,8 @@ overlays/ov036 0x021ab1a8 s017C_RollerCoasterCallSwitch
 overlays/ov036 0x021ab1e0 ScrcmdFieldGimmickCartLanes_UnlockLaneFromScript
 overlays/ov036 0x021ab208 s024D_RollerCoasterAmbienceStart
 overlays/ov036 0x021ab25c ScriptNative_WaitFieldFade
+overlays/ov036 0x021ab498 s02E8_CallFieldFadeOut
+overlays/ov036 0x021ab50c s02E9_CallFieldFadeIn
 overlays/ov036 0x021ab580 FieldFadeEvent_Callback
 overlays/ov036 0x021ac0d0 ShopUI_TryBuyItem
 overlays/ov036 0x021ac1d0 ShopUI_TryBuyMove
