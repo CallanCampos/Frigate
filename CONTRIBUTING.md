@@ -25,8 +25,8 @@ follows; [the docs](README.md#documentation) have the details.
 
 The [workflow](docs/decompiling.md#workflow) in short:
 
-1. Find the original file's boundaries and its name, from a string the ROM embeds (such as `"resort_npc.c"`) or else
-   from what it does. `tools/decomp/source_files.py ovNNN` helps; see
+1. Find the original file's boundaries and its name, from a string the ROM embeds (such as `"resort_npc.c"`), in
+   English, or else from what it does. `tools/decomp/source_files.py ovNNN` helps; see
    [Code organization](docs/code-organization.md).
 2. Add the file to both versions with `tools/decomp/add_source_file.py`.
 3. Write the C, in the same order as the functions in the ROM. `tools/decomp/compiler_probe.py FILE --mismatches`
@@ -69,7 +69,9 @@ still linked, and objdiff shows how close it is.
   decompilation's structure where that is what matches, rewritten in this project's names, types and format, but
   don't paste their code. Never use leaked or otherwise unlawfully obtained
   material, such as leaked source code, in any form.
-- **Names:** use swan's names first (see [Names](docs/code-organization.md#names)). Name anything else through
+- **Names:** in English, without Japanese words or Game Freak's private abbreviations (`zukan` is `Pokedex`,
+  `fldmmdl` `FieldActor`); well-known acronyms such as BGM, SE, HP and TM stay. Use swan's names first, translated the
+  same way (see [Names](docs/code-organization.md#names)). Name anything else through
   `tools/decomp/rename_symbol.py`, which records the name in `config/names.txt` and updates the source. Library
   code in `lib/` uses the SDK's own names where the code shows them, noting swan's name where it differs.
 - **Bugs:** mark a bug in the game with `// BUG:` and a fix under `#ifdef BUGFIX`, with the original code in `#else`.
