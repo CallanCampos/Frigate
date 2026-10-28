@@ -425,6 +425,11 @@ void PokedexListObj_PutMon(PokedexListWork *wk, u16 species) {
     ClActor_SetDrawAnim(wk->actors[id], FALSE);
 
     // BUG: for the unknown picture the form is whatever the stack holds, since nothing read it from the Pokédex
+#if defined(PLATFORM_PC) || defined(BUGFIX)
+    if (species == SPECIES_NONE) {
+        form = 0;
+    }
+#endif
     personal = PML_PersonalLoad(species, form, HEAPID_POKEDEX_LIST | HEAPID_TAIL_BIT);
     if (species != SPECIES_NONE && PML_PersonalGetParam(personal, PERSONAL_NO_FLIP) == 0) {
         ClActor_SetFlip(wk->actors[id], 1, TRUE);

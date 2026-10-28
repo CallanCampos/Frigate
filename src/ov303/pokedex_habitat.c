@@ -235,25 +235,37 @@ static const PokedexHabitatSeqFunc sPokedexHabitatSequences[SEQ_COUNT + 1] = {
 // clang-format on
 
 // BUG: neither table ends with TOUCH_RECT_END, so the search runs on into the data that follows them
+#if defined(PLATFORM_PC) || defined(BUGFIX)
+#define POKEDEX_HABITAT_TOUCH_CAPACITY(count) ((count) + 1)
+#else
+#define POKEDEX_HABITAT_TOUCH_CAPACITY(count) count
+#endif
+
 // clang-format off
-static const TouchRect sPokedexHabitatCursorTouchRects[CURSOR_TOUCH_COUNT] = {
+static const TouchRect sPokedexHabitatCursorTouchRects[POKEDEX_HABITAT_TOUCH_CAPACITY(CURSOR_TOUCH_COUNT)] = {
     { 168, 191, 232, 255 }, { 168, 191, 96, 212 },
     { 48, 80, 32, 72 },     { 48, 80, 72, 112 },    { 48, 80, 112, 152 },   { 48, 80, 152, 192 },   { 48, 80, 192, 232 },
     { 80, 112, 32, 72 },    { 80, 112, 72, 112 },   { 80, 112, 112, 152 },  { 80, 112, 152, 192 },  { 80, 112, 192, 232 },
     { 112, 144, 32, 72 },   { 112, 144, 72, 112 },  { 112, 144, 112, 152 }, { 112, 144, 152, 192 }, { 112, 144, 192, 232 },
     { 144, 176, 32, 72 },   { 144, 176, 72, 112 },  { 144, 176, 112, 152 }, { 144, 176, 152, 192 }, { 144, 176, 192, 232 },
+#if defined(PLATFORM_PC) || defined(BUGFIX)
+    { TOUCH_RECT_END, 0, 0, 0 },
+#endif
 };
 
 // clang-format on
 
 // clang-format off
-static const TouchRect sPokedexHabitatListTouchRects[LIST_TOUCH_COUNT] = {
+static const TouchRect sPokedexHabitatListTouchRects[POKEDEX_HABITAT_TOUCH_CAPACITY(LIST_TOUCH_COUNT)] = {
     { 168, 191, 184, 207 }, { 168, 191, 208, 231 }, { 168, 191, 232, 255 }, { 168, 191, 68, 92 },   { 168, 191, 108, 132 },
     { 168, 191, 148, 172 }, { 168, 191, 0, 24 },    { 168, 191, 24, 48 },   { 52, 76, 12, 36 },     { 52, 76, 228, 244 },
     { 48, 80, 32, 72 },     { 48, 80, 72, 112 },    { 48, 80, 112, 152 },   { 48, 80, 152, 192 },   { 48, 80, 192, 232 },
     { 80, 112, 32, 72 },    { 80, 112, 72, 112 },   { 80, 112, 112, 152 },  { 80, 112, 152, 192 },  { 80, 112, 192, 232 },
     { 112, 144, 32, 72 },   { 112, 144, 72, 112 },  { 112, 144, 112, 152 }, { 112, 144, 152, 192 }, { 112, 144, 192, 232 },
     { 144, 176, 32, 72 },   { 144, 176, 72, 112 },  { 144, 176, 112, 152 }, { 144, 176, 152, 192 }, { 144, 176, 192, 232 },
+#if defined(PLATFORM_PC) || defined(BUGFIX)
+    { TOUCH_RECT_END, 0, 0, 0 },
+#endif
 };
 
 // clang-format on

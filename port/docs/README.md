@@ -77,6 +77,7 @@ Each directory of `port/` has a guide to its files: what each does, the part of 
 
 | Guide | What it covers |
 | --- | --- |
+| [../tests/integrate/README.md](../tests/integrate/README.md) | Actual game/SDK fixtures, including Pokédex touch bounds and form selection, with fatal sanitizer coverage and explicit asset/rendering limits |
 | [../app/README.md](../app/README.md) | The program: `main()` and its options, the window, the controls, replays, the run directory, the sound driver's trace, the macOS app's scripts |
 | [../hal/README.md](../hal/README.md) | The platform layer: one row per module with the SDK module it replaces, how decomp files are adapted, the names |
 | [../gfx/README.md](../gfx/README.md) | The renderers: 2D, the geometry engine, 3D, capture, the scanline hook |

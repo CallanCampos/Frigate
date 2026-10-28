@@ -32,13 +32,50 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
 
+## 2026-10-28: guard inherited Pokédex reads on native hosts
+
+- **Upstream:** proposed `b7ce134e0c`, still fourteen naming commits beyond `fd3b9e600d`; reviewed main is
+  `71eabc1eb0`. These two bug notes and original behaviors already exist in main under the former filenames.
+  This is a safety companion for the existing sync proposal, not a completed sync of main.
+- **Port:** `PORT_SHA`, on the local sync-resolution branch. Two `PLATFORM_PC`/optional `BUGFIX` guards bound the
+  habitat touch scans and explicitly pass form 0 for an unknown picture. Known saved forms remain unchanged.
+- **ROM (T0):** fresh configure/Ninja, 9,610 steps, zero warnings, both original hashes match: B2
+  `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb`, W2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`.
+  Actual MWCC preprocessing of both changed owners matches `76daa0e43f` in both versions, four of four streams.
+- **Host build/tests (T1/T2):** both actual-source fixtures pass in ordinary and full LLVM 23 fatal ASan/UBSan
+  configurations, two of two per mode, zero skips. All 98,304 real GFL searches match an independently bounded
+  first-hit calculation; inclusive edges, overlapping-area precedence and no-hit behavior are retained. Six actual
+  list-selection flows cover both picture slots, unknown form 0, saved Unown form 7 and no-flip behavior.
+- **Replay/oracle/sanitizers/performance/play (T3/T4/T5/T6/T7):** no new complete Pokédex gameplay, asset or rendering
+  claim. New-head complete native/hosted gates remain required. Prior head `76daa0e43f` passes canonical B2
+  347/28 explicit skips of 375 and W2 344/28 of 372, zero failures, owner status 57500430587. Its later style failure
+  exposed these original bug notes; it is not transferred to this new head as a successful Standards result.
+- **Tiers/trap stubs:** no new scan; these bounds do not complete native gameplay features or original SDK support.
+- **64-bit warnings:** no new cast/type change. The prior canonical guard passes 365 sites/229 keys, real 66,
+  1,707 compiled inputs and zero missing; final-head verification must repeat it.
+- **Work done:** add one physical end entry per touch table without changing its logical count, existing coordinates
+  or order. The default DS path retains its original tokens/data. Set unknown form only for `SPECIES_NONE` immediately
+  before the original personal-data call; normal production zero-init already gives 0, so no new observed form crash
+  is claimed. Fixture TUs include the actual owners and link the remaining genuine game/SDK objects. The real touch
+  scanner itself has fatal sanitizers even in the ordinary test configuration. A fixture-only final pattern-init
+  flag prevents implicit zero-init concealing the form defect; the production object retains zero-init.
+  Private exact original-source controls produce an actual GFL scanner global-buffer-overflow (macOS SIGABRT) and
+  a form argument of 43,690 instead of 0. Those controls preserve their commands/hashes and stay out of the permanent
+  build. The strict style checker and its fixtures pass; no style suppression or sanitizer exception is added.
+- **Next:** combine this tested companion with reviewed main as required, publish the existing sync PR, run its
+  exact-head full gates and approve/merge normally. Continue the separate experimental shared-controller CPU reader
+  and original-game timing comparisons; its work is not imported into this sync.
+- **Blockers:** no human action blocks this safety correction. Final integrated-head gates remain due. Cloud Apple
+  runner capacity delays the independent AI PR; original input, seed, golden, budget and sanitizer policy stay fixed.
+  Spanish issue 45 remains open without gameplay/save evidence.
+
 ## 2026-10-28: refresh the bounded naming proposal and satisfy required formatting
 
 - **Upstream:** proposed `b7ce134e0cdc91c4539112c050c20e634d74f40b`, fourteen commits beyond `fd3b9e600d`.
   Four arrived after the previous proposal: day care/GTS/Forces of Nature, naming tools/report, and English archive/
   text-bank names. Real merge `7412f62ba5` retains its provenance trailer. Main remains reviewed `71eabc1eb0`;
   this is still the existing draft sync PR, not a completed sync of main.
-- **Port:** `PORT_SHA`, formatting-only companion and living path correction after the upstream import. No
+- **Port:** `76daa0e43f`, formatting-only companion and living path correction after the upstream import. No
   reference/rewrite exception is used. Imported decomp configs equal upstream; incoming workflows are unchanged.
 - **ROM (T0):** fresh configure/Ninja, 1,768 steps, zero warnings, both original hashes match: B2
   `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb`, W2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`.
