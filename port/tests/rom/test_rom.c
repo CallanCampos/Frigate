@@ -14,6 +14,7 @@
 #include "hal/host/host.h"
 #include "hal/os/port_os.h"
 #include "hal/rom/port_rom.h"
+#include "hal/rom/rom_manifest.h"
 #include "nitro/card.h"
 // card.h's backup calls as the game's backup_card.c makes them on the host, with the buffer kept whole
 #include "hal/card/card_backup_calls.h"
@@ -247,7 +248,10 @@ static void OverlayMain(void) {
 #ifdef WHITE2
     Check((u32)(uintptr_t)info.ramAddress == 0x02150400, "overlay 12 loads where the field core does");
 #else
-    Check((u32)(uintptr_t)info.ramAddress == 0x021503c0, "overlay 12 loads where the field core does");
+    // The Spanish ROM's main is 64 bytes shorter, so its overlays above main load 0x40 lower
+    // (port/docs/research/es-rom-support.md)
+    u32 fieldCore = strcmp(port_rom_manifest_version, "b2_es") == 0 ? 0x02150380 : 0x021503c0;
+    Check((u32)(uintptr_t)info.ramAddress == fieldCore, "overlay 12 loads where the field core does");
 #endif
 
     // A real overlay's statics in their sections

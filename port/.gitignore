@@ -5,3 +5,6 @@
 !/tools/compile-probe/README.md
 !/tools/compile-probe/scripts/
 !/tools/compile-probe/shim/
+
+# The player's own dump's manifest entry, which rom_manifest.py writes for PORT_ROM_LANGUAGE (docs/adr/0025)
+/tools/research/assets/nitrofs_manifest_languages.json
