@@ -32,6 +32,23 @@ struct FieldWeather {
     TCB *tcb;
 };
 
+// FieldWeather's transition: end the weather, then start the next, or start the next over it as it ends; the index of
+// WEATHER_TRANSITION_FUNCS
+enum {
+    WEATHER_TRANSITION_SEQUENTIAL,
+    WEATHER_TRANSITION_CROSSFADE,
+};
+
+// FieldWeather's state through a change of weather: a crossfade goes from WEATHER_STATE_START to WEATHER_STATE_WAIT_END
+// and back to WEATHER_STATE_IDLE, a sequential change through all of them
+enum {
+    WEATHER_STATE_IDLE,
+    WEATHER_STATE_START,
+    WEATHER_STATE_WAIT_END,
+    WEATHER_STATE_LOAD_OVERLAY,
+    WEATHER_STATE_START_NEXT,
+};
+
 typedef struct WeatherOverlay {
     WeatherData *data;
     u32 overlayId;
@@ -54,7 +71,7 @@ static const Field3DBgInit WEATHER_BG_SETUPS[2] = {
 
 static const ClActSurfaceSetup WEATHER_SURFACE_SETUP = { 0, 0, 0x100, 0xc0, 0, 1 };
 
-static const WeatherOverlay WEATHER_OVERLAYS[15] = {
+static const WeatherOverlay WEATHER_OVERLAYS[WEATHER_MAX] = {
     { &SUNNY_WEATHER, OVERLAY_ID(74) },        { &FLAKE_WEATHER, OVERLAY_ID(75) },
     { &RAIN_WEATHER, OVERLAY_ID(76) },         { &SANDSTORM_WEATHER, OVERLAY_ID(77) },
     { &BLIZZARD_WEATHER, OVERLAY_ID(75) },     { &FLUTTER_WEATHER, OVERLAY_ID(75) },
@@ -80,8 +97,8 @@ FieldWeather *FieldWeather_Create(FieldCamera *camera, FieldLight *light, FieldF
     for (i = 0; i < 2; i++) {
         weather->layers[i] = Field3DBG_CreateBillboard(&WEATHER_BG_SETUPS[i], heapId);
     }
-    weather->transition = 0;
-    weather->state = 0;
+    weather->transition = WEATHER_TRANSITION_SEQUENTIAL;
+    weather->state = WEATHER_STATE_IDLE;
     weather->current = WEATHER_NONE;
     weather->next = WEATHER_NONE;
     weather->pending = WEATHER_NONE;
@@ -120,7 +137,7 @@ void FieldWeather_Update(FieldWeather *weather, HeapID heapId) {
     s32 i;
 
     WEATHER_TRANSITION_FUNCS[weather->transition](weather, heapId);
-    if (weather->state == 0 && weather->pending != WEATHER_NONE) {
+    if (weather->state == WEATHER_STATE_IDLE && weather->pending != WEATHER_NONE) {
         FieldWeather_RequestChange(weather, weather->pending);
         weather->pending = WEATHER_NONE;
     }
@@ -155,14 +172,14 @@ BOOL FieldWeather_IsTaskActive(FieldWeather *weather) {
 void SetWeatherInit(FieldWeather *weather, u16 weatherId, HeapID heapId) {
     s32 i;
 
-    if (weatherId == weather->current && weatherId != 0) {
+    if (weatherId == weather->current && weatherId != WEATHER_SUNNY) {
         return;
     }
     for (i = 0; i < 2; i++) {
         WeatherTask_ForceEnd(weather->tasks[i]);
     }
     FieldWeather_UnloadOverlay(weather);
-    weather->state = 0;
+    weather->state = WEATHER_STATE_IDLE;
     FieldWeather_LoadOverlay(weather, WEATHER_OVERLAYS[weatherId].overlayId);
     WeatherTask_Start(weather->tasks[0], WEATHER_OVERLAYS[weatherId].data, 0, 0, 1, 1, heapId);
     weather->current = weatherId;
@@ -204,42 +221,42 @@ static void FieldWeather_ReleaseBillboardVramTask(TCB *tcb, void *data) {
 }
 
 static BOOL FieldWeather_StartTransition(FieldWeather *weather, u32 weatherId) {
-    if (weather->state != 0) {
+    if (weather->state != WEATHER_STATE_IDLE) {
         weather->pending = weatherId;
         return FALSE;
     }
-    if (weather->current == weatherId && weatherId != 0) {
+    if (weather->current == weatherId && weatherId != WEATHER_SUNNY) {
         return FALSE;
     }
     weather->next = weatherId;
     weather->fadeIn = TRUE;
     weather->transition = FieldWeather_GetTransitionMode(weather->current, weather->next);
-    weather->state = 1;
+    weather->state = WEATHER_STATE_START;
     return TRUE;
 }
 
 static void FieldWeather_UpdateSequential(FieldWeather *weather, HeapID heapId) {
     switch (weather->state) {
-    case 1:
+    case WEATHER_STATE_START:
         WeatherTask_RequestEnd(weather->tasks[0], 1, 1);
-        weather->state = 2;
+        weather->state = WEATHER_STATE_WAIT_END;
         break;
-    case 2:
+    case WEATHER_STATE_WAIT_END:
         if (!WeatherTask_GetPhase(weather->tasks[0])) {
             FieldWeather_UnloadOverlay(weather);
-            weather->state = 3;
+            weather->state = WEATHER_STATE_LOAD_OVERLAY;
         }
         break;
-    case 3:
+    case WEATHER_STATE_LOAD_OVERLAY:
         FieldWeather_LoadOverlay(weather, WEATHER_OVERLAYS[weather->next].overlayId);
-        weather->state = 4;
+        weather->state = WEATHER_STATE_START_NEXT;
         break;
-    case 4:
+    case WEATHER_STATE_START_NEXT:
         WeatherTask_Start(weather->tasks[0], WEATHER_OVERLAYS[weather->next].data, 1, 1, 1, weather->fadeIn, heapId);
         weather->current = weather->next;
         weather->fadeIn = TRUE;
         weather->next = WEATHER_NONE;
-        weather->state = 0;
+        weather->state = WEATHER_STATE_IDLE;
         break;
     }
 }
@@ -248,14 +265,14 @@ static void FieldWeather_UpdateCrossfade(FieldWeather *weather, HeapID heapId) {
     WeatherTask *task;
 
     switch (weather->state) {
-    case 0:
+    case WEATHER_STATE_IDLE:
         break;
-    case 1:
+    case WEATHER_STATE_START:
         WeatherTask_Start(weather->tasks[1], WEATHER_OVERLAYS[weather->next].data, 1, 1, 2, weather->fadeIn, heapId);
         WeatherTask_RequestEnd(weather->tasks[0], 1, 2);
-        weather->state = 2;
+        weather->state = WEATHER_STATE_WAIT_END;
         break;
-    case 2:
+    case WEATHER_STATE_WAIT_END:
         if (!WeatherTask_GetPhase(weather->tasks[0])) {
             task = weather->tasks[0];
             weather->tasks[0] = weather->tasks[1];
@@ -263,29 +280,29 @@ static void FieldWeather_UpdateCrossfade(FieldWeather *weather, HeapID heapId) {
             weather->tasks[1] = task;
             weather->next = WEATHER_NONE;
             weather->fadeIn = TRUE;
-            weather->state = 0;
+            weather->state = WEATHER_STATE_IDLE;
         }
         break;
     }
 }
 
 static u32 FieldWeather_GetTransitionMode(u16 current, u16 next) {
-    u32 result = FALSE;
+    u32 result = WEATHER_TRANSITION_SEQUENTIAL;
 
     switch (current) {
-    case 1:
-        if (next == 4 || next == 5) {
-            result = TRUE;
+    case WEATHER_FLAKE:
+        if (next == WEATHER_BLIZZARD || next == WEATHER_FLUTTER) {
+            result = WEATHER_TRANSITION_CROSSFADE;
         }
         break;
-    case 4:
-        if (next == 1 || next == 5) {
-            result = TRUE;
+    case WEATHER_BLIZZARD:
+        if (next == WEATHER_FLAKE || next == WEATHER_FLUTTER) {
+            result = WEATHER_TRANSITION_CROSSFADE;
         }
         break;
-    case 5:
-        if (next == 4 || next == 1) {
-            result = TRUE;
+    case WEATHER_FLUTTER:
+        if (next == WEATHER_BLIZZARD || next == WEATHER_FLAKE) {
+            result = WEATHER_TRANSITION_CROSSFADE;
         }
         break;
     }
