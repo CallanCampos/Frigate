@@ -42,8 +42,15 @@ whose 4-byte `.bss` static the strip drops with its two functions while its plac
 names the ROM's order, and `gstats.c`'s 23 functions the game doesn't call, whose statics, local initializers and
 first `""` give the file's data the ROM's layout, and, by the same ruling, for NitroSDK code that ntrtwl's
 reconstruction shows: multiboot's `mb_gameinfo.c`, whose child side and unused setters (26 functions, 14 of them listed)
-give the four words at the head of its `.bss` that the parent never reads. Any other entry is another
-exception for the maintainer to accept.
+give the four words at the head of its `.bss` that the parent never reads. Overlay 182's `dwc_mov_wh.c` lists a
+child connection reconstructed from the two buffer-size messages it shares with the parent's, whose first use puts
+them where the ROM's `.data` has them; nothing else of it is known. Any other entry is another exception for the
+maintainer to accept.
+
+`AuthService.c` also restores two password-login entry points with their callbacks and password helper. These five
+functions are checked against a reference object's assembly; the game's eight surviving functions and all of its
+data are checked against both ROMs. Removing the restored entry points retains the shared XML field names in their
+original order. Their declarations stay in the source file, since they are absent from the linked game.
 
 The strip drops each listed symbol's section, every allocated section that only dropped code reaches (a static
 function, a string, an unpooled static), the exception indices of dropped code, the relocations of what stays (the
@@ -317,6 +324,24 @@ autoload, and `config_fixes.py remove-file ltd_autoload_0 FILE START` deletes a 
 autoload's `delinks.txt`; both are recorded in `config/fixes.txt`. `compiler_probe.py`, `rename_symbol.py` and
 `check_nonmatching_rows.py` find the file's DSi functions in the LTD autoload's symbols.
 
+## Migrated DTCM data
+
+A main SDK object can also hold initialized data and zero-initialized state that the linker places in DTCM.
+`lib/nitro/src/os/os_irqTable.c` defines the 32 interrupt-handler pointers (`OS_IRQTable`, 0x80 bytes) and the waiting
+thread queue (`OSi_IrqThreadQueue`, 8 bytes) between `#pragma section DTCM begin` and `end`. Its compiler section names
+are `.dtcm.data` and `.dtcm.bss`; its functions, callback indexes and callback state remain in the main module.
+
+The one source entry in main's `delinks.txt` owns `.dtcm.data:0x02fe0020-0x02fe00a0` and
+`.dtcm.bss:0x02fe00a0-0x02fe00a8` in both games. DTCM's `.data` and `.bss` receive these sections from the same object.
+The existing `.dtcm` migration spelling keeps its zero-initialized meaning. The `config_fixes.py add-section` helper
+validates each range in its DTCM target section, and `bss-size dtcm 8 0x02fe00a0` records the queue's recovered size so
+that the module's 24 trailing alignment bytes are not mistaken for part of the queue.
+
+The empty-initializer prefix and trailing alignment fill remain separate from these typed objects. They are not
+C filler arrays, and adding the objects does not change the original data denominator or relocation destinations.
+Objdiff compares these owners with `combine_data_sections` disabled, because its default grouping would merge the
+initialized `.dtcm.data` with the zero-initialized `.dtcm.bss`. Both sections still contribute their full sizes.
+
 ## Files of one name
 
 A file is named after its original object, even when another module's file has the same name: the DWC utility's
@@ -350,6 +375,34 @@ show this, since nothing moves. Two tools check it:
 The words that point at a symbol have all been judged: six in literal pools were real pointers and got relocations,
 and the others, in literal pools and data alike, are constants or byte and halfword tables that happen to look like
 addresses, such as `0x02020100`. The words that point at no symbol (`--all`) are mostly such tables too.
+
+## Remaining generated ranges
+
+The generated gap objects still contain 196 data bytes and a 32-byte ITCM prefix after recovering the touchscreen
+rectangle, the HTTP root's trailing member and the sprite parameter cache. These ranges are not all missing C
+objects. Addresses below are Black 2 / White 2; sizes and contents agree between versions.
+
+| Module / section | Start | Bytes | Evidence |
+| --- | --- | ---: | --- |
+| Main `.data` | `0x0209b258` / `0x0209b298` | 8 | Two zero words before the renderer's state; original ownership remains unproven. |
+| Main `.rodata` | `0x020942d4` / `0x02094300` | 8 | Two `FX32_ONE` words before the software sprite tables. |
+| Main `.rodata` | `0x02094364` / `0x02094390` | 8 | All ones before the renderer core's identity matrix. |
+| Main `.rodata` | `0x02094384` / `0x020943b0` | 12 | All ones before the character canvas's function tables. |
+| Main `.data` | `0x0209d728` / `0x0209d768` | 24 | Zero alignment tail after `SDK_OVERLAY_DIGEST_END`, to the next 32-byte boundary. |
+| Overlay 081 `.data` | `0x021eac90` / `0x021eacd0` | 16 | Zero tail after the file-name string, to the module's 32-byte end boundary. |
+| DTCM `.bss` | `0x02fe00a8` / `0x02fe00a8` | 24 | Alignment tail after the recovered eight-byte IRQ thread queue. |
+| ITCM `.text` | `0x01ff8000` / `0x01ff8000` | 32 | Empty initializer-list terminator and alignment before the first function. |
+| DTCM `.data` | `0x02fe0000` / `0x02fe0000` | 32 | Zero autoload prefix, separate from the IRQ callback table. |
+| Autoload 2 `.data` | `0x02400000` / `0x02400000` | 32 | Entire initialized block is zero; no source object is identified. |
+| Autoload 3 `.data` | `0x06898000` / `0x06898000` | 32 | Entire initialized block is zero; no source object is identified. |
+
+The nonzero graphics ranges need complete object-layout evidence. Two live `const s16 posZ = -1` locals in
+`g2d_RendererCore.c` emit four bytes altogether, not its eight-byte prefix, while preserving all 19 functions.
+`g2d_CharCanvas.c`'s two live `const u32 fullbits` locals emit eight bytes while preserving all 18 functions, but
+also move the unused 2D table relative to the other data. Three such mask locals give the twelve bytes without the
+original table layout; function-level IPA retains a static table but places the constants at the end instead.
+These scratch variants are not retained. Matching a value or a function is insufficient to claim the surrounding
+data, and the zero-filled startup and alignment ranges must not be replaced with arbitrary C filler arrays.
 
 ## Known gaps
 

@@ -80,3 +80,16 @@ target_compile_options(port_encounter_dispatch_tests PRIVATE -fsanitize=undefine
 target_link_options(port_encounter_dispatch_tests PRIVATE -fsanitize=undefined)
 add_test(NAME integrate_encounter_dispatch COMMAND port_encounter_dispatch_tests)
 set_tests_properties(integrate_encounter_dispatch PROPERTIES TIMEOUT 30)
+
+# The archive seeker's host C after upstream's MWCC-only assembly exception, on bounded synthetic FS callbacks.
+add_executable(port_archive_seek_tests tests/integrate/archive_seek.c)
+target_link_libraries(port_archive_seek_tests PRIVATE port_decomp_env)
+target_include_directories(port_archive_seek_tests PRIVATE "${REPO_ROOT}")
+target_compile_options(port_archive_seek_tests PRIVATE -fsanitize=address,undefined -fno-sanitize-recover=all)
+target_link_options(port_archive_seek_tests PRIVATE -fsanitize=address,undefined)
+add_test(NAME integrate_archive_seek COMMAND port_archive_seek_tests)
+add_test(NAME integrate_archive_seek_assert
+    COMMAND "${CMAKE_COMMAND}" -E env PYTHONDONTWRITEBYTECODE=1 "${PORT_PYTHON}"
+        "${CMAKE_CURRENT_SOURCE_DIR}/tests/app/check_exit.py" --status 70
+        --expect "ArchiveMoveImageTop fileCnt=2, datID=2" -- "$<TARGET_FILE:port_archive_seek_tests>" invalid)
+set_tests_properties(integrate_archive_seek integrate_archive_seek_assert PROPERTIES TIMEOUT 30)

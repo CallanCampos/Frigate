@@ -947,7 +947,7 @@ static int isPush(void) {
     int top;
     int i;
 
-    if (!DWCi_TPlCheckTrigger(gDWCUtilTouchScreenRect)) {
+    if (!DWCi_TPlCheckTrigger(DWCi_R_SCR)) {
         return ADDRESS_ITEM_NONE;
     }
     top = FX_DivS32(sAddressSettings.scroll, ADDRESS_ROW_HEIGHT);

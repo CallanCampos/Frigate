@@ -21,10 +21,11 @@ src/ov189/dpw_profile.c:
     .text       start:0x0219d544 end:0x0219d590
 
 lib/dwc/src/nd/nd.c:
-    .text       start:0x021a54f4 end:0x021a6cc4
-    .rodata     start:0x021acdc4 end:0x021aceb8
-    .data       start:0x021ae0dc end:0x021ae2cc
-    .bss        start:0x021b28e8 end:0x021b2aa8
+    complete
+    .text       start:0x021a5a04 end:0x021a6cc4
+    .rodata     start:0x021acde4 end:0x021aceb8
+    .data       start:0x021ae10c end:0x021ae2cc
+    .bss        start:0x021b2964 end:0x021b2aa8
 
 lib/dpw/src/dpw_tr.c:
     complete
@@ -158,10 +159,17 @@ lib/dwc/src/nhttp/nhttp_thread.c:
 lib/dwc/src/nhttp/d_nhttp_common.c:
     complete
     .text       start:0x021a0a78 end:0x021a0e5c
-    .bss        start:0x021ae704 end:0x021b2890
+    .bss        start:0x021ae704 end:0x021b28a0
 
 lib/dwc/src/ghttp/ghttpEncryption.c:
     complete
     .text       start:0x021a2418 end:0x021a2c90
     .data       start:0x021ad40c end:0x021adb08
     .bss        start:0x021b28c0 end:0x021b28e4
+
+lib/dwc/src/nd/nd_api.c:
+    complete
+    .text       start:0x021a54f4 end:0x021a5a04
+    .rodata     start:0x021acdc4 end:0x021acde4
+    .data       start:0x021ae0dc end:0x021ae10c
+    .bss        start:0x021b28e8 end:0x021b2964

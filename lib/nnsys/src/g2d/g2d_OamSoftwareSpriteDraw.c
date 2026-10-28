@@ -16,9 +16,18 @@ typedef struct {
     int sy;
 } SpriteParams;
 
-static BOOL bAutoZOffsetAdd_;
-static fx32 zOffset_;
-static NNS_G2dOamSoftEmuUVFlipCorrectFunc s_pUVFlipCorrectFunc;
+// Cached texture coordinates for the sprite-cache entry points removed by the original link
+typedef struct SoftwareSpriteParamCache {
+    fx32 u0;
+    fx32 v0;
+    fx32 u1;
+    fx32 v1;
+} SoftwareSpriteParamCache;
+
+static SoftwareSpriteParamCache softwareSpreiteParamCache_ = { 0, 0, 0, 0 };
+static fx32 zOffset_ = 0;
+static BOOL bAutoZOffsetAdd_ = FALSE;
+static NNS_G2dOamSoftEmuUVFlipCorrectFunc s_pUVFlipCorrectFunc = NULL;
 static fx32 zOffsetStep_ = -FX32_ONE;
 
 // The texture format of each OAM color mode

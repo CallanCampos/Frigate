@@ -1,7 +1,7 @@
 // NitroSDK's interrupt table and the handlers of the interrupts that have callbacks (os_irqTable.c), on the host.
 //
-// OS_IRQTable and OSi_IrqThreadQueue are DTCM data with no C in the decomp (config/b2_us/arm9/dtcm): the table's
-// contents here are the DS's, from its relocations: OS_IrqDummy everywhere but the four timers (OSi_IrqTimer0 to 3,
+// Upstream now defines OS_IRQTable and OSi_IrqThreadQueue in DTCM C. The host still owns the IRQ callback path
+// and uses its whole-address DTCM flag below. The table agrees with the recovered SDK initializer: OS_IrqDummy everywhere but the four timers (OSi_IrqTimer0 to 3,
 // entries 3 to 6), the four DMA channels (OSi_IrqDma0 to 3, entries 8 to 11) and the DSi's four new DMA channels
 // (OSi_IrqNDma0 to 3, entries 28 to 31).
 //

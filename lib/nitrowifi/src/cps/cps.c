@@ -870,8 +870,13 @@ static u32 send_tcp(u8 *data, u32 len, CPSSoc *soc, u8 flags) {
             if (best < 0) {
                 break;
             }
-            CPS_PUT32(tcp + blocks * 8 + 24, soc->ackno + soc->ooo[best].start - soc->rcvbuf_len);
-            CPS_PUT32(tcp + blocks * 8 + 28, soc->ackno + soc->ooo[best].start - soc->rcvbuf_len + soc->ooo[best].len);
+            // The block's edges, in halves at offsets from the block (CPS_PUT32 would group the block's address)
+            CPS_PUT16(tcp + 24 + blocks * 8, (u16)((soc->ackno + soc->ooo[best].start - soc->rcvbuf_len) >> 16));
+            CPS_PUT16(tcp + 24 + blocks * 8 + 2, (u16)(soc->ackno + soc->ooo[best].start - soc->rcvbuf_len));
+            CPS_PUT16(tcp + 24 + blocks * 8 + 4,
+                      (u16)((soc->ackno + soc->ooo[best].start - soc->rcvbuf_len + soc->ooo[best].len) >> 16));
+            CPS_PUT16(tcp + 24 + blocks * 8 + 6,
+                      (u16)(soc->ackno + soc->ooo[best].start - soc->rcvbuf_len + soc->ooo[best].len));
             blocks++;
             last = best;
             best = -1;

@@ -8047,7 +8047,7 @@ sDefaultFont kind:data(any) addr:0x02093390
 DEFAULT_GX_LIGHT kind:data(any) addr:0x02093dc0
 DEFAULT_CAMERA_PROJECTION kind:data(any) addr:0x02093dc8
 DEFAULT_LOOKAT kind:data(any) addr:0x02093de8
-data_02093e0c kind:data(any) addr:0x02093e0c
+sOBJImageLoadFuncs kind:data(any) addr:0x02093e0c
 obj_char_lut kind:data(any) addr:0x02093e1c
 pltt_type_lut kind:data(any) addr:0x02093e24
 data_02093e44 kind:data(any) addr:0x02093e44
@@ -9118,7 +9118,7 @@ mtxCacheBuffer_ kind:bss addr:0x021431d8
 mcRenderState_ kind:bss addr:0x021435d8
 s_pTaskRegisterFunc kind:bss addr:0x021439e0
 s_pUVFlipCorrectFunc kind:bss addr:0x021439ec
-data_021439f8 kind:bss addr:0x021439f8
+softwareSpreiteParamCache_ kind:bss addr:0x021439f8
 pTheInstance_ kind:bss addr:0x02143a08
 NNS_G3dGlb kind:bss addr:0x02143a0c
 NNS_G3dRS kind:bss addr:0x02143c70

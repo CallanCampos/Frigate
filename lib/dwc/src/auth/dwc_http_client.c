@@ -177,21 +177,26 @@ static BOOL DWCi_Http_CheckHeaderReceived(DWCHttp *http) {
 
 static void DWCi_Http_Thread(void *arg) {
     DWCHttp *http = arg;
+    CPSSoc *soc;
     CPSInAddr ip;
     u64 lastData;
     u32 length;
     int headersDone = 0;
-    CPSSoc *soc = &http->soc;
-    DWCHttpSslConnection *con = &http->con;
-    DWCHttpBuffer *response = &http->rep;
-    int timeout = http->param.timeout;
+    DWCHttpSslConnection *con;
+    DWCHttpBuffer *response;
+    int timeout;
     char *request;
     int room;
     int size;
     u8 *data;
     char *old;
 
-    if (timeout <= 0) {
+    soc = &http->soc;
+    con = &http->con;
+    response = &http->rep;
+    if (http->param.timeout > 0) {
+        timeout = http->param.timeout;
+    } else {
         timeout = 60000;
     }
     DWCi_Http_InitCpsSocket(http);

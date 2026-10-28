@@ -5,21 +5,15 @@
 #include "nitro/mi.h"
 #include "nitro/os.h"
 
+// Download engine; nd_api.c is the separate public wrapper (descriptive filename, inferred from its compiler and data
+// layout)
+//
 // NitroDWC's download library (DWC_Nd), which the games use to fetch files from the Nintendo Wi-Fi Connection's
 // download server (Mystery Gift's gifts). The ROM names none of it: see nd.h for where the names come from.
 //
 // A call starts a request to the server with HTTP's POST; the parameters travel in base64 (a variant that pads with
 // '*', and puts '.' and '-' for 62 and 63) and the answer comes back as a status and a body. A thread waits until the
 // Wi-Fi connection is up and sets the library up; NdReportResults then reports each result to the game's callback.
-
-// Where the library is: 0 idle, 1 ready, 2 busy with a call, 3 a call ended well, 4 one failed
-enum {
-    ND_PHASE_IDLE,
-    ND_PHASE_READY,
-    ND_PHASE_BUSY,
-    ND_PHASE_DONE,
-    ND_PHASE_FAILED,
-};
 
 // The events of the HTTP client's callback
 enum {
@@ -33,50 +27,6 @@ typedef struct NdBufferFullEvent {
     u8 unk0[8];
     BOOL grow;
 } NdBufferFullEvent;
-
-// The thread's memory: what DWC_NdInitAsync was given, the connection's information (the service locator's host and
-// token), the thread's stack and the thread
-typedef struct DWCNdCnt {
-    char gamecd[0x20];
-    char passwd[0x20];
-    // Whether the thread set the library up
-    BOOL ndinitialized;
-    DWCSvlResult svlresult;
-    u8 svlthreadstack[0x800];
-    OSThread svlthread;
-} DWCNdCnt;
-
-// The call in progress and the result that NdReportResults gives the game
-typedef struct NdState {
-    DWCNdCallback callback;
-    BOOL notified;
-    int code;
-    int error;
-    int reason;
-    int phase;
-    DWCNdCnt *work;
-} NdState;
-
-// The library's settings, and the request that is running
-typedef struct NdContext {
-    // Records a result, and is given to the requests
-    DWCNdCallback onResult;
-    NHTTPAlloc alloc;
-    BOOL running;
-    BOOL hasApInfo;
-    int request;
-    NHTTPFree free;
-    char *token;
-    char *url;
-    // Whether a request is in flight
-    BOOL requestActive;
-    void (*onCleanedUp)(void);
-    // The game's code and the cartridge's, in base64
-    char rhGameCodeParam[9];
-    char gameCodeParam[9];
-    // The attributes of DWC_NdSetAttr, in base64
-    char *attrs[3];
-} NdContext;
 
 // A request in flight, which the HTTP client's callback gets back
 typedef struct NdTask {
@@ -105,14 +55,8 @@ typedef struct NdCertificate {
     const u8 *exponent;
 } NdCertificate;
 
-static void *DWCi_NdAlloc(u32 size, int align);
-static void DWCi_NdFree(void *ptr);
-static void DWCi_NdCleanupCallback(void);
-static void DWCi_SVLTokenWaitThread(void *arg);
-static void DWCi_NdCallback(DWCNdCallbackReason reason, DWCNdError error, int code);
 static void DWCi_Ndi_freeAttr(void);
 static BOOL setAttr(int index, const char *text);
-static BOOL DWCi_NdSetAttr(const char *attr1, const char *attr2, const char *attr3);
 static int getNchar(u8 *dest, const char *src, int size);
 static int decodeChar(u32 c);
 static u32 DWCi_Ndi_getDecodeLenBASE64(int size);
@@ -120,14 +64,8 @@ static int DWCi_Ndi_getEncodeLenBASE64(int size);
 static int DWCi_Ndi_encodeBASE64(char *dest, const char *src, int srcSize);
 static int DWCi_Ndi_decodeBASE64(char *dest, const char *src, int srcSize);
 static char *strAlloc(const char *text);
-static BOOL DWCi_NdStartup(NHTTPAlloc alloc, NHTTPFree free, const char *url, const char *token, const char *gameCode,
-                           const char *password, DWCNdCallback onResult);
 static void nhttpCleanupCallback(void);
-static void DWCi_NdCleanupAsync(void (*onCleanedUp)(void));
-// Volatile as in the definition below: the ROM reloads it at each use
-static BOOL ReleaseRequest(volatile int request);
-static void SetWifiError(int error, int serverError);
-static BOOL DWCi_NdCancelAsync(void);
+static BOOL ReleaseRequest(int request);
 static BOOL DWCi_Ndi_getApInfo(char *dest);
 static BOOL DWCi_Ndi_getDSdesc(char *gameCode, char *userId);
 static void DWCi_Ndi_getUserAgent(char *dest);
@@ -137,9 +75,6 @@ static void freeHttp(NdTask *task, int request);
 static BOOL setupHttp(NdTask **taskOut, int *requestOut, const char *action, char *buffer, int bufferSize,
                       const char *logData);
 static BOOL runHttp(NdTask *task, int request);
-static BOOL DWCi_NdGetFileListAsync(DWCNdFileInfo *files, u32 offset, u32 count);
-static BOOL DWCi_NdGetFileAsync(DWCNdFileInfo *file, void *buffer, u32 size, const char *logData);
-static BOOL DWCi_NdGetProgress(u32 *received, u32 *total);
 static BOOL DWCi_Ndi_response_count(int request, NdTask *task);
 static BOOL DWCi_Ndi_response_contents(int request, NdTask *task);
 static BOOL DWCi_Ndi_response_list(int request, NdTask *task);
@@ -161,280 +96,16 @@ static int DWCi_Ndi_strToInt(const char *text, int size);
 static int DWCi_Ndi_intToStr(char *dest, u32 value);
 static int DWCi_Ndi_intToStrFigure(char *dest, u64 value, int minDigits);
 static int DWCi_Ndi_hexToStrFigure(char *dest, u32 value, int digits);
-
-static char sNdLogDataParam[0x59];
+static char sNdLogDataParam[0x5c];
 static DWCApInfo sNdApInfo;
-static char sNdUserAgent[0x21];
+static char sNdUserAgent[0x23];
 static char sNdPasswordParam[25];
 static OSMutex sNdAttrMutex;
 static OSMutex sNdRequestMutex;
-static char sNdUserIdParam[21];
 static char sNdApInfoParam[21];
+static char sNdUserIdParam[22];
 static char sNdMacParam[17];
-static NdContext sNdContext;
-static OSMutex sNdMutex;
-static NdState sDwcNdState;
 
-// The padding character of the base64, and the parameter "action" of the requests, "count", "list" and "contents" in
-// base64; the first two are not used
-static const char pad[1] = { '*' };
-static const char sActionCount[] = "Y291bnQ*";
-static const char sActionList[] = "bGlzdA**";
-static const char sActionContents[] = "Y29udGVudHM*";
-
-static void *DWCi_NdAlloc(u32 size, int align) {
-    return DWC_AllocEx(10, size, align);
-}
-
-static void DWCi_NdFree(void *ptr) {
-    DWC_Free(10, ptr, 0);
-}
-
-// Ends the thread and gives its memory back, and tells NdReportResults that the library has ended
-static void DWCi_NdCleanupCallback(void) {
-    OS_JoinThread(&sDwcNdState.work->svlthread);
-    DWCi_NdFree(sDwcNdState.work);
-    sDwcNdState.work = NULL;
-    OS_LockMutex(&sNdMutex);
-    sDwcNdState.phase = ND_PHASE_DONE;
-    sDwcNdState.reason = ND_CBREASON_CLEANED_UP;
-    OS_UnlockMutex(&sNdMutex);
-}
-
-// Waits for the Wi-Fi connection, then sets the library up with the connection's host
-static void DWCi_SVLTokenWaitThread(void *arg) {
-    char url[0x100];
-    char token[0x190];
-
-    for (;;) {
-        switch (DWC_SVLProcess()) {
-        case 3: {
-            DWCNdCnt *work = sDwcNdState.work;
-
-            if (strlen(work->svlresult.svlhost) + strlen("https:///download") > 0xff) {
-                DWCi_NdCallback(DWC_ND_CBREASON_INITIALIZE, DWC_ND_ERROR_FATAL, -1);
-                return;
-            }
-            OS_SNPrintf(url, 0x100, "https://%s/download", work->svlresult.svlhost);
-            work = sDwcNdState.work;
-            if (DWC_Base64Encode(work->svlresult.svltoken, strlen(work->svlresult.svltoken), token, 0x190) < 0) {
-                DWCi_NdCallback(DWC_ND_CBREASON_INITIALIZE, DWC_ND_ERROR_FATAL, -1);
-                return;
-            }
-            if (!DWCi_NdStartup(DWCi_NdAlloc, DWCi_NdFree, url, token, sDwcNdState.work->gamecd,
-                                sDwcNdState.work->passwd, DWCi_NdCallback)) {
-                DWCi_NdCallback(DWC_ND_CBREASON_INITIALIZE, DWC_ND_ERROR_FATAL, -1);
-                return;
-            }
-            sDwcNdState.work->ndinitialized = TRUE;
-            DWCi_NdCallback(DWC_ND_CBREASON_INITIALIZE, DWC_ND_ERROR_NONE, -1);
-            return;
-        }
-        case 4: {
-            int code;
-            DWC_GetLastError(&code);
-            DWCi_SetError(13, code);
-            DWCi_NdCallback(DWC_ND_CBREASON_INITIALIZE, DWC_ND_ERROR_HTTP, -1);
-            return;
-        }
-        case 5:
-            DWCi_NdCallback(DWC_ND_CBREASON_INITIALIZE, DWC_ND_ERROR_CANCELED, -1);
-            return;
-        default:
-            OS_Sleep(100);
-            break;
-        }
-    }
-}
-
-// Records the result of a call, for NdReportResults to give the game
-static void DWCi_NdCallback(DWCNdCallbackReason reason, DWCNdError error, int code) {
-    if (error != 0) {
-        SetWifiError(error, code);
-    }
-    OS_LockMutex(&sNdMutex);
-    sDwcNdState.phase = ND_PHASE_DONE;
-    sDwcNdState.reason = reason;
-    sDwcNdState.error = error;
-    sDwcNdState.code = code;
-    if (error != 0) {
-        sDwcNdState.phase = ND_PHASE_FAILED;
-    }
-    OS_UnlockMutex(&sNdMutex);
-}
-
-BOOL DWC_NdInitAsync(DWCNdCallback callback, char *gameCode, char *password) {
-    if (DWCi_IsError()) {
-        return FALSE;
-    }
-    OS_InitMutex(&sNdMutex);
-    OS_LockMutex(&sNdMutex);
-    if (sDwcNdState.phase != ND_PHASE_IDLE) {
-        SetWifiError(DWC_ND_ERROR_BUSY, 0);
-        OS_UnlockMutex(&sNdMutex);
-        return FALSE;
-    }
-    sDwcNdState.phase = ND_PHASE_BUSY;
-    OS_UnlockMutex(&sNdMutex);
-    sDwcNdState.reason = 0;
-    sDwcNdState.error = 0;
-    sDwcNdState.code = 0;
-    sDwcNdState.callback = callback;
-    sDwcNdState.notified = FALSE;
-    sDwcNdState.work = DWCi_NdAlloc(sizeof(DWCNdCnt), 32);
-    if (sDwcNdState.work == NULL) {
-        SetWifiError(DWC_ND_ERROR_ALLOC, 0);
-        return FALSE;
-    }
-    MI_CpuFill8(sDwcNdState.work, 0, sizeof(DWCNdCnt));
-    sDwcNdState.work->ndinitialized = FALSE;
-    strncpy(sDwcNdState.work->gamecd, gameCode, 0x1f);
-    strncpy(sDwcNdState.work->passwd, password, 0x1f);
-    if (!DWC_SVLGetTokenAsync("9000", &sDwcNdState.work->svlresult)) {
-        DWCi_NdFree(sDwcNdState.work);
-        sDwcNdState.work = NULL;
-        return FALSE;
-    }
-    OS_CreateThread(&sDwcNdState.work->svlthread, DWCi_SVLTokenWaitThread, NULL,
-                    sDwcNdState.work->svlthreadstack + sizeof(sDwcNdState.work->svlthreadstack),
-                    sizeof(sDwcNdState.work->svlthreadstack), 16);
-    OS_WakeupThreadDirect(&sDwcNdState.work->svlthread);
-    return TRUE;
-}
-
-void NdReportResults(void) {
-    BOOL notify = FALSE;
-    BOOL ended = FALSE;
-    int reason;
-
-    OS_LockMutex(&sNdMutex);
-    reason = sDwcNdState.reason;
-    if (reason == 0 && sDwcNdState.phase == ND_PHASE_FAILED) {
-        if (!sDwcNdState.notified) {
-            notify = TRUE;
-            sDwcNdState.notified = TRUE;
-        }
-    } else if ((u32)(sDwcNdState.phase - ND_PHASE_DONE) <= 1) {
-        notify = TRUE;
-        sDwcNdState.phase = ND_PHASE_READY;
-    }
-    if (reason == ND_CBREASON_CLEANED_UP) {
-        sDwcNdState.phase = ND_PHASE_IDLE;
-        sDwcNdState.reason = 0;
-        ended = TRUE;
-    }
-    OS_UnlockMutex(&sNdMutex);
-    if (sDwcNdState.callback != NULL) {
-        if (ended) {
-            sDwcNdState.callback(ND_CBREASON_CLEANED_UP, DWC_ND_ERROR_NONE, -1);
-        } else if (notify) {
-            sDwcNdState.callback(sDwcNdState.reason, sDwcNdState.error, sDwcNdState.code);
-        }
-    }
-}
-
-BOOL DWC_NdCleanupAsync(void) {
-    if (sDwcNdState.phase == ND_PHASE_IDLE) {
-        return FALSE;
-    }
-    OS_LockMutex(&sNdMutex);
-    if (sDwcNdState.phase == ND_PHASE_IDLE) {
-        OS_UnlockMutex(&sNdMutex);
-        return FALSE;
-    }
-    sDwcNdState.phase = ND_PHASE_BUSY;
-    OS_UnlockMutex(&sNdMutex);
-    if (!sDwcNdState.work->ndinitialized) {
-        DWCi_NdCleanupCallback();
-    } else {
-        DWCi_NdCleanupAsync(DWCi_NdCleanupCallback);
-    }
-    return TRUE;
-}
-
-BOOL DWC_NdSetAttr(const char *attr1, const char *attr2, const char *attr3) {
-    if (DWCi_IsError()) {
-        return FALSE;
-    }
-    return DWCi_NdSetAttr(attr1, attr2, attr3);
-}
-
-BOOL DWC_NdGetFileListAsync(DWCNdFileInfo *files, unsigned int offset, unsigned int count) {
-    if (DWCi_IsError()) {
-        return FALSE;
-    }
-    OS_LockMutex(&sNdMutex);
-    if (sDwcNdState.phase != ND_PHASE_READY) {
-        SetWifiError(DWC_ND_ERROR_BUSY, 0);
-        OS_UnlockMutex(&sNdMutex);
-        return FALSE;
-    }
-    sDwcNdState.phase = ND_PHASE_BUSY;
-    OS_UnlockMutex(&sNdMutex);
-    MI_CpuFill8(files, 0, sizeof(DWCNdFileInfo) * count);
-    if (DWCi_NdGetFileListAsync(files, offset, count)) {
-        return TRUE;
-    }
-    OS_LockMutex(&sNdMutex);
-    sDwcNdState.phase = ND_PHASE_READY;
-    OS_UnlockMutex(&sNdMutex);
-    return FALSE;
-}
-
-BOOL DWC_NdGetFileAsync(DWCNdFileInfo *file, char *buffer, unsigned int size) {
-    BOOL result;
-
-    if (DWCi_IsError()) {
-        return FALSE;
-    }
-    OS_LockMutex(&sNdMutex);
-    if (sDwcNdState.phase != ND_PHASE_READY) {
-        SetWifiError(DWC_ND_ERROR_BUSY, 0);
-        OS_UnlockMutex(&sNdMutex);
-        return FALSE;
-    }
-    sDwcNdState.phase = ND_PHASE_BUSY;
-    OS_UnlockMutex(&sNdMutex);
-    result = FALSE;
-    if (DWCi_NdGetFileAsync(file, buffer, size, NULL)) {
-        return TRUE;
-    }
-    OS_LockMutex(&sNdMutex);
-    sDwcNdState.phase = ND_PHASE_READY;
-    OS_UnlockMutex(&sNdMutex);
-    return result;
-}
-
-BOOL DWC_NdCancelAsync(void) {
-    if (DWCi_IsError()) {
-        return FALSE;
-    }
-    OS_LockMutex(&sNdMutex);
-    if (sDwcNdState.phase != ND_PHASE_BUSY) {
-        OS_UnlockMutex(&sNdMutex);
-        return FALSE;
-    }
-    OS_UnlockMutex(&sNdMutex);
-    if (DWCi_NdCancelAsync()) {
-        return TRUE;
-    }
-    return FALSE;
-}
-
-BOOL DWC_NdGetProgress(u32 *received, u32 *contentLength) {
-    if (DWCi_IsError()) {
-        return FALSE;
-    }
-    OS_LockMutex(&sNdMutex);
-    if (sDwcNdState.phase != ND_PHASE_BUSY) {
-        OS_UnlockMutex(&sNdMutex);
-        return FALSE;
-    }
-    OS_UnlockMutex(&sNdMutex);
-    return DWCi_NdGetProgress(received, contentLength);
-}
-
-// Gives the three attributes' memory back
 static void DWCi_Ndi_freeAttr(void) {
     char **attrs = sNdContext.attrs;
     int i;
@@ -474,7 +145,7 @@ static BOOL setAttr(int index, const char *text) {
     return TRUE;
 }
 
-static BOOL DWCi_NdSetAttr(const char *attr1, const char *attr2, const char *attr3) {
+BOOL DWCi_NdSetAttr(const char *attr1, const char *attr2, const char *attr3) {
     DWCi_Ndi_lockGlobal();
     DWCi_Ndi_freeAttr();
     if (setAttr(0, attr1) && setAttr(1, attr2) && setAttr(2, attr3)) {
@@ -636,8 +307,8 @@ static char *strAlloc(const char *text) {
 }
 
 // Sets the library up: the memory, the parameters that every request carries, and the HTTP client
-static BOOL DWCi_NdStartup(NHTTPAlloc alloc, NHTTPFree free, const char *url, const char *token, const char *gameCode,
-                           const char *password, DWCNdCallback onResult) {
+BOOL DWCi_NdStartup(NHTTPAlloc alloc, NHTTPFree free, const char *url, const char *token, const char *gameCode,
+                    const char *password, DWCNdCallback onResult) {
     sNdContext.alloc = alloc;
     sNdContext.free = free;
     sNdContext.onResult = onResult;
@@ -690,7 +361,7 @@ static void nhttpCleanupCallback(void) {
 }
 
 // Ends the library's request and the HTTP client, and then calls the function
-static void DWCi_NdCleanupAsync(void (*onCleanedUp)(void)) {
+void DWCi_NdCleanupAsync(void (*onCleanedUp)(void)) {
     sNdContext.running = FALSE;
     sNdContext.onCleanedUp = onCleanedUp;
     ReleaseRequest(sNdContext.request);
@@ -698,8 +369,9 @@ static void DWCi_NdCleanupAsync(void (*onCleanedUp)(void)) {
 }
 
 // Destroys a request; the answer is FALSE when it could not
-// The request is volatile, as Black 1's version of this function has it: the ROM reloads it from its stack slot at
-// each use and keeps the dead store of 0
+// The original keeps the handle in its stack slot and reloads it at every use, including right after the `cmp`, which
+// only `volatile` reproduces; Black 1's decomp has the same `void *volatile handle` in this function. Nothing can
+// change the value here, so it is the original's spelling, not a workaround
 static BOOL ReleaseRequest(volatile int request) {
     BOOL result = TRUE;
 
@@ -717,7 +389,7 @@ static BOOL ReleaseRequest(volatile int request) {
 }
 
 // Gives the Wi-Fi library the error that a call of the download library ended with
-static void SetWifiError(int error, int serverError) {
+void SetWifiError(int error, int serverError) {
     switch (error) {
     case DWC_ND_ERROR_NONE:
     case DWC_ND_ERROR_CANCELED:
@@ -750,7 +422,7 @@ static void SetWifiError(int error, int serverError) {
 }
 
 // Cancels the request when one is running, and says whether it did
-static BOOL DWCi_NdCancelAsync(void) {
+BOOL DWCi_NdCancelAsync(void) {
     BOOL canceled;
     u32 received;
     u32 total;
@@ -1133,7 +805,7 @@ static BOOL runHttp(NdTask *task, int request) {
 }
 
 // Asks the server for count files from offset
-static BOOL DWCi_NdGetFileListAsync(DWCNdFileInfo *files, u32 offset, u32 count) {
+BOOL DWCi_NdGetFileListAsync(DWCNdFileInfo *files, u32 offset, u32 count) {
     NdTask *task;
     int request;
     int bufferSize = count << 8;
@@ -1200,7 +872,7 @@ static BOOL DWCi_NdGetFileListAsync(DWCNdFileInfo *files, u32 offset, u32 count)
 }
 
 // Asks the server for a file, whose name it takes from the list's entry
-static BOOL DWCi_NdGetFileAsync(DWCNdFileInfo *file, void *buffer, u32 size, const char *logData) {
+BOOL DWCi_NdGetFileAsync(DWCNdFileInfo *file, void *buffer, u32 size, const char *logData) {
     NdTask *task;
     int request;
     int nameLength;
@@ -1252,7 +924,7 @@ fail:
     return FALSE;
 }
 
-static BOOL DWCi_NdGetProgress(u32 *received, u32 *total) {
+BOOL DWCi_NdGetProgress(u32 *received, u32 *total) {
     if (!sNdContext.running) {
         return FALSE;
     }

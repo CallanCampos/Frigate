@@ -1315,7 +1315,7 @@ data_ov182_021c058c kind:data(any) addr:0x021c05cc
 sBgCharNames kind:data(any) addr:0x021c05d0
 sBgSizes kind:data(any) addr:0x021c05d4
 data_ov182_021c0596 kind:data(any) addr:0x021c05d6
-gDWCUtilTouchScreenRect kind:data(any) addr:0x021c05dc
+DWCi_R_SCR kind:data(any) addr:0x021c05dc
 sTaskCounts kind:data(any) addr:0x021c05e4
 data_ov182_021c05c0 kind:data(any) addr:0x021c0600
 data_ov182_021c0602_w2_us kind:data(any) addr:0x021c0602 ambiguous
@@ -1667,7 +1667,7 @@ sSubScreenRow kind:bss addr:0x021c41b0
 sUsbScan kind:bss addr:0x021c41b4
 sDialog kind:bss addr:0x021c41b8
 data_ov182_021c417c kind:bss addr:0x021c41bc
-gWork kind:bss addr:0x021c41c0
+sLogPrint kind:bss addr:0x021c41c0
 sDownloadPlaySysWork kind:bss addr:0x021c41c8
 sResource kind:bss addr:0x021c41cc
 sScreens kind:bss addr:0x021c41d0

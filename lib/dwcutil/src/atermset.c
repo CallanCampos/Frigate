@@ -80,14 +80,6 @@ enum {
     AC_STATE_FAILED,
 };
 
-typedef struct {
-    u8 *items;     // 0x00: where a message's items go, after its header
-    BOOL debug;    // 0x04: formats the MAC addresses (for a print that is left out)
-    u32 stackSize; // 0x08
-    u32 deadline;  // 0x0c: in milliseconds, 0xffffffff for none
-    int apCount;   // 0x10: ATERMi_ApConfigStart's, which nothing reads
-} UtilAcConfig;
-
 typedef struct MacAddress {
     u8 bytes[6];
 } MacAddress;
@@ -125,10 +117,6 @@ typedef struct BSSID_LIST {
     WLAN_BSSID Bssid[1];
 } BSSID_LIST;
 
-typedef struct HelloId {
-    u8 bytes[7];
-} HelloId;
-
 static void APCi_Notify(WCMNotice *notice);
 static BOOL APCi_MoveIdleState(void);
 static int UtilAcWcm_GetApList(void *dest, int max);
@@ -148,7 +136,7 @@ static int InitAtermApcNetwork(int apCount);
 static int FreeAtermApcNetwork(void);
 static int ConnectAP(void);
 static void DisconnectAP(void);
-static int CheckAccessPoint(const BSSID_LIST *scan, const BSSID_LIST *previous, int *index);
+static int CheckAccessPoint(const BSSID_LIST *scan, const BSSID_LIST *previous, u32 *index);
 static int ScanAP(void);
 static int SendFrameViaInterface(int sock, const SOCSockAddrIn *to, const u8 *ownAddress, const void *data, int length);
 static int SendBroadcast(int sock, const void *data, int length);
@@ -186,29 +174,36 @@ static void MD5_memcpy(u8 *output, const u8 *input, u32 length);
 static void MD5_memset(char *output, int value, u32 length);
 static void MD5Encode(u8 *digest, const u8 *data, u32 length);
 static u32 GetTickCount(void);
-static void *Calloc(int count, int size);
+static void *Calloc(u32 count, u32 size);
 static void UtilAc_Free(void *ptr);
 static int PutHex(char *out, s8 value);
 static int PutMac(char *out, const s8 *mac);
 static int ATERMi_ApConfigGetState(ATERMApConfigState *status);
 static void SendNotify(void);
 
-// MWCC 2.0 gives each of these a section of its own and lays them out in the reverse of their definitions
+// The file is built with -ipa file, which writes its objects out ahead of its functions, in one heapsort by size: those
+// of 4 bytes or less go to one .bss and one .data, the others to a section each, and objects of the same size come out
+// in an order that depends only on the sequence of sizes defined. This order of definitions gives the ROM's layout
 static u8 sAcPacket[0x800];
 static u8 sAcMessage[0x800];
-static char sAcApSsid[0x21];
+static char sAcApSsid[0x22];
 static u8 sAcEssid[0x20];
 static u8 sAcSessionKey[0x20];
 // The key of the first exchange: the two MAC addresses, the greater first, and "WARP"
 static u8 sAcKey[0x10];
+static u8 sAcOwnMac[6];
 static u8 sAcBssid[6];
 static u8 sAcApMac[6];
-static u8 sAcOwnMac[6];
-static const HelloId sAcHelloId = { { 6, 0, 1, 2, 3, 4, 5 } };
-static UtilAcConfig sAcConfig = { sAcMessage + 8, TRUE, 0x800, 0xffffffff, 0x40 };
-static char sAcHostName[12]; // Defined before the socket functions, where the ROM's .data has it
+// The setup's configuration
+static BOOL sAcDebug = TRUE; // Formats the MAC addresses (for a print that is left out)
+static u32 sAcStackSize = 0x800;
+static u32 sAcDeadline = 0xffffffff;  // In milliseconds, 0xffffffff for none
+static u8 *sAcItems = sAcMessage + 8; // Where a message's items go, after its header
+static int sAcConfigApCount = 0x40;   // ATERMi_ApConfigStart's, which nothing reads
+// The SSID of an access point in its setup mode
+static char sAcStealthSsid[] = "******";
 // Fixed addresses on the access point's network, in network order: 192.168.0.176/24, with 192.168.0.200 as the
-// gateway and 192.168.0.32 as the DNS server
+// gateway and 192.168.0.32 as the DNS server, and the name that the console gives
 static SOCConfig sAcSocConfig = {
     SOC_VENDOR_NINTENDO,
     SOC_VERSION,
@@ -228,27 +223,117 @@ static SOCConfig sAcSocConfig = {
     NULL,
     NULL,
     NULL,
-    sAcHostName,
+    "NINTENDO-DS",
     4,
     0,
     0,
 };
-// The setup's state, defined with initializers so that the functions reach it from one base. MWCC 2.0 lays out the
-// initialized objects defined above a file's first function by size with one heapsort, each in its own section (.bss,
-// .data or .rodata), and this order of definitions gives the ROM's layout. Rijndael's tables take part: defined among
-// the state, the ten tables of 1024 bytes come out in the ROM's order (Td2 to Td4, Te0 to Te4, Td0, Td1)
+// The setup's state, and Rijndael's tables among it
 static WS_11G_PROFILE_DATA sAcSettings = { 0 };
 static ATERMApConfigParam sAcResult = { 0 };
 static OSThread sAcThread = { 0 };
 static OSMutex sAcSocMutex = { 0 };
 static int sAcEvents[4] = { 0 };
-static u8 sAcHasSsid = 0; // Whether the settings named the network, which the last message tells
-static void *sAcWepDesc = NULL;
-static int sAcWcmState = 0;
-static BOOL sAcSocStarted = FALSE;
+static u8 sAcHasSsid = 0;         // Whether the settings named the network, which the last message tells
+static BOOL sAcConnected = FALSE; // Whether it joined the access point
+static void *sAcWcmWork = NULL;
 static int sAcPacketSize = 0;
-static BOOL sAcCancel = FALSE;
+static void *sAcWepDesc = NULL;
+static int sAcApIndex = 0; // The setup's access point in the list
 // Rijndael (AES) as in rijndael-alg-fst.c
+static const u32 Td2[256] = {
+    0xa75051f4, 0x65537e41, 0xa4c31a17, 0x5e963a27, 0x6bcb3bab, 0x45f11f9d, 0x58abacfa, 0x03934be3, 0xfa552030,
+    0x6df6ad76, 0x769188cc, 0x4c25f502, 0xd7fc4fe5, 0xcbd7c52a, 0x44802635, 0xa38fb562, 0x5a49deb1, 0x1b6725ba,
+    0x0e9845ea, 0xc0e15dfe, 0x7502c32f, 0xf012814c, 0x97a38d46, 0xf9c66bd3, 0x5fe7038f, 0x9c951592, 0x7aebbf6d,
+    0x59da9552, 0x832dd4be, 0x21d35874, 0x692949e0, 0xc8448ec9, 0x896a75c2, 0x7978f48e, 0x3e6b9958, 0x71dd27b9,
+    0x4fb6bee1, 0xad17f088, 0xac66c920, 0x3ab47dce, 0x4a1863df, 0x3182e51a, 0x33609751, 0x7f456253, 0x77e0b164,
+    0xae84bb6b, 0xa01cfe81, 0x2b94f908, 0x68587048, 0xfd198f45, 0x6c8794de, 0xf8b7527b, 0xd323ab73, 0x02e2724b,
+    0x8f57e31f, 0xab2a6655, 0x2807b2eb, 0xc2032fb5, 0x7b9a86c5, 0x08a5d337, 0x87f23028, 0xa5b223bf, 0x6aba0203,
+    0x825ced16, 0x1c2b8acf, 0xb492a779, 0xf2f0f307, 0xe2a14e69, 0xf4cd65da, 0xbed50605, 0x621fd134, 0xfe8ac4a6,
+    0x539d342e, 0x55a0a2f3, 0xe132058a, 0xeb75a4f6, 0xec390b83, 0xefaa4060, 0x9f065e71, 0x1051bd6e, 0x8af93e21,
+    0x063d96dd, 0x05aedd3e, 0xbd464de6, 0x8db59154, 0x5d0571c4, 0xd46f0406, 0x15ff6050, 0xfb241998, 0xe997d6bd,
+    0x43cc8940, 0x9e7767d9, 0x42bdb0e8, 0x8b880789, 0x5b38e719, 0xeedb79c8, 0x0a47a17c, 0x0fe97c42, 0x1ec9f884,
+    0x00000000, 0x86830980, 0xed48322b, 0x70ac1e11, 0x724e6c5a, 0xfffbfd0e, 0x38560f85, 0xd51e3dae, 0x3927362d,
+    0xd9640a0f, 0xa621685c, 0x54d19b5b, 0x2e3a2436, 0x67b10c0a, 0xe70f9357, 0x96d2b4ee, 0x919e1b9b, 0xc54f80c0,
+    0x20a261dc, 0x4b695a77, 0x1a161c12, 0xba0ae293, 0x2ae5c0a0, 0xe0433c22, 0x171d121b, 0x0d0b0e09, 0xc7adf28b,
+    0xa8b92db6, 0xa9c8141e, 0x198557f1, 0x074caf75, 0xddbbee99, 0x60fda37f, 0x269ff701, 0xf5bc5c72, 0x3bc54466,
+    0x7e345bfb, 0x29768b43, 0xc6dccb23, 0xfc68b6ed, 0xf163b8e4, 0xdccad731, 0x85104263, 0x22401397, 0x112084c6,
+    0x247d854a, 0x3df8d2bb, 0x3211aef9, 0xa16dc729, 0x2f4b1d9e, 0x30f3dcb2, 0x52ec0d86, 0xe3d077c1, 0x166c2bb3,
+    0xb999a970, 0x48fa1194, 0x642247e9, 0x8cc4a8fc, 0x3f1aa0f0, 0x2cd8567d, 0x90ef2233, 0x4ec78749, 0xd1c1d938,
+    0xa2fe8cca, 0x0b3698d4, 0x81cfa6f5, 0xde28a57a, 0x8e26dab7, 0xbfa43fad, 0x9de42c3a, 0x920d5078, 0xcc9b6a5f,
+    0x4662547e, 0x13c2f68d, 0xb8e890d8, 0xf75e2e39, 0xaff582c3, 0x80be9f5d, 0x937c69d0, 0x2da96fd5, 0x12b3cf25,
+    0x993bc8ac, 0x7da71018, 0x636ee89c, 0xbb7bdb3b, 0x7809cd26, 0x18f46e59, 0xb701ec9a, 0x9aa8834f, 0x6e65e695,
+    0xe67eaaff, 0xcf0821bc, 0xe8e6ef15, 0x9bd9bae7, 0x36ce4a6f, 0x09d4ea9f, 0x7cd629b0, 0xb2af31a4, 0x23312a3f,
+    0x9430c6a5, 0x66c035a2, 0xbc37744e, 0xcaa6fc82, 0xd0b0e090, 0xd81533a7, 0x984af104, 0xdaf741ec, 0x500e7fcd,
+    0xf62f1791, 0xd68d764d, 0xb04d43ef, 0x4d54ccaa, 0x04dfe496, 0xb5e39ed1, 0x881b4c6a, 0x1fb8c12c, 0x517f4665,
+    0xea049d5e, 0x355d018c, 0x7473fa87, 0x412efb0b, 0x1d5ab367, 0xd25292db, 0x5633e910, 0x47136dd6, 0x618c9ad7,
+    0x0c7a37a1, 0x148e59f8, 0x3c89eb13, 0x27eecea9, 0xc935b761, 0xe5ede11c, 0xb13c7a47, 0xdf599cd2, 0x733f55f2,
+    0xce791814, 0x37bf73c7, 0xcdea53f7, 0xaa5b5ffd, 0x6f14df3d, 0xdb867844, 0xf381caaf, 0xc43eb968, 0x342c3824,
+    0x405fc2a3, 0xc372161d, 0x250cbce2, 0x498b283c, 0x9541ff0d, 0x017139a8, 0xb3de080c, 0xe49cd8b4, 0xc1906456,
+    0x84617bcb, 0xb670d532, 0x5c74486c, 0x5742d0b8,
+};
+static const u32 Td3[256] = {
+    0xf4a75051, 0x4165537e, 0x17a4c31a, 0x275e963a, 0xab6bcb3b, 0x9d45f11f, 0xfa58abac, 0xe303934b, 0x30fa5520,
+    0x766df6ad, 0xcc769188, 0x024c25f5, 0xe5d7fc4f, 0x2acbd7c5, 0x35448026, 0x62a38fb5, 0xb15a49de, 0xba1b6725,
+    0xea0e9845, 0xfec0e15d, 0x2f7502c3, 0x4cf01281, 0x4697a38d, 0xd3f9c66b, 0x8f5fe703, 0x929c9515, 0x6d7aebbf,
+    0x5259da95, 0xbe832dd4, 0x7421d358, 0xe0692949, 0xc9c8448e, 0xc2896a75, 0x8e7978f4, 0x583e6b99, 0xb971dd27,
+    0xe14fb6be, 0x88ad17f0, 0x20ac66c9, 0xce3ab47d, 0xdf4a1863, 0x1a3182e5, 0x51336097, 0x537f4562, 0x6477e0b1,
+    0x6bae84bb, 0x81a01cfe, 0x082b94f9, 0x48685870, 0x45fd198f, 0xde6c8794, 0x7bf8b752, 0x73d323ab, 0x4b02e272,
+    0x1f8f57e3, 0x55ab2a66, 0xeb2807b2, 0xb5c2032f, 0xc57b9a86, 0x3708a5d3, 0x2887f230, 0xbfa5b223, 0x036aba02,
+    0x16825ced, 0xcf1c2b8a, 0x79b492a7, 0x07f2f0f3, 0x69e2a14e, 0xdaf4cd65, 0x05bed506, 0x34621fd1, 0xa6fe8ac4,
+    0x2e539d34, 0xf355a0a2, 0x8ae13205, 0xf6eb75a4, 0x83ec390b, 0x60efaa40, 0x719f065e, 0x6e1051bd, 0x218af93e,
+    0xdd063d96, 0x3e05aedd, 0xe6bd464d, 0x548db591, 0xc45d0571, 0x06d46f04, 0x5015ff60, 0x98fb2419, 0xbde997d6,
+    0x4043cc89, 0xd99e7767, 0xe842bdb0, 0x898b8807, 0x195b38e7, 0xc8eedb79, 0x7c0a47a1, 0x420fe97c, 0x841ec9f8,
+    0x00000000, 0x80868309, 0x2bed4832, 0x1170ac1e, 0x5a724e6c, 0x0efffbfd, 0x8538560f, 0xaed51e3d, 0x2d392736,
+    0x0fd9640a, 0x5ca62168, 0x5b54d19b, 0x362e3a24, 0x0a67b10c, 0x57e70f93, 0xee96d2b4, 0x9b919e1b, 0xc0c54f80,
+    0xdc20a261, 0x774b695a, 0x121a161c, 0x93ba0ae2, 0xa02ae5c0, 0x22e0433c, 0x1b171d12, 0x090d0b0e, 0x8bc7adf2,
+    0xb6a8b92d, 0x1ea9c814, 0xf1198557, 0x75074caf, 0x99ddbbee, 0x7f60fda3, 0x01269ff7, 0x72f5bc5c, 0x663bc544,
+    0xfb7e345b, 0x4329768b, 0x23c6dccb, 0xedfc68b6, 0xe4f163b8, 0x31dccad7, 0x63851042, 0x97224013, 0xc6112084,
+    0x4a247d85, 0xbb3df8d2, 0xf93211ae, 0x29a16dc7, 0x9e2f4b1d, 0xb230f3dc, 0x8652ec0d, 0xc1e3d077, 0xb3166c2b,
+    0x70b999a9, 0x9448fa11, 0xe9642247, 0xfc8cc4a8, 0xf03f1aa0, 0x7d2cd856, 0x3390ef22, 0x494ec787, 0x38d1c1d9,
+    0xcaa2fe8c, 0xd40b3698, 0xf581cfa6, 0x7ade28a5, 0xb78e26da, 0xadbfa43f, 0x3a9de42c, 0x78920d50, 0x5fcc9b6a,
+    0x7e466254, 0x8d13c2f6, 0xd8b8e890, 0x39f75e2e, 0xc3aff582, 0x5d80be9f, 0xd0937c69, 0xd52da96f, 0x2512b3cf,
+    0xac993bc8, 0x187da710, 0x9c636ee8, 0x3bbb7bdb, 0x267809cd, 0x5918f46e, 0x9ab701ec, 0x4f9aa883, 0x956e65e6,
+    0xffe67eaa, 0xbccf0821, 0x15e8e6ef, 0xe79bd9ba, 0x6f36ce4a, 0x9f09d4ea, 0xb07cd629, 0xa4b2af31, 0x3f23312a,
+    0xa59430c6, 0xa266c035, 0x4ebc3774, 0x82caa6fc, 0x90d0b0e0, 0xa7d81533, 0x04984af1, 0xecdaf741, 0xcd500e7f,
+    0x91f62f17, 0x4dd68d76, 0xefb04d43, 0xaa4d54cc, 0x9604dfe4, 0xd1b5e39e, 0x6a881b4c, 0x2c1fb8c1, 0x65517f46,
+    0x5eea049d, 0x8c355d01, 0x877473fa, 0x0b412efb, 0x671d5ab3, 0xdbd25292, 0x105633e9, 0xd647136d, 0xd7618c9a,
+    0xa10c7a37, 0xf8148e59, 0x133c89eb, 0xa927eece, 0x61c935b7, 0x1ce5ede1, 0x47b13c7a, 0xd2df599c, 0xf2733f55,
+    0x14ce7918, 0xc737bf73, 0xf7cdea53, 0xfdaa5b5f, 0x3d6f14df, 0x44db8678, 0xaff381ca, 0x68c43eb9, 0x24342c38,
+    0xa3405fc2, 0x1dc37216, 0xe2250cbc, 0x3c498b28, 0x0d9541ff, 0xa8017139, 0x0cb3de08, 0xb4e49cd8, 0x56c19064,
+    0xcb84617b, 0x32b670d5, 0x6c5c7448, 0xb85742d0,
+};
+static const u32 Td4[256] = {
+    0x52525252, 0x09090909, 0x6a6a6a6a, 0xd5d5d5d5, 0x30303030, 0x36363636, 0xa5a5a5a5, 0x38383838, 0xbfbfbfbf,
+    0x40404040, 0xa3a3a3a3, 0x9e9e9e9e, 0x81818181, 0xf3f3f3f3, 0xd7d7d7d7, 0xfbfbfbfb, 0x7c7c7c7c, 0xe3e3e3e3,
+    0x39393939, 0x82828282, 0x9b9b9b9b, 0x2f2f2f2f, 0xffffffff, 0x87878787, 0x34343434, 0x8e8e8e8e, 0x43434343,
+    0x44444444, 0xc4c4c4c4, 0xdededede, 0xe9e9e9e9, 0xcbcbcbcb, 0x54545454, 0x7b7b7b7b, 0x94949494, 0x32323232,
+    0xa6a6a6a6, 0xc2c2c2c2, 0x23232323, 0x3d3d3d3d, 0xeeeeeeee, 0x4c4c4c4c, 0x95959595, 0x0b0b0b0b, 0x42424242,
+    0xfafafafa, 0xc3c3c3c3, 0x4e4e4e4e, 0x08080808, 0x2e2e2e2e, 0xa1a1a1a1, 0x66666666, 0x28282828, 0xd9d9d9d9,
+    0x24242424, 0xb2b2b2b2, 0x76767676, 0x5b5b5b5b, 0xa2a2a2a2, 0x49494949, 0x6d6d6d6d, 0x8b8b8b8b, 0xd1d1d1d1,
+    0x25252525, 0x72727272, 0xf8f8f8f8, 0xf6f6f6f6, 0x64646464, 0x86868686, 0x68686868, 0x98989898, 0x16161616,
+    0xd4d4d4d4, 0xa4a4a4a4, 0x5c5c5c5c, 0xcccccccc, 0x5d5d5d5d, 0x65656565, 0xb6b6b6b6, 0x92929292, 0x6c6c6c6c,
+    0x70707070, 0x48484848, 0x50505050, 0xfdfdfdfd, 0xedededed, 0xb9b9b9b9, 0xdadadada, 0x5e5e5e5e, 0x15151515,
+    0x46464646, 0x57575757, 0xa7a7a7a7, 0x8d8d8d8d, 0x9d9d9d9d, 0x84848484, 0x90909090, 0xd8d8d8d8, 0xabababab,
+    0x00000000, 0x8c8c8c8c, 0xbcbcbcbc, 0xd3d3d3d3, 0x0a0a0a0a, 0xf7f7f7f7, 0xe4e4e4e4, 0x58585858, 0x05050505,
+    0xb8b8b8b8, 0xb3b3b3b3, 0x45454545, 0x06060606, 0xd0d0d0d0, 0x2c2c2c2c, 0x1e1e1e1e, 0x8f8f8f8f, 0xcacacaca,
+    0x3f3f3f3f, 0x0f0f0f0f, 0x02020202, 0xc1c1c1c1, 0xafafafaf, 0xbdbdbdbd, 0x03030303, 0x01010101, 0x13131313,
+    0x8a8a8a8a, 0x6b6b6b6b, 0x3a3a3a3a, 0x91919191, 0x11111111, 0x41414141, 0x4f4f4f4f, 0x67676767, 0xdcdcdcdc,
+    0xeaeaeaea, 0x97979797, 0xf2f2f2f2, 0xcfcfcfcf, 0xcececece, 0xf0f0f0f0, 0xb4b4b4b4, 0xe6e6e6e6, 0x73737373,
+    0x96969696, 0xacacacac, 0x74747474, 0x22222222, 0xe7e7e7e7, 0xadadadad, 0x35353535, 0x85858585, 0xe2e2e2e2,
+    0xf9f9f9f9, 0x37373737, 0xe8e8e8e8, 0x1c1c1c1c, 0x75757575, 0xdfdfdfdf, 0x6e6e6e6e, 0x47474747, 0xf1f1f1f1,
+    0x1a1a1a1a, 0x71717171, 0x1d1d1d1d, 0x29292929, 0xc5c5c5c5, 0x89898989, 0x6f6f6f6f, 0xb7b7b7b7, 0x62626262,
+    0x0e0e0e0e, 0xaaaaaaaa, 0x18181818, 0xbebebebe, 0x1b1b1b1b, 0xfcfcfcfc, 0x56565656, 0x3e3e3e3e, 0x4b4b4b4b,
+    0xc6c6c6c6, 0xd2d2d2d2, 0x79797979, 0x20202020, 0x9a9a9a9a, 0xdbdbdbdb, 0xc0c0c0c0, 0xfefefefe, 0x78787878,
+    0xcdcdcdcd, 0x5a5a5a5a, 0xf4f4f4f4, 0x1f1f1f1f, 0xdddddddd, 0xa8a8a8a8, 0x33333333, 0x88888888, 0x07070707,
+    0xc7c7c7c7, 0x31313131, 0xb1b1b1b1, 0x12121212, 0x10101010, 0x59595959, 0x27272727, 0x80808080, 0xecececec,
+    0x5f5f5f5f, 0x60606060, 0x51515151, 0x7f7f7f7f, 0xa9a9a9a9, 0x19191919, 0xb5b5b5b5, 0x4a4a4a4a, 0x0d0d0d0d,
+    0x2d2d2d2d, 0xe5e5e5e5, 0x7a7a7a7a, 0x9f9f9f9f, 0x93939393, 0xc9c9c9c9, 0x9c9c9c9c, 0xefefefef, 0xa0a0a0a0,
+    0xe0e0e0e0, 0x3b3b3b3b, 0x4d4d4d4d, 0xaeaeaeae, 0x2a2a2a2a, 0xf5f5f5f5, 0xb0b0b0b0, 0xc8c8c8c8, 0xebebebeb,
+    0xbbbbbbbb, 0x3c3c3c3c, 0x83838383, 0x53535353, 0x99999999, 0x61616161, 0x17171717, 0x2b2b2b2b, 0x04040404,
+    0x7e7e7e7e, 0xbabababa, 0x77777777, 0xd6d6d6d6, 0x26262626, 0xe1e1e1e1, 0x69696969, 0x14141414, 0x63636363,
+    0x55555555, 0x21212121, 0x0c0c0c0c, 0x7d7d7d7d,
+};
 static const u32 Te0[256] = {
     0xc66363a5, 0xf87c7c84, 0xee777799, 0xf67b7b8d, 0xfff2f20d, 0xd66b6bbd, 0xde6f6fb1, 0x91c5c554, 0x60303050,
     0x02010103, 0xce6767a9, 0x562b2b7d, 0xe7fefe19, 0xb5d7d762, 0x4dababe6, 0xec76769a, 0x8fcaca45, 0x1f82829d,
@@ -466,128 +551,35 @@ static const u32 Td1[256] = {
     0x5fc2a340, 0x72161dc3, 0x0cbce225, 0x8b283c49, 0x41ff0d95, 0x7139a801, 0xde080cb3, 0x9cd8b4e4, 0x906456c1,
     0x617bcb84, 0x70d532b6, 0x74486c5c, 0x42d0b857,
 };
-static const u32 Td2[256] = {
-    0xa75051f4, 0x65537e41, 0xa4c31a17, 0x5e963a27, 0x6bcb3bab, 0x45f11f9d, 0x58abacfa, 0x03934be3, 0xfa552030,
-    0x6df6ad76, 0x769188cc, 0x4c25f502, 0xd7fc4fe5, 0xcbd7c52a, 0x44802635, 0xa38fb562, 0x5a49deb1, 0x1b6725ba,
-    0x0e9845ea, 0xc0e15dfe, 0x7502c32f, 0xf012814c, 0x97a38d46, 0xf9c66bd3, 0x5fe7038f, 0x9c951592, 0x7aebbf6d,
-    0x59da9552, 0x832dd4be, 0x21d35874, 0x692949e0, 0xc8448ec9, 0x896a75c2, 0x7978f48e, 0x3e6b9958, 0x71dd27b9,
-    0x4fb6bee1, 0xad17f088, 0xac66c920, 0x3ab47dce, 0x4a1863df, 0x3182e51a, 0x33609751, 0x7f456253, 0x77e0b164,
-    0xae84bb6b, 0xa01cfe81, 0x2b94f908, 0x68587048, 0xfd198f45, 0x6c8794de, 0xf8b7527b, 0xd323ab73, 0x02e2724b,
-    0x8f57e31f, 0xab2a6655, 0x2807b2eb, 0xc2032fb5, 0x7b9a86c5, 0x08a5d337, 0x87f23028, 0xa5b223bf, 0x6aba0203,
-    0x825ced16, 0x1c2b8acf, 0xb492a779, 0xf2f0f307, 0xe2a14e69, 0xf4cd65da, 0xbed50605, 0x621fd134, 0xfe8ac4a6,
-    0x539d342e, 0x55a0a2f3, 0xe132058a, 0xeb75a4f6, 0xec390b83, 0xefaa4060, 0x9f065e71, 0x1051bd6e, 0x8af93e21,
-    0x063d96dd, 0x05aedd3e, 0xbd464de6, 0x8db59154, 0x5d0571c4, 0xd46f0406, 0x15ff6050, 0xfb241998, 0xe997d6bd,
-    0x43cc8940, 0x9e7767d9, 0x42bdb0e8, 0x8b880789, 0x5b38e719, 0xeedb79c8, 0x0a47a17c, 0x0fe97c42, 0x1ec9f884,
-    0x00000000, 0x86830980, 0xed48322b, 0x70ac1e11, 0x724e6c5a, 0xfffbfd0e, 0x38560f85, 0xd51e3dae, 0x3927362d,
-    0xd9640a0f, 0xa621685c, 0x54d19b5b, 0x2e3a2436, 0x67b10c0a, 0xe70f9357, 0x96d2b4ee, 0x919e1b9b, 0xc54f80c0,
-    0x20a261dc, 0x4b695a77, 0x1a161c12, 0xba0ae293, 0x2ae5c0a0, 0xe0433c22, 0x171d121b, 0x0d0b0e09, 0xc7adf28b,
-    0xa8b92db6, 0xa9c8141e, 0x198557f1, 0x074caf75, 0xddbbee99, 0x60fda37f, 0x269ff701, 0xf5bc5c72, 0x3bc54466,
-    0x7e345bfb, 0x29768b43, 0xc6dccb23, 0xfc68b6ed, 0xf163b8e4, 0xdccad731, 0x85104263, 0x22401397, 0x112084c6,
-    0x247d854a, 0x3df8d2bb, 0x3211aef9, 0xa16dc729, 0x2f4b1d9e, 0x30f3dcb2, 0x52ec0d86, 0xe3d077c1, 0x166c2bb3,
-    0xb999a970, 0x48fa1194, 0x642247e9, 0x8cc4a8fc, 0x3f1aa0f0, 0x2cd8567d, 0x90ef2233, 0x4ec78749, 0xd1c1d938,
-    0xa2fe8cca, 0x0b3698d4, 0x81cfa6f5, 0xde28a57a, 0x8e26dab7, 0xbfa43fad, 0x9de42c3a, 0x920d5078, 0xcc9b6a5f,
-    0x4662547e, 0x13c2f68d, 0xb8e890d8, 0xf75e2e39, 0xaff582c3, 0x80be9f5d, 0x937c69d0, 0x2da96fd5, 0x12b3cf25,
-    0x993bc8ac, 0x7da71018, 0x636ee89c, 0xbb7bdb3b, 0x7809cd26, 0x18f46e59, 0xb701ec9a, 0x9aa8834f, 0x6e65e695,
-    0xe67eaaff, 0xcf0821bc, 0xe8e6ef15, 0x9bd9bae7, 0x36ce4a6f, 0x09d4ea9f, 0x7cd629b0, 0xb2af31a4, 0x23312a3f,
-    0x9430c6a5, 0x66c035a2, 0xbc37744e, 0xcaa6fc82, 0xd0b0e090, 0xd81533a7, 0x984af104, 0xdaf741ec, 0x500e7fcd,
-    0xf62f1791, 0xd68d764d, 0xb04d43ef, 0x4d54ccaa, 0x04dfe496, 0xb5e39ed1, 0x881b4c6a, 0x1fb8c12c, 0x517f4665,
-    0xea049d5e, 0x355d018c, 0x7473fa87, 0x412efb0b, 0x1d5ab367, 0xd25292db, 0x5633e910, 0x47136dd6, 0x618c9ad7,
-    0x0c7a37a1, 0x148e59f8, 0x3c89eb13, 0x27eecea9, 0xc935b761, 0xe5ede11c, 0xb13c7a47, 0xdf599cd2, 0x733f55f2,
-    0xce791814, 0x37bf73c7, 0xcdea53f7, 0xaa5b5ffd, 0x6f14df3d, 0xdb867844, 0xf381caaf, 0xc43eb968, 0x342c3824,
-    0x405fc2a3, 0xc372161d, 0x250cbce2, 0x498b283c, 0x9541ff0d, 0x017139a8, 0xb3de080c, 0xe49cd8b4, 0xc1906456,
-    0x84617bcb, 0xb670d532, 0x5c74486c, 0x5742d0b8,
-};
-static const u32 Td3[256] = {
-    0xf4a75051, 0x4165537e, 0x17a4c31a, 0x275e963a, 0xab6bcb3b, 0x9d45f11f, 0xfa58abac, 0xe303934b, 0x30fa5520,
-    0x766df6ad, 0xcc769188, 0x024c25f5, 0xe5d7fc4f, 0x2acbd7c5, 0x35448026, 0x62a38fb5, 0xb15a49de, 0xba1b6725,
-    0xea0e9845, 0xfec0e15d, 0x2f7502c3, 0x4cf01281, 0x4697a38d, 0xd3f9c66b, 0x8f5fe703, 0x929c9515, 0x6d7aebbf,
-    0x5259da95, 0xbe832dd4, 0x7421d358, 0xe0692949, 0xc9c8448e, 0xc2896a75, 0x8e7978f4, 0x583e6b99, 0xb971dd27,
-    0xe14fb6be, 0x88ad17f0, 0x20ac66c9, 0xce3ab47d, 0xdf4a1863, 0x1a3182e5, 0x51336097, 0x537f4562, 0x6477e0b1,
-    0x6bae84bb, 0x81a01cfe, 0x082b94f9, 0x48685870, 0x45fd198f, 0xde6c8794, 0x7bf8b752, 0x73d323ab, 0x4b02e272,
-    0x1f8f57e3, 0x55ab2a66, 0xeb2807b2, 0xb5c2032f, 0xc57b9a86, 0x3708a5d3, 0x2887f230, 0xbfa5b223, 0x036aba02,
-    0x16825ced, 0xcf1c2b8a, 0x79b492a7, 0x07f2f0f3, 0x69e2a14e, 0xdaf4cd65, 0x05bed506, 0x34621fd1, 0xa6fe8ac4,
-    0x2e539d34, 0xf355a0a2, 0x8ae13205, 0xf6eb75a4, 0x83ec390b, 0x60efaa40, 0x719f065e, 0x6e1051bd, 0x218af93e,
-    0xdd063d96, 0x3e05aedd, 0xe6bd464d, 0x548db591, 0xc45d0571, 0x06d46f04, 0x5015ff60, 0x98fb2419, 0xbde997d6,
-    0x4043cc89, 0xd99e7767, 0xe842bdb0, 0x898b8807, 0x195b38e7, 0xc8eedb79, 0x7c0a47a1, 0x420fe97c, 0x841ec9f8,
-    0x00000000, 0x80868309, 0x2bed4832, 0x1170ac1e, 0x5a724e6c, 0x0efffbfd, 0x8538560f, 0xaed51e3d, 0x2d392736,
-    0x0fd9640a, 0x5ca62168, 0x5b54d19b, 0x362e3a24, 0x0a67b10c, 0x57e70f93, 0xee96d2b4, 0x9b919e1b, 0xc0c54f80,
-    0xdc20a261, 0x774b695a, 0x121a161c, 0x93ba0ae2, 0xa02ae5c0, 0x22e0433c, 0x1b171d12, 0x090d0b0e, 0x8bc7adf2,
-    0xb6a8b92d, 0x1ea9c814, 0xf1198557, 0x75074caf, 0x99ddbbee, 0x7f60fda3, 0x01269ff7, 0x72f5bc5c, 0x663bc544,
-    0xfb7e345b, 0x4329768b, 0x23c6dccb, 0xedfc68b6, 0xe4f163b8, 0x31dccad7, 0x63851042, 0x97224013, 0xc6112084,
-    0x4a247d85, 0xbb3df8d2, 0xf93211ae, 0x29a16dc7, 0x9e2f4b1d, 0xb230f3dc, 0x8652ec0d, 0xc1e3d077, 0xb3166c2b,
-    0x70b999a9, 0x9448fa11, 0xe9642247, 0xfc8cc4a8, 0xf03f1aa0, 0x7d2cd856, 0x3390ef22, 0x494ec787, 0x38d1c1d9,
-    0xcaa2fe8c, 0xd40b3698, 0xf581cfa6, 0x7ade28a5, 0xb78e26da, 0xadbfa43f, 0x3a9de42c, 0x78920d50, 0x5fcc9b6a,
-    0x7e466254, 0x8d13c2f6, 0xd8b8e890, 0x39f75e2e, 0xc3aff582, 0x5d80be9f, 0xd0937c69, 0xd52da96f, 0x2512b3cf,
-    0xac993bc8, 0x187da710, 0x9c636ee8, 0x3bbb7bdb, 0x267809cd, 0x5918f46e, 0x9ab701ec, 0x4f9aa883, 0x956e65e6,
-    0xffe67eaa, 0xbccf0821, 0x15e8e6ef, 0xe79bd9ba, 0x6f36ce4a, 0x9f09d4ea, 0xb07cd629, 0xa4b2af31, 0x3f23312a,
-    0xa59430c6, 0xa266c035, 0x4ebc3774, 0x82caa6fc, 0x90d0b0e0, 0xa7d81533, 0x04984af1, 0xecdaf741, 0xcd500e7f,
-    0x91f62f17, 0x4dd68d76, 0xefb04d43, 0xaa4d54cc, 0x9604dfe4, 0xd1b5e39e, 0x6a881b4c, 0x2c1fb8c1, 0x65517f46,
-    0x5eea049d, 0x8c355d01, 0x877473fa, 0x0b412efb, 0x671d5ab3, 0xdbd25292, 0x105633e9, 0xd647136d, 0xd7618c9a,
-    0xa10c7a37, 0xf8148e59, 0x133c89eb, 0xa927eece, 0x61c935b7, 0x1ce5ede1, 0x47b13c7a, 0xd2df599c, 0xf2733f55,
-    0x14ce7918, 0xc737bf73, 0xf7cdea53, 0xfdaa5b5f, 0x3d6f14df, 0x44db8678, 0xaff381ca, 0x68c43eb9, 0x24342c38,
-    0xa3405fc2, 0x1dc37216, 0xe2250cbc, 0x3c498b28, 0x0d9541ff, 0xa8017139, 0x0cb3de08, 0xb4e49cd8, 0x56c19064,
-    0xcb84617b, 0x32b670d5, 0x6c5c7448, 0xb85742d0,
-};
-static const u32 Td4[256] = {
-    0x52525252, 0x09090909, 0x6a6a6a6a, 0xd5d5d5d5, 0x30303030, 0x36363636, 0xa5a5a5a5, 0x38383838, 0xbfbfbfbf,
-    0x40404040, 0xa3a3a3a3, 0x9e9e9e9e, 0x81818181, 0xf3f3f3f3, 0xd7d7d7d7, 0xfbfbfbfb, 0x7c7c7c7c, 0xe3e3e3e3,
-    0x39393939, 0x82828282, 0x9b9b9b9b, 0x2f2f2f2f, 0xffffffff, 0x87878787, 0x34343434, 0x8e8e8e8e, 0x43434343,
-    0x44444444, 0xc4c4c4c4, 0xdededede, 0xe9e9e9e9, 0xcbcbcbcb, 0x54545454, 0x7b7b7b7b, 0x94949494, 0x32323232,
-    0xa6a6a6a6, 0xc2c2c2c2, 0x23232323, 0x3d3d3d3d, 0xeeeeeeee, 0x4c4c4c4c, 0x95959595, 0x0b0b0b0b, 0x42424242,
-    0xfafafafa, 0xc3c3c3c3, 0x4e4e4e4e, 0x08080808, 0x2e2e2e2e, 0xa1a1a1a1, 0x66666666, 0x28282828, 0xd9d9d9d9,
-    0x24242424, 0xb2b2b2b2, 0x76767676, 0x5b5b5b5b, 0xa2a2a2a2, 0x49494949, 0x6d6d6d6d, 0x8b8b8b8b, 0xd1d1d1d1,
-    0x25252525, 0x72727272, 0xf8f8f8f8, 0xf6f6f6f6, 0x64646464, 0x86868686, 0x68686868, 0x98989898, 0x16161616,
-    0xd4d4d4d4, 0xa4a4a4a4, 0x5c5c5c5c, 0xcccccccc, 0x5d5d5d5d, 0x65656565, 0xb6b6b6b6, 0x92929292, 0x6c6c6c6c,
-    0x70707070, 0x48484848, 0x50505050, 0xfdfdfdfd, 0xedededed, 0xb9b9b9b9, 0xdadadada, 0x5e5e5e5e, 0x15151515,
-    0x46464646, 0x57575757, 0xa7a7a7a7, 0x8d8d8d8d, 0x9d9d9d9d, 0x84848484, 0x90909090, 0xd8d8d8d8, 0xabababab,
-    0x00000000, 0x8c8c8c8c, 0xbcbcbcbc, 0xd3d3d3d3, 0x0a0a0a0a, 0xf7f7f7f7, 0xe4e4e4e4, 0x58585858, 0x05050505,
-    0xb8b8b8b8, 0xb3b3b3b3, 0x45454545, 0x06060606, 0xd0d0d0d0, 0x2c2c2c2c, 0x1e1e1e1e, 0x8f8f8f8f, 0xcacacaca,
-    0x3f3f3f3f, 0x0f0f0f0f, 0x02020202, 0xc1c1c1c1, 0xafafafaf, 0xbdbdbdbd, 0x03030303, 0x01010101, 0x13131313,
-    0x8a8a8a8a, 0x6b6b6b6b, 0x3a3a3a3a, 0x91919191, 0x11111111, 0x41414141, 0x4f4f4f4f, 0x67676767, 0xdcdcdcdc,
-    0xeaeaeaea, 0x97979797, 0xf2f2f2f2, 0xcfcfcfcf, 0xcececece, 0xf0f0f0f0, 0xb4b4b4b4, 0xe6e6e6e6, 0x73737373,
-    0x96969696, 0xacacacac, 0x74747474, 0x22222222, 0xe7e7e7e7, 0xadadadad, 0x35353535, 0x85858585, 0xe2e2e2e2,
-    0xf9f9f9f9, 0x37373737, 0xe8e8e8e8, 0x1c1c1c1c, 0x75757575, 0xdfdfdfdf, 0x6e6e6e6e, 0x47474747, 0xf1f1f1f1,
-    0x1a1a1a1a, 0x71717171, 0x1d1d1d1d, 0x29292929, 0xc5c5c5c5, 0x89898989, 0x6f6f6f6f, 0xb7b7b7b7, 0x62626262,
-    0x0e0e0e0e, 0xaaaaaaaa, 0x18181818, 0xbebebebe, 0x1b1b1b1b, 0xfcfcfcfc, 0x56565656, 0x3e3e3e3e, 0x4b4b4b4b,
-    0xc6c6c6c6, 0xd2d2d2d2, 0x79797979, 0x20202020, 0x9a9a9a9a, 0xdbdbdbdb, 0xc0c0c0c0, 0xfefefefe, 0x78787878,
-    0xcdcdcdcd, 0x5a5a5a5a, 0xf4f4f4f4, 0x1f1f1f1f, 0xdddddddd, 0xa8a8a8a8, 0x33333333, 0x88888888, 0x07070707,
-    0xc7c7c7c7, 0x31313131, 0xb1b1b1b1, 0x12121212, 0x10101010, 0x59595959, 0x27272727, 0x80808080, 0xecececec,
-    0x5f5f5f5f, 0x60606060, 0x51515151, 0x7f7f7f7f, 0xa9a9a9a9, 0x19191919, 0xb5b5b5b5, 0x4a4a4a4a, 0x0d0d0d0d,
-    0x2d2d2d2d, 0xe5e5e5e5, 0x7a7a7a7a, 0x9f9f9f9f, 0x93939393, 0xc9c9c9c9, 0x9c9c9c9c, 0xefefefef, 0xa0a0a0a0,
-    0xe0e0e0e0, 0x3b3b3b3b, 0x4d4d4d4d, 0xaeaeaeae, 0x2a2a2a2a, 0xf5f5f5f5, 0xb0b0b0b0, 0xc8c8c8c8, 0xebebebeb,
-    0xbbbbbbbb, 0x3c3c3c3c, 0x83838383, 0x53535353, 0x99999999, 0x61616161, 0x17171717, 0x2b2b2b2b, 0x04040404,
-    0x7e7e7e7e, 0xbabababa, 0x77777777, 0xd6d6d6d6, 0x26262626, 0xe1e1e1e1, 0x69696969, 0x14141414, 0x63636363,
-    0x55555555, 0x21212121, 0x0c0c0c0c, 0x7d7d7d7d,
-};
 static const u32 rcon[10] = { 0x01000000, 0x02000000, 0x04000000, 0x08000000, 0x10000000,
                               0x20000000, 0x40000000, 0x80000000, 0x1b000000, 0x36000000 };
-static BOOL sAcRunning = FALSE; // Whether the thread runs
-static int sAcApIndex = 0;      // The setup's access point in the list
-static u8 *sAcSearchBssid = NULL;
-static void *sAcWcmBuffer = NULL;
-static int sAcSecure = 0; // From the hello, whether the access point asks for the MAC address
-static void *sAcStack = NULL;
-static void *sAcBssDesc = NULL;
-static u8 *sAcSearchEssid = NULL;
-static int sAcState = 0; // AC_STATE_*
-static u8 *sAcApList = NULL;
-static DWCWcmCallback sAcWcmCallback = NULL;
-static int sAcStatusResult = 0; // 1, or the negative error that ended the setup, as the status says
+static DWCUtilAcCallback sAcCallback = NULL;
+static int sAcStatusResult = 0;    // 1, or the negative error that ended the setup, as the status says
+static BOOL sAcWcmStarted = FALSE; // Whether the WCM is started
 static int sAcApCount = 0;
 static int sAcEventRead = 0;
-static u32 sAcSearchOption = 0;
-static int sAcStep = 0; // The step of AutoConfigThreadEx
-static int sAcMessageSize = 0;
-static BOOL sAcConnected = FALSE; // Whether it joined the access point
-static void (*sAcFree)(void *ptr) = NULL;
-static DWCUtilAcCallback sAcCallback = NULL;
 static int sAcEventWrite = 0;
+static BOOL sAcRunning = FALSE; // Whether the thread runs
+static u8 *sAcSearchBssid = NULL;
+static void *sAcWcmBuffer = NULL;
+static void *sAcBssDesc = NULL;
+static u32 sAcSearchOption = 0;
 static u32 sAcConnectOption = 0;
 static void *sAcBlock = NULL;
-static WCMConfig *sAcWcmConfig = NULL;
-static BOOL sAcWcmStarted = FALSE; // Whether the WCM is started
+static int sAcSecure = 0; // From the hello, whether the access point asks for the MAC address
+static BOOL sAcCancel = FALSE;
+static int sAcWcmState = 0;
+static void (*sAcFree)(void *ptr) = NULL;
+static void *sAcStack = NULL;
 static void *(*sAcAlloc)(u32 size) = NULL;
-static void *sAcWcmWork = NULL;
+static DWCWcmCallback sAcWcmCallback = NULL;
+static int sAcState = 0; // AC_STATE_*
+static int sAcMessageSize = 0;
+static WCMConfig *sAcWcmConfig = NULL;
+static u8 *sAcSearchEssid = NULL;
+static u8 *sAcApList = NULL;
+static BOOL sAcSocStarted = FALSE;
+static int sAcStep = 0; // The step of AutoConfigThreadEx
 
 static void APCi_Notify(WCMNotice *notice) {
     if (notice == NULL) {
@@ -1143,7 +1135,7 @@ static int ConnectAP(void) {
     do {
         int event;
 
-        if (GetTickCount() >= sAcConfig.deadline) {
+        if (GetTickCount() >= sAcDeadline) {
             result = RESULT_SCAN_TIMEOUT;
             break;
         }
@@ -1225,7 +1217,7 @@ static void DisconnectAP(void) {
 
 // Looks for the access point that opened its setup: one that was secured in the scan before and is open now, or else
 // one named "******" in this scan and not in the one before. Gives its place in the scan
-static int CheckAccessPoint(const BSSID_LIST *scan, const BSSID_LIST *previous, int *index) {
+static int CheckAccessPoint(const BSSID_LIST *scan, const BSSID_LIST *previous, u32 *index) {
     int found = 0;
     int result = 0;
     int i;
@@ -1268,7 +1260,7 @@ static int CheckAccessPoint(const BSSID_LIST *scan, const BSSID_LIST *previous, 
         for (i = 0; i < previous->NumberOfItems; i++) {
             memcpy(name, old->ssid, 0x20);
             name[old->ssidLength] = 0;
-            if (memcmp(name, "******", strlen("******")) == 0 && old->Privacy == 0) {
+            if (memcmp(name, sAcStealthSsid, strlen(sAcStealthSsid)) == 0 && old->Privacy == 0) {
                 foundOld = 1;
                 break;
             }
@@ -1277,7 +1269,7 @@ static int CheckAccessPoint(const BSSID_LIST *scan, const BSSID_LIST *previous, 
         for (i = 0; i < scan->NumberOfItems; i++) {
             memcpy(name, entry->ssid, 0x20);
             name[entry->ssidLength] = 0;
-            if (strlen(name) == strlen("******") && memcmp(name, "******", strlen("******")) == 0 &&
+            if (strlen(name) == strlen(sAcStealthSsid) && memcmp(name, sAcStealthSsid, strlen(sAcStealthSsid)) == 0 &&
                 entry->Privacy == 0) {
                 foundNew = 1;
                 break;
@@ -1298,26 +1290,27 @@ static int CheckAccessPoint(const BSSID_LIST *scan, const BSSID_LIST *previous, 
 // Scans for the access points until one opens its setup; 1 when one did, or a negative number
 static int ScanAP(void) {
     int result = RESULT_NO_MEMORY;
-    int foundIndex = 0;
-    char text[0x20];
     int round;
-    int j;
-    int i;
-    int size = sAcApCount * sizeof(WLAN_BSSID) + sizeof(BSSID_LIST);
-    BSSID_LIST *scan = NULL;
+    int j, i;
+    u32 foundIndex = 0;
+    u32 size;
+    BSSID_LIST *scan;
     BSSID_LIST *previous = NULL;
+    WLAN_BSSID *entry;
+    char text[0x20];
+    BOOL waiting;
+    OSAlarm alarm;
+    int count;
+    int found;
+    WMBssDesc *bss;
 
+    size = sAcApCount * sizeof(WLAN_BSSID) + sizeof(BSSID_LIST);
     scan = Calloc(1, size);
     if (scan != NULL) {
         previous = Calloc(1, size);
         if (previous != NULL) {
             for (round = 0; round < 30 && !sAcCancel; round++) {
-                OSAlarm alarm;
-                BOOL waiting;
-                int count;
-                WMBssDesc *bss;
-
-                if (GetTickCount() >= sAcConfig.deadline) {
+                if (GetTickCount() >= sAcDeadline) {
                     break;
                 }
                 if (!UtilAcWcm_Search(NULL, NULL, 0, 0x30bffe)) {
@@ -1332,7 +1325,7 @@ static int ScanAP(void) {
                     int event;
 
                     OS_Sleep(10);
-                    if (GetTickCount() >= sAcConfig.deadline || sAcCancel) {
+                    if (GetTickCount() >= sAcDeadline || sAcCancel) {
                         break;
                     }
                     while ((event = AtermApc_GetEvent()) != 0) {
@@ -1345,9 +1338,9 @@ static int ScanAP(void) {
                             waiting = FALSE;
                             break;
                         case DWC_WCM_EVENT_FOUND_AP:
-                            i = UtilAcWcm_GetApList(sAcApList, sAcApCount);
-                            if (i > count) {
-                                count = i;
+                            found = UtilAcWcm_GetApList(sAcApList, sAcApCount);
+                            if (found > count) {
+                                count = found;
                                 OS_CancelAlarm(&alarm);
                                 OS_SetAlarm(&alarm, OS_MilliSecondsToTicks(2000), UtilAc_OnAlarm,
                                             (void *)EVENT_SCAN_TIMEOUT);
@@ -1387,27 +1380,21 @@ static int ScanAP(void) {
                     result = RESULT_TOO_MANY_APS;
                     goto done;
                 }
-                bss = (WMBssDesc *)sAcApList;
-                j = 0;
-                if (count > 0) {
-                    for (; j < count; j++) {
-                        memcpy(scan->Bssid[i].ssid, bss->ssid, 0x20);
-                        scan->Bssid[i].ssidLength = bss->ssidLength;
-                        scan->Bssid[i].ssid[bss->ssidLength] = 0;
-                        if (bss->capaInfo & 0x10) {
-                            scan->Bssid[i].Privacy = 1;
-                        } else {
-                            scan->Bssid[i].Privacy = 0;
-                        }
-                        memcpy(scan->Bssid[i].MacAddress, bss->bssid, 6);
-                        bss++;
-                        i++;
+                for (j = 0, bss = (WMBssDesc *)sAcApList; j < count; j++, bss++) {
+                    memcpy(scan->Bssid[i].ssid, bss->ssid, 0x20);
+                    scan->Bssid[i].ssidLength = bss->ssidLength;
+                    scan->Bssid[i].ssid[bss->ssidLength] = 0;
+                    if (bss->capaInfo & 0x10) {
+                        scan->Bssid[i].Privacy = 1;
+                    } else {
+                        scan->Bssid[i].Privacy = 0;
                     }
+                    memcpy(scan->Bssid[i].MacAddress, bss->bssid, 6);
+                    i++;
                 }
                 scan->NumberOfItems = count;
                 if (sAcState != AC_STATE_SCANNING && CheckAccessPoint(scan, previous, &foundIndex)) {
-                    WLAN_BSSID *entry = &scan->Bssid[foundIndex];
-
+                    entry = &scan->Bssid[foundIndex];
                     sAcApIndex = foundIndex;
                     strcpy(sAcApSsid, entry->ssid);
                     memcpy(sAcApMac, entry->MacAddress, 6);
@@ -1418,7 +1405,7 @@ static int ScanAP(void) {
                 sAcState = AC_STATE_SCANNED;
                 SendNotify();
             }
-            if (round >= 30 || GetTickCount() > sAcConfig.deadline) {
+            if (round >= 30 || GetTickCount() > sAcDeadline) {
                 result = RESULT_SCAN_TIMEOUT;
             } else if (sAcCancel) {
                 result = RESULT_CANCELLED;
@@ -1437,10 +1424,7 @@ done:
     return result;
 }
 
-// The name that the console gives (the word before the 4 points to it, as in dwc_ac_soc.c's configuration), and the
-// MD5's padding (md5c.c's PADDING). MWCC 2.0 writes data defined between functions out with the next function, and the
-// ROM's .data has these two after CheckAccessPoint's literal and before GetMacEncKey', so they are defined here
-static char sAcHostName[] = "NINTENDO-DS";
+// The MD5's padding (md5c.c's PADDING)
 static u8 PADDING[64] = { 0x80 };
 
 // A 16-bit number in network order
@@ -1655,24 +1639,20 @@ static int GetCommandElement(const u8 *packet, int type, u8 *out, const u8 *key)
 
 // The hello of this side
 static int SetSearchRes(u8 *out) {
-    struct {
-        u16 version;
-        HelloId id;
-    } data;
     u8 *end;
+    u16 version = 0x100;
+    u8 id[7] = { 6, 0, 1, 2, 3, 4, 5 };
 
-    data.version = 0x100;
-    data.id = sAcHelloId;
-    end = SetElementData(sAcConfig.items, 1, &data.version, sizeof(data.version));
-    end = SetElementData(end, 2, &data.version, sizeof(data.version));
+    end = SetElementData(sAcItems, 1, &version, sizeof(version));
+    end = SetElementData(end, 2, &version, sizeof(version));
     if (sAcSecure) {
-        end = SetElementData(end, 5, &data.version, sizeof(data.version));
+        end = SetElementData(end, 5, &version, sizeof(version));
     }
-    end = SetElementData(end, 3, &data.id, sizeof(data.id));
+    end = SetElementData(end, 3, id, sizeof(id));
     if (sAcSecure) {
         end = SetElementData(end, 4, sAcOwnMac, 6);
     }
-    return SetFrameData(out, 2, sAcMessage, end - sAcConfig.items + 8, NULL);
+    return SetFrameData(out, 2, sAcMessage, end - sAcItems + 8, NULL);
 }
 
 static int GetAdapterMac(u8 *mac) {
@@ -1699,7 +1679,7 @@ static int GetMacEncKey(u8 *key, const SOCSockAddrIn *from) {
         memcpy(key, &ap, 6);
         memcpy(key + 6, &own, 6);
     }
-    if (sAcConfig.debug) {
+    if (sAcDebug) {
         PutMac(ownText, (s8 *)own.bytes);
         PutMac(apText, (s8 *)ap.bytes);
     }
@@ -1903,7 +1883,7 @@ static inline int UtilAc_TakeSessionKey(const u8 *message, int retries) {
         retries = 0;
         sAcStep = 7;
         sAcState = AC_STATE_KEY;
-        sAcConfig.deadline = 0xffffffff;
+        sAcDeadline = 0xffffffff;
         SendNotify();
     }
     return retries;
@@ -1963,7 +1943,7 @@ static int AutoConfigThreadEx(void) {
             }
             break;
         case 4:
-            if (GetTickCount() >= sAcConfig.deadline) {
+            if (GetTickCount() >= sAcDeadline) {
                 SOC_Close(sock);
                 result = RESULT_SCAN_TIMEOUT;
                 done = TRUE;
@@ -1972,7 +1952,7 @@ static int AutoConfigThreadEx(void) {
                 GetMacEncKey(sAcKey, &from);
                 if (SOC_RecvFrom(sock, sAcPacket, sizeof(sAcPacket), 4, &from) > 0 &&
                     IsSearchCommand(sAcPacket, &sAcSecure)) {
-                    sAcConfig.deadline = GetTickCount() + 30000;
+                    sAcDeadline = GetTickCount() + 30000;
                     sAcStep = 5;
                     sAcState = AC_STATE_HELLO;
                     SendNotify();
@@ -1986,7 +1966,7 @@ static int AutoConfigThreadEx(void) {
             sAcStep = 6;
             break;
         case 6:
-            if (GetTickCount() >= sAcConfig.deadline) {
+            if (GetTickCount() >= sAcDeadline) {
                 SOC_Close(sock);
                 result = RESULT_HELLO_TIMEOUT;
                 done = TRUE;
@@ -2072,7 +2052,7 @@ static void AutoConfigThread(void *arg) {
     } else {
         sAcState = AC_STATE_FAILED;
     }
-    sAcConfig.deadline = 0xffffffff;
+    sAcDeadline = 0xffffffff;
     SendNotify();
 }
 
@@ -2602,7 +2582,7 @@ static u32 GetTickCount(void) {
     return OS_TicksToMilliSeconds(OS_GetTick());
 }
 
-static void *Calloc(int count, int size) {
+static void *Calloc(u32 count, u32 size) {
     int total = count * size;
     void *ptr = sAcAlloc(total);
 
@@ -2662,19 +2642,19 @@ int ATERMi_ApConfigStart(u32 priority, int apCount, DWCUtilAcCallback callback, 
     if (sAcState >= AC_STATE_SCANNING && sAcState <= AC_STATE_KEY) {
         return RESULT_BUSY;
     }
-    sAcConfig.apCount = apCount;
+    sAcConfigApCount = apCount;
     sAcState = AC_STATE_FAILED;
     sAcCallback = callback;
     sAcAlloc = alloc;
     sAcFree = free;
-    sAcConfig.stackSize = stackSize;
+    sAcStackSize = stackSize;
     result = InitAtermApcNetwork(apCount);
     sAcWcmStarted = TRUE;
     if (result < 0) {
         sAcStatusResult = result;
         return result;
     }
-    sAcStack = sAcAlloc(sAcConfig.stackSize);
+    sAcStack = sAcAlloc(sAcStackSize);
     if (sAcStack == NULL) {
         sAcStatusResult = RESULT_NO_MEMORY;
         return RESULT_NO_MEMORY;
@@ -2683,10 +2663,9 @@ int ATERMi_ApConfigStart(u32 priority, int apCount, DWCUtilAcCallback callback, 
         sAcStatusResult = RESULT_NO_THREADS;
         return RESULT_NO_THREADS;
     }
-    OS_CreateThread(&sAcThread, AutoConfigThread, NULL, (u8 *)sAcStack + (sAcConfig.stackSize & ~7),
-                    sAcConfig.stackSize, priority);
+    OS_CreateThread(&sAcThread, AutoConfigThread, NULL, (u8 *)sAcStack + (sAcStackSize & ~7), sAcStackSize, priority);
     sAcState = AC_STATE_SCANNING;
-    sAcConfig.deadline = GetTickCount() + 60000;
+    sAcDeadline = GetTickCount() + 60000;
     sAcCancel = FALSE;
     memset(&sAcResult, 0, sizeof(sAcResult));
     SendNotify();
@@ -2730,10 +2709,10 @@ int ATERMi_ApConfigEnd(void) {
 
 static int ATERMi_ApConfigGetState(ATERMApConfigState *status) {
     status->state = sAcState;
-    if (sAcConfig.deadline == 0xffffffff) {
+    if (sAcDeadline == 0xffffffff) {
         status->timeout = 0xffffffff;
     } else {
-        status->timeout = sAcConfig.deadline - GetTickCount();
+        status->timeout = sAcDeadline - GetTickCount();
     }
     status->result = sAcStatusResult;
     return 1;

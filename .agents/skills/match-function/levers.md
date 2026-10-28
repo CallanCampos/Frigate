@@ -255,11 +255,23 @@ text to `grep -n` there. Entries without a key come from later work and still be
   `int c;` declared first at the top. (matching.md: "declared first at the top")
 - Don't try `register` for allocation or a counter that nothing reads: MWCC 2.0/sp2 ignores it. A `const` on an
   initialized local can move its stack slot. (matching.md: "ignores the `register` storage class")
+- A byte tested, then used in both branches, in the wrong register: read it from the array again in each branch
+  (`if (data[q] & 0xf0)`, `g = data[q++] << 6`) instead of through a variable. (matching.md: "read again from the array")
+- A commutative `adds` with its operands swapped: build the sum in two statements, the first operand assigned first
+  (`c4 = d - e; c4 = c4 + a5 + c6;`). (matching.md: "follow how the sum was built")
+- A divisor loaded into r1 and shifted in place where the original loads r0 and shifts into r1: compute it into a
+  variable first (`x = hFactor * 8; mcusX = width / x;`). (matching.md: "A divisor computed into a variable")
 
 ## Stack slots or frame size
 
+- A 0 stored to a flag's slot before the loads of a 64-bit compare, where the original stores it after them: clear the
+  flags inside the block, after the compare. (matching.md: "A flag cleared inside the block")
+
 - A write result missing its store to a later read's output slot: use one transfer-length local for both operations
   (`DWCi_Http_Thread`). (matching.md: "one transfer-length local")
+- A frame one word short (an extra `r3` in the push) with a sign word hoisted for a 64-bit compare in a 4-byte
+  slot, where the original's sits in the high half of an 8-byte one: assign the `int` in both arms of an `if`/`else`,
+  not as a default and an override (`DWCi_Http_Thread`). (matching.md: "keeps its sign word")
 
 - Raw rail progress spilled as converted scalars: keep the signed position/length snapshot and let its ratio
   inline read through a `const` pointer. (matching.md: "a progress snapshot")
@@ -352,6 +364,10 @@ text to `grep -n` there. Entries without a key come from later work and still be
   despite word-sized spill accesses. (matching.md: "source-availability mask in the parameter")
 
 ## Instructions in another order (scheduling)
+
+- An address sum computed before a stored value where the original computes it after (or the reverse): a macro's
+  `(u8 *)(p) + 2` groups `p`; write the halves' addresses flat (`tcp + 24 + blocks * 8 + 2`). (matching.md:
+  "Parentheses that group a pointer sum")
 
 - A table index computed after a spill where the original computes it before: the table may be a function-local
   `static` in an inline getter. (matching.md: "holds it as a function-local `static`")
@@ -568,6 +584,10 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - A Thumb tail jump through a register other than `r3` (`ldr r1, =f; bx r1`) is not compiler output, so it is the
   SDK's assembly: an `asm` function (`lib/` only). ARM code tail-calls through `ip`, and only without a frame.
   (matching.md: "always `r3` in Thumb")
+- A dead store the original keeps that no installed compiler produces from any spelling, flag, pragma or IPA mode: an
+  `asm` function, the maintainer's exception taken once for `arc_tool.c`'s `ArchiveMoveImageTop` (Thumb asm, pool via
+  `ldr rX, [pc, #imm]` and `dcd symbol`; `dcd symbol+4` reaches into a symbol).
+  (matching.md: "A Thumb `asm` function in a Thumb file")
 
 - A narrowing before an `and` into a `u8` field: `x &= mask` narrows the mask, `x = x & mask` doesn't.
   (matching.md: "compound assignment to a narrow field")
@@ -614,6 +634,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - A sum truncated to `s16` before a comparison was stored in an `s16` local. (matching.md: "truncates to `s16`")
 - A narrowing again after a clamp is `MATH_CLAMP`, a conditional expression. (matching.md: "narrowed again after it is clamped")
 - A local reloaded from its stack slot before each use can be a `u8` flag, not `volatile`.
+- A by-value parameter reloaded from `[sp, #n]` at each use, even with no call between, is `volatile` at its
+  declaration, where the original source had it: `ReleaseRequest`'s handle, as Black 1's decomp also has it.
+  (matching.md: "A by-value parameter that the original keeps in its stack slot")
 - The reverse: a zero loaded back from a spilled `u8` flag's slot for a later zero store, where the original stores
   one register again, is a `BOOL` flag, with the return and the caller's parameter it ends in.
   (matching.md: "The same goes for a returned flag")
@@ -1002,6 +1025,11 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 ## Data and sections
 
+- A file whose data sits ahead of all its functions, sorted by size across `.bss`, `.data` and `.rodata`: build it with
+  `-ipa file`, write word "structs" as separate statics and strings as the literals or arrays they are, and reorder
+  the definitions of each size until the sort places them. (matching.md: "Under `-ipa file`, MWCC 2.0 writes every
+  object")
+
 - Duplicate protocol literals pooled once, with two independently grouped sets of globals: verify original
   source boundaries (`dwc_main.c`/`dwc_match.c`). (matching.md: "boundary at `DWC_AddMatchKeyInt`")
 - MSL exception indices before ordinary rodata: restore `-Cpp_exceptions on` and register the emitted `.exceptix`.
@@ -1032,8 +1060,16 @@ text to `grep -n` there. Entries without a key come from later work and still be
   their statics, is an exception to "Write C from the asm", made for `wipe_sub.c`'s 31 handlers (with the two
   `wipe_wnd.c` readers they call) alone; any other file is another exception for the maintainer to accept. Making the objects globals instead isn't kept.
   (matching.md: "A function-local static of a function MWCC doesn't emit"; configs.md: "Dead-stripped code")
+- A four-byte gap after a string can be its explicit extra terminator plus alignment (`dwc_profanity.c`'s `"/ac\0"`).
+  Check the literal's recorded size before adding an object. (matching.md: "apparent four-byte gap")
 - String literals in another order: MWCC lays them out in the order they first appear in the source; a `""` the
   game has before the file's name needs an earlier use. (matching.md: "String literals")
+- A table's equal-length literals in an order no plain entry order gives: list the table with C99 designators,
+  `[i] = "..."`, in the order the size sort needs; the index keeps the table's meaning.
+  (matching.md: "A table's literals can be listed in an order other than the table's")
+- A shared `.data` section in the wrong place among 4-byte literals: its position is its smallest object's, so move
+  it with the order the tables are declared in, and keep the 4-byte strings as literals rather than `char[]` statics.
+  (matching.md: "The same freedom places literals among the file's 4-byte statics")
 - A literal laid out before every surviving use of it: code the original link dead-stripped. Each code literal has a
   section of its own, and a static called from code the optimizer removes is still emitted with its literals.
   (matching.md: "Each literal that code creates")
@@ -1121,6 +1157,10 @@ text to `grep -n` there. Entries without a key come from later work and still be
   "ask for `-ipa file` before anything else")
 - A constant loaded from the pool with no relocation where MWCC folds it or builds it with `mov`/`lsl`: a linker
   symbol, `extern u8 SYM[]` cast at the use. (matching.md: "is a linker symbol")
+- Missing unused `.bss` with matching code: `g2d_OamSoftwareSpriteDraw.c` needs `-ipa function` and explicit zero
+  initializers on its live state to retain the sprite cache. (matching.md: "also needs `-ipa function`")
+- A gap after an aligned struct can be a missing member: `NHttpRoot` has eight trailing padding halfwords.
+  (matching.md: "root storage has an explicit")
 - A gap in `.bss` before a 32-aligned object: the previous file ends there, unless it is built with `-ipa file`, which
   gives each object of 64 bytes or more a section of its own. (matching.md: "makes its file's whole `.bss` section
   32-aligned")
@@ -1152,6 +1192,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
   (matching.md: "An `asm {}` block inside a C function")
 - SPL's `1.2/base` compiler emits a file's functions in reverse source order.
 - The MWCC linker here doesn't dead-strip unreferenced global functions.
+- Code matches under both IPA modes but data does not: compare section alignment and shared strings; a reference
+  object can identify dead functions that introduce live strings (`AuthService.c`).
+  (matching.md: "A reference object's assembly")
 - A static function whose symbol isn't renamed to its C name shows as "unknown" in the probe.
 - TwlSDK code that resists respellings: rebuild it in the shape of cybervisi0n/libntr's reconstruction (its
   `static inline` setters and wrappers, `if (n > 0) { ... }` blocks with their locals, cursor layouts), in our own

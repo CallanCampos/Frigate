@@ -235,81 +235,86 @@ static BOOL Yos_BitWrite(u8 *dst, u32 *pos, u32 value, u32 count) {
 // Transforms an 8x8 block of samples with the AAN DCT in 8 bit fixed point, and quantizes the coefficients
 static void Yos_JpegEncoderForwardDct(const u8 *block, const s32 *divisors, s16 *coefs) {
     s32 workspace[64];
-    s32 k;
-    s32 i;
-    s32 tmp0, tmp1, tmp2, tmp3, tmp4, tmp5, tmp6, tmp7;
-    s32 tmp10, tmp11, z1, z3, z5a, z5b, z6a, z6b;
+    // The a are a pass's sums and differences of opposite samples (the middle difference goes straight into c4), the
+    // c their butterflies, and both are reused for the products
+    s32 k, i, a0, a1, a2, a3, a5, a6, a7, c0, c1, c2, c3, c4, c5, c6, c7;
 
     for (i = 0; i < 8; i++) {
-        tmp0 = block[i + 0] + block[i + 56] - 256;
-        tmp1 = block[i + 8] + block[i + 48] - 256;
-        tmp2 = block[i + 16] + block[i + 40] - 256;
-        tmp3 = block[i + 24] + block[i + 32] - 256;
-        tmp4 = block[i + 24] - block[i + 32];
-        tmp5 = block[i + 16] - block[i + 40];
-        tmp6 = block[i + 8] - block[i + 48];
-        tmp7 = block[i + 0] - block[i + 56];
+        a0 = block[i + 0] + block[i + 56] - 256;
+        a1 = block[i + 8] + block[i + 48] - 256;
+        a2 = block[i + 16] + block[i + 40] - 256;
+        a3 = block[i + 24] + block[i + 32] - 256;
 
-        tmp10 = tmp0 + tmp3;
-        tmp11 = tmp1 + tmp2;
-        tmp1 = tmp1 - tmp2 + tmp0 - tmp3;
-        tmp0 = tmp0 - tmp3;
-        tmp2 = tmp5 + tmp6;
-        tmp6 = tmp6 + tmp7;
+        a5 = block[i + 16] - block[i + 40];
+        a6 = block[i + 8] - block[i + 48];
+        a7 = block[i + 0] - block[i + 56];
 
-        tmp5 = tmp4 + tmp5 + tmp6;
+        c0 = a0 + a3;
+        c1 = a1 + a2;
+        c2 = a0 + (a1 - a2) - a3;
+        c3 = a0 - a3;
+        c5 = a5 + a6;
+        c6 = a6 + a7;
 
-        z1 = tmp1 * 181;
-        z3 = tmp2 * 181;
-        z5a = tmp5 * 98;
-        z5b = tmp5 * 237;
-        z6a = tmp6 * 139;
-        z6b = tmp6 * 334;
+        c4 = block[i + 24] - block[i + 32];
+        c4 = c4 + a5 + c6;
 
-        workspace[i + 0] = (tmp10 + tmp11) << 8;
-        workspace[i + 32] = (tmp10 - tmp11) << 8;
-        workspace[i + 16] = z1 + (tmp0 << 8);
-        workspace[i + 48] = (tmp0 << 8) - z1;
-        workspace[i + 8] = z3 + (tmp7 << 8) + z5a + z6a;
-        workspace[i + 40] = (tmp7 << 8) - z3 + z5b - z6b;
-        workspace[i + 24] = (tmp7 << 8) - z3 - z5b + z6b;
-        workspace[i + 56] = z3 + (tmp7 << 8) - z5a - z6a;
+        c2 = c2 * 181;
+        c5 = c5 * 181;
+        a0 = c4 * 98;
+        a1 = c4 * 237;
+        a2 = c6 * 139;
+        a3 = c6 * 334;
+        c3 = c3 << 8;
+        a7 = a7 << 8;
+
+        workspace[i + 0] = (c0 + c1) << 8;
+        workspace[i + 32] = (c0 - c1) << 8;
+        workspace[i + 16] = c2 + c3;
+        workspace[i + 48] = c3 - c2;
+        workspace[i + 8] = a7 + c5 + a0 + a2;
+        workspace[i + 40] = a7 - c5 + a1 - a3;
+        workspace[i + 24] = a7 - c5 - a1 + a3;
+        workspace[i + 56] = a7 + c5 - a0 - a2;
     }
 
-    for (i = k = 0; i < 8; i++, k += 8) {
-        tmp0 = workspace[k + 0] + workspace[k + 7];
-        tmp1 = workspace[k + 1] + workspace[k + 6];
-        tmp2 = workspace[k + 2] + workspace[k + 5];
-        tmp3 = workspace[k + 3] + workspace[k + 4];
-        tmp4 = workspace[k + 3] - workspace[k + 4];
-        tmp5 = workspace[k + 2] - workspace[k + 5];
-        tmp6 = workspace[k + 1] - workspace[k + 6];
-        tmp7 = workspace[k + 0] - workspace[k + 7];
+    for (k = 0, i = 0; i < 8; i++, k += 8) {
+        a0 = workspace[k + 0] + workspace[k + 7];
+        a1 = workspace[k + 1] + workspace[k + 6];
+        a2 = workspace[k + 2] + workspace[k + 5];
+        a3 = workspace[k + 3] + workspace[k + 4];
 
-        tmp10 = tmp0 + tmp3;
-        tmp11 = tmp1 + tmp2;
-        tmp1 = tmp1 - tmp2 + tmp0 - tmp3;
-        tmp0 = tmp0 - tmp3;
-        tmp2 = tmp5 + tmp6;
-        tmp6 = tmp6 + tmp7;
+        a5 = workspace[k + 2] - workspace[k + 5];
+        a6 = workspace[k + 1] - workspace[k + 6];
+        a7 = workspace[k + 0] - workspace[k + 7];
 
-        tmp5 = tmp4 + tmp5 + tmp6;
+        c0 = a0 + a3;
+        c1 = a1 + a2;
+        c2 = a0 + (a1 - a2) - a3;
+        c3 = a0 - a3;
+        c5 = a5 + a6;
+        c6 = a6 + a7;
 
-        z1 = tmp1 * 181;
-        z3 = tmp2 * 181;
-        z5a = tmp5 * 98;
-        z5b = tmp5 * 237;
-        z6a = tmp6 * 139;
-        z6b = tmp6 * 334;
+        c4 = workspace[k + 3] - workspace[k + 4];
+        c4 = c4 + a5 + c6;
 
-        coefs[k + 0] = ((((tmp10 + tmp11) + 128) >> 8) * divisors[i * 8 + 0] + 0x800) >> 12;
-        coefs[k + 1] = (((z3 + (tmp7 << 8) + z5a + z6a + 0x8000) >> 16) * divisors[i * 8 + 1] + 0x800) >> 12;
-        coefs[k + 2] = (((z1 + (tmp0 << 8) + 0x8000) >> 16) * divisors[i * 8 + 2] + 0x800) >> 12;
-        coefs[k + 3] = ((((tmp7 << 8) - z3 - z5b + z6b + 0x8000) >> 16) * divisors[i * 8 + 3] + 0x800) >> 12;
-        coefs[k + 4] = ((((tmp10 - tmp11) + 128) >> 8) * divisors[i * 8 + 4] + 0x800) >> 12;
-        coefs[k + 5] = ((((tmp7 << 8) - z3 + z5b - z6b + 0x8000) >> 16) * divisors[i * 8 + 5] + 0x800) >> 12;
-        coefs[k + 6] = ((((tmp0 << 8) - z1 + 0x8000) >> 16) * divisors[i * 8 + 6] + 0x800) >> 12;
-        coefs[k + 7] = (((z3 + (tmp7 << 8) - z5a - z6a + 0x8000) >> 16) * divisors[i * 8 + 7] + 0x800) >> 12;
+        c2 = c2 * 181;
+        c5 = c5 * 181;
+        c3 = c3 << 8;
+        a7 = a7 << 8;
+        a0 = c4 * 98;
+        a1 = c4 * 237;
+        a2 = c6 * 139;
+        a3 = c6 * 334;
+
+        coefs[k + 0] = (((c0 + c1 + 128) >> 8) * divisors[i * 8 + 0] + 0x800) >> 12;
+        coefs[k + 1] = (((a7 + c5 + a0 + a2 + 0x8000) >> 16) * divisors[i * 8 + 1] + 0x800) >> 12;
+        coefs[k + 2] = (((c3 + c2 + 0x8000) >> 16) * divisors[i * 8 + 2] + 0x800) >> 12;
+        coefs[k + 3] = (((a7 - c5 - a1 + a3 + 0x8000) >> 16) * divisors[i * 8 + 3] + 0x800) >> 12;
+        coefs[k + 4] = (((c0 - c1 + 128) >> 8) * divisors[i * 8 + 4] + 0x800) >> 12;
+        coefs[k + 5] = (((a7 - c5 + a1 - a3 + 0x8000) >> 16) * divisors[i * 8 + 5] + 0x800) >> 12;
+        coefs[k + 6] = (((c3 - c2 + 0x8000) >> 16) * divisors[i * 8 + 6] + 0x800) >> 12;
+        coefs[k + 7] = (((a7 + c5 - a0 - a2 + 0x8000) >> 16) * divisors[i * 8 + 7] + 0x800) >> 12;
     }
 }
 
@@ -864,12 +869,7 @@ static u32 Yos_JPEGEncode(const void *src, u8 *dst, u32 limit, JpegEncWork *work
                           JpegEncConvertFunc convert) {
     JpegEncComponent components[3];
     u32 pos;
-    u32 cbOffset;
-    u32 yOffset;
-    u32 crOffset;
-    u32 chromBlocksX;
-    u32 chromBlocksY;
-    u32 chromSize;
+    u32 chromOffset;
     u32 blocksX, blocksY;
     u32 mcusX, mcusY;
     u32 hFactor = 1;
@@ -877,8 +877,10 @@ static u32 Yos_JPEGEncode(const void *src, u8 *dst, u32 limit, JpegEncWork *work
     u32 q;
     u32 i;
     u32 x;
+    u32 y;
     u32 dhtLength;
     u8(*quant)[64];
+    u8 *yPlane, *cbPlane, *crPlane;
     JpegEncHuffTable *dcLum;
     JpegEncHuffTable *dcChrom;
     JpegEncHuffTable *acLum;
@@ -897,8 +899,12 @@ static u32 Yos_JPEGEncode(const void *src, u8 *dst, u32 limit, JpegEncWork *work
         break;
     }
     sJpegEncLimit = limit;
-    mcusX = width / (hFactor * 8);
-    mcusY = height / (vFactor * 8);
+    // x and y hold an MCU's width and height, then the chroma blocks across and down, and y then the chroma
+    // coefficients' size
+    x = hFactor * 8;
+    mcusX = width / x;
+    y = vFactor * 8;
+    mcusY = height / y;
     blocksX = width / 8;
     blocksY = height / 8;
     quant = work->quant;
@@ -907,24 +913,25 @@ static u32 Yos_JPEGEncode(const void *src, u8 *dst, u32 limit, JpegEncWork *work
     acLum = &work->acLum;
     acChrom = &work->acChrom;
     huffWork = &work->huffWork;
-    chromBlocksX = blocksX / hFactor;
-    chromBlocksY = blocksY / vFactor;
+    x = blocksX / hFactor;
+    y = blocksY / vFactor;
     components[0].blocksX = blocksX;
     components[0].blocksY = blocksY;
-    components[1].blocksX = components[2].blocksX = chromBlocksX;
-    components[1].blocksY = components[2].blocksY = chromBlocksY;
+    components[1].blocksX = components[2].blocksX = x;
+    components[1].blocksY = components[2].blocksY = y;
     components[0].coefs = (s16 *)((u8 *)work + sizeof(JpegEncWork));
-    // yOffset is the chroma coefficients' offset until it passes them, and pos the size of a plane until the header,
-    // as the SDK reuses them
-    yOffset = blocksX * blocksY * 128 + sizeof(JpegEncWork);
-    chromSize = chromBlocksX * chromBlocksY * 128;
-    components[1].coefs = (s16 *)((u8 *)work + yOffset);
-    components[2].coefs = (s16 *)((u8 *)work + (yOffset + chromSize));
-    yOffset += chromSize * 2;
+    // The coefficients follow the work memory, the chroma components' after the luminance's (chromOffset), and the
+    // planes follow them (from i); pos is a plane's size until the header
+    chromOffset = blocksX * blocksY * 128 + sizeof(JpegEncWork);
+    y = x * y * 128;
+    components[1].coefs = (s16 *)((u8 *)work + chromOffset);
+    components[2].coefs = (s16 *)((u8 *)work + (chromOffset + y));
+    i = chromOffset + y * 2;
+    yPlane = (u8 *)work + i;
     components[0].lastDc = components[1].lastDc = components[2].lastDc = 0;
     pos = width * height;
-    cbOffset = yOffset + pos;
-    crOffset = (pos << 1) + yOffset;
+    cbPlane = (u8 *)work + (i + pos);
+    crPlane = (u8 *)work + ((pos << 1) + i);
 
     // Scale the quantization tables as IJG's libjpeg does
     if (quality < 50) {
@@ -954,22 +961,22 @@ static u32 Yos_JPEGEncode(const void *src, u8 *dst, u32 limit, JpegEncWork *work
     }
 
     if (convert != NULL) {
-        convert(src, width, height, (u8 *)work + yOffset);
+        convert(src, width, height, yPlane);
     }
-    Yos_JpegEncodeSample1to1Component((u8 *)work + yOffset, work->divisors[0], &components[0], width);
+    Yos_JpegEncodeSample1to1Component(yPlane, work->divisors[0], &components[0], width);
     if (sampling == SSP_JPEG_OUTPUT_YUV444) {
-        Yos_JpegEncodeSample1to1Component((u8 *)work + cbOffset, work->divisors[1], &components[1], width);
+        Yos_JpegEncodeSample1to1Component(cbPlane, work->divisors[1], &components[1], width);
     } else if (sampling == SSP_JPEG_OUTPUT_YUV420) {
-        Yos_JpegEncodeSample2to2Component((u8 *)work + cbOffset, work->divisors[1], &components[1], width);
+        Yos_JpegEncodeSample2to2Component(cbPlane, work->divisors[1], &components[1], width);
     } else {
-        Yos_JpegEncodeSample2to1Component((u8 *)work + cbOffset, work->divisors[1], &components[1], width);
+        Yos_JpegEncodeSample2to1Component(cbPlane, work->divisors[1], &components[1], width);
     }
     if (sampling == SSP_JPEG_OUTPUT_YUV444) {
-        Yos_JpegEncodeSample1to1Component((u8 *)work + crOffset, work->divisors[1], &components[2], width);
+        Yos_JpegEncodeSample1to1Component(crPlane, work->divisors[1], &components[2], width);
     } else if (sampling == SSP_JPEG_OUTPUT_YUV420) {
-        Yos_JpegEncodeSample2to2Component((u8 *)work + crOffset, work->divisors[1], &components[2], width);
+        Yos_JpegEncodeSample2to2Component(crPlane, work->divisors[1], &components[2], width);
     } else {
-        Yos_JpegEncodeSample2to1Component((u8 *)work + crOffset, work->divisors[1], &components[2], width);
+        Yos_JpegEncodeSample2to1Component(crPlane, work->divisors[1], &components[2], width);
     }
 
     // SOI, or the EXIF data, and SOF0

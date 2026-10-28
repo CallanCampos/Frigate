@@ -9,6 +9,10 @@
 // and check its signature. The signature is of an MD5-like hash of the certificate's fields over the service's RSA
 // public key, which is in the file below. The file and the names are GameSpy's own, as its webservices/AuthService.c
 // has them, where the code shows them, and ours elsewhere.
+// The original link removes wsLoginProfile and wsLoginUnique with their callbacks and password helper, but their
+// first uses of shared XML field names determine the surviving string order. These five routines are recovered from
+// a reference object's Thumb assembly, and their instruction bytes match it. config/deadstrip.toml removes them
+// again, keeping the shared strings the remote login uses.
 
 // What a login is waiting for: the function to call and its user data
 typedef struct WSIRequestData {
@@ -16,7 +20,19 @@ typedef struct WSIRequestData {
     void *mUserData;
 } WSIRequestData;
 
+// These entry points are removed by the original link and are not part of the game's public API
+WSLoginValue wsLoginProfile(int partnerCode, int namespaceId, const gsi_char *profileNick, const gsi_char *email,
+                            const gsi_char *password, const gsi_char *cdkey, WSLoginCallback callback, void *userData);
+WSLoginValue wsLoginUnique(int partnerCode, int namespaceId, const gsi_char *uniqueNick, const gsi_char *password,
+                           const gsi_char *cdkey, WSLoginCallback callback, void *userData);
+
 static gsi_bool Auth_PrepareUrl(void);
+static void wsiLoginProfileCallback(GHTTPResult status, GSXmlStreamWriter unused, GSXmlStreamReader reader,
+                                    void *userData);
+static void wsLoginUniqueCallback(GHTTPResult status, GSXmlStreamWriter unused, GSXmlStreamReader reader,
+                                  void *userData);
+static void wsiLoginEncryptPassword(const gsi_char *password, gsi_u8 ciphertext[0x80]);
+
 static void Auth_OnResponse(GHTTPResult status, GSXmlStreamWriter unused, GSXmlStreamReader reader, void *userData);
 static gsi_u32 Auth_ToWire(gsi_u32 value);
 static gsi_bool Auth_ReadCertificate(GSLoginCertificate *certificate, GSXmlStreamReader reader);
@@ -55,6 +71,213 @@ char *Auth_GetUrl(void) {
     }
     gsDebugFormat(GSIDebugCat_App, GSIDebugType_State, GSIDebugLevel_HotError, "No availability\r\n");
     return NULL;
+}
+
+static void wsiLoginProfileCallback(GHTTPResult status, GSXmlStreamWriter unused, GSXmlStreamReader reader,
+                                    void *userData) {
+    WSIRequestData *request = userData;
+    WSLoginResponse result;
+    GSLoginCertificate *certificate = &result.mCertificate;
+    MD5_CTX context;
+
+    // As in GameSpy's login callbacks, the certificate is marked invalid before the whole result is cleared
+    certificate->mIsValid = gsi_false;
+    memset(&result, 0, sizeof(result));
+    if (status == GHTTPSuccess) {
+        if (!gsXmlMoveToStart(reader) || !gsXmlMoveToNext(reader, "LoginProfileResult")) {
+            result.mLoginResult = WSLogin_ParseError;
+        } else if (!gsXmlReadChildAsInt(reader, "responseCode", (int *)&result.mResponseCode)) {
+            result.mLoginResult = WSLogin_ParseError;
+        } else if (result.mResponseCode != 0) {
+            result.mLoginResult = WSLogin_ServerError;
+        } else if (!gsXmlMoveToChild(reader, "certificate") || !Auth_ReadCertificate(certificate, reader) ||
+                   !gsXmlMoveToParent(reader) ||
+                   !gsXmlReadChildAsLargeInt(reader, "peerkeyprivate", &result.mPrivateData.mPeerPrivateKey.exponent)) {
+            result.mLoginResult = WSLogin_ParseError;
+        } else {
+            memcpy(&result.mPrivateData.mPeerPrivateKey.modulus, &certificate->mPeerPublicKey.modulus,
+                   sizeof(gsLargeInt_t));
+            MD5Init(&context);
+            gsLargeIntAddToMD5(&result.mPrivateData.mPeerPrivateKey.exponent, &context);
+            MD5Final(result.mPrivateData.mKeyHash, &context);
+            certificate->mIsValid = Auth_CheckCertificate(certificate);
+            if (!certificate->mIsValid) {
+                result.mLoginResult = WSLogin_InvalidCertificate;
+            }
+        }
+    } else {
+        result.mLoginResult = WSLogin_HttpError;
+    }
+    if (request->mUserCallback != NULL) {
+        // BUG: The profile login reports HTTP success even when the request fails
+#ifdef BUGFIX
+        request->mUserCallback(status, &result, request->mUserData);
+#else
+        request->mUserCallback(GHTTPSuccess, &result, request->mUserData);
+#endif
+    }
+    gsifree(request);
+}
+
+WSLoginValue wsLoginProfile(int partnerCode, int namespaceId, const gsi_char *profileNick, const gsi_char *email,
+                            const gsi_char *password, const gsi_char *cdkey, WSLoginCallback callback, void *userData) {
+    gsi_u8 encryptedPassword[0x80];
+    WSIRequestData *request;
+    GSXmlStreamWriter writer;
+
+    if (!Auth_PrepareUrl()) {
+        return WSLogin_NoAvailabilityCheck;
+    }
+    if (strlen(profileNick) >= 0x1f) {
+        return WSLogin_InvalidParameters;
+    }
+    if (strlen(email) >= 0x33) {
+        return WSLogin_InvalidParameters;
+    }
+    if (strlen(password) >= 0x1f) {
+        return WSLogin_InvalidParameters;
+    }
+    if (cdkey != NULL && strlen(cdkey) > 0x41) {
+        return WSLogin_InvalidParameters;
+    }
+    request = gsimalloc(sizeof(WSIRequestData));
+    if (request == NULL) {
+        return WSLogin_OutOfMemory;
+    }
+    request->mUserCallback = callback;
+    request->mUserData = userData;
+    wsiLoginEncryptPassword(password, encryptedPassword);
+    writer = gsXmlCreateStreamWriter(WS_AUTHSERVICE_NAMESPACES, 1);
+    if (writer == NULL) {
+        // BUG: The request allocation is leaked when the writer cannot be created
+#ifdef BUGFIX
+        gsifree(request);
+#endif
+        return WSLogin_OutOfMemory;
+    }
+    if (!gsXmlWriteOpenTag(writer, "ns1", "LoginProfile") || !gsXmlWriteIntElement(writer, "ns1", "version", 1) ||
+        !gsXmlWriteIntElement(writer, "ns1", "partnercode", partnerCode) ||
+        !gsXmlWriteIntElement(writer, "ns1", "namespaceid", namespaceId) ||
+        !gsXmlWriteAsciiStringElement(writer, "ns1", "email", email) ||
+        !gsXmlWriteAsciiStringElement(writer, "ns1", "profilenick", profileNick) ||
+        !gsXmlWriteOpenTag(writer, "ns1", "password") ||
+        !gsXmlWriteHexBinaryElement(writer, "ns1", "Value", encryptedPassword, sizeof(encryptedPassword)) ||
+        !gsXmlWriteCloseTag(writer, "ns1", "password") || !gsXmlWriteCloseTag(writer, "ns1", "LoginProfile") ||
+        !gsXmlCloseWriter(writer)) {
+        gsXmlFreeWriter(writer);
+        // BUG: The request allocation is leaked when serialization fails
+#ifdef BUGFIX
+        gsifree(request);
+#endif
+        return WSLogin_OutOfMemory;
+    }
+    if (gsiExecuteSoap(wsAuthServiceURL, "SOAPAction: \"http://gamespy.net/AuthService/LoginProfile\"", writer,
+                       wsiLoginProfileCallback, request) == NULL) {
+        gsXmlFreeWriter(writer);
+        gsifree(request);
+        return WSLogin_OutOfMemory;
+    }
+    return WSLogin_Success;
+}
+
+static void wsLoginUniqueCallback(GHTTPResult status, GSXmlStreamWriter unused, GSXmlStreamReader reader,
+                                  void *userData) {
+    WSIRequestData *request = userData;
+    WSLoginResponse result;
+    GSLoginCertificate *certificate = &result.mCertificate;
+    MD5_CTX context;
+
+    // As in GameSpy's login callbacks, the certificate is marked invalid before the whole result is cleared
+    certificate->mIsValid = gsi_false;
+    memset(&result, 0, sizeof(result));
+    if (status == GHTTPSuccess) {
+        if (!gsXmlMoveToStart(reader) || !gsXmlMoveToNext(reader, "LoginUniqueNickResult")) {
+            result.mLoginResult = WSLogin_ParseError;
+        } else if (!gsXmlReadChildAsInt(reader, "responseCode", (int *)&result.mResponseCode)) {
+            result.mLoginResult = WSLogin_ParseError;
+        } else if (result.mResponseCode != 0) {
+            result.mLoginResult = WSLogin_ServerError;
+        } else if (!gsXmlMoveToChild(reader, "certificate") || !Auth_ReadCertificate(certificate, reader) ||
+                   !gsXmlMoveToParent(reader) ||
+                   !gsXmlReadChildAsLargeInt(reader, "peerkeyprivate", &result.mPrivateData.mPeerPrivateKey.exponent)) {
+            result.mLoginResult = WSLogin_ParseError;
+        } else {
+            memcpy(&result.mPrivateData.mPeerPrivateKey.modulus, &certificate->mPeerPublicKey.modulus,
+                   sizeof(gsLargeInt_t));
+            MD5Init(&context);
+            gsLargeIntAddToMD5(&result.mPrivateData.mPeerPrivateKey.exponent, &context);
+            MD5Final(result.mPrivateData.mKeyHash, &context);
+            certificate->mIsValid = Auth_CheckCertificate(certificate);
+            if (!certificate->mIsValid) {
+                result.mLoginResult = WSLogin_InvalidCertificate;
+            }
+        }
+    } else if (status == GHTTPRequestCancelled) {
+        result.mLoginResult = WSLogin_Cancelled;
+    } else {
+        result.mLoginResult = WSLogin_HttpError;
+    }
+    if (request->mUserCallback != NULL) {
+        request->mUserCallback(status, &result, request->mUserData);
+    }
+    gsifree(request);
+}
+
+WSLoginValue wsLoginUnique(int partnerCode, int namespaceId, const gsi_char *uniqueNick, const gsi_char *password,
+                           const gsi_char *cdkey, WSLoginCallback callback, void *userData) {
+    gsi_u8 encryptedPassword[0x80];
+    WSIRequestData *request;
+    GSXmlStreamWriter writer;
+
+    if (!Auth_PrepareUrl()) {
+        return WSLogin_NoAvailabilityCheck;
+    }
+    if (strlen(uniqueNick) >= 0x15) {
+        return WSLogin_InvalidParameters;
+    }
+    if (strlen(password) >= 0x1f) {
+        return WSLogin_InvalidParameters;
+    }
+    if (cdkey != NULL && strlen(cdkey) >= 0x41) {
+        return WSLogin_InvalidParameters;
+    }
+    request = gsimalloc(sizeof(WSIRequestData));
+    if (request == NULL) {
+        return WSLogin_OutOfMemory;
+    }
+    request->mUserCallback = callback;
+    request->mUserData = userData;
+    wsiLoginEncryptPassword(password, encryptedPassword);
+    writer = gsXmlCreateStreamWriter(WS_AUTHSERVICE_NAMESPACES, 1);
+    if (writer == NULL) {
+        // BUG: The request allocation is leaked when the writer cannot be created
+#ifdef BUGFIX
+        gsifree(request);
+#endif
+        return WSLogin_OutOfMemory;
+    }
+    if (!gsXmlWriteOpenTag(writer, "ns1", "LoginUniqueNick") || !gsXmlWriteIntElement(writer, "ns1", "version", 1) ||
+        !gsXmlWriteIntElement(writer, "ns1", "partnercode", partnerCode) ||
+        !gsXmlWriteIntElement(writer, "ns1", "namespaceid", namespaceId) ||
+        !gsXmlWriteAsciiStringElement(writer, "ns1", "uniquenick", uniqueNick) ||
+        !gsXmlWriteOpenTag(writer, "ns1", "password") ||
+        !gsXmlWriteHexBinaryElement(writer, "ns1", "Value", encryptedPassword, sizeof(encryptedPassword)) ||
+        !gsXmlWriteCloseTag(writer, "ns1", "password") || !gsXmlWriteCloseTag(writer, "ns1", "LoginUniqueNick") ||
+        !gsXmlCloseWriter(writer)) {
+        gsXmlFreeWriter(writer);
+        // BUG: The request allocation is leaked when serialization fails
+#ifdef BUGFIX
+        gsifree(request);
+#endif
+        return WSLogin_OutOfMemory;
+    }
+    if (gsiExecuteSoap(wsAuthServiceURL, "SOAPAction: \"http://gamespy.net/AuthService/LoginUniqueNick\"", writer,
+                       wsLoginUniqueCallback, request) == NULL) {
+        gsXmlFreeWriter(writer);
+        gsifree(request);
+        return WSLogin_OutOfMemory;
+    }
+    return WSLogin_Success;
 }
 
 static void Auth_OnResponse(GHTTPResult status, GSXmlStreamWriter unused, GSXmlStreamReader reader, void *userData) {
@@ -133,6 +356,14 @@ gsi_u32 wsLoginRemoteAuth(int partnerCode, int namespaceId, const gsi_char *auth
         return WSLogin_OutOfMemory;
     }
     return 0;
+}
+
+static void wsiLoginEncryptPassword(const gsi_char *password, gsi_u8 ciphertext[0x80]) {
+    gsCryptRSAKey key;
+
+    gsLargeIntSetFromHexString(&key.modulus, WS_AUTHSERVICE_SIGNATURE_KEY);
+    gsLargeIntSetFromHexString(&key.exponent, sPublicKeyExponent);
+    gsCryptRSAEncryptBuffer(&key, (const unsigned char *)password, strlen(password), ciphertext);
 }
 
 static gsi_u32 Auth_ToWire(gsi_u32 value) {

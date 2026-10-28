@@ -430,16 +430,23 @@ static const NetCommand sNetCommands[] = {
     [WBM_NET_CMD_PERSON - WBM_NET_CMD_INFO] = { WifiBattleMatchNet_OnPersonReceived, WifiBattleMatchNet_GetRecvBuffer },
 };
 
-static char sVer[] = "ver";
-static char sDis[] = "dis";
-static const char *sWifiCupPartyTable = "WIFICUP_POKEMON_PARTY";
+// The tables are declared, and their names listed, in the order that lays them out as the ROM's .data has them: MWCC
+// sorts a file's data objects and string literals by size, so the order of the definitions and of an initializer's
+// literals decides where each goes. The designators keep every name in its own place in its table, so the tables still
+// say what they said; "ver" and "dis" are literals of the last one, where two `char[]` statics would grow the shared
+// section by their eight bytes
 static const char *sLastLoginTable = "LAST_LOGIN_DATETIME";
 static const char *sRecordIdTable = "recordid";
 static const char *sRecordDataTables[6] = {
-    "RECORD_DATA_01", "RECORD_DATA_02", "RECORD_DATA_03", "RECORD_DATA_04", "RECORD_DATA_05", "RECORD_DATA_06",
+    [3] = "RECORD_DATA_04", [2] = "RECORD_DATA_03", [4] = "RECORD_DATA_05",
+    [5] = "RECORD_DATA_06", [0] = "RECORD_DATA_01", [1] = "RECORD_DATA_02",
 };
+static const char *sWifiCupPartyTable = "WIFICUP_POKEMON_PARTY";
 // The names of the matching keys, by the number the work gives them
-static const char *sMatchKeyNames[WBM_MATCH_KEY_MAX] = { "mod", "rul", "deb", "rat", "cup", sDis, "cnt", sVer };
+static const char *sMatchKeyNames[WBM_MATCH_KEY_MAX] = {
+    [WBM_MATCH_KEY_CUP] = "cup", [WBM_MATCH_KEY_MOD] = "mod", [WBM_MATCH_KEY_DEB] = "deb", [WBM_MATCH_KEY_DIS] = "dis",
+    [WBM_MATCH_KEY_VER] = "ver", [WBM_MATCH_KEY_RUL] = "rul", [WBM_MATCH_KEY_RAT] = "rat", [WBM_MATCH_KEY_CNT] = "cnt",
+};
 
 static WifiBattleMatchNetDownload sDownload;
 

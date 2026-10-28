@@ -29,6 +29,7 @@ lib/dwcutil/src/aosslink.c:
     .bss        start:0x021c2940 end:0x021c2aa0
 
 lib/dwcutil/src/atermset.c:
+    complete
     .text       start:0x021a7858 end:0x021ab040
     .rodata     start:0x021bd2e8 end:0x021bfb18
     .data       start:0x021c0678 end:0x021c0740
@@ -59,6 +60,7 @@ lib/dwcutil/src/dwc_mov_mbp.c:
     .bss        start:0x021c417c end:0x021c4180
 
 lib/dwcutil/src/dwc_mov_wh.c:
+    complete
     .text       start:0x021b9bbc end:0x021ba768
     .data       start:0x021c1770 end:0x021c1ad8
     .bss        start:0x021c4180 end:0x021c4188
@@ -88,6 +90,7 @@ lib/dwcutilui/src/cellinfo.c:
 lib/dwcutilui/src/foundation.c:
     complete
     .text       start:0x021bc1a8 end:0x021bc1dc
+    .rodata     start:0x021c059c end:0x021c05a4
 
 lib/dwcutilui/src/heap.c:
     complete
@@ -438,6 +441,7 @@ lib/dwcutilui/src/step.c:
     .bss        start:0x021c416c end:0x021c4174
 
 lib/dwcutilui/src/usbap.c:
+    complete
     .text       start:0x021b8834 end:0x021b8cf0
     .rodata     start:0x021c0468 end:0x021c04bc
     .bss        start:0x021c4174 end:0x021c4178

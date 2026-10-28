@@ -43,30 +43,7 @@ enum {
     WIH_ERRCODE_NOMORE_CHANNEL = 0x18,
 };
 
-// The state names, one per state before WIH_STATE_FATAL, which the state change passes to the work's log
-extern const char *const stateNames[];
-
-// The messages the helper logs, one for each call site. Their text is the file's own delinked .data, which the file
-// does not write yet, so they are declared here until it does. The names are ours
-extern const char data_ov182_021c18d4[]; // the state it moves from
-extern const char data_ov182_021c18dc[]; // the state it moves to
-extern const char data_ov182_021c18e0[]; // a child that connected
-extern const char data_ov182_021c190c[]; // a child that disconnected
-extern const char data_ov182_021c1938[]; // a state code that is not known
-extern const char data_ov182_021c1958[]; // key sharing would not start
-extern const char data_ov182_021c1988[]; // the end of the parent mode failed
-extern const char data_ov182_021c19b0[]; // the receive buffer size
-extern const char data_ov182_021c19c8[]; // the send buffer size
-extern const char data_ov182_021c19e0[]; // how busy the measured channel was
-extern const char data_ov182_021c19f8[]; // the channel that was chosen
-extern const char data_ov182_021c1a10[]; // the connect mode that is not a parent one
-extern const char data_ov182_021c1a2c[]; // the data sharing had nothing to send
-extern const char data_ov182_021c1a5c[]; // the data sharing failed
-extern const char data_ov182_021c1a90[]; // the finalize found the helper idle
-extern const char data_ov182_021c1ab4[]; // the finalize ends what the helper is doing
-
-// What the helper prints its state changes and its failures through, which it takes from the first word of the work
-// pointer. Nothing in this build sets it
+// What the helper prints its state changes and its failures through. Nothing in this build sets it
 typedef void (*WHLogPrint)(u32 level, const char *format, ...);
 // What the scan calls with each child that connects, to say whether it may stay
 typedef BOOL (*WHScanFilter)(WMStartParentCallback *info);
@@ -120,14 +97,6 @@ typedef struct {
     WMKeySetBuf keySharing;
 } WHWork;
 
-// The helper's work, and what it prints through, which the file's functions reach the helper's work through
-typedef struct {
-    WHLogPrint logPrint;
-    WHWork *work;
-} WHWorkPointer;
-
-extern WHWorkPointer gWork;
-
 // What the file that follows this one in the overlay calls
 void DWCi_MOV_WH_SetGgid(u32 ggid);
 u16 DWCi_MOV_WH_GetBitmap(void);
@@ -141,5 +110,8 @@ BOOL DWCi_MOV_WH_StepDS(u8 *data);
 void DWCi_MOV_WH_Reset(void);
 void DWCi_MOV_WH_Finalize(void);
 BOOL DWCi_MOV_WH_End(void);
+
+// The child's connection, which nothing in the game calls (see dwc_mov_wh.c)
+void DWCi_MOV_WH_ChildConnect(void);
 
 #endif // POKEBW2_DWCUTIL_DWC_MOV_WH_H

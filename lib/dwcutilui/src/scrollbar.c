@@ -153,7 +153,7 @@ static void moveBar(void) {
     int pos;
     int max;
 
-    if (DWCi_TPlCheck(gDWCUtilTouchScreenRect)) {
+    if (DWCi_TPlCheck(DWCi_R_SCR)) {
         DWCi_TPlGet(point);
         if (point[0] >= sScrollbar->origin[0] - 30) {
             pos = sScrollbar->grabPos + (point[1] - sScrollbar->grabPoint[1]);
