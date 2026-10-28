@@ -11433,6 +11433,7 @@ overlays/ov036 0x021ad4d0 ShopUI_PrintPrice
 overlays/ov036 0x021ad560 ShopUI_PrintTMPrice
 overlays/ov036 0x021ad64c ShopUI_CursorCallback
 overlays/ov036 0x021ad6cc ShopUI_FreeMenuList
+overlays/ov036 0x021ad6e0 ShopUI_PrintStreamCallback
 overlays/ov036 0x021ad848 ShopUI_DrawMessageFrame
 overlays/ov036 0x021ad864 ShopUI_PrintMessageInFrame
 overlays/ov036 0x021ad8e8 ShopUI_PrintItemBuyMessage
