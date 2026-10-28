@@ -1371,6 +1371,14 @@ static BOOL CanMoveOnRail(FieldPlayer *player, FieldInteractWk *wk) {
     return FALSE;
 }
 
+// The steps of the surf exit: face the shore, jump to it, land and change back, and let the actors move again
+enum {
+    SURF_EXIT_FACE,
+    SURF_EXIT_JUMP,
+    SURF_EXIT_LAND,
+    SURF_EXIT_END,
+};
+
 static GameEventReturnCode EventSurfExit_Callback(GameEvent *event, u32 *state, void *data) {
     SurfExitWork *work = data;
     FieldPlayer *player = Field_GetPlayer(work->field);
@@ -1380,12 +1388,12 @@ static GameEventReturnCode EventSurfExit_Callback(GameEvent *event, u32 *state, 
     FieldPlayer_GetExState(player);
     actor = FieldPlayer_GetActor(player);
     switch (*state) {
-    case 0:
+    case SURF_EXIT_FACE:
         DisableAllActorsMovement(GetActorMModelSystem(actor));
         CheckSetActorFaceDir(actor, work->dir);
         (*state)++;
         break;
-    case 1: {
+    case SURF_EXIT_JUMP: {
         u16 acmd;
 
         FldeffSurfPokemon_SetFollowMode(FieldPlayer_GetRideEffect(player), 0);
@@ -1399,13 +1407,13 @@ static GameEventReturnCode EventSurfExit_Callback(GameEvent *event, u32 *state, 
         (*state)++;
         break;
     }
-    case 2:
+    case SURF_EXIT_LAND:
         if (FldAct_CheckAcmdEnd(actor) == TRUE) {
             FieldPlayer_ChangeToNormalForm(player);
             (*state)++;
         }
         break;
-    case 3:
+    case SURF_EXIT_END:
         EnableAllActorsMovement(GetActorMModelSystem(actor));
         FieldPlayer_SetGridHopLanded(player);
         return GAMEEVENT_DONE;
