@@ -76,6 +76,12 @@ enum {
     FOOTMARK_KIND_MAX,
 };
 void Footmark_SetActor(FieldActor *actor, FieldEffects *effects, u32 kind);
+// fldeff_reflect.c: an actor's reflection, by kind: in water, whose width swings, and in a mirror floor or ice, which
+// stays still
+enum {
+    REFLECT_KIND_WATER = 1,
+    REFLECT_KIND_MIRROR,
+};
 void ReflectTask_SetActor(MMSys *system, FieldActor *actor, FieldEffects *effects, u32 kind);
 void FldeffRipple_Start(FieldEffects *effects, FieldActor *actor, u32 arg2, u32 arg3);
 void FldeffSplash_AddModel(FieldEffects *effects, FieldActor *actor);
