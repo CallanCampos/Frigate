@@ -61,7 +61,7 @@ void GrassTask_Start(FieldEffects *effects, FieldActor *actor, BOOL animate, int
 void Footmark_SetMMdl(FieldActor *actor, FieldEffects *effects, u32 kind);
 void ReflectTask_SetMMdl(MMSys *system, FieldActor *actor, FieldEffects *effects, u32 kind);
 void FldeffRipple_Start(FieldEffects *effects, FieldActor *actor, u32 arg2, u32 arg3);
-void func_ov036_021bea3c(FieldEffects *effects, FieldActor *actor);
+void FldeffSplash_AddModel(FieldEffects *effects, FieldActor *actor);
 void func_ov036_021c289c(FieldActor *actor, FieldEffects *effects);
 void func_ov036_021c94e0(FieldEffects *effects, FieldActor *actor);
 
@@ -181,8 +181,8 @@ u16 HideTask_IsFinished(FieldEffectTask *task);
 void FldeffBubble_Start(FieldActor *actor, FieldEffects *effects);
 void *FldeffBubble_CreateRes(FieldEffects *effects, HeapID heapId);
 void func_ov036_021c6990(FieldEffects *effects, void *data);
-void *func_ov036_021be988(FieldEffects *effects, HeapID heapId);
-void func_ov036_021be9ac(FieldEffects *effects, void *data);
+void *FldeffSplash_CreateModelRes(FieldEffects *effects, HeapID heapId);
+void FldeffSplash_DeleteModelRes(FieldEffects *effects, void *data);
 void *func_ov036_021c944c(FieldEffects *effects, HeapID heapId);
 void func_ov036_021c9470(FieldEffects *effects, void *data);
 void *FldeffFesKira_Create(FieldEffects *effects, HeapID heapId);

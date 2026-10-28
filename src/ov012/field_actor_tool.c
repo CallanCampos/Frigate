@@ -347,7 +347,7 @@ void ActorTerrainEffect_FallenLeaves(FieldActor *actor, ActorTerrainEffectParam 
 void ActorTerrainEffect_Splash(FieldActor *actor, ActorTerrainEffectParam *param) {
     if (MapTile_IsSplashWater(param->tileClass) == TRUE) {
         if (FldAct_IsSplashed(actor) == FALSE) {
-            func_ov036_021bea3c(param->effects, actor);
+            FldeffSplash_AddModel(param->effects, actor);
             FldAct_SetSplashed(actor, TRUE);
         }
     } else {
@@ -358,7 +358,7 @@ void ActorTerrainEffect_Splash(FieldActor *actor, ActorTerrainEffectParam *param
 void ActorTerrainEffect_SplashOrSwamp(FieldActor *actor, ActorTerrainEffectParam *param) {
     if (MapTile_IsSplashWater(param->tileClass) == TRUE) {
         if (FldAct_IsSplashed(actor) == FALSE) {
-            func_ov036_021bea3c(param->effects, actor);
+            FldeffSplash_AddModel(param->effects, actor);
             FldAct_SetSplashed(actor, TRUE);
         }
     } else if (MapTile_IsSwamp(param->tileClass) == TRUE) {

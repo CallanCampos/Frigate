@@ -11923,8 +11923,13 @@ overlays/ov036 0x021be8b0 RippleTask_Init
 overlays/ov036 0x021be948 RippleTask_Free
 overlays/ov036 0x021be964 RippleTask_Update
 overlays/ov036 0x021be984 RippleTask_Draw
+overlays/ov036 0x021be988 FldeffSplash_CreateModelRes
+overlays/ov036 0x021be9ac FldeffSplash_DeleteModelRes
+overlays/ov036 0x021be9c0 FldeffSplash_LoadModel
 overlays/ov036 0x021bea20 FldeffSplash_UnloadModel
+overlays/ov036 0x021bea3c FldeffSplash_AddModel
 overlays/ov036 0x021bea68 FldeffSplash_InitModelObj
+overlays/ov036 0x021beaac FldeffSplash_ExitModelObj
 overlays/ov036 0x021beab0 FldeffSplash_UpdateModelObj
 overlays/ov036 0x021beb38 FldeffSplash_DrawModelObj
 overlays/ov036 0x021bf004 ShortcutMenu_Delete
