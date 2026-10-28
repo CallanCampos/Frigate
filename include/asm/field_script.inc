@@ -2163,7 +2163,7 @@
     .2byte \a1
     .endm
 
-    // func_ov036_021ab1a8
+    // s017C_RollerCoasterCallSwitch
     .macro Cmd_017C a0
     FieldCommand 380
     .2byte \a0
@@ -2175,12 +2175,12 @@
     .2byte \a0
     .endm
 
-    // func_ov036_021aaf78
+    // s0186_DriftveilGymPrepareFreight
     .macro Cmd_0186
     FieldCommand 390
     .endm
 
-    // func_ov036_021aaf88
+    // s0187_DriftveilLiftPlaceAtBottom
     .macro Cmd_0187 a0
     FieldCommand 391
     .2byte \a0
@@ -2193,31 +2193,31 @@
     .2byte \a1
     .endm
 
-    // func_ov036_021aaec8
+    // s018D_DriftveilGymCallFreight
     .macro Cmd_018D a0
     FieldCommand 397
     .2byte \a0
     .endm
 
-    // func_ov036_021aaf1c
+    // s018E_DriftveilLiftCallMove
     .macro Cmd_018E a0
     FieldCommand 398
     .2byte \a0
     .endm
 
-    // func_ov036_021ab004
+    // s018F_IcirrusGymCallSwitchAnim
     .macro Cmd_018F a0
     FieldCommand 399
     .2byte \a0
     .endm
 
-    // func_ov036_021ab03c
+    // s0190_IcirrusGymCallFlipSwitch
     .macro Cmd_0190 a0
     FieldCommand 400
     .2byte \a0
     .endm
 
-    // func_ov036_021ab074
+    // s0191_IcirrusGymToggleMovementAtPlace
     .macro Cmd_0191 a0
     FieldCommand 401
     .2byte \a0
@@ -3185,7 +3185,7 @@
     FieldCommand 588
     .endm
 
-    // func_ov036_021ab208
+    // s024D_RollerCoasterAmbienceStart
     .macro Cmd_024D
     FieldCommand 589
     .endm
@@ -3237,12 +3237,12 @@
     .2byte \a0
     .endm
 
-    // func_ov036_021aad44
+    // s025B_GymElecReapplyProgress
     .macro Cmd_025B
     FieldCommand 603
     .endm
 
-    // func_ov036_021aad58
+    // s025C_GymElecSetFollower
     .macro Cmd_025C a0, a1, a2
     FieldCommand 604
     .2byte \a0
@@ -3250,13 +3250,13 @@
     .2byte \a2
     .endm
 
-    // func_ov036_021aad90
+    // s025D_GymElecSetProgress
     .macro Cmd_025D a0
     FieldCommand 605
     .2byte \a0
     .endm
 
-    // func_ov036_021aadc8
+    // s025F_GymElecSetStage
     .macro Cmd_025F a0
     FieldCommand 607
     .2byte \a0
@@ -3293,13 +3293,13 @@
     FieldCommand 615
     .endm
 
-    // func_ov036_021aae48
+    // s0268_GymInsectPlayObject
     .macro Cmd_0268 a0
     FieldCommand 616
     .2byte \a0
     .endm
 
-    // func_ov036_021aae74
+    // s0269_GymInsectShowEffect
     .macro Cmd_0269
     FieldCommand 617
     .endm
@@ -3434,7 +3434,7 @@
     FieldCommand 651
     .endm
 
-    // func_ov036_021aafa8
+    // s028E_MistraltonGymFireCannon
     .macro Cmd_028E a0
     FieldCommand 654
     .2byte \a0
@@ -3451,13 +3451,13 @@
     .byte \a0
     .endm
 
-    // func_ov036_021ab134
+    // s0291_VirbankGymStopModelAnimations
     .macro Cmd_0291 a0
     FieldCommand 657
     .2byte \a0
     .endm
 
-    // func_ov036_021ab158
+    // s0292_VirbankGymSetActorFlag
     .macro Cmd_0292 a0
     FieldCommand 658
     .2byte \a0
@@ -3536,12 +3536,12 @@
     .2byte \a0
     .endm
 
-    // func_ov036_021ab178
+    // s02A2_HumilauGymPlayLeaderSplash
     .macro Cmd_02A2
     FieldCommand 674
     .endm
 
-    // func_ov036_021ab190
+    // s02A3_HumilauGymPlayLeaderWaves
     .macro Cmd_02A3
     FieldCommand 675
     .endm
@@ -3551,29 +3551,29 @@
     FieldCommand 676
     .endm
 
-    // func_ov036_021ab094
+    // s02A5_OpelucidGymCallMove
     .macro Cmd_02A5 a0
     FieldCommand 677
     .2byte \a0
     .endm
 
-    // func_ov036_021ab104
+    // s02A6_OpelucidGymRefreshVars
     .macro Cmd_02A6
     FieldCommand 678
     .endm
 
-    // func_ov036_021ab0cc
+    // s02A7_OpelucidGymCallButton
     .macro Cmd_02A7 a0
     FieldCommand 679
     .2byte \a0
     .endm
 
-    // func_ov036_021ab114
+    // s02A8_OpelucidGymFreeHeap
     .macro Cmd_02A8
     FieldCommand 680
     .endm
 
-    // func_ov036_021ab124
+    // s02A9_OpelucidGymCreateHeap
     .macro Cmd_02A9
     FieldCommand 681
     .endm
