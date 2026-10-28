@@ -291,7 +291,7 @@ static void BmpMenuListSetup_Init(BmpMenuListHeader *header, const ListMenuReque
 static const ListMenuRequest sYesNoMenuRequest;
 
 static MsgStream *MsgBGPrinter_CreateMsgStreamColor(FieldMsgBG *sys, StrBuf *strbuf, BmpWin *window, u16 x, u16 y,
-                                                    u32 wait, u16 a6);
+                                                    u32 wait, u16 backgroundColor);
 static BOOL MsgBGPrinter_MsgStreamCallback(u32 event);
 static MsgStream *MsgBGPrinter_CreateMsgStream(FieldMsgBG *sys, StrBuf *strbuf, BmpWin *window, u16 x, u16 y, u32 wait);
 static void MsgStream_Free(MsgStream *stream);
@@ -914,13 +914,13 @@ u32 MsgBGPrinter_YesNoMenuMain(ListMenuUI *menu) {
 }
 
 static MsgStream *MsgBGPrinter_CreateMsgStreamColor(FieldMsgBG *sys, StrBuf *strbuf, BmpWin *window, u16 x, u16 y,
-                                                    u32 wait, u16 a6) {
+                                                    u32 wait, u16 backgroundColor) {
     MsgStream *stream = GFL_HeapAllocate(sys->heapId, sizeof(MsgStream), TRUE, "field_msgbg.c", 2179);
 
     stream->sys = sys;
     stream->wait = wait;
     stream->stream = PrintStream_CreateWithCallback(window, x, y, strbuf, sys->font, wait, sys->tcbMgr, 0, sys->heapId,
-                                                    a6, MsgBGPrinter_MsgStreamCallback);
+                                                    backgroundColor, MsgBGPrinter_MsgStreamCallback);
     MsgBGInput_Reset(&stream->sys->input);
     return stream;
 }
