@@ -250,11 +250,12 @@ BOOL Scrcmd_PokemonMisc_PokeDexGetEvaluationParams(VM *vm, FieldScriptEnv *env) 
     u16 mode = ScriptReadAny(vm, env);
     u16 *message = ScriptReadVar(vm, env);
     u16 *count = ScriptReadVar(vm, env);
-    u16 *unk = ScriptReadVar(vm, env);
+    // The jingle of the evaluation, one of SEQ_ME_HYOUKA1 to 6
+    u16 *jingle = ScriptReadVar(vm, env);
     HeapID heapId = FieldScriptEnv_GetHeapID(env);
     PokeDexSave *pokedex = GameData_GetPokedex(FieldScriptEnv_GetGameData(env));
 
-    PokeDex_GetEvaluationParams(pokedex, mode, heapId, message, count, unk);
+    PokeDex_GetEvaluationParams(pokedex, mode, heapId, message, count, jingle);
     return FALSE;
 }
 
