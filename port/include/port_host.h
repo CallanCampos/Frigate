@@ -12,6 +12,18 @@
 #include <stddef.h>
 #include <string.h>
 
+// A 64-bit value in a struct keeps the DS's 4-byte alignment, which include/types.h's PORT_DS_ALIGN_64 gives u64, s64
+// and f64, so that save blocks and files keep the DS's offsets. MinGW's default MSVC layout ignores it inside structs
+// and puts a u64 after a u32 at offset 8: port/CMakeLists.txt builds with -mno-ms-bitfields on Windows, and this stops
+// a build without it
+typedef unsigned long long PortHostDsU64 __attribute__((aligned(4)));
+struct PortHostDsLayout {
+    unsigned int before;
+    PortHostDsU64 value;
+};
+_Static_assert(offsetof(struct PortHostDsLayout, value) == 4 && sizeof(struct PortHostDsLayout) == 12,
+               "a 64-bit value in a struct must keep the DS's 4-byte alignment (on Windows: -mno-ms-bitfields)");
+
 // MSL strings contain 16-bit DS code units. Keep their operations away from the host libc (32-bit wchar_t on
 // macOS/Linux); port/hal/stubs/wstring_host.c compiles the original MSL implementation with these private names.
 #define wcslen port_msl_wcslen

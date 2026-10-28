@@ -32,11 +32,41 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
 
+## 2026-10-28: integrate the reviewed Windows layout fix into AI sequencing
+
+- **Upstream:** reviewed main `3ea5609ea3` contains `fd3b9e600d`. PR 56 merged normally after exact owner approval
+  5685158902, successful owner status 57484486904 and all 14 checks. The independent `29b9dcfef9` naming proposal
+  remains local and is not imported into this feature. Main's post-merge CI follows separately.
+- **Port:** `PORT_SHA`, a real merge of that reviewed main into PR 57's `68f1aa7c2b`; no force/rebase or bypass.
+  The three AI locals and test-selector source remain unchanged. The Windows README records the known limitation
+  that old incorrect-layout saves need separately validated conversion; backups must be preserved.
+- **ROM (T0):** fresh configure/Ninja after integration passes both original ROM hashes with zero warnings. The
+  production AI source still hashes to `cadac9bddeb7cbbc089969d08c6d79d7d06d833e055c32473cec116c8a7c66ff`.
+- **Host build/tests (T1/T2):** prior exact-head `68f1aa7c2b` canonical verification succeeds: B2 348 passed/28 explicit
+  skips of 376, W2 345/28 of 373, zero failures; owner status 57486646065. Pointer guard: 365 sites/229 keys, real 66,
+  harmless 123, handled 141, unreachable 35, 1,708 compiled inputs/zero missing. These are prior-head results;
+  the merged head requires fresh canonical and hosted gates before merging.
+- **Replay/oracle/sanitizers/play (T3/T4/T5/T7):** no production AI/HAL/data/clock/RNG change in this integration.
+  Prior authentic ordinary/fatal-sanitizer entry results below remain source-specific, with their actual timing
+  defect and comparison limits retained. No additional battle outcome or Spanish compatibility claim is made.
+- **Performance (T6):** existing budgets and gates remain; no input, reference, seed, mask or lag changes.
+- **Tiers/trap stubs:** no new scan; this adds no completed native feature or replacement game implementation.
+- **64-bit warnings:** the prior-head guard above passes; fresh integrated-head verification must recheck it.
+- **Work done:** keep the actual-source test isolation repair while adopting the reviewed platform layout contract:
+  Windows uses GCC-compatible member layout and every forced host header checks the 4-byte 64-bit member contract.
+  Owner probes of the real types/day-care header fail with default MinGW layout and pass with the correction;
+  macOS ARM64/Linux x86-64 compile the expected offsets unchanged. No original handoff work or saves are modified.
+- **Next:** publish this reviewed-base update, rerun exact-head local/hosted gates and merge once all pass. Complete
+  the Linux visibility contribution and upstream proposal separately, then fix general CARD CPU timing before
+  claiming faithful Terrell decisions and continuing Ranch/Hugh/Herdier.
+- **Blockers:** no human action blocks the integration. Required new-head checks remain; native feature/timing gaps
+  and issue 45's missing Spanish gameplay/save evidence are still unfinished.
+
 ## 2026-10-28: make trainer-AI regressions independent of linker retention
 
 - **Upstream:** reviewed main remains `b631907c33`, containing `fd3b9e600d`. Two newly fetched upstream naming commits
   through `29b9dcfef9` are being resolved/verified on a separate sync topic; they are not imported into this feature.
-- **Port:** `PORT_SHA`, a test/tool follow-up to PR 57 head `125435cb4f`. The three production AI sequencing fixes
+- **Port:** `68f1aa7c2b`, a test/tool follow-up to PR 57 head `125435cb4f`. The three production AI sequencing fixes
   and their source hash are unchanged; no game/HAL/header/data/clock/RNG changes are added by this follow-up.
 - **ROM (T0):** fresh configure/Ninja passes both original hashes with zero warnings: B2
   `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb`, W2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`. All production and
