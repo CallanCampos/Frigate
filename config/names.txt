@@ -11255,6 +11255,7 @@ overlays/ov036 0x021a424c GrassTask_Update
 overlays/ov036 0x021a4320 GrassTask_Draw
 overlays/ov036 0x021a4324 GrassTask_IsActorOnTile
 overlays/ov036 0x021a4384 FldeffNamipoke_Create
+overlays/ov036 0x021a43a8 FldeffNamipoke_Delete
 overlays/ov036 0x021a43bc FldeffNamipoke_LoadResources
 overlays/ov036 0x021a4458 FldeffNamipoke_FreeResources
 overlays/ov036 0x021a4484 FldeffNamipoke_Start
@@ -11263,12 +11264,14 @@ overlays/ov036 0x021a4514 FldeffNamipoke_SetWakeEnabled
 overlays/ov036 0x021a4530 FldeffNamipoke_GetWakeScale
 overlays/ov036 0x021a4550 FldeffNamipoke_GetWakeLength
 overlays/ov036 0x021a4588 FldeffNamipoke_Init
+overlays/ov036 0x021a45f8 FldeffNamipoke_Exit
 overlays/ov036 0x021a45fc FldeffNamipoke_PlaceObjects
 overlays/ov036 0x021a4710 FldeffNamipoke_UpdateGrid
 overlays/ov036 0x021a4924 FldeffNamipoke_DrawGrid
 overlays/ov036 0x021a4944 FldeffNamipoke_UpdateRail
 overlays/ov036 0x021a4bc0 FldeffNamipoke_DrawRail
 overlays/ov036 0x021a4d20 FldeffNamipokeSplash_Create
+overlays/ov036 0x021a4d48 FldeffNamipokeSplash_Delete
 overlays/ov036 0x021a4d5c FldeffNamipokeSplash_LoadResources
 overlays/ov036 0x021a4e7c FldeffNamipokeSplash_FreeResources
 overlays/ov036 0x021a4eb0 FldeffNamipokeSplash_StartOnEffect
