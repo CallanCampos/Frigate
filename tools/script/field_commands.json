@@ -3147,7 +3147,7 @@
    ]
   },
   "381": {
-   "handler": "ScrcmdFieldGimmickCartLanes_UnlockLaneFromScript",
+   "handler": "s017D_RollerCoasterSetCarIntroSeen",
    "overlay": 36,
    "args": [
     "u16"
@@ -3166,7 +3166,7 @@
    ]
   },
   "396": {
-   "handler": "ScrcmdFieldGimmickPlateDoors_StartDoorEvent",
+   "handler": "s018C_DriftveilGymCallElevator",
    "overlay": 36,
    "args": [
     "u16",

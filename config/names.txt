@@ -11526,7 +11526,7 @@ overlays/ov036 0x021aad90 s025D_GymElecSetProgress
 overlays/ov036 0x021aadc8 s025F_GymElecSetStage
 overlays/ov036 0x021aae48 s0268_GymInsectPlayObject
 overlays/ov036 0x021aae74 s0269_GymInsectShowEffect
-overlays/ov036 0x021aae88 ScrcmdFieldGimmickPlateDoors_StartDoorEvent
+overlays/ov036 0x021aae88 s018C_DriftveilGymCallElevator
 overlays/ov036 0x021aaec8 s018D_DriftveilGymCallFreight
 overlays/ov036 0x021aaf1c s018E_DriftveilLiftCallMove
 overlays/ov036 0x021aaf78 s0186_DriftveilGymPrepareFreight
@@ -11545,7 +11545,7 @@ overlays/ov036 0x021ab158 s0292_VirbankGymSetActorFlag
 overlays/ov036 0x021ab178 s02A2_HumilauGymPlayLeaderSplash
 overlays/ov036 0x021ab190 s02A3_HumilauGymPlayLeaderWaves
 overlays/ov036 0x021ab1a8 s017C_RollerCoasterCallSwitch
-overlays/ov036 0x021ab1e0 ScrcmdFieldGimmickCartLanes_UnlockLaneFromScript
+overlays/ov036 0x021ab1e0 s017D_RollerCoasterSetCarIntroSeen
 overlays/ov036 0x021ab208 s024D_RollerCoasterAmbienceStart
 overlays/ov036 0x021ab25c ScriptNative_WaitFieldFade
 overlays/ov036 0x021ab498 s02E8_CallFieldFadeOut

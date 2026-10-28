@@ -476,7 +476,7 @@ const FieldScriptCommand EVCMD_TABLE[] = {
     GimmickGateCmd_ViewBoard,                         // 0x17a
     func_ov012_02157bdc,                              // 0x17b
     s017C_RollerCoasterCallSwitch,                    // 0x17c
-    ScrcmdFieldGimmickCartLanes_UnlockLaneFromScript, // 0x17d
+    s017D_RollerCoasterSetCarIntroSeen,               // 0x17d
     NULL,                                             // 0x17e
     NULL,                                             // 0x17f
     NULL,                                             // 0x180
@@ -491,7 +491,7 @@ const FieldScriptCommand EVCMD_TABLE[] = {
     NULL,                                             // 0x189
     NULL,                                             // 0x18a
     NULL,                                             // 0x18b
-    ScrcmdFieldGimmickPlateDoors_StartDoorEvent,      // 0x18c
+    s018C_DriftveilGymCallElevator,                   // 0x18c
     s018D_DriftveilGymCallFreight,                    // 0x18d
     s018E_DriftveilLiftCallMove,                      // 0x18e
     s018F_IcirrusGymCallSwitchAnim,                   // 0x18f

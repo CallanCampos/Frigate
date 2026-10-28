@@ -2157,7 +2157,7 @@
     .2byte \a0
     .endm
 
-    .macro ScrcmdFieldGimmickCartLanes_UnlockLaneFromScript a0
+    .macro RollerCoasterSetCarIntroSeen a0
     FieldCommand 381
     .2byte \a0
     .endm
@@ -2171,7 +2171,7 @@
     .2byte \a0
     .endm
 
-    .macro ScrcmdFieldGimmickPlateDoors_StartDoorEvent a0, a1
+    .macro DriftveilGymCallElevator a0, a1
     FieldCommand 396
     .2byte \a0
     .2byte \a1
