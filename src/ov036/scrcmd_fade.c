@@ -24,6 +24,25 @@ enum {
     FIELD_FADE_IN_WHITE,
 };
 
+// FieldFadeEvent_Callback's sequence: start the fade of its mode, then wait for it
+enum {
+    FIELD_FADE_SEQ_INIT,
+    FIELD_FADE_SEQ_OUT_BLACK,
+    FIELD_FADE_SEQ_IN_BLACK,
+    FIELD_FADE_SEQ_OUT_WHITE,
+    FIELD_FADE_SEQ_IN_WHITE,
+    FIELD_FADE_SEQ_WAIT,
+};
+
+// The planes that the fades brighten and darken, every one but BG1, and all of them, which a white fade takes on the
+// sub screen
+#define FIELD_FADE_PLANES                                                                                              \
+    (GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_BG3 | GX_BLEND_PLANEMASK_OBJ |               \
+     GX_BLEND_PLANEMASK_BD)
+#define FIELD_FADE_PLANES_ALL                                                                                          \
+    (GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG1 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_BG3 |               \
+     GX_BLEND_PLANEMASK_OBJ | GX_BLEND_PLANEMASK_BD)
+
 typedef struct {
     Field *field;
     u32 mode;
@@ -207,11 +226,11 @@ static GameEventReturnCode FieldFadeEvent_Callback(GameEvent *event, u32 *state,
     u32 enabledBGs;
 
     switch (*state) {
-    case 0:
+    case FIELD_FADE_SEQ_INIT:
         resetLCD = FALSE;
         switch (fade->mode) {
         case FIELD_FADE_OUT_BLACK:
-            *state = 1;
+            *state = FIELD_FADE_SEQ_OUT_BLACK;
             break;
         case FIELD_FADE_IN_BLACK:
             if (fade->useSubscreenMasterBrightness == TRUE) {
@@ -219,10 +238,10 @@ static GameEventReturnCode FieldFadeEvent_Callback(GameEvent *event, u32 *state,
                 GXS_SetMasterBrightness(-16);
                 resetLCD = TRUE;
             }
-            *state = 2;
+            *state = FIELD_FADE_SEQ_IN_BLACK;
             break;
         case FIELD_FADE_OUT_WHITE:
-            *state = 3;
+            *state = FIELD_FADE_SEQ_OUT_WHITE;
             break;
         case FIELD_FADE_IN_WHITE:
             if (fade->useSubscreenMasterBrightness == TRUE) {
@@ -230,7 +249,7 @@ static GameEventReturnCode FieldFadeEvent_Callback(GameEvent *event, u32 *state,
                 GXS_SetMasterBrightness(16);
                 resetLCD = TRUE;
             }
-            *state = 4;
+            *state = FIELD_FADE_SEQ_IN_WHITE;
             break;
         }
         if (resetLCD == TRUE) {
@@ -240,43 +259,43 @@ static GameEventReturnCode FieldFadeEvent_Callback(GameEvent *event, u32 *state,
             FieldG2D_Prepare3DSurface(fade->field);
         }
         break;
-    case 1:
+    case FIELD_FADE_SEQ_OUT_BLACK:
         if (fade->useSubscreenMasterBrightness == TRUE) {
-            BrightnessController_StartTransition(16, -16, 0, 0x3d, BRIGHTNESS_MAIN_SCREEN);
+            BrightnessController_StartTransition(16, -16, 0, FIELD_FADE_PLANES, BRIGHTNESS_MAIN_SCREEN);
             GFL_FadeSet(FADE_ENGINE_B_BLACK, 0, 16, 1);
         } else {
-            BrightnessController_StartTransition(4, -16, 0, 0x3d, BRIGHTNESS_BOTH_SCREENS);
+            BrightnessController_StartTransition(4, -16, 0, FIELD_FADE_PLANES, BRIGHTNESS_BOTH_SCREENS);
         }
-        *state = 5;
+        *state = FIELD_FADE_SEQ_WAIT;
         break;
-    case 2:
+    case FIELD_FADE_SEQ_IN_BLACK:
         if (fade->useSubscreenMasterBrightness == TRUE) {
             GFL_FadeSet(FADE_ENGINE_A_BLACK | FADE_ENGINE_B_BLACK, 16, 0, 1);
         } else {
-            BrightnessController_StartTransition(6, 0, -16, 0x3d, BRIGHTNESS_BOTH_SCREENS);
+            BrightnessController_StartTransition(6, 0, -16, FIELD_FADE_PLANES, BRIGHTNESS_BOTH_SCREENS);
         }
-        *state = 5;
+        *state = FIELD_FADE_SEQ_WAIT;
         break;
-    case 3:
+    case FIELD_FADE_SEQ_OUT_WHITE:
         if (fade->useSubscreenMasterBrightness == TRUE) {
-            BrightnessController_StartTransition(16, 16, 0, 0x3d, BRIGHTNESS_MAIN_SCREEN);
+            BrightnessController_StartTransition(16, 16, 0, FIELD_FADE_PLANES, BRIGHTNESS_MAIN_SCREEN);
             GFL_FadeSet(FADE_ENGINE_B_WHITE, 0, 16, 1);
         } else {
-            BrightnessController_StartTransition(4, 16, 0, 0x3d, BRIGHTNESS_MAIN_SCREEN);
-            BrightnessController_StartTransition(4, 16, 0, 0x3f, BRIGHTNESS_SUB_SCREEN);
+            BrightnessController_StartTransition(4, 16, 0, FIELD_FADE_PLANES, BRIGHTNESS_MAIN_SCREEN);
+            BrightnessController_StartTransition(4, 16, 0, FIELD_FADE_PLANES_ALL, BRIGHTNESS_SUB_SCREEN);
         }
-        *state = 5;
+        *state = FIELD_FADE_SEQ_WAIT;
         break;
-    case 4:
+    case FIELD_FADE_SEQ_IN_WHITE:
         if (fade->useSubscreenMasterBrightness == TRUE) {
             GFL_FadeSet(FADE_ENGINE_A_WHITE | FADE_ENGINE_B_WHITE, 16, 0, 1);
         } else {
-            BrightnessController_StartTransition(6, 0, 16, 0x3d, BRIGHTNESS_MAIN_SCREEN);
-            BrightnessController_StartTransition(6, 0, 16, 0x3f, BRIGHTNESS_SUB_SCREEN);
+            BrightnessController_StartTransition(6, 0, 16, FIELD_FADE_PLANES, BRIGHTNESS_MAIN_SCREEN);
+            BrightnessController_StartTransition(6, 0, 16, FIELD_FADE_PLANES_ALL, BRIGHTNESS_SUB_SCREEN);
         }
-        *state = 5;
+        *state = FIELD_FADE_SEQ_WAIT;
         break;
-    case 5:
+    case FIELD_FADE_SEQ_WAIT:
         if (BrightnessController_IsTransitionComplete(BRIGHTNESS_BOTH_SCREENS) == TRUE &&
             GFL_FadeIsRunning() == FALSE) {
             if (fade->mode == FIELD_FADE_IN_BLACK || fade->mode == FIELD_FADE_IN_WHITE) {
