@@ -14,7 +14,7 @@
     ScriptEntriesEnd
 
 Script_10:
-    HollowRivalCmd_0262 0, 0
+    HollowRivalSetValue 0, 0
     VMHalt
 
 Script_1:

@@ -425,7 +425,7 @@ Script_11:
     EvCameraEnd
     FlagSet EVENT_FLAG_0x0385
     WorkSetConst EVENT_WORK_0x410d, 1
-    HollowRivalCmd_0262 1, 37
+    HollowRivalSetValue 1, 37
     FlagSet EVENT_FLAG_0x0407
     FinishAllEvents
     ActorsUnpauseAll

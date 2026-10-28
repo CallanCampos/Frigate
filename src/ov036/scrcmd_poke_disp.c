@@ -2,7 +2,8 @@
 // camera's shake. The ROM has no name for the file; scrcmd_poke_disp.c is descriptive, after its first command. It
 // is a file of its own because overlay 36's .rodata has its 8-byte actor setup after the 62-byte answer list of
 // scrcmd_pep_quiz.c, which one file's size sort can't give. Names from swan
-// (https://github.com/ds-pokemon-hacking/swan, GPL-3.0)
+// (https://github.com/ds-pokemon-hacking/swan, GPL-3.0), except s022A_HollowRivalGenMsgID and
+// s02C5_JoinAvenueRecordActivity, which are ours
 #include "types.h"
 #include "constants/arc.h"
 #include "constants/pokemon.h"
@@ -201,12 +202,12 @@ BOOL s0228_RecordGet(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL func_ov036_021c783c(VM *vm, FieldScriptEnv *env) {
+BOOL s02C5_JoinAvenueRecordActivity(VM *vm, FieldScriptEnv *env) {
     JoinAvenue_RecordActivity(VM_Read16(vm));
     return FALSE;
 }
 
-BOOL func_ov036_021c784c(VM *vm, FieldScriptEnv *env) {
+BOOL s022A_HollowRivalGenMsgID(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameData *gameData = GSYS_GetGameData(FieldScriptEnv_GetGameSystem(env));
     PlayerInfo *playerInfo = GetGameDataPlayerInfo(gameData);

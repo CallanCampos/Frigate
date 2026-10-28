@@ -65,7 +65,7 @@ L_00E1:
 
 L_00E3:
     SEPlay SEQ_SE_MESSAGE
-    Cmd_0230 0x8020, 0
+    MsgPlaceSignFont4 0x8020, 0
     VMStackPush EVENT_WORK_0x418f
     VMStackPushConst 2
     VMStackCmp CMP_GE
@@ -253,7 +253,7 @@ Script_19:
 L_030B:
     SEPlay SEQ_SE_MESSAGE
     // "HOJLFWBSCOPPH[f000]븁\u0000"
-    Cmd_0230 AbyssalRuins5_Text_Hojlfwbscopph, 0
+    MsgPlaceSignFont4 AbyssalRuins5_Text_Hojlfwbscopph, 0
     VMStackPush EVENT_WORK_0x418f
     VMStackPushConst 2
     VMStackCmp CMP_GE
@@ -277,7 +277,7 @@ L_0338:
     VMJumpIf CMP_STACK, L_03B2
     SEPlay SEQ_SE_MESSAGE
     // "HOJLFWBSCOPPH[f000]븁\u0000"
-    Cmd_0230 AbyssalRuins5_Text_Hojlfwbscopph, 0
+    MsgPlaceSignFont4 AbyssalRuins5_Text_Hojlfwbscopph, 0
     VMStackPush EVENT_WORK_0x418f
     VMStackPushConst 2
     VMStackCmp CMP_GE
@@ -304,7 +304,7 @@ L_0370:
 L_03B2:
     SEPlay SEQ_SE_MESSAGE
     // "UTPMTUFHHOJLPO"
-    Cmd_0230 AbyssalRuins5_Text_Utpmtufhhojlpo, 0
+    MsgPlaceSignFont4 AbyssalRuins5_Text_Utpmtufhhojlpo, 0
     VMStackPush EVENT_WORK_0x418f
     VMStackPushConst 2
     VMStackCmp CMP_GE

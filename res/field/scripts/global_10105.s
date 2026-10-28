@@ -472,12 +472,12 @@ L_06DB:
 L_06F5:
     WorkSetConst 0x8033, 0
     WorkSetConst 0x8034, 0
-    Plugin13_Cmd1005 0, 0x8033
+    PokemonCenterCmd_GetMatchState 0, 0x8033
     VMStackPush 0x8033
     VMStackPushConst 1
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_0753
-    Plugin13_Cmd1005 2, 0x8033
+    PokemonCenterCmd_GetMatchState 2, 0x8033
     VMStackPush 0x8033
     VMStackPushConst 0
     VMStackCmp CMP_EQ
@@ -489,7 +489,7 @@ L_06F5:
     VMJump L_0753
 
 L_074D:
-    Plugin13_Cmd1008 5, 0x8033
+    PokemonCenterCmd_SetMatchState 5, 0x8033
 
 L_0753:
     VMCall L_0026
@@ -569,7 +569,7 @@ L_08AD:
     WorkSetConst 0x8038, 0
     WorkSetConst 0x8039, 0
     ActorMsgClose
-    Cmd_01B0 0x802a, 0x8037
+    Regulation_CheckPartyRegulation 0x802a, 0x8037
     VMStackPush 0x8037
     VMStackPushConst 2
     VMStackCmp CMP_EQ
@@ -592,13 +592,13 @@ L_08E8:
 
 L_0915:
     WorkGet 0x802b, 0x8037
-    Plugin13_Cmd1006
-    Plugin13_Cmd1008 4, 1
+    PokemonCenterCmd_SetMatchInProgress
+    PokemonCenterCmd_SetMatchState 4, 1
     RTGetZoneID 0x8039
     FieldSetNextZone 0x8039, 1, 10, 65535, 1
     FlagSet EVENT_FLAG_CONTINUE_SCRIPT
     WorkSetConst EVENT_WORK_CONTINUE_SCRIPT, 1
-    Cmd_02ED 0, 0
+    SetSoftResetBlocked 0, 0
     VMStackPush 0x8000
     VMStackPush 0x8001
     VMStackPush 0x8002
@@ -621,8 +621,8 @@ L_0915:
     PokemonCenterCmd_ClearMatchInProgress
     FlagReset EVENT_FLAG_CONTINUE_SCRIPT
     WorkSetConst EVENT_WORK_CONTINUE_SCRIPT, 0
-    Plugin13_Cmd1008 4, 0
-    Cmd_02ED 1, 0
+    PokemonCenterCmd_SetMatchState 4, 0
+    SetSoftResetBlocked 1, 0
     VMReturn
 
 L_09B0:
@@ -638,8 +638,8 @@ L_09B0:
     PokemonCenterCmd_ClearMatchInProgress
     FlagReset EVENT_FLAG_CONTINUE_SCRIPT
     WorkSetConst EVENT_WORK_CONTINUE_SCRIPT, 0
-    Plugin13_Cmd1008 4, 0
-    Cmd_02ED 1, 0
+    PokemonCenterCmd_SetMatchState 4, 0
+    SetSoftResetBlocked 1, 0
     VMReturn
     VMJump L_0A2E
 
@@ -652,8 +652,8 @@ L_09FB:
     PokemonCenterCmd_ClearMatchInProgress
     FlagReset EVENT_FLAG_CONTINUE_SCRIPT
     WorkSetConst EVENT_WORK_CONTINUE_SCRIPT, 0
-    Plugin13_Cmd1008 4, 0
-    Cmd_02ED 1, 0
+    PokemonCenterCmd_SetMatchState 4, 0
+    SetSoftResetBlocked 1, 0
     VMReturn
 
 L_0A2E:
@@ -1040,7 +1040,7 @@ L_0FF8:
     VMReturn
 
 L_1013:
-    Cmd_02C5 17
+    JoinAvenueRecordActivity 17
     FunfestBGMReturn
     PokePartyRecoverAll
     VMCall L_1656
@@ -1279,7 +1279,7 @@ L_139F:
     VMReturn
 
 L_13BA:
-    Cmd_02C5 18
+    JoinAvenueRecordActivity 18
     FunfestBGMReturn
     PokePartyRecoverAll
     VMCall L_1656

@@ -164,7 +164,7 @@ Movement_0230:
 Script_6:
     ActorsPauseAll
     FlagSet EVENT_FLAG_0x0a51
-    Cmd_02C5 27
+    JoinAvenueRecordActivity 27
     ActorNew 15, 26, 0, 251, 249, 0
     ActorWalkRoute 251, 14, 14, 1, 8, 1
     VMSleep 10

@@ -278,8 +278,8 @@ Script_2:
     FlagReset EVENT_FLAG_0x033f
     FlagReset EVENT_FLAG_0x033d
     WorkSetConst EVENT_WORK_0x40f0, 1
-    HollowRivalCmd_0262 1, 15
-    HollowRivalCmd_0262 2, 3
+    HollowRivalSetValue 1, 15
+    HollowRivalSetValue 2, 3
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt
@@ -357,8 +357,8 @@ Script_3:
     WorkSetConst EVENT_WORK_0x40c9, 1
     WorkSetConst EVENT_WORK_0x40ca, 1
     FlagSet EVENT_FLAG_0x03c2
-    HollowRivalCmd_0262 2, 5
-    HollowRivalCmd_0262 1, 17
+    HollowRivalSetValue 2, 5
+    HollowRivalSetValue 1, 17
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt

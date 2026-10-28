@@ -204,7 +204,7 @@ Movement_0310:
 
 Script_4:
     ActorsPauseAll
-    KeysCmd_02D1 0x8023
+    KeyInfoGetMyCityProgress 0x8023
     VMStackPushFlag EVENT_FLAG_0x0960
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -297,7 +297,7 @@ L_044C:
 L_0452:
     SEPlay SEQ_SE_MESSAGE
     ActorSetEyeToEye
-    Cmd_02D5 19, EVENT_WORK_0x400f
+    WbtIsTrainerBeaten 19, EVENT_WORK_0x400f
     VMStackPush EVENT_WORK_0x400f
     VMStackPushConst 1
     VMStackCmp CMP_EQ

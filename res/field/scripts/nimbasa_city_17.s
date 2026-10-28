@@ -72,7 +72,7 @@ Script_14:
     VMStackPushConst 1
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_0101
-    Cmd_024D
+    RollerCoasterAmbienceStart
 
 L_0101:
     VMHalt
@@ -138,7 +138,7 @@ L_0195:
 
 Script_2:
     ActorsPauseAll
-    Cmd_017C 0
+    RollerCoasterCallSwitch 0
     VMCall L_01E7
     FinishAllEvents
     ActorsUnpauseAll
@@ -146,7 +146,7 @@ Script_2:
 
 Script_3:
     ActorsPauseAll
-    Cmd_017C 1
+    RollerCoasterCallSwitch 1
     VMCall L_01E7
     FinishAllEvents
     ActorsUnpauseAll
@@ -154,7 +154,7 @@ Script_3:
 
 Script_4:
     ActorsPauseAll
-    Cmd_017C 2
+    RollerCoasterCallSwitch 2
     VMCall L_01E7
     FinishAllEvents
     ActorsUnpauseAll
@@ -162,7 +162,7 @@ Script_4:
 
 Script_5:
     ActorsPauseAll
-    Cmd_017C 3
+    RollerCoasterCallSwitch 3
     VMCall L_01E7
     FinishAllEvents
     ActorsUnpauseAll
@@ -228,12 +228,12 @@ Script_7:
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_02C6
     VMCall L_02E2
-    Cmd_017D 1
+    ScrcmdFieldGimmickCartLanes_UnlockLaneFromScript 1
     VMJump L_02D0
 
 L_02C6:
     VMCall L_0349
-    Cmd_017D 2
+    ScrcmdFieldGimmickCartLanes_UnlockLaneFromScript 2
 
 L_02D0:
     WorkSetConst 0x8027, 0

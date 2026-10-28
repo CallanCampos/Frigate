@@ -1205,7 +1205,7 @@ void MsgBGPrinter_DeleteTalkWin(ActorMsgWin *win) {
 }
 
 BOOL MsgBGPrinter_WaitTalkWinClose(ActorMsgWin *win) {
-    if (func_ov036_0218b4e8(win->talk, win->type)) {
+    if (TalkMsgWin_IsWindowFree(win->talk, win->type)) {
         MI_CpuFill8(win, 0, sizeof(ActorMsgWin));
         return TRUE;
     }
@@ -1235,7 +1235,7 @@ BOOL MsgBGPrinter_TalkWinMain(ActorMsgWin *actorWin) {
     PrintStream *stream;
     u32 state;
 
-    if (!func_ov036_0218b4fc(actorWin->talk, actorWin->type)) {
+    if (!TalkMsgWin_IsWindowShown(actorWin->talk, actorWin->type)) {
         return FALSE;
     }
     stream = TalkMsgWin_GetPrintStream(actorWin->talk, actorWin->type);
@@ -1483,11 +1483,12 @@ void MsgBGPrinter_AddSubMsgWinMsg(FieldMsgBG *sys, MsgData *msgData, u32 msgId, 
                                 TALKMSG_WIN_FRAME_NORMAL);
 }
 
-void func_ov036_02188ddc(FieldMsgBG *sys, StrBuf *strbuf, u16 userId, u8 x, u8 y, u8 width, u8 height) {
-    func_ov036_02188dfc(sys, strbuf, userId, x, y, width, height, TALKMSG_WIN_FRAME_NORMAL);
+void MsgBGPrinter_AddSubMsgWinStr(FieldMsgBG *sys, StrBuf *strbuf, u16 userId, u8 x, u8 y, u8 width, u8 height) {
+    MsgBGPrinter_AddSubMsgWinStrFrame(sys, strbuf, userId, x, y, width, height, TALKMSG_WIN_FRAME_NORMAL);
 }
 
-void func_ov036_02188dfc(FieldMsgBG *sys, StrBuf *strbuf, u16 userId, u8 x, u8 y, u8 width, u8 height, u32 frameType) {
+void MsgBGPrinter_AddSubMsgWinStrFrame(FieldMsgBG *sys, StrBuf *strbuf, u16 userId, u8 x, u8 y, u8 width, u8 height,
+                                       u32 frameType) {
     NumberedMsgWin *win = GFL_HeapAllocate(sys->heapId, sizeof(NumberedMsgWin), TRUE, "field_msgbg.c", 3710);
     int slot = FieldMsgBG_AddNumberedWindow(sys, win);
 
@@ -1542,7 +1543,7 @@ BOOL MsgBGPrinter_ExistsSubMsgWin(FieldMsgBG *sys) {
 }
 
 static BOOL MsgBGPrinter_SubMsgWinMain(NumberedMsgWin *win) {
-    if (!func_ov036_0218b4fc(win->talk, win->index)) {
+    if (!TalkMsgWin_IsWindowShown(win->talk, win->index)) {
         return FALSE;
     }
     GCTX_HIDGetPressedKeys();

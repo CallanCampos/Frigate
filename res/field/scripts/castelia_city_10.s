@@ -114,11 +114,11 @@ Script_2:
     SEPlay SEQ_SE_KAIDAN
     ActorDelete 1
     SEWait
-    HollowRivalCmd_0263 1
+    HollowRivalSetFlag 1
     WorkSetConst EVENT_WORK_0x40ae, 2
     WorkSetConst EVENT_WORK_0x40e2, 1
     FlagSet EVENT_FLAG_0x02ec
-    HollowRivalCmd_0262 1, 0
+    HollowRivalSetValue 1, 0
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt

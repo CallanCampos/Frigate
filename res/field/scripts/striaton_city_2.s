@@ -111,7 +111,7 @@ L_01BA:
 Script_1:
     ActorsPauseAll
     WorkSetConst EVENT_WORK_0x400a, 1
-    Cmd_02B2 8, EVENT_WORK_0x400f
+    MemoryLinkCheckFlag 8, EVENT_WORK_0x400f
     DebugPrint EVENT_WORK_0x400f
     VMStackPush EVENT_WORK_0x400f
     VMStackPushConst 1
@@ -135,7 +135,7 @@ L_0203:
 Script_2:
     ActorsPauseAll
     WorkSetConst EVENT_WORK_0x400a, 2
-    Cmd_02B2 8, EVENT_WORK_0x400f
+    MemoryLinkCheckFlag 8, EVENT_WORK_0x400f
     VMStackPush EVENT_WORK_0x400f
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -158,7 +158,7 @@ L_024C:
 Script_3:
     ActorsPauseAll
     WorkSetConst EVENT_WORK_0x400a, 3
-    Cmd_02B2 8, EVENT_WORK_0x400f
+    MemoryLinkCheckFlag 8, EVENT_WORK_0x400f
     VMStackPush EVENT_WORK_0x400f
     VMStackPushConst 1
     VMStackCmp CMP_EQ

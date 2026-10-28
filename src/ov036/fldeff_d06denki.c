@@ -70,7 +70,7 @@ typedef struct {
 static void D06Denki_LoadResources(FieldEffectD06Denki *effect);
 static void D06Denki_FreeResources(FieldEffectD06Denki *effect);
 void FieldTerrainEffectElec_Init(FieldEffectTask *task, void *work);
-static void func_ov036_021c28fc(FieldEffectTask *task, void *work);
+static void SparkTask_Exit(FieldEffectTask *task, void *work);
 static void SparkTask_Update(FieldEffectTask *task, void *work);
 static void SparkTask_Draw(FieldEffectTask *task, void *work);
 static void StoneTask_Init(FieldEffectTask *task, void *work);
@@ -90,7 +90,7 @@ void *StoneTask_Create(FieldEffects *effects, HeapID heapId) {
     return effect;
 }
 
-void func_ov036_021c27ac(FieldEffects *effects, void *data) {
+void D06Denki_Delete(FieldEffects *effects, void *data) {
     D06Denki_FreeResources(data);
     GFL_HeapFree(data);
 }
@@ -134,14 +134,14 @@ static const FieldEffectTaskVTable STONE_TASK_VTABLE = {
 };
 
 static const FieldEffectTaskVTable SPARK_TASK_VTABLE = {
-    sizeof(SparkTask), FieldTerrainEffectElec_Init, func_ov036_021c28fc, SparkTask_Update, SparkTask_Draw,
+    sizeof(SparkTask), FieldTerrainEffectElec_Init, SparkTask_Exit, SparkTask_Update, SparkTask_Draw,
 };
 
 static const FieldEffectTaskVTable MARK_TASK_VTABLE = {
     sizeof(MarkTask), MarkTask_Init, MarkTask_Delete, MarkTask_Update, MarkTask_Draw,
 };
 
-void func_ov036_021c289c(FieldActor *actor, FieldEffects *effects) {
+void D06Denki_StartSpark(FieldActor *actor, FieldEffects *effects) {
     VecFx32 pos;
     SparkTaskParams params;
 
@@ -160,7 +160,7 @@ void FieldTerrainEffectElec_Init(FieldEffectTask *task, void *work) {
     GFL_SndSEPlay(SEQ_SE_FLD_49);
 }
 
-static void func_ov036_021c28fc(FieldEffectTask *task, void *work) {
+static void SparkTask_Exit(FieldEffectTask *task, void *work) {
 }
 
 static void SparkTask_Update(FieldEffectTask *task, void *work) {

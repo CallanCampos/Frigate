@@ -32,7 +32,7 @@ Script_2:
 
 Script_3:
     ActorsPauseAll
-    Cmd_01F6 0, 0, 0, 0x8010
+    Scrcmd_CheckWifiListFlags 0, 0, 0, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 0
     VMStackCmp CMP_EQ

@@ -143,7 +143,7 @@ L_01AE:
 
 L_01B8:
     MsgWinCloseAll
-    Cmd_0275 0, 24, 0
+    WordSetFunfestMission 0, 24, 0
     SEPlay SEQ_SE_FLD_133
     // "The Funfest Mission\n“[f000]ŀ\u0001\u0000\"[f000]븀\u0000\nhas been added to the Entralink."
     SystemMsg UndellaTownPokemonCenter_Text_FunfestMissionHasBeen, 0

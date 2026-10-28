@@ -82,7 +82,7 @@ Script_1:
     MsgWinCloseAll
     ActorCmdExec 0, Movement_05A0
     ActorCmdWait
-    Cmd_02B5 0, 0
+    WordSetMemoryLinkPlayerName 0, 0
     // "[f000]븉\u0001\u0001[f000]Ā\u0001\u0000![f000]븁\u0000\nIs it because of that Trainer\nthat my heart wavers now?[f000]븁\u0000\nWere the words of the Pokémon\nin Accumula Town really true?[f000]븁\u0000\nDoes that mean [f000]Ā\u0001\u0000\nis an ideal Trainer?[f000]븉\u0001\u0000[f000]븁\u0000"
     ActorMsg MSGFILE_SCRIPT, ChargestoneCave5_Text_BecauseTrainerHeartWavers, 0, 1, 0
     MsgWinCloseAll

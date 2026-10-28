@@ -38,7 +38,7 @@ L_0087:
     VMCall L_0095
 
 L_008D:
-    Cmd_013C
+    GameCommTryBoot
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt
@@ -47,7 +47,7 @@ L_0095:
     TrialHouseWorkInit
     WorkSetConst 0x8027, 0
     WorkSetConst 0x8028, 0
-    TrialHouseCmd_01F2 0x8027
+    TrialHouseGetExaminationType 0x8027
     VMStackPush 0x8027
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -205,7 +205,7 @@ L_02EE:
     WorkSetConst 0x802b, 0
     WorkSetConst 0x802c, 0
     WorkSetConst 0x802d, 0
-    TrialHouseCmd_01ED 0x8023
+    TrialHouseSetDownloadMode 0x8023
     VMStackPush 0x8023
     VMStackPushConst 0
     VMStackCmp CMP_EQ
@@ -260,7 +260,7 @@ L_03DE:
 
 L_03E4:
     WorkSetConst 0x802e, 0
-    TrialHouseCmd_01F2 0x802e
+    TrialHouseGetExaminationType 0x802e
     VMStackPush 0x802e
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -290,7 +290,7 @@ L_044A:
     // "Then, let's begin.[f000]븁\u0000\nPlease bear in mind that once you start\nthe challenge, you will face five battles[f000]븀\u0000\nwithout a break.[f000]븁\u0000\nNow, please choose the Pokémon you would\nlike to battle with.[f000]븁\u0000"
     ActorMsg MSGFILE_SCRIPT, Global10440_Text_ThenLetsBeginPlease, 0x8011, 2, 0
     ActorMsgClose
-    Cmd_01B0 0x802b, 0x802a
+    Regulation_CheckPartyRegulation 0x802b, 0x802a
     VMStackPush 0x802a
     VMStackPushConst 2
     VMStackCmp CMP_EQ
@@ -339,7 +339,7 @@ L_04E8:
 
 L_0507:
     RecordAdd 121, 1
-    Cmd_02C5 4
+    JoinAvenueRecordActivity 4
     FunfestBGMReturn
     // "Now, the Battle Test begins!\nPlease go inside![f000]븁\u0000"
     ActorMsg MSGFILE_SCRIPT, Global10440_Text_NowBattleTestBegins, 0x8011, 2, 0
@@ -369,7 +369,7 @@ L_0507:
     // "All right.[f000]븁\u0000\nI will tell you the result of your\nBattle Test.[f000]븁\u0000\nThe test result is...[f000]븁\u0000"
     ActorMsg MSGFILE_SCRIPT, Global10440_Text_AllRightWillTell, 0x8011, 2, 0
     ActorMsgClose
-    Cmd_01DD 3, 0, 0
+    BroadcastGameBeacon 3, 0, 0
     TrialHouseCalcPointsStars 0x802f, 0x8031
     RecordGet 121, 0x802d
     VMStackPush 0x8030
@@ -380,13 +380,13 @@ L_0507:
     VMStackCmp CMP_EQ
     VMStackCmp CMP_OR
     VMJumpIf CMP_STACK, L_05DF
-    Cmd_01DD 4, 0x802f, 0
+    BroadcastGameBeacon 4, 0x802f, 0
 
 L_05DF:
     FadeOutBlackQ
     FadeWait
     FieldClose
-    TrialHouseCmd_01F4 0x8023, 1
+    TrialHouseCallResults 0x8023, 1
     FieldOpen
     FadeInBlackQ
     FadeWait
@@ -472,7 +472,7 @@ L_06EE:
     VMStackPushConst 5
     VMStackCmp CMP_LT
     VMJumpIf CMP_STACK, L_075A
-    TrialHouseCmd_01EA 0x8022, 0x8033
+    TrialHouseSetTrainer 0x8022, 0x8033
     ActorNew 7, 0, 1, 251, 0x8033, 0
     ActorCmdExec 251, Movement_09F4
     ActorCmdWait
@@ -546,7 +546,7 @@ L_0824:
     SystemMsgAsync Global10440_Text_CommunicatingDontTurnOff, 2
     VMSleep 1
     MsgSetLoadingSpinner 0
-    TrialHouseCmd_01F0 0x8010
+    TrialHouseDownloadExamination 0x8010
     InfoMsgClose
     VMStackPush 0x8010
     VMStackPushConst 0
@@ -582,7 +582,7 @@ L_0892:
 L_08B9:
     WorkSetConst 0x8035, 0
     WorkSetConst 0x8036, 0
-    TrialHouseCmd_01F2 0x8035
+    TrialHouseGetExaminationType 0x8035
     VMStackPush 0x8035
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -725,7 +725,7 @@ Script_2:
     WorkSetConst 0x8039, 0
     WorkSetConst 0x803a, 0
     SEPlay SEQ_SE_MESSAGE
-    Cmd_01F5 0x803a
+    TrialHouseGetRecordMask 0x803a
     WorkSetConst 0x8039, 0
     VMStackPush 0x803a
     VMStackPushConst 0
@@ -791,7 +791,7 @@ L_0B70:
     FadeOutBlackQ
     FadeWait
     FieldClose
-    TrialHouseCmd_01F4 0x8038, 0
+    TrialHouseCallResults 0x8038, 0
     FieldOpen
     FadeInBlackQ
     FadeWait

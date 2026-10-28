@@ -55,7 +55,7 @@ Script_1:
     FlagReset EVENT_FLAG_0x03e2
 
 L_00C7:
-    Cmd_02CB EVENT_WORK_0x400f
+    PokewoodGetLevel EVENT_WORK_0x400f
     VMStackPush EVENT_WORK_0x400f
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -569,7 +569,7 @@ Movement_08F4:
 Script_5:
     ActorsPauseAll
     WordSetPlayerName 0
-    Cmd_02CB EVENT_WORK_0x400f
+    PokewoodGetLevel EVENT_WORK_0x400f
     VMStackPush EVENT_WORK_0x400f
     VMStackPushConst 3
     VMStackCmp CMP_LT
@@ -604,7 +604,7 @@ L_0968:
 Script_6:
     ActorsPauseAll
     WordSetPlayerName 0
-    Cmd_02CB EVENT_WORK_0x400f
+    PokewoodGetLevel EVENT_WORK_0x400f
     VMStackPush EVENT_WORK_0x400f
     VMStackPushConst 3
     VMStackCmp CMP_LT
@@ -729,7 +729,7 @@ Script_14:
 Script_15:
     ActorsPauseAll
     WordSetPlayerName 0
-    Cmd_02CB EVENT_WORK_0x400f
+    PokewoodGetLevel EVENT_WORK_0x400f
     VMStackPush EVENT_WORK_0x400f
     VMStackPushConst 3
     VMStackCmp CMP_LT
@@ -756,7 +756,7 @@ L_0AF4:
 Script_16:
     ActorsPauseAll
     WordSetPlayerName 0
-    Cmd_02CB EVENT_WORK_0x400f
+    PokewoodGetLevel EVENT_WORK_0x400f
     VMStackPush EVENT_WORK_0x400f
     VMStackPushConst 2
     VMStackCmp CMP_LT
@@ -798,7 +798,7 @@ L_0B71:
 Script_17:
     ActorsPauseAll
     WordSetPlayerName 0
-    Cmd_02CB EVENT_WORK_0x400f
+    PokewoodGetLevel EVENT_WORK_0x400f
     VMStackPush EVENT_WORK_0x400f
     VMStackPushConst 3
     VMStackCmp CMP_LT

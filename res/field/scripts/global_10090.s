@@ -443,7 +443,7 @@ L_062E:
     // "Accessed the Help System.[f000]븁\u0000"
     SystemMsg Global10090_Text_AccessedHelpSystem, 2
     InfoMsgClose
-    Cmd_0231 0x8010
+    CallGameManual 0x8010
     VMStackPush 0x8010
     VMStackPushConst 0
     VMStackCmp CMP_EQ

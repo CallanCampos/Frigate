@@ -1183,11 +1183,11 @@
     .2byte \a0
     .endm
 
-    .macro TrainerDataCmd_00C9
+    .macro ConfigToggleKanji
     FieldCommand 201
     .endm
 
-    .macro TrainerDataCmd_00CA a0
+    .macro ConfigGetKanji a0
     FieldCommand 202
     .2byte \a0
     .endm
@@ -1208,8 +1208,7 @@
     .2byte \a0
     .endm
 
-    // s00CE_TrainerCardGetStars
-    .macro Cmd_00CE a0
+    .macro TrainerCardGetStars a0
     FieldCommand 206
     .2byte \a0
     .endm
@@ -1332,30 +1331,29 @@
     FieldCommand 227
     .endm
 
-    // s00E4_BoxUnlockWallpapers
-    .macro Cmd_00E4 a0
+    .macro BoxUnlockWallpapers a0
     FieldCommand 228
     .2byte \a0
     .endm
 
-    .macro TimeSigCmd_00E5 a0, a1
+    .macro FieldScriptEnv_CmdGetTrainerViewGroupAndMarkSeen a0, a1
     FieldCommand 229
     .2byte \a0
     .2byte \a1
     .endm
 
-    .macro TrainerCardCmd_00E6 a0, a1
+    .macro StartMenuIsItemUnlocked a0, a1
     FieldCommand 230
     .2byte \a0
     .2byte \a1
     .endm
 
-    .macro TrainerCardCmd_00E7 a0
+    .macro StartMenuUnlockItem a0
     FieldCommand 231
     .2byte \a0
     .endm
 
-    .macro TrainerCardCmd_00E8 a0, a1
+    .macro StartMenuIsItemSelected a0, a1
     FieldCommand 232
     .2byte \a0
     .2byte \a1
@@ -1850,18 +1848,15 @@
     .2byte \a0
     .endm
 
-    // s013C_GameCommTryBoot
-    .macro Cmd_013C
+    .macro GameCommTryBoot
     FieldCommand 316
     .endm
 
-    // s013D_GameCommPause
-    .macro Cmd_013D
+    .macro GameCommPause
     FieldCommand 317
     .endm
 
-    // s013E_GameCommResume
-    .macro Cmd_013E
+    .macro GameCommResume
     FieldCommand 318
     .endm
 
@@ -2016,14 +2011,12 @@
     FieldCommand 346
     .endm
 
-    // s015B_WifiListHasValidProfile
-    .macro Cmd_015B a0
+    .macro WifiListHasValidProfile a0
     FieldCommand 347
     .2byte \a0
     .endm
 
-    // s015C_WifiListCountFriends
-    .macro Cmd_015C a0
+    .macro WifiListCountFriends a0
     FieldCommand 348
     .2byte \a0
     .endm
@@ -2036,8 +2029,7 @@
     FieldCommand 350
     .endm
 
-    // s015F_Nop
-    .macro Cmd_015F
+    .macro Nop
     FieldCommand 351
     .endm
 
@@ -2056,33 +2048,32 @@
     FieldCommand 354
     .endm
 
-    .macro MusicalCmd_0163 a0, a1
+    .macro MusicalCall a0, a1
     FieldCommand 355
     .2byte \a0
     .byte \a1
     .endm
 
-    .macro MusicalCmd_0164 a0
+    .macro MusicalCallDressUp a0
     FieldCommand 356
     .2byte \a0
     .endm
 
-    .macro MusicalCmd_0165 a0, a1, a2
+    .macro MusicalGetInfo a0, a1, a2
     FieldCommand 357
     .byte \a0
     .2byte \a1
     .2byte \a2
     .endm
 
-    .macro MusicalCmd_0166 a0, a1, a2
+    .macro MusicalGetAudienceGift a0, a1, a2
     FieldCommand 358
     .2byte \a0
     .byte \a1
     .2byte \a2
     .endm
 
-    // s0167_MusicalComm
-    .macro Cmd_0167 a0, a1, a2, a3
+    .macro MusicalComm a0, a1, a2, a3
     FieldCommand 359
     .2byte \a0
     .2byte \a1
@@ -2090,24 +2081,23 @@
     .2byte \a3
     .endm
 
-    .macro MusicalCmd_0168 a0
+    .macro MusicalAddProp a0
     FieldCommand 360
     .2byte \a0
     .endm
 
-    .macro MusicalCmd_0169 a0
+    .macro MusicalClearAudienceGift a0
     FieldCommand 361
     .2byte \a0
     .endm
 
-    // s016A_MusicalSelectPoke
-    .macro Cmd_016A a0, a1
+    .macro MusicalSelectPoke a0, a1
     FieldCommand 362
     .2byte \a0
     .2byte \a1
     .endm
 
-    .macro HighLinkCmd_016E
+    .macro CallMonolith
     FieldCommand 366
     .endm
 
@@ -2150,8 +2140,7 @@
     FieldCommand 377
     .endm
 
-    // GimmickGateCmd_ViewBoard
-    .macro Cmd_017A a0
+    .macro GimmickGateCmd_ViewBoard a0
     FieldCommand 378
     .2byte \a0
     .endm
@@ -2163,62 +2152,52 @@
     .2byte \a1
     .endm
 
-    // s017C_RollerCoasterCallSwitch
-    .macro Cmd_017C a0
+    .macro RollerCoasterCallSwitch a0
     FieldCommand 380
     .2byte \a0
     .endm
 
-    // ScrcmdFieldGimmickCartLanes_UnlockLaneFromScript
-    .macro Cmd_017D a0
+    .macro ScrcmdFieldGimmickCartLanes_UnlockLaneFromScript a0
     FieldCommand 381
     .2byte \a0
     .endm
 
-    // s0186_DriftveilGymPrepareFreight
-    .macro Cmd_0186
+    .macro DriftveilGymPrepareFreight
     FieldCommand 390
     .endm
 
-    // s0187_DriftveilLiftPlaceAtBottom
-    .macro Cmd_0187 a0
+    .macro DriftveilLiftPlaceAtBottom a0
     FieldCommand 391
     .2byte \a0
     .endm
 
-    // ScrcmdFieldGimmickPlateDoors_StartDoorEvent
-    .macro Cmd_018C a0, a1
+    .macro ScrcmdFieldGimmickPlateDoors_StartDoorEvent a0, a1
     FieldCommand 396
     .2byte \a0
     .2byte \a1
     .endm
 
-    // s018D_DriftveilGymCallFreight
-    .macro Cmd_018D a0
+    .macro DriftveilGymCallFreight a0
     FieldCommand 397
     .2byte \a0
     .endm
 
-    // s018E_DriftveilLiftCallMove
-    .macro Cmd_018E a0
+    .macro DriftveilLiftCallMove a0
     FieldCommand 398
     .2byte \a0
     .endm
 
-    // s018F_IcirrusGymCallSwitchAnim
-    .macro Cmd_018F a0
+    .macro IcirrusGymCallSwitchAnim a0
     FieldCommand 399
     .2byte \a0
     .endm
 
-    // s0190_IcirrusGymCallFlipSwitch
-    .macro Cmd_0190 a0
+    .macro IcirrusGymCallFlipSwitch a0
     FieldCommand 400
     .2byte \a0
     .endm
 
-    // s0191_IcirrusGymToggleMovementAtPlace
-    .macro Cmd_0191 a0
+    .macro IcirrusGymToggleMovementAtPlace a0
     FieldCommand 401
     .2byte \a0
     .endm
@@ -2257,8 +2236,7 @@
     .2byte \a0
     .endm
 
-    // s01A1_PleasureBoatGetRoomInfo
-    .macro Cmd_01A1 a0, a1, a2, a3
+    .macro PleasureBoatGetRoomInfo a0, a1, a2, a3
     FieldCommand 417
     .2byte \a0
     .2byte \a1
@@ -2315,15 +2293,13 @@
     FieldCommand 430
     .endm
 
-    // Regulation_RegisterAllowedSpecies
-    .macro Cmd_01AF a0, a1
+    .macro Regulation_RegisterAllowedSpecies a0, a1
     FieldCommand 431
     .2byte \a0
     .2byte \a1
     .endm
 
-    // Regulation_CheckPartyRegulation
-    .macro Cmd_01B0 a0, a1
+    .macro Regulation_CheckPartyRegulation a0, a1
     FieldCommand 432
     .2byte \a0
     .2byte \a1
@@ -2333,14 +2309,12 @@
     FieldCommand 433
     .endm
 
-    // ScrcmdProcFld_SpawnMovePokemonIfInactive
-    .macro Cmd_01B2 a0
+    .macro ScrcmdProcFld_SpawnMovePokemonIfInactive a0
     FieldCommand 434
     .2byte \a0
     .endm
 
-    // FieldChunk_ScrCmdReadSaveByte
-    .macro Cmd_01B3 a0, a1
+    .macro FieldChunk_ScrCmdReadSaveByte a0, a1
     FieldCommand 435
     .2byte \a0
     .2byte \a1
@@ -2415,20 +2389,17 @@
     FieldCommand 459
     .endm
 
-    // ElevatorTable_GetMysteryEntryCount
-    .macro Cmd_01CC a0
+    .macro ElevatorTable_GetMysteryEntryCount a0
     FieldCommand 460
     .2byte \a0
     .endm
 
-    // ElevatorTable_RegisterBirthdayEntry
-    .macro Cmd_01CD a0
+    .macro ElevatorTable_RegisterBirthdayEntry a0
     FieldCommand 461
     .2byte \a0
     .endm
 
-    // s01CE_UnityTowerGetTrainerClass
-    .macro Cmd_01CE a0, a1
+    .macro UnityTowerGetTrainerClass a0, a1
     FieldCommand 462
     .2byte \a0
     .2byte \a1
@@ -2527,14 +2498,13 @@
     .2byte \a1
     .endm
 
-    .macro DreamWorldCmd_01DC a0, a1
+    .macro DreamWorldItems a0, a1
     FieldCommand 476
     .2byte \a0
     .2byte \a1
     .endm
 
-    // func_ov036_021c3018
-    .macro Cmd_01DD a0, a1, a2
+    .macro BroadcastGameBeacon a0, a1, a2
     FieldCommand 477
     .2byte \a0
     .2byte \a1
@@ -2547,8 +2517,7 @@
     .2byte \a1
     .endm
 
-    // func_ov036_021c315c
-    .macro Cmd_01DF
+    .macro CallPassPowerFlash
     FieldCommand 479
     .endm
 
@@ -2609,7 +2578,7 @@
     .2byte \a2
     .endm
 
-    .macro TrialHouseCmd_01EA a0, a1
+    .macro TrialHouseSetTrainer a0, a1
     FieldCommand 490
     .2byte \a0
     .2byte \a1
@@ -2625,12 +2594,12 @@
     FieldCommand 492
     .endm
 
-    .macro TrialHouseCmd_01ED a0
+    .macro TrialHouseSetDownloadMode a0
     FieldCommand 493
     .2byte \a0
     .endm
 
-    .macro TrainerCardCmd_01EE a0
+    .macro TrialHouseSetBattleTestRank a0
     FieldCommand 494
     .2byte \a0
     .endm
@@ -2640,7 +2609,7 @@
     .2byte \a0
     .endm
 
-    .macro TrialHouseCmd_01F0 a0
+    .macro TrialHouseDownloadExamination a0
     FieldCommand 496
     .2byte \a0
     .endm
@@ -2651,7 +2620,7 @@
     .2byte \a1
     .endm
 
-    .macro TrialHouseCmd_01F2 a0
+    .macro TrialHouseGetExaminationType a0
     FieldCommand 498
     .2byte \a0
     .endm
@@ -2661,20 +2630,18 @@
     .2byte \a0
     .endm
 
-    .macro TrialHouseCmd_01F4 a0, a1
+    .macro TrialHouseCallResults a0, a1
     FieldCommand 500
     .2byte \a0
     .2byte \a1
     .endm
 
-    // s01F5_TrialHouseGetRecordMask
-    .macro Cmd_01F5 a0
+    .macro TrialHouseGetRecordMask a0
     FieldCommand 501
     .2byte \a0
     .endm
 
-    // Scrcmd_CheckWifiListFlags
-    .macro Cmd_01F6 a0, a1, a2, a3
+    .macro Scrcmd_CheckWifiListFlags a0, a1, a2, a3
     FieldCommand 502
     .2byte \a0
     .2byte \a1
@@ -2682,8 +2649,7 @@
     .2byte \a3
     .endm
 
-    // Scrcmd_WifiListOperation
-    .macro Cmd_01F7 a0, a1, a2, a3
+    .macro Scrcmd_WifiListOperation a0, a1, a2, a3
     FieldCommand 503
     .2byte \a0
     .2byte \a1
@@ -2691,15 +2657,13 @@
     .2byte \a3
     .endm
 
-    // Scrcmd_SetWifiFriendNameWord
-    .macro Cmd_01F8 a0, a1
+    .macro Scrcmd_SetWifiFriendNameWord a0, a1
     FieldCommand 504
     .2byte \a0
     .2byte \a1
     .endm
 
-    // Scrcmd_CheckPmsWordPair
-    .macro Cmd_01F9 a0, a1, a2, a3
+    .macro Scrcmd_CheckPmsWordPair a0, a1, a2, a3
     FieldCommand 505
     .2byte \a0
     .2byte \a1
@@ -2728,7 +2692,7 @@
     .2byte \a2
     .endm
 
-    .macro TrainerGameInfoCmd_01FD a0, a1, a2, a3
+    .macro SurveyCmd_Start a0, a1, a2, a3
     FieldCommand 509
     .2byte \a0
     .2byte \a1
@@ -2736,7 +2700,7 @@
     .2byte \a3
     .endm
 
-    .macro TrainerGameInfoCmd_01FE
+    .macro SurveyCmd_Clear
     FieldCommand 510
     .endm
 
@@ -2758,13 +2722,13 @@
     .2byte \a1
     .endm
 
-    .macro TrainerCardCmd_0202 a0, a1
+    .macro SurveyCmd_GetQuestionState a0, a1
     FieldCommand 514
     .2byte \a0
     .2byte \a1
     .endm
 
-    .macro TrainerCardCmd_0203 a0
+    .macro SurveyCmd_GetCurrentRemaining a0
     FieldCommand 515
     .2byte \a0
     .endm
@@ -2784,34 +2748,32 @@
     .2byte \a0
     .endm
 
-    .macro TrainerGameInfoCmd_0207 a0
+    .macro WordSetPasserbyCount a0
     FieldCommand 519
     .byte \a0
     .endm
 
-    .macro TrainerGameInfoCmd_0208 a0
+    .macro WordSetThankedCount a0
     FieldCommand 520
     .byte \a0
     .endm
 
-    // SurveyCmd_WriteOwnAnswer
-    .macro Cmd_0209 a0, a1
+    .macro SurveyCmd_WriteOwnAnswer a0, a1
     FieldCommand 521
     .2byte \a0
     .2byte \a1
     .endm
 
-    // SurveyCmd_ShowRankMessage
-    .macro Cmd_020A
+    .macro SurveyCmd_ShowRankMessage
     FieldCommand 522
     .endm
 
-    .macro TrainerGameInfoCmd_020B a0
+    .macro SurveyCmd_GetRank a0
     FieldCommand 523
     .2byte \a0
     .endm
 
-    .macro TrainerGameInfoCmd_020C
+    .macro SurveyCmd_RaiseRank
     FieldCommand 524
     .endm
 
@@ -2823,8 +2785,7 @@
     .2byte \a3
     .endm
 
-    // s020E_SpPokeJump
-    .macro Cmd_020E a0, a1, a2, a3, a4, a5
+    .macro SpPokeJump a0, a1, a2, a3, a4, a5
     FieldCommand 526
     .2byte \a0
     .2byte \a1
@@ -2834,8 +2795,7 @@
     .2byte \a5
     .endm
 
-    // s020F_SpPokeAppear
-    .macro Cmd_020F a0, a1, a2, a3
+    .macro SpPokeAppear a0, a1, a2, a3
     FieldCommand 527
     .2byte \a0
     .2byte \a1
@@ -2843,28 +2803,24 @@
     .2byte \a3
     .endm
 
-    // s0210_SpPokeWaitAnimEnd
-    .macro Cmd_0210 a0
+    .macro SpPokeWaitAnimEnd a0
     FieldCommand 528
     .2byte \a0
     .endm
 
-    // s0211_SpPokeWaitFrame
-    .macro Cmd_0211 a0
+    .macro SpPokeWaitFrame a0
     FieldCommand 529
     .2byte \a0
     .endm
 
-    // s0212_ActorMoveToHeight
-    .macro Cmd_0212 a0, a1, a2
+    .macro ActorMoveToHeight a0, a1, a2
     FieldCommand 530
     .2byte \a0
     .2byte \a1
     .2byte \a2
     .endm
 
-    // s0213_ActorHoldPos
-    .macro Cmd_0213 a0
+    .macro ActorHoldPos a0
     FieldCommand 531
     .2byte \a0
     .endm
@@ -2877,8 +2833,7 @@
     .2byte \a3
     .endm
 
-    // s0215_SetSpecialTransferUsed
-    .macro Cmd_0215 a0, a1
+    .macro SetSpecialTransferUsed a0, a1
     FieldCommand 533
     .2byte \a0
     .2byte \a1
@@ -2923,7 +2878,7 @@
     .2byte \a1
     .endm
 
-    .macro AreaNPCCmd_021D a0
+    .macro EntreeForestRemovePkm a0
     FieldCommand 541
     .2byte \a0
     .endm
@@ -2976,8 +2931,7 @@
     .2byte \a0
     .endm
 
-    // CountTrainersEvent_StartCountOtherOtIdsTask
-    .macro Cmd_0226 a0
+    .macro CountTrainersEvent_StartCountOtherOtIdsTask a0
     FieldCommand 550
     .2byte \a0
     .endm
@@ -2994,14 +2948,13 @@
     .2byte \a1
     .endm
 
-    .macro HollowRivalCmd_022A a0, a1
+    .macro HollowRivalGenMsgID a0, a1
     FieldCommand 554
     .2byte \a0
     .2byte \a1
     .endm
 
-    // Scrcmd_StartSwapNpcEvent
-    .macro Cmd_022B a0, a1
+    .macro Scrcmd_StartSwapNpcEvent a0, a1
     FieldCommand 555
     .2byte \a0
     .2byte \a1
@@ -3012,8 +2965,7 @@
     .2byte \a0
     .endm
 
-    // ScriptNative_SetMmdlZoneDeleteOff
-    .macro Cmd_022E a0
+    .macro ScriptNative_SetMmdlZoneDeleteOff a0
     FieldCommand 558
     .2byte \a0
     .endm
@@ -3024,21 +2976,18 @@
     .2byte \a1
     .endm
 
-    // s0230_MsgPlaceSignFont4
-    .macro Cmd_0230 a0, a1
+    .macro MsgPlaceSignFont4 a0, a1
     FieldCommand 560
     .2byte \a0
     .2byte \a1
     .endm
 
-    // s0231_CallGameManual
-    .macro Cmd_0231 a0
+    .macro CallGameManual a0
     FieldCommand 561
     .2byte \a0
     .endm
 
-    // PokeParty_ControlLegendMon
-    .macro Cmd_0232 a0, a1
+    .macro PokeParty_ControlLegendMon a0, a1
     FieldCommand 562
     .2byte \a0
     .2byte \a1
@@ -3082,8 +3031,7 @@
     .2byte \a0
     .endm
 
-    // ScriptNative_CheckPlayerFormModel
-    .macro Cmd_0239 a0
+    .macro ScriptNative_CheckPlayerFormModel a0
     FieldCommand 569
     .2byte \a0
     .endm
@@ -3099,13 +3047,11 @@
     FieldCommand 571
     .endm
 
-    // s023C_NuvemaGimmickPlay
-    .macro Cmd_023C
+    .macro NuvemaGimmickPlay
     FieldCommand 572
     .endm
 
-    // s023D_NuvemaGimmickWaitAnim
-    .macro Cmd_023D
+    .macro NuvemaGimmickWaitAnim
     FieldCommand 573
     .endm
 
@@ -3120,15 +3066,13 @@
     FieldCommand 575
     .endm
 
-    // ScriptWork_FadeBgmVolume
-    .macro Cmd_0240 a0, a1
+    .macro ScriptWork_FadeBgmVolume a0, a1
     FieldCommand 576
     .2byte \a0
     .2byte \a1
     .endm
 
-    // ScriptWork_RestoreBgmVolume
-    .macro Cmd_0241 a0
+    .macro ScriptWork_RestoreBgmVolume a0
     FieldCommand 577
     .2byte \a0
     .endm
@@ -3160,8 +3104,7 @@
     .2byte \a3
     .endm
 
-    // s0249_GetRandomDistinctSix
-    .macro Cmd_0249 a0, a1, a2, a3, a4, a5
+    .macro GetRandomDistinctSix a0, a1, a2, a3, a4, a5
     FieldCommand 585
     .2byte \a0
     .2byte \a1
@@ -3171,8 +3114,7 @@
     .2byte \a5
     .endm
 
-    // s024A_FieldSubscreenIsEnabled
-    .macro Cmd_024A a0
+    .macro FieldSubscreenIsEnabled a0
     FieldCommand 586
     .2byte \a0
     .endm
@@ -3185,8 +3127,7 @@
     FieldCommand 588
     .endm
 
-    // s024D_RollerCoasterAmbienceStart
-    .macro Cmd_024D
+    .macro RollerCoasterAmbienceStart
     FieldCommand 589
     .endm
 
@@ -3237,38 +3178,34 @@
     .2byte \a0
     .endm
 
-    // s025B_GymElecReapplyProgress
-    .macro Cmd_025B
+    .macro GymElecReapplyProgress
     FieldCommand 603
     .endm
 
-    // s025C_GymElecSetFollower
-    .macro Cmd_025C a0, a1, a2
+    .macro GymElecSetFollower a0, a1, a2
     FieldCommand 604
     .2byte \a0
     .2byte \a1
     .2byte \a2
     .endm
 
-    // s025D_GymElecSetProgress
-    .macro Cmd_025D a0
+    .macro GymElecSetProgress a0
     FieldCommand 605
     .2byte \a0
     .endm
 
-    // s025F_GymElecSetStage
-    .macro Cmd_025F a0
+    .macro GymElecSetStage a0
     FieldCommand 607
     .2byte \a0
     .endm
 
-    .macro HollowRivalCmd_0262 a0, a1
+    .macro HollowRivalSetValue a0, a1
     FieldCommand 610
     .2byte \a0
     .2byte \a1
     .endm
 
-    .macro HollowRivalCmd_0263 a0
+    .macro HollowRivalSetFlag a0
     FieldCommand 611
     .2byte \a0
     .endm
@@ -3279,12 +3216,12 @@
     .2byte \a1
     .endm
 
-    .macro HollowRivalCmd_0265 a0
+    .macro CallXTransceiverSecret a0
     FieldCommand 613
     .2byte \a0
     .endm
 
-    .macro HollowRivalCmd_0266 a0
+    .macro HollowRivalGetCounter a0
     FieldCommand 614
     .2byte \a0
     .endm
@@ -3293,14 +3230,12 @@
     FieldCommand 615
     .endm
 
-    // s0268_GymInsectPlayObject
-    .macro Cmd_0268 a0
+    .macro GymInsectPlayObject a0
     FieldCommand 616
     .2byte \a0
     .endm
 
-    // s0269_GymInsectShowEffect
-    .macro Cmd_0269
+    .macro GymInsectShowEffect
     FieldCommand 617
     .endm
 
@@ -3343,8 +3278,7 @@
     FieldCommand 628
     .endm
 
-    // s0275_WordSetFunfestMission
-    .macro Cmd_0275 a0, a1, a2
+    .macro WordSetFunfestMission a0, a1, a2
     FieldCommand 629
     .byte \a0
     .2byte \a1
@@ -3434,14 +3368,12 @@
     FieldCommand 651
     .endm
 
-    // s028E_MistraltonGymFireCannon
-    .macro Cmd_028E a0
+    .macro MistraltonGymFireCannon a0
     FieldCommand 654
     .2byte \a0
     .endm
 
-    // s028F_CallRivalNameInput
-    .macro Cmd_028F a0
+    .macro CallRivalNameInput a0
     FieldCommand 655
     .2byte \a0
     .endm
@@ -3451,14 +3383,12 @@
     .byte \a0
     .endm
 
-    // s0291_VirbankGymStopModelAnimations
-    .macro Cmd_0291 a0
+    .macro VirbankGymStopModelAnimations a0
     FieldCommand 657
     .2byte \a0
     .endm
 
-    // s0292_VirbankGymSetActorFlag
-    .macro Cmd_0292 a0
+    .macro VirbankGymSetActorFlag a0
     FieldCommand 658
     .2byte \a0
     .endm
@@ -3490,8 +3420,7 @@
     .2byte \a3
     .endm
 
-    // s0298_WordSetEmptyFileMessage
-    .macro Cmd_0298 a0, a1
+    .macro WordSetEmptyFileMessage a0, a1
     FieldCommand 664
     .byte \a0
     .2byte \a1
@@ -3536,13 +3465,11 @@
     .2byte \a0
     .endm
 
-    // s02A2_HumilauGymPlayLeaderSplash
-    .macro Cmd_02A2
+    .macro HumilauGymPlayLeaderSplash
     FieldCommand 674
     .endm
 
-    // s02A3_HumilauGymPlayLeaderWaves
-    .macro Cmd_02A3
+    .macro HumilauGymPlayLeaderWaves
     FieldCommand 675
     .endm
 
@@ -3551,30 +3478,25 @@
     FieldCommand 676
     .endm
 
-    // s02A5_OpelucidGymCallMove
-    .macro Cmd_02A5 a0
+    .macro OpelucidGymCallMove a0
     FieldCommand 677
     .2byte \a0
     .endm
 
-    // s02A6_OpelucidGymRefreshVars
-    .macro Cmd_02A6
+    .macro OpelucidGymRefreshVars
     FieldCommand 678
     .endm
 
-    // s02A7_OpelucidGymCallButton
-    .macro Cmd_02A7 a0
+    .macro OpelucidGymCallButton a0
     FieldCommand 679
     .2byte \a0
     .endm
 
-    // s02A8_OpelucidGymFreeHeap
-    .macro Cmd_02A8
+    .macro OpelucidGymFreeHeap
     FieldCommand 680
     .endm
 
-    // s02A9_OpelucidGymCreateHeap
-    .macro Cmd_02A9
+    .macro OpelucidGymCreateHeap
     FieldCommand 681
     .endm
 
@@ -3582,8 +3504,7 @@
     FieldCommand 684
     .endm
 
-    // s02AE_GameGetMyCity
-    .macro Cmd_02AE a0
+    .macro GameGetMyCity a0
     FieldCommand 686
     .2byte \a0
     .endm
@@ -3598,46 +3519,42 @@
     .2byte \a0
     .endm
 
-    .macro KeysCmd_02B1 a0
+    .macro KeyInfoGetChamberKey a0
     FieldCommand 689
     .2byte \a0
     .endm
 
-    // s02B2_MemoryLinkCheckFlag
-    .macro Cmd_02B2 a0, a1
+    .macro MemoryLinkCheckFlag a0, a1
     FieldCommand 690
     .2byte \a0
     .2byte \a1
     .endm
 
-    // s02B3_MemoryLinkGetVar
-    .macro Cmd_02B3 a0, a1
+    .macro MemoryLinkGetVar a0, a1
     FieldCommand 691
     .2byte \a0
     .2byte \a1
     .endm
 
-    // s02B4_MemoryLinkIsPlayerLinked
-    .macro Cmd_02B4 a0, a1
+    .macro MemoryLinkIsPlayerLinked a0, a1
     FieldCommand 692
     .2byte \a0
     .2byte \a1
     .endm
 
-    // s02B5_WordSetMemoryLinkPlayerName
-    .macro Cmd_02B5 a0, a1
+    .macro WordSetMemoryLinkPlayerName a0, a1
     FieldCommand 693
     .2byte \a0
     .2byte \a1
     .endm
 
-    .macro MusicalCmd_02B6 a0, a1
+    .macro MemoryLinkCheckMusical a0, a1
     FieldCommand 694
     .2byte \a0
     .2byte \a1
     .endm
 
-    .macro MusicalCmd_02B7 a0
+    .macro MemoryLinkAddMusicalProps a0
     FieldCommand 695
     .2byte \a0
     .endm
@@ -3695,13 +3612,11 @@
     .2byte \a0
     .endm
 
-    // s02C4_HiddenHollowSetPeriod
-    .macro Cmd_02C4
+    .macro HiddenHollowSetPeriod
     FieldCommand 708
     .endm
 
-    // func_ov036_021c783c
-    .macro Cmd_02C5 a0
+    .macro JoinAvenueRecordActivity a0
     FieldCommand 709
     .2byte \a0
     .endm
@@ -3719,8 +3634,7 @@
     .2byte \a0
     .endm
 
-    // s02CB_PokewoodGetLevel
-    .macro Cmd_02CB a0
+    .macro PokewoodGetLevel a0
     FieldCommand 715
     .2byte \a0
     .endm
@@ -3737,7 +3651,7 @@
     FieldCommand 720
     .endm
 
-    .macro KeysCmd_02D1 a0
+    .macro KeyInfoGetMyCityProgress a0
     FieldCommand 721
     .2byte \a0
     .endm
@@ -3746,7 +3660,7 @@
     FieldCommand 722
     .endm
 
-    .macro HollowRivalCmd_02D3 a0, a1
+    .macro HollowRivalGetValue a0, a1
     FieldCommand 723
     .2byte \a0
     .2byte \a1
@@ -3757,20 +3671,19 @@
     .2byte \a0
     .endm
 
-    // func_ov036_021c9a7c
-    .macro Cmd_02D5 a0, a1
+    .macro WbtIsTrainerBeaten a0, a1
     FieldCommand 725
     .2byte \a0
     .2byte \a1
     .endm
 
-    .macro UnityTowerCmd_02D7 a0, a1
+    .macro Scrcmd_GetWifiHistoryCountryCount a0, a1
     FieldCommand 727
     .2byte \a0
     .2byte \a1
     .endm
 
-    .macro UnityTowerCmd_02D8 a0
+    .macro Scrcmd_MarkPartnerCandidate a0
     FieldCommand 728
     .2byte \a0
     .endm
@@ -3781,7 +3694,7 @@
     .2byte \a1
     .endm
 
-    .macro UnityTowerCmd_02DA a0
+    .macro UnityTowerSetRatingLevel a0
     FieldCommand 730
     .2byte \a0
     .endm
@@ -3834,15 +3747,13 @@
     FieldCommand 742
     .endm
 
-    // s02E8_CallFieldFadeOut
-    .macro Cmd_02E8 a0, a1
+    .macro CallFieldFadeOut a0, a1
     FieldCommand 744
     .2byte \a0
     .2byte \a1
     .endm
 
-    // s02E9_CallFieldFadeIn
-    .macro Cmd_02E9 a0, a1
+    .macro CallFieldFadeIn a0, a1
     FieldCommand 745
     .2byte \a0
     .2byte \a1
@@ -3858,8 +3769,7 @@
     .2byte \a5
     .endm
 
-    // s02ED_SetSoftResetBlocked
-    .macro Cmd_02ED a0, a1
+    .macro SetSoftResetBlocked a0, a1
     FieldCommand 749
     .2byte \a0
     .2byte \a1
@@ -3889,20 +3799,17 @@
 
     // Plugin 1
 
-    // BSubwayCmd_ClearWork
-    .macro Plugin1_Cmd1000
+    .macro BSubwayCmd_ClearWork
     FieldCommand 1000
     .endm
 
-    // BSubwayCmd_CreateWork
-    .macro Plugin1_Cmd1001 a0, a1
+    .macro BSubwayCmd_CreateWork a0, a1
     FieldCommand 1001
     .2byte \a0
     .2byte \a1
     .endm
 
-    // BSubwayCmd_FreeWork
-    .macro Plugin1_Cmd1002
+    .macro BSubwayCmd_FreeWork
     FieldCommand 1002
     .endm
 
@@ -3951,8 +3858,7 @@
 
     // Plugin 3
 
-    // PokemonLeagueCmd_DisableRailLines
-    .macro Plugin3_Cmd1000 a0
+    .macro PokemonLeagueCmd_DisableRailLines a0
     FieldCommand 1000
     .2byte \a0
     .endm
@@ -3962,14 +3868,12 @@
     .2byte \a0
     .endm
 
-    // PokemonLeagueCmd_PlayGrimsleyGroup
-    .macro Plugin3_Cmd1002 a0
+    .macro PokemonLeagueCmd_PlayGrimsleyGroup a0
     FieldCommand 1002
     .2byte \a0
     .endm
 
-    // PokemonLeagueCmd_PlayGrimsleyModel0Animation
-    .macro Plugin3_Cmd1003 a0
+    .macro PokemonLeagueCmd_PlayGrimsleyModel0Animation a0
     FieldCommand 1003
     .2byte \a0
     .endm
@@ -3978,96 +3882,79 @@
     FieldCommand 1004
     .endm
 
-    // PokemonLeagueCmd_PlayCaitlinModels34Or5
-    .macro Plugin3_Cmd1005 a0
+    .macro PokemonLeagueCmd_PlayCaitlinModels34Or5 a0
     FieldCommand 1005
     .2byte \a0
     .endm
 
-    // PokemonLeagueCmd_CallCaitlinModel1Event
-    .macro Plugin3_Cmd1006
+    .macro PokemonLeagueCmd_CallCaitlinModel1Event
     FieldCommand 1006
     .endm
 
-    // PokemonLeagueCmd_PlayCaitlinModel0
-    .macro Plugin3_Cmd1007
+    .macro PokemonLeagueCmd_PlayCaitlinModel0
     FieldCommand 1007
     .endm
 
-    // PokemonLeagueCmd_DropCaitlinActor
-    .macro Plugin3_Cmd1008 a0, a1
+    .macro PokemonLeagueCmd_DropCaitlinActor a0, a1
     FieldCommand 1008
     .2byte \a0
     .2byte \a1
     .endm
 
-    // PokemonLeagueCmd_CallShauntalModel8Event
-    .macro Plugin3_Cmd1009
+    .macro PokemonLeagueCmd_CallShauntalModel8Event
     FieldCommand 1009
     .endm
 
-    // PokemonLeagueCmd_PlayShauntalModel
-    .macro Plugin3_Cmd1010 a0
+    .macro PokemonLeagueCmd_PlayShauntalModel a0
     FieldCommand 1010
     .2byte \a0
     .endm
 
-    // PokemonLeagueCmd_CallShauntalRoomChangeEvent
-    .macro Plugin3_Cmd1011 a0
+    .macro PokemonLeagueCmd_CallShauntalRoomChangeEvent a0
     FieldCommand 1011
     .2byte \a0
     .endm
 
-    // PokemonLeagueCmd_CallShauntalModels6And9Event
-    .macro Plugin3_Cmd1012
+    .macro PokemonLeagueCmd_CallShauntalModels6And9Event
     FieldCommand 1012
     .endm
 
-    // PokemonLeagueCmd_PlayMarshalModel0
-    .macro Plugin3_Cmd1013
+    .macro PokemonLeagueCmd_PlayMarshalModel0
     FieldCommand 1013
     .endm
 
-    // PokemonLeagueCmd_PlayMarshalModel3Animation
-    .macro Plugin3_Cmd1014 a0
+    .macro PokemonLeagueCmd_PlayMarshalModel3Animation a0
     FieldCommand 1014
     .2byte \a0
     .endm
 
-    // PokemonLeagueCmd_PlayMarshalModel1
-    .macro Plugin3_Cmd1015
+    .macro PokemonLeagueCmd_PlayMarshalModel1
     FieldCommand 1015
     .endm
 
-    // PokemonLeagueCmd_CallMarshalPlatformEvent
-    .macro Plugin3_Cmd1016
+    .macro PokemonLeagueCmd_CallMarshalPlatformEvent
     FieldCommand 1016
     .endm
 
-    // PokemonLeagueCmd_CallChampionChangeEvent
-    .macro Plugin3_Cmd1017
+    .macro PokemonLeagueCmd_CallChampionChangeEvent
     FieldCommand 1017
     .endm
 
-    // PokemonLeagueCmd_CallChampionOpenEvent
-    .macro Plugin3_Cmd1018
+    .macro PokemonLeagueCmd_CallChampionOpenEvent
     FieldCommand 1018
     .endm
 
-    // PokemonLeagueCmd_HideChampionActorShadow
-    .macro Plugin3_Cmd1019 a0
+    .macro PokemonLeagueCmd_HideChampionActorShadow a0
     FieldCommand 1019
     .2byte \a0
     .endm
 
-    // PokemonLeagueCmd_ShowChampionActorShadow
-    .macro Plugin3_Cmd1020 a0
+    .macro PokemonLeagueCmd_ShowChampionActorShadow a0
     FieldCommand 1020
     .2byte \a0
     .endm
 
-    // PokemonLeagueCmd_SetChampionRoomOpen
-    .macro Plugin3_Cmd1021
+    .macro PokemonLeagueCmd_SetChampionRoomOpen
     FieldCommand 1021
     .endm
 
@@ -4119,20 +4006,17 @@
     .2byte \a0
     .endm
 
-    // WbtCmd_MakeMatch
-    .macro Plugin6_Cmd1005
+    .macro WbtCmd_MakeMatch
     FieldCommand 1005
     .endm
 
-    // WbtCmd_IsTournamentAvailable
-    .macro Plugin6_Cmd1006 a0, a1
+    .macro WbtCmd_IsTournamentAvailable a0, a1
     FieldCommand 1006
     .2byte \a0
     .2byte \a1
     .endm
 
-    // WbtCmd_WouldOpenTournament
-    .macro Plugin6_Cmd1007 a0, a1
+    .macro WbtCmd_WouldOpenTournament a0, a1
     FieldCommand 1007
     .2byte \a0
     .2byte \a1
@@ -4173,14 +4057,12 @@
     .2byte \a0
     .endm
 
-    // WbtCmd_SetCategory
-    .macro Plugin6_Cmd1015 a0
+    .macro WbtCmd_SetCategory a0
     FieldCommand 1015
     .2byte \a0
     .endm
 
-    // WbtCmd_GetCategory
-    .macro Plugin6_Cmd1016 a0
+    .macro WbtCmd_GetCategory a0
     FieldCommand 1016
     .2byte \a0
     .endm
@@ -4201,53 +4083,45 @@
     .2byte \a0
     .endm
 
-    // WbtCmd_GetSlot
-    .macro Plugin6_Cmd1022 a0, a1
+    .macro WbtCmd_GetSlot a0, a1
     FieldCommand 1022
     .2byte \a0
     .2byte \a1
     .endm
 
-    // WbtCmd_GetSlotTrainerObjCodes
-    .macro Plugin6_Cmd1023 a0, a1, a2
+    .macro WbtCmd_GetSlotTrainerObjCodes_1023 a0, a1, a2
     FieldCommand 1023
     .2byte \a0
     .2byte \a1
     .2byte \a2
     .endm
 
-    // WbtCmd_GetEntryCount
-    .macro Plugin6_Cmd1024 a0
+    .macro WbtCmd_GetEntryCount a0
     FieldCommand 1024
     .2byte \a0
     .endm
 
-    // WbtCmd_CountDownloads
-    .macro Plugin6_Cmd1025 a0
+    .macro WbtCmd_CountDownloads a0
     FieldCommand 1025
     .2byte \a0
     .endm
 
-    // WbtCmd_SetDownloadSlot
-    .macro Plugin6_Cmd1026 a0
+    .macro WbtCmd_SetDownloadSlot a0
     FieldCommand 1026
     .2byte \a0
     .endm
 
-    // WbtCmd_GetDownloadSlot
-    .macro Plugin6_Cmd1027 a0
+    .macro WbtCmd_GetDownloadSlot a0
     FieldCommand 1027
     .2byte \a0
     .endm
 
-    // WbtCmd_SetUseBattleBox
-    .macro Plugin6_Cmd1028 a0
+    .macro WbtCmd_SetUseBattleBox a0
     FieldCommand 1028
     .2byte \a0
     .endm
 
-    // WbtCmd_GetSlotTrainerObjCodes
-    .macro Plugin6_Cmd1031 a0, a1, a2
+    .macro WbtCmd_GetSlotTrainerObjCodes_1031 a0, a1, a2
     FieldCommand 1031
     .2byte \a0
     .2byte \a1
@@ -4259,40 +4133,34 @@
     .2byte \a0
     .endm
 
-    // WbtCmd_SetTournamentNameWord
-    .macro Plugin6_Cmd1044 a0, a1
+    .macro WbtCmd_SetTournamentNameWord a0, a1
     FieldCommand 1044
     .byte \a0
     .2byte \a1
     .endm
 
-    // WbtCmd_CallEntryPartySelect
-    .macro Plugin6_Cmd1046 a0
+    .macro WbtCmd_CallEntryPartySelect a0
     FieldCommand 1046
     .2byte \a0
     .endm
 
-    // WbtCmd_ShowTrainerList
-    .macro Plugin6_Cmd1047 a0
+    .macro WbtCmd_ShowTrainerList a0
     FieldCommand 1047
     .2byte \a0
     .endm
 
-    // WbtCmd_CallPokeSelect
-    .macro Plugin6_Cmd1048 a0
+    .macro WbtCmd_CallPokeSelect a0
     FieldCommand 1048
     .2byte \a0
     .endm
 
-    // WbtCmd_ShowDownloads
-    .macro Plugin6_Cmd1049 a0, a1
+    .macro WbtCmd_ShowDownloads a0, a1
     FieldCommand 1049
     .2byte \a0
     .2byte \a1
     .endm
 
-    // WbtCmd_ShowWinRecord
-    .macro Plugin6_Cmd1050 a0
+    .macro WbtCmd_ShowWinRecord a0
     FieldCommand 1050
     .2byte \a0
     .endm
@@ -4303,8 +4171,7 @@
     .2byte \a1
     .endm
 
-    // WbtCmd_GetRegulationId
-    .macro Plugin6_Cmd1057 a0
+    .macro WbtCmd_GetRegulationId a0
     FieldCommand 1057
     .2byte \a0
     .endm
@@ -4315,95 +4182,60 @@
     .2byte \a0
     .endm
 
-    // WbtCmd_CheckEntryParties
-    .macro Plugin6_Cmd1059 a0
+    .macro WbtCmd_CheckEntryParties a0
     FieldCommand 1059
     .2byte \a0
     .endm
 
     // Plugin 7
 
-    // WbtCmd_MakeMatch
-    .macro Plugin7_Cmd1005
-    FieldCommand 1005
-    .endm
-
-    // WbtCmd_SetCategory
-    .macro Plugin7_Cmd1015 a0
-    FieldCommand 1015
-    .2byte \a0
-    .endm
-
-    // WbtCmd_GetCategory
-    .macro Plugin7_Cmd1016 a0
-    FieldCommand 1016
-    .2byte \a0
-    .endm
-
-    // WbtCmd_GetRoundRemaining
-    .macro Plugin7_Cmd1019 a0
+    .macro WbtCmd_GetRoundRemaining a0
     FieldCommand 1019
     .2byte \a0
     .endm
 
-    // WbtCmd_ResetPicks
-    .macro Plugin7_Cmd1023
+    .macro WbtCmd_ResetPicks_1023
     FieldCommand 1023
     .endm
 
-    // WbtCmd_GetEntryCount
-    .macro Plugin7_Cmd1024 a0
-    FieldCommand 1024
-    .2byte \a0
-    .endm
-
-    // WbtCmd_ShowPartyList
-    .macro Plugin7_Cmd1029
+    .macro WbtCmd_ShowPartyList
     FieldCommand 1029
     .endm
 
-    // WbtCmd_ClosePartyList
-    .macro Plugin7_Cmd1030
+    .macro WbtCmd_ClosePartyList
     FieldCommand 1030
     .endm
 
-    // WbtCmd_ResetPicks
-    .macro Plugin7_Cmd1031
+    .macro WbtCmd_ResetPicks_1031
     FieldCommand 1031
     .endm
 
-    // WbtCmd_RandomPick
-    .macro Plugin7_Cmd1032 a0
+    .macro WbtCmd_RandomPick a0
     FieldCommand 1032
     .2byte \a0
     .endm
 
-    // WbtCmd_SetPick
-    .macro Plugin7_Cmd1033 a0, a1
+    .macro WbtCmd_SetPick a0, a1
     FieldCommand 1033
     .2byte \a0
     .2byte \a1
     .endm
 
-    // WbtCmd_WordSetPickSpecies
-    .macro Plugin7_Cmd1034 a0, a1
+    .macro WbtCmd_WordSetPickSpecies a0, a1
     FieldCommand 1034
     .byte \a0
     .2byte \a1
     .endm
 
-    // WbtCmd_ListPartyPokemon
-    .macro Plugin7_Cmd1035
+    .macro WbtCmd_ListPartyPokemon
     FieldCommand 1035
     .endm
 
-    // WbtCmd_Dummy
-    .macro Plugin7_Cmd1036
+    .macro WbtCmd_Dummy
     FieldCommand 1036
     .endm
 
-    // WbtCmd_SwapPickedPokemon
-    .macro Plugin7_Cmd1037
+    .macro WbtCmd_SwapPickedPokemon
     FieldCommand 1037
     .endm
 
@@ -4411,135 +4243,103 @@
     FieldCommand 1039
     .endm
 
-    // WbtCmd_GetOpponentObjCode
-    .macro Plugin7_Cmd1040 a0
+    .macro WbtCmd_GetOpponentObjCode a0
     FieldCommand 1040
     .2byte \a0
     .endm
 
-    // WbtCmd_ShowOpponentLine
-    .macro Plugin7_Cmd1041 a0, a1
+    .macro WbtCmd_ShowOpponentLine a0, a1
     FieldCommand 1041
     .2byte \a0
     .2byte \a1
     .endm
 
-    // WbtCmd_CallBattle
-    .macro Plugin7_Cmd1042 a0
+    .macro WbtCmd_CallBattle a0
     FieldCommand 1042
     .2byte \a0
     .endm
 
-    // WbtCmd_ShowOpponentLine7
-    .macro Plugin7_Cmd1043 a0
+    .macro WbtCmd_ShowOpponentLine7 a0
     FieldCommand 1043
     .2byte \a0
     .endm
 
-    // WbtCmd_SetTournamentNameWord
-    .macro Plugin7_Cmd1044 a0, a1
-    FieldCommand 1044
-    .byte \a0
-    .2byte \a1
-    .endm
-
-    // WbtCmd_WordSetOpponentName
-    .macro Plugin7_Cmd1045 a0
+    .macro WbtCmd_WordSetOpponentName a0
     FieldCommand 1045
     .byte \a0
     .endm
 
-    // WbtCmd_ShowTrainerList
-    .macro Plugin7_Cmd1047 a0
-    FieldCommand 1047
-    .2byte \a0
-    .endm
-
-    // WbtCmd_ShowPortraits
-    .macro Plugin7_Cmd1052 a0
+    .macro WbtCmd_ShowPortraits a0
     FieldCommand 1052
     .2byte \a0
     .endm
 
-    // WbtCmd_LoadPortraitScene
-    .macro Plugin7_Cmd1053 a0, a1
+    .macro WbtCmd_LoadPortraitScene a0, a1
     FieldCommand 1053
     .2byte \a0
     .2byte \a1
     .endm
 
-    // WbtCmd_PlayStadiumIntro
-    .macro Plugin7_Cmd1054
+    .macro WbtCmd_PlayStadiumIntro
     FieldCommand 1054
     .endm
 
-    // WbtCmd_SwitchLights
-    .macro Plugin7_Cmd1055 a0, a1
+    .macro WbtCmd_SwitchLights a0, a1
     FieldCommand 1055
     .2byte \a0
     .2byte \a1
     .endm
 
-    // WbtCmd_PlayCrowd
-    .macro Plugin7_Cmd1056 a0
+    .macro WbtCmd_PlayCrowd a0
     FieldCommand 1056
     .2byte \a0
     .endm
 
-    // WbtCmd_SetNamePlates
-    .macro Plugin7_Cmd1060 a0
+    .macro WbtCmd_SetNamePlates a0
     FieldCommand 1060
     .2byte \a0
     .endm
 
     // Plugin 8
 
-    // ResortCmd_StartTalk
-    .macro Plugin8_Cmd1000
+    .macro ResortCmd_StartTalk_1000
     FieldCommand 1000
     .endm
 
-    // ResortCmd_EndTalk
-    .macro Plugin8_Cmd1001
+    .macro ResortCmd_EndTalk
     FieldCommand 1001
     .endm
 
-    // ResortCmd_GetValue
-    .macro Plugin8_Cmd1002 a0, a1
+    .macro ResortCmd_GetValue a0, a1
     FieldCommand 1002
     .2byte \a0
     .2byte \a1
     .endm
 
-    // ResortCmd_GetScriptValue
-    .macro Plugin8_Cmd1003 a0, a1
+    .macro ResortCmd_GetScriptValue a0, a1
     FieldCommand 1003
     .2byte \a0
     .2byte \a1
     .endm
 
-    // ResortCmd_ShowRecords
-    .macro Plugin8_Cmd1004 a0, a1
+    .macro ResortCmd_ShowRecords a0, a1
     FieldCommand 1004
     .2byte \a0
     .2byte \a1
     .endm
 
-    // ResortCmd_MakeData
-    .macro Plugin8_Cmd1005 a0, a1
+    .macro ResortCmd_MakeData a0, a1
     FieldCommand 1005
     .2byte \a0
     .2byte \a1
     .endm
 
-    // ResortCmd_RecreatePeople
-    .macro Plugin8_Cmd1006 a0
+    .macro ResortCmd_RecreatePeople a0
     FieldCommand 1006
     .2byte \a0
     .endm
 
-    // ResortCmd_SetWord
-    .macro Plugin8_Cmd1007 a0, a1, a2, a3
+    .macro ResortCmd_SetWord a0, a1, a2, a3
     FieldCommand 1007
     .2byte \a0
     .2byte \a1
@@ -4547,16 +4347,14 @@
     .2byte \a3
     .endm
 
-    // ResortCmd_RemovePerson
-    .macro Plugin8_Cmd1008 a0, a1, a2
+    .macro ResortCmd_RemovePerson a0, a1, a2
     FieldCommand 1008
     .2byte \a0
     .2byte \a1
     .2byte \a2
     .endm
 
-    // ResortCmd_AddShopExperience
-    .macro Plugin8_Cmd1009 a0, a1, a2, a3
+    .macro ResortCmd_AddShopExperience a0, a1, a2, a3
     FieldCommand 1009
     .2byte \a0
     .2byte \a1
@@ -4564,62 +4362,53 @@
     .2byte \a3
     .endm
 
-    // ResortCmd_AddPopularity
-    .macro Plugin8_Cmd1010 a0, a1, a2
+    .macro ResortCmd_AddPopularity a0, a1, a2
     FieldCommand 1010
     .2byte \a0
     .2byte \a1
     .2byte \a2
     .endm
 
-    // ResortCmd_StartTalk
-    .macro Plugin8_Cmd1011
+    .macro ResortCmd_StartTalk_1011
     FieldCommand 1011
     .endm
 
-    // ResortCmd_SaveShopId
-    .macro Plugin8_Cmd1012
+    .macro ResortCmd_SaveShopId
     FieldCommand 1012
     .endm
 
-    // ResortCmd_SetOccupantsLocked
-    .macro Plugin8_Cmd1013 a0
+    .macro ResortCmd_SetOccupantsLocked a0
     FieldCommand 1013
     .2byte \a0
     .endm
 
-    // ResortCmd_HideActors
-    .macro Plugin8_Cmd1014 a0
+    .macro ResortCmd_HideActors a0
     FieldCommand 1014
     .2byte \a0
     .endm
 
-    // ResortCmd_RaffleShopItem
-    .macro Plugin8_Cmd1015 a0, a1, a2
+    .macro ResortCmd_RaffleShopItem a0, a1, a2
     FieldCommand 1015
     .2byte \a0
     .2byte \a1
     .2byte \a2
     .endm
 
-    // ResortCmd_SetFriendship
-    .macro Plugin8_Cmd1016 a0, a1, a2
+    .macro ResortCmd_SetFriendship a0, a1, a2
     FieldCommand 1016
     .2byte \a0
     .2byte \a1
     .2byte \a2
     .endm
 
-    // ResortCmd_RaiseLevel
-    .macro Plugin8_Cmd1017 a0, a1, a2
+    .macro ResortCmd_RaiseLevel a0, a1, a2
     FieldCommand 1017
     .2byte \a0
     .2byte \a1
     .2byte \a2
     .endm
 
-    // ResortCmd_ChangeEffortValue
-    .macro Plugin8_Cmd1018 a0, a1, a2, a3
+    .macro ResortCmd_ChangeEffortValue a0, a1, a2, a3
     FieldCommand 1018
     .2byte \a0
     .2byte \a1
@@ -4627,28 +4416,24 @@
     .2byte \a3
     .endm
 
-    // ResortCmd_ShortenEggSteps
-    .macro Plugin8_Cmd1019 a0, a1, a2
+    .macro ResortCmd_ShortenEggSteps a0, a1, a2
     FieldCommand 1019
     .2byte \a0
     .2byte \a1
     .2byte \a2
     .endm
 
-    // ResortCmd_SetShopFlag
-    .macro Plugin8_Cmd1020
+    .macro ResortCmd_SetShopFlag
     FieldCommand 1020
     .endm
 
-    // ResortCmd_PayAndSetShopFlag
-    .macro Plugin8_Cmd1021 a0, a1
+    .macro ResortCmd_PayAndSetShopFlag a0, a1
     FieldCommand 1021
     .2byte \a0
     .2byte \a1
     .endm
 
-    // ResortCmd_GetPersonVisit
-    .macro Plugin8_Cmd1022 a0, a1, a2, a3, a4
+    .macro ResortCmd_GetPersonVisit a0, a1, a2, a3, a4
     FieldCommand 1022
     .2byte \a0
     .2byte \a1
@@ -4657,15 +4442,13 @@
     .2byte \a4
     .endm
 
-    // ResortCmd_NameEntry
-    .macro Plugin8_Cmd1023 a0, a1
+    .macro ResortCmd_NameEntry a0, a1
     FieldCommand 1023
     .2byte \a0
     .2byte \a1
     .endm
 
-    // ResortCmd_Visit
-    .macro Plugin8_Cmd1024 a0, a1, a2, a3
+    .macro ResortCmd_Visit a0, a1, a2, a3
     FieldCommand 1024
     .2byte \a0
     .2byte \a1
@@ -4673,113 +4456,97 @@
     .2byte \a3
     .endm
 
-    // ResortCmd_CheckRank100Unlock
-    .macro Plugin8_Cmd1025 a0
+    .macro ResortCmd_CheckRank100Unlock a0
     FieldCommand 1025
     .2byte \a0
     .endm
 
-    // ResortCmd_MarkRaffled
-    .macro Plugin8_Cmd1026
+    .macro ResortCmd_MarkRaffled
     FieldCommand 1026
     .endm
 
-    // ResortCmd_AddRecordPerson
-    .macro Plugin8_Cmd1027 a0, a1
+    .macro ResortCmd_AddRecordPerson a0, a1
     FieldCommand 1027
     .2byte \a0
     .2byte \a1
     .endm
 
-    // ResortCmd_AddEntryOrRecord
-    .macro Plugin8_Cmd1028 a0, a1
+    .macro ResortCmd_AddEntryOrRecord a0, a1
     FieldCommand 1028
     .2byte \a0
     .2byte \a1
     .endm
 
-    // ResortCmd_GetNPCValue
-    .macro Plugin8_Cmd1029 a0, a1, a2
+    .macro ResortCmd_GetNPCValue a0, a1, a2
     FieldCommand 1029
     .2byte \a0
     .2byte \a1
     .2byte \a2
     .endm
 
-    // ResortCmd_SetOwnValue
-    .macro Plugin8_Cmd1030 a0, a1
+    .macro ResortCmd_SetOwnValue a0, a1
     FieldCommand 1030
     .2byte \a0
     .2byte \a1
     .endm
 
-    // ResortCmd_GetOwnValue
-    .macro Plugin8_Cmd1031 a0, a1
+    .macro ResortCmd_GetOwnValue a0, a1
     FieldCommand 1031
     .2byte \a0
     .2byte \a1
     .endm
 
-    // ResortCmd_SetOccupantWords
-    .macro Plugin8_Cmd1032 a0, a1, a2
+    .macro ResortCmd_SetOccupantWords a0, a1, a2
     FieldCommand 1032
     .2byte \a0
     .2byte \a1
     .2byte \a2
     .endm
 
-    // ResortCmd_SetNPCWord
-    .macro Plugin8_Cmd1033 a0, a1, a2
+    .macro ResortCmd_SetNPCWord a0, a1, a2
     FieldCommand 1033
     .2byte \a0
     .2byte \a1
     .2byte \a2
     .endm
 
-    // ResortCmd_GetGoodsValue
-    .macro Plugin8_Cmd1034 a0, a1, a2
+    .macro ResortCmd_GetGoodsValue a0, a1, a2
     FieldCommand 1034
     .2byte \a0
     .2byte \a1
     .2byte \a2
     .endm
 
-    // ResortCmd_DescribeOccupant
-    .macro Plugin8_Cmd1035 a0, a1, a2
+    .macro ResortCmd_DescribeOccupant a0, a1, a2
     FieldCommand 1035
     .2byte \a0
     .2byte \a1
     .2byte \a2
     .endm
 
-    // ResortCmd_ShowMedalInfo
-    .macro Plugin8_Cmd1036
+    .macro ResortCmd_ShowMedalInfo
     FieldCommand 1036
     .endm
 
-    // ResortCmd_StartSceneAnim
-    .macro Plugin8_Cmd1037 a0
+    .macro ResortCmd_StartSceneAnim a0
     FieldCommand 1037
     .2byte \a0
     .endm
 
-    // ResortCmd_IsSceneAnimDone
-    .macro Plugin8_Cmd1038 a0, a1
+    .macro ResortCmd_IsSceneAnimDone a0, a1
     FieldCommand 1038
     .2byte \a0
     .2byte \a1
     .endm
 
-    // ResortCmd_EndSceneAnim
-    .macro Plugin8_Cmd1039 a0
+    .macro ResortCmd_EndSceneAnim a0
     FieldCommand 1039
     .2byte \a0
     .endm
 
     // Plugin 8, with overlay 60 loaded
 
-    // ResortShopCmd_Open
-    .macro Plugin8Ov60_Cmd1000 a0, a1, a2, a3, a4, a5, a6, a7
+    .macro ResortShopCmd_Open_1000 a0, a1, a2, a3, a4, a5, a6, a7
     FieldCommand 1000
     .2byte \a0
     .2byte \a1
@@ -4791,8 +4558,7 @@
     .2byte \a7
     .endm
 
-    // ResortShopCmd_Open
-    .macro Plugin8Ov60_Cmd1011 a0, a1, a2, a3, a4, a5, a6, a7
+    .macro ResortShopCmd_Open_1011 a0, a1, a2, a3, a4, a5, a6, a7
     FieldCommand 1011
     .2byte \a0
     .2byte \a1
@@ -4806,44 +4572,37 @@
 
     // Plugin 9
 
-    // BlackTowerCmd_CreateWalls
-    .macro Plugin9_Cmd1000
+    .macro BlackTowerCmd_CreateWalls
     FieldCommand 1000
     .endm
 
-    // BlackTowerCmd_ChangeRoom
-    .macro Plugin9_Cmd1001 a0, a1, a2
+    .macro BlackTowerCmd_ChangeRoom a0, a1, a2
     FieldCommand 1001
     .2byte \a0
     .2byte \a1
     .2byte \a2
     .endm
 
-    // BlackTowerCmd_StartRun
-    .macro Plugin9_Cmd1003
+    .macro BlackTowerCmd_StartRun
     FieldCommand 1003
     .endm
 
-    // BlackTowerCmd_GetFloorInArea
-    .macro Plugin9_Cmd1004 a0
+    .macro BlackTowerCmd_GetFloorInArea a0
     FieldCommand 1004
     .2byte \a0
     .endm
 
-    // BlackTowerCmd_ChangeFloor
-    .macro Plugin9_Cmd1005 a0
+    .macro BlackTowerCmd_ChangeFloor a0
     FieldCommand 1005
     .2byte \a0
     .endm
 
-    // BlackTowerCmd_GetArea
-    .macro Plugin9_Cmd1006 a0
+    .macro BlackTowerCmd_GetArea a0
     FieldCommand 1006
     .2byte \a0
     .endm
 
-    // BlackTowerCmd_CallBattleEvent
-    .macro Plugin9_Cmd1007
+    .macro BlackTowerCmd_CallBattleEvent
     FieldCommand 1007
     .endm
 
@@ -4853,8 +4612,7 @@
     .2byte \a0
     .endm
 
-    // BlackTowerCmd_SetTrainerDefeated
-    .macro Plugin9_Cmd1009 a0, a1
+    .macro BlackTowerCmd_SetTrainerDefeated a0, a1
     FieldCommand 1009
     .2byte \a0
     .2byte \a1
@@ -4866,15 +4624,13 @@
     .2byte \a0
     .endm
 
-    // BlackTowerCmd_IsTrainerDefeated
-    .macro Plugin9_Cmd1011 a0, a1
+    .macro BlackTowerCmd_IsTrainerDefeated a0, a1
     FieldCommand 1011
     .2byte \a0
     .2byte \a1
     .endm
 
-    // BlackTowerCmd_GetNpcScript
-    .macro Plugin9_Cmd1012 a0
+    .macro BlackTowerCmd_GetNpcScript a0
     FieldCommand 1012
     .2byte \a0
     .endm
@@ -4885,42 +4641,36 @@
     .2byte \a0
     .endm
 
-    // BlackTowerCmd_GetSpecialTrainerFlag
-    .macro Plugin9_Cmd1014 a0, a1
+    .macro BlackTowerCmd_GetSpecialTrainerFlag a0, a1
     FieldCommand 1014
     .2byte \a0
     .2byte \a1
     .endm
 
-    // BlackTowerCmd_SetSpecialTrainerFlag
-    .macro Plugin9_Cmd1015 a0, a1
+    .macro BlackTowerCmd_SetSpecialTrainerFlag a0, a1
     FieldCommand 1015
     .2byte \a0
     .2byte \a1
     .endm
 
-    // BlackTowerCmd_CallDoorEvent
-    .macro Plugin9_Cmd1016 a0, a1
+    .macro BlackTowerCmd_CallDoorEvent a0, a1
     FieldCommand 1016
     .2byte \a0
     .2byte \a1
     .endm
 
-    // BlackTowerCmd_GetGoalFloor
-    .macro Plugin9_Cmd1017 a0
+    .macro BlackTowerCmd_GetGoalFloor a0
     FieldCommand 1017
     .2byte \a0
     .endm
 
-    // BlackTowerCmd_GetTrainerClass
-    .macro Plugin9_Cmd1018 a0, a1
+    .macro BlackTowerCmd_GetTrainerClass a0, a1
     FieldCommand 1018
     .2byte \a0
     .2byte \a1
     .endm
 
-    // BlackTowerCmd_SetProgress
-    .macro Plugin9_Cmd1019 a0
+    .macro BlackTowerCmd_SetProgress a0
     FieldCommand 1019
     .2byte \a0
     .endm
@@ -4937,107 +4687,91 @@
     .2byte \a0
     .endm
 
-    // BlackTowerCmd_GetTrainerId
-    .macro Plugin9_Cmd1022 a0, a1
+    .macro BlackTowerCmd_GetTrainerId a0, a1
     FieldCommand 1022
     .2byte \a0
     .2byte \a1
     .endm
 
-    // BlackTowerCmd_GetVersion
-    .macro Plugin9_Cmd1023 a0
+    .macro BlackTowerCmd_GetVersion a0
     FieldCommand 1023
     .2byte \a0
     .endm
 
-    // BlackTowerCmd_GetInfo
-    .macro Plugin9_Cmd1024 a0, a1, a2
+    .macro BlackTowerCmd_GetInfo a0, a1, a2
     FieldCommand 1024
     .2byte \a0
     .2byte \a1
     .2byte \a2
     .endm
 
-    // BlackTowerCmd_CallMachineEvent
-    .macro Plugin9_Cmd1025
+    .macro BlackTowerCmd_CallMachineEvent
     FieldCommand 1025
     .endm
 
-    // BlackTowerCmd_IsTargetSlot
-    .macro Plugin9_Cmd1026 a0, a1
+    .macro BlackTowerCmd_IsTargetSlot a0, a1
     FieldCommand 1026
     .2byte \a0
     .2byte \a1
     .endm
 
-    // BlackTowerCmd_GetNpcScriptByResult
-    .macro Plugin9_Cmd1027 a0, a1
+    .macro BlackTowerCmd_GetNpcScriptByResult a0, a1
     FieldCommand 1027
     .2byte \a0
     .2byte \a1
     .endm
 
-    // BlackTowerCmd_GetRoomNpcCount
-    .macro Plugin9_Cmd1028 a0
+    .macro BlackTowerCmd_GetRoomNpcCount a0
     FieldCommand 1028
     .2byte \a0
     .endm
 
-    // BlackTowerCmd_HasEarnedMoney
-    .macro Plugin9_Cmd1029 a0
+    .macro BlackTowerCmd_HasEarnedMoney a0
     FieldCommand 1029
     .2byte \a0
     .endm
 
-    // BlackTowerCmd_CallLiftEvent
-    .macro Plugin9_Cmd1030
+    .macro BlackTowerCmd_CallLiftEvent
     FieldCommand 1030
     .endm
 
-    // BlackTowerCmd_TakeEarnedMoney
-    .macro Plugin9_Cmd1031 a0
+    .macro BlackTowerCmd_TakeEarnedMoney a0
     FieldCommand 1031
     .2byte \a0
     .endm
 
     // Plugin 10
 
-    // PokewoodCmd_Film
-    .macro Plugin10_Cmd1000 a0, a1, a2
+    .macro PokewoodCmd_Film a0, a1, a2
     FieldCommand 1000
     .2byte \a0
     .2byte \a1
     .2byte \a2
     .endm
 
-    // PokewoodCmd_WatchSlot
-    .macro Plugin10_Cmd1001 a0, a1
+    .macro PokewoodCmd_WatchSlot a0, a1
     FieldCommand 1001
     .2byte \a0
     .2byte \a1
     .endm
 
-    // PokewoodCmd_PickMovie
-    .macro Plugin10_Cmd1002 a0
+    .macro PokewoodCmd_PickMovie a0
     FieldCommand 1002
     .2byte \a0
     .endm
 
-    // PokewoodCmd_OpenMenu
-    .macro Plugin10_Cmd1003 a0, a1
+    .macro PokewoodCmd_OpenMenu a0, a1
     FieldCommand 1003
     .2byte \a0
     .2byte \a1
     .endm
 
-    // PokewoodCmd_SetSaveSlot
-    .macro Plugin10_Cmd1004 a0
+    .macro PokewoodCmd_SetSaveSlot a0
     FieldCommand 1004
     .2byte \a0
     .endm
 
-    // PokewoodCmd_SetMessageWord
-    .macro Plugin10_Cmd1005 a0, a1
+    .macro PokewoodCmd_SetMessageWord a0, a1
     FieldCommand 1005
     .byte \a0
     .2byte \a1
@@ -5067,8 +4801,7 @@
     .2byte \a1
     .endm
 
-    // PokewoodCmd_GetDownloadedMovieResult
-    .macro Plugin10_Cmd1010 a0, a1
+    .macro PokewoodCmd_GetDownloadedMovieResult a0, a1
     FieldCommand 1010
     .2byte \a0
     .2byte \a1
@@ -5082,34 +4815,29 @@
     FieldCommand 1012
     .endm
 
-    // PokewoodCmd_SelectCast
-    .macro Plugin10_Cmd1013 a0
+    .macro PokewoodCmd_SelectCast a0
     FieldCommand 1013
     .2byte \a0
     .endm
 
-    // PokewoodCmd_SetUsePlayerCast
-    .macro Plugin10_Cmd1014 a0
+    .macro PokewoodCmd_SetUsePlayerCast a0
     FieldCommand 1014
     .2byte \a0
     .endm
 
-    // PokewoodCmd_GetNewUnlockKind
-    .macro Plugin10_Cmd1015 a0, a1, a2
+    .macro PokewoodCmd_GetNewUnlockKind a0, a1, a2
     FieldCommand 1015
     .2byte \a0
     .2byte \a1
     .2byte \a2
     .endm
 
-    // PokewoodCmd_TestAndSetLevelBit
-    .macro Plugin10_Cmd1016 a0
+    .macro PokewoodCmd_TestAndSetLevelBit a0
     FieldCommand 1016
     .2byte \a0
     .endm
 
-    // PokewoodCmd_GetSlotFlag
-    .macro Plugin10_Cmd1017 a0, a1
+    .macro PokewoodCmd_GetSlotFlag a0, a1
     FieldCommand 1017
     .2byte \a0
     .2byte \a1
@@ -5143,14 +4871,12 @@
     .2byte \a0
     .endm
 
-    // PokewoodCmd_SetSlotFlag
-    .macro Plugin10_Cmd1022 a0
+    .macro PokewoodCmd_SetSlotFlag a0
     FieldCommand 1022
     .2byte \a0
     .endm
 
-    // PokewoodCmd_OpenRecordMonitor
-    .macro Plugin10_Cmd1023 a0
+    .macro PokewoodCmd_OpenRecordMonitor a0
     FieldCommand 1023
     .2byte \a0
     .endm
@@ -5170,8 +4896,7 @@
     .2byte \a1
     .endm
 
-    // PokewoodCmd_WatchBlock
-    .macro Plugin10_Cmd1026
+    .macro PokewoodCmd_WatchBlock
     FieldCommand 1026
     .endm
 
@@ -5188,27 +4913,23 @@
 
     // Plugin 12
 
-    // PlasmaFrigateCmd_PressSwitch
-    .macro Plugin12_Cmd1000 a0
+    .macro PlasmaFrigateCmd_PressSwitch a0
     FieldCommand 1000
     .2byte \a0
     .endm
 
-    // PlasmaFrigateCmd_SetLightsState
-    .macro Plugin12_Cmd1001 a0, a1
+    .macro PlasmaFrigateCmd_SetLightsState a0, a1
     FieldCommand 1001
     .2byte \a0
     .2byte \a1
     .endm
 
-    // PlasmaFrigateCmd_PlayGroupASecond
-    .macro Plugin12_Cmd1002 a0
+    .macro PlasmaFrigateCmd_PlayGroupASecond a0
     FieldCommand 1002
     .2byte \a0
     .endm
 
-    // PlasmaFrigateCmd_PlayGroupBSecond
-    .macro Plugin12_Cmd1003 a0
+    .macro PlasmaFrigateCmd_PlayGroupBSecond a0
     FieldCommand 1003
     .2byte \a0
     .endm
@@ -5223,21 +4944,18 @@
     .2byte \a0
     .endm
 
-    // PlasmaFrigateCmd_SetSwitchLightState
-    .macro Plugin12_Cmd1006 a0, a1
+    .macro PlasmaFrigateCmd_SetSwitchLightState a0, a1
     FieldCommand 1006
     .2byte \a0
     .2byte \a1
     .endm
 
-    // PlasmaFrigateCmd_PlaySwitchAnim
-    .macro Plugin12_Cmd1007 a0
+    .macro PlasmaFrigateCmd_PlaySwitchAnim a0
     FieldCommand 1007
     .2byte \a0
     .endm
 
-    // PlasmaFrigateCmd_PlaySwitchLightAnim
-    .macro Plugin12_Cmd1008 a0
+    .macro PlasmaFrigateCmd_PlaySwitchLightAnim a0
     FieldCommand 1008
     .2byte \a0
     .endm
@@ -5255,15 +4973,13 @@
     .2byte \a1
     .endm
 
-    // PokemonCenterCmd_GetMatchState
-    .macro Plugin13_Cmd1005 a0, a1
+    .macro PokemonCenterCmd_GetMatchState a0, a1
     FieldCommand 1005
     .2byte \a0
     .2byte \a1
     .endm
 
-    // PokemonCenterCmd_SetMatchInProgress
-    .macro Plugin13_Cmd1006
+    .macro PokemonCenterCmd_SetMatchInProgress
     FieldCommand 1006
     .endm
 
@@ -5271,15 +4987,13 @@
     FieldCommand 1007
     .endm
 
-    // PokemonCenterCmd_SetMatchState
-    .macro Plugin13_Cmd1008 a0, a1
+    .macro PokemonCenterCmd_SetMatchState a0, a1
     FieldCommand 1008
     .2byte \a0
     .2byte \a1
     .endm
 
-    // PokemonCenterCmd_AddBattlePoints
-    .macro Plugin13_Cmd1009 a0
+    .macro PokemonCenterCmd_AddBattlePoints a0
     FieldCommand 1009
     .2byte \a0
     .endm
@@ -5287,36 +5001,36 @@
     // Plugin 14
 
     // Plugin14Cmd_StartAspertiaSeasonAnimations
-    .macro Plugin14_Cmd1000
+    .macro Plugin14Cmd_StartAspertiaSeasonAnimations
     FieldCommand 1000
     .endm
 
     // Plugin14Cmd_ShowGC6Model
-    .macro Plugin14_Cmd1001 a0
+    .macro Plugin14Cmd_ShowGC6Model a0
     FieldCommand 1001
     .2byte \a0
     .endm
 
     // Plugin14Cmd_PlayGC6Model
-    .macro Plugin14_Cmd1002 a0
+    .macro Plugin14Cmd_PlayGC6Model a0
     FieldCommand 1002
     .2byte \a0
     .endm
 
     // Plugin14Cmd_StartActorHover
-    .macro Plugin14_Cmd1003 a0
+    .macro Plugin14Cmd_StartActorHover a0
     FieldCommand 1003
     .2byte \a0
     .endm
 
     // Plugin14Cmd_PlayGC6Model23
-    .macro Plugin14_Cmd1004 a0
+    .macro Plugin14Cmd_PlayGC6Model23 a0
     FieldCommand 1004
     .2byte \a0
     .endm
 
     // Plugin14Cmd_HideGC6Model3
-    .macro Plugin14_Cmd1005
+    .macro Plugin14Cmd_HideGC6Model3
     FieldCommand 1005
     .endm
 
@@ -5329,12 +5043,12 @@
     .endm
 
     // Plugin14Cmd_ResetLCDToBlack
-    .macro Plugin14_Cmd1007
+    .macro Plugin14Cmd_ResetLCDToBlack
     FieldCommand 1007
     .endm
 
     // Plugin14Cmd_StartLeagueCenterAnimations
-    .macro Plugin14_Cmd1009
+    .macro Plugin14Cmd_StartLeagueCenterAnimations
     FieldCommand 1009
     .endm
 
@@ -5345,17 +5059,17 @@
     .endm
 
     // Plugin14Cmd_LoadAspertiaBG3Picture
-    .macro Plugin14_Cmd1011
+    .macro Plugin14Cmd_LoadAspertiaBG3Picture
     FieldCommand 1011
     .endm
 
     // Plugin14Cmd_CallDT9ReleaseEvent
-    .macro Plugin14_Cmd1012
+    .macro Plugin14Cmd_CallDT9ReleaseEvent
     FieldCommand 1012
     .endm
 
     // Plugin14Cmd_CallDT9ThrowEvent
-    .macro Plugin14_Cmd1013 a0, a1, a2, a3, a4, a5
+    .macro Plugin14Cmd_CallDT9ThrowEvent a0, a1, a2, a3, a4, a5
     FieldCommand 1013
     .2byte \a0
     .2byte \a1
@@ -5366,7 +5080,7 @@
     .endm
 
     // Plugin14Cmd_PlayDT9Thrown
-    .macro Plugin14_Cmd1014 a0, a1, a2
+    .macro Plugin14Cmd_PlayDT9Thrown a0, a1, a2
     FieldCommand 1014
     .2byte \a0
     .2byte \a1
@@ -5374,19 +5088,19 @@
     .endm
 
     // Plugin14Cmd_CallDT9WaitThrownDoneEvent
-    .macro Plugin14_Cmd1015
+    .macro Plugin14Cmd_CallDT9WaitThrownDoneEvent
     FieldCommand 1015
     .endm
 
     // Plugin14Cmd_CallDT9WaitFifthFrameEvent
-    .macro Plugin14_Cmd1016
+    .macro Plugin14Cmd_CallDT9WaitFifthFrameEvent
     FieldCommand 1016
     .endm
 
     // Plugin 15
 
     // Plugin15Cmd_ShowSplash
-    .macro Plugin15_Cmd1000 a0, a1, a2
+    .macro Plugin15Cmd_ShowSplash a0, a1, a2
     FieldCommand 1000
     .2byte \a0
     .2byte \a1
@@ -5394,7 +5108,7 @@
     .endm
 
     // Plugin15Cmd_JumpActorOut
-    .macro Plugin15_Cmd1001 a0, a1, a2, a3
+    .macro Plugin15Cmd_JumpActorOut a0, a1, a2, a3
     FieldCommand 1001
     .2byte \a0
     .2byte \a1
@@ -5405,45 +5119,45 @@
     // Plugin 16
 
     // Plugin16Cmd_ShowRuinsModel
-    .macro Plugin16_Cmd1000 a0
+    .macro Plugin16Cmd_ShowRuinsModel a0
     FieldCommand 1000
     .2byte \a0
     .endm
 
     // Plugin16Cmd_SetRuinsAnimFrame
-    .macro Plugin16_Cmd1001 a0
+    .macro Plugin16Cmd_SetRuinsAnimFrame a0
     FieldCommand 1001
     .2byte \a0
     .endm
 
     // Plugin16Cmd_PlayRuinsAnim
-    .macro Plugin16_Cmd1002 a0
+    .macro Plugin16Cmd_PlayRuinsAnim a0
     FieldCommand 1002
     .2byte \a0
     .endm
 
     // Plugin16Cmd_CallFormEvent
-    .macro Plugin16_Cmd1003
+    .macro Plugin16Cmd_CallFormEvent
     FieldCommand 1003
     .endm
 
     // Plugin16Cmd_HideActor2
-    .macro Plugin16_Cmd1004
+    .macro Plugin16Cmd_HideActor2
     FieldCommand 1004
     .endm
 
     // Plugin16Cmd_StartChase
-    .macro Plugin16_Cmd1005 a0
+    .macro Plugin16Cmd_StartChase a0
     FieldCommand 1005
     .2byte \a0
     .endm
 
     // Plugin16Cmd_WaitChase
-    .macro Plugin16_Cmd1006
+    .macro Plugin16Cmd_WaitChase
     FieldCommand 1006
     .endm
 
     // Plugin16Cmd_DropActor
-    .macro Plugin16_Cmd1007
+    .macro Plugin16Cmd_DropActor
     FieldCommand 1007
     .endm

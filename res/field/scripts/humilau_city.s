@@ -103,8 +103,8 @@ L_013A:
 Script_9:
     ActorsPauseAll
     ActorNew 792, 100, 1, 251, 230, 0
-    Plugin15_Cmd1000 791, 65531, 151
-    Plugin15_Cmd1001 251, 791, 156, 1
+    Plugin15Cmd_ShowSplash 791, 65531, 151
+    Plugin15Cmd_JumpActorOut 251, 791, 156, 1
     // "Uihaa![f000]븁\u0000"
     ActorMsg MSGFILE_SCRIPT, HumilauCity_Text_Uihaa, 251, 0, 0
     MsgWinCloseAll
@@ -229,7 +229,7 @@ L_031D:
     WorkSetConst EVENT_WORK_0x40df, 2
     FlagSet EVENT_FLAG_0x0324
     FlagSet EVENT_FLAG_0x0325
-    HollowRivalCmd_0262 1, 28
+    HollowRivalSetValue 1, 28
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt
@@ -311,7 +311,7 @@ Script_8:
     // "With Pokémon and people,\ntreasure every meeting.[f000]븀\u0000\nThere may not be another...[f000]븁\u0000\nThat's why you have to give\nit your best during that moment...[f000]븁\u0000"
     ParentActorMsg MSGFILE_SCRIPT, HumilauCity_Text_PokemonPeopleTreasureEvery_2, 0, 0
     MsgWinCloseAll
-    Cmd_0275 0, 40, 0
+    WordSetFunfestMission 0, 40, 0
     SEPlay SEQ_SE_FLD_133
     // "The Funfest Mission\n“[f000]ŀ\u0001\u0000\"[f000]븀\u0000\nhas been added to the Entralink!"
     SystemMsg HumilauCity_Text_FunfestMissionHasBeen, 0
@@ -673,7 +673,7 @@ Script_19:
     // "Ahhhhhh!\nThe weather's great today, too![f000]븁\u0000\nI wonder how many days have passed\nsince I came here on my vacation.[f000]븁\u0000\nSpending every day in such abundance\nmakes my brain a little mushy.[f000]븁\u0000\nI wonder if there will be an event\nthat will stimulate me a little.[f000]븁\u0000"
     ParentActorMsg MSGFILE_SCRIPT, HumilauCity_Text_AhhhhhhWeathersGreatToday, 0, 0
     MsgWinCloseAll
-    Cmd_0275 0, 25, 0
+    WordSetFunfestMission 0, 25, 0
     SEPlay SEQ_SE_FLD_133
     // "The Funfest Mission\n“[f000]ŀ\u0001\u0000\"[f000]븀\u0000\nhas been added to the Entralink!"
     SystemMsg HumilauCity_Text_FunfestMissionHasBeen_2, 0

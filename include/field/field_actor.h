@@ -191,7 +191,8 @@ void RailActorAnim_ResetBlactAnime(FieldActor *actor);
 // The functions that run an action command: what to do on the first frame, each frame and at the end
 typedef BOOL (*ActorAcmdFunc)(FieldActor *actor);
 
-// The work of a jump along the rail, which fldmmdl_g3dobj.c's func_ov036_02195354 starts and fld_act_rail.c updates
+// The work of a jump along the rail, which fldmmdl_g3dobj.c's RailActorAcmd_InitJumpWithSe starts and fld_act_rail.c
+// updates
 typedef struct {
     s32 speed;
     s32 progress;
@@ -254,7 +255,7 @@ BOOL RailActor_AcStayWalkU4F0(FieldActor *actor);
 BOOL RailActor_AcStayWalkD4F0(FieldActor *actor);
 BOOL RailActor_AcStayWalkL4F0(FieldActor *actor);
 BOOL RailActor_AcStayWalkR4F0(FieldActor *actor);
-void func_ov036_02195354(FieldActor *actor, u16 dir, u32 speed, u32 timer, u16 frame, s16 height, u16 step);
+void RailActorAcmd_InitJumpWithSe(FieldActor *actor, u16 dir, u32 speed, u32 timer, u16 frame, s16 height, u16 step);
 // Also fldmmdl_g3dobj.c's: the freeing of the actors' 3D system, their 3D object system, the creation and deletion of
 // an actor's 3D object, the tile under a rail position, and the direction an actor on the rails faces for a camera
 // angle

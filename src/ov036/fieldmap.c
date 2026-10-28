@@ -223,7 +223,7 @@ Field *Field_Create(GameSystem *gsys, HeapID heapId) {
     if (AreaData_HasSeasons(areaId)) {
         season = GameSystem_GetSeason(gsys);
     } else if (AreaData_IsInfinityDungeon(areaId)) {
-        if (!func_ov036_0218141c(PlayerState_GetZoneID(GSYS_GetPlayerState(gsys)))) {
+        if (!IsZoneFirstBlackTowerOrWhiteTreehollow(PlayerState_GetZoneID(GSYS_GetPlayerState(gsys)))) {
             season = KeyDataSave_GetArea(getKeyDataBlkAddress(GameData_GetSaveControl(field->gameData)));
         }
     } else if (AreaData_IsJoinAvenue(areaId)) {
@@ -232,7 +232,7 @@ Field *Field_Create(GameSystem *gsys, HeapID heapId) {
         WbtSystem **wbt = GameData_GetWbtSystemPtr(field->gameData);
 
         if (wbt != NULL && *wbt != NULL) {
-            season = func_ov036_021c98f4(*wbt);
+            season = GetPWTSeason(*wbt);
         }
     }
     field->areaData = AreaData_Create(heapId, areaId, season);
@@ -440,7 +440,7 @@ u32 FieldRoutine_MapSpawnFinish(GameSystem *gsys, Field *field) {
         }
         FieldStatus_SetContinueFlag(GameData_GetFieldStatus(field->gameData), FALSE);
         FieldG3DMapper_UpdateSync(field->g3DMapper);
-        func_ov036_021b6660(field->fesGimmick);
+        FesGimmick_OnZoneEnter(field->fesGimmick);
         if (GetZoneIsUnionRoom(field->zoneId) == TRUE || IsZone150Or151(field->zoneId) == TRUE) {
             GSYS_SetEventProvider(gsys, FieldEventProvider_UnionRoom, field);
         } else if (Field_GetControllerTypeID(field) == 1) {
@@ -551,7 +551,7 @@ u32 FieldRoutine_RunAltFrame(GameSystem *gsys, Field *field) {
 u32 FieldRoutine_MapUnload(GameSystem *gsys, Field *field) {
     GameData *gameData;
 
-    func_ov036_021b65d4(field->fesGimmick);
+    FesGimmick_DeleteSparkles(field->fesGimmick);
     EncEff_Free(field->encEff);
     Fld3DCi_Free(field->g3dCi);
     FieldParticle_Free(field->particleSystem);
@@ -853,7 +853,7 @@ void FieldG2D_Prepare3DSurface(Field *field) {
     MsgBGPrinter_SetupBg(field->msgBGSys);
 }
 
-void func_ov036_02180630(Field *field) {
+void FieldG2D_Prepare3DSurfaceDelayed(Field *field) {
     MtxFx22 mtx;
 
     MAT2_SetScaleRot(&mtx, 0, FX32_ONE, FX32_ONE, MAT2_ROT_IDX);
@@ -1033,7 +1033,7 @@ void Field_InitActorSystem(Field *field) {
     FieldActorG3DSystem_Create(field->actorSystem, field->g3DObjSystem);
     FldActSys_InitDraw(field->actorSystem, FieldCamera_GetViewYawPtr(field->cameraSystem));
     FldActSys_WakeUpAllActors(field->actorSystem);
-    FldActSys_SetShadowsEnabled(actorSystem, func_ov036_021813b8(field->zoneId));
+    FldActSys_SetShadowsEnabled(actorSystem, IsZoneShadowsEnabled(field->zoneId));
 }
 
 void Field_SuspendActorSystem(Field *field) {
@@ -1124,7 +1124,7 @@ void Field_SwapZoneByMatrix(Field *field) {
     MI_SetMainMemoryPriority(MI_PROCESSOR_ARM9);
     Field_HotswapSpawnActors(field, gameData, actorSystem, eventData, zoneId);
     FestMission_OnZoneEnter(field->gameSystem, zoneId);
-    func_ov036_021b6660(field->fesGimmick);
+    FesGimmick_OnZoneEnter(field->fesGimmick);
     MI_SetMainMemoryPriority(MI_PROCESSOR_ARM7);
     func_ov012_02153668(GSYS_GetGameCommSystem(field->gameSystem));
 }
@@ -1210,19 +1210,19 @@ void Field_LoadWFBC(GameData *gameData, Field *field, u32 zoneId) {
         } else {
             city = GameData_GetCityState(field->gameData, 0);
         }
-        func_ov036_021852f4(field->g3DMapper, city, isOther);
+        FieldG3DMapper_SetupWfbc(field->g3DMapper, city, isOther);
     }
 }
 
 void Field_LoadJoinAvenue(GameData *gameData, Field *field, u32 zoneId) {
-    ResortMapCreateWork *resortMap = func_ov036_02185304(field->g3DMapper);
+    ResortMapCreateWork *resortMap = FieldG3DMapper_GetResortMap(field->g3DMapper);
     JoinAvenueSave *joinAvenue = SaveControl_GetJoinAvenue(GameData_GetSaveControl(gameData));
     JoinAvenueInfo *info = JoinAvenue_GetInfo(joinAvenue);
     JoinAvenueOccupants *occupants = getAddressOfBeginningOfOccupants(joinAvenue);
 
     if (IsZoneJoinAvenue(zoneId)) {
-        func_ov036_021c8984(resortMap, zoneId, info, occupants);
-        func_ov036_021c8b40(resortMap, GameData_GetEventData(gameData));
+        ResortMapCreate_Setup(resortMap, zoneId, info, occupants);
+        ResortMapCreate_MoveShopEntities(resortMap, GameData_GetEventData(gameData));
     }
 }
 
@@ -1484,7 +1484,7 @@ u32 GetObjectProjectionMatrixOffset(u16 zoneId) {
     return 0x136;
 }
 
-BOOL func_ov036_021813b8(u16 zoneId) {
+BOOL IsZoneShadowsEnabled(u16 zoneId) {
     if (zoneId == ZONE_NIMBASA_CITY_17) {
         return FALSE;
     }
@@ -1516,7 +1516,7 @@ BOOL IsZoneTwoPassLoad(u16 zoneId) {
     return FALSE;
 }
 
-BOOL func_ov036_0218141c(u16 zoneId) {
+BOOL IsZoneFirstBlackTowerOrWhiteTreehollow(u16 zoneId) {
     switch (zoneId) {
     case ZONE_WHITE_TREEHOLLOW:
     case ZONE_BLACK_TOWER:

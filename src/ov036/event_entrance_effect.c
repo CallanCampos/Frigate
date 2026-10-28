@@ -385,7 +385,7 @@ static GameEventReturnCode EntranceEffect_DepartureCallback(GameEvent *event, u3
         break;
     case 5:
         EntranceEffect_FreePlayerAcmd(field);
-        GameEvent_ChainNext(event, func_ov036_021b74a0(gsys, warp));
+        GameEvent_ChainNext(event, EventWarpSequence_CreateWalkEvent(gsys, warp));
         *state = EntranceEffect_GetNextStep(work);
         EntranceEffect_AdvanceStep(work);
         if (work->continueDirect) {

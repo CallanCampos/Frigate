@@ -121,7 +121,7 @@ typedef struct {
 } SpinEventWork;
 
 static GameEventReturnCode EventQuicksandArrive_Callback(GameEvent *event, u32 *state, void *data);
-static GameEventReturnCode func_ov036_021b9764(GameEvent *event, u32 *state, void *data);
+static GameEventReturnCode EventQuicksandArrive_RunSpinZoom(GameEvent *event, u32 *state, void *data);
 static GameEventReturnCode EventQuicksandArrive_RunSpinZoomAlt(GameEvent *event, u32 *state, void *data);
 static GameEventReturnCode EventQuicksandArrive_RunSpinZoomSmoke(GameEvent *event, u32 *state, void *data);
 static GameEventReturnCode EventPlayerSpinDown_Callback(GameEvent *event, u32 *state, void *data);
@@ -136,9 +136,9 @@ GameEvent *EventQuicksandArrive_Create(GameEvent *parent, GameSystem *gsys, Fiel
     return event;
 }
 
-GameEvent *func_ov036_021b95ac(GameEvent *parent, GameSystem *gsys, Field *field, BOOL seasonChanged, u32 prevSeason,
-                               u32 nextSeason) {
-    GameEvent *event = GameEvent_Create(gsys, parent, func_ov036_021b9764, sizeof(SpinEventWork));
+GameEvent *EventQuicksandArrive_CreateSpinZoom(GameEvent *parent, GameSystem *gsys, Field *field, BOOL seasonChanged,
+                                               u32 prevSeason, u32 nextSeason) {
+    GameEvent *event = GameEvent_Create(gsys, parent, EventQuicksandArrive_RunSpinZoom, sizeof(SpinEventWork));
     SpinEventWork *wk = GameEvent_GetData(event);
 
     wk->field = field;
@@ -162,7 +162,7 @@ GameEvent *EventQuicksandArrive_CreateSpinZoomAlt(GameEvent *parent, GameSystem 
     return event;
 }
 
-GameEvent *func_ov036_021b9614(GameEvent *parent, GameSystem *gsys, Field *field) {
+GameEvent *EventQuicksandArrive_CreateSpinZoomSmoke(GameEvent *parent, GameSystem *gsys, Field *field) {
     GameEvent *event = GameEvent_Create(gsys, parent, EventQuicksandArrive_RunSpinZoomSmoke, sizeof(SpinEventWork));
     SpinEventWork *wk = GameEvent_GetData(event);
 
@@ -180,7 +180,7 @@ GameEvent *EventPlayerSpinDown_Create(GameEvent *parent, GameSystem *gsys, Field
     return event;
 }
 
-GameEvent *func_ov036_021b9664(GameEvent *parent, GameSystem *gsys, Field *field) {
+GameEvent *EventQuicksandArrive_CreateMoveAnime(GameEvent *parent, GameSystem *gsys, Field *field) {
     GameEvent *event = GameEvent_Create(gsys, parent, EventQuicksandArrive_RunMoveAnime, 0x68);
     FallEventWork *wk = GameEvent_GetData(event);
 
@@ -227,12 +227,12 @@ static GameEventReturnCode EventQuicksandArrive_Callback(GameEvent *event, u32 *
     return GAMEEVENT_CONTINUE;
 }
 
-static void func_ov036_021b986c(SpinEventWork *wk);
-static void func_ov036_021b97f0(SpinEventWork *wk);
-static GameEvent *func_ov036_021b9890(SpinEventWork *wk);
-static void func_ov036_021b9858(SpinEventWork *wk);
+static void EventQuicksandArrive_StartPlayerSpin(SpinEventWork *wk);
+static void EventQuicksandArrive_StartZoomOut(SpinEventWork *wk);
+static GameEvent *EventQuicksandArrive_CreateFadeIn(SpinEventWork *wk);
+static void EventQuicksandArrive_EndZoomOut(SpinEventWork *wk);
 
-static GameEventReturnCode func_ov036_021b9764(GameEvent *event, u32 *state, void *data) {
+static GameEventReturnCode EventQuicksandArrive_RunSpinZoom(GameEvent *event, u32 *state, void *data) {
     SpinEventWork *wk = data;
     Field *field = wk->field;
     FieldCamera *camera = Field_GetCameraSystem(field);
@@ -250,13 +250,13 @@ static GameEventReturnCode func_ov036_021b9764(GameEvent *event, u32 *state, voi
         break;
     case 2:
         if (wk->hasWarp == 0) {
-            func_ov036_021b986c(wk);
-            func_ov036_021b97f0(wk);
+            EventQuicksandArrive_StartPlayerSpin(wk);
+            EventQuicksandArrive_StartZoomOut(wk);
         }
         (*state)++;
         break;
     case 3:
-        GameEvent_ChainNext(event, func_ov036_021b9890(wk));
+        GameEvent_ChainNext(event, EventQuicksandArrive_CreateFadeIn(wk));
         (*state)++;
         break;
     case 4:
@@ -265,13 +265,13 @@ static GameEventReturnCode func_ov036_021b9764(GameEvent *event, u32 *state, voi
         }
         break;
     case 5:
-        func_ov036_021b9858(wk);
+        EventQuicksandArrive_EndZoomOut(wk);
         return GAMEEVENT_DONE;
     }
     return GAMEEVENT_CONTINUE;
 }
 
-static void func_ov036_021b97f0(SpinEventWork *wk) {
+static void EventQuicksandArrive_StartZoomOut(SpinEventWork *wk) {
     FieldCamera *camera = Field_GetCameraSystem(wk->field);
     FieldCameraAnimationController *controller = Field_CreateCameraAnimationController(wk->field);
 
@@ -288,12 +288,12 @@ static void func_ov036_021b97f0(SpinEventWork *wk) {
     FieldCameraAnimationController_StartAnimation(wk->controller);
 }
 
-static void func_ov036_021b9858(SpinEventWork *wk) {
+static void EventQuicksandArrive_EndZoomOut(SpinEventWork *wk) {
     FieldCameraAnimationController_FinishCamera(wk->controller);
     FieldCameraAnimationController_FreeAnimation(wk->controller);
 }
 
-static void func_ov036_021b986c(SpinEventWork *wk) {
+static void EventQuicksandArrive_StartPlayerSpin(SpinEventWork *wk) {
     FieldTaskManager *taskManager = Field_GetTaskManager(wk->field);
     FieldTask *task = FieldActorSpinTask_CreatePlayerDeaccel(wk->field, 0x3c, 8, 1);
 
@@ -302,7 +302,7 @@ static void func_ov036_021b986c(SpinEventWork *wk) {
 
 static void EventQuicksandArrive_OnScoreboardEnd(void *data);
 
-static GameEvent *func_ov036_021b9890(SpinEventWork *wk) {
+static GameEvent *EventQuicksandArrive_CreateFadeIn(SpinEventWork *wk) {
     GameSystem *gsys = wk->gsys;
     Field *field = wk->field;
 
@@ -316,8 +316,8 @@ static GameEvent *func_ov036_021b9890(SpinEventWork *wk) {
 static void EventQuicksandArrive_OnScoreboardEnd(void *data) {
     SpinEventWork *wk = data;
 
-    func_ov036_021b986c(wk);
-    func_ov036_021b97f0(wk);
+    EventQuicksandArrive_StartPlayerSpin(wk);
+    EventQuicksandArrive_StartZoomOut(wk);
 }
 
 static void EventQuicksandArrive_StartZoomOutAlt(SpinEventWork *wk);

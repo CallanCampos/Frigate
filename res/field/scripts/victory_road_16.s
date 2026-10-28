@@ -85,7 +85,7 @@ L_00E8:
     SEWait
     BGMChangeMap
     WorkSetConst EVENT_WORK_0x4124, 1
-    HollowRivalCmd_0262 1, 38
+    HollowRivalSetValue 1, 38
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt

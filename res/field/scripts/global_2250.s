@@ -11,7 +11,7 @@ Script_1:
     InfoMsgClose
     CallEggHatch 0x8020
     RecordAdd 9, 1
-    Cmd_02C5 8
+    JoinAvenueRecordActivity 8
     WorkSetConst 0x8020, 0
     VMHalt
     .balign 4, 0

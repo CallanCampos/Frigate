@@ -42,7 +42,7 @@ L_008E:
 Script_1:
     WorkSetConst 0x8020, 0
     PlayerGetDir 0x8020
-    Cmd_0269
+    GymInsectShowEffect
     WorkCmpConst 0x8020, 0
     VMJumpIf CMP_EQ, L_00AF
     VMJump L_00BD
@@ -147,7 +147,7 @@ Script_4:
     VMStackPushConst 0
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_023A
-    Cmd_0268 0
+    GymInsectPlayObject 0
     VMCall L_025A
     FlagSet EVENT_FLAG_0x0109
 
@@ -241,7 +241,7 @@ Movement_0320:
 
 Script_6:
     ActorsPauseAll
-    Cmd_0268 1
+    GymInsectPlayObject 1
     ActorCmdExec 255, Movement_03B0
     VMCall L_025A
     ActorCmdWait

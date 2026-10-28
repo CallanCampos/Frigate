@@ -9,7 +9,7 @@ Script_1:
     ActorsPauseAll
     SEPlay SEQ_SE_MESSAGE
     ActorSetEyeToEye
-    Cmd_01F6 0, 0, 0, 0x8010
+    Scrcmd_CheckWifiListFlags 0, 0, 0, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 0
     VMStackCmp CMP_EQ
@@ -21,7 +21,7 @@ Script_1:
     VMJump L_00E8
 
 L_0045:
-    Cmd_01F7 0, 0, 0, 0x8010
+    Scrcmd_WifiListOperation 0, 0, 0, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 0
     VMStackCmp CMP_EQ
@@ -46,7 +46,7 @@ L_0078:
     VMJump L_00E8
 
 L_00B1:
-    Cmd_01F7 1, 0, 0, 0x8010
+    Scrcmd_WifiListOperation 1, 0, 0, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -67,14 +67,14 @@ L_00E8:
 
 Script_2:
     WorkSetConst 0x8020, 0
-    Cmd_01F7 2, 0, 0, 0x8010
+    Scrcmd_WifiListOperation 2, 0, 0, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_012D
     // "Loblolly: I finally came up with some new\ndesigns. I'm really proud of them![f000]븁\u0000\nBut I'd like your opinion. Would you\ntake a look at these Décor items, and[f000]븀\u0000\ntell me which one you'd dream about?"
     ActorMsg MSGFILE_SCRIPT, Global10445_Text_LoblollyFinallyCameUp, 0x8011, 2, 0
-    Cmd_01F7 3, 0, 0, 0
+    Scrcmd_WifiListOperation 3, 0, 0, 0
     VMJump L_0164
 
 L_012D:
@@ -92,11 +92,11 @@ L_0158:
     ActorMsg MSGFILE_SCRIPT, Global10445_Text_LoblollyOhGoingHelp, 0x8011, 2, 0
 
 L_0164:
-    Cmd_01F8 0, 0
-    Cmd_01F8 1, 1
-    Cmd_01F8 2, 2
-    Cmd_01F8 3, 3
-    Cmd_01F8 4, 4
+    Scrcmd_SetWifiFriendNameWord 0, 0
+    Scrcmd_SetWifiFriendNameWord 1, 1
+    Scrcmd_SetWifiFriendNameWord 2, 2
+    Scrcmd_SetWifiFriendNameWord 3, 3
+    Scrcmd_SetWifiFriendNameWord 4, 4
     ListMenu_AnchorTopRight 31, 1, 0, 1, 32800
     ListMenuAdd 10, 65535, 0
     ListMenuAdd 11, 65535, 1
@@ -120,7 +120,7 @@ L_0164:
     VMJump L_0210
 
 L_01F6:
-    Cmd_01F7 4, 0x8020, 0, 0
+    Scrcmd_WifiListOperation 4, 0x8020, 0, 0
     // "Oh, you have impeccable taste![f000]븁\u0000\nThat's it. This Décor is so great that\npeople will dream about it![f000]븁\u0000\nYour advice was very helpful. Next time I\ncome up with great designs, I'd love to[f000]븀\u0000\nbounce my ideas off you again!"
     ActorMsg MSGFILE_SCRIPT, Global10445_Text_OhHaveImpeccableTaste, 0x8011, 2, 0
     LastKeyWait

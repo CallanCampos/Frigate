@@ -39,10 +39,10 @@ typedef struct {
 // EventWarpSequence_CreateIn pick by its type
 GameEventReturnCode EventWarpSequenceOut_RunPlain(GameEvent *event, u32 *state, void *data);
 GameEventReturnCode EventWarpSequenceOut_RunGroundAnime(GameEvent *event, u32 *state, void *data);
-GameEventReturnCode func_ov036_021b74c8(GameEvent *event, u32 *state, void *data);
+GameEventReturnCode EventWarpSequenceOut_RunObjectAnime(GameEvent *event, u32 *state, void *data);
 GameEventReturnCode EventWarpSequenceOut_RunAppear(GameEvent *event, u32 *state, void *data);
 GameEventReturnCode EventWarpSequenceOut_RunCamera(GameEvent *event, u32 *state, void *data);
-GameEventReturnCode func_ov036_021b7604(GameEvent *event, u32 *state, void *data);
+GameEventReturnCode EventWarpSequenceOut_RunFadeSe(GameEvent *event, u32 *state, void *data);
 GameEventReturnCode EventWarpSequenceIn_RunPlain(GameEvent *event, u32 *state, void *data);
 GameEventReturnCode EventWarpSequenceIn_RunGroundAnime(GameEvent *event, u32 *state, void *data);
 GameEventReturnCode EventWarpSequenceIn_RunObjectAnime(GameEvent *event, u32 *state, void *data);
@@ -51,7 +51,7 @@ GameEventReturnCode EventWarpSequenceIn_RunCamera(GameEvent *event, u32 *state, 
 GameEventReturnCode EventWarpSequenceIn_RunFadeSe(GameEvent *event, u32 *state, void *data);
 
 // The event that walks the player into the entrance
-GameEvent *func_ov036_021b74a0(GameSystem *gsys, WarpSequence *warp);
+GameEvent *EventWarpSequence_CreateWalkEvent(GameSystem *gsys, WarpSequence *warp);
 
 // The entrance camera's lifetime, parameters and animation
 EntranceCamera *EntranceCamera_Create(Field *field);

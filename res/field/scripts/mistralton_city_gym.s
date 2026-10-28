@@ -152,12 +152,12 @@ L_01A2:
     VMStackPushConst 2
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_0211
-    HollowRivalCmd_0262 0, 3
-    HollowRivalCmd_0262 1, 18
+    HollowRivalSetValue 0, 3
+    HollowRivalSetValue 1, 18
     VMJump L_0217
 
 L_0211:
-    HollowRivalCmd_0262 1, 19
+    HollowRivalSetValue 1, 19
 
 L_0217:
     TrainerFlagSet TRAINER_PILOT_FLYNN
@@ -184,7 +184,7 @@ Script_5:
     WorkSetConst 0x8022, 0
     ActorCmdExec 255, Movement_032C
     ActorCmdWait
-    Cmd_028E 5
+    MistraltonGymFireCannon 5
     VMSleep 30
     ActorCmdExec 255, Movement_0334
     ActorCmdWait

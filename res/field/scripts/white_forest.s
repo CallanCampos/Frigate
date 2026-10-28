@@ -44,7 +44,7 @@ Script_1:
     VMHalt
 
 Script_2:
-    KeysCmd_02D1 0x8020
+    KeyInfoGetMyCityProgress 0x8020
     VMStackPush 0x8020
     VMStackPushConst 5
     VMStackCmp CMP_GE
@@ -340,7 +340,7 @@ L_04EA:
 
 Script_9:
     ActorsPauseAll
-    KeysCmd_02D1 0x8020
+    KeyInfoGetMyCityProgress 0x8020
     VMStackPush 0x8020
     VMStackPushConst 4
     VMStackCmp CMP_LE
@@ -389,7 +389,7 @@ L_05C9:
 
 Script_10:
     ActorsPauseAll
-    KeysCmd_02D1 0x8020
+    KeyInfoGetMyCityProgress 0x8020
     VMStackPush 0x8020
     VMStackPushConst 4
     VMStackCmp CMP_LE
@@ -440,7 +440,7 @@ L_0669:
 Script_11:
     ActorsPauseAll
     WordSetPlayerName 0
-    KeysCmd_02D1 0x8020
+    KeyInfoGetMyCityProgress 0x8020
     VMStackPush 0x8020
     VMStackPushConst 9
     VMStackCmp CMP_LE
@@ -472,7 +472,7 @@ L_06CC:
 
 Script_12:
     ActorsPauseAll
-    KeysCmd_02D1 0x8020
+    KeyInfoGetMyCityProgress 0x8020
     VMStackPush 0x8020
     VMStackPushConst 4
     VMStackCmp CMP_LE
@@ -522,7 +522,7 @@ L_076C:
 
 Script_13:
     ActorsPauseAll
-    KeysCmd_02D1 0x8020
+    KeyInfoGetMyCityProgress 0x8020
     VMStackPush 0x8020
     VMStackPushConst 4
     VMStackCmp CMP_LE
@@ -573,7 +573,7 @@ L_080F:
 
 Script_14:
     ActorsPauseAll
-    KeysCmd_02D1 0x8020
+    KeyInfoGetMyCityProgress 0x8020
     VMStackPush 0x8020
     VMStackPushConst 4
     VMStackCmp CMP_LE
@@ -622,7 +622,7 @@ L_08AC:
 
 Script_15:
     ActorsPauseAll
-    KeysCmd_02D1 0x8020
+    KeyInfoGetMyCityProgress 0x8020
     VMStackPush 0x8020
     VMStackPushConst 4
     VMStackCmp CMP_LE

@@ -79,7 +79,7 @@ Script_1:
     FlagSet EVENT_FLAG_0x02e7
     FlagReset EVENT_FLAG_0x02e4
     FlagReset EVENT_FLAG_0x0323
-    HollowRivalCmd_0262 4, 0
+    HollowRivalSetValue 4, 0
     WorkSetConst EVENT_WORK_0x40a1, 8
     FinishAllEvents
     ActorsUnpauseAll

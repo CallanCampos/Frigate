@@ -111,7 +111,7 @@ L_016C:
     VMStackPushConst 0
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_01BF
-    Plugin10_Cmd1016 0x8010
+    PokewoodCmd_TestAndSetLevelBit 0x8010
     VMStackPush 0x8010
     VMStackPushConst 0
     VMStackCmp CMP_EQ
@@ -183,8 +183,8 @@ L_0273:
     VMJump L_02AA
 
 L_0286:
-    Cmd_02C5 3
-    Cmd_01DD 14, 0x8024, 0
+    JoinAvenueRecordActivity 3
+    BroadcastGameBeacon 14, 0x8024, 0
     VMCall L_0655
     VMCall L_034A
     VMCall L_0714
@@ -254,7 +254,7 @@ L_035A:
     WorkSetConst 0x8010, 30
     VMCall L_0420
     MsgWinCloseAll
-    Plugin10_Cmd1000 0x8026, 0x8024, 0x8010
+    PokewoodCmd_Film 0x8026, 0x8024, 0x8010
     DebugPrint 0x8010
     VMStackPush 0x8010
     VMStackPushConst 0
@@ -376,7 +376,7 @@ L_0526:
     ActorMsg MSGFILE_SCRIPT, Global10815_Text_OkPickWhichScript, 0x8011, 2, 0
     MsgWinCloseAll
     WorkSetConst 0x8024, 41
-    Plugin10_Cmd1002 0x8024
+    PokewoodCmd_PickMovie 0x8024
     DebugPrint 0x8024
     VMStackPush 0x8024
     VMStackPushConst 41
@@ -406,7 +406,7 @@ L_05A7:
     ActorMsg MSGFILE_SCRIPT, Global10815_Text_OkAllRightThen_2, 0x8011, 2, 0
     MsgWinCloseAll
     WorkSetConst 0x8022, 5
-    Plugin10_Cmd1014 0
+    PokewoodCmd_SetUsePlayerCast 0
     VMJump L_061E
 
 L_05C5:
@@ -421,7 +421,7 @@ L_05D8:
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_0603
     WorkSetConst 0x8022, 4
-    Plugin10_Cmd1014 1
+    PokewoodCmd_SetUsePlayerCast 1
     VMJump L_0612
 
 L_0603:
@@ -442,7 +442,7 @@ L_0620:
     // "OK! All right![f000]븁\u0000\nThen pick the Pokémon\nthat will perform with you![f000]븁\u0000"
     ActorMsg MSGFILE_SCRIPT, Global10815_Text_OkAllRightThen, 0x8011, 2, 0
     MsgWinCloseAll
-    Plugin10_Cmd1013 0x8010
+    PokewoodCmd_SelectCast 0x8010
     VMStackPush 0x8010
     VMStackPushConst 0
     VMStackCmp CMP_EQ
@@ -609,7 +609,7 @@ L_084F:
     // "OK. Decide which film\nto remove from the theater.[f000]븁\u0000"
     ActorMsg MSGFILE_SCRIPT, Global10815_Text_OkDecideWhichFilm, 0x8011, 2, 0
     MsgWinCloseAll
-    Plugin10_Cmd1003 1, 0x8026
+    PokewoodCmd_OpenMenu 1, 0x8026
     VMStackPush 0x8026
     VMStackPushConst 8
     VMStackCmp CMP_EQ
@@ -636,7 +636,7 @@ L_08BD:
 
 L_08D0:
     DebugPrint 0x8026
-    Plugin10_Cmd1004 0x8026
+    PokewoodCmd_SetSaveSlot 0x8026
     VMStackPush 0x8000
     VMStackPush 0x8001
     VMStackPush 0x8002
@@ -733,13 +733,13 @@ L_0A15:
     VMStackPushConst 41
     VMStackCmp CMP_LT
     VMJumpIf CMP_STACK, L_0B8C
-    Plugin10_Cmd1015 0x8024, 0x802d, 0x8010
+    PokewoodCmd_GetNewUnlockKind 0x8024, 0x802d, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_0B80
     WordSetPlayerName 0
-    Plugin10_Cmd1005 1, 0x8024
+    PokewoodCmd_SetMessageWord 1, 0x8024
     WorkCmpConst 0x802d, 0
     VMJumpIf CMP_EQ, L_0A5E
     VMJump L_0A70

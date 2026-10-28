@@ -205,7 +205,7 @@ L_0308:
     ActorCmdExec 0, Movement_0978
     ActorCmdWait
     WorkSetConst EVENT_WORK_0x40a0, 1
-    HollowRivalCmd_0263 4
+    HollowRivalSetFlag 4
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt

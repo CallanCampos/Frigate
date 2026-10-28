@@ -81,7 +81,7 @@ Script_3:
     LastKeyWait
     MsgWinCloseAll
     FlagSet EVENT_FLAG_0x0987
-    HollowRivalCmd_0262 2, 6
+    HollowRivalSetValue 2, 6
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt

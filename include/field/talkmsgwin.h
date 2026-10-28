@@ -76,8 +76,8 @@ void TalkMsgWin_Release(TalkMsgWinSys *sys, u32 index);
 void TalkMsgWin_Open(TalkMsgWinSys *sys, u32 index);
 void TalkMsgWin_Close(TalkMsgWinSys *sys, u32 index);
 // Whether window index is free, and whether it is open
-BOOL func_ov036_0218b4e8(TalkMsgWinSys *sys, u32 index);
-BOOL func_ov036_0218b4fc(TalkMsgWinSys *sys, u32 index);
+BOOL TalkMsgWin_IsWindowFree(TalkMsgWinSys *sys, u32 index);
+BOOL TalkMsgWin_IsWindowShown(TalkMsgWinSys *sys, u32 index);
 PrintStream *TalkMsgWin_GetPrintStream(TalkMsgWinSys *sys, u32 index);
 BmpWin *TalkMsgWin_GetBmpWin(TalkMsgWinSys *sys, u32 index);
 // Prints another string in window index, or only stops the printing when strbuf is NULL

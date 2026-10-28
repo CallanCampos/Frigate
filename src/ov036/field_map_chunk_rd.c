@@ -91,8 +91,8 @@ BOOL FieldChunkAccessor_RD_Update(FieldChunk *chunk, FieldChunkContext *context)
         propSystem = FieldChunkContext_GetPropSystem(context);
         terrain = (u8 *)container + file->terrainOffset;
         chunkIndex = FieldChunkContext_GetChunkIndex(context);
-        func_ov036_021c898c(FieldChunkContext_GetResortMap(context), terrain, propSystem, chunk, propCount, chunkIndex,
-                            FieldChunkContext_GetHeapID(context));
+        ResortMapCreate_PatchChunk(FieldChunkContext_GetResortMap(context), terrain, propSystem, chunk, propCount,
+                                   chunkIndex, FieldChunkContext_GetHeapID(context));
         FieldChunk_SetupModel(chunk);
         if (FieldChunkContext_HasAnimator(context)) {
             FieldTerrainSRTAnimatorChunkState_Bind(FieldChunkContext_GetSRTAnimatorState(context),

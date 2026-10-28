@@ -45,7 +45,7 @@ static const BlActAnimStep RIPPLE_ANIM_SPREAD[] = {
 
 static const BlActAnimStep *RIPPLE_ANIMS[] = { RIPPLE_ANIM_SPREAD };
 
-void *func_ov036_021be790(FieldEffects *effects, HeapID heapId) {
+void *FldeffRipple_Create(FieldEffects *effects, HeapID heapId) {
     FieldEffectRipple *ripple = GFL_HeapAllocate(heapId, sizeof(FieldEffectRipple), TRUE, "fldeff_ripple.c", 88);
 
     ripple->effects = effects;
@@ -54,7 +54,7 @@ void *func_ov036_021be790(FieldEffects *effects, HeapID heapId) {
     return ripple;
 }
 
-void func_ov036_021be7c4(FieldEffects *effects, void *data) {
+void FldeffRipple_Delete(FieldEffects *effects, void *data) {
     FieldEffectRipple_FreeMaterial(data);
     GFL_HeapFree(data);
 }
@@ -78,7 +78,7 @@ static void FieldEffectRipple_FreeMaterial(FieldEffectRipple *ripple) {
 }
 
 // Start a ripple at the actor's feet, further back if big, and at its first tile if atInit
-void func_ov036_021be828(FieldEffects *effects, FieldActor *actor, u32 big, u32 atInit) {
+void FldeffRipple_Start(FieldEffects *effects, FieldActor *actor, u32 big, u32 atInit) {
     VecFx32 pos;
     RippleTaskParams params;
     GridPos gpos;

@@ -41,13 +41,13 @@ u8 FieldFlashAnimation_GetAlpha(FieldFlashAnimation *animation);
 void FieldFlashAnimation_SetAlpha(FieldFlashAnimation *animation, u32 alpha);
 
 void FieldFlashAnimation_CmdInit(FieldFlash *flash);
-void func_ov036_021c1d30(FieldFlash *flash);
+void FieldFlashAnimation_CmdExpand(FieldFlash *flash);
 void FieldFlashAnimation_ShowExpanded(FieldFlash *flash);
 void FieldFlashAnimation_HideMask(FieldFlash *flash);
 
 static void (*const FIELD_FLASH_FUNCTIONS[])(FieldFlash *) = {
     FieldFlashAnimation_CmdInit,
-    func_ov036_021c1d30,
+    FieldFlashAnimation_CmdExpand,
     FieldFlashAnimation_ShowExpanded,
     FieldFlashAnimation_HideMask,
 };
@@ -154,7 +154,7 @@ void FieldFlashAnimation_CmdInit(FieldFlash *flash) {
     FieldFlashAnimation_SetAlpha(&flash->animation, 0x1f);
 }
 
-void func_ov036_021c1d30(FieldFlash *flash) {
+void FieldFlashAnimation_CmdExpand(FieldFlash *flash) {
     flash->state = 2;
     FieldFlashAnimation_Set(&flash->animation, 0x3000, 0xaa00, 0x1f, 0x1f, 0xf);
     GFL_SndSEPlay(SEQ_SE_FLD_127);

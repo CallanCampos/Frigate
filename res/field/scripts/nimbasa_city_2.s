@@ -28,7 +28,7 @@ Script_3:
 L_0055:
     WorkSetConst 0x8020, 0
     WorkSetConst 0x8021, 0
-    HollowRivalCmd_0266 0x8020
+    HollowRivalGetCounter 0x8020
     RTCGetWeekDay 0x8010
     WorkCmpConst 0x8010, 2
     VMJumpIf CMP_EQ, L_007C
@@ -146,7 +146,7 @@ L_01E7:
     VMStackCmp CMP_AND
     VMStackCmp CMP_AND
     VMJumpIf CMP_STACK, L_023C
-    HollowRivalCmd_0262 1, 44
+    HollowRivalSetValue 1, 44
     VMJump L_02B4
 
 L_023C:
@@ -162,7 +162,7 @@ L_023C:
     VMStackCmp CMP_AND
     VMStackCmp CMP_AND
     VMJumpIf CMP_STACK, L_027B
-    HollowRivalCmd_0262 3, 11
+    HollowRivalSetValue 3, 11
     VMJump L_02B4
 
 L_027B:
@@ -178,7 +178,7 @@ L_027B:
     VMStackCmp CMP_AND
     VMStackCmp CMP_AND
     VMJumpIf CMP_STACK, L_02B4
-    HollowRivalCmd_0262 2, 13
+    HollowRivalSetValue 2, 13
 
 L_02B4:
     VMStackPush 0x8024
@@ -197,7 +197,7 @@ L_02B4:
     VMStackCmp CMP_EQ
     VMStackCmp CMP_AND
     VMJumpIf CMP_STACK, L_0306
-    HollowRivalCmd_0262 1, 41
+    HollowRivalSetValue 1, 41
     VMJump L_035E
 
 L_0306:
@@ -209,7 +209,7 @@ L_0306:
     VMStackCmp CMP_EQ
     VMStackCmp CMP_AND
     VMJumpIf CMP_STACK, L_0335
-    HollowRivalCmd_0262 1, 42
+    HollowRivalSetValue 1, 42
     VMJump L_035E
 
 L_0335:
@@ -221,7 +221,7 @@ L_0335:
     VMStackCmp CMP_EQ
     VMStackCmp CMP_AND
     VMJumpIf CMP_STACK, L_035E
-    HollowRivalCmd_0262 1, 43
+    HollowRivalSetValue 1, 43
 
 L_035E:
     VMStackPush 0x8024
@@ -232,7 +232,7 @@ L_035E:
     VMStackCmp CMP_EQ
     VMStackCmp CMP_AND
     VMJumpIf CMP_STACK, L_0387
-    HollowRivalCmd_0262 3, 0
+    HollowRivalSetValue 3, 0
 
 L_0387:
     VMStackPush 0x8024
@@ -247,7 +247,7 @@ L_0387:
     VMStackPushConst 0
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_03C9
-    HollowRivalCmd_0262 2, 14
+    HollowRivalSetValue 2, 14
     VMJump L_03E2
 
 L_03C9:
@@ -255,7 +255,7 @@ L_03C9:
     VMStackPushConst 1
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_03E2
-    HollowRivalCmd_0262 2, 0
+    HollowRivalSetValue 2, 0
 
 L_03E2:
     WorkSetConst 0x8024, 0
@@ -385,7 +385,7 @@ L_0561:
 L_056D:
     FadeInBlackQ
     FadeWait
-    HollowRivalCmd_0263 5
+    HollowRivalSetFlag 5
     FlagSet EVENT_FLAG_0x029f
     WorkSetConst EVENT_WORK_0x4126, 1
     WorkSetConst EVENT_WORK_0x4127, 1

@@ -10,43 +10,44 @@ struct FieldWFBC {
     CityState *state;
 };
 
-static void func_ov036_0218adfc(FieldWFBC *wfbc, HeapID heapId);
-static void func_ov036_0218ae00(FieldWFBC *wfbc);
-static void func_ov036_0218ae04(FieldWFBC *wfbc);
-static void func_ov036_0218ae10(FieldWFBC *work, CityState *city, BOOL isOther);
+static void FieldWFBC_LoadResources(FieldWFBC *wfbc, HeapID heapId);
+static void FieldWFBC_FreeResources(FieldWFBC *wfbc);
+static void FieldWFBC_Clear(FieldWFBC *wfbc);
+static void FieldWFBC_SetCityState(FieldWFBC *work, CityState *city, BOOL isOther);
 
-FieldWFBC *func_ov036_0218adac(HeapID heapId) {
+FieldWFBC *FieldWFBC_Create(HeapID heapId) {
     FieldWFBC *wfbc = GFL_HeapAllocate(heapId, sizeof(FieldWFBC), TRUE, "field_wfbc.c", 87);
 
-    func_ov036_0218ae04(wfbc);
+    FieldWFBC_Clear(wfbc);
     return wfbc;
 }
 
-void func_ov036_0218add0(FieldWFBC *wfbc) {
-    func_ov036_0218ae00(wfbc);
+void FieldWFBC_Free(FieldWFBC *wfbc) {
+    FieldWFBC_FreeResources(wfbc);
     GFL_HeapFree(wfbc);
 }
 
-void func_ov036_0218ade0(FieldWFBC *wfbc, CityState *city, BOOL isOther, HeapID heapId) {
-    func_ov036_0218adfc(wfbc, heapId);
-    func_ov036_0218ae10(wfbc, city, isOther);
+void FieldWFBC_Setup(FieldWFBC *wfbc, CityState *city, BOOL isOther, HeapID heapId) {
+    FieldWFBC_LoadResources(wfbc, heapId);
+    FieldWFBC_SetCityState(wfbc, city, isOther);
 }
 
-static void func_ov036_0218adfc(FieldWFBC *wfbc, HeapID heapId) {
+// Empty in this game: Black and White's field_wfbc.c loads and frees the city's people data at these two calls
+static void FieldWFBC_LoadResources(FieldWFBC *wfbc, HeapID heapId) {
 }
 
-static void func_ov036_0218ae00(FieldWFBC *wfbc) {
+static void FieldWFBC_FreeResources(FieldWFBC *wfbc) {
 }
 
-static void func_ov036_0218ae04(FieldWFBC *wfbc) {
+static void FieldWFBC_Clear(FieldWFBC *wfbc) {
     wfbc->city = 0;
     wfbc->isOther = FALSE;
     wfbc->state = NULL;
 }
 
-static void func_ov036_0218ae10(FieldWFBC *wfbc, CityState *city, BOOL isOther) {
+static void FieldWFBC_SetCityState(FieldWFBC *wfbc, CityState *city, BOOL isOther) {
     CityState_IsSet(city);
-    func_ov036_0218ae04(wfbc);
+    FieldWFBC_Clear(wfbc);
     wfbc->city = city->city;
     wfbc->isOther = isOther;
     if (isOther == FALSE) {

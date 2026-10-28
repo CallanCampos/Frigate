@@ -49,7 +49,7 @@ Script_2:
     ActorCmdWait
     ActorCmdExec 255, Movement_07C0
     ActorCmdWait
-    Cmd_02A5 0
+    OpelucidGymCallMove 0
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt
@@ -61,7 +61,7 @@ Script_3:
     ActorCmdWait
     ActorCmdExec 255, Movement_07C0
     ActorCmdWait
-    Cmd_02A5 1
+    OpelucidGymCallMove 1
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt
@@ -73,7 +73,7 @@ Script_4:
     ActorCmdWait
     ActorCmdExec 255, Movement_07C0
     ActorCmdWait
-    Cmd_02A5 2
+    OpelucidGymCallMove 2
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt
@@ -85,7 +85,7 @@ Script_5:
     ActorCmdWait
     ActorCmdExec 255, Movement_07C0
     ActorCmdWait
-    Cmd_02A5 3
+    OpelucidGymCallMove 3
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt
@@ -176,7 +176,7 @@ L_0248:
     ParentActorMsg MSGFILE_SCRIPT, OpelucidCityGym_Text_TripleBattlesItsCombination, 0, 0
     MsgWinCloseAll
     VMCall L_0133
-    Cmd_02A6
+    OpelucidGymRefreshVars
     VMStackPush EVENT_WORK_0x40d1
     VMStackPushConst 0
     VMStackCmp CMP_EQ
@@ -233,7 +233,7 @@ L_0309:
     ParentActorMsg MSGFILE_SCRIPT, OpelucidCityGym_Text_RotationBattlesHowThree, 0, 0
     MsgWinCloseAll
     VMCall L_0133
-    Cmd_02A6
+    OpelucidGymRefreshVars
     VMStackPush EVENT_WORK_0x40d1
     VMStackPushConst 0
     VMStackCmp CMP_EQ
@@ -277,7 +277,7 @@ Script_10:
     ParentActorMsg MSGFILE_SCRIPT, OpelucidCityGym_Text_DefenseEverything, 0, 0
     MsgWinCloseAll
     VMCall L_0133
-    Cmd_02A6
+    OpelucidGymRefreshVars
     VMStackPush EVENT_WORK_0x40d0
     VMStackPushConst 0
     VMStackCmp CMP_EQ
@@ -318,7 +318,7 @@ Script_9:
     ParentActorMsg MSGFILE_SCRIPT, OpelucidCityGym_Text_OffenseEverything, 0, 0
     MsgWinCloseAll
     VMCall L_0133
-    Cmd_02A6
+    OpelucidGymRefreshVars
     VMStackPush EVENT_WORK_0x40d0
     VMStackPushConst 0
     VMStackCmp CMP_EQ
@@ -441,14 +441,14 @@ Script_12:
     VMStackPushConst 0
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_073A
-    Cmd_02A8
+    OpelucidGymFreeHeap
     WorkSetConst 0x802c, 0
-    Cmd_02B2 0, 0x802c
+    MemoryLinkCheckFlag 0, 0x802c
     VMStackPush 0x802c
     VMStackPushConst 1
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_060C
-    Cmd_02B5 0, 2
+    WordSetMemoryLinkPlayerName 0, 2
     // "Welcome. Thank you for coming. I am the\nOpelucid Pokémon Gym Leader, Drayden.[f000]븁\u0000\nAs the mayor, I've given everything\nto developing the city.[f000]븁\u0000\nAs a Trainer, I've simply been pursuing\ngreater strength.[f000]븁\u0000\nBut what I'm searching for now is a young\nTrainer who can show me a bright future.[f000]븁\u0000\nPerhaps you can show me that future,\nthe way [f000]Ā\u0001\u0002 and Iris have?[f000]븁\u0000"
     ParentActorMsg MSGFILE_SCRIPT, OpelucidCityGym_Text_WelcomeThankComingAm_2, 0, 0
     VMJump L_0616
@@ -493,7 +493,7 @@ L_0672:
     MEPlay SEQ_ME_BADGE
     WorkSetConst 0x802e, 0
     TrainerCardGetSex 0x802e
-    Cmd_02A8
+    OpelucidGymFreeHeap
     VMStackPush 0x802e
     VMStackPushConst 0
     VMStackCmp CMP_EQ
@@ -506,7 +506,7 @@ L_06B3:
 
 L_06B7:
     MEWait
-    Cmd_02A9
+    OpelucidGymCreateHeap
     WorkSetConst 0x802e, 0
     WordSetPlayerName 0
     // "[f000]Ā\u0001\u0000 received the Legend Badge\nfrom Drayden![f000]븁\u0000"
@@ -535,7 +535,7 @@ L_06B7:
     TrainerFlagSet TRAINER_VETERAN_JERRY
     FlagSet EVENT_FLAG_0x0974
     WorkSetConst EVENT_WORK_0x40d6, 1
-    HollowRivalCmd_0262 1, 24
+    HollowRivalSetValue 1, 24
     VMJump L_0748
 
 L_073A:
@@ -556,9 +556,9 @@ Script_13:
     VMStackPushConst 1
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_0775
-    Cmd_02A7 0
+    OpelucidGymCallButton 0
     WorkSetConst EVENT_WORK_0x40cf, 2
-    Cmd_02A6
+    OpelucidGymRefreshVars
 
 L_0775:
     FinishAllEvents

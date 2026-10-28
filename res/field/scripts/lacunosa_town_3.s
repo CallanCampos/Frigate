@@ -135,8 +135,8 @@ L_0113:
     FlagSet EVENT_FLAG_0x030e
     FlagReset EVENT_FLAG_0x0310
     WorkSetConst EVENT_WORK_0x40ce, 1
-    HollowRivalCmd_0262 3, 6
-    HollowRivalCmd_0262 0, 5
+    HollowRivalSetValue 3, 6
+    HollowRivalSetValue 0, 5
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt

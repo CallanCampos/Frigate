@@ -74,7 +74,7 @@ L_010A:
     VMHalt
 
 Script_2:
-    Cmd_02B2 12, EVENT_WORK_0x400f
+    MemoryLinkCheckFlag 12, EVENT_WORK_0x400f
     VMStackPush EVENT_WORK_0x400f
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -132,7 +132,7 @@ L_01DC:
     VMHalt
 
 L_01DE:
-    Cmd_02B2 12, EVENT_WORK_0x400f
+    MemoryLinkCheckFlag 12, EVENT_WORK_0x400f
     VMStackPush EVENT_WORK_0x400f
     VMStackPushConst 0
     VMStackCmp CMP_EQ
@@ -148,7 +148,7 @@ L_0211:
     VMReturn
 
 L_0213:
-    Cmd_02B2 12, EVENT_WORK_0x400f
+    MemoryLinkCheckFlag 12, EVENT_WORK_0x400f
     VMStackPush EVENT_WORK_0x400f
     VMStackPushConst 0
     VMStackCmp CMP_EQ

@@ -19,7 +19,7 @@ Script_1:
     ParentActorMsg MSGFILE_SCRIPT, DriftveilDrawbridge_Text_SometimesAboveBridgeCan, 0, 0
     MsgWaitAdvance
     MsgWinCloseAll
-    Cmd_0275 0, 14, 0
+    WordSetFunfestMission 0, 14, 0
     SEPlay SEQ_SE_FLD_133
     // "The Funfest Mission\n“[f000]ŀ\u0001\u0000\"[f000]븀\u0000\nhas been added to the Entralink!"
     SystemMsg DriftveilDrawbridge_Text_FunfestMissionHasBeen, 0

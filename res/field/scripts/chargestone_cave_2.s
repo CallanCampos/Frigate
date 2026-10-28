@@ -36,7 +36,7 @@ L_0070:
     VMStackPushConst 0
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_0089
-    HollowRivalCmd_0262 3, 2
+    HollowRivalSetValue 3, 2
 
 L_0089:
     VMHalt
@@ -199,13 +199,13 @@ Script_7:
     VMStackPushConst 22
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_02D1
-    Cmd_0275 0, 18, 0
+    WordSetFunfestMission 0, 18, 0
     // "The Funfest Mission\n“[f000]ŀ\u0001\u0000\"[f000]븀\u0000\nhas been added to the Entralink."
     SystemMsg ChargestoneCave2_Text_FunfestMissionHasBeen_2, 0
     VMJump L_02DE
 
 L_02D1:
-    Cmd_0275 0, 17, 0
+    WordSetFunfestMission 0, 17, 0
     // "The Funfest Mission\n“[f000]ŀ\u0001\u0000\"[f000]븀\u0000\nhas been added to the Entralink."
     SystemMsg ChargestoneCave2_Text_FunfestMissionHasBeen, 0
 

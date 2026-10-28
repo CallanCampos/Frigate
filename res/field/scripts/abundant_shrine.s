@@ -265,7 +265,7 @@ Script_1:
     // "Why do delicious vegetables grow in the\nfields of Mistralton City?[f000]븁\u0000\nIt's because the ones who grow them are\nvery picky about the mulch they use.[f000]븁\u0000\nIt's good mulch. Strong mulch. It's\nstored up a lot of energy from nature.[f000]븀\u0000\nAnd that makes it really stinky![f000]븁\u0000\nSuch a powerful aroma! It burns\nall the way to the back of your nose![f000]븁\u0000\nAww. Just remembering it\nmakes me dizzy![f000]븁\u0000"
     ParentActorMsg MSGFILE_SCRIPT, AbundantShrine_Text_WhyDeliciousVegetablesGrow, 0, 0
     MsgWinCloseAll
-    Cmd_0275 0, 39, 0
+    WordSetFunfestMission 0, 39, 0
     SEPlay SEQ_SE_FLD_133
     // "The Funfest Mission\n“[f000]ŀ\u0001\u0000\"[f000]븀\u0000\nhas been added to the Entralink."
     SystemMsg AbundantShrine_Text_FunfestMissionHasBeen, 0

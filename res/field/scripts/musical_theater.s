@@ -43,7 +43,7 @@ Script_11:
     ActorsPauseAll
     WorkSetConst 0x8020, 0
     WorkSetConst 0x8021, 0
-    Cmd_02B4 1, 0x8020
+    MemoryLinkIsPlayerLinked 1, 0x8020
     ActorCmdExec 255, Movement_04BC
     ActorCmdWait
     ActorCmdExec 11, Movement_04C4
@@ -80,7 +80,7 @@ L_012E:
     VMSleep 16
     ActorCmdExec 11, Movement_0484
     ActorCmdWait
-    Cmd_02B5 1, 0
+    WordSetMemoryLinkPlayerName 1, 0
     // "You know what? I'll give you this\nProp Case![f000]븁\u0000\nIt contains all the Props our superstar\n[f000]Ā\u0001\u0000 used to have.[f000]븁\u0000"
     ActorMsg MSGFILE_SCRIPT, MusicalTheater_Text_KnowWhatIllGive, 11, 0, 0
     MsgWinCloseAll
@@ -159,9 +159,9 @@ L_025C:
     VMHalt
 
 L_026E:
-    Cmd_0167 0, 0, 0, 0
+    MusicalComm 0, 0, 0, 0
     WorkSetConst 0x8023, 0
-    MusicalCmd_0165 11, 0, 0x8023
+    MusicalGetInfo 11, 0, 0x8023
     VMStackPush 0x8023
     VMStackPushConst 0
     VMStackCmp CMP_EQ
@@ -178,7 +178,7 @@ L_02B8:
 
 L_02BE:
     WorkSetConst 0x8023, 0
-    Cmd_0167 1, 0, 0, 0
+    MusicalComm 1, 0, 0, 0
     // "If you have a Pokémon that can play\nDress Up, you can participate in the[f000]븀\u0000\nPokémon Musical![f000]븁\u0000\nWould you please join us?\nThe receptionist can explain everything.[f000]븁\u0000\nLet us say a brief farewell!\nI eagerly anticipate seeing you on stage![f000]븁\u0000"
     ActorMsg MSGFILE_SCRIPT, MusicalTheater_Text_IfHavePokemonCan, 11, 0, 0
     MsgWinCloseAll
@@ -218,7 +218,7 @@ L_035A:
     VMStackPushConst 0
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_039A
-    Cmd_016A 0x8025, 0x8024
+    MusicalSelectPoke 0x8025, 0x8024
     VMStackPush 0x8025
     VMStackPushConst 0
     VMStackCmp CMP_EQ
@@ -238,12 +238,12 @@ L_039A:
     BGMPush 6
     FadeWait
     FieldClose
-    MusicalCmd_0164 0x8024
+    MusicalCallDressUp 0x8024
     FieldOpen
     FadeInWhiteQ
     BGMPop 0, 60
     FadeWait
-    MusicalCmd_0165 13, 0, 0x8010
+    MusicalGetInfo 13, 0, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 0
     VMStackCmp CMP_EQ
@@ -281,7 +281,7 @@ Script_17:
     VMStackPop 0x8000
     ActorCmdExec 11, Movement_0504
     ActorCmdWait
-    MusicalCmd_02B7 0x8026
+    MemoryLinkAddMusicalProps 0x8026
     // "I hope you'll be the superstar of a\nnew generation![f000]븁\u0000\nIt's time to play Dress Up![f000]븁\u0000"
     ActorMsg MSGFILE_SCRIPT, MusicalTheater_Text_HopeYoullSuperstarNew, 11, 0, 0
     MsgWinCloseAll
@@ -355,7 +355,7 @@ Movement_0514:
 Script_12:
     ActorsPauseAll
     SEPlay SEQ_SE_MESSAGE
-    MusicalCmd_0165 7, 0, 0x8010
+    MusicalGetInfo 7, 0, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -363,7 +363,7 @@ Script_12:
     // "There is a Musical Photo saved from\nlast time![f000]븁\u0000"
     InfoMsg MusicalTheater_Text_ThereMusicalPhotoSaved, 2
     MsgWinCloseAll
-    MusicalCmd_0163 0, 2
+    MusicalCall 0, 2
     VMJump L_0567
 
 L_055E:
@@ -456,8 +456,8 @@ Script_1:
     WorkSetConst 0x802a, 0
     SEPlay SEQ_SE_MESSAGE
     ActorSetEyeToEye
-    Cmd_02B4 1, 0x8028
-    MusicalCmd_02B6 0, 0x8027
+    MemoryLinkIsPlayerLinked 1, 0x8028
+    MemoryLinkCheckMusical 0, 0x8027
     VMStackPush 0x8028
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -467,7 +467,7 @@ Script_1:
     VMStackCmp CMP_AND
     VMJumpIf CMP_STACK, L_0750
     MusicalGetOwnedPropCount 0x802a
-    Cmd_02B5 1, 0
+    WordSetMemoryLinkPlayerName 1, 0
     VMStackPush 0x802a
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -548,7 +548,7 @@ Script_18:
     WorkSetConst 0x802b, 0
     FadeInBlackQ
     FadeWait
-    MusicalCmd_02B7 0x802b
+    MemoryLinkAddMusicalProps 0x802b
     VMStackPush 0x802b
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -588,7 +588,7 @@ L_07EE:
 L_0804:
     WorkSetConst 0x802c, 0
     WorkSetConst 0x802c, 0
-    MusicalCmd_0165 15, 24, 0x8010
+    MusicalGetInfo 15, 24, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 0
     VMStackCmp CMP_EQ
@@ -626,7 +626,7 @@ L_08AB:
     VMStackPushConst 0
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_0921
-    MusicalCmd_0165 15, 67, 0x8010
+    MusicalGetInfo 15, 67, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 0
     VMStackCmp CMP_EQ
@@ -653,12 +653,12 @@ L_0921:
     VMStackPushConst 0
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_0998
-    MusicalCmd_0165 15, 55, 0x8010
+    MusicalGetInfo 15, 55, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 0
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_0998
-    MusicalCmd_0165 1, 0, 0x8010
+    MusicalGetInfo 1, 0, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 5
     VMStackCmp CMP_GE
@@ -680,12 +680,12 @@ L_0998:
     VMStackPushConst 0
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_0A0F
-    MusicalCmd_0165 15, 82, 0x8010
+    MusicalGetInfo 15, 82, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 0
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_0A0F
-    MusicalCmd_0165 1, 0, 0x8010
+    MusicalGetInfo 1, 0, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 10
     VMStackCmp CMP_GE
@@ -734,7 +734,7 @@ Script_8:
     ActorsPauseAll
     SEPlay SEQ_SE_MESSAGE
     ActorSetEyeToEye
-    MusicalCmd_0165 1, 0, 0x8010
+    MusicalGetInfo 1, 0, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 2
     VMStackCmp CMP_LT
@@ -780,7 +780,7 @@ Script_9:
     VMStackPushConst 0
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_0B52
-    MusicalCmd_0165 6, 0, 0x8010
+    MusicalGetInfo 6, 0, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -864,9 +864,9 @@ Script_16:
     WorkSetConst 0x8031, 0
     WorkSetConst 0x8032, 0
     WorkSetConst 0x8033, 0
-    Cmd_02B4 1, 0x8031
-    MusicalCmd_02B6 1, 0x8032
-    MusicalCmd_0165 0, 0, 0x8033
+    MemoryLinkIsPlayerLinked 1, 0x8031
+    MemoryLinkCheckMusical 1, 0x8032
+    MusicalGetInfo 0, 0, 0x8033
     SEPlay SEQ_SE_MESSAGE
     ActorSetEyeToEye
     VMStackPush 0x8031
@@ -878,7 +878,7 @@ Script_16:
     VMJump L_0C87
 
 L_0C44:
-    Cmd_02B5 1, 0
+    WordSetMemoryLinkPlayerName 1, 0
     VMStackPush 0x8032
     VMStackPushConst 0
     VMStackCmp CMP_EQ
