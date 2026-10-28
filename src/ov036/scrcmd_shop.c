@@ -87,12 +87,66 @@ enum {
     SHOP_CURRENCY_SHARDS,
 };
 
-// The variables the move tutor's script reads once a move was bought: 0 if no Pokémon was chosen, 2 if the chosen one
-// can learn the move and 1 if it can't, then the move, the slot of the Pokémon that learns it and the price
+// The variables the move tutor's script reads once a move was bought: a MOVE_TUTOR_RESULT_*, then the move, the slot of
+// the Pokémon that learns it and the price
 #define SHOP_VAR_RESULT (VARS_START + 12)
 #define SHOP_VAR_MOVE (VARS_START + 13)
 #define SHOP_VAR_SLOT (VARS_START + 14)
 #define SHOP_VAR_PRICE (VARS_START + 15)
+
+// SHOP_VAR_RESULT: no Pokémon was chosen, the chosen one can't learn the move, or it can
+enum {
+    MOVE_TUTOR_RESULT_NONE,
+    MOVE_TUTOR_RESULT_CANNOT_LEARN,
+    MOVE_TUTOR_RESULT_CAN_LEARN,
+};
+
+// The records that buying adds to: the purchases, the money and the Battle Points spent, and the Premier Balls given
+#define RECORD_SHOP_PURCHASES 21
+#define RECORD_MONEY_SPENT 22
+#define RECORD_PREMIER_BALLS 31
+#define RECORD_BP_SPENT 34
+
+// ScriptNative_UpdateShopUI's sequence: turn the camera to the counter, run the menu, turn it back and end, or, once
+// a tutor's move was bought, choose the Pokémon that learns it
+enum {
+    SHOP_SEQ_FINISH_CAMERA_DELAY,
+    SHOP_SEQ_WAIT_CAMERA_DELAY,
+    SHOP_SEQ_START_CAMERA,
+    SHOP_SEQ_WAIT_CAMERA,
+    SHOP_SEQ_UPDATE_UI,
+    SHOP_SEQ_RETURN_CAMERA,
+    SHOP_SEQ_WAIT_RETURN_CAMERA,
+    SHOP_SEQ_END,
+    SHOP_SEQ_CHOOSE_POKEMON,
+    SHOP_SEQ_SET_RESULT,
+};
+
+// ShopUI_Update's sequence: browse the list, choose an amount, confirm (showing the bag's count when only one can be
+// bought), buy, and the message that every step waits on before its nextState
+enum {
+    SHOP_UI_SEQ_INIT,
+    SHOP_UI_SEQ_BROWSE,
+    SHOP_UI_SEQ_SHOW_AMOUNT,
+    SHOP_UI_SEQ_CHOOSE_AMOUNT,
+    SHOP_UI_SEQ_RETURN_TO_LIST,
+    SHOP_UI_SEQ_CONFIRM_ONE,
+    SHOP_UI_SEQ_CONFIRM,
+    SHOP_UI_SEQ_WAIT_CONFIRM,
+    SHOP_UI_SEQ_BUY_ITEM,
+    SHOP_UI_SEQ_BUY_MOVE,
+    SHOP_UI_SEQ_TEACH_MOVE,
+    SHOP_UI_SEQ_PREMIER_BALL,
+    SHOP_UI_SEQ_WAIT_MESSAGE,
+    SHOP_UI_SEQ_EXIT,
+};
+
+// What ShopUI_ChangeItemAmount did to the amount
+enum {
+    SHOP_AMOUNT_UNCHANGED,
+    SHOP_AMOUNT_MORE,
+    SHOP_AMOUNT_LESS,
+};
 
 // The archives of the Poké Marts' item lists, and of the number of items in each list
 #define ARCID_SHOP_ITEMS 282
@@ -634,36 +688,36 @@ static BOOL ScriptNative_UpdateShopUI(VM *vm, void *env) {
     FieldCamera *camera = Field_GetCameraSystem(field);
 
     switch (shop->state) {
-    case 0:
+    case SHOP_SEQ_FINISH_CAMERA_DELAY:
         FieldCamera_FinishDelay(camera);
         shop->state++;
         break;
-    case 1:
+    case SHOP_SEQ_WAIT_CAMERA_DELAY:
         if (!FieldCamera_IsDelayActive(camera)) {
             shop->state++;
         }
         break;
-    case 2:
+    case SHOP_SEQ_START_CAMERA:
         StartShopCameraAnime(shop, field, camera);
         shop->state++;
         break;
-    case 3:
+    case SHOP_SEQ_WAIT_CAMERA:
         if (!FieldCamera_IsAnimating(camera)) {
             shop->state++;
-            shop->work.state = 0;
+            shop->work.state = SHOP_UI_SEQ_INIT;
             setAlphaBlend_wrapper(FALSE);
         }
         break;
-    case 4:
+    case SHOP_SEQ_UPDATE_UI:
         if (ShopUI_Update(gsys, &shop->work, shop->shopId, shop->subId)) {
             if (shop->work.boughtMove == TRUE) {
-                shop->state = 8;
+                shop->state = SHOP_SEQ_CHOOSE_POKEMON;
             } else {
                 shop->state++;
             }
         }
         break;
-    case 5: {
+    case SHOP_SEQ_RETURN_CAMERA: {
         FieldEvCameraAnimationFlags flags = { FALSE, FALSE, FALSE, FALSE, FALSE, TRUE };
 
         FieldCameraAnm_SetReturnAnimation(camera, &flags, 8);
@@ -671,7 +725,7 @@ static BOOL ScriptNative_UpdateShopUI(VM *vm, void *env) {
         shop->unk1 = 0;
         break;
     }
-    case 6:
+    case SHOP_SEQ_WAIT_RETURN_CAMERA:
         if (!FieldCamera_IsAnimating(camera)) {
             FieldCamera_ResetBind(camera);
             FieldCamera_SetUseBoundaryEnable(camera, shop->useBoundary);
@@ -681,10 +735,10 @@ static BOOL ScriptNative_UpdateShopUI(VM *vm, void *env) {
             shop->state++;
         }
         break;
-    case 7:
+    case SHOP_SEQ_END:
         GFL_HeapFree(*heapPtr);
         return TRUE;
-    case 8: {
+    case SHOP_SEQ_CHOOSE_POKEMON: {
         GameEvent *event = ScriptWork_GetEvent(scriptWork);
         ShopMoveTutorListArgs args;
 
@@ -697,7 +751,7 @@ static BOOL ScriptNative_UpdateShopUI(VM *vm, void *env) {
         shop->state++;
         break;
     }
-    case 9: {
+    case SHOP_SEQ_SET_RESULT: {
         EventWork *eventWork = GameData_GetEventWork(GSYS_GetGameData(gsys));
         u16 *result = EventWork_GetWkPtr(eventWork, SHOP_VAR_RESULT);
         u16 *move = EventWork_GetWkPtr(eventWork, SHOP_VAR_MOVE);
@@ -711,14 +765,14 @@ static BOOL ScriptNative_UpdateShopUI(VM *vm, void *env) {
         if (shop->chosen != 0) {
             GetMoveTutorShopSortimentBits(gsys, shop->work.tutorMoveIndex, shop->work.tutorIndex, &learnable);
             if (learnable & (1 << shop->slot)) {
-                *result = 2;
+                *result = MOVE_TUTOR_RESULT_CAN_LEARN;
             } else {
-                *result = 1;
+                *result = MOVE_TUTOR_RESULT_CANNOT_LEARN;
             }
         } else {
-            *result = 0;
+            *result = MOVE_TUTOR_RESULT_NONE;
         }
-        shop->state = 7;
+        shop->state = SHOP_SEQ_END;
         break;
     }
     }
@@ -806,8 +860,8 @@ static void ShopUI_TryBuyItem(ShopUIWork *wk) {
 
     if (!BagSave_CheckAvailItemSpace(wk->bag, wk->item, 1, wk->heapId)) {
         ShopUI_SetStatusDialogue(wk, ScrcmdShop_Text_CantTakeAnyMore, wk->item, FALSE);
-        wk->state = 12;
-        wk->nextState = 4;
+        wk->state = SHOP_UI_SEQ_WAIT_MESSAGE;
+        wk->nextState = SHOP_UI_SEQ_RETURN_TO_LIST;
         return;
     }
     if (balance < wk->price) {
@@ -816,20 +870,20 @@ static void ShopUI_TryBuyItem(ShopUIWork *wk) {
         } else {
             ShopUI_SetStatusDialogue(wk, ScrcmdShop_Text_DontHaveEnoughBp, wk->item, FALSE);
         }
-        wk->state = 12;
-        wk->nextState = 4;
+        wk->state = SHOP_UI_SEQ_WAIT_MESSAGE;
+        wk->nextState = SHOP_UI_SEQ_RETURN_TO_LIST;
         return;
     }
     if (balance >= wk->price && balance < wk->price * 2) {
         ShopUI_SetBuyConfirmMessage(wk, wk->listMode);
-        wk->state = 12;
-        wk->nextState = 5;
+        wk->state = SHOP_UI_SEQ_WAIT_MESSAGE;
+        wk->nextState = SHOP_UI_SEQ_CONFIRM_ONE;
         return;
     }
     if (wk->listMode == SHOP_LIST_ITEMS) {
         ShopUI_SetStatusDialogue(wk, ScrcmdShop_Text_CertainlyHowManyWould, wk->item, FALSE);
-        wk->state = 12;
-        wk->nextState = 2;
+        wk->state = SHOP_UI_SEQ_WAIT_MESSAGE;
+        wk->nextState = SHOP_UI_SEQ_SHOW_AMOUNT;
         wk->maxAmount = balance / wk->price;
         if (wk->maxAmount > 99) {
             wk->maxAmount = 99;
@@ -839,8 +893,8 @@ static void ShopUI_TryBuyItem(ShopUIWork *wk) {
         }
     } else {
         ShopUI_SetBuyConfirmMessage(wk, wk->listMode);
-        wk->state = 12;
-        wk->nextState = 6;
+        wk->state = SHOP_UI_SEQ_WAIT_MESSAGE;
+        wk->nextState = SHOP_UI_SEQ_CONFIRM;
     }
 }
 
@@ -848,13 +902,13 @@ static void ShopUI_TryBuyItem(ShopUIWork *wk) {
 static void ShopUI_TryBuyMove(ShopUIWork *wk) {
     if (ShopUI_GetBalance(wk) < wk->price) {
         ShopUI_SetStatusDialogue(wk, ScrcmdShop_Text_DontHaveEnough, MOVE_TUTOR_CURRENCY_ITEMS[wk->tutorIndex], TRUE);
-        wk->state = 12;
-        wk->nextState = 4;
+        wk->state = SHOP_UI_SEQ_WAIT_MESSAGE;
+        wk->nextState = SHOP_UI_SEQ_RETURN_TO_LIST;
         return;
     }
     ShopUI_SetBuyConfirmMessage(wk, wk->listMode);
-    wk->state = 12;
-    wk->nextState = 6;
+    wk->state = SHOP_UI_SEQ_WAIT_MESSAGE;
+    wk->nextState = SHOP_UI_SEQ_CONFIRM;
 }
 
 static void ShopUI_UpdateItemBrowse(ShopUIWork *wk) {
@@ -872,7 +926,7 @@ static void ShopUI_UpdateItemBrowse(ShopUIWork *wk) {
         return;
     }
     if (index == BMPMENULIST_CANCEL) {
-        wk->state = 13;
+        wk->state = SHOP_UI_SEQ_EXIT;
         return;
     }
     wk->item = wk->entries[index].item;
@@ -908,12 +962,12 @@ static u8 ShopUI_WaitAB(ShopUIWork *wk) {
 static void ShopUI_SpendMoney(ShopUIWork *wk, u32 amount) {
     if (wk->currency == SHOP_CURRENCY_MONEY) {
         subCashFromTotal(wk->trainerCard, amount);
-        RecordAdd(wk->records, 22, amount);
+        RecordAdd(wk->records, RECORD_MONEY_SPENT, amount);
     } else {
         BSubwayScoreData_SubBattlePoints(wk->bsubwayScore, amount);
-        RecordAdd(wk->records, 34, amount);
+        RecordAdd(wk->records, RECORD_BP_SPENT, amount);
     }
-    RecordAddOne(wk->records, 21);
+    RecordAddOne(wk->records, RECORD_SHOP_PURCHASES);
 }
 
 static BOOL ShopUI_Update(GameSystem *gsys, ShopUIWork *wk, u32 shopId, u32 subId) {
@@ -923,32 +977,32 @@ static BOOL ShopUI_Update(GameSystem *gsys, ShopUIWork *wk, u32 shopId, u32 subI
     u32 result;
 
     switch (wk->state) {
-    case 0:
+    case SHOP_UI_SEQ_INIT:
         ShopUI_Init(gsys, wk, shopId, subId);
         wk->state++;
         break;
-    case 1:
+    case SHOP_UI_SEQ_BROWSE:
         ShopUI_UpdateItemBrowse(wk);
         break;
-    case 2:
+    case SHOP_UI_SEQ_SHOW_AMOUNT:
         ShopUI_PrintBagCount(wk, wk->item);
         ShopUI_UpdateItemAmountDisp(wk, wk->amount, wk->price);
         ClActor_SetVisible(wk->actors[3], TRUE);
-        wk->state = 3;
+        wk->state = SHOP_UI_SEQ_CHOOSE_AMOUNT;
         break;
-    case 3:
+    case SHOP_UI_SEQ_CHOOSE_AMOUNT:
         wk->state = ShopUI_UpdateInput(wk);
         break;
-    case 4:
+    case SHOP_UI_SEQ_RETURN_TO_LIST:
         ShopUI_ClearListScreen(0);
         BmpWin_FlushMap(wk->windows[2]);
         BmpWin_FlushMap(wk->windows[5]);
         GFL_BGSysQueueScrLoad(1);
         ClActor_SetVisible(wk->actors[3], FALSE);
         BmpMenuList_Redraw(wk->list);
-        wk->state = 1;
+        wk->state = SHOP_UI_SEQ_BROWSE;
         break;
-    case 5:
+    case SHOP_UI_SEQ_CONFIRM_ONE:
         ShopUI_ClearListScreen(1);
         BmpWin_FlushMap(wk->windows[2]);
         ClActor_SetVisible(wk->actors[3], FALSE);
@@ -956,69 +1010,69 @@ static BOOL ShopUI_Update(GameSystem *gsys, ShopUIWork *wk, u32 shopId, u32 subI
         if (wk->listMode != SHOP_LIST_TMS) {
             ShopUI_PrintBagCount(wk, wk->item);
         }
-        wk->state = 7;
+        wk->state = SHOP_UI_SEQ_WAIT_CONFIRM;
         break;
-    case 6:
+    case SHOP_UI_SEQ_CONFIRM:
         ShopUI_ClearListScreen(1);
         BmpWin_FlushMap(wk->windows[2]);
         ClActor_SetVisible(wk->actors[3], FALSE);
         wk->confirmDialog = ShopUI_CreateConfirmDialog(&sConfirmDialogSetup, 1, 9, 0, wk->heapId);
-        wk->state = 7;
+        wk->state = SHOP_UI_SEQ_WAIT_CONFIRM;
         break;
-    case 7:
+    case SHOP_UI_SEQ_WAIT_CONFIRM:
         result = ConfirmDialog_Update(wk->confirmDialog);
         if (result == BMPMENU_NULL) {
             break;
         }
         if (result == 0) {
             if (wk->listMode == SHOP_LIST_MOVES) {
-                wk->state = 9;
+                wk->state = SHOP_UI_SEQ_BUY_MOVE;
             } else {
-                wk->state = 8;
+                wk->state = SHOP_UI_SEQ_BUY_ITEM;
             }
             ShopUI_ClearListScreen(1);
             BmpMenuList_Redraw(wk->list);
             BmpWin_FlushMap(wk->windows[2]);
             GFL_BGSysQueueScrLoad(1);
         } else if (result == BMPMENU_CANCEL) {
-            wk->state = 4;
+            wk->state = SHOP_UI_SEQ_RETURN_TO_LIST;
         }
         break;
-    case 8:
+    case SHOP_UI_SEQ_BUY_ITEM:
         GFL_SndSEPlay(SEQ_SE_SYS_22);
         ShopUI_SetStatusDialogue(wk, ScrcmdShop_Text_HereThankPutAway, wk->item, wk->amount > 1);
         ShopUI_SpendMoney(wk, wk->price * wk->amount);
         ShopUI_UpdateMoneyDisp(wk);
         BagSave_AddItem(wk->bag, wk->item, wk->amount, wk->heapId);
-        wk->state = 12;
-        wk->nextState = 11;
+        wk->state = SHOP_UI_SEQ_WAIT_MESSAGE;
+        wk->nextState = SHOP_UI_SEQ_PREMIER_BALL;
         break;
-    case 9:
+    case SHOP_UI_SEQ_BUY_MOVE:
         ShopUI_SetStatusDialogue(wk, ScrcmdShop_Text_PickPokemonWantLearn, wk->item, FALSE);
-        wk->state = 12;
-        wk->nextState = 10;
+        wk->state = SHOP_UI_SEQ_WAIT_MESSAGE;
+        wk->nextState = SHOP_UI_SEQ_TEACH_MOVE;
         break;
-    case 10:
+    case SHOP_UI_SEQ_TEACH_MOVE:
         wk->boughtMove = TRUE;
         wk->move = wk->item;
-        wk->state = 13;
+        wk->state = SHOP_UI_SEQ_EXIT;
         break;
-    case 11:
+    case SHOP_UI_SEQ_PREMIER_BALL:
         // A Premier Ball for ten Poké Balls
         if (wk->item == ITEM_POKE_BALL && wk->amount >= 10) {
             ShopUI_SetStatusDialogue(wk, ScrcmdShop_Text_AlsoGetPremierBall, wk->item, FALSE);
             BagSave_AddItem(wk->bag, ITEM_PREMIER_BALL, 1, wk->heapId);
-            RecordAddOne(wk->records, 31);
-            wk->state = 12;
-            wk->nextState = 4;
+            RecordAddOne(wk->records, RECORD_PREMIER_BALLS);
+            wk->state = SHOP_UI_SEQ_WAIT_MESSAGE;
+            wk->nextState = SHOP_UI_SEQ_RETURN_TO_LIST;
         } else {
-            wk->state = 4;
+            wk->state = SHOP_UI_SEQ_RETURN_TO_LIST;
         }
         break;
-    case 12:
+    case SHOP_UI_SEQ_WAIT_MESSAGE:
         wk->state = ShopUI_WaitAB(wk);
         break;
-    case 13:
+    case SHOP_UI_SEQ_EXIT:
         ShopUI_FreeMenuList(wk);
         ShopUI_FreeClActResources(wk);
         ShopUI_FreeSprites(wk);
@@ -1630,8 +1684,7 @@ static void ShopUI_SetupMoveBuyMsg(ShopUIWork *wk, u32 msgId, u16 move, u32 pric
     ShopUI_PrintMessageInFrame(wk, msgId);
 }
 
-// Changes the amount by delta, wrapping around by one and stopping at the ends by ten. Returns 1 for more, 2 for less
-// and 0 if it didn't change
+// Changes the amount by delta, wrapping around by one and stopping at the ends by ten. Returns a SHOP_AMOUNT_*
 static u32 ShopUI_ChangeItemAmount(s16 *amount, u16 max, s32 delta) {
     s16 old = *amount;
 
@@ -1642,38 +1695,38 @@ static u32 ShopUI_ChangeItemAmount(s16 *amount, u16 max, s32 delta) {
             *amount = max;
         }
         if (*amount == old) {
-            return 0;
+            return SHOP_AMOUNT_UNCHANGED;
         }
-        return 2;
+        return SHOP_AMOUNT_LESS;
     case -10:
         *amount = old - 10;
         if (*amount <= 0) {
             *amount = 1;
         }
         if (*amount == old) {
-            return 0;
+            return SHOP_AMOUNT_UNCHANGED;
         }
-        return 2;
+        return SHOP_AMOUNT_LESS;
     case 1:
         *amount = old + 1;
         if (*amount > max) {
             *amount = 1;
         }
         if (*amount == old) {
-            return 0;
+            return SHOP_AMOUNT_UNCHANGED;
         }
-        return 1;
+        return SHOP_AMOUNT_MORE;
     case 10:
         *amount = old + 10;
         if (*amount > max) {
             *amount = max;
         }
         if (*amount == old) {
-            return 0;
+            return SHOP_AMOUNT_UNCHANGED;
         }
-        return 1;
+        return SHOP_AMOUNT_MORE;
     }
-    return 0;
+    return SHOP_AMOUNT_UNCHANGED;
 }
 
 static u8 ShopUI_UpdateInput(ShopUIWork *wk) {
@@ -1701,14 +1754,14 @@ static u8 ShopUI_UpdateInput(ShopUIWork *wk) {
     if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_A) {
         GFL_SndSEPlay(SEQ_SE_DECIDE1);
         ShopUI_SetBuyConfirmMessage(wk, wk->listMode);
-        wk->nextState = 6;
-        return 12;
+        wk->nextState = SHOP_UI_SEQ_CONFIRM;
+        return SHOP_UI_SEQ_WAIT_MESSAGE;
     }
     if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_B) {
         GFL_SndSEPlay(SEQ_SE_CANCEL1);
-        return 4;
+        return SHOP_UI_SEQ_RETURN_TO_LIST;
     }
-    return 3;
+    return SHOP_UI_SEQ_CHOOSE_AMOUNT;
 }
 
 static void ShopUI_ClearListScreen(u32 index) {
