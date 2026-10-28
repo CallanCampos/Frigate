@@ -63,7 +63,7 @@ void ReflectTask_SetMMdl(MMSys *system, FieldActor *actor, FieldEffects *effects
 void FldeffRipple_Start(FieldEffects *effects, FieldActor *actor, u32 arg2, u32 arg3);
 void FldeffSplash_AddModel(FieldEffects *effects, FieldActor *actor);
 void D06Denki_StartSpark(FieldActor *actor, FieldEffects *effects);
-void func_ov036_021c94e0(FieldEffects *effects, FieldActor *actor);
+void FldeffOchiba_Start(FieldEffects *effects, FieldActor *actor);
 
 // field_effect.c: the effects a map has loaded, by ID, and the tasks that play them
 enum {
@@ -183,8 +183,8 @@ void *FldeffBubble_CreateRes(FieldEffects *effects, HeapID heapId);
 void FldeffBubble_DeleteRes(FieldEffects *effects, void *data);
 void *FldeffSplash_CreateModelRes(FieldEffects *effects, HeapID heapId);
 void FldeffSplash_DeleteModelRes(FieldEffects *effects, void *data);
-void *func_ov036_021c944c(FieldEffects *effects, HeapID heapId);
-void func_ov036_021c9470(FieldEffects *effects, void *data);
+void *FldeffOchiba_Create(FieldEffects *effects, HeapID heapId);
+void FldeffOchiba_Delete(FieldEffects *effects, void *data);
 void *FldeffFesKira_Create(FieldEffects *effects, HeapID heapId);
 void FldeffFesKira_Delete(FieldEffects *effects, void *data);
 void *EncountTask_CreateGrass(FieldEffects *effects, HeapID heapId);

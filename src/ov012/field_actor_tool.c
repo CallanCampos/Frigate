@@ -340,7 +340,7 @@ void ActorTerrainEffect_Footmark(FieldActor *actor, ActorTerrainEffectParam *par
 
 void ActorTerrainEffect_FallenLeaves(FieldActor *actor, ActorTerrainEffectParam *param) {
     if (MapTile_IsFallenLeaves(param->tileClassOrigY) == TRUE) {
-        func_ov036_021c94e0(param->effects, actor);
+        FldeffOchiba_Start(param->effects, actor);
     }
 }
 

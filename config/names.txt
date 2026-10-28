@@ -12223,6 +12223,15 @@ overlays/ov036 0x021c8b40 ResortMapCreate_MoveShopEntities
 overlays/ov036 0x021c9394 CreateMissionHiddenHollowPokemonActor
 overlays/ov036 0x021c93c0 ActivateHiddenHollowMission
 overlays/ov036 0x021c9440 GetHiddenHollowMissionLevel
+overlays/ov036 0x021c944c FldeffOchiba_Create
+overlays/ov036 0x021c9470 FldeffOchiba_Delete
+overlays/ov036 0x021c9484 FldeffOchiba_LoadResource
+overlays/ov036 0x021c94cc FldeffOchiba_FreeResource
+overlays/ov036 0x021c94e0 FldeffOchiba_Start
+overlays/ov036 0x021c955c FldeffOchiba_Init
+overlays/ov036 0x021c95a4 FldeffOchiba_Exit
+overlays/ov036 0x021c95b0 FldeffOchiba_Update
+overlays/ov036 0x021c95cc FldeffOchiba_Draw
 overlays/ov036 0x021c98a4 GetPWTTournamentInfo
 overlays/ov036 0x021c9ab0 Scrcmd_GetWifiHistoryCountryCount
 overlays/ov036 0x021c9b38 Scrcmd_MarkPartnerCandidate

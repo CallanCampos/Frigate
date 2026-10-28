@@ -95,7 +95,7 @@ static const FieldEffectVTable FIELD_EFFECT_VTABLES[FLDEFF_MAX + 1] = {
     { 14, Hide_CreateResources, Hide_DeleteResources },
     { 15, FldeffBubble_CreateRes, FldeffBubble_DeleteRes },
     { 16, FldeffSplash_CreateModelRes, FldeffSplash_DeleteModelRes },
-    { 17, func_ov036_021c944c, func_ov036_021c9470 },
+    { 17, FldeffOchiba_Create, FldeffOchiba_Delete },
     { 18, FldeffFesKira_Create, FldeffFesKira_Delete },
     { 19, EncountTask_CreateGrass, EncountTask_Delete },
     { 20, EncountTask_CreateReallyTallGrass, EncountTask_Delete },

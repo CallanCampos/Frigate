@@ -1,6 +1,6 @@
 // The fallen leaves an actor kicks up, and the player sinking into a pile of leaves. The name is the ROM's own, from
 // GFL_HeapAllocate's file argument ("ochiba" is fallen leaves). Function names from swan
-// (https://github.com/ds-pokemon-hacking/swan, GPL-3.0)
+// (https://github.com/ds-pokemon-hacking/swan, GPL-3.0), except the FldeffOchiba_ functions, which are ours
 #include "types.h"
 #include "field/field.h"
 #include "field/field_actor.h"
@@ -47,33 +47,33 @@ typedef struct {
     fx32 speed;
 } LeafPileStuckWork;
 
-static void func_ov036_021c9484(FieldEffectOchiba *effect);
-static void func_ov036_021c94cc(FieldEffectOchiba *effect);
-static void func_ov036_021c955c(FieldEffectTask *task, void *work);
-static void func_ov036_021c95a4(FieldEffectTask *task, void *work);
-static void func_ov036_021c95b0(FieldEffectTask *task, void *work);
-static void func_ov036_021c95cc(FieldEffectTask *task, void *work);
+static void FldeffOchiba_LoadResource(FieldEffectOchiba *effect);
+static void FldeffOchiba_FreeResource(FieldEffectOchiba *effect);
+static void FldeffOchiba_Init(FieldEffectTask *task, void *work);
+static void FldeffOchiba_Exit(FieldEffectTask *task, void *work);
+static void FldeffOchiba_Update(FieldEffectTask *task, void *work);
+static void FldeffOchiba_Draw(FieldEffectTask *task, void *work);
 static GameEvent *EventLeafPileStuck_Create(GameEvent *parent, GameSystem *gsys);
 static GameEventReturnCode EventLeafPileStuck_Callback(GameEvent *event, u32 *state, void *data);
 
 static const FieldEffectTaskVTable OCHIBA_TASK_VTABLE = {
-    sizeof(OchibaTask), func_ov036_021c955c, func_ov036_021c95a4, func_ov036_021c95b0, func_ov036_021c95cc,
+    sizeof(OchibaTask), FldeffOchiba_Init, FldeffOchiba_Exit, FldeffOchiba_Update, FldeffOchiba_Draw,
 };
 
-void *func_ov036_021c944c(FieldEffects *effects, HeapID heapId) {
+void *FldeffOchiba_Create(FieldEffects *effects, HeapID heapId) {
     FieldEffectOchiba *effect = GFL_HeapAllocate(heapId, sizeof(FieldEffectOchiba), TRUE, "fldeff_ochiba.c", 109);
 
     effect->effects = effects;
-    func_ov036_021c9484(effect);
+    FldeffOchiba_LoadResource(effect);
     return effect;
 }
 
-void func_ov036_021c9470(FieldEffects *effects, void *data) {
-    func_ov036_021c94cc(data);
+void FldeffOchiba_Delete(FieldEffects *effects, void *data) {
+    FldeffOchiba_FreeResource(data);
     GFL_HeapFree(data);
 }
 
-static void func_ov036_021c9484(FieldEffectOchiba *effect) {
+static void FldeffOchiba_LoadResource(FieldEffectOchiba *effect) {
     FieldG3DObjResRequest request;
     FieldG3DObjSystem *objSys = FieldEffects_GetFieldMapData(effect->effects);
     ArcTool *arc = FieldEffects_GetArc(effect->effects);
@@ -85,12 +85,12 @@ static void func_ov036_021c9484(FieldEffectOchiba *effect) {
     effect->resGroup = FieldG3DObjSystem_AddResGroup(objSys, &request, FALSE);
 }
 
-static void func_ov036_021c94cc(FieldEffectOchiba *effect) {
+static void FldeffOchiba_FreeResource(FieldEffectOchiba *effect) {
     FieldG3DObjSystem_FreeResGroup(FieldEffects_GetFieldMapData(effect->effects), effect->resGroup);
 }
 
 // Leaves under the actor, which face the way it does
-void func_ov036_021c94e0(FieldEffects *effects, FieldActor *actor) {
+void FldeffOchiba_Start(FieldEffects *effects, FieldActor *actor) {
     VecFx32 pos;
     OchibaTaskParams params;
     fx32 height;
@@ -111,7 +111,7 @@ void func_ov036_021c94e0(FieldEffects *effects, FieldActor *actor) {
     FieldEffects_TCBCreate(effects, &OCHIBA_TASK_VTABLE, &params.pos, 0, &params, 0);
 }
 
-static void func_ov036_021c955c(FieldEffectTask *task, void *work) {
+static void FldeffOchiba_Init(FieldEffectTask *task, void *work) {
     OchibaTask *ochibaTask = work;
     OchibaTaskParams *params = FieldEffects_GetObjectParam(task);
     FieldEffectOchiba *effect = params->effect;
@@ -126,14 +126,14 @@ static void func_ov036_021c955c(FieldEffectTask *task, void *work) {
     FieldG3DObjSystem_SetObjectManualDraw(objSys, ochibaTask->objIdx, TRUE);
 }
 
-static void func_ov036_021c95a4(FieldEffectTask *task, void *work) {
+static void FldeffOchiba_Exit(FieldEffectTask *task, void *work) {
     OchibaTask *ochibaTask = work;
 
     FieldG3DObjSystem_FreeObj(ochibaTask->objSys, ochibaTask->objIdx);
 }
 
 // End when the animation does
-static void func_ov036_021c95b0(FieldEffectTask *task, void *work) {
+static void FldeffOchiba_Update(FieldEffectTask *task, void *work) {
     OchibaTask *ochibaTask = work;
 
     if (!FieldG3DObjSystem_StepObjAnm(ochibaTask->objSys, ochibaTask->objIdx, FX32_ONE)) {
@@ -141,7 +141,7 @@ static void func_ov036_021c95b0(FieldEffectTask *task, void *work) {
     }
 }
 
-static void func_ov036_021c95cc(FieldEffectTask *task, void *work) {
+static void FldeffOchiba_Draw(FieldEffectTask *task, void *work) {
     OchibaTask *ochibaTask = work;
     u16 rotations[4][3] = { { 0, 0xc000, 0 }, { 0, 0x4000, 0 }, { 0, 0, 0 }, { 0, 0x8000, 0 } };
     u16 *rot = rotations[ochibaTask->dir];
