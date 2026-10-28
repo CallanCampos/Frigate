@@ -113,8 +113,8 @@ void BillboardActorScene_SetColEmissive(BillboardActorScene *scene, const GXRgb 
 void BillboardActorScene_SetBasePolyID(BillboardActorScene *scene, const u8 *id);
 void BillboardActorScene_SetGeomOrigin(BillboardActorScene *scene, u8 origin);
 void BillboardActorScene_SetTexcoordOffset(BillboardActorScene *scene, s16 s, s16 t);
-// The width and height of a texture of a billboard actor size, its width's GX_TEXSIZE_S* in bits 4 to 6 and its height's in
-// bits 0 to 2
+// The width and height of a texture of a billboard actor size, its width's GX_TEXSIZE_S* in bits 4 to 6 and its
+// height's in bits 0 to 2
 void BillboardActor_GetTexDimensions(int size, u16 *width, u16 *height);
 
 // Add a material of a texture resource, of one read from an archive, or of a texture already in VRAM, faceWidth by

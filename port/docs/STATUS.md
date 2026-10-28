@@ -32,10 +32,44 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
 
+## 2026-10-28: refresh the bounded naming proposal and satisfy required formatting
+
+- **Upstream:** proposed `b7ce134e0cdc91c4539112c050c20e634d74f40b`, fourteen commits beyond `fd3b9e600d`.
+  Four arrived after the previous proposal: day care/GTS/Forces of Nature, naming tools/report, and English archive/
+  text-bank names. Real merge `7412f62ba5` retains its provenance trailer. Main remains reviewed `71eabc1eb0`;
+  this is still the existing draft sync PR, not a completed sync of main.
+- **Port:** `PORT_SHA`, formatting-only companion and living path correction after the upstream import. No
+  reference/rewrite exception is used. Imported decomp configs equal upstream; incoming workflows are unchanged.
+- **ROM (T0):** fresh configure/Ninja, 1,768 steps, zero warnings, both original hashes match: B2
+  `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb`, W2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`.
+- **Host build/tests (T1/T2):** previous exact head `b7e5f7abbb` passes complete canonical builds and suites: B2
+  347 passed/28 explicit skips of 375; W2 344/28 of 372; zero failures, owner status 57497704204. These results
+  remain scoped to that head. New-head canonical and hosted gates must pass again before approval and merging.
+- **Replay/oracle/sanitizers/performance/play (T3/T4/T5/T6/T7):** no new gameplay, timing-parity or sanitizer claim.
+  Inputs, seeds, masks, references, budgets and sanitizer policy remain unchanged. Existing CARD/AI timing work
+  and the experimental reader remain separate; no unreviewed feature head is imported.
+- **Tiers/trap stubs:** no new scan; naming and organization do not complete a native feature.
+- **64-bit warnings:** the previous exact-head guard passes 365 sites/229 keys, real 66, 1,707 compiled inputs and
+  zero missing. New-head verification repeats it; no new port casts or narrowed fields are introduced.
+- **Work done:** an independent refreshed audit retains all 156 known added noncomment adaptation lines across all
+  32 affected adapted files: 151 literal/path/whitespace matches plus five verified callback renames, zero unmatched.
+  This does not claim whole-sync token equivalence. Day care's two pointer-valued setters survive its rename;
+  update the living game-change path to `day_care.c`. Only two obsolete archive constants remain in historical
+  research prose, which is intentionally retained. Required Standards CI exposed imported formatting; newer
+  upstream fixes the Hall of Fame layout, and three tiny companion corrections wrap one comment and two calls.
+  Independent lexical checks preserve all 1,522/1,079/2,029 C tokens, including literals; no assertion or `__LINE__`
+  occurs in those files. The pinned 23.1.1 audit's other 357 files pass, and the three corrected files pass too.
+  No formatter guard, source-standard rule or required check is weakened.
+- **Next:** publish this bounded refresh to the same draft, rerun exact-head canonical/hosted gates, incorporate
+  further reviewed main as necessary, then approve and merge normally. Continue the separate shared-controller
+  SDK CPU reader and authentic New Game/AI timing validation afterward.
+- **Blockers:** no human action blocks the proposal. Current-head checks remain due; the old head's formatting
+  failure cannot be treated as passing. Spanish issue 45 remains open without gameplay/save evidence.
+
 ## 2026-10-28: adopt reviewed Linux support in the naming sync proposal
 
 - **Upstream:** proposed `0e2d7f0974`; this is still a bounded resolution for the existing draft sync PR.
-- **Port:** `PORT_SHA`, a real merge of reviewed main `71eabc1eb0` after PR 58 passed all 14 checks and owner review.
+- **Port:** `b7e5f7abbb`, a real merge of reviewed main `71eabc1eb0` after PR 58 passed all 14 checks and owner review.
 - **ROM (T0):** the preceding sync head passes both original hashes with zero warnings; fresh integrated-head
   verification repeats configure/Ninja before merge. This base update changes no ROM source.
 - **Host build/tests (T1/T2):** prior sync suites pass B2 345/29 explicit skips of 374 and W2 342/29 of 371.

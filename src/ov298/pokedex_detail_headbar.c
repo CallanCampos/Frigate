@@ -151,7 +151,8 @@ static void PokedexDetailHeadbar_InitBG(PokedexDetailHeadbar *headbar) {
     headbar->bitmap = GFL_G2DIOLoadBitmap(ARCID_POKEDEX_GRA, 14, FALSE, headbar->heapId);
     headbar->charSize = GFL_BitmapCalcPixelDataSize(headbar->bitmap);
     headbar->charPos = GFL_BGSysLoadCharDynamic(HEADBAR_BG, GFL_BitmapGetPixelData(headbar->bitmap), headbar->charSize);
-    loadBGScrToVramByNarcNoReserve(ARCID_POKEDEX_GRA, 38, HEADBAR_BG, 0, headbar->charPos, 0xc0, FALSE, headbar->heapId);
+    loadBGScrToVramByNarcNoReserve(ARCID_POKEDEX_GRA, 38, HEADBAR_BG, 0, headbar->charPos, 0xc0, FALSE,
+                                   headbar->heapId);
     GFL_BGSysSetScrPaletteNo(HEADBAR_BG, 0, 0, 32, 24, 13);
     headbar->msgData =
         GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_BTL_SERVER_FLOW_TITLE, headbar->heapId);

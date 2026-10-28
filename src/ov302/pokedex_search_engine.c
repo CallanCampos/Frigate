@@ -274,7 +274,8 @@ u32 PokedexSearchEngine_LoadList(u32 type, HeapID heapId, u16 **outList) {
     } else {
         u16 *regionalTable = PML_PersonalLoadRegionalDexTable(heapId, &size);
         u32 length;
-        u16 *national = GFL_ArcSysReadHeapNewLZGetLen(ARCID_POKEDEX_SEARCH, FILE_NATIONAL_ORDER, FALSE, heapId, &length);
+        u16 *national =
+            GFL_ArcSysReadHeapNewLZGetLen(ARCID_POKEDEX_SEARCH, FILE_NATIONAL_ORDER, FALSE, heapId, &length);
         u16 count = length >> 1;
         u16 *list = GFL_HeapAllocate(heapId, size * 2, FALSE, "zukan_search_engine.c", 862);
         u16 n = 0;
