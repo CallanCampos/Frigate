@@ -39,8 +39,8 @@ typedef struct {
     FieldActorIdentity identity;
 } ReflectTask;
 
-static void func_ov036_021b49a4(FieldEffectReflect *effect);
-static void func_ov036_021b49a8(FieldEffectReflect *effect);
+static void FldeffReflect_InitResource(FieldEffectReflect *effect);
+static void FldeffReflect_DeleteResource(FieldEffectReflect *effect);
 static void ReflectTask_Init(FieldEffectTask *task, void *data);
 static void ReflectTask_Free(FieldEffectTask *task, void *data);
 static void ReflectTask_Update(FieldEffectTask *task, void *data);
@@ -58,23 +58,23 @@ static const fx32 REFLECT_TYPE_OFFSET_Y[3] = { -0x19000, -0x21000, -0x19000 };
 static const fx32 REFLECT_BILLBOARD_OFFSET_Y[3] = { 0, 0, 0 };
 static const fx32 REFLECT_BILLBOARD_OFFSET_Z[3] = { 0xc000, 0x6000, 0x19000 };
 
-void *func_ov036_021b496c(FieldEffects *effects, HeapID heapId) {
+void *FldeffReflect_Create(FieldEffects *effects, HeapID heapId) {
     FieldEffectReflect *effect = GFL_HeapAllocate(heapId, sizeof(FieldEffectReflect), TRUE, "fldeff_reflect.c", 131);
 
     effect->effects = effects;
-    func_ov036_021b49a4(effect);
+    FldeffReflect_InitResource(effect);
     return effect;
 }
 
-void func_ov036_021b4990(FieldEffects *effects, void *effect) {
-    func_ov036_021b49a8(effect);
+void FldeffReflect_Delete(FieldEffects *effects, void *effect) {
+    FldeffReflect_DeleteResource(effect);
     GFL_HeapFree(effect);
 }
 
-static void func_ov036_021b49a4(FieldEffectReflect *effect) {
+static void FldeffReflect_InitResource(FieldEffectReflect *effect) {
 }
 
-static void func_ov036_021b49a8(FieldEffectReflect *effect) {
+static void FldeffReflect_DeleteResource(FieldEffectReflect *effect) {
 }
 
 void ReflectTask_SetMMdl(MMSys *mmSys, FieldActor *actor, FieldEffects *effects, u32 type) {

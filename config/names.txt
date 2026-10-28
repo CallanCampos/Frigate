@@ -11588,6 +11588,10 @@ overlays/ov036 0x021b4878 FootmarkTask_Init
 overlays/ov036 0x021b48e8 FootmarkTask_Delete
 overlays/ov036 0x021b4904 FootmarkTask_Update
 overlays/ov036 0x021b4968 FootmarkTask_Draw
+overlays/ov036 0x021b496c FldeffReflect_Create
+overlays/ov036 0x021b4990 FldeffReflect_Delete
+overlays/ov036 0x021b49a4 FldeffReflect_InitResource
+overlays/ov036 0x021b49a8 FldeffReflect_DeleteResource
 overlays/ov036 0x021b49ac ReflectTask_SetMMdl
 overlays/ov036 0x021b49f4 ReflectTask_Init
 overlays/ov036 0x021b4a30 ReflectTask_Free
