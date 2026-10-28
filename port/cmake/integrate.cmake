@@ -94,16 +94,21 @@ add_test(NAME integrate_archive_seek_assert
         --expect "ArchiveMoveImageTop fileCnt=2, datID=2" -- "$<TARGET_FILE:port_archive_seek_tests>" invalid)
 set_tests_properties(integrate_archive_seek integrate_archive_seek_assert PROPERTIES TIMEOUT 30)
 
-# Actual trainer-AI commands and VM on owned synthetic scripts; no ROM or replacement interpreter. Per-function/data
-# sections keep unrelated battle code out of this small target; sanitizer coverage of the selected commands remains.
-add_executable(port_tr_ai_tables_tests tests/integrate/tr_ai_tables.c "${REPO_ROOT}/src/system/vm.c")
+# Exact actual trainer-AI definitions, without the unrelated callback table retained by ELF ASan/COFF linkers.
+# The generator fails closed on source-boundary changes; selected command bodies and the VM keep all sanitizers.
+set(tr_ai_projection "${PORT_GEN}/tr_ai_tables_source.inc")
+add_custom_command(OUTPUT "${tr_ai_projection}"
+    COMMAND "${CMAKE_COMMAND}" -E env PYTHONDONTWRITEBYTECODE=1 "${PORT_PYTHON}"
+        "${CMAKE_CURRENT_SOURCE_DIR}/tools/project_tr_ai_tables.py"
+        --source "${REPO_ROOT}/src/ov170/tr_ai.c" --out "${tr_ai_projection}"
+    DEPENDS "${REPO_ROOT}/src/ov170/tr_ai.c" "${CMAKE_CURRENT_SOURCE_DIR}/tools/project_tr_ai_tables.py"
+    VERBATIM)
+add_executable(port_tr_ai_tables_tests tests/integrate/tr_ai_tables.c "${REPO_ROOT}/src/system/vm.c"
+    "${tr_ai_projection}")
 target_link_libraries(port_tr_ai_tables_tests PRIVATE port_decomp_env)
-target_include_directories(port_tr_ai_tables_tests PRIVATE "${REPO_ROOT}")
-target_compile_options(port_tr_ai_tables_tests PRIVATE -ffunction-sections -fdata-sections)
-if(APPLE)
-    target_link_options(port_tr_ai_tables_tests PRIVATE -Wl,-dead_strip)
-else()
-    target_link_options(port_tr_ai_tables_tests PRIVATE -Wl,--gc-sections)
-endif()
+target_include_directories(port_tr_ai_tables_tests PRIVATE "${PORT_GEN}")
 add_test(NAME integrate_tr_ai_tables COMMAND port_tr_ai_tables_tests)
-set_tests_properties(integrate_tr_ai_tables PROPERTIES TIMEOUT 30)
+add_test(NAME integrate_tr_ai_projection
+    COMMAND "${CMAKE_COMMAND}" -E env PYTHONDONTWRITEBYTECODE=1 "${PORT_PYTHON}"
+        "${CMAKE_CURRENT_SOURCE_DIR}/tests/tools/test_project_tr_ai_tables.py")
+set_tests_properties(integrate_tr_ai_tables integrate_tr_ai_projection PROPERTIES TIMEOUT 30)

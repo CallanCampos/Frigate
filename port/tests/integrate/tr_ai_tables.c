@@ -2,7 +2,7 @@
 // scripts. Protect the post-operand PC base used by original DS AI scripts from compiler evaluation order; no ROM,
 // replacement interpreter, AI timing model or fabricated game functions. Only move-effect data and unused heaps
 // are fixture APIs. The real commands, argument reads, branches, callback returns and VM stopping are exercised.
-#include "src/ov170/tr_ai.c"
+#include "tr_ai_tables_source.inc"
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>

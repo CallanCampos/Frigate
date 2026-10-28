@@ -32,12 +32,46 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
 
+## 2026-10-28: make trainer-AI regressions independent of linker retention
+
+- **Upstream:** reviewed main remains `b631907c33`, containing `fd3b9e600d`. Two newly fetched upstream naming commits
+  through `29b9dcfef9` are being resolved/verified on a separate sync topic; they are not imported into this feature.
+- **Port:** `PORT_SHA`, a test/tool follow-up to PR 57 head `125435cb4f`. The three production AI sequencing fixes
+  and their source hash are unchanged; no game/HAL/header/data/clock/RNG changes are added by this follow-up.
+- **ROM (T0):** fresh configure/Ninja passes both original hashes with zero warnings: B2
+  `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb`, W2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`. All production and
+  owned test/helper hashes remain frozen. Every allocated AI object section already matches both original controls.
+- **Host build/tests (T1/T2):** both versions pass the two focused CTests in ordinary and fatal LLVM 23 ASan/UBSan
+  builds: thirteen real command/VM cases and six source-selection units, zero skips. The source selector retains
+  exact definition bytes and the original private context/prototypes, omits unrelated callback-table/battle code,
+  and regenerates when source or selector changes. Missing/duplicate/malformed definitions fail before output is
+  replaced; comments, literals and LF/CRLF continuations are covered. No collection flags or sanitizer exclusions.
+- **Replay/oracle/sanitizers/play (T3/T4/T5/T7):** production source is unchanged from the prior integrated proof:
+  both complete ordinary suites pass B2 347/28 explicit skips of 375 and W2 344/28 of 372. Both ordinary and both
+  full fatal-sanitizer 9,000-frame entries match all 36,000 payloads and frames of their fixed controls, with authentic
+  seeds and unchanged fully valid saves. These remain labeled prior-source results; new exact-head gates follow.
+  The actual native slot-1 versus DS slot-0 decision difference remains open. No new gameplay/parity claim is made.
+- **Performance (T6):** existing limits remain; no new performance claim, reference, input, seed, lag or mask change.
+- **Tiers/trap stubs/64-bit warnings:** no new scan or production cast change. Previous tier/stub measurements below
+  remain; exact-head verification must recheck the prior 365 sites/66 real and 1,707 compiled inputs/zero missing.
+- **Work done:** hosted Windows and sanitized Linux failed to link the initial whole-source test because unused
+  table/initialization globals retained all 120 callbacks and unrelated battle dependencies. The new bounded source
+  selector compiles the exact five real definitions, with original diagnostic lines, and the separate actual VM.
+  Local IR/binary checks confirm the unrelated globals/functions are absent. Neither fake battle functions nor
+  ignored unresolved symbols are introduced. Guides/feature map/lessons document ownership and verification limits.
+- **Next:** publish the corrected PR head and rerun canonical/hosted gates, including actual Windows/Linux links.
+  Review/merge the independently verified Windows layout contribution, integrate reviewed main as needed, then
+  complete the pending upstream sync and general CARD CPU timing before claiming faithful Terrell combat.
+- **Blockers:** no human action blocks these fixes. Hosted ELF/COFF retesting and exact-head gates are pending.
+  Original DS timing/choice differences and later native features remain unfinished; issue 45 still lacks the
+  Spanish gameplay/save evidence because the owner has no dump.
+
 ## 2026-10-28: integrate AI sequencing with the reviewed cartridge foundation
 
 - **Upstream:** `fd3b9e600da72b208fa98c3486988d3d7ce16766`, still contained in reviewed main `b631907c33`.
   PR 55 merged normally after all 14 checks passed; exact owner status 57473124170 and review 5683448057 apply to
   `ca9555921c`. Its canonical suites passed B2 346/28 explicit skips of 374 and W2 343/28 of 371. Main CI is running.
-- **Port:** `PORT_SHA`, a real merge of reviewed main into `b0f4350fef`. Three guide conflicts retain both additions;
+- **Port:** `125435cb4f`, a real merge of reviewed main into `b0f4350fef`. Three guide conflicts retain both additions;
   the actual AI production/test source is unchanged. No original handoff work, private evidence or backup is removed.
 - **ROM (T0):** fresh configure/Ninja passes both original hashes with zero warnings after integration. The AI source
   hash remains unchanged; all 167 allocatable original-object sections were already verified identical per version.

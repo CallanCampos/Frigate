@@ -3,6 +3,20 @@
 What port work taught that isn't obvious from the code, newest first. A lesson about MWCC or the decomp's own
 workflow goes in the decomp checkout instead; this file is the port's ([CLAUDE.md](../CLAUDE.md), the iteration loop).
 
+## 2026-10-28: isolate source regressions before linker retention
+
+- Function/data sections and garbage collection did not isolate the trainer-AI test on every platform. The actual
+  120-command table and initialization record retained unrelated battle code on Windows and sanitized Linux; ASan
+  registration and `llvm.compiler.used` made otherwise unused table references live. Preserve the failed evidence
+  and fix that assumption instead of ignoring unresolved symbols, adding fake battle APIs or disabling sanitizers.
+- Select the actual private context/prototypes and five needed definitions before compilation, retaining their exact
+  source and original diagnostic lines. A small, deliberately bounded selector fails on missing/duplicate definitions
+  or malformed lexical boundaries. CMake depends on both source and selector. The real VM stays a separate original
+  source, and all thirteen command cases keep fatal sanitizer coverage without linker-specific collection flags.
+- Exact-source claims include Windows line endings. Preserve CRLF bytes on input/output, handle escaped line
+  continuations in comments/literals, and check failed generation preserves the previous output. Native Mac passes
+  establish the local contract; hosted ELF/COFF checks still have to validate the repaired platform assumption.
+
 ## 2026-10-28: sequence bytecode reads before relative pointer arithmetic
 
 - Matching DS code does not make operand evaluation order portable. In `vm->pc + VM_Read32(vm)`, native clang

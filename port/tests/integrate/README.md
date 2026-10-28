@@ -12,8 +12,11 @@ Registered targets and tests live in [../../cmake/integrate.cmake](../../cmake/i
 | [archive_seek.c](archive_seek.c) | Actual archive FATB/FNTB/FIMG seeking and bounded synthetic file I/O | `integrate_archive_seek*` |
 | [test_integrate.c](test_integrate.c), [ovsec_probe.c](ovsec_probe.c) | DMA, heaps, input, screen output and overlay-section integration | Other `integrate_*` scenarios |
 
-Run `ctest --test-dir <native-build> -R '^integrate_tr_ai_tables$' --output-on-failure`. The target compiles the actual
-AI source in the fixture translation unit to access its genuine private context; linker section collection removes
-unrelated battle code. `PORT_SANITIZE=ON` applies the same fatal sanitizer policy as other native tests, without a new
-exception. No ROM or authentic trainer data is embedded in the fixture. Passing these tests proves operand sequencing,
-not trainer decision timing or complete battle parity.
+Run `ctest --test-dir <native-build> -R '^integrate_tr_ai_(tables|projection)$' --output-on-failure`.
+The target compiles exact source slices of the five actual AI definitions and their original headers/types/prototypes,
+selected by [project_tr_ai_tables.py](../../tools/project_tr_ai_tables.py). It omits the unrelated command table and
+battle initialization at generation time, so COFF/ELF linkers and ASan global registration cannot retain them.
+The helper fails on missing/duplicate definitions or malformed boundaries, and CMake regenerates after source changes.
+`PORT_SANITIZE=ON` applies the same fatal sanitizer policy as other native tests, without a new exception. No ROM or
+authentic trainer data is embedded in the fixture. `integrate_tr_ai_projection` checks source retention and fail-closed
+generation. Passing these tests proves operand sequencing, not trainer decision timing or complete battle parity.
