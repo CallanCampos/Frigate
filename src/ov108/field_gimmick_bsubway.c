@@ -13,9 +13,6 @@
 // to 76 keeps this in its gimmick state's user data. Zone 75's train shakes the map now and then; the others load
 // the field effect of the train, which script plugin 1 starts and drives
 
-// The field effect of the trains
-#define FLDEFF_TRAIN 13
-
 typedef struct {
     u16 unk0;
     // The zone's entry in sZoneGimmicks and sGimmickFuncs
@@ -175,7 +172,7 @@ static void TrainSetup(BSubwayGimmickWork *work, Field *field) {
 
     effects = Field_GetFieldEffects(field);
     work->data = GFL_HeapAllocate(work->heapId, sizeof(TrainWork), TRUE, "field_gimmick_bsubway.c", 274);
-    id = FLDEFF_TRAIN;
+    id = FLDEFF_BTRAIN;
     FieldEffects_Load(effects, &id, 1);
 }
 

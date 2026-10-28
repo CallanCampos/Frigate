@@ -79,7 +79,7 @@ void FldeffDust_Start(FieldActor *actor, FieldEffects *effects) {
     CopyActorWPos(actor, &pos);
     pos.y += FX32_ONE;
     pos.z += FX32_CONST(6);
-    params.smoke = FieldEffects_GetHandleData(effects, 1);
+    params.smoke = FieldEffects_GetHandleData(effects, FLDEFF_DUST);
     params.pos = pos;
     FieldEffects_TCBCreate(effects, &SMOKE_TASK_VTABLE, NULL, 0, &params, 0);
 }
@@ -94,7 +94,7 @@ void FldeffDust_StartFacing(FieldActor *actor, FieldEffects *effects) {
     pos.y += FX32_ONE;
     pos.z += FX_Mul(FX_CosIdx(angle), FX32_CONST(6));
     pos.x += FX_Mul(FX_SinIdx(angle), FX32_CONST(6));
-    params.smoke = FieldEffects_GetHandleData(effects, 1);
+    params.smoke = FieldEffects_GetHandleData(effects, FLDEFF_DUST);
     params.pos = pos;
     FieldEffects_TCBCreate(effects, &SMOKE_TASK_VTABLE, NULL, 0, &params, 0);
 }

@@ -87,7 +87,7 @@ FieldEffectTask *FldeffFishing_Start(FieldEffects *effects, const VecFx32 *pos, 
     u8 zOffsets[2][4] = { { 0, 0, 0, 0 }, { 0, 0, 3, 3 } };
     FishingTaskParams params;
 
-    params.effect = FieldEffects_GetHandleData(effects, 12);
+    params.effect = FieldEffects_GetHandleData(effects, FLDEFF_FISHING);
     params.pos = *pos;
     params.pos.z += FX32_CONST(zOffsets[sameHeight][dir]);
     return FieldEffects_TCBCreate(effects, &FISHING_TASK_VTABLE, NULL, 0, &params, 0);

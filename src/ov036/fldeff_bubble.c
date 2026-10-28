@@ -55,7 +55,7 @@ void FldeffBubble_Start(FieldActor *actor, FieldEffects *effects) {
     BubbleTaskParams params;
     VecFx32 pos;
 
-    params.effect = FieldEffects_GetHandleData(effects, 15);
+    params.effect = FieldEffects_GetHandleData(effects, FLDEFF_BUBBLE);
     params.actor = actor;
     CopyActorWPos(actor, &pos);
     FieldEffects_TCBCreate(effects, &BUBBLE_TASK_VTABLE, &pos, 0, &params, 0);

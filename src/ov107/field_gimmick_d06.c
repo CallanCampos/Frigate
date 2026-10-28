@@ -19,7 +19,6 @@
 #define STONE_ACTOR_ID 0xfd
 #define STONE_COUNT 12
 #define MARK_COUNT 14
-#define EFFECT_ID 10
 
 // How far a stone can go in a push
 #define MAX_PUSH_STEPS 0x20
@@ -186,7 +185,7 @@ void GimmickD06_Setup(Field *field) {
     work->state = state;
     work->field = field;
     work->zone = zone;
-    effectId = EFFECT_ID;
+    effectId = FLDEFF_D06_ELECTRIC;
     FieldEffects_Load(effects, &effectId, 1);
     if (!state->initialized) {
         count = GetStoneCount(work->zone);
