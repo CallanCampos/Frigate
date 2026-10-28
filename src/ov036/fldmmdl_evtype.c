@@ -32,14 +32,14 @@ static BOOL FldmmdlMovecode_CheckByEventType(FieldActor *actor);
 static BOOL FldmmdlMovecode_UpdateByEventType(FieldActor *actor);
 static BOOL FldmmdlMovecode_HasLeftOldGrid(FieldActor *actor);
 static BOOL FldmmdlMovecode_IsAtOldGrid(FieldActor *actor);
-static void func_ov036_0219268c(FieldActor *actor);
-static BOOL func_ov036_02192690(FieldActor *actor);
-static BOOL func_ov036_02192694(FieldActor *actor);
-static void func_ov036_02192698(FieldActor *actor);
-static BOOL func_ov036_021926b0(FieldActor *actor);
+static void FldmmdlMove_InitEvTypeNone(FieldActor *actor);
+static BOOL FldmmdlMove_CheckEvTypeNone(FieldActor *actor);
+static BOOL FldmmdlMove_UpdateEvTypeNone(FieldActor *actor);
+static void FldmmdlMove_InitWalkRepeatLookAround(FieldActor *actor);
+static BOOL FldmmdlMove_CheckWalkRepeatLookAround(FieldActor *actor);
 static BOOL FldmmdlMove_TurnLookAround(FieldActor *actor);
 static void FldmmdlMove_InitWalkRepeatSpin(FieldActor *actor);
-static BOOL func_ov036_02192870(FieldActor *actor);
+static BOOL FldmmdlMove_CheckWalkRepeatSpin(FieldActor *actor);
 static BOOL FldmmdlMove_TurnSpin(FieldActor *actor);
 static BOOL FldmmdlMove_IsButtonBHeld(void);
 
@@ -95,24 +95,24 @@ static BOOL FldmmdlMovecode_IsAtOldGrid(FieldActor *actor) {
     return FALSE;
 }
 
-static void func_ov036_0219268c(FieldActor *actor) {
+static void FldmmdlMove_InitEvTypeNone(FieldActor *actor) {
 }
 
-static BOOL func_ov036_02192690(FieldActor *actor) {
+static BOOL FldmmdlMove_CheckEvTypeNone(FieldActor *actor) {
     return FALSE;
 }
 
-static BOOL func_ov036_02192694(FieldActor *actor) {
+static BOOL FldmmdlMove_UpdateEvTypeNone(FieldActor *actor) {
     return FALSE;
 }
 
-static void func_ov036_02192698(FieldActor *actor) {
+static void FldmmdlMove_InitWalkRepeatLookAround(FieldActor *actor) {
     ActorSpinWork *work = FldAct_InitMoveSubProcWork(actor, 9);
 
     work->limit = GetActorUserParam(actor, 1);
 }
 
-static BOOL func_ov036_021926b0(FieldActor *actor) {
+static BOOL FldmmdlMove_CheckWalkRepeatLookAround(FieldActor *actor) {
     ActorSpinWork *work = FldAct_GetMoveSubProcWork(actor);
 
     switch (work->state) {
@@ -205,7 +205,7 @@ static void FldmmdlMove_InitWalkRepeatSpin(FieldActor *actor) {
     work->variant = variant;
 }
 
-static BOOL func_ov036_02192870(FieldActor *actor) {
+static BOOL FldmmdlMove_CheckWalkRepeatSpin(FieldActor *actor) {
     ActorSpinWork *work = FldAct_GetMoveSubProcWork(actor);
 
     switch (work->state) {
@@ -299,40 +299,32 @@ static BOOL FldmmdlMove_IsButtonBHeld(void) {
     return FALSE;
 }
 
-static const ActorEvTypeInitFunc ACTOR_EVENTTYPE_FUNCS[] = { func_ov036_0219268c,
-                                                             func_ov036_0219268c,
-                                                             func_ov036_0219268c,
-                                                             func_ov036_0219268c,
-                                                             func_ov036_02192698,
-                                                             FldmmdlMove_InitWalkRepeatSpin,
-                                                             FldmmdlMove_InitWalkRepeatSpin,
-                                                             func_ov036_0219268c,
-                                                             func_ov036_0219268c,
-                                                             func_ov036_0219268c,
-                                                             func_ov036_0219268c,
-                                                             func_ov036_0219268c,
-                                                             func_ov036_0219268c,
-                                                             func_ov036_0219268c,
-                                                             func_ov036_02192698,
-                                                             FldmmdlMove_InitWalkRepeatSpin,
-                                                             FldmmdlMove_InitWalkRepeatSpin,
-                                                             func_ov036_0219268c,
-                                                             func_ov036_0219268c,
-                                                             func_ov036_0219268c,
-                                                             FldmmdlMove_InitWalkRepeatSpin };
+static const ActorEvTypeInitFunc ACTOR_EVENTTYPE_FUNCS[] = {
+    FldmmdlMove_InitEvTypeNone,     FldmmdlMove_InitEvTypeNone,           FldmmdlMove_InitEvTypeNone,
+    FldmmdlMove_InitEvTypeNone,     FldmmdlMove_InitWalkRepeatLookAround, FldmmdlMove_InitWalkRepeatSpin,
+    FldmmdlMove_InitWalkRepeatSpin, FldmmdlMove_InitEvTypeNone,           FldmmdlMove_InitEvTypeNone,
+    FldmmdlMove_InitEvTypeNone,     FldmmdlMove_InitEvTypeNone,           FldmmdlMove_InitEvTypeNone,
+    FldmmdlMove_InitEvTypeNone,     FldmmdlMove_InitEvTypeNone,           FldmmdlMove_InitWalkRepeatLookAround,
+    FldmmdlMove_InitWalkRepeatSpin, FldmmdlMove_InitWalkRepeatSpin,       FldmmdlMove_InitEvTypeNone,
+    FldmmdlMove_InitEvTypeNone,     FldmmdlMove_InitEvTypeNone,           FldmmdlMove_InitWalkRepeatSpin
+};
 
-static const ActorEvTypeFunc data_ov036_021cbe44[] = { func_ov036_02192690, func_ov036_02192690, func_ov036_02192690,
-                                                       func_ov036_02192690, func_ov036_021926b0, func_ov036_02192870,
-                                                       func_ov036_02192870, func_ov036_02192690, func_ov036_02192690,
-                                                       func_ov036_02192690, func_ov036_02192690, func_ov036_02192690,
-                                                       func_ov036_02192690, func_ov036_02192690, func_ov036_021926b0,
-                                                       func_ov036_02192870, func_ov036_02192870, func_ov036_02192690,
-                                                       func_ov036_02192690, func_ov036_02192690, func_ov036_02192870 };
+static const ActorEvTypeFunc data_ov036_021cbe44[] = {
+    FldmmdlMove_CheckEvTypeNone,     FldmmdlMove_CheckEvTypeNone,           FldmmdlMove_CheckEvTypeNone,
+    FldmmdlMove_CheckEvTypeNone,     FldmmdlMove_CheckWalkRepeatLookAround, FldmmdlMove_CheckWalkRepeatSpin,
+    FldmmdlMove_CheckWalkRepeatSpin, FldmmdlMove_CheckEvTypeNone,           FldmmdlMove_CheckEvTypeNone,
+    FldmmdlMove_CheckEvTypeNone,     FldmmdlMove_CheckEvTypeNone,           FldmmdlMove_CheckEvTypeNone,
+    FldmmdlMove_CheckEvTypeNone,     FldmmdlMove_CheckEvTypeNone,           FldmmdlMove_CheckWalkRepeatLookAround,
+    FldmmdlMove_CheckWalkRepeatSpin, FldmmdlMove_CheckWalkRepeatSpin,       FldmmdlMove_CheckEvTypeNone,
+    FldmmdlMove_CheckEvTypeNone,     FldmmdlMove_CheckEvTypeNone,           FldmmdlMove_CheckWalkRepeatSpin
+};
 
 static const ActorEvTypeFunc data_ov036_021cbe98[] = {
-    func_ov036_02192694,  func_ov036_02192694,  func_ov036_02192694, func_ov036_02192694, FldmmdlMove_TurnLookAround,
-    FldmmdlMove_TurnSpin, FldmmdlMove_TurnSpin, func_ov036_02192694, func_ov036_02192694, func_ov036_02192694,
-    func_ov036_02192694,  func_ov036_02192694,  func_ov036_02192694, func_ov036_02192694, FldmmdlMove_TurnLookAround,
-    FldmmdlMove_TurnSpin, FldmmdlMove_TurnSpin, func_ov036_02192694, func_ov036_02192694, func_ov036_02192694,
-    FldmmdlMove_TurnSpin
+    FldmmdlMove_UpdateEvTypeNone, FldmmdlMove_UpdateEvTypeNone, FldmmdlMove_UpdateEvTypeNone,
+    FldmmdlMove_UpdateEvTypeNone, FldmmdlMove_TurnLookAround,   FldmmdlMove_TurnSpin,
+    FldmmdlMove_TurnSpin,         FldmmdlMove_UpdateEvTypeNone, FldmmdlMove_UpdateEvTypeNone,
+    FldmmdlMove_UpdateEvTypeNone, FldmmdlMove_UpdateEvTypeNone, FldmmdlMove_UpdateEvTypeNone,
+    FldmmdlMove_UpdateEvTypeNone, FldmmdlMove_UpdateEvTypeNone, FldmmdlMove_TurnLookAround,
+    FldmmdlMove_TurnSpin,         FldmmdlMove_TurnSpin,         FldmmdlMove_UpdateEvTypeNone,
+    FldmmdlMove_UpdateEvTypeNone, FldmmdlMove_UpdateEvTypeNone, FldmmdlMove_TurnSpin
 };
