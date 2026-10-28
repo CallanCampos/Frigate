@@ -1,0 +1,54 @@
+# Cartridge boundaries
+
+These modules serve NitroSDK CARD (`lib/nitro/src/card`): ROM/filesystem reads, saves and the genuine-card check.
+The player supplies the ROM/save; no cartridge data is stored here.
+
+| Module | Responsibility |
+| --- | --- |
+| [card_rom.c](card_rom.c), [port_card.h](port_card.h), [card_internal.h](card_internal.h) | Existing production reader/lifecycle, unchanged by this foundation. Requested DMA still uses the existing CARD-task fallback. |
+| [backup.c](backup.c), [card_backup_host.c](card_backup_host.c), [card_backup_calls.h](card_backup_calls.h) | Backup-image service and native pointer transport. |
+| [card_spi.c](card_spi.c), [card_spi.h](card_spi.h) | Cartridge infrared/SPI model. |
+| [port_card_bus.c](port_card_bus.c), [port_card_bus.h](port_card_bus.h) | Independent caller-owned NTR read/ID wire engine; `card_bus`. |
+| [port_card_hardware.c](port_card_hardware.c), [port_card_hardware.h](port_card_hardware.h) | Test-activated physical READY/COMMIT events and bounded native-mainRAM DMA service; `card_hardware_*`. |
+
+## Physical foundation, not production timing
+
+Production `card_rom.c` and `replaced.txt` are byte-identical to reviewed main. This candidate does not activate wire
+latency, a CPU page cache, SDK DMA setup, a new polling cost or a second cartridge in runtime play. CPU adapter and
+actual SDK completion work remain separate preserved WIP. Future CPU and DMA commands must share **one** bus owner
+and the same `PortCardBusRequest`, after lifecycle/polling review. No game/SDK source, input, seed or golden changes
+are part of this foundation. [ADR0028](../../docs/adr/0028-card-wire-and-physical-dma-progress.md) records the scope.
+
+The bus implements independently expressed rules from the pinned test oracle's **model**, not a retail-card
+measurement: [melonDS1.1 NDSCart.cpp](https://github.com/melonDS-emu/melonDS/blob/1.1/src/NDSCart.cpp),
+`WriteROMCnt`, `ROMPrepareData`, `AdvanceROMTransfer`, `ReadROMData`, `ROMEndTransfer`.
+Archive SHA256: `61e339bcb18a68a17485973637d972ea628c5624d7e6b8adf6870f895d5e26fd`. No implementation text was imported.
+For byte clock C5/8, first READY is C*(8+L1+L2+4); subsequent READY follows consumption+C*(4+L2 at a 512-byte
+boundary); zero-length completion is C*(8+L1). An unread READY word holds indefinitely. Premature reads return the
+old latch. Final consumption clears BUSY and optionally latches completion. Latch/ack and IRQ delivery are distinct.
+The engine honors supplied L1 even for ID: original SDK `CARDi_ReadRomIDCore` masks L1 when building its command;
+that policy belongs to the future adapter. Backends supply immutable bytes/ID with whole native context pointers.
+
+Only typed ordinary NTR READ and ID commands exist. DSi, encrypted/secure phases, writes, status/refresh commands
+and raw ROMCnt/slot ownership are unsupported. Invalid size/latency/address range, backward time, backend error
+and deadline overflow fail explicitly. No CPU-work, FS, allocation, copy or game-AI cost is inferred.
+
+## Test-activated physical events
+
+The closed core event kind calls physical state transitions directly, even during old IRQ Spin. It never invokes
+SDK handlers/tasks, generic timed callbacks, frame hooks or arbitrary observer functions. READY demands an armed
+repeat-one-word channel; COMMIT consumes the latch, writes four bounded bytes and schedules the next READY from
+actual consumption. Final consumption latches CARD_DATA IF, never an ordinary DMA IRQ.
+
+Known native-mainRAM service occupies nine normalized cycles per word, the specific pinned IO32-to-mainRAM count 1
+burst class in [the DMA guide](../dma/README.md). Timers/lines/physical events progress during that interval; ARM9,
+IRQ delivery and generic host work wait until unit release. Own-work Spin excludes that stall once; absolute waits
+and Halt count it toward their existing deadline. A target inside a stall can return later because ARM9 is stopped.
+Equal-cycle timer/line/timed events retain their relative order; due physical transitions close before ARM9 or host
+work resumes. The exact timerIF64/READY 64/COMMIT 73 case is tested, without a general hardware-parity claim.
+
+The single armed channel owns a whole native-main-arena range. Unknown pointers, misalignment, invalid channels,
+overlap and exhausted payload bounds cannot gain writes. Stopped/reset tokens cannot commit; epochs are monotonic
+across reset and exhaustion stays fail-closed. Reset/cancel and OS run teardown discard pending events before their
+buffers disappear. Actual MI Stop/StopAll cancel this experimental channel. Generic reuse fails visibly rather
+than stealing it; production MIi_CardDmaCopy32 remains deliberately unsupported. No new production feature flag.

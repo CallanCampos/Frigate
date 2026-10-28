@@ -3,6 +3,18 @@
 What port work taught that isn't obvious from the code, newest first. A lesson about MWCC or the decomp's own
 workflow goes in the decomp checkout instead; this file is the port's ([CLAUDE.md](../CLAUDE.md), the iteration loop).
 
+## 2026-10-28: invalidate physical tokens and close equal-cycle events
+
+- Resetting a native DMA generation to zero permits an ABA bug: an old token 1 can authorize a new token 1's output.
+  Preserve a monotonically advancing epoch across reset, fail closed at exhaustion, and test the exact old-demand /
+  reset / new-demand / old-commit sequence against the actual new destination.
+- An event which only latches timer IF must not let ARM9 run before READY at the same cycle has stopped it for DMA.
+  Preserve existing event order but close all due physical transitions before the CPU/IRQ/host boundary. Test IF
+  observed at 64 and handler/host work at 73 after the 9-cycle unit, not only a timer somewhere inside a transfer.
+- A unit foundation can be useful without activating its incomplete SDK adapter. Keep the original reader unchanged
+  when CPU timing still has a real screenshot regression; retain the failed evidence and separate physical unit
+  correctness from gameplay/AI parity. Never adjust seeds, inputs, goldens or masks to publish an increment.
+
 ## 2026-10-28: measure card work before assigning an AI delay
 
 - A typed API which returns the right bytes can still have the wrong request stream. The native archive wrapper

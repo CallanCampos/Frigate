@@ -93,6 +93,7 @@ What becomes easier, what becomes harder, what must be watched, and what would m
 | [0025](0025-a-spanish-rom-by-a-manifest-of-its-own.md) | A Spanish ROM by a manifest of its own, read by the US code | §1, §4.5 | proposed |
 | [0026](0026-native-archive-table-caches.md) | Keep archive offsets and resolve cached tables through the native pointer | §4.5, §4.8, §6 | accepted |
 | [0027](0027-recorded-input-streams.md) | Record effective video input with explicit initial state, clock and bounded seeds | §4.5, §6 | accepted |
+| [0028](0028-card-wire-and-physical-dma-progress.md) | Keep the CARD physical model separate from production SDK integration | §4.5, §6 | accepted (physical foundation only) |
 
 ## Decisions waiting for an ADR
 

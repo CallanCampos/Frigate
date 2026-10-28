@@ -32,6 +32,63 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
 
+## 2026-10-28: independent cartridge wire and physical DMA foundation
+
+- **Upstream:** `fd3b9e600da72b208fa98c3486988d3d7ce16766`, still contained after a fresh fetch.
+  Reviewed main is `70085bfae7`: PR 54 merged normally after all 14 checks passed on `3931242d52` and owner
+  review. Its exact-head canonical local gates passed B2 326/28 explicit skips of 354 and W2 323/28 of 351;
+  status 57460557946 records success. Issue 38 closed automatically. The merged main's Compile, Standards and
+  Frigate CI runs also pass; no protection or workflow policy change.
+- **Port:** `PORT_SHA`, on `codex/card-physical-foundation`. All changes are in `port/`. This is the independent
+  clock/controller foundation. Production `hal/card/card_rom.c` and `replaced.txt` are byte-identical to reviewed
+  main; no CPU-reader adapter, new product flag or production DMA selection is included.
+- **ROM (T0):** `build/python-signed-wibo configure.py b2_us w2_us`, then `ninja -j2`, passes with zero warnings;
+  B2 `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb`, W2
+  `b5d7490be7b415b8f1e672a53e978a9cc667e56a`. The wrapper is a local supported runtime override: configure's
+  original download/pin validation remains intact and identical signed executable code runs privately. No wrapper,
+  binary, shared-tool change or game/config/header change is committed.
+- **Host build (T1):** both RelWithDebInfo all-target builds pass on arm64 macOS with LLVM 23. The strict focused
+  build uses fatal ASan/UBSan, recovery off and the existing ignorelist; frame-time report-only is off. Source/build/
+  input hashes remain fixed through full validation. Exact-head canonical and hosted gates follow publication.
+- **Tests (T2/T3/T6):** complete ordinary suites pass: B2 348 passed/26 explicit fixture-dependent skips of 374;
+  W2 345/26 of 371, zero failures. This includes original New Game/house pixels, opening/title/Aspertia screen and
+  state references, sound references, save round trips, ROM/file tests, pointer guard and new hardware cases.
+  No input, golden, seed, tolerance or exclusion changes. The manifest tool passes 14/14: its production-fragment
+  probe now mocks the added target-registration commands and reports CMake diagnostics on failure, retaining every
+  schema/output assertion. Focused controller/device/scheduler tests pass 22/22 without skips.
+- **Oracle (T4):** no new runtime CARD integration or story comparison is claimed. Existing reference/hash checks
+  above remain intact. The controller/service rules use the pinned melonDS 1.1 model and original SDK policy;
+  neither emulator-model arithmetic nor an independent unit pass establishes retail timing or trainer-AI parity.
+- **Sanitizers (T5):** 22/22 focused tests pass with fatal LLVM ASan/UBSan and zero skips. Both complete OS small-stack
+  and ASan fake-stack suites also pass, 2/2, on the frozen foundation. This is separate from new whole-game strict
+  story validation, which remains required when activating a runtime reader.
+- **Visual/performance play (T7):** full-suite replay and enforced performance checks pass where their fixtures are
+  available; skips are explicit. No new windowed story milestone or frame-budget relaxation. The foundation's
+  physical activation is test-only, and reviewed main's product reader remains unchanged.
+- **Tiers:** no new source-unit scan for this port-only foundation. Last scan: 41,017 tier (a), zero (b)/(c), plus
+  2,385 veneers/16,906 bytes; this does not measure native SDK completeness.
+- **Trap stubs:** unchanged at 25 functions plus `CARDi_NdmaInterface` data per game. Production
+  `MIi_CardDmaCopy32` still diagnoses the unfinished SDK integration; no trap is silently replaced with success.
+- **64-bit warnings:** both builds retain 365 sites/229 keys: real 66, harmless 123, handled 141, unreachable 35;
+  1,707 compiled inputs and zero missing. No baseline or suppression changes.
+- **Work done:** caller-owned typed NTR wire requests model command/word/gap deadlines, held READY and end-IRQ
+  latching. An absolute wait supports real IRQ host-stack execution and elapsed preemption time. Closed physical
+  READY/COMMIT events progress through old IRQ spins and masks while generic host callbacks remain separate.
+  A bounded native-main-arena channel models the pinned nine-cycle IO32-to-mainRAM one-word service class; own CPU
+  work excludes bus stalls once, while absolute targets stay fixed. Reset epochs prevent old-token ABA reuse;
+  equal-cycle regressions observe timer IF at 64 and handler/host work at 73 after commit. Guides/maps, lessons and
+  [ADR 0028](adr/0028-card-wire-and-physical-dma-progress.md) document this limited accepted boundary.
+- **Next:** publish and finish the protected exact-head review/verification gates. Unify future CPU/DMA commands
+  onto one owner, model original SDK polling/work and preserve genuine page/ID/interrupt/task sequencing before
+  production activation. A separately preserved CPU-wire prototype changes animated-screen and clock/state/sound
+  alignment; its failed full-suite evidence remains visible and its inputs/goldens are unchanged. Continue authentic
+  Route 20 progression through Terrell's mandatory Patrat battle, then Ranch arrival, Hugh's Town Map, Herdier's
+  rescue and the first gym. A northward shortcut is an original one-way ledge, not a native collision defect.
+- **Blockers:** no missing game C or human approval blocks ongoing work. SDK timing/production DMA, trainer-AI
+  deadline fidelity, later story and remaining native features are unfinished; ADR 0023 remains proposed. Issue 45
+  still needs Spanish Black 2 gameplay/save evidence and the owner has no dump. All unfinished user worktrees and
+  the separate timing prototype are preserved; no ROM, save, capture or diagnostic executable is included.
+
 ## 2026-10-28: effective input recording and fresh-process replay
 
 - **Upstream:** `fd3b9e600da72b208fa98c3486988d3d7ce16766`, reviewed main `afec4eed2b`. PR 53 merged
@@ -40,7 +97,7 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
   normalize identically in upstream and adapted Frigate, and all 184 changed scripts preserve command bodies
   and arguments. Two conflicts retain the port's wide callback types. Formatting is whitespace only; no workflow
   change or reference exception. PR 52's cache change remains intact.
-- **Port:** `PORT_SHA` on `codex/input-recording`, with snapshot `1839aa2c61` and normal main integration at
+- **Port:** `3931242d52` on `codex/input-recording`, with snapshot `1839aa2c61` and normal main integration at
   `5bc0b71fe6`, followed by writer fixes, the evidence checker and guides. Changes relative to reviewed main are
   all in `port/`. Game C, source configurations, RNG algorithms and input assets stay unchanged by recording.
   The recorded experiments below ran on the explicit pre-sync source at `055c4910cd`/main `85a0c74c06`.
