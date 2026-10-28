@@ -10009,6 +10009,8 @@ overlays/ov036 0x02188c90 MsgBGPrinter_PlainWinDrawCursor
 overlays/ov036 0x02188cbc MsgBGPrinter_GetPlainWinStreamState
 overlays/ov036 0x02188cc0 MsgBGPrinter_SetupSubMsgWin
 overlays/ov036 0x02188d6c MsgBGPrinter_AddSubMsgWinMsg
+overlays/ov036 0x02188ddc MsgBGPrinter_AddSubMsgWinStr
+overlays/ov036 0x02188dfc MsgBGPrinter_AddSubMsgWinStrFrame
 overlays/ov036 0x02188e70 MsgBGPrinter_FreeSubMsgWin
 overlays/ov036 0x02188e90 MsgBGPrinter_DeleteSubMsgWin
 overlays/ov036 0x02188e9c MsgBGPrinter_DeleteAllSubMsgWin

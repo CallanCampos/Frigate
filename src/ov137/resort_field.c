@@ -1506,8 +1506,8 @@ static void ResortBubble_Show(ResortBubble *bubble, FieldMsgBG *msgBGSys, Resort
     if (mode == TRUE) {
         xs = sBubbleXs1;
     }
-    func_ov036_02188dfc(msgBGSys, bubble->strbuf, bubble->index, xs[bubble->index], sBubbleYs[bubble->index], width, 2,
-                        style);
+    MsgBGPrinter_AddSubMsgWinStrFrame(msgBGSys, bubble->strbuf, bubble->index, xs[bubble->index],
+                                      sBubbleYs[bubble->index], width, 2, style);
 }
 
 static void ResortBubble_Hide(ResortBubble *bubble, FieldMsgBG *msgBGSys) {

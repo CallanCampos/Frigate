@@ -1483,11 +1483,12 @@ void MsgBGPrinter_AddSubMsgWinMsg(FieldMsgBG *sys, MsgData *msgData, u32 msgId, 
                                 TALKMSG_WIN_FRAME_NORMAL);
 }
 
-void func_ov036_02188ddc(FieldMsgBG *sys, StrBuf *strbuf, u16 userId, u8 x, u8 y, u8 width, u8 height) {
-    func_ov036_02188dfc(sys, strbuf, userId, x, y, width, height, TALKMSG_WIN_FRAME_NORMAL);
+void MsgBGPrinter_AddSubMsgWinStr(FieldMsgBG *sys, StrBuf *strbuf, u16 userId, u8 x, u8 y, u8 width, u8 height) {
+    MsgBGPrinter_AddSubMsgWinStrFrame(sys, strbuf, userId, x, y, width, height, TALKMSG_WIN_FRAME_NORMAL);
 }
 
-void func_ov036_02188dfc(FieldMsgBG *sys, StrBuf *strbuf, u16 userId, u8 x, u8 y, u8 width, u8 height, u32 frameType) {
+void MsgBGPrinter_AddSubMsgWinStrFrame(FieldMsgBG *sys, StrBuf *strbuf, u16 userId, u8 x, u8 y, u8 width, u8 height,
+                                       u32 frameType) {
     NumberedMsgWin *win = GFL_HeapAllocate(sys->heapId, sizeof(NumberedMsgWin), TRUE, "field_msgbg.c", 3710);
     int slot = FieldMsgBG_AddNumberedWindow(sys, win);
 

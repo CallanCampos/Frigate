@@ -725,7 +725,7 @@ BOOL s003A_MultiMsg(VM *vm, FieldScriptEnv *env) {
     if (y + height > 24) {
         y = height = 4;
     }
-    func_ov036_02188ddc(fieldWork->msgBGSys, strbuf, index, x, y, width, height);
+    MsgBGPrinter_AddSubMsgWinStr(fieldWork->msgBGSys, strbuf, index, x, y, width, height);
     GFL_StrBufFree(strbuf);
     FieldScriptSubEvent_Register(SCRIPT_SUB_EVENT_MULTI_MSG);
     return FALSE;
