@@ -5414,7 +5414,7 @@ gEnterBuildingLCDConfig kind:data(any) addr:0x021d1624
 data_ov036_021d1634 kind:data(any) addr:0x021d1634
 data_ov036_021d16c4 kind:data(any) addr:0x021d16c4
 data_ov036_021d1754 kind:data(any) addr:0x021d1754
-data_ov036_021d1760 kind:data(any) addr:0x021d1760
+COMM_ERROR_PROC_FUNCTIONS kind:data(any) addr:0x021d1760
 WATERFALL_UP_HANDLERS kind:data(any) addr:0x021d176c
 data_ov036_021d1784 kind:data(any) addr:0x021d1784
 data_ov036_021d178c kind:data(any) addr:0x021d178c
