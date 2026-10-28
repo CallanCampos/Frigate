@@ -50,7 +50,9 @@ void FieldPlayer_SyncState(FieldPlayer *player);
 void FieldPlayer_ForceBrake(FieldPlayer *player);
 void FieldPlayer_SetRailPos(FieldPlayer *player, const RailPosition *pos);
 void FieldPlayer_GetRailWorldPos(FieldPlayer *player, VecFx32 *pos);
-// The event of walking into an actor, or NULL. Only on the grid
+// The event of walking into an actor, or NULL. Only on the grid. The flags say which events may start: a boulder's
+// push, once the flag that Strength sets is set
+#define OBJ_CONTACT_STRENGTH 0x1
 GameEvent *FieldPlayer_CheckObjContactEvent(FieldPlayer *player, u32 pressedKeys, u32 heldKeys, u32 flags);
 void FieldPlayer_FinishFormChange(FieldPlayer *player);
 // The core's terrain effect task: set and get

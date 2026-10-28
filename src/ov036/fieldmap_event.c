@@ -312,7 +312,7 @@ static GameEvent *FieldEventProvider_Grid_CheckForEvent(GameSystem *gsys, Field 
         u32 contactFlags = 0;
 
         if (EventWork_FlagGet(GameData_GetEventWork(wk.gameData), EVENT_FLAG_0x0964) == TRUE) {
-            contactFlags |= 1;
+            contactFlags |= OBJ_CONTACT_STRENGTH;
         }
         event = FieldPlayer_CheckObjContactEvent(wk.player, wk.pressed, wk.held, contactFlags);
         if (event != NULL) {
