@@ -72,19 +72,36 @@ typedef struct {
     u16 item;
     u8 level;
     u8 form;
-    // 1 for shiny, 2 for never shiny
+    // A WILD_SHINY_ value
     u8 shinyLock;
     u8 hiddenAbility;
     u8 unk08[8];
-    // 1 for male, 2 for female
+    // A WILD_SEX_ value
     u8 sex;
     u8 unk11[3];
 } WildPkmParam;
+
+// Whether a wild Pokémon is shiny: by chance, always or never
+enum {
+    WILD_SHINY_RANDOM,
+    WILD_SHINY_FORCED,
+    WILD_SHINY_NEVER,
+};
+
+// A wild Pokémon's sex: by chance and the lead's Cute Charm, male or female
+enum {
+    WILD_SEX_RANDOM,
+    WILD_SEX_MALE,
+    WILD_SEX_FEMALE,
+};
 
 void CreateEncountManager(EncountManager *manager, GameData *gameData, int encType, u32 mode, u16 weather);
 u32 FieldEncount_CalcEncountRate(EncountManager *manager, GameData *gameData, u32 rate);
 int FieldEncount_GenWilds(EncData *encData, EncountManager *manager, u16 zoneId, WildPkmParam *params);
 RoamingPkm *FieldEncount_RndCheckRoaming(EncountManager *manager, u32 zoneId);
+// What FieldEncount_RndCheckNPoke returns when none of N's Pokémon appears
+#define N_POKE_NONE 0xff
+
 u8 FieldEncount_RndCheckNPoke(EncountManager *manager, u32 zoneId);
 void FieldEncount_CreateWildPkm(PartyPkm *pkm, const EncountManager *manager, WildPkmParam *param);
 void FieldEncount_GenRoamingPkm(PartyPkm *pkm, const EncountManager *manager, const RoamingPkm *roamingPkm);

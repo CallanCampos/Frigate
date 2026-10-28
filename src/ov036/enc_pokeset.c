@@ -11,6 +11,7 @@
 #include "constants/zones.h"
 #include "field/enc_pokeset.h"
 #include "field/encounter.h"
+#include "field/event_wild_battle.h"
 #include "field/field.h"
 #include "gfl/random.h"
 #include "gfl/std.h"
@@ -24,6 +25,7 @@
 #include "save/save_control.h"
 #include "system/aeabi.h"
 #include "system/game_data.h"
+#include "system/zone_weather.h"
 
 // The event flag that starts the swarms, which other systems wait for too
 #define FLAG_SWARMS EVENT_FLAG_0x0960
@@ -179,11 +181,11 @@ void CreateEncountManager(EncountManager *manager, GameData *gameData, int encTy
     if (!EncountSave_IsRepelDepleted(SaveControl_GetEncountSave(save))) {
         manager->repelActive = TRUE;
     }
-    if (manager->mode == 2) {
+    if (manager->mode == ENCOUNT_MODE_SWEET_SCENT) {
         manager->forced = TRUE;
-        manager->mode = 0;
+        manager->mode = ENCOUNT_MODE_NORMAL;
     }
-    if (manager->mode == 1) {
+    if (manager->mode == ENCOUNT_MODE_EFFECT) {
         manager->forced = TRUE;
     }
     manager->pairActive = GameData_CheckPairFlag(gameData);
@@ -280,7 +282,7 @@ u8 FieldEncount_RndCheckNPoke(EncountManager *manager, u32 zoneId) {
     u8 i;
 
     if (!EventWork_FlagGet(GameData_GetEventWork(manager->gameData), FLAG_N_POKEMON)) {
-        return 0xff;
+        return N_POKE_NONE;
     }
     chance = 5;
     caught = GetAlreadyCaughtNPokeCount(manager->encountSave);
@@ -292,7 +294,7 @@ u8 FieldEncount_RndCheckNPoke(EncountManager *manager, u32 zoneId) {
         chance = 10;
     }
     if (GFL_RandomLCAlt(100) >= chance) {
-        return 0xff;
+        return N_POKE_NONE;
     }
     count = 0;
     for (i = 0; i < ENCOUNT_SAVE_N_POKE_COUNT; i++) {
@@ -312,7 +314,7 @@ u8 FieldEncount_RndCheckNPoke(EncountManager *manager, u32 zoneId) {
         }
     }
     if (count == 0) {
-        return 0xff;
+        return N_POKE_NONE;
     }
     return candidates[GFL_RandomLCAlt(count)];
 }
@@ -408,12 +410,12 @@ static void SetupEncountFlagsByPartyPokeAbil(EncountManager *manager, u16 weathe
         manager->rateDown = TRUE;
         return;
     case ABILITY_SAND_VEIL:
-        if (weather == 3 || weather == 12) {
+        if (weather == WEATHER_SANDSTORM || weather == WEATHER_SANDSTORM_2) {
             manager->rateDown = TRUE;
         }
         return;
     case ABILITY_SNOW_CLOAK:
-        if (weather == 1 || weather == 4 || weather == 5) {
+        if (weather == WEATHER_FLAKE || weather == WEATHER_BLIZZARD || weather == WEATHER_FLUTTER) {
             manager->rateDown = TRUE;
         }
         return;
@@ -566,7 +568,7 @@ static void FieldEncount_SetupFromData(const WildEncSlot *slot, WildPkmParam *pa
     param->level = slot->minLevel + GFL_RandomLC(100) % (range + 1);
     param->species = slot->species;
     formCount = PML_PersonalGetParamSingle(slot->species, 0, PERSONAL_FORM_COUNT);
-    if (slot->form == 0x1f) {
+    if (slot->form == WILD_ENC_FORM_RANDOM) {
         param->form = GFL_RandomLCAlt(formCount);
     } else if (slot->form >= formCount) {
         param->form = 0;
@@ -575,13 +577,16 @@ static void FieldEncount_SetupFromData(const WildEncSlot *slot, WildPkmParam *pa
     }
 }
 
+// What GetEncountIndexForPreferredType returns when no slot has the type
+#define ENCOUNT_SLOT_NONE 0xff
+
 static u8 GetEncountIndexForPreferredType(EncountManager *manager, const WildEncSlot *slots, u8 type) {
     u8 candidates[12];
     int count = 0;
     int i;
 
     for (i = 0; i < manager->slotCount; i++) {
-        if (slots[i].form != 0x1f) {
+        if (slots[i].form != WILD_ENC_FORM_RANDOM) {
             u8 type1 = PML_PersonalGetParamSingle(slots[i].species, slots[i].form, PERSONAL_TYPE_1);
             u8 type2 = PML_PersonalGetParamSingle(slots[i].species, slots[i].form, PERSONAL_TYPE_2);
 
@@ -591,7 +596,7 @@ static u8 GetEncountIndexForPreferredType(EncountManager *manager, const WildEnc
         }
     }
     if (count == 0) {
-        return 0xff;
+        return ENCOUNT_SLOT_NONE;
     }
     return candidates[GFL_RandomLC(count)];
 }
@@ -622,14 +627,14 @@ static void FieldEncount_CheckApplyHighLevelWilds(const EncountManager *manager,
 }
 
 static void FieldEncount_GenWildPokeParam(EncountManager *manager, const WildEncSlot *slots, WildPkmParam *param) {
-    u8 index = 0xff;
+    u8 index = ENCOUNT_SLOT_NONE;
 
     if (manager->magnetPull) {
         index = GetEncountIndexForPreferredType(manager, slots, TYPE_STEEL);
     } else if (manager->staticAbility) {
         index = GetEncountIndexForPreferredType(manager, slots, TYPE_ELECTRIC);
     }
-    if (index == 0xff) {
+    if (index == ENCOUNT_SLOT_NONE) {
         index = ENCOUNT_SLOT_RANDOMIZE_FUNCS[manager->slotFuncIndex](manager->slotCount);
     }
     FieldEncount_SetupFromData(&slots[index], param);
@@ -645,7 +650,7 @@ static void FieldEncount_SetRandomHeldItem(PartyPkm *pkm, PersonalData *personal
     int i;
 
     for (i = 0; i < 3; i++) {
-        items[i] = PML_PersonalGetParam(personal, 0x11 + i);
+        items[i] = PML_PersonalGetParam(personal, PERSONAL_ITEM_1 + i);
     }
     if (items[0] == items[1]) {
         PokeParty_SetParam(pkm, PKM_PARAM_ITEM, items[0]);
@@ -664,34 +669,34 @@ static void FieldEncount_SetRandomHeldItem(PartyPkm *pkm, PersonalData *personal
 }
 
 static u32 FieldEncount_GenPID(const EncountManager *manager, PersonalData *personal, WildPkmParam *param) {
-    u32 sex = 2;
+    u32 sex = GENDER_UNKNOWN;
     u32 shiny;
     u32 pid;
     u8 sexRatio = PML_PersonalGetParam(personal, PERSONAL_SEX_RATIO);
 
     if (isGenderlessOrSetGender(sexRatio) != TRUE) {
         if (manager->cuteCharm) {
-            if (manager->leadSex == 0) {
-                sex = 1;
-            } else if (manager->leadSex == 1) {
-                sex = 0;
+            if (manager->leadSex == GENDER_MALE) {
+                sex = GENDER_FEMALE;
+            } else if (manager->leadSex == GENDER_FEMALE) {
+                sex = GENDER_MALE;
             }
         }
-        if (param->sex == 1) {
-            sex = 0;
-        } else if (param->sex == 2) {
-            sex = 1;
+        if (param->sex == WILD_SEX_MALE) {
+            sex = GENDER_MALE;
+        } else if (param->sex == WILD_SEX_FEMALE) {
+            sex = GENDER_FEMALE;
         }
     }
-    if (param->shinyLock == 2) {
+    if (param->shinyLock == WILD_SHINY_NEVER) {
         shiny = 0;
-    } else if (param->shinyLock == 1) {
+    } else if (param->shinyLock == WILD_SHINY_FORCED) {
         shiny = 1;
     } else {
         shiny = 2;
     }
     pid = PML_GenPID(manager->trainerId, param->species, param->form, sex, 2, shiny);
-    if (param->shinyLock != 2 && param->shinyLock != 1) {
+    if (param->shinyLock != WILD_SHINY_NEVER && param->shinyLock != WILD_SHINY_FORCED) {
         if ((((manager->trainerId >> 16) ^ (manager->trainerId & 0xffff)) ^ (pid & 0xffff)) & 1) {
             return pid | 0x80000000;
         }

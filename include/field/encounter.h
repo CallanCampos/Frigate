@@ -62,6 +62,9 @@ typedef struct {
     u8 maxLevel;
 } WildEncSlot;
 
+// A slot's form that picks one of the species' forms at random
+#define WILD_ENC_FORM_RANDOM 0x1f
+
 // A zone's wild encounters for a season, 0xe8 bytes of archive 0x7f
 struct EncData {
     // The encounter rate of each kind of encounter (ENCTYPE_*), 0 for none
