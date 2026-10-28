@@ -2948,13 +2948,13 @@
     .2byte \a1
     .endm
 
-    .macro HollowRivalGenMsgID a0, a1
+    .macro TVGenProgramMsgID a0, a1
     FieldCommand 554
     .2byte \a0
     .2byte \a1
     .endm
 
-    .macro Scrcmd_StartSwapNpcEvent a0, a1
+    .macro StartSwapNpcEvent a0, a1
     FieldCommand 555
     .2byte \a0
     .2byte \a1

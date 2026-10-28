@@ -2,8 +2,8 @@
 // camera's shake. The ROM has no name for the file; scrcmd_poke_disp.c is descriptive, after its first command. It
 // is a file of its own because overlay 36's .rodata has its 8-byte actor setup after the 62-byte answer list of
 // scrcmd_pep_quiz.c, which one file's size sort can't give. Names from swan
-// (https://github.com/ds-pokemon-hacking/swan, GPL-3.0), except s022A_HollowRivalGenMsgID and
-// s02C5_JoinAvenueRecordActivity, which are ours
+// (https://github.com/ds-pokemon-hacking/swan, GPL-3.0), except s0216_CheckBeaconTrainerKey, s022A_TVGenProgramMsgID,
+// s022B_StartSwapNpcEvent and s02C5_JoinAvenueRecordActivity, which are ours
 #include "types.h"
 #include "constants/arc.h"
 #include "constants/pokemon.h"
@@ -46,6 +46,27 @@ typedef struct {
     FieldCameraShakeSetup setup;
     u32 unk28;
 } EventEvCameraShake;
+
+// The steps of the Pokémon's display: show it for 16 frames, wait for A or B, then free its window
+enum {
+    POKE_DISP_STATE_DELAY,
+    POKE_DISP_STATE_WAIT_INPUT,
+    POKE_DISP_STATE_END,
+};
+
+// The TV programs whose messages s022A_TVGenProgramMsgID picks: Interview Unova, or Pokémon Idol Chat for the rest of
+// its rolls; Moves for Living; and the Personality Assessment and Horoscope
+enum {
+    TV_PROGRAM_INTERVIEW,
+    TV_PROGRAM_MOVES_FOR_LIVING,
+    TV_PROGRAM_HOROSCOPE,
+};
+
+// The steps of the camera shake event: start the shake's task, then wait until it ends
+enum {
+    EV_CAMERA_SHAKE_STATE_START,
+    EV_CAMERA_SHAKE_STATE_WAIT,
+};
 
 static void EventFieldPokeDisp_InitBmpWin(EventFieldPokeDisp *data);
 static void EventFieldPokeDisp_UpdateBmpWin(EventFieldPokeDisp *data);
@@ -124,27 +145,27 @@ static GameEventReturnCode EventFieldPokeDisp_Callback(GameEvent *event, u32 *st
     EventFieldPokeDisp *disp = data;
 
     switch (*state) {
-    case 0:
+    case POKE_DISP_STATE_DELAY:
         disp->frames++;
         if (disp->frames > 15) {
             (*state)++;
         }
         break;
-    case 1:
-        if (GCTX_HIDGetPressedKeys() & 3) {
+    case POKE_DISP_STATE_WAIT_INPUT:
+        if (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) {
             EventFieldPokeDisp_UpdateClAct(disp);
             EventFieldPokeDisp_UpdateBmpWin(disp);
             (*state)++;
         }
         break;
-    case 2:
+    case POKE_DISP_STATE_END:
         BmpWin_Free(disp->window);
         return GAMEEVENT_DONE;
     }
     return GAMEEVENT_CONTINUE;
 }
 
-BOOL Scrcmd_CheckBeaconTrainerKey(VM *vm, FieldScriptEnv *env) {
+BOOL s0216_CheckBeaconTrainerKey(VM *vm, FieldScriptEnv *env) {
     u16 flag = ScriptReadAny(vm, env);
     u16 *result = ScriptReadVar(vm, env);
     GameData *gameData = GSYS_GetGameData(FieldScriptEnv_GetGameSystem(env));
@@ -207,7 +228,7 @@ BOOL s02C5_JoinAvenueRecordActivity(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s022A_HollowRivalGenMsgID(VM *vm, FieldScriptEnv *env) {
+BOOL s022A_TVGenProgramMsgID(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameData *gameData = GSYS_GetGameData(FieldScriptEnv_GetGameSystem(env));
     PlayerInfo *playerInfo = GetGameDataPlayerInfo(gameData);
@@ -241,12 +262,12 @@ BOOL s022A_HollowRivalGenMsgID(VM *vm, FieldScriptEnv *env) {
         WordSet_LoadSpeciesName(wordSet, 1, HollowRivalSave_GetSpecies(rival));
     }
     switch (kind) {
-    case 0:
+    case TV_PROGRAM_INTERVIEW:
         base = 0;
         value = GFL_RandomLC(0x24);
         if (value >= 0x16) {
             value -= 0x16;
-            if ((u8)getTrainerGender(playerInfo) == 0) {
+            if ((u8)getTrainerGender(playerInfo) == GENDER_MALE) {
                 base = 0x24;
             } else {
                 base = 0x16;
@@ -274,11 +295,11 @@ BOOL s022A_HollowRivalGenMsgID(VM *vm, FieldScriptEnv *env) {
             }
         }
         break;
-    case 1:
+    case TV_PROGRAM_MOVES_FOR_LIVING:
         base = 0x32;
         value = GFL_RandomLC(0x32);
         break;
-    case 2:
+    case TV_PROGRAM_HOROSCOPE:
         base = 0x64;
         value = GFL_RandomLC(0x50);
         break;
@@ -326,7 +347,7 @@ GameEvent *EventEvCameraShake_Create(GameSystem *gsys, FieldCameraShakeSetup *se
     EventEvCameraShake *data;
 
     setup->delay = 0;
-    setup->mode = 0;
+    setup->mode = CAMERA_SHAKE_BOTH;
     event = GameEvent_Create(gsys, NULL, EventEvCameraShake_Callback, sizeof(EventEvCameraShake));
     data = GameEvent_GetData(event);
     data->setup = *setup;
@@ -339,13 +360,13 @@ static GameEventReturnCode EventEvCameraShake_Callback(GameEvent *event, u32 *st
     FieldCameraShakeSetup *setup = &shake->setup;
 
     switch (*state) {
-    case 0:
+    case EV_CAMERA_SHAKE_STATE_START:
         shake->task = FieldCameraShakeTask_Create(field, setup);
         shake->callback = FieldTask_GetCallback(shake->task);
         FieldTaskManager_AddTask(Field_GetTaskManager(field), shake->task, 0);
         (*state)++;
         break;
-    case 1:
+    case EV_CAMERA_SHAKE_STATE_WAIT:
         if (!FieldTaskManager_CheckCallbackRegistered(Field_GetTaskManager(field), shake->callback)) {
             return GAMEEVENT_DONE;
         }
@@ -354,7 +375,7 @@ static GameEventReturnCode EventEvCameraShake_Callback(GameEvent *event, u32 *st
     return GAMEEVENT_CONTINUE;
 }
 
-BOOL Scrcmd_StartSwapNpcEvent(VM *vm, FieldScriptEnv *env) {
+BOOL s022B_StartSwapNpcEvent(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     u16 actorId;

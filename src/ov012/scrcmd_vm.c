@@ -629,7 +629,7 @@ const FieldScriptCommand EVCMD_TABLE[] = {
     s0213_ActorHoldPos,                               // 0x213
     s0214_CallPokemonPreview,                         // 0x214
     s0215_SetSpecialTransferUsed,                     // 0x215
-    Scrcmd_CheckBeaconTrainerKey,                     // 0x216
+    s0216_CheckBeaconTrainerKey,                      // 0x216
     s0217_MapChangeEntreeForest,                      // 0x217
     func_ov012_02164c68,                              // 0x218
     func_ov012_02164bcc,                              // 0x219
@@ -649,8 +649,8 @@ const FieldScriptCommand EVCMD_TABLE[] = {
     s0227_RecordAdd,                                  // 0x227
     s0228_RecordGet,                                  // 0x228
     NULL,                                             // 0x229
-    s022A_HollowRivalGenMsgID,                        // 0x22a
-    Scrcmd_StartSwapNpcEvent,                         // 0x22b
+    s022A_TVGenProgramMsgID,                          // 0x22a
+    s022B_StartSwapNpcEvent,                          // 0x22b
     NULL,                                             // 0x22c
     s022D_PlayFieldEffectByTable,                     // 0x22d
     ScriptNative_SetActorZoneDeleteOff,               // 0x22e

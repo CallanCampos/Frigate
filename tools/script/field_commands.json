@@ -4064,7 +4064,7 @@
    ]
   },
   "534": {
-   "handler": "Scrcmd_CheckBeaconTrainerKey",
+   "handler": "s0216_CheckBeaconTrainerKey",
    "overlay": 36,
    "args": [
     "any",
@@ -4212,7 +4212,7 @@
    ]
   },
   "554": {
-   "handler": "s022A_HollowRivalGenMsgID",
+   "handler": "s022A_TVGenProgramMsgID",
    "overlay": 36,
    "args": [
     "any",
@@ -4221,7 +4221,7 @@
    "area": "HollowRival"
   },
   "555": {
-   "handler": "Scrcmd_StartSwapNpcEvent",
+   "handler": "s022B_StartSwapNpcEvent",
    "overlay": 36,
    "args": [
     "any",
