@@ -43,7 +43,7 @@ BOOL s0098_BGMPlay(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
 
     ScriptWork_CallEvent(work, EventBGMPlay_Create(gsys, VM_Read16(vm)));
-    FieldSnd_StopAmbienceAll(GameData_GetFieldSoundSystem(GSYS_GetGameData(gsys)), 2);
+    FieldSnd_StopAmbienceAll(GameData_GetFieldSoundSystem(GSYS_GetGameData(gsys)), FIELD_SND_AMBIENCE_STOP_SCRIPT_BGM);
     FieldScriptSubEvent_Register(SCRIPT_SUB_EVENT_BGM_PLAY);
     return TRUE;
 }
@@ -55,7 +55,7 @@ BOOL s0235_BGMPlayEx(VM *vm, FieldScriptEnv *env) {
     u16 fadeOutFrames = VM_Read16(vm);
 
     ScriptWork_CallEvent(work, EventBGMPlayEx_Create(gsys, bgm, fadeOutFrames));
-    FieldSnd_StopAmbienceAll(GameData_GetFieldSoundSystem(GSYS_GetGameData(gsys)), 2);
+    FieldSnd_StopAmbienceAll(GameData_GetFieldSoundSystem(GSYS_GetGameData(gsys)), FIELD_SND_AMBIENCE_STOP_SCRIPT_BGM);
     FieldScriptSubEvent_Register(SCRIPT_SUB_EVENT_BGM_PLAY);
     return TRUE;
 }
@@ -65,7 +65,7 @@ BOOL s0246_BGMFadeOutAll(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
 
     ScriptWork_CallEvent(work, CreateBGMFadeOutEvent(gsys, VM_Read16(vm)));
-    FieldSnd_StopAmbienceAll(GameData_GetFieldSoundSystem(GSYS_GetGameData(gsys)), 2);
+    FieldSnd_StopAmbienceAll(GameData_GetFieldSoundSystem(GSYS_GetGameData(gsys)), FIELD_SND_AMBIENCE_STOP_SCRIPT_BGM);
     FieldScriptSubEvent_Register(SCRIPT_SUB_EVENT_BGM_PLAY);
     return TRUE;
 }
@@ -125,7 +125,7 @@ BOOL ScriptWork_RestoreBgmVolume(VM *vm, FieldScriptEnv *env) {
     FieldSound *fieldSound = GameData_GetFieldSoundSystem(gameData);
     u16 frames = ScriptReadAny(vm, env);
 
-    FieldSnd_SetPlayerVolumeFade(fieldSound, 127, (u8)frames);
+    FieldSnd_SetPlayerVolumeFade(fieldSound, SND_VOLUME_MAX, (u8)frames);
     FieldScriptSubEvent_Unregister(SCRIPT_SUB_EVENT_BGM_VOLUME);
     return FALSE;
 }
@@ -136,7 +136,7 @@ BOOL ScriptWork_RestoreBgmVolumeEvent(FinishScriptSubEventsWork *work, u32 *stat
 
     switch (*state) {
     case 0:
-        FieldSnd_SetPlayerVolumeFade(fieldSound, 127, 0);
+        FieldSnd_SetPlayerVolumeFade(fieldSound, SND_VOLUME_MAX, 0);
         (*state)++;
         break;
     case 1:
@@ -155,7 +155,7 @@ BOOL s009E_BGMChangeMap(VM *vm, FieldScriptEnv *env) {
     u32 bgm = GetMapBGMIDByPlayerState2(gameData, Field_GetPlayerStateZoneID(field), season);
 
     ScriptWork_CallEvent(work, EventBGMChange_Create(gsys, bgm, 90, 60));
-    FieldSnd_ResumeAmbience(fieldSound, 2);
+    FieldSnd_ResumeAmbience(fieldSound, FIELD_SND_AMBIENCE_STOP_SCRIPT_BGM);
     FieldScriptSubEvent_Unregister(SCRIPT_SUB_EVENT_BGM_PLAY);
     return TRUE;
 }
@@ -171,7 +171,7 @@ BOOL s0238_BGMChangeMapEx(VM *vm, FieldScriptEnv *env) {
     u32 bgm = GetMapBGMIDByPlayerState2(gameData, Field_GetPlayerStateZoneID(field), season);
 
     ScriptWork_CallEvent(work, EventBGMChange_Create(gsys, bgm, fadeOutFrames, 60));
-    FieldSnd_ResumeAmbience(fieldSound, 2);
+    FieldSnd_ResumeAmbience(fieldSound, FIELD_SND_AMBIENCE_STOP_SCRIPT_BGM);
     FieldScriptSubEvent_Unregister(SCRIPT_SUB_EVENT_BGM_PLAY);
     return TRUE;
 }
@@ -224,14 +224,16 @@ BOOL FieldScriptSubEventFinish_MEPlayback(FinishScriptSubEventsWork *work, u32 *
 }
 
 BOOL s024C_BGMAmbienceResume(VM *vm, FieldScriptEnv *env) {
-    FieldSnd_ResumeAmbience(GameData_GetFieldSoundSystem(GSYS_GetGameData(FieldScriptEnv_GetGameSystem(env))), 2);
+    FieldSnd_ResumeAmbience(GameData_GetFieldSoundSystem(GSYS_GetGameData(FieldScriptEnv_GetGameSystem(env))),
+                            FIELD_SND_AMBIENCE_STOP_SCRIPT_BGM);
     FieldScriptSubEvent_Unregister(SCRIPT_SUB_EVENT_BGM_PLAY);
     return FALSE;
 }
 
 // Finishes the sub event of the commands that play the BGM: the ambient sounds come back
 BOOL FieldScriptSubEventFinish_BGMPlayback(FinishScriptSubEventsWork *work, u32 *state) {
-    FieldSnd_ResumeAmbience(GameData_GetFieldSoundSystem(GSYS_GetGameData(work->gsys)), 2);
+    FieldSnd_ResumeAmbience(GameData_GetFieldSoundSystem(GSYS_GetGameData(work->gsys)),
+                            FIELD_SND_AMBIENCE_STOP_SCRIPT_BGM);
     return TRUE;
 }
 
