@@ -10872,6 +10872,7 @@ overlays/ov036 0x02198da0 Field3DBG_CalcQuadGeometry
 overlays/ov036 0x02198e64 Field3DBG_DrawQuad
 overlays/ov036 0x02198f50 Field3DBG_SetPolygonAttr
 overlays/ov036 0x02198f78 Field3DBG_SetTextureParams
+overlays/ov036 0x02199004 FieldWeather_Create
 overlays/ov036 0x021990d8 FieldWeather_Delete
 overlays/ov036 0x0219917c FieldWeather_IsTaskActive
 overlays/ov036 0x02199208 FieldWeather_RequestChange
