@@ -3,6 +3,7 @@
 // Names from swan (https://github.com/ds-pokemon-hacking/swan, GPL-3.0).
 // Additional helper and table names are our descriptive guesses.
 #include "types.h"
+#include "constants/directions.h"
 #include "field/field_actor.h"
 #include "field/field_effect.h"
 #include "gfl/billboard_actor.h"
@@ -21,6 +22,12 @@ typedef struct {
     // How far deep sand tracks sink
     fx32 sinkDepth;
 } FieldEffectFootmark;
+
+// A mark stays a while, then fades out
+enum {
+    FOOTMARK_STATE_WAIT,
+    FOOTMARK_STATE_FADE,
+};
 
 // What a mark starts from
 typedef struct {
@@ -118,20 +125,20 @@ static u32 Footmark_GetTexture(FieldEffectFootmark *footmark, u32 kind, u32 dir,
     u32 track;
 
     switch (kind) {
-    case 0:
+    case FOOTMARK_KIND_SAND:
         texture = dir;
         break;
-    case 1:
+    case FOOTMARK_KIND_SAND_TRACKS:
         texture = FOOTMARK_TRACK_TEXTURES[prevDir][dir];
         break;
-    case 2:
+    case FOOTMARK_KIND_SNOW:
         texture = dir + 10;
         break;
-    case 3:
+    case FOOTMARK_KIND_SNOW_TRACKS:
         track = FOOTMARK_TRACK_TEXTURES[prevDir][dir] - 4;
         texture = track + 14;
         break;
-    case 4:
+    case FOOTMARK_KIND_DEEP_SAND_TRACKS:
         track = FOOTMARK_TRACK_TEXTURES[prevDir][dir] - 4;
         texture = track + 20;
         break;
@@ -143,7 +150,7 @@ void Footmark_SetActor(FieldActor *actor, FieldEffects *effects, u32 kind) {
     FootmarkTaskParams params;
     VecFx32 pos;
     u16 texture;
-    FieldEffectFootmark *footmark = FieldEffects_GetHandleData(effects, 5);
+    FieldEffectFootmark *footmark = FieldEffects_GetHandleData(effects, FLDEFF_FOOTMARK);
 
     params.footmark = footmark;
     texture = Footmark_GetTexture(footmark, kind, GetActorFaceDir(actor), GetActorLastFaceDir(actor));
@@ -151,12 +158,12 @@ void Footmark_SetActor(FieldActor *actor, FieldEffects *effects, u32 kind) {
     ConvGXZToVector(FldAct_GetInitGPosX(actor), FldAct_GetInitGPosZ(actor), &pos);
     // Footprints to the left or right, whose texture is the direction, sit a little further back.
     // The retail deep-sand branch tests directional IDs outside its 20-25 track texture range.
-    if (kind == 0 && (texture == 2 || texture == 3)) {
+    if (kind == FOOTMARK_KIND_SAND && (texture == DIR_LEFT || texture == DIR_RIGHT)) {
         pos.z -= FX32_CONST(2);
-    } else if (kind == 4 && (texture == 2 || texture == 3)) {
+    } else if (kind == FOOTMARK_KIND_DEEP_SAND_TRACKS && (texture == DIR_LEFT || texture == DIR_RIGHT)) {
         pos.z -= FX32_CONST(2);
     }
-    if (kind == 4) {
+    if (kind == FOOTMARK_KIND_DEEP_SAND_TRACKS) {
         pos.y -= footmark->sinkDepth;
     }
     params.texture = texture;
@@ -203,13 +210,13 @@ static void FootmarkTask_Update(FieldEffectTask *task, void *work) {
     u16 sceneActor;
 
     switch (fmTask->state) {
-    case 0:
+    case FOOTMARK_STATE_WAIT:
         fmTask->timer++;
         if (fmTask->timer >= 16) {
             fmTask->state++;
         }
         break;
-    case 1:
+    case FOOTMARK_STATE_FADE:
         fmTask->alpha -= 2;
         if (fmTask->alpha < 0) {
             FieldEffects_DeleteObject(task);

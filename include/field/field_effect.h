@@ -64,8 +64,17 @@ void FldeffDust_Start(FieldActor *actor, FieldEffects *effects);
 // The dust in front of an actor
 void FldeffDust_StartFacing(FieldActor *actor, FieldEffects *effects);
 void GrassTask_Start(FieldEffects *effects, FieldActor *actor, BOOL animate, int kind);
-// fldeff_footmark.c: the marks an actor leaves, by kind: footprints in sand (0) and snow (2), the tracks of actors
-// whose footprint type is 2 in sand (1) and snow (3), and tracks in deep sand (4). Tracks turn with the actor
+// fldeff_footmark.c: the marks an actor leaves, by kind: footprints in sand and snow, the tracks of actors whose
+// footprint type is 2 in sand and snow, and tracks in deep sand. Tracks turn with the actor. The actor's map
+// attributes pass FOOTMARK_KIND_MAX for no mark
+enum {
+    FOOTMARK_KIND_SAND,
+    FOOTMARK_KIND_SAND_TRACKS,
+    FOOTMARK_KIND_SNOW,
+    FOOTMARK_KIND_SNOW_TRACKS,
+    FOOTMARK_KIND_DEEP_SAND_TRACKS,
+    FOOTMARK_KIND_MAX,
+};
 void Footmark_SetActor(FieldActor *actor, FieldEffects *effects, u32 kind);
 void ReflectTask_SetActor(MMSys *system, FieldActor *actor, FieldEffects *effects, u32 kind);
 void FldeffRipple_Start(FieldEffects *effects, FieldActor *actor, u32 arg2, u32 arg3);
