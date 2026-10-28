@@ -33,3 +33,5 @@ flags = [
 [file_flags]
 "snd/snd_capture.c" = ["-ipa function"]
 "g3d/sbc.c" = ["-ipa function"]
+# The sprite cache survives without its entry points; explicit zero initializers pool the live state as in the ROM
+"g2d/g2d_OamSoftwareSpriteDraw.c" = ["-ipa function"]

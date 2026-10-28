@@ -17,6 +17,7 @@ after importing names from swan.
     config_fixes.py add-label . _ll_mul 0x0208d60c                           # a second name for a function
     config_fixes.py remove-label . _dadd 0x0208c224                          # a second name the function now has
     config_fixes.py add-data overlays/ov307 EGG_DEMO_VIEW_UNK_FX32 0x021df70c  # an object that nothing references
+    config_fixes.py bss-size dtcm 8 0x02fe00a0                            # a typed queue before alignment fill
     config_fixes.py add-function . ampOffFreeBlocks thumb 0x20 0x02006dec     # a function that dsd took for a label
     config_fixes.py add-reloc overlays/ov036 load 'overlay(259)' 0x021a039c 0x021ae188  # a pointer dsd missed
     config_fixes.py section-end overlays/ov310 src/ov310/research_list.c .rodata 0x021a7028  # move a file's boundary
@@ -82,8 +83,7 @@ def config_dir(version: str, module: str) -> Path:
 
 
 def address_module(module: str, action: str, argument: str) -> str:
-    """The module whose addresses a fix's address is in: a file's section that dsd migrates from ARM9 main is the LTD
-    autoload's."""
+    """The module whose addresses a fix uses: a migrated main source section has its target module's addresses."""
     return section_module(module, argument.split(":")[1]) if action in SECTION_ACTIONS else module
 
 
@@ -142,6 +142,23 @@ def plan_fix(version: str, module: str, addr: int, action: str, argument: str):
                 and int(m.group(1), 16) < addr]
         symbol = f"{argument} kind:bss addr:{addr:#010x}" if in_bss else f"{argument} kind:data(any) addr:{addr:#010x}"
         lines.insert(data[-1] + 1 if data else len(lines), symbol)
+        return path, "\n".join(lines) + "\n"
+    if action == "bss_size":
+        # A recovered type can end before the module's alignment tail, which is not part of the object.
+        size = int(argument, 0)
+        if size <= 0:
+            sys.exit("BSS object size must be positive")
+        path = config_dir(version, module) / "symbols.txt"
+        lines = path.read_text().splitlines()
+        at = [i for i, line in enumerate(lines) if (m := SYMBOL_ADDR_RE.search(line))
+              and int(m.group(1), 16) == addr and re.search(r"\bkind:bss(?:\(| )", line)]
+        if len(at) != 1:
+            sys.exit(f"{version} {module}: expected one BSS symbol at {addr:#010x}")
+        sections = parse_sections(config_dir(version, module) / "delinks.txt")
+        if not any(name.endswith("bss") and start <= addr < addr + size <= end
+                   for name, (start, end) in sections.items()):
+            sys.exit(f"{version} {module}: BSS object {addr:#010x}-{addr + size:#010x} leaves its module section")
+        lines[at[0]] = re.sub(r"kind:bss(?:\([^)]*\))?", f"kind:bss(size={size:#x})", lines[at[0]])
         return path, "\n".join(lines) + "\n"
     if action == "add_function":
         # A function that dsd's analysis missed, such as one after a literal pool that it took for code. Replaces the
@@ -292,12 +309,14 @@ def plan_fix(version: str, module: str, addr: int, action: str, argument: str):
             sys.exit(f"{version} {module}: {source} is not registered")
         end = addr + int(size, 0)
         if address_module(module, action, argument) != module:
-            # A migrated section must lie in the LTD autoload's section that dsd places it in
-            held = parse_sections(config_dir(version, LTD_MODULE) / "delinks.txt").get(MIGRATED_SECTIONS[section])
+            # A migrated section must lie in the target module's section that dsd places it in
+            target_module = address_module(module, action, argument)
+            held = parse_sections(config_dir(version, target_module) / "delinks.txt").get(MIGRATED_SECTIONS[section])
             if held is None or not held[0] <= addr < end <= held[1]:
-                sys.exit(f"{version} {module}: {section} {addr:#010x}-{end:#010x} is outside {LTD_MODULE}'s "
+                sys.exit(f"{version} {module}: {section} {addr:#010x}-{end:#010x} is outside {target_module}'s "
                          f"{MIGRATED_SECTIONS[section]}")
-        order = [".text", ".init", ".rodata", ".ctor", ".data", ".bss", ".ltdmain", ".ltdmain.bss"]
+        order = [".text", ".init", ".rodata", ".ctor", ".data", ".bss", ".dtcm.data", ".dtcm.bss",
+                 ".ltdmain", ".ltdmain.bss"]
         at = start + 1
         while at < len(lines) and lines[at].startswith(" "):
             name = lines[at].split()[0]
@@ -496,6 +515,10 @@ def main():
     command = commands.add_parser("remove-symbol", help="remove symbols")
     command.add_argument("module")
     command.add_argument("addresses", nargs="+")
+    command = commands.add_parser("bss-size", help="set a recovered BSS object's size, excluding alignment fill")
+    command.add_argument("module")
+    command.add_argument("size")
+    command.add_argument("addresses", nargs="+")
     command = commands.add_parser("add-label", help="give a function a second name")
     command.add_argument("module")
     command.add_argument("name")
@@ -565,6 +588,7 @@ def main():
                 "remove_orphan_reloc": getattr(args, "source_module", ""),
                 "reloc_addend": getattr(args, "addend", ""), "add_label": getattr(args, "name", ""),
                 "remove_label": getattr(args, "name", ""), "add_data": getattr(args, "name", ""),
+                "bss_size": getattr(args, "size", ""),
                 "add_function": f"{getattr(args, 'name', '')}:{getattr(args, 'mode', '')}:{getattr(args, 'size', '')}",
                 "add_reloc": ",".join([getattr(args, "kind", ""), getattr(args, "destination", ""),
                                        getattr(args, "target", ""), *([args.addend] if getattr(args, "addend", None)

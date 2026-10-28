@@ -880,9 +880,6 @@ ghiReferenceCount kind:bss addr:0x021b28a4
 sDwcNdState kind:bss addr:0x021b28a8
 sNdMutex kind:bss addr:0x021b28c4
 sNdContext kind:bss addr:0x021b28dc
-data_ov189_021b2904 kind:bss addr:0x021b2904
-data_ov189_021b290d kind:bss addr:0x021b290d
-data_ov189_021b2918 kind:bss addr:0x021b2918
 sNdMacParam kind:bss addr:0x021b2924
 sNdApInfoParam kind:bss addr:0x021b2935
 sNdUserIdParam kind:bss addr:0x021b294a

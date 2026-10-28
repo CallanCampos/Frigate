@@ -23,7 +23,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
-from tools.decomp.dsd_config import LTD_MODULE, ROOT, SYMBOL_RE, config_lock, section_module  # noqa: E402
+from tools.decomp.dsd_config import MIGRATED_MODULES, ROOT, SYMBOL_RE, config_lock, section_module  # noqa: E402
 
 PRIMARY = "b2_us"
 OTHERS = ["w2_us"]
@@ -53,9 +53,9 @@ def find_symbols(version: str, name: str) -> list[tuple[str, int]]:
 
 
 def entry_modules(module: str) -> list[str]:
-    """The modules whose delinks.txt may list a file with sections at a module's addresses: the LTD autoload's are also
-    an ARM9 main file's migrated .ltdmain sections."""
-    return [module, "."] if module == LTD_MODULE else [module]
+    """The modules whose delinks.txt may list a file with sections at a module's addresses: main SDK sources can also
+    own migrated DTCM or LTD sections."""
+    return [module, "."] if module in MIGRATED_MODULES.values() else [module]
 
 
 def owning_source(module: str, addr: int) -> Path | None:

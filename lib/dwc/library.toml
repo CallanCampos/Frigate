@@ -29,6 +29,8 @@ flags = [
 # .bss is size-sorted, with the u16 first), and vct_session.c has its four 66-byte transition tables 4-aligned in
 # sections of their own, which only -ipa file gives
 [file_flags]
+# The download engine has separately aligned local initializers and large constant tables
+"nd/nd.c" = ["-ipa file"]
 "vct/vct_adpcm.c" = ["-nothumb"]
 "vct/vct_audio.c" = ["-nothumb", "-ipa file"]
 "vct/vct_buffer.c" = ["-nothumb"]

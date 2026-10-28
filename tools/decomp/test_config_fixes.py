@@ -496,6 +496,69 @@ class BoundaryRecordTests(unittest.TestCase):
         self.assertEqual(self.snapshot(), before)
 
 
+class DtcmMigrationTests(ConfigFixFixture):
+    """Initialized data and zero-initialized state of a main SDK object belong in DTCM."""
+
+    WHOLE = "lib/nitro/irq_table.c"
+
+    def setUp(self):
+        super().setUp()
+        for addr in (0x7010, 0x7080, 0x7090):
+            self.mapper.addresses[("dtcm", addr, "w2_us")] = addr + 0x800
+        for version, main, dtcm in [("b2_us", 0x1000, 0x7000), ("w2_us", 0x2000, 0x7800)]:
+            path = fixes.config_dir(version, ".") / "delinks.txt"
+            path.write_text(path.read_text() + f"\n{self.WHOLE}:\n    complete\n"
+                            f"    .text       start:{main:#010x} end:{main + 0x80:#010x}\n")
+            self.sections(version, "dtcm", [(".data", dtcm, dtcm + 0x80),
+                                            (".bss", dtcm + 0x80, dtcm + 0xa0)])
+
+    def test_data_and_bss_use_their_dtcm_ranges_in_both_versions(self):
+        self.cli("add-section", ".", self.WHOLE, ".dtcm.data", "0x20", "0x7010")
+        self.cli("add-section", ".", self.WHOLE, ".dtcm.bss", "0x8", "0x7080")
+        for version, dtcm in [("b2_us", 0x7000), ("w2_us", 0x7800)]:
+            text = (fixes.config_dir(version, ".") / "delinks.txt").read_text()
+            self.assertIn(f"    .dtcm.data  start:{dtcm + 0x10:#010x} end:{dtcm + 0x30:#010x}\n", text)
+            self.assertIn(f"    .dtcm.bss   start:{dtcm + 0x80:#010x} end:{dtcm + 0x88:#010x}\n", text)
+        self.assertIn(("dtcm", 0x7010, "w2_us"), self.mapper.calls)
+        self.assertIn(("dtcm", 0x7080, "w2_us"), self.mapper.calls)
+
+    def test_initialized_data_cannot_be_placed_in_dtcm_bss(self):
+        before = self.snapshot()
+        with self.assertRaisesRegex(SystemExit, "outside dtcm's .data"):
+            self.cli("add-section", ".", self.WHOLE, ".dtcm.data", "0x8", "0x7090")
+        self.assertEqual(self.snapshot(), before)
+
+    def test_bss_size_separates_the_queue_from_module_alignment(self):
+        for version, dtcm in [("b2_us", 0x7000), ("w2_us", 0x7800)]:
+            path = fixes.config_dir(version, "dtcm") / "symbols.txt"
+            path.write_text(f"IrqQueue kind:bss addr:{dtcm + 0x80:#010x}\n")
+        self.cli("bss-size", "dtcm", "8", "0x7080")
+        for version, dtcm in [("b2_us", 0x7000), ("w2_us", 0x7800)]:
+            text = (fixes.config_dir(version, "dtcm") / "symbols.txt").read_text()
+            self.assertEqual(text, f"IrqQueue kind:bss(size=0x8) addr:{dtcm + 0x80:#010x}\n")
+        before = self.snapshot()
+        self.cli("bss-size", "dtcm", "8", "0x7080")
+        self.assertEqual(self.snapshot(), before)
+
+    def test_bss_size_rejects_an_initialized_object(self):
+        for version, dtcm in [("b2_us", 0x7000), ("w2_us", 0x7800)]:
+            path = fixes.config_dir(version, "dtcm") / "symbols.txt"
+            path.write_text(f"Table kind:data(any) addr:{dtcm + 0x80:#010x}\n")
+        before = self.snapshot()
+        with self.assertRaisesRegex(SystemExit, "expected one BSS symbol"):
+            self.cli("bss-size", "dtcm", "8", "0x7080")
+        self.assertEqual(self.snapshot(), before)
+
+    def test_bss_size_cannot_leave_its_module_section(self):
+        for version, dtcm in [("b2_us", 0x7000), ("w2_us", 0x7800)]:
+            path = fixes.config_dir(version, "dtcm") / "symbols.txt"
+            path.write_text(f"IrqQueue kind:bss addr:{dtcm + 0x80:#010x}\n")
+        before = self.snapshot()
+        with self.assertRaisesRegex(SystemExit, "leaves its module section"):
+            self.cli("bss-size", "dtcm", "0x24", "0x7080")
+        self.assertEqual(self.snapshot(), before)
+
+
 class LtdMigrationTests(ConfigFixFixture):
     """A DSi part's entry in the LTD autoload moves into its whole's entry in ARM9 main as migrated sections."""
 

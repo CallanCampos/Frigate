@@ -4,6 +4,23 @@
 
 static void OSi_IrqCallback(int index);
 
+// The handlers and the queue that OS_WaitIrq sleeps on are in DTCM, where the IRQ handler reaches them directly.
+// clang-format off
+#pragma define_section DTCM ".dtcm.data" ".dtcm.bss" ".dtcm.data" abs32 RWX
+// clang-format on
+#pragma section DTCM begin
+
+OSIrqFunction OS_IRQTable[32] = {
+    OS_IrqDummy, OS_IrqDummy, OS_IrqDummy, OSi_IrqTimer0, OSi_IrqTimer1, OSi_IrqTimer2, OSi_IrqTimer3, OS_IrqDummy,
+    OSi_IrqDma0, OSi_IrqDma1, OSi_IrqDma2, OSi_IrqDma3,   OS_IrqDummy,   OS_IrqDummy,   OS_IrqDummy,   OS_IrqDummy,
+    OS_IrqDummy, OS_IrqDummy, OS_IrqDummy, OS_IrqDummy,   OS_IrqDummy,   OS_IrqDummy,   OS_IrqDummy,   OS_IrqDummy,
+    OS_IrqDummy, OS_IrqDummy, OS_IrqDummy, OS_IrqDummy,   OSi_IrqNDma0,  OSi_IrqNDma1,  OSi_IrqNDma2,  OSi_IrqNDma3,
+};
+
+OSThreadQueue OSi_IrqThreadQueue;
+
+#pragma section DTCM end
+
 // The interrupt bit that each callback is for: DMA0 to 3, then NDMA0 to 3, then Timer0 to 3
 static u16 OSi_IrqCallbackInfoIndex[OSi_IRQCALLBACK_NUM] = {
     REG_OS_IE_D0_SHIFT, REG_OS_IE_D0_SHIFT + 1, REG_OS_IE_D0_SHIFT + 2, REG_OS_IE_D0_SHIFT + 3,

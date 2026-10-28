@@ -528,6 +528,7 @@
 . 0x02093376 remove_symbol
 . 0x02093378 add_data sDaysBeforeMonth
 . 0x02093e0c add_data data_02093e0c
+. 0x02093e0c section_start src/gfl/arc_util.c:.rodata
 . 0x02093e44 add_data data_02093e44
 . 0x020940b8 add_data WifiIdTool_InverseNibbleSubstitution
 . 0x020941b8 add_data NNSi_FndUnitHeapAllocatorFuncs
@@ -630,6 +631,7 @@
 . 0x021435dc remove_symbol
 . 0x021439d8 remove_symbol
 . 0x021439f8 add_data data_021439f8
+. 0x02143a08 section_end lib/nnsys/src/g2d/g2d_OamSoftwareSpriteDraw.c:.bss
 . 0x02143a10 remove_symbol
 . 0x02143a14 remove_symbol
 . 0x02143a58 remove_symbol
@@ -734,6 +736,9 @@
 . 0x0276b09c add_section lib/nitro/src/mi/mi_sharedWram.c:.ltdmain.bss:0x40
 . 0x0276b0dc add_section lib/nitro/src/os/os_application_jump.c:.ltdmain.bss:0x8
 . 0x0276b0e4 add_section lib/nitro/src/spi/pm.c:.ltdmain.bss:0x1c
+. 0x02fe0020 add_section lib/nitro/src/os/os_irqTable.c:.dtcm.data:0x80
+. 0x02fe00a0 add_section lib/nitro/src/os/os_irqTable.c:.dtcm.bss:0x8
+dtcm 0x02fe00a0 bss_size 8
 ltd_autoload_0 0x02700228 reloc_addend 0x1000
 ltd_autoload_0 0x0270022c reloc_addend 0x11b4
 ltd_autoload_0 0x027007bc reloc_addend 0x1000
@@ -1518,6 +1523,10 @@ overlays/ov036 0x021bb774 reloc_addend 0x380
 overlays/ov036 0x021bf910 reloc_module overlay(280)
 overlays/ov036 0x021c73dc section_end src/ov036/scrcmd_field.c:.text
 overlays/ov036 0x021c8cd0 section_start src/ov036/scrcmd_hidden_hollow.c:.text
+overlays/ov036 0x021c9282 reloc_module overlay(12)
+overlays/ov036 0x021c928e reloc_module overlay(12)
+overlays/ov036 0x021c9298 reloc_module overlay(12)
+overlays/ov036 0x021c92a2 reloc_module overlay(12)
 overlays/ov036 0x021c9eb8 add_section src/ov036/fieldmap.c:.rodata:0x98c
 overlays/ov036 0x021c9ec4 section_start src/ov036/fieldmap.c:.rodata
 overlays/ov036 0x021ca058 remove_symbol
@@ -2735,6 +2744,7 @@ overlays/ov182 0x021bdaf9 remove_symbol
 overlays/ov182 0x021bdb41 remove_symbol
 overlays/ov182 0x021bfb54 add_data data_ov182_021bfb54
 overlays/ov182 0x021c04bc add_data data_ov182_021c04bc
+overlays/ov182 0x021c059c add_section lib/dwcutilui/src/foundation.c:.rodata:8
 overlays/ov182 0x021c0d90 section_start lib/dwcutilui/src/scenemenu.c:.data
 overlays/ov182 0x021c0de8 section_end lib/dwcutilui/src/sceneopterase.c:.data
 overlays/ov182 0x021c40b8 section_end lib/dwcutilui/src/rakuraku.c:.bss
@@ -2884,16 +2894,28 @@ overlays/ov186 0x021ad1fc remove_symbol
 overlays/ov186 0x021ad1fe remove_symbol
 overlays/ov186 0x021ad3c8 remove_reloc
 overlays/ov186 0x021ad448 remove_reloc
+overlays/ov189 0x021a59c4 section_start lib/dwc/src/nd/nd.c:.text
+overlays/ov189 0x021a59e4 reloc_addend 0x3c
+overlays/ov189 0x021a5a64 reloc_addend 0x3c
+overlays/ov189 0x021a5de8 reloc_addend 0x31
+overlays/ov189 0x021a6520 reloc_addend 0x28
+overlays/ov189 0x021a6540 reloc_addend 0x31
 overlays/ov189 0x021aa6ec add_function MulWords:arm:0xf0
 overlays/ov189 0x021aa7d8 remove_symbol
 overlays/ov189 0x021acd84 add_data sBase64Pad
 overlays/ov189 0x021acd85 add_data sActionCount
+overlays/ov189 0x021acda4 section_start lib/dwc/src/nd/nd.c:.rodata
 overlays/ov189 0x021acea0 section_end lib/dwc/src/enc/dwc_encsession.c:.rodata
 overlays/ov189 0x021acea0 section_start lib/dwc/src/crypt/crypt.c:.rodata
+overlays/ov189 0x021ae0cc section_start lib/dwc/src/nd/nd.c:.data
 overlays/ov189 0x021b2840 add_data data_ov189_021b2840
 overlays/ov189 0x021b2840 remove_symbol
-overlays/ov189 0x021b2850 section_end lib/dwc/src/nhttp/d_nhttp_common.c:.bss
 overlays/ov189 0x021b2850 add_data data_ov189_021b2850
+overlays/ov189 0x021b2860 section_end lib/dwc/src/nhttp/d_nhttp_common.c:.bss
+overlays/ov189 0x021b2904 remove_symbol
+overlays/ov189 0x021b290d remove_symbol
+overlays/ov189 0x021b2918 remove_symbol
+overlays/ov189 0x021b2924 section_start lib/dwc/src/nd/nd.c:.bss
 overlays/ov190 0x021b5144 remove_reloc
 overlays/ov190 0x021b5244 remove_reloc
 overlays/ov190 0x021b5308 reloc_module overlay(184)

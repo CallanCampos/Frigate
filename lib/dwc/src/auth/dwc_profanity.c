@@ -72,7 +72,7 @@ static BOOL DWCi_CheckProfanityAsync(const u16 **words, int count, const char *t
         sWords->wordsnum = count;
         strncpy(sWords->url, DWCauthhttpparam.url, 0x100);
         sWords->url[0x100] = 0;
-        found = strstr(sWords->url, "/ac");
+        found = strstr(sWords->url, "/ac\0");
         if (found != NULL) {
             MI_CpuCopy8("/pr", found, 4);
             config.url = sWords->url;

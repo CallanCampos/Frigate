@@ -39,7 +39,10 @@ a rule here changes, change it there too.
   a function that the SDK, or a library it bundles, wrote in assembly (an `asm` function in its C file, such as
   NitroSDK's `MTX_Identity43`, the CP15 cache functions or DWC's big-number helpers) is an MWCC `asm` function, said
   to be one in a comment, and assembly the library inlined at several sites (DS Protect's cache flush) is a
-  `static inline` with an `asm {}` block, said to be one in a comment. The user chose both. A library that is
+  `static inline` with an `asm {}` block, said to be one in a comment. The user chose both. One game function is an
+  `asm` function too: `src/gfl/arc_tool.c`'s `ArchiveMoveImageTop`, whose original build kept a dead store of
+  `fimgOffset + 8` back to its stack slot that no installed compiler produces from the C; the maintainer took this
+  exception for the last non-matching function on 2026-10-27, and the file says so. A library that is
   hand-written assembly as a whole, whose routines have several entries or names (MSL's runtime, `fp_fastI.s`), is an
   assembly file assembled by the mwasmarm of its compiler's version (library.toml's `asm_flags`); the user chose this
   on 2026-10-22.

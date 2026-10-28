@@ -249,7 +249,6 @@ static gsi_bool gsLargeIntDiv(const gsLargeInt_t *a, const gsLargeInt_t *b, gsLa
 static gsi_bool gsiLargeIntDiv(const gsi_u32 *a, gsi_u32 aLength, const gsLargeInt_t *b, gsLargeInt_t *quotient,
                                gsLargeInt_t *remainder) {
     int bit = 31;
-    gsi_u32 top;
     int offset;
     int length;
     gsLargeInt_t quotientWork;
@@ -257,6 +256,7 @@ static gsi_bool gsiLargeIntDiv(const gsi_u32 *a, gsi_u32 aLength, const gsLargeI
     const gsi_u32 *bData = b->mData;
     gsi_u32 bLength = b->mLength;
     int done = 0;
+    gsi_u32 top;
 
     gsiLargeIntTimerStart(GSLintTimerDiv);
     memset(work, 0, sizeof(work));
@@ -340,7 +340,7 @@ static gsi_bool gsiLargeIntDiv(const gsi_u32 *a, gsi_u32 aLength, const gsLargeI
                 gsiLargeIntTimerStop(GSLintTimerDiv);
                 return gsi_false;
             }
-            quotientWork.mData[offset] += digit;
+            quotientWork.mData[offset] = (gsi_u32)(quotientWork.mData[offset] + digit);
             if (quotientWork.mLength < offset + length) {
                 quotientWork.mLength = offset + length;
             }

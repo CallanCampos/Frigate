@@ -307,7 +307,7 @@ static void touchTriger(void) {
     u16 rect[4];
     int i;
 
-    if (DWCi_TPlCheckTrigger(gDWCUtilTouchScreenRect)) {
+    if (DWCi_TPlCheckTrigger(DWCi_R_SCR)) {
         sKeyboard->touched = -1;
         for (i = 0; i < KEYBOARD_CHAR_KEYS; i++) {
             DWCi_Coord2Rect(&sCharKeyPositions[i], sCharKeySize, rect);
@@ -351,7 +351,7 @@ static void touchRelease(void) {
 
     i = 0;
     sKeyboard->key = 0;
-    if (!DWCi_TPlCheckRelease(gDWCUtilTouchScreenRect)) {
+    if (!DWCi_TPlCheckRelease(DWCi_R_SCR)) {
         return;
     }
     do {
@@ -433,7 +433,7 @@ static void touch(void) {
     u16 rect[4];
     int i;
 
-    if (DWCi_TPlCheck(gDWCUtilTouchScreenRect)) {
+    if (DWCi_TPlCheck(DWCi_R_SCR)) {
         for (i = 0; i < KEYBOARD_CHAR_KEYS; i++) {
             DWCi_Coord2Rect(&sCharKeyPositions[i], sCharKeySize, rect);
             if (DWCi_TPlCheck(rect)) {

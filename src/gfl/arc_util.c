@@ -16,14 +16,15 @@ static u32 unpackAndLoadOBJChar(void *file, u32 engine, u32 offset, u32 size);
 static void GFL_BGSysLoadNSCR(void *file, u32 bg, u32 offset, u32 palOffset, u32 size, BOOL async);
 static void GFL_BGSysLoadNCLR(void *file, u32 type, u32 srcOffset, u32 offset, u32 size);
 
-static const VramLoadFunc obj_char_lut[] = {
-    GX_LoadOBJ,
-    GXS_LoadOBJ,
-};
-
-static const VramLoadFunc pltt_type_lut[] = {
-    GX_LoadBGPltt,  GX_LoadOBJPltt,  GX_LoadBGExtPltt,  GX_LoadOBJExtPltt,
-    GXS_LoadBGPltt, GXS_LoadOBJPltt, GXS_LoadBGExtPltt, GXS_LoadOBJExtPltt,
+// The unused image-loader table belongs here by adjacency to the related OBJ and palette dispatch tables.
+// Its descriptive name, source ownership and per-function IPA setting are inferred from the ROM layout.
+typedef void (*ImageLoadFunc)(const NNSG2dCharacterData *data, u32 baseAddr, NNS_G2D_VRAM_TYPE type,
+                              NNSG2dImageProxy *proxy);
+static const ImageLoadFunc sOBJImageLoadFuncs[] = {
+    NNS_G2dLoadImage1DMapping,
+    NNS_G2dLoadImage2DMapping,
+    NNS_G2dLoadImage1DMapping,
+    NNS_G2dLoadImage2DMapping,
 };
 
 u32 GFL_BGSysLoadNCGRStatic(u32 arcId, u32 fileId, u32 bg, u32 offset, u32 size, BOOL compressed, HeapID heapId) {
@@ -121,6 +122,11 @@ u32 loadOBJCharToVram(ArcTool *arc, u32 fileId, u32 engine, u32 offset, u32 size
 
     return unpackAndLoadOBJChar(file, engine, offset, size);
 }
+
+static const VramLoadFunc obj_char_lut[] = {
+    GX_LoadOBJ,
+    GXS_LoadOBJ,
+};
 
 static u32 unpackAndLoadOBJChar(void *file, u32 engine, u32 offset, u32 size) {
     NNSG2dCharacterData *character;
@@ -229,6 +235,11 @@ void GFL_G2DIOLoadArcNCLR(ArcTool *arc, u32 fileId, u32 type, u32 srcOffset, u32
 
     GFL_BGSysLoadNCLR(file, type, srcOffset, offset, size);
 }
+
+static const VramLoadFunc pltt_type_lut[] = {
+    GX_LoadBGPltt,  GX_LoadOBJPltt,  GX_LoadBGExtPltt,  GX_LoadOBJExtPltt,
+    GXS_LoadBGPltt, GXS_LoadOBJPltt, GXS_LoadBGExtPltt, GXS_LoadOBJExtPltt,
+};
 
 // Loads a palette file from srcOffset into it to palette memory of a PALTYPE_*
 static void GFL_BGSysLoadNCLR(void *file, u32 type, u32 srcOffset, u32 offset, u32 size) {

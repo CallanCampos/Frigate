@@ -275,6 +275,7 @@ lib/dwc/src/gscommon/gsDebug.c:
     .bss        start:0x021907a0 end:0x02190804
 
 lib/dwc/src/gscommon/gsLargeInt.c:
+    complete
     .text       start:0x0216cd94 end:0x0216dd9c
     .data       start:0x02186eb4 end:0x02186ec4
     .bss        start:0x02190804 end:0x02190894
@@ -406,6 +407,7 @@ lib/dwc/src/auth/dwc_auth.c:
     .bss        start:0x0218e924 end:0x021905f8
 
 lib/dwc/src/auth/dwc_http_client.c:
+    complete
     .text       start:0x0216a408 end:0x0216b14c
     .data       start:0x02185d24 end:0x02185e68
     .bss        start:0x021905f8 end:0x021905fc
@@ -417,6 +419,7 @@ lib/dwc/src/auth/dwc_conntest.c:
     .bss        start:0x021905fc end:0x02190690
 
 lib/dwc/src/auth/dwc_profanity.c:
+    complete
     .text       start:0x0216bbe4 end:0x0216c154
     .data       start:0x02185f10 end:0x02185fd4
     .bss        start:0x02190690 end:0x02190694

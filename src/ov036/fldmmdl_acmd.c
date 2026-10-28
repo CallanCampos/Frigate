@@ -132,12 +132,12 @@ static BOOL FieldAcmdTCB_CheckSeqPerms(FieldAcmdWork *work);
 static BOOL FieldAcmdTCB_AdvanceQueue(FieldAcmdWork *work);
 static BOOL FieldAcmdTCB_End(FieldAcmdWork *work);
 static BOOL FldAct_ExecAcmd(FieldActor *actor, u32 acmd, u32 state);
-static BOOL func_ov036_0218f09c(FieldActor *actor);
-static void func_ov036_0218f0ac(FieldActor *actor, u32 dir);
-static BOOL func_ov036_0218f0d0(FieldActor *actor);
-static BOOL func_ov036_0218f0dc(FieldActor *actor);
-static BOOL func_ov036_0218f0e8(FieldActor *actor);
-static BOOL func_ov036_0218f0f4(FieldActor *actor);
+static BOOL FieldAcmdTCB_SetAcmdEnd(FieldActor *actor);
+static void FieldAcmdTCB_FaceInit(FieldActor *actor, u32 dir);
+static BOOL FieldAcmdTCB_FaceUp(FieldActor *actor);
+static BOOL FieldAcmdTCB_FaceDown(FieldActor *actor);
+static BOOL FieldAcmdTCB_FaceLeft(FieldActor *actor);
+static BOOL FieldAcmdTCB_FaceRight(FieldActor *actor);
 static void FieldAcmdTCB_WalkInit(FieldActor *actor, u32 dir, fx32 speed, s16 frames, u16 state);
 static BOOL FieldAcmdTCB_WalkMove(FieldActor *actor);
 static BOOL FieldAcmdTCB_WalkUp32F(FieldActor *actor);
@@ -174,26 +174,26 @@ static BOOL FieldAcmdTCB_WalkLeft16FFastAnime(FieldActor *actor);
 static BOOL FieldAcmdTCB_WalkRight16FFastAnime(FieldActor *actor);
 static void FieldAcmdTCB_StayWalkInit(FieldActor *actor, u32 dir, s16 frames, u16 state);
 static BOOL FieldAcmdTCB_StayWalkMove(FieldActor *actor);
-static BOOL func_ov036_0218f4c0(FieldActor *actor);
-static BOOL func_ov036_0218f4d0(FieldActor *actor);
-static BOOL func_ov036_0218f4e0(FieldActor *actor);
-static BOOL func_ov036_0218f4f0(FieldActor *actor);
-static BOOL func_ov036_0218f500(FieldActor *actor);
-static BOOL func_ov036_0218f510(FieldActor *actor);
-static BOOL func_ov036_0218f520(FieldActor *actor);
-static BOOL func_ov036_0218f530(FieldActor *actor);
-static BOOL func_ov036_0218f540(FieldActor *actor);
-static BOOL func_ov036_0218f550(FieldActor *actor);
-static BOOL func_ov036_0218f560(FieldActor *actor);
-static BOOL func_ov036_0218f570(FieldActor *actor);
-static BOOL func_ov036_0218f580(FieldActor *actor);
-static BOOL func_ov036_0218f590(FieldActor *actor);
-static BOOL func_ov036_0218f5a0(FieldActor *actor);
-static BOOL func_ov036_0218f5b0(FieldActor *actor);
-static BOOL func_ov036_0218f5c0(FieldActor *actor);
-static BOOL func_ov036_0218f5d0(FieldActor *actor);
-static BOOL func_ov036_0218f5e0(FieldActor *actor);
-static BOOL func_ov036_0218f5f0(FieldActor *actor);
+static BOOL FieldAcmdTCB_StayWalkUp32F(FieldActor *actor);
+static BOOL FieldAcmdTCB_StayWalkDown32F(FieldActor *actor);
+static BOOL FieldAcmdTCB_StayWalkLeft32F(FieldActor *actor);
+static BOOL FieldAcmdTCB_StayWalkRight32F(FieldActor *actor);
+static BOOL FieldAcmdTCB_StayWalkUp16F(FieldActor *actor);
+static BOOL FieldAcmdTCB_StayWalkDown16F(FieldActor *actor);
+static BOOL FieldAcmdTCB_StayWalkLeft16F(FieldActor *actor);
+static BOOL FieldAcmdTCB_StayWalkRight16F(FieldActor *actor);
+static BOOL FieldAcmdTCB_StayWalkUp8F(FieldActor *actor);
+static BOOL FieldAcmdTCB_StayWalkDown8F(FieldActor *actor);
+static BOOL FieldAcmdTCB_StayWalkLeft8F(FieldActor *actor);
+static BOOL FieldAcmdTCB_StayWalkRight8F(FieldActor *actor);
+static BOOL FieldAcmdTCB_StayWalkUp4F(FieldActor *actor);
+static BOOL FieldAcmdTCB_StayWalkDown4F(FieldActor *actor);
+static BOOL FieldAcmdTCB_StayWalkLeft4F(FieldActor *actor);
+static BOOL FieldAcmdTCB_StayWalkRight4F(FieldActor *actor);
+static BOOL FieldAcmdTCB_StayWalkUp2F(FieldActor *actor);
+static BOOL FieldAcmdTCB_StayWalkDown2F(FieldActor *actor);
+static BOOL FieldAcmdTCB_StayWalkLeft2F(FieldActor *actor);
+static BOOL FieldAcmdTCB_StayWalkRight2F(FieldActor *actor);
 
 static void FieldAcmdTCB_JumpInit(FieldActor *actor, u32 dir, fx32 speed, u32 frames, u16 state, s16 heightTable,
                                   u16 heightStep, u32 se);
@@ -210,26 +210,26 @@ static BOOL FieldAcmdTCB_StayJumpUp8F(FieldActor *actor);
 static BOOL FieldAcmdTCB_StayJumpDown8F(FieldActor *actor);
 static BOOL FieldAcmdTCB_StayJumpLeft8F(FieldActor *actor);
 static BOOL FieldAcmdTCB_StayJumpRight8F(FieldActor *actor);
-static BOOL func_ov036_0218f878(FieldActor *actor);
-static BOOL func_ov036_0218f898(FieldActor *actor);
-static BOOL func_ov036_0218f8bc(FieldActor *actor);
-static BOOL func_ov036_0218f8e0(FieldActor *actor);
-static BOOL func_ov036_0218f900(FieldActor *actor);
-static BOOL func_ov036_0218f920(FieldActor *actor);
-static BOOL func_ov036_0218f944(FieldActor *actor);
-static BOOL func_ov036_0218f964(FieldActor *actor);
-static BOOL func_ov036_0218f988(FieldActor *actor);
+static BOOL FieldAcmdTCB_JumpUp1G8F(FieldActor *actor);
+static BOOL FieldAcmdTCB_JumpDown1G8F(FieldActor *actor);
+static BOOL FieldAcmdTCB_JumpLeft1G8F(FieldActor *actor);
+static BOOL FieldAcmdTCB_JumpRight1G8F(FieldActor *actor);
+static BOOL FieldAcmdTCB_JumpUp2G16F(FieldActor *actor);
+static BOOL FieldAcmdTCB_JumpDown2G16F(FieldActor *actor);
+static BOOL FieldAcmdTCB_JumpLeft2G16F(FieldActor *actor);
+static BOOL FieldAcmdTCB_JumpRight2G16F(FieldActor *actor);
+static BOOL FieldAcmdTCB_JumpLeft1G16F(FieldActor *actor);
 static BOOL FieldAcmdTCB_JumpRight1G16F(FieldActor *actor);
-static BOOL func_ov036_0218f9c8(FieldActor *actor);
+static BOOL FieldAcmdTCB_JumpLeft3G12F(FieldActor *actor);
 static BOOL FieldAcmdTCB_JumpRight3G12F(FieldActor *actor);
-static BOOL func_ov036_0218fa10(FieldActor *actor);
+static BOOL FieldAcmdTCB_JumpUp3G24FNoSe(FieldActor *actor);
 static BOOL FieldAcmdTCB_JumpDown3G24FNoSe(FieldActor *actor);
 static BOOL FieldAcmdTCB_JumpLeft3G24FNoSe(FieldActor *actor);
 static BOOL FieldAcmdTCB_JumpRight3G24FNoSe(FieldActor *actor);
 static void FieldAcmdTCB_WaitInit(FieldActor *actor, u32 count);
 static BOOL FieldAcmdTCB_WaitMove(FieldActor *actor);
-static BOOL func_ov036_0218fad8(FieldActor *actor);
-static BOOL func_ov036_0218fae4(FieldActor *actor);
+static BOOL FieldAcmdTCB_Wait1F(FieldActor *actor);
+static BOOL FieldAcmdTCB_Wait2F(FieldActor *actor);
 static BOOL FieldAcmdTCB_Wait4F(FieldActor *actor);
 static BOOL FieldAcmdTCB_Wait8F(FieldActor *actor);
 static BOOL FieldAcmdTCB_Wait15F(FieldActor *actor);
@@ -239,22 +239,22 @@ static BOOL FieldAcmdTCB_RiseInit(FieldActor *actor);
 static BOOL FieldAcmdTCB_RiseMove(FieldActor *actor);
 static BOOL FieldAcmdTCB_FallInit(FieldActor *actor);
 static BOOL FieldAcmdTCB_FallMove(FieldActor *actor);
-static BOOL func_ov036_0218fc14(FieldActor *actor);
-static BOOL func_ov036_0218fc28(FieldActor *actor);
-static BOOL func_ov036_0218fc3c(FieldActor *actor);
-static BOOL func_ov036_0218fc50(FieldActor *actor);
-static BOOL func_ov036_0218fc64(FieldActor *actor);
-static BOOL func_ov036_0218fc78(FieldActor *actor);
-static void func_ov036_0218fc8c(FieldActor *actor, u32 kind, u32 unused, BOOL playSE);
+static BOOL FieldAcmdTCB_SetHiddenFlag(FieldActor *actor);
+static BOOL FieldAcmdTCB_ClearHiddenFlag(FieldActor *actor);
+static BOOL FieldAcmdTCB_SetFaceDirLockFlag(FieldActor *actor);
+static BOOL FieldAcmdTCB_ClearFaceDirLockFlag(FieldActor *actor);
+static BOOL FieldAcmdTCB_SetAnimePauseFlag(FieldActor *actor);
+static BOOL FieldAcmdTCB_ClearAnimePauseFlag(FieldActor *actor);
+static void FieldAcmdTCB_MarkWaitInit(FieldActor *actor, u32 kind, u32 unused, BOOL playSE);
 static BOOL FieldAcmdTCB_MarkWait(FieldActor *actor);
-static BOOL func_ov036_0218fce8(FieldActor *actor);
-static BOOL func_ov036_0218fcf8(FieldActor *actor);
-static BOOL func_ov036_0218fd08(FieldActor *actor);
+static BOOL FieldAcmdTCB_MarkWaitExcl(FieldActor *actor);
+static BOOL FieldAcmdTCB_MarkWaitExclNoSe(FieldActor *actor);
+static BOOL FieldAcmdTCB_MarkWaitNoteNoSe(FieldActor *actor);
 static BOOL func_ov036_0218fd18(FieldActor *actor);
 static BOOL func_ov036_0218fd28(FieldActor *actor);
-static BOOL func_ov036_0218fd38(FieldActor *actor);
-static BOOL func_ov036_0218fd48(FieldActor *actor);
-static BOOL func_ov036_0218fd58(FieldActor *actor);
+static BOOL FieldAcmdTCB_MarkWaitQuestion(FieldActor *actor);
+static BOOL FieldAcmdTCB_MarkWaitNote(FieldActor *actor);
+static BOOL FieldAcmdTCB_MarkWaitEllipsis(FieldActor *actor);
 static void FieldAcmdTCB_WalkTableInit(FieldActor *actor, u32 dir, u32 steps, u32 state);
 static BOOL FieldAcmdTCB_WalkTableMove(FieldActor *actor, const s32 *distances);
 static BOOL FieldAcmdTCB_WalkUp6F(FieldActor *actor);
@@ -265,27 +265,27 @@ static BOOL FieldAcmdTCB_DashUp6F(FieldActor *actor);
 static BOOL FieldAcmdTCB_DashDown6F(FieldActor *actor);
 static BOOL FieldAcmdTCB_DashLeft6F(FieldActor *actor);
 static BOOL FieldAcmdTCB_DashRight6F(FieldActor *actor);
-static BOOL func_ov036_0218fe84(FieldActor *actor);
-static BOOL func_ov036_0218fe9c(FieldActor *actor);
-static BOOL func_ov036_0218feac(FieldActor *actor);
-static BOOL func_ov036_0218febc(FieldActor *actor);
-static BOOL func_ov036_0218fecc(FieldActor *actor);
-static BOOL func_ov036_0218fedc(FieldActor *actor);
-static BOOL func_ov036_0218fef4(FieldActor *actor);
-static BOOL func_ov036_0218ff04(FieldActor *actor);
-static BOOL func_ov036_0218ff14(FieldActor *actor);
-static BOOL func_ov036_0218ff24(FieldActor *actor);
-static BOOL func_ov036_0218ff34(FieldActor *actor);
-static BOOL func_ov036_0218ff4c(FieldActor *actor);
-static BOOL func_ov036_0218ff5c(FieldActor *actor);
-static BOOL func_ov036_0218ff6c(FieldActor *actor);
-static BOOL func_ov036_0218ff7c(FieldActor *actor);
-static BOOL func_ov036_0218ff8c(FieldActor *actor);
-static BOOL func_ov036_0218ffa4(FieldActor *actor);
-static BOOL func_ov036_0218ffc0(FieldActor *actor);
-static BOOL func_ov036_0218ffdc(FieldActor *actor);
-static BOOL func_ov036_0218fff8(FieldActor *actor);
-static BOOL func_ov036_02190010(FieldActor *actor);
+static BOOL FieldAcmdTCB_Walk6FMove(FieldActor *actor);
+static BOOL FieldAcmdTCB_WalkUp3F(FieldActor *actor);
+static BOOL FieldAcmdTCB_WalkDown3F(FieldActor *actor);
+static BOOL FieldAcmdTCB_WalkLeft3F(FieldActor *actor);
+static BOOL FieldAcmdTCB_WalkRight3F(FieldActor *actor);
+static BOOL FieldAcmdTCB_Walk3FMove(FieldActor *actor);
+static BOOL FieldAcmdTCB_WalkUp7F(FieldActor *actor);
+static BOOL FieldAcmdTCB_WalkDown7F(FieldActor *actor);
+static BOOL FieldAcmdTCB_WalkLeft7F(FieldActor *actor);
+static BOOL FieldAcmdTCB_WalkRight7F(FieldActor *actor);
+static BOOL FieldAcmdTCB_Walk7FMove(FieldActor *actor);
+static BOOL FieldAcmdTCB_WalkUp12F(FieldActor *actor);
+static BOOL FieldAcmdTCB_WalkDown12F(FieldActor *actor);
+static BOOL FieldAcmdTCB_WalkLeft12F(FieldActor *actor);
+static BOOL FieldAcmdTCB_WalkRight12F(FieldActor *actor);
+static BOOL FieldAcmdTCB_Walk12FMove(FieldActor *actor);
+static BOOL FieldAcmdTCB_AnimeWaitEndInit10(FieldActor *actor);
+static BOOL FieldAcmdTCB_AnimeWaitEndInit11(FieldActor *actor);
+static BOOL FieldAcmdTCB_AnimeWaitEndInit12(FieldActor *actor);
+static BOOL FieldAcmdTCB_AnimeWaitEndInit10Se(FieldActor *actor);
+static BOOL FieldAcmdTCB_AnimeWaitEndInit11Se(FieldActor *actor);
 static BOOL FieldAcmdTCB_AnimeWaitEndStop(FieldActor *actor);
 static BOOL FieldAcmdTCB_AnimeWaitEnd(FieldActor *actor);
 static BOOL FieldAcmdTCB_HideOffInit(FieldActor *actor);
@@ -293,10 +293,10 @@ static BOOL FieldAcmdTCB_HideOffMove(FieldActor *actor);
 static void FieldAcmdTCB_StayInit(FieldActor *actor, u32 value, u16 limit);
 static BOOL FieldAcmdTCB_StayMove(FieldActor *actor);
 static BOOL FieldAcmdTCB_StayWalk32F40F(FieldActor *actor);
-static BOOL func_ov036_021901e8(FieldActor *actor);
-static BOOL func_ov036_02190200(FieldActor *actor);
-static BOOL func_ov036_02190218(FieldActor *actor);
-static BOOL func_ov036_02190234(FieldActor *actor);
+static BOOL FieldAcmdTCB_StayWalk16F41F(FieldActor *actor);
+static BOOL FieldAcmdTCB_StayIdle8F(FieldActor *actor);
+static BOOL FieldAcmdTCB_StayWalkBobInit(FieldActor *actor);
+static BOOL FieldAcmdTCB_StayWalkBobMove(FieldActor *actor);
 
 static void FieldAcmdTCB_StepInit(FieldActor *actor, const VecFx32 *delta, u32 faceDir, u32 motionDir, u32 value,
                                   u8 param);
@@ -304,7 +304,7 @@ static void FieldAcmdTCB_StepInit(FieldActor *actor, const VecFx32 *delta, u32 f
 static BOOL FieldAcmdTCB_StepMove(FieldActor *actor);
 static BOOL FieldAcmdTCB_StepUpFaceLeft8F(FieldActor *actor);
 static BOOL FieldAcmdTCB_StepDownFaceRight8F(FieldActor *actor);
-static BOOL func_ov036_021903f8(FieldActor *actor);
+static BOOL FieldAcmdTCB_StepLeftFaceDown8F(FieldActor *actor);
 static BOOL FieldAcmdTCB_StepRightFaceUp8F(FieldActor *actor);
 static BOOL FieldAcmdTCB_StepUpFaceRight8F(FieldActor *actor);
 static BOOL FieldAcmdTCB_StepDownFaceLeft8F(FieldActor *actor);
@@ -324,7 +324,7 @@ static BOOL FieldAcmdTCB_StepLeftFaceRight2F(FieldActor *actor);
 static BOOL FieldAcmdTCB_StepRightFaceLeft2F(FieldActor *actor);
 static BOOL FieldAcmdTCB_DashStepUpFaceLeft4F(FieldActor *actor);
 static BOOL FieldAcmdTCB_DashStepDownFaceRight4F(FieldActor *actor);
-static BOOL func_ov036_021907e0(FieldActor *actor);
+static BOOL FieldAcmdTCB_DashStepLeftFaceDown4F(FieldActor *actor);
 static BOOL FieldAcmdTCB_DashStepRightFaceUp4F(FieldActor *actor);
 static BOOL FieldAcmdTCB_DashStepUpFaceRight4F(FieldActor *actor);
 static BOOL FieldAcmdTCB_DashStepDownFaceLeft4F(FieldActor *actor);
@@ -341,7 +341,7 @@ static void FieldAcmdTCB_HopInit(FieldActor *actor, s32 step, u32 faceDir, u32 m
 static BOOL FieldAcmdTCB_HopMove(FieldActor *actor);
 static BOOL FieldAcmdTCB_HopUpFaceLeft8F(FieldActor *actor);
 static BOOL FieldAcmdTCB_HopDownFaceRight8F(FieldActor *actor);
-static BOOL func_ov036_02190c98(FieldActor *actor);
+static BOOL FieldAcmdTCB_HopLeftFaceDown8F(FieldActor *actor);
 static BOOL FieldAcmdTCB_HopRightFaceUp8F(FieldActor *actor);
 static BOOL FieldAcmdTCB_HopUpFaceRight8F(FieldActor *actor);
 static BOOL FieldAcmdTCB_HopDownFaceLeft8F(FieldActor *actor);
@@ -353,22 +353,22 @@ static BOOL FieldAcmdTCB_HopLeftFaceRight8F(FieldActor *actor);
 static BOOL FieldAcmdTCB_HopRightFaceLeft8F(FieldActor *actor);
 static BOOL FieldAcmdTCB_StayWalk22FInit(FieldActor *actor);
 static BOOL FieldAcmdTCB_StayWalk22FMove(FieldActor *actor);
-static BOOL func_ov036_02190e60(FieldActor *actor);
+static BOOL FieldAcmdTCB_SetAnime10(FieldActor *actor);
 static BOOL FieldAcmdTCB_DashLeft2F(FieldActor *actor);
 static BOOL FieldAcmdTCB_Dash2FMove(FieldActor *actor);
 static BOOL FieldAcmdTCB_FlyUpInit(FieldActor *actor);
-static BOOL func_ov036_02190f14(FieldActor *actor);
+static BOOL FieldAcmdTCB_FlyUpMove(FieldActor *actor);
 static BOOL func_ov036_0219100c(FieldActor *actor);
-static BOOL func_ov036_02191020(FieldActor *actor);
+static BOOL FieldAcmdTCB_AnimeWaitEndFaceDownInit(FieldActor *actor);
 static BOOL FieldAcmdTCB_AnimeWaitEndFaceDown(FieldActor *actor);
 static BOOL FieldAcmdTCB_ResetDrawOffset(FieldActor *actor);
 static BOOL FieldAcmdTCB_FlyReadyInit(FieldActor *actor);
-static BOOL func_ov036_021910f4(FieldActor *actor);
+static BOOL FieldAcmdTCB_FlyReadyMove(FieldActor *actor);
 static BOOL func_ov036_02191174(FieldActor *actor);
-static BOOL func_ov036_02191188(FieldActor *actor);
-static BOOL func_ov036_0219119c(FieldActor *actor);
-static BOOL func_ov036_021911b0(FieldActor *actor);
-static BOOL func_ov036_021911cc(FieldActor *actor);
+static BOOL FieldAcmdTCB_DrawReadyWaitInit10(FieldActor *actor);
+static BOOL FieldAcmdTCB_DrawReadyWaitInit11(FieldActor *actor);
+static BOOL FieldAcmdTCB_DrawReadyWaitInit12(FieldActor *actor);
+static BOOL FieldAcmdTCB_DrawReadyWaitInit13(FieldActor *actor);
 static BOOL FieldAcmdTCB_DrawReadyWaitStop(FieldActor *actor);
 static BOOL FieldAcmdTCB_DrawReadyWait(FieldActor *actor);
 
@@ -425,7 +425,7 @@ void CopyActorPosAllAdd(FieldActor *actor, VecFx32 *dest) {
     dest->z = wPos.z + pos1.z + pos2.z + pos3.z + offset.z;
 }
 
-void func_ov036_0218ee08(FieldActor *actor) {
+void FieldAcmdSyncBillboardPos(FieldActor *actor) {
     VecFx32 pos;
     u32 idx = FldAct_GetBlActIdx(actor, 0);
 
@@ -579,35 +579,35 @@ static BOOL FldAct_ExecAcmd(FieldActor *actor, u32 acmd, u32 state) {
     return ACTOR_ACTION_COMMAND_TABLES[acmd][state](actor);
 }
 
-static BOOL func_ov036_0218f09c(FieldActor *actor) {
+static BOOL FieldAcmdTCB_SetAcmdEnd(FieldActor *actor) {
     SetActorMovementFlag(actor, 0x400);
     return FALSE;
 }
 
-static void func_ov036_0218f0ac(FieldActor *actor, u32 dir) {
+static void FieldAcmdTCB_FaceInit(FieldActor *actor, u32 dir) {
     CheckSetActorFaceDir(actor, dir);
     FldAct_SetDrawStatus(actor, 0);
     SetActorInitialGPosToNowGPos(actor);
     FieldActor_NextAcmdState(actor);
 }
 
-static BOOL func_ov036_0218f0d0(FieldActor *actor) {
-    func_ov036_0218f0ac(actor, DIR_UP);
+static BOOL FieldAcmdTCB_FaceUp(FieldActor *actor) {
+    FieldAcmdTCB_FaceInit(actor, DIR_UP);
     return TRUE;
 }
 
-static BOOL func_ov036_0218f0dc(FieldActor *actor) {
-    func_ov036_0218f0ac(actor, DIR_DOWN);
+static BOOL FieldAcmdTCB_FaceDown(FieldActor *actor) {
+    FieldAcmdTCB_FaceInit(actor, DIR_DOWN);
     return TRUE;
 }
 
-static BOOL func_ov036_0218f0e8(FieldActor *actor) {
-    func_ov036_0218f0ac(actor, DIR_LEFT);
+static BOOL FieldAcmdTCB_FaceLeft(FieldActor *actor) {
+    FieldAcmdTCB_FaceInit(actor, DIR_LEFT);
     return TRUE;
 }
 
-static BOOL func_ov036_0218f0f4(FieldActor *actor) {
-    func_ov036_0218f0ac(actor, DIR_RIGHT);
+static BOOL FieldAcmdTCB_FaceRight(FieldActor *actor) {
+    FieldAcmdTCB_FaceInit(actor, DIR_RIGHT);
     return TRUE;
 }
 
@@ -825,102 +825,102 @@ static BOOL FieldAcmdTCB_StayWalkMove(FieldActor *actor) {
     return FALSE;
 }
 
-static BOOL func_ov036_0218f4c0(FieldActor *actor) {
+static BOOL FieldAcmdTCB_StayWalkUp32F(FieldActor *actor) {
     FieldAcmdTCB_StayWalkInit(actor, DIR_UP, 32, 1);
     return TRUE;
 }
 
-static BOOL func_ov036_0218f4d0(FieldActor *actor) {
+static BOOL FieldAcmdTCB_StayWalkDown32F(FieldActor *actor) {
     FieldAcmdTCB_StayWalkInit(actor, DIR_DOWN, 32, 1);
     return TRUE;
 }
 
-static BOOL func_ov036_0218f4e0(FieldActor *actor) {
+static BOOL FieldAcmdTCB_StayWalkLeft32F(FieldActor *actor) {
     FieldAcmdTCB_StayWalkInit(actor, DIR_LEFT, 32, 1);
     return TRUE;
 }
 
-static BOOL func_ov036_0218f4f0(FieldActor *actor) {
+static BOOL FieldAcmdTCB_StayWalkRight32F(FieldActor *actor) {
     FieldAcmdTCB_StayWalkInit(actor, DIR_RIGHT, 32, 1);
     return TRUE;
 }
 
-static BOOL func_ov036_0218f500(FieldActor *actor) {
+static BOOL FieldAcmdTCB_StayWalkUp16F(FieldActor *actor) {
     FieldAcmdTCB_StayWalkInit(actor, DIR_UP, 16, 2);
     return TRUE;
 }
 
-static BOOL func_ov036_0218f510(FieldActor *actor) {
+static BOOL FieldAcmdTCB_StayWalkDown16F(FieldActor *actor) {
     FieldAcmdTCB_StayWalkInit(actor, DIR_DOWN, 16, 2);
     return TRUE;
 }
 
-static BOOL func_ov036_0218f520(FieldActor *actor) {
+static BOOL FieldAcmdTCB_StayWalkLeft16F(FieldActor *actor) {
     FieldAcmdTCB_StayWalkInit(actor, DIR_LEFT, 16, 2);
     return TRUE;
 }
 
-static BOOL func_ov036_0218f530(FieldActor *actor) {
+static BOOL FieldAcmdTCB_StayWalkRight16F(FieldActor *actor) {
     FieldAcmdTCB_StayWalkInit(actor, DIR_RIGHT, 16, 2);
     return TRUE;
 }
 
-static BOOL func_ov036_0218f540(FieldActor *actor) {
+static BOOL FieldAcmdTCB_StayWalkUp8F(FieldActor *actor) {
     FieldAcmdTCB_StayWalkInit(actor, DIR_UP, 8, 3);
     return TRUE;
 }
 
-static BOOL func_ov036_0218f550(FieldActor *actor) {
+static BOOL FieldAcmdTCB_StayWalkDown8F(FieldActor *actor) {
     FieldAcmdTCB_StayWalkInit(actor, DIR_DOWN, 8, 3);
     return TRUE;
 }
 
-static BOOL func_ov036_0218f560(FieldActor *actor) {
+static BOOL FieldAcmdTCB_StayWalkLeft8F(FieldActor *actor) {
     FieldAcmdTCB_StayWalkInit(actor, DIR_LEFT, 8, 3);
     return TRUE;
 }
 
-static BOOL func_ov036_0218f570(FieldActor *actor) {
+static BOOL FieldAcmdTCB_StayWalkRight8F(FieldActor *actor) {
     FieldAcmdTCB_StayWalkInit(actor, DIR_RIGHT, 8, 3);
     return TRUE;
 }
 
-static BOOL func_ov036_0218f580(FieldActor *actor) {
+static BOOL FieldAcmdTCB_StayWalkUp4F(FieldActor *actor) {
     FieldAcmdTCB_StayWalkInit(actor, DIR_UP, 4, 4);
     return TRUE;
 }
 
-static BOOL func_ov036_0218f590(FieldActor *actor) {
+static BOOL FieldAcmdTCB_StayWalkDown4F(FieldActor *actor) {
     FieldAcmdTCB_StayWalkInit(actor, DIR_DOWN, 4, 4);
     return TRUE;
 }
 
-static BOOL func_ov036_0218f5a0(FieldActor *actor) {
+static BOOL FieldAcmdTCB_StayWalkLeft4F(FieldActor *actor) {
     FieldAcmdTCB_StayWalkInit(actor, DIR_LEFT, 4, 4);
     return TRUE;
 }
 
-static BOOL func_ov036_0218f5b0(FieldActor *actor) {
+static BOOL FieldAcmdTCB_StayWalkRight4F(FieldActor *actor) {
     FieldAcmdTCB_StayWalkInit(actor, DIR_RIGHT, 4, 4);
     return TRUE;
 }
 
-static BOOL func_ov036_0218f5c0(FieldActor *actor) {
+static BOOL FieldAcmdTCB_StayWalkUp2F(FieldActor *actor) {
     FieldAcmdTCB_StayWalkInit(actor, DIR_UP, 2, 5);
     return TRUE;
 }
 
-static BOOL func_ov036_0218f5d0(FieldActor *actor) {
+static BOOL FieldAcmdTCB_StayWalkDown2F(FieldActor *actor) {
     FieldAcmdTCB_StayWalkInit(actor, DIR_DOWN, 2, 5);
     return TRUE;
 }
 
-static BOOL func_ov036_0218f5e0(FieldActor *actor) {
+static BOOL FieldAcmdTCB_StayWalkLeft2F(FieldActor *actor) {
     FieldAcmdTCB_StayWalkInit(actor, DIR_LEFT, 2, 5);
     return TRUE;
 }
 
-static BOOL func_ov036_0218f5f0(FieldActor *actor) {
+static BOOL FieldAcmdTCB_StayWalkRight2F(FieldActor *actor) {
     FieldAcmdTCB_StayWalkInit(actor, DIR_RIGHT, 2, 5);
     return TRUE;
 }
@@ -1039,47 +1039,47 @@ static BOOL FieldAcmdTCB_StayJumpRight8F(FieldActor *actor) {
     return TRUE;
 }
 
-static BOOL func_ov036_0218f878(FieldActor *actor) {
+static BOOL FieldAcmdTCB_JumpUp1G8F(FieldActor *actor) {
     FieldAcmdTCB_JumpInitWithSe(actor, DIR_UP, 0x2000, 8, 3, 0, 0x200);
     return TRUE;
 }
 
-static BOOL func_ov036_0218f898(FieldActor *actor) {
+static BOOL FieldAcmdTCB_JumpDown1G8F(FieldActor *actor) {
     FieldAcmdTCB_JumpInitWithSe(actor, DIR_DOWN, 0x2000, 8, 3, 0, 0x200);
     return TRUE;
 }
 
-static BOOL func_ov036_0218f8bc(FieldActor *actor) {
+static BOOL FieldAcmdTCB_JumpLeft1G8F(FieldActor *actor) {
     FieldAcmdTCB_JumpInitWithSe(actor, DIR_LEFT, 0x2000, 8, 3, 0, 0x200);
     return TRUE;
 }
 
-static BOOL func_ov036_0218f8e0(FieldActor *actor) {
+static BOOL FieldAcmdTCB_JumpRight1G8F(FieldActor *actor) {
     FieldAcmdTCB_JumpInitWithSe(actor, DIR_RIGHT, 0x2000, 8, 3, 0, 0x200);
     return TRUE;
 }
 
-static BOOL func_ov036_0218f900(FieldActor *actor) {
+static BOOL FieldAcmdTCB_JumpUp2G16F(FieldActor *actor) {
     FieldAcmdTCB_JumpInitWithSe(actor, DIR_UP, 0x2000, 16, 3, 0, 0x100);
     return TRUE;
 }
 
-static BOOL func_ov036_0218f920(FieldActor *actor) {
+static BOOL FieldAcmdTCB_JumpDown2G16F(FieldActor *actor) {
     FieldAcmdTCB_JumpInitWithSe(actor, DIR_DOWN, 0x2000, 16, 3, 0, 0x100);
     return TRUE;
 }
 
-static BOOL func_ov036_0218f944(FieldActor *actor) {
+static BOOL FieldAcmdTCB_JumpLeft2G16F(FieldActor *actor) {
     FieldAcmdTCB_JumpInitWithSe(actor, DIR_LEFT, 0x2000, 16, 3, 0, 0x100);
     return TRUE;
 }
 
-static BOOL func_ov036_0218f964(FieldActor *actor) {
+static BOOL FieldAcmdTCB_JumpRight2G16F(FieldActor *actor) {
     FieldAcmdTCB_JumpInitWithSe(actor, DIR_RIGHT, 0x2000, 16, 3, 0, 0x100);
     return TRUE;
 }
 
-static BOOL func_ov036_0218f988(FieldActor *actor) {
+static BOOL FieldAcmdTCB_JumpLeft1G16F(FieldActor *actor) {
     FieldAcmdTCB_JumpInitWithSe(actor, DIR_LEFT, 0x1000, 16, 2, 0, 0xf0);
     return TRUE;
 }
@@ -1089,7 +1089,7 @@ static BOOL FieldAcmdTCB_JumpRight1G16F(FieldActor *actor) {
     return TRUE;
 }
 
-static BOOL func_ov036_0218f9c8(FieldActor *actor) {
+static BOOL FieldAcmdTCB_JumpLeft3G12F(FieldActor *actor) {
     FieldAcmdTCB_JumpInitWithSe(actor, DIR_LEFT, 0x4000, 12, 3, 0, 0x140);
     return TRUE;
 }
@@ -1099,7 +1099,7 @@ static BOOL FieldAcmdTCB_JumpRight3G12F(FieldActor *actor) {
     return TRUE;
 }
 
-static BOOL func_ov036_0218fa10(FieldActor *actor) {
+static BOOL FieldAcmdTCB_JumpUp3G24FNoSe(FieldActor *actor) {
     FieldAcmdTCB_JumpInit(actor, DIR_UP, 0x2000, 24, 3, 0, 0xa0, 0);
     return TRUE;
 }
@@ -1137,12 +1137,12 @@ static BOOL FieldAcmdTCB_WaitMove(FieldActor *actor) {
     return TRUE;
 }
 
-static BOOL func_ov036_0218fad8(FieldActor *actor) {
+static BOOL FieldAcmdTCB_Wait1F(FieldActor *actor) {
     FieldAcmdTCB_WaitInit(actor, 1);
     return TRUE;
 }
 
-static BOOL func_ov036_0218fae4(FieldActor *actor) {
+static BOOL FieldAcmdTCB_Wait2F(FieldActor *actor) {
     FieldAcmdTCB_WaitInit(actor, 2);
     return TRUE;
 }
@@ -1225,43 +1225,43 @@ static BOOL FieldAcmdTCB_FallMove(FieldActor *actor) {
     return TRUE;
 }
 
-static BOOL func_ov036_0218fc14(FieldActor *actor) {
+static BOOL FieldAcmdTCB_SetHiddenFlag(FieldActor *actor) {
     SetActorFlag(actor, 4);
     FieldActor_NextAcmdState(actor);
     return TRUE;
 }
 
-static BOOL func_ov036_0218fc28(FieldActor *actor) {
+static BOOL FieldAcmdTCB_ClearHiddenFlag(FieldActor *actor) {
     ClearActorFlag(actor, 4);
     FieldActor_NextAcmdState(actor);
     return TRUE;
 }
 
-static BOOL func_ov036_0218fc3c(FieldActor *actor) {
+static BOOL FieldAcmdTCB_SetFaceDirLockFlag(FieldActor *actor) {
     SetActorFlag(actor, 8);
     FieldActor_NextAcmdState(actor);
     return TRUE;
 }
 
-static BOOL func_ov036_0218fc50(FieldActor *actor) {
+static BOOL FieldAcmdTCB_ClearFaceDirLockFlag(FieldActor *actor) {
     ClearActorFlag(actor, 8);
     FieldActor_NextAcmdState(actor);
     return TRUE;
 }
 
-static BOOL func_ov036_0218fc64(FieldActor *actor) {
+static BOOL FieldAcmdTCB_SetAnimePauseFlag(FieldActor *actor) {
     SetActorFlag(actor, 16);
     FieldActor_NextAcmdState(actor);
     return TRUE;
 }
 
-static BOOL func_ov036_0218fc78(FieldActor *actor) {
+static BOOL FieldAcmdTCB_ClearAnimePauseFlag(FieldActor *actor) {
     ClearActorFlag(actor, 16);
     FieldActor_NextAcmdState(actor);
     return TRUE;
 }
 
-static void func_ov036_0218fc8c(FieldActor *actor, u32 kind, u32 unused, BOOL playSE) {
+static void FieldAcmdTCB_MarkWaitInit(FieldActor *actor, u32 kind, u32 unused, BOOL playSE) {
     AcmdEffectWork *work = FldAct_InitMoveCmdWork(actor, 8);
 
     work->kind = kind;
@@ -1281,43 +1281,43 @@ static BOOL FieldAcmdTCB_MarkWait(FieldActor *actor) {
     return FALSE;
 }
 
-static BOOL func_ov036_0218fce8(FieldActor *actor) {
-    func_ov036_0218fc8c(actor, 0, 0, TRUE);
+static BOOL FieldAcmdTCB_MarkWaitExcl(FieldActor *actor) {
+    FieldAcmdTCB_MarkWaitInit(actor, 0, 0, TRUE);
     return FALSE;
 }
 
-static BOOL func_ov036_0218fcf8(FieldActor *actor) {
-    func_ov036_0218fc8c(actor, 0, 0, FALSE);
+static BOOL FieldAcmdTCB_MarkWaitExclNoSe(FieldActor *actor) {
+    FieldAcmdTCB_MarkWaitInit(actor, 0, 0, FALSE);
     return FALSE;
 }
 
-static BOOL func_ov036_0218fd08(FieldActor *actor) {
-    func_ov036_0218fc8c(actor, 2, 0, FALSE);
+static BOOL FieldAcmdTCB_MarkWaitNoteNoSe(FieldActor *actor) {
+    FieldAcmdTCB_MarkWaitInit(actor, 2, 0, FALSE);
     return FALSE;
 }
 
 static BOOL func_ov036_0218fd18(FieldActor *actor) {
-    func_ov036_0218fc8c(actor, 0, 0, TRUE);
+    FieldAcmdTCB_MarkWaitInit(actor, 0, 0, TRUE);
     return FALSE;
 }
 
 static BOOL func_ov036_0218fd28(FieldActor *actor) {
-    func_ov036_0218fc8c(actor, 0, 0, TRUE);
+    FieldAcmdTCB_MarkWaitInit(actor, 0, 0, TRUE);
     return FALSE;
 }
 
-static BOOL func_ov036_0218fd38(FieldActor *actor) {
-    func_ov036_0218fc8c(actor, 1, 0, TRUE);
+static BOOL FieldAcmdTCB_MarkWaitQuestion(FieldActor *actor) {
+    FieldAcmdTCB_MarkWaitInit(actor, 1, 0, TRUE);
     return FALSE;
 }
 
-static BOOL func_ov036_0218fd48(FieldActor *actor) {
-    func_ov036_0218fc8c(actor, 2, 0, TRUE);
+static BOOL FieldAcmdTCB_MarkWaitNote(FieldActor *actor) {
+    FieldAcmdTCB_MarkWaitInit(actor, 2, 0, TRUE);
     return FALSE;
 }
 
-static BOOL func_ov036_0218fd58(FieldActor *actor) {
-    func_ov036_0218fc8c(actor, 3, 0, TRUE);
+static BOOL FieldAcmdTCB_MarkWaitEllipsis(FieldActor *actor) {
+    FieldAcmdTCB_MarkWaitInit(actor, 3, 0, TRUE);
     return FALSE;
 }
 
@@ -1390,123 +1390,123 @@ static BOOL FieldAcmdTCB_DashRight6F(FieldActor *actor) {
     return TRUE;
 }
 
-static BOOL func_ov036_0218fe84(FieldActor *actor) {
+static BOOL FieldAcmdTCB_Walk6FMove(FieldActor *actor) {
     if (FieldAcmdTCB_WalkTableMove(actor, data_ov036_021cb5d4) == TRUE) {
         return TRUE;
     }
     return FALSE;
 }
 
-static BOOL func_ov036_0218fe9c(FieldActor *actor) {
+static BOOL FieldAcmdTCB_WalkUp3F(FieldActor *actor) {
     FieldAcmdTCB_WalkTableInit(actor, DIR_UP, 3, 7);
     return TRUE;
 }
 
-static BOOL func_ov036_0218feac(FieldActor *actor) {
+static BOOL FieldAcmdTCB_WalkDown3F(FieldActor *actor) {
     FieldAcmdTCB_WalkTableInit(actor, DIR_DOWN, 3, 7);
     return TRUE;
 }
 
-static BOOL func_ov036_0218febc(FieldActor *actor) {
+static BOOL FieldAcmdTCB_WalkLeft3F(FieldActor *actor) {
     FieldAcmdTCB_WalkTableInit(actor, DIR_LEFT, 3, 7);
     return TRUE;
 }
 
-static BOOL func_ov036_0218fecc(FieldActor *actor) {
+static BOOL FieldAcmdTCB_WalkRight3F(FieldActor *actor) {
     FieldAcmdTCB_WalkTableInit(actor, DIR_RIGHT, 3, 7);
     return TRUE;
 }
 
-static BOOL func_ov036_0218fedc(FieldActor *actor) {
+static BOOL FieldAcmdTCB_Walk3FMove(FieldActor *actor) {
     if (FieldAcmdTCB_WalkTableMove(actor, data_ov036_021cb5b0) == TRUE) {
         return TRUE;
     }
     return FALSE;
 }
 
-static BOOL func_ov036_0218fef4(FieldActor *actor) {
+static BOOL FieldAcmdTCB_WalkUp7F(FieldActor *actor) {
     FieldAcmdTCB_WalkTableInit(actor, DIR_UP, 7, 8);
     return TRUE;
 }
 
-static BOOL func_ov036_0218ff04(FieldActor *actor) {
+static BOOL FieldAcmdTCB_WalkDown7F(FieldActor *actor) {
     FieldAcmdTCB_WalkTableInit(actor, DIR_DOWN, 7, 8);
     return TRUE;
 }
 
-static BOOL func_ov036_0218ff14(FieldActor *actor) {
+static BOOL FieldAcmdTCB_WalkLeft7F(FieldActor *actor) {
     FieldAcmdTCB_WalkTableInit(actor, DIR_LEFT, 7, 8);
     return TRUE;
 }
 
-static BOOL func_ov036_0218ff24(FieldActor *actor) {
+static BOOL FieldAcmdTCB_WalkRight7F(FieldActor *actor) {
     FieldAcmdTCB_WalkTableInit(actor, DIR_RIGHT, 7, 8);
     return TRUE;
 }
 
-static BOOL func_ov036_0218ff34(FieldActor *actor) {
+static BOOL FieldAcmdTCB_Walk7FMove(FieldActor *actor) {
     if (FieldAcmdTCB_WalkTableMove(actor, data_ov036_021cb5ec) == TRUE) {
         return TRUE;
     }
     return FALSE;
 }
 
-static BOOL func_ov036_0218ff4c(FieldActor *actor) {
+static BOOL FieldAcmdTCB_WalkUp12F(FieldActor *actor) {
     FieldAcmdTCB_WalkTableInit(actor, DIR_UP, 12, 9);
     return TRUE;
 }
 
-static BOOL func_ov036_0218ff5c(FieldActor *actor) {
+static BOOL FieldAcmdTCB_WalkDown12F(FieldActor *actor) {
     FieldAcmdTCB_WalkTableInit(actor, DIR_DOWN, 12, 9);
     return TRUE;
 }
 
-static BOOL func_ov036_0218ff6c(FieldActor *actor) {
+static BOOL FieldAcmdTCB_WalkLeft12F(FieldActor *actor) {
     FieldAcmdTCB_WalkTableInit(actor, DIR_LEFT, 12, 9);
     return TRUE;
 }
 
-static BOOL func_ov036_0218ff7c(FieldActor *actor) {
+static BOOL FieldAcmdTCB_WalkRight12F(FieldActor *actor) {
     FieldAcmdTCB_WalkTableInit(actor, DIR_RIGHT, 12, 9);
     return TRUE;
 }
 
-static BOOL func_ov036_0218ff8c(FieldActor *actor) {
+static BOOL FieldAcmdTCB_Walk12FMove(FieldActor *actor) {
     if (FieldAcmdTCB_WalkTableMove(actor, data_ov036_021cb608) == TRUE) {
         return TRUE;
     }
     return FALSE;
 }
 
-static BOOL func_ov036_0218ffa4(FieldActor *actor) {
+static BOOL FieldAcmdTCB_AnimeWaitEndInit10(FieldActor *actor) {
     FldAct_InitMoveCmdWork(actor, 4);
     FldAct_SetDrawStatus(actor, 10);
     FieldActor_NextAcmdState(actor);
     return FALSE;
 }
 
-static BOOL func_ov036_0218ffc0(FieldActor *actor) {
+static BOOL FieldAcmdTCB_AnimeWaitEndInit11(FieldActor *actor) {
     FldAct_InitMoveCmdWork(actor, 4);
     FldAct_SetDrawStatus(actor, 11);
     FieldActor_NextAcmdState(actor);
     return FALSE;
 }
 
-static BOOL func_ov036_0218ffdc(FieldActor *actor) {
+static BOOL FieldAcmdTCB_AnimeWaitEndInit12(FieldActor *actor) {
     FldAct_InitMoveCmdWork(actor, 4);
     FldAct_SetDrawStatus(actor, 12);
     FieldActor_NextAcmdState(actor);
     return FALSE;
 }
 
-static BOOL func_ov036_0218fff8(FieldActor *actor) {
+static BOOL FieldAcmdTCB_AnimeWaitEndInit10Se(FieldActor *actor) {
     GFL_SndSEPlay(SEQ_SE_FLD_152);
-    return func_ov036_0218ffa4(actor);
+    return FieldAcmdTCB_AnimeWaitEndInit10(actor);
 }
 
-static BOOL func_ov036_02190010(FieldActor *actor) {
+static BOOL FieldAcmdTCB_AnimeWaitEndInit11Se(FieldActor *actor) {
     GFL_SndSEPlay(SEQ_SE_FLD_152);
-    return func_ov036_0218ffc0(actor);
+    return FieldAcmdTCB_AnimeWaitEndInit11(actor);
 }
 
 static BOOL FieldAcmdTCB_AnimeWaitEndStop(FieldActor *actor) {
@@ -1608,26 +1608,26 @@ static BOOL FieldAcmdTCB_StayWalk32F40F(FieldActor *actor) {
     return FALSE;
 }
 
-static BOOL func_ov036_021901e8(FieldActor *actor) {
+static BOOL FieldAcmdTCB_StayWalk16F41F(FieldActor *actor) {
     FieldAcmdTCB_StayInit(actor, 2, 41);
     FieldActor_NextAcmdState(actor);
     return FALSE;
 }
 
-static BOOL func_ov036_02190200(FieldActor *actor) {
+static BOOL FieldAcmdTCB_StayIdle8F(FieldActor *actor) {
     FieldAcmdTCB_StayInit(actor, 0, 8);
     FieldActor_NextAcmdState(actor);
     return FALSE;
 }
 
-static BOOL func_ov036_02190218(FieldActor *actor) {
+static BOOL FieldAcmdTCB_StayWalkBobInit(FieldActor *actor) {
     FldAct_InitMoveCmdWork(actor, 4);
     FldAct_SetDrawStatus(actor, 1);
     FieldActor_NextAcmdState(actor);
     return TRUE;
 }
 
-static BOOL func_ov036_02190234(FieldActor *actor) {
+static BOOL FieldAcmdTCB_StayWalkBobMove(FieldActor *actor) {
     VecFx32 offset = { 0, 0, 0 };
     s32 heights[10] = { 0, 0, 0, 0, 0, 0x4000, 0x4000, 0x3000, 0, 0 };
     s32 *work;
@@ -1707,7 +1707,7 @@ static BOOL FieldAcmdTCB_StepDownFaceRight8F(FieldActor *actor) {
     return TRUE;
 }
 
-static BOOL func_ov036_021903f8(FieldActor *actor) {
+static BOOL FieldAcmdTCB_StepLeftFaceDown8F(FieldActor *actor) {
     VecFx32 delta = { 0, 0, FX32_CONST(2) };
 
     FieldAcmdTCB_StepInit(actor, &delta, DIR_DOWN, DIR_LEFT, 8, 3);
@@ -1843,7 +1843,7 @@ static BOOL FieldAcmdTCB_DashStepDownFaceRight4F(FieldActor *actor) {
     return TRUE;
 }
 
-static BOOL func_ov036_021907e0(FieldActor *actor) {
+static BOOL FieldAcmdTCB_DashStepLeftFaceDown4F(FieldActor *actor) {
     VecFx32 step = { 0, 0, 0x4000 };
     FieldAcmdTCB_StepInit(actor, &step, DIR_DOWN, DIR_LEFT, 4, 10);
     return TRUE;
@@ -2038,7 +2038,7 @@ static BOOL FieldAcmdTCB_HopDownFaceRight8F(FieldActor *actor) {
     return TRUE;
 }
 
-static BOOL func_ov036_02190c98(FieldActor *actor) {
+static BOOL FieldAcmdTCB_HopLeftFaceDown8F(FieldActor *actor) {
     FieldAcmdTCB_HopInit(actor, 0x2000, DIR_DOWN, DIR_LEFT, 8, 3, 2, 1, 0);
     return TRUE;
 }
@@ -2104,7 +2104,7 @@ static BOOL FieldAcmdTCB_StayWalk22FMove(FieldActor *actor) {
     return FALSE;
 }
 
-static BOOL func_ov036_02190e60(FieldActor *actor) {
+static BOOL FieldAcmdTCB_SetAnime10(FieldActor *actor) {
     FldAct_SetDrawStatus(actor, 10);
     FieldActor_NextAcmdState(actor);
     return TRUE;
@@ -2145,7 +2145,7 @@ static BOOL FieldAcmdTCB_FlyUpInit(FieldActor *actor) {
     return TRUE;
 }
 
-static BOOL func_ov036_02190f14(FieldActor *actor) {
+static BOOL FieldAcmdTCB_FlyUpMove(FieldActor *actor) {
     LiftWork *work = FldAct_GetMoveCmdWork(actor);
     u16 anim;
     u16 step;
@@ -2194,7 +2194,7 @@ static BOOL func_ov036_0219100c(FieldActor *actor) {
     return TRUE;
 }
 
-static BOOL func_ov036_02191020(FieldActor *actor) {
+static BOOL FieldAcmdTCB_AnimeWaitEndFaceDownInit(FieldActor *actor) {
     FldAct_SetDrawStatus(actor, 11);
     FieldActor_NextAcmdState(actor);
     return FALSE;
@@ -2232,7 +2232,7 @@ static BOOL FieldAcmdTCB_FlyReadyInit(FieldActor *actor) {
     return TRUE;
 }
 
-static BOOL func_ov036_021910f4(FieldActor *actor) {
+static BOOL FieldAcmdTCB_FlyReadyMove(FieldActor *actor) {
     ShiftWork *work = FldAct_GetMoveCmdWork(actor);
     u16 anim;
     u16 step;
@@ -2265,26 +2265,26 @@ static BOOL func_ov036_02191174(FieldActor *actor) {
     return TRUE;
 }
 
-static BOOL func_ov036_02191188(FieldActor *actor) {
+static BOOL FieldAcmdTCB_DrawReadyWaitInit10(FieldActor *actor) {
     FldAct_SetDrawStatus(actor, 10);
     FieldActor_NextAcmdState(actor);
     return FALSE;
 }
 
-static BOOL func_ov036_0219119c(FieldActor *actor) {
+static BOOL FieldAcmdTCB_DrawReadyWaitInit11(FieldActor *actor) {
     FldAct_SetDrawStatus(actor, 11);
     FieldActor_NextAcmdState(actor);
     return FALSE;
 }
 
-static BOOL func_ov036_021911b0(FieldActor *actor) {
+static BOOL FieldAcmdTCB_DrawReadyWaitInit12(FieldActor *actor) {
     FldAct_SetDrawStatus(actor, 12);
     func_ov036_02197288(actor);
     FieldActor_NextAcmdState(actor);
     return FALSE;
 }
 
-static BOOL func_ov036_021911cc(FieldActor *actor) {
+static BOOL FieldAcmdTCB_DrawReadyWaitInit13(FieldActor *actor) {
     FldAct_SetDrawStatus(actor, 13);
     func_ov036_02197288(actor);
     FieldActor_NextAcmdState(actor);
@@ -2313,439 +2313,530 @@ static BOOL FieldAcmdTCB_DrawReadyWait(FieldActor *actor) {
 // functions (then update functions, for a shared start), except commands 88-91 (their index in
 // ACTOR_ACTION_COMMAND_TABLES), which follow command 83's table, 117-120, which follow 152's, and 153-158, which follow
 // 144's. The tables the functions read come last, declared at the top.
-const ActorAcmdFunc ACMD_DIR_TABLE[] = { func_ov036_0218f0d0, func_ov036_0218f09c };
+const ActorAcmdFunc ACMD_DIR_TABLE[] = { FieldAcmdTCB_FaceUp, FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cad0c[] = { func_ov036_0218f0dc, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cad0c[] = { FieldAcmdTCB_FaceDown, FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cad14[] = { func_ov036_0218f0e8, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cad14[] = { FieldAcmdTCB_FaceLeft, FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021caccc[] = { func_ov036_0218f0f4, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021caccc[] = { FieldAcmdTCB_FaceRight, FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc ACMD_WALK32_TABLE[] = { FieldAcmdTCB_WalkUp32F, FieldAcmdTCB_WalkMove, func_ov036_0218f09c };
+const ActorAcmdFunc ACMD_WALK32_TABLE[] = { FieldAcmdTCB_WalkUp32F, FieldAcmdTCB_WalkMove, FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb580[] = { FieldAcmdTCB_WalkDown32F, FieldAcmdTCB_WalkMove, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb580[] = { FieldAcmdTCB_WalkDown32F, FieldAcmdTCB_WalkMove,
+                                              FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb574[] = { FieldAcmdTCB_WalkLeft32F, FieldAcmdTCB_WalkMove, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb574[] = { FieldAcmdTCB_WalkLeft32F, FieldAcmdTCB_WalkMove,
+                                              FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb568[] = { FieldAcmdTCB_WalkRight32F, FieldAcmdTCB_WalkMove, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb568[] = { FieldAcmdTCB_WalkRight32F, FieldAcmdTCB_WalkMove,
+                                              FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc ACMD_WALK16_TABLE[] = { FieldAcmdTCB_WalkUp16F, FieldAcmdTCB_WalkMove, func_ov036_0218f09c };
+const ActorAcmdFunc ACMD_WALK16_TABLE[] = { FieldAcmdTCB_WalkUp16F, FieldAcmdTCB_WalkMove, FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb550[] = { FieldAcmdTCB_WalkDown16F, FieldAcmdTCB_WalkMove, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb550[] = { FieldAcmdTCB_WalkDown16F, FieldAcmdTCB_WalkMove,
+                                              FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb544[] = { FieldAcmdTCB_WalkLeft16F, FieldAcmdTCB_WalkMove, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb544[] = { FieldAcmdTCB_WalkLeft16F, FieldAcmdTCB_WalkMove,
+                                              FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb538[] = { FieldAcmdTCB_WalkRight16F, FieldAcmdTCB_WalkMove, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb538[] = { FieldAcmdTCB_WalkRight16F, FieldAcmdTCB_WalkMove,
+                                              FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc ACMD_WALK8_TABLE[] = { FieldAcmdTCB_WalkUp8F, FieldAcmdTCB_WalkMove, func_ov036_0218f09c };
+const ActorAcmdFunc ACMD_WALK8_TABLE[] = { FieldAcmdTCB_WalkUp8F, FieldAcmdTCB_WalkMove, FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb520[] = { FieldAcmdTCB_WalkDown8F, FieldAcmdTCB_WalkMove, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb520[] = { FieldAcmdTCB_WalkDown8F, FieldAcmdTCB_WalkMove, FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb514[] = { FieldAcmdTCB_WalkLeft8F, FieldAcmdTCB_WalkMove, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb514[] = { FieldAcmdTCB_WalkLeft8F, FieldAcmdTCB_WalkMove, FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb508[] = { FieldAcmdTCB_WalkRight8F, FieldAcmdTCB_WalkMove, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb508[] = { FieldAcmdTCB_WalkRight8F, FieldAcmdTCB_WalkMove,
+                                              FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc ACMD_WALK4_TABLE[] = { FieldAcmdTCB_WalkUp4F, FieldAcmdTCB_WalkMove, func_ov036_0218f09c };
+const ActorAcmdFunc ACMD_WALK4_TABLE[] = { FieldAcmdTCB_WalkUp4F, FieldAcmdTCB_WalkMove, FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb4f0[] = { FieldAcmdTCB_WalkDown4F, FieldAcmdTCB_WalkMove, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb4f0[] = { FieldAcmdTCB_WalkDown4F, FieldAcmdTCB_WalkMove, FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb4e4[] = { FieldAcmdTCB_WalkLeft4F, FieldAcmdTCB_WalkMove, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb4e4[] = { FieldAcmdTCB_WalkLeft4F, FieldAcmdTCB_WalkMove, FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb4d8[] = { FieldAcmdTCB_WalkRight4F, FieldAcmdTCB_WalkMove, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb4d8[] = { FieldAcmdTCB_WalkRight4F, FieldAcmdTCB_WalkMove,
+                                              FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc ACMD_WALK2_TABLE[] = { FieldAcmdTCB_WalkUp2F, FieldAcmdTCB_WalkMove, func_ov036_0218f09c };
+const ActorAcmdFunc ACMD_WALK2_TABLE[] = { FieldAcmdTCB_WalkUp2F, FieldAcmdTCB_WalkMove, FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb4c0[] = { FieldAcmdTCB_WalkDown2F, FieldAcmdTCB_WalkMove, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb4c0[] = { FieldAcmdTCB_WalkDown2F, FieldAcmdTCB_WalkMove, FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb4b4[] = { FieldAcmdTCB_WalkLeft2F, FieldAcmdTCB_WalkMove, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb4b4[] = { FieldAcmdTCB_WalkLeft2F, FieldAcmdTCB_WalkMove, FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb4a8[] = { FieldAcmdTCB_WalkRight2F, FieldAcmdTCB_WalkMove, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb4a8[] = { FieldAcmdTCB_WalkRight2F, FieldAcmdTCB_WalkMove,
+                                              FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb49c[] = { FieldAcmdTCB_WalkUp1F, FieldAcmdTCB_WalkMove, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb49c[] = { FieldAcmdTCB_WalkUp1F, FieldAcmdTCB_WalkMove, FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb490[] = { FieldAcmdTCB_WalkDown1F, FieldAcmdTCB_WalkMove, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb490[] = { FieldAcmdTCB_WalkDown1F, FieldAcmdTCB_WalkMove, FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb484[] = { FieldAcmdTCB_WalkLeft1F, FieldAcmdTCB_WalkMove, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb484[] = { FieldAcmdTCB_WalkLeft1F, FieldAcmdTCB_WalkMove, FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb478[] = { FieldAcmdTCB_WalkRight1F, FieldAcmdTCB_WalkMove, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb478[] = { FieldAcmdTCB_WalkRight1F, FieldAcmdTCB_WalkMove,
+                                              FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc ACMD_TURN32_TABLE[] = { func_ov036_0218f4c0, FieldAcmdTCB_StayWalkMove, func_ov036_0218f09c };
+const ActorAcmdFunc ACMD_TURN32_TABLE[] = { FieldAcmdTCB_StayWalkUp32F, FieldAcmdTCB_StayWalkMove,
+                                            FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb460[] = { func_ov036_0218f4d0, FieldAcmdTCB_StayWalkMove, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb460[] = { FieldAcmdTCB_StayWalkDown32F, FieldAcmdTCB_StayWalkMove,
+                                              FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb454[] = { func_ov036_0218f4e0, FieldAcmdTCB_StayWalkMove, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb454[] = { FieldAcmdTCB_StayWalkLeft32F, FieldAcmdTCB_StayWalkMove,
+                                              FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb448[] = { func_ov036_0218f4f0, FieldAcmdTCB_StayWalkMove, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb448[] = { FieldAcmdTCB_StayWalkRight32F, FieldAcmdTCB_StayWalkMove,
+                                              FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc ACMD_TURN16_TABLE[] = { func_ov036_0218f500, FieldAcmdTCB_StayWalkMove, func_ov036_0218f09c };
+const ActorAcmdFunc ACMD_TURN16_TABLE[] = { FieldAcmdTCB_StayWalkUp16F, FieldAcmdTCB_StayWalkMove,
+                                            FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb430[] = { func_ov036_0218f510, FieldAcmdTCB_StayWalkMove, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb430[] = { FieldAcmdTCB_StayWalkDown16F, FieldAcmdTCB_StayWalkMove,
+                                              FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb424[] = { func_ov036_0218f520, FieldAcmdTCB_StayWalkMove, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb424[] = { FieldAcmdTCB_StayWalkLeft16F, FieldAcmdTCB_StayWalkMove,
+                                              FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb418[] = { func_ov036_0218f530, FieldAcmdTCB_StayWalkMove, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb418[] = { FieldAcmdTCB_StayWalkRight16F, FieldAcmdTCB_StayWalkMove,
+                                              FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc ACMD_TURN8_TABLE[] = { func_ov036_0218f540, FieldAcmdTCB_StayWalkMove, func_ov036_0218f09c };
+const ActorAcmdFunc ACMD_TURN8_TABLE[] = { FieldAcmdTCB_StayWalkUp8F, FieldAcmdTCB_StayWalkMove,
+                                           FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb400[] = { func_ov036_0218f550, FieldAcmdTCB_StayWalkMove, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb400[] = { FieldAcmdTCB_StayWalkDown8F, FieldAcmdTCB_StayWalkMove,
+                                              FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb3f4[] = { func_ov036_0218f560, FieldAcmdTCB_StayWalkMove, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb3f4[] = { FieldAcmdTCB_StayWalkLeft8F, FieldAcmdTCB_StayWalkMove,
+                                              FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb3e8[] = { func_ov036_0218f570, FieldAcmdTCB_StayWalkMove, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb3e8[] = { FieldAcmdTCB_StayWalkRight8F, FieldAcmdTCB_StayWalkMove,
+                                              FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc ACMD_TURN4_TABLE[] = { func_ov036_0218f580, FieldAcmdTCB_StayWalkMove, func_ov036_0218f09c };
+const ActorAcmdFunc ACMD_TURN4_TABLE[] = { FieldAcmdTCB_StayWalkUp4F, FieldAcmdTCB_StayWalkMove,
+                                           FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb010[] = { func_ov036_0218f590, FieldAcmdTCB_StayWalkMove, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb010[] = { FieldAcmdTCB_StayWalkDown4F, FieldAcmdTCB_StayWalkMove,
+                                              FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb3c4[] = { func_ov036_0218f5a0, FieldAcmdTCB_StayWalkMove, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb3c4[] = { FieldAcmdTCB_StayWalkLeft4F, FieldAcmdTCB_StayWalkMove,
+                                              FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb3b8[] = { func_ov036_0218f5b0, FieldAcmdTCB_StayWalkMove, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb3b8[] = { FieldAcmdTCB_StayWalkRight4F, FieldAcmdTCB_StayWalkMove,
+                                              FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc ACMD_TURN2_TABLE[] = { func_ov036_0218f5c0, FieldAcmdTCB_StayWalkMove, func_ov036_0218f09c };
+const ActorAcmdFunc ACMD_TURN2_TABLE[] = { FieldAcmdTCB_StayWalkUp2F, FieldAcmdTCB_StayWalkMove,
+                                           FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb3a0[] = { func_ov036_0218f5d0, FieldAcmdTCB_StayWalkMove, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb3a0[] = { FieldAcmdTCB_StayWalkDown2F, FieldAcmdTCB_StayWalkMove,
+                                              FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb394[] = { func_ov036_0218f5e0, FieldAcmdTCB_StayWalkMove, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb394[] = { FieldAcmdTCB_StayWalkLeft2F, FieldAcmdTCB_StayWalkMove,
+                                              FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb388[] = { func_ov036_0218f5f0, FieldAcmdTCB_StayWalkMove, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb388[] = { FieldAcmdTCB_StayWalkRight2F, FieldAcmdTCB_StayWalkMove,
+                                              FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc ACMD_JUMP16F[] = { FieldAcmdTCB_StayJumpUp16F, FieldAcmdTCB_JumpMove, func_ov036_0218f09c };
+const ActorAcmdFunc ACMD_JUMP16F[] = { FieldAcmdTCB_StayJumpUp16F, FieldAcmdTCB_JumpMove, FieldAcmdTCB_SetAcmdEnd };
 
 const ActorAcmdFunc data_ov036_021cb370[] = { FieldAcmdTCB_StayJumpDown16F, FieldAcmdTCB_JumpMove,
-                                              func_ov036_0218f09c };
+                                              FieldAcmdTCB_SetAcmdEnd };
 
 const ActorAcmdFunc data_ov036_021cb364[] = { FieldAcmdTCB_StayJumpLeft16F, FieldAcmdTCB_JumpMove,
-                                              func_ov036_0218f09c };
+                                              FieldAcmdTCB_SetAcmdEnd };
 
 const ActorAcmdFunc data_ov036_021cb358[] = { FieldAcmdTCB_StayJumpRight16F, FieldAcmdTCB_JumpMove,
-                                              func_ov036_0218f09c };
+                                              FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc ACMD_JUMP8F[] = { FieldAcmdTCB_StayJumpUp8F, FieldAcmdTCB_JumpMove, func_ov036_0218f09c };
+const ActorAcmdFunc ACMD_JUMP8F[] = { FieldAcmdTCB_StayJumpUp8F, FieldAcmdTCB_JumpMove, FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb340[] = { FieldAcmdTCB_StayJumpDown8F, FieldAcmdTCB_JumpMove, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb340[] = { FieldAcmdTCB_StayJumpDown8F, FieldAcmdTCB_JumpMove,
+                                              FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb334[] = { FieldAcmdTCB_StayJumpLeft8F, FieldAcmdTCB_JumpMove, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb334[] = { FieldAcmdTCB_StayJumpLeft8F, FieldAcmdTCB_JumpMove,
+                                              FieldAcmdTCB_SetAcmdEnd };
 
 const ActorAcmdFunc data_ov036_021cb328[] = { FieldAcmdTCB_StayJumpRight8F, FieldAcmdTCB_JumpMove,
-                                              func_ov036_0218f09c };
+                                              FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb31c[] = { func_ov036_0218f878, FieldAcmdTCB_JumpMove, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb31c[] = { FieldAcmdTCB_JumpUp1G8F, FieldAcmdTCB_JumpMove, FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb310[] = { func_ov036_0218f898, FieldAcmdTCB_JumpMove, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb310[] = { FieldAcmdTCB_JumpDown1G8F, FieldAcmdTCB_JumpMove,
+                                              FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb304[] = { func_ov036_0218f8bc, FieldAcmdTCB_JumpMove, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb304[] = { FieldAcmdTCB_JumpLeft1G8F, FieldAcmdTCB_JumpMove,
+                                              FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb2f8[] = { func_ov036_0218f8e0, FieldAcmdTCB_JumpMove, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb2f8[] = { FieldAcmdTCB_JumpRight1G8F, FieldAcmdTCB_JumpMove,
+                                              FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb2ec[] = { func_ov036_0218f900, FieldAcmdTCB_JumpMove, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb2ec[] = { FieldAcmdTCB_JumpUp2G16F, FieldAcmdTCB_JumpMove,
+                                              FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb2e0[] = { func_ov036_0218f920, FieldAcmdTCB_JumpMove, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb2e0[] = { FieldAcmdTCB_JumpDown2G16F, FieldAcmdTCB_JumpMove,
+                                              FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb2d4[] = { func_ov036_0218f944, FieldAcmdTCB_JumpMove, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb2d4[] = { FieldAcmdTCB_JumpLeft2G16F, FieldAcmdTCB_JumpMove,
+                                              FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb2c8[] = { func_ov036_0218f964, FieldAcmdTCB_JumpMove, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb2c8[] = { FieldAcmdTCB_JumpRight2G16F, FieldAcmdTCB_JumpMove,
+                                              FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc ACMD_JUMP3G16F_TABLE[] = { func_ov036_0218f988, FieldAcmdTCB_JumpMove, func_ov036_0218f09c };
+const ActorAcmdFunc ACMD_JUMP3G16F_TABLE[] = { FieldAcmdTCB_JumpLeft1G16F, FieldAcmdTCB_JumpMove,
+                                               FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb1e4[] = { FieldAcmdTCB_JumpRight1G16F, FieldAcmdTCB_JumpMove, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb1e4[] = { FieldAcmdTCB_JumpRight1G16F, FieldAcmdTCB_JumpMove,
+                                              FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb2a4[] = { func_ov036_0218f9c8, FieldAcmdTCB_JumpMove, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb2a4[] = { FieldAcmdTCB_JumpLeft3G12F, FieldAcmdTCB_JumpMove,
+                                              FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb298[] = { FieldAcmdTCB_JumpRight3G12F, FieldAcmdTCB_JumpMove, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb298[] = { FieldAcmdTCB_JumpRight3G12F, FieldAcmdTCB_JumpMove,
+                                              FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb28c[] = { func_ov036_0218fad8, FieldAcmdTCB_WaitMove, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb28c[] = { FieldAcmdTCB_Wait1F, FieldAcmdTCB_WaitMove, FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb280[] = { func_ov036_0218fae4, FieldAcmdTCB_WaitMove, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb280[] = { FieldAcmdTCB_Wait2F, FieldAcmdTCB_WaitMove, FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb250[] = { FieldAcmdTCB_Wait4F, FieldAcmdTCB_WaitMove, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb250[] = { FieldAcmdTCB_Wait4F, FieldAcmdTCB_WaitMove, FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb25c[] = { FieldAcmdTCB_Wait8F, FieldAcmdTCB_WaitMove, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb25c[] = { FieldAcmdTCB_Wait8F, FieldAcmdTCB_WaitMove, FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb274[] = { FieldAcmdTCB_Wait15F, FieldAcmdTCB_WaitMove, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb274[] = { FieldAcmdTCB_Wait15F, FieldAcmdTCB_WaitMove, FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb2b0[] = { FieldAcmdTCB_Wait16F, FieldAcmdTCB_WaitMove, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb2b0[] = { FieldAcmdTCB_Wait16F, FieldAcmdTCB_WaitMove, FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb244[] = { FieldAcmdTCB_Wait32F, FieldAcmdTCB_WaitMove, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb244[] = { FieldAcmdTCB_Wait32F, FieldAcmdTCB_WaitMove, FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb238[] = { FieldAcmdTCB_RiseInit, FieldAcmdTCB_RiseMove, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb238[] = { FieldAcmdTCB_RiseInit, FieldAcmdTCB_RiseMove, FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb22c[] = { FieldAcmdTCB_FallInit, FieldAcmdTCB_FallMove, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb22c[] = { FieldAcmdTCB_FallInit, FieldAcmdTCB_FallMove, FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cad04[] = { func_ov036_0218fc14, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cad04[] = { FieldAcmdTCB_SetHiddenFlag, FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cacec[] = { func_ov036_0218fc28, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cacec[] = { FieldAcmdTCB_ClearHiddenFlag, FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cacac[] = { func_ov036_0218fc3c, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cacac[] = { FieldAcmdTCB_SetFaceDirLockFlag, FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cacdc[] = { func_ov036_0218fc50, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cacdc[] = { FieldAcmdTCB_ClearFaceDirLockFlag, FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cacd4[] = { func_ov036_0218fc64, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cacd4[] = { FieldAcmdTCB_SetAnimePauseFlag, FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cacfc[] = { func_ov036_0218fc78, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cacfc[] = { FieldAcmdTCB_ClearAnimePauseFlag, FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cadb8[] = { func_ov036_0218fce8, FieldAcmdTCB_MarkWait, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cadb8[] = { FieldAcmdTCB_MarkWaitExcl, FieldAcmdTCB_MarkWait,
+                                              FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cad28[] = { func_ov036_0218fcf8, FieldAcmdTCB_MarkWait, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cad28[] = { FieldAcmdTCB_MarkWaitExclNoSe, FieldAcmdTCB_MarkWait,
+                                              FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb1c0[] = { func_ov036_0218fd08, FieldAcmdTCB_MarkWait, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb1c0[] = { FieldAcmdTCB_MarkWaitNoteNoSe, FieldAcmdTCB_MarkWait,
+                                              FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb1b4[] = { func_ov036_0218fd18, FieldAcmdTCB_MarkWait, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb1b4[] = { func_ov036_0218fd18, FieldAcmdTCB_MarkWait, FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb1a8[] = { func_ov036_0218fd38, FieldAcmdTCB_MarkWait, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb1a8[] = { FieldAcmdTCB_MarkWaitQuestion, FieldAcmdTCB_MarkWait,
+                                              FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb19c[] = { func_ov036_0218fd48, FieldAcmdTCB_MarkWait, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb19c[] = { FieldAcmdTCB_MarkWaitNote, FieldAcmdTCB_MarkWait,
+                                              FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb190[] = { func_ov036_0218fd58, FieldAcmdTCB_MarkWait, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb190[] = { FieldAcmdTCB_MarkWaitEllipsis, FieldAcmdTCB_MarkWait,
+                                              FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb184[] = { FieldAcmdTCB_WalkUp6F, func_ov036_0218fe84, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb184[] = { FieldAcmdTCB_WalkUp6F, FieldAcmdTCB_Walk6FMove, FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb178[] = { FieldAcmdTCB_WalkDown6F, func_ov036_0218fe84, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb178[] = { FieldAcmdTCB_WalkDown6F, FieldAcmdTCB_Walk6FMove,
+                                              FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb16c[] = { FieldAcmdTCB_WalkLeft6F, func_ov036_0218fe84, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb16c[] = { FieldAcmdTCB_WalkLeft6F, FieldAcmdTCB_Walk6FMove,
+                                              FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb160[] = { FieldAcmdTCB_WalkRight6F, func_ov036_0218fe84, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb160[] = { FieldAcmdTCB_WalkRight6F, FieldAcmdTCB_Walk6FMove,
+                                              FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb154[] = { FieldAcmdTCB_DashUp6F, func_ov036_0218fe84, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb154[] = { FieldAcmdTCB_DashUp6F, FieldAcmdTCB_Walk6FMove, FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb148[] = { FieldAcmdTCB_DashDown6F, func_ov036_0218fe84, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb148[] = { FieldAcmdTCB_DashDown6F, FieldAcmdTCB_Walk6FMove,
+                                              FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb13c[] = { FieldAcmdTCB_DashLeft6F, func_ov036_0218fe84, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb13c[] = { FieldAcmdTCB_DashLeft6F, FieldAcmdTCB_Walk6FMove,
+                                              FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021caec0[] = { FieldAcmdTCB_DashRight6F, func_ov036_0218fe84, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021caec0[] = { FieldAcmdTCB_DashRight6F, FieldAcmdTCB_Walk6FMove,
+                                              FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb124[] = { func_ov036_0218fe9c, func_ov036_0218fedc, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb124[] = { FieldAcmdTCB_WalkUp3F, FieldAcmdTCB_Walk3FMove, FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb118[] = { func_ov036_0218feac, func_ov036_0218fedc, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb118[] = { FieldAcmdTCB_WalkDown3F, FieldAcmdTCB_Walk3FMove,
+                                              FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb10c[] = { func_ov036_0218febc, func_ov036_0218fedc, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb10c[] = { FieldAcmdTCB_WalkLeft3F, FieldAcmdTCB_Walk3FMove,
+                                              FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb100[] = { func_ov036_0218fecc, func_ov036_0218fedc, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb100[] = { FieldAcmdTCB_WalkRight3F, FieldAcmdTCB_Walk3FMove,
+                                              FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc ACMD_RUN4F_TABLE[] = { FieldAcmdTCB_DashUp4F, FieldAcmdTCB_WalkMove, func_ov036_0218f09c };
+const ActorAcmdFunc ACMD_RUN4F_TABLE[] = { FieldAcmdTCB_DashUp4F, FieldAcmdTCB_WalkMove, FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb0e8[] = { FieldAcmdTCB_DashDown4F, FieldAcmdTCB_WalkMove, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb0e8[] = { FieldAcmdTCB_DashDown4F, FieldAcmdTCB_WalkMove, FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb0dc[] = { FieldAcmdTCB_DashLeft4F, FieldAcmdTCB_WalkMove, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb0dc[] = { FieldAcmdTCB_DashLeft4F, FieldAcmdTCB_WalkMove, FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb0d0[] = { FieldAcmdTCB_DashRight4F, FieldAcmdTCB_WalkMove, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb0d0[] = { FieldAcmdTCB_DashRight4F, FieldAcmdTCB_WalkMove,
+                                              FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb0c4[] = { func_ov036_0218fef4, func_ov036_0218ff34, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb0c4[] = { FieldAcmdTCB_WalkUp7F, FieldAcmdTCB_Walk7FMove, FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb0b8[] = { func_ov036_0218ff04, func_ov036_0218ff34, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb0b8[] = { FieldAcmdTCB_WalkDown7F, FieldAcmdTCB_Walk7FMove,
+                                              FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb0ac[] = { func_ov036_0218ff14, func_ov036_0218ff34, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb0ac[] = { FieldAcmdTCB_WalkLeft7F, FieldAcmdTCB_Walk7FMove,
+                                              FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb0a0[] = { func_ov036_0218ff24, func_ov036_0218ff34, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb0a0[] = { FieldAcmdTCB_WalkRight7F, FieldAcmdTCB_Walk7FMove,
+                                              FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb094[] = { func_ov036_0218ff4c, func_ov036_0218ff8c, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb094[] = { FieldAcmdTCB_WalkUp12F, FieldAcmdTCB_Walk12FMove,
+                                              FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb088[] = { func_ov036_0218ff5c, func_ov036_0218ff8c, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb088[] = { FieldAcmdTCB_WalkDown12F, FieldAcmdTCB_Walk12FMove,
+                                              FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb07c[] = { func_ov036_0218ff6c, func_ov036_0218ff8c, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb07c[] = { FieldAcmdTCB_WalkLeft12F, FieldAcmdTCB_Walk12FMove,
+                                              FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb070[] = { func_ov036_0218ff7c, func_ov036_0218ff8c, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb070[] = { FieldAcmdTCB_WalkRight12F, FieldAcmdTCB_Walk12FMove,
+                                              FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb064[] = { func_ov036_0218ffa4, FieldAcmdTCB_AnimeWaitEndStop, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb064[] = { FieldAcmdTCB_AnimeWaitEndInit10, FieldAcmdTCB_AnimeWaitEndStop,
+                                              FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb058[] = { func_ov036_0218ffa4, FieldAcmdTCB_AnimeWaitEnd, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb058[] = { FieldAcmdTCB_AnimeWaitEndInit10, FieldAcmdTCB_AnimeWaitEnd,
+                                              FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb04c[] = { func_ov036_0218ffc0, FieldAcmdTCB_AnimeWaitEndStop, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb04c[] = { FieldAcmdTCB_AnimeWaitEndInit11, FieldAcmdTCB_AnimeWaitEndStop,
+                                              FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb040[] = { func_ov036_0218ffc0, FieldAcmdTCB_AnimeWaitEnd, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb040[] = { FieldAcmdTCB_AnimeWaitEndInit11, FieldAcmdTCB_AnimeWaitEnd,
+                                              FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb034[] = { func_ov036_0218ffdc, FieldAcmdTCB_AnimeWaitEndStop, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb034[] = { FieldAcmdTCB_AnimeWaitEndInit12, FieldAcmdTCB_AnimeWaitEndStop,
+                                              FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb028[] = { func_ov036_0218ffdc, FieldAcmdTCB_AnimeWaitEnd, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb028[] = { FieldAcmdTCB_AnimeWaitEndInit12, FieldAcmdTCB_AnimeWaitEnd,
+                                              FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb01c[] = { func_ov036_0218fff8, FieldAcmdTCB_AnimeWaitEndStop, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb01c[] = { FieldAcmdTCB_AnimeWaitEndInit10Se, FieldAcmdTCB_AnimeWaitEndStop,
+                                              FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cae30[] = { func_ov036_02190010, FieldAcmdTCB_AnimeWaitEndStop, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cae30[] = { FieldAcmdTCB_AnimeWaitEndInit11Se, FieldAcmdTCB_AnimeWaitEndStop,
+                                              FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb004[] = { FieldAcmdTCB_HideOffInit, FieldAcmdTCB_HideOffMove, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb004[] = { FieldAcmdTCB_HideOffInit, FieldAcmdTCB_HideOffMove,
+                                              FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021caff8[] = { FieldAcmdTCB_StayWalk32F40F, FieldAcmdTCB_StayMove, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021caff8[] = { FieldAcmdTCB_StayWalk32F40F, FieldAcmdTCB_StayMove,
+                                              FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cafec[] = { func_ov036_021901e8, FieldAcmdTCB_StayMove, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cafec[] = { FieldAcmdTCB_StayWalk16F41F, FieldAcmdTCB_StayMove,
+                                              FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cafe0[] = { func_ov036_02190200, FieldAcmdTCB_StayMove, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cafe0[] = { FieldAcmdTCB_StayIdle8F, FieldAcmdTCB_StayMove, FieldAcmdTCB_SetAcmdEnd };
 
 const ActorAcmdFunc data_ov036_021cafd4[] = { FieldAcmdTCB_StepUpFaceLeft8F, FieldAcmdTCB_StepMove,
-                                              func_ov036_0218f09c };
+                                              FieldAcmdTCB_SetAcmdEnd };
 
 const ActorAcmdFunc data_ov036_021cafc8[] = { FieldAcmdTCB_StepDownFaceRight8F, FieldAcmdTCB_StepMove,
-                                              func_ov036_0218f09c };
+                                              FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cafbc[] = { func_ov036_021903f8, FieldAcmdTCB_StepMove, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cafbc[] = { FieldAcmdTCB_StepLeftFaceDown8F, FieldAcmdTCB_StepMove,
+                                              FieldAcmdTCB_SetAcmdEnd };
 
 const ActorAcmdFunc data_ov036_021cafb0[] = { FieldAcmdTCB_StepRightFaceUp8F, FieldAcmdTCB_StepMove,
-                                              func_ov036_0218f09c };
+                                              FieldAcmdTCB_SetAcmdEnd };
 
 const ActorAcmdFunc data_ov036_021caf80[] = { FieldAcmdTCB_StepUpFaceRight8F, FieldAcmdTCB_StepMove,
-                                              func_ov036_0218f09c };
+                                              FieldAcmdTCB_SetAcmdEnd };
 
 const ActorAcmdFunc data_ov036_021caf8c[] = { FieldAcmdTCB_StepDownFaceLeft8F, FieldAcmdTCB_StepMove,
-                                              func_ov036_0218f09c };
+                                              FieldAcmdTCB_SetAcmdEnd };
 
 const ActorAcmdFunc data_ov036_021cafa4[] = { FieldAcmdTCB_StepLeftFaceUp8F, FieldAcmdTCB_StepMove,
-                                              func_ov036_0218f09c };
+                                              FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb1f0[] = { func_ov036_021904f4, FieldAcmdTCB_StepMove, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb1f0[] = { func_ov036_021904f4, FieldAcmdTCB_StepMove, FieldAcmdTCB_SetAcmdEnd };
 
 const ActorAcmdFunc data_ov036_021cb208[] = { FieldAcmdTCB_StepUpFaceDown8F, FieldAcmdTCB_StepMove,
-                                              func_ov036_0218f09c };
+                                              FieldAcmdTCB_SetAcmdEnd };
 
 const ActorAcmdFunc data_ov036_021cb214[] = { FieldAcmdTCB_StepDownFaceUp8F, FieldAcmdTCB_StepMove,
-                                              func_ov036_0218f09c };
+                                              FieldAcmdTCB_SetAcmdEnd };
 
 const ActorAcmdFunc data_ov036_021cb268[] = { FieldAcmdTCB_StepLeftFaceRight8F, FieldAcmdTCB_StepMove,
-                                              func_ov036_0218f09c };
+                                              FieldAcmdTCB_SetAcmdEnd };
 
 const ActorAcmdFunc data_ov036_021cb3d0[] = { FieldAcmdTCB_StepRightFaceLeft8F, FieldAcmdTCB_StepMove,
-                                              func_ov036_0218f09c };
+                                              FieldAcmdTCB_SetAcmdEnd };
 
 const ActorAcmdFunc data_ov036_021caf44[] = { FieldAcmdTCB_StepUpFaceDown4F, FieldAcmdTCB_StepMove,
-                                              func_ov036_0218f09c };
+                                              FieldAcmdTCB_SetAcmdEnd };
 
 const ActorAcmdFunc data_ov036_021caf38[] = { FieldAcmdTCB_StepDownFaceUp4F, FieldAcmdTCB_StepMove,
-                                              func_ov036_0218f09c };
+                                              FieldAcmdTCB_SetAcmdEnd };
 
 const ActorAcmdFunc data_ov036_021caf2c[] = { FieldAcmdTCB_StepLeftFaceRight4F, FieldAcmdTCB_StepMove,
-                                              func_ov036_0218f09c };
+                                              FieldAcmdTCB_SetAcmdEnd };
 
 const ActorAcmdFunc data_ov036_021cadc4[] = { FieldAcmdTCB_StepRightFaceLeft4F, FieldAcmdTCB_StepMove,
-                                              func_ov036_0218f09c };
+                                              FieldAcmdTCB_SetAcmdEnd };
 
 const ActorAcmdFunc data_ov036_021cb1d8[] = { FieldAcmdTCB_StepUpFaceDown2F, FieldAcmdTCB_StepMove,
-                                              func_ov036_0218f09c };
+                                              FieldAcmdTCB_SetAcmdEnd };
 
 const ActorAcmdFunc data_ov036_021cb1cc[] = { FieldAcmdTCB_StepDownFaceUp2F, FieldAcmdTCB_StepMove,
-                                              func_ov036_0218f09c };
+                                              FieldAcmdTCB_SetAcmdEnd };
 
 const ActorAcmdFunc data_ov036_021caefc[] = { FieldAcmdTCB_StepLeftFaceRight2F, FieldAcmdTCB_StepMove,
-                                              func_ov036_0218f09c };
+                                              FieldAcmdTCB_SetAcmdEnd };
 
 const ActorAcmdFunc data_ov036_021caef0[] = { FieldAcmdTCB_StepRightFaceLeft2F, FieldAcmdTCB_StepMove,
-                                              func_ov036_0218f09c };
+                                              FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021caee4[] = { func_ov036_0218fa10, FieldAcmdTCB_JumpMove, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021caee4[] = { FieldAcmdTCB_JumpUp3G24FNoSe, FieldAcmdTCB_JumpMove,
+                                              FieldAcmdTCB_SetAcmdEnd };
 
 const ActorAcmdFunc data_ov036_021caed8[] = { FieldAcmdTCB_JumpDown3G24FNoSe, FieldAcmdTCB_JumpMove,
-                                              func_ov036_0218f09c };
+                                              FieldAcmdTCB_SetAcmdEnd };
 
 const ActorAcmdFunc data_ov036_021caecc[] = { FieldAcmdTCB_JumpLeft3G24FNoSe, FieldAcmdTCB_JumpMove,
-                                              func_ov036_0218f09c };
+                                              FieldAcmdTCB_SetAcmdEnd };
 
 const ActorAcmdFunc data_ov036_021cad94[] = { FieldAcmdTCB_JumpRight3G24FNoSe, FieldAcmdTCB_JumpMove,
-                                              func_ov036_0218f09c };
+                                              FieldAcmdTCB_SetAcmdEnd };
 
 const ActorAcmdFunc data_ov036_021caeb4[] = { FieldAcmdTCB_DashStepUpFaceLeft4F, FieldAcmdTCB_StepMove,
-                                              func_ov036_0218f09c };
+                                              FieldAcmdTCB_SetAcmdEnd };
 
 const ActorAcmdFunc data_ov036_021caea8[] = { FieldAcmdTCB_DashStepDownFaceRight4F, FieldAcmdTCB_StepMove,
-                                              func_ov036_0218f09c };
+                                              FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cae9c[] = { func_ov036_021907e0, FieldAcmdTCB_StepMove, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cae9c[] = { FieldAcmdTCB_DashStepLeftFaceDown4F, FieldAcmdTCB_StepMove,
+                                              FieldAcmdTCB_SetAcmdEnd };
 
 const ActorAcmdFunc data_ov036_021cae90[] = { FieldAcmdTCB_DashStepRightFaceUp4F, FieldAcmdTCB_StepMove,
-                                              func_ov036_0218f09c };
+                                              FieldAcmdTCB_SetAcmdEnd };
 
 const ActorAcmdFunc data_ov036_021cae84[] = { FieldAcmdTCB_DashStepUpFaceRight4F, FieldAcmdTCB_StepMove,
-                                              func_ov036_0218f09c };
+                                              FieldAcmdTCB_SetAcmdEnd };
 
 const ActorAcmdFunc data_ov036_021cae78[] = { FieldAcmdTCB_DashStepDownFaceLeft4F, FieldAcmdTCB_StepMove,
-                                              func_ov036_0218f09c };
+                                              FieldAcmdTCB_SetAcmdEnd };
 
 const ActorAcmdFunc data_ov036_021cae6c[] = { FieldAcmdTCB_DashStepLeftFaceUp4F, FieldAcmdTCB_StepMove,
-                                              func_ov036_0218f09c };
+                                              FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cae60[] = { func_ov036_021908e4, FieldAcmdTCB_StepMove, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cae60[] = { func_ov036_021908e4, FieldAcmdTCB_StepMove, FieldAcmdTCB_SetAcmdEnd };
 
 const ActorAcmdFunc data_ov036_021cae54[] = { FieldAcmdTCB_DashStepUpFaceDown4F, FieldAcmdTCB_StepMove,
-                                              func_ov036_0218f09c };
+                                              FieldAcmdTCB_SetAcmdEnd };
 
 const ActorAcmdFunc data_ov036_021cae48[] = { FieldAcmdTCB_DashStepDownFaceUp4F, FieldAcmdTCB_StepMove,
-                                              func_ov036_0218f09c };
+                                              FieldAcmdTCB_SetAcmdEnd };
 
 const ActorAcmdFunc data_ov036_021cae3c[] = { FieldAcmdTCB_DashStepLeftFaceRight4F, FieldAcmdTCB_StepMove,
-                                              func_ov036_0218f09c };
+                                              FieldAcmdTCB_SetAcmdEnd };
 
 const ActorAcmdFunc data_ov036_021cae00[] = { FieldAcmdTCB_DashStepRightFaceLeft4F, FieldAcmdTCB_StepMove,
-                                              func_ov036_0218f09c };
+                                              FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cae18[] = { FieldAcmdTCB_HopUpFaceLeft8F, FieldAcmdTCB_HopMove, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cae18[] = { FieldAcmdTCB_HopUpFaceLeft8F, FieldAcmdTCB_HopMove,
+                                              FieldAcmdTCB_SetAcmdEnd };
 
 const ActorAcmdFunc data_ov036_021cae24[] = { FieldAcmdTCB_HopDownFaceRight8F, FieldAcmdTCB_HopMove,
-                                              func_ov036_0218f09c };
+                                              FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021caf50[] = { func_ov036_02190c98, FieldAcmdTCB_HopMove, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021caf50[] = { FieldAcmdTCB_HopLeftFaceDown8F, FieldAcmdTCB_HopMove,
+                                              FieldAcmdTCB_SetAcmdEnd };
 
 const ActorAcmdFunc data_ov036_021caf5c[] = { FieldAcmdTCB_HopRightFaceUp8F, FieldAcmdTCB_HopMove,
-                                              func_ov036_0218f09c };
+                                              FieldAcmdTCB_SetAcmdEnd };
 
 const ActorAcmdFunc data_ov036_021caf98[] = { FieldAcmdTCB_HopUpFaceRight8F, FieldAcmdTCB_HopMove,
-                                              func_ov036_0218f09c };
+                                              FieldAcmdTCB_SetAcmdEnd };
 
 const ActorAcmdFunc data_ov036_021cb1fc[] = { FieldAcmdTCB_HopDownFaceLeft8F, FieldAcmdTCB_HopMove,
-                                              func_ov036_0218f09c };
+                                              FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb220[] = { FieldAcmdTCB_HopLeftFaceUp8F, FieldAcmdTCB_HopMove, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb220[] = { FieldAcmdTCB_HopLeftFaceUp8F, FieldAcmdTCB_HopMove,
+                                              FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb598[] = { func_ov036_02190d60, FieldAcmdTCB_HopMove, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb598[] = { func_ov036_02190d60, FieldAcmdTCB_HopMove, FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cadd0[] = { FieldAcmdTCB_HopUpFaceDown8F, FieldAcmdTCB_HopMove, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cadd0[] = { FieldAcmdTCB_HopUpFaceDown8F, FieldAcmdTCB_HopMove,
+                                              FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cad1c[] = { FieldAcmdTCB_HopDownFaceUp8F, FieldAcmdTCB_HopMove, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cad1c[] = { FieldAcmdTCB_HopDownFaceUp8F, FieldAcmdTCB_HopMove,
+                                              FieldAcmdTCB_SetAcmdEnd };
 
 const ActorAcmdFunc data_ov036_021caf08[] = { FieldAcmdTCB_HopLeftFaceRight8F, FieldAcmdTCB_HopMove,
-                                              func_ov036_0218f09c };
+                                              FieldAcmdTCB_SetAcmdEnd };
 
 const ActorAcmdFunc data_ov036_021cadac[] = { FieldAcmdTCB_HopRightFaceLeft8F, FieldAcmdTCB_HopMove,
-                                              func_ov036_0218f09c };
+                                              FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cada0[] = { func_ov036_0218fd28, FieldAcmdTCB_MarkWait, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cada0[] = { func_ov036_0218fd28, FieldAcmdTCB_MarkWait, FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cad40[] = { func_ov036_02190218, func_ov036_02190234, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cad40[] = { FieldAcmdTCB_StayWalkBobInit, FieldAcmdTCB_StayWalkBobMove,
+                                              FieldAcmdTCB_SetAcmdEnd };
 
 const ActorAcmdFunc data_ov036_021cad88[] = { FieldAcmdTCB_WalkUp16FFastAnime, FieldAcmdTCB_WalkMove,
-                                              func_ov036_0218f09c };
+                                              FieldAcmdTCB_SetAcmdEnd };
 
 const ActorAcmdFunc data_ov036_021cad7c[] = { FieldAcmdTCB_WalkDown16FFastAnime, FieldAcmdTCB_WalkMove,
-                                              func_ov036_0218f09c };
+                                              FieldAcmdTCB_SetAcmdEnd };
 
 const ActorAcmdFunc data_ov036_021cad70[] = { FieldAcmdTCB_WalkLeft16FFastAnime, FieldAcmdTCB_WalkMove,
-                                              func_ov036_0218f09c };
+                                              FieldAcmdTCB_SetAcmdEnd };
 
 const ActorAcmdFunc data_ov036_021caddc[] = { FieldAcmdTCB_WalkRight16FFastAnime, FieldAcmdTCB_WalkMove,
-                                              func_ov036_0218f09c };
+                                              FieldAcmdTCB_SetAcmdEnd };
 
 const ActorAcmdFunc data_ov036_021cadf4[] = { FieldAcmdTCB_StayWalk22FInit, FieldAcmdTCB_StayWalk22FMove,
-                                              func_ov036_0218f09c };
+                                              FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cacbc[] = { func_ov036_02190e60, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cacbc[] = { FieldAcmdTCB_SetAnime10, FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021caf20[] = { FieldAcmdTCB_DashLeft2F, FieldAcmdTCB_Dash2FMove, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021caf20[] = { FieldAcmdTCB_DashLeft2F, FieldAcmdTCB_Dash2FMove,
+                                              FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021caf68[] = { FieldAcmdTCB_FlyUpInit, func_ov036_02190f14, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021caf68[] = { FieldAcmdTCB_FlyUpInit, FieldAcmdTCB_FlyUpMove, FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cacc4[] = { func_ov036_0219100c, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cacc4[] = { func_ov036_0219100c, FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cb5a4[] = { func_ov036_02191020, FieldAcmdTCB_AnimeWaitEndFaceDown,
-                                              func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cb5a4[] = { FieldAcmdTCB_AnimeWaitEndFaceDownInit, FieldAcmdTCB_AnimeWaitEndFaceDown,
+                                              FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cace4[] = { FieldAcmdTCB_ResetDrawOffset, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cace4[] = { FieldAcmdTCB_ResetDrawOffset, FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021caf14[] = { FieldAcmdTCB_FlyReadyInit, func_ov036_021910f4, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021caf14[] = { FieldAcmdTCB_FlyReadyInit, FieldAcmdTCB_FlyReadyMove,
+                                              FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cacb4[] = { func_ov036_02191174, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cacb4[] = { func_ov036_02191174, FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cad4c[] = { func_ov036_02191188, FieldAcmdTCB_DrawReadyWaitStop,
-                                              func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cad4c[] = { FieldAcmdTCB_DrawReadyWaitInit10, FieldAcmdTCB_DrawReadyWaitStop,
+                                              FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cade8[] = { func_ov036_0219119c, FieldAcmdTCB_DrawReadyWait, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cade8[] = { FieldAcmdTCB_DrawReadyWaitInit11, FieldAcmdTCB_DrawReadyWait,
+                                              FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021cae0c[] = { func_ov036_021911b0, FieldAcmdTCB_DrawReadyWait, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021cae0c[] = { FieldAcmdTCB_DrawReadyWaitInit12, FieldAcmdTCB_DrawReadyWait,
+                                              FieldAcmdTCB_SetAcmdEnd };
 
-const ActorAcmdFunc data_ov036_021caf74[] = { func_ov036_021911cc, FieldAcmdTCB_DrawReadyWait, func_ov036_0218f09c };
+const ActorAcmdFunc data_ov036_021caf74[] = { FieldAcmdTCB_DrawReadyWaitInit13, FieldAcmdTCB_DrawReadyWait,
+                                              FieldAcmdTCB_SetAcmdEnd };
 
 static const s32 data_ov036_021cb5b0[] = { 0x5000, 0x6000, 0x5000 };
 

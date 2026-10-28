@@ -5,28 +5,31 @@
 // ROM gives it no string). It holds the names of the fields of the Sake tables that the Wi-Fi battle competitions keep
 // their arena stats and the Wi-Fi cup's in, as the strings that the requests use
 
+// The names are listed in the order that lays their string literals out as the ROM's .data has them: MWCC sorts a
+// file's literals by size, so the equal-size ones come out in an order that depends on where they are listed. Each
+// designator is the name's place in the table, and the order of the lines is free
 static const char *sArenaFieldNames[] = {
-    "ARENA_ELO_RATING_1V1_DOUBLE",
-    "ARENA_ELO_RATING_1V1_ROTATE",
-    "ARENA_ELO_RATING_1V1_SHOOTER",
-    "ARENA_ELO_RATING_1V1_SINGLE",
-    "ARENA_ELO_RATING_1V1_TRIPLE",
-    "ARENA_ELO_RATING_1V1_WIFICUP",
-    "CHEATS_COUNTER",
-    "COMPLETE_MATCHES_COUNTER",
-    "DISCONNECTS_COUNTER",
-    "NUM_DOUBLE_LOSE_COUNTER",
-    "NUM_DOUBLE_WIN_COUNTER",
-    "NUM_ROTATE_LOSE_COUNTER",
-    "NUM_ROTATE_WIN_COUNTER",
-    "NUM_SHOOTER_LOSE_COUNTER",
-    "NUM_SHOOTER_WIN_COUNTER",
-    "NUM_SINGLE_LOSE_COUNTER",
-    "NUM_SINGLE_WIN_COUNTER",
-    "NUM_TRIPLE_LOSE_COUNTER",
-    "NUM_TRIPLE_WIN_COUNTER",
-    "RECORD_SAVE_IDX",
-    "recordid",
+    [0] = "ARENA_ELO_RATING_1V1_DOUBLE",
+    [1] = "ARENA_ELO_RATING_1V1_ROTATE",
+    [2] = "ARENA_ELO_RATING_1V1_SHOOTER",
+    [3] = "ARENA_ELO_RATING_1V1_SINGLE",
+    [6] = "CHEATS_COUNTER",
+    [4] = "ARENA_ELO_RATING_1V1_TRIPLE",
+    [5] = "ARENA_ELO_RATING_1V1_WIFICUP",
+    [7] = "COMPLETE_MATCHES_COUNTER",
+    [9] = "NUM_DOUBLE_LOSE_COUNTER",
+    [8] = "DISCONNECTS_COUNTER",
+    [10] = "NUM_DOUBLE_WIN_COUNTER",
+    [11] = "NUM_ROTATE_LOSE_COUNTER",
+    [15] = "NUM_SINGLE_LOSE_COUNTER",
+    [12] = "NUM_ROTATE_WIN_COUNTER",
+    [16] = "NUM_SINGLE_WIN_COUNTER",
+    [17] = "NUM_TRIPLE_LOSE_COUNTER",
+    [18] = "NUM_TRIPLE_WIN_COUNTER",
+    [13] = "NUM_SHOOTER_LOSE_COUNTER",
+    [14] = "NUM_SHOOTER_WIN_COUNTER",
+    [19] = "RECORD_SAVE_IDX",
+    [20] = "recordid",
 };
 
 static const char *sWifiCupFieldNames[] = {

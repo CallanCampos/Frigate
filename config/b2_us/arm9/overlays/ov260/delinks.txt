@@ -22,12 +22,14 @@ src/ov260/wifibattlematch_link_competition.c:
     .data       start:0x021bfe68 end:0x021bfe70
 
 src/ov260/wifibattlematch_net.c:
+    complete
     .text       start:0x021b8cc8 end:0x021bc058
     .rodata     start:0x021bfcfc end:0x021bfd38
     .data       start:0x021bfe70 end:0x021c00e4
     .bss        start:0x021c1ca0 end:0x021c1ca8
 
 src/ov260/wifibattlematch_net_fields.c:
+    complete
     .text       start:0x021bc058 end:0x021bc218
     .data       start:0x021c00e4 end:0x021c0750
 
@@ -72,6 +74,7 @@ lib/dwc/src/gdb/gdb.c:
     .bss        start:0x021c2454 end:0x021c24dc
 
 lib/dwc/src/auth/AuthService.c:
+    complete
     .text       start:0x021bf63c end:0x021bfcd8
     .rodata     start:0x021bfd38 end:0x021bfe44
     .data       start:0x021c1ab8 end:0x021c1ca0

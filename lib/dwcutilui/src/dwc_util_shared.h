@@ -20,10 +20,4 @@
 #include "struct_decls.h"
 #include "task.h"
 
-// Entry points in later, still unrecovered files of the DWC settings utility.
-
-// The whole touch screen, a rectangle as in foundation.c: .rodata between font.c's and
-// task.c's that no file claims yet
-extern const u16 gDWCUtilTouchScreenRect[4];
-
 #endif // POKEBW2_DWCUTIL_DWC_UTIL_SHARED_H

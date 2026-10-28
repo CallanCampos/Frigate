@@ -126,6 +126,12 @@ tools that show the differences.
 - Compound assignments add in another order than one expression: `mystery_net.c`'s `Mystery_ParseHex` adds the
   shifted value first, as the original does, only as `value <<= 4; value += digit;`, not as
   `value = value * 16 + digit`.
+- An element updated through a cast of its own type, `a[i] = (T)(a[i] + d)`, is a load and a separate store, where
+  `a[i] += d` and `a[i] = a[i] + d` are one update that shares `i * 4` with the other uses of `i` around it. In
+  `gsLargeInt.c`'s `gsiLargeIntDiv`, GameSpy's `quotientWork.mData[offset] = (gsi_u32)(quotientWork.mData[offset] +
+  digit)` leaves `r7` free in the loop and spills the `offset * 4` temporaries, as the original does; without the
+  cast, `r7` holds one `offset * 4` for the whole loop (12 bytes short). `top` declared after `done` then puts the
+  two spilled locals in the original's slots.
 - An array element's address kept as `base + i * size` and read as `[base, offset]`, where ours keeps `&p[i]`, comes
   from a pointer to `const`: `pdw_postman.c`'s `FindMysteryGiftDeliveryManNPCID` and `scrcmd_medal.c`'s
   `GetMrMedalActorUID` declare `const ZoneNPC *npcs;`.
@@ -860,7 +866,16 @@ Same instructions, registers swapped.
 - DWC's `DWCi_Http_Thread` uses one transfer-length local for `CPS_SocWrite`'s result and the later
   `CPS_SocRead` output. Keeping the write result in a separate `sent` local drops the original's store to the
   address-taken length slot. The shared `u32 length`, with `(s32)length <= 0` for the write error check, restores
-  that store and reduces the difference from 242 bytes to 37; the remaining stack slots still differ.
+  that store and reduces the difference from 242 bytes to 37.
+- An `int` compared with a `u64` keeps its sign word, hoisted before the loop, in the high half of an 8-byte slot
+  whose low half is never accessed when the `int` is assigned in both arms of an `if`/`else` (or a ternary), and in a
+  4-byte slot when it has a default and an `if` that overrides it; the code is the same. `DWCi_Http_Thread` sets its
+  timeout with `if (http->param.timeout > 0) { timeout = http->param.timeout; } else { timeout = 60000; }` for the
+  original's 0x3c frame and `{r4-r7, lr}` (ours pushed `r3` too and reserved 0x38), where `int timeout =
+  http->param.timeout;` and `if (timeout <= 0) { timeout = 60000; }` give the compare `OS_TicksToMilliSeconds(...) >
+  timeout` a 4-byte sign slot. Its `CPSSoc *soc` is declared first, for the slot above `ip`, and assigned after
+  `headersDone`'s initializer (`soc = &http->soc;` as the first statement), which keeps the original's store order;
+  an initializer stores it first.
 
 - `RailMath_RailToWorldSlerpXZ` keeps raw signed position and length at the original stack slots when they form
   a progress snapshot and an inline reads that snapshot through a `const` pointer to compute its fixed-point ratio.
@@ -1391,6 +1406,11 @@ Same code, other `sp` offsets or frame size.
   memory local, placed by declaration order among the memory locals (not the spill slot) and reloaded after every
   store. `ArchiveMoveImageTop`'s `fimgOffset` went to sp+0xc and `Yos_JPEGEncode`'s `chromBlocksX` to sp+0x64 that way.
   It works where the original reloads a local it never kept in a register: `gti2HandleNack`'s `first`.
+- A by-value parameter that the original keeps in its stack slot and reloads at every use, even where no call comes
+  between, is `volatile` where it is declared: `ReleaseRequest` (`nd.c`) reads `[sp, #8]` before the test, before each
+  of the two calls, and stores 0 back to it at the end, and Black 1's decomp has the same `void *volatile handle`.
+  No other thread can write that slot, so the qualifier isn't a claim about sharing: it is the SDK source's own
+  spelling, and with it the engine matches byte for byte.
 - A cast of one operand to its own type keeps MWCC from merging two copies of an expression, and a cast of an array
   to its own element type makes it compute an element's address again rather than reuse a hoisted base. Neither is
   natural C; this project takes them only under the maintainer's 2026-10-25 ruling, with a comment: NitroWiFi's
@@ -1941,6 +1961,18 @@ Same instructions, scheduled in another order.
   inline against the SDK's own definition before writing a local copy with its terms swapped.
 
 ## An instruction too many or too few
+
+- A dead `movs rN, #0` right after a call, which no later code reads and nothing branches to, can be the `0` of an
+  assert's `(exp) || (OS_Terminate(), 0)`. MWCC tests the `||`'s right operand for its truth with `cmp rN, #0`, drops
+  the branch because both of its targets are the next statement, and keeps the constant alive for the compare that is
+  left; the Thumb peephole then folds `mov rN, #0; cmp rN, #0` into the flag-setting `movs rN, #0`, deleting the
+  compare and leaving the move. At -O4 the IR's copy propagation and dead-assignment removal delete the constant
+  before code generation, so the move survives only with both passes off: overlay 182's `DWCi_MOV_WH_ParentConnect`
+  (`dwc_mov_wh.c`) matches under `#pragma opt_dead_assignments off` and `#pragma opt_propagation off` around it alone
+  (the whole file in `dsi/1.1p1` through `1.3p1`). Neither pragma alone keeps the move, nor do the pair over the
+  whole file (`SelectChannel` grows to 0x94), `-opt nodeadstore,noprop` or any `if`, flag or inline form. With a
+  non-constant operand the orphaned compare stays visible: `(OS_Terminate(), x)` leaves `cmp rN, #0` after the call.
+  Nothing shows the original source had the pragmas, so the file says why they are there.
 
 - NitroWiFi's `rcv_finished` saves and restores whole transcript contexts with explicit `MI_CpuCopy8` calls.
   Structure assignment changes the runtime-copy shape and frame even though it expresses the same snapshot.
@@ -3741,7 +3773,9 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   packed against the next with no 4-byte gap: overlay 257's `ctvt_draw.c` starts with the 10 unread bytes of
   `sUnusedColors`, then 2-byte tables, which no `-ipa file` layout gives, and matches whole with `-ipa function` and its
   tables defined just above `CtvtDraw_UpdateDraw`, their first user (`config/compiler_flags.toml` records the flag).
-  With every table above the first function the colors sort after the 2-byte tables again. `.data` is written out
+  With every table above the first function the colors sort after the 2-byte tables again. `arc_util.c` likewise
+  starts with an unused 16-byte image-loader table ahead of its 8-byte OBJ and 32-byte palette dispatch tables when
+  those two tables are defined just above their first users; all 39 functions stay unchanged. `.data` is written out
   the same way: the ROM has the 16-byte `sVADInfo` ahead of the 12-byte `sInitialCoefficients`, which no declaration
   order gives in one file while both are defined above the first function. They belong to two files (`vct_vad.c` and
   `vct_dsp.c`), each laid out on its own, which is why the order looked unreachable.
@@ -3810,6 +3844,10 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   zero-initialized, its four functions that reach the statics from the base match and so does the file's `.bss`.
   Such a static goes first in `.bss`, ahead of the tentative ones, wherever it is defined: `aosslink.c`'s `sBss =
   { 0 }` sat at `.bss + 0` defined just above its function, below other functions, and as a global alike.
+- `g2d_OamSoftwareSpriteDraw.c` also needs `-ipa function`: it retains the unused, zero-initialized 16-byte
+  `softwareSpreiteParamCache_` after the three live state words. Explicit zero initializers on those live statics
+  keep their accesses pooled, so all six functions still match. With `-ipa file`, the cache disappears even though
+  it belongs to the original file's `.bss`. Matching the functions alone does not establish the IPA setting.
 - A zero-initialized static is reached from the section's pooled base, and so is a struct of statics, but the two
   compile differently: the struct's member is a field of one object, which MWCC loads again at other points (after a
   64-bit store, before a zero, across a loop), while a static of its own is known and scheduled freely. Statics that the
@@ -3956,6 +3994,14 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   template that the ROM doesn't have. Only an initializer above the file's first function sorts this way; below a
   function its literals come out in source order. NitroWiFi's `ssl.c` matches its `.data` with its OID table as six
   string literals at the top of the file, sorted among its named objects, as in Black 1's version.
+- A function's string literals go out as MWCC generates its code, each at its first use, so two strings of one function
+  laid out apart, with another function's between them, were first used higher in the file by a function the original
+  link dropped. Overlay 182's `dwc_mov_wh.c` has `DWCi_MOV_WH_ParentConnect`'s two buffer-size messages ahead of the
+  channel measurement's and its `"unknown connect mode %d\n"` after them; a global defined above the measurement that
+  logs the two sizes, listed in `config/deadstrip.toml`, gives the ROM's order, and an unreferenced `static` doesn't,
+  as MWCC doesn't generate it. The same file's state names sort by size ahead of their table only with the work
+  pointer and the log function as two statics initialized to `NULL` above the table: as one 8-byte struct, or left
+  tentative, the three 26-byte names come out in another order (`rodata_order.py` gives the same).
 - A zero-initialized static too far from its section's base for the load's immediate (`ldrh` reaches 0x3e) gets a
   section-relative pool word of its own, apart from the symbol's literal, so one object shows two literal words.
   `dwc_aoss_ap.c`'s successor `aosslink.c` (DWC utility, 2.0/sp1p2) matches `AOSSi_WLANConnect` with `sBss = { 0 }` at
@@ -3985,6 +4031,11 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   and `GetChallenge`'s `challenge`, which the dead code reads; its local initializers and function-local statics
   (`challengestr`, `sesskeystr`) join the size sort, and `GetPersistData`'s `""` comes before `value_for_key`'s
   `"\\"`. Without the dead code, three placeholder words and an unused inline stood in for them.
+- A reference object's assembly can identify the dead functions behind a surviving string order. `AuthService.c`'s
+  profile and unique-nick logins, their callbacks and their password helper match that assembly; stripping their two
+  public entry points puts nine shared XML field names before the remote-login strings, matching the ROM's data and
+  relocations in both versions. The eight live functions already match with either IPA mode, but `-ipa file` is still
+  necessary for the RSA constants' section alignment. A function-only probe cannot settle the file's IPA setting.
 - A function-local `const` scalar with an initializer, `static` or not, is emitted in `.rodata` even when every read
   of it folds (`const u32 n = 11;` gives a 4-byte `_ZZ...E1n_0`), while a file-scope `static const` scalar that code
   only reads is dropped.
@@ -4076,6 +4127,10 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   itself prove that code was dead-stripped: inline linkage and named metadata can place strings in the shared data
   section before the separate code-literal sections. Overlay 28's separate groups of empty strings still need their
   own boundary/emission explanation.
+- `dwc_profanity.c`'s apparent four-byte gap between `"/ac"` and `"/pr"` belongs to the authentication-path literal:
+  a reference object records five bytes, `"/ac\0"` including the implicit terminator. Four-byte section alignment
+  places `"/pr"` eight bytes after its start. Restoring the explicit zero matches the full file in both versions with
+  its existing `-ipa file` setting; no extra object or dead function is needed.
 - Ordinary code literals are created during code generation, for references that survive optimization, so they come
   after a file's shared file-scope data. Dead code, unused locals and folded asserts create none. A literal earlier
   than every surviving ordinary code reference can come from code the original linker stripped, but shared inline
@@ -4232,6 +4287,9 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   ROM, the aligned buffer is larger than its use: the LTD's `photo_sign.c` sizes its random buffer, which the ARM7
   writes, to a whole 32-byte cache line though each fill uses 16. Aligning the next file's object instead gave the
   right size but changed how its code addresses it.
+- `d_nhttp_common.c`'s root storage has an explicit `u16 padding[8]` member after its thread state. A reference object's
+  debug layout records that member at `0x4150` and the complete type's size as `0x4160`. Restoring it recovers the
+  sixteen-byte `.bss` gap without changing any function; aligning the shorter object alone cannot supply that member.
 - One `ATTRIBUTE_ALIGN(32)` object makes its file's whole `.bss` section 32-aligned, and the linker starts the section
   on a 32-byte boundary, so a gap in the ROM's `.bss` before a 32-aligned object can be the end of the previous file:
   NitroSDK's `snd_command.c` starts at `0x0214c700` with its 32-aligned command array, and the queue before the gap is
@@ -4275,11 +4333,11 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   where `gsync_disp.c` has `sActorPositions`. Look at the sibling file a copy was made from for the missing object.
   Nothing the compiler drops itself is listed, so this can't be reproduced under `-nodead`. A zero-size global,
   `const char *x[] = {};` (GCC's empty initializer), is listed where it is defined and emits nothing, so it tests a
-  place for such an object without adding bytes; it is placeholder data and stays out of the source. One before
-  `wifibattlematch_net_fields.c`'s tables gives the ROM's `.data` exactly. When a run of equal-size objects that stay
-  together comes out in an order no arrangement gives, enumerate the arrangements by how many listed objects are
-  smaller and larger than the run: `wifibattlematch_net.c`'s six 15-byte `RECORD_DATA` strings, just before their
-  table, need at least two objects more than the file has, one of them larger.
+  place for such an object without adding bytes; it is placeholder data and stays out of the source. When a run of
+  equal-size objects that stay together comes out in an order no arrangement gives, enumerate the arrangements by how
+  many listed objects are smaller and larger than the run before concluding that an object is missing:
+  `wifibattlematch_net.c`'s six 15-byte `RECORD_DATA` strings looked like that until the designator order below
+  placed them.
 - A small table that the ROM has after a 64-byte-or-larger table of the same file, where the size sort can only put
   it before, belongs to the next file. Overlay 290's 12-byte battle proc table sits after the 0x90-byte step table:
   no layout of one file gives that (`rodata_order.py`: G:12! S:144 B:12 is always B G S or G B S). Its three
@@ -4292,6 +4350,17 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   declared directly before `sBoardPlNames`. A static table that nothing reads is dropped and a literal only it has is
   not listed, but one that a later table repeats is listed where the dropped table stood: an unused
   `static const char *s[] = { "recordid" };` ahead of `wifibattlematch_net_fields.c`'s tables moves that string.
+- A table's literals can be listed in an order other than the table's: a C99 designator gives an element's index and
+  the literal is listed where the line is, so `[6] = "CHEATS_COUNTER"` may sit above `[4] = "..."`. That is the only
+  order that reaches `wifibattlematch_net_fields.c`'s `.data`: its 1,644 bytes and 29 relocations match the ROM with
+  `sArenaFieldNames`' 21 lines listed in another order (the Wi-Fi cup's table needs no designator, as its own order is
+  the one the sort wants). No plain order of the entries gives it, which is the "no declaration order" of its old row.
+- The same freedom places literals among the file's 4-byte statics: the shared `.data` section sits where its smallest
+  object sorts, so both the order of the lines and the order of the table definitions move it. `wifibattlematch_net.c`
+  keeps `"ver"` and `"dis"` as literals of `sMatchKeyNames` rather than two `static char[]` (which would put 8 bytes
+  into the shared section and make it 76), and declares `sLastLoginTable`, `sRecordIdTable`, `sRecordDataTables`,
+  `sWifiCupPartyTable` and `sMatchKeyNames` in that order, which sorts the 68-byte section after the two 4-byte
+  literals; its `.data` (628 bytes, 17 relocations) and `.rodata` then match both versions.
 - A second `""` in what was taken for one file's `.data` is a file boundary: MWCC pools equal string literals within
   a translation unit, so each run of functions that shares one `""` is a file of its own. Overlay 28's `union_main.c`
   and `colosseum.c` were five files (`union_main.c`, `union_receive.c`, `union_subproc.c`, `colosseum_comm.c`,
@@ -4452,6 +4521,13 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   function per entry, in the ROM's order, each falling into the next (an `asm` function gets no epilogue). In a Thumb
   file, an ARM `asm` function goes between `#pragma thumb off` and `#pragma thumb on`.
 
+- A Thumb `asm` function in a Thumb file takes Thumb mnemonics, and `ldr rX, =symbol` is an illegal operand there, so
+  its pool is written as `ldr rX, [pc, #imm]` with `dcd symbol` words, and a `dcd symbol+4` gives a relocation into a
+  symbol's interior. `arc_tool.c`'s `ArchiveMoveImageTop` is the one game-code `asm` function: the original build kept
+  a dead store of `fimgOffset + 8` back to its stack slot, which no installed compiler produces from the C, and the
+  maintainer took the exception for the last non-matching function. Its assert's two strings became file-scope arrays
+  (one whose leading four zero bytes are the empty file name), and the file's other asserts pass that array as their
+  file name, which keeps the data byte for byte.
 - An `asm` function has one name: the assembler doesn't take `entry` or `.global` (`unknown assembler instruction
   mnemonic`, in `dsi/1.1p1` and `dsi/1.2`), and MWCC ignores `__attribute__((alias))` and `#pragma alias`. A library
   that is hand-written assembly as a whole, whose routines have several entries and second names, is an assembly file

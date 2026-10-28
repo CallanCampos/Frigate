@@ -1,5 +1,7 @@
 #include "foundation.h"
 
+const u16 DWCi_R_SCR[4] = { 0, 0, 256, 192 };
+
 void DWCi_InputCoord(u16 x, u16 y, u16 *point) {
     point[0] = x;
     point[1] = y;

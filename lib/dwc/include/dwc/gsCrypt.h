@@ -12,6 +12,10 @@ typedef struct {
     gsLargeInt_t exponent;
 } gsCryptRSAKey;
 
+// Encrypts a short message with a public key into a 1024-bit RSA ciphertext
+gsi_i32 gsCryptRSAEncryptBuffer(const gsCryptRSAKey *key, const unsigned char *plainText, gsi_u32 size,
+                                unsigned char cipherText[0x80]);
+
 // Checks a PKCS #1 signature of an MD5 or SHA-1 hash with a public key: 0 when it is right, below 0 when it isn't
 gsi_i32 gsCryptRSAVerifySignedHash(const gsCryptRSAKey *key, const unsigned char *hash, gsi_u32 hashSize,
                                    const unsigned char *signature, gsi_u32 signatureSize);

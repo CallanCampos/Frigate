@@ -622,7 +622,7 @@ static BOOL FieldPlayerMoveTask_Callback(void *work) {
         pos.y = current.y;
         FieldPlayer_SetWPos(player, &pos);
         CheckRecalcActorY(actor);
-        func_ov036_0218ee08(actor);
+        FieldAcmdSyncBillboardPos(actor);
         if (data->duration <= data->frame) {
             return TRUE;
         }
