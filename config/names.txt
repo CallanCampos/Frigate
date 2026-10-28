@@ -12613,6 +12613,8 @@ overlays/ov036 0x021cbb44 sMirrorTurnOrders
 overlays/ov036 0x021cbb64 sPlayerSightMoveCodes
 overlays/ov036 0x021cbbec sMoveCodeTurnDirs
 overlays/ov036 0x021cbc70 sDirSets
+overlays/ov036 0x021cbe44 ACTOR_EVENTTYPE_CHECK_FUNCS
+overlays/ov036 0x021cbe98 ACTOR_EVENTTYPE_UPDATE_FUNCS
 overlays/ov036 0x021cd0f0 sBillboardSet26Animations
 overlays/ov036 0x021cd0f4 sBillboardSet9Animations
 overlays/ov036 0x021cd0f8 sBillboardSet11Animations

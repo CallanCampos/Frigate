@@ -4701,8 +4701,8 @@ data_ov036_021cbdb0 kind:data(any) addr:0x021cbdb0
 data_ov036_021cbdc0 kind:data(any) addr:0x021cbdc0
 data_ov036_021cbdd0 kind:data(any) addr:0x021cbdd0
 ACTOR_EVENTTYPE_FUNCS kind:data(any) addr:0x021cbdf0
-data_ov036_021cbe44 kind:data(any) addr:0x021cbe44
-data_ov036_021cbe98 kind:data(any) addr:0x021cbe98
+ACTOR_EVENTTYPE_CHECK_FUNCS kind:data(any) addr:0x021cbe44
+ACTOR_EVENTTYPE_UPDATE_FUNCS kind:data(any) addr:0x021cbe98
 data_ov036_021cbeec kind:data(any) addr:0x021cbeec
 data_ov036_021cbef4 kind:data(any) addr:0x021cbef4
 data_ov036_021cbefc kind:data(any) addr:0x021cbefc
