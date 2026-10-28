@@ -184,6 +184,9 @@ void FieldRenderPhase2_EncountEffect(Field *field);
 FieldDispControl *FieldG2D_GetDispControl(Field *field);
 FieldEffects *Field_GetFieldEffects(Field *field);
 FieldG3DObjSystem *Field_GetG3DObjSys(Field *field);
+// No fog, which GetZoneFogIndex and GetZoneFogIndexAll return for a zone without one
+#define ZONE_FOG_NONE 0x0fffffff
+
 u32 GetZoneFogIndex(u16 zoneId);
 u32 ZoneData_GetObjectProjectionMatrixType(u16 zoneId);
 u32 GetObjectProjectionMatrixOffset(u16 zoneId);

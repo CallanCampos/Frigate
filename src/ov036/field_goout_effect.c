@@ -11,7 +11,24 @@
 #include "gfl/random.h"
 #include "nitro/fx.h"
 #include "system/game_data.h"
+#include "system/rtc.h"
 #include "system/zone_weather.h"
+
+// The scene of the field's 3D objects that the lens flare takes
+#define LENS_FLARE_SCENE 3
+
+// A resource that the lens flare doesn't have
+#define LENS_FLARE_RESOURCE_NONE 0xffff
+
+// The steps of a lens flare: show it with its animations paused at their start, wait for
+// FieldLensFlare_GreenlightStart, play the animations, hide it once they end, then end the request
+enum {
+    LENS_FLARE_STATE_SHOW,
+    LENS_FLARE_STATE_WAIT_GREENLIGHT,
+    LENS_FLARE_STATE_PLAY,
+    LENS_FLARE_STATE_WAIT_END,
+    LENS_FLARE_STATE_END,
+};
 
 FieldLensFlare *FieldLensFlare_Create(GameSystem *gameSystem, GameData *gameData, FieldExpObjSystem *expObjSys,
                                       u8 effectIndex, u32 dayPeriod, HeapID heapId) {
@@ -25,11 +42,11 @@ FieldLensFlare *FieldLensFlare_Create(GameSystem *gameSystem, GameData *gameData
     lensFlare->expObjSys = expObjSys;
     lensFlare->gameData = gameData;
     if (GFL_HeapGetFreeSize(heapId) < 15000) {
-        lensFlare->effectId = 8;
+        lensFlare->effectId = LENS_FLARE_NONE;
         lensFlare->available = FALSE;
     } else {
         entryIdx = GameData_GetLensFlareEntryIdx(lensFlare->gameData);
-        lensFlare->effectId = 8;
+        lensFlare->effectId = LENS_FLARE_NONE;
         if (entryIdx < 0x43) {
             effectSet = FieldLensFlare_GetEffectSetID(lensFlare->ownedData, entryIdx, effectIndex,
                                                       FieldLensFlare_GetSubIndexForDayPeriod(dayPeriod));
@@ -39,7 +56,7 @@ FieldLensFlare *FieldLensFlare_Create(GameSystem *gameSystem, GameData *gameData
                     FieldLensFlareData_GetLensFlareID(lensFlare->ownedData, effectSet, GFL_RandomLC(setSize));
             }
         }
-        if (lensFlare->effectId != 8) {
+        if (lensFlare->effectId != LENS_FLARE_NONE) {
             FieldLensFlare_Load(lensFlare->expObjSys, lensFlare->ownedData, lensFlare->effectId);
             lensFlare->available = TRUE;
         } else {
@@ -50,7 +67,7 @@ FieldLensFlare *FieldLensFlare_Create(GameSystem *gameSystem, GameData *gameData
 }
 
 void FieldLensFlare_Free(FieldLensFlare *lensFlare) {
-    if (lensFlare->effectId != 8) {
+    if (lensFlare->effectId != LENS_FLARE_NONE) {
         FieldExpObj_FreeScene(lensFlare->expObjSys, 3);
     }
     FieldLensFlareData_Free(lensFlare->ownedData);
@@ -62,37 +79,37 @@ void FieldLensFlare_Update(FieldLensFlare *lensFlare, FieldCamera *camera) {
     FieldExpObjAnm *anm;
     BOOL finished;
 
-    if (lensFlare->effectId == 8) {
+    if (lensFlare->effectId == LENS_FLARE_NONE) {
         return;
     }
     if (lensFlare->requested) {
         switch (lensFlare->state) {
-        case 0:
+        case LENS_FLARE_STATE_SHOW:
             for (i = 0; i < 4; i++) {
-                FieldExpObj_SetAnm(lensFlare->expObjSys, 3, 0, i, TRUE);
-                anm = FieldExpObj_GetAnmInfo(lensFlare->expObjSys, 3, 0, i);
+                FieldExpObj_SetAnm(lensFlare->expObjSys, LENS_FLARE_SCENE, 0, i, TRUE);
+                anm = FieldExpObj_GetAnmInfo(lensFlare->expObjSys, LENS_FLARE_SCENE, 0, i);
                 FieldExpObjAnm_SetPaused(anm, TRUE);
-                FieldExpObj_SetAnmFrame(lensFlare->expObjSys, 3, 0, i, 0);
+                FieldExpObj_SetAnmFrame(lensFlare->expObjSys, LENS_FLARE_SCENE, 0, i, 0);
                 FieldExpObjAnm_SetLooped(anm, FALSE);
             }
-            FieldExpObj_SetActorHidden(lensFlare->expObjSys, 3, 0, FALSE);
+            FieldExpObj_SetActorHidden(lensFlare->expObjSys, LENS_FLARE_SCENE, 0, FALSE);
             lensFlare->state++;
             break;
-        case 1:
+        case LENS_FLARE_STATE_WAIT_GREENLIGHT:
             if (lensFlare->active) {
                 lensFlare->state++;
             }
             break;
-        case 2:
+        case LENS_FLARE_STATE_PLAY:
             for (i = 0; i < 4; i++) {
-                FieldExpObjAnm_SetPaused(FieldExpObj_GetAnmInfo(lensFlare->expObjSys, 3, 0, i), FALSE);
+                FieldExpObjAnm_SetPaused(FieldExpObj_GetAnmInfo(lensFlare->expObjSys, LENS_FLARE_SCENE, 0, i), FALSE);
             }
             lensFlare->state++;
             break;
-        case 3:
+        case LENS_FLARE_STATE_WAIT_END:
             finished = TRUE;
             for (i = 0; i < 4; i++) {
-                anm = FieldExpObj_GetAnmInfo(lensFlare->expObjSys, 3, 0, i);
+                anm = FieldExpObj_GetAnmInfo(lensFlare->expObjSys, LENS_FLARE_SCENE, 0, i);
                 if (!FieldExpObjAnm_IsPlaybackFinished(anm)) {
                     finished = FALSE;
                 } else {
@@ -101,10 +118,10 @@ void FieldLensFlare_Update(FieldLensFlare *lensFlare, FieldCamera *camera) {
             }
             if (finished) {
                 lensFlare->state++;
-                FieldExpObj_SetActorHidden(lensFlare->expObjSys, 3, 0, TRUE);
+                FieldExpObj_SetActorHidden(lensFlare->expObjSys, LENS_FLARE_SCENE, 0, TRUE);
             }
             break;
-        case 4:
+        case LENS_FLARE_STATE_END:
             lensFlare->active = FALSE;
             lensFlare->requested = FALSE;
             break;
@@ -115,10 +132,10 @@ void FieldLensFlare_Update(FieldLensFlare *lensFlare, FieldCamera *camera) {
 }
 
 void FieldLensFlare_RequestStart(FieldLensFlare *lensFlare) {
-    if (lensFlare->available != FALSE && lensFlare->effectId != 8) {
+    if (lensFlare->available != FALSE && lensFlare->effectId != LENS_FLARE_NONE) {
         lensFlare->requested = TRUE;
         lensFlare->active = FALSE;
-        lensFlare->state = 0;
+        lensFlare->state = LENS_FLARE_STATE_SHOW;
     }
 }
 
@@ -130,10 +147,10 @@ void FieldLensFlare_GreenlightStart(FieldLensFlare *lensFlare) {
 
 void FieldLensFlare_Cancel(FieldLensFlare *lensFlare) {
     if (lensFlare->requested != FALSE) {
-        FieldExpObj_SetActorHidden(lensFlare->expObjSys, 3, 0, TRUE);
+        FieldExpObj_SetActorHidden(lensFlare->expObjSys, LENS_FLARE_SCENE, 0, TRUE);
         lensFlare->requested = FALSE;
         lensFlare->active = FALSE;
-        lensFlare->state = 0;
+        lensFlare->state = LENS_FLARE_STATE_SHOW;
     }
 }
 
@@ -146,10 +163,10 @@ void FieldLensFlare_DecideForZoneTransit(FieldLensFlare *lensFlare, u16 zoneId, 
     useEntry = TRUE;
     FieldLensFlareData_BytesToEntryCount(lensFlare->ownedData);
     weather = GetWeatherAll(lensFlare->gameSystem, zoneId);
-    if (weather != 0 && weather != 0xffff) {
+    if (weather != WEATHER_SUNNY && weather != WEATHER_NONE) {
         useEntry = FALSE;
     }
-    if (fog != 0x0fffffff) {
+    if (fog != ZONE_FOG_NONE) {
         useEntry = FALSE;
     }
     applicable = FALSE;
@@ -179,7 +196,7 @@ void FieldLensFlare_CalcPos(FieldLensFlare *lensFlare, G3DCamera *camera) {
     VEC_Subtract(&target, &position, &offset);
     VEC_Normalize(&offset, &offset);
     VEC_MultAdd(0x3c000, &offset, &position, &offset);
-    matrix = FieldExpObj_GetActorMatrixPtr(lensFlare->expObjSys, 3, 0);
+    matrix = FieldExpObj_GetActorMatrixPtr(lensFlare->expObjSys, LENS_FLARE_SCENE, 0);
     matrix->translation = offset;
 }
 
@@ -197,7 +214,7 @@ void FieldLensFlare_Load(FieldExpObjSystem *expObjSys, FieldLensFlareData *data,
     resourceCount = 0;
     for (index = 0; index < 5; index++) {
         resourceId = FieldLensFlareData_GetResDatID(data, effectId, index);
-        if (resourceId != 0xffff) {
+        if (resourceId != LENS_FLARE_RESOURCE_NONE) {
             resources[resourceCount].arcId = 0xe8;
             resources[resourceCount].fileId = resourceId;
             resources[resourceCount].type = G3D_SCENE_RES_ARCSYS;
@@ -218,8 +235,8 @@ void FieldLensFlare_Load(FieldExpObjSystem *expObjSys, FieldLensFlareData *data,
     scene.resourceCount = resourceCount;
     scene.actors = &actor;
     scene.actorCount = 1;
-    FieldExpObj_AddScene(expObjSys, &scene, 3);
-    FieldExpObj_SetActorHidden(expObjSys, 3, 0, TRUE);
+    FieldExpObj_AddScene(expObjSys, &scene, LENS_FLARE_SCENE);
+    FieldExpObj_SetActorHidden(expObjSys, LENS_FLARE_SCENE, 0, TRUE);
 }
 
 BOOL FieldLensFlare_IsApplicable(GameData *gameData, u16 zoneId) {
@@ -228,13 +245,13 @@ BOOL FieldLensFlare_IsApplicable(GameData *gameData, u16 zoneId) {
 
 u8 FieldLensFlare_GetSubIndexForDayPeriod(u32 period) {
     switch (period) {
-    case 0:
-    case 1:
+    case DAY_PERIOD_MORNING:
+    case DAY_PERIOD_DAY:
         return 0;
-    case 2:
+    case DAY_PERIOD_EVENING:
         return 1;
-    case 3:
-    case 4:
+    case DAY_PERIOD_NIGHT:
+    case DAY_PERIOD_MIDNIGHT:
         return 2;
     default:
         return 0;

@@ -1498,7 +1498,7 @@ fx32 Field_CalcActorYOffset(Field *field) {
 
 u32 GetZoneFogIndexAll(Field *field, u16 zoneId) {
     if (zoneId == ZONE_OPELUCID_CITY && !GameData_IsMapReplaceEventSet(field->gameData, 0)) {
-        return 0xfffffff;
+        return ZONE_FOG_NONE;
     }
     return GetZoneFogIndex(zoneId);
 }
