@@ -11559,12 +11559,15 @@ overlays/ov036 0x021b3b88 FieldRailTilemap_IsForceMoveRight
 overlays/ov036 0x021b3b94 FieldRailTilemap_IsForceMoveStop
 overlays/ov036 0x021b3ba0 FieldRailTilemap_IsSlipDown
 overlays/ov036 0x021b3da8 FieldNoGridMapper_SetLineEnabled
+overlays/ov036 0x021b3e50 FldeffGyoe_Create
+overlays/ov036 0x021b3e94 FldeffGyoe_Delete
 overlays/ov036 0x021b3ea8 FldeffGyoe_InitResource
 overlays/ov036 0x021b3ef0 FldeffGyoe_DeleteResource
 overlays/ov036 0x021b3f14 FldeffGyoe_SetMMdl
 overlays/ov036 0x021b3f64 FldeffGyoe_StartHeld
 overlays/ov036 0x021b3fb4 FldeffGyoe_IsFinished
 overlays/ov036 0x021b3fc8 FldeffGyoe_InitHeldTask
+overlays/ov036 0x021b3ff4 FldeffGyoe_DeleteTask
 overlays/ov036 0x021b3ff8 FldeffGyoe_UpdateHeldTask
 overlays/ov036 0x021b4034 FldeffGyoe_UpdateTask
 overlays/ov036 0x021b4078 FldeffGyoe_DrawTask
