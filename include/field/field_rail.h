@@ -285,10 +285,10 @@ BOOL RailMath_WorldToRailSlerp(u32 lineId, FieldRailSystem *rail, const VecFx32 
 // The camera functions of the rails' cameras
 void RailCameraFuncSetStaticPYR(FieldRailSystem *rail);
 void RailCameraFuncSetStaticPYDist(FieldRailSystem *rail);
-void func_ov036_021b2cc4(FieldRailSystem *rail);
+void FieldRailCamera_FixedAngleAtCentre(FieldRailSystem *rail);
 void FieldRailCamera_BlendAngles(FieldRailSystem *rail);
 void FieldRailCamera_BlendAnglesAtFocus(FieldRailSystem *rail);
-void func_ov036_021b2e78(FieldRailSystem *rail);
+void FieldRailCamera_BlendAnglesAtCentre(FieldRailSystem *rail);
 void FieldRailCamera_FixedEyeTarget(FieldRailSystem *rail);
 void FieldRailCamera_BlendEyeTarget(FieldRailSystem *rail);
 void FieldRailCamera_BlendOrbit(FieldRailSystem *rail);
@@ -298,8 +298,8 @@ void FieldRailCamera_YawFromPoint(FieldRailSystem *rail);
 void FieldRailCamera_FollowHeading(FieldRailSystem *rail);
 void FieldRailCamera_FollowHeadingSlope(FieldRailSystem *rail);
 void FieldRailCamera_FollowHeadingAtCentre(FieldRailSystem *rail);
-void func_ov036_021b3568(FieldRailSystem *rail);
-void func_ov036_021b3590(FieldRailSystem *rail);
+void FieldRailCamera_ApplyLineStart(FieldRailSystem *rail);
+void FieldRailCamera_ApplyLineEnd(FieldRailSystem *rail);
 void FieldRailCamera_FixedAngleShift(FieldRailSystem *rail);
 void FieldRailCamera_FixedAngleShiftAtFocus(FieldRailSystem *rail);
 void FieldRailCamera_BlendAnglesShift(FieldRailSystem *rail);

@@ -394,7 +394,7 @@ void RailCameraFuncSetStaticPYDist(FieldRailSystem *rail) {
     FieldCamera_CoordsSetZoom(camera, zoom);
 }
 
-void func_ov036_021b2cc4(FieldRailSystem *rail) {
+void FieldRailCamera_FixedAngleAtCentre(FieldRailSystem *rail) {
     RailUnit *unit = FieldRailSystem_GetCameraParentUnit(rail);
     FieldCamera *camera = FieldRailSystem_GetFieldCamera(rail);
     VecFx32 target;
@@ -467,7 +467,7 @@ void FieldRailCamera_BlendAnglesAtFocus(FieldRailSystem *rail) {
     FieldCamera_CoordsSetTarget(camera, &target);
 }
 
-void func_ov036_021b2e78(FieldRailSystem *rail) {
+void FieldRailCamera_BlendAnglesAtCentre(FieldRailSystem *rail) {
     RailUnit *unit = FieldRailSystem_GetCameraParentUnit(rail);
     FieldCamera *camera = FieldRailSystem_GetFieldCamera(rail);
     VecFx32 target;
@@ -705,7 +705,7 @@ void FieldRailCamera_FollowHeadingAtCentre(FieldRailSystem *rail) {
     FieldCamera_CoordsSetTarget(FieldRailSystem_GetFieldCamera(rail), &target);
 }
 
-void func_ov036_021b3568(FieldRailSystem *rail) {
+void FieldRailCamera_ApplyLineStart(FieldRailSystem *rail) {
     RailUnit *unit = FieldRailSystem_GetCameraParentUnit(rail);
     u16 onLine = RailUnit_IsOnLine(unit);
     RailPoint *point = GetCurrentRailLinePoint1(unit);
@@ -715,7 +715,7 @@ void func_ov036_021b3568(FieldRailSystem *rail) {
     }
 }
 
-void func_ov036_021b3590(FieldRailSystem *rail) {
+void FieldRailCamera_ApplyLineEnd(FieldRailSystem *rail) {
     RailUnit *unit = FieldRailSystem_GetCameraParentUnit(rail);
     u16 onLine = RailUnit_IsOnLine(unit);
     RailPoint *point = GetCurrentRailLinePoint2(unit);
