@@ -460,7 +460,7 @@ static void positionShakingSpot(EncountSystem *system, EffectEncountState *state
         for (x = area.minX; x <= area.maxX; x++) {
             u32 kind;
 
-            func_ov036_02185230(mapper, chunk, &pos, &terrain);
+            FieldG3DMapper_GetChunkHandleTerrain(mapper, chunk, &pos, &terrain);
             kind = MapTile_GetEncounterEffectKind(terrain.tileType);
             if (kindMask & sPhenomenonKindMasks[kind]) {
                 state->candidates.entries[state->candidates.count].kind = kind;

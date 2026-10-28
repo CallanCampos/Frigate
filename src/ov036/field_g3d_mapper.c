@@ -190,7 +190,7 @@ void FieldG3D_RenderFieldmap(FieldG3DMapper *mapper, G3DCamera *camera, u32 pass
     }
 }
 
-HeightExList *func_ov036_02184590(FieldG3DMapper *mapper) {
+HeightExList *FieldG3DMapper_GetHeightEx(FieldG3DMapper *mapper) {
     return mapper->heightEx;
 }
 
@@ -724,7 +724,8 @@ BOOL FieldG3DMapper_GetTerrain(FieldG3DMapper *mapper, const VecFx32 *position, 
     return TRUE;
 }
 
-BOOL func_ov036_02185230(FieldG3DMapper *mapper, u32 index, const VecFx32 *position, MapTerrainBuf *terrain) {
+BOOL FieldG3DMapper_GetChunkHandleTerrain(FieldG3DMapper *mapper, u32 index, const VecFx32 *position,
+                                          MapTerrainBuf *terrain) {
     MapTerrainSamplerOutput chunkTerrain;
 
     FieldChunk_GetTerrainBaseLayer(&chunkTerrain, mapper->chunkHandles[index].chunk, position, mapper->chunkSpan);
@@ -774,11 +775,11 @@ FieldPropSystem *FieldG3DMapper_GetBMSystem(FieldG3DMapper *mapper) {
     return mapper->propSystem;
 }
 
-void func_ov036_021852f4(FieldG3DMapper *mapper, CityState *city, BOOL isOther) {
+void FieldG3DMapper_SetupWfbc(FieldG3DMapper *mapper, CityState *city, BOOL isOther) {
     func_ov036_0218ade0(mapper->wfbc, city, isOther, mapper->heapId);
 }
 
-ResortMapCreateWork *func_ov036_02185304(FieldG3DMapper *mapper) {
+ResortMapCreateWork *FieldG3DMapper_GetResortMap(FieldG3DMapper *mapper) {
     return mapper->resortMap;
 }
 

@@ -1210,12 +1210,12 @@ void Field_LoadWFBC(GameData *gameData, Field *field, u32 zoneId) {
         } else {
             city = GameData_GetCityState(field->gameData, 0);
         }
-        func_ov036_021852f4(field->g3DMapper, city, isOther);
+        FieldG3DMapper_SetupWfbc(field->g3DMapper, city, isOther);
     }
 }
 
 void Field_LoadJoinAvenue(GameData *gameData, Field *field, u32 zoneId) {
-    ResortMapCreateWork *resortMap = func_ov036_02185304(field->g3DMapper);
+    ResortMapCreateWork *resortMap = FieldG3DMapper_GetResortMap(field->g3DMapper);
     JoinAvenueSave *joinAvenue = SaveControl_GetJoinAvenue(GameData_GetSaveControl(gameData));
     JoinAvenueInfo *info = JoinAvenue_GetInfo(joinAvenue);
     JoinAvenueOccupants *occupants = getAddressOfBeginningOfOccupants(joinAvenue);
