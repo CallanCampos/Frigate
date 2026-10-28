@@ -282,6 +282,58 @@ seed 0xea56a175a2fffc8a       # optional, repeated: the random seeds the DS buil
   to 191.
 - Columns are separated by spaces or tabs; lines may end with CR LF. Anything else is an error that names the line.
 
+### Recordings (proposed; not implemented)
+
+`--record FILE` is not an available option yet. This is the contract for the implementation tracked in issue #38.
+A recording targets reproducible native input on a compatible build, with the same ROM and starting save directory.
+It does not promise that a CPU-time-dependent trainer battle follows the DS's course (ADR 0023), or that unrelated
+builds reproduce the same game behavior.
+
+```
+pbwinput 1
+# Recorded by Frigate: frigate-black2 <commit>, ROM <the dump's SHA-1>
+version b2_us
+frames video
+time 2026-10-25 14:03:27      # the effective RTC at power-on
+clock running
+seed 0x...                    # bounded seed list, before the first frame
+# FRAME BUTTONS [TOUCH]
+...
+```
+
+- **Effective input, on video frames.** At the VBlank hook, capture the held buttons, lid and pen state after window
+  input/replay application, at the same boundary playback uses before ARM7 touch sampling. Write the corresponding
+  monotonically increasing video-frame number. Several VBlanks can share one game frame; they remain distinct in
+  this file. In particular, a pen down for one VBlank and released for the next must remain two samples. Do not
+  coalesce a game frame's touches into an invented held touch: the game's latest-sample read can observe a release.
+  Emit state changes only, flush each complete line, and retain the initial input state needed before the first read.
+  A killed process leaves a parseable prefix of complete samples; clean exit flushes any remaining complete sample.
+- **Effective clock.** Capture the RTC actually selected for the recorded run, including an explicit `--fixed-time`
+  override. Live recording captures the host's local time once, then makes the RTC follow virtual time, as
+  `--fixed-time` already does. It can fall behind wall time while paused or slow, and advance faster during fast play.
+  Record `clock running` or `clock pinned` from the effective mode, not a discarded input-file default. Ordinary
+  non-recorded live play keeps its existing host-clock behavior.
+- **Bounded seeds.** For live recording, draw 64 seeds from the host's random source before starting the game, write
+  them and supply them through `port_random_seed_give`. For recording a replay, preserve its explicitly declared
+  seed list; reject a replay with no declared seeds before starting (option error, status 2). Before any request past
+  the declared list (the 65th for a live recording), flush the readable prefix and stop with status 1 and a diagnostic,
+  before an unrecorded fallback seed reaches the game. Count seed requests, not battles: startup also consumes one.
+  The present `buildSeed` fallback combines timing and other entropy, so no cross-machine guarantee is made for it.
+  `run.txt` must identify the supplied seeds; an unlimited recording needs a separately reviewed format/seed design.
+- **With `--input FILE`.** Record the effective states after playback, normalized into `frames video` even when the
+  input uses `frames game`. Preserve the explicit seeds and the effective RTC/mode described above. Both input frame
+  domains and RTC overrides need round-trip tests; copying header text alone does not establish equivalent playback.
+  Replay-to-live handoff is a later change, not part of this proposal.
+- **Errors.** A destination that cannot be created is an option error (status 2) before game startup. A write/flush
+  error or seed exhaustion stops the run with status 1 and a diagnostic; never silently continue an incomplete
+  recording. Do not overwrite the input file or a save file when selecting the output destination.
+
+Acceptance tests for the later implementation: both-version seeded record/replay routes compare frame/state and save
+hashes; one-VBlank touch transitions in a two-VBlank game pass preserve what the actual touch API returns; game/video
+input domains and effective RTC overrides round-trip; initial/unchanged/lid states, seed-list rejection/exhaustion,
+clean exit, crash prefixes, unwritable paths and mid-run write failures have focused regressions. Those tests and the
+option itself are not added by this documentation change. Issue #38 remains open until they are implemented and pass.
+
 ## Run directories
 
 What `pbw-oracle` and `oracle.py port` write, and `compare.py` reads:
