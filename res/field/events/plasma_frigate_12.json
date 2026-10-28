@@ -16,7 +16,7 @@
         {
             "id": 0,
             "model": "OBJ_CODE_291",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x0344",
             "script": 2000,
@@ -35,7 +35,7 @@
         {
             "id": 1,
             "model": "OBJ_CODE_TEAM_PLASMA_GRUNT_F",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x0344",
             "script": 2000,
@@ -54,7 +54,7 @@
         {
             "id": 2,
             "model": "OBJ_CODE_TEAM_PLASMA_GRUNT_M",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x0344",
             "script": 2000,

@@ -5,7 +5,7 @@
         {
             "id": 0,
             "model": "OBJ_CODE_POKEFAN_F",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 4,
@@ -24,7 +24,7 @@
         {
             "id": 1,
             "model": "OBJ_CODE_27",
-            "movement": 17,
+            "movement": "MOVE_CODE_FACE_RIGHT",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 5,
@@ -43,7 +43,7 @@
         {
             "id": 2,
             "model": "OBJ_CODE_BATTLE_GIRL",
-            "movement": 42,
+            "movement": "MOVE_CODE_LOOP_DOWN_LEFT_UP_RIGHT",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 6,
@@ -62,7 +62,7 @@
         {
             "id": 3,
             "model": "OBJ_CODE_BACKERS_M",
-            "movement": 3,
+            "movement": "MOVE_CODE_WALK_RANDOM",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x035c",
             "script": 8,
@@ -81,7 +81,7 @@
         {
             "id": 4,
             "model": "OBJ_CODE_BIKER",
-            "movement": 3,
+            "movement": "MOVE_CODE_WALK_RANDOM",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 7,

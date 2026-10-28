@@ -276,7 +276,7 @@
         {
             "id": 0,
             "model": "OBJ_CODE_LASS",
-            "movement": 16,
+            "movement": "MOVE_CODE_FACE_LEFT",
             "type": "ACTOR_EVENT_TYPE_TRAINER",
             "flag": 0,
             "script": 3269,
@@ -295,7 +295,7 @@
         {
             "id": 1,
             "model": "OBJ_CODE_PKMN_BREEDER_M",
-            "movement": 17,
+            "movement": "MOVE_CODE_FACE_RIGHT",
             "type": "ACTOR_EVENT_TYPE_TRAINER",
             "flag": 0,
             "script": 3302,
@@ -314,7 +314,7 @@
         {
             "id": 2,
             "model": "OBJ_CODE_PRESCHOOLER_M",
-            "movement": 40,
+            "movement": "MOVE_CODE_LOOP_RIGHT_UP_LEFT_DOWN",
             "type": "ACTOR_EVENT_TYPE_TRAINER",
             "flag": 0,
             "script": 3272,
@@ -333,7 +333,7 @@
         {
             "id": 3,
             "model": "OBJ_CODE_PRESCHOOLER_F",
-            "movement": 14,
+            "movement": "MOVE_CODE_FACE_UP",
             "type": "ACTOR_EVENT_TYPE_TRAINER",
             "flag": 0,
             "script": 3273,
@@ -352,7 +352,7 @@
         {
             "id": 4,
             "model": "OBJ_CODE_TWINS",
-            "movement": 16,
+            "movement": "MOVE_CODE_FACE_LEFT",
             "type": "ACTOR_EVENT_TYPE_TRAINER",
             "flag": 0,
             "script": 3274,
@@ -371,7 +371,7 @@
         {
             "id": 5,
             "model": "OBJ_CODE_TWINS",
-            "movement": 16,
+            "movement": "MOVE_CODE_FACE_LEFT",
             "type": "ACTOR_EVENT_TYPE_TRAINER",
             "flag": 0,
             "script": 5274,
@@ -390,7 +390,7 @@
         {
             "id": 6,
             "model": "OBJ_CODE_HARLEQUIN_233",
-            "movement": 39,
+            "movement": "MOVE_CODE_LOOP_LEFT_DOWN_RIGHT_UP",
             "type": "ACTOR_EVENT_TYPE_TRAINER_WALK_SPIN_COUNTERCLOCKWISE",
             "flag": 0,
             "script": 3275,
@@ -409,7 +409,7 @@
         {
             "id": 7,
             "model": "OBJ_CODE_HARLEQUIN_233",
-            "movement": 24,
+            "movement": "MOVE_CODE_ROUTE_LEFT_DOWN_UP_RIGHT",
             "type": "ACTOR_EVENT_TYPE_TRAINER",
             "flag": 0,
             "script": 3276,
@@ -428,7 +428,7 @@
         {
             "id": 8,
             "model": "OBJ_CODE_NURSERY_AIDE",
-            "movement": 3,
+            "movement": "MOVE_CODE_WALK_RANDOM",
             "type": "ACTOR_EVENT_TYPE_TRAINER",
             "flag": 0,
             "script": 3271,
@@ -447,7 +447,7 @@
         {
             "id": 9,
             "model": "OBJ_CODE_110",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x04b1",
             "script": 7101,
@@ -466,7 +466,7 @@
         {
             "id": 10,
             "model": "OBJ_CODE_110",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x04b2",
             "script": 7102,
@@ -485,7 +485,7 @@
         {
             "id": 11,
             "model": "OBJ_CODE_110",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x04b3",
             "script": 7103,
@@ -504,7 +504,7 @@
         {
             "id": 12,
             "model": "OBJ_CODE_110",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x04b4",
             "script": 7104,
@@ -523,7 +523,7 @@
         {
             "id": 13,
             "model": "OBJ_CODE_YOUNGSTER",
-            "movement": 43,
+            "movement": "MOVE_CODE_LOOP_LEFT_UP_RIGHT_DOWN",
             "type": "ACTOR_EVENT_TYPE_TRAINER_SPIN_COUNTERCLOCKWISE",
             "flag": 0,
             "script": 3270,
@@ -542,7 +542,7 @@
         {
             "id": 14,
             "model": "OBJ_CODE_110",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x03a4",
             "script": 10520,
@@ -561,7 +561,7 @@
         {
             "id": 15,
             "model": "OBJ_CODE_110",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x03a5",
             "script": 10520,
@@ -580,7 +580,7 @@
         {
             "id": 16,
             "model": "OBJ_CODE_BATTLE_GIRL",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 6,

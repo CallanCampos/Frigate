@@ -206,7 +206,7 @@
         {
             "id": 0,
             "model": "OBJ_CODE_POKEFAN_M",
-            "movement": 69,
+            "movement": "MOVE_CODE_RAIL_STAY",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 1,
@@ -225,7 +225,7 @@
         {
             "id": 1,
             "model": "OBJ_CODE_LASS",
-            "movement": 69,
+            "movement": "MOVE_CODE_RAIL_STAY",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 2,
@@ -244,7 +244,7 @@
         {
             "id": 2,
             "model": "OBJ_CODE_BACKPACKER_F",
-            "movement": 69,
+            "movement": "MOVE_CODE_RAIL_STAY",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 4,
@@ -263,7 +263,7 @@
         {
             "id": 3,
             "model": "OBJ_CODE_ACE_TRAINER_M",
-            "movement": 82,
+            "movement": "MOVE_CODE_RAIL_WALK_RANDOM_UP_DOWN",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 3,
@@ -282,7 +282,7 @@
         {
             "id": 4,
             "model": "OBJ_CODE_BACKERS_M",
-            "movement": 70,
+            "movement": "MOVE_CODE_RAIL_TURN_RANDOM",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x035a",
             "script": 5,

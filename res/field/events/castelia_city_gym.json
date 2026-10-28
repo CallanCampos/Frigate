@@ -26,7 +26,7 @@
         {
             "id": 0,
             "model": "OBJ_CODE_HARLEQUIN_233",
-            "movement": 15,
+            "movement": "MOVE_CODE_FACE_DOWN",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 7,
@@ -45,7 +45,7 @@
         {
             "id": 1,
             "model": "OBJ_CODE_HARLEQUIN_233",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_TRAINER",
             "flag": 0,
             "script": 3734,
@@ -64,7 +64,7 @@
         {
             "id": 2,
             "model": "OBJ_CODE_HARLEQUIN_233",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_TRAINER",
             "flag": 0,
             "script": 3736,
@@ -83,7 +83,7 @@
         {
             "id": 3,
             "model": "OBJ_CODE_HARLEQUIN_233",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_TRAINER",
             "flag": 0,
             "script": 3737,
@@ -102,7 +102,7 @@
         {
             "id": 4,
             "model": "OBJ_CODE_187",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 8,

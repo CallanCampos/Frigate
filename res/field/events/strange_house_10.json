@@ -206,7 +206,7 @@
         {
             "id": 0,
             "model": "OBJ_CODE_110",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x04bc",
             "script": 7112,

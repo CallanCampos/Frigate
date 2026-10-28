@@ -26,7 +26,7 @@
         {
             "id": 0,
             "model": "OBJ_CODE_MODEL_BIGROCK2",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 10000,
@@ -45,7 +45,7 @@
         {
             "id": 1,
             "model": "OBJ_CODE_MODEL_BIGROCK2",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 10000,
@@ -64,7 +64,7 @@
         {
             "id": 2,
             "model": "OBJ_CODE_ARTIST",
-            "movement": 15,
+            "movement": "MOVE_CODE_FACE_DOWN",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 1,
@@ -83,7 +83,7 @@
         {
             "id": 3,
             "model": "OBJ_CODE_110",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x049d",
             "script": 7081,
@@ -102,7 +102,7 @@
         {
             "id": 4,
             "model": "OBJ_CODE_110",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x049e",
             "script": 7082,

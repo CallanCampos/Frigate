@@ -5,7 +5,7 @@
         {
             "id": 0,
             "model": "OBJ_CODE_SCIENTIST_M_52",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 10290,
@@ -24,7 +24,7 @@
         {
             "id": 1,
             "model": "OBJ_CODE_SCIENTIST_F_46",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 10292,
@@ -43,7 +43,7 @@
         {
             "id": 2,
             "model": "OBJ_CODE_SCIENTIST_M_52",
-            "movement": 6,
+            "movement": "MOVE_CODE_TURN_RANDOM_UP_LEFT",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 10294,
@@ -62,7 +62,7 @@
         {
             "id": 3,
             "model": "OBJ_CODE_SCIENTIST_F_46",
-            "movement": 17,
+            "movement": "MOVE_CODE_FACE_RIGHT",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 10293,

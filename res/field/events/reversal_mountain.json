@@ -136,7 +136,7 @@
         {
             "id": 0,
             "model": "OBJ_CODE_110",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x04c0",
             "script": 7116,
@@ -155,7 +155,7 @@
         {
             "id": 1,
             "model": "OBJ_CODE_110",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x04bf",
             "script": 7115,
@@ -174,7 +174,7 @@
         {
             "id": 2,
             "model": "OBJ_CODE_110",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x04c1",
             "script": 7117,
@@ -193,7 +193,7 @@
         {
             "id": 3,
             "model": "OBJ_CODE_CYCLIST_M",
-            "movement": 37,
+            "movement": "MOVE_CODE_LOOP_UP_LEFT_DOWN_RIGHT",
             "type": "ACTOR_EVENT_TYPE_TRAINER_DASH",
             "flag": 0,
             "script": 3468,
@@ -212,7 +212,7 @@
         {
             "id": 4,
             "model": "OBJ_CODE_CYCLIST_F",
-            "movement": 42,
+            "movement": "MOVE_CODE_LOOP_DOWN_LEFT_UP_RIGHT",
             "type": "ACTOR_EVENT_TYPE_TRAINER_DASH",
             "flag": 0,
             "script": 3467,
@@ -231,7 +231,7 @@
         {
             "id": 5,
             "model": "OBJ_CODE_110",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x04ba",
             "script": 7110,
@@ -250,7 +250,7 @@
         {
             "id": 6,
             "model": "OBJ_CODE_110",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x05ca",
             "script": 7382,

@@ -56,7 +56,7 @@
         {
             "id": 0,
             "model": "OBJ_CODE_187",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 3,
@@ -75,7 +75,7 @@
         {
             "id": 1,
             "model": "OBJ_CODE_WORKER_26",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 12,
@@ -94,7 +94,7 @@
         {
             "id": 2,
             "model": "OBJ_CODE_WORKER_26",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 13,
@@ -113,7 +113,7 @@
         {
             "id": 3,
             "model": "OBJ_CODE_WORKER_26",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 14,
@@ -132,7 +132,7 @@
         {
             "id": 4,
             "model": "OBJ_CODE_WORKER_26",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 15,
@@ -151,7 +151,7 @@
         {
             "id": 5,
             "model": "OBJ_CODE_WORKER_26",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 16,
@@ -170,7 +170,7 @@
         {
             "id": 6,
             "model": "OBJ_CODE_WORKER_26",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 11,
@@ -189,7 +189,7 @@
         {
             "id": 7,
             "model": "OBJ_CODE_227",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x03e9",
             "script": 1,
@@ -208,7 +208,7 @@
         {
             "id": 8,
             "model": "OBJ_CODE_WORKER_26",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 17,

@@ -96,7 +96,7 @@
         {
             "id": 0,
             "model": "OBJ_CODE_BLACK_BELT",
-            "movement": 81,
+            "movement": "MOVE_CODE_RAIL_WALK_RANDOM",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 3,
@@ -115,7 +115,7 @@
         {
             "id": 1,
             "model": "OBJ_CODE_DEPOT_AGENT",
-            "movement": 70,
+            "movement": "MOVE_CODE_RAIL_TURN_RANDOM",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 1,
@@ -134,7 +134,7 @@
         {
             "id": 2,
             "model": "OBJ_CODE_DEPOT_AGENT",
-            "movement": 81,
+            "movement": "MOVE_CODE_RAIL_WALK_RANDOM",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 2,
@@ -153,7 +153,7 @@
         {
             "id": 3,
             "model": "OBJ_CODE_10",
-            "movement": 69,
+            "movement": "MOVE_CODE_RAIL_STAY",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 6,
@@ -172,7 +172,7 @@
         {
             "id": 4,
             "model": "OBJ_CODE_ACE_TRAINER_M",
-            "movement": 69,
+            "movement": "MOVE_CODE_RAIL_STAY",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x0285",
             "script": 10310,

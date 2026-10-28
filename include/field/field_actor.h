@@ -4,6 +4,7 @@
 #include "types.h"
 #include "constants/actor_event_types.h"
 #include "constants/directions.h"
+#include "constants/move_codes.h"
 #include "field/zone.h"
 #include "gfl/billboard_actor.h"
 #include "gfl/heap.h"

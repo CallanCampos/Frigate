@@ -136,7 +136,7 @@
         {
             "id": 0,
             "model": "OBJ_CODE_HIKER",
-            "movement": 2,
+            "movement": "MOVE_CODE_TURN_RANDOM",
             "type": "ACTOR_EVENT_TYPE_TRAINER",
             "flag": 0,
             "script": 3487,
@@ -155,7 +155,7 @@
         {
             "id": 1,
             "model": "OBJ_CODE_WORKER_26",
-            "movement": 20,
+            "movement": "MOVE_CODE_WALK_BACK_AND_FORTH",
             "type": "ACTOR_EVENT_TYPE_TRAINER",
             "flag": 0,
             "script": 3489,
@@ -174,7 +174,7 @@
         {
             "id": 2,
             "model": "OBJ_CODE_MODEL_BIGROCK2",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 10000,
@@ -193,7 +193,7 @@
         {
             "id": 3,
             "model": "OBJ_CODE_MODEL_BIGROCK2",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 10000,
@@ -212,7 +212,7 @@
         {
             "id": 4,
             "model": "OBJ_CODE_110",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x049f",
             "script": 7083,
@@ -231,7 +231,7 @@
         {
             "id": 5,
             "model": "OBJ_CODE_110",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x04a1",
             "script": 7085,
@@ -250,7 +250,7 @@
         {
             "id": 6,
             "model": "OBJ_CODE_WORKER_26",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x03be",
             "script": 3,
@@ -269,7 +269,7 @@
         {
             "id": 7,
             "model": "OBJ_CODE_WORKER_26",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x03be",
             "script": 2,
@@ -288,7 +288,7 @@
         {
             "id": 8,
             "model": "OBJ_CODE_WORKER_26",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x03be",
             "script": 1,
@@ -307,7 +307,7 @@
         {
             "id": 9,
             "model": "OBJ_CODE_206",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x03be",
             "script": 2000,
@@ -326,7 +326,7 @@
         {
             "id": 10,
             "model": "OBJ_CODE_206",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x03be",
             "script": 2000,
@@ -345,7 +345,7 @@
         {
             "id": 11,
             "model": "OBJ_CODE_206",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x03be",
             "script": 2000,
@@ -364,7 +364,7 @@
         {
             "id": 12,
             "model": "OBJ_CODE_206",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x03be",
             "script": 2000,
@@ -383,7 +383,7 @@
         {
             "id": 13,
             "model": "OBJ_CODE_206",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x03be",
             "script": 2000,
@@ -402,7 +402,7 @@
         {
             "id": 14,
             "model": "OBJ_CODE_206",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x03be",
             "script": 2000,
@@ -421,7 +421,7 @@
         {
             "id": 15,
             "model": "OBJ_CODE_206",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x03be",
             "script": 2000,
@@ -440,7 +440,7 @@
         {
             "id": 16,
             "model": "OBJ_CODE_WORKER_26",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x03b4",
             "script": 4,
@@ -459,7 +459,7 @@
         {
             "id": 17,
             "model": "OBJ_CODE_WORKER_26",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x03b5",
             "script": 6,
@@ -478,7 +478,7 @@
         {
             "id": 18,
             "model": "OBJ_CODE_WORKER_26",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x03b6",
             "script": 5,
@@ -497,7 +497,7 @@
         {
             "id": 19,
             "model": "OBJ_CODE_206",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x03be",
             "script": 2000,
@@ -516,7 +516,7 @@
         {
             "id": 20,
             "model": "OBJ_CODE_206",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x03be",
             "script": 2000,
@@ -535,7 +535,7 @@
         {
             "id": 21,
             "model": "OBJ_CODE_206",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x03be",
             "script": 2000,

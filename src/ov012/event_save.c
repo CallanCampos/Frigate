@@ -75,7 +75,7 @@ GameEventReturnCode EventPrepareResidentActors_Callback(GameEvent *event, u32 *s
     case 0:
         actorSystem = Field_GetActorSystem(field);
         player = FindPlayerFieldActor(actorSystem);
-        actor = FindActorByMoveCode(actorSystem, 0x30);
+        actor = FindActorByMoveCode(actorSystem, MOVE_CODE_FOLLOW_PLAYER);
         work->movingActors = 0;
         DisableAllActorsMovement(actorSystem);
         if (!FldAct_CheckAcmdEnd(player)) {
@@ -109,7 +109,7 @@ GameEventReturnCode EventPrepareResidentActors_Callback(GameEvent *event, u32 *s
             }
         }
         if (work->movingActors & 2) {
-            actor = FindActorByMoveCode(actorSystem, 0x30);
+            actor = FindActorByMoveCode(actorSystem, MOVE_CODE_FOLLOW_PLAYER);
             if (!IsActorFlag16(actor)) {
                 DisableActorMovement(actor);
                 work->movingActors &= ~2;

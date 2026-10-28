@@ -216,7 +216,7 @@
         {
             "id": 0,
             "model": "OBJ_CODE_PSYCHIC_F",
-            "movement": 8,
+            "movement": "MOVE_CODE_TURN_RANDOM_DOWN_LEFT",
             "type": "ACTOR_EVENT_TYPE_TRAINER",
             "flag": 0,
             "script": 3510,
@@ -235,7 +235,7 @@
         {
             "id": 1,
             "model": "OBJ_CODE_PSYCHIC_M",
-            "movement": 13,
+            "movement": "MOVE_CODE_TURN_RANDOM_DOWN_LEFT_RIGHT",
             "type": "ACTOR_EVENT_TYPE_TRAINER",
             "flag": 0,
             "script": 3512,
@@ -254,7 +254,7 @@
         {
             "id": 2,
             "model": "OBJ_CODE_110",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x058a",
             "script": 7318,

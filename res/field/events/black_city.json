@@ -196,7 +196,7 @@
         {
             "id": 0,
             "model": "OBJ_CODE_ROUGHNECK",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 6,
@@ -215,7 +215,7 @@
         {
             "id": 1,
             "model": "OBJ_CODE_BATTLE_GIRL",
-            "movement": 3,
+            "movement": "MOVE_CODE_WALK_RANDOM",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 7,
@@ -234,7 +234,7 @@
         {
             "id": 2,
             "model": "OBJ_CODE_VETERAN_M",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 12,
@@ -253,7 +253,7 @@
         {
             "id": 3,
             "model": "OBJ_CODE_SCIENTIST_F_46",
-            "movement": 3,
+            "movement": "MOVE_CODE_WALK_RANDOM",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x03ca",
             "script": 8,
@@ -272,7 +272,7 @@
         {
             "id": 4,
             "model": "OBJ_CODE_CLERK_F",
-            "movement": 3,
+            "movement": "MOVE_CODE_WALK_RANDOM",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 9,
@@ -291,7 +291,7 @@
         {
             "id": 5,
             "model": "OBJ_CODE_CLERK_M_67",
-            "movement": 3,
+            "movement": "MOVE_CODE_WALK_RANDOM",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 11,
@@ -310,7 +310,7 @@
         {
             "id": 6,
             "model": "OBJ_CODE_PKMN_RANGER_F",
-            "movement": 3,
+            "movement": "MOVE_CODE_WALK_RANDOM",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x03cb",
             "script": 10,
@@ -329,7 +329,7 @@
         {
             "id": 7,
             "model": "OBJ_CODE_BACKPACKER_F",
-            "movement": 3,
+            "movement": "MOVE_CODE_WALK_RANDOM",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 13,

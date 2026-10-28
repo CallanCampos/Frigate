@@ -256,7 +256,7 @@
         {
             "id": 0,
             "model": "OBJ_CODE_BATTLE_GIRL",
-            "movement": 44,
+            "movement": "MOVE_CODE_LOOP_RIGHT_DOWN_LEFT_UP",
             "type": "ACTOR_EVENT_TYPE_TRAINER",
             "flag": 0,
             "script": 3524,
@@ -275,7 +275,7 @@
         {
             "id": 1,
             "model": "OBJ_CODE_BACKPACKER_M",
-            "movement": 17,
+            "movement": "MOVE_CODE_FACE_RIGHT",
             "type": "ACTOR_EVENT_TYPE_TRAINER",
             "flag": 0,
             "script": 3788,
@@ -294,7 +294,7 @@
         {
             "id": 2,
             "model": "OBJ_CODE_BLACK_BELT",
-            "movement": 38,
+            "movement": "MOVE_CODE_LOOP_DOWN_RIGHT_UP_LEFT",
             "type": "ACTOR_EVENT_TYPE_TRAINER",
             "flag": 0,
             "script": 3523,
@@ -313,7 +313,7 @@
         {
             "id": 3,
             "model": "OBJ_CODE_HIKER",
-            "movement": 16,
+            "movement": "MOVE_CODE_FACE_LEFT",
             "type": "ACTOR_EVENT_TYPE_TRAINER",
             "flag": 0,
             "script": 3522,
@@ -332,7 +332,7 @@
         {
             "id": 4,
             "model": "OBJ_CODE_PKMN_RANGER_M",
-            "movement": 20,
+            "movement": "MOVE_CODE_WALK_BACK_AND_FORTH",
             "type": "ACTOR_EVENT_TYPE_TRAINER_LOOK_AROUND",
             "flag": 0,
             "script": 3516,
@@ -351,7 +351,7 @@
         {
             "id": 5,
             "model": "OBJ_CODE_ACE_TRAINER_F",
-            "movement": 16,
+            "movement": "MOVE_CODE_FACE_LEFT",
             "type": "ACTOR_EVENT_TYPE_TRAINER",
             "flag": 0,
             "script": 3787,
@@ -370,7 +370,7 @@
         {
             "id": 6,
             "model": "OBJ_CODE_ACE_TRAINER_M",
-            "movement": 17,
+            "movement": "MOVE_CODE_FACE_RIGHT",
             "type": "ACTOR_EVENT_TYPE_TRAINER",
             "flag": 0,
             "script": 3519,
@@ -389,7 +389,7 @@
         {
             "id": 7,
             "model": "OBJ_CODE_DOCTOR",
-            "movement": 15,
+            "movement": "MOVE_CODE_FACE_DOWN",
             "type": "ACTOR_EVENT_TYPE_TRAINER",
             "flag": 0,
             "script": 3672,
@@ -408,7 +408,7 @@
         {
             "id": 8,
             "model": "OBJ_CODE_110",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x04c3",
             "script": 7119,
@@ -427,7 +427,7 @@
         {
             "id": 9,
             "model": "OBJ_CODE_110",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x04c4",
             "script": 7120,
@@ -446,7 +446,7 @@
         {
             "id": 10,
             "model": "OBJ_CODE_110",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x04c5",
             "script": 7121,
@@ -465,7 +465,7 @@
         {
             "id": 11,
             "model": "OBJ_CODE_110",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x04c6",
             "script": 7122,
@@ -484,7 +484,7 @@
         {
             "id": 12,
             "model": "OBJ_CODE_110",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x04c7",
             "script": 7123,
@@ -503,7 +503,7 @@
         {
             "id": 13,
             "model": "OBJ_CODE_249",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x03bf",
             "script": 6,
@@ -522,7 +522,7 @@
         {
             "id": 14,
             "model": "OBJ_CODE_BACKPACKER_F",
-            "movement": 16,
+            "movement": "MOVE_CODE_FACE_LEFT",
             "type": "ACTOR_EVENT_TYPE_TRAINER",
             "flag": 0,
             "script": 3514,
@@ -541,7 +541,7 @@
         {
             "id": 15,
             "model": "OBJ_CODE_HIKER",
-            "movement": 15,
+            "movement": "MOVE_CODE_FACE_DOWN",
             "type": "ACTOR_EVENT_TYPE_TRAINER",
             "flag": 0,
             "script": 3521,
@@ -560,7 +560,7 @@
         {
             "id": 16,
             "model": "OBJ_CODE_SCIENTIST_M_52",
-            "movement": 13,
+            "movement": "MOVE_CODE_TURN_RANDOM_DOWN_LEFT_RIGHT",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 7,

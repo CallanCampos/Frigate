@@ -76,7 +76,7 @@
         {
             "id": 0,
             "model": "OBJ_CODE_110",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x053d",
             "script": 7241,
@@ -95,7 +95,7 @@
         {
             "id": 1,
             "model": "OBJ_CODE_WORKER_26",
-            "movement": 42,
+            "movement": "MOVE_CODE_LOOP_DOWN_LEFT_UP_RIGHT",
             "type": "ACTOR_EVENT_TYPE_TRAINER",
             "flag": 0,
             "script": 3525,
@@ -114,7 +114,7 @@
         {
             "id": 2,
             "model": "OBJ_CODE_VETERAN_F",
-            "movement": 16,
+            "movement": "MOVE_CODE_FACE_LEFT",
             "type": "ACTOR_EVENT_TYPE_TRAINER",
             "flag": 0,
             "script": 3533,
@@ -133,7 +133,7 @@
         {
             "id": 3,
             "model": "OBJ_CODE_WORKER_26",
-            "movement": 15,
+            "movement": "MOVE_CODE_FACE_DOWN",
             "type": "ACTOR_EVENT_TYPE_TRAINER",
             "flag": 0,
             "script": 3526,

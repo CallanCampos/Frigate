@@ -146,7 +146,7 @@
         {
             "id": 0,
             "model": "OBJ_CODE_110",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x0469",
             "script": 7029,
@@ -165,7 +165,7 @@
         {
             "id": 1,
             "model": "OBJ_CODE_110",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x046a",
             "script": 7030,
@@ -184,7 +184,7 @@
         {
             "id": 2,
             "model": "OBJ_CODE_297",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 3,
@@ -203,7 +203,7 @@
         {
             "id": 3,
             "model": "OBJ_CODE_DANCER",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 2,
@@ -222,7 +222,7 @@
         {
             "id": 4,
             "model": "OBJ_CODE_ROUGHNECK",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 1,

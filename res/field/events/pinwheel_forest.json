@@ -276,7 +276,7 @@
         {
             "id": 0,
             "model": "OBJ_CODE_210",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x055b",
             "script": 7271,
@@ -295,7 +295,7 @@
         {
             "id": 1,
             "model": "OBJ_CODE_110",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x055a",
             "script": 7270,
@@ -314,7 +314,7 @@
         {
             "id": 2,
             "model": "OBJ_CODE_110",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x0559",
             "script": 7269,
@@ -333,7 +333,7 @@
         {
             "id": 3,
             "model": "OBJ_CODE_110",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x0558",
             "script": 7268,
@@ -352,7 +352,7 @@
         {
             "id": 4,
             "model": "OBJ_CODE_110",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x0557",
             "script": 7267,
@@ -371,7 +371,7 @@
         {
             "id": 5,
             "model": "OBJ_CODE_BLACK_BELT",
-            "movement": 10,
+            "movement": "MOVE_CODE_TURN_RANDOM_UP_DOWN_LEFT",
             "type": "ACTOR_EVENT_TYPE_TRAINER",
             "flag": 0,
             "script": 3637,
@@ -390,7 +390,7 @@
         {
             "id": 6,
             "model": "OBJ_CODE_BATTLE_GIRL",
-            "movement": 20,
+            "movement": "MOVE_CODE_WALK_BACK_AND_FORTH",
             "type": "ACTOR_EVENT_TYPE_TRAINER_LOOK_AROUND",
             "flag": 0,
             "script": 3638,
@@ -409,7 +409,7 @@
         {
             "id": 7,
             "model": "OBJ_CODE_ACE_TRAINER_M",
-            "movement": 15,
+            "movement": "MOVE_CODE_FACE_DOWN",
             "type": "ACTOR_EVENT_TYPE_TRAINER",
             "flag": 0,
             "script": 3635,
@@ -428,7 +428,7 @@
         {
             "id": 8,
             "model": "OBJ_CODE_ACE_TRAINER_F",
-            "movement": 20,
+            "movement": "MOVE_CODE_WALK_BACK_AND_FORTH",
             "type": "ACTOR_EVENT_TYPE_TRAINER_LOOK_AROUND",
             "flag": 0,
             "script": 3636,
@@ -447,7 +447,7 @@
         {
             "id": 9,
             "model": "OBJ_CODE_SCHOOL_KID_M",
-            "movement": 20,
+            "movement": "MOVE_CODE_WALK_BACK_AND_FORTH",
             "type": "ACTOR_EVENT_TYPE_TRAINER",
             "flag": 0,
             "script": 3633,
@@ -466,7 +466,7 @@
         {
             "id": 10,
             "model": "OBJ_CODE_SCHOOL_KID_F",
-            "movement": 17,
+            "movement": "MOVE_CODE_FACE_RIGHT",
             "type": "ACTOR_EVENT_TYPE_TRAINER",
             "flag": 0,
             "script": 3634,
@@ -485,7 +485,7 @@
         {
             "id": 11,
             "model": "OBJ_CODE_BATTLE_GIRL",
-            "movement": 3,
+            "movement": "MOVE_CODE_WALK_RANDOM",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 3,
@@ -504,7 +504,7 @@
         {
             "id": 12,
             "model": "OBJ_CODE_14",
-            "movement": 3,
+            "movement": "MOVE_CODE_WALK_RANDOM",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 4,

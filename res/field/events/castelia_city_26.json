@@ -26,7 +26,7 @@
         {
             "id": 0,
             "model": "OBJ_CODE_SCIENTIST_M_52",
-            "movement": 3,
+            "movement": "MOVE_CODE_WALK_RANDOM",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 1,
@@ -45,7 +45,7 @@
         {
             "id": 1,
             "model": "OBJ_CODE_ARTIST",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 6,
@@ -64,7 +64,7 @@
         {
             "id": 2,
             "model": "OBJ_CODE_128",
-            "movement": 39,
+            "movement": "MOVE_CODE_LOOP_LEFT_DOWN_RIGHT_UP",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 7,
@@ -83,7 +83,7 @@
         {
             "id": 3,
             "model": "OBJ_CODE_21",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 5,
@@ -102,7 +102,7 @@
         {
             "id": 4,
             "model": "OBJ_CODE_CLERK_M_67",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 2,
@@ -121,7 +121,7 @@
         {
             "id": 5,
             "model": "OBJ_CODE_CLERK_M_67",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 3,
@@ -140,7 +140,7 @@
         {
             "id": 6,
             "model": "OBJ_CODE_18",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 4,

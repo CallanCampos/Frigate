@@ -56,7 +56,7 @@
         {
             "id": 0,
             "model": "OBJ_CODE_104",
-            "movement": 15,
+            "movement": "MOVE_CODE_FACE_DOWN",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 7,
@@ -75,7 +75,7 @@
         {
             "id": 1,
             "model": "OBJ_CODE_105",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 6,
@@ -94,7 +94,7 @@
         {
             "id": 2,
             "model": "OBJ_CODE_305",
-            "movement": 3,
+            "movement": "MOVE_CODE_WALK_RANDOM",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 8,
@@ -113,7 +113,7 @@
         {
             "id": 3,
             "model": "OBJ_CODE_376",
-            "movement": 38,
+            "movement": "MOVE_CODE_LOOP_DOWN_RIGHT_UP_LEFT",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 9,

@@ -26,7 +26,7 @@
         {
             "id": 0,
             "model": "OBJ_CODE_76",
-            "movement": 15,
+            "movement": "MOVE_CODE_FACE_DOWN",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 1,
@@ -45,7 +45,7 @@
         {
             "id": 1,
             "model": "OBJ_CODE_WAITER",
-            "movement": 15,
+            "movement": "MOVE_CODE_FACE_DOWN",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 2,
@@ -64,7 +64,7 @@
         {
             "id": 2,
             "model": "OBJ_CODE_GENTLEMAN",
-            "movement": 3,
+            "movement": "MOVE_CODE_WALK_RANDOM",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 3,
@@ -83,7 +83,7 @@
         {
             "id": 3,
             "model": "OBJ_CODE_WORKER_44",
-            "movement": 15,
+            "movement": "MOVE_CODE_FACE_DOWN",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 4,
@@ -102,7 +102,7 @@
         {
             "id": 4,
             "model": "OBJ_CODE_POKEFAN_F",
-            "movement": 15,
+            "movement": "MOVE_CODE_FACE_DOWN",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 5,

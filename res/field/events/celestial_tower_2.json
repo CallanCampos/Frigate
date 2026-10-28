@@ -76,7 +76,7 @@
         {
             "id": 0,
             "model": "OBJ_CODE_105",
-            "movement": 14,
+            "movement": "MOVE_CODE_FACE_UP",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x02fe",
             "script": 2,
@@ -95,7 +95,7 @@
         {
             "id": 1,
             "model": "OBJ_CODE_WAITRESS",
-            "movement": 17,
+            "movement": "MOVE_CODE_FACE_RIGHT",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x0337",
             "script": 3,
@@ -114,7 +114,7 @@
         {
             "id": 2,
             "model": "OBJ_CODE_POLICEMAN",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 5,
@@ -133,7 +133,7 @@
         {
             "id": 3,
             "model": "OBJ_CODE_65",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 4,

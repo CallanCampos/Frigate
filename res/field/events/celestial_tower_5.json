@@ -66,7 +66,7 @@
         {
             "id": 0,
             "model": "OBJ_CODE_110",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x04b8",
             "script": 7108,
@@ -85,7 +85,7 @@
         {
             "id": 1,
             "model": "OBJ_CODE_110",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x04b9",
             "script": 7109,
@@ -104,7 +104,7 @@
         {
             "id": 2,
             "model": "OBJ_CODE_65",
-            "movement": 16,
+            "movement": "MOVE_CODE_FACE_LEFT",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x033a",
             "script": 2,
@@ -123,7 +123,7 @@
         {
             "id": 3,
             "model": "OBJ_CODE_SOCIALITE",
-            "movement": 17,
+            "movement": "MOVE_CODE_FACE_RIGHT",
             "type": "ACTOR_EVENT_TYPE_TRAINER",
             "flag": 0,
             "script": 3552,
@@ -142,7 +142,7 @@
         {
             "id": 4,
             "model": "OBJ_CODE_GENTLEMAN",
-            "movement": 8,
+            "movement": "MOVE_CODE_TURN_RANDOM_DOWN_LEFT",
             "type": "ACTOR_EVENT_TYPE_TRAINER",
             "flag": 0,
             "script": 3551,
@@ -161,7 +161,7 @@
         {
             "id": 5,
             "model": "OBJ_CODE_PSYCHIC_F",
-            "movement": 15,
+            "movement": "MOVE_CODE_FACE_DOWN",
             "type": "ACTOR_EVENT_TYPE_TRAINER",
             "flag": 0,
             "script": 3556,

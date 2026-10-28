@@ -24,7 +24,9 @@ typedef struct {
 
 // Overlay 36's tables of the move codes' functions, by move code (field_actor_movedata.c's), and of the scene nodes'
 // functions, by sceneNodeType (field_actor_drawdata.c's)
-extern const FieldActorMoveCode *const ACTOR_MOVE_CODE_FUNCTION_TABLES[];
+// The number of move codes (constants/move_codes.h)
+#define MOVE_CODE_MAX 0x56
+extern const FieldActorMoveCode *const ACTOR_MOVE_CODE_FUNCTION_TABLES[MOVE_CODE_MAX];
 // Overlay 36's field_actor_movedata.c: the tables of the action commands' functions, by command, for the actors on the
 // grid and on the rails, and the rows of commands that differ only by direction, by direction
 extern const ActorAcmdFunc *const ACTOR_ACTION_COMMAND_TABLES[];

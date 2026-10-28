@@ -98,7 +98,7 @@ void TryRespawnFollowActor(GameData *gameData, u32 behind) {
         hidden = FALSE;
         AdjusGridXZByDir(GetInverseDirection((u16)dir), &x, &z, 1);
     }
-    actor = CreateNewActorByParam(mmSys, x, z, dir, FOLLOWER_ACTOR_ID, wk->objCode, 0x30, zoneId);
+    actor = CreateNewActorByParam(mmSys, x, z, dir, FOLLOWER_ACTOR_ID, wk->objCode, MOVE_CODE_FOLLOW_PLAYER, zoneId);
     SetActorSCRID(actor, wk->scrId);
     SetActorFlag32(actor, TRUE);
     SetActorHidden(actor, hidden);
@@ -184,7 +184,7 @@ BOOL Scrcmd_PairSys_ActorPairSet(VM *vm, FieldScriptEnv *env) {
         scrId = FldAct_GetSCRID(actor);
     }
     setupNpcFollower(gameData, index, isPersistent, actorId, FldAct_GetObjCode(actor), scrId, trainerId);
-    ChangeActorMoveCodeSeq(actor, 0x30);
+    ChangeActorMoveCodeSeq(actor, MOVE_CODE_FOLLOW_PLAYER);
     ChangeActorUID(actor, FOLLOWER_ACTOR_ID);
     SetActorSCRID(actor, scrId);
     if (isPersistent == TRUE) {

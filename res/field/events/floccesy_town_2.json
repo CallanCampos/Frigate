@@ -5,7 +5,7 @@
         {
             "id": 0,
             "model": "OBJ_CODE_SCHOOL_KID_F",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 5,
@@ -24,7 +24,7 @@
         {
             "id": 1,
             "model": "OBJ_CODE_SCHOOL_KID_M",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 6,
@@ -43,7 +43,7 @@
         {
             "id": 2,
             "model": "OBJ_CODE_97",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 4,
@@ -62,7 +62,7 @@
         {
             "id": 3,
             "model": "OBJ_CODE_304",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x03e4",
             "script": 7,

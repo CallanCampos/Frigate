@@ -96,7 +96,7 @@
         {
             "id": 0,
             "model": "OBJ_CODE_PKMN_RANGER_M",
-            "movement": 44,
+            "movement": "MOVE_CODE_LOOP_RIGHT_DOWN_LEFT_UP",
             "type": "ACTOR_EVENT_TYPE_TRAINER_SPIN_COUNTERCLOCKWISE",
             "flag": 0,
             "script": 3515,
@@ -115,7 +115,7 @@
         {
             "id": 1,
             "model": "OBJ_CODE_110",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x04c8",
             "script": 7124,

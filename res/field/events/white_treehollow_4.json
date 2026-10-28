@@ -5,7 +5,7 @@
         {
             "id": 0,
             "model": "OBJ_CODE_MODEL_BIGROCK2",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 10000,
@@ -24,7 +24,7 @@
         {
             "id": 1,
             "model": "OBJ_CODE_MODEL_BIGROCK2",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 10000,
@@ -43,7 +43,7 @@
         {
             "id": 2,
             "model": "OBJ_CODE_MODEL_BIGROCK2",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 10000,
@@ -62,7 +62,7 @@
         {
             "id": 3,
             "model": "OBJ_CODE_MODEL_BIGROCK2",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 10000,

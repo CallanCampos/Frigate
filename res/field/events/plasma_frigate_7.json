@@ -5,7 +5,7 @@
         {
             "id": 0,
             "model": "OBJ_CODE_TEAM_PLASMA_GRUNT_M",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x0345",
             "script": 1,
@@ -24,7 +24,7 @@
         {
             "id": 1,
             "model": "OBJ_CODE_TEAM_PLASMA_GRUNT_M",
-            "movement": 5,
+            "movement": "MOVE_CODE_WALK_RANDOM_LEFT_RIGHT",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x03e6",
             "script": 6,
@@ -43,7 +43,7 @@
         {
             "id": 2,
             "model": "OBJ_CODE_TEAM_PLASMA_GRUNT_M",
-            "movement": 5,
+            "movement": "MOVE_CODE_WALK_RANDOM_LEFT_RIGHT",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x03e5",
             "script": 7,
@@ -62,7 +62,7 @@
         {
             "id": 3,
             "model": "OBJ_CODE_TEAM_PLASMA_GRUNT_M",
-            "movement": 20,
+            "movement": "MOVE_CODE_WALK_BACK_AND_FORTH",
             "type": "ACTOR_EVENT_TYPE_TRAINER_LOOK_AROUND",
             "flag": "EVENT_FLAG_0x03d0",
             "script": 3800,
@@ -81,7 +81,7 @@
         {
             "id": 4,
             "model": "OBJ_CODE_TEAM_PLASMA_GRUNT_F",
-            "movement": 20,
+            "movement": "MOVE_CODE_WALK_BACK_AND_FORTH",
             "type": "ACTOR_EVENT_TYPE_TRAINER_LOOK_AROUND",
             "flag": "EVENT_FLAG_0x03d0",
             "script": 3801,
@@ -100,7 +100,7 @@
         {
             "id": 5,
             "model": "OBJ_CODE_TEAM_PLASMA_GRUNT_M",
-            "movement": 20,
+            "movement": "MOVE_CODE_WALK_BACK_AND_FORTH",
             "type": "ACTOR_EVENT_TYPE_TRAINER_LOOK_AROUND",
             "flag": "EVENT_FLAG_0x03d0",
             "script": 3812,
@@ -119,7 +119,7 @@
         {
             "id": 6,
             "model": "OBJ_CODE_TEAM_PLASMA_GRUNT_F",
-            "movement": 20,
+            "movement": "MOVE_CODE_WALK_BACK_AND_FORTH",
             "type": "ACTOR_EVENT_TYPE_TRAINER_LOOK_AROUND",
             "flag": "EVENT_FLAG_0x03d0",
             "script": 3802,
@@ -138,7 +138,7 @@
         {
             "id": 7,
             "model": "OBJ_CODE_291",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x040c",
             "script": 2000,

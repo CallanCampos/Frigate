@@ -106,7 +106,7 @@
         {
             "id": 0,
             "model": "OBJ_CODE_BLACK_BELT",
-            "movement": 69,
+            "movement": "MOVE_CODE_RAIL_STAY",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 3,
@@ -125,7 +125,7 @@
         {
             "id": 1,
             "model": "OBJ_CODE_SOCIALITE",
-            "movement": 81,
+            "movement": "MOVE_CODE_RAIL_WALK_RANDOM",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 7,
@@ -144,7 +144,7 @@
         {
             "id": 2,
             "model": "OBJ_CODE_65",
-            "movement": 69,
+            "movement": "MOVE_CODE_RAIL_STAY",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 6,
@@ -163,7 +163,7 @@
         {
             "id": 3,
             "model": "OBJ_CODE_ACE_TRAINER_F",
-            "movement": 81,
+            "movement": "MOVE_CODE_RAIL_WALK_RANDOM",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 8,
@@ -182,7 +182,7 @@
         {
             "id": 4,
             "model": "OBJ_CODE_BACKERS_M",
-            "movement": 81,
+            "movement": "MOVE_CODE_RAIL_WALK_RANDOM",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x035f",
             "script": 2,
@@ -201,7 +201,7 @@
         {
             "id": 5,
             "model": "OBJ_CODE_BACKERS_M",
-            "movement": 81,
+            "movement": "MOVE_CODE_RAIL_WALK_RANDOM",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 4,
@@ -220,7 +220,7 @@
         {
             "id": 6,
             "model": "OBJ_CODE_STRIKER",
-            "movement": 69,
+            "movement": "MOVE_CODE_RAIL_STAY",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 5,

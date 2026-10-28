@@ -246,7 +246,7 @@
         {
             "id": 0,
             "model": "OBJ_CODE_PKMN_BREEDER_M",
-            "movement": 9,
+            "movement": "MOVE_CODE_TURN_RANDOM_DOWN_RIGHT",
             "type": "ACTOR_EVENT_TYPE_TRAINER",
             "flag": 0,
             "script": 3299,
@@ -265,7 +265,7 @@
         {
             "id": 1,
             "model": "OBJ_CODE_PKMN_RANGER_F",
-            "movement": 54,
+            "movement": "MOVE_CODE_HIDE_36",
             "type": "ACTOR_EVENT_TYPE_TRAINER_ALL_DIRS",
             "flag": 0,
             "script": 3297,
@@ -284,7 +284,7 @@
         {
             "id": 2,
             "model": "OBJ_CODE_PKMN_RANGER_M",
-            "movement": 41,
+            "movement": "MOVE_CODE_LOOP_UP_RIGHT_DOWN_LEFT",
             "type": "ACTOR_EVENT_TYPE_TRAINER_SPIN_CLOCKWISE",
             "flag": 0,
             "script": 3298,
@@ -303,7 +303,7 @@
         {
             "id": 3,
             "model": "OBJ_CODE_VETERAN_M",
-            "movement": 15,
+            "movement": "MOVE_CODE_FACE_DOWN",
             "type": "ACTOR_EVENT_TYPE_TRAINER",
             "flag": 0,
             "script": 3142,
@@ -322,7 +322,7 @@
         {
             "id": 4,
             "model": "OBJ_CODE_210",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x048d",
             "script": 7065,
@@ -341,7 +341,7 @@
         {
             "id": 5,
             "model": "OBJ_CODE_216",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x048e",
             "script": 7066,
@@ -360,7 +360,7 @@
         {
             "id": 6,
             "model": "OBJ_CODE_110",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x048f",
             "script": 7067,
@@ -379,7 +379,7 @@
         {
             "id": 7,
             "model": "OBJ_CODE_BACKPACKER_M",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x03c7",
             "script": 1,

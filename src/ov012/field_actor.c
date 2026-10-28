@@ -524,7 +524,7 @@ void FldActSys_WakeUpAllActors(MMSys *system) {
         if (!CheckActorFlag(actor, 2)) {
             FldAct_InitMoveProc(system, actor);
         }
-        if (moveCode != 0x55 && CheckActorMovementFlag(actor, 1)) {
+        if (moveCode != MOVE_CODE_HIDE_LEAVES && CheckActorMovementFlag(actor, 1)) {
             FldAct_CallMoveReturnProc(actor);
             ClearActorMovementFlag(actor, 1);
         }
@@ -536,7 +536,7 @@ void FldActSys_WakeUpAllActors(MMSys *system) {
             ClearActorMovementFlag(actor, 4);
         }
         FldAct_ClearEffectFlags(actor);
-        if (moveCode == 0x55 && CheckActorMovementFlag(actor, 1)) {
+        if (moveCode == MOVE_CODE_HIDE_LEAVES && CheckActorMovementFlag(actor, 1)) {
             FldAct_CallMoveReturnProc(actor);
             ClearActorMovementFlag(actor, 1);
         }
@@ -1657,7 +1657,7 @@ static void FldAct_AddTask(FieldActor *actor, MMSys *system) {
     u16 priority = FldActSys_GetTaskPriority(system);
     u16 moveCode = GetActorMoveCode(actor);
 
-    if (moveCode == 0x30 || moveCode == 0x32) {
+    if (moveCode == MOVE_CODE_FOLLOW_PLAYER || moveCode == MOVE_CODE_FOLLOW_PAIRED_TRAINER) {
         priorityOffset = 1;
     } else if (GetActorUID(actor) == ACTOR_UID_PLAYER) {
         priorityOffset--;

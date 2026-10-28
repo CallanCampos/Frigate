@@ -206,7 +206,7 @@
         {
             "id": 0,
             "model": "OBJ_CODE_FISHERMAN",
-            "movement": 16,
+            "movement": "MOVE_CODE_FACE_LEFT",
             "type": "ACTOR_EVENT_TYPE_TRAINER",
             "flag": 0,
             "script": 3211,
@@ -225,7 +225,7 @@
         {
             "id": 1,
             "model": "OBJ_CODE_FISHERMAN",
-            "movement": 16,
+            "movement": "MOVE_CODE_FACE_LEFT",
             "type": "ACTOR_EVENT_TYPE_TRAINER",
             "flag": 0,
             "script": 3210,
@@ -244,7 +244,7 @@
         {
             "id": 2,
             "model": "OBJ_CODE_POLICEMAN",
-            "movement": 3,
+            "movement": "MOVE_CODE_WALK_RANDOM",
             "type": "ACTOR_EVENT_TYPE_TRAINER",
             "flag": 0,
             "script": 3212,
@@ -263,7 +263,7 @@
         {
             "id": 3,
             "model": "OBJ_CODE_BIKER",
-            "movement": 14,
+            "movement": "MOVE_CODE_FACE_UP",
             "type": "ACTOR_EVENT_TYPE_TRAINER",
             "flag": 0,
             "script": 3220,
@@ -282,7 +282,7 @@
         {
             "id": 4,
             "model": "OBJ_CODE_ROUGHNECK",
-            "movement": 14,
+            "movement": "MOVE_CODE_FACE_UP",
             "type": "ACTOR_EVENT_TYPE_TRAINER",
             "flag": 0,
             "script": 5220,
@@ -301,7 +301,7 @@
         {
             "id": 5,
             "model": "OBJ_CODE_BIKER",
-            "movement": 17,
+            "movement": "MOVE_CODE_FACE_RIGHT",
             "type": "ACTOR_EVENT_TYPE_TRAINER",
             "flag": 0,
             "script": 3218,
@@ -320,7 +320,7 @@
         {
             "id": 6,
             "model": "OBJ_CODE_YOUNGSTER",
-            "movement": 42,
+            "movement": "MOVE_CODE_LOOP_DOWN_LEFT_UP_RIGHT",
             "type": "ACTOR_EVENT_TYPE_TRAINER",
             "flag": 0,
             "script": 3284,
@@ -339,7 +339,7 @@
         {
             "id": 7,
             "model": "OBJ_CODE_ROUGHNECK",
-            "movement": 14,
+            "movement": "MOVE_CODE_FACE_UP",
             "type": "ACTOR_EVENT_TYPE_TRAINER",
             "flag": 0,
             "script": 3216,
@@ -358,7 +358,7 @@
         {
             "id": 8,
             "model": "OBJ_CODE_ROUGHNECK",
-            "movement": 17,
+            "movement": "MOVE_CODE_FACE_RIGHT",
             "type": "ACTOR_EVENT_TYPE_TRAINER",
             "flag": 0,
             "script": 3217,
@@ -377,7 +377,7 @@
         {
             "id": 9,
             "model": "OBJ_CODE_POLICEMAN",
-            "movement": 20,
+            "movement": "MOVE_CODE_WALK_BACK_AND_FORTH",
             "type": "ACTOR_EVENT_TYPE_TRAINER",
             "flag": 0,
             "script": 3214,
@@ -396,7 +396,7 @@
         {
             "id": 10,
             "model": "OBJ_CODE_POLICEMAN",
-            "movement": 7,
+            "movement": "MOVE_CODE_TURN_RANDOM_UP_RIGHT",
             "type": "ACTOR_EVENT_TYPE_TRAINER",
             "flag": 0,
             "script": 3215,
@@ -415,7 +415,7 @@
         {
             "id": 11,
             "model": "OBJ_CODE_PKMN_BREEDER_F",
-            "movement": 16,
+            "movement": "MOVE_CODE_FACE_LEFT",
             "type": "ACTOR_EVENT_TYPE_TRAINER",
             "flag": 0,
             "script": 3296,
@@ -434,7 +434,7 @@
         {
             "id": 12,
             "model": "OBJ_CODE_326",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x02f5",
             "script": 4,
@@ -453,7 +453,7 @@
         {
             "id": 13,
             "model": "OBJ_CODE_326",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x02f5",
             "script": 4,
@@ -472,7 +472,7 @@
         {
             "id": 14,
             "model": "OBJ_CODE_326",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x02f5",
             "script": 4,
@@ -491,7 +491,7 @@
         {
             "id": 15,
             "model": "OBJ_CODE_250",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x02f6",
             "script": 7,
@@ -510,7 +510,7 @@
         {
             "id": 16,
             "model": "OBJ_CODE_WORKER_44",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x03dc",
             "script": 6,
@@ -529,7 +529,7 @@
         {
             "id": 17,
             "model": "OBJ_CODE_326",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x02f5",
             "script": 4,
@@ -548,7 +548,7 @@
         {
             "id": 18,
             "model": "OBJ_CODE_326",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x02f5",
             "script": 4,
@@ -567,7 +567,7 @@
         {
             "id": 19,
             "model": "OBJ_CODE_326",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x02f5",
             "script": 4,
@@ -586,7 +586,7 @@
         {
             "id": 20,
             "model": "OBJ_CODE_326",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x02f5",
             "script": 4,
@@ -605,7 +605,7 @@
         {
             "id": 21,
             "model": "OBJ_CODE_326",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x02f5",
             "script": 2000,
@@ -624,7 +624,7 @@
         {
             "id": 22,
             "model": "OBJ_CODE_326",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x02f5",
             "script": 2000,
@@ -643,7 +643,7 @@
         {
             "id": 23,
             "model": "OBJ_CODE_326",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x02f5",
             "script": 2000,
@@ -662,7 +662,7 @@
         {
             "id": 24,
             "model": "OBJ_CODE_326",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x02f5",
             "script": 2000,
@@ -681,7 +681,7 @@
         {
             "id": 25,
             "model": "OBJ_CODE_348",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x0386",
             "script": 8,
@@ -700,7 +700,7 @@
         {
             "id": 26,
             "model": "OBJ_CODE_110",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x047b",
             "script": 7047,
@@ -719,7 +719,7 @@
         {
             "id": 27,
             "model": "OBJ_CODE_110",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x047c",
             "script": 7048,
@@ -738,7 +738,7 @@
         {
             "id": 28,
             "model": "OBJ_CODE_110",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x047d",
             "script": 7049,
@@ -757,7 +757,7 @@
         {
             "id": 29,
             "model": "OBJ_CODE_110",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x0481",
             "script": 7053,
@@ -776,7 +776,7 @@
         {
             "id": 30,
             "model": "OBJ_CODE_19",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 10,
@@ -795,7 +795,7 @@
         {
             "id": 31,
             "model": "OBJ_CODE_HIKER",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 11,
@@ -814,7 +814,7 @@
         {
             "id": 32,
             "model": "OBJ_CODE_BACKERS_F",
-            "movement": 2,
+            "movement": "MOVE_CODE_TURN_RANDOM",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 12,

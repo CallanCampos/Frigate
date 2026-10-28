@@ -13,6 +13,9 @@
 #include "gfl/key.h"
 #include "gfl/random.h"
 
+// Ends the tables of move codes, and stands for no move code where one is looked for in them
+#define MOVE_CODE_LIST_END 0xff
+
 // The facing a walking code keeps for actors that turn and then restore it: the facing before, a row of
 // sMirrorTurnOrders and whether movement flag 8 was set
 typedef struct {
@@ -51,8 +54,8 @@ typedef struct {
     u32 state;
 } RailFaceWork;
 
-// The work of an actor that turns around a rotation of directions: turn is 2 for a clockwise one, state picks the
-// function of the table that runs
+// The work of an actor that turns around a rotation of directions: turn is the way it turns, DIR_LEFT or DIR_RIGHT,
+// state picks the function of the table that runs
 typedef struct {
     s8 turn;
     u8 pad1;
@@ -267,24 +270,29 @@ static BOOL (*const sSwingSteps[])(FieldActor *actor, RailTurnWork *work) = {
     FieldActorMovecode_SwingStepRotateDir,
 };
 
-// The directions that each move code turns between, in turn, after the move code and ended by DIR_NONE. A move code
-// of 0xff ends the table
+// The directions that each move code turns between, in turn, after the move code and ended by DIR_NONE, for the event
+// type that turns when the player presses B; the first two give the random walks' codes with their directions.
+// MOVE_CODE_LIST_END ends the table
 static const u16 sMoveCodeTurnDirs[][6] = {
-    { 4, DIR_UP, DIR_DOWN, DIR_NONE },
-    { 5, DIR_LEFT, DIR_RIGHT, DIR_NONE },
-    { 6, DIR_UP, DIR_LEFT, DIR_NONE },
-    { 7, DIR_UP, DIR_RIGHT, DIR_NONE },
-    { 8, DIR_DOWN, DIR_LEFT, DIR_NONE },
-    { 9, DIR_DOWN, DIR_RIGHT, DIR_NONE },
-    { 10, DIR_UP, DIR_DOWN, DIR_LEFT, DIR_NONE },
-    { 11, DIR_UP, DIR_RIGHT, DIR_DOWN, DIR_NONE },
-    { 12, DIR_UP, DIR_RIGHT, DIR_LEFT, DIR_NONE },
-    { 13, DIR_DOWN, DIR_LEFT, DIR_RIGHT, DIR_NONE },
-    { 0xff },
+    { MOVE_CODE_WALK_RANDOM_UP_DOWN, DIR_UP, DIR_DOWN, DIR_NONE },
+    { MOVE_CODE_WALK_RANDOM_LEFT_RIGHT, DIR_LEFT, DIR_RIGHT, DIR_NONE },
+    { MOVE_CODE_TURN_RANDOM_UP_LEFT, DIR_UP, DIR_LEFT, DIR_NONE },
+    { MOVE_CODE_TURN_RANDOM_UP_RIGHT, DIR_UP, DIR_RIGHT, DIR_NONE },
+    { MOVE_CODE_TURN_RANDOM_DOWN_LEFT, DIR_DOWN, DIR_LEFT, DIR_NONE },
+    { MOVE_CODE_TURN_RANDOM_DOWN_RIGHT, DIR_DOWN, DIR_RIGHT, DIR_NONE },
+    { MOVE_CODE_TURN_RANDOM_UP_DOWN_LEFT, DIR_UP, DIR_DOWN, DIR_LEFT, DIR_NONE },
+    { MOVE_CODE_TURN_RANDOM_UP_DOWN_RIGHT, DIR_UP, DIR_RIGHT, DIR_DOWN, DIR_NONE },
+    { MOVE_CODE_TURN_RANDOM_UP_LEFT_RIGHT, DIR_UP, DIR_RIGHT, DIR_LEFT, DIR_NONE },
+    { MOVE_CODE_TURN_RANDOM_DOWN_LEFT_RIGHT, DIR_DOWN, DIR_LEFT, DIR_RIGHT, DIR_NONE },
+    { MOVE_CODE_LIST_END },
 };
 
 static const ActorMoveCodePair sPatrolSwapMoveCodes[] = {
-    { 0x25, 0x2b }, { 0x26, 0x2c }, { 0x27, 0x2a }, { 0x28, 0x29 }, { 0xff, 0xff },
+    { MOVE_CODE_LOOP_UP_LEFT_DOWN_RIGHT, MOVE_CODE_LOOP_LEFT_UP_RIGHT_DOWN },
+    { MOVE_CODE_LOOP_DOWN_RIGHT_UP_LEFT, MOVE_CODE_LOOP_RIGHT_DOWN_LEFT_UP },
+    { MOVE_CODE_LOOP_LEFT_DOWN_RIGHT_UP, MOVE_CODE_LOOP_DOWN_LEFT_UP_RIGHT },
+    { MOVE_CODE_LOOP_RIGHT_UP_LEFT_DOWN, MOVE_CODE_LOOP_UP_RIGHT_DOWN_LEFT },
+    { MOVE_CODE_LIST_END, MOVE_CODE_LIST_END },
 };
 
 static const s32 sDirSet0[] = { DIR_UP, DIR_DOWN, DIR_LEFT, DIR_RIGHT, DIR_NONE };
@@ -395,7 +403,7 @@ static u16 FieldActorMovecode_GetNextDirInRotation(u16 moveCode, u16 faceDir) {
             return DIR_NONE;
         }
         i++;
-    } while (sMoveCodeTurnDirs[i][0] != 0xff);
+    } while (sMoveCodeTurnDirs[i][0] != MOVE_CODE_LIST_END);
     return DIR_NONE;
 }
 
@@ -496,49 +504,49 @@ static void FieldActorMovecode_GetMoveRect(FieldActor *actor, WalkRect *rect) {
     w = GetActorWalkAreaW(actor);
     h = GetActorWalkAreaH(actor);
     switch (GetActorMoveCode(actor)) {
-    case 6:
+    case MOVE_CODE_TURN_RANDOM_UP_LEFT:
         rect->minX = x - w;
         rect->maxX = x;
         rect->minZ = z - h;
         rect->maxZ = z;
         break;
-    case 7:
+    case MOVE_CODE_TURN_RANDOM_UP_RIGHT:
         rect->minX = x;
         rect->maxX = x + w;
         rect->minZ = z - h;
         rect->maxZ = z;
         break;
-    case 8:
+    case MOVE_CODE_TURN_RANDOM_DOWN_LEFT:
         rect->minX = x - w;
         rect->maxX = x;
         rect->minZ = z;
         rect->maxZ = z + h;
         break;
-    case 9:
+    case MOVE_CODE_TURN_RANDOM_DOWN_RIGHT:
         rect->maxX = x + w;
         rect->minX = x;
         rect->minZ = z;
         rect->maxZ = z + h;
         break;
-    case 10:
+    case MOVE_CODE_TURN_RANDOM_UP_DOWN_LEFT:
         rect->minX = x - w;
         rect->maxX = x;
         rect->minZ = z - h;
         rect->maxZ = z + h;
         break;
-    case 11:
+    case MOVE_CODE_TURN_RANDOM_UP_DOWN_RIGHT:
         rect->maxX = x + w;
         rect->minX = x;
         rect->minZ = z - h;
         rect->maxZ = z + h;
         break;
-    case 12:
+    case MOVE_CODE_TURN_RANDOM_UP_LEFT_RIGHT:
         rect->minX = x - w;
         rect->maxX = x + w;
         rect->minZ = z - h;
         rect->maxZ = z;
         break;
-    case 13:
+    case MOVE_CODE_TURN_RANDOM_DOWN_LEFT_RIGHT:
         rect->minX = x - w;
         rect->maxX = x + w;
         rect->minZ = z;
@@ -607,12 +615,12 @@ static void FieldActorMovecode_InitSpin(FieldActor *actor, u32 turn) {
     SetActorInitialGPosToNowGPos(actor);
 }
 
-void FieldActorMovecode_InitSpinClockwise(FieldActor *actor) {
-    FieldActorMovecode_InitSpin(actor, 2);
+void FieldActorMovecode_InitSpinLeft(FieldActor *actor) {
+    FieldActorMovecode_InitSpin(actor, DIR_LEFT);
 }
 
-void FieldActorMovecode_InitSpinCounterClockwise(FieldActor *actor) {
-    FieldActorMovecode_InitSpin(actor, 3);
+void FieldActorMovecode_InitSpinRight(FieldActor *actor) {
+    FieldActorMovecode_InitSpin(actor, DIR_RIGHT);
 }
 
 void FieldActorMovecode_MoveSpin(FieldActor *actor) {
@@ -672,13 +680,13 @@ static BOOL FieldActorMovecode_SpinStepWaitInterval(FieldActor *actor, RailTurnW
 }
 
 static BOOL FieldActorMovecode_SpinStepRotateDir(FieldActor *actor, RailTurnWork *work) {
-    u32 clockwise[5] = { DIR_UP, DIR_LEFT, DIR_DOWN, DIR_RIGHT, DIR_NONE };
-    u32 counter[5] = { DIR_UP, DIR_RIGHT, DIR_DOWN, DIR_LEFT, DIR_NONE };
-    u32 *dirs = clockwise;
+    u32 counterclockwise[5] = { DIR_UP, DIR_LEFT, DIR_DOWN, DIR_RIGHT, DIR_NONE };
+    u32 clockwise[5] = { DIR_UP, DIR_RIGHT, DIR_DOWN, DIR_LEFT, DIR_NONE };
+    u32 *dirs = counterclockwise;
     u32 face;
     s32 i;
-    if (work->turn != 2) {
-        dirs = counter;
+    if (work->turn != DIR_LEFT) {
+        dirs = clockwise;
     }
     face = GetActorFaceDir(actor);
     for (i = 0; dirs[i] != DIR_NONE; i++) {
@@ -696,7 +704,7 @@ static BOOL FieldActorMovecode_SpinStepRotateDir(FieldActor *actor, RailTurnWork
 }
 
 void FieldActorMovecode_InitSwing(FieldActor *actor) {
-    FieldActorMovecode_InitSpin(actor, 3);
+    FieldActorMovecode_InitSpin(actor, DIR_RIGHT);
 }
 
 void FieldActorMovecode_MoveSwing(FieldActor *actor) {
@@ -732,13 +740,13 @@ static BOOL FieldActorMovecode_SwingStepWaitInterval(FieldActor *actor, RailTurn
 }
 
 static BOOL FieldActorMovecode_SwingStepRotateDir(FieldActor *actor, RailTurnWork *work) {
-    u32 clockwise[5] = { DIR_UP, DIR_LEFT, DIR_DOWN, DIR_RIGHT, DIR_NONE };
-    u32 counter[5] = { DIR_UP, DIR_RIGHT, DIR_DOWN, DIR_LEFT, DIR_NONE };
-    u32 *dirs = clockwise;
+    u32 counterclockwise[5] = { DIR_UP, DIR_LEFT, DIR_DOWN, DIR_RIGHT, DIR_NONE };
+    u32 clockwise[5] = { DIR_UP, DIR_RIGHT, DIR_DOWN, DIR_LEFT, DIR_NONE };
+    u32 *dirs = counterclockwise;
     u32 face;
     s32 i;
-    if (work->turn != 2) {
-        dirs = counter;
+    if (work->turn != DIR_LEFT) {
+        dirs = clockwise;
     }
     face = GetActorFaceDir(actor);
     for (i = 0; dirs[i] != DIR_NONE; i++) {
@@ -765,7 +773,20 @@ static BOOL (*const sBackForthSteps[])(FieldActor *actor, RailPaceWork *work) = 
 };
 
 static const u32 sPlayerSightMoveCodes[] = {
-    0x2, 0x6, 0x7, 0x8, 0x9, 0xa, 0xb, 0xc, 0xd, 0x2d, 0x2e, 0x12, 0x13, 0xff,
+    MOVE_CODE_TURN_RANDOM,
+    MOVE_CODE_TURN_RANDOM_UP_LEFT,
+    MOVE_CODE_TURN_RANDOM_UP_RIGHT,
+    MOVE_CODE_TURN_RANDOM_DOWN_LEFT,
+    MOVE_CODE_TURN_RANDOM_DOWN_RIGHT,
+    MOVE_CODE_TURN_RANDOM_UP_DOWN_LEFT,
+    MOVE_CODE_TURN_RANDOM_UP_DOWN_RIGHT,
+    MOVE_CODE_TURN_RANDOM_UP_LEFT_RIGHT,
+    MOVE_CODE_TURN_RANDOM_DOWN_LEFT_RIGHT,
+    MOVE_CODE_TURN_RANDOM_UP_DOWN,
+    MOVE_CODE_TURN_RANDOM_LEFT_RIGHT,
+    MOVE_CODE_SPIN_COUNTERCLOCKWISE,
+    MOVE_CODE_SPIN_CLOCKWISE,
+    MOVE_CODE_LIST_END,
 };
 
 static const ActorDirTableEntry sDirSets[] = {
@@ -1094,17 +1115,17 @@ static BOOL FieldActorMovecode_RoutePatrolSwapStepLookForPlayer(FieldActor *acto
 
 static BOOL FieldActorMovecode_RoutePatrolSwapStepSwapMoveCode(FieldActor *actor, ActorPatrolWork *work) {
     if (FieldAcmdTCB_Update(actor) == TRUE) {
-        u16 other = 0xff;
+        u16 other = MOVE_CODE_LIST_END;
         u16 moveCode = GetActorMoveCode(actor);
         const ActorMoveCodePair *pair;
 
-        for (pair = sPatrolSwapMoveCodes; pair->first != 0xff; pair++) {
+        for (pair = sPatrolSwapMoveCodes; pair->first != MOVE_CODE_LIST_END; pair++) {
             if (pair->first == moveCode) {
                 other = pair->second;
             } else if (pair->second == moveCode) {
                 other = pair->first;
             }
-            if (other != 0xff) {
+            if (other != MOVE_CODE_LIST_END) {
                 s32 dirIdx = 4 - (work->dirIdx + 1);
 
                 ChangeActorMoveCodeSeq(actor, other);
@@ -1281,7 +1302,7 @@ static u32 FieldActorMovecode_GetSightDirToPlayer(FieldActor *actor) {
     do {
         entry = sPlayerSightMoveCodes[i];
         i++;
-    } while (entry != moveCode && entry != 0xff);
+    } while (entry != moveCode && entry != MOVE_CODE_LIST_END);
     if (moveCode != entry) {
         return DIR_NONE;
     }

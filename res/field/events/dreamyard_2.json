@@ -196,7 +196,7 @@
         {
             "id": 0,
             "model": "OBJ_CODE_110",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x0576",
             "script": 7298,
@@ -215,7 +215,7 @@
         {
             "id": 1,
             "model": "OBJ_CODE_110",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x0577",
             "script": 7299,
@@ -234,7 +234,7 @@
         {
             "id": 2,
             "model": "OBJ_CODE_110",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x0575",
             "script": 7297,
@@ -253,7 +253,7 @@
         {
             "id": 3,
             "model": "OBJ_CODE_SCIENTIST_F_46",
-            "movement": 38,
+            "movement": "MOVE_CODE_LOOP_DOWN_RIGHT_UP_LEFT",
             "type": "ACTOR_EVENT_TYPE_TURN_BACK_ON_SIGHT",
             "flag": 0,
             "script": 3743,
@@ -272,7 +272,7 @@
         {
             "id": 4,
             "model": "OBJ_CODE_SCIENTIST_M_52",
-            "movement": 38,
+            "movement": "MOVE_CODE_LOOP_DOWN_RIGHT_UP_LEFT",
             "type": "ACTOR_EVENT_TYPE_TURN_BACK_ON_SIGHT",
             "flag": 0,
             "script": 3744,
@@ -291,7 +291,7 @@
         {
             "id": 5,
             "model": "OBJ_CODE_PSYCHIC_F",
-            "movement": 41,
+            "movement": "MOVE_CODE_LOOP_UP_RIGHT_DOWN_LEFT",
             "type": "ACTOR_EVENT_TYPE_TURN_BACK_ON_SIGHT",
             "flag": 0,
             "script": 3741,
@@ -310,7 +310,7 @@
         {
             "id": 6,
             "model": "OBJ_CODE_PSYCHIC_M",
-            "movement": 37,
+            "movement": "MOVE_CODE_LOOP_UP_LEFT_DOWN_RIGHT",
             "type": "ACTOR_EVENT_TYPE_TURN_BACK_ON_SIGHT",
             "flag": 0,
             "script": 3742,

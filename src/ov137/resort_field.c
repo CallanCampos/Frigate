@@ -316,7 +316,7 @@ static BOOL (*const sWalkerStates[])(ResortWalker *walker, MMSys *mmSys, FieldPl
     ResortWalker_StateLookAround, ResortWalker_StateStopAtShop,
 };
 static const FieldActorMoveCode sWalkerMoveCode = {
-    0, ResortWalkerMove_Unk4, ResortWalkerMove_Update, ResortWalkerMove_Unk0C, ResortWalkerMove_Unk10,
+    MOVE_CODE_NONE, ResortWalkerMove_Unk4, ResortWalkerMove_Update, ResortWalkerMove_Unk0C, ResortWalkerMove_Unk10,
 };
 static const ResortSceneAnim sSceneAnims[] = {
     { ResortSceneAnim0_Start, ResortSceneAnim0_Update, ResortSceneAnim0_End },
@@ -668,7 +668,7 @@ static void ResortWalker_Init(ResortWalker *walker, HeapID heapId) {
 
 static void ResortWalker_Release(ResortWalker *walker) {
     if (ResortWalker_IsAssigned(walker)) {
-        ChangeActorMoveCodeSeq(ResortPerson_GetActor(walker->person), 0);
+        ChangeActorMoveCodeSeq(ResortPerson_GetActor(walker->person), MOVE_CODE_NONE);
     }
     ResortWalker_Clear(walker);
 }
@@ -1638,7 +1638,7 @@ static void ResortFieldPeople_PlaceAtShops(ResortFieldPeople *people, ResortSys 
     for (i = 0; i < ResortNPC_GetCount(npc); i++) {
         FieldActor *actor = ResortNPC_GetActor(npc, i);
         if (actor != NULL) {
-            ChangeActorMoveCodeSeq(actor, (GetGPosX(actor) < 15 ? DIR_RIGHT : DIR_LEFT) + 14);
+            ChangeActorMoveCodeSeq(actor, (GetGPosX(actor) < 15 ? DIR_RIGHT : DIR_LEFT) + MOVE_CODE_FACE_UP);
         }
     }
 }

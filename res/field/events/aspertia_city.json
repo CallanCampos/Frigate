@@ -216,7 +216,7 @@
         {
             "id": 0,
             "model": "OBJ_CODE_291",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x02e9",
             "script": 1,
@@ -235,7 +235,7 @@
         {
             "id": 1,
             "model": "OBJ_CODE_251",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x02e7",
             "script": 9,
@@ -254,7 +254,7 @@
         {
             "id": 2,
             "model": "OBJ_CODE_249",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x02e6",
             "script": 7,
@@ -273,7 +273,7 @@
         {
             "id": 3,
             "model": "OBJ_CODE_TWINS",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x02e8",
             "script": 10,
@@ -292,7 +292,7 @@
         {
             "id": 4,
             "model": "OBJ_CODE_BACKERS_M",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 13,
@@ -311,7 +311,7 @@
         {
             "id": 5,
             "model": "OBJ_CODE_ARTIST",
-            "movement": 4,
+            "movement": "MOVE_CODE_WALK_RANDOM_UP_DOWN",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 12,
@@ -330,7 +330,7 @@
         {
             "id": 6,
             "model": "OBJ_CODE_YOUNGSTER",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 11,
@@ -349,7 +349,7 @@
         {
             "id": 7,
             "model": "OBJ_CODE_223",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x02e5",
             "script": 24,
@@ -368,7 +368,7 @@
         {
             "id": 8,
             "model": "OBJ_CODE_110",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x044c",
             "script": 7000,
@@ -387,7 +387,7 @@
         {
             "id": 9,
             "model": "OBJ_CODE_POKEFAN_M",
-            "movement": 3,
+            "movement": "MOVE_CODE_WALK_RANDOM",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 26,
@@ -406,7 +406,7 @@
         {
             "id": 10,
             "model": "OBJ_CODE_14",
-            "movement": 3,
+            "movement": "MOVE_CODE_WALK_RANDOM",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 27,
@@ -425,7 +425,7 @@
         {
             "id": 11,
             "model": "OBJ_CODE_21",
-            "movement": 3,
+            "movement": "MOVE_CODE_WALK_RANDOM",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 28,
@@ -444,7 +444,7 @@
         {
             "id": 12,
             "model": "OBJ_CODE_LASS",
-            "movement": 3,
+            "movement": "MOVE_CODE_WALK_RANDOM",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 31,
@@ -463,7 +463,7 @@
         {
             "id": 13,
             "model": "OBJ_CODE_251",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x03ef",
             "script": 2000,

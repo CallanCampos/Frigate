@@ -256,7 +256,7 @@
         {
             "id": 0,
             "model": "OBJ_CODE_CLERK_M_67",
-            "movement": 15,
+            "movement": "MOVE_CODE_FACE_DOWN",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 2000,
@@ -275,7 +275,7 @@
         {
             "id": 1,
             "model": "OBJ_CODE_ACE_TRAINER_F",
-            "movement": 15,
+            "movement": "MOVE_CODE_FACE_DOWN",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 4,
@@ -294,7 +294,7 @@
         {
             "id": 2,
             "model": "OBJ_CODE_ACE_TRAINER_M",
-            "movement": 15,
+            "movement": "MOVE_CODE_FACE_DOWN",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 5,
@@ -313,7 +313,7 @@
         {
             "id": 3,
             "model": "OBJ_CODE_CLERK_F",
-            "movement": 16,
+            "movement": "MOVE_CODE_FACE_LEFT",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 0,
@@ -332,7 +332,7 @@
         {
             "id": 4,
             "model": "OBJ_CODE_CLERK_F",
-            "movement": 17,
+            "movement": "MOVE_CODE_FACE_RIGHT",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 0,

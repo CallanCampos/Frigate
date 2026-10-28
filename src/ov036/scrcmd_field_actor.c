@@ -41,8 +41,6 @@ u8 g_ScrEventActorFlags;
 // The actor IDs of the follower and of the script's own actor
 #define SCRIPT_ACTOR_FOLLOWER 0xf2
 #define SCRIPT_ACTOR_SELF 0xf1
-// The move code of the Pokémon that follows the player
-#define MOVE_CODE_FOLLOWER 0x30
 
 // The actors that DisableAllButEventActorsMovement left moving, which WaitAndDisableEventMovement stops once they
 // finish
@@ -101,7 +99,7 @@ static FieldActor *FindScriptActor(FieldScriptEnv *env, u16 id) {
     MMSys *mmSys = GetScrEnvActorSys(env);
 
     if (id == SCRIPT_ACTOR_FOLLOWER) {
-        actor = FindActorByMoveCode(mmSys, MOVE_CODE_FOLLOWER);
+        actor = FindActorByMoveCode(mmSys, MOVE_CODE_FOLLOW_PLAYER);
     } else if (id == SCRIPT_ACTOR_SELF) {
         ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
         // BUG: The script's own actor is never looked up, so the actor returned is garbage
@@ -625,7 +623,7 @@ static BOOL WaitAndDisableEventMovement(VM *vm, void *data) {
         g_ScrEventActorFlags &= ~EVENT_ACTOR_PARENT;
     }
     if (g_ScrEventActorFlags & EVENT_ACTOR_FOLLOWER) {
-        actor = FindActorByMoveCode(mmSys, MOVE_CODE_FOLLOWER);
+        actor = FindActorByMoveCode(mmSys, MOVE_CODE_FOLLOW_PLAYER);
         if (IsActorFlag16(actor) == FALSE) {
             DisableActorMovement(actor);
             g_ScrEventActorFlags &= ~EVENT_ACTOR_FOLLOWER;
@@ -653,7 +651,7 @@ static BOOL DisableAllButEventActorsMovement(VM *vm, FieldScriptEnv *env) {
     MMSys *mmSys = GetScrEnvActorSys(env);
     FieldActor *parent = ScriptWork_GetParentActor(work);
     FieldActor *player = FindScrEnvPlayerActor(env);
-    FieldActor *follower = FindActorByMoveCode(mmSys, MOVE_CODE_FOLLOWER);
+    FieldActor *follower = FindActorByMoveCode(mmSys, MOVE_CODE_FOLLOW_PLAYER);
     FieldActor *pair = FindPairedTrainerActor(parent);
 
     g_ScrEventActorFlags = 0;
@@ -681,7 +679,7 @@ static BOOL DisableAllButEventActorsMovement(VM *vm, FieldScriptEnv *env) {
 static BOOL WaitAndDisableFollowerMovement(VM *vm, void *data) {
     FieldScriptEnv *env = data;
     FieldScriptEnv_GetScriptWork(env);
-    FieldActor *follower = FindActorByMoveCode(GetScrEnvActorSys(env), MOVE_CODE_FOLLOWER);
+    FieldActor *follower = FindActorByMoveCode(GetScrEnvActorSys(env), MOVE_CODE_FOLLOW_PLAYER);
 
     if (IsActorFlag16(follower) == FALSE) {
         DisableActorMovement(follower);
@@ -696,7 +694,7 @@ BOOL PauseEventMModels(VM *vm, FieldScriptEnv *env) {
         FieldActor *follower;
 
         DisableAllActorsMovement(mmSys);
-        follower = FindActorByMoveCode(mmSys, MOVE_CODE_FOLLOWER);
+        follower = FindActorByMoveCode(mmSys, MOVE_CODE_FOLLOW_PLAYER);
         if (follower != NULL && IsActorFlag16(follower) == TRUE) {
             EnableActorMovement(follower);
             VM_SetNativeCallback(vm, WaitAndDisableFollowerMovement);

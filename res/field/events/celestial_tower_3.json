@@ -86,7 +86,7 @@
         {
             "id": 0,
             "model": "OBJ_CODE_110",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x04b5",
             "script": 7105,
@@ -105,7 +105,7 @@
         {
             "id": 1,
             "model": "OBJ_CODE_110",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x04b6",
             "script": 7106,
@@ -124,7 +124,7 @@
         {
             "id": 2,
             "model": "OBJ_CODE_NURSERY_AIDE",
-            "movement": 16,
+            "movement": "MOVE_CODE_FACE_LEFT",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x0338",
             "script": 2,
@@ -143,7 +143,7 @@
         {
             "id": 3,
             "model": "OBJ_CODE_SCHOOL_KID_F",
-            "movement": 15,
+            "movement": "MOVE_CODE_FACE_DOWN",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x033b",
             "script": 3,
@@ -162,7 +162,7 @@
         {
             "id": 4,
             "model": "OBJ_CODE_PSYCHIC_F",
-            "movement": 9,
+            "movement": "MOVE_CODE_TURN_RANDOM_DOWN_RIGHT",
             "type": "ACTOR_EVENT_TYPE_TRAINER",
             "flag": 0,
             "script": 3554,
@@ -181,7 +181,7 @@
         {
             "id": 5,
             "model": "OBJ_CODE_POKEFAN_M",
-            "movement": 16,
+            "movement": "MOVE_CODE_FACE_LEFT",
             "type": "ACTOR_EVENT_TYPE_TRAINER",
             "flag": 0,
             "script": 3549,

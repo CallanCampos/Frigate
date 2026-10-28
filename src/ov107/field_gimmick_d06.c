@@ -472,7 +472,8 @@ static void StopMark(Field *field, u32 index) {
 static FieldActor *CreateStone(Field *field, int x, int z) {
     MMSys *actorSystem = Field_GetActorSystem(field);
 
-    return CreateNewActorByParam(actorSystem, x, z, 0, STONE_ACTOR_ID, 0, 0, Field_GetPlayerStateZoneID(field));
+    return CreateNewActorByParam(actorSystem, x, z, 0, STONE_ACTOR_ID, 0, MOVE_CODE_NONE,
+                                 Field_GetPlayerStateZoneID(field));
 }
 
 static StoneWork *GetWork(Field *field) {

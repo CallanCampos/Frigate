@@ -5,7 +5,7 @@
         {
             "id": 0,
             "model": "OBJ_CODE_BACKERS_M",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 1,
@@ -24,7 +24,7 @@
         {
             "id": 1,
             "model": "OBJ_CODE_313",
-            "movement": 3,
+            "movement": "MOVE_CODE_WALK_RANDOM",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 2,
@@ -43,7 +43,7 @@
         {
             "id": 2,
             "model": "OBJ_CODE_313",
-            "movement": 3,
+            "movement": "MOVE_CODE_WALK_RANDOM",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 3,
@@ -62,7 +62,7 @@
         {
             "id": 3,
             "model": "OBJ_CODE_313",
-            "movement": 3,
+            "movement": "MOVE_CODE_WALK_RANDOM",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 4,
@@ -81,7 +81,7 @@
         {
             "id": 4,
             "model": "OBJ_CODE_313",
-            "movement": 3,
+            "movement": "MOVE_CODE_WALK_RANDOM",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 6,
@@ -100,7 +100,7 @@
         {
             "id": 5,
             "model": "OBJ_CODE_313",
-            "movement": 3,
+            "movement": "MOVE_CODE_WALK_RANDOM",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 5,

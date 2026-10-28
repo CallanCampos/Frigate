@@ -86,7 +86,7 @@
         {
             "id": 0,
             "model": "OBJ_CODE_110",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x0566",
             "script": 7282,
@@ -105,7 +105,7 @@
         {
             "id": 1,
             "model": "OBJ_CODE_110",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x0567",
             "script": 7283,
@@ -124,7 +124,7 @@
         {
             "id": 2,
             "model": "OBJ_CODE_110",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x0568",
             "script": 7284,
@@ -143,7 +143,7 @@
         {
             "id": 3,
             "model": "OBJ_CODE_110",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x056b",
             "script": 7287,
@@ -162,7 +162,7 @@
         {
             "id": 4,
             "model": "OBJ_CODE_BATTLE_GIRL",
-            "movement": 17,
+            "movement": "MOVE_CODE_FACE_RIGHT",
             "type": "ACTOR_EVENT_TYPE_TRAINER",
             "flag": 0,
             "script": 3676,
@@ -181,7 +181,7 @@
         {
             "id": 5,
             "model": "OBJ_CODE_BLACK_BELT",
-            "movement": 7,
+            "movement": "MOVE_CODE_TURN_RANDOM_UP_RIGHT",
             "type": "ACTOR_EVENT_TYPE_TRAINER",
             "flag": 0,
             "script": 3677,
@@ -200,7 +200,7 @@
         {
             "id": 6,
             "model": "OBJ_CODE_BLACK_BELT",
-            "movement": 16,
+            "movement": "MOVE_CODE_FACE_LEFT",
             "type": "ACTOR_EVENT_TYPE_TRAINER",
             "flag": 0,
             "script": 3678,
@@ -219,7 +219,7 @@
         {
             "id": 7,
             "model": "OBJ_CODE_VETERAN_M",
-            "movement": 46,
+            "movement": "MOVE_CODE_TURN_RANDOM_LEFT_RIGHT",
             "type": "ACTOR_EVENT_TYPE_TRAINER",
             "flag": 0,
             "script": 3042,

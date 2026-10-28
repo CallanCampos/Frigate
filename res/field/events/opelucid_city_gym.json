@@ -26,7 +26,7 @@
         {
             "id": 0,
             "model": "OBJ_CODE_187",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 11,
@@ -45,7 +45,7 @@
         {
             "id": 1,
             "model": "OBJ_CODE_VETERAN_M",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 6,
@@ -64,7 +64,7 @@
         {
             "id": 2,
             "model": "OBJ_CODE_VETERAN_F",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 10,
@@ -83,7 +83,7 @@
         {
             "id": 3,
             "model": "OBJ_CODE_VETERAN_M",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 9,
@@ -102,7 +102,7 @@
         {
             "id": 4,
             "model": "OBJ_CODE_VETERAN_M",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 7,
@@ -121,7 +121,7 @@
         {
             "id": 5,
             "model": "OBJ_CODE_VETERAN_F",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 8,
@@ -140,7 +140,7 @@
         {
             "id": 6,
             "model": "OBJ_CODE_229",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x031f",
             "script": 12,

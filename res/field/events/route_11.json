@@ -246,7 +246,7 @@
         {
             "id": 0,
             "model": "OBJ_CODE_117",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x0321",
             "script": 4,
@@ -265,7 +265,7 @@
         {
             "id": 1,
             "model": "OBJ_CODE_216",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x04e6",
             "script": 7154,
@@ -284,7 +284,7 @@
         {
             "id": 2,
             "model": "OBJ_CODE_210",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x04e7",
             "script": 7155,
@@ -303,7 +303,7 @@
         {
             "id": 3,
             "model": "OBJ_CODE_110",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x04e8",
             "script": 7156,
@@ -322,7 +322,7 @@
         {
             "id": 4,
             "model": "OBJ_CODE_PKMN_BREEDER_F",
-            "movement": 15,
+            "movement": "MOVE_CODE_FACE_DOWN",
             "type": "ACTOR_EVENT_TYPE_TRAINER",
             "flag": 0,
             "script": 3303,
@@ -341,7 +341,7 @@
         {
             "id": 5,
             "model": "OBJ_CODE_PKMN_RANGER_M",
-            "movement": 14,
+            "movement": "MOVE_CODE_FACE_UP",
             "type": "ACTOR_EVENT_TYPE_TRAINER",
             "flag": 0,
             "script": 3305,
@@ -360,7 +360,7 @@
         {
             "id": 6,
             "model": "OBJ_CODE_PKMN_RANGER_F",
-            "movement": 15,
+            "movement": "MOVE_CODE_FACE_DOWN",
             "type": "ACTOR_EVENT_TYPE_TRAINER",
             "flag": 0,
             "script": 3304,
@@ -379,7 +379,7 @@
         {
             "id": 7,
             "model": "OBJ_CODE_210",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x03a6",
             "script": 10521,
@@ -398,7 +398,7 @@
         {
             "id": 8,
             "model": "OBJ_CODE_210",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x03a7",
             "script": 10521,

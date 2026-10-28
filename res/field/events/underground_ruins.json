@@ -46,7 +46,7 @@
         {
             "id": 0,
             "model": "OBJ_CODE_PSYCHIC_M",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 7,

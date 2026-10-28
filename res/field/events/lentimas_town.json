@@ -176,7 +176,7 @@
         {
             "id": 0,
             "model": "OBJ_CODE_WORKER_26",
-            "movement": 3,
+            "movement": "MOVE_CODE_WALK_RANDOM",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 3,
@@ -195,7 +195,7 @@
         {
             "id": 1,
             "model": "OBJ_CODE_131",
-            "movement": 17,
+            "movement": "MOVE_CODE_FACE_RIGHT",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 6,
@@ -214,7 +214,7 @@
         {
             "id": 2,
             "model": "OBJ_CODE_105",
-            "movement": 15,
+            "movement": "MOVE_CODE_FACE_DOWN",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x0308",
             "script": 2,
@@ -233,7 +233,7 @@
         {
             "id": 3,
             "model": "OBJ_CODE_BACKPACKER_M",
-            "movement": 15,
+            "movement": "MOVE_CODE_FACE_DOWN",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 4,
@@ -252,7 +252,7 @@
         {
             "id": 4,
             "model": "OBJ_CODE_21",
-            "movement": 16,
+            "movement": "MOVE_CODE_FACE_LEFT",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 5,
@@ -271,7 +271,7 @@
         {
             "id": 5,
             "model": "OBJ_CODE_249",
-            "movement": 16,
+            "movement": "MOVE_CODE_FACE_LEFT",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x0309",
             "script": 2000,
@@ -290,7 +290,7 @@
         {
             "id": 6,
             "model": "OBJ_CODE_110",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x04ba",
             "script": 7110,
@@ -309,7 +309,7 @@
         {
             "id": 7,
             "model": "OBJ_CODE_76",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 8,

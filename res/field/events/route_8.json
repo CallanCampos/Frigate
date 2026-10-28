@@ -256,7 +256,7 @@
         {
             "id": 0,
             "model": "OBJ_CODE_PARASOL_LADY",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 4,
@@ -275,7 +275,7 @@
         {
             "id": 1,
             "model": "OBJ_CODE_FISHERMAN",
-            "movement": 16,
+            "movement": "MOVE_CODE_FACE_LEFT",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x0317",
             "script": 5,
@@ -294,7 +294,7 @@
         {
             "id": 2,
             "model": "OBJ_CODE_110",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x0528",
             "script": 7220,
@@ -313,7 +313,7 @@
         {
             "id": 3,
             "model": "OBJ_CODE_110",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x0529",
             "script": 7221,
@@ -332,7 +332,7 @@
         {
             "id": 4,
             "model": "OBJ_CODE_110",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x052a",
             "script": 7222,
@@ -351,7 +351,7 @@
         {
             "id": 5,
             "model": "OBJ_CODE_YOUNGSTER",
-            "movement": 20,
+            "movement": "MOVE_CODE_WALK_BACK_AND_FORTH",
             "type": "ACTOR_EVENT_TYPE_TRAINER_LOOK_AROUND",
             "flag": 0,
             "script": 3571,
@@ -370,7 +370,7 @@
         {
             "id": 6,
             "model": "OBJ_CODE_LASS",
-            "movement": 14,
+            "movement": "MOVE_CODE_FACE_UP",
             "type": "ACTOR_EVENT_TYPE_TRAINER",
             "flag": 0,
             "script": 3572,
@@ -389,7 +389,7 @@
         {
             "id": 7,
             "model": "OBJ_CODE_PARASOL_LADY",
-            "movement": 15,
+            "movement": "MOVE_CODE_FACE_DOWN",
             "type": "ACTOR_EVENT_TYPE_TRAINER",
             "flag": 0,
             "script": 3574,
@@ -408,7 +408,7 @@
         {
             "id": 8,
             "model": "OBJ_CODE_FISHERMAN",
-            "movement": 16,
+            "movement": "MOVE_CODE_FACE_LEFT",
             "type": "ACTOR_EVENT_TYPE_TRAINER",
             "flag": 0,
             "script": 3575,
@@ -427,7 +427,7 @@
         {
             "id": 9,
             "model": "OBJ_CODE_PARASOL_LADY",
-            "movement": 3,
+            "movement": "MOVE_CODE_WALK_RANDOM",
             "type": "ACTOR_EVENT_TYPE_TRAINER",
             "flag": 0,
             "script": 3573,

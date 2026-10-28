@@ -236,7 +236,7 @@
         {
             "id": 0,
             "model": "OBJ_CODE_355",
-            "movement": 69,
+            "movement": "MOVE_CODE_RAIL_STAY",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x02ef",
             "script": 2000,
@@ -255,7 +255,7 @@
         {
             "id": 1,
             "model": "OBJ_CODE_CLERK_F",
-            "movement": 81,
+            "movement": "MOVE_CODE_RAIL_WALK_RANDOM",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 10,
@@ -274,7 +274,7 @@
         {
             "id": 2,
             "model": "OBJ_CODE_CLERK_M_67",
-            "movement": 70,
+            "movement": "MOVE_CODE_RAIL_TURN_RANDOM",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 17,
@@ -293,7 +293,7 @@
         {
             "id": 3,
             "model": "OBJ_CODE_CLERK_M_67",
-            "movement": 70,
+            "movement": "MOVE_CODE_RAIL_TURN_RANDOM",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 16,
@@ -312,7 +312,7 @@
         {
             "id": 4,
             "model": "OBJ_CODE_CLERK_M_67",
-            "movement": 79,
+            "movement": "MOVE_CODE_RAIL_TURN_RANDOM_UP_DOWN",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 19,
@@ -331,7 +331,7 @@
         {
             "id": 5,
             "model": "OBJ_CODE_CLERK_F",
-            "movement": 70,
+            "movement": "MOVE_CODE_RAIL_TURN_RANDOM",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 11,
@@ -350,7 +350,7 @@
         {
             "id": 6,
             "model": "OBJ_CODE_CLERK_F",
-            "movement": 81,
+            "movement": "MOVE_CODE_RAIL_WALK_RANDOM",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 12,
@@ -369,7 +369,7 @@
         {
             "id": 7,
             "model": "OBJ_CODE_CLERK_F",
-            "movement": 70,
+            "movement": "MOVE_CODE_RAIL_TURN_RANDOM",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 13,
@@ -388,7 +388,7 @@
         {
             "id": 8,
             "model": "OBJ_CODE_CLERK_M_67",
-            "movement": 76,
+            "movement": "MOVE_CODE_RAIL_TURN_RANDOM_UP_DOWN_RIGHT",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 18,
@@ -407,7 +407,7 @@
         {
             "id": 9,
             "model": "OBJ_CODE_CLERK_F",
-            "movement": 73,
+            "movement": "MOVE_CODE_RAIL_TURN_RANDOM_DOWN_LEFT",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 14,
@@ -426,7 +426,7 @@
         {
             "id": 10,
             "model": "OBJ_CODE_CLERK_M_67",
-            "movement": 70,
+            "movement": "MOVE_CODE_RAIL_TURN_RANDOM",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 15,
@@ -445,7 +445,7 @@
         {
             "id": 11,
             "model": "OBJ_CODE_HARLEQUIN_233",
-            "movement": 69,
+            "movement": "MOVE_CODE_RAIL_STAY",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 21,
@@ -464,7 +464,7 @@
         {
             "id": 12,
             "model": "OBJ_CODE_355",
-            "movement": 69,
+            "movement": "MOVE_CODE_RAIL_STAY",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x0406",
             "script": 2000,

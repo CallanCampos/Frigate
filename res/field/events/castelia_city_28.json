@@ -26,7 +26,7 @@
         {
             "id": 0,
             "model": "OBJ_CODE_83",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 1,
@@ -45,7 +45,7 @@
         {
             "id": 1,
             "model": "OBJ_CODE_RICH_BOY",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 4,
@@ -64,7 +64,7 @@
         {
             "id": 2,
             "model": "OBJ_CODE_83",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 6,
@@ -83,7 +83,7 @@
         {
             "id": 3,
             "model": "OBJ_CODE_SOCIALITE",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 5,

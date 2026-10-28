@@ -5,7 +5,7 @@
         {
             "id": 0,
             "model": "OBJ_CODE_110",
-            "movement": 69,
+            "movement": "MOVE_CODE_RAIL_STAY",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x0535",
             "script": 7233,
@@ -24,7 +24,7 @@
         {
             "id": 1,
             "model": "OBJ_CODE_110",
-            "movement": 69,
+            "movement": "MOVE_CODE_RAIL_STAY",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x0537",
             "script": 7235,

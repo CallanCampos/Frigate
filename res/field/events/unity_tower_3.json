@@ -16,7 +16,7 @@
         {
             "id": 0,
             "model": "OBJ_CODE_POLICEMAN",
-            "movement": 17,
+            "movement": "MOVE_CODE_FACE_RIGHT",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 2,
@@ -35,7 +35,7 @@
         {
             "id": 1,
             "model": "OBJ_CODE_WORK_00",
-            "movement": 15,
+            "movement": "MOVE_CODE_FACE_DOWN",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x0260",
             "script": 3,
@@ -54,7 +54,7 @@
         {
             "id": 2,
             "model": "OBJ_CODE_WORK_01",
-            "movement": 16,
+            "movement": "MOVE_CODE_FACE_LEFT",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x0261",
             "script": 4,
@@ -73,7 +73,7 @@
         {
             "id": 3,
             "model": "OBJ_CODE_WORK_02",
-            "movement": 17,
+            "movement": "MOVE_CODE_FACE_RIGHT",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x0262",
             "script": 5,
@@ -92,7 +92,7 @@
         {
             "id": 4,
             "model": "OBJ_CODE_WORK_03",
-            "movement": 17,
+            "movement": "MOVE_CODE_FACE_RIGHT",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x0263",
             "script": 6,
@@ -111,7 +111,7 @@
         {
             "id": 5,
             "model": "OBJ_CODE_WORK_04",
-            "movement": 16,
+            "movement": "MOVE_CODE_FACE_LEFT",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x0264",
             "script": 7,
@@ -130,7 +130,7 @@
         {
             "id": 6,
             "model": "OBJ_CODE_76",
-            "movement": 15,
+            "movement": "MOVE_CODE_FACE_DOWN",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 10,

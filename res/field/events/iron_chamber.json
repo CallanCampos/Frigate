@@ -26,7 +26,7 @@
         {
             "id": 0,
             "model": "OBJ_CODE_352",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x039b",
             "script": 6,

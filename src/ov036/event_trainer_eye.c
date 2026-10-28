@@ -353,11 +353,11 @@ static BOOL EventTrainerEyeSub_DecideJumpOut(EventTrainerEyeWork *work) {
     work->seq = TRAINER_EYE_SEQ_TURN_TRAINER;
     moveCode = GetActorMoveCode(work->data.actor);
     switch (moveCode) {
-    case 0x33:
-    case 0x34:
-    case 0x35:
-    case 0x36:
-    case 0x55:
+    case MOVE_CODE_HIDE_33:
+    case MOVE_CODE_HIDE_34:
+    case MOVE_CODE_HIDE_35:
+    case MOVE_CODE_HIDE_36:
+    case MOVE_CODE_HIDE_LEAVES:
         work->seq = TRAINER_EYE_SEQ_JUMP_OUT;
         break;
     }
@@ -481,7 +481,7 @@ static BOOL EventTrainerEyeSub_WaitTurnPlayer(EventTrainerEyeWork *work) {
 
 static BOOL EventTrainerEyeSub_SetIdleMoveCode(EventTrainerEyeWork *work) {
     FldAct_EndAcmd(work->data.actor);
-    ChangeActorMoveCodeSeq(work->data.actor, 0);
+    ChangeActorMoveCodeSeq(work->data.actor, MOVE_CODE_NONE);
     work->seq = TRAINER_EYE_SEQ_FINISH;
     return TRUE;
 }

@@ -26,7 +26,7 @@
         {
             "id": 0,
             "model": "OBJ_CODE_WAITRESS",
-            "movement": 17,
+            "movement": "MOVE_CODE_FACE_RIGHT",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 3,
@@ -45,7 +45,7 @@
         {
             "id": 1,
             "model": "OBJ_CODE_CLERK_M_67",
-            "movement": 14,
+            "movement": "MOVE_CODE_FACE_UP",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x0303",
             "script": 2000,
@@ -64,7 +64,7 @@
         {
             "id": 2,
             "model": "OBJ_CODE_POKEFAN_M",
-            "movement": 16,
+            "movement": "MOVE_CODE_FACE_LEFT",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x0302",
             "script": 5,
@@ -83,7 +83,7 @@
         {
             "id": 3,
             "model": "OBJ_CODE_CLERK_F",
-            "movement": 14,
+            "movement": "MOVE_CODE_FACE_UP",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x0302",
             "script": 6,
@@ -102,7 +102,7 @@
         {
             "id": 4,
             "model": "OBJ_CODE_ACE_TRAINER_F",
-            "movement": 14,
+            "movement": "MOVE_CODE_FACE_UP",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x0302",
             "script": 7,
@@ -121,7 +121,7 @@
         {
             "id": 5,
             "model": "OBJ_CODE_HIKER",
-            "movement": 14,
+            "movement": "MOVE_CODE_FACE_UP",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x0302",
             "script": 8,
@@ -140,7 +140,7 @@
         {
             "id": 6,
             "model": "OBJ_CODE_CLERK_M_67",
-            "movement": 14,
+            "movement": "MOVE_CODE_FACE_UP",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x0302",
             "script": 9,

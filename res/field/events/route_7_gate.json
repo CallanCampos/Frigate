@@ -16,7 +16,7 @@
         {
             "id": 0,
             "model": "OBJ_CODE_185",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 2000,
@@ -35,7 +35,7 @@
         {
             "id": 1,
             "model": "OBJ_CODE_185",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 2000,
@@ -54,7 +54,7 @@
         {
             "id": 2,
             "model": "OBJ_CODE_185",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 2000,
@@ -73,7 +73,7 @@
         {
             "id": 3,
             "model": "OBJ_CODE_185",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 2000,
@@ -92,7 +92,7 @@
         {
             "id": 4,
             "model": "OBJ_CODE_185",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 2000,
@@ -111,7 +111,7 @@
         {
             "id": 5,
             "model": "OBJ_CODE_185",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 2000,
@@ -130,7 +130,7 @@
         {
             "id": 6,
             "model": "OBJ_CODE_185",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 2000,
@@ -149,7 +149,7 @@
         {
             "id": 7,
             "model": "OBJ_CODE_185",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 2000,
@@ -168,7 +168,7 @@
         {
             "id": 8,
             "model": "OBJ_CODE_185",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 2000,

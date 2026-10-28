@@ -16,7 +16,7 @@
         {
             "id": 0,
             "model": "OBJ_CODE_ARTIST",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 5,
@@ -35,7 +35,7 @@
         {
             "id": 1,
             "model": "OBJ_CODE_LADY",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 6,
@@ -54,7 +54,7 @@
         {
             "id": 2,
             "model": "OBJ_CODE_LADY",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 7,
@@ -73,7 +73,7 @@
         {
             "id": 3,
             "model": "OBJ_CODE_8",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x028e",
             "script": 10391,
@@ -92,7 +92,7 @@
         {
             "id": 4,
             "model": "OBJ_CODE_LADY",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 10,
@@ -111,7 +111,7 @@
         {
             "id": 5,
             "model": "OBJ_CODE_LADY",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 9,

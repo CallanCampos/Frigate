@@ -296,12 +296,12 @@ static void FesMissionPeople_PlaceActors(GameSystem *gsys, FesMissionWork *work,
                 const s32 *coords = (const s32 *)place->pos.grid;
 
                 ZoneNPC_SetGridPos(&npc, coords[0], coords[1], FX32_CONST(coords[2]));
-                npc.moveCode = 2;
+                npc.moveCode = MOVE_CODE_TURN_RANDOM;
             } else {
                 const u16 *values = &place->pos.rail.componentId;
 
                 ZoneNPC_SetRailPos(&npc, values[0], values[1], values[2]);
-                npc.moveCode = 70;
+                npc.moveCode = MOVE_CODE_RAIL_TURN_RANDOM;
             }
             npc.uid = 236 + i;
             npc.param0 = work->params[i][0];

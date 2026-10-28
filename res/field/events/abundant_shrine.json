@@ -206,7 +206,7 @@
         {
             "id": 0,
             "model": "OBJ_CODE_216",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x0549",
             "script": 7253,
@@ -225,7 +225,7 @@
         {
             "id": 1,
             "model": "OBJ_CODE_110",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x054a",
             "script": 7254,
@@ -244,7 +244,7 @@
         {
             "id": 2,
             "model": "OBJ_CODE_110",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x054b",
             "script": 7255,
@@ -263,7 +263,7 @@
         {
             "id": 3,
             "model": "OBJ_CODE_110",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x054c",
             "script": 7256,
@@ -282,7 +282,7 @@
         {
             "id": 4,
             "model": "OBJ_CODE_110",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x054d",
             "script": 7257,
@@ -301,7 +301,7 @@
         {
             "id": 5,
             "model": "OBJ_CODE_YOUNGSTER",
-            "movement": 38,
+            "movement": "MOVE_CODE_LOOP_DOWN_RIGHT_UP_LEFT",
             "type": "ACTOR_EVENT_TYPE_TRAINER_SPIN_COUNTERCLOCKWISE",
             "flag": 0,
             "script": 3557,
@@ -320,7 +320,7 @@
         {
             "id": 6,
             "model": "OBJ_CODE_LASS",
-            "movement": 8,
+            "movement": "MOVE_CODE_TURN_RANDOM_DOWN_LEFT",
             "type": "ACTOR_EVENT_TYPE_TRAINER",
             "flag": 0,
             "script": 3558,
@@ -339,7 +339,7 @@
         {
             "id": 7,
             "model": "OBJ_CODE_TWINS",
-            "movement": 15,
+            "movement": "MOVE_CODE_FACE_DOWN",
             "type": "ACTOR_EVENT_TYPE_TRAINER",
             "flag": 0,
             "script": 3560,
@@ -358,7 +358,7 @@
         {
             "id": 8,
             "model": "OBJ_CODE_TWINS",
-            "movement": 15,
+            "movement": "MOVE_CODE_FACE_DOWN",
             "type": "ACTOR_EVENT_TYPE_TRAINER",
             "flag": 0,
             "script": 5560,
@@ -377,7 +377,7 @@
         {
             "id": 9,
             "model": "OBJ_CODE_YOUNGSTER",
-            "movement": 20,
+            "movement": "MOVE_CODE_WALK_BACK_AND_FORTH",
             "type": "ACTOR_EVENT_TYPE_TRAINER",
             "flag": 0,
             "script": 3559,
@@ -396,7 +396,7 @@
         {
             "id": 10,
             "model": "OBJ_CODE_PKMN_BREEDER_M",
-            "movement": 3,
+            "movement": "MOVE_CODE_WALK_RANDOM",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": 0,
             "script": 1,
@@ -415,7 +415,7 @@
         {
             "id": 11,
             "model": "OBJ_CODE_ARTIST",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x0404",
             "script": 2000,
@@ -434,7 +434,7 @@
         {
             "id": 12,
             "model": "OBJ_CODE_YOUNGSTER",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x040e",
             "script": 2000,
@@ -453,7 +453,7 @@
         {
             "id": 13,
             "model": "OBJ_CODE_10",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x040e",
             "script": 2000,
@@ -472,7 +472,7 @@
         {
             "id": 14,
             "model": "OBJ_CODE_14",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x040e",
             "script": 2000,

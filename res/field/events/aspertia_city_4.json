@@ -16,7 +16,7 @@
         {
             "id": 0,
             "model": "OBJ_CODE_TWINS",
-            "movement": 14,
+            "movement": "MOVE_CODE_FACE_UP",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x0323",
             "script": 2,
@@ -35,7 +35,7 @@
         {
             "id": 1,
             "model": "OBJ_CODE_308",
-            "movement": 0,
+            "movement": "MOVE_CODE_NONE",
             "type": "ACTOR_EVENT_TYPE_NONE",
             "flag": "EVENT_FLAG_0x03c5",
             "script": 3,
