@@ -44,7 +44,7 @@ Movement_006C:
 
 L_0078:
     SEPlay SEQ_SE_MESSAGE
-    Cmd_0230 0x8020, 0
+    MsgPlaceSignFont4 0x8020, 0
     VMStackPush EVENT_WORK_0x418f
     VMStackPushConst 2
     VMStackCmp CMP_GE

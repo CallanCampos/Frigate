@@ -4013,7 +4013,7 @@ Script_401:
     WorkGet 0x8009, 0x800d
     RTCallGlobal 2808
     ItemCheckSpace 0x8008, 0x8009, 0x8020
-    Cmd_0239 0x8021
+    ScriptNative_CheckPlayerFormModel 0x8021
     VMStackPush 0x8020
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -4059,9 +4059,9 @@ L_2FA8:
 
 L_2FB6:
     WorkSetConst 0x8022, 0
-    Cmd_0239 0x8022
+    ScriptNative_CheckPlayerFormModel 0x8022
     ItemAdd 0x8008, 0x8009, 0x8010
-    Cmd_01DD 0, 0x8008, 0
+    BroadcastGameBeacon 0, 0x8008, 0
     MEWait
     VMStackPush 0x8022
     VMStackPushConst 1

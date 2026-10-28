@@ -139,7 +139,7 @@ L_01BD:
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_01F6
     VMCall L_0208
-    Cmd_02C5 29
+    JoinAvenueRecordActivity 29
     // "We look forward to your next visit."
     ParentActorMsg MSGFILE_SCRIPT, Global10395_Text_WeLookForwardNext, 0, 0
     LastKeyWait

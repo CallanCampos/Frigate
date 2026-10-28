@@ -46,21 +46,21 @@ L_0099:
     VMHalt
 
 Script_27:
-    Cmd_01A1 0, 4, 0, EVENT_WORK_0x4020
-    Cmd_01A1 1, 4, 0, EVENT_WORK_0x4021
-    Cmd_01A1 2, 4, 0, EVENT_WORK_0x4022
-    Cmd_01A1 3, 4, 0, EVENT_WORK_0x4023
-    Cmd_01A1 4, 4, 0, EVENT_WORK_0x4024
-    Cmd_01A1 5, 4, 0, EVENT_WORK_0x4025
-    Cmd_01A1 6, 4, 0, EVENT_WORK_0x4026
-    Cmd_01A1 7, 4, 0, EVENT_WORK_0x4027
-    Cmd_01A1 8, 4, 0, EVENT_WORK_0x4028
-    Cmd_01A1 9, 4, 0, EVENT_WORK_0x4029
-    Cmd_01A1 10, 4, 0, EVENT_WORK_0x402a
-    Cmd_01A1 11, 4, 0, EVENT_WORK_0x402b
-    Cmd_01A1 12, 4, 0, EVENT_WORK_0x402c
-    Cmd_01A1 13, 4, 0, EVENT_WORK_0x402d
-    Cmd_01A1 14, 4, 0, EVENT_WORK_0x402e
+    PleasureBoatGetRoomInfo 0, 4, 0, EVENT_WORK_0x4020
+    PleasureBoatGetRoomInfo 1, 4, 0, EVENT_WORK_0x4021
+    PleasureBoatGetRoomInfo 2, 4, 0, EVENT_WORK_0x4022
+    PleasureBoatGetRoomInfo 3, 4, 0, EVENT_WORK_0x4023
+    PleasureBoatGetRoomInfo 4, 4, 0, EVENT_WORK_0x4024
+    PleasureBoatGetRoomInfo 5, 4, 0, EVENT_WORK_0x4025
+    PleasureBoatGetRoomInfo 6, 4, 0, EVENT_WORK_0x4026
+    PleasureBoatGetRoomInfo 7, 4, 0, EVENT_WORK_0x4027
+    PleasureBoatGetRoomInfo 8, 4, 0, EVENT_WORK_0x4028
+    PleasureBoatGetRoomInfo 9, 4, 0, EVENT_WORK_0x4029
+    PleasureBoatGetRoomInfo 10, 4, 0, EVENT_WORK_0x402a
+    PleasureBoatGetRoomInfo 11, 4, 0, EVENT_WORK_0x402b
+    PleasureBoatGetRoomInfo 12, 4, 0, EVENT_WORK_0x402c
+    PleasureBoatGetRoomInfo 13, 4, 0, EVENT_WORK_0x402d
+    PleasureBoatGetRoomInfo 14, 4, 0, EVENT_WORK_0x402e
     VMHalt
 
 Script_1:
@@ -443,7 +443,7 @@ Script_26:
 
 L_055B:
     WorkSetConst 0x8025, 0
-    Cmd_01A1 EVENT_WORK_0x4000, 5, 0, 0x8025
+    PleasureBoatGetRoomInfo EVENT_WORK_0x4000, 5, 0, 0x8025
     DebugPrint 0x8025
     VMStackPush 0x8025
     VMStackPushConst 0
@@ -475,13 +475,13 @@ L_05CE:
     WorkSetConst 0x8026, 0
     WorkSetConst 0x8027, 0
     WorkSetConst 0x8028, 0
-    Cmd_01A1 EVENT_WORK_0x4000, 8, 0, 0x8010
+    PleasureBoatGetRoomInfo EVENT_WORK_0x4000, 8, 0, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_0627
     WorkSetConst 0x8028, 1
-    Cmd_01A1 EVENT_WORK_0x4000, 7, 0x8028, 0x8026
+    PleasureBoatGetRoomInfo EVENT_WORK_0x4000, 7, 0x8028, 0x8026
     SEPlay SEQ_SE_MESSAGE
     ActorSetEyeToEye
     ParentActorMsg MSGFILE_SCRIPT, 0x8026, 0, 0
@@ -495,8 +495,8 @@ L_0627:
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_06D8
     WorkSetConst 0x8028, 0
-    Cmd_01A1 EVENT_WORK_0x4000, 7, 0x8028, 0x8026
-    Cmd_01A1 EVENT_WORK_0x4000, 6, 0, 0x8027
+    PleasureBoatGetRoomInfo EVENT_WORK_0x4000, 7, 0x8028, 0x8026
+    PleasureBoatGetRoomInfo EVENT_WORK_0x4000, 6, 0, 0x8027
     DebugPrint 0x8027
     SEPlay SEQ_SE_MESSAGE
     ActorSetEyeToEye
@@ -534,7 +534,7 @@ L_06D2:
 
 L_06D8:
     WorkSetConst 0x8028, 1
-    Cmd_01A1 EVENT_WORK_0x4000, 7, 0x8028, 0x8026
+    PleasureBoatGetRoomInfo EVENT_WORK_0x4000, 7, 0x8028, 0x8026
     SEPlay SEQ_SE_MESSAGE
     ActorSetEyeToEye
     ParentActorMsg MSGFILE_SCRIPT, 0x8026, 0, 0
@@ -546,7 +546,7 @@ L_06FC:
 
 L_06FE:
     WorkSetConst 0x802b, 0
-    Cmd_01A1 EVENT_WORK_0x4000, 7, 0, 0x802b
+    PleasureBoatGetRoomInfo EVENT_WORK_0x4000, 7, 0, 0x802b
     DebugPrint 0x802b
     SEPlay SEQ_SE_MESSAGE
     ActorSetEyeToEye
@@ -558,14 +558,14 @@ L_06FE:
 
 L_072E:
     WorkSetConst 0x802c, 0
-    Cmd_01A1 EVENT_WORK_0x4000, 7, 0, 0x802c
+    PleasureBoatGetRoomInfo EVENT_WORK_0x4000, 7, 0, 0x802c
     SEPlay SEQ_SE_MESSAGE
     ActorSetEyeToEye
     ParentActorMsg MSGFILE_SCRIPT, 0x802c, 0, 0
     ActorMsgClose
     SEPlay SEQ_SE_FLD_78
     SEWait
-    Cmd_01A1 EVENT_WORK_0x4000, 7, 1, 0x802c
+    PleasureBoatGetRoomInfo EVENT_WORK_0x4000, 7, 1, 0x802c
     SEPlay SEQ_SE_MESSAGE
     ActorSetEyeToEye
     ParentActorMsg MSGFILE_SCRIPT, 0x802c, 0, 0

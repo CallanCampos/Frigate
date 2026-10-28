@@ -17,7 +17,7 @@ Script_1:
     // "[f000]Ā\u0001\u0000 used the Pass Power\n“[f000]Ĝ\u0001\u0002!\"[f000]븁\u0000"
     SystemMsg Global10435_Text_UsedPassPower, 2
     InfoMsgClose
-    Cmd_01DF
+    CallPassPowerFlash
     WorkAdd 0x8021, 8
     SystemMsg 0x8021, 2
     LastKeyWait

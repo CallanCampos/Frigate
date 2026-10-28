@@ -21,7 +21,7 @@ Script_9:
     VMStackCmp CMP_EQ
     VMStackCmp CMP_AND
     VMJumpIf CMP_STACK, L_004F
-    HollowRivalCmd_0262 0, 10
+    HollowRivalSetValue 0, 10
 
 L_004F:
     VMHalt
@@ -39,12 +39,12 @@ Script_1:
 
 Script_2:
     ActorsPauseAll
-    Cmd_02B4 2, EVENT_WORK_0x400f
+    MemoryLinkIsPlayerLinked 2, EVENT_WORK_0x400f
     VMStackPush EVENT_WORK_0x400f
     VMStackPushConst 1
     VMStackCmp CMP_GE
     VMJumpIf CMP_STACK, L_00A4
-    Cmd_02B5 2, 0
+    WordSetMemoryLinkPlayerName 2, 0
     FunfestMissionBroadcast 17, 0
     SEPlay SEQ_SE_MESSAGE
     // "[f000]Ā\u0001\u0000's House"

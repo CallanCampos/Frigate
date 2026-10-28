@@ -20,7 +20,7 @@ Script_1:
 
 L_0049:
     WorkSetConst 0x8027, 0
-    HollowRivalCmd_0266 0x8027
+    HollowRivalGetCounter 0x8027
     VMStackPush 0x8027
     VMStackPushConst 3
     VMStackCmp CMP_EQ
@@ -153,7 +153,7 @@ L_0216:
     FadeWait
     BGMChangeMap
     WorkSetConst 0x8029, 0
-    HollowRivalCmd_0266 0x8029
+    HollowRivalGetCounter 0x8029
     VMStackPush EVENT_WORK_0x4188
     VMStackPushConst 2
     VMStackCmp CMP_EQ
@@ -200,7 +200,7 @@ L_0314:
     ActorCmdWait
     ActorDelete 0x8011
     FlagSet 0x8023
-    Cmd_02C5 21
+    JoinAvenueRecordActivity 21
     VMCall L_0A10
     VMStackPush 0x8026
     VMStackPushConst 0
@@ -218,7 +218,7 @@ L_0314:
     VMStackCmp CMP_EQ
     VMStackCmp CMP_AND
     VMJumpIf CMP_STACK, L_037A
-    HollowRivalCmd_0262 1, 41
+    HollowRivalSetValue 1, 41
     VMJump L_03D2
 
 L_037A:
@@ -230,7 +230,7 @@ L_037A:
     VMStackCmp CMP_EQ
     VMStackCmp CMP_AND
     VMJumpIf CMP_STACK, L_03A9
-    HollowRivalCmd_0262 1, 42
+    HollowRivalSetValue 1, 42
     VMJump L_03D2
 
 L_03A9:
@@ -242,7 +242,7 @@ L_03A9:
     VMStackCmp CMP_EQ
     VMStackCmp CMP_AND
     VMJumpIf CMP_STACK, L_03D2
-    HollowRivalCmd_0262 1, 43
+    HollowRivalSetValue 1, 43
 
 L_03D2:
     VMStackPush 0x8026
@@ -253,7 +253,7 @@ L_03D2:
     VMStackCmp CMP_EQ
     VMStackCmp CMP_AND
     VMJumpIf CMP_STACK, L_03FB
-    HollowRivalCmd_0262 3, 0
+    HollowRivalSetValue 3, 0
 
 L_03FB:
     VMStackPush 0x8026
@@ -268,7 +268,7 @@ L_03FB:
     VMStackPushConst 0
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_043D
-    HollowRivalCmd_0262 2, 14
+    HollowRivalSetValue 2, 14
     VMJump L_0456
 
 L_043D:
@@ -276,7 +276,7 @@ L_043D:
     VMStackPushConst 1
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_0456
-    HollowRivalCmd_0262 2, 0
+    HollowRivalSetValue 2, 0
 
 L_0456:
     WorkSetConst 0x8028, 0
@@ -595,7 +595,7 @@ L_08BE:
     VMStackPop 0x8000
     LastKeyWait
     ActorMsgClose
-    Cmd_02C5 21
+    JoinAvenueRecordActivity 21
     FlagSet EVENT_FLAG_DAILY_0x0ab4
     TrainerFlagGet 0x8022, 0x8036
     VMStackPush 0x8036

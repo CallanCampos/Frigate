@@ -18,7 +18,7 @@
     VMReturn
 
 L_0048:
-    MusicalCmd_0165 31, 0, 0x8022
+    MusicalGetInfo 31, 0, 0x8022
     VMStackPush 0x8022
     VMStackPushConst 100
     VMStackCmp CMP_GE
@@ -28,7 +28,7 @@ L_0048:
     VMJump L_00D1
 
 L_0074:
-    MusicalCmd_0165 32, 0, 0x8022
+    MusicalGetInfo 32, 0, 0x8022
     VMStackPush 0x8022
     VMStackPushConst 70
     VMStackCmp CMP_GE
@@ -280,10 +280,10 @@ L_03E6:
 
 L_03EA:
     WorkAdd 0x8027, 1
-    Cmd_0167 14, 0x8027, 0, 0
+    MusicalComm 14, 0x8027, 0, 0
     VMCall L_00D5
     WordSetMusicalInfo 5, 0, 0x8024
-    MusicalCmd_0165 38, 0x8024, 0x8023
+    MusicalGetInfo 38, 0x8024, 0x8023
     WordSetMusicalInfo 4, 1, 0x8023
     VMStackPush 0x8023
     VMStackPushConst 4
@@ -298,9 +298,9 @@ L_0438:
     ActorMsg MSGFILE_SCRIPT, MusicalTheater2_Text_SDressUpPerformance_2, 3, 0, 0
 
 L_0444:
-    MusicalCmd_0165 33, 0x8024, 0x8022
+    MusicalGetInfo 33, 0x8024, 0x8022
     WorkAdd 0x8027, 1
-    Cmd_0167 14, 0x8027, 0, 0
+    MusicalComm 14, 0x8027, 0, 0
     VMStackPush 0x8022
     VMStackPushConst 100
     VMStackCmp CMP_GE
@@ -354,13 +354,13 @@ L_0520:
     VMReturn
 
 Script_1:
-    MusicalCmd_0165 39, 0, 0x8021
+    MusicalGetInfo 39, 0, 0x8021
     WorkGet EVENT_WORK_0x4021, 0x8021
-    MusicalCmd_0165 39, 1, 0x8021
+    MusicalGetInfo 39, 1, 0x8021
     WorkGet EVENT_WORK_0x4022, 0x8021
-    MusicalCmd_0165 39, 2, 0x8021
+    MusicalGetInfo 39, 2, 0x8021
     WorkGet EVENT_WORK_0x4023, 0x8021
-    MusicalCmd_0165 39, 3, 0x8021
+    MusicalGetInfo 39, 3, 0x8021
     WorkGet EVENT_WORK_0x4024, 0x8021
     VMHalt
 
@@ -375,13 +375,13 @@ Script_3:
     EvCameraWait
     FadeInBlackQ
     FadeWait
-    Cmd_0167 15, 0, 0, 0
-    Cmd_0167 19, 0, 0, 0x8010
+    MusicalComm 15, 0, 0, 0
+    MusicalComm 19, 0, 0, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 0
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_06B2
-    Cmd_0167 20, 0, 0, 0x8010
+    MusicalComm 20, 0, 0, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -389,37 +389,37 @@ Script_3:
     MsgSetAutoscrolls 1
 
 L_05C8:
-    MusicalCmd_0165 36, 0, 0x8023
+    MusicalGetInfo 36, 0, 0x8023
     WordSetMusicalInfo 2, 0, 0
     WordSetMusicalInfo 3, 1, 0x8023
     // "Welcome to the musical!\nI'm very pleased with your participation![f000]븁\u0000\nParticipants for this musical are:[f000]븁\u0000"
     ActorMsg MSGFILE_SCRIPT, MusicalTheater2_Text_WelcomeMusicalImVery, 3, 0, 0
-    Cmd_0167 14, 111, 0, 0
+    MusicalComm 14, 111, 0, 0
     WordSetMusicalInfo 6, 2, 0
     WordSetMusicalInfo 5, 3, 0
     // "[f000]Ā\u0001\u0003 will participate\nwith [f000]ā\u0001\u0002![f000]븁\u0000"
     ActorMsg MSGFILE_SCRIPT, MusicalTheater2_Text_WillParticipate, 3, 0, 0
-    Cmd_0167 14, 112, 0, 0
+    MusicalComm 14, 112, 0, 0
     WordSetMusicalInfo 6, 2, 1
     WordSetMusicalInfo 5, 3, 1
     // "[f000]Ā\u0001\u0003 will participate\nwith [f000]ā\u0001\u0002![f000]븁\u0000"
     ActorMsg MSGFILE_SCRIPT, MusicalTheater2_Text_WillParticipate, 3, 0, 0
-    Cmd_0167 14, 113, 0, 0
+    MusicalComm 14, 113, 0, 0
     WordSetMusicalInfo 6, 2, 2
     WordSetMusicalInfo 5, 3, 2
     // "[f000]Ā\u0001\u0003 will participate\nwith [f000]ā\u0001\u0002![f000]븁\u0000"
     ActorMsg MSGFILE_SCRIPT, MusicalTheater2_Text_WillParticipate, 3, 0, 0
-    Cmd_0167 14, 114, 0, 0
+    MusicalComm 14, 114, 0, 0
     WordSetMusicalInfo 6, 2, 3
     WordSetMusicalInfo 5, 3, 3
     // "[f000]Ā\u0001\u0003 will participate\nwith [f000]ā\u0001\u0002![f000]븁\u0000"
     ActorMsg MSGFILE_SCRIPT, MusicalTheater2_Text_WillParticipate, 3, 0, 0
-    Cmd_0167 14, 115, 0, 0
+    MusicalComm 14, 115, 0, 0
     // "And the show you'll be performing\nis [f000]Ģ\u0001\u0000.[f000]븁\u0000\nThat is a popular show\namong [f000]ĳ\u0001\u0001.[f000]븁\u0000\nWell, without further ado...\nLet's play Dress Up![f000]븁\u0000"
     ActorMsg MSGFILE_SCRIPT, MusicalTheater2_Text_ShowYoullPerformingPopular, 2, 0, 0
     ActorMsgClose
-    Cmd_0167 14, 11, 0, 0
-    Cmd_0167 20, 0, 0, 0x8010
+    MusicalComm 14, 11, 0, 0
+    MusicalComm 20, 0, 0, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -442,7 +442,7 @@ Script_4:
     EvCameraWait
     FadeInWhiteQ
     FadeWait
-    Cmd_0167 20, 0, 0, 0x8010
+    MusicalComm 20, 0, 0, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -453,11 +453,11 @@ L_0703:
     // "I guess everyone is ready.\nLet's go up on stage![f000]븁\u0000"
     ActorMsg MSGFILE_SCRIPT, MusicalTheater2_Text_GuessEveryoneReadyLets, 3, 0, 0
     ActorMsgClose
-    Cmd_0167 17, 0, 0, 0
+    MusicalComm 17, 0, 0, 0
     FadeOutBlackQ
     FadeWait
     EvCameraEnd
-    Cmd_0167 20, 0, 0, 0x8010
+    MusicalComm 20, 0, 0, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -478,7 +478,7 @@ Script_5:
     EvCameraWait
     FadeInBlackQ
     FadeWait
-    Cmd_0167 20, 0, 0, 0x8010
+    MusicalComm 20, 0, 0, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -486,8 +486,8 @@ Script_5:
     MsgSetAutoscrolls 1
 
 L_0793:
-    Cmd_0167 14, 12, 0, 0
-    MusicalCmd_0165 30, 0, 0x8020
+    MusicalComm 14, 12, 0, 0
+    MusicalGetInfo 30, 0, 0x8020
     WorkSetConst 0x8027, 120
     VMCall L_0048
     WorkSetConst 0x8028, 1
@@ -499,7 +499,7 @@ L_07C2:
     VMStackPushConst 1
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_0813
-    MusicalCmd_0165 37, 0x8026, 0x8024
+    MusicalGetInfo 37, 0x8026, 0x8024
     VMCall L_03EA
     WorkGet 0x8025, 0x8024
     VMStackPush 0x8026
@@ -516,16 +516,16 @@ L_080D:
     VMJump L_07C2
 
 L_0813:
-    Cmd_0167 14, 141, 0, 0
+    MusicalComm 14, 141, 0, 0
     WorkSetConst 0x8024, 5
     VMCall L_00D5
     // "Thank you very much for participating in\nthe musical today![f000]븁\u0000\nPlease join another musical again!\nHave a great day![f000]븁\u0000"
     ActorMsg MSGFILE_SCRIPT, MusicalTheater2_Text_ThankVeryMuchParticipating, 3, 0, 0
-    Cmd_0167 20, 0, 0, 0x8010
+    MusicalComm 20, 0, 0, 0x8010
     ActorMsgClose
-    Cmd_0167 14, 142, 0, 0
+    MusicalComm 14, 142, 0, 0
     WorkSetConst 0x8029, 0
-    MusicalCmd_0166 0, 0, 0x8029
+    MusicalGetAudienceGift 0, 0, 0x8029
     VMStackPush 0x8029
     VMStackPushConst 0
     VMStackCmp CMP_EQ
@@ -537,7 +537,7 @@ L_0875:
     FlagReset EVENT_FLAG_0x026e
 
 L_0879:
-    MusicalCmd_0166 1, 0, 0x8029
+    MusicalGetAudienceGift 1, 0, 0x8029
     VMStackPush 0x8029
     VMStackPushConst 0
     VMStackCmp CMP_EQ
@@ -549,7 +549,7 @@ L_089D:
     FlagReset EVENT_FLAG_0x026f
 
 L_08A1:
-    MusicalCmd_0166 2, 0, 0x8029
+    MusicalGetAudienceGift 2, 0, 0x8029
     VMStackPush 0x8029
     VMStackPushConst 0
     VMStackCmp CMP_EQ
@@ -561,7 +561,7 @@ L_08C5:
     FlagReset EVENT_FLAG_0x0270
 
 L_08C9:
-    MusicalCmd_0166 3, 0, 0x8029
+    MusicalGetAudienceGift 3, 0, 0x8029
     VMStackPush 0x8029
     VMStackPushConst 0
     VMStackCmp CMP_EQ
@@ -573,7 +573,7 @@ L_08ED:
     FlagReset EVENT_FLAG_0x0271
 
 L_08F1:
-    MusicalCmd_0166 4, 0, 0x8029
+    MusicalGetAudienceGift 4, 0, 0x8029
     VMStackPush 0x8029
     VMStackPushConst 0
     VMStackCmp CMP_EQ
@@ -585,7 +585,7 @@ L_0915:
     FlagReset EVENT_FLAG_0x0272
 
 L_0919:
-    MusicalCmd_0166 5, 0, 0x8029
+    MusicalGetAudienceGift 5, 0, 0x8029
     VMStackPush 0x8029
     VMStackPushConst 0
     VMStackCmp CMP_EQ
@@ -597,7 +597,7 @@ L_093D:
     FlagReset EVENT_FLAG_0x0295
 
 L_0941:
-    MusicalCmd_0166 6, 0, 0x8029
+    MusicalGetAudienceGift 6, 0, 0x8029
     VMStackPush 0x8029
     VMStackPushConst 0
     VMStackCmp CMP_EQ
@@ -609,7 +609,7 @@ L_0965:
     FlagReset EVENT_FLAG_0x0296
 
 L_0969:
-    MusicalCmd_0166 7, 0, 0x8029
+    MusicalGetAudienceGift 7, 0, 0x8029
     VMStackPush 0x8029
     VMStackPushConst 0
     VMStackCmp CMP_EQ
@@ -621,7 +621,7 @@ L_098D:
     FlagReset EVENT_FLAG_0x0297
 
 L_0991:
-    MusicalCmd_0166 8, 0, 0x8029
+    MusicalGetAudienceGift 8, 0, 0x8029
     VMStackPush 0x8029
     VMStackPushConst 0
     VMStackCmp CMP_EQ
@@ -633,7 +633,7 @@ L_09B5:
     FlagReset EVENT_FLAG_0x0298
 
 L_09B9:
-    MusicalCmd_0166 9, 0, 0x8029
+    MusicalGetAudienceGift 9, 0, 0x8029
     VMStackPush 0x8029
     VMStackPushConst 0
     VMStackCmp CMP_EQ
@@ -647,7 +647,7 @@ L_09DD:
 L_09E1:
     WorkSetConst 0x8029, 0
     FlagReset EVENT_FLAG_0x00f2
-    Cmd_0167 20, 0, 0, 0x8010
+    MusicalComm 20, 0, 0, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -658,7 +658,7 @@ L_0A0C:
     FadeOutBlackQ
     FadeWait
     EvCameraEnd
-    Cmd_0167 20, 0, 0, 0x8010
+    MusicalComm 20, 0, 0, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ

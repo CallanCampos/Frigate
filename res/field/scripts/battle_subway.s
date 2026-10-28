@@ -602,7 +602,7 @@ L_098F:
     VMStackPushConst 1
     VMStackCmp CMP_GT
     VMJumpIf CMP_STACK, L_09C4
-    Cmd_01DD 7, 0x8010, 0
+    BroadcastGameBeacon 7, 0x8010, 0
 
 L_09C4:
     BSubwayCmd_Tool 357, 0, 0, 32784
@@ -947,7 +947,7 @@ L_0ECC:
     BSubwayCmd_Tool 306, 0, 0, 0
     BSubwayCmd_Tool 347, 0, 0, 0
     BSubwayCmd_Tool 202, 1, 0, 0
-    Plugin1_Cmd1002
+    BSubwayCmd_FreeWork
     // "Saving...\nDon't turn off the power."
     SystemMsg BattleSubway_Text_SavingDontTurnOff, 2
     SaveDataWrite 0x8010
@@ -1343,7 +1343,7 @@ L_15BE:
 
 L_15D2:
     BSubwayCmd_Tool 401, 0, 0, 0
-    Cmd_013C
+    GameCommTryBoot
     BSubwayCmd_Tool 330, 0, 0, 0
     VMReturn
 

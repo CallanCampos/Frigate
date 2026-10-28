@@ -377,7 +377,7 @@ L_0538:
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_059D
     WorkSetConst EVENT_WORK_0x4030, 0
-    Cmd_0209 8, 3
+    SurveyCmd_WriteOwnAnswer 8, 3
     WorkSetConst 0x8025, 495
     WordSetPokeSpecies 1, 495
     WordSetPokeSpecies 2, 495
@@ -389,7 +389,7 @@ L_059D:
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_05D2
     WorkSetConst EVENT_WORK_0x4030, 1
-    Cmd_0209 8, 1
+    SurveyCmd_WriteOwnAnswer 8, 1
     WorkSetConst 0x8025, 498
     WordSetPokeSpecies 1, 498
     WordSetPokeSpecies 2, 498
@@ -397,7 +397,7 @@ L_059D:
 
 L_05D2:
     WorkSetConst EVENT_WORK_0x4030, 2
-    Cmd_0209 8, 2
+    SurveyCmd_WriteOwnAnswer 8, 2
     WorkSetConst 0x8025, 501
     WordSetPokeSpecies 1, 501
     WordSetPokeSpecies 2, 501
@@ -1106,7 +1106,7 @@ L_109A:
     FlagSet EVENT_FLAG_0x02e6
     FlagSet EVENT_FLAG_0x02e4
     FlagSet EVENT_FLAG_0x0323
-    HollowRivalCmd_0262 4, 1
+    HollowRivalSetValue 4, 1
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt
@@ -1192,9 +1192,9 @@ Script_23:
     // "I registered Professor Juniper\nfor you, too![f000]븁\u0000"
     ActorMsg MSGFILE_SCRIPT, AspertiaCity_Text_RegisteredProfessorJuniperToo, 2, 0, 0
     MsgWinCloseAll
-    HollowRivalCmd_0263 2
-    HollowRivalCmd_0263 3
-    HollowRivalCmd_0263 0
+    HollowRivalSetFlag 2
+    HollowRivalSetFlag 3
+    HollowRivalSetFlag 0
     MEPlay SEQ_ME_CALL
     // "The Xtransceiver is ringing!"
     SystemMsg AspertiaCity_Text_XtransceiverRinging, 2
@@ -1275,9 +1275,9 @@ Script_23:
     FlagSet EVENT_FLAG_0x02e5
     FlagSet EVENT_FLAG_0x006a
     FlagReset EVENT_FLAG_0x0408
-    HollowRivalCmd_0262 3, 1
-    TrainerCardCmd_00E7 1
-    TrainerCardCmd_00E7 2
+    HollowRivalSetValue 3, 1
+    StartMenuUnlockItem 1
+    StartMenuUnlockItem 2
     MedalDiscover 73
     MedalDiscover 174
     MedalDiscover 179
@@ -1805,8 +1805,8 @@ Script_25:
     FlagSet EVENT_FLAG_0x02e9
     FlagSet EVENT_FLAG_0x02e8
     WorkSetConst EVENT_WORK_0x4115, 2
-    HollowRivalCmd_0262 0, 10
-    HollowRivalCmd_0262 1, 41
+    HollowRivalSetValue 0, 10
+    HollowRivalSetValue 1, 41
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt
@@ -1820,7 +1820,7 @@ Script_29:
 
 Script_30:
     ActorsPauseAll
-    Plugin14_Cmd1000
+    Plugin14Cmd_StartAspertiaSeasonAnimations
     ActorCmdExec 251, Movement_1E38
     ActorCmdWait
     VMSleep 45
@@ -1860,7 +1860,7 @@ Script_30:
 
 Script_32:
     ActorsPauseAll
-    Plugin14_Cmd1011
+    Plugin14Cmd_LoadAspertiaBG3Picture
     ActorDelete 4
     ActorSetGPos 255, 53, 0, 750, 1
     GameGetVersion 0x8010

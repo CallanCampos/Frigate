@@ -49,9 +49,9 @@ L_00AE:
 
 Script_2:
     ActorsPauseAll
-    Cmd_0186
+    DriftveilGymPrepareFreight
     FadeInBlack
-    Cmd_018D 0
+    DriftveilGymCallFreight 0
     FadeWait
     FinishAllEvents
     ActorsUnpauseAll
@@ -189,7 +189,7 @@ L_029F:
 L_02B1:
     ActorCmdWait
     FadeOutBlack
-    Cmd_018D 2
+    DriftveilGymCallFreight 2
     FadeWait
     SEPlay SEQ_SE_FLD_59
     VMSleep 40
@@ -281,9 +281,9 @@ Script_4:
     SEPlay SEQ_SE_FLD_61
     SEWait
     VMCall L_04C2
-    Cmd_018C 0, 0
+    ScrcmdFieldGimmickPlateDoors_StartDoorEvent 0, 0
     VMCall L_058C
-    Cmd_018C 0, 1
+    ScrcmdFieldGimmickPlateDoors_StartDoorEvent 0, 1
     VMCall L_0656
     SEWait
     FinishAllEvents
@@ -297,9 +297,9 @@ Script_5:
     SEPlay SEQ_SE_FLD_61
     SEWait
     VMCall L_04C2
-    Cmd_018C 1, 0
+    ScrcmdFieldGimmickPlateDoors_StartDoorEvent 1, 0
     VMCall L_058C
-    Cmd_018C 1, 1
+    ScrcmdFieldGimmickPlateDoors_StartDoorEvent 1, 1
     VMCall L_0656
     SEWait
     FinishAllEvents
@@ -313,9 +313,9 @@ Script_6:
     SEPlay SEQ_SE_FLD_61
     SEWait
     VMCall L_04C2
-    Cmd_018C 2, 0
+    ScrcmdFieldGimmickPlateDoors_StartDoorEvent 2, 0
     VMCall L_058C
-    Cmd_018C 2, 1
+    ScrcmdFieldGimmickPlateDoors_StartDoorEvent 2, 1
     VMCall L_0656
     SEWait
     FinishAllEvents
@@ -329,9 +329,9 @@ Script_7:
     SEPlay SEQ_SE_FLD_61
     SEWait
     VMCall L_04C2
-    Cmd_018C 3, 0
+    ScrcmdFieldGimmickPlateDoors_StartDoorEvent 3, 0
     VMCall L_058C
-    Cmd_018C 3, 1
+    ScrcmdFieldGimmickPlateDoors_StartDoorEvent 3, 1
     VMCall L_0656
     SEWait
     FinishAllEvents
@@ -445,7 +445,7 @@ Script_8:
     MsgWaitAdvance
     MsgWinCloseAll
     FadeOutBlack
-    Cmd_018D 1
+    DriftveilGymCallFreight 1
     FadeWait
     RTReserveScript 2
     MapChangeCore ZONE_DRIFTVEIL_CITY_GYM_2, 8, 0, 4, 0

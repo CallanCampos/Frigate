@@ -144,7 +144,7 @@ L_01D8:
     // "Waaaah! I lost!\nMy win streak's over... Sniff...[f000]븁\u0000"
     ParentActorMsg MSGFILE_SCRIPT, StriatonCity7_Text_WaaaahLostWinStreaks, 2, 0
     MsgWinCloseAll
-    Cmd_0275 0, 41, 0
+    WordSetFunfestMission 0, 41, 0
     SEPlay SEQ_SE_FLD_133
     // "The Funfest Mission\n“[f000]ŀ\u0001\u0000\"[f000]븀\u0000\nhas been added to the Entralink!"
     SystemMsg StriatonCity7_Text_FunfestMissionHasBeen, 0

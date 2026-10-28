@@ -210,7 +210,7 @@ L_031F:
     ActorMsgClose
     ItemSub 0x8022, 1, 0x8010
     RecordAdd 89, 1
-    Cmd_02C5 15
+    JoinAvenueRecordActivity 15
     ActorCmdExec 6, Movement_06E4
     ActorCmdWait
     VMSleep 90

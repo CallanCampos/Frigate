@@ -97,8 +97,8 @@ Script_8:
     FlagSet EVENT_FLAG_0x037c
     FlagSet EVENT_FLAG_0x037b
     FlagSet EVENT_FLAG_0x0989
-    HollowRivalCmd_0262 2, 1
-    HollowRivalCmd_0262 1, 13
+    HollowRivalSetValue 2, 1
+    HollowRivalSetValue 1, 13
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt
@@ -153,8 +153,8 @@ Script_12:
     WorkSetConst EVENT_WORK_PLASMA_FRIGATE_LOCATION, 0
     FlagReset EVENT_FLAG_0x0989
     FlagReset EVENT_FLAG_0x03e9
-    HollowRivalCmd_0262 1, 14
-    HollowRivalCmd_0262 2, 2
+    HollowRivalSetValue 1, 14
+    HollowRivalSetValue 2, 2
     WorkSetConst EVENT_WORK_0x4135, 2
     ActorAdd 17
     FinishAllEvents

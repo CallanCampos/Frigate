@@ -93,7 +93,7 @@ L_014F:
     MsgWinCloseAll
     WorkSetConst EVENT_WORK_0x40b2, 2
     FlagSet EVENT_FLAG_0x02f2
-    HollowRivalCmd_0262 1, 1
+    HollowRivalSetValue 1, 1
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt

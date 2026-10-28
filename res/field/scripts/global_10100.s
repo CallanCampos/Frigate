@@ -190,8 +190,8 @@ L_0276:
     VMReturn
 
 L_02A9:
-    Cmd_015B 0x8028
-    Cmd_015C 0x8027
+    WifiListHasValidProfile 0x8028
+    WifiListCountFriends 0x8027
     VMStackPush 0x8027
     VMStackPushConst 0
     VMStackCmp CMP_GT
@@ -288,7 +288,7 @@ L_0403:
     VMReturn
 
 L_041E:
-    Cmd_02C5 26
+    JoinAvenueRecordActivity 26
     FunfestBGMReturn
     // "Right this way, please.[f000]븁\u0000"
     ActorMsg MSGFILE_SCRIPT, Global10100_Text_RightWayPlease, 0x8011, 4, 0

@@ -79,7 +79,7 @@ L_0094:
     VMStackPop 0x8000
     FlagSet EVENT_FLAG_0x01ab
     WorkSetConst EVENT_WORK_0x4121, 1
-    HollowRivalCmd_0262 1, 20
+    HollowRivalSetValue 1, 20
     VMJump L_01C3
 
 L_013C:

@@ -243,7 +243,7 @@ Script_4:
     VMHalt
 
 L_03EE:
-    Plugin1_Cmd1000
+    BSubwayCmd_ClearWork
     BSubwayCmd_Tool 0, 0, 0, 32800
     VMStackPush 0x8020
     VMStackPushConst 4
@@ -419,7 +419,7 @@ L_0648:
     VMCall L_3151
 
 L_0693:
-    Cmd_013C
+    GameCommTryBoot
 
 L_0695:
     VMCall L_28A4
@@ -573,7 +573,7 @@ L_08C7:
 
 L_08C9:
     BSubwayCmd_Tool 0, 0, 0, 32800
-    Plugin1_Cmd1001 0, 0x8020
+    BSubwayCmd_CreateWork 0, 0x8020
     VMCall L_2F54
     VMStackPush 0x8010
     VMStackPushConst 0
@@ -613,9 +613,9 @@ L_0969:
     BSubwayCmd_Tool 359, 0, 0, 0
     BSubwayCmd_Tool 316, 0, 0, 0
     VMCall L_1DB2
-    Cmd_01DD 6, 0, 0
+    BroadcastGameBeacon 6, 0, 0
     RecordAdd 48, 1
-    Cmd_02C5 2
+    JoinAvenueRecordActivity 2
     FunfestBGMReturn
     VMCall L_23B4
     VMCall L_29D1
@@ -623,7 +623,7 @@ L_0969:
 
 L_09A5:
     BSubwayCmd_Tool 0, 0, 0, 32800
-    Plugin1_Cmd1001 0, 0x8020
+    BSubwayCmd_CreateWork 0, 0x8020
     VMCall L_2F54
     VMStackPush 0x8010
     VMStackPushConst 0
@@ -761,9 +761,9 @@ L_0BDD:
     BSubwayCmd_Tool 316, 0, 0, 0
     VMCall L_21E0
     VMCall L_1DB2
-    Cmd_01DD 6, 0, 0
+    BroadcastGameBeacon 6, 0, 0
     RecordAdd 48, 1
-    Cmd_02C5 2
+    JoinAvenueRecordActivity 2
     FunfestBGMReturn
     VMCall L_23B4
     VMCall L_29D1
@@ -844,7 +844,7 @@ L_0D29:
     VMStackPushConst 0
     VMStackCmp CMP_NE
     VMJumpIf CMP_STACK, L_0D6D
-    Cmd_013C
+    GameCommTryBoot
     VMCall L_28A4
     VMReturn
 
@@ -1197,9 +1197,9 @@ L_12E5:
 
 L_133E:
     BSubwayCmd_Tool 359, 0, 0, 0
-    Cmd_01DD 6, 0, 0
+    BroadcastGameBeacon 6, 0, 0
     RecordAdd 48, 1
-    Cmd_02C5 2
+    JoinAvenueRecordActivity 2
     FunfestBGMReturn
     VMCall L_23B4
     VMCall L_29D1
@@ -1285,7 +1285,7 @@ L_143B:
     VMReturn
 
 L_1487:
-    Plugin1_Cmd1001 0, 4
+    BSubwayCmd_CreateWork 0, 4
     VMCall L_2F54
     VMStackPush 0x8010
     VMStackPushConst 0
@@ -1343,7 +1343,7 @@ L_1548:
 
 L_156B:
     BSubwayCmd_Tool 104, 0, 0, 32802
-    Cmd_013C
+    GameCommTryBoot
     VMStackPush 0x8022
     VMStackPushConst 0
     VMStackCmp CMP_EQ
@@ -1387,7 +1387,7 @@ L_15FA:
     WorkSetConst EVENT_WORK_0x4176, 1
     BSubwayCmd_Tool 322, 0, 0, 0
     BSubwayCmd_Tool 306, 0, 0, 0
-    Plugin1_Cmd1002
+    BSubwayCmd_FreeWork
     VMCall L_2D3B
     FadeEx 3, 0, 16, 2
     FadeExWait
@@ -1402,7 +1402,7 @@ L_1661:
 L_1667:
     MsgWinCloseAll
     RecordAdd 48, 1
-    Cmd_02C5 2
+    JoinAvenueRecordActivity 2
     FunfestBGMReturn
     VMCall L_23B4
     VMCall L_29D1
@@ -1412,7 +1412,7 @@ L_1667:
 
 Script_5:
     VMCall L_1EDD
-    Cmd_013C
+    GameCommTryBoot
     BSubwayCmd_Tool 3, 0, 0, 32784
     VMStackPush 0x8010
     VMStackPushConst 0
@@ -1435,7 +1435,7 @@ Script_5:
     BSubwayCmd_Tool 1, 0, 0, 0
 
 L_16FF:
-    Plugin1_Cmd1001 1, 10
+    BSubwayCmd_CreateWork 1, 10
     BSubwayCmd_Tool 310, 0, 0, 32784
     BSubwayCmd_Tool 8, 0, 0, 32802
     VMStackPush 0x8022
@@ -1457,9 +1457,9 @@ L_173E:
     WorkSetConst 0x8008, 42
     VMCall L_3151
     MsgWinCloseAll
-    Cmd_01DD 6, 0, 0
+    BroadcastGameBeacon 6, 0, 0
     RecordAdd 48, 1
-    Cmd_02C5 2
+    JoinAvenueRecordActivity 2
     FunfestBGMReturn
     VMCall L_23B4
     VMCall L_29D1
@@ -2653,19 +2653,19 @@ L_28A4:
     VMCall L_3151
     LastKeyWait
     MsgWinCloseAll
-    Plugin1_Cmd1002
+    BSubwayCmd_FreeWork
     VMCall L_1FFC
     VMReturn
 
 L_28C4:
     VMCall L_1EDD
-    Plugin1_Cmd1002
+    BSubwayCmd_FreeWork
     VMCall L_1FFC
     VMReturn
 
 L_28D4:
     BSubwayCmd_Tool 401, 0, 0, 0
-    Cmd_013C
+    GameCommTryBoot
     BSubwayCmd_Tool 330, 0, 0, 0
     VMReturn
 
@@ -3175,7 +3175,7 @@ L_3075:
     VMJump L_3081
 
 L_3081:
-    Cmd_01B0 0x8039, 0x8022
+    Regulation_CheckPartyRegulation 0x8039, 0x8022
     WorkCmpConst 0x8022, 0
     VMJumpIf CMP_EQ, L_309A
     VMJump L_30B0
@@ -3310,7 +3310,7 @@ L_3250:
 L_3271:
     FunfestBGMReturn
     BSubwayCmd_Tool 103, 0, 0, 32802
-    Cmd_013C
+    GameCommTryBoot
     VMStackPush 0x8022
     VMStackPushConst 1
     VMStackCmp CMP_EQ

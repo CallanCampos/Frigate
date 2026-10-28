@@ -265,7 +265,7 @@ L_040F:
     WorkSetConst EVENT_WORK_PLASMA_FRIGATE_LOCATION, 1
     WorkSetConst EVENT_WORK_0x4106, 1
     WorkSetConst EVENT_WORK_0x40e3, 2
-    HollowRivalCmd_0262 1, 29
+    HollowRivalSetValue 1, 29
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt

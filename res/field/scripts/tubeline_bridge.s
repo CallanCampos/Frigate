@@ -194,12 +194,12 @@ Script_6:
 
 Script_7:
     ActorsPauseAll
-    Cmd_02B4 0, EVENT_WORK_0x400f
+    MemoryLinkIsPlayerLinked 0, EVENT_WORK_0x400f
     VMStackPush EVENT_WORK_0x400f
     VMStackPushConst 1
     VMStackCmp CMP_GE
     VMJumpIf CMP_STACK, L_02DD
-    Cmd_02B5 0, 1
+    WordSetMemoryLinkPlayerName 0, 1
     SEPlay SEQ_SE_MESSAGE
     ActorSetEyeToEye
     // "We were riding our motorbikes\nto our hearts' content...[f000]븁\u0000\nWe believed we could\nride forever and ever...[f000]븁\u0000\nYes, it's an infinite,\nlimitless, breakneck road...[f000]븁\u0000\nWith the breakneck team, Black Empoleon![f000]븁\u0000\nBack when I had a one-on-one\nbattle with [f000]Ā\u0001\u0001...[f000]븀\u0000\nthat was our golden age.[f000]븁\u0000\nIt was the age of gold."

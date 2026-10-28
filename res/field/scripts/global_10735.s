@@ -45,7 +45,7 @@
 
 Script_19:
     ActorsPauseAll
-    Plugin9_Cmd1001 4, 8, 7
+    BlackTowerCmd_ChangeRoom 4, 8, 7
     VMCall L_2454
     RTReserveScript 10742
     SEStop
@@ -55,7 +55,7 @@ Script_19:
     VMHalt
 
 L_00E0:
-    Plugin9_Cmd1001 4, 7, 7
+    BlackTowerCmd_ChangeRoom 4, 7, 7
     VMCall L_2454
     RTReserveScript 10742
     SEStop
@@ -65,13 +65,13 @@ Script_20:
     ActorsPauseAll
     FadeEx 3, 16, 0, 2
     FadeExWait
-    Plugin9_Cmd1001 4, 8, 7
+    BlackTowerCmd_ChangeRoom 4, 8, 7
     VMCall L_2454
     RTReserveScript 10742
     SEStop
 
 Script_1:
-    Plugin9_Cmd1000
+    BlackTowerCmd_CreateWalls
     VMHalt
 
 Script_2:
@@ -80,7 +80,7 @@ Script_2:
     ActorCmdWait
     VMCall L_242D
     VMCall L_2611
-    Plugin9_Cmd1001 0, 8, 7
+    BlackTowerCmd_ChangeRoom 0, 8, 7
     VMCall L_247B
     FadeEx 3, 16, 0, 2
     FadeExWait
@@ -93,7 +93,7 @@ Script_3:
     ActorCmdExec 255, Movement_2BAC
     ActorCmdWait
     VMCall L_242D
-    Plugin9_Cmd1001 1, 8, 7
+    BlackTowerCmd_ChangeRoom 1, 8, 7
     VMCall L_247B
     FadeEx 3, 16, 0, 2
     FadeExWait
@@ -106,7 +106,7 @@ Script_4:
     ActorCmdExec 255, Movement_2BC4
     ActorCmdWait
     VMCall L_242D
-    Plugin9_Cmd1001 2, 8, 7
+    BlackTowerCmd_ChangeRoom 2, 8, 7
     VMCall L_247B
     FadeEx 3, 16, 0, 2
     FadeExWait
@@ -119,7 +119,7 @@ Script_5:
     ActorCmdExec 255, Movement_2BB8
     ActorCmdWait
     VMCall L_242D
-    Plugin9_Cmd1001 3, 8, 7
+    BlackTowerCmd_ChangeRoom 3, 8, 7
     VMCall L_247B
     FadeEx 3, 16, 0, 2
     FadeExWait
@@ -134,7 +134,7 @@ Script_7:
     WorkSetConst 0x8034, 0
     WorkSetConst 0x8035, 0
     WorkSetConst 0x8036, 0
-    Plugin9_Cmd1023 0x8020
+    BlackTowerCmd_GetVersion 0x8020
     EvCameraInit
     EvCameraUnbind
     VMStackPush 0x8020
@@ -148,17 +148,17 @@ L_0243:
     EvCameraMoveTo 4056, 0, 0xed000, 0x68000, 0x10000, 0xfffed000, 20
 
 L_025B:
-    Plugin9_Cmd1016 0, 1
+    BlackTowerCmd_CallDoorEvent 0, 1
     ActorCmdExec 255, Movement_2B90
     ActorCmdWait
-    Plugin9_Cmd1016 0, 0
+    BlackTowerCmd_CallDoorEvent 0, 0
     EvCameraWait
     // "Where would you like to go to?"
     SystemMsg Global10735_Text_WhereWouldLikeGo, 2
-    Plugin9_Cmd1004 0x8035
-    Plugin9_Cmd1006 0x8021
-    Plugin9_Cmd1024 0, 0x8021, 0x8033
-    Plugin9_Cmd1024 1, 0x8021, 0x8034
+    BlackTowerCmd_GetFloorInArea 0x8035
+    BlackTowerCmd_GetArea 0x8021
+    BlackTowerCmd_GetInfo 0, 0x8021, 0x8033
+    BlackTowerCmd_GetInfo 1, 0x8021, 0x8034
     WorkAdd 0x8034, 0x8033
     WorkSetConst 0x8032, 0
     DebugPrint 0x8033
@@ -250,7 +250,7 @@ L_041D:
 L_043B:
     VMCall L_2454
     RTReserveScript 10743
-    Plugin9_Cmd1005 0x802f
+    BlackTowerCmd_ChangeFloor 0x802f
     SEStop
     EvCameraWait
     EvCameraRebind
@@ -278,7 +278,7 @@ L_04A7:
 
 L_04BF:
     VMCall L_2454
-    Plugin9_Cmd1001 4, 8, 7
+    BlackTowerCmd_ChangeRoom 4, 8, 7
     RTReserveScript 10742
     SEStop
     WorkSetConst EVENT_WORK_0x4191, 1
@@ -287,11 +287,11 @@ L_04BF:
     VMJump L_0503
 
 L_04E3:
-    Plugin9_Cmd1016 0, 1
+    BlackTowerCmd_CallDoorEvent 0, 1
     ActorCmdExec 255, Movement_2C00
     ActorCmdWait
     EvCameraMoveToDefault 20
-    Plugin9_Cmd1016 0, 0
+    BlackTowerCmd_CallDoorEvent 0, 0
     EvCameraWait
     EvCameraRebind
     EvCameraEnd
@@ -300,11 +300,11 @@ L_0503:
     VMJump L_0529
 
 L_0509:
-    Plugin9_Cmd1016 0, 1
+    BlackTowerCmd_CallDoorEvent 0, 1
     ActorCmdExec 255, Movement_2C00
     ActorCmdWait
     EvCameraMoveToDefault 20
-    Plugin9_Cmd1016 0, 0
+    BlackTowerCmd_CallDoorEvent 0, 0
     EvCameraWait
     EvCameraRebind
     EvCameraEnd
@@ -342,7 +342,7 @@ L_0580:
 L_0586:
     WorkSetConst 0x8037, 0
     WorkSetConst 0x8010, 0
-    Plugin9_Cmd1023 0x8020
+    BlackTowerCmd_GetVersion 0x8020
     VMStackPush 0x8020
     VMStackPushConst 23
     VMStackCmp CMP_EQ
@@ -468,8 +468,8 @@ L_075B:
     WorkSetConst 0x8039, 0
     WorkSetConst 0x803a, 0
     WorkSetConst 0x803b, 0
-    Plugin9_Cmd1023 0x8020
-    KeysCmd_02D1 0x803b
+    BlackTowerCmd_GetVersion 0x8020
+    KeyInfoGetMyCityProgress 0x803b
     VMStackPush 0x803b
     VMStackPushConst 9
     VMStackCmp CMP_GT
@@ -521,16 +521,16 @@ L_083B:
     VMStackPushConst 0
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_0B37
-    Cmd_01DD 12, 0x8022, 0
+    BroadcastGameBeacon 12, 0x8022, 0
     VMStackPush 0x8020
     VMStackPushConst 23
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_0877
-    Cmd_02C5 22
+    JoinAvenueRecordActivity 22
     VMJump L_087B
 
 L_0877:
-    Cmd_02C5 32
+    JoinAvenueRecordActivity 32
 
 L_087B:
     VMStackPush 0x8020
@@ -622,11 +622,11 @@ L_09EA:
     VMStackPushConst 5
     VMStackCmp CMP_LT
     VMJumpIf CMP_STACK, L_0A0B
-    Plugin9_Cmd1016 0, 1
+    BlackTowerCmd_CallDoorEvent 0, 1
     VMJump L_0A11
 
 L_0A0B:
-    Plugin9_Cmd1016 1, 1
+    BlackTowerCmd_CallDoorEvent 1, 1
 
 L_0A11:
     ActorCmdExec 255, Movement_2B90
@@ -636,11 +636,11 @@ L_0A11:
     VMStackPushConst 5
     VMStackCmp CMP_LT
     VMJumpIf CMP_STACK, L_0A3C
-    Plugin9_Cmd1016 0, 0
+    BlackTowerCmd_CallDoorEvent 0, 0
     VMJump L_0A42
 
 L_0A3C:
-    Plugin9_Cmd1016 1, 0
+    BlackTowerCmd_CallDoorEvent 1, 0
 
 L_0A42:
     VMStackPush 0x8020
@@ -677,9 +677,9 @@ L_0AE7:
 
 L_0B05:
     VMCall L_2454
-    Plugin9_Cmd1003
-    Plugin9_Cmd1024 0, 0x8022, 0x8038
-    Plugin9_Cmd1005 0x8038
+    BlackTowerCmd_StartRun
+    BlackTowerCmd_GetInfo 0, 0x8022, 0x8038
+    BlackTowerCmd_ChangeFloor 0x8038
     SEStop
     EvCameraWait
     EvCameraRebind
@@ -738,8 +738,8 @@ Script_8:
     ActorsPauseAll
     WorkSetConst 0x803c, 0
     WorkSetConst 0x803d, 0
-    Plugin9_Cmd1006 0x8021
-    Plugin9_Cmd1023 0x8020
+    BlackTowerCmd_GetArea 0x8021
+    BlackTowerCmd_GetVersion 0x8020
     GameGetVersion 0x802c
     VMStackPush 0x8020
     VMStackPushConst 23
@@ -826,11 +826,11 @@ L_0D6A:
     VMStackPushConst 5
     VMStackCmp CMP_LT
     VMJumpIf CMP_STACK, L_0DA7
-    Plugin9_Cmd1016 0, 1
+    BlackTowerCmd_CallDoorEvent 0, 1
     VMJump L_0DAD
 
 L_0DA7:
-    Plugin9_Cmd1016 1, 1
+    BlackTowerCmd_CallDoorEvent 1, 1
 
 L_0DAD:
     EvCameraWait
@@ -842,7 +842,7 @@ L_0DAD:
     VMStackPushConst 5
     VMStackCmp CMP_LT
     VMJumpIf CMP_STACK, L_0DF8
-    Plugin9_Cmd1016 0, 0
+    BlackTowerCmd_CallDoorEvent 0, 0
     ActorCmdExec 0x8023, Movement_2B44
     ActorCmdExec 255, Movement_2BD0
     ActorCmdWait
@@ -851,7 +851,7 @@ L_0DAD:
     VMJump L_0E1A
 
 L_0DF8:
-    Plugin9_Cmd1016 1, 0
+    BlackTowerCmd_CallDoorEvent 1, 0
     ActorCmdExec 0x8023, Movement_2B30
     ActorCmdExec 255, Movement_2BE8
     ActorCmdWait
@@ -860,13 +860,13 @@ L_0DF8:
 
 L_0E1A:
     Plugin9_Cmd1020 0x803d
-    KeysCmd_02D1 0x8024
+    KeyInfoGetMyCityProgress 0x8024
     VMStackPush 0x803d
     VMStackPushConst 1
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_1148
     WorkGet 0x8025, 0x8021
-    Cmd_01DD 13, 0x8025, 0
+    BroadcastGameBeacon 13, 0x8025, 0
     VMCall L_2A32
     VMStackPush 0x8025
     VMStackPushConst 1
@@ -884,8 +884,8 @@ L_0E1A:
     MedalGive 158
 
 L_0E87:
-    Plugin9_Cmd1024 3, 0, 0x8008
-    Plugin9_Cmd1024 4, 0, 0x8009
+    BlackTowerCmd_GetInfo 3, 0, 0x8008
+    BlackTowerCmd_GetInfo 4, 0, 0x8009
     VMStackPush 0x8009
     VMStackPushConst 3
     VMStackCmp CMP_LE
@@ -934,8 +934,8 @@ L_0F03:
     MedalGive 159
 
 L_0F41:
-    Plugin9_Cmd1024 3, 0, 0x8008
-    Plugin9_Cmd1024 4, 0, 0x8009
+    BlackTowerCmd_GetInfo 3, 0, 0x8008
+    BlackTowerCmd_GetInfo 4, 0, 0x8009
     VMStackPush 0x8009
     VMStackPushConst 5
     VMStackCmp CMP_LE
@@ -955,7 +955,7 @@ L_0F7F:
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_1103
     WorkAdd 0x8024, 1
-    Plugin9_Cmd1019 0x8024
+    BlackTowerCmd_SetProgress 0x8024
     EvCameraInit
     EvCameraUnbind
     VMStackPush 0x8021
@@ -994,7 +994,7 @@ L_1065:
     MsgWaitAdvance
     ActorMsgClose
     EvCameraWait
-    Plugin9_Cmd1025
+    BlackTowerCmd_CallMachineEvent
     EvCameraMoveToDefault 20
     EvCameraWait
     VMStackPush 0x8020
@@ -1072,12 +1072,12 @@ L_1148:
     VMStackPushConst 1
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_11E7
-    Plugin9_Cmd1029 0x803c
+    BlackTowerCmd_HasEarnedMoney 0x803c
     VMStackPush 0x803c
     VMStackPushConst 1
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_11B0
-    Plugin9_Cmd1031 1
+    BlackTowerCmd_TakeEarnedMoney 1
     VMStackPush 0x8020
     VMStackPushConst 23
     VMStackCmp CMP_EQ
@@ -1140,11 +1140,11 @@ Script_9:
     ActorsPauseAll
     WorkSetConst 0x803e, 0
     WorkSetConst 0x803f, 0
-    Plugin9_Cmd1023 0x8020
+    BlackTowerCmd_GetVersion 0x8020
     VMCall L_1E4C
-    Plugin9_Cmd1006 0x8021
-    Plugin9_Cmd1024 0, 0x8021, 0x803f
-    Plugin9_Cmd1024 6, 0x8021, 0x803e
+    BlackTowerCmd_GetArea 0x8021
+    BlackTowerCmd_GetInfo 0, 0x8021, 0x803f
+    BlackTowerCmd_GetInfo 6, 0x8021, 0x803e
     EvCameraInit
     EvCameraUnbind
     VMStackPush EVENT_WORK_0x4190
@@ -1215,13 +1215,13 @@ L_13BB:
     SEWait
     InfoMsgClose
     EvCameraMoveToDefault 20
-    Plugin9_Cmd1016 0, 1
+    BlackTowerCmd_CallDoorEvent 0, 1
     EvCameraWait
     EvCameraRebind
     EvCameraEnd
     ActorCmdExec 255, Movement_2C00
     ActorCmdWait
-    Plugin9_Cmd1016 0, 0
+    BlackTowerCmd_CallDoorEvent 0, 0
     WorkSetConst 0x803f, 0
     WorkSetConst 0x803e, 0
     FinishAllEvents
@@ -1233,24 +1233,24 @@ Script_11:
     SEPlay SEQ_SE_MESSAGE
     ActorSetEyeToEye
     WorkGet 0x8028, 0x8011
-    Plugin9_Cmd1022 0x8028, 0x8026
-    Plugin9_Cmd1018 0x8026, 0x802b
-    Plugin9_Cmd1011 0x8028, 0x8029
-    Plugin9_Cmd1026 0x8028, 0x8030
+    BlackTowerCmd_GetTrainerId 0x8028, 0x8026
+    BlackTowerCmd_GetTrainerClass 0x8026, 0x802b
+    BlackTowerCmd_IsTrainerDefeated 0x8028, 0x8029
+    BlackTowerCmd_IsTargetSlot 0x8028, 0x8030
     VMStackPush 0x8029
     VMStackPushConst 0
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_14BF
     TrainerClassBGMPlayPush 0x802b
     VMCall L_14EE
-    Plugin9_Cmd1007
+    BlackTowerCmd_CallBattleEvent
     TrainerBattleIsVictory 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_14B1
     CallTrainerBattleEnd
-    Plugin9_Cmd1009 0x8028, 1
+    BlackTowerCmd_SetTrainerDefeated 0x8028, 1
     RecordAdd 49, 1
     VMStackPush 0x8030
     VMStackPushConst 1
@@ -1301,14 +1301,14 @@ L_14E8:
 
 L_14EE:
     WorkSetConst 0x8040, 0
-    KeysCmd_02D1 0x8024
-    Plugin9_Cmd1006 0x8021
-    Plugin9_Cmd1023 0x8020
+    KeyInfoGetMyCityProgress 0x8024
+    BlackTowerCmd_GetArea 0x8021
+    BlackTowerCmd_GetVersion 0x8020
     VMStackPush 0x8030
     VMStackPushConst 1
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_157D
-    Plugin9_Cmd1024 11, 0, 0x8040
+    BlackTowerCmd_GetInfo 11, 0, 0x8040
     VMStackPush 0x8040
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -1329,7 +1329,7 @@ L_155F:
     VMJump L_1577
 
 L_1565:
-    Plugin9_Cmd1027 1, 0x8031
+    BlackTowerCmd_GetNpcScriptByResult 1, 0x8031
     ActorMsg MSGFILE_SCRIPT, 0x8031, 0x8011, 0, 0
 
 L_1577:
@@ -1345,10 +1345,10 @@ L_1585:
 
 L_158F:
     WorkSetConst 0x8041, 0
-    KeysCmd_02D1 0x8024
-    Plugin9_Cmd1006 0x8021
-    Plugin9_Cmd1023 0x8020
-    Plugin9_Cmd1024 11, 0, 0x8041
+    KeyInfoGetMyCityProgress 0x8024
+    BlackTowerCmd_GetArea 0x8021
+    BlackTowerCmd_GetVersion 0x8020
+    BlackTowerCmd_GetInfo 11, 0, 0x8041
     VMStackPush 0x8041
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -1369,7 +1369,7 @@ L_15ED:
     VMJump L_1605
 
 L_15F3:
-    Plugin9_Cmd1027 0, 0x8031
+    BlackTowerCmd_GetNpcScriptByResult 0, 0x8031
     ActorMsg MSGFILE_SCRIPT, 0x8031, 0x8011, 0, 0
 
 L_1605:
@@ -1379,10 +1379,10 @@ L_1605:
 Script_10:
     ActorsPauseAll
     TrainerEyeGetTrainerID 0, 0x8028
-    Plugin9_Cmd1022 0x8028, 0x8026
-    Plugin9_Cmd1018 0x8026, 0x802b
-    Plugin9_Cmd1011 0x8028, 0x8029
-    Plugin9_Cmd1026 0x8028, 0x8030
+    BlackTowerCmd_GetTrainerId 0x8028, 0x8026
+    BlackTowerCmd_GetTrainerClass 0x8026, 0x802b
+    BlackTowerCmd_IsTrainerDefeated 0x8028, 0x8029
+    BlackTowerCmd_IsTargetSlot 0x8028, 0x8030
     VMStackPush 0x8029
     VMStackPushConst 0
     VMStackCmp CMP_EQ
@@ -1392,14 +1392,14 @@ Script_10:
     TrainerEyeEventStart
     TrainerGetActorID 0, 0x8027
     VMCall L_14EE
-    Plugin9_Cmd1007
+    BlackTowerCmd_CallBattleEvent
     TrainerBattleIsVictory 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_16CD
     CallTrainerBattleEnd
-    Plugin9_Cmd1009 0x8028, 1
+    BlackTowerCmd_SetTrainerDefeated 0x8028, 1
     RecordAdd 49, 1
     VMStackPush 0x8030
     VMStackPushConst 1
@@ -1445,9 +1445,9 @@ Script_12:
     GameGetVersion 0x802c
     SEPlay SEQ_SE_MESSAGE
     ActorSetEyeToEye
-    KeysCmd_02D1 0x8024
-    Plugin9_Cmd1006 0x8021
-    Plugin9_Cmd1023 0x8020
+    KeyInfoGetMyCityProgress 0x8024
+    BlackTowerCmd_GetArea 0x8021
+    BlackTowerCmd_GetVersion 0x8020
     Plugin9_Cmd1008 0x8046
     VMStackPush 0x8020
     VMStackPushConst 23
@@ -1573,7 +1573,7 @@ L_190D:
     ActorCmdExec 255, Movement_2BAC
     ActorCmdWait
     VMCall L_242D
-    Plugin9_Cmd1001 4, 8, 7
+    BlackTowerCmd_ChangeRoom 4, 8, 7
     RTReserveScript 10742
     SEStop
     VMJump L_194B
@@ -1597,8 +1597,8 @@ L_194B:
 Script_14:
     ActorsPauseAll
     WorkSetConst 0x8049, 0
-    Plugin9_Cmd1023 0x8020
-    Plugin9_Cmd1006 0x8021
+    BlackTowerCmd_GetVersion 0x8020
+    BlackTowerCmd_GetArea 0x8021
     ActorCmdExec 255, Movement_2CA4
     ActorCmdWait
     ActorCmdExec 255, Movement_2C10
@@ -1644,8 +1644,8 @@ L_1A29:
 Script_13:
     ActorsPauseAll
     WorkSetConst 0x804a, 0
-    Plugin9_Cmd1023 0x8020
-    Plugin9_Cmd1006 0x8021
+    BlackTowerCmd_GetVersion 0x8020
+    BlackTowerCmd_GetArea 0x8021
     ActorCmdExec 255, Movement_2CA4
     ActorCmdWait
     ActorCmdExec 255, Movement_2C10
@@ -1682,10 +1682,10 @@ L_1AE5:
     ActorCmdWait
     ActorWalkRoute 251, 6, 2, 4, 8, 1
     ActorCmdWait
-    Plugin9_Cmd1016 0, 1
+    BlackTowerCmd_CallDoorEvent 0, 1
     ActorCmdExec 251, Movement_2C4C
     ActorCmdWait
-    Plugin9_Cmd1016 0, 0
+    BlackTowerCmd_CallDoorEvent 0, 0
     ActorDelete 251
     VMStackPush 0x8020
     VMStackPushConst 23
@@ -1706,7 +1706,7 @@ L_1B3A:
 
 Script_15:
     ActorsPauseAll
-    Plugin9_Cmd1023 0x8020
+    BlackTowerCmd_GetVersion 0x8020
     ActorCmdExec 255, Movement_2CB4
     ActorWalkRoute 251, 6, 1, 4, 8, 1
     ActorCmdWait
@@ -1740,7 +1740,7 @@ L_1BA5:
 
 Script_16:
     ActorsPauseAll
-    Plugin9_Cmd1023 0x8020
+    BlackTowerCmd_GetVersion 0x8020
     ActorCmdExec 255, Movement_2CB4
     ActorCmdWait
     ActorCmdExec 255, Movement_2C10
@@ -1773,7 +1773,7 @@ L_1C2E:
 
 Script_17:
     ActorsPauseAll
-    Plugin9_Cmd1023 0x8020
+    BlackTowerCmd_GetVersion 0x8020
     ActorWalkRoute 251, 1, 7, 0, 8, 0
     ActorCmdExec 255, Movement_2CA4
     ActorCmdWait
@@ -1807,7 +1807,7 @@ L_1CC5:
 
 Script_18:
     ActorsPauseAll
-    Plugin9_Cmd1023 0x8020
+    BlackTowerCmd_GetVersion 0x8020
     ActorCmdExec 255, Movement_2C10
     ActorCmdWait
     ActorCmdExec 255, Movement_2C84
@@ -1890,8 +1890,8 @@ L_1E1C:
     VMHalt
 
 L_1E4C:
-    Plugin9_Cmd1023 0x8020
-    Plugin9_Cmd1006 0x8021
+    BlackTowerCmd_GetVersion 0x8020
+    BlackTowerCmd_GetArea 0x8021
     GameGetVersion 0x802c
     VMStackPush 0x8021
     VMStackPushConst 0
@@ -2081,8 +2081,8 @@ L_215C:
     WorkSetConst 0x804d, 93
 
 L_216E:
-    Plugin9_Cmd1022 0x8028, 0x8026
-    Plugin9_Cmd1014 0x8026, 0x804e
+    BlackTowerCmd_GetTrainerId 0x8028, 0x8026
+    BlackTowerCmd_GetSpecialTrainerFlag 0x8026, 0x804e
     VMStackPush 0x804e
     VMStackPushConst 1
     VMStackCmp CMP_NE
@@ -2098,7 +2098,7 @@ L_216E:
     ActorMsg MSGFILE_SCRIPT, 0x804d, 0x8011, 2, 0
     LastKeyWait
     ActorMsgClose
-    Plugin9_Cmd1015 0x8026, 1
+    BlackTowerCmd_SetSpecialTrainerFlag 0x8026, 1
     VMJump L_21E4
 
 L_21D4:
@@ -2124,9 +2124,9 @@ L_21FA:
 L_2214:
     WorkSetConst 0x804f, 0
     WorkSetConst 0x8050, 0
-    Plugin9_Cmd1024 9, 0, 0x804f
-    Plugin9_Cmd1024 10, 0, 0x8050
-    Plugin9_Cmd1023 0x8020
+    BlackTowerCmd_GetInfo 9, 0, 0x804f
+    BlackTowerCmd_GetInfo 10, 0, 0x8050
+    BlackTowerCmd_GetVersion 0x8020
     WorkGet 0x8021, 0x8025
     WorkAdd 0x8021, 1
     WordSetPlayerName 0
@@ -2159,8 +2159,8 @@ L_227B:
 L_22AB:
     WorkSetConst 0x8051, 0
     WorkSetConst 0x8052, 0
-    Plugin9_Cmd1024 9, 0, 0x8051
-    Plugin9_Cmd1024 10, 0, 0x8052
+    BlackTowerCmd_GetInfo 9, 0, 0x8051
+    BlackTowerCmd_GetInfo 10, 0, 0x8052
     VMStackPush 0x8000
     VMStackPush 0x8001
     WorkSet 0x8000, 0x8051
@@ -2227,8 +2227,8 @@ L_23C3:
     VMReturn
 
 L_23C9:
-    Plugin9_Cmd1023 0x8020
-    KeysCmd_02D1 0x8024
+    BlackTowerCmd_GetVersion 0x8020
+    KeyInfoGetMyCityProgress 0x8024
     WorkAdd 0x8024, 1
     WordSetNumber 0, 0x8024, 2
     VMStackPush 0x8020
@@ -2253,7 +2253,7 @@ L_2427:
     VMReturn
 
 L_242D:
-    Plugin9_Cmd1023 0x8020
+    BlackTowerCmd_GetVersion 0x8020
     VMStackPush 0x8020
     VMStackPushConst 23
     VMStackCmp CMP_EQ
@@ -2268,7 +2268,7 @@ L_2452:
     VMReturn
 
 L_2454:
-    Plugin9_Cmd1023 0x8020
+    BlackTowerCmd_GetVersion 0x8020
     VMStackPush 0x8020
     VMStackPushConst 23
     VMStackCmp CMP_EQ
@@ -2284,10 +2284,10 @@ L_2479:
 
 L_247B:
     WorkSetConst 0x8053, 0
-    Plugin9_Cmd1024 2, 0, 0x8053
-    Plugin9_Cmd1023 0x8020
+    BlackTowerCmd_GetInfo 2, 0, 0x8053
+    BlackTowerCmd_GetVersion 0x8020
     GameGetVersion 0x802c
-    Plugin9_Cmd1006 0x8021
+    BlackTowerCmd_GetArea 0x8021
     VMStackPush 0x8053
     VMStackPushConst 10
     VMStackCmp CMP_EQ
@@ -2377,7 +2377,7 @@ L_2609:
 
 L_2611:
     WorkSetConst 0x8054, 0
-    Plugin9_Cmd1024 5, 0, 0x8054
+    BlackTowerCmd_GetInfo 5, 0, 0x8054
     FlagSet EVENT_FLAG_0x0352
     FlagSet EVENT_FLAG_0x0353
     FlagGet EVENT_FLAG_0x0167, 0x8010
@@ -2389,13 +2389,13 @@ L_2611:
     VMStackPushConst 1
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_26AE
-    Plugin9_Cmd1023 0x8020
+    BlackTowerCmd_GetVersion 0x8020
     GameGetVersion 0x802c
     VMStackPush 0x8020
     VMStackPush 0x802c
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_26AE
-    Plugin9_Cmd1006 0x8021
+    BlackTowerCmd_GetArea 0x8021
     VMStackPush 0x8021
     VMStackPushConst 2
     VMStackCmp CMP_EQ
@@ -2417,7 +2417,7 @@ L_26AE:
     VMReturn
 
 L_26B6:
-    Plugin9_Cmd1023 0x8020
+    BlackTowerCmd_GetVersion 0x8020
     VMStackPush 0x8020
     VMStackPushConst 23
     VMStackCmp CMP_EQ
@@ -2435,14 +2435,14 @@ L_26DD:
     WorkSetConst 0x8055, 0
     WorkSetConst 0x8056, 0
     WorkSetConst 0x8057, 0
-    KeysCmd_02D1 0x8024
-    Plugin9_Cmd1012 0x802a
-    Plugin9_Cmd1017 0x8055
+    KeyInfoGetMyCityProgress 0x8024
+    BlackTowerCmd_GetNpcScript 0x802a
+    BlackTowerCmd_GetGoalFloor 0x8055
     WordSetNumber 0, 0x8055, 2
-    Plugin9_Cmd1028 0x8056
+    BlackTowerCmd_GetRoomNpcCount 0x8056
     WordSetNumber 2, 0x8056, 1
-    Plugin9_Cmd1006 0x8021
-    Plugin9_Cmd1023 0x8020
+    BlackTowerCmd_GetArea 0x8021
+    BlackTowerCmd_GetVersion 0x8020
     VMStackPush 0x8020
     VMStackPushConst 23
     VMStackCmp CMP_EQ
@@ -2630,7 +2630,7 @@ L_297B:
     VMJump L_2986
 
 L_2986:
-    Plugin9_Cmd1024 11, 0, 0x8057
+    BlackTowerCmd_GetInfo 11, 0, 0x8057
     VMStackPush 0x8057
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -2676,11 +2676,11 @@ L_2A0C:
     VMReturn
 
 L_2A2E:
-    Plugin9_Cmd1030
+    BlackTowerCmd_CallLiftEvent
     VMReturn
 
 L_2A32:
-    Plugin9_Cmd1023 0x8020
+    BlackTowerCmd_GetVersion 0x8020
     VMStackPush 0x8020
     VMStackPushConst 23
     VMStackCmp CMP_EQ

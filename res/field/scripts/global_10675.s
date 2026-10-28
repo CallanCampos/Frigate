@@ -13,7 +13,7 @@ Script_1:
     ActorsPauseAll
     SEPlay SEQ_SE_MESSAGE
     ActorSetEyeToEye
-    Plugin6_Cmd1022 0, 0x8010
+    WbtCmd_GetSlot 0, 0x8010
     VMCall L_0060
     FinishAllEvents
     ActorsUnpauseAll
@@ -23,7 +23,7 @@ Script_2:
     ActorsPauseAll
     SEPlay SEQ_SE_MESSAGE
     ActorSetEyeToEye
-    Plugin6_Cmd1022 1, 0x8010
+    WbtCmd_GetSlot 1, 0x8010
     VMCall L_0060
     FinishAllEvents
     ActorsUnpauseAll
@@ -33,7 +33,7 @@ Script_3:
     ActorsPauseAll
     SEPlay SEQ_SE_MESSAGE
     ActorSetEyeToEye
-    Plugin6_Cmd1022 2, 0x8010
+    WbtCmd_GetSlot 2, 0x8010
     VMCall L_0060
     FinishAllEvents
     ActorsUnpauseAll
@@ -179,7 +179,7 @@ L_0238:
     // "Which Trainer do you want to\nknow about?"
     ParentActorMsg MSGFILE_SCRIPT, Global10675_Text_WhichTrainerWantKnow, 2, 0
     ListMenu_AnchorTopRight 31, 1, 0, 1, 32802
-    Cmd_02D5 0, 0x8010
+    WbtIsTrainerBeaten 0, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -187,7 +187,7 @@ L_0238:
     ListMenuAdd 65, 65535, 65
 
 L_027F:
-    Cmd_02D5 1, 0x8010
+    WbtIsTrainerBeaten 1, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -195,7 +195,7 @@ L_027F:
     ListMenuAdd 66, 65535, 66
 
 L_02A0:
-    Cmd_02D5 2, 0x8010
+    WbtIsTrainerBeaten 2, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -203,7 +203,7 @@ L_02A0:
     ListMenuAdd 67, 65535, 67
 
 L_02C1:
-    Cmd_02D5 3, 0x8010
+    WbtIsTrainerBeaten 3, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -211,7 +211,7 @@ L_02C1:
     ListMenuAdd 68, 65535, 68
 
 L_02E2:
-    Cmd_02D5 4, 0x8010
+    WbtIsTrainerBeaten 4, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -219,7 +219,7 @@ L_02E2:
     ListMenuAdd 69, 65535, 69
 
 L_0303:
-    Cmd_02D5 5, 0x8010
+    WbtIsTrainerBeaten 5, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -227,7 +227,7 @@ L_0303:
     ListMenuAdd 70, 65535, 70
 
 L_0324:
-    Cmd_02D5 6, 0x8010
+    WbtIsTrainerBeaten 6, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -235,7 +235,7 @@ L_0324:
     ListMenuAdd 71, 65535, 71
 
 L_0345:
-    Cmd_02D5 7, 0x8010
+    WbtIsTrainerBeaten 7, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -243,7 +243,7 @@ L_0345:
     ListMenuAdd 72, 65535, 72
 
 L_0366:
-    Cmd_02D5 8, 0x8010
+    WbtIsTrainerBeaten 8, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -251,7 +251,7 @@ L_0366:
     ListMenuAdd 73, 65535, 73
 
 L_0387:
-    Cmd_02D5 9, 0x8010
+    WbtIsTrainerBeaten 9, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -259,7 +259,7 @@ L_0387:
     ListMenuAdd 74, 65535, 74
 
 L_03A8:
-    Cmd_02D5 10, 0x8010
+    WbtIsTrainerBeaten 10, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -267,7 +267,7 @@ L_03A8:
     ListMenuAdd 75, 65535, 75
 
 L_03C9:
-    Cmd_02D5 11, 0x8010
+    WbtIsTrainerBeaten 11, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -275,7 +275,7 @@ L_03C9:
     ListMenuAdd 76, 65535, 76
 
 L_03EA:
-    Cmd_02D5 12, 0x8010
+    WbtIsTrainerBeaten 12, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -283,7 +283,7 @@ L_03EA:
     ListMenuAdd 77, 65535, 77
 
 L_040B:
-    Cmd_02D5 13, 0x8010
+    WbtIsTrainerBeaten 13, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -291,7 +291,7 @@ L_040B:
     ListMenuAdd 78, 65535, 78
 
 L_042C:
-    Cmd_02D5 19, 0x8010
+    WbtIsTrainerBeaten 19, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -470,7 +470,7 @@ L_0678:
     // "Which Trainer do you want to\nknow about?"
     ParentActorMsg MSGFILE_SCRIPT, Global10675_Text_WhichTrainerWantKnow, 2, 0
     ListMenu_AnchorTopRight 31, 1, 0, 1, 32802
-    Cmd_02D5 20, 0x8010
+    WbtIsTrainerBeaten 20, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -478,7 +478,7 @@ L_0678:
     ListMenuAdd 85, 65535, 85
 
 L_06BF:
-    Cmd_02D5 21, 0x8010
+    WbtIsTrainerBeaten 21, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -486,7 +486,7 @@ L_06BF:
     ListMenuAdd 86, 65535, 86
 
 L_06E0:
-    Cmd_02D5 22, 0x8010
+    WbtIsTrainerBeaten 22, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -494,7 +494,7 @@ L_06E0:
     ListMenuAdd 87, 65535, 87
 
 L_0701:
-    Cmd_02D5 23, 0x8010
+    WbtIsTrainerBeaten 23, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -502,7 +502,7 @@ L_0701:
     ListMenuAdd 88, 65535, 88
 
 L_0722:
-    Cmd_02D5 24, 0x8010
+    WbtIsTrainerBeaten 24, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -510,7 +510,7 @@ L_0722:
     ListMenuAdd 89, 65535, 89
 
 L_0743:
-    Cmd_02D5 25, 0x8010
+    WbtIsTrainerBeaten 25, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -518,7 +518,7 @@ L_0743:
     ListMenuAdd 90, 65535, 90
 
 L_0764:
-    Cmd_02D5 26, 0x8010
+    WbtIsTrainerBeaten 26, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -526,7 +526,7 @@ L_0764:
     ListMenuAdd 91, 65535, 91
 
 L_0785:
-    Cmd_02D5 35, 0x8010
+    WbtIsTrainerBeaten 35, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -534,7 +534,7 @@ L_0785:
     ListMenuAdd 100, 65535, 100
 
 L_07A6:
-    Cmd_02D5 14, 0x8010
+    WbtIsTrainerBeaten 14, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -542,7 +542,7 @@ L_07A6:
     ListMenuAdd 79, 65535, 79
 
 L_07C7:
-    Cmd_02D5 53, 0x8010
+    WbtIsTrainerBeaten 53, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -671,7 +671,7 @@ L_0964:
     // "Which Trainer do you want to\nknow about?"
     ParentActorMsg MSGFILE_SCRIPT, Global10675_Text_WhichTrainerWantKnow, 2, 0
     ListMenu_AnchorTopRight 31, 1, 0, 1, 32802
-    Cmd_02D5 27, 0x8010
+    WbtIsTrainerBeaten 27, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -679,7 +679,7 @@ L_0964:
     ListMenuAdd 92, 65535, 92
 
 L_09AB:
-    Cmd_02D5 28, 0x8010
+    WbtIsTrainerBeaten 28, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -687,7 +687,7 @@ L_09AB:
     ListMenuAdd 93, 65535, 93
 
 L_09CC:
-    Cmd_02D5 29, 0x8010
+    WbtIsTrainerBeaten 29, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -695,7 +695,7 @@ L_09CC:
     ListMenuAdd 94, 65535, 94
 
 L_09ED:
-    Cmd_02D5 30, 0x8010
+    WbtIsTrainerBeaten 30, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -703,7 +703,7 @@ L_09ED:
     ListMenuAdd 95, 65535, 95
 
 L_0A0E:
-    Cmd_02D5 31, 0x8010
+    WbtIsTrainerBeaten 31, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -711,7 +711,7 @@ L_0A0E:
     ListMenuAdd 96, 65535, 96
 
 L_0A2F:
-    Cmd_02D5 32, 0x8010
+    WbtIsTrainerBeaten 32, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -719,7 +719,7 @@ L_0A2F:
     ListMenuAdd 97, 65535, 97
 
 L_0A50:
-    Cmd_02D5 33, 0x8010
+    WbtIsTrainerBeaten 33, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -727,7 +727,7 @@ L_0A50:
     ListMenuAdd 98, 65535, 98
 
 L_0A71:
-    Cmd_02D5 34, 0x8010
+    WbtIsTrainerBeaten 34, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -735,7 +735,7 @@ L_0A71:
     ListMenuAdd 99, 65535, 99
 
 L_0A92:
-    Cmd_02D5 15, 0x8010
+    WbtIsTrainerBeaten 15, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -854,7 +854,7 @@ L_0C0C:
     // "Which Trainer do you want to\nknow about?"
     ParentActorMsg MSGFILE_SCRIPT, Global10675_Text_WhichTrainerWantKnow, 2, 0
     ListMenu_AnchorTopRight 31, 1, 0, 1, 32802
-    Cmd_02D5 36, 0x8010
+    WbtIsTrainerBeaten 36, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -862,7 +862,7 @@ L_0C0C:
     ListMenuAdd 101, 65535, 101
 
 L_0C53:
-    Cmd_02D5 37, 0x8010
+    WbtIsTrainerBeaten 37, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -870,7 +870,7 @@ L_0C53:
     ListMenuAdd 102, 65535, 102
 
 L_0C74:
-    Cmd_02D5 38, 0x8010
+    WbtIsTrainerBeaten 38, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -878,7 +878,7 @@ L_0C74:
     ListMenuAdd 103, 65535, 103
 
 L_0C95:
-    Cmd_02D5 39, 0x8010
+    WbtIsTrainerBeaten 39, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -886,7 +886,7 @@ L_0C95:
     ListMenuAdd 104, 65535, 104
 
 L_0CB6:
-    Cmd_02D5 40, 0x8010
+    WbtIsTrainerBeaten 40, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -894,7 +894,7 @@ L_0CB6:
     ListMenuAdd 105, 65535, 105
 
 L_0CD7:
-    Cmd_02D5 41, 0x8010
+    WbtIsTrainerBeaten 41, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -902,7 +902,7 @@ L_0CD7:
     ListMenuAdd 106, 65535, 106
 
 L_0CF8:
-    Cmd_02D5 42, 0x8010
+    WbtIsTrainerBeaten 42, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -910,7 +910,7 @@ L_0CF8:
     ListMenuAdd 107, 65535, 107
 
 L_0D19:
-    Cmd_02D5 43, 0x8010
+    WbtIsTrainerBeaten 43, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -918,7 +918,7 @@ L_0D19:
     ListMenuAdd 108, 65535, 108
 
 L_0D3A:
-    Cmd_02D5 44, 0x8010
+    WbtIsTrainerBeaten 44, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -926,7 +926,7 @@ L_0D3A:
     ListMenuAdd 109, 65535, 109
 
 L_0D5B:
-    Cmd_02D5 16, 0x8010
+    WbtIsTrainerBeaten 16, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -934,7 +934,7 @@ L_0D5B:
     ListMenuAdd 81, 65535, 81
 
 L_0D7C:
-    Cmd_02D5 17, 0x8010
+    WbtIsTrainerBeaten 17, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -1073,7 +1073,7 @@ L_0F3C:
     // "Which Trainer do you want to\nknow about?"
     ParentActorMsg MSGFILE_SCRIPT, Global10675_Text_WhichTrainerWantKnow, 2, 0
     ListMenu_AnchorTopRight 31, 1, 0, 1, 32802
-    Cmd_02D5 45, 0x8010
+    WbtIsTrainerBeaten 45, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -1081,7 +1081,7 @@ L_0F3C:
     ListMenuAdd 110, 65535, 110
 
 L_0F83:
-    Cmd_02D5 46, 0x8010
+    WbtIsTrainerBeaten 46, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -1089,7 +1089,7 @@ L_0F83:
     ListMenuAdd 111, 65535, 111
 
 L_0FA4:
-    Cmd_02D5 47, 0x8010
+    WbtIsTrainerBeaten 47, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -1097,7 +1097,7 @@ L_0FA4:
     ListMenuAdd 112, 65535, 112
 
 L_0FC5:
-    Cmd_02D5 48, 0x8010
+    WbtIsTrainerBeaten 48, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -1105,7 +1105,7 @@ L_0FC5:
     ListMenuAdd 113, 65535, 113
 
 L_0FE6:
-    Cmd_02D5 49, 0x8010
+    WbtIsTrainerBeaten 49, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -1113,7 +1113,7 @@ L_0FE6:
     ListMenuAdd 114, 65535, 114
 
 L_1007:
-    Cmd_02D5 50, 0x8010
+    WbtIsTrainerBeaten 50, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -1121,7 +1121,7 @@ L_1007:
     ListMenuAdd 115, 65535, 115
 
 L_1028:
-    Cmd_02D5 51, 0x8010
+    WbtIsTrainerBeaten 51, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -1129,7 +1129,7 @@ L_1028:
     ListMenuAdd 116, 65535, 116
 
 L_1049:
-    Cmd_02D5 52, 0x8010
+    WbtIsTrainerBeaten 52, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -1137,7 +1137,7 @@ L_1049:
     ListMenuAdd 117, 65535, 117
 
 L_106A:
-    Cmd_02D5 18, 0x8010
+    WbtIsTrainerBeaten 18, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -1247,129 +1247,129 @@ L_11DC:
 
 L_11DE:
     WorkSetConst 0x8021, 0
-    Cmd_02D5 0, 0x8010
+    WbtIsTrainerBeaten 0, 0x8010
     WorkAdd 0x8021, 0x8010
-    Cmd_02D5 1, 0x8010
+    WbtIsTrainerBeaten 1, 0x8010
     WorkAdd 0x8021, 0x8010
-    Cmd_02D5 2, 0x8010
+    WbtIsTrainerBeaten 2, 0x8010
     WorkAdd 0x8021, 0x8010
-    Cmd_02D5 3, 0x8010
+    WbtIsTrainerBeaten 3, 0x8010
     WorkAdd 0x8021, 0x8010
-    Cmd_02D5 4, 0x8010
+    WbtIsTrainerBeaten 4, 0x8010
     WorkAdd 0x8021, 0x8010
-    Cmd_02D5 5, 0x8010
+    WbtIsTrainerBeaten 5, 0x8010
     WorkAdd 0x8021, 0x8010
-    Cmd_02D5 6, 0x8010
+    WbtIsTrainerBeaten 6, 0x8010
     WorkAdd 0x8021, 0x8010
-    Cmd_02D5 7, 0x8010
+    WbtIsTrainerBeaten 7, 0x8010
     WorkAdd 0x8021, 0x8010
-    Cmd_02D5 8, 0x8010
+    WbtIsTrainerBeaten 8, 0x8010
     WorkAdd 0x8021, 0x8010
-    Cmd_02D5 9, 0x8010
+    WbtIsTrainerBeaten 9, 0x8010
     WorkAdd 0x8021, 0x8010
-    Cmd_02D5 10, 0x8010
+    WbtIsTrainerBeaten 10, 0x8010
     WorkAdd 0x8021, 0x8010
-    Cmd_02D5 11, 0x8010
+    WbtIsTrainerBeaten 11, 0x8010
     WorkAdd 0x8021, 0x8010
-    Cmd_02D5 12, 0x8010
+    WbtIsTrainerBeaten 12, 0x8010
     WorkAdd 0x8021, 0x8010
-    Cmd_02D5 13, 0x8010
+    WbtIsTrainerBeaten 13, 0x8010
     WorkAdd 0x8021, 0x8010
-    Cmd_02D5 19, 0x8010
+    WbtIsTrainerBeaten 19, 0x8010
     WorkAdd 0x8021, 0x8010
     VMReturn
 
 L_129A:
     WorkSetConst 0x8021, 0
-    Cmd_02D5 20, 0x8010
+    WbtIsTrainerBeaten 20, 0x8010
     WorkAdd 0x8021, 0x8010
-    Cmd_02D5 21, 0x8010
+    WbtIsTrainerBeaten 21, 0x8010
     WorkAdd 0x8021, 0x8010
-    Cmd_02D5 22, 0x8010
+    WbtIsTrainerBeaten 22, 0x8010
     WorkAdd 0x8021, 0x8010
-    Cmd_02D5 23, 0x8010
+    WbtIsTrainerBeaten 23, 0x8010
     WorkAdd 0x8021, 0x8010
-    Cmd_02D5 24, 0x8010
+    WbtIsTrainerBeaten 24, 0x8010
     WorkAdd 0x8021, 0x8010
-    Cmd_02D5 25, 0x8010
+    WbtIsTrainerBeaten 25, 0x8010
     WorkAdd 0x8021, 0x8010
-    Cmd_02D5 26, 0x8010
+    WbtIsTrainerBeaten 26, 0x8010
     WorkAdd 0x8021, 0x8010
-    Cmd_02D5 35, 0x8010
+    WbtIsTrainerBeaten 35, 0x8010
     WorkAdd 0x8021, 0x8010
-    Cmd_02D5 14, 0x8010
+    WbtIsTrainerBeaten 14, 0x8010
     WorkAdd 0x8021, 0x8010
-    Cmd_02D5 53, 0x8010
+    WbtIsTrainerBeaten 53, 0x8010
     WorkAdd 0x8021, 0x8010
     VMReturn
 
 L_131A:
     WorkSetConst 0x8021, 0
-    Cmd_02D5 27, 0x8010
+    WbtIsTrainerBeaten 27, 0x8010
     WorkAdd 0x8021, 0x8010
-    Cmd_02D5 28, 0x8010
+    WbtIsTrainerBeaten 28, 0x8010
     WorkAdd 0x8021, 0x8010
-    Cmd_02D5 29, 0x8010
+    WbtIsTrainerBeaten 29, 0x8010
     WorkAdd 0x8021, 0x8010
-    Cmd_02D5 30, 0x8010
+    WbtIsTrainerBeaten 30, 0x8010
     WorkAdd 0x8021, 0x8010
-    Cmd_02D5 31, 0x8010
+    WbtIsTrainerBeaten 31, 0x8010
     WorkAdd 0x8021, 0x8010
-    Cmd_02D5 32, 0x8010
+    WbtIsTrainerBeaten 32, 0x8010
     WorkAdd 0x8021, 0x8010
-    Cmd_02D5 33, 0x8010
+    WbtIsTrainerBeaten 33, 0x8010
     WorkAdd 0x8021, 0x8010
-    Cmd_02D5 34, 0x8010
+    WbtIsTrainerBeaten 34, 0x8010
     WorkAdd 0x8021, 0x8010
-    Cmd_02D5 15, 0x8010
+    WbtIsTrainerBeaten 15, 0x8010
     WorkAdd 0x8021, 0x8010
     VMReturn
 
 L_138E:
     WorkSetConst 0x8021, 0
-    Cmd_02D5 36, 0x8010
+    WbtIsTrainerBeaten 36, 0x8010
     WorkAdd 0x8021, 0x8010
-    Cmd_02D5 37, 0x8010
+    WbtIsTrainerBeaten 37, 0x8010
     WorkAdd 0x8021, 0x8010
-    Cmd_02D5 38, 0x8010
+    WbtIsTrainerBeaten 38, 0x8010
     WorkAdd 0x8021, 0x8010
-    Cmd_02D5 39, 0x8010
+    WbtIsTrainerBeaten 39, 0x8010
     WorkAdd 0x8021, 0x8010
-    Cmd_02D5 40, 0x8010
+    WbtIsTrainerBeaten 40, 0x8010
     WorkAdd 0x8021, 0x8010
-    Cmd_02D5 41, 0x8010
+    WbtIsTrainerBeaten 41, 0x8010
     WorkAdd 0x8021, 0x8010
-    Cmd_02D5 42, 0x8010
+    WbtIsTrainerBeaten 42, 0x8010
     WorkAdd 0x8021, 0x8010
-    Cmd_02D5 43, 0x8010
+    WbtIsTrainerBeaten 43, 0x8010
     WorkAdd 0x8021, 0x8010
-    Cmd_02D5 44, 0x8010
+    WbtIsTrainerBeaten 44, 0x8010
     WorkAdd 0x8021, 0x8010
-    Cmd_02D5 16, 0x8010
+    WbtIsTrainerBeaten 16, 0x8010
     WorkAdd 0x8021, 0x8010
-    Cmd_02D5 17, 0x8010
+    WbtIsTrainerBeaten 17, 0x8010
     WorkAdd 0x8021, 0x8010
     VMReturn
 
 L_141A:
     WorkSetConst 0x8021, 0
-    Cmd_02D5 45, 0x8010
+    WbtIsTrainerBeaten 45, 0x8010
     WorkAdd 0x8021, 0x8010
-    Cmd_02D5 46, 0x8010
+    WbtIsTrainerBeaten 46, 0x8010
     WorkAdd 0x8021, 0x8010
-    Cmd_02D5 47, 0x8010
+    WbtIsTrainerBeaten 47, 0x8010
     WorkAdd 0x8021, 0x8010
-    Cmd_02D5 48, 0x8010
+    WbtIsTrainerBeaten 48, 0x8010
     WorkAdd 0x8021, 0x8010
-    Cmd_02D5 49, 0x8010
+    WbtIsTrainerBeaten 49, 0x8010
     WorkAdd 0x8021, 0x8010
-    Cmd_02D5 50, 0x8010
+    WbtIsTrainerBeaten 50, 0x8010
     WorkAdd 0x8021, 0x8010
-    Cmd_02D5 51, 0x8010
+    WbtIsTrainerBeaten 51, 0x8010
     WorkAdd 0x8021, 0x8010
-    Cmd_02D5 52, 0x8010
+    WbtIsTrainerBeaten 52, 0x8010
     WorkAdd 0x8021, 0x8010
-    Cmd_02D5 18, 0x8010
+    WbtIsTrainerBeaten 18, 0x8010
     WorkAdd 0x8021, 0x8010
     VMReturn
     .balign 4, 0

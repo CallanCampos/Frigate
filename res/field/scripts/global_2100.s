@@ -17,7 +17,7 @@
     ScriptEntriesEnd
 
 Script_3:
-    Cmd_02B2 0, EVENT_WORK_0x400f
+    MemoryLinkCheckFlag 0, EVENT_WORK_0x400f
     DebugPrint 80
     VMStackPush EVENT_WORK_0x400f
     VMStackPushConst 1
@@ -46,7 +46,7 @@ Script_4:
     VMHalt
 
 Script_5:
-    Cmd_02B2 0, EVENT_WORK_0x400f
+    MemoryLinkCheckFlag 0, EVENT_WORK_0x400f
     VMStackPush EVENT_WORK_0x400f
     VMStackPushConst 0
     VMStackCmp CMP_EQ
@@ -256,7 +256,7 @@ Script_1:
     ActorsPauseAll
     SEPlay SEQ_SE_MESSAGE
     ActorSetEyeToEye
-    Cmd_00CE 0x8021
+    TrainerCardGetStars 0x8021
     TrainerCardGetBirthDate 0x8025, 0x8026
     RTCGetDate 0x8023, 0x8024
     VMStackPush 0x8023
@@ -539,7 +539,7 @@ L_06E0:
 
 L_0745:
     WorkSetConst 0x802b, 1
-    Cmd_01DD 2, 0, 0
+    BroadcastGameBeacon 2, 0, 0
     VMJump L_0797
 
 L_0759:
@@ -593,7 +593,7 @@ L_0809:
     VMStackPushConst 1
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_0846
-    TimeSigCmd_00E5 0x8008, 0x8009
+    FieldScriptEnv_CmdGetTrainerViewGroupAndMarkSeen 0x8008, 0x8009
     VMStackPush 0x8008
     VMStackPushConst 0
     VMStackCmp CMP_EQ
@@ -670,7 +670,7 @@ L_0947:
     VMStackPushConst 1
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_097E
-    Cmd_02C5 16
+    JoinAvenueRecordActivity 16
     FunfestBGMReturn
     // "I hope you enjoy your time in\nthe Union Room.[f000]븁\u0000"
     ActorMsg MSGFILE_SCRIPT, Global2100_Text_HopeEnjoyTimeUnion, 0x8011, 4, 0
@@ -860,7 +860,7 @@ L_0B96:
     BMHndAnmWait 0x8038
     SEWait
     BMReleaseHandle 0x8038
-    Plugin13_Cmd1005 4, 0x8039
+    PokemonCenterCmd_GetMatchState 4, 0x8039
     VMStackPush 0x8039
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -1192,7 +1192,7 @@ L_0FF1:
 L_100F:
     WorkSetConst 0x803a, 0
     WorkSetConst 0x803b, 0
-    Plugin13_Cmd1005 0, 0x803a
+    PokemonCenterCmd_GetMatchState 0, 0x803a
     ActorCmdExec 255, Movement_10D0
     ActorCmdWait
     VMStackPush 0x803a
@@ -1205,12 +1205,12 @@ L_100F:
     VMJump L_108F
 
 L_1052:
-    Plugin13_Cmd1005 3, 0x803b
+    PokemonCenterCmd_GetMatchState 3, 0x803b
     VMStackPush 0x803b
     VMStackPushConst 0
     VMStackCmp CMP_GT
     VMJumpIf CMP_STACK, L_108F
-    Plugin13_Cmd1009 0x803b
+    PokemonCenterCmd_AddBattlePoints 0x803b
     WordSetPlayerName 0
     // "In honor of your achievement in battle,\nI present you with these Battle Points![f000]븁\u0000"
     SystemMsg Global2100_Text_HonorAchievementBattlePresent, 2
@@ -1223,7 +1223,7 @@ L_1052:
     InfoMsgClose
 
 L_108F:
-    Plugin13_Cmd1008 4, 0
+    PokemonCenterCmd_SetMatchState 4, 0
     // "Saving...\nDon't turn off the power."
     SystemMsg Global2100_Text_SavingDontTurnOff, 2
     VMSleep 1
@@ -1233,7 +1233,7 @@ L_108F:
     VMStackPushConst 0
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_10C0
-    Cmd_02ED 1, 0
+    SetSoftResetBlocked 1, 0
 
 L_10C0:
     MsgWinCloseAll

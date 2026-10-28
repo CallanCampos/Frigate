@@ -53,21 +53,21 @@ Script_2:
     ActorsPauseAll
     SEPlay SEQ_SE_MESSAGE
     ActorSetEyeToEye
-    Plugin8_Cmd1000
-    Plugin8_Cmd1002 0, 0x8023
-    Plugin8_Cmd1007 0, 254, 0, 0
-    Plugin8_Cmd1007 6, 254, 0, 2
-    Plugin8_Cmd1003 50, 0x8024
+    ResortCmd_StartTalk_1000
+    ResortCmd_GetValue 0, 0x8023
+    ResortCmd_SetWord 0, 254, 0, 0
+    ResortCmd_SetWord 6, 254, 0, 2
+    ResortCmd_GetScriptValue 50, 0x8024
     ActorMsg MSGFILE_SCRIPT, 0x8024, 0x8023, 2, 0
-    Plugin8_Cmd1007 8, 255, 0, 0
-    Plugin8_Cmd1003 51, 0x8024
+    ResortCmd_SetWord 8, 255, 0, 0
+    ResortCmd_GetScriptValue 51, 0x8024
     ActorMsg MSGFILE_SCRIPT, 0x8024, 0x8023, 2, 0
-    Plugin8_Cmd1002 3, 0x8026
+    ResortCmd_GetValue 3, 0x8026
     VMStackPush 0x8026
     VMStackPushConst 0
     VMStackCmp CMP_NE
     VMJumpIf CMP_STACK, L_0187
-    Plugin8_Cmd1003 57, 0x8024
+    ResortCmd_GetScriptValue 57, 0x8024
     ActorMsg MSGFILE_SCRIPT, 0x8024, 0x8023, 2, 0
     ActorMsgClose
     VMStackPush 0x8000
@@ -77,7 +77,7 @@ Script_2:
     RTCallGlobal 2805
     VMStackPop 0x8001
     VMStackPop 0x8000
-    Plugin8_Cmd1026
+    ResortCmd_MarkRaffled
     RecordAdd 130, 1
     VMJump L_0189
 
@@ -144,7 +144,7 @@ L_0249:
     VMJump L_018F
 
 L_024F:
-    Plugin8_Cmd1001
+    ResortCmd_EndTalk
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt
@@ -157,7 +157,7 @@ L_0257:
     SystemMsg Global10685_Text_Empty_253, 2
     ListMenu_AnchorTopRight 31, 1, 0, 1, 32800
     ListMenuAdd 174, 235, 0
-    Plugin8_Cmd1002 6, 0x803a
+    ResortCmd_GetValue 6, 0x803a
     VMStackPush 0x803a
     VMStackPushConst 0
     VMStackCmp CMP_EQ
@@ -165,7 +165,7 @@ L_0257:
     ListMenuAdd 176, 237, 2
 
 L_02A1:
-    Plugin8_Cmd1002 1, 0x8039
+    ResortCmd_GetValue 1, 0x8039
     VMStackPush 0x8039
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -173,13 +173,13 @@ L_02A1:
     ListMenuAdd 175, 236, 1
 
 L_02C2:
-    Plugin8_Cmd1002 41, 0x803b
+    ResortCmd_GetValue 41, 0x803b
     VMStackPush 0x803b
     VMStackPushConst 1
     VMStackCmp CMP_NE
     VMJumpIf CMP_STACK, L_0312
-    Plugin8_Cmd1002 15, 0x8026
-    Plugin8_Cmd1002 13, 0x8027
+    ResortCmd_GetValue 15, 0x8026
+    ResortCmd_GetValue 13, 0x8027
     VMStackPush 0x8026
     VMStackPushConst 0
     VMStackCmp CMP_GT
@@ -209,8 +209,8 @@ L_0337:
 L_034B:
     WorkSetConst 0x803c, 0
     WorkSetConst 0x8030, 0
-    Plugin8_Cmd1002 10, 0x803c
-    Plugin8_Cmd1003 5, 0x8024
+    ResortCmd_GetValue 10, 0x803c
+    ResortCmd_GetScriptValue 5, 0x8024
     ActorMsg MSGFILE_SCRIPT, 0x8024, 0x8023, 2, 0
     ListMenu_AnchorTopRight 31, 1, 0, 1, 32800
     ListMenuAdd 207, 65535, 0
@@ -236,7 +236,7 @@ L_03B1:
     SystemMsg Global10685_Text_ThereNoRoomNew_2, 2
     InfoMsgClose
     JoinAvenueStoreStart
-    Plugin8Ov60_Cmd1011 1, 3, 0, 0x8029, 0x802a, 0x802b, 0x802c, 0x802d
+    ResortShopCmd_Open_1011 1, 3, 0, 0x8029, 0x802a, 0x802b, 0x802c, 0x802d
     JoinAvenueStoreEnd
     VMStackPush 0x8029
     VMStackPushConst 255
@@ -246,25 +246,25 @@ L_03B1:
 
 L_03F7:
     RecordAdd 128, 1
-    Plugin8_Cmd1007 0, 254, 0, 0
-    Plugin8_Cmd1007 6, 254, 0, 1
-    Plugin8_Cmd1007 18, 254, 0, 2
-    Plugin8_Cmd1003 59, 0x8024
+    ResortCmd_SetWord 0, 254, 0, 0
+    ResortCmd_SetWord 6, 254, 0, 1
+    ResortCmd_SetWord 18, 254, 0, 2
+    ResortCmd_GetScriptValue 59, 0x8024
     ActorMsg MSGFILE_SCRIPT, 0x8024, 0x8023, 2, 0
     ActorMsgClose
-    Plugin8_Cmd1007 15, 254, 0, 0
-    Plugin8_Cmd1007 14, 254, 0, 1
+    ResortCmd_SetWord 15, 254, 0, 0
+    ResortCmd_SetWord 14, 254, 0, 1
     FadeOutBlack
     FadeWait
     VMStackPush 0x803c
     VMStackPushConst 1
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_0462
-    Plugin8_Cmd1008 0, 0, 0x802c
+    ResortCmd_RemovePerson 0, 0, 0x802c
 
 L_0462:
-    Plugin8_Cmd1005 0, 0x802e
-    Plugin8_Cmd1008 0, 255, 0
+    ResortCmd_MakeData 0, 0x802e
+    ResortCmd_RemovePerson 0, 255, 0
     FieldClose
     FieldOpen
     EvCameraInit
@@ -362,37 +362,37 @@ L_05A2:
     VMReturn
 
 L_05B6:
-    Plugin8_Cmd1002 16, 0x8026
+    ResortCmd_GetValue 16, 0x8026
     WorkCmpConst 0x8026, 0
     VMJumpIf CMP_EQ, L_05CF
     VMJump L_068A
 
 L_05CF:
-    Plugin8_Cmd1007 18, 254, 0, 0
-    Plugin8_Cmd1003 52, 0x8024
+    ResortCmd_SetWord 18, 254, 0, 0
+    ResortCmd_GetScriptValue 52, 0x8024
     ActorMsg MSGFILE_SCRIPT, 0x8024, 0x8023, 2, 0
     ActorMsgClose
     // "Please choose an assistant\nto be replaced.[f000]븁\u0000"
     SystemMsg Global10685_Text_PleaseChooseAssistantReplaced, 2
     InfoMsgClose
     JoinAvenueStoreStart
-    Plugin8Ov60_Cmd1011 1, 1, 0, 0x8029, 0x802a, 0x802b, 0x802c, 0x802d
+    ResortShopCmd_Open_1011 1, 1, 0, 0x8029, 0x802a, 0x802b, 0x802c, 0x802d
     JoinAvenueStoreEnd
     VMStackPush 0x8029
     VMStackPushConst 255
     VMStackCmp CMP_NE
     VMJumpIf CMP_STACK, L_0684
-    Plugin8_Cmd1007 0, 254, 0, 0
-    Plugin8_Cmd1007 6, 254, 0, 1
-    Plugin8_Cmd1007 18, 254, 0, 2
-    Plugin8_Cmd1003 53, 0x8024
+    ResortCmd_SetWord 0, 254, 0, 0
+    ResortCmd_SetWord 6, 254, 0, 1
+    ResortCmd_SetWord 18, 254, 0, 2
+    ResortCmd_GetScriptValue 53, 0x8024
     ActorMsg MSGFILE_SCRIPT, 0x8024, 0x8023, 2, 0
     ActorMsgClose
     FadeEx 3, 0, 16, 2
     FadeExWait
-    Plugin8_Cmd1008 0, 3, 0x802c
-    Plugin8_Cmd1005 1, 0x802e
-    Plugin8_Cmd1008 0, 255, 0
+    ResortCmd_RemovePerson 0, 3, 0x802c
+    ResortCmd_MakeData 1, 0x802e
+    ResortCmd_RemovePerson 0, 255, 0
     FadeEx 3, 16, 0, 2
     FadeExWait
     WorkSetConst 0x8021, 0
@@ -406,7 +406,7 @@ L_068A:
     VMJump L_06B7
 
 L_069D:
-    Plugin8_Cmd1003 54, 0x8024
+    ResortCmd_GetScriptValue 54, 0x8024
     ActorMsg MSGFILE_SCRIPT, 0x8024, 0x8023, 2, 0
     ActorMsgClose
     VMJump L_06E4
@@ -417,7 +417,7 @@ L_06B7:
     VMJump L_06E4
 
 L_06CA:
-    Plugin8_Cmd1003 55, 0x8024
+    ResortCmd_GetScriptValue 55, 0x8024
     ActorMsg MSGFILE_SCRIPT, 0x8024, 0x8023, 2, 0
     ActorMsgClose
     VMJump L_06E4
@@ -439,7 +439,7 @@ L_06FE:
     // "What do you want to hear?"
     SystemMsg Global10685_Text_WhatWantHear, 2
     ListMenu_AnchorTopRight 31, 1, 0, 1, 32800
-    Plugin8_Cmd1002 15, 0x8026
+    ResortCmd_GetValue 15, 0x8026
     VMStackPush 0x8026
     VMStackPushConst 0
     VMStackCmp CMP_GT
@@ -447,7 +447,7 @@ L_06FE:
     ListMenuAdd 210, 65535, 0
 
 L_0741:
-    Plugin8_Cmd1002 13, 0x8026
+    ResortCmd_GetValue 13, 0x8026
     VMStackPush 0x8026
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -470,7 +470,7 @@ L_0785:
     VMJump L_08D8
 
 L_079A:
-    Plugin8_Cmd1002 15, 0x803f
+    ResortCmd_GetValue 15, 0x803f
     WorkSetConst 0x803e, 0
     VMStackPush 0x803f
     VMStackPushConst 0
@@ -484,9 +484,9 @@ L_07B9:
     VMJumpIf CMP_STACK, L_08A4
     WorkGet 0x803d, 0x803e
     WorkAdd 0x803d, 0
-    Plugin8_Cmd1007 6, 254, 0, 0
-    Plugin8_Cmd1007 0, 254, 0, 1
-    Plugin8_Cmd1003 0x803d, 0x8024
+    ResortCmd_SetWord 6, 254, 0, 0
+    ResortCmd_SetWord 0, 254, 0, 1
+    ResortCmd_GetScriptValue 0x803d, 0x8024
     VMStackPush 0x8024
     VMStackPushConst 0
     VMStackCmp CMP_NE
@@ -503,7 +503,7 @@ L_0823:
     VMJumpIf CMP_STACK, L_086D
     WorkGet 0x803d, 0x802e
     WorkAdd 0x803d, 0
-    Plugin8_Cmd1003 0x803d, 0x8024
+    ResortCmd_GetScriptValue 0x803d, 0x8024
     VMStackPush 0x8024
     VMStackPushConst 0
     VMStackCmp CMP_NE
@@ -519,7 +519,7 @@ L_086D:
     VMStackPushConst 1
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_0892
-    Plugin8_Cmd1003 10, 0x8024
+    ResortCmd_GetScriptValue 10, 0x8024
     ActorMsg MSGFILE_SCRIPT, 0x8024, 0x8023, 2, 0
 
 L_0892:
@@ -535,9 +535,9 @@ L_08A4:
     VMJump L_08D0
 
 L_08AA:
-    Plugin8_Cmd1007 6, 254, 0, 0
-    Plugin8_Cmd1007 0, 254, 0, 1
-    Plugin8_Cmd1003 11, 0x8024
+    ResortCmd_SetWord 6, 254, 0, 0
+    ResortCmd_SetWord 0, 254, 0, 1
+    ResortCmd_GetScriptValue 11, 0x8024
     ActorMsg MSGFILE_SCRIPT, 0x8024, 0x8023, 2, 0
 
 L_08D0:
@@ -550,19 +550,19 @@ L_08D8:
     VMJump L_093A
 
 L_08EB:
-    Plugin8_Cmd1002 13, 0x8026
+    ResortCmd_GetValue 13, 0x8026
     VMStackPush 0x8026
     VMStackPushConst 1
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_0920
-    Plugin8_Cmd1003 8, 0x8024
+    ResortCmd_GetScriptValue 8, 0x8024
     ActorMsg MSGFILE_SCRIPT, 0x8024, 0x8023, 2, 0
     ActorMsgClose
-    Plugin8_Cmd1036
+    ResortCmd_ShowMedalInfo
     VMJump L_0934
 
 L_0920:
-    Plugin8_Cmd1003 9, 0x8024
+    ResortCmd_GetScriptValue 9, 0x8024
     ActorMsg MSGFILE_SCRIPT, 0x8024, 0x8023, 2, 0
     ActorMsgClose
 
@@ -596,30 +596,30 @@ L_0979:
     WorkSetConst 0x8042, 0
     WorkSetConst 0x8030, 0
     WorkSetConst 0x8038, 0
-    Plugin8_Cmd1003 4, 0x8024
+    ResortCmd_GetScriptValue 4, 0x8024
     ActorMsg MSGFILE_SCRIPT, 0x8024, 0x8023, 2, 0
     ActorMsgClose
     JoinAvenueStoreStart
-    Plugin8Ov60_Cmd1011 1, 2, 0, 0x8029, 0x802a, 0x802b, 0x802c, 0x802d
+    ResortShopCmd_Open_1011 1, 2, 0, 0x8029, 0x802a, 0x802b, 0x802c, 0x802d
     JoinAvenueStoreEnd
     VMStackPush 0x8029
     VMStackPushConst 255
     VMStackCmp CMP_NE
     VMJumpIf CMP_STACK, L_0B72
     RecordAdd 127, 1
-    Plugin8_Cmd1007 0, 254, 0, 0
-    Plugin8_Cmd1007 18, 254, 0, 1
-    Plugin8_Cmd1003 56, 0x8024
+    ResortCmd_SetWord 0, 254, 0, 0
+    ResortCmd_SetWord 18, 254, 0, 1
+    ResortCmd_GetScriptValue 56, 0x8024
     ActorMsg MSGFILE_SCRIPT, 0x8024, 0x8023, 2, 0
     ActorMsgClose
-    Plugin8_Cmd1022 0x802c, 0x8035, 0x8024, 0x8025, 0x8040
+    ResortCmd_GetPersonVisit 0x802c, 0x8035, 0x8024, 0x8025, 0x8040
     WorkGet 0x8034, 0x8040
     WorkGet 0x8041, 0x8040
     FadeEx 3, 0, 16, 2
     FadeExWait
     EvCameraInit
     EvCameraUnbind
-    Plugin8_Cmd1024 0x802c, 4, 0x8026, 0x8026
+    ResortCmd_Visit 0x802c, 4, 0x8026, 0x8026
     VMCall L_0B86
     VMStackPush 0x8033
     VMStackPushConst 0
@@ -637,10 +637,10 @@ L_0A5F:
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_0ACB
     WorkGet 0x802c, 0x8037
-    Plugin8_Cmd1024 0x8037, 2, 0x8035, 0x8026
-    Plugin8_Cmd1024 0x8035, 3, 0x8024, 0x8026
-    Plugin8_Cmd1003 62, 0x8025
-    Plugin8_Cmd1024 0x8040, 1, 0x8034, 0x8026
+    ResortCmd_Visit 0x8037, 2, 0x8035, 0x8026
+    ResortCmd_Visit 0x8035, 3, 0x8024, 0x8026
+    ResortCmd_GetScriptValue 62, 0x8025
+    ResortCmd_Visit 0x8040, 1, 0x8034, 0x8026
     VMStackPush 0x8035
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -648,7 +648,7 @@ L_0A5F:
     WorkGet 0x8041, 0x8034
 
 L_0AB5:
-    Plugin8_Cmd1024 0x8037, 5, 0x8026, 0x8026
+    ResortCmd_Visit 0x8037, 5, 0x8026, 0x8026
     VMCall L_0B86
     VMJump L_0A5F
 
@@ -670,15 +670,15 @@ L_0AEC:
 
 L_0B0B:
     VMCall L_20B4
-    Plugin8_Cmd1008 0, 255, 0
-    Plugin8_Cmd1039 0
+    ResortCmd_RemovePerson 0, 255, 0
+    ResortCmd_EndSceneAnim 0
     EvCameraMoveToDefault 1
     EvCameraWait
     EvCameraRebind
     EvCameraEnd
     FadeEx 3, 16, 0, 2
     FadeExWait
-    Plugin8_Cmd1031 28, 0x8026
+    ResortCmd_GetOwnValue 28, 0x8026
     VMStackPush 0x8026
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -709,13 +709,13 @@ L_0B86:
     VMCall L_120C
     FadeEx 3, 16, 0, 2
     FadeExWait
-    Plugin8_Cmd1007 0, 254, 0, 0
-    Plugin8_Cmd1007 1, 0, 0x802c, 1
+    ResortCmd_SetWord 0, 254, 0, 0
+    ResortCmd_SetWord 1, 0, 0x802c, 1
     // "[f000]Ā\u0001\u0000 has come to\n[f000]ĸ\u0001\u0001![f000]븁\u0000"
     SystemMsg Global10685_Text_HasCome, 2
-    Plugin8_Cmd1024 0x802c, 0, 0x8036, 0x8037
-    Plugin8_Cmd1002 60, 0x8026
-    Plugin8_Cmd1031 27, 0x8027
+    ResortCmd_Visit 0x802c, 0, 0x8036, 0x8037
+    ResortCmd_GetValue 60, 0x8026
+    ResortCmd_GetOwnValue 27, 0x8027
     VMStackPush 0x8026
     VMStackPushConst 0
     VMStackCmp CMP_EQ
@@ -735,7 +735,7 @@ L_0C10:
     VMStackPushConst 0
     VMStackCmp CMP_LE
     VMJumpIf CMP_STACK, L_0C3B
-    Plugin8_Cmd1003 93, 0x8043
+    ResortCmd_GetScriptValue 93, 0x8043
     VMJump L_0C73
 
 L_0C3B:
@@ -743,7 +743,7 @@ L_0C3B:
     VMStackPushConst 5
     VMStackCmp CMP_LE
     VMJumpIf CMP_STACK, L_0C5A
-    Plugin8_Cmd1003 94, 0x8043
+    ResortCmd_GetScriptValue 94, 0x8043
     VMJump L_0C73
 
 L_0C5A:
@@ -751,14 +751,14 @@ L_0C5A:
     VMStackPushConst 14
     VMStackCmp CMP_LT
     VMJumpIf CMP_STACK, L_0C73
-    Plugin8_Cmd1003 95, 0x8043
+    ResortCmd_GetScriptValue 95, 0x8043
 
 L_0C73:
     VMStackPush 0x8043
     VMStackPushConst 0
     VMStackCmp CMP_NE
     VMJumpIf CMP_STACK, L_0C96
-    Plugin8_Cmd1007 0, 0, 0x802c, 0
+    ResortCmd_SetWord 0, 0, 0x802c, 0
     SystemMsg 0x8043, 2
 
 L_0C96:
@@ -776,7 +776,7 @@ L_0CAF:
     VMStackPushConst 0
     VMStackCmp CMP_LE
     VMJumpIf CMP_STACK, L_0CDA
-    Plugin8_Cmd1003 94, 0x8043
+    ResortCmd_GetScriptValue 94, 0x8043
     VMJump L_0CF3
 
 L_0CDA:
@@ -784,14 +784,14 @@ L_0CDA:
     VMStackPushConst 3
     VMStackCmp CMP_LT
     VMJumpIf CMP_STACK, L_0CF3
-    Plugin8_Cmd1003 95, 0x8043
+    ResortCmd_GetScriptValue 95, 0x8043
 
 L_0CF3:
     VMStackPush 0x8043
     VMStackPushConst 0
     VMStackCmp CMP_NE
     VMJumpIf CMP_STACK, L_0D16
-    Plugin8_Cmd1007 0, 0, 0x802c, 0
+    ResortCmd_SetWord 0, 0, 0x802c, 0
     SystemMsg 0x8043, 2
 
 L_0D16:
@@ -809,7 +809,7 @@ L_0D2F:
     VMStackPushConst 2
     VMStackCmp CMP_LE
     VMJumpIf CMP_STACK, L_0D5A
-    Plugin8_Cmd1003 94, 0x8043
+    ResortCmd_GetScriptValue 94, 0x8043
     VMJump L_0D73
 
 L_0D5A:
@@ -817,45 +817,45 @@ L_0D5A:
     VMStackPushConst 7
     VMStackCmp CMP_LT
     VMJumpIf CMP_STACK, L_0D73
-    Plugin8_Cmd1003 95, 0x8043
+    ResortCmd_GetScriptValue 95, 0x8043
 
 L_0D73:
     VMStackPush 0x8043
     VMStackPushConst 0
     VMStackCmp CMP_NE
     VMJumpIf CMP_STACK, L_0D96
-    Plugin8_Cmd1007 0, 0, 0x802c, 0
+    ResortCmd_SetWord 0, 0, 0x802c, 0
     SystemMsg 0x8043, 2
 
 L_0D96:
     VMJump L_0D9C
 
 L_0D9C:
-    Plugin8_Cmd1007 0, 254, 0, 0
-    Plugin8_Cmd1007 0, 0, 0x802c, 2
-    Plugin8_Cmd1007 6, 0, 0x802c, 3
+    ResortCmd_SetWord 0, 254, 0, 0
+    ResortCmd_SetWord 0, 0, 0x802c, 2
+    ResortCmd_SetWord 6, 0, 0x802c, 3
     // "[f000]Ā\u0001\u0002: [f000]ķ\u0001\u0003[f000]븁\u0000"
     SystemMsg Global10685_Text_Empty_48, 2
-    Plugin8_Cmd1007 0, 254, 0, 0
-    Plugin8_Cmd1007 6, 254, 0, 4
-    Plugin8_Cmd1003 60, 0x8043
+    ResortCmd_SetWord 0, 254, 0, 0
+    ResortCmd_SetWord 6, 254, 0, 4
+    ResortCmd_GetScriptValue 60, 0x8043
     SystemMsg 0x8043, 2
     VMStackPush 0x8035
     VMStackPushConst 0
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_0E19
-    Plugin8_Cmd1007 0, 254, 0, 0
-    Plugin8_Cmd1007 1, 0, 0x802c, 1
+    ResortCmd_SetWord 0, 254, 0, 0
+    ResortCmd_SetWord 1, 0, 0x802c, 1
     SystemMsg 0x8024, 2
     WorkSetConst 0x8033, 0
     VMJump L_1090
 
 L_0E19:
     WorkSetConst 0x8033, 1
-    Plugin8_Cmd1007 0, 254, 0, 0
-    Plugin8_Cmd1007 1, 0, 0x802c, 1
-    Plugin8_Cmd1007 0, 0, 0x802c, 2
-    Plugin8_Cmd1002 60, 0x8026
+    ResortCmd_SetWord 0, 254, 0, 0
+    ResortCmd_SetWord 1, 0, 0x802c, 1
+    ResortCmd_SetWord 0, 0, 0x802c, 2
+    ResortCmd_GetValue 60, 0x8026
     VMStackPush 0x8026
     VMStackPushConst 0
     VMStackCmp CMP_EQ
@@ -863,9 +863,9 @@ L_0E19:
     SystemMsg 0x8025, 2
 
 L_0E5C:
-    Plugin8_Cmd1007 0, 254, 0, 0
+    ResortCmd_SetWord 0, 254, 0, 0
     SystemMsg 0x8024, 2
-    Plugin8_Cmd1009 0x802c, 0x8034, 0x8026, 0x8044
+    ResortCmd_AddShopExperience 0x802c, 0x8034, 0x8026, 0x8044
     WorkAdd 0x8044, 1
     VMStackPush 0x8026
     VMStackPushConst 3
@@ -916,18 +916,18 @@ L_0EF7:
     FieldOpen
     EvCameraInit
     EvCameraUnbind
-    Plugin8_Cmd1006 0x802c
+    ResortCmd_RecreatePeople 0x802c
     WorkGet 0x8032, 0x802c
     VMCall L_1EFA
     FadeInWhite
     FadeWait
-    Plugin8_Cmd1007 1, 0, 0x802c, 0
+    ResortCmd_SetWord 1, 0, 0x802c, 0
     MEPlay SEQ_ME_AVENUE_02
     // "[f000]ĸ\u0001\u0001\nis now [f000]ĸ\u0001\u0000!"
     SystemMsg Global10685_Text_Now, 2
     MEWait
     MsgWaitAdvance
-    Plugin8_Cmd1007 1, 0, 0x802c, 1
+    ResortCmd_SetWord 1, 0, 0x802c, 1
     // "[f000]ĸ\u0001\u0001 has\nupgraded services![f000]븁\u0000"
     SystemMsg Global10685_Text_HasUpgradedServices, 2
     VMJump L_0F61
@@ -938,22 +938,22 @@ L_0F61:
     VMJump L_1012
 
 L_0F74:
-    Plugin8_Cmd1007 0, 0, 0x802c, 0
-    Plugin8_Cmd1007 0, 254, 0, 1
-    Plugin8_Cmd1007 6, 0, 0x802c, 2
-    Plugin8_Cmd1003 89, 0x8024
+    ResortCmd_SetWord 0, 0, 0x802c, 0
+    ResortCmd_SetWord 0, 254, 0, 1
+    ResortCmd_SetWord 6, 0, 0x802c, 2
+    ResortCmd_GetScriptValue 89, 0x8024
     SystemMsg 0x8024, 2
-    Plugin8_Cmd1007 0, 254, 0, 1
-    Plugin8_Cmd1007 18, 254, 0, 2
-    Plugin8_Cmd1007 6, 254, 0, 3
-    Plugin8_Cmd1003 91, 0x8024
+    ResortCmd_SetWord 0, 254, 0, 1
+    ResortCmd_SetWord 18, 254, 0, 2
+    ResortCmd_SetWord 6, 254, 0, 3
+    ResortCmd_GetScriptValue 91, 0x8024
     SystemMsg 0x8024, 2
-    Plugin8_Cmd1007 0, 0, 0x802c, 0
-    Plugin8_Cmd1007 0, 254, 0, 1
-    Plugin8_Cmd1007 1, 0, 0x8037, 2
-    Plugin8_Cmd1007 6, 254, 0, 3
-    Plugin8_Cmd1007 18, 0, 0x802c, 4
-    Plugin8_Cmd1003 90, 0x8024
+    ResortCmd_SetWord 0, 0, 0x802c, 0
+    ResortCmd_SetWord 0, 254, 0, 1
+    ResortCmd_SetWord 1, 0, 0x8037, 2
+    ResortCmd_SetWord 6, 254, 0, 3
+    ResortCmd_SetWord 18, 0, 0x802c, 4
+    ResortCmd_GetScriptValue 90, 0x8024
     SystemMsg 0x8024, 2
     WorkSetConst 0x8033, 2
     VMJump L_1090
@@ -973,13 +973,13 @@ L_1031:
     VMJump L_1090
 
 L_1044:
-    Plugin8_Cmd1007 0, 0, 0x802c, 0
-    Plugin8_Cmd1007 0, 254, 0, 1
-    Plugin8_Cmd1007 6, 0, 0x802c, 2
-    Plugin8_Cmd1003 89, 0x8024
+    ResortCmd_SetWord 0, 0, 0x802c, 0
+    ResortCmd_SetWord 0, 254, 0, 1
+    ResortCmd_SetWord 6, 0, 0x802c, 2
+    ResortCmd_GetScriptValue 89, 0x8024
     SystemMsg 0x8024, 2
-    Plugin8_Cmd1007 18, 254, 0, 3
-    Plugin8_Cmd1003 92, 0x8024
+    ResortCmd_SetWord 18, 254, 0, 3
+    ResortCmd_GetScriptValue 92, 0x8024
     SystemMsg 0x8024, 2
     WorkSetConst 0x8033, 1
     VMJump L_1090
@@ -996,7 +996,7 @@ L_1090:
 L_10B2:
     WorkSetConst 0x8045, 0
     WorkSetConst 0x8046, 0
-    Plugin8_Cmd1010 0x8034, 0x8045, 0x8046
+    ResortCmd_AddPopularity 0x8034, 0x8045, 0x8046
     VMStackPush 0x8045
     VMStackPushConst 2
     VMStackCmp CMP_NE
@@ -1007,7 +1007,7 @@ L_10B2:
     VMCall L_179C
     FadeEx 3, 16, 0, 2
     FadeExWait
-    Plugin8_Cmd1007 8, 255, 0, 0
+    ResortCmd_SetWord 8, 255, 0, 0
     WordSetNumber 7, 0x8034, 5
     // "[f000]Ĺ\u0001\u0000's\npopularity went up by [f000]ȃ\u0001\u0007 points![f000]븁\u0000"
     SystemMsg Global10685_Text_SPopularityWentUp_2, 2
@@ -1030,7 +1030,7 @@ L_10B2:
     VMStackCmp CMP_OR
     VMStackCmp CMP_OR
     VMJumpIf CMP_STACK, L_11E8
-    Plugin8_Cmd1037 0
+    ResortCmd_StartSceneAnim 0
     WordSetNumber 8, 0x8046, 4
     // "...!![f000]븂\u0001<"
     SystemMsg Global10685_Text_Empty_50, 2
@@ -1047,7 +1047,7 @@ L_10B2:
     VMStackCmp CMP_EQ
     VMStackCmp CMP_OR
     VMJumpIf CMP_STACK, L_11AF
-    Plugin8_Cmd1007 12, 255, 0, 2
+    ResortCmd_SetWord 12, 255, 0, 2
     // "This place's reputation as\n“[f000]ł\u0001\u0002\"[f000]븀\u0000\nis spreading![f000]븁\u0000"
     SystemMsg Global10685_Text_PlacesReputationSpreading, 2
 
@@ -1060,7 +1060,7 @@ L_11AF:
     VMStackCmp CMP_EQ
     VMStackCmp CMP_OR
     VMJumpIf CMP_STACK, L_11E8
-    Plugin8_Cmd1007 4, 255, 0, 0
+    ResortCmd_SetWord 4, 255, 0, 0
     // "...Oh?[f000]븁\u0000\nThe owner is here![f000]븁\u0000\nGo to [f000]ĺ\u0001\u0000's office.[f000]븁\u0000"
     SystemMsg Global10685_Text_OhOwnerHereGo, 2
     WorkSetConst EVENT_WORK_0x4119, 1
@@ -1083,7 +1083,7 @@ L_120C:
     WorkSetConst 0x8047, 0
     WorkGet 0x8047, 0x8032
     WorkAdd 0x8047, 52
-    Plugin8_Cmd1002 0x8047, 0x802f
+    ResortCmd_GetValue 0x8047, 0x802f
     VMCall L_1232
     WorkSetConst 0x8047, 0
     VMReturn
@@ -1376,7 +1376,7 @@ L_1798:
 L_179C:
     EvCameraMoveTo 64037, 0, 0xe1000, 0xf8000, 0x24000, 0x247000, 1
     EvCameraWait
-    Plugin8_Cmd1014 4
+    ResortCmd_HideActors 4
     VMReturn
 
 L_17BC:
@@ -1396,8 +1396,8 @@ L_17DC:
     VMReturn
 
 L_17EE:
-    Plugin8_Cmd1003 58, 0x8024
-    Plugin8_Cmd1007 6, 254, 0, 1
+    ResortCmd_GetScriptValue 58, 0x8024
+    ResortCmd_SetWord 6, 254, 0, 1
     ActorMsg MSGFILE_SCRIPT, 0x8024, 0x8023, 2, 0
     LastKeyWait
     ActorMsgClose
@@ -1408,23 +1408,23 @@ Script_3:
     ActorsPauseAll
     SEPlay SEQ_SE_MESSAGE
     ActorSetEyeToEye
-    Plugin8_Cmd1000
-    Plugin8_Cmd1002 0, 0x8023
+    ResortCmd_StartTalk_1000
+    ResortCmd_GetValue 0, 0x8023
     VMCall L_1834
-    Plugin8_Cmd1001
+    ResortCmd_EndTalk
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt
 
 L_1834:
     WorkSetConst 0x8048, 0
-    Plugin8_Cmd1003 80, 0x8024
-    Plugin8_Cmd1007 0, 254, 0, 0
-    Plugin8_Cmd1007 4, 255, 0, 1
-    Plugin8_Cmd1007 6, 254, 0, 2
+    ResortCmd_GetScriptValue 80, 0x8024
+    ResortCmd_SetWord 0, 254, 0, 0
+    ResortCmd_SetWord 4, 255, 0, 1
+    ResortCmd_SetWord 6, 254, 0, 2
     ActorMsg MSGFILE_SCRIPT, 0x8024, 0x8023, 2, 0
-    Plugin8_Cmd1003 88, 0x8024
-    Plugin8_Cmd1002 40, 0x802e
+    ResortCmd_GetScriptValue 88, 0x8024
+    ResortCmd_GetValue 40, 0x802e
     VMStackPush 0x8024
     VMStackPushConst 0
     VMStackCmp CMP_NE
@@ -1513,12 +1513,12 @@ L_19B1:
     VMStackPushConst 0
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_19E4
-    Plugin8_Cmd1007 18, 254, 0, 0
+    ResortCmd_SetWord 18, 254, 0, 0
     ActorMsg MSGFILE_SCRIPT, 0x8024, 0x8023, 2, 0
-    Plugin8_Cmd1007 0, 254, 0, 0
+    ResortCmd_SetWord 0, 254, 0, 0
 
 L_19E4:
-    Plugin8_Cmd1031 19, 0x8026
+    ResortCmd_GetOwnValue 19, 0x8026
     VMStackPush 0x8026
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -1527,9 +1527,9 @@ L_19E4:
     VMStackCmp CMP_EQ
     VMStackCmp CMP_AND
     VMJumpIf CMP_STACK, L_1A39
-    Plugin8_Cmd1007 8, 255, 0, 0
-    Plugin8_Cmd1007 17, 255, 0, 1
-    Plugin8_Cmd1003 87, 0x8024
+    ResortCmd_SetWord 8, 255, 0, 0
+    ResortCmd_SetWord 17, 255, 0, 1
+    ResortCmd_GetScriptValue 87, 0x8024
     ActorMsg MSGFILE_SCRIPT, 0x8024, 0x8023, 2, 0
     WorkSetConst EVENT_WORK_0x4008, 1
 
@@ -1547,7 +1547,7 @@ L_1A3F:
     VMJump L_1BA9
 
 L_1A6B:
-    Plugin8_Cmd1002 11, 0x8048
+    ResortCmd_GetValue 11, 0x8048
     WorkCmpConst 0x8048, 0
     VMJumpIf CMP_EQ, L_1A84
     VMJump L_1A90
@@ -1620,10 +1620,10 @@ L_1B5D:
     VMJump L_1B69
 
 L_1B69:
-    Plugin8_Cmd1007 4, 255, 0, 0
-    Plugin8_Cmd1007 0, 254, 0, 1
-    Plugin8_Cmd1007 18, 254, 0, 2
-    Plugin8_Cmd1003 81, 0x8024
+    ResortCmd_SetWord 4, 255, 0, 0
+    ResortCmd_SetWord 0, 254, 0, 1
+    ResortCmd_SetWord 18, 254, 0, 2
+    ResortCmd_GetScriptValue 81, 0x8024
     ActorMsg MSGFILE_SCRIPT, 0x8024, 0x8023, 2, 0
     LastKeyWait
     ActorMsgClose
@@ -1646,7 +1646,7 @@ L_1BCA:
     VMJump L_1C4C
 
 L_1BDD:
-    Plugin8_Cmd1003 96, 0x8024
+    ResortCmd_GetScriptValue 96, 0x8024
     VMStackPush 0x8024
     VMStackPushConst 0
     VMStackCmp CMP_NE
@@ -1654,12 +1654,12 @@ L_1BDD:
     ActorMsg MSGFILE_SCRIPT, 0x8024, 0x8023, 2, 0
 
 L_1C02:
-    Plugin8_Cmd1007 9, 254, 0, 0
-    Plugin8_Cmd1007 1, 254, 0, 1
-    Plugin8_Cmd1007 10, 254, 0, 2
-    Plugin8_Cmd1007 4, 255, 0, 3
-    Plugin8_Cmd1007 18, 254, 0, 4
-    Plugin8_Cmd1003 86, 0x8024
+    ResortCmd_SetWord 9, 254, 0, 0
+    ResortCmd_SetWord 1, 254, 0, 1
+    ResortCmd_SetWord 10, 254, 0, 2
+    ResortCmd_SetWord 4, 255, 0, 3
+    ResortCmd_SetWord 18, 254, 0, 4
+    ResortCmd_GetScriptValue 86, 0x8024
     ActorMsg MSGFILE_SCRIPT, 0x8024, 0x8023, 2, 0
     VMJump L_1CC4
 
@@ -1678,10 +1678,10 @@ L_1C6B:
     VMJump L_1CBE
 
 L_1C7E:
-    Plugin8_Cmd1007 4, 255, 0, 0
-    Plugin8_Cmd1007 0, 254, 0, 1
-    Plugin8_Cmd1007 18, 254, 0, 2
-    Plugin8_Cmd1003 81, 0x8024
+    ResortCmd_SetWord 4, 255, 0, 0
+    ResortCmd_SetWord 0, 254, 0, 1
+    ResortCmd_SetWord 18, 254, 0, 2
+    ResortCmd_GetScriptValue 81, 0x8024
     ActorMsg MSGFILE_SCRIPT, 0x8024, 0x8023, 2, 0
     LastKeyWait
     ActorMsgClose
@@ -1700,15 +1700,15 @@ L_1CCA:
 
 L_1CD2:
     WorkSetConst 0x8049, 0
-    Plugin8_Cmd1003 6, 0x8024
-    Plugin8_Cmd1007 1, 254, 0, 0
+    ResortCmd_GetScriptValue 6, 0x8024
+    ResortCmd_SetWord 1, 254, 0, 0
     ActorMsg MSGFILE_SCRIPT, 0x8024, 0x8023, 2, 0
-    Plugin8_Cmd1002 2, 0x8049
-    Plugin8_Cmd1007 2, 254, 0, 0
+    ResortCmd_GetValue 2, 0x8049
+    ResortCmd_SetWord 2, 254, 0, 0
     ListMenu_AnchorTopRight 31, 1, 0, 1, 32800
     ListMenuAdd 202, 65535, 0
-    Plugin8_Cmd1002 15, 0x8026
-    Plugin8_Cmd1002 13, 0x8027
+    ResortCmd_GetValue 15, 0x8026
+    ResortCmd_GetValue 13, 0x8027
     VMStackPush 0x8026
     VMStackPushConst 0
     VMStackCmp CMP_GT
@@ -1749,8 +1749,8 @@ L_1DA6:
     VMStackPushConst 1
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_1E39
-    Plugin8_Cmd1003 82, 0x8024
-    Plugin8_Cmd1007 15, 254, 0, 0
+    ResortCmd_GetScriptValue 82, 0x8024
+    ResortCmd_SetWord 15, 254, 0, 0
     ActorMsg MSGFILE_SCRIPT, 0x8024, 0x8023, 2, 0
     YesNoWin 0x8027
     VMStackPush 0x8027
@@ -1762,7 +1762,7 @@ L_1DA6:
     VMJump L_1E33
 
 L_1DFE:
-    Plugin8_Cmd1003 83, 0x8024
+    ResortCmd_GetScriptValue 83, 0x8024
     ActorMsg MSGFILE_SCRIPT, 0x8024, 0x8023, 2, 0
     YesNoWin 0x8027
     VMStackPush 0x8027
@@ -1780,16 +1780,16 @@ L_1E39:
     VMStackPushConst 1
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_1ED2
-    Plugin8_Cmd1007 6, 254, 0, 0
-    Plugin8_Cmd1007 18, 254, 0, 1
-    Plugin8_Cmd1003 84, 0x8024
+    ResortCmd_SetWord 6, 254, 0, 0
+    ResortCmd_SetWord 18, 254, 0, 1
+    ResortCmd_GetScriptValue 84, 0x8024
     ActorMsg MSGFILE_SCRIPT, 0x8024, 0x8023, 2, 0
     ActorMsgClose
-    Plugin8_Cmd1007 15, 254, 0, 0
-    Plugin8_Cmd1007 14, 254, 0, 1
+    ResortCmd_SetWord 15, 254, 0, 0
+    ResortCmd_SetWord 14, 254, 0, 1
     FadeOutBlack
     FadeWait
-    Plugin8_Cmd1005 2, 0x802e
+    ResortCmd_MakeData 2, 0x802e
     FieldClose
     FieldOpen
     EvCameraInit
@@ -1810,7 +1810,7 @@ L_1E39:
     VMJump L_1EE4
 
 L_1ED2:
-    Plugin8_Cmd1003 85, 0x8024
+    ResortCmd_GetScriptValue 85, 0x8024
     ActorMsg MSGFILE_SCRIPT, 0x8024, 0x8023, 2, 0
 
 L_1EE4:
@@ -1906,24 +1906,24 @@ L_209A:
     VMReturn
 
 L_209E:
-    Plugin8_Cmd1014 1
+    ResortCmd_HideActors 1
     VMReturn
 
 L_20A4:
-    Plugin8_Cmd1014 3
+    ResortCmd_HideActors 3
     ActorCmdExec 255, Movement_4748
     ActorCmdWait
     VMReturn
 
 L_20B4:
-    Plugin8_Cmd1014 2
+    ResortCmd_HideActors 2
     ActorCmdExec 255, Movement_4750
     ActorCmdWait
     VMReturn
 
 L_20C4:
     WorkSetConst 0x804b, 0
-    Plugin8_Cmd1002 9, 0x804b
+    ResortCmd_GetValue 9, 0x804b
     VMStackPush 0x804b
     VMStackPushConst 0
     VMStackCmp CMP_EQ
@@ -1933,29 +1933,29 @@ L_20C4:
     FadeExWait
     EvCameraInit
     EvCameraUnbind
-    Plugin8_Cmd1002 40, 0x8032
+    ResortCmd_GetValue 40, 0x8032
     VMCall L_1EEC
     FadeEx 3, 16, 0, 2
     FadeExWait
     WorkSetConst 0x802e, 0
     VMCall L_2178
-    Plugin8_Cmd1031 19, 0x8026
+    ResortCmd_GetOwnValue 19, 0x8026
     VMStackPush 0x8026
     VMStackPushConst 1
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_2150
-    Plugin8_Cmd1003 145, 0x8024
+    ResortCmd_GetScriptValue 145, 0x8024
     ActorMsg MSGFILE_SCRIPT, 0x8024, 0x8023, 1, 0
     WorkSetConst 0x802e, 1
     VMCall L_2178
 
 L_2150:
     VMCall L_17BC
-    Plugin8_Cmd1020
+    ResortCmd_SetShopFlag
     VMJump L_2170
 
 L_215E:
-    Plugin8_Cmd1003 142, 0x8024
+    ResortCmd_GetScriptValue 142, 0x8024
     ActorMsg MSGFILE_SCRIPT, 0x8024, 0x8023, 2, 0
 
 L_2170:
@@ -1964,14 +1964,14 @@ L_2170:
 
 L_2178:
     WorkSetConst 0x804c, 0
-    Plugin8_Cmd1015 0x802e, 0x804c, 0x8026
-    Plugin8_Cmd1003 143, 0x8024
+    ResortCmd_RaffleShopItem 0x802e, 0x804c, 0x8026
+    ResortCmd_GetScriptValue 143, 0x8024
     ActorMsg MSGFILE_SCRIPT, 0x8024, 0x8023, 1, 0
     VMStackPush 0x8026
     VMStackPushConst 0
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_21C3
-    Plugin8_Cmd1003 141, 0x8024
+    ResortCmd_GetScriptValue 141, 0x8024
     ActorMsg MSGFILE_SCRIPT, 0x8024, 0x8023, 1, 0
     VMJump L_2230
 
@@ -1981,12 +1981,12 @@ L_21C3:
     VMStackPushConst 1
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_21ED
-    Plugin8_Cmd1003 144, 0x8024
+    ResortCmd_GetScriptValue 144, 0x8024
     ActorMsg MSGFILE_SCRIPT, 0x8024, 0x8023, 1, 0
 
 L_21ED:
     WordSetNumber 0, 0x8026, 2
-    Plugin8_Cmd1003 140, 0x8024
+    ResortCmd_GetScriptValue 140, 0x8024
     MEPlay SEQ_ME_AVENUE_03
     ActorMsg MSGFILE_SCRIPT, 0x8024, 0x8023, 1, 0
     MEWait
@@ -2035,7 +2035,7 @@ L_2268:
 L_2270:
     ActorMsgClose
     JoinAvenueStoreStart
-    Plugin8Ov60_Cmd1011 0, 0, 1, 0x8029, 0x802a, 0x802b, 0x802c, 0x802d
+    ResortShopCmd_Open_1011 0, 0, 1, 0x8029, 0x802a, 0x802b, 0x802c, 0x802d
     JoinAvenueStoreEnd
     WorkCmpConst 0x8029, 7
     VMJumpIf CMP_EQ, L_229B
@@ -2202,7 +2202,7 @@ L_248D:
     VMStackPushConst 1
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_24DD
-    Plugin8_Cmd1003 164, 0x8024
+    ResortCmd_GetScriptValue 164, 0x8024
     ActorMsg MSGFILE_SCRIPT, 0x8024, 0x8023, 2, 0
     VMReturn
 
@@ -2212,7 +2212,7 @@ L_24DD:
     VMStackPushConst 0
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_250C
-    Plugin8_Cmd1003 176, 0x8024
+    ResortCmd_GetScriptValue 176, 0x8024
     ActorMsg MSGFILE_SCRIPT, 0x8024, 0x8023, 2, 0
     VMReturn
 
@@ -2223,7 +2223,7 @@ L_250C:
     VMJump L_2535
 
 L_2525:
-    Plugin8_Cmd1018 0x8028, 5, 0x802a, 0x8026
+    ResortCmd_ChangeEffortValue 0x8028, 5, 0x802a, 0x8026
     VMJump L_27A0
 
 L_2535:
@@ -2232,7 +2232,7 @@ L_2535:
     VMJump L_2558
 
 L_2548:
-    Plugin8_Cmd1018 0x8028, 4, 0x802a, 0x8026
+    ResortCmd_ChangeEffortValue 0x8028, 4, 0x802a, 0x8026
     VMJump L_27A0
 
 L_2558:
@@ -2241,7 +2241,7 @@ L_2558:
     VMJump L_257B
 
 L_256B:
-    Plugin8_Cmd1018 0x8028, 3, 0x802a, 0x8026
+    ResortCmd_ChangeEffortValue 0x8028, 3, 0x802a, 0x8026
     VMJump L_27A0
 
 L_257B:
@@ -2250,7 +2250,7 @@ L_257B:
     VMJump L_259E
 
 L_258E:
-    Plugin8_Cmd1018 0x8028, 2, 0x802a, 0x8026
+    ResortCmd_ChangeEffortValue 0x8028, 2, 0x802a, 0x8026
     VMJump L_27A0
 
 L_259E:
@@ -2259,7 +2259,7 @@ L_259E:
     VMJump L_25C1
 
 L_25B1:
-    Plugin8_Cmd1018 0x8028, 1, 0x802a, 0x8026
+    ResortCmd_ChangeEffortValue 0x8028, 1, 0x802a, 0x8026
     VMJump L_27A0
 
 L_25C1:
@@ -2268,7 +2268,7 @@ L_25C1:
     VMJump L_25E4
 
 L_25D4:
-    Plugin8_Cmd1018 0x8028, 0, 0x802a, 0x8026
+    ResortCmd_ChangeEffortValue 0x8028, 0, 0x802a, 0x8026
     VMJump L_27A0
 
 L_25E4:
@@ -2278,12 +2278,12 @@ L_25E4:
 
 L_25F7:
     WorkSetConst 0x8027, 1
-    Plugin8_Cmd1016 0x8028, 0x802b, 0x8026
+    ResortCmd_SetFriendship 0x8028, 0x802b, 0x8026
     VMStackPush 0x8026
     VMStackPushConst 1
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_2628
-    Plugin8_Cmd1018 0x8028, 6, 0x802a, 0x8026
+    ResortCmd_ChangeEffortValue 0x8028, 6, 0x802a, 0x8026
     WorkSetConst 0x8026, 1
 
 L_2628:
@@ -2296,12 +2296,12 @@ L_262E:
 
 L_2641:
     WorkSetConst 0x8027, 1
-    Plugin8_Cmd1016 0x8028, 0x802b, 0x8026
+    ResortCmd_SetFriendship 0x8028, 0x802b, 0x8026
     VMStackPush 0x8026
     VMStackPushConst 1
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_2672
-    Plugin8_Cmd1018 0x8028, 7, 0x802a, 0x8026
+    ResortCmd_ChangeEffortValue 0x8028, 7, 0x802a, 0x8026
     WorkSetConst 0x8026, 1
 
 L_2672:
@@ -2314,12 +2314,12 @@ L_2678:
 
 L_268B:
     WorkSetConst 0x8027, 1
-    Plugin8_Cmd1016 0x8028, 0x802b, 0x8026
+    ResortCmd_SetFriendship 0x8028, 0x802b, 0x8026
     VMStackPush 0x8026
     VMStackPushConst 1
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_26BC
-    Plugin8_Cmd1018 0x8028, 8, 0x802a, 0x8026
+    ResortCmd_ChangeEffortValue 0x8028, 8, 0x802a, 0x8026
     WorkSetConst 0x8026, 1
 
 L_26BC:
@@ -2332,12 +2332,12 @@ L_26C2:
 
 L_26D5:
     WorkSetConst 0x8027, 1
-    Plugin8_Cmd1016 0x8028, 0x802b, 0x8026
+    ResortCmd_SetFriendship 0x8028, 0x802b, 0x8026
     VMStackPush 0x8026
     VMStackPushConst 1
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_2706
-    Plugin8_Cmd1018 0x8028, 10, 0x802a, 0x8026
+    ResortCmd_ChangeEffortValue 0x8028, 10, 0x802a, 0x8026
     WorkSetConst 0x8026, 1
 
 L_2706:
@@ -2350,12 +2350,12 @@ L_270C:
 
 L_271F:
     WorkSetConst 0x8027, 1
-    Plugin8_Cmd1016 0x8028, 0x802b, 0x8026
+    ResortCmd_SetFriendship 0x8028, 0x802b, 0x8026
     VMStackPush 0x8026
     VMStackPushConst 1
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_2750
-    Plugin8_Cmd1018 0x8028, 11, 0x802a, 0x8026
+    ResortCmd_ChangeEffortValue 0x8028, 11, 0x802a, 0x8026
     WorkSetConst 0x8026, 1
 
 L_2750:
@@ -2368,12 +2368,12 @@ L_2756:
 
 L_2769:
     WorkSetConst 0x8027, 1
-    Plugin8_Cmd1016 0x8028, 0x802b, 0x8026
+    ResortCmd_SetFriendship 0x8028, 0x802b, 0x8026
     VMStackPush 0x8026
     VMStackPushConst 1
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_279A
-    Plugin8_Cmd1018 0x8028, 9, 0x802a, 0x8026
+    ResortCmd_ChangeEffortValue 0x8028, 9, 0x802a, 0x8026
     WorkSetConst 0x8026, 1
 
 L_279A:
@@ -2394,11 +2394,11 @@ L_27CB:
     VMStackPushConst 1
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_27EA
-    Plugin8_Cmd1003 167, 0x8024
+    ResortCmd_GetScriptValue 167, 0x8024
     VMJump L_27F0
 
 L_27EA:
-    Plugin8_Cmd1003 166, 0x8024
+    ResortCmd_GetScriptValue 166, 0x8024
 
 L_27F0:
     ActorMsg MSGFILE_SCRIPT, 0x8024, 0x8023, 2, 0
@@ -2418,7 +2418,7 @@ L_27FE:
     VMStackPushConst 1
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_284E
-    Plugin8_Cmd1003 164, 0x8024
+    ResortCmd_GetScriptValue 164, 0x8024
     ActorMsg MSGFILE_SCRIPT, 0x8024, 0x8023, 2, 0
     VMReturn
 
@@ -2428,12 +2428,12 @@ L_284E:
     VMStackPushConst 0
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_287D
-    Plugin8_Cmd1003 176, 0x8024
+    ResortCmd_GetScriptValue 176, 0x8024
     ActorMsg MSGFILE_SCRIPT, 0x8024, 0x8023, 2, 0
     VMReturn
 
 L_287D:
-    Plugin8_Cmd1016 0x8028, 0x802a, 0x8026
+    ResortCmd_SetFriendship 0x8028, 0x802a, 0x8026
     VMStackPush 0x8026
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -2444,7 +2444,7 @@ L_287D:
     VMJump L_28C2
 
 L_28B0:
-    Plugin8_Cmd1003 168, 0x8024
+    ResortCmd_GetScriptValue 168, 0x8024
     ActorMsg MSGFILE_SCRIPT, 0x8024, 0x8023, 2, 0
 
 L_28C2:
@@ -2464,12 +2464,12 @@ L_28C4:
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_29E3
     VMCall L_2AC3
-    Plugin8_Cmd1019 0x802c, 0x8028, 0x8026
+    ResortCmd_ShortenEggSteps 0x802c, 0x8028, 0x8026
     VMStackPush 0x8026
     VMStackPushConst 0
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_2933
-    Plugin8_Cmd1003 158, 0x8024
+    ResortCmd_GetScriptValue 158, 0x8024
     VMJump L_2996
 
 L_2933:
@@ -2477,7 +2477,7 @@ L_2933:
     VMStackPushConst 5
     VMStackCmp CMP_LE
     VMJumpIf CMP_STACK, L_2952
-    Plugin8_Cmd1003 159, 0x8024
+    ResortCmd_GetScriptValue 159, 0x8024
     VMJump L_2996
 
 L_2952:
@@ -2485,7 +2485,7 @@ L_2952:
     VMStackPushConst 10
     VMStackCmp CMP_LE
     VMJumpIf CMP_STACK, L_2971
-    Plugin8_Cmd1003 160, 0x8024
+    ResortCmd_GetScriptValue 160, 0x8024
     VMJump L_2996
 
 L_2971:
@@ -2493,11 +2493,11 @@ L_2971:
     VMStackPushConst 40
     VMStackCmp CMP_LE
     VMJumpIf CMP_STACK, L_2990
-    Plugin8_Cmd1003 161, 0x8024
+    ResortCmd_GetScriptValue 161, 0x8024
     VMJump L_2996
 
 L_2990:
-    Plugin8_Cmd1003 162, 0x8024
+    ResortCmd_GetScriptValue 162, 0x8024
 
 L_2996:
     ActorMsg MSGFILE_SCRIPT, 0x8024, 0x8023, 2, 0
@@ -2507,9 +2507,9 @@ L_2996:
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_29D7
     RecordAdd 9, 1
-    Cmd_02C5 8
+    JoinAvenueRecordActivity 8
     CallEggHatch 0x8026
-    Plugin8_Cmd1003 156, 0x8024
+    ResortCmd_GetScriptValue 156, 0x8024
     ActorMsg MSGFILE_SCRIPT, 0x8024, 0x8023, 2, 0
 
 L_29D7:
@@ -2517,7 +2517,7 @@ L_29D7:
     VMJump L_29F5
 
 L_29E3:
-    Plugin8_Cmd1003 165, 0x8024
+    ResortCmd_GetScriptValue 165, 0x8024
     ActorMsg MSGFILE_SCRIPT, 0x8024, 0x8023, 2, 0
 
 L_29F5:
@@ -2536,7 +2536,7 @@ L_29FD:
     VMStackPushConst 1
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_2A4D
-    Plugin8_Cmd1003 164, 0x8024
+    ResortCmd_GetScriptValue 164, 0x8024
     ActorMsg MSGFILE_SCRIPT, 0x8024, 0x8023, 2, 0
     VMReturn
 
@@ -2546,12 +2546,12 @@ L_2A4D:
     VMStackPushConst 0
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_2A7C
-    Plugin8_Cmd1003 176, 0x8024
+    ResortCmd_GetScriptValue 176, 0x8024
     ActorMsg MSGFILE_SCRIPT, 0x8024, 0x8023, 2, 0
     VMReturn
 
 L_2A7C:
-    Plugin8_Cmd1017 0x8028, 0x802a, 0x8026
+    ResortCmd_RaiseLevel 0x8028, 0x802a, 0x8026
     VMStackPush 0x8026
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -2562,7 +2562,7 @@ L_2A7C:
     VMJump L_2AC1
 
 L_2AAF:
-    Plugin8_Cmd1003 169, 0x8024
+    ResortCmd_GetScriptValue 169, 0x8024
     ActorMsg MSGFILE_SCRIPT, 0x8024, 0x8023, 2, 0
 
 L_2AC1:
@@ -2573,15 +2573,15 @@ L_2AC3:
     FadeExWait
     EvCameraInit
     EvCameraUnbind
-    Plugin8_Cmd1002 40, 0x8032
+    ResortCmd_GetValue 40, 0x8032
     VMCall L_120C
     FadeEx 3, 16, 0, 2
     FadeExWait
-    Plugin8_Cmd1007 0, 254, 0, 0
-    Plugin8_Cmd1007 6, 254, 0, 1
+    ResortCmd_SetWord 0, 254, 0, 0
+    ResortCmd_SetWord 6, 254, 0, 1
     WordSetPartyPokeName 2, 0x8028
-    Plugin8_Cmd1007 18, 254, 0, 3
-    Plugin8_Cmd1034 0x802c, 0, 0x8024
+    ResortCmd_SetWord 18, 254, 0, 3
+    ResortCmd_GetGoodsValue 0x802c, 0, 0x8024
     SystemMsg 0x8024, 2
     InfoMsgClose
     VMCall L_17BC
@@ -2589,13 +2589,13 @@ L_2AC3:
 
 L_2B26:
     WorkSetConst 0x804e, 0
-    Plugin8_Cmd1002 11, 0x804e
+    ResortCmd_GetValue 11, 0x804e
     WorkCmpConst 0x804e, 1
     VMJumpIf CMP_EQ, L_2B45
     VMJump L_2B51
 
 L_2B45:
-    Plugin8_Cmd1003 151, 0x8024
+    ResortCmd_GetScriptValue 151, 0x8024
     VMJump L_2BB4
 
 L_2B51:
@@ -2604,7 +2604,7 @@ L_2B51:
     VMJump L_2B70
 
 L_2B64:
-    Plugin8_Cmd1003 155, 0x8024
+    ResortCmd_GetScriptValue 155, 0x8024
     VMJump L_2BB4
 
 L_2B70:
@@ -2613,7 +2613,7 @@ L_2B70:
     VMJump L_2B8F
 
 L_2B83:
-    Plugin8_Cmd1003 157, 0x8024
+    ResortCmd_GetScriptValue 157, 0x8024
     VMJump L_2BB4
 
 L_2B8F:
@@ -2622,11 +2622,11 @@ L_2B8F:
     VMJump L_2BAE
 
 L_2BA2:
-    Plugin8_Cmd1003 153, 0x8024
+    ResortCmd_GetScriptValue 153, 0x8024
     VMJump L_2BB4
 
 L_2BAE:
-    Plugin8_Cmd1003 151, 0x8024
+    ResortCmd_GetScriptValue 151, 0x8024
 
 L_2BB4:
     ActorMsg MSGFILE_SCRIPT, 0x8024, 0x8023, 2, 0
@@ -2636,13 +2636,13 @@ L_2BB4:
 
 L_2BCA:
     WorkSetConst 0x804f, 0
-    Plugin8_Cmd1002 11, 0x804f
+    ResortCmd_GetValue 11, 0x804f
     WorkCmpConst 0x804f, 1
     VMJumpIf CMP_EQ, L_2BE9
     VMJump L_2BF5
 
 L_2BE9:
-    Plugin8_Cmd1003 150, 0x8024
+    ResortCmd_GetScriptValue 150, 0x8024
     VMJump L_2C39
 
 L_2BF5:
@@ -2651,7 +2651,7 @@ L_2BF5:
     VMJump L_2C14
 
 L_2C08:
-    Plugin8_Cmd1003 154, 0x8024
+    ResortCmd_GetScriptValue 154, 0x8024
     VMJump L_2C39
 
 L_2C14:
@@ -2660,11 +2660,11 @@ L_2C14:
     VMJump L_2C33
 
 L_2C27:
-    Plugin8_Cmd1003 152, 0x8024
+    ResortCmd_GetScriptValue 152, 0x8024
     VMJump L_2C39
 
 L_2C33:
-    Plugin8_Cmd1003 150, 0x8024
+    ResortCmd_GetScriptValue 150, 0x8024
 
 L_2C39:
     ActorMsg MSGFILE_SCRIPT, 0x8024, 0x8023, 2, 0
@@ -2673,10 +2673,10 @@ L_2C39:
 
 L_2C4D:
     MoneyWinDisp 31, 1
-    Plugin8_Cmd1003 163, 0x8024
+    ResortCmd_GetScriptValue 163, 0x8024
     ActorMsg MSGFILE_SCRIPT, 0x8024, 0x8023, 2, 0
     ActorMsgClose
-    Plugin8_Cmd1021 0x802d, 0x802c
+    ResortCmd_PayAndSetShopFlag 0x802d, 0x802c
     SEPlay SEQ_SE_SYS_22
     MoneyWinUpdate
     WordSetPlayerName 0
@@ -2690,8 +2690,8 @@ Script_4:
     ActorsPauseAll
     SEPlay SEQ_SE_MESSAGE
     ActorSetEyeToEye
-    Plugin8_Cmd1000
-    Plugin8_Cmd1002 0, 0x8023
+    ResortCmd_StartTalk_1000
+    ResortCmd_GetValue 0, 0x8023
     WorkSetConst 0x8021, 1
 
 L_2C98:
@@ -2705,19 +2705,19 @@ L_2C98:
     VMJump L_2D39
 
 L_2CC4:
-    Plugin8_Cmd1007 11, 255, 0, 0
-    Plugin8_Cmd1007 13, 255, 0, 1
-    Plugin8_Cmd1007 12, 255, 0, 2
-    Plugin8_Cmd1003 102, 0x8024
+    ResortCmd_SetWord 11, 255, 0, 0
+    ResortCmd_SetWord 13, 255, 0, 1
+    ResortCmd_SetWord 12, 255, 0, 2
+    ResortCmd_GetScriptValue 102, 0x8024
     ActorMsg MSGFILE_SCRIPT, 0x8024, 0x8023, 2, 0
-    Plugin8_Cmd1031 19, 0x8026
+    ResortCmd_GetOwnValue 19, 0x8026
     VMStackPush 0x8026
     VMStackPushConst 1
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_2D33
-    Plugin8_Cmd1007 8, 255, 0, 3
-    Plugin8_Cmd1007 17, 255, 0, 4
-    Plugin8_Cmd1003 108, 0x8024
+    ResortCmd_SetWord 8, 255, 0, 3
+    ResortCmd_SetWord 17, 255, 0, 4
+    ResortCmd_GetScriptValue 108, 0x8024
     ActorMsg MSGFILE_SCRIPT, 0x8024, 0x8023, 2, 0
 
 L_2D33:
@@ -2730,7 +2730,7 @@ L_2D39:
 
 L_2D4C:
     ActorMsgClose
-    Plugin8_Cmd1023 0, 1
+    ResortCmd_NameEntry 0, 1
     VMJump L_2E60
 
 L_2D5A:
@@ -2740,7 +2740,7 @@ L_2D5A:
 
 L_2D6D:
     ActorMsgClose
-    Plugin8_Cmd1023 1, 1
+    ResortCmd_NameEntry 1, 1
     VMJump L_2E60
 
 L_2D7B:
@@ -2750,7 +2750,7 @@ L_2D7B:
 
 L_2D8E:
     ActorMsgClose
-    Plugin8_Cmd1023 2, 1
+    ResortCmd_NameEntry 2, 1
     VMJump L_2E60
 
 L_2D9C:
@@ -2760,7 +2760,7 @@ L_2D9C:
 
 L_2DAF:
     ActorMsgClose
-    Plugin8_Cmd1023 3, 1
+    ResortCmd_NameEntry 3, 1
     VMJump L_2E60
 
 L_2DBD:
@@ -2769,7 +2769,7 @@ L_2DBD:
     VMJump L_2E1B
 
 L_2DD0:
-    Plugin8_Cmd1003 115, 0x8024
+    ResortCmd_GetScriptValue 115, 0x8024
     ActorMsg MSGFILE_SCRIPT, 0x8024, 0x8023, 2, 0
     YesNoWin 0x8027
     VMStackPush 0x8027
@@ -2791,8 +2791,8 @@ L_2E1B:
     VMJump L_2E5A
 
 L_2E2E:
-    Plugin8_Cmd1003 101, 0x8024
-    Plugin8_Cmd1007 4, 255, 0, 0
+    ResortCmd_GetScriptValue 101, 0x8024
+    ResortCmd_SetWord 4, 255, 0, 0
     ActorMsg MSGFILE_SCRIPT, 0x8024, 0x8023, 2, 0
     LastKeyWait
     ActorMsgClose
@@ -2806,21 +2806,21 @@ L_2E60:
     VMJump L_2C98
 
 L_2E66:
-    Plugin8_Cmd1001
+    ResortCmd_EndTalk
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt
 
 L_2E6E:
-    Plugin8_Cmd1007 0, 254, 0, 0
-    Plugin8_Cmd1007 6, 254, 0, 1
-    Plugin8_Cmd1007 4, 255, 0, 2
-    Plugin8_Cmd1007 18, 254, 0, 3
-    Plugin8_Cmd1003 100, 0x8024
+    ResortCmd_SetWord 0, 254, 0, 0
+    ResortCmd_SetWord 6, 254, 0, 1
+    ResortCmd_SetWord 4, 255, 0, 2
+    ResortCmd_SetWord 18, 254, 0, 3
+    ResortCmd_GetScriptValue 100, 0x8024
     ActorMsg MSGFILE_SCRIPT, 0x8024, 0x8023, 2, 0
     ListMenu_AnchorTopRight 31, 1, 0, 1, 32800
     ListMenuAdd 185, 65535, 0
-    Plugin8_Cmd1002 34, 0x8026
+    ResortCmd_GetValue 34, 0x8026
     VMStackPush 0x8026
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -2831,7 +2831,7 @@ L_2EDA:
     ListMenuAdd 205, 65535, 2
     ListMenuAdd 206, 65535, 3
     ListMenuAdd 212, 65535, 4
-    Plugin8_Cmd1002 62, 0x8026
+    ResortCmd_GetValue 62, 0x8026
     VMStackPush 0x8026
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -2854,7 +2854,7 @@ L_2F38:
     WorkSetConst 0x8050, 0
     WorkSetConst 0x8051, 0
     WorkSetConst 0x8052, 0
-    Plugin8_Cmd1031 17, 0x8052
+    ResortCmd_GetOwnValue 17, 0x8052
     WorkSetConst 0x8022, 1
 
 L_2F56:
@@ -2862,7 +2862,7 @@ L_2F56:
     VMStackPushConst 1
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_30FC
-    Plugin8_Cmd1003 106, 0x8024
+    ResortCmd_GetScriptValue 106, 0x8024
     ActorMsg MSGFILE_SCRIPT, 0x8024, 0x8023, 2, 0
     ListMenu_AnchorTopRight 31, 1, 0, 1, 32800
     ListMenuAdd 215, 65535, 0
@@ -2882,13 +2882,13 @@ L_2FC7:
     VMStackPushConst 4
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_2FEC
-    Plugin8_Cmd1030 17, 0x8052
+    ResortCmd_SetOwnValue 17, 0x8052
     WorkSetConst 0x8022, 0
     VMJump L_30F6
 
 L_2FEC:
     ActorMsgClose
-    Plugin8_Cmd1030 17, 0x8020
+    ResortCmd_SetOwnValue 17, 0x8020
     FadeOutBlackQ
     FadeWait
     PlayerGetGPos 0x8050, 0x8051
@@ -2937,7 +2937,7 @@ L_30A7:
 
 L_30B3:
     ActorFindByGPos 0x8023, 0x8026, 11, 0, 11
-    Plugin8_Cmd1030 26, 0x8023
+    ResortCmd_SetOwnValue 26, 0x8023
     ActorSetEyeToEye
     FadeInBlackQ
     FadeWait
@@ -2945,7 +2945,7 @@ L_30B3:
     VMStackPushConst 0
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_30F6
-    Plugin8_Cmd1003 105, 0x8024
+    ResortCmd_GetScriptValue 105, 0x8024
     ActorMsg MSGFILE_SCRIPT, 0x8024, 0x8023, 2, 0
     WorkSetConst 0x8022, 0
 
@@ -2967,7 +2967,7 @@ L_311C:
     VMStackPushConst 1
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_31E2
-    Plugin8_Cmd1003 107, 0x8024
+    ResortCmd_GetScriptValue 107, 0x8024
     ActorMsg MSGFILE_SCRIPT, 0x8024, 0x8023, 2, 0
     ListMenu_AnchorTopRight 31, 1, 0, 1, 32800
     ListMenuAdd 226, 65535, 0
@@ -2997,7 +2997,7 @@ L_31B5:
 
 L_31D4:
     ActorMsgClose
-    Plugin8_Cmd1004 0x8020, 0x8020
+    ResortCmd_ShowRecords 0x8020, 0x8020
 
 L_31DC:
     VMJump L_311C
@@ -3011,13 +3011,13 @@ Script_5:
     WorkSetConst 0x8054, 0
     SEPlay SEQ_SE_MESSAGE
     ActorSetEyeToEye
-    Plugin8_Cmd1000
-    Plugin8_Cmd1002 0, 0x8023
-    Plugin8_Cmd1007 0, 254, 0, 0
-    Plugin8_Cmd1007 6, 254, 0, 1
-    Plugin8_Cmd1007 4, 255, 0, 2
-    Plugin8_Cmd1007 18, 254, 0, 3
-    Plugin8_Cmd1003 100, 0x8024
+    ResortCmd_StartTalk_1000
+    ResortCmd_GetValue 0, 0x8023
+    ResortCmd_SetWord 0, 254, 0, 0
+    ResortCmd_SetWord 6, 254, 0, 1
+    ResortCmd_SetWord 4, 255, 0, 2
+    ResortCmd_SetWord 18, 254, 0, 3
+    ResortCmd_GetScriptValue 100, 0x8024
     ActorMsg MSGFILE_SCRIPT, 0x8024, 0x8023, 2, 0
     ActorMsgClose
     // "            "
@@ -3044,7 +3044,7 @@ L_328D:
     // "            "
     SystemMsg Global10685_Text_Empty_31, 2
     InfoMsgClose
-    Plugin8_Cmd1001
+    ResortCmd_EndTalk
     MapChangeWarp ZONE_JOIN_AVENUE, 42, 52, 1
     WorkSetConst 0x8021, 0
     VMJump L_3353
@@ -3056,7 +3056,7 @@ L_32AD:
 
 L_32C0:
     InfoMsgClose
-    Plugin8_Cmd1001
+    ResortCmd_EndTalk
     MapChangeWarp ZONE_JOIN_AVENUE, 31, 39, 1
     WorkSetConst 0x8021, 0
     VMJump L_3353
@@ -3068,7 +3068,7 @@ L_32DA:
 
 L_32ED:
     InfoMsgClose
-    Plugin8_Cmd1001
+    ResortCmd_EndTalk
     MapChangeWarp ZONE_JOIN_AVENUE, 31, 27, 1
     WorkSetConst 0x8021, 0
     VMJump L_3353
@@ -3080,7 +3080,7 @@ L_3307:
 
 L_331A:
     InfoMsgClose
-    Plugin8_Cmd1001
+    ResortCmd_EndTalk
     MapChangeWarp ZONE_JOIN_AVENUE, 31, 15, 1
     WorkSetConst 0x8021, 0
     VMJump L_3353
@@ -3104,7 +3104,7 @@ L_3359:
 
 L_336C:
     InfoMsgClose
-    Plugin8_Cmd1001
+    ResortCmd_EndTalk
     FadeOutBlackQ
     FadeWait
     CallPlaceSelect 0x8053, 0x8054
@@ -3127,18 +3127,18 @@ L_33A3:
 
 L_33B6:
     InfoMsgClose
-    Plugin8_Cmd1003 101, 0x8024
-    Plugin8_Cmd1007 4, 255, 0, 0
+    ResortCmd_GetScriptValue 101, 0x8024
+    ResortCmd_SetWord 4, 255, 0, 0
     ActorMsg MSGFILE_SCRIPT, 0x8024, 0x8023, 2, 0
     LastKeyWait
     ActorMsgClose
-    Plugin8_Cmd1001
+    ResortCmd_EndTalk
     WorkSetConst 0x8021, 0
     VMJump L_33F0
 
 L_33E6:
     InfoMsgClose
-    Plugin8_Cmd1001
+    ResortCmd_EndTalk
     WorkSetConst 0x8021, 0
 
 L_33F0:
@@ -3152,7 +3152,7 @@ L_33F6:
     VMHalt
 
 L_3408:
-    Plugin8_Cmd1007 8, 255, 0, 0
+    ResortCmd_SetWord 8, 255, 0, 0
     ListMenu_AnchorTopRight 31, 1, 0, 1, 32800
     ListMenuAdd 189, 65535, 0
     ListMenuAdd 190, 65535, 1
@@ -3188,13 +3188,13 @@ Script_6:
     ActorsPauseAll
     SEPlay SEQ_SE_MESSAGE
     ActorSetEyeToEye
-    Plugin8_Cmd1000
-    Plugin8_Cmd1002 0, 0x8023
-    Plugin8_Cmd1007 0, 254, 0, 0
-    Plugin8_Cmd1007 6, 254, 0, 1
-    Plugin8_Cmd1007 4, 255, 0, 2
-    Plugin8_Cmd1007 18, 254, 0, 3
-    Plugin8_Cmd1003 100, 0x8024
+    ResortCmd_StartTalk_1000
+    ResortCmd_GetValue 0, 0x8023
+    ResortCmd_SetWord 0, 254, 0, 0
+    ResortCmd_SetWord 6, 254, 0, 1
+    ResortCmd_SetWord 4, 255, 0, 2
+    ResortCmd_SetWord 18, 254, 0, 3
+    ResortCmd_GetScriptValue 100, 0x8024
     ActorMsg MSGFILE_SCRIPT, 0x8024, 0x8023, 2, 0
     ActorMsgClose
     FadeEx 3, 0, 16, 2
@@ -3204,7 +3204,7 @@ Script_6:
     MEWait
     FadeEx 3, 16, 0, 2
     FadeExWait
-    Plugin8_Cmd1001
+    ResortCmd_EndTalk
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt
@@ -3213,8 +3213,8 @@ Script_7:
     ActorsPauseAll
     SEPlay SEQ_SE_MESSAGE
     ActorSetEyeToEye
-    Plugin8_Cmd1000
-    Plugin8_Cmd1002 0, 0x8023
+    ResortCmd_StartTalk_1000
+    ResortCmd_GetValue 0, 0x8023
     WorkSetConst 0x8021, 1
 
 L_3528:
@@ -3222,11 +3222,11 @@ L_3528:
     VMStackPushConst 1
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_3696
-    Plugin8_Cmd1007 0, 254, 0, 0
-    Plugin8_Cmd1007 6, 254, 0, 1
-    Plugin8_Cmd1007 4, 255, 0, 2
-    Plugin8_Cmd1007 18, 254, 0, 3
-    Plugin8_Cmd1003 100, 0x8024
+    ResortCmd_SetWord 0, 254, 0, 0
+    ResortCmd_SetWord 6, 254, 0, 1
+    ResortCmd_SetWord 4, 255, 0, 2
+    ResortCmd_SetWord 18, 254, 0, 3
+    ResortCmd_GetScriptValue 100, 0x8024
     ActorMsg MSGFILE_SCRIPT, 0x8024, 0x8023, 2, 0
     VMCall L_369E
     WorkCmpConst 0x8020, 0
@@ -3266,12 +3266,12 @@ L_35E2:
     VMJump L_3632
 
 L_35F5:
-    Plugin8_Cmd1002 64, 0x8026
+    ResortCmd_GetValue 64, 0x8026
     VMStackPush 0x8026
     VMStackPushConst 1
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_3626
-    Plugin8_Cmd1003 116, 0x8024
+    ResortCmd_GetScriptValue 116, 0x8024
     ActorMsg MSGFILE_SCRIPT, 0x8024, 0x8023, 2, 0
     VMJump L_362C
 
@@ -3296,8 +3296,8 @@ L_3651:
     VMJump L_3690
 
 L_3664:
-    Plugin8_Cmd1003 101, 0x8024
-    Plugin8_Cmd1007 4, 255, 0, 0
+    ResortCmd_GetScriptValue 101, 0x8024
+    ResortCmd_SetWord 4, 255, 0, 0
     ActorMsg MSGFILE_SCRIPT, 0x8024, 0x8023, 2, 0
     LastKeyWait
     ActorMsgClose
@@ -3308,7 +3308,7 @@ L_3690:
     VMJump L_3528
 
 L_3696:
-    Plugin8_Cmd1001
+    ResortCmd_EndTalk
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt
@@ -3319,7 +3319,7 @@ L_369E:
     ListMenuAdd 220, 65535, 1
     ListMenuAdd 213, 65535, 2
     ListMenuAdd 214, 65535, 3
-    Plugin8_Cmd1002 33, 0x8026
+    ResortCmd_GetValue 33, 0x8026
     VMStackPush 0x8026
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -3341,20 +3341,20 @@ L_370B:
 L_370D:
     ActorMsgClose
     JoinAvenueStoreStart
-    Plugin8Ov60_Cmd1011 2, 0, 2, 0x8029, 0x802a, 0x802b, 0x802c, 0x802d
+    ResortShopCmd_Open_1011 2, 0, 2, 0x8029, 0x802a, 0x802b, 0x802c, 0x802d
     JoinAvenueStoreEnd
     VMStackPush 0x8029
     VMStackPushConst 1
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_3762
-    Plugin8_Cmd1003 103, 0x8024
+    ResortCmd_GetScriptValue 103, 0x8024
     ActorMsg MSGFILE_SCRIPT, 0x8024, 0x8023, 2, 0
     ActorMsgClose
     FadeOutBlack
     FadeWait
     FieldClose
     FieldOpen
-    Plugin8_Cmd1006 8
+    ResortCmd_RecreatePeople 8
     FadeInBlack
     FadeWait
     WorkSetConst 0x8021, 0
@@ -3365,13 +3365,13 @@ L_3762:
 L_3764:
     ActorMsgClose
     JoinAvenueStoreStart
-    Plugin8Ov60_Cmd1011 2, 1, 2, 0x8029, 0x802a, 0x802b, 0x802c, 0x802d
+    ResortShopCmd_Open_1011 2, 1, 2, 0x8029, 0x802a, 0x802b, 0x802c, 0x802d
     JoinAvenueStoreEnd
     VMStackPush 0x8029
     VMStackPushConst 1
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_37B5
-    Plugin8_Cmd1003 104, 0x8024
+    ResortCmd_GetScriptValue 104, 0x8024
     ActorMsg MSGFILE_SCRIPT, 0x8024, 0x8023, 2, 0
     ActorMsgClose
     FadeOutBlack
@@ -3390,15 +3390,15 @@ Script_8:
     WorkSetConst 0x8055, 0
     SEPlay SEQ_SE_MESSAGE
     ActorSetEyeToEye
-    Plugin8_Cmd1000
-    Plugin8_Cmd1002 0, 0x8023
-    Plugin8_Cmd1007 0, 254, 0, 0
-    Plugin8_Cmd1007 6, 254, 0, 1
-    Plugin8_Cmd1007 4, 255, 0, 2
-    Plugin8_Cmd1007 18, 254, 0, 3
-    Plugin8_Cmd1003 100, 0x8024
+    ResortCmd_StartTalk_1000
+    ResortCmd_GetValue 0, 0x8023
+    ResortCmd_SetWord 0, 254, 0, 0
+    ResortCmd_SetWord 6, 254, 0, 1
+    ResortCmd_SetWord 4, 255, 0, 2
+    ResortCmd_SetWord 18, 254, 0, 3
+    ResortCmd_GetScriptValue 100, 0x8024
     ActorMsg MSGFILE_SCRIPT, 0x8024, 0x8023, 2, 0
-    Plugin8_Cmd1002 17, 0x8026
+    ResortCmd_GetValue 17, 0x8026
     VMStackPush 0x8026
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -3406,7 +3406,7 @@ Script_8:
     WorkAdd 0x8055, 1
 
 L_3826:
-    Plugin8_Cmd1002 18, 0x8026
+    ResortCmd_GetValue 18, 0x8026
     VMStackPush 0x8026
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -3414,7 +3414,7 @@ L_3826:
     WorkAdd 0x8055, 1
 
 L_3845:
-    Plugin8_Cmd1002 21, 0x8026
+    ResortCmd_GetValue 21, 0x8026
     VMStackPush 0x8026
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -3422,7 +3422,7 @@ L_3845:
     WorkAdd 0x8055, 1
 
 L_3864:
-    Plugin8_Cmd1002 20, 0x8026
+    ResortCmd_GetValue 20, 0x8026
     VMStackPush 0x8026
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -3430,7 +3430,7 @@ L_3864:
     WorkAdd 0x8055, 1
 
 L_3883:
-    Plugin8_Cmd1002 19, 0x8026
+    ResortCmd_GetValue 19, 0x8026
     VMStackPush 0x8026
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -3438,7 +3438,7 @@ L_3883:
     WorkAdd 0x8055, 1
 
 L_38A2:
-    Plugin8_Cmd1002 22, 0x8026
+    ResortCmd_GetValue 22, 0x8026
     VMStackPush 0x8026
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -3446,7 +3446,7 @@ L_38A2:
     WorkAdd 0x8055, 1
 
 L_38C1:
-    Plugin8_Cmd1002 23, 0x8026
+    ResortCmd_GetValue 23, 0x8026
     VMStackPush 0x8026
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -3454,7 +3454,7 @@ L_38C1:
     WorkAdd 0x8055, 1
 
 L_38E0:
-    Plugin8_Cmd1002 24, 0x8026
+    ResortCmd_GetValue 24, 0x8026
     VMStackPush 0x8026
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -3466,36 +3466,36 @@ L_38FF:
     VMStackPushConst 1
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_393E
-    Plugin8_Cmd1007 16, 255, 0, 0
-    Plugin8_Cmd1007 8, 255, 0, 1
-    Plugin8_Cmd1003 113, 0x8024
+    ResortCmd_SetWord 16, 255, 0, 0
+    ResortCmd_SetWord 8, 255, 0, 1
+    ResortCmd_GetScriptValue 113, 0x8024
     ActorMsg MSGFILE_SCRIPT, 0x8024, 0x8023, 2, 0
     VMJump L_396A
 
 L_393E:
     VMCall L_3998
-    Plugin8_Cmd1007 16, 255, 0, 0
-    Plugin8_Cmd1007 8, 255, 0, 1
-    Plugin8_Cmd1003 114, 0x8024
+    ResortCmd_SetWord 16, 255, 0, 0
+    ResortCmd_SetWord 8, 255, 0, 1
+    ResortCmd_GetScriptValue 114, 0x8024
     ActorMsg MSGFILE_SCRIPT, 0x8024, 0x8023, 2, 0
 
 L_396A:
-    Plugin8_Cmd1007 4, 255, 0, 0
-    Plugin8_Cmd1003 101, 0x8024
+    ResortCmd_SetWord 4, 255, 0, 0
+    ResortCmd_GetScriptValue 101, 0x8024
     ActorMsg MSGFILE_SCRIPT, 0x8024, 0x8023, 2, 0
     LastKeyWait
     ActorMsgClose
-    Plugin8_Cmd1001
+    ResortCmd_EndTalk
     WorkSetConst 0x8055, 0
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt
 
 L_3998:
-    Plugin8_Cmd1003 112, 0x8024
+    ResortCmd_GetScriptValue 112, 0x8024
     ActorMsg MSGFILE_SCRIPT, 0x8024, 0x8023, 2, 0
     ListMenu_AnchorTopRight 31, 1, 0, 0, 32800
-    Plugin8_Cmd1002 17, 0x8026
+    ResortCmd_GetValue 17, 0x8026
     VMStackPush 0x8026
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -3503,7 +3503,7 @@ L_3998:
     ListMenuAdd 280, 65535, 0
 
 L_39D4:
-    Plugin8_Cmd1002 18, 0x8026
+    ResortCmd_GetValue 18, 0x8026
     VMStackPush 0x8026
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -3511,7 +3511,7 @@ L_39D4:
     ListMenuAdd 281, 65535, 1
 
 L_39F5:
-    Plugin8_Cmd1002 21, 0x8026
+    ResortCmd_GetValue 21, 0x8026
     VMStackPush 0x8026
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -3519,7 +3519,7 @@ L_39F5:
     ListMenuAdd 284, 65535, 4
 
 L_3A16:
-    Plugin8_Cmd1002 20, 0x8026
+    ResortCmd_GetValue 20, 0x8026
     VMStackPush 0x8026
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -3527,7 +3527,7 @@ L_3A16:
     ListMenuAdd 282, 65535, 2
 
 L_3A37:
-    Plugin8_Cmd1002 19, 0x8026
+    ResortCmd_GetValue 19, 0x8026
     VMStackPush 0x8026
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -3535,7 +3535,7 @@ L_3A37:
     ListMenuAdd 283, 65535, 3
 
 L_3A58:
-    Plugin8_Cmd1002 22, 0x8026
+    ResortCmd_GetValue 22, 0x8026
     VMStackPush 0x8026
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -3543,7 +3543,7 @@ L_3A58:
     ListMenuAdd 285, 65535, 5
 
 L_3A79:
-    Plugin8_Cmd1002 23, 0x8026
+    ResortCmd_GetValue 23, 0x8026
     VMStackPush 0x8026
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -3551,7 +3551,7 @@ L_3A79:
     ListMenuAdd 286, 65535, 6
 
 L_3A9A:
-    Plugin8_Cmd1002 24, 0x8026
+    ResortCmd_GetValue 24, 0x8026
     VMStackPush 0x8026
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -3560,26 +3560,26 @@ L_3A9A:
 
 L_3ABB:
     ListMenuShow
-    Plugin8_Cmd1030 16, 0x8020
+    ResortCmd_SetOwnValue 16, 0x8020
     VMReturn
 
 Script_9:
     ActorsPauseAll
     SEPlay SEQ_SE_MESSAGE
     ActorSetEyeToEye
-    Plugin8_Cmd1000
-    Plugin8_Cmd1002 0, 0x8023
-    Plugin8_Cmd1007 0, 254, 0, 0
-    Plugin8_Cmd1007 4, 255, 0, 1
-    Plugin8_Cmd1007 6, 254, 0, 2
-    Plugin8_Cmd1003 120, 0x8024
+    ResortCmd_StartTalk_1000
+    ResortCmd_GetValue 0, 0x8023
+    ResortCmd_SetWord 0, 254, 0, 0
+    ResortCmd_SetWord 4, 255, 0, 1
+    ResortCmd_SetWord 6, 254, 0, 2
+    ResortCmd_GetScriptValue 120, 0x8024
     ActorMsg MSGFILE_SCRIPT, 0x8024, 0x8023, 2, 0
-    Plugin8_Cmd1002 3, 0x8026
+    ResortCmd_GetValue 3, 0x8026
     VMStackPush 0x8026
     VMStackPushConst 0
     VMStackCmp CMP_NE
     VMJumpIf CMP_STACK, L_3B60
-    Plugin8_Cmd1003 57, 0x8024
+    ResortCmd_GetScriptValue 57, 0x8024
     ActorMsg MSGFILE_SCRIPT, 0x8024, 0x8023, 2, 0
     ActorMsgClose
     VMStackPush 0x8000
@@ -3589,7 +3589,7 @@ Script_9:
     RTCallGlobal 2805
     VMStackPop 0x8001
     VMStackPop 0x8000
-    Plugin8_Cmd1026
+    ResortCmd_MarkRaffled
     RecordAdd 130, 1
     VMJump L_3B62
 
@@ -3638,7 +3638,7 @@ L_3BE4:
     VMJump L_3B68
 
 L_3BEA:
-    Plugin8_Cmd1001
+    ResortCmd_EndTalk
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt
@@ -3649,7 +3649,7 @@ L_3BF2:
     SystemMsg Global10685_Text_Empty_253, 2
     ListMenu_AnchorTopRight 31, 1, 0, 1, 32800
     ListMenuAdd 174, 235, 0
-    Plugin8_Cmd1002 6, 0x8056
+    ResortCmd_GetValue 6, 0x8056
     VMStackPush 0x8056
     VMStackPushConst 0
     VMStackCmp CMP_EQ
@@ -3675,22 +3675,22 @@ Script_10:
     WorkSetConst 0x8057, 0
     SEPlay SEQ_SE_MESSAGE
     ActorSetEyeToEye
-    Plugin8_Cmd1029 0x8057, 0, 0x8023
-    Plugin8_Cmd1029 0x8023, 33, 0x802e
+    ResortCmd_GetNPCValue 0x8057, 0, 0x8023
+    ResortCmd_GetNPCValue 0x8023, 33, 0x802e
     WorkGet 0x8057, 0x802e
     WorkAdd 0x8057, 0
-    Plugin8_Cmd1031 0x8057, 0x8026
+    ResortCmd_GetOwnValue 0x8057, 0x8026
     VMStackPush 0x8026
     VMStackPushConst 0
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_3CC0
-    Plugin8_Cmd1029 0x8023, 28, 0x8024
+    ResortCmd_GetNPCValue 0x8023, 28, 0x8024
     ActorMsg MSGFILE_SCRIPT, 0x8024, 0x8023, 2, 0
     VMCall L_3E50
     VMJump L_3D4E
 
 L_3CC0:
-    Plugin8_Cmd1029 0x8023, 29, 0x8024
+    ResortCmd_GetNPCValue 0x8023, 29, 0x8024
     ActorMsg MSGFILE_SCRIPT, 0x8024, 0x8023, 2, 0
     ListMenu_AnchorTopRight 31, 1, 0, 1, 32800
     ListMenuAdd 1719, 65535, 0
@@ -3730,12 +3730,12 @@ L_3D4E:
 
 L_3D5C:
     WorkSetConst EVENT_WORK_0x400b, 0
-    Plugin8_Cmd1032 0x802e, EVENT_WORK_0x400b, 0x8026
+    ResortCmd_SetOccupantWords 0x802e, EVENT_WORK_0x400b, 0x8026
     VMStackPush 0x8026
     VMStackPushConst 0
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_3D99
-    Plugin8_Cmd1029 0x8023, 32, 0x8024
+    ResortCmd_GetNPCValue 0x8023, 32, 0x8024
     ActorMsg MSGFILE_SCRIPT, 0x8024, 0x8023, 2, 0
     LastKeyWait
     VMJump L_3D9F
@@ -3754,15 +3754,15 @@ L_3DA7:
     VMStackPushConst 1
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_3E4E
-    Plugin8_Cmd1032 0x802e, EVENT_WORK_0x400b, 0x8026
+    ResortCmd_SetOccupantWords 0x802e, EVENT_WORK_0x400b, 0x8026
     WorkAdd EVENT_WORK_0x400b, 1
     DebugPrint 0x8026
     WorkAdd 0x8026, 16
     WorkSub 0x8026, 1
     DebugPrint 0x8026
-    Plugin8_Cmd1029 0x8023, 0x8026, 0x8024
+    ResortCmd_GetNPCValue 0x8023, 0x8026, 0x8024
     ActorMsg MSGFILE_SCRIPT, 0x8024, 0x8023, 2, 0
-    Plugin8_Cmd1032 0x802e, EVENT_WORK_0x400b, 0x8026
+    ResortCmd_SetOccupantWords 0x802e, EVENT_WORK_0x400b, 0x8026
     VMStackPush 0x8026
     VMStackPushConst 0
     VMStackCmp CMP_EQ
@@ -3771,7 +3771,7 @@ L_3DA7:
     VMJump L_3E48
 
 L_3E17:
-    Plugin8_Cmd1029 0x8023, 31, 0x8024
+    ResortCmd_GetNPCValue 0x8023, 31, 0x8024
     ActorMsg MSGFILE_SCRIPT, 0x8024, 0x8023, 2, 0
     YesNoWin 0x8027
     VMStackPush 0x8027
@@ -3789,12 +3789,12 @@ L_3E4E:
 L_3E50:
     WorkSetConst 0x8058, 0
     WorkSetConst 0x8059, 0
-    Plugin8_Cmd1029 0x8023, 1, 0x802e
-    Plugin8_Cmd1029 0x8023, 3, 0x8058
-    Plugin8_Cmd1007 4, 255, 0, 0
-    Plugin8_Cmd1007 19, 255, 0, 1
-    Plugin8_Cmd1007 20, 255, 0, 2
-    Plugin8_Cmd1029 0x8023, 2, 0x8024
+    ResortCmd_GetNPCValue 0x8023, 1, 0x802e
+    ResortCmd_GetNPCValue 0x8023, 3, 0x8058
+    ResortCmd_SetWord 4, 255, 0, 0
+    ResortCmd_SetWord 19, 255, 0, 1
+    ResortCmd_SetWord 20, 255, 0, 2
+    ResortCmd_GetNPCValue 0x8023, 2, 0x8024
     ActorMsg MSGFILE_SCRIPT, 0x8024, 0x8023, 2, 0
     ListMenu_AnchorTopRight 31, 1, 0, 0, 32800
 
@@ -3804,21 +3804,21 @@ L_3EA7:
     VMStackCmp CMP_LT
     VMJumpIf CMP_STACK, L_3EDA
     DebugPrint 0x8059
-    Plugin8_Cmd1033 0x802e, 0x8059, 0
+    ResortCmd_SetNPCWord 0x802e, 0x8059, 0
     ListMenuAdd 1682, 65535, 0x8059
     WorkAdd 0x8059, 1
     VMJump L_3EA7
 
 L_3EDA:
     ListMenuShow
-    Plugin8_Cmd1029 0x8023, 30, 0x8024
+    ResortCmd_GetNPCValue 0x8023, 30, 0x8024
     ActorMsg MSGFILE_SCRIPT, 0x8024, 0x8023, 2, 0
     LastKeyWait
-    Plugin8_Cmd1029 0x8023, 33, 0x802e
+    ResortCmd_GetNPCValue 0x8023, 33, 0x802e
     WorkGet 0x8058, 0x802e
     WorkAdd 0x8058, 0
     WorkAdd 0x8020, 1
-    Plugin8_Cmd1030 0x8058, 0x8020
+    ResortCmd_SetOwnValue 0x8058, 0x8020
     WorkSetConst 0x8059, 0
     WorkSetConst 0x8058, 0
     VMReturn
@@ -3827,11 +3827,11 @@ Script_11:
     ActorsPauseAll
     WorkSetConst 0x805a, 0
     WorkSetConst 0x805b, 0
-    Plugin8_Cmd1013 1
+    ResortCmd_SetOccupantsLocked 1
     SEPlay SEQ_SE_MESSAGE
     ActorSetEyeToEye
-    Plugin8_Cmd1029 0x8023, 0, 0x8023
-    Plugin8_Cmd1007 8, 255, 0, 0
+    ResortCmd_GetNPCValue 0x8023, 0, 0x8023
+    ResortCmd_SetWord 8, 255, 0, 0
     // "I love [f000]Ĺ\u0001\u0000![f000]븁\u0000\nI love people in this avenue, too![f000]븁\u0000\nThat's why I'm checking\neveryone's history.[f000]븁\u0000\nWhose history do you want to know?"
     ActorMsg MSGFILE_SCRIPT, Global10685_Text_LoveLovePeopleAvenue, 0x8023, 2, 0
     VMCall L_412C
@@ -3840,18 +3840,18 @@ Script_11:
     VMStackCmp CMP_NE
     VMJumpIf CMP_STACK, L_40FC
     WorkGet 0x802e, 0x8020
-    Plugin8_Cmd1007 0, 0, 0x802e, 0
+    ResortCmd_SetWord 0, 0, 0x802e, 0
     // "Then, I'll tell\nas much of [f000]Ā\u0001\u0000's history[f000]븀\u0000\nas I know.[f000]븁\u0000"
     ActorMsg MSGFILE_SCRIPT, Global10685_Text_ThenIllTellMuch, 0x8023, 2, 0
-    Plugin8_Cmd1035 0x802e, 0, 0x8024
+    ResortCmd_DescribeOccupant 0x802e, 0, 0x8024
     ActorMsg MSGFILE_SCRIPT, 0x8024, 0x8023, 2, 0
-    Plugin8_Cmd1035 0x802e, 1, 0x8024
+    ResortCmd_DescribeOccupant 0x802e, 1, 0x8024
     ActorMsg MSGFILE_SCRIPT, 0x8024, 0x8023, 2, 0
-    Plugin8_Cmd1035 0x802e, 2, 0x8024
+    ResortCmd_DescribeOccupant 0x802e, 2, 0x8024
     ActorMsg MSGFILE_SCRIPT, 0x8024, 0x8023, 2, 0
-    Plugin8_Cmd1035 0x802e, 3, 0x8024
+    ResortCmd_DescribeOccupant 0x802e, 3, 0x8024
     ActorMsg MSGFILE_SCRIPT, 0x8024, 0x8023, 2, 0
-    Plugin8_Cmd1035 0x802e, 5, 0x8024
+    ResortCmd_DescribeOccupant 0x802e, 5, 0x8024
     ActorMsg MSGFILE_SCRIPT, 0x8024, 0x8023, 2, 0
     // "That is [f000]Ā\u0001\u0000's history.[f000]븁\u0000\nDo you want to know more\nabout [f000]Ā\u0001\u0000?"
     ActorMsg MSGFILE_SCRIPT, Global10685_Text_SHistoryWantKnow, 0x8023, 2, 0
@@ -3860,17 +3860,17 @@ Script_11:
     VMStackPushConst 0
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_40FC
-    Plugin8_Cmd1035 0x802e, 6, 0x8024
+    ResortCmd_DescribeOccupant 0x802e, 6, 0x8024
     ActorMsg MSGFILE_SCRIPT, 0x8024, 0x8023, 2, 0
-    Plugin8_Cmd1035 0x802e, 7, 0x8024
+    ResortCmd_DescribeOccupant 0x802e, 7, 0x8024
     ActorMsg MSGFILE_SCRIPT, 0x8024, 0x8023, 2, 0
-    Plugin8_Cmd1035 0x802e, 8, 0x8024
+    ResortCmd_DescribeOccupant 0x802e, 8, 0x8024
     ActorMsg MSGFILE_SCRIPT, 0x8024, 0x8023, 2, 0
-    Plugin8_Cmd1035 0x802e, 9, 0x8024
+    ResortCmd_DescribeOccupant 0x802e, 9, 0x8024
     ActorMsg MSGFILE_SCRIPT, 0x8024, 0x8023, 2, 0
     // "On [f000]Ā\u0001\u0000's\nJoin Avenue...[f000]븁\u0000"
     ActorMsg MSGFILE_SCRIPT, Global10685_Text_SJoinAvenue, 0x8023, 2, 0
-    Plugin8_Cmd1035 0x802e, 10, 0x8026
+    ResortCmd_DescribeOccupant 0x802e, 10, 0x8026
     VMStackPush 0x8026
     VMStackPushConst 0
     VMStackCmp CMP_EQ
@@ -3880,7 +3880,7 @@ Script_11:
     VMJump L_40FC
 
 L_409B:
-    Plugin8_Cmd1035 0x802e, 11, 0x8026
+    ResortCmd_DescribeOccupant 0x802e, 11, 0x8026
     WorkSetConst 0x805a, 0
 
 L_40A9:
@@ -3890,18 +3890,18 @@ L_40A9:
     VMJumpIf CMP_STACK, L_40E8
     WorkGet 0x805b, 0x805a
     WorkAdd 0x805b, 13
-    Plugin8_Cmd1035 0x802e, 0x805b, 0x8024
+    ResortCmd_DescribeOccupant 0x802e, 0x805b, 0x8024
     ActorMsg MSGFILE_SCRIPT, 0x8024, 0x8023, 2, 0
     WorkAdd 0x805a, 1
     VMJump L_40A9
 
 L_40E8:
-    Plugin8_Cmd1035 0x802e, 12, 0x8024
+    ResortCmd_DescribeOccupant 0x802e, 12, 0x8024
     ActorMsg MSGFILE_SCRIPT, 0x8024, 0x8023, 2, 0
 
 L_40FC:
-    Plugin8_Cmd1013 0
-    Plugin8_Cmd1007 8, 255, 0, 0
+    ResortCmd_SetOccupantsLocked 0
+    ResortCmd_SetWord 8, 255, 0, 0
     // "I love [f000]Ĺ\u0001\u0000![f000]븁\u0000\nI love people in this avenue, too![f000]븁\u0000\nI'll keep watching this avenue forever.[f000]븁\u0000\nPlease speak to me again!"
     ActorMsg MSGFILE_SCRIPT, Global10685_Text_LoveLovePeopleAvenue_2, 0x8023, 2, 0
     LastKeyWait
@@ -3914,75 +3914,75 @@ L_40FC:
 
 L_412C:
     ListMenu_AnchorTopRight 31, 1, 0, 129, 32800
-    Plugin8_Cmd1002 32, 0x8026
+    ResortCmd_GetValue 32, 0x8026
     VMStackPush 0x8026
     VMStackPushConst 1
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_4160
-    Plugin8_Cmd1007 0, 0, 7, 0
+    ResortCmd_SetWord 0, 0, 7, 0
     ListMenuAdd 1752, 65535, 7
 
 L_4160:
-    Plugin8_Cmd1002 31, 0x8026
+    ResortCmd_GetValue 31, 0x8026
     VMStackPush 0x8026
     VMStackPushConst 1
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_418B
-    Plugin8_Cmd1007 0, 0, 6, 0
+    ResortCmd_SetWord 0, 0, 6, 0
     ListMenuAdd 1752, 65535, 6
 
 L_418B:
-    Plugin8_Cmd1002 30, 0x8026
+    ResortCmd_GetValue 30, 0x8026
     VMStackPush 0x8026
     VMStackPushConst 1
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_41B6
-    Plugin8_Cmd1007 0, 0, 5, 0
+    ResortCmd_SetWord 0, 0, 5, 0
     ListMenuAdd 1752, 65535, 5
 
 L_41B6:
-    Plugin8_Cmd1002 29, 0x8026
+    ResortCmd_GetValue 29, 0x8026
     VMStackPush 0x8026
     VMStackPushConst 1
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_41E1
-    Plugin8_Cmd1007 0, 0, 4, 0
+    ResortCmd_SetWord 0, 0, 4, 0
     ListMenuAdd 1752, 65535, 4
 
 L_41E1:
-    Plugin8_Cmd1002 28, 0x8026
+    ResortCmd_GetValue 28, 0x8026
     VMStackPush 0x8026
     VMStackPushConst 1
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_420C
-    Plugin8_Cmd1007 0, 0, 3, 0
+    ResortCmd_SetWord 0, 0, 3, 0
     ListMenuAdd 1752, 65535, 3
 
 L_420C:
-    Plugin8_Cmd1002 27, 0x8026
+    ResortCmd_GetValue 27, 0x8026
     VMStackPush 0x8026
     VMStackPushConst 1
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_4237
-    Plugin8_Cmd1007 0, 0, 2, 0
+    ResortCmd_SetWord 0, 0, 2, 0
     ListMenuAdd 1752, 65535, 2
 
 L_4237:
-    Plugin8_Cmd1002 26, 0x8026
+    ResortCmd_GetValue 26, 0x8026
     VMStackPush 0x8026
     VMStackPushConst 1
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_4262
-    Plugin8_Cmd1007 0, 0, 1, 0
+    ResortCmd_SetWord 0, 0, 1, 0
     ListMenuAdd 1752, 65535, 1
 
 L_4262:
-    Plugin8_Cmd1002 25, 0x8026
+    ResortCmd_GetValue 25, 0x8026
     VMStackPush 0x8026
     VMStackPushConst 1
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_428D
-    Plugin8_Cmd1007 0, 0, 0, 0
+    ResortCmd_SetWord 0, 0, 0, 0
     ListMenuAdd 1752, 65535, 0
 
 L_428D:
@@ -4092,7 +4092,7 @@ L_43FC:
 
 L_4425:
     WorkAdd 0x802e, 12
-    Plugin8_Cmd1003 0x802e, 0x8024
+    ResortCmd_GetScriptValue 0x802e, 0x8024
     FunfestMissionBroadcast 17, 0
     SEPlay SEQ_SE_MESSAGE
     MsgPlaceSign 0x8024, 2
@@ -4107,11 +4107,11 @@ Script_13:
     ActorsPauseAll
     SEPlay SEQ_SE_MESSAGE
     ActorSetEyeToEye
-    Plugin8_Cmd1000
-    Plugin8_Cmd1002 0, 0x8023
-    Plugin8_Cmd1007 0, 254, 0, 0
-    Plugin8_Cmd1007 6, 254, 0, 2
-    Plugin8_Cmd1003 125, 0x8024
+    ResortCmd_StartTalk_1000
+    ResortCmd_GetValue 0, 0x8023
+    ResortCmd_SetWord 0, 254, 0, 0
+    ResortCmd_SetWord 6, 254, 0, 2
+    ResortCmd_GetScriptValue 125, 0x8024
     ActorMsg MSGFILE_SCRIPT, 0x8024, 0x8023, 2, 0
     ActorMsgClose
     WorkSetConst 0x8021, 1
@@ -4153,7 +4153,7 @@ L_4509:
     VMJump L_4493
 
 L_450F:
-    Plugin8_Cmd1001
+    ResortCmd_EndTalk
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt
@@ -4180,11 +4180,11 @@ Script_14:
     WorkSetConst 0x8031, 1
     SEPlay SEQ_SE_MESSAGE
     ActorSetEyeToEye
-    Plugin8_Cmd1000
-    Plugin8_Cmd1002 0, 0x8023
-    Plugin8_Cmd1007 0, 254, 0, 0
-    Plugin8_Cmd1007 6, 254, 0, 2
-    Plugin8_Cmd1003 130, 0x8024
+    ResortCmd_StartTalk_1000
+    ResortCmd_GetValue 0, 0x8023
+    ResortCmd_SetWord 0, 254, 0, 0
+    ResortCmd_SetWord 6, 254, 0, 2
+    ResortCmd_GetScriptValue 130, 0x8024
     ActorMsg MSGFILE_SCRIPT, 0x8024, 0x8023, 2, 0
     ActorMsgClose
     WorkSetConst 0x8021, 1
@@ -4227,7 +4227,7 @@ L_4613:
     VMJump L_4599
 
 L_4619:
-    Plugin8_Cmd1001
+    ResortCmd_EndTalk
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt
@@ -4253,11 +4253,11 @@ Script_15:
     ActorsPauseAll
     SEPlay SEQ_SE_MESSAGE
     ActorSetEyeToEye
-    Plugin8_Cmd1000
-    Plugin8_Cmd1002 0, 0x8023
-    Plugin8_Cmd1007 8, 255, 0, 1
+    ResortCmd_StartTalk_1000
+    ResortCmd_GetValue 0, 0x8023
+    ResortCmd_SetWord 8, 255, 0, 1
     WordSetPlayerName 0
-    Plugin8_Cmd1003 170, 0x8024
+    ResortCmd_GetScriptValue 170, 0x8024
     ActorMsg MSGFILE_SCRIPT, 0x8024, 0x8023, 2, 0
     ActorMsgClose
     WorkSetConst 0x8021, 1
@@ -4292,7 +4292,7 @@ L_46F3:
     VMJump L_4696
 
 L_46F9:
-    Plugin8_Cmd1001
+    ResortCmd_EndTalk
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt
@@ -4302,7 +4302,7 @@ L_4701:
     SystemMsg Global10685_Text_Empty_253, 2
     ListMenu_AnchorTopRight 31, 1, 0, 1, 32800
     ListMenuAdd 176, 237, 0
-    Plugin8_Cmd1031 22, 0x8026
+    ResortCmd_GetOwnValue 22, 0x8026
     ListMenuAdd 183, 244, 1
     ListMenuShow
     InfoMsgClose
@@ -4423,9 +4423,9 @@ L_48D6:
     VMJumpIf CMP_STACK, L_4917
     WorkSetConst EVENT_WORK_0x4110, 6
     WorkSetConst EVENT_WORK_0x410b, 1
-    Plugin8_Cmd1030 18, 0
-    Plugin8_Cmd1028 3, 4
-    Plugin8_Cmd1028 3, 5
+    ResortCmd_SetOwnValue 18, 0
+    ResortCmd_AddEntryOrRecord 3, 4
+    ResortCmd_AddEntryOrRecord 3, 5
     MapChangeWarp ZONE_ROUTE_4, 430, 490, 0
     WorkSetConst 0x8021, 0
 

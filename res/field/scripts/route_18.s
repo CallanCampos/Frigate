@@ -43,7 +43,7 @@ L_0096:
 
 L_00A4:
     ActorCmdWait
-    Cmd_02D5 49, 0x8023
+    WbtIsTrainerBeaten 49, 0x8023
     VMStackPush 0x8023
     VMStackPushConst 1
     VMStackCmp CMP_EQ

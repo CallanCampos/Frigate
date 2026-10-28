@@ -24,7 +24,7 @@
     WorkSetConst 0x8022, 0
 
 Script_15:
-    Cmd_02B2 0, EVENT_WORK_0x400f
+    MemoryLinkCheckFlag 0, EVENT_WORK_0x400f
     DebugPrint EVENT_WORK_0x400f
     VMStackPush EVENT_WORK_0x400f
     VMStackPushConst 1
@@ -53,7 +53,7 @@ L_00AB:
     VMStackCmp CMP_EQ
     VMStackCmp CMP_AND
     VMJumpIf CMP_STACK, L_00DA
-    HollowRivalCmd_0262 1, 43
+    HollowRivalSetValue 1, 43
     VMJump L_0103
 
 L_00DA:
@@ -65,7 +65,7 @@ L_00DA:
     VMStackCmp CMP_EQ
     VMStackCmp CMP_AND
     VMJumpIf CMP_STACK, L_0103
-    HollowRivalCmd_0262 1, 42
+    HollowRivalSetValue 1, 42
 
 L_0103:
     VMHalt
@@ -197,7 +197,7 @@ L_0310:
 L_0316:
     FlagSet EVENT_FLAG_0x02cf
     WorkSetConst EVENT_WORK_0x413f, 1
-    HollowRivalCmd_0262 1, 10
+    HollowRivalSetValue 1, 10
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt
@@ -407,7 +407,7 @@ L_0625:
 
 L_0650:
     ActorCmdWait
-    Cmd_02B2 0, EVENT_WORK_0x400f
+    MemoryLinkCheckFlag 0, EVENT_WORK_0x400f
     VMStackPush EVENT_WORK_0x400f
     VMStackPushConst 1
     VMStackCmp CMP_GE
@@ -430,15 +430,15 @@ L_0695:
     WorkSetConst 0x8023, 0
     VMReturn
     PlayerGetGPos 0x8021, 0x8022
-    Cmd_020F 1, 8, 3, 18
-    Cmd_0211 1
+    SpPokeAppear 1, 8, 3, 18
+    SpPokeWaitFrame 1
     FadeEx 12, 0, 16, 2
     FadeExWait
     ActorDelete 1
     FadeEx 12, 16, 0, 2
     FadeExWait
-    Cmd_0210 1
-    Cmd_020E 1, 0x8021, 3, 0x8022, 3, 8
+    SpPokeWaitAnimEnd 1
+    SpPokeJump 1, 0x8021, 3, 0x8022, 3, 8
     VMReturn
     .balign 4, 0
 
@@ -637,7 +637,7 @@ Script_14:
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_08FE
     VMCall L_097A
-    HollowRivalCmd_0262 1, 43
+    HollowRivalSetValue 1, 43
     FlagSet EVENT_FLAG_0x01eb
     VMJump L_090C
 

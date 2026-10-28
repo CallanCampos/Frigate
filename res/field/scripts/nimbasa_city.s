@@ -78,7 +78,7 @@ L_0112:
     VMStackCmp CMP_EQ
     VMStackCmp CMP_AND
     VMJumpIf CMP_STACK, L_0141
-    HollowRivalCmd_0262 2, 14
+    HollowRivalSetValue 2, 14
     VMJump L_016A
 
 L_0141:
@@ -90,7 +90,7 @@ L_0141:
     VMStackCmp CMP_EQ
     VMStackCmp CMP_AND
     VMJumpIf CMP_STACK, L_016A
-    HollowRivalCmd_0262 2, 0
+    HollowRivalSetValue 2, 0
 
 L_016A:
     VMHalt
@@ -332,7 +332,7 @@ Script_30:
 Script_12:
     ActorsPauseAll
     WorkSetConst EVENT_WORK_0x40c0, 2
-    HollowRivalCmd_0262 1, 7
+    HollowRivalSetValue 1, 7
     EvCameraInit
     EvCameraUnbind
     EvCameraMoveTo 9688, 0, 0xed000, 0x1978000, 0x1000f, 0x1b68000, 20
@@ -684,7 +684,7 @@ L_08A4:
     ActorCmdWait
     ActorDelete 3
     FlagSet EVENT_FLAG_0x02f9
-    HollowRivalCmd_0262 1, 8
+    HollowRivalSetValue 1, 8
     BGMChangeMap
     FinishAllEvents
     ActorsUnpauseAll

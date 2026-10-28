@@ -70,14 +70,14 @@ Script_2:
     VMStackPushConst 1
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_0103
-    Cmd_0292 1
+    VirbankGymSetActorFlag 1
 
 L_0103:
     VMStackPush EVENT_WORK_0x4001
     VMStackPushConst 1
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_011A
-    Cmd_0292 2
+    VirbankGymSetActorFlag 2
 
 L_011A:
     VMHalt
@@ -113,9 +113,9 @@ L_0157:
     VMJump L_01CD
 
 L_0188:
-    Cmd_0291 0
-    Cmd_0291 1
-    Cmd_0291 2
+    VirbankGymStopModelAnimations 0
+    VirbankGymStopModelAnimations 1
+    VirbankGymStopModelAnimations 2
     VMStackPushFlag EVENT_FLAG_0x0960
     VMStackPushConst 0
     VMStackCmp CMP_EQ
@@ -201,9 +201,9 @@ L_02B2:
 
 L_02B4:
     VMCall L_0478
-    Cmd_0291 0
-    Cmd_0291 1
-    Cmd_0291 2
+    VirbankGymStopModelAnimations 0
+    VirbankGymStopModelAnimations 1
+    VirbankGymStopModelAnimations 2
     // "Sigh!\nWhat are you doing losing, Roxie?![f000]븁\u0000\nWell...\nI guess that means you're strong![f000]븁\u0000\nThis stinks,\nbut I gave it everything I had, and[f000]븀\u0000\nI feel revitalized and refreshed now![f000]븁\u0000\nHere!\nProof that you beat me![f000]븁\u0000"
     ActorMsg MSGFILE_SCRIPT, VirbankCityGym2_Text_SighWhatDoingLosing, 4, 0, 0
     ActorMsgClose
@@ -356,7 +356,7 @@ L_049D:
     VMJumpIf CMP_STACK, L_04CE
     ISSSwitchDisable 1
     ISSSwitchDisable 4
-    Cmd_0292 1
+    VirbankGymSetActorFlag 1
     WorkSetConst EVENT_WORK_0x4000, 1
     WorkSetConst EVENT_WORK_0x4003, 1
 
@@ -370,7 +370,7 @@ L_04D0:
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_04F7
     ISSSwitchDisable 2
-    Cmd_0292 2
+    VirbankGymSetActorFlag 2
     WorkSetConst EVENT_WORK_0x4001, 1
 
 L_04F7:

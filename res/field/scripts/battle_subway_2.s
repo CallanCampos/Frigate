@@ -42,7 +42,7 @@ Script_2:
     VMStackPushConst 0
     VMStackCmp CMP_NE
     VMJumpIf CMP_STACK, L_00F0
-    Plugin1_Cmd1001 1, 0x8023
+    BSubwayCmd_CreateWork 1, 0x8023
     VMStackPush 0x8023
     VMStackPushConst 3
     VMStackCmp CMP_EQ
@@ -964,7 +964,7 @@ L_0ECD:
     MsgWaitAdvance
     MsgWinCloseAll
     BSubwayCmd_Tool 15, 0x8023, 0, 0
-    Cmd_01DD 8, 0, 0
+    BroadcastGameBeacon 8, 0, 0
     WorkCmpConst 0x8023, 5
     VMJumpIf CMP_EQ, L_0F97
     VMJump L_0FA1
@@ -1422,7 +1422,7 @@ Movement_16C4:
 
 L_16DC:
     BSubwayCmd_Tool 401, 0, 0, 0
-    Cmd_013C
+    GameCommTryBoot
     BSubwayCmd_Tool 330, 0, 0, 0
     VMReturn
 

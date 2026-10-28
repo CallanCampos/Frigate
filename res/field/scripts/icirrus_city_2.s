@@ -28,7 +28,7 @@ Script_17:
     VMHalt
 
 Script_15:
-    Cmd_02B2 0, EVENT_WORK_0x400c
+    MemoryLinkCheckFlag 0, EVENT_WORK_0x400c
     VMStackPush EVENT_WORK_0x400c
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -44,7 +44,7 @@ L_008D:
     VMHalt
 
 L_0095:
-    Cmd_02B2 0, EVENT_WORK_0x400c
+    MemoryLinkCheckFlag 0, EVENT_WORK_0x400c
     VMStackPushFlag EVENT_FLAG_0x01d0
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -63,7 +63,7 @@ L_00D2:
     VMReturn
 
 L_00D4:
-    Cmd_02B2 0, EVENT_WORK_0x400c
+    MemoryLinkCheckFlag 0, EVENT_WORK_0x400c
     VMStackPushFlag EVENT_FLAG_0x01d0
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -92,7 +92,7 @@ Script_1:
     ActorsPauseAll
     SEPlay SEQ_SE_MESSAGE
     ActorSetEyeToEye
-    Cmd_02B2 0, EVENT_WORK_0x400f
+    MemoryLinkCheckFlag 0, EVENT_WORK_0x400f
     VMStackPush EVENT_WORK_0x400f
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -322,8 +322,8 @@ Script_3:
 Script_4:
     ActorsPauseAll
     SEPlay SEQ_SE_FLD_64
-    Cmd_018F 0
-    Cmd_0190 0
+    IcirrusGymCallSwitchAnim 0
+    IcirrusGymCallFlipSwitch 0
     VMStackPush EVENT_WORK_0x4001
     VMStackPushConst 0
     VMStackCmp CMP_EQ
@@ -346,8 +346,8 @@ L_04A5:
 Script_5:
     ActorsPauseAll
     SEPlay SEQ_SE_FLD_64
-    Cmd_018F 1
-    Cmd_0190 1
+    IcirrusGymCallSwitchAnim 1
+    IcirrusGymCallFlipSwitch 1
     VMStackPush EVENT_WORK_0x4002
     VMStackPushConst 0
     VMStackCmp CMP_EQ
@@ -370,8 +370,8 @@ L_050E:
 Script_6:
     ActorsPauseAll
     SEPlay SEQ_SE_FLD_64
-    Cmd_018F 2
-    Cmd_0190 2
+    IcirrusGymCallSwitchAnim 2
+    IcirrusGymCallFlipSwitch 2
     VMStackPush EVENT_WORK_0x4003
     VMStackPushConst 0
     VMStackCmp CMP_EQ
@@ -394,7 +394,7 @@ L_0577:
 Script_7:
     ActorsPauseAll
     PlayerTurnByTrigger
-    Cmd_0191 0
+    IcirrusGymToggleMovementAtPlace 0
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt
@@ -402,7 +402,7 @@ Script_7:
 Script_8:
     ActorsPauseAll
     PlayerTurnByTrigger
-    Cmd_0191 1
+    IcirrusGymToggleMovementAtPlace 1
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt
@@ -410,7 +410,7 @@ Script_8:
 Script_9:
     ActorsPauseAll
     PlayerTurnByTrigger
-    Cmd_0191 2
+    IcirrusGymToggleMovementAtPlace 2
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt
@@ -418,7 +418,7 @@ Script_9:
 Script_10:
     ActorsPauseAll
     PlayerTurnByTrigger
-    Cmd_0191 3
+    IcirrusGymToggleMovementAtPlace 3
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt
@@ -426,7 +426,7 @@ Script_10:
 Script_11:
     ActorsPauseAll
     PlayerTurnByTrigger
-    Cmd_0191 5
+    IcirrusGymToggleMovementAtPlace 5
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt
@@ -434,7 +434,7 @@ Script_11:
 Script_12:
     ActorsPauseAll
     PlayerTurnByTrigger
-    Cmd_0191 4
+    IcirrusGymToggleMovementAtPlace 4
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt
@@ -442,7 +442,7 @@ Script_12:
 Script_13:
     ActorsPauseAll
     PlayerTurnByTrigger
-    Cmd_0191 7
+    IcirrusGymToggleMovementAtPlace 7
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt
@@ -450,7 +450,7 @@ Script_13:
 Script_14:
     ActorsPauseAll
     PlayerTurnByTrigger
-    Cmd_0191 6
+    IcirrusGymToggleMovementAtPlace 6
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt

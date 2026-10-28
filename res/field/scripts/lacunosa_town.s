@@ -407,8 +407,8 @@ L_05CE:
     ActorDelete 9
     FlagSet EVENT_FLAG_0x030a
     FlagSet EVENT_FLAG_0x030b
-    HollowRivalCmd_0262 3, 7
-    HollowRivalCmd_0262 0, 6
+    HollowRivalSetValue 3, 7
+    HollowRivalSetValue 0, 6
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt
@@ -527,7 +527,7 @@ L_0895:
     VMJumpIf CMP_STACK, L_0A51
     WorkSetConst EVENT_WORK_0x40ce, 2
     FlagReset EVENT_FLAG_0x0311
-    HollowRivalCmd_0262 1, 22
+    HollowRivalSetValue 1, 22
     ActorAdd 10
     ActorAdd 11
     VMStackPush 0x8022
@@ -763,7 +763,7 @@ L_0C1F:
     FlagSet EVENT_FLAG_0x0310
     WorkSetConst EVENT_WORK_0x40ce, 3
     WorkSetConst EVENT_WORK_0x40cc, 4
-    HollowRivalCmd_0262 1, 23
+    HollowRivalSetValue 1, 23
     VMReturn
 
 L_0CB0:
