@@ -5,6 +5,7 @@
 #include "constants/arc.h"
 #include "field/field.h"
 #include "field/field_camera.h"
+#include "field/field_controller.h"
 #include "field/field_scene_area.h"
 #include "gfl/arc.h"
 #include "gfl/arc_util.h"
@@ -183,7 +184,7 @@ static void FieldCameraAreaCalc_CIRCLE_FixedLookAt(FieldSceneArea *area, const C
     FieldCamera_CoordsSetEye(camera, &eye);
 }
 
-// Whether the position's tile is in the rectangle; never with the controller type 1
+// Whether the position's tile is in the rectangle; never on a rail
 static BOOL FieldCameraAreaCalc_RECT_CheckColl(FieldSceneArea *area, const CameraArea *cameraArea, const VecFx32 *pos) {
     VecFx32 tilePos;
     u16 gridX;
@@ -191,7 +192,7 @@ static BOOL FieldCameraAreaCalc_RECT_CheckColl(FieldSceneArea *area, const Camer
     u16 width;
     u16 height;
 
-    if (Field_GetResolvedControllerTypeID(GetFieldSceneAreaField(area)) == 1) {
+    if (Field_GetResolvedControllerTypeID(GetFieldSceneAreaField(area)) == FIELDMAP_CTRL_TYPE_NOGRID) {
         return FALSE;
     }
     tilePos = *pos;
