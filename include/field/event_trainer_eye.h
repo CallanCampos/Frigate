@@ -9,6 +9,9 @@
 // event_trainer_eye.c: the Trainers who see the player and walk up to battle. Names from swan
 // (https://github.com/ds-pokemon-hacking/swan, GPL-3.0)
 
+// The script of the special Trainers, whose Trainer ID is their actor's UID
+#define SCRID_SPECIAL_TRAINER 0x29f9
+
 typedef struct EventTrainerEyeWork EventTrainerEyeWork;
 
 // The event of the Trainers that have seen the player, or NULL if none has

@@ -21,10 +21,9 @@
 #include "system/game_event.h"
 #include "system/game_system.h"
 
-// The script of a Trainer's battle, and of the Trainer whose actor uses the special script
+// The script of a Trainer's battle, and of the Trainer whose actor uses SCRID_SPECIAL_TRAINER
 #define SCRID_TRAINER_CLASH 0xee8
 #define SCRID_SPECIAL_TRAINER_CLASH 0x29f8
-#define SCRID_SPECIAL_TRAINER 0x29f9
 
 enum {
     TRAINER_EYE_SEQ_START_MOVE,
