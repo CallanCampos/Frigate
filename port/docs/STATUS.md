@@ -34,26 +34,38 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
 
 ## 2026-10-28: the window on Linux, with the game's symbols hidden from a shared SDL3
 
-- **Upstream:** `fd3b9e600d`, as reviewed main `b631907c33` has it; this branch merges no upstream commit.
-- **Port:** `PORT_SHA`, on `port/linux-hidden-game-symbols`, from `b631907c33`.
-- **ROM:** T0 not run: this clone has no `orig/`. The branch changes only `port/CMakeLists.txt` and this file, so
-  MWCC's build is untouched; T0 is still due before merge.
+- **Upstream:** `fd3b9e600d`, as reviewed main `3ea5609ea3` has it; this branch merges no upstream commit.
+- **Port:** `PORT_SHA`, on `port/linux-hidden-game-symbols`, from `b631907c33` with `3ea5609ea3` merged.
+- **ROM:** T0 not run: this clone has no `orig/`. The branch changes only `port/` (`CMakeLists.txt`,
+  `cmake/app.cmake`, `hal/host/host_posix.c`, `tests/app/test_symbols.c` and this file), so MWCC's build is
+  untouched; T0 is still due before merge.
 - **Host build:** Linux (Ubuntu 26.04, clang 21.1.8, the distribution's shared SDL3 3.4.2), RelWithDebInfo,
-  `build/port` (us) and `build/port-es` (es) build. `nm -D --defined-only` on either program lists only `main`, where
-  it listed GameSpy's `socket`, `connect`, `bind`, `send`, `sendto`, `recv`, `recvfrom`, `setsockopt`, `getsockname`,
-  `inet_addr` and `shutdown` before.
-- **Tests:** T2, T3 and T6 by `ctest -j8`, without a ROM: 355 of 355 in each build, the ROM tests skipped. With the
-  IRES dump, the es program opens its window (it stopped with "SDL_Init failed: No available video device" before) and
-  writes the Pokémon, Nintendo, Creatures and Game Freak screen at frame 180. T4, T5 and T7 not run.
+  `build/port` (us) and `build/port-es` (es) build with GNU ld, and `build/port-es-lld` (es,
+  `-DCMAKE_EXE_LINKER_FLAGS=-fuse-ld=lld`) builds the program. `nm -D --defined-only` on either GNU ld program lists
+  only `main`, where it listed GameSpy's `socket`, `connect`, `bind`, `send`, `sendto`, `recv`, `recvfrom`,
+  `setsockopt`, `getsockname`, `inet_addr` and `shutdown` before. No hidden name is defined twice in either the GNU ld
+  or the LLD program.
+- **Tests:** T2, T3 and T6 by `ctest -j8`, without a ROM: 356 of 356 in each build, the ROM tests skipped, with
+  `app_symbols_lld` new. The previous resolver, built against the new `test_symbols.c`, passes under GNU ld and fails
+  "a hidden global" under LLD; the new one passes under both. With the IRES dump, the es program opens its window (it
+  stopped with "SDL_Init failed: No available video device" before) and writes the Pokémon, Nintendo, Creatures and
+  Game Freak screen at frame 180. `--run-dir DIR --run-dump EVENT_BATTLE_RETURN_PROC_FUNCTIONS:8` writes that global's
+  8 bytes to `memory.txt` from the GNU ld program (GLOBAL HIDDEN) and from the LLD one (LOCAL HIDDEN). T4, T5 and T7
+  not run.
 - **Tiers:** unchanged: no game C changes.
-- **Trap stubs:** unchanged: no game or HAL source changes.
-- **64-bit warnings:** not rerun: no C changes; the last entry's 365 sites, real 66, stand.
+- **Trap stubs:** unchanged: no game source or stub generator changes.
+- **64-bit warnings:** not rerun: no game C changes; the last entry's 365 sites, real 66, stand.
 - **Work done:** on Linux, an executable exports a definition that a shared library refers to, and it wins over the
   C library's. GameSpy defines the BSD socket calls for the DS (`lib/dwc/src/gscommon/gsPlatformSocket.c`), so
   libwayland-client and libX11, loaded by a distribution's shared SDL3, called GameSpy's `socket` and `connect`, found
   no display, and SDL fell through every video driver: no window on any Linux desktop, the US build too. CI runs
-  headless and didn't see it. `port_decomp_env` compiles
-  the decomp with `-fvisibility=hidden` on Linux: the game's calls bind as before, inside the program. No game change.
+  headless and didn't see it. `port_decomp_env` compiles the decomp with `-fvisibility=hidden` on Linux: the game's
+  calls bind as before, inside the program. The owner's review of PR 58 found that LLD makes such a global LOCAL
+  HIDDEN, where GNU ld keeps it GLOBAL HIDDEN, and that `port_host_global_address` (`port/hal/host/host_posix.c`),
+  which skipped every LOCAL symbol, would then have lost `--run-dump`'s globals. It now takes a LOCAL symbol that is
+  hidden, which no static is, and gives NULL for a name that two symbols it takes have. `test_symbols.c` checks a
+  hidden global on Linux, linked by GNU ld (`app_symbols`) and, where `ld.lld` is installed and the compiler is clang,
+  by LLD (`app_symbols_lld`, `port/cmake/app.cmake`). No game change.
 - **Next:** this branch published as a pull request to `main`, T0 and the owner's review. Issue 45's Spanish
   gameplay and save evidence can now be gathered by playing the es build with a window.
 - **Blockers:** none.
