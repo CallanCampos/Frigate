@@ -154,8 +154,16 @@ void *FieldEffects_GetObjectWork(FieldEffectTask *task);
 void FieldEffects_SetLuminanceTable(FieldEffects *effects, const u8 *table);
 void FieldEffects_ApplyLuminanceTable(FieldEffects *effects, G3DResource *resource);
 
-// fldeff_surf_pokemon.c: the Pokémon an actor surfs on, facing dir at pos, and how it follows the actor (0: it doesn't,
-// 1: it bobs under the actor, 2: the actor's offset is left alone), which can change; and whether its wake shows
+// fldeff_surf_pokemon.c: the Pokémon an actor surfs on, facing dir at pos, and how it follows the actor, which can
+// change; and whether its wake shows
+enum {
+    // It stays where it is
+    SURF_POKEMON_FOLLOW_NONE,
+    // It bobs under the actor, which it lifts by its draw offset
+    SURF_POKEMON_FOLLOW_BOB,
+    // It follows the actor and leaves the actor's draw offset alone, without its wake
+    SURF_POKEMON_FOLLOW_KEEP_OFFSET,
+};
 FieldEffectTask *FldeffSurfPokemon_Start(FieldEffects *effects, u16 dir, const VecFx32 *pos, FieldActor *actor,
                                          u32 mode);
 void FldeffSurfPokemon_SetFollowMode(FieldEffectTask *task, u8 mode);
