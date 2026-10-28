@@ -3,6 +3,20 @@
 What port work taught that isn't obvious from the code, newest first. A lesson about MWCC or the decomp's own
 workflow goes in the decomp checkout instead; this file is the port's ([CLAUDE.md](../CLAUDE.md), the iteration loop).
 
+## 2026-10-28: sequence bytecode reads before relative pointer arithmetic
+
+- Matching DS code does not make operand evaluation order portable. In `vm->pc + VM_Read32(vm)`, native clang
+  loaded the PC before the read and MWCC loaded it after. The four-byte displacement sent Terrell's actual effect
+  table jump outside the same script, producing a long random-comparison loop. Sequence the read explicitly, then
+  use the advanced PC; all 167 allocatable original-object sections stay identical in both versions.
+- Regress the actual commands and interpreter, including backward offsets and list polarity. A copied arithmetic
+  expression would not establish that dispatch, argument consumption, branching and stopping still work. Original
+  source fails all three affected command groups; the fixed thirteen cases pass ordinary and fatal sanitizers.
+- Trace the first wrong operand before inventing a CPU delay. The loop's 501 draws per pass came after the wrong
+  jump and reached the existing deadline cap. Both fixed entry captures remove persistent NNS/LC/MT-state
+  differences, while two unique MT-index differences per game remain visible. Keep those timing differences,
+  duplicate-counter ambiguities and absent pixel comparisons explicit; do not broaden masks or claim battle parity.
+
 ## 2026-10-28: measure card work before assigning an AI delay
 
 - A typed API which returns the right bytes can still have the wrong request stream. The native archive wrapper

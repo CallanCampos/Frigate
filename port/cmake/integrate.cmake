@@ -93,3 +93,17 @@ add_test(NAME integrate_archive_seek_assert
         "${CMAKE_CURRENT_SOURCE_DIR}/tests/app/check_exit.py" --status 70
         --expect "ArchiveMoveImageTop fileCnt=2, datID=2" -- "$<TARGET_FILE:port_archive_seek_tests>" invalid)
 set_tests_properties(integrate_archive_seek integrate_archive_seek_assert PROPERTIES TIMEOUT 30)
+
+# Actual trainer-AI commands and VM on owned synthetic scripts; no ROM or replacement interpreter. Per-function/data
+# sections keep unrelated battle code out of this small target; sanitizer coverage of the selected commands remains.
+add_executable(port_tr_ai_tables_tests tests/integrate/tr_ai_tables.c "${REPO_ROOT}/src/system/vm.c")
+target_link_libraries(port_tr_ai_tables_tests PRIVATE port_decomp_env)
+target_include_directories(port_tr_ai_tables_tests PRIVATE "${REPO_ROOT}")
+target_compile_options(port_tr_ai_tables_tests PRIVATE -ffunction-sections -fdata-sections)
+if(APPLE)
+    target_link_options(port_tr_ai_tables_tests PRIVATE -Wl,-dead_strip)
+else()
+    target_link_options(port_tr_ai_tables_tests PRIVATE -Wl,--gc-sections)
+endif()
+add_test(NAME integrate_tr_ai_tables COMMAND port_tr_ai_tables_tests)
+set_tests_properties(integrate_tr_ai_tables PROPERTIES TIMEOUT 30)

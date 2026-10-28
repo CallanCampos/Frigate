@@ -32,6 +32,50 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
 
+## 2026-10-28: preserve trainer-AI post-operand script bases
+
+- **Upstream:** `fd3b9e600da72b208fa98c3486988d3d7ce16766`, contained in reviewed main `70085bfae7`.
+  The separately reviewed foundation PR 55 is now merged as `b631907c33` after all 14 checks passed; its corrected
+  save test takes 2.01 seconds on the Intel runner. This candidate still requires integration with that main.
+- **Port:** `PORT_SHA`, on `codex/ai-script-sequencing`. Three natural C locals in `src/ov170/tr_ai.c` sequence each
+  signed table/list operand read before using the advanced PC. No AI replacement, score, RNG, data or clock change.
+- **ROM (T0):** fresh configure/Ninja, 8,799 steps, zero warnings; both original hashes match: B2
+  `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb`, W2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`.
+  All 167 allocatable MWCC sections of this file match the reviewed control in each version, retaining every
+  repeated `.text`/`.rodata` section: 161 code sections/9,736 code bytes, 10,288 initialized bytes in total.
+- **Host build (T1):** both complete ordinary native all-target builds and suites pass on the frozen production/test
+  source: B2 327 passed/28 explicit fixture-dependent skips of 355; W2 324/28 of 352, zero failures. Integration and
+  exact-head required verification follow before publication.
+- **Tests (T2):** thirteen cases execute the actual AI commands and actual VM on owned synthetic scripts: post-read
+  table/list bases, positive/negative relative offsets and destinations, effect/default selection, matching and
+  nonmatching lists, sentinel, return and stop semantics. Ordinary and fatal LLVM 23 ASan/UBSan runs pass. Original
+  source separately fails the intended assertion in each of the three affected command groups. No new exception.
+- **Replay/oracle (T3/T4):** private diagnostic captures substitute only the actual fixed AI object into unchanged
+  reviewed control programs. Both complete 9,000 frames/36,000 semantic state payloads with exactly the two authentic
+  DS seeds. Starting saves remain byte-identical; both complete banks, all 73 blocks, tables and footers validate.
+  From counter 4,900, every unique NNS, LC and MT-firstword payload matches DS: B2 3,851 pairs, W2 3,913. The prior
+  persistent NNS/MT-state divergence disappears. Two unique MT-index differences per game remain; 19/20 duplicate
+  counter sets remain explicitly ambiguous, and 230/167 native frames beyond DS coverage are unassessed.
+- **Sanitizers/play (T5/T7):** focused fatal-sanitizer cases pass, with no new whole-route sanitizer claim yet. Both
+  bounded captures reach Terrell's first action menu: Tepig level 6, B2 23/23 HP or W2 24/24, versus Patrat level 4.
+  No attack or victory is claimed. Bottom hashes match corresponding snapshots; no equal-counter sparse PNG pairs
+  exist for top-screen pixel comparison. Complete trainer decision timing and consumer-value equality remain open.
+- **Performance (T6):** no budget adjustment or new performance claim; applicable suite gates remain enabled.
+- **Tiers/trap stubs:** no new scan; previous 41,017 tier (a), zero (b)/(c), plus 2,385 veneers/16,906 bytes and
+  25 function traps plus `CARDi_NdmaInterface` data remain. Complete ROM decompilation is not native completeness.
+- **64-bit warnings:** no cast/type change; prior 365 sites/229 keys, real 66, harmless 123, handled 141, unreachable
+  35, with 1,707 compiled inputs/zero missing. Exact integrated-head verification must recheck this guard.
+- **Work done:** control-preserving observers of the same 9,120-byte B2 script proved opcode 115 used native table
+  base 522 instead of original DS 526, selecting an out-of-script target instead of 1,878. The full original DS
+  11,000-frame/56,086-payload and native 9,000-frame/36,000-payload traces equal their controls. Native clang read the
+  pointer before `VM_Read32`; MWCC read it after. Explicit sequencing fixes that cause and two equivalent list sites.
+  The original random-comparison loop reached the existing deadline cap after the wrong jump; no fitted delay was
+  warranted. Guides and the game-change ledger describe the actual owners, fixture boundaries and remaining limits.
+- **Next:** integrate reviewed main, complete exact-head local/hosted gates and publish a protected PR. Then trace
+  the remaining MT consumer ordering before claiming faithful Terrell combat and continuing Ranch/Hugh/Herdier.
+- **Blockers:** no human action blocks this fix. CPU/DMA SDK timing integration and later native features remain
+  unfinished. Issue 45 still needs Spanish gameplay/save evidence; the owner has no dump.
+
 ## 2026-10-28: effective input recording and fresh-process replay
 
 - **Upstream:** `fd3b9e600da72b208fa98c3486988d3d7ce16766`, reviewed main `afec4eed2b`. PR 53 merged
