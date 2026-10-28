@@ -5,6 +5,8 @@
 // Names from swan (https://github.com/ds-pokemon-hacking/swan, GPL-3.0).
 // Additional helper and table names are our descriptive guesses.
 #include "types.h"
+#include "constants/directions.h"
+#include "field/field_acmd.h"
 #include "field/field_actor.h"
 #include "field/field_map.h"
 #include "field/field_nogrid_mapper.h"
@@ -22,11 +24,17 @@ typedef struct {
     RailPosition position;
 } ActorRailWork;
 
+// ActorRailWork's position.componentIsLine before the actor has saved a position on the rail
+#define RAIL_POSITION_NONE 2
+
 // A set of directions an actor chooses among, by the number the actor's data gives
 typedef struct {
     u32 id;
     const s32 *list;
 } DirListEntry;
+
+// The id of the entry that ends DIR_LISTS
+#define DIR_LIST_END 11
 
 typedef struct {
     ActorRailWork rail;
@@ -50,6 +58,24 @@ typedef struct {
     s8 side;
     u8 front;
 } ActorRailPatrolWork;
+
+// ActorRailWalkWork's state: face the direction the actor is in, wait for it and a random time, walk a step in a
+// random direction and wait for it
+enum {
+    RAIL_WALK_FACE,
+    RAIL_WALK_WAIT_FACE,
+    RAIL_WALK_WAIT,
+    RAIL_WALK_STEP,
+    RAIL_WALK_WAIT_STEP,
+};
+
+// ActorRailPatrolWork's state: face the actor's direction, or the opposite one once it has turned back, take a step
+// and wait for it
+enum {
+    RAIL_PATROL_FACE,
+    RAIL_PATROL_STEP,
+    RAIL_PATROL_WAIT_STEP,
+};
 
 static u32 RailActor_CheckCollision(FieldActor *actor, const RailPosition *from, const RailPosition *to, u32 *tile);
 static BOOL RailActor_CheckActorCollision(FieldActor *actor, const RailPosition *pos);
@@ -80,25 +106,25 @@ static void RailActorPatrol_Free(FieldActor *actor);
 // How long an actor waits, ended by -1
 static const s32 WAIT_TIMES[5] = { 0x10, 0x20, 0x30, 0x40, -1 };
 
-// The directions an actor chooses among, ended by 9, in DIR_LISTS's order
-static const s32 DIRS_ALL[5] = { 0, 1, 2, 3, 9 };
-static const s32 DIRS_UP_LEFT[3] = { 0, 2, 9 };
-static const s32 DIRS_UP_RIGHT[3] = { 0, 3, 9 };
-static const s32 DIRS_DOWN_LEFT[3] = { 1, 2, 9 };
-static const s32 DIRS_DOWN_RIGHT[3] = { 1, 3, 9 };
-static const s32 DIRS_UP_DOWN_LEFT[4] = { 0, 1, 2, 9 };
-static const s32 DIRS_UP_DOWN_RIGHT[4] = { 0, 1, 3, 9 };
-static const s32 DIRS_UP_LEFT_RIGHT[4] = { 0, 2, 3, 9 };
-static const s32 DIRS_DOWN_LEFT_RIGHT[4] = { 1, 2, 3, 9 };
-static const s32 DIRS_UP_DOWN[3] = { 0, 1, 9 };
-static const s32 DIRS_LEFT_RIGHT[3] = { 2, 3, 9 };
+// The directions an actor chooses among, ended by DIR_NONE, in DIR_LISTS's order
+static const s32 DIRS_ALL[5] = { DIR_UP, DIR_DOWN, DIR_LEFT, DIR_RIGHT, DIR_NONE };
+static const s32 DIRS_UP_LEFT[3] = { DIR_UP, DIR_LEFT, DIR_NONE };
+static const s32 DIRS_UP_RIGHT[3] = { DIR_UP, DIR_RIGHT, DIR_NONE };
+static const s32 DIRS_DOWN_LEFT[3] = { DIR_DOWN, DIR_LEFT, DIR_NONE };
+static const s32 DIRS_DOWN_RIGHT[3] = { DIR_DOWN, DIR_RIGHT, DIR_NONE };
+static const s32 DIRS_UP_DOWN_LEFT[4] = { DIR_UP, DIR_DOWN, DIR_LEFT, DIR_NONE };
+static const s32 DIRS_UP_DOWN_RIGHT[4] = { DIR_UP, DIR_DOWN, DIR_RIGHT, DIR_NONE };
+static const s32 DIRS_UP_LEFT_RIGHT[4] = { DIR_UP, DIR_LEFT, DIR_RIGHT, DIR_NONE };
+static const s32 DIRS_DOWN_LEFT_RIGHT[4] = { DIR_DOWN, DIR_LEFT, DIR_RIGHT, DIR_NONE };
+static const s32 DIRS_UP_DOWN[3] = { DIR_UP, DIR_DOWN, DIR_NONE };
+static const s32 DIRS_LEFT_RIGHT[3] = { DIR_LEFT, DIR_RIGHT, DIR_NONE };
 
-// The sets of directions, by the number in the actor's data, ended by 11
+// The sets of directions, by the number in the actor's data, ended by DIR_LIST_END
 static const DirListEntry DIR_LISTS[] = {
     { 0, DIRS_ALL },           { 1, DIRS_UP_LEFT },       { 2, DIRS_UP_RIGHT },
     { 3, DIRS_DOWN_LEFT },     { 4, DIRS_DOWN_RIGHT },    { 5, DIRS_UP_DOWN_LEFT },
     { 6, DIRS_UP_DOWN_RIGHT }, { 7, DIRS_UP_LEFT_RIGHT }, { 8, DIRS_DOWN_LEFT_RIGHT },
-    { 9, DIRS_UP_DOWN },       { 10, DIRS_LEFT_RIGHT },   { 11, NULL },
+    { 9, DIRS_UP_DOWN },       { 10, DIRS_LEFT_RIGHT },   { DIR_LIST_END, NULL },
 };
 
 // The direction an actor ends up facing in, by the side of the rail's turn and the direction it was in
@@ -222,7 +248,7 @@ static BOOL RailActor_CheckActorCollision(FieldActor *actor, const RailPosition 
 
     FieldRailSystem_GetLocationPos(railSystem, pos, &target);
     radius = FX_Div(FieldRailSystem_GetUnitScale(railSystem), 0x4000);
-    while (NextActor(mmSys, &other, &index) == 1) {
+    while (NextActor(mmSys, &other, &index) == TRUE) {
         if (other == actor) {
             continue;
         }
@@ -262,7 +288,7 @@ FieldActor *FindActorByRailPosExcluding(MMSys *mmSys, const RailPosition *pos, B
     railSystem = FieldNoGridMapper_GetRailSystem(FldActSys_GetNoGridMapper(mmSys));
     FieldRailSystem_GetLocationPos(railSystem, pos, &target);
     radius = FX_Div(FieldRailSystem_GetUnitScale(railSystem), 0x4000);
-    while (NextActor(mmSys, &other, &index) == 1) {
+    while (NextActor(mmSys, &other, &index) == TRUE) {
         RailPosition initRail;
         RailPosition otherRail;
 
@@ -272,7 +298,7 @@ FieldActor *FindActorByRailPosExcluding(MMSys *mmSys, const RailPosition *pos, B
         if (exclude != NULL && exclude == other) {
             continue;
         }
-        if (GetActorUID(other) == 0xff) {
+        if (GetActorUID(other) == ACTOR_UID_PLAYER) {
             continue;
         }
         if (checkInit) {
@@ -538,13 +564,13 @@ static const s32 *RailActor_GetDirectionList(u32 key) {
         }
         entry++;
         id = entry->id;
-    } while (id != 0xb);
+    } while (id != DIR_LIST_END);
     return NULL;
 }
 
 static void RailActor_AcquireUnit(ActorRailWork *rail, FieldActor *actor) {
     rail->unit = FieldNoGridMapper_AcquireUnit(FldActSys_GetNoGridMapper(GetActorMModelSystem(actor)));
-    rail->position.componentIsLine = 2;
+    rail->position.componentIsLine = RAIL_POSITION_NONE;
 }
 
 static void RailActor_SaveUnitPosition(ActorRailWork *rail, FieldActor *actor) {
@@ -569,7 +595,7 @@ static void SetActorPositionRailCoordinates(ActorRailWork *rail, const RailPosit
 }
 
 static void RailActor_RestoreUnitPosition(ActorRailWork *rail, FieldActor *actor) {
-    if (rail->position.componentIsLine != 2) {
+    if (rail->position.componentIsLine != RAIL_POSITION_NONE) {
         VecFx32 pos;
 
         RailUnit_SetRailPos(rail->unit, &rail->position);
@@ -579,7 +605,7 @@ static void RailActor_RestoreUnitPosition(ActorRailWork *rail, FieldActor *actor
 }
 
 static void RailActorWait_Init(FieldActor *actor, u16 dirs) {
-    ActorRailWaitWork *work = RailActor_InitWork(actor, 0x10);
+    ActorRailWaitWork *work = RailActor_InitWork(actor, sizeof(ActorRailWaitWork));
 
     work->wait = RailActor_ChooseListValue(WAIT_TIMES, -1);
     work->dirs = dirs;
@@ -593,7 +619,7 @@ static void RailActorWait_Update(FieldActor *actor) {
     work->wait--;
     if (work->wait <= 0) {
         work->wait = RailActor_ChooseListValue(WAIT_TIMES, -1);
-        CheckSetActorFaceDir(actor, RailActor_ChooseDirection(work->dirs, 9));
+        CheckSetActorFaceDir(actor, RailActor_ChooseDirection(work->dirs, DIR_NONE));
     }
     RailActor_SaveUnitPosition(&work->rail, actor);
 }
@@ -603,11 +629,11 @@ static void RailActorWait_Free(FieldActor *actor) {
 }
 
 static void RailActorWalk_Init(FieldActor *actor, u32 dir) {
-    ActorRailWalkWork *work = RailActor_InitWork(actor, 0x10);
+    ActorRailWalkWork *work = RailActor_InitWork(actor, sizeof(ActorRailWalkWork));
     RailPosition pos;
 
     GetActorRailPos(actor, &pos);
-    work->state = 0;
+    work->state = RAIL_WALK_FACE;
     work->wait = 0;
     work->dir = dir;
     work->front = pos.posFront;
@@ -620,52 +646,52 @@ static void RailActorWalk_Update(FieldActor *actor) {
     ActorRailWalkWork *work = (ActorRailWalkWork *)GetNPCRailPosPtrAddr(actor);
 
     switch (work->state) {
-    case 0:
+    case RAIL_WALK_FACE:
         FldAct_ClearMoving(actor);
         FldAct_ClearMoveEnd(actor);
-        FldAct_SetLocalAcmd(actor, (u32)GetAcmdForDir((u32)GetActorFaceDir(actor), 0));
+        FldAct_SetLocalAcmd(actor, (u32)GetAcmdForDir((u32)GetActorFaceDir(actor), ACMD_FACE));
         work->state++;
         break;
-    case 1:
+    case RAIL_WALK_WAIT_FACE:
         if (!FieldAcmdTCB_Update(actor)) {
             break;
         }
         work->wait = RailActor_ChooseListValue(WAIT_TIMES, -1);
         work->state++;
-    case 2:
+    case RAIL_WALK_WAIT:
         work->wait--;
         if (work->wait != 0) {
             break;
         }
         work->state++;
-    case 3: {
-        u32 dir = RailActor_ChooseDirection(work->dir, 9);
+    case RAIL_WALK_STEP: {
+        u32 dir = RailActor_ChooseDirection(work->dir, DIR_NONE);
         RailPosition current;
         RailPosition next;
 
         ChangeActorDirection(actor, dir);
         if (RailActor_GetHitBitsDirNoAttr(actor, dir) != 0) {
-            work->state = 0;
+            work->state = RAIL_WALK_FACE;
             break;
         }
         GetActorRailPos(actor, &current);
         GetActorRailPosForDir(actor, dir, &next);
         if (current.componentId != next.componentId) {
-            work->state = 0;
+            work->state = RAIL_WALK_FACE;
             break;
         }
         if (RailActor_IsOutsideWalkArea(actor, work->front, work->side, &next)) {
-            work->state = 0;
+            work->state = RAIL_WALK_FACE;
             break;
         }
-        FldAct_SetLocalAcmd(actor, (u32)GetAcmdForDir(dir, 0xc));
+        FldAct_SetLocalAcmd(actor, (u32)GetAcmdForDir(dir, ACMD_WALK_8F));
         FldAct_SetMoving(actor);
         work->state++;
     }
-    case 4:
+    case RAIL_WALK_WAIT_STEP:
         if (FieldAcmdTCB_Update(actor)) {
             FldAct_ClearMoving(actor);
-            work->state = 0;
+            work->state = RAIL_WALK_FACE;
         }
         break;
     }
@@ -677,11 +703,11 @@ static void RailActorWalk_Free(FieldActor *actor) {
 }
 
 static void RailActorPatrol_Init(FieldActor *actor) {
-    ActorRailPatrolWork *work = RailActor_InitWork(actor, 0x10);
+    ActorRailPatrolWork *work = RailActor_InitWork(actor, sizeof(ActorRailPatrolWork));
     RailPosition pos;
 
     GetActorRailPos(actor, &pos);
-    work->state = 0;
+    work->state = RAIL_PATROL_FACE;
     work->reversed = 0;
     work->front = pos.posFront;
     work->side = pos.posSide;
@@ -693,16 +719,16 @@ static void RailActorPatrol_Update(FieldActor *actor) {
     ActorRailPatrolWork *work = (ActorRailPatrolWork *)GetNPCRailPosPtrAddr(actor);
 
     switch (work->state) {
-    case 0: {
+    case RAIL_PATROL_FACE: {
         u32 dir = GetDefaultActorDir(actor);
 
         if (work->reversed == 1) {
             dir = GetInverseDirection((u16)dir);
         }
         ChangeActorDirection(actor, dir);
-        work->state = 1;
+        work->state = RAIL_PATROL_STEP;
     }
-    case 1: {
+    case RAIL_PATROL_STEP: {
         u32 blocked;
         u32 acmd;
         BOOL outside;
@@ -730,19 +756,19 @@ static void RailActorPatrol_Update(FieldActor *actor) {
             blocked = RailActor_GetHitBitsDirNoAttr(actor, dir);
             GetActorRailPosForDir(actor, dir, &next);
         }
-        acmd = 0xc;
+        acmd = ACMD_WALK_8F;
         if (blocked) {
-            acmd = 0x20;
+            acmd = ACMD_STAY_WALK_8F;
         }
         FldAct_SetLocalAcmd(actor, (u32)GetAcmdForDir(dir, (u16)acmd));
         FldAct_SetMoving(actor);
-        work->state = 2;
+        work->state = RAIL_PATROL_WAIT_STEP;
         break;
     }
-    case 2:
-        if (FieldAcmdTCB_Update(actor) == 1) {
+    case RAIL_PATROL_WAIT_STEP:
+        if (FieldAcmdTCB_Update(actor) == TRUE) {
             FldAct_ClearMoving(actor);
-            work->state = 0;
+            work->state = RAIL_PATROL_FACE;
         }
         break;
     }
