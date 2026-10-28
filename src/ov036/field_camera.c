@@ -54,6 +54,14 @@ static void FieldCamera_CoordsDerive_(const VecFx32 *vec, u16 *pitch, u16 *yaw, 
 static void FieldCamera_CoordsSetFromDir(FieldCamera *camera, const VecFx32 *vec);
 static BOOL FieldCameraBoundary_RestrictRect(const FieldCameraBoundary *bound, const VecFx32 *in, VecFx32 *out);
 static BOOL FieldCameraBoundary_RestrictCircle(const FieldCameraBoundary *bound, const VecFx32 *in, VecFx32 *out);
+// The side of a rectangle that a point inside it is pushed out through
+enum {
+    RECT_SIDE_MIN_X,
+    RECT_SIDE_MAX_X,
+    RECT_SIDE_MIN_Z,
+    RECT_SIDE_MAX_Z,
+};
+
 static BOOL FieldCameraBoundary_RepealRect(const FieldCameraBoundary *bound, const VecFx32 *in, VecFx32 *out);
 static void FieldCameraApply_TransRot(const VecFx32 *base, VecFx32 *out, u16 yaw, u16 pitch, fx32 zoom);
 static void FieldCameraApply_SetAllInit(FieldCamera *camera);
@@ -91,10 +99,11 @@ static BOOL (*MM_CAMBOUND_FUNCS[])(const FieldCameraBoundary *bound, const VecFx
     FieldCameraBoundary_RepealRect,
 };
 
-FieldCamera *FieldCamera_Create(u32 cameraIndex, u32 a1, G3DCamera *g3dCamera, const VecFx32 *target, HeapID heapId) {
+FieldCamera *FieldCamera_Create(u32 cameraIndex, u32 transformType, G3DCamera *g3dCamera, const VecFx32 *target,
+                                HeapID heapId) {
     FieldCamera *camera = GFL_HeapAllocate(heapId, sizeof(FieldCamera), TRUE, "field_camera.c", 128);
     camera->defaultsIndex = cameraIndex;
-    camera->transformType = a1;
+    camera->transformType = transformType;
     camera->g3dCamera = g3dCamera;
     camera->eyeBind = NULL;
     camera->heapId = heapId;
@@ -114,7 +123,7 @@ FieldCamera *FieldCamera_Create(u32 cameraIndex, u32 a1, G3DCamera *g3dCamera, c
     camera->pitch = 0;
     camera->zoom = 120;
     camera->useBoundary = TRUE;
-    if (GFL_G3DCameraGetProjectionType(g3dCamera) == 0) {
+    if (GFL_G3DCameraGetProjectionType(g3dCamera) == G3DCAM_PROJECTION_PERSPECTIVE) {
         fx32 fovCos;
         GFL_G3DCameraPerspectiveGetFOVCos(g3dCamera, &fovCos);
         camera->fov = FX_AcosIdx(fovCos);
@@ -183,14 +192,14 @@ static void FieldCamera_CoordsLoadDefaults(FieldCamera *camera, const VecFx32 *t
     FieldCamera_SetZFar(camera, defaults.zFar);
     FieldCamera_SetZNear(camera, defaults.zNear);
     switch (defaults.swapMode) {
-    case 0:
-        GFL_G3DSysSetSwapBufferParams(0, 0);
+    case GX_BUFFERMODE_Z:
+        GFL_G3DSysSetSwapBufferParams(GX_SORTMODE_AUTO, GX_BUFFERMODE_Z);
         break;
-    case 1:
-        GFL_G3DSysSetSwapBufferParams(0, 1);
+    case GX_BUFFERMODE_W:
+        GFL_G3DSysSetSwapBufferParams(GX_SORTMODE_AUTO, GX_BUFFERMODE_W);
         break;
     }
-    if (GFL_G3DCameraGetProjectionType(camera->g3dCamera) == 0) {
+    if (GFL_G3DCameraGetProjectionType(camera->g3dCamera) == G3DCAM_PROJECTION_PERSPECTIVE) {
         GFL_G3DCameraPerspectiveSetFOVSin(camera->g3dCamera, FX_SinIdx(camera->fov));
         GFL_G3DCameraPerspectiveSetFOVCos(camera->g3dCamera, FX_CosIdx(camera->fov));
     }

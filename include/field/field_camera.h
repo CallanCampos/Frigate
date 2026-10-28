@@ -77,6 +77,7 @@ typedef struct {
     u32 yaw;
     u32 unkC;
     u8 unk10;
+    // The GXBufferMode of the swap
     u8 swapMode;
     u16 fov;
     fx32 zNear;
@@ -263,7 +264,8 @@ typedef struct {
 
 // Shakes the camera; the task ends when the shake does
 FieldTask *FieldCameraShakeTask_Create(Field *field, const FieldCameraShakeSetup *setup);
-FieldCamera *FieldCamera_Create(u32 cameraIndex, u32 a1, G3DCamera *g3dCamera, const VecFx32 *target, HeapID heapId);
+FieldCamera *FieldCamera_Create(u32 cameraIndex, u32 transformType, G3DCamera *g3dCamera, const VecFx32 *target,
+                                HeapID heapId);
 void FieldCamera_Free(FieldCamera *camera);
 // The camera's pitch
 u16 *FieldCamera_GetViewPitchPtr(FieldCamera *camera);
