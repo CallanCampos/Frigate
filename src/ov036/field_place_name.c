@@ -500,16 +500,16 @@ void PlaceName_CreateLetters(PlaceName *wk) {
     text.printQueue = wk->printQueue;
     heapId = FieldPlaceName_GetHeapID(wk);
     arc = FieldPlaceName_GetArc(wk);
-    wk->objects[0] =
-        PlaceNameLetter_Create(heapId, 0, &text, wk->clactUnit, arc, 0, wk->palettes[0], wk->chars, wk->cellAnims);
+    wk->objects[0] = PlaceNameLetter_Create(heapId, PLACE_NAME_LETTER_TEXT, &text, wk->clactUnit, arc, 0,
+                                            wk->palettes[0], wk->chars, wk->cellAnims);
     MI_CpuFill8(&frame, 0, sizeof(frame));
     frame.palette = wk->palettes[1];
     frame.chars = wk->chars;
     frame.cellAnims = wk->cellAnims;
     heapId = FieldPlaceName_GetHeapID(wk);
     arc = FieldPlaceName_GetArc(wk);
-    wk->objects[1] =
-        PlaceNameLetter_Create(heapId, 1, &frame, wk->clactUnit, arc, 0, wk->palettes[0], wk->chars, wk->cellAnims);
+    wk->objects[1] = PlaceNameLetter_Create(heapId, PLACE_NAME_LETTER_FRAME, &frame, wk->clactUnit, arc, 0,
+                                            wk->palettes[0], wk->chars, wk->cellAnims);
 }
 
 void PlaceName_FreeLetters(PlaceName *wk) {
