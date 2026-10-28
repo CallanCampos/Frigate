@@ -997,30 +997,30 @@ static BOOL FieldCameraBoundary_RepealRect(const FieldCameraBoundary *bound, con
                 if (FX32_CONST(maxZ) > pos.z) {
                     moved = TRUE;
                     best = out->x - FX32_CONST(minX);
-                    side = 0;
+                    side = RECT_SIDE_MIN_X;
                     if (best > FX32_CONST(maxX) - out->x) {
                         best = FX32_CONST(maxX) - out->x;
-                        side = 1;
+                        side = RECT_SIDE_MAX_X;
                     }
                     if (best > out->z - FX32_CONST(minZ)) {
                         best = out->z - FX32_CONST(minZ);
-                        side = 2;
+                        side = RECT_SIDE_MIN_Z;
                     }
                     if (best > FX32_CONST(maxZ) - out->z) {
                         best = FX32_CONST(maxZ) - out->z;
-                        side = 3;
+                        side = RECT_SIDE_MAX_Z;
                     }
                     switch (side) {
-                    case 0:
+                    case RECT_SIDE_MIN_X:
                         out->x = FX32_CONST(minX);
                         break;
-                    case 1:
+                    case RECT_SIDE_MAX_X:
                         out->x = FX32_CONST(maxX);
                         break;
-                    case 2:
+                    case RECT_SIDE_MIN_Z:
                         out->z = FX32_CONST(minZ);
                         break;
-                    case 3:
+                    case RECT_SIDE_MAX_Z:
                         out->z = FX32_CONST(maxZ);
                         break;
                     }
