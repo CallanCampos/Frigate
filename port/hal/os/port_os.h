@@ -98,6 +98,15 @@ uint64_t port_os_cycles(void);
 uint32_t port_os_vcount(void);
 uint32_t port_os_frame(void);
 void port_os_spin(uint64_t cycles);
+// Wait for an absolute device deadline, spending elapsed IRQ/other-thread time toward it (unlike spin's own CPU
+// work). Physical DMA unit stalls may pass the target before ARM9 can resume; they never extend the target.
+// Boot/thread fibers and IRQ handlers may call it. Returns 0 without advancing from a host callback or
+// outside a run; returns 1 after reaching/passing deadline. A past deadline never rewinds. Event ordering is unchanged.
+// Timed host work progresses even with IRQs masked; IF delivery still follows I/IE/IME. IRQ waits run that work on
+// their existing dispatcher stack without nested IRQ delivery. Host callbacks must publish device state, never wait
+// recursively or call the SDK. A stop disposes a suspended thread fiber as for other waits; from an IRQ wait it
+// returns 0, and the handler must unwind. This is a device wait, not a sleeping-thread or CPU-work primitive.
+int port_os_wait_until(uint64_t deadline);
 // IF as the HAL keeps it (reg_OS_IF reads the same), and OS_SetIrqCheckFlag's word (HW_INTR_CHECK_BUF, at the end of
 // the host's DTCM block), for handlers that can't reach it through HW_DTCM yet (see os_irqTable.c)
 uint32_t port_os_get_if(void);
@@ -110,7 +119,8 @@ typedef struct PortOsStats {
     uint32_t fibersAlive;
     uint32_t fibersCreated;
     uint32_t halts;
-    uint32_t irqs; // handlers run
+    uint32_t irqs;              // handlers run
+    uint64_t deviceStallCycles; // physical CARD DMA bus service; excluded from own CPU work, counted once
 } PortOsStats;
 PortOsStats port_os_stats(void);
 // The deepest a thread's host stack (given as its OSThread) has gone, when the fibers are painted

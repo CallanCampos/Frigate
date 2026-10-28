@@ -60,7 +60,7 @@ set(port_os_scenarios
     wakeup_preempts yield_order queue_wake_order join_destructor mutex message_queue vblank_and_alarms
     irq_wakeup_deferred irq_while_disabled busy_wait_preempted scheduler_lock destroy_and_recreate kill_thread
     switch_callback hblank_lines hblank_main_loop hblank_flag_in_handler dispstat_gates_blanks
-    frame_hooks_on_host_stack timed_work irq_on_switch_in async_completion waits request_irq scanline_hook
+    frame_hooks_on_host_stack timed_work device_deadline device_preempted device_masked device_irq_wait device_lifecycle irq_on_switch_in async_completion waits request_irq scanline_hook
     display_registers timers_and_tick stop_from_frame_hook arenas locks console deadlock determinism boot_cpsr
     destroy_many wait_vcount0 valarm_each_run wcm_workspace)
 foreach(scenario IN LISTS port_os_scenarios)

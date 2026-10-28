@@ -15,6 +15,7 @@ main-save blocks. Standard library only.
 
 from __future__ import annotations
 
+import binascii
 import struct
 
 BACKUP_SIZE = 0x80000
@@ -36,11 +37,10 @@ SAVE_MAGIC = 0x31053527
 
 
 def _crc16_update(crc: int, data: bytes) -> int:
-    for byte in data:
-        crc ^= byte << 8
-        for _ in range(8):
-            crc = ((crc << 1) ^ 0x1021) & 0xffff if crc & 0x8000 else (crc << 1) & 0xffff
-    return crc
+    # The standard-library C implementation has the same 0x1021, non-reflected update with no final XOR.
+    # Retain the supplied state: block discovery updates four bytes at a time, while validation hashes full blocks.
+    # This keeps all 73 checks in both banks affordable on slower CI runners without changing their timeout.
+    return binascii.crc_hqx(data, crc)
 
 
 def crc16_ccitt(data: bytes) -> int:
