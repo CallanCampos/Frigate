@@ -32,13 +32,39 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
 
+## 2026-10-28: the window on Linux, with the game's symbols hidden from a shared SDL3
+
+- **Upstream:** `fd3b9e600d`, as reviewed main `b631907c33` has it; this branch merges no upstream commit.
+- **Port:** `PORT_SHA`, on `port/linux-hidden-game-symbols`, from `b631907c33`.
+- **ROM:** T0 not run: this clone has no `orig/`. The branch changes only `port/CMakeLists.txt` and this file, so
+  MWCC's build is untouched; T0 is still due before merge.
+- **Host build:** Linux (Ubuntu 26.04, clang 21.1.8, the distribution's shared SDL3 3.4.2), RelWithDebInfo,
+  `build/port` (us) and `build/port-es` (es) build. `nm -D --defined-only` on either program lists only `main`, where
+  it listed GameSpy's `socket`, `connect`, `bind`, `send`, `sendto`, `recv`, `recvfrom`, `setsockopt`, `getsockname`,
+  `inet_addr` and `shutdown` before.
+- **Tests:** T2, T3 and T6 by `ctest -j8`, without a ROM: 355 of 355 in each build, the ROM tests skipped. With the
+  IRES dump, the es program opens its window (it stopped with "SDL_Init failed: No available video device" before) and
+  writes the Pokémon, Nintendo, Creatures and Game Freak screen at frame 180. T4, T5 and T7 not run.
+- **Tiers:** unchanged: no game C changes.
+- **Trap stubs:** unchanged: no game or HAL source changes.
+- **64-bit warnings:** not rerun: no C changes; the last entry's 365 sites, real 66, stand.
+- **Work done:** on Linux, an executable exports a definition that a shared library refers to, and it wins over the
+  C library's. GameSpy defines the BSD socket calls for the DS (`lib/dwc/src/gscommon/gsPlatformSocket.c`), so
+  libwayland-client and libX11, loaded by a distribution's shared SDL3, called GameSpy's `socket` and `connect`, found
+  no display, and SDL fell through every video driver: no window on any Linux desktop, the US build too. CI runs
+  headless and didn't see it. `port_decomp_env` compiles
+  the decomp with `-fvisibility=hidden` on Linux: the game's calls bind as before, inside the program. No game change.
+- **Next:** this branch published as a pull request to `main`, T0 and the owner's review. Issue 45's Spanish
+  gameplay and save evidence can now be gathered by playing the es build with a window.
+- **Blockers:** none.
+
 ## 2026-10-28: keep complete save validation fast on CI
 
 - **Upstream:** `fd3b9e600da72b208fa98c3486988d3d7ce16766`; reviewed main `70085bfae7`.
   PR 55's foundation head `3c6928e219` passed its exact-head local gates: B2 346 passed/28 explicit skips of 374;
   W2 343/28 of 371, zero failures, status 57467175440. Its macOS 15 Intel job then timed out after 120.14 seconds
   in `oracle_save_image`; every other hosted job passed. The merge remains gated on the corrected head's checks.
-- **Port:** `PORT_SHA`, a follow-up on `codex/card-physical-foundation`. This changes the oracle's Python CRC
+- **Port:** `ca9555921c`, a follow-up on `codex/card-physical-foundation`. This changes the oracle's Python CRC
   implementation and incremental CRC tests. No native C/header/build configuration, game data or workflow change.
 - **ROM (T0):** fresh configure/Ninja passes both original hashes with zero warnings: B2
   `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb`, W2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`.

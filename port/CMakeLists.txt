@@ -279,6 +279,14 @@ if(UNIX AND NOT APPLE)
     set(PORT_LIBM m)
 endif()
 target_link_libraries(port_decomp_env INTERFACE ${PORT_LIBM})
+# The decomp defines functions under the C library's names, GameSpy's socket, connect, send and recv for the DS
+# (lib/dwc/src/gscommon/gsPlatformSocket.c). On Linux an executable exports a definition that a shared library refers
+# to, and that definition wins over the C library's: a distribution's shared SDL3 then reached Wayland and X11 through
+# GameSpy's socket and found no display ("No available video device"). Hidden, the game's symbols stay inside the
+# program and its calls are unchanged. macOS's two-level namespace and Windows' imports never bind across like this
+if(UNIX AND NOT APPLE)
+    target_compile_options(port_decomp_env INTERFACE -fvisibility=hidden)
+endif()
 
 add_library(pokebw2_game OBJECT ${game_sources})
 target_link_libraries(pokebw2_game PRIVATE port_decomp_env)
