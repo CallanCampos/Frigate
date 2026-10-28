@@ -38,12 +38,12 @@ void FldeffIwakudaki_Start(FieldActor *actor, FieldEffects *effects);
 FieldEffectTask *FldeffFishing_Start(FieldEffects *effects, const VecFx32 *pos, u32 dir, u32 sameHeight);
 void FldeffFishing_SetAnimeSpeed(FieldEffectTask *task, u16 speed);
 // The festival's sparkles: start their task, show one at pos, hide one or all, and whether one shows and its value
-FieldEffectTask *func_ov036_021a5bb4(FieldEffects *effects);
-void func_ov036_021a5c04(FieldEffectTask *task, u8 idx, u16 value, const VecFx32 *pos);
-void func_ov036_021a5c2c(FieldEffectTask *task, u8 idx);
-void func_ov036_021a5c44(FieldEffectTask *task);
-u16 func_ov036_021a5c5c(FieldEffectTask *task, u8 idx);
-u16 func_ov036_021a5c74(FieldEffectTask *task, u8 idx);
+FieldEffectTask *FldeffFesKira_Start(FieldEffects *effects);
+void FldeffFesKira_Show(FieldEffectTask *task, u8 idx, u16 value, const VecFx32 *pos);
+void FldeffFesKira_Hide(FieldEffectTask *task, u8 idx);
+void FldeffFesKira_HideAll(FieldEffectTask *task);
+u16 FldeffFesKira_IsShown(FieldEffectTask *task, u8 idx);
+u16 FldeffFesKira_GetValue(FieldEffectTask *task, u8 idx);
 // The field effect of a phenomenon, which fldeff_encount.c plays
 FieldEffectTask *EncountTask_Start(EncountSystem *system, FieldEffects *effects, u16 x, u16 z, fx32 height, u32 kind);
 // Pause and hide a phenomenon
@@ -185,8 +185,8 @@ void *func_ov036_021be988(FieldEffects *effects, HeapID heapId);
 void func_ov036_021be9ac(FieldEffects *effects, void *data);
 void *func_ov036_021c944c(FieldEffects *effects, HeapID heapId);
 void func_ov036_021c9470(FieldEffects *effects, void *data);
-void *func_ov036_021a5a18(FieldEffects *effects, HeapID heapId);
-void func_ov036_021a5a20(FieldEffects *effects, void *data);
+void *FldeffFesKira_Create(FieldEffects *effects, HeapID heapId);
+void FldeffFesKira_Delete(FieldEffects *effects, void *data);
 void *EncountTask_CreateGrass(FieldEffects *effects, HeapID heapId);
 void *EncountTask_CreateReallyTallGrass(FieldEffects *effects, HeapID heapId);
 void *EncountTask_CreateDustCloud(FieldEffects *effects, HeapID heapId);

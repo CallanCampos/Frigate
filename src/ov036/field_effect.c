@@ -96,7 +96,7 @@ static const FieldEffectVTable FIELD_EFFECT_VTABLES[FLDEFF_MAX + 1] = {
     { 15, FldeffBubble_CreateRes, func_ov036_021c6990 },
     { 16, func_ov036_021be988, func_ov036_021be9ac },
     { 17, func_ov036_021c944c, func_ov036_021c9470 },
-    { 18, func_ov036_021a5a18, func_ov036_021a5a20 },
+    { 18, FldeffFesKira_Create, FldeffFesKira_Delete },
     { 19, EncountTask_CreateGrass, EncountTask_Delete },
     { 20, EncountTask_CreateReallyTallGrass, EncountTask_Delete },
     { 21, EncountTask_CreateDustCloud, EncountTask_Delete },

@@ -50,53 +50,53 @@ typedef struct {
     FesKira kiras[FES_KIRA_MAX];
 } FesKiraTask;
 
-static FieldEffectFesKira *func_ov036_021a5a34(FieldEffects *effects, HeapID heapId);
-static void func_ov036_021a5a58(FieldEffectFesKira *effect);
-static void func_ov036_021a5a90(FesKiraObj *obj, FieldEffectFesKira *effect);
-static void func_ov036_021a5afc(FesKiraObj *obj, FieldEffectFesKira *effect);
-static void func_ov036_021a5b34(FieldEffectFesKira *effect, const FesKiraSpec *spec, ArcTool *arc);
-static void func_ov036_021a5b78(FieldEffectFesKira *effect);
-static void func_ov036_021a5c8c(FieldEffectTask *task, void *work);
-static void func_ov036_021a5ca8(FieldEffectTask *task, void *work);
-static void func_ov036_021a5cac(FieldEffectTask *task, void *work);
-static void func_ov036_021a5cdc(FieldEffectTask *task, void *work);
+static FieldEffectFesKira *FldeffFesKira_CreateCore(FieldEffects *effects, HeapID heapId);
+static void FldeffFesKira_LoadSpec(FieldEffectFesKira *effect);
+static void FesKiraObj_Create(FesKiraObj *obj, FieldEffectFesKira *effect);
+static void FesKiraObj_Free(FesKiraObj *obj, FieldEffectFesKira *effect);
+static void FldeffFesKira_LoadModel(FieldEffectFesKira *effect, const FesKiraSpec *spec, ArcTool *arc);
+static void FldeffFesKira_FreeResources(FieldEffectFesKira *effect);
+static void FldeffFesKira_Init(FieldEffectTask *task, void *work);
+static void FldeffFesKira_Exit(FieldEffectTask *task, void *work);
+static void FldeffFesKira_Update(FieldEffectTask *task, void *work);
+static void FldeffFesKira_Draw(FieldEffectTask *task, void *work);
 
 // clang-format off
 static const FieldEffectTaskVTable FES_KIRA_TASK_VTABLE = {
     sizeof(FesKiraTask),
-    func_ov036_021a5c8c,
-    func_ov036_021a5ca8,
-    func_ov036_021a5cac,
-    func_ov036_021a5cdc,
+    FldeffFesKira_Init,
+    FldeffFesKira_Exit,
+    FldeffFesKira_Update,
+    FldeffFesKira_Draw,
 };
 
 // clang-format on
 
 static FesKiraSpec FES_KIRA_SPEC = { 1, 99, { 158, 0, 0, 0 } };
 
-void *func_ov036_021a5a18(FieldEffects *effects, HeapID heapId) {
-    return func_ov036_021a5a34(effects, heapId);
+void *FldeffFesKira_Create(FieldEffects *effects, HeapID heapId) {
+    return FldeffFesKira_CreateCore(effects, heapId);
 }
 
-void func_ov036_021a5a20(FieldEffects *effects, void *data) {
-    func_ov036_021a5b78(data);
+void FldeffFesKira_Delete(FieldEffects *effects, void *data) {
+    FldeffFesKira_FreeResources(data);
     GFL_HeapFree(data);
 }
 
-static FieldEffectFesKira *func_ov036_021a5a34(FieldEffects *effects, HeapID heapId) {
+static FieldEffectFesKira *FldeffFesKira_CreateCore(FieldEffects *effects, HeapID heapId) {
     FieldEffectFesKira *effect = GFL_HeapAllocate(heapId, sizeof(FieldEffectFesKira), TRUE, "fldeff_fes_kira.c", 179);
 
     effect->effects = effects;
-    func_ov036_021a5a58(effect);
+    FldeffFesKira_LoadSpec(effect);
     return effect;
 }
 
-static void func_ov036_021a5a58(FieldEffectFesKira *effect) {
+static void FldeffFesKira_LoadSpec(FieldEffectFesKira *effect) {
     effect->spec = FES_KIRA_SPEC;
-    func_ov036_021a5b34(effect, &effect->spec, FieldEffects_GetArc(effect->effects));
+    FldeffFesKira_LoadModel(effect, &effect->spec, FieldEffects_GetArc(effect->effects));
 }
 
-static void func_ov036_021a5a90(FesKiraObj *obj, FieldEffectFesKira *effect) {
+static void FesKiraObj_Create(FesKiraObj *obj, FieldEffectFesKira *effect) {
     int i;
 
     obj->mdl = GFL_G3DMdlCreate(effect->mdlRes, 0, effect->mdlRes);
@@ -109,7 +109,7 @@ static void func_ov036_021a5a90(FesKiraObj *obj, FieldEffectFesKira *effect) {
     }
 }
 
-static void func_ov036_021a5afc(FesKiraObj *obj, FieldEffectFesKira *effect) {
+static void FesKiraObj_Free(FesKiraObj *obj, FieldEffectFesKira *effect) {
     int i;
 
     for (i = 0; i < effect->spec.anmCount; i++) {
@@ -119,7 +119,7 @@ static void func_ov036_021a5afc(FesKiraObj *obj, FieldEffectFesKira *effect) {
     GFL_G3DMdlFree(obj->mdl);
 }
 
-static void func_ov036_021a5b34(FieldEffectFesKira *effect, const FesKiraSpec *spec, ArcTool *arc) {
+static void FldeffFesKira_LoadModel(FieldEffectFesKira *effect, const FesKiraSpec *spec, ArcTool *arc) {
     int i;
 
     effect->mdlRes = GFL_G3DSysReadArcToolResource(arc, spec->mdlId);
@@ -127,13 +127,13 @@ static void func_ov036_021a5b34(FieldEffectFesKira *effect, const FesKiraSpec *s
     for (i = 0; i < spec->anmCount; i++) {
         effect->anmRes[i] = GFL_G3DSysReadArcToolResource(arc, spec->anmIds[i]);
     }
-    func_ov036_021a5a90(&effect->obj, effect);
+    FesKiraObj_Create(&effect->obj, effect);
 }
 
-static void func_ov036_021a5b78(FieldEffectFesKira *effect) {
+static void FldeffFesKira_FreeResources(FieldEffectFesKira *effect) {
     int i;
 
-    func_ov036_021a5afc(&effect->obj, effect);
+    FesKiraObj_Free(&effect->obj, effect);
     for (i = 0; i < effect->spec.anmCount; i++) {
         GFL_G3DResFree(effect->anmRes[i]);
     }
@@ -142,7 +142,7 @@ static void func_ov036_021a5b78(FieldEffectFesKira *effect) {
 }
 
 // Start the sparkles' task, with none shown, if the map has loaded the effect
-FieldEffectTask *func_ov036_021a5bb4(FieldEffects *effects) {
+FieldEffectTask *FldeffFesKira_Start(FieldEffects *effects) {
     FesKiraTaskParams params;
     Field *field = FieldEffects_GetField(effects);
     FieldEffectFesKira *effect = FieldEffects_GetHandleData(effects, 18);
@@ -157,7 +157,7 @@ FieldEffectTask *func_ov036_021a5bb4(FieldEffects *effects) {
 }
 
 // Show sparkle idx at pos
-void func_ov036_021a5c04(FieldEffectTask *task, u8 idx, u16 value, const VecFx32 *pos) {
+void FldeffFesKira_Show(FieldEffectTask *task, u8 idx, u16 value, const VecFx32 *pos) {
     FesKiraTask *kiraTask = FieldEffects_GetObjectWork(task);
 
     if (idx < FES_KIRA_MAX) {
@@ -168,7 +168,7 @@ void func_ov036_021a5c04(FieldEffectTask *task, u8 idx, u16 value, const VecFx32
 }
 
 // Hide sparkle idx, and every sparkle
-void func_ov036_021a5c2c(FieldEffectTask *task, u8 idx) {
+void FldeffFesKira_Hide(FieldEffectTask *task, u8 idx) {
     FesKiraTask *kiraTask = FieldEffects_GetObjectWork(task);
 
     if (idx < FES_KIRA_MAX) {
@@ -176,7 +176,7 @@ void func_ov036_021a5c2c(FieldEffectTask *task, u8 idx) {
     }
 }
 
-void func_ov036_021a5c44(FieldEffectTask *task) {
+void FldeffFesKira_HideAll(FieldEffectTask *task) {
     int i;
     FesKiraTask *kiraTask = FieldEffects_GetObjectWork(task);
 
@@ -186,7 +186,7 @@ void func_ov036_021a5c44(FieldEffectTask *task) {
 }
 
 // Whether sparkle idx shows, and its value
-u16 func_ov036_021a5c5c(FieldEffectTask *task, u8 idx) {
+u16 FldeffFesKira_IsShown(FieldEffectTask *task, u8 idx) {
     FesKiraTask *kiraTask = FieldEffects_GetObjectWork(task);
 
     if (idx >= FES_KIRA_MAX) {
@@ -195,7 +195,7 @@ u16 func_ov036_021a5c5c(FieldEffectTask *task, u8 idx) {
     return kiraTask->kiras[idx].active;
 }
 
-u16 func_ov036_021a5c74(FieldEffectTask *task, u8 idx) {
+u16 FldeffFesKira_GetValue(FieldEffectTask *task, u8 idx) {
     FesKiraTask *kiraTask = FieldEffects_GetObjectWork(task);
 
     if (idx >= FES_KIRA_MAX) {
@@ -204,17 +204,17 @@ u16 func_ov036_021a5c74(FieldEffectTask *task, u8 idx) {
     return kiraTask->kiras[idx].value;
 }
 
-static void func_ov036_021a5c8c(FieldEffectTask *task, void *work) {
+static void FldeffFesKira_Init(FieldEffectTask *task, void *work) {
     FesKiraTask *kiraTask = work;
 
     kiraTask->params = *(FesKiraTaskParams *)FieldEffects_GetObjectParam(task);
     FieldEffects_UpdateObject(task);
 }
 
-static void func_ov036_021a5ca8(FieldEffectTask *task, void *work) {
+static void FldeffFesKira_Exit(FieldEffectTask *task, void *work) {
 }
 
-static void func_ov036_021a5cac(FieldEffectTask *task, void *work) {
+static void FldeffFesKira_Update(FieldEffectTask *task, void *work) {
     int i;
     FesKiraTask *kiraTask = work;
     FieldEffectFesKira *effect = kiraTask->params.effect;
@@ -224,7 +224,7 @@ static void func_ov036_021a5cac(FieldEffectTask *task, void *work) {
     }
 }
 
-static void func_ov036_021a5cdc(FieldEffectTask *task, void *work) {
+static void FldeffFesKira_Draw(FieldEffectTask *task, void *work) {
     SRTMatrix srt = { { 0, 0, 0 }, { FX32_ONE, FX32_ONE, FX32_ONE } };
     int i;
     FesKiraTask *kiraTask = work;
