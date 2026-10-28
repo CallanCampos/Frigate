@@ -32,13 +32,54 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
 
+## 2026-10-27: upstream sync prepared through `02cfabcc50`; native blockers fixed
+
+Preparation record for PR 43. Final base reconciliation, long route checks and publication follow; this is not a
+completed sync on main.
+
+- **Upstream:** `02cfabcc5023ee432980f88645d41593c614c61f`, 46 commits after reviewed `deb044db2d3d`.
+  The original merge through `61ec4115fd52` and subsequent real merge `95806b27ac` retain the upstream parents.
+  The owner explicitly authorized this sync's reference exception for incoming commit `f2b0f0c299` on 2026-10-27;
+  no reference gate, App permission or branch rule is disabled.
+- **Port:** `PORT_SHA`, on `codex/upstream-sync-61ec4115fd52-f786fed9939d`, after reviewed-main merge `4316d79bb4`.
+  This local preparation is not yet pushed. Reviewed PRs 42 and 40 are merged; PR 44's experimental loader remains
+  separate and must be reviewed/validated before main is merged into this proposal again.
+- **ROM (T0):** configure/Ninja, 10,691 steps, both original SHA1s match: B2
+  `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb`, W2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`.
+  `check_mwcc_neutral.py --base 02cfabcc50 --jobs 2 src/gfl/arc_tool.c` passes 2/2; the DS assembly's tokens remain
+  unchanged in both versions. All existing port adaptations are retained.
+- **Host build (T1):** both ordinary arm64 macOS all-target builds pass. The newly recovered SDK globals replace
+  19 data placeholders; no imported C is excluded to hide the new link reference.
+- **Tests (T2/T3):** `integrate_archive_seek*` and `hal_gscrypt_*` pass 4/4 in the focused B2 run. Both full ordinary
+  core runs are in progress, excluding timing/oracle labels. B2's New Game, house and same-save replays, strict
+  pointer guard and real assembly oracle (5/5, zero skips) pass. Final counts belong to the publication record.
+- **T4/T5/T6/T7:** full updated Phase 4 oracle routes, strict native replays, produced-save comparisons and windowed
+  save/reload checks remain due after the final reviewed base is integrated; no earlier result is relabeled as this
+  sync's complete route proof. JPEG/camera/network gameplay is outside the Phase 4 coverage.
+- **Tiers:** `port/tools/progress/progress.py --root . --version <version> --out <local-output>`: 40,949 tier (a)
+  ROM-linked functions, zero tier (b), 68 tier (c), with 2,385 veneers excluded. Relative to reviewed main: +509 in
+  (a), -509 in (b), (c) unchanged. Code bytes a/b/c: B2 3,845,958/0/4,302, W2 3,846,046/0/4,302.
+- **Trap stubs:** 25 functions and one data placeholder in the ordinary B2 generated source (previously 25/20).
+  The separate absent-ROM GameSpy declarations have explicit typed terminating implementations in the HAL.
+- **64-bit warnings:** B2 guard: 365 sites/229 keys, real 66, harmless 123, handled 141, unreachable 35;
+  1,703 compiled inputs, zero uncompiled. The classified baseline is unchanged.
+- **Work done:** retained equivalent host C for `ArchiveMoveImageTop` after upstream's MWCC-only ARM exception,
+  preserving its seeks, lengths and assert arguments; the original DS assembly remains under `#else`.
+  Added the exact SDK-signature `gsCryptRSAEncryptBuffer` absent-ROM terminator and actual-source/typed-call
+  regressions. Updated IRQ ownership comments and module/test maps; [game-changes.md](game-changes.md) records
+  the only additional change outside `port/`.
+- **Next:** integrate the final reviewed main after PR 44, complete the remaining route/gate validation, update
+  this PR's exact head, obtain delegated owner approval and merge through protection.
+- **Blockers:** no known source blocker; validation is ongoing. Spanish gameplay/save evidence remains issue #45,
+  and the recording implementation remains issue #38.
+
 ## 2026-10-26: Phase 4 catch, save, quit and reload validated in both games
 
 Completed local validation of the recovered route, not a completed upstream sync or a release. The ready PR and its
 exact-head local/hosted checks are the publication record. ADR 0023 remains **proposed** for owner review.
 
 - **Upstream:** unchanged, `deb044db2d3d` from reviewed main `f786fed993` (PR 41); no pending upstream changes imported.
-- **Port:** `PORT_SHA`, on `codex/phase4-route`. Integration `91d0874aa9` retains reviewed main and the original
+- **Port:** `ed26ff887f`, on `codex/phase4-route`. Integration `91d0874aa9` retains reviewed main and the original
   Phase 4 history as parents. Runtime fixes are `9a8d4f2a0c`; this entry and the final proof updates change records
   only. Original `wt-p4` and `wt-p4b` HEADs, staged patches and working patches were rechecked unchanged; a separate
   verified self-contained history bundle and binary patches preserve the unfinished work.

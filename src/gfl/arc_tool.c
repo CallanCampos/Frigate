@@ -91,6 +91,39 @@ static void GFL_ArcSysInitArcHandle(FSFile *file, u32 arcId) {
     }
 }
 
+#ifdef PLATFORM_PC
+// The host keeps the equivalent C used before upstream's MWCC-only assembly exception. The dead stack store that
+// forced that exception affects neither archive offsets nor data; host compilers cannot assemble its ARM code.
+static u32 ArchiveMoveImageTop(FSFile *file, u32 fileId, u32 offset, u32 size) {
+    NarcFATBEntry entry;
+    NarcFATBHeader fatb;
+    u32 value = 0;
+    u32 fntbOffset;
+    u32 fimgOffset;
+    u32 fatbOffset;
+
+    FS_SeekFile(file, NARC_HEADER_SIZE_OFFSET, FS_SEEK_SET);
+    FS_ReadFile(file, &value, 2);
+    fatbOffset = value;
+    FS_SeekFile(file, fatbOffset + NARC_BLOCK_SIZE_OFFSET, FS_SEEK_SET);
+    FS_ReadFile(file, &fatb, 6);
+    if (!(fatb.fileCount > fileId)) {
+        GFL_DebugAssertFailEx(sAssertNameAndFormat, 0, sAssertNameAndFormat + 4, fatb.fileCount, fileId);
+    }
+    fntbOffset = fatbOffset + fatb.size;
+    FS_SeekFile(file, fntbOffset + NARC_BLOCK_SIZE_OFFSET, FS_SEEK_SET);
+    FS_ReadFile(file, &value, 4);
+    fimgOffset = fntbOffset + value;
+    FS_SeekFile(file, fatbOffset + NARC_FATB_ENTRIES_OFFSET + fileId * sizeof(NarcFATBEntry), FS_SEEK_SET);
+    FS_ReadFile(file, &entry, sizeof(NarcFATBEntry));
+    fimgOffset += NARC_FIMG_DATA_OFFSET + entry.start;
+    FS_SeekFile(file, offset + fimgOffset, FS_SEEK_SET);
+    if (size == 0) {
+        size = entry.end - entry.start;
+    }
+    return size;
+}
+#else
 // Seeks to the data of a file of an archive, at offset into it, and returns its size, or size if it is not 0.
 // Hand-written in assembly: the original build's compiler kept the dead store of fimgOffset + 8 back to its stack
 // slot, which no installed compiler produces from the C, so the maintainer took the assembly exception for this, the
@@ -183,6 +216,7 @@ SizeDone:
 }
 
 // clang-format on
+#endif
 
 void GFL_ArcSysRead(void *dest, u32 arcId, u32 fileId) {
     GFL_ArcSysReadImpl(dest, arcId, fileId, 0, 0);

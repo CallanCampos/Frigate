@@ -20,6 +20,11 @@ callback's tokens 0x12/0x13 (the two `OS_SetAlarm` calls). No address enters thi
 these casts. No source change, broad baseline update or guard relaxation is needed; existing baseline rows retain
 their counts and classifications.
 
+The sync through `02cfabcc50` exposes one more absent-ROM reference: `AuthService.c`'s recovered password login
+calls `gsCryptRSAEncryptBuffer`, declared in `dwc/gsCrypt.h` but absent from the ROM and its symbol map.
+[../hal/stubs/gscrypt.c](../hal/stubs/gscrypt.c) preserves the exact SDK signature and stops with its name and exit 70
+for every argument, including NULL. It provides no encryption result or fabricated DS address.
+
 ## The three allowed kinds
 
 1. **Neutral:** a portability fix that compiles to the same bytes under MWCC, such as `uptr` for a value that carries
@@ -82,6 +87,7 @@ file keeps what the port needed.
 
 | File | Kind | Guard or macro | Why | MWCC-neutral proof | Commit |
 | --- | --- | --- | --- | --- | --- |
+| `src/gfl/arc_tool.c` | Platform | `#ifdef PLATFORM_PC` around `ArchiveMoveImageTop`; original DS assembly under `#else` | Host uses the equivalent pre-assembly C: upstream requires an MWCC-only ARM exception for a dead stack store. NARC seeks, explicit/default lengths and assertion arguments stay the same. | `integrate_archive_seek*`: actual source with bounded synthetic FS callbacks, ASan/UBSan. MWCC tokens match `02cfabcc50` in both versions (2/2); both original ROM SHA1s pass after the full build. | `PORT_SHA` |
 | `include/gfl/overlay.h` | Platform | `#ifdef PLATFORM_PC` around `OVERLAY_ID` | `OVERLAY_ID(n)` is the address of a linker symbol; the host links every overlay into one program, so the ID is `n` | `check_mwcc_neutral.py`, every file, both versions; ninja, both SHA1s | `577554b0b` |
 | `lib/nitro/include/nitro/math.h` | Platform | `#if defined(PLATFORM_PC)` before `#elif defined(__thumb)` | `MATH_CountLeadingZeros` is an MWCC `asm` block; the host counts with `__builtin_clz` | as above | `577554b0b` |
 | `lib/nitro/src/crypto/rc4.c`, `fx/fx_mtx22.c`, `fx/fx_mtx33.c`, `fx/fx_mtx43.c`, `fx/fx_mtx44.c`, `gx/g3x.c`, `math/math_pop.c` | Platform | `#ifndef PLATFORM_PC` around each MWCC `asm` function (18 in all) | MWCC `asm` functions don't compile on a host; `port/hal` provides host versions | as above | `577554b0b` |

@@ -104,3 +104,12 @@ that incorrect native and verifier callback types still fail: a capability probe
 `integrate_encounter_dispatch` compiles the actual `src/ov036/enceff_data.c` table with constructors declared by
 its SDK headers. All 38 callbacks must preserve their target, object pointers, used parameter and return value;
 UBSan has no ignorelist. LLVM checks the function types too; Apple clang still checks argument forwarding.
+
+### Archive seek and absent RSA regressions
+
+`integrate_archive_seek` includes the actual `src/gfl/arc_tool.c` with a fabricated two-file NARC and bounded FS
+callbacks: default and explicit lengths, range offsets, bytes and empty entries must agree. Its assertion subprocess
+must name the invalid member and exit 70. ASan/UBSan remain fatal; no ROM or engine stand-in is involved.
+`hal_gscrypt_null` and `hal_gscrypt_buffers` call the actual SDK declaration and the absent-ROM terminator in
+[hal/test_gscrypt.c](hal/test_gscrypt.c); [hal/check_gscrypt.py](hal/check_gscrypt.py) requires its name, diagnostic and
+exit 70, rejecting a return or unrelated fault. The tests cover link contracts, not online gameplay.

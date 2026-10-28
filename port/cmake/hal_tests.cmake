@@ -100,3 +100,15 @@ foreach(variant IN ITEMS plain sanitized)
     endif()
     add_test(NAME hal_std_string_${variant} COMMAND ${target})
 endforeach()
+
+# AuthService's reconstructed password logins reference RSA encryption absent from the DS link and ROM.
+add_executable(test_hal_gscrypt tests/hal/test_gscrypt.c hal/stubs/gscrypt.c)
+target_link_libraries(test_hal_gscrypt PRIVATE port_decomp_env)
+target_include_directories(test_hal_gscrypt PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
+target_compile_options(test_hal_gscrypt PRIVATE -Wall -Wextra -Werror)
+foreach(mode IN ITEMS null buffers)
+    add_test(NAME hal_gscrypt_${mode}
+        COMMAND "${PORT_PYTHON}" "${CMAKE_CURRENT_SOURCE_DIR}/tests/hal/check_gscrypt.py"
+            "$<TARGET_FILE:test_hal_gscrypt>" "${mode}")
+    set_tests_properties(hal_gscrypt_${mode} PROPERTIES TIMEOUT 30)
+endforeach()
