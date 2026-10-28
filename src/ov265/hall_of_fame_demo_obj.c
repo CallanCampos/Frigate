@@ -315,7 +315,7 @@ void HallOfFameDemoObj_AddPoke(HallOfFameDemoWork *wk) {
 }
 
 void HallOfFameDemoObj_LoadTypePalette(HallOfFameDemoWork *wk) {
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_DENDOU_DEMO, HEAPID_TAIL(HEAPID_HALL_OF_FAME_DEMO));
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_HALL_OF_FAME_DEMO, HEAPID_TAIL(HEAPID_HALL_OF_FAME_DEMO));
     NNSG2dPaletteData *palette;
     void *file = GFL_G2DIOReadNCLRArc(arc, sHallOfFameDemoTypePalettes[wk->type], &palette, HEAPID_HALL_OF_FAME_DEMO);
 
@@ -478,7 +478,7 @@ void HallOfFameDemoObj_SetFontOamVisible(HallOfFameDemoWork *wk, u32 id, BOOL vi
 
 // Loads the main screen's actors' graphics and the font's palette
 static void HallOfFameDemoObj_LoadResources(HallOfFameDemoWork *wk) {
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_DENDOU_DEMO, HEAPID_TAIL(HEAPID_HALL_OF_FAME_DEMO));
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_HALL_OF_FAME_DEMO, HEAPID_TAIL(HEAPID_HALL_OF_FAME_DEMO));
 
     wk->chrRes[HALL_OF_FAME_DEMO_CHR_OBJ] =
         ClActSys_LoadChars(arc, NARC_HALL_OF_FAME_DEMO_OBJ_1ST_NCGR, FALSE, CLACT_VRAM_MAIN, HEAPID_HALL_OF_FAME_DEMO);
@@ -541,7 +541,7 @@ void HallOfFameDemoObj_Init2nd(HallOfFameDemoWork *wk) {
     HallOfFameDemoObj_SetVisible(wk, HALL_OF_FAME_DEMO_OBJ_PLATE_UPPER, FALSE);
     HallOfFameDemoObj_SetVisible(wk, HALL_OF_FAME_DEMO_OBJ_PLATE_LOWER, FALSE);
 
-    arc = GFL_ArcSysCreateFileHandle(ARCID_DENDOU_DEMO, HEAPID_TAIL(HEAPID_HALL_OF_FAME_DEMO));
+    arc = GFL_ArcSysCreateFileHandle(ARCID_HALL_OF_FAME_DEMO, HEAPID_TAIL(HEAPID_HALL_OF_FAME_DEMO));
     wk->chrRes[HALL_OF_FAME_DEMO_CHR_OBJ_SUB] =
         ClActSys_LoadChars(arc, NARC_HALL_OF_FAME_DEMO_OBJ_2ND_NCGR, FALSE, CLACT_VRAM_SUB, HEAPID_HALL_OF_FAME_DEMO);
     wk->palRes[HALL_OF_FAME_DEMO_PAL_OBJ_SUB] =

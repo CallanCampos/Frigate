@@ -276,7 +276,7 @@ static void PokedexRegistration_LoadCover(PokedexRegistrationWork *wk) {
     GFL_BGSysClearScr(3);
     GFL_BGSysSetBGPriority(1, 3);
     GFL_BGSysSetBGPriority(3, 0);
-    arc = GFL_ArcSysCreateFileHandle(ARCID_ZUKAN_GRA, wk->heapId);
+    arc = GFL_ArcSysCreateFileHandle(ARCID_POKEDEX_GRA, wk->heapId);
     GFL_G2DIOLoadArcNCLRDefault(arc, FILE_COVER_PALETTE, 0, 0, 0x20, wk->heapId);
     wk->coverChars = GFL_BGSysLoadArcNCGRDynamic(arc, FILE_COVER_CHARS, BG_COVER, COVER_CHARS_SIZE, FALSE, wk->heapId);
     loadBGScrToVramByFileNoReserveNegAlign(arc, FILE_COVER_SCREEN, BG_COVER, (u16)wk->coverChars, COVER_SCREEN_SIZE,

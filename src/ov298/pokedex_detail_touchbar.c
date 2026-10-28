@@ -501,7 +501,7 @@ static void PokedexDetailTouchbar_CreateGeneral(PokedexDetailTouchbar *touchbar)
     ArcTool *arc;
     u8 i;
 
-    arc = GFL_ArcSysCreateFileHandle(ARCID_ZUKAN_GRA, touchbar->heapId);
+    arc = GFL_ArcSysCreateFileHandle(ARCID_POKEDEX_GRA, touchbar->heapId);
     touchbar->res[POKEDEX_DETAIL_TOUCHBAR_GENERAL].palette =
         ClActSys_LoadPlttRange(arc, 3, CLACT_VRAM_MAIN, 11 * 32, 0, 3, touchbar->heapId);
     touchbar->res[POKEDEX_DETAIL_TOUCHBAR_GENERAL].chars =
@@ -703,7 +703,7 @@ static void PokedexDetailTouchbar_UpdateGeneral(PokedexDetailTouchbar *touchbar)
 // Reads the two palettes that the selected tab glows between
 static void PokedexDetailTouchbar_InitGlow(PokedexDetailTouchbar *touchbar) {
     NNSG2dPaletteData *palette;
-    void *file = GFL_G2DIOReadNCLR(ARCID_ZUKAN_GRA, 3, &palette, touchbar->heapId);
+    void *file = GFL_G2DIOReadNCLR(ARCID_POKEDEX_GRA, 3, &palette, touchbar->heapId);
     u16 *data = palette->pRawData;
 
     MI_CpuCopy8(data + 16, touchbar->glowPalettes[0], 32);
@@ -847,7 +847,7 @@ static void PokedexDetailTouchbar_CreateMap(PokedexDetailTouchbar *touchbar) {
     u8 i;
     PokedexDetailTbarIcon *icon;
 
-    arc = GFL_ArcSysCreateFileHandle(ARCID_ZUKAN_GRA, touchbar->heapId);
+    arc = GFL_ArcSysCreateFileHandle(ARCID_POKEDEX_GRA, touchbar->heapId);
     touchbar->res[POKEDEX_DETAIL_TOUCHBAR_MAP].palette =
         ClActSys_LoadPlttRange(arc, 6, CLACT_VRAM_MAIN, 11 * 32, 0, 3, touchbar->heapId);
     touchbar->res[POKEDEX_DETAIL_TOUCHBAR_MAP].chars =
@@ -906,7 +906,7 @@ static void PokedexDetailTouchbar_CreateForm(PokedexDetailTouchbar *touchbar) {
     u8 i;
     PokedexDetailTbarIcon *icon;
 
-    arc = GFL_ArcSysCreateFileHandle(ARCID_ZUKAN_GRA, touchbar->heapId);
+    arc = GFL_ArcSysCreateFileHandle(ARCID_POKEDEX_GRA, touchbar->heapId);
     touchbar->res[POKEDEX_DETAIL_TOUCHBAR_FORM].palette =
         ClActSys_LoadPlttRange(arc, 3, CLACT_VRAM_MAIN, 11 * 32, 0, 3, touchbar->heapId);
     touchbar->res[POKEDEX_DETAIL_TOUCHBAR_FORM].chars =

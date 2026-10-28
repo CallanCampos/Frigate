@@ -191,7 +191,7 @@ void HallOfFameDemoMain_ExitBg2nd(void) {
 }
 
 void HallOfFameDemoMain_LoadBg(void) {
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_DENDOU_DEMO, HEAPID_HALL_OF_FAME_DEMO);
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_HALL_OF_FAME_DEMO, HEAPID_HALL_OF_FAME_DEMO);
 
     GFL_G2DIOLoadArcNCLRDefault(arc, NARC_HALL_OF_FAME_DEMO_BG_NCLR, PALTYPE_MAIN_BG_EX, 0x6000, 0x20,
                                 HEAPID_HALL_OF_FAME_DEMO);
@@ -355,7 +355,7 @@ void HallOfFameDemoMain_CreateTypeParticle(HallOfFameDemoWork *wk) {
     wk->ptc[HALL_OF_FAME_DEMO_PTC_TYPE] = Particle_CreateSystem(
         wk->ptcWork[HALL_OF_FAME_DEMO_PTC_TYPE], HALL_OF_FAME_DEMO_PTC_WORK_SIZE, TRUE, HEAPID_HALL_OF_FAME_DEMO);
     Particle_SetResource(wk->ptc[HALL_OF_FAME_DEMO_PTC_TYPE],
-                         Particle_ReadResource(ARCID_DENDOU_DEMO, sHallOfFameDemoTypeParticles[wk->type],
+                         Particle_ReadResource(ARCID_HALL_OF_FAME_DEMO, sHallOfFameDemoTypeParticles[wk->type],
                                                HEAPID_HALL_OF_FAME_DEMO),
                          TRUE, NULL);
 }
@@ -376,7 +376,7 @@ void HallOfFameDemoMain_CreateNameParticle(HallOfFameDemoWork *wk) {
         wk->ptcWork[HALL_OF_FAME_DEMO_PTC_NAME], HALL_OF_FAME_DEMO_PTC_WORK_SIZE, TRUE, HEAPID_HALL_OF_FAME_DEMO);
     Particle_SetResource(
         wk->ptc[HALL_OF_FAME_DEMO_PTC_NAME],
-        Particle_ReadResource(ARCID_DENDOU_DEMO, NARC_HALL_OF_FAME_DEMO_NAME_SPA, HEAPID_HALL_OF_FAME_DEMO), TRUE,
+        Particle_ReadResource(ARCID_HALL_OF_FAME_DEMO, NARC_HALL_OF_FAME_DEMO_NAME_SPA, HEAPID_HALL_OF_FAME_DEMO), TRUE,
         NULL);
 }
 

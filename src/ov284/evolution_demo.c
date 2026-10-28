@@ -1005,7 +1005,7 @@ static void EvolutionDemo_DiscardBGM(EvolutionDemoParam *param, EvolutionDemoWor
 }
 
 static void EvolutionDemo_InitBG(EvolutionDemoParam *param, EvolutionDemoWork *wk) {
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_SHINKA_DEMO, wk->graphicHeapId);
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_EVOLUTION_DEMO, wk->graphicHeapId);
 
     GFL_G2DIOLoadArcNCLRDefault(arc, 3, 0, 0, 0x20, wk->graphicHeapId);
     GFL_BGSysLoadArcNCGRStatic(arc, 5, 2, 0, 0, FALSE, wk->graphicHeapId);
@@ -1018,7 +1018,7 @@ static void EvolutionDemo_FreeBG(EvolutionDemoParam *param, EvolutionDemoWork *w
 }
 
 static void EvolutionDemo_InitActors(EvolutionDemoParam *param, EvolutionDemoWork *wk) {
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_SHINKA_DEMO, wk->graphicHeapId);
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_EVOLUTION_DEMO, wk->graphicHeapId);
     u8 i;
 
     wk->palette = ClActSys_LoadPlttRange(arc, 3, 0, 0, 0, 1, wk->graphicHeapId);
@@ -1113,9 +1113,9 @@ static void EvolutionDemo_InitMsg(EvolutionDemoParam *param, EvolutionDemoWork *
     BmpWin_FlushMap(window);
     GFL_BGSysQueueScrLoad(BmpWin_GetBGIndex(window));
     wk->frameChars = LoadCursorImageEndOfHeap(1, 2, 0, wk->graphicHeapId);
-    wk->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_SHINKA_DEMO, wk->graphicHeapId);
+    wk->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_EVOLUTION_DEMO, wk->graphicHeapId);
     wk->moveMsgData =
-        GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_SHINKA_DEMO_BTL_MAIN, wk->graphicHeapId);
+        GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_EVOLUTION_DEMO_BTL_MAIN, wk->graphicHeapId);
     wk->tcbExManager = GFL_TCBExMgrCreate(wk->graphicHeapId, wk->graphicHeapId, 1, 0);
     GFL_TextRndUpdateColorIndexLUT(1, 2, 15);
     wk->message = NULL;

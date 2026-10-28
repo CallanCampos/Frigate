@@ -85,34 +85,34 @@ enum {
 
 // The archive's files
 enum {
-    NARC_GURU2_EGG_NSBMD = 0,
-    NARC_GURU2_DISC_2_NSBMD,
-    NARC_GURU2_DISC_3_NSBMD,
-    NARC_GURU2_DISC_4_NSBMD,
-    NARC_GURU2_DISC_5_NSBMD,
-    NARC_GURU2_SHADOW_NSBMD,
-    NARC_GURU2_CURSOR_0_NSBMD,
-    NARC_GURU2_CURSOR_1_NSBMD,
-    NARC_GURU2_CURSOR_2_NSBMD,
-    NARC_GURU2_CURSOR_3_NSBMD,
-    NARC_GURU2_CURSOR_4_NSBMD,
-    NARC_GURU2_CURSOR_0_ANM,
-    NARC_GURU2_CURSOR_1_ANM,
-    NARC_GURU2_CURSOR_2_ANM,
-    NARC_GURU2_CURSOR_3_ANM,
-    NARC_GURU2_CURSOR_4_ANM,
-    NARC_GURU2_BG_NCGR,
-    NARC_GURU2_BG_NCLR,
-    NARC_GURU2_BG3_NSCR,
-    NARC_GURU2_BG2_NSCR,
-    NARC_GURU2_SUB_NCLR,
-    NARC_GURU2_SUB_BG3_NCGR,
-    NARC_GURU2_SUB_BG2_NCGR,
-    NARC_GURU2_SUB_BG3_NSCR,
-    NARC_GURU2_BUTTON_NSCR,
-    NARC_GURU2_BUTTON_PUSHED_NSCR,
-    NARC_GURU2_BUTTON_HALF_NSCR,
-    NARC_GURU2_BG_NSBMD,
+    NARC_SPIN_TRADE_EGG_NSBMD = 0,
+    NARC_SPIN_TRADE_DISC_2_NSBMD,
+    NARC_SPIN_TRADE_DISC_3_NSBMD,
+    NARC_SPIN_TRADE_DISC_4_NSBMD,
+    NARC_SPIN_TRADE_DISC_5_NSBMD,
+    NARC_SPIN_TRADE_SHADOW_NSBMD,
+    NARC_SPIN_TRADE_CURSOR_0_NSBMD,
+    NARC_SPIN_TRADE_CURSOR_1_NSBMD,
+    NARC_SPIN_TRADE_CURSOR_2_NSBMD,
+    NARC_SPIN_TRADE_CURSOR_3_NSBMD,
+    NARC_SPIN_TRADE_CURSOR_4_NSBMD,
+    NARC_SPIN_TRADE_CURSOR_0_ANM,
+    NARC_SPIN_TRADE_CURSOR_1_ANM,
+    NARC_SPIN_TRADE_CURSOR_2_ANM,
+    NARC_SPIN_TRADE_CURSOR_3_ANM,
+    NARC_SPIN_TRADE_CURSOR_4_ANM,
+    NARC_SPIN_TRADE_BG_NCGR,
+    NARC_SPIN_TRADE_BG_NCLR,
+    NARC_SPIN_TRADE_BG3_NSCR,
+    NARC_SPIN_TRADE_BG2_NSCR,
+    NARC_SPIN_TRADE_SUB_NCLR,
+    NARC_SPIN_TRADE_SUB_BG3_NCGR,
+    NARC_SPIN_TRADE_SUB_BG2_NCGR,
+    NARC_SPIN_TRADE_SUB_BG3_NSCR,
+    NARC_SPIN_TRADE_BUTTON_NSCR,
+    NARC_SPIN_TRADE_BUTTON_PUSHED_NSCR,
+    NARC_SPIN_TRADE_BUTTON_HALF_NSCR,
+    NARC_SPIN_TRADE_BG_NSBMD,
 };
 
 enum {
@@ -650,11 +650,11 @@ static const fx32 sDiscAngleOffsets[SPIN_TRADE_MEMBER_MAX + 1] = {
 };
 
 static const G3DSceneResourceSetup sEggResources[] = {
-    { ARCID_GURU2, NARC_GURU2_EGG_NSBMD, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_SPIN_TRADE, NARC_SPIN_TRADE_EGG_NSBMD, 0, G3D_SCENE_RES_ARCSYS },
 };
 
 static const G3DSceneResourceSetup sDisc2Resources[] = {
-    { ARCID_GURU2, NARC_GURU2_DISC_2_NSBMD, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_SPIN_TRADE, NARC_SPIN_TRADE_DISC_2_NSBMD, 0, G3D_SCENE_RES_ARCSYS },
 };
 
 static const GXRgb sEdgeColors[8] = {
@@ -696,16 +696,16 @@ static const u16 sEggAngles[SPIN_TRADE_MEMBER_MAX + 1][SPIN_TRADE_MEMBER_MAX] = 
 };
 
 static const G3DSceneResourceSetup sDisc4Resources[] = {
-    { ARCID_GURU2, NARC_GURU2_DISC_4_NSBMD, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_SPIN_TRADE, NARC_SPIN_TRADE_DISC_4_NSBMD, 0, G3D_SCENE_RES_ARCSYS },
 };
 
 static const G3DSceneResourceSetup sCursor3Resources[] = {
-    { ARCID_GURU2, NARC_GURU2_CURSOR_3_NSBMD, 0, G3D_SCENE_RES_ARCSYS },
-    { ARCID_GURU2, NARC_GURU2_CURSOR_3_ANM, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_SPIN_TRADE, NARC_SPIN_TRADE_CURSOR_3_NSBMD, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_SPIN_TRADE, NARC_SPIN_TRADE_CURSOR_3_ANM, 0, G3D_SCENE_RES_ARCSYS },
 };
 
 static const G3DSceneResourceSetup sDisc5Resources[] = {
-    { ARCID_GURU2, NARC_GURU2_DISC_5_NSBMD, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_SPIN_TRADE, NARC_SPIN_TRADE_DISC_5_NSBMD, 0, G3D_SCENE_RES_ARCSYS },
 };
 
 static const SpinTradeNameWindowData sNameWindows3[] = {
@@ -715,11 +715,11 @@ static const SpinTradeNameWindowData sNameWindows3[] = {
 };
 
 static const G3DSceneResourceSetup sShadowResources[] = {
-    { ARCID_GURU2, NARC_GURU2_SHADOW_NSBMD, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_SPIN_TRADE, NARC_SPIN_TRADE_SHADOW_NSBMD, 0, G3D_SCENE_RES_ARCSYS },
 };
 
 static const G3DSceneResourceSetup sDisc3Resources[] = {
-    { ARCID_GURU2, NARC_GURU2_DISC_3_NSBMD, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_SPIN_TRADE, NARC_SPIN_TRADE_DISC_3_NSBMD, 0, G3D_SCENE_RES_ARCSYS },
 };
 
 static const VecFx32 sSpinTradeCameraPosition = { 0, FX32_CONST(48), FX32_CONST(112) };
@@ -734,12 +734,12 @@ static const G3DSceneActorSetup sEggActors[] = {
 };
 
 static const G3DSceneResourceSetup sBGResources[] = {
-    { ARCID_GURU2, NARC_GURU2_BG_NSBMD, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_SPIN_TRADE, NARC_SPIN_TRADE_BG_NSBMD, 0, G3D_SCENE_RES_ARCSYS },
 };
 
 static const G3DSceneResourceSetup sCursor0Resources[] = {
-    { ARCID_GURU2, NARC_GURU2_CURSOR_0_NSBMD, 0, G3D_SCENE_RES_ARCSYS },
-    { ARCID_GURU2, NARC_GURU2_CURSOR_0_ANM, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_SPIN_TRADE, NARC_SPIN_TRADE_CURSOR_0_NSBMD, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_SPIN_TRADE, NARC_SPIN_TRADE_CURSOR_0_ANM, 0, G3D_SCENE_RES_ARCSYS },
 };
 
 static const G3DSceneAnimationSetup sCursorAnimations[] = {
@@ -747,8 +747,8 @@ static const G3DSceneAnimationSetup sCursorAnimations[] = {
 };
 
 static const G3DSceneResourceSetup sCursor1Resources[] = {
-    { ARCID_GURU2, NARC_GURU2_CURSOR_1_NSBMD, 0, G3D_SCENE_RES_ARCSYS },
-    { ARCID_GURU2, NARC_GURU2_CURSOR_1_ANM, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_SPIN_TRADE, NARC_SPIN_TRADE_CURSOR_1_NSBMD, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_SPIN_TRADE, NARC_SPIN_TRADE_CURSOR_1_ANM, 0, G3D_SCENE_RES_ARCSYS },
 };
 
 static const G3DSceneActorSetup sShadowActors[] = {
@@ -756,8 +756,8 @@ static const G3DSceneActorSetup sShadowActors[] = {
 };
 
 static const G3DSceneResourceSetup sCursor4Resources[] = {
-    { ARCID_GURU2, NARC_GURU2_CURSOR_4_NSBMD, 0, G3D_SCENE_RES_ARCSYS },
-    { ARCID_GURU2, NARC_GURU2_CURSOR_4_ANM, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_SPIN_TRADE, NARC_SPIN_TRADE_CURSOR_4_NSBMD, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_SPIN_TRADE, NARC_SPIN_TRADE_CURSOR_4_ANM, 0, G3D_SCENE_RES_ARCSYS },
 };
 
 // By player count, from two
@@ -773,8 +773,8 @@ static const G3DSceneActorSetup sCursorActors[] = {
 };
 
 static const G3DSceneResourceSetup sCursor2Resources[] = {
-    { ARCID_GURU2, NARC_GURU2_CURSOR_2_NSBMD, 0, G3D_SCENE_RES_ARCSYS },
-    { ARCID_GURU2, NARC_GURU2_CURSOR_2_ANM, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_SPIN_TRADE, NARC_SPIN_TRADE_CURSOR_2_NSBMD, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_SPIN_TRADE, NARC_SPIN_TRADE_CURSOR_2_ANM, 0, G3D_SCENE_RES_ARCSYS },
 };
 
 static const G3DSceneSetup sBGScene = { sBGResources, NELEMS(sBGResources), sBGActors, NELEMS(sBGActors) };
@@ -863,7 +863,7 @@ BOOL SpinTradeMain_Init(GameProc *proc, u32 *state, void *param, void *work) {
     g2m->g2p = g2p;
     g2m->g2c = g2p->g2c;
     g2m->party = GameData_GetParty(g2m->g2p->param->gameData);
-    g2m->arc = GFL_ArcSysCreateFileHandle(ARCID_GURU2, HEAPID_SPIN_TRADE);
+    g2m->arc = GFL_ArcSysCreateFileHandle(ARCID_SPIN_TRADE, HEAPID_SPIN_TRADE);
     SpinTradeMain_InitGraphics(g2m);
     g2m->vblankTCB = GFL_VBlankTCBAdd(SpinTradeMain_VBlank, g2m, 1);
     g2m->g3dManager = GFL_G3DMgrCreate(20, 11, HEAPID_SPIN_TRADE);
@@ -1936,51 +1936,51 @@ static void SpinTradeMain_InitBGs(SpinTradeMainWork *g2m) {
 static void SpinTradeMain_LoadBGs(SpinTradeMainWork *g2m) {
     void *file;
 
-    file = SpinTradeMain_LoadFile(g2m, NARC_GURU2_BG_NCLR, FALSE);
+    file = SpinTradeMain_LoadFile(g2m, NARC_SPIN_TRADE_BG_NCLR, FALSE);
     NNS_G2dGetUnpackedPaletteData(file, &g2m->paletteData);
     PaletteFade_LoadData(g2m->fade, g2m->paletteData->pRawData, 0, 0, 0x40);
     GFL_HeapFree(file);
 
-    file = SpinTradeMain_LoadFile(g2m, NARC_GURU2_SUB_NCLR, FALSE);
+    file = SpinTradeMain_LoadFile(g2m, NARC_SPIN_TRADE_SUB_NCLR, FALSE);
     NNS_G2dGetUnpackedPaletteData(file, &g2m->paletteData);
     PaletteFade_LoadData(g2m->fade, g2m->paletteData->pRawData, 1, 0, 0x40);
     GFL_HeapFree(file);
     PaletteFade_BlendPalettes(g2m->fade, 1, 0xffff, 8, GX_RGB(0, 0, 0));
 
-    file = SpinTradeMain_LoadFile(g2m, NARC_GURU2_BG_NCGR, FALSE);
+    file = SpinTradeMain_LoadFile(g2m, NARC_SPIN_TRADE_BG_NCGR, FALSE);
     NNS_G2dGetUnpackedCharacterData(file, &g2m->charData);
     GFL_BGSysLoadChar(3, g2m->charData->pRawData, g2m->charData->szByte, 0);
     GFL_HeapFree(file);
 
-    file = SpinTradeMain_LoadFile(g2m, NARC_GURU2_SUB_BG2_NCGR, FALSE);
+    file = SpinTradeMain_LoadFile(g2m, NARC_SPIN_TRADE_SUB_BG2_NCGR, FALSE);
     NNS_G2dGetUnpackedCharacterData(file, &g2m->charData);
     GFL_BGSysLoadChar(6, g2m->charData->pRawData, g2m->charData->szByte, 0);
     GFL_HeapFree(file);
 
-    file = SpinTradeMain_LoadFile(g2m, NARC_GURU2_SUB_BG3_NCGR, FALSE);
+    file = SpinTradeMain_LoadFile(g2m, NARC_SPIN_TRADE_SUB_BG3_NCGR, FALSE);
     NNS_G2dGetUnpackedCharacterData(file, &g2m->charData);
     GFL_BGSysLoadChar(7, g2m->charData->pRawData, g2m->charData->szByte, 0);
     GFL_HeapFree(file);
 
-    file = SpinTradeMain_LoadFile(g2m, NARC_GURU2_BG2_NSCR, FALSE);
+    file = SpinTradeMain_LoadFile(g2m, NARC_SPIN_TRADE_BG2_NSCR, FALSE);
     NNS_G2dGetUnpackedScreenData(file, &g2m->screenData);
     GFL_BGSysBufferScrDefault(2, g2m->screenData->rawData, g2m->screenData->szByte);
     GFL_BGSysLoadScr(2);
     GFL_HeapFree(file);
 
-    file = SpinTradeMain_LoadFile(g2m, NARC_GURU2_BG3_NSCR, FALSE);
+    file = SpinTradeMain_LoadFile(g2m, NARC_SPIN_TRADE_BG3_NSCR, FALSE);
     NNS_G2dGetUnpackedScreenData(file, &g2m->screenData);
     GFL_BGSysBufferScrDefault(3, g2m->screenData->rawData, g2m->screenData->szByte);
     GFL_BGSysLoadScr(3);
     GFL_HeapFree(file);
 
-    file = SpinTradeMain_LoadFile(g2m, NARC_GURU2_BUTTON_NSCR, FALSE);
+    file = SpinTradeMain_LoadFile(g2m, NARC_SPIN_TRADE_BUTTON_NSCR, FALSE);
     NNS_G2dGetUnpackedScreenData(file, &g2m->screenData);
     GFL_BGSysBufferScrDefault(6, g2m->screenData->rawData, g2m->screenData->szByte);
     GFL_BGSysLoadScr(6);
     GFL_HeapFree(file);
 
-    file = SpinTradeMain_LoadFile(g2m, NARC_GURU2_SUB_BG3_NSCR, FALSE);
+    file = SpinTradeMain_LoadFile(g2m, NARC_SPIN_TRADE_SUB_BG3_NSCR, FALSE);
     NNS_G2dGetUnpackedScreenData(file, &g2m->screenData);
     GFL_BGSysBufferScrDefault(7, g2m->screenData->rawData, g2m->screenData->szByte);
     GFL_BGSysLoadScr(7);
@@ -2007,15 +2007,15 @@ static void SpinTradeMain_LoadButtonScreen(SpinTradeMainWork *g2m, u32 fileId) {
 }
 
 static void SpinTradeMain_ShowButtonHalf(SpinTradeMainWork *g2m) {
-    SpinTradeMain_LoadButtonScreen(g2m, NARC_GURU2_BUTTON_HALF_NSCR);
+    SpinTradeMain_LoadButtonScreen(g2m, NARC_SPIN_TRADE_BUTTON_HALF_NSCR);
 }
 
 static void SpinTradeMain_ShowButton(SpinTradeMainWork *g2m) {
-    SpinTradeMain_LoadButtonScreen(g2m, NARC_GURU2_BUTTON_NSCR);
+    SpinTradeMain_LoadButtonScreen(g2m, NARC_SPIN_TRADE_BUTTON_NSCR);
 }
 
 static void SpinTradeMain_ShowButtonPushed(SpinTradeMainWork *g2m) {
-    SpinTradeMain_LoadButtonScreen(g2m, NARC_GURU2_BUTTON_PUSHED_NSCR);
+    SpinTradeMain_LoadButtonScreen(g2m, NARC_SPIN_TRADE_BUTTON_PUSHED_NSCR);
 }
 
 static void SpinTradeMain_InitFade(SpinTradeMainWork *g2m) {
@@ -2042,7 +2042,7 @@ static void SpinTradeMain_InitClAct(SpinTradeMainWork *g2m) {
 }
 
 static void SpinTradeMain_LoadClActResources(SpinTradeMainWork *g2m) {
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_GURU2_OBJ, HEAPID_SPIN_TRADE);
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_SPIN_TRADE_OBJ, HEAPID_SPIN_TRADE);
 
     g2m->chars = ClActSys_LoadChars(arc, 6, FALSE, 0, HEAPID_SPIN_TRADE);
     g2m->palette = ClActSys_LoadPltt(arc, 0, 0, 0, HEAPID_SPIN_TRADE);

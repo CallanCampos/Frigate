@@ -119,7 +119,7 @@ static void PokedexListBmp_LoadWindowBG(PokedexListWork *wk, u32 window) {
     posX = BmpWin_GetPosX(wk->windows[window].window);
     posY = BmpWin_GetPosY(wk->windows[window].window);
     pixels = GFL_BitmapGetPixelData(BmpWin_GetBitmap(wk->windows[window].window));
-    arc = GFL_ArcSysCreateFileHandle(ARCID_ZUKAN_GRA, HEAPID_POKEDEX_LIST);
+    arc = GFL_ArcSysCreateFileHandle(ARCID_POKEDEX_GRA, HEAPID_POKEDEX_LIST);
     screenFile = GFL_G2DIOReadNSCRArc(arc, 71, FALSE, &screenData, HEAPID_POKEDEX_LIST | HEAPID_TAIL_BIT);
     screen = (u16 *)screenData->rawData;
     charFile = GFL_G2DIOReadBGNCGRArc(arc, 59, FALSE, &charData, HEAPID_POKEDEX_LIST | HEAPID_TAIL_BIT);

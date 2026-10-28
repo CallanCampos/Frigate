@@ -196,7 +196,7 @@ void HallOfFamePCMain_ExitBg(void) {
 }
 
 void HallOfFamePCMain_LoadBgGraphic(void) {
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_DENDOU_PC, HEAPID_TAIL(HEAPID_HALL_OF_FAME_PC));
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_HALL_OF_FAME_PC, HEAPID_TAIL(HEAPID_HALL_OF_FAME_PC));
 
     GFL_G2DIOLoadArcNCLRDefault(arc, 1, PALTYPE_MAIN_BG, 0, 0x80, HEAPID_HALL_OF_FAME_PC);
     GFL_G2DIOLoadArcNCLRDefault(arc, 6, PALTYPE_SUB_BG, 0, 0x40, HEAPID_HALL_OF_FAME_PC);

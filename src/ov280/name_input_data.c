@@ -8,7 +8,7 @@
 // The name-entry screen's tables, named after the ROM's "namein_data.c". The name-entry screen is overlay 280
 
 // The name-entry screen's archive
-#define ARCID_NAMEIN 0x78
+#define ARCID_NAME_INPUT 0x78
 // Its members: the keyboards, then the word tables, then the conversion table
 #define NARC_NAME_INPUT_KEYBOARD_0 0
 #define NARC_NAME_INPUT_WORD_TABLE_0 5
@@ -22,7 +22,7 @@ static u16 NameInputData_ConvTableCount(const NameInputConvTable *table);
 static u16 NameInputData_ConvTableGet(const NameInputConvTable *table, u16 row, u16 column);
 
 static NameInputKeyboard *NameInputData_LoadKeyboard(u32 index, HeapID heapId) {
-    return GFL_ArcSysReadHeapNewLZ(ARCID_NAMEIN, NARC_NAME_INPUT_KEYBOARD_0 + index, FALSE, heapId);
+    return GFL_ArcSysReadHeapNewLZ(ARCID_NAME_INPUT, NARC_NAME_INPUT_KEYBOARD_0 + index, FALSE, heapId);
 }
 
 static void NameInputData_FreeKeyboard(NameInputKeyboard *keyboard) {
@@ -66,7 +66,7 @@ u16 NameInputKeyboard_GetChar(const NameInputKeyboard *keyboard, u16 x, u16 y) {
 }
 
 NameInputWordTable *NameInputData_LoadWordTable(u32 index, HeapID heapId) {
-    return GFL_ArcSysReadHeapNewLZ(ARCID_NAMEIN, NARC_NAME_INPUT_WORD_TABLE_0 + index, FALSE, heapId);
+    return GFL_ArcSysReadHeapNewLZ(ARCID_NAME_INPUT, NARC_NAME_INPUT_WORD_TABLE_0 + index, FALSE, heapId);
 }
 
 void NameInputData_FreeWordTable(NameInputWordTable *table) {
@@ -152,7 +152,7 @@ static BOOL NameInputData_WordMatches(const u16 *word, const u16 *str) {
 }
 
 NameInputConvTable *NameInputData_LoadConvTable(HeapID heapId) {
-    return GFL_ArcSysReadHeapNewLZ(ARCID_NAMEIN, NARC_NAME_INPUT_CONV_TABLE, FALSE, heapId);
+    return GFL_ArcSysReadHeapNewLZ(ARCID_NAME_INPUT, NARC_NAME_INPUT_CONV_TABLE, FALSE, heapId);
 }
 
 void NameInputData_FreeConvTable(NameInputConvTable *table) {

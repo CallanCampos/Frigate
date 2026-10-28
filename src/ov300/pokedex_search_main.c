@@ -28,7 +28,7 @@
 #include "system/palanm.h"
 #include "system/printsys.h"
 #include "system/wordset.h"
-#include "text/system/zknsearch_main.h"
+#include "text/system/pokedex_search_main.h"
 
 // The Pokédex's search screen: its BGs and graphics, its fades and the touch bar that slides in
 
@@ -52,11 +52,12 @@ static const BGSysVRAMConfig sPokedexSearchVRAMConfig = {
 
 // The messages of the types, and of none
 static const u16 sPokedexSearchTypeMsgs[POKEDEX_SEARCH_TYPE_COUNT + 1] = {
-    ZknsearchMain_Text_Normal,   ZknsearchMain_Text_Fighting, ZknsearchMain_Text_Flying, ZknsearchMain_Text_Poison,
-    ZknsearchMain_Text_Ground,   ZknsearchMain_Text_Rock,     ZknsearchMain_Text_Bug,    ZknsearchMain_Text_Ghost,
-    ZknsearchMain_Text_Steel,    ZknsearchMain_Text_Fire,     ZknsearchMain_Text_Water,  ZknsearchMain_Text_Grass,
-    ZknsearchMain_Text_Electric, ZknsearchMain_Text_Psychic,  ZknsearchMain_Text_Ice,    ZknsearchMain_Text_Dragon,
-    ZknsearchMain_Text_Dark,     ZknsearchMain_Text_Empty_9,
+    PokedexSearchMain_Text_Normal,   PokedexSearchMain_Text_Fighting, PokedexSearchMain_Text_Flying,
+    PokedexSearchMain_Text_Poison,   PokedexSearchMain_Text_Ground,   PokedexSearchMain_Text_Rock,
+    PokedexSearchMain_Text_Bug,      PokedexSearchMain_Text_Ghost,    PokedexSearchMain_Text_Steel,
+    PokedexSearchMain_Text_Fire,     PokedexSearchMain_Text_Water,    PokedexSearchMain_Text_Grass,
+    PokedexSearchMain_Text_Electric, PokedexSearchMain_Text_Psychic,  PokedexSearchMain_Text_Ice,
+    PokedexSearchMain_Text_Dragon,   PokedexSearchMain_Text_Dark,     PokedexSearchMain_Text_Empty_9,
 };
 
 // The shapes in the order of the list
@@ -338,7 +339,7 @@ void PokedexSearchMain_LoadGraphics(void) {
     u16 *screen;
     u32 i;
 
-    arc = GFL_ArcSysCreateFileHandle(ARCID_ZUKAN_GRA, HEAPID_POKEDEX_SEARCH | HEAPID_TAIL_BIT);
+    arc = GFL_ArcSysCreateFileHandle(ARCID_POKEDEX_GRA, HEAPID_POKEDEX_SEARCH | HEAPID_TAIL_BIT);
     GFL_G2DIOLoadArcNCLRDefault(arc, 75, PALTYPE_MAIN_BG, 0, 0xc0, HEAPID_POKEDEX_SEARCH);
     GFL_G2DIOLoadArcNCLRDefault(arc, 76, PALTYPE_SUB_BG, 0, 0xa0, HEAPID_POKEDEX_SEARCH);
     GFL_BGSysLoadArcNCGRDynamic(arc, 83, 0, 0, FALSE, HEAPID_POKEDEX_SEARCH);
@@ -430,7 +431,7 @@ void PokedexSearchMain_ExitWindow(void) {
 }
 
 void PokedexSearchMain_InitMsg(PokedexSearchWork *wk) {
-    wk->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_ZKNSEARCH_MAIN, HEAPID_POKEDEX_SEARCH);
+    wk->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_POKEDEX_SEARCH_MAIN, HEAPID_POKEDEX_SEARCH);
     wk->font = GFL_FontCreate(ARCID_FONT, 0, 0, FALSE, HEAPID_POKEDEX_SEARCH);
     wk->wordSet = GFL_WordSetSystemCreateDefault(HEAPID_POKEDEX_SEARCH);
     wk->printQueue = PrintQueue_CreateDefault(HEAPID_POKEDEX_SEARCH);
@@ -446,7 +447,7 @@ void PokedexSearchMain_ExitMsg(PokedexSearchWork *wk) {
 }
 
 void PokedexSearchMain_InitBlinkAnm(PokedexSearchWork *wk) {
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_ZUKAN_GRA, HEAPID_POKEDEX_SEARCH | HEAPID_TAIL_BIT);
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_POKEDEX_GRA, HEAPID_POKEDEX_SEARCH | HEAPID_TAIL_BIT);
 
     wk->blinkAnm = BlinkPalAnm_Create(3 * 0x10, 0x10, 1, HEAPID_POKEDEX_SEARCH);
     BlinkPalAnm_SetPalBufferArcTool(wk->blinkAnm, arc, 75, 2 * 0x10, 3 * 0x10);
@@ -472,7 +473,7 @@ void PokedexSearchMain_ExitBGWinFrame(PokedexSearchWork *wk) {
 }
 
 void PokedexSearchMain_LoadMainScreen(PokedexSearchWork *wk) {
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_ZUKAN_GRA, HEAPID_POKEDEX_SEARCH | HEAPID_TAIL_BIT);
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_POKEDEX_GRA, HEAPID_POKEDEX_SEARCH | HEAPID_TAIL_BIT);
 
     loadBGScrToVramByFileNoReserveNegAlign(arc, 95, 0, 0, 0, FALSE, HEAPID_POKEDEX_SEARCH);
     loadBGScrToVramByFileNoReserveNegAlign(arc, 94, 3, 0, 0, FALSE, HEAPID_POKEDEX_SEARCH);
@@ -480,35 +481,35 @@ void PokedexSearchMain_LoadMainScreen(PokedexSearchWork *wk) {
 }
 
 void PokedexSearchMain_LoadOrderScreen(PokedexSearchWork *wk) {
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_ZUKAN_GRA, HEAPID_POKEDEX_SEARCH | HEAPID_TAIL_BIT);
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_POKEDEX_GRA, HEAPID_POKEDEX_SEARCH | HEAPID_TAIL_BIT);
 
     loadBGScrToVramByFileNoReserveNegAlign(arc, 91, 3, 0, 0, FALSE, HEAPID_POKEDEX_SEARCH);
     GFL_ArcToolFree(arc);
 }
 
 void PokedexSearchMain_LoadInitialScreen(PokedexSearchWork *wk) {
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_ZUKAN_GRA, HEAPID_POKEDEX_SEARCH | HEAPID_TAIL_BIT);
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_POKEDEX_GRA, HEAPID_POKEDEX_SEARCH | HEAPID_TAIL_BIT);
 
     loadBGScrToVramByFileNoReserveNegAlign(arc, 90, 3, 0, 0, FALSE, HEAPID_POKEDEX_SEARCH);
     GFL_ArcToolFree(arc);
 }
 
 void PokedexSearchMain_LoadTypeScreen(PokedexSearchWork *wk) {
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_ZUKAN_GRA, HEAPID_POKEDEX_SEARCH | HEAPID_TAIL_BIT);
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_POKEDEX_GRA, HEAPID_POKEDEX_SEARCH | HEAPID_TAIL_BIT);
 
     loadBGScrToVramByFileNoReserveNegAlign(arc, 92, 3, 0, 0, FALSE, HEAPID_POKEDEX_SEARCH);
     GFL_ArcToolFree(arc);
 }
 
 void PokedexSearchMain_LoadColorScreen(PokedexSearchWork *wk) {
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_ZUKAN_GRA, HEAPID_POKEDEX_SEARCH | HEAPID_TAIL_BIT);
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_POKEDEX_GRA, HEAPID_POKEDEX_SEARCH | HEAPID_TAIL_BIT);
 
     loadBGScrToVramByFileNoReserveNegAlign(arc, 88, 3, 0, 0, FALSE, HEAPID_POKEDEX_SEARCH);
     GFL_ArcToolFree(arc);
 }
 
 void PokedexSearchMain_LoadShapeScreen(PokedexSearchWork *wk) {
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_ZUKAN_GRA, HEAPID_POKEDEX_SEARCH | HEAPID_TAIL_BIT);
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_POKEDEX_GRA, HEAPID_POKEDEX_SEARCH | HEAPID_TAIL_BIT);
 
     loadBGScrToVramByFileNoReserveNegAlign(arc, 89, 3, 0, 0, FALSE, HEAPID_POKEDEX_SEARCH);
     GFL_ArcToolFree(arc);
@@ -521,7 +522,7 @@ void PokedexSearchMain_LoadLoadingScreen(PokedexSearchWork *wk) {
 
     wk->loadingScreen =
         GFL_HeapAllocate(HEAPID_POKEDEX_SEARCH, 32 * LOADING_HEIGHT * sizeof(u16), FALSE, "zknsearch_main.c", 944);
-    arc = GFL_ArcSysCreateFileHandle(ARCID_ZUKAN_GRA, HEAPID_POKEDEX_SEARCH | HEAPID_TAIL_BIT);
+    arc = GFL_ArcSysCreateFileHandle(ARCID_POKEDEX_GRA, HEAPID_POKEDEX_SEARCH | HEAPID_TAIL_BIT);
     file = GFL_G2DIOReadNSCRArc(arc, 93, FALSE, &screen, HEAPID_POKEDEX_SEARCH | HEAPID_TAIL_BIT);
     MIi_CpuCopy16(screen->rawData, wk->loadingScreen, 32 * LOADING_HEIGHT * sizeof(u16));
     GFL_HeapFree(file);

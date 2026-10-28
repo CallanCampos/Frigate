@@ -768,7 +768,7 @@ static BOOL PokedexDetailForm_Main(PokedexDetailProcSys *sys, int *seq, void *pa
             MCSS_Hide(wk->sprites[SPRITE_NEXT_FRONT].mcss);
             MCSS_StartFade(wk->sprites[SPRITE_NEXT_FRONT].mcss, 16, 16, 0, 0);
         }
-        wk->bgChars = PokedexDetail_LoadBG(FALSE, param->heapId, 7, 1, 1, 0, ARCID_ZUKAN_GRA, 2, 12, 36, 0);
+        wk->bgChars = PokedexDetail_LoadBG(FALSE, param->heapId, 7, 1, 1, 0, ARCID_POKEDEX_GRA, 2, 12, 36, 0);
         wk->backgroundMain = PokedexDetailBackground_Create(param->heapId, 3, 3, 1, 2);
         wk->backgroundSub = PokedexDetailBackground_Create(param->heapId, 3, 4, 2, 3);
         PokedexDetailPalFade_ReadPalettes(wk->palFade);
@@ -1271,7 +1271,7 @@ static void PokedexDetailForm_CreateText(PokedexDetailFormParam *param, PokedexD
         BmpWin_FlushChar(wk->windows[i]);
     }
     wk->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_BTL_SERVER_FLOW_TITLE, param->heapId);
-    wk->formMsgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_ZUKAN_DETAIL_FORM, param->heapId);
+    wk->formMsgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_POKEDEX_DETAIL_FORM, param->heapId);
     wk->formNameTable = GFL_ArcSysReadHeapNewLZGetLen(ARCID_FORM_NAME_TABLE, 0, FALSE, param->heapId, &size);
 
     bitmap = BmpWin_GetBitmap(wk->windows[WINDOW_LABELS]);
@@ -2304,7 +2304,7 @@ static void PokedexDetailForm_SetMode(PokedexDetailFormParam *param, PokedexDeta
 
 static void PokedexDetailForm_CreateActors(PokedexDetailFormParam *param, PokedexDetailFormWork *wk,
                                            PokedexDetailCommon *common) {
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_ZUKAN_GRA, param->heapId);
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_POKEDEX_GRA, param->heapId);
     u8 i;
 
     wk->resources[POKEDEX_DETAIL_FORM_RES_MAIN_PALETTE] =

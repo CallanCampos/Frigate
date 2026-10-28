@@ -11,7 +11,7 @@
 // The Pokédex's search: the species of the list that match the search screen's criteria, found a few at a time
 
 // The archive of the search's data, and its files: the forms of the shape lists, the initials' groups and the shapes
-#define ARCID_ZUKAN_SEARCH 97
+#define ARCID_POKEDEX_SEARCH 97
 #define FILE_FORMS 0
 #define FILE_INITIALS 1
 #define FILE_SHAPES 2
@@ -101,7 +101,7 @@ void PokedexSearchEngine_Free(PokedexSearchEngine *engine) {
 BOOL PokedexSearchEngine_Step(PokedexSearchEngine *engine, HeapID heapId, u16 *count, u16 **list) {
     switch (engine->step) {
     case STEP_OPEN:
-        engine->arc = GFL_ArcSysCreateFileHandle(ARCID_ZUKAN_SEARCH, heapId);
+        engine->arc = GFL_ArcSysCreateFileHandle(ARCID_POKEDEX_SEARCH, heapId);
         engine->step = STEP_LOAD_LIST;
         break;
     case STEP_LOAD_LIST:
@@ -274,7 +274,7 @@ u32 PokedexSearchEngine_LoadList(u32 type, HeapID heapId, u16 **outList) {
     } else {
         u16 *regionalTable = PML_PersonalLoadRegionalDexTable(heapId, &size);
         u32 length;
-        u16 *national = GFL_ArcSysReadHeapNewLZGetLen(ARCID_ZUKAN_SEARCH, FILE_NATIONAL_ORDER, FALSE, heapId, &length);
+        u16 *national = GFL_ArcSysReadHeapNewLZGetLen(ARCID_POKEDEX_SEARCH, FILE_NATIONAL_ORDER, FALSE, heapId, &length);
         u16 count = length >> 1;
         u16 *list = GFL_HeapAllocate(heapId, size * 2, FALSE, "zukan_search_engine.c", 862);
         u16 n = 0;

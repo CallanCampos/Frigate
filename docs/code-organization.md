@@ -183,7 +183,12 @@ so far:
 | asonda, tomo | Played, Friend | | siin (the initial's kana row) | Initial |
 | kami (the trio) | ForcesOfNature | | | |
 
-The constants generated from the game's data, such as `SEQ_BGM_KOUKAN` and the message IDs, keep their words for now.
+The data's names follow the same rule, with three exceptions that the ROM spells out. The sound constants
+(`generated/sound*.txt`, `SEQ_BGM_KOUKAN`) are the sound archive's symbols, which the build writes back into it; the
+map models' and texture sets' (`generated/map_models.txt`, `map_texture_sets.txt`) are the assets' own names; and a
+message ID that quotes its text (`Bank0366_Text_SwKusabi10`) says what the message says. Everything else is English:
+the archives (`ARCID_SPIN_TRADE` and its `res/graphics/spin_trade/`), their members and the text banks
+(`TEXT_BANK_POKEDEX_SEARCH_MAIN`, whose message IDs are `PokedexSearchMain_Text_*`).
 `tools/decomp/rename_symbol.py` renames a symbol in both versions, updates the source files and records the name:
 
 ```sh

@@ -74,10 +74,10 @@ static void EvolutionDemoEffect_Reverse3D(EvolutionDemoEffect *effect);
 static BOOL EvolutionDemoEffect_Is3DIdle(EvolutionDemoEffect *effect);
 
 static const G3DSceneResourceSetup sModelResources[] = {
-    { ARCID_SHINKA_DEMO, 8, 0 },
-    { ARCID_SHINKA_DEMO, 9, 0 },
-    { ARCID_SHINKA_DEMO, 6, 0 },
-    { ARCID_SHINKA_DEMO, 7, 0 },
+    { ARCID_EVOLUTION_DEMO, 8, 0 },
+    { ARCID_EVOLUTION_DEMO, 9, 0 },
+    { ARCID_EVOLUTION_DEMO, 6, 0 },
+    { ARCID_EVOLUTION_DEMO, 7, 0 },
 };
 
 static const G3DSceneAnimationSetup sModelAnimations[] = { { 1, 0 }, { 2, 0 }, { 3, 0 } };
@@ -92,7 +92,7 @@ static const G3DSceneSetup sModelScene = { sModelResources, NELEMS(sModelResourc
 // Not referenced. Its value, FX32_ONE, is the step of the model's looping animation and the scale of its actor
 const fx32 EVOLUTION_DEMO_EFFECT_UNK_FX32 = FX32_ONE;
 
-static const DemoParticleResource sParticleResources[DEMO_PARTICLE_UNIT_COUNT] = { { ARCID_SHINKA_DEMO, 10 } };
+static const DemoParticleResource sParticleResources[DEMO_PARTICLE_UNIT_COUNT] = { { ARCID_EVOLUTION_DEMO, 10 } };
 
 static const DemoParticleEvent sParticleEvents[] = {
     { 0, 0, 1 },   { 0, 0, 0 },   { 0, 0, 2 },   { 0, 0, 3 },   { 0, 0, 4 },

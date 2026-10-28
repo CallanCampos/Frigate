@@ -42,9 +42,11 @@ the module's files in address order (`docs/source-files.md`), one commit per fil
   name suggests. Say so in the commit.
 - **The ROM spells some names out.** `GFL_ASSERT` keeps its expression as text, so a name in an assert is Game
   Freak's: rename it all the same, and write that assert out with the ROM's text (`docs/code-standards.md`, rule 3).
-  A file name passed to `GFL_HeapAllocate` is a string and never changes. The `ARCID_*` and `NARC_<DIR>_*` names that
-  name `res/graphics/` directories, the text headers (`text/system/<bank>.h`) and the constants of `generated/` lists
-  are the data's names: rename them only with `tools/data/rename_constant.py`, which renames the data too.
+  A file name passed to `GFL_HeapAllocate` is a string and never changes, and neither do the sound constants (the
+  sound archive's own symbols) or the map models' and texture sets' (the assets' names). The constants of the other
+  `generated/` lists, the text banks with their headers and message IDs, are renamed only with
+  `tools/data/rename_constant.py`, which renames the data with them; an `ARCID_*` name of `include/constants/arc.h`
+  names its `res/graphics/` directory, which is renamed with it.
 
 ## 4. Functions and data
 

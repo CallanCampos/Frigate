@@ -452,7 +452,7 @@ static void PokedexAreaListView_CreateActorSys(void) {
 }
 
 static void PokedexAreaListView_LoadGraphics(void) {
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_ZUKAN_GRA, HEAPID_POKEDEX_AREA_LIST);
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_POKEDEX_GRA, HEAPID_POKEDEX_AREA_LIST);
 
     GFL_G2DIOLoadArcNCLRDefault(arc, 49, PALTYPE_MAIN_BG, 0, 0, HEAPID_POKEDEX_AREA_LIST);
     GFL_G2DIOLoadArcNCLRDefault(arc, 51, PALTYPE_SUB_BG, 0, 0, HEAPID_POKEDEX_AREA_LIST);
@@ -489,7 +489,7 @@ static void PokedexAreaListView_CreateActors(PokedexAreaListView *view) {
 
         setup.vramType = 0;
         setup.flags = 0;
-        setup.arcId = ARCID_ZUKAN_GRA;
+        setup.arcId = ARCID_POKEDEX_GRA;
         setup.paletteFile = 53;
         setup.charFile = 57;
         setup.cellFile = 63;
@@ -504,7 +504,7 @@ static void PokedexAreaListView_CreateActors(PokedexAreaListView *view) {
 
         setup.vramType = 1;
         setup.flags = 0;
-        setup.arcId = ARCID_ZUKAN_GRA;
+        setup.arcId = ARCID_POKEDEX_GRA;
         setup.paletteFile = 53;
         setup.charFile = 57;
         setup.cellFile = 63;
@@ -678,7 +678,7 @@ void PokedexAreaListView_StartFade(PokedexAreaListView *view, u8 start, u8 end) 
 
 // The cursor's row blinks
 static void PokedexAreaListView_InitBlink(PokedexAreaListView *view) {
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_ZUKAN_GRA, HEAPID_POKEDEX_AREA_LIST);
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_POKEDEX_GRA, HEAPID_POKEDEX_AREA_LIST);
 
     view->blinkAnm = BlinkPalAnm_Create(16, 5, 0xfffe, HEAPID_POKEDEX_AREA_LIST);
     BlinkPalAnm_SetPalBufferArcTool(view->blinkAnm, arc, 53, 16, 32);
@@ -781,7 +781,7 @@ ClActor *PokedexAreaListView_GetActor(PokedexAreaListView *view, u32 index) {
 
 void PokedexAreaListView_InitList(PokedexAreaListView *view, u32 count, PokedexHabitatSummary *areas, u16 zone,
                                   u16 cursorPos) {
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_ZUKAN_GRA, HEAPID_POKEDEX_AREA_LIST);
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_POKEDEX_GRA, HEAPID_POKEDEX_AREA_LIST);
     FrameListSetup setup = sPokedexAreaListSetup;
     MsgData *msgData;
     u32 i;
@@ -825,7 +825,7 @@ void PokedexAreaListView_InitList(PokedexAreaListView *view, u32 count, PokedexH
     }
     GFL_MsgDataFree(msgData);
 
-    arc = GFL_ArcSysCreateFileHandle(ARCID_ZUKAN_GRA, HEAPID_POKEDEX_AREA_LIST);
+    arc = GFL_ArcSysCreateFileHandle(ARCID_POKEDEX_GRA, HEAPID_POKEDEX_AREA_LIST);
     FrameList_LoadCursorPalette(view->list, arc, 49, 7, 7);
     GFL_ArcToolFree(arc);
 

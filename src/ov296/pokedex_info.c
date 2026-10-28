@@ -40,7 +40,7 @@
 // in one of the six others that the Pokédex has seen it in. The sprite, types and footprint are loaded into a slot of
 // two, so that showing another Pokémon swaps slots instead of waiting for the old one to be freed
 
-// The Pokédex's graphics (ARCID_ZUKAN_GRA) members
+// The Pokédex's graphics (ARCID_POKEDEX_GRA) members
 #define POKEDEX_GRA_PALETTE 9
 #define POKEDEX_GRA_PALETTE_EXTRA 2
 #define POKEDEX_GRA_CHARS 0x1a
@@ -245,7 +245,7 @@ static const u16 sEntryX[POKEDEX_INFO_LANGUAGE_COUNT] = { 4, 2, 2, 2, 2, 4 };
 // The type icons of each language in the Pokédex's graphics
 static const u16 sTypeIconFiles[POKEDEX_INFO_LANGUAGE_COUNT] = { 22, 19, 20, 21, 24, 23 };
 static const u16 sHeightX[POKEDEX_INFO_LANGUAGE_COUNT] = { 93, 94, 94, 94, 94, 94 };
-static const u32 sArcIds[POKEDEX_INFO_ARC_COUNT] = { ARCID_ZUKAN_GRA, ARCID_FORM_NAME_TABLE, ARCID_FONT, 0, 0, 0, 0 };
+static const u32 sArcIds[POKEDEX_INFO_ARC_COUNT] = { ARCID_POKEDEX_GRA, ARCID_FORM_NAME_TABLE, ARCID_FONT, 0, 0, 0, 0 };
 // Where each type's icon is in its language's file, as its tile row and column
 static const u8 sTypeIconTiles[TYPE_NULL + 1][2] = {
     { 0, 0 }, { 2, 1 }, { 2, 0 }, { 3, 0 }, { 1, 2 }, { 1, 1 }, { 2, 3 }, { 2, 2 }, { 3, 2 },
@@ -1076,7 +1076,7 @@ static void PokedexInfo_FlushWindows(PokedexInfo *info) {
 }
 
 static void PokedexInfo_InitLabelWindows(PokedexInfo *info) {
-    GFLBitmap *src = GFL_G2DIOLoadBitmap(ARCID_ZUKAN_GRA, POKEDEX_GRA_CHARS, FALSE, info->heapId);
+    GFLBitmap *src = GFL_G2DIOLoadBitmap(ARCID_POKEDEX_GRA, POKEDEX_GRA_CHARS, FALSE, info->heapId);
     GFLBitmap *dest;
 
     // The caught label's window
