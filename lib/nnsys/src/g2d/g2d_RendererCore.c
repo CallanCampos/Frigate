@@ -337,10 +337,14 @@ static void DrawOamToSurface3D_(GXOamAttr *oam) {
         flipV ^= oamFlip;
         oam->attr01 = (oam->attr01 & ~GX_OAM_ATTR01_HF_MASK) | (flipH << GX_OAM_ATTR01_HF_SHIFT);
         oam->attr01 = (oam->attr01 & ~GX_OAM_ATTR01_VF_MASK) | (flipV << GX_OAM_ATTR01_VF_SHIFT);
-        NNS_G2dDrawOneOam3DDirectWithPosFast(posX, posY, -1, oam, &pTheInstance_->pImgProxy->attr,
+        const s16 posZ = -1;
+
+        NNS_G2dDrawOneOam3DDirectWithPosFast(posX, posY, posZ, oam, &pTheInstance_->pImgProxy->attr,
                                              pTheInstance_->baseTexAddr3D, pTheInstance_->basePltAddr3D);
     } else {
-        NNS_G2dDrawOneOam3DDirectWithPosFast(GetOamPosX_(oam), GetOamPosY_(oam), -1, oam,
+        const s16 posZ = -1;
+
+        NNS_G2dDrawOneOam3DDirectWithPosFast(GetOamPosX_(oam), GetOamPosY_(oam), posZ, oam,
                                              &pTheInstance_->pImgProxy->attr, pTheInstance_->baseTexAddr3D,
                                              pTheInstance_->basePltAddr3D);
     }
@@ -551,7 +555,9 @@ void NNS_G2dRndCoreDrawCellVramTransfer(const NNSG2dCellData *cell, u32 cellVram
         surface->pBeforeDrawCellBackFunc(pTheInstance_, cell);
     }
     if (pTheInstance_->bDrawEnable) {
-        if (cellVramTransferHandle != NNS_G2D_INVALID_CELL_TRANSFER_STATE_HANDLE) {
+        const u32 invalidHandle = NNS_G2D_INVALID_CELL_TRANSFER_STATE_HANDLE;
+
+        if (cellVramTransferHandle != invalidHandle) {
             u32 type = surface->type;
             NNSG2dCellTransferState *state = NNSi_G2dGetCellTransferState(cellVramTransferHandle);
 

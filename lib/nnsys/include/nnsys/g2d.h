@@ -1092,6 +1092,9 @@ void NNS_G2dCharCanvasInitForBG(NNSG2dCharCanvas *pCC, void *charBase, int areaW
                                 NNSG2dCharaColorMode colorMode);
 void NNS_G2dCharCanvasInitForOBJ1D(NNSG2dCharCanvas *pCC, void *charBase, int areaWidth, int areaHeight,
                                    NNSG2dCharaColorMode colorMode);
+// The 2D OBJ canvas init, which the original link dropped though its table stays in the ROM
+void NNS_G2dCharCanvasInitForOBJ2DRect(NNSG2dCharCanvas *pCC, void *charBase, int areaWidth, int areaHeight,
+                                       NNSG2dCharaColorMode colorMode);
 // Draws a character with its top left at x, y in color cl and returns its width
 int NNS_G2dCharCanvasDrawChar(const NNSG2dCharCanvas *pCC, const NNSG2dFont *pFont, int x, int y, int cl, u16 ccode);
 void NNS_G2dMapScrToCharText(void *scnBase, int areaWidth, int areaHeight, int areaLeft, int areaTop,

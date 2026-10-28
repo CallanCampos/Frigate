@@ -53,10 +53,10 @@ static void NNS_G2dMapScrToChar256x16Pltt(u16 *pScr, int areaWidth, int areaHeig
 
 // The 2D OBJ canvas's functions. NitroSystem's table is static, but this one is not, since nothing the game keeps uses
 // it and MWCC would leave it out
-const NNSiG2dCharCanvasVTable VTABLE_OBJ2DRECT = { DrawGlyphLine, ClearLine, ClearAreaLine };
-// MWCC emits these two in the reverse of their order here, which puts the BG's first as in the ROM
-static const NNSiG2dCharCanvasVTable VTABLE_OBJ1D = { DrawGlyph1D, ClearContinuous, ClearArea1D };
+// MWCC emits these in this order: the 2D OBJ's table, the BG's, the 1D OBJ's, which is the ROM's
 static const NNSiG2dCharCanvasVTable VTABLE_BG = { DrawGlyphLine, ClearContinuous, ClearAreaLine };
+static const NNSiG2dCharCanvasVTable VTABLE_OBJ1D = { DrawGlyph1D, ClearContinuous, ClearArea1D };
+const NNSiG2dCharCanvasVTable VTABLE_OBJ2DRECT = { DrawGlyphLine, ClearLine, ClearAreaLine };
 
 // The largest OBJ that fits in an area, by the log2 sizes of the area, at most 8 characters: [height][width]
 static const ObjectSize sMaxObjSize[4][4] = {
@@ -89,8 +89,9 @@ static u32 GetCharIndex1D(u32 x, u32 y, int areaWidth, int areaHeight, int objWi
     u32 charNo = 0;
 
     while (TRUE) {
-        const u32 maskW = 0xffffffff << objWidthShift;
-        const u32 maskH = 0xffffffff << objHeightShift;
+        const u32 fullbits = (u32)(~0);
+        const u32 maskW = fullbits << objWidthShift;
+        const u32 maskH = fullbits << objHeightShift;
         const u32 bodyWidth = areaWidth & maskW;
         const u32 bodyHeight = areaHeight & maskH;
 
@@ -163,9 +164,10 @@ static void ClearChar(u32 *pChar, int x, int y, int w, int h, u32 cl, int bpp) {
         }
     } else {
         // Two words a line, with the masks of both
+        const u32 fullbits = (u32)(~0);
         const u32 left = x * 8;
         const u32 right = 64 - (left + w * 8);
-        u32 mask0 = 0xffffffff >> left;
+        u32 mask0 = fullbits >> left;
         u32 mask1;
         u32 data0;
         u32 data1;
@@ -178,7 +180,7 @@ static void ClearChar(u32 *pChar, int x, int y, int w, int h, u32 cl, int bpp) {
         } else {
             mask0 <<= left;
         }
-        mask1 = 0xffffffff << right;
+        mask1 = fullbits << right;
         if (left >= 32) {
             mask1 = (mask1 >> ((left - 32) + right)) << (left - 32);
         } else {
@@ -590,6 +592,15 @@ void NNS_G2dCharCanvasInitForOBJ1D(NNSG2dCharCanvas *pCC, void *charBase, int ar
     InitCharCanvas(pCC, charBase, areaWidth, areaHeight, colorMode, &VTABLE_OBJ1D, param.packed);
 }
 
+// The 2D OBJ canvas init, which the original link dropped though its functions table stays in the ROM; the game
+// keeps the table because this function references it. Reconstructed from ntrtwl's NitroSystem
+void NNS_G2dCharCanvasInitForOBJ2DRect(NNSG2dCharCanvas *pCC, void *charBase, int areaWidth, int areaHeight,
+                                       NNSG2dCharaColorMode colorMode) {
+    int lineWidth = (colorMode == NNS_G2D_CHARA_COLORMODE_16) ? 32 : 16;
+
+    InitCharCanvas(pCC, charBase, areaWidth, areaHeight, colorMode, &VTABLE_OBJ2DRECT, lineWidth);
+}
+
 // Maps an area of a text BG's screen to the characters of a canvas, in order. A screen wider than 32 characters is
 // made of 32 by 32 blocks
 void NNS_G2dMapScrToCharText(void *scnBase, int areaWidth, int areaHeight, int areaLeft, int areaTop,
@@ -654,8 +665,9 @@ int NNS_G2dArrangeOBJ1D(GXOamAttr *oam, int areaWidth, int areaHeight, int x, in
     const ObjectSize *pSize = &sMaxObjSize[ObjSizeShiftOf(areaHeight)][ObjSizeShiftOf(areaWidth)];
     const int objWidthShift = pSize->widthShift;
     const int objHeightShift = pSize->heightShift;
-    const u32 bodyWidth = areaWidth & (0xffffffff << objWidthShift);
-    const u32 bodyHeight = areaHeight & (0xffffffff << objHeightShift);
+    const u32 fullbits = (u32)(~0);
+    const u32 bodyWidth = areaWidth & (fullbits << objWidthShift);
+    const u32 bodyHeight = areaHeight & (fullbits << objHeightShift);
     const int charUnit = (color == GX_OAM_COLORMODE_16) ? 1 : 2;
     int numObj = 0;
     const u32 shape = OBJSizeToShape(pSize);

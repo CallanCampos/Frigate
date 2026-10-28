@@ -30,6 +30,10 @@ static BOOL bAutoZOffsetAdd_ = FALSE;
 static NNS_G2dOamSoftEmuUVFlipCorrectFunc s_pUVFlipCorrectFunc = NULL;
 static fx32 zOffsetStep_ = -FX32_ONE;
 
+// Two unit values the ROM holds before the tables: the original kept them as objects though nothing loads them,
+// and their names are unknown. Each is its own four-byte object, which is what puts them before the tables.
+static const u32 sUnitValue0[1] = { FX32_ONE };
+static const u32 sUnitValue1[1] = { FX32_ONE };
 // The texture format of each OAM color mode
 static const GXTexFmt texFmtTbl_[2] = { GX_TEXFMT_PLTT16, GX_TEXFMT_PLTT256 };
 // The characters in a row of a 2D mapped image, by its texture width
