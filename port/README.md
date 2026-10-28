@@ -68,7 +68,8 @@ ctest --test-dir build/port -j4 --output-on-failure                      # test
   Chat lists). The initial contributor ran 1,800 boot frames; New Game, field progression and Spanish saves
   have not been validated. A generated manifest checks structural bounds and subsequent consistency with that
   dump, not its authenticity or compatibility. Use an isolated `--save-dir` and keep original cartridge saves
-  backed up. No Spanish dump is supplied or required for the synthetic loader tests.
+  backed up. No Spanish dump is supplied or required for the synthetic loader tests. Missing gameplay/save
+  evidence is tracked separately in issue #45.
 - **The program's options** are in `frigate-black2 --help`, which says what each does and what each exit status means,
   from `sOptions` in [app/main.c](app/main.c): `--headless` runs without a window or pacing, `--frames N` stops after N
   frames, `--screenshot PATH` writes both screens at the end, `--save-dir PATH` keeps the saves elsewhere,
