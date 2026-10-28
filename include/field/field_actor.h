@@ -146,6 +146,8 @@ void SetZoneNPCMdlID(EventData *eventData, u16 npcId, u16 objCode);
 void SetZoneNPCSCRID(EventData *eventData, u16 npcId, u16 scriptId);
 void GetNPCMdlInfoForOBJCODE(const MMSys *actorSystem, u16 objCode, FieldActorConfig *config);
 void LoadMModelSystemInfoCache(MMSys *mmSys, s32 index);
+// The flag of an actor that moves on rails, which SetRailActorFlag sets
+#define ACTOR_FLAG_RAIL 0x2000
 void SetActorFlag(FieldActor *actor, u32 flag);
 void ClearActorFlag(FieldActor *actor, u32 flag);
 // The movement flag that hides an actor's shadow, which the actor terrain effects set off a shadow tile
