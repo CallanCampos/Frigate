@@ -1,6 +1,7 @@
 // Transitions into and out of maps: the fades, wipes and the building-entrance effect that the field events run
 // around a warp. Each creator allocates a TransitionEvent for its callback
 #include "types.h"
+#include "constants/directions.h"
 #include "field/building_enter_effect.h"
 #include "field/event_season_banner.h"
 #include "field/field.h"
@@ -37,20 +38,22 @@ typedef struct {
 u32 EventGameTransition_GetFadeKind(u32 type);
 u32 EventGameTransition_LookupExitEffect(u32 from, u32 to);
 u32 EventGameTransition_LookupEntranceEffect(u32 from, u32 to);
-GameEvent *EventGameTransition_CreateFadeOutEventForEffect(GameSystem *gsys, Field *field, u32 type, u32 a3, u32 a4);
-GameEvent *EventGameTransition_CreateFadeInEventForEffect(GameSystem *gsys, Field *field, u32 type, u32 a3, u32 a4);
+GameEvent *EventGameTransition_CreateFadeOutEventForEffect(GameSystem *gsys, Field *field, u32 type, u32 skipWait,
+                                                           u32 fadeSlowness);
+GameEvent *EventGameTransition_CreateFadeInEventForEffect(GameSystem *gsys, Field *field, u32 type, u32 skipWait,
+                                                          u32 keepLCD);
 GameEvent *EventGameTransition_CreateFadeOutEventDefault(GameSystem *gsys, Field *field);
 GameEvent *EventGameTransition_CreateFadeInEventDefault(GameSystem *gsys, Field *field);
 GameEvent *EventGameTransition_SeasonBanner_Create(GameSystem *gsys, Field *field, u8 startSeason, u8 endSeason);
-GameEvent *EventGameTransition_CreateFadeOutEventEffect4(GameSystem *gsys, Field *field);
-GameEvent *EventGameTransition_CreateFadeOutEventEffect5(GameSystem *gsys, Field *field);
-GameEvent *EventGameTransition_CreateFadeInEventEffect5(GameSystem *gsys, Field *field);
-GameEvent *EventGameTransition_CreateFadeOutEventEffect6(GameSystem *gsys, Field *field);
-GameEvent *EventGameTransition_CreateFadeInEventEffect6(GameSystem *gsys, Field *field);
-GameEvent *EventGameTransition_CreateFadeOutEventEffect7(GameSystem *gsys, Field *field);
-GameEvent *EventGameTransition_CreateFadeInEventEffect7(GameSystem *gsys, Field *field);
-GameEvent *EventGameTransition_CreateFadeOutEventEffect8(GameSystem *gsys, Field *field);
-GameEvent *EventGameTransition_CreateFadeInEventEffect8(GameSystem *gsys, Field *field);
+GameEvent *EventGameTransition_CreateWipeOutEvent(GameSystem *gsys, Field *field);
+GameEvent *EventGameTransition_CreateWipeOutEventUp(GameSystem *gsys, Field *field);
+GameEvent *EventGameTransition_CreateWipeInEventUp(GameSystem *gsys, Field *field);
+GameEvent *EventGameTransition_CreateWipeOutEventDown(GameSystem *gsys, Field *field);
+GameEvent *EventGameTransition_CreateWipeInEventDown(GameSystem *gsys, Field *field);
+GameEvent *EventGameTransition_CreateWipeOutEventLeft(GameSystem *gsys, Field *field);
+GameEvent *EventGameTransition_CreateWipeInEventLeft(GameSystem *gsys, Field *field);
+GameEvent *EventGameTransition_CreateWipeOutEventRight(GameSystem *gsys, Field *field);
+GameEvent *EventGameTransition_CreateWipeInEventRight(GameSystem *gsys, Field *field);
 GameEvent *EventGameTransition_StartFadeOutByFacing(GameSystem *gsys, Field *field);
 GameEvent *EventGameTransition_StartFadeInByFacing(GameSystem *gsys, Field *field);
 GameEventReturnCode EventGameTransition_RunFadeOut(GameEvent *event, u32 *state, void *data);
@@ -59,15 +62,15 @@ GameEventReturnCode setupScreenForEnterBuilding(GameEvent *event, u32 *state, vo
 GameEventReturnCode EventGameTransition_RunDefaultFadeIn(GameEvent *event, u32 *state, void *data);
 GameEventReturnCode EventGameTransition_SeasonBanner_Callback(GameEvent *event, u32 *state, void *data);
 GameEventReturnCode EventGameTransition_RunSeasonFadeInWithCallback(GameEvent *event, u32 *state, void *data);
-GameEventReturnCode EventGameTransition_RunWipeOutEffect4(GameEvent *event, u32 *state, void *data);
-GameEventReturnCode EventGameTransition_RunWipeOutEffect5(GameEvent *event, u32 *state, void *data);
-GameEventReturnCode EventGameTransition_RunWipeOutEffect6(GameEvent *event, u32 *state, void *data);
-GameEventReturnCode EventGameTransition_RunWipeOutEffect7(GameEvent *event, u32 *state, void *data);
-GameEventReturnCode EventGameTransition_RunWipeOutEffect8(GameEvent *event, u32 *state, void *data);
-GameEventReturnCode EventGameTransition_RunWipeInEffect5(GameEvent *event, u32 *state, void *data);
-GameEventReturnCode EventGameTransition_RunWipeInEffect6(GameEvent *event, u32 *state, void *data);
-GameEventReturnCode EventGameTransition_RunWipeInEffect7(GameEvent *event, u32 *state, void *data);
-GameEventReturnCode EventGameTransition_RunWipeInEffect8(GameEvent *event, u32 *state, void *data);
+GameEventReturnCode EventGameTransition_RunWipeOut(GameEvent *event, u32 *state, void *data);
+GameEventReturnCode EventGameTransition_RunWipeOutUp(GameEvent *event, u32 *state, void *data);
+GameEventReturnCode EventGameTransition_RunWipeOutDown(GameEvent *event, u32 *state, void *data);
+GameEventReturnCode EventGameTransition_RunWipeOutLeft(GameEvent *event, u32 *state, void *data);
+GameEventReturnCode EventGameTransition_RunWipeOutRight(GameEvent *event, u32 *state, void *data);
+GameEventReturnCode EventGameTransition_RunWipeInUp(GameEvent *event, u32 *state, void *data);
+GameEventReturnCode EventGameTransition_RunWipeInDown(GameEvent *event, u32 *state, void *data);
+GameEventReturnCode EventGameTransition_RunWipeInLeft(GameEvent *event, u32 *state, void *data);
+GameEventReturnCode EventGameTransition_RunWipeInRight(GameEvent *event, u32 *state, void *data);
 GameEventReturnCode EventGameTransition_RunFadeInWithBgRestore(GameEvent *event, u32 *state, void *data);
 void FieldG3D_SetLCDConfigKeepBGs(Field *field);
 void EventGameTransition_ResetBgAffine(Field *field);
@@ -82,55 +85,55 @@ u32 GetInTransitionTypeBetweenZones(u16 fromZone, u16 toZone) {
                                                     GetMapTransitionEffectType(toZone));
 }
 
-GameEvent *CallFieldMapEntranceOutTransitionDefault(GameSystem *gsys, Field *field, u32 type, u32 a3) {
-    return CallFieldMapEntranceOutTransition(gsys, field, type, a3, -1);
+GameEvent *CallFieldMapEntranceOutTransitionDefault(GameSystem *gsys, Field *field, u32 type, u32 skipWait) {
+    return CallFieldMapEntranceOutTransition(gsys, field, type, skipWait, -1);
 }
 
-GameEvent *CallFieldMapEntranceOutTransition(GameSystem *gsys, Field *field, u32 type, u32 a3, u32 a4) {
+GameEvent *CallFieldMapEntranceOutTransition(GameSystem *gsys, Field *field, u32 type, u32 skipWait, u32 fadeSlowness) {
     switch (type) {
-    case 2:
+    case FIELD_TRANSITION_BUILDING:
     default:
         return EventGameTransition_CreateFadeOutEventDefault(gsys, field);
-    case 0:
-    case 1:
-    case 3:
-        return EventGameTransition_CreateFadeOutEventForEffect(gsys, field, type, a3, a4);
-    case 4:
-        return EventGameTransition_CreateFadeOutEventEffect4(gsys, field);
-    case 5:
-        return EventGameTransition_CreateFadeOutEventEffect5(gsys, field);
-    case 6:
-        return EventGameTransition_CreateFadeOutEventEffect6(gsys, field);
-    case 7:
-        return EventGameTransition_CreateFadeOutEventEffect7(gsys, field);
-    case 8:
-        return EventGameTransition_CreateFadeOutEventEffect8(gsys, field);
-    case 9:
+    case FIELD_TRANSITION_FADE_BLACK:
+    case FIELD_TRANSITION_FADE_WHITE:
+    case FIELD_TRANSITION_SEASON:
+        return EventGameTransition_CreateFadeOutEventForEffect(gsys, field, type, skipWait, fadeSlowness);
+    case FIELD_TRANSITION_WIPE:
+        return EventGameTransition_CreateWipeOutEvent(gsys, field);
+    case FIELD_TRANSITION_WIPE_UP:
+        return EventGameTransition_CreateWipeOutEventUp(gsys, field);
+    case FIELD_TRANSITION_WIPE_DOWN:
+        return EventGameTransition_CreateWipeOutEventDown(gsys, field);
+    case FIELD_TRANSITION_WIPE_LEFT:
+        return EventGameTransition_CreateWipeOutEventLeft(gsys, field);
+    case FIELD_TRANSITION_WIPE_RIGHT:
+        return EventGameTransition_CreateWipeOutEventRight(gsys, field);
+    case FIELD_TRANSITION_WIPE_FACING:
         return EventGameTransition_StartFadeOutByFacing(gsys, field);
     }
 }
 
-GameEvent *CallFieldMapEntranceInTransition(GameSystem *gsys, Field *field, u32 type, u32 a3, u32 a4, u8 startSeason,
-                                            u8 endSeason) {
+GameEvent *CallFieldMapEntranceInTransition(GameSystem *gsys, Field *field, u32 type, u32 skipWait, u32 keepLCD,
+                                            u8 startSeason, u8 endSeason) {
     switch (type) {
-    case 2:
-    case 4:
+    case FIELD_TRANSITION_BUILDING:
+    case FIELD_TRANSITION_WIPE:
     default:
         return EventGameTransition_CreateFadeInEventDefault(gsys, field);
-    case 0:
-    case 1:
-        return EventGameTransition_CreateFadeInEventForEffect(gsys, field, type, a3, a4);
-    case 3:
+    case FIELD_TRANSITION_FADE_BLACK:
+    case FIELD_TRANSITION_FADE_WHITE:
+        return EventGameTransition_CreateFadeInEventForEffect(gsys, field, type, skipWait, keepLCD);
+    case FIELD_TRANSITION_SEASON:
         return EventGameTransition_SeasonBanner_Create(gsys, field, startSeason, endSeason);
-    case 5:
-        return EventGameTransition_CreateFadeInEventEffect5(gsys, field);
-    case 6:
-        return EventGameTransition_CreateFadeInEventEffect6(gsys, field);
-    case 7:
-        return EventGameTransition_CreateFadeInEventEffect7(gsys, field);
-    case 8:
-        return EventGameTransition_CreateFadeInEventEffect8(gsys, field);
-    case 9:
+    case FIELD_TRANSITION_WIPE_UP:
+        return EventGameTransition_CreateWipeInEventUp(gsys, field);
+    case FIELD_TRANSITION_WIPE_DOWN:
+        return EventGameTransition_CreateWipeInEventDown(gsys, field);
+    case FIELD_TRANSITION_WIPE_LEFT:
+        return EventGameTransition_CreateWipeInEventLeft(gsys, field);
+    case FIELD_TRANSITION_WIPE_RIGHT:
+        return EventGameTransition_CreateWipeInEventRight(gsys, field);
+    case FIELD_TRANSITION_WIPE_FACING:
         return EventGameTransition_StartFadeInByFacing(gsys, field);
     }
 }
@@ -143,7 +146,7 @@ GameEvent *EventGameTransition_CreateSeasonFadeInEventWithCallback(GameSystem *g
     TransitionEvent *data = GameEvent_GetData(event);
     data->gsys = gsys;
     data->field = field;
-    data->type = 3;
+    data->type = FIELD_TRANSITION_SEASON;
     data->startSeason = startSeason;
     data->endSeason = endSeason;
     data->fadeMode = EventGameTransition_GetFadeKind(data->type);
@@ -152,46 +155,47 @@ GameEvent *EventGameTransition_CreateSeasonFadeInEventWithCallback(GameSystem *g
     return event;
 }
 
-GameEvent *EventGameTransition_CreateFadeInEventWithBgRestore(GameSystem *gsys, Field *field, u32 a2, u32 a3, u32 a4) {
+GameEvent *EventGameTransition_CreateFadeInEventWithBgRestore(GameSystem *gsys, Field *field, u32 type, u32 skipWait,
+                                                              u32 fadeSlowness) {
     GameEvent *event =
         GameEvent_Create(gsys, NULL, EventGameTransition_RunFadeInWithBgRestore, sizeof(TransitionEvent));
     TransitionEvent *data = GameEvent_GetData(event);
     data->gsys = gsys;
     data->field = field;
-    data->type = a2;
-    data->skipWait = a3;
-    data->fadeMode = EventGameTransition_GetFadeKind(a2);
-    data->fadeSlowness = a4;
+    data->type = type;
+    data->skipWait = skipWait;
+    data->fadeMode = EventGameTransition_GetFadeKind(type);
+    data->fadeSlowness = fadeSlowness;
     return event;
 }
 
-GameEvent *EventGameTransition_CreateFadeOutEvent(GameSystem *gsys, Field *field, u32 a2, u32 a3) {
+GameEvent *EventGameTransition_CreateFadeOutEvent(GameSystem *gsys, Field *field, u32 type, u32 skipWait) {
     GameEvent *event = GameEvent_Create(gsys, NULL, EventGameTransition_RunFadeOut, sizeof(TransitionEvent));
     TransitionEvent *data = GameEvent_GetData(event);
     data->gsys = gsys;
     data->field = field;
-    data->type = a2;
-    data->skipWait = a3;
-    data->fadeMode = EventGameTransition_GetFadeKind(a2);
+    data->type = type;
+    data->skipWait = skipWait;
+    data->fadeMode = EventGameTransition_GetFadeKind(type);
     return event;
 }
 
 u32 EventGameTransition_GetFadeKind(u32 type) {
     switch (type) {
-    case 0:
+    case FIELD_TRANSITION_FADE_BLACK:
     default:
-        return 3;
-    case 1:
-        return 12;
-    case 2:
-    case 3:
-    case 4:
-    case 5:
-    case 6:
-    case 7:
-    case 8:
-    case 9:
-        return 2;
+        return FADE_ENGINE_A_BLACK | FADE_ENGINE_B_BLACK;
+    case FIELD_TRANSITION_FADE_WHITE:
+        return FADE_ENGINE_A_WHITE | FADE_ENGINE_B_WHITE;
+    case FIELD_TRANSITION_BUILDING:
+    case FIELD_TRANSITION_SEASON:
+    case FIELD_TRANSITION_WIPE:
+    case FIELD_TRANSITION_WIPE_UP:
+    case FIELD_TRANSITION_WIPE_DOWN:
+    case FIELD_TRANSITION_WIPE_LEFT:
+    case FIELD_TRANSITION_WIPE_RIGHT:
+    case FIELD_TRANSITION_WIPE_FACING:
+        return FADE_ENGINE_B_BLACK;
     }
 }
 
@@ -211,27 +215,29 @@ u32 EventGameTransition_LookupEntranceEffect(u32 from, u32 to) {
     return table[from][to];
 }
 
-GameEvent *EventGameTransition_CreateFadeOutEventForEffect(GameSystem *gsys, Field *field, u32 type, u32 a3, u32 a4) {
+GameEvent *EventGameTransition_CreateFadeOutEventForEffect(GameSystem *gsys, Field *field, u32 type, u32 skipWait,
+                                                           u32 fadeSlowness) {
     GameEvent *event = GameEvent_Create(gsys, NULL, EventGameTransition_RunFadeOut, sizeof(TransitionEvent));
     TransitionEvent *data = GameEvent_GetData(event);
     data->gsys = gsys;
     data->field = field;
     data->type = type;
-    data->skipWait = a3;
-    data->fadeSlowness = a4;
+    data->skipWait = skipWait;
+    data->fadeSlowness = fadeSlowness;
     data->fadeMode = EventGameTransition_GetFadeKind(type);
     return event;
 }
 
-GameEvent *EventGameTransition_CreateFadeInEventForEffect(GameSystem *gsys, Field *field, u32 type, u32 a3, u32 a4) {
+GameEvent *EventGameTransition_CreateFadeInEventForEffect(GameSystem *gsys, Field *field, u32 type, u32 skipWait,
+                                                          u32 keepLCD) {
     GameEvent *event = GameEvent_Create(gsys, NULL, EventGameTransition_RunFadeIn, sizeof(TransitionEvent));
     TransitionEvent *data = GameEvent_GetData(event);
     data->gsys = gsys;
     data->field = field;
     data->type = type;
-    data->skipWait = a3;
+    data->skipWait = skipWait;
     data->fadeMode = EventGameTransition_GetFadeKind(type);
-    data->keepLCD = a4;
+    data->keepLCD = keepLCD;
     return event;
 }
 
@@ -240,8 +246,8 @@ GameEvent *EventGameTransition_CreateFadeOutEventDefault(GameSystem *gsys, Field
     TransitionEvent *data = GameEvent_GetData(event);
     data->gsys = gsys;
     data->field = field;
-    data->type = 2;
-    data->fadeMode = EventGameTransition_GetFadeKind(2);
+    data->type = FIELD_TRANSITION_BUILDING;
+    data->fadeMode = EventGameTransition_GetFadeKind(FIELD_TRANSITION_BUILDING);
     return event;
 }
 
@@ -250,8 +256,8 @@ GameEvent *EventGameTransition_CreateFadeInEventDefault(GameSystem *gsys, Field 
     TransitionEvent *data = GameEvent_GetData(event);
     data->gsys = gsys;
     data->field = field;
-    data->type = 2;
-    data->fadeMode = EventGameTransition_GetFadeKind(2);
+    data->type = FIELD_TRANSITION_BUILDING;
+    data->fadeMode = EventGameTransition_GetFadeKind(FIELD_TRANSITION_BUILDING);
     return event;
 }
 
@@ -260,7 +266,7 @@ GameEvent *EventGameTransition_SeasonBanner_Create(GameSystem *gsys, Field *fiel
     TransitionEvent *data = GameEvent_GetData(event);
     data->gsys = gsys;
     data->field = field;
-    data->type = 3;
+    data->type = FIELD_TRANSITION_SEASON;
     data->startSeason = startSeason;
     data->endSeason = endSeason;
     data->fadeMode = EventGameTransition_GetFadeKind(data->type);
@@ -269,121 +275,121 @@ GameEvent *EventGameTransition_SeasonBanner_Create(GameSystem *gsys, Field *fiel
     return event;
 }
 
-GameEvent *EventGameTransition_CreateFadeOutEventEffect4(GameSystem *gsys, Field *field) {
-    GameEvent *event = GameEvent_Create(gsys, NULL, EventGameTransition_RunWipeOutEffect4, sizeof(TransitionEvent));
+GameEvent *EventGameTransition_CreateWipeOutEvent(GameSystem *gsys, Field *field) {
+    GameEvent *event = GameEvent_Create(gsys, NULL, EventGameTransition_RunWipeOut, sizeof(TransitionEvent));
     TransitionEvent *data = GameEvent_GetData(event);
     data->gsys = gsys;
     data->field = field;
-    data->type = 4;
-    data->fadeMode = EventGameTransition_GetFadeKind(4);
+    data->type = FIELD_TRANSITION_WIPE;
+    data->fadeMode = EventGameTransition_GetFadeKind(FIELD_TRANSITION_WIPE);
     return event;
 }
 
-GameEvent *EventGameTransition_CreateFadeOutEventEffect5(GameSystem *gsys, Field *field) {
-    GameEvent *event = GameEvent_Create(gsys, NULL, EventGameTransition_RunWipeOutEffect5, sizeof(TransitionEvent));
+GameEvent *EventGameTransition_CreateWipeOutEventUp(GameSystem *gsys, Field *field) {
+    GameEvent *event = GameEvent_Create(gsys, NULL, EventGameTransition_RunWipeOutUp, sizeof(TransitionEvent));
     TransitionEvent *data = GameEvent_GetData(event);
     data->gsys = gsys;
     data->field = field;
-    data->type = 5;
-    data->fadeMode = EventGameTransition_GetFadeKind(5);
+    data->type = FIELD_TRANSITION_WIPE_UP;
+    data->fadeMode = EventGameTransition_GetFadeKind(FIELD_TRANSITION_WIPE_UP);
     return event;
 }
 
-GameEvent *EventGameTransition_CreateFadeInEventEffect5(GameSystem *gsys, Field *field) {
-    GameEvent *event = GameEvent_Create(gsys, NULL, EventGameTransition_RunWipeInEffect5, sizeof(TransitionEvent));
+GameEvent *EventGameTransition_CreateWipeInEventUp(GameSystem *gsys, Field *field) {
+    GameEvent *event = GameEvent_Create(gsys, NULL, EventGameTransition_RunWipeInUp, sizeof(TransitionEvent));
     TransitionEvent *data = GameEvent_GetData(event);
     data->gsys = gsys;
     data->field = field;
-    data->type = 5;
-    data->fadeMode = EventGameTransition_GetFadeKind(5);
+    data->type = FIELD_TRANSITION_WIPE_UP;
+    data->fadeMode = EventGameTransition_GetFadeKind(FIELD_TRANSITION_WIPE_UP);
     return event;
 }
 
-GameEvent *EventGameTransition_CreateFadeOutEventEffect6(GameSystem *gsys, Field *field) {
-    GameEvent *event = GameEvent_Create(gsys, NULL, EventGameTransition_RunWipeOutEffect6, sizeof(TransitionEvent));
+GameEvent *EventGameTransition_CreateWipeOutEventDown(GameSystem *gsys, Field *field) {
+    GameEvent *event = GameEvent_Create(gsys, NULL, EventGameTransition_RunWipeOutDown, sizeof(TransitionEvent));
     TransitionEvent *data = GameEvent_GetData(event);
     data->gsys = gsys;
     data->field = field;
-    data->type = 6;
-    data->fadeMode = EventGameTransition_GetFadeKind(6);
+    data->type = FIELD_TRANSITION_WIPE_DOWN;
+    data->fadeMode = EventGameTransition_GetFadeKind(FIELD_TRANSITION_WIPE_DOWN);
     return event;
 }
 
-GameEvent *EventGameTransition_CreateFadeInEventEffect6(GameSystem *gsys, Field *field) {
-    GameEvent *event = GameEvent_Create(gsys, NULL, EventGameTransition_RunWipeInEffect6, sizeof(TransitionEvent));
+GameEvent *EventGameTransition_CreateWipeInEventDown(GameSystem *gsys, Field *field) {
+    GameEvent *event = GameEvent_Create(gsys, NULL, EventGameTransition_RunWipeInDown, sizeof(TransitionEvent));
     TransitionEvent *data = GameEvent_GetData(event);
     data->gsys = gsys;
     data->field = field;
-    data->type = 6;
-    data->fadeMode = EventGameTransition_GetFadeKind(6);
+    data->type = FIELD_TRANSITION_WIPE_DOWN;
+    data->fadeMode = EventGameTransition_GetFadeKind(FIELD_TRANSITION_WIPE_DOWN);
     return event;
 }
 
-GameEvent *EventGameTransition_CreateFadeOutEventEffect7(GameSystem *gsys, Field *field) {
-    GameEvent *event = GameEvent_Create(gsys, NULL, EventGameTransition_RunWipeOutEffect7, sizeof(TransitionEvent));
+GameEvent *EventGameTransition_CreateWipeOutEventLeft(GameSystem *gsys, Field *field) {
+    GameEvent *event = GameEvent_Create(gsys, NULL, EventGameTransition_RunWipeOutLeft, sizeof(TransitionEvent));
     TransitionEvent *data = GameEvent_GetData(event);
     data->gsys = gsys;
     data->field = field;
-    data->type = 7;
-    data->fadeMode = EventGameTransition_GetFadeKind(7);
+    data->type = FIELD_TRANSITION_WIPE_LEFT;
+    data->fadeMode = EventGameTransition_GetFadeKind(FIELD_TRANSITION_WIPE_LEFT);
     return event;
 }
 
-GameEvent *EventGameTransition_CreateFadeInEventEffect7(GameSystem *gsys, Field *field) {
-    GameEvent *event = GameEvent_Create(gsys, NULL, EventGameTransition_RunWipeInEffect7, sizeof(TransitionEvent));
+GameEvent *EventGameTransition_CreateWipeInEventLeft(GameSystem *gsys, Field *field) {
+    GameEvent *event = GameEvent_Create(gsys, NULL, EventGameTransition_RunWipeInLeft, sizeof(TransitionEvent));
     TransitionEvent *data = GameEvent_GetData(event);
     data->gsys = gsys;
     data->field = field;
-    data->type = 7;
-    data->fadeMode = EventGameTransition_GetFadeKind(7);
+    data->type = FIELD_TRANSITION_WIPE_LEFT;
+    data->fadeMode = EventGameTransition_GetFadeKind(FIELD_TRANSITION_WIPE_LEFT);
     return event;
 }
 
-GameEvent *EventGameTransition_CreateFadeOutEventEffect8(GameSystem *gsys, Field *field) {
-    GameEvent *event = GameEvent_Create(gsys, NULL, EventGameTransition_RunWipeOutEffect8, sizeof(TransitionEvent));
+GameEvent *EventGameTransition_CreateWipeOutEventRight(GameSystem *gsys, Field *field) {
+    GameEvent *event = GameEvent_Create(gsys, NULL, EventGameTransition_RunWipeOutRight, sizeof(TransitionEvent));
     TransitionEvent *data = GameEvent_GetData(event);
     data->gsys = gsys;
     data->field = field;
-    data->type = 8;
-    data->fadeMode = EventGameTransition_GetFadeKind(8);
+    data->type = FIELD_TRANSITION_WIPE_RIGHT;
+    data->fadeMode = EventGameTransition_GetFadeKind(FIELD_TRANSITION_WIPE_RIGHT);
     return event;
 }
 
-GameEvent *EventGameTransition_CreateFadeInEventEffect8(GameSystem *gsys, Field *field) {
-    GameEvent *event = GameEvent_Create(gsys, NULL, EventGameTransition_RunWipeInEffect8, sizeof(TransitionEvent));
+GameEvent *EventGameTransition_CreateWipeInEventRight(GameSystem *gsys, Field *field) {
+    GameEvent *event = GameEvent_Create(gsys, NULL, EventGameTransition_RunWipeInRight, sizeof(TransitionEvent));
     TransitionEvent *data = GameEvent_GetData(event);
     data->gsys = gsys;
     data->field = field;
-    data->type = 8;
-    data->fadeMode = EventGameTransition_GetFadeKind(8);
+    data->type = FIELD_TRANSITION_WIPE_RIGHT;
+    data->fadeMode = EventGameTransition_GetFadeKind(FIELD_TRANSITION_WIPE_RIGHT);
     return event;
 }
 
 GameEvent *EventGameTransition_StartFadeOutByFacing(GameSystem *gsys, Field *field) {
     switch (FieldPlayer_GetFaceDir(Field_GetPlayer(field))) {
-    case 2:
+    case DIR_LEFT:
     default:
-        return EventGameTransition_CreateFadeOutEventEffect7(gsys, field);
-    case 3:
-        return EventGameTransition_CreateFadeOutEventEffect8(gsys, field);
-    case 0:
-        return EventGameTransition_CreateFadeOutEventEffect5(gsys, field);
-    case 1:
-        return EventGameTransition_CreateFadeOutEventEffect6(gsys, field);
+        return EventGameTransition_CreateWipeOutEventLeft(gsys, field);
+    case DIR_RIGHT:
+        return EventGameTransition_CreateWipeOutEventRight(gsys, field);
+    case DIR_UP:
+        return EventGameTransition_CreateWipeOutEventUp(gsys, field);
+    case DIR_DOWN:
+        return EventGameTransition_CreateWipeOutEventDown(gsys, field);
     }
 }
 
 GameEvent *EventGameTransition_StartFadeInByFacing(GameSystem *gsys, Field *field) {
     switch (FieldPlayer_GetFaceDir(Field_GetPlayer(field))) {
-    case 2:
+    case DIR_LEFT:
     default:
-        return EventGameTransition_CreateFadeInEventEffect7(gsys, field);
-    case 3:
-        return EventGameTransition_CreateFadeInEventEffect8(gsys, field);
-    case 0:
-        return EventGameTransition_CreateFadeInEventEffect5(gsys, field);
-    case 1:
-        return EventGameTransition_CreateFadeInEventEffect6(gsys, field);
+        return EventGameTransition_CreateWipeInEventLeft(gsys, field);
+    case DIR_RIGHT:
+        return EventGameTransition_CreateWipeInEventRight(gsys, field);
+    case DIR_UP:
+        return EventGameTransition_CreateWipeInEventUp(gsys, field);
+    case DIR_DOWN:
+        return EventGameTransition_CreateWipeInEventDown(gsys, field);
     }
 }
 
@@ -548,7 +554,7 @@ GameEventReturnCode EventGameTransition_RunSeasonFadeInWithCallback(GameEvent *e
     return GAMEEVENT_CONTINUE;
 }
 
-GameEventReturnCode EventGameTransition_RunWipeOutEffect4(GameEvent *event, u32 *state, void *data) {
+GameEventReturnCode EventGameTransition_RunWipeOut(GameEvent *event, u32 *state, void *data) {
     TransitionEvent *work = data;
     Field *field = work->field;
     switch (*state) {
@@ -572,7 +578,7 @@ GameEventReturnCode EventGameTransition_RunWipeOutEffect4(GameEvent *event, u32 
     return GAMEEVENT_CONTINUE;
 }
 
-GameEventReturnCode EventGameTransition_RunWipeOutEffect5(GameEvent *event, u32 *state, void *data) {
+GameEventReturnCode EventGameTransition_RunWipeOutUp(GameEvent *event, u32 *state, void *data) {
     TransitionEvent *work = data;
     Field *field = work->field;
     switch (*state) {
@@ -596,7 +602,7 @@ GameEventReturnCode EventGameTransition_RunWipeOutEffect5(GameEvent *event, u32 
     return GAMEEVENT_CONTINUE;
 }
 
-GameEventReturnCode EventGameTransition_RunWipeOutEffect6(GameEvent *event, u32 *state, void *data) {
+GameEventReturnCode EventGameTransition_RunWipeOutDown(GameEvent *event, u32 *state, void *data) {
     TransitionEvent *work = data;
     Field *field = work->field;
     switch (*state) {
@@ -620,7 +626,7 @@ GameEventReturnCode EventGameTransition_RunWipeOutEffect6(GameEvent *event, u32 
     return GAMEEVENT_CONTINUE;
 }
 
-GameEventReturnCode EventGameTransition_RunWipeOutEffect7(GameEvent *event, u32 *state, void *data) {
+GameEventReturnCode EventGameTransition_RunWipeOutLeft(GameEvent *event, u32 *state, void *data) {
     TransitionEvent *work = data;
     Field *field = work->field;
     switch (*state) {
@@ -644,7 +650,7 @@ GameEventReturnCode EventGameTransition_RunWipeOutEffect7(GameEvent *event, u32 
     return GAMEEVENT_CONTINUE;
 }
 
-GameEventReturnCode EventGameTransition_RunWipeOutEffect8(GameEvent *event, u32 *state, void *data) {
+GameEventReturnCode EventGameTransition_RunWipeOutRight(GameEvent *event, u32 *state, void *data) {
     TransitionEvent *work = data;
     Field *field = work->field;
     switch (*state) {
@@ -668,7 +674,7 @@ GameEventReturnCode EventGameTransition_RunWipeOutEffect8(GameEvent *event, u32 
     return GAMEEVENT_CONTINUE;
 }
 
-GameEventReturnCode EventGameTransition_RunWipeInEffect5(GameEvent *event, u32 *state, void *data) {
+GameEventReturnCode EventGameTransition_RunWipeInUp(GameEvent *event, u32 *state, void *data) {
     TransitionEvent *work = data;
     Field *field = work->field;
     switch (*state) {
@@ -694,7 +700,7 @@ GameEventReturnCode EventGameTransition_RunWipeInEffect5(GameEvent *event, u32 *
     return GAMEEVENT_CONTINUE;
 }
 
-GameEventReturnCode EventGameTransition_RunWipeInEffect6(GameEvent *event, u32 *state, void *data) {
+GameEventReturnCode EventGameTransition_RunWipeInDown(GameEvent *event, u32 *state, void *data) {
     TransitionEvent *work = data;
     Field *field = work->field;
     switch (*state) {
@@ -720,7 +726,7 @@ GameEventReturnCode EventGameTransition_RunWipeInEffect6(GameEvent *event, u32 *
     return GAMEEVENT_CONTINUE;
 }
 
-GameEventReturnCode EventGameTransition_RunWipeInEffect7(GameEvent *event, u32 *state, void *data) {
+GameEventReturnCode EventGameTransition_RunWipeInLeft(GameEvent *event, u32 *state, void *data) {
     TransitionEvent *work = data;
     Field *field = work->field;
     switch (*state) {
@@ -746,7 +752,7 @@ GameEventReturnCode EventGameTransition_RunWipeInEffect7(GameEvent *event, u32 *
     return GAMEEVENT_CONTINUE;
 }
 
-GameEventReturnCode EventGameTransition_RunWipeInEffect8(GameEvent *event, u32 *state, void *data) {
+GameEventReturnCode EventGameTransition_RunWipeInRight(GameEvent *event, u32 *state, void *data) {
     TransitionEvent *work = data;
     Field *field = work->field;
     switch (*state) {

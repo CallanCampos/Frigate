@@ -124,7 +124,7 @@ GameEventReturnCode EventWarpSequenceOut_RunPlain(GameEvent *event, u32 *state, 
     switch (*state) {
     case 0:
         EventWarpSequenceOut_ChangeToZoneBGM(out);
-        if (warp->outTransition != 2) {
+        if (warp->outTransition != FIELD_TRANSITION_BUILDING) {
             GFL_SndSEPlay(SEQ_SE_KAIDAN);
         }
         EventWarpSequenceOut_PlayTransition(out, event);
@@ -210,7 +210,7 @@ GameEventReturnCode EventWarpSequenceOut_RunObjectAnime(GameEvent *event, u32 *s
         break;
     case 1:
         if (EventWarpSequence_UpdateTCB(warp)) {
-            if (warp->outTransition != 2) {
+            if (warp->outTransition != FIELD_TRANSITION_BUILDING) {
                 GFL_SndSEPlay(SEQ_SE_KAIDAN);
             }
             EventWarpSequenceOut_PlayTransition(out, event);
@@ -283,7 +283,7 @@ GameEventReturnCode EventWarpSequenceOut_RunFadeSe(GameEvent *event, u32 *state,
     case 0:
         EventWarpSequenceOut_ChangeToZoneBGM(out);
         GFL_SndSEPlay(SEQ_SE_FLD_102);
-        GameEvent_ChainNext(event, CallFieldMapEntranceOutTransitionDefault(gsys, field, 2, 0));
+        GameEvent_ChainNext(event, CallFieldMapEntranceOutTransitionDefault(gsys, field, FIELD_TRANSITION_BUILDING, 0));
         (*state)++;
         break;
     case 1:
@@ -344,7 +344,8 @@ static void EventWarpSequenceOut_PlayTransition(WarpOutData *out, GameEvent *eve
     Field *field = warp->field;
 
     if (warp->seasonChanged) {
-        GameEvent_ChainNext(event, CallFieldMapEntranceOutTransitionDefault(gsys, field, 0, 0));
+        GameEvent_ChainNext(event,
+                            CallFieldMapEntranceOutTransitionDefault(gsys, field, FIELD_TRANSITION_FADE_BLACK, 0));
     } else {
         GameEvent_ChainNext(event, CallFieldMapEntranceOutTransitionDefault(gsys, field, warp->outTransition, 0));
     }
@@ -509,7 +510,8 @@ GameEventReturnCode EventWarpSequenceIn_RunFadeSe(GameEvent *event, u32 *state, 
         (*state)++;
         break;
     case 1:
-        GameEvent_ChainNext(event, CallFieldMapEntranceInTransition(gsys, field, 2, 0, 0, 0, 0));
+        GameEvent_ChainNext(event,
+                            CallFieldMapEntranceInTransition(gsys, field, FIELD_TRANSITION_BUILDING, 0, 0, 0, 0));
         (*state)++;
         break;
     case 2:
@@ -539,8 +541,8 @@ static void EventWarpSequenceIn_PlayTransition(WarpInData *in, GameEvent *event)
     Field *field = warp->field;
 
     if (warp->seasonChanged) {
-        GameEvent_ChainNext(event,
-                            CallFieldMapEntranceInTransition(gsys, field, 3, 0, 0, warp->startSeason, warp->endSeason));
+        GameEvent_ChainNext(event, CallFieldMapEntranceInTransition(gsys, field, FIELD_TRANSITION_SEASON, 0, 0,
+                                                                    warp->startSeason, warp->endSeason));
     } else {
         GameEvent_ChainNext(event, CallFieldMapEntranceInTransition(gsys, field, warp->inTransition, 0, 1, 0, 0));
     }

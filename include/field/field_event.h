@@ -45,10 +45,26 @@ struct WarpSequence {
     FieldAcmdTCB *walkTask;
 };
 
-GameEvent *CallFieldMapEntranceInTransition(GameSystem *gsys, Field *field, u32 type, u32 a3, u32 a4, u8 startSeason,
-                                            u8 endSeason);
-GameEvent *CallFieldMapEntranceOutTransition(GameSystem *gsys, Field *field, u32 type, u32 a3, u32 a4);
-GameEvent *CallFieldMapEntranceOutTransitionDefault(GameSystem *gsys, Field *field, u32 type, u32 a3);
+// field_transition.c's transitions of the screen around a warp, by type: a fade to black or white, the building
+// entrance's (the default), the season banner's (on the way in), a wipe out, the wipes of the player's facing up, down,
+// left and right, and the one the player's facing picks among them. skipWait ends the fade's event without waiting for
+// it; the way out takes the fade's slowness, and the way in whether to restore the field's BGs first
+enum {
+    FIELD_TRANSITION_FADE_BLACK,
+    FIELD_TRANSITION_FADE_WHITE,
+    FIELD_TRANSITION_BUILDING,
+    FIELD_TRANSITION_SEASON,
+    FIELD_TRANSITION_WIPE,
+    FIELD_TRANSITION_WIPE_UP,
+    FIELD_TRANSITION_WIPE_DOWN,
+    FIELD_TRANSITION_WIPE_LEFT,
+    FIELD_TRANSITION_WIPE_RIGHT,
+    FIELD_TRANSITION_WIPE_FACING,
+};
+GameEvent *CallFieldMapEntranceInTransition(GameSystem *gsys, Field *field, u32 type, u32 skipWait, u32 keepLCD,
+                                            u8 startSeason, u8 endSeason);
+GameEvent *CallFieldMapEntranceOutTransition(GameSystem *gsys, Field *field, u32 type, u32 skipWait, u32 fadeSlowness);
+GameEvent *CallFieldMapEntranceOutTransitionDefault(GameSystem *gsys, Field *field, u32 type, u32 skipWait);
 // The season banner's event between two seasons, which calls callback with callbackArg
 GameEvent *EventGameTransition_CreateSeasonFadeInEventWithCallback(GameSystem *gsys, Field *field, u8 startSeason,
                                                                    u8 endSeason, void (*callback)(void *arg),
@@ -88,8 +104,9 @@ void PlaceName_ShowForZone(PlaceName *placeName, u32 zoneId);
 // The field effect of an ID, such as flying off and landing, or NULL
 GameEvent *EventFieldEffect_Create(GameSystem *gsys, Fld3DCi *ci, u8 effectId);
 // The fade out of the field before flying
-GameEvent *EventGameTransition_CreateFadeOutEvent(GameSystem *gsys, Field *field, u32 a2, u32 a3);
-GameEvent *EventGameTransition_CreateFadeInEventWithBgRestore(GameSystem *gsys, Field *field, u32 a2, u32 a3, u32 a4);
+GameEvent *EventGameTransition_CreateFadeOutEvent(GameSystem *gsys, Field *field, u32 type, u32 skipWait);
+GameEvent *EventGameTransition_CreateFadeInEventWithBgRestore(GameSystem *gsys, Field *field, u32 type, u32 skipWait,
+                                                              u32 fadeSlowness);
 GameEvent *EventQuicksandArrive_CreateSpinZoom(GameEvent *event, GameSystem *gsys, Field *field, BOOL seasonChanged,
                                                u32 prevSeason, u32 season);
 GameEvent *EventQuicksandArrive_CreateSpinZoomAlt(GameEvent *event, GameSystem *gsys, Field *field, BOOL seasonChanged,
