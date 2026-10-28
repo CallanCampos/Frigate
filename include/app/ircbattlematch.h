@@ -25,6 +25,8 @@ enum {
     IRCBATTLEMATCH_MODE_TRADE,
     // Exchanging friend codes
     IRCBATTLEMATCH_MODE_FRIEND,
+    // The Feeling Check, as the infrared menu's button picks it
+    IRCBATTLEMATCH_MODE_FEELING_CHECK,
     // The musical, started by script command 18 with an argument of 0 or not
     IRCBATTLEMATCH_MODE_MUSICAL_ARG0 = 9,
     IRCBATTLEMATCH_MODE_MUSICAL_ARG1,

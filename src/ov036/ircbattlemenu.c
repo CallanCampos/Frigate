@@ -3,6 +3,7 @@
 // Names from swan (https://github.com/ds-pokemon-hacking/swan, GPL-3.0).
 // Additional helper and table names are our descriptive guesses.
 #include "types.h"
+#include "app/ircbattlematch.h"
 #include "constants/arc.h"
 #include "constants/sound.h"
 #include "constants/text_banks.h"
@@ -156,6 +157,39 @@ static IrcMenuWinRect sWinRectsA[] = {
 
 static const s32 sCenterX[] = { 0x20, 0x21, 0x28, 0x2a };
 static const s32 sCenterY[] = { 8, 8, 16, 8 };
+
+// The infrared menu's buttons, by sTouchRectsA: the four choices, back, and second touch areas of three of the choices
+enum {
+    IRC_MENU_MAIN_BATTLE,
+    IRC_MENU_MAIN_TRADE,
+    IRC_MENU_MAIN_FEELING_CHECK,
+    IRC_MENU_MAIN_FRIEND_CODE,
+    IRC_MENU_MAIN_BACK,
+    IRC_MENU_MAIN_BATTLE_2,
+    IRC_MENU_MAIN_TRADE_2,
+    IRC_MENU_MAIN_FRIEND_CODE_2,
+};
+
+// The buttons of the player count menu, the battle box menu and the battle type menu
+enum {
+    IRC_MENU_COUNT_TWO,
+    IRC_MENU_COUNT_FOUR,
+    IRC_MENU_COUNT_BACK,
+};
+
+enum {
+    IRC_MENU_BOX_BATTLE_BOX,
+    IRC_MENU_BOX_PARTY,
+    IRC_MENU_BOX_BACK,
+};
+
+enum {
+    IRC_MENU_TYPE_SINGLE,
+    IRC_MENU_TYPE_DOUBLE,
+    IRC_MENU_TYPE_TRIPLE,
+    IRC_MENU_TYPE_ROTATION,
+    IRC_MENU_TYPE_BACK,
+};
 
 static const TouchRect sTouchRectsA[] = {
     { 0x20, 0x50, 0x10, 0x80 }, { 0x20, 0x50, 0x80, 0xf0 }, { 0x50, 0x80, 0x40, 0xc0 },
@@ -571,7 +605,7 @@ static void IrcMenu_FreeGraphics(IrcMenuWork *wk) {
 
 static void IrcMenu_WaitExit(IrcMenuWork *wk) {
     if (GFL_WipeIsFinished()) {
-        if (wk->mode != 12) {
+        if (wk->mode != IRCBATTLEMATCH_RESULT_QUIT) {
             if (!GameCommSys_BootCheck(GSYS_GetGameCommSystem(EventIRC_GetGameSystem(wk->param)))) {
                 IrcMenu_SetStateAtLine(wk, NULL, 866);
             }
@@ -584,12 +618,12 @@ static void IrcMenu_WaitExit(IrcMenuWork *wk) {
 static void IrcMenu_StartExit(IrcMenuWork *wk) {
     wk->ending = TRUE;
     GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, WIPE_COLOR_BLACK, 6, 1, wk->heapId);
-    if (wk->mode != 12) {
+    if (wk->mode != IRCBATTLEMATCH_RESULT_QUIT) {
         if (GameCommSys_BootCheck(GSYS_GetGameCommSystem(EventIRC_GetGameSystem(wk->param)))) {
             GameCommSys_ExitReq(GSYS_GetGameCommSystem(EventIRC_GetGameSystem(wk->param)));
         }
     }
-    if (wk->mode >= 1 && wk->mode <= 8) {
+    if (wk->mode >= IRCBATTLEMATCH_MODE_SINGLE && wk->mode <= IRCBATTLEMATCH_MODE_FEELING_CHECK) {
         JoinAvenue_RecordActivity(30);
     }
     IrcMenu_SetStateAtLine(wk, IrcMenu_WaitExit, 901);
@@ -599,7 +633,7 @@ static void IrcMenu_StartExit(IrcMenuWork *wk) {
 static void IrcMenu_OnMainButtonAnimEnd(u32 param, fx32 frame) {
     IrcMenuWork *wk = (IrcMenuWork *)param;
 
-    if (wk->mode == 12) {
+    if (wk->mode == IRCBATTLEMATCH_RESULT_QUIT) {
         IrcMenu_SetStateAtLine(wk, IrcMenu_StartExit, 917);
         return;
     }
@@ -607,7 +641,7 @@ static void IrcMenu_OnMainButtonAnimEnd(u32 param, fx32 frame) {
         IrcMenu_SetStateAtLine(wk, IrcMenu_AskSave, 920);
         return;
     }
-    if ((u32)(wk->mode - 6) <= 2) {
+    if ((u32)(wk->mode - IRCBATTLEMATCH_MODE_TRADE) <= IRCBATTLEMATCH_MODE_FEELING_CHECK - IRCBATTLEMATCH_MODE_TRADE) {
         IrcMenu_SetStateAtLine(wk, IrcMenu_StartExit, 925);
         return;
     }
@@ -624,12 +658,12 @@ static void IrcMenu_PressMainButton(IrcMenuWork *wk) {
     callback.type = CLACT_CALLBACK_LAST_FRAME;
     callback.param = (u32)wk;
     callback.func = IrcMenu_OnMainButtonAnimEnd;
-    if (index == 5) {
-        index = 0;
-    } else if (index == 6) {
-        index = 1;
-    } else if (index == 7) {
-        index = 3;
+    if (index == IRC_MENU_MAIN_BATTLE_2) {
+        index = IRC_MENU_MAIN_BATTLE;
+    } else if (index == IRC_MENU_MAIN_TRADE_2) {
+        index = IRC_MENU_MAIN_TRADE;
+    } else if (index == IRC_MENU_MAIN_FRIEND_CODE_2) {
+        index = IRC_MENU_MAIN_FRIEND_CODE;
     }
     ClActor_SetAutoAnim(wk->actors[index], TRUE);
     ClActor_SetAnimCallback(wk->actors[index], &callback);
@@ -649,42 +683,42 @@ static BOOL IrcMenu_MainTouch(u32 button, IrcMenuWork *wk) {
 
     wk->selected = button;
     switch (button) {
-    case 0:
-    case 5:
+    case IRC_MENU_MAIN_BATTLE:
+    case IRC_MENU_MAIN_BATTLE_2:
         GFL_SndSEPlay(SEQ_SE_SYS_69);
         IrcMenu_SetStateAtLine(wk, IrcMenu_PressMainButton, 999);
-        wk->mode = 1;
+        wk->mode = IRCBATTLEMATCH_MODE_SINGLE;
         result = TRUE;
         break;
-    case 1:
-    case 6:
+    case IRC_MENU_MAIN_TRADE:
+    case IRC_MENU_MAIN_TRADE_2:
         if (howManyPartyPokesAreNotEggs(GameData_GetParty(wk->gameData)) < 2) {
             GFL_MsgDataLoadStrbuf(wk->msgData, Startmenu2_Text_NeedLeastTwoPokemon, wk->strBuf);
             IrcMenu_PrintMessage(wk, FALSE);
             IrcMenu_SetStateAtLine(wk, IrcMenu_WaitMessageTouch, 1011);
         } else {
             GFL_SndSEPlay(SEQ_SE_SYS_69);
-            wk->mode = 6;
+            wk->mode = IRCBATTLEMATCH_MODE_TRADE;
             IrcMenu_SetStateAtLine(wk, IrcMenu_PressMainButton, 1017);
             result = TRUE;
         }
         break;
-    case 2:
+    case IRC_MENU_MAIN_FEELING_CHECK:
         GFL_SndSEPlay(SEQ_SE_SYS_69);
-        wk->mode = 8;
+        wk->mode = IRCBATTLEMATCH_MODE_FEELING_CHECK;
         IrcMenu_SetStateAtLine(wk, IrcMenu_PressMainButton, 1023);
         result = TRUE;
         break;
-    case 3:
-    case 7:
+    case IRC_MENU_MAIN_FRIEND_CODE:
+    case IRC_MENU_MAIN_FRIEND_CODE_2:
         GFL_SndSEPlay(SEQ_SE_SYS_69);
-        wk->mode = 7;
+        wk->mode = IRCBATTLEMATCH_MODE_FRIEND;
         IrcMenu_SetStateAtLine(wk, IrcMenu_PressMainButton, 1030);
         result = TRUE;
         break;
-    case 4:
+    case IRC_MENU_MAIN_BACK:
         GFL_SndSEPlay(SEQ_SE_SYS_70);
-        wk->mode = 12;
+        wk->mode = IRCBATTLEMATCH_RESULT_QUIT;
         IrcMenu_SetStateAtLine(wk, IrcMenu_PressMainButton, 1037);
         break;
     }
@@ -711,7 +745,7 @@ static void IrcMenu_ShowPlayerCountMenu(IrcMenuWork *wk) {
 static void IrcMenu_OnPlayerCountButtonAnimEnd(u32 param, fx32 frame) {
     IrcMenuWork *wk = (IrcMenuWork *)param;
 
-    if (wk->mode == 5) {
+    if (wk->mode == IRCBATTLEMATCH_MODE_MULTI) {
         if (BattleBoxSave_HasPkm(getBattleBox(wk->param->save))) {
             IrcMenu_SetStateAtLine(wk, IrcMenu_ShowBattleBoxMenu, 1100);
         } else {
@@ -727,10 +761,10 @@ static void IrcMenu_WaitPlayerCountButtonAnim(IrcMenuWork *wk) {
 
 static void IrcMenu_PressPlayerCountButton(IrcMenuWork *wk) {
     ClActorCallback callback;
-    int index = 0;
+    int index = IRC_MENU_COUNT_TWO;
 
-    if (wk->mode == 5) {
-        index = 1;
+    if (wk->mode == IRCBATTLEMATCH_MODE_MULTI) {
+        index = IRC_MENU_COUNT_FOUR;
     }
     callback.type = CLACT_CALLBACK_LAST_FRAME;
     callback.param = (u32)wk;
@@ -767,18 +801,18 @@ static BOOL IrcMenu_PlayerCountTouch(u32 button, IrcMenuWork *wk) {
 
     wk->selected = button;
     switch (button) {
-    case 0:
+    case IRC_MENU_COUNT_TWO:
         GFL_SndSEPlay(SEQ_SE_SYS_69);
         IrcMenu_SetStateAtLine(wk, IrcMenu_PressPlayerCountButton, 1196);
         break;
-    case 1:
+    case IRC_MENU_COUNT_FOUR:
         GFL_SndSEPlay(SEQ_SE_SYS_69);
-        wk->mode = 5;
+        wk->mode = IRCBATTLEMATCH_MODE_MULTI;
         IrcMenu_SetStateAtLine(wk, IrcMenu_PressPlayerCountButton, 1202);
         break;
-    case 2:
+    case IRC_MENU_COUNT_BACK:
         GFL_SndSEPlay(SEQ_SE_SYS_70);
-        wk->mode = 12;
+        wk->mode = IRCBATTLEMATCH_RESULT_QUIT;
         IrcMenu_SetStateAtLine(wk, IrcMenu_PressPlayerCountBack, 1208);
         break;
     }
@@ -801,8 +835,8 @@ static void IrcMenu_OnBattleBoxButtonAnimEnd(u32 param, fx32 frame) {
     IrcMenuWork *wk = (IrcMenuWork *)param;
 
     if (wk->choice == 2) {
-        if (wk->mode == 5) {
-            wk->mode = 1;
+        if (wk->mode == IRCBATTLEMATCH_MODE_MULTI) {
+            wk->mode = IRCBATTLEMATCH_MODE_SINGLE;
             IrcMenu_SetStateAtLine(wk, IrcMenu_ShowPlayerCountMenu, 1254);
         } else {
             IrcMenu_SetStateAtLine(wk, IrcMenu_ShowBattleTypeMenu, 1258);
@@ -838,19 +872,19 @@ static BOOL IrcMenu_BattleBoxTouch(u32 button, IrcMenuWork *wk) {
 
     wk->selected = button;
     switch (button) {
-    case 1:
+    case IRC_MENU_BOX_PARTY:
         GFL_SndSEPlay(SEQ_SE_SYS_69);
         wk->choice = 0;
         IrcMenu_SetStateAtLine(wk, IrcMenu_PressBattleBoxButton, 1325);
         result = TRUE;
         break;
-    case 0:
+    case IRC_MENU_BOX_BATTLE_BOX:
         GFL_SndSEPlay(SEQ_SE_SYS_69);
         wk->choice = 1;
         result = TRUE;
         IrcMenu_SetStateAtLine(wk, IrcMenu_PressBattleBoxButton, 1331);
         break;
-    case 2:
+    case IRC_MENU_BOX_BACK:
         GFL_SndSEPlay(SEQ_SE_SYS_70);
         wk->choice = 2;
         IrcMenu_SetStateAtLine(wk, IrcMenu_PressBattleBoxButton, 1337);
@@ -873,7 +907,7 @@ static void IrcMenu_ShowBattleBoxMenu(IrcMenuWork *wk) {
 static void IrcMenu_OnBattleTypeButtonAnimEnd(u32 param, fx32 frame) {
     IrcMenuWork *wk = (IrcMenuWork *)param;
 
-    if (wk->mode == 12) {
+    if (wk->mode == IRCBATTLEMATCH_RESULT_QUIT) {
         IrcMenu_SetStateAtLine(wk, IrcMenu_ShowPlayerCountMenu, 1377);
     } else if (BattleBoxSave_HasPkm(getBattleBox(wk->param->save))) {
         IrcMenu_SetStateAtLine(wk, IrcMenu_ShowBattleBoxMenu, 1382);
@@ -890,16 +924,16 @@ static void IrcMenu_PressBattleTypeButton(IrcMenuWork *wk) {
     int index;
 
     switch (wk->mode) {
-    case 1:
+    case IRCBATTLEMATCH_MODE_SINGLE:
         index = 0;
         break;
-    case 2:
+    case IRCBATTLEMATCH_MODE_DOUBLE:
         index = 1;
         break;
-    case 3:
+    case IRCBATTLEMATCH_MODE_TRIPLE:
         index = 2;
         break;
-    case 4:
+    case IRCBATTLEMATCH_MODE_ROTATION:
         index = 3;
         break;
     default:
@@ -920,33 +954,33 @@ static BOOL IrcMenu_BattleTypeTouch(u32 button, IrcMenuWork *wk) {
 
     wk->selected = button;
     switch (button) {
-    case 0:
+    case IRC_MENU_TYPE_SINGLE:
         GFL_SndSEPlay(SEQ_SE_SYS_69);
         result = TRUE;
-        wk->mode = 1;
+        wk->mode = IRCBATTLEMATCH_MODE_SINGLE;
         IrcMenu_SetStateAtLine(wk, IrcMenu_PressBattleTypeButton, 1466);
         break;
-    case 1:
+    case IRC_MENU_TYPE_DOUBLE:
         GFL_SndSEPlay(SEQ_SE_SYS_69);
-        wk->mode = 2;
+        wk->mode = IRCBATTLEMATCH_MODE_DOUBLE;
         IrcMenu_SetStateAtLine(wk, IrcMenu_PressBattleTypeButton, 1472);
         result = TRUE;
         break;
-    case 2:
+    case IRC_MENU_TYPE_TRIPLE:
         GFL_SndSEPlay(SEQ_SE_SYS_69);
-        wk->mode = 3;
+        wk->mode = IRCBATTLEMATCH_MODE_TRIPLE;
         IrcMenu_SetStateAtLine(wk, IrcMenu_PressBattleTypeButton, 1478);
         result = TRUE;
         break;
-    case 3:
+    case IRC_MENU_TYPE_ROTATION:
         GFL_SndSEPlay(SEQ_SE_SYS_69);
-        wk->mode = 4;
+        wk->mode = IRCBATTLEMATCH_MODE_ROTATION;
         IrcMenu_SetStateAtLine(wk, IrcMenu_PressBattleTypeButton, 1484);
         result = TRUE;
         break;
-    case 4:
+    case IRC_MENU_TYPE_BACK:
         GFL_SndSEPlay(SEQ_SE_SYS_70);
-        wk->mode = 12;
+        wk->mode = IRCBATTLEMATCH_RESULT_QUIT;
         IrcMenu_SetStateAtLine(wk, IrcMenu_PressBattleTypeButton, 1490);
         break;
     }
@@ -1185,7 +1219,7 @@ static void IrcMenu_WaitSave(IrcMenuWork *wk) {
         BmpWin_ClearFrame(wk->msgWin, 2);
         BmpWin_ClearScreen(wk->msgWin);
         GFL_BGSysQueueScrLoad(5);
-        if (wk->mode == 1) {
+        if (wk->mode == IRCBATTLEMATCH_MODE_SINGLE) {
             IrcMenu_SetStateAtLine(wk, IrcMenu_ShowPlayerCountMenu, 0x77f);
         } else {
             IrcMenu_SetStateAtLine(wk, IrcMenu_StartExit, 0x782);
@@ -1206,7 +1240,7 @@ static void IrcMenu_WaitSaveErrorDismiss(IrcMenuWork *wk) {
         IrcMenu_SetDimmed(wk, FALSE);
         GFL_BGSysClearScr(3);
         IrcMenu_FreeMessageWindow(wk);
-        wk->mode = 12;
+        wk->mode = IRCBATTLEMATCH_RESULT_QUIT;
         IrcMenu_SetStateAtLine(wk, IrcMenu_MainUpdate, 0x7ab);
     }
 }
@@ -1228,7 +1262,7 @@ static void IrcMenu_HandleSaveAnswer(IrcMenuWork *wk) {
             IrcMenu_SetDimmed(wk, FALSE);
             GFL_BGSysClearScr(3);
             IrcMenu_FreeMessageWindow(wk);
-            wk->mode = 12;
+            wk->mode = IRCBATTLEMATCH_RESULT_QUIT;
             IrcMenu_SetStateAtLine(wk, IrcMenu_MainUpdate, 0x7d0);
         }
         AppTaskMenu_Free(wk->yesNoMenu);
@@ -1321,7 +1355,7 @@ static BOOL IrcMenu_Main(GameProc *proc, u32 *state, void *param, void *work) {
         GSYS_TryBootGameComm(EventIRC_GetGameSystem(wk->param));
     }
     if (GFL_WipeIsFinished() && GSYS_IsLowBatteryCGearOff(EventIRC_GetGameSystem(wk->param))) {
-        wk->mode = 12;
+        wk->mode = IRCBATTLEMATCH_RESULT_QUIT;
         done = TRUE;
         Wipe_SetScreenCovered(0, WIPE_COLOR_BLACK);
         Wipe_SetScreenCovered(1, WIPE_COLOR_BLACK);
