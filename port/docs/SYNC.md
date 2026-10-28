@@ -13,6 +13,12 @@ as an automatic first step of unrelated feature work. Review the pending sync in
 
 ## Scheduled proposals
 
+GitHub schedules are best effort: runs can be delayed, and queued jobs can be dropped under sufficiently high
+load ([GitHub's schedule documentation](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule)).
+If upstream has advanced without a proposal, manually dispatch the existing workflow with
+`gh workflow run port-sync.yml -R CallanCampos/Frigate`; its existing-proposal guard keeps one bounded proposal.
+A missing scheduled event alone does not establish its cause.
+
 `.github/workflows/port-sync.yml` runs hourly and manually, only in `CallanCampos/Frigate`. Its trusted helper
 [upstream_sync.py](../tools/upstream_sync.py):
 

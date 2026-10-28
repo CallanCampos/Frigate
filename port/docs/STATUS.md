@@ -32,11 +32,50 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
 
+## 2026-10-28: validate the frozen 36-commit field naming proposal
+
+- **Upstream:** `f71f5fe61d`, 36 commits after reviewed `b7ce134e0c`. The App's bounded PR 60 proposal is
+  `6d33e29061`, based on reviewed Frigate main `42eade465e`; no later upstream commits are imported.
+- **Port:** `PORT_SHA`, a documentation companion directly on the App's original two-parent upstream merge.
+  The separately validated private 25-commit proposal remains preserved; its duplicate merge is not imported.
+  Main is not yet synchronized by this proposal, and no experimental CARD SDK reader is included.
+- **ROM (T0):** fresh signed-runtime configure/Ninja completes 1,455 steps with zero warnings; both original hashes
+  match: B2 `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb`, W2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`.
+  The complete compiled objects and ROMs supply the actual neutrality proof; no redundant compiler sweep was added.
+- **Host build/tests (T1/T2):** new arm64 macOS RelWithDebInfo all-target builds pass. Full CTest suites pass B2
+  351/28 explicit skips of 379 and W2 348/28 of 376, zero failures. The actual assembly oracle runs five of five
+  cases per game, zero skips, through the existing `build/port-venv` interpreter with Unicorn 2.1.4.
+- **Replay/oracle/sanitizers/performance/play (T3/T4/T5/T6/T7):** applicable ordinary replay/save/recording checks,
+  both title timing gates and B2's additional New Game timing gate pass. Party-menu timing lacks its save fixture
+  and explicitly skips. Oracle-dependent DS comparisons skip with `PORT_BUILD_ORACLE=OFF`. No fresh full DS-route,
+  full-app fatal sanitizer, windowed-play or timing-parity proof is claimed. Existing inputs, seeds, reference
+  images, masks, sanitizer settings and performance budgets are unchanged.
+- **Tiers/trap stubs:** no fresh tier scan or stub removal; naming is not new native functionality. The naming-report
+  tool now excludes compiler-generated anonymous objects using the last B2 map; that metric is not matching or
+  gameplay coverage.
+- **64-bit warnings:** both required guards pass: 365 sites/229 keys (real 66, harmless 123, handled 141,
+  unreachable 35), all 1,711 inputs compiled and zero missing. No baseline or classification change.
+- **Work done:** review the field/actor/rail/camera/infrared-menu/weather/player/encounter names, constants and table
+  formatting. The proposal changes 79 upstream paths; all 202 existing game/SDK adaptations retain exactly their
+  prior added and removed lines. Seven adapted incoming owners retain their host safety/native-width work:
+  `event_mapchange.c`, `enc_pokeset.c`, `field_buildmodel.c`, `field_camera.c`, `field_fade.c`,
+  `field_player_grid.c` and `ircbattlemenu.c`. No manual game/configuration repair was needed. There are 332
+  same-address symbol renames and no old-symbol references in `port/`. Strict style and pinned 23.1.1 formatting
+  pass all 73 changed C/headers. SYNC.md explains best-effort schedules and the existing manual dispatch path,
+  preserving one bounded proposal without guessing why a particular scheduled event was absent.
+- **Next:** independent review and protected exact-head publication/verification for PR 60; retain this frozen
+  upstream target. Continue faithful native CARD investigation and authentic Ranch progression separately.
+- **Blockers:** hosted checks and owner local-verification status for the final published head are still pending.
+  No workflow changes or reference-guard override is needed: the actual cross-repository and closing-keyword
+  patterns match no incoming commit. One message contains the compiler-local name `@6131`; the helper does not check mentions.
+  ADR 0023 remains proposed; this sync claims no AI deadline or whole-game parity. Spanish issue 45 still needs
+  genuine gameplay/save evidence.
+
 ## 2026-10-28: integrate reviewed trainer-AI sequencing into the final sync proposal
 
 - **Upstream:** proposed `b7ce134e0c`; reviewed main is now `9440367870`, after PR 57 passed all 14 checks and a
   normal protected merge. This remains the existing sync proposal, not a completed upstream sync of main.
-- **Port:** `PORT_SHA`, a real merge of that reviewed main into the bounded fourteen-commit proposal and tested
+- **Port:** `6722afdaf3`, a real merge of that reviewed main into the bounded fourteen-commit proposal and tested
   Pokédex safety companion. No experimental SDK CPU reader is imported.
 - **ROM (T0):** the Pokédex companion `251f932888` passes both original hashes with zero warnings and four of four
   actual MWCC preprocessing comparisons. PR 57 head `3c28971eef` also passes both hashes. This merged head requires
