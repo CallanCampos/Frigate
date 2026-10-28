@@ -60,6 +60,7 @@ records keep what was decided or found at the time, and are added to, not rewrit
 | [research/sdk-surface.md](research/sdk-surface.md) | The libraries' layers, the SDK surface the game uses, hardware access, the boundary's options |
 | [research/compile-probe.md](research/compile-probe.md) | The decomp compiled for 64-bit hosts: warnings, struct layouts, undefined behaviour |
 | [research/assets-arm7-sound.md](research/assets-arm7-sound.md) | The ROM's layout and formats, the ARM7, sound, saves, the DSi, infrared |
+| [research/es-rom-support.md](research/es-rom-support.md) | The Spanish Black 2 ROM (IRES) against the US one, and what Frigate needs to play it |
 | [research/platinum-port.md](research/platinum-port.md) | The Pokémon Platinum PC port: its changes, history and lessons |
 | [research/libntr.md](research/libntr.md) | libntr's architecture, coverage, licensing and gaps for BW2 |
 | [research/platinum-mods-alternatives.md](research/platinum-mods-alternatives.md) | Widescreen and single-screen mods, Gen4Recomp, other DS ports, multiplayer |

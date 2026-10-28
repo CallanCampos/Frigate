@@ -83,6 +83,15 @@ static void PrintSha1(char out[41], const uint8_t sha1[20]) {
     }
 }
 
+// Whose dump the manifest's is, for the messages: the decomp's (b2_us, w2_us), or another language's dump of the same
+// version, which port/tools/research/assets/rom_manifest.py hashed for PORT_ROM_LANGUAGE (port/cmake/rom.cmake)
+static const char *ManifestDumpOwner(void) {
+    size_t length = strlen(port_rom_manifest_version);
+    BOOL decomp = length >= 3 && strcmp(port_rom_manifest_version + length - 3, "_us") == 0;
+
+    return decomp ? "the decomp's" : "the manifest's";
+}
+
 // The files of a dump against the manifest: found tells which manifest entries the FNT has; mismatches count what
 // doesn't match, and names lists the first of them
 typedef struct ManifestCheck {
@@ -285,9 +294,8 @@ static BOOL CheckFiles(const uint8_t *data, size_t size, char *message, size_t m
     check.fatSize = Read32(data + HEADER_FAT_OFFSET + 4);
     PrintSha1(expected, port_rom_manifest_sha1);
     if ((uint64_t)check.fnt + check.fntSize > size || (uint64_t)check.fat + check.fatSize > size) {
-        snprintf(message, messageSize,
-                 "its SHA-1 is %s, not the decomp's %s, and its file tables lie past the end of the file", sha1Text,
-                 expected);
+        snprintf(message, messageSize, "its SHA-1 is %s, not %s %s, and its file tables lie past the end of the file",
+                 sha1Text, ManifestDumpOwner(), expected);
         return FALSE;
     }
     check.found = calloc(port_rom_manifest_count, sizeof(BOOL));
@@ -305,8 +313,8 @@ static BOOL CheckFiles(const uint8_t *data, size_t size, char *message, size_t m
     }
     free(check.found);
     if (check.broken) {
-        snprintf(message, messageSize, "its SHA-1 is %s, not the decomp's %s, and its file name table is damaged",
-                 sha1Text, expected);
+        snprintf(message, messageSize, "its SHA-1 is %s, not %s %s, and its file name table is damaged", sha1Text,
+                 ManifestDumpOwner(), expected);
         return FALSE;
     }
     CheckOverlays(&check);
@@ -314,7 +322,7 @@ static BOOL CheckFiles(const uint8_t *data, size_t size, char *message, size_t m
         return TRUE;
     }
     used = 0;
-    Append(message, messageSize, &used, "its SHA-1 is %s, not the decomp's %s, and", sha1Text, expected);
+    Append(message, messageSize, &used, "its SHA-1 is %s, not %s %s, and", sha1Text, ManifestDumpOwner(), expected);
     if (check.mismatches != 0) {
         Append(message, messageSize, &used,
                " the port's manifest finds %d of the %zu files the game reads changed:", check.mismatches,
@@ -346,13 +354,19 @@ static BOOL CheckFiles(const uint8_t *data, size_t size, char *message, size_t m
 }
 
 // The name of a game code's version, for a message about a ROM of another one: Black 2 is IRE?, White 2 IRD?, and the
-// fourth letter is the region (O for the US)
+// fourth letter is the region (O for the US, S for Spain, which PORT_ROM_LANGUAGE es plays)
 static const char *DescribeGameCode(const char *code) {
     if (memcmp(code, "IREO", 4) == 0) {
         return "Pokémon Black 2 (US)";
     }
     if (memcmp(code, "IRDO", 4) == 0) {
         return "Pokémon White 2 (US)";
+    }
+    if (memcmp(code, "IRES", 4) == 0) {
+        return "Pokémon Black 2 (Spain)";
+    }
+    if (memcmp(code, "IRDS", 4) == 0) {
+        return "Pokémon White 2 (Spain)";
     }
     if (memcmp(code, "IRE", 3) == 0) {
         return "Pokémon Black 2 of another region";
@@ -532,12 +546,12 @@ void port_rom_boot(void) {
             StopWithoutRom(reason);
         }
         if (verdict == PORT_ROM_EXACT) {
-            fprintf(stderr, "port: rom: %s: %s, the dump the decomp builds\n", path, port_rom_manifest_title);
+            fprintf(stderr, "port: rom: %s: %s, %s dump\n", path, port_rom_manifest_title, ManifestDumpOwner());
         } else {
             fprintf(stderr,
-                    "port: rom: %s: %s; not the decomp's dump, but its NitroFS files and overlay table match the "
-                    "port's manifest\n",
-                    path, port_rom_manifest_title);
+                    "port: rom: %s: %s; not %s dump, but its NitroFS files and overlay table match the port's "
+                    "manifest\n",
+                    path, port_rom_manifest_title, ManifestDumpOwner());
         }
     }
     port_rom_place_system_area();

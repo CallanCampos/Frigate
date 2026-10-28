@@ -7,10 +7,10 @@
 #   cmake --build build/port
 #   ctest --test-dir build/port
 #
-# Options: -DPORT_VERSION=b2_us|w2_us (default b2_us), -DPORT_FETCH_SDL3, -DPORT_MACOS_DISTRIBUTION, and -DPORT_SANITIZE
-# with -DPORT_SANITIZE_RECOVER (the sanitized build) here; the others are in the fragments of port/cmake/, included at
-# the end, and port/cmake/README.md lists them all. Each fragment labels its tests where it defines them
-# (port_test_labels).
+# Options: -DPORT_VERSION=b2_us|w2_us (default b2_us), -DPORT_ROM_LANGUAGE=us|es (default us), -DPORT_FETCH_SDL3,
+# -DPORT_MACOS_DISTRIBUTION, and -DPORT_SANITIZE with -DPORT_SANITIZE_RECOVER (the sanitized build) here; the others
+# are in the fragments of port/cmake/, included at the end, and port/cmake/README.md lists them all. Each fragment
+# labels its tests where it defines them (port_test_labels).
 cmake_minimum_required(VERSION 3.28)
 
 # The macOS build for other Macs than the one that builds it (ADR 0015): one universal program, arm64 and x86_64, for
@@ -105,6 +105,24 @@ elseif(PORT_VERSION STREQUAL "w2_us")
     set(PORT_WINDOW_ICON "${CMAKE_CURRENT_SOURCE_DIR}/assets/branding/window-white2-32.png")
 else()
     message(FATAL_ERROR "PORT_VERSION must be b2_us or w2_us, not ${PORT_VERSION}")
+endif()
+
+# The ROM data the program plays: us, the dump the decomp builds, or experimental Spanish Black 2
+# (IRES only), whose files the US code reads instead, by the manifest that
+# port/tools/research/assets/rom_manifest.py writes from that dump (port/cmake/rom.cmake). The game's code stays the
+# decomp's US C, with English game logic where it has any (port/docs/research/es-rom-support.md, section 4)
+set(PORT_ROM_LANGUAGE "us" CACHE STRING "The language of the ROM to play: us (the decomp's) or es (Spanish)")
+set_property(CACHE PORT_ROM_LANGUAGE PROPERTY STRINGS us es)
+if(PORT_ROM_LANGUAGE STREQUAL "us")
+    set(PORT_ROM_REGION "US")
+elseif(PORT_ROM_LANGUAGE STREQUAL "es")
+    if(NOT PORT_VERSION STREQUAL "b2_us")
+        message(FATAL_ERROR "PORT_ROM_LANGUAGE=es is experimental and supports only Black 2 (b2_us/IRES)")
+    endif()
+    message(WARNING "Experimental IRES data loader: Spanish gameplay/save compatibility is not established")
+    set(PORT_ROM_REGION "Spain, experimental")
+else()
+    message(FATAL_ERROR "PORT_ROM_LANGUAGE must be us or es, not ${PORT_ROM_LANGUAGE}")
 endif()
 
 get_filename_component(REPO_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/.." ABSOLUTE)
@@ -254,6 +272,13 @@ target_compile_options(port_decomp_env INTERFACE
     # decomp does it where the original did, so that part of the group stays a warning
     -Werror=implicit-function-declaration -Werror=int-conversion -Werror=incompatible-pointer-types
     -Wno-error=incompatible-pointer-types-discards-qualifiers)
+# The decomp's C calls the C library's math (sqrt, which clang turns into sqrtf where its argument and result are
+# float), which glibc keeps in libm. The pinned SDL3 brings it on its link line, a distribution's shared SDL3 doesn't,
+# so on Linux it is linked by name; macOS's and MSYS2's C libraries have it already
+if(UNIX AND NOT APPLE)
+    set(PORT_LIBM m)
+endif()
+target_link_libraries(port_decomp_env INTERFACE ${PORT_LIBM})
 
 add_library(pokebw2_game OBJECT ${game_sources})
 target_link_libraries(pokebw2_game PRIVATE port_decomp_env)
@@ -356,7 +381,7 @@ add_executable(${PORT_PROGRAM}
     $<TARGET_OBJECTS:pokebw2_game> $<TARGET_OBJECTS:port_hal> $<TARGET_OBJECTS:port_app> ${port_gfx_objects}
     "${PORT_GEN}/stubs.c")
 target_include_directories(${PORT_PROGRAM} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
-target_link_libraries(${PORT_PROGRAM} PRIVATE SDL3::SDL3)
+target_link_libraries(${PORT_PROGRAM} PRIVATE SDL3::SDL3 ${PORT_LIBM})
 
 # Labels, so that a part of the tests can be run by what it needs (ctest -L LABEL, or -LE LABEL to leave it out;
 # port/tests/README.md). A test gets its labels where it is defined, with port_test_labels(TEST LABEL...):

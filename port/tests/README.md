@@ -104,3 +104,13 @@ that incorrect native and verifier callback types still fail: a capability probe
 `integrate_encounter_dispatch` compiles the actual `src/ov036/enceff_data.c` table with constructors declared by
 its SDK headers. All 38 callbacks must preserve their target, object pointers, used parameter and return value;
 UBSan has no ignorelist. LLVM checks the function types too; Apple clang still checks argument forwarding.
+
+### Experimental Spanish manifest validation
+
+`rom_manifest_tool` runs [rom/test_manifest.py](rom/test_manifest.py) against fabricated header/FNT/FAT/overlay
+bytes and the actual [rom_manifest.py](../tools/research/assets/rom_manifest.py). It covers CRC/table bounds, IDs,
+cycles, duplicate/unsafe paths, image sizes, schema rejection, atomic output preservation, and the actual
+[rom.cmake](../cmake/rom.cmake) generator in a target-registration-free probe. The probe validates US output
+stability, missing/invalid Spanish manifests and rejection of Spanish White 2. It compiles no game and needs no ROM.
+It establishes parser/configuration behavior, not Spanish asset or gameplay compatibility. Run directly with
+`PYTHONDONTWRITEBYTECODE=1 python3 port/tests/rom/test_manifest.py`.

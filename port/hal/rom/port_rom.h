@@ -1,12 +1,14 @@
 // The player's ROM, the program's one source of the game's files (PLAN.md §1, §4.5). The ROM is opened once per
 // process from the dump the player gives: --rom PATH, else the FRIGATE_ROM environment variable, else, for
 // development, orig/baserom_<version>.nds in the repository the program was built from. It is mapped read-only and
-// checked: its game code must be the version the program was built for (IREO for Black 2, IRDO for White 2), and the
-// dump must be the one the decomp builds, by the SHA-1 of the whole file (b2_us.sha1, w2_us.sha1), or, failing that,
-// what the host reads of it must match the port's manifest (rom_manifest.h): every file of its NitroFS
-// (port/tools/research/assets/nitrofs_manifest.json), the ARM9 overlay table, and each overlay's file as long as the
-// image its header gives. That accepts trimmed and re-padded dumps. Anything else stops the program with a message that
-// says what is wrong.
+// checked: its game code must be the version the program was built for (IREO for Black 2, IRDO for White 2, or IRES
+// for an experimental Spanish Black 2 with PORT_ROM_LANGUAGE es), and the dump must be the manifest's, by the SHA-1 of the whole file
+// (the decomp's b2_us.sha1 and w2_us.sha1, or the one rom_manifest.py hashed), or, failing that, what the host reads
+// of it must match the port's manifest (rom_manifest.h): every file of its NitroFS
+// (port/tools/research/assets/nitrofs_manifest.json, or nitrofs_manifest_languages.json for another language), the
+// ARM9 overlay table, and each overlay's file as long as the image its header gives. That accepts trimmed and re-padded
+// dumps. A user-generated manifest establishes consistency with that chosen dump, not authenticity or gameplay
+// compatibility. Its generator validates structure first. Anything else stops with a diagnostic.
 //
 // The CARD library's ROM reads (port/hal/card/card_rom.c) read the mapped file as a card answers them; and
 // port_rom_place_system_area puts what the DS's boot code and ARM7 leave in main memory for the card and file system
@@ -27,7 +29,7 @@
 // How a ROM passed its check
 typedef enum PortRomVerdict {
     PORT_ROM_REFUSED = 0, // not a usable dump of this version
-    PORT_ROM_EXACT = 1,   // the SHA-1 of the whole file is the decomp's
+    PORT_ROM_EXACT = 1,   // the SHA-1 of the whole file is the manifest's
     PORT_ROM_FILES = 2,   // another dump (trimmed, re-padded, another header), whose NitroFS files all match
 } PortRomVerdict;
 

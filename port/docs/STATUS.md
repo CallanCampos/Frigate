@@ -32,6 +32,55 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
 
+## 2026-10-27: Spanish manifest review fixes, experimental scope only
+
+Preparation record for the PR 44 review, not completed Spanish gameplay support.
+
+- **Upstream:** unchanged; this task imports no upstream commits.
+- **Port:** `PORT_SHA`, on `codex/review-spanish-rom`, preserving contributor head `6215e87d1f`.
+- **ROM (T0):** not run in this focused review; maintainer exact-head validation remains required.
+- **Host build:** not run; only ROM-free parser/configuration tests run here.
+- **Tests:** `PYTHONDONTWRITEBYTECODE=1 python3 port/tests/rom/test_manifest.py`: 14 tests pass, including the actual
+  CMake manifest fragment with no game compilation. Synthetic checks cover malformed tables/CRC/IDs/paths, schema,
+  B2-es-only scope and atomic output failures. Spanish T4/T5/T6/T7 remain unrun; no dump is available to this review.
+- **Tiers, trap stubs and 64-bit warnings:** unchanged by this tooling/documentation review; not remeasured.
+- **Work done:** bounded structural validation before generating exact-ROM hashes, configure schema checks, atomic
+  manifest replacement, synthetic regressions and explicit experimental IRES-only scope. US build inputs remain
+  unchanged; the probe confirms identical generated US output with or without an invalid Spanish side manifest.
+- **Next:** full US regression/exact-head gates, contributor diagnosis of the four Spanish replay failures, then
+  isolated Spanish New Game/field/save-CRC/own-save-reload evidence. Review proposed ADR 0025.
+- **Blockers:** no local Spanish dump; same archive/member counts and self-generated hashes establish neither
+  authenticity nor asset/gameplay compatibility. Spanish White 2 is refused.
+
+## 2026-10-27: a Spanish Black 2 ROM (IRES) by a manifest of its own, `PORT_ROM_LANGUAGE=es`
+
+- **Upstream:** `deb044db2d`, as `main` has it since PR 41; this branch merges no upstream commit.
+- **Port:** `PORT_SHA`, on `port/spanish-rom-manifest`: `f8e5aca53f` (libm linked by name on Linux, for a
+  distribution's shared SDL3), `c548738245` (the Spanish ROM) and this entry's commit, which ignores the player's
+  `nitrofs_manifest_languages.json` in `port/.gitignore`.
+- **ROM:** T0 not run: this clone has no `orig/`. The branch changes nothing outside `port/`; T0 is still due before
+  merge.
+- **Host build:** Linux (Ubuntu 26.04, clang 21.1.8), RelWithDebInfo, `build/port` (us) and `build/port-es` (es) build clean.
+- **Tests:** T2, T3 and T6 by `ctest -j8`. US build: 295 of 295 pass, the ROM tests skipped for lack of a US dump. es
+  build without a ROM: 295 of 295, the same skips. es build with the player's IRES dump in `FRIGATE_ROM`: 291 pass and
+  4 fail, `replay_new_game`, `replay_new_game_house`, `replay_same_save` and `replay_starter_save`, whose frame
+  hashes are the US recordings'; the oracle tests skip (no melonDS here). T4, T5 and T7 not run.
+- **Tiers:** unchanged: the branch changes no game C.
+- **Trap stubs:** 25 function stubs and 20 data placeholders (`build/port/gen/stubs.c`); the es build with the IRES
+  dump runs `--headless --frames 1800` to its end with no trap ("Pokémon Black 2 (Spain), the manifest's dump").
+- **64-bit warnings:** `check_ptrcasts: 365 sites in 229 keys (real 66, harmless 123, handled 141, unreachable 35),
+  1694 files, 0 not compiled`: real sites not above the last counted entry's 66.
+- **Work done:** [ADR 0025](adr/0025-a-spanish-rom-by-a-manifest-of-its-own.md) and the report
+  [es-rom-support.md](research/es-rom-support.md): IRES has the US files' and archives' shapes, so the US code reads
+  it. `rom_manifest.py` writes the dump's entry (hashes only) into `nitrofs_manifest_languages.json`, which
+  `rom.cmake` builds the manifest from with `PORT_ROM_LANGUAGE=es`; that file is the player's and is now ignored, so
+  it can't be committed by mistake. `rom.c`'s messages and `test_rom`'s overlay 12 address follow the language. No game
+  change.
+- **Next:** this branch published as a pull request to `main` (gh isn't installed in this clone), T0 on a machine with
+  `orig/`, and the owner's review; then the earliest unmet criterion of the current phase, as the entries below
+  record.
+- **Blockers:** none upstream. Replays recorded on IRES would be its own; the US ones stay held to the US dump.
+
 ## 2026-10-27: recording-format proposal reviewed; implementation remains open
 
 - **Upstream:** unchanged, `deb044db2d3d`, from reviewed main `60da690df2` (PR 42).
@@ -154,7 +203,7 @@ This entry is a preparation snapshot. Final validation and merge results are rec
 [PR 33 and its checks](https://github.com/CallanCampos/Frigate/pull/33); pending labels below refer to this snapshot.
 
 - **Upstream:** unchanged from reviewed `main` at `ae7f39f4f9`; this task imports no additional upstream sync.
-- **Port:** `PORT_SHA`, on `codex/review-conflict-syncs`, PR 33's `ddc4ff6048` merged with reviewed `main` at
+- **Port:** `32f40212de`, on `codex/review-conflict-syncs`, PR 33's `ddc4ff6048` merged with reviewed `main` at
   `ae7f39f4f9`. Both histories' STATUS entries are retained, with main's newer entries above PR 33's historical task
   entry; main's pointer-offset audit documentation is retained too.
 - **ROM:** T0 not rerun at this focused review stage; the original PR 33 entry below records its earlier results.
