@@ -50,7 +50,7 @@ extern const FieldActorSceneNodeVTable FIELD_ACTOR_VTABLE_DIR_ANIME_3;
 extern const FieldActorSceneNodeVTable FIELD_ACTOR_VTABLE_DIR_ANIME_1;
 extern const FieldActorSceneNodeVTable FIELD_ACTOR_VTABLE_MULTI_PATTERN;
 // Overlay 36's field_actor_g3dobj_draw.c: the functions of the actors drawn as a 3D model
-extern const FieldActorSceneNodeVTable data_ov036_021cf9a0;
+extern const FieldActorSceneNodeVTable FIELD_ACTOR_VTABLE_G3D_OBJ;
 
 // A position on the grid
 typedef struct {

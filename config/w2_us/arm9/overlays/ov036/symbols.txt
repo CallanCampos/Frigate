@@ -1477,11 +1477,11 @@ RailActorAnim_Update kind:function(thumb,size=0x10c) addr:0x02197320
 RailActorAnim_AddHeightOffset kind:function(thumb,size=0x18) addr:0x0219742c
 RailActor_GetCameraRelativeDir kind:function(thumb,size=0x38) addr:0x02197444
 RailActor_UpdateVisibilityAndAnimation kind:function(thumb,size=0x60) addr:0x0219747c
-FieldActorDraw_InitBillboardActorId kind:function(thumb,size=0x16) addr:0x021974dc
-FieldActorDraw_DrawEffect kind:function(thumb,size=0x5a) addr:0x021974f4
-FieldActorDraw_DeleteEffect kind:function(thumb,size=0x14) addr:0x02197550
-FieldActorDraw_SuspendEffect kind:function(thumb,size=0x8) addr:0x02197564
-FieldActorDraw_WakeUpEffect kind:function(thumb,size=0x8) addr:0x0219756c
+FieldActorG3DObjDraw_Create kind:function(thumb,size=0x16) addr:0x021974dc
+FieldActorG3DObjDraw_Update kind:function(thumb,size=0x5a) addr:0x021974f4
+FieldActorG3DObjDraw_Delete kind:function(thumb,size=0x14) addr:0x02197550
+FieldActorG3DObjDraw_Suspend kind:function(thumb,size=0x8) addr:0x02197564
+FieldActorG3DObjDraw_WakeUp kind:function(thumb,size=0x8) addr:0x0219756c
 FieldFog_Create kind:function(thumb,size=0x34) addr:0x02197574
 FieldFog_Free kind:function(thumb,size=0x8) addr:0x021975a8
 FieldFog_Update kind:function(thumb,size=0x30) addr:0x021975b0
@@ -5221,7 +5221,7 @@ FIELD_ACTOR_VTABLE_DIR_ANIME_3 kind:data(any) addr:0x021cf95c
 FIELD_ACTOR_VTABLE_DIR_ANIME_1 kind:data(any) addr:0x021cf974
 FIELD_ACTOR_VTABLE_MULTI_PATTERN kind:data(any) addr:0x021cf98c
 RAIL_OBJ_ANIMS kind:data(any) addr:0x021cf9a4
-data_ov036_021cf9a0 kind:data(any) addr:0x021cf9d4
+FIELD_ACTOR_VTABLE_G3D_OBJ kind:data(any) addr:0x021cf9d4
 sFieldMenuBGSetup kind:data(any) addr:0x021cf9ec
 sFieldSubscreenDefs kind:data(any) addr:0x021cfa0c
 WEATHER_SURFACE_SETUP kind:data(any) addr:0x021cfb78
