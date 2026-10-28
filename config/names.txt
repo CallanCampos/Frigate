@@ -11907,6 +11907,8 @@ overlays/ov036 0x021bc108 Fld3DCi_FollowTargetCallback
 overlays/ov036 0x021bc388 Fld3DCi_FreeSceneTemplate
 overlays/ov036 0x021bc420 Fld3DCi_RestoreBGPriorities
 overlays/ov036 0x021bc43c Fld3DCi_RestoreScreenDispA
+overlays/ov036 0x021bc828 Fld3DCi_IsFlyArrivalEffect
+overlays/ov036 0x021bc838 Fld3DCi_IsNoFadeOutEffect
 overlays/ov036 0x021bccf0 Fld3DCi_GetTexDataOffset
 overlays/ov036 0x021bcd00 Fld3DCi_GetPlttDataOffset
 overlays/ov036 0x021bcfcc Fld3DCi_InitEventData
