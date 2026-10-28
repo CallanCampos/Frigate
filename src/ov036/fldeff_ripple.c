@@ -100,7 +100,7 @@ void FldeffRipple_Start(FieldEffects *effects, FieldActor *actor, u32 big, u32 a
         pos.y -= FX32_CONST(14);
         pos.z -= FX32_CONST(10);
     }
-    params.ripple = FieldEffects_GetHandleData(effects, 7);
+    params.ripple = FieldEffects_GetHandleData(effects, FLDEFF_RIPPLE);
     params.pos = pos;
     FieldEffects_TCBCreate(effects, &RIPPLE_TASK_VTABLE, NULL, 0, &params, 0);
 }
@@ -125,7 +125,7 @@ static void RippleTask_Init(FieldEffectTask *task, void *work) {
     request.callback = NULL;
     request.callbackData = rippleTask;
     rippleTask->actorIndex = BillboardActorSys_ExecActorRequests(billboardActor, 0, &request, 1, 3);
-    if (rippleTask->actorIndex == 0xffff) {
+    if (rippleTask->actorIndex == BILLBOARD_ACTOR_NONE) {
         FieldEffects_DeleteObject(task);
         return;
     }
@@ -140,7 +140,7 @@ static void RippleTask_Free(FieldEffectTask *task, void *work) {
     BillboardActorSys *billboardActor = rippleTask->ripple->billboardActor;
     u16 actorIndex = rippleTask->actorIndex;
 
-    if (actorIndex != 0xffff) {
+    if (actorIndex != BILLBOARD_ACTOR_NONE) {
         BillboardActorSys_DeleteActors(billboardActor, actorIndex, 1);
     }
 }

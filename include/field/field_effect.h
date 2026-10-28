@@ -83,7 +83,7 @@ enum {
     REFLECT_KIND_MIRROR,
 };
 void ReflectTask_SetActor(MMSys *system, FieldActor *actor, FieldEffects *effects, u32 kind);
-void FldeffRipple_Start(FieldEffects *effects, FieldActor *actor, u32 arg2, u32 arg3);
+void FldeffRipple_Start(FieldEffects *effects, FieldActor *actor, u32 big, u32 atInit);
 void FldeffSplash_AddModel(FieldEffects *effects, FieldActor *actor);
 void D06Electric_StartSpark(FieldActor *actor, FieldEffects *effects);
 void FldeffLeaves_Start(FieldEffects *effects, FieldActor *actor);
