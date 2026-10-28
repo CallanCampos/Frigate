@@ -58,10 +58,10 @@ static void RailActor_MapAttrProcMoveEndJump(FieldActor *actor);
 static void RailActor_MapAttrGrassProc0(FieldActor *actor, u32 tile, u32 origYTile, const FieldActorConfig *info);
 static void RailActor_MapAttrGrassProc12(FieldActor *actor, u32 tile, u32 origYTile, const FieldActorConfig *info);
 static void RailActor_MapAttrFootMarkProc1(FieldActor *actor, u32 tile, u32 origYTile, const FieldActorConfig *info);
-static void func_ov036_02194dac(FieldActor *actor, u32 tile, u32 origYTile, const FieldActorConfig *info);
+static void RailActor_MapAttrShadowProc(FieldActor *actor, u32 tile, u32 origYTile, const FieldActorConfig *info);
 static void RailActor_EnsureShadow(FieldActor *actor, u32 tile, u32 origYTile, const FieldActorConfig *info);
 static void func_ov036_02194dec(FieldActor *actor, u32 tile, u32 origYTile, const FieldActorConfig *info);
-static void func_ov036_02194df0(FieldActor *actor, u32 tile, u32 origYTile, const FieldActorConfig *info);
+static void RailActor_MapAttrLandingDustProc(FieldActor *actor, u32 tile, u32 origYTile, const FieldActorConfig *info);
 static void RailActor_StartReflection(FieldActor *actor, u32 tile, u32 origYTile, const FieldActorConfig *info);
 static void RailActor_ClearReflectionIfOffTile(FieldActor *actor, u32 tile, u32 origYTile,
                                                const FieldActorConfig *info);
@@ -320,7 +320,7 @@ static void RailActor_MapAttrProcMoveStartFirst(FieldActor *actor) {
         const FieldActorConfig *info = GetActorMdlInfo(actor);
 
         RailActor_MapAttrGrassProc0(actor, tile, origYTile, info);
-        func_ov036_02194dac(actor, tile, origYTile, info);
+        RailActor_MapAttrShadowProc(actor, tile, origYTile, info);
         RailActor_StartReflection(actor, tile, origYTile, info);
         RailActor_UpdateShadowGroup(actor, tile, origYTile, info);
     }
@@ -373,7 +373,7 @@ static void RailActor_MapAttrProcMoveEndJump(FieldActor *actor) {
         RailActor_ClearReflectionIfOffTile(actor, tile, origYTile, info);
         func_ov036_02194dec(actor, tile, origYTile, info);
         RailActor_MapAttrGrassProc12(actor, tile, origYTile, info);
-        func_ov036_02194df0(actor, tile, origYTile, info);
+        RailActor_MapAttrLandingDustProc(actor, tile, origYTile, info);
         RailActor_UpdateShadowGroup(actor, tile, origYTile, info);
     }
 }
@@ -402,7 +402,7 @@ static void RailActor_MapAttrFootMarkProc1(FieldActor *actor, u32 tile, u32 orig
     }
 }
 
-static void func_ov036_02194dac(FieldActor *actor, u32 tile, u32 origYTile, const FieldActorConfig *info) {
+static void RailActor_MapAttrShadowProc(FieldActor *actor, u32 tile, u32 origYTile, const FieldActorConfig *info) {
     RailActor_EnsureShadow(actor, tile, origYTile, info);
 }
 
@@ -418,7 +418,7 @@ static void RailActor_EnsureShadow(FieldActor *actor, u32 tile, u32 origYTile, c
 static void func_ov036_02194dec(FieldActor *actor, u32 tile, u32 origYTile, const FieldActorConfig *info) {
 }
 
-static void func_ov036_02194df0(FieldActor *actor, u32 tile, u32 origYTile, const FieldActorConfig *info) {
+static void RailActor_MapAttrLandingDustProc(FieldActor *actor, u32 tile, u32 origYTile, const FieldActorConfig *info) {
     FldeffKemuri_StartFacing(actor, FldAct_GetFieldEffects(actor));
 }
 
@@ -473,12 +473,12 @@ static FieldEffects *FldAct_GetFieldEffects(FieldActor *actor) {
     return Field_GetFieldEffects(GetMMSysField(GetActorMModelSystem(actor)));
 }
 
-BOOL func_ov036_02194ee8(FieldActor *actor) {
+BOOL RailActor_AcSetAcmdEnd(FieldActor *actor) {
     SetActorMovementFlag(actor, 0x400);
     return FALSE;
 }
 
-BOOL func_ov036_02194ef8(FieldActor *actor) {
+BOOL RailActor_AcNextState(FieldActor *actor) {
     FieldActor_NextAcmdState(actor);
     return TRUE;
 }
@@ -490,22 +490,22 @@ static void RailActorAcmd_InitTurn(FieldActor *actor, u32 dir) {
     FieldActor_NextAcmdState(actor);
 }
 
-BOOL func_ov036_02194f28(FieldActor *actor) {
+BOOL RailActor_AcFaceU(FieldActor *actor) {
     RailActorAcmd_InitTurn(actor, DIR_UP);
     return TRUE;
 }
 
-BOOL func_ov036_02194f34(FieldActor *actor) {
+BOOL RailActor_AcFaceD(FieldActor *actor) {
     RailActorAcmd_InitTurn(actor, DIR_DOWN);
     return TRUE;
 }
 
-BOOL func_ov036_02194f40(FieldActor *actor) {
+BOOL RailActor_AcFaceL(FieldActor *actor) {
     RailActorAcmd_InitTurn(actor, DIR_LEFT);
     return TRUE;
 }
 
-BOOL func_ov036_02194f4c(FieldActor *actor) {
+BOOL RailActor_AcFaceR(FieldActor *actor) {
     RailActorAcmd_InitTurn(actor, DIR_RIGHT);
     return TRUE;
 }
@@ -540,67 +540,67 @@ BOOL RailActor_AcWalkEnd(FieldActor *actor) {
     return FALSE;
 }
 
-BOOL func_ov036_02194ff4(FieldActor *actor) {
+BOOL RailActor_AcWalkU16F0(FieldActor *actor) {
     RailActorAcmd_InitMove(actor, 0, 16, 2);
     return TRUE;
 }
-BOOL func_ov036_02195004(FieldActor *actor) {
+BOOL RailActor_AcWalkD16F0(FieldActor *actor) {
     RailActorAcmd_InitMove(actor, 1, 16, 2);
     return TRUE;
 }
-BOOL func_ov036_02195014(FieldActor *actor) {
+BOOL RailActor_AcWalkL16F0(FieldActor *actor) {
     RailActorAcmd_InitMove(actor, 2, 16, 2);
     return TRUE;
 }
-BOOL func_ov036_02195024(FieldActor *actor) {
+BOOL RailActor_AcWalkR16F0(FieldActor *actor) {
     RailActorAcmd_InitMove(actor, 3, 16, 2);
     return TRUE;
 }
-BOOL func_ov036_02195034(FieldActor *actor) {
+BOOL RailActor_AcWalkU8F0(FieldActor *actor) {
     RailActorAcmd_InitMove(actor, 0, 8, 3);
     return TRUE;
 }
-BOOL func_ov036_02195044(FieldActor *actor) {
+BOOL RailActor_AcWalkD8F0(FieldActor *actor) {
     RailActorAcmd_InitMove(actor, 1, 8, 3);
     return TRUE;
 }
-BOOL func_ov036_02195054(FieldActor *actor) {
+BOOL RailActor_AcWalkL8F0(FieldActor *actor) {
     RailActorAcmd_InitMove(actor, 2, 8, 3);
     return TRUE;
 }
-BOOL func_ov036_02195064(FieldActor *actor) {
+BOOL RailActor_AcWalkR8F0(FieldActor *actor) {
     RailActorAcmd_InitMove(actor, 3, 8, 3);
     return TRUE;
 }
-BOOL func_ov036_02195074(FieldActor *actor) {
+BOOL RailActor_AcWalkU4F0(FieldActor *actor) {
     RailActorAcmd_InitMove(actor, 0, 4, 4);
     return TRUE;
 }
-BOOL func_ov036_02195084(FieldActor *actor) {
+BOOL RailActor_AcWalkD4F0(FieldActor *actor) {
     RailActorAcmd_InitMove(actor, 1, 4, 4);
     return TRUE;
 }
-BOOL func_ov036_02195094(FieldActor *actor) {
+BOOL RailActor_AcWalkL4F0(FieldActor *actor) {
     RailActorAcmd_InitMove(actor, 2, 4, 4);
     return TRUE;
 }
-BOOL func_ov036_021950a4(FieldActor *actor) {
+BOOL RailActor_AcWalkR4F0(FieldActor *actor) {
     RailActorAcmd_InitMove(actor, 3, 4, 4);
     return TRUE;
 }
-BOOL func_ov036_021950b4(FieldActor *actor) {
+BOOL RailActor_AcWalkU2F0(FieldActor *actor) {
     RailActorAcmd_InitMove(actor, 0, 2, 5);
     return TRUE;
 }
-BOOL func_ov036_021950c4(FieldActor *actor) {
+BOOL RailActor_AcWalkD2F0(FieldActor *actor) {
     RailActorAcmd_InitMove(actor, 1, 2, 5);
     return TRUE;
 }
-BOOL func_ov036_021950d4(FieldActor *actor) {
+BOOL RailActor_AcWalkL2F0(FieldActor *actor) {
     RailActorAcmd_InitMove(actor, 2, 2, 5);
     return TRUE;
 }
-BOOL func_ov036_021950e4(FieldActor *actor) {
+BOOL RailActor_AcWalkR2F0(FieldActor *actor) {
     RailActorAcmd_InitMove(actor, 3, 2, 5);
     return TRUE;
 }
@@ -642,83 +642,83 @@ BOOL RailActor_AcStayWalk1(FieldActor *actor) {
     FieldActor_NextAcmdState(actor);
     return TRUE;
 }
-BOOL func_ov036_0219519c(FieldActor *actor) {
+BOOL RailActor_AcStayWalkU32F0(FieldActor *actor) {
     RailActorAcmd_InitWait(actor, 0, 32, 1);
     return TRUE;
 }
-BOOL func_ov036_021951ac(FieldActor *actor) {
+BOOL RailActor_AcStayWalkD32F0(FieldActor *actor) {
     RailActorAcmd_InitWait(actor, 1, 32, 1);
     return TRUE;
 }
-BOOL func_ov036_021951bc(FieldActor *actor) {
+BOOL RailActor_AcStayWalkL32F0(FieldActor *actor) {
     RailActorAcmd_InitWait(actor, 2, 32, 1);
     return TRUE;
 }
-BOOL func_ov036_021951cc(FieldActor *actor) {
+BOOL RailActor_AcStayWalkR32F0(FieldActor *actor) {
     RailActorAcmd_InitWait(actor, 3, 32, 1);
     return TRUE;
 }
-BOOL func_ov036_021951dc(FieldActor *actor) {
+BOOL RailActor_AcStayWalkU16F0(FieldActor *actor) {
     RailActorAcmd_InitWait(actor, 0, 16, 2);
     return TRUE;
 }
-BOOL func_ov036_021951ec(FieldActor *actor) {
+BOOL RailActor_AcStayWalkD16F0(FieldActor *actor) {
     RailActorAcmd_InitWait(actor, 1, 16, 2);
     return TRUE;
 }
-BOOL func_ov036_021951fc(FieldActor *actor) {
+BOOL RailActor_AcStayWalkL16F0(FieldActor *actor) {
     RailActorAcmd_InitWait(actor, 2, 16, 2);
     return TRUE;
 }
-BOOL func_ov036_0219520c(FieldActor *actor) {
+BOOL RailActor_AcStayWalkR16F0(FieldActor *actor) {
     RailActorAcmd_InitWait(actor, 3, 16, 2);
     return TRUE;
 }
-BOOL func_ov036_0219521c(FieldActor *actor) {
+BOOL RailActor_AcStayWalkU8F0(FieldActor *actor) {
     RailActorAcmd_InitWait(actor, 0, 8, 3);
     return TRUE;
 }
-BOOL func_ov036_0219522c(FieldActor *actor) {
+BOOL RailActor_AcStayWalkD8F0(FieldActor *actor) {
     RailActorAcmd_InitWait(actor, 1, 8, 3);
     return TRUE;
 }
-BOOL func_ov036_0219523c(FieldActor *actor) {
+BOOL RailActor_AcStayWalkL8F0(FieldActor *actor) {
     RailActorAcmd_InitWait(actor, 2, 8, 3);
     return TRUE;
 }
-BOOL func_ov036_0219524c(FieldActor *actor) {
+BOOL RailActor_AcStayWalkR8F0(FieldActor *actor) {
     RailActorAcmd_InitWait(actor, 3, 8, 3);
     return TRUE;
 }
-BOOL func_ov036_0219525c(FieldActor *actor) {
+BOOL RailActor_AcStayWalkU2F0(FieldActor *actor) {
     RailActorAcmd_InitWait(actor, 0, 2, 5);
     return TRUE;
 }
-BOOL func_ov036_0219526c(FieldActor *actor) {
+BOOL RailActor_AcStayWalkD2F0(FieldActor *actor) {
     RailActorAcmd_InitWait(actor, 1, 2, 5);
     return TRUE;
 }
-BOOL func_ov036_0219527c(FieldActor *actor) {
+BOOL RailActor_AcStayWalkL2F0(FieldActor *actor) {
     RailActorAcmd_InitWait(actor, 2, 2, 5);
     return TRUE;
 }
-BOOL func_ov036_0219528c(FieldActor *actor) {
+BOOL RailActor_AcStayWalkR2F0(FieldActor *actor) {
     RailActorAcmd_InitWait(actor, 3, 2, 5);
     return TRUE;
 }
-BOOL func_ov036_0219529c(FieldActor *actor) {
+BOOL RailActor_AcStayWalkU4F0(FieldActor *actor) {
     RailActorAcmd_InitWait(actor, 0, 4, 4);
     return TRUE;
 }
-BOOL func_ov036_021952ac(FieldActor *actor) {
+BOOL RailActor_AcStayWalkD4F0(FieldActor *actor) {
     RailActorAcmd_InitWait(actor, 1, 4, 4);
     return TRUE;
 }
-BOOL func_ov036_021952bc(FieldActor *actor) {
+BOOL RailActor_AcStayWalkL4F0(FieldActor *actor) {
     RailActorAcmd_InitWait(actor, 2, 4, 4);
     return TRUE;
 }
-BOOL func_ov036_021952cc(FieldActor *actor) {
+BOOL RailActor_AcStayWalkR4F0(FieldActor *actor) {
     RailActorAcmd_InitWait(actor, 3, 4, 4);
     return TRUE;
 }
