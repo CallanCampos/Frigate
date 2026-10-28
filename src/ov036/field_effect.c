@@ -97,12 +97,12 @@ static const FieldEffectVTable FIELD_EFFECT_VTABLES[FLDEFF_MAX + 1] = {
     { 16, func_ov036_021be988, func_ov036_021be9ac },
     { 17, func_ov036_021c944c, func_ov036_021c9470 },
     { 18, func_ov036_021a5a18, func_ov036_021a5a20 },
-    { 19, func_ov036_021a50a4, func_ov036_021a50ec },
-    { 20, func_ov036_021a50b0, func_ov036_021a50ec },
-    { 21, func_ov036_021a50bc, func_ov036_021a50ec },
-    { 22, func_ov036_021a50c8, func_ov036_021a50ec },
-    { 23, func_ov036_021a50d4, func_ov036_021a50ec },
-    { 24, func_ov036_021a50e0, func_ov036_021a50ec },
+    { 19, EncountTask_CreateGrass, EncountTask_Delete },
+    { 20, EncountTask_CreateReallyTallGrass, EncountTask_Delete },
+    { 21, EncountTask_CreateDustCloud, EncountTask_Delete },
+    { 22, EncountTask_CreateWater0, EncountTask_Delete },
+    { 23, EncountTask_CreateWater1, EncountTask_Delete },
+    { 24, EncountTask_CreateFlyingShadow, EncountTask_Delete },
     { FLDEFF_NONE, NULL, NULL },
 };
 

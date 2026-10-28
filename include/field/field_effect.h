@@ -187,12 +187,12 @@ void *func_ov036_021c944c(FieldEffects *effects, HeapID heapId);
 void func_ov036_021c9470(FieldEffects *effects, void *data);
 void *func_ov036_021a5a18(FieldEffects *effects, HeapID heapId);
 void func_ov036_021a5a20(FieldEffects *effects, void *data);
-void *func_ov036_021a50a4(FieldEffects *effects, HeapID heapId);
-void *func_ov036_021a50b0(FieldEffects *effects, HeapID heapId);
-void *func_ov036_021a50bc(FieldEffects *effects, HeapID heapId);
-void *func_ov036_021a50c8(FieldEffects *effects, HeapID heapId);
-void *func_ov036_021a50d4(FieldEffects *effects, HeapID heapId);
-void *func_ov036_021a50e0(FieldEffects *effects, HeapID heapId);
-void func_ov036_021a50ec(FieldEffects *effects, void *data);
+void *EncountTask_CreateGrass(FieldEffects *effects, HeapID heapId);
+void *EncountTask_CreateReallyTallGrass(FieldEffects *effects, HeapID heapId);
+void *EncountTask_CreateDustCloud(FieldEffects *effects, HeapID heapId);
+void *EncountTask_CreateWater0(FieldEffects *effects, HeapID heapId);
+void *EncountTask_CreateWater1(FieldEffects *effects, HeapID heapId);
+void *EncountTask_CreateFlyingShadow(FieldEffects *effects, HeapID heapId);
+void EncountTask_Delete(FieldEffects *effects, void *data);
 
 #endif // POKEBW2_FIELD_FIELD_EFFECT_H

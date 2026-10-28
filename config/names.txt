@@ -11281,6 +11281,13 @@ overlays/ov036 0x021a4f2c FldeffNamipokeSplash_Init
 overlays/ov036 0x021a4ff0 FldeffNamipokeSplash_Exit
 overlays/ov036 0x021a5004 FldeffNamipokeSplash_Update
 overlays/ov036 0x021a5084 FldeffNamipokeSplash_Draw
+overlays/ov036 0x021a50a4 EncountTask_CreateGrass
+overlays/ov036 0x021a50b0 EncountTask_CreateReallyTallGrass
+overlays/ov036 0x021a50bc EncountTask_CreateDustCloud
+overlays/ov036 0x021a50c8 EncountTask_CreateWater0
+overlays/ov036 0x021a50d4 EncountTask_CreateWater1
+overlays/ov036 0x021a50e0 EncountTask_CreateFlyingShadow
+overlays/ov036 0x021a50ec EncountTask_Delete
 overlays/ov036 0x021a5100 EncountTask_Create
 overlays/ov036 0x021a5130 EncountTask_LoadKind
 overlays/ov036 0x021a5178 EncountEffectObj_Create
@@ -11292,6 +11299,7 @@ overlays/ov036 0x021a53f8 EncountTask_Start
 overlays/ov036 0x021a5498 EncountTask_SetPaused
 overlays/ov036 0x021a54a8 EncountTask_SetDrawHidden
 overlays/ov036 0x021a54b8 EncountTask_Init
+overlays/ov036 0x021a54f8 EncountTask_Exit
 overlays/ov036 0x021a54fc EncountTask_Update
 overlays/ov036 0x021a5550 EncountTask_PlaySound
 overlays/ov036 0x021a55b8 EncountTask_Draw
