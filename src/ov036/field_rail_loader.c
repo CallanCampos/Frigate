@@ -892,23 +892,23 @@ static void RailActorAnim_DrawMultiPattern(FieldActor *actor) {
             switch (entry->kind) {
             case 0:
                 switch (state) {
-                case 10:
+                case DRAW_STATUS_ANIME_10:
                     anim = 1;
                     break;
-                case 11:
+                case DRAW_STATUS_ANIME_11:
                     anim = 2;
                     break;
-                case 12:
+                case DRAW_STATUS_ANIME_12:
                     anim = 3;
                     break;
                 }
                 break;
             case 1:
                 switch (state) {
-                case 10:
+                case DRAW_STATUS_ANIME_10:
                     anim = 2;
                     break;
-                case 11:
+                case DRAW_STATUS_ANIME_11:
                     anim = 3;
                     break;
                 default:
@@ -921,7 +921,7 @@ static void RailActorAnim_DrawMultiPattern(FieldActor *actor) {
                 }
                 break;
             case 3:
-                if (state == 10) {
+                if (state == DRAW_STATUS_ANIME_10) {
                     anim = 2;
                 } else if (dir == DIR_UP) {
                     anim = 1;
@@ -930,7 +930,7 @@ static void RailActorAnim_DrawMultiPattern(FieldActor *actor) {
                 }
                 break;
             case 4:
-                if (state == 10) {
+                if (state == DRAW_STATUS_ANIME_10) {
                     anim = 2;
                 }
                 break;
@@ -1043,17 +1043,17 @@ static void RailActorAnim_DrawThreePattern(FieldActor *actor) {
 
             if (objCode == OBJ_CODE_123) {
                 switch (state) {
-                case 10:
+                case DRAW_STATUS_ANIME_10:
                     anim = 1;
                     break;
-                case 11:
+                case DRAW_STATUS_ANIME_11:
                     anim = 2;
                     break;
-                case 12:
+                case DRAW_STATUS_ANIME_12:
                     anim = 3;
                     break;
                 }
-            } else if (objCode == OBJ_CODE_374 && state == 13) {
+            } else if (objCode == OBJ_CODE_374 && state == DRAW_STATUS_ANIME_13) {
                 anim = 4;
             }
             work->anim.state = state;
