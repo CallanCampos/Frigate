@@ -78,3 +78,13 @@ Before publication: owner review, both ROM hashes and canonical full native gate
 integration: actual SDK lifecycle/polling review, both versions' full native/strict suites, source/traffic/oracle
 comparisons and save/reload checks, with every mismatch diagnosed. ADR0023 remains proposed; accepting this limited
 foundation does not accept a CPU adapter, production DMA, AI parity, whole-game completion or the overall goal.
+
+
+## 2026-10-28: shared CPU command boundary, still inactive in gameplay
+
+The follow-up gives the same physical controller explicit CPU ownership and monotonic command tokens. CPU and DMA
+cannot overlap. A CPU consume schedules the next READY or publishes final transfer IF before its caller's separate
+memory store; it does not deliver an IRQ or invent instruction costs. Cancel/reset invalidate old tokens, and backend
+failure retains an explicit IO result without completion. Both ordinary and fatal ASan/UBSan builds pass the six new
+CPU scenarios and every existing physical-controller case in both games. The unchanged production reader, original
+SDK cache/task integration and unresolved authentic New Game/AI timing remain outside this increment's acceptance.
