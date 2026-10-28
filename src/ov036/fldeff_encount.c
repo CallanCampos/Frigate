@@ -73,7 +73,7 @@ static void EncountTask_LoadKind0Models(FieldEffectEncount *effect, EncountEffec
 static void EncountTask_LoadModels(FieldEffectEncount *effect, EncountEffectSpec *spec, ArcTool *arc);
 static void EncountEffect_FreeResources(FieldEffectEncount *effect);
 static void EncountTask_Init(FieldEffectTask *task, void *work);
-static void func_ov036_021a54f8(FieldEffectTask *task, void *work);
+static void EncountTask_Exit(FieldEffectTask *task, void *work);
 static void EncountTask_Update(FieldEffectTask *task, void *work);
 static void EncountTask_PlaySound(EncountTask *encountTask, FieldEffectEncount *effect);
 static void EncountTask_Draw(FieldEffectTask *task, void *work);
@@ -88,7 +88,7 @@ static const u8 ENCOUNT_EFFECT_INDICES[8] = { 0, 0, 0, 1, 2, 3, 4, 5 };
 static const FieldEffectTaskVTable ENCOUNT_TASK_VTABLE = {
     sizeof(EncountTask),
     EncountTask_Init,
-    func_ov036_021a54f8,
+    EncountTask_Exit,
     EncountTask_Update,
     EncountTask_Draw,
 };
@@ -107,31 +107,31 @@ static EncountEffectSpec ENCOUNT_EFFECT_SPECS[6] = {
 
 // clang-format on
 
-void *func_ov036_021a50a4(FieldEffects *effects, HeapID heapId) {
+void *EncountTask_CreateGrass(FieldEffects *effects, HeapID heapId) {
     return EncountTask_Create(effects, heapId, 0);
 }
 
-void *func_ov036_021a50b0(FieldEffects *effects, HeapID heapId) {
+void *EncountTask_CreateReallyTallGrass(FieldEffects *effects, HeapID heapId) {
     return EncountTask_Create(effects, heapId, 1);
 }
 
-void *func_ov036_021a50bc(FieldEffects *effects, HeapID heapId) {
+void *EncountTask_CreateDustCloud(FieldEffects *effects, HeapID heapId) {
     return EncountTask_Create(effects, heapId, 2);
 }
 
-void *func_ov036_021a50c8(FieldEffects *effects, HeapID heapId) {
+void *EncountTask_CreateWater0(FieldEffects *effects, HeapID heapId) {
     return EncountTask_Create(effects, heapId, 3);
 }
 
-void *func_ov036_021a50d4(FieldEffects *effects, HeapID heapId) {
+void *EncountTask_CreateWater1(FieldEffects *effects, HeapID heapId) {
     return EncountTask_Create(effects, heapId, 4);
 }
 
-void *func_ov036_021a50e0(FieldEffects *effects, HeapID heapId) {
+void *EncountTask_CreateFlyingShadow(FieldEffects *effects, HeapID heapId) {
     return EncountTask_Create(effects, heapId, 5);
 }
 
-void func_ov036_021a50ec(FieldEffects *effects, void *data) {
+void EncountTask_Delete(FieldEffects *effects, void *data) {
     EncountEffect_FreeResources(data);
     GFL_HeapFree(data);
 }
@@ -297,7 +297,7 @@ static void EncountTask_Init(FieldEffectTask *task, void *work) {
     FieldEffects_UpdateObject(task);
 }
 
-static void func_ov036_021a54f8(FieldEffectTask *task, void *work) {
+static void EncountTask_Exit(FieldEffectTask *task, void *work) {
 }
 
 static void EncountTask_Update(FieldEffectTask *task, void *work) {

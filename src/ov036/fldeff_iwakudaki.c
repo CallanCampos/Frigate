@@ -39,7 +39,7 @@ static void FldeffIwakudaki_UploadTexturesTask(TCB *tcb, void *data);
 static void FldeffIwakudaki_Init(FieldEffectTask *task, void *work);
 static void FldeffIwakudaki_Exit(FieldEffectTask *task, void *work);
 static void FldeffIwakudaki_Update(FieldEffectTask *task, void *work);
-static void func_ov036_021a57ec(FieldEffectTask *task, void *work);
+static void FldeffIwakudaki_Draw(FieldEffectTask *task, void *work);
 
 // clang-format off
 static const FieldEffectTaskVTable ROCK_SMASH_TASK_VTABLE = {
@@ -47,7 +47,7 @@ static const FieldEffectTaskVTable ROCK_SMASH_TASK_VTABLE = {
     FldeffIwakudaki_Init,
     FldeffIwakudaki_Exit,
     FldeffIwakudaki_Update,
-    func_ov036_021a57ec,
+    FldeffIwakudaki_Draw,
 };
 
 // clang-format on
@@ -63,7 +63,7 @@ void *FldeffIwakudaki_Create(FieldEffects *effects, HeapID heapId) {
     return effect;
 }
 
-void func_ov036_021a5628(FieldEffects *effects, void *data) {
+void FldeffIwakudaki_Delete(FieldEffects *effects, void *data) {
     FldeffIwakudaki_FreeResources(data);
     GFL_HeapFree(data);
 }
@@ -163,7 +163,7 @@ static void FldeffIwakudaki_Update(FieldEffectTask *task, void *work) {
     }
 }
 
-static void func_ov036_021a57ec(FieldEffectTask *task, void *work) {
+static void FldeffIwakudaki_Draw(FieldEffectTask *task, void *work) {
     SRTMatrix srt = { { 0, 0, 0 }, { FX32_ONE, FX32_ONE, FX32_ONE } };
     RockSmashTask *rockTask = work;
 

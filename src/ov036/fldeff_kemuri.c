@@ -24,20 +24,20 @@ typedef struct {
     u16 objIdx;
 } SmokeTask;
 
-static void func_ov036_021a3e18(FieldEffectSmoke *smoke);
+static void FldeffKemuri_LoadResource(FieldEffectSmoke *smoke);
 static void FldeffKemuri_FreeResource(FieldEffectSmoke *smoke);
 static void FldeffKemuri_Init(FieldEffectTask *task, void *work);
-static void func_ov036_021a3fac(FieldEffectTask *task, void *work);
-static void func_ov036_021a3fb8(FieldEffectTask *task, void *work);
-static void func_ov036_021a3fd4(FieldEffectTask *task, void *work);
+static void FldeffKemuri_Exit(FieldEffectTask *task, void *work);
+static void FldeffKemuri_Update(FieldEffectTask *task, void *work);
+static void FldeffKemuri_Draw(FieldEffectTask *task, void *work);
 
 // clang-format off
 static const FieldEffectTaskVTable SMOKE_TASK_VTABLE = {
     sizeof(SmokeTask),
     FldeffKemuri_Init,
-    func_ov036_021a3fac,
-    func_ov036_021a3fb8,
-    func_ov036_021a3fd4,
+    FldeffKemuri_Exit,
+    FldeffKemuri_Update,
+    FldeffKemuri_Draw,
 };
 
 // clang-format on
@@ -46,7 +46,7 @@ void *playSmokeEffect(FieldEffects *effects, HeapID heapId) {
     FieldEffectSmoke *smoke = GFL_HeapAllocate(heapId, sizeof(FieldEffectSmoke), TRUE, "fldeff_kemuri.c", 82);
 
     smoke->effects = effects;
-    func_ov036_021a3e18(smoke);
+    FldeffKemuri_LoadResource(smoke);
     return smoke;
 }
 
@@ -55,7 +55,7 @@ void freeSmokeEffect(FieldEffects *effects, void *data) {
     GFL_HeapFree(data);
 }
 
-static void func_ov036_021a3e18(FieldEffectSmoke *smoke) {
+static void FldeffKemuri_LoadResource(FieldEffectSmoke *smoke) {
     FieldG3DObjResRequest request;
     FieldG3DObjSystem *objSys = FieldEffects_GetFieldMapData(smoke->effects);
     ArcTool *arc = FieldEffects_GetArc(smoke->effects);
@@ -109,14 +109,14 @@ static void FldeffKemuri_Init(FieldEffectTask *task, void *work) {
     smokeTask->objIdx = FieldG3DObjSystem_AddObj(smokeTask->objSys, smokeTask->smoke->resGroup, 0, &params->pos);
 }
 
-static void func_ov036_021a3fac(FieldEffectTask *task, void *work) {
+static void FldeffKemuri_Exit(FieldEffectTask *task, void *work) {
     SmokeTask *smokeTask = work;
 
     FieldG3DObjSystem_FreeObj(smokeTask->objSys, smokeTask->objIdx);
 }
 
 // End when the animation does
-static void func_ov036_021a3fb8(FieldEffectTask *task, void *work) {
+static void FldeffKemuri_Update(FieldEffectTask *task, void *work) {
     SmokeTask *smokeTask = work;
 
     if (!FieldG3DObjSystem_StepObjAnm(smokeTask->objSys, smokeTask->objIdx, FX32_ONE)) {
@@ -124,5 +124,5 @@ static void func_ov036_021a3fb8(FieldEffectTask *task, void *work) {
     }
 }
 
-static void func_ov036_021a3fd4(FieldEffectTask *task, void *work) {
+static void FldeffKemuri_Draw(FieldEffectTask *task, void *work) {
 }

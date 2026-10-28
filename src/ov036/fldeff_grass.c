@@ -44,7 +44,7 @@ static void Grass_FreeTextures(FieldEffectGrass *grass);
 static void GrassTask_Init(FieldEffectTask *task, void *work);
 static void GrassTask_Delete(FieldEffectTask *task, void *work);
 static void GrassTask_Update(FieldEffectTask *task, void *work);
-static void func_ov036_021a4320(FieldEffectTask *task, void *work);
+static void GrassTask_Draw(FieldEffectTask *task, void *work);
 static BOOL GrassTask_IsActorOnTile(GrassTask *grassTask);
 
 // Whether each kind of grass ends as soon as the actor walks on, and the step of its animation it settles on
@@ -58,7 +58,7 @@ static const FieldEffectTaskVTable GRASS_TASK_VTABLE = {
     GrassTask_Init,
     GrassTask_Delete,
     GrassTask_Update,
-    func_ov036_021a4320,
+    GrassTask_Draw,
 };
 
 // clang-format on
@@ -262,7 +262,7 @@ static void GrassTask_Update(FieldEffectTask *task, void *work) {
     }
 }
 
-static void func_ov036_021a4320(FieldEffectTask *task, void *work) {
+static void GrassTask_Draw(FieldEffectTask *task, void *work) {
 }
 
 // Whether the actor is still on the grass's tile, or standing still on its first tile

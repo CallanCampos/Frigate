@@ -34,12 +34,12 @@ typedef struct {
     u32 actorIndex;
 } ShadowTask;
 
-static void func_ov036_021a3b9c(FieldEffectShadow *shadow);
+static void FldeffShadow_CreateSlot(FieldEffectShadow *shadow);
 static void FldeffShadow_DeleteSlot(FieldEffectShadow *shadow);
 static void FldeffShadow_Init(FieldEffectTask *task, void *work);
 static void FldeffShadow_Exit(FieldEffectTask *task, void *work);
 static void FldeffShadow_Update(FieldEffectTask *task, void *work);
-static void func_ov036_021a3d28(FieldEffectTask *task, void *work);
+static void FldeffShadow_Draw(FieldEffectTask *task, void *work);
 
 static const VecFx32 SHADOW_SCALE = { FX32_ONE, FX32_ONE, FX32_CONST(0.75) };
 
@@ -49,7 +49,7 @@ static const FieldEffectTaskVTable SHADOW_TASK_VTABLE = {
     FldeffShadow_Init,
     FldeffShadow_Exit,
     FldeffShadow_Update,
-    func_ov036_021a3d28,
+    FldeffShadow_Draw,
 };
 
 // clang-format on
@@ -64,7 +64,7 @@ void *FieldEffect_Shadow_Create(FieldEffects *effects, HeapID heapId) {
     shadow->blact = Field_GetEffectBlAct(field);
     shadow->scene = BlActSys_GetScene(shadow->blact);
     shadow->postFx = Field_GetColorPostFX(field);
-    func_ov036_021a3b9c(shadow);
+    FldeffShadow_CreateSlot(shadow);
     return shadow;
 }
 
@@ -73,7 +73,7 @@ void FieldEffect_Shadow_Free(FieldEffects *effects, void *data) {
     GFL_HeapFree(data);
 }
 
-static void func_ov036_021a3b9c(FieldEffectShadow *shadow) {
+static void FldeffShadow_CreateSlot(FieldEffectShadow *shadow) {
     BlActMatRequest request;
     G3DResource *texture = GFL_G3DSysReadArcToolResource(FieldEffects_GetArc(shadow->effects), 47);
 
@@ -157,7 +157,7 @@ static void FldeffShadow_Update(FieldEffectTask *task, void *work) {
 }
 
 // Follow the actor, a little above its feet
-static void func_ov036_021a3d28(FieldEffectTask *task, void *work) {
+static void FldeffShadow_Draw(FieldEffectTask *task, void *work) {
     VecFx32 pos;
     VecFx32 offset;
     BOOL visible;

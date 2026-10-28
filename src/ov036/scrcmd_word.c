@@ -1,7 +1,7 @@
 // The script commands that set the words of messages: names of the player, rival, items, moves, Pokémon, places and
 // the rest, and numbers. The ROM has no name for the file; scrcmd_word.c is descriptive. Function names from swan
 // (https://github.com/ds-pokemon-hacking/swan, GPL-3.0)
-// Additional helper and table names are our descriptive guesses.
+// Additional helper and table names, and those of commands 0x207, 0x208, 0x275 and 0x298, are our descriptive guesses.
 #include "types.h"
 #include "field/field.h"
 #include "field/field_daycare.h"
@@ -252,7 +252,7 @@ BOOL s0062_WordSetTrainerClassNameWithArticle(VM *vm, FieldScriptEnv *env) {
     return WordSet_LoadTrainerClassFromScript(vm, env, loadTrainerTypeWithArticleToStrbuf);
 }
 
-BOOL func_ov036_021a7c64(VM *vm, FieldScriptEnv *env) {
+BOOL s0207_WordSetPasserbyCount(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     TrainerGameInfoSave *info = getTrainerGameInfoAddress(GameData_GetSaveControl(FieldScriptEnv_GetGameData(env)));
     WordSet *wordSet = ScriptWork_GetWordSet(work);
@@ -262,7 +262,7 @@ BOOL func_ov036_021a7c64(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL func_ov036_021a7cb4(VM *vm, FieldScriptEnv *env) {
+BOOL s0208_WordSetThankedCount(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     TrainerGameInfoSave *info = getTrainerGameInfoAddress(GameData_GetSaveControl(FieldScriptEnv_GetGameData(env)));
     WordSet *wordSet = ScriptWork_GetWordSet(work);
@@ -293,7 +293,7 @@ BOOL s026D_WordSetMedalRank(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL func_ov036_021a7d70(VM *vm, FieldScriptEnv *env) {
+BOOL s0298_WordSetEmptyFileMessage(VM *vm, FieldScriptEnv *env) {
     WordSet *wordSet = ScriptWork_GetWordSet(FieldScriptEnv_GetScriptWork(env));
     u8 index = VM_Read8(vm);
     u16 messageId = ScriptReadAny(vm, env);
@@ -318,7 +318,7 @@ BOOL s029A_WordSetLoadNature(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL func_ov036_021a7e04(VM *vm, FieldScriptEnv *env) {
+BOOL s0275_WordSetFunfestMission(VM *vm, FieldScriptEnv *env) {
     WordSet *wordSet = ScriptWork_GetWordSet(FieldScriptEnv_GetScriptWork(env));
     u8 index = VM_Read8(vm);
     u16 value = ScriptReadAny(vm, env);

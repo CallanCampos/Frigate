@@ -53,7 +53,7 @@ BOOL WbtCmd_ShowOpponentLine(VM *vm, FieldScriptEnv *env) {
     WbtBattle_LoadOpponentLine(sys, message, text);
     WbtStadium_LoadRivalName(env, wordSet, 1);
     GFL_WordSetFormatStrbuf(wordSet, strbuf, text);
-    return func_ov036_021a8eb4(vm, env, strbuf, value, 0, 0);
+    return CallFieldActorMessageDispStrBuf(vm, env, strbuf, value, 0, 0);
 }
 
 BOOL WbtCmd_CallBattle(VM *vm, FieldScriptEnv *env) {

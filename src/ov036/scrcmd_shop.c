@@ -251,7 +251,7 @@ static void ShopUI_PrintPrice(BmpMenuList *list, s32 value, u8 y);
 static void ShopUI_PrintTMPrice(BmpMenuList *list, s32 value, u8 y);
 static void ShopUI_CursorCallback(BmpMenuList *list, s32 value, u8 init);
 static void ShopUI_FreeMenuList(ShopUIWork *wk);
-static BOOL func_ov036_021ad6e0(u32 event);
+static BOOL ShopUI_PrintStreamCallback(u32 event);
 static void ShopUI_SetStatusDialogue(ShopUIWork *wk, u32 msgId, u16 item, BOOL plural);
 static void ShopUI_SetBuyConfirmMessage(ShopUIWork *wk, u8 listMode);
 static void ShopUI_DrawMessageFrame(BmpWin *window);
@@ -1546,7 +1546,7 @@ static void ShopUI_FreeMenuList(ShopUIWork *wk) {
     BmpMenuList_Free(wk->list, &listTop, &cursorRow);
 }
 
-static BOOL func_ov036_021ad6e0(u32 event) {
+static BOOL ShopUI_PrintStreamCallback(u32 event) {
     return FALSE;
 }
 
@@ -1564,7 +1564,7 @@ static void ShopUI_SetStatusDialogue(ShopUIWork *wk, u32 msgId, u16 item, BOOL p
     GFL_StrBufFree(strbuf);
     wk->printStream =
         PrintStream_CreateWithCallback(wk->windows[6], 0, 0, wk->message, wk->font, TextSpeed_GetCurrentWait(),
-                                       wk->tcbManager, 0, wk->heapId, 0xffff, func_ov036_021ad6e0);
+                                       wk->tcbManager, 0, wk->heapId, 0xffff, ShopUI_PrintStreamCallback);
     BmpWin_TransferNow(wk->windows[6]);
 }
 

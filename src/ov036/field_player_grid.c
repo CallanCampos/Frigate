@@ -263,14 +263,14 @@ static const TileClassSFX TILE_CLASS_SFX_LAY1[] = {
     {MapTile_IsSnow_, SEQ_SE_FLD_11, 2, 4, SEASON_ANY},
     {MapTile_IsSnowNoCycling, SEQ_SE_FLD_11, 2, 4, SEASON_ANY},
     {MapTile_IsSplashWater, SEQ_SE_FLD_13, 2, 4, SEASON_ANY},
-    {func_ov036_021a2bf4, SEQ_SE_FLD_13, 2, 4, SEASON_ANY},
+    {MapTile_IsRippleWater, SEQ_SE_FLD_13, 2, 4, SEASON_ANY},
     {MapTile_IsSwamp, SEQ_SE_FLD_13, 2, 4, SEASON_ANY},
     {MapTile_IsDeepSand, SEQ_SE_FLD_91, 2, 4, SEASON_ANY},
     {MapTile_IsAnySand, SEQ_SE_FLD_14, 2, 4, SEASON_ANY},
     {MapTile_IsPuddle, SEQ_SE_FLD_11, 2, 4, 3},
     {MapTile_IsMud, SEQ_SE_FLD_11, 2, 4, 3},
     {MapTile_IsHiddenGrottoEntranceGrass, SEQ_SE_FLD_08, 2, 4, SEASON_ANY},
-    {func_ov036_021a2cd4, SEQ_SE_FLD_12, 2, 4, 2},
+    {MapTile_IsFallenLeaves, SEQ_SE_FLD_12, 2, 4, 2},
     {NULL, 0, 0, 0, SEASON_ANY},
 };
 

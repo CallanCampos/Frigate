@@ -636,7 +636,7 @@ static GameEventReturnCode EventFieldEffect_Callback(GameEvent *event, u32 *stat
         msgBGSys = Field_GetMsgBGSys(field);
         placeName = Field_GetPlaceName(field);
         MsgBGPrinter_ReloadBg(msgBGSys);
-        func_ov036_021b5180(placeName);
+        PlaceName_RestoreWindow(placeName);
         MsgBGPrinter_RequestSysFrame(msgBGSys);
         reg_G2_BG2CNT = (reg_G2_BG2CNT & 0x43) | 0x1f18;
         GFL_BGSysClearBG(2);

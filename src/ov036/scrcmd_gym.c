@@ -1,5 +1,6 @@
 // The script commands of the gyms' puzzles, which call into each gym's gimmick overlay. The ROM has no name for the
-// file; scrcmd_gym.c is descriptive. Function names from swan (https://github.com/ds-pokemon-hacking/swan, GPL-3.0)
+// file; scrcmd_gym.c is descriptive. Function names from swan (https://github.com/ds-pokemon-hacking/swan, GPL-3.0),
+// except the commands swan has no name for, which are ours, after the gimmick functions they call.
 #include "types.h"
 #include "constants/sound.h"
 #include "field/field_script.h"
@@ -18,12 +19,12 @@
 #include "system/game_system.h"
 #include "system/vm.h"
 
-BOOL func_ov036_021aad44(VM *vm, FieldScriptEnv *env) {
+BOOL s025B_GymElecReapplyProgress(VM *vm, FieldScriptEnv *env) {
     GymElec_ReapplyProgress(GSYS_GetField(FieldScriptEnv_GetGameSystem(env)));
     return FALSE;
 }
 
-BOOL func_ov036_021aad58(VM *vm, FieldScriptEnv *env) {
+BOOL s025C_GymElecSetFollower(VM *vm, FieldScriptEnv *env) {
     Field *field = GSYS_GetField(FieldScriptEnv_GetGameSystem(env));
     u16 a1 = VM_Read16(vm);
     u16 a2 = VM_Read16(vm);
@@ -33,7 +34,7 @@ BOOL func_ov036_021aad58(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL func_ov036_021aad90(VM *vm, FieldScriptEnv *env) {
+BOOL s025D_GymElecSetProgress(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     u8 progress = VM_Read16(vm);
     GameEvent *event = GymElec_SetProgress(gsys, progress);
@@ -45,7 +46,7 @@ BOOL func_ov036_021aad90(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL func_ov036_021aadc8(VM *vm, FieldScriptEnv *env) {
+BOOL s025F_GymElecSetStage(VM *vm, FieldScriptEnv *env) {
     Field *field = GSYS_GetField(FieldScriptEnv_GetGameSystem(env));
 
     switch (VM_Read16(vm)) {
@@ -80,14 +81,14 @@ BOOL func_ov036_021aadc8(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL func_ov036_021aae48(VM *vm, FieldScriptEnv *env) {
+BOOL s0268_GymInsectPlayObject(VM *vm, FieldScriptEnv *env) {
     Field *field = GSYS_GetField(FieldScriptEnv_GetGameSystem(env));
 
     GymInsect_PlayObject(field, ScriptReadAny(vm, env));
     return FALSE;
 }
 
-BOOL func_ov036_021aae74(VM *vm, FieldScriptEnv *env) {
+BOOL s0269_GymInsectShowEffect(VM *vm, FieldScriptEnv *env) {
     GymInsect_ShowEffect(GSYS_GetField(FieldScriptEnv_GetGameSystem(env)));
     return FALSE;
 }
@@ -106,7 +107,7 @@ BOOL ScrcmdFieldGimmickPlateDoors_StartDoorEvent(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL func_ov036_021aaec8(VM *vm, FieldScriptEnv *env) {
+BOOL s018D_DriftveilGymCallFreight(VM *vm, FieldScriptEnv *env) {
     GameEvent *event;
     BOOL a1 = FALSE;
     BOOL a2 = FALSE;
@@ -132,7 +133,7 @@ BOOL func_ov036_021aaec8(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL func_ov036_021aaf1c(VM *vm, FieldScriptEnv *env) {
+BOOL s018E_DriftveilLiftCallMove(VM *vm, FieldScriptEnv *env) {
     GameEvent *event;
     BOOL a1;
     BOOL a2 = FALSE;
@@ -161,19 +162,19 @@ BOOL func_ov036_021aaf1c(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL func_ov036_021aaf78(VM *vm, FieldScriptEnv *env) {
+BOOL s0186_DriftveilGymPrepareFreight(VM *vm, FieldScriptEnv *env) {
     DriftveilGym_PrepareFreight(FieldScriptEnv_GetGameSystem(env));
     return FALSE;
 }
 
-BOOL func_ov036_021aaf88(VM *vm, FieldScriptEnv *env) {
+BOOL s0187_DriftveilLiftPlaceAtBottom(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
 
     DriftveilLift_PlaceAtBottom(gsys, VM_Read16(vm));
     return FALSE;
 }
 
-BOOL func_ov036_021aafa8(VM *vm, FieldScriptEnv *env) {
+BOOL s028E_MistraltonGymFireCannon(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     GSYS_GetField(gsys);
@@ -192,7 +193,7 @@ BOOL s02BB_Gym0601FanAmbienceStart(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL func_ov036_021ab004(VM *vm, FieldScriptEnv *env) {
+BOOL s018F_IcirrusGymCallSwitchAnim(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     GameEvent *event = GymIcirrus_CreateSwitchAnimEvent(gsys, VM_Read16(vm));
@@ -204,7 +205,7 @@ BOOL func_ov036_021ab004(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL func_ov036_021ab03c(VM *vm, FieldScriptEnv *env) {
+BOOL s0190_IcirrusGymCallFlipSwitch(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     GameEvent *event = GymIcirrus_CreateFlipSwitchEvent(gsys, VM_Read16(vm));
@@ -216,14 +217,14 @@ BOOL func_ov036_021ab03c(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL func_ov036_021ab074(VM *vm, FieldScriptEnv *env) {
+BOOL s0191_IcirrusGymToggleMovementAtPlace(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
 
     GymIcirrus_ToggleMovementAtPlace(gsys, VM_Read16(vm));
     return FALSE;
 }
 
-BOOL func_ov036_021ab094(VM *vm, FieldScriptEnv *env) {
+BOOL s02A5_OpelucidGymCallMove(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     GameEvent *event = GymOpelucid_CreateMoveEvent(gsys, VM_Read16(vm));
@@ -235,7 +236,7 @@ BOOL func_ov036_021ab094(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL func_ov036_021ab0cc(VM *vm, FieldScriptEnv *env) {
+BOOL s02A7_OpelucidGymCallButton(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     GameEvent *event = GymOpelucid_CreateButtonEvent(gsys, VM_Read16(vm));
@@ -247,22 +248,22 @@ BOOL func_ov036_021ab0cc(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL func_ov036_021ab104(VM *vm, FieldScriptEnv *env) {
+BOOL s02A6_OpelucidGymRefreshVars(VM *vm, FieldScriptEnv *env) {
     GymOpelucid_RefreshVars(FieldScriptEnv_GetGameSystem(env));
     return FALSE;
 }
 
-BOOL func_ov036_021ab114(VM *vm, FieldScriptEnv *env) {
+BOOL s02A8_OpelucidGymFreeHeap(VM *vm, FieldScriptEnv *env) {
     GymOpelucid_FreeHeap(FieldScriptEnv_GetGameSystem(env));
     return FALSE;
 }
 
-BOOL func_ov036_021ab124(VM *vm, FieldScriptEnv *env) {
+BOOL s02A9_OpelucidGymCreateHeap(VM *vm, FieldScriptEnv *env) {
     GymOpelucid_CreateHeap(FieldScriptEnv_GetGameSystem(env));
     return FALSE;
 }
 
-BOOL func_ov036_021ab134(VM *vm, FieldScriptEnv *env) {
+BOOL s0291_VirbankGymStopModelAnimations(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     GSYS_GetField(gsys);
 
@@ -270,14 +271,14 @@ BOOL func_ov036_021ab134(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL func_ov036_021ab158(VM *vm, FieldScriptEnv *env) {
+BOOL s0292_VirbankGymSetActorFlag(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
 
     GymVirbank_SetActorFlag(gsys, VM_Read16(vm));
     return TRUE;
 }
 
-BOOL func_ov036_021ab178(VM *vm, FieldScriptEnv *env) {
+BOOL s02A2_HumilauGymPlayLeaderSplash(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     GSYS_GetField(gsys);
 
@@ -285,7 +286,7 @@ BOOL func_ov036_021ab178(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL func_ov036_021ab190(VM *vm, FieldScriptEnv *env) {
+BOOL s02A3_HumilauGymPlayLeaderWaves(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     GSYS_GetField(gsys);
 
@@ -293,7 +294,7 @@ BOOL func_ov036_021ab190(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL func_ov036_021ab1a8(VM *vm, FieldScriptEnv *env) {
+BOOL s017C_RollerCoasterCallSwitch(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     u8 a1 = VM_Read16(vm);
@@ -316,7 +317,7 @@ BOOL ScrcmdFieldGimmickCartLanes_UnlockLaneFromScript(VM *vm, FieldScriptEnv *en
     return FALSE;
 }
 
-BOOL func_ov036_021ab208(VM *vm, FieldScriptEnv *env) {
+BOOL s024D_RollerCoasterAmbienceStart(VM *vm, FieldScriptEnv *env) {
     RollerCoaster_StartAmbience(FieldScriptEnv_GetGameSystem(env));
     return FALSE;
 }

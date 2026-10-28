@@ -165,7 +165,7 @@ static BOOL TeamSelect_CheckTeams(GameSystem *gsys, u32 a1, Regulation *regulati
     return TRUE;
 }
 
-u32 func_ov036_021aece0(GameSystem *gsys, u32 a1, Regulation *regulation, HeapID heapId) {
+u32 Regulation_CheckTeams(GameSystem *gsys, u32 a1, Regulation *regulation, HeapID heapId) {
     u32 partyResult;
     u32 battleBoxResult;
     u16 result;

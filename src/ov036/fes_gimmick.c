@@ -95,7 +95,7 @@ void FesGimmick_BindPlayer(FesGimmick *fes, FieldEffects *effects, FieldPlayer *
     fes->effects = effects;
     fes->player = player;
     fes->playerActor = FieldPlayer_GetActor(player);
-    fes->sparkles = func_ov036_021a5bb4(fes->effects);
+    fes->sparkles = FldeffFesKira_Start(fes->effects);
 }
 
 void func_ov036_021b65d4(FesGimmick *fes) {
