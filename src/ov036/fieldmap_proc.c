@@ -13,7 +13,17 @@
 #include "system/game_comm.h"
 #include "system/game_system.h"
 
-u8 g_FieldHeapMemory[0x10000];
+// The field menu's heap, which the field map's heap leaves room for, and the cell actors' heap, in memory of its own
+#define FIELD_MENU_HEAP_SIZE 0xf000
+#define FIELD_CLACT_HEAP_SIZE 0x10000
+
+// The steps of FieldmapProc_Init
+enum {
+    SEQ_CREATE_FIELD,
+    SEQ_END_COMM,
+};
+
+u8 g_FieldHeapMemory[FIELD_CLACT_HEAP_SIZE];
 
 const GameProcFunctions FIELDMAP_PROC_FUNCS = { FieldmapProc_Init, FieldmapProc_Update, FieldmapProc_End };
 
@@ -21,14 +31,14 @@ BOOL FieldmapProc_Init(GameProc *proc, u32 *seq, void *param, void *work) {
     GameSystem *gsys = param;
 
     switch (*seq) {
-    case 0: {
+    case SEQ_CREATE_FIELD: {
         Field **procWork;
-        u32 heapSize = GetFieldmapZoneHeapSize(PlayerState_GetZoneID(GSYS_GetPlayerState(gsys))) - 0xf000;
+        u32 heapSize = GetFieldmapZoneHeapSize(PlayerState_GetZoneID(GSYS_GetPlayerState(gsys))) - FIELD_MENU_HEAP_SIZE;
 
         GFL_HeapCreateChild(HEAPID_USER, HEAPID_FIELDMAP, heapSize);
-        GFL_HeapCreateChild(HEAPID_USER, HEAPID_FIELD_MENU, 0xf000);
+        GFL_HeapCreateChild(HEAPID_USER, HEAPID_FIELD_MENU, FIELD_MENU_HEAP_SIZE);
         GFL_HeapCreateChild(HEAPID_FIELDMAP, HEAPID_FIELD_PARTICLE, 0xc000);
-        GFL_HeapCreateRoot(g_FieldHeapMemory, 0x10000, HEAPID_FIELD_CLACT);
+        GFL_HeapCreateRoot(g_FieldHeapMemory, FIELD_CLACT_HEAP_SIZE, HEAPID_FIELD_CLACT);
         GFL_HeapCreateChild(HEAPID_FIELD_CLACT, HEAPID_FIELD_WEATHER, 0x6400);
         GFL_HeapCreateChild(HEAPID_FIELD_CLACT, HEAPID_FIELD_PLACE_NAME, 0x7400);
         GFL_HeapCreateChild(HEAPID_FIELD_CLACT, HEAPID_FIELD_SCENEAREA, 0x500);
@@ -38,13 +48,14 @@ BOOL FieldmapProc_Init(GameProc *proc, u32 *seq, void *param, void *work) {
         (*seq)++;
         break;
     }
-    case 1:
+    case SEQ_END_COMM:
+        // Without the C-Gear, the beacon search and Entralink end
         if (!GSYS_IsCGearOn(gsys)) {
             GameCommSys *comm = GSYS_GetGameCommSystem(gsys);
 
             switch (GameCommSys_BootCheck(comm)) {
-            case 1:
-            case 2:
+            case GAME_COMM_NO_BEACON_SEARCH:
+            case GAME_COMM_NO_INTRUDE:
                 GameCommSys_ExitReq(comm);
                 break;
             }
