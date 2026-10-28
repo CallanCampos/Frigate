@@ -28381,7 +28381,7 @@ overlays/ov214 0x021e1de4 sPokeNameListHeader
 overlays/ov214 0x021e1e18 sNationHeadTable
 overlays/ov214 0x021e1ed0 sSearchLevelMinMaxTable
 overlays/ov214 0x021e1f28 sLevelMinMaxTable
-overlays/ov214 0x021e1f88 ZukanSortHiraTable
+overlays/ov214 0x021e1f88 PokedexSortInitialTable
 overlays/ov214 0x021e1ff4 sCountryListTbl
 overlays/ov214 0x021e20f8 sExplainMsgTable
 overlays/ov214 0x021e210c sSexWinPos

@@ -894,18 +894,19 @@ u16 *WorldTrade_PokedexSortDataGet(int heapId, int idx, int *num) {
     return data;
 }
 
-// Where the species of each initial start and end in the sorted list. The name is the one the assert prints
-static const u32 ZukanSortHiraTable[27] = {
+// Where the species of each initial, A to Z, start and end in the list sorted by name
+static const u32 PokedexSortInitialTable[27] = {
     0,   28,  62,  112, 147, 167, 184, 226, 249, 253, 260, 282, 315, 372,
     386, 392, 435, 438, 463, 557, 590, 595, 615, 636, 637, 640, 649,
 };
 
 void WorldTrade_HeadwordRangeGet(int select, int *start, int *end) {
-    // clang-format off
-    GFL_ASSERT(select < NELEMS(ZukanSortHiraTable));
-    // clang-format on
-    *start = ZukanSortHiraTable[select];
-    *end = ZukanSortHiraTable[select + 1];
+    // GFL_ASSERT written out: the game prints Game Freak's name for PokedexSortInitialTable, ZukanSortHiraTable
+    if (!(select < NELEMS(PokedexSortInitialTable))) {
+        GFL_DebugAssertFail("", 0, "select < NELEMS(ZukanSortHiraTable)");
+    }
+    *start = PokedexSortInitialTable[select];
+    *end = PokedexSortInitialTable[select + 1];
 }
 
 u8 *WorldTrade_SinnohPokedexDataGet(int heapId) {

@@ -160,10 +160,10 @@ Names that swan lacks are ours, and are recorded in `config/names.txt` by module
 
 Every name is English, swan's included: a Japanese word or one of Game Freak's private abbreviations is translated,
 and the header of a file whose swan names were translated says so. The user chose this on 2026-10-28. Well-known
-acronyms such as BGM, SE, HP, PP, TM, HM, NPC, BG and OBJ stay. So does a name the ROM spells out: `GFL_ASSERT` keeps
-its expression's text in the game, so a name in an assert is Game Freak's own and keeps its word, as
-`worldtrade_deposit.c`'s `ZukanSortHiraTable` does (renaming it makes the string, and every object after it, move).
-The words so far:
+acronyms such as BGM, SE, HP, PP, TM, HM, NPC, BG and OBJ stay. A name the ROM spells out is in English too: `GFL_ASSERT`
+keeps its expression's text in the game, so an assert that names something by a translated word is written out with
+the ROM's text, as `worldtrade_deposit.c`'s for `PokedexSortInitialTable` is (docs/code-standards.md, rule 3). The words
+so far:
 
 | Word | English | | Word | English |
 |---|---|---|---|---|

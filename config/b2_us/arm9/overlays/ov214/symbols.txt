@@ -556,7 +556,7 @@ data_ov214_021e1e90 kind:data(any) addr:0x021e1e90
 data_ov214_021e1eb0 kind:data(any) addr:0x021e1eb0
 sSearchLevelMinMaxTable kind:data(any) addr:0x021e1ed0
 sLevelMinMaxTable kind:data(any) addr:0x021e1f28
-ZukanSortHiraTable kind:data(any) addr:0x021e1f88
+PokedexSortInitialTable kind:data(any) addr:0x021e1f88
 sCountryListTbl kind:data(any) addr:0x021e1ff4
 sExplainMsgTable kind:data(any) addr:0x021e20f8
 sSexWinPos kind:data(any) addr:0x021e210c
