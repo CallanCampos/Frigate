@@ -675,6 +675,7 @@ static void TestFrameHooksOnHostStack(void) {
 
 // Timer 3's interrupt, which the decomp's os.h doesn't name
 #define TIMER3_IRQ (OS_IE_TIMER0 << 3)
+#define TIMER2_IRQ (OS_IE_TIMER0 << 2)
 
 // The SDK calls a timer's function once (OSi_IrqCallback), so it sets itself again
 static void TimedWorkHandler(void) {
@@ -716,6 +717,191 @@ static void TestTimedWork(void) {
                "timer 3 (irq mode 1, line 100)", "vblank 1 (irq mode 1, line 192)", "main waited",
                "work (host stack 1, line 192)", "timer 3 (irq mode 1, line 192)", "vblank 2 (irq mode 1, line 192)",
                "main waited again");
+}
+
+// Absolute device waits use the real SDK thread/IRQ machinery; IRQ work is elapsed device time, not extra CPU work.
+static u64 sDeviceWorkAt;
+static u64 sDeviceIrqAt;
+static u64 sDeviceHighAt;
+static u64 sDeviceHighCycles;
+static int sDeviceAfterStop;
+static void DeviceWork(void) {
+    sDeviceWorkAt = port_os_cycles();
+    Check(port_fiber_current() == NULL, "device work runs on host stack");
+    Check(!port_os_wait_until(sDeviceWorkAt + 100), "host callback cannot wait");
+    Check(port_os_cycles() == sDeviceWorkAt, "invalid host wait does not move time");
+    port_os_request_irq(TIMER3_IRQ);
+}
+static void DeviceIrq(void) {
+    sDeviceIrqAt = port_os_cycles();
+    port_osi_stop_timer(3);
+    port_os_spin(300);
+}
+static void TestDeviceDeadline(void) {
+    Boot(VBlankHandler);
+    u64 start = port_os_cycles();
+    Check(port_os_wait_until(start), "exact deadline succeeds");
+    Check(port_os_cycles() == start, "exact deadline keeps clock");
+    Check(port_os_wait_until(start + 100), "future deadline succeeds");
+    Check(port_os_cycles() == start + 100, "exact future clock");
+    Check(port_os_wait_until(start), "past deadline succeeds");
+    Check(port_os_cycles() == start + 100, "past deadline never rewinds");
+    OS_SetIrqFunction(TIMER3_IRQ, DeviceIrq);
+    OS_EnableIrqMask(TIMER3_IRQ);
+    sDeviceIrqAt = 0;
+    port_osi_start_timer(3, 0x10000 - 200, 1, TRUE);
+    Check(port_os_wait_until(start + 1000), "wait across timer IRQ");
+    Check(sDeviceIrqAt == start + 300, "timer IRQ occurred at its actual deadline");
+    Check(port_os_cycles() == start + 1000, "IRQ work did not extend device deadline");
+}
+static void DeviceHigh(void *arg) {
+    (void)arg;
+    OS_SleepThread(&sQueue);
+    sDeviceHighAt = port_os_cycles();
+    port_os_spin(sDeviceHighCycles);
+}
+static void DeviceWakeIrq(void) {
+    port_osi_stop_timer(3);
+    OS_WakeupThread(&sQueue);
+}
+static void TestDevicePreempted(void) {
+    Boot(VBlankHandler);
+    sDeviceHighCycles = 1200;
+    Create(0, DeviceHigh, NULL, 10);
+    OS_WakeupThreadDirect(&sThreads[0]);
+    u64 start = port_os_cycles();
+    OS_SetIrqFunction(TIMER3_IRQ, DeviceWakeIrq);
+    OS_EnableIrqMask(TIMER3_IRQ);
+    port_osi_start_timer(3, 0x10000 - 200, 1, TRUE);
+    Check(port_os_wait_until(start + 1000), "wait across higher priority thread");
+    Check(sDeviceHighAt == start + 200, "IRQ woke high thread on time");
+    Check(port_os_cycles() == start + 1400, "overdue waiter resumes without adding remaining CPU time");
+    sDeviceHighCycles = 200;
+    Create(1, DeviceHigh, NULL, 10);
+    OS_WakeupThreadDirect(&sThreads[1]);
+    start = port_os_cycles();
+    OS_SetIrqFunction(TIMER3_IRQ, DeviceWakeIrq);
+    port_osi_start_timer(3, 0x10000 - 200, 1, TRUE);
+    Check(port_os_wait_until(start + 1000), "wait across shorter high-priority work");
+    Check(port_os_cycles() == start + 1000, "shorter thread work spends rather than extends deadline");
+}
+static void TestDeviceMasked(void) {
+    Boot(VBlankHandler);
+    OS_SetIrqFunction(TIMER3_IRQ, DeviceIrq);
+    OS_EnableIrqMask(TIMER3_IRQ);
+    sDeviceWorkAt = sDeviceIrqAt = 0;
+    u64 start = port_os_cycles();
+    u32 enabled = OS_DisableInterrupts();
+    port_os_set_timed_work(DeviceWork, start + 200);
+    Check(port_os_wait_until(start + 500), "masked device wait succeeds");
+    Check(sDeviceWorkAt == start + 200, "host device work progresses while masked");
+    Check(sDeviceIrqAt == 0 && (port_os_get_if() & TIMER3_IRQ), "IF latched without handler delivery");
+    Check(port_os_cycles() == start + 500, "masked deadline exact");
+    OS_RestoreInterrupts(enabled);
+    Check(sDeviceIrqAt == start + 500, "unmask delivers at current time");
+    // IME and IE separately mask delivery, not host work or the deadline.
+    OS_SetIrqFunction(TIMER3_IRQ, DeviceIrq);
+    OS_DisableIrq();
+    start = port_os_cycles();
+    port_os_set_timed_work(DeviceWork, start + 200);
+    Check(port_os_wait_until(start + 500), "IME-masked wait succeeds");
+    Check(sDeviceWorkAt == start + 200 && sDeviceIrqAt < start, "IME does not gate device progress");
+    OS_EnableIrq();
+    OS_SetIrqFunction(TIMER3_IRQ, DeviceIrq);
+    OS_DisableIrqMask(TIMER3_IRQ);
+    start = port_os_cycles();
+    port_os_set_timed_work(DeviceWork, start + 200);
+    Check(port_os_wait_until(start + 500), "IE-masked wait succeeds");
+    Check(sDeviceWorkAt == start + 200 && sDeviceIrqAt < start, "IE does not gate device progress");
+    OS_EnableIrqMask(TIMER3_IRQ);
+    port_os_poll_irq();
+}
+static int sDeviceNested;
+static int sDeviceInHandler;
+static void DeviceSecondaryIrq(void) {
+    Check(!sDeviceInHandler, "secondary IRQ is not delivered inside device wait's IRQ");
+    ++sDeviceNested;
+}
+static void DeviceIrqWork(void) {
+    sDeviceWorkAt = port_os_cycles();
+    Check(port_fiber_current() == NULL, "IRQ device work on host stack");
+    Check(!port_os_wait_until(sDeviceWorkAt + 100), "IRQ device callback cannot recurse into wait");
+    Check(port_os_cycles() == sDeviceWorkAt, "rejected recursive wait preserves time");
+    port_os_request_irq(TIMER2_IRQ);
+}
+static void DeviceWaitIrq(void) {
+    port_osi_stop_timer(3);
+    sDeviceInHandler = 1;
+    u64 start = port_os_cycles();
+    port_os_set_timed_work(DeviceIrqWork, start + 200);
+    Check(port_os_wait_until(start + 500), "IRQ may wait for physical deadline");
+    Check(port_os_cycles() == start + 500 && sDeviceWorkAt == start + 200, "IRQ wait publishes timed work");
+    Check(!sDeviceNested && (port_os_get_if() & TIMER2_IRQ), "nested IRQ remains latched");
+    sDeviceWorkAt = 0;
+    port_os_set_timed_work(DeviceIrqWork, port_os_cycles() + 100);
+    port_os_spin(200);
+    Check(sDeviceWorkAt == 0, "existing IRQ Spin retains deferred host-work behavior");
+    u64 past = port_os_cycles();
+    Check(port_os_wait_until(past - 10), "past IRQ wait publishes already queued device work");
+    Check(port_os_cycles() == past && sDeviceWorkAt == past, "past IRQ wait drains work without rewinding");
+    sDeviceInHandler = 0;
+}
+static void TestDeviceIrqWait(void) {
+    Boot(VBlankHandler);
+    sDeviceNested = sDeviceInHandler = 0;
+    sDeviceWorkAt = 0;
+    OS_SetIrqFunction(TIMER3_IRQ, DeviceWaitIrq);
+    OS_SetIrqFunction(TIMER2_IRQ, DeviceSecondaryIrq);
+    OS_EnableIrqMask(TIMER3_IRQ | TIMER2_IRQ);
+    // Do not request TIMER3 again from the callback used by the handler's wait.
+    port_osi_start_timer(3, 0x10000 - 100, 1, TRUE);
+    Check(port_os_wait_until(1000), "thread wait enclosing IRQ wait");
+    Check(sDeviceNested == 1 && port_os_cycles() == 1000, "latched IRQ delivered after handler, same absolute target");
+}
+static void DeviceStop(void) {
+    port_os_stop();
+}
+static void DeviceStopMain(void) {
+    Boot(VBlankHandler);
+    port_os_set_timed_work(DeviceStop, 100);
+    port_os_set_timed_work(DeviceWork, 200);
+    port_os_wait_until(1000);
+    sDeviceAfterStop = 1;
+}
+static int sDeviceStopUnwound;
+static void DeviceStopIrq(void) {
+    port_osi_stop_timer(3);
+    port_os_set_timed_work(DeviceStop, port_os_cycles() + 100);
+    Check(!port_os_wait_until(port_os_cycles() + 500), "IRQ wait reports stop instead of reaching deadline");
+    sDeviceStopUnwound = 1;
+}
+static void DeviceStopIrqMain(void) {
+    Boot(VBlankHandler);
+    OS_SetIrqFunction(TIMER3_IRQ, DeviceStopIrq);
+    OS_EnableIrqMask(TIMER3_IRQ);
+    port_osi_start_timer(3, 0x10000 - 100, 1, TRUE);
+    port_os_wait_until(1000);
+    sDeviceAfterStop = 1;
+}
+static void DeviceResetMain(void) {
+    Boot(VBlankHandler);
+    Check(port_os_cycles() == 0, "new run resets clock");
+    port_os_wait_until(1000);
+    Check(sDeviceWorkAt == 0, "new run forgot pending device work");
+}
+static int RunDeviceLifecycle(void) {
+    sFailed = 0;
+    sDeviceAfterStop = 0;
+    sDeviceWorkAt = 0;
+    Check(!port_os_wait_until(10), "outside-run wait is rejected");
+    Check(port_os_run(DeviceStopMain) == PORT_OS_STOPPED, "stop disposes absolute waiter");
+    Check(!sDeviceAfterStop, "stopped waiter does not resume");
+    sDeviceStopUnwound = 0;
+    Check(port_os_run(DeviceStopIrqMain) == PORT_OS_STOPPED, "stop inside IRQ device work ends run");
+    Check(sDeviceStopUnwound && !sDeviceAfterStop, "IRQ unwinds, interrupted thread never resumes");
+    Check(port_os_run(DeviceResetMain) == PORT_OS_RETURNED, "next run returns and wait guard resets");
+    printf("device_lifecycle: %s\n", sFailed ? "FAIL" : "ok");
+    return sFailed;
 }
 
 // Loading a context whose I bit is clear takes a pending interrupt before the thread's first instruction. Main sets
@@ -1423,6 +1609,10 @@ static const Test sTests[] = {
     { "dispstat_gates_blanks", TestDispStatGatesBlanks },
     { "frame_hooks_on_host_stack", TestFrameHooksOnHostStack },
     { "timed_work", TestTimedWork },
+    { "device_deadline", TestDeviceDeadline },
+    { "device_preempted", TestDevicePreempted },
+    { "device_masked", TestDeviceMasked },
+    { "device_irq_wait", TestDeviceIrqWait },
     { "irq_on_switch_in", TestIrqOnSwitchIn },
     { "async_completion", TestAsyncCompletion },
     { "waits", TestWaits },
@@ -1535,6 +1725,10 @@ int main(int argc, char **argv) {
             failures += RunTest(&sTests[i]);
             ran++;
         }
+    }
+    if (all || strcmp(name, "device_lifecycle") == 0) {
+        failures += RunDeviceLifecycle();
+        ran++;
     }
     if (all || strcmp(name, "stop_from_frame_hook") == 0) {
         failures += RunStopFromFrameHook();

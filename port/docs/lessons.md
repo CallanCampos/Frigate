@@ -3,6 +3,29 @@
 What port work taught that isn't obvious from the code, newest first. A lesson about MWCC or the decomp's own
 workflow goes in the decomp checkout instead; this file is the port's ([CLAUDE.md](../CLAUDE.md), the iteration loop).
 
+## 2026-10-28: keep full save integrity checks affordable
+
+- The full save-image suite timed out at 120 seconds on an Intel CI runner while every other job passed. Keep its
+  corruption, second-bank, checksum-table and footer checks, and fix the expensive primitive before increasing the
+  test budget. The per-bit Python CRC loop has the same non-reflected 0x1021 update as `binascii.crc_hqx`, including
+  its supplied state and no final XOR; the public wrapper still starts at 0xffff.
+- Verify incremental discovery as well as whole-block CRCs. All 16,777,216 state/byte transitions matched the old
+  implementation, every empty update retained its state, and both validators accepted identical layouts and all
+  banks/blocks/tables/footers in 12 immutable DS images. The same 18-test local command dropped from 12.47 to 0.57
+  seconds; the existing CI timeout remains 120 seconds. That measurement is local, not a promised runner duration.
+
+## 2026-10-28: invalidate physical tokens and close equal-cycle events
+
+- Resetting a native DMA generation to zero permits an ABA bug: an old token 1 can authorize a new token 1's output.
+  Preserve a monotonically advancing epoch across reset, fail closed at exhaustion, and test the exact old-demand /
+  reset / new-demand / old-commit sequence against the actual new destination.
+- An event which only latches timer IF must not let ARM9 run before READY at the same cycle has stopped it for DMA.
+  Preserve existing event order but close all due physical transitions before the CPU/IRQ/host boundary. Test IF
+  observed at 64 and handler/host work at 73 after the 9-cycle unit, not only a timer somewhere inside a transfer.
+- A unit foundation can be useful without activating its incomplete SDK adapter. Keep the original reader unchanged
+  when CPU timing still has a real screenshot regression; retain the failed evidence and separate physical unit
+  correctness from gameplay/AI parity. Never adjust seeds, inputs, goldens or masks to publish an increment.
+
 ## 2026-10-28: measure card work before assigning an AI delay
 
 - A typed API which returns the right bytes can still have the wrong request stream. The native archive wrapper

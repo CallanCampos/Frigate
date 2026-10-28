@@ -174,8 +174,8 @@ class ManifestTests(unittest.TestCase):
             output = root / 'gen/rom'
             output.mkdir(parents=True)
             probe = root / 'probe.cmake'
-            ignored = ('set_property', 'target_sources', 'add_executable', 'target_link_libraries',
-                       'target_include_directories', 'target_compile_options', 'add_test',
+            ignored = ('set_property', 'set_target_properties', 'target_sources', 'add_executable', 'target_link_libraries',
+                       'target_include_directories', 'target_compile_options', 'target_compile_definitions', 'add_test',
                        'set_tests_properties', 'enable_testing')
             prefix = ''.join(f'function({name})\nendfunction()\n' for name in ignored)
             prefix += (f'set(REPO_ROOT "{root.as_posix()}")\nset(PORT_GEN "{(root / "gen").as_posix()}")\n'
@@ -191,7 +191,8 @@ class ManifestTests(unittest.TestCase):
                 probe.write_text(prefix + f'set(PORT_VERSION {version})\nset(PORT_ROM_LANGUAGE {language})\n'
                                  f'include("{(ROOT / "port/cmake/rom.cmake").as_posix()}")\n')
                 return subprocess.run(['cmake', '-P', str(probe)], capture_output=True, text=True)
-            self.assertEqual(run('us').returncode, 0)
+            result = run('us')
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
             us = (output / 'rom_manifest.c').read_bytes()
             self.assertEqual(run('us', {'b2_es': {'invalid': True}}).returncode, 0)
             self.assertEqual((output / 'rom_manifest.c').read_bytes(), us)

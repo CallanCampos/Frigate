@@ -4,7 +4,8 @@
 // The SDK's versions pass every address through the channel's registers as a u32, which cuts a host pointer, and then
 // spin on the channel's enable bit, which only the hardware clears. Here a transfer is done by the CPU at once, in the
 // order the DMA moves its units (from the first to the last, so an overlapping copy behaves as the DS's does), and a
-// channel is never busy: the waits and stops have nothing to wait for. The registers are left alone.
+// generic channel is never busy. The separate card_dma.c physical milestone has test-only repeat-channel
+// ownership; production CARD does not select it yet. Generic operations cannot steal that armed channel.
 //
 // A transfer that the DS ends with an interrupt (the Async functions with a callback, and the display list sends) ends
 // with the same interrupt here: the callback is entered as the SDK enters it (OSi_EnterDmaCallback), the channel's
@@ -13,6 +14,7 @@
 //
 // The geometry engine's command FIFO and ports are reached through port_hw_g3_send, so that each word sent to them is
 // logged for the geometry engine as a CPU store would be (ADR 0004).
+#include "hal/dma/card_dma.h"
 #include "hal/hw/hw.h"
 #include "hal/os/port_os.h"
 #include "nitro/gx.h"
@@ -20,6 +22,16 @@
 #include "nitro/os.h"
 #include <stdio.h>
 #include <stdlib.h>
+
+// Experimental CARD hardware has explicit channel ownership. Generic immediate copies must not silently steal it;
+// the future SDK integration will supply faithful busy/wait arbitration before enabling this path in production.
+static void CheckCardOwnership(u32 channel) {
+    PortCardDmaState card = port_card_dma_state();
+    if (card.armed && card.channel == channel) {
+        fprintf(stderr, "port: dma: generic operation conflicts with experimental CARD DMA channel ownership\n");
+        exit(PORT_OS_TERMINATE_STATUS);
+    }
+}
 
 // Requests the channel's interrupt for a callback the SDK entered for it, and takes it if it can be taken now
 static void EndWithInterrupt(u32 dmaNo, MIDmaCallback callback, void *arg) {
@@ -64,18 +76,27 @@ static void Copy16(const void *src, void *dest, u32 size) {
 // starting it, and nothing in the program starts it later, so nothing moves
 void MIi_DmaFill32(u32 dmaNo, void *dest, u32 data, u32 size, BOOL dmaEnable) {
     if (dmaEnable) {
+        if (size != 0) {
+            CheckCardOwnership(dmaNo);
+        }
         Fill32(dest, data, size);
     }
 }
 
 void MIi_DmaCopy32(u32 dmaNo, const void *src, void *dest, u32 size, BOOL dmaEnable) {
     if (dmaEnable) {
+        if (size != 0) {
+            CheckCardOwnership(dmaNo);
+        }
         Copy32(src, dest, size);
     }
 }
 
 void MIi_DmaCopy16(u32 dmaNo, const void *src, void *dest, u32 size, BOOL dmaEnable) {
     if (dmaEnable) {
+        if (size != 0) {
+            CheckCardOwnership(dmaNo);
+        }
         Copy16(src, dest, size);
     }
 }
@@ -92,6 +113,7 @@ void MIi_DmaFill32Async(u32 dmaNo, void *dest, u32 data, u32 size, MIDmaCallback
     if (!dmaEnable) {
         return;
     }
+    CheckCardOwnership(dmaNo);
     Fill32(dest, data, size);
     if (callback != NULL) {
         EndWithInterrupt(dmaNo, callback, arg);
@@ -109,20 +131,27 @@ void MIi_DmaCopy32Async(u32 dmaNo, const void *src, void *dest, u32 size, MIDmaC
     if (!dmaEnable) {
         return;
     }
+    CheckCardOwnership(dmaNo);
     Copy32(src, dest, size);
     if (callback != NULL) {
         EndWithInterrupt(dmaNo, callback, arg);
     }
 }
 
-// NitroSDK's MI_WaitDma, MI_StopDma and MI_StopAllDma: every transfer is over by the time its call returns
+// Generic transfers finish before return. Experimental CARD Stop invalidates its armed generation; a generic
+// Wait on that channel fails visibly until the actual SDK DMA lifecycle/wait integration is implemented.
 void MI_WaitDma(u32 dmaNo) {
+    CheckCardOwnership(dmaNo);
 }
 
 void MI_StopDma(u32 dmaNo) {
+    port_card_dma_stop(dmaNo);
 }
 
 void MI_StopAllDma(void) {
+    for (unsigned channel = 0; channel < 4; ++channel) {
+        port_card_dma_stop(channel);
+    }
 }
 
 // NitroSDK's MIi_CheckAnotherAutoDMA and MIi_CheckDma0SourceAddress, the SDK's guards against a clash of channels
@@ -135,9 +164,10 @@ void MIi_CheckDma0SourceAddress(u32 dmaNo, u32 src, u32 size, u32 dir) {
 }
 
 // NitroSDK's MIi_CardDmaCopy32, which CARD's table of DMA functions holds for reading the card's data port. The host's
-// card (port/hal/card/card_rom.c) copies from the ROM file and never calls it
+// CPU adapter (port/hal/card/card_rom.c) still does not select DMA. Physical tests use the explicit bounded arm API.
 void MIi_CardDmaCopy32(u32 dmaNo, const void *src, void *dest, u32 size) {
-    fprintf(stderr, "port: dma: MIi_CardDmaCopy32 was called, but the host's card reads never use DMA\n");
+    fprintf(stderr, "port: dma: MIi_CardDmaCopy32 was called, but SDK CARD DMA setup is not integrated (experimental "
+                    "typed hardware only)\n");
     exit(PORT_OS_TERMINATE_STATUS);
 }
 
