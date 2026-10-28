@@ -18,6 +18,7 @@
 #include "field/field_player.h"
 #include "field/field_sound.h"
 #include "field/pair_sys.h"
+#include "field/zone.h"
 #include "gfl/arc.h"
 #include "gfl/heap.h"
 #include "gfl/sound.h"
@@ -85,25 +86,25 @@ GameEvent *EventWarpSequence_CreateOut(WarpSequence *warp) {
     WarpOutData *data;
 
     switch (warp->departureTransitionType) {
-    case 0:
+    case WARP_TRANSITION_NONE:
         index = WARP_EVENT_PLAIN;
         break;
-    case 1:
+    case WARP_TRANSITION_MAT:
         index = WARP_EVENT_PLAIN;
         break;
-    case 2:
+    case WARP_TRANSITION_WALK_IN_2:
         index = WARP_EVENT_OBJECT_ANIME;
         break;
-    case 3:
+    case WARP_TRANSITION_DOOR:
         index = WARP_EVENT_GROUND_ANIME;
         break;
-    case 4:
+    case WARP_TRANSITION_WALK_IN:
         index = WARP_EVENT_OBJECT_ANIME;
         break;
-    case 5:
+    case WARP_TRANSITION_WARP_PAD:
         index = WARP_EVENT_APPEAR;
         break;
-    case 6:
+    case WARP_TRANSITION_GATE:
         index = WARP_EVENT_FADE_SE;
         break;
     default:
@@ -361,25 +362,25 @@ GameEvent *EventWarpSequence_CreateIn(WarpSequence *warp) {
     WarpInData *data;
 
     switch (warp->transitionType) {
-    case 0:
+    case WARP_TRANSITION_NONE:
         index = WARP_EVENT_PLAIN;
         break;
-    case 1:
+    case WARP_TRANSITION_MAT:
         index = WARP_EVENT_PLAIN;
         break;
-    case 2:
+    case WARP_TRANSITION_WALK_IN_2:
         index = WARP_EVENT_OBJECT_ANIME;
         break;
-    case 3:
+    case WARP_TRANSITION_DOOR:
         index = WARP_EVENT_GROUND_ANIME;
         break;
-    case 4:
+    case WARP_TRANSITION_WALK_IN:
         index = WARP_EVENT_OBJECT_ANIME;
         break;
-    case 5:
+    case WARP_TRANSITION_WARP_PAD:
         index = WARP_EVENT_APPEAR;
         break;
-    case 6:
+    case WARP_TRANSITION_GATE:
         index = WARP_EVENT_FADE_SE;
         break;
     default:
@@ -860,7 +861,7 @@ void EntranceCamera_ConfigureFileArrival(EntranceCamera *camera) {
 }
 
 void EntranceCamera_ReadFile(EntranceCameraFile *dest, u32 index) {
-    GFL_ArcSysRead(dest, ARCID_ENTRANCE_CAMERA, index - 7);
+    GFL_ArcSysRead(dest, ARCID_ENTRANCE_CAMERA, index - WARP_TRANSITION_CAMERA);
 }
 
 void FieldCamera_ChangeRefPos(FieldCamera *camera, const VecFx32 *target) {
@@ -887,7 +888,7 @@ u32 EntranceCamera_GetTransitionType(EntranceCamera *camera) {
 }
 
 BOOL EntranceCamera_HasRecord(EntranceCamera *camera) {
-    return CityState_IsSlotIndexOutOfRange(EntranceCamera_GetParam(camera)->transitionType);
+    return IsEntranceCameraTransition(EntranceCamera_GetParam(camera)->transitionType);
 }
 
 BOOL EntranceCamera_AimsAtEntrance(EntranceCamera *camera) {

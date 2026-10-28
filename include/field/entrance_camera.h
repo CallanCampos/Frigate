@@ -18,8 +18,8 @@ typedef struct {
     BOOL isDeparture;
 } EntranceCameraParam;
 
-// An entrance camera's file in archive 0xb1, one for each transition type from 7: where the camera starts or ends, in
-// whole units
+// An entrance camera's file in archive 0xb1, one for each transition type from WARP_TRANSITION_CAMERA: where the camera
+// starts or ends, in whole units
 typedef struct {
     u32 unk0;
     u32 pitch;

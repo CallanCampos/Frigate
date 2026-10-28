@@ -8443,7 +8443,7 @@ overlays/ov012 0x0215c594 FieldProcLink_FreeParam
 overlays/ov012 0x0215c59c EventPrepareResidentActors_Callback
 overlays/ov012 0x0215cd58 CityState_ApplyVersionZones
 overlays/ov012 0x0215cd8c CityState_Init
-overlays/ov012 0x0215cd98 CityState_IsSlotIndexOutOfRange
+overlays/ov012 0x0215cd98 IsEntranceCameraTransition
 overlays/ov012 0x0215d104 ZoneWarp_CalcPosWeightBitsRail
 overlays/ov012 0x0215d4d0 GetBGEntityCenterPosGrid
 overlays/ov012 0x0215d4ec GetBGEntityPosRail

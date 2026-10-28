@@ -116,6 +116,28 @@ struct ZoneTrigger {
     u16 unk14;
 };
 
+// A warp's transition type, which picks the events that take the player out through it and in at the other end
+// (entrance_camera.c) and how it is taken (fieldmap_event.c): stepped on (NONE, WARP_PAD, GATE), walked off from where
+// the player stands (MAT) or walked into from the tile before it (the rest)
+enum {
+    // No entrance: a map change to a position, and the one warp of the Pokémon League's entrance
+    WARP_TRANSITION_NONE,
+    // A warp the player stands on and walks off the map from, such as a building's exit mat
+    WARP_TRANSITION_MAT,
+    // The player walks one tile into the warp and one tile out of the other end. The code treats WALK_IN_2 alike; the
+    // maps use it between a house's floors and between some of the towers' and caves'
+    WARP_TRANSITION_WALK_IN_2,
+    // A building's door, which opens for the player
+    WARP_TRANSITION_DOOR,
+    WARP_TRANSITION_WALK_IN,
+    // The warp pads that spin the player away and down, as EventMapChangeWarpPad_Create's map change
+    WARP_TRANSITION_WARP_PAD,
+    // The way through a gate, from one of its halves to the other, with a fade and a sound
+    WARP_TRANSITION_GATE,
+    // The first of the entrances with an entrance camera, each with its file of archive 0xb1 from here
+    WARP_TRANSITION_CAMERA,
+};
+
 struct ZoneWarp {
     u16 unk0;
     u16 destId;

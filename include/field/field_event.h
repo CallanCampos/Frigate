@@ -26,8 +26,8 @@ struct WarpSequence {
     GameSystem *gsys;
     GameData *gameData;
     Field *field;
-    // The transition types of the warps the player leaves by and arrives at, 0 for a move to a position, which pick the
-    // warp's events
+    // The transition types of the warps the player leaves by and arrives at, WARP_TRANSITION_NONE for a move to a
+    // position, which pick the warp's events
     u32 departureTransitionType;
     u32 transitionType;
     u16 zoneId;

@@ -128,7 +128,7 @@ s32 GetWarpIDByPlayerPos(EventData *data, const VecFx32 *position, u8 direction)
 
     ExpandVecInGridDir(direction, &front, 0x10000);
     for (index = 0; index < data->warpCount; index++, warp++) {
-        if (warp->transitionType == 1) {
+        if (warp->transitionType == WARP_TRANSITION_MAT) {
             if (!IsWarpZoneOrWarpID0xFFFF(warp) && CheckWarpPositionMatch(warp, position) == TRUE) {
                 return index;
             }
