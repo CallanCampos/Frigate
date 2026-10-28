@@ -34,6 +34,71 @@
 #include "system/vm.h"
 #include "system/wordset.h"
 
+// What s0224_PokePartyGetIV gives: the IVs' total, the highest, or one of them
+enum {
+    IV_QUERY_TOTAL,
+    IV_QUERY_HIGHEST,
+    IV_QUERY_HP,
+    IV_QUERY_ATTACK,
+    IV_QUERY_DEFENSE,
+    IV_QUERY_SPEED,
+    IV_QUERY_SP_ATTACK,
+    IV_QUERY_SP_DEFENSE,
+};
+
+// The tutors of the move tutor commands, by the moves they teach: Draco Meteor, the starters' ultimate moves and
+// their pledges
+enum {
+    MOVE_TUTOR_DRACO_METEOR,
+    MOVE_TUTOR_ULTIMATE,
+    MOVE_TUTOR_PLEDGE,
+};
+
+// The moves of PokeParty_CheckMoveTutorNormal's list
+enum {
+    TUTOR_MOVE_GRASS_PLEDGE,
+    TUTOR_MOVE_FIRE_PLEDGE,
+    TUTOR_MOVE_WATER_PLEDGE,
+    TUTOR_MOVE_FRENZY_PLANT,
+    TUTOR_MOVE_BLAST_BURN,
+    TUTOR_MOVE_HYDRO_CANNON,
+    TUTOR_MOVE_DRACO_METEOR,
+};
+
+// The move that the party list shows for the tutors whose move depends on the Pokémon
+#define TUTOR_LIST_MOVE_ULTIMATE 0xfffe
+#define TUTOR_LIST_MOVE_PLEDGE 0xfffd
+
+// Whether a Pokémon, or any in the party, can learn the tutor's move: it can, it can't, it isn't friendly enough, or
+// it knows the move
+enum {
+    MOVE_TUTOR_CHECK_OK,
+    MOVE_TUTOR_CHECK_INCOMPATIBLE,
+    MOVE_TUTOR_CHECK_NOT_FRIENDLY,
+    MOVE_TUTOR_CHECK_KNOWN,
+};
+
+// What s0223_PokePartyGetHiddenPowerType gives for a Pokémon that can't learn Hidden Power
+#define HIDDEN_POWER_TYPE_NONE 0xffff
+
+// Whether the Pokémon can be traded for the offer: it can, it is an egg, it is another species or sex, or it can't
+// be traded at all (an egg or a fused Kyurem)
+enum {
+    FIELD_TRADE_CHECK_OK,
+    FIELD_TRADE_CHECK_EGG,
+    FIELD_TRADE_CHECK_SPECIES,
+    FIELD_TRADE_CHECK_SEX,
+    FIELD_TRADE_CHECK_UNTRADEABLE,
+};
+
+// What PokeParty_ControlLegendMon does: check whether the party has the legendary Pokémon, move it to the front, or
+// swap a party Pokémon with it from the box first
+enum {
+    LEGEND_MON_CHECK_PARTY,
+    LEGEND_MON_MOVE_TO_FRONT,
+    LEGEND_MON_SWAP_FROM_BOX,
+};
+
 static u16 PokeParty_GetTutorMoveID(PartyPkm *pkm, u32 tutor);
 static u32 PML_PkmGetHapinessMax(u32 unused);
 static BOOL PokeParty_CheckTutorMoveCompat(PartyPkm *pkm, u32 tutor);
@@ -59,7 +124,8 @@ BOOL s0107_CallPokeSelect(VM *vm, FieldScriptEnv *env) {
         mode = 0x1b;
     }
     args.mode = mode;
-    ScriptWork_CallEvent(work, GameEvent_CreateOverlayDelegate(gsys, OVERLAY_ID(20), EventPokeSelect_Create, &args));
+    ScriptWork_CallEvent(
+        work, GameEvent_CreateOverlayDelegate(gsys, OVERLAY_EVENT_POKE_STATUS, EventPokeSelect_Create, &args));
     return TRUE;
 }
 
@@ -152,28 +218,28 @@ BOOL s0224_PokePartyGetIV(VM *vm, FieldScriptEnv *env) {
         }
     }
     switch (type) {
-    case 0:
+    case IV_QUERY_TOTAL:
         *result = total;
         break;
-    case 1:
+    case IV_QUERY_HIGHEST:
         *result = highest;
         break;
-    case 2:
+    case IV_QUERY_HP:
         *result = ivs[0];
         break;
-    case 3:
+    case IV_QUERY_ATTACK:
         *result = ivs[1];
         break;
-    case 4:
+    case IV_QUERY_DEFENSE:
         *result = ivs[2];
         break;
-    case 5:
+    case IV_QUERY_SPEED:
         *result = ivs[3];
         break;
-    case 6:
+    case IV_QUERY_SP_ATTACK:
         *result = ivs[4];
         break;
-    case 7:
+    case IV_QUERY_SP_DEFENSE:
         *result = ivs[5];
         break;
     }
@@ -199,13 +265,13 @@ BOOL s01C4_PokeDexIsComplete(VM *vm, FieldScriptEnv *env) {
     u16 kind = ScriptReadAny(vm, env);
 
     switch (kind) {
-    case 1:
+    case POKEDEX_EVALUATION_NATIONAL_CAUGHT:
         *result = PokeDex_IsCompleteNational(pokedex);
         break;
-    case 3:
+    case POKEDEX_EVALUATION_REGIONAL_CAUGHT:
         *result = PokeDex_IsCompleteUnova(pokedex, Field_GetHeapID(field));
         break;
-    case 2:
+    case POKEDEX_EVALUATION_REGIONAL_SEEN:
         *result = PokeDex_IsSeenAllUnova(pokedex, Field_GetHeapID(field));
         break;
     }
@@ -214,27 +280,27 @@ BOOL s01C4_PokeDexIsComplete(VM *vm, FieldScriptEnv *env) {
 
 static u16 PokeParty_GetTutorMoveID(PartyPkm *pkm, u32 tutor) {
     switch (tutor) {
-    case 1:
-        if (PokeParty_CheckMoveTutorNormal(pkm, 3)) {
+    case MOVE_TUTOR_ULTIMATE:
+        if (PokeParty_CheckMoveTutorNormal(pkm, TUTOR_MOVE_FRENZY_PLANT)) {
             return MOVE_FRENZY_PLANT;
         }
-        if (PokeParty_CheckMoveTutorNormal(pkm, 4)) {
+        if (PokeParty_CheckMoveTutorNormal(pkm, TUTOR_MOVE_BLAST_BURN)) {
             return MOVE_BLAST_BURN;
         }
-        if (PokeParty_CheckMoveTutorNormal(pkm, 5)) {
+        if (PokeParty_CheckMoveTutorNormal(pkm, TUTOR_MOVE_HYDRO_CANNON)) {
             return MOVE_HYDRO_CANNON;
         }
         break;
-    case 0:
+    case MOVE_TUTOR_DRACO_METEOR:
         return MOVE_DRACO_METEOR;
-    case 2:
-        if (PokeParty_CheckMoveTutorNormal(pkm, 0)) {
+    case MOVE_TUTOR_PLEDGE:
+        if (PokeParty_CheckMoveTutorNormal(pkm, TUTOR_MOVE_GRASS_PLEDGE)) {
             return MOVE_GRASS_PLEDGE;
         }
-        if (PokeParty_CheckMoveTutorNormal(pkm, 1)) {
+        if (PokeParty_CheckMoveTutorNormal(pkm, TUTOR_MOVE_FIRE_PLEDGE)) {
             return MOVE_FIRE_PLEDGE;
         }
-        if (PokeParty_CheckMoveTutorNormal(pkm, 2)) {
+        if (PokeParty_CheckMoveTutorNormal(pkm, TUTOR_MOVE_WATER_PLEDGE)) {
             return MOVE_WATER_PLEDGE;
         }
         break;
@@ -248,30 +314,30 @@ static u32 PML_PkmGetHapinessMax(u32 unused) {
 
 static BOOL PokeParty_CheckTutorMoveCompat(PartyPkm *pkm, u32 tutor) {
     switch (tutor) {
-    case 1:
-        if (PokeParty_CheckMoveTutorNormal(pkm, 3)) {
+    case MOVE_TUTOR_ULTIMATE:
+        if (PokeParty_CheckMoveTutorNormal(pkm, TUTOR_MOVE_FRENZY_PLANT)) {
             return TRUE;
         }
-        if (PokeParty_CheckMoveTutorNormal(pkm, 4)) {
+        if (PokeParty_CheckMoveTutorNormal(pkm, TUTOR_MOVE_BLAST_BURN)) {
             return TRUE;
         }
-        if (PokeParty_CheckMoveTutorNormal(pkm, 5)) {
-            return TRUE;
-        }
-        return FALSE;
-    case 0:
-        if (PokeParty_CheckMoveTutorNormal(pkm, 6)) {
+        if (PokeParty_CheckMoveTutorNormal(pkm, TUTOR_MOVE_HYDRO_CANNON)) {
             return TRUE;
         }
         return FALSE;
-    case 2:
-        if (PokeParty_CheckMoveTutorNormal(pkm, 0)) {
+    case MOVE_TUTOR_DRACO_METEOR:
+        if (PokeParty_CheckMoveTutorNormal(pkm, TUTOR_MOVE_DRACO_METEOR)) {
             return TRUE;
         }
-        if (PokeParty_CheckMoveTutorNormal(pkm, 1)) {
+        return FALSE;
+    case MOVE_TUTOR_PLEDGE:
+        if (PokeParty_CheckMoveTutorNormal(pkm, TUTOR_MOVE_GRASS_PLEDGE)) {
             return TRUE;
         }
-        if (PokeParty_CheckMoveTutorNormal(pkm, 2)) {
+        if (PokeParty_CheckMoveTutorNormal(pkm, TUTOR_MOVE_FIRE_PLEDGE)) {
+            return TRUE;
+        }
+        if (PokeParty_CheckMoveTutorNormal(pkm, TUTOR_MOVE_WATER_PLEDGE)) {
             return TRUE;
         }
         return FALSE;
@@ -300,12 +366,12 @@ static u32 CheckPartyAllMoveTutor(VM *vm, FieldScriptEnv *env, u32 tutor, u8 *le
         }
     }
     if (!anyCompatible) {
-        return 1;
+        return MOVE_TUTOR_CHECK_INCOMPATIBLE;
     }
     if (anyReady == 0) {
-        return 2;
+        return MOVE_TUTOR_CHECK_NOT_FRIENDLY;
     }
-    return 0;
+    return MOVE_TUTOR_CHECK_OK;
 }
 
 BOOL s01D1_MoveTutorCheckParty(VM *vm, FieldScriptEnv *env) {
@@ -337,18 +403,18 @@ BOOL s01D2_MoveTutorCheckPkm(VM *vm, FieldScriptEnv *env) {
     u32 index = ScriptReadAny(vm, env);
     u16 *result = ScriptReadVar(vm, env);
 
-    *result = 1;
+    *result = MOVE_TUTOR_CHECK_INCOMPATIBLE;
     if (!CheckGetPartyPokemon(env, index, &pkm)) {
         return FALSE;
     }
     if (!PokeParty_CheckTutorMoveCompat(pkm, tutor)) {
-        *result = 1;
+        *result = MOVE_TUTOR_CHECK_INCOMPATIBLE;
     } else if (CheckPokeMoveLearned_NonEgg(pkm, PokeParty_GetTutorMoveID(pkm, tutor)) == TRUE) {
-        *result = 3;
+        *result = MOVE_TUTOR_CHECK_KNOWN;
     } else if (PokeParty_GetParam(pkm, PKM_PARAM_HAPPINESS, NULL) < PML_PkmGetHapinessMax(tutor)) {
-        *result = 2;
+        *result = MOVE_TUTOR_CHECK_NOT_FRIENDLY;
     } else {
-        *result = 0;
+        *result = MOVE_TUTOR_CHECK_OK;
     }
     return FALSE;
 }
@@ -362,18 +428,18 @@ BOOL s01D4_MoveTutorCallPokeSelect(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
 
-    if (CheckPartyAllMoveTutor(vm, env, tutor, &learnable, FALSE) != 0) {
+    if (CheckPartyAllMoveTutor(vm, env, tutor, &learnable, FALSE) != MOVE_TUTOR_CHECK_OK) {
         *picked = 0;
     } else {
         MI_CpuFill8(&args, 0, sizeof(args));
         switch (tutor) {
-        case 1:
-            args.move = 0xfffe;
+        case MOVE_TUTOR_ULTIMATE:
+            args.move = TUTOR_LIST_MOVE_ULTIMATE;
             break;
-        case 2:
-            args.move = 0xfffd;
+        case MOVE_TUTOR_PLEDGE:
+            args.move = TUTOR_LIST_MOVE_PLEDGE;
             break;
-        case 0:
+        case MOVE_TUTOR_DRACO_METEOR:
             args.move = MOVE_DRACO_METEOR;
             break;
         default:
@@ -383,8 +449,8 @@ BOOL s01D4_MoveTutorCallPokeSelect(VM *vm, FieldScriptEnv *env) {
         args.picked = picked;
         args.index = index;
         args.learnable = learnable;
-        ScriptWork_CallEvent(
-            work, GameEvent_CreateOverlayDelegate(gsys, OVERLAY_ID(20), EventMoveTutorPokeSelect_Create, &args));
+        ScriptWork_CallEvent(work, GameEvent_CreateOverlayDelegate(gsys, OVERLAY_EVENT_POKE_STATUS,
+                                                                   EventMoveTutorPokeSelect_Create, &args));
     }
     return TRUE;
 }
@@ -415,9 +481,9 @@ BOOL s0223_PokePartyGetHiddenPowerType(VM *vm, FieldScriptEnv *env) {
     u8 tm = PML_ItemGetTMBitMask(ITEM_TM10);
 
     if (!CheckGetPartyPokemon(env, index, &pkm)) {
-        *result = 0xffff;
+        *result = HIDDEN_POWER_TYPE_NONE;
     } else if (!canPkmLearnTM_Wrapper(pkm, tm)) {
-        *result = 0xffff;
+        *result = HIDDEN_POWER_TYPE_NONE;
     } else {
         *result = getHiddenPowerType(pkm);
     }
@@ -450,8 +516,8 @@ BOOL s0109_CallPokeMoveReplace(VM *vm, FieldScriptEnv *env) {
     args.partyIndex = partyIndex;
     args.forgetHm = move == 0;
     args.move = move;
-    ScriptWork_CallEvent(work,
-                         GameEvent_CreateOverlayDelegate(gsys, OVERLAY_ID(20), EventPokeMoveReplace_Create, &args));
+    ScriptWork_CallEvent(
+        work, GameEvent_CreateOverlayDelegate(gsys, OVERLAY_EVENT_POKE_STATUS, EventPokeMoveReplace_Create, &args));
     return TRUE;
 }
 
@@ -505,27 +571,28 @@ BOOL s01B5_FieldTradeCheck(VM *vm, FieldScriptEnv *env) {
     pkm = PokeParty_GetPkm(GameData_GetParty(gameData), partyIndex);
     input = FieldTradeInput_Create(heapId, offerIndex);
 
-    *result = 0;
-    if (*result == 0) {
+    *result = FIELD_TRADE_CHECK_OK;
+    if (*result == FIELD_TRADE_CHECK_OK) {
         u32 species = PokeParty_GetParam(pkm, PKM_PARAM_SPECIES, NULL);
         u32 form = PokeParty_GetParam(pkm, PKM_PARAM_FORM, NULL);
 
         if (PokeParty_GetParam(pkm, PKM_PARAM_IS_EGG, NULL) == 1) {
-            *result = 4;
+            *result = FIELD_TRADE_CHECK_UNTRADEABLE;
         }
         if (isKyuremTransformed(species, form) == 1) {
-            *result = 4;
+            *result = FIELD_TRADE_CHECK_UNTRADEABLE;
         }
     }
-    if (*result == 0 && PokeParty_GetParam(pkm, PKM_PARAM_IS_EGG, NULL) == 1) {
-        *result = 1;
+    if (*result == FIELD_TRADE_CHECK_OK && PokeParty_GetParam(pkm, PKM_PARAM_IS_EGG, NULL) == 1) {
+        *result = FIELD_TRADE_CHECK_EGG;
     }
-    if (*result == 0 && PokeParty_GetParam(pkm, PKM_PARAM_SPECIES, NULL) != FieldTradeInput_GetWantedSpecies(input)) {
-        *result = 2;
+    if (*result == FIELD_TRADE_CHECK_OK &&
+        PokeParty_GetParam(pkm, PKM_PARAM_SPECIES, NULL) != FieldTradeInput_GetWantedSpecies(input)) {
+        *result = FIELD_TRADE_CHECK_SPECIES;
     }
-    if (*result == 0 && FieldTradeInput_GetWantedSex(input) != 2 &&
+    if (*result == FIELD_TRADE_CHECK_OK && FieldTradeInput_GetWantedSex(input) != GENDER_UNKNOWN &&
         PokeParty_GetParam(pkm, PKM_PARAM_SEX, NULL) != FieldTradeInput_GetWantedSex(input)) {
-        *result = 3;
+        *result = FIELD_TRADE_CHECK_SEX;
     }
     FieldTradeInput_Free(input);
     return FALSE;
@@ -617,17 +684,17 @@ BOOL PokeParty_ControlLegendMon(VM *vm, FieldScriptEnv *env) {
     GameData *gameData = FieldScriptEnv_GetGameData(env);
 
     switch (kind) {
-    case 0:
+    case LEGEND_MON_CHECK_PARTY:
         if (GetOTZekromPartyIdx(gameData) < 0) {
             *result = 0;
         } else {
             *result = 1;
         }
         break;
-    case 1:
+    case LEGEND_MON_MOVE_TO_FRONT:
         ScrcmdPokemonFld_MoveLegendToFront(env);
         break;
-    case 2:
+    case LEGEND_MON_SWAP_FROM_BOX:
         ScrcmdPokemonFld_SwapPartyMonWithBoxedLegend(env, *result);
         ScrcmdPokemonFld_MoveLegendToFront(env);
         break;

@@ -105,7 +105,7 @@ PartyPkm *EntreeForest_CreateSymbolMon(HeapID heapId, GameData *gameData, const 
     level = levels[pokemon->species];
     GFL_HeapFree(levels);
     id = getIDAsUInt(GetGameDataPlayerInfo(gameData));
-    pid = PML_GenPID(id, pokemon->species, pokemon->form, pokemon->sex, 0, 0);
+    pid = PML_GenPID(id, pokemon->species, pokemon->form, pokemon->sex, 0, PID_RARE_NEVER);
     pkm = PokeParty_NewTempPkm(pokemon->species, level, -1, heapId);
     PokeParty_CreatePkm(pkm, pokemon->species, level, id, PKM_IVS_RANDOM, pid);
     PokeParty_SetHiddenAbil(pkm, pokemon->species, pokemon->form);

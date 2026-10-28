@@ -14,6 +14,7 @@
 #include "field/colosseum.h"
 #include "field/comm_entry_menu.h"
 #include "field/comm_player.h"
+#include "field/field.h"
 #include "field/field_actor.h"
 #include "field/field_controller.h"
 #include "field/field_player.h"
@@ -2407,11 +2408,11 @@ static BOOL UnionOneself_StepPartySelectRun(UnionSystem *unisys, UnionSelf *situ
     UnionColosseum *clsys = unisys->colosseum_sys;
     u32 partyResult;
     u32 boxResult;
-    u32 selected;
+    u32 ineligible;
     u32 result;
     u32 kind;
-    u8 partyOk;
-    u8 boxOk;
+    u8 partyIneligible;
+    u8 boxIneligible;
 
     if (!UnionMsg_IsPrintDone(unisys)) {
         return FALSE;
@@ -2434,34 +2435,35 @@ static BOOL UnionOneself_StepPartySelectRun(UnionSystem *unisys, UnionSelf *situ
         UnionMsg_FreeAll(unisys);
         UnionOneself_CheckPartyRegulation(unisys, &partyResult);
         UnionOneself_CheckBoxRegulation(unisys, &boxResult);
-        partyOk = TRUE;
+        partyIneligible = TRUE;
         if (partyResult == 0) {
-            partyOk = FALSE;
+            partyIneligible = FALSE;
         }
-        boxOk = TRUE;
+        boxIneligible = TRUE;
         if (boxResult == 0) {
-            boxOk = FALSE;
+            boxIneligible = FALSE;
         }
         unisys->alloc.boxParty = UnionOneself_CreateBoxParty(unisys);
-        unisys->alloc.partySelect = PartySelectList_Create(field, GameData_GetParty(unisys->param->gameData),
-                                                           unisys->alloc.boxParty, partyOk, boxOk, 0x15);
+        unisys->alloc.partySelect =
+            PartySelectList_Create(field, GameData_GetParty(unisys->param->gameData), unisys->alloc.boxParty,
+                                   partyIneligible, boxIneligible, 0x15);
         (*seq)++;
         break;
     case 3:
         if (PartySelectList_Main(unisys->alloc.partySelect) == TRUE) {
-            result = PartySelectList_Delete(unisys->alloc.partySelect, &selected);
+            result = PartySelectList_Delete(unisys->alloc.partySelect, &ineligible);
             unisys->alloc.partySelect = NULL;
-            if (result == 2) {
+            if (result == PARTY_SELECT_CANCEL) {
                 UnionOneself_FreeBoxParty(unisys->alloc.boxParty);
                 unisys->alloc.boxParty = NULL;
                 UnionOneself_SetNextStep(unisys, UNION_STEP_COLOSSEUM_STAND);
                 return TRUE;
             }
             switch (result) {
-            case 0:
+            case PARTY_SELECT_PARTY:
                 clsys->unk17C[1] = 0;
                 break;
-            case 1:
+            case PARTY_SELECT_BATTLE_BOX:
                 clsys->unk17C[1] = 1;
                 break;
             }

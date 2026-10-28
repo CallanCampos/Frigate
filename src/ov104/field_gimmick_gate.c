@@ -660,7 +660,7 @@ void GimmickGate_AddWeatherMessage(GimmickGateWork *work) {
     placeMessages = GFL_MsgSysLoadData(0, ARCID_SYSTEM_MESSAGE, TEXT_BANK_PLACE_NAMES, work->heapId);
     weatherMessages = GFL_MsgSysLoadData(0, ARCID_SYSTEM_MESSAGE, TEXT_BANK_GYM_INSECT, work->heapId);
     for (i = 0; i < 4; i++) {
-        if (list.zones[i] == 0x267) {
+        if (list.zones[i] == ZONE_MAX) {
             continue;
         }
         weather = list.weather[i];
@@ -972,7 +972,7 @@ s32 GimmickGateZoneList_Count(const GimmickGateZoneList *list) {
 
     count = 0;
     for (index = 0; index < 4; index++) {
-        if (list->zones[index] != 0x267 && list->weather[index] != 0xffff) {
+        if (list->zones[index] != ZONE_MAX && list->weather[index] != 0xffff) {
             count++;
         }
     }
@@ -983,7 +983,7 @@ void GimmickGateZoneList_Clear(GimmickGateZoneList *list) {
     s32 index;
 
     for (index = 0; index < 4; index++) {
-        list->zones[index] = 0x267;
+        list->zones[index] = ZONE_MAX;
         list->weather[index] = 0xff;
     }
 }
@@ -1000,7 +1000,7 @@ void GimmickGate_GetWeatherZones(GimmickGateWork *work, GimmickGateZoneList *out
     GimmickGate_GetReportedWeatherZones(work, &second);
     GimmickGate_GetRoamerZones(work, &first);
     for (i = 0; i < 4; i++) {
-        if (first.zones[i] == 0x267 || first.weather[i] == 0xffff || count >= 2) {
+        if (first.zones[i] == ZONE_MAX || first.weather[i] == 0xffff || count >= 2) {
             break;
         }
         out->zones[count] = first.zones[i];
@@ -1008,7 +1008,7 @@ void GimmickGate_GetWeatherZones(GimmickGateWork *work, GimmickGateZoneList *out
         count++;
     }
     for (i = 0; i < 4; i++) {
-        if (second.zones[i] == 0x267 || second.weather[i] == 0xffff || count >= 2) {
+        if (second.zones[i] == ZONE_MAX || second.weather[i] == 0xffff || count >= 2) {
             break;
         }
         out->zones[count] = second.zones[i];

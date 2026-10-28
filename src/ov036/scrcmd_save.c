@@ -9,14 +9,23 @@
 #include "field/pokewood_system.h"
 #include "field/scrcmd_save.h"
 #include "field/subscreen.h"
+#include "gfl/backup_system.h"
 #include "save/records.h"
 #include "system/game_data.h"
 #include "system/game_event.h"
 #include "system/game_system.h"
 #include "system/vm.h"
 
-// The C-Gear screen, which shows the saving
-#define SUBSCREEN_CGEAR 7
+// The save's steps: start it with the saving icon, wait for it, stop the report screen's bar if it failed, wait for the
+// bar to fill, and take the icon away
+enum {
+    SAVE_STATE_START,
+    SAVE_STATE_WAIT_SAVE,
+    SAVE_STATE_STOP_BAR,
+    SAVE_STATE_WAIT_BAR,
+    SAVE_STATE_END,
+    SAVE_STATE_DONE,
+};
 
 typedef struct {
     GameSystem *gsys;
@@ -34,55 +43,56 @@ static GameEventReturnCode EventSaveData_Callback(GameEvent *event, u32 *state, 
     HeapID heapId = Field_GetHeapID(field);
 
     switch (*state) {
-    case 0:
+    case SAVE_STATE_START:
         save->saveIcon = FieldSaveanime_Create(heapId, field);
         FieldSaveanime_Start(save->saveIcon);
-        if (FieldSubscreen_GetScreenID(subscreen) == SUBSCREEN_CGEAR) {
+        if (FieldSubscreen_GetScreenID(subscreen) == FLD_SUBSCREEN_ID_SAVE_REPORT) {
             FieldSubscreen_Report_InitSave(subscreen);
             FieldSubscreen_Report_StartBar(subscreen);
         }
         RecordAddOne(GameData_GetRecords(gameData), 1);
         if (!save->pokewood) {
             GameData_StartSave(gameData);
-            *state = 1;
+            *state = SAVE_STATE_WAIT_SAVE;
         } else {
             GameEvent_ChainNext(event, EventPokewoodSave_Create(save->gsys, save->result));
-            *state = 2;
+            *state = SAVE_STATE_STOP_BAR;
         }
         break;
-    case 1:
+    case SAVE_STATE_WAIT_SAVE:
         switch (GameData_UpdateSave(gameData)) {
-        case 0:
-        case 1:
+        case SAVE_RESULT_CONTINUE:
+        case SAVE_RESULT_LAST:
             // Still saving
             break;
-        case 2:
+        case SAVE_RESULT_OK:
             *save->result = TRUE;
-            *state = 2;
+            *state = SAVE_STATE_STOP_BAR;
             break;
-        case 3:
+        case SAVE_RESULT_NG:
             *save->result = FALSE;
-            *state = 2;
+            *state = SAVE_STATE_STOP_BAR;
             break;
         }
         break;
-    case 2:
-        if (*save->result == FALSE && FieldSubscreen_GetScreenID(subscreen) == SUBSCREEN_CGEAR) {
+    case SAVE_STATE_STOP_BAR:
+        if (*save->result == FALSE && FieldSubscreen_GetScreenID(subscreen) == FLD_SUBSCREEN_ID_SAVE_REPORT) {
             FieldSubscreen_Report_StopBar(subscreen);
         }
-        *state = 3;
+        *state = SAVE_STATE_WAIT_BAR;
         break;
-    case 3:
-        if (FieldSubscreen_GetScreenID(subscreen) != SUBSCREEN_CGEAR || FieldSubscreen_Report_IsBarFull(subscreen)) {
-            *state = 4;
+    case SAVE_STATE_WAIT_BAR:
+        if (FieldSubscreen_GetScreenID(subscreen) != FLD_SUBSCREEN_ID_SAVE_REPORT ||
+            FieldSubscreen_Report_IsBarFull(subscreen)) {
+            *state = SAVE_STATE_END;
         }
         break;
-    case 4:
+    case SAVE_STATE_END:
         FieldSaveanime_Stop(save->saveIcon);
         FieldSaveanime_Delete(save->saveIcon);
-        *state = 5;
+        *state = SAVE_STATE_DONE;
         break;
-    case 5:
+    case SAVE_STATE_DONE:
         return GAMEEVENT_DONE;
     }
     return GAMEEVENT_CONTINUE;

@@ -156,13 +156,20 @@ typedef struct {
     u16 name[8];
     // What the player said, when kind is UNION_CHAT_KIND_SENTENCE
     PMSData sentence;
-    u16 unk18;
-    u8 mac[6]; // of the player, who is looked up by it
+    u16 counter; // of the beacon the line was heard in: a line is new when it changes
+    u8 mac[6];   // of the player, who is looked up by it
     u8 gender;
     u8 kind;    // UNION_CHAT_KIND_*
-    u8 subKind; // 0, or 1 for a friend and 2 for another player
+    u8 subKind; // UNION_CHAT_RELATION_*
     u8 unk23;
 } UnionVisitor;
+
+// Who the player of a line is to this one: a registered friend, a trainer met before, or neither
+enum {
+    UNION_CHAT_RELATION_NONE,
+    UNION_CHAT_RELATION_FRIEND,
+    UNION_CHAT_RELATION_MET,
+};
 
 // What a line of the chat says: the player's sentence, or that it entered the Union Room, or what the player wants to
 // do
@@ -179,7 +186,10 @@ enum {
 
 typedef struct {
     UnionVisitor visitors[UNION_VISITOR_MAX];
-    u8 unk438[4];
+    // The ring's oldest line and the next one to fill
+    u8 oldest;
+    u8 next;
+    u8 unk43A[2];
     // How many lines were added, the newest line the touch screen shows at its bottom, and the one it showed before
     s32 count;
     int viewEnd;

@@ -778,11 +778,11 @@ static int Box2Seq_ArrangeMain(Box2SysWork *syswk) {
         return Box2Seq_AnimFrameButton(syswk, 10, Box2Seq_Goto(syswk, 26));
     case 34:
         GFL_SndSEPlay(SEQ_SE_CLOSE1);
-        syswk->param->unk28 = 1;
+        syswk->param->closed = TRUE;
         return Box2Seq_AnimActorButton(syswk, 7, 8, 16);
     case 35:
         GFL_SndSEPlay(SEQ_SE_CANCEL1);
-        syswk->param->unk28 = 0;
+        syswk->param->closed = FALSE;
         return Box2Seq_AnimActorButton(syswk, 6, 9, 116);
     case 36:
         GFL_SndSEPlay(SEQ_SE_DECIDE1);
@@ -869,7 +869,7 @@ static int Box2Seq_ArrangeMain(Box2SysWork *syswk) {
             syswk->app->oldCurPos = pos;
             return Box2Seq_AnimFrameButton(syswk, 5, 19);
         }
-        syswk->param->unk28 = 0;
+        syswk->param->closed = FALSE;
         return Box2Seq_AnimActorButton(syswk, 6, 9, 116);
     case CURSORMOVE_CURSOR_ON:
         GFL_SndSEPlay(SEQ_SE_SELECT1);
@@ -2074,7 +2074,7 @@ static int Box2Seq_RangePartyIn(Box2SysWork *syswk) {
         syswk->app->subSeq++;
         return Box2Seq_RunVFunc(syswk, Box2Main_VFuncFrameMove, 41);
     case 1:
-        if (syswk->param->mode == 4 && syswk->param->unk14 == 1) {
+        if (syswk->param->mode == 4 && syswk->param->battleBoxLocked == 1) {
             GFL_SndSEPlay(SEQ_SE_BEEP);
             Box2Bmp_PrintBattleBoxLocked(syswk, 0);
             syswk->moveMode = 0;
@@ -2674,7 +2674,7 @@ static int Box2Seq_ArrangePartyMain(Box2SysWork *syswk) {
         return Box2Seq_AnimFrameButton(syswk, 10, Box2Seq_Goto(syswk, 28));
     case 7:
         GFL_SndSEPlay(SEQ_SE_CLOSE1);
-        syswk->param->unk28 = 1;
+        syswk->param->closed = TRUE;
         return Box2Seq_AnimActorButton(syswk, 7, 8, 16);
     case 8:
         GFL_SndSEPlay(SEQ_SE_CANCEL1);
@@ -2862,7 +2862,7 @@ static int Box2Seq_MovePartyIn(Box2SysWork *syswk) {
         syswk->app->subSeq++;
         return Box2Seq_RunVFunc(syswk, Box2Main_VFuncFrameMove, 31);
     case 1:
-        if (syswk->param->mode == 4 && syswk->param->unk14 == 1) {
+        if (syswk->param->mode == 4 && syswk->param->battleBoxLocked == 1) {
             GFL_SndSEPlay(SEQ_SE_BEEP);
             Box2Bmp_PrintBattleBoxLocked(syswk, 0);
             syswk->moveMode = 0;
@@ -3274,11 +3274,11 @@ static int Box2Seq_ArrangeBoxMain(Box2SysWork *syswk) {
         return Box2Seq_AnimFrameButton(syswk, 10, Box2Seq_Goto(syswk, 48));
     case 34:
         GFL_SndSEPlay(SEQ_SE_CLOSE1);
-        syswk->param->unk28 = 1;
+        syswk->param->closed = TRUE;
         return Box2Seq_AnimActorButton(syswk, 7, 8, 16);
     case 35:
         GFL_SndSEPlay(SEQ_SE_CANCEL1);
-        syswk->param->unk28 = 0;
+        syswk->param->closed = FALSE;
         return Box2Seq_AnimActorButton(syswk, 6, 9, 116);
     case 36:
         GFL_SndSEPlay(SEQ_SE_DECIDE1);
@@ -3357,7 +3357,7 @@ static int Box2Seq_ArrangeBoxMain(Box2SysWork *syswk) {
             syswk->app->oldCurPos = pos;
             return Box2Seq_AnimFrameButton(syswk, 5, 47);
         }
-        syswk->param->unk28 = 0;
+        syswk->param->closed = FALSE;
         return Box2Seq_AnimActorButton(syswk, 6, 9, 116);
     case CURSORMOVE_CURSOR_ON:
         GFL_SndSEPlay(SEQ_SE_SELECT1);
@@ -3479,7 +3479,7 @@ static int Box2Seq_ArrangeBoxPartyMain(Box2SysWork *syswk) {
         return Box2Seq_AnimFrameButton(syswk, 10, Box2Seq_Goto(syswk, 50));
     case 7:
         GFL_SndSEPlay(SEQ_SE_CLOSE1);
-        syswk->param->unk28 = 1;
+        syswk->param->closed = TRUE;
         return Box2Seq_AnimActorButton(syswk, 7, 8, 16);
     case 8:
         GFL_SndSEPlay(SEQ_SE_CANCEL1);
@@ -3683,11 +3683,11 @@ static int Box2Seq_WithdrawMain(Box2SysWork *syswk) {
         return Box2Seq_ScrollTrayRight(syswk, 0, 54);
     case 33:
         GFL_SndSEPlay(SEQ_SE_CLOSE1);
-        syswk->param->unk28 = 1;
+        syswk->param->closed = TRUE;
         return Box2Seq_AnimActorButton(syswk, 7, 8, 16);
     case 34:
         GFL_SndSEPlay(SEQ_SE_CANCEL1);
-        syswk->param->unk28 = 0;
+        syswk->param->closed = FALSE;
         return Box2Seq_AnimActorButton(syswk, 6, 9, 116);
     case 35:
         GFL_SndSEPlay(SEQ_SE_DECIDE1);
@@ -3746,7 +3746,7 @@ static int Box2Seq_WithdrawMain(Box2SysWork *syswk) {
             CursorMove_SetPos(syswk->app->cursorMove, pos);
             return Box2Seq_AnimFrameButton(syswk, 5, 55);
         }
-        syswk->param->unk28 = 0;
+        syswk->param->closed = FALSE;
         return Box2Seq_AnimActorButton(syswk, 6, 9, 116);
     case CURSORMOVE_CURSOR_ON:
         GFL_SndSEPlay(SEQ_SE_SELECT1);
@@ -3887,11 +3887,11 @@ static int Box2Seq_DepositPartyMain(Box2SysWork *syswk) {
     switch (res) {
     case 6:
         GFL_SndSEPlay(SEQ_SE_CLOSE1);
-        syswk->param->unk28 = 1;
+        syswk->param->closed = TRUE;
         return Box2Seq_AnimActorButton(syswk, 7, 8, 16);
     case 7:
         GFL_SndSEPlay(SEQ_SE_CANCEL1);
-        syswk->param->unk28 = 0;
+        syswk->param->closed = FALSE;
         return Box2Seq_AnimActorButton(syswk, 6, 9, 116);
     case 8:
         GFL_SndSEPlay(SEQ_SE_DECIDE1);
@@ -3938,7 +3938,7 @@ static int Box2Seq_DepositPartyMain(Box2SysWork *syswk) {
             CursorMove_SetPos(syswk->app->cursorMove, pos);
             return Box2Seq_AnimFrameButton(syswk, 5, 60);
         }
-        syswk->param->unk28 = 0;
+        syswk->param->closed = FALSE;
         return Box2Seq_AnimActorButton(syswk, 6, 9, 116);
     case CURSORMOVE_NONE:
     case CURSORMOVE_SCROLL_R:
@@ -4250,11 +4250,11 @@ static int Box2Seq_ItemMain(Box2SysWork *syswk) {
         return Box2Seq_AnimFrameButton(syswk, 10, Box2Seq_Goto(syswk, 26));
     case 34:
         GFL_SndSEPlay(SEQ_SE_CLOSE1);
-        syswk->param->unk28 = 1;
+        syswk->param->closed = TRUE;
         return Box2Seq_AnimActorButton(syswk, 7, 8, 16);
     case 35:
         GFL_SndSEPlay(SEQ_SE_CANCEL1);
-        syswk->param->unk28 = 0;
+        syswk->param->closed = FALSE;
         return Box2Seq_AnimActorButton(syswk, 6, 9, 116);
     case 36:
         GFL_SndSEPlay(SEQ_SE_DECIDE1);
@@ -4336,7 +4336,7 @@ static int Box2Seq_ItemMain(Box2SysWork *syswk) {
             CursorMove_SetPos(syswk->app->cursorMove, pos);
             return Box2Seq_AnimFrameButton(syswk, 5, 68);
         }
-        syswk->param->unk28 = 0;
+        syswk->param->closed = FALSE;
         return Box2Seq_AnimActorButton(syswk, 6, 9, 116);
     case CURSORMOVE_NONE:
     case CURSORMOVE_UNK_7:
@@ -4896,7 +4896,7 @@ static int Box2Seq_ItemPartyMain(Box2SysWork *syswk) {
         return Box2Seq_AnimFrameButton(syswk, 10, Box2Seq_Goto(syswk, 28));
     case 7:
         GFL_SndSEPlay(SEQ_SE_CLOSE1);
-        syswk->param->unk28 = 1;
+        syswk->param->closed = TRUE;
         return Box2Seq_AnimActorButton(syswk, 7, 8, 16);
     case 8:
         GFL_SndSEPlay(SEQ_SE_CANCEL1);
@@ -5141,7 +5141,7 @@ static int Box2Seq_DreamWorldMain(Box2SysWork *syswk) {
         return Box2Seq_ScrollTrayRight(syswk, 0, 85);
     case 33:
         GFL_SndSEPlay(SEQ_SE_CANCEL1);
-        syswk->param->unk28 = 0;
+        syswk->param->closed = FALSE;
         syswk->param->tray = BOX2_GET_NONE;
         syswk->param->position = BOX2_GET_NONE;
         return Box2Seq_AnimActorButton(syswk, 6, 9, 116);
@@ -5194,7 +5194,7 @@ static int Box2Seq_DreamWorldMain(Box2SysWork *syswk) {
             CursorMove_SetPos(syswk->app->cursorMove, pos);
             return Box2Seq_AnimFrameButton(syswk, 5, 88);
         }
-        syswk->param->unk28 = 0;
+        syswk->param->closed = FALSE;
         syswk->param->tray = BOX2_GET_NONE;
         syswk->param->position = BOX2_GET_NONE;
         return Box2Seq_AnimActorButton(syswk, 6, 9, 116);
@@ -5284,7 +5284,7 @@ static int Box2Seq_TakeItem(Box2SysWork *syswk) {
 
     switch (syswk->app->subSeq) {
     case 0:
-        if (syswk->param->mode == 4 && syswk->param->unk14 == 1) {
+        if (syswk->param->mode == 4 && syswk->param->battleBoxLocked == 1) {
             Box2Obj_SetVisible(syswk->app, BOX2_ACTOR_CURSOR, FALSE);
             Box2Frame_SlideMenuOut(syswk->app->bgWinFrame);
             syswk->app->subSeq = 3;

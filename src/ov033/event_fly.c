@@ -1,4 +1,5 @@
 #include "types.h"
+#include "constants/pokemon.h"
 #include "field/encounter_effect.h"
 #include "field/event_fly.h"
 #include "field/event_mapchange.h"
@@ -37,12 +38,12 @@ GameEvent *EventFly_CreateMapChangeEvent(GameSystem *gsys, Field *field, u32 zon
     MI_CpuFill8(work, 0, sizeof(FlyEventWork));
     work->gsys = gsys;
     work->zoneId = zoneId;
-    if (getTrainerGender(GetGameDataPlayerInfo(GSYS_GetGameData(gsys))) == 0) {
-        work->effectOut = 11;
-        work->effectIn = 12;
+    if (getTrainerGender(GetGameDataPlayerInfo(GSYS_GetGameData(gsys))) == GENDER_MALE) {
+        work->effectOut = FLD3DCI_FLY_OUT_MALE;
+        work->effectIn = FLD3DCI_FLY_IN_MALE;
     } else {
-        work->effectOut = 31;
-        work->effectIn = 32;
+        work->effectOut = FLD3DCI_FLY_OUT_FEMALE;
+        work->effectIn = FLD3DCI_FLY_IN_FEMALE;
     }
     LoadZoneSpawnInfoCheckRail(&work->spawn, zoneId);
     return event;
@@ -108,7 +109,8 @@ GameEventReturnCode EventFly_Callback(GameEvent *event, u32 *state, void *data) 
         EnableAllActorsMovement(Field_GetActorSystem(field));
         SetActorHidden(FieldPlayer_GetActor(Field_GetPlayer(field)), TRUE);
         FieldCameraAnm_EVCameraEnd(camera);
-        GameEvent_ChainNext(event, EventGameTransition_CreateFadeOutEvent(work->gsys, field, 0, 0));
+        GameEvent_ChainNext(event,
+                            EventGameTransition_CreateFadeOutEvent(work->gsys, field, FIELD_TRANSITION_FADE_BLACK, 0));
         (*state)++;
         break;
     case 4:

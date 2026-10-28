@@ -44,10 +44,10 @@ void UnionChat_AppendLine(UnionSystem *unisys, UnionBeaconEntry *bpc, const u16 
             visitor->sentence.words[0] = mine_pmsdata[2];
             visitor->sentence.words[1] = mine_pmsdata[3];
             visitor->kind = mine_chat_type;
-            visitor->unk18 = 0;
+            visitor->counter = 0;
             OS_GetMacAddress(visitor->mac);
             visitor->gender = getTrainerGender(info);
-            visitor->subKind = 0;
+            visitor->subKind = UNION_CHAT_RELATION_NONE;
         } else {
             GameData *gameData;
             WifiList *wifiList;
@@ -59,18 +59,18 @@ void UnionChat_AppendLine(UnionSystem *unisys, UnionBeaconEntry *bpc, const u16 
             visitor->sentence.words[0] = bpc->beacon.look2[2];
             visitor->sentence.words[1] = bpc->beacon.look2[3];
             visitor->kind = bpc->beacon.state;
-            visitor->unk18 = bpc->beacon.counter;
+            visitor->counter = bpc->beacon.counter;
             MI_CpuCopy8(bpc->mac, visitor->mac, 6);
             visitor->gender = bpc->beacon.gender;
             gameData = GSYS_GetGameData(unisys->param->gsys);
             wifiList = GameData_GetWifiList(gameData);
             rival = getHollow_RivalData(GameData_GetSaveControl(gameData));
             if (UnionEff_IsFriendBeacon(wifiList, &bpc->beacon) == TRUE) {
-                visitor->subKind = 1;
+                visitor->subKind = UNION_CHAT_RELATION_FRIEND;
             } else if (Misc_IsMetTrainer(rival, bpc->beacon.trainerId) == TRUE) {
-                visitor->subKind = 2;
+                visitor->subKind = UNION_CHAT_RELATION_MET;
             } else {
-                visitor->subKind = 0;
+                visitor->subKind = UNION_CHAT_RELATION_NONE;
             }
         }
         if (list->count == list->viewEnd) {
@@ -87,16 +87,16 @@ void UnionChat_AppendLine(UnionSystem *unisys, UnionBeaconEntry *bpc, const u16 
 static UnionVisitor *UnionChat_AllocateLine(UnionVisitorList *list) {
     UnionVisitor *visitor;
 
-    if (list->count > 0 && list->unk438[1] == list->unk438[0]) {
-        list->unk438[0]++;
-        if (list->unk438[0] >= UNION_VISITOR_MAX) {
-            list->unk438[0] = 0;
+    if (list->count > 0 && list->next == list->oldest) {
+        list->oldest++;
+        if (list->oldest >= UNION_VISITOR_MAX) {
+            list->oldest = 0;
         }
     }
-    visitor = &list->visitors[list->unk438[1]];
-    list->unk438[1]++;
-    if (list->unk438[1] >= UNION_VISITOR_MAX) {
-        list->unk438[1] = 0;
+    visitor = &list->visitors[list->next];
+    list->next++;
+    if (list->next >= UNION_VISITOR_MAX) {
+        list->next = 0;
     }
     return visitor;
 }
@@ -123,7 +123,7 @@ static BOOL UnionChat_IsNewBeacon(UnionVisitorList *list, const u8 *mac, u16 cou
         }
         visitor = UnionChat_GetLine(list, i);
         if (visitor != NULL && GFL_STD_MemCmp(visitor->mac, mac, 6) == 0) {
-            if (visitor->unk18 != counter) {
+            if (visitor->counter != counter) {
                 return TRUE;
             }
             return FALSE;

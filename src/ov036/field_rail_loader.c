@@ -169,7 +169,7 @@ GameEvent *CreatePlayerXActorScriptCall(GameSystem *gsys, Field *field, u32 scri
 
 static void FieldActorMove_VanishProc(FieldActor *actor) {
     SetActorHidden(actor, TRUE);
-    SetActorMovementFlag(actor, 0x8000);
+    SetActorMovementFlag(actor, ACTOR_MOVEMENT_FLAG_HIDE_SHADOW);
 }
 
 static void FieldActorMove_VanishDraw(FieldActor *actor) {
@@ -1175,7 +1175,7 @@ static u8 RailActor_GetCameraRelativeDir(FieldActor *actor) {
     u16 angle = FldActSys_GetCameraAngle(GetActorMModelSystem(actor));
     u16 dir = GetActorFaceDir(actor);
 
-    if (CheckActorFlag(actor, 0x2000)) {
+    if (CheckActorFlag(actor, ACTOR_FLAG_RAIL)) {
         return RailActor_GetDirByAngle(actor, angle);
     }
     return RotateDirByAngle(dir, angle);

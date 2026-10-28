@@ -110,11 +110,11 @@ void FldeffRockSmash_Start(FieldActor *actor, FieldEffects *effects) {
     CopyActorWPos(actor, &pos);
     pos.y += FX32_ONE;
     pos.z += FX32_CONST(12);
-    if (!FieldEffects_IsLoaded(effects, 9)) {
-        id = 9;
+    if (!FieldEffects_IsLoaded(effects, FLDEFF_ROCK_SMASH)) {
+        id = FLDEFF_ROCK_SMASH;
         FieldEffects_Load(effects, &id, 1);
     }
-    params.effect = FieldEffects_GetHandleData(effects, 9);
+    params.effect = FieldEffects_GetHandleData(effects, FLDEFF_ROCK_SMASH);
     params.pos = pos;
     FieldEffects_TCBCreate(effects, &ROCK_SMASH_TASK_VTABLE, NULL, 0, &params, 0);
 }

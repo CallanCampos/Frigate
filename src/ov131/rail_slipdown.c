@@ -203,7 +203,7 @@ static void RailSlipdown_Task(TCB *tcb, void *data) {
     case SLIPDOWN_STATE_START:
         GFL_SndSEPlay(SEQ_SE_FLD_92);
         work->state = SLIPDOWN_STATE_SLIDE;
-        SetActorMovementFlag(work->actor, 0x8000);
+        SetActorMovementFlag(work->actor, ACTOR_MOVEMENT_FLAG_HIDE_SHADOW);
         // fallthrough
     case SLIPDOWN_STATE_SLIDE: {
         VecFx32 pos;
@@ -255,7 +255,7 @@ static void RailSlipdown_Task(TCB *tcb, void *data) {
         } else {
             SetActorInitedPositionRail(work->actor, &work->railPos);
         }
-        ClearActorMovementFlag(work->actor, 0x8000);
+        ClearActorMovementFlag(work->actor, ACTOR_MOVEMENT_FLAG_HIDE_SHADOW);
         FldAct_SetHeightCalcDisabled(work->actor, FALSE);
         FldAct_SetMapAttrDisabled(work->actor, FALSE);
         SetActorCollisionEnabled(work->actor, TRUE);

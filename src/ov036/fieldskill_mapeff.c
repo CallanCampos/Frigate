@@ -41,9 +41,9 @@ void FieldSkillMapEff_SetupFlash(FieldSkillMapEff *effect, u32 flashPerms, HeapI
     if (flashPerms & 3) {
         effect->flash = FieldFlash_Create(heapId);
         if (flashPerms & 2) {
-            FieldFlash_RequestState(effect->flash, 2);
+            FieldFlash_RequestState(effect->flash, FIELD_FLASH_REQUEST_LIT);
         } else {
-            FieldFlash_RequestState(effect->flash, 0);
+            FieldFlash_RequestState(effect->flash, FIELD_FLASH_REQUEST_DARK);
         }
     } else {
         effect->flash = NULL;

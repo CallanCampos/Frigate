@@ -6,6 +6,9 @@
 #include "gfl/heap.h"
 #include "struct_decls.h"
 
+// No lens flare: the end of an effect set's lens flares, after the 8 lens flares
+#define LENS_FLARE_NONE 8
+
 typedef struct FieldLensFlareEntry {
     u16 zoneId;
     u16 transitId;
@@ -25,6 +28,7 @@ struct FieldLensFlare {
     u32 state;
     FieldLensFlareData *ownedData;
     GameSystem *gameSystem;
+    // A lens flare, or LENS_FLARE_NONE
     u16 effectId;
     u16 unk1e;
     GameData *gameData;

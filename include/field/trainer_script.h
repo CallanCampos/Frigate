@@ -4,8 +4,7 @@
 #include "types.h"
 #include "struct_decls.h"
 
-// A Trainer who has seen the player: how far away, facing which way, and in which kind of battle (0: a single
-// Trainer, 1: a double battle pair, 2: two Trainers at once, 3: one with the player's partner)
+// A Trainer who has seen the player: how far away, facing which way, and in which kind of battle
 typedef struct {
     FieldActor *actor;
     int range;
@@ -14,6 +13,15 @@ typedef struct {
     u32 trainerId;
     u32 kind;
 } TrainerClashData;
+
+// TrainerClashData's kind: a single Trainer, a double battle pair, two Trainers who saw the player at once, and one
+// with the player's partner
+enum {
+    TRAINER_CLASH_SINGLE,
+    TRAINER_CLASH_DOUBLE_PAIR,
+    TRAINER_CLASH_TWO_TRAINERS,
+    TRAINER_CLASH_WITH_PARTNER,
+};
 
 struct TrainerClashSlot {
     TrainerClashData data;

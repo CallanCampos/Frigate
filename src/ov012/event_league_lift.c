@@ -85,7 +85,8 @@ static GameEventReturnCode EventLeagueLiftWarp_Callback(GameEvent *event, u32 *s
         }
         break;
     case 4:
-        GameEvent_ChainNext(event, CallFieldMapEntranceOutTransitionDefault(gsys, field, 0, 0));
+        GameEvent_ChainNext(event,
+                            CallFieldMapEntranceOutTransitionDefault(gsys, field, FIELD_TRANSITION_FADE_BLACK, 0));
         (*state)++;
         break;
     case 5:
@@ -150,7 +151,7 @@ static void LeagueLiftArrival_PlacePlayer(LeagueLiftArrivalData *data) {
 static GameEventReturnCode EventLeagueLiftArrival_Callback(GameEvent *event, u32 *state, void *work) {
     LeagueLiftArrivalData *data = work;
     BOOL done;
-    FieldEvCameraShake shake;
+    FieldCameraShakeSetup shake;
     FieldPlayer *player;
     FieldActor *actor;
     VecFx32 pos;
@@ -173,7 +174,8 @@ static GameEventReturnCode EventLeagueLiftArrival_Callback(GameEvent *event, u32
     case 2:
         GimmickLeagueLift_PlayLiftAnim(data->field);
         GimmickLeagueLift_PlayArrivalModel(data->field);
-        GameEvent_ChainNext(event, CallFieldMapEntranceInTransition(data->gsys, data->field, 0, 0, 1, 0, 0));
+        GameEvent_ChainNext(
+            event, CallFieldMapEntranceInTransition(data->gsys, data->field, FIELD_TRANSITION_FADE_BLACK, 0, 1, 0, 0));
         (*state)++;
         break;
     case 3:
@@ -186,17 +188,17 @@ static GameEventReturnCode EventLeagueLiftArrival_Callback(GameEvent *event, u32
             GFL_G3DCurveFree(data->curve);
             GFL_SndPlayerStop(GFL_SndSeqGetPlayerIndex(SEQ_SE_LIFT));
             GFL_SndSEPlay(SEQ_SE_LIFT_STOP);
-            shake.unk00 = 2;
-            shake.unk02 = 0;
-            shake.unk14 = 3;
-            shake.unk04 = 2;
-            shake.unk10 = 2;
-            shake.unk18 = 0;
-            shake.unk06 = 0;
-            shake.unk08 = 1;
-            shake.unk0A = 0;
-            shake.unk0C = 0;
-            shake.unk0E = 2;
+            shake.amplitudeX = 2;
+            shake.amplitudeY = 0;
+            shake.period = 3;
+            shake.steps = 2;
+            shake.totalSteps = 2;
+            shake.frame = 0;
+            shake.decayX = 0;
+            shake.decayY = 1;
+            shake.decayStart = 0;
+            shake.decayTimer = 0;
+            shake.decayInterval = 2;
             GameEvent_ChainNext(event, EventEvCameraShake_Create(data->gsys, &shake));
             (*state)++;
         }

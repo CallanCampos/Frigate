@@ -2,8 +2,10 @@
 // Names from swan (https://github.com/ds-pokemon-hacking/swan, GPL-3.0).
 // Additional helper and table names are our descriptive guesses.
 #include "types.h"
+#include "constants/directions.h"
 #include "constants/sound.h"
 #include "field/field.h"
+#include "field/field_acmd.h"
 #include "field/field_actor.h"
 #include "field/field_map.h"
 #include "field/field_slope_slip.h"
@@ -30,11 +32,17 @@ typedef struct {
     u32 frames;
 } SlopeSlipWork;
 
+enum {
+    SLOPE_SLIP_STATE_START,
+    SLOPE_SLIP_STATE_SLIDE,
+    SLOPE_SLIP_STATE_END,
+};
+
 static const SlopeSlipTileConfig SLOPE_SLIP_TILES[4] = {
-    { 0x77, 0xe, 2, 2 },
-    { 0x76, 0xf, 3, 2 },
-    { 0x78, 0xc, 0, 2 },
-    { 0x79, 0xd, 1, 2 },
+    { 0x77, ACMD_WALK_8F + DIR_LEFT, DIR_LEFT, 2 },
+    { 0x76, ACMD_WALK_8F + DIR_RIGHT, DIR_RIGHT, 2 },
+    { 0x78, ACMD_WALK_8F + DIR_UP, DIR_UP, 2 },
+    { 0x79, ACMD_WALK_8F + DIR_DOWN, DIR_DOWN, 2 },
 };
 
 const SlopeSlipTileConfig *GetSlopeSlipTileConfig(u32 tileClass);
@@ -72,26 +80,26 @@ void SlopeSlip_SpinFinish(SlopeSlipWork *work);
 GameEventReturnCode SlopeSlip_SpinTaskMain(GameEvent *event, u32 *state, void *data) {
     SlopeSlipWork *work = data;
     switch (*state) {
-    case 0:
+    case SLOPE_SLIP_STATE_START:
         if (!IsTileSlopeSlip_(SlopeSlip_GetTileClass(work))) {
-            *state = 2;
+            *state = SLOPE_SLIP_STATE_END;
         } else {
-            *state = 1;
+            *state = SLOPE_SLIP_STATE_SLIDE;
         }
         break;
-    case 1:
+    case SLOPE_SLIP_STATE_SLIDE:
         SlopeSlip_SpinTick(work);
         if (FldAct_CheckAcmdEnd(work->actor)) {
             SlopeSlip_SpinSelectEntry(work);
             if (SlopeSlip_SpinIsBlocked(work)) {
                 GFL_SndPlayerStop(GFL_SndSeqGetPlayerIndex(SEQ_SE_FLD_35));
-                *state = 2;
+                *state = SLOPE_SLIP_STATE_END;
             } else {
                 SlopeSlip_SpinStartStep(work);
             }
         }
         break;
-    case 2:
+    case SLOPE_SLIP_STATE_END:
         SlopeSlip_SpinFinish(work);
         return GAMEEVENT_DONE;
     }
@@ -150,15 +158,15 @@ void SlopeSlip_SpinTick(SlopeSlipWork *work) {
     work->frames++;
     if (work->frames % interval == 0) {
         work->dir = (work->dir + 1) % 4;
-        ClearActorFlag(work->actor, 8);
+        ClearActorFlag(work->actor, ACTOR_FLAG_FACE_DIR_LOCK);
         CheckSetActorFaceDir(work->actor, work->dir);
-        SetActorFlag(work->actor, 8);
+        SetActorFlag(work->actor, ACTOR_FLAG_FACE_DIR_LOCK);
     }
 }
 
 void SlopeSlip_SpinStartStep(SlopeSlipWork *work) {
     FldAct_SetAcmd(work->actor, SlopeSlip_GetAcmd(work));
-    SetActorFlag(work->actor, 8);
+    SetActorFlag(work->actor, ACTOR_FLAG_FACE_DIR_LOCK);
     if (!GFL_SndPlayerIsActive(GFL_SndSeqGetPlayerIndex(SEQ_SE_FLD_35))) {
         GFL_SndSEPlay(SEQ_SE_FLD_35);
     }
@@ -180,7 +188,7 @@ BOOL SlopeSlip_SpinIsBlocked(SlopeSlipWork *work) {
 }
 
 void SlopeSlip_SpinFinish(SlopeSlipWork *work) {
-    ClearActorFlag(work->actor, 8);
+    ClearActorFlag(work->actor, ACTOR_FLAG_FACE_DIR_LOCK);
     if (work->config != NULL) {
         CheckSetActorFaceDir(work->actor, SlopeSlip_GetDirection(work));
     }

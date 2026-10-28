@@ -13,6 +13,14 @@ typedef struct FieldTask FieldTask;
 
 typedef BOOL (*FieldTaskCallback)(void *data);
 
+// A task's state, which FieldTask_GetState returns: waiting to be started, running, and ended once its callback
+// returned TRUE
+enum {
+    FIELD_TASK_STATE_WAIT,
+    FIELD_TASK_STATE_RUNNING,
+    FIELD_TASK_STATE_END,
+};
+
 // Allocates dataSize bytes of data for the task
 FieldTask *FieldTask_Create(HeapID heapId, u32 dataSize, FieldTaskCallback callback);
 void FieldTask_Free(FieldTask *task);

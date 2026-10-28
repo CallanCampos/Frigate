@@ -228,12 +228,12 @@ Script_7:
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_02C6
     VMCall L_02E2
-    ScrcmdFieldGimmickCartLanes_UnlockLaneFromScript 1
+    RollerCoasterSetCarIntroSeen 1
     VMJump L_02D0
 
 L_02C6:
     VMCall L_0349
-    ScrcmdFieldGimmickCartLanes_UnlockLaneFromScript 2
+    RollerCoasterSetCarIntroSeen 2
 
 L_02D0:
     WorkSetConst 0x8027, 0

@@ -103,7 +103,7 @@ static void Hide_FreeObjects(FieldEffectHide *effect) {
 FieldEffectTask *HideTask_Start(FieldEffects *effects, FieldActor *actor, u32 kind) {
     HideTaskParams params;
 
-    params.effect = FieldEffects_GetHandleData(effects, 14);
+    params.effect = FieldEffects_GetHandleData(effects, FLDEFF_HIDE);
     params.objSys = FieldEffects_GetFieldMapData(effects);
     params.actor = actor;
     params.kind = kind;

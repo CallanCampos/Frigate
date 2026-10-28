@@ -2,12 +2,15 @@
 // by GFL_HeapAllocate's file argument ("ochiba" is fallen leaves). Function names from swan
 // (https://github.com/ds-pokemon-hacking/swan, GPL-3.0), except the FldeffOchiba_ functions, which are ours
 #include "types.h"
+#include "constants/directions.h"
 #include "field/field.h"
+#include "field/field_acmd.h"
 #include "field/field_actor.h"
 #include "field/field_effect.h"
 #include "field/field_g3dobj.h"
 #include "field/field_player.h"
 #include "field/field_script.h"
+#include "field/player_state.h"
 #include "field/scrcmd_leaves.h"
 #include "gfl/calctool.h"
 #include "gfl/heap.h"
@@ -46,6 +49,19 @@ typedef struct {
     fx32 targetY;
     fx32 speed;
 } LeafPileStuckWork;
+
+// The steps of the player stuck in a pile of leaves: return the player to walking, start the leaves, sink,
+// struggle with the keys for 40 frames, get out, wait until the player's animation ends, end
+enum {
+    LEAF_PILE_STATE_CHECK_FORM,
+    LEAF_PILE_STATE_RESET_FORM,
+    LEAF_PILE_STATE_START_LEAVES,
+    LEAF_PILE_STATE_SINK,
+    LEAF_PILE_STATE_STRUGGLE,
+    LEAF_PILE_STATE_LEAVE,
+    LEAF_PILE_STATE_WAIT_LEAVE,
+    LEAF_PILE_STATE_END,
+};
 
 static void FldeffLeaves_LoadResource(FieldEffectLeaves *effect);
 static void FldeffLeaves_FreeResource(FieldEffectLeaves *effect);
@@ -104,7 +120,7 @@ void FldeffLeaves_Start(FieldEffects *effects, FieldActor *actor) {
     GetHeightFromMap(actor, &pos, &height);
     pos.y = height;
     dir = GetActorFaceDir(actor);
-    params.effect = FieldEffects_GetHandleData(effects, 17);
+    params.effect = FieldEffects_GetHandleData(effects, FLDEFF_LEAVES);
     params.actor = actor;
     params.pos = pos;
     params.dir = dir;
@@ -185,66 +201,66 @@ static GameEventReturnCode EventLeafPileStuck_Callback(GameEvent *event, u32 *st
     u32 keys;
 
     switch (*state) {
-    case 0:
-        if (FieldPlayer_DeriveExState(work->args.player) == 0) {
-            *state = 2;
+    case LEAF_PILE_STATE_CHECK_FORM:
+        if (FieldPlayer_DeriveExState(work->args.player) == FLD_PLAYER_EXSTATE_NONE) {
+            *state = LEAF_PILE_STATE_START_LEAVES;
         } else {
-            *state = 1;
+            *state = LEAF_PILE_STATE_RESET_FORM;
         }
         break;
-    case 1:
+    case LEAF_PILE_STATE_RESET_FORM:
         FieldPlayer_SetSpecialSeq(work->args.player, 1);
         FieldPlayer_FinishFormChange(work->args.player);
-        *state = 2;
+        *state = LEAF_PILE_STATE_START_LEAVES;
         break;
-    case 2:
+    case LEAF_PILE_STATE_START_LEAVES:
         LeavesEffect_Start(&work->args);
-        *state = 3;
-    case 3:
+        *state = LEAF_PILE_STATE_SINK;
+    case LEAF_PILE_STATE_SINK:
         work->y -= work->speed;
         if (work->y <= work->targetY) {
             work->y = work->targetY;
-            *state = 4;
+            *state = LEAF_PILE_STATE_STRUGGLE;
         }
         FieldPlayer_GetWPos(work->args.player, &pos);
         pos.y = work->y;
         FieldPlayer_SetWPos(work->args.player, &pos);
         break;
-    case 4:
+    case LEAF_PILE_STATE_STRUGGLE:
         actor = FieldPlayer_GetActor(work->args.player);
         keys = GCTX_HIDGetHeldKeys();
         if (keys & PAD_KEY_UP) {
-            FldAct_SetAcmd(actor, 0x24);
+            FldAct_SetAcmd(actor, ACMD_STAY_WALK_4F + DIR_UP);
         }
         if (keys & PAD_KEY_DOWN) {
-            FldAct_SetAcmd(actor, 0x25);
+            FldAct_SetAcmd(actor, ACMD_STAY_WALK_4F + DIR_DOWN);
         }
         if (keys & PAD_KEY_LEFT) {
-            FldAct_SetAcmd(actor, 0x26);
+            FldAct_SetAcmd(actor, ACMD_STAY_WALK_4F + DIR_LEFT);
         }
         if (keys & PAD_KEY_RIGHT) {
-            FldAct_SetAcmd(actor, 0x27);
+            FldAct_SetAcmd(actor, ACMD_STAY_WALK_4F + DIR_RIGHT);
         }
         if (work->frames++ > 40) {
-            *state = 5;
+            *state = LEAF_PILE_STATE_LEAVE;
         }
         break;
-    case 5: {
+    case LEAF_PILE_STATE_LEAVE: {
         u32 dir = FieldPlayer_GetFaceDir(work->args.player);
 
         actor = FieldPlayer_GetActor(work->args.player);
         FldAct_SetAcmd(actor, dir + 0x30);
         CheckRecalcActorY(actor);
-        *state = 6;
+        *state = LEAF_PILE_STATE_WAIT_LEAVE;
         break;
     }
-    case 6:
+    case LEAF_PILE_STATE_WAIT_LEAVE:
         if (FieldPlayer_CheckAnimePaused(work->args.player) == TRUE) {
-            *state = 7;
+            *state = LEAF_PILE_STATE_END;
         }
         break;
-    case 7:
-        return TRUE;
+    case LEAF_PILE_STATE_END:
+        return GAMEEVENT_DONE;
     }
-    return FALSE;
+    return GAMEEVENT_CONTINUE;
 }

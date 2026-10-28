@@ -21,28 +21,43 @@ typedef struct {
     BOOL ex;
 } ListMenuEvent;
 
+// The yes/no event: wait a frame, open the menu, wait for the answer, and close it
+enum {
+    YES_NO_STATE_START,
+    YES_NO_STATE_WAIT,
+    YES_NO_STATE_SELECT,
+    YES_NO_STATE_END,
+};
+
+// The list menu's event: wait a frame, show the menu, and wait for the choice
+enum {
+    LIST_MENU_STATE_START,
+    LIST_MENU_STATE_WAIT,
+    LIST_MENU_STATE_SELECT,
+};
+
 static GameEventReturnCode ScrcmdMsgwin_YesNoEventMain(GameEvent *event, u32 *state, void *data) {
     YesNoEvent *yesNo = data;
 
     FieldScriptEnv_GetScriptWork(yesNo->env);
     switch (*state) {
-    case 0:
+    case YES_NO_STATE_START:
         FieldScriptEnv_SetWaitCounter(yesNo->env, 1);
         (*state)++;
-    case 1:
+    case YES_NO_STATE_WAIT:
         if (FieldScriptEnv_UpdateWaitCounter(yesNo->env) == TRUE) {
             yesNo->window = MsgBGPrinter_CreateYesNoMenu(
                 Field_GetMsgBGSys(GSYS_GetField(FieldScriptEnv_GetGameSystem(yesNo->env))), 0);
             (*state)++;
         }
         break;
-    case 2:
+    case YES_NO_STATE_SELECT:
         switch (MsgBGPrinter_YesNoMenuMain(yesNo->window)) {
-        case 0:
+        case MSGBG_YES_NO_YES:
             *yesNo->result = FALSE;
             (*state)++;
             break;
-        case 2:
+        case MSGBG_YES_NO_WAITING:
             break;
         default:
             *yesNo->result = TRUE;
@@ -50,7 +65,7 @@ static GameEventReturnCode ScrcmdMsgwin_YesNoEventMain(GameEvent *event, u32 *st
             break;
         }
         break;
-    case 3:
+    case YES_NO_STATE_END:
         MsgBGPrinter_DeleteMenuFunc(yesNo->window);
         return GAMEEVENT_DONE;
     }
@@ -79,16 +94,16 @@ static GameEventReturnCode ListMenuEvent_Callback(GameEvent *event, u32 *state, 
     BOOL done;
 
     switch (*state) {
-    case 0:
+    case LIST_MENU_STATE_START:
         FieldScriptEnv_SetWaitCounter(menu->env, 1);
         (*state)++;
-    case 1:
+    case LIST_MENU_STATE_WAIT:
         if (FieldScriptEnv_UpdateWaitCounter(menu->env) == TRUE) {
             FieldScriptEnv_ShowListMenu(menu->env);
             (*state)++;
         }
         break;
-    case 2:
+    case LIST_MENU_STATE_SELECT:
         if (menu->ex) {
             done = FieldScriptEnv_UpdateListMenuEx(menu->env);
         } else {
@@ -120,7 +135,7 @@ BOOL s00AD_ListMenuInitCommon(VM *vm, FieldScriptEnv *env) {
     u8 flags = VM_Read8(vm);
     u16 *result = ScriptWork_GetWkAddr(work, gameData, VM_Read16(vm));
 
-    InitListMenu(env, x, y, cursor, flags, 0, result, ScriptWork_GetWordSet(work), NULL);
+    InitListMenu(env, x, y, cursor, flags, LIST_MENU_ANCHOR_TOP_LEFT, result, ScriptWork_GetWordSet(work), NULL);
     return TRUE;
 }
 
@@ -134,7 +149,7 @@ BOOL s00AE_ListMenu_AnchorTopLeft(VM *vm, FieldScriptEnv *env) {
     u16 *result = ScriptWork_GetWkAddr(work, gameData, VM_Read16(vm));
     WordSet *wordSet = ScriptWork_GetWordSet(work);
 
-    InitListMenu(env, x, y, cursor, flags, 0, result, wordSet, GetFieldScriptMsgData(env));
+    InitListMenu(env, x, y, cursor, flags, LIST_MENU_ANCHOR_TOP_LEFT, result, wordSet, GetFieldScriptMsgData(env));
     return TRUE;
 }
 
@@ -148,7 +163,7 @@ BOOL s00B2_ListMenu_AnchorTopRight(VM *vm, FieldScriptEnv *env) {
     u16 *result = ScriptWork_GetWkAddr(work, gameData, VM_Read16(vm));
     WordSet *wordSet = ScriptWork_GetWordSet(work);
 
-    InitListMenu(env, x, y, cursor, flags, 1, result, wordSet, GetFieldScriptMsgData(env));
+    InitListMenu(env, x, y, cursor, flags, LIST_MENU_ANCHOR_TOP_RIGHT, result, wordSet, GetFieldScriptMsgData(env));
     return TRUE;
 }
 

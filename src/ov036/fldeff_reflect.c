@@ -85,7 +85,7 @@ void ReflectTask_SetActor(MMSys *mmSys, FieldActor *actor, FieldEffects *effects
     params.actor = actor;
     params.mmSys = mmSys;
     params.billboardActorSys = FieldBillboardActor_GetBillboardActorSys(FldActSys_GetFieldBillboardActor(mmSys));
-    params.effect = FieldEffects_GetHandleData(effects, 6);
+    params.effect = FieldEffects_GetHandleData(effects, FLDEFF_REFLECT);
     FieldEffects_TCBCreate(effects, &REFLECT_TASK_VTABLE, NULL, 0, &params, 0);
 }
 
@@ -97,7 +97,7 @@ static void ReflectTask_Init(FieldEffectTask *task, void *data) {
     work->swingSpeed = 0x40;
     work->base = 0;
     work->swing = 0;
-    if (work->params.type == 2) {
+    if (work->params.type == REFLECT_KIND_MIRROR) {
         work->swingSpeed = 0;
     }
     FldAct_GetIdentity(params->actor, &work->identity);
@@ -124,7 +124,7 @@ static void ReflectTask_Update(FieldEffectTask *task, void *data) {
     }
     billboardActorIdx = FldAct_GetBillboardActorIdx(work->params.actor, 0);
     if (!work->created) {
-        if (billboardActorIdx == 0xffff) {
+        if (billboardActorIdx == BILLBOARD_ACTOR_NONE) {
             return;
         }
         {
@@ -137,7 +137,7 @@ static void ReflectTask_Update(FieldEffectTask *task, void *data) {
         }
         work->created = TRUE;
     }
-    if (work->billboardActor[1] != 0xffff) {
+    if (work->billboardActor[1] != BILLBOARD_ACTOR_NONE) {
         if (!work->initialized) {
             FldBillboardActor_GetActorSize(work->params.actor, &x, &y);
             work->base = x;
@@ -162,7 +162,7 @@ static void ReflectTask_Draw(FieldEffectTask *task, void *data) {
     ReflectTask *work = data;
 
     if (FldAct_CheckIdentity(work->params.actor, &work->identity) == 1 && work->created &&
-        work->billboardActor[1] != 0xffff) {
+        work->billboardActor[1] != BILLBOARD_ACTOR_NONE) {
         ReflectTask_UpdateBillboard(work->billboardActor[1], work);
     }
 }
@@ -186,7 +186,7 @@ static void ReflectTask_UpdateBillboard(u16 billboardActorIdx, void *data) {
     BOOL flip;
     s16 rot[4];
 
-    if (billboardActorIdx == 0xffff) {
+    if (billboardActorIdx == BILLBOARD_ACTOR_NONE) {
         return;
     }
     zoneId = Field_GetPlayerStateZoneID(FieldEffects_GetField(work->params.effect->effects));
@@ -212,8 +212,8 @@ static void ReflectTask_UpdateBillboard(u16 billboardActorIdx, void *data) {
     pos.y -= offset.y;
     pos.z -= offset.z;
     pos.y += REFLECT_BILLBOARD_OFFSET_Y[config->billboardSize];
-    if (config->billboardSize == 2) {
-        if (GetTileFlags(GetCachedTileUnderActor(actor)) & 0x40) {
+    if (config->billboardSize == ACTOR_BILLBOARD_SIZE_64) {
+        if (GetTileFlags(GetCachedTileUnderActor(actor)) & TILE_FLAG_REFLECT) {
             pos.y -= 0x3800;
         } else {
             pos.y -= 0x8000;
@@ -257,19 +257,19 @@ static fx32 ReflectTask_GetZoneHeightOffset(u32 zoneId, u32 billboardSize) {
     fx32 offset = 0;
 
     if (zoneId == ZONE_ICIRRUS_CITY || zoneId == ZONE_ROUTE_8) {
-        if (billboardSize == 0) {
+        if (billboardSize == ACTOR_BILLBOARD_SIZE_32) {
             offset = -0x800;
         }
     } else if (zoneId == ZONE_POKEMON_LEAGUE_8) {
-        if (billboardSize == 0) {
+        if (billboardSize == ACTOR_BILLBOARD_SIZE_32) {
             offset = 2 << 10;
         }
     } else if (zoneId == ZONE_ROUTE_10_9) {
-        if (billboardSize == 0) {
+        if (billboardSize == ACTOR_BILLBOARD_SIZE_32) {
             offset = -0x5800;
         }
     } else {
-        if (billboardSize == 0) {
+        if (billboardSize == ACTOR_BILLBOARD_SIZE_32) {
             offset = 6 << 10;
         }
     }
@@ -286,7 +286,7 @@ static void ReflectTask_AdjustJoinAvenueHeight(FieldCamera *camera, u32 zoneId, 
         } else if (FieldCamera_CoordsGetPitch(camera) > 10000) {
             drop -= drop / 2;
         }
-        if (billboardSize == 0) {
+        if (billboardSize == ACTOR_BILLBOARD_SIZE_32) {
             pos->z -= 0xc000;
             pos->y -= drop;
         }

@@ -1440,17 +1440,17 @@ static void FieldActorMovecode_StartMirrorTurn(FieldActor *actor, ActorFaceMemor
     face->dir = dir;
     i %= 4;
     nextDir = sMirrorTurnOrders[face->row][i];
-    if (CheckActorFlag(actor, 8)) {
+    if (CheckActorFlag(actor, ACTOR_FLAG_FACE_DIR_LOCK)) {
         face->hadFlag8 = 1;
     } else {
         face->hadFlag8 = 0;
     }
     CheckSetActorFaceDir(actor, nextDir);
-    SetActorFlag(actor, 8);
+    SetActorFlag(actor, ACTOR_FLAG_FACE_DIR_LOCK);
 }
 
 static void FieldActorMovecode_EndMirrorTurn(FieldActor *actor, ActorFaceMemory *face) {
     if (face->hadFlag8 == 0) {
-        ClearActorFlag(actor, 8);
+        ClearActorFlag(actor, ACTOR_FLAG_FACE_DIR_LOCK);
     }
 }

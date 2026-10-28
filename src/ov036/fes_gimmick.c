@@ -228,7 +228,7 @@ void FesGimmick_BoostPartyLevels(FesGimmick *gimmick, PokeParty *party) {
 
 BOOL hollowFesMissions(FesGimmick *gimmick, u32 id) {
     if (FesGimmick_IsCurrent(gimmick, MISSION_HOLLOW) && FesMissionHollow_IsActive(gimmick) &&
-        RivalSelect_FindEntryIndex(gimmick, id) != 10) {
+        RivalSelect_FindEntryIndex(gimmick, id) != RIVAL_ENTRY_NONE) {
         return TRUE;
     }
     return FALSE;

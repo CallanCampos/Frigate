@@ -34,6 +34,11 @@ GameEvent *CallYButtonShortcutMenu(GameSystem *gsys, Field *field, u16 code);
 GameEventReturnCode EventShortcutChoicePopup_Callback(GameEvent *event, u32 *state, void *data);
 GameEventReturnCode EventShortcutCallDirect_Callback(GameEvent *event, u32 *state, void *data);
 
+// How the menu starts: closed, to slide in, or open, as it comes back from what it called
+enum {
+    SHORTCUT_MENU_START_CLOSED,
+    SHORTCUT_MENU_START_OPEN,
+};
 ShortcutMenuApp *ShortcutMenu_Create(GameData *gameData, u32 mode, ShortcutMenuPos *listPos, HeapID menuHeapId,
                                      HeapID heapId);
 void ShortcutMenu_Delete(ShortcutMenuApp *app);

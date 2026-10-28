@@ -13,6 +13,15 @@
 
 #define GRASS_KIND_COUNT 8
 
+// A step's grass: it shakes, settles on its rest step, and stays until the actor leaves its tile. Grass that isn't
+// animated starts settling
+enum {
+    GRASS_STATE_SHAKE,
+    GRASS_STATE_SETTLE,
+    GRASS_STATE_SETTLED,
+    GRASS_STATE_WAIT_LEAVE,
+};
+
 typedef struct {
     FieldEffects *effects;
     BillboardActorSys *billboardActor;
@@ -148,7 +157,7 @@ void GrassTask_Start(FieldEffects *effects, FieldActor *actor, BOOL animate, int
     fx32 height;
 
     if (kind < GRASS_KIND_COUNT) {
-        params.grass = FieldEffects_GetHandleData(effects, 2);
+        params.grass = FieldEffects_GetHandleData(effects, FLDEFF_GRASS);
         params.actor = actor;
         params.kind = kind;
         params.uid = GetActorUID(actor);
@@ -158,7 +167,7 @@ void GrassTask_Start(FieldEffects *effects, FieldActor *actor, BOOL animate, int
         ConvGXZToVector(params.gx, params.gz, &pos);
         pos.y = GetActorPosY(actor);
         // The step back in z is written in both branches, which sets the registers
-        if (CheckActorFlag(actor, 0x2000)) {
+        if (CheckActorFlag(actor, ACTOR_FLAG_RAIL)) {
             pos.y += FX32_CONST(7);
             pos.z -= FX32_CONST(2);
         } else {
@@ -194,7 +203,7 @@ static void GrassTask_Init(FieldEffectTask *task, void *work) {
     request.callbackData = grassTask;
     billboardActor = grassTask->params.grass->billboardActor;
     grassTask->actorIndex = BillboardActorSys_ExecActorRequests(billboardActor, 0, &request, 1, 0);
-    if (grassTask->actorIndex == 0xffff) {
+    if (grassTask->actorIndex == BILLBOARD_ACTOR_NONE) {
         FieldEffects_DeleteObject(task);
         return;
     }
@@ -203,7 +212,7 @@ static void GrassTask_Init(FieldEffectTask *task, void *work) {
     BillboardActorSys_SetActorAnim(billboardActor, actorIndex, 0);
     BillboardActorSys_SetActorAnimating(billboardActor, actorIndex, TRUE);
     if (FieldEffects_GetObjectMode(task) == FALSE) {
-        grassTask->state = 1;
+        grassTask->state = GRASS_STATE_SETTLE;
     }
     FieldEffects_UpdateObject(task);
 }
@@ -212,7 +221,7 @@ static void GrassTask_Delete(FieldEffectTask *task, void *work) {
     GrassTask *grassTask = work;
     BillboardActorSys *billboardActor = grassTask->params.grass->billboardActor;
 
-    if (grassTask->actorIndex != 0xffff) {
+    if (grassTask->actorIndex != BILLBOARD_ACTOR_NONE) {
         BillboardActorSys_DeleteActors(billboardActor, grassTask->actorIndex, 1);
     }
 }
@@ -223,13 +232,12 @@ static void GrassTask_Update(FieldEffectTask *task, void *work) {
     BillboardActorSys *billboardActor = grassTask->params.grass->billboardActor;
 
     switch (grassTask->state) {
-    case 0:
-        // Shaking
+    case GRASS_STATE_SHAKE:
         if (GRASS_ENDS_ON_LEAVE[grassTask->params.kind] == TRUE) {
             FieldActor *actor = grassTask->params.actor;
 
             if (FldAct_CheckIdentity(actor, &grassTask->identity) == TRUE && !GrassTask_IsActorOnTile(grassTask) &&
-                GetActorMotionDir(actor) == 1) {
+                GetActorMotionDir(actor) == DIR_DOWN) {
                 FieldEffects_DeleteObject(task);
                 return;
             }
@@ -238,8 +246,7 @@ static void GrassTask_Update(FieldEffectTask *task, void *work) {
             grassTask->state++;
         }
         break;
-    case 1:
-        // Settle
+    case GRASS_STATE_SETTLE:
         if (!FldAct_CheckIdentity(grassTask->params.actor, &grassTask->identity)) {
             FieldEffects_DeleteObject(task);
             return;
@@ -247,10 +254,9 @@ static void GrassTask_Update(FieldEffectTask *task, void *work) {
         BillboardActorSys_SetActorStep(billboardActor, grassTask->actorIndex, GRASS_REST_STEPS[grassTask->params.kind]);
         grassTask->state++;
         break;
-    case 2:
+    case GRASS_STATE_SETTLED:
         grassTask->state++;
-    case 3:
-        // Stay until the actor leaves the tile
+    case GRASS_STATE_WAIT_LEAVE:
         if (!FldAct_CheckIdentity(grassTask->params.actor, &grassTask->identity)) {
             FieldEffects_DeleteObject(task);
             return;
@@ -273,7 +279,7 @@ static BOOL GrassTask_IsActorOnTile(GrassTask *grassTask) {
     u8 endsOnLeave = GRASS_ENDS_ON_LEAVE[grassTask->params.kind];
 
     if (grassTask->params.gx != gx || grassTask->params.gz != gz) {
-        if (endsOnLeave == FALSE && GetActorMotionDir(actor) == 0) {
+        if (endsOnLeave == FALSE && GetActorMotionDir(actor) == DIR_UP) {
             gx = FldAct_GetInitGPosX(actor);
             gz = FldAct_GetInitGPosZ(actor);
             if (grassTask->params.gx == gx && grassTask->params.gz == gz) {

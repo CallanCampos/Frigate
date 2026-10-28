@@ -24,7 +24,7 @@ WbtSystem *WbtSystem_Create(HeapID heapId, BOOL a1) {
     sys->round = 0;
     sys->seed = ((u64)GFL_RandomMT() << 32) + GFL_RandomMT();
     MATH_InitRand32(&sys->rand, sys->seed);
-    sys->unk1E = GFL_RandomLC(4);
+    sys->season = GFL_RandomLC(4);
     for (i = 0; i < 8; i++) {
         WbtEntrant_Init(&sys->entrants[i], heapId);
     }

@@ -89,7 +89,8 @@ static GameEventReturnCode EventBtlInstPokeSelect_Callback(GameEvent *event, u32
 
     switch (*state) {
     case 0:
-        GameEvent_ChainNext(event, CallFieldMapEntranceOutTransitionDefault(gsys, work->field, 0, 0));
+        GameEvent_ChainNext(
+            event, CallFieldMapEntranceOutTransitionDefault(gsys, work->field, FIELD_TRANSITION_FADE_BLACK, 0));
         (*state)++;
         break;
     case 1:
@@ -105,7 +106,8 @@ static GameEventReturnCode EventBtlInstPokeSelect_Callback(GameEvent *event, u32
         (*state)++;
         break;
     case 4:
-        GameEvent_ChainNext(event, CallFieldMapEntranceInTransition(gsys, work->field, 0, 0, 1, 0, 0));
+        GameEvent_ChainNext(
+            event, CallFieldMapEntranceInTransition(gsys, work->field, FIELD_TRANSITION_FADE_BLACK, 0, 1, 0, 0));
         MI_CpuCopy8(work->partyParam.picked, work->picked, sizeof(work->partyParam.picked));
         *work->choice = work->partyParam.index;
         *work->result = work->partyParam.result;

@@ -205,7 +205,8 @@ BOOL s008E_CallTrainerBattleEnd(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
 
-    ScriptWork_CallEvent(work, CallFieldMapEntranceInTransition(gsys, GSYS_GetField(gsys), 0, 0, 1, 0, 0));
+    ScriptWork_CallEvent(
+        work, CallFieldMapEntranceInTransition(gsys, GSYS_GetField(gsys), FIELD_TRANSITION_FADE_BLACK, 0, 1, 0, 0));
     return TRUE;
 }
 

@@ -38,9 +38,9 @@ GameEventReturnCode EventFestival_Callback(GameEvent *event, u32 *state, void *d
     case 0: {
         GameEvent *transition;
         if (work->mode == 0) {
-            transition = CallFieldMapEntranceOutTransitionDefault(gsys, field, 0, 0);
+            transition = CallFieldMapEntranceOutTransitionDefault(gsys, field, FIELD_TRANSITION_FADE_BLACK, 0);
         } else {
-            transition = CallFieldMapEntranceOutTransitionDefault(gsys, field, 1, 0);
+            transition = CallFieldMapEntranceOutTransitionDefault(gsys, field, FIELD_TRANSITION_FADE_WHITE, 0);
         }
         GameEvent_ChainNext(event, transition);
         if (GFL_NetIsInitialized() == 1 && Field_GetCommKind(work->comm) == 1 &&
@@ -88,10 +88,10 @@ GameEventReturnCode EventFestival_Callback(GameEvent *event, u32 *state, void *d
     case 6: {
         GameEvent *transition;
         if (work->mode == 0) {
-            transition = CallFieldMapEntranceInTransition(gsys, field, 0, 0, 1, 0, 0);
+            transition = CallFieldMapEntranceInTransition(gsys, field, FIELD_TRANSITION_FADE_BLACK, 0, 1, 0, 0);
         } else {
             FieldSubscreen_ChangeImm(Field_GetSubscreen(field), 0);
-            transition = CallFieldMapEntranceInTransition(gsys, field, 1, 0, 1, 0, 0);
+            transition = CallFieldMapEntranceInTransition(gsys, field, FIELD_TRANSITION_FADE_WHITE, 0, 1, 0, 0);
         }
         GameEvent_ChainNext(event, transition);
         (*state)++;

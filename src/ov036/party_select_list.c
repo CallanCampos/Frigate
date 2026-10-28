@@ -32,8 +32,9 @@ struct PartySelectList {
     PokeParty *playerParty;
     PokeParty *bbox;
     HeapID heapId;
-    int partyOk;
-    int bboxOk;
+    // Set when the team fails the regulation
+    int partyIneligible;
+    int bboxIneligible;
     ClActUnit *unit;
     ClActor *partyIcons[PARTY_SELECT_LIST_MAX];
     ClActor *bboxIcons[PARTY_SELECT_LIST_MAX];
@@ -58,12 +59,19 @@ struct PartySelectList {
     u8 finish;
 };
 
+enum {
+    PARTY_SELECT_STATE_PRINT,
+    PARTY_SELECT_STATE_WAIT_MESSAGE,
+    PARTY_SELECT_STATE_MENU,
+    PARTY_SELECT_STATE_END,
+};
+
 static void PartySelectList_CreateMessages(PartySelectList *psl);
 static void PartySelectList_LoadIconResources(PartySelectList *psl);
 static void PartySelectList_CreateIcons(PartySelectList *psl);
 static void PartySelectList_LoadItemResources(PartySelectList *psl);
 static void PartySelectList_CreateItemIcons(PartySelectList *psl);
-static int PartySelectList_GetResult(PartySelectList *psl, u32 *out);
+static int PartySelectList_GetResult(PartySelectList *psl, u32 *ineligible);
 static void PartySelectList_DeleteItemIcons(PartySelectList *psl);
 static void PartySelectList_FreeItemResources(PartySelectList *psl);
 static void PartySelectList_DeleteIcons(PartySelectList *psl);
@@ -87,9 +95,9 @@ static void PartySelectList_DrawPartyDetails(PartySelectList *psl, PokeParty *pa
 static void PartySelectList_CreatePreviewWindow(PartySelectList *psl);
 
 static const ListMenuRow sPartySelectRows[] = {
-    { Bank0104_Text_Party, { 0 } },
-    { Bank0104_Text_BattleBox, { 1 } },
-    { Bank0104_Text_Cancel, { 2 } },
+    { Bank0104_Text_Party, { PARTY_SELECT_PARTY } },
+    { Bank0104_Text_BattleBox, { PARTY_SELECT_BATTLE_BOX } },
+    { Bank0104_Text_Cancel, { PARTY_SELECT_CANCEL } },
 };
 
 static const ListMenuRequest sPartySelectRequest = {
@@ -108,8 +116,8 @@ static const ListMenuRequest sPartySelectRequest = {
     .height = 6,
 };
 
-PartySelectList *PartySelectList_Create(Field *field, PokeParty *playerParty, PokeParty *bbox, u8 partyOk, u32 bboxOk,
-                                        HeapID heapId) {
+PartySelectList *PartySelectList_Create(Field *field, PokeParty *playerParty, PokeParty *bbox, u8 partyIneligible,
+                                        u32 bboxIneligible, HeapID heapId) {
     PartySelectList *psl;
 
     // GFL_ASSERT written out: the game prints Game Freak's name for playerParty, temoti
@@ -121,8 +129,8 @@ PartySelectList *PartySelectList_Create(Field *field, PokeParty *playerParty, Po
     psl->playerParty = playerParty;
     psl->bbox = bbox;
     psl->heapId = heapId;
-    psl->partyOk = partyOk;
-    psl->bboxOk = bboxOk;
+    psl->partyIneligible = partyIneligible;
+    psl->bboxIneligible = bboxIneligible;
     psl->unit = ClActUnit_Create(32, 10, psl->heapId);
     psl->font = GFL_FontCreate(ARCID_FONT, 3, 0, 0, psl->heapId);
     PartySelectList_CreateMessages(psl);
@@ -133,8 +141,8 @@ PartySelectList *PartySelectList_Create(Field *field, PokeParty *playerParty, Po
     return psl;
 }
 
-int PartySelectList_Delete(PartySelectList *psl, u32 *out) {
-    int result = PartySelectList_GetResult(psl, out);
+int PartySelectList_Delete(PartySelectList *psl, u32 *ineligible) {
+    int result = PartySelectList_GetResult(psl, ineligible);
 
     // clang-format off
     GFL_ASSERT(psl->finish == TRUE);
@@ -152,18 +160,18 @@ int PartySelectList_Delete(PartySelectList *psl, u32 *out) {
 
 BOOL PartySelectList_Main(PartySelectList *psl) {
     switch (psl->state) {
-    case 0:
+    case PARTY_SELECT_STATE_PRINT:
         PartySelectList_CreateMessageWindow(psl);
         PartySelectList_PrintMessage(psl, Bank0104_Text_PleaseSelectWhetherUse);
         psl->state++;
         break;
-    case 1:
+    case PARTY_SELECT_STATE_WAIT_MESSAGE:
         if (PartySelectList_IsMessageDone(psl) == TRUE) {
             PartySelectList_CreateMenu(psl);
             psl->state++;
         }
         break;
-    case 2:
+    case PARTY_SELECT_STATE_MENU:
         if (MsgBGPrinter_IsPrintQueFinished(psl->msgBGSys) == TRUE) {
             u32 result = PartySelectList_UpdateMenu(psl);
 
@@ -171,11 +179,12 @@ BOOL PartySelectList_Main(PartySelectList *psl) {
                 PartySelectList_FreeMenu(psl);
                 PartySelectList_ClearPreview(psl);
                 PartySelectList_FreeMessageWindow(psl);
-                // Unsigned, so the cases are tested in the order 2, BMPMENULIST_CANCEL, BMPMENULIST_NULL
+                // Unsigned, so the cases are tested in the order PARTY_SELECT_CANCEL, BMPMENULIST_CANCEL,
+                // BMPMENULIST_NULL
                 switch (result) {
-                case 2: // Cancel, chosen from the list or with B
+                case PARTY_SELECT_CANCEL: // Chosen from the list or with B
                 case BMPMENULIST_CANCEL:
-                    psl->cursor = 2;
+                    psl->cursor = PARTY_SELECT_CANCEL;
                     psl->state++;
                     break;
                 case BMPMENULIST_NULL:
@@ -195,12 +204,12 @@ BOOL PartySelectList_Main(PartySelectList *psl) {
     return FALSE;
 }
 
-static int PartySelectList_GetResult(PartySelectList *psl, u32 *out) {
-    *out = 0;
-    if (psl->cursor == 0 && psl->partyOk == 1) {
-        *out = 1;
-    } else if (psl->cursor == 1 && psl->bboxOk == 1) {
-        *out = 1;
+static int PartySelectList_GetResult(PartySelectList *psl, u32 *ineligible) {
+    *ineligible = FALSE;
+    if (psl->cursor == PARTY_SELECT_PARTY && psl->partyIneligible == TRUE) {
+        *ineligible = TRUE;
+    } else if (psl->cursor == PARTY_SELECT_BATTLE_BOX && psl->bboxIneligible == TRUE) {
+        *ineligible = TRUE;
     }
     return psl->cursor;
 }
@@ -330,13 +339,13 @@ static void PartySelectList_ShowIcons(PartySelectList *psl, u32 mode) {
             ClActor_SetVisible(psl->bboxIcons[i], FALSE);
         }
     }
-    if (mode == 0) {
+    if (mode == PARTY_SELECT_PARTY) {
         for (i = 0; i < PARTY_SELECT_LIST_MAX; i++) {
             if (psl->partyIcons[i] != NULL) {
                 ClActor_SetVisible(psl->partyIcons[i], TRUE);
             }
         }
-    } else if (mode == 1) {
+    } else if (mode == PARTY_SELECT_BATTLE_BOX) {
         for (i = 0; i < PARTY_SELECT_LIST_MAX; i++) {
             if (psl->bboxIcons[i] != NULL) {
                 ClActor_SetVisible(psl->bboxIcons[i], TRUE);
@@ -432,13 +441,13 @@ static void PartySelectList_ShowItemIcons(PartySelectList *psl, u32 mode) {
             ClActor_SetVisible(psl->bboxItems[i], FALSE);
         }
     }
-    if (mode == 0) {
+    if (mode == PARTY_SELECT_PARTY) {
         for (i = 0; i < PARTY_SELECT_LIST_MAX; i++) {
             if (psl->partyItems[i] != NULL) {
                 ClActor_SetVisible(psl->partyItems[i], TRUE);
             }
         }
-    } else if (mode == 1) {
+    } else if (mode == PARTY_SELECT_BATTLE_BOX) {
         for (i = 0; i < PARTY_SELECT_LIST_MAX; i++) {
             if (psl->bboxItems[i] != NULL) {
                 ClActor_SetVisible(psl->bboxItems[i], TRUE);
@@ -481,7 +490,7 @@ static void PartySelectList_CursorCallback(BmpMenuList *list, s32 value, u8 init
     PartySelectList *psl = BmpMenuList_GetWork(list);
 
     // The party or the Battle Box, and not a negative result
-    if ((u32)value < 2) {
+    if ((u32)value < PARTY_SELECT_CANCEL) {
         PartySelectList_ShowPreview(psl, value);
     } else {
         PartySelectList_ClearPreview(psl);
@@ -491,11 +500,11 @@ static void PartySelectList_CursorCallback(BmpMenuList *list, s32 value, u8 init
 static void PartySelectList_RowColorCallback(BmpMenuList *list, s32 value, u8 y) {
     PartySelectList *psl = BmpMenuList_GetWork(list);
 
-    if (value == 0 && psl->partyOk == 1) {
+    if (value == PARTY_SELECT_PARTY && psl->partyIneligible == TRUE) {
         BmpMenuList_SetOverrideColors(list, 1, 0, 2);
         return;
     }
-    if (value == 1) {
+    if (value == PARTY_SELECT_BATTLE_BOX) {
         BmpMenuList_SetOverrideColors(list, 1, 0, 2);
         return;
     }
@@ -580,7 +589,7 @@ static void PartySelectList_DrawPartyDetails(PartySelectList *psl, PokeParty *pa
 static void PartySelectList_ShowPreview(PartySelectList *psl, u32 mode) {
     PokeParty *party;
 
-    if (mode == 0) {
+    if (mode == PARTY_SELECT_PARTY) {
         party = psl->playerParty;
     } else {
         party = psl->bbox;

@@ -5,6 +5,7 @@
 // GPL-3.0)
 // Additional helper and table names are our descriptive guesses.
 #include "types.h"
+#include "constants/directions.h"
 #include "constants/sound.h"
 #include "field/event_action_call.h"
 #include "field/event_actor_move.h"
@@ -50,19 +51,38 @@ u8 g_ScrEventActorFlags;
 #define EVENT_ACTOR_PARENT (1 << 2)
 #define EVENT_ACTOR_PAIR (1 << 3)
 
+// The route's flags: walk through actors, through blocked tiles, or check only the map's bounds
+#define WALK_ROUTE_FLAG_THROUGH_ACTORS (1 << 0)
+#define WALK_ROUTE_FLAG_THROUGH_BLOCKED (1 << 1)
+#define WALK_ROUTE_FLAG_BOUNDS_ONLY (1 << 2)
+
+// The axis the route walks first
+enum {
+    WALK_ROUTE_AXIS_X,
+    WALK_ROUTE_AXIS_Z,
+};
+
+// The steps toward the destination along an axis: +x, -x, -z and +z
+enum {
+    WALK_ROUTE_STEP_RIGHT,
+    WALK_ROUTE_STEP_LEFT,
+    WALK_ROUTE_STEP_UP,
+    WALK_ROUTE_STEP_DOWN,
+};
+
 // An action command as the walked route writes it
 typedef struct {
     u16 code;
     u16 count;
 } WalkRouteAcmd;
 
-// The route that s024F_ActorWalkRoute has an actor walk: to the tile (x, z), first along x if axis is 0
+// The route that s024F_ActorWalkRoute has an actor walk: to the tile (x, z), first along axis
 typedef struct {
     FieldScriptEnv *env;
     Field *field;
     u16 x;
     u16 z;
-    // Bit 0 walks through actors, bit 1 through blocked tiles, bit 2 checks only the map's bounds
+    // WALK_ROUTE_FLAG_*
     u16 flags;
     // Frames per tile
     u16 speed;
@@ -71,10 +91,10 @@ typedef struct {
 
 static FieldActor *FindScrEnvPlayerActor(FieldScriptEnv *env);
 
-static const u32 ACMD_QUEUE_TURN_N_8F[2] = { ACMD(0x20, 1), ACMD_END };
-static const u32 ACMD_QUEUE_TURN_S_8F[2] = { ACMD(0x21, 1), ACMD_END };
-static const u32 ACMD_QUEUE_TURN_W_8F[2] = { ACMD(0x22, 1), ACMD_END };
-static const u32 ACMD_QUEUE_TURN_E_8F[2] = { ACMD(0x23, 1), ACMD_END };
+static const u32 ACMD_QUEUE_TURN_N_8F[2] = { ACMD(ACMD_STAY_WALK_8F + DIR_UP, 1), ACMD_END };
+static const u32 ACMD_QUEUE_TURN_S_8F[2] = { ACMD(ACMD_STAY_WALK_8F + DIR_DOWN, 1), ACMD_END };
+static const u32 ACMD_QUEUE_TURN_W_8F[2] = { ACMD(ACMD_STAY_WALK_8F + DIR_LEFT, 1), ACMD_END };
+static const u32 ACMD_QUEUE_TURN_E_8F[2] = { ACMD(ACMD_STAY_WALK_8F + DIR_RIGHT, 1), ACMD_END };
 
 static FieldActor *FindScriptActor(FieldScriptEnv *env, u16 id) {
     FieldActor *actor;
@@ -111,54 +131,54 @@ BOOL s0064_ActorCmdExec(VM *vm, FieldScriptEnv *env) {
 static void WriteWalkRouteAcmdCore(WalkRouteAcmd *acmd, u32 dir, u16 *index, u16 count, WalkRoute *route) {
     u32 code;
 
-    // The command that walks up at the speed: the next three walk down, left and right
+    // The command that walks up at the speed, uphill's for 12 and 6 frames: the next three walk down, left and right
     switch (route->speed) {
     case 32:
-        code = 0x4;
+        code = ACMD_WALK_32F;
         break;
     case 16:
-        code = 0x8;
+        code = ACMD_WALK_16F;
         break;
     case 12:
-        code = 0xa7;
+        code = ACMD_WALK_UPHILL_8F;
         break;
     case 8:
-        code = 0xc;
+        code = ACMD_WALK_8F;
         break;
     case 7:
-        code = 0x60;
+        code = ACMD_WALK_7F;
         break;
     case 6:
-        code = 0x4c;
+        code = ACMD_WALK_UPHILL_4F;
         break;
     case 4:
-        code = 0x10;
+        code = ACMD_WALK_4F;
         break;
     case 3:
-        code = 0x50;
+        code = ACMD_WALK_3F;
         break;
     case 2:
-        code = 0x14;
+        code = ACMD_WALK_2F;
         break;
     default:
-        code = 0x8;
+        code = ACMD_WALK_16F;
         break;
     }
     switch (dir) {
-    case 0:
-        acmd[*index].code = code;
+    case DIR_UP:
+        acmd[*index].code = code + DIR_UP;
         acmd[*index].count = count;
         break;
-    case 1:
-        acmd[*index].code = code + 1;
+    case DIR_DOWN:
+        acmd[*index].code = code + DIR_DOWN;
         acmd[*index].count = count;
         break;
-    case 2:
-        acmd[*index].code = code + 2;
+    case DIR_LEFT:
+        acmd[*index].code = code + DIR_LEFT;
         acmd[*index].count = count;
         break;
-    case 3:
-        acmd[*index].code = code + 3;
+    case DIR_RIGHT:
+        acmd[*index].code = code + DIR_RIGHT;
         acmd[*index].count = count;
         break;
     }
@@ -167,16 +187,16 @@ static void WriteWalkRouteAcmdCore(WalkRouteAcmd *acmd, u32 dir, u16 *index, u16
 
 static void AdjustVecByDir(u32 dir, VecFx32 *pos, u16 tiles) {
     switch (dir) {
-    case 0:
+    case DIR_UP:
         pos->z -= GRID_TO_FX32(tiles);
         break;
-    case 1:
+    case DIR_DOWN:
         pos->z += GRID_TO_FX32(tiles);
         break;
-    case 2:
+    case DIR_LEFT:
         pos->x -= GRID_TO_FX32(tiles);
         break;
-    case 3:
+    case DIR_RIGHT:
         pos->x += GRID_TO_FX32(tiles);
         break;
     }
@@ -186,7 +206,7 @@ static BOOL WalkRouteDestPosBlockCheck(WalkRoute *route, VecFx32 pos) {
     FieldG3DMapper *mapper;
     u32 tileFlags;
 
-    if (route->flags & 4) {
+    if (route->flags & WALK_ROUTE_FLAG_BOUNDS_ONLY) {
         mapper = Field_GetG3DMapper(route->field);
         tileFlags = GetTileFlags(GetTileTypeAtPos(mapper, &pos));
         if (FieldG3DMapper_IsPosOutOfBounds(mapper, &pos) == TRUE) {
@@ -195,16 +215,16 @@ static BOOL WalkRouteDestPosBlockCheck(WalkRoute *route, VecFx32 pos) {
         return FALSE;
     }
     mapper = Field_GetG3DMapper(route->field);
-    if (!(route->flags & 2)) {
+    if (!(route->flags & WALK_ROUTE_FLAG_THROUGH_BLOCKED)) {
         tileFlags = GetTileFlags(GetTileTypeAtPos(mapper, &pos));
-        if ((tileFlags & 1) || (tileFlags & 2)) {
+        if ((tileFlags & TILE_FLAG_COLLISION) || (tileFlags & TILE_FLAG_WATER)) {
             return TRUE;
         }
     }
     if (FieldG3DMapper_IsPosOutOfBounds(mapper, &pos) == TRUE) {
         return TRUE;
     }
-    if (!(route->flags & 1)) {
+    if (!(route->flags & WALK_ROUTE_FLAG_THROUGH_ACTORS)) {
         if (GetFirstActorOnGPos(Field_GetActorSystem(route->field), FX32_TO_GRID(pos.x), FX32_TO_GRID(pos.z), TRUE) !=
             NULL) {
             return TRUE;
@@ -225,23 +245,23 @@ static BOOL WalkRoute_Detour(u32 dir, VecFx32 *pos, WalkRouteAcmd *acmd, u16 *in
     start.z = pos->z;
 
     switch (dir) {
-    case 2:
-    case 3:
+    case DIR_LEFT:
+    case DIR_RIGHT:
         for (i = 1;; i++) {
             sideZ = start;
-            AdjustVecByDir(0, &sideZ, i);
+            AdjustVecByDir(DIR_UP, &sideZ, i);
             AdjustVecByDir(dir, &sideZ, 1);
             if (!WalkRouteDestPosBlockCheck(route, sideZ)) {
-                WriteWalkRouteAcmdCore(acmd, 0, index, i, route);
+                WriteWalkRouteAcmdCore(acmd, DIR_UP, index, i, route);
                 WriteWalkRouteAcmdCore(acmd, dir, index, 1, route);
                 VEC_Set(pos, sideZ.x, sideZ.y, sideZ.z);
                 break;
             }
             sideZ = start;
-            AdjustVecByDir(1, &sideZ, i);
+            AdjustVecByDir(DIR_DOWN, &sideZ, i);
             AdjustVecByDir(dir, &sideZ, 1);
             if (!WalkRouteDestPosBlockCheck(route, sideZ)) {
-                WriteWalkRouteAcmdCore(acmd, 1, index, i, route);
+                WriteWalkRouteAcmdCore(acmd, DIR_DOWN, index, i, route);
                 WriteWalkRouteAcmdCore(acmd, dir, index, 1, route);
                 VEC_Set(pos, sideZ.x, sideZ.y, sideZ.z);
                 break;
@@ -251,23 +271,23 @@ static BOOL WalkRoute_Detour(u32 dir, VecFx32 *pos, WalkRouteAcmd *acmd, u16 *in
             }
         }
         break;
-    case 0:
-    case 1:
+    case DIR_UP:
+    case DIR_DOWN:
         for (i = 1;; i++) {
             sideX = start;
-            AdjustVecByDir(2, &sideX, i);
+            AdjustVecByDir(DIR_LEFT, &sideX, i);
             AdjustVecByDir(dir, &sideX, 1);
             if (!WalkRouteDestPosBlockCheck(route, sideX)) {
-                WriteWalkRouteAcmdCore(acmd, 2, index, i, route);
+                WriteWalkRouteAcmdCore(acmd, DIR_LEFT, index, i, route);
                 WriteWalkRouteAcmdCore(acmd, dir, index, 1, route);
                 VEC_Set(pos, sideX.x, sideX.y, sideX.z);
                 break;
             }
             sideX = start;
-            AdjustVecByDir(3, &sideX, i);
+            AdjustVecByDir(DIR_RIGHT, &sideX, i);
             AdjustVecByDir(dir, &sideX, 1);
             if (!WalkRouteDestPosBlockCheck(route, sideX)) {
-                WriteWalkRouteAcmdCore(acmd, 3, index, i, route);
+                WriteWalkRouteAcmdCore(acmd, DIR_RIGHT, index, i, route);
                 WriteWalkRouteAcmdCore(acmd, dir, index, 1, route);
                 VEC_Set(pos, sideX.x, sideX.y, sideX.z);
                 break;
@@ -288,17 +308,17 @@ static void WalkRoute_WriteStep(u32 step, VecFx32 *pos, WalkRouteAcmd *acmd, u16
 
     VEC_Set(&next, pos->x, pos->y, pos->z);
     switch (step) {
-    case 1:
-        dir = 2;
+    case WALK_ROUTE_STEP_LEFT:
+        dir = DIR_LEFT;
         break;
-    case 0:
-        dir = 3;
+    case WALK_ROUTE_STEP_RIGHT:
+        dir = DIR_RIGHT;
         break;
-    case 2:
-        dir = 0;
+    case WALK_ROUTE_STEP_UP:
+        dir = DIR_UP;
         break;
-    case 3:
-        dir = 1;
+    case WALK_ROUTE_STEP_DOWN:
+        dir = DIR_DOWN;
         break;
     }
     AdjustVecByDir(dir, &next, 1);
@@ -320,19 +340,19 @@ static BOOL WalkRoute_ReturnToLine(u32 step, fx32 line, fx32 now, VecFx32 *pos, 
 
     VEC_Set(&next, pos->x, pos->y, pos->z);
     switch (step) {
-    case 0:
-    case 1:
+    case WALK_ROUTE_STEP_RIGHT:
+    case WALK_ROUTE_STEP_LEFT:
         if (diff > 0) {
-            dir = 0;
+            dir = DIR_UP;
         } else {
-            dir = 1;
+            dir = DIR_DOWN;
         }
         break;
-    case 2:
-    case 3:
-        dir = 2;
+    case WALK_ROUTE_STEP_UP:
+    case WALK_ROUTE_STEP_DOWN:
+        dir = DIR_LEFT;
         if (diff <= 0) {
-            dir = 3;
+            dir = DIR_RIGHT;
         }
         break;
     }
@@ -354,13 +374,13 @@ static void WalkRoute_WriteAxis(WalkRouteAcmd *acmd, u16 *index, VecFx32 *pos, V
     fx32 *destAxis;
     fx32 line;
 
-    if (route->axis == 0) {
+    if (route->axis == WALK_ROUTE_AXIS_X) {
         posOther = &pos->z;
         line = pos->z;
         if (dest->x > pos->x) {
-            step = 0;
+            step = WALK_ROUTE_STEP_RIGHT;
         } else {
-            step = 1;
+            step = WALK_ROUTE_STEP_LEFT;
         }
         posAxis = &pos->x;
         destAxis = &dest->x;
@@ -368,9 +388,9 @@ static void WalkRoute_WriteAxis(WalkRouteAcmd *acmd, u16 *index, VecFx32 *pos, V
         line = pos->x;
         posOther = &pos->x;
         if (dest->z > pos->z) {
-            step = 3;
+            step = WALK_ROUTE_STEP_DOWN;
         } else {
-            step = 2;
+            step = WALK_ROUTE_STEP_UP;
         }
         posAxis = &pos->z;
         destAxis = &dest->z;
@@ -401,10 +421,10 @@ static u16 CreateRouteActionQueue(WalkRouteAcmd *acmd, FieldActor *actor, WalkRo
     WalkRouteDestPosBlockCheck(route, dest);
 #endif
     WalkRoute_WriteAxis(acmd, &index, &pos, &dest, route);
-    route->axis = route->axis == 0 ? 1 : 0;
+    route->axis = route->axis == WALK_ROUTE_AXIS_X ? WALK_ROUTE_AXIS_Z : WALK_ROUTE_AXIS_X;
     WalkRoute_WriteAxis(acmd, &index, &pos, &dest, route);
-    // The route ends with 0xfd, not ACMD_END
-    acmd[index].code = 0xfd;
+    // The route ends with ACMD_END_KEEP, not ACMD_END
+    acmd[index].code = ACMD_END_KEEP;
     acmd[index].count = 0;
     return index;
 }
@@ -823,7 +843,7 @@ BOOL s0077_PlayerTurnByTrigger(VM *vm, FieldScriptEnv *env) {
     Field *field = fieldWork->field;
     GameData *gameData = FieldScriptEnv_GetGameData(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
-    u16 dirs[4] = { 0, 1, 2, 3 };
+    u16 dirs[4] = { DIR_UP, DIR_DOWN, DIR_LEFT, DIR_RIGHT };
     EventData *eventData = GameData_GetEventData(gameData);
     EventWork *eventWork = GameData_GetEventWork(gameData);
     FieldPlayer *player = Field_GetPlayer(field);
@@ -851,18 +871,18 @@ BOOL s0077_PlayerTurnByTrigger(VM *vm, FieldScriptEnv *env) {
     faceDir = FieldPlayer_GetFaceDir(player);
 #endif
     if (faceDir != dir) {
-        if (dir == 0) {
+        if (dir == DIR_UP) {
             action = ACMD_QUEUE_TURN_N_8F;
-        } else if (dir == 1) {
+        } else if (dir == DIR_DOWN) {
             action = ACMD_QUEUE_TURN_S_8F;
-        } else if (dir == 2) {
+        } else if (dir == DIR_LEFT) {
             action = ACMD_QUEUE_TURN_W_8F;
-        } else if (dir == 3) {
+        } else if (dir == DIR_RIGHT) {
             action = ACMD_QUEUE_TURN_E_8F;
         } else {
             return FALSE;
         }
-        ScriptWork_CallEvent(work, EventActionCall_Create(gsys, field, 0xff, action));
+        ScriptWork_CallEvent(work, EventActionCall_Create(gsys, field, ACTOR_UID_PLAYER, action));
         return TRUE;
     }
     return FALSE;
@@ -874,20 +894,20 @@ BOOL s0078_PlayerGetExState(VM *vm, FieldScriptEnv *env) {
     u16 *result = ScriptReadVar(vm, env);
 
     switch (FieldPlayer_GetExState(player)) {
-    case 0:
-        *result = 0;
+    case FLD_PLAYER_EXSTATE_NONE:
+        *result = FLD_PLAYER_EXSTATE_NONE;
         break;
-    case 1:
-        *result = 1;
+    case FLD_PLAYER_EXSTATE_CYCLING:
+        *result = FLD_PLAYER_EXSTATE_CYCLING;
         break;
-    case 2:
-        *result = 2;
+    case FLD_PLAYER_EXSTATE_SURF:
+        *result = FLD_PLAYER_EXSTATE_SURF;
         break;
-    case 3:
-        *result = 3;
+    case FLD_PLAYER_EXSTATE_DIVE:
+        *result = FLD_PLAYER_EXSTATE_DIVE;
         break;
     default:
-        *result = 0;
+        *result = FLD_PLAYER_EXSTATE_NONE;
         break;
     }
     return FALSE;
@@ -952,22 +972,22 @@ BOOL s02BE_ActorMoveLinear(VM *vm, FieldScriptEnv *env) {
 
 BOOL s0071_PlayerGetRailPos(VM *vm, FieldScriptEnv *env) {
     FieldActor *actor = FindScrEnvPlayerActor(env);
-    u16 *a = ScriptReadVar(vm, env);
-    u16 *b = ScriptReadVar(vm, env);
-    u16 *c = ScriptReadVar(vm, env);
+    u16 *lineIndex = ScriptReadVar(vm, env);
+    u16 *front = ScriptReadVar(vm, env);
+    u16 *side = ScriptReadVar(vm, env);
 
-    SetWkToActorRailPos(FldAct_GetRailUnit(actor), a, b, c);
+    SetWkToActorRailPos(FldAct_GetRailUnit(actor), lineIndex, front, side);
     return FALSE;
 }
 
 BOOL s0072_ActorGetRailPos(VM *vm, FieldScriptEnv *env) {
     MMSys *mmSys = GetScrEnvActorSys(env);
     FieldActor *actor = FindFieldActor(mmSys, ScriptReadAny(vm, env));
-    u16 *a = ScriptReadVar(vm, env);
-    u16 *b = ScriptReadVar(vm, env);
-    u16 *c = ScriptReadVar(vm, env);
+    u16 *lineIndex = ScriptReadVar(vm, env);
+    u16 *front = ScriptReadVar(vm, env);
+    u16 *side = ScriptReadVar(vm, env);
 
-    SetWkToActorRailPos(FldAct_GetRailUnit(actor), a, b, c);
+    SetWkToActorRailPos(FldAct_GetRailUnit(actor), lineIndex, front, side);
     return FALSE;
 }
 
@@ -985,12 +1005,12 @@ BOOL s007A_ActorPlayRailSlipdown(VM *vm, FieldScriptEnv *env) {
 BOOL s007C_PlayerSetRailPos(VM *vm, FieldScriptEnv *env) {
     RailPosition railPos;
     FieldActor *actor = FindScrEnvPlayerActor(env);
-    u16 a = ScriptReadAny(vm, env);
-    u16 b = ScriptReadAny(vm, env);
-    u16 c = ScriptReadAny(vm, env);
+    u16 lineIndex = ScriptReadAny(vm, env);
+    u16 front = ScriptReadAny(vm, env);
+    u16 side = ScriptReadAny(vm, env);
     RailUnit *unit = FldAct_GetRailUnit(actor);
 
-    RailUnit_SetLineLocation(unit, a, b, c);
+    RailUnit_SetLineLocation(unit, lineIndex, front, side);
     RailUnit_GetRailPos(unit, &railPos);
     SetActorInitedPositionRail(actor, &railPos);
     return FALSE;
@@ -1000,12 +1020,12 @@ BOOL s007D_ActorSetRailPos(VM *vm, FieldScriptEnv *env) {
     RailPosition railPos;
     MMSys *mmSys = GetScrEnvActorSys(env);
     FieldActor *actor = FindFieldActor(mmSys, ScriptReadAny(vm, env));
-    u16 a = ScriptReadAny(vm, env);
-    u16 b = ScriptReadAny(vm, env);
-    u16 c = ScriptReadAny(vm, env);
+    u16 lineIndex = ScriptReadAny(vm, env);
+    u16 front = ScriptReadAny(vm, env);
+    u16 side = ScriptReadAny(vm, env);
     RailUnit *unit = FldAct_GetRailUnit(actor);
 
-    RailUnit_SetLineLocation(unit, a, b, c);
+    RailUnit_SetLineLocation(unit, lineIndex, front, side);
     RailUnit_GetRailPos(unit, &railPos);
     SetActorInitedPositionRail(actor, &railPos);
     return FALSE;

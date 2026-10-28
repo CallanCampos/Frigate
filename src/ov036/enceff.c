@@ -10,6 +10,7 @@
 #include "constants/zones.h"
 #include "field/encounter.h"
 #include "field/encounter_effect.h"
+#include "field/event_wild_battle.h"
 #include "field/field.h"
 #include "field/field_map.h"
 #include "field/field_player.h"
@@ -28,7 +29,6 @@
 
 #define ENCEFF_OVERLAYS 3
 #define MAX_TRAINER_IDS 50
-#define BOXES 24
 
 struct EncEff {
     void *eventData;
@@ -51,6 +51,12 @@ typedef struct {
     u16 *result;
     TrainerIdList ids;
 } CountTrainersEvent;
+
+enum {
+    COUNT_TRAINERS_STATE_PARTY,
+    COUNT_TRAINERS_STATE_BOXES,
+    COUNT_TRAINERS_STATE_BATTLE_BOX,
+};
 
 static void EncEff_FreeWorkArea(EncEff *encEff);
 static void EncEff_LoadSubOvl(EncEff *encEff, u32 overlayId);
@@ -163,7 +169,8 @@ static void EncEff_UnloadAllSubOverlays(EncEff *encEff) {
     }
 }
 
-void EventBattleCall_DecideEnvWild(s32 species, s32 form, s32 a2, BOOL a3, Field *field, u32 *encEffect, u16 *bgm) {
+void EventBattleCall_DecideEnvWild(s32 species, s32 form, s32 encountMode, BOOL isDouble, Field *field, u32 *encEffect,
+                                   u16 *bgm) {
     u16 zoneId = Field_GetPlayerStateZoneID(field);
     u16 parentZone = GetZoneParentZone(zoneId);
     u32 tileType;
@@ -241,12 +248,12 @@ void EventBattleCall_DecideEnvWild(s32 species, s32 form, s32 a2, BOOL a3, Field
         return;
     }
 
-    if (a2 == 1) {
+    if (encountMode == ENCOUNT_MODE_EFFECT) {
         *bgm = SEQ_BGM_VS_TSUYOPOKE;
         *encEffect = 0x20;
         return;
     }
-    if (a2 == 4) {
+    if (encountMode == ENCOUNT_MODE_FISHING) {
         if (parentZone == ZONE_VICTORY_ROAD_2) {
             *bgm = SEQ_BGM_VS_TSUYOPOKE;
         } else {
@@ -257,11 +264,11 @@ void EventBattleCall_DecideEnvWild(s32 species, s32 form, s32 a2, BOOL a3, Field
     }
     tileType = FieldPlayer_GetTileTypeUnder(Field_GetPlayer(field));
     tileClass = GetTileClass(tileType);
-    if (GetTileFlags(tileType) & 2) {
+    if (GetTileFlags(tileType) & TILE_FLAG_WATER) {
         music = SEQ_BGM_VS_NORAPOKE;
         env = 2;
     } else if (MapTile_IsTallGrass(tileClass)) {
-        if (a3) {
+        if (isDouble) {
             music = SEQ_BGM_VS_TSUYOPOKE;
             env = 1;
         } else {
@@ -298,14 +305,14 @@ void EventBattleCall_DecideEnvTrainer(u32 trainerId, Field *field, u32 *encEffec
     u32 env;
     BOOL exterior = TRUE;
 
-    if (bgmGroup < 14) {
+    if (bgmGroup < NELEMS(SPECIAL_TRAINER_BGM)) {
         *bgm = SPECIAL_TRAINER_BGM[bgmGroup];
         *encEffect = SPECIAL_TRAINER_ENCEFF[special];
         return;
     }
     tileType = FieldPlayer_GetTileTypeUnder(Field_GetPlayer(field));
     tileClass = GetTileClass(tileType);
-    if (GetTileFlags(tileType) & 2) {
+    if (GetTileFlags(tileType) & TILE_FLAG_WATER) {
         env = 6;
     } else if (IsTileSand(tileClass)) {
         env = 8;
@@ -347,24 +354,24 @@ static GameEventReturnCode CountTrainersEvent_Callback(GameEvent *event, u32 *st
 
     gameData = GSYS_GetGameData(GameEvent_GetGameSystem(event));
     switch (*state) {
-    case 0:
+    case COUNT_TRAINERS_STATE_PARTY:
         CountTrainersEvent_ScanParty(count->playerId, gameData, &count->ids);
         (*state)++;
         break;
-    case 1: {
+    case COUNT_TRAINERS_STATE_BOXES: {
         s32 box = count->box;
 
         for (i = 0; i < 2; i++) {
             CountTrainersEvent_ScanBox(count->playerId, gameData, box + i, &count->ids);
             count->box++;
-            if (count->box >= BOXES) {
+            if (count->box >= BOX_MAX_TRAY) {
                 (*state)++;
                 break;
             }
         }
         break;
     }
-    case 2:
+    case COUNT_TRAINERS_STATE_BATTLE_BOX:
         CountTrainersEvent_ScanBattleBox(count->playerId, gameData, 0, &count->ids);
         done = TRUE;
         break;

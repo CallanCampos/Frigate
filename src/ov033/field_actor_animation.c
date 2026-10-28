@@ -88,7 +88,7 @@ void FieldActorAnmProc_Play(FieldActorAnmProc *proc, u16 animation) {
     proc->finished = TRUE;
     proc->animation = animation;
     FieldActorAnmProc_CommitTransform(proc->curve, proc->actor, &proc->pos);
-    SetActorMovementFlag(proc->actor, 0x8000);
+    SetActorMovementFlag(proc->actor, ACTOR_MOVEMENT_FLAG_HIDE_SHADOW);
 }
 
 BOOL FieldActorAnmProc_IsPlaying(FieldActorAnmProc *proc) {
@@ -110,7 +110,7 @@ void FieldActorAnmProc_Update(FieldAsyncProc *asyncProc, Field *field, void *dat
             CopyActorWPos(work->actor, &pos);
             SetActorWPosAll(work->actor, &pos, GetActorFaceDir(work->actor));
             if (FIELD_ACTOR_ANM_IS_ALLOW_MOVE_ON_END[work->animation] != 0) {
-                ClearActorMovementFlag(work->actor, 0x8000);
+                ClearActorMovementFlag(work->actor, ACTOR_MOVEMENT_FLAG_HIDE_SHADOW);
             }
         }
         FldAct_InvokeUpdateCallback(work->actor);

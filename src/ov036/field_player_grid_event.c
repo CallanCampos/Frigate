@@ -7,6 +7,7 @@
 #include "constants/sound.h"
 #include "field/encounter.h"
 #include "field/field.h"
+#include "field/field_acmd.h"
 #include "field/field_actor.h"
 #include "field/field_effect.h"
 #include "field/field_map.h"
@@ -112,14 +113,20 @@ static GameEvent *FieldPlayerGrid_CheckObjContactEventCore(FieldPlayerGrid *grid
     GameEvent *event = NULL;
     u32 contType = FieldPlayerGrid_GetMoveDirContType(grid, dir);
 
-    if (flags & 1) {
+    if (flags & OBJ_CONTACT_STRENGTH) {
         event = FieldPlayerGrid_CheckStrengthRockPushEvent(grid, dir, contType);
     }
     return event;
 }
 
-// Classifies the tiles in front of a boulder: 0 for free tiles, 1 for a blocking non-hole tile,
-// 2 for a mix of free tiles and holes, and 3 when all tiles are holes
+// What the tiles in front of a boulder are: free, blocked by one that isn't a hole, partly holes, or all holes
+enum {
+    STRENGTH_ROCK_SPACE_FREE,
+    STRENGTH_ROCK_SPACE_BLOCKED,
+    STRENGTH_ROCK_SPACE_PART_HOLE,
+    STRENGTH_ROCK_SPACE_HOLE,
+};
+
 static u32 StrengthRockSpaceCheck(FieldActor *rock, u16 dir, FieldG3DMapper *mapper) {
     VecFx32 pos;
     VecFx32 tilePos;
@@ -145,7 +152,7 @@ static u32 StrengthRockSpaceCheck(FieldActor *rock, u16 dir, FieldG3DMapper *map
             tileClass = GetTileClass(tileType);
             if (MapTile_BlocksCollision(tileType)) {
                 if (!MapTile_IsStrengthHole(tileClass)) {
-                    return 1;
+                    return STRENGTH_ROCK_SPACE_BLOCKED;
                 }
                 hasHole = TRUE;
             } else {
@@ -155,12 +162,12 @@ static u32 StrengthRockSpaceCheck(FieldActor *rock, u16 dir, FieldG3DMapper *map
     }
     if (hasHole == TRUE) {
         if (hasFree == FALSE) {
-            return 3;
+            return STRENGTH_ROCK_SPACE_HOLE;
         } else {
-            return 2;
+            return STRENGTH_ROCK_SPACE_PART_HOLE;
         }
     }
-    return 0;
+    return STRENGTH_ROCK_SPACE_FREE;
 }
 
 static GameEvent *FieldPlayerGrid_CheckStrengthRockPushEvent(FieldPlayerGrid *grid, u16 dir, u32 contType) {
@@ -169,18 +176,19 @@ static GameEvent *FieldPlayerGrid_CheckStrengthRockPushEvent(FieldPlayerGrid *gr
     u32 coll;
     BOOL fillsHole;
 
-    if (contType == 1) {
+    if (contType == MOVE_DIR_CONT_MOVE) {
         rock = FieldPlayerGrid_FindFrontActor(grid, dir);
         if (rock != NULL && IsNPCStrengthRock(FldAct_GetObjCode(rock)) == TRUE) {
             space = StrengthRockSpaceCheck(
                 rock, dir, Field_GetG3DMapper(FieldPlayerCore_GetField(FieldPlayerGrid_GetPlayerCore(grid))));
-            coll = ActorRouteCollCheckOneTileInDir(rock, dir) & ~1;
-            if ((coll & 2) && space - 2 <= 1) {
-                coll &= ~2;
+            coll = ActorRouteCollCheckOneTileInDir(rock, dir) & ~ACTOR_COLL_WALK_AREA;
+            if ((coll & ACTOR_COLL_BLOCKED) &&
+                (space == STRENGTH_ROCK_SPACE_PART_HOLE || space == STRENGTH_ROCK_SPACE_HOLE)) {
+                coll &= ~ACTOR_COLL_BLOCKED;
             }
             if (coll == 0) {
                 fillsHole = FALSE;
-                if (space == 3) {
+                if (space == STRENGTH_ROCK_SPACE_HOLE) {
                     fillsHole = TRUE;
                 }
                 return EventStrengthRockPush_Create(grid, dir, rock, fillsHole);
@@ -205,6 +213,16 @@ static GameEvent *EventStrengthRockPush_Create(FieldPlayerGrid *grid, u16 dir, F
     return event;
 }
 
+// The steps of a boulder's push: push it a tile, then let it fall into the hole if it fills one, and shake it until it
+// settles there
+enum {
+    STRENGTH_PUSH_STATE_START,
+    STRENGTH_PUSH_STATE_WAIT_PUSH,
+    STRENGTH_PUSH_STATE_FALL,
+    STRENGTH_PUSH_STATE_SETTLE,
+    STRENGTH_PUSH_STATE_END,
+};
+
 static GameEventReturnCode EventStrengthRockPush_Callback(GameEvent *event, u32 *state, void *data) {
     StrengthRockPushEvent *push = data;
     VecFx32 holePos;
@@ -212,27 +230,27 @@ static GameEventReturnCode EventStrengthRockPush_Callback(GameEvent *event, u32 
     VecFx32 settlePos;
 
     switch (*state) {
-    case 0:
+    case STRENGTH_PUSH_STATE_START:
         if (!IsAllActorAcmdFinished(push->rock)) {
             break;
         }
         if (!IsAllActorAcmdFinished(push->player) && !FieldPlayerGrid_StopTurnOrBlocked(push->grid)) {
             break;
         }
-        FldAct_SetAcmd(push->rock, GetAcmdForDir(push->dir, 8));
-        FldAct_SetAcmd(push->player, GetAcmdForDir(push->dir, 0x20));
+        FldAct_SetAcmd(push->rock, GetAcmdForDir(push->dir, ACMD_WALK_16F));
+        FldAct_SetAcmd(push->player, GetAcmdForDir(push->dir, ACMD_STAY_WALK_8F));
         GFL_SndSEPlay(SEQ_SE_FLD_03);
         (*state)++;
         break;
-    case 1:
+    case STRENGTH_PUSH_STATE_WAIT_PUSH:
         if (!FldAct_CheckAcmdEnd(push->rock)) {
             break;
         }
         if (!FldAct_CheckAcmdEnd(push->player)) {
             break;
         }
-        if (push->fillsHole == 0) {
-            *state = 4;
+        if (push->fillsHole == FALSE) {
+            *state = STRENGTH_PUSH_STATE_END;
             break;
         }
         CopyActorWPos(push->rock, &holePos);
@@ -247,7 +265,7 @@ static GameEventReturnCode EventStrengthRockPush_Callback(GameEvent *event, u32 
         GFL_SndSEPlay(SEQ_SE_FLD_04);
         (*state)++;
         break;
-    case 2:
+    case STRENGTH_PUSH_STATE_FALL:
         CopyActorWPos(push->rock, &fallPos);
         if (push->height < fallPos.y) {
             fallPos.y -= FX32_CONST(4);
@@ -266,7 +284,7 @@ static GameEventReturnCode EventStrengthRockPush_Callback(GameEvent *event, u32 
             (*state)++;
         }
         break;
-    case 3:
+    case STRENGTH_PUSH_STATE_SETTLE:
         FldAct_SetOuterDrawOffset(push->rock, &push->offset);
         push->offset.y = -push->offset.y;
         push->counter++;
@@ -285,7 +303,7 @@ static GameEventReturnCode EventStrengthRockPush_Callback(GameEvent *event, u32 
             (*state)++;
         }
         break;
-    case 4:
+    case STRENGTH_PUSH_STATE_END:
         return GAMEEVENT_DONE;
     }
     return GAMEEVENT_CONTINUE;
@@ -315,6 +333,16 @@ void FieldSurfTCB_Free(TCB *tcb) {
     GFL_TCBRemove(tcb);
 }
 
+// The steps of the surf: put the Pokémon on the water, wait, jump onto it, change to the surfing form, and stay done
+enum {
+    SURF_STATE_START,
+    SURF_STATE_WAIT,
+    SURF_STATE_JUMP,
+    SURF_STATE_WAIT_JUMP,
+    SURF_STATE_FORM_CHANGE,
+    SURF_STATE_END,
+};
+
 static void FieldSurfTCB_Callback(TCB *tcb, void *work) {
     SurfTCB *surf = work;
     FieldActor *actor = FieldPlayer_GetActor(surf->player);
@@ -330,63 +358,63 @@ static void FieldSurfTCB_Callback(TCB *tcb, void *work) {
     EncountSystem *encounter;
 
     switch (surf->state) {
-    case 0:
+    case SURF_STATE_START:
         dir = GetActorFaceDir(actor);
         gx = GetGPosX(actor);
         gz = GetGPosZ(actor);
         CopyActorWPos(actor, &pos);
         ConvGXZToVector(gx, gz, &pos);
         distance = FX32_CONST(16);
-        if (surf->onSurfEdge == 1) {
+        if (surf->onSurfEdge == TRUE) {
             distance *= 2;
         }
         ExpandVecInGridDir(dir, &pos, distance);
         height = 0;
         GetHeightFromMap(actor, &pos, &height);
         pos.y = height;
-        task = FldeffSurfPokemon_Start(Field_GetFieldEffects(surf->field), dir, &pos, actor, 0);
+        task = FldeffSurfPokemon_Start(Field_GetFieldEffects(surf->field), dir, &pos, actor, SURF_POKEMON_FOLLOW_NONE);
         FieldPlayer_SetRideEffect(surf->player, task);
         encounter = Field_GetEncountSystem(surf->field);
         gridPos[0] = HEIGHT_TO_GRID(pos.x);
         gridPos[1] = HEIGHT_TO_GRID(pos.y);
         gridPos[2] = HEIGHT_TO_GRID(pos.z);
         if (EncountState_CheckSpecialEncountPos(encounter, gridPos)) {
-            EffectEncount_SetEffectHidden(encounter, 1);
+            EffectEncount_SetEffectHidden(encounter, TRUE);
         }
         surf->state++;
         break;
-    case 1:
+    case SURF_STATE_WAIT:
         surf->counter++;
         if (surf->counter > 15) {
             surf->state++;
         }
         break;
-    case 2:
+    case SURF_STATE_JUMP:
         dir = GetActorFaceDir(actor);
-        acmd = GetAcmdForDir(dir, 0x34);
-        if (surf->onSurfEdge == 1) {
-            acmd = GetAcmdForDir(dir, 0x38);
+        acmd = GetAcmdForDir(dir, ACMD_JUMP_1);
+        if (surf->onSurfEdge == TRUE) {
+            acmd = GetAcmdForDir(dir, ACMD_JUMP_2);
         }
         FldAct_SetAcmd(actor, acmd);
         surf->state++;
         break;
-    case 3:
+    case SURF_STATE_WAIT_JUMP:
         if (!FldAct_CheckAcmdEnd(actor)) {
             break;
         }
         FldAct_EndAcmd(actor);
-        FldeffSurfPokemon_SetFollowMode(FieldPlayer_GetRideEffect(surf->player), 1);
+        FldeffSurfPokemon_SetFollowMode(FieldPlayer_GetRideEffect(surf->player), SURF_POKEMON_FOLLOW_BOB);
         FieldPlayer_SetSpecialSeq(surf->player, 4);
         surf->state++;
         // fall through
-    case 4:
+    case SURF_STATE_FORM_CHANGE:
         if (FieldPlayer_StepFormChange(surf->player) == TRUE) {
             FieldPlayer_SetGridHopLanded(surf->player);
             surf->finished = TRUE;
             surf->state++;
         }
         break;
-    case 5:
+    case SURF_STATE_END:
         break;
     }
 }
@@ -460,13 +488,13 @@ static BOOL FieldPlayerGrid_JumpUpStart(WaterfallTCB *waterfall) {
     waterfall->stepY = FX32_CONST(6);
     waterfall->shake.y = FX32_ONE;
     task = FieldPlayer_GetRideEffect(waterfall->player);
-    FldeffSurfPokemon_SetFollowMode(task, 2);
+    FldeffSurfPokemon_SetFollowMode(task, SURF_POKEMON_FOLLOW_KEEP_OFFSET);
     kind = 1;
-    if ((u16)(waterfall->dir + 0xfffe) <= 1) {
+    if (waterfall->dir == DIR_LEFT || waterfall->dir == DIR_RIGHT) {
         kind = 3;
     }
     effects = Field_GetFieldEffects(waterfall->field);
-    effectId = 8;
+    effectId = FLDEFF_SURF_POKEMON_SPLASH;
     FieldEffects_Load(effects, &effectId, 1);
     waterfall->splash = FldeffSurfPokemonSplash_StartOnEffect(effects, kind, task);
     FieldCameraZoomTCB_Create(waterfall->field, 16, FX32_CONST(32));
@@ -494,7 +522,7 @@ static BOOL FieldPlayerGrid_JumpUpApproach(WaterfallTCB *waterfall) {
         FieldEffects_DeleteObject(waterfall->splash);
         task = FieldPlayer_GetRideEffect(waterfall->player);
         kind = 2;
-        if ((u16)(waterfall->dir + 0xfffe) <= 1) {
+        if (waterfall->dir == DIR_LEFT || waterfall->dir == DIR_RIGHT) {
             kind = 2;
         }
         waterfall->splash = FldeffSurfPokemonSplash_StartOnEffect(Field_GetFieldEffects(waterfall->field), kind, task);
@@ -573,7 +601,7 @@ static BOOL FieldPlayerGrid_JumpUpLand(WaterfallTCB *waterfall) {
     FldAct_SetHeightCalcDisabled(actor, FALSE);
     SetActorWPosAll(actor, &waterfall->dest, waterfall->dir);
     task = FieldPlayer_GetRideEffect(waterfall->player);
-    FldeffSurfPokemon_SetFollowMode(task, 1);
+    FldeffSurfPokemon_SetFollowMode(task, SURF_POKEMON_FOLLOW_BOB);
     waterfall->splash = FldeffSurfPokemonSplash_StartOnEffect(Field_GetFieldEffects(waterfall->field), 0, task);
     GFL_SndSEPlay(SEQ_SE_FLD_83);
     waterfall->state++;
@@ -586,13 +614,21 @@ static BOOL FieldPlayerGrid_JumpUpWaitEffect(WaterfallTCB *waterfall) {
     if (waterfall->splash != NULL && FldeffSurfPokemonSplash_IsFinished(waterfall->splash) == TRUE) {
         effects = Field_GetFieldEffects(waterfall->field);
         FieldEffects_DeleteObject(waterfall->splash);
-        FieldEffects_FreeEffect(effects, 8);
+        FieldEffects_FreeEffect(effects, FLDEFF_SURF_POKEMON_SPLASH);
         FieldPlayer_SetGridHopLanded(waterfall->player);
         waterfall->splash = NULL;
         waterfall->finished = TRUE;
     }
     return FALSE;
 }
+
+// The steps of going down a waterfall: start the splash, move to its edge, drop to the foot and move off onto the water
+enum {
+    WATERFALL_DOWN_START,
+    WATERFALL_DOWN_APPROACH,
+    WATERFALL_DOWN_DROP,
+    WATERFALL_DOWN_LAND,
+};
 
 static void FieldPlayerGrid_UpdateJumpDown(WaterfallTCB *waterfall) {
     FieldActor *actor = FieldPlayer_GetActor(waterfall->player);
@@ -607,7 +643,7 @@ static void FieldPlayerGrid_UpdateJumpDown(WaterfallTCB *waterfall) {
     u32 effectId;
 
     switch (waterfall->state) {
-    case 0:
+    case WATERFALL_DOWN_START:
         FldAct_SetHeightCalcDisabled(actor, TRUE);
         CopyActorWPos(actor, &startPos);
         posA = startPos;
@@ -625,21 +661,21 @@ static void FieldPlayerGrid_UpdateJumpDown(WaterfallTCB *waterfall) {
         waterfall->stepY = -0x6000;
         waterfall->shake.y = FX32_ONE;
         task = FieldPlayer_GetRideEffect(waterfall->player);
-        FldeffSurfPokemon_SetFollowMode(task, 2);
+        FldeffSurfPokemon_SetFollowMode(task, SURF_POKEMON_FOLLOW_KEEP_OFFSET);
         FldeffSurfPokemon_SetWakeEnabled(task, FALSE);
         kind = 1;
-        if ((u16)(waterfall->dir + 0xfffe) <= 1) {
+        if (waterfall->dir == DIR_LEFT || waterfall->dir == DIR_RIGHT) {
             kind = 3;
         }
         effects = Field_GetFieldEffects(waterfall->field);
-        effectId = 8;
+        effectId = FLDEFF_SURF_POKEMON_SPLASH;
         FieldEffects_Load(effects, &effectId, 1);
         waterfall->splash = FldeffSurfPokemonSplash_StartOnEffect(effects, kind, task);
         FieldCameraZoomTCB_Create(waterfall->field, 16, FX32_CONST(32));
         GFL_SndSEPlay(SEQ_SE_FLD_82);
         waterfall->state++;
         // fall through
-    case 1:
+    case WATERFALL_DOWN_APPROACH:
         CopyActorWPos(actor, &pos);
         pos.x += waterfall->stepX;
         pos.z += waterfall->stepZ;
@@ -653,7 +689,7 @@ static void FieldPlayerGrid_UpdateJumpDown(WaterfallTCB *waterfall) {
             FieldEffects_DeleteObject(waterfall->splash);
             task = FieldPlayer_GetRideEffect(waterfall->player);
             kind = 2;
-            if ((u16)(waterfall->dir + 0xfffe) <= 1) {
+            if (waterfall->dir == DIR_LEFT || waterfall->dir == DIR_RIGHT) {
                 kind = 2;
             }
             waterfall->splash =
@@ -661,7 +697,7 @@ static void FieldPlayerGrid_UpdateJumpDown(WaterfallTCB *waterfall) {
         }
         Waterfall_SetShakeOffset(actor, &waterfall->shake);
         break;
-    case 2:
+    case WATERFALL_DOWN_DROP:
         CopyActorWPos(actor, &pos);
         pos.y += waterfall->stepY;
         if (pos.y <= waterfall->dest.y) {
@@ -672,12 +708,12 @@ static void FieldPlayerGrid_UpdateJumpDown(WaterfallTCB *waterfall) {
             FieldCameraZoomTCB_Create(waterfall->field, 16, -FX32_CONST(32));
             FieldEffects_DeleteObject(waterfall->splash);
             task = FieldPlayer_GetRideEffect(waterfall->player);
-            FldeffSurfPokemon_SetFollowMode(task, 1);
+            FldeffSurfPokemon_SetFollowMode(task, SURF_POKEMON_FOLLOW_BOB);
             waterfall->splash = FldeffSurfPokemonSplash_StartOnEffect(Field_GetFieldEffects(waterfall->field), 0, task);
         }
         SetActorWPosValue(actor, &pos);
         break;
-    case 3:
+    case WATERFALL_DOWN_LAND:
         CopyActorWPos(actor, &pos);
         pos.x += waterfall->stepX;
         pos.z += waterfall->stepZ;
@@ -688,7 +724,7 @@ static void FieldPlayerGrid_UpdateJumpDown(WaterfallTCB *waterfall) {
             FldAct_SetHeightCalcDisabled(actor, FALSE);
             SetActorWPosAll(actor, &waterfall->dest, waterfall->dir);
             FieldEffects_DeleteObject(waterfall->splash);
-            FieldEffects_FreeEffect(effects, 8);
+            FieldEffects_FreeEffect(effects, FLDEFF_SURF_POKEMON_SPLASH);
             FieldPlayer_SetGridHopLanded(waterfall->player);
             FldeffSurfPokemon_SetWakeEnabled(FieldPlayer_GetRideEffect(waterfall->player), TRUE);
             waterfall->splash = NULL;

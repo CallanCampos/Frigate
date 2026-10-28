@@ -122,7 +122,13 @@ typedef struct {
 PokeParty *PokeParty_Create(HeapID heapId);
 void PokeParty_CreateTempPkm(PartyPkm *pkm, u16 species, u16 level, u64 id);
 u32 PokeParty_GetSaveDataSize(void);
-u32 PML_GenPID(u32 seed, u16 species, u16 form, u32 sex, u32 ability, u32 a5);
+// How PML_GenPID treats shininess: never shiny, always shiny, or as the random value falls
+enum {
+    PID_RARE_NEVER,
+    PID_RARE_ALWAYS,
+    PID_RARE_RANDOM,
+};
+u32 PML_GenPID(u32 id, u16 species, u16 form, u32 sex, u32 ability, u32 rare);
 // Whether the personality is shiny for the trainer ID
 BOOL PML_UtilPIDIsRare(u32 id, u32 pid);
 u32 makeSpecialPID(u32 id, u16 species, u16 form, u8 sex, u8 a4, BOOL a5);
@@ -209,7 +215,12 @@ u32 PML_GetPkmRawSize(void);
 void PML_PkmInit(BoxPkm *pkm);
 // Opens the personal archives and empties the cache of the species data read last
 void PML_PersonalInit(HeapID heapId);
-// Which of its species' abilities the Pokémon has: 0, 1, or 2 for the hidden one
+// Which of its species' abilities the Pokémon has: the first, the second or the hidden one
+enum {
+    ABILITY_SLOT_1,
+    ABILITY_SLOT_2,
+    ABILITY_SLOT_HIDDEN,
+};
 u8 getParentAbilSlotNumber(PartyPkm *pkm);
 // Restore the PP of the Pokémon's moves
 void PokeParty_PPRecover(PartyPkm *pkm);

@@ -46,7 +46,15 @@ BOOL Misc_GetFlag(RivalDataSave *data, int flag);
 HollowRivalSave *Misc_GetHollowRival(RivalDataSave *data);
 void Misc_SetFlag(RivalDataSave *data, int flag);
 
-// The kind of thing in a Hidden Hollow, 0 when it is empty
+// The kind of thing in a Hidden Hollow's slot: nothing, a Pokémon, an item in a ball, or a hidden item
+enum {
+    HOLLOW_SLOT_TYPE_EMPTY,
+    HOLLOW_SLOT_TYPE_POKEMON,
+    HOLLOW_SLOT_TYPE_ITEM,
+    HOLLOW_SLOT_TYPE_HIDDEN_ITEM,
+};
+
+// The kind of thing in a Hidden Hollow, a HOLLOW_SLOT_TYPE_ value
 u32 getTypeOfFilledSlot(RivalDataSave *data, u32 hollow);
 void setSlot(RivalDataSave *data, u32 hollow, u16 slot);
 void setGroup(RivalDataSave *data, u32 hollow, u16 group);

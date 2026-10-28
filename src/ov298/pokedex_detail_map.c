@@ -454,7 +454,7 @@ static u8 sPokedexDetailMapKindRects[HABITAT_KIND_COUNT][4] = {
 
 void PokedexDetailMap_InitParam(PokedexDetailMapParam *param, HeapID heapId) {
     param->heapId = heapId;
-    param->place = POKEDEX_DETAIL_MAP_NO_PLACE;
+    param->place = ZONE_MAX;
 }
 
 static BOOL PokedexDetailMap_Init(PokedexDetailProcSys *sys, int *seq, void *param_, void *work,
@@ -2438,7 +2438,7 @@ static void PokedexDetailMap_UpdateButton(PokedexDetailMapParam *param, PokedexD
     PokeDexSave *pokedex = GameData_GetPokedex(PokedexDetailCommon_GetGameData(common));
     PokedexDetailTouchbar *touchbar = PokedexDetailCommon_GetTouchbar(common);
 
-    param->place = POKEDEX_DETAIL_MAP_NO_PLACE;
+    param->place = ZONE_MAX;
     if (show == TRUE) {
         if (PokeDex_IsHabitatListEnabled(pokedex) == TRUE) {
             ClActor_SetVisible(wk->actors[ACTOR_BUTTON], FALSE);

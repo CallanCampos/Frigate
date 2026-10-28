@@ -124,8 +124,8 @@ GameEventReturnCode EventFieldAppCall_Callback(GameEvent *event, u32 *state, voi
         }
         break;
     case 6:
-        GameEvent_ChainNext(
-            event, CallFieldMapEntranceOutTransitionDefault(work->input->gameSystem, work->input->field, 0, 0));
+        GameEvent_ChainNext(event, CallFieldMapEntranceOutTransitionDefault(work->input->gameSystem, work->input->field,
+                                                                            FIELD_TRANSITION_FADE_BLACK, 0));
         *state = 7;
         break;
     case 7:
@@ -147,8 +147,8 @@ GameEventReturnCode EventFieldAppCall_Callback(GameEvent *event, u32 *state, voi
         break;
     case 10:
         if (FieldAppCallParam_CanRetry(&work->params)) {
-            GameEvent_ChainNext(
-                event, CallFieldMapEntranceInTransition(work->input->gameSystem, work->input->field, 0, 0, 0, 0, 0));
+            GameEvent_ChainNext(event, CallFieldMapEntranceInTransition(work->input->gameSystem, work->input->field,
+                                                                        FIELD_TRANSITION_FADE_BLACK, 0, 0, 0, 0));
             *state = 1;
         }
         break;

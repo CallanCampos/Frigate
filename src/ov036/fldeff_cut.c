@@ -20,6 +20,25 @@
 
 #define CUT_ANM_COUNT 3
 
+// What s01DD_BroadcastGameBeacon broadcasts, each by its GameBeacon_Broadcast function
+enum {
+    BEACON_COMMAND_FOUND_ITEM,
+    BEACON_COMMAND_FIELD_MOVE,
+    BEACON_COMMAND_UNION_ROOM_RECEPTION,
+    BEACON_COMMAND_BATTLE_INSTITUTE_CHALLENGE,
+    BEACON_COMMAND_BATTLE_INSTITUTE_RANK,
+    BEACON_COMMAND_POKE_TRANSFER,
+    BEACON_COMMAND_BATTLE_SUBWAY_CHALLENGE,
+    BEACON_COMMAND_BATTLE_SUBWAY_WIN_STREAK,
+    BEACON_COMMAND_BATTLE_SUBWAY_TROPHY,
+    BEACON_COMMAND_TOURNAMENT_CHALLENGE,
+    BEACON_COMMAND_TOURNAMENT_WIN,
+    BEACON_COMMAND_TOURNAMENT_LOSS,
+    BEACON_COMMAND_AREA_CHALLENGE,
+    BEACON_COMMAND_AREA_CLEARED,
+    BEACON_COMMAND_POKESTAR_SHOOTING,
+};
+
 typedef struct {
     FieldEffects *effects;
     G3DResource *mdlRes;
@@ -103,7 +122,7 @@ void FldeffCut_Start(FieldActor *actor, FieldEffects *effects) {
         pos.x += FX32_CONST(16);
         break;
     }
-    params.effect = FieldEffects_GetHandleData(effects, 11);
+    params.effect = FieldEffects_GetHandleData(effects, FLDEFF_CUT);
     params.pos = pos;
     FieldEffects_TCBCreate(effects, &CUT_TASK_VTABLE, NULL, 0, &params, 0);
 }
@@ -186,49 +205,49 @@ BOOL s01DD_BroadcastGameBeacon(VM *vm, FieldScriptEnv *env) {
     zoneId = GetScriptEnvZoneID(env);
 
     switch (command) {
-    case 0:
+    case BEACON_COMMAND_FOUND_ITEM:
         GameBeacon_BroadcastFoundItem(value);
         break;
-    case 1:
+    case BEACON_COMMAND_FIELD_MOVE:
         GameBeacon_BroadcastFieldMove(value);
         break;
-    case 2:
+    case BEACON_COMMAND_UNION_ROOM_RECEPTION:
         GameBeacon_BroadcastUnionRoomReception();
         break;
-    case 3:
+    case BEACON_COMMAND_BATTLE_INSTITUTE_CHALLENGE:
         GameBeacon_BroadcastBattleInstituteChallenge();
         break;
-    case 4:
+    case BEACON_COMMAND_BATTLE_INSTITUTE_RANK:
         GameBeacon_BroadcastBattleInstituteRank(value);
         break;
-    case 5:
+    case BEACON_COMMAND_POKE_TRANSFER:
         GameBeacon_BroadcastPokeTransfer();
         break;
-    case 6:
+    case BEACON_COMMAND_BATTLE_SUBWAY_CHALLENGE:
         GameBeacon_BroadcastBattleSubwayChallenge();
         break;
-    case 7:
+    case BEACON_COMMAND_BATTLE_SUBWAY_WIN_STREAK:
         GameBeacon_BroadcastBattleSubwayWinStreak(value);
         break;
-    case 8:
+    case BEACON_COMMAND_BATTLE_SUBWAY_TROPHY:
         GameBeacon_BroadcastBattleSubwayTrophy();
         break;
-    case 9:
+    case BEACON_COMMAND_TOURNAMENT_CHALLENGE:
         GameBeacon_BroadcastTournamentChallenge(value);
         break;
-    case 10:
+    case BEACON_COMMAND_TOURNAMENT_WIN:
         GameBeacon_BroadcastTournamentWin(value, extra);
         break;
-    case 11:
+    case BEACON_COMMAND_TOURNAMENT_LOSS:
         GameBeacon_BroadcastTournamentLoss(value, extra);
         break;
-    case 12:
+    case BEACON_COMMAND_AREA_CHALLENGE:
         GameBeacon_BroadcastAreaChallenge(value, zoneId);
         break;
-    case 13:
+    case BEACON_COMMAND_AREA_CLEARED:
         GameBeacon_BroadcastAreaCleared(value, zoneId);
         break;
-    case 14:
+    case BEACON_COMMAND_POKESTAR_SHOOTING:
         GameBeacon_BroadcastPokestarShooting(value);
         break;
     }

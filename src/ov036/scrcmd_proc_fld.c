@@ -30,8 +30,6 @@
 #include "system/game_system.h"
 #include "system/vm.h"
 
-#define BOX2_MODE_BATTLE_BOX 4
-
 // What the PC Box's callback stores its result from
 typedef struct {
     GameData *gameData;
@@ -49,10 +47,10 @@ typedef struct {
 static void ScrcmdProcFld_FinishPlaceSelect(void *work);
 static void ScrcmdProcFld_FreeXTransceiverParam(void *work);
 
-// Store the Battle Box's team when it was edited, and whether the player picked a Pokémon
+// Store the Battle Box's team when it was edited, and whether the player closed the PC Box rather than backed out
 static void ScrcmdProcFld_FinishOv170Event(void *data) {
     PCCallWork *work = data;
-    u16 picked;
+    u16 closed;
 
     if (work->param->mode == BOX2_MODE_BATTLE_BOX) {
         BattleBoxSave *battleBox = getBattleBox(GameData_GetSaveControl(work->gameData));
@@ -62,16 +60,16 @@ static void ScrcmdProcFld_FinishOv170Event(void *data) {
     if (work->param->mode == BOX2_MODE_BATTLE_BOX) {
         GFL_HeapFree(work->param->party);
     }
-    switch (work->param->unk28) {
-    case 0:
+    switch (work->param->closed) {
+    case FALSE:
     default:
-        picked = FALSE;
+        closed = FALSE;
         break;
-    case 1:
-        picked = TRUE;
+    case TRUE:
+        closed = TRUE;
         break;
     }
-    *work->result = picked;
+    *work->result = closed;
     GFL_HeapFree(work->param);
 }
 
@@ -93,14 +91,14 @@ BOOL s014F_CallPC(VM *vm, FieldScriptEnv *env) {
     param->bag = GameData_GetBag(gameData);
     param->playerInfo = GetGameDataPlayerInfo(gameData);
     param->trainerData = getTrainerDataBlkAddress(save);
-    param->unk1C = PokeDex_IsNationalObtained(pokedex);
+    param->isNationalDex = PokeDex_IsNationalObtained(pokedex);
     param->mode = mode;
-    param->unk14 = 0;
+    param->battleBoxLocked = FALSE;
     if (mode == BOX2_MODE_BATTLE_BOX) {
         BattleBoxSave *battleBox = getBattleBox(save);
 
         param->party = convertBoxedPokeSetToParty(battleBox, HEAPID_GAMEEVENT);
-        param->unk14 = BattleBoxSave_CheckFlags(battleBox, 3);
+        param->battleBoxLocked = BattleBoxSave_CheckFlags(battleBox, 3);
     }
     callWork = GFL_HeapAllocate(HEAPID_GAMEEVENT, sizeof(PCCallWork), FALSE, "scrcmd_proc_fld.c", 150);
     callWork->gameData = gameData;
@@ -208,13 +206,13 @@ BOOL s0155_CallXTransceiver(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     Field *field = GSYS_GetField(gsys);
-    u16 a1 = ScriptReadAny(vm, env);
+    u16 scriptId = ScriptReadAny(vm, env);
     u16 a2 = VM_Read16(vm);
     LocalTvtParam *param = GFL_HeapAllocate(HEAPID_GAMEEVENT, sizeof(LocalTvtParam), TRUE, "scrcmd_proc_fld.c", 401);
 
     param->mode = LOCAL_TVT_MODE_SCRIPT;
     param->unk04 = a2;
-    param->scriptId = a1;
+    param->scriptId = scriptId;
     param->gameData = FieldScriptEnv_GetGameData(env);
     param->gsys = gsys;
     ScriptWork_CallEvent(work, EventFieldSubprocessCall_CreateWithCallback(gsys, field, OVERLAY_XTRANSCEIVER,
@@ -293,10 +291,10 @@ BOOL s0285_CallWordSetPokeNameInput(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     WordSet *wordSet = ScriptWork_GetWordSet(work);
-    u16 a1 = ScriptReadAny(vm, env);
-    u16 a2 = ScriptReadAny(vm, env);
+    u16 species = ScriptReadAny(vm, env);
+    u16 form = ScriptReadAny(vm, env);
 
-    ScriptWork_CallEvent(work, EventPokeNameWordSetInput_Create(gsys, a1, a2, ScriptReadVar(vm, env), wordSet));
+    ScriptWork_CallEvent(work, EventPokeNameWordSetInput_Create(gsys, species, form, ScriptReadVar(vm, env), wordSet));
     return TRUE;
 }
 

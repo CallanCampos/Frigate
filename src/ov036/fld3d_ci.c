@@ -84,7 +84,8 @@ typedef struct {
     u8 animation1Count;
     u8 animation2Count;
     u16 dimCapture;
-    u16 fadeSpeed;
+    // The slot of the effect's sound and fade lists in FLD3DCI_SOUND_KEYS and FLD3DCI_FADE_KEYS
+    u16 keyList;
     u32 disableMovement;
     u32 param;
     u32 fogEnabled;
@@ -99,7 +100,8 @@ typedef struct {
     u16 animations1[4];
     u16 animations2[4];
     u16 dimCapture;
-    u16 fadeSpeed;
+    // The slot of the effect's sound and fade lists in FLD3DCI_SOUND_KEYS and FLD3DCI_FADE_KEYS
+    u16 keyList;
 } Fld3DCiFile;
 
 // The data of the event that runs a field effect
@@ -114,9 +116,10 @@ typedef struct {
     u32 sex;
     u32 rare;
     u32 egg;
-    u32 unk14;
-    u16 unk18;
-    u16 unk1a;
+    // Whether the cry plays, the frames before it does, and the frames it plays at full volume before it fades out
+    u32 playCry;
+    u16 cryDelay;
+    u16 cryHold;
     u32 voice;
 } PokeSpriteParam;
 
@@ -191,7 +194,8 @@ struct Fld3DCi {
     u32 actor2Finished;
     GameEventCallback callback;
     Fld3DCiControlFunc control;
-    u32 unk134;
+    // The step of the cut-ins' control, EventFieldEffectCutinSub_ControlEffect
+    u32 controlState;
     u16 frame;
     u16 soundIndex;
     u16 fadeIndex;
@@ -212,14 +216,14 @@ static inline G3DCamera *Fld3DCi_CreateDefaultCamera(const VecFx32 *position, co
 
 #define FIELD_EFFECT_COUNT 117
 
-static const Fld3DCiSoundKey data_ov036_021d1cd0[] = {
+static const Fld3DCiSoundKey FLD3DCI_SOUND_KEYS_06[] = {
     { SEQ_SE_TDEMO_003, 25 },        { SEQ_SE_SW_CI_VSCHAMP_01, 54 },
     { SEQ_SE_SW_CI_VSCHAMP_02, 55 }, { SEQ_SE_SW_CI_VSCHAMP_02, 65 },
     { SEQ_SE_SW_CI_VSCHAMP_03, 89 }, { SEQ_SE_SW_CI_VSCHAMP_04, 90 },
     { SEQ_SE_W009_01, 150 },         { -1 },
 };
 
-static const Fld3DCiSoundKey data_ov036_021d1d10[] = {
+static const Fld3DCiSoundKey FLD3DCI_SOUND_KEYS_33[] = {
     { SEQ_SE_SW_KUSABI_IN_02, 2 },   { SEQ_SE_SW_KUSABI_IN_03, 5 },
     { SEQ_SE_SW_KUSABI_IN_04, 169 }, { SEQ_SE_SW_KUSABI_IN_05, 257 },
     { SEQ_SE_SW_KUSABI_IN_06, 260 }, { SEQ_SE_SW_KUSABI_IN_07, 446 },
@@ -229,7 +233,7 @@ static const Fld3DCiSoundKey data_ov036_021d1d10[] = {
     { SEQ_SE_SW_KUSABI_IN_13, 576 }, { -1 },
 };
 
-static const Fld3DCiSoundKey data_ov036_021d1d80[] = {
+static const Fld3DCiSoundKey FLD3DCI_SOUND_KEYS_34[] = {
     { SEQ_SE_SW_KUSABI_IN_02, 2 },   { SEQ_SE_SW_KUSABI_IN_03, 5 },
     { SEQ_SE_SW_KUSABI_IN_04, 169 }, { SEQ_SE_SW_KUSABI_IN_05, 257 },
     { SEQ_SE_SW_KUSABI_IN_06, 260 }, { SEQ_SE_SW_KUSABI_IN_07, 446 },
@@ -239,29 +243,29 @@ static const Fld3DCiSoundKey data_ov036_021d1d80[] = {
     { SEQ_SE_SW_KUSABI_IN_13, 576 }, { -1 },
 };
 
-// The sound effects of each effect, by its fade speed. Declared before the fades, which puts the two tables in the
+// The sound effects of each effect, by its key list. Declared before the fades, which puts the two tables in the
 // ROM's order in MWCC's size sort of the file's data
-static const Fld3DCiSoundKey *const data_ov036_021d1e80[] = {
-    data_ov036_021d17ac, data_ov036_021d17b4, data_ov036_021d17bc, data_ov036_021d1c0c, data_ov036_021d1980,
-    data_ov036_021d1990, data_ov036_021d1cd0, data_ov036_021d1a98, data_ov036_021d1b54, data_ov036_021d1b7c,
-    data_ov036_021d1a40, data_ov036_021d19a0, data_ov036_021d19b0, data_ov036_021d19c0, data_ov036_021d19d0,
-    data_ov036_021d1794, data_ov036_021d179c, data_ov036_021d1a58, data_ov036_021d1ba4, data_ov036_021d19f8,
-    data_ov036_021d17c4, data_ov036_021d17a4, data_ov036_021d1bd4, data_ov036_021d17cc, data_ov036_021d178c,
-    data_ov036_021d1784, data_ov036_021d1960, data_ov036_021d1a10, data_ov036_021d1970, data_ov036_021d1adc,
-    data_ov036_021d1a78, data_ov036_021d1b04, data_ov036_021d1b2c, data_ov036_021d1d10, data_ov036_021d1d80,
-    data_ov036_021d1a28,
+static const Fld3DCiSoundKey *const FLD3DCI_SOUND_KEYS[] = {
+    FLD3DCI_SOUND_KEYS_00, FLD3DCI_SOUND_KEYS_01, FLD3DCI_SOUND_KEYS_02, FLD3DCI_SOUND_KEYS_03, FLD3DCI_SOUND_KEYS_04,
+    FLD3DCI_SOUND_KEYS_05, FLD3DCI_SOUND_KEYS_06, FLD3DCI_SOUND_KEYS_07, FLD3DCI_SOUND_KEYS_08, FLD3DCI_SOUND_KEYS_09,
+    FLD3DCI_SOUND_KEYS_10, FLD3DCI_SOUND_KEYS_11, FLD3DCI_SOUND_KEYS_12, FLD3DCI_SOUND_KEYS_13, FLD3DCI_SOUND_KEYS_14,
+    FLD3DCI_SOUND_KEYS_15, FLD3DCI_SOUND_KEYS_16, FLD3DCI_SOUND_KEYS_17, FLD3DCI_SOUND_KEYS_18, FLD3DCI_SOUND_KEYS_19,
+    FLD3DCI_SOUND_KEYS_20, FLD3DCI_SOUND_KEYS_21, FLD3DCI_SOUND_KEYS_22, FLD3DCI_SOUND_KEYS_23, FLD3DCI_SOUND_KEYS_24,
+    FLD3DCI_SOUND_KEYS_25, FLD3DCI_SOUND_KEYS_26, FLD3DCI_SOUND_KEYS_27, FLD3DCI_SOUND_KEYS_28, FLD3DCI_SOUND_KEYS_29,
+    FLD3DCI_SOUND_KEYS_30, FLD3DCI_SOUND_KEYS_31, FLD3DCI_SOUND_KEYS_32, FLD3DCI_SOUND_KEYS_33, FLD3DCI_SOUND_KEYS_34,
+    FLD3DCI_SOUND_KEYS_35,
 };
 
-// The screen fades of each effect, by its fade speed
-static const Fld3DCiFadeKey *const FLD3DCI_FADE_ANIMATIONS[] = {
-    data_ov036_021d1ab8, data_ov036_021d1918, data_ov036_021d190c, data_ov036_021d181c, data_ov036_021d18f4,
-    data_ov036_021d18c4, data_ov036_021d1c44, data_ov036_021d18d0, data_ov036_021d1834, data_ov036_021d17d4,
-    data_ov036_021d1954, data_ov036_021d1930, data_ov036_021d1894, data_ov036_021d17ec, data_ov036_021d18e8,
-    data_ov036_021d17e0, data_ov036_021d1864, data_ov036_021d18a0, data_ov036_021d17f8, data_ov036_021d1840,
-    data_ov036_021d1948, data_ov036_021d1828, data_ov036_021d1924, data_ov036_021d1870, data_ov036_021d18ac,
-    data_ov036_021d1888, data_ov036_021d184c, data_ov036_021d1900, data_ov036_021d19e0, data_ov036_021d187c,
-    data_ov036_021d1858, data_ov036_021d1804, data_ov036_021d193c, data_ov036_021d1810, data_ov036_021d18b8,
-    data_ov036_021d18dc,
+// The screen fades of each effect, by its key list
+static const Fld3DCiFadeKey *const FLD3DCI_FADE_KEYS[] = {
+    FLD3DCI_FADE_KEYS_00, FLD3DCI_FADE_KEYS_01, FLD3DCI_FADE_KEYS_02, FLD3DCI_FADE_KEYS_03, FLD3DCI_FADE_KEYS_04,
+    FLD3DCI_FADE_KEYS_05, FLD3DCI_FADE_KEYS_06, FLD3DCI_FADE_KEYS_07, FLD3DCI_FADE_KEYS_08, FLD3DCI_FADE_KEYS_09,
+    FLD3DCI_FADE_KEYS_10, FLD3DCI_FADE_KEYS_11, FLD3DCI_FADE_KEYS_12, FLD3DCI_FADE_KEYS_13, FLD3DCI_FADE_KEYS_14,
+    FLD3DCI_FADE_KEYS_15, FLD3DCI_FADE_KEYS_16, FLD3DCI_FADE_KEYS_17, FLD3DCI_FADE_KEYS_18, FLD3DCI_FADE_KEYS_19,
+    FLD3DCI_FADE_KEYS_20, FLD3DCI_FADE_KEYS_21, FLD3DCI_FADE_KEYS_22, FLD3DCI_FADE_KEYS_23, FLD3DCI_FADE_KEYS_24,
+    FLD3DCI_FADE_KEYS_25, FLD3DCI_FADE_KEYS_26, FLD3DCI_FADE_KEYS_27, FLD3DCI_FADE_KEYS_28, FLD3DCI_FADE_KEYS_29,
+    FLD3DCI_FADE_KEYS_30, FLD3DCI_FADE_KEYS_31, FLD3DCI_FADE_KEYS_32, FLD3DCI_FADE_KEYS_33, FLD3DCI_FADE_KEYS_34,
+    FLD3DCI_FADE_KEYS_35,
 };
 
 // The free heap each effect needs; the effects after the 71st need none
@@ -307,8 +311,8 @@ static u32 NNS_G3DResTexGetPltRAMAddress(const NNSG3dResTex *tex, const char *na
 static void NNS_G3DNormalizeName(NNSG3dResName *dest, const char *name);
 static void EventFieldEffect_DimCaptureColor(void);
 static void Fld3DCi_InitEventData(Fld3DCi *ci, Fld3DCiEvent *data);
-static void Fld3DCi_UpdateSound(Fld3DCi *ci, u8 speed);
-static void Fld3DCi_UpdateFade(Fld3DCi *ci, u8 speed);
+static void Fld3DCi_UpdateSound(Fld3DCi *ci, u8 keyList);
+static void Fld3DCi_UpdateFade(Fld3DCi *ci, u8 keyList);
 static void Fld3DCi_DisplayRestoreTask(TCB *tcb, void *work);
 static Fld3DCiFade *Fld3DCiFade_Create(u32 heapId);
 static void Fld3DCi_AllFadeTCB(TCB *tcb, void *work);
@@ -391,7 +395,7 @@ GameEvent *EventFieldEffect_Create(GameSystem *gsys, Fld3DCi *ci, u8 effectId) {
         return NULL;
     }
     ci->particleDone = 0;
-    ci->unk134 = 0;
+    ci->controlState = 0;
     ci->frame = 0;
     ci->soundIndex = 0;
     ci->fadeIndex = 0;
@@ -406,7 +410,7 @@ GameEvent *EventFieldEffect_Create(GameSystem *gsys, Fld3DCi *ci, u8 effectId) {
 
 static GameEvent *EventFieldEffect_CreatePokeSpriteCore(GameSystem *gsys, Fld3DCi *ci, u32 species, u32 form, u32 sex,
                                                         u32 rare, u32 egg) {
-    GameEvent *event = EventFieldEffect_Create(gsys, ci, 3);
+    GameEvent *event = EventFieldEffect_Create(gsys, ci, FLD3DCI_POKE_SPRITE);
     PokeSpriteParam *param;
 
     if (event == NULL) {
@@ -420,9 +424,9 @@ static GameEvent *EventFieldEffect_CreatePokeSpriteCore(GameSystem *gsys, Fld3DC
     param->sex = sex;
     param->rare = rare;
     param->egg = egg;
-    param->unk18 = 5;
-    param->unk14 = 1;
-    param->unk1a = 30;
+    param->cryDelay = 5;
+    param->playCry = TRUE;
+    param->cryHold = 30;
     return event;
 }
 
@@ -471,6 +475,28 @@ GameEvent *EventFieldEffect_CreateBattleCutin(GameSystem *gsys, Fld3DCi *ci, u32
     return event;
 }
 
+// The steps of a field effect: stop the actors and fade out, hide the player flying off or remove the actor Alder flies
+// off with, capture the screen and set the 3D background up, load the scene and run the effect's own event, start it
+// and fade in, wait for the sounds to load, run it until it ends and its fade with it, then free it and restore the
+// display
+enum {
+    FLD3DCI_STATE_START,
+    FLD3DCI_STATE_HIDE_ACTOR,
+    FLD3DCI_STATE_CAPTURE,
+    FLD3DCI_STATE_SETUP_3D,
+    FLD3DCI_STATE_LOAD,
+    FLD3DCI_STATE_CALLBACK,
+    FLD3DCI_STATE_START_SCENE,
+    FLD3DCI_STATE_FADE_IN,
+    FLD3DCI_STATE_WAIT_SOUND,
+    FLD3DCI_STATE_UPDATE,
+    FLD3DCI_STATE_WAIT_FADE,
+    FLD3DCI_STATE_FREE,
+    FLD3DCI_STATE_RESTORE_DISPLAY,
+    FLD3DCI_STATE_WAIT_RESTORE,
+    FLD3DCI_STATE_END,
+};
+
 static GameEventReturnCode EventFieldEffect_Callback(GameEvent *event, u32 *state, void *work) {
     Fld3DCiEvent *data = work;
     Fld3DCi *ci = data->ci;
@@ -478,7 +504,7 @@ static GameEventReturnCode EventFieldEffect_Callback(GameEvent *event, u32 *stat
     Field *field = GSYS_GetField(gsys);
 
     switch (*state) {
-    case 0:
+    case FLD3DCI_STATE_START:
         if (data->scene.disableMovement) {
             DisableAllActorsMovement(Field_GetActorSystem(field));
         }
@@ -489,13 +515,13 @@ static GameEventReturnCode EventFieldEffect_Callback(GameEvent *event, u32 *stat
         }
         (*state)++;
         break;
-    case 1:
+    case FLD3DCI_STATE_HIDE_ACTOR:
         (*state)++;
-        if (ci->effectId == 0xb || ci->effectId == 0x1f) {
+        if (ci->effectId == FLD3DCI_FLY_OUT_MALE || ci->effectId == FLD3DCI_FLY_OUT_FEMALE) {
             SetActorHidden(FieldPlayer_GetActor(Field_GetPlayer(field)), TRUE);
             break;
         }
-        if (ci->effectId == 0x1e) {
+        if (ci->effectId == FLD3DCI_ALDER_FLY) {
             FieldActor *actor = FindFieldActor(Field_GetActorSystem(field), ci->param.words[0]);
 
             if (actor != NULL) {
@@ -503,12 +529,12 @@ static GameEventReturnCode EventFieldEffect_Callback(GameEvent *event, u32 *stat
             }
             break;
         }
-    case 2:
+    case FLD3DCI_STATE_CAPTURE:
         Field_SetEffectRunningFlag(field, TRUE);
         Fld3DCi_RequestScreenCap(ci);
         (*state)++;
         break;
-    case 3:
+    case FLD3DCI_STATE_SETUP_3D:
         if (ci->screenCapDone == 0) {
             break;
         }
@@ -531,11 +557,11 @@ static GameEventReturnCode EventFieldEffect_Callback(GameEvent *event, u32 *stat
         }
         (*state)++;
         break;
-    case 4:
+    case FLD3DCI_STATE_LOAD:
         EventFieldEffect_LoadGraphics(event, ci, &data->scene, ci->effectId);
         (*state)++;
         break;
-    case 5:
+    case FLD3DCI_STATE_CALLBACK:
         (*state)++;
         if (ci->callback != NULL) {
             GameSystem *gameSystem = GameEvent_GetGameSystem(event);
@@ -543,7 +569,7 @@ static GameEventReturnCode EventFieldEffect_Callback(GameEvent *event, u32 *stat
             GameEvent_ChainNext(event, GameEvent_Create(gameSystem, event, ci->callback, 0));
             break;
         }
-    case 6:
+    case FLD3DCI_STATE_START_SCENE:
         ci->fade = Fld3DCiFade_Create(ci->heapId);
         GFL_BGSysSetBGEnabled(2, 1);
         GFL_BGSysSetBGEnabled(0, 1);
@@ -554,7 +580,7 @@ static GameEventReturnCode EventFieldEffect_Callback(GameEvent *event, u32 *stat
         }
         (*state)++;
         break;
-    case 7:
+    case FLD3DCI_STATE_FADE_IN:
         if (Fld3DCi_IsFlyArrivalEffect(ci->effectId)) {
             GameEvent_ChainNext(event, GameEvent_Create(gsys, event, EventFieldEffectFadeInAllBlack_Callback, 0));
         } else {
@@ -562,17 +588,17 @@ static GameEventReturnCode EventFieldEffect_Callback(GameEvent *event, u32 *stat
         }
         (*state)++;
         break;
-    case 8:
+    case FLD3DCI_STATE_WAIT_SOUND:
         if (GFL_SndIsLoadThreadRunning()) {
             break;
         }
         (*state)++;
-    case 9: {
+    case FLD3DCI_STATE_UPDATE: {
         BOOL particleFinished;
         BOOL actor1Finished;
         BOOL actor2Finished;
         BOOL finished;
-        u8 speed;
+        u8 keyList;
 
         ci->frame++;
         particleFinished = Fld3DCi_UpdateParticles(ci);
@@ -581,9 +607,9 @@ static GameEventReturnCode EventFieldEffect_Callback(GameEvent *event, u32 *stat
         ci->particleFinished = particleFinished;
         ci->actor1Finished = actor1Finished;
         ci->actor2Finished = actor2Finished;
-        speed = data->scene.fadeSpeed;
-        Fld3DCi_UpdateSound(ci, speed);
-        Fld3DCi_UpdateFade(ci, speed);
+        keyList = data->scene.keyList;
+        Fld3DCi_UpdateSound(ci, keyList);
+        Fld3DCi_UpdateFade(ci, keyList);
         finished = FALSE;
         if (ci->control != NULL) {
             finished = ci->control(event, ci);
@@ -595,14 +621,14 @@ static GameEventReturnCode EventFieldEffect_Callback(GameEvent *event, u32 *stat
         }
         break;
     }
-    case 10:
+    case FLD3DCI_STATE_WAIT_FADE:
         ci->frame++;
-        Fld3DCi_UpdateFade(ci, data->scene.fadeSpeed);
+        Fld3DCi_UpdateFade(ci, data->scene.keyList);
         if (!Fld3DCiFade_IsRunning(ci->fade)) {
             (*state)++;
         }
         break;
-    case 11:
+    case FLD3DCI_STATE_FREE:
         Field_SetRenderMode(field, 0);
         Fld3DCi_FreeG3D(ci, &data->scene);
         Fld3DCiFade_Free(ci->fade);
@@ -619,13 +645,13 @@ static GameEventReturnCode EventFieldEffect_Callback(GameEvent *event, u32 *stat
         FieldFog_SetEnabled(Field_GetFog(field), data->scene.fogEnabled);
         (*state)++;
         break;
-    case 12:
+    case FLD3DCI_STATE_RESTORE_DISPLAY:
         FieldLight_Flush(Field_GetLightSystem(field), TRUE);
         ci->dimDone = 0;
         GFL_VBlankTCBAdd(Fld3DCi_DisplayRestoreTask, &ci->dimDone, 0);
         (*state)++;
         break;
-    case 13: {
+    case FLD3DCI_STATE_WAIT_RESTORE: {
         FieldMsgBG *msgBGSys;
         PlaceName *placeName;
 
@@ -649,7 +675,7 @@ static GameEventReturnCode EventFieldEffect_Callback(GameEvent *event, u32 *stat
         (*state)++;
         break;
     }
-    case 14:
+    case FLD3DCI_STATE_END:
         return TRUE;
     }
     return FALSE;
@@ -915,7 +941,7 @@ static void Fld3DCi_LoadG3DSceneTemplate(Fld3DCiScene *scene, u32 fileId, HeapID
     scene->setup.actors = scene->actors;
     scene->particle = file.particle;
     scene->dimCapture = file.dimCapture;
-    scene->fadeSpeed = file.fadeSpeed;
+    scene->keyList = file.keyList;
 }
 
 static void Fld3DCi_FreeSceneTemplate(Fld3DCiScene *scene) {
@@ -973,23 +999,30 @@ static void Fld3DCi_RestoreScreenDispA(Fld3DCi *ci) {
     GFL_BGSysSetEnabledBGsA(ci->enabledBGs);
 }
 
+// The steps of the Pokémon sprite's event: put the sprite into the scene's texture, free what it was made from, and end
+enum {
+    POKE_SPRITE_STATE_CONVERT,
+    POKE_SPRITE_STATE_FREE,
+    POKE_SPRITE_STATE_END,
+};
+
 static GameEventReturnCode EventFieldEffectPokeSpriteSub_Callback(GameEvent *event, u32 *state, void *work) {
     Fld3DCiEvent *data = GameEvent_GetData(GameEvent_GetReturnEvent(event));
     Fld3DCi *ci = data->ci;
 
     GSYS_GetField(GameEvent_GetGameSystem(event));
     switch (*state) {
-    case 0:
+    case POKE_SPRITE_STATE_CONVERT:
         EventFieldEffectPokeSpriteSub_ConvertSprite(ci);
         (*state)++;
         break;
-    case 1:
+    case POKE_SPRITE_STATE_FREE:
         GFL_BitmapFree(ci->bitmap);
         GFL_HeapFree(ci->charData);
         GFL_HeapFree(ci->paletteData);
         (*state)++;
         break;
-    case 2:
+    case POKE_SPRITE_STATE_END:
         return TRUE;
     }
     return FALSE;
@@ -999,9 +1032,9 @@ static BOOL EventFieldEffectPokeSpriteSub_ControlEffect(GameEvent *event, Fld3DC
     BOOL done;
     PokeSpriteParam *param = &ci->param.pokeSprite;
 
-    if (param->unk14 != 0 && param->unk18 != 0) {
-        param->unk18--;
-        if (param->unk18 == 0) {
+    if (param->playCry != 0 && param->cryDelay != 0) {
+        param->cryDelay--;
+        if (param->cryDelay == 0) {
             if (param->species == SPECIES_CHATOT) {
                 PokeVoiceChatterInfo info;
 
@@ -1011,15 +1044,15 @@ static BOOL EventFieldEffectPokeSpriteSub_ControlEffect(GameEvent *event, Fld3DC
                 param->voice = PokeVoice_Play(param->species, param->form, 0x40, 0, 0, 0, 0, NULL);
             }
         }
-        param->unk1a = 30;
+        param->cryHold = 30;
         return FALSE;
     }
     done = FALSE;
-    if (param->unk18 == 0) {
+    if (param->cryDelay == 0) {
         if (!PokeVoice_IsPlayingAny()) {
             done = TRUE;
-        } else if (param->unk1a != 0) {
-            param->unk1a--;
+        } else if (param->cryHold != 0) {
+            param->cryHold--;
         } else if (PokeVoice_GetVolume(param->voice) > 0) {
             PokeVoice_AdjustVolume(param->voice, -16);
         } else {
@@ -1098,14 +1131,20 @@ static void EventFieldEffectPokeSpriteSub_ConvertSprite(Fld3DCi *ci) {
     GFL_HeapGetFreeSize(ci->heapId);
 }
 
+// The steps of the effects' fades: start the fade and wait for it
+enum {
+    FLD3DCI_FADE_START,
+    FLD3DCI_FADE_WAIT,
+};
+
 static GameEventReturnCode EventFieldEffectFadeOutWhite_Callback(GameEvent *event, u32 *state, void *work) {
     GSYS_GetField(GameEvent_GetGameSystem(event));
     switch (*state) {
-    case 0:
-        GFL_FadeSet(4, 0, 16, -1);
+    case FLD3DCI_FADE_START:
+        GFL_FadeSet(FADE_ENGINE_A_WHITE, 0, 16, -1);
         (*state)++;
         break;
-    case 1:
+    case FLD3DCI_FADE_WAIT:
         if (!GFL_FadeIsRunning()) {
             return TRUE;
         }
@@ -1117,11 +1156,11 @@ static GameEventReturnCode EventFieldEffectFadeOutWhite_Callback(GameEvent *even
 static GameEventReturnCode EventFieldEffectFadeInWhiteTop_Callback(GameEvent *event, u32 *state, void *work) {
     GSYS_GetField(GameEvent_GetGameSystem(event));
     switch (*state) {
-    case 0:
-        GFL_FadeSet(4, 16, 0, -1);
+    case FLD3DCI_FADE_START:
+        GFL_FadeSet(FADE_ENGINE_A_WHITE, 16, 0, -1);
         (*state)++;
         break;
-    case 1:
+    case FLD3DCI_FADE_WAIT:
         if (!GFL_FadeIsRunning()) {
             return TRUE;
         }
@@ -1133,11 +1172,11 @@ static GameEventReturnCode EventFieldEffectFadeInWhiteTop_Callback(GameEvent *ev
 static GameEventReturnCode EventFieldEffectFadeInAllBlack_Callback(GameEvent *event, u32 *state, void *work) {
     GSYS_GetField(GameEvent_GetGameSystem(event));
     switch (*state) {
-    case 0:
-        GFL_FadeSet(3, 16, 0, 0);
+    case FLD3DCI_FADE_START:
+        GFL_FadeSet(FADE_ENGINE_A_BLACK | FADE_ENGINE_B_BLACK, 16, 0, 0);
         (*state)++;
         break;
-    case 1:
+    case FLD3DCI_FADE_WAIT:
         if (!GFL_FadeIsRunning()) {
             return TRUE;
         }
@@ -1147,7 +1186,7 @@ static GameEventReturnCode EventFieldEffectFadeInAllBlack_Callback(GameEvent *ev
 }
 
 static BOOL Fld3DCi_IsFlyArrivalEffect(u16 effectId) {
-    if (effectId == 12 || effectId == 32) {
+    if (effectId == FLD3DCI_FLY_IN_MALE || effectId == FLD3DCI_FLY_IN_FEMALE) {
         return TRUE;
     }
     return FALSE;
@@ -1198,17 +1237,28 @@ static void Fld3DCi_ConvG2DToG3D(Fld3DCi *ci, const char *texName, const char *p
     GFL_HeapGetFreeSize(ci->heapId);
 }
 
+// The steps of a cut-in's end: wait for its scene, fade both screens out, to white when the event's param is set, and
+// wait for the fade
+enum {
+    CUTIN_CONTROL_WAIT_EFFECT,
+    CUTIN_CONTROL_FADE_OUT,
+    CUTIN_CONTROL_WAIT_FADE,
+};
+
 static BOOL EventFieldEffectCutinSub_ControlEffect(GameEvent *event, Fld3DCi *ci) {
-    switch (ci->unk134) {
-    case 0:
+    switch (ci->controlState) {
+    case CUTIN_CONTROL_WAIT_EFFECT:
         if (ci->particleFinished != 0 && ci->actor1Finished != 0 && ci->actor2Finished != 0) {
-            ci->unk134++;
+            ci->controlState++;
         }
         break;
-    case 1:
-        GFL_FadeSet(((Fld3DCiEvent *)GameEvent_GetData(event))->scene.param != 0 ? 12 : 3, 0, 16, -1);
-        ci->unk134++;
-    case 2:
+    case CUTIN_CONTROL_FADE_OUT:
+        GFL_FadeSet(((Fld3DCiEvent *)GameEvent_GetData(event))->scene.param != 0
+                        ? FADE_ENGINE_A_WHITE | FADE_ENGINE_B_WHITE
+                        : FADE_ENGINE_A_BLACK | FADE_ENGINE_B_BLACK,
+                    0, 16, -1);
+        ci->controlState++;
+    case CUTIN_CONTROL_WAIT_FADE:
         if (!GFL_FadeIsRunning()) {
             return TRUE;
         }
@@ -1216,6 +1266,16 @@ static BOOL EventFieldEffectCutinSub_ControlEffect(GameEvent *event, Fld3DCi *ci
     }
     return FALSE;
 }
+
+// The steps of a cut-in's event: draw the name above, put the player's pictures into the scene's textures (one, or two
+// for a flag of 2), draw the one below, and place the scene
+enum {
+    CUTIN_STATE_NAME_UP,
+    CUTIN_STATE_HERO_1,
+    CUTIN_STATE_HERO_2,
+    CUTIN_STATE_NAME_DOWN,
+    CUTIN_STATE_END,
+};
 
 static GameEventReturnCode EventFieldEffectCutinSub_Callback(GameEvent *event, u32 *state, void *work) {
     Fld3DCiEvent *data = GameEvent_GetData(GameEvent_GetReturnEvent(event));
@@ -1230,28 +1290,28 @@ static GameEventReturnCode EventFieldEffectCutinSub_Callback(GameEvent *event, u
     GSYS_GetField(gsys);
     param = &ci->param.cutin;
     switch (*state) {
-    case 0:
+    case CUTIN_STATE_NAME_UP:
         EventFieldEffectCutinSub_DrawStrToTexture(info, rival, ci, "name_up", "name_up_pl", param->animation,
                                                   param->color, param->color2, FALSE);
         (*state)++;
         break;
-    case 1:
+    case CUTIN_STATE_HERO_1:
         if (param->flag == 0) {
-            *state = 4;
+            *state = CUTIN_STATE_END;
             break;
         }
         ci->bitmap = GFL_BitmapCreate(16, 16, 32, ci->heapId);
         if (param->flag == 1) {
-            if (getTrainerGender(info) == 0) {
+            if (getTrainerGender(info) == GENDER_MALE) {
                 charFile = 0x2f;
                 palFile = 0x48;
             } else {
                 charFile = 0x32;
                 palFile = 0x4a;
             }
-            *state = 3;
+            *state = CUTIN_STATE_NAME_DOWN;
         } else {
-            if (getTrainerGender(info) == 0) {
+            if (getTrainerGender(info) == GENDER_MALE) {
                 charFile = 0x30;
                 palFile = 0x49;
             } else {
@@ -1262,12 +1322,12 @@ static GameEventReturnCode EventFieldEffectCutinSub_Callback(GameEvent *event, u
         }
         Fld3DCi_ConvG2DToG3D(ci, "trsw_hero01", "trsw_hero01_pl", charFile, palFile, 16, 16, 16, 0, 0, 0);
         break;
-    case 2:
+    case CUTIN_STATE_HERO_2:
         GFL_BitmapFree(ci->bitmap);
         GFL_HeapFree(ci->charData);
         GFL_HeapFree(ci->paletteData);
         ci->bitmap = GFL_BitmapCreate(16, 16, 32, ci->heapId);
-        if (getTrainerGender(info) == 0) {
+        if (getTrainerGender(info) == GENDER_MALE) {
             charFile = 0x31;
             palFile = 0x49;
         } else {
@@ -1277,7 +1337,7 @@ static GameEventReturnCode EventFieldEffectCutinSub_Callback(GameEvent *event, u
         Fld3DCi_ConvG2DToG3D(ci, "trsw_hero02", "trsw_hero02_pl", charFile, palFile, 16, 16, 16, 0, 0, 1);
         (*state)++;
         break;
-    case 3:
+    case CUTIN_STATE_NAME_DOWN:
         GFL_BitmapFree(ci->bitmap);
         GFL_HeapFree(ci->charData);
         GFL_HeapFree(ci->paletteData);
@@ -1285,7 +1345,7 @@ static GameEventReturnCode EventFieldEffectCutinSub_Callback(GameEvent *event, u
                                                   param->color, param->color2, TRUE);
         (*state)++;
         break;
-    case 4:
+    case CUTIN_STATE_END:
         ci->srt.translation.x = 0;
         ci->srt.translation.y = 0;
         ci->srt.translation.z = FX32_CONST(-700);
@@ -1333,6 +1393,12 @@ static void Fld3DCi_DeferBitmapFree(Fld3DCi *ci) {
 }
 #endif
 
+// The steps of converting an effect's bitmaps: read its entries, then put one into the scene's textures a frame
+enum {
+    BITMAP_CONV_STATE_LOAD,
+    BITMAP_CONV_STATE_CONVERT,
+};
+
 static GameEventReturnCode EventFld3DCiBitmapConv_Callback(GameEvent *event, u32 *state, void *work) {
     Fld3DCiEvent *data = GameEvent_GetData(GameEvent_GetReturnEvent(event));
     Fld3DCi *ci = data->ci;
@@ -1345,11 +1411,11 @@ static GameEventReturnCode EventFld3DCiBitmapConv_Callback(GameEvent *event, u32
     u8 srcOffset;
 
     switch (*state) {
-    case 0:
+    case BITMAP_CONV_STATE_LOAD:
         param->entries = GFL_ArcSysReadHeapNewRange(0x10c, param->file, ci->heapId, 4, param->count * 0x30);
         param->index = 0;
         (*state)++;
-    case 1:
+    case BITMAP_CONV_STATE_CONVERT:
         offset = param->index * 0x30;
         entry = (Fld3DCiBitmapEntry *)((u8 *)param->entries + offset);
         width = entry->width;
@@ -1490,7 +1556,7 @@ static void EventFieldEffectCutinSub_DrawStrToTexture(PlayerInfo *info, RivalDat
 }
 
 GameEvent *EventFieldEffect_CreateAlderFly(GameSystem *gsys, Fld3DCi *ci, u32 actorId) {
-    GameEvent *event = EventFieldEffect_Create(gsys, ci, 30);
+    GameEvent *event = EventFieldEffect_Create(gsys, ci, FLD3DCI_ALDER_FLY);
 
     if (event == NULL) {
         return NULL;
@@ -1527,8 +1593,8 @@ static void Fld3DCi_InitEventData(Fld3DCi *ci, Fld3DCiEvent *data) {
     data->scene.param = 0;
 }
 
-static void Fld3DCi_UpdateSound(Fld3DCi *ci, u8 speed) {
-    const Fld3DCiSoundKey *keys = data_ov036_021d1e80[speed];
+static void Fld3DCi_UpdateSound(Fld3DCi *ci, u8 keyList) {
+    const Fld3DCiSoundKey *keys = FLD3DCI_SOUND_KEYS[keyList];
 
     if (keys[ci->soundIndex].se != -1 && ci->frame == keys[ci->soundIndex].frame) {
         GFL_SndSEPlay(keys[ci->soundIndex].se);
@@ -1536,8 +1602,8 @@ static void Fld3DCi_UpdateSound(Fld3DCi *ci, u8 speed) {
     }
 }
 
-static void Fld3DCi_UpdateFade(Fld3DCi *ci, u8 speed) {
-    const Fld3DCiFadeKey *keys = FLD3DCI_FADE_ANIMATIONS[speed];
+static void Fld3DCi_UpdateFade(Fld3DCi *ci, u8 keyList) {
+    const Fld3DCiFadeKey *keys = FLD3DCI_FADE_KEYS[keyList];
 
     if (keys[ci->fadeIndex].frame != -1 && ci->frame == keys[ci->fadeIndex].frame) {
         Fld3DCiFadeState_Set(ci->fade, keys[ci->fadeIndex].flags, keys[ci->fadeIndex].from, keys[ci->fadeIndex].to,

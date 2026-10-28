@@ -299,7 +299,8 @@ static GameEventReturnCode EventFestMissionStart_Callback(GameEvent *event, u32 
             break;
         }
         GFL_SndSEPlay(SEQ_SE_W295_01);
-        GameEvent_ChainNext(event, CallFieldMapEntranceOutTransitionDefault(work->gsys, work->field, 1, 0));
+        GameEvent_ChainNext(
+            event, CallFieldMapEntranceOutTransitionDefault(work->gsys, work->field, FIELD_TRANSITION_FADE_WHITE, 0));
         (*state)++;
         break;
     case 3:
@@ -313,7 +314,8 @@ static GameEventReturnCode EventFestMissionStart_Callback(GameEvent *event, u32 
         (*state)++;
         break;
     case 5:
-        GameEvent_ChainNext(event, CallFieldMapEntranceInTransition(work->gsys, work->field, 1, 0, 1, 0, 0));
+        GameEvent_ChainNext(
+            event, CallFieldMapEntranceInTransition(work->gsys, work->field, FIELD_TRANSITION_FADE_WHITE, 0, 1, 0, 0));
         (*state)++;
         break;
     case 6:
@@ -408,7 +410,8 @@ static GameEventReturnCode EventFestMissionEnd_Callback(GameEvent *event, u32 *s
         (*state)++;
         break;
     case 1:
-        GameEvent_ChainNext(event, CallFieldMapEntranceOutTransitionDefault(work->gsys, work->field, 1, 0));
+        GameEvent_ChainNext(
+            event, CallFieldMapEntranceOutTransitionDefault(work->gsys, work->field, FIELD_TRANSITION_FADE_WHITE, 0));
         (*state)++;
         break;
     case 2:
@@ -429,7 +432,8 @@ static GameEventReturnCode EventFestMissionEnd_Callback(GameEvent *event, u32 *s
         break;
     case 5:
         FieldSubscreen_ChangeImm(Field_GetSubscreen(work->field), 0);
-        GameEvent_ChainNext(event, CallFieldMapEntranceInTransition(work->gsys, work->field, 1, 0, 1, 0, 0));
+        GameEvent_ChainNext(
+            event, CallFieldMapEntranceInTransition(work->gsys, work->field, FIELD_TRANSITION_FADE_WHITE, 0, 1, 0, 0));
         (*state)++;
         break;
     default:
@@ -468,7 +472,7 @@ static void FestMission_Print(FestMissionEventWork *work) {
         GFL_MsgDataLoadStrbuf(work->msgData, EventFestMission_Text_TimeRemainingMinSec, work->strbuf);
     }
     FestMission_PrintLine(work, work->strbuf, 8, 7);
-    GFL_MsgDataLoadStrbuf(work->msgData, work->mission.info.unk10_6 + 13, work->strbuf);
+    GFL_MsgDataLoadStrbuf(work->msgData, work->mission.info.targetKind + 13, work->strbuf);
     FestMission_PrintLine(work, work->strbuf, 8, 8);
 }
 

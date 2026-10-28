@@ -1150,7 +1150,7 @@ static void DataConvert_SeqEnterId(KeySystemSeq *seq, int *state, void *work) {
         break;
     case 2:
         param = wk->subProcParam;
-        if (param->unk1C) {
+        if (param->canceled) {
             if (wk->enteredCode != NULL) {
                 GFL_StrBufFree(wk->enteredCode);
                 wk->enteredCode = NULL;
