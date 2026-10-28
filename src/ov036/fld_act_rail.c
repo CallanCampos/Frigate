@@ -77,42 +77,42 @@ static BOOL RailJump_Update(FieldActor *actor) {
     return TRUE;
 }
 
-static BOOL func_ov036_02195480(FieldActor *actor) {
+static BOOL RailActor_AcJumpU1G8F0(FieldActor *actor) {
     func_ov036_02195354(actor, 0, 0x2000, 8, 3, 0, 0x200);
     return TRUE;
 }
 
-static BOOL func_ov036_021954a0(FieldActor *actor) {
+static BOOL RailActor_AcJumpD1G8F0(FieldActor *actor) {
     func_ov036_02195354(actor, 1, 0x2000, 8, 3, 0, 0x200);
     return TRUE;
 }
 
-static BOOL func_ov036_021954c4(FieldActor *actor) {
+static BOOL RailActor_AcJumpL1G8F0(FieldActor *actor) {
     func_ov036_02195354(actor, 2, 0x2000, 8, 3, 0, 0x200);
     return TRUE;
 }
 
-static BOOL func_ov036_021954e8(FieldActor *actor) {
+static BOOL RailActor_AcJumpR1G8F0(FieldActor *actor) {
     func_ov036_02195354(actor, 3, 0x2000, 8, 3, 0, 0x200);
     return TRUE;
 }
 
-static BOOL func_ov036_02195508(FieldActor *actor) {
+static BOOL RailActor_AcJumpU2G16F0(FieldActor *actor) {
     func_ov036_02195354(actor, 0, 0x2000, 0x10, 3, 0, 0x100);
     return TRUE;
 }
 
-static BOOL func_ov036_02195528(FieldActor *actor) {
+static BOOL RailActor_AcJumpD2G16F0(FieldActor *actor) {
     func_ov036_02195354(actor, 1, 0x2000, 0x10, 3, 0, 0x100);
     return TRUE;
 }
 
-static BOOL func_ov036_0219554c(FieldActor *actor) {
+static BOOL RailActor_AcJumpL2G16F0(FieldActor *actor) {
     func_ov036_02195354(actor, 2, 0x2000, 0x10, 3, 0, 0x100);
     return TRUE;
 }
 
-static BOOL func_ov036_0219556c(FieldActor *actor) {
+static BOOL RailActor_AcJumpR2G16F0(FieldActor *actor) {
     func_ov036_02195354(actor, 3, 0x2000, 0x10, 3, 0, 0x100);
     return TRUE;
 }
@@ -172,11 +172,11 @@ const ActorAcmdFunc data_ov036_021cf3d8[] = { RailActor_AcStayWalkU2F0, RailActo
 const ActorAcmdFunc data_ov036_021cf3c0[] = { RailActor_AcStayWalkD2F0, RailActor_AcStayWalk1, RailActor_AcSetAcmdEnd };
 const ActorAcmdFunc data_ov036_021cf3cc[] = { RailActor_AcStayWalkL2F0, RailActor_AcStayWalk1, RailActor_AcSetAcmdEnd };
 const ActorAcmdFunc data_ov036_021cf42c[] = { RailActor_AcStayWalkR2F0, RailActor_AcStayWalk1, RailActor_AcSetAcmdEnd };
-const ActorAcmdFunc data_ov036_021cf5ac[] = { func_ov036_02195480, RailJump_Update, RailActor_AcSetAcmdEnd };
-const ActorAcmdFunc data_ov036_021cf498[] = { func_ov036_021954a0, RailJump_Update, RailActor_AcSetAcmdEnd };
-const ActorAcmdFunc data_ov036_021cf3e4[] = { func_ov036_021954c4, RailJump_Update, RailActor_AcSetAcmdEnd };
-const ActorAcmdFunc data_ov036_021cf408[] = { func_ov036_021954e8, RailJump_Update, RailActor_AcSetAcmdEnd };
-const ActorAcmdFunc data_ov036_021cf5b8[] = { func_ov036_02195508, RailJump_Update, RailActor_AcSetAcmdEnd };
-const ActorAcmdFunc data_ov036_021cf3a8[] = { func_ov036_02195528, RailJump_Update, RailActor_AcSetAcmdEnd };
-const ActorAcmdFunc data_ov036_021cf5c4[] = { func_ov036_0219554c, RailJump_Update, RailActor_AcSetAcmdEnd };
-const ActorAcmdFunc data_ov036_021cf3f0[] = { func_ov036_0219556c, RailJump_Update, RailActor_AcSetAcmdEnd };
+const ActorAcmdFunc data_ov036_021cf5ac[] = { RailActor_AcJumpU1G8F0, RailJump_Update, RailActor_AcSetAcmdEnd };
+const ActorAcmdFunc data_ov036_021cf498[] = { RailActor_AcJumpD1G8F0, RailJump_Update, RailActor_AcSetAcmdEnd };
+const ActorAcmdFunc data_ov036_021cf3e4[] = { RailActor_AcJumpL1G8F0, RailJump_Update, RailActor_AcSetAcmdEnd };
+const ActorAcmdFunc data_ov036_021cf408[] = { RailActor_AcJumpR1G8F0, RailJump_Update, RailActor_AcSetAcmdEnd };
+const ActorAcmdFunc data_ov036_021cf5b8[] = { RailActor_AcJumpU2G16F0, RailJump_Update, RailActor_AcSetAcmdEnd };
+const ActorAcmdFunc data_ov036_021cf3a8[] = { RailActor_AcJumpD2G16F0, RailJump_Update, RailActor_AcSetAcmdEnd };
+const ActorAcmdFunc data_ov036_021cf5c4[] = { RailActor_AcJumpL2G16F0, RailJump_Update, RailActor_AcSetAcmdEnd };
+const ActorAcmdFunc data_ov036_021cf3f0[] = { RailActor_AcJumpR2G16F0, RailJump_Update, RailActor_AcSetAcmdEnd };

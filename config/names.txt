@@ -10681,6 +10681,14 @@ overlays/ov036 0x021952bc RailActor_AcStayWalkL4F0
 overlays/ov036 0x021952cc RailActor_AcStayWalkR4F0
 overlays/ov036 0x021952dc RailActorAcmd_InitJump
 overlays/ov036 0x02195378 RailJump_Update
+overlays/ov036 0x02195480 RailActor_AcJumpU1G8F0
+overlays/ov036 0x021954a0 RailActor_AcJumpD1G8F0
+overlays/ov036 0x021954c4 RailActor_AcJumpL1G8F0
+overlays/ov036 0x021954e8 RailActor_AcJumpR1G8F0
+overlays/ov036 0x02195508 RailActor_AcJumpU2G16F0
+overlays/ov036 0x02195528 RailActor_AcJumpD2G16F0
+overlays/ov036 0x0219554c RailActor_AcJumpL2G16F0
+overlays/ov036 0x0219556c RailActor_AcJumpR2G16F0
 overlays/ov036 0x02195604 RailActor_GetNowLocation
 overlays/ov036 0x02195624 RailActor_UpdateRailWork
 overlays/ov036 0x02195640 RailActor_SetMoveRequest
