@@ -92,9 +92,9 @@ PartySelectList *PartySelectList_Create(Field *field, PokeParty *party, PokePart
                                         u32 battleBoxIneligible, HeapID heapId);
 BOOL PartySelectList_Main(PartySelectList *select);
 int PartySelectList_Delete(PartySelectList *select, u32 *ineligible);
-FieldEffectTask *FldeffBtrain_Start(FieldEffects *effects, u32 a1, const VecFx32 *pos);
-void FldeffBtrain_SetAnime(FieldEffectTask *task, u16 a1);
-void FldeffBtrain_SetHidden(FieldEffectTask *task, u16 a1);
+FieldEffectTask *FldeffBtrain_Start(FieldEffects *effects, u32 trainIdx, const VecFx32 *pos);
+void FldeffBtrain_SetAnime(FieldEffectTask *task, u16 anmIdx);
+void FldeffBtrain_SetHidden(FieldEffectTask *task, u16 hidden);
 void FieldPlayer_SetWPos(FieldPlayer *player, const VecFx32 *pos);
 void FieldPlayer_SetDirection(FieldPlayer *player, u16 dir);
 // field_fade.c's fade of the field's screens, by type: in or out, quickly or at the slower speed. white fades from or
