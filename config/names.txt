@@ -11313,10 +11313,14 @@ overlays/ov036 0x021a5734 FldeffIwakudaki_Init
 overlays/ov036 0x021a5798 FldeffIwakudaki_Exit
 overlays/ov036 0x021a57bc FldeffIwakudaki_Update
 overlays/ov036 0x021a57ec FldeffIwakudaki_Draw
+overlays/ov036 0x021a5828 FldeffFishing_Create
+overlays/ov036 0x021a584c FldeffFishing_Delete
 overlays/ov036 0x021a5860 FldeffFishing_LoadResources
 overlays/ov036 0x021a58b4 FldeffFishing_FreeResources
+overlays/ov036 0x021a58e0 FldeffFishing_Start
 overlays/ov036 0x021a5968 FldeffFishing_SetAnimeSpeed
 overlays/ov036 0x021a597c FldeffFishing_Init
+overlays/ov036 0x021a5998 FldeffFishing_Exit
 overlays/ov036 0x021a599c FldeffFishing_Update
 overlays/ov036 0x021a59dc FldeffFishing_Draw
 overlays/ov036 0x021a5e30 EventTrainerEyeSub_GetPlayerDistance

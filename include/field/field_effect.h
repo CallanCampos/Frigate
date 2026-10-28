@@ -35,7 +35,7 @@ void StoneTask_PulseTrigger(FieldEffectTask *task);
 // Break the rock in front of an actor with Rock Smash
 void FldeffIwakudaki_Start(FieldActor *actor, FieldEffects *effects);
 // The ripples of a fishing line cast in dir from pos, and how fast they play
-FieldEffectTask *func_ov036_021a58e0(FieldEffects *effects, const VecFx32 *pos, u32 dir, u32 sameHeight);
+FieldEffectTask *FldeffFishing_Start(FieldEffects *effects, const VecFx32 *pos, u32 dir, u32 sameHeight);
 void FldeffFishing_SetAnimeSpeed(FieldEffectTask *task, u16 speed);
 // The festival's sparkles: start their task, show one at pos, hide one or all, and whether one shows and its value
 FieldEffectTask *func_ov036_021a5bb4(FieldEffects *effects);
@@ -166,8 +166,8 @@ void *StoneTask_Create(FieldEffects *effects, HeapID heapId);
 void func_ov036_021c27ac(FieldEffects *effects, void *data);
 void *FldeffIaigiri_Create(FieldEffects *effects, HeapID heapId);
 void func_ov036_021c2e00(FieldEffects *effects, void *data);
-void *func_ov036_021a5828(FieldEffects *effects, HeapID heapId);
-void func_ov036_021a584c(FieldEffects *effects, void *data);
+void *FldeffFishing_Create(FieldEffects *effects, HeapID heapId);
+void FldeffFishing_Delete(FieldEffects *effects, void *data);
 void *FieldEffect_BTrain_Create(FieldEffects *effects, HeapID heapId);
 void FieldEffect_BTrain_Free(FieldEffects *effects, void *data);
 void *func_ov036_021c66e8(FieldEffects *effects, HeapID heapId);

@@ -276,7 +276,7 @@ void func_ov033_02179628(FishingEventWork *work) {
     if (work->fishingPos.y != work->playerPos.y) {
         sameHeight = 0;
     }
-    work->effect30 = func_ov036_021a58e0(effects, &work->fishingPos, work->faceDirection, sameHeight);
+    work->effect30 = FldeffFishing_Start(effects, &work->fishingPos, work->faceDirection, sameHeight);
 }
 
 void func_ov033_02179650(FishingEventWork *work) {
