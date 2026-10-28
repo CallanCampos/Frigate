@@ -3,6 +3,18 @@
 What port work taught that isn't obvious from the code, newest first. A lesson about MWCC or the decomp's own
 workflow goes in the decomp checkout instead; this file is the port's ([CLAUDE.md](../CLAUDE.md), the iteration loop).
 
+## 2026-10-28: isolate host-library names without losing dump globals
+
+- GameSpy's BSD socket names can interpose on a shared SDL3's display libraries on ELF. Hidden game symbols keep
+  those libraries on libc while direct game calls retain their own definitions. Test a real DSO and an unconnected
+  local socket; a headless display test alone cannot catch the desktop failure. Default-visibility negatives prove
+  the regression test exercises the policy rather than merely returning success.
+- Hidden definitions are not represented identically by linkers: GNU ld kept GLOBAL HIDDEN in the tested executable,
+  while LLD localized it to LOCAL HIDDEN. The actual resolver rejected every local and broke `--run-dump` despite
+  successful window isolation. Accept only hidden locals, retain ordinary-local rejection and fail closed on
+  ambiguous same-name addresses. Exercise actual symbol-table lookup under both linkers and fatal sanitizers;
+  simulated resolver callbacks do not verify this contract.
+
 ## 2026-10-28: keep full save integrity checks affordable
 
 - The full save-image suite timed out at 120 seconds on an Intel CI runner while every other job passed. Keep its
