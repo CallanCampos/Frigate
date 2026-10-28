@@ -3031,7 +3031,7 @@
     .2byte \a1
     .endm
 
-    // func_ov036_021ae0cc
+    // s0231_CallGameManual
     .macro Cmd_0231 a0
     FieldCommand 561
     .2byte \a0
@@ -3440,7 +3440,7 @@
     .2byte \a0
     .endm
 
-    // func_ov036_021ae300
+    // s028F_CallRivalNameInput
     .macro Cmd_028F a0
     FieldCommand 655
     .2byte \a0

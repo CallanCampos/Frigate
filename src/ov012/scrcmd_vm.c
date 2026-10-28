@@ -656,7 +656,7 @@ const FieldScriptCommand EVCMD_TABLE[] = {
     ScriptNative_SetMmdlZoneDeleteOff,                // 0x22e
     s022F_WordSetLoadPastTradePkmName,                // 0x22f
     s0230_MsgPlaceSignFont4,                          // 0x230
-    func_ov036_021ae0cc,                              // 0x231
+    s0231_CallGameManual,                             // 0x231
     PokeParty_ControlLegendMon,                       // 0x232
     Scrcmd_HasPlayerLanguage,                         // 0x233
     s0234_ActorFallDownToXZ,                          // 0x234
@@ -708,7 +708,7 @@ const FieldScriptCommand EVCMD_TABLE[] = {
     s0262_HollowRivalSetValue,                        // 0x262
     s0263_HollowRivalSetFlag,                         // 0x263
     func_ov012_0216a748,                              // 0x264
-    func_ov036_021ae18c,                              // 0x265
+    s0265_CallXTransceiverSecret,                     // 0x265
     s0266_HollowRivalGetCounter,                      // 0x266
     func_ov012_0216a7cc,                              // 0x267
     s0268_GymInsectPlayObject,                        // 0x268
@@ -750,7 +750,7 @@ const FieldScriptCommand EVCMD_TABLE[] = {
     NULL,                                             // 0x28c
     NULL,                                             // 0x28d
     s028E_MistraltonGymFireCannon,                    // 0x28e
-    func_ov036_021ae300,                              // 0x28f
+    s028F_CallRivalNameInput,                         // 0x28f
     s0290_WordSetLoadRivalName,                       // 0x290
     s0291_VirbankGymStopModelAnimations,              // 0x291
     s0292_VirbankGymSetActorFlag,                     // 0x292
