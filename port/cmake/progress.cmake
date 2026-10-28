@@ -13,3 +13,10 @@ add_test(NAME progress_compile_check
         "${CMAKE_CURRENT_SOURCE_DIR}/tests/progress/test_compile_check.py" "${REPO_ROOT}" "${PORT_VERSION}")
 set_tests_properties(progress_compile_check PROPERTIES SKIP_RETURN_CODE 77 TIMEOUT 300)
 port_test_labels(progress_compile_check static)
+
+# The report's explicit cross-module LTD/DTCM ownership, from synthetic delinks only; no ROM or compiler required.
+add_test(NAME progress_ownership
+    COMMAND "${CMAKE_COMMAND}" -E env PYTHONDONTWRITEBYTECODE=1 "${PORT_PYTHON}"
+        "${CMAKE_CURRENT_SOURCE_DIR}/tests/progress/test_ownership.py")
+set_tests_properties(progress_ownership PROPERTIES TIMEOUT 60)
+port_test_labels(progress_ownership static)
