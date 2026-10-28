@@ -207,11 +207,11 @@ BOOL Scrcmd_ProcFld_CallXTransceiver(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     Field *field = GSYS_GetField(gsys);
     u16 scriptId = ScriptReadAny(vm, env);
-    u16 a2 = VM_Read16(vm);
+    u16 swapPalette = VM_Read16(vm);
     LocalTvtParam *param = GFL_HeapAllocate(HEAPID_GAMEEVENT, sizeof(LocalTvtParam), TRUE, "scrcmd_proc_fld.c", 401);
 
     param->mode = LOCAL_TVT_MODE_SCRIPT;
-    param->unk04 = a2;
+    param->swapPalette = swapPalette;
     param->scriptId = scriptId;
     param->gameData = FieldScriptEnv_GetGameData(env);
     param->gsys = gsys;
@@ -225,14 +225,14 @@ BOOL Scrcmd_ProcFld_CallXTransceiverSecret(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     Field *field = GSYS_GetField(gsys);
-    u16 a1;
+    u16 swapPalette;
     LocalTvtParam *param;
 
     getHollow_RivalBlk(GameData_GetSaveControl(GSYS_GetGameData(gsys)));
-    a1 = ScriptReadAny(vm, env);
+    swapPalette = ScriptReadAny(vm, env);
     param = GFL_HeapAllocate(HEAPID_GAMEEVENT, sizeof(LocalTvtParam), TRUE, "scrcmd_proc_fld.c", 437);
     param->mode = LOCAL_TVT_MODE_CALL_SECRET;
-    param->unk04 = a1;
+    param->swapPalette = swapPalette;
     param->gameData = FieldScriptEnv_GetGameData(env);
     param->gsys = gsys;
     ScriptWork_CallEvent(work, EventFieldSubprocessCall_CreateWithCallback(gsys, field, OVERLAY_XTRANSCEIVER,

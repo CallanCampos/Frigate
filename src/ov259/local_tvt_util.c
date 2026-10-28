@@ -221,7 +221,7 @@ u32 LocalTvtUtil_GetTime(GameData *gameData) {
     return LOCAL_TVT_TIME_NIGHT;
 }
 
-LocalTvtBG *LocalTvtBG_Create(GameData *gameData, HeapID heapId, u32 unk04) {
+LocalTvtBG *LocalTvtBG_Create(GameData *gameData, HeapID heapId, u32 swapPalette) {
     LocalTvtBG *bg = GFL_HeapAllocate(heapId, sizeof(LocalTvtBG), TRUE, "local_tvt_util.c", 126);
     BOOL isMale = TRUE;
     PlayerInfo *playerInfo = GetGameDataPlayerInfo(gameData);
@@ -230,7 +230,7 @@ LocalTvtBG *LocalTvtBG_Create(GameData *gameData, HeapID heapId, u32 unk04) {
     if (getTrainerGender(playerInfo) != GENDER_MALE) {
         isMale = FALSE;
     }
-    if (unk04 ^ isMale) {
+    if (swapPalette ^ isMale) {
         GFL_G2DIOLoadArcNCLRDefault(arc, 7, PALTYPE_SUB_BG, 0, 3 * 0x20, heapId);
     } else {
         GFL_G2DIOLoadArcNCLRDefault(arc, 6, PALTYPE_SUB_BG, 0, 3 * 0x20, heapId);

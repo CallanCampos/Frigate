@@ -81,7 +81,7 @@ static BOOL LocalTvt_ProcInit(GameProc *proc, u32 *state, void *param, void *wor
     charaSetup.message = sys->message;
     charaSetup.timeOfDay = LocalTvtUtil_GetTime(tvtParam->gameData);
     sys->chara = LocalTvtChara_Create(&charaSetup, sys->heapId);
-    sys->bg = LocalTvtBG_Create(tvtParam->gameData, sys->heapId, sys->param->unk04);
+    sys->bg = LocalTvtBG_Create(tvtParam->gameData, sys->heapId, sys->param->swapPalette);
     sys->initMode(sys);
     GFL_NetSetIconScreen(FALSE, sys->heapId);
     return TRUE;
