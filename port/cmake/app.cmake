@@ -78,6 +78,19 @@ target_include_directories(port_test_symbols PRIVATE "${CMAKE_CURRENT_SOURCE_DIR
 target_compile_options(port_test_symbols PRIVATE -std=c11 -Wall -Wextra -Werror)
 target_link_libraries(port_test_symbols PRIVATE ${CMAKE_DL_LIBS})
 add_test(NAME app_symbols COMMAND port_test_symbols)
+# On Linux the same test linked by LLD too, where it is installed: LLD makes a hidden global LOCAL in the symbol table,
+# GNU ld (the default) keeps it GLOBAL, and the lookup must find the decomp's under either
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux" AND CMAKE_C_COMPILER_ID MATCHES "Clang")
+    find_program(PORT_LD_LLD ld.lld)
+    if(PORT_LD_LLD)
+        add_executable(port_test_symbols_lld "${CMAKE_CURRENT_SOURCE_DIR}/tests/app/test_symbols.c" ${port_host_sources})
+        target_include_directories(port_test_symbols_lld PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
+        target_compile_options(port_test_symbols_lld PRIVATE -std=c11 -Wall -Wextra -Werror)
+        target_link_options(port_test_symbols_lld PRIVATE "-fuse-ld=${PORT_LD_LLD}")
+        target_link_libraries(port_test_symbols_lld PRIVATE ${CMAKE_DL_LIBS})
+        add_test(NAME app_symbols_lld COMMAND port_test_symbols_lld)
+    endif()
+endif()
 
 # The run directory's writer (port/app/run_dir.c), plain and under the sanitizers, with the platform layer's SHA-1 and
 # its record of the random seeds the game built

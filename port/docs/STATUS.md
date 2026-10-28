@@ -32,13 +32,112 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
 
+## 2026-10-28: combine the contributor's LLD follow-up with namespace regression coverage
+
+- **Upstream:** reviewed main remains `3ea5609ea3`, containing `fd3b9e600d`; the separate naming proposal is still
+  local. This merges the contributor's concurrently published `6241265c6c` normally, preserving all their commits.
+- **Port:** `PORT_SHA`, after maintainer candidate `cd4588750f`. Retain the contributor's hidden-global regression
+  and optional Clang/LLD target, plus the independent actual-policy host and executable/DSO tests. No force push.
+- **ROM (T0):** fresh configure/Ninja after combining the changes passes both original hashes with zero warnings.
+  No source outside `port/` changes; all source/test evidence is retained separately from ROMs and saves.
+- **Host build/tests (T1/T2):** the actual Mac `app_symbols` and `host_global_symbols` tests pass 2/2. All eight actual
+  Linux resolver probes pass again on the final combined resolver: GNU ld/LLD, default/hidden visibility and
+  ordinary/fatal ASan+UBSan. The unchanged namespace fixtures retain four hidden-policy passes and four expected
+  default-policy failures, with typed volatile calls and unconnected local sockets only. New exact-head full
+  canonical builds/suites and all hosted platform tests remain due before approval/merge.
+- **Replay/oracle/sanitizers/play (T3/T4/T5/T7):** the real lookup and namespace contracts are verified without a
+  ROM; no new gameplay or GUI claim. The contributor's observed window/copyright screen does not establish Spanish
+  gameplay or save/reload. Issue 45 remains open. No input, golden, seed, mask, lag or sanitizer exclusion changes.
+- **Performance (T6):** symbol names resolve when dump specifications are added; no per-frame full-table scan.
+  Existing budgets remain. No native feature-completion claim or new tier/stub scan is introduced.
+- **64-bit warnings:** no cast/type change; fresh canonical verification must measure complete compilation again.
+- **Work done:** combine equivalent hidden-global fixes without overwriting the contributor's work. Use the concise
+  found-symbol form while retaining address-based ambiguity rejection, so identical-address entries remain valid.
+  Correct the overly broad static/desktop claims: ordinary statics remain private, while deliberately hidden local
+  provenance cannot be distinguished and differing same-name addresses fail closed. The optional LLD test uses the
+  exact linker found by CMake. Guides/maps retain actual owners and fixture boundaries.
+- **Next:** publish the combined final head to PR 58, run its full protected gates and approve only after review.
+  Merge the AI repair and bounded upstream proposal when their required checks pass, then continue CARD CPU timing.
+- **Blockers:** no human action blocks verification; required final-head local/hosted checks are pending. The native
+  AI timing defect and later gameplay features remain unfinished; Spanish gameplay/save evidence is still absent.
+
+## 2026-10-28: preserve ELF dump globals while isolating the game's socket names
+
+- **Upstream:** reviewed main `3ea5609ea3` contains `fd3b9e600d`; the separate `29b9dcfef9` naming proposal remains
+  local. This merges reviewed main into the contributor's Linux visibility proposal, retaining the Windows fix.
+- **Port:** `cd4588750f`, maintainer follow-up to PR 58 head `948b7efa0f`. Game/HAL ownership is unchanged except the
+  ELF global-name resolver; the original Linux-only visibility policy remains. No source outside `port/` changes.
+- **ROM (T0):** fresh configure/Ninja passes both original hashes with zero warnings: B2
+  `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb`, W2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`.
+- **Host build/tests (T1/T2):** the actual Mac host test target builds and `host_global_symbols` passes. Eight real
+  Linux resolver probes pass: GNU ld/LLD, default/hidden visibility, ordinary/fatal ASan+UBSan. The same tracked
+  fixture checks exact global/weak-alias addresses, unique hidden-local lookup, ordinary-local rejection and
+  ambiguous hidden-local rejection. Four shared-library socket probes pass hidden ordinary/fatal builds under
+  both linkers; all four default-visibility negatives fail as expected. The executable's own typed pointer still
+  reaches its sentinel; the DSO opens/closes a real unconnected local AF_UNIX socket. No ROM, server or external
+  network is used. Both targets inherit the production visibility/sanitizer environment in Linux CMake CI.
+- **Replay/oracle/sanitizers/play (T3/T4/T5/T7):** no new gameplay, screenshot or Spanish compatibility claim. The
+  contributor's window/copyright-screen observation remains limited to the described desktop. ROM-free probes
+  preserve the actual resolver and loader contract, not full game outcomes. Exact-head canonical/hosted gates remain.
+- **Performance (T6):** no budget changes; symbol resolution occurs when dump specifications are added, not per
+  frame. Full-name scanning rejects ambiguity without introducing an every-frame lookup.
+- **Tiers/trap stubs/64-bit warnings:** no new scan or cast change; fresh canonical verification must recheck the
+  existing tier/stub/complete-compilation measures. No completed native feature or whole-game claim is introduced.
+- **Work done:** reproduced the original socket interposition and a remaining linker-specific dump regression.
+  GNU ld keeps hidden globals GLOBAL HIDDEN; LLD makes them LOCAL HIDDEN, which the old resolver rejected. Accept
+  only hidden local entries in addition to legacy global/weak symbols; ordinary statics remain private and distinct
+  same-name addresses return NULL. Guides/maps and ROM-free tests cover both the window namespace and actual dump
+  API. No exported-symbol workaround, arbitrary-local lookup, ignored linker error or sanitizer exclusion is added.
+- **Next:** publish this follow-up to the contributor PR, run exact-head canonical and hosted gates, then approve
+  and merge normally. Complete the reviewed AI repair and upstream proposal, then resume general CARD CPU timing.
+- **Blockers:** no human action blocks verification. Hosted final-head tests and full native gates remain due.
+  Issue 45 stays open: showing the Spanish copyright screen does not verify gameplay or save/quit/reload.
+
+## 2026-10-28: the window on Linux, with the game's symbols hidden from a shared SDL3
+
+- **Upstream:** `fd3b9e600d`, as reviewed main `3ea5609ea3` has it; this branch merges no upstream commit.
+- **Port:** `6241265c6c`, on `port/linux-hidden-game-symbols`, from `b631907c33` with `3ea5609ea3` merged.
+- **ROM:** T0 not run: this clone has no `orig/`. The branch changes only `port/` (`CMakeLists.txt`,
+  `cmake/app.cmake`, `hal/host/host_posix.c`, `tests/app/test_symbols.c` and this file), so MWCC's build is
+  untouched; T0 is still due before merge.
+- **Host build:** Linux (Ubuntu 26.04, clang 21.1.8, the distribution's shared SDL3 3.4.2), RelWithDebInfo,
+  `build/port` (us) and `build/port-es` (es) build with GNU ld, and `build/port-es-lld` (es,
+  `-DCMAKE_EXE_LINKER_FLAGS=-fuse-ld=lld`) builds the program. `nm -D --defined-only` on either GNU ld program lists
+  only `main`, where it listed GameSpy's `socket`, `connect`, `bind`, `send`, `sendto`, `recv`, `recvfrom`,
+  `setsockopt`, `getsockname`, `inet_addr` and `shutdown` before. No hidden name is defined twice in either the GNU ld
+  or the LLD program.
+- **Tests:** T2, T3 and T6 by `ctest -j8`, without a ROM: 356 of 356 in each build, the ROM tests skipped, with
+  `app_symbols_lld` new. The previous resolver, built against the new `test_symbols.c`, passes under GNU ld and fails
+  "a hidden global" under LLD; the new one passes under both. With the IRES dump, the es program opens its window (it
+  stopped with "SDL_Init failed: No available video device" before) and writes the Pokémon, Nintendo, Creatures and
+  Game Freak screen at frame 180. `--run-dir DIR --run-dump EVENT_BATTLE_RETURN_PROC_FUNCTIONS:8` writes that global's
+  8 bytes to `memory.txt` from the GNU ld program (GLOBAL HIDDEN) and from the LLD one (LOCAL HIDDEN). T4, T5 and T7
+  not run.
+- **Tiers:** unchanged: no game C changes.
+- **Trap stubs:** unchanged: no game source or stub generator changes.
+- **64-bit warnings:** not rerun: no game C changes; the last entry's 365 sites, real 66, stand.
+- **Work done:** on Linux, an executable exports a definition that a shared library refers to, and it wins over the
+  C library's. GameSpy defines the BSD socket calls for the DS (`lib/dwc/src/gscommon/gsPlatformSocket.c`), so
+  libwayland-client and libX11, loaded by a distribution's shared SDL3, called GameSpy's `socket` and `connect`, found
+  no display in the observed shared SDL3 Wayland/X11 setup, including the US build. CI runs
+  headless and didn't see it. `port_decomp_env` compiles the decomp with `-fvisibility=hidden` on Linux: the game's
+  calls bind as before, inside the program. The owner's review of PR 58 found that LLD makes such a global LOCAL
+  HIDDEN, where GNU ld keeps it GLOBAL HIDDEN, and that `port_host_global_address` (`port/hal/host/host_posix.c`),
+  which skipped every LOCAL symbol, would then have lost `--run-dump`'s globals. It now takes a LOCAL symbol that is
+  hidden; ordinary statics stay private and differing same-name candidate addresses give NULL. `test_symbols.c` checks a
+  hidden global on Linux, linked by GNU ld (`app_symbols`) and, where `ld.lld` is installed and the compiler is clang,
+  by LLD (`app_symbols_lld`, `port/cmake/app.cmake`). No game change.
+- **Next:** this branch published as a pull request to `main`, T0 and the owner's review. Issue 45's Spanish
+  gameplay and save evidence can now be gathered by playing the es build with a window.
+- **Blockers:** none.
+
 ## 2026-10-28: keep complete save validation fast on CI
 
 - **Upstream:** `fd3b9e600da72b208fa98c3486988d3d7ce16766`; reviewed main `70085bfae7`.
   PR 55's foundation head `3c6928e219` passed its exact-head local gates: B2 346 passed/28 explicit skips of 374;
   W2 343/28 of 371, zero failures, status 57467175440. Its macOS 15 Intel job then timed out after 120.14 seconds
   in `oracle_save_image`; every other hosted job passed. The merge remains gated on the corrected head's checks.
-- **Port:** `PORT_SHA`, a follow-up on `codex/card-physical-foundation`. This changes the oracle's Python CRC
+- **Port:** `ca9555921c`, a follow-up on `codex/card-physical-foundation`. This changes the oracle's Python CRC
   implementation and incremental CRC tests. No native C/header/build configuration, game data or workflow change.
 - **ROM (T0):** fresh configure/Ninja passes both original hashes with zero warnings: B2
   `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb`, W2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`.

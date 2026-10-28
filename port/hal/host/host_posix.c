@@ -271,7 +271,10 @@ void *port_host_global_address(const char *name) {
 // An ELF program exports nothing unless it links with --export-dynamic, and what it exports would stand in for any
 // library's symbol of the same name (the game has MD5Init, as libbsd does). So the program's own symbol table, which
 // the linker keeps unless the program is stripped, is read from the file, and a symbol's address is its value plus
-// where the program was loaded
+// where the program was loaded. The decomp is compiled with hidden visibility on Linux (port/CMakeLists.txt): GNU ld
+// keeps such a global GLOBAL HIDDEN in the table, LLD makes it LOCAL HIDDEN. So a LOCAL symbol counts when it is
+// hidden. Ordinary statics stay private; a deliberately hidden local is indistinguishable here, so a name
+// with differing candidate addresses gives NULL rather than selecting an arbitrary object
 
 // The main program's load address: the first object dl_iterate_phdr reports
 static int TakeFirst(struct dl_phdr_info *info, size_t size, void *data) {
@@ -319,6 +322,7 @@ static int MapProgram(void) {
 
 void *port_host_global_address(const char *name) {
     const ElfW(Shdr) * sections;
+    const ElfW(Sym) *found = NULL;
     ElfW(Addr) base = 0;
 
     if (!MapProgram()) {
@@ -345,14 +349,22 @@ void *port_host_global_address(const char *name) {
             const ElfW(Sym) *symbol = &symbols[j];
 
             if (symbol->st_shndx == SHN_UNDEF || symbol->st_name >= strtab->sh_size ||
-                ELF64_ST_BIND(symbol->st_info) == STB_LOCAL || strcmp(names + symbol->st_name, name) != 0) {
+                (ELF64_ST_BIND(symbol->st_info) == STB_LOCAL &&
+                 ELF64_ST_VISIBILITY(symbol->st_other) != STV_HIDDEN) ||
+                strcmp(names + symbol->st_name, name) != 0) {
                 continue;
             }
-            dl_iterate_phdr(TakeFirst, &base);
-            return (void *)(base + symbol->st_value);
+            if (found != NULL && found->st_value != symbol->st_value) {
+                return NULL;
+            }
+            found = symbol;
         }
     }
-    return NULL;
+    if (found == NULL) {
+        return NULL;
+    }
+    dl_iterate_phdr(TakeFirst, &base);
+    return (void *)(base + found->st_value);
 }
 
 #else
