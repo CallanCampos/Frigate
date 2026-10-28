@@ -1,4 +1,4 @@
-// The splash around an actor wading through water: field effect 16. The name is the ROM's own, from
+// The splash around an actor wading through water: field effect FLDEFF_SPLASH. The name is the ROM's own, from
 // GFL_HeapAllocate's file argument.
 #include "types.h"
 #include "field/field_actor.h"
@@ -77,7 +77,7 @@ static void FldeffSplash_UnloadModel(FieldEffectSplash *splash) {
 void FldeffSplash_AddModel(FieldEffects *effects, FieldActor *actor) {
     SplashTaskParams params;
 
-    params.splash = FieldEffects_GetHandleData(effects, 16);
+    params.splash = FieldEffects_GetHandleData(effects, FLDEFF_SPLASH);
     params.actor = actor;
     FieldEffects_TCBCreate(effects, &SPLASH_TASK_VTABLE, NULL, 0, &params, 0);
 }
