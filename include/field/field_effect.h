@@ -60,7 +60,7 @@ void GrassTask_Start(FieldEffects *effects, FieldActor *actor, BOOL animate, int
 // whose footprint type is 2 in sand (1) and snow (3), and tracks in deep sand (4). Tracks turn with the actor
 void Footmark_SetMMdl(FieldActor *actor, FieldEffects *effects, u32 kind);
 void ReflectTask_SetMMdl(MMSys *system, FieldActor *actor, FieldEffects *effects, u32 kind);
-void func_ov036_021be828(FieldEffects *effects, FieldActor *actor, u32 arg2, u32 arg3);
+void FldeffRipple_Start(FieldEffects *effects, FieldActor *actor, u32 arg2, u32 arg3);
 void func_ov036_021bea3c(FieldEffects *effects, FieldActor *actor);
 void func_ov036_021c289c(FieldActor *actor, FieldEffects *effects);
 void func_ov036_021c94e0(FieldEffects *effects, FieldActor *actor);
@@ -156,8 +156,8 @@ void *Footmark_Init(FieldEffects *effects, HeapID heapId);
 void Footmark_Delete(FieldEffects *effects, void *data);
 void *FldeffReflect_Create(FieldEffects *effects, HeapID heapId);
 void FldeffReflect_Delete(FieldEffects *effects, void *data);
-void *func_ov036_021be790(FieldEffects *effects, HeapID heapId);
-void func_ov036_021be7c4(FieldEffects *effects, void *data);
+void *FldeffRipple_Create(FieldEffects *effects, HeapID heapId);
+void FldeffRipple_Delete(FieldEffects *effects, void *data);
 void *FldeffNamipokeSplash_Create(FieldEffects *effects, HeapID heapId);
 void FldeffNamipokeSplash_Delete(FieldEffects *effects, void *data);
 void *FldeffIwakudaki_Create(FieldEffects *effects, HeapID heapId);

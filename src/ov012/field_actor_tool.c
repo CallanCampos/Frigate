@@ -362,7 +362,7 @@ void ActorTerrainEffect_SplashOrSwamp(FieldActor *actor, ActorTerrainEffectParam
             FldAct_SetSplashed(actor, TRUE);
         }
     } else if (MapTile_IsSwamp(param->tileClass) == TRUE) {
-        func_ov036_021be828(param->effects, actor, 1, 0);
+        FldeffRipple_Start(param->effects, actor, 1, 0);
     } else {
         FldAct_SetSplashed(actor, FALSE);
     }
@@ -415,13 +415,13 @@ void ActorTerrainEffect_LandingDust(FieldActor *actor, ActorTerrainEffectParam *
 
 void ActorTerrainEffect_RippleOrigY(FieldActor *actor, ActorTerrainEffectParam *param) {
     if (MapTile_IsRippleWater(param->tileClassOrigY) == TRUE) {
-        func_ov036_021be828(param->effects, actor, 0, 1);
+        FldeffRipple_Start(param->effects, actor, 0, 1);
     }
 }
 
 void ActorTerrainEffect_Ripple(FieldActor *actor, ActorTerrainEffectParam *param) {
     if (MapTile_IsRippleWater(param->tileClass) == TRUE) {
-        func_ov036_021be828(param->effects, actor, 0, 0);
+        FldeffRipple_Start(param->effects, actor, 0, 0);
     }
 }
 

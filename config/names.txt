@@ -11914,8 +11914,11 @@ overlays/ov036 0x021bcd00 Fld3DCi_GetPlttDataOffset
 overlays/ov036 0x021bcfcc Fld3DCi_InitEventData
 overlays/ov036 0x021bd074 Fld3DCi_DisplayRestoreTask
 overlays/ov036 0x021bd788 DayCare_MonKnowsMove
+overlays/ov036 0x021be790 FldeffRipple_Create
+overlays/ov036 0x021be7c4 FldeffRipple_Delete
 overlays/ov036 0x021be7d8 FieldEffectRipple_LoadMaterial
 overlays/ov036 0x021be818 FieldEffectRipple_FreeMaterial
+overlays/ov036 0x021be828 FldeffRipple_Start
 overlays/ov036 0x021be8b0 RippleTask_Init
 overlays/ov036 0x021be948 RippleTask_Free
 overlays/ov036 0x021be964 RippleTask_Update
