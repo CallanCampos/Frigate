@@ -43,9 +43,9 @@ struct MoveReminderProcessData {
 MoveReminderProcessData *MoveReminderProcessData_Create(HeapID heapId);
 void MoveReminderProcessData_Free(MoveReminderProcessData *data);
 
-// The screen's process (waza_oshie_main.c)
-extern const GameProcFunctions WazaOshieProcFunctions;
+// The screen's process (move_tutor_main.c)
+extern const GameProcFunctions MoveTutorProcFunctions;
 // The same, under the name its caller still uses
-extern const GameProcFunctions WazaOshieProcFunctions;
+extern const GameProcFunctions MoveTutorProcFunctions;
 
 #endif // POKEBW2_PML_MOVE_REMINDER_H

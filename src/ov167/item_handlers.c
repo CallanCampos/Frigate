@@ -18,8 +18,8 @@
 #include "constants/species.h"
 #include "constants/types.h"
 #include "pml/item.h"
+#include "pml/move.h"
 #include "pml/poke_party.h"
-#include "pml/waza.h"
 
 // One entry of the item lookup table at the end of the file: an item and the function that returns its handlers
 typedef struct ItemEventAddEntry {

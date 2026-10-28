@@ -10,7 +10,7 @@
 #include "constants/sound.h"
 #include "constants/version.h"
 #include "constants/zones.h"
-#include "demo/shinka_demo.h"
+#include "demo/evolution_demo.h"
 #include "field/colosseum.h"
 #include "field/comm_entry_menu.h"
 #include "field/comm_player.h"
@@ -1661,11 +1661,11 @@ static BOOL UnionOneself_StepTradeRun(UnionSystem *unisys, UnionSelf *situ, Fiel
     case 3: {
         PokemonTradeParam *param =
             GFL_HeapAllocate(HEAPID_UNION, sizeof(PokemonTradeParam), TRUE, "union_oneself.c", 2766);
-        ShinkaDemoParam *evolution;
+        EvolutionDemoParam *evolution;
 
         param->gameData = GSYS_GetGameData(unisys->param->gsys);
         param->party = PokeParty_Create(HEAPID_UNION);
-        evolution = GFL_HeapAllocate(HEAPID_GAMEEVENT, sizeof(ShinkaDemoParam), FALSE, "union_oneself.c", 2773);
+        evolution = GFL_HeapAllocate(HEAPID_GAMEEVENT, sizeof(EvolutionDemoParam), FALSE, "union_oneself.c", 2773);
         evolution->gameData = param->gameData;
         evolution->party = param->party;
         evolution->species = 0;

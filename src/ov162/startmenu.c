@@ -41,7 +41,7 @@
 #include "save/join_avenue.h"
 #include "save/key_info.h"
 #include "save/player_info.h"
-#include "save/pokedex.h"
+#include "save/pokedex_savedata.h"
 #include "save/save_control.h"
 #include "save/save_outside.h"
 #include "system/app_keycursor.h"

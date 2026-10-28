@@ -5,7 +5,7 @@
 #include "types.h"
 #include "field/field_actor.h"
 #include "field/field_effect.h"
-#include "gfl/blact.h"
+#include "gfl/billboard_actor.h"
 #include "gfl/g3d.h"
 #include "gfl/heap.h"
 #include "nitro/fx.h"
@@ -16,7 +16,7 @@ enum {
 
 typedef struct {
     FieldEffects *effects;
-    BlActSys *blact;
+    BillboardActorSys *billboardActor;
     u16 mats[FOOTMARK_TEXTURE_COUNT];
     // How far deep sand tracks sink
     fx32 sinkDepth;
@@ -74,7 +74,7 @@ void *Footmark_Init(FieldEffects *effects, HeapID heapId) {
         GFL_HeapAllocate(heapId, sizeof(FieldEffectFootmark), TRUE, "fldeff_footmark.c", 157);
 
     footmark->effects = effects;
-    footmark->blact = Field_GetEffectBlAct(FieldEffects_GetField(effects));
+    footmark->billboardActor = Field_GetEffectBillboardActor(FieldEffects_GetField(effects));
     Footmark_LoadTextures(footmark);
     footmark->sinkDepth = FX32_CONST(2);
     return footmark;
@@ -88,18 +88,18 @@ void Footmark_Delete(FieldEffects *effects, void *data) {
 static void Footmark_LoadTextures(FieldEffectFootmark *footmark) {
     const u16 *file = FOOTMARK_TEXTURE_FILES;
     ArcTool *arc = FieldEffects_GetArc(footmark->effects);
-    BlActMatRequest request;
+    BillboardActorMatRequest request;
     int i;
 
     request.format = 2;
     request.size = 17;
     request.faceWidth = 16;
     request.faceHeight = 16;
-    request.mode = BLACT_LOAD_TRIM;
+    request.mode = BILLBOARD_ACTOR_LOAD_TRIM;
     for (i = 0; i < FOOTMARK_TEXTURE_COUNT; i++) {
         request.texResource = GFL_G3DSysReadArcToolResource(arc, *file);
         FieldEffects_ApplyLuminanceTable(footmark->effects, request.texResource);
-        footmark->mats[i] = BlActSys_ExecMatLoadRequests(footmark->blact, &request, 1);
+        footmark->mats[i] = BillboardActorSys_ExecMatLoadRequests(footmark->billboardActor, &request, 1);
         file++;
     }
 }
@@ -108,7 +108,7 @@ static void Footmark_FreeTextures(FieldEffectFootmark *footmark) {
     int i;
 
     for (i = 0; i < FOOTMARK_TEXTURE_COUNT; i++) {
-        BlActSys_FreeMaterials(footmark->blact, footmark->mats[i], 1);
+        BillboardActorSys_FreeMaterials(footmark->billboardActor, footmark->mats[i], 1);
     }
 }
 
@@ -139,7 +139,7 @@ static u32 Footmark_GetTexture(FieldEffectFootmark *footmark, u32 kind, u32 dir,
     return texture;
 }
 
-void Footmark_SetMMdl(FieldActor *actor, FieldEffects *effects, u32 kind) {
+void Footmark_SetActor(FieldActor *actor, FieldEffects *effects, u32 kind) {
     FootmarkTaskParams params;
     VecFx32 pos;
     u16 texture;
@@ -166,7 +166,7 @@ void Footmark_SetMMdl(FieldActor *actor, FieldEffects *effects, u32 kind) {
 static void FootmarkTask_Init(FieldEffectTask *task, void *work) {
     FootmarkTask *fmTask = work;
     FootmarkTaskParams *params = FieldEffects_GetObjectParam(task);
-    BlActActorRequest request;
+    BillboardActorRequest request;
 
     fmTask->params = *params;
     fmTask->alpha = 31;
@@ -179,18 +179,18 @@ static void FootmarkTask_Init(FieldEffectTask *task, void *work) {
     request.callback = NULL;
     request.callbackData = fmTask;
     FieldEffects_GetObjectPos(task, &request.pos);
-    fmTask->actor = BlActSys_ExecActorRequests(fmTask->params.footmark->blact, 0, &request, 1, 3);
-    if (fmTask->actor == BLACT_NONE) {
+    fmTask->actor = BillboardActorSys_ExecActorRequests(fmTask->params.footmark->billboardActor, 0, &request, 1, 3);
+    if (fmTask->actor == BILLBOARD_ACTOR_NONE) {
         FieldEffects_DeleteObject(task);
     }
 }
 
 static void FootmarkTask_Delete(FieldEffectTask *task, void *work) {
     FootmarkTask *fmTask = work;
-    BlActSys *blact = fmTask->params.footmark->blact;
+    BillboardActorSys *billboardActor = fmTask->params.footmark->billboardActor;
 
-    if (fmTask->actor != BLACT_NONE) {
-        BlActSys_DeleteActors(blact, fmTask->actor, 1);
+    if (fmTask->actor != BILLBOARD_ACTOR_NONE) {
+        BillboardActorSys_DeleteActors(billboardActor, fmTask->actor, 1);
     }
 }
 
@@ -198,8 +198,8 @@ static void FootmarkTask_Delete(FieldEffectTask *task, void *work) {
 static void FootmarkTask_Update(FieldEffectTask *task, void *work) {
     FootmarkTask *fmTask = work;
     u8 alpha;
-    BlActSys *blact;
-    BlActScene *scene;
+    BillboardActorSys *billboardActor;
+    BillboardActorScene *scene;
     u16 sceneActor;
 
     switch (fmTask->state) {
@@ -216,10 +216,10 @@ static void FootmarkTask_Update(FieldEffectTask *task, void *work) {
             return;
         }
         alpha = fmTask->alpha;
-        blact = fmTask->params.footmark->blact;
-        scene = BlActSys_GetScene(blact);
-        sceneActor = BlActSys_GetSceneActor(blact, fmTask->actor);
-        BlActScene_SetActorAlpha(scene, sceneActor, &alpha);
+        billboardActor = fmTask->params.footmark->billboardActor;
+        scene = BillboardActorSys_GetScene(billboardActor);
+        sceneActor = BillboardActorSys_GetSceneActor(billboardActor, fmTask->actor);
+        BillboardActorScene_SetActorAlpha(scene, sceneActor, &alpha);
         break;
     }
 }

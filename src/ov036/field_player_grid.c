@@ -1151,7 +1151,7 @@ static void FieldPlayerGrid_UpdateBikeMove(FieldPlayerGrid *grid, FieldActor *ac
         if (FieldPlayerGrid_GetTileInDir(grid, PLAYER_DIR_NONE, &tileType) == TRUE &&
             MapTile_IsDeepSand(GetTileClass(tileType)) == TRUE) {
             acmd = ACMD_BIKE_DEEP_SAND;
-            FldeffKemuri_Start(actor, Field_GetFieldEffects(grid->field));
+            FldeffDust_Start(actor, Field_GetFieldEffects(grid->field));
         }
     }
     if (checkHeight == TRUE && FieldPlayerGrid_CompareHeightChange(grid, input->dir) == 1) {

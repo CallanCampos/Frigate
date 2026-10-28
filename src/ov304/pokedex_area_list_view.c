@@ -1,0 +1,1170 @@
+#include "types.h"
+#include "app/pokedex_area_list_view.h"
+#include "app/pokedex_common.h"
+#include "app/ui/frame_list.h"
+#include "app/ui/print_msg.h"
+#include "app/ui/ui_scene.h"
+#include "constants/arc.h"
+#include "constants/text_banks.h"
+#include "field/zone.h"
+#include "gfl/arc.h"
+#include "gfl/arc_util.h"
+#include "gfl/bg_sys.h"
+#include "gfl/bmp.h"
+#include "gfl/bmpwin.h"
+#include "gfl/clact.h"
+#include "gfl/graphics.h"
+#include "gfl/gx_layers.h"
+#include "gfl/heap.h"
+#include "gfl/msg.h"
+#include "gfl/overlay.h"
+#include "gfl/str.h"
+#include "gfl/tcb.h"
+#include "gfl/touchpanel.h"
+#include "nitro/gx.h"
+#include "nitro/hw.h"
+#include "system/aeabi.h"
+#include "system/app_menu_common.h"
+#include "system/blink_palanm.h"
+#include "system/gf_font.h"
+#include "system/palanm.h"
+#include "system/printsys.h"
+
+// What the Pokédex's list of areas shows. The ROM doesn't name this file; pokedex_area_list_view.c is a guess after
+// pokedex_area_list.c, whose work holds this file's
+
+// The frames between the steps of the scrolling backgrounds
+#define BG_SCROLL_FRAMES 4
+
+// The y of the scroll bar's ends
+#define SCROLL_BAR_TOP 12
+#define SCROLL_BAR_BOTTOM 156
+
+#define ROW_HEIGHT 24
+
+// The value of the list's items
+#define ITEM_AREA 1
+
+static void PokedexAreaListView_InitVRAM(void);
+static void PokedexAreaListView_InitBG(void);
+static void PokedexAreaListView_InitActorSys(PokedexAreaListView *view);
+static void PokedexAreaListView_InitWindows(PokedexAreaListView *view);
+static void PokedexAreaListView_CreateActorSys(void);
+static void PokedexAreaListView_LoadGraphics(void);
+static void PokedexAreaListView_CreateActors(PokedexAreaListView *view);
+static void PokedexAreaListView_InitPaletteFade(PokedexAreaListView *view);
+static void PokedexAreaListView_InitWindowMask(void);
+static void PokedexAreaListView_ExitWindowMask(void);
+static void PokedexAreaListView_ExitBG(void);
+static void PokedexAreaListView_ExitActors(PokedexAreaListView *view);
+static void PokedexAreaListView_ExitPaletteFade(PokedexAreaListView *view);
+static void PokedexAreaListView_ExitWindows(PokedexAreaListView *view);
+static void PokedexAreaListView_InitBlink(PokedexAreaListView *view);
+static void PokedexAreaListView_ExitBlink(PokedexAreaListView *view);
+static void PokedexAreaListView_InitBlend(void);
+static void PokedexAreaListView_Update(PokedexAreaListView *view);
+static void PokedexAreaListView_Blink(PokedexAreaListView *view);
+static u32 PokedexAreaListView_GetItemScreen(PokedexHabitatSummary *area);
+static void PokedexAreaListView_PrintItem(void *work, u32 index, PrintWindow *window, s16 y, BOOL firstBG);
+static void PokedexAreaListView_SelectItem(void *work, u32 index, BOOL moved);
+static void PokedexAreaListView_ScrollItems(void *work, s16 delta);
+static void PokedexAreaListView_SetRowMarks(PokedexAreaListView *view, u32 index, s16 y, BOOL firstBG);
+static void PokedexAreaListView_UpdateScrollBar(PokedexAreaListView *view);
+static BOOL PokedexAreaListView_IsAtBottom(PokedexAreaListView *view);
+static BOOL PokedexAreaListView_IsActorAnimating(PokedexAreaListView *view, u32 index);
+static u16 PokedexAreaListView_GetActorAnim(PokedexAreaListView *view, u32 index);
+static void PokedexAreaListView_ShowMarkFrame(PokedexAreaListView *view, BOOL visible);
+static void PokedexAreaListView_MoveMarkFrame(PokedexAreaListView *view);
+static void PokedexAreaListView_UpdatePageButtons(PokedexAreaListView *view, BOOL force);
+static void PokedexAreaListView_UpdateDecideButton(PokedexAreaListView *view);
+static void PokedexAreaListView_GetKinds(PokedexHabitatSummary *area, u8 *kind0, u8 *kind1, u8 *kind2);
+
+static const BGSysVRAMConfig sPokedexAreaListVRAMConfig = {
+    GX_VRAM_A,
+    GX_VRAM_NONE,
+    GX_VRAM_C,
+    GX_VRAM_NONE,
+    GX_VRAM_B,
+    GX_VRAM_NONE,
+    GX_VRAM_D,
+    GX_VRAM_NONE,
+    GX_VRAM_NONE,
+    GX_VRAM_NONE,
+    GX_OBJVRAMMODE_CHAR_1D_128K,
+    GX_OBJVRAMMODE_CHAR_1D_128K,
+};
+
+static const FrameListCallbacks sPokedexAreaListCallbacks = {
+    PokedexAreaListView_PrintItem,
+    PokedexAreaListView_SelectItem,
+    PokedexAreaListView_ScrollItems,
+};
+
+static const FrameListTouch sPokedexAreaListTouch[] = {
+    { { 0, 23, 128, 231 }, FRAMELIST_TOUCH_ITEM },
+    { { 24, 47, 128, 231 }, FRAMELIST_TOUCH_ITEM },
+    { { 48, 71, 128, 231 }, FRAMELIST_TOUCH_ITEM },
+    { { 72, 95, 128, 231 }, FRAMELIST_TOUCH_ITEM },
+    { { 96, 119, 128, 231 }, FRAMELIST_TOUCH_ITEM },
+    { { 120, 143, 128, 231 }, FRAMELIST_TOUCH_ITEM },
+    { { 144, 167, 128, 231 }, FRAMELIST_TOUCH_ITEM },
+    { { 8, 160, 232, 255 }, FRAMELIST_TOUCH_BAR },
+    { { 168, 191, 136, 159 }, FRAMELIST_TOUCH_PAGE_UP },
+    { { 168, 191, 160, 183 }, FRAMELIST_TOUCH_PAGE_DOWN },
+    { { TOUCH_RECT_END, 0, 0, 0 }, 0 },
+};
+
+static const FrameListSetup sPokedexAreaListSetup = {
+    { 2, 6, 8, 0, 24, 3, 7, 0, 15, 3, 5, { 24, 12, 8, 6, 4, 3 }, 7, 8, 0 },
+    0,
+    10,
+    0,
+    POKEDEX_AREA_LIST_ROWS,
+    0,
+    sPokedexAreaListTouch,
+    &sPokedexAreaListCallbacks,
+    NULL,
+};
+
+void PokedexAreaListView_Init(PokedexAreaListView *view, GameData *gameData) {
+    GFL_OvlLoad(OVERLAY_APP_UI);
+    GFL_BGSysSetEnabledBGsA(0);
+    GFL_BGSysSetEnabledBGsB(0);
+    G2_BlendNone();
+    G2S_BlendNone();
+    GX_SetMasterBrightness(-16);
+    GXS_SetMasterBrightness(-16);
+    GFL_BGSysSetDisplayLayout(GX_DISP_SELECT_SUB_MAIN);
+    PokedexAreaListView_InitVRAM();
+    PokedexAreaListView_InitBG();
+    PokedexAreaListView_InitActorSys(view);
+    PokedexAreaListView_InitWindows(view);
+    PokedexAreaListView_CreateActors(view);
+    PokedexAreaListView_LoadGraphics();
+    PokedexAreaListView_InitPaletteFade(view);
+    PokedexAreaListView_InitBlink(view);
+    PokedexAreaListView_InitBlend();
+    PokedexAreaListView_InitWindowMask();
+    view->listBusy = TRUE;
+}
+
+BOOL PokedexAreaListView_Draw(PokedexAreaListView *view) {
+    if (FrameList_Draw(view->list) == TRUE) {
+        PokedexAreaListView_ShowMarkFrame(view, TRUE);
+        PokedexAreaListView_UpdatePageButtons(view, FALSE);
+        return FALSE;
+    }
+    return TRUE;
+}
+
+void PokedexAreaListView_Exit(PokedexAreaListView *view) {
+    PokedexAreaListView_ExitWindowMask();
+    PokedexAreaListView_ExitWindows(view);
+    PokedexAreaListView_ExitBlink(view);
+    PokedexAreaListView_ExitActors(view);
+    PokedexAreaListView_ExitBG();
+    PokedexAreaListView_ExitPaletteFade(view);
+    G2_BlendNone();
+    G2S_BlendNone();
+    GX_SetMasterBrightness(-16);
+    GXS_SetMasterBrightness(-16);
+    G2_BlendNone();
+    G2S_BlendNone();
+    GFL_BGSysSetEnabledBGsA(0);
+    GFL_BGSysSetEnabledBGsB(0);
+    GFL_OvlUnload(OVERLAY_APP_UI);
+}
+
+void PokedexAreaListView_VBlank(PokedexAreaListView *view) {
+    ClActSys_VBlank();
+    PaletteFade_Transfer(view->paletteFade);
+}
+
+void PokedexAreaListView_HBlank(PokedexAreaListView *view) {
+    s32 vcount = GX_GetVCount();
+
+    if (vcount >= 168) {
+        G2S_ChangeBlendAlpha(11, 5);
+    } else if (vcount >= 144) {
+        G2S_ChangeBlendAlpha(10, 6);
+    } else if (vcount >= 120) {
+        G2S_ChangeBlendAlpha(9, 7);
+    } else if (vcount >= 96) {
+        G2S_ChangeBlendAlpha(8, 8);
+    } else if (vcount >= 72) {
+        G2S_ChangeBlendAlpha(6, 10);
+    } else {
+        G2S_ChangeBlendAlpha(4, 12);
+    }
+}
+
+void PokedexAreaListView_Main(PokedexAreaListView *view) {
+    PokedexAreaListView_Update(view);
+    PokedexAreaListView_UpdateScrollBar(view);
+    if (view->blinkPaused == FALSE) {
+        PokedexAreaListView_Blink(view);
+    }
+    view->scrollTimer++;
+    if (view->scrollTimer == BG_SCROLL_FRAMES) {
+        GFL_BGSysMoveBGReq(3, BG_MOVE_RIGHT, 1);
+        GFL_BGSysMoveBGReq(7, BG_MOVE_RIGHT, 1);
+        view->scrollTimer = 0;
+    }
+    ClActSys_Draw();
+}
+
+u32 PokedexAreaListView_ListMain(PokedexAreaListView *view) {
+    u32 result = FrameList_Main(view->list);
+
+    if (result == FRAMELIST_NONE) {
+        PokedexAreaListView_ShowMarkFrame(view, TRUE);
+        PokedexAreaListView_UpdatePageButtons(view, FALSE);
+        view->listBusy = FALSE;
+    } else {
+        view->listBusy = TRUE;
+    }
+    return result;
+}
+
+static void PokedexAreaListView_InitVRAM(void) {
+    GFL_BGSysSetVRAMBanks(&sPokedexAreaListVRAMConfig);
+}
+
+static void PokedexAreaListView_InitBG(void) {
+    GFL_BGSysCreate(HEAPID_POKEDEX_AREA_LIST);
+    {
+        BGSysLCDConfig config = { GX_DISPMODE_GRAPHICS, GX_BGMODE_0, GX_BGMODE_0, GX_BG0_AS_2D };
+
+        GFL_BGSysSetLCDConfig(&config);
+    }
+    {
+        BGSetup setup = {
+            0,
+            0,
+            0x800,
+            0,
+            BGRES_256x256,
+            GX_BG_COLORMODE_16,
+            GX_BG_SCRBASE(0xf800),
+            GX_BG_CHARBASE(0x00000),
+            0x8000,
+            GX_BG_EXTPLTT_01,
+            0,
+            0,
+            0,
+        };
+
+        GFL_BGSysCreateBG(0, &setup, BGMODE_TEXT);
+        GFL_BGSysClearScr(0);
+        GFL_BGSysClearCharCore(0, BGSYS_TILE_SIZE_16, 0, HEAPID_POKEDEX_AREA_LIST);
+        GFL_BGSysQueueScrLoad(0);
+        GFL_BGSysSetBGEnabled(0, TRUE);
+    }
+    {
+        BGSetup setup = {
+            0,
+            0,
+            0x800,
+            0,
+            BGRES_256x512,
+            GX_BG_COLORMODE_16,
+            GX_BG_SCRBASE(0xf000),
+            GX_BG_CHARBASE(0x08000),
+            0x4000,
+            GX_BG_EXTPLTT_01,
+            1,
+            0,
+            0,
+        };
+
+        GFL_BGSysCreateBG(1, &setup, BGMODE_TEXT);
+        GFL_BGSysSetBGEnabled(1, TRUE);
+    }
+    {
+        BGSetup setup = {
+            0,
+            0,
+            0x800,
+            0,
+            BGRES_256x256,
+            GX_BG_COLORMODE_16,
+            GX_BG_SCRBASE(0xe800),
+            GX_BG_CHARBASE(0x10000),
+            0x8000,
+            GX_BG_EXTPLTT_01,
+            2,
+            0,
+            0,
+        };
+
+        GFL_BGSysCreateBG(2, &setup, BGMODE_TEXT);
+        GFL_BGSysClearScr(2);
+        GFL_BGSysQueueScrLoad(2);
+        GFL_BGSysSetBGEnabled(2, TRUE);
+    }
+    {
+        BGSetup setup = {
+            0,
+            0,
+            0x800,
+            0,
+            BGRES_256x256,
+            GX_BG_COLORMODE_16,
+            GX_BG_SCRBASE(0xe000),
+            GX_BG_CHARBASE(0x18000),
+            0x8000,
+            GX_BG_EXTPLTT_01,
+            3,
+            0,
+            0,
+        };
+
+        GFL_BGSysCreateBG(3, &setup, BGMODE_TEXT);
+        GFL_BGSysSetBGEnabled(3, TRUE);
+    }
+    {
+        BGSetup setup = {
+            0,
+            0,
+            0x800,
+            0,
+            BGRES_256x256,
+            GX_BG_COLORMODE_16,
+            GX_BG_SCRBASE(0x0000),
+            GX_BG_CHARBASE(0x04000),
+            0x8000,
+            GX_BG_EXTPLTT_01,
+            0,
+            0,
+            0,
+        };
+
+        GFL_BGSysCreateBG(4, &setup, BGMODE_TEXT);
+        GFL_BGSysClearScr(4);
+        GFL_BGSysClearCharCore(4, BGSYS_TILE_SIZE_16, 0, HEAPID_POKEDEX_AREA_LIST);
+        GFL_BGSysQueueScrLoad(4);
+        GFL_BGSysSetBGEnabled(4, TRUE);
+    }
+    {
+        BGSetup setup = {
+            0,
+            0,
+            0x800,
+            0,
+            BGRES_512x256,
+            GX_BG_COLORMODE_16,
+            GX_BG_SCRBASE(0x0800),
+            GX_BG_CHARBASE(0x0c000),
+            0x8000,
+            GX_BG_EXTPLTT_01,
+            1,
+            0,
+            0,
+        };
+
+        GFL_BGSysCreateBG(5, &setup, BGMODE_TEXT);
+        GFL_BGSysClearScr(5);
+        GFL_BGSysQueueScrLoad(5);
+        GFL_BGSysSetBGEnabled(5, TRUE);
+    }
+    {
+        BGSetup setup = {
+            0,
+            0,
+            0x800,
+            0,
+            BGRES_256x256,
+            GX_BG_COLORMODE_16,
+            GX_BG_SCRBASE(0x1000),
+            GX_BG_CHARBASE(0x10000),
+            0x8000,
+            GX_BG_EXTPLTT_01,
+            2,
+            0,
+            0,
+        };
+
+        GFL_BGSysCreateBG(6, &setup, BGMODE_TEXT);
+        GFL_BGSysClearScr(6);
+        GFL_BGSysQueueScrLoad(6);
+        GFL_BGSysSetBGEnabled(6, TRUE);
+    }
+    {
+        BGSetup setup = {
+            0,
+            0,
+            0x800,
+            0,
+            BGRES_256x256,
+            GX_BG_COLORMODE_16,
+            GX_BG_SCRBASE(0x1800),
+            GX_BG_CHARBASE(0x1c000),
+            0x8000,
+            GX_BG_EXTPLTT_01,
+            2,
+            0,
+            0,
+        };
+
+        GFL_BGSysCreateBG(7, &setup, BGMODE_TEXT);
+        GFL_BGSysClearScr(7);
+        GFL_BGSysQueueScrLoad(7);
+        GFL_BGSysSetBGEnabled(7, TRUE);
+    }
+    GFL_BGSysSetBGEnabledA(GX_PLANEMASK_BG0 | GX_PLANEMASK_BG1, TRUE);
+    GFL_BGSysSetBGEnabledB(GX_PLANEMASK_BG0 | GX_PLANEMASK_BG1 | GX_PLANEMASK_BG2, TRUE);
+}
+
+static void PokedexAreaListView_InitActorSys(PokedexAreaListView *view) {
+    PokedexAreaListView_CreateActorSys();
+    view->actorUnit = ClActUnit_Create(112, 0, HEAPID_POKEDEX_AREA_LIST);
+    ClActUnit_UseSystemRenderer(view->actorUnit);
+    GFL_BGSysSetBGEnabledA(GX_PLANEMASK_OBJ, TRUE);
+    GFL_BGSysSetBGEnabledB(GX_PLANEMASK_OBJ, TRUE);
+}
+
+// The windows cover the whole of their screens, the lower and the upper
+static void PokedexAreaListView_InitWindows(PokedexAreaListView *view) {
+    BmpWin_InitAllocator(HEAPID_POKEDEX_AREA_LIST);
+    view->printQueue = PrintQueue_CreateDefault(HEAPID_POKEDEX_AREA_LIST);
+
+    view->windows[POKEDEX_AREA_LIST_WIN_MAIN] = BmpWin_CreateDynamic(0, 0, 0, 32, 24, 15, 0);
+    BmpWin_FlushMap(view->windows[POKEDEX_AREA_LIST_WIN_MAIN]);
+    GFL_BitmapFill(BmpWin_GetBitmap(view->windows[POKEDEX_AREA_LIST_WIN_MAIN]), 0);
+    BmpWin_FlushChar(view->windows[POKEDEX_AREA_LIST_WIN_MAIN]);
+    GFL_BGSysQueueScrLoad(0);
+    PrintWindow_Init(&view->printWindows[POKEDEX_AREA_LIST_WIN_MAIN], view->windows[POKEDEX_AREA_LIST_WIN_MAIN]);
+
+    view->windows[POKEDEX_AREA_LIST_WIN_SUB] = BmpWin_CreateDynamic(4, 0, 0, 32, 24, 0, 0);
+    BmpWin_FlushMap(view->windows[POKEDEX_AREA_LIST_WIN_SUB]);
+    GFL_BitmapFill(BmpWin_GetBitmap(view->windows[POKEDEX_AREA_LIST_WIN_SUB]), 0);
+    BmpWin_FlushChar(view->windows[POKEDEX_AREA_LIST_WIN_SUB]);
+    GFL_BGSysQueueScrLoad(4);
+    PrintWindow_Init(&view->printWindows[POKEDEX_AREA_LIST_WIN_SUB], view->windows[POKEDEX_AREA_LIST_WIN_SUB]);
+
+    view->font = GFL_FontCreate(ARCID_FONT, 0, 0, FALSE, HEAPID_POKEDEX_AREA_LIST);
+}
+
+static void PokedexAreaListView_CreateActorSys(void) {
+    ClActSysSetup setup = { 0, 0, 0, 512, 4, 124, 4, 124, 0, 112, 112, 112, 0, 16, 16 };
+
+    ClActSys_Create(&setup, &sPokedexAreaListVRAMConfig, HEAPID_POKEDEX_AREA_LIST);
+}
+
+static void PokedexAreaListView_LoadGraphics(void) {
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_POKEDEX_GRA, HEAPID_POKEDEX_AREA_LIST);
+
+    GFL_G2DIOLoadArcNCLRDefault(arc, 49, PALTYPE_MAIN_BG, 0, 0, HEAPID_POKEDEX_AREA_LIST);
+    GFL_G2DIOLoadArcNCLRDefault(arc, 51, PALTYPE_SUB_BG, 0, 0, HEAPID_POKEDEX_AREA_LIST);
+    GFL_BGSysLoadArcNCGRStatic(arc, 58, 3, 0, 0, FALSE, HEAPID_POKEDEX_AREA_LIST);
+    loadBGScrToVramByFileNoReserveNegAlign(arc, 115, 3, 0, 0, FALSE, HEAPID_POKEDEX_AREA_LIST);
+    GFL_BGSysLoadArcNCGRStatic(arc, 59, 5, 0, 0, FALSE, HEAPID_POKEDEX_AREA_LIST);
+    loadBGScrToVramByFileNoReserveNegAlign(arc, 127, 5, 0, 0, FALSE, HEAPID_POKEDEX_AREA_LIST);
+    GFL_BGSysLoadArcNCGRStatic(arc, 60, 2, 0, 0, FALSE, HEAPID_POKEDEX_AREA_LIST);
+    GFL_BGSysLoadArcNCGRStatic(arc, 61, 6, 0, 0, FALSE, HEAPID_POKEDEX_AREA_LIST);
+    GFL_BGSysLoadArcNCGRStatic(arc, 59, 7, 0, 0, FALSE, HEAPID_POKEDEX_AREA_LIST);
+    loadBGScrToVramByFileNoReserveNegAlign(arc, 116, 7, 0, 0, FALSE, HEAPID_POKEDEX_AREA_LIST);
+    GFL_ArcToolFree(arc);
+
+    // The touch bar
+    arc = GFL_ArcSysCreateFileHandle(getUINarcIdx(), HEAPID_POKEDEX_AREA_LIST);
+    GFL_BGSysLoadArcNCGRDynamic(arc, AppMenuCommon_GetBarBgCharFile(), 1, 0, FALSE, HEAPID_POKEDEX_AREA_LIST);
+    GFL_G2DIOLoadArcNCLRDefault(arc, AppMenuCommon_GetBarBgPaletteFile(), PALTYPE_MAIN_BG, 14 * 0x20, 0x20,
+                                HEAPID_POKEDEX_AREA_LIST);
+    loadBGScrToVramByFileNoReserveNegAlign(arc, AppMenuCommon_GetBarScreenFile(), 1, 0, 0, FALSE,
+                                           HEAPID_POKEDEX_AREA_LIST);
+    GFL_BGSysSetScrPaletteNo(1, 0, 21, 32, 3, 14);
+    GFL_BGSysQueueScrLoad(1);
+    GFL_ArcToolFree(arc);
+
+    GFL_BGSysLoadNCLRDefault(ARCID_FONT, 5, PALTYPE_MAIN_BG, 15 * 0x20, 0x20, HEAPID_POKEDEX_AREA_LIST);
+    GFL_BGSysLoadNCLRDefault(ARCID_FONT, 5, PALTYPE_SUB_BG, 15 * 0x20, 0x20, HEAPID_POKEDEX_AREA_LIST);
+}
+
+static void PokedexAreaListView_CreateActors(PokedexAreaListView *view) {
+    int i;
+
+    {
+        UIObjResSetup setup;
+
+        setup.vramType = 0;
+        setup.flags = 0;
+        setup.arcId = ARCID_POKEDEX_GRA;
+        setup.paletteFile = 53;
+        setup.charFile = 57;
+        setup.cellFile = 63;
+        setup.animFile = 73;
+        setup.paletteOffset = 0;
+        setup.paletteStart = 0;
+        setup.paletteCount = 7;
+        UIObjRes_Load(&view->res[POKEDEX_AREA_LIST_RES_MAIN], &setup, view->actorUnit, HEAPID_POKEDEX_AREA_LIST);
+    }
+    {
+        UIObjResSetup setup;
+
+        setup.vramType = 1;
+        setup.flags = 0;
+        setup.arcId = ARCID_POKEDEX_GRA;
+        setup.paletteFile = 53;
+        setup.charFile = 57;
+        setup.cellFile = 63;
+        setup.animFile = 73;
+        setup.paletteOffset = 0;
+        setup.paletteStart = 0;
+        setup.paletteCount = 7;
+        UIObjRes_Load(&view->res[POKEDEX_AREA_LIST_RES_SUB], &setup, view->actorUnit, HEAPID_POKEDEX_AREA_LIST);
+    }
+    {
+        UIObjResSetup setup;
+
+        setup.vramType = 0;
+        setup.flags = 0;
+        setup.arcId = getUINarcIdx();
+        setup.paletteFile = AppMenuCommon_GetTouchBarPaletteFile();
+        setup.charFile = AppMenuCommon_GetTouchBarCharFile();
+        setup.cellFile = AppMenuCommon_GetTouchBarCellFile(2);
+        setup.animFile = AppMenuCommon_GetTouchBarAnimFile(2);
+        setup.paletteOffset = 10;
+        setup.paletteStart = 0;
+        setup.paletteCount = 3;
+        UIObjRes_Load(&view->res[POKEDEX_AREA_LIST_RES_TOUCHBAR], &setup, view->actorUnit, HEAPID_POKEDEX_AREA_LIST);
+    }
+
+    for (i = POKEDEX_AREA_LIST_OBJ_MARK; i < POKEDEX_AREA_LIST_OBJ_MARK + POKEDEX_AREA_LIST_MARK_COUNT; i++) {
+        view->actors[i] = UIObjRes_CreateActor(&view->res[POKEDEX_AREA_LIST_RES_MAIN], view->actorUnit, 0, 0, 12,
+                                               HEAPID_POKEDEX_AREA_LIST);
+        ClActor_SetVisible(view->actors[i], FALSE);
+        ClActor_SetBgPriority(view->actors[i], 2);
+        ClActor_SetObjMode(view->actors[i], GX_OAM_MODE_XLU);
+    }
+    for (i = POKEDEX_AREA_LIST_OBJ_MARK_SUB; i < POKEDEX_AREA_LIST_OBJ_MARK_SUB + POKEDEX_AREA_LIST_MARK_COUNT; i++) {
+        view->actors[i] = UIObjRes_CreateActor(&view->res[POKEDEX_AREA_LIST_RES_SUB], view->actorUnit, 0, 0, 12,
+                                               HEAPID_POKEDEX_AREA_LIST);
+        ClActor_SetVisible(view->actors[i], FALSE);
+        ClActor_SetBgPriority(view->actors[i], 2);
+        ClActor_SetObjMode(view->actors[i], GX_OAM_MODE_XLU);
+    }
+    // The marks' windows on the upper screen show the row under them unblended
+    for (i = POKEDEX_AREA_LIST_OBJ_MARK_WINDOW; i < POKEDEX_AREA_LIST_OBJ_MARK_WINDOW + POKEDEX_AREA_LIST_MARK_COUNT;
+         i++) {
+        view->actors[i] = UIObjRes_CreateActor(&view->res[POKEDEX_AREA_LIST_RES_SUB], view->actorUnit, 0, 0, 12,
+                                               HEAPID_POKEDEX_AREA_LIST);
+        ClActor_SetVisible(view->actors[i], TRUE);
+        ClActor_SetObjMode(view->actors[i], 2);
+    }
+
+    view->actors[POKEDEX_AREA_LIST_OBJ_DECIDE] = UIObjRes_CreateActor(
+        &view->res[POKEDEX_AREA_LIST_RES_MAIN], view->actorUnit, 32, 64, 15, HEAPID_POKEDEX_AREA_LIST);
+    ClActor_SetVisible(view->actors[POKEDEX_AREA_LIST_OBJ_DECIDE], TRUE);
+    ClActor_SetAutoAnim(view->actors[POKEDEX_AREA_LIST_OBJ_DECIDE], TRUE);
+
+    view->actors[POKEDEX_AREA_LIST_OBJ_MODE_UPPER] = UIObjRes_CreateActor(
+        &view->res[POKEDEX_AREA_LIST_RES_MAIN], view->actorUnit, 32, 110, 13, HEAPID_POKEDEX_AREA_LIST);
+    ClActor_SetVisible(view->actors[POKEDEX_AREA_LIST_OBJ_MODE_UPPER], TRUE);
+    ClActor_SetBgPriority(view->actors[POKEDEX_AREA_LIST_OBJ_MODE_UPPER], 2);
+
+    view->actors[POKEDEX_AREA_LIST_OBJ_MODE_LOWER] = UIObjRes_CreateActor(
+        &view->res[POKEDEX_AREA_LIST_RES_MAIN], view->actorUnit, 32, 133, 13, HEAPID_POKEDEX_AREA_LIST);
+    ClActor_SetVisible(view->actors[POKEDEX_AREA_LIST_OBJ_MODE_LOWER], TRUE);
+    ClActor_SetBgPriority(view->actors[POKEDEX_AREA_LIST_OBJ_MODE_LOWER], 2);
+
+    view->actors[POKEDEX_AREA_LIST_OBJ_MODE_HABITAT] = UIObjRes_CreateActor(
+        &view->res[POKEDEX_AREA_LIST_RES_MAIN], view->actorUnit, 32, 156, 14, HEAPID_POKEDEX_AREA_LIST);
+    ClActor_SetVisible(view->actors[POKEDEX_AREA_LIST_OBJ_MODE_HABITAT], TRUE);
+    ClActor_SetBgPriority(view->actors[POKEDEX_AREA_LIST_OBJ_MODE_HABITAT], 2);
+
+    view->actors[POKEDEX_AREA_LIST_OBJ_MODE] = UIObjRes_CreateActor(
+        &view->res[POKEDEX_AREA_LIST_RES_MAIN], view->actorUnit, 32, 180, 1, HEAPID_POKEDEX_AREA_LIST);
+    ClActor_SetVisible(view->actors[POKEDEX_AREA_LIST_OBJ_MODE], TRUE);
+
+    view->actors[POKEDEX_AREA_LIST_OBJ_SCROLL_BAR] = UIObjRes_CreateActor(
+        &view->res[POKEDEX_AREA_LIST_RES_MAIN], view->actorUnit, 0, 0, 2, HEAPID_POKEDEX_AREA_LIST);
+
+    view->actors[POKEDEX_AREA_LIST_OBJ_SCROLL_RAIL] = UIObjRes_CreateActor(
+        &view->res[POKEDEX_AREA_LIST_RES_MAIN], view->actorUnit, 252, 84, 3, HEAPID_POKEDEX_AREA_LIST);
+    ClActor_SetBgPriority(view->actors[POKEDEX_AREA_LIST_OBJ_SCROLL_RAIL], 1);
+
+    view->actors[POKEDEX_AREA_LIST_OBJ_MARK_FRAME] = UIObjRes_CreateActor(
+        &view->res[POKEDEX_AREA_LIST_RES_MAIN], view->actorUnit, 0, 0, 32, HEAPID_POKEDEX_AREA_LIST);
+    ClActor_SetBgPriority(view->actors[POKEDEX_AREA_LIST_OBJ_MARK_FRAME], 1);
+
+    view->actors[POKEDEX_AREA_LIST_OBJ_PAGE_UP] = UIObjRes_CreateActor(
+        &view->res[POKEDEX_AREA_LIST_RES_TOUCHBAR], view->actorUnit, 132, 168, 4, HEAPID_POKEDEX_AREA_LIST);
+    view->actors[POKEDEX_AREA_LIST_OBJ_PAGE_DOWN] = UIObjRes_CreateActor(
+        &view->res[POKEDEX_AREA_LIST_RES_TOUCHBAR], view->actorUnit, 156, 168, 5, HEAPID_POKEDEX_AREA_LIST);
+    view->actors[POKEDEX_AREA_LIST_OBJ_SHORTCUT] = UIObjRes_CreateActor(
+        &view->res[POKEDEX_AREA_LIST_RES_TOUCHBAR], view->actorUnit, 184, 172, 6, HEAPID_POKEDEX_AREA_LIST);
+    view->actors[POKEDEX_AREA_LIST_OBJ_EXIT] = UIObjRes_CreateActor(
+        &view->res[POKEDEX_AREA_LIST_RES_TOUCHBAR], view->actorUnit, 208, 168, 0, HEAPID_POKEDEX_AREA_LIST);
+    view->actors[POKEDEX_AREA_LIST_OBJ_RETURN] = UIObjRes_CreateActor(
+        &view->res[POKEDEX_AREA_LIST_RES_TOUCHBAR], view->actorUnit, 232, 168, 1, HEAPID_POKEDEX_AREA_LIST);
+}
+
+static void PokedexAreaListView_InitPaletteFade(PokedexAreaListView *view) {
+    view->paletteFade = PaletteFade_Create(HEAPID_POKEDEX_AREA_LIST);
+    PaletteFade_AllocBuffer(view->paletteFade, PALFADE_BUFFER_MAIN_BG, 0x200, HEAPID_POKEDEX_AREA_LIST);
+    PaletteFade_AllocBuffer(view->paletteFade, PALFADE_BUFFER_SUB_BG, 0x200, HEAPID_POKEDEX_AREA_LIST);
+    PaletteFade_AllocBuffer(view->paletteFade, PALFADE_BUFFER_MAIN_OBJ, 0x200, HEAPID_POKEDEX_AREA_LIST);
+    PaletteFade_AllocBuffer(view->paletteFade, PALFADE_BUFFER_SUB_OBJ, 0x200, HEAPID_POKEDEX_AREA_LIST);
+    PaletteFade_LoadFromVRAM(view->paletteFade, PALFADE_BUFFER_MAIN_BG, 0, 0x200);
+    PaletteFade_LoadFromVRAM(view->paletteFade, PALFADE_BUFFER_SUB_BG, 0, 0x200);
+    PaletteFade_LoadFromVRAM(view->paletteFade, PALFADE_BUFFER_MAIN_OBJ, 0, 0x200);
+    PaletteFade_LoadFromVRAM(view->paletteFade, PALFADE_BUFFER_SUB_OBJ, 0, 0x200);
+}
+
+// The marks' windows on the upper screen show the row under them unblended
+static void PokedexAreaListView_InitWindowMask(void) {
+    G2S_SetWndOBJInsidePlane(GX_WND_PLANEMASK_BG0 | GX_WND_PLANEMASK_BG1 | GX_WND_PLANEMASK_BG3 | GX_WND_PLANEMASK_OBJ,
+                             TRUE);
+    G2S_SetWndOutsidePlane(GX_WND_PLANEMASK_BG0 | GX_WND_PLANEMASK_BG1 | GX_WND_PLANEMASK_BG2 | GX_WND_PLANEMASK_BG3 |
+                               GX_WND_PLANEMASK_OBJ,
+                           TRUE);
+    GXS_SetVisibleWnd(GX_WNDMASK_OW);
+}
+
+static void PokedexAreaListView_ExitWindowMask(void) {
+    GXS_SetVisibleWnd(GX_WNDMASK_NONE);
+}
+
+static void PokedexAreaListView_ExitBG(void) {
+    GFL_BGSysSetBGEnabledA(GX_PLANEMASK_BG0 | GX_PLANEMASK_BG1 | GX_PLANEMASK_BG2 | GX_PLANEMASK_BG3, FALSE);
+    GFL_BGSysSetBGEnabledB(GX_PLANEMASK_BG0 | GX_PLANEMASK_BG1 | GX_PLANEMASK_BG2 | GX_PLANEMASK_BG3, FALSE);
+    GFL_BGSysReleaseBG(7);
+    GFL_BGSysReleaseBG(6);
+    GFL_BGSysReleaseBG(5);
+    GFL_BGSysReleaseBG(4);
+    GFL_BGSysReleaseBG(3);
+    GFL_BGSysReleaseBG(2);
+    GFL_BGSysReleaseBG(1);
+    GFL_BGSysReleaseBG(0);
+    GFL_BGSysFree();
+}
+
+static void PokedexAreaListView_ExitActors(PokedexAreaListView *view) {
+    UIObjRes_Free(&view->res[POKEDEX_AREA_LIST_RES_MAIN]);
+    UIObjRes_Free(&view->res[POKEDEX_AREA_LIST_RES_SUB]);
+    UIObjRes_Free(&view->res[POKEDEX_AREA_LIST_RES_TOUCHBAR]);
+    ClActUnit_Delete(view->actorUnit);
+    ClActSys_Delete();
+}
+
+static void PokedexAreaListView_ExitPaletteFade(PokedexAreaListView *view) {
+    PaletteFade_FreeBuffer(view->paletteFade, PALFADE_BUFFER_MAIN_BG);
+    PaletteFade_FreeBuffer(view->paletteFade, PALFADE_BUFFER_SUB_BG);
+    PaletteFade_FreeBuffer(view->paletteFade, PALFADE_BUFFER_MAIN_OBJ);
+    PaletteFade_FreeBuffer(view->paletteFade, PALFADE_BUFFER_SUB_OBJ);
+    PaletteFade_Free(view->paletteFade);
+}
+
+static void PokedexAreaListView_ExitWindows(PokedexAreaListView *view) {
+    PrintQueue_Clear(view->printQueue);
+    PrintQueue_Free(view->printQueue);
+    GFL_FontFree(view->font);
+    BmpWin_FreeAllocator();
+    BmpWin_Free(view->windows[POKEDEX_AREA_LIST_WIN_MAIN]);
+    BmpWin_Free(view->windows[POKEDEX_AREA_LIST_WIN_SUB]);
+}
+
+void PokedexAreaListView_StartFade(PokedexAreaListView *view, u8 start, u8 end) {
+    PaletteFade_StartFade(view->paletteFade, 1 << PALFADE_BUFFER_MAIN_BG, 0xbfff, -14, start, end, GX_RGB(0, 0, 0),
+                          GFL_VBlankGetTCBMgr());
+    PaletteFade_StartFade(view->paletteFade, 1 << PALFADE_BUFFER_SUB_BG, 0x3ffe, -14, start, end, GX_RGB(0, 0, 0),
+                          GFL_VBlankGetTCBMgr());
+    PaletteFade_StartFade(view->paletteFade, 1 << PALFADE_BUFFER_MAIN_OBJ, 0x3f, -14, start, end, GX_RGB(0, 0, 0),
+                          GFL_VBlankGetTCBMgr());
+    PaletteFade_StartFade(view->paletteFade, 1 << PALFADE_BUFFER_SUB_OBJ, 0x3fff, -14, start, end, GX_RGB(0, 0, 0),
+                          GFL_VBlankGetTCBMgr());
+}
+
+// The cursor's row blinks
+static void PokedexAreaListView_InitBlink(PokedexAreaListView *view) {
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_POKEDEX_GRA, HEAPID_POKEDEX_AREA_LIST);
+
+    view->blinkAnm = BlinkPalAnm_Create(16, 5, 0xfffe, HEAPID_POKEDEX_AREA_LIST);
+    BlinkPalAnm_SetPalBufferArcTool(view->blinkAnm, arc, 53, 16, 32);
+    view->blinkPaused = TRUE;
+    GFL_ArcToolFree(arc);
+}
+
+static void PokedexAreaListView_ExitBlink(PokedexAreaListView *view) {
+    BlinkPalAnm_Free(view->blinkAnm);
+}
+
+static void PokedexAreaListView_InitBlend(void) {
+    G2x_SetBlendAlpha_(REG_DB_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG2, GX_BLEND_PLANEMASK_BG3, 6, 10);
+}
+
+u32 PokedexAreaListView_IsFading(PokedexAreaListView *view) {
+    return PaletteFade_GetActiveMask(view->paletteFade);
+}
+
+// Prints what the queue holds, and gives the marks' actors what the list set for them
+static void PokedexAreaListView_Update(PokedexAreaListView *view) {
+    int i;
+    int window;
+
+    view->printed = FALSE;
+    PrintQueue_Main(view->printQueue);
+    for (i = 0; i < POKEDEX_AREA_LIST_MARK_COUNT; i++) {
+        ClActor *actor = view->actors[POKEDEX_AREA_LIST_OBJ_MARK + i];
+        PokedexAreaListMark *mark = &view->marks[0][i];
+
+        if (mark->changed == TRUE) {
+            ClActor_SetVisible(actor, mark->visible);
+            ClActor_SetSequence(actor, mark->anim);
+            ClActor_SetSurfacePos(actor, &mark->pos, 0);
+            mark->changed = FALSE;
+        }
+    }
+    for (i = POKEDEX_AREA_LIST_OBJ_MARK_SUB; i < POKEDEX_AREA_LIST_OBJ_MARK_SUB + POKEDEX_AREA_LIST_MARK_COUNT; i++) {
+        ClActor *actor = view->actors[i];
+        PokedexAreaListMark *mark = &view->subMarks[0][i - POKEDEX_AREA_LIST_OBJ_MARK_SUB];
+        ClActor *window = view->actors[i + POKEDEX_AREA_LIST_OBJ_MARK_WINDOW - POKEDEX_AREA_LIST_OBJ_MARK_SUB];
+
+        if (mark->changed == TRUE) {
+            ClActor_SetVisible(actor, mark->visible);
+            ClActor_SetSequence(actor, mark->anim);
+            ClActor_SetSurfacePos(actor, &mark->pos, 1);
+            mark->changed = FALSE;
+            ClActor_SetVisible(window, mark->visible);
+            ClActor_SetSurfacePos(window, &mark->pos, 1);
+            ClActor_SetSequence(window, mark->anim);
+        }
+    }
+    for (window = 0; window < POKEDEX_AREA_LIST_WIN_COUNT; window++) {
+        PrintWindow_Flush(&view->printWindows[window], view->printQueue);
+        view->printed = PrintWindow_IsPrinted(&view->printWindows[window]);
+    }
+}
+
+BOOL PokedexAreaListView_IsPrinted(PokedexAreaListView *view) {
+    return view->printed;
+}
+
+void PokedexAreaListView_Print(u32 window, StrBuf *strbuf, PokedexAreaListView *view, s16 x, s16 y, u16 width,
+                               u16 height, u16 color) {
+    BmpWin *bmpWin;
+
+    switch (window) {
+    case POKEDEX_AREA_LIST_WIN_MAIN:
+        bmpWin = view->windows[POKEDEX_AREA_LIST_WIN_MAIN];
+        break;
+    case POKEDEX_AREA_LIST_WIN_SUB:
+        bmpWin = view->windows[POKEDEX_AREA_LIST_WIN_SUB];
+        break;
+    }
+    GFL_BitmapFillArea(BmpWin_GetBitmap(bmpWin), x, y, width, height, 0);
+    PrintWindow_Print(&view->printWindows[window], view->printQueue, x, y, strbuf, view->font, color);
+}
+
+static void PokedexAreaListView_Blink(PokedexAreaListView *view) {
+    BlinkPalAnm_Main(view->blinkAnm);
+}
+
+void PokedexAreaListView_FillWindow(u32 window, u8 color, PokedexAreaListView *view) {
+    BmpWin *bmpWin;
+
+    switch (window) {
+    case POKEDEX_AREA_LIST_WIN_MAIN:
+        bmpWin = view->windows[POKEDEX_AREA_LIST_WIN_MAIN];
+        break;
+    case POKEDEX_AREA_LIST_WIN_SUB:
+        bmpWin = view->windows[POKEDEX_AREA_LIST_WIN_SUB];
+        break;
+    }
+    GFL_BitmapFill(BmpWin_GetBitmap(bmpWin), color);
+}
+
+ClActor *PokedexAreaListView_GetActor(PokedexAreaListView *view, u32 index) {
+    return view->actors[index];
+}
+
+void PokedexAreaListView_InitList(PokedexAreaListView *view, u32 count, PokedexHabitatSummary *areas, u16 zone,
+                                  u16 cursorPos) {
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_POKEDEX_GRA, HEAPID_POKEDEX_AREA_LIST);
+    FrameListSetup setup = sPokedexAreaListSetup;
+    MsgData *msgData;
+    u32 i;
+
+    setup.count = POKEDEX_AREA_LIST_NAME_MAX;
+    setup.work = view;
+    setup.cursorPos = cursorPos;
+    for (i = 0; i < count; i++) {
+        PokedexHabitatSummary *area = &areas[i];
+
+        if (area->zone == zone) {
+            if (i > count - POKEDEX_AREA_LIST_ROWS) {
+                setup.cursorPos = i - (count - POKEDEX_AREA_LIST_ROWS);
+                setup.scroll = i - setup.cursorPos;
+            } else if (i < POKEDEX_AREA_LIST_ROWS) {
+                setup.cursorPos = i;
+            } else {
+                setup.scroll = i;
+            }
+            break;
+        }
+    }
+    view->list = FrameList_Create(&setup, HEAPID_POKEDEX_AREA_LIST);
+    // The rows' screens: the kinds of habitat an area has, and the same with every one of them complete
+    FrameList_LoadScreen(view->list, arc, 122, FALSE, 0);
+    FrameList_LoadScreen(view->list, arc, 123, FALSE, 1);
+    FrameList_LoadScreen(view->list, arc, 124, FALSE, 2);
+    FrameList_LoadScreen(view->list, arc, 125, FALSE, 3);
+    FrameList_LoadScreen(view->list, arc, 126, FALSE, 4);
+    FrameList_LoadScreen(view->list, arc, 117, FALSE, 5);
+    FrameList_LoadScreen(view->list, arc, 118, FALSE, 6);
+    FrameList_LoadScreen(view->list, arc, 119, FALSE, 7);
+    FrameList_LoadScreen(view->list, arc, 120, FALSE, 8);
+    FrameList_LoadScreen(view->list, arc, 121, FALSE, 9);
+    GFL_ArcToolFree(arc);
+
+    msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_PLACE_NAMES, HEAPID_POKEDEX_AREA_LIST);
+    for (i = 0; i < count; i++) {
+        view->names[i] = GFL_MsgDataLoadStrbufNew(msgData, ZoneData_GetPlaceNameID(areas[i].zone));
+        FrameList_AddItem(view->list, PokedexAreaListView_GetItemScreen(&areas[i]), ITEM_AREA);
+    }
+    GFL_MsgDataFree(msgData);
+
+    arc = GFL_ArcSysCreateFileHandle(ARCID_POKEDEX_GRA, HEAPID_POKEDEX_AREA_LIST);
+    FrameList_LoadCursorPalette(view->list, arc, 49, 7, 7);
+    GFL_ArcToolFree(arc);
+
+    if (count <= POKEDEX_AREA_LIST_ROWS) {
+        ClActor_SetVisible(PokedexAreaListView_GetActor(view, POKEDEX_AREA_LIST_OBJ_SCROLL_RAIL), FALSE);
+        ClActor_SetVisible(PokedexAreaListView_GetActor(view, POKEDEX_AREA_LIST_OBJ_SCROLL_BAR), FALSE);
+    } else {
+        PokedexAreaListView_UpdateScrollBar(view);
+    }
+    if (count < POKEDEX_AREA_LIST_ROWS) {
+        view->shownRows = count;
+    } else {
+        view->shownRows = POKEDEX_AREA_LIST_ROWS;
+    }
+    view->count = count;
+    view->areas = areas;
+}
+
+// The screen of an area's row: one of five by the kinds of habitat the area has, and of five more once every one
+// of them is complete
+static u32 PokedexAreaListView_GetItemScreen(PokedexHabitatSummary *area) {
+    int screen = -1;
+    BOOL partial = FALSE;
+    u32 kinds[5][POKEDEX_AREA_LIST_KINDS] = {
+        { 1, 0, 0 }, { 0, 1, 0 }, { 1, 1, 0 }, { 0, 1, 1 }, { 1, 1, 1 },
+    };
+    u8 kind0;
+    u8 kind1;
+    u8 kind2;
+    BOOL complete;
+    int i;
+
+    PokedexAreaListView_GetKinds(area, &kind0, &kind1, &kind2);
+    for (i = 0; i < 5; i++) {
+        if (kind0 == kinds[i][0] && kind1 == kinds[i][1] && kind2 == kinds[i][2]) {
+            screen = i;
+            break;
+        }
+    }
+    if (screen < 0) {
+        screen = 0;
+    }
+    complete = TRUE;
+    for (i = 0; i < POKEDEX_AREA_LIST_KINDS; i++) {
+        if (area->conditions[i] == 1 && area->states[i] != 2) {
+            complete = FALSE;
+            break;
+        }
+    }
+    for (i = 0; i < POKEDEX_AREA_LIST_KINDS; i++) {
+        if (area->display[i] == 1) {
+            partial = TRUE;
+            break;
+        }
+    }
+    if (complete == TRUE && partial == FALSE) {
+        screen += 5;
+    }
+    return screen;
+}
+
+void PokedexAreaListView_ExitList(PokedexAreaListView *view) {
+    int i;
+
+    for (i = 0; i < view->count; i++) {
+        GFL_StrBufFree(view->names[i]);
+    }
+    FrameList_Free(view->list);
+}
+
+static void PokedexAreaListView_PrintItem(void *work, u32 index, PrintWindow *window, s16 y, BOOL firstBG) {
+    PokedexAreaListView *view = work;
+
+    PrintStrAligned(window, FrameList_GetPrintQueue(view->list), 0, 4, view->names[index], view->font,
+                    PRINT_COLOR(14, 15, 0), PRINT_ALIGN_LEFT);
+    if (FrameList_GetValue(view->list, index) == ITEM_AREA) {
+        PokedexAreaListView_SetRowMarks(view, index, y, firstBG);
+    }
+}
+
+static void PokedexAreaListView_SelectItem(void *work, u32 index, BOOL moved) {
+    PokedexAreaListView *view = work;
+
+    PokedexAreaListView_MoveMarkFrame(view);
+    if (GFL_HIDIsTouchPressed()) {
+        PokedexAreaListView_UpdateDecideButton(view);
+    }
+}
+
+// Moves the marks with the rows, and hides those that leave the screen
+static void PokedexAreaListView_ScrollItems(void *work, s16 delta) {
+    PokedexAreaListView *view = work;
+    int i;
+
+    for (i = 0; i < POKEDEX_AREA_LIST_MARK_COUNT; i++) {
+        PokedexAreaListMark *mark = &view->marks[0][i];
+        PokedexAreaListMark *subMark = &view->subMarks[0][i];
+
+        mark->pos.y -= delta;
+        subMark->pos.y -= delta;
+        if (mark->pos.y <= -12 || mark->pos.y >= 204) {
+            mark->visible = FALSE;
+        }
+        if (subMark->pos.y <= -12 || subMark->pos.y >= 204) {
+            subMark->visible = FALSE;
+        }
+        mark->changed = TRUE;
+        subMark->changed = TRUE;
+    }
+    PokedexAreaListView_ShowMarkFrame(view, FALSE);
+}
+
+// Sets the marks of a row that the list drew at y, on its first BG, the lower screen's, or on its second: one for
+// each kind of habitat the area has, from the right
+static void PokedexAreaListView_SetRowMarks(PokedexAreaListView *view, u32 index, s16 y, BOOL firstBG) {
+    int place = 0;
+    PokedexHabitatSummary *area = &view->areas[index];
+    u16 anims[5] = { 12, 11, 7, 8, 0 };
+    u8 kind0;
+    u8 kind1;
+    u8 kind2;
+    ClActorPos pos;
+    PokedexAreaListMark *marks;
+
+    PokedexAreaListView_GetKinds(area, &kind0, &kind1, &kind2);
+    if (firstBG == TRUE) {
+        marks = view->marks[index % POKEDEX_AREA_LIST_DRAWN_ROWS];
+    } else {
+        marks = view->subMarks[index % POKEDEX_AREA_LIST_DRAWN_ROWS];
+    }
+    pos.x = 76;
+    y += 12;
+    pos.y = y;
+    marks[2].pos = pos;
+    pos.x += 16;
+    marks[1].pos = pos;
+    pos.x += 16;
+    marks[0].pos = pos;
+    marks[0].visible = FALSE;
+    marks[1].visible = FALSE;
+    marks[2].visible = FALSE;
+    if (kind2 == 1) {
+        if (area->display[2] != 4) {
+            marks[place].anim = anims[area->display[2]];
+            marks[place].visible = TRUE;
+        }
+        place++;
+    }
+    if (kind1 == 1) {
+        if (area->display[1] != 4) {
+            marks[place].anim = anims[area->display[1]];
+            marks[place].visible = TRUE;
+        }
+        place++;
+    }
+    if (kind0 == 1) {
+        if (area->display[0] != 4) {
+            marks[place].anim = anims[area->display[0]];
+            marks[place].visible = TRUE;
+        }
+        place++;
+    }
+    marks[0].changed = TRUE;
+    marks[1].changed = TRUE;
+    marks[2].changed = TRUE;
+}
+
+static void PokedexAreaListView_UpdateScrollBar(PokedexAreaListView *view) {
+    ClActor *actor = PokedexAreaListView_GetActor(view, POKEDEX_AREA_LIST_OBJ_SCROLL_BAR);
+    ClActorPos pos;
+    u32 y;
+
+    ClActor_GetSurfacePos(actor, &pos, 0);
+    y = FrameList_ClampBarPos(view->list, pos.y);
+    if (y < SCROLL_BAR_TOP) {
+        y = SCROLL_BAR_TOP;
+    } else if (y > SCROLL_BAR_BOTTOM) {
+        y = SCROLL_BAR_BOTTOM;
+    }
+    pos.x = 252;
+    pos.y = y;
+    ClActor_SetSurfacePos(actor, &pos, 0);
+}
+
+void PokedexAreaListView_HideUndrawnMarks(PokedexAreaListView *view) {
+    int i;
+
+    for (i = 0; i < POKEDEX_AREA_LIST_MARK_COUNT; i++) {
+        PokedexAreaListMark *mark = &view->marks[0][i];
+        PokedexAreaListMark *subMark = &view->subMarks[0][i];
+
+        if (mark->changed == FALSE) {
+            mark->changed = TRUE;
+            mark->visible = FALSE;
+        }
+        if (subMark->changed == FALSE) {
+            subMark->changed = TRUE;
+            subMark->visible = FALSE;
+        }
+    }
+}
+
+int PokedexAreaListView_GetListSelected(PokedexAreaListView *view) {
+    return FrameList_GetSelected(view->list);
+}
+
+s16 PokedexAreaListView_GetListCursor(PokedexAreaListView *view) {
+    return FrameList_GetCursor(view->list);
+}
+
+// Whether the cursor is on the last area
+static BOOL PokedexAreaListView_IsAtBottom(PokedexAreaListView *view) {
+    if (!FrameList_CanScrollDown(view->list) && view->shownRows - 1 == PokedexAreaListView_GetListCursor(view)) {
+        return TRUE;
+    }
+    return FALSE;
+}
+
+int PokedexAreaListView_GetListScroll(PokedexAreaListView *view) {
+    return FrameList_GetScroll(view->list);
+}
+
+void PokedexAreaListView_SetListCursor(PokedexAreaListView *view, int pos) {
+    FrameList_SetCursor(view->list, pos);
+}
+
+void PokedexAreaListView_SetCursorPalette(PokedexAreaListView *view, u32 palette) {
+    s16 cursor = FrameList_GetCursor(view->list);
+
+    FrameList_SetRowPalette(view->list, (u16)cursor, palette);
+    GFL_BGSysQueueScrLoad(2);
+}
+
+PokedexHabitatSummary *PokedexAreaListView_GetArea(PokedexAreaListView *view, u32 index) {
+    return &view->areas[index];
+}
+
+void PokedexAreaListView_SetActorAnim(PokedexAreaListView *view, u32 index, u32 anim) {
+    ClActor *actor = PokedexAreaListView_GetActor(view, index);
+
+    ClActor_SetSequence(actor, anim);
+    ClActor_SetAnimTime(actor, 0);
+    ClActor_SetAutoAnim(actor, TRUE);
+}
+
+static BOOL PokedexAreaListView_IsActorAnimating(PokedexAreaListView *view, u32 index) {
+    return ClActor_IsAnimActive(view->actors[index]);
+}
+
+static u16 PokedexAreaListView_GetActorAnim(PokedexAreaListView *view, u32 index) {
+    return ClActor_GetSequence(view->actors[index]);
+}
+
+static void PokedexAreaListView_ShowMarkFrame(PokedexAreaListView *view, BOOL visible) {
+    ClActor_SetVisible(view->actors[POKEDEX_AREA_LIST_OBJ_MARK_FRAME], visible);
+}
+
+// Puts the frame around the marks of the cursor's row, as wide as the marks it has
+static void PokedexAreaListView_MoveMarkFrame(PokedexAreaListView *view) {
+    ClActor *actor = view->actors[POKEDEX_AREA_LIST_OBJ_MARK_FRAME];
+    int count = -1;
+    s16 cursor = FrameList_GetCursor(view->list);
+    int scroll = PokedexAreaListView_GetListScroll(view);
+    u32 anims[POKEDEX_AREA_LIST_KINDS] = { 32, 34, 36 };
+    ClActorPos pos;
+    int i;
+
+    pos.y = cursor * ROW_HEIGHT + 12;
+    pos.x = 116;
+    for (i = 0; i < POKEDEX_AREA_LIST_KINDS; i++) {
+        if (view->areas[cursor + scroll].conditions[i] == 1 && view->areas[cursor + scroll].conditionsMet[i] == 1) {
+            count++;
+            pos.x -= 16;
+        }
+    }
+    ClActor_SetSurfacePos(actor, &pos, 0);
+    PokedexAreaListView_SetActorAnim(view, POKEDEX_AREA_LIST_OBJ_MARK_FRAME, anims[count]);
+}
+
+// Shows the page buttons as usable or not, unless one is playing its animation of being pressed
+static void PokedexAreaListView_UpdatePageButtons(PokedexAreaListView *view, BOOL force) {
+    int scroll = PokedexAreaListView_GetListScroll(view);
+    s16 cursor = PokedexAreaListView_GetListCursor(view);
+
+    if (!PokedexAreaListView_IsActorAnimating(view, POKEDEX_AREA_LIST_OBJ_PAGE_UP) ||
+        PokedexAreaListView_GetActorAnim(view, POKEDEX_AREA_LIST_OBJ_PAGE_UP) != 12 || force == TRUE) {
+        if (scroll == 0 && cursor == 0) {
+            PokedexAreaListView_SetActorAnim(view, POKEDEX_AREA_LIST_OBJ_PAGE_UP, 18);
+        } else {
+            PokedexAreaListView_SetActorAnim(view, POKEDEX_AREA_LIST_OBJ_PAGE_UP, 4);
+        }
+    }
+    if (!PokedexAreaListView_IsActorAnimating(view, POKEDEX_AREA_LIST_OBJ_PAGE_DOWN) ||
+        PokedexAreaListView_GetActorAnim(view, POKEDEX_AREA_LIST_OBJ_PAGE_DOWN) != 13 || force == TRUE) {
+        if (PokedexAreaListView_IsAtBottom(view)) {
+            PokedexAreaListView_SetActorAnim(view, POKEDEX_AREA_LIST_OBJ_PAGE_DOWN, 19);
+        } else {
+            PokedexAreaListView_SetActorAnim(view, POKEDEX_AREA_LIST_OBJ_PAGE_DOWN, 5);
+        }
+    }
+}
+
+void PokedexAreaListView_Slide(PokedexAreaListView *view, int offset, BOOL touchbar) {
+    if (touchbar) {
+        int i;
+
+        GFL_BGSysMoveBGReq(1, BG_MOVE_UP, offset);
+        for (i = POKEDEX_AREA_LIST_OBJ_MODE; i <= POKEDEX_AREA_LIST_OBJ_EXIT; i++) {
+            ClActor *actor = view->actors[i];
+            ClActorPos pos;
+
+            ClActor_GetSurfacePos(actor, &pos, 0);
+            pos.y += (s16)offset;
+            ClActor_SetSurfacePos(actor, &pos, 0);
+        }
+    } else {
+        GFL_BGSysMoveBGReq(4, BG_MOVE_UP, offset);
+        GFL_BGSysMoveBGReq(5, BG_MOVE_UP, offset);
+    }
+}
+
+static void PokedexAreaListView_UpdateDecideButton(PokedexAreaListView *view) {
+    ClActor *actor = view->actors[POKEDEX_AREA_LIST_OBJ_DECIDE];
+
+    if (view->listBusy == FALSE) {
+        ClActor_SetAnimTime(actor, 0);
+        ClActor_SetSequence(actor, 40);
+    } else {
+        ClActor_SetSequence(actor, 15);
+    }
+}
+
+void PokedexAreaListView_SetBlinkPaused(PokedexAreaListView *view, BOOL paused) {
+    view->blinkPaused = paused;
+}
+
+// Whether an area has each kind of habitat, and it is shown
+static void PokedexAreaListView_GetKinds(PokedexHabitatSummary *area, u8 *kind0, u8 *kind1, u8 *kind2) {
+    *kind0 = area->conditions[0] & area->conditionsMet[0];
+    *kind1 = area->conditions[1] & area->conditionsMet[1];
+    *kind2 = area->conditions[2] & area->conditionsMet[2];
+}

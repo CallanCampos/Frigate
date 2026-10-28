@@ -102,7 +102,7 @@ static GameEventReturnCode PokeNameEntry_Callback(GameEvent *event, u32 *state, 
     switch (*state) {
     case 0:
         GameEvent_ChainNext(
-            event, ReturnToField_CreateNameInEvent(work->gsys, work->field, work->nameEntry, work->transition));
+            event, ReturnToField_CreateNameInputEvent(work->gsys, work->field, work->nameEntry, work->transition));
         (*state)++;
         break;
     case 1:
@@ -197,7 +197,7 @@ static GameEventReturnCode JoinAvenueNameEntry_Callback(GameEvent *event, u32 *s
 
     switch (*state) {
     case 0:
-        GameEvent_ChainNext(event, ReturnToField_CreateNameInEvent(work->gsys, work->field, work->nameEntry, TRUE));
+        GameEvent_ChainNext(event, ReturnToField_CreateNameInputEvent(work->gsys, work->field, work->nameEntry, TRUE));
         (*state)++;
         break;
     case 1:
@@ -262,7 +262,7 @@ static GameEventReturnCode RivalNameEntry_Callback(GameEvent *event, u32 *state,
 
     switch (*state) {
     case 0:
-        GameEvent_ChainNext(event, ReturnToField_CreateNameInEvent(work->gsys, work->field, work->nameEntry, TRUE));
+        GameEvent_ChainNext(event, ReturnToField_CreateNameInputEvent(work->gsys, work->field, work->nameEntry, TRUE));
         (*state)++;
         break;
     case 1:
@@ -303,7 +303,7 @@ static GameEventReturnCode EventPokeNameWordSetInput_Callback(GameEvent *event, 
 
     switch (*state) {
     case 0:
-        GameEvent_ChainNext(event, ReturnToField_CreateNameInEvent(work->gsys, work->field, work->nameEntry, TRUE));
+        GameEvent_ChainNext(event, ReturnToField_CreateNameInputEvent(work->gsys, work->field, work->nameEntry, TRUE));
         (*state)++;
         break;
     case 1:

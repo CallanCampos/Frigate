@@ -30,7 +30,7 @@
 #include "save/musical_savedata.h"
 #include "save/mystery_gift.h"
 #include "save/player_savedata.h"
-#include "save/pokedex.h"
+#include "save/pokedex_savedata.h"
 #include "save/pokedex_skin_save.h"
 #include "save/pokewood.h"
 #include "save/records.h"

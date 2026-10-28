@@ -19,7 +19,7 @@ typedef struct {
 // A prop that the player owns, as the dressing room keeps it
 typedef struct {
     u16 itemId;
-    // The materials of the BlAct scene that hold its texture, in colors and dimmed
+    // The materials of the BillboardActor scene that hold its texture, in colors and dimmed
     u32 material;
     u32 dimMaterial;
     // Whether it is on the stage or worn

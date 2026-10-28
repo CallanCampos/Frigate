@@ -165,15 +165,15 @@ void WF2DMAP_OBJDrawWkUpdataFlagSet(WF2DMAP_OBJDRAWWK *wk, BOOL flag) {
     wk->updata = flag;
 }
 
-void WF2DMAP_OBJDrawWkKuruAnimeStart(WF2DMAP_OBJDRAWWK *wk) {
+void WF2DMAP_OBJDrawWkSpinAnimeStart(WF2DMAP_OBJDRAWWK *wk) {
     WF2DMAP_OBJDrawWkAnmSet(wk, WF_2DC_ANMROTA, wk->way);
 }
 
-void WF2DMAP_OBJDrawWkKuruAnimeMain(WF2DMAP_OBJDRAWWK *wk) {
+void WF2DMAP_OBJDrawWkSpinAnimeMain(WF2DMAP_OBJDRAWWK *wk) {
     WF_2DC_WkPatAnmMain(wk->drawWk);
 }
 
-void WF2DMAP_OBJDrawWkKuruAnimeEnd(WF2DMAP_OBJDRAWWK *wk) {
+void WF2DMAP_OBJDrawWkSpinAnimeEnd(WF2DMAP_OBJDRAWWK *wk) {
     WF2DMAP_OBJDrawWkAnmSet(wk, WF2DMAP_OBJDrawWkAnmTypeGet(wk->drawWk, wk->status), wk->way);
     WF2DMAP_OBJDrawWkUpdata(wk);
 }

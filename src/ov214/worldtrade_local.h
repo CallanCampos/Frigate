@@ -155,7 +155,7 @@ typedef struct {
     int sexPos;
     int levelPos;
     // Whether each species is of the regional Pokédex
-    u8 *sinouTable;
+    u8 *sinnohTable;
     // The species in the order of their names
     u16 *nameSortTable;
     int nameSortNum;
@@ -208,8 +208,8 @@ typedef struct {
     MsgData *msgManager;
     MsgData *monsNameManager;
     MsgData *countryNameManager;
-    PokeDexSave *zukan;
-    u8 *sinouTable;
+    PokeDexSave *dex;
+    u8 *sinnohTable;
     TrainerDataSave *config;
 } WorldTradeInputHeader;
 
@@ -465,13 +465,13 @@ void WorldTrade_MyPokeWantPrint(MsgData *msgManager, MsgData *monsNameManager, W
                                 int monsno, int sex, int level, WorldTradePrint *print);
 void WorldTrade_PokeInfoPrint(MsgData *msgManager, WordSet *wordSet, BmpWin **win, BoxPkm *pkm,
                               Dpw_Tr_PokemonDataSimple *post, WorldTradePrint *print);
-u16 *WorldTrade_ZukanSortDataGet(int heapId, int idx, int *num);
+u16 *WorldTrade_PokedexSortDataGet(int heapId, int idx, int *num);
 void WorldTrade_HeadwordRangeGet(int select, int *start, int *end);
-u8 *WorldTrade_SinouZukanDataGet(int heapId);
+u8 *WorldTrade_SinnohPokedexDataGet(int heapId);
 void WorldTrade_PostPokemonBaseDataMake(Dpw_Tr_Data *dtd, WorldTradeWork *wk);
 BmpMenuList *WorldTrade_PokeNameListMake(WorldTradeWork *wk, ListMenuOption **menulist, BmpWin *win,
                                          MsgData *msgManager, MsgData *monsNameManager, WorldTradeDepositWork *dw,
-                                         PokeDexSave *zukan);
+                                         PokeDexSave *dex);
 int WorldTrade_LevelListAdd(ListMenuOption **menulist, MsgData *msgManager, int tblSelect);
 void WorldTrade_LevelMinMaxSet(Dpw_Tr_PokemonSearchData *dtps, int index, int tblSelect);
 int WorldTrade_LevelTermGet(int min, int max, int tblSelect);

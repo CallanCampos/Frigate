@@ -11,6 +11,6 @@ void FieldSurfTCB_Free(TCB *tcb);
 TCB *FieldWaterfallTCB_Create(FieldPlayer *player, u32 direction, u32 param, HeapID heapId);
 BOOL FieldWaterfallTCB_CheckEnd(TCB *tcb);
 void FieldWaterfallTCB_Free(TCB *tcb);
-void FldeffIaigiri_Start(FieldActor *actor, FieldEffects *effects);
+void FldeffCut_Start(FieldActor *actor, FieldEffects *effects);
 
 #endif // POKEBW2_FIELD_FIELD_MOVE_TCB_H

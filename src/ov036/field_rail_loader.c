@@ -17,7 +17,7 @@
 #include "field/field_script_event.h"
 #include "field/zone.h"
 #include "gfl/arc_util.h"
-#include "gfl/blact.h"
+#include "gfl/billboard_actor.h"
 #include "gfl/g3d.h"
 #include "gfl/heap.h"
 #include "nitro/fx.h"
@@ -75,15 +75,15 @@ typedef struct {
     u8 anim;
 } RailObjAnim;
 
-static void FldmmdlMove_VanishProc(FieldActor *actor);
-static void FldmmdlMove_VanishDraw(FieldActor *actor);
-static void FldmmdlMove_VanishDelete(FieldActor *actor);
-static void FldmmdlMove_VanishSuspend(FieldActor *actor);
-static void FldmmdlMove_VanishWakeUp(FieldActor *actor);
+static void FieldActorMove_VanishProc(FieldActor *actor);
+static void FieldActorMove_VanishDraw(FieldActor *actor);
+static void FieldActorMove_VanishDelete(FieldActor *actor);
+static void FieldActorMove_VanishSuspend(FieldActor *actor);
+static void FieldActorMove_VanishWakeUp(FieldActor *actor);
 static void RailActorAnim_InitDirAnime(FieldActor *actor);
 static void RailActorAnim_DeleteDirAnime(FieldActor *actor);
 static void RailActorAnim_DrawDirAnime(FieldActor *actor);
-static u32 RailActorAnim_GetBlactIdDirAnime(FieldActor *actor, u32 param);
+static u32 RailActorAnim_GetBillboardActorIdDirAnime(FieldActor *actor, u32 param);
 static void RailActorAnim_DrawDirAnimeMoving(FieldActor *actor);
 static void RailActorAnim_InitDirAnimeB(FieldActor *actor);
 static void RailActorAnim_DeleteDirAnimeB(FieldActor *actor);
@@ -91,7 +91,7 @@ static void RailActorAnim_DrawDirAnimeB(FieldActor *actor);
 static void RailActorAnim_DrawDirAnimeSized(FieldActor *actor);
 static void RailActorAnim_DrawWalkAnime(FieldActor *actor);
 static void RailActorAnim_DrawWalkAnimeB(FieldActor *actor);
-static u32 RailActorAnim_GetBlactIdWalkAnime(FieldActor *actor, u32 param);
+static u32 RailActorAnim_GetBillboardActorIdWalkAnime(FieldActor *actor, u32 param);
 static void RailActorAnim_DrawTwoFrame(FieldActor *actor);
 static void RailActorAnim_DrawThreeFrame(FieldActor *actor);
 static void TransformVecByCamera(G3DCamera *camera, VecFx32 *vec, VecFx32 *dest);
@@ -105,19 +105,19 @@ static void RailActorAnim_DrawWalking(FieldActor *actor);
 static void RailActorAnim_UpdateWalkOffset(FieldActor *actor, RailNpcWork *work, u8 dir);
 static void RailActorAnim_ShiftOffsetByDir(FieldActor *actor, u32 dir, const FieldActorConfig *config, VecFx32 *offset);
 static BOOL RailActorAnim_CheckStepFrame(RailNpcWork *work, u32 dir, const FieldActorConfig *config);
-static void FldAct_SyncLights(BlActSys *sys, FieldActor *actor, RailActorWork *work);
-static u32 RailActorAnim_GetBlactIdFixedState(FieldActor *actor, u32 param);
+static void FldAct_SyncLights(BillboardActorSys *sys, FieldActor *actor, RailActorWork *work);
+static u32 RailActorAnim_GetBillboardActorIdFixedState(FieldActor *actor, u32 param);
 static void RailActorAnim_InitDirAnimeC(FieldActor *actor);
 static void RailActorAnim_DeleteDirAnimeC(FieldActor *actor);
 static void RailActorAnim_DrawMultiPattern(FieldActor *actor);
-static u32 RailActorAnim_GetBlactIdMultiPattern(FieldActor *actor, u32 param);
+static u32 RailActorAnim_GetBillboardActorIdMultiPattern(FieldActor *actor, u32 param);
 static void RailActorAnim_DrawTwoPattern(FieldActor *actor);
 static void RailActorAnim_DrawThreePattern(FieldActor *actor);
 static void RailActorAnim_Reset(RailActorAnim *anim);
-static void RailActorAnim_Update(RailActorAnim *anim, FieldActor *actor, BlActSys *sys, u16 index);
+static void RailActorAnim_Update(RailActorAnim *anim, FieldActor *actor, BillboardActorSys *sys, u16 index);
 static void RailActorAnim_AddHeightOffset(FieldActor *actor, VecFx32 *pos);
 static u8 RailActor_GetCameraRelativeDir(FieldActor *actor);
-static void RailActor_UpdateVisibilityAndAnimation(FieldActor *actor, BlActSys *sys, u16 index, BOOL changed,
+static void RailActor_UpdateVisibilityAndAnimation(FieldActor *actor, BillboardActorSys *sys, u16 index, BOOL changed,
                                                    BOOL flag);
 
 RailLoader *FieldRailLoader_Create(u32 heapId) {
@@ -166,32 +166,32 @@ GameEvent *CreatePlayerXActorScriptCall(GameSystem *gsys, Field *field, u32 scri
     return EventScriptCall_Create(gsys, scriptId, actor, heapId);
 }
 
-static void FldmmdlMove_VanishProc(FieldActor *actor) {
+static void FieldActorMove_VanishProc(FieldActor *actor) {
     SetActorHidden(actor, TRUE);
     SetActorMovementFlag(actor, 0x8000);
 }
 
-static void FldmmdlMove_VanishDraw(FieldActor *actor) {
+static void FieldActorMove_VanishDraw(FieldActor *actor) {
 }
 
-static void FldmmdlMove_VanishDelete(FieldActor *actor) {
+static void FieldActorMove_VanishDelete(FieldActor *actor) {
 }
 
-static void FldmmdlMove_VanishSuspend(FieldActor *actor) {
+static void FieldActorMove_VanishSuspend(FieldActor *actor) {
 }
 
-static void FldmmdlMove_VanishWakeUp(FieldActor *actor) {
+static void FieldActorMove_VanishWakeUp(FieldActor *actor) {
 }
 
-void RailActorAnim_GetBlactAnime(FieldActor *actor, u16 *anim, u16 *step) {
+void RailActorAnim_GetBillboardActorAnime(FieldActor *actor, u16 *anim, u16 *step) {
     if (GetActorMdlInfo(actor)->entityType == 1) {
-        RailActorWork *work = FldAct_GetBlActWorkPtr(actor);
+        RailActorWork *work = FldAct_GetBillboardActorWorkPtr(actor);
 
-        if (work->index != BLACT_NONE) {
-            BlActSys *sys = FieldBlAct_GetBlActSys(FldAct_GetFieldBlAct(actor));
+        if (work->index != BILLBOARD_ACTOR_NONE) {
+            BillboardActorSys *sys = FieldBillboardActor_GetBillboardActorSys(FldAct_GetFieldBillboardActor(actor));
 
-            *anim = BlActSys_GetActorAnim(sys, work->index);
-            *step = BlActSys_GetActorStep(sys, work->index);
+            *anim = BillboardActorSys_GetActorAnim(sys, work->index);
+            *step = BillboardActorSys_GetActorStep(sys, work->index);
             return;
         }
         *anim = 0;
@@ -202,72 +202,72 @@ void RailActorAnim_GetBlactAnime(FieldActor *actor, u16 *anim, u16 *step) {
     *step = 0;
 }
 
-const FieldActorSceneNodeVTable data_ov036_021cf868 = { FldmmdlMove_VanishProc,   FldmmdlMove_VanishDraw,
-                                                        FldmmdlMove_VanishDelete, FldmmdlMove_VanishSuspend,
-                                                        FldmmdlMove_VanishWakeUp, NULL };
+const FieldActorSceneNodeVTable data_ov036_021cf868 = { FieldActorMove_VanishProc,   FieldActorMove_VanishDraw,
+                                                        FieldActorMove_VanishDelete, FieldActorMove_VanishSuspend,
+                                                        FieldActorMove_VanishWakeUp, NULL };
 
-void RailActorAnim_SetBlactAnime(FieldActor *actor, u16 anim, u16 step) {
+void RailActorAnim_SetBillboardActorAnime(FieldActor *actor, u16 anim, u16 step) {
     if (GetActorMdlInfo(actor)->entityType == 1) {
-        RailActorWork *work = FldAct_GetBlActWorkPtr(actor);
+        RailActorWork *work = FldAct_GetBillboardActorWorkPtr(actor);
 
-        if (work->index != BLACT_NONE) {
-            BlActSys *sys = FieldBlAct_GetBlActSys(FldAct_GetFieldBlAct(actor));
+        if (work->index != BILLBOARD_ACTOR_NONE) {
+            BillboardActorSys *sys = FieldBillboardActor_GetBillboardActorSys(FldAct_GetFieldBillboardActor(actor));
 
-            BlActSys_SetActorAnim(sys, work->index, anim);
-            BlActSys_SetActorStep(sys, work->index, step);
+            BillboardActorSys_SetActorAnim(sys, work->index, anim);
+            BillboardActorSys_SetActorStep(sys, work->index, step);
         }
     }
 }
 
 static void RailActorAnim_InitDirAnime(FieldActor *actor) {
-    RailActorWork *work = FldAct_ResetBlActWork(actor, 8);
+    RailActorWork *work = FldAct_ResetBillboardActorWork(actor, 8);
 
     RailActorAnim_Reset(&work->anim);
-    FldBlAct_AddActorMmdlOrReserve(actor, &work->index);
+    FldBillboardActor_AddFieldActorOrReserve(actor, &work->index);
 }
 
 static void RailActorAnim_DeleteDirAnime(FieldActor *actor) {
-    RailActorWork *work = FldAct_GetBlActWorkPtr(actor);
+    RailActorWork *work = FldAct_GetBillboardActorWorkPtr(actor);
 
-    FldBlAct_DeleteActorMmdl(actor, work->index);
+    FldBillboardActor_DeleteFieldActor(actor, work->index);
 }
 
 static void RailActorAnim_DrawDirAnime(FieldActor *actor) {
-    RailActorWork *work = FldAct_GetBlActWorkPtr(actor);
+    RailActorWork *work = FldAct_GetBillboardActorWorkPtr(actor);
 
-    if (work->index != BLACT_NONE) {
-        BlActSys *sys = FieldBlAct_GetBlActSys(FldAct_GetFieldBlAct(actor));
+    if (work->index != BILLBOARD_ACTOR_NONE) {
+        BillboardActorSys *sys = FieldBillboardActor_GetBillboardActorSys(FldAct_GetFieldBillboardActor(actor));
         VecFx32 pos;
 
         RailActorAnim_Update(&work->anim, actor, sys, work->index);
         CopyActorPosAllAdd(actor, &pos);
         RailActorAnim_AddHeightOffset(actor, &pos);
-        BlActScene_SetActorPos(BlActSys_GetScene(sys), work->index, &pos);
+        BillboardActorScene_SetActorPos(BillboardActorSys_GetScene(sys), work->index, &pos);
         FldAct_SyncLights(sys, actor, work);
     }
 }
 
 const FieldActorSceneNodeVTable data_ov036_021cf940 = {
     RailActorAnim_InitDirAnime,   RailActorAnim_DrawDirAnime, RailActorAnim_DeleteDirAnime,
-    RailActorAnim_DeleteDirAnime, RailActorAnim_InitDirAnime, RailActorAnim_GetBlactIdDirAnime
+    RailActorAnim_DeleteDirAnime, RailActorAnim_InitDirAnime, RailActorAnim_GetBillboardActorIdDirAnime
 };
 const FieldActorSceneNodeVTable data_ov036_021cf928 = {
     RailActorAnim_InitDirAnime,   RailActorAnim_DrawDirAnime, RailActorAnim_DeleteDirAnime,
-    RailActorAnim_DeleteDirAnime, RailActorAnim_InitDirAnime, RailActorAnim_GetBlactIdDirAnime
+    RailActorAnim_DeleteDirAnime, RailActorAnim_InitDirAnime, RailActorAnim_GetBillboardActorIdDirAnime
 };
 
-static u32 RailActorAnim_GetBlactIdDirAnime(FieldActor *actor, u32 param) {
-    RailActorWork *work = FldAct_GetBlActWorkPtr(actor);
+static u32 RailActorAnim_GetBillboardActorIdDirAnime(FieldActor *actor, u32 param) {
+    RailActorWork *work = FldAct_GetBillboardActorWorkPtr(actor);
 
     return work->index;
 }
 
 static void RailActorAnim_DrawDirAnimeMoving(FieldActor *actor) {
     BOOL changed = FALSE;
-    RailActorWork *work = FldAct_GetBlActWorkPtr(actor);
+    RailActorWork *work = FldAct_GetBillboardActorWorkPtr(actor);
 
-    if (work->index != BLACT_NONE) {
-        BlActSys *sys = FieldBlAct_GetBlActSys(FldAct_GetFieldBlAct(actor));
+    if (work->index != BILLBOARD_ACTOR_NONE) {
+        BillboardActorSys *sys = FieldBillboardActor_GetBillboardActorSys(FldAct_GetFieldBillboardActor(actor));
         u8 dir = RailActor_GetCameraRelativeDir(actor);
         u16 state = FldAct_GetDrawStatus(actor);
         VecFx32 pos;
@@ -275,66 +275,66 @@ static void RailActorAnim_DrawDirAnimeMoving(FieldActor *actor) {
         if (work->anim.dir != dir) {
             work->anim.dir = dir;
             work->anim.state = state;
-            BlActSys_SetActorAnim(sys, work->index, dir);
+            BillboardActorSys_SetActorAnim(sys, work->index, dir);
             changed = TRUE;
         } else if (work->anim.state != state) {
-            BlActSys_SetActorAnim(sys, work->index, dir);
-            BlActSys_SetActorStep(sys, work->index, changed);
+            BillboardActorSys_SetActorAnim(sys, work->index, dir);
+            BillboardActorSys_SetActorStep(sys, work->index, changed);
             work->anim.state = state;
         }
         RailActor_UpdateVisibilityAndAnimation(actor, sys, work->index, changed, FALSE);
         CopyActorPosAllAdd(actor, &pos);
         RailActorAnim_AddHeightOffset(actor, &pos);
-        BlActScene_SetActorPos(BlActSys_GetScene(sys), work->index, &pos);
+        BillboardActorScene_SetActorPos(BillboardActorSys_GetScene(sys), work->index, &pos);
         FldAct_SyncLights(sys, actor, work);
     }
 }
 
 const FieldActorSceneNodeVTable data_ov036_021cf850 = {
     RailActorAnim_InitDirAnime,   RailActorAnim_DrawDirAnimeMoving, RailActorAnim_DeleteDirAnime,
-    RailActorAnim_DeleteDirAnime, RailActorAnim_InitDirAnime,       RailActorAnim_GetBlactIdDirAnime
+    RailActorAnim_DeleteDirAnime, RailActorAnim_InitDirAnime,       RailActorAnim_GetBillboardActorIdDirAnime
 };
 
 static void RailActorAnim_InitDirAnimeB(FieldActor *actor) {
-    RailActorWork *work = FldAct_ResetBlActWork(actor, 8);
+    RailActorWork *work = FldAct_ResetBillboardActorWork(actor, 8);
 
     RailActorAnim_Reset(&work->anim);
-    FldBlAct_AddActorMmdlOrReserve(actor, &work->index);
+    FldBillboardActor_AddFieldActorOrReserve(actor, &work->index);
 }
 
 static void RailActorAnim_DeleteDirAnimeB(FieldActor *actor) {
-    RailActorWork *work = FldAct_GetBlActWorkPtr(actor);
+    RailActorWork *work = FldAct_GetBillboardActorWorkPtr(actor);
 
-    FldBlAct_DeleteActorMmdl(actor, work->index);
+    FldBillboardActor_DeleteFieldActor(actor, work->index);
 }
 
 static void RailActorAnim_DrawDirAnimeB(FieldActor *actor) {
-    RailActorWork *work = FldAct_GetBlActWorkPtr(actor);
+    RailActorWork *work = FldAct_GetBillboardActorWorkPtr(actor);
 
-    if (work->index != BLACT_NONE) {
-        BlActSys *sys = FieldBlAct_GetBlActSys(FldAct_GetFieldBlAct(actor));
+    if (work->index != BILLBOARD_ACTOR_NONE) {
+        BillboardActorSys *sys = FieldBillboardActor_GetBillboardActorSys(FldAct_GetFieldBillboardActor(actor));
         VecFx32 pos;
 
         RailActorAnim_Update(&work->anim, actor, sys, work->index);
         CopyActorPosAllAdd(actor, &pos);
         RailActorAnim_AddHeightOffset(actor, &pos);
-        BlActScene_SetActorPos(BlActSys_GetScene(sys), work->index, &pos);
+        BillboardActorScene_SetActorPos(BillboardActorSys_GetScene(sys), work->index, &pos);
         FldAct_SyncLights(sys, actor, work);
     }
 }
 
 const FieldActorSceneNodeVTable data_ov036_021cf8f8 = {
     RailActorAnim_InitDirAnimeB,   RailActorAnim_DrawDirAnimeB, RailActorAnim_DeleteDirAnimeB,
-    RailActorAnim_DeleteDirAnimeB, RailActorAnim_InitDirAnimeB, RailActorAnim_GetBlactIdWalkAnime
+    RailActorAnim_DeleteDirAnimeB, RailActorAnim_InitDirAnimeB, RailActorAnim_GetBillboardActorIdWalkAnime
 };
 
 static void RailActorAnim_DrawDirAnimeSized(FieldActor *actor) {
     BOOL changed = FALSE;
     BOOL flag = FALSE;
-    RailActorWork *work = FldAct_GetBlActWorkPtr(actor);
+    RailActorWork *work = FldAct_GetBillboardActorWorkPtr(actor);
 
-    if (work->index != BLACT_NONE) {
-        BlActSys *sys = FieldBlAct_GetBlActSys(FldAct_GetFieldBlAct(actor));
+    if (work->index != BILLBOARD_ACTOR_NONE) {
+        BillboardActorSys *sys = FieldBillboardActor_GetBillboardActorSys(FldAct_GetFieldBillboardActor(actor));
         u8 dir = RailActor_GetCameraRelativeDir(actor);
         u8 nodeType;
         u16 anim;
@@ -354,28 +354,28 @@ static void RailActorAnim_DrawDirAnimeSized(FieldActor *actor) {
         anim += dir;
         if (work->anim.dir != dir) {
             work->anim.dir = dir;
-            BlActSys_SetActorAnim(sys, work->index, anim);
+            BillboardActorSys_SetActorAnim(sys, work->index, anim);
             changed = TRUE;
         }
         RailActor_UpdateVisibilityAndAnimation(actor, sys, work->index, changed, flag);
         CopyActorPosAllAdd(actor, &pos);
         RailActorAnim_AddHeightOffset(actor, &pos);
-        BlActScene_SetActorPos(BlActSys_GetScene(sys), work->index, &pos);
+        BillboardActorScene_SetActorPos(BillboardActorSys_GetScene(sys), work->index, &pos);
         FldAct_SyncLights(sys, actor, work);
     }
 }
 
 const FieldActorSceneNodeVTable data_ov036_021cf8e0 = {
     RailActorAnim_InitDirAnimeB,   RailActorAnim_DrawDirAnimeSized, RailActorAnim_DeleteDirAnimeB,
-    RailActorAnim_DeleteDirAnimeB, RailActorAnim_InitDirAnimeB,     RailActorAnim_GetBlactIdWalkAnime
+    RailActorAnim_DeleteDirAnimeB, RailActorAnim_InitDirAnimeB,     RailActorAnim_GetBillboardActorIdWalkAnime
 };
 
 static void RailActorAnim_DrawWalkAnime(FieldActor *actor) {
-    RailActorWork *work = FldAct_GetBlActWorkPtr(actor);
+    RailActorWork *work = FldAct_GetBillboardActorWorkPtr(actor);
 
-    if (work->index != BLACT_NONE) {
+    if (work->index != BILLBOARD_ACTOR_NONE) {
         u16 state;
-        BlActSys *sys = FieldBlAct_GetBlActSys(FldAct_GetFieldBlAct(actor));
+        BillboardActorSys *sys = FieldBillboardActor_GetBillboardActorSys(FldAct_GetFieldBillboardActor(actor));
         VecFx32 pos;
 
         state = FldAct_GetDrawStatus(actor);
@@ -388,7 +388,7 @@ static void RailActorAnim_DrawWalkAnime(FieldActor *actor) {
                 work->anim.dir = dir;
                 work->anim.state = state;
                 work->anim.step = 0;
-                BlActSys_SetActorAnim(sys, work->index, state + 30);
+                BillboardActorSys_SetActorAnim(sys, work->index, state + 30);
             }
             RailActor_UpdateVisibilityAndAnimation(actor, sys, work->index, changed, FALSE);
         } else {
@@ -396,21 +396,21 @@ static void RailActorAnim_DrawWalkAnime(FieldActor *actor) {
         }
         CopyActorPosAllAdd(actor, &pos);
         RailActorAnim_AddHeightOffset(actor, &pos);
-        BlActScene_SetActorPos(BlActSys_GetScene(sys), work->index, &pos);
+        BillboardActorScene_SetActorPos(BillboardActorSys_GetScene(sys), work->index, &pos);
         FldAct_SyncLights(sys, actor, work);
     }
 }
 
 const FieldActorSceneNodeVTable data_ov036_021cf8c8 = {
     RailActorAnim_InitDirAnimeB,   RailActorAnim_DrawWalkAnime, RailActorAnim_DeleteDirAnimeB,
-    RailActorAnim_DeleteDirAnimeB, RailActorAnim_InitDirAnimeB, RailActorAnim_GetBlactIdWalkAnime
+    RailActorAnim_DeleteDirAnimeB, RailActorAnim_InitDirAnimeB, RailActorAnim_GetBillboardActorIdWalkAnime
 };
 
 static void RailActorAnim_DrawWalkAnimeB(FieldActor *actor) {
-    RailActorWork *work = FldAct_GetBlActWorkPtr(actor);
+    RailActorWork *work = FldAct_GetBillboardActorWorkPtr(actor);
 
-    if (work->index != BLACT_NONE) {
-        BlActSys *sys = FieldBlAct_GetBlActSys(FldAct_GetFieldBlAct(actor));
+    if (work->index != BILLBOARD_ACTOR_NONE) {
+        BillboardActorSys *sys = FieldBillboardActor_GetBillboardActorSys(FldAct_GetFieldBillboardActor(actor));
         u16 state = FldAct_GetDrawStatus(actor);
         VecFx32 pos;
 
@@ -421,7 +421,7 @@ static void RailActorAnim_DrawWalkAnimeB(FieldActor *actor) {
                 work->anim.dir = dir;
                 work->anim.state = state;
                 work->anim.step = 0;
-                BlActSys_SetActorAnim(sys, work->index, state + 30);
+                BillboardActorSys_SetActorAnim(sys, work->index, state + 30);
             }
             RailActor_UpdateVisibilityAndAnimation(actor, sys, work->index, TRUE, FALSE);
         } else {
@@ -429,86 +429,86 @@ static void RailActorAnim_DrawWalkAnimeB(FieldActor *actor) {
         }
         CopyActorPosAllAdd(actor, &pos);
         RailActorAnim_AddHeightOffset(actor, &pos);
-        BlActScene_SetActorPos(BlActSys_GetScene(sys), work->index, &pos);
+        BillboardActorScene_SetActorPos(BillboardActorSys_GetScene(sys), work->index, &pos);
         FldAct_SyncLights(sys, actor, work);
     }
 }
 
 const FieldActorSceneNodeVTable data_ov036_021cf8b0 = {
     RailActorAnim_InitDirAnimeB,   RailActorAnim_DrawWalkAnimeB, RailActorAnim_DeleteDirAnimeB,
-    RailActorAnim_DeleteDirAnimeB, RailActorAnim_InitDirAnimeB,  RailActorAnim_GetBlactIdWalkAnime
+    RailActorAnim_DeleteDirAnimeB, RailActorAnim_InitDirAnimeB,  RailActorAnim_GetBillboardActorIdWalkAnime
 };
 
-static u32 RailActorAnim_GetBlactIdWalkAnime(FieldActor *actor, u32 param) {
-    RailActorWork *work = FldAct_GetBlActWorkPtr(actor);
+static u32 RailActorAnim_GetBillboardActorIdWalkAnime(FieldActor *actor, u32 param) {
+    RailActorWork *work = FldAct_GetBillboardActorWorkPtr(actor);
 
     return work->index;
 }
 
 static void RailActorAnim_DrawTwoFrame(FieldActor *actor) {
-    RailActorWork *work = FldAct_GetBlActWorkPtr(actor);
+    RailActorWork *work = FldAct_GetBillboardActorWorkPtr(actor);
 
-    if (work->index != BLACT_NONE) {
+    if (work->index != BILLBOARD_ACTOR_NONE) {
         u16 state;
-        BlActSys *sys = FieldBlAct_GetBlActSys(FldAct_GetFieldBlAct(actor));
+        BillboardActorSys *sys = FieldBillboardActor_GetBillboardActorSys(FldAct_GetFieldBillboardActor(actor));
         VecFx32 pos;
 
         state = FldAct_GetDrawStatus(actor);
         if (work->anim.state >= 2) {
             work->anim.state = 0;
-            BlActSys_SetActorAnim(sys, work->index, work->anim.state);
-            BlActSys_SetActorStep(sys, work->index, 0);
+            BillboardActorSys_SetActorAnim(sys, work->index, work->anim.state);
+            BillboardActorSys_SetActorStep(sys, work->index, 0);
         }
         if (state < 2 && work->anim.state != state) {
             work->anim.state = state;
-            BlActSys_SetActorAnim(sys, work->index, work->anim.state);
-            BlActSys_SetActorStep(sys, work->index, 0);
+            BillboardActorSys_SetActorAnim(sys, work->index, work->anim.state);
+            BillboardActorSys_SetActorStep(sys, work->index, 0);
         }
         RailActor_UpdateVisibilityAndAnimation(actor, sys, work->index, FALSE, FALSE);
         CopyActorPosAllAdd(actor, &pos);
         RailActorAnim_AddHeightOffset(actor, &pos);
-        BlActScene_SetActorPos(BlActSys_GetScene(sys), work->index, &pos);
+        BillboardActorScene_SetActorPos(BillboardActorSys_GetScene(sys), work->index, &pos);
     }
 }
 
 const FieldActorSceneNodeVTable data_ov036_021cf898 = {
     RailActorAnim_InitDirAnime,   RailActorAnim_DrawTwoFrame, RailActorAnim_DeleteDirAnime,
-    RailActorAnim_DeleteDirAnime, RailActorAnim_InitDirAnime, RailActorAnim_GetBlactIdDirAnime
+    RailActorAnim_DeleteDirAnime, RailActorAnim_InitDirAnime, RailActorAnim_GetBillboardActorIdDirAnime
 };
 
 static void RailActorAnim_DrawThreeFrame(FieldActor *actor) {
-    RailActorWork *work = FldAct_GetBlActWorkPtr(actor);
+    RailActorWork *work = FldAct_GetBillboardActorWorkPtr(actor);
 
-    if (work->index != BLACT_NONE) {
+    if (work->index != BILLBOARD_ACTOR_NONE) {
         u16 state;
-        BlActSys *sys = FieldBlAct_GetBlActSys(FldAct_GetFieldBlAct(actor));
+        BillboardActorSys *sys = FieldBillboardActor_GetBillboardActorSys(FldAct_GetFieldBillboardActor(actor));
         VecFx32 pos;
 
         state = FldAct_GetDrawStatus(actor);
         if (work->anim.state >= 3) {
             work->anim.state = 0;
-            BlActSys_SetActorAnim(sys, work->index, work->anim.state);
-            BlActSys_SetActorStep(sys, work->index, 0);
+            BillboardActorSys_SetActorAnim(sys, work->index, work->anim.state);
+            BillboardActorSys_SetActorStep(sys, work->index, 0);
         }
         if (state < 3 && work->anim.state != state) {
             work->anim.state = state;
-            BlActSys_SetActorAnim(sys, work->index, work->anim.state);
-            BlActSys_SetActorStep(sys, work->index, 0);
+            BillboardActorSys_SetActorAnim(sys, work->index, work->anim.state);
+            BillboardActorSys_SetActorStep(sys, work->index, 0);
         }
         RailActor_UpdateVisibilityAndAnimation(actor, sys, work->index, FALSE, FALSE);
         CopyActorPosAllAdd(actor, &pos);
         RailActorAnim_AddHeightOffset(actor, &pos);
-        BlActScene_SetActorPos(BlActSys_GetScene(sys), work->index, &pos);
+        BillboardActorScene_SetActorPos(BillboardActorSys_GetScene(sys), work->index, &pos);
     }
 }
 
 const FieldActorSceneNodeVTable data_ov036_021cf880 = {
     RailActorAnim_InitDirAnime,   RailActorAnim_DrawThreeFrame, RailActorAnim_DeleteDirAnime,
-    RailActorAnim_DeleteDirAnime, RailActorAnim_InitDirAnime,   RailActorAnim_GetBlactIdDirAnime
+    RailActorAnim_DeleteDirAnime, RailActorAnim_InitDirAnime,   RailActorAnim_GetBillboardActorIdDirAnime
 };
 
 void RailActorAnim_SetState(FieldActor *actor, BOOL value) {
-    RailActorWork *work = FldAct_GetBlActWorkPtr(actor);
+    RailActorWork *work = FldAct_GetBillboardActorWorkPtr(actor);
 
     work->unk2 = value;
 }
@@ -537,10 +537,10 @@ static void RailActorAnim_GetFrameOffsetZero(FieldActor *actor, u16 anim, u16 st
 
 static void RailActorAnim_DrawBillboardOffset(FieldActor *actor) {
     BOOL changed = FALSE;
-    RailActorWork *work = FldAct_GetBlActWorkPtr(actor);
+    RailActorWork *work = FldAct_GetBillboardActorWorkPtr(actor);
 
-    if (work->index != BLACT_NONE) {
-        BlActSys *sys = FieldBlAct_GetBlActSys(FldAct_GetFieldBlAct(actor));
+    if (work->index != BILLBOARD_ACTOR_NONE) {
+        BillboardActorSys *sys = FieldBillboardActor_GetBillboardActorSys(FldAct_GetFieldBillboardActor(actor));
         u8 dir = RailActor_GetCameraRelativeDir(actor);
         u16 state = FldAct_GetDrawStatus(actor);
         u16 anim = dir + state * 4;
@@ -551,14 +551,14 @@ static void RailActorAnim_DrawBillboardOffset(FieldActor *actor) {
             changed = TRUE;
             work->anim.dir = dir;
             work->anim.state = state;
-            BlActSys_SetActorAnim(sys, work->index, anim);
-            BlActSys_SetActorStep(sys, work->index, 0);
+            BillboardActorSys_SetActorAnim(sys, work->index, anim);
+            BillboardActorSys_SetActorStep(sys, work->index, 0);
         }
         RailActor_UpdateVisibilityAndAnimation(actor, sys, work->index, changed, TRUE);
         CopyActorPosAllAdd(actor, &pos);
         RailActorAnim_AddHeightOffset(actor, &pos);
-        RailActorAnim_GetFrameOffsetZero(actor, BlActSys_GetActorAnim(sys, work->index),
-                                         BlActSys_GetActorStep(sys, work->index), &offset);
+        RailActorAnim_GetFrameOffsetZero(actor, BillboardActorSys_GetActorAnim(sys, work->index),
+                                         BillboardActorSys_GetActorStep(sys, work->index), &offset);
         pos.x += offset.x;
         pos.y += offset.y;
         pos.z += offset.z;
@@ -573,47 +573,47 @@ static void RailActorAnim_DrawBillboardOffset(FieldActor *actor) {
             pos.y -= 0xc000;
             pos.z += 0x8000;
         }
-        BlActScene_SetActorPos(BlActSys_GetScene(sys), work->index, &pos);
+        BillboardActorScene_SetActorPos(BillboardActorSys_GetScene(sys), work->index, &pos);
     }
 }
 
 const FieldActorSceneNodeVTable data_ov036_021cf838 = {
     RailActorAnim_InitDirAnime,   RailActorAnim_DrawBillboardOffset, RailActorAnim_DeleteDirAnime,
-    RailActorAnim_DeleteDirAnime, RailActorAnim_InitDirAnime,        RailActorAnim_GetBlactIdDirAnime
+    RailActorAnim_DeleteDirAnime, RailActorAnim_InitDirAnime,        RailActorAnim_GetBillboardActorIdDirAnime
 };
 
 static void RailActorAnim_DrawStatic(FieldActor *actor) {
-    RailActorWork *work = FldAct_GetBlActWorkPtr(actor);
+    RailActorWork *work = FldAct_GetBillboardActorWorkPtr(actor);
 
-    if (work->index != BLACT_NONE) {
-        BlActSys *sys = FieldBlAct_GetBlActSys(FldAct_GetFieldBlAct(actor));
+    if (work->index != BILLBOARD_ACTOR_NONE) {
+        BillboardActorSys *sys = FieldBillboardActor_GetBillboardActorSys(FldAct_GetFieldBillboardActor(actor));
         u8 dir = RailActor_GetCameraRelativeDir(actor);
         VecFx32 pos;
 
         if (work->anim.dir != dir) {
-            BlActSys_SetActorAnim(sys, work->index, dir);
-            BlActSys_SetActorStep(sys, work->index, 0);
+            BillboardActorSys_SetActorAnim(sys, work->index, dir);
+            BillboardActorSys_SetActorStep(sys, work->index, 0);
             work->anim.dir = dir;
         }
         RailActor_UpdateVisibilityAndAnimation(actor, sys, work->index, FALSE, FALSE);
         CopyActorPosAllAdd(actor, &pos);
         RailActorAnim_AddHeightOffset(actor, &pos);
-        BlActScene_SetActorPos(BlActSys_GetScene(sys), work->index, &pos);
+        BillboardActorScene_SetActorPos(BillboardActorSys_GetScene(sys), work->index, &pos);
     }
 }
 
 const FieldActorSceneNodeVTable data_ov036_021cf910 = {
     RailActorAnim_InitDirAnime,   RailActorAnim_DrawStatic,   RailActorAnim_DeleteDirAnime,
-    RailActorAnim_DeleteDirAnime, RailActorAnim_InitDirAnime, RailActorAnim_GetBlactIdDirAnime
+    RailActorAnim_DeleteDirAnime, RailActorAnim_InitDirAnime, RailActorAnim_GetBillboardActorIdDirAnime
 };
 
 BOOL RailActorAnim_SyncFrameGroup(FieldActor *actor, u16 time) {
     u16 step;
-    RailActorWork *work = FldAct_GetBlActWorkPtr(actor);
-    BlActSys *sys;
+    RailActorWork *work = FldAct_GetBillboardActorWorkPtr(actor);
+    BillboardActorSys *sys;
     u16 current;
 
-    if (work->index == BLACT_NONE) {
+    if (work->index == BILLBOARD_ACTOR_NONE) {
         return FALSE;
     }
     if (time < 24) {
@@ -649,52 +649,52 @@ BOOL RailActorAnim_SyncFrameGroup(FieldActor *actor, u16 time) {
     } else {
         step = 12;
     }
-    sys = FieldBlAct_GetBlActSys(FldAct_GetFieldBlAct(actor));
-    current = BlActSys_GetActorStep(sys, work->index);
+    sys = FieldBillboardActor_GetBillboardActorSys(FldAct_GetFieldBillboardActor(actor));
+    current = BillboardActorSys_GetActorStep(sys, work->index);
     if (current != step) {
-        BlActSys_SetActorStep(sys, work->index, 0);
+        BillboardActorSys_SetActorStep(sys, work->index, 0);
     }
     return TRUE;
 }
 
 static void RailActorAnim_DrawPositionOnly(FieldActor *actor) {
-    RailActorWork *work = FldAct_GetBlActWorkPtr(actor);
+    RailActorWork *work = FldAct_GetBillboardActorWorkPtr(actor);
 
-    if (work->index != BLACT_NONE) {
-        BlActSys *sys = FieldBlAct_GetBlActSys(FldAct_GetFieldBlAct(actor));
+    if (work->index != BILLBOARD_ACTOR_NONE) {
+        BillboardActorSys *sys = FieldBillboardActor_GetBillboardActorSys(FldAct_GetFieldBillboardActor(actor));
         VecFx32 pos;
 
         RailActor_UpdateVisibilityAndAnimation(actor, sys, work->index, FALSE, FALSE);
         CopyActorPosAllAdd(actor, &pos);
         RailActorAnim_AddHeightOffset(actor, &pos);
-        BlActScene_SetActorPos(BlActSys_GetScene(sys), work->index, &pos);
+        BillboardActorScene_SetActorPos(BillboardActorSys_GetScene(sys), work->index, &pos);
     }
 }
 
 const FieldActorSceneNodeVTable data_ov036_021cf820 = {
     RailActorAnim_InitDirAnimeB,   RailActorAnim_DrawPositionOnly, RailActorAnim_DeleteDirAnimeB,
-    RailActorAnim_DeleteDirAnimeB, RailActorAnim_InitDirAnimeB,    RailActorAnim_GetBlactIdWalkAnime
+    RailActorAnim_DeleteDirAnimeB, RailActorAnim_InitDirAnimeB,    RailActorAnim_GetBillboardActorIdWalkAnime
 };
 
 static void RailActorAnim_InitFixedState(FieldActor *actor) {
-    RailActorWork *work = FldAct_ResetBlActWork(actor, 8);
+    RailActorWork *work = FldAct_ResetBillboardActorWork(actor, 8);
 
     work->unk2 = 9;
-    FldBlAct_AddActorMmdlOrReserve(actor, &work->index);
+    FldBillboardActor_AddFieldActorOrReserve(actor, &work->index);
 }
 
 static void RailActorAnim_DeleteFixedState(FieldActor *actor) {
-    RailActorWork *work = FldAct_GetBlActWorkPtr(actor);
+    RailActorWork *work = FldAct_GetBillboardActorWorkPtr(actor);
 
-    FldBlAct_DeleteActorMmdl(actor, work->index);
+    FldBillboardActor_DeleteFieldActor(actor, work->index);
 }
 
 static void RailActorAnim_DrawWalking(FieldActor *actor) {
-    RailNpcWork *work = FldAct_GetBlActWorkPtr(actor);
+    RailNpcWork *work = FldAct_GetBillboardActorWorkPtr(actor);
 
-    if (work->index != BLACT_NONE) {
+    if (work->index != BILLBOARD_ACTOR_NONE) {
         BOOL changed = FALSE;
-        BlActSys *sys = FieldBlAct_GetBlActSys(FldAct_GetFieldBlAct(actor));
+        BillboardActorSys *sys = FieldBillboardActor_GetBillboardActorSys(FldAct_GetFieldBillboardActor(actor));
         u16 dir = GetActorFaceDir(actor);
         VecFx32 pos;
 
@@ -703,7 +703,7 @@ static void RailActorAnim_DrawWalking(FieldActor *actor) {
             work->dir = dir;
             work->frame = 0;
             work->unk8 = 0;
-            BlActSys_SetActorAnim(sys, work->index, work->dir);
+            BillboardActorSys_SetActorAnim(sys, work->index, work->dir);
             {
                 VecFx32 offset = { 0, 0, 0 };
 
@@ -713,14 +713,14 @@ static void RailActorAnim_DrawWalking(FieldActor *actor) {
         RailActorAnim_UpdateWalkOffset(actor, work, dir);
         CopyActorPosAllAdd(actor, &pos);
         RailActorAnim_AddHeightOffset(actor, &pos);
-        BlActScene_SetActorPos(BlActSys_GetScene(sys), work->index, &pos);
+        BillboardActorScene_SetActorPos(BillboardActorSys_GetScene(sys), work->index, &pos);
         RailActor_UpdateVisibilityAndAnimation(actor, sys, work->index, changed, FALSE);
     }
 }
 
 const FieldActorSceneNodeVTable data_ov036_021cf808 = {
     RailActorAnim_InitFixedState,   RailActorAnim_DrawWalking,    RailActorAnim_DeleteFixedState,
-    RailActorAnim_DeleteFixedState, RailActorAnim_InitFixedState, RailActorAnim_GetBlactIdFixedState
+    RailActorAnim_DeleteFixedState, RailActorAnim_InitFixedState, RailActorAnim_GetBillboardActorIdFixedState
 };
 
 static void RailActorAnim_UpdateWalkOffset(FieldActor *actor, RailNpcWork *work, u8 dir) {
@@ -819,37 +819,37 @@ static BOOL RailActorAnim_CheckStepFrame(RailNpcWork *work, u32 dir, const Field
     return FALSE;
 }
 
-static void FldAct_SyncLights(BlActSys *sys, FieldActor *actor, RailActorWork *work) {
+static void FldAct_SyncLights(BillboardActorSys *sys, FieldActor *actor, RailActorWork *work) {
     if (FldAct_GetShadowGroup(actor) != 0) {
-        BlActSys_SetActorLight(sys, work->index, TRUE, 3);
-        BlActSys_SetActorLight(sys, work->index, FALSE, 0);
-        BlActSys_SetActorLight(sys, work->index, FALSE, 1);
-        BlActSys_SetActorLight(sys, work->index, FALSE, 2);
+        BillboardActorSys_SetActorLight(sys, work->index, TRUE, 3);
+        BillboardActorSys_SetActorLight(sys, work->index, FALSE, 0);
+        BillboardActorSys_SetActorLight(sys, work->index, FALSE, 1);
+        BillboardActorSys_SetActorLight(sys, work->index, FALSE, 2);
     } else {
-        BlActSys_SetActorLight(sys, work->index, TRUE, 0);
-        BlActSys_SetActorLight(sys, work->index, FALSE, 1);
-        BlActSys_SetActorLight(sys, work->index, FALSE, 2);
-        BlActSys_SetActorLight(sys, work->index, FALSE, 3);
+        BillboardActorSys_SetActorLight(sys, work->index, TRUE, 0);
+        BillboardActorSys_SetActorLight(sys, work->index, FALSE, 1);
+        BillboardActorSys_SetActorLight(sys, work->index, FALSE, 2);
+        BillboardActorSys_SetActorLight(sys, work->index, FALSE, 3);
     }
 }
 
-static u32 RailActorAnim_GetBlactIdFixedState(FieldActor *actor, u32 param) {
-    RailActorWork *work = FldAct_GetBlActWorkPtr(actor);
+static u32 RailActorAnim_GetBillboardActorIdFixedState(FieldActor *actor, u32 param) {
+    RailActorWork *work = FldAct_GetBillboardActorWorkPtr(actor);
 
     return work->index;
 }
 
 static void RailActorAnim_InitDirAnimeC(FieldActor *actor) {
-    RailActorWork *work = FldAct_ResetBlActWork(actor, 8);
+    RailActorWork *work = FldAct_ResetBillboardActorWork(actor, 8);
 
     RailActorAnim_Reset(&work->anim);
-    FldBlAct_AddActorMmdlOrReserve(actor, &work->index);
+    FldBillboardActor_AddFieldActorOrReserve(actor, &work->index);
 }
 
 static void RailActorAnim_DeleteDirAnimeC(FieldActor *actor) {
-    RailActorWork *work = FldAct_GetBlActWorkPtr(actor);
+    RailActorWork *work = FldAct_GetBillboardActorWorkPtr(actor);
 
-    FldBlAct_DeleteActorMmdl(actor, work->index);
+    FldBillboardActor_DeleteFieldActor(actor, work->index);
 }
 
 static const RailObjAnim RAIL_OBJ_ANIMS[12] = {
@@ -860,15 +860,15 @@ static const RailObjAnim RAIL_OBJ_ANIMS[12] = {
 
 static void RailActorAnim_DrawMultiPattern(FieldActor *actor) {
     u16 changed = FALSE;
-    BlActSys *sys;
+    BillboardActorSys *sys;
     const RailObjAnim *entry = NULL;
-    RailActorWork *work = FldAct_GetBlActWorkPtr(actor);
+    RailActorWork *work = FldAct_GetBillboardActorWorkPtr(actor);
 
-    if (work->index == BLACT_NONE) {
+    if (work->index == BILLBOARD_ACTOR_NONE) {
         return;
     }
     {
-        sys = FieldBlAct_GetBlActSys(FldAct_GetFieldBlAct(actor));
+        sys = FieldBillboardActor_GetBillboardActorSys(FldAct_GetFieldBillboardActor(actor));
         u16 objCode = FldAct_GetObjCode(actor);
         u16 state = FldAct_GetDrawStatus(actor);
         u8 dir = RailActor_GetCameraRelativeDir(actor);
@@ -940,37 +940,37 @@ static void RailActorAnim_DrawMultiPattern(FieldActor *actor) {
             }
             changed = TRUE;
             work->anim.state = state;
-            BlActSys_SetActorAnim(sys, work->index, anim);
+            BillboardActorSys_SetActorAnim(sys, work->index, anim);
         }
         RailActor_UpdateVisibilityAndAnimation(actor, sys, work->index, changed, TRUE);
         CopyActorPosAllAdd(actor, &pos);
         RailActorAnim_AddHeightOffset(actor, &pos);
-        BlActScene_SetActorPos(BlActSys_GetScene(sys), work->index, &pos);
+        BillboardActorScene_SetActorPos(BillboardActorSys_GetScene(sys), work->index, &pos);
     }
 }
 
 const FieldActorSceneNodeVTable data_ov036_021cf958 = {
     RailActorAnim_InitDirAnimeC,   RailActorAnim_DrawMultiPattern, RailActorAnim_DeleteDirAnimeC,
-    RailActorAnim_DeleteDirAnimeC, RailActorAnim_InitDirAnimeC,    RailActorAnim_GetBlactIdMultiPattern
+    RailActorAnim_DeleteDirAnimeC, RailActorAnim_InitDirAnimeC,    RailActorAnim_GetBillboardActorIdMultiPattern
 };
 
-static u32 RailActorAnim_GetBlactIdMultiPattern(FieldActor *actor, u32 param) {
-    RailActorWork *work = FldAct_GetBlActWorkPtr(actor);
+static u32 RailActorAnim_GetBillboardActorIdMultiPattern(FieldActor *actor, u32 param) {
+    RailActorWork *work = FldAct_GetBillboardActorWorkPtr(actor);
 
     return work->index;
 }
 
-BOOL RailActorAnim_GetBlactAnimeTypeA(FieldActor *actor, u16 *anim, u16 *step) {
+BOOL RailActorAnim_GetBillboardActorAnimeTypeA(FieldActor *actor, u16 *anim, u16 *step) {
     u16 objCode = FldAct_GetObjCode(actor);
 
     if (objCode == OBJ_CODE_211 || objCode == OBJ_CODE_213) {
-        RailActorWork *work = FldAct_GetBlActWorkPtr(actor);
+        RailActorWork *work = FldAct_GetBillboardActorWorkPtr(actor);
 
-        if (work->index != BLACT_NONE) {
-            BlActSys *sys = FieldBlAct_GetBlActSys(FldAct_GetFieldBlAct(actor));
+        if (work->index != BILLBOARD_ACTOR_NONE) {
+            BillboardActorSys *sys = FieldBillboardActor_GetBillboardActorSys(FldAct_GetFieldBillboardActor(actor));
 
-            *anim = BlActSys_GetActorAnim(sys, work->index);
-            *step = BlActSys_GetActorStep(sys, work->index);
+            *anim = BillboardActorSys_GetActorAnim(sys, work->index);
+            *step = BillboardActorSys_GetActorStep(sys, work->index);
             return TRUE;
         }
         return FALSE;
@@ -980,17 +980,17 @@ BOOL RailActorAnim_GetBlactAnimeTypeA(FieldActor *actor, u16 *anim, u16 *step) {
     return TRUE;
 }
 
-BOOL RailActorAnim_GetBlactAnimeTypeB(FieldActor *actor, u16 *anim, u16 *step) {
+BOOL RailActorAnim_GetBillboardActorAnimeTypeB(FieldActor *actor, u16 *anim, u16 *step) {
     u16 objCode = FldAct_GetObjCode(actor);
 
     if (objCode == OBJ_CODE_221 || objCode == OBJ_CODE_222) {
-        RailActorWork *work = FldAct_GetBlActWorkPtr(actor);
+        RailActorWork *work = FldAct_GetBillboardActorWorkPtr(actor);
 
-        if (work->index != BLACT_NONE) {
-            BlActSys *sys = FieldBlAct_GetBlActSys(FldAct_GetFieldBlAct(actor));
+        if (work->index != BILLBOARD_ACTOR_NONE) {
+            BillboardActorSys *sys = FieldBillboardActor_GetBillboardActorSys(FldAct_GetFieldBillboardActor(actor));
 
-            *anim = BlActSys_GetActorAnim(sys, work->index);
-            *step = BlActSys_GetActorStep(sys, work->index);
+            *anim = BillboardActorSys_GetActorAnim(sys, work->index);
+            *step = BillboardActorSys_GetActorStep(sys, work->index);
             return TRUE;
         }
         return FALSE;
@@ -1002,36 +1002,36 @@ BOOL RailActorAnim_GetBlactAnimeTypeB(FieldActor *actor, u16 *anim, u16 *step) {
 
 static void RailActorAnim_DrawTwoPattern(FieldActor *actor) {
     BOOL changed = FALSE;
-    RailActorWork *work = FldAct_GetBlActWorkPtr(actor);
+    RailActorWork *work = FldAct_GetBillboardActorWorkPtr(actor);
 
-    if (work->index != BLACT_NONE) {
-        BlActSys *sys = FieldBlAct_GetBlActSys(FldAct_GetFieldBlAct(actor));
+    if (work->index != BILLBOARD_ACTOR_NONE) {
+        BillboardActorSys *sys = FieldBillboardActor_GetBillboardActorSys(FldAct_GetFieldBillboardActor(actor));
         u16 state = FldAct_GetDrawStatus(actor);
         VecFx32 pos;
 
         if (state != work->anim.state && state < 2) {
             work->anim.state = state;
-            BlActSys_SetActorAnim(sys, work->index, state);
+            BillboardActorSys_SetActorAnim(sys, work->index, state);
             changed = TRUE;
         }
         RailActor_UpdateVisibilityAndAnimation(actor, sys, work->index, changed, FALSE);
         CopyActorPosAllAdd(actor, &pos);
         RailActorAnim_AddHeightOffset(actor, &pos);
-        BlActScene_SetActorPos(BlActSys_GetScene(sys), work->index, &pos);
+        BillboardActorScene_SetActorPos(BillboardActorSys_GetScene(sys), work->index, &pos);
     }
 }
 
 const FieldActorSceneNodeVTable data_ov036_021cf7d8 = {
     RailActorAnim_InitDirAnimeB,   RailActorAnim_DrawTwoPattern, RailActorAnim_DeleteDirAnimeB,
-    RailActorAnim_DeleteDirAnimeB, RailActorAnim_InitDirAnimeB,  RailActorAnim_GetBlactIdWalkAnime
+    RailActorAnim_DeleteDirAnimeB, RailActorAnim_InitDirAnimeB,  RailActorAnim_GetBillboardActorIdWalkAnime
 };
 
 static void RailActorAnim_DrawThreePattern(FieldActor *actor) {
     BOOL changed = FALSE;
-    RailActorWork *work = FldAct_GetBlActWorkPtr(actor);
+    RailActorWork *work = FldAct_GetBillboardActorWorkPtr(actor);
 
-    if (work->index != BLACT_NONE) {
-        BlActSys *sys = FieldBlAct_GetBlActSys(FldAct_GetFieldBlAct(actor));
+    if (work->index != BILLBOARD_ACTOR_NONE) {
+        BillboardActorSys *sys = FieldBillboardActor_GetBillboardActorSys(FldAct_GetFieldBillboardActor(actor));
         u16 objCode = FldAct_GetObjCode(actor);
         u16 state = FldAct_GetDrawStatus(actor);
         VecFx32 pos;
@@ -1055,34 +1055,36 @@ static void RailActorAnim_DrawThreePattern(FieldActor *actor) {
                 anim = 4;
             }
             work->anim.state = state;
-            BlActSys_SetActorAnim(sys, work->index, anim);
+            BillboardActorSys_SetActorAnim(sys, work->index, anim);
             changed = TRUE;
         }
         RailActor_UpdateVisibilityAndAnimation(actor, sys, work->index, changed, FALSE);
         CopyActorPosAllAdd(actor, &pos);
         RailActorAnim_AddHeightOffset(actor, &pos);
-        BlActScene_SetActorPos(BlActSys_GetScene(sys), work->index, &pos);
+        BillboardActorScene_SetActorPos(BillboardActorSys_GetScene(sys), work->index, &pos);
     }
 }
 
 const FieldActorSceneNodeVTable data_ov036_021cf7f0 = {
     RailActorAnim_InitDirAnimeB,   RailActorAnim_DrawThreePattern, RailActorAnim_DeleteDirAnimeB,
-    RailActorAnim_DeleteDirAnimeB, RailActorAnim_InitDirAnimeB,    RailActorAnim_GetBlactIdWalkAnime
+    RailActorAnim_DeleteDirAnimeB, RailActorAnim_InitDirAnimeB,    RailActorAnim_GetBillboardActorIdWalkAnime
 };
 
-BOOL RailActorAnim_CheckBlactReady(FieldActor *actor) {
+BOOL RailActorAnim_CheckBillboardActorReady(FieldActor *actor) {
     u16 objCode = FldAct_GetObjCode(actor);
 
     if (objCode != OBJ_CODE_123 && objCode != OBJ_CODE_374) {
         return TRUE;
     }
     {
-        u16 index = FldAct_GetBlActIdx(actor, 0);
+        u16 index = FldAct_GetBillboardActorIdx(actor, 0);
 
-        if (index != BLACT_NONE) {
+        if (index != BILLBOARD_ACTOR_NONE) {
             u16 cmd;
 
-            if (BlActSys_GetActorLastCmd(FieldBlAct_GetBlActSys(FldAct_GetFieldBlAct(actor)), index, &cmd) == TRUE) {
+            if (BillboardActorSys_GetActorLastCmd(
+                    FieldBillboardActor_GetBillboardActorSys(FldAct_GetFieldBillboardActor(actor)), index, &cmd) ==
+                TRUE) {
                 return TRUE;
             }
         }
@@ -1090,14 +1092,15 @@ BOOL RailActorAnim_CheckBlactReady(FieldActor *actor) {
     return FALSE;
 }
 
-void RailActorAnim_ResetBlactAnime(FieldActor *actor) {
+void RailActorAnim_ResetBillboardActorAnime(FieldActor *actor) {
     u16 objCode = FldAct_GetObjCode(actor);
 
     if (objCode == OBJ_CODE_123 || objCode == OBJ_CODE_374) {
-        u16 index = FldAct_GetBlActIdx(actor, 0);
+        u16 index = FldAct_GetBillboardActorIdx(actor, 0);
 
-        if (index != BLACT_NONE) {
-            BlActSys_SetActorStep(FieldBlAct_GetBlActSys(FldAct_GetFieldBlAct(actor)), index, 0);
+        if (index != BILLBOARD_ACTOR_NONE) {
+            BillboardActorSys_SetActorStep(
+                FieldBillboardActor_GetBillboardActorSys(FldAct_GetFieldBillboardActor(actor)), index, 0);
         }
     }
 }
@@ -1107,7 +1110,7 @@ static void RailActorAnim_Reset(RailActorAnim *anim) {
     anim->dir = 8;
 }
 
-static void RailActorAnim_Update(RailActorAnim *anim, FieldActor *actor, BlActSys *sys, u16 index) {
+static void RailActorAnim_Update(RailActorAnim *anim, FieldActor *actor, BillboardActorSys *sys, u16 index) {
     BOOL changed = FALSE;
     u16 animId;
     u16 dir = RailActor_GetCameraRelativeDir(actor);
@@ -1122,12 +1125,12 @@ static void RailActorAnim_Update(RailActorAnim *anim, FieldActor *actor, BlActSy
         anim->state = state;
         anim->dir = dir;
         anim->step = 0;
-        BlActSys_SetActorAnim(sys, index, animId);
+        BillboardActorSys_SetActorAnim(sys, index, animId);
     } else if (state != anim->state) {
         changed = TRUE;
         if (state == 0) {
             if (anim->state == 0) {
-                BlActSys_SetActorAnim(sys, index, animId);
+                BillboardActorSys_SetActorAnim(sys, index, animId);
                 anim->state = state;
                 anim->pending = 0;
             } else if (anim->pending == 0) {
@@ -1136,26 +1139,26 @@ static void RailActorAnim_Update(RailActorAnim *anim, FieldActor *actor, BlActSy
             } else {
                 u8 steps[4] = { 0, 2, 2, 0 };
 
-                anim->step = BlActSys_GetActorStep(sys, index);
+                anim->step = BillboardActorSys_GetActorStep(sys, index);
                 if (anim->step >= 4) {
                     anim->step = 0;
                 }
                 anim->step = steps[anim->step];
-                BlActSys_SetActorAnim(sys, index, animId);
+                BillboardActorSys_SetActorAnim(sys, index, animId);
                 anim->state = state;
                 anim->pending = 0;
             }
         } else {
             if (anim->state != 0) {
-                anim->step = BlActSys_GetActorStep(sys, index);
+                anim->step = BillboardActorSys_GetActorStep(sys, index);
                 if (anim->step >= 2) {
                     anim->step = 0;
                 } else {
                     anim->step = 2;
                 }
             }
-            BlActSys_SetActorAnim(sys, index, animId);
-            BlActSys_SetActorStep(sys, index, anim->step);
+            BillboardActorSys_SetActorAnim(sys, index, animId);
+            BillboardActorSys_SetActorStep(sys, index, anim->step);
             anim->state = state;
             anim->pending = 0;
         }
@@ -1177,11 +1180,11 @@ static u8 RailActor_GetCameraRelativeDir(FieldActor *actor) {
     return RotateDirByAngle(dir, angle);
 }
 
-static void RailActor_UpdateVisibilityAndAnimation(FieldActor *actor, BlActSys *sys, u16 index, BOOL changed,
+static void RailActor_UpdateVisibilityAndAnimation(FieldActor *actor, BillboardActorSys *sys, u16 index, BOOL changed,
                                                    BOOL flag) {
     BOOL animate = TRUE;
     BOOL visible;
-    u8 shown = FldBlAct_GetEntryHookFlag(actor);
+    u8 shown = FldBillboardActor_GetEntryHookFlag(actor);
 
     if (!changed) {
         if (flag == 1) {
@@ -1192,10 +1195,10 @@ static void RailActor_UpdateVisibilityAndAnimation(FieldActor *actor, BlActSys *
             animate = FALSE;
         }
     }
-    BlActSys_SetActorAnimating(sys, index, animate);
+    BillboardActorSys_SetActorAnimating(sys, index, animate);
     visible = TRUE;
     if (IsActorHidden(actor) == 1) {
         visible = FALSE;
     }
-    BlActSys_SetActorVisible(sys, index, visible);
+    BillboardActorSys_SetActorVisible(sys, index, visible);
 }

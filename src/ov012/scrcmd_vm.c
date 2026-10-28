@@ -31,8 +31,8 @@
 #include "field/scrcmd_entree_forest.h"
 #include "field/scrcmd_fade.h"
 #include "field/scrcmd_field.h"
+#include "field/scrcmd_field_actor.h"
 #include "field/scrcmd_fld_battle.h"
-#include "field/scrcmd_fldmmdl.h"
 #include "field/scrcmd_game_state.h"
 #include "field/scrcmd_gym.h"
 #include "field/scrcmd_hidden_hollow.h"
@@ -653,7 +653,7 @@ const FieldScriptCommand EVCMD_TABLE[] = {
     Scrcmd_StartSwapNpcEvent,                         // 0x22b
     NULL,                                             // 0x22c
     s022D_PlayFieldEffectByTable,                     // 0x22d
-    ScriptNative_SetMmdlZoneDeleteOff,                // 0x22e
+    ScriptNative_SetActorZoneDeleteOff,               // 0x22e
     s022F_WordSetLoadPastTradePkmName,                // 0x22f
     s0230_MsgPlaceSignFont4,                          // 0x230
     s0231_CallGameManual,                             // 0x231
@@ -721,7 +721,7 @@ const FieldScriptCommand EVCMD_TABLE[] = {
     NULL,                                             // 0x26f
     NULL,                                             // 0x270
     s0271_MedalAcknowledge,                           // 0x271
-    s0272_MedalGetGuruActor,                          // 0x272
+    s0272_MedalGetSpinTradeActor,                     // 0x272
     s0273_MedalGive,                                  // 0x273
     s0274_FunfestMissionStart,                        // 0x274
     s0275_WordSetFunfestMission,                      // 0x275

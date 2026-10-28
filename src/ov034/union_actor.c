@@ -151,10 +151,13 @@ BOOL UnionOneself_CanTalkTo(UnionSystem *unisys, u16 id) {
 
 static FieldActor *UnionOneself_FindActor(UnionSystem *unisys, UnionBeaconEntry *entry, UnionActorSlot *slot) {
     u16 id = UnionOneself_GetActorId(entry, slot);
-    FieldActor *mmdl = FindFieldActor(GameData_GetMMSys(unisys->param->gameData), id);
+    FieldActor *fieldActor = FindFieldActor(GameData_GetMMSys(unisys->param->gameData), id);
 
-    GFL_ASSERT(mmdl != NULL);
-    return mmdl;
+    // GFL_ASSERT written out: the game prints Game Freak's name for fieldActor, mmdl
+    if (!(fieldActor != NULL)) {
+        GFL_DebugAssertFail("", 0, "mmdl != NULL");
+    }
+    return fieldActor;
 }
 
 static UnionActorSlot *UnionOneself_CreateActorSlot(UnionSystem *unisys, UnionBeaconEntry *entry, UnionMember *member,

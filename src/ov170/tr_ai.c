@@ -15,8 +15,8 @@
 #include "nitro/fx.h"
 #include "nitro/os.h"
 #include "pml/item.h"
+#include "pml/move.h"
 #include "pml/personal.h"
-#include "pml/waza.h"
 #include "system/vm.h"
 
 // The AI stops thinking for the frame once it has run for this many ticks

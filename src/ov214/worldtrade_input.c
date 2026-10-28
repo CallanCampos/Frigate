@@ -13,7 +13,7 @@
 #include "gfl/str.h"
 #include "gfl/touchpanel.h"
 #include "gfl/ui.h"
-#include "save/pokedex.h"
+#include "save/pokedex_savedata.h"
 #include "system/bgwinfrm.h"
 #include "system/bmp_menulist.h"
 #include "worldtrade_local.h"
@@ -84,11 +84,11 @@ struct WorldTradeInputWork {
     ClActor *searchCursorAct;
     // The window's screen, which slides in and out
     BGWinFrame *bgWinFrm;
-    PokeDexSave *zukan;
+    PokeDexSave *dex;
     MsgData *msgManager;
     MsgData *monsNameManager;
     MsgData *countryNameManager;
-    u8 *sinouTable;
+    u8 *sinnohTable;
     // The Pokémon names, levels or countries listed
     ListMenuOption *nameList;
     WorldTradeNumFont *numFont;
@@ -156,9 +156,9 @@ static u32 Input_SeqHead2Init(WorldTradeInputWork *wk);
 static u32 Input_SeqHead2Main(WorldTradeInputWork *wk);
 static u32 Input_SeqHead2Exit(WorldTradeInputWork *wk);
 static u32 Input_SeqHead2Return(WorldTradeInputWork *wk);
-static int Input_PokeNameCountSeen(u8 *sinou, PokeDexSave *zukan, int num, u16 *sortList, int start, int end);
-static int Input_PokeNameListMake(ListMenuOption **menulist, MsgData *monsNameManager, MsgData *msgManager, u8 *sinou,
-                                  int head, PokeDexSave *zukan);
+static int Input_PokeNameCountSeen(u8 *sinnoh, PokeDexSave *dex, int num, u16 *sortList, int start, int end);
+static int Input_PokeNameListMake(ListMenuOption **menulist, MsgData *monsNameManager, MsgData *msgManager, u8 *sinnoh,
+                                  int head, PokeDexSave *dex);
 static void Input_PokeNameListPrint(WorldTradeInputWork *wk, int page, int max);
 static void Input_NationListPrint(WorldTradeInputWork *wk, int page, int max);
 static u32 Input_SeqPokeNameInit(WorldTradeInputWork *wk);
@@ -187,9 +187,9 @@ static void Input_SystemPrint(BGWinFrame *frm, MsgData *msgManager, BmpWin *win,
                               WorldTradePrint *print);
 static void Input_TouchPrint(BGWinFrame *frm, MsgData *msgManager, BmpWin *win, int msgNo, WorldTradePrint *print);
 static void Input_PagePrint(BGWinFrame *frm, WorldTradeNumFont *numFont, BmpWin *win, int page, int max);
-static int Input_PokeSeeCountSiin(WorldTradeInputWork *wk, int siin);
+static int Input_PokeSeeCountInitial(WorldTradeInputWork *wk, int initial);
 static BOOL Input_PokeSeeCountCategory(WorldTradeInputWork *wk, int select);
-static int Input_NationCountSiin(WorldTradeInputWork *wk, int siin);
+static int Input_NationCountInitial(WorldTradeInputWork *wk, int initial);
 static BOOL Input_NationCountCategory(WorldTradeInputWork *wk, int select);
 
 // Where the windows and the cursor's stops of each list are, in characters or pixels
@@ -472,8 +472,8 @@ WorldTradeInputWork *WorldTrade_Input_Init(WorldTradeInputHeader *header, int fr
     wk->msgManager = header->msgManager;
     wk->monsNameManager = header->monsNameManager;
     wk->countryNameManager = header->countryNameManager;
-    wk->zukan = header->zukan;
-    wk->sinouTable = header->sinouTable;
+    wk->dex = header->dex;
+    wk->sinnohTable = header->sinnohTable;
     wk->bgFrame = frame;
     wk->situation = situation;
     wk->head1 = 0;
@@ -1559,7 +1559,7 @@ static u32 Input_SeqHead2Init(WorldTradeInputWork *wk) {
     Input_SystemPrint(wk->bgWinFrm, wk->msgManager, wk->menuWin[0], wk->head1 + 0x74, 2, INPUT_COLOR_NORMAL,
                       &wk->print);
     for (i = 1; i <= sHeadwordRange[wk->head1].count; i++) {
-        if (Input_PokeSeeCountSiin(wk, sHeadOffset[wk->head1] + i - 1) > 0) {
+        if (Input_PokeSeeCountInitial(wk, sHeadOffset[wk->head1] + i - 1) > 0) {
             color = INPUT_COLOR_NORMAL;
             wk->seeCheck[sHeadOffset[wk->head1] + i - 1] = 1;
         } else {
@@ -1636,33 +1636,33 @@ static u32 Input_SeqHead2Return(WorldTradeInputWork *wk) {
     return INPUT_NULL;
 }
 
-static int Input_PokeNameCountSeen(u8 *sinou, PokeDexSave *zukan, int num, u16 *sortList, int start, int end) {
+static int Input_PokeNameCountSeen(u8 *sinnoh, PokeDexSave *dex, int num, u16 *sortList, int start, int end) {
     int i;
     int count = 0;
 
     for (i = start; i < end; i++) {
-        if (PokeDex_IsSeen(zukan, sortList[i])) {
+        if (PokeDex_IsSeen(dex, sortList[i])) {
             count++;
         }
     }
     return count;
 }
 
-static int Input_PokeNameListMake(ListMenuOption **menulist, MsgData *monsNameManager, MsgData *msgManager, u8 *sinou,
-                                  int head, PokeDexSave *zukan) {
+static int Input_PokeNameListMake(ListMenuOption **menulist, MsgData *monsNameManager, MsgData *msgManager, u8 *sinnoh,
+                                  int head, PokeDexSave *dex) {
     int i;
     int num;
     int start;
     int end;
     int count;
-    u16 *sortList = WorldTrade_ZukanSortDataGet(HEAPID_WORLDTRADE, 0, &num);
+    u16 *sortList = WorldTrade_PokedexSortDataGet(HEAPID_WORLDTRADE, 0, &num);
 
     WorldTrade_HeadwordRangeGet(head, &start, &end);
     num = end - start;
-    count = Input_PokeNameCountSeen(sinou, zukan, num, sortList, start, end);
+    count = Input_PokeNameCountSeen(sinnoh, dex, num, sortList, start, end);
     *menulist = ListMenuCore_CreateOptionList(count + 1, HEAPID_WORLDTRADE);
     for (i = start; i < end; i++) {
-        if (PokeDex_IsSeen(zukan, sortList[i])) {
+        if (PokeDex_IsSeen(dex, sortList[i])) {
             ListMenuCore_AppendMsgOption(*menulist, monsNameManager, sortList[i], sortList[i], HEAPID_WORLDTRADE);
         }
     }
@@ -1706,8 +1706,8 @@ static u32 Input_SeqPokeNameInit(WorldTradeInputWork *wk) {
     BGWinFrame_LoadScreen(wk->bgWinFrm, 0, ARCID_WORLDTRADE, 0x1d, TRUE);
     BGWinFrame_GetScreen(wk->bgWinFrm, 0);
     Input_SelectBmpWinAdd(wk, INPUT_MODE_POKEMON_NAME);
-    wk->listMax = Input_PokeNameListMake(&wk->nameList, wk->monsNameManager, wk->msgManager, wk->sinouTable,
-                                         wk->head2 + sHeadOffset[wk->head1], wk->zukan);
+    wk->listMax = Input_PokeNameListMake(&wk->nameList, wk->monsNameManager, wk->msgManager, wk->sinnohTable,
+                                         wk->head2 + sHeadOffset[wk->head1], wk->dex);
     wk->page = 0;
     Input_PokeNameListPrint(wk, 0, wk->listMax);
     pageMax = Input_ListPageNum(wk->listMax, 4);
@@ -1892,7 +1892,7 @@ static u32 Input_SeqNationHead2Init(WorldTradeInputWork *wk) {
     Input_SystemPrint(wk->bgWinFrm, wk->msgManager, wk->menuWin[0], wk->head1 + 0x74, 2, INPUT_COLOR_NORMAL,
                       &wk->print);
     for (i = 1; i < 4; i++) {
-        if (Input_NationCountSiin(wk, sHeadOffset[wk->head1] + i - 1) > 0) {
+        if (Input_NationCountInitial(wk, sHeadOffset[wk->head1] + i - 1) > 0) {
             color = INPUT_COLOR_NORMAL;
             wk->seeCheck[sHeadOffset[wk->head1] + i - 1] = 1;
         } else {
@@ -2183,16 +2183,16 @@ static void Input_PagePrint(BGWinFrame *frm, WorldTradeNumFont *numFont, BmpWin 
     BGWinFrame_WriteBmpWin(frm, 0, win);
 }
 
-static int Input_PokeSeeCountSiin(WorldTradeInputWork *wk, int siin) {
+static int Input_PokeSeeCountInitial(WorldTradeInputWork *wk, int initial) {
     int num;
     int start;
     int end;
     int count;
-    u16 *sortList = WorldTrade_ZukanSortDataGet(HEAPID_WORLDTRADE, 0, &num);
+    u16 *sortList = WorldTrade_PokedexSortDataGet(HEAPID_WORLDTRADE, 0, &num);
 
-    WorldTrade_HeadwordRangeGet(siin, &start, &end);
+    WorldTrade_HeadwordRangeGet(initial, &start, &end);
     num = end - start;
-    count = Input_PokeNameCountSeen(wk->sinouTable, wk->zukan, num, sortList, start, end);
+    count = Input_PokeNameCountSeen(wk->sinnohTable, wk->dex, num, sortList, start, end);
     GFL_HeapFree(sortList);
     return count;
 }
@@ -2203,20 +2203,20 @@ static BOOL Input_PokeSeeCountCategory(WorldTradeInputWork *wk, int select) {
 
     if (sHeadwordRange[select].count > 0) {
         for (i = 0; i < sHeadwordRange[select].count; i++) {
-            if (Input_PokeSeeCountSiin(wk, start + i) > 0) {
+            if (Input_PokeSeeCountInitial(wk, start + i) > 0) {
                 return TRUE;
             }
         }
-    } else if (Input_PokeSeeCountSiin(wk, start) > 0) {
+    } else if (Input_PokeSeeCountInitial(wk, start) > 0) {
         return TRUE;
     }
     return FALSE;
 }
 
-static int Input_NationCountSiin(WorldTradeInputWork *wk, int siin) {
+static int Input_NationCountInitial(WorldTradeInputWork *wk, int initial) {
     int number;
 
-    return WorldTrade_NationSortListNumGet(siin, &number);
+    return WorldTrade_NationSortListNumGet(initial, &number);
 }
 
 static BOOL Input_NationCountCategory(WorldTradeInputWork *wk, int select) {
@@ -2225,11 +2225,11 @@ static BOOL Input_NationCountCategory(WorldTradeInputWork *wk, int select) {
 
     if (sHeadwordRange[select].count > 0) {
         for (i = 0; i < sHeadwordRange[select].count; i++) {
-            if (Input_NationCountSiin(wk, start + i) > 0) {
+            if (Input_NationCountInitial(wk, start + i) > 0) {
                 return TRUE;
             }
         }
-    } else if (Input_NationCountSiin(wk, start) > 0) {
+    } else if (Input_NationCountInitial(wk, start) > 0) {
         return TRUE;
     }
     return FALSE;

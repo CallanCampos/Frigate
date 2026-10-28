@@ -621,7 +621,7 @@ static void SetActorsY(ShortcutMenuList *menu, u32 y) {
     }
 }
 
-GameEvent *ReturnToField_CreateNameInEvent(GameSystem *gsys, Field *field, NameEntryParam *param, BOOL transition) {
+GameEvent *ReturnToField_CreateNameInputEvent(GameSystem *gsys, Field *field, NameEntryParam *param, BOOL transition) {
     ShortcutMenuReturn *ret;
     GameEvent *event;
 

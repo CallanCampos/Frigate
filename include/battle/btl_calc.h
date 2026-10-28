@@ -8,7 +8,7 @@
 #include "battle/btl_pokeparam.h"
 #include "gfl/heap.h"
 #include "nitro/math.h"
-#include "pml/waza.h"
+#include "pml/move.h"
 #include "struct_decls.h"
 
 // Up to four client IDs without repeats, the unused ones 4

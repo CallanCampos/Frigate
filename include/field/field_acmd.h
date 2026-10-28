@@ -27,8 +27,8 @@ enum {
     ACMD_STAY_WALK_2F = 0x28,
     ACMD_JUMP_1 = 0x34,
     ACMD_JUMP_2 = 0x38,
-    // The "!" bubble over the actor (fldeff_gyoe.c's kind 0) with its sound; one command, for no direction
-    ACMD_GYOE = 0x4b,
+    // The "!" bubble over the actor (fldeff_emotion_bubble.c's kind 0) with its sound; one command, for no direction
+    ACMD_EMOTION_BUBBLE = 0x4b,
     ACMD_WALK_UPHILL_4F = 0x4c,
     ACMD_DASH = 0x58,
     ACMD_BIKE_DEEP_SAND = 0x9b,
@@ -46,7 +46,7 @@ extern const u32 ACMD_QUEUE_WALK_S_8F[2];
 extern const u32 ACMD_QUEUE_WALK_W_8F[2];
 extern const u32 ACMD_QUEUE_WALK_E_8F[2];
 
-// The functions of each action command, by the command's state, which fldmmdl_movedata.c's
+// The functions of each action command, by the command's state, which field_actor_movedata.c's
 // ACTOR_ACTION_COMMAND_TABLES lists by command
 extern const ActorAcmdFunc data_ov036_021cacac[];
 extern const ActorAcmdFunc data_ov036_021cacb4[];

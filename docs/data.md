@@ -344,7 +344,7 @@ fragmented. Those resources are preserved as separate source files and can be re
 `src/system/poke_icon.c` picks the bank, and the icons' cells and animations for each OBJ mapping are
 `shared/icon_{cells,animations}_{32k,64k,128k}`. `footprint.png` is a 16×32 character sheet and uses
 `res/pokemon/shared/footprint_palette.pal`, with the cells and animations of `shared/footprint_*_old` for the species
-up to Arceus and `shared/footprint_*` for the rest (`zukan_info.c`).
+up to Arceus and `shared/footprint_*` for the rest (`pokedex_info.c`).
 The older musical sprite archive has its own `musical/` subfolder. Files identical to the regular sprite are omitted
 there; the packer uses the regular file for those entries, so an edit of one shows in both. Sprite forms have
 `form_<n>/` folders under their species, numbered by the forms' `sprite_offset` (`GetPokemonDataIDBase`); the musical
@@ -1038,7 +1038,7 @@ events.
 ## 2D graphics
 
 The menus, apps and screens keep their 2D graphics in archives of Nitro resources, an archive each: the title screen's,
-the Pokédex's (`ARCID_ZUKAN_GRA`), the box's (`ARCID_BOX2`) and the others. Each is `res/graphics/<archive>/`, named
+the Pokédex's (`ARCID_POKEDEX_GRA`), the box's (`ARCID_BOX2`) and the others. Each is `res/graphics/<archive>/`, named
 after its `ARCID_*` constant in `include/constants/arc.h`, whose number gives the archive's file (`ARCID_TITLE`, 26, is
 `a/0/2/6`); `configure.py` packs a directory for each, 110 of them. An archive that swan doesn't name is named after
 the source file that loads it, or the prefix of an app's files where several load it (`ARCID_BTLV` for the

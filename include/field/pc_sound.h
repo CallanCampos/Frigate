@@ -24,6 +24,6 @@ GameEvent *FieldDoorAnime_StartClose(GameEvent *parent, GameSystem *gsys, Field 
 GameEvent *Scrcmd_CreateSubProcEvent(GameSystem *gsys, u16 option, u16 *result);
 GameEventReturnCode Scrcmd_SubProcEventMain(GameEvent *event, u32 *state, void *data);
 
-extern const GameProcFunctions DENDOU_PC_PROC_FUNCTIONS;
+extern const GameProcFunctions HALL_OF_FAME_PC_PROC_FUNCTIONS;
 
 #endif // POKEBW2_FIELD_PC_SOUND_H

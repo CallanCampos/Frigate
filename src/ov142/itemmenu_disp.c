@@ -24,7 +24,7 @@
 #include "nitro/os.h"
 #include "nnsys/g2d.h"
 #include "pml/item.h"
-#include "pml/waza.h"
+#include "pml/move.h"
 #include "save/bag.h"
 #include "save/player_info.h"
 #include "save/save_control.h"
@@ -431,7 +431,7 @@ void ItemMenuDisp_ShowTMIcons(ItemMenuWork *work, BOOL show) {
     if (work->selIcon != NULL) {
         ClActor_SetVisible(work->selIcon, show);
     }
-    move = PML_ItemGetTMWazaID(ItemMenu_GetSlot(work, ItemMenu_GetCursorIndex(work))->item);
+    move = PML_ItemGetTMMoveID(ItemMenu_GetSlot(work, ItemMenu_GetCursorIndex(work))->item);
     if (move != 0) {
         ClActor_SetVisible(work->categoryIcons[PML_MoveGetCategory(move)], show);
         ClActor_SetVisible(work->typeIcons[PML_MoveGetType(move)], show);
@@ -463,7 +463,7 @@ void ItemMenuDisp_DrawItemInfo(ItemMenuWork *work) {
     GFL_BitmapFill(BmpWin_GetBitmap(work->itemNameWindow.window), 0);
     GFL_BitmapFill(BmpWin_GetBitmap(work->countWindow.window), 0);
     GFL_BitmapFill(BmpWin_GetBitmap(work->descWindow.window), 0);
-    move = PML_ItemGetTMWazaID(slot->item);
+    move = PML_ItemGetTMMoveID(slot->item);
     pocket = BagSave_GetExistingItemPocket(work->bag, slot->item);
     if (move == 0) {
         GFL_MsgDataLoadStrbuf(work->msgData, 134, work->strbuf);
@@ -716,7 +716,7 @@ void ItemMenuDisp_CreateListActors(ItemMenuWork *work) {
 // Whether a TM or HM teaches a move that is used in the field
 static BOOL ItemMenuDisp_IsFieldMoveTM(u16 item) {
     if (PML_ItemIsTMHM(item) == TRUE) {
-        switch (PML_ItemGetTMWazaID(item)) {
+        switch (PML_ItemGetTMMoveID(item)) {
         case MOVE_CUT:
         case MOVE_FLY:
         case MOVE_SURF:
@@ -780,7 +780,7 @@ void ItemMenuDisp_DrawList(ItemMenuWork *work) {
         }
         GFL_BitmapFill(work->rowNameBitmaps[i], 13);
         GFL_MsgDataLoadStrbuf(work->msgData, 130, work->strbuf);
-        move = PML_ItemGetTMWazaID(slot->item);
+        move = PML_ItemGetTMMoveID(slot->item);
         if (move == 0) {
             ItemMenu_SetItemName(work, 0, slot->item);
         } else {

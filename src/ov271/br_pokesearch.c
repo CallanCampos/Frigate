@@ -16,7 +16,7 @@
 #include "gfl/str.h"
 #include "gfl/touchpanel.h"
 #include "pml/species_names.h"
-#include "save/pokedex.h"
+#include "save/pokedex_savedata.h"
 #include "system/bmp_menuwork.h"
 
 // The first letters, which the buttons are for

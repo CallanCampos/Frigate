@@ -5,7 +5,7 @@
 
 // Pokérus: catching it, its days running out and its spread through the party. The file's name is a guess: the ROM has
 // no string for it. It is a file of its own because nothing ties it to poke_personal.c before it, whose archives it
-// doesn't touch, or to shinka_check.c after it: it only reads and writes the Pokérus field of the party's Pokémon.
+// doesn't touch, or to evolution_check.c after it: it only reads and writes the Pokérus field of the party's Pokémon.
 // The functions' names are swan's
 
 // The Pokérus field: the days left in the low nibble, the strain in the high one

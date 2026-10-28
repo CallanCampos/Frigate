@@ -40,7 +40,7 @@
 #include "save/box.h"
 #include "save/chatter.h"
 #include "save/dream_world.h"
-#include "save/pokedex.h"
+#include "save/pokedex_savedata.h"
 #include "save/save_control.h"
 #include "system/app_menu_common.h"
 #include "system/app_taskmenu.h"
@@ -91,7 +91,7 @@ static void PokeIconFreeDataMake(Box2SysWork *syswk, u32 pos);
 static void PokeIconBufPosChange(Box2SysWork *syswk, Box2PokeMoveWork *work);
 static void PokeIconBufPosChangeRange(Box2SysWork *syswk, Box2PokeMoveWork *work);
 static void PokeIconBufPosChangeAll(Box2SysWork *syswk, Box2PokeMoveWork *work);
-static int PokeFreeWazaCheck(u16 move);
+static int PokeFreeMoveCheck(u16 move);
 static void Box2Main_ItemIconTouchMove(Box2AppWork *app, u32 x, u32 y);
 static void ItemIconMoveMakeCore(Box2SysWork *syswk, u32 setPos, u32 putPos, u32 mvMode, BOOL hand);
 static void Box2Main_ItemIconMoveMakeScroll(Box2SysWork *syswk, u32 mvMode);
@@ -2099,7 +2099,7 @@ static void PokeIconBufPosChangeAll(Box2SysWork *syswk, Box2PokeMoveWork *work) 
 }
 
 // The index of a move among the field moves that keep a Pokémon from being released; none in this game
-static int PokeFreeWazaCheck(u16 move) {
+static int PokeFreeMoveCheck(u16 move) {
     return -1;
 }
 
@@ -2116,9 +2116,9 @@ void Box2Main_PokeFreeCreate(Box2SysWork *syswk) {
     work->checkFlag = 0;
     pkm = Box2Main_GetBoxPkm(syswk, syswk->tray, syswk->pos);
     for (i = 0; i < 4; i++) {
-        int waza = PokeFreeWazaCheck(PML_PkmGetParam(pkm, PKM_PARAM_MOVE1 + i, NULL));
-        if (waza != -1) {
-            work->checkFlag |= 1 << waza;
+        int moveId = PokeFreeMoveCheck(PML_PkmGetParam(pkm, PKM_PARAM_MOVE1 + i, NULL));
+        if (moveId != -1) {
+            work->checkFlag |= 1 << moveId;
             return;
         }
     }
@@ -2130,7 +2130,7 @@ void Box2Main_PokeFreeExit(Box2SysWork *syswk) {
 
 // Checks some Pokémon of the boxes and the party for the field moves of the one being released; FALSE once all are
 // checked
-BOOL Box2Main_PokeFreeWazaCheck(Box2SysWork *syswk) {
+BOOL Box2Main_PokeFreeMoveCheck(Box2SysWork *syswk) {
     Box2PokeFreeWork *work = syswk->app->subWork;
     u16 pos = work->checkCnt;
     u32 n;
@@ -2157,9 +2157,9 @@ BOOL Box2Main_PokeFreeWazaCheck(Box2SysWork *syswk) {
         }
         if (pkm != NULL && PML_PkmGetParam(pkm, PKM_PARAM_SPECIES_VALID, NULL) != 0) {
             for (i = 0; i < 4; i++) {
-                int waza = PokeFreeWazaCheck(PML_PkmGetParam(pkm, PKM_PARAM_MOVE1 + i, NULL));
-                if (waza != -1) {
-                    work->checkFlag = work->checkFlag & (0xff ^ (1 << waza));
+                int moveId = PokeFreeMoveCheck(PML_PkmGetParam(pkm, PKM_PARAM_MOVE1 + i, NULL));
+                if (moveId != -1) {
+                    work->checkFlag = work->checkFlag & (0xff ^ (1 << moveId));
                 }
             }
         }
@@ -2467,7 +2467,7 @@ static Box2PokeInfo *PokeInfoDataMake(BoxPkm *pkm) {
             info->sexPut = 0;
         }
         for (i = 0; i < 4; i++) {
-            info->waza[i] = PML_PkmGetParam(pkm, PKM_PARAM_MOVE1 + i, NULL);
+            info->moveId[i] = PML_PkmGetParam(pkm, PKM_PARAM_MOVE1 + i, NULL);
         }
     } else {
         info = NULL;
@@ -2717,9 +2717,9 @@ int Box2Main_BagExit(Box2SysWork *syswk) {
     return 0;
 }
 
-int Box2Main_NameInCall(Box2SysWork *syswk) {
+int Box2Main_NameInputCall(Box2SysWork *syswk) {
     TrainerGameInfoSave *gameInfo = getTrainerGameInfoAddress(GameData_GetSaveControl(syswk->param->gameData));
-    Box2NameInWork *work = GFL_HeapAllocate(HEAPID_BOX2, sizeof(Box2NameInWork), TRUE, "box2_main.c", 4659);
+    Box2NameInputWork *work = GFL_HeapAllocate(HEAPID_BOX2, sizeof(Box2NameInputWork), TRUE, "box2_main.c", 4659);
 
     work->name = GFL_StrBufCreate(20, HEAPID_BOX2);
     loadBoxNameToStrbuf(syswk->param->boxes, syswk->tray, work->name);
@@ -2730,8 +2730,8 @@ int Box2Main_NameInCall(Box2SysWork *syswk) {
     return 0;
 }
 
-int Box2Main_NameInExit(Box2SysWork *syswk) {
-    Box2NameInWork *work = syswk->subProcWork;
+int Box2Main_NameInputExit(Box2SysWork *syswk) {
+    Box2NameInputWork *work = syswk->subProcWork;
 
     if (work->param->unk1C == 0) {
         getBoxNameFromStrbuf(syswk->param->boxes, syswk->tray, work->param->name);

@@ -229,7 +229,7 @@ u16 BsubwayScr_GetMemberNum(u16 mode);
 void BsubwayScr_CreatePartners(BSubwayScrWork *bsw, u8 a1);
 void BsubwayScr_DrawTrainerNos(BSubwayScrWork *bsw);
 void BsubwayScr_PackBattleMon(BSubwayPokemon *dest, PartyPkm *pkm);
-void *BsubwayScr_GetNameinEncounterWork(BSubwayScrWork *bsw);
+void *BsubwayScr_GetNameInputEncounterWork(BSubwayScrWork *bsw);
 BtlSetup *BsubwayScr_CreateBtlSetup(BSubwayScrWork *bsw, GameSystem *gsys);
 BOOL BsubwayScr_CreateTrainer(BSubwayScrWork *bsw, BSubwayTrainer *trainer, u16 trainerId, u32 count,
                               const u16 *species, const u16 *items, BSubwayTeamConfig *config, HeapID heapId);

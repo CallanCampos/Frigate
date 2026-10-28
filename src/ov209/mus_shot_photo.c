@@ -11,7 +11,7 @@
 #include "gfl/arc.h"
 #include "gfl/arc_util.h"
 #include "gfl/bg_sys.h"
-#include "gfl/blact.h"
+#include "gfl/billboard_actor.h"
 #include "gfl/bmp.h"
 #include "gfl/bmpwin.h"
 #include "gfl/g3d.h"
@@ -35,7 +35,7 @@ struct MusShotPhoto {
     MusicalShot *shot;
     MusicalPoke *pokes[4];
     G3DCamera *camera;
-    BlActScene *blact;
+    BillboardActorScene *billboardActor;
     MusPokeDrawSys *pokeDraw;
     MusItemDrawSys *itemDraw;
     StaActBg *bg;
@@ -169,7 +169,7 @@ void MusShotPhoto_Main(MusShotPhoto *photo) {
     MusPokeDraw_DrawSystem(photo->pokeDraw);
     StaActPoke_UpdateSystem_Item(photo->staPoke);
     StaActBg_DrawSystem(photo->bg);
-    BlActScene_Draw(photo->blact, photo->camera, NULL);
+    BillboardActorScene_Draw(photo->billboardActor, photo->camera, NULL);
     MusShotPhoto_Debug(photo);
     GFL_G3DSysReqSwapBuffers();
 }
@@ -190,11 +190,11 @@ static void MusShotPhoto_InitGraphics(MusShotPhoto *photo) {
     G3X_AlphaBlend(TRUE);
     GFL_G3DSysSetSwapBufferParams(0, 0);
     {
-        BlActSceneSetup setup = { 128, 128, { FX32_ONE, FX32_ONE, FX32_ONE }, 0, 0, 0, 0, 63, 0 };
+        BillboardActorSceneSetup setup = { 128, 128, { FX32_ONE, FX32_ONE, FX32_ONE }, 0, 0, 0, 0, 63, 0 };
         VecFx32 scale = { FX32_CONST(4), FX32_CONST(4), FX32_ONE };
 
-        photo->blact = BlActScene_Create(&setup, photo->heapId);
-        BlActScene_SetScale(photo->blact, &scale);
+        photo->billboardActor = BillboardActorScene_Create(&setup, photo->heapId);
+        BillboardActorScene_SetScale(photo->billboardActor, &scale);
     }
     MusShotPhoto_InitBG(&MUS_SHOT_PHOTO_BG1_SETUP, 1, 0);
     MusShotPhoto_InitBG(&MUS_SHOT_PHOTO_BG2_SETUP, 2, 0);
@@ -227,7 +227,7 @@ static void MusShotPhoto_ExitGraphics(MusShotPhoto *photo) {
     GFL_BGSysReleaseBG(3);
     GFL_BGSysReleaseBG(1);
     GFL_BGSysReleaseBG(2);
-    BlActScene_Delete(photo->blact);
+    BillboardActorScene_Delete(photo->billboardActor);
     GFL_G3DCameraFree(photo->camera);
     GFL_G3DSysFree();
     GFL_BGSysReleaseBG(0);
@@ -245,8 +245,9 @@ static void MusShotPhoto_InitPokes(MusShotPhoto *photo) {
 
     photo->pokeDraw = MusPokeDraw_InitSystem(photo->heapId);
     MusPokeDraw_SetTexBase(photo->pokeDraw, FX32_CONST(32));
-    photo->itemDraw = MusItemDraw_InitSystem(photo->blact, 36, photo->heapId);
-    photo->staPoke = StaActPoke_InitSystem(photo->heapId, NULL, photo->pokeDraw, photo->itemDraw, photo->blact);
+    photo->itemDraw = MusItemDraw_InitSystem(photo->billboardActor, 36, photo->heapId);
+    photo->staPoke =
+        StaActPoke_InitSystem(photo->heapId, NULL, photo->pokeDraw, photo->itemDraw, photo->billboardActor);
     for (i = 0; i < 4; i++) {
         photo->pokeActs[i] = NULL;
     }

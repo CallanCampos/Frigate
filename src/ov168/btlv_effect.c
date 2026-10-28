@@ -35,7 +35,7 @@
 #include "nitro/gx.h"
 #include "nnsys/g3d.h"
 #include "nnsys/gfd.h"
-#include "pml/waza.h"
+#include "pml/move.h"
 #include "save/player_info.h"
 #include "system/mcss.h"
 #include "system/palanm.h"

@@ -3,8 +3,8 @@
 #include "gfl/arc.h"
 #include "gfl/heap.h"
 #include "gfl/std.h"
+#include "pml/move.h"
 #include "pml/poke_party.h"
-#include "pml/waza.h"
 #include "save/high_link.h"
 
 // The pass powers in effect: one for each effect, with the time it has left, and what each does to the game's

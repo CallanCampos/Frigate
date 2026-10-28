@@ -48,7 +48,7 @@
 #include "pml/poke_party.h"
 #include "save/box.h"
 #include "save/player_info.h"
-#include "save/pokedex.h"
+#include "save/pokedex_savedata.h"
 #include "save/save_control.h"
 #include "system/app_menu_common.h"
 #include "system/app_taskmenu.h"

@@ -141,9 +141,9 @@ WorldTrade_WantLevelPrint_XY kind:function(thumb,size=0x50) addr:0x021d6f78
 WorldTrade_PokeWantPrint kind:function(thumb,size=0xc6) addr:0x021d6fc8
 WorldTrade_MyPokeWantPrint kind:function(thumb,size=0xc6) addr:0x021d7090
 WorldTrade_PokeInfoPrint kind:function(thumb,size=0x140) addr:0x021d7158
-WorldTrade_ZukanSortDataGet kind:function(thumb,size=0x24) addr:0x021d7298
+WorldTrade_PokedexSortDataGet kind:function(thumb,size=0x24) addr:0x021d7298
 WorldTrade_HeadwordRangeGet kind:function(thumb,size=0x34) addr:0x021d72bc
-WorldTrade_SinouZukanDataGet kind:function(thumb,size=0x68) addr:0x021d72f0
+WorldTrade_SinnohPokedexDataGet kind:function(thumb,size=0x68) addr:0x021d72f0
 WorldTrade_PostPokemonBaseDataMake kind:function(thumb,size=0x114) addr:0x021d7358
 Deposit_DepositPokemonDataMake kind:function(thumb,size=0x40) addr:0x021d746c
 Deposit_PokeNameSortListMake kind:function(thumb,size=0xb4) addr:0x021d74ac
@@ -257,9 +257,9 @@ Input_SeqLevelExit kind:function(thumb,size=0x30) addr:0x021daca0
 Input_SystemPrint kind:function(thumb,size=0x32) addr:0x021dacd0
 Input_TouchPrint kind:function(thumb,size=0x4c) addr:0x021dad04
 Input_PagePrint kind:function(thumb,size=0x66) addr:0x021dad50
-Input_PokeSeeCountSiin kind:function(thumb,size=0x44) addr:0x021dadb8
+Input_PokeSeeCountInitial kind:function(thumb,size=0x44) addr:0x021dadb8
 Input_PokeSeeCountCategory kind:function(thumb,size=0x58) addr:0x021dadfc
-Input_NationCountSiin kind:function(thumb,size=0xc) addr:0x021dae54
+Input_NationCountInitial kind:function(thumb,size=0xc) addr:0x021dae54
 Input_NationCountCategory kind:function(thumb,size=0x58) addr:0x021dae60
 WorldTrade_MyPoke_Init kind:function(thumb,size=0x108) addr:0x021daeb8
 WorldTrade_MyPoke_Main kind:function(thumb,size=0x14) addr:0x021dafc0
@@ -556,7 +556,7 @@ data_ov214_021e1e90 kind:data(any) addr:0x021e1e90
 data_ov214_021e1eb0 kind:data(any) addr:0x021e1eb0
 sSearchLevelMinMaxTable kind:data(any) addr:0x021e1ed0
 sLevelMinMaxTable kind:data(any) addr:0x021e1f28
-ZukanSortHiraTable kind:data(any) addr:0x021e1f88
+PokedexSortInitialTable kind:data(any) addr:0x021e1f88
 sCountryListTbl kind:data(any) addr:0x021e1ff4
 sExplainMsgTable kind:data(any) addr:0x021e20f8
 sSexWinPos kind:data(any) addr:0x021e210c

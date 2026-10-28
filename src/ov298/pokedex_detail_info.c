@@ -1,0 +1,767 @@
+#include "types.h"
+#include "app/pokedex_detail.h"
+#include "app/pokedex_info.h"
+#include "app/ui/ui_scene.h"
+#include "constants/arc.h"
+#include "constants/sound.h"
+#include "constants/text_banks.h"
+#include "gfl/arc.h"
+#include "gfl/arc_util.h"
+#include "gfl/bg_sys.h"
+#include "gfl/clact.h"
+#include "gfl/graphics.h"
+#include "gfl/heap.h"
+#include "gfl/key.h"
+#include "gfl/msg.h"
+#include "gfl/overlay.h"
+#include "gfl/sound.h"
+#include "gfl/std.h"
+#include "gfl/tcb.h"
+#include "gfl/touchpanel.h"
+#include "gfl/ui.h"
+#include "nitro/fx.h"
+#include "nnsys/g2d.h"
+#include "save/pokedex_savedata.h"
+#include "system/game_data.h"
+#include "system/gf_font.h"
+
+// The detail screen's info page, which the ROM does not name: the Pokémon's entry on both screens, from overlay 296,
+// with buttons for the languages it has been seen in, which show the entry on the sub screen in that language
+
+#define LANGUAGE_BUTTON_COUNT 6
+// No language button is pushed, or the entry is in the game's language
+#define LANGUAGE_NONE LANGUAGE_BUTTON_COUNT
+
+#define SPECIES_SPINDA 327
+
+enum {
+    INFO_SEQ_INIT,
+    INFO_SEQ_FADE_IN,
+    INFO_SEQ_WAIT_FADE_IN,
+    INFO_SEQ_MAIN,
+    INFO_SEQ_WAIT_FADE_OUT,
+    INFO_SEQ_EXIT,
+};
+
+// How the page ends
+enum {
+    INFO_EXIT_NONE,
+    INFO_EXIT_PAGE,
+    INFO_EXIT_SCREEN,
+};
+
+// A language button's animation
+enum {
+    BUTTON_IDLE,
+    BUTTON_PUSHED,
+    BUTTON_WAIT_ANIM,
+    BUTTON_DONE,
+};
+
+typedef struct {
+    u8 x;
+    u8 y;
+    u8 rect[4];
+    u8 anim;
+    u8 pushedAnim;
+    u8 language;
+} LanguageButtonData;
+
+typedef struct {
+    ClActor *actor;
+    // The touch area: x, y, width and height
+    u8 rect[4];
+    u16 anim;
+    u16 pushedAnim;
+    u8 language;
+    int state;
+} LanguageButton;
+
+typedef struct {
+    TCB *vblankTcb;
+    PokedexInfo *infoMain;
+    PokedexInfo *infoSub;
+    PokedexDetailBlend *blendMain;
+    PokedexDetailBlend *blendSub;
+    int exit;
+    BOOL inputEnabled;
+    LanguageButton buttons[LANGUAGE_BUTTON_COUNT];
+    // The button being pushed, and the button of the language shown
+    int pushed;
+    int language;
+    u32 palette;
+    u32 chars;
+    u32 cellAnims;
+    // The shown language's button glows between two palettes
+    u16 glowPalettes[2][16];
+    u16 glowPalette[16];
+    int glowPhase;
+    BOOL glowStart;
+    Font *font;
+    MsgData *msgData[3];
+} PokedexDetailInfoWork;
+
+static BOOL PokedexDetailInfo_Init(PokedexDetailProcSys *sys, int *seq, void *param, void *work,
+                                   PokedexDetailCommon *common);
+static BOOL PokedexDetailInfo_Exit(PokedexDetailProcSys *sys, int *seq, void *param, void *work,
+                                   PokedexDetailCommon *common);
+static BOOL PokedexDetailInfo_Main(PokedexDetailProcSys *sys, int *seq, void *param, void *work,
+                                   PokedexDetailCommon *common);
+static void PokedexDetailInfo_Command(PokedexDetailProcSys *sys, int *seq, void *param, void *work,
+                                      PokedexDetailCommon *common, int command);
+static void PokedexDetailInfo_VBlank(TCB *tcb, void *data);
+static BOOL PokedexDetailInfo_CheckTouch(PokedexDetailInfoParam *param, PokedexDetailInfoWork *wk,
+                                         PokedexDetailCommon *common);
+static BOOL PokedexDetailInfo_CheckKeys(PokedexDetailInfoParam *param, PokedexDetailInfoWork *wk,
+                                        PokedexDetailCommon *common);
+static void PokedexDetailInfo_ChangePokemon(PokedexDetailInfoParam *param, PokedexDetailInfoWork *wk,
+                                            PokedexDetailCommon *common);
+static void PokedexDetailInfo_SetLanguage(PokedexDetailInfoParam *param, PokedexDetailInfoWork *wk,
+                                          PokedexDetailCommon *common, int language);
+static void PokedexDetailInfo_CreateButtons(PokedexDetailInfoParam *param, PokedexDetailInfoWork *wk,
+                                            PokedexDetailCommon *common);
+static void PokedexDetailInfo_FreeButtons(PokedexDetailInfoParam *param, PokedexDetailInfoWork *wk,
+                                          PokedexDetailCommon *common);
+static void PokedexDetailInfo_UpdateButton(PokedexDetailInfoParam *param, PokedexDetailInfoWork *wk,
+                                           PokedexDetailCommon *common);
+static void PokedexDetailInfo_ResetButtons(PokedexDetailInfoParam *param, PokedexDetailInfoWork *wk,
+                                           PokedexDetailCommon *common, const BOOL *visible);
+static void PokedexDetailInfo_GetPokemon(PokedexDetailInfoParam *param, PokedexDetailInfoWork *wk,
+                                         PokedexDetailCommon *common, u16 *species, u16 *form, u16 *sex, u16 *rare,
+                                         u32 *personality, BOOL *caught, BOOL *languages);
+static void PokedexDetailInfo_InitGlow(PokedexDetailInfoParam *param, PokedexDetailInfoWork *wk,
+                                       PokedexDetailCommon *common);
+static void PokedexDetailInfo_FreeGlow(PokedexDetailInfoParam *param, PokedexDetailInfoWork *wk,
+                                       PokedexDetailCommon *common);
+static void PokedexDetailInfo_StartGlow(PokedexDetailInfoParam *param, PokedexDetailInfoWork *wk,
+                                        PokedexDetailCommon *common);
+static void PokedexDetailInfo_StopGlow(PokedexDetailInfoParam *param, PokedexDetailInfoWork *wk,
+                                       PokedexDetailCommon *common);
+static void PokedexDetailInfo_UpdateGlow(PokedexDetailInfoParam *param, PokedexDetailInfoWork *wk,
+                                         PokedexDetailCommon *common);
+
+const PokedexDetailProcFuncs POKEDEX_DETAIL_INFO_PROC_FUNCS = {
+    PokedexDetailInfo_Init, PokedexDetailInfo_Main, PokedexDetailInfo_Exit, PokedexDetailInfo_Command, NULL,
+};
+
+// The buttons of Japanese, French, German, Italian, Spanish and Korean
+static const LanguageButtonData sPokedexDetailInfoLanguageButtons[LANGUAGE_BUTTON_COUNT] = {
+    { 2, 91, { 2, 91, 16, 15 }, 8, 15, 1 },    { 17, 91, { 19, 91, 20, 15 }, 9, 16, 3 },
+    { 38, 91, { 40, 91, 20, 15 }, 10, 27, 5 }, { 59, 91, { 61, 91, 20, 15 }, 11, 17, 4 },
+    { 80, 91, { 82, 91, 20, 15 }, 12, 18, 7 }, { 101, 91, { 103, 91, 20, 15 }, 13, 19, 8 },
+};
+
+void PokedexDetailInfo_InitParam(PokedexDetailInfoParam *param, HeapID heapId) {
+    param->heapId = heapId;
+}
+
+static BOOL PokedexDetailInfo_Init(PokedexDetailProcSys *sys, int *seq, void *param_, void *work,
+                                   PokedexDetailCommon *common) {
+    PokedexDetailInfoParam *param = param_;
+    PokedexDetailInfoWork *wk;
+
+    GFL_OvlLoad(OVERLAY_APP_UI);
+    GFL_OvlLoad(OVERLAY_POKEDEX_INFO);
+    wk = PokedexDetailProcSys_AllocWork(sys, sizeof(PokedexDetailInfoWork), param->heapId);
+    MI_CpuFill8(wk, 0, sizeof(PokedexDetailInfoWork));
+    wk->vblankTcb = GFL_VBlankTCBAdd(PokedexDetailInfo_VBlank, wk, 1);
+    wk->pushed = LANGUAGE_NONE;
+    wk->language = LANGUAGE_NONE;
+    wk->glowStart = FALSE;
+    wk->blendMain = PokedexDetailBlend_Create(param->heapId);
+    wk->blendSub = PokedexDetailBlend_Create(param->heapId);
+    PokedexDetailBlend_InitPlanes(wk->blendMain);
+    PokedexDetailBlend_InitPlanes(wk->blendSub);
+    PokedexDetailBlend_SetOut(0, wk->blendMain);
+    PokedexDetailBlend_SetOut(1, wk->blendSub);
+    wk->exit = INFO_EXIT_NONE;
+    wk->inputEnabled = TRUE;
+    return TRUE;
+}
+
+static BOOL PokedexDetailInfo_Exit(PokedexDetailProcSys *sys, int *seq, void *param_, void *work,
+                                   PokedexDetailCommon *common) {
+    PokedexDetailInfoParam *param = param_;
+    PokedexDetailInfoWork *wk = work;
+
+    PokedexDetailInfo_StopGlow(param, wk, common);
+    PokedexDetailInfo_FreeGlow(param, wk, common);
+    PokedexInfo_Free(wk->infoSub);
+    PokedexInfo_Free(wk->infoMain);
+    PokedexDetailInfo_FreeButtons(param, wk, common);
+    GFL_FontFree(wk->font);
+    GFL_MsgDataFree(wk->msgData[2]);
+    GFL_MsgDataFree(wk->msgData[1]);
+    GFL_MsgDataFree(wk->msgData[0]);
+    PokedexDetailBlend_Free(wk->blendSub);
+    PokedexDetailBlend_Free(wk->blendMain);
+    GFL_TCBRemove(wk->vblankTcb);
+    PokedexDetailProcSys_FreeWork(sys);
+    GFL_OvlUnload(OVERLAY_POKEDEX_INFO);
+    GFL_OvlUnload(OVERLAY_APP_UI);
+    return TRUE;
+}
+
+static BOOL PokedexDetailInfo_Main(PokedexDetailProcSys *sys, int *seq, void *param_, void *work,
+                                   PokedexDetailCommon *common) {
+    PokedexDetailInfoParam *param = param_;
+    PokedexDetailInfoWork *wk = work;
+    PokedexDetailTouchbar *touchbar = PokedexDetailCommon_GetTouchbar(common);
+    PokedexDetailHeadbar *headbar = PokedexDetailCommon_GetHeadbar(common);
+
+    switch (*seq) {
+    case INFO_SEQ_INIT: {
+        u8 bg;
+        PokeDexSave *pokedex;
+        ClActUnit *unit;
+        BOOL national;
+        u16 species;
+        u16 form;
+        u16 sex;
+        u16 rare;
+        u32 personality;
+        BOOL caught;
+        BOOL languages[LANGUAGE_BUTTON_COUNT];
+
+        *seq = INFO_SEQ_FADE_IN;
+        wk->font = GFL_FontCreate(ARCID_FONT, 0, 1, FALSE, param->heapId);
+        wk->msgData[0] = GFL_MsgSysLoadData(TRUE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_SPECIES_CATEGORIES, param->heapId);
+        wk->msgData[1] = GFL_MsgSysLoadData(TRUE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_POKEDEX_HEIGHTS, param->heapId);
+        wk->msgData[2] = GFL_MsgSysLoadData(TRUE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_POKEDEX_WEIGHTS, param->heapId);
+        for (bg = 0; bg <= 7; bg++) {
+            if (bg != 1 && bg != 5) {
+                GFL_BGSysMoveBG(bg, BG_MOVE_SET_X, 0);
+                GFL_BGSysMoveBG(bg, BG_MOVE_SET_Y, 0);
+                GFL_BGSysClearBG(bg);
+            }
+        }
+
+        if (PokedexDetailTouchbar_GetState(touchbar) != POKEDEX_DETAIL_TOUCHBAR_SHOWN) {
+            PokedexDetailTouchbar_SetType(touchbar, POKEDEX_DETAIL_TOUCHBAR_GENERAL, POKEDEX_DETAIL_PAGE_INFO - 1,
+                                          PokedexDetailCommon_GetCount(common) > 1 ? TRUE : FALSE);
+            PokedexDetailTouchbar_Appear(touchbar, 0);
+        } else {
+            PokedexDetailTouchbar_SetPage(touchbar, POKEDEX_DETAIL_PAGE_INFO - 1);
+        }
+        PokedexDetailTouchbar_SetActive(touchbar, FALSE);
+        PokedexDetailTouchbar_SetCheck(
+            touchbar, GameData_IsShortcutRegistered(PokedexDetailCommon_GetGameData(common), SHORTCUT_POKEDEX_INFO));
+        if (PokedexDetailHeadbar_GetState(headbar) != POKEDEX_DETAIL_TOUCHBAR_SHOWN) {
+            PokedexDetailHeadbar_SetTitle(headbar, 0);
+            PokedexDetailHeadbar_Appear(headbar);
+        }
+
+        PokedexDetailInfo_CreateButtons(param, wk, common);
+        pokedex = GameData_GetPokedex(PokedexDetailCommon_GetGameData(common));
+        unit = PokedexDetailGraphic_GetClActUnit(PokedexDetailCommon_GetGraphic(common));
+        switch (PokeDex_GetMode(pokedex)) {
+        case 0:
+            national = FALSE;
+            break;
+        case 1:
+            national = TRUE;
+            break;
+        case 2:
+            national = PokeDex_IsNationalObtained(pokedex);
+            break;
+        }
+        PokedexDetailInfo_GetPokemon(param, wk, common, &species, &form, &sex, &rare, &personality, &caught, languages);
+        wk->infoMain = PokedexInfo_Create(param->heapId, species, form, sex, rare, personality, national, caught, 2, 0,
+                                          1, unit, wk->font, PokedexDetailCommon_GetPrintQueue(common), wk->msgData[0],
+                                          wk->msgData[1], wk->msgData[2]);
+        wk->infoSub = PokedexInfo_Create(param->heapId, species, form, sex, rare, personality, national, caught, 2, 1,
+                                         1, unit, wk->font, PokedexDetailCommon_GetPrintQueue(common), wk->msgData[0],
+                                         wk->msgData[1], wk->msgData[2]);
+        PokedexInfo_Hide(wk->infoSub);
+        PokedexDetailInfo_ResetButtons(param, wk, common, languages);
+        PokedexDetailInfo_InitGlow(param, wk, common);
+        PokedexDetailInfo_StartGlow(param, wk, common);
+        break;
+    }
+    case INFO_SEQ_FADE_IN:
+        *seq = INFO_SEQ_WAIT_FADE_IN;
+        PokedexDetailBlend_StartIn(wk->blendMain);
+        PokedexDetailBlend_StartIn(wk->blendSub);
+        break;
+    case INFO_SEQ_WAIT_FADE_IN:
+        if (!PokedexDetailBlend_IsActive(wk->blendMain) &&
+            PokedexDetailTouchbar_GetState(touchbar) == POKEDEX_DETAIL_TOUCHBAR_SHOWN &&
+            PokedexDetailHeadbar_GetState(headbar) == POKEDEX_DETAIL_TOUCHBAR_SHOWN) {
+            PokedexDetailTouchbar_Unlock(touchbar);
+            PokedexDetailTouchbar_SetActive(touchbar, TRUE);
+            *seq = INFO_SEQ_MAIN;
+        }
+        break;
+    case INFO_SEQ_MAIN:
+        if (wk->exit != INFO_EXIT_NONE) {
+            *seq = INFO_SEQ_WAIT_FADE_OUT;
+            PokedexDetailBlend_StartOut(wk->blendMain);
+            PokedexDetailBlend_StartOut(wk->blendSub);
+            PokedexDetailHeadbar_Disappear(headbar);
+            if (wk->exit == INFO_EXIT_SCREEN) {
+                PokedexDetailTouchbar_Disappear(touchbar, 0);
+            }
+        } else if (!PokedexDetailTouchbar_IsArrowTriggered(touchbar) && wk->inputEnabled) {
+            if (!PokedexDetailInfo_CheckTouch(param, wk, common)) {
+                PokedexDetailInfo_CheckKeys(param, wk, common);
+            }
+        }
+        break;
+    case INFO_SEQ_WAIT_FADE_OUT:
+        if (!PokedexDetailBlend_IsActive(wk->blendMain) && !PokedexDetailBlend_IsActive(wk->blendSub) &&
+            PokedexDetailHeadbar_GetState(headbar) == POKEDEX_DETAIL_TOUCHBAR_HIDDEN) {
+            if (wk->exit == INFO_EXIT_SCREEN) {
+                if (PokedexDetailTouchbar_GetState(touchbar) == POKEDEX_DETAIL_TOUCHBAR_HIDDEN) {
+                    *seq = INFO_SEQ_EXIT;
+                }
+            } else {
+                *seq = INFO_SEQ_EXIT;
+            }
+        }
+        break;
+    case INFO_SEQ_EXIT:
+        return TRUE;
+    }
+
+    if (*seq >= INFO_SEQ_WAIT_FADE_IN) {
+        PokedexDetailInfo_UpdateButton(param, wk, common);
+        PokedexInfo_Update(wk->infoMain);
+        PokedexInfo_Update(wk->infoSub);
+        if (wk->pushed == LANGUAGE_NONE) {
+            PokedexDetailInfo_UpdateGlow(param, wk, common);
+        }
+    }
+    PokedexDetailBlend_Update(wk->blendMain, wk->blendSub);
+    return FALSE;
+}
+
+static void PokedexDetailInfo_Command(PokedexDetailProcSys *sys, int *seq, void *param, void *work,
+                                      PokedexDetailCommon *common, int command) {
+    PokedexDetailInfoWork *wk = work;
+
+    if (wk != NULL) {
+        PokedexDetailTouchbar *touchbar = PokedexDetailCommon_GetTouchbar(common);
+        BOOL unlock = FALSE;
+
+        // Input waits while the bar's icons play their animations
+        switch (command) {
+        case POKEDEX_DETAIL_CMD_CLOSE_TOUCH:
+        case POKEDEX_DETAIL_CMD_RETURN_TOUCH:
+        case POKEDEX_DETAIL_CMD_CUR_D_TOUCH:
+        case POKEDEX_DETAIL_CMD_CUR_U_TOUCH:
+        case POKEDEX_DETAIL_CMD_CHECK_TOUCH:
+        case POKEDEX_DETAIL_CMD_MAP_TOUCH:
+        case POKEDEX_DETAIL_CMD_VOICE_TOUCH:
+        case POKEDEX_DETAIL_CMD_FORM_TOUCH:
+            wk->inputEnabled = FALSE;
+            break;
+        }
+        switch (command) {
+        case POKEDEX_DETAIL_CMD_CLOSE:
+        case POKEDEX_DETAIL_CMD_RETURN:
+        case POKEDEX_DETAIL_CMD_CUR_D:
+        case POKEDEX_DETAIL_CMD_CUR_U:
+        case POKEDEX_DETAIL_CMD_CHECK:
+        case POKEDEX_DETAIL_CMD_MAP:
+        case POKEDEX_DETAIL_CMD_VOICE:
+        case POKEDEX_DETAIL_CMD_FORM:
+            unlock = TRUE;
+            wk->inputEnabled = TRUE;
+            break;
+        }
+
+        switch (command) {
+        case POKEDEX_DETAIL_CMD_CUR_D_TOUCH: {
+            u16 species = PokedexDetailCommon_GetSpecies(common);
+
+            PokedexDetailCommon_GoNext(common);
+            if (species != PokedexDetailCommon_GetSpecies(common)) {
+                PokedexDetailInfo_ChangePokemon(param, wk, common);
+            }
+            break;
+        }
+        case POKEDEX_DETAIL_CMD_CUR_U_TOUCH: {
+            u16 species = PokedexDetailCommon_GetSpecies(common);
+
+            PokedexDetailCommon_GoPrev(common);
+            if (species != PokedexDetailCommon_GetSpecies(common)) {
+                PokedexDetailInfo_ChangePokemon(param, wk, common);
+            }
+            break;
+        }
+        }
+
+        switch (command) {
+        case POKEDEX_DETAIL_CMD_NONE:
+            break;
+        case POKEDEX_DETAIL_CMD_CLOSE:
+        case POKEDEX_DETAIL_CMD_RETURN:
+            wk->exit = INFO_EXIT_SCREEN;
+            break;
+        case POKEDEX_DETAIL_CMD_MAP:
+        case POKEDEX_DETAIL_CMD_VOICE:
+        case POKEDEX_DETAIL_CMD_FORM:
+            wk->exit = INFO_EXIT_PAGE;
+            break;
+        case POKEDEX_DETAIL_CMD_CUR_D:
+            PokedexDetailTouchbar_Unlock(touchbar);
+            break;
+        case POKEDEX_DETAIL_CMD_CUR_U:
+            PokedexDetailTouchbar_Unlock(touchbar);
+            break;
+        case POKEDEX_DETAIL_CMD_CHECK:
+            GameData_SetKeyItemRegistration(PokedexDetailCommon_GetGameData(common), SHORTCUT_POKEDEX_INFO,
+                                            PokedexDetailTouchbar_GetCheck(touchbar));
+            PokedexDetailTouchbar_Unlock(touchbar);
+            break;
+        default:
+            if (unlock) {
+                PokedexDetailTouchbar_Unlock(touchbar);
+            }
+            break;
+        }
+    }
+}
+
+static void PokedexDetailInfo_VBlank(TCB *tcb, void *data) {
+}
+
+static BOOL PokedexDetailInfo_CheckTouch(PokedexDetailInfoParam *param, PokedexDetailInfoWork *wk,
+                                         PokedexDetailCommon *common) {
+    PokedexDetailTouchbar *touchbar = PokedexDetailCommon_GetTouchbar(common);
+    BOOL pushed = FALSE;
+
+    if (wk->pushed == LANGUAGE_NONE) {
+        u32 x;
+        u32 y;
+
+        if (GFL_HIDGetTouchPressedPoint(&x, &y)) {
+            u8 i;
+
+            for (i = 0; i < LANGUAGE_BUTTON_COUNT; i++) {
+                if (ClActor_IsVisible(wk->buttons[i].actor) && wk->buttons[i].rect[0] <= x &&
+                    x < wk->buttons[i].rect[0] + wk->buttons[i].rect[2] && wk->buttons[i].rect[1] <= y &&
+                    y < wk->buttons[i].rect[1] + wk->buttons[i].rect[3]) {
+                    if (wk->language != i) {
+                        wk->pushed = i;
+                        pushed = TRUE;
+                    }
+                    break;
+                }
+            }
+        }
+    }
+
+    if (pushed) {
+        PokedexDetailInfo_SetLanguage(param, wk, common, wk->pushed);
+        wk->buttons[wk->pushed].state = BUTTON_PUSHED;
+        ClActor_SetSequence(wk->buttons[wk->pushed].actor, wk->buttons[wk->pushed].pushedAnim);
+        GFL_SndSEPlay(SEQ_SE_SELECT3);
+        GCTX_HIDSetUsingTouch(TRUE);
+        PokedexDetailTouchbar_SetActive(touchbar, FALSE);
+    }
+    return pushed;
+}
+
+// L and R move to the previous and next language seen, and with none chosen yet, A or either of them to the first
+static BOOL PokedexDetailInfo_CheckKeys(PokedexDetailInfoParam *param, PokedexDetailInfoWork *wk,
+                                        PokedexDetailCommon *common) {
+    PokedexDetailTouchbar *touchbar = PokedexDetailCommon_GetTouchbar(common);
+    BOOL pushed = FALSE;
+
+    if (wk->pushed == LANGUAGE_NONE) {
+        u32 typed = GCTX_HIDGetTypedKeys();
+        u32 pressed = GCTX_HIDGetPressedKeys();
+        u8 i;
+
+        if (wk->language == LANGUAGE_NONE) {
+            if ((typed & (PAD_BUTTON_L | PAD_BUTTON_R)) || (pressed & PAD_BUTTON_A)) {
+                for (i = 0; i < LANGUAGE_BUTTON_COUNT; i++) {
+                    if (ClActor_IsVisible(wk->buttons[i].actor)) {
+                        wk->pushed = i;
+                        pushed = TRUE;
+                        break;
+                    }
+                }
+            }
+        } else if ((typed & PAD_BUTTON_R) || (pressed & PAD_BUTTON_A)) {
+            for (i = 1; i < LANGUAGE_BUTTON_COUNT; i++) {
+                u8 button = (wk->language + i) % LANGUAGE_BUTTON_COUNT;
+
+                if (ClActor_IsVisible(wk->buttons[button].actor)) {
+                    wk->pushed = button;
+                    pushed = TRUE;
+                    break;
+                }
+            }
+        } else if (typed & PAD_BUTTON_L) {
+            for (i = 1; i < LANGUAGE_BUTTON_COUNT; i++) {
+                u8 button = (wk->language + LANGUAGE_BUTTON_COUNT - i) % LANGUAGE_BUTTON_COUNT;
+
+                if (ClActor_IsVisible(wk->buttons[button].actor)) {
+                    wk->pushed = button;
+                    pushed = TRUE;
+                    break;
+                }
+            }
+        }
+    }
+
+    if (pushed) {
+        PokedexDetailInfo_SetLanguage(param, wk, common, wk->pushed);
+        wk->buttons[wk->pushed].state = BUTTON_PUSHED;
+        ClActor_SetSequence(wk->buttons[wk->pushed].actor, wk->buttons[wk->pushed].pushedAnim);
+        GFL_SndSEPlay(SEQ_SE_SELECT3);
+        GCTX_HIDSetUsingTouch(FALSE);
+        PokedexDetailTouchbar_SetActive(touchbar, FALSE);
+    }
+    return pushed;
+}
+
+// Shows the Pokémon the list moved to, in the game's language unless it has been seen in the one shown
+static void PokedexDetailInfo_ChangePokemon(PokedexDetailInfoParam *param, PokedexDetailInfoWork *wk,
+                                            PokedexDetailCommon *common) {
+    BOOL ownLanguage;
+    u16 species;
+    u16 form;
+    u16 sex;
+    u16 rare;
+    u32 personality;
+    BOOL caught;
+    BOOL languages[LANGUAGE_BUTTON_COUNT];
+
+    PokedexDetailInfo_GetPokemon(param, wk, common, &species, &form, &sex, &rare, &personality, &caught, languages);
+    ownLanguage = TRUE;
+    PokedexInfo_SetPokemon(wk->infoMain, species, form, sex, rare, personality, caught);
+    if (wk->language != LANGUAGE_NONE) {
+        if (languages[wk->language]) {
+            ownLanguage = FALSE;
+        } else {
+            PokedexDetailInfo_StopGlow(param, wk, common);
+            wk->language = LANGUAGE_NONE;
+        }
+    }
+    if (ownLanguage) {
+        PokedexInfo_Hide(wk->infoSub);
+    } else {
+        PokedexInfo_SetPokemonInLanguage(wk->infoSub, species, form, sex, rare, personality, caught, wk->language);
+    }
+    PokedexDetailInfo_ResetButtons(param, wk, common, languages);
+}
+
+static void PokedexDetailInfo_SetLanguage(PokedexDetailInfoParam *param, PokedexDetailInfoWork *wk,
+                                          PokedexDetailCommon *common, int language) {
+    if (wk->language != language) {
+        if (wk->language == LANGUAGE_NONE) {
+            u16 species;
+            u16 form;
+            u16 sex;
+            u16 rare;
+            u32 personality;
+            BOOL caught;
+            BOOL languages[LANGUAGE_BUTTON_COUNT];
+
+            PokedexDetailInfo_GetPokemon(param, wk, common, &species, &form, &sex, &rare, &personality, &caught,
+                                         languages);
+            PokedexInfo_SetPokemonInLanguage(wk->infoSub, species, form, sex, rare, personality, caught, language);
+            PokedexInfo_Show(wk->infoSub);
+        } else {
+            PokedexInfo_SetLanguage(wk->infoSub, language);
+        }
+        PokedexDetailInfo_StopGlow(param, wk, common);
+        wk->language = language;
+        PokedexDetailInfo_StartGlow(param, wk, common);
+    }
+}
+
+static void PokedexDetailInfo_CreateButtons(PokedexDetailInfoParam *param, PokedexDetailInfoWork *wk,
+                                            PokedexDetailCommon *common) {
+    PokedexDetailTouchbar *touchbar = PokedexDetailCommon_GetTouchbar(common);
+    ClActUnit *unit = PokedexDetailGraphic_GetClActUnit(PokedexDetailCommon_GetGraphic(common));
+    ClActSurface surface = CLACT_SURFACE_MAIN;
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_POKEDEX_GRA, param->heapId);
+    ClActorSetup setup;
+    u8 i;
+
+    wk->palette = PokedexDetailTouchbar_GetIconPalette(touchbar);
+    wk->chars = ClActSys_LoadChars(arc, 13, FALSE, CLACT_VRAM_MAIN, param->heapId);
+    wk->cellAnims = ClActSys_LoadCellAnims(arc, 28, 45, param->heapId);
+    GFL_ArcToolFree(arc);
+
+    for (i = 0; i < LANGUAGE_BUTTON_COUNT; i++) {
+        MI_CpuFill8(&setup, 0, sizeof(ClActorSetup));
+        wk->buttons[i].rect[0] = sPokedexDetailInfoLanguageButtons[i].rect[0];
+        wk->buttons[i].rect[1] = sPokedexDetailInfoLanguageButtons[i].rect[1];
+        wk->buttons[i].rect[2] = sPokedexDetailInfoLanguageButtons[i].rect[2];
+        wk->buttons[i].rect[3] = sPokedexDetailInfoLanguageButtons[i].rect[3];
+        wk->buttons[i].anim = sPokedexDetailInfoLanguageButtons[i].anim;
+        wk->buttons[i].pushedAnim = sPokedexDetailInfoLanguageButtons[i].pushedAnim;
+        wk->buttons[i].language = sPokedexDetailInfoLanguageButtons[i].language;
+        wk->buttons[i].state = BUTTON_IDLE;
+        setup.x = sPokedexDetailInfoLanguageButtons[i].x;
+        setup.y = sPokedexDetailInfoLanguageButtons[i].y;
+        setup.sequence = wk->buttons[i].anim;
+        wk->buttons[i].actor =
+            ClActor_Create(unit, wk->chars, wk->palette, wk->cellAnims, &setup, surface, param->heapId);
+        ClActor_SetAutoAnim(wk->buttons[i].actor, TRUE);
+        ClActor_SetObjMode(wk->buttons[i].actor, 1);
+    }
+}
+
+static void PokedexDetailInfo_FreeButtons(PokedexDetailInfoParam *param, PokedexDetailInfoWork *wk,
+                                          PokedexDetailCommon *common) {
+    u8 i;
+
+    for (i = 0; i < LANGUAGE_BUTTON_COUNT; i++) {
+        ClActor_Delete(wk->buttons[i].actor);
+    }
+    ClActSys_FreeChars(wk->chars);
+    ClActSys_FreeCellAnims(wk->cellAnims);
+}
+
+static void PokedexDetailInfo_UpdateButton(PokedexDetailInfoParam *param, PokedexDetailInfoWork *wk,
+                                           PokedexDetailCommon *common) {
+    PokedexDetailTouchbar *touchbar = PokedexDetailCommon_GetTouchbar(common);
+
+    if (wk->pushed != LANGUAGE_NONE) {
+        u8 i = wk->pushed;
+
+        switch (wk->buttons[i].state) {
+        case BUTTON_IDLE:
+            break;
+        case BUTTON_PUSHED:
+            wk->buttons[i].state = BUTTON_WAIT_ANIM;
+            break;
+        case BUTTON_WAIT_ANIM:
+            if (!ClActor_IsAnimActive(wk->buttons[i].actor)) {
+                wk->buttons[i].state = BUTTON_DONE;
+            }
+            break;
+        case BUTTON_DONE:
+            ClActor_SetSequence(wk->buttons[i].actor, wk->buttons[i].anim);
+            wk->buttons[i].state = BUTTON_IDLE;
+            wk->pushed = LANGUAGE_NONE;
+            PokedexDetailTouchbar_SetActive(touchbar, TRUE);
+            break;
+        }
+    }
+}
+
+// Shows the buttons of the languages the Pokémon has been seen in
+static void PokedexDetailInfo_ResetButtons(PokedexDetailInfoParam *param, PokedexDetailInfoWork *wk,
+                                           PokedexDetailCommon *common, const BOOL *visible) {
+    u8 i;
+
+    for (i = 0; i < LANGUAGE_BUTTON_COUNT; i++) {
+        ClActor_SetVisible(wk->buttons[i].actor, visible[i]);
+        wk->buttons[i].state = BUTTON_IDLE;
+        ClActor_SetSequence(wk->buttons[i].actor, wk->buttons[i].anim);
+    }
+    wk->pushed = LANGUAGE_NONE;
+}
+
+static void PokedexDetailInfo_GetPokemon(PokedexDetailInfoParam *param, PokedexDetailInfoWork *wk,
+                                         PokedexDetailCommon *common, u16 *species, u16 *form, u16 *sex, u16 *rare,
+                                         u32 *personality, BOOL *caught, BOOL *languages) {
+    PokeDexSave *pokedex = GameData_GetPokedex(PokedexDetailCommon_GetGameData(common));
+    u16 shown = PokedexDetailCommon_GetSpecies(common);
+    u32 shownForm;
+    u32 shownSex;
+    u32 shownRare;
+    u32 shownPersonality = 0;
+    BOOL shownCaught;
+    BOOL seenLanguages[LANGUAGE_BUTTON_COUNT];
+    u8 i;
+
+    PokeDex_GetShownSexRareForm(pokedex, shown, &shownSex, &shownRare, &shownForm, param->heapId);
+    if (shown == SPECIES_SPINDA) {
+        shownPersonality = PokeDex_GetSpindaPersonality(pokedex, shownPersonality);
+    }
+    shownCaught = PokeDex_IsCaught(pokedex, shown);
+    for (i = 0; i < LANGUAGE_BUTTON_COUNT; i++) {
+        seenLanguages[i] = PokeDex_HasLanguage(pokedex, shown, wk->buttons[i].language);
+    }
+
+    *species = shown;
+    *form = shownForm;
+    *sex = shownSex;
+    *rare = shownRare;
+    *personality = shownPersonality;
+    *caught = shownCaught;
+    for (i = 0; i < LANGUAGE_BUTTON_COUNT; i++) {
+        languages[i] = seenLanguages[i];
+    }
+}
+
+// Reads the two palettes that the shown language's button glows between
+static void PokedexDetailInfo_InitGlow(PokedexDetailInfoParam *param, PokedexDetailInfoWork *wk,
+                                       PokedexDetailCommon *common) {
+    NNSG2dPaletteData *palette;
+    void *file = GFL_G2DIOReadNCLR(ARCID_POKEDEX_GRA, 3, &palette, param->heapId);
+    u16 *data = palette->pRawData;
+
+    MI_CpuCopy8(data + 16, wk->glowPalettes[0], 32);
+    MI_CpuCopy8(data + 48, wk->glowPalettes[1], 32);
+    GFL_HeapFree(file);
+    wk->glowPhase = 0;
+    MI_CpuCopy8(wk->glowPalettes[0], wk->glowPalette, 32);
+    NNS_GfdRegisterNewVramTransferTask(NNS_GFD_DST_2D_OBJ_PLTT_MAIN, 6 * 32, wk->glowPalette, 32);
+}
+
+static void PokedexDetailInfo_FreeGlow(PokedexDetailInfoParam *param, PokedexDetailInfoWork *wk,
+                                       PokedexDetailCommon *common) {
+}
+
+static void PokedexDetailInfo_StartGlow(PokedexDetailInfoParam *param, PokedexDetailInfoWork *wk,
+                                        PokedexDetailCommon *common) {
+    if (wk->language != LANGUAGE_NONE) {
+        wk->glowPhase = 0;
+        wk->glowStart = TRUE;
+    }
+}
+
+static void PokedexDetailInfo_StopGlow(PokedexDetailInfoParam *param, PokedexDetailInfoWork *wk,
+                                       PokedexDetailCommon *common) {
+    if (wk->language != LANGUAGE_NONE) {
+        ClActor_SetPalette(wk->buttons[wk->language].actor, 0, 0);
+        wk->glowStart = FALSE;
+    }
+}
+
+// Blends the glowing palette between the two palettes with a cosine, and loads it into OBJ palette 6
+static void PokedexDetailInfo_UpdateGlow(PokedexDetailInfoParam *param, PokedexDetailInfoWork *wk,
+                                         PokedexDetailCommon *common) {
+    s16 ratio;
+    u8 i;
+
+    if (wk->glowStart) {
+        if (wk->language != LANGUAGE_NONE) {
+            ClActor_SetPalette(wk->buttons[wk->language].actor, 2, 0);
+        }
+        wk->glowStart = FALSE;
+    }
+
+    if (wk->glowPhase + 0x400 >= 0x10000) {
+        wk->glowPhase = wk->glowPhase + 0x400 - 0x10000;
+    } else {
+        wk->glowPhase += 0x400;
+    }
+    ratio = (FX_CosIdx(wk->glowPhase) + FX32_ONE) / 2;
+
+    for (i = 0; i < 16; i++) {
+        u16 from = wk->glowPalettes[0][i];
+        u16 to = wk->glowPalettes[1][i];
+        u8 r0 = from & 0x1f;
+        u8 g0 = (from & 0x3e0) >> 5;
+        u8 b0 = (from & 0x7c00) >> 10;
+        u8 r1 = to & 0x1f;
+        u8 g1 = (to & 0x3e0) >> 5;
+        u8 b1 = (to & 0x7c00) >> 10;
+        u8 r = r0 + (((r1 - r0) * ratio) >> FX32_SHIFT);
+        u8 g = g0 + (((g1 - g0) * ratio) >> FX32_SHIFT);
+        u8 b = b0 + (((b1 - b0) * ratio) >> FX32_SHIFT);
+
+        wk->glowPalette[i] = r | (g << 5) | (b << 10);
+    }
+    NNS_GfdRegisterNewVramTransferTask(NNS_GFD_DST_2D_OBJ_PLTT_MAIN, 6 * 32, wk->glowPalette, 32);
+}

@@ -46,7 +46,7 @@ static const u8 data_ov012_0216cdc8[4][4] = {
 
 void FldAct_InitMoveProcGrid(FieldActor *actor) {
     FldAct_CallMoveInitProc(actor);
-    FldmmdlMovecode_InitEventTypeProcThunk(actor);
+    FieldActorMovecode_InitEventTypeProcThunk(actor);
     SetActorFlag(actor, 2);
 }
 
@@ -58,7 +58,7 @@ void FldAct_UpdateMoveProcGrid(FieldActor *actor) {
         if (CheckActorMovementFlag(actor, 0x200)) {
             FieldAcmdTCB_RunCmds(actor);
         } else if (IsActorMovementDisabled(actor) == FALSE && FldAct_CanRunMoveProc(actor) == TRUE &&
-                   FldmmdlMovecode_UpdateEventTypeProc(actor) == FALSE) {
+                   FieldActorMovecode_UpdateEventTypeProc(actor) == FALSE) {
             FldAct_CallMoveProc(actor);
         }
         FldAct_ProcMoveStartEffects(actor);
@@ -333,14 +333,14 @@ void ActorTerrainEffect_Footmark(FieldActor *actor, ActorTerrainEffectParam *par
             }
         }
         if (kind != 5) {
-            Footmark_SetMMdl(actor, param->effects, kind);
+            Footmark_SetActor(actor, param->effects, kind);
         }
     }
 }
 
 void ActorTerrainEffect_FallenLeaves(FieldActor *actor, ActorTerrainEffectParam *param) {
     if (MapTile_IsFallenLeaves(param->tileClassOrigY) == TRUE) {
-        FldeffOchiba_Start(param->effects, actor);
+        FldeffLeaves_Start(param->effects, actor);
     }
 }
 
@@ -409,7 +409,7 @@ void ActorTerrainEffect_UpdateShadowVisible(FieldActor *actor, ActorTerrainEffec
 
 void ActorTerrainEffect_LandingDust(FieldActor *actor, ActorTerrainEffectParam *param) {
     if (!(param->tileFlags & 2) && FldAct_IsLandingDustDisabled(actor) == FALSE) {
-        FldeffKemuri_Start(actor, param->effects);
+        FldeffDust_Start(actor, param->effects);
     }
 }
 
@@ -449,7 +449,7 @@ void ActorTerrainEffect_Reflection(FieldActor *actor, ActorTerrainEffectParam *p
             if (MapTile_IsMirrorFloor(tileClass) == TRUE || MapTile_IsIce(tileClass) == TRUE) {
                 kind = 2;
             }
-            ReflectTask_SetMMdl(system, actor, param->effects, kind);
+            ReflectTask_SetActor(system, actor, param->effects, kind);
             FldAct_SetReflectingFlag(actor, TRUE);
         }
     }
@@ -470,7 +470,7 @@ void ActorTerrainEffect_UpdateReflection(FieldActor *actor, ActorTerrainEffectPa
 
 void ActorTerrainEffect_ElectricField(FieldActor *actor, ActorTerrainEffectParam *param) {
     if (MapTile_IsElectricField(param->tileClass) == TRUE) {
-        D06Denki_StartSpark(actor, param->effects);
+        D06Electric_StartSpark(actor, param->effects);
     }
 }
 

@@ -4,7 +4,7 @@
 // Overlay 209's sta_act_obj.c: the stage's objects, billboard actors that scroll with the stage
 
 #include "types.h"
-#include "gfl/blact.h"
+#include "gfl/billboard_actor.h"
 #include "gfl/heap.h"
 #include "nitro/fx.h"
 #include "struct_decls.h"
@@ -22,11 +22,11 @@ struct StaActObjSys {
     HeapID heapId;
     // How far the stage has scrolled, in pixels
     u16 scroll;
-    BlActScene *blact;
+    BillboardActorScene *billboardActor;
     StaActObj objs[5];
 };
 
-StaActObjSys *StaActObj_InitSystem(HeapID heapId, BlActScene *blact);
+StaActObjSys *StaActObj_InitSystem(HeapID heapId, BillboardActorScene *billboardActor);
 void StaActObj_TermSystem(StaActObjSys *sys);
 void StaActObj_UpdateSystem(StaActObjSys *sys);
 void StaActObj_SetScrollOffset(StaActObjSys *sys, u16 scroll);

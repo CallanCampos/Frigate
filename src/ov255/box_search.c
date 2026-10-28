@@ -26,7 +26,7 @@
 #include "gfl/touchpanel.h"
 #include "gfl/ui.h"
 #include "pml/personal.h"
-#include "save/pokedex.h"
+#include "save/pokedex_savedata.h"
 #include "system/app_menu_common.h"
 #include "system/cursor_move.h"
 #include "system/game_data.h"
@@ -40,7 +40,7 @@
 // the sex, the held item and the markings that the box's Pokémon are filtered by. Names are ours
 
 // The archive of the Pokédex's orders of species
-#define ARCID_ZUKAN_DATA 97
+#define ARCID_POKEDEX_DATA 97
 
 // What the search's lists are of
 enum {
@@ -2346,7 +2346,7 @@ static void PutCursorAtValue(BoxSearchWork *wk, u32 actor, int count, int value)
 // Loads the species in the order of their names
 static u16 *LoadSpeciesOrder(u32 heapId, u32 *count) {
     u32 size;
-    u16 *species = GFL_ArcSysReadHeapNewLZGetLen(ARCID_ZUKAN_DATA, 5, FALSE, heapId, &size);
+    u16 *species = GFL_ArcSysReadHeapNewLZGetLen(ARCID_POKEDEX_DATA, 5, FALSE, heapId, &size);
 
     *count = size / 2;
     return species;

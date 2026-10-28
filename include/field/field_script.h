@@ -238,12 +238,12 @@ BOOL s01CA_NDemoEnd(VM *vm, FieldScriptEnv *env);
 BOOL s01CB_NDemoReadyTalkMotion(VM *vm, FieldScriptEnv *env);
 // enceff.c: the count of the trainer IDs of the Pokémon the player didn't catch
 BOOL CountTrainersEvent_StartCountOtherOtIdsTask(VM *vm, FieldScriptEnv *env);
-// fldeff_iaigiri.c: the League's lift, the beacon commands, the Pass Power that ran out and its flash
+// fldeff_cut.c: the League's lift, the beacon commands, the Pass Power that ran out and its flash
 BOOL s01B1_CallLeagueLiftWarp(VM *vm, FieldScriptEnv *env);
 BOOL s01DD_BroadcastGameBeacon(VM *vm, FieldScriptEnv *env);
 BOOL s01DE_PassPowerPopDepletedID(VM *vm, FieldScriptEnv *env);
 BOOL s01DF_CallPassPowerFlash(VM *vm, FieldScriptEnv *env);
-// fldeff_ochiba.c: the player sinking into a pile of leaves
+// fldeff_leaves.c: the player sinking into a pile of leaves
 BOOL s02AC_CallLeafPileStuck(VM *vm, FieldScriptEnv *env);
 
 BOOL s02CF_PokeDexCheckHabitatList(VM *vm, FieldScriptEnv *env);
@@ -418,6 +418,6 @@ void *ScriptWork_CreateVarCopy(ScriptWork *work);
 void ScriptWork_RestoreVarCopy(ScriptWork *work, void *copy);
 u16 *ScriptWork_GetLocalWork(ScriptWork *work, u16 id);
 WordSet *ScriptWork_GetWordSet(ScriptWork *work);
-MMSys *GetScrEnvMMdlSys(FieldScriptEnv *env);
+MMSys *GetScrEnvActorSys(FieldScriptEnv *env);
 
 #endif // POKEBW2_FIELD_FIELD_SCRIPT_H

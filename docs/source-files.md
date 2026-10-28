@@ -227,10 +227,10 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 | `scrcmd_game_state.c` | `0x021555f8`–`0x02156174` | 55 | complete | descriptive |
 | `scrcmd_pokemon.c` | `0x02156174`–`0x021574a4` | 43 | complete | string at `0x0216e1f4` |
 | `scrcmd_proc.c` | `0x021574a4`–`0x02157c20` | 21 | complete | string at `0x0216e208` |
-| `scrcmd_sodateya.c` | `0x02157c20`–`0x021580c4` | 18 | complete | string at `0x0216e218` |
+| `scrcmd_day_care.c` | `0x02157c20`–`0x021580c4` | 18 | complete | ROM's `scrcmd_sodateya.c`, string at `0x0216e218` |
 | `scrcmd_musical.c` | `0x021580c4`–`0x021590ec` | 27 | complete | string at `0x0216e22c` |
 | `field_encount_st.c` | `0x021590ec`–`0x02159230` | 14 | complete | string at `0x0216e240` |
-| `hiden_event.c` | `0x02159230`–`0x02159bc0` | 44 | complete | descriptive |
+| `hm_event.c` | `0x02159230`–`0x02159bc0` | 44 | complete | descriptive |
 | `scrcmd_network.c` | `0x02159bc0`–`0x02159d54` | 9 | complete | string at `0x0216e254` |
 | `scrcmd_stadium.c` | `0x02159d54`–`0x0215a0b0` | 9 | complete | descriptive |
 | `event_battle_lose.c` | `0x0215a0b0`–`0x0215a19c` | 2 | complete | descriptive |
@@ -276,16 +276,16 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 | `survey.c` | `0x021652cc`–`0x02165598` | 14 | complete | descriptive |
 | `scrcmd_sp_poke_gimmick.c` | `0x02165598`–`0x0216598c` | 8 | complete | descriptive |
 | `oneshot_dr.c` | `0x0216598c`–`0x021659ec` | 2 | complete | descriptive |
-| `namein_setup.c` | `0x021659ec`–`0x02165b1c` | 7 | complete | string at `0x0216e3a0` |
+| `name_input_setup.c` | `0x021659ec`–`0x02165b1c` | 7 | complete | ROM's `namein_setup.c`, string at `0x0216e3a0` |
 | `event_league_lift.c` | `0x02165b1c`–`0x02165eb8` | 7 | complete | descriptive |
 | `event_bsubway.c` | `0x02165eb8`–`0x02166664` | 17 | complete | descriptive |
-| `fldmmdl.c` | `0x02166664`–`0x02168320` | 270 | complete | string at `0x0216e5c0` |
+| `field_actor.c` | `0x02166664`–`0x02168320` | 270 | complete | ROM's `fldmmdl.c`, string at `0x0216e5c0` |
 | `fest_mission_field.c` | `0x02168320`–`0x02168468` | 5 | complete | descriptive |
 | `burmy_form.c` | `0x02168468`–`0x021684bc` | 1 | complete | descriptive |
 | `event_battle.c` | `0x021684bc`–`0x0216919c` | 26 | complete | string at `0x0216e5dc` |
 | `trcard_sys.c` | `0x0216919c`–`0x02169c1c` | 23 | complete | string at `0x0216e5ec` |
 | `scrcmd_sp_poke.c` | `0x02169c1c`–`0x02169c7c` | 4 | complete | descriptive |
-| `waza_oshie.c` | `0x02169c7c`–`0x02169e18` | 4 | complete | string at `0x0216e5fc` |
+| `move_tutor.c` | `0x02169c7c`–`0x02169e18` | 4 | complete | ROM's `waza_oshie.c`, string at `0x0216e5fc` |
 | `g3d_text_draw.c` | `0x02169e18`–`0x0216a190` | 7 | complete | descriptive |
 | `pass_power_check.c` | `0x0216a190`–`0x0216a23c` | 2 | complete | descriptive |
 | `pair_sys.c` | `0x0216a23c`–`0x0216a6a4` | 16 | complete | string at `0x0216e60c` |
@@ -488,7 +488,7 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 | `event_fly.c` | `0x02178908`–`0x02178ca8` | 3 | complete | descriptive |
 | `event_chatot.c` | `0x02178ca8`–`0x021791c0` | 10 | complete | descriptive |
 | `event_fishing.c` | `0x021791c0`–`0x02179664` | 9 | complete | descriptive |
-| `event_dendou_machine.c` | `0x02179664`–`0x02179868` | 8 | complete | descriptive |
+| `event_hall_of_fame_machine.c` | `0x02179664`–`0x02179868` | 8 | complete | descriptive |
 | `event_pc.c` | `0x02179868`–`0x02179b54` | 8 | complete | descriptive |
 | `event_pokemon_center.c` | `0x02179b54`–`0x02179dd4` | 9 | complete | descriptive |
 | `event_game_manual.c` | `0x02179dd4`–`0x02179e98` | 3 | complete | string at `0x0217c610` |
@@ -546,17 +546,17 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 | `field_menu_event.c` | `0x0218b12c`–`0x0218b1f8` | 2 | complete | descriptive |
 | `talkmsgwin.c` | `0x0218b1f8`–`0x0218d0e8` | 54 | complete | string at `0x021d4c24` |
 | `ircbattlemenu.c` | `0x0218d0e8`–`0x0218ed18` | 65 | complete | string at `0x021d4d24` |
-| `fldmmdl_acmd.c` | `0x0218ed18`–`0x02191228` | 247 | complete | string at `0x021d4d40` |
-| `fldmmdl_movecode.c` | `0x02191228`–`0x021925a4` | 98 | complete | descriptive |
-| `fldmmdl_evtype.c` | `0x021925a4`–`0x02192a4c` | 17 | complete | descriptive |
-| `fldmmdl_movecode_pair.c` | `0x02192a4c`–`0x02193680` | 68 | complete | descriptive |
-| `fldmmdl_blact.c` | `0x02193680`–`0x021946b4` | 58 | complete | string at `0x021d4d50` |
-| `fldmmdl_g3dobj.c` | `0x021946b4`–`0x02195378` | 91 | complete | string at `0x021d4d60` |
+| `field_actor_acmd.c` | `0x0218ed18`–`0x02191228` | 247 | complete | ROM's `fldmmdl_acmd.c`, string at `0x021d4d40` |
+| `field_actor_movecode.c` | `0x02191228`–`0x021925a4` | 98 | complete | descriptive |
+| `field_actor_evtype.c` | `0x021925a4`–`0x02192a4c` | 17 | complete | descriptive |
+| `field_actor_movecode_pair.c` | `0x02192a4c`–`0x02193680` | 68 | complete | descriptive |
+| `field_actor_billboard.c` | `0x02193680`–`0x021946b4` | 58 | complete | ROM's `fldmmdl_blact.c`, string at `0x021d4d50` |
+| `field_actor_g3dobj.c` | `0x021946b4`–`0x02195378` | 91 | complete | ROM's `fldmmdl_g3dobj.c`, string at `0x021d4d60` |
 | `fld_act_rail.c` | `0x02195378`–`0x02195590` | 9 | complete | descriptive |
-| `fldmmdl_rail.c` | `0x02195590`–`0x02196208` | 64 | complete | descriptive |
+| `field_actor_rail.c` | `0x02195590`–`0x02196208` | 64 | complete | descriptive |
 | `rail_data_handle.c` | `0x02196208`–`0x02196238` | 1 | complete | descriptive |
 | `field_rail_loader.c` | `0x02196238`–`0x0219749c` | 57 | complete | string at `0x021d4de8` |
-| `fldmmdl_g3dobj_draw.c` | `0x0219749c`–`0x02197534` | 5 | complete | descriptive |
+| `field_actor_g3dobj_draw.c` | `0x0219749c`–`0x02197534` | 5 | complete | descriptive |
 | `field_fog.c` | `0x02197534`–`0x02197710` | 22 | complete | string at `0x021d4dfc` |
 | `field_zonefog.c` | `0x02197710`–`0x02197820` | 11 | complete | string at `0x021d4e08` |
 | `field_light.c` | `0x02197820`–`0x02198198` | 31 | complete | string at `0x021d4e18` |
@@ -582,13 +582,13 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 | `fld_scenearea_loader.c` | `0x021a30f8`–`0x021a3664` | 20 | complete | string at `0x021d4fe0` |
 | `field_effect.c` | `0x021a3664`–`0x021a3b34` | 38 | complete | string at `0x021d4ff8` |
 | `fldeff_shadow.c` | `0x021a3b34`–`0x021a3de0` | 9 | complete | string at `0x021d5008` |
-| `fldeff_kemuri.c` | `0x021a3de0`–`0x021a3fd8` | 10 | complete | string at `0x021d5018` |
+| `fldeff_dust.c` | `0x021a3de0`–`0x021a3fd8` | 10 | complete | ROM's `fldeff_kemuri.c`, string at `0x021d5018` |
 | `fldeff_grass.c` | `0x021a3fd8`–`0x021a4384` | 10 | complete | string at `0x021d5050` |
-| `fldeff_namipoke.c` | `0x021a4384`–`0x021a50a4` | 27 | complete | string at `0x021d5060` |
+| `fldeff_surf_pokemon.c` | `0x021a4384`–`0x021a50a4` | 27 | complete | ROM's `fldeff_namipoke.c`, string at `0x021d5060` |
 | `fldeff_encount.c` | `0x021a50a4`–`0x021a5604` | 22 | complete | string at `0x021d50c8` |
-| `fldeff_iwakudaki.c` | `0x021a5604`–`0x021a5828` | 10 | complete | string at `0x021d50ec` |
+| `fldeff_rock_smash.c` | `0x021a5604`–`0x021a5828` | 10 | complete | ROM's `fldeff_iwakudaki.c`, string at `0x021d50ec` |
 | `fldeff_fishing.c` | `0x021a5828`–`0x021a5a18` | 10 | complete | string at `0x021d5104` |
-| `fldeff_fes_kira.c` | `0x021a5a18`–`0x021a5d2c` | 18 | complete | string at `0x021d5124` |
+| `fldeff_fes_sparkle.c` | `0x021a5a18`–`0x021a5d2c` | 18 | complete | ROM's `fldeff_fes_kira.c`, string at `0x021d5124` |
 | `event_trainer_eye.c` | `0x021a5d2c`–`0x021a6668` | 39 | complete | string at `0x021d5138` |
 | `scrcmd_trainer.c` | `0x021a6668`–`0x021a6b80` | 18 | complete | descriptive |
 | `scrcmd_save.c` | `0x021a6b80`–`0x021a6d14` | 3 | complete | descriptive |
@@ -598,7 +598,7 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 | `scrcmd_mapchange.c` | `0x021a7eb8`–`0x021a82bc` | 9 | complete | descriptive |
 | `scrcmd_menu.c` | `0x021a82bc`–`0x021a861c` | 11 | complete | descriptive |
 | `scrcmd_msg.c` | `0x021a861c`–`0x021a98c4` | 65 | complete | descriptive |
-| `scrcmd_fldmmdl.c` | `0x021a98c4`–`0x021aad44` | 50 | complete | string at `0x021d514c` |
+| `scrcmd_field_actor.c` | `0x021a98c4`–`0x021aad44` | 50 | complete | ROM's `scrcmd_fldmmdl.c`, string at `0x021d514c` |
 | `scrcmd_gym.c` | `0x021aad44`–`0x021ab218` | 28 | complete | descriptive |
 | `scrcmd_fade.c` | `0x021ab218`–`0x021ab73c` | 18 | complete | descriptive |
 | `scrcmd_buildmodel.c` | `0x021ab73c`–`0x021abb48` | 18 | complete | descriptive |
@@ -616,7 +616,7 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 | `field_rail_func.c` | `0x021b2404`–`0x021b3a3c` | 30 | complete | descriptive |
 | `rail_attr.c` | `0x021b3a3c`–`0x021b3bac` | 13 | complete | string at `0x021d525c` |
 | `field_nogrid_mapper.c` | `0x021b3bac`–`0x021b3e50` | 18 | complete | string at `0x021d5268` |
-| `fldeff_gyoe.c` | `0x021b3e50`–`0x021b427c` | 15 | complete | string at `0x021d5280` |
+| `fldeff_emotion_bubble.c` | `0x021b3e50`–`0x021b427c` | 15 | complete | ROM's `fldeff_gyoe.c`, string at `0x021d5280` |
 | `fieldmap_func.c` | `0x021b427c`–`0x021b445c` | 9 | complete | string at `0x021d5290` |
 | `union_mine_pms.c` | `0x021b445c`–`0x021b46b0` | 4 | complete | descriptive |
 | `fldeff_footmark.c` | `0x021b46b0`–`0x021b496c` | 10 | complete | string at `0x021d5324` |
@@ -634,7 +634,7 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 | `field_player_grid_event.c` | `0x021ba81c`–`0x021bb590` | 23 | complete | string at `0x021d5404` |
 | `fld_particle.c` | `0x021bb590`–`0x021bb67c` | 8 | complete | string at `0x021d5420` |
 | `fld3d_ci.c` | `0x021bb67c`–`0x021bd2ac` | 54 | complete | string at `0x021d5430` |
-| `sodateya.c` | `0x021bd2ac`–`0x021be790` | 65 | complete | string at `0x021d54a4` |
+| `day_care.c` | `0x021bd2ac`–`0x021be790` | 65 | complete | ROM's `sodateya.c`, string at `0x021d54a4` |
 | `fldeff_ripple.c` | `0x021be790`–`0x021be988` | 9 | complete | string at `0x021d54b4` |
 | `fldeff_splash.c` | `0x021be988`–`0x021beb70` | 9 | complete | string at `0x021d54c4` |
 | `sound_obj.c` | `0x021beb70`–`0x021bedd8` | 9 | complete | string at `0x021d54d4` |
@@ -650,9 +650,9 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 | `pleasure_boat.c` | `0x021c2080`–`0x021c229c` | 12 | complete | string at `0x021d557c` |
 | `field_slope_slip.c` | `0x021c229c`–`0x021c24b4` | 14 | complete | descriptive |
 | `field_water_current.c` | `0x021c24b4`–`0x021c2788` | 18 | complete | descriptive |
-| `fldeff_d06denki.c` | `0x021c2788`–`0x021c2cbc` | 23 | complete | string at `0x021d558c` |
+| `fldeff_d06electric.c` | `0x021c2788`–`0x021c2cbc` | 23 | complete | ROM's `fldeff_d06denki.c`, string at `0x021d558c` |
 | `land_data_patch.c` | `0x021c2cbc`–`0x021c2ddc` | 6 | complete | string at `0x021d55a0` |
-| `fldeff_iaigiri.c` | `0x021c2ddc`–`0x021c3180` | 13 | complete | string at `0x021d55c0` |
+| `fldeff_cut.c` | `0x021c2ddc`–`0x021c3180` | 13 | complete | ROM's `fldeff_iaigiri.c`, string at `0x021d55c0` |
 | `party_select_list.c` | `0x021c3180`–`0x021c3c34` | 30 | complete | string at `0x021d55f8` |
 | `field_bbd_color.c` | `0x021c3c34`–`0x021c3d9c` | 6 | complete | string at `0x021d5620` |
 | `comm_entry_menu.c` | `0x021c3d9c`–`0x021c5d7c` | 75 | complete | string at `0x021d5634` |
@@ -673,8 +673,8 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 | `resort_mapcreate.c` | `0x021c8954`–`0x021c8c34` | 6 | complete | string at `0x021d5744` |
 | `hidden_hollow_generate.c` | `0x021c8c34`–`0x021c8cd0` | 1 | complete | descriptive |
 | `scrcmd_hidden_hollow.c` | `0x021c8cd0`–`0x021c944c` | 18 | complete | descriptive |
-| `fldeff_ochiba.c` | `0x021c944c`–`0x021c97b8` | 12 | complete | string at `0x021d5758` |
-| `scrcmd_ochiba.c` | `0x021c97b8`–`0x021c9eb8` | 22 | complete | string at `0x021d5768` |
+| `fldeff_leaves.c` | `0x021c944c`–`0x021c97b8` | 12 | complete | ROM's `fldeff_ochiba.c`, string at `0x021d5758` |
+| `scrcmd_leaves.c` | `0x021c97b8`–`0x021c9eb8` | 22 | complete | ROM's `scrcmd_ochiba.c`, string at `0x021d5768` |
 
 ### Overlay 50
 
@@ -841,8 +841,8 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `oekaki_comm.c` | `0x0217cfc0`–`0x0217d34c` | 12 | complete | descriptive |
-| `oekaki.c` | `0x0217d34c`–`0x0217f84c` | 89 | complete | string at `0x0217fd38` |
+| `drawing_comm.c` | `0x0217cfc0`–`0x0217d34c` | 12 | complete | descriptive |
+| `drawing.c` | `0x0217d34c`–`0x0217f84c` | 89 | complete | ROM's `oekaki.c`, string at `0x0217fd38` |
 
 ### Overlay 71
 
@@ -1683,7 +1683,7 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 | `btl_tables.c` | `0x0689ca10`–`0x0689cc20` | 27 | complete | descriptive |
 | `btl_poke_select.c` | `0x0689cc20`–`0x0689ccc4` | 10 | complete | descriptive |
 | `btl_monset.c` | `0x0689ccc4`–`0x0689d178` | 38 | complete | descriptive |
-| `btl_wazarec.c` | `0x0689d178`–`0x0689d284` | 7 | complete | descriptive |
+| `btl_move_rec.c` | `0x0689d178`–`0x0689d284` | 7 | complete | descriptive |
 | `btl_faintrec.c` | `0x0689d284`–`0x0689d384` | 9 | complete | descriptive |
 | `btl_pospoke.c` | `0x0689d384`–`0x0689d790` | 44 | complete | descriptive |
 
@@ -2256,10 +2256,10 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `guru2.c` | `0x021bb700`–`0x021bb984` | 13 | complete | string at `0x021c1100` |
-| `guru2_comm.c` | `0x021bb984`–`0x021bbc98` | 25 | complete | string at `0x021c1108` |
-| `guru2_receipt.c` | `0x021bbc98`–`0x021bd6a0` | 69 | complete | descriptive |
-| `guru2_main.c` | `0x021bd6a0`–`0x021c08d0` | 185 | complete | string at `0x021c1158` |
+| `spin_trade.c` | `0x021bb700`–`0x021bb984` | 13 | complete | ROM's `guru2.c`, string at `0x021c1100` |
+| `spin_trade_comm.c` | `0x021bb984`–`0x021bbc98` | 25 | complete | ROM's `guru2_comm.c`, string at `0x021c1108` |
+| `spin_trade_receipt.c` | `0x021bbc98`–`0x021bd6a0` | 69 | complete | descriptive |
+| `spin_trade_main.c` | `0x021bd6a0`–`0x021c08d0` | 185 | complete | ROM's `guru2_main.c`, string at `0x021c1158` |
 
 ### Overlay 253
 
@@ -2291,12 +2291,12 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `dendou_pc.c` | `0x021bb700`–`0x021bb758` | 3 | complete | descriptive |
-| `dpc_main.c` | `0x021bb758`–`0x021bbd10` | 17 | complete | descriptive |
-| `dpc_seq.c` | `0x021bbd10`–`0x021bc714` | 21 | complete | descriptive |
-| `dpc_bmp.c` | `0x021bc714`–`0x021bce88` | 8 | complete | descriptive |
-| `dpc_obj.c` | `0x021bce88`–`0x021bd748` | 25 | complete | descriptive |
-| `dpc_ui.c` | `0x021bd748`–`0x021bd8e4` | 3 | complete | descriptive |
+| `hall_of_fame_pc.c` | `0x021bb700`–`0x021bb758` | 3 | complete | descriptive |
+| `hall_of_fame_pc_main.c` | `0x021bb758`–`0x021bbd10` | 17 | complete | descriptive |
+| `hall_of_fame_pc_seq.c` | `0x021bbd10`–`0x021bc714` | 21 | complete | descriptive |
+| `hall_of_fame_pc_bmp.c` | `0x021bc714`–`0x021bce88` | 8 | complete | descriptive |
+| `hall_of_fame_pc_obj.c` | `0x021bce88`–`0x021bd748` | 25 | complete | descriptive |
+| `hall_of_fame_pc_ui.c` | `0x021bd748`–`0x021bd8e4` | 3 | complete | descriptive |
 
 ### Overlay 257
 
@@ -2330,7 +2330,7 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `waza_oshie_main.c` | `0x021998c0`–`0x0219b9a8` | 84 | complete | descriptive |
+| `move_tutor_main.c` | `0x021998c0`–`0x0219b9a8` | 84 | complete | descriptive |
 
 ### Overlay 259
 
@@ -2424,10 +2424,10 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `dendou_demo.c` | `0x021998c0`–`0x0219991c` | 3 | complete | descriptive |
-| `ddemo_main.c` | `0x0219991c`–`0x0219a1d4` | 44 | complete | descriptive |
-| `ddemo_seq.c` | `0x0219a1d4`–`0x0219aadc` | 17 | complete | descriptive |
-| `ddemo_obj.c` | `0x0219aadc`–`0x0219b7d0` | 35 | complete | descriptive |
+| `hall_of_fame_demo.c` | `0x021998c0`–`0x0219991c` | 3 | complete | descriptive |
+| `hall_of_fame_demo_main.c` | `0x0219991c`–`0x0219a1d4` | 44 | complete | descriptive |
+| `hall_of_fame_demo_seq.c` | `0x0219a1d4`–`0x0219aadc` | 17 | complete | descriptive |
+| `hall_of_fame_demo_obj.c` | `0x0219aadc`–`0x0219b7d0` | 35 | complete | descriptive |
 
 ### Overlay 266
 
@@ -2531,9 +2531,9 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `namein.c` | `0x021d96e0`–`0x021dd28c` | 111 | complete | descriptive |
-| `namein_graphic.c` | `0x021dd28c`–`0x021dd4c8` | 14 | complete | string at `0x021ddb84` |
-| `namein_data.c` | `0x021dd4c8`–`0x021dd8e4` | 23 | complete | string at `0x021ddb98` |
+| `name_input.c` | `0x021d96e0`–`0x021dd28c` | 111 | complete | descriptive |
+| `name_input_graphic.c` | `0x021dd28c`–`0x021dd4c8` | 14 | complete | ROM's `namein_graphic.c`, string at `0x021ddb84` |
+| `name_input_data.c` | `0x021dd4c8`–`0x021dd8e4` | 23 | complete | ROM's `namein_data.c`, string at `0x021ddb98` |
 
 ### Overlay 281
 
@@ -2549,10 +2549,10 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `shinka_demo.c` | `0x021e30e0`–`0x021e49b0` | 44 | complete | string at `0x021e80a0` |
-| `shinka_demo_graphic.c` | `0x021e49b0`–`0x021e4dd0` | 23 | complete | string at `0x021e80b0` |
-| `shinka_demo_view.c` | `0x021e4dd0`–`0x021e7824` | 56 | complete | string at `0x021e80c8` |
-| `shinka_demo_effect.c` | `0x021e7824`–`0x021e7d9c` | 28 | complete | string at `0x021e80dc` |
+| `evolution_demo.c` | `0x021e30e0`–`0x021e49b0` | 44 | complete | ROM's `shinka_demo.c`, string at `0x021e80a0` |
+| `evolution_demo_graphic.c` | `0x021e49b0`–`0x021e4dd0` | 23 | complete | ROM's `shinka_demo_graphic.c`, string at `0x021e80b0` |
+| `evolution_demo_view.c` | `0x021e4dd0`–`0x021e7824` | 56 | complete | ROM's `shinka_demo_view.c`, string at `0x021e80c8` |
+| `evolution_demo_effect.c` | `0x021e7824`–`0x021e7d9c` | 28 | complete | ROM's `shinka_demo_effect.c`, string at `0x021e80dc` |
 
 ### Overlay 285
 
@@ -2658,7 +2658,7 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `zukan_info.c` | `0x0219d6e0`–`0x0219fa7c` | 61 | complete | string at `0x0219fba0` |
+| `pokedex_info.c` | `0x0219d6e0`–`0x0219fa7c` | 61 | complete | ROM's `zukan_info.c`, string at `0x0219fba0` |
 
 ### Overlay 297
 
@@ -2666,9 +2666,9 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `zukan_toroku.c` | `0x021f4260`–`0x021f4638` | 6 | complete | descriptive |
-| `zukan_toroku_graphic.c` | `0x021f4638`–`0x021f487c` | 16 | complete | string at `0x021f4fa0` |
-| `zukan_nickname.c` | `0x021f487c`–`0x021f4e38` | 9 | complete | string at `0x021f4fb8` |
+| `pokedex_registration.c` | `0x021f4260`–`0x021f4638` | 6 | complete | descriptive |
+| `pokedex_registration_graphic.c` | `0x021f4638`–`0x021f487c` | 16 | complete | ROM's `zukan_toroku_graphic.c`, string at `0x021f4fa0` |
+| `pokedex_nickname.c` | `0x021f487c`–`0x021f4e38` | 9 | complete | ROM's `zukan_nickname.c`, string at `0x021f4fb8` |
 
 ### Overlay 298
 
@@ -2676,17 +2676,17 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `zukan_detail_procsys.c` | `0x0219fbc0`–`0x0219fcdc` | 7 | complete | string at `0x021acde0` |
-| `zukan_detail_common.c` | `0x0219fcdc`–`0x021a03e8` | 39 | complete | string at `0x021acdf8` |
-| `zukan_detail.c` | `0x021a03e8`–`0x021a0700` | 5 | complete | string at `0x021ace10` |
-| `zukan_detail_graphic.c` | `0x021a0700`–`0x021a0ae0` | 23 | complete | string at `0x021ace20` |
-| `zknd_tbar.c` | `0x021a0ae0`–`0x021a1268` | 39 | complete | string at `0x021ace38` |
-| `zukan_detail_touchbar.c` | `0x021a1268`–`0x021a21f0` | 44 | complete | string at `0x021ace44` |
-| `zukan_detail_headbar.c` | `0x021a21f0`–`0x021a24e0` | 13 | complete | string at `0x021ace5c` |
-| `zukan_detail_info.c` | `0x021a24e0`–`0x021a328c` | 20 | complete | descriptive |
-| `zukan_detail_map.c` | `0x021a328c`–`0x021a63d4` | 76 | complete | descriptive |
-| `zukan_detail_voice.c` | `0x021a63d4`–`0x021a79e0` | 39 | complete | string at `0x021ace88` |
-| `zukan_detail_form.c` | `0x021a79e0`–`0x021abf74` | 75 | complete | string at `0x021acec4` |
+| `pokedex_detail_procsys.c` | `0x0219fbc0`–`0x0219fcdc` | 7 | complete | ROM's `zukan_detail_procsys.c`, string at `0x021acde0` |
+| `pokedex_detail_common.c` | `0x0219fcdc`–`0x021a03e8` | 39 | complete | ROM's `zukan_detail_common.c`, string at `0x021acdf8` |
+| `pokedex_detail.c` | `0x021a03e8`–`0x021a0700` | 5 | complete | ROM's `zukan_detail.c`, string at `0x021ace10` |
+| `pokedex_detail_graphic.c` | `0x021a0700`–`0x021a0ae0` | 23 | complete | ROM's `zukan_detail_graphic.c`, string at `0x021ace20` |
+| `pokedex_detail_tbar.c` | `0x021a0ae0`–`0x021a1268` | 39 | complete | ROM's `zknd_tbar.c`, string at `0x021ace38` |
+| `pokedex_detail_touchbar.c` | `0x021a1268`–`0x021a21f0` | 44 | complete | ROM's `zukan_detail_touchbar.c`, string at `0x021ace44` |
+| `pokedex_detail_headbar.c` | `0x021a21f0`–`0x021a24e0` | 13 | complete | ROM's `zukan_detail_headbar.c`, string at `0x021ace5c` |
+| `pokedex_detail_info.c` | `0x021a24e0`–`0x021a328c` | 20 | complete | descriptive |
+| `pokedex_detail_map.c` | `0x021a328c`–`0x021a63d4` | 76 | complete | descriptive |
+| `pokedex_detail_voice.c` | `0x021a63d4`–`0x021a79e0` | 39 | complete | ROM's `zukan_detail_voice.c`, string at `0x021ace88` |
+| `pokedex_detail_form.c` | `0x021a79e0`–`0x021abf74` | 75 | complete | ROM's `zukan_detail_form.c`, string at `0x021acec4` |
 
 ### Overlay 299
 
@@ -2694,12 +2694,12 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `zukanlist.c` | `0x0219fbc0`–`0x0219fc14` | 3 | complete | descriptive |
-| `zknlist_main.c` | `0x0219fc14`–`0x021a05dc` | 29 | complete | descriptive |
-| `zknlist_seq.c` | `0x021a05dc`–`0x021a0ec0` | 16 | complete | descriptive |
-| `zknlist_bmp.c` | `0x021a0ec0`–`0x021a13f0` | 12 | complete | descriptive |
-| `zknlist_obj.c` | `0x021a13f0`–`0x021a23a4` | 33 | complete | descriptive |
-| `zknlist_ui.c` | `0x021a23a4`–`0x021a25c8` | 1 | complete | descriptive |
+| `pokedex_list.c` | `0x0219fbc0`–`0x0219fc14` | 3 | complete | descriptive |
+| `pokedex_list_main.c` | `0x0219fc14`–`0x021a05dc` | 29 | complete | descriptive |
+| `pokedex_list_seq.c` | `0x021a05dc`–`0x021a0ec0` | 16 | complete | descriptive |
+| `pokedex_list_bmp.c` | `0x021a0ec0`–`0x021a13f0` | 12 | complete | descriptive |
+| `pokedex_list_obj.c` | `0x021a13f0`–`0x021a23a4` | 33 | complete | descriptive |
+| `pokedex_list_ui.c` | `0x021a23a4`–`0x021a25c8` | 1 | complete | descriptive |
 
 ### Overlay 300
 
@@ -2707,13 +2707,13 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `zukansearch.c` | `0x0219fbc0`–`0x0219fc14` | 3 | complete | descriptive |
-| `zknsearch_main.c` | `0x0219fc14`–`0x021a08d0` | 46 | complete | string at `0x021a4800` |
-| `zknsearch_seq.c` | `0x021a08d0`–`0x021a1ce8` | 41 | complete | descriptive |
-| `zknsearch_bmp.c` | `0x021a1ce8`–`0x021a26ac` | 25 | complete | descriptive |
-| `zknsearch_obj.c` | `0x021a26ac`–`0x021a382c` | 42 | complete | descriptive |
-| `zknsearch_ui.c` | `0x021a382c`–`0x021a3bb4` | 12 | complete | descriptive |
-| `zknsearch_list.c` | `0x021a3bb4`–`0x021a4094` | 21 | complete | descriptive |
+| `pokedex_search.c` | `0x0219fbc0`–`0x0219fc14` | 3 | complete | descriptive |
+| `pokedex_search_main.c` | `0x0219fc14`–`0x021a08d0` | 46 | complete | ROM's `zknsearch_main.c`, string at `0x021a4800` |
+| `pokedex_search_seq.c` | `0x021a08d0`–`0x021a1ce8` | 41 | complete | descriptive |
+| `pokedex_search_bmp.c` | `0x021a1ce8`–`0x021a26ac` | 25 | complete | descriptive |
+| `pokedex_search_obj.c` | `0x021a26ac`–`0x021a382c` | 42 | complete | descriptive |
+| `pokedex_search_ui.c` | `0x021a382c`–`0x021a3bb4` | 12 | complete | descriptive |
+| `pokedex_search_list.c` | `0x021a3bb4`–`0x021a4094` | 21 | complete | descriptive |
 
 ### Overlay 301
 
@@ -2721,7 +2721,7 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `zukan_open.c` | `0x0219fbc0`–`0x021a023c` | 19 | complete | descriptive |
+| `pokedex_open.c` | `0x0219fbc0`–`0x021a023c` | 19 | complete | descriptive |
 
 ### Overlay 302
 
@@ -2729,9 +2729,9 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `zukan.c` | `0x021acee0`–`0x021ad624` | 19 | complete | string at `0x021ae5a0` |
-| `zukan_common.c` | `0x021ad624`–`0x021adecc` | 20 | complete | string at `0x021ae5a8` |
-| `zukan_search_engine.c` | `0x021adecc`–`0x021ae3dc` | 7 | complete | string at `0x021ae5b8` |
+| `pokedex.c` | `0x021acee0`–`0x021ad624` | 19 | complete | ROM's `zukan.c`, string at `0x021ae5a0` |
+| `pokedex_common.c` | `0x021ad624`–`0x021adecc` | 20 | complete | ROM's `zukan_common.c`, string at `0x021ae5a8` |
+| `pokedex_search_engine.c` | `0x021adecc`–`0x021ae3dc` | 7 | complete | ROM's `zukan_search_engine.c`, string at `0x021ae5b8` |
 
 ### Overlay 303
 
@@ -2739,8 +2739,8 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `zukan_habitat.c` | `0x0219fbc0`–`0x021a1a80` | 56 | complete | descriptive |
-| `zukan_habitat_graphic.c` | `0x021a1a80`–`0x021a32d8` | 58 | complete | descriptive |
+| `pokedex_habitat.c` | `0x0219fbc0`–`0x021a1a80` | 56 | complete | descriptive |
+| `pokedex_habitat_graphic.c` | `0x021a1a80`–`0x021a32d8` | 58 | complete | descriptive |
 
 ### Overlay 304
 
@@ -2748,8 +2748,8 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `zukan_area_list.c` | `0x0219fbc0`–`0x021a073c` | 34 | complete | descriptive |
-| `zukan_area_list_view.c` | `0x021a073c`–`0x021a1dac` | 58 | complete | descriptive |
+| `pokedex_area_list.c` | `0x0219fbc0`–`0x021a073c` | 34 | complete | descriptive |
+| `pokedex_area_list_view.c` | `0x021a073c`–`0x021a1dac` | 58 | complete | descriptive |
 
 ### Overlay 305
 
@@ -2852,8 +2852,8 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `chihou_zukan_award.c` | `0x0219ce80`–`0x0219d6a4` | 16 | complete | string at `0x0219db80` |
-| `chihou_zukan_award_graphic.c` | `0x0219d6a4`–`0x0219da10` | 17 | complete | string at `0x0219db98` |
+| `regional_pokedex_award.c` | `0x0219ce80`–`0x0219d6a4` | 16 | complete | ROM's `chihou_zukan_award.c`, string at `0x0219db80` |
+| `regional_pokedex_award_graphic.c` | `0x0219d6a4`–`0x0219da10` | 17 | complete | ROM's `chihou_zukan_award_graphic.c`, string at `0x0219db98` |
 
 ### Overlay 315
 
@@ -2861,8 +2861,8 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `zenkoku_zukan_award.c` | `0x0219ce80`–`0x0219d73c` | 16 | complete | string at `0x0219dc40` |
-| `zenkoku_zukan_award_graphic.c` | `0x0219d73c`–`0x0219daa8` | 17 | complete | string at `0x0219dc58` |
+| `national_pokedex_award.c` | `0x0219ce80`–`0x0219d73c` | 16 | complete | ROM's `zenkoku_zukan_award.c`, string at `0x0219dc40` |
+| `national_pokedex_award_graphic.c` | `0x0219d73c`–`0x0219daa8` | 17 | complete | ROM's `zenkoku_zukan_award_graphic.c`, string at `0x0219dc58` |
 
 ### Overlay 316
 

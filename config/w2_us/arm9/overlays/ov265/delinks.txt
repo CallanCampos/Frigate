@@ -3,22 +3,22 @@
     .ctor       start:0x0219bb1c end:0x0219bb1c kind:rodata align:4
     .bss        start:0x0219bb20 end:0x0219bb20 kind:bss align:32
 
-src/ov265/dendou_demo.c:
+src/ov265/hall_of_fame_demo.c:
     complete
     .text       start:0x02199900 end:0x0219995c
     .rodata     start:0x0219b810 end:0x0219b81c
 
-src/ov265/ddemo_main.c:
+src/ov265/hall_of_fame_demo_main.c:
     complete
     .text       start:0x0219995c end:0x0219a214
     .rodata     start:0x0219b81c end:0x0219b950
 
-src/ov265/ddemo_seq.c:
+src/ov265/hall_of_fame_demo_seq.c:
     complete
     .text       start:0x0219a214 end:0x0219ab1c
     .rodata     start:0x0219b950 end:0x0219b978
 
-src/ov265/ddemo_obj.c:
+src/ov265/hall_of_fame_demo_obj.c:
     complete
     .text       start:0x0219ab1c end:0x0219b810
     .rodata     start:0x0219b978 end:0x0219bb1c

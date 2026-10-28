@@ -94,6 +94,33 @@ add_test(NAME integrate_archive_seek_assert
         --expect "ArchiveMoveImageTop fileCnt=2, datID=2" -- "$<TARGET_FILE:port_archive_seek_tests>" invalid)
 set_tests_properties(integrate_archive_seek integrate_archive_seek_assert PROPERTIES TIMEOUT 30)
 
+# The actual Pokédex habitat/list owners in fixture TUs, with their ordinary objects excluded. All other genuine
+# game/SDK objects resolve dependencies; no dead-strip assumption or unknown-symbol stand-ins. Synthetic resources
+# in the form fixture exercise only PutMon's argument/ordering contract, not asset loading or graphics.
+foreach(kind touch form)
+    if(kind STREQUAL "touch")
+        set(pokedex_owner "(pokedex_habitat|touchpanel)")
+        set(pokedex_extra_source tests/integrate/pokedex_touch_scanner.c)
+    else()
+        set(pokedex_owner "pokedex_list_obj")
+        set(pokedex_extra_source "")
+    endif()
+    add_executable(port_pokedex_${kind}_tests tests/integrate/pokedex_${kind}.c ${pokedex_extra_source}
+        "$<FILTER:$<TARGET_OBJECTS:pokebw2_game>,EXCLUDE,/${pokedex_owner}[.]c[.](o|obj)$>"
+        $<TARGET_OBJECTS:port_hal> ${port_gfx_objects} "${PORT_GEN}/stubs.c")
+    target_link_libraries(port_pokedex_${kind}_tests PRIVATE port_decomp_env SDL3::SDL3)
+    target_include_directories(port_pokedex_${kind}_tests PRIVATE "${REPO_ROOT}" "${CMAKE_CURRENT_SOURCE_DIR}")
+    target_compile_options(port_pokedex_${kind}_tests PRIVATE -fsanitize=address,undefined -fno-sanitize-recover=all)
+    target_link_options(port_pokedex_${kind}_tests PRIVATE -fsanitize=address,undefined)
+    if(port_os_stack_probes)
+        target_compile_options(port_pokedex_${kind}_tests PRIVATE ${port_os_stack_probes})
+    endif()
+    add_test(NAME integrate_pokedex_${kind} COMMAND port_pokedex_${kind}_tests)
+    set_tests_properties(integrate_pokedex_${kind} PROPERTIES TIMEOUT 60)
+endforeach()
+# Source-level initialization must hold even without the production zero-init safety net. Source options are last.
+set_property(SOURCE tests/integrate/pokedex_form.c APPEND PROPERTY COMPILE_OPTIONS -ftrivial-auto-var-init=pattern)
+
 # Exact actual trainer-AI definitions, without the unrelated callback table retained by ELF ASan/COFF linkers.
 # The generator fails closed on source-boundary changes; selected command bodies and the VM keep all sanitizers.
 set(tr_ai_projection "${PORT_GEN}/tr_ai_tables_source.inc")

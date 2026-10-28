@@ -1,7 +1,7 @@
 // The rail data's tables of the curves' conversions between rail and world positions and of the rails' camera
 // functions, which a reset gives the rail data. The name is descriptive. The size sort sets the file apart from
-// fldmmdl_rail.c: without these tables in that file's sort, its direction sets come out in the ROM's order when they
-// are declared in DIR_LISTS's order, and with them only a scrambled order does
+// field_actor_rail.c: without these tables in that file's sort, its direction sets come out in the ROM's order when
+// they are declared in DIR_LISTS's order, and with them only a scrambled order does
 #include "types.h"
 #include "field/field_actor.h"
 #include "field/field_rail.h"

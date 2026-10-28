@@ -30,7 +30,7 @@
 #include "gfl/ui.h"
 #include "nitro/hw.h"
 #include "pml/poke_party.h"
-#include "save/pokedex.h"
+#include "save/pokedex_savedata.h"
 #include "save/records.h"
 #include "save/save_control.h"
 #include "system/bmp_menu.h"
@@ -52,7 +52,7 @@ enum {
     EGG_DEMO_FADE_IN,
     EGG_DEMO_WAIT_ACTORS,
     EGG_DEMO_WAIT_BGM,
-    EGG_DEMO_WAIT_KOUKAN,
+    EGG_DEMO_WAIT_TRADE,
     EGG_DEMO_HATCH,
     EGG_DEMO_HATCHED,
     EGG_DEMO_WAIT_WHITE,
@@ -76,8 +76,8 @@ enum {
     BGM_IDLE,
     BGM_FADE_OUT,
     BGM_PLAY,
-    BGM_LOAD_KOUKAN,
-    BGM_KOUKAN,
+    BGM_LOAD_TRADE,
+    BGM_TRADE,
     BGM_LOAD_FANFARE,
     BGM_FANFARE,
     BGM_FADE_OUT_END,
@@ -141,8 +141,8 @@ static void EggDemo_UpdateBGM(EggDemoParam *param, EggDemoWork *wk);
 static BOOL EggDemo_IsBGMFadingOut(EggDemoParam *param, EggDemoWork *wk);
 static void EggDemo_PlayBGM(EggDemoParam *param, EggDemoWork *wk);
 static BOOL EggDemo_IsBGMPlaying(EggDemoParam *param, EggDemoWork *wk);
-static void EggDemo_PlayKoukan(EggDemoParam *param, EggDemoWork *wk);
-static BOOL EggDemo_IsKoukanPlaying(EggDemoParam *param, EggDemoWork *wk);
+static void EggDemo_PlayTrade(EggDemoParam *param, EggDemoWork *wk);
+static BOOL EggDemo_IsTradePlaying(EggDemoParam *param, EggDemoWork *wk);
 static void EggDemo_PushBGM(EggDemoParam *param, EggDemoWork *wk);
 static void EggDemo_PopBGM(EggDemoParam *param, EggDemoWork *wk);
 static void EggDemo_PlayFanfare(EggDemoParam *param, EggDemoWork *wk);
@@ -242,12 +242,12 @@ static BOOL EggDemo_Main(GameProc *proc, u32 *state, void *param, void *work) {
         break;
     case EGG_DEMO_WAIT_BGM:
         if (EggDemo_IsBGMPlaying(param, wk) == FALSE) {
-            wk->state = EGG_DEMO_WAIT_KOUKAN;
-            EggDemo_PlayKoukan(param, wk);
+            wk->state = EGG_DEMO_WAIT_TRADE;
+            EggDemo_PlayTrade(param, wk);
         }
         break;
-    case EGG_DEMO_WAIT_KOUKAN:
-        if (EggDemo_IsKoukanPlaying(param, wk)) {
+    case EGG_DEMO_WAIT_TRADE:
+        if (EggDemo_IsTradePlaying(param, wk)) {
             wk->state = EGG_DEMO_HATCH;
             EggDemoView_Start(wk->view);
         }
@@ -516,9 +516,9 @@ static void EggDemo_UpdateBGM(EggDemoParam *param, EggDemoWork *wk) {
             wk->bgm = BGM_IDLE;
         }
         break;
-    case BGM_LOAD_KOUKAN:
+    case BGM_LOAD_TRADE:
         if (GFL_SndBGMLoadStep(SEQ_BGM_KOUKAN, &wk->bgmStep, FALSE)) {
-            wk->bgm = BGM_KOUKAN;
+            wk->bgm = BGM_TRADE;
         }
         break;
     case BGM_LOAD_FANFARE:
@@ -529,7 +529,7 @@ static void EggDemo_UpdateBGM(EggDemoParam *param, EggDemoWork *wk) {
     case BGM_FANFARE:
         if (GFL_SndBGMIsPlaying() == FALSE) {
             EggDemo_PopBGM(param, wk);
-            wk->bgm = BGM_KOUKAN;
+            wk->bgm = BGM_TRADE;
         }
         break;
     case BGM_FADE_OUT_END:
@@ -554,14 +554,14 @@ static BOOL EggDemo_IsBGMPlaying(EggDemoParam *param, EggDemoWork *wk) {
     return wk->bgm == BGM_PLAY;
 }
 
-static void EggDemo_PlayKoukan(EggDemoParam *param, EggDemoWork *wk) {
+static void EggDemo_PlayTrade(EggDemoParam *param, EggDemoWork *wk) {
     wk->bgmStep = 0;
     GFL_SndBGMLoadStep(SEQ_BGM_KOUKAN, &wk->bgmStep, TRUE);
-    wk->bgm = BGM_LOAD_KOUKAN;
+    wk->bgm = BGM_LOAD_TRADE;
 }
 
-static BOOL EggDemo_IsKoukanPlaying(EggDemoParam *param, EggDemoWork *wk) {
-    return wk->bgm == BGM_KOUKAN;
+static BOOL EggDemo_IsTradePlaying(EggDemoParam *param, EggDemoWork *wk) {
+    return wk->bgm == BGM_TRADE;
 }
 
 static void EggDemo_PushBGM(EggDemoParam *param, EggDemoWork *wk) {

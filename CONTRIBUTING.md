@@ -13,7 +13,8 @@ follows; [the docs](README.md#documentation) have the details.
 3. Pick something to work on. [Source files](docs/source-files.md) lists every overlay's original files and the
    [progress on ByteMatch](https://bytematch.dev/fuddlesworth/pokebw2) shows what is left. [Nonmatching functions](docs/nonmatching-functions.md) lists
    functions already in C that don't match yet, each with what was tried, if you like a puzzle. Before starting
-   overlay work, find its open `[Decomp] Overlay NNN` issue and read the comments. If nobody has claimed it, comment
+   overlay work, find its open `[Decomp] Overlay NNN` issue (for naming, its `[Names] Overlay NNN` issue, with
+   `tools/decomp/naming_report.py` and the `name-symbols` skill) and read the comments. If nobody has claimed it, comment
    that you are claiming it and what file or range you are starting with; then recheck for a concurrent claim.
    Treat a claim as active until its author releases it or the issue closes. Release yours if you leave the overlay
    unfinished. If someone already has it, choose another overlay or coordinate with them first. After each published
@@ -25,8 +26,8 @@ follows; [the docs](README.md#documentation) have the details.
 
 The [workflow](docs/decompiling.md#workflow) in short:
 
-1. Find the original file's boundaries and its name, from a string the ROM embeds (such as `"resort_npc.c"`) or else
-   from what it does. `tools/decomp/source_files.py ovNNN` helps; see
+1. Find the original file's boundaries and its name, from a string the ROM embeds (such as `"resort_npc.c"`), in
+   English, or else from what it does. `tools/decomp/source_files.py ovNNN` helps; see
    [Code organization](docs/code-organization.md).
 2. Add the file to both versions with `tools/decomp/add_source_file.py`.
 3. Write the C, in the same order as the functions in the ROM. `tools/decomp/compiler_probe.py FILE --mismatches`
@@ -69,7 +70,9 @@ still linked, and objdiff shows how close it is.
   decompilation's structure where that is what matches, rewritten in this project's names, types and format, but
   don't paste their code. Never use leaked or otherwise unlawfully obtained
   material, such as leaked source code, in any form.
-- **Names:** use swan's names first (see [Names](docs/code-organization.md#names)). Name anything else through
+- **Names:** in English, without Japanese words or Game Freak's private abbreviations (`zukan` is `Pokedex`,
+  `fldmmdl` `FieldActor`); well-known acronyms such as BGM, SE, HP and TM stay. Use swan's names first, translated the
+  same way (see [Names](docs/code-organization.md#names)). Name anything else through
   `tools/decomp/rename_symbol.py`, which records the name in `config/names.txt` and updates the source. Library
   code in `lib/` uses the SDK's own names where the code shows them, noting swan's name where it differs.
 - **Bugs:** mark a bug in the game with `// BUG:` and a fix under `#ifdef BUGFIX`, with the original code in `#else`.

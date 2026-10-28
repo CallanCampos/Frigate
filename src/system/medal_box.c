@@ -33,7 +33,7 @@ static void MedalInfo_SetDate(MedalInfo *info, u8 year, u8 month, u8 day) {
 void MedalBox_Init(MedalBox *box) {
     MI_CpuFill8(box, 0, sizeof(MedalBox));
     box->lastMedal = 0xff;
-    ZukanHabitatSave_Init(MedalBox_GetHabitatList(box));
+    PokedexHabitatSave_Init(MedalBox_GetHabitatList(box));
 }
 
 u32 MedalBox_GetBlockSize(void) {
@@ -156,6 +156,6 @@ MedalBox *SaveControl_GetMedalBox(SaveControl *save) {
     return SaveControl_GetBlockPtr(save, SAVE_BLOCK_MEDAL_BOX);
 }
 
-ZukanHabitatSave *MedalBox_GetHabitatList(MedalBox *box) {
+PokedexHabitatSave *MedalBox_GetHabitatList(MedalBox *box) {
     return &box->habitatList;
 }

@@ -122,7 +122,7 @@ GameEventReturnCode EventFieldMenu_Callback(GameEvent *event, u32 *state, void *
         EnableAllActorsMovement(Field_GetActorSystem(work->field));
         CalcPlayerActionPossibilities(GSYS_GetField(work->gameSystem), &action);
         HiddenEventArgs_Set(&args, work->appCall.partySlot, work->appCall.eventId, work->appCall.eventValue);
-        next = CreateHidenEvent(work->appCall.eventId, &args, &action);
+        next = CreateHMEvent(work->appCall.eventId, &args, &action);
         if (next == NULL) {
             return GAMEEVENT_DONE;
         }
@@ -169,7 +169,7 @@ GameEventReturnCode EventFieldMenu_Callback(GameEvent *event, u32 *state, void *
 static const s32 sFieldMenuAppIds[9] = {
     -1,
     FIELD_APP_POKELIST,
-    FIELD_APP_ZUKAN,
+    FIELD_APP_POKEDEX,
     FIELD_APP_BAG,
     FIELD_APP_TRAINER_CARD,
     FIELD_APP_SAVE,

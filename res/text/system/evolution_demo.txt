@@ -1,0 +1,4 @@
+EvolutionDemo_Text_WhatEvolving = What?\n{0102:0} is evolving!
+EvolutionDemo_Text_HuhStoppedEvolving = Huh? {0102:0}\nstopped evolving!
+EvolutionDemo_Text_CongratulationsEvolvedInto = Congratulations! Your {0102:0}\nevolved into {0101:1}!
+EvolutionDemo_Text_Empty =                           \x{ffff}

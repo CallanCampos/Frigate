@@ -72,7 +72,7 @@ u8 BtlServerFlow_MonIDToPos(BtlServerFlow *serverFlow, u8 monId);
 BOOL BtlServerFlow_GetPendingAction(BtlServerFlow *flow, u8 monId, BattleAction *action);
 BOOL BtlServerFlow_IsLastToAct(BtlServerFlow *flow, u8 monId);
 u16 BtlServerFlow_GetLastUsedMove(BtlServerFlow *flow);
-BtlWazaRec *BtlServerFlow_GetWazaRec(BtlServerFlow *flow);
+BtlMoveRec *BtlServerFlow_GetMoveRec(BtlServerFlow *flow);
 BtlFaintRec *BtlServerFlow_GetFaintRec(BtlServerFlow *flow);
 BOOL BtlServerFlow_IsMonInBattle(BtlServerFlow *flow, u8 monId);
 u32 BtlServerFlow_GetBattleType(BtlServerFlow *flow);

@@ -143,7 +143,7 @@ static void HideTask_Exit(FieldEffectTask *task, void *work) {
     HideTask *hideTask = work;
 
     if (FldAct_CheckIdentity(hideTask->params.actor, &hideTask->identity) == TRUE) {
-        FldmmdlMove_SetHideEffect(hideTask->params.actor, NULL);
+        FieldActorMove_SetHideEffect(hideTask->params.actor, NULL);
     }
 }
 

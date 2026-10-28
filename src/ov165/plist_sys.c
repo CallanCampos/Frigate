@@ -122,8 +122,8 @@ static u16 PokeList_GetBagCount(PokeListWork *wk, u16 item);
 // of PokeList_InitGraphics; this one is declared ahead of them, and its place there sets its place in .rodata
 static const BGSetup sBG0Setup = { 0, 0, 0x800, 0, 1, GX_BG_COLORMODE_16, 0xf, 6, 0x8000, 0, 0, 0, 0 };
 
-// The moves outside battle, by the index of their check in CheckAllowHidenEvent
-static const u16 sHidenMoves[] = {
+// The moves outside battle, by the index of their check in CheckAllowHMEvent
+static const u16 sHMMoves[] = {
     MOVE_CUT, MOVE_SURF,        MOVE_WATERFALL, MOVE_STRENGTH, MOVE_FLY,        MOVE_FLASH,      MOVE_TELEPORT,
     MOVE_DIG, MOVE_SWEET_SCENT, MOVE_CHATTER,   MOVE_DIVE,     MOVE_MILK_DRINK, MOVE_SOFTBOILED,
 };
@@ -177,7 +177,7 @@ BOOL PokeList_Init(PokeListWork *wk) {
         wk->wasMode1A = FALSE;
     }
     if (wk->param->mode == 6 && wk->param->move == 0) {
-        wk->param->move = PML_ItemGetTMWazaID(wk->param->item);
+        wk->param->move = PML_ItemGetTMMoveID(wk->param->item);
     }
     PokeList_InitGraphics(wk);
     PokeList_LoadResources(wk);
@@ -2331,9 +2331,9 @@ static void PokeList_DoMenuItem(PokeListWork *wk) {
                 PokeList_ShowItemUseless(wk);
             }
         } else {
-            u32 hiden = PokeList_GetHidenResult(wk->pkm, wk->menuItem - 16);
+            u32 hm = PokeList_GetHMResult(wk->pkm, wk->menuItem - 16);
 
-            if (hiden == 22 || hiden == 23) {
+            if (hm == 22 || hm == 23) {
                 if (IsZoneNormal(wk->param->zoneId) == FALSE) {
                     PokeList_ShowMessage(wk, 0x51, TRUE, PokeList_MessageDoneSelect);
                 } else {
@@ -2355,11 +2355,11 @@ static void PokeList_DoMenuItem(PokeListWork *wk) {
                     }
                 }
             } else {
-                switch (CheckAllowHidenEvent(hiden - 11, &wk->param->action)) {
+                switch (CheckAllowHMEvent(hm - 11, &wk->param->action)) {
                 case 0:
                     wk->state = 19;
                     wk->param->index = wk->cursorPos;
-                    wk->param->result = hiden;
+                    wk->param->result = hm;
                     break;
                 case 1:
                     PokeList_ShowMessage(wk, 0x51, TRUE, PokeList_MessageDoneSelect);
@@ -2369,7 +2369,7 @@ static void PokeList_DoMenuItem(PokeListWork *wk) {
                     break;
                 case 3:
                     PokeListMessage_CreateWordSet(wk, wk->message);
-                    PokeListMessage_SetMoveName(wk, wk->message, 0, *(sHidenMoves + hiden - 11));
+                    PokeListMessage_SetMoveName(wk, wk->message, 0, *(sHMMoves + hm - 11));
                     PokeList_ShowMessage(wk, 0xab, TRUE, PokeList_MessageDoneSelect);
                     PokeListMessage_FreeWordSet(wk, wk->message);
                     break;
@@ -2483,7 +2483,7 @@ static void PokeList_EndSwap(PokeListWork *wk) {
 }
 
 // The result that a move used outside battle ends the list with, or 0 for a move that can't be
-u32 PokeList_GetHidenResult(PartyPkm *pkm, u8 slot) {
+u32 PokeList_GetHMResult(PartyPkm *pkm, u8 slot) {
     switch (PokeParty_GetParam(pkm, PKM_PARAM_MOVE1 + slot, NULL)) {
     case MOVE_CUT:
         return 11;

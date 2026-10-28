@@ -9,7 +9,7 @@
 #include "app/musical/mus_poke_draw.h"
 #include "app/musical/sta_act_effect.h"
 #include "field/musical.h"
-#include "gfl/blact.h"
+#include "gfl/billboard_actor.h"
 #include "gfl/heap.h"
 #include "nitro/fx.h"
 #include "struct_decls.h"
@@ -61,7 +61,7 @@ struct StaActPokeSys {
     HeapID heapId;
     // NULL in the photo
     StaActing *stage;
-    BlActScene *blact;
+    BillboardActorScene *billboardActor;
     MusPokeDrawSys *pokeDraw;
     MusItemDrawSys *itemDraw;
     StaActPoke pokes[4];
@@ -73,7 +73,7 @@ struct StaActPokeSys {
 };
 
 StaActPokeSys *StaActPoke_InitSystem(HeapID heapId, StaActing *stage, MusPokeDrawSys *pokeDraw,
-                                     MusItemDrawSys *itemDraw, BlActScene *blact);
+                                     MusItemDrawSys *itemDraw, BillboardActorScene *billboardActor);
 void StaActPoke_TermSystem(StaActPokeSys *sys);
 void StaActPoke_UpdateSystem(StaActPokeSys *sys);
 // Places the props, after the sprites are drawn and their marker cells known, and runs their effects

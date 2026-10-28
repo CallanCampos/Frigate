@@ -2965,7 +2965,7 @@
     .2byte \a0
     .endm
 
-    .macro ScriptNative_SetMmdlZoneDeleteOff a0
+    .macro ScriptNative_SetActorZoneDeleteOff a0
     FieldCommand 558
     .2byte \a0
     .endm
@@ -3263,7 +3263,7 @@
     .2byte \a1
     .endm
 
-    .macro MedalGetGuruActor a0, a1
+    .macro MedalGetSpinTradeActor a0, a1
     FieldCommand 626
     .2byte \a0
     .2byte \a1

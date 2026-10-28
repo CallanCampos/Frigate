@@ -24,8 +24,8 @@ void UnionEff_Update(UnionEffect *work);
 void UnionEff_Draw(UnionEffect *work);
 // Focus on an actor
 void UnionEff_AddFocus(UnionEffect *work, FieldActor *actor);
-// Put a mark over an actor, the asonda one when asonda is TRUE and else the tomo one
-void UnionEff_AddMark(UnionEffect *work, FieldActor *actor, BOOL asonda);
+// Put a mark over an actor, the played one when played is TRUE and else the friend one
+void UnionEff_AddMark(UnionEffect *work, FieldActor *actor, BOOL played);
 // Take the mark off an actor
 void UnionEff_RemoveMark(UnionEffect *work, FieldActor *actor);
 

@@ -16,7 +16,7 @@
 #include "constants/battle.h"
 #include "constants/items.h"
 #include "pml/item.h"
-#include "pml/waza.h"
+#include "pml/move.h"
 
 // The strongest moves Forewarn found, one entry per move
 typedef struct ForewarnEntry {

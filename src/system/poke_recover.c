@@ -1,7 +1,7 @@
 #include "types.h"
 #include "constants/pokemon.h"
+#include "pml/move.h"
 #include "pml/poke_party.h"
-#include "pml/waza.h"
 
 // Restoring a Pokémon's PP, and healing a Pokémon and a party. The file's name is a guess, from what it does: the
 // ROM has no string for it. The functions' names are swan's (https://github.com/ds-pokemon-hacking/swan, GPL-3.0)

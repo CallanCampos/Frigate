@@ -4,38 +4,38 @@
     .data       start:0x021a4840 end:0x021a4860 kind:data align:32
     .bss        start:0x021a4860 end:0x021a4860 kind:bss align:32
 
-src/ov300/zukansearch.c:
+src/ov300/pokedex_search.c:
     complete
     .text       start:0x0219fc00 end:0x0219fc54
     .rodata     start:0x021a40d4 end:0x021a40e0
 
-src/ov300/zknsearch_main.c:
+src/ov300/pokedex_search_main.c:
     complete
     .text       start:0x0219fc54 end:0x021a0910
     .rodata     start:0x021a40e0 end:0x021a4254
     .data       start:0x021a4840 end:0x021a4860
 
-src/ov300/zknsearch_seq.c:
+src/ov300/pokedex_search_seq.c:
     complete
     .text       start:0x021a0910 end:0x021a1d28
     .rodata     start:0x021a4254 end:0x021a42c0
 
-src/ov300/zknsearch_bmp.c:
+src/ov300/pokedex_search_bmp.c:
     complete
     .text       start:0x021a1d28 end:0x021a26ec
     .rodata     start:0x021a42c0 end:0x021a4320
 
-src/ov300/zknsearch_obj.c:
+src/ov300/pokedex_search_obj.c:
     complete
     .text       start:0x021a26ec end:0x021a386c
     .rodata     start:0x021a4320 end:0x021a44d4
 
-src/ov300/zknsearch_ui.c:
+src/ov300/pokedex_search_ui.c:
     complete
     .text       start:0x021a386c end:0x021a3bf4
     .rodata     start:0x021a44d4 end:0x021a45a4
 
-src/ov300/zknsearch_list.c:
+src/ov300/pokedex_search_list.c:
     complete
     .text       start:0x021a3bf4 end:0x021a40d4
     .rodata     start:0x021a45a4 end:0x021a4828

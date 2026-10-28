@@ -10,9 +10,9 @@
 #include "constants/pokemon.h"
 #include "gfl/heap.h"
 #include "pml/item.h"
+#include "pml/move.h"
 #include "pml/personal.h"
 #include "pml/poke_party.h"
-#include "pml/waza.h"
 
 // A numerator and a denominator
 typedef struct {

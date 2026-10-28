@@ -30,7 +30,7 @@
 #include "save/dream_world.h"
 #include "save/event_work.h"
 #include "save/player_info.h"
-#include "save/pokedex.h"
+#include "save/pokedex_savedata.h"
 #include "save/save_control.h"
 #include "save/trainer_card.h"
 #include "system/bmp_menulist.h"

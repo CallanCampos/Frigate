@@ -42,7 +42,7 @@ L_0075:
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_00BF
     FlagReset EVENT_FLAG_0x02ea
-    MedalGetGuruActor 0x8010, 0x8024
+    MedalGetSpinTradeActor 0x8010, 0x8024
     VMStackPush 0x8010
     VMStackPushConst 0
     VMStackCmp CMP_EQ
@@ -54,7 +54,7 @@ L_00B3:
     VMJump L_00E0
 
 L_00BF:
-    MedalGetGuruActor 0x8010, 0x8024
+    MedalGetSpinTradeActor 0x8010, 0x8024
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ

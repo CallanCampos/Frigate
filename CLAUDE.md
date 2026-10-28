@@ -14,14 +14,17 @@ a rule here changes, change it there too.
   does, and an incremental build hides those in files it didn't rebuild. Black 2 is primary. White 2 shares the source (`BLACK2`/`WHITE2` defines) and gets its configs through the version map, so
   change configs only with the scripts, which update both versions and record what they did:
   `add_source_file.py`, `mark_complete.py`, `rename_symbol.py`, `config_fixes.py`.
-- **One source file per original file**, named after the ROM's embedded string, or descriptively, with the guess said
-  in the header and the commit; never an overlay number. Functions go in address order, and in reverse for SPL,
+- **One source file per original file**, named in English after the ROM's embedded string (`pokedex_registration.c` is
+  `pokedex_registration.c`, with the ROM's name in the header), or descriptively, with the guess said in the header and
+  the commit; never an overlay number. Functions go in address order, and in reverse for SPL,
   whose `1.2/base` compiler emits them reversed. `src/` is code built with the game's compiler: `src/ovNNN/` for overlays,
   `src/gfl` and `src/system` for main, by link order. Libraries built apart, with their own compiler, go in
   `lib/<name>/{include,src}` with a `library.toml`: `lib/spl`, `lib/dsprot`, `lib/nitro` (RC4 so far) and
   `lib/nnsys` (FND and GFD so far).
   `docs/code-organization.md` has the rest.
-- **Names:** swan's first, marked as swan's in the header. Our own go through `rename_symbol.py`, which records them
+- **Names:** in English, never a Japanese word or one of Game Freak's private abbreviations (`zukan` is `Pokedex`,
+  `fldmmdl` `FieldActor`, `blact` `BillboardActor`); well-known acronyms such as BGM, SE, HP, TM and NPC stay. The user
+  chose this on 2026-10-28. swan's first, translated the same way, marked as swan's in the header. Our own go through `rename_symbol.py`, which records them
   in `config/names.txt`. Types swan doesn't name are named after their owner. Rename a static's symbol to its C name.
   Library code in `lib/` (NitroSDK, NitroSystem, TwlSDK, DWC) uses the SDK's own names where the code shows them, even
   over swan's; the header notes swan's name where it differs. The user chose this.
@@ -51,7 +54,8 @@ a rule here changes, change it there too.
   step is obvious. Ask only real decisions, such as placement with no evidence or a change of scope. Answer any message
   the user sends mid-turn.
 - **Claim an overlay before working on it.** For any overlay decompilation or matching work, find its open
-  `[Decomp] Overlay NNN` GitHub issue and read its comments before editing or delegating edits. If someone has an
+  `[Decomp] Overlay NNN` GitHub issue, and for naming work its `[Names] Overlay NNN` issue (the `name-symbols` skill),
+  and read its comments before editing or delegating edits. If someone has an
   active claim in a comment, choose another overlay; if the user specified that overlay, tell them it is claimed.
   Otherwise comment `Claiming overlay NNN for decompilation` with the file or range you will start with, recheck
   the comments for a concurrent earlier claim, then proceed. A claim stays active until its author explicitly
@@ -97,6 +101,8 @@ a rule here changes, change it there too.
 | Add a file to both versions | `.venv/bin/python tools/decomp/add_source_file.py src/X.c overlays/ov033 .text:A-B ... --incomplete` |
 | Mark complete | `.venv/bin/python tools/decomp/mark_complete.py src/X.c` |
 | Name a symbol | `.venv/bin/python tools/decomp/rename_symbol.py func_ov033_0217acd4 Name` |
+| What is left to name | `.venv/bin/python tools/decomp/naming_report.py [--module ov033]` |
+| Script commands after renaming handlers | `.venv/bin/python tools/script/sync_handler_names.py` |
 | Rename a constant of `generated/` and its uses | `.venv/bin/python tools/data/rename_constant.py OLD NEW` |
 | Progress of the local build | `ninja progress` |
 | Build and verify | `python3 configure.py && ninja 2>&1 \| tail -20` (configure only when source files were added) |
@@ -106,6 +112,8 @@ a rule here changes, change it there too.
 
 Skills in `.claude/skills/`, with Codex copies in `.agents/skills/` that change with them in the same commit:
 - `decomp-file`: the whole loop for one original file, from boundaries to commit.
+- `name-symbols`: naming a decompiled module from its `[Names]` issue: address-named functions and data, `unk` fields,
+  placeholder parameters, and bare numbers that should be constants, with `naming_report.py`.
 - `match-function`: the triage-and-levers loop for a function that doesn't match, with its stop rules, the symptom
   index (`levers.md`) and the capped permuter (`permuter.md`).
 - `fix-build`: a link, module-check, SHA1 or White 2-only failure.

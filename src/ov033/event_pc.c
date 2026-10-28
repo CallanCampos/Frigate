@@ -41,7 +41,7 @@ GameEventReturnCode Scrcmd_SubProcEventMain(GameEvent *event, u32 *state, void *
     switch (*state) {
     case 0:
         next = EventFieldSubprocessTransition_Create(data->gsys, data->field, OVERLAY_ID(256),
-                                                     &DENDOU_PC_PROC_FUNCTIONS, &data->gameData);
+                                                     &HALL_OF_FAME_PC_PROC_FUNCTIONS, &data->gameData);
         GameEvent_ChainNext(event, next);
         (*state)++;
         break;

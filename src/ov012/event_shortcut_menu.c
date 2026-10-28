@@ -1,6 +1,6 @@
 #include "types.h"
 #include "app/p_status.h"
-#include "app/zukan.h"
+#include "app/pokedex.h"
 #include "constants/bag.h"
 #include "constants/items.h"
 #include "constants/pokemon.h"
@@ -212,7 +212,7 @@ GameEventReturnCode EventShortcutChoicePopup_Callback(GameEvent *event, u32 *sta
         EnableAllActorsMovement(Field_GetActorSystem(work->field));
         CalcPlayerActionPossibilities(work->field, &possibilities);
         HiddenEventArgs_Set(&args, work->input->partySlot, work->input->eventId, work->input->eventValue);
-        next = CreateHidenEvent(work->input->eventId, &args, &possibilities);
+        next = CreateHMEvent(work->input->eventId, &args, &possibilities);
         if (next != NULL) {
             GameEvent_ChainNext(event, next);
         }
@@ -318,7 +318,7 @@ GameEventReturnCode EventShortcutCallDirect_Callback(GameEvent *event, u32 *stat
         EnableAllActorsMovement(Field_GetActorSystem(work->field));
         CalcPlayerActionPossibilities(work->field, &possibilities);
         HiddenEventArgs_Set(&args, work->input->partySlot, work->input->eventId, work->input->eventValue);
-        next = CreateHidenEvent(work->input->eventId, &args, &possibilities);
+        next = CreateHMEvent(work->input->eventId, &args, &possibilities);
         if (next != NULL) {
             GameEvent_ChainNext(event, next);
         }
@@ -397,36 +397,36 @@ u32 ShortcutMenu_SetKeyItemID(FieldAppCallInput *input, u32 item) {
         input->appParam = BAG_POCKET_FREE_SPACE;
         return 0;
     case SHORTCUT_POKEDEX_LIST:
-        input->appId = FIELD_APP_ZUKAN;
-        input->appParam = ZUKAN_START_LIST;
+        input->appId = FIELD_APP_POKEDEX;
+        input->appParam = POKEDEX_START_LIST;
         return 0;
     case SHORTCUT_POKEDEX_SEARCH:
-        input->appId = FIELD_APP_ZUKAN;
-        input->appParam = ZUKAN_START_SEARCH;
+        input->appId = FIELD_APP_POKEDEX;
+        input->appParam = POKEDEX_START_SEARCH;
         return 0;
     case SHORTCUT_POKEDEX_INFO:
-        input->appId = FIELD_APP_ZUKAN;
-        input->appParam = ZUKAN_START_INFO;
+        input->appId = FIELD_APP_POKEDEX;
+        input->appParam = POKEDEX_START_INFO;
         return 0;
     case SHORTCUT_POKEDEX_MAP:
-        input->appId = FIELD_APP_ZUKAN;
-        input->appParam = ZUKAN_START_MAP;
+        input->appId = FIELD_APP_POKEDEX;
+        input->appParam = POKEDEX_START_MAP;
         return 0;
     case SHORTCUT_POKEDEX_VOICE:
-        input->appId = FIELD_APP_ZUKAN;
-        input->appParam = ZUKAN_START_VOICE;
+        input->appId = FIELD_APP_POKEDEX;
+        input->appParam = POKEDEX_START_VOICE;
         return 0;
     case SHORTCUT_POKEDEX_FORM:
-        input->appId = FIELD_APP_ZUKAN;
-        input->appParam = ZUKAN_START_FORM;
+        input->appId = FIELD_APP_POKEDEX;
+        input->appParam = POKEDEX_START_FORM;
         return 0;
     case SHORTCUT_POKEDEX_AWARDS:
-        input->appId = FIELD_APP_ZUKAN;
-        input->appParam = ZUKAN_START_AWARDS;
+        input->appId = FIELD_APP_POKEDEX;
+        input->appParam = POKEDEX_START_AWARDS;
         return 0;
     case SHORTCUT_POKEDEX_HABITAT:
-        input->appId = FIELD_APP_ZUKAN;
-        input->appParam = ZUKAN_START_HABITATS;
+        input->appId = FIELD_APP_POKEDEX;
+        input->appParam = POKEDEX_START_HABITATS;
         return 0;
     case SHORTCUT_TRAINER_CARD_FRONT:
         input->appId = FIELD_APP_TRAINER_CARD;
@@ -458,7 +458,7 @@ u32 ShortcutMenu_SetKeyItemID(FieldAppCallInput *input, u32 item) {
         input->appParam = ITEM_REVEAL_GLASS;
         return 0;
     default:
-        input->appId = FIELD_APP_ZUKAN;
+        input->appId = FIELD_APP_POKEDEX;
         return 0;
     }
 }

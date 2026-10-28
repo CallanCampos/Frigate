@@ -1388,7 +1388,7 @@ static GameEventReturnCode EventSurfExit_Callback(GameEvent *event, u32 *state, 
     case 1: {
         u16 acmd;
 
-        FldeffNamipoke_SetFollowMode(FieldPlayer_GetRideEffect(player), 0);
+        FldeffSurfPokemon_SetFollowMode(FieldPlayer_GetRideEffect(player), 0);
         FieldPlayer_SetSpecialSeq(player, 1);
         FieldPlayer_FinishFormChange(player);
         acmd = GetAcmdForDir(work->dir, ACMD_JUMP_1);

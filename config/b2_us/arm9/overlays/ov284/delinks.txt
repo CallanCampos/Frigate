@@ -4,25 +4,25 @@
     .data       start:0x021e80a0 end:0x021e8100 kind:data align:32
     .bss        start:0x021e8100 end:0x021e8100 kind:bss align:32
 
-src/ov284/shinka_demo_graphic.c:
+src/ov284/evolution_demo_graphic.c:
     .text       start:0x021e49b0 end:0x021e4dd0
     .rodata     start:0x021e7dd8 end:0x021e7f80
     .data       start:0x021e80b0 end:0x021e80c8
     complete
 
-src/ov284/shinka_demo_effect.c:
+src/ov284/evolution_demo_effect.c:
     .text       start:0x021e7824 end:0x021e7d9c
     .rodata     start:0x021e7ff4 end:0x021e8098
     .data       start:0x021e80dc end:0x021e8100
     complete
 
-src/ov284/shinka_demo_view.c:
+src/ov284/evolution_demo_view.c:
     complete
     .text       start:0x021e4dd0 end:0x021e7824
     .rodata     start:0x021e7f80 end:0x021e7ff4
     .data       start:0x021e80c8 end:0x021e80dc
 
-src/ov284/shinka_demo.c:
+src/ov284/evolution_demo.c:
     .text       start:0x021e30e0 end:0x021e49b0
     .rodata     start:0x021e7d9c end:0x021e7dd8
     .data       start:0x021e80a0 end:0x021e80b0

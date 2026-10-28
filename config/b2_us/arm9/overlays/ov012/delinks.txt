@@ -126,7 +126,7 @@ src/ov012/scrcmd_proc.c:
     .text       start:0x021574a4 end:0x02157c20
     .data       start:0x0216e208 end:0x0216e218
 
-src/ov012/scrcmd_sodateya.c:
+src/ov012/scrcmd_day_care.c:
     complete
     .text       start:0x02157c20 end:0x021580c4
     .data       start:0x0216e218 end:0x0216e22c
@@ -142,7 +142,7 @@ src/ov012/field_encount_st.c:
     .rodata     start:0x0216ca34 end:0x0216ca74
     .data       start:0x0216e240 end:0x0216e254
 
-src/ov012/hiden_event.c:
+src/ov012/hm_event.c:
     complete
     .text       start:0x02159230 end:0x02159bc0
     .rodata     start:0x0216ca74 end:0x0216cb38
@@ -357,7 +357,7 @@ src/ov012/oneshot_dr.c:
     .text       start:0x0216598c end:0x021659ec
     .rodata     start:0x0216dc1c end:0x0216dc3c
 
-src/ov012/namein_setup.c:
+src/ov012/name_input_setup.c:
     complete
     .text       start:0x021659ec end:0x02165b1c
     .data       start:0x0216e3a0 end:0x0216e3b0
@@ -372,7 +372,7 @@ src/ov012/event_bsubway.c:
     .text       start:0x02165eb8 end:0x02166664
     .rodata     start:0x0216dc5c end:0x0216dc68
 
-src/ov012/fldmmdl.c:
+src/ov012/field_actor.c:
     complete
     .text       start:0x02166664 end:0x02168320
     .data       start:0x0216e3b0 end:0x0216e5cc
@@ -392,7 +392,7 @@ src/ov012/scrcmd_sp_poke.c:
     complete
     .text       start:0x02169c1c end:0x02169c7c
 
-src/ov012/waza_oshie.c:
+src/ov012/move_tutor.c:
     complete
     .text       start:0x02169c7c end:0x02169e18
     .data       start:0x0216e5fc end:0x0216e60c

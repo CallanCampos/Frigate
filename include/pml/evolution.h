@@ -5,7 +5,7 @@
 #include "gfl/heap.h"
 #include "struct_decls.h"
 
-// The check of whether a Pokémon evolves (shinka_check.c, named by the ROM's string). CheckEvolveSpecies,
+// The check of whether a Pokémon evolves (evolution_check.c, shinka_check.c by the ROM's string). CheckEvolveSpecies,
 // loadEvolutionFile, getEvolutionInfoFile and CheckPokeMoveLearned are swan's names
 // (https://github.com/ds-pokemon-hacking/swan, GPL-3.0). loadEvolutionFile and getEvolutionInfoParam are declared in
 // pml/personal.h

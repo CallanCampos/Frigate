@@ -47,7 +47,7 @@ struct FieldAppCallInput {
 // The apps of FIELD_PROC_LINK_LIST, by index
 enum {
     FIELD_APP_POKELIST,
-    FIELD_APP_ZUKAN,
+    FIELD_APP_POKEDEX,
     FIELD_APP_BAG,
     FIELD_APP_TRAINER_CARD,
     FIELD_APP_SAVE,
@@ -57,7 +57,7 @@ enum {
     FIELD_APP_TOWNMAP,
     FIELD_APP_WIFI_NOTE,
     FIELD_APP_MAIL,
-    FIELD_APP_SHINKA_DEMO,
+    FIELD_APP_EVOLUTION_DEMO,
     FIELD_APP_BATTLE_RECORDER,
     FIELD_APP_XTRANSCEIVER,
     FIELD_APP_MEDALBOX,
@@ -108,8 +108,8 @@ extern const FieldProcLink FIELD_PROC_LINK_LIST[FIELD_APP_MAX];
 
 void *FieldAppCall_CreatePokeListParam(FieldAppCallWork *work, s32 appParam, s32 prevAppId, const void *prevParam);
 u32 FieldAppCall_GetPokeListResult(FieldAppCallWork *work, void *param);
-void *FieldAppCall_CreateZukanParam(FieldAppCallWork *work, s32 appParam, s32 prevAppId, const void *prevParam);
-u32 FieldAppCall_GetZukanResult(FieldAppCallWork *work, void *param);
+void *FieldAppCall_CreatePokedexParam(FieldAppCallWork *work, s32 appParam, s32 prevAppId, const void *prevParam);
+u32 FieldAppCall_GetPokedexResult(FieldAppCallWork *work, void *param);
 void *FieldAppCall_CreatePStatusParam(FieldAppCallWork *work, s32 appParam, s32 prevAppId, const void *prevParam);
 u32 FieldAppCall_GetPStatusResult(FieldAppCallWork *work, void *param);
 u32 FieldAppCall_GetBagMode(GameSystem *gsys);
@@ -128,7 +128,7 @@ void *FieldAppCall_CreateMailParam(FieldAppCallWork *work, s32 appParam, s32 pre
 u32 FieldAppCall_GetMailResult(FieldAppCallWork *work, void *param);
 void FieldAppCall_FreeMailParam(void *param);
 void *script_evo(FieldAppCallWork *work, s32 appParam, s32 prevAppId, const void *prevParam);
-u32 FieldAppCall_GetShinkaDemoResult(FieldAppCallWork *work, void *param);
+u32 FieldAppCall_GetEvolutionDemoResult(FieldAppCallWork *work, void *param);
 void *FieldAppCall_CreateBattleRecorderParam(FieldAppCallWork *work, s32 appParam, s32 prevAppId,
                                              const void *prevParam);
 u32 FieldAppCall_GetBattleRecorderResult(FieldAppCallWork *work, void *param);

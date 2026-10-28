@@ -3,6 +3,17 @@
 What port work taught that isn't obvious from the code, newest first. A lesson about MWCC or the decomp's own
 workflow goes in the decomp checkout instead; this file is the port's ([CLAUDE.md](../CLAUDE.md), the iteration loop).
 
+## 2026-10-28: validate the whole Standards pipeline after naming imports
+
+- A large rename can make inherited lines appear newly added. A passing formatter does not prove the added-line
+  rules pass. Run the workflow's formatter, style checker and fixtures, configuration-copy, names and row checks
+  before publishing a refreshed sync; keep the source of every failure visible.
+- Preserve original DS behavior with explicit native guards when inherited undefined reads need host safety. The
+  actual touch scanner reproduces an out-of-bounds read on unterminated tables; extra end entries preserve valid
+  hit precedence. Production zero-init can hide an uninitialized argument, so the actual-source regression fixture
+  uses pattern init only for itself. Keep original negative controls as diagnostic evidence, without rewriting
+  source to manufacture failures in the permanent build.
+
 ## 2026-10-28: isolate host-library names without losing dump globals
 
 - GameSpy's BSD socket names can interpose on a shared SDL3's display libraries on ELF. Hidden game symbols keep

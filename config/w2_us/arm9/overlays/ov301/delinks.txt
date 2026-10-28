@@ -3,7 +3,7 @@
     .ctor       start:0x021a0380 end:0x021a0380 kind:rodata align:4
     .bss        start:0x021a03a0 end:0x021a03a0 kind:bss align:32
 
-src/ov301/zukan_open.c:
+src/ov301/pokedex_open.c:
     complete
     .text       start:0x0219fc00 end:0x021a027c
     .rodata     start:0x021a027c end:0x021a0380

@@ -40,7 +40,7 @@
 #include "save/config.h"
 #include "save/high_link.h"
 #include "save/player_info.h"
-#include "save/pokedex.h"
+#include "save/pokedex_savedata.h"
 #include "save/records.h"
 #include "save/save_control.h"
 #include "system/app_keycursor.h"

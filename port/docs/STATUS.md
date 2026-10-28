@@ -32,10 +32,131 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
 
+## 2026-10-28: integrate reviewed trainer-AI sequencing into the final sync proposal
+
+- **Upstream:** proposed `b7ce134e0c`; reviewed main is now `9440367870`, after PR 57 passed all 14 checks and a
+  normal protected merge. This remains the existing sync proposal, not a completed upstream sync of main.
+- **Port:** `PORT_SHA`, a real merge of that reviewed main into the bounded fourteen-commit proposal and tested
+  Pokédex safety companion. No experimental SDK CPU reader is imported.
+- **ROM (T0):** the Pokédex companion `251f932888` passes both original hashes with zero warnings and four of four
+  actual MWCC preprocessing comparisons. PR 57 head `3c28971eef` also passes both hashes. This merged head requires
+  fresh configure/Ninja and both hashes before publication/merge; prior results are not transferred.
+- **Host build/tests (T1/T2):** PR 57's exact-head canonical suites pass B2 349/28 explicit skips of 377 and W2
+  346/28 of 374, zero failures, owner status 57497595373. The companion's two actual Pokédex fixtures pass ordinary
+  and full fatal LLVM builds, including 98,304 real touch searches and six form flows. New-head full gates remain due.
+- **Replay/oracle/sanitizers/performance/play (T3/T4/T5/T6/T7):** no new completed gameplay or timing-parity claim.
+  Preserve all input/seed/reference/mask/budget/sanitizer policies. The three AI sequencing locals remain the only
+  AI source difference from frozen upstream; the actual-source selector and VM tests are retained intact.
+- **Tiers/trap stubs:** no new scan; reviewed source sequencing and host bounds do not complete native features.
+- **64-bit warnings:** the prior AI exact-head guard passes 365 sites/229 keys, real 66, 1,708 compiled inputs and
+  zero missing. New-head verification repeats it.
+- **Work done:** resolve five integration conflicts by retaining both additions. The AI and Pokédex CMake blocks
+  remain byte-identical to their reviewed/tested parents, including generator, fatal sanitizer and fixture-only
+  pattern policies. The integration guide has one combined module table and both evidence/limit sections. The
+  STATUS union preserves all 110 parent sections in both parents' order; common differences only fill PORT_SHA.
+  The game-change ledger retains both the AI and Pokédex/format entries. Original port adaptations remain intact.
+- **Next:** publish this final integrated head to the existing sync PR; run exact-head canonical and hosted gates,
+  owner review, then merge normally. Continue the separately preserved shared-controller CPU work afterward.
+- **Blockers:** no human action blocks validation. Final integrated-head gates remain required; native timing and
+  Spanish issue 45's missing gameplay/save evidence remain unfinished.
+
+## 2026-10-28: guard inherited Pokédex reads on native hosts
+
+- **Upstream:** proposed `b7ce134e0c`, still fourteen naming commits beyond `fd3b9e600d`; reviewed main is
+  `71eabc1eb0`. These two bug notes and original behaviors already exist in main under the former filenames.
+  This is a safety companion for the existing sync proposal, not a completed sync of main.
+- **Port:** `251f932888`, on the local sync-resolution branch. Two `PLATFORM_PC`/optional `BUGFIX` guards bound the
+  habitat touch scans and explicitly pass form 0 for an unknown picture. Known saved forms remain unchanged.
+- **ROM (T0):** fresh configure/Ninja, 9,610 steps, zero warnings, both original hashes match: B2
+  `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb`, W2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`.
+  Actual MWCC preprocessing of both changed owners matches `76daa0e43f` in both versions, four of four streams.
+- **Host build/tests (T1/T2):** both actual-source fixtures pass in ordinary and full LLVM 23 fatal ASan/UBSan
+  configurations, two of two per mode, zero skips. All 98,304 real GFL searches match an independently bounded
+  first-hit calculation; inclusive edges, overlapping-area precedence and no-hit behavior are retained. Six actual
+  list-selection flows cover both picture slots, unknown form 0, saved Unown form 7 and no-flip behavior.
+- **Replay/oracle/sanitizers/performance/play (T3/T4/T5/T6/T7):** no new complete Pokédex gameplay, asset or rendering
+  claim. New-head complete native/hosted gates remain required. Prior head `76daa0e43f` passes canonical B2
+  347/28 explicit skips of 375 and W2 344/28 of 372, zero failures, owner status 57500430587. Its later style failure
+  exposed these original bug notes; it is not transferred to this new head as a successful Standards result.
+- **Tiers/trap stubs:** no new scan; these bounds do not complete native gameplay features or original SDK support.
+- **64-bit warnings:** no new cast/type change. The prior canonical guard passes 365 sites/229 keys, real 66,
+  1,707 compiled inputs and zero missing; final-head verification must repeat it.
+- **Work done:** add one physical end entry per touch table without changing its logical count, existing coordinates
+  or order. The default DS path retains its original tokens/data. Set unknown form only for `SPECIES_NONE` immediately
+  before the original personal-data call; normal production zero-init already gives 0, so no new observed form crash
+  is claimed. Fixture TUs include the actual owners and link the remaining genuine game/SDK objects. The real touch
+  scanner itself has fatal sanitizers even in the ordinary test configuration. A fixture-only final pattern-init
+  flag prevents implicit zero-init concealing the form defect; the production object retains zero-init.
+  Private exact original-source controls produce an actual GFL scanner global-buffer-overflow (macOS SIGABRT) and
+  a form argument of 43,690 instead of 0. Those controls preserve their commands/hashes and stay out of the permanent
+  build. The strict style checker and its fixtures pass; no style suppression or sanitizer exception is added.
+- **Next:** combine this tested companion with reviewed main as required, publish the existing sync PR, run its
+  exact-head full gates and approve/merge normally. Continue the separate experimental shared-controller CPU reader
+  and original-game timing comparisons; its work is not imported into this sync.
+- **Blockers:** no human action blocks this safety correction. Final integrated-head gates remain due. Cloud Apple
+  runner capacity delays the independent AI PR; original input, seed, golden, budget and sanitizer policy stay fixed.
+  Spanish issue 45 remains open without gameplay/save evidence.
+
+## 2026-10-28: refresh the bounded naming proposal and satisfy required formatting
+
+- **Upstream:** proposed `b7ce134e0cdc91c4539112c050c20e634d74f40b`, fourteen commits beyond `fd3b9e600d`.
+  Four arrived after the previous proposal: day care/GTS/Forces of Nature, naming tools/report, and English archive/
+  text-bank names. Real merge `7412f62ba5` retains its provenance trailer. Main remains reviewed `71eabc1eb0`;
+  this is still the existing draft sync PR, not a completed sync of main.
+- **Port:** `76daa0e43f`, formatting-only companion and living path correction after the upstream import. No
+  reference/rewrite exception is used. Imported decomp configs equal upstream; incoming workflows are unchanged.
+- **ROM (T0):** fresh configure/Ninja, 1,768 steps, zero warnings, both original hashes match: B2
+  `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb`, W2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`.
+- **Host build/tests (T1/T2):** previous exact head `b7e5f7abbb` passes complete canonical builds and suites: B2
+  347 passed/28 explicit skips of 375; W2 344/28 of 372; zero failures, owner status 57497704204. These results
+  remain scoped to that head. New-head canonical and hosted gates must pass again before approval and merging.
+- **Replay/oracle/sanitizers/performance/play (T3/T4/T5/T6/T7):** no new gameplay, timing-parity or sanitizer claim.
+  Inputs, seeds, masks, references, budgets and sanitizer policy remain unchanged. Existing CARD/AI timing work
+  and the experimental reader remain separate; no unreviewed feature head is imported.
+- **Tiers/trap stubs:** no new scan; naming and organization do not complete a native feature.
+- **64-bit warnings:** the previous exact-head guard passes 365 sites/229 keys, real 66, 1,707 compiled inputs and
+  zero missing. New-head verification repeats it; no new port casts or narrowed fields are introduced.
+- **Work done:** an independent refreshed audit retains all 156 known added noncomment adaptation lines across all
+  32 affected adapted files: 151 literal/path/whitespace matches plus five verified callback renames, zero unmatched.
+  This does not claim whole-sync token equivalence. Day care's two pointer-valued setters survive its rename;
+  update the living game-change path to `day_care.c`. Only two obsolete archive constants remain in historical
+  research prose, which is intentionally retained. Required Standards CI exposed imported formatting; newer
+  upstream fixes the Hall of Fame layout, and three tiny companion corrections wrap one comment and two calls.
+  Independent lexical checks preserve all 1,522/1,079/2,029 C tokens, including literals; no assertion or `__LINE__`
+  occurs in those files. The pinned 23.1.1 audit's other 357 files pass, and the three corrected files pass too.
+  No formatter guard, source-standard rule or required check is weakened.
+- **Next:** publish this bounded refresh to the same draft, rerun exact-head canonical/hosted gates, incorporate
+  further reviewed main as necessary, then approve and merge normally. Continue the separate shared-controller
+  SDK CPU reader and authentic New Game/AI timing validation afterward.
+- **Blockers:** no human action blocks the proposal. Current-head checks remain due; the old head's formatting
+  failure cannot be treated as passing. Spanish issue 45 remains open without gameplay/save evidence.
+
+## 2026-10-28: adopt reviewed Linux support in the naming sync proposal
+
+- **Upstream:** proposed `0e2d7f0974`; this is still a bounded resolution for the existing draft sync PR.
+- **Port:** `b7e5f7abbb`, a real merge of reviewed main `71eabc1eb0` after PR 58 passed all 14 checks and owner review.
+- **ROM (T0):** the preceding sync head passes both original hashes with zero warnings; fresh integrated-head
+  verification repeats configure/Ninja before merge. This base update changes no ROM source.
+- **Host build/tests (T1/T2):** prior sync suites pass B2 345/29 explicit skips of 374 and W2 342/29 of 371.
+  Supplementary actual assembly-oracle CTests pass both games using the existing Unicorn Python environment:
+  B2 118.31 seconds, W2 101.79 seconds. The original suite's environment-dependent skip record remains unchanged.
+  New-head canonical checks repeat all native builds/tests, including the adopted Linux regressions.
+- **Replay/oracle/sanitizers/performance/play (T3/T4/T5/T6/T7):** no new gameplay or timing-parity claim; original
+  inputs, seeds, goldens, masks, budgets and sanitizer policy are unchanged. Hosted checks remain mandatory.
+- **Tiers/trap stubs:** no new scan; this integration does not complete a native feature.
+- **64-bit warnings:** both prior-version guards pass 365 sites/229 keys, real 66, 1,707 inputs/zero missing;
+  integrated-head verification repeats the guard.
+- **Work done:** retain both independent historical records and all reviewed Linux namespace/ELF dump support.
+  No upstream conflict resolution, decomp config or game adaptation is changed by this reviewed-base update.
+- **Next:** integrate further reviewed main as necessary, publish the existing sync PR and pass exact-head/hosted
+  gates before approval and normal merge. Continue general CARD CPU service after repository maintenance.
+- **Blockers:** no human action blocks verification. Required checks, native timing gaps and issue 45's Spanish
+  gameplay/save evidence remain unfinished.
+
 ## 2026-10-28: integrate the reviewed Linux visibility and dump fixes into AI sequencing
 
 - **Upstream:** `fd3b9e600d`, contained in reviewed main `71eabc1eb0`. The separate naming sync remains a proposal.
-- **Port:** `PORT_SHA`, a normal merge of reviewed main into PR 57; preserve both documentation additions.
+- **Port:** `3c28971eef`, a normal merge of reviewed main into PR 57; preserve both documentation additions.
 - **ROM (T0):** both original hashes passed with zero warnings on each previous head; the new integrated head
   repeats fresh configure/Ninja in its exact-head gate. No production AI or ROM source changed in this merge.
 - **Host build/tests (T1/T2):** prior AI head `3eec88afb4`: B2 348 passed/28 explicit skips of 376, W2 345/28 of
@@ -60,7 +181,7 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
 
 - **Upstream:** reviewed main remains `3ea5609ea3`, containing `fd3b9e600d`; the separate naming proposal is still
   local. This merges the contributor's concurrently published `6241265c6c` normally, preserving all their commits.
-- **Port:** `PORT_SHA`, after maintainer candidate `cd4588750f`. Retain the contributor's hidden-global regression
+- **Port:** `b9020ba00b`, after maintainer candidate `cd4588750f`. Retain the contributor's hidden-global regression
   and optional Clang/LLD target, plus the independent actual-policy host and executable/DSO tests. No force push.
 - **ROM (T0):** fresh configure/Ninja after combining the changes passes both original hashes with zero warnings.
   No source outside `port/` changes; all source/test evidence is retained separately from ROMs and saves.
@@ -154,6 +275,71 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
 - **Next:** this branch published as a pull request to `main`, T0 and the owner's review. Issue 45's Spanish
   gameplay and save evidence can now be gathered by playing the es build with a window.
 - **Blockers:** none.
+
+## 2026-10-28: validate the expanded naming sync and preserve port adaptations
+
+- **Upstream:** proposed `0e2d7f0974a9104d274f00ecaa8167fbfac7dfa1`, ten commits beyond reviewed main's
+  `fd3b9e600d`: Hall of Fame, HM, Pokédex, evolution/trade, moves, name entry, Union Room and field actors/effects.
+  This remains a proposal for the existing draft sync PR, not a completed sync of main. No reference/rewrite
+  exception is used; no incoming workflow changes exist.
+- **Port:** `f3a6ee4639`, on `codex/upstream-sync-c13587cf7872-3ea5609ea3e2`; real upstream merge with its
+  `Upstream-Commit` trailer and reviewed main `3ea5609ea3`. Pending feature/contributor PRs remain separate.
+- **ROM (T0):** fresh configure/Ninja, 9,607 steps, zero compiler warnings; both original hashes match: B2
+  `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb`, W2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`.
+- **Host build/tests (T1/T2):** complete arm64 macOS RelWithDebInfo builds pass. Full CTest: B2 345 passed,
+  29 explicit skips of 374; W2 342 passed, 29 skips of 371; zero failures. Skips comprise 24 absent DS oracle
+  fixtures, absent party timing fixtures, unavailable Python Unicorn, two unsupported Apple function-sanitizer
+  negatives and the single-architecture universal check. Supplementary assembly-oracle runs use the existing
+  Unicorn environment; their results are recorded separately in PR verification. No test policy is weakened.
+- **Replay/oracle/sanitizers/performance/play (T3/T4/T5/T6/T7):** existing native replay and applicable tests pass;
+  title timing passes both games and New Game timing passes B2. No new gameplay completion or full timing-parity
+  claim. Targeted MWCC preprocessing matches upstream for all four Hall of Fame C files and the Pokédex form C
+  file in both versions: ten of ten. Canonical exact-head and hosted PR checks remain merge gates.
+- **Tiers/trap stubs:** no new scan; this naming/organization sync does not complete native features. Previously
+  measured matching coverage remains separate from the unfinished CARD/DMA/AI timing and unsupported SDK paths.
+- **64-bit warnings:** both-version pointer guards pass: 365 sites in 229 keys (66 real, 123 harmless, 141 handled,
+  35 unreachable), 1,707 compiled inputs and zero missing; no increase.
+- **Work done:** retain full-width Hall of Fame handles/callbacks and the renamed Pokédex form callback; preserve
+  the ten `sizeof(HiddenEventData)` allocations. An independent audit checks all 32 incoming files carrying port
+  adaptations: all 156 previous added noncomment lines survive, 151 after path/whitespace normalization and five
+  verified callback renames. This additive-line audit is not a whole-sync token-equivalence claim. Imported decomp
+  configs equal upstream. Update the actual field-script test include and living source references for field-actor
+  renames; oracle changes only descriptive names, with identical logic, inputs, seeds, masks and goldens.
+- **Next:** finish feature/contributor review, incorporate reviewed main, and publish this bounded resolution to
+  the existing sync PR; rerun its exact-head local gates and require every hosted check before merging. Continue
+  general native CARD CPU service and original-DS timing comparison afterward.
+- **Blockers:** no human action blocks the sync resolution. Hosted/canonical validation remains due. Issue 45
+  remains open: Spanish gameplay and save/reload have no validating ROM dump or evidence here.
+
+## 2026-10-28: prepare the Hall of Fame/HM naming sync without losing port changes
+
+- **Upstream:** proposed `29b9dcfef987d1bb850afd62f687d36447c27c4b`, two naming commits beyond `fd3b9e600d`.
+  Reviewed main remains `b631907c33`, whose Compile, Standards and Frigate CI all pass. This is a local proposal,
+  not a completed sync of main; no reference/rewrite exception is used and no incoming workflow changes exist.
+- **Port:** `2cfb2f3330`, on `codex/upstream-sync-2026-10-28-hall-of-fame`; real upstream merge with its provenance
+  trailer. The proposal is not pushed. Independent Windows/AI/Linux contributor work is being reviewed separately.
+- **ROM (T0):** fresh configure/Ninja, 10,651 steps, zero warnings; both original hashes match: B2
+  `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb`, W2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`.
+- **Host build/tests (T1/T2):** not run for this proposal yet. Targeted MWCC preprocessing matches upstream for all
+  four renamed Hall of Fame demo C files in both versions: eight of eight, including the widened owning header.
+  An independent source-preservation proof checks all 89 incoming old/new paths: all other imported blobs match
+  upstream exactly, and all other ported source remains identical to reviewed main. Four incoming files retain
+  precisely their documented adaptations. A separate read-only review found no actionable issue.
+- **Replay/oracle/sanitizers/performance/play (T3/T4/T5/T6/T7):** no new runtime claim. Full integrated native builds,
+  suites, pointer guard, required hosted checks and exact-head verification remain due before protected merging.
+  Inputs, seeds, goldens, masks, budgets and sanitizer policy remain unchanged.
+- **Tiers/trap stubs:** no new scan; this imports names and organization, not a native-feature completion. Existing
+  tier/stub measurements and the unfinished CARD/DMA/AI timing limits remain separate from matching ROM coverage.
+- **64-bit warnings:** not rescanned yet; recheck the prior 365 sites/66 real and complete compilation after renames.
+- **Work done:** resolve two conflict owners using upstream's renamed structure: remove `ddemo_main.h` and preserve
+  `seHandle` as `uptr` in `hall_of_fame_demo_main.h`; keep the renamed callback declaration/definition and registration
+  parameter full-width in `hall_of_fame_demo_main.c`. The ten HM event `sizeof(HiddenEventData)` allocations and nine
+  existing mail-pointer casts survive. Config imports equal upstream; no decomp config is manually edited. The game
+  change ledger follows the three renamed port-adaptation paths. Original handoff work, saves and backups stay intact.
+- **Next:** finish the reviewed feature/contributor PRs, integrate their reviewed main into this proposal, then run
+  complete native/canonical checks and publish one bounded sync PR. Check for an existing bot proposal before push.
+- **Blockers:** no human action blocks this local resolution. Native/hosted validation and the reviewed-base update
+  remain unfinished. Issue 45 stays open until Spanish gameplay and save/reload evidence exists.
 
 ## 2026-10-28: integrate the reviewed Windows layout fix into AI sequencing
 
@@ -3254,6 +3440,7 @@ merges fall: above the PR 12 sync's entry, below the entries of PRs 20, 17 and 2
   it with a merge commit.
 - **Next:** the field's entry (PR 18).
 - **Blockers:** the field's external heap, until the field's entry.
+
 ## 2026-10-23: upstream sync `0a12a2bd3` merged (PR 12): the save's city state initialized by the game's own C
 
 This entry was added afterwards, by the entry above: the sync merged without one.
@@ -5676,6 +5863,7 @@ by the results here.
   from it, and every battle event. `NNSi_objSizeWTbl` and `NNSi_objSizeHTbl` (ARM9 main, NitroSystem G2D, no overlay
   issue and so no claim): the Pokédex, and any flipped or affine cell. `data_ov167_021d7490` (overlay 167, issue #120):
   the first move of any battle. Overlay 12's script data, as before.
+
 ## 2026-10-18: Frigate's test launcher for the field menu's apps (ADR 0012, proposed), on a branch of its own
 
 - **Upstream:** `045e97b90` (PR #364), merged by `5ad9a1e1d`; no sync, this task doesn't push.
@@ -6480,6 +6668,7 @@ by the results here.
   a save brings, with D7's sidecar, when a save from another console needs it.
 - **Blockers:** overlay 36 (issue #83) stops CONTINUE at the field's process table and gates the overworld; overlay
   12's script data stops New Game at the field's first script.
+
 ## 2026-10-17: gamepads, and the macOS app in a disk image
 
 - **Upstream:** `615939e25`, as merged into the port's `main` by `e1b68f578`.
@@ -6622,6 +6811,7 @@ by the results here.
   `rom_game_overlays`; `--screen-hashes` folded into `--run-dir`.
 - **Blockers:** overlay 36 (issue #83) gates phase 3, the overworld; overlays 11 and 182 (Wi-Fi, Download Play) only
   matter from phase 7.
+
 ## 2026-10-17: the intro as the DS draws it: libfx's products in place, and a replay checked against the oracle
 
 - **Upstream:** `e484d5011` (merge of PR #353), as in the last entry; no sync in this task.

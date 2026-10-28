@@ -29,7 +29,7 @@ static BOOL FestSparkle_IsBlockedRail(FesGimmick *gimmick, FestSparkleWork *work
 static FestSparkleZone *FestSparkle_GetZone(FestSparkleWork *work, u16 zoneId);
 
 void FestSparkle_Show(FesGimmick *gimmick, FestSparkleWork *work) {
-    FldeffFesKira_HideAll(gimmick->sparkles);
+    FldeffFesSparkle_HideAll(gimmick->sparkles);
     if (work->count != 0) {
         FestSparkle_ShowAll(gimmick, work);
     }
@@ -43,7 +43,7 @@ BOOL FestSparkle_End(FesGimmick *gimmick, FestSparkleWork *work) {
     } else {
         result = FALSE;
     }
-    FldeffFesKira_HideAll(gimmick->sparkles);
+    FldeffFesSparkle_HideAll(gimmick->sparkles);
     MI_CpuClear32(work, sizeof(FestSparkleWork));
     return result;
 }
@@ -55,7 +55,7 @@ GameEvent *FestSparkle_CheckPickUpGrid(FesGimmick *gimmick, const VecFx32 *posit
 
     for (i = 0; i < work->count; i++) {
         place = &work->places[work->placeIndex[i]];
-        if (FldeffFesKira_IsShown(gimmick->sparkles, i) && place->isRail == FALSE &&
+        if (FldeffFesSparkle_IsShown(gimmick->sparkles, i) && place->isRail == FALSE &&
             CheckBGPositionMatchGrid(place, position)) {
             return FestSparkle_PickUp(gimmick, work, i);
         }
@@ -71,7 +71,7 @@ GameEvent *FestSparkle_CheckPickUpRail(FesGimmick *gimmick, const RailPosition *
     Field_GetResolvedControllerTypeID(gimmick->field);
     for (i = 0; i < work->count; i++) {
         place = &work->places[work->placeIndex[i]];
-        if (FldeffFesKira_IsShown(gimmick->sparkles, i) && place->isRail == TRUE &&
+        if (FldeffFesSparkle_IsShown(gimmick->sparkles, i) && place->isRail == TRUE &&
             CheckBGPositionMatchRail(place, position)) {
             return FestSparkle_PickUp(gimmick, work, i);
         }
@@ -112,10 +112,10 @@ BOOL FestSparkle_IsOnTile(FesGimmick *gimmick, u16 x, u16 z, fx32 height) {
 
 static GameEvent *FestSparkle_PickUp(FesGimmick *gimmick, FestSparkleWork *work, u8 idx) {
     FestSparkleZone *zone = FestSparkle_GetZone(work, work->zoneId);
-    u16 value = FldeffFesKira_GetValue(gimmick->sparkles, idx);
+    u16 value = FldeffFesSparkle_GetValue(gimmick->sparkles, idx);
     GameEvent *event;
 
-    FldeffFesKira_Hide(gimmick->sparkles, idx);
+    FldeffFesSparkle_Hide(gimmick->sparkles, idx);
     zone->found[idx] = TRUE;
     if (value == 0) {
         return NULL;
@@ -153,7 +153,7 @@ static BOOL FestSparkle_ShowAll(FesGimmick *gimmick, FestSparkleWork *work) {
             }
             FieldRailSystem_GetLocationPos(gimmick->railSystem, &railPos, &pos);
         }
-        FldeffFesKira_Show(gimmick->sparkles, i, work->values[i], &pos);
+        FldeffFesSparkle_Show(gimmick->sparkles, i, work->values[i], &pos);
     }
     return TRUE;
 }

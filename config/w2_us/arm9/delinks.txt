@@ -1286,7 +1286,7 @@ src/system/cgear_picture_save.c:
     complete
     .text       start:0x0200ce50 end:0x0200ce8c
 
-src/system/pokedex.c:
+src/system/pokedex_savedata.c:
     complete
     .text       start:0x0200ce8c end:0x0200dcec
     .rodata     start:0x0208f838 end:0x0208f9a0
@@ -1391,7 +1391,7 @@ src/system/memory_link_savedata.c:
     .text       start:0x020108cc end:0x02010ca0
     .rodata     start:0x0208fa8c end:0x0208faec
 
-src/system/zukan_habitat_savedata.c:
+src/system/pokedex_habitat_savedata.c:
     complete
     .text       start:0x02010ca0 end:0x02010dc0
 
@@ -1605,7 +1605,7 @@ src/system/pokerus.c:
     complete
     .text       start:0x0202053c end:0x020207b4
 
-src/system/shinka_check.c:
+src/system/evolution_check.c:
     complete
     .text       start:0x020207b4 end:0x02020ca4
     .data       start:0x0209a424 end:0x0209a444
@@ -1624,7 +1624,7 @@ src/system/poke_icon.c:
     .text       start:0x02020f6c end:0x020212ac
     .rodata     start:0x02090578 end:0x0209086c
 
-src/system/waza_tool.c:
+src/system/move_tool.c:
     complete
     .text       start:0x020212ac end:0x020219a0
     .data       start:0x0209a444 end:0x0209a450

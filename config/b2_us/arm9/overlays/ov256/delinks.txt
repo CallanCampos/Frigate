@@ -3,31 +3,31 @@
     .ctor       start:0x021bdbd8 end:0x021bdbd8 kind:rodata align:4
     .bss        start:0x021bdbe0 end:0x021bdbe0 kind:bss align:32
 
-src/ov256/dendou_pc.c:
+src/ov256/hall_of_fame_pc.c:
     complete
     .text       start:0x021bb700 end:0x021bb758
     .rodata     start:0x021bd8e4 end:0x021bd8f0
 
-src/ov256/dpc_main.c:
+src/ov256/hall_of_fame_pc_main.c:
     complete
     .text       start:0x021bb758 end:0x021bbd10
     .rodata     start:0x021bd8f0 end:0x021bd9f0
 
-src/ov256/dpc_seq.c:
+src/ov256/hall_of_fame_pc_seq.c:
     complete
     .text       start:0x021bbd10 end:0x021bc714
     .rodata     start:0x021bd9f0 end:0x021bda28
 
-src/ov256/dpc_bmp.c:
+src/ov256/hall_of_fame_pc_bmp.c:
     complete
     .text       start:0x021bc714 end:0x021bce88
 
-src/ov256/dpc_obj.c:
+src/ov256/hall_of_fame_pc_obj.c:
     complete
     .text       start:0x021bce88 end:0x021bd748
     .rodata     start:0x021bda28 end:0x021bdbc4
 
-src/ov256/dpc_ui.c:
+src/ov256/hall_of_fame_pc_ui.c:
     complete
     .text       start:0x021bd748 end:0x021bd8e4
     .rodata     start:0x021bdbc4 end:0x021bdbd8
