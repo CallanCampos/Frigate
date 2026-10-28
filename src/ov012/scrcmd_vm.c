@@ -624,8 +624,8 @@ const FieldScriptCommand EVCMD_TABLE[] = {
     s0204_SurveyGetTime,                              // 0x204
     s0205_CallGreetingPhraseInput,                    // 0x205
     s0206_CallThanksPhraseInput,                      // 0x206
-    func_ov036_021a7c64,                              // 0x207
-    func_ov036_021a7cb4,                              // 0x208
+    s0207_WordSetPasserbyCount,                       // 0x207
+    s0208_WordSetThankedCount,                        // 0x208
     SurveyCmd_WriteOwnAnswer,                         // 0x209
     SurveyCmd_ShowRankMessage,                        // 0x20a
     SurveyCmd_GetRank,                                // 0x20b
@@ -734,7 +734,7 @@ const FieldScriptCommand EVCMD_TABLE[] = {
     s0272_MedalGetGuruActor,                          // 0x272
     s0273_MedalGive,                                  // 0x273
     s0274_FunfestMissionStart,                        // 0x274
-    func_ov036_021a7e04,                              // 0x275
+    s0275_WordSetFunfestMission,                      // 0x275
     s0276_FunfestMissionBroadcast,                    // 0x276
     s0277_FunfestActorDelete,                         // 0x277
     s0278_FunfestDispSalesmanMessage,                 // 0x278
@@ -769,7 +769,7 @@ const FieldScriptCommand EVCMD_TABLE[] = {
     s0295_HiddenHollowReset,                          // 0x295
     s0296_HiddenHollowCallWarpOut,                    // 0x296
     s0297_CallWildBattleEx,                           // 0x297
-    func_ov036_021a7d70,                              // 0x298
+    s0298_WordSetEmptyFileMessage,                    // 0x298
     s0299_WordSetLoadAbility,                         // 0x299
     s029A_WordSetLoadNature,                          // 0x29a
     s029B_WordSetLoadJoinAvenueName,                  // 0x29b

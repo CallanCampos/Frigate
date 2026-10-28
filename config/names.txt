@@ -11353,6 +11353,10 @@ overlays/ov036 0x021a6ec4 ScriptWork_RestoreBgmVolume
 overlays/ov036 0x021a6f08 ScriptWork_RestoreBgmVolumeEvent
 overlays/ov036 0x021a7340 ScriptWork_PlayPerapVoice
 overlays/ov036 0x021a7c18 WordSet_LoadTrainerClassFromScript
+overlays/ov036 0x021a7c64 s0207_WordSetPasserbyCount
+overlays/ov036 0x021a7cb4 s0208_WordSetThankedCount
+overlays/ov036 0x021a7d70 s0298_WordSetEmptyFileMessage
+overlays/ov036 0x021a7e04 s0275_WordSetFunfestMission
 overlays/ov036 0x021a82bc ScrcmdMsgwin_YesNoEventMain
 overlays/ov036 0x021a8344 ScrcmdMsgwin_CreateYesNoEvent
 overlays/ov036 0x021a86b8 SystemMsgWin_Close

@@ -3343,7 +3343,7 @@
     FieldCommand 628
     .endm
 
-    // func_ov036_021a7e04
+    // s0275_WordSetFunfestMission
     .macro Cmd_0275 a0, a1, a2
     FieldCommand 629
     .byte \a0
@@ -3490,7 +3490,7 @@
     .2byte \a3
     .endm
 
-    // func_ov036_021a7d70
+    // s0298_WordSetEmptyFileMessage
     .macro Cmd_0298 a0, a1
     FieldCommand 664
     .byte \a0
