@@ -4,7 +4,8 @@ screen comparisons exact and with the 3D tolerance screen by screen, comparisons
 comparisons, symbols.py's map parser and name lookup, seeds.py's reading of the random seeds the DS built from its
 memory and oracle.py's check of an input file's seeds against them, and oracle.py's handling of the port's runs (with a
 stand-in program), of the clock, of the saves made on the oracle from saves and their cache, of the comparison sequences
-and their references, and of a missing oracle or ROM. They make up their own runs and need neither melonDS nor a ROM.
+and their references, of the round trips' save comparison (the bytes they declare, the mystery gift block decrypted)
+and of a missing oracle or ROM. They make up their own runs and need neither melonDS nor a ROM.
 Standard library only.
 """
 
@@ -1202,6 +1203,19 @@ class OracleScriptTests(unittest.TestCase):
         self.assertEqual(oracle.compare_boots(a, a), (3, None))
         self.assertEqual(oracle.compare_boots(a, b)[0], 2)
         self.assertIn("frame 3", oracle.compare_boots(a, b)[1])
+        # Up to a count, the frames after it are left out of both (a round trip's continued_last)
+        self.assertEqual(oracle.compare_boots(a, b, last_count=2), (2, None))
+        self.assertEqual(oracle.compare_boots(a, b, last_count=3)[0], 2)
+        # Before the game sets the count up, its word holds whatever the memory did, a value past the last count among
+        # them, so the frames end only once the count has reached it: the start-up's 99999, then counts 1 to 5, count
+        # 3 for two frames (a pass of two), and a difference at count 4 that the frames up to count 3 leave out
+        c = compare.Run("c", {i: compare.Frame(i, i, count, i, None, None, None, "c" * 40, "d" * 40, False, False)
+                              for i, count in enumerate((99999, 1, 2, 3, 3, 4, 5), 1)})
+        d = compare.Run("d", dict(c.frames))
+        d.frames[6] = compare.Frame(6, 6, 4, 6, None, None, None, "e" * 40, "d" * 40, False, False)
+        self.assertEqual(oracle.compare_boots(c, d, last_count=3), (5, None))
+        self.assertEqual(oracle.compare_boots(c, d)[0], 5)
+        self.assertIn("frame 6", oracle.compare_boots(c, d)[1])
 
     def test_port_save_skips_without_the_rom_or_the_oracle(self):
         with tempfile.TemporaryDirectory() as d:
@@ -1308,7 +1322,7 @@ class OracleScriptTests(unittest.TestCase):
         for frame in range(1, 5):
             runs.frame(runs.oracle, frame, black, counter=frame - 1, three_d=False)
             runs.frame(runs.port, frame, black, counter=frame - 1)
-        label, size = oracle.STATE[0]
+        label, size = oracle.STATE[0].label, oracle.STATE[0].size
         state = (bytes(range(256)) * (size // 256 + 1))[:size]
         other = bytes([state[0] ^ 1]) + state[1:]
         runs.memory(runs.oracle, [f"{frame} {label} 0x02000000 {size} {state.hex()}" for frame in (2, 3, 4)])
@@ -1386,8 +1400,11 @@ class OracleScriptTests(unittest.TestCase):
                                 set(range(1, sequence.oracle_frames + 1)), name)
                 for version, table in sequence.known_state.items():
                     self.assertTrue(set(oracle.by_frame(table)) <= state, name)
-            # It plays its own input file or another sequence's
-            self.assertTrue(not sequence.input or sequence.input in oracle.SEQUENCES, name)
+                for version, table in sequence.known_random.items():
+                    self.assertTrue(set(oracle.by_frame(table)) <= state, name)
+            # It plays its own input file, another sequence's or a save's
+            self.assertTrue(not sequence.input or sequence.input in oracle.SEQUENCES or sequence.input in oracle.SAVES,
+                            name)
             for version in ("b2_us", "w2_us"):
                 self.assertTrue(os.path.exists(os.path.join(oracle.REPO_ROOT, oracle.SEQUENCE_INPUT.format(
                     name=sequence.input or name, version=version))), (name, version))
@@ -1410,6 +1427,152 @@ class OracleScriptTests(unittest.TestCase):
                     name=name, version=version))), (name, version))
                 self.assertRegex(digest, "^[0-9a-f]{40}$", (name, version))
                 self.assertIsNone(oracle.save_kept(name, version), (name, version))
+        # A round trip continues the save its maker makes with the sequence that starts from that save, and the port
+        # makes its own within the frames the oracle takes
+        for name, trip in oracle.ROUND_TRIPS.items():
+            self.assertIn(trip.maker, oracle.SAVES, name)
+            self.assertIn(trip.continued, oracle.SEQUENCES, name)
+            self.assertEqual(oracle.SEQUENCES[trip.continued].save, trip.maker, name)
+            self.assertTrue(0 < trip.port_frames <= oracle.SAVES[trip.maker].frames, name)
+            # A cut is a sequence from the save the maker starts from, and the input file the port plays, the maker's
+            # or its own, starts with the cut's lines, so that the cut's comparison holds the port's run up to it
+            if trip.cut:
+                self.assertIn(trip.cut, oracle.SEQUENCES, name)
+                self.assertEqual(oracle.SEQUENCES[trip.cut].save, oracle.SAVES[trip.maker].start, name)
+            self.assertTrue(set(trip.port_input) <= {"b2_us", "w2_us"}, name)
+            self.assertTrue(trip.continued_last >= 0, name)
+            for version in oracle.SAVES[trip.maker].sha1:
+                for played in {trip.maker, trip.port_input.get(version, trip.maker)}:
+                    path = os.path.join(oracle.REPO_ROOT, oracle.SEQUENCE_INPUT.format(name=played, version=version))
+                    self.assertTrue(os.path.exists(path), (name, played, version))
+                    if trip.cut:
+                        cut = os.path.join(oracle.REPO_ROOT, oracle.SEQUENCE_INPUT.format(name=trip.cut,
+                                                                                          version=version))
+                        self.assertTrue(oracle.input_starts_with(path, cut), (name, played, version))
+            # The bytes it declares are the chip's, each with why, and none of the mystery gift block's contents,
+            # which the trip compares decrypted
+            encrypted = {copy + oracle.MYSTERY_GIFT_BLOCK + i for copy in (0, oracle.SECOND_COPY)
+                         for i in range(oracle.MYSTERY_GIFT_SIZE - 4)}
+            for version, table in trip.known.items():
+                self.assertIn(version, ("b2_us", "w2_us"))
+                for spans, why in table.items():
+                    offsets = oracle.parse_offsets(spans)
+                    self.assertTrue(offsets and all(0 <= i < oracle.BACKUP_SIZE for i in offsets), (name, spans))
+                    self.assertFalse(encrypted & set(offsets), (name, spans))
+                    self.assertTrue(why, (name, spans))
+        # A sequence's state has a label of its own for each part, and a dump for each program
+        for name, sequence in oracle.SEQUENCES.items():
+            labels = [dump.label for dump in sequence.state]
+            self.assertEqual(len(labels), len(set(labels)), name)
+            self.assertTrue(all(dump.oracle and dump.port and dump.size > 0 for dump in sequence.state), name)
+
+    def test_save_differences(self):
+        # The spans where two saves differ, bytes 8 or less apart joined
+        a = bytes(64)
+        b = bytearray(a)
+        for i in (3, 4, 12, 30, 63):
+            b[i] = 1
+        self.assertEqual(oracle.save_differences(a, bytes(b)), [(3, 12), (30, 30), (63, 63)])
+        self.assertEqual(oracle.save_differences(a, a), [])
+        # A save cut short differs in every byte it lacks, whichever comes first
+        self.assertEqual(oracle.save_differences(a, a[:40]), [(40, 63)])
+        self.assertEqual(oracle.save_differences(a[:40], bytes(b)), [(3, 12), (30, 30), (40, 63)])
+
+    def test_declared_save_bytes(self):
+        # Offsets and spans, the main save's second copy, and the differences outside what a round trip declares
+        self.assertEqual(oracle.parse_offsets("0x19427,0x18fa2-0x18fa3"), [0x19427, 0x18FA2, 0x18FA3])
+        self.assertEqual(oracle.both_copies("0x10,0x20-0x21"), "0x10,0x20-0x21,0x26010,0x26020-0x26021")
+        a = bytes(64)
+        b = bytearray(a)
+        for i in (3, 4, 12, 30, 63):
+            b[i] = 1
+        self.assertEqual(oracle.undeclared_differences(a, bytes(b), {"0x3-0x4,0x1e": "declared"}), [(12, 12), (63, 63)])
+        self.assertEqual(oracle.undeclared_differences(a, bytes(b), {"0x0-0x3f": "all of it"}), [])
+        self.assertEqual(oracle.undeclared_differences(a, bytes(b), {}), oracle.save_differences(a, bytes(b)))
+        # The bytes a shorter save lacks are undeclared unless the trip declares them
+        self.assertEqual(oracle.undeclared_differences(a, a[:40], {"0x3-0x4": "declared"}), [(40, 63)])
+        self.assertEqual(oracle.undeclared_differences(a, a[:40], {"0x28-0x3f": "declared"}), [])
+
+    def test_mystery_gift_decrypted(self):
+        # A save's mystery gift blocks, encrypted as mgEncryptData encrypts them (src/system/mystery_data.c), come out
+        # as their contents; the same contents under two keys differ only in the key once decrypted
+        def encrypted(contents: bytes, key: int) -> bytes:
+            checksum = sum(contents) & 0xFFFF
+            out = bytearray(contents)
+            seed = checksum + (key << 16)
+            for i in range(0, len(out), 2):
+                seed = (seed * 1103515245 + 24691) & 0xFFFFFFFF
+                struct.pack_into("<H", out, i, struct.unpack_from("<H", out, i)[0] ^ (seed >> 16))
+            return bytes(out) + struct.pack("<HH", checksum, key)
+
+        def save(block: bytes) -> bytes:
+            out = bytearray(b"\xff" * oracle.BACKUP_SIZE)
+            for copy in (0, oracle.SECOND_COPY):
+                out[copy + oracle.MYSTERY_GIFT_BLOCK:copy + oracle.MYSTERY_GIFT_BLOCK + len(block)] = block
+            return bytes(out)
+
+        contents = bytes((i * 7) & 0xFF for i in range(oracle.MYSTERY_GIFT_SIZE - 4))
+        a, b = save(encrypted(contents, 0x7F7F)), save(encrypted(contents, 0x7560))
+        plain_a, problems_a = oracle.mystery_gift_decrypted(a)
+        plain_b, problems_b = oracle.mystery_gift_decrypted(b)
+        self.assertEqual((problems_a, problems_b), ([], []))
+        block = slice(oracle.MYSTERY_GIFT_BLOCK, oracle.MYSTERY_GIFT_BLOCK + oracle.MYSTERY_GIFT_SIZE - 4)
+        self.assertEqual(plain_a[block], contents)
+        key = oracle.MYSTERY_GIFT_BLOCK + oracle.MYSTERY_GIFT_SIZE - 2
+        self.assertEqual(oracle.save_differences(plain_a, plain_b), [(key, key + 1), (key + oracle.SECOND_COPY,
+                                                                                     key + oracle.SECOND_COPY + 1)])
+        self.assertGreater(len(oracle.save_differences(a, b)), 0)
+        # Contents that changed under the encryption don't add up to the checksum
+        damaged = bytearray(a)
+        damaged[oracle.MYSTERY_GIFT_BLOCK + 8] ^= 0x10
+        _, problems = oracle.mystery_gift_decrypted(bytes(damaged))
+        self.assertEqual(len(problems), 1)
+        self.assertIn(f"{oracle.MYSTERY_GIFT_BLOCK:#x}", problems[0])
+
+    def test_input_starts_with(self):
+        # An input file starts with another's lines as a program reads them: comments, blank lines and spacing aside
+        with tempfile.TemporaryDirectory() as d:
+            files = {"cut": "pbwinput 1\n# the cut\nversion b2_us\nseed 0x1  # GFL's\n100 A\n104 -\n",
+                     "longer": "pbwinput 1\nversion  b2_us\n\nseed 0x1\n100 A  # pressed\n104 -\n200 B\n204 -\n",
+                     "other": "pbwinput 1\nversion b2_us\nseed 0x2\n100 A\n104 -\n200 B\n",
+                     "before": "pbwinput 1\nversion b2_us\nseed 0x1\n50 B\n100 A\n104 -\n"}
+            paths = {}
+            for name, text in files.items():
+                paths[name] = os.path.join(d, f"{name}.pbwinput")
+                with open(paths[name], "w") as f:
+                    f.write(text)
+            self.assertEqual(oracle.input_lines(paths["longer"]),
+                             ["pbwinput 1", "version b2_us", "seed 0x1", "100 A", "104 -", "200 B", "204 -"])
+            self.assertTrue(oracle.input_starts_with(paths["longer"], paths["cut"]))
+            self.assertTrue(oracle.input_starts_with(paths["cut"], paths["cut"]))
+            # Another seed, a press of its own before the cut's end, or a file shorter than the cut: not its start
+            self.assertFalse(oracle.input_starts_with(paths["other"], paths["cut"]))
+            self.assertFalse(oracle.input_starts_with(paths["before"], paths["cut"]))
+            self.assertFalse(oracle.input_starts_with(paths["cut"], paths["longer"]))
+
+    def test_state_dumps(self):
+        # Each program's dump of a part of the game's state, by the same label; none for a sequence that compares none
+        dump = oracle.StateDump("gfl", "*gfl_use.c/sWork", "**port_gfl_use_work", 8)
+        self.assertEqual(dump.spec("oracle", "1-4"), "gfl=*gfl_use.c/sWork:8@1-4")
+        self.assertEqual(dump.spec("port", "2"), "gfl=**port_gfl_use_work:8@2")
+        self.assertEqual(oracle.state_dumps(oracle.Sequence(4, 4, "", "9")), ([], []))
+        sequence = oracle.Sequence(4, 6, "", "9", state_frames="2-3", state_oracle="3-5", state=(dump,))
+        self.assertEqual(oracle.state_dumps(sequence),
+                         (["gfl=*gfl_use.c/sWork:8@3-5"], ["gfl=**port_gfl_use_work:8@2-3"]))
+        self.assertEqual(oracle.STATE[0].spec("port", "7"), "NNS_G3dGlb=NNS_G3dGlb:612@7")
+        # GFL's random state is left out at known_random's frames as well as known_state's, the rest only at the latter
+        sequence = oracle.Sequence(4, 6, "", "9", state_frames="1-6", state_oracle="1-6",
+                                   known_state={"b2_us": {"2": "a known state"}},
+                                   known_random={"b2_us": {"4-5": "a known random state"}},
+                                   state=oracle.STATE + oracle.RANDOM_STATE)
+        self.assertEqual(oracle.compared_state_frames(sequence, "b2_us"), [1, 3, 4, 5, 6])
+        self.assertEqual(oracle.compared_state_frames(sequence, "b2_us", random=True), [1, 3, 6])
+        self.assertEqual(oracle.compared_state_frames(sequence, "w2_us", random=True), [1, 2, 3, 4, 5, 6])
+
+    def test_round_trip_skips_without_the_oracle(self):
+        with tempfile.TemporaryDirectory() as d:
+            status = quiet(oracle.main, ["round-trip", "catch", "--port", "x", "--oracle", os.path.join(d, "missing")])
+        self.assertEqual(status, oracle.SKIP)
 
     def test_check_skips_without_the_oracle(self):
         with tempfile.TemporaryDirectory() as d:

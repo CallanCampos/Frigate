@@ -610,6 +610,9 @@ void snd7_invalidate_wave(const u8 *start, const u8 *end) {
         if ((channel->flags & SND7_EXCHANNEL_ACTIVE) && channel->type == SND7_EXCHANNEL_PCM &&
             (uintptr_t)start <= (uintptr_t)channel->data && (uintptr_t)channel->data <= (uintptr_t)end) {
             channel->flags &= ~SND7_EXCHANNEL_START;
+            // The host executes the packet before the next register update. Cancel a start already queued by
+            // ExChannelMain as well, or that update would restart this disposed wave after the immediate stop.
+            snd7_set_sync(channel, snd7_sync(channel) & ~SND7_SYNC_START);
             snd7_stop_channel(i, 0);
         }
     }

@@ -50,3 +50,33 @@ if(PORT_TEST_BOOT_LOGOS)
         PASS_REGULAR_EXPRESSION "wrote the screens after frame 120" FAIL_REGULAR_EXPRESSION "has no C yet|watchdog")
     port_test_labels(integrate_boot_logos route)
 endif()
+
+# R13: compile the actual VM with its production ignorelist. Only command-table context erasure is excepted;
+# incorrect native/verifier calls still fail. Apple clang's missing C function check explicitly skips negatives.
+add_executable(port_vm_dispatch_tests tests/integrate/vm_dispatch.c "${REPO_ROOT}/src/system/vm.c")
+target_link_libraries(port_vm_dispatch_tests PRIVATE port_decomp_env)
+target_compile_options(port_vm_dispatch_tests PRIVATE -fsanitize=undefined -fno-sanitize-recover=all
+    "-fsanitize-ignorelist=${CMAKE_CURRENT_SOURCE_DIR}/cmake/sanitizer_ignorelist.txt")
+target_link_options(port_vm_dispatch_tests PRIVATE -fsanitize=undefined)
+# The control must not inherit an accidentally broadened ignorelist: only the actual VM uses that list.
+set_property(SOURCE tests/integrate/vm_dispatch.c APPEND PROPERTY COMPILE_OPTIONS -fno-sanitize-ignorelist)
+foreach(mode IN ITEMS main extra)
+    add_test(NAME integrate_vm_dispatch_${mode} COMMAND port_vm_dispatch_tests ${mode})
+endforeach()
+foreach(mode IN ITEMS native verifier)
+    add_test(NAME integrate_vm_dispatch_${mode}
+        COMMAND "${CMAKE_COMMAND}" -E env PYTHONDONTWRITEBYTECODE=1 "${PORT_PYTHON}"
+            "${CMAKE_CURRENT_SOURCE_DIR}/tests/integrate/check_vm_dispatch.py"
+            "$<TARGET_FILE:port_vm_dispatch_tests>" ${mode})
+    set_tests_properties(integrate_vm_dispatch_${mode} PROPERTIES SKIP_RETURN_CODE 77 TIMEOUT 30)
+endforeach()
+
+# R14: all 38 encounter creators through the actual table, using their real header signatures. No exemptions.
+add_executable(port_encounter_dispatch_tests tests/integrate/encounter_dispatch.c
+    "${REPO_ROOT}/src/ov036/enceff_data.c")
+target_link_libraries(port_encounter_dispatch_tests PRIVATE port_decomp_env)
+target_compile_options(port_encounter_dispatch_tests PRIVATE -fsanitize=undefined -fno-sanitize-recover=all
+    -fno-sanitize-ignorelist)
+target_link_options(port_encounter_dispatch_tests PRIVATE -fsanitize=undefined)
+add_test(NAME integrate_encounter_dispatch COMMAND port_encounter_dispatch_tests)
+set_tests_properties(integrate_encounter_dispatch PROPERTIES TIMEOUT 30)

@@ -121,3 +121,17 @@ if(CMAKE_C_COMPILER_ID MATCHES "Clang")
                 "${CMAKE_CURRENT_SOURCE_DIR}/tests/nnsys/ds_layout_probe.c")
     set_tests_properties(nnsys_ds_layout PROPERTIES TIMEOUT 60)
 endif()
+
+# R15: exercise the actual SDK NODEMIX and FIFO sender under ASan without rebuilding the whole game sanitized.
+# Replace only these two cached objects with instrumented copies; all other SDK/HAL/GE behavior stays real.
+add_executable(port_nodemix_tests tests/nnsys/test_nodemix.c "${REPO_ROOT}/lib/nnsys/src/g3d/sbc.c" hal/hw/hw.c
+    "$<FILTER:$<TARGET_OBJECTS:pokebw2_game>,EXCLUDE,/sbc[.]c[.](o|obj)$>"
+    "$<FILTER:$<TARGET_OBJECTS:port_hal>,EXCLUDE,/hw[.]c[.](o|obj)$>"
+    ${port_gfx_objects} "${PORT_GEN}/stubs.c")
+target_link_libraries(port_nodemix_tests PRIVATE port_decomp_env SDL3::SDL3)
+target_include_directories(port_nodemix_tests PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/..")
+target_compile_options(port_nodemix_tests PRIVATE -fsanitize=address,undefined -fno-sanitize-recover=all
+    -fno-omit-frame-pointer)
+target_link_options(port_nodemix_tests PRIVATE -fsanitize=address,undefined)
+add_test(NAME nnsys_nodemix COMMAND port_nodemix_tests)
+set_tests_properties(nnsys_nodemix PROPERTIES TIMEOUT 30)

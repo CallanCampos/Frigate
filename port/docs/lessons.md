@@ -3,6 +3,18 @@
 What port work taught that isn't obvious from the code, newest first. A lesson about MWCC or the decomp's own
 workflow goes in the decomp checkout instead; this file is the port's ([CLAUDE.md](../CLAUDE.md), the iteration loop).
 
+## 2026-10-26: owners, queued starts and complete packets
+
+- A stopped audio voice can restart when its pending register writes run. Invalidation must cancel its queued
+  START as well as stop hardware; heap disposal must wait while wave owners remain live. Test later updates
+  after release, not just the synchronous stop (`snd_invalidate_wave`).
+- Closed-range fixtures need payloads strictly outside the end. Adjacent ordinary allocations exposed a test
+  assumption ASan's redzones hid; keep the control inside a larger allocation rather than change the protocol.
+- NODEMIX needs twelve packet words although only nine normal words matter. A complete host temporary fixes
+  bounds; shortening the packet breaks geometry. Check the real SDK, FIFO and resulting matrices.
+- Apple clang emits no C function-type sanitizer check. Use upstream LLVM and an explicit capability probe:
+  the VM table exception must still leave native and verifier callbacks checked.
+
 ## 2026-10-25: the field script's offsets, after PR 29
 
 - **A `u32` offset that the DS's 32-bit sum wraps is a truncation the pointer cast guard can't see.** The field script
@@ -45,6 +57,46 @@ workflow goes in the decomp checkout instead; this file is the port's ([CLAUDE.m
   measured its tiers with progress.py alone. `progress_compile_check` now runs it at every ctest of a checkout that
   has the decomp's `.venv` and compilers, as the local verification's (`sync_upstream.sh --verify-pr`) has; Frigate CI's
   Python has no pyelftools, so there it skips.
+## 2026-10-25: phase 4's PC, and Hugh's battle to its end
+
+- **An unsigned offset added to a pointer wraps on the DS and moves 4 GiB on a host.** The field script VM read its
+  jumps' offsets as `u32` (`src/ov012/scrcmd_vm.c`): a jump back, a negative offset, came out right on the DS, whose
+  32-bit sum wraps, and 4 GiB on on a 64-bit host, where `VM_Run` then crashed on the next command. Nothing is cast,
+  so the pointer cast guard can't see it, and the earlier PC coverage first found it at the PC's menu, which
+  shows itself again with one when the PC Box closes. The merged regression is `integrate_script_offsets`, extended
+  with the PC's cases; the current audit is `pointer_offsets.query`. Where a `u32` from a script, a file or a table is
+  added to a pointer, ask whether it can be negative; the trainer AI's and the battle effects' VMs read theirs as
+  `s32` already.
+- **When the sanitized build stops first on another report, a print in the loop finds a crash sooner.** ASan stopped
+  in the gate on the way to the PC (a word-at-a-time `STD_GetStringLength` reading past the board's date string)
+  before the crash; a scratch print in `VM_Run`, never committed, of the position against the script's base showed
+  the base plus 4 GiB at the first command after a jump back.
+- **Find a game object in melonDS's memory by its fields, then dump only it.** The PC's log-off left a townsperson's
+  turns 2 counts apart, and neither the screens nor the sound traces said where. One oracle run dumped the 4 MiB of
+  main RAM at one frame (`--dump ram=0x02000000:0x400000@F`), a search for the actor's known fields (uid, zone,
+  movement code, script) gave its address, and a second run dumped its 4 bytes of wait at every frame; with a scratch
+  trace of the port's, it put the difference at the script's end, where the first guess had put it at its start.
+- **A DS pass that draws a window over several frames shows it partway on each but the last.** The PC's menus and the
+  deposit screen redraw in passes of 2 to 6 frames on the DS; the count pairs the port's finished picture with the
+  first, so check the pass's last frame against the port's before calling it anything but `PC_WINDOW`'s kind.
+- **A trainer battle's save made past the cut differs where the battle's length shows.** The port's own battle reaches
+  the Pokémon Center at another count than the DS's, so a townsperson who turns at random has another wait and
+  direction when the game saves, and the mystery gift block, which the Pokémon Center's deliveryman reads and so
+  encrypts again with a key from the VBlank count, comes out as other bytes; Tepig's data, the money, the bag and the
+  flags are melonDS's. White 2's battle takes more turns, and its presses after the cut are the port's own.
+- **Compare an encrypted block by what it holds, and declare only its key.** The mystery gift block was first declared
+  whole, 2,712 bytes a copy, because every read encrypts it again under a key from the VBlank count; that let any
+  change to the gift data pass. Decrypted with the key each save keeps (`mystery_gift_decrypted`), the two blocks were
+  the same, contents and checksum, and only the key's 2 bytes and the block's CRC are declared now.
+- **Hold a continued run to the oracle's run on the same save.** The port's continuation of its own save was first
+  compared with melonDS's continuation of melonDS's save, which needed a stretch of random state declared where the
+  two saves' townsperson draws apart; compared with melonDS's continuation of the port's save, every frame and state
+  matched with the sequence's own declarations and nothing more.
+- **A timer's lead can hide until it runs out.** The PC's log-off let the townsperson by the counter take up his wait
+  a field pass sooner on the DS in both versions, but in White 2 his wait didn't run out before the field menu stopped
+  him, so nothing differed, and the lead showed only after the save, as draws 126 counts later where the dialog closed
+  128 later. Before a count goes into a known difference's cause, trace the timer on both programs (the DS's object
+  dumped from melonDS's memory, the port's from a scratch print) rather than infer it from the draws.
 
 ## 2026-10-24: phase 4's route
 
@@ -58,6 +110,35 @@ workflow goes in the decomp checkout instead; this file is the port's ([CLAUDE.m
   fix writes melonDS's Z interpolation again step for step, and melonDS's own comment there says it doesn't match the
   hardware exactly yet. So the code says it is derived from melonDS 1.1 (GPLv3 or later, which Frigate's GPLv3 can
   take) and names the function, and the records call it alignment with the oracle, not the DS's arithmetic.
+- **Cut a route where the programs must part, and start the next piece from the oracle's save.** Hugh's AI picks
+  another move on the port by construction, so a route through his battle can't be held past his second turn. Ending
+  that piece there and starting the next from the save melonDS makes after the battle (a `SAVES` step held to its
+  SHA-1) lets everything after it be held frame by frame again; each piece's own save starts the one after it.
+- **Presses moved to another start need their waits measured again.** The Route 19 presses, shifted by a fixed count
+  to start in the Pokémon Center, went astray in the gate, where the guard's words end later than they did after the
+  battle; B mashed over the span where they can end puts every later press back on its count.
+- **A frame half the port's frame before is a write after the beam.** Where a DS frame equals the port's frame before
+  above some line and the port's own below it (a wipe's first step, the place name's banner, the capture demo's fade),
+  or the other way round, find the line, and the write the pass makes when the beam is there: that names the cause,
+  where a frame count alone says only that the frame differs.
+- **The DS's backup chip takes time, so a save's dialog does too.** Its progress dots, its message and its close all
+  come later on the DS, and in between both programs show the same frames: declare only the spans that differ, and
+  compare the save files byte by byte instead. The play time, counted in ticks, is in both the dialog and the file,
+  and the two clocks part by seconds, enough to move a minute.
+- **A screen that is the port's frame before points at a wait, and the twister's index tells logic from luck.** White
+  2's wild battle showed the DS's whole scene a pass behind from Purrloin's appearance: the battle waits for the cry,
+  and the DS's pass read the channel just before its ARM7 stopped it, as with Kyurem's cry at the title. Dumping the
+  twister's index by count on both (the oracle's memory, the port's trace) showed the same number of draws at each
+  count of the intro, so what then differed for the rest of the battle was which animation drew which number, not the
+  generator.
+- **A claim about state is a test, not a log.** The review found "GFL's state is the DS's count for count" resting on
+  scratch traces. Dumping the random state with the sequence (`RANDOM_STATE`) made it a check at every count, and the
+  check found what the traces had only sampled: the AI's two passes at each turn, where they fall in each version, and
+  every save's townspeople drawing the same numbers 168 to 232 counts later on the DS. When a static has no name the
+  port can look up, give the host file that compiles it a global holding its address and dump through it (`**`).
+- **Declare a state's parts apart when their causes are apart.** GFL's random state differs for reasons NNS G3D's
+  doesn't (the AI's time, the save's dialog, White 2's battle after the cry), so it has its own declarations
+  (`known_random`), and NNS G3D's state is still held at those frames.
 
 ## 2026-10-24: the DS's random seeds, and what they don't fix
 
