@@ -5291,7 +5291,7 @@ sPhenomenonKindMasks kind:data(any) addr:0x021d0306
 DUST_CLOUD_ITEMS_NORMAL kind:data(any) addr:0x021d0310
 sPhenomenonSearchOffsets kind:data(any) addr:0x021d0324
 DUST_CLOUD_SHARD_ZONES kind:data(any) addr:0x021d0338
-data_ov036_021d0324 kind:data(any) addr:0x021d0358
+TILE_CLASS_BATTLE_TERRAINS kind:data(any) addr:0x021d0358
 data_ov036_021d0325 kind:data(any) addr:0x021d0359
 FIELD_CAMERA_ARCIDS kind:data(any) addr:0x021d03a8
 FIELD_CAMERA_AREA_FUNCS kind:data(any) addr:0x021d03b0
