@@ -3677,13 +3677,13 @@
     .2byte \a1
     .endm
 
-    .macro Scrcmd_GetWifiHistoryCountryCount a0, a1
+    .macro GetWifiHistoryCountryCount a0, a1
     FieldCommand 727
     .2byte \a0
     .2byte \a1
     .endm
 
-    .macro Scrcmd_MarkPartnerCandidate a0
+    .macro MarkPartnerCandidate a0
     FieldCommand 728
     .2byte \a0
     .endm

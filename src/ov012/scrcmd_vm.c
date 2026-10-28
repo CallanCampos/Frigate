@@ -658,7 +658,7 @@ const FieldScriptCommand EVCMD_TABLE[] = {
     s0230_MsgPlaceSignFont4,                          // 0x230
     s0231_CallGameManual,                             // 0x231
     PokeParty_ControlLegendMon,                       // 0x232
-    Scrcmd_HasPlayerLanguage,                         // 0x233
+    s0233_HasPlayerLanguage,                          // 0x233
     s0234_ActorFallDownToXZ,                          // 0x234
     s0235_BGMPlayEx,                                  // 0x235
     s0236_WordSetLoadItemCollectorPrice,              // 0x236
@@ -822,9 +822,9 @@ const FieldScriptCommand EVCMD_TABLE[] = {
     s02D4_ItemGetTMCount,                             // 0x2d4
     s02D5_WbtIsTrainerBeaten,                         // 0x2d5
     NULL,                                             // 0x2d6
-    Scrcmd_GetWifiHistoryCountryCount,                // 0x2d7
-    Scrcmd_MarkPartnerCandidate,                      // 0x2d8
-    Scrcmd_IsPartnerCandidateMarked,                  // 0x2d9
+    s02D7_GetWifiHistoryCountryCount,                 // 0x2d7
+    s02D8_MarkPartnerCandidate,                       // 0x2d8
+    s02D9_IsPartnerCandidateMarked,                   // 0x2d9
     s02DA_UnityTowerSetRatingLevel,                   // 0x2da
     s02DB_UnityTowerSetFloor,                         // 0x2db
     s02DC_UnityTowerInitVisitorMessage,               // 0x2dc

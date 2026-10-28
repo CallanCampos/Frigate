@@ -12369,11 +12369,11 @@ overlays/ov036 0x021c98a4 GetPWTTournamentInfo
 overlays/ov036 0x021c98f4 GetPWTSeason
 overlays/ov036 0x021c9a40 s02D1_KeyInfoGetMyCityProgress
 overlays/ov036 0x021c9a7c s02D5_WbtIsTrainerBeaten
-overlays/ov036 0x021c9ab0 Scrcmd_GetWifiHistoryCountryCount
-overlays/ov036 0x021c9b38 Scrcmd_MarkPartnerCandidate
-overlays/ov036 0x021c9b88 Scrcmd_IsPartnerCandidateMarked
+overlays/ov036 0x021c9ab0 s02D7_GetWifiHistoryCountryCount
+overlays/ov036 0x021c9b38 s02D8_MarkPartnerCandidate
+overlays/ov036 0x021c9b88 s02D9_IsPartnerCandidateMarked
 overlays/ov036 0x021c9bec s02DA_UnityTowerSetRatingLevel
-overlays/ov036 0x021c9d24 Scrcmd_HasPlayerLanguage
+overlays/ov036 0x021c9d24 s0233_HasPlayerLanguage
 overlays/ov036 0x021c9ec4 sResolvedControllerTypes
 overlays/ov036 0x021c9f20 FIELD_CLACT_SETUP
 overlays/ov036 0x021c9f7c sFieldLights

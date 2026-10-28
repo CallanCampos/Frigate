@@ -63,7 +63,7 @@ void Scrcmd_CollectPartnersByLanguage(UnityTowerSurveySave *survey, UnityTowerFl
 u32 Scrcmd_GetPartnerCandidateHistoryIndex(UnityTowerFloor *output, u32 index) {
     u32 result;
 
-    result = 0xff;
+    result = UNITY_TOWER_HISTORY_INDEX_NONE;
     if (index < 5 && index < output->count) {
         result = output->visitors[index];
     }

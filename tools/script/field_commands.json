@@ -4281,7 +4281,7 @@
    ]
   },
   "563": {
-   "handler": "Scrcmd_HasPlayerLanguage",
+   "handler": "s0233_HasPlayerLanguage",
    "overlay": 36,
    "args": [
     "var"
@@ -5228,7 +5228,7 @@
    ]
   },
   "727": {
-   "handler": "Scrcmd_GetWifiHistoryCountryCount",
+   "handler": "s02D7_GetWifiHistoryCountryCount",
    "overlay": 36,
    "args": [
     "any",
@@ -5237,7 +5237,7 @@
    "area": "UnityTower"
   },
   "728": {
-   "handler": "Scrcmd_MarkPartnerCandidate",
+   "handler": "s02D8_MarkPartnerCandidate",
    "overlay": 36,
    "args": [
     "any"
@@ -5245,7 +5245,7 @@
    "area": "UnityTower"
   },
   "729": {
-   "handler": "Scrcmd_IsPartnerCandidateMarked",
+   "handler": "s02D9_IsPartnerCandidateMarked",
    "overlay": 36,
    "args": [
     "any",

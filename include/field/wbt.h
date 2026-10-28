@@ -157,7 +157,8 @@ struct WbtSystem {
     // The Type Expert Tournament's type
     u8 type;
     u8 unk1D;
-    u8 unk1E;
+    // The map's season, rolled when the tournament starts
+    u8 season;
     u8 unk1F;
     u64 seed;
     MATHRandContext32 rand;
