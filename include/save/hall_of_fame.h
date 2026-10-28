@@ -7,8 +7,8 @@
 #include "nitro/rtc.h"
 #include "struct_decls.h"
 
-// The Hall of Fame, extra save block 8: the last 15 teams that entered it, which s00EA_HOFCheckIntegrity checks and
-// overlay 256 shows from the PC. Block 0x40 of the main save has the size of one team
+// The Hall of Fame, extra save block 8: the last 15 teams that entered it, which Scrcmd_GameState_HOFCheckIntegrity
+// checks and overlay 256 shows from the PC. Block 0x40 of the main save has the size of one team
 // (hall_of_fame_savedata.c, a descriptive name).
 
 #define HALL_OF_FAME_TEAMS 15

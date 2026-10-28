@@ -177,7 +177,7 @@ L_0222:
     VMJump L_022D
 
 L_022D:
-    InfoMsgClose_0039
+    InfoMsgClose
     BGMPlay SEQ_BGM_E_BERU
     ActorCmdExec 255, Movement_0618
     ActorCmdWait

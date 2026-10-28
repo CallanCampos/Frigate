@@ -40,7 +40,7 @@
 // A MedalDef's check from this is an index into sMedalChecks, and below it a record that must reach the threshold
 #define MEDAL_CHECK_FIRST 10000
 
-// The actions of PokemonCenterCmd_Medal
+// The actions of Scrcmd_PokemonCenter_Medal
 enum {
     MEDAL_ACTION_CHECK = 1000,
     MEDAL_ACTION_ACKNOWLEDGE,
@@ -97,7 +97,7 @@ static void PokemonCenter_CheckBoxPkm(BoxPkm *pkm, MedalCheckContext *ctx);
 static void PokemonCenter_CheckPartyPkm(MedalCheckContext *ctx, PartyPkm *pkm);
 static u32 PokemonCenter_CountSetFlags(const u32 *flags, EventWork *eventWork, int count);
 
-BOOL PokemonCenterCmd_Medal(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_PokemonCenter_Medal(VM *vm, FieldScriptEnv *env) {
     GameData *gameData = FieldScriptEnv_GetGameData(env);
     SaveControl *save = GameData_GetSaveControl(gameData);
     MedalBox *box = SaveControl_GetMedalBox(save);
@@ -146,7 +146,7 @@ static s32 PokemonCenter_FindEarnedMedal(FieldScriptEnv *env) {
     return -1;
 }
 
-BOOL PokemonCenterCmd_FindEarnedMedal(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_PokemonCenter_FindEarnedMedal(VM *vm, FieldScriptEnv *env) {
     u16 *found = ScriptReadVar(vm, env);
     u16 *medal = ScriptReadVar(vm, env);
     s32 index = PokemonCenter_FindEarnedMedal(env);
@@ -796,7 +796,7 @@ static u32 PokemonCenter_CountSetFlags(const u32 *flags, EventWork *eventWork, i
     return set;
 }
 
-BOOL PokemonCenterCmd_GetMatchState(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_PokemonCenter_GetMatchState(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameData *gameData = GSYS_GetGameData(FieldScriptEnv_GetGameSystem(env));
     RecordSave *record = SaveControl_GetRecordSave(GameData_GetSaveControl(gameData));
@@ -824,7 +824,7 @@ BOOL PokemonCenterCmd_GetMatchState(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL PokemonCenterCmd_SetMatchInProgress(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_PokemonCenter_SetMatchInProgress(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameData *gameData = GSYS_GetGameData(FieldScriptEnv_GetGameSystem(env));
 
@@ -833,7 +833,7 @@ BOOL PokemonCenterCmd_SetMatchInProgress(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL PokemonCenterCmd_ClearMatchInProgress(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_PokemonCenter_ClearMatchInProgress(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
 
     RecordSave_ClearMatchInProgress(
@@ -841,8 +841,8 @@ BOOL PokemonCenterCmd_ClearMatchInProgress(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-// Action 4 sets the value that PokemonCenterCmd_GetMatchState's info 4 returns, and action 5 counts record 0x35
-BOOL PokemonCenterCmd_SetMatchState(VM *vm, FieldScriptEnv *env) {
+// Action 4 sets the value that Scrcmd_PokemonCenter_GetMatchState's info 4 returns, and action 5 counts record 0x35
+BOOL Scrcmd_PokemonCenter_SetMatchState(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     SaveControl *save = GameData_GetSaveControl(GSYS_GetGameData(FieldScriptEnv_GetGameSystem(env)));
     RecordSave *record = getRecordBlkAddress(save);
@@ -860,7 +860,7 @@ BOOL PokemonCenterCmd_SetMatchState(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL PokemonCenterCmd_AddBattlePoints(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_PokemonCenter_AddBattlePoints(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameData *gameData = GSYS_GetGameData(FieldScriptEnv_GetGameSystem(env));
     RecordSave *record = getRecordBlkAddress(GameData_GetSaveControl(gameData));

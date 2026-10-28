@@ -119,7 +119,7 @@ L_0190:
     WordSetPlayerName 0
     // "[f000]Ā\u0001\u0000 received the Quake Badge\nfrom Clay![f000]븁\u0000"
     SystemMsg DriftveilCityGym_Text_ReceivedQuakeBadgeFrom, 0
-    InfoMsgClose
+    SystemMsgClose
     // "So this is yer fifth Badge, huh?[f000]븁\u0000\nIf that's so, Pokémon up to Lv. 60\nwill obey ya.[f000]븁\u0000\nHere!\nTake this, too![f000]븁\u0000"
     ActorMsg MSGFILE_SCRIPT, DriftveilCityGym_Text_YerFifthBadgeHuh, 7, 0, 0
     ActorMsgClose

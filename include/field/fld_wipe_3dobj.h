@@ -13,9 +13,9 @@
 FieldFlashG3D *FieldFlashG3D_Create(HeapID heapId);
 void FieldFlashG3D_Free(FieldFlashG3D *flash);
 void FieldFlashG3D_Draw(FieldFlashG3D *flash, fx32 scale, u32 alpha);
-BOOL s019B_PlayFieldEffect(VM *vm, FieldScriptEnv *env);
-BOOL s019C_PlayHMCutInEffect(VM *vm, FieldScriptEnv *env);
-BOOL s019D_PlayAlderFlyEffect(VM *vm, FieldScriptEnv *env);
-BOOL s022D_PlayFieldEffectByTable(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_FldWipe3dobj_PlayFieldEffect(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_FldWipe3dobj_PlayHMCutInEffect(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_FldWipe3dobj_PlayAlderFlyEffect(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_FldWipe3dobj_FieldEffect(VM *vm, FieldScriptEnv *env);
 
 #endif // POKEBW2_FIELD_FLD_WIPE_3DOBJ_H

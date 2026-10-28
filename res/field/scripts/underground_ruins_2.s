@@ -47,7 +47,7 @@ Script_3:
     // "Chamber of the one that joins\nthe sun in protecting this place."
     InfoMsg UndergroundRuins2_Text_ChamberOneJoinsSun, 2
     LastKeyWait
-    InfoMsgClose_0039
+    InfoMsgClose
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt
@@ -58,7 +58,7 @@ Script_4:
     // "Two answers are needed to\nfind the true path.[f000]븁\u0000\nCourageous one,\nlet me tell you the answer I know.[f000]븁\u0000\nCheck the ground six steps down and\n● steps right of the eyeball.[f000]븁\u0000\nThe other answer can only be found\nwhen the moon is in the sky."
     InfoMsg UndergroundRuins2_Text_TwoAnswersNeededFind, 2
     LastKeyWait
-    InfoMsgClose_0039
+    InfoMsgClose
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt
@@ -69,7 +69,7 @@ Script_5:
     // "The world is split into two:\nday and night...black and white..."
     InfoMsg UndergroundRuins2_Text_WorldSplitIntoTwo, 2
     LastKeyWait
-    InfoMsgClose_0039
+    InfoMsgClose
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt
@@ -80,7 +80,7 @@ Script_6:
     // "The protectors were born\nout of rock, ice, and magma..."
     InfoMsg UndergroundRuins2_Text_ProtectorsWereBornOut, 2
     LastKeyWait
-    InfoMsgClose_0039
+    InfoMsgClose
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt

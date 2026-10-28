@@ -1182,18 +1182,18 @@ static void FieldInteractWk_CalcPlayerFrontPos(FieldInteractWk *wk, VecFx32 *out
     }
 }
 
-// Whether the warp is taken by stepping on it, whatever the direction: transitions 0, 5 and 6
+// Whether the warp is taken by stepping on it, whatever the direction
 static BOOL IsStepOnWarp(ZoneWarp *warp) {
     u32 type = GetWarpTransitionType(warp);
 
-    return type == 0 || type == 5 || type == 6;
+    return type == WARP_TRANSITION_NONE || type == WARP_TRANSITION_WARP_PAD || type == WARP_TRANSITION_GATE;
 }
 
 static BOOL CheckWarpDirectionMatch2(const ZoneWarp *warp, u16 dir) {
     return CheckWarpDirectionMatch(warp, dir);
 }
 
-// The warp of a wall that the player walks into: the one under the player with transition 1, or the one in front
+// The warp of a wall that the player walks into: the mat under the player, or the warp in front
 static GameEvent *CheckWallWarpEvent(FieldInteractWk *wk, GameSystem *gsys, Field *field) {
     VecFx32 front;
     u32 warpId;
@@ -1206,7 +1206,7 @@ static GameEvent *CheckWallWarpEvent(FieldInteractWk *wk, GameSystem *gsys, Fiel
     warpId = GetWarpForWalkIn(wk, wk->pos);
     if (warpId != WARP_ID_NONE) {
         warp = GetZoneWarpByID(wk->eventData, warpId);
-        if (!IsWarpZoneOrWarpID0xFFFF(warp) && GetWarpTransitionType(warp) == 1) {
+        if (!IsWarpZoneOrWarpID0xFFFF(warp) && GetWarpTransitionType(warp) == WARP_TRANSITION_MAT) {
             RememberOutboundWarp(wk, warpId, wk->pos);
             return CreateWarpMapChangeEvent(wk, field, warpId, wk->pos);
         }
@@ -1283,7 +1283,7 @@ static GameEvent *CheckRailWarpMapChangeEvent(FieldInteractWk *wk, GameSystem *g
     return CreateWarpMapChangeEventRail(wk, field, warpId, &pos);
 }
 
-// The warp that the player walks into on a rail: the one under the player with transition 1, or the one in front
+// The warp that the player walks into on a rail: the mat under the player, or the warp in front
 static GameEvent *CheckRailWallWarpEvent(FieldInteractWk *wk, GameSystem *gsys, Field *field, RailPosition *front) {
     RailPosition pos;
     u32 warpId;
@@ -1294,7 +1294,7 @@ static GameEvent *CheckRailWallWarpEvent(FieldInteractWk *wk, GameSystem *gsys, 
     if (warpId != WARP_ID_NONE) {
         warp = GetZoneWarpByID(wk->eventData, warpId);
         if (!IsWarpZoneOrWarpID0xFFFF(warp) && CheckWarpDirectionMatch2(warp, wk->faceDir) &&
-            GetWarpTransitionType(warp) == 1) {
+            GetWarpTransitionType(warp) == WARP_TRANSITION_MAT) {
             RememberOutboundWarpRail(wk, warpId, &pos);
             return CreateWarpMapChangeEventRail(wk, field, warpId, &pos);
         }

@@ -225,7 +225,7 @@ Script_11:
     // "This is a Foongus?"
     InfoMsg AccumulaTown_Text_Foongus, 2
     LastKeyWait
-    InfoMsgClose_0039
+    InfoMsgClose
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt

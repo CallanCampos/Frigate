@@ -25,7 +25,7 @@ L_003A:
     VMJumpIf CMP_STACK, L_00EF
     // "Is there something you would\nlike to know about researching dreams?"
     ParentActorMsg MSGFILE_SCRIPT, CasteliaCity30_Text_ThereSomethingWouldLike, 2, 0
-    ListMenu_AnchorTopRight 31, 1, 0, 1, 32801
+    ListMenuAnchorTopRight 31, 1, 0, 1, 32801
     ListMenuAdd 26, 65535, 1
     ListMenuAdd 27, 65535, 2
     ListMenuAdd 28, 65535, 3
@@ -79,7 +79,7 @@ Script_2:
     // "C-Gear Help[f000]븁\u0000\nIf you have trouble using it, touch the\n“?\" icon on the C-Gear screen!"
     SystemMsg CasteliaCity30_Text_CGearHelpIf, 2
     LastKeyWait
-    InfoMsgClose
+    SystemMsgClose
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt
@@ -90,7 +90,7 @@ Script_3:
     // "What is the Pokémon Storage System?[f000]븁\u0000\nThe person who developed the\nPokémon Storage System for the PC[f000]븀\u0000\nconnection is Bill in the Kanto region."
     SystemMsg CasteliaCity30_Text_WhatPokemonStorageSystem, 2
     LastKeyWait
-    InfoMsgClose
+    SystemMsgClose
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt
@@ -267,12 +267,12 @@ L_0372:
     SystemMsg CasteliaCity30_Text_ReceivedEevee, 0
     MEWait
     MsgWaitAdvance
-    InfoMsgClose
+    SystemMsgClose
     // "Would you like to give a\nnickname to this Eevee?"
     SystemMsg CasteliaCity30_Text_WouldLikeGiveNickname, 0
     WorkSetConst 0x8026, 0
     YesNoWin 0x8026
-    InfoMsgClose
+    SystemMsgClose
     VMStackPush 0x8026
     VMStackPushConst 0
     VMStackCmp CMP_EQ
@@ -322,7 +322,7 @@ L_0432:
     VMJumpIf CMP_STACK, L_053C
     // "Amanita: Is there something you'd like\nto ask me?"
     ActorMsg MSGFILE_SCRIPT, CasteliaCity30_Text_AmanitaThereSomethingYoud, 1, 2, 0
-    ListMenu_AnchorTopRight 31, 1, 0, 1, 32809
+    ListMenuAnchorTopRight 31, 1, 0, 1, 32809
     ListMenuAdd 9, 65535, 1
     ListMenuAdd 10, 65535, 2
     ListMenuAdd 11, 65535, 3

@@ -8,6 +8,6 @@
 
 // A parameter of the entrance of a Hidden Grotto: 0 is its zone
 u32 GetHiddenHollowEntranceParam(u8 hollow, u32 param);
-BOOL s02C4_HiddenHollowSetPeriod(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_HiddenHollow_HiddenHollowSetPeriod(VM *vm, FieldScriptEnv *env);
 
 #endif // POKEBW2_FIELD_HIDDEN_HOLLOW_H

@@ -186,7 +186,7 @@ L_026A:
 L_028B:
     // "Would you like to use\nInfrared Communication or[f000]븀\u0000\nDS Wireless Communications?"
     ActorMsg MSGFILE_SCRIPT, Global10450_Text_WouldLikeUseInfrared, 0x8011, 2, 0
-    ListMenu_AnchorTopRight 31, 1, 0, 1, 32805
+    ListMenuAnchorTopRight 31, 1, 0, 1, 32805
     ListMenuAdd 47, 65535, 0
     ListMenuAdd 48, 65535, 1
     ListMenuAdd 40, 65535, 2
@@ -290,7 +290,7 @@ L_040F:
     VMJumpIf CMP_STACK, L_0653
     // "One of you will become the leader.\nThat person will get to choose the show[f000]븀\u0000\nyou'll perform![f000]븁\u0000\nThe other members should select\n“Join group.\""
     ActorMsg MSGFILE_SCRIPT, Global10450_Text_OneWillBecomeLeader, 0x8011, 2, 0
-    ListMenu_AnchorTopRight 31, 1, 0, 1, 32804
+    ListMenuAnchorTopRight 31, 1, 0, 1, 32804
     ListMenuAdd 39, 65535, 1
     ListMenuAdd 38, 65535, 0
     ListMenuAdd 40, 65535, 2
@@ -578,7 +578,7 @@ L_0863:
     VMStackPushConst 1
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_0A72
-    ListMenu_AnchorTopRight 31, 1, 0, 1, 32784
+    ListMenuAnchorTopRight 31, 1, 0, 1, 32784
     ListMenuAdd 35, 65535, 0
     ListMenuAdd 36, 65535, 1
     ListMenuAdd 37, 65535, 2
@@ -614,7 +614,7 @@ L_08F9:
     VMJumpIf CMP_STACK, L_0A6C
     // "What would you like me to explain?"
     ActorMsg MSGFILE_SCRIPT, Global10450_Text_WhatWouldLikeExplain, 0x8011, 2, 0
-    ListMenu_AnchorTopRight 31, 1, 0, 1, 32784
+    ListMenuAnchorTopRight 31, 1, 0, 1, 32784
     ListMenuAdd 60, 65535, 0
     ListMenuAdd 62, 65535, 1
     ListMenuAdd 64, 65535, 2
@@ -735,7 +735,7 @@ L_0AF1:
     MusicalGetInfo 14, 0, 0x802c
     // "Which show would you like\nto participate in?"
     ActorMsg MSGFILE_SCRIPT, Global10450_Text_WhichShowWouldLike, 0x8011, 2, 0
-    ListMenu_AnchorTopRight 31, 1, 0, 1, 32784
+    ListMenuAnchorTopRight 31, 1, 0, 1, 32784
     ListMenuAdd 29, 65535, 0
     ListMenuAdd 30, 65535, 1
     ListMenuAdd 31, 65535, 2
@@ -839,7 +839,7 @@ Script_4:
     ActorSetEyeToEye
     // "Which show would you like\nto participate in?"
     ParentActorMsg MSGFILE_SCRIPT, Global10450_Text_WhichShowWouldLike, 0, 0
-    ListMenu_AnchorTopRight 31, 1, 0, 1, 32784
+    ListMenuAnchorTopRight 31, 1, 0, 1, 32784
     ListMenuAdd 29, 65535, 0
     ListMenuAdd 30, 65535, 1
     ListMenuAdd 31, 65535, 2
@@ -1035,7 +1035,7 @@ L_0EFC:
     LastKeyWait
 
 L_0F04:
-    InfoMsgClose
+    SystemMsgClose
     MusicalAddProp 0x8008
     RTEndGlobal
     FinishAllEvents

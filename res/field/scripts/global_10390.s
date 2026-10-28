@@ -58,7 +58,7 @@ L_007C:
     SystemMsg Global10390_Text_ReceivedItemS, 0
     MEWait
     MsgWaitAdvance
-    InfoMsgClose
+    SystemMsgClose
     DreamWorldItems 2, 0x8010
     DreamWorldItems 3, 0x8010
 

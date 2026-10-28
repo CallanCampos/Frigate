@@ -53,7 +53,7 @@ L_007F:
     VMStackPushConst 1
     VMStackCmp CMP_NE
     VMJumpIf CMP_STACK, L_020C
-    ListMenu_AnchorTopRight 31, 1, 0, 1, 32800
+    ListMenuAnchorTopRight 31, 1, 0, 1, 32800
     ListMenuAdd 2, 65535, 0
     ListMenuAdd 3, 65535, 1
     ListMenuAdd 4, 65535, 2

@@ -13,14 +13,14 @@
 #include "system/game_system.h"
 #include "system/vm.h"
 
-BOOL s01E1_StadiumLoadTrainerTable(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Stadium_StadiumLoadTrainerTable(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     StadiumTrainerEntry *trainers = GFL_ArcSysReadHeapNewLZ(0xce, 0, 0, HEAPID_TAIL(4));
     ScriptWork_SetStadiumTrainers(work, trainers);
     return FALSE;
 }
 
-BOOL s01E2_StadiumFreeTrainerTable(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Stadium_StadiumFreeTrainerTable(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     StadiumTrainerEntry *trainers = ScriptWork_GetStadiumTrainers(work);
     if (trainers != NULL) {
@@ -30,7 +30,7 @@ BOOL s01E2_StadiumFreeTrainerTable(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s01E3_StadiumSetupActorSingle(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Stadium_StadiumSetupActorSingle(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     u16 a = ScriptReadAny(vm, env);
     u16 b = ScriptReadAny(vm, env);
@@ -44,7 +44,7 @@ BOOL s01E3_StadiumSetupActorSingle(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s01E0_StadiumSetupActorsDouble(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Stadium_StadiumSetupActorsDouble(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     u16 a = ScriptReadAny(vm, env);
     u16 b = ScriptReadAny(vm, env);
@@ -58,7 +58,7 @@ BOOL s01E0_StadiumSetupActorsDouble(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s01E0_StadiumSetupActorsTriple(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Stadium_StadiumSetupActorsTriple(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     u16 npc1 = ScriptReadAny(vm, env);
     u16 npc2 = ScriptReadAny(vm, env);
@@ -78,7 +78,7 @@ BOOL s01E0_StadiumSetupActorsTriple(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s01E5_StadiumResetTrainerFlags(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Stadium_StadiumResetTrainerFlags(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work;
     EventWork *eventWork;
     s32 i;
@@ -95,7 +95,7 @@ BOOL s01E5_StadiumResetTrainerFlags(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s0249_GetRandomDistinctSix(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Stadium_GetRandomDistinctSix(VM *vm, FieldScriptEnv *env) {
     u16 *results[6];
 
     FieldScriptEnv_GetScriptWork(env);

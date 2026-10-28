@@ -8,10 +8,10 @@
 #include "field/field_script.h"
 #include "struct_decls.h"
 
-BOOL s0198_FieldSubscreenChange(VM *vm, FieldScriptEnv *env);
-BOOL s0199_FieldSubscreenReturn(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_Field_FieldSubscreenChange(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_Field_FieldSubscreenReturn(VM *vm, FieldScriptEnv *env);
 // FIELD_SCRIPT_SUB_EVENT_FINISH_FUNCS's entry for the subscreen
 BOOL FieldScriptSubEventFinish_Subscreen(FinishScriptSubEventsWork *work, u32 *state);
-BOOL s01F9_CheckPmsWordPair(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_Field_CheckPmsWordPair(VM *vm, FieldScriptEnv *env);
 
 #endif // POKEBW2_FIELD_SCRCMD_FIELD_H

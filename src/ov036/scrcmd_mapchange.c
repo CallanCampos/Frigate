@@ -21,7 +21,7 @@
 // The world position of a tile
 #define GRID_TO_FX32(n) ((n) * FX32_CONST(16))
 
-BOOL s00C2_MapChangeWarp(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Mapchange_MapChangeWarp(VM *vm, FieldScriptEnv *env) {
     VecFx32 pos;
     GameSystem *gsys = ScriptWork_GetGameSystem(FieldScriptEnv_GetScriptWork(env));
     Field *field = GSYS_GetField(gsys);
@@ -39,7 +39,7 @@ BOOL s00C2_MapChangeWarp(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL s00BE_MapChangeFake(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Mapchange_MapChangeFake(VM *vm, FieldScriptEnv *env) {
     VecFx32 pos;
     GameSystem *gsys = ScriptWork_GetGameSystem(FieldScriptEnv_GetScriptWork(env));
     Field *field = GSYS_GetField(gsys);
@@ -58,7 +58,7 @@ BOOL s00BE_MapChangeFake(VM *vm, FieldScriptEnv *env) {
 }
 
 // Sink into the quicksand under the player
-BOOL s00C1_MapChangeQuicksand(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Mapchange_MapChangeQuicksand(VM *vm, FieldScriptEnv *env) {
     VecFx32 effectPos;
     VecFx32 pos;
     VecFx32 playerPos;
@@ -92,7 +92,7 @@ BOOL s00C1_MapChangeQuicksand(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL s00BF_MapChangeWarpPad(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Mapchange_MapChangeWarpPad(VM *vm, FieldScriptEnv *env) {
     VecFx32 pos;
     GameSystem *gsys = ScriptWork_GetGameSystem(FieldScriptEnv_GetScriptWork(env));
     Field *field = GSYS_GetField(gsys);
@@ -110,7 +110,7 @@ BOOL s00BF_MapChangeWarpPad(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL s00C3_MapChangeUnionRoom(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Mapchange_MapChangeUnionRoom(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = ScriptWork_GetGameSystem(FieldScriptEnv_GetScriptWork(env));
     Field *field = GSYS_GetField(gsys);
     GameEvent *event = GSYS_GetNowEvent(gsys);
@@ -119,7 +119,7 @@ BOOL s00C3_MapChangeUnionRoom(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL s00C4_MapChangeCore(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Mapchange_MapChangeCore(VM *vm, FieldScriptEnv *env) {
     VecFx32 pos;
     GameSystem *gsys = ScriptWork_GetGameSystem(FieldScriptEnv_GetScriptWork(env));
     Field *field = GSYS_GetField(gsys);
@@ -139,7 +139,7 @@ BOOL s00C4_MapChangeCore(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL s00C0_MapChangeWarpRail(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Mapchange_MapChangeWarpRail(VM *vm, FieldScriptEnv *env) {
     RailPosition pos;
     GameSystem *gsys = ScriptWork_GetGameSystem(FieldScriptEnv_GetScriptWork(env));
     Field *field = GSYS_GetField(gsys);
@@ -156,7 +156,7 @@ BOOL s00C0_MapChangeWarpRail(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL s0247_MapChangeRail(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Mapchange_MapChangeRail(VM *vm, FieldScriptEnv *env) {
     RailPosition pos;
     GameSystem *gsys = ScriptWork_GetGameSystem(FieldScriptEnv_GetScriptWork(env));
     Field *field = GSYS_GetField(gsys);
@@ -174,7 +174,7 @@ BOOL s0247_MapChangeRail(VM *vm, FieldScriptEnv *env) {
 }
 
 // Fly to the zone's spawn point
-BOOL s028A_MapChangeFlyWarp(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Mapchange_MapChangeFlyWarp(VM *vm, FieldScriptEnv *env) {
     ZoneSpawnInfo spawn;
     GameEvent *event;
     GameSystem *gsys = ScriptWork_GetGameSystem(FieldScriptEnv_GetScriptWork(env));

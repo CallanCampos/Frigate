@@ -150,7 +150,7 @@ L_01F6:
     Cmd_01DB 3, 0x8025
     SystemMsg 0x8025, 2
     LastKeyWait
-    InfoMsgClose
+    SystemMsgClose
 
 L_0206:
     VMReturn
@@ -226,7 +226,7 @@ L_02E4:
 
 L_02F6:
     MsgWaitAdvance
-    InfoMsgClose
+    SystemMsgClose
     Cmd_01DB 4, 0x8010
     VMReturn
     .balign 4, 0

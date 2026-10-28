@@ -13,7 +13,7 @@
 // The part of the day by the season's hours of light
 u32 LocalTvtUtil_GetTime(GameData *gameData);
 // The backgrounds of both screens
-LocalTvtBG *LocalTvtBG_Create(GameData *gameData, HeapID heapId, u32 unk04);
+LocalTvtBG *LocalTvtBG_Create(GameData *gameData, HeapID heapId, u32 swapPalette);
 void LocalTvtBG_Free(LocalTvtBG *bg);
 
 // A sequence of functions with a step each, until one ends it

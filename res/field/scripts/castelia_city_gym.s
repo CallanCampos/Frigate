@@ -384,7 +384,7 @@ L_04E3:
 
 L_04E8:
     LastKeyWait
-    InfoMsgClose_0039
+    InfoMsgClose
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt

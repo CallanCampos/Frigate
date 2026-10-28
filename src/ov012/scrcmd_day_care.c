@@ -16,7 +16,7 @@
 #include "system/game_system.h"
 #include "system/vm.h"
 
-BOOL s00EB_DayCareCheckSpawnFlag(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_DayCare_DayCareCheckSpawnFlag(VM *vm, FieldScriptEnv *env) {
     u16 *result = ScriptReadVar(vm, env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     DayCare *dayCare = Field_GetDayCare(GSYS_GetField(gsys));
@@ -24,7 +24,7 @@ BOOL s00EB_DayCareCheckSpawnFlag(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s00EC_DayCareBreed(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_DayCare_DayCareBreed(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     PokeParty *party = GameData_GetParty(FieldScriptEnv_GetGameData(env));
     DayCare *dayCare = Field_GetDayCare(GSYS_GetField(gsys));
@@ -32,14 +32,14 @@ BOOL s00EC_DayCareBreed(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s00ED_DayCareResetSeed(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_DayCare_DayCareResetSeed(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     DayCare *dayCare = Field_GetDayCare(GSYS_GetField(gsys));
     DayCare_CheckResetSeed(dayCare);
     return FALSE;
 }
 
-BOOL s00F7_DayCareCallPokeSelect(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_DayCare_DayCareCallPokeSelect(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     u16 *result = ScriptReadVar(vm, env);
     GameData *gameData = FieldScriptEnv_GetGameData(env);
@@ -51,7 +51,7 @@ BOOL s00F7_DayCareCallPokeSelect(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL s00F0_DayCareDeposit(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_DayCare_DayCareDeposit(VM *vm, FieldScriptEnv *env) {
     u16 slot = ScriptReadAny(vm, env);
     PokeParty *party = GameData_GetParty(FieldScriptEnv_GetGameData(env));
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
@@ -60,7 +60,7 @@ BOOL s00F0_DayCareDeposit(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s00F1_DayCareWithdraw(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_DayCare_DayCareWithdraw(VM *vm, FieldScriptEnv *env) {
     u16 slot = ScriptReadAny(vm, env);
     PokeParty *party = GameData_GetParty(FieldScriptEnv_GetGameData(env));
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
@@ -69,7 +69,7 @@ BOOL s00F1_DayCareWithdraw(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s00EE_DayCareGetPkmCount(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_DayCare_DayCareGetPkmCount(VM *vm, FieldScriptEnv *env) {
     u16 *result = ScriptReadVar(vm, env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     DayCare *dayCare = Field_GetDayCare(GSYS_GetField(gsys));
@@ -77,7 +77,7 @@ BOOL s00EE_DayCareGetPkmCount(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s00EF_DayCareCalcEggSpawnChance(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_DayCare_DayCareCalcEggSpawnChance(VM *vm, FieldScriptEnv *env) {
     u16 *result = ScriptReadVar(vm, env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     DayCare *dayCare = Field_GetDayCare(GSYS_GetField(gsys));
@@ -85,7 +85,7 @@ BOOL s00EF_DayCareCalcEggSpawnChance(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s00F2_DayCareGetSpecies(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_DayCare_DayCareGetSpecies(VM *vm, FieldScriptEnv *env) {
     u16 *result = ScriptReadVar(vm, env);
     u16 slot = ScriptReadAny(vm, env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
@@ -95,7 +95,7 @@ BOOL s00F2_DayCareGetSpecies(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s00F3_DayCareGetForme(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_DayCare_DayCareGetForme(VM *vm, FieldScriptEnv *env) {
     u16 *result = ScriptReadVar(vm, env);
     u16 slot = ScriptReadAny(vm, env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
@@ -105,7 +105,7 @@ BOOL s00F3_DayCareGetForme(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s00F8_DayCareGetSex(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_DayCare_DayCareGetSex(VM *vm, FieldScriptEnv *env) {
     u16 *result = ScriptReadVar(vm, env);
     u16 slot = ScriptReadAny(vm, env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
@@ -115,7 +115,7 @@ BOOL s00F8_DayCareGetSex(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s00F4_DayCareCalcNewLevel(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_DayCare_DayCareCalcNewLevel(VM *vm, FieldScriptEnv *env) {
     u16 *result = ScriptReadVar(vm, env);
     u16 slot = ScriptReadAny(vm, env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
@@ -124,7 +124,7 @@ BOOL s00F4_DayCareCalcNewLevel(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s00F5_DayCareCalcLevelGain(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_DayCare_DayCareCalcLevelGain(VM *vm, FieldScriptEnv *env) {
     u16 *result = ScriptReadVar(vm, env);
     u16 slot = ScriptReadAny(vm, env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
@@ -134,7 +134,7 @@ BOOL s00F5_DayCareCalcLevelGain(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s00F6_DayCareCalcWithdrawCost(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_DayCare_DayCareCalcWithdrawCost(VM *vm, FieldScriptEnv *env) {
     u16 *result = ScriptReadVar(vm, env);
     u16 slot = ScriptReadAny(vm, env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
@@ -144,7 +144,7 @@ BOOL s00F6_DayCareCalcWithdrawCost(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s023E_DayCareGetSexForNamePrint(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_DayCare_DayCareGetSexForNamePrint(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     DayCare *dayCare = Field_GetDayCare(GSYS_GetField(gsys));
     u16 *result = ScriptReadVar(vm, env);

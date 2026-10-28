@@ -167,7 +167,7 @@ L_0261:
 
 L_0275:
     WorkSetConst 0x802a, 0
-    ListMenu_AnchorTopRight 31, 1, 0, 1, 32810
+    ListMenuAnchorTopRight 31, 1, 0, 1, 32810
     ListMenuAdd 5, 65535, 2
     ListMenuAdd 6, 65535, 3
     ListMenuAdd 7, 65535, 255

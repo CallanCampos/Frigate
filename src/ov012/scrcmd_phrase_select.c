@@ -11,7 +11,8 @@
 #include "system/pms.h"
 #include "system/vm.h"
 
-// The script command that lets the player pick a phrase (a descriptive name). s01DA_CallPhraseSelect is swan's name
+// The script command that lets the player pick a phrase (a descriptive name). Scrcmd_PhraseSelect_CallPhraseSelect is
+// swan's name
 
 typedef struct {
     u32 mode;
@@ -26,7 +27,7 @@ typedef struct {
 
 static GameEventReturnCode EventPhraseSelect_Callback(GameEvent *event, u32 *state, void *data);
 
-BOOL s01DA_CallPhraseSelect(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_PhraseSelect_CallPhraseSelect(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     GameData *gameData = FieldScriptEnv_GetGameData(env);
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);

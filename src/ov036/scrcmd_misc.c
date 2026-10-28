@@ -85,7 +85,7 @@ static const u8 ANVILLE_TRAIN_INDICES_BY_DAY_DIGIT[10] = { 9, 1, 3, 5, 4, 2, 6, 
 // The field prop model for each Anville train index; index 0 uses the same model as index 1.
 static const u16 ANVILLE_TRAIN_MODEL_IDS[ANVILLE_TRAIN_MAX] = { 117, 117, 118, 133, 248, 249, 250, 251, 252, 253, 254 };
 
-BOOL s0134_CasteliaRushInit(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Misc_CasteliaRushInit(VM *vm, FieldScriptEnv *env) {
     ScriptFieldWork *fieldWork = ScriptWork_GetFieldWork(FieldScriptEnv_GetScriptWork(env));
 
     FieldAsyncProcManager_AddProc(OVERLAY_CASTELIA_RUSH, Field_GetAsyncProcMgr(fieldWork->field),
@@ -94,7 +94,7 @@ BOOL s0134_CasteliaRushInit(VM *vm, FieldScriptEnv *env) {
 }
 
 // Set a word to the name of the trainer log entry that the DS owner's birthday picks, with that trainer's gender
-BOOL ElevatorTable_RegisterBirthdayEntry(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Misc_ElevatorRegisterBirthdayEntry(VM *vm, FieldScriptEnv *env) {
     OSOwnerInfo ownerInfo;
     u16 wordIndex;
     TrainerLogSave *data;
@@ -125,7 +125,7 @@ BOOL ElevatorTable_RegisterBirthdayEntry(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL ElevatorTable_GetMysteryEntryCount(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Misc_ElevatorGetMysteryEntryCount(VM *vm, FieldScriptEnv *env) {
     GameData *gameData = FieldScriptEnv_GetGameData(env);
     u16 *result = ScriptReadVar(vm, env);
 
@@ -157,7 +157,7 @@ static u32 ElevatorTable_CountEntries(ElevatorFloor *table) {
 }
 
 // The table of floors follows the command in the script
-BOOL s01C1_ElevatorSetTablePtr(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Misc_ElevatorSetTablePtr(VM *vm, FieldScriptEnv *env) {
     s32 offset = VM_Read32(vm);
 
     FieldScriptEnv_SetElevatorTable(env, (ElevatorFloor *)(vm->pc + offset));
@@ -165,7 +165,7 @@ BOOL s01C1_ElevatorSetTablePtr(VM *vm, FieldScriptEnv *env) {
 }
 
 // A list of the floors other than this one
-BOOL s01C2_ElevatorBuildListMenu(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Misc_ElevatorBuildListMenu(VM *vm, FieldScriptEnv *env) {
     ElevatorFloor *table = FieldScriptEnv_GetElevatorTable(env);
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     StrBuf *expanded = ScriptWork_GetMainStrBuf(work);
@@ -184,7 +184,7 @@ BOOL s01C2_ElevatorBuildListMenu(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s01C2_ElevatorChangeMap(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Misc_ElevatorChangeMap(VM *vm, FieldScriptEnv *env) {
     VecFx32 pos;
     u16 index = ScriptReadAny(vm, env);
     ElevatorFloor *table = FieldScriptEnv_GetElevatorTable(env);
@@ -210,7 +210,7 @@ BOOL s01C2_ElevatorChangeMap(VM *vm, FieldScriptEnv *env) {
 }
 
 // What the item collector of the group pays for the item, or 0
-BOOL s01FC_ItemCollectorGetPrice(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Misc_ItemCollectorGetPrice(VM *vm, FieldScriptEnv *env) {
     u32 size;
     u32 i;
     ItemCollectorPrice *prices;
@@ -235,7 +235,7 @@ BOOL s01FC_ItemCollectorGetPrice(VM *vm, FieldScriptEnv *env) {
 }
 
 // Whether the player has any item that the item collector of the group buys
-BOOL s01FB_ItemCollectorCheckGroup(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Misc_ItemCollectorCheckGroup(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameData *gameData = FieldScriptEnv_GetGameData(env);
     ScriptFieldWork *fieldWork = ScriptWork_GetFieldWork(work);
@@ -261,7 +261,7 @@ BOOL s01FB_ItemCollectorCheckGroup(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s0236_WordSetLoadItemCollectorPrice(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Misc_WordSetLoadItemCollectorPrice(VM *vm, FieldScriptEnv *env) {
     u32 size;
     ItemCollectorPrice *prices;
     u32 i;
@@ -287,7 +287,7 @@ BOOL s0236_WordSetLoadItemCollectorPrice(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s0237_ItemCollectorSell(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Misc_ItemCollectorSell(VM *vm, FieldScriptEnv *env) {
     u32 size;
     ItemCollectorPrice *prices;
     u32 i;
@@ -314,7 +314,7 @@ BOOL s0237_ItemCollectorSell(VM *vm, FieldScriptEnv *env) {
 }
 
 // Resolve the script's train index to the field prop model used by BMChangeMdlID.
-BOOL s0221_AnvilleTrainGetModelID(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Misc_AnvilleTrainGetModelID(VM *vm, FieldScriptEnv *env) {
     u16 index = ScriptReadAny(vm, env);
     u16 *result = ScriptReadVar(vm, env);
 
@@ -338,7 +338,7 @@ static BOOL AnvilleTrain_IsSpecialDate(u32 month, u32 day) {
 }
 
 // The index also selects the train enthusiast's explanation in Anville Town.
-BOOL s0222_AnvilleTrainGetDailyIndex(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Misc_AnvilleTrainGetDailyIndex(VM *vm, FieldScriptEnv *env) {
     u16 *result = ScriptReadVar(vm, env);
     GameData *gameData = FieldScriptEnv_GetGameData(env);
     u32 month = GameData_GetMonth(gameData);

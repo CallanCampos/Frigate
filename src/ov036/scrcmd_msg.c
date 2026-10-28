@@ -141,7 +141,7 @@ static BOOL ScriptNative_SystemMsgWinWait(VM *vm, void *env) {
     return FALSE;
 }
 
-BOOL s0034_SystemMsg(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Msg_SystemMsg(VM *vm, FieldScriptEnv *env) {
     FieldScriptEnv_GetScriptWork(env);
     u16 msgId = ScriptReadAny(vm, env);
     StrBuf *strbuf;
@@ -153,7 +153,7 @@ BOOL s0034_SystemMsg(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL s0035_SystemMsgAsync(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Msg_SystemMsgAsync(VM *vm, FieldScriptEnv *env) {
     StrBuf *strbuf = ScriptWork_GetMainStrBuf(FieldScriptEnv_GetScriptWork(env));
     u16 msgId = ScriptReadAny(vm, env);
     FieldMsgWin *window;
@@ -166,7 +166,7 @@ BOOL s0035_SystemMsgAsync(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s0037_MsgSetLoadingSpinner(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Msg_MsgSetLoadingSpinner(VM *vm, FieldScriptEnv *env) {
     HeapID heapId = Field_GetHeapID(GSYS_GetField(FieldScriptEnv_GetGameSystem(env)));
     u16 hide = ScriptReadAny(vm, env);
     WaitIcon *icon;
@@ -187,7 +187,7 @@ BOOL s0037_MsgSetLoadingSpinner(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s0036_InfoMsgClose(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Msg_SystemMsgClose(VM *vm, FieldScriptEnv *env) {
     SystemMsgWin_Close(env);
     return FALSE;
 }
@@ -197,7 +197,7 @@ BOOL FieldScriptSubEventFinish_SystemMsg(FinishScriptSubEventsWork *work, u32 *s
     return TRUE;
 }
 
-BOOL s0040_MoneyWinDisp(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Msg_MoneyWinDisp(VM *vm, FieldScriptEnv *env) {
     u16 x = ScriptReadAny(vm, env);
     u16 y = ScriptReadAny(vm, env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
@@ -228,7 +228,7 @@ BOOL s0040_MoneyWinDisp(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s0042_MoneyWinUpdate(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Msg_MoneyWinUpdate(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     GameData *gameData = GSYS_GetGameData(gsys);
     GameData_GetPlayerState(gameData);
@@ -251,7 +251,7 @@ BOOL s0042_MoneyWinUpdate(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s0041_MoneyWinClose(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Msg_MoneyWinClose(VM *vm, FieldScriptEnv *env) {
     Field *field = GSYS_GetField(FieldScriptEnv_GetGameSystem(env));
     MoneyWin *moneyWin = Field_GetMoneyWin(field);
 
@@ -522,7 +522,7 @@ static BOOL CallFieldActorMessageDisp(VM *vm, FieldScriptEnv *env, u16 fileNo, u
     return FALSE;
 }
 
-BOOL s003C_ActorMsg(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Msg_ActorMsg(VM *vm, FieldScriptEnv *env) {
     u16 fileNo = ScriptReadAny(vm, env);
     u16 msgId = ScriptReadAny(vm, env);
     u16 actorId = ScriptReadAny(vm, env);
@@ -532,7 +532,7 @@ BOOL s003C_ActorMsg(VM *vm, FieldScriptEnv *env) {
     return CallFieldActorMessageDisp(vm, env, fileNo, msgId, actorId, pos, frameType);
 }
 
-BOOL s003D_ParentActorMsg(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Msg_ParentActorMsg(VM *vm, FieldScriptEnv *env) {
     FieldActor *actor = ScriptWork_GetParentActor(FieldScriptEnv_GetScriptWork(env));
     u16 fileNo = ScriptReadAny(vm, env);
     u16 msgId = ScriptReadAny(vm, env);
@@ -561,7 +561,7 @@ static BOOL CallFieldActorMessageDispSelect(VM *vm, FieldScriptEnv *env, u8 seco
     return CallFieldActorMessageDisp(vm, env, MSGFILE_SCRIPT, msgId, actorId, pos, frameType);
 }
 
-BOOL s0278_FunfestDispSalesmanMessage(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Msg_FunfestDispSalesmanMessage(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     u32 count = FesGimmick_IsOnSale(Field_GetFesGimmick(GSYS_GetField(FieldScriptEnv_GetGameSystem(env))));
     u16 actorId = ScriptWork_ResolveHybridValue(work, FieldScriptEnv_GetGameData(env), 0x8011);
@@ -573,13 +573,13 @@ BOOL s0278_FunfestDispSalesmanMessage(VM *vm, FieldScriptEnv *env) {
     return CallFieldActorMessageDisp(vm, env, MSGFILE_SCRIPT, msgId, actorId, pos, TALKMSG_WIN_FRAME_NORMAL);
 }
 
-BOOL s0048_ActorMsgGendered(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Msg_ActorMsgGendered(VM *vm, FieldScriptEnv *env) {
     PlayerState *playerState = GameData_GetPlayerState(FieldScriptEnv_GetGameData(env));
 
     return CallFieldActorMessageDispSelect(vm, env, getTrainerGender(&playerState->playerInfo) != 0);
 }
 
-BOOL s0049_ActorMsgVersioned(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Msg_ActorMsgVersioned(VM *vm, FieldScriptEnv *env) {
 #ifdef BLACK2
     return CallFieldActorMessageDispSelect(vm, env, TRUE);
 #else
@@ -587,7 +587,7 @@ BOOL s0049_ActorMsgVersioned(VM *vm, FieldScriptEnv *env) {
 #endif
 }
 
-BOOL s003E_ActorMsgClose(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Msg_ActorMsgClose(VM *vm, FieldScriptEnv *env) {
     ActorMsgWin_CloseAsync(vm, env);
     return TRUE;
 }
@@ -597,7 +597,7 @@ BOOL FieldScriptSubEventFinish_ActorMsg(FinishScriptSubEventsWork *work, u32 *st
     return TRUE;
 }
 
-BOOL s0087_TrainerSayMessage(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Msg_TrainerSayMessage(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     ScriptFieldWork *fieldWork = ScriptWork_GetFieldWork(work);
     u16 trainerId = ScriptReadAny(vm, env);
@@ -690,15 +690,15 @@ static void InfoMsgWin_Close(FieldScriptEnv *env) {
     }
 }
 
-BOOL s0038_InfoMsg(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Msg_InfoMsg(VM *vm, FieldScriptEnv *env) {
     return displayText(vm, env, TALKMSG_WIN_FRAME_NORMAL);
 }
 
-BOOL s004A_ScreamMsg(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Msg_ScreamMsg(VM *vm, FieldScriptEnv *env) {
     return displayText(vm, env, TALKMSG_WIN_FRAME_SPIKY);
 }
 
-BOOL s0039_InfoMsgClose(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Msg_InfoMsgClose(VM *vm, FieldScriptEnv *env) {
     InfoMsgWin_Close(env);
     return FALSE;
 }
@@ -708,7 +708,7 @@ BOOL FieldScriptSubEventFinish_InfoMsg(FinishScriptSubEventsWork *work, u32 *sta
     return TRUE;
 }
 
-BOOL s003A_MultiMsg(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Msg_MultiMsg(VM *vm, FieldScriptEnv *env) {
     ScriptFieldWork *fieldWork = ScriptWork_GetFieldWork(FieldScriptEnv_GetScriptWork(env));
     u16 msgId = ScriptReadAny(vm, env);
     u16 x = ScriptReadAny(vm, env);
@@ -732,7 +732,7 @@ BOOL s003A_MultiMsg(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s003B_MsgWinCloseNo(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Msg_MsgWinCloseNo(VM *vm, FieldScriptEnv *env) {
     ScriptFieldWork *fieldWork = ScriptWork_GetFieldWork(FieldScriptEnv_GetScriptWork(env));
 
     MsgBGPrinter_DeleteSubMsgWin(fieldWork->msgBGSys, VM_Read16(vm));
@@ -781,7 +781,7 @@ static void SignMsgWin_Close(FieldScriptEnv *env) {
     }
 }
 
-BOOL s0043_MsgPlaceSign(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Msg_MsgPlaceSign(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     u16 msgId = ScriptReadAny(vm, env);
     u16 type = VM_Read16(vm);
@@ -796,7 +796,7 @@ BOOL s0043_MsgPlaceSign(VM *vm, FieldScriptEnv *env) {
 }
 
 // A sign in font 4, which only the Abyssal Ruins' scripts use
-BOOL s0230_MsgPlaceSignFont4(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Msg_MsgPlaceSignFont4(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     ScriptFieldWork *fieldWork = ScriptWork_GetFieldWork(work);
     u16 msgId = ScriptReadAny(vm, env);
@@ -814,7 +814,7 @@ BOOL s0230_MsgPlaceSignFont4(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL s0044_MsgPlaceSignClose(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Msg_MsgPlaceSignClose(VM *vm, FieldScriptEnv *env) {
     SignMsgWin_Close(env);
     return FALSE;
 }
@@ -839,7 +839,7 @@ static BOOL ScriptNative_CheckerMsgWinWait(VM *vm, void *env) {
     return FALSE;
 }
 
-BOOL s0045_CheckerMsg(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Msg_CheckerMsg(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     u16 msgId = VM_Read16(vm);
     u8 x = VM_Read8(vm);
@@ -858,7 +858,7 @@ BOOL s0045_CheckerMsg(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL s0046_CheckerMsgClose(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Msg_CheckerMsgClose(VM *vm, FieldScriptEnv *env) {
     CheckerMsgWin_Close(env);
     return FALSE;
 }
@@ -868,7 +868,7 @@ BOOL FieldScriptSubEventFinish_CheckerMsg(FinishScriptSubEventsWork *work, u32 *
     return TRUE;
 }
 
-BOOL s003F_MsgWinCloseAll(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Msg_MsgWinCloseAll(VM *vm, FieldScriptEnv *env) {
     if (FieldScriptSubEvent_IsRegistered(SCRIPT_SUB_EVENT_SYSTEM_MSG)) {
         SystemMsgWin_Close(env);
     }
@@ -908,12 +908,12 @@ static BOOL ScriptNative_AdvanceMessages(VM *vm, void *env) {
     return FALSE;
 }
 
-BOOL s004B_MsgWaitAdvance(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Msg_MsgWaitAdvance(VM *vm, FieldScriptEnv *env) {
     VM_SetNativeCallback(vm, ScriptNative_AdvanceMessages);
     return TRUE;
 }
 
-BOOL s0033_MsgSetAutoscrolls(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Msg_MsgSetAutoscrolls(VM *vm, FieldScriptEnv *env) {
     ScriptFieldWork *fieldWork = ScriptWork_GetFieldWork(FieldScriptEnv_GetScriptWork(env));
 
     if (VM_Read16(vm)) {

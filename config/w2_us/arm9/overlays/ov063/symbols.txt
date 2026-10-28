@@ -1,4 +1,4 @@
-BadgeGateCmd_PlayCheck kind:function(thumb,size=0x3a) addr:0x021e5840
-BadgeGateCmd_PlayLastGate kind:function(thumb,size=0x28) addr:0x021e587c
+Scrcmd_BadgeGate_PlayCheck kind:function(thumb,size=0x3a) addr:0x021e5840
+Scrcmd_BadgeGate_PlayLastGate kind:function(thumb,size=0x28) addr:0x021e587c
 BADGE_GATE_SCRIPT_COMMANDS kind:data(any) addr:0x021e58a4 ambiguous
 data_ov063_021e5868 kind:data(any) addr:0x021e58a8 ambiguous

@@ -67,7 +67,7 @@ Script_2:
     ScreamMsg UndellaBay_Text_Jelliiii, 2
     PVWait
     MsgWaitAdvance
-    InfoMsgClose_0039
+    InfoMsgClose
     WorkSetConst 0x8025, 0
     WorkSetConst 0x8025, 128
     WorkOr 0x8025, 8
@@ -86,7 +86,7 @@ L_011C:
     ScreamMsg UndellaBay_Text_Jeeelliii, 2
     PVWait
     MsgWaitAdvance
-    InfoMsgClose_0039
+    InfoMsgClose
     WorkSetConst 0x8026, 0
     WorkSetConst 0x8026, 128
     WorkOr 0x8026, 8
@@ -134,7 +134,7 @@ L_01D0:
     // "Jellicent dove down into\nthe depths of the ocean..."
     SystemMsg UndellaBay_Text_JellicentDoveDownInto, 2
     LastKeyWait
-    InfoMsgClose
+    SystemMsgClose
     VMJump L_0214
 
 L_01F7:
@@ -145,7 +145,7 @@ L_01F7:
     // "Jellicent dove down into\nthe depths of the ocean..."
     SystemMsg UndellaBay_Text_JellicentDoveDownInto_2, 2
     LastKeyWait
-    InfoMsgClose
+    SystemMsgClose
 
 L_0214:
     VMJump L_021A

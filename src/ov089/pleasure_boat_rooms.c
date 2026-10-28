@@ -45,10 +45,10 @@ typedef struct {
     u32 values[2];
 } PersonEntry;
 
-// Which side a room is on and something else about it (the counts of PleasureBoat_GetInfo)
+// Which side a room is on and whether its door is blue (the counts of PleasureBoat_GetInfo)
 typedef struct {
     u32 isPort;
-    u32 unk4;
+    u32 hasBlueDoor;
 } RoomSide;
 
 static void RoomPicker_Reset(RoomPicker *picker);
@@ -154,7 +154,7 @@ void PleasureBoat_SetUpRooms(PleasureBoat *boat, BOOL flag) {
         } else {
             boat->infoCounts[1]++;
         }
-        if (side->unk4 == 0) {
+        if (side->hasBlueDoor == 0) {
             boat->infoCounts[2]++;
         } else {
             boat->infoCounts[3]++;

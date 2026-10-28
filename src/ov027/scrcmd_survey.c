@@ -111,7 +111,7 @@ void insideProbabilityLoop(SurveyProbabilityState *state, u32 selection) {
     }
 }
 
-BOOL SurveyCmd_GetRank(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Survey_SurveyGetRank(VM *vm, FieldScriptEnv *env) {
     TrainerGameInfoSave *info;
     u16 *out;
 
@@ -122,7 +122,7 @@ BOOL SurveyCmd_GetRank(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL SurveyCmd_RaiseRank(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Survey_SurveyRaiseRank(VM *vm, FieldScriptEnv *env) {
     TrainerGameInfoSave *info;
     int count;
 
@@ -137,7 +137,7 @@ BOOL SurveyCmd_RaiseRank(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s01FF_SurveyGetCurrentQuestionID(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Survey_SurveyGetCurrentQuestionID(VM *vm, FieldScriptEnv *env) {
     TrainerGameInfoSave *info;
     u16 *out;
 
@@ -148,7 +148,7 @@ BOOL s01FF_SurveyGetCurrentQuestionID(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s0200_SurveyGetCurrentAnswerIDs(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Survey_SurveyGetCurrentAnswerIDs(VM *vm, FieldScriptEnv *env) {
     TrainerGameInfoSave *info;
     u16 *first;
     u16 *second;
@@ -165,7 +165,7 @@ BOOL s0200_SurveyGetCurrentAnswerIDs(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s0204_SurveyGetTime(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Survey_SurveyGetTime(VM *vm, FieldScriptEnv *env) {
     SaveControl *save;
     u16 *out;
 
@@ -176,7 +176,7 @@ BOOL s0204_SurveyGetTime(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL SurveyCmd_Start(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Survey_SurveyStart(VM *vm, FieldScriptEnv *env) {
     SaveControl *save;
     TrainerGameInfoSave *info;
     u16 values[3];
@@ -201,7 +201,7 @@ BOOL SurveyCmd_Start(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL SurveyCmd_Clear(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Survey_SurveyClear(VM *vm, FieldScriptEnv *env) {
     SaveControl *save;
     TrainerGameInfoSave *info;
     int i;
@@ -218,7 +218,7 @@ BOOL SurveyCmd_Clear(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s0201_SurveyGetPopularOptionMsgID(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Survey_SurveyGetPopularOptionMsgID(VM *vm, FieldScriptEnv *env) {
     int i;
     u16 question;
     u16 *out;
@@ -248,7 +248,7 @@ BOOL s0201_SurveyGetPopularOptionMsgID(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL SurveyCmd_WriteOwnAnswer(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Survey_SurveyWriteOwnAnswer(VM *vm, FieldScriptEnv *env) {
     u8 *answers;
     u32 question;
     u32 answer;
@@ -262,7 +262,7 @@ BOOL SurveyCmd_WriteOwnAnswer(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL SurveyCmd_ShowRankMessage(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Survey_SurveyShowRankMessage(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work;
     GameEvent *event;
 
@@ -272,7 +272,7 @@ BOOL SurveyCmd_ShowRankMessage(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL SurveyCmd_GetQuestionState(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Survey_SurveyGetQuestionState(VM *vm, FieldScriptEnv *env) {
     SaveControl *save;
     TrainerCardSave *card;
     u8 index;
@@ -290,7 +290,7 @@ BOOL SurveyCmd_GetQuestionState(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL SurveyCmd_GetCurrentRemaining(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Survey_SurveyGetCurrentRemaining(VM *vm, FieldScriptEnv *env) {
     SaveControl *save;
     TrainerCardSave *card;
     u16 *out;

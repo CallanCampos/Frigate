@@ -23,41 +23,41 @@ typedef struct {
     s32 volume;
 } Plugin14SeqFadeOut;
 
-static BOOL Plugin14Cmd_ShowGC6Model(VM *vm, FieldScriptEnv *env) {
+static BOOL Scrcmd_Plugin14_ShowGC6Model(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
 
     GimmickGC6_ShowModel01(gsys, VM_Read16(vm));
     return FALSE;
 }
 
-static BOOL Plugin14Cmd_PlayGC6Model(VM *vm, FieldScriptEnv *env) {
+static BOOL Scrcmd_Plugin14_PlayGC6Model(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
 
     GimmickGC6_PlayModel01(gsys, VM_Read16(vm));
     return FALSE;
 }
 
-static BOOL Plugin14Cmd_StartActorHover(VM *vm, FieldScriptEnv *env) {
+static BOOL Scrcmd_Plugin14_StartActorHover(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
 
     GimmickGC6_CallStartHover(gsys, VM_Read16(vm));
     return FALSE;
 }
 
-static BOOL Plugin14Cmd_PlayGC6Model23(VM *vm, FieldScriptEnv *env) {
+static BOOL Scrcmd_Plugin14_PlayGC6Model23(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
 
     GimmickGC6_PlayModel23(gsys, ScriptReadAny(vm, env) == TRUE);
     return FALSE;
 }
 
-static BOOL Plugin14Cmd_HideGC6Model3(VM *vm, FieldScriptEnv *env) {
+static BOOL Scrcmd_Plugin14_HideGC6Model3(VM *vm, FieldScriptEnv *env) {
     GimmickGC6_HideModel3(FieldScriptEnv_GetGameSystem(env));
     return FALSE;
 }
 
 // Moves an actor by whole units along x and z
-static BOOL Plugin14Cmd_ShiftActor(VM *vm, FieldScriptEnv *env) {
+static BOOL Scrcmd_Plugin14_ShiftActor(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     u32 actorId = ScriptReadAny(vm, env);
     s16 dx = ScriptReadAny(vm, env);
@@ -77,7 +77,7 @@ static BOOL Plugin14Cmd_ShiftActor(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-static BOOL Plugin14Cmd_ResetLCDToBlack(VM *vm, FieldScriptEnv *env) {
+static BOOL Scrcmd_Plugin14_ResetLCDToBlack(VM *vm, FieldScriptEnv *env) {
     Field *field = GSYS_GetField(FieldScriptEnv_GetGameSystem(env));
     u32 enabledA = GFL_BGSysGetEnabledBGsA();
     u32 enabledB = GFL_BGSysGetEnabledBGsB();
@@ -93,12 +93,12 @@ static BOOL Plugin14Cmd_ResetLCDToBlack(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-static BOOL Plugin14Cmd_StartAspertiaSeasonAnimations(VM *vm, FieldScriptEnv *env) {
+static BOOL Scrcmd_Plugin14_StartAspertiaSeasonAnimations(VM *vm, FieldScriptEnv *env) {
     AspertiaCity_PlaySeasonModel(FieldScriptEnv_GetGameSystem(env));
     return FALSE;
 }
 
-static BOOL Plugin14Cmd_StartLeagueCenterAnimations(VM *vm, FieldScriptEnv *env) {
+static BOOL Scrcmd_Plugin14_StartLeagueCenterAnimations(VM *vm, FieldScriptEnv *env) {
     LeagueCenter_PlayModel(FieldScriptEnv_GetGameSystem(env));
     return FALSE;
 }
@@ -106,7 +106,7 @@ static BOOL Plugin14Cmd_StartLeagueCenterAnimations(VM *vm, FieldScriptEnv *env)
 static BOOL Plugin14_SeqFadeOutTask(void *data);
 
 // Fades a sound sequence out and stops it
-static BOOL Plugin14Cmd_FadeOutSeq(VM *vm, FieldScriptEnv *env) {
+static BOOL Scrcmd_Plugin14_FadeOutSeq(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     Field *field = GSYS_GetField(FieldScriptEnv_GetGameSystem(env));
     HeapID heapId = Field_GetHeapID(field);
@@ -134,12 +134,12 @@ static BOOL Plugin14_SeqFadeOutTask(void *data) {
     return FALSE;
 }
 
-static BOOL Plugin14Cmd_LoadAspertiaBG3Picture(VM *vm, FieldScriptEnv *env) {
+static BOOL Scrcmd_Plugin14_LoadAspertiaBG3Picture(VM *vm, FieldScriptEnv *env) {
     AspertiaCity_RequestBG(FieldScriptEnv_GetGameSystem(env));
     return FALSE;
 }
 
-static BOOL Plugin14Cmd_CallDT9ReleaseEvent(VM *vm, FieldScriptEnv *env) {
+static BOOL Scrcmd_Plugin14_CallDT9ReleaseEvent(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameEvent *event = GimmickDT9_CreateReleaseEvent(FieldScriptEnv_GetGameSystem(env));
 
@@ -150,7 +150,7 @@ static BOOL Plugin14Cmd_CallDT9ReleaseEvent(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-static BOOL Plugin14Cmd_CallDT9ThrowEvent(VM *vm, FieldScriptEnv *env) {
+static BOOL Scrcmd_Plugin14_CallDT9ThrowEvent(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     Field *field = GSYS_GetField(gsys);
@@ -179,7 +179,7 @@ static BOOL Plugin14Cmd_CallDT9ThrowEvent(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-static BOOL Plugin14Cmd_PlayDT9Thrown(VM *vm, FieldScriptEnv *env) {
+static BOOL Scrcmd_Plugin14_PlayDT9Thrown(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     u16 x = ScriptReadAny(vm, env);
     u16 y = ScriptReadAny(vm, env);
@@ -193,7 +193,7 @@ static BOOL Plugin14Cmd_PlayDT9Thrown(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-static BOOL Plugin14Cmd_CallDT9WaitThrownDoneEvent(VM *vm, FieldScriptEnv *env) {
+static BOOL Scrcmd_Plugin14_CallDT9WaitThrownDoneEvent(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameEvent *event = GimmickDT9_CreateWaitThrownDoneEvent(FieldScriptEnv_GetGameSystem(env));
 
@@ -204,7 +204,7 @@ static BOOL Plugin14Cmd_CallDT9WaitThrownDoneEvent(VM *vm, FieldScriptEnv *env) 
     return TRUE;
 }
 
-static BOOL Plugin14Cmd_CallDT9WaitFifthFrameEvent(VM *vm, FieldScriptEnv *env) {
+static BOOL Scrcmd_Plugin14_CallDT9WaitFifthFrameEvent(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameEvent *event = GimmickDT9_CreateWaitFifthFrameEvent(FieldScriptEnv_GetGameSystem(env));
 
@@ -216,22 +216,22 @@ static BOOL Plugin14Cmd_CallDT9WaitFifthFrameEvent(VM *vm, FieldScriptEnv *env) 
 }
 
 const FieldScriptCommand PLUGIN_14_SCRIPT_COMMANDS[] = {
-    Plugin14Cmd_StartAspertiaSeasonAnimations,
-    Plugin14Cmd_ShowGC6Model,
-    Plugin14Cmd_PlayGC6Model,
-    Plugin14Cmd_StartActorHover,
-    Plugin14Cmd_PlayGC6Model23,
-    Plugin14Cmd_HideGC6Model3,
-    Plugin14Cmd_ShiftActor,
-    Plugin14Cmd_ResetLCDToBlack,
+    Scrcmd_Plugin14_StartAspertiaSeasonAnimations,
+    Scrcmd_Plugin14_ShowGC6Model,
+    Scrcmd_Plugin14_PlayGC6Model,
+    Scrcmd_Plugin14_StartActorHover,
+    Scrcmd_Plugin14_PlayGC6Model23,
+    Scrcmd_Plugin14_HideGC6Model3,
+    Scrcmd_Plugin14_ShiftActor,
+    Scrcmd_Plugin14_ResetLCDToBlack,
     NULL,
-    Plugin14Cmd_StartLeagueCenterAnimations,
-    Plugin14Cmd_FadeOutSeq,
-    Plugin14Cmd_LoadAspertiaBG3Picture,
-    Plugin14Cmd_CallDT9ReleaseEvent,
-    Plugin14Cmd_CallDT9ThrowEvent,
-    Plugin14Cmd_PlayDT9Thrown,
-    Plugin14Cmd_CallDT9WaitThrownDoneEvent,
-    Plugin14Cmd_CallDT9WaitFifthFrameEvent,
+    Scrcmd_Plugin14_StartLeagueCenterAnimations,
+    Scrcmd_Plugin14_FadeOutSeq,
+    Scrcmd_Plugin14_LoadAspertiaBG3Picture,
+    Scrcmd_Plugin14_CallDT9ReleaseEvent,
+    Scrcmd_Plugin14_CallDT9ThrowEvent,
+    Scrcmd_Plugin14_PlayDT9Thrown,
+    Scrcmd_Plugin14_CallDT9WaitThrownDoneEvent,
+    Scrcmd_Plugin14_CallDT9WaitFifthFrameEvent,
     (FieldScriptCommand)0xFFFFFFFF,
 };

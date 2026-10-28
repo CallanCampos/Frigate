@@ -158,7 +158,7 @@ L_020C:
 
 L_0220:
     WorkSetConst 0x8025, 0
-    ListMenu_AnchorTopRight 31, 1, 0, 1, 32805
+    ListMenuAnchorTopRight 31, 1, 0, 1, 32805
     ListMenuAdd 10, 65535, 2
     ListMenuAdd 11, 65535, 1
     ListMenuAdd 12, 65535, 10

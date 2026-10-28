@@ -37,8 +37,8 @@ Script_3:
     VMStackPushConst 1
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_0071
-    PokemonLeagueCmd_DisableRailLines 2
-    PokemonLeagueCmd_SetCamera 2
+    DisableRailLines 2
+    SetCamera 2
 
 L_0071:
     VMStackPushFlag EVENT_FLAG_0x0968
@@ -255,10 +255,10 @@ L_0359:
 
 Script_5:
     ActorsPauseAll
-    PokemonLeagueCmd_PlayGrimsleyGroup 0
+    PlayGrimsleyGroup 0
     SEPlay SEQ_SE_SW_GEEMA_01
     VMSleep 20
-    PokemonLeagueCmd_PlayGrimsleyModel0Animation 0
+    PlayGrimsleyModel0Animation 0
     SEPlay SEQ_SE_SW_GEEMA_02
     VMSleep 25
     WorkSetConst EVENT_WORK_0x4000, 1
@@ -268,13 +268,13 @@ Script_5:
 
 Script_6:
     ActorsPauseAll
-    PokemonLeagueCmd_DisableRailLines 2
-    PokemonLeagueCmd_SetCamera 2
+    DisableRailLines 2
+    SetCamera 2
     VMSleep 10
-    PokemonLeagueCmd_PlayGrimsleyModel0Animation 1
+    PlayGrimsleyModel0Animation 1
     SEPlay SEQ_SE_SW_GEEMA_03
     VMSleep 50
-    PokemonLeagueCmd_PlayGrimsleyGroup 1
+    PlayGrimsleyGroup 1
     SEPlay SEQ_SE_SW_GEEMA_01
     WorkSetConst EVENT_WORK_0x4001, 1
     FinishAllEvents

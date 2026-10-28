@@ -6,5 +6,6 @@
 // lays out by size within a file, so it is in a file of its own, linked after the commands.
 
 const FieldScriptCommand BSUBWAY_SCRIPT_COMMANDS[] = {
-    BSubwayCmd_ClearWork, BSubwayCmd_CreateWork, BSubwayCmd_FreeWork, BSubwayCmd_Tool, (FieldScriptCommand)0xFFFFFFFF,
+    Scrcmd_Bsubway_ClearWork, Scrcmd_Bsubway_CreateWork,      Scrcmd_Bsubway_FreeWork,
+    Scrcmd_Bsubway_Tool,      (FieldScriptCommand)0xFFFFFFFF,
 };

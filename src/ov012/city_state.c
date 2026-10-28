@@ -1,4 +1,5 @@
 #include "types.h"
+#include "field/zone.h"
 #include "system/game_data.h"
 
 void CityState_ApplyVersionZones(CityState *state) {
@@ -17,8 +18,9 @@ void CityState_Init(CityState *state) {
     state->city = 2;
 }
 
-BOOL CityState_IsSlotIndexOutOfRange(s32 value) {
-    if (value >= 7) {
+// Whether a warp's transition type is one of an entrance camera's
+BOOL IsEntranceCameraTransition(s32 transitionType) {
+    if (transitionType >= WARP_TRANSITION_CAMERA) {
         return TRUE;
     }
     return FALSE;

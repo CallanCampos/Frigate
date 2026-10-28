@@ -114,7 +114,7 @@ Script_6:
     // "It looks like you can climb up here![f000]븁\u0000\nWill you proceed to the upper floor?"
     SystemMsg AbyssalRuins7_Text_LooksLikeCanClimb, 2
     YesNoWin 0x8010
-    InfoMsgClose
+    SystemMsgClose
     VMStackPush 0x8010
     VMStackPushConst 0
     VMStackCmp CMP_EQ
@@ -280,7 +280,7 @@ Script_8:
     // "It looks like you can climb down here![f000]븁\u0000\nWill you return to the lower floor?"
     SystemMsg AbyssalRuins7_Text_LooksLikeCanClimb_2, 2
     YesNoWin 0x8010
-    InfoMsgClose
+    SystemMsgClose
     VMStackPush 0x8010
     VMStackPushConst 0
     VMStackCmp CMP_EQ
@@ -353,7 +353,7 @@ Script_9:
     // "It looks like you can climb down here![f000]븁\u0000\nWill you return to the lower floor?"
     SystemMsg AbyssalRuins7_Text_LooksLikeCanClimb_2, 2
     YesNoWin 0x8010
-    InfoMsgClose
+    SystemMsgClose
     VMStackPush 0x8010
     VMStackPushConst 0
     VMStackCmp CMP_EQ

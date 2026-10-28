@@ -528,7 +528,7 @@ L_06E0:
     VMJumpIf CMP_STACK, L_0797
     // "Welcome to the Pokémon Wireless\nClub Union Room.[f000]븁\u0000\nYou may interact directly with\nmany Trainers here.[f000]븁\u0000\nWould you like to enter the room?"
     ActorMsg MSGFILE_SCRIPT, Global2100_Text_WelcomePokemonWirelessClub, 0x8011, 4, 0
-    ListMenu_AnchorTopRight 31, 1, 0, 1, 32814
+    ListMenuAnchorTopRight 31, 1, 0, 1, 32814
     ListMenuAdd 18, 65535, 18
     ListMenuAdd 20, 65535, 20
     ListMenuAdd 19, 65535, 19
@@ -593,7 +593,7 @@ L_0809:
     VMStackPushConst 1
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_0846
-    FieldScriptEnv_CmdGetTrainerViewGroupAndMarkSeen 0x8008, 0x8009
+    GetTrainerViewGroupAndMarkSeen 0x8008, 0x8009
     VMStackPush 0x8008
     VMStackPushConst 0
     VMStackCmp CMP_EQ
@@ -734,7 +734,7 @@ L_09CD:
     BMCreateHandleByGPos 0x8032, 6, 0x802f, 0x8030
     SEPlay SEQ_SE_FLD_23
     BMHndAudioVisualAnmPlay 0x8032, 1
-    PlayerMoveToYAsync_ 0, 40, 64, 0
+    PlayerMoveToYAsync_0248 0, 40, 64, 0
     BMHndAnmWait 0x8032
     FadeOutBlackQ
     FadeWait
@@ -831,13 +831,13 @@ L_0B51:
     VMJump L_0B96
 
 L_0B94:
-    FadeInBlackQ_
+    FadeInBlackQ_01A8
 
 L_0B96:
     FadeWait
     SEPlay SEQ_SE_FLD_23
     BMHndAudioVisualAnmPlay 0x8037, 0
-    PlayerMoveToYAsync_ 1, 40, 64, 0
+    PlayerMoveToYAsync_0248 1, 40, 64, 0
     VMSleep 2
     ActorCmdExec 255, Movement_0C58
     ActorCmdWait
@@ -860,7 +860,7 @@ L_0B96:
     BMHndAnmWait 0x8038
     SEWait
     BMReleaseHandle 0x8038
-    PokemonCenterCmd_GetMatchState 4, 0x8039
+    GetMatchState 4, 0x8039
     VMStackPush 0x8039
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -937,7 +937,7 @@ L_0C99:
     // "It seems you can't use it yet."
     InfoMsg Global2100_Text_SeemsCantUseYet, 2
     LastKeyWait
-    InfoMsgClose_0039
+    InfoMsgClose
 
 L_0CA2:
     FinishAllEvents
@@ -1192,7 +1192,7 @@ L_0FF1:
 L_100F:
     WorkSetConst 0x803a, 0
     WorkSetConst 0x803b, 0
-    PokemonCenterCmd_GetMatchState 0, 0x803a
+    GetMatchState 0, 0x803a
     ActorCmdExec 255, Movement_10D0
     ActorCmdWait
     VMStackPush 0x803a
@@ -1205,12 +1205,12 @@ L_100F:
     VMJump L_108F
 
 L_1052:
-    PokemonCenterCmd_GetMatchState 3, 0x803b
+    GetMatchState 3, 0x803b
     VMStackPush 0x803b
     VMStackPushConst 0
     VMStackCmp CMP_GT
     VMJumpIf CMP_STACK, L_108F
-    PokemonCenterCmd_AddBattlePoints 0x803b
+    AddBattlePoints 0x803b
     WordSetPlayerName 0
     // "In honor of your achievement in battle,\nI present you with these Battle Points![f000]븁\u0000"
     SystemMsg Global2100_Text_HonorAchievementBattlePresent, 2
@@ -1220,10 +1220,10 @@ L_1052:
     SystemMsg Global2100_Text_ReceivedBp, 2
     MEWait
     MsgWaitAdvance
-    InfoMsgClose
+    SystemMsgClose
 
 L_108F:
-    PokemonCenterCmd_SetMatchState 4, 0
+    SetMatchState 4, 0
     // "Saving...\nDon't turn off the power."
     SystemMsg Global2100_Text_SavingDontTurnOff, 2
     VMSleep 1

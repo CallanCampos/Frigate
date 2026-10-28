@@ -1,17 +1,17 @@
 {
  "commands": {
   "0": {
-   "handler": "s0000_VMNop",
+   "handler": "Scrcmd_Vm_VMNop",
    "overlay": 12,
    "args": []
   },
   "1": {
-   "handler": "s0001_VMNop2",
+   "handler": "Scrcmd_Vm_VMNop2",
    "overlay": 12,
    "args": []
   },
   "2": {
-   "handler": "s0002_VMHalt",
+   "handler": "Scrcmd_Vm_VMHalt",
    "overlay": 12,
    "args": [],
    "flow": [
@@ -19,7 +19,7 @@
    ]
   },
   "3": {
-   "handler": "s0003_VMSleep",
+   "handler": "Scrcmd_Vm_VMSleep",
    "overlay": 12,
    "args": [
     "u16"
@@ -29,7 +29,7 @@
    ]
   },
   "4": {
-   "handler": "s0004_VMCall",
+   "handler": "Scrcmd_Vm_VMCall",
    "overlay": 12,
    "args": [
     "u32"
@@ -39,7 +39,7 @@
    ]
   },
   "5": {
-   "handler": "s0005_VMReturn",
+   "handler": "Scrcmd_Vm_VMReturn",
    "overlay": 12,
    "args": [],
    "flow": [
@@ -47,67 +47,67 @@
    ]
   },
   "6": {
-   "handler": "s0006_DebugPrint",
+   "handler": "Scrcmd_Vm_DebugPrint",
    "overlay": 12,
    "args": [
     "any"
    ]
   },
   "7": {
-   "handler": "s0007_DebugStack",
+   "handler": "Scrcmd_Vm_DebugStack",
    "overlay": 12,
    "args": [
     "any"
    ]
   },
   "8": {
-   "handler": "s0008_VMStackPushConst",
+   "handler": "Scrcmd_Vm_VMStackPushConst",
    "overlay": 12,
    "args": [
     "u16"
    ]
   },
   "9": {
-   "handler": "s0009_VMStackPush",
+   "handler": "Scrcmd_Vm_VMStackPush",
    "overlay": 12,
    "args": [
     "any"
    ]
   },
   "10": {
-   "handler": "s000A_VMStackPop",
+   "handler": "Scrcmd_Vm_VMStackPop",
    "overlay": 12,
    "args": [
     "var"
    ]
   },
   "11": {
-   "handler": "s000B_VMStackDiscard",
+   "handler": "Scrcmd_Vm_VMStackDiscard",
    "overlay": 12,
    "args": []
   },
   "12": {
-   "handler": "s000C_VMStackAdd",
+   "handler": "Scrcmd_Vm_VMStackAdd",
    "overlay": 12,
    "args": []
   },
   "13": {
-   "handler": "s000D_VMStackSub",
+   "handler": "Scrcmd_Vm_VMStackSub",
    "overlay": 12,
    "args": []
   },
   "14": {
-   "handler": "s000E_VMStackMul",
+   "handler": "Scrcmd_Vm_VMStackMul",
    "overlay": 12,
    "args": []
   },
   "15": {
-   "handler": "s000F_VMStackDiv",
+   "handler": "Scrcmd_Vm_VMStackDiv",
    "overlay": 12,
    "args": []
   },
   "16": {
-   "handler": "s0010_VMStackPushFlag",
+   "handler": "Scrcmd_Vm_VMStackPushFlag",
    "overlay": 12,
    "args": [
     "any"
@@ -117,7 +117,7 @@
    ]
   },
   "17": {
-   "handler": "s0011_VMStackCmp",
+   "handler": "Scrcmd_Vm_VMStackCmp",
    "overlay": 12,
    "args": [
     "u16"
@@ -127,7 +127,7 @@
    ]
   },
   "18": {
-   "handler": "s0012_WorkAnd",
+   "handler": "Scrcmd_Vm_WorkAnd",
    "overlay": 12,
    "args": [
     "var",
@@ -135,7 +135,7 @@
    ]
   },
   "19": {
-   "handler": "s0013_WorkOr",
+   "handler": "Scrcmd_Vm_WorkOr",
    "overlay": 12,
    "args": [
     "var",
@@ -143,7 +143,7 @@
    ]
   },
   "20": {
-   "handler": "s0014_VMRegSet8",
+   "handler": "Scrcmd_Vm_VMRegSet8",
    "overlay": 12,
    "args": [
     "u8",
@@ -151,7 +151,7 @@
    ]
   },
   "21": {
-   "handler": "s0015_VMRegSet32",
+   "handler": "Scrcmd_Vm_VMRegSet32",
    "overlay": 12,
    "args": [
     "u8",
@@ -159,7 +159,7 @@
    ]
   },
   "22": {
-   "handler": "s0016_VMRegMov",
+   "handler": "Scrcmd_Vm_VMRegMov",
    "overlay": 12,
    "args": [
     "u8",
@@ -167,7 +167,7 @@
    ]
   },
   "23": {
-   "handler": "s0017_VMRegCmp8",
+   "handler": "Scrcmd_Vm_VMRegCmp8",
    "overlay": 12,
    "args": [
     "u8",
@@ -175,7 +175,7 @@
    ]
   },
   "24": {
-   "handler": "s0018_VMRegCmpConst8",
+   "handler": "Scrcmd_Vm_VMRegCmpConst8",
    "overlay": 12,
    "args": [
     "u8",
@@ -183,7 +183,7 @@
    ]
   },
   "25": {
-   "handler": "s0019_WorkCmpConst",
+   "handler": "Scrcmd_Vm_WorkCmpConst",
    "overlay": 12,
    "args": [
     "var",
@@ -191,7 +191,7 @@
    ]
   },
   "26": {
-   "handler": "s001A_WorkCmpWork",
+   "handler": "Scrcmd_Vm_WorkCmpWork",
    "overlay": 12,
    "args": [
     "var",
@@ -199,7 +199,7 @@
    ]
   },
   "27": {
-   "handler": "s001B_RTCallGlobalAsync",
+   "handler": "Scrcmd_Vm_RTCallGlobalAsync",
    "overlay": 12,
    "args": [
     "u16"
@@ -209,7 +209,7 @@
    ]
   },
   "28": {
-   "handler": "s001C_RTCallGlobal",
+   "handler": "Scrcmd_Vm_RTCallGlobal",
    "overlay": 12,
    "args": [
     "u16"
@@ -222,7 +222,7 @@
    ]
   },
   "29": {
-   "handler": "s001D_RTEndGlobal",
+   "handler": "Scrcmd_Vm_RTEndGlobal",
    "overlay": 12,
    "args": [],
    "flow": [
@@ -230,7 +230,7 @@
    ]
   },
   "30": {
-   "handler": "s001E_VMJump",
+   "handler": "Scrcmd_Vm_VMJump",
    "overlay": 12,
    "args": [
     "u32"
@@ -240,7 +240,7 @@
    ]
   },
   "31": {
-   "handler": "s001F_VMJumpIf",
+   "handler": "Scrcmd_Vm_VMJumpIf",
    "overlay": 12,
    "args": [
     "u8",
@@ -255,7 +255,7 @@
    ]
   },
   "32": {
-   "handler": "s0020_VMCallIf",
+   "handler": "Scrcmd_Vm_VMCallIf",
    "overlay": 12,
    "args": [
     "u8",
@@ -270,7 +270,7 @@
    ]
   },
   "33": {
-   "handler": "s0021_RTReserveScript",
+   "handler": "Scrcmd_Vm_RTReserveScript",
    "overlay": 12,
    "args": [
     "u16"
@@ -280,14 +280,14 @@
    ]
   },
   "34": {
-   "handler": "s0022_FieldGetContinueFlag",
+   "handler": "Scrcmd_Vm_FieldGetContinueFlag",
    "overlay": 12,
    "args": [
     "var"
    ]
   },
   "35": {
-   "handler": "s0023_FlagSet",
+   "handler": "Scrcmd_Vm_FlagSet",
    "overlay": 12,
    "args": [
     "any"
@@ -297,7 +297,7 @@
    ]
   },
   "36": {
-   "handler": "s0024_FlagReset",
+   "handler": "Scrcmd_Vm_FlagReset",
    "overlay": 12,
    "args": [
     "any"
@@ -307,7 +307,7 @@
    ]
   },
   "37": {
-   "handler": "s0025_FlagGet",
+   "handler": "Scrcmd_Vm_FlagGet",
    "overlay": 12,
    "args": [
     "any",
@@ -319,7 +319,7 @@
    ]
   },
   "38": {
-   "handler": "s0026_WorkAdd",
+   "handler": "Scrcmd_Vm_WorkAdd",
    "overlay": 12,
    "args": [
     "var",
@@ -327,7 +327,7 @@
    ]
   },
   "39": {
-   "handler": "s0027_WorkSub",
+   "handler": "Scrcmd_Vm_WorkSub",
    "overlay": 12,
    "args": [
     "var",
@@ -335,7 +335,7 @@
    ]
   },
   "40": {
-   "handler": "s0028_WorkSetConst",
+   "handler": "Scrcmd_Vm_WorkSetConst",
    "overlay": 12,
    "args": [
     "var",
@@ -343,7 +343,7 @@
    ]
   },
   "41": {
-   "handler": "s0029_WorkGet",
+   "handler": "Scrcmd_Vm_WorkGet",
    "overlay": 12,
    "args": [
     "var",
@@ -351,7 +351,7 @@
    ]
   },
   "42": {
-   "handler": "s002A_WorkSet",
+   "handler": "Scrcmd_Vm_WorkSet",
    "overlay": 12,
    "args": [
     "var",
@@ -359,7 +359,7 @@
    ]
   },
   "43": {
-   "handler": "s002B_WorkMul",
+   "handler": "Scrcmd_Vm_WorkMul",
    "overlay": 12,
    "args": [
     "var",
@@ -367,7 +367,7 @@
    ]
   },
   "44": {
-   "handler": "s002C_WorkDiv",
+   "handler": "Scrcmd_Vm_WorkDiv",
    "overlay": 12,
    "args": [
     "var",
@@ -375,7 +375,7 @@
    ]
   },
   "45": {
-   "handler": "s002D_WorkMod",
+   "handler": "Scrcmd_Vm_WorkMod",
    "overlay": 12,
    "args": [
     "var",
@@ -383,7 +383,7 @@
    ]
   },
   "46": {
-   "handler": "s002E_ActorsPauseAll",
+   "handler": "Scrcmd_Vm_ActorsPauseAll",
    "overlay": 12,
    "args": [],
    "flow": [
@@ -391,17 +391,17 @@
    ]
   },
   "47": {
-   "handler": "s002F_ActorsUnpauseAll",
+   "handler": "Scrcmd_Vm_ActorsUnpauseAll",
    "overlay": 12,
    "args": []
   },
   "48": {
-   "handler": "s0030_FinishAllEvents",
+   "handler": "Scrcmd_Vm_FinishAllEvents",
    "overlay": 12,
    "args": []
   },
   "49": {
-   "handler": "s0031_ABKeyWait",
+   "handler": "Scrcmd_Vm_ABKeyWait",
    "overlay": 12,
    "args": [],
    "flow": [
@@ -409,7 +409,7 @@
    ]
   },
   "50": {
-   "handler": "s0032_LastKeyWait",
+   "handler": "Scrcmd_Vm_LastKeyWait",
    "overlay": 12,
    "args": [],
    "flow": [
@@ -417,14 +417,14 @@
    ]
   },
   "51": {
-   "handler": "s0033_MsgSetAutoscrolls",
+   "handler": "Scrcmd_Msg_MsgSetAutoscrolls",
    "overlay": 36,
    "args": [
     "u16"
    ]
   },
   "52": {
-   "handler": "s0034_SystemMsg",
+   "handler": "Scrcmd_Msg_SystemMsg",
    "overlay": 36,
    "args": [
     "any",
@@ -439,7 +439,7 @@
    ]
   },
   "53": {
-   "handler": "s0035_SystemMsgAsync",
+   "handler": "Scrcmd_Msg_SystemMsgAsync",
    "overlay": 36,
    "args": [
     "any",
@@ -451,19 +451,19 @@
    ]
   },
   "54": {
-   "handler": "s0036_InfoMsgClose",
+   "handler": "Scrcmd_Msg_SystemMsgClose",
    "overlay": 36,
    "args": []
   },
   "55": {
-   "handler": "s0037_MsgSetLoadingSpinner",
+   "handler": "Scrcmd_Msg_MsgSetLoadingSpinner",
    "overlay": 36,
    "args": [
     "any"
    ]
   },
   "56": {
-   "handler": "s0038_InfoMsg",
+   "handler": "Scrcmd_Msg_InfoMsg",
    "overlay": 36,
    "args": [
     "any",
@@ -478,12 +478,12 @@
    ]
   },
   "57": {
-   "handler": "s0039_InfoMsgClose",
+   "handler": "Scrcmd_Msg_InfoMsgClose",
    "overlay": 36,
    "args": []
   },
   "58": {
-   "handler": "s003A_MultiMsg",
+   "handler": "Scrcmd_Msg_MultiMsg",
    "overlay": 36,
    "args": [
     "any",
@@ -493,14 +493,14 @@
    ]
   },
   "59": {
-   "handler": "s003B_MsgWinCloseNo",
+   "handler": "Scrcmd_Msg_MsgWinCloseNo",
    "overlay": 36,
    "args": [
     "u16"
    ]
   },
   "60": {
-   "handler": "s003C_ActorMsg",
+   "handler": "Scrcmd_Msg_ActorMsg",
    "overlay": 36,
    "args": [
     "any",
@@ -521,7 +521,7 @@
    ]
   },
   "61": {
-   "handler": "s003D_ParentActorMsg",
+   "handler": "Scrcmd_Msg_ParentActorMsg",
    "overlay": 36,
    "args": [
     "any",
@@ -540,7 +540,7 @@
    ]
   },
   "62": {
-   "handler": "s003E_ActorMsgClose",
+   "handler": "Scrcmd_Msg_ActorMsgClose",
    "overlay": 36,
    "args": [],
    "flow": [
@@ -548,7 +548,7 @@
    ]
   },
   "63": {
-   "handler": "s003F_MsgWinCloseAll",
+   "handler": "Scrcmd_Msg_MsgWinCloseAll",
    "overlay": 36,
    "args": [],
    "flow": [
@@ -556,7 +556,7 @@
    ]
   },
   "64": {
-   "handler": "s0040_MoneyWinDisp",
+   "handler": "Scrcmd_Msg_MoneyWinDisp",
    "overlay": 36,
    "args": [
     "any",
@@ -564,17 +564,17 @@
    ]
   },
   "65": {
-   "handler": "s0041_MoneyWinClose",
+   "handler": "Scrcmd_Msg_MoneyWinClose",
    "overlay": 36,
    "args": []
   },
   "66": {
-   "handler": "s0042_MoneyWinUpdate",
+   "handler": "Scrcmd_Msg_MoneyWinUpdate",
    "overlay": 36,
    "args": []
   },
   "67": {
-   "handler": "s0043_MsgPlaceSign",
+   "handler": "Scrcmd_Msg_MsgPlaceSign",
    "overlay": 36,
    "args": [
     "any",
@@ -589,12 +589,12 @@
    ]
   },
   "68": {
-   "handler": "s0044_MsgPlaceSignClose",
+   "handler": "Scrcmd_Msg_MsgPlaceSignClose",
    "overlay": 36,
    "args": []
   },
   "69": {
-   "handler": "s0045_CheckerMsg",
+   "handler": "Scrcmd_Msg_CheckerMsg",
    "overlay": 36,
    "args": [
     "u16",
@@ -613,19 +613,19 @@
    ]
   },
   "70": {
-   "handler": "s0046_CheckerMsgClose",
+   "handler": "Scrcmd_Msg_CheckerMsgClose",
    "overlay": 36,
    "args": []
   },
   "71": {
-   "handler": "s0047_YesNoWin",
+   "handler": "Scrcmd_Menu_YesNoWin",
    "overlay": 36,
    "args": [
     "var"
    ]
   },
   "72": {
-   "handler": "s0048_ActorMsgGendered",
+   "handler": "Scrcmd_Msg_ActorMsgGendered",
    "overlay": 36,
    "args": [
     "any",
@@ -649,7 +649,7 @@
    ]
   },
   "73": {
-   "handler": "s0049_ActorMsgVersioned",
+   "handler": "Scrcmd_Msg_ActorMsgVersioned",
    "overlay": 36,
    "args": [
     "any",
@@ -672,7 +672,7 @@
    ]
   },
   "74": {
-   "handler": "s004A_ScreamMsg",
+   "handler": "Scrcmd_Msg_ScreamMsg",
    "overlay": 36,
    "args": [
     "any",
@@ -687,7 +687,7 @@
    ]
   },
   "75": {
-   "handler": "s004B_MsgWaitAdvance",
+   "handler": "Scrcmd_Msg_MsgWaitAdvance",
    "overlay": 36,
    "args": [],
    "flow": [
@@ -695,14 +695,14 @@
    ]
   },
   "76": {
-   "handler": "s004C_WordSetPlayerName",
+   "handler": "Scrcmd_Word_WordSetPlayerName",
    "overlay": 36,
    "args": [
     "u8"
    ]
   },
   "77": {
-   "handler": "s004D_WordSetItemName",
+   "handler": "Scrcmd_Word_WordSetItemName",
    "overlay": 36,
    "args": [
     "u8",
@@ -710,7 +710,7 @@
    ]
   },
   "78": {
-   "handler": "s004E_WordSetItemNameEx",
+   "handler": "Scrcmd_Word_WordSetItemNameEx",
    "overlay": 36,
    "args": [
     "u8",
@@ -726,7 +726,7 @@
    ]
   },
   "79": {
-   "handler": "s004F_WordSetItemNameWithArticle",
+   "handler": "Scrcmd_Word_WordSetItemNameWithArticle",
    "overlay": 36,
    "args": [
     "u8",
@@ -734,7 +734,7 @@
    ]
   },
   "80": {
-   "handler": "s0050_WordSetTMMoveName",
+   "handler": "Scrcmd_Word_WordSetTMMoveName",
    "overlay": 36,
    "args": [
     "u8",
@@ -746,7 +746,7 @@
    ]
   },
   "81": {
-   "handler": "s0051_WordSetMoveName",
+   "handler": "Scrcmd_Word_WordSetMoveName",
    "overlay": 36,
    "args": [
     "u8",
@@ -758,7 +758,7 @@
    ]
   },
   "82": {
-   "handler": "s0052_WordSetItemPocketName",
+   "handler": "Scrcmd_Word_WordSetItemPocketName",
    "overlay": 36,
    "args": [
     "u8",
@@ -770,7 +770,7 @@
    ]
   },
   "83": {
-   "handler": "s0053_WordSetPartyPokeSpecies",
+   "handler": "Scrcmd_Word_WordSetPartyPokeSpecies",
    "overlay": 36,
    "args": [
     "u8",
@@ -778,7 +778,7 @@
    ]
   },
   "84": {
-   "handler": "s0054_WordSetPartyPokeName",
+   "handler": "Scrcmd_Word_WordSetPartyPokeName",
    "overlay": 36,
    "args": [
     "u8",
@@ -786,7 +786,7 @@
    ]
   },
   "85": {
-   "handler": "s0055_WordSetDaycarePokeSpecies",
+   "handler": "Scrcmd_Word_WordSetDaycarePokeSpecies",
    "overlay": 36,
    "args": [
     "u8",
@@ -794,7 +794,7 @@
    ]
   },
   "86": {
-   "handler": "s0056_WordSetPokeTypeName",
+   "handler": "Scrcmd_Word_WordSetPokeTypeName",
    "overlay": 36,
    "args": [
     "u8",
@@ -806,7 +806,7 @@
    ]
   },
   "87": {
-   "handler": "s0057_WordSetPokeSpecies",
+   "handler": "Scrcmd_Word_WordSetPokeSpecies",
    "overlay": 36,
    "args": [
     "u8",
@@ -814,7 +814,7 @@
    ]
   },
   "88": {
-   "handler": "s0058_WordSetPokeSpeciesWithArticle",
+   "handler": "Scrcmd_Word_WordSetPokeSpeciesWithArticle",
    "overlay": 36,
    "args": [
     "u8",
@@ -822,7 +822,7 @@
    ]
   },
   "89": {
-   "handler": "s0059_WordSetPlaceName",
+   "handler": "Scrcmd_Word_WordSetPlaceName",
    "overlay": 36,
    "args": [
     "u8",
@@ -830,7 +830,7 @@
    ]
   },
   "90": {
-   "handler": "s005A_WordSetTrendName",
+   "handler": "Scrcmd_Word_WordSetTrendName",
    "overlay": 36,
    "args": [
     "u8",
@@ -838,7 +838,7 @@
    ]
   },
   "91": {
-   "handler": "s005B_WordSetDaycarePokeName",
+   "handler": "Scrcmd_Word_WordSetDaycarePokeName",
    "overlay": 36,
    "args": [
     "u8",
@@ -846,7 +846,7 @@
    ]
   },
   "92": {
-   "handler": "s005C_WordSetNumber",
+   "handler": "Scrcmd_Word_WordSetNumber",
    "overlay": 36,
    "args": [
     "u8",
@@ -855,7 +855,7 @@
    ]
   },
   "93": {
-   "handler": "s005D_WordSetMusicalInfo",
+   "handler": "Scrcmd_Musical_WordSetMusicalInfo",
    "overlay": 12,
    "args": [
     "u8",
@@ -864,7 +864,7 @@
    ]
   },
   "94": {
-   "handler": "s005E_WordSetCountry",
+   "handler": "Scrcmd_Word_WordSetCountry",
    "overlay": 36,
    "args": [
     "u8",
@@ -872,7 +872,7 @@
    ]
   },
   "95": {
-   "handler": "s005F_WordSetHobbyName",
+   "handler": "Scrcmd_Word_WordSetHobbyName",
    "overlay": 36,
    "args": [
     "u8",
@@ -880,7 +880,7 @@
    ]
   },
   "96": {
-   "handler": "s0060_WordSetPassPowerName",
+   "handler": "Scrcmd_Word_WordSetPassPowerName",
    "overlay": 36,
    "args": [
     "u8",
@@ -888,7 +888,7 @@
    ]
   },
   "97": {
-   "handler": "s0061_WordSetTrainerClassName",
+   "handler": "Scrcmd_Word_WordSetTrainerClassName",
    "overlay": 36,
    "args": [
     "u8",
@@ -896,7 +896,7 @@
    ]
   },
   "98": {
-   "handler": "s0062_WordSetTrainerClassNameWithArticle",
+   "handler": "Scrcmd_Word_WordSetTrainerClassNameWithArticle",
    "overlay": 36,
    "args": [
     "u8",
@@ -904,7 +904,7 @@
    ]
   },
   "99": {
-   "handler": "s0063_WordSetSurveyAnswer",
+   "handler": "Scrcmd_Word_WordSetSurveyAnswer",
    "overlay": 36,
    "args": [
     "u8",
@@ -912,7 +912,7 @@
    ]
   },
   "100": {
-   "handler": "s0064_ActorCmdExec",
+   "handler": "Scrcmd_FieldActor_ActorCmdExec",
    "overlay": 36,
    "args": [
     "any",
@@ -920,7 +920,7 @@
    ]
   },
   "101": {
-   "handler": "s0065_ActorCmdWait",
+   "handler": "Scrcmd_FieldActor_ActorCmdWait",
    "overlay": 36,
    "args": [],
    "flow": [
@@ -928,7 +928,7 @@
    ]
   },
   "102": {
-   "handler": "s0066_ActorGetMoveCode",
+   "handler": "Scrcmd_FieldActor_ActorGetMoveCode",
    "overlay": 36,
    "args": [
     "var",
@@ -936,7 +936,7 @@
    ]
   },
   "103": {
-   "handler": "s0067_ActorGetGPos",
+   "handler": "Scrcmd_FieldActor_ActorGetGPos",
    "overlay": 36,
    "args": [
     "any",
@@ -945,7 +945,7 @@
    ]
   },
   "104": {
-   "handler": "s0068_PlayerGetGPos",
+   "handler": "Scrcmd_FieldActor_PlayerGetGPos",
    "overlay": 36,
    "args": [
     "var",
@@ -953,7 +953,7 @@
    ]
   },
   "105": {
-   "handler": "s0069_ActorNew",
+   "handler": "Scrcmd_FieldActor_ActorNew",
    "overlay": 36,
    "args": [
     "any",
@@ -965,7 +965,7 @@
    ]
   },
   "106": {
-   "handler": "s006A_ActorGetSpawnFlag",
+   "handler": "Scrcmd_FieldActor_ActorGetSpawnFlag",
    "overlay": 36,
    "args": [
     "any",
@@ -973,21 +973,21 @@
    ]
   },
   "107": {
-   "handler": "s006B_ActorAdd",
+   "handler": "Scrcmd_FieldActor_ActorAdd",
    "overlay": 36,
    "args": [
     "any"
    ]
   },
   "108": {
-   "handler": "s006C_ActorDelete",
+   "handler": "Scrcmd_FieldActor_ActorDelete",
    "overlay": 36,
    "args": [
     "any"
    ]
   },
   "109": {
-   "handler": "s006D_ActorSetGPos",
+   "handler": "Scrcmd_FieldActor_ActorSetGPos",
    "overlay": 36,
    "args": [
     "any",
@@ -998,14 +998,14 @@
    ]
   },
   "110": {
-   "handler": "s006E_PlayerGetDir",
+   "handler": "Scrcmd_FieldActor_PlayerGetDir",
    "overlay": 36,
    "args": [
     "var"
    ]
   },
   "111": {
-   "handler": "s006F_PlayerGetActorInFront",
+   "handler": "Scrcmd_FieldActor_PlayerGetActorInFront",
    "overlay": 36,
    "args": [
     "var",
@@ -1013,7 +1013,7 @@
    ]
   },
   "112": {
-   "handler": "s0070_ActorFindByGPos",
+   "handler": "Scrcmd_FieldActor_ActorFindByGPos",
    "overlay": 36,
    "args": [
     "var",
@@ -1024,7 +1024,7 @@
    ]
   },
   "113": {
-   "handler": "s0071_PlayerGetRailPos",
+   "handler": "Scrcmd_FieldActor_PlayerGetRailPos",
    "overlay": 36,
    "args": [
     "var",
@@ -1033,7 +1033,7 @@
    ]
   },
   "114": {
-   "handler": "s0072_ActorGetRailPos",
+   "handler": "Scrcmd_FieldActor_ActorGetRailPos",
    "overlay": 36,
    "args": [
     "any",
@@ -1043,7 +1043,7 @@
    ]
   },
   "115": {
-   "handler": "s0073_ActorSetMoveCode",
+   "handler": "Scrcmd_FieldActor_ActorSetMoveCode",
    "overlay": 36,
    "args": [
     "any",
@@ -1051,12 +1051,12 @@
    ]
   },
   "116": {
-   "handler": "s0074_ActorSetEyeToEye",
+   "handler": "Scrcmd_FieldActor_ActorSetEyeToEye",
    "overlay": 36,
    "args": []
   },
   "117": {
-   "handler": "s0075_PlayerSetSpecialSequence",
+   "handler": "Scrcmd_FieldActor_PlayerSetSpecialSequence",
    "overlay": 36,
    "args": [
     "u16"
@@ -1066,7 +1066,7 @@
    ]
   },
   "118": {
-   "handler": "s0076_PlayerMoveToYAsync",
+   "handler": "Scrcmd_FieldActor_PlayerMoveToYAsync",
    "overlay": 36,
    "args": [
     "any",
@@ -1076,19 +1076,19 @@
    ]
   },
   "119": {
-   "handler": "s0077_PlayerTurnByTrigger",
+   "handler": "Scrcmd_FieldActor_PlayerTurnByTrigger",
    "overlay": 36,
    "args": []
   },
   "120": {
-   "handler": "s0078_PlayerGetExState",
+   "handler": "Scrcmd_FieldActor_PlayerGetExState",
    "overlay": 36,
    "args": [
     "var"
    ]
   },
   "121": {
-   "handler": "s0079_ActorGetUserParam",
+   "handler": "Scrcmd_FieldActor_ActorGetUserParam",
    "overlay": 36,
    "args": [
     "any",
@@ -1097,14 +1097,14 @@
    ]
   },
   "122": {
-   "handler": "s007A_ActorPlayRailSlipdown",
+   "handler": "Scrcmd_FieldActor_ActorPlayRailSlipdown",
    "overlay": 36,
    "args": [
     "any"
    ]
   },
   "123": {
-   "handler": "s007B_ActorJumpToGPos",
+   "handler": "Scrcmd_FieldActor_ActorJumpToGPos",
    "overlay": 36,
    "args": [
     "any",
@@ -1114,7 +1114,7 @@
    ]
   },
   "124": {
-   "handler": "s007C_PlayerSetRailPos",
+   "handler": "Scrcmd_FieldActor_PlayerSetRailPos",
    "overlay": 36,
    "args": [
     "any",
@@ -1123,7 +1123,7 @@
    ]
   },
   "125": {
-   "handler": "s007D_ActorSetRailPos",
+   "handler": "Scrcmd_FieldActor_ActorSetRailPos",
    "overlay": 36,
    "args": [
     "any",
@@ -1133,14 +1133,14 @@
    ]
   },
   "126": {
-   "handler": "s007E_ActorPlayTeleportSeq",
+   "handler": "Scrcmd_FieldActor_ActorPlayTeleportSeq",
    "overlay": 36,
    "args": [
     "any"
    ]
   },
   "127": {
-   "handler": "s007F_TrainerEyeGetTrainerID",
+   "handler": "Scrcmd_Trainer_TrainerEyeGetTrainerID",
    "overlay": 36,
    "args": [
     "any",
@@ -1148,19 +1148,19 @@
    ]
   },
   "128": {
-   "handler": "s0080_TrainerEyeEventInit",
+   "handler": "Scrcmd_Trainer_TrainerEyeEventInit",
    "overlay": 36,
    "args": [
     "any"
    ]
   },
   "129": {
-   "handler": "s0081_TrainerEyeEventStart",
+   "handler": "Scrcmd_Trainer_TrainerEyeEventStart",
    "overlay": 36,
    "args": []
   },
   "130": {
-   "handler": "s0082_TrainerGetActorID",
+   "handler": "Scrcmd_Trainer_TrainerGetActorID",
    "overlay": 36,
    "args": [
     "any",
@@ -1168,21 +1168,21 @@
    ]
   },
   "131": {
-   "handler": "s0083_TrainerGetBattleType",
+   "handler": "Scrcmd_Trainer_TrainerEyeGetBattleType",
    "overlay": 36,
    "args": [
     "var"
    ]
   },
   "132": {
-   "handler": "s0084_ActorGetTrainerID",
+   "handler": "Scrcmd_Trainer_ActorGetTrainerID",
    "overlay": 36,
    "args": [
     "var"
    ]
   },
   "133": {
-   "handler": "s0085_CallTrainerBattle",
+   "handler": "Scrcmd_Trainer_CallTrainerBattle",
    "overlay": 36,
    "args": [
     "any",
@@ -1196,7 +1196,7 @@
    ]
   },
   "134": {
-   "handler": "s0085_CallTrainerMultiBattle",
+   "handler": "Scrcmd_Trainer_CallTrainerMultiBattle",
    "overlay": 36,
    "args": [
     "any",
@@ -1206,7 +1206,7 @@
    ]
   },
   "135": {
-   "handler": "s0087_TrainerSayMessage",
+   "handler": "Scrcmd_Msg_TrainerSayMessage",
    "overlay": 36,
    "args": [
     "any",
@@ -1223,7 +1223,7 @@
    ]
   },
   "136": {
-   "handler": "s0088_TrainerGetMessageTypes",
+   "handler": "Scrcmd_Trainer_TrainerGetMessageTypes",
    "overlay": 36,
    "args": [
     "var",
@@ -1232,7 +1232,7 @@
    ]
   },
   "138": {
-   "handler": "s008A_TrainerGetBattleType",
+   "handler": "Scrcmd_Trainer_TrainerGetBattleType",
    "overlay": 36,
    "args": [
     "any",
@@ -1244,7 +1244,7 @@
    ]
   },
   "139": {
-   "handler": "s008B_TrainerBGMPlayPush",
+   "handler": "Scrcmd_Trainer_TrainerBGMPlayPush",
    "overlay": 36,
    "args": [
     "any"
@@ -1254,7 +1254,7 @@
    ]
   },
   "140": {
-   "handler": "s008C_CallTrainerLose",
+   "handler": "Scrcmd_GameState_CallTrainerLose",
    "overlay": 12,
    "args": [],
    "flow": [
@@ -1262,26 +1262,26 @@
    ]
   },
   "141": {
-   "handler": "s008D_TrainerBattleIsVictory",
+   "handler": "Scrcmd_GameState_TrainerBattleIsVictory",
    "overlay": 12,
    "args": [
     "var"
    ]
   },
   "142": {
-   "handler": "s008E_CallTrainerBattleEnd",
+   "handler": "Scrcmd_Trainer_CallTrainerBattleEnd",
    "overlay": 36,
    "args": []
   },
   "143": {
-   "handler": "s008F_TrainerClassBGMPlayPush",
+   "handler": "Scrcmd_Trainer_TrainerClassBGMPlayPush",
    "overlay": 36,
    "args": [
     "any"
    ]
   },
   "144": {
-   "handler": "s0090_TrainerBGMPlay",
+   "handler": "Scrcmd_Trainer_TrainerBGMPlay",
    "overlay": 36,
    "args": [
     "any"
@@ -1291,7 +1291,7 @@
    ]
   },
   "146": {
-   "handler": "s0092_TrainerGetFieldAction",
+   "handler": "Scrcmd_Trainer_TrainerGetFieldAction",
    "overlay": 36,
    "args": [
     "any",
@@ -1303,7 +1303,7 @@
    ]
   },
   "147": {
-   "handler": "s0093_TrainerGetPrizeItem",
+   "handler": "Scrcmd_Trainer_TrainerGetPrizeItem",
    "overlay": 36,
    "args": [
     "any",
@@ -1315,7 +1315,7 @@
    ]
   },
   "148": {
-   "handler": "s0094_CallTradedPokemonBattle",
+   "handler": "Scrcmd_Trainer_CallTradedPokemonBattle",
    "overlay": 36,
    "args": [
     "any",
@@ -1331,7 +1331,7 @@
    ]
   },
   "149": {
-   "handler": "s0095_TrainerFlagSet",
+   "handler": "Scrcmd_GameState_TrainerFlagSet",
    "overlay": 12,
    "args": [
     "any"
@@ -1341,7 +1341,7 @@
    ]
   },
   "150": {
-   "handler": "s0096_TrainerFlagReset",
+   "handler": "Scrcmd_GameState_TrainerFlagReset",
    "overlay": 12,
    "args": [
     "any"
@@ -1351,7 +1351,7 @@
    ]
   },
   "151": {
-   "handler": "s0097_TrainerFlagGet",
+   "handler": "Scrcmd_GameState_TrainerFlagGet",
    "overlay": 12,
    "args": [
     "any",
@@ -1363,7 +1363,7 @@
    ]
   },
   "152": {
-   "handler": "s0098_BGMPlay",
+   "handler": "Scrcmd_Sound_BGMPlay",
    "overlay": 36,
    "args": [
     "u16"
@@ -1373,7 +1373,7 @@
    ]
   },
   "155": {
-   "handler": "s009B_BGMIsPlaying",
+   "handler": "Scrcmd_Sound_BGMIsPlaying",
    "overlay": 36,
    "args": [
     "u16",
@@ -1381,12 +1381,12 @@
    ]
   },
   "158": {
-   "handler": "s009E_BGMChangeMap",
+   "handler": "Scrcmd_Sound_BGMChangeMap",
    "overlay": 36,
    "args": []
   },
   "159": {
-   "handler": "s009F_BGMPlayPush",
+   "handler": "Scrcmd_Sound_BGMPlayPush",
    "overlay": 36,
    "args": [
     "any"
@@ -1396,7 +1396,7 @@
    ]
   },
   "160": {
-   "handler": "s00A0_BGMWait",
+   "handler": "Scrcmd_Sound_BGMWait",
    "overlay": 36,
    "args": [],
    "flow": [
@@ -1404,14 +1404,14 @@
    ]
   },
   "161": {
-   "handler": "s00A1_BGMPush",
+   "handler": "Scrcmd_Sound_BGMPush",
    "overlay": 36,
    "args": [
     "any"
    ]
   },
   "162": {
-   "handler": "s00A2_BGMPop",
+   "handler": "Scrcmd_Sound_BGMPop",
    "overlay": 36,
    "args": [
     "any",
@@ -1419,21 +1419,21 @@
    ]
   },
   "163": {
-   "handler": "s00A3_ISSSwitchEnable",
+   "handler": "Scrcmd_Sound_ISSSwitchEnable",
    "overlay": 36,
    "args": [
     "any"
    ]
   },
   "164": {
-   "handler": "s00A4_ISSSwitchDisable",
+   "handler": "Scrcmd_Sound_ISSSwitchDisable",
    "overlay": 36,
    "args": [
     "any"
    ]
   },
   "165": {
-   "handler": "s00A5_ISSSwitchQuery",
+   "handler": "Scrcmd_Sound_ISSSwitchQuery",
    "overlay": 36,
    "args": [
     "var",
@@ -1441,7 +1441,7 @@
    ]
   },
   "166": {
-   "handler": "s00A6_SEPlay",
+   "handler": "Scrcmd_Sound_SEPlay",
    "overlay": 36,
    "args": [
     "any"
@@ -1451,12 +1451,12 @@
    ]
   },
   "167": {
-   "handler": "s00A7_SEStop",
+   "handler": "Scrcmd_Sound_SEStop",
    "overlay": 36,
    "args": []
   },
   "168": {
-   "handler": "s00A8_SEWait",
+   "handler": "Scrcmd_Sound_SEWait",
    "overlay": 36,
    "args": [],
    "flow": [
@@ -1464,7 +1464,7 @@
    ]
   },
   "169": {
-   "handler": "s00A9_MEPlay",
+   "handler": "Scrcmd_Sound_MEPlay",
    "overlay": 36,
    "args": [
     "any"
@@ -1474,7 +1474,7 @@
    ]
   },
   "170": {
-   "handler": "s00AA_MEWait",
+   "handler": "Scrcmd_Sound_MEWait",
    "overlay": 36,
    "args": [],
    "flow": [
@@ -1482,7 +1482,7 @@
    ]
   },
   "171": {
-   "handler": "s00AB_PVPlay",
+   "handler": "Scrcmd_Sound_PVPlay",
    "overlay": 36,
    "args": [
     "any",
@@ -1490,7 +1490,7 @@
    ]
   },
   "172": {
-   "handler": "s00AC_PVWait",
+   "handler": "Scrcmd_Sound_PVWait",
    "overlay": 36,
    "args": [],
    "flow": [
@@ -1498,7 +1498,7 @@
    ]
   },
   "173": {
-   "handler": "s00AD_ListMenuInitCommon",
+   "handler": "Scrcmd_Menu_ListMenuInitCommon",
    "overlay": 36,
    "args": [
     "u8",
@@ -1509,7 +1509,7 @@
    ]
   },
   "174": {
-   "handler": "s00AE_ListMenu_AnchorTopLeft",
+   "handler": "Scrcmd_Menu_ListMenuAnchorTopLeft",
    "overlay": 36,
    "args": [
     "u8",
@@ -1520,7 +1520,7 @@
    ]
   },
   "175": {
-   "handler": "s00AF_ListMenuAdd",
+   "handler": "Scrcmd_Menu_ListMenuAdd",
    "overlay": 36,
    "args": [
     "u16",
@@ -1529,17 +1529,17 @@
    ]
   },
   "176": {
-   "handler": "s00B0_ListMenuShow",
+   "handler": "Scrcmd_Menu_ListMenuShow",
    "overlay": 36,
    "args": []
   },
   "177": {
-   "handler": "s00B1_ListMenuShow2",
+   "handler": "Scrcmd_Menu_ListMenuShow2",
    "overlay": 36,
    "args": []
   },
   "178": {
-   "handler": "s00B2_ListMenu_AnchorTopRight",
+   "handler": "Scrcmd_Menu_ListMenuAnchorTopRight",
    "overlay": 36,
    "args": [
     "u8",
@@ -1550,7 +1550,7 @@
    ]
   },
   "179": {
-   "handler": "s00B3_FadeEx",
+   "handler": "Scrcmd_Fade_FadeEx",
    "overlay": 36,
    "args": [
     "u16",
@@ -1560,7 +1560,7 @@
    ]
   },
   "180": {
-   "handler": "s00B4_FadeExWait",
+   "handler": "Scrcmd_Fade_FadeExWait",
    "overlay": 36,
    "args": [],
    "flow": [
@@ -1568,7 +1568,7 @@
    ]
   },
   "181": {
-   "handler": "s00B5_ItemAdd",
+   "handler": "Scrcmd_Item_ItemAdd",
    "overlay": 36,
    "args": [
     "any",
@@ -1582,7 +1582,7 @@
    ]
   },
   "182": {
-   "handler": "s00B6_ItemSub",
+   "handler": "Scrcmd_Item_ItemSub",
    "overlay": 36,
    "args": [
     "any",
@@ -1596,7 +1596,7 @@
    ]
   },
   "183": {
-   "handler": "s00B7_ItemCheckSpace",
+   "handler": "Scrcmd_Item_ItemCheckSpace",
    "overlay": 36,
    "args": [
     "any",
@@ -1610,7 +1610,7 @@
    ]
   },
   "184": {
-   "handler": "s00B8_ItemCheckAmount",
+   "handler": "Scrcmd_Item_ItemCheckAmount",
    "overlay": 36,
    "args": [
     "any",
@@ -1624,7 +1624,7 @@
    ]
   },
   "185": {
-   "handler": "s00B9_ItemGetCount",
+   "handler": "Scrcmd_Item_ItemGetCount",
    "overlay": 36,
    "args": [
     "any",
@@ -1636,7 +1636,7 @@
    ]
   },
   "186": {
-   "handler": "s00BA_ItemIsTMHM",
+   "handler": "Scrcmd_Item_ItemIsTMHM",
    "overlay": 36,
    "args": [
     "any",
@@ -1648,7 +1648,7 @@
    ]
   },
   "187": {
-   "handler": "s00BB_ItemGetPocket",
+   "handler": "Scrcmd_Item_ItemGetPocket",
    "overlay": 36,
    "args": [
     "any",
@@ -1660,14 +1660,14 @@
    ]
   },
   "188": {
-   "handler": "s00BC_PhenomenonGetItemID",
+   "handler": "Scrcmd_Encount_PhenomenonGetItemID",
    "overlay": 36,
    "args": [
     "var"
    ]
   },
   "189": {
-   "handler": "s00BD_ItemGetClass",
+   "handler": "Scrcmd_Item_ItemGetClass",
    "overlay": 36,
    "args": [
     "any",
@@ -1679,7 +1679,7 @@
    ]
   },
   "190": {
-   "handler": "s00BE_MapChangeFake",
+   "handler": "Scrcmd_Mapchange_MapChangeFake",
    "overlay": 36,
    "args": [
     "u16",
@@ -1695,7 +1695,7 @@
    ]
   },
   "191": {
-   "handler": "s00BF_MapChangeWarpPad",
+   "handler": "Scrcmd_Mapchange_MapChangeWarpPad",
    "overlay": 36,
    "args": [
     "u16",
@@ -1711,7 +1711,7 @@
    ]
   },
   "192": {
-   "handler": "s00C0_MapChangeWarpRail",
+   "handler": "Scrcmd_Mapchange_MapChangeWarpRail",
    "overlay": 36,
    "args": [
     "u16",
@@ -1729,7 +1729,7 @@
    ]
   },
   "193": {
-   "handler": "s00C1_MapChangeQuicksand",
+   "handler": "Scrcmd_Mapchange_MapChangeQuicksand",
    "overlay": 36,
    "args": [
     "u16",
@@ -1743,7 +1743,7 @@
    ]
   },
   "194": {
-   "handler": "s00C2_MapChangeWarp",
+   "handler": "Scrcmd_Mapchange_MapChangeWarp",
    "overlay": 36,
    "args": [
     "u16",
@@ -1759,12 +1759,12 @@
    ]
   },
   "195": {
-   "handler": "s00C3_MapChangeUnionRoom",
+   "handler": "Scrcmd_Mapchange_MapChangeUnionRoom",
    "overlay": 36,
    "args": []
   },
   "196": {
-   "handler": "s00C4_MapChangeCore",
+   "handler": "Scrcmd_Mapchange_MapChangeCore",
    "overlay": 36,
    "args": [
     "u16",
@@ -1782,7 +1782,7 @@
    ]
   },
   "197": {
-   "handler": "s00C5_CallSurf",
+   "handler": "Scrcmd_FieldMove_CallSurf",
    "overlay": 33,
    "args": [],
    "flow": [
@@ -1790,7 +1790,7 @@
    ]
   },
   "198": {
-   "handler": "s00C6_CallWaterfall",
+   "handler": "Scrcmd_FieldMove_CallWaterfall",
    "overlay": 33,
    "args": [
     "any"
@@ -1800,25 +1800,25 @@
    ]
   },
   "199": {
-   "handler": "s00C7_CallCut",
+   "handler": "Scrcmd_FieldMove_CallCut",
    "overlay": 33,
    "args": []
   },
   "200": {
-   "handler": "s00C8_CallDiving",
+   "handler": "Scrcmd_FieldMove_CallDiving",
    "overlay": 33,
    "args": [
     "any"
    ]
   },
   "201": {
-   "handler": "s00C9_ConfigToggleKanji",
+   "handler": "Scrcmd_GameState_ConfigToggleKanji",
    "overlay": 12,
    "args": [],
    "area": "TrainerData"
   },
   "202": {
-   "handler": "s00CA_ConfigGetKanji",
+   "handler": "Scrcmd_GameState_ConfigGetKanji",
    "overlay": 12,
    "args": [
     "var"
@@ -1826,7 +1826,7 @@
    "area": "TrainerData"
   },
   "203": {
-   "handler": "s00CB_Random",
+   "handler": "Scrcmd_GameState_Random",
    "overlay": 12,
    "args": [
     "var",
@@ -1834,35 +1834,35 @@
    ]
   },
   "204": {
-   "handler": "s00CC_RTGetTextFile",
+   "handler": "Scrcmd_GameState_RTGetTextFile",
    "overlay": 12,
    "args": [
     "var"
    ]
   },
   "205": {
-   "handler": "s00CD_RTCGetDayPart",
+   "handler": "Scrcmd_GameState_RTCGetDayPart",
    "overlay": 12,
    "args": [
     "var"
    ]
   },
   "206": {
-   "handler": "s00CE_TrainerCardGetStars",
+   "handler": "Scrcmd_GameState_TrainerCardGetStars",
    "overlay": 12,
    "args": [
     "var"
    ]
   },
   "207": {
-   "handler": "s00CF_RTCGetWeekDay",
+   "handler": "Scrcmd_GameState_RTCGetWeekDay",
    "overlay": 12,
    "args": [
     "var"
    ]
   },
   "208": {
-   "handler": "s00D0_RTCGetDate",
+   "handler": "Scrcmd_GameState_RTCGetDate",
    "overlay": 12,
    "args": [
     "var",
@@ -1870,7 +1870,7 @@
    ]
   },
   "209": {
-   "handler": "s00D1_RTCGetTime",
+   "handler": "Scrcmd_GameState_RTCGetTime",
    "overlay": 12,
    "args": [
     "var",
@@ -1878,21 +1878,21 @@
    ]
   },
   "210": {
-   "handler": "s00D2_RTCGetSeason",
+   "handler": "Scrcmd_GameState_RTCGetSeason",
    "overlay": 12,
    "args": [
     "var"
    ]
   },
   "211": {
-   "handler": "s00D3_RTGetZoneID",
+   "handler": "Scrcmd_GameState_RTGetZoneID",
    "overlay": 12,
    "args": [
     "var"
    ]
   },
   "212": {
-   "handler": "s00D4_TrainerCardGetBirthDate",
+   "handler": "Scrcmd_GameState_TrainerCardGetBirthDate",
    "overlay": 12,
    "args": [
     "var",
@@ -1900,7 +1900,7 @@
    ]
   },
   "213": {
-   "handler": "s00D5_TrainerCardHasBadge",
+   "handler": "Scrcmd_GameState_TrainerCardHasBadge",
    "overlay": 12,
    "args": [
     "var",
@@ -1908,21 +1908,21 @@
    ]
   },
   "214": {
-   "handler": "s00D6_TrainerCardAddBadge",
+   "handler": "Scrcmd_GameState_TrainerCardAddBadge",
    "overlay": 12,
    "args": [
     "any"
    ]
   },
   "215": {
-   "handler": "s00D7_TrainerCardGetBadgeCount",
+   "handler": "Scrcmd_GameState_TrainerCardGetBadgeCount",
    "overlay": 12,
    "args": [
     "var"
    ]
   },
   "216": {
-   "handler": "s00D8_MapReplaceIsEventSet",
+   "handler": "Scrcmd_GameState_MapReplaceIsEventSet",
    "overlay": 12,
    "args": [
     "any",
@@ -1930,14 +1930,14 @@
    ]
   },
   "217": {
-   "handler": "s00D9_FieldSetTeleportZone",
+   "handler": "Scrcmd_GameState_FieldSetTeleportZone",
    "overlay": 12,
    "args": [
     "any"
    ]
   },
   "218": {
-   "handler": "s00DA_MapReplaceSetEvent",
+   "handler": "Scrcmd_GameState_MapReplaceSetEvent",
    "overlay": 12,
    "args": [
     "any",
@@ -1946,12 +1946,12 @@
    ]
   },
   "219": {
-   "handler": "s00DB_FieldSetNextZoneHere",
+   "handler": "Scrcmd_GameState_FieldSetNextZoneHere",
    "overlay": 12,
    "args": []
   },
   "220": {
-   "handler": "s00DC_FieldSetNextZone",
+   "handler": "Scrcmd_GameState_FieldSetNextZone",
    "overlay": 12,
    "args": [
     "any",
@@ -1962,7 +1962,7 @@
    ]
   },
   "221": {
-   "handler": "s00DD_PokeDexGetCount",
+   "handler": "Scrcmd_GameState_PokeDexGetCount",
    "overlay": 12,
    "args": [
     "any",
@@ -1970,7 +1970,7 @@
    ]
   },
   "222": {
-   "handler": "s00DE_PokeDexRegist",
+   "handler": "Scrcmd_GameState_PokeDexRegist",
    "overlay": 12,
    "args": [
     "any",
@@ -1978,7 +1978,7 @@
    ]
   },
   "223": {
-   "handler": "s00DF_PokeDexIsRegist",
+   "handler": "Scrcmd_GameState_PokeDexIsRegist",
    "overlay": 12,
    "args": [
     "any",
@@ -1992,40 +1992,40 @@
    ]
   },
   "224": {
-   "handler": "s00E0_GameGetVersion",
+   "handler": "Scrcmd_GameState_GameGetVersion",
    "overlay": 12,
    "args": [
     "var"
    ]
   },
   "225": {
-   "handler": "s00E1_TrainerCardGetSex",
+   "handler": "Scrcmd_GameState_TrainerCardGetSex",
    "overlay": 12,
    "args": [
     "var"
    ]
   },
   "226": {
-   "handler": "s00E2_SaveDataCheckRequired",
+   "handler": "Scrcmd_GameState_SaveDataCheckRequired",
    "overlay": 12,
    "args": [
     "var"
    ]
   },
   "227": {
-   "handler": "s00E3_GiveRunningShoes",
+   "handler": "Scrcmd_GameState_GiveRunningShoes",
    "overlay": 12,
    "args": []
   },
   "228": {
-   "handler": "s00E4_BoxUnlockWallpapers",
+   "handler": "Scrcmd_GameState_BoxUnlockWallpapers",
    "overlay": 12,
    "args": [
     "any"
    ]
   },
   "229": {
-   "handler": "FieldScriptEnv_CmdGetTrainerViewGroupAndMarkSeen",
+   "handler": "Scrcmd_GameState_GetTrainerViewGroupAndMarkSeen",
    "overlay": 12,
    "args": [
     "var",
@@ -2034,7 +2034,7 @@
    "area": "TimeSig"
   },
   "230": {
-   "handler": "s00E6_StartMenuIsItemUnlocked",
+   "handler": "Scrcmd_GameState_StartMenuIsItemUnlocked",
    "overlay": 12,
    "args": [
     "any",
@@ -2043,7 +2043,7 @@
    "area": "TrainerCard"
   },
   "231": {
-   "handler": "s00E7_StartMenuUnlockItem",
+   "handler": "Scrcmd_GameState_StartMenuUnlockItem",
    "overlay": 12,
    "args": [
     "any"
@@ -2051,7 +2051,7 @@
    "area": "TrainerCard"
   },
   "232": {
-   "handler": "s00E8_StartMenuIsItemSelected",
+   "handler": "Scrcmd_GameState_StartMenuIsItemSelected",
    "overlay": 12,
    "args": [
     "any",
@@ -2060,59 +2060,59 @@
    "area": "TrainerCard"
   },
   "234": {
-   "handler": "s00EA_HOFCheckIntegrity",
+   "handler": "Scrcmd_GameState_HOFCheckIntegrity",
    "overlay": 12,
    "args": [
     "var"
    ]
   },
   "235": {
-   "handler": "s00EB_DayCareCheckSpawnFlag",
+   "handler": "Scrcmd_DayCare_DayCareCheckSpawnFlag",
    "overlay": 12,
    "args": [
     "var"
    ]
   },
   "236": {
-   "handler": "s00EC_DayCareBreed",
+   "handler": "Scrcmd_DayCare_DayCareBreed",
    "overlay": 12,
    "args": []
   },
   "237": {
-   "handler": "s00ED_DayCareResetSeed",
+   "handler": "Scrcmd_DayCare_DayCareResetSeed",
    "overlay": 12,
    "args": []
   },
   "238": {
-   "handler": "s00EE_DayCareGetPkmCount",
+   "handler": "Scrcmd_DayCare_DayCareGetPkmCount",
    "overlay": 12,
    "args": [
     "var"
    ]
   },
   "239": {
-   "handler": "s00EF_DayCareCalcEggSpawnChance",
+   "handler": "Scrcmd_DayCare_DayCareCalcEggSpawnChance",
    "overlay": 12,
    "args": [
     "var"
    ]
   },
   "240": {
-   "handler": "s00F0_DayCareDeposit",
+   "handler": "Scrcmd_DayCare_DayCareDeposit",
    "overlay": 12,
    "args": [
     "any"
    ]
   },
   "241": {
-   "handler": "s00F1_DayCareWithdraw",
+   "handler": "Scrcmd_DayCare_DayCareWithdraw",
    "overlay": 12,
    "args": [
     "any"
    ]
   },
   "242": {
-   "handler": "s00F2_DayCareGetSpecies",
+   "handler": "Scrcmd_DayCare_DayCareGetSpecies",
    "overlay": 12,
    "args": [
     "var",
@@ -2120,7 +2120,7 @@
    ]
   },
   "243": {
-   "handler": "s00F3_DayCareGetForme",
+   "handler": "Scrcmd_DayCare_DayCareGetForme",
    "overlay": 12,
    "args": [
     "var",
@@ -2128,7 +2128,7 @@
    ]
   },
   "244": {
-   "handler": "s00F4_DayCareCalcNewLevel",
+   "handler": "Scrcmd_DayCare_DayCareCalcNewLevel",
    "overlay": 12,
    "args": [
     "var",
@@ -2136,7 +2136,7 @@
    ]
   },
   "245": {
-   "handler": "s00F5_DayCareCalcLevelGain",
+   "handler": "Scrcmd_DayCare_DayCareCalcLevelGain",
    "overlay": 12,
    "args": [
     "var",
@@ -2144,7 +2144,7 @@
    ]
   },
   "246": {
-   "handler": "s00F6_DayCareCalcWithdrawCost",
+   "handler": "Scrcmd_DayCare_DayCareCalcWithdrawCost",
    "overlay": 12,
    "args": [
     "var",
@@ -2152,14 +2152,14 @@
    ]
   },
   "247": {
-   "handler": "s00F7_DayCareCallPokeSelect",
+   "handler": "Scrcmd_DayCare_DayCareCallPokeSelect",
    "overlay": 12,
    "args": [
     "var"
    ]
   },
   "248": {
-   "handler": "s00F8_DayCareGetSex",
+   "handler": "Scrcmd_DayCare_DayCareGetSex",
    "overlay": 12,
    "args": [
     "var",
@@ -2167,21 +2167,21 @@
    ]
   },
   "249": {
-   "handler": "s00F9_MoneyAdd",
+   "handler": "Scrcmd_Pokemon_MoneyAdd",
    "overlay": 12,
    "args": [
     "any"
    ]
   },
   "250": {
-   "handler": "s00FA_MoneySub",
+   "handler": "Scrcmd_Pokemon_MoneySub",
    "overlay": 12,
    "args": [
     "any"
    ]
   },
   "251": {
-   "handler": "s00FB_MoneyCheck",
+   "handler": "Scrcmd_Pokemon_MoneyCheck",
    "overlay": 12,
    "args": [
     "var",
@@ -2189,7 +2189,7 @@
    ]
   },
   "252": {
-   "handler": "s00FC_PokePartyGetHappiness",
+   "handler": "Scrcmd_Pokemon_PokePartyGetHappiness",
    "overlay": 12,
    "args": [
     "var",
@@ -2197,7 +2197,7 @@
    ]
   },
   "253": {
-   "handler": "s00FD_PokePartyAdjustHappiness",
+   "handler": "Scrcmd_Pokemon_PokePartyAdjustHappiness",
    "overlay": 12,
    "args": [
     "any",
@@ -2206,7 +2206,7 @@
    ]
   },
   "254": {
-   "handler": "s00FE_PokePartyGetSpecies",
+   "handler": "Scrcmd_Pokemon_PokePartyGetSpecies",
    "overlay": 12,
    "args": [
     "var",
@@ -2214,7 +2214,7 @@
    ]
   },
   "255": {
-   "handler": "s00FF_PokePartyGetForme",
+   "handler": "Scrcmd_Pokemon_PokePartyGetForme",
    "overlay": 12,
    "args": [
     "var",
@@ -2222,14 +2222,14 @@
    ]
   },
   "256": {
-   "handler": "s0100_PokePartyCheckPokerus",
+   "handler": "Scrcmd_PokemonMisc_PokePartyCheckPokerus",
    "overlay": 36,
    "args": [
     "var"
    ]
   },
   "257": {
-   "handler": "s0101_PokePartyIsFullHP",
+   "handler": "Scrcmd_Pokemon_PokePartyIsFullHP",
    "overlay": 12,
    "args": [
     "var",
@@ -2237,7 +2237,7 @@
    ]
   },
   "258": {
-   "handler": "s0102_PokePartyIsEgg",
+   "handler": "Scrcmd_Pokemon_PokePartyIsEgg",
    "overlay": 12,
    "args": [
     "var",
@@ -2245,7 +2245,7 @@
    ]
   },
   "259": {
-   "handler": "s0103_PokePartyGetCount",
+   "handler": "Scrcmd_Pokemon_PokePartyGetCount",
    "overlay": 12,
    "args": [
     "var",
@@ -2253,12 +2253,12 @@
    ]
   },
   "260": {
-   "handler": "s0104_PokePartyRecoverAll",
+   "handler": "Scrcmd_Pokemon_PokePartyRecoverAll",
    "overlay": 12,
    "args": []
   },
   "261": {
-   "handler": "s0105_CallPokeNameInput",
+   "handler": "Scrcmd_PokemonMisc_CallPokeNameInput",
    "overlay": 36,
    "args": [
     "var",
@@ -2267,14 +2267,14 @@
    ]
   },
   "262": {
-   "handler": "s0106_CallEggHatch",
+   "handler": "Scrcmd_PokemonMisc_CallEggHatch",
    "overlay": 36,
    "args": [
     "var"
    ]
   },
   "263": {
-   "handler": "s0107_CallPokeSelect",
+   "handler": "Scrcmd_PokemonMisc_CallPokeSelect",
    "overlay": 36,
    "args": [
     "u16",
@@ -2284,7 +2284,7 @@
    ]
   },
   "264": {
-   "handler": "s0108_PokePartyGetMoveCount",
+   "handler": "Scrcmd_Pokemon_PokePartyGetMoveCount",
    "overlay": 12,
    "args": [
     "var",
@@ -2292,7 +2292,7 @@
    ]
   },
   "265": {
-   "handler": "s0109_CallPokeMoveReplace",
+   "handler": "Scrcmd_PokemonMisc_CallPokeMoveReplace",
    "overlay": 36,
    "args": [
     "var",
@@ -2302,7 +2302,7 @@
    ]
   },
   "266": {
-   "handler": "s010A_PokePartyGetMove",
+   "handler": "Scrcmd_Pokemon_PokePartyGetMove",
    "overlay": 12,
    "args": [
     "var",
@@ -2311,7 +2311,7 @@
    ]
   },
   "267": {
-   "handler": "s010B_PokePartyLearnMove",
+   "handler": "Scrcmd_Pokemon_PokePartyLearnMove",
    "overlay": 12,
    "args": [
     "any",
@@ -2320,7 +2320,7 @@
    ]
   },
   "268": {
-   "handler": "s010C_PokePartyAdd",
+   "handler": "Scrcmd_Pokemon_PokePartyAdd",
    "overlay": 12,
    "args": [
     "var",
@@ -2330,7 +2330,7 @@
    ]
   },
   "269": {
-   "handler": "s010D_PokePartyGetMemberByType",
+   "handler": "Scrcmd_Pokemon_PokePartyGetMemberByType",
    "overlay": 12,
    "args": [
     "var",
@@ -2338,7 +2338,7 @@
    ]
   },
   "270": {
-   "handler": "s010E_PokePartyAddEx",
+   "handler": "Scrcmd_Pokemon_PokePartyAddEx",
    "overlay": 12,
    "args": [
     "var",
@@ -2353,7 +2353,7 @@
    ]
   },
   "271": {
-   "handler": "s010F_PokePartyAddEgg",
+   "handler": "Scrcmd_Pokemon_PokePartyAddEgg",
    "overlay": 12,
    "args": [
     "var",
@@ -2362,7 +2362,7 @@
    ]
   },
   "272": {
-   "handler": "s0110_PokePartyGetParam",
+   "handler": "Scrcmd_Pokemon_PokePartyGetParam",
    "overlay": 12,
    "args": [
     "var",
@@ -2371,7 +2371,7 @@
    ]
   },
   "273": {
-   "handler": "s0111_PokePartySetIV",
+   "handler": "Scrcmd_Pokemon_PokePartySetIV",
    "overlay": 12,
    "args": [
     "any",
@@ -2380,7 +2380,7 @@
    ]
   },
   "274": {
-   "handler": "s0112_PokePartyGetEVTotal",
+   "handler": "Scrcmd_Pokemon_PokePartyGetEVTotal",
    "overlay": 12,
    "args": [
     "var",
@@ -2388,7 +2388,7 @@
    ]
   },
   "275": {
-   "handler": "s0113_PokePartyIsOriginGame",
+   "handler": "Scrcmd_Pokemon_PokePartyIsOriginGame",
    "overlay": 12,
    "args": [
     "var",
@@ -2396,7 +2396,7 @@
    ]
   },
   "276": {
-   "handler": "s0114_PokePartyGetCountBySpecies",
+   "handler": "Scrcmd_Pokemon_PokePartyGetCountBySpecies",
    "overlay": 12,
    "args": [
     "any",
@@ -2404,7 +2404,7 @@
    ]
   },
   "277": {
-   "handler": "s0115_PokePartyHasMove",
+   "handler": "Scrcmd_Pokemon_PokePartyHasMove",
    "overlay": 12,
    "args": [
     "var",
@@ -2413,7 +2413,7 @@
    ]
   },
   "278": {
-   "handler": "s0116_PokePartyHasMoveAny",
+   "handler": "Scrcmd_Pokemon_PokePartyHasMoveAny",
    "overlay": 12,
    "args": [
     "var",
@@ -2421,7 +2421,7 @@
    ]
   },
   "279": {
-   "handler": "s0117_PokePartySetForme",
+   "handler": "Scrcmd_Pokemon_PokePartySetForme",
    "overlay": 12,
    "args": [
     "any",
@@ -2429,7 +2429,7 @@
    ]
   },
   "280": {
-   "handler": "s0118_PokePartyFindBySpecies",
+   "handler": "Scrcmd_Pokemon_PokePartyFindBySpecies",
    "overlay": 12,
    "args": [
     "any",
@@ -2438,7 +2438,7 @@
    ]
   },
   "281": {
-   "handler": "s0119_PokePartyIsFromWhiteForest",
+   "handler": "Scrcmd_Pokemon_PokePartyIsFromWhiteForest",
    "overlay": 12,
    "args": [
     "var",
@@ -2447,7 +2447,7 @@
    ]
   },
   "282": {
-   "handler": "s011A_PokePartyGetMetDate",
+   "handler": "Scrcmd_Pokemon_PokePartyGetMetDate",
    "overlay": 12,
    "args": [
     "var",
@@ -2457,7 +2457,7 @@
    ]
   },
   "283": {
-   "handler": "s011B_PokePartyGetTypes",
+   "handler": "Scrcmd_Pokemon_PokePartyGetTypes",
    "overlay": 12,
    "args": [
     "var",
@@ -2466,7 +2466,7 @@
    ]
   },
   "284": {
-   "handler": "s011C_PokePartyChangeRotomForme",
+   "handler": "Scrcmd_Pokemon_PokePartyChangeRotomForme",
    "overlay": 12,
    "args": [
     "any",
@@ -2475,21 +2475,21 @@
    ]
   },
   "285": {
-   "handler": "s011D_TrainerCardSetFavePokemon",
+   "handler": "Scrcmd_PokemonMisc_TrainerCardSetFavePokemon",
    "overlay": 36,
    "args": [
     "any"
    ]
   },
   "286": {
-   "handler": "s011E_TrainerCardSaveGymVictoryParty",
+   "handler": "Scrcmd_PokemonMisc_TrainerCardSaveGymVictoryParty",
    "overlay": 36,
    "args": [
     "any"
    ]
   },
   "287": {
-   "handler": "s011F_WordSetGymVictoryParty",
+   "handler": "Scrcmd_PokemonMisc_WordSetGymVictoryParty",
    "overlay": 36,
    "args": [
     "any",
@@ -2497,7 +2497,7 @@
    ]
   },
   "288": {
-   "handler": "s0120_FieldTradeSavePokemon",
+   "handler": "Scrcmd_PokemonMisc_FieldTradeSavePokemon",
    "overlay": 36,
    "args": [
     "any",
@@ -2505,7 +2505,7 @@
    ]
   },
   "289": {
-   "handler": "s0121_BoxGetCount",
+   "handler": "Scrcmd_Pokemon_BoxGetCount",
    "overlay": 12,
    "args": [
     "var",
@@ -2513,7 +2513,7 @@
    ]
   },
   "290": {
-   "handler": "s0122_BoxAdd",
+   "handler": "Scrcmd_Pokemon_BoxAdd",
    "overlay": 12,
    "args": [
     "var",
@@ -2523,7 +2523,7 @@
    ]
   },
   "291": {
-   "handler": "s0123_BoxAddEx",
+   "handler": "Scrcmd_Pokemon_BoxAddEx",
    "overlay": 12,
    "args": [
     "var",
@@ -2538,7 +2538,7 @@
    ]
   },
   "292": {
-   "handler": "s0124_BMHndAnmPlay",
+   "handler": "Scrcmd_Buildmodel_BMHndAnmPlay",
    "overlay": 36,
    "args": [
     "any",
@@ -2546,12 +2546,12 @@
    ]
   },
   "293": {
-   "handler": "s0125_BMPlayHOFMachineSeq",
+   "handler": "Scrcmd_Buildmodel_BMPlayHOFMachineSeq",
    "overlay": 36,
    "args": []
   },
   "294": {
-   "handler": "s0126_BMChangeMdlID",
+   "handler": "Scrcmd_Buildmodel_BMChangeMdlID",
    "overlay": 36,
    "args": [
     "any",
@@ -2561,7 +2561,7 @@
    ]
   },
   "295": {
-   "handler": "s0127_BMCreateHandleByGPos",
+   "handler": "Scrcmd_Buildmodel_BMCreateHandleByGPos",
    "overlay": 36,
    "args": [
     "var",
@@ -2571,14 +2571,14 @@
    ]
   },
   "296": {
-   "handler": "s0128_BMReleaseHandle",
+   "handler": "Scrcmd_Buildmodel_BMReleaseHandle",
    "overlay": 36,
    "args": [
     "any"
    ]
   },
   "297": {
-   "handler": "s0129_BMHndAudioVisualAnmPlay",
+   "handler": "Scrcmd_Buildmodel_BMHndAudioVisualAnmPlay",
    "overlay": 36,
    "args": [
     "any",
@@ -2586,7 +2586,7 @@
    ]
   },
   "298": {
-   "handler": "s012A_BMHndAnmWait",
+   "handler": "Scrcmd_Buildmodel_BMHndAnmWait",
    "overlay": 36,
    "args": [
     "any"
@@ -2596,7 +2596,7 @@
    ]
   },
   "299": {
-   "handler": "s012B_BMAnmPlayInv",
+   "handler": "Scrcmd_Buildmodel_BMAnmPlayInv",
    "overlay": 36,
    "args": [
     "any",
@@ -2605,14 +2605,14 @@
    ]
   },
   "300": {
-   "handler": "s012C_BMHndAnmPause",
+   "handler": "Scrcmd_Buildmodel_BMHndAnmPause",
    "overlay": 36,
    "args": [
     "any"
    ]
   },
   "301": {
-   "handler": "s012D_BMSetVisible",
+   "handler": "Scrcmd_Buildmodel_BMSetVisible",
    "overlay": 36,
    "args": [
     "any",
@@ -2622,7 +2622,7 @@
    ]
   },
   "302": {
-   "handler": "s012E_BMAnmPlayLoop",
+   "handler": "Scrcmd_Buildmodel_BMAnmPlayLoop",
    "overlay": 36,
    "args": [
     "any",
@@ -2631,36 +2631,36 @@
    ]
   },
   "303": {
-   "handler": "s012F_PokecenPlayHealingSequence",
+   "handler": "Scrcmd_Buildmodel_PokecenPlayHealingSequence",
    "overlay": 36,
    "args": [
     "any"
    ]
   },
   "304": {
-   "handler": "s0130_PokecenPCOpen",
+   "handler": "Scrcmd_Buildmodel_PokecenPCOpen",
    "overlay": 36,
    "args": []
   },
   "305": {
-   "handler": "s0131_PokecenPCIdle",
+   "handler": "Scrcmd_Buildmodel_PokecenPCIdle",
    "overlay": 36,
    "args": []
   },
   "306": {
-   "handler": "s0132_PokecenPCClose",
+   "handler": "Scrcmd_Buildmodel_PokecenPCClose",
    "overlay": 36,
    "args": [
     "any"
    ]
   },
   "308": {
-   "handler": "s0134_CasteliaRushInit",
+   "handler": "Scrcmd_Misc_CasteliaRushInit",
    "overlay": 36,
    "args": []
   },
   "310": {
-   "handler": "s0136_FieldSetWeather",
+   "handler": "Scrcmd_Weather_FieldSetWeather",
    "overlay": 12,
    "args": [
     "any",
@@ -2668,14 +2668,14 @@
    ]
   },
   "311": {
-   "handler": "s0137_SaveDataWrite",
+   "handler": "Scrcmd_Save_SaveDataWrite",
    "overlay": 36,
    "args": [
     "var"
    ]
   },
   "312": {
-   "handler": "s0138_SaveDataGetStatus",
+   "handler": "Scrcmd_GameState_SaveDataGetStatus",
    "overlay": 12,
    "args": [
     "var",
@@ -2684,7 +2684,7 @@
    ]
   },
   "313": {
-   "handler": "s0139_GameCommDisconnect",
+   "handler": "Scrcmd_Network_GameCommDisconnect",
    "overlay": 12,
    "args": [
     "var"
@@ -2694,56 +2694,56 @@
    ]
   },
   "314": {
-   "handler": "s013A_GameCommGetStatus",
+   "handler": "Scrcmd_Net_GameCommGetStatus",
    "overlay": 36,
    "args": [
     "var"
    ]
   },
   "315": {
-   "handler": "s013B_GameCommCheckDSiWiFi",
+   "handler": "Scrcmd_Network_GameCommCheckDSiWiFi",
    "overlay": 12,
    "args": [
     "var"
    ]
   },
   "316": {
-   "handler": "s013C_GameCommTryBoot",
+   "handler": "Scrcmd_Network_GameCommTryBoot",
    "overlay": 12,
    "args": []
   },
   "317": {
-   "handler": "s013D_GameCommPause",
+   "handler": "Scrcmd_Network_GameCommPause",
    "overlay": 12,
    "args": []
   },
   "318": {
-   "handler": "s013E_GameCommResume",
+   "handler": "Scrcmd_Network_GameCommResume",
    "overlay": 12,
    "args": []
   },
   "319": {
-   "handler": "s013F_EvCameraInit",
+   "handler": "Scrcmd_Camera_EvCameraInit",
    "overlay": 36,
    "args": []
   },
   "320": {
-   "handler": "s0140_EvCameraEnd",
+   "handler": "Scrcmd_Camera_EvCameraEnd",
    "overlay": 36,
    "args": []
   },
   "321": {
-   "handler": "s0141_EvCameraUnbind",
+   "handler": "Scrcmd_Camera_EvCameraUnbind",
    "overlay": 36,
    "args": []
   },
   "322": {
-   "handler": "s0142_EvCameraRebind",
+   "handler": "Scrcmd_Camera_EvCameraRebind",
    "overlay": 36,
    "args": []
   },
   "323": {
-   "handler": "s0143_EvCameraMoveTo",
+   "handler": "Scrcmd_Camera_EvCameraMoveTo",
    "overlay": 36,
    "args": [
     "u16",
@@ -2756,19 +2756,19 @@
    ]
   },
   "324": {
-   "handler": "s0144_EvCameraReturn",
+   "handler": "Scrcmd_Camera_EvCameraReturn",
    "overlay": 36,
    "args": [
     "u16"
    ]
   },
   "325": {
-   "handler": "s0145_EvCameraWait",
+   "handler": "Scrcmd_Camera_EvCameraWait",
    "overlay": 36,
    "args": []
   },
   "326": {
-   "handler": "s0146_EvCameraMoveToCommon",
+   "handler": "Scrcmd_Camera_EvCameraMoveToCommon",
    "overlay": 36,
    "args": [
     "u16",
@@ -2776,14 +2776,14 @@
    ]
   },
   "327": {
-   "handler": "s0147_EvCameraMoveToDefault",
+   "handler": "Scrcmd_Camera_EvCameraMoveToDefault",
    "overlay": 36,
    "args": [
     "u16"
    ]
   },
   "328": {
-   "handler": "s0148_EvCameraShake",
+   "handler": "Scrcmd_Camera_EvCameraShake",
    "overlay": 36,
    "args": [
     "any",
@@ -2797,7 +2797,7 @@
    ]
   },
   "329": {
-   "handler": "s0149_CallFriendlyShopBuy",
+   "handler": "Scrcmd_Shop_CallFriendlyShopBuy",
    "overlay": 36,
    "args": [
     "any",
@@ -2808,22 +2808,22 @@
    ]
   },
   "330": {
-   "handler": "s014A_FieldOpen",
+   "handler": "Scrcmd_Proc_FieldOpen",
    "overlay": 12,
    "args": []
   },
   "331": {
-   "handler": "s014B_FieldClose",
+   "handler": "Scrcmd_Proc_FieldClose",
    "overlay": 12,
    "args": []
   },
   "332": {
-   "handler": "s014C_RTFreeUserHeap",
+   "handler": "Scrcmd_Proc_RTFreeUserHeap",
    "overlay": 12,
    "args": []
   },
   "333": {
-   "handler": "s014D_CallRecordSystem",
+   "handler": "Scrcmd_ProcFld_CallRecordSystem",
    "overlay": 36,
    "args": [
     "any",
@@ -2831,7 +2831,7 @@
    ]
   },
   "334": {
-   "handler": "s014E_CallBag",
+   "handler": "Scrcmd_Proc_CallBag",
    "overlay": 12,
    "args": [
     "any",
@@ -2843,7 +2843,7 @@
    ]
   },
   "335": {
-   "handler": "s014F_CallPC",
+   "handler": "Scrcmd_ProcFld_CallPC",
    "overlay": 36,
    "args": [
     "var",
@@ -2851,14 +2851,14 @@
    ]
   },
   "336": {
-   "handler": "s0150_CallMailbox",
+   "handler": "Scrcmd_Proc_CallMailbox",
    "overlay": 12,
    "args": [
     "var"
    ]
   },
   "337": {
-   "handler": "s0151_CallPokedexDiploma",
+   "handler": "Scrcmd_Proc_CallPokedexDiploma",
    "overlay": 12,
    "args": [
     "any",
@@ -2869,12 +2869,12 @@
    ]
   },
   "338": {
-   "handler": "s0152_CallGeonet",
+   "handler": "Scrcmd_ProcFld_CallGeonet",
    "overlay": 36,
    "args": []
   },
   "339": {
-   "handler": "s0153_callPoke3Select",
+   "handler": "Scrcmd_Proc_callPoke3Select",
    "overlay": 12,
    "args": [
     "var"
@@ -2884,7 +2884,7 @@
    ]
   },
   "340": {
-   "handler": "s0154_Call3DDemo",
+   "handler": "Scrcmd_Proc_Call3DDemo",
    "overlay": 12,
    "args": [
     "any",
@@ -2892,7 +2892,7 @@
    ]
   },
   "341": {
-   "handler": "s0155_CallXTransceiver",
+   "handler": "Scrcmd_ProcFld_CallXTransceiver",
    "overlay": 36,
    "args": [
     "any",
@@ -2900,7 +2900,7 @@
    ]
   },
   "342": {
-   "handler": "s0156_CallGameClear",
+   "handler": "Scrcmd_ProcFld_CallGameClear",
    "overlay": 36,
    "args": [
     "any"
@@ -2910,60 +2910,60 @@
    ]
   },
   "343": {
-   "handler": "s0157_ActorAnimationInit",
+   "handler": "Scrcmd_FieldActorAnimation_ActorAnimationInit",
    "overlay": 33,
    "args": [
     "any"
    ]
   },
   "344": {
-   "handler": "s0158_ActorAnimationFree",
+   "handler": "Scrcmd_FieldActorAnimation_ActorAnimationFree",
    "overlay": 33,
    "args": []
   },
   "345": {
-   "handler": "s0159_ActorAnimationPlay",
+   "handler": "Scrcmd_FieldActorAnimation_ActorAnimationPlay",
    "overlay": 33,
    "args": [
     "any"
    ]
   },
   "346": {
-   "handler": "s015A_ActorAnimationWait",
+   "handler": "Scrcmd_FieldActorAnimation_ActorAnimationWait",
    "overlay": 33,
    "args": []
   },
   "347": {
-   "handler": "s015B_WifiListHasValidProfile",
+   "handler": "Scrcmd_Net_WifiListHasValidProfile",
    "overlay": 36,
    "args": [
     "var"
    ]
   },
   "348": {
-   "handler": "s015C_WifiListCountFriends",
+   "handler": "Scrcmd_Net_WifiListCountFriends",
    "overlay": 36,
    "args": [
     "var"
    ]
   },
   "349": {
-   "handler": "s015D_NetConnectWiFiClub",
+   "handler": "Scrcmd_Net_NetConnectWiFiClub",
    "overlay": 36,
    "args": []
   },
   "350": {
-   "handler": "s015E_NetConnectGTS",
+   "handler": "Scrcmd_Net_NetConnectGTS",
    "overlay": 36,
    "args": []
   },
   "351": {
-   "handler": "s015F_Nop",
+   "handler": "Scrcmd_Proc_Nop",
    "overlay": 12,
    "args": []
   },
   "352": {
-   "handler": "s0160_NetConnectWiFiBattle",
+   "handler": "Scrcmd_Proc_NetConnectWiFiBattle",
    "overlay": 12,
    "args": [
     "any",
@@ -2971,19 +2971,19 @@
    ]
   },
   "353": {
-   "handler": "s0161_NetConnectBattleVideo",
+   "handler": "Scrcmd_Proc_NetConnectBattleVideo",
    "overlay": 12,
    "args": [
     "any"
    ]
   },
   "354": {
-   "handler": "s0162_NetConnectGTSNegotiation",
+   "handler": "Scrcmd_Net_NetConnectGTSNegotiation",
    "overlay": 36,
    "args": []
   },
   "355": {
-   "handler": "s0163_MusicalCall",
+   "handler": "Scrcmd_Musical_MusicalCall",
    "overlay": 12,
    "args": [
     "any",
@@ -2995,7 +2995,7 @@
    ]
   },
   "356": {
-   "handler": "s0164_MusicalCallDressUp",
+   "handler": "Scrcmd_Musical_MusicalCallDressUp",
    "overlay": 12,
    "args": [
     "any"
@@ -3003,7 +3003,7 @@
    "area": "Musical"
   },
   "357": {
-   "handler": "s0165_MusicalGetInfo",
+   "handler": "Scrcmd_Musical_MusicalGetInfo",
    "overlay": 12,
    "args": [
     "u8",
@@ -3013,7 +3013,7 @@
    "area": "Musical"
   },
   "358": {
-   "handler": "s0166_MusicalGetAudienceGift",
+   "handler": "Scrcmd_Musical_MusicalGetAudienceGift",
    "overlay": 12,
    "args": [
     "any",
@@ -3023,7 +3023,7 @@
    "area": "Musical"
   },
   "359": {
-   "handler": "s0167_MusicalComm",
+   "handler": "Scrcmd_Musical_MusicalComm",
    "overlay": 12,
    "args": [
     "any",
@@ -3036,7 +3036,7 @@
    ]
   },
   "360": {
-   "handler": "s0168_MusicalAddProp",
+   "handler": "Scrcmd_Musical_MusicalAddProp",
    "overlay": 12,
    "args": [
     "any"
@@ -3044,7 +3044,7 @@
    "area": "Musical"
   },
   "361": {
-   "handler": "s0169_MusicalClearAudienceGift",
+   "handler": "Scrcmd_Musical_MusicalClearAudienceGift",
    "overlay": 12,
    "args": [
     "any"
@@ -3052,7 +3052,7 @@
    "area": "Musical"
   },
   "362": {
-   "handler": "s016A_MusicalSelectPoke",
+   "handler": "Scrcmd_Musical_MusicalSelectPoke",
    "overlay": 12,
    "args": [
     "var",
@@ -3060,7 +3060,7 @@
    ]
   },
   "366": {
-   "handler": "s016E_CallMonolith",
+   "handler": "Scrcmd_Proc_CallMonolith",
    "overlay": 12,
    "args": [],
    "area": "HighLink",
@@ -3084,7 +3084,7 @@
    ]
   },
   "372": {
-   "handler": "s0174_CallWildBattle",
+   "handler": "Scrcmd_Encount_CallWildBattle",
    "overlay": 36,
    "args": [
     "any",
@@ -3093,12 +3093,12 @@
    ]
   },
   "373": {
-   "handler": "s0175_CallWildBattleEnd",
+   "handler": "Scrcmd_Encount_CallWildBattleEnd",
    "overlay": 36,
    "args": []
   },
   "374": {
-   "handler": "s0176_CallWildLose",
+   "handler": "Scrcmd_GameState_CallWildLose",
    "overlay": 12,
    "args": [],
    "flow": [
@@ -3106,26 +3106,26 @@
    ]
   },
   "375": {
-   "handler": "s0177_WildBattleIsVictory",
+   "handler": "Scrcmd_GameState_WildBattleIsVictory",
    "overlay": 12,
    "args": [
     "var"
    ]
   },
   "376": {
-   "handler": "s0178_WildBattleGetResult",
+   "handler": "Scrcmd_GameState_WildBattleGetResult",
    "overlay": 12,
    "args": [
     "var"
    ]
   },
   "377": {
-   "handler": "s0179_CallCaptureDemo",
+   "handler": "Scrcmd_Encount_CallCaptureDemo",
    "overlay": 36,
    "args": []
   },
   "378": {
-   "handler": "GimmickGateCmd_ViewBoard",
+   "handler": "Scrcmd_FieldGimmickGate_GimmickGateViewBoard",
    "overlay": 104,
    "args": [
     "any"
@@ -3140,33 +3140,33 @@
    ]
   },
   "380": {
-   "handler": "s017C_RollerCoasterCallSwitch",
+   "handler": "Scrcmd_Gym_RollerCoasterCallSwitch",
    "overlay": 36,
    "args": [
     "u16"
    ]
   },
   "381": {
-   "handler": "s017D_RollerCoasterSetCarIntroSeen",
+   "handler": "Scrcmd_Gym_RollerCoasterSetCarIntroSeen",
    "overlay": 36,
    "args": [
     "u16"
    ]
   },
   "390": {
-   "handler": "s0186_DriftveilGymPrepareFreight",
+   "handler": "Scrcmd_Gym_DriftveilGymPrepareFreight",
    "overlay": 36,
    "args": []
   },
   "391": {
-   "handler": "s0187_DriftveilLiftPlaceAtBottom",
+   "handler": "Scrcmd_Gym_DriftveilLiftPlaceAtBottom",
    "overlay": 36,
    "args": [
     "u16"
    ]
   },
   "396": {
-   "handler": "s018C_DriftveilGymCallElevator",
+   "handler": "Scrcmd_Gym_DriftveilGymCallElevator",
    "overlay": 36,
    "args": [
     "u16",
@@ -3174,89 +3174,89 @@
    ]
   },
   "397": {
-   "handler": "s018D_DriftveilGymCallFreight",
+   "handler": "Scrcmd_Gym_DriftveilGymCallFreight",
    "overlay": 36,
    "args": [
     "u16"
    ]
   },
   "398": {
-   "handler": "s018E_DriftveilLiftCallMove",
+   "handler": "Scrcmd_Gym_DriftveilLiftCallMove",
    "overlay": 36,
    "args": [
     "u16"
    ]
   },
   "399": {
-   "handler": "s018F_IcirrusGymCallSwitchAnim",
+   "handler": "Scrcmd_Gym_IcirrusGymCallSwitchAnim",
    "overlay": 36,
    "args": [
     "u16"
    ]
   },
   "400": {
-   "handler": "s0190_IcirrusGymCallFlipSwitch",
+   "handler": "Scrcmd_Gym_IcirrusGymCallFlipSwitch",
    "overlay": 36,
    "args": [
     "u16"
    ]
   },
   "401": {
-   "handler": "s0191_IcirrusGymToggleMovementAtPlace",
+   "handler": "Scrcmd_Gym_IcirrusGymToggleMovementAtPlace",
    "overlay": 36,
    "args": [
     "u16"
    ]
   },
   "407": {
-   "handler": "s0197_CGearPowerOn",
+   "handler": "Scrcmd_ProcFld_CGearPowerOn",
    "overlay": 36,
    "args": [
     "any"
    ]
   },
   "408": {
-   "handler": "s0198_FieldSubscreenChange",
+   "handler": "Scrcmd_Field_FieldSubscreenChange",
    "overlay": 36,
    "args": [
     "any"
    ]
   },
   "409": {
-   "handler": "s0199_FieldSubscreenReturn",
+   "handler": "Scrcmd_Field_FieldSubscreenReturn",
    "overlay": 36,
    "args": []
   },
   "410": {
-   "handler": "s019A_CGearControlWarning",
+   "handler": "Scrcmd_PokeDisp_CGearControlWarning",
    "overlay": 36,
    "args": [
     "u16"
    ]
   },
   "411": {
-   "handler": "s019B_PlayFieldEffect",
+   "handler": "Scrcmd_FldWipe3dobj_PlayFieldEffect",
    "overlay": 36,
    "args": [
     "any"
    ]
   },
   "412": {
-   "handler": "s019C_PlayHMCutInEffect",
+   "handler": "Scrcmd_FldWipe3dobj_PlayHMCutInEffect",
    "overlay": 36,
    "args": [
     "any"
    ]
   },
   "413": {
-   "handler": "s019D_PlayAlderFlyEffect",
+   "handler": "Scrcmd_FldWipe3dobj_PlayAlderFlyEffect",
    "overlay": 36,
    "args": [
     "any"
    ]
   },
   "417": {
-   "handler": "s01A1_PleasureBoatGetRoomInfo",
+   "handler": "Scrcmd_RoyalUnova_PleasureBoatGetRoomInfo",
    "overlay": 12,
    "args": [
     "any",
@@ -3266,34 +3266,34 @@
    ]
   },
   "418": {
-   "handler": "s01A2_CallRoyalUnovaView",
+   "handler": "Scrcmd_RoyalUnova_CallRoyalUnovaView",
    "overlay": 12,
    "args": [
     "var"
    ]
   },
   "419": {
-   "handler": "s01A3_FadeInBlackQ",
+   "handler": "Scrcmd_Fade_FadeInBlackQ",
    "overlay": 36,
    "args": []
   },
   "420": {
-   "handler": "s01A4_FadeOutBlackQ",
+   "handler": "Scrcmd_Fade_FadeOutBlackQ",
    "overlay": 36,
    "args": []
   },
   "421": {
-   "handler": "s01A5_FadeInWhiteQ",
+   "handler": "Scrcmd_Fade_FadeInWhiteQ",
    "overlay": 36,
    "args": []
   },
   "422": {
-   "handler": "s01A6_FadeOutWhiteQ",
+   "handler": "Scrcmd_Fade_FadeOutWhiteQ",
    "overlay": 36,
    "args": []
   },
   "423": {
-   "handler": "s01A7_FadeWait",
+   "handler": "Scrcmd_Fade_FadeWait",
    "overlay": 36,
    "args": [],
    "flow": [
@@ -3301,37 +3301,37 @@
    ]
   },
   "424": {
-   "handler": "s01A8_FadeInBlackQ_",
+   "handler": "Scrcmd_Fade_FadeInBlackQ_01A8",
    "overlay": 36,
    "args": []
   },
   "426": {
-   "handler": "s01AA_CallSeasonBanner",
+   "handler": "Scrcmd_Fade_CallSeasonBanner",
    "overlay": 36,
    "args": []
   },
   "427": {
-   "handler": "s01AB_FadeInBlack",
+   "handler": "Scrcmd_Fade_FadeInBlack",
    "overlay": 36,
    "args": []
   },
   "428": {
-   "handler": "s01AC_FadeOutBlack",
+   "handler": "Scrcmd_Fade_FadeOutBlack",
    "overlay": 36,
    "args": []
   },
   "429": {
-   "handler": "s01AD_FadeInWhite",
+   "handler": "Scrcmd_Fade_FadeInWhite",
    "overlay": 36,
    "args": []
   },
   "430": {
-   "handler": "s01AE_FadeOutWhite",
+   "handler": "Scrcmd_Fade_FadeOutWhite",
    "overlay": 36,
    "args": []
   },
   "431": {
-   "handler": "Regulation_RegisterAllowedSpecies",
+   "handler": "Scrcmd_FldBattle_RegisterAllowedSpecies",
    "overlay": 36,
    "args": [
     "any",
@@ -3339,7 +3339,7 @@
    ]
   },
   "432": {
-   "handler": "Regulation_CheckPartyRegulation",
+   "handler": "Scrcmd_FldBattle_CheckPartyRegulation",
    "overlay": 36,
    "args": [
     "any",
@@ -3347,19 +3347,19 @@
    ]
   },
   "433": {
-   "handler": "s01B1_CallLeagueLiftWarp",
+   "handler": "Scrcmd_FldeffCut_CallLeagueLiftWarp",
    "overlay": 36,
    "args": []
   },
   "434": {
-   "handler": "ScrcmdProcFld_SpawnMovePokemonIfInactive",
+   "handler": "Scrcmd_Encount_SpawnMovePokemonIfInactive",
    "overlay": 36,
    "args": [
     "any"
    ]
   },
   "435": {
-   "handler": "FieldChunk_ScrCmdReadSaveByte",
+   "handler": "Scrcmd_SpPokeGimmick_ReadSaveByte",
    "overlay": 12,
    "args": [
     "any",
@@ -3367,7 +3367,7 @@
    ]
   },
   "436": {
-   "handler": "s01B4_FieldTradeStart",
+   "handler": "Scrcmd_PokemonMisc_FieldTradeStart",
    "overlay": 36,
    "args": [
     "any",
@@ -3375,7 +3375,7 @@
    ]
   },
   "437": {
-   "handler": "s01B5_FieldTradeCheck",
+   "handler": "Scrcmd_PokemonMisc_FieldTradeCheck",
    "overlay": 36,
    "args": [
     "var",
@@ -3389,26 +3389,26 @@
    ]
   },
   "449": {
-   "handler": "s01C1_ElevatorSetTablePtr",
+   "handler": "Scrcmd_Misc_ElevatorSetTablePtr",
    "overlay": 36,
    "args": [
     "u32"
    ]
   },
   "450": {
-   "handler": "s01C2_ElevatorBuildListMenu",
+   "handler": "Scrcmd_Misc_ElevatorBuildListMenu",
    "overlay": 36,
    "args": []
   },
   "451": {
-   "handler": "s01C2_ElevatorChangeMap",
+   "handler": "Scrcmd_Misc_ElevatorChangeMap",
    "overlay": 36,
    "args": [
     "any"
    ]
   },
   "452": {
-   "handler": "s01C4_PokeDexIsComplete",
+   "handler": "Scrcmd_PokemonMisc_PokeDexIsComplete",
    "overlay": 36,
    "args": [
     "var",
@@ -3416,7 +3416,7 @@
    ]
   },
   "453": {
-   "handler": "s01C5_PokeDexGetEvaluationParams",
+   "handler": "Scrcmd_PokemonMisc_PokeDexGetEvaluationParams",
    "overlay": 36,
    "args": [
     "any",
@@ -3426,24 +3426,24 @@
    ]
   },
   "454": {
-   "handler": "s01C6_PokeDexGiveNational",
+   "handler": "Scrcmd_GameState_PokeDexGiveNational",
    "overlay": 12,
    "args": []
   },
   "455": {
-   "handler": "s01C7_PokeDexHaveNational",
+   "handler": "Scrcmd_GameState_PokeDexHaveNational",
    "overlay": 12,
    "args": [
     "var"
    ]
   },
   "456": {
-   "handler": "s01C8_PokeDexEnable",
+   "handler": "Scrcmd_GameState_PokeDexEnable",
    "overlay": 12,
    "args": []
   },
   "457": {
-   "handler": "s01C9_NDemoStart",
+   "handler": "Scrcmd_Ndemo_NDemoStart",
    "overlay": 12,
    "args": [
     "u16",
@@ -3452,31 +3452,31 @@
    ]
   },
   "458": {
-   "handler": "s01CA_NDemoEnd",
+   "handler": "Scrcmd_Ndemo_NDemoEnd",
    "overlay": 12,
    "args": []
   },
   "459": {
-   "handler": "s01CB_NDemoReadyTalkMotion",
+   "handler": "Scrcmd_Ndemo_NDemoReadyTalkMotion",
    "overlay": 12,
    "args": []
   },
   "460": {
-   "handler": "ElevatorTable_GetMysteryEntryCount",
+   "handler": "Scrcmd_Misc_ElevatorGetMysteryEntryCount",
    "overlay": 36,
    "args": [
     "var"
    ]
   },
   "461": {
-   "handler": "ElevatorTable_RegisterBirthdayEntry",
+   "handler": "Scrcmd_Misc_ElevatorRegisterBirthdayEntry",
    "overlay": 36,
    "args": [
     "any"
    ]
   },
   "462": {
-   "handler": "s01CE_UnityTowerGetTrainerClass",
+   "handler": "Scrcmd_UnityTower_UnityTowerGetTrainerClass",
    "overlay": 12,
    "args": [
     "u16",
@@ -3484,7 +3484,7 @@
    ]
   },
   "463": {
-   "handler": "s01CF_UnityTowerGetStateParam",
+   "handler": "Scrcmd_UnityTower_UnityTowerGetStateParam",
    "overlay": 12,
    "args": [
     "any",
@@ -3492,7 +3492,7 @@
    ]
   },
   "464": {
-   "handler": "s01D0_UnityTowerCallFloorSelect",
+   "handler": "Scrcmd_UnityTower_UnityTowerCallFloorSelect",
    "overlay": 12,
    "args": [
     "any",
@@ -3502,7 +3502,7 @@
    ]
   },
   "465": {
-   "handler": "s01D1_MoveTutorCheckParty",
+   "handler": "Scrcmd_PokemonMisc_MoveTutorCheckParty",
    "overlay": 36,
    "args": [
     "any",
@@ -3510,7 +3510,7 @@
    ]
   },
   "466": {
-   "handler": "s01D2_MoveTutorCheckPkm",
+   "handler": "Scrcmd_PokemonMisc_MoveTutorCheckPkm",
    "overlay": 36,
    "args": [
     "any",
@@ -3519,7 +3519,7 @@
    ]
   },
   "467": {
-   "handler": "s01D3_MoveTutorGetMoveID",
+   "handler": "Scrcmd_PokemonMisc_MoveTutorGetMoveID",
    "overlay": 36,
    "args": [
     "any",
@@ -3528,7 +3528,7 @@
    ]
   },
   "468": {
-   "handler": "s01D4_MoveTutorCallPokeSelect",
+   "handler": "Scrcmd_PokemonMisc_MoveTutorCallPokeSelect",
    "overlay": 36,
    "args": [
     "any",
@@ -3537,7 +3537,7 @@
    ]
   },
   "469": {
-   "handler": "s01D5_MoveReminderCheckPkm",
+   "handler": "Scrcmd_Pokemon_MoveReminderCheckPkm",
    "overlay": 12,
    "args": [
     "var",
@@ -3545,7 +3545,7 @@
    ]
   },
   "470": {
-   "handler": "s01D6_MoveReminderCallMoveSelect",
+   "handler": "Scrcmd_Proc_MoveReminderCallMoveSelect",
    "overlay": 12,
    "args": [
     "var",
@@ -3553,7 +3553,7 @@
    ]
   },
   "471": {
-   "handler": "s01D7_ObjInitPointGPos",
+   "handler": "Scrcmd_GameState_ObjInitPointGPos",
    "overlay": 12,
    "args": [
     "any",
@@ -3563,7 +3563,7 @@
    ]
   },
   "472": {
-   "handler": "s01D8_ObjInitWarpGPos",
+   "handler": "Scrcmd_GameState_ObjInitWarpGPos",
    "overlay": 12,
    "args": [
     "any",
@@ -3573,7 +3573,7 @@
    ]
   },
   "473": {
-   "handler": "s01D9_ObjInitNPCGPos",
+   "handler": "Scrcmd_GameState_ObjInitNPCGPos",
    "overlay": 12,
    "args": [
     "any",
@@ -3584,7 +3584,7 @@
    ]
   },
   "474": {
-   "handler": "s01DA_CallPhraseSelect",
+   "handler": "Scrcmd_PhraseSelect_CallPhraseSelect",
    "overlay": 12,
    "args": [
     "any",
@@ -3602,7 +3602,7 @@
    ]
   },
   "476": {
-   "handler": "s01DC_DreamWorldItems",
+   "handler": "Scrcmd_Musical_DreamWorldItems",
    "overlay": 12,
    "args": [
     "any",
@@ -3611,7 +3611,7 @@
    "area": "DreamWorld"
   },
   "477": {
-   "handler": "s01DD_BroadcastGameBeacon",
+   "handler": "Scrcmd_FldeffCut_BroadcastGameBeacon",
    "overlay": 36,
    "args": [
     "any",
@@ -3620,7 +3620,7 @@
    ]
   },
   "478": {
-   "handler": "s01DE_PassPowerPopDepletedID",
+   "handler": "Scrcmd_FldeffCut_PassPowerPopDepletedID",
    "overlay": 36,
    "args": [
     "var",
@@ -3628,12 +3628,12 @@
    ]
   },
   "479": {
-   "handler": "s01DF_CallPassPowerFlash",
+   "handler": "Scrcmd_FldeffCut_CallPassPowerFlash",
    "overlay": 36,
    "args": []
   },
   "480": {
-   "handler": "s01E0_StadiumSetupActorsDouble",
+   "handler": "Scrcmd_Stadium_StadiumSetupActorsDouble",
    "overlay": 12,
    "args": [
     "any",
@@ -3643,17 +3643,17 @@
    ]
   },
   "481": {
-   "handler": "s01E1_StadiumLoadTrainerTable",
+   "handler": "Scrcmd_Stadium_StadiumLoadTrainerTable",
    "overlay": 12,
    "args": []
   },
   "482": {
-   "handler": "s01E2_StadiumFreeTrainerTable",
+   "handler": "Scrcmd_Stadium_StadiumFreeTrainerTable",
    "overlay": 12,
    "args": []
   },
   "483": {
-   "handler": "s01E3_StadiumSetupActorSingle",
+   "handler": "Scrcmd_Stadium_StadiumSetupActorSingle",
    "overlay": 12,
    "args": [
     "any",
@@ -3662,7 +3662,7 @@
    ]
   },
   "484": {
-   "handler": "s01E0_StadiumSetupActorsTriple",
+   "handler": "Scrcmd_Stadium_StadiumSetupActorsTriple",
    "overlay": 12,
    "args": [
     "any",
@@ -3674,29 +3674,29 @@
    ]
   },
   "485": {
-   "handler": "s01E5_StadiumResetTrainerFlags",
+   "handler": "Scrcmd_Stadium_StadiumResetTrainerFlags",
    "overlay": 12,
    "args": []
   },
   "486": {
-   "handler": "s01E6_TrialHouseWorkInit",
+   "handler": "Scrcmd_TrialHouse_TrialHouseWorkInit",
    "overlay": 12,
    "args": []
   },
   "487": {
-   "handler": "s01E7_TrialHouseWorkDelete",
+   "handler": "Scrcmd_TrialHouse_TrialHouseWorkDelete",
    "overlay": 12,
    "args": []
   },
   "488": {
-   "handler": "s01E8_TrialHousePrepareParty",
+   "handler": "Scrcmd_TrialHouse_TrialHousePrepareParty",
    "overlay": 12,
    "args": [
     "any"
    ]
   },
   "489": {
-   "handler": "s01E9_TrialHouseCallTeamSelect",
+   "handler": "Scrcmd_TrialHouse_TrialHouseCallTeamSelect",
    "overlay": 12,
    "args": [
     "any",
@@ -3705,7 +3705,7 @@
    ]
   },
   "490": {
-   "handler": "s01EA_TrialHouseSetTrainer",
+   "handler": "Scrcmd_TrialHouse_TrialHouseSetTrainer",
    "overlay": 12,
    "args": [
     "any",
@@ -3714,7 +3714,7 @@
    "area": "TrialHouse"
   },
   "491": {
-   "handler": "s01EB_TrialHouseMsgDisp",
+   "handler": "Scrcmd_TrialHouse_TrialHouseMsgDisp",
    "overlay": 12,
    "args": [
     "any",
@@ -3722,12 +3722,12 @@
    ]
   },
   "492": {
-   "handler": "s01EC_TrialHouseStartBattle",
+   "handler": "Scrcmd_TrialHouse_TrialHouseStartBattle",
    "overlay": 12,
    "args": []
   },
   "493": {
-   "handler": "s01ED_TrialHouseSetDownloadMode",
+   "handler": "Scrcmd_TrialHouse_TrialHouseSetDownloadMode",
    "overlay": 12,
    "args": [
     "any"
@@ -3735,7 +3735,7 @@
    "area": "TrialHouse"
   },
   "494": {
-   "handler": "s01EE_TrialHouseSetBattleTestRank",
+   "handler": "Scrcmd_TrialHouse_TrialHouseSetBattleTestRank",
    "overlay": 12,
    "args": [
     "any"
@@ -3743,14 +3743,14 @@
    "area": "TrainerCard"
   },
   "495": {
-   "handler": "s01EF_TrialHouseGetBattleTestRank",
+   "handler": "Scrcmd_TrialHouse_TrialHouseGetBattleTestRank",
    "overlay": 12,
    "args": [
     "var"
    ]
   },
   "496": {
-   "handler": "s01F0_TrialHouseDownloadExamination",
+   "handler": "Scrcmd_TrialHouse_TrialHouseDownloadExamination",
    "overlay": 12,
    "args": [
     "var"
@@ -3758,7 +3758,7 @@
    "area": "TrialHouse"
   },
   "497": {
-   "handler": "s01F1_TrialHouseCalcPointsStars",
+   "handler": "Scrcmd_TrialHouse_TrialHouseCalcPointsStars",
    "overlay": 12,
    "args": [
     "var",
@@ -3766,7 +3766,7 @@
    ]
   },
   "498": {
-   "handler": "s01F2_TrialHouseGetExaminationType",
+   "handler": "Scrcmd_TrialHouse_TrialHouseGetExaminationType",
    "overlay": 12,
    "args": [
     "var"
@@ -3774,14 +3774,14 @@
    "area": "TrialHouse"
   },
   "499": {
-   "handler": "s01F3_TrialHouseSaveData",
+   "handler": "Scrcmd_TrialHouse_TrialHouseSaveData",
    "overlay": 12,
    "args": [
     "any"
    ]
   },
   "500": {
-   "handler": "s01F4_TrialHouseCallResults",
+   "handler": "Scrcmd_TrialHouse_TrialHouseCallResults",
    "overlay": 12,
    "args": [
     "any",
@@ -3790,14 +3790,14 @@
    "area": "TrialHouse"
   },
   "501": {
-   "handler": "s01F5_TrialHouseGetRecordMask",
+   "handler": "Scrcmd_TrialHouse_TrialHouseGetRecordMask",
    "overlay": 12,
    "args": [
     "var"
    ]
   },
   "502": {
-   "handler": "Scrcmd_CheckWifiListFlags",
+   "handler": "Scrcmd_PhraseInput_CheckWifiListFlags",
    "overlay": 33,
    "args": [
     "any",
@@ -3807,7 +3807,7 @@
    ]
   },
   "503": {
-   "handler": "Scrcmd_WifiListOperation",
+   "handler": "Scrcmd_PhraseInput_WifiListOperation",
    "overlay": 33,
    "args": [
     "any",
@@ -3817,7 +3817,7 @@
    ]
   },
   "504": {
-   "handler": "Scrcmd_SetWifiFriendNameWord",
+   "handler": "Scrcmd_PhraseInput_SetWifiFriendNameWord",
    "overlay": 33,
    "args": [
     "any",
@@ -3825,7 +3825,7 @@
    ]
   },
   "505": {
-   "handler": "s01F9_CheckPmsWordPair",
+   "handler": "Scrcmd_Field_CheckPmsWordPair",
    "overlay": 36,
    "args": [
     "any",
@@ -3835,7 +3835,7 @@
    ]
   },
   "506": {
-   "handler": "s01FA_PepQuizGenerate",
+   "handler": "Scrcmd_PepQuiz_PepQuizGenerate",
    "overlay": 36,
    "args": [
     "any",
@@ -3845,7 +3845,7 @@
    ]
   },
   "507": {
-   "handler": "s01FB_ItemCollectorCheckGroup",
+   "handler": "Scrcmd_Misc_ItemCollectorCheckGroup",
    "overlay": 36,
    "args": [
     "any",
@@ -3853,7 +3853,7 @@
    ]
   },
   "508": {
-   "handler": "s01FC_ItemCollectorGetPrice",
+   "handler": "Scrcmd_Misc_ItemCollectorGetPrice",
    "overlay": 36,
    "args": [
     "any",
@@ -3862,7 +3862,7 @@
    ]
   },
   "509": {
-   "handler": "SurveyCmd_Start",
+   "handler": "Scrcmd_Survey_SurveyStart",
    "overlay": 27,
    "args": [
     "any",
@@ -3873,20 +3873,20 @@
    "area": "TrainerGameInfo"
   },
   "510": {
-   "handler": "SurveyCmd_Clear",
+   "handler": "Scrcmd_Survey_SurveyClear",
    "overlay": 27,
    "args": [],
    "area": "TrainerGameInfo"
   },
   "511": {
-   "handler": "s01FF_SurveyGetCurrentQuestionID",
+   "handler": "Scrcmd_Survey_SurveyGetCurrentQuestionID",
    "overlay": 27,
    "args": [
     "var"
    ]
   },
   "512": {
-   "handler": "s0200_SurveyGetCurrentAnswerIDs",
+   "handler": "Scrcmd_Survey_SurveyGetCurrentAnswerIDs",
    "overlay": 27,
    "args": [
     "var",
@@ -3895,7 +3895,7 @@
    ]
   },
   "513": {
-   "handler": "s0201_SurveyGetPopularOptionMsgID",
+   "handler": "Scrcmd_Survey_SurveyGetPopularOptionMsgID",
    "overlay": 27,
    "args": [
     "any",
@@ -3903,7 +3903,7 @@
    ]
   },
   "514": {
-   "handler": "SurveyCmd_GetQuestionState",
+   "handler": "Scrcmd_Survey_SurveyGetQuestionState",
    "overlay": 27,
    "args": [
     "any",
@@ -3912,7 +3912,7 @@
    "area": "TrainerCard"
   },
   "515": {
-   "handler": "SurveyCmd_GetCurrentRemaining",
+   "handler": "Scrcmd_Survey_SurveyGetCurrentRemaining",
    "overlay": 27,
    "args": [
     "var"
@@ -3920,28 +3920,28 @@
    "area": "TrainerCard"
   },
   "516": {
-   "handler": "s0204_SurveyGetTime",
+   "handler": "Scrcmd_Survey_SurveyGetTime",
    "overlay": 27,
    "args": [
     "var"
    ]
   },
   "517": {
-   "handler": "s0205_CallGreetingPhraseInput",
+   "handler": "Scrcmd_ProcFld_CallGreetingPhraseInput",
    "overlay": 36,
    "args": [
     "var"
    ]
   },
   "518": {
-   "handler": "s0206_CallThanksPhraseInput",
+   "handler": "Scrcmd_ProcFld_CallThanksPhraseInput",
    "overlay": 36,
    "args": [
     "var"
    ]
   },
   "519": {
-   "handler": "s0207_WordSetPasserbyCount",
+   "handler": "Scrcmd_Word_WordSetPasserbyCount",
    "overlay": 36,
    "args": [
     "u8"
@@ -3949,7 +3949,7 @@
    "area": "TrainerGameInfo"
   },
   "520": {
-   "handler": "s0208_WordSetThankedCount",
+   "handler": "Scrcmd_Word_WordSetThankedCount",
    "overlay": 36,
    "args": [
     "u8"
@@ -3957,7 +3957,7 @@
    "area": "TrainerGameInfo"
   },
   "521": {
-   "handler": "SurveyCmd_WriteOwnAnswer",
+   "handler": "Scrcmd_Survey_SurveyWriteOwnAnswer",
    "overlay": 27,
    "args": [
     "any",
@@ -3965,12 +3965,12 @@
    ]
   },
   "522": {
-   "handler": "SurveyCmd_ShowRankMessage",
+   "handler": "Scrcmd_Survey_SurveyShowRankMessage",
    "overlay": 27,
    "args": []
   },
   "523": {
-   "handler": "SurveyCmd_GetRank",
+   "handler": "Scrcmd_Survey_SurveyGetRank",
    "overlay": 27,
    "args": [
     "var"
@@ -3978,13 +3978,13 @@
    "area": "TrainerGameInfo"
   },
   "524": {
-   "handler": "SurveyCmd_RaiseRank",
+   "handler": "Scrcmd_Survey_SurveyRaiseRank",
    "overlay": 27,
    "args": [],
    "area": "TrainerGameInfo"
   },
   "525": {
-   "handler": "s020D_PokePartyFindEx",
+   "handler": "Scrcmd_SpPokeGimmick_PokePartyFindEx",
    "overlay": 12,
    "args": [
     "any",
@@ -3994,7 +3994,7 @@
    ]
   },
   "526": {
-   "handler": "s020E_SpPokeJump",
+   "handler": "Scrcmd_SpPokeGimmick_SpPokeJump",
    "overlay": 12,
    "args": [
     "any",
@@ -4006,7 +4006,7 @@
    ]
   },
   "527": {
-   "handler": "s020F_SpPokeAppear",
+   "handler": "Scrcmd_SpPokeGimmick_SpPokeAppear",
    "overlay": 12,
    "args": [
     "any",
@@ -4016,21 +4016,21 @@
    ]
   },
   "528": {
-   "handler": "s0210_SpPokeWaitAnimEnd",
+   "handler": "Scrcmd_SpPokeGimmick_SpPokeWaitAnimEnd",
    "overlay": 12,
    "args": [
     "any"
    ]
   },
   "529": {
-   "handler": "s0211_SpPokeWaitFrame",
+   "handler": "Scrcmd_SpPokeGimmick_SpPokeWaitFrame",
    "overlay": 12,
    "args": [
     "any"
    ]
   },
   "530": {
-   "handler": "s0212_ActorMoveToHeight",
+   "handler": "Scrcmd_ActorMove_ActorMoveToHeight",
    "overlay": 12,
    "args": [
     "any",
@@ -4039,14 +4039,14 @@
    ]
   },
   "531": {
-   "handler": "s0213_ActorHoldPos",
+   "handler": "Scrcmd_ActorMove_ActorHoldPos",
    "overlay": 12,
    "args": [
     "any"
    ]
   },
   "532": {
-   "handler": "s0214_CallPokemonPreview",
+   "handler": "Scrcmd_PokeDisp_CallPokemonPreview",
    "overlay": 36,
    "args": [
     "any",
@@ -4056,7 +4056,7 @@
    ]
   },
   "533": {
-   "handler": "s0215_SetSpecialTransferUsed",
+   "handler": "Scrcmd_SpPokeGimmick_SetSpecialTransferUsed",
    "overlay": 12,
    "args": [
     "any",
@@ -4064,7 +4064,7 @@
    ]
   },
   "534": {
-   "handler": "s0216_CheckBeaconTrainerKey",
+   "handler": "Scrcmd_PokeDisp_IsOneShotDRObtained",
    "overlay": 36,
    "args": [
     "any",
@@ -4073,7 +4073,7 @@
    "area": "TrainerCard"
   },
   "535": {
-   "handler": "s0217_MapChangeEntreeForest",
+   "handler": "Scrcmd_EntreeForest_MapChangeEntreeForest",
    "overlay": 12,
    "args": [
     "any"
@@ -4098,7 +4098,7 @@
    "area": "AreaNPC"
   },
   "538": {
-   "handler": "s021A_WordSetLoadEntreeForestPkmName",
+   "handler": "Scrcmd_EntreeForest_WordSetLoadEntreeForestPkmName",
    "overlay": 12,
    "args": [
     "any",
@@ -4106,12 +4106,12 @@
    ]
   },
   "539": {
-   "handler": "s021B_EntreeForestSpawnAllPkm",
+   "handler": "Scrcmd_EntreeForest_EntreeForestSpawnAllPkm",
    "overlay": 12,
    "args": []
   },
   "540": {
-   "handler": "s021C_EntreeForestStartBattle",
+   "handler": "Scrcmd_EntreeForest_EntreeForestStartBattle",
    "overlay": 12,
    "args": [
     "any",
@@ -4119,7 +4119,7 @@
    ]
   },
   "541": {
-   "handler": "s021D_EntreeForestRemovePkm",
+   "handler": "Scrcmd_EntreeForest_EntreeForestRemovePkm",
    "overlay": 12,
    "args": [
     "any"
@@ -4127,7 +4127,7 @@
    "area": "AreaNPC"
   },
   "542": {
-   "handler": "s021E_FishingChallengeGetRandomPkm",
+   "handler": "Scrcmd_Encount_FishingChallengeGetRandomPkm",
    "overlay": 36,
    "args": [
     "var"
@@ -4150,7 +4150,7 @@
    ]
   },
   "545": {
-   "handler": "s0221_AnvilleTrainGetModelID",
+   "handler": "Scrcmd_Misc_AnvilleTrainGetModelID",
    "overlay": 36,
    "args": [
     "any",
@@ -4158,14 +4158,14 @@
    ]
   },
   "546": {
-   "handler": "s0222_AnvilleTrainGetDailyIndex",
+   "handler": "Scrcmd_Misc_AnvilleTrainGetDailyIndex",
    "overlay": 36,
    "args": [
     "var"
    ]
   },
   "547": {
-   "handler": "s0223_PokePartyGetHiddenPowerType",
+   "handler": "Scrcmd_PokemonMisc_PokePartyGetHiddenPowerType",
    "overlay": 36,
    "args": [
     "var",
@@ -4173,7 +4173,7 @@
    ]
   },
   "548": {
-   "handler": "s0224_PokePartyGetIV",
+   "handler": "Scrcmd_PokemonMisc_PokePartyGetIV",
    "overlay": 36,
    "args": [
     "any",
@@ -4182,21 +4182,21 @@
    ]
   },
   "549": {
-   "handler": "s0225_ItemGetRandomOwnedTMMove",
+   "handler": "Scrcmd_PokemonMisc_ItemGetRandomOwnedTMMove",
    "overlay": 36,
    "args": [
     "var"
    ]
   },
   "550": {
-   "handler": "CountTrainersEvent_StartCountOtherOtIdsTask",
+   "handler": "Scrcmd_Enceff_StartCountOtherOtIdsTask",
    "overlay": 36,
    "args": [
     "var"
    ]
   },
   "551": {
-   "handler": "s0227_RecordAdd",
+   "handler": "Scrcmd_PokeDisp_RecordAdd",
    "overlay": 36,
    "args": [
     "any",
@@ -4204,7 +4204,7 @@
    ]
   },
   "552": {
-   "handler": "s0228_RecordGet",
+   "handler": "Scrcmd_PokeDisp_RecordGet",
    "overlay": 36,
    "args": [
     "any",
@@ -4212,7 +4212,7 @@
    ]
   },
   "554": {
-   "handler": "s022A_TVGenProgramMsgID",
+   "handler": "Scrcmd_PokeDisp_TVGenProgramMsgID",
    "overlay": 36,
    "args": [
     "any",
@@ -4221,7 +4221,7 @@
    "area": "HollowRival"
   },
   "555": {
-   "handler": "s022B_StartSwapNpcEvent",
+   "handler": "Scrcmd_PokeDisp_StartSwapNpcEvent",
    "overlay": 36,
    "args": [
     "any",
@@ -4229,21 +4229,21 @@
    ]
   },
   "557": {
-   "handler": "s022D_PlayFieldEffectByTable",
+   "handler": "Scrcmd_FldWipe3dobj_FieldEffect",
    "overlay": 36,
    "args": [
     "any"
    ]
   },
   "558": {
-   "handler": "ScriptNative_SetActorZoneDeleteOff",
+   "handler": "Scrcmd_FieldActor_SetActorZoneDeleteOff",
    "overlay": 36,
    "args": [
     "any"
    ]
   },
   "559": {
-   "handler": "s022F_WordSetLoadPastTradePkmName",
+   "handler": "Scrcmd_PokemonMisc_WordSetLoadPastTradePkmName",
    "overlay": 36,
    "args": [
     "any",
@@ -4251,7 +4251,7 @@
    ]
   },
   "560": {
-   "handler": "s0230_MsgPlaceSignFont4",
+   "handler": "Scrcmd_Msg_MsgPlaceSignFont4",
    "overlay": 36,
    "args": [
     "any",
@@ -4266,14 +4266,14 @@
    ]
   },
   "561": {
-   "handler": "s0231_CallGameManual",
+   "handler": "Scrcmd_ProcFld_CallGameManual",
    "overlay": 36,
    "args": [
     "var"
    ]
   },
   "562": {
-   "handler": "PokeParty_ControlLegendMon",
+   "handler": "Scrcmd_PokemonMisc_ControlLegendMon",
    "overlay": 36,
    "args": [
     "any",
@@ -4281,14 +4281,14 @@
    ]
   },
   "563": {
-   "handler": "s0233_HasPlayerLanguage",
+   "handler": "Scrcmd_Leaves_UnityTowerGetVisitorCountry",
    "overlay": 36,
    "args": [
     "var"
    ]
   },
   "564": {
-   "handler": "s0234_ActorFallDownToXZ",
+   "handler": "Scrcmd_FieldActor_ActorFallDownToXZ",
    "overlay": 36,
    "args": [
     "any",
@@ -4298,7 +4298,7 @@
    ]
   },
   "565": {
-   "handler": "s0235_BGMPlayEx",
+   "handler": "Scrcmd_Sound_BGMPlayEx",
    "overlay": 36,
    "args": [
     "u16",
@@ -4306,7 +4306,7 @@
    ]
   },
   "566": {
-   "handler": "s0236_WordSetLoadItemCollectorPrice",
+   "handler": "Scrcmd_Misc_WordSetLoadItemCollectorPrice",
    "overlay": 36,
    "args": [
     "any",
@@ -4316,7 +4316,7 @@
    ]
   },
   "567": {
-   "handler": "s0237_ItemCollectorSell",
+   "handler": "Scrcmd_Misc_ItemCollectorSell",
    "overlay": 36,
    "args": [
     "any",
@@ -4324,21 +4324,21 @@
    ]
   },
   "568": {
-   "handler": "s0238_BGMChangeMapEx",
+   "handler": "Scrcmd_Sound_BGMChangeMapEx",
    "overlay": 36,
    "args": [
     "u16"
    ]
   },
   "569": {
-   "handler": "ScriptNative_CheckPlayerFormModel",
+   "handler": "Scrcmd_FieldActor_CheckPlayerFormModel",
    "overlay": 36,
    "args": [
     "var"
    ]
   },
   "570": {
-   "handler": "ScriptWork_PlayPerapVoice",
+   "handler": "Scrcmd_Sound_PokeVoicePlay",
    "overlay": 36,
    "args": [
     "any",
@@ -4351,17 +4351,17 @@
    "args": []
   },
   "572": {
-   "handler": "s023C_NuvemaGimmickPlay",
+   "handler": "Scrcmd_SpPoke_NuvemaGimmickPlay",
    "overlay": 12,
    "args": []
   },
   "573": {
-   "handler": "s023D_NuvemaGimmickWaitAnim",
+   "handler": "Scrcmd_SpPoke_NuvemaGimmickWaitAnim",
    "overlay": 12,
    "args": []
   },
   "574": {
-   "handler": "s023E_DayCareGetSexForNamePrint",
+   "handler": "Scrcmd_DayCare_DayCareGetSexForNamePrint",
    "overlay": 12,
    "args": [
     "var",
@@ -4370,12 +4370,12 @@
    ]
   },
   "575": {
-   "handler": "s023F_CallPlaceNameDisp",
+   "handler": "Scrcmd_PlaceName_CallPlaceNameDisp",
    "overlay": 36,
    "args": []
   },
   "576": {
-   "handler": "ScriptWork_FadeBgmVolume",
+   "handler": "Scrcmd_Sound_FadeBgmVolume",
    "overlay": 36,
    "args": [
     "any",
@@ -4383,28 +4383,28 @@
    ]
   },
   "577": {
-   "handler": "ScriptWork_RestoreBgmVolume",
+   "handler": "Scrcmd_Sound_RestoreBgmVolume",
    "overlay": 36,
    "args": [
     "any"
    ]
   },
   "581": {
-   "handler": "s0245_BGMFadeOut",
+   "handler": "Scrcmd_Sound_BGMFadeOut",
    "overlay": 36,
    "args": [
     "u16"
    ]
   },
   "582": {
-   "handler": "s0246_BGMFadeOutAll",
+   "handler": "Scrcmd_Sound_BGMFadeOutAll",
    "overlay": 36,
    "args": [
     "u16"
    ]
   },
   "583": {
-   "handler": "s0247_MapChangeRail",
+   "handler": "Scrcmd_Mapchange_MapChangeRail",
    "overlay": 36,
    "args": [
     "u16",
@@ -4422,7 +4422,7 @@
    ]
   },
   "584": {
-   "handler": "s0248_PlayerMoveToYAsync_",
+   "handler": "Scrcmd_FieldActor_PlayerMoveToYAsync_0248",
    "overlay": 36,
    "args": [
     "any",
@@ -4432,7 +4432,7 @@
    ]
   },
   "585": {
-   "handler": "s0249_GetRandomDistinctSix",
+   "handler": "Scrcmd_Stadium_GetRandomDistinctSix",
    "overlay": 12,
    "args": [
     "var",
@@ -4444,29 +4444,29 @@
    ]
   },
   "586": {
-   "handler": "s024A_FieldSubscreenIsEnabled",
+   "handler": "Scrcmd_Network_FieldSubscreenIsEnabled",
    "overlay": 12,
    "args": [
     "var"
    ]
   },
   "587": {
-   "handler": "s024B_FieldSubscreenDisable",
+   "handler": "Scrcmd_Network_FieldSubscreenDisable",
    "overlay": 12,
    "args": []
   },
   "588": {
-   "handler": "s024C_BGMAmbienceResume",
+   "handler": "Scrcmd_Sound_BGMAmbienceResume",
    "overlay": 36,
    "args": []
   },
   "589": {
-   "handler": "s024D_RollerCoasterAmbienceStart",
+   "handler": "Scrcmd_Gym_RollerCoasterAmbienceStart",
    "overlay": 36,
    "args": []
   },
   "590": {
-   "handler": "s024E_PokePartyIsFullPP",
+   "handler": "Scrcmd_Pokemon_PokePartyIsFullPP",
    "overlay": 12,
    "args": [
     "var",
@@ -4474,7 +4474,7 @@
    ]
   },
   "591": {
-   "handler": "s024F_ActorWalkRoute",
+   "handler": "Scrcmd_FieldActor_ActorWalkRoute",
    "overlay": 36,
    "args": [
     "any",
@@ -4487,7 +4487,7 @@
    "conditional": true
   },
   "592": {
-   "handler": "s0250_ActorPairSet",
+   "handler": "Scrcmd_PairSys_ActorPairSet",
    "overlay": 12,
    "args": [
     "any",
@@ -4498,7 +4498,7 @@
    ]
   },
   "593": {
-   "handler": "s0251_ActorPairEnd",
+   "handler": "Scrcmd_PairSys_ActorPairEnd",
    "overlay": 12,
    "args": [
     "any",
@@ -4510,14 +4510,14 @@
    ]
   },
   "594": {
-   "handler": "s0252_ActorPairGetTrID",
+   "handler": "Scrcmd_PairSys_ActorPairGetTrID",
    "overlay": 12,
    "args": [
     "var"
    ]
   },
   "595": {
-   "handler": "s0253_ActorPairSetMoveEnable",
+   "handler": "Scrcmd_PairSys_ActorPairSetMoveEnable",
    "overlay": 12,
    "args": [
     "u8"
@@ -4531,12 +4531,12 @@
    ]
   },
   "603": {
-   "handler": "s025B_GymElecReapplyProgress",
+   "handler": "Scrcmd_Gym_GymElecReapplyProgress",
    "overlay": 36,
    "args": []
   },
   "604": {
-   "handler": "s025C_GymElecSetFollower",
+   "handler": "Scrcmd_Gym_GymElecSetFollower",
    "overlay": 36,
    "args": [
     "u16",
@@ -4545,21 +4545,21 @@
    ]
   },
   "605": {
-   "handler": "s025D_GymElecSetProgress",
+   "handler": "Scrcmd_Gym_GymElecSetProgress",
    "overlay": 36,
    "args": [
     "u16"
    ]
   },
   "607": {
-   "handler": "s025F_GymElecSetStage",
+   "handler": "Scrcmd_Gym_GymElecSetStage",
    "overlay": 36,
    "args": [
     "u16"
    ]
   },
   "610": {
-   "handler": "s0262_HollowRivalSetValue",
+   "handler": "Scrcmd_HollowRival_HollowRivalSetValue",
    "overlay": 12,
    "args": [
     "u16",
@@ -4568,7 +4568,7 @@
    "area": "HollowRival"
   },
   "611": {
-   "handler": "s0263_HollowRivalSetFlag",
+   "handler": "Scrcmd_HollowRival_HollowRivalSetFlag",
    "overlay": 12,
    "args": [
     "u16"
@@ -4585,7 +4585,7 @@
    "area": "HollowRival"
   },
   "613": {
-   "handler": "s0265_CallXTransceiverSecret",
+   "handler": "Scrcmd_ProcFld_CallXTransceiverSecret",
    "overlay": 36,
    "args": [
     "any"
@@ -4593,7 +4593,7 @@
    "area": "HollowRival"
   },
   "614": {
-   "handler": "s0266_HollowRivalGetCounter",
+   "handler": "Scrcmd_HollowRival_HollowRivalGetCounter",
    "overlay": 12,
    "args": [
     "var"
@@ -4607,19 +4607,19 @@
    "area": "HollowRival"
   },
   "616": {
-   "handler": "s0268_GymInsectPlayObject",
+   "handler": "Scrcmd_Gym_GymInsectPlayObject",
    "overlay": 36,
    "args": [
     "any"
    ]
   },
   "617": {
-   "handler": "s0269_GymInsectShowEffect",
+   "handler": "Scrcmd_Gym_GymInsectShowEffect",
    "overlay": 36,
    "args": []
   },
   "620": {
-   "handler": "s026C_WordSetMedalName",
+   "handler": "Scrcmd_Word_WordSetMedalName",
    "overlay": 36,
    "args": [
     "u8",
@@ -4627,7 +4627,7 @@
    ]
   },
   "621": {
-   "handler": "s026D_WordSetMedalRank",
+   "handler": "Scrcmd_Word_WordSetMedalRank",
    "overlay": 36,
    "args": [
     "u8",
@@ -4635,7 +4635,7 @@
    ]
   },
   "622": {
-   "handler": "s026E_MedalGetCount",
+   "handler": "Scrcmd_Medal_MedalGetCount",
    "overlay": 36,
    "args": [
     "u8",
@@ -4643,7 +4643,7 @@
    ]
   },
   "625": {
-   "handler": "s0271_MedalAcknowledge",
+   "handler": "Scrcmd_Medal_MedalAcknowledge",
    "overlay": 36,
    "args": [
     "any",
@@ -4651,7 +4651,7 @@
    ]
   },
   "626": {
-   "handler": "s0272_MedalGetSpinTradeActor",
+   "handler": "Scrcmd_Medal_MedalGetSpinTradeActor",
    "overlay": 36,
    "args": [
     "var",
@@ -4659,19 +4659,19 @@
    ]
   },
   "627": {
-   "handler": "s0273_MedalGive",
+   "handler": "Scrcmd_Medal_MedalGive",
    "overlay": 36,
    "args": [
     "any"
    ]
   },
   "628": {
-   "handler": "s0274_FunfestMissionStart",
+   "handler": "Scrcmd_Funfest_FunfestMissionStart",
    "overlay": 33,
    "args": []
   },
   "629": {
-   "handler": "s0275_WordSetFunfestMission",
+   "handler": "Scrcmd_Word_WordSetFunfestMission",
    "overlay": 36,
    "args": [
     "u8",
@@ -4680,7 +4680,7 @@
    ]
   },
   "630": {
-   "handler": "s0276_FunfestMissionBroadcast",
+   "handler": "Scrcmd_Funfest_FunfestMissionBroadcast",
    "overlay": 33,
    "args": [
     "any",
@@ -4688,12 +4688,12 @@
    ]
   },
   "631": {
-   "handler": "s0277_FunfestActorDelete",
+   "handler": "Scrcmd_Funfest_FunfestActorDelete",
    "overlay": 33,
    "args": []
   },
   "632": {
-   "handler": "s0278_FunfestDispSalesmanMessage",
+   "handler": "Scrcmd_Msg_FunfestDispSalesmanMessage",
    "overlay": 36,
    "args": [
     "any",
@@ -4705,12 +4705,12 @@
    ]
   },
   "633": {
-   "handler": "s0279_FunfestBGMReturn",
+   "handler": "Scrcmd_Funfest_FunfestBGMReturn",
    "overlay": 33,
    "args": []
   },
   "634": {
-   "handler": "s027A_FunfestGetGenericInfo",
+   "handler": "Scrcmd_Funfest_FunfestGetGenericInfo",
    "overlay": 33,
    "args": [
     "any",
@@ -4718,7 +4718,7 @@
    ]
   },
   "635": {
-   "handler": "s027B_FunfestGetItemExchangeInfo",
+   "handler": "Scrcmd_Funfest_FunfestGetItemExchangeInfo",
    "overlay": 33,
    "args": [
     "any",
@@ -4728,7 +4728,7 @@
    ]
   },
   "636": {
-   "handler": "s027C_FunfestGetItemSaleInfo",
+   "handler": "Scrcmd_Funfest_FunfestGetItemSaleInfo",
    "overlay": 33,
    "args": [
     "var",
@@ -4736,7 +4736,7 @@
    ]
   },
   "637": {
-   "handler": "s027D_FunfestGetPokemonQuizInfo",
+   "handler": "Scrcmd_Funfest_FunfestGetPokemonQuizInfo",
    "overlay": 33,
    "args": [
     "var",
@@ -4745,7 +4745,7 @@
    ]
   },
   "638": {
-   "handler": "s027E_FunfestGetPokemonQuizSpecies",
+   "handler": "Scrcmd_Funfest_FunfestGetPokemonQuizSpecies",
    "overlay": 33,
    "args": [
     "any",
@@ -4753,7 +4753,7 @@
    ]
   },
   "639": {
-   "handler": "s027F_FunfestGetPokemonQuizBogusSpecies",
+   "handler": "Scrcmd_Funfest_FunfestGetPokemonQuizBogusSpecies",
    "overlay": 33,
    "args": [
     "any",
@@ -4761,7 +4761,7 @@
    ]
   },
   "644": {
-   "handler": "s0284_CallPlaceSelect",
+   "handler": "Scrcmd_ProcFld_CallPlaceSelect",
    "overlay": 36,
    "args": [
     "var",
@@ -4769,7 +4769,7 @@
    ]
   },
   "645": {
-   "handler": "s0285_CallWordSetPokeNameInput",
+   "handler": "Scrcmd_ProcFld_CallWordSetPokeNameInput",
    "overlay": 36,
    "args": [
     "any",
@@ -4778,7 +4778,7 @@
    ]
   },
   "650": {
-   "handler": "s028A_MapChangeFlyWarp",
+   "handler": "Scrcmd_Mapchange_MapChangeFlyWarp",
    "overlay": 36,
    "args": [
     "u16",
@@ -4790,54 +4790,54 @@
    ]
   },
   "651": {
-   "handler": "s028B_CallEntralinkWarpOut",
+   "handler": "Scrcmd_Funfest_CallEntralinkWarpOut",
    "overlay": 33,
    "args": []
   },
   "654": {
-   "handler": "s028E_MistraltonGymFireCannon",
+   "handler": "Scrcmd_Gym_MistraltonGymFireCannon",
    "overlay": 36,
    "args": [
     "u16"
    ]
   },
   "655": {
-   "handler": "s028F_CallRivalNameInput",
+   "handler": "Scrcmd_ProcFld_CallRivalNameInput",
    "overlay": 36,
    "args": [
     "var"
    ]
   },
   "656": {
-   "handler": "s0290_WordSetLoadRivalName",
+   "handler": "Scrcmd_Word_WordSetLoadRivalName",
    "overlay": 36,
    "args": [
     "u8"
    ]
   },
   "657": {
-   "handler": "s0291_VirbankGymStopModelAnimations",
+   "handler": "Scrcmd_Gym_VirbankGymStopModelAnimations",
    "overlay": 36,
    "args": [
     "u16"
    ]
   },
   "658": {
-   "handler": "s0292_VirbankGymSetActorFlag",
+   "handler": "Scrcmd_Gym_VirbankGymSetActorFlag",
    "overlay": 36,
    "args": [
     "u16"
    ]
   },
   "659": {
-   "handler": "s0293_HiddenHollowCallWarpIn",
+   "handler": "Scrcmd_HiddenHollow_HiddenHollowCallWarpIn",
    "overlay": 36,
    "args": [
     "any"
    ]
   },
   "660": {
-   "handler": "s0294_HiddenHollowGetParam",
+   "handler": "Scrcmd_HiddenHollow_HiddenHollowGetParam",
    "overlay": 36,
    "args": [
     "any",
@@ -4845,17 +4845,17 @@
    ]
   },
   "661": {
-   "handler": "s0295_HiddenHollowReset",
+   "handler": "Scrcmd_HiddenHollow_HiddenHollowReset",
    "overlay": 36,
    "args": []
   },
   "662": {
-   "handler": "s0296_HiddenHollowCallWarpOut",
+   "handler": "Scrcmd_HiddenHollow_HiddenHollowCallWarpOut",
    "overlay": 36,
    "args": []
   },
   "663": {
-   "handler": "s0297_CallWildBattleEx",
+   "handler": "Scrcmd_Encount_CallWildBattleEx",
    "overlay": 36,
    "args": [
     "any",
@@ -4865,7 +4865,7 @@
    ]
   },
   "664": {
-   "handler": "s0298_WordSetEmptyFileMessage",
+   "handler": "Scrcmd_Word_WordSetEmptyFileMessage",
    "overlay": 36,
    "args": [
     "u8",
@@ -4873,7 +4873,7 @@
    ]
   },
   "665": {
-   "handler": "s0299_WordSetLoadAbility",
+   "handler": "Scrcmd_Word_WordSetLoadAbility",
    "overlay": 36,
    "args": [
     "u8",
@@ -4885,7 +4885,7 @@
    ]
   },
   "666": {
-   "handler": "s029A_WordSetLoadNature",
+   "handler": "Scrcmd_Word_WordSetLoadNature",
    "overlay": 36,
    "args": [
     "u8",
@@ -4893,14 +4893,14 @@
    ]
   },
   "667": {
-   "handler": "s029B_WordSetLoadJoinAvenueName",
+   "handler": "Scrcmd_Word_WordSetLoadJoinAvenueName",
    "overlay": 36,
    "args": [
     "u8"
    ]
   },
   "670": {
-   "handler": "s029E_MedalGetFieldEffectID",
+   "handler": "Scrcmd_Medal_MedalGetFieldEffectID",
    "overlay": 36,
    "args": [
     "any",
@@ -4908,14 +4908,14 @@
    ]
   },
   "671": {
-   "handler": "s029F_MedalDiscover",
+   "handler": "Scrcmd_Medal_MedalDiscover",
    "overlay": 36,
    "args": [
     "any"
    ]
   },
   "672": {
-   "handler": "s02A0_MedalIsObtained",
+   "handler": "Scrcmd_Medal_MedalIsObtained",
    "overlay": 36,
    "args": [
     "var",
@@ -4923,19 +4923,19 @@
    ]
   },
   "673": {
-   "handler": "s02A1_MedalGetMostCompleteCategory",
+   "handler": "Scrcmd_Medal_MedalGetMostCompleteCategory",
    "overlay": 36,
    "args": [
     "var"
    ]
   },
   "674": {
-   "handler": "s02A2_HumilauGymPlayLeaderSplash",
+   "handler": "Scrcmd_Gym_HumilauGymPlayLeaderSplash",
    "overlay": 36,
    "args": []
   },
   "675": {
-   "handler": "s02A3_HumilauGymPlayLeaderWaves",
+   "handler": "Scrcmd_Gym_HumilauGymPlayLeaderWaves",
    "overlay": 36,
    "args": []
   },
@@ -4945,62 +4945,62 @@
    "args": []
   },
   "677": {
-   "handler": "s02A5_OpelucidGymCallMove",
+   "handler": "Scrcmd_Gym_OpelucidGymCallMove",
    "overlay": 36,
    "args": [
     "u16"
    ]
   },
   "678": {
-   "handler": "s02A6_OpelucidGymRefreshVars",
+   "handler": "Scrcmd_Gym_OpelucidGymRefreshVars",
    "overlay": 36,
    "args": []
   },
   "679": {
-   "handler": "s02A7_OpelucidGymCallButton",
+   "handler": "Scrcmd_Gym_OpelucidGymCallButton",
    "overlay": 36,
    "args": [
     "u16"
    ]
   },
   "680": {
-   "handler": "s02A8_OpelucidGymFreeHeap",
+   "handler": "Scrcmd_Gym_OpelucidGymFreeHeap",
    "overlay": 36,
    "args": []
   },
   "681": {
-   "handler": "s02A9_OpelucidGymCreateHeap",
+   "handler": "Scrcmd_Gym_OpelucidGymCreateHeap",
    "overlay": 36,
    "args": []
   },
   "684": {
-   "handler": "s02AC_CallLeafPileStuck",
+   "handler": "Scrcmd_FldeffLeaves_CallLeafPileStuck",
    "overlay": 36,
    "args": []
   },
   "686": {
-   "handler": "s02AE_GameGetMyCity",
+   "handler": "Scrcmd_Keysystem_GameGetMyCity",
    "overlay": 12,
    "args": [
     "var"
    ]
   },
   "687": {
-   "handler": "s02AF_GameGetDifficulty",
+   "handler": "Scrcmd_Keysystem_GameGetDifficulty",
    "overlay": 12,
    "args": [
     "var"
    ]
   },
   "688": {
-   "handler": "s02B0_CallUnovaLinkKeyUnlock",
+   "handler": "Scrcmd_Keysystem_CallUnovaLinkKeyUnlock",
    "overlay": 12,
    "args": [
     "any"
    ]
   },
   "689": {
-   "handler": "s02B1_KeyInfoGetChamberKey",
+   "handler": "Scrcmd_Keysystem_KeyInfoGetChamberKey",
    "overlay": 12,
    "args": [
     "var"
@@ -5008,7 +5008,7 @@
    "area": "Keys"
   },
   "690": {
-   "handler": "s02B2_MemoryLinkCheckFlag",
+   "handler": "Scrcmd_DownloadData_MemoryLinkCheckFlag",
    "overlay": 12,
    "args": [
     "any",
@@ -5016,7 +5016,7 @@
    ]
   },
   "691": {
-   "handler": "s02B3_MemoryLinkGetVar",
+   "handler": "Scrcmd_DownloadData_MemoryLinkGetVar",
    "overlay": 12,
    "args": [
     "any",
@@ -5024,7 +5024,7 @@
    ]
   },
   "692": {
-   "handler": "s02B4_MemoryLinkIsPlayerLinked",
+   "handler": "Scrcmd_DownloadData_MemoryLinkIsPlayerLinked",
    "overlay": 12,
    "args": [
     "any",
@@ -5032,7 +5032,7 @@
    ]
   },
   "693": {
-   "handler": "s02B5_WordSetMemoryLinkPlayerName",
+   "handler": "Scrcmd_DownloadData_WordSetMemoryLinkPlayerName",
    "overlay": 12,
    "args": [
     "any",
@@ -5040,7 +5040,7 @@
    ]
   },
   "694": {
-   "handler": "s02B6_MemoryLinkCheckMusical",
+   "handler": "Scrcmd_DownloadData_MemoryLinkCheckMusical",
    "overlay": 12,
    "args": [
     "any",
@@ -5049,7 +5049,7 @@
    "area": "Musical"
   },
   "695": {
-   "handler": "s02B7_MemoryLinkAddMusicalProps",
+   "handler": "Scrcmd_DownloadData_MemoryLinkAddMusicalProps",
    "overlay": 12,
    "args": [
     "var"
@@ -5057,29 +5057,29 @@
    "area": "Musical"
   },
   "696": {
-   "handler": "s02B8_PedometerStart",
+   "handler": "Scrcmd_Pedometer_PedometerStart",
    "overlay": 12,
    "args": []
   },
   "697": {
-   "handler": "s02B9_PedometerEnd",
+   "handler": "Scrcmd_Pedometer_PedometerEnd",
    "overlay": 12,
    "args": []
   },
   "698": {
-   "handler": "s02BA_PedometerGet",
+   "handler": "Scrcmd_Pedometer_PedometerGet",
    "overlay": 12,
    "args": [
     "var"
    ]
   },
   "699": {
-   "handler": "s02BB_Gym0601FanAmbienceStart",
+   "handler": "Scrcmd_Gym_Gym0601FanAmbienceStart",
    "overlay": 36,
    "args": []
   },
   "700": {
-   "handler": "s02BC_TVCheckCommercial",
+   "handler": "Scrcmd_PokeDisp_TVCheckCommercial",
    "overlay": 36,
    "args": [
     "any",
@@ -5087,14 +5087,14 @@
    ]
   },
   "701": {
-   "handler": "s02BD_TVGenCommercialMsgID",
+   "handler": "Scrcmd_PokeDisp_TVGenCommercialMsgID",
    "overlay": 36,
    "args": [
     "var"
    ]
   },
   "702": {
-   "handler": "s02BE_ActorMoveLinear",
+   "handler": "Scrcmd_FieldActor_ActorMoveLinear",
    "overlay": 36,
    "args": [
     "any",
@@ -5105,7 +5105,7 @@
    ]
   },
   "704": {
-   "handler": "s02C0_FieldTradeGetSpecies",
+   "handler": "Scrcmd_PokemonMisc_FieldTradeGetSpecies",
    "overlay": 36,
    "args": [
     "var",
@@ -5117,7 +5117,7 @@
    ]
   },
   "706": {
-   "handler": "s02C2_RepelRearm",
+   "handler": "Scrcmd_Encount_RepelRearm",
    "overlay": 36,
    "args": [
     "var"
@@ -5132,19 +5132,19 @@
    "area": "HollowRival"
   },
   "708": {
-   "handler": "s02C4_HiddenHollowSetPeriod",
+   "handler": "Scrcmd_HiddenHollow_HiddenHollowSetPeriod",
    "overlay": 12,
    "args": []
   },
   "709": {
-   "handler": "s02C5_JoinAvenueRecordActivity",
+   "handler": "Scrcmd_PokeDisp_JoinAvenueRecordActivity",
    "overlay": 36,
    "args": [
     "u16"
    ]
   },
   "710": {
-   "handler": "s02C6_JoinAvenueStoreStart",
+   "handler": "Scrcmd_JoinAvenueStore_JoinAvenueStoreStart",
    "overlay": 12,
    "args": [],
    "swap": [
@@ -5153,7 +5153,7 @@
    ]
   },
   "711": {
-   "handler": "s02C6_JoinAvenueStoreEnd",
+   "handler": "Scrcmd_JoinAvenueStore_JoinAvenueStoreEnd",
    "overlay": 12,
    "args": [],
    "swap": [
@@ -5162,21 +5162,21 @@
    ]
   },
   "714": {
-   "handler": "s02CA_CallHappyPhraseInput",
+   "handler": "Scrcmd_ProcFld_CallHappyPhraseInput",
    "overlay": 36,
    "args": [
     "var"
    ]
   },
   "715": {
-   "handler": "s02CB_PokewoodGetLevel",
+   "handler": "Scrcmd_JoinAvenueStore_PokewoodGetLevel",
    "overlay": 12,
    "args": [
     "var"
    ]
   },
   "719": {
-   "handler": "s02CF_PokeDexCheckHabitatList",
+   "handler": "Scrcmd_Leaves_PokeDexCheckHabitatList",
    "overlay": 36,
    "args": [
     "any",
@@ -5186,12 +5186,12 @@
    ]
   },
   "720": {
-   "handler": "s02D0_PokeDexEnableHabitatList",
+   "handler": "Scrcmd_GameState_PokeDexEnableHabitatList",
    "overlay": 12,
    "args": []
   },
   "721": {
-   "handler": "s02D1_KeyInfoGetMyCityProgress",
+   "handler": "Scrcmd_Leaves_KeyInfoGetMyCityProgress",
    "overlay": 36,
    "args": [
     "var"
@@ -5199,12 +5199,12 @@
    "area": "Keys"
   },
   "722": {
-   "handler": "s02D2_FieldOpenRestoreLCD",
+   "handler": "Scrcmd_GameState_FieldOpenRestoreLCD",
    "overlay": 12,
    "args": []
   },
   "723": {
-   "handler": "s02D3_HollowRivalGetValue",
+   "handler": "Scrcmd_HollowRival_HollowRivalGetValue",
    "overlay": 12,
    "args": [
     "u16",
@@ -5213,14 +5213,14 @@
    "area": "HollowRival"
   },
   "724": {
-   "handler": "s02D4_ItemGetTMCount",
+   "handler": "Scrcmd_Item_ItemGetTMCount",
    "overlay": 36,
    "args": [
     "var"
    ]
   },
   "725": {
-   "handler": "s02D5_WbtIsTrainerBeaten",
+   "handler": "Scrcmd_Leaves_WbtIsTrainerBeaten",
    "overlay": 36,
    "args": [
     "any",
@@ -5228,7 +5228,7 @@
    ]
   },
   "727": {
-   "handler": "s02D7_GetWifiHistoryCountryCount",
+   "handler": "Scrcmd_Leaves_GetWifiHistoryCountryCount",
    "overlay": 36,
    "args": [
     "any",
@@ -5237,7 +5237,7 @@
    "area": "UnityTower"
   },
   "728": {
-   "handler": "s02D8_MarkPartnerCandidate",
+   "handler": "Scrcmd_Leaves_MarkPartnerCandidate",
    "overlay": 36,
    "args": [
     "any"
@@ -5245,7 +5245,7 @@
    "area": "UnityTower"
   },
   "729": {
-   "handler": "s02D9_IsPartnerCandidateMarked",
+   "handler": "Scrcmd_Leaves_UnityTowerGetVisitorParam",
    "overlay": 36,
    "args": [
     "any",
@@ -5254,7 +5254,7 @@
    "area": "UnityTower"
   },
   "730": {
-   "handler": "s02DA_UnityTowerSetRatingLevel",
+   "handler": "Scrcmd_Leaves_UnityTowerSetRatingLevel",
    "overlay": 36,
    "args": [
     "any"
@@ -5262,7 +5262,7 @@
    "area": "UnityTower"
   },
   "731": {
-   "handler": "s02DB_UnityTowerSetFloor",
+   "handler": "Scrcmd_Leaves_UnityTowerSetFloor",
    "overlay": 36,
    "args": [
     "any",
@@ -5270,7 +5270,7 @@
    ]
   },
   "732": {
-   "handler": "s02DC_UnityTowerInitVisitorMessage",
+   "handler": "Scrcmd_Leaves_UnityTowerInitVisitorMessage",
    "overlay": 36,
    "args": [
     "any",
@@ -5279,38 +5279,38 @@
    ]
   },
   "733": {
-   "handler": "s02DD_UnityTowerGetVisitorCount",
+   "handler": "Scrcmd_Leaves_UnityTowerGetVisitorCount",
    "overlay": 36,
    "args": [
     "var"
    ]
   },
   "734": {
-   "handler": "s02DE_UnityTowerSetHobby",
+   "handler": "Scrcmd_Leaves_UnityTowerSetHobby",
    "overlay": 36,
    "args": [
     "any"
    ]
   },
   "735": {
-   "handler": "s02DF_UnityTowerGetHobby",
+   "handler": "Scrcmd_Leaves_UnityTowerGetHobby",
    "overlay": 36,
    "args": [
     "var"
    ]
   },
   "737": {
-   "handler": "s02E1_MedalDiscoverInitial",
+   "handler": "Scrcmd_Medal_MedalDiscoverInitial",
    "overlay": 36,
    "args": []
   },
   "739": {
-   "handler": "s02E3_LensFlareRequest",
+   "handler": "Scrcmd_JoinAvenueStore_LensFlareRequest",
    "overlay": 12,
    "args": []
   },
   "741": {
-   "handler": "s02E5_HiddenHollowSet",
+   "handler": "Scrcmd_HiddenHollow_HiddenHollowSet",
    "overlay": 36,
    "args": [
     "any",
@@ -5320,12 +5320,12 @@
    ]
   },
   "742": {
-   "handler": "s02E6_HiddenHollowCreateEvents",
+   "handler": "Scrcmd_HiddenHollow_HiddenHollowCreateEvents",
    "overlay": 36,
    "args": []
   },
   "744": {
-   "handler": "s02E8_CallFieldFadeOut",
+   "handler": "Scrcmd_Fade_CallFieldFadeOut",
    "overlay": 36,
    "args": [
     "any",
@@ -5333,7 +5333,7 @@
    ]
   },
   "745": {
-   "handler": "s02E9_CallFieldFadeIn",
+   "handler": "Scrcmd_Fade_CallFieldFadeIn",
    "overlay": 36,
    "args": [
     "any",
@@ -5341,7 +5341,7 @@
    ]
   },
   "746": {
-   "handler": "s02EA_PokePartyAddNPoke",
+   "handler": "Scrcmd_Pokemon_PokePartyAddNPoke",
    "overlay": 12,
    "args": [
     "var",
@@ -5353,7 +5353,7 @@
    ]
   },
   "749": {
-   "handler": "s02ED_SetSoftResetBlocked",
+   "handler": "Scrcmd_GameState_SetSoftResetBlocked",
    "overlay": 12,
    "args": [
     "any",
@@ -5361,7 +5361,7 @@
    ]
   },
   "750": {
-   "handler": "s02EE_MusicalIsPropOwned",
+   "handler": "Scrcmd_Musical_MusicalIsPropOwned",
    "overlay": 12,
    "args": [
     "any",
@@ -5369,14 +5369,14 @@
    ]
   },
   "751": {
-   "handler": "s02EF_MusicalGetOwnedPropCount",
+   "handler": "Scrcmd_Musical_MusicalGetOwnedPropCount",
    "overlay": 12,
    "args": [
     "var"
    ]
   },
   "753": {
-   "handler": "s02F1_SetOneShotDRObtained",
+   "handler": "Scrcmd_GameState_SetOneShotDRObtained",
    "overlay": 12,
    "args": [
     "any"
@@ -5384,7 +5384,7 @@
    "area": "TrainerCard"
   },
   "754": {
-   "handler": "s02F2_IsOneShotDRObtained",
+   "handler": "Scrcmd_GameState_IsOneShotDRObtained_02F2",
    "overlay": 12,
    "args": [
     "any",
@@ -5413,12 +5413,12 @@
    ],
    "commands": {
     "1000": {
-     "handler": "BSubwayCmd_ClearWork",
+     "handler": "Scrcmd_Bsubway_ClearWork",
      "overlay": 50,
      "args": []
     },
     "1001": {
-     "handler": "BSubwayCmd_CreateWork",
+     "handler": "Scrcmd_Bsubway_CreateWork",
      "overlay": 50,
      "args": [
       "u16",
@@ -5426,12 +5426,12 @@
      ]
     },
     "1002": {
-     "handler": "BSubwayCmd_FreeWork",
+     "handler": "Scrcmd_Bsubway_FreeWork",
      "overlay": 50,
      "args": []
     },
     "1003": {
-     "handler": "BSubwayCmd_Tool",
+     "handler": "Scrcmd_Bsubway_Tool",
      "overlay": 50,
      "args": [
       "u16",
@@ -5454,7 +5454,7 @@
    ],
    "commands": {
     "1000": {
-     "handler": "PleasureBoatCmd_Create",
+     "handler": "Scrcmd_PleasureBoat_Create",
      "overlay": 51,
      "args": [
       "any"
@@ -5464,12 +5464,12 @@
      ]
     },
     "1001": {
-     "handler": "PleasureBoatCmd_Free",
+     "handler": "Scrcmd_PleasureBoat_Free",
      "overlay": 51,
      "args": []
     },
     "1002": {
-     "handler": "PleasureBoatCmd_GetInfo",
+     "handler": "Scrcmd_PleasureBoat_GetInfo",
      "overlay": 51,
      "args": [
       "u16",
@@ -5477,7 +5477,7 @@
      ]
     },
     "1003": {
-     "handler": "PleasureBoatCmd_AdvanceClock",
+     "handler": "Scrcmd_PleasureBoat_AdvanceClock",
      "overlay": 51,
      "args": [
       "u16",
@@ -5485,7 +5485,7 @@
      ]
     },
     "1004": {
-     "handler": "PleasureBoatCmd_SetTrainerInfo",
+     "handler": "Scrcmd_PleasureBoat_SetTrainerInfo",
      "overlay": 51,
      "args": [
       "any",
@@ -5495,7 +5495,7 @@
      ]
     },
     "1005": {
-     "handler": "PleasureBoatCmd_StopClock",
+     "handler": "Scrcmd_PleasureBoat_StopClock",
      "overlay": 51,
      "args": []
     }
@@ -5514,57 +5514,57 @@
    ],
    "commands": {
     "1000": {
-     "handler": "PokemonLeagueCmd_DisableRailLines",
+     "handler": "Scrcmd_PokemonLeague_DisableRailLines",
      "overlay": 52,
      "args": [
       "any"
      ]
     },
     "1001": {
-     "handler": "PokemonLeagueCmd_SetCamera",
+     "handler": "Scrcmd_PokemonLeague_SetCamera",
      "overlay": 52,
      "args": [
       "any"
      ]
     },
     "1002": {
-     "handler": "PokemonLeagueCmd_PlayGrimsleyGroup",
+     "handler": "Scrcmd_PokemonLeague_PlayGrimsleyGroup",
      "overlay": 52,
      "args": [
       "u16"
      ]
     },
     "1003": {
-     "handler": "PokemonLeagueCmd_PlayGrimsleyModel0Animation",
+     "handler": "Scrcmd_PokemonLeague_PlayGrimsleyModel0Animation",
      "overlay": 52,
      "args": [
       "u16"
      ]
     },
     "1004": {
-     "handler": "PokemonLeagueCmd_PlayCaitlinAmbience",
+     "handler": "Scrcmd_PokemonLeague_PlayCaitlinAmbience",
      "overlay": 52,
      "args": []
     },
     "1005": {
-     "handler": "PokemonLeagueCmd_PlayCaitlinModels34Or5",
+     "handler": "Scrcmd_PokemonLeague_PlayCaitlinModels34Or5",
      "overlay": 52,
      "args": [
       "u16"
      ]
     },
     "1006": {
-     "handler": "PokemonLeagueCmd_CallCaitlinModel1Event",
+     "handler": "Scrcmd_PokemonLeague_CallCaitlinModel1Event",
      "overlay": 52,
      "args": []
     },
     "1007": {
-     "handler": "PokemonLeagueCmd_PlayCaitlinModel0",
+     "handler": "Scrcmd_PokemonLeague_PlayCaitlinModel0",
      "overlay": 52,
      "args": []
     },
     "1008": {
-     "handler": "PokemonLeagueCmd_DropCaitlinActor",
+     "handler": "Scrcmd_PokemonLeague_DropCaitlinActor",
      "overlay": 52,
      "args": [
       "u16",
@@ -5572,77 +5572,77 @@
      ]
     },
     "1009": {
-     "handler": "PokemonLeagueCmd_CallShauntalModel8Event",
+     "handler": "Scrcmd_PokemonLeague_CallShauntalModel8Event",
      "overlay": 52,
      "args": []
     },
     "1010": {
-     "handler": "PokemonLeagueCmd_PlayShauntalModel",
+     "handler": "Scrcmd_PokemonLeague_PlayShauntalModel",
      "overlay": 52,
      "args": [
       "u16"
      ]
     },
     "1011": {
-     "handler": "PokemonLeagueCmd_CallShauntalRoomChangeEvent",
+     "handler": "Scrcmd_PokemonLeague_CallShauntalRoomChangeEvent",
      "overlay": 52,
      "args": [
       "u16"
      ]
     },
     "1012": {
-     "handler": "PokemonLeagueCmd_CallShauntalModels6And9Event",
+     "handler": "Scrcmd_PokemonLeague_CallShauntalModels6And9Event",
      "overlay": 52,
      "args": []
     },
     "1013": {
-     "handler": "PokemonLeagueCmd_PlayMarshalModel0",
+     "handler": "Scrcmd_PokemonLeague_PlayMarshalModel0",
      "overlay": 52,
      "args": []
     },
     "1014": {
-     "handler": "PokemonLeagueCmd_PlayMarshalModel3Animation",
+     "handler": "Scrcmd_PokemonLeague_PlayMarshalModel3Animation",
      "overlay": 52,
      "args": [
       "u16"
      ]
     },
     "1015": {
-     "handler": "PokemonLeagueCmd_PlayMarshalModel1",
+     "handler": "Scrcmd_PokemonLeague_PlayMarshalModel1",
      "overlay": 52,
      "args": []
     },
     "1016": {
-     "handler": "PokemonLeagueCmd_CallMarshalPlatformEvent",
+     "handler": "Scrcmd_PokemonLeague_CallMarshalPlatformEvent",
      "overlay": 52,
      "args": []
     },
     "1017": {
-     "handler": "PokemonLeagueCmd_CallChampionChangeEvent",
+     "handler": "Scrcmd_PokemonLeague_CallChampionChangeEvent",
      "overlay": 52,
      "args": []
     },
     "1018": {
-     "handler": "PokemonLeagueCmd_CallChampionOpenEvent",
+     "handler": "Scrcmd_PokemonLeague_CallChampionOpenEvent",
      "overlay": 52,
      "args": []
     },
     "1019": {
-     "handler": "PokemonLeagueCmd_HideChampionActorShadow",
+     "handler": "Scrcmd_PokemonLeague_HideChampionActorShadow",
      "overlay": 52,
      "args": [
       "u16"
      ]
     },
     "1020": {
-     "handler": "PokemonLeagueCmd_ShowChampionActorShadow",
+     "handler": "Scrcmd_PokemonLeague_ShowChampionActorShadow",
      "overlay": 52,
      "args": [
       "u16"
      ]
     },
     "1021": {
-     "handler": "PokemonLeagueCmd_SetChampionRoomOpen",
+     "handler": "Scrcmd_PokemonLeague_SetChampionRoomOpen",
      "overlay": 52,
      "args": []
     }
@@ -5657,12 +5657,12 @@
    ],
    "commands": {
     "1000": {
-     "handler": "PalParkCmd_CallMbParent",
+     "handler": "Scrcmd_Palpark_CallMbParent",
      "overlay": 53,
      "args": []
     },
     "1001": {
-     "handler": "PalParkCmd_GetInfo",
+     "handler": "Scrcmd_Palpark_GetInfo",
      "overlay": 53,
      "args": [
       "u8",
@@ -5684,12 +5684,12 @@
    ],
    "commands": {
     "1000": {
-     "handler": "AbyssalRuinsCmd_StartUnderwaterEffect",
+     "handler": "Scrcmd_AbyssalRuins_StartUnderwaterEffect",
      "overlay": 54,
      "args": []
     },
     "1001": {
-     "handler": "AbyssalRuinsCmd_GetStepCounter",
+     "handler": "Scrcmd_AbyssalRuins_GetStepCounter",
      "overlay": 54,
      "args": [
       "var"
@@ -5707,43 +5707,43 @@
    ],
    "commands": {
     "1000": {
-     "handler": "WbtCmd_Create",
+     "handler": "Scrcmd_Wbt_Create",
      "overlay": 55,
      "args": []
     },
     "1001": {
-     "handler": "WbtCmd_Free",
+     "handler": "Scrcmd_Wbt_Free",
      "overlay": 55,
      "args": []
     },
     "1002": {
-     "handler": "WbtCmd_IsCreated",
+     "handler": "Scrcmd_Wbt_IsCreated",
      "overlay": 55,
      "args": [
       "var"
      ]
     },
     "1003": {
-     "handler": "WbtCmd_SetRound",
+     "handler": "Scrcmd_Wbt_SetRound",
      "overlay": 55,
      "args": [
       "any"
      ]
     },
     "1004": {
-     "handler": "WbtCmd_GetRound",
+     "handler": "Scrcmd_Wbt_GetRound",
      "overlay": 55,
      "args": [
       "var"
      ]
     },
     "1005": {
-     "handler": "WbtCmd_MakeMatch",
+     "handler": "Scrcmd_Wbt_MakeMatch",
      "overlay": 55,
      "args": []
     },
     "1006": {
-     "handler": "WbtCmd_IsTournamentAvailable",
+     "handler": "Scrcmd_WbtEntrance_IsTournamentAvailable",
      "overlay": 56,
      "args": [
       "any",
@@ -5751,7 +5751,7 @@
      ]
     },
     "1007": {
-     "handler": "WbtCmd_WouldOpenTournament",
+     "handler": "Scrcmd_WbtEntrance_WouldOpenTournament",
      "overlay": 56,
      "args": [
       "any",
@@ -5759,75 +5759,75 @@
      ]
     },
     "1008": {
-     "handler": "WbtCmd_CheckRegulation",
+     "handler": "Scrcmd_WbtEntrance_CheckRegulation",
      "overlay": 56,
      "args": [
       "var"
      ]
     },
     "1009": {
-     "handler": "WbtCmd_SetStyle",
+     "handler": "Scrcmd_Wbt_SetStyle",
      "overlay": 55,
      "args": [
       "any"
      ]
     },
     "1010": {
-     "handler": "WbtCmd_GetStyle",
+     "handler": "Scrcmd_Wbt_GetStyle",
      "overlay": 55,
      "args": [
       "var"
      ]
     },
     "1011": {
-     "handler": "WbtCmd_SetTournament",
+     "handler": "Scrcmd_Wbt_SetTournament",
      "overlay": 55,
      "args": [
       "any"
      ]
     },
     "1012": {
-     "handler": "WbtCmd_GetTournament",
+     "handler": "Scrcmd_Wbt_GetTournament",
      "overlay": 55,
      "args": [
       "var"
      ]
     },
     "1013": {
-     "handler": "WbtCmd_SetType",
+     "handler": "Scrcmd_Wbt_SetType",
      "overlay": 55,
      "args": [
       "any"
      ]
     },
     "1014": {
-     "handler": "WbtCmd_GetType",
+     "handler": "Scrcmd_Wbt_GetType",
      "overlay": 55,
      "args": [
       "var"
      ]
     },
     "1015": {
-     "handler": "WbtCmd_SetCategory",
+     "handler": "Scrcmd_Wbt_SetCategory",
      "overlay": 55,
      "args": [
       "any"
      ]
     },
     "1016": {
-     "handler": "WbtCmd_GetCategory",
+     "handler": "Scrcmd_Wbt_GetCategory",
      "overlay": 55,
      "args": [
       "var"
      ]
     },
     "1017": {
-     "handler": "WbtCmd_RecordWin",
+     "handler": "Scrcmd_Wbt_RecordWin",
      "overlay": 55,
      "args": []
     },
     "1018": {
-     "handler": "WbtCmd_GetWinCount",
+     "handler": "Scrcmd_Wbt_GetWinCount",
      "overlay": 55,
      "args": [
       "any",
@@ -5836,14 +5836,14 @@
      ]
     },
     "1020": {
-     "handler": "WbtCmd_AwardBattlePoints",
+     "handler": "Scrcmd_WbtEntrance_AwardBattlePoints",
      "overlay": 56,
      "args": [
       "var"
      ]
     },
     "1022": {
-     "handler": "WbtCmd_GetSlot",
+     "handler": "Scrcmd_WbtEntrance_GetSlot",
      "overlay": 56,
      "args": [
       "any",
@@ -5851,7 +5851,7 @@
      ]
     },
     "1023": {
-     "handler": "WbtCmd_GetSlotTrainerObjCodes",
+     "handler": "Scrcmd_WbtEntrance_GetSlotTrainerObjCodes",
      "overlay": 56,
      "args": [
       "var",
@@ -5860,42 +5860,42 @@
      ]
     },
     "1024": {
-     "handler": "WbtCmd_GetEntryCount",
+     "handler": "Scrcmd_Wbt_GetEntryCount",
      "overlay": 55,
      "args": [
       "var"
      ]
     },
     "1025": {
-     "handler": "WbtCmd_CountDownloads",
+     "handler": "Scrcmd_WbtEntrance_CountDownloads",
      "overlay": 56,
      "args": [
       "var"
      ]
     },
     "1026": {
-     "handler": "WbtCmd_SetDownloadSlot",
+     "handler": "Scrcmd_WbtEntrance_SetDownloadSlot",
      "overlay": 56,
      "args": [
       "any"
      ]
     },
     "1027": {
-     "handler": "WbtCmd_GetDownloadSlot",
+     "handler": "Scrcmd_WbtEntrance_GetDownloadSlot",
      "overlay": 56,
      "args": [
       "var"
      ]
     },
     "1028": {
-     "handler": "WbtCmd_SetUseBattleBox",
+     "handler": "Scrcmd_WbtEntrance_SetUseBattleBox",
      "overlay": 56,
      "args": [
       "any"
      ]
     },
     "1031": {
-     "handler": "WbtCmd_GetSlotTrainerObjCodes",
+     "handler": "Scrcmd_WbtEntrance_GetSlotTrainerObjCodes",
      "overlay": 56,
      "args": [
       "var",
@@ -5904,14 +5904,14 @@
      ]
     },
     "1038": {
-     "handler": "WbtCmd_MakeRentalParty",
+     "handler": "Scrcmd_WbtEntrance_MakeRentalParty",
      "overlay": 56,
      "args": [
       "any"
      ]
     },
     "1044": {
-     "handler": "WbtCmd_SetTournamentNameWord",
+     "handler": "Scrcmd_Wbt_SetTournamentNameWord",
      "overlay": 55,
      "args": [
       "u8",
@@ -5919,28 +5919,28 @@
      ]
     },
     "1046": {
-     "handler": "WbtCmd_CallEntryPartySelect",
+     "handler": "Scrcmd_WbtEntrance_CallEntryPartySelect",
      "overlay": 56,
      "args": [
       "var"
      ]
     },
     "1047": {
-     "handler": "WbtCmd_ShowTrainerList",
+     "handler": "Scrcmd_Wbt_ShowTrainerList",
      "overlay": 55,
      "args": [
       "any"
      ]
     },
     "1048": {
-     "handler": "WbtCmd_CallPokeSelect",
+     "handler": "Scrcmd_WbtEntrance_CallPokeSelect",
      "overlay": 56,
      "args": [
       "var"
      ]
     },
     "1049": {
-     "handler": "WbtCmd_ShowDownloads",
+     "handler": "Scrcmd_WbtEntrance_ShowDownloads",
      "overlay": 56,
      "args": [
       "var",
@@ -5948,14 +5948,14 @@
      ]
     },
     "1050": {
-     "handler": "WbtCmd_ShowWinRecord",
+     "handler": "Scrcmd_WbtEntrance_ShowWinRecord",
      "overlay": 56,
      "args": [
       "var"
      ]
     },
     "1051": {
-     "handler": "WbtCmd_Download",
+     "handler": "Scrcmd_WbtEntrance_Download",
      "overlay": 56,
      "args": [
       "any",
@@ -5963,7 +5963,7 @@
      ]
     },
     "1057": {
-     "handler": "WbtCmd_GetRegulationId",
+     "handler": "Scrcmd_WbtEntrance_GetRegulationId",
      "overlay": 56,
      "args": [
       "var"
@@ -5977,7 +5977,7 @@
      ]
     },
     "1059": {
-     "handler": "WbtCmd_CheckEntryParties",
+     "handler": "Scrcmd_WbtEntrance_CheckEntryParties",
      "overlay": 56,
      "args": [
       "var"
@@ -5995,104 +5995,104 @@
    ],
    "commands": {
     "1000": {
-     "handler": "WbtCmd_Create",
+     "handler": "Scrcmd_Wbt_Create",
      "overlay": 55,
      "args": []
     },
     "1001": {
-     "handler": "WbtCmd_Free",
+     "handler": "Scrcmd_Wbt_Free",
      "overlay": 55,
      "args": []
     },
     "1002": {
-     "handler": "WbtCmd_IsCreated",
+     "handler": "Scrcmd_Wbt_IsCreated",
      "overlay": 55,
      "args": [
       "var"
      ]
     },
     "1003": {
-     "handler": "WbtCmd_SetRound",
+     "handler": "Scrcmd_Wbt_SetRound",
      "overlay": 55,
      "args": [
       "any"
      ]
     },
     "1004": {
-     "handler": "WbtCmd_GetRound",
+     "handler": "Scrcmd_Wbt_GetRound",
      "overlay": 55,
      "args": [
       "var"
      ]
     },
     "1005": {
-     "handler": "WbtCmd_MakeMatch",
+     "handler": "Scrcmd_Wbt_MakeMatch",
      "overlay": 55,
      "args": []
     },
     "1009": {
-     "handler": "WbtCmd_SetStyle",
+     "handler": "Scrcmd_Wbt_SetStyle",
      "overlay": 55,
      "args": [
       "any"
      ]
     },
     "1010": {
-     "handler": "WbtCmd_GetStyle",
+     "handler": "Scrcmd_Wbt_GetStyle",
      "overlay": 55,
      "args": [
       "var"
      ]
     },
     "1011": {
-     "handler": "WbtCmd_SetTournament",
+     "handler": "Scrcmd_Wbt_SetTournament",
      "overlay": 55,
      "args": [
       "any"
      ]
     },
     "1012": {
-     "handler": "WbtCmd_GetTournament",
+     "handler": "Scrcmd_Wbt_GetTournament",
      "overlay": 55,
      "args": [
       "var"
      ]
     },
     "1013": {
-     "handler": "WbtCmd_SetType",
+     "handler": "Scrcmd_Wbt_SetType",
      "overlay": 55,
      "args": [
       "any"
      ]
     },
     "1014": {
-     "handler": "WbtCmd_GetType",
+     "handler": "Scrcmd_Wbt_GetType",
      "overlay": 55,
      "args": [
       "var"
      ]
     },
     "1015": {
-     "handler": "WbtCmd_SetCategory",
+     "handler": "Scrcmd_Wbt_SetCategory",
      "overlay": 55,
      "args": [
       "any"
      ]
     },
     "1016": {
-     "handler": "WbtCmd_GetCategory",
+     "handler": "Scrcmd_Wbt_GetCategory",
      "overlay": 55,
      "args": [
       "var"
      ]
     },
     "1017": {
-     "handler": "WbtCmd_RecordWin",
+     "handler": "Scrcmd_Wbt_RecordWin",
      "overlay": 55,
      "args": []
     },
     "1018": {
-     "handler": "WbtCmd_GetWinCount",
+     "handler": "Scrcmd_Wbt_GetWinCount",
      "overlay": 55,
      "args": [
       "any",
@@ -6101,48 +6101,48 @@
      ]
     },
     "1019": {
-     "handler": "WbtCmd_GetRoundRemaining",
+     "handler": "Scrcmd_WbtStadium_GetRoundRemaining",
      "overlay": 57,
      "args": [
       "var"
      ]
     },
     "1023": {
-     "handler": "WbtCmd_ResetPicks",
+     "handler": "Scrcmd_WbtStadium_ResetPicks",
      "overlay": 57,
      "args": []
     },
     "1024": {
-     "handler": "WbtCmd_GetEntryCount",
+     "handler": "Scrcmd_Wbt_GetEntryCount",
      "overlay": 55,
      "args": [
       "var"
      ]
     },
     "1029": {
-     "handler": "WbtCmd_ShowPartyList",
+     "handler": "Scrcmd_WbtStadium_ShowPartyList",
      "overlay": 57,
      "args": []
     },
     "1030": {
-     "handler": "WbtCmd_ClosePartyList",
+     "handler": "Scrcmd_WbtStadium_ClosePartyList",
      "overlay": 57,
      "args": []
     },
     "1031": {
-     "handler": "WbtCmd_ResetPicks",
+     "handler": "Scrcmd_WbtStadium_ResetPicks",
      "overlay": 57,
      "args": []
     },
     "1032": {
-     "handler": "WbtCmd_RandomPick",
+     "handler": "Scrcmd_WbtStadium_RandomPick",
      "overlay": 57,
      "args": [
       "any"
      ]
     },
     "1033": {
-     "handler": "WbtCmd_SetPick",
+     "handler": "Scrcmd_WbtStadium_SetPick",
      "overlay": 57,
      "args": [
       "any",
@@ -6150,7 +6150,7 @@
      ]
     },
     "1034": {
-     "handler": "WbtCmd_WordSetPickSpecies",
+     "handler": "Scrcmd_WbtStadium_WordSetPickSpecies",
      "overlay": 57,
      "args": [
       "u8",
@@ -6158,34 +6158,34 @@
      ]
     },
     "1035": {
-     "handler": "WbtCmd_ListPartyPokemon",
+     "handler": "Scrcmd_WbtStadium_ListPartyPokemon",
      "overlay": 57,
      "args": []
     },
     "1036": {
-     "handler": "WbtCmd_Dummy",
+     "handler": "Scrcmd_WbtStadium_Dummy",
      "overlay": 57,
      "args": []
     },
     "1037": {
-     "handler": "WbtCmd_SwapPickedPokemon",
+     "handler": "Scrcmd_WbtStadium_SwapPickedPokemon",
      "overlay": 57,
      "args": []
     },
     "1039": {
-     "handler": "WbtCmd_MakeOpponentParty",
+     "handler": "Scrcmd_WbtStadium_MakeOpponentParty",
      "overlay": 57,
      "args": []
     },
     "1040": {
-     "handler": "WbtCmd_GetOpponentObjCode",
+     "handler": "Scrcmd_WbtStadium_GetOpponentObjCode",
      "overlay": 57,
      "args": [
       "var"
      ]
     },
     "1041": {
-     "handler": "WbtCmd_ShowOpponentLine",
+     "handler": "Scrcmd_WbtStadium_ShowOpponentLine",
      "overlay": 57,
      "args": [
       "any",
@@ -6196,14 +6196,14 @@
      ]
     },
     "1042": {
-     "handler": "WbtCmd_CallBattle",
+     "handler": "Scrcmd_WbtStadium_CallBattle",
      "overlay": 57,
      "args": [
       "var"
      ]
     },
     "1043": {
-     "handler": "WbtCmd_ShowOpponentLine7",
+     "handler": "Scrcmd_WbtStadium_ShowOpponentLine7",
      "overlay": 57,
      "args": [
       "any"
@@ -6213,7 +6213,7 @@
      ]
     },
     "1044": {
-     "handler": "WbtCmd_SetTournamentNameWord",
+     "handler": "Scrcmd_Wbt_SetTournamentNameWord",
      "overlay": 55,
      "args": [
       "u8",
@@ -6221,28 +6221,28 @@
      ]
     },
     "1045": {
-     "handler": "WbtCmd_WordSetOpponentName",
+     "handler": "Scrcmd_WbtStadium_WordSetOpponentName",
      "overlay": 57,
      "args": [
       "u8"
      ]
     },
     "1047": {
-     "handler": "WbtCmd_ShowTrainerList",
+     "handler": "Scrcmd_Wbt_ShowTrainerList",
      "overlay": 55,
      "args": [
       "any"
      ]
     },
     "1052": {
-     "handler": "WbtCmd_ShowPortraits",
+     "handler": "Scrcmd_WbtStadium_ShowPortraits",
      "overlay": 57,
      "args": [
       "any"
      ]
     },
     "1053": {
-     "handler": "WbtCmd_LoadPortraitScene",
+     "handler": "Scrcmd_WbtStadium_LoadPortraitScene",
      "overlay": 57,
      "args": [
       "any",
@@ -6250,12 +6250,12 @@
      ]
     },
     "1054": {
-     "handler": "WbtCmd_PlayStadiumIntro",
+     "handler": "Scrcmd_WbtStadium_PlayStadiumIntro",
      "overlay": 57,
      "args": []
     },
     "1055": {
-     "handler": "WbtCmd_SwitchLights",
+     "handler": "Scrcmd_WbtStadium_SwitchLights",
      "overlay": 57,
      "args": [
       "any",
@@ -6263,14 +6263,14 @@
      ]
     },
     "1056": {
-     "handler": "WbtCmd_PlayCrowd",
+     "handler": "Scrcmd_WbtStadium_PlayCrowd",
      "overlay": 57,
      "args": [
       "any"
      ]
     },
     "1060": {
-     "handler": "WbtCmd_SetNamePlates",
+     "handler": "Scrcmd_WbtStadium_SetNamePlates",
      "overlay": 57,
      "args": [
       "any"
@@ -6289,17 +6289,17 @@
    ],
    "commands": {
     "1000": {
-     "handler": "ResortCmd_StartTalk",
+     "handler": "Scrcmd_Resort_StartTalk",
      "overlay": 59,
      "args": []
     },
     "1001": {
-     "handler": "ResortCmd_EndTalk",
+     "handler": "Scrcmd_Resort_EndTalk",
      "overlay": 59,
      "args": []
     },
     "1002": {
-     "handler": "ResortCmd_GetValue",
+     "handler": "Scrcmd_Resort_GetValue",
      "overlay": 59,
      "args": [
       "any",
@@ -6307,7 +6307,7 @@
      ]
     },
     "1003": {
-     "handler": "ResortCmd_GetScriptValue",
+     "handler": "Scrcmd_Resort_GetScriptValue",
      "overlay": 59,
      "args": [
       "any",
@@ -6315,7 +6315,7 @@
      ]
     },
     "1004": {
-     "handler": "ResortCmd_ShowRecords",
+     "handler": "Scrcmd_Resort_ShowRecords",
      "overlay": 59,
      "args": [
       "any",
@@ -6326,7 +6326,7 @@
      ]
     },
     "1005": {
-     "handler": "ResortCmd_MakeData",
+     "handler": "Scrcmd_Resort_MakeData",
      "overlay": 59,
      "args": [
       "u16",
@@ -6334,14 +6334,14 @@
      ]
     },
     "1006": {
-     "handler": "ResortCmd_RecreatePeople",
+     "handler": "Scrcmd_Resort_RecreatePeople",
      "overlay": 59,
      "args": [
       "any"
      ]
     },
     "1007": {
-     "handler": "ResortCmd_SetWord",
+     "handler": "Scrcmd_Resort_SetWord",
      "overlay": 59,
      "args": [
       "u16",
@@ -6351,7 +6351,7 @@
      ]
     },
     "1008": {
-     "handler": "ResortCmd_RemovePerson",
+     "handler": "Scrcmd_Resort_RemovePerson",
      "overlay": 59,
      "args": [
       "any",
@@ -6360,7 +6360,7 @@
      ]
     },
     "1009": {
-     "handler": "ResortCmd_AddShopExperience",
+     "handler": "Scrcmd_Resort_AddShopExperience",
      "overlay": 59,
      "args": [
       "any",
@@ -6370,7 +6370,7 @@
      ]
     },
     "1010": {
-     "handler": "ResortCmd_AddPopularity",
+     "handler": "Scrcmd_Resort_AddPopularity",
      "overlay": 59,
      "args": [
       "any",
@@ -6379,31 +6379,31 @@
      ]
     },
     "1011": {
-     "handler": "ResortCmd_StartTalk",
+     "handler": "Scrcmd_Resort_StartTalk",
      "overlay": 59,
      "args": []
     },
     "1012": {
-     "handler": "ResortCmd_SaveShopId",
+     "handler": "Scrcmd_Resort_SaveShopId",
      "overlay": 59,
      "args": []
     },
     "1013": {
-     "handler": "ResortCmd_SetOccupantsLocked",
+     "handler": "Scrcmd_Resort_SetOccupantsLocked",
      "overlay": 59,
      "args": [
       "any"
      ]
     },
     "1014": {
-     "handler": "ResortCmd_HideActors",
+     "handler": "Scrcmd_Resort_HideActors",
      "overlay": 59,
      "args": [
       "any"
      ]
     },
     "1015": {
-     "handler": "ResortCmd_RaffleShopItem",
+     "handler": "Scrcmd_Resort_RaffleShopItem",
      "overlay": 59,
      "args": [
       "any",
@@ -6412,7 +6412,7 @@
      ]
     },
     "1016": {
-     "handler": "ResortCmd_SetFriendship",
+     "handler": "Scrcmd_Resort_SetFriendship",
      "overlay": 59,
      "args": [
       "any",
@@ -6421,7 +6421,7 @@
      ]
     },
     "1017": {
-     "handler": "ResortCmd_RaiseLevel",
+     "handler": "Scrcmd_Resort_RaiseLevel",
      "overlay": 59,
      "args": [
       "any",
@@ -6430,7 +6430,7 @@
      ]
     },
     "1018": {
-     "handler": "ResortCmd_ChangeEffortValue",
+     "handler": "Scrcmd_Resort_ChangeEffortValue",
      "overlay": 59,
      "args": [
       "any",
@@ -6440,7 +6440,7 @@
      ]
     },
     "1019": {
-     "handler": "ResortCmd_ShortenEggSteps",
+     "handler": "Scrcmd_Resort_ShortenEggSteps",
      "overlay": 59,
      "args": [
       "any",
@@ -6449,12 +6449,12 @@
      ]
     },
     "1020": {
-     "handler": "ResortCmd_SetShopFlag",
+     "handler": "Scrcmd_Resort_SetShopFlag",
      "overlay": 59,
      "args": []
     },
     "1021": {
-     "handler": "ResortCmd_PayAndSetShopFlag",
+     "handler": "Scrcmd_Resort_PayAndSetShopFlag",
      "overlay": 59,
      "args": [
       "any",
@@ -6463,7 +6463,7 @@
      "area": "TrainerCard"
     },
     "1022": {
-     "handler": "ResortCmd_GetPersonVisit",
+     "handler": "Scrcmd_Resort_GetPersonVisit",
      "overlay": 59,
      "args": [
       "any",
@@ -6474,7 +6474,7 @@
      ]
     },
     "1023": {
-     "handler": "ResortCmd_NameEntry",
+     "handler": "Scrcmd_Resort_NameEntry",
      "overlay": 59,
      "args": [
       "u16",
@@ -6482,7 +6482,7 @@
      ]
     },
     "1024": {
-     "handler": "ResortCmd_Visit",
+     "handler": "Scrcmd_Resort_Visit",
      "overlay": 59,
      "args": [
       "any",
@@ -6492,19 +6492,19 @@
      ]
     },
     "1025": {
-     "handler": "ResortCmd_CheckRank100Unlock",
+     "handler": "Scrcmd_Resort_CheckRank100Unlock",
      "overlay": 59,
      "args": [
       "var"
      ]
     },
     "1026": {
-     "handler": "ResortCmd_MarkRaffled",
+     "handler": "Scrcmd_Resort_MarkRaffled",
      "overlay": 59,
      "args": []
     },
     "1027": {
-     "handler": "ResortCmd_AddRecordPerson",
+     "handler": "Scrcmd_Resort_AddRecordPerson",
      "overlay": 59,
      "args": [
       "any",
@@ -6512,7 +6512,7 @@
      ]
     },
     "1028": {
-     "handler": "ResortCmd_AddEntryOrRecord",
+     "handler": "Scrcmd_Resort_AddEntryOrRecord",
      "overlay": 59,
      "args": [
       "any",
@@ -6520,7 +6520,7 @@
      ]
     },
     "1029": {
-     "handler": "ResortCmd_GetNPCValue",
+     "handler": "Scrcmd_Resort_GetNPCValue",
      "overlay": 59,
      "args": [
       "any",
@@ -6529,7 +6529,7 @@
      ]
     },
     "1030": {
-     "handler": "ResortCmd_SetOwnValue",
+     "handler": "Scrcmd_Resort_SetOwnValue",
      "overlay": 59,
      "args": [
       "any",
@@ -6537,7 +6537,7 @@
      ]
     },
     "1031": {
-     "handler": "ResortCmd_GetOwnValue",
+     "handler": "Scrcmd_Resort_GetOwnValue",
      "overlay": 59,
      "args": [
       "any",
@@ -6545,7 +6545,7 @@
      ]
     },
     "1032": {
-     "handler": "ResortCmd_SetOccupantWords",
+     "handler": "Scrcmd_Resort_SetOccupantWords",
      "overlay": 59,
      "args": [
       "any",
@@ -6554,7 +6554,7 @@
      ]
     },
     "1033": {
-     "handler": "ResortCmd_SetNPCWord",
+     "handler": "Scrcmd_Resort_SetNPCWord",
      "overlay": 59,
      "args": [
       "any",
@@ -6563,7 +6563,7 @@
      ]
     },
     "1034": {
-     "handler": "ResortCmd_GetGoodsValue",
+     "handler": "Scrcmd_Resort_GetGoodsValue",
      "overlay": 59,
      "args": [
       "any",
@@ -6572,7 +6572,7 @@
      ]
     },
     "1035": {
-     "handler": "ResortCmd_DescribeOccupant",
+     "handler": "Scrcmd_Resort_DescribeOccupant",
      "overlay": 59,
      "args": [
       "any",
@@ -6581,19 +6581,19 @@
      ]
     },
     "1036": {
-     "handler": "ResortCmd_ShowMedalInfo",
+     "handler": "Scrcmd_Medalinfo_ShowMedalInfo",
      "overlay": 59,
      "args": []
     },
     "1037": {
-     "handler": "ResortCmd_StartSceneAnim",
+     "handler": "Scrcmd_Resort_StartSceneAnim",
      "overlay": 59,
      "args": [
       "any"
      ]
     },
     "1038": {
-     "handler": "ResortCmd_IsSceneAnimDone",
+     "handler": "Scrcmd_Resort_IsSceneAnimDone",
      "overlay": 59,
      "args": [
       "any",
@@ -6601,7 +6601,7 @@
      ]
     },
     "1039": {
-     "handler": "ResortCmd_EndSceneAnim",
+     "handler": "Scrcmd_Resort_EndSceneAnim",
      "overlay": 59,
      "args": [
       "any"
@@ -6611,7 +6611,7 @@
    "variants": {
     "60": {
      "1000": {
-      "handler": "ResortShopCmd_Open",
+      "handler": "Scrcmd_ResortShop_Open",
       "overlay": 60,
       "args": [
        "any",
@@ -6629,7 +6629,7 @@
       ]
      },
      "1011": {
-      "handler": "ResortShopCmd_Open",
+      "handler": "Scrcmd_ResortShop_Open",
       "overlay": 60,
       "args": [
        "any",
@@ -6669,12 +6669,12 @@
    ],
    "commands": {
     "1000": {
-     "handler": "BlackTowerCmd_CreateWalls",
+     "handler": "Scrcmd_BlackTower_CreateWalls",
      "overlay": 61,
      "args": []
     },
     "1001": {
-     "handler": "BlackTowerCmd_ChangeRoom",
+     "handler": "Scrcmd_BlackTower_ChangeRoom",
      "overlay": 61,
      "args": [
       "any",
@@ -6683,12 +6683,12 @@
      ]
     },
     "1003": {
-     "handler": "BlackTowerCmd_StartRun",
+     "handler": "Scrcmd_BlackTower_StartRun",
      "overlay": 61,
      "args": []
     },
     "1004": {
-     "handler": "BlackTowerCmd_GetFloorInArea",
+     "handler": "Scrcmd_BlackTower_GetFloorInArea",
      "overlay": 61,
      "args": [
       "var"
@@ -6696,14 +6696,14 @@
      "area": "Keys"
     },
     "1005": {
-     "handler": "BlackTowerCmd_ChangeFloor",
+     "handler": "Scrcmd_BlackTower_ChangeFloor",
      "overlay": 61,
      "args": [
       "any"
      ]
     },
     "1006": {
-     "handler": "BlackTowerCmd_GetArea",
+     "handler": "Scrcmd_BlackTower_GetArea",
      "overlay": 61,
      "args": [
       "var"
@@ -6711,7 +6711,7 @@
      "area": "Keys"
     },
     "1007": {
-     "handler": "BlackTowerCmd_CallBattleEvent",
+     "handler": "Scrcmd_BlackTower_CallBattleEvent",
      "overlay": 61,
      "args": []
     },
@@ -6723,7 +6723,7 @@
      ]
     },
     "1009": {
-     "handler": "BlackTowerCmd_SetTrainerDefeated",
+     "handler": "Scrcmd_BlackTower_SetTrainerDefeated",
      "overlay": 61,
      "args": [
       "any",
@@ -6739,7 +6739,7 @@
      ]
     },
     "1011": {
-     "handler": "BlackTowerCmd_IsTrainerDefeated",
+     "handler": "Scrcmd_BlackTower_IsTrainerDefeated",
      "overlay": 61,
      "args": [
       "any",
@@ -6748,7 +6748,7 @@
      "area": "Keys"
     },
     "1012": {
-     "handler": "BlackTowerCmd_GetNpcScript",
+     "handler": "Scrcmd_BlackTower_GetNpcScript",
      "overlay": 61,
      "args": [
       "var"
@@ -6763,7 +6763,7 @@
      ]
     },
     "1014": {
-     "handler": "BlackTowerCmd_GetSpecialTrainerFlag",
+     "handler": "Scrcmd_BlackTower_GetSpecialTrainerFlag",
      "overlay": 61,
      "args": [
       "any",
@@ -6772,7 +6772,7 @@
      "area": "Keys"
     },
     "1015": {
-     "handler": "BlackTowerCmd_SetSpecialTrainerFlag",
+     "handler": "Scrcmd_BlackTower_SetSpecialTrainerFlag",
      "overlay": 61,
      "args": [
       "any",
@@ -6781,7 +6781,7 @@
      "area": "Keys"
     },
     "1016": {
-     "handler": "BlackTowerCmd_CallDoorEvent",
+     "handler": "Scrcmd_BlackTower_CallDoorEvent",
      "overlay": 61,
      "args": [
       "any",
@@ -6789,7 +6789,7 @@
      ]
     },
     "1017": {
-     "handler": "BlackTowerCmd_GetGoalFloor",
+     "handler": "Scrcmd_BlackTower_GetGoalFloor",
      "overlay": 61,
      "args": [
       "var"
@@ -6797,7 +6797,7 @@
      "area": "Keys"
     },
     "1018": {
-     "handler": "BlackTowerCmd_GetTrainerClass",
+     "handler": "Scrcmd_BlackTower_GetTrainerClass",
      "overlay": 61,
      "args": [
       "any",
@@ -6805,7 +6805,7 @@
      ]
     },
     "1019": {
-     "handler": "BlackTowerCmd_SetProgress",
+     "handler": "Scrcmd_BlackTower_SetProgress",
      "overlay": 61,
      "args": [
       "any"
@@ -6829,7 +6829,7 @@
      "area": "Keys"
     },
     "1022": {
-     "handler": "BlackTowerCmd_GetTrainerId",
+     "handler": "Scrcmd_BlackTower_GetTrainerId",
      "overlay": 61,
      "args": [
       "any",
@@ -6838,14 +6838,14 @@
      "area": "Keys"
     },
     "1023": {
-     "handler": "BlackTowerCmd_GetVersion",
+     "handler": "Scrcmd_BlackTower_GetVersion",
      "overlay": 61,
      "args": [
       "var"
      ]
     },
     "1024": {
-     "handler": "BlackTowerCmd_GetInfo",
+     "handler": "Scrcmd_BlackTower_GetInfo",
      "overlay": 61,
      "args": [
       "any",
@@ -6855,12 +6855,12 @@
      "area": "Keys"
     },
     "1025": {
-     "handler": "BlackTowerCmd_CallMachineEvent",
+     "handler": "Scrcmd_BlackTower_CallMachineEvent",
      "overlay": 61,
      "args": []
     },
     "1026": {
-     "handler": "BlackTowerCmd_IsTargetSlot",
+     "handler": "Scrcmd_BlackTower_IsTargetSlot",
      "overlay": 61,
      "args": [
       "any",
@@ -6869,7 +6869,7 @@
      "area": "Keys"
     },
     "1027": {
-     "handler": "BlackTowerCmd_GetNpcScriptByResult",
+     "handler": "Scrcmd_BlackTower_GetNpcScriptByResult",
      "overlay": 61,
      "args": [
       "any",
@@ -6878,26 +6878,26 @@
      "area": "Keys"
     },
     "1028": {
-     "handler": "BlackTowerCmd_GetRoomNpcCount",
+     "handler": "Scrcmd_BlackTower_GetRoomNpcCount",
      "overlay": 61,
      "args": [
       "var"
      ]
     },
     "1029": {
-     "handler": "BlackTowerCmd_HasEarnedMoney",
+     "handler": "Scrcmd_BlackTower_HasEarnedMoney",
      "overlay": 61,
      "args": [
       "var"
      ]
     },
     "1030": {
-     "handler": "BlackTowerCmd_CallLiftEvent",
+     "handler": "Scrcmd_BlackTower_CallLiftEvent",
      "overlay": 61,
      "args": []
     },
     "1031": {
-     "handler": "BlackTowerCmd_TakeEarnedMoney",
+     "handler": "Scrcmd_BlackTower_TakeEarnedMoney",
      "overlay": 61,
      "args": [
       "any"
@@ -6917,7 +6917,7 @@
    ],
    "commands": {
     "1000": {
-     "handler": "PokewoodCmd_Film",
+     "handler": "Scrcmd_Pokewood_Film",
      "overlay": 62,
      "args": [
       "any",
@@ -6926,7 +6926,7 @@
      ]
     },
     "1001": {
-     "handler": "PokewoodCmd_WatchSlot",
+     "handler": "Scrcmd_Pokewood_WatchSlot",
      "overlay": 62,
      "args": [
       "any",
@@ -6934,14 +6934,14 @@
      ]
     },
     "1002": {
-     "handler": "PokewoodCmd_PickMovie",
+     "handler": "Scrcmd_Pokewood_PickMovie",
      "overlay": 62,
      "args": [
       "var"
      ]
     },
     "1003": {
-     "handler": "PokewoodCmd_OpenMenu",
+     "handler": "Scrcmd_Pokewood_OpenMenu",
      "overlay": 62,
      "args": [
       "any",
@@ -6949,14 +6949,14 @@
      ]
     },
     "1004": {
-     "handler": "PokewoodCmd_SetSaveSlot",
+     "handler": "Scrcmd_Pokewood_SetSaveSlot",
      "overlay": 62,
      "args": [
       "any"
      ]
     },
     "1005": {
-     "handler": "PokewoodCmd_SetMessageWord",
+     "handler": "Scrcmd_Pokewood_SetMessageWord",
      "overlay": 62,
      "args": [
       "u8",
@@ -6964,7 +6964,7 @@
      ]
     },
     "1006": {
-     "handler": "PokewoodCmd_GetMovieFlag",
+     "handler": "Scrcmd_Pokewood_GetMovieFlag",
      "overlay": 62,
      "args": [
       "any",
@@ -6973,7 +6973,7 @@
      ]
     },
     "1007": {
-     "handler": "PokewoodCmd_SetMovieFlag",
+     "handler": "Scrcmd_Pokewood_SetMovieFlag",
      "overlay": 62,
      "args": [
       "any",
@@ -6981,14 +6981,14 @@
      ]
     },
     "1008": {
-     "handler": "PokewoodCmd_CountDownloadedMovies",
+     "handler": "Scrcmd_Pokewood_CountDownloadedMovies",
      "overlay": 62,
      "args": [
       "var"
      ]
     },
     "1009": {
-     "handler": "PokewoodCmd_CheckDownloadedMovie",
+     "handler": "Scrcmd_Pokewood_CheckDownloadedMovie",
      "overlay": 62,
      "args": [
       "any",
@@ -6996,7 +6996,7 @@
      ]
     },
     "1010": {
-     "handler": "PokewoodCmd_GetDownloadedMovieResult",
+     "handler": "Scrcmd_Pokewood_GetDownloadedMovieResult",
      "overlay": 62,
      "args": [
       "any",
@@ -7004,31 +7004,31 @@
      ]
     },
     "1011": {
-     "handler": "PokewoodCmd_Create",
+     "handler": "Scrcmd_Pokewood_Create",
      "overlay": 62,
      "args": []
     },
     "1012": {
-     "handler": "PokewoodCmd_Free",
+     "handler": "Scrcmd_Pokewood_Free",
      "overlay": 62,
      "args": []
     },
     "1013": {
-     "handler": "PokewoodCmd_SelectCast",
+     "handler": "Scrcmd_Pokewood_SelectCast",
      "overlay": 62,
      "args": [
       "var"
      ]
     },
     "1014": {
-     "handler": "PokewoodCmd_SetUsePlayerCast",
+     "handler": "Scrcmd_Pokewood_SetUsePlayerCast",
      "overlay": 62,
      "args": [
       "any"
      ]
     },
     "1015": {
-     "handler": "PokewoodCmd_GetNewUnlockKind",
+     "handler": "Scrcmd_Pokewood_GetNewUnlockKind",
      "overlay": 62,
      "args": [
       "any",
@@ -7037,14 +7037,14 @@
      ]
     },
     "1016": {
-     "handler": "PokewoodCmd_TestAndSetLevelBit",
+     "handler": "Scrcmd_Pokewood_TestAndSetLevelBit",
      "overlay": 62,
      "args": [
       "var"
      ]
     },
     "1017": {
-     "handler": "PokewoodCmd_GetSlotFlag",
+     "handler": "Scrcmd_Pokewood_GetSlotFlag",
      "overlay": 62,
      "args": [
       "any",
@@ -7084,14 +7084,14 @@
      ]
     },
     "1022": {
-     "handler": "PokewoodCmd_SetSlotFlag",
+     "handler": "Scrcmd_Pokewood_SetSlotFlag",
      "overlay": 62,
      "args": [
       "any"
      ]
     },
     "1023": {
-     "handler": "PokewoodCmd_OpenRecordMonitor",
+     "handler": "Scrcmd_Pokewood_OpenRecordMonitor",
      "overlay": 62,
      "args": [
       "var"
@@ -7108,7 +7108,7 @@
      ]
     },
     "1025": {
-     "handler": "PokewoodCmd_CountMovieFlags",
+     "handler": "Scrcmd_Pokewood_CountMovieFlags",
      "overlay": 62,
      "args": [
       "any",
@@ -7116,7 +7116,7 @@
      ]
     },
     "1026": {
-     "handler": "PokewoodCmd_WatchBlock",
+     "handler": "Scrcmd_Pokewood_WatchBlock",
      "overlay": 62,
      "args": []
     }
@@ -7131,14 +7131,14 @@
    ],
    "commands": {
     "1000": {
-     "handler": "BadgeGateCmd_PlayCheck",
+     "handler": "Scrcmd_BadgeGate_PlayCheck",
      "overlay": 63,
      "args": [
       "any"
      ]
     },
     "1001": {
-     "handler": "BadgeGateCmd_PlayLastGate",
+     "handler": "Scrcmd_BadgeGate_PlayLastGate",
      "overlay": 63,
      "args": []
     }
@@ -7162,14 +7162,14 @@
    ],
    "commands": {
     "1000": {
-     "handler": "PlasmaFrigateCmd_PressSwitch",
+     "handler": "Scrcmd_PlasmaFrigate_PressSwitch",
      "overlay": 64,
      "args": [
       "u16"
      ]
     },
     "1001": {
-     "handler": "PlasmaFrigateCmd_SetLightsState",
+     "handler": "Scrcmd_PlasmaFrigate_SetLightsState",
      "overlay": 64,
      "args": [
       "u16",
@@ -7177,35 +7177,35 @@
      ]
     },
     "1002": {
-     "handler": "PlasmaFrigateCmd_PlayGroupASecond",
+     "handler": "Scrcmd_PlasmaFrigate_PlayGroupASecond",
      "overlay": 64,
      "args": [
       "u16"
      ]
     },
     "1003": {
-     "handler": "PlasmaFrigateCmd_PlayGroupBSecond",
+     "handler": "Scrcmd_PlasmaFrigate_PlayGroupBSecond",
      "overlay": 64,
      "args": [
       "u16"
      ]
     },
     "1004": {
-     "handler": "PlasmaFrigateCmd_EnterPassword",
+     "handler": "Scrcmd_PlasmaFrigate_EnterPassword",
      "overlay": 64,
      "args": [
       "var"
      ]
     },
     "1005": {
-     "handler": "PlasmaFrigateCmd_GetPasswordIndex",
+     "handler": "Scrcmd_PlasmaFrigate_GetPasswordIndex",
      "overlay": 64,
      "args": [
       "var"
      ]
     },
     "1006": {
-     "handler": "PlasmaFrigateCmd_SetSwitchLightState",
+     "handler": "Scrcmd_PlasmaFrigate_SetSwitchLightState",
      "overlay": 64,
      "args": [
       "u16",
@@ -7213,14 +7213,14 @@
      ]
     },
     "1007": {
-     "handler": "PlasmaFrigateCmd_PlaySwitchAnim",
+     "handler": "Scrcmd_PlasmaFrigate_PlaySwitchAnim",
      "overlay": 64,
      "args": [
       "u16"
      ]
     },
     "1008": {
-     "handler": "PlasmaFrigateCmd_PlaySwitchLightAnim",
+     "handler": "Scrcmd_PlasmaFrigate_PlaySwitchLightAnim",
      "overlay": 64,
      "args": [
       "u16"
@@ -7256,14 +7256,14 @@
    ],
    "commands": {
     "1000": {
-     "handler": "PokemonCenterCmd_Medal",
+     "handler": "Scrcmd_PokemonCenter_Medal",
      "overlay": 65,
      "args": [
       "u16"
      ]
     },
     "1001": {
-     "handler": "PokemonCenterCmd_FindEarnedMedal",
+     "handler": "Scrcmd_PokemonCenter_FindEarnedMedal",
      "overlay": 65,
      "args": [
       "var",
@@ -7271,7 +7271,7 @@
      ]
     },
     "1005": {
-     "handler": "PokemonCenterCmd_GetMatchState",
+     "handler": "Scrcmd_PokemonCenter_GetMatchState",
      "overlay": 65,
      "args": [
       "any",
@@ -7279,17 +7279,17 @@
      ]
     },
     "1006": {
-     "handler": "PokemonCenterCmd_SetMatchInProgress",
+     "handler": "Scrcmd_PokemonCenter_SetMatchInProgress",
      "overlay": 65,
      "args": []
     },
     "1007": {
-     "handler": "PokemonCenterCmd_ClearMatchInProgress",
+     "handler": "Scrcmd_PokemonCenter_ClearMatchInProgress",
      "overlay": 65,
      "args": []
     },
     "1008": {
-     "handler": "PokemonCenterCmd_SetMatchState",
+     "handler": "Scrcmd_PokemonCenter_SetMatchState",
      "overlay": 65,
      "args": [
       "any",
@@ -7298,7 +7298,7 @@
      "area": "TrainerCard"
     },
     "1009": {
-     "handler": "PokemonCenterCmd_AddBattlePoints",
+     "handler": "Scrcmd_PokemonCenter_AddBattlePoints",
      "overlay": 65,
      "args": [
       "any"
@@ -7319,45 +7319,45 @@
    ],
    "commands": {
     "1000": {
-     "handler": "Plugin14Cmd_StartAspertiaSeasonAnimations",
+     "handler": "Scrcmd_Plugin14_StartAspertiaSeasonAnimations",
      "overlay": 66,
      "args": []
     },
     "1001": {
-     "handler": "Plugin14Cmd_ShowGC6Model",
+     "handler": "Scrcmd_Plugin14_ShowGC6Model",
      "overlay": 66,
      "args": [
       "u16"
      ]
     },
     "1002": {
-     "handler": "Plugin14Cmd_PlayGC6Model",
+     "handler": "Scrcmd_Plugin14_PlayGC6Model",
      "overlay": 66,
      "args": [
       "u16"
      ]
     },
     "1003": {
-     "handler": "Plugin14Cmd_StartActorHover",
+     "handler": "Scrcmd_Plugin14_StartActorHover",
      "overlay": 66,
      "args": [
       "u16"
      ]
     },
     "1004": {
-     "handler": "Plugin14Cmd_PlayGC6Model23",
+     "handler": "Scrcmd_Plugin14_PlayGC6Model23",
      "overlay": 66,
      "args": [
       "any"
      ]
     },
     "1005": {
-     "handler": "Plugin14Cmd_HideGC6Model3",
+     "handler": "Scrcmd_Plugin14_HideGC6Model3",
      "overlay": 66,
      "args": []
     },
     "1006": {
-     "handler": "Plugin14Cmd_ShiftActor",
+     "handler": "Scrcmd_Plugin14_ShiftActor",
      "overlay": 66,
      "args": [
       "any",
@@ -7366,34 +7366,34 @@
      ]
     },
     "1007": {
-     "handler": "Plugin14Cmd_ResetLCDToBlack",
+     "handler": "Scrcmd_Plugin14_ResetLCDToBlack",
      "overlay": 66,
      "args": []
     },
     "1009": {
-     "handler": "Plugin14Cmd_StartLeagueCenterAnimations",
+     "handler": "Scrcmd_Plugin14_StartLeagueCenterAnimations",
      "overlay": 66,
      "args": []
     },
     "1010": {
-     "handler": "Plugin14Cmd_FadeOutSeq",
+     "handler": "Scrcmd_Plugin14_FadeOutSeq",
      "overlay": 66,
      "args": [
       "any"
      ]
     },
     "1011": {
-     "handler": "Plugin14Cmd_LoadAspertiaBG3Picture",
+     "handler": "Scrcmd_Plugin14_LoadAspertiaBG3Picture",
      "overlay": 66,
      "args": []
     },
     "1012": {
-     "handler": "Plugin14Cmd_CallDT9ReleaseEvent",
+     "handler": "Scrcmd_Plugin14_CallDT9ReleaseEvent",
      "overlay": 66,
      "args": []
     },
     "1013": {
-     "handler": "Plugin14Cmd_CallDT9ThrowEvent",
+     "handler": "Scrcmd_Plugin14_CallDT9ThrowEvent",
      "overlay": 66,
      "args": [
       "any",
@@ -7405,7 +7405,7 @@
      ]
     },
     "1014": {
-     "handler": "Plugin14Cmd_PlayDT9Thrown",
+     "handler": "Scrcmd_Plugin14_PlayDT9Thrown",
      "overlay": 66,
      "args": [
       "any",
@@ -7414,12 +7414,12 @@
      ]
     },
     "1015": {
-     "handler": "Plugin14Cmd_CallDT9WaitThrownDoneEvent",
+     "handler": "Scrcmd_Plugin14_CallDT9WaitThrownDoneEvent",
      "overlay": 66,
      "args": []
     },
     "1016": {
-     "handler": "Plugin14Cmd_CallDT9WaitFifthFrameEvent",
+     "handler": "Scrcmd_Plugin14_CallDT9WaitFifthFrameEvent",
      "overlay": 66,
      "args": []
     }
@@ -7436,7 +7436,7 @@
    ],
    "commands": {
     "1000": {
-     "handler": "Plugin15Cmd_ShowSplash",
+     "handler": "Scrcmd_Plugin15_ShowSplash",
      "overlay": 67,
      "args": [
       "any",
@@ -7445,7 +7445,7 @@
      ]
     },
     "1001": {
-     "handler": "Plugin15Cmd_JumpActorOut",
+     "handler": "Scrcmd_Plugin15_JumpActorOut",
      "overlay": 67,
      "args": [
       "any",
@@ -7467,50 +7467,50 @@
    ],
    "commands": {
     "1000": {
-     "handler": "Plugin16Cmd_ShowRuinsModel",
+     "handler": "Scrcmd_Plugin16_ShowRuinsModel",
      "overlay": 68,
      "args": [
       "any"
      ]
     },
     "1001": {
-     "handler": "Plugin16Cmd_SetRuinsAnimFrame",
+     "handler": "Scrcmd_Plugin16_SetRuinsAnimFrame",
      "overlay": 68,
      "args": [
       "any"
      ]
     },
     "1002": {
-     "handler": "Plugin16Cmd_PlayRuinsAnim",
+     "handler": "Scrcmd_Plugin16_PlayRuinsAnim",
      "overlay": 68,
      "args": [
       "any"
      ]
     },
     "1003": {
-     "handler": "Plugin16Cmd_CallFormEvent",
+     "handler": "Scrcmd_Plugin16_CallFormEvent",
      "overlay": 68,
      "args": []
     },
     "1004": {
-     "handler": "Plugin16Cmd_HideActor2",
+     "handler": "Scrcmd_Plugin16_HideActor2",
      "overlay": 68,
      "args": []
     },
     "1005": {
-     "handler": "Plugin16Cmd_StartChase",
+     "handler": "Scrcmd_Plugin16_StartChase",
      "overlay": 68,
      "args": [
       "any"
      ]
     },
     "1006": {
-     "handler": "Plugin16Cmd_WaitChase",
+     "handler": "Scrcmd_Plugin16_WaitChase",
      "overlay": 68,
      "args": []
     },
     "1007": {
-     "handler": "Plugin16Cmd_DropActor",
+     "handler": "Scrcmd_Plugin16_DropActor",
      "overlay": 68,
      "args": []
     }

@@ -104,7 +104,7 @@ Script_2:
     InfoMsg ReversalMountain11_Text_GwogoboGwobobobo, 1
     PVWait
     MsgWaitAdvance
-    InfoMsgClose_0039
+    InfoMsgClose
     ActorAdd 0
     ActorFallDownToXZ 0, 10, 12, 1
     VMSleep 60
@@ -129,7 +129,7 @@ Script_3:
     ScreamMsg ReversalMountain11_Text_GwogoboGwobobobo, 2
     PVWait
     MsgWaitAdvance
-    InfoMsgClose_0039
+    InfoMsgClose
     CallWildBattle 485, 68, 1
     WildBattleIsVictory 0x8010
     VMStackPush 0x8010
@@ -173,7 +173,7 @@ L_0263:
     // "Heatran vanished into the\ndepths of the volcano..."
     SystemMsg ReversalMountain11_Text_HeatranVanishedIntoDepths, 2
     LastKeyWait
-    InfoMsgClose
+    SystemMsgClose
 
 L_0280:
     FinishAllEvents

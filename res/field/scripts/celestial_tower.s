@@ -44,7 +44,7 @@ Script_2:
     FlagSet EVENT_FLAG_0x0198
 
 L_0095:
-    ScriptWork_FadeBgmVolume 64, 30
+    FadeBgmVolume 64, 30
     SEPlay SEQ_SE_FLD_151
     // "[f000]Ā\u0001\u0000 rang the bell..."
     InfoMsg CelestialTower_Text_RangBell, 2
@@ -54,11 +54,11 @@ L_0095:
     BMHndAnmWait 0x8023
     BMReleaseHandle 0x8023
     SEWait
-    ScriptWork_RestoreBgmVolume 60
+    RestoreBgmVolume 60
     // "The sound of the bell\nreverberates through the area..."
     InfoMsg CelestialTower_Text_SoundBellReverberatesThrough, 2
     LastKeyWait
-    InfoMsgClose_0039
+    InfoMsgClose
     VMStackPush EVENT_WORK_0x40ee
     VMStackPushConst 5
     VMStackCmp CMP_EQ
@@ -72,7 +72,7 @@ L_00F0:
     // "The bell was left untouched..."
     InfoMsg CelestialTower_Text_BellLeftUntouched, 2
     LastKeyWait
-    InfoMsgClose_0039
+    InfoMsgClose
 
 L_00F9:
     WorkSetConst 0x8023, 0
@@ -98,7 +98,7 @@ Script_3:
     InfoMsg CelestialTower_Text_Kyauun, 2
     PVWait
     MsgWaitAdvance
-    InfoMsgClose_0039
+    InfoMsgClose
     PlayerGetGPos 0x8021, 0x8022
     ActorAdd 0
     ActorSetGPos 0, 24, 9, 26, 2
@@ -136,7 +136,7 @@ Script_4:
     ScreamMsg CelestialTower_Text_Kyauun, 2
     PVWait
     MsgWaitAdvance
-    InfoMsgClose_0039
+    InfoMsgClose
     CallWildBattle 481, 65, 1
     WildBattleIsVictory 0x8010
     VMStackPush 0x8010
@@ -173,7 +173,7 @@ L_0249:
     // "Mesprit went flying off somewhere..."
     SystemMsg CelestialTower_Text_MespritWentFlyingOff, 2
     LastKeyWait
-    InfoMsgClose
+    SystemMsgClose
     VMJump L_0259
 
 L_0259:

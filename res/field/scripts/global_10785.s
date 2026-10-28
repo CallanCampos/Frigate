@@ -204,7 +204,7 @@ L_025E:
     WordSetItemName 0, 0x8027
     WordSetItemName 1, 0x8028
     FunfestDispSalesmanMessage 16, 9, 2
-    ListMenu_AnchorTopRight 31, 1, 0, 1, 32811
+    ListMenuAnchorTopRight 31, 1, 0, 1, 32811
     ListMenuAdd 12, 65535, 2
     ListMenuAdd 13, 65535, 1
     ListMenuAdd 14, 65535, 0
@@ -452,7 +452,7 @@ L_0636:
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_0760
     Random 0x8035, 3
-    ListMenu_AnchorTopRight 31, 1, 0, 0, 32820
+    ListMenuAnchorTopRight 31, 1, 0, 0, 32820
     ListMenuAdd 46, 65535, 0
     ListMenuAdd 47, 65535, 1
     ListMenuAdd 48, 65535, 2
@@ -474,7 +474,7 @@ L_0697:
     WorkGet 0x8021, 0x8034
     WorkGet 0x8022, 0x8035
     VMCall L_0786
-    InfoMsgClose_0039
+    InfoMsgClose
     WorkCmpConst 0x8034, 0
     VMJumpIf CMP_EQ, L_06BE
     VMJump L_06CA
@@ -648,7 +648,7 @@ L_0964:
     WordSetNumber 6, 0x8043, 2
     // "Now!\nWhat is the name of the Pokémon[f000]븀\u0000\nin position [f000]ȁ\u0001\u0006?"
     ParentActorMsg MSGFILE_SCRIPT, Global10785_Text_NowWhatNamePokemon, 2, 0
-    ListMenu_AnchorTopRight 31, 1, 0, 0, 32830
+    ListMenuAnchorTopRight 31, 1, 0, 0, 32830
     WorkSetConst 0x803f, 0
 
 L_0990:

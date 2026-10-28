@@ -35,8 +35,8 @@ the module's files in address order (`docs/source-files.md`), one commit per fil
   translate its names to ours and credit it with its URL in the commit; never copy its code). pret's decomps name the
   Gen 4 shapes. A name you can't support stays as it is: an `unk_2E4` with a known offset is better than a wrong word.
 - **The file's conventions:** a field effect's table slots are `_Create`/`_Delete` and its task's `_Init`, `_Exit`,
-  `_Update`, `_Draw`; a script command's handler is `sNNNN_Name` with the command number, as swan's are
-  (`s0207_WordSetPasserbyCount`), and a file header that says its names are swan's marks the new ones as ours; a set of
+  `_Update`, `_Draw`; a script command's handler is `Scrcmd_<Group>_<Name>`, `<Group>` its `scrcmd_<group>.c` file and
+  `<Name>` the command's name in the scripts (`Scrcmd_Msg_InfoMsgClose`, `docs/scripts.md`), swan's included; a set of
   near-identical functions told apart only by their arguments is numbered (`InitFaceDirSet0`..`3`).
 - **Copies stay address-named** where a name would mislead: a copy-pasted duplicate that does something other than its
   name suggests. Say so in the commit.

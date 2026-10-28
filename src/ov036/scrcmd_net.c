@@ -16,7 +16,7 @@
 #include "system/game_system.h"
 #include "system/vm.h"
 
-BOOL s013A_GameCommGetStatus(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Net_GameCommGetStatus(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     u16 *result = ScriptReadVar(vm, env);
 
@@ -24,21 +24,21 @@ BOOL s013A_GameCommGetStatus(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL s015B_WifiListHasValidProfile(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Net_WifiListHasValidProfile(VM *vm, FieldScriptEnv *env) {
     u16 *result = ScriptReadVar(vm, env);
 
     *result = WifiList_HasValidProfile(GameData_GetWifiList(FieldScriptEnv_GetGameData(env)));
     return FALSE;
 }
 
-BOOL s015C_WifiListCountFriends(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Net_WifiListCountFriends(VM *vm, FieldScriptEnv *env) {
     u16 *result = ScriptReadVar(vm, env);
 
     *result = WifiList_CountFriends(GameData_GetWifiList(FieldScriptEnv_GetGameData(env)));
     return FALSE;
 }
 
-BOOL s015D_NetConnectWiFiClub(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Net_NetConnectWiFiClub(VM *vm, FieldScriptEnv *env) {
     EventWifiClubArgs args;
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
@@ -50,7 +50,7 @@ BOOL s015D_NetConnectWiFiClub(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL s015E_NetConnectGTS(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Net_NetConnectGTS(VM *vm, FieldScriptEnv *env) {
     EventWorldTradeArgs args;
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
@@ -62,7 +62,7 @@ BOOL s015E_NetConnectGTS(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL s0162_NetConnectGTSNegotiation(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Net_NetConnectGTSNegotiation(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
 

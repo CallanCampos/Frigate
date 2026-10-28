@@ -17,7 +17,7 @@ enum {
 };
 
 // Runs Poké Transfer, whose DS Download Play parent sends the game to the other system
-static BOOL PalParkCmd_CallMbParent(VM *vm, FieldScriptEnv *env) {
+static BOOL Scrcmd_Palpark_CallMbParent(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     GameData *gameData = FieldScriptEnv_GetGameData(env);
@@ -32,7 +32,7 @@ static BOOL PalParkCmd_CallMbParent(VM *vm, FieldScriptEnv *env) {
 }
 
 // Sets a variable to the last Poké Transfer's result or the high score (PAL_PARK_INFO_*, a byte in the script)
-static BOOL PalParkCmd_GetInfo(VM *vm, FieldScriptEnv *env) {
+static BOOL Scrcmd_Palpark_GetInfo(VM *vm, FieldScriptEnv *env) {
     u8 info = VM_Read8(vm);
     u16 *var = ScriptReadVar(vm, env);
     TrainerGameInfoSave *gameInfo = getTrainerGameInfoAddress(GameData_GetSaveControl(FieldScriptEnv_GetGameData(env)));
@@ -49,7 +49,7 @@ static BOOL PalParkCmd_GetInfo(VM *vm, FieldScriptEnv *env) {
 }
 
 const FieldScriptCommand PAL_PARK_SCRIPT_COMMANDS[] = {
-    PalParkCmd_CallMbParent,
-    PalParkCmd_GetInfo,
+    Scrcmd_Palpark_CallMbParent,
+    Scrcmd_Palpark_GetInfo,
     (FieldScriptCommand)0xFFFFFFFF,
 };

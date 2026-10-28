@@ -8,7 +8,7 @@
 #include "system/vm.h"
 
 BOOL func_ov012_02169c1c(VM *vm, FieldScriptEnv *env);
-BOOL s023C_NuvemaGimmickPlay(VM *vm, FieldScriptEnv *env);
-BOOL s023D_NuvemaGimmickWaitAnim(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_SpPoke_NuvemaGimmickPlay(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_SpPoke_NuvemaGimmickWaitAnim(VM *vm, FieldScriptEnv *env);
 
 #endif // POKEBW2_FIELD_SCRCMD_SP_POKE_H

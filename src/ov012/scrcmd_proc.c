@@ -35,14 +35,14 @@ struct BagScriptResult {
     u16 *item;
 };
 
-BOOL s014A_FieldOpen(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Proc_FieldOpen(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     ScriptWork_CallEvent(work, EventFieldOpen_CreateHeadless(gsys));
     return TRUE;
 }
 
-BOOL s014B_FieldClose(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Proc_FieldClose(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     Field *field = GSYS_GetField(gsys);
@@ -95,7 +95,7 @@ BOOL WaitScrCmdOverlayProcess(VM *vm, void *data) {
     return TRUE;
 }
 
-BOOL s014C_RTFreeUserHeap(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Proc_RTFreeUserHeap(VM *vm, FieldScriptEnv *env) {
     ScriptWork_FreeUserHeap(FieldScriptEnv_GetScriptWork(env));
     return TRUE;
 }
@@ -113,7 +113,7 @@ void CallBag_ReadResult(ScriptOverlayWork *work) {
     GFL_HeapFree(work->resource);
 }
 
-BOOL s014E_CallBag(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Proc_CallBag(VM *vm, FieldScriptEnv *env) {
     u16 mode;
     u16 *hasSelection;
     u16 *item;
@@ -152,7 +152,7 @@ void CallMailbox_ReadResult(void *arg) {
     GFL_HeapFree(work->resource);
 }
 
-BOOL s0150_CallMailbox(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Proc_CallMailbox(VM *vm, FieldScriptEnv *env) {
     ScriptWork *scriptWork;
     GameSystem *gsys;
     GameData *gameData;
@@ -195,7 +195,7 @@ void MoveReminder_ReadResult(void *arg) {
     MoveReminderProcessData_Free(work->resource);
 }
 
-BOOL s01D6_MoveReminderCallMoveSelect(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Proc_MoveReminderCallMoveSelect(VM *vm, FieldScriptEnv *env) {
     ScriptWork *scriptWork;
     GameSystem *gsys;
     GameData *gameData;
@@ -235,7 +235,7 @@ BOOL s01D6_MoveReminderCallMoveSelect(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL s016E_CallMonolith(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Proc_CallMonolith(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys;
     GameCommSys *commSys;
     GameData *gameData;
@@ -261,7 +261,7 @@ BOOL s016E_CallMonolith(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL s0154_Call3DDemo(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Proc_Call3DDemo(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work;
     GameSystem *gsys;
     u16 demoId;
@@ -279,7 +279,7 @@ BOOL s0154_Call3DDemo(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL s0151_CallPokedexDiploma(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Proc_CallPokedexDiploma(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys;
     GameData *gameData;
     PlayerInfo *playerInfo;
@@ -328,7 +328,7 @@ BOOL s0151_CallPokedexDiploma(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL s0153_callPoke3Select(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Proc_callPoke3Select(VM *vm, FieldScriptEnv *env) {
     u16 *result;
     PselParam *param;
 
@@ -339,13 +339,13 @@ BOOL s0153_callPoke3Select(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL s015F_Nop(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Proc_Nop(VM *vm, FieldScriptEnv *env) {
     FieldScriptEnv_GetScriptWork(env);
     FieldScriptEnv_GetGameSystem(env);
     return TRUE;
 }
 
-BOOL s0160_NetConnectWiFiBattle(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Proc_NetConnectWiFiBattle(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work;
     GameSystem *gsys;
     u16 battleType;
@@ -393,7 +393,7 @@ BOOL s0160_NetConnectWiFiBattle(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL s0161_NetConnectBattleVideo(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Proc_NetConnectBattleVideo(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work;
     GameSystem *gsys;
     u16 mode;

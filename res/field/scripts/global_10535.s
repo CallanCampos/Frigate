@@ -119,7 +119,7 @@ Script_1:
 
 L_0172:
     ActorPairSet 0x8000, 0x8001, 0x8002, 0x8003, 0x8004
-    ScriptNative_SetActorZoneDeleteOff 254
+    SetActorZoneDeleteOff 254
     RTEndGlobal
     VMHalt
 

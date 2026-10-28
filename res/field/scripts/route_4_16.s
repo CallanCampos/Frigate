@@ -410,7 +410,7 @@ Script_10:
     ScreamMsg Route416_Text_RaRaRaRa, 2
     PVWait
     MsgWaitAdvance
-    InfoMsgClose_0039
+    InfoMsgClose
     WorkSetConst 0x8024, 0
     WorkSetConst 0x8024, 128
     WorkOr 0x8024, 8
@@ -450,7 +450,7 @@ L_062B:
     // "Braviary flew off into the sky..."
     SystemMsg Route416_Text_BraviaryFlewOffInto, 2
     LastKeyWait
-    InfoMsgClose
+    SystemMsgClose
     VMJump L_063B
 
 L_063B:

@@ -37,8 +37,8 @@
 #define HOLLOW_FILE_VERSION 0
 #endif
 
-// What s0294_HiddenHollowGetParam gives of the grotto's slot: the Pokémon's species, level, form and whether it is
-// female, the item in a ball or the hidden item, whether the slot is a hidden item, and the grotto
+// What Scrcmd_HiddenHollow_HiddenHollowGetParam gives of the grotto's slot: the Pokémon's species, level, form and
+// whether it is female, the item in a ball or the hidden item, whether the slot is a hidden item, and the grotto
 enum {
     HIDDEN_HOLLOW_PARAM_SPECIES,
     HIDDEN_HOLLOW_PARAM_LEVEL,
@@ -111,7 +111,7 @@ static void CreateMissionHiddenHollowPokemonActor(HollowEventWork *work);
 static void ActivateHiddenHollowMission(HollowEventWork *work);
 static u32 GetHiddenHollowMissionLevel(u32 hollow);
 
-BOOL s0294_HiddenHollowGetParam(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_HiddenHollow_HiddenHollowGetParam(VM *vm, FieldScriptEnv *env) {
     FesGimmick *gimmick;
     Field *field;
     u8 slot;
@@ -209,7 +209,7 @@ BOOL s0294_HiddenHollowGetParam(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s0295_HiddenHollowReset(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_HiddenHollow_HiddenHollowReset(VM *vm, FieldScriptEnv *env) {
     GameData *gameData;
     Field *field;
     RivalDataSave *rival;
@@ -234,7 +234,7 @@ BOOL s0295_HiddenHollowReset(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL s0293_HiddenHollowCallWarpIn(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_HiddenHollow_HiddenHollowCallWarpIn(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     GameData *gameData = FieldScriptEnv_GetGameData(env);
     ScriptWork *scriptWork = FieldScriptEnv_GetScriptWork(env);
@@ -369,7 +369,7 @@ static void CreateHiddenHollowItemActor(MMSys *actors) {
     SetActorSCRID(actor, 2);
 }
 
-BOOL s0296_HiddenHollowCallWarpOut(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_HiddenHollow_HiddenHollowCallWarpOut(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     GameData *gameData = FieldScriptEnv_GetGameData(env);
     ScriptWork *scriptWork = FieldScriptEnv_GetScriptWork(env);
@@ -430,7 +430,7 @@ static HollowSlot *getSlotFilePtr(HollowFile *file, u32 slot) {
     return &file->slots[HOLLOW_FILE_VERSION][slot];
 }
 
-BOOL s02E5_HiddenHollowSet(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_HiddenHollow_HiddenHollowSet(VM *vm, FieldScriptEnv *env) {
     GameData *gameData = FieldScriptEnv_GetGameData(env);
     u8 hollow = ScriptReadAny(vm, env);
     u16 slot = ScriptReadAny(vm, env);
@@ -466,7 +466,7 @@ static void ActivateHiddenHollowMission(HollowEventWork *work) {
     }
 }
 
-BOOL s02E6_HiddenHollowCreateEvents(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_HiddenHollow_HiddenHollowCreateEvents(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     GameData *gameData = FieldScriptEnv_GetGameData(env);
     RivalDataSave *rival;

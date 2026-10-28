@@ -24,9 +24,9 @@ Script_1:
     // "Welcome, challenger![f000]븁\u0000"
     ActorMsg MSGFILE_SCRIPT, PokemonLeague9_Text_WelcomeChallenger, 0, 1, 0
     MsgWinCloseAll
-    PokemonLeagueCmd_CallChampionChangeEvent
-    PokemonLeagueCmd_HideChampionActorShadow 0
-    PokemonLeagueCmd_HideChampionActorShadow 255
+    CallChampionChangeEvent
+    HideChampionActorShadow 0
+    HideChampionActorShadow 255
     SEPlay SEQ_SE_SW_CHAMPIRIS_01
     VMSleep 60
     ActorCmdExec 0, Movement_044C
@@ -94,7 +94,7 @@ L_013E:
     ActorCmdExec 0, Movement_04AC
     ActorCmdWait
     VMSleep 30
-    PokemonLeagueCmd_SetChampionRoomOpen
+    SetChampionRoomOpen
     VMStackPushFlag EVENT_FLAG_0x0960
     VMStackPushConst 0
     VMStackCmp CMP_EQ
@@ -180,7 +180,7 @@ L_027F:
     EvCameraWait
     EvCameraRebind
     EvCameraEnd
-    PokemonLeagueCmd_CallChampionOpenEvent
+    CallChampionOpenEvent
     SEPlay SEQ_SE_SW_CHAMPIRIS_02
     SEPlay SEQ_SE_SW_CHAMPIRIS_06
     VMSleep 130
@@ -212,9 +212,9 @@ L_027F:
     VMSleep 2
     ActorCmdExec 0, Movement_0474
     ActorCmdWait
-    PokemonLeagueCmd_ShowChampionActorShadow 0
-    PokemonLeagueCmd_ShowChampionActorShadow 255
-    PokemonLeagueCmd_ShowChampionActorShadow 251
+    ShowChampionActorShadow 0
+    ShowChampionActorShadow 255
+    ShowChampionActorShadow 251
     RTReserveScript 1
     MapChangeWarp ZONE_POKEMON_LEAGUE_10, 8, 19, 0
     FinishAllEvents
@@ -244,7 +244,7 @@ L_03BF:
     VMJump L_03D3
 
 L_03D3:
-    PokemonLeagueCmd_HideChampionActorShadow 251
+    HideChampionActorShadow 251
     EvCameraInit
     EvCameraUnbind
     EvCameraMoveTo 10317, 0, 0x72000, 0x108000, 0xd00cf, 0x31b000, 1

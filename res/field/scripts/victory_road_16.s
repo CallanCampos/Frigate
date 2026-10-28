@@ -18,7 +18,7 @@ Script_1:
     BGMPlay SEQ_BGM_E_HUE
     // "Wait up![f000]븁\u0000"
     InfoMsg VictoryRoad16_Text_WaitUp, 2
-    InfoMsgClose_0039
+    InfoMsgClose
     ActorCmdExec 255, Movement_018C
     ActorCmdWait
     WorkAdd 0x8021, 2

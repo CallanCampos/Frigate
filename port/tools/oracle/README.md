@@ -1316,7 +1316,7 @@ failure to fix, never a known difference. By kind:
   5063–5066 and White 2 frames 17987–17990 / 18067–18070 for the four-pixel scrolls (`BALLOON_SCROLL`). The latter
   follow `PrintStream_Task`'s bitmap copy/fill and `BmpWin_FlushChar`; the native text interior equals the same-counter
   DS interior shifted upward four pixels, exactly, and the next DS picture matches the native one. The InfoMsg
-  follows `s0038_InfoMsg` → `MsgBGPrinter_CreatePlainWin` → `TalkMsgWin_AddFrameWindow` → char/map flushes and direct
+  follows `Scrcmd_Msg_InfoMsg` → `MsgBGPrinter_CreatePlainWin` → `TalkMsgWin_AddFrameWindow` → char/map flushes and direct
   `GX_LoadBGnChar/Scr` copies. A fresh Black 2 trace dumps the whole main BG VRAM (`0x06000000:0x80000`), main palette
   and OAM at DS frames 6588 and 6589: all are identical at frame end, although the window appears on the LCD only
   in 6589. Its rectangle equals native frame 4530 exactly. The same source path and adjacent-frame rectangle match

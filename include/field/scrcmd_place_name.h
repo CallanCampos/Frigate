@@ -8,6 +8,6 @@
 #include "struct_decls.h"
 #include "system/vm.h"
 
-BOOL s023F_CallPlaceNameDisp(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_PlaceName_CallPlaceNameDisp(VM *vm, FieldScriptEnv *env);
 
 #endif // POKEBW2_FIELD_SCRCMD_PLACE_NAME_H

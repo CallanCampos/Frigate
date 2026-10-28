@@ -220,7 +220,7 @@ L_0241:
     InfoMsg NacreneCity_Text_Kyouuuun, 1
     PVWait
     MsgWaitAdvance
-    InfoMsgClose_0039
+    InfoMsgClose
     PlayerGetGPos 0x8021, 0x8022
     ActorAdd 0
     ActorSetGPos 0, 633, 2, 580, 3
@@ -249,7 +249,7 @@ Script_6:
     ScreamMsg NacreneCity_Text_Kyouuuun, 2
     PVWait
     MsgWaitAdvance
-    InfoMsgClose_0039
+    InfoMsgClose
     CallWildBattle 480, 65, 1
     WildBattleIsVictory 0x8010
     VMStackPush 0x8010
@@ -286,7 +286,7 @@ L_0337:
     // "Uxie went flying off somewhere..."
     SystemMsg NacreneCity_Text_UxieWentFlyingOff, 2
     LastKeyWait
-    InfoMsgClose
+    SystemMsgClose
     VMJump L_0347
 
 L_0347:

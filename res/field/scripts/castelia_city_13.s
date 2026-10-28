@@ -72,7 +72,7 @@
     WorkSetConst 0x8053, 0
 
 L_017A:
-    ListMenu_AnchorTopRight 31, 10, 0x8008, 1, 32784
+    ListMenuAnchorTopRight 31, 10, 0x8008, 1, 32784
     ListMenuAdd 4, 65535, 0
     ListMenuAdd 5, 65535, 1
     ListMenuShow
@@ -104,7 +104,7 @@ Script_1:
     VMJumpIf CMP_STACK, L_01FF
     VMCall L_4298
     FlagSet EVENT_FLAG_0x00cc
-    SurveyCmd_RaiseRank
+    SurveyRaiseRank
     VMCall L_01B0
     VMCall L_0236
     VMJump L_0230
@@ -211,7 +211,7 @@ L_030E:
 
 L_034C:
     VMCall L_4401
-    SurveyCmd_Clear
+    SurveyClear
 
 L_0354:
     VMJump L_0360
@@ -233,7 +233,7 @@ L_0362:
 
 L_0387:
     SurveyGetCurrentQuestionID 0x8022
-    SurveyCmd_GetQuestionState 0x8022, 0x8023
+    SurveyGetQuestionState 0x8022, 0x8023
     VMStackPush 0x8023
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -255,7 +255,7 @@ L_03B8:
 
 L_03E3:
     VMCall L_4401
-    SurveyCmd_Clear
+    SurveyClear
 
 L_03EB:
     VMReturn
@@ -311,7 +311,7 @@ L_0460:
     VMJumpIf CMP_STACK, L_0578
     WorkGet 0x8008, 0x8024
     VMCall L_463F
-    SurveyCmd_GetQuestionState 0x8024, 0x8027
+    SurveyGetQuestionState 0x8024, 0x8027
     VMStackPush 0x8027
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -369,7 +369,7 @@ L_0584:
     VMReturn
 
 L_058C:
-    SurveyCmd_GetRank 0x8028
+    SurveyGetRank 0x8028
     VMCall L_369C
     VMCall L_518D
     VMCall L_4447
@@ -386,7 +386,7 @@ L_058C:
     VMJump L_0627
 
 L_05DF:
-    SurveyCmd_GetRank 0x8029
+    SurveyGetRank 0x8029
     VMStackPush 0x8028
     VMStackPush 0x8029
     VMStackCmp CMP_NE
@@ -432,21 +432,21 @@ L_0657:
 
 L_0679:
     VMCall L_1E49
-    SurveyCmd_Start 0x8024, 0x8009, 0x800a, 0x800b
+    SurveyStart 0x8024, 0x8009, 0x800a, 0x800b
     VMReturn
 
 L_068B:
     SurveyGetCurrentQuestionID 0x8040
     WorkGet 0x8008, 0x8040
     VMCall L_06C0
-    SurveyCmd_Clear
+    SurveyClear
     VMCall L_0C58
     WorkGet 0x8032, 0x8010
     VMStackPush 0x8032
     VMStackPushConst 0
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_06BE
-    SurveyCmd_RaiseRank
+    SurveyRaiseRank
 
 L_06BE:
     VMReturn
@@ -900,7 +900,7 @@ L_0C50:
 L_0C58:
     VMCall L_0BFA
     WorkGet 0x8041, 0x8010
-    SurveyCmd_GetRank 0x8040
+    SurveyGetRank 0x8040
     WorkCmpConst 0x8040, 1
     VMJumpIf CMP_EQ, L_0C7B
     VMJump L_0C87
@@ -3414,7 +3414,7 @@ L_2F28:
     SurveyGetCurrentQuestionID 0x804d
     // "What would you like to do today?"
     ActorMsg MSGFILE_SCRIPT, CasteliaCity13_Text_WhatWouldLikeToday, 0x8011, 2, 0
-    ListMenu_AnchorTopRight 31, 1, 0, 1, 32784
+    ListMenuAnchorTopRight 31, 1, 0, 1, 32784
     ListMenuAdd 12, 65535, 12
     VMStackPush 0x804d
     VMStackPushConst 0
@@ -3429,7 +3429,7 @@ L_2F64:
     VMReturn
 
 L_2F78:
-    ListMenu_AnchorTopRight 31, 1, 0, 1, 32784
+    ListMenuAnchorTopRight 31, 1, 0, 1, 32784
     ListMenuAdd 18, 65535, 0
     ListMenuAdd 17, 65535, 1
     ListMenuAdd 19, 65535, 2
@@ -3438,7 +3438,7 @@ L_2F78:
 
 L_2F9D:
     WorkSetConst 0x8054, 0
-    ListMenu_AnchorTopRight 31, 1, 0, 1, 32784
+    ListMenuAnchorTopRight 31, 1, 0, 1, 32784
     WorkCmpConst 0x8008, 0
     VMJumpIf CMP_EQ, L_2FBF
     VMJump L_331B
@@ -4289,7 +4289,7 @@ L_3C32:
 L_3C34:
     SEPlay SEQ_SE_SYS_80
     SystemMsg 0x804e, 2
-    InfoMsgClose
+    SystemMsgClose
     VMReturn
 
 L_3C42:
@@ -4713,11 +4713,11 @@ L_41D8:
 L_41DA:
     SEPlay SEQ_SE_SYS_80
     SystemMsg 0x804e, 2
-    InfoMsgClose
+    SystemMsgClose
     VMReturn
 
 L_41E8:
-    SurveyCmd_GetRank 0x8040
+    SurveyGetRank 0x8040
     WorkCmpConst 0x8040, 1
     VMJumpIf CMP_EQ, L_41FF
     VMJump L_420B
@@ -4766,7 +4766,7 @@ L_4287:
     SEPlay SEQ_SE_SYS_82
     WordSetPlayerName 1
     SystemMsg 0x8041, 2
-    InfoMsgClose
+    SystemMsgClose
     VMReturn
 
 L_4298:
@@ -4777,7 +4777,7 @@ L_4298:
     WordSetPlayerName 1
     // "[f000]Ā\u0001\u0001 was appointed\nas a statistician![f000]븁\u0000"
     SystemMsg CasteliaCity13_Text_AppointedStatistician, 2
-    InfoMsgClose
+    SystemMsgClose
     WordSetPlayerName 1
     // "Statisticians have only one task!\nThey conduct requested surveys.[f000]븁\u0000\nFirst, you'll receive survey requests\nfrom me.[f000]븁\u0000\nThen, with the Survey Radar, you'll\nchoose the survey you want to conduct.[f000]븁\u0000\nThen, if you pass by a lot of people,\nthe radar will collect the information.[f000]븁\u0000\nOf course, we've prepared compensation\nfor the survey.[f000]븁\u0000\nStatistician [f000]Ā\u0001\u0001!\nI expect you to do a great job![f000]븁\u0000"
     ActorMsg MSGFILE_SCRIPT, CasteliaCity13_Text_StatisticiansHaveOnlyOne, 0x8011, 2, 0
@@ -4825,7 +4825,7 @@ L_4327:
 
 L_433B:
     WorkGet 0x8040, 0x8008
-    SurveyCmd_GetRank 0x8041
+    SurveyGetRank 0x8041
     WorkCmpConst 0x8040, 0
     VMJumpIf CMP_EQ, L_4358
     VMJump L_4376
@@ -4959,7 +4959,7 @@ L_44C3:
     VMReturn
 
 L_44D6:
-    SurveyCmd_GetRank 0x8040
+    SurveyGetRank 0x8040
     WorkCmpConst 0x8040, 1
     VMJumpIf CMP_EQ, L_44ED
     VMJump L_44F9
@@ -5010,7 +5010,7 @@ L_4575:
     VMReturn
 
 L_4585:
-    SurveyCmd_GetRank 0x8032
+    SurveyGetRank 0x8032
     WorkCmpConst 0x8032, 1
     VMJumpIf CMP_EQ, L_459C
     VMJump L_45A8
@@ -6373,7 +6373,7 @@ L_57C0:
 L_57CE:
     WorkGet 0x802e, 0x8008
     SurveyGetCurrentQuestionID 0x802b
-    SurveyCmd_GetCurrentRemaining 0x802d
+    SurveyGetCurrentRemaining 0x802d
     WorkCmpConst 0x802e, 2
     VMJumpIf CMP_EQ, L_57EF
     VMJump L_57FC
@@ -7287,7 +7287,7 @@ L_643C:
     WorkGet 0x8008, 0x802a
     WorkGet 0x8009, 0x802b
     VMCall L_74D5
-    SurveyCmd_WriteOwnAnswer 0x802b, 0x8010
+    SurveyWriteOwnAnswer 0x802b, 0x8010
     VMStackPush 0x802a
     VMStackPushConst 0
     VMStackCmp CMP_EQ
@@ -7322,7 +7322,7 @@ L_64C5:
     WorkGet 0x8008, 0x802a
     WorkGet 0x8009, 0x802b
     VMCall L_7614
-    SurveyCmd_WriteOwnAnswer 0x802b, 0x8010
+    SurveyWriteOwnAnswer 0x802b, 0x8010
     VMStackPush 0x802c
     VMStackPushConst 255
     VMStackCmp CMP_NE
@@ -7349,7 +7349,7 @@ L_6531:
     WorkGet 0x8008, 0x802a
     WorkGet 0x8009, 0x802b
     VMCall L_7753
-    SurveyCmd_WriteOwnAnswer 0x802b, 0x8010
+    SurveyWriteOwnAnswer 0x802b, 0x8010
     WorkSetConst 0x8010, 1
     VMReturn
 
@@ -7535,7 +7535,7 @@ L_6793:
     VMReturn
 
 L_6795:
-    ListMenu_AnchorTopRight 31, 1, 0, 1, 32784
+    ListMenuAnchorTopRight 31, 1, 0, 1, 32784
     ListMenuAdd 269, 65535, 0
     ListMenuAdd 270, 65535, 1
     ListMenuAdd 271, 65535, 2
@@ -7553,7 +7553,7 @@ L_67F2:
     VMCall L_6D84
     WorkGet 0x8040, 0x8009
     WorkGet 0x8041, 0x800a
-    ListMenu_AnchorTopRight 31, 1, 0, 0, 32784
+    ListMenuAnchorTopRight 31, 1, 0, 0, 32784
     WorkGet 0x8042, 0x8040
     WorkSetConst 0x8043, 1
 
@@ -8337,7 +8337,7 @@ L_72FF:
 L_7301:
     SEPlay SEQ_SE_SYS_82
     SystemMsg 0x804d, 2
-    InfoMsgClose
+    SystemMsgClose
     VMReturn
 
 L_730F:
@@ -8928,7 +8928,7 @@ Script_5:
     WordSetPlayerName 1
     // "[f000]Ā\u0001\u0001 received a Poké Ball.[f000]븁\u0000"
     SystemMsg CasteliaCity13_Text_ReceivedPokeBall, 2
-    InfoMsgClose
+    SystemMsgClose
     // "Please remember to thank someone\nwho helps you![f000]븁\u0000\nIt may sound trivial, but it's important.[f000]븁\u0000\nNow, will you tell me your\nfeeling of gratitude?"
     ActorMsg MSGFILE_SCRIPT, CasteliaCity13_Text_PleaseRememberThankSomeone, 0x8011, 2, 0
     VMJump L_7ABD
@@ -9029,7 +9029,7 @@ L_7BDE:
 
 Script_7:
     ActorsPauseAll
-    SurveyCmd_GetRank 0x8010
+    SurveyGetRank 0x8010
     WorkCmpConst 0x8010, 1
     VMJumpIf CMP_EQ, L_7BFD
     VMJump L_7C09
@@ -9090,7 +9090,7 @@ L_7C8B:
 
 Script_8:
     ActorsPauseAll
-    SurveyCmd_GetRank 0x8010
+    SurveyGetRank 0x8010
     WorkCmpConst 0x8010, 1
     VMJumpIf CMP_EQ, L_7CC3
     VMJump L_7CCF
@@ -9151,7 +9151,7 @@ L_7D51:
 
 Script_9:
     ActorsPauseAll
-    SurveyCmd_GetRank 0x8010
+    SurveyGetRank 0x8010
     WorkCmpConst 0x8010, 2
     VMJumpIf CMP_EQ, L_7D89
     VMJump L_7D95
@@ -9203,7 +9203,7 @@ L_7DF8:
 
 Script_10:
     ActorsPauseAll
-    SurveyCmd_GetRank 0x8010
+    SurveyGetRank 0x8010
     WorkCmpConst 0x8010, 2
     VMJumpIf CMP_EQ, L_7E30
     VMJump L_7E3C
@@ -9255,7 +9255,7 @@ L_7E9F:
 
 Script_11:
     ActorsPauseAll
-    SurveyCmd_GetRank 0x8010
+    SurveyGetRank 0x8010
     WorkCmpConst 0x8010, 3
     VMJumpIf CMP_EQ, L_7ED7
     VMJump L_7EE3
@@ -9298,7 +9298,7 @@ L_7F27:
 
 Script_12:
     ActorsPauseAll
-    SurveyCmd_GetRank 0x8010
+    SurveyGetRank 0x8010
     WorkCmpConst 0x8010, 4
     VMJumpIf CMP_EQ, L_7F5F
     VMJump L_7F6B
@@ -9332,7 +9332,7 @@ L_7F90:
 
 Script_13:
     ActorsPauseAll
-    SurveyCmd_GetRank 0x8010
+    SurveyGetRank 0x8010
     WorkCmpConst 0x8010, 5
     VMJumpIf CMP_EQ, L_7FC8
     VMJump L_7FD4
@@ -9358,7 +9358,7 @@ L_7FDA:
 Script_14:
     ActorsPauseAll
     SEPlay SEQ_SE_MESSAGE
-    SurveyCmd_ShowRankMessage
+    SurveyShowRankMessage
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt
@@ -9397,7 +9397,7 @@ L_8064:
     VMHalt
 
 Script_15:
-    SurveyCmd_GetRank 0x8010
+    SurveyGetRank 0x8010
     FlagSet EVENT_FLAG_0x027d
     FlagSet EVENT_FLAG_0x027e
     FlagSet EVENT_FLAG_0x027f

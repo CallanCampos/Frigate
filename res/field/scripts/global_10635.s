@@ -35,7 +35,7 @@ L_0073:
     VMHalt
 
 L_0075:
-    PokemonCenterCmd_Medal 1000
+    Medal 1000
     VMCall L_00E2
     VMStackPush 0x8010
     VMStackPushConst 1
@@ -208,7 +208,7 @@ L_032F:
     SystemMsg Global10635_Text_ReceivedHintMedal, 0
 
 L_0335:
-    InfoMsgClose
+    SystemMsgClose
     // "For your information,\nyou can get Medals if you meet[f000]븀\u0000\ntheir conditions.[f000]븁\u0000\nGo to a Pokémon Center,\nand you can get Medals from me[f000]븀\u0000\none after another![f000]븁\u0000\nFirst, please use your Medal Box and\ncheck the inside![f000]븁\u0000"
     ActorMsg MSGFILE_SCRIPT, Global10635_Text_InformationCanGetMedals, 1, 0, 0
     ActorMsgClose
@@ -328,7 +328,7 @@ L_04AA:
     // "[f000]Ā\u0001\u0000. I've been waiting for you!\nYou're doing terrific![f000]븀\u0000\nHere's a new Medal![f000]븁\u0000"
     ParentActorMsg MSGFILE_SCRIPT, Global10635_Text_IveBeenWaitingYoure, 0, 0
     ActorMsgClose
-    PokemonCenterCmd_FindEarnedMedal 0x8010, 0x8020
+    FindEarnedMedal 0x8010, 0x8020
     VMStackPush 0x8010
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -336,7 +336,7 @@ L_04AA:
     VMCall L_0771
 
 L_04D8:
-    PokemonCenterCmd_FindEarnedMedal 0x8010, 0x8020
+    FindEarnedMedal 0x8010, 0x8020
 
 L_04DE:
     VMStackPush 0x8010
@@ -347,7 +347,7 @@ L_04DE:
     ParentActorMsg MSGFILE_SCRIPT, Global10635_Text_HaveAnotherMedalWant, 0, 0
     ActorMsgClose
     VMCall L_0771
-    PokemonCenterCmd_FindEarnedMedal 0x8010, 0x8020
+    FindEarnedMedal 0x8010, 0x8020
     VMJump L_04DE
 
 L_050F:
@@ -383,8 +383,8 @@ L_056F:
     SystemMsg Global10635_Text_ReceivedHintMedal, 0
 
 L_0575:
-    InfoMsgClose
-    PokemonCenterCmd_Medal 1002
+    SystemMsgClose
+    Medal 1002
     MedalGetCount 5, 0x8010
     VMStackPush 0x8010
     VMStackPushConst 0
@@ -415,7 +415,7 @@ L_05C9:
     VMStackPushConst 1
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_06B9
-    PokemonCenterCmd_Medal 1003
+    Medal 1003
     MedalGetCount 7, 0x8021
     WordSetMedalRank 1, 0x8021
     // "[f000]Ā\u0001\u0000's Medal Box\nhas been upgraded to[f000]븀\u0000\n[f000][ff00]\u0001\u0002[f000]Ķ\u0001\u0001[f000][ff00]\u0001\u0000 Rank!"
@@ -423,7 +423,7 @@ L_05C9:
     MEPlay SEQ_ME_MD_FAN01
     MEWait
     MsgWaitAdvance
-    InfoMsgClose
+    SystemMsgClose
     // "In commemoration of the upgrade,\nI'll give you a Medal, as well![f000]븁\u0000"
     ParentActorMsg MSGFILE_SCRIPT, Global10635_Text_CommemorationUpgradeIllGive, 0, 0
     ActorMsgClose
@@ -544,7 +544,7 @@ L_0771:
     WordSetMedalName 1, 0x8020
     // "[f000]Ā\u0001\u0000 obtained\nthe [f000][ff00]\u0001\u0002[f000]ĵ\u0001\u0001[f000][ff00]\u0001\u0000 Medal.[f000]븁\u0000"
     SystemMsg Global10635_Text_ObtainedMedal, 0
-    InfoMsgClose
+    SystemMsgClose
     VMReturn
     .balign 4, 0
 

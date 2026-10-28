@@ -113,7 +113,7 @@ L_019F:
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_02B9
     WorkSetConst 0x8020, 0
-    ListMenu_AnchorTopRight 31, 1, 0, 1, 32805
+    ListMenuAnchorTopRight 31, 1, 0, 1, 32805
     ListMenuAdd 30, 65535, 0
     ListMenuAdd 31, 65535, 1
     ListMenuAdd 35, 65535, 2
@@ -212,7 +212,7 @@ L_02EE:
     VMJumpIf CMP_STACK, L_03E4
     // "Which challenge would you like,\nSingle or Double?"
     ActorMsg MSGFILE_SCRIPT, Global10440_Text_WhichChallengeWouldLike, 0x8011, 2, 0
-    ListMenu_AnchorTopRight 31, 1, 0, 1, 32809
+    ListMenuAnchorTopRight 31, 1, 0, 1, 32809
     ListMenuAdd 33, 65535, 0
     ListMenuAdd 34, 65535, 1
     ListMenuAdd 32, 65535, 2
@@ -290,7 +290,7 @@ L_044A:
     // "Then, let's begin.[f000]븁\u0000\nPlease bear in mind that once you start\nthe challenge, you will face five battles[f000]븀\u0000\nwithout a break.[f000]븁\u0000\nNow, please choose the Pokémon you would\nlike to battle with.[f000]븁\u0000"
     ActorMsg MSGFILE_SCRIPT, Global10440_Text_ThenLetsBeginPlease, 0x8011, 2, 0
     ActorMsgClose
-    Regulation_CheckPartyRegulation 0x802b, 0x802a
+    CheckPartyRegulation 0x802b, 0x802a
     VMStackPush 0x802a
     VMStackPushConst 2
     VMStackCmp CMP_EQ
@@ -335,7 +335,7 @@ L_04E8:
     // "Saving...\nDon't turn off the power."
     SystemMsgAsync Global10440_Text_SavingDontTurnOff, 2
     TrialHouseSaveData 1
-    InfoMsgClose
+    SystemMsgClose
 
 L_0507:
     RecordAdd 121, 1
@@ -547,7 +547,7 @@ L_0824:
     VMSleep 1
     MsgSetLoadingSpinner 0
     TrialHouseDownloadExamination 0x8010
-    InfoMsgClose
+    SystemMsgClose
     VMStackPush 0x8010
     VMStackPushConst 0
     VMStackCmp CMP_EQ
@@ -734,7 +734,7 @@ Script_2:
     // "There is no test result to display now."
     SystemMsgAsync Global10440_Text_ThereNoTestResult, 2
     LastKeyWait
-    InfoMsgClose
+    SystemMsgClose
     VMJump L_0B70
 
 L_0AB1:
@@ -758,12 +758,12 @@ L_0AD6:
 L_0AFB:
     // "Which test result would you like to see?"
     SystemMsgAsync Global10440_Text_WhichTestResultWould, 2
-    ListMenu_AnchorTopRight 31, 1, 0, 1, 32784
+    ListMenuAnchorTopRight 31, 1, 0, 1, 32784
     ListMenuAdd 36, 65535, 0
     ListMenuAdd 37, 65535, 1
     ListMenuAdd 32, 65535, 2
     ListMenuShow
-    InfoMsgClose
+    SystemMsgClose
     WorkCmpConst 0x8010, 0
     VMJumpIf CMP_EQ, L_0B39
     VMJump L_0B4B

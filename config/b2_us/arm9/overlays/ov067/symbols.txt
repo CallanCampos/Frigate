@@ -1,3 +1,3 @@
-Plugin15Cmd_ShowSplash kind:function(thumb,size=0x40) addr:0x021e5800
-Plugin15Cmd_JumpActorOut kind:function(thumb,size=0x62) addr:0x021e5840
+Scrcmd_Plugin15_ShowSplash kind:function(thumb,size=0x40) addr:0x021e5800
+Scrcmd_Plugin15_JumpActorOut kind:function(thumb,size=0x62) addr:0x021e5840
 PLUGIN_15_SCRIPT_COMMANDS kind:data(any) addr:0x021e58a4 ambiguous

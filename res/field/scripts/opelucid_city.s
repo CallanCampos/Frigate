@@ -1447,11 +1447,11 @@ L_1781:
     // "The Xtransceiver is ringing."
     SystemMsg OpelucidCity_Text_XtransceiverRinging, 2
     MEWait
-    InfoMsgClose
+    SystemMsgClose
     WordSetPlayerName 0
     // "[f000]Ā\u0001\u0000 picked up the Xtransceiver.[f000]븁\u0000"
     SystemMsg OpelucidCity_Text_PickedUpXtransceiver, 2
-    InfoMsgClose
+    SystemMsgClose
     FadeOutBlackQ
     FadeWait
     CallXTransceiver 5, 0

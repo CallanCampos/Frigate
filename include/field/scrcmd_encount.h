@@ -8,13 +8,13 @@
 #include "struct_decls.h"
 #include "system/vm.h"
 
-BOOL s0174_CallWildBattle(VM *vm, FieldScriptEnv *env);
-BOOL s0297_CallWildBattleEx(VM *vm, FieldScriptEnv *env);
-BOOL s0175_CallWildBattleEnd(VM *vm, FieldScriptEnv *env);
-BOOL s0179_CallCaptureDemo(VM *vm, FieldScriptEnv *env);
-BOOL s00BC_PhenomenonGetItemID(VM *vm, FieldScriptEnv *env);
-BOOL ScrcmdProcFld_SpawnMovePokemonIfInactive(VM *vm, FieldScriptEnv *env);
-BOOL s021E_FishingChallengeGetRandomPkm(VM *vm, FieldScriptEnv *env);
-BOOL s02C2_RepelRearm(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_Encount_CallWildBattle(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_Encount_CallWildBattleEx(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_Encount_CallWildBattleEnd(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_Encount_CallCaptureDemo(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_Encount_PhenomenonGetItemID(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_Encount_SpawnMovePokemonIfInactive(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_Encount_FishingChallengeGetRandomPkm(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_Encount_RepelRearm(VM *vm, FieldScriptEnv *env);
 
 #endif // POKEBW2_FIELD_SCRCMD_ENCOUNT_H

@@ -8,8 +8,8 @@
 #include "struct_decls.h"
 #include "system/vm.h"
 
-BOOL s02B8_PedometerStart(VM *vm, FieldScriptEnv *env);
-BOOL s02B9_PedometerEnd(VM *vm, FieldScriptEnv *env);
-BOOL s02BA_PedometerGet(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_Pedometer_PedometerStart(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_Pedometer_PedometerEnd(VM *vm, FieldScriptEnv *env);
+BOOL Scrcmd_Pedometer_PedometerGet(VM *vm, FieldScriptEnv *env);
 
 #endif // POKEBW2_FIELD_SCRCMD_PEDOMETER_H

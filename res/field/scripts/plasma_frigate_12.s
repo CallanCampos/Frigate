@@ -43,10 +43,10 @@ L_0067:
     VMStackPushConst 1
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_0092
-    PlasmaFrigateCmd_SetSwitchLightState 0, 1
-    PlasmaFrigateCmd_SetSwitchLightState 1, 1
-    PlasmaFrigateCmd_SetSwitchLightState 2, 1
-    PlasmaFrigateCmd_SetSwitchLightState 3, 1
+    SetSwitchLightState 0, 1
+    SetSwitchLightState 1, 1
+    SetSwitchLightState 2, 1
+    SetSwitchLightState 3, 1
 
 L_0092:
     VMReturn
@@ -197,7 +197,7 @@ L_02C9:
     VMStackPushConst 0
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_038A
-    PlasmaFrigateCmd_GetPasswordIndex EVENT_WORK_0x400a
+    GetPasswordIndex EVENT_WORK_0x400a
     DebugPrint EVENT_WORK_0x400a
     SEPlay SEQ_SE_SW_PLAZMASHIP_01
     SEWait
@@ -210,7 +210,7 @@ L_02C9:
     VMJumpIf CMP_STACK, L_0382
     MsgWinCloseAll
     WorkSetConst 0x8020, 0
-    PlasmaFrigateCmd_EnterPassword 0x8020
+    EnterPassword 0x8020
     VMStackPush 0x8020
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -221,13 +221,13 @@ L_02C9:
     SEWait
     MsgWaitAdvance
     MsgWinCloseAll
-    PlasmaFrigateCmd_PlaySwitchLightAnim 0
+    PlaySwitchLightAnim 0
     VMSleep 8
-    PlasmaFrigateCmd_PlaySwitchLightAnim 1
+    PlaySwitchLightAnim 1
     VMSleep 8
-    PlasmaFrigateCmd_PlaySwitchLightAnim 2
+    PlaySwitchLightAnim 2
     VMSleep 8
-    PlasmaFrigateCmd_PlaySwitchLightAnim 3
+    PlaySwitchLightAnim 3
     // "All the barriers were deactivated,\nand now you can proceed!"
     SystemMsg PlasmaFrigate12_Text_AllBarriersWereDeactivated, 2
     LastKeyWait

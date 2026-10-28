@@ -319,7 +319,7 @@ Script_10:
     .byte 0x80
     .byte 0x8b
     .byte 0x00
-    ScrcmdProcFld_SpawnMovePokemonIfInactive 100
+    SpawnMovePokemonIfInactive 100
     VMReturn
     .byte 0xde
     .byte 0x09
@@ -1632,7 +1632,7 @@ Script_3:
     .byte 0x00
     .byte 0x8b
     .byte 0x00
-    ScrcmdProcFld_SpawnMovePokemonIfInactive 100
+    SpawnMovePokemonIfInactive 100
     VMReturn
     .byte 0xc1
     .byte 0x03

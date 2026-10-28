@@ -222,7 +222,7 @@ Script_3:
     EvCameraWait
     // "This is the theater![f000]븁\u0000\nOf course, this is where\nthe films are shown.[f000]븀\u0000\nMovie fans from all over[f000]븀\u0000\nalso gather here![f000]븁\u0000\nHow about we have a look inside?[f000]븁\u0000"
     InfoMsg PokestarStudios_Text_TheaterCourseWhereFilms, 2
-    InfoMsgClose_0039
+    InfoMsgClose
     EvCameraMoveToDefault 40
     EvCameraWait
     EvCameraRebind
@@ -260,7 +260,7 @@ Script_33:
     EvCameraWait
     // "This is the filming studio![f000]븁\u0000\nThis is where Pokéstar Studios\nmovies are born![f000]븁\u0000\nWell now, come inside!\nMr. Deeoh should be waiting![f000]븁\u0000"
     InfoMsg PokestarStudios_Text_FilmingStudioWherePokestar, 2
-    InfoMsgClose_0039
+    InfoMsgClose
     EvCameraMoveToDefault 40
     EvCameraWait
     EvCameraRebind

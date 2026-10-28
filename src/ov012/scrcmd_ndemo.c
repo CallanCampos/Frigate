@@ -11,7 +11,7 @@
 
 static GameEventReturnCode EventNDemoEnd_Callback(GameEvent *event, u32 *state, void *data);
 
-BOOL s01C9_NDemoStart(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Ndemo_NDemoStart(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     u8 a0 = VM_Read16(vm);
@@ -29,13 +29,13 @@ BOOL s01C9_NDemoStart(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL s01CB_NDemoReadyTalkMotion(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Ndemo_NDemoReadyTalkMotion(VM *vm, FieldScriptEnv *env) {
     FieldScriptEnv_GetScriptWork(env);
     FaceUp_StartTalk(GSYS_GetField(FieldScriptEnv_GetGameSystem(env)));
     return FALSE;
 }
 
-BOOL s01CA_NDemoEnd(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Ndemo_NDemoEnd(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameEvent *event = GameEvent_Create(FieldScriptEnv_GetGameSystem(env), NULL, EventNDemoEnd_Callback, 0);
 

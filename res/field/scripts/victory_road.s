@@ -214,11 +214,11 @@ Script_14:
 
 Script_2:
     ActorsPauseAll
-    BadgeGateCmd_PlayCheck 0
+    PlayCheck 0
     // "Basic Badge confirmed!"
     SystemMsg VictoryRoad_Text_BasicBadgeConfirmed, 2
     LastKeyWait
-    InfoMsgClose
+    SystemMsgClose
     WorkSetConst EVENT_WORK_0x40e4, 2
     FinishAllEvents
     ActorsUnpauseAll
@@ -226,11 +226,11 @@ Script_2:
 
 Script_3:
     ActorsPauseAll
-    BadgeGateCmd_PlayCheck 1
+    PlayCheck 1
     // "Toxic Badge confirmed!"
     SystemMsg VictoryRoad_Text_ToxicBadgeConfirmed, 2
     LastKeyWait
-    InfoMsgClose
+    SystemMsgClose
     WorkSetConst EVENT_WORK_0x40e5, 2
     FinishAllEvents
     ActorsUnpauseAll
@@ -238,11 +238,11 @@ Script_3:
 
 Script_4:
     ActorsPauseAll
-    BadgeGateCmd_PlayCheck 2
+    PlayCheck 2
     // "Insect Badge confirmed!"
     SystemMsg VictoryRoad_Text_InsectBadgeConfirmed, 2
     LastKeyWait
-    InfoMsgClose
+    SystemMsgClose
     WorkSetConst EVENT_WORK_0x40e6, 2
     FinishAllEvents
     ActorsUnpauseAll
@@ -250,11 +250,11 @@ Script_4:
 
 Script_5:
     ActorsPauseAll
-    BadgeGateCmd_PlayCheck 3
+    PlayCheck 3
     // "Bolt Badge confirmed!"
     SystemMsg VictoryRoad_Text_BoltBadgeConfirmed, 2
     LastKeyWait
-    InfoMsgClose
+    SystemMsgClose
     WorkSetConst EVENT_WORK_0x40e7, 2
     FinishAllEvents
     ActorsUnpauseAll
@@ -262,11 +262,11 @@ Script_5:
 
 Script_6:
     ActorsPauseAll
-    BadgeGateCmd_PlayCheck 4
+    PlayCheck 4
     // "Quake Badge confirmed!"
     SystemMsg VictoryRoad_Text_QuakeBadgeConfirmed, 2
     LastKeyWait
-    InfoMsgClose
+    SystemMsgClose
     WorkSetConst EVENT_WORK_0x40e8, 2
     FinishAllEvents
     ActorsUnpauseAll
@@ -274,11 +274,11 @@ Script_6:
 
 Script_7:
     ActorsPauseAll
-    BadgeGateCmd_PlayCheck 5
+    PlayCheck 5
     // "Jet Badge confirmed!"
     SystemMsg VictoryRoad_Text_JetBadgeConfirmed, 2
     LastKeyWait
-    InfoMsgClose
+    SystemMsgClose
     WorkSetConst EVENT_WORK_0x40e9, 2
     FinishAllEvents
     ActorsUnpauseAll
@@ -286,11 +286,11 @@ Script_7:
 
 Script_8:
     ActorsPauseAll
-    BadgeGateCmd_PlayCheck 6
+    PlayCheck 6
     // "Legend Badge confirmed!"
     SystemMsg VictoryRoad_Text_LegendBadgeConfirmed, 2
     LastKeyWait
-    InfoMsgClose
+    SystemMsgClose
     WorkSetConst EVENT_WORK_0x40ea, 2
     FinishAllEvents
     ActorsUnpauseAll
@@ -298,11 +298,11 @@ Script_8:
 
 Script_9:
     ActorsPauseAll
-    BadgeGateCmd_PlayCheck 7
+    PlayCheck 7
     // "Wave Badge confirmed!"
     SystemMsg VictoryRoad_Text_WaveBadgeConfirmed, 2
     LastKeyWait
-    InfoMsgClose
+    SystemMsgClose
     WorkSetConst EVENT_WORK_0x40eb, 2
     FinishAllEvents
     ActorsUnpauseAll
@@ -332,7 +332,7 @@ Script_10:
 
 L_045E:
     VMCall L_0498
-    BadgeGateCmd_PlayLastGate
+    PlayLastGate
     VMCall L_049E
     WorkSetConst EVENT_WORK_0x40ec, 2
     FlagSet EVENT_FLAG_ARRIVED_VICTORY_ROAD

@@ -103,8 +103,8 @@ L_013A:
 Script_9:
     ActorsPauseAll
     ActorNew 792, 100, 1, 251, 230, 0
-    Plugin15Cmd_ShowSplash 791, 65531, 151
-    Plugin15Cmd_JumpActorOut 251, 791, 156, 1
+    ShowSplash 791, 65531, 151
+    JumpActorOut 251, 791, 156, 1
     // "Uihaa![f000]븁\u0000"
     ActorMsg MSGFILE_SCRIPT, HumilauCity_Text_Uihaa, 251, 0, 0
     MsgWinCloseAll
@@ -353,7 +353,7 @@ L_04C3:
     // "It's a face board..."
     InfoMsg HumilauCity_Text_ItsFaceBoard, 2
     LastKeyWait
-    InfoMsgClose_0039
+    InfoMsgClose
     FlagSet EVENT_FLAG_DAILY_0x0adc
     WorkSetConst EVENT_WORK_0x4000, 1
     VMJump L_070A
@@ -363,7 +363,7 @@ L_04EF:
     WorkSetConst EVENT_WORK_0x4000, 1
     // "There's a face board![f000]븁\u0000"
     InfoMsg HumilauCity_Text_TheresFaceBoard, 2
-    InfoMsgClose_0039
+    InfoMsgClose
     ActorAdd 6
     Random EVENT_WORK_0x4001, 4
     VMStackPush EVENT_WORK_0x4001

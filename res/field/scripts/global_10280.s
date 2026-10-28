@@ -91,7 +91,7 @@ L_011B:
     // "Which Fossil should I turn back\ninto a Pokémon?"
     ActorMsg MSGFILE_SCRIPT, Global10280_Text_WhichFossilShouldTurn, 6, 2, 0
     WorkSetConst 0x8022, 0
-    ListMenu_AnchorTopRight 31, 1, 0, 1, 32804
+    ListMenuAnchorTopRight 31, 1, 0, 1, 32804
     WorkSetConst 0x8025, 99
     ItemCheckAmount 0x8025, 1, 0x8010
     VMStackPush 0x8010
@@ -245,13 +245,13 @@ L_03B4:
     SystemMsg Global10280_Text_Received, 2
     MEWait
     MsgWaitAdvance
-    InfoMsgClose
+    SystemMsgClose
     PokePartyAdd 0x8010, 0x8023, 0, 25
     WordSetPokeSpecies 0, 0x8023
     // "Would you like to give a nickname to the\nnewly received [f000]ā\u0001\u0000?"
     SystemMsg Global10280_Text_WouldLikeGiveNickname, 2
     YesNoWin 0x8010
-    InfoMsgClose
+    SystemMsgClose
     VMStackPush 0x8010
     VMStackPushConst 0
     VMStackCmp CMP_EQ

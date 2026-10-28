@@ -360,7 +360,7 @@ static void ResortShop_SetCamera(ResortShop *shop, Field *field, u16 cameraMode)
 static BOOL ResortShop_FadeIn(ResortShop *shop, Field *field, int *seq);
 static BOOL ResortShop_FadeOut(ResortShop *shop, Field *field, int *seq);
 
-BOOL ResortShopCmd_Open(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_ResortShop_Open(VM *vm, FieldScriptEnv *env) {
     u16 mode = ScriptReadAny(vm, env);
     u16 subMode = ScriptReadAny(vm, env);
     u16 cameraMode = ScriptReadAny(vm, env);

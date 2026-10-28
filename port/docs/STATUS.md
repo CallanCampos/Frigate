@@ -32,11 +32,41 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
 
+## 2026-10-28: validate the frozen script-handler and terrain naming sync
+
+- **Upstream:** frozen `cdbe99de1c73`, nine commits after `fada8baae349`; PR 64 remains a proposal until protected
+  merge. Reviewed Frigate base is `2a3782a6fb`. Later tips and PR 63's backup-service feature remain separate.
+- **Port:** `PORT_SHA`, real two-parent upstream merge with canonical subject and complete Upstream-Commit trailer.
+- **ROM (T0):** fresh signed-runtime configure/Ninja passes both original US hashes with zero compiler warnings:
+  B2 `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb`, W2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`.
+  All source/config/tool changes outside the VM conflict are automatic imports, not manual decomp setup changes.
+- **Host build/tests (T1/T2):** fresh arm64 macOS RelWithDebInfo all-target builds pass. Full suites finish
+  B2 357 passed/28 explicit skips of 385 and W2 354/28 of 382, zero failures. Both actual assembly oracles run
+  five of five without skips; all 446 candidate source/record hashes remain fixed throughout verification.
+- **Replay/oracle/sanitizers/performance/play (T3/T4/T5/T6/T7):** registered replay, reference-hash, timing and
+  save checks pass in those suites, including the actual renamed script-offset fixture. No new whole-app fatal
+  sanitizer, windowed-play or general timing-parity claim. Inputs, seeds, goldens, masks and budgets stay fixed.
+- **Tiers/trap stubs:** no fresh scan, trap removal or experimental reader/service activation.
+- **64-bit warnings:** required guard passes: 365 sites/229 keys (real 66, harmless 123, handled 141,
+  unreachable 35), all 1,711 files compiled, zero missing. No baseline change.
+- **Work done:** preserve all four signed VM relative offsets under incoming Scrcmd handler names; update six
+  actual fixture names and living documentation, retaining assertions and historical records. All other 438
+  incoming blobs match the automatic merge. Same-address handler maps, constant/macro and script normalization
+  show the bounded naming changes; actual compiled ROM/native results supply validation beyond normalization.
+  Pinned clang-format 23.1.1 passes all 170 changed original C/headers plus the fixture; strict style, style
+  fixtures, symbol-name dry run and nonmatching-row checks pass. The production macro generator reproduces the
+  entire committed include byte-for-byte. No workflow/toolchain/delink changes or reference/rewrite overrides.
+- **Next:** publish the resolved exact head as a normal fast-forward of the App draft, then owner local
+  verification, explicit source approval and all required hosted checks before normal protected merge of PR 64.
+  Reverify after any reviewed-main update; no merge from an outdated base.
+- **Blockers:** published-head and hosted checks remain required. Native timing, later story coverage and
+  proposed ADR 0023 remain unfinished. Spanish issue 45 still lacks a locally available dump.
+
 ## 2026-10-28: validate the frozen 79-commit field naming sync
 
 - **Upstream:** frozen `fada8baae349`, 79 commits after `f71f5fe61d`; PR 62 remains a proposal until protected merge.
   Reviewed Frigate base is `43eaf0429a`. No later upstream commits or experimental reader/service features enter.
-- **Port:** `PORT_SHA`, real two-parent upstream merge with the complete Upstream-Commit trailer.
+- **Port:** `59b9fc8351`, real two-parent upstream merge with the complete Upstream-Commit trailer.
 - **ROM (T0):** fresh signed-runtime configure/Ninja passes both original US hashes with zero compiler warnings:
   B2 `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb`, W2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`.
   No manual decomp-config changes; complete compiled files and final ROMs supply the neutrality proof.

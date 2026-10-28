@@ -51,7 +51,7 @@ L_009B:
     InfoMsg Route23_Text_Kyuuun, 1
     PVWait
     MsgWaitAdvance
-    InfoMsgClose_0039
+    InfoMsgClose
     PlayerGetGPos 0x8021, 0x8022
     ActorAdd 16
     ActorSetGPos 16, 575, 8, 90, 3
@@ -80,7 +80,7 @@ Script_3:
     ScreamMsg Route23_Text_Kyuuun, 2
     PVWait
     MsgWaitAdvance
-    InfoMsgClose_0039
+    InfoMsgClose
     CallWildBattle 482, 65, 1
     WildBattleIsVictory 0x8010
     VMStackPush 0x8010
@@ -117,7 +117,7 @@ L_0191:
     // "Azelf went flying off somewhere..."
     SystemMsg Route23_Text_AzelfWentFlyingOff, 2
     LastKeyWait
-    InfoMsgClose
+    SystemMsgClose
     VMJump L_01A1
 
 L_01A1:

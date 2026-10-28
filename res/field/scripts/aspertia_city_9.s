@@ -95,7 +95,7 @@ L_0126:
 
 L_012B:
     LastKeyWait
-    InfoMsgClose_0039
+    InfoMsgClose
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt
@@ -150,7 +150,7 @@ L_019B:
     VMJumpIf CMP_STACK, L_0296
     // "What do you want to read about?"
     SystemMsg AspertiaCity9_Text_WhatWantReadAbout, 2
-    ListMenu_AnchorTopRight 31, 1, 0, 1, 32803
+    ListMenuAnchorTopRight 31, 1, 0, 1, 32803
     ListMenuAdd 13, 65535, 0
     ListMenuAdd 14, 65535, 1
     ListMenuAdd 15, 65535, 2
@@ -209,7 +209,7 @@ L_0290:
     VMJump L_019B
 
 L_0296:
-    InfoMsgClose
+    SystemMsgClose
     WorkSetConst 0x8023, 0
     FinishAllEvents
     ActorsUnpauseAll

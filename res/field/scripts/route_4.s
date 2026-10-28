@@ -416,7 +416,7 @@ Script_8:
     ScreamMsg Route4_Text_Awwwwk, 2
     PVWait
     MsgWaitAdvance
-    InfoMsgClose_0039
+    InfoMsgClose
     WorkSetConst 0x8024, 0
     WorkSetConst 0x8024, 128
     WorkOr 0x8024, 8
@@ -456,7 +456,7 @@ L_065F:
     // "Mandibuzz flew off into the sky..."
     SystemMsg Route4_Text_MandibuzzFlewOffInto, 2
     LastKeyWait
-    InfoMsgClose
+    SystemMsgClose
     VMJump L_066F
 
 L_066F:

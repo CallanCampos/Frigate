@@ -131,7 +131,7 @@ L_0221:
     SEPlay SEQ_SE_ARDEMO_01
     // "[f000]Ā\u0001\u0000 handed over\nthe Town Map![f000]븁\u0000"
     SystemMsg FloccesyRanch2_Text_HandedOverTownMap, 0
-    InfoMsgClose
+    SystemMsgClose
     SEWait
     // "[f000]Ā\u0001\u0001: Tch...\nShe didn't have to do that...[f000]븁\u0000\nThanks to you, too. We just left,\nand you've already helped me out.[f000]븁\u0000"
     ActorMsg MSGFILE_SCRIPT, FloccesyRanch2_Text_TchSheDidntHave, 0, 0, 0

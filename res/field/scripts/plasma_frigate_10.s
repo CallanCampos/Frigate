@@ -67,10 +67,10 @@ L_00D2:
     VMStackPushConst 1
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_00FD
-    PlasmaFrigateCmd_SetLightsState 0, 1
-    PlasmaFrigateCmd_SetLightsState 1, 1
-    PlasmaFrigateCmd_SetLightsState 2, 1
-    PlasmaFrigateCmd_SetLightsState 3, 1
+    SetLightsState 0, 1
+    SetLightsState 1, 1
+    SetLightsState 2, 1
+    SetLightsState 3, 1
 
 L_00FD:
     VMReturn
@@ -404,7 +404,7 @@ Script_7:
     WorkSetConst EVENT_WORK_0x4001, 0
     WorkSetConst EVENT_WORK_0x4002, 0
     WorkSetConst EVENT_WORK_0x4003, 0
-    PlasmaFrigateCmd_PressSwitch 0
+    PressSwitch 0
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt
@@ -415,7 +415,7 @@ Script_8:
     WorkSetConst EVENT_WORK_0x4000, 0
     WorkSetConst EVENT_WORK_0x4002, 0
     WorkSetConst EVENT_WORK_0x4003, 0
-    PlasmaFrigateCmd_PressSwitch 1
+    PressSwitch 1
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt
@@ -426,7 +426,7 @@ Script_9:
     WorkSetConst EVENT_WORK_0x4000, 0
     WorkSetConst EVENT_WORK_0x4001, 0
     WorkSetConst EVENT_WORK_0x4003, 0
-    PlasmaFrigateCmd_PressSwitch 2
+    PressSwitch 2
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt
@@ -437,7 +437,7 @@ Script_10:
     WorkSetConst EVENT_WORK_0x4000, 0
     WorkSetConst EVENT_WORK_0x4001, 0
     WorkSetConst EVENT_WORK_0x4002, 0
-    PlasmaFrigateCmd_PressSwitch 3
+    PressSwitch 3
     FinishAllEvents
     ActorsUnpauseAll
     VMHalt
@@ -460,7 +460,7 @@ L_05AF:
     VMStackPushConst 0
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_0670
-    PlasmaFrigateCmd_GetPasswordIndex EVENT_WORK_0x400a
+    GetPasswordIndex EVENT_WORK_0x400a
     DebugPrint EVENT_WORK_0x400a
     SEPlay SEQ_SE_SW_PLAZMASHIP_01
     SEWait
@@ -473,7 +473,7 @@ L_05AF:
     VMJumpIf CMP_STACK, L_0668
     MsgWinCloseAll
     WorkSetConst 0x8024, 0
-    PlasmaFrigateCmd_EnterPassword 0x8024
+    EnterPassword 0x8024
     VMStackPush 0x8024
     VMStackPushConst 1
     VMStackCmp CMP_EQ
@@ -484,13 +484,13 @@ L_05AF:
     SEWait
     MsgWaitAdvance
     MsgWinCloseAll
-    PlasmaFrigateCmd_PlayGroupASecond 0
+    PlayGroupASecond 0
     VMSleep 8
-    PlasmaFrigateCmd_PlayGroupASecond 1
+    PlayGroupASecond 1
     VMSleep 8
-    PlasmaFrigateCmd_PlayGroupASecond 2
+    PlayGroupASecond 2
     VMSleep 8
-    PlasmaFrigateCmd_PlayGroupASecond 3
+    PlayGroupASecond 3
     // "All barriers were deactivated,\nand you can proceed now."
     SystemMsg PlasmaFrigate10_Text_AllBarriersWereDeactivated, 2
     LastKeyWait

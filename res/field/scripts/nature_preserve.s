@@ -25,7 +25,7 @@ Script_1:
     ScreamMsg NaturePreserve_Text_Gwaooooogh, 2
     PVWait
     MsgWaitAdvance
-    InfoMsgClose_0039
+    InfoMsgClose
     WorkSetConst 0x8020, 0
     WorkOr 0x8020, 2
     WorkOr 0x8020, 128
@@ -64,7 +64,7 @@ L_00C1:
     // "The dark Haxorus vanished\ninto the preserve..."
     SystemMsg NaturePreserve_Text_DarkHaxorusVanishedInto, 2
     LastKeyWait
-    InfoMsgClose
+    SystemMsgClose
     VMJump L_00D1
 
 L_00D1:

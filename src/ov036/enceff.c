@@ -329,7 +329,7 @@ void EventBattleCall_DecideEnvTrainer(u32 trainerId, Field *field, u32 *encEffec
     *encEffect = env;
 }
 
-BOOL CountTrainersEvent_StartCountOtherOtIdsTask(VM *vm, FieldScriptEnv *env) {
+BOOL Scrcmd_Enceff_StartCountOtherOtIdsTask(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     GameData *gameData = FieldScriptEnv_GetGameData(env);
