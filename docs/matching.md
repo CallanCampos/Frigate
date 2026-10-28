@@ -4521,6 +4521,13 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   function per entry, in the ROM's order, each falling into the next (an `asm` function gets no epilogue). In a Thumb
   file, an ARM `asm` function goes between `#pragma thumb off` and `#pragma thumb on`.
 
+- A Thumb `asm` function in a Thumb file takes Thumb mnemonics, and `ldr rX, =symbol` is an illegal operand there, so
+  its pool is written as `ldr rX, [pc, #imm]` with `dcd symbol` words, and a `dcd symbol+4` gives a relocation into a
+  symbol's interior. `arc_tool.c`'s `ArchiveMoveImageTop` is the one game-code `asm` function: the original build kept
+  a dead store of `fimgOffset + 8` back to its stack slot, which no installed compiler produces from the C, and the
+  maintainer took the exception for the last non-matching function. Its assert's two strings became file-scope arrays
+  (one whose leading four zero bytes are the empty file name), and the file's other asserts pass that array as their
+  file name, which keeps the data byte for byte.
 - An `asm` function has one name: the assembler doesn't take `entry` or `.global` (`unknown assembler instruction
   mnemonic`, in `dsi/1.1p1` and `dsi/1.2`), and MWCC ignores `__attribute__((alias))` and `#pragma alias`. A library
   that is hand-written assembly as a whole, whose routines have several entries and second names, is an assembly file

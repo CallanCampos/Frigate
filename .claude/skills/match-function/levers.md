@@ -584,6 +584,10 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - A Thumb tail jump through a register other than `r3` (`ldr r1, =f; bx r1`) is not compiler output, so it is the
   SDK's assembly: an `asm` function (`lib/` only). ARM code tail-calls through `ip`, and only without a frame.
   (matching.md: "always `r3` in Thumb")
+- A dead store the original keeps that no installed compiler produces from any spelling, flag, pragma or IPA mode: an
+  `asm` function, the maintainer's exception taken once for `arc_tool.c`'s `ArchiveMoveImageTop` (Thumb asm, pool via
+  `ldr rX, [pc, #imm]` and `dcd symbol`; `dcd symbol+4` reaches into a symbol).
+  (matching.md: "A Thumb `asm` function in a Thumb file")
 
 - A narrowing before an `and` into a `u8` field: `x &= mask` narrows the mask, `x = x & mask` doesn't.
   (matching.md: "compound assignment to a narrow field")
