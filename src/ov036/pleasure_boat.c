@@ -9,31 +9,40 @@
 #include "gfl/sound.h"
 
 #define PLEASURE_BOAT_PERIOD 1350
+// The cruise ends once this many periods have passed
+#define PLEASURE_BOAT_PERIOD_COUNT 4
+
+// What PleasureBoat_GetTimeEvent finds
+enum {
+    PLEASURE_BOAT_TIME_NONE,
+    PLEASURE_BOAT_TIME_PERIOD_END,
+    PLEASURE_BOAT_TIME_CRUISE_END,
+};
 
 static BOOL PleasureBoat_GetTimeEvent(PleasureBoat *boat);
 
-PleasureBoat *PleasureBoat_Create(BOOL a0) {
+PleasureBoat *PleasureBoat_Create(BOOL altTrainers) {
     PleasureBoat *boat = GFL_HeapAllocate(HEAPID_TRIAL_HOUSE, sizeof(PleasureBoat), TRUE, "pleasure_boat.c", 49);
 
-    boat->unk0 = 0;
+    boat->periodEnded = FALSE;
     boat->clock = 0;
     boat->period = 0;
     boat->infoCounts[0] = 0;
     boat->infoCounts[1] = 0;
     boat->infoCounts[2] = 0;
     boat->infoCounts[3] = 0;
-    boat->unk1B4 = 0;
+    boat->clockStopped = FALSE;
     GFL_OvlLoad(OVERLAY_ID(89));
-    PleasureBoat_SetUpRooms(boat, a0);
+    PleasureBoat_SetUpRooms(boat, altTrainers);
     GFL_OvlUnload(OVERLAY_ID(89));
     return boat;
 }
 
 void PleasureBoat_AckEvent(PleasureBoat *boat) {
-    if (boat != NULL && boat->unk1B4 == 0 && boat->unk0 != 0) {
+    if (boat != NULL && !boat->clockStopped && boat->periodEnded) {
         GFL_SndSEPlay(SEQ_SE_FLD_78);
         boat->period++;
-        boat->unk0 = 0;
+        boat->periodEnded = FALSE;
     }
 }
 
@@ -44,16 +53,16 @@ GameEvent *PleasureBoat_Update(GameSystem *gsys, PleasureBoat *boat) {
     if (boat == NULL) {
         return NULL;
     }
-    if (boat->unk1B4 != 0) {
+    if (boat->clockStopped) {
         return NULL;
     }
     boat->clock++;
     switch (PleasureBoat_GetTimeEvent(boat)) {
-    case 1:
-        boat->unk0 = 1;
+    case PLEASURE_BOAT_TIME_PERIOD_END:
+        boat->periodEnded = TRUE;
         created = FALSE;
         break;
-    case 2:
+    case PLEASURE_BOAT_TIME_CRUISE_END:
         event = EventScriptCall_Create(gsys, 1, NULL, 0x8015);
         created = TRUE;
         break;
@@ -124,7 +133,7 @@ u32 PleasureBoat_GetPassengerParam(PleasureBoat *boat, u32 room) {
 }
 
 u32 PleasureBoat_GetPassengerType(PleasureBoat *boat, u32 room) {
-    return boat->rooms[room].unk4;
+    return boat->rooms[room].trainerId;
 }
 
 u32 PleasureBoat_GetPassengerExtra(PleasureBoat *boat, u32 room, u32 index) {
@@ -140,12 +149,13 @@ void PleasureBoat_SetTrainerDefeated(PleasureBoat *boat, u32 trainer, BOOL defea
 }
 
 static BOOL PleasureBoat_GetTimeEvent(PleasureBoat *boat) {
-    if (boat->clock >= 0x1518 && boat->period >= 4) {
-        return 2;
+    if (boat->clock >= PLEASURE_BOAT_PERIOD_COUNT * PLEASURE_BOAT_PERIOD &&
+        boat->period >= PLEASURE_BOAT_PERIOD_COUNT) {
+        return PLEASURE_BOAT_TIME_CRUISE_END;
     }
     return boat->clock % PLEASURE_BOAT_PERIOD == 0;
 }
 
 void PleasureBoat_StopClock(PleasureBoat *boat) {
-    boat->unk1B4 = 1;
+    boat->clockStopped = TRUE;
 }
