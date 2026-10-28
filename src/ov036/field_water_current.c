@@ -1,8 +1,10 @@
 // Names from swan (https://github.com/ds-pokemon-hacking/swan, GPL-3.0).
 // Additional helper and table names are our descriptive guesses.
 #include "types.h"
+#include "constants/directions.h"
 #include "constants/sound.h"
 #include "field/field.h"
+#include "field/field_acmd.h"
 #include "field/field_actor.h"
 #include "field/field_effect.h"
 #include "field/field_map.h"
@@ -14,7 +16,8 @@
 typedef struct WaterCurrentTile {
     u16 tileClass;
     u16 acmd;
-    u16 unused;
+    // The direction of the current, which nothing reads
+    u16 dir;
 } WaterCurrentTile;
 
 typedef struct WaterCurrentTileAcmd {
@@ -35,6 +38,12 @@ typedef struct EventWaterCurrentMove {
     s32 loopPlayer;
 } EventWaterCurrentMove;
 
+enum {
+    WATER_CURRENT_STATE_START,
+    WATER_CURRENT_STATE_FLOW,
+    WATER_CURRENT_STATE_END,
+};
+
 const WaterCurrentTile *GetWaterCurrentTileConfig(u32 tileClass);
 BOOL IsTileWaterCurrent_(u32 tileClass);
 const WaterCurrentTileAcmd *GetWaterCurrentFlowTileConfig(u32 tileClass);
@@ -51,10 +60,10 @@ static const WaterCurrentTileAcmd WATER_CURRENT_FLOW_TILES[4] = {
 };
 
 static const WaterCurrentTile WATER_CURRENT_TILES[4] = {
-    { 0x95, 0x52, 0x2 },
-    { 0x94, 0x53, 0x3 },
-    { 0x96, 0x50, 0x0 },
-    { 0x97, 0x51, 0x1 },
+    { 0x95, ACMD_WALK_3F + DIR_LEFT, DIR_LEFT },
+    { 0x94, ACMD_WALK_3F + DIR_RIGHT, DIR_RIGHT },
+    { 0x96, ACMD_WALK_3F + DIR_UP, DIR_UP },
+    { 0x97, ACMD_WALK_3F + DIR_DOWN, DIR_DOWN },
 };
 
 const WaterCurrentTile *GetWaterCurrentTileConfig(u32 tileClass) {
@@ -100,16 +109,16 @@ GameEventReturnCode WaterCurrent_SlideTaskMain(GameEvent *event, u32 *state, voi
     EventWaterCurrentMove *work = data;
 
     switch (*state) {
-    case 0:
+    case WATER_CURRENT_STATE_START:
         if (!IsTileWaterCurrent_(WaterCurrent_GetTileClass(work))) {
-            *state = 2;
+            *state = WATER_CURRENT_STATE_END;
         } else {
             FldeffSurfPokemon_SetWakeEnabled(FieldPlayer_GetRideEffect(work->player), FALSE);
             WaterCurrent_SlidePlayLoopSe(work);
-            *state = 1;
+            *state = WATER_CURRENT_STATE_FLOW;
         }
         break;
-    case 1:
+    case WATER_CURRENT_STATE_FLOW:
         WaterCurrent_SlidePlayLoopSe(work);
         if (FldAct_CheckAcmdEnd(work->actor)) {
             WaterCurrent_SlideFinishBump(work);
@@ -117,13 +126,13 @@ GameEventReturnCode WaterCurrent_SlideTaskMain(GameEvent *event, u32 *state, voi
             WaterCurrent_SlideSelectBumpEntry(work);
             if (!work->tile && !work->flowTile) {
                 WaterCurrent_SlideStopLoopSe(work);
-                *state = 2;
+                *state = WATER_CURRENT_STATE_END;
             } else {
                 WaterCurrent_SlideStartStep(work);
             }
         }
         break;
-    case 2:
+    case WATER_CURRENT_STATE_END:
         WaterCurrent_SlideShowSurfPokemon(work);
         return GAMEEVENT_DONE;
     }
@@ -186,7 +195,7 @@ void WaterCurrent_SlideStartStep(EventWaterCurrentMove *work) {
 void WaterCurrent_SlideFinishBump(EventWaterCurrentMove *work) {
     if (work->flowTile) {
         FieldEffects *effects = Field_GetFieldEffects(work->field);
-        u32 effectId = 8;
+        u32 effectId = FLDEFF_SURF_POKEMON_SPLASH;
         VecFx32 pos;
 
         if (!FieldEffects_IsLoaded(effects, effectId)) {
