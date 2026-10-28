@@ -117,6 +117,15 @@ EncountSystem *EncSys_Create(Field *field);
 void EncSys_Free(EncountSystem *system);
 BOOL EncSys_IsActive(EncountSystem *system, u32 a1);
 void EncSys_Update(EncountSystem *system, BOOL moved, BOOL turned);
+// The flags of a static encounter that make its Pokémon: shiny, without its held item, with its hidden ability, never
+// shiny, male or female. The others change the battle
+#define STATIC_ENC_FLAG_SHINY 0x2
+#define STATIC_ENC_FLAG_NO_ITEM 0x4
+#define STATIC_ENC_FLAG_HIDDEN_ABILITY 0x8
+#define STATIC_ENC_FLAG_NOT_SHINY 0x10
+#define STATIC_ENC_FLAG_MALE 0x20
+#define STATIC_ENC_FLAG_FEMALE 0x40
+
 GameEvent *EventWildBattleCall_CreateStatic(EncountSystem *system, u16 species, u8 level, u8 form, u16 flags);
 u32 ConvFieldWeatherToBtl(Field *field);
 void EffectEncount_ConsumeSpot(EncountSystem *system);

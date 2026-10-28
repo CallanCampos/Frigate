@@ -21,6 +21,9 @@ enum {
     ENCTYPE_MAX,
 };
 
+// No kind of encounter: the tile has none, or a static encounter
+#define ENCTYPE_NONE 0xff
+
 // What an encounter knows of the player's lead Pokémon and how it rolls the wild ones
 typedef struct {
     GameData *gameData;

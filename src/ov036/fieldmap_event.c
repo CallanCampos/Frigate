@@ -105,10 +105,6 @@
 // A grid tile's side, in world units and in fx32
 #define GRID_UNITS 16
 #define GRID_SIZE FX32_CONST(GRID_UNITS)
-// The tile flag that MapTile_BlocksCollision tests, and the one of water, which the player can't jump onto from the
-// water and which gives battles their water music
-#define TILE_FLAG_COLLISION 0x1
-#define TILE_FLAG_WATER 0x2
 
 // The steps that the step counter of the game data counts to
 #define STEP_TOTAL_MAX 9999

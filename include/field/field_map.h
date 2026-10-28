@@ -116,6 +116,13 @@ void MapMatrix_Patch(MapMatrix *matrix, GameSystem *gsys, HeapID heapId);
 #define TILE_TYPE_NONE 0xffffffff
 
 u32 GetTileTypeAtPos(FieldG3DMapper *mapper, const VecFx32 *position);
+// The tile flags that GetTileFlags returns: the one that MapTile_BlocksCollision tests, the one of water, which the
+// player can't jump onto from the water and which gives battles their water music, and the one of the tiles where
+// wild Pokémon appear
+#define TILE_FLAG_COLLISION 0x1
+#define TILE_FLAG_WATER 0x2
+#define TILE_FLAG_ENCOUNT 0x4
+
 u32 GetTileFlags(u32 tileType);
 u16 GetAbyssalRuinsDiveZoneID(Field *field, u16 *zoneId);
 u16 GetTileClass(u32 tileType);
