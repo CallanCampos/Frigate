@@ -26,6 +26,38 @@ workflow goes in the decomp checkout instead; this file is the port's ([CLAUDE.m
   ambiguous same-name addresses. Exercise actual symbol-table lookup under both linkers and fatal sanitizers;
   simulated resolver callbacks do not verify this contract.
 
+## 2026-10-28: isolate source regressions before linker retention
+
+- Function/data sections and garbage collection did not isolate the trainer-AI test on every platform. The actual
+  120-command table and initialization record retained unrelated battle code on Windows and sanitized Linux; ASan
+  registration and `llvm.compiler.used` made otherwise unused table references live. Preserve the failed evidence
+  and fix that assumption instead of ignoring unresolved symbols, adding fake battle APIs or disabling sanitizers.
+- Select the actual private context/prototypes and five needed definitions before compilation, retaining their exact
+  source and original diagnostic lines. A small, deliberately bounded selector fails on missing/duplicate definitions
+  or malformed lexical boundaries. CMake depends on both source and selector. The real VM stays a separate original
+  source, and all thirteen command cases keep fatal sanitizer coverage without linker-specific collection flags.
+- Exact-source claims include Windows line endings. Preserve CRLF bytes on input/output, handle escaped line
+  continuations in comments/literals, and check failed generation preserves the previous output. Native Mac passes
+  establish the local contract; hosted ELF/COFF checks still have to validate the repaired platform assumption.
+
+## 2026-10-28: sequence bytecode reads before relative pointer arithmetic
+
+- Matching DS code does not make operand evaluation order portable. In `vm->pc + VM_Read32(vm)`, native clang
+  loaded the PC before the read and MWCC loaded it after. The four-byte displacement sent Terrell's actual effect
+  table jump outside the same script, producing a long random-comparison loop. Sequence the read explicitly, then
+  use the advanced PC; all 167 allocatable original-object sections stay identical in both versions.
+- Regress the actual commands and interpreter, including backward offsets and list polarity. A copied arithmetic
+  expression would not establish that dispatch, argument consumption, branching and stopping still work. Original
+  source fails all three affected command groups; the fixed thirteen cases pass ordinary and fatal sanitizers.
+- Trace the first wrong operand before inventing a CPU delay. The loop's 501 draws per pass came after the wrong
+  jump and reached the existing deadline cap. Both fixed entry captures remove persistent NNS/LC/MT-state
+  differences, while two unique MT-index differences per game remain visible. Keep those timing differences,
+  duplicate-counter ambiguities and absent pixel comparisons explicit; do not broaden masks or claim battle parity.
+- Equal final RNG state can conceal different decisions. A full-control-preserving follow-up observed the actual
+  consumers, returned values and post-store choices: native assigned its choice draw earlier and selected slot 1,
+  while DS selected slot 0 with the same scores and target. Preserve caller/value ordering and observe the actual
+  choice; neither a matching stream by index nor a final-state comparison proves consumer equality.
+
 ## 2026-10-28: keep full save integrity checks affordable
 
 - The full save-image suite timed out at 120 seconds on an Intel CI runner while every other job passed. Keep its

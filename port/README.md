@@ -134,6 +134,8 @@ build/port/frigate-black2 --rom /c/Games/black2.nds                      # your 
   of 64-bit values (`PORT_DS_ALIGN_64`, `include/types.h`) and moves the save's fields after one. Everything that
   includes the decomp's headers is built with `-mno-ms-bitfields`, as [CMakeLists.txt](CMakeLists.txt) sets for
   Windows, and [include/port_host.h](include/port_host.h) stops a build that lays a `u64` out otherwise.
+  Earlier Windows builds using the incorrect layout wrote incompatible saves. Preserve their backups; conversion
+  of those saves still needs separate implementation and validation.
 - **Names that aren't ASCII:** every program of the build carries a manifest that makes UTF-8 its code page (Windows
   10 1903 or later, [app/windows/utf8.manifest](app/windows/utf8.manifest)), so a ROM, a save folder or a run directory
   named with accents works as on macOS and Linux.

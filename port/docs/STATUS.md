@@ -32,12 +32,40 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
 
+## 2026-10-28: integrate reviewed trainer-AI sequencing into the final sync proposal
+
+- **Upstream:** proposed `b7ce134e0c`; reviewed main is now `9440367870`, after PR 57 passed all 14 checks and a
+  normal protected merge. This remains the existing sync proposal, not a completed upstream sync of main.
+- **Port:** `PORT_SHA`, a real merge of that reviewed main into the bounded fourteen-commit proposal and tested
+  Pokédex safety companion. No experimental SDK CPU reader is imported.
+- **ROM (T0):** the Pokédex companion `251f932888` passes both original hashes with zero warnings and four of four
+  actual MWCC preprocessing comparisons. PR 57 head `3c28971eef` also passes both hashes. This merged head requires
+  fresh configure/Ninja and both hashes before publication/merge; prior results are not transferred.
+- **Host build/tests (T1/T2):** PR 57's exact-head canonical suites pass B2 349/28 explicit skips of 377 and W2
+  346/28 of 374, zero failures, owner status 57497595373. The companion's two actual Pokédex fixtures pass ordinary
+  and full fatal LLVM builds, including 98,304 real touch searches and six form flows. New-head full gates remain due.
+- **Replay/oracle/sanitizers/performance/play (T3/T4/T5/T6/T7):** no new completed gameplay or timing-parity claim.
+  Preserve all input/seed/reference/mask/budget/sanitizer policies. The three AI sequencing locals remain the only
+  AI source difference from frozen upstream; the actual-source selector and VM tests are retained intact.
+- **Tiers/trap stubs:** no new scan; reviewed source sequencing and host bounds do not complete native features.
+- **64-bit warnings:** the prior AI exact-head guard passes 365 sites/229 keys, real 66, 1,708 compiled inputs and
+  zero missing. New-head verification repeats it.
+- **Work done:** resolve five integration conflicts by retaining both additions. The AI and Pokédex CMake blocks
+  remain byte-identical to their reviewed/tested parents, including generator, fatal sanitizer and fixture-only
+  pattern policies. The integration guide has one combined module table and both evidence/limit sections. The
+  STATUS union preserves all 110 parent sections in both parents' order; common differences only fill PORT_SHA.
+  The game-change ledger retains both the AI and Pokédex/format entries. Original port adaptations remain intact.
+- **Next:** publish this final integrated head to the existing sync PR; run exact-head canonical and hosted gates,
+  owner review, then merge normally. Continue the separately preserved shared-controller CPU work afterward.
+- **Blockers:** no human action blocks validation. Final integrated-head gates remain required; native timing and
+  Spanish issue 45's missing gameplay/save evidence remain unfinished.
+
 ## 2026-10-28: guard inherited Pokédex reads on native hosts
 
 - **Upstream:** proposed `b7ce134e0c`, still fourteen naming commits beyond `fd3b9e600d`; reviewed main is
   `71eabc1eb0`. These two bug notes and original behaviors already exist in main under the former filenames.
   This is a safety companion for the existing sync proposal, not a completed sync of main.
-- **Port:** `PORT_SHA`, on the local sync-resolution branch. Two `PLATFORM_PC`/optional `BUGFIX` guards bound the
+- **Port:** `251f932888`, on the local sync-resolution branch. Two `PLATFORM_PC`/optional `BUGFIX` guards bound the
   habitat touch scans and explicitly pass form 0 for an unknown picture. Known saved forms remain unchanged.
 - **ROM (T0):** fresh configure/Ninja, 9,610 steps, zero warnings, both original hashes match: B2
   `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb`, W2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`.
@@ -124,6 +152,30 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
   gates before approval and normal merge. Continue general CARD CPU service after repository maintenance.
 - **Blockers:** no human action blocks verification. Required checks, native timing gaps and issue 45's Spanish
   gameplay/save evidence remain unfinished.
+
+## 2026-10-28: integrate the reviewed Linux visibility and dump fixes into AI sequencing
+
+- **Upstream:** `fd3b9e600d`, contained in reviewed main `71eabc1eb0`. The separate naming sync remains a proposal.
+- **Port:** `3c28971eef`, a normal merge of reviewed main into PR 57; preserve both documentation additions.
+- **ROM (T0):** both original hashes passed with zero warnings on each previous head; the new integrated head
+  repeats fresh configure/Ninja in its exact-head gate. No production AI or ROM source changed in this merge.
+- **Host build/tests (T1/T2):** prior AI head `3eec88afb4`: B2 348 passed/28 explicit skips of 376, W2 345/28 of
+  373, zero failures, owner status 57490406825. Reviewed Linux head `b9020ba00b`: B2 347/28 of 375, W2 344/28 of
+  372, zero failures, owner status 57494482854, all 14 hosted checks green and owner approval 5686514674.
+  Fresh integrated-head canonical and hosted checks remain mandatory; prior results are not transferred.
+- **Replay/oracle/sanitizers/play (T3/T4/T5/T7):** no new gameplay or timing-parity claim. Actual AI source and the
+  exact-source test selector are unchanged; reviewed main adds Linux namespace/ELF resolver regressions. Existing
+  authentic captures retain their consumer-timing/choice limits. Spanish issue 45 remains unverified.
+- **Performance (T6):** retain existing budgets, fixtures, masks, seeds and sanitizer policy.
+- **Tiers/trap stubs:** no new scan; unchanged game source and native feature scope.
+- **64-bit warnings:** previous heads pass 365 sites/229 keys, real 66, with complete compilation; the integrated
+  gate repeats this measurement. No new cast/type changes.
+- **Work done:** adopt the reviewed shared-SDL3 namespace fix, hidden-local lookup and ambiguity rejection, including
+  the contributor's optional LLD regression and real executable/DSO tests. No author commits or handoff work dropped.
+- **Next:** publish this base update, run exact-head gates and merge only after all required checks pass. Finish
+  the bounded upstream sync and continue the original-DS CARD CPU service investigation.
+- **Blockers:** no human action blocks this integration. Required checks and remaining native timing/features are
+  unfinished; showing the Spanish copyright screen does not establish gameplay/save compatibility.
 
 ## 2026-10-28: combine the contributor's LLD follow-up with namespace regression coverage
 
@@ -288,6 +340,148 @@ old entry gets are its `PORT_SHA` filled in and a typo or a broken link fixed.
   complete native/canonical checks and publish one bounded sync PR. Check for an existing bot proposal before push.
 - **Blockers:** no human action blocks this local resolution. Native/hosted validation and the reviewed-base update
   remain unfinished. Issue 45 stays open until Spanish gameplay and save/reload evidence exists.
+
+## 2026-10-28: integrate the reviewed Windows layout fix into AI sequencing
+
+- **Upstream:** reviewed main `3ea5609ea3` contains `fd3b9e600d`. PR 56 merged normally after exact owner approval
+  5685158902, successful owner status 57484486904 and all 14 checks. The independent `29b9dcfef9` naming proposal
+  remains local and is not imported into this feature. Main's post-merge CI follows separately.
+- **Port:** `3eec88afb4`, a real merge of that reviewed main into PR 57's `68f1aa7c2b`; no force/rebase or bypass.
+  The three AI locals and test-selector source remain unchanged. The Windows README records the known limitation
+  that old incorrect-layout saves need separately validated conversion; backups must be preserved.
+- **ROM (T0):** fresh configure/Ninja after integration passes both original ROM hashes with zero warnings. The
+  production AI source still hashes to `cadac9bddeb7cbbc089969d08c6d79d7d06d833e055c32473cec116c8a7c66ff`.
+- **Host build/tests (T1/T2):** prior exact-head `68f1aa7c2b` canonical verification succeeds: B2 348 passed/28 explicit
+  skips of 376, W2 345/28 of 373, zero failures; owner status 57486646065. Pointer guard: 365 sites/229 keys, real 66,
+  harmless 123, handled 141, unreachable 35, 1,708 compiled inputs/zero missing. These are prior-head results;
+  the merged head requires fresh canonical and hosted gates before merging.
+- **Replay/oracle/sanitizers/play (T3/T4/T5/T7):** no production AI/HAL/data/clock/RNG change in this integration.
+  Prior authentic ordinary/fatal-sanitizer entry results below remain source-specific, with their actual timing
+  defect and comparison limits retained. No additional battle outcome or Spanish compatibility claim is made.
+- **Performance (T6):** existing budgets and gates remain; no input, reference, seed, mask or lag changes.
+- **Tiers/trap stubs:** no new scan; this adds no completed native feature or replacement game implementation.
+- **64-bit warnings:** the prior-head guard above passes; fresh integrated-head verification must recheck it.
+- **Work done:** keep the actual-source test isolation repair while adopting the reviewed platform layout contract:
+  Windows uses GCC-compatible member layout and every forced host header checks the 4-byte 64-bit member contract.
+  Owner probes of the real types/day-care header fail with default MinGW layout and pass with the correction;
+  macOS ARM64/Linux x86-64 compile the expected offsets unchanged. No original handoff work or saves are modified.
+- **Next:** publish this reviewed-base update, rerun exact-head local/hosted gates and merge once all pass. Complete
+  the Linux visibility contribution and upstream proposal separately, then fix general CARD CPU timing before
+  claiming faithful Terrell decisions and continuing Ranch/Hugh/Herdier.
+- **Blockers:** no human action blocks the integration. Required new-head checks remain; native feature/timing gaps
+  and issue 45's missing Spanish gameplay/save evidence are still unfinished.
+
+## 2026-10-28: make trainer-AI regressions independent of linker retention
+
+- **Upstream:** reviewed main remains `b631907c33`, containing `fd3b9e600d`. Two newly fetched upstream naming commits
+  through `29b9dcfef9` are being resolved/verified on a separate sync topic; they are not imported into this feature.
+- **Port:** `68f1aa7c2b`, a test/tool follow-up to PR 57 head `125435cb4f`. The three production AI sequencing fixes
+  and their source hash are unchanged; no game/HAL/header/data/clock/RNG changes are added by this follow-up.
+- **ROM (T0):** fresh configure/Ninja passes both original hashes with zero warnings: B2
+  `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb`, W2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`. All production and
+  owned test/helper hashes remain frozen. Every allocated AI object section already matches both original controls.
+- **Host build/tests (T1/T2):** both versions pass the two focused CTests in ordinary and fatal LLVM 23 ASan/UBSan
+  builds: thirteen real command/VM cases and six source-selection units, zero skips. The source selector retains
+  exact definition bytes and the original private context/prototypes, omits unrelated callback-table/battle code,
+  and regenerates when source or selector changes. Missing/duplicate/malformed definitions fail before output is
+  replaced; comments, literals and LF/CRLF continuations are covered. No collection flags or sanitizer exclusions.
+- **Replay/oracle/sanitizers/play (T3/T4/T5/T7):** production source is unchanged from the prior integrated proof:
+  both complete ordinary suites pass B2 347/28 explicit skips of 375 and W2 344/28 of 372. Both ordinary and both
+  full fatal-sanitizer 9,000-frame entries match all 36,000 payloads and frames of their fixed controls, with authentic
+  seeds and unchanged fully valid saves. These remain labeled prior-source results; new exact-head gates follow.
+  The actual native slot-1 versus DS slot-0 decision difference remains open. No new gameplay/parity claim is made.
+- **Performance (T6):** existing limits remain; no new performance claim, reference, input, seed, lag or mask change.
+- **Tiers/trap stubs/64-bit warnings:** no new scan or production cast change. Previous tier/stub measurements below
+  remain; exact-head verification must recheck the prior 365 sites/66 real and 1,707 compiled inputs/zero missing.
+- **Work done:** hosted Windows and sanitized Linux failed to link the initial whole-source test because unused
+  table/initialization globals retained all 120 callbacks and unrelated battle dependencies. The new bounded source
+  selector compiles the exact five real definitions, with original diagnostic lines, and the separate actual VM.
+  Local IR/binary checks confirm the unrelated globals/functions are absent. Neither fake battle functions nor
+  ignored unresolved symbols are introduced. Guides/feature map/lessons document ownership and verification limits.
+- **Next:** publish the corrected PR head and rerun canonical/hosted gates, including actual Windows/Linux links.
+  Review/merge the independently verified Windows layout contribution, integrate reviewed main as needed, then
+  complete the pending upstream sync and general CARD CPU timing before claiming faithful Terrell combat.
+- **Blockers:** no human action blocks these fixes. Hosted ELF/COFF retesting and exact-head gates are pending.
+  Original DS timing/choice differences and later native features remain unfinished; issue 45 still lacks the
+  Spanish gameplay/save evidence because the owner has no dump.
+
+## 2026-10-28: integrate AI sequencing with the reviewed cartridge foundation
+
+- **Upstream:** `fd3b9e600da72b208fa98c3486988d3d7ce16766`, still contained in reviewed main `b631907c33`.
+  PR 55 merged normally after all 14 checks passed; exact owner status 57473124170 and review 5683448057 apply to
+  `ca9555921c`. Its canonical suites passed B2 346/28 explicit skips of 374 and W2 343/28 of 371. Main CI is running.
+- **Port:** `125435cb4f`, a real merge of reviewed main into `b0f4350fef`. Three guide conflicts retain both additions;
+  the actual AI production/test source is unchanged. No original handoff work, private evidence or backup is removed.
+- **ROM (T0):** fresh configure/Ninja passes both original hashes with zero warnings after integration. The AI source
+  hash remains unchanged; all 167 allocatable original-object sections were already verified identical per version.
+- **Host build/tests (T1/T2):** both integrated ordinary all-target builds and complete suites pass: B2 347 passed/28 explicit
+  skips of 375, W2 344/28 of 372, zero failures. The thirteen actual-command/VM cases pass again with fatal LLVM 23
+  ASan/UBSan. Exact-head required gates follow.
+- **Replay/oracle/play (T3/T4/T7):** both integrated ordinary programs complete 9,000 frames and 36,000 semantic
+  payloads, exactly matching every frame and payload of the earlier fixed controls. Both authentic seeds are used;
+  starting saves remain identical and both banks/all 73 blocks/table/footer validate. First-menu screenshots were
+  inspected: Tepig level 6 at B2 23/23 or W2 24/24 HP, against Patrat level 4. No attack or victory is claimed.
+- **Sanitizers/performance (T5/T6):** both full LLVM 23 fatal ASan/UBSan programs complete the same 9,000-frame entry,
+  matching every ordinary frame and all 36,000 semantic payloads per game, using both authentic seeds and retaining
+  identical fully valid saves. Recovery is OFF. Both versions' thirteen command/VM cases pass under these sanitizers.
+  Existing performance gates pass; no limit, input, seed, reference, lag or exclusion changes.
+- **Tiers/trap stubs/64-bit warnings:** no new scan; prior tier/stub figures below remain. No cast/type change;
+  the integrated exact-head guard must recheck the prior 365 sites/66 real and 1,707 compiled inputs/zero missing.
+- **Work done:** preserved both independent changes and their historical records. A new control-preserving B2
+  observer proves a remaining timing defect: native consumes all six GuessAbility draws and move choice at counter
+  7,579; DS spreads these across 7,581–7,583. All 26 draws in the bounded window match by RNG index, but consumers
+  receive different values. Actual post-store observations show equal scores (100,100,0,0) and target 0, yet native
+  chooses slot 1 and DS slot 0. Full native 9,000-frame/36,000-payload and DS 11,000-frame/56,086-payload observers
+  equal their controls. Equal final RNG state therefore does not establish trainer decision parity.
+- **Next:** finish integrated proof and publish this script-base repair through a protected PR. Trace original
+  tick/load/suspension boundaries and fix the omitted SDK timing before claiming faithful Terrell combat, then
+  continue Ranch/Hugh/Herdier. The preserved CPU-wire prototype remains inactive while its regressions are unresolved.
+- **Blockers:** no human action blocks the repair or timing investigation. Full native functionality remains
+  unfinished. Issue 45 remains open for Spanish gameplay/save evidence; the owner has no dump.
+
+## 2026-10-28: preserve trainer-AI post-operand script bases
+
+- **Upstream:** `fd3b9e600da72b208fa98c3486988d3d7ce16766`, contained in reviewed main `70085bfae7`.
+  The separately reviewed foundation PR 55 is now merged as `b631907c33` after all 14 checks passed; its corrected
+  save test takes 2.01 seconds on the Intel runner. This candidate still requires integration with that main.
+- **Port:** `b0f4350fef`, on `codex/ai-script-sequencing`. Three natural C locals in `src/ov170/tr_ai.c` sequence each
+  signed table/list operand read before using the advanced PC. No AI replacement, score, RNG, data or clock change.
+- **ROM (T0):** fresh configure/Ninja, 8,799 steps, zero warnings; both original hashes match: B2
+  `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb`, W2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`.
+  All 167 allocatable MWCC sections of this file match the reviewed control in each version, retaining every
+  repeated `.text`/`.rodata` section: 161 code sections/9,736 code bytes, 10,288 initialized bytes in total.
+- **Host build (T1):** both complete ordinary native all-target builds and suites pass on the frozen production/test
+  source: B2 327 passed/28 explicit fixture-dependent skips of 355; W2 324/28 of 352, zero failures. Integration and
+  exact-head required verification follow before publication.
+- **Tests (T2):** thirteen cases execute the actual AI commands and actual VM on owned synthetic scripts: post-read
+  table/list bases, positive/negative relative offsets and destinations, effect/default selection, matching and
+  nonmatching lists, sentinel, return and stop semantics. Ordinary and fatal LLVM 23 ASan/UBSan runs pass. Original
+  source separately fails the intended assertion in each of the three affected command groups. No new exception.
+- **Replay/oracle (T3/T4):** private diagnostic captures substitute only the actual fixed AI object into unchanged
+  reviewed control programs. Both complete 9,000 frames/36,000 semantic state payloads with exactly the two authentic
+  DS seeds. Starting saves remain byte-identical; both complete banks, all 73 blocks, tables and footers validate.
+  From counter 4,900, every unique NNS, LC and MT-firstword payload matches DS: B2 3,851 pairs, W2 3,913. The prior
+  persistent NNS/MT-state divergence disappears. Two unique MT-index differences per game remain; 19/20 duplicate
+  counter sets remain explicitly ambiguous, and 230/167 native frames beyond DS coverage are unassessed.
+- **Sanitizers/play (T5/T7):** focused fatal-sanitizer cases pass, with no new whole-route sanitizer claim yet. Both
+  bounded captures reach Terrell's first action menu: Tepig level 6, B2 23/23 HP or W2 24/24, versus Patrat level 4.
+  No attack or victory is claimed. Bottom hashes match corresponding snapshots; no equal-counter sparse PNG pairs
+  exist for top-screen pixel comparison. Complete trainer decision timing and consumer-value equality remain open.
+- **Performance (T6):** no budget adjustment or new performance claim; applicable suite gates remain enabled.
+- **Tiers/trap stubs:** no new scan; previous 41,017 tier (a), zero (b)/(c), plus 2,385 veneers/16,906 bytes and
+  25 function traps plus `CARDi_NdmaInterface` data remain. Complete ROM decompilation is not native completeness.
+- **64-bit warnings:** no cast/type change; prior 365 sites/229 keys, real 66, harmless 123, handled 141, unreachable
+  35, with 1,707 compiled inputs/zero missing. Exact integrated-head verification must recheck this guard.
+- **Work done:** control-preserving observers of the same 9,120-byte B2 script proved opcode 115 used native table
+  base 522 instead of original DS 526, selecting an out-of-script target instead of 1,878. The full original DS
+  11,000-frame/56,086-payload and native 9,000-frame/36,000-payload traces equal their controls. Native clang read the
+  pointer before `VM_Read32`; MWCC read it after. Explicit sequencing fixes that cause and two equivalent list sites.
+  The original random-comparison loop reached the existing deadline cap after the wrong jump; no fitted delay was
+  warranted. Guides and the game-change ledger describe the actual owners, fixture boundaries and remaining limits.
+- **Next:** integrate reviewed main, complete exact-head local/hosted gates and publish a protected PR. Then trace
+  the remaining MT consumer ordering before claiming faithful Terrell combat and continuing Ranch/Hugh/Herdier.
+- **Blockers:** no human action blocks this fix. CPU/DMA SDK timing integration and later native features remain
+  unfinished. Issue 45 still needs Spanish gameplay/save evidence; the owner has no dump.
 
 ## 2026-10-28: keep complete save validation fast on CI
 
@@ -3246,6 +3440,7 @@ merges fall: above the PR 12 sync's entry, below the entries of PRs 20, 17 and 2
   it with a merge commit.
 - **Next:** the field's entry (PR 18).
 - **Blockers:** the field's external heap, until the field's entry.
+
 ## 2026-10-23: upstream sync `0a12a2bd3` merged (PR 12): the save's city state initialized by the game's own C
 
 This entry was added afterwards, by the entry above: the sync merged without one.
@@ -5668,6 +5863,7 @@ by the results here.
   from it, and every battle event. `NNSi_objSizeWTbl` and `NNSi_objSizeHTbl` (ARM9 main, NitroSystem G2D, no overlay
   issue and so no claim): the Pokédex, and any flipped or affine cell. `data_ov167_021d7490` (overlay 167, issue #120):
   the first move of any battle. Overlay 12's script data, as before.
+
 ## 2026-10-18: Frigate's test launcher for the field menu's apps (ADR 0012, proposed), on a branch of its own
 
 - **Upstream:** `045e97b90` (PR #364), merged by `5ad9a1e1d`; no sync, this task doesn't push.
@@ -6472,6 +6668,7 @@ by the results here.
   a save brings, with D7's sidecar, when a save from another console needs it.
 - **Blockers:** overlay 36 (issue #83) stops CONTINUE at the field's process table and gates the overworld; overlay
   12's script data stops New Game at the field's first script.
+
 ## 2026-10-17: gamepads, and the macOS app in a disk image
 
 - **Upstream:** `615939e25`, as merged into the port's `main` by `e1b68f578`.
@@ -6614,6 +6811,7 @@ by the results here.
   `rom_game_overlays`; `--screen-hashes` folded into `--run-dir`.
 - **Blockers:** overlay 36 (issue #83) gates phase 3, the overworld; overlays 11 and 182 (Wi-Fi, Download Play) only
   matter from phase 7.
+
 ## 2026-10-17: the intro as the DS draws it: libfx's products in place, and a replay checked against the oracle
 
 - **Upstream:** `e484d5011` (merge of PR #353), as in the last entry; no sync in this task.
