@@ -22,6 +22,9 @@ struct FldActMatColorPreset {
     u16 emissive[3];
 };
 
+// What DecideAbyssalRuinsDiveZoneByUndellaBayPos returns off the dive spots: the number of zones, one past the last
+#define DIVE_ZONE_NONE 0x267
+
 static u16 DecideAbyssalRuinsDiveZoneByUndellaBayPos(u32 zoneId, u32 x, u32 z);
 
 // Dive spots of Undella Bay: zone, x, z, the Abyssal Ruins zone they lead to
@@ -77,7 +80,7 @@ static u16 DecideAbyssalRuinsDiveZoneByUndellaBayPos(u32 zoneId, u32 x, u32 z) {
             return warp[3];
         }
     }
-    return 0x267;
+    return DIVE_ZONE_NONE;
 }
 
 u16 GetAbyssalRuinsDiveZoneID(Field *field, u16 *zoneId) {
@@ -87,7 +90,7 @@ u16 GetAbyssalRuinsDiveZoneID(Field *field, u16 *zoneId) {
     u16 z = GetGPosZ(actor);
 
     *zoneId = DecideAbyssalRuinsDiveZoneByUndellaBayPos(playerZoneId, x, z);
-    if (*zoneId != 0x267) {
+    if (*zoneId != DIVE_ZONE_NONE) {
         return TRUE;
     }
     *zoneId = playerZoneId;
