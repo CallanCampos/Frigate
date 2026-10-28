@@ -44,7 +44,7 @@ FieldG3DMapper *FieldG3DMapper_Create(HeapID heapId, u16 season) {
     mapper->phase1MaxChunkCount = 0;
     mapper->terrainAnimator = NULL;
     mapper->propSystem = FieldPropSystem_Create(mapper->heapId, mapper, season);
-    mapper->wfbc = func_ov036_0218adac(heapId);
+    mapper->wfbc = FieldWFBC_Create(heapId);
     mapper->resortMap = ResortMapCreate_Create(heapId);
     mapper->heightEx = HeightEx_CreateTable(0x10, heapId);
     return mapper;
@@ -54,7 +54,7 @@ void FieldG3DMapper_Free(FieldG3DMapper *mapper) {
     HeightEx_FreeTable(mapper->heightEx);
     FieldG3DMapper_FreeMap(mapper);
     ResortMapCreate_Free(mapper->resortMap);
-    func_ov036_0218add0(mapper->wfbc);
+    FieldWFBC_Free(mapper->wfbc);
     if (mapper->propSystem != NULL) {
         FieldPropSystem_Free(mapper->propSystem);
         mapper->propSystem = NULL;
@@ -776,7 +776,7 @@ FieldPropSystem *FieldG3DMapper_GetBMSystem(FieldG3DMapper *mapper) {
 }
 
 void FieldG3DMapper_SetupWfbc(FieldG3DMapper *mapper, CityState *city, BOOL isOther) {
-    func_ov036_0218ade0(mapper->wfbc, city, isOther, mapper->heapId);
+    FieldWFBC_Setup(mapper->wfbc, city, isOther, mapper->heapId);
 }
 
 ResortMapCreateWork *FieldG3DMapper_GetResortMap(FieldG3DMapper *mapper) {

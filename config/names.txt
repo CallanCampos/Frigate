@@ -10071,6 +10071,13 @@ overlays/ov036 0x0218a748 MsgBGInput_GetTextWait
 overlays/ov036 0x0218a760 MsgBGPrinter_KeyWaitCheckSkip
 overlays/ov036 0x0218a798 MsgBGPrinter_KeyWaitCheckAdvance
 overlays/ov036 0x0218a7d8 MsgBGPrinter_StreamSetSpeed
+overlays/ov036 0x0218adac FieldWFBC_Create
+overlays/ov036 0x0218add0 FieldWFBC_Free
+overlays/ov036 0x0218ade0 FieldWFBC_Setup
+overlays/ov036 0x0218adfc FieldWFBC_LoadResources
+overlays/ov036 0x0218ae00 FieldWFBC_FreeResources
+overlays/ov036 0x0218ae04 FieldWFBC_Clear
+overlays/ov036 0x0218ae10 FieldWFBC_SetCityState
 overlays/ov036 0x0218b050 FieldCommActor_MoveDelete
 overlays/ov036 0x0218b110 FieldCommActor_SetMoveWork
 overlays/ov036 0x0218b128 FieldCommActor_ConvertDir

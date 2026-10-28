@@ -102,9 +102,9 @@ void HeightEx_SetAreaInUse(u8 index, BOOL inUse, HeightExList *list);
 // Overlay 36's field_fade.c: whether a grid position is in the rectangle of an entry of the list
 BOOL HeightEx_IsPointInArea(s32 x, s32 z, const HeightExEntry *entry);
 // The mapper's WFBC work
-FieldWFBC *func_ov036_0218adac(HeapID heapId);
-void func_ov036_0218add0(FieldWFBC *wfbc);
-void func_ov036_0218ade0(FieldWFBC *wfbc, CityState *city, BOOL isOther, HeapID heapId);
+FieldWFBC *FieldWFBC_Create(HeapID heapId);
+void FieldWFBC_Free(FieldWFBC *wfbc);
+void FieldWFBC_Setup(FieldWFBC *wfbc, CityState *city, BOOL isOther, HeapID heapId);
 void FieldSubscreen_ChangeImm(FieldSubscreen *subscreen, u32 mode);
 BOOL FieldTaskManager_IsIdle(FieldTaskManager *taskManager);
 u32 FieldTaskManager_GetActiveTaskCount(FieldTaskManager *taskManager);
