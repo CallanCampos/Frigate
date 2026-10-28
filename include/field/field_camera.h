@@ -245,9 +245,16 @@ typedef struct {
     // The frame of the swing
     u32 frame;
     s16 delay;
+    // A CAMERA_SHAKE_ value
     u8 mode;
     u8 pad1F;
 } FieldCameraShakeSetup;
+// What the shake moves: the camera's target and its eye offset, the target only, or the eye offset only
+enum {
+    CAMERA_SHAKE_BOTH,
+    CAMERA_SHAKE_TARGET,
+    CAMERA_SHAKE_EYE,
+};
 
 // Shakes the camera; the task ends when the shake does
 FieldTask *FieldCameraShakeTask_Create(Field *field, const FieldCameraShakeSetup *setup);
