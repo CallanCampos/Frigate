@@ -116,8 +116,8 @@ GameEvent *EventLeagueLiftWarp_Create(GameSystem *gsys, Field *field) {
     data->taskManager = Field_GetTaskManager(field);
     data->animation.frames = 20;
     data->animation.dst = data_ov012_0216dc3c;
-    data->animation.unk48 = TRUE;
-    data->animation.unk4C = TRUE;
+    data->animation.releaseBind = TRUE;
+    data->animation.disableBoundary = TRUE;
     data->cameraController = Field_CreateCameraAnimationController(field);
     FieldCameraAnimationController_SetAnimation(data->cameraController, &data->animation);
     return event;

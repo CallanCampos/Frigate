@@ -158,8 +158,9 @@ typedef struct {
     u32 frames;
     FieldCameraCoords src;
     FieldCameraCoords dst;
-    BOOL unk48;
-    BOOL unk4C;
+    // Whether the camera lets go of what it is bound to, and leaves its boundary, while the animation plays
+    BOOL releaseBind;
+    BOOL disableBoundary;
 } FieldCameraAnimation;
 
 typedef struct FieldCameraAnimationController FieldCameraAnimationController;
