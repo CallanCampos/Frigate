@@ -10716,6 +10716,7 @@ overlays/ov036 0x021952ac RailActor_AcStayWalkD4F0
 overlays/ov036 0x021952bc RailActor_AcStayWalkL4F0
 overlays/ov036 0x021952cc RailActor_AcStayWalkR4F0
 overlays/ov036 0x021952dc RailActorAcmd_InitJump
+overlays/ov036 0x02195354 RailActorAcmd_InitJumpWithSe
 overlays/ov036 0x02195378 RailJump_Update
 overlays/ov036 0x02195480 RailActor_AcJumpU1G8F0
 overlays/ov036 0x021954a0 RailActor_AcJumpD1G8F0

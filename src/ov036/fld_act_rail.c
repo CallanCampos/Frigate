@@ -78,42 +78,42 @@ static BOOL RailJump_Update(FieldActor *actor) {
 }
 
 static BOOL RailActor_AcJumpU1G8F0(FieldActor *actor) {
-    func_ov036_02195354(actor, 0, 0x2000, 8, 3, 0, 0x200);
+    RailActorAcmd_InitJumpWithSe(actor, 0, 0x2000, 8, 3, 0, 0x200);
     return TRUE;
 }
 
 static BOOL RailActor_AcJumpD1G8F0(FieldActor *actor) {
-    func_ov036_02195354(actor, 1, 0x2000, 8, 3, 0, 0x200);
+    RailActorAcmd_InitJumpWithSe(actor, 1, 0x2000, 8, 3, 0, 0x200);
     return TRUE;
 }
 
 static BOOL RailActor_AcJumpL1G8F0(FieldActor *actor) {
-    func_ov036_02195354(actor, 2, 0x2000, 8, 3, 0, 0x200);
+    RailActorAcmd_InitJumpWithSe(actor, 2, 0x2000, 8, 3, 0, 0x200);
     return TRUE;
 }
 
 static BOOL RailActor_AcJumpR1G8F0(FieldActor *actor) {
-    func_ov036_02195354(actor, 3, 0x2000, 8, 3, 0, 0x200);
+    RailActorAcmd_InitJumpWithSe(actor, 3, 0x2000, 8, 3, 0, 0x200);
     return TRUE;
 }
 
 static BOOL RailActor_AcJumpU2G16F0(FieldActor *actor) {
-    func_ov036_02195354(actor, 0, 0x2000, 0x10, 3, 0, 0x100);
+    RailActorAcmd_InitJumpWithSe(actor, 0, 0x2000, 0x10, 3, 0, 0x100);
     return TRUE;
 }
 
 static BOOL RailActor_AcJumpD2G16F0(FieldActor *actor) {
-    func_ov036_02195354(actor, 1, 0x2000, 0x10, 3, 0, 0x100);
+    RailActorAcmd_InitJumpWithSe(actor, 1, 0x2000, 0x10, 3, 0, 0x100);
     return TRUE;
 }
 
 static BOOL RailActor_AcJumpL2G16F0(FieldActor *actor) {
-    func_ov036_02195354(actor, 2, 0x2000, 0x10, 3, 0, 0x100);
+    RailActorAcmd_InitJumpWithSe(actor, 2, 0x2000, 0x10, 3, 0, 0x100);
     return TRUE;
 }
 
 static BOOL RailActor_AcJumpR2G16F0(FieldActor *actor) {
-    func_ov036_02195354(actor, 3, 0x2000, 0x10, 3, 0, 0x100);
+    RailActorAcmd_InitJumpWithSe(actor, 3, 0x2000, 0x10, 3, 0, 0x100);
     return TRUE;
 }
 

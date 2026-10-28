@@ -747,6 +747,6 @@ static void RailActorAcmd_InitJump(FieldActor *actor, u32 dir, u32 speed, u32 ti
     }
 }
 
-void func_ov036_02195354(FieldActor *actor, u16 dir, u32 speed, u32 timer, u16 frame, s16 height, u16 step) {
+void RailActorAcmd_InitJumpWithSe(FieldActor *actor, u16 dir, u32 speed, u32 timer, u16 frame, s16 height, u16 step) {
     RailActorAcmd_InitJump(actor, dir, speed, timer, frame, height, step, SEQ_SE_DANSA);
 }
