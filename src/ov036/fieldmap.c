@@ -440,7 +440,7 @@ u32 FieldRoutine_MapSpawnFinish(GameSystem *gsys, Field *field) {
         }
         FieldStatus_SetContinueFlag(GameData_GetFieldStatus(field->gameData), FALSE);
         FieldG3DMapper_UpdateSync(field->g3DMapper);
-        func_ov036_021b6660(field->fesGimmick);
+        FesGimmick_OnZoneEnter(field->fesGimmick);
         if (GetZoneIsUnionRoom(field->zoneId) == TRUE || IsZone150Or151(field->zoneId) == TRUE) {
             GSYS_SetEventProvider(gsys, FieldEventProvider_UnionRoom, field);
         } else if (Field_GetControllerTypeID(field) == 1) {
@@ -551,7 +551,7 @@ u32 FieldRoutine_RunAltFrame(GameSystem *gsys, Field *field) {
 u32 FieldRoutine_MapUnload(GameSystem *gsys, Field *field) {
     GameData *gameData;
 
-    func_ov036_021b65d4(field->fesGimmick);
+    FesGimmick_DeleteSparkles(field->fesGimmick);
     EncEff_Free(field->encEff);
     Fld3DCi_Free(field->g3dCi);
     FieldParticle_Free(field->particleSystem);
@@ -1124,7 +1124,7 @@ void Field_SwapZoneByMatrix(Field *field) {
     MI_SetMainMemoryPriority(MI_PROCESSOR_ARM9);
     Field_HotswapSpawnActors(field, gameData, actorSystem, eventData, zoneId);
     FestMission_OnZoneEnter(field->gameSystem, zoneId);
-    func_ov036_021b6660(field->fesGimmick);
+    FesGimmick_OnZoneEnter(field->fesGimmick);
     MI_SetMainMemoryPriority(MI_PROCESSOR_ARM7);
     func_ov012_02153668(GSYS_GetGameCommSystem(field->gameSystem));
 }

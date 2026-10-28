@@ -562,7 +562,7 @@ static BOOL CallFieldActorMessageDispSelect(VM *vm, FieldScriptEnv *env, u8 seco
 
 BOOL s0278_FunfestDispSalesmanMessage(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
-    u32 count = func_ov036_021b67bc(Field_GetFesGimmick(GSYS_GetField(FieldScriptEnv_GetGameSystem(env))));
+    u32 count = FesGimmick_IsOnSale(Field_GetFesGimmick(GSYS_GetField(FieldScriptEnv_GetGameSystem(env))));
     u16 actorId = ScriptWork_ResolveHybridValue(work, FieldScriptEnv_GetGameData(env), 0x8011);
     u16 msgId = ScriptReadAny(vm, env);
     u16 step = ScriptReadAny(vm, env);

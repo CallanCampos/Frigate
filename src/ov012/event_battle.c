@@ -239,7 +239,7 @@ GameEvent *EventTrainerBattleCall_Create(GameSystem *gsys, Field *field, u32 a2,
     if (flags & 4) {
         PokeParty *party = BtlSetup_GetParty(setup, 1);
 
-        func_ov036_021b67d8(Field_GetFesGimmick(field), party);
+        FesGimmick_BoostPartyLevels(Field_GetFesGimmick(field), party);
     }
     if (flags & 2) {
         if (AreaData_IsInfinityDungeon(ZoneData_GetAreaID(Field_GetPlayerStateZoneID(field)))) {

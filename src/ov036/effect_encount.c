@@ -482,7 +482,7 @@ static void EffectEncount_PlaceRandomCandidate(EncountSystem *system, EffectEnco
     RareEncountSpot *spot = &encountState->rareSpot;
 
     candidate->y = (candidate->height >> 4) / FX32_ONE;
-    if (func_ov036_021b6758(Field_GetFesGimmick(system->field), candidate->x, candidate->z, candidate->height)) {
+    if (FesGimmick_IsSparkleOnTile(Field_GetFesGimmick(system->field), candidate->x, candidate->z, candidate->height)) {
         return;
     }
     if (IsPositionOccupiedByActorAny(system, candidate->x, candidate->y, candidate->z, FALSE)) {
