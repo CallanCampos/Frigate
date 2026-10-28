@@ -340,14 +340,14 @@ static u32 FieldPlayerRail_CheckAction(FieldPlayerNoGrid *nogrid, u32 dir, u32 p
     u32 command;
 
     switch (FieldPlayerCore_GetExState(nogrid->core)) {
-    case 0:
+    case FLD_PLAYER_EXSTATE_NONE:
         command = FieldPlayerRail_CheckActionWalk(nogrid, pressedKeys, heldKeys, dir, force);
         break;
-    case 1:
+    case FLD_PLAYER_EXSTATE_CYCLING:
         command = FieldPlayerRail_CheckActionSlow(nogrid, pressedKeys, heldKeys, dir, force);
         break;
-    case 2:
-    case 3:
+    case FLD_PLAYER_EXSTATE_SURF:
+    case FLD_PLAYER_EXSTATE_DIVE:
         command = FieldPlayerRail_CheckActionRail(nogrid, pressedKeys, heldKeys, dir, force);
         break;
     }
@@ -357,14 +357,14 @@ static u32 FieldPlayerRail_CheckAction(FieldPlayerNoGrid *nogrid, u32 dir, u32 p
 static void FieldPlayerRail_StartAction(FieldPlayerNoGrid *nogrid, u32 command, u32 dir, u32 pressedKeys, u32 heldKeys,
                                         BOOL force) {
     switch (FieldPlayerCore_GetExState(nogrid->core)) {
-    case 0:
+    case FLD_PLAYER_EXSTATE_NONE:
         FieldPlayerRail_StartActionWalk(nogrid, command, pressedKeys, heldKeys, dir, force);
         break;
-    case 1:
+    case FLD_PLAYER_EXSTATE_CYCLING:
         FieldPlayerRail_StartActionSlow(nogrid, command, pressedKeys, heldKeys, dir, force);
         break;
-    case 2:
-    case 3:
+    case FLD_PLAYER_EXSTATE_SURF:
+    case FLD_PLAYER_EXSTATE_DIVE:
         FieldPlayerRail_StartActionRail(nogrid, command, pressedKeys, heldKeys, dir, force);
         break;
     }
