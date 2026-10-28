@@ -35,7 +35,8 @@ struct WarpSequence {
     BOOL seasonChanged;
     u8 startSeason;
     u8 endSeason;
-    u32 unk48;
+    // Whether the departure changed to the next zone's BGM, which the arrival then fades in
+    u32 zoneBGMChanged;
     u32 unk4C;
     // The task that walks the player one tile, which the entrance events start
     FieldAcmdTCB *walkTask;

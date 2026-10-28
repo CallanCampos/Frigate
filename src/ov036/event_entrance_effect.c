@@ -12,6 +12,7 @@
 #include "field/field.h"
 #include "field/field_actor.h"
 #include "field/field_camera.h"
+#include "field/field_controller.h"
 #include "field/field_event.h"
 #include "field/field_g3d_mapper.h"
 #include "field/field_nogrid_mapper.h"
@@ -25,20 +26,36 @@
 #include "system/game_event.h"
 #include "system/game_system.h"
 
-// The steps of an entrance event, which it plays in the order of its steps array
+// The steps of the arrival's event, which it plays in the order of its steps array
 enum {
-    ENTRANCE_STEP_START,
-    ENTRANCE_STEP_TRANSITION,
-    ENTRANCE_STEP_2,
-    ENTRANCE_STEP_OPEN_DOOR,
-    ENTRANCE_STEP_WAIT_OPEN,
-    ENTRANCE_STEP_WALK,
-    ENTRANCE_STEP_CAMERA,
-    ENTRANCE_STEP_CLOSE_DOOR,
-    ENTRANCE_STEP_WAIT_CLOSE,
-    ENTRANCE_STEP_END,
-    ENTRANCE_STEP_WAIT_DELAY,
-    ENTRANCE_STEP_WAIT_TIMER,
+    ARRIVAL_STEP_START,
+    ARRIVAL_STEP_TRANSITION,
+    ARRIVAL_STEP_2,
+    ARRIVAL_STEP_OPEN_DOOR,
+    ARRIVAL_STEP_WAIT_OPEN,
+    ARRIVAL_STEP_WALK,
+    ARRIVAL_STEP_CAMERA,
+    ARRIVAL_STEP_CLOSE_DOOR,
+    ARRIVAL_STEP_WAIT_CLOSE,
+    ARRIVAL_STEP_END,
+    ARRIVAL_STEP_WAIT_DELAY,
+    ARRIVAL_STEP_WAIT_TIMER,
+};
+
+// The steps of the departure's event, the same way: set up the camera, start its animation, wait for the field's
+// tasks, open the door and wait for it, walk in, change to the next zone's BGM, play the transition, and end, with a
+// wait for a camera without frames
+enum {
+    DEPARTURE_STEP_START,
+    DEPARTURE_STEP_CAMERA,
+    DEPARTURE_STEP_WAIT_TASKS,
+    DEPARTURE_STEP_OPEN_DOOR,
+    DEPARTURE_STEP_WAIT_OPEN,
+    DEPARTURE_STEP_WALK,
+    DEPARTURE_STEP_BGM,
+    DEPARTURE_STEP_TRANSITION,
+    DEPARTURE_STEP_END,
+    DEPARTURE_STEP_WAIT_TIMER,
 };
 
 typedef struct {
@@ -116,58 +133,58 @@ static void EntranceEffect_SetArrivalSteps(EntranceEffectWork *work) {
         case DIR_UP:
         case DIR_DOWN:
         default:
-            work->steps[0] = ENTRANCE_STEP_START;
-            work->steps[1] = ENTRANCE_STEP_TRANSITION;
-            work->steps[2] = ENTRANCE_STEP_2;
-            work->steps[3] = ENTRANCE_STEP_CAMERA;
-            work->steps[4] = ENTRANCE_STEP_OPEN_DOOR;
-            work->steps[5] = ENTRANCE_STEP_WAIT_OPEN;
-            work->steps[6] = ENTRANCE_STEP_WALK;
-            work->steps[7] = ENTRANCE_STEP_CLOSE_DOOR;
-            work->steps[8] = ENTRANCE_STEP_WAIT_CLOSE;
-            work->steps[9] = ENTRANCE_STEP_END;
+            work->steps[0] = ARRIVAL_STEP_START;
+            work->steps[1] = ARRIVAL_STEP_TRANSITION;
+            work->steps[2] = ARRIVAL_STEP_2;
+            work->steps[3] = ARRIVAL_STEP_CAMERA;
+            work->steps[4] = ARRIVAL_STEP_OPEN_DOOR;
+            work->steps[5] = ARRIVAL_STEP_WAIT_OPEN;
+            work->steps[6] = ARRIVAL_STEP_WALK;
+            work->steps[7] = ARRIVAL_STEP_CLOSE_DOOR;
+            work->steps[8] = ARRIVAL_STEP_WAIT_CLOSE;
+            work->steps[9] = ARRIVAL_STEP_END;
             break;
         case DIR_LEFT:
         case DIR_RIGHT:
-            work->steps[0] = ENTRANCE_STEP_START;
-            work->steps[1] = ENTRANCE_STEP_TRANSITION;
-            work->steps[2] = ENTRANCE_STEP_2;
-            work->steps[3] = ENTRANCE_STEP_OPEN_DOOR;
-            work->steps[4] = ENTRANCE_STEP_WAIT_OPEN;
-            work->steps[5] = ENTRANCE_STEP_WALK;
-            work->steps[6] = ENTRANCE_STEP_CAMERA;
-            work->steps[7] = ENTRANCE_STEP_CLOSE_DOOR;
-            work->steps[8] = ENTRANCE_STEP_WAIT_CLOSE;
-            work->steps[9] = ENTRANCE_STEP_END;
+            work->steps[0] = ARRIVAL_STEP_START;
+            work->steps[1] = ARRIVAL_STEP_TRANSITION;
+            work->steps[2] = ARRIVAL_STEP_2;
+            work->steps[3] = ARRIVAL_STEP_OPEN_DOOR;
+            work->steps[4] = ARRIVAL_STEP_WAIT_OPEN;
+            work->steps[5] = ARRIVAL_STEP_WALK;
+            work->steps[6] = ARRIVAL_STEP_CAMERA;
+            work->steps[7] = ARRIVAL_STEP_CLOSE_DOOR;
+            work->steps[8] = ARRIVAL_STEP_WAIT_CLOSE;
+            work->steps[9] = ARRIVAL_STEP_END;
             break;
         }
     } else if (CityState_IsSlotIndexOutOfRange(warp->transitionType)) {
-        work->steps[0] = ENTRANCE_STEP_START;
-        work->steps[1] = ENTRANCE_STEP_TRANSITION;
-        work->steps[2] = ENTRANCE_STEP_2;
-        work->steps[3] = ENTRANCE_STEP_WALK;
-        work->steps[4] = ENTRANCE_STEP_CAMERA;
-        work->steps[5] = ENTRANCE_STEP_END;
+        work->steps[0] = ARRIVAL_STEP_START;
+        work->steps[1] = ARRIVAL_STEP_TRANSITION;
+        work->steps[2] = ARRIVAL_STEP_2;
+        work->steps[3] = ARRIVAL_STEP_WALK;
+        work->steps[4] = ARRIVAL_STEP_CAMERA;
+        work->steps[5] = ARRIVAL_STEP_END;
     } else {
         switch (Field_GetPlayerDirection(field)) {
         case DIR_UP:
         case DIR_DOWN:
         default:
-            work->steps[0] = ENTRANCE_STEP_START;
-            work->steps[1] = ENTRANCE_STEP_TRANSITION;
-            work->steps[2] = ENTRANCE_STEP_2;
-            work->steps[3] = ENTRANCE_STEP_CAMERA;
-            work->steps[4] = ENTRANCE_STEP_WALK;
-            work->steps[5] = ENTRANCE_STEP_END;
+            work->steps[0] = ARRIVAL_STEP_START;
+            work->steps[1] = ARRIVAL_STEP_TRANSITION;
+            work->steps[2] = ARRIVAL_STEP_2;
+            work->steps[3] = ARRIVAL_STEP_CAMERA;
+            work->steps[4] = ARRIVAL_STEP_WALK;
+            work->steps[5] = ARRIVAL_STEP_END;
             break;
         case DIR_LEFT:
         case DIR_RIGHT:
-            work->steps[0] = ENTRANCE_STEP_START;
-            work->steps[1] = ENTRANCE_STEP_TRANSITION;
-            work->steps[2] = ENTRANCE_STEP_2;
-            work->steps[3] = ENTRANCE_STEP_WALK;
-            work->steps[4] = ENTRANCE_STEP_CAMERA;
-            work->steps[5] = ENTRANCE_STEP_END;
+            work->steps[0] = ARRIVAL_STEP_START;
+            work->steps[1] = ARRIVAL_STEP_TRANSITION;
+            work->steps[2] = ARRIVAL_STEP_2;
+            work->steps[3] = ARRIVAL_STEP_WALK;
+            work->steps[4] = ARRIVAL_STEP_CAMERA;
+            work->steps[5] = ARRIVAL_STEP_END;
             break;
         }
     }
@@ -186,7 +203,7 @@ static GameEventReturnCode EntranceEffect_ArrivalCallback(GameEvent *event, u32 
 
     Field_GetPlayerStateZoneID(field);
     switch (*state) {
-    case ENTRANCE_STEP_START:
+    case ARRIVAL_STEP_START:
         Field_SetPlayerHidden(field, TRUE);
         if (!FieldCamera_SupportsDelay(camera)) {
             *state = EntranceEffect_GetNextStep(work);
@@ -194,72 +211,72 @@ static GameEventReturnCode EntranceEffect_ArrivalCallback(GameEvent *event, u32 
             break;
         }
         FieldCamera_FinishDelay(camera);
-        *state = ENTRANCE_STEP_WAIT_DELAY;
+        *state = ARRIVAL_STEP_WAIT_DELAY;
         break;
-    case ENTRANCE_STEP_WAIT_DELAY:
+    case ARRIVAL_STEP_WAIT_DELAY:
         if (!FieldCamera_IsDelayActive(camera)) {
             *state = EntranceEffect_GetNextStep(work);
             EntranceEffect_AdvanceStep(work);
         }
         break;
-    case ENTRANCE_STEP_TRANSITION:
+    case ARRIVAL_STEP_TRANSITION:
         EntranceCamera_Configure(work->camera, &work->cameraParam);
         FieldSnd_FadeInImmediate(fieldSound, gameData);
         EntranceEffect_ChainArrivalTransition(event, work);
         *state = EntranceEffect_GetNextStep(work);
         EntranceEffect_AdvanceStep(work);
         break;
-    case ENTRANCE_STEP_2:
+    case ARRIVAL_STEP_2:
         *state = EntranceEffect_GetNextStep(work);
         EntranceEffect_AdvanceStep(work);
         break;
-    case ENTRANCE_STEP_OPEN_DOOR:
+    case ARRIVAL_STEP_OPEN_DOOR:
         EntranceEffect_OpenDoor(work);
         *state = EntranceEffect_GetNextStep(work);
         EntranceEffect_AdvanceStep(work);
         break;
-    case ENTRANCE_STEP_WAIT_OPEN:
+    case ARRIVAL_STEP_WAIT_OPEN:
         if (EntranceEffect_IsDoorAnimationDone(work) == TRUE) {
             *state = EntranceEffect_GetNextStep(work);
             EntranceEffect_AdvanceStep(work);
         }
         break;
-    case ENTRANCE_STEP_WALK:
+    case ARRIVAL_STEP_WALK:
         Field_SetPlayerHidden(field, FALSE);
         GameEvent_ChainNext(event, CallMoveOneTileFrontEvent(gsys, field));
         if (EntranceCamera_IsActive(work->camera) && EntranceCamera_HasZeroFrames(work->camera)) {
-            *state = ENTRANCE_STEP_WAIT_TIMER;
+            *state = ARRIVAL_STEP_WAIT_TIMER;
             break;
         }
         *state = EntranceEffect_GetNextStep(work);
         EntranceEffect_AdvanceStep(work);
         break;
-    case ENTRANCE_STEP_CLOSE_DOOR:
+    case ARRIVAL_STEP_CLOSE_DOOR:
         EntranceEffect_CloseDoor(work);
         *state = EntranceEffect_GetNextStep(work);
         EntranceEffect_AdvanceStep(work);
         break;
-    case ENTRANCE_STEP_WAIT_TIMER:
+    case ARRIVAL_STEP_WAIT_TIMER:
         if (work->timer++ > 15) {
             *state = EntranceEffect_GetNextStep(work);
             EntranceEffect_AdvanceStep(work);
         }
         break;
-    case ENTRANCE_STEP_CAMERA:
+    case ARRIVAL_STEP_CAMERA:
         EntranceCamera_StartAnimation(work->camera);
         *state = EntranceEffect_GetNextStep(work);
         EntranceEffect_AdvanceStep(work);
         break;
-    case ENTRANCE_STEP_WAIT_CLOSE:
+    case ARRIVAL_STEP_WAIT_CLOSE:
         if (EntranceEffect_IsDoorAnimationDone(work) == TRUE) {
             *state = EntranceEffect_GetNextStep(work);
             EntranceEffect_AdvanceStep(work);
         }
         break;
-    case ENTRANCE_STEP_END:
+    case ARRIVAL_STEP_END:
         break;
     }
-    if (GSYS_GetNowEvent(gsys) == event && EntranceEffect_GetStep(work) == ENTRANCE_STEP_END &&
+    if (GSYS_GetNowEvent(gsys) == event && EntranceEffect_GetStep(work) == ARRIVAL_STEP_END &&
         FieldTaskManager_IsIdle(taskManager)) {
         EntranceCamera_FinishCamera(work->camera);
         FieldCamera_LoadDefaults(camera);
@@ -297,22 +314,22 @@ GameEvent *EntranceEffect_CreateB(WarpSequence *warp) {
 
 static void EntranceEffect_SetDepartureSteps(EntranceEffectWork *work) {
     if (EntranceEffect_HasDoor(work)) {
-        work->steps[0] = 0;
-        work->steps[1] = 3;
-        work->steps[2] = 1;
-        work->steps[3] = 2;
-        work->steps[4] = 5;
-        work->steps[5] = 6;
-        work->steps[6] = 7;
-        work->steps[7] = 8;
+        work->steps[0] = DEPARTURE_STEP_START;
+        work->steps[1] = DEPARTURE_STEP_OPEN_DOOR;
+        work->steps[2] = DEPARTURE_STEP_CAMERA;
+        work->steps[3] = DEPARTURE_STEP_WAIT_TASKS;
+        work->steps[4] = DEPARTURE_STEP_WALK;
+        work->steps[5] = DEPARTURE_STEP_BGM;
+        work->steps[6] = DEPARTURE_STEP_TRANSITION;
+        work->steps[7] = DEPARTURE_STEP_END;
     } else {
-        work->steps[0] = 0;
-        work->steps[1] = 1;
-        work->steps[2] = 2;
-        work->steps[3] = 5;
-        work->steps[4] = 6;
-        work->steps[5] = 7;
-        work->steps[6] = 8;
+        work->steps[0] = DEPARTURE_STEP_START;
+        work->steps[1] = DEPARTURE_STEP_CAMERA;
+        work->steps[2] = DEPARTURE_STEP_WAIT_TASKS;
+        work->steps[3] = DEPARTURE_STEP_WALK;
+        work->steps[4] = DEPARTURE_STEP_BGM;
+        work->steps[5] = DEPARTURE_STEP_TRANSITION;
+        work->steps[6] = DEPARTURE_STEP_END;
     }
 }
 
@@ -327,7 +344,7 @@ static GameEventReturnCode EntranceEffect_DepartureCallback(GameEvent *event, u3
     FieldTaskManager *taskManager = Field_GetTaskManager(field);
 
     switch (*state) {
-    case 0:
+    case DEPARTURE_STEP_START:
         EntranceCamera_Configure(work->camera, &work->cameraParam);
         *state = EntranceEffect_GetNextStep(work);
         EntranceEffect_AdvanceStep(work);
@@ -335,7 +352,7 @@ static GameEventReturnCode EntranceEffect_DepartureCallback(GameEvent *event, u3
             return GAMEEVENT_CONTINUE_DIRECT;
         }
         break;
-    case 1:
+    case DEPARTURE_STEP_CAMERA:
         EntranceCamera_StartAnimation(work->camera);
         *state = EntranceEffect_GetNextStep(work);
         EntranceEffect_AdvanceStep(work);
@@ -343,7 +360,7 @@ static GameEventReturnCode EntranceEffect_DepartureCallback(GameEvent *event, u3
             return GAMEEVENT_CONTINUE_DIRECT;
         }
         break;
-    case 3:
+    case DEPARTURE_STEP_OPEN_DOOR:
         EntranceEffect_OpenDoor(work);
         *state = EntranceEffect_GetNextStep(work);
         EntranceEffect_AdvanceStep(work);
@@ -351,12 +368,12 @@ static GameEventReturnCode EntranceEffect_DepartureCallback(GameEvent *event, u3
             return GAMEEVENT_CONTINUE_DIRECT;
         }
         break;
-    case 2:
+    case DEPARTURE_STEP_WAIT_TASKS:
         if (!FieldTaskManager_IsIdle(taskManager)) {
             break;
         }
         if (EntranceCamera_IsActive(work->camera) && EntranceCamera_HasZeroFrames(work->camera)) {
-            *state = 9;
+            *state = DEPARTURE_STEP_WAIT_TIMER;
         } else {
             *state = EntranceEffect_GetNextStep(work);
             EntranceEffect_AdvanceStep(work);
@@ -365,7 +382,7 @@ static GameEventReturnCode EntranceEffect_DepartureCallback(GameEvent *event, u3
             return GAMEEVENT_CONTINUE_DIRECT;
         }
         break;
-    case 4:
+    case DEPARTURE_STEP_WAIT_OPEN:
         if (EntranceEffect_IsDoorAnimationDone(work) == TRUE) {
             *state = EntranceEffect_GetNextStep(work);
             EntranceEffect_AdvanceStep(work);
@@ -374,7 +391,7 @@ static GameEventReturnCode EntranceEffect_DepartureCallback(GameEvent *event, u3
             }
         }
         break;
-    case 9:
+    case DEPARTURE_STEP_WAIT_TIMER:
         if (work->timer++ > 15) {
             *state = EntranceEffect_GetNextStep(work);
             EntranceEffect_AdvanceStep(work);
@@ -383,7 +400,7 @@ static GameEventReturnCode EntranceEffect_DepartureCallback(GameEvent *event, u3
             }
         }
         break;
-    case 5:
+    case DEPARTURE_STEP_WALK:
         EntranceEffect_FreePlayerAcmd(field);
         GameEvent_ChainNext(event, EventWarpSequence_CreateWalkEvent(gsys, warp));
         *state = EntranceEffect_GetNextStep(work);
@@ -392,13 +409,13 @@ static GameEventReturnCode EntranceEffect_DepartureCallback(GameEvent *event, u3
             return GAMEEVENT_CONTINUE_DIRECT;
         }
         break;
-    case 6:
+    case DEPARTURE_STEP_BGM:
         FieldSnd_SetZoneBGM(fieldSound, gameData, warp->spawn.zoneId, warp->endSeason);
-        warp->unk48 = TRUE;
+        warp->zoneBGMChanged = TRUE;
         *state = EntranceEffect_GetNextStep(work);
         EntranceEffect_AdvanceStep(work);
         break;
-    case 7:
+    case DEPARTURE_STEP_TRANSITION:
         if (EntranceEffect_ShouldPlayStairsSound(work)) {
             GFL_SndSEPlay(SEQ_SE_KAIDAN);
         }
@@ -406,7 +423,7 @@ static GameEventReturnCode EntranceEffect_DepartureCallback(GameEvent *event, u3
         *state = EntranceEffect_GetNextStep(work);
         EntranceEffect_AdvanceStep(work);
         break;
-    case 8:
+    case DEPARTURE_STEP_END:
         EntranceCamera_FinishCamera(work->camera);
         EntranceCamera_Destroy(work->camera);
         EntranceEffect_FreeDoorHandle(work);
@@ -424,7 +441,7 @@ static void EntranceEffect_GetPlayerPosition(Field *field, VecFx32 *pos) {
 }
 
 static void EntranceEffect_GetFrontPosition(Field *field, VecFx32 *pos) {
-    if (Field_GetResolvedControllerTypeID(field) == 1) {
+    if (Field_GetResolvedControllerTypeID(field) == FIELDMAP_CTRL_TYPE_NOGRID) {
         EntranceEffect_GetRailFrontPosition(field, pos);
     } else {
         EntranceEffect_GetGridFrontPosition(field, pos);

@@ -317,7 +317,7 @@ static void EventWarpSequenceOut_ChangeToZoneBGM(WarpOutData *out) {
     GameData *gameData = warp->gameData;
 
     FieldSnd_SetZoneBGM(GameData_GetFieldSoundSystem(gameData), gameData, warp->spawn.zoneId, warp->endSeason);
-    warp->unk48 = 1;
+    warp->zoneBGMChanged = 1;
 }
 
 static void EventWarpSequenceOut_FadeOutBGM(WarpOutData *out, GameEvent *event) {
@@ -391,7 +391,7 @@ GameEventReturnCode EventWarpSequenceIn_RunPlain(GameEvent *event, u32 *state, v
 
     switch (*state) {
     case 0:
-        if (warp->unk48 != 0) {
+        if (warp->zoneBGMChanged != 0) {
             EventWarpSequenceIn_FadeInBGM(in);
         }
         EventWarpSequenceIn_PlayTransition(in, event);
@@ -432,7 +432,7 @@ GameEventReturnCode EventWarpSequenceIn_RunObjectAnime(GameEvent *event, u32 *st
         (*state)++;
         break;
     case 1:
-        if (warp->unk48 != 0) {
+        if (warp->zoneBGMChanged != 0) {
             EventWarpSequenceIn_FadeInBGM(in);
         } else if (warp->unk4C != 0) {
             EventWarpSequenceIn_ChainBGMFadeIn(in, event);
@@ -492,7 +492,7 @@ GameEventReturnCode EventWarpSequenceIn_RunFadeSe(GameEvent *event, u32 *state, 
 
     switch (*state) {
     case 0:
-        if (warp->unk48 != 0) {
+        if (warp->zoneBGMChanged != 0) {
             EventWarpSequenceIn_FadeInBGM(in);
         }
         (*state)++;
