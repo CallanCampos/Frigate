@@ -11454,6 +11454,7 @@ overlays/ov036 0x021aeb0c Regulation_SetCaughtSpeciesWords
 overlays/ov036 0x021aeb64 Regulation_ListCaughtSpecies
 overlays/ov036 0x021aebf0 Regulation_CreatePartyCheckTask
 overlays/ov036 0x021aec28 TeamSelect_CheckTeams
+overlays/ov036 0x021aece0 Regulation_CheckTeams
 overlays/ov036 0x021aecf8 TeamSelectEvent_Create
 overlays/ov036 0x021aed8c TeamSelectEvent_Callback
 overlays/ov036 0x021af9dc PokeParty_ControlLegendMon

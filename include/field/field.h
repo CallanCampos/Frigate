@@ -69,7 +69,7 @@ GameEvent *JoinAvenueNameEntry_Create(u16 target, GameSystem *gsys, u16 *result,
 // the player choose between them, or NULL when neither can enter
 GameEvent *Regulation_CreatePartyCheckTask(GameSystem *gsys, u32 a1, Regulation *regulation, u16 *result,
                                            HeapID heapId);
-u32 func_ov036_021aece0(GameSystem *gsys, u32 a1, Regulation *regulation, HeapID heapId);
+u32 Regulation_CheckTeams(GameSystem *gsys, u32 a1, Regulation *regulation, HeapID heapId);
 // The screen that picks the party or the Battle Box for a battle, whether it is done, and the choice
 PartySelectList *PartySelectList_Create(Field *field, PokeParty *party, PokeParty *battleBoxParty, u8 partyOk,
                                         u32 battleBoxOk, HeapID heapId);

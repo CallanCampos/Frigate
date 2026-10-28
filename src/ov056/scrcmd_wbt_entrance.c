@@ -89,7 +89,7 @@ BOOL WbtCmd_CheckEntryParties(VM *vm, FieldScriptEnv *env) {
     u16 *var = ScriptReadVar(vm, env);
     HeapID heapId = FieldScriptEnv_GetHeapID(env);
 
-    *var = func_ov036_021aece0(gsys, 1, WbtSystem_GetRegulation(sys), heapId);
+    *var = Regulation_CheckTeams(gsys, 1, WbtSystem_GetRegulation(sys), heapId);
     return FALSE;
 }
 
