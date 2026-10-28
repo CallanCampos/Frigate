@@ -2,7 +2,7 @@
 #include "app/gtsnego.h"
 #include "app/pokemon_trade.h"
 #include "app/wifi_login.h"
-#include "demo/shinka_demo.h"
+#include "demo/evolution_demo.h"
 #include "field/event_gtsnego.h"
 #include "field/field_event.h"
 #include "gfl/heap.h"
@@ -125,8 +125,8 @@ GameEventReturnCode EventGtsNego_Callback(GameEvent *event, u32 *state, void *da
         *state = 4;
         break;
     case 10: {
-        ShinkaDemoParam *evolution =
-            GFL_HeapAllocate(HEAPID_GAMEEVENT, sizeof(ShinkaDemoParam), FALSE, "event_gtsnego.c", 204);
+        EvolutionDemoParam *evolution =
+            GFL_HeapAllocate(HEAPID_GAMEEVENT, sizeof(EvolutionDemoParam), FALSE, "event_gtsnego.c", 204);
 
         evolution->gameData = wk->trade.gameData;
         evolution->party = wk->party;
@@ -136,7 +136,7 @@ GameEventReturnCode EventGtsNego_Callback(GameEvent *event, u32 *state, void *da
         evolution->unkC = 1;
         evolution->canCancel = FALSE;
         wk->trade.evolution = evolution;
-        GSYS_QueueProc(gsys, OVERLAY_SHINKA_DEMO, &SHINKA_DEMO_PROC_FUNCTIONS, evolution);
+        GSYS_QueueProc(gsys, OVERLAY_EVOLUTION_DEMO, &EVOLUTION_DEMO_PROC_FUNCTIONS, evolution);
         (*state)++;
         break;
     }

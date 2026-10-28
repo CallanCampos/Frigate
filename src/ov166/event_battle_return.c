@@ -12,7 +12,7 @@
 #include "constants/pokemon.h"
 #include "constants/species.h"
 #include "constants/text_banks.h"
-#include "demo/shinka_demo.h"
+#include "demo/evolution_demo.h"
 #include "field/burmy_form.h"
 #include "field/player_state.h"
 #include "field/zone.h"
@@ -63,7 +63,7 @@ typedef struct {
     // Where the Pokémon goes when the party is full
     StrBuf *boxMessage;
     u32 box;
-    ShinkaDemoParam *shinkaDemo;
+    EvolutionDemoParam *evolutionDemo;
     // The party slot evolveMask's lowest bit stands for
     u16 evolveSlot;
     // The party slots whose Pokémon leveled up in the battle, which may evolve
@@ -124,7 +124,7 @@ static BOOL EventBattleReturn_Init(GameProc *proc, u32 *state, void *param, void
     wk->pkm = NULL;
     wk->boxMessage = NULL;
     wk->box = 0;
-    wk->shinkaDemo = NULL;
+    wk->evolutionDemo = NULL;
     wk->heapId = HEAPID_BATTLE_RETURN;
     wk->procManager = CreateGameProcManager(wk->heapId);
     wk->musicDone = FALSE;
@@ -167,7 +167,7 @@ static BOOL EventBattleReturn_Main(GameProc *proc, u32 *state, void *param, void
     u32 evolveSlot;
     PartyPkm *pkm;
     u32 method;
-    ShinkaDemoParam *demo;
+    EvolutionDemoParam *demo;
 
     procRunning = GFL_ProcMgrUpdate(wk->procManager);
     if (procRunning == TRUE) {
@@ -321,7 +321,8 @@ static BOOL EventBattleReturn_Main(GameProc *proc, u32 *state, void *param, void
                 wk->evolveMask = wk->evolveMask >> 1;
                 wk->evolveSlot++;
                 if (species != 0) {
-                    demo = GFL_HeapAllocate(wk->heapId, sizeof(ShinkaDemoParam), FALSE, "event_battle_return.c", 465);
+                    demo =
+                        GFL_HeapAllocate(wk->heapId, sizeof(EvolutionDemoParam), FALSE, "event_battle_return.c", 465);
                     demo->gameData = prm->gameData;
                     demo->party = party;
                     demo->species = species;
@@ -329,8 +330,8 @@ static BOOL EventBattleReturn_Main(GameProc *proc, u32 *state, void *param, void
                     demo->method = method;
                     demo->unkC = 0;
                     demo->canCancel = TRUE;
-                    wk->shinkaDemo = demo;
-                    QueueGameProc(wk->procManager, OVERLAY_SHINKA_DEMO, &SHINKA_DEMO_PROC_FUNCTIONS, demo);
+                    wk->evolutionDemo = demo;
+                    QueueGameProc(wk->procManager, OVERLAY_EVOLUTION_DEMO, &EVOLUTION_DEMO_PROC_FUNCTIONS, demo);
                     *state = 5;
                     break;
                 }
@@ -341,8 +342,8 @@ static BOOL EventBattleReturn_Main(GameProc *proc, u32 *state, void *param, void
         break;
     case 5:
         if (procRunning != TRUE) {
-            GFL_HeapFree(wk->shinkaDemo);
-            wk->shinkaDemo = NULL;
+            GFL_HeapFree(wk->evolutionDemo);
+            wk->evolutionDemo = NULL;
             if (wk->evolveMask != 0) {
                 *state = 4;
             } else {

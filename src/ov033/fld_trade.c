@@ -2,7 +2,7 @@
 #include "constants/arc.h"
 #include "constants/pokemon.h"
 #include "constants/text_banks.h"
-#include "demo/shinka_demo.h"
+#include "demo/evolution_demo.h"
 #include "field/event_field_trade.h"
 #include "field/field_event.h"
 #include "field/fld_trade.h"
@@ -178,7 +178,7 @@ GameEventReturnCode EventFieldTrade_Callback(GameEvent *event, u32 *state, void 
     Field *field;
     PartyPkm *pkm;
     PokeDexSave *pokedex;
-    ShinkaDemoParam *evolutionParam;
+    EvolutionDemoParam *evolutionParam;
     u32 species;
     u32 method;
 
@@ -219,7 +219,8 @@ GameEventReturnCode EventFieldTrade_Callback(GameEvent *event, u32 *state, void 
     case 3:
         species = CheckEvolveSpecies(party, pkm, 1, 0, GameData_GetSeason(gameData), &method, HEAPID_GAMEEVENT);
         if (species != 0) {
-            evolutionParam = GFL_HeapAllocate(HEAPID_GAMEEVENT, sizeof(ShinkaDemoParam), FALSE, "fld_trade.c", 0x1ff);
+            evolutionParam =
+                GFL_HeapAllocate(HEAPID_GAMEEVENT, sizeof(EvolutionDemoParam), FALSE, "fld_trade.c", 0x1ff);
             evolutionParam->gameData = gameData;
             evolutionParam->party = party;
             evolutionParam->species = species;
@@ -228,8 +229,9 @@ GameEventReturnCode EventFieldTrade_Callback(GameEvent *event, u32 *state, void 
             evolutionParam->unkC = 1;
             evolutionParam->canCancel = FALSE;
             work->evolutionParam = evolutionParam;
-            GameEvent_ChainNext(event, EventFieldSubprocessTransition_Create(
-                                           gsys, field, OVERLAY_ID(284), &SHINKA_DEMO_PROC_FUNCTIONS, evolutionParam));
+            GameEvent_ChainNext(event,
+                                EventFieldSubprocessTransition_Create(gsys, field, OVERLAY_ID(284),
+                                                                      &EVOLUTION_DEMO_PROC_FUNCTIONS, evolutionParam));
         }
         *state = 4;
         break;

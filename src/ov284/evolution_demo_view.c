@@ -1,8 +1,9 @@
+// The ROM names this file shinka_demo_view.c.
 #include "types.h"
 #include "constants/pokemon.h"
 #include "constants/species.h"
-#include "demo/shinka_demo.h"
-#include "demo/shinka_demo_view.h"
+#include "demo/evolution_demo.h"
+#include "demo/evolution_demo_view.h"
 #include "gfl/arc_util.h"
 #include "gfl/bmp.h"
 #include "gfl/bmpwin.h"
@@ -177,7 +178,7 @@ typedef struct {
     SpriteRest *rest;
 } PiecesManager;
 
-struct ShinkaDemoView {
+struct EvolutionDemoView {
     HeapID heapId;
     PartyPkm *pkm;
     BOOL played;
@@ -208,57 +209,57 @@ struct ShinkaDemoView {
     BOOL mcssVisible;
 };
 
-static void ShinkaDemoView_InitMcss(ShinkaDemoView *view);
-static void ShinkaDemoView_FreeMcss(ShinkaDemoView *view);
-static fx32 ShinkaDemoView_GetSpriteY(PartyPkm *pkm);
-static void ShinkaDemoView_AddMcss(ShinkaDemoView *view);
-static void ShinkaDemoView_RemoveMcss(ShinkaDemoView *view);
-static u8 ShinkaDemoView_OtherMcss(u8 index);
-static void ShinkaDemoView_SetMcssOffsets(ShinkaDemoView *view);
-static void ShinkaDemoView_SetMcssX(ShinkaDemoView *view, fx32 x);
-static void ShinkaDemoView_InitPieces(ShinkaDemoView *view);
-static void ShinkaDemoView_FreePieces(ShinkaDemoView *view);
-static void ShinkaDemoView_UpdatePieces(ShinkaDemoView *view);
-static void ShinkaDemoView_DrawPieces(ShinkaDemoView *view);
-static void ShinkaDemoView_StartPieces(ShinkaDemoView *view);
-static BOOL ShinkaDemoView_ArePiecesMoving(ShinkaDemoView *view);
-static void ShinkaDemoView_StopPieces(ShinkaDemoView *view);
-static void ShinkaDemoView_SetPiecesPosition(ShinkaDemoView *view, fx32 x, fx32 y, fx32 z);
-static void ShinkaDemoPieces_SetPosition(SpritePieces *pieces, HeapID heapId, fx32 x, fx32 y, fx32 z);
-static void ShinkaDemoView_UnwhitenPieces(ShinkaDemoView *view);
-static BOOL ShinkaDemoView_ArePiecesIdle(ShinkaDemoView *view);
-static BOOL ShinkaDemoView_ArePiecesReturned(ShinkaDemoView *view);
-static SpritePieces *ShinkaDemoPieces_Create(u32 species, u32 form, u32 sex, BOOL rare, u32 dir, BOOL egg, u32 texAddr,
-                                             u32 plttAddr, HeapID heapId);
-static void ShinkaDemoPieces_Free(SpritePieces *pieces, HeapID heapId);
-static void ShinkaDemoPieces_Init(SpritePieces *pieces, HeapID heapId);
-static void ShinkaDemoPieces_Layout(SpritePieces *pieces, HeapID heapId);
-static void ShinkaDemoPieces_Draw(SpritePieces *pieces, HeapID heapId);
-static void ShinkaDemoView_RunPieces(ShinkaDemoView *view);
-static void ShinkaDemoPieces_Move(SpritePieces *pieces, HeapID heapId);
-static void ShinkaDemoPieces_SetFade(SpritePieces *pieces, HeapID heapId, GXRgb color, s16 start, s16 end, s16 wait,
-                                     s16 step);
-static BOOL ShinkaDemoPieces_IsFadeDone(SpritePieces *pieces, HeapID heapId);
-static void ShinkaDemoPieces_UpdateFade(SpritePieces *pieces, HeapID heapId);
-static void ShinkaDemoPieces_ApplyFade(SpritePieces *pieces, HeapID heapId);
-static BOOL ShinkaDemoPieces_IsIdle(SpritePieces *pieces, HeapID heapId);
-static BOOL ShinkaDemoPieces_IsGathered(SpritePieces *pieces, HeapID heapId);
-static void ShinkaDemoPieces_Whiten(SpritePieces *pieces, HeapID heapId);
-static BOOL ShinkaDemoPieces_IsWhite(SpritePieces *pieces, HeapID heapId);
-static BOOL ShinkaDemoPieces_IsReturned(SpritePieces *pieces, HeapID heapId);
-static void ShinkaDemoPieces_Update(SpritePieces *pieces, HeapID heapId);
-static SpriteRest *ShinkaDemoRest_Create(u32 texAddr, u32 plttAddr, HeapID heapId);
-static void ShinkaDemoRest_Free(SpriteRest *rest, HeapID heapId);
-static void ShinkaDemoRest_Update(SpriteRest *rest, HeapID heapId);
-static void ShinkaDemoRest_Draw(SpriteRest *rest, HeapID heapId);
-static void ShinkaDemoRest_SetPosition(SpriteRest *rest, HeapID heapId, fx32 x, fx32 y, fx32 z);
+static void EvolutionDemoView_InitMcss(EvolutionDemoView *view);
+static void EvolutionDemoView_FreeMcss(EvolutionDemoView *view);
+static fx32 EvolutionDemoView_GetSpriteY(PartyPkm *pkm);
+static void EvolutionDemoView_AddMcss(EvolutionDemoView *view);
+static void EvolutionDemoView_RemoveMcss(EvolutionDemoView *view);
+static u8 EvolutionDemoView_OtherMcss(u8 index);
+static void EvolutionDemoView_SetMcssOffsets(EvolutionDemoView *view);
+static void EvolutionDemoView_SetMcssX(EvolutionDemoView *view, fx32 x);
+static void EvolutionDemoView_InitPieces(EvolutionDemoView *view);
+static void EvolutionDemoView_FreePieces(EvolutionDemoView *view);
+static void EvolutionDemoView_UpdatePieces(EvolutionDemoView *view);
+static void EvolutionDemoView_DrawPieces(EvolutionDemoView *view);
+static void EvolutionDemoView_StartPieces(EvolutionDemoView *view);
+static BOOL EvolutionDemoView_ArePiecesMoving(EvolutionDemoView *view);
+static void EvolutionDemoView_StopPieces(EvolutionDemoView *view);
+static void EvolutionDemoView_SetPiecesPosition(EvolutionDemoView *view, fx32 x, fx32 y, fx32 z);
+static void EvolutionDemoPieces_SetPosition(SpritePieces *pieces, HeapID heapId, fx32 x, fx32 y, fx32 z);
+static void EvolutionDemoView_UnwhitenPieces(EvolutionDemoView *view);
+static BOOL EvolutionDemoView_ArePiecesIdle(EvolutionDemoView *view);
+static BOOL EvolutionDemoView_ArePiecesReturned(EvolutionDemoView *view);
+static SpritePieces *EvolutionDemoPieces_Create(u32 species, u32 form, u32 sex, BOOL rare, u32 dir, BOOL egg,
+                                                u32 texAddr, u32 plttAddr, HeapID heapId);
+static void EvolutionDemoPieces_Free(SpritePieces *pieces, HeapID heapId);
+static void EvolutionDemoPieces_Init(SpritePieces *pieces, HeapID heapId);
+static void EvolutionDemoPieces_Layout(SpritePieces *pieces, HeapID heapId);
+static void EvolutionDemoPieces_Draw(SpritePieces *pieces, HeapID heapId);
+static void EvolutionDemoView_RunPieces(EvolutionDemoView *view);
+static void EvolutionDemoPieces_Move(SpritePieces *pieces, HeapID heapId);
+static void EvolutionDemoPieces_SetFade(SpritePieces *pieces, HeapID heapId, GXRgb color, s16 start, s16 end, s16 wait,
+                                        s16 step);
+static BOOL EvolutionDemoPieces_IsFadeDone(SpritePieces *pieces, HeapID heapId);
+static void EvolutionDemoPieces_UpdateFade(SpritePieces *pieces, HeapID heapId);
+static void EvolutionDemoPieces_ApplyFade(SpritePieces *pieces, HeapID heapId);
+static BOOL EvolutionDemoPieces_IsIdle(SpritePieces *pieces, HeapID heapId);
+static BOOL EvolutionDemoPieces_IsGathered(SpritePieces *pieces, HeapID heapId);
+static void EvolutionDemoPieces_Whiten(SpritePieces *pieces, HeapID heapId);
+static BOOL EvolutionDemoPieces_IsWhite(SpritePieces *pieces, HeapID heapId);
+static BOOL EvolutionDemoPieces_IsReturned(SpritePieces *pieces, HeapID heapId);
+static void EvolutionDemoPieces_Update(SpritePieces *pieces, HeapID heapId);
+static SpriteRest *EvolutionDemoRest_Create(u32 texAddr, u32 plttAddr, HeapID heapId);
+static void EvolutionDemoRest_Free(SpriteRest *rest, HeapID heapId);
+static void EvolutionDemoRest_Update(SpriteRest *rest, HeapID heapId);
+static void EvolutionDemoRest_Draw(SpriteRest *rest, HeapID heapId);
+static void EvolutionDemoRest_SetPosition(SpriteRest *rest, HeapID heapId, fx32 x, fx32 y, fx32 z);
 
-// Declared in demo/shinka_demo_view.h. This order lays them out as the original has them
-const f32 SHINKA_DEMO_HELIX_HEIGHT = 44.0f;
-const f32 SHINKA_DEMO_HELIX_RADIUS_MAX = 20.0f;
-const u32 SHINKA_DEMO_VIEW_UNK_774 = 774;
-const f32 SHINKA_DEMO_HELIX_TOP = 22.0f;
-const f32 SHINKA_DEMO_HELIX_RADIUS_MIN = 10.0f;
+// Declared in demo/evolution_demo_view.h. This order lays them out as the original has them
+const f32 EVOLUTION_DEMO_HELIX_HEIGHT = 44.0f;
+const f32 EVOLUTION_DEMO_HELIX_RADIUS_MAX = 20.0f;
+const u32 EVOLUTION_DEMO_VIEW_UNK_774 = 774;
+const f32 EVOLUTION_DEMO_HELIX_TOP = 22.0f;
+const f32 EVOLUTION_DEMO_HELIX_RADIUS_MIN = 10.0f;
 
 // The top of the rest of the sprite's quad and texture for each count of rows broken away
 static const fx16 sRestTops[PIECE_ROWS + 1] = {
@@ -270,8 +271,8 @@ static const u8 sRestTexTops[PIECE_ROWS + 1] = {
     16, 21, 26, 32, 37, 42, 48, 53, 58, 64, 69, 74, 80, 85, 90, 96, 101, 106, 112,
 };
 
-ShinkaDemoView *ShinkaDemoView_Create(HeapID heapId, BOOL played, PartyPkm *pkm, u16 species) {
-    ShinkaDemoView *view = GFL_HeapAllocate(heapId, sizeof(ShinkaDemoView), TRUE, "shinka_demo_view.c", 513);
+EvolutionDemoView *EvolutionDemoView_Create(HeapID heapId, BOOL played, PartyPkm *pkm, u16 species) {
+    EvolutionDemoView *view = GFL_HeapAllocate(heapId, sizeof(EvolutionDemoView), TRUE, "shinka_demo_view.c", 513);
 
     view->heapId = heapId;
     view->played = played;
@@ -302,24 +303,24 @@ ShinkaDemoView *ShinkaDemoView_Create(HeapID heapId, BOOL played, PartyPkm *pkm,
     } else {
         view->current = 1;
     }
-    ShinkaDemoView_InitMcss(view);
-    ShinkaDemoView_AddMcss(view);
-    ShinkaDemoView_InitPieces(view);
+    EvolutionDemoView_InitMcss(view);
+    EvolutionDemoView_AddMcss(view);
+    EvolutionDemoView_InitPieces(view);
     view->mcssVisible = TRUE;
     return view;
 }
 
-void ShinkaDemoView_Free(ShinkaDemoView *view) {
-    ShinkaDemoView_FreePieces(view);
-    ShinkaDemoView_RemoveMcss(view);
-    ShinkaDemoView_FreeMcss(view);
+void EvolutionDemoView_Free(EvolutionDemoView *view) {
+    EvolutionDemoView_FreePieces(view);
+    EvolutionDemoView_RemoveMcss(view);
+    EvolutionDemoView_FreeMcss(view);
     if (view->evolved != NULL) {
         GFL_HeapFree(view->evolved);
     }
     GFL_HeapFree(view);
 }
 
-void ShinkaDemoView_Update(ShinkaDemoView *view) {
+void EvolutionDemoView_Update(EvolutionDemoView *view) {
     PartyPkm *pkm;
 
     switch (view->state) {
@@ -344,7 +345,7 @@ void ShinkaDemoView_Update(ShinkaDemoView *view) {
     case VIEW_WHITEN:
         view->state = VIEW_WAIT_WHITE;
         MCSS_StartFade(view->mcss[view->current], 0, 16, 0, GX_RGB(31, 31, 31));
-        MCSS_StartFade(view->mcss[ShinkaDemoView_OtherMcss(view->current)], 16, 16, 0, GX_RGB(31, 31, 31));
+        MCSS_StartFade(view->mcss[EvolutionDemoView_OtherMcss(view->current)], 16, 16, 0, GX_RGB(31, 31, 31));
         MCSS_PauseAnimation(view->mcss[view->current]);
         break;
     case VIEW_WAIT_WHITE:
@@ -362,8 +363,8 @@ void ShinkaDemoView_Update(ShinkaDemoView *view) {
         break;
     case VIEW_SHOW_PIECES:
         view->state = VIEW_FADE_PIECES;
-        ShinkaDemoView_SetMcssX(view, FX32_CONST(256));
-        ShinkaDemoView_SetPiecesPosition(view, 0, FX32_CONST(-0.5), 0);
+        EvolutionDemoView_SetMcssX(view, FX32_CONST(256));
+        EvolutionDemoView_SetPiecesPosition(view, 0, FX32_CONST(-0.5), 0);
         view->mcssVisible = FALSE;
         NNS_G2dRestartMCAnimation(MCSS_GetMultiCellAnimation(view->mcss[view->current]));
         break;
@@ -377,17 +378,17 @@ void ShinkaDemoView_Update(ShinkaDemoView *view) {
         break;
     case VIEW_FADE_PIECES:
         view->state = VIEW_WAIT_PIECES_FADE;
-        ShinkaDemoView_UnwhitenPieces(view);
+        EvolutionDemoView_UnwhitenPieces(view);
         break;
     case VIEW_WAIT_PIECES_FADE:
-        if (ShinkaDemoView_ArePiecesIdle(view)) {
+        if (EvolutionDemoView_ArePiecesIdle(view)) {
             view->state = VIEW_MOVE_PIECES;
             view->piecesStarted = TRUE;
-            ShinkaDemoView_StartPieces(view);
+            EvolutionDemoView_StartPieces(view);
         }
         break;
     case VIEW_MOVE_PIECES:
-        if (ShinkaDemoView_ArePiecesReturned(view)) {
+        if (EvolutionDemoView_ArePiecesReturned(view)) {
             view->state = VIEW_WAIT_RETURNED;
         }
         break;
@@ -402,7 +403,7 @@ void ShinkaDemoView_Update(ShinkaDemoView *view) {
         }
         break;
     case VIEW_CANCELLED:
-        if (ShinkaDemoView_ArePiecesReturned(view)) {
+        if (EvolutionDemoView_ArePiecesReturned(view)) {
             view->state = VIEW_WAIT_REVEAL;
             view->unk3C = TRUE;
             view->piecesReturned = TRUE;
@@ -418,13 +419,13 @@ void ShinkaDemoView_Update(ShinkaDemoView *view) {
         if (view->cancelled) {
             view->frame = 0;
         } else {
-            view->current = ShinkaDemoView_OtherMcss(view->current);
+            view->current = EvolutionDemoView_OtherMcss(view->current);
             MCSS_Show(view->mcss[view->current]);
-            MCSS_Hide(view->mcss[ShinkaDemoView_OtherMcss(view->current)]);
+            MCSS_Hide(view->mcss[EvolutionDemoView_OtherMcss(view->current)]);
             view->frame = 30;
         }
-        ShinkaDemoView_SetMcssX(view, 0);
-        ShinkaDemoView_SetPiecesPosition(view, FX32_CONST(256), FX32_CONST(-0.5), 0);
+        EvolutionDemoView_SetMcssX(view, 0);
+        EvolutionDemoView_SetPiecesPosition(view, FX32_CONST(256), FX32_CONST(-0.5), 0);
         view->mcssVisible = TRUE;
         break;
     case VIEW_WAIT_FADE_IN:
@@ -474,74 +475,74 @@ void ShinkaDemoView_Update(ShinkaDemoView *view) {
     if (view->mcssVisible) {
         MCSSSys_Update(view->mcssSystem);
     }
-    ShinkaDemoView_UpdatePieces(view);
+    EvolutionDemoView_UpdatePieces(view);
 }
 
-void ShinkaDemoView_Draw(ShinkaDemoView *view) {
+void EvolutionDemoView_Draw(EvolutionDemoView *view) {
     if (view->mcssVisible) {
         MCSSSys_Draw(view->mcssSystem);
     } else {
-        ShinkaDemoView_DrawPieces(view);
+        EvolutionDemoView_DrawPieces(view);
     }
 }
 
-void ShinkaDemoView_Start(ShinkaDemoView *view) {
+void EvolutionDemoView_Start(EvolutionDemoView *view) {
     view->started = TRUE;
 }
 
-BOOL ShinkaDemoView_IsCryDone(ShinkaDemoView *view) {
+BOOL EvolutionDemoView_IsCryDone(EvolutionDemoView *view) {
     return view->cryDone;
 }
 
-void ShinkaDemoView_Evolve(ShinkaDemoView *view) {
+void EvolutionDemoView_Evolve(EvolutionDemoView *view) {
     view->evolveRequested = TRUE;
 }
 
-BOOL ShinkaDemoView_HavePiecesReturned(ShinkaDemoView *view) {
+BOOL EvolutionDemoView_HavePiecesReturned(EvolutionDemoView *view) {
     return view->piecesReturned;
 }
 
-void ShinkaDemoView_Reveal(ShinkaDemoView *view) {
+void EvolutionDemoView_Reveal(EvolutionDemoView *view) {
     view->revealRequested = TRUE;
 }
 
-void ShinkaDemoView_FadeIn(ShinkaDemoView *view) {
+void EvolutionDemoView_FadeIn(EvolutionDemoView *view) {
     view->fadeInRequested = TRUE;
 }
 
-BOOL ShinkaDemoView_IsDone(ShinkaDemoView *view) {
+BOOL EvolutionDemoView_IsDone(EvolutionDemoView *view) {
     return view->done;
 }
 
-BOOL ShinkaDemoView_HavePiecesStarted(ShinkaDemoView *view) {
+BOOL EvolutionDemoView_HavePiecesStarted(EvolutionDemoView *view) {
     return view->piecesStarted;
 }
 
-BOOL ShinkaDemoView_GetUnk3C(ShinkaDemoView *view) {
+BOOL EvolutionDemoView_GetUnk3C(EvolutionDemoView *view) {
     return view->unk3C;
 }
 
-BOOL ShinkaDemoView_Cancel(ShinkaDemoView *view) {
-    if (ShinkaDemoView_ArePiecesMoving(view)) {
+BOOL EvolutionDemoView_Cancel(EvolutionDemoView *view) {
+    if (EvolutionDemoView_ArePiecesMoving(view)) {
         view->cancelled = TRUE;
         view->state = VIEW_CANCELLED;
-        ShinkaDemoView_StopPieces(view);
+        EvolutionDemoView_StopPieces(view);
         return TRUE;
     }
     return FALSE;
 }
 
-static void ShinkaDemoView_InitMcss(ShinkaDemoView *view) {
+static void EvolutionDemoView_InitMcss(EvolutionDemoView *view) {
     view->mcssSystem = MCSSSys_Create(2, view->heapId);
     MCSSSys_SetTexBase(view->mcssSystem, 0x30000);
     MCSSSys_EnableOrtho(view->mcssSystem);
 }
 
-static void ShinkaDemoView_FreeMcss(ShinkaDemoView *view) {
+static void EvolutionDemoView_FreeMcss(EvolutionDemoView *view) {
     MCSSSys_Free(view->mcssSystem);
 }
 
-static fx32 ShinkaDemoView_GetSpriteY(PartyPkm *pkm) {
+static fx32 EvolutionDemoView_GetSpriteY(PartyPkm *pkm) {
     u32 species = PokeParty_GetParam(pkm, PKM_PARAM_SPECIES, NULL);
     fx32 y = FX32_CONST(-18);
 
@@ -559,7 +560,7 @@ static fx32 ShinkaDemoView_GetSpriteY(PartyPkm *pkm) {
     return y;
 }
 
-static void ShinkaDemoView_AddMcss(ShinkaDemoView *view) {
+static void EvolutionDemoView_AddMcss(EvolutionDemoView *view) {
     u8 i;
     VecFx32 scale;
 
@@ -573,10 +574,10 @@ static void ShinkaDemoView_AddMcss(ShinkaDemoView *view) {
         for (i = 0; i < NELEMS(view->mcss); i++) {
             if (i == 0) {
                 view->mcss[i] =
-                    MCSSSys_AddPartyPkm(view->mcssSystem, view->pkm, 0, 0, ShinkaDemoView_GetSpriteY(view->pkm), 0);
+                    MCSSSys_AddPartyPkm(view->mcssSystem, view->pkm, 0, 0, EvolutionDemoView_GetSpriteY(view->pkm), 0);
             } else {
                 view->mcss[i] = MCSSSys_AddPartyPkm(view->mcssSystem, view->evolved, 0, 0,
-                                                    ShinkaDemoView_GetSpriteY(view->evolved), 0);
+                                                    EvolutionDemoView_GetSpriteY(view->evolved), 0);
             }
             MCSS_SetNoShadow(view->mcss[i], 1);
             MCSS_SetLoopAnimation(view->mcss[i]);
@@ -587,15 +588,16 @@ static void ShinkaDemoView_AddMcss(ShinkaDemoView *view) {
             }
         }
     } else {
-        view->mcss[1] = MCSSSys_AddPartyPkm(view->mcssSystem, view->pkm, 0, 0, ShinkaDemoView_GetSpriteY(view->pkm), 0);
+        view->mcss[1] =
+            MCSSSys_AddPartyPkm(view->mcssSystem, view->pkm, 0, 0, EvolutionDemoView_GetSpriteY(view->pkm), 0);
         MCSS_SetNoShadow(view->mcss[1], 1);
         MCSS_SetLoopAnimation(view->mcss[1]);
         MCSS_SetScale(view->mcss[1], &scale);
     }
-    ShinkaDemoView_SetMcssOffsets(view);
+    EvolutionDemoView_SetMcssOffsets(view);
 }
 
-static void ShinkaDemoView_RemoveMcss(ShinkaDemoView *view) {
+static void EvolutionDemoView_RemoveMcss(EvolutionDemoView *view) {
     u8 i;
 
     for (i = 0; i < NELEMS(view->mcss); i++) {
@@ -606,11 +608,11 @@ static void ShinkaDemoView_RemoveMcss(ShinkaDemoView *view) {
     }
 }
 
-static u8 ShinkaDemoView_OtherMcss(u8 index) {
+static u8 EvolutionDemoView_OtherMcss(u8 index) {
     return index == 0 ? 1 : 0;
 }
 
-static void ShinkaDemoView_SetMcssOffsets(ShinkaDemoView *view) {
+static void EvolutionDemoView_SetMcssOffsets(EvolutionDemoView *view) {
     u8 i;
     f32 height;
     f32 top;
@@ -638,7 +640,7 @@ static void ShinkaDemoView_SetMcssOffsets(ShinkaDemoView *view) {
     }
 }
 
-static void ShinkaDemoView_SetMcssX(ShinkaDemoView *view, fx32 x) {
+static void EvolutionDemoView_SetMcssX(EvolutionDemoView *view, fx32 x) {
     u8 i;
     VecFx32 pos;
 
@@ -651,7 +653,7 @@ static void ShinkaDemoView_SetMcssX(ShinkaDemoView *view, fx32 x) {
     }
 }
 
-static void ShinkaDemoView_InitPieces(ShinkaDemoView *view) {
+static void EvolutionDemoView_InitPieces(EvolutionDemoView *view) {
     PiecesManager *manager = GFL_HeapAllocate(view->heapId, sizeof(PiecesManager), TRUE, "shinka_demo_view.c", 1356);
     SpritePieces *pieces;
     u32 species;
@@ -673,13 +675,14 @@ static void ShinkaDemoView_InitPieces(ShinkaDemoView *view) {
     form = PokeParty_GetParam(view->pkm, PKM_PARAM_FORM, NULL);
     sex = PokeParty_GetSex(view->pkm);
     rare = PokeParty_IsRare(view->pkm);
-    pieces = manager->pieces[0] = ShinkaDemoPieces_Create(species, form, sex, rare, 0, 0, 0x26000, 0x960, view->heapId);
+    pieces = manager->pieces[0] =
+        EvolutionDemoPieces_Create(species, form, sex, rare, 0, 0, 0x26000, 0x960, view->heapId);
     if (view->played == FALSE) {
-        ShinkaDemoPieces_Init(pieces, view->heapId);
+        EvolutionDemoPieces_Init(pieces, view->heapId);
         pieces->state = PIECES_WHITE;
-        ShinkaDemoPieces_SetFade(pieces, view->heapId, GX_RGB(31, 31, 31), 31, 31, 0, 31);
+        EvolutionDemoPieces_SetFade(pieces, view->heapId, GX_RGB(31, 31, 31), 31, 31, 0, 31);
     } else {
-        ShinkaDemoPieces_Layout(pieces, view->heapId);
+        EvolutionDemoPieces_Layout(pieces, view->heapId);
     }
     if (view->played == FALSE) {
         species = PokeParty_GetParam(view->evolved, PKM_PARAM_SPECIES, NULL);
@@ -687,10 +690,10 @@ static void ShinkaDemoView_InitPieces(ShinkaDemoView *view) {
         sex = PokeParty_GetSex(view->evolved);
         rare = PokeParty_IsRare(view->evolved);
         pieces = manager->pieces[1] =
-            ShinkaDemoPieces_Create(species, form, sex, rare, 0, 0, 0x28000, 0x980, view->heapId);
-        ShinkaDemoPieces_Init(pieces, view->heapId);
+            EvolutionDemoPieces_Create(species, form, sex, rare, 0, 0, 0x28000, 0x980, view->heapId);
+        EvolutionDemoPieces_Init(pieces, view->heapId);
         pieces->state = PIECES_WHITE;
-        ShinkaDemoPieces_SetFade(pieces, view->heapId, GX_RGB(31, 31, 31), 31, 31, 0, 31);
+        EvolutionDemoPieces_SetFade(pieces, view->heapId, GX_RGB(31, 31, 31), 31, 31, 0, 31);
         for (row = 0; row < PIECE_ROWS; row++) {
             for (col = 0; col < PIECE_COLUMNS; col++) {
                 pieces->pieces[row][col].alpha = 0;
@@ -698,10 +701,10 @@ static void ShinkaDemoView_InitPieces(ShinkaDemoView *view) {
         }
     }
     if (view->played == FALSE) {
-        manager->rest = ShinkaDemoRest_Create(0x26000, 0x960, view->heapId);
+        manager->rest = EvolutionDemoRest_Create(0x26000, 0x960, view->heapId);
     }
     view->pieces = manager;
-    ShinkaDemoView_SetPiecesPosition(view, FX32_CONST(256), FX32_CONST(-0.5), 0);
+    EvolutionDemoView_SetPiecesPosition(view, FX32_CONST(256), FX32_CONST(-0.5), 0);
     {
         VecFx32 cameraPosition = { 0, 0, FX32_CONST(100) };
         VecFx32 cameraUp = { 0, FX32_ONE, 0 };
@@ -713,23 +716,23 @@ static void ShinkaDemoView_InitPieces(ShinkaDemoView *view) {
     }
 }
 
-static void ShinkaDemoView_FreePieces(ShinkaDemoView *view) {
+static void EvolutionDemoView_FreePieces(EvolutionDemoView *view) {
     PiecesManager *manager = view->pieces;
     u8 i;
 
     GFL_G3DCameraFree(manager->camera);
     if (manager->rest != NULL) {
-        ShinkaDemoRest_Free(manager->rest, view->heapId);
+        EvolutionDemoRest_Free(manager->rest, view->heapId);
     }
     for (i = 0; i < NELEMS(manager->pieces); i++) {
         if (manager->pieces[i] != NULL) {
-            ShinkaDemoPieces_Free(manager->pieces[i], view->heapId);
+            EvolutionDemoPieces_Free(manager->pieces[i], view->heapId);
         }
     }
     GFL_HeapFree(manager);
 }
 
-static void ShinkaDemoView_UpdatePieces(ShinkaDemoView *view) {
+static void EvolutionDemoView_UpdatePieces(EvolutionDemoView *view) {
     PiecesManager *manager = view->pieces;
     HeapID heapId = view->heapId;
     u8 i;
@@ -739,7 +742,7 @@ static void ShinkaDemoView_UpdatePieces(ShinkaDemoView *view) {
     case MANAGER_WAIT:
         break;
     case MANAGER_RUN:
-        ShinkaDemoView_RunPieces(view);
+        EvolutionDemoView_RunPieces(view);
         break;
     case MANAGER_UNUSED_2:
         break;
@@ -749,15 +752,15 @@ static void ShinkaDemoView_UpdatePieces(ShinkaDemoView *view) {
     for (i = 0; i < NELEMS(manager->pieces); i++) {
         pieces = manager->pieces[i];
         if (pieces != NULL) {
-            if (view->cancelled && ShinkaDemoPieces_IsWhite(pieces, heapId)) {
+            if (view->cancelled && EvolutionDemoPieces_IsWhite(pieces, heapId)) {
                 pieces->state = PIECES_RETURNED;
             }
-            ShinkaDemoPieces_Update(pieces, heapId);
+            EvolutionDemoPieces_Update(pieces, heapId);
         }
     }
 }
 
-static void ShinkaDemoView_DrawPieces(ShinkaDemoView *view) {
+static void EvolutionDemoView_DrawPieces(EvolutionDemoView *view) {
     PiecesManager *manager = view->pieces;
     G3DCameraProjection projection;
     FxLookAt lookAt;
@@ -785,11 +788,11 @@ static void ShinkaDemoView_DrawPieces(ShinkaDemoView *view) {
     G3_MaterialColorSpecEmi(GX_RGB(31, 31, 31), GX_RGB(31, 31, 31), FALSE);
     for (i = 0; i < NELEMS(manager->pieces); i++) {
         if (manager->pieces[i] != NULL) {
-            ShinkaDemoPieces_Draw(manager->pieces[i], view->heapId);
+            EvolutionDemoPieces_Draw(manager->pieces[i], view->heapId);
         }
     }
     if (manager->rest != NULL) {
-        ShinkaDemoRest_Draw(manager->rest, view->heapId);
+        EvolutionDemoRest_Draw(manager->rest, view->heapId);
     }
     GFL_G3DSysMtxSetProjection(&projection);
     GFL_G3DSysMtxSetViewLookAt(&lookAt);
@@ -797,7 +800,7 @@ static void ShinkaDemoView_DrawPieces(ShinkaDemoView *view) {
     NNS_G3dGeFlushBuffer();
 }
 
-static void ShinkaDemoView_StartPieces(ShinkaDemoView *view) {
+static void EvolutionDemoView_StartPieces(EvolutionDemoView *view) {
     PiecesManager *manager = view->pieces;
 
     if (manager->state == MANAGER_WAIT) {
@@ -805,7 +808,7 @@ static void ShinkaDemoView_StartPieces(ShinkaDemoView *view) {
     }
 }
 
-static BOOL ShinkaDemoView_ArePiecesMoving(ShinkaDemoView *view) {
+static BOOL EvolutionDemoView_ArePiecesMoving(EvolutionDemoView *view) {
     PiecesManager *manager = view->pieces;
 
     if (manager->state != MANAGER_WAIT && manager->state != 4) {
@@ -815,7 +818,7 @@ static BOOL ShinkaDemoView_ArePiecesMoving(ShinkaDemoView *view) {
 }
 
 // Makes the old form's pieces go on to fade as if they had gathered, unless they already have
-static void ShinkaDemoView_StopPieces(ShinkaDemoView *view) {
+static void EvolutionDemoView_StopPieces(EvolutionDemoView *view) {
     SpritePieces *pieces = view->pieces->pieces[0];
 
     if (pieces->state != PIECES_GATHERED && pieces->state != PIECES_WHITENING && pieces->state != PIECES_WHITE) {
@@ -823,28 +826,28 @@ static void ShinkaDemoView_StopPieces(ShinkaDemoView *view) {
     }
 }
 
-static void ShinkaDemoView_SetPiecesPosition(ShinkaDemoView *view, fx32 x, fx32 y, fx32 z) {
+static void EvolutionDemoView_SetPiecesPosition(EvolutionDemoView *view, fx32 x, fx32 y, fx32 z) {
     PiecesManager *manager = view->pieces;
     u8 i;
 
     for (i = 0; i < NELEMS(manager->pieces); i++) {
         if (manager->pieces[i] != NULL) {
-            ShinkaDemoPieces_SetPosition(manager->pieces[i], view->heapId, x, y, z);
+            EvolutionDemoPieces_SetPosition(manager->pieces[i], view->heapId, x, y, z);
         }
     }
     if (manager->rest != NULL) {
-        ShinkaDemoRest_SetPosition(manager->rest, view->heapId, x, y, z);
+        EvolutionDemoRest_SetPosition(manager->rest, view->heapId, x, y, z);
     }
 }
 
-static void ShinkaDemoPieces_SetPosition(SpritePieces *pieces, HeapID heapId, fx32 x, fx32 y, fx32 z) {
+static void EvolutionDemoPieces_SetPosition(SpritePieces *pieces, HeapID heapId, fx32 x, fx32 y, fx32 z) {
     pieces->pos.x = x;
     pieces->pos.y = y;
     pieces->pos.z = z;
 }
 
 // Fades the pieces from white to their colors
-static void ShinkaDemoView_UnwhitenPieces(ShinkaDemoView *view) {
+static void EvolutionDemoView_UnwhitenPieces(EvolutionDemoView *view) {
     HeapID heapId = view->heapId;
     PiecesManager *manager = view->pieces;
     u8 i;
@@ -854,33 +857,33 @@ static void ShinkaDemoView_UnwhitenPieces(ShinkaDemoView *view) {
         pieces = manager->pieces[i];
         if (pieces != NULL) {
             pieces->state = PIECES_UNWHITENING;
-            ShinkaDemoPieces_SetFade(pieces, heapId, GX_RGB(31, 31, 31), 31, 0, 0, -1);
+            EvolutionDemoPieces_SetFade(pieces, heapId, GX_RGB(31, 31, 31), 31, 0, 0, -1);
         }
     }
 }
 
-static BOOL ShinkaDemoView_ArePiecesIdle(ShinkaDemoView *view) {
+static BOOL EvolutionDemoView_ArePiecesIdle(EvolutionDemoView *view) {
     HeapID heapId = view->heapId;
     PiecesManager *manager = view->pieces;
     BOOL idle = TRUE;
     u8 i;
 
     for (i = 0; i < NELEMS(manager->pieces); i++) {
-        if (manager->pieces[i] != NULL && ShinkaDemoPieces_IsIdle(manager->pieces[i], heapId) == FALSE) {
+        if (manager->pieces[i] != NULL && EvolutionDemoPieces_IsIdle(manager->pieces[i], heapId) == FALSE) {
             idle = FALSE;
         }
     }
     return idle;
 }
 
-static BOOL ShinkaDemoView_ArePiecesReturned(ShinkaDemoView *view) {
+static BOOL EvolutionDemoView_ArePiecesReturned(EvolutionDemoView *view) {
     HeapID heapId = view->heapId;
     PiecesManager *manager = view->pieces;
     BOOL returned = TRUE;
     u8 i;
 
     for (i = 0; i < NELEMS(manager->pieces); i++) {
-        if (manager->pieces[i] != NULL && ShinkaDemoPieces_IsReturned(manager->pieces[i], heapId) == FALSE) {
+        if (manager->pieces[i] != NULL && EvolutionDemoPieces_IsReturned(manager->pieces[i], heapId) == FALSE) {
             returned = FALSE;
         }
     }
@@ -888,8 +891,8 @@ static BOOL ShinkaDemoView_ArePiecesReturned(ShinkaDemoView *view) {
 }
 
 // Loads a Pokémon's sprite as a 128 by 128 texture, with the sprite's 96 by 96 pixels 16 pixels from its top left
-static SpritePieces *ShinkaDemoPieces_Create(u32 species, u32 form, u32 sex, BOOL rare, u32 dir, BOOL egg, u32 texAddr,
-                                             u32 plttAddr, HeapID heapId) {
+static SpritePieces *EvolutionDemoPieces_Create(u32 species, u32 form, u32 sex, BOOL rare, u32 dir, BOOL egg,
+                                                u32 texAddr, u32 plttAddr, HeapID heapId) {
     SpritePieces *pieces = GFL_HeapAllocate(heapId, sizeof(SpritePieces), TRUE, "shinka_demo_view.c", 1824);
     u32 characterNo;
     u32 paletteNo;
@@ -946,7 +949,7 @@ static SpritePieces *ShinkaDemoPieces_Create(u32 species, u32 form, u32 sex, BOO
     return pieces;
 }
 
-static void ShinkaDemoPieces_Free(SpritePieces *pieces, HeapID heapId) {
+static void EvolutionDemoPieces_Free(SpritePieces *pieces, HeapID heapId) {
     GFL_BitmapFree(pieces->bitmap);
     GFL_HeapFree(pieces->characterFile);
     GFL_HeapFree(pieces->paletteFile);
@@ -958,7 +961,7 @@ static inline fx32 SquaredLengthXZ(fx32 x, fx32 z) {
 }
 
 // Lays the pieces out as the sprite, and gives each its place in the helix and the way there
-static void ShinkaDemoPieces_Init(SpritePieces *pieces, HeapID heapId) {
+static void EvolutionDemoPieces_Init(SpritePieces *pieces, HeapID heapId) {
     u8 i;
     u8 row;
     u8 col;
@@ -973,7 +976,7 @@ static void ShinkaDemoPieces_Init(SpritePieces *pieces, HeapID heapId) {
     fx32 dy;
     fx32 dz;
 
-    ShinkaDemoPieces_Layout(pieces, heapId);
+    EvolutionDemoPieces_Layout(pieces, heapId);
     pieces->state = PIECES_IDLE;
     for (i = 0; i < NELEMS(pieces->colors); i++) {
         pieces->colors[i] = GX_RGB(31, 31, 31);
@@ -1019,12 +1022,12 @@ static void ShinkaDemoPieces_Init(SpritePieces *pieces, HeapID heapId) {
                 }
             }
             piece->angle = (index << 16) / TURN_PIECES;
-            piece->height = FX32_CONST(SHINKA_DEMO_HELIX_TOP - turn * (SHINKA_DEMO_HELIX_HEIGHT / 6) -
-                                       index * (SHINKA_DEMO_HELIX_HEIGHT / 6 / TURN_PIECES));
+            piece->height = FX32_CONST(EVOLUTION_DEMO_HELIX_TOP - turn * (EVOLUTION_DEMO_HELIX_HEIGHT / 6) -
+                                       index * (EVOLUTION_DEMO_HELIX_HEIGHT / 6 / TURN_PIECES));
             y = piece->height / 4096.0f;
-            radius = SHINKA_DEMO_HELIX_RADIUS_MIN + (SHINKA_DEMO_HELIX_RADIUS_MAX - SHINKA_DEMO_HELIX_RADIUS_MIN) * y *
-                                                        y / SHINKA_DEMO_HELIX_HEIGHT / SHINKA_DEMO_HELIX_HEIGHT * 2.0f *
-                                                        2.0f;
+            radius = EVOLUTION_DEMO_HELIX_RADIUS_MIN +
+                     (EVOLUTION_DEMO_HELIX_RADIUS_MAX - EVOLUTION_DEMO_HELIX_RADIUS_MIN) * y * y /
+                         EVOLUTION_DEMO_HELIX_HEIGHT / EVOLUTION_DEMO_HELIX_HEIGHT * 2.0f * 2.0f;
             piece->radius = FX32_CONST(radius);
             piece->target.x = FX_Mul(piece->radius, FX_CosIdx(piece->angle));
             piece->target.z = FX_Mul(piece->radius, FX_SinIdx(piece->angle));
@@ -1054,7 +1057,7 @@ static void ShinkaDemoPieces_Init(SpritePieces *pieces, HeapID heapId) {
 }
 
 // Places the pieces where they make up the sprite
-static void ShinkaDemoPieces_Layout(SpritePieces *pieces, HeapID heapId) {
+static void EvolutionDemoPieces_Layout(SpritePieces *pieces, HeapID heapId) {
     int i;
     f32 size;
     f32 pixels;
@@ -1107,7 +1110,7 @@ static void ShinkaDemoPieces_Layout(SpritePieces *pieces, HeapID heapId) {
     }
 }
 
-static void ShinkaDemoPieces_Draw(SpritePieces *pieces, HeapID heapId) {
+static void EvolutionDemoPieces_Draw(SpritePieces *pieces, HeapID heapId) {
     int row;
     int col;
     SpritePiece *rowPieces;
@@ -1146,7 +1149,7 @@ static void ShinkaDemoPieces_Draw(SpritePieces *pieces, HeapID heapId) {
 
 // Moves the old form's pieces, has the new form's follow them, and shows the new form's pieces where the old form's
 // have been hidden
-static void ShinkaDemoView_RunPieces(ShinkaDemoView *view) {
+static void EvolutionDemoView_RunPieces(EvolutionDemoView *view) {
     PiecesManager *manager = view->pieces;
     HeapID heapId = view->heapId;
     SpritePieces *old;
@@ -1158,7 +1161,7 @@ static void ShinkaDemoView_RunPieces(ShinkaDemoView *view) {
     BOOL show;
 
     if (manager->state == MANAGER_RUN) {
-        ShinkaDemoPieces_Move(manager->pieces[0], heapId);
+        EvolutionDemoPieces_Move(manager->pieces[0], heapId);
         old = manager->pieces[0];
         new = manager->pieces[1];
         new->angle = old->angle;
@@ -1215,19 +1218,19 @@ static void ShinkaDemoView_RunPieces(ShinkaDemoView *view) {
         old = manager->pieces[0];
         new = manager->pieces[1];
         new->state = old->state;
-        if (ShinkaDemoPieces_IsGathered(old, heapId)) {
-            ShinkaDemoPieces_Whiten(old, heapId);
-            ShinkaDemoPieces_Whiten(new, heapId);
+        if (EvolutionDemoPieces_IsGathered(old, heapId)) {
+            EvolutionDemoPieces_Whiten(old, heapId);
+            EvolutionDemoPieces_Whiten(new, heapId);
         }
-        ShinkaDemoPieces_IsReturned(old, heapId);
+        EvolutionDemoPieces_IsReturned(old, heapId);
         if (manager->rest != NULL) {
             manager->rest->rowCount = manager->pieces[0]->rowCount;
-            ShinkaDemoRest_Update(manager->rest, heapId);
+            EvolutionDemoRest_Update(manager->rest, heapId);
         }
     }
 }
 
-static void ShinkaDemoPieces_Move(SpritePieces *pieces, HeapID heapId) {
+static void EvolutionDemoPieces_Move(SpritePieces *pieces, HeapID heapId) {
     VecFx32 delta;
     s16 row;
     s16 col;
@@ -1407,7 +1410,7 @@ static void ShinkaDemoPieces_Move(SpritePieces *pieces, HeapID heapId) {
                 spinPiece->pos.y = spinPiece->height;
             }
         }
-        if (ShinkaDemoPieces_IsWhite(pieces, heapId) && pieces->frame >= 30) {
+        if (EvolutionDemoPieces_IsWhite(pieces, heapId) && pieces->frame >= 30) {
             hideColumn = pieces->hideColumnBack;
             hideRow = pieces->hideRowBack;
             if (hideRow >= 0 && hideColumn >= 0) {
@@ -1553,8 +1556,8 @@ static void ShinkaDemoPieces_Move(SpritePieces *pieces, HeapID heapId) {
     }
 }
 
-static void ShinkaDemoPieces_SetFade(SpritePieces *pieces, HeapID heapId, GXRgb color, s16 start, s16 end, s16 wait,
-                                     s16 step) {
+static void EvolutionDemoPieces_SetFade(SpritePieces *pieces, HeapID heapId, GXRgb color, s16 start, s16 end, s16 wait,
+                                        s16 step) {
     pieces->fadeColor = color;
     pieces->fadeStart = start;
     pieces->fadeEnd = end;
@@ -1576,14 +1579,14 @@ static void ShinkaDemoPieces_SetFade(SpritePieces *pieces, HeapID heapId, GXRgb 
     }
     pieces->fadeValue = pieces->fadeStart;
     pieces->fadeCounter = pieces->fadeWait;
-    ShinkaDemoPieces_ApplyFade(pieces, heapId);
+    EvolutionDemoPieces_ApplyFade(pieces, heapId);
 }
 
-static BOOL ShinkaDemoPieces_IsFadeDone(SpritePieces *pieces, HeapID heapId) {
+static BOOL EvolutionDemoPieces_IsFadeDone(SpritePieces *pieces, HeapID heapId) {
     return pieces->fadeStep == 0;
 }
 
-static void ShinkaDemoPieces_UpdateFade(SpritePieces *pieces, HeapID heapId) {
+static void EvolutionDemoPieces_UpdateFade(SpritePieces *pieces, HeapID heapId) {
     if (pieces->fadeStep != 0) {
         if (pieces->fadeCounter > 0) {
             pieces->fadeCounter--;
@@ -1595,13 +1598,13 @@ static void ShinkaDemoPieces_UpdateFade(SpritePieces *pieces, HeapID heapId) {
             } else {
                 pieces->fadeCounter = pieces->fadeWait;
             }
-            ShinkaDemoPieces_ApplyFade(pieces, heapId);
+            EvolutionDemoPieces_ApplyFade(pieces, heapId);
         }
     }
 }
 
 // Blends the sprite's palette toward fadeColor by fadeValue out of 31, except its transparent color
-static void ShinkaDemoPieces_ApplyFade(SpritePieces *pieces, HeapID heapId) {
+static void EvolutionDemoPieces_ApplyFade(SpritePieces *pieces, HeapID heapId) {
     GXRgb *src = pieces->palette->pRawData;
     s16 fadeR = pieces->fadeColor & 0x1f;
     s16 fadeG = (pieces->fadeColor & 0x3e0) >> 5;
@@ -1633,34 +1636,34 @@ static void ShinkaDemoPieces_ApplyFade(SpritePieces *pieces, HeapID heapId) {
                                        sizeof(pieces->colors));
 }
 
-static BOOL ShinkaDemoPieces_IsIdle(SpritePieces *pieces, HeapID heapId) {
+static BOOL EvolutionDemoPieces_IsIdle(SpritePieces *pieces, HeapID heapId) {
     return pieces->state == PIECES_IDLE;
 }
 
-static BOOL ShinkaDemoPieces_IsGathered(SpritePieces *pieces, HeapID heapId) {
+static BOOL EvolutionDemoPieces_IsGathered(SpritePieces *pieces, HeapID heapId) {
     return pieces->state == PIECES_GATHERED;
 }
 
-static void ShinkaDemoPieces_Whiten(SpritePieces *pieces, HeapID heapId) {
+static void EvolutionDemoPieces_Whiten(SpritePieces *pieces, HeapID heapId) {
     pieces->state = PIECES_WHITENING;
-    ShinkaDemoPieces_SetFade(pieces, heapId, GX_RGB(31, 31, 31), 0, 31, 0, 1);
+    EvolutionDemoPieces_SetFade(pieces, heapId, GX_RGB(31, 31, 31), 0, 31, 0, 1);
 }
 
-static BOOL ShinkaDemoPieces_IsWhite(SpritePieces *pieces, HeapID heapId) {
+static BOOL EvolutionDemoPieces_IsWhite(SpritePieces *pieces, HeapID heapId) {
     return pieces->state == PIECES_WHITE;
 }
 
-static BOOL ShinkaDemoPieces_IsReturned(SpritePieces *pieces, HeapID heapId) {
+static BOOL EvolutionDemoPieces_IsReturned(SpritePieces *pieces, HeapID heapId) {
     return pieces->state == PIECES_RETURNED;
 }
 
-static void ShinkaDemoPieces_Update(SpritePieces *pieces, HeapID heapId) {
+static void EvolutionDemoPieces_Update(SpritePieces *pieces, HeapID heapId) {
     switch (pieces->state) {
     case PIECES_IDLE:
     case PIECES_GATHERED:
         break;
     case PIECES_WHITENING:
-        if (ShinkaDemoPieces_IsFadeDone(pieces, heapId)) {
+        if (EvolutionDemoPieces_IsFadeDone(pieces, heapId)) {
             pieces->state = PIECES_WHITE;
         }
         break;
@@ -1668,15 +1671,15 @@ static void ShinkaDemoPieces_Update(SpritePieces *pieces, HeapID heapId) {
     case PIECES_RETURNED:
         break;
     case PIECES_UNWHITENING:
-        if (ShinkaDemoPieces_IsFadeDone(pieces, heapId)) {
+        if (EvolutionDemoPieces_IsFadeDone(pieces, heapId)) {
             pieces->state = PIECES_IDLE;
         }
         break;
     }
-    ShinkaDemoPieces_UpdateFade(pieces, heapId);
+    EvolutionDemoPieces_UpdateFade(pieces, heapId);
 }
 
-static SpriteRest *ShinkaDemoRest_Create(u32 texAddr, u32 plttAddr, HeapID heapId) {
+static SpriteRest *EvolutionDemoRest_Create(u32 texAddr, u32 plttAddr, HeapID heapId) {
     SpriteRest *rest = GFL_HeapAllocate(heapId, sizeof(SpriteRest), TRUE, "shinka_demo_view.c", 3377);
 
     rest->texAddr = texAddr;
@@ -1709,18 +1712,18 @@ static SpriteRest *ShinkaDemoRest_Create(u32 texAddr, u32 plttAddr, HeapID heapI
     return rest;
 }
 
-static void ShinkaDemoRest_Free(SpriteRest *rest, HeapID heapId) {
+static void EvolutionDemoRest_Free(SpriteRest *rest, HeapID heapId) {
     GFL_HeapFree(rest);
 }
 
 // Moves the top of the quad down to the first row that has not broken away
-static void ShinkaDemoRest_Update(SpriteRest *rest, HeapID heapId) {
+static void EvolutionDemoRest_Update(SpriteRest *rest, HeapID heapId) {
     rest->vertices[3].y = sRestTops[rest->rowCount];
     rest->vertices[0].y = rest->vertices[3].y;
     rest->t0 = FX32_CONST(sRestTexTops[rest->rowCount]);
 }
 
-static void ShinkaDemoRest_Draw(SpriteRest *rest, HeapID heapId) {
+static void EvolutionDemoRest_Draw(SpriteRest *rest, HeapID heapId) {
     int cull;
 
     if (rest->rowCount < PIECE_ROWS) {
@@ -1750,7 +1753,7 @@ static void ShinkaDemoRest_Draw(SpriteRest *rest, HeapID heapId) {
     }
 }
 
-static void ShinkaDemoRest_SetPosition(SpriteRest *rest, HeapID heapId, fx32 x, fx32 y, fx32 z) {
+static void EvolutionDemoRest_SetPosition(SpriteRest *rest, HeapID heapId, fx32 x, fx32 y, fx32 z) {
     rest->pos.x = x;
     rest->pos.y = y;
     rest->pos.z = z;

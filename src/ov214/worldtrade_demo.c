@@ -2,7 +2,7 @@
 #include "app/pokemon_trade.h"
 #include "app/ui/ui_scene.h"
 #include "constants/pokemon.h"
-#include "demo/shinka_demo.h"
+#include "demo/evolution_demo.h"
 #include "gfl/heap.h"
 #include "gfl/overlay.h"
 #include "gfl/proc.h"
@@ -81,7 +81,7 @@ int WorldTrade_Demo_Init(WorldTradeWork *wk, int seq) {
 
 int WorldTrade_Demo_Main(WorldTradeWork *wk, int seq) {
     int ret = WT_SEQ_MAIN;
-    ShinkaDemoParam *evolution;
+    EvolutionDemoParam *evolution;
 
     switch (wk->subprocessSeq) {
     case 0:
@@ -104,8 +104,8 @@ int WorldTrade_Demo_Main(WorldTradeWork *wk, int seq) {
                     wk->subProcParam = NULL;
                 }
                 wk->subProcParam =
-                    GFL_HeapAllocate(HEAPID_WORLDTRADE, sizeof(ShinkaDemoParam), FALSE, "worldtrade_demo.c", 235);
-                MI_CpuFill8(wk->subProcParam, 0, sizeof(ShinkaDemoParam));
+                    GFL_HeapAllocate(HEAPID_WORLDTRADE, sizeof(EvolutionDemoParam), FALSE, "worldtrade_demo.c", 235);
+                MI_CpuFill8(wk->subProcParam, 0, sizeof(EvolutionDemoParam));
                 evolution = wk->subProcParam;
                 evolution->gameData = GSYS_GetGameData(wk->param->gsys);
                 evolution->party = PokeParty_Create(HEAPID_WORLDTRADE);
@@ -116,7 +116,8 @@ int WorldTrade_Demo_Main(WorldTradeWork *wk, int seq) {
                 evolution->unkC = 1;
                 evolution->canCancel = FALSE;
                 GFL_OvlUnload(OVERLAY_APP_UI);
-                QueueGameProc(wk->procManager, OVERLAY_SHINKA_DEMO, &SHINKA_DEMO_PROC_FUNCTIONS, wk->subProcParam);
+                QueueGameProc(wk->procManager, OVERLAY_EVOLUTION_DEMO, &EVOLUTION_DEMO_PROC_FUNCTIONS,
+                              wk->subProcParam);
                 wk->subprocessSeq = 1;
             } else {
                 WorldTrade_SubProcessChange(wk, WORLDTRADE_TITLE, 0);
@@ -146,9 +147,9 @@ int WorldTrade_Demo_Main(WorldTradeWork *wk, int seq) {
                         GFL_HeapFree(wk->subProcParam);
                         wk->subProcParam = NULL;
                     }
-                    wk->subProcParam =
-                        GFL_HeapAllocate(HEAPID_WORLDTRADE, sizeof(ShinkaDemoParam), FALSE, "worldtrade_demo.c", 304);
-                    MI_CpuFill8(wk->subProcParam, 0, sizeof(ShinkaDemoParam));
+                    wk->subProcParam = GFL_HeapAllocate(HEAPID_WORLDTRADE, sizeof(EvolutionDemoParam), FALSE,
+                                                        "worldtrade_demo.c", 304);
+                    MI_CpuFill8(wk->subProcParam, 0, sizeof(EvolutionDemoParam));
                     evolution = wk->subProcParam;
                     evolution->gameData = GSYS_GetGameData(wk->param->gsys);
                     evolution->party = PokeParty_Create(HEAPID_WORLDTRADE);
@@ -159,7 +160,8 @@ int WorldTrade_Demo_Main(WorldTradeWork *wk, int seq) {
                     evolution->unkC = 1;
                     evolution->canCancel = FALSE;
                     GFL_OvlUnload(OVERLAY_APP_UI);
-                    QueueGameProc(wk->procManager, OVERLAY_SHINKA_DEMO, &SHINKA_DEMO_PROC_FUNCTIONS, wk->subProcParam);
+                    QueueGameProc(wk->procManager, OVERLAY_EVOLUTION_DEMO, &EVOLUTION_DEMO_PROC_FUNCTIONS,
+                                  wk->subProcParam);
                     wk->subprocessSeq = 1;
                 } else {
                     WorldTrade_SubProcessChange(wk, WORLDTRADE_TITLE, 0);

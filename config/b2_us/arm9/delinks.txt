@@ -1605,7 +1605,7 @@ src/system/pokerus.c:
     complete
     .text       start:0x02020510 end:0x02020788
 
-src/system/shinka_check.c:
+src/system/evolution_check.c:
     complete
     .text       start:0x02020788 end:0x02020c78
     .data       start:0x0209a3e4 end:0x0209a404

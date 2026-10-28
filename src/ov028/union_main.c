@@ -8,7 +8,7 @@
 #include "app/pokelist.h"
 #include "app/pokemon_trade.h"
 #include "constants/zones.h"
-#include "demo/shinka_demo.h"
+#include "demo/evolution_demo.h"
 #include "field/colosseum.h"
 #include "field/event_colosseum_battle.h"
 #include "field/event_mapchange.h"

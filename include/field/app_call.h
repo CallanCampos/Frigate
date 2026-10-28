@@ -57,7 +57,7 @@ enum {
     FIELD_APP_TOWNMAP,
     FIELD_APP_WIFI_NOTE,
     FIELD_APP_MAIL,
-    FIELD_APP_SHINKA_DEMO,
+    FIELD_APP_EVOLUTION_DEMO,
     FIELD_APP_BATTLE_RECORDER,
     FIELD_APP_XTRANSCEIVER,
     FIELD_APP_MEDALBOX,
@@ -128,7 +128,7 @@ void *FieldAppCall_CreateMailParam(FieldAppCallWork *work, s32 appParam, s32 pre
 u32 FieldAppCall_GetMailResult(FieldAppCallWork *work, void *param);
 void FieldAppCall_FreeMailParam(void *param);
 void *script_evo(FieldAppCallWork *work, s32 appParam, s32 prevAppId, const void *prevParam);
-u32 FieldAppCall_GetShinkaDemoResult(FieldAppCallWork *work, void *param);
+u32 FieldAppCall_GetEvolutionDemoResult(FieldAppCallWork *work, void *param);
 void *FieldAppCall_CreateBattleRecorderParam(FieldAppCallWork *work, s32 appParam, s32 prevAppId,
                                              const void *prevParam);
 u32 FieldAppCall_GetBattleRecorderResult(FieldAppCallWork *work, void *param);

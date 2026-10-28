@@ -7,7 +7,7 @@
 #include "app/pokelist.h"
 #include "app/pokemon_trade.h"
 #include "constants/zones.h"
-#include "demo/shinka_demo.h"
+#include "demo/evolution_demo.h"
 #include "field/colosseum.h"
 #include "field/event_colosseum_battle.h"
 #include "field/event_mapchange.h"
@@ -194,7 +194,7 @@ static BOOL UnionCommand_TrainerCard(GameSystem *gsys, UnionSystem *unisys, Fiel
 static BOOL UnionCommand_Trade(GameSystem *gsys, UnionSystem *unisys, Field *field, void *arg, GameEvent *event,
                                GameEvent **next, u8 *step) {
     PokemonTradeParam *trade = arg;
-    ShinkaDemoParam *evolution;
+    EvolutionDemoParam *evolution;
 
     switch (*step) {
     case 0:
@@ -229,7 +229,7 @@ static BOOL UnionCommand_Trade(GameSystem *gsys, UnionSystem *unisys, Field *fie
         evolution->unkC = 1;
         evolution->canCancel = FALSE;
         trade->evolution = evolution;
-        GSYS_QueueProc(gsys, OVERLAY_SHINKA_DEMO, &SHINKA_DEMO_PROC_FUNCTIONS, evolution);
+        GSYS_QueueProc(gsys, OVERLAY_EVOLUTION_DEMO, &EVOLUTION_DEMO_PROC_FUNCTIONS, evolution);
         (*step)++;
         break;
     case 5:

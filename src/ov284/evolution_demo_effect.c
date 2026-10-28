@@ -1,7 +1,8 @@
+// The ROM names this file shinka_demo_effect.c.
 #include "types.h"
 #include "constants/arc.h"
 #include "demo/demo_particle.h"
-#include "demo/shinka_demo.h"
+#include "demo/evolution_demo.h"
 #include "gfl/g3d.h"
 #include "gfl/heap.h"
 #include "gfl/particle.h"
@@ -37,7 +38,7 @@ typedef struct {
     BOOL visible;
 } EffectActor;
 
-struct ShinkaDemoEffect {
+struct EvolutionDemoEffect {
     HeapID heapId;
     BOOL played;
     s32 state;
@@ -52,25 +53,25 @@ struct ShinkaDemoEffect {
     u32 state3D;
 };
 
-static EffectActor *ShinkaDemoEffect_CreateActors(HeapID heapId, u16 count);
-static void ShinkaDemoEffect_FreeActors(EffectActor *actors);
-static DemoParticle *ShinkaDemoParticle_Create(HeapID heapId, u16 count, const DemoParticleEvent *events);
-static void ShinkaDemoParticle_Free(DemoParticle *particle);
-static void ShinkaDemoParticle_Update(DemoParticle *particle);
-static void ShinkaDemoParticle_Draw(DemoParticle *particle);
-static void ShinkaDemoParticle_Start(DemoParticle *particle);
-static void ShinkaDemoParticle_Stop(DemoParticle *particle, s32 stopTimer);
-static void ShinkaDemoParticle_SetStopTimer(DemoParticle *particle, s32 stopTimer);
-static void ShinkaDemoEffect_Init3D(ShinkaDemoEffect *effect);
-static void ShinkaDemoEffect_Free3D(ShinkaDemoEffect *effect);
-static void ShinkaDemoEffect_Draw3D(ShinkaDemoEffect *effect);
-static void ShinkaDemoEffect_AddScene(ShinkaDemoEffect *effect);
-static void ShinkaDemoEffect_DeleteScene(ShinkaDemoEffect *effect);
-static void ShinkaDemoEffect_Update3D(ShinkaDemoEffect *effect);
-static void ShinkaDemoEffect_Play3D(ShinkaDemoEffect *effect);
-static BOOL ShinkaDemoEffect_Is3DAtEnd(ShinkaDemoEffect *effect);
-static void ShinkaDemoEffect_Reverse3D(ShinkaDemoEffect *effect);
-static BOOL ShinkaDemoEffect_Is3DIdle(ShinkaDemoEffect *effect);
+static EffectActor *EvolutionDemoEffect_CreateActors(HeapID heapId, u16 count);
+static void EvolutionDemoEffect_FreeActors(EffectActor *actors);
+static DemoParticle *EvolutionDemoParticle_Create(HeapID heapId, u16 count, const DemoParticleEvent *events);
+static void EvolutionDemoParticle_Free(DemoParticle *particle);
+static void EvolutionDemoParticle_Update(DemoParticle *particle);
+static void EvolutionDemoParticle_Draw(DemoParticle *particle);
+static void EvolutionDemoParticle_Start(DemoParticle *particle);
+static void EvolutionDemoParticle_Stop(DemoParticle *particle, s32 stopTimer);
+static void EvolutionDemoParticle_SetStopTimer(DemoParticle *particle, s32 stopTimer);
+static void EvolutionDemoEffect_Init3D(EvolutionDemoEffect *effect);
+static void EvolutionDemoEffect_Free3D(EvolutionDemoEffect *effect);
+static void EvolutionDemoEffect_Draw3D(EvolutionDemoEffect *effect);
+static void EvolutionDemoEffect_AddScene(EvolutionDemoEffect *effect);
+static void EvolutionDemoEffect_DeleteScene(EvolutionDemoEffect *effect);
+static void EvolutionDemoEffect_Update3D(EvolutionDemoEffect *effect);
+static void EvolutionDemoEffect_Play3D(EvolutionDemoEffect *effect);
+static BOOL EvolutionDemoEffect_Is3DAtEnd(EvolutionDemoEffect *effect);
+static void EvolutionDemoEffect_Reverse3D(EvolutionDemoEffect *effect);
+static BOOL EvolutionDemoEffect_Is3DIdle(EvolutionDemoEffect *effect);
 
 static const G3DSceneResourceSetup sModelResources[] = {
     { ARCID_SHINKA_DEMO, 8, 0 },
@@ -89,7 +90,7 @@ static const G3DSceneSetup sModelScene = { sModelResources, NELEMS(sModelResourc
                                            NELEMS(sModelActors) };
 
 // Not referenced. Its value, FX32_ONE, is the step of the model's looping animation and the scale of its actor
-const fx32 SHINKA_DEMO_EFFECT_UNK_FX32 = FX32_ONE;
+const fx32 EVOLUTION_DEMO_EFFECT_UNK_FX32 = FX32_ONE;
 
 static const DemoParticleResource sParticleResources[DEMO_PARTICLE_UNIT_COUNT] = { { ARCID_SHINKA_DEMO, 10 } };
 
@@ -98,7 +99,7 @@ static const DemoParticleEvent sParticleEvents[] = {
     { 500, 0, 5 }, { 500, 0, 6 }, { 755, 0, 7 }, { 783, 0, 8 },
 };
 
-static EffectActor *ShinkaDemoEffect_CreateActors(HeapID heapId, u16 count) {
+static EffectActor *EvolutionDemoEffect_CreateActors(HeapID heapId, u16 count) {
     EffectActor *actors = GFL_HeapAllocate(heapId, sizeof(EffectActor) * count, TRUE, "shinka_demo_effect.c", 232);
     u16 i;
 
@@ -114,12 +115,13 @@ static EffectActor *ShinkaDemoEffect_CreateActors(HeapID heapId, u16 count) {
     return actors;
 }
 
-static void ShinkaDemoEffect_FreeActors(EffectActor *actors) {
+static void EvolutionDemoEffect_FreeActors(EffectActor *actors) {
     GFL_HeapFree(actors);
 }
 
-ShinkaDemoEffect *ShinkaDemoEffect_Create(HeapID heapId, BOOL played) {
-    ShinkaDemoEffect *effect = GFL_HeapAllocate(heapId, sizeof(ShinkaDemoEffect), TRUE, "shinka_demo_effect.c", 336);
+EvolutionDemoEffect *EvolutionDemoEffect_Create(HeapID heapId, BOOL played) {
+    EvolutionDemoEffect *effect =
+        GFL_HeapAllocate(heapId, sizeof(EvolutionDemoEffect), TRUE, "shinka_demo_effect.c", 336);
 
     effect->heapId = heapId;
     effect->played = played;
@@ -129,45 +131,45 @@ ShinkaDemoEffect *ShinkaDemoEffect_Create(HeapID heapId, BOOL played) {
         effect->state = EFFECT_PLAYED;
     }
     effect->wait = 0;
-    effect->particle = ShinkaDemoParticle_Create(effect->heapId, NELEMS(sParticleEvents), sParticleEvents);
-    ShinkaDemoEffect_Init3D(effect);
-    ShinkaDemoEffect_AddScene(effect);
+    effect->particle = EvolutionDemoParticle_Create(effect->heapId, NELEMS(sParticleEvents), sParticleEvents);
+    EvolutionDemoEffect_Init3D(effect);
+    EvolutionDemoEffect_AddScene(effect);
     return effect;
 }
 
-void ShinkaDemoEffect_Free(ShinkaDemoEffect *effect) {
-    ShinkaDemoEffect_DeleteScene(effect);
-    ShinkaDemoEffect_Free3D(effect);
-    ShinkaDemoParticle_Free(effect->particle);
+void EvolutionDemoEffect_Free(EvolutionDemoEffect *effect) {
+    EvolutionDemoEffect_DeleteScene(effect);
+    EvolutionDemoEffect_Free3D(effect);
+    EvolutionDemoParticle_Free(effect->particle);
     GFL_HeapFree(effect);
 }
 
-void ShinkaDemoEffect_Update(ShinkaDemoEffect *effect) {
+void EvolutionDemoEffect_Update(EvolutionDemoEffect *effect) {
     switch (effect->state) {
     case EFFECT_WAIT_START:
     case EFFECT_PARTICLES:
         break;
     case EFFECT_START_3D:
-        ShinkaDemoEffect_Play3D(effect);
+        EvolutionDemoEffect_Play3D(effect);
         effect->state = EFFECT_WAIT_3D;
         break;
     case EFFECT_WAIT_3D:
-        if (ShinkaDemoEffect_Is3DAtEnd(effect)) {
+        if (EvolutionDemoEffect_Is3DAtEnd(effect)) {
             effect->state = EFFECT_HOLD_3D;
             effect->wait = 3;
-            ShinkaDemoParticle_SetStopTimer(effect->particle, 0);
+            EvolutionDemoParticle_SetStopTimer(effect->particle, 0);
         }
         break;
     case EFFECT_HOLD_3D:
         if (effect->wait == 0) {
-            ShinkaDemoEffect_Reverse3D(effect);
+            EvolutionDemoEffect_Reverse3D(effect);
             effect->state = EFFECT_WAIT_3D_REVERSE;
         } else {
             effect->wait--;
         }
         break;
     case EFFECT_WAIT_3D_REVERSE:
-        if (ShinkaDemoEffect_Is3DIdle(effect)) {
+        if (EvolutionDemoEffect_Is3DIdle(effect)) {
             effect->state = EFFECT_DONE;
         }
         break;
@@ -175,48 +177,48 @@ void ShinkaDemoEffect_Update(ShinkaDemoEffect *effect) {
     case EFFECT_PLAYED:
         break;
     }
-    ShinkaDemoEffect_Update3D(effect);
-    ShinkaDemoParticle_Update(effect->particle);
+    EvolutionDemoEffect_Update3D(effect);
+    EvolutionDemoParticle_Update(effect->particle);
 }
 
-void ShinkaDemoEffect_Draw(ShinkaDemoEffect *effect) {
-    ShinkaDemoEffect_Draw3D(effect);
-    ShinkaDemoParticle_Draw(effect->particle);
+void EvolutionDemoEffect_Draw(EvolutionDemoEffect *effect) {
+    EvolutionDemoEffect_Draw3D(effect);
+    EvolutionDemoParticle_Draw(effect->particle);
 }
 
 // Stops the particles and plays the 3D model when the evolution is cancelled
-void ShinkaDemoEffect_Cancel(ShinkaDemoEffect *effect) {
-    ShinkaDemoParticle_Stop(effect->particle, 30);
+void EvolutionDemoEffect_Cancel(EvolutionDemoEffect *effect) {
+    EvolutionDemoParticle_Stop(effect->particle, 30);
     if (effect->state == EFFECT_PARTICLES) {
         effect->state = EFFECT_START_3D;
     }
 }
 
-void ShinkaDemoEffect_Start(ShinkaDemoEffect *effect) {
-    ShinkaDemoParticle_Start(effect->particle);
+void EvolutionDemoEffect_Start(EvolutionDemoEffect *effect) {
+    EvolutionDemoParticle_Start(effect->particle);
     effect->state = EFFECT_PARTICLES;
     effect->wait = 620;
 }
 
-void ShinkaDemoEffect_Start3D(ShinkaDemoEffect *effect) {
+void EvolutionDemoEffect_Start3D(EvolutionDemoEffect *effect) {
     if (effect->state == EFFECT_PARTICLES) {
         effect->state = EFFECT_START_3D;
     }
 }
 
-BOOL ShinkaDemoEffect_Is3DHeld(ShinkaDemoEffect *effect) {
+BOOL EvolutionDemoEffect_Is3DHeld(EvolutionDemoEffect *effect) {
     return effect->state == EFFECT_HOLD_3D;
 }
 
 // Whether the 3D model is about to or has started reversing
-BOOL ShinkaDemoEffect_Is3DReversing(ShinkaDemoEffect *effect) {
+BOOL EvolutionDemoEffect_Is3DReversing(EvolutionDemoEffect *effect) {
     if (effect->state == EFFECT_HOLD_3D && effect->wait <= 1) {
         return TRUE;
     }
     return effect->state == EFFECT_WAIT_3D_REVERSE;
 }
 
-static DemoParticle *ShinkaDemoParticle_Create(HeapID heapId, u16 count, const DemoParticleEvent *events) {
+static DemoParticle *EvolutionDemoParticle_Create(HeapID heapId, u16 count, const DemoParticleEvent *events) {
     VecFx32 cameraPosition = { 0, 0, FX32_CONST(13) };
     VecFx32 cameraUp = { 0, FX32_ONE, 0 };
     VecFx32 cameraTarget = { 0, 0, 0 };
@@ -254,13 +256,13 @@ static DemoParticle *ShinkaDemoParticle_Create(HeapID heapId, u16 count, const D
     return particle;
 }
 
-static void ShinkaDemoParticle_Free(DemoParticle *particle) {
+static void EvolutionDemoParticle_Free(DemoParticle *particle) {
     Particle_Free();
     GFL_HeapFree(particle);
 }
 
 // Emits the particles of the events at the current frame
-static void ShinkaDemoParticle_Update(DemoParticle *particle) {
+static void EvolutionDemoParticle_Update(DemoParticle *particle) {
     if (particle->active) {
         VecFx32 pos = { 0, 0, 0 };
 
@@ -282,33 +284,33 @@ static void ShinkaDemoParticle_Update(DemoParticle *particle) {
     }
 }
 
-static void ShinkaDemoParticle_Draw(DemoParticle *particle) {
+static void EvolutionDemoParticle_Draw(DemoParticle *particle) {
     Particle_DrawAndUpdateAll();
 }
 
-static void ShinkaDemoParticle_Start(DemoParticle *particle) {
+static void EvolutionDemoParticle_Start(DemoParticle *particle) {
     particle->active = TRUE;
 }
 
-static void ShinkaDemoParticle_Stop(DemoParticle *particle, s32 stopTimer) {
+static void EvolutionDemoParticle_Stop(DemoParticle *particle, s32 stopTimer) {
     particle->active = FALSE;
     particle->stopTimer = stopTimer;
 }
 
-static void ShinkaDemoParticle_SetStopTimer(DemoParticle *particle, s32 stopTimer) {
+static void EvolutionDemoParticle_SetStopTimer(DemoParticle *particle, s32 stopTimer) {
     particle->stopTimer = stopTimer;
 }
 
-static void ShinkaDemoEffect_Init3D(ShinkaDemoEffect *effect) {
+static void EvolutionDemoEffect_Init3D(EvolutionDemoEffect *effect) {
     effect->g3dManager = GFL_G3DMgrCreate(4, 1, effect->heapId);
     effect->actorCount = 0;
 }
 
-static void ShinkaDemoEffect_Free3D(ShinkaDemoEffect *effect) {
+static void EvolutionDemoEffect_Free3D(EvolutionDemoEffect *effect) {
     GFL_G3DMgrFree(effect->g3dManager);
 }
 
-static void ShinkaDemoEffect_Draw3D(ShinkaDemoEffect *effect) {
+static void EvolutionDemoEffect_Draw3D(EvolutionDemoEffect *effect) {
     u16 i;
     EffectActor *actor;
 
@@ -320,7 +322,7 @@ static void ShinkaDemoEffect_Draw3D(ShinkaDemoEffect *effect) {
     }
 }
 
-static void ShinkaDemoEffect_AddScene(ShinkaDemoEffect *effect) {
+static void EvolutionDemoEffect_AddScene(EvolutionDemoEffect *effect) {
     u16 i;
     u16 first;
     EffectActor *actor;
@@ -329,7 +331,7 @@ static void ShinkaDemoEffect_AddScene(ShinkaDemoEffect *effect) {
 
     effect->scene = GFL_G3DMgrNewScene(effect->g3dManager, &sModelScene);
     effect->actorCount = 1;
-    effect->actors = ShinkaDemoEffect_CreateActors(effect->heapId, effect->actorCount);
+    effect->actors = EvolutionDemoEffect_CreateActors(effect->heapId, effect->actorCount);
     first = GFL_G3DMgrGetSceneFirstActorIdx(effect->g3dManager, effect->scene);
     effect->modelActor = 0;
     actor = &effect->actors[0];
@@ -351,13 +353,13 @@ static void ShinkaDemoEffect_AddScene(ShinkaDemoEffect *effect) {
     GFL_G3DActorSetAnmFrame(model, 2, &frame);
 }
 
-static void ShinkaDemoEffect_DeleteScene(ShinkaDemoEffect *effect) {
+static void EvolutionDemoEffect_DeleteScene(EvolutionDemoEffect *effect) {
     GFL_G3DMgrDeleteScene(effect->g3dManager, effect->scene);
-    ShinkaDemoEffect_FreeActors(effect->actors);
+    EvolutionDemoEffect_FreeActors(effect->actors);
     effect->actorCount = 0;
 }
 
-static void ShinkaDemoEffect_Update3D(ShinkaDemoEffect *effect) {
+static void EvolutionDemoEffect_Update3D(EvolutionDemoEffect *effect) {
     u16 i;
     G3DActor *model;
     BOOL running1;
@@ -383,18 +385,18 @@ static void ShinkaDemoEffect_Update3D(ShinkaDemoEffect *effect) {
     }
 }
 
-static void ShinkaDemoEffect_Play3D(ShinkaDemoEffect *effect) {
+static void EvolutionDemoEffect_Play3D(EvolutionDemoEffect *effect) {
     effect->state3D = EFFECT_3D_FORWARD;
 }
 
-static BOOL ShinkaDemoEffect_Is3DAtEnd(ShinkaDemoEffect *effect) {
+static BOOL EvolutionDemoEffect_Is3DAtEnd(EvolutionDemoEffect *effect) {
     return effect->state3D == EFFECT_3D_END;
 }
 
-static void ShinkaDemoEffect_Reverse3D(ShinkaDemoEffect *effect) {
+static void EvolutionDemoEffect_Reverse3D(EvolutionDemoEffect *effect) {
     effect->state3D = EFFECT_3D_REVERSE;
 }
 
-static BOOL ShinkaDemoEffect_Is3DIdle(ShinkaDemoEffect *effect) {
+static BOOL EvolutionDemoEffect_Is3DIdle(EvolutionDemoEffect *effect) {
     return effect->state3D == EFFECT_3D_IDLE;
 }

@@ -1,5 +1,6 @@
+// The ROM names this file shinka_demo_graphic.c.
 #include "types.h"
-#include "demo/shinka_demo.h"
+#include "demo/evolution_demo.h"
 #include "gfl/bg_sys.h"
 #include "gfl/bmpwin.h"
 #include "gfl/clact.h"
@@ -22,20 +23,20 @@
 
 typedef struct {
     u32 unk0;
-} ShinkaDemoBG;
+} EvolutionDemoBG;
 
 typedef struct {
     ClActUnit *unit;
-} ShinkaDemoClAct;
+} EvolutionDemoClAct;
 
 typedef struct {
     G3DCamera *camera;
-} ShinkaDemoG3dSys;
+} EvolutionDemoG3dSys;
 
-struct ShinkaDemoGraphic {
-    ShinkaDemoBG bg;
-    ShinkaDemoClAct clact;
-    ShinkaDemoG3dSys g3d;
+struct EvolutionDemoGraphic {
+    EvolutionDemoBG bg;
+    EvolutionDemoClAct clact;
+    EvolutionDemoG3dSys g3d;
     TCB *vblankTask;
 };
 
@@ -44,22 +45,22 @@ typedef struct {
     BGSetup setup;
     u32 mode;
     u32 enabled;
-} ShinkaDemoBGSetup;
+} EvolutionDemoBGSetup;
 
-static void ShinkaDemoGraphic_VBlank(TCB *tcb, void *data);
-static void ShinkaDemoBG_Init(ShinkaDemoBG *bg, HeapID heapId);
-static void ShinkaDemoBG_Free(ShinkaDemoBG *bg);
-static void ShinkaDemoBG_Update(ShinkaDemoBG *bg);
-static void ShinkaDemoBG_VBlank(ShinkaDemoBG *bg);
-static void ShinkaDemoClAct_Init(ShinkaDemoClAct *clact, const BGSysVRAMConfig *vramConfig, HeapID heapId);
-static void ShinkaDemoClAct_Free(ShinkaDemoClAct *clact);
-static void ShinkaDemoClAct_Update(ShinkaDemoClAct *clact);
-static void ShinkaDemoClAct_VBlank(ShinkaDemoClAct *clact);
-static ClActUnit *ShinkaDemoClAct_GetUnit(ShinkaDemoClAct *clact);
-static void ShinkaDemoG3dSys_Init(ShinkaDemoG3dSys *g3d, HeapID heapId);
-static void ShinkaDemoG3dSys_Free(ShinkaDemoG3dSys *g3d);
-static void ShinkaDemoG3dSys_Begin(ShinkaDemoG3dSys *g3d);
-static void ShinkaDemoG3dSys_End(ShinkaDemoG3dSys *g3d);
+static void EvolutionDemoGraphic_VBlank(TCB *tcb, void *data);
+static void EvolutionDemoBG_Init(EvolutionDemoBG *bg, HeapID heapId);
+static void EvolutionDemoBG_Free(EvolutionDemoBG *bg);
+static void EvolutionDemoBG_Update(EvolutionDemoBG *bg);
+static void EvolutionDemoBG_VBlank(EvolutionDemoBG *bg);
+static void EvolutionDemoClAct_Init(EvolutionDemoClAct *clact, const BGSysVRAMConfig *vramConfig, HeapID heapId);
+static void EvolutionDemoClAct_Free(EvolutionDemoClAct *clact);
+static void EvolutionDemoClAct_Update(EvolutionDemoClAct *clact);
+static void EvolutionDemoClAct_VBlank(EvolutionDemoClAct *clact);
+static ClActUnit *EvolutionDemoClAct_GetUnit(EvolutionDemoClAct *clact);
+static void EvolutionDemoG3dSys_Init(EvolutionDemoG3dSys *g3d, HeapID heapId);
+static void EvolutionDemoG3dSys_Free(EvolutionDemoG3dSys *g3d);
+static void EvolutionDemoG3dSys_Begin(EvolutionDemoG3dSys *g3d);
+static void EvolutionDemoG3dSys_End(EvolutionDemoG3dSys *g3d);
 
 static const BGSysVRAMConfig sVRAMConfig = {
     GX_VRAM_BG_128_A,  GX_VRAM_BGEXTPLTT_NONE,  GX_VRAM_SUB_BG_128_C,       GX_VRAM_SUB_BGEXTPLTT_NONE,
@@ -72,7 +73,7 @@ static const VecFx32 sCameraTarget = { 0, 0, 0 };
 static const VecFx32 sCameraUpVector = { 0, FX32_ONE, 0 };
 
 // clang-format off
-static const ShinkaDemoBGSetup sBGSetups[BG_COUNT] = {
+static const EvolutionDemoBGSetup sBGSetups[BG_COUNT] = {
     { 1,
       { 0, 0, 0x800, 0, BGRES_256x256, GX_BG_COLORMODE_16, GX_BG_SCRBASE(0x1000), GX_BG_CHARBASE(0x08000), 0x8000,
         GX_BG_EXTPLTT_01, 1, GX_BG_AREAOVER_XLU, FALSE },
@@ -112,7 +113,7 @@ static const BGSysLCDConfig sLCDConfig = { GX_DISPMODE_GRAPHICS, GX_BGMODE_0, GX
 static const ClActSysSetup sClActSetup = { 0, 0, 0, 512, 4, 124, 4, 124, 0, 32, 32, 32, 32, 16, 16 };
 
 // The 3D system calls this once it is set up
-static void ShinkaDemoGraphic_G3DInit(void) {
+static void EvolutionDemoGraphic_G3DInit(void) {
     u32 i;
 
     GFL_BGSysSetBGEnabledA(GX_PLANEMASK_BG0, TRUE);
@@ -131,11 +132,11 @@ static void ShinkaDemoGraphic_G3DInit(void) {
     GFL_G3DSysSetSwapBufferParams(GX_SORTMODE_MANUAL, GX_BUFFERMODE_Z);
 }
 
-ShinkaDemoGraphic *ShinkaDemoGraphic_Create(u32 layout, HeapID heapId) {
-    ShinkaDemoGraphic *graphic =
-        GFL_HeapAllocate(heapId, sizeof(ShinkaDemoGraphic), FALSE, "shinka_demo_graphic.c", 479);
+EvolutionDemoGraphic *EvolutionDemoGraphic_Create(u32 layout, HeapID heapId) {
+    EvolutionDemoGraphic *graphic =
+        GFL_HeapAllocate(heapId, sizeof(EvolutionDemoGraphic), FALSE, "shinka_demo_graphic.c", 479);
 
-    MI_CpuFill8(graphic, 0, sizeof(ShinkaDemoGraphic));
+    MI_CpuFill8(graphic, 0, sizeof(EvolutionDemoGraphic));
     G2_BlendNone();
     G2S_BlendNone();
     GX_SetVisibleWnd(GX_WNDMASK_NONE);
@@ -147,45 +148,45 @@ ShinkaDemoGraphic *ShinkaDemoGraphic_Create(u32 layout, HeapID heapId) {
     GFL_BGSysDisableAllA();
     GFL_BGSysDisableAllB();
     GFL_TextRndInitColorIndexLUT();
-    ShinkaDemoBG_Init(&graphic->bg, heapId);
-    ShinkaDemoClAct_Init(&graphic->clact, &sVRAMConfig, heapId);
-    ShinkaDemoG3dSys_Init(&graphic->g3d, heapId);
-    graphic->vblankTask = GFL_VBlankTCBAdd(ShinkaDemoGraphic_VBlank, graphic, 0);
+    EvolutionDemoBG_Init(&graphic->bg, heapId);
+    EvolutionDemoClAct_Init(&graphic->clact, &sVRAMConfig, heapId);
+    EvolutionDemoG3dSys_Init(&graphic->g3d, heapId);
+    graphic->vblankTask = GFL_VBlankTCBAdd(EvolutionDemoGraphic_VBlank, graphic, 0);
     return graphic;
 }
 
-void ShinkaDemoGraphic_Free(ShinkaDemoGraphic *graphic) {
+void EvolutionDemoGraphic_Free(EvolutionDemoGraphic *graphic) {
     GFL_TCBRemove(graphic->vblankTask);
-    ShinkaDemoG3dSys_Free(&graphic->g3d);
-    ShinkaDemoClAct_Free(&graphic->clact);
-    ShinkaDemoBG_Free(&graphic->bg);
+    EvolutionDemoG3dSys_Free(&graphic->g3d);
+    EvolutionDemoClAct_Free(&graphic->clact);
+    EvolutionDemoBG_Free(&graphic->bg);
     GFL_TextRndResetColorIndexLUT();
     G2_BlendNone();
     G2S_BlendNone();
     GX_SetVisibleWnd(GX_WNDMASK_NONE);
     GXS_SetVisibleWnd(GX_WNDMASK_NONE);
-    MI_CpuFill8(graphic, 0, sizeof(ShinkaDemoGraphic));
+    MI_CpuFill8(graphic, 0, sizeof(EvolutionDemoGraphic));
     GFL_HeapFree(graphic);
 }
 
-void ShinkaDemoGraphic_Update(ShinkaDemoGraphic *graphic) {
-    ShinkaDemoClAct_Update(&graphic->clact);
-    ShinkaDemoBG_Update(&graphic->bg);
+void EvolutionDemoGraphic_Update(EvolutionDemoGraphic *graphic) {
+    EvolutionDemoClAct_Update(&graphic->clact);
+    EvolutionDemoBG_Update(&graphic->bg);
 }
 
-void ShinkaDemoGraphic_Begin3D(ShinkaDemoGraphic *graphic) {
-    ShinkaDemoG3dSys_Begin(&graphic->g3d);
+void EvolutionDemoGraphic_Begin3D(EvolutionDemoGraphic *graphic) {
+    EvolutionDemoG3dSys_Begin(&graphic->g3d);
 }
 
-void ShinkaDemoGraphic_End3D(ShinkaDemoGraphic *graphic) {
-    ShinkaDemoG3dSys_End(&graphic->g3d);
+void EvolutionDemoGraphic_End3D(EvolutionDemoGraphic *graphic) {
+    EvolutionDemoG3dSys_End(&graphic->g3d);
 }
 
-ClActUnit *ShinkaDemoGraphic_GetClActUnit(ShinkaDemoGraphic *graphic) {
-    return ShinkaDemoClAct_GetUnit(&graphic->clact);
+ClActUnit *EvolutionDemoGraphic_GetClActUnit(EvolutionDemoGraphic *graphic) {
+    return EvolutionDemoClAct_GetUnit(&graphic->clact);
 }
 
-void ShinkaDemoGraphic_InitSubBG(ShinkaDemoGraphic *graphic) {
+void EvolutionDemoGraphic_InitSubBG(EvolutionDemoGraphic *graphic) {
     u32 i;
 
     GFL_BGSysSetLCDConfigForEngine(&sLCDConfig, BGSYS_ENGINE_SUB);
@@ -198,7 +199,7 @@ void ShinkaDemoGraphic_InitSubBG(ShinkaDemoGraphic *graphic) {
     }
 }
 
-void ShinkaDemoGraphic_FreeSubBG(ShinkaDemoGraphic *graphic) {
+void EvolutionDemoGraphic_FreeSubBG(EvolutionDemoGraphic *graphic) {
     u32 i;
 
     for (i = 0; i < NELEMS(sBGSetups); i++) {
@@ -208,17 +209,17 @@ void ShinkaDemoGraphic_FreeSubBG(ShinkaDemoGraphic *graphic) {
     }
 }
 
-static void ShinkaDemoGraphic_VBlank(TCB *tcb, void *data) {
-    ShinkaDemoGraphic *graphic = data;
+static void EvolutionDemoGraphic_VBlank(TCB *tcb, void *data) {
+    EvolutionDemoGraphic *graphic = data;
 
-    ShinkaDemoBG_VBlank(&graphic->bg);
-    ShinkaDemoClAct_VBlank(&graphic->clact);
+    EvolutionDemoBG_VBlank(&graphic->bg);
+    EvolutionDemoClAct_VBlank(&graphic->clact);
 }
 
-static void ShinkaDemoBG_Init(ShinkaDemoBG *bg, HeapID heapId) {
+static void EvolutionDemoBG_Init(EvolutionDemoBG *bg, HeapID heapId) {
     u32 i;
 
-    MI_CpuFill8(bg, 0, sizeof(ShinkaDemoBG));
+    MI_CpuFill8(bg, 0, sizeof(EvolutionDemoBG));
     GFL_BGSysCreate(heapId);
     BmpWin_InitAllocator(heapId);
     GFL_BGSysSetLCDConfig(&sLCDConfig);
@@ -231,7 +232,7 @@ static void ShinkaDemoBG_Init(ShinkaDemoBG *bg, HeapID heapId) {
     }
 }
 
-static void ShinkaDemoBG_Free(ShinkaDemoBG *bg) {
+static void EvolutionDemoBG_Free(EvolutionDemoBG *bg) {
     u32 i;
 
     for (i = 0; i < NELEMS(sBGSetups); i++) {
@@ -241,18 +242,18 @@ static void ShinkaDemoBG_Free(ShinkaDemoBG *bg) {
     }
     BmpWin_FreeAllocator();
     GFL_BGSysFree();
-    MI_CpuFill8(bg, 0, sizeof(ShinkaDemoBG));
+    MI_CpuFill8(bg, 0, sizeof(EvolutionDemoBG));
 }
 
-static void ShinkaDemoBG_Update(ShinkaDemoBG *bg) {
+static void EvolutionDemoBG_Update(EvolutionDemoBG *bg) {
 }
 
-static void ShinkaDemoBG_VBlank(ShinkaDemoBG *bg) {
+static void EvolutionDemoBG_VBlank(EvolutionDemoBG *bg) {
     GFL_BGSysUpdate();
 }
 
-static void ShinkaDemoClAct_Init(ShinkaDemoClAct *clact, const BGSysVRAMConfig *vramConfig, HeapID heapId) {
-    MI_CpuFill8(clact, 0, sizeof(ShinkaDemoClAct));
+static void EvolutionDemoClAct_Init(EvolutionDemoClAct *clact, const BGSysVRAMConfig *vramConfig, HeapID heapId) {
+    MI_CpuFill8(clact, 0, sizeof(EvolutionDemoClAct));
     ClActSys_Create(&sClActSetup, vramConfig, heapId);
     clact->unit = ClActUnit_Create(128, 0, heapId);
     ClActUnit_UseSystemRenderer(clact->unit);
@@ -260,43 +261,43 @@ static void ShinkaDemoClAct_Init(ShinkaDemoClAct *clact, const BGSysVRAMConfig *
     GFL_BGSysSetBGEnabledB(GX_PLANEMASK_OBJ, TRUE);
 }
 
-static void ShinkaDemoClAct_Free(ShinkaDemoClAct *clact) {
+static void EvolutionDemoClAct_Free(EvolutionDemoClAct *clact) {
     ClActUnit_Delete(clact->unit);
     ClActSys_Delete();
-    MI_CpuFill8(clact, 0, sizeof(ShinkaDemoClAct));
+    MI_CpuFill8(clact, 0, sizeof(EvolutionDemoClAct));
 }
 
-static void ShinkaDemoClAct_Update(ShinkaDemoClAct *clact) {
+static void EvolutionDemoClAct_Update(EvolutionDemoClAct *clact) {
     ClActSys_Draw();
 }
 
-static void ShinkaDemoClAct_VBlank(ShinkaDemoClAct *clact) {
+static void EvolutionDemoClAct_VBlank(EvolutionDemoClAct *clact) {
     ClActSys_VBlank();
 }
 
-static ClActUnit *ShinkaDemoClAct_GetUnit(ShinkaDemoClAct *clact) {
+static ClActUnit *EvolutionDemoClAct_GetUnit(EvolutionDemoClAct *clact) {
     return clact->unit;
 }
 
-static void ShinkaDemoG3dSys_Init(ShinkaDemoG3dSys *g3d, HeapID heapId) {
-    GFL_G3DSysCreate(FALSE, 2, 0, 1, 0, heapId, ShinkaDemoGraphic_G3DInit);
+static void EvolutionDemoG3dSys_Init(EvolutionDemoG3dSys *g3d, HeapID heapId) {
+    GFL_G3DSysCreate(FALSE, 2, 0, 1, 0, heapId, EvolutionDemoGraphic_G3DInit);
     // A 40 degree field of view
     g3d->camera = GFL_G3DCameraCreate(G3DCAM_PROJECTION_PERSPECTIVE, FX_SinIdx(DEG_TO_IDX(20)),
                                       FX_CosIdx(DEG_TO_IDX(20)), FX32_CONST(4.0 / 3.0), 0, FX32_ONE, FX32_CONST(1024),
                                       0, &sCameraPosition, &sCameraUpVector, &sCameraTarget, heapId);
 }
 
-static void ShinkaDemoG3dSys_Free(ShinkaDemoG3dSys *g3d) {
+static void EvolutionDemoG3dSys_Free(EvolutionDemoG3dSys *g3d) {
     GFL_G3DCameraFree(g3d->camera);
     GFL_G3DSysFree();
 }
 
-static void ShinkaDemoG3dSys_Begin(ShinkaDemoG3dSys *g3d) {
+static void EvolutionDemoG3dSys_Begin(EvolutionDemoG3dSys *g3d) {
     GFL_G3DSysReset();
     GFL_G3DCameraFlush(g3d->camera);
     GFL_G3DSysMtxViewFlush();
 }
 
-static void ShinkaDemoG3dSys_End(ShinkaDemoG3dSys *g3d) {
+static void EvolutionDemoG3dSys_End(EvolutionDemoG3dSys *g3d) {
     GFL_G3DSysReqSwapBuffers();
 }

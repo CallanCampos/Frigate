@@ -3,7 +3,7 @@
 
 #include "types.h"
 #include "app/gtsnego.h"
-#include "demo/shinka_demo.h"
+#include "demo/evolution_demo.h"
 #include "gfl/overlay.h"
 #include "gfl/proc.h"
 #include "struct_decls.h"
@@ -26,7 +26,7 @@ typedef struct {
     GtsNegoParam *nego;
     PokeParty *party;
     // Not used by the trade, the events keep the evolution demo's parameter here
-    ShinkaDemoParam *evolution;
+    EvolutionDemoParam *evolution;
     void *buffer;
     // Where the Pokémon traded away is
     u16 box;

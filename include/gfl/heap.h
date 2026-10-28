@@ -67,7 +67,7 @@ enum {
     HEAPID_MONOLITH = 0x61,
     HEAPID_GAMESYNC = 0x67,
     // The evolution demo's graphics, which it frees while another screen runs
-    HEAPID_SHINKA_DEMO_GRAPHIC = 0x68,
+    HEAPID_EVOLUTION_DEMO_GRAPHIC = 0x68,
     // Not from swan: the Pokédex's heap, overlay 302
     HEAPID_POKEDEX = 0x69,
     // Not from swan: the Pokédex registration's heap, overlay 297
@@ -108,7 +108,7 @@ enum {
     HEAPID_POKEMON_TRADE = 0x91,
     HEAPID_FIELD_WEATHER = 0x92,
     HEAPID_FIELD_PLACE_NAME = 0x93,
-    HEAPID_SHINKA_DEMO = 0x94,
+    HEAPID_EVOLUTION_DEMO = 0x94,
     HEAPID_POKEDEX_DETAIL = 0x95,
     HEAPID_FIELD_SCENEAREA = 0x96,
     HEAPID_BOX_SEARCH = 0x98,

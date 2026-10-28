@@ -12,8 +12,8 @@
 #include "pml/poke_party.h"
 #include "system/rtc.h"
 
-// Whether a Pokémon evolves, by its species' evolution table. The ROM's string names the file. The functions' and
-// the zone lists' names are swan's (https://github.com/ds-pokemon-hacking/swan, GPL-3.0)
+// Whether a Pokémon evolves, by its species' evolution table. The ROM's string names the file shinka_check.c. The
+// functions' and the zone lists' names are swan's (https://github.com/ds-pokemon-hacking/swan, GPL-3.0)
 
 // The friendship the friendship methods take
 #define EVO_FRIENDSHIP 220

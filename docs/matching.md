@@ -401,7 +401,7 @@ Same instructions, registers swapped.
   cosine of 90 and then of 270 degrees: one reused `cos, sin` pair gave the second cosine `r7` and spilled the sine,
   `fx32 cos; fx32 sin; fx32 cos2; fx32 sin2;` matches, and `sin, cos, sin2, cos2` is further off.
 - Variables declared in an inner block are allocated apart from the function's variables of the same name: in
-  `ShinkaDemoPieces_Move`, the branch that moves a piece home declares its own `dx` and `dz`, which live on the stack
+  `EvolutionDemoPieces_Move`, the branch that moves a piece home declares its own `dx` and `dz`, which live on the stack
   while the other branches keep theirs in registers.
 - `s02A1_MedalGetMostCompleteCategory` declares its ranking-loop counter `s32 j;` first in the function, before
   `fx32 best = 0;`. With `j` in that position, `best` takes `r5` and both loop counters take `r4`; with `j` declared
@@ -1104,7 +1104,7 @@ Same code, other `sp` offsets or frame size.
 - A local assigned straight from a `static inline`'s return is copy-propagated into the inline's result temporary,
   which is slotted by first use after the named locals, while the same value computed in place stays a named local
   slotted by its declaration. Spill slots that look grouped by kind across branches can be this: overlay 284's
-  `ShinkaDemoPieces_Move` gets the original's slots only with each branch's `fx32 distSqXZ` block-scoped and set as
+  `EvolutionDemoPieces_Move` gets the original's slots only with each branch's `fx32 distSqXZ` block-scoped and set as
   `FX_Mul(x, x) + FX_Mul(z, z)` written out; through the file's `SquaredLengthXZ` inline they are temporaries.
   Only when the assignment dominates every use, though: overlay 143's `MonolithMissionInfo_DrawRecords` gets `best`
   slotted as a temporary through a pass-through inline getter, but `count`, assigned in one branch of an `if`/`else`,
@@ -1794,7 +1794,7 @@ Same instructions, scheduled in another order.
 - NitroSDK's inline functions take enums, such as `GXBGColorMode`, and the BG system's `GFL_BGSysCreateBG` only loads
   every argument of `G2_SetBG0Control` before shifting any with enum parameters. `nitro/gx.h` keeps the SDK's types for
   this reason.
-- Where `FX_Mul`'s sign extensions go depends on the statements. In `ShinkaDemoPieces_Init`, squaring `dy` before
+- Where `FX_Mul`'s sign extensions go depends on the statements. In `EvolutionDemoPieces_Init`, squaring `dy` before
   either square root, `distY = FX_Mul(dy, dy);`, keeps `dy`'s extension in a stack slot across the first one, and only
   the sum written as a `static inline` function, `distXZ = SquaredLengthXZ(dx, dz);`, puts that extension before the
   sum's multiplies. The same sum written in place, in any statement order, cast or split, does not.
@@ -1831,7 +1831,7 @@ Same instructions, scheduled in another order.
   `func_ov194_021c4ec0` does for its marking icons' animation pairs.
 - A `u32` local's reload from its stack slot is hoisted above a store through a pointer, and a `u16` local's is
   not: `event_battle_return.c`'s `EventBattleReturn_Main` sets up the evolution demo with `str r7, [r3, #4];
-  ldr r0, [sp, #0x18]; ldr r2, =SHINKA_DEMO_PROC_FUNCTIONS; strh r0, [r3, #8]` only with `u16 species`. That in turn
+  ldr r0, [sp, #0x18]; ldr r2, =EVOLUTION_DEMO_PROC_FUNCTIONS; strh r0, [r3, #8]` only with `u16 species`. That in turn
   needs `CheckEvolveSpecies` to return `u16`, or the call's result is narrowed. It is not aliasing: taking the
   local's address, moving it into a local struct or retyping the pointee's fields leaves the `u32` hoist in place.
 - One constant register feeds a stack argument and a register argument of the same value, so an extra `mov` into
@@ -2438,7 +2438,7 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   the summary screen's debug box matches only with `PML_CreateTempPkm(pkm, species, level, PKM_ID_RANDOM)` taking a
   `u64` ID.
 - A caller that keeps an argument register untouched across a call to a function that ignores it is passing that
-  argument: `ShinkaDemoPieces_IsFadeDone` takes the heap ID like the functions around it.
+  argument: `EvolutionDemoPieces_IsFadeDone` takes the heap ID like the functions around it.
 
 - `if (!f()) { ... } else { return x; }` puts the `else` out of line, after the function's other code, where
   `if (f()) { return x; }` keeps it in place (`ctvt_game.c`'s `CtvtGame_Main` and `CtvtGame_UpdatePlay`).
@@ -4047,7 +4047,7 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   initializer goes before a file's 19-byte table unless something smaller is shared. A read of a const global whose
   initializer has been seen is folded and doesn't count as a reference. Taking its address counts, and so does reading
   it before its definition, as an unused inline function in a header does, even though that code is never emitted.
-  `demo/shinka_demo_view.h` reconstructs such accessors for the evolution demo's helix constants. Heapsort is not
+  `demo/evolution_demo_view.h` reconstructs such accessors for the evolution demo's helix constants. Heapsort is not
   stable, so objects of the same size come out in an order that depends on where every object in the file is declared,
   and moving one object can reorder others. `tools/decomp/rodata_order.py` predicts the layout for a declaration order
   and tries the orders of the objects given with `--permute`; `intro_graphic.c` matches only with its light setups

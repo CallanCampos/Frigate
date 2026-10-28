@@ -1,3 +1,4 @@
+// The ROM names this file shinka_demo.c.
 #include "types.h"
 #include "app/p_status.h"
 #include "app/ui/ui_scene.h"
@@ -10,7 +11,7 @@
 #include "constants/sound.h"
 #include "constants/species.h"
 #include "constants/text_banks.h"
-#include "demo/shinka_demo.h"
+#include "demo/evolution_demo.h"
 #include "gfl/arc.h"
 #include "gfl/arc_util.h"
 #include "gfl/bg_sys.h"
@@ -57,52 +58,52 @@
 
 // The steps of the process
 enum {
-    SHINKA_DEMO_WAIT,
-    SHINKA_DEMO_FADE_IN,
-    SHINKA_DEMO_WAIT_ACTORS,
-    SHINKA_DEMO_SHOW_WINDOW,
-    SHINKA_DEMO_PRINT_EVOLVING,
-    SHINKA_DEMO_WAIT_EVOLVING,
-    SHINKA_DEMO_WAIT_CRY,
-    SHINKA_DEMO_WAIT_BGM,
-    SHINKA_DEMO_EVOLVE,
-    SHINKA_DEMO_EVOLVED,
-    SHINKA_DEMO_SHOW_WINDOW_EVOLVED,
-    SHINKA_DEMO_PRINT_EVOLVED,
-    SHINKA_DEMO_WAIT_EVOLVED,
-    SHINKA_DEMO_CANCELLED,
-    SHINKA_DEMO_SHOW_WINDOW_CANCELLED,
-    SHINKA_DEMO_PRINT_CANCELLED,
-    SHINKA_DEMO_WAIT_CANCELLED,
-    SHINKA_DEMO_AFTER_EVOLVING,
-    SHINKA_DEMO_LEARN_MOVE,
-    SHINKA_DEMO_WAIT_LEARNED,
-    SHINKA_DEMO_PRINT_WANTS_MOVE,
-    SHINKA_DEMO_WAIT_WANTS_MOVE,
-    SHINKA_DEMO_WAIT_FORGET_ANSWER,
-    SHINKA_DEMO_WAIT_FADE_OV207,
-    SHINKA_DEMO_OV207,
-    SHINKA_DEMO_OV207_END,
-    SHINKA_DEMO_WAIT_FADE_OV207_END,
-    SHINKA_DEMO_WAIT_FADE_OV287,
-    SHINKA_DEMO_OV287,
-    SHINKA_DEMO_WAIT_FADE_OV287_END,
-    SHINKA_DEMO_OV287_END,
-    SHINKA_DEMO_FORGET,
-    SHINKA_DEMO_SHOW_WINDOW_FORGET,
-    SHINKA_DEMO_PRINT_FORGOT,
-    SHINKA_DEMO_WAIT_FORGOT,
-    SHINKA_DEMO_WAIT_LEARNED_NEW,
-    SHINKA_DEMO_GIVE_UP,
-    SHINKA_DEMO_SHOW_WINDOW_GIVE_UP,
-    SHINKA_DEMO_PRINT_GIVE_UP,
-    SHINKA_DEMO_WAIT_GIVE_UP,
-    SHINKA_DEMO_WAIT_GIVE_UP_ANSWER,
-    SHINKA_DEMO_WAIT_NOT_LEARNED,
-    SHINKA_DEMO_END,
-    SHINKA_DEMO_WAIT_BGM_END,
-    SHINKA_DEMO_WAIT_FADE_END,
-    SHINKA_DEMO_DONE,
+    EVOLUTION_DEMO_WAIT,
+    EVOLUTION_DEMO_FADE_IN,
+    EVOLUTION_DEMO_WAIT_ACTORS,
+    EVOLUTION_DEMO_SHOW_WINDOW,
+    EVOLUTION_DEMO_PRINT_EVOLVING,
+    EVOLUTION_DEMO_WAIT_EVOLVING,
+    EVOLUTION_DEMO_WAIT_CRY,
+    EVOLUTION_DEMO_WAIT_BGM,
+    EVOLUTION_DEMO_EVOLVE,
+    EVOLUTION_DEMO_EVOLVED,
+    EVOLUTION_DEMO_SHOW_WINDOW_EVOLVED,
+    EVOLUTION_DEMO_PRINT_EVOLVED,
+    EVOLUTION_DEMO_WAIT_EVOLVED,
+    EVOLUTION_DEMO_CANCELLED,
+    EVOLUTION_DEMO_SHOW_WINDOW_CANCELLED,
+    EVOLUTION_DEMO_PRINT_CANCELLED,
+    EVOLUTION_DEMO_WAIT_CANCELLED,
+    EVOLUTION_DEMO_AFTER_EVOLVING,
+    EVOLUTION_DEMO_LEARN_MOVE,
+    EVOLUTION_DEMO_WAIT_LEARNED,
+    EVOLUTION_DEMO_PRINT_WANTS_MOVE,
+    EVOLUTION_DEMO_WAIT_WANTS_MOVE,
+    EVOLUTION_DEMO_WAIT_FORGET_ANSWER,
+    EVOLUTION_DEMO_WAIT_FADE_OV207,
+    EVOLUTION_DEMO_OV207,
+    EVOLUTION_DEMO_OV207_END,
+    EVOLUTION_DEMO_WAIT_FADE_OV207_END,
+    EVOLUTION_DEMO_WAIT_FADE_OV287,
+    EVOLUTION_DEMO_OV287,
+    EVOLUTION_DEMO_WAIT_FADE_OV287_END,
+    EVOLUTION_DEMO_OV287_END,
+    EVOLUTION_DEMO_FORGET,
+    EVOLUTION_DEMO_SHOW_WINDOW_FORGET,
+    EVOLUTION_DEMO_PRINT_FORGOT,
+    EVOLUTION_DEMO_WAIT_FORGOT,
+    EVOLUTION_DEMO_WAIT_LEARNED_NEW,
+    EVOLUTION_DEMO_GIVE_UP,
+    EVOLUTION_DEMO_SHOW_WINDOW_GIVE_UP,
+    EVOLUTION_DEMO_PRINT_GIVE_UP,
+    EVOLUTION_DEMO_WAIT_GIVE_UP,
+    EVOLUTION_DEMO_WAIT_GIVE_UP_ANSWER,
+    EVOLUTION_DEMO_WAIT_NOT_LEARNED,
+    EVOLUTION_DEMO_END,
+    EVOLUTION_DEMO_WAIT_BGM_END,
+    EVOLUTION_DEMO_WAIT_FADE_END,
+    EVOLUTION_DEMO_DONE,
 };
 
 // What the music is doing
@@ -110,8 +111,8 @@ enum {
     BGM_IDLE,
     BGM_FADE_OUT,
     BGM_PLAY,
-    BGM_LOAD_KOUKAN,
-    BGM_KOUKAN,
+    BGM_LOAD_TRADE,
+    BGM_TRADE,
     BGM_PUSHED,
     BGM_FADE_OUT_END,
     BGM_LOAD_FANFARE,
@@ -144,7 +145,7 @@ typedef struct {
 typedef struct {
     HeapID heapId;
     HeapID graphicHeapId;
-    ShinkaDemoGraphic *graphic;
+    EvolutionDemoGraphic *graphic;
     Font *font;
     PrintQueue *printQueue;
     PartyPkm *pkm;
@@ -186,80 +187,80 @@ typedef struct {
     u8 usingKeys;
     BPlistParam ov287Param;
     PStatusParam *pstatusParam;
-    ShinkaDemoView *view;
-    ShinkaDemoEffect *effect;
+    EvolutionDemoView *view;
+    EvolutionDemoEffect *effect;
     BOOL unk10C;
     BOOL unk110;
     BOOL unk114;
     BOOL unk118;
     GameProcManager *procManager;
-} ShinkaDemoWork;
+} EvolutionDemoWork;
 
-static BOOL ShinkaDemo_Init(GameProc *proc, u32 *state, void *param, void *work);
-static BOOL ShinkaDemo_Main(GameProc *proc, u32 *state, void *param, void *work);
-static BOOL ShinkaDemo_Exit(GameProc *proc, u32 *state, void *param, void *work);
-static void ShinkaDemo_InitGraphics(ShinkaDemoParam *param, ShinkaDemoWork *wk);
-static void ShinkaDemo_FreeGraphics(ShinkaDemoParam *param, ShinkaDemoWork *wk);
-static void ShinkaDemo_InitBGM(ShinkaDemoParam *param, ShinkaDemoWork *wk);
-static void ShinkaDemo_FreeBGM(ShinkaDemoParam *param, ShinkaDemoWork *wk);
-static void ShinkaDemo_UpdateBGM(ShinkaDemoParam *param, ShinkaDemoWork *wk);
-static BOOL ShinkaDemo_IsBGMFadingOut(ShinkaDemoParam *param, ShinkaDemoWork *wk);
-static void ShinkaDemo_RestoreBGM(ShinkaDemoParam *param, ShinkaDemoWork *wk);
-static void ShinkaDemo_PlayBGM(ShinkaDemoParam *param, ShinkaDemoWork *wk);
-static BOOL ShinkaDemo_IsBGMPlaying(ShinkaDemoParam *param, ShinkaDemoWork *wk);
-static void ShinkaDemo_PlayKoukan(ShinkaDemoParam *param, ShinkaDemoWork *wk);
-static void ShinkaDemo_PushBGM(ShinkaDemoParam *param, ShinkaDemoWork *wk);
-static void ShinkaDemo_PopBGM(ShinkaDemoParam *param, ShinkaDemoWork *wk);
-static BOOL ShinkaDemo_IsKoukanPlaying(ShinkaDemoParam *param, ShinkaDemoWork *wk);
-static void ShinkaDemo_FadeOutBGM(ShinkaDemoParam *param, ShinkaDemoWork *wk);
-static BOOL ShinkaDemo_IsBGMFadingOutEnd(ShinkaDemoParam *param, ShinkaDemoWork *wk);
-static void ShinkaDemo_PlayFanfare(ShinkaDemoParam *param, ShinkaDemoWork *wk);
-static BOOL ShinkaDemo_IsFanfarePlaying(ShinkaDemoParam *param, ShinkaDemoWork *wk);
-static void ShinkaDemo_PlayLevelUp(ShinkaDemoParam *param, ShinkaDemoWork *wk);
-static void ShinkaDemo_DiscardBGM(ShinkaDemoParam *param, ShinkaDemoWork *wk);
-static void ShinkaDemo_InitBG(ShinkaDemoParam *param, ShinkaDemoWork *wk);
-static void ShinkaDemo_FreeBG(ShinkaDemoParam *param, ShinkaDemoWork *wk);
-static void ShinkaDemo_InitActors(ShinkaDemoParam *param, ShinkaDemoWork *wk);
-static void ShinkaDemo_FreeActors(ShinkaDemoParam *param, ShinkaDemoWork *wk);
-static void ShinkaDemo_StartActors(ShinkaDemoParam *param, ShinkaDemoWork *wk);
-static BOOL ShinkaDemo_AreActorsDone(ShinkaDemoParam *param, ShinkaDemoWork *wk);
-static void ShinkaDemo_VBlank(TCB *tcb, void *data);
-static void ShinkaDemo_InitMsg(ShinkaDemoParam *param, ShinkaDemoWork *wk);
-static void ShinkaDemo_FreeMsg(ShinkaDemoParam *param, ShinkaDemoWork *wk);
-static void ShinkaDemo_UpdateMsg(ShinkaDemoParam *param, ShinkaDemoWork *wk);
-static BOOL ShinkaDemo_OnPrintEvent(u32 event);
-static void ShinkaDemo_Print(ShinkaDemoWork *wk, MsgData *msgData, u32 messageId, PrintStreamCallback callback,
-                             u32 type0, void *word0, u32 type1, void *word1);
-static BOOL ShinkaDemo_IsPrintDone(ShinkaDemoWork *wk);
-static BOOL ShinkaDemo_WaitButton(ShinkaDemoWork *wk);
-static void ShinkaDemo_ClearWindow(ShinkaDemoWork *wk, u8 color);
-static void ShinkaDemo_ShowWindow(ShinkaDemoParam *param, ShinkaDemoWork *wk, BOOL show);
-static void ShinkaDemo_InitMenu(ShinkaDemoParam *param, ShinkaDemoWork *wk);
-static void ShinkaDemo_FreeMenu(ShinkaDemoParam *param, ShinkaDemoWork *wk);
-static void ShinkaDemo_SetMenuChoices(ShinkaDemoWork *wk, MsgData *msgData0, u32 messageId0, u32 type00, void *word00,
-                                      u32 type10, void *word10, MsgData *msgData1, u32 messageId1, u32 type01,
-                                      void *word01, u32 type11, void *word11);
-static StrBuf *ShinkaDemo_FormatMessage(HeapID heapId, MsgData *msgData, u32 messageId, u32 type0, void *word0,
-                                        u32 type1, void *word1);
-static void ShinkaDemo_MakeShedinja(ShinkaDemoParam *param, ShinkaDemoWork *wk);
-static void ShinkaDemo_RemoveHeldItem(ShinkaDemoParam *param, ShinkaDemoWork *wk);
+static BOOL EvolutionDemo_Init(GameProc *proc, u32 *state, void *param, void *work);
+static BOOL EvolutionDemo_Main(GameProc *proc, u32 *state, void *param, void *work);
+static BOOL EvolutionDemo_Exit(GameProc *proc, u32 *state, void *param, void *work);
+static void EvolutionDemo_InitGraphics(EvolutionDemoParam *param, EvolutionDemoWork *wk);
+static void EvolutionDemo_FreeGraphics(EvolutionDemoParam *param, EvolutionDemoWork *wk);
+static void EvolutionDemo_InitBGM(EvolutionDemoParam *param, EvolutionDemoWork *wk);
+static void EvolutionDemo_FreeBGM(EvolutionDemoParam *param, EvolutionDemoWork *wk);
+static void EvolutionDemo_UpdateBGM(EvolutionDemoParam *param, EvolutionDemoWork *wk);
+static BOOL EvolutionDemo_IsBGMFadingOut(EvolutionDemoParam *param, EvolutionDemoWork *wk);
+static void EvolutionDemo_RestoreBGM(EvolutionDemoParam *param, EvolutionDemoWork *wk);
+static void EvolutionDemo_PlayBGM(EvolutionDemoParam *param, EvolutionDemoWork *wk);
+static BOOL EvolutionDemo_IsBGMPlaying(EvolutionDemoParam *param, EvolutionDemoWork *wk);
+static void EvolutionDemo_PlayTrade(EvolutionDemoParam *param, EvolutionDemoWork *wk);
+static void EvolutionDemo_PushBGM(EvolutionDemoParam *param, EvolutionDemoWork *wk);
+static void EvolutionDemo_PopBGM(EvolutionDemoParam *param, EvolutionDemoWork *wk);
+static BOOL EvolutionDemo_IsTradePlaying(EvolutionDemoParam *param, EvolutionDemoWork *wk);
+static void EvolutionDemo_FadeOutBGM(EvolutionDemoParam *param, EvolutionDemoWork *wk);
+static BOOL EvolutionDemo_IsBGMFadingOutEnd(EvolutionDemoParam *param, EvolutionDemoWork *wk);
+static void EvolutionDemo_PlayFanfare(EvolutionDemoParam *param, EvolutionDemoWork *wk);
+static BOOL EvolutionDemo_IsFanfarePlaying(EvolutionDemoParam *param, EvolutionDemoWork *wk);
+static void EvolutionDemo_PlayLevelUp(EvolutionDemoParam *param, EvolutionDemoWork *wk);
+static void EvolutionDemo_DiscardBGM(EvolutionDemoParam *param, EvolutionDemoWork *wk);
+static void EvolutionDemo_InitBG(EvolutionDemoParam *param, EvolutionDemoWork *wk);
+static void EvolutionDemo_FreeBG(EvolutionDemoParam *param, EvolutionDemoWork *wk);
+static void EvolutionDemo_InitActors(EvolutionDemoParam *param, EvolutionDemoWork *wk);
+static void EvolutionDemo_FreeActors(EvolutionDemoParam *param, EvolutionDemoWork *wk);
+static void EvolutionDemo_StartActors(EvolutionDemoParam *param, EvolutionDemoWork *wk);
+static BOOL EvolutionDemo_AreActorsDone(EvolutionDemoParam *param, EvolutionDemoWork *wk);
+static void EvolutionDemo_VBlank(TCB *tcb, void *data);
+static void EvolutionDemo_InitMsg(EvolutionDemoParam *param, EvolutionDemoWork *wk);
+static void EvolutionDemo_FreeMsg(EvolutionDemoParam *param, EvolutionDemoWork *wk);
+static void EvolutionDemo_UpdateMsg(EvolutionDemoParam *param, EvolutionDemoWork *wk);
+static BOOL EvolutionDemo_OnPrintEvent(u32 event);
+static void EvolutionDemo_Print(EvolutionDemoWork *wk, MsgData *msgData, u32 messageId, PrintStreamCallback callback,
+                                u32 type0, void *word0, u32 type1, void *word1);
+static BOOL EvolutionDemo_IsPrintDone(EvolutionDemoWork *wk);
+static BOOL EvolutionDemo_WaitButton(EvolutionDemoWork *wk);
+static void EvolutionDemo_ClearWindow(EvolutionDemoWork *wk, u8 color);
+static void EvolutionDemo_ShowWindow(EvolutionDemoParam *param, EvolutionDemoWork *wk, BOOL show);
+static void EvolutionDemo_InitMenu(EvolutionDemoParam *param, EvolutionDemoWork *wk);
+static void EvolutionDemo_FreeMenu(EvolutionDemoParam *param, EvolutionDemoWork *wk);
+static void EvolutionDemo_SetMenuChoices(EvolutionDemoWork *wk, MsgData *msgData0, u32 messageId0, u32 type00,
+                                         void *word00, u32 type10, void *word10, MsgData *msgData1, u32 messageId1,
+                                         u32 type01, void *word01, u32 type11, void *word11);
+static StrBuf *EvolutionDemo_FormatMessage(HeapID heapId, MsgData *msgData, u32 messageId, u32 type0, void *word0,
+                                           u32 type1, void *word1);
+static void EvolutionDemo_MakeShedinja(EvolutionDemoParam *param, EvolutionDemoWork *wk);
+static void EvolutionDemo_RemoveHeldItem(EvolutionDemoParam *param, EvolutionDemoWork *wk);
 
-const GameProcFunctions SHINKA_DEMO_PROC_FUNCTIONS = { ShinkaDemo_Init, ShinkaDemo_Main, ShinkaDemo_Exit };
+const GameProcFunctions EVOLUTION_DEMO_PROC_FUNCTIONS = { EvolutionDemo_Init, EvolutionDemo_Main, EvolutionDemo_Exit };
 
 static const ClActorSetup sActorSetups[ACTOR_COUNT] = {
     { 128, 96, 0, 0, 1 }, { 128, 96, 1, 0, 1 }, { 128, 96, 2, 0, 1 },
     { 128, 96, 3, 0, 1 }, { 128, 96, 4, 0, 1 }, { 128, 96, 5, 0, 1 },
 };
 
-static BOOL ShinkaDemo_Init(GameProc *proc, u32 *state, void *param, void *work) {
-    ShinkaDemoParam *demoParam = param;
-    ShinkaDemoWork *wk;
+static BOOL EvolutionDemo_Init(GameProc *proc, u32 *state, void *param, void *work) {
+    EvolutionDemoParam *demoParam = param;
+    EvolutionDemoWork *wk;
 
-    GFL_HeapCreateChild(HEAPID_USER, HEAPID_SHINKA_DEMO, 0x10000);
-    wk = GFL_ProcInitSubsystem(proc, sizeof(ShinkaDemoWork), HEAPID_SHINKA_DEMO);
-    MI_CpuFill8(wk, 0, sizeof(ShinkaDemoWork));
-    wk->heapId = HEAPID_SHINKA_DEMO;
-    wk->state = SHINKA_DEMO_WAIT;
+    GFL_HeapCreateChild(HEAPID_USER, HEAPID_EVOLUTION_DEMO, 0x10000);
+    wk = GFL_ProcInitSubsystem(proc, sizeof(EvolutionDemoWork), HEAPID_EVOLUTION_DEMO);
+    MI_CpuFill8(wk, 0, sizeof(EvolutionDemoWork));
+    wk->heapId = HEAPID_EVOLUTION_DEMO;
+    wk->state = EVOLUTION_DEMO_WAIT;
     wk->wait = 5;
     wk->bgm = BGM_IDLE;
     wk->pkm = PokeParty_GetPkm(demoParam->party, demoParam->partyIndex);
@@ -272,35 +273,35 @@ static BOOL ShinkaDemo_Init(GameProc *proc, u32 *state, void *param, void *work)
     wk->usingKeys = FALSE;
     wk->pstatusParam = GFL_HeapAllocate(wk->heapId, sizeof(PStatusParam), TRUE, "shinka_demo.c", 578);
     GFL_FadeSet(3, 16, 16, -16);
-    ShinkaDemo_InitBGM(param, wk);
-    wk->vblankTask = GFL_VBlankTCBAdd(ShinkaDemo_VBlank, wk, 1);
+    EvolutionDemo_InitBGM(param, wk);
+    wk->vblankTask = GFL_VBlankTCBAdd(EvolutionDemo_VBlank, wk, 1);
     wk->unk10C = FALSE;
     wk->unk110 = FALSE;
     wk->unk114 = FALSE;
     wk->unk118 = FALSE;
     wk->procManager = CreateGameProcManager(wk->heapId);
-    ShinkaDemo_InitGraphics(param, wk);
+    EvolutionDemo_InitGraphics(param, wk);
     GFL_NetSetIconScreen(0, wk->heapId);
     return TRUE;
 }
 
-static BOOL ShinkaDemo_Exit(GameProc *proc, u32 *state, void *param, void *work) {
-    ShinkaDemoWork *wk = work;
+static BOOL EvolutionDemo_Exit(GameProc *proc, u32 *state, void *param, void *work) {
+    EvolutionDemoWork *wk = work;
 
-    ShinkaDemo_FreeGraphics(param, wk);
+    EvolutionDemo_FreeGraphics(param, wk);
     FreeGameProcManager(wk->procManager);
     GFL_TCBRemove(wk->vblankTask);
-    ShinkaDemo_FreeBGM(param, wk);
+    EvolutionDemo_FreeBGM(param, wk);
     GFL_HeapFree(wk->pstatusParam);
     GFL_StrBufFree(wk->nickname);
     GFL_ProcReleaseSubsystem(proc);
-    GFL_HeapDelete(HEAPID_SHINKA_DEMO);
+    GFL_HeapDelete(HEAPID_EVOLUTION_DEMO);
     return TRUE;
 }
 
-static BOOL ShinkaDemo_Main(GameProc *proc, u32 *state, void *param, void *work) {
-    ShinkaDemoParam *demoParam = param;
-    ShinkaDemoWork *wk = work;
+static BOOL EvolutionDemo_Main(GameProc *proc, u32 *state, void *param, void *work) {
+    EvolutionDemoParam *demoParam = param;
+    EvolutionDemoWork *wk = work;
     BOOL procRunning;
     u32 keys;
     u32 result;
@@ -312,94 +313,94 @@ static BOOL ShinkaDemo_Main(GameProc *proc, u32 *state, void *param, void *work)
     if (procRunning == TRUE) {
         return FALSE;
     }
-    if (wk->state != SHINKA_DEMO_OV207 && wk->state != SHINKA_DEMO_OV207_END && wk->printStream != NULL) {
+    if (wk->state != EVOLUTION_DEMO_OV207 && wk->state != EVOLUTION_DEMO_OV207_END && wk->printStream != NULL) {
         KeyCursor_Update(wk->keyCursor, wk->printStream, wk->window);
     }
     switch (wk->state) {
-    case SHINKA_DEMO_WAIT:
+    case EVOLUTION_DEMO_WAIT:
         if (wk->wait == 0) {
-            wk->state = SHINKA_DEMO_FADE_IN;
+            wk->state = EVOLUTION_DEMO_FADE_IN;
             GFL_FadeSet(3, 16, 0, -16);
         } else {
             wk->wait--;
         }
         break;
-    case SHINKA_DEMO_FADE_IN:
+    case EVOLUTION_DEMO_FADE_IN:
         if (GFL_FadeIsRunning() == FALSE) {
-            wk->state = SHINKA_DEMO_WAIT_ACTORS;
-            ShinkaDemo_StartActors(param, wk);
+            wk->state = EVOLUTION_DEMO_WAIT_ACTORS;
+            EvolutionDemo_StartActors(param, wk);
         }
         break;
-    case SHINKA_DEMO_WAIT_ACTORS:
-        if (ShinkaDemo_IsBGMFadingOut(param, wk) == FALSE && ShinkaDemo_AreActorsDone(param, wk)) {
+    case EVOLUTION_DEMO_WAIT_ACTORS:
+        if (EvolutionDemo_IsBGMFadingOut(param, wk) == FALSE && EvolutionDemo_AreActorsDone(param, wk)) {
             if (wk->windowShown) {
-                wk->state = SHINKA_DEMO_PRINT_EVOLVING;
+                wk->state = EVOLUTION_DEMO_PRINT_EVOLVING;
             } else {
-                wk->state = SHINKA_DEMO_SHOW_WINDOW;
-                ShinkaDemo_ShowWindow(param, wk, TRUE);
+                wk->state = EVOLUTION_DEMO_SHOW_WINDOW;
+                EvolutionDemo_ShowWindow(param, wk, TRUE);
             }
         }
         break;
-    case SHINKA_DEMO_SHOW_WINDOW:
+    case EVOLUTION_DEMO_SHOW_WINDOW:
         wk->bg1Request = BG1_SHOW;
-        wk->state = SHINKA_DEMO_PRINT_EVOLVING;
+        wk->state = EVOLUTION_DEMO_PRINT_EVOLVING;
         break;
-    case SHINKA_DEMO_PRINT_EVOLVING:
-        ShinkaDemo_Print(wk, wk->msgData, 0, NULL, WORD_NICKNAME, wk->pkm, WORD_NONE, NULL);
-        wk->state = SHINKA_DEMO_WAIT_EVOLVING;
+    case EVOLUTION_DEMO_PRINT_EVOLVING:
+        EvolutionDemo_Print(wk, wk->msgData, 0, NULL, WORD_NICKNAME, wk->pkm, WORD_NONE, NULL);
+        wk->state = EVOLUTION_DEMO_WAIT_EVOLVING;
         break;
-    case SHINKA_DEMO_WAIT_EVOLVING:
-        if (ShinkaDemo_IsPrintDone(wk) && ShinkaDemo_WaitButton(wk)) {
-            ShinkaDemo_ShowWindow(param, wk, FALSE);
-            wk->state = SHINKA_DEMO_WAIT_CRY;
-            ShinkaDemoView_Start(wk->view);
+    case EVOLUTION_DEMO_WAIT_EVOLVING:
+        if (EvolutionDemo_IsPrintDone(wk) && EvolutionDemo_WaitButton(wk)) {
+            EvolutionDemo_ShowWindow(param, wk, FALSE);
+            wk->state = EVOLUTION_DEMO_WAIT_CRY;
+            EvolutionDemoView_Start(wk->view);
         }
         break;
-    case SHINKA_DEMO_WAIT_CRY:
-        if (ShinkaDemoView_IsCryDone(wk->view)) {
-            wk->state = SHINKA_DEMO_WAIT_BGM;
-            ShinkaDemo_PlayBGM(param, wk);
+    case EVOLUTION_DEMO_WAIT_CRY:
+        if (EvolutionDemoView_IsCryDone(wk->view)) {
+            wk->state = EVOLUTION_DEMO_WAIT_BGM;
+            EvolutionDemo_PlayBGM(param, wk);
         }
         break;
-    case SHINKA_DEMO_WAIT_BGM:
-        if (ShinkaDemo_IsBGMPlaying(param, wk) == FALSE) {
-            wk->state = SHINKA_DEMO_EVOLVE;
-            ShinkaDemoView_Evolve(wk->view);
-            ShinkaDemoEffect_Start(wk->effect);
+    case EVOLUTION_DEMO_WAIT_BGM:
+        if (EvolutionDemo_IsBGMPlaying(param, wk) == FALSE) {
+            wk->state = EVOLUTION_DEMO_EVOLVE;
+            EvolutionDemoView_Evolve(wk->view);
+            EvolutionDemoEffect_Start(wk->effect);
             GFL_SndSEPlay(SEQ_SE_SHDEMO_01);
             wk->unk10C = TRUE;
             wk->wait = 0;
         }
         break;
-    case SHINKA_DEMO_EVOLVE:
+    case EVOLUTION_DEMO_EVOLVE:
         keys = GCTX_HIDGetPressedKeys();
-        if (ShinkaDemoView_IsDone(wk->view)) {
+        if (EvolutionDemoView_IsDone(wk->view)) {
             if (wk->cancelled) {
-                wk->state = SHINKA_DEMO_CANCELLED;
+                wk->state = EVOLUTION_DEMO_CANCELLED;
             } else {
-                wk->state = SHINKA_DEMO_EVOLVED;
+                wk->state = EVOLUTION_DEMO_EVOLVED;
             }
             break;
         }
-        if (ShinkaDemoView_HavePiecesStarted(wk->view)) {
-            ShinkaDemo_PlayKoukan(param, wk);
+        if (EvolutionDemoView_HavePiecesStarted(wk->view)) {
+            EvolutionDemo_PlayTrade(param, wk);
         }
-        if (ShinkaDemoView_GetUnk3C(wk->view)) {
-            ShinkaDemo_PushBGM(param, wk);
+        if (EvolutionDemoView_GetUnk3C(wk->view)) {
+            EvolutionDemo_PushBGM(param, wk);
         }
-        if (ShinkaDemoView_HavePiecesReturned(wk->view)) {
-            ShinkaDemoEffect_Start3D(wk->effect);
+        if (EvolutionDemoView_HavePiecesReturned(wk->view)) {
+            EvolutionDemoEffect_Start3D(wk->effect);
             if (wk->unk110 == FALSE) {
                 GFL_SndSEPlay(SEQ_SE_SHDEMO_04);
                 wk->unk10C = FALSE;
                 wk->unk110 = TRUE;
             }
         }
-        if (ShinkaDemoEffect_Is3DHeld(wk->effect)) {
-            ShinkaDemoView_Reveal(wk->view);
+        if (EvolutionDemoEffect_Is3DHeld(wk->effect)) {
+            EvolutionDemoView_Reveal(wk->view);
         }
-        if (ShinkaDemoEffect_Is3DReversing(wk->effect)) {
-            ShinkaDemoView_FadeIn(wk->view);
+        if (EvolutionDemoEffect_Is3DReversing(wk->effect)) {
+            EvolutionDemoView_FadeIn(wk->view);
             if (wk->unk114 == FALSE) {
                 if (wk->cancelled == FALSE) {
                     wk->unk10C = TRUE;
@@ -409,7 +410,7 @@ static BOOL ShinkaDemo_Main(GameProc *proc, u32 *state, void *param, void *work)
         }
         if (wk->unk10C) {
             if (wk->unk118 == FALSE && wk->wait >= 90) {
-                if (ShinkaDemo_IsKoukanPlaying(param, wk)) {
+                if (EvolutionDemo_IsTradePlaying(param, wk)) {
                     GFL_SndSEPlay(SEQ_SE_SHDEMO_02);
                     wk->unk118 = TRUE;
                 }
@@ -420,14 +421,14 @@ static BOOL ShinkaDemo_Main(GameProc *proc, u32 *state, void *param, void *work)
             }
             wk->wait++;
         }
-        if (demoParam->canCancel && ShinkaDemo_IsKoukanPlaying(param, wk) && wk->cancelled == FALSE &&
-            (keys & PAD_BUTTON_B) && ShinkaDemoView_Cancel(wk->view)) {
+        if (demoParam->canCancel && EvolutionDemo_IsTradePlaying(param, wk) && wk->cancelled == FALSE &&
+            (keys & PAD_BUTTON_B) && EvolutionDemoView_Cancel(wk->view)) {
             wk->cancelled = TRUE;
             GCTX_HIDSetUsingTouch(0);
-            ShinkaDemoEffect_Cancel(wk->effect);
+            EvolutionDemoEffect_Cancel(wk->effect);
         }
         break;
-    case SHINKA_DEMO_EVOLVED:
+    case EVOLUTION_DEMO_EVOLVED:
         setChangedPkmSpecies(wk->pkm, demoParam->species);
         if (demoParam->gameData != NULL) {
             pokedex = GameData_GetPokedex(demoParam->gameData);
@@ -435,125 +436,125 @@ static BOOL ShinkaDemo_Main(GameProc *proc, u32 *state, void *param, void *work)
             addPkmToDex(pokedex, wk->pkm);
         }
         GameBeaconSys_SendEvolution(PokeParty_GetParam(wk->pkm, PKM_PARAM_SPECIES, NULL), wk->nickname);
-        ShinkaDemo_PlayFanfare(param, wk);
+        EvolutionDemo_PlayFanfare(param, wk);
         if (wk->windowShown) {
-            wk->state = SHINKA_DEMO_PRINT_EVOLVED;
+            wk->state = EVOLUTION_DEMO_PRINT_EVOLVED;
         } else {
-            ShinkaDemo_ShowWindow(param, wk, TRUE);
-            wk->state = SHINKA_DEMO_SHOW_WINDOW_EVOLVED;
+            EvolutionDemo_ShowWindow(param, wk, TRUE);
+            wk->state = EVOLUTION_DEMO_SHOW_WINDOW_EVOLVED;
         }
         break;
-    case SHINKA_DEMO_SHOW_WINDOW_EVOLVED:
+    case EVOLUTION_DEMO_SHOW_WINDOW_EVOLVED:
         wk->bg1Request = BG1_SHOW;
-        wk->state = SHINKA_DEMO_PRINT_EVOLVED;
+        wk->state = EVOLUTION_DEMO_PRINT_EVOLVED;
         break;
-    case SHINKA_DEMO_PRINT_EVOLVED:
-        ShinkaDemo_Print(wk, wk->msgData, 2, NULL, WORD_STRBUF, wk->nickname, WORD_SPECIES, wk->pkm);
-        wk->state = SHINKA_DEMO_WAIT_EVOLVED;
+    case EVOLUTION_DEMO_PRINT_EVOLVED:
+        EvolutionDemo_Print(wk, wk->msgData, 2, NULL, WORD_STRBUF, wk->nickname, WORD_SPECIES, wk->pkm);
+        wk->state = EVOLUTION_DEMO_WAIT_EVOLVED;
         break;
-    case SHINKA_DEMO_WAIT_EVOLVED:
-        if (ShinkaDemo_IsPrintDone(wk) && ShinkaDemo_IsFanfarePlaying(param, wk) == FALSE &&
-            ShinkaDemo_WaitButton(wk)) {
+    case EVOLUTION_DEMO_WAIT_EVOLVED:
+        if (EvolutionDemo_IsPrintDone(wk) && EvolutionDemo_IsFanfarePlaying(param, wk) == FALSE &&
+            EvolutionDemo_WaitButton(wk)) {
             records = GameData_GetRecords(demoParam->gameData);
             RecordAddOne(records, 10);
             RecordAddOne(records, 88);
-            wk->state = SHINKA_DEMO_AFTER_EVOLVING;
+            wk->state = EVOLUTION_DEMO_AFTER_EVOLVING;
         }
         break;
-    case SHINKA_DEMO_CANCELLED:
+    case EVOLUTION_DEMO_CANCELLED:
         if (wk->cancelled) {
-            ShinkaDemo_DiscardBGM(param, wk);
+            EvolutionDemo_DiscardBGM(param, wk);
         } else {
-            ShinkaDemo_PopBGM(param, wk);
+            EvolutionDemo_PopBGM(param, wk);
         }
         if (wk->windowShown) {
-            wk->state = SHINKA_DEMO_PRINT_CANCELLED;
+            wk->state = EVOLUTION_DEMO_PRINT_CANCELLED;
         } else {
-            ShinkaDemo_ShowWindow(param, wk, TRUE);
-            wk->state = SHINKA_DEMO_SHOW_WINDOW_CANCELLED;
+            EvolutionDemo_ShowWindow(param, wk, TRUE);
+            wk->state = EVOLUTION_DEMO_SHOW_WINDOW_CANCELLED;
         }
         break;
-    case SHINKA_DEMO_SHOW_WINDOW_CANCELLED:
+    case EVOLUTION_DEMO_SHOW_WINDOW_CANCELLED:
         wk->bg1Request = BG1_SHOW;
-        wk->state = SHINKA_DEMO_PRINT_CANCELLED;
+        wk->state = EVOLUTION_DEMO_PRINT_CANCELLED;
         break;
-    case SHINKA_DEMO_PRINT_CANCELLED:
-        ShinkaDemo_Print(wk, wk->msgData, 1, NULL, WORD_NICKNAME, wk->pkm, WORD_NONE, NULL);
-        wk->state = SHINKA_DEMO_WAIT_CANCELLED;
+    case EVOLUTION_DEMO_PRINT_CANCELLED:
+        EvolutionDemo_Print(wk, wk->msgData, 1, NULL, WORD_NICKNAME, wk->pkm, WORD_NONE, NULL);
+        wk->state = EVOLUTION_DEMO_WAIT_CANCELLED;
         break;
-    case SHINKA_DEMO_WAIT_CANCELLED:
-        if (ShinkaDemo_IsPrintDone(wk) && ShinkaDemo_WaitButton(wk)) {
-            wk->state = SHINKA_DEMO_END;
+    case EVOLUTION_DEMO_WAIT_CANCELLED:
+        if (EvolutionDemo_IsPrintDone(wk) && EvolutionDemo_WaitButton(wk)) {
+            wk->state = EVOLUTION_DEMO_END;
         }
         break;
-    case SHINKA_DEMO_AFTER_EVOLVING:
+    case EVOLUTION_DEMO_AFTER_EVOLVING:
         switch (demoParam->method) {
         case EVO_METHOD_SHEDINJA:
-            ShinkaDemo_MakeShedinja(param, wk);
+            EvolutionDemo_MakeShedinja(param, wk);
             break;
         case EVO_METHOD_TRADE_WITH_ITEM:
         case EVO_METHOD_HELD_ITEM_DAY:
         case EVO_METHOD_HELD_ITEM_NIGHT:
-            ShinkaDemo_RemoveHeldItem(param, wk);
+            EvolutionDemo_RemoveHeldItem(param, wk);
             break;
         }
-        wk->state = SHINKA_DEMO_LEARN_MOVE;
+        wk->state = EVOLUTION_DEMO_LEARN_MOVE;
         wk->learnIndex = 0;
         break;
-    case SHINKA_DEMO_LEARN_MOVE:
+    case EVOLUTION_DEMO_LEARN_MOVE:
         wk->move = PokeParty_LearnNextLevelMove(wk->pkm, &wk->learnIndex, wk->heapId);
         if (wk->move == 0) {
-            wk->state = SHINKA_DEMO_END;
+            wk->state = EVOLUTION_DEMO_END;
         } else if (wk->move != 0xfffe) {
             if (wk->move & 0x8000) {
                 wk->move &= 0x7fff;
-                wk->state = SHINKA_DEMO_PRINT_WANTS_MOVE;
+                wk->state = EVOLUTION_DEMO_PRINT_WANTS_MOVE;
             } else {
-                wk->state = SHINKA_DEMO_WAIT_LEARNED;
-                ShinkaDemo_Print(wk, wk->moveMsgData, 3, NULL, WORD_NICKNAME, wk->pkm, WORD_MOVE, &wk->move);
-                ShinkaDemo_PlayLevelUp(param, wk);
+                wk->state = EVOLUTION_DEMO_WAIT_LEARNED;
+                EvolutionDemo_Print(wk, wk->moveMsgData, 3, NULL, WORD_NICKNAME, wk->pkm, WORD_MOVE, &wk->move);
+                EvolutionDemo_PlayLevelUp(param, wk);
             }
         }
         break;
-    case SHINKA_DEMO_WAIT_LEARNED:
-        if (ShinkaDemo_IsPrintDone(wk) && ShinkaDemo_WaitButton(wk)) {
-            wk->state = SHINKA_DEMO_LEARN_MOVE;
+    case EVOLUTION_DEMO_WAIT_LEARNED:
+        if (EvolutionDemo_IsPrintDone(wk) && EvolutionDemo_WaitButton(wk)) {
+            wk->state = EVOLUTION_DEMO_LEARN_MOVE;
         }
         break;
-    case SHINKA_DEMO_PRINT_WANTS_MOVE:
-        wk->state = SHINKA_DEMO_WAIT_WANTS_MOVE;
-        ShinkaDemo_Print(wk, wk->moveMsgData, 4, NULL, WORD_NICKNAME, wk->pkm, WORD_MOVE, &wk->move);
+    case EVOLUTION_DEMO_PRINT_WANTS_MOVE:
+        wk->state = EVOLUTION_DEMO_WAIT_WANTS_MOVE;
+        EvolutionDemo_Print(wk, wk->moveMsgData, 4, NULL, WORD_NICKNAME, wk->pkm, WORD_MOVE, &wk->move);
         break;
-    case SHINKA_DEMO_WAIT_WANTS_MOVE:
-        if (ShinkaDemo_IsPrintDone(wk)) {
-            wk->state = SHINKA_DEMO_WAIT_FORGET_ANSWER;
-            ShinkaDemo_SetMenuChoices(wk, wk->menuMsgData, 2, WORD_NONE, NULL, WORD_NONE, NULL, wk->menuMsgData, 3,
-                                      WORD_NONE, NULL, WORD_NONE, NULL);
+    case EVOLUTION_DEMO_WAIT_WANTS_MOVE:
+        if (EvolutionDemo_IsPrintDone(wk)) {
+            wk->state = EVOLUTION_DEMO_WAIT_FORGET_ANSWER;
+            EvolutionDemo_SetMenuChoices(wk, wk->menuMsgData, 2, WORD_NONE, NULL, WORD_NONE, NULL, wk->menuMsgData, 3,
+                                         WORD_NONE, NULL, WORD_NONE, NULL);
             TwoChoiceMenu_Open(wk->menu, wk->choices[0], wk->choices[1]);
         }
         break;
-    case SHINKA_DEMO_WAIT_FORGET_ANSWER:
+    case EVOLUTION_DEMO_WAIT_FORGET_ANSWER:
         result = TwoChoiceMenu_GetResult(wk->menu);
         if (result == TWO_CHOICE_MENU_NONE) {
             break;
         }
         if (result == TWO_CHOICE_MENU_FIRST) {
             if (demoParam->unkC) {
-                wk->state = SHINKA_DEMO_WAIT_FADE_OV207;
+                wk->state = EVOLUTION_DEMO_WAIT_FADE_OV207;
                 GFL_FadeSet(3, 0, 16, 0);
             } else {
-                wk->state = SHINKA_DEMO_WAIT_FADE_OV287;
+                wk->state = EVOLUTION_DEMO_WAIT_FADE_OV287;
                 GFL_FadeSet(2, 0, 16, 0);
             }
         } else if (result == TWO_CHOICE_MENU_SECOND) {
-            wk->state = SHINKA_DEMO_GIVE_UP;
+            wk->state = EVOLUTION_DEMO_GIVE_UP;
         }
         TwoChoiceMenu_Close(wk->menu);
         break;
-    case SHINKA_DEMO_WAIT_FADE_OV207:
+    case EVOLUTION_DEMO_WAIT_FADE_OV207:
         if (GFL_FadeIsRunning() == FALSE) {
-            ShinkaDemo_FreeGraphics(param, wk);
-            wk->state = SHINKA_DEMO_OV207;
+            EvolutionDemo_FreeGraphics(param, wk);
+            wk->state = EVOLUTION_DEMO_OV207;
             save = GameData_GetSaveControl(demoParam->gameData);
             wk->pstatusParam->dataType = PSTATUS_DATA_PARTY;
             wk->pstatusParam->gameData = demoParam->gameData;
@@ -570,41 +571,41 @@ static BOOL ShinkaDemo_Main(GameProc *proc, u32 *state, void *param, void *work)
             QueueGameProc(wk->procManager, OVERLAY_NONE, &PSTATUS_PROC_FUNCTIONS, wk->pstatusParam);
         }
         break;
-    case SHINKA_DEMO_OV207:
+    case EVOLUTION_DEMO_OV207:
         if (procRunning != TRUE) {
-            wk->state = SHINKA_DEMO_OV207_END;
+            wk->state = EVOLUTION_DEMO_OV207_END;
             break;
         }
         return FALSE;
-    case SHINKA_DEMO_OV207_END:
+    case EVOLUTION_DEMO_OV207_END:
         GFL_OvlUnload(OVERLAY_PSTATUS);
-        wk->state = SHINKA_DEMO_WAIT_FADE_OV207_END;
-        ShinkaDemo_InitGraphics(param, wk);
+        wk->state = EVOLUTION_DEMO_WAIT_FADE_OV207_END;
+        EvolutionDemo_InitGraphics(param, wk);
         GFL_NetSetIconScreen(0, wk->heapId);
         GFL_FadeSet(3, 16, 0, 0);
         break;
-    case SHINKA_DEMO_WAIT_FADE_OV207_END:
+    case EVOLUTION_DEMO_WAIT_FADE_OV207_END:
         if (GFL_FadeIsRunning() == FALSE) {
             switch (wk->pstatusParam->result) {
             case 0:
                 wk->slot = wk->pstatusParam->slot;
                 wk->forgetMove = PokeParty_GetParam(wk->pkm, PKM_PARAM_MOVE1 + wk->slot, NULL);
-                wk->state = SHINKA_DEMO_FORGET;
+                wk->state = EVOLUTION_DEMO_FORGET;
                 break;
             case 1:
             case 2:
             default:
-                wk->state = SHINKA_DEMO_GIVE_UP;
+                wk->state = EVOLUTION_DEMO_GIVE_UP;
                 break;
             }
         }
         break;
-    case SHINKA_DEMO_WAIT_FADE_OV287:
+    case EVOLUTION_DEMO_WAIT_FADE_OV287:
         if (GFL_FadeIsRunning() == FALSE) {
-            wk->state = SHINKA_DEMO_OV287;
+            wk->state = EVOLUTION_DEMO_OV287;
             TwoChoiceMenu_Free(wk->menu);
             wk->menu = NULL;
-            ShinkaDemoGraphic_FreeSubBG(wk->graphic);
+            EvolutionDemoGraphic_FreeSubBG(wk->graphic);
             wk->usingKeys = GCTX_HIDIsUsingTouch() == FALSE;
             wk->tcbBuffer = GFL_HeapAllocate(wk->heapId, GFL_TCBMgrCalcAllocSize(8), FALSE, "shinka_demo.c", 1360);
             MI_CpuFill8(wk->tcbBuffer, 0, GFL_TCBMgrCalcAllocSize(8));
@@ -632,16 +633,16 @@ static BOOL ShinkaDemo_Main(GameProc *proc, u32 *state, void *param, void *work)
             GFL_FadeSet(2, 16, 0, 0);
         }
         break;
-    case SHINKA_DEMO_OV287:
+    case EVOLUTION_DEMO_OV287:
         GFL_TCBMgrUpdate(wk->tcbManager);
         if (wk->ov287Param.done) {
-            wk->state = SHINKA_DEMO_WAIT_FADE_OV287_END;
+            wk->state = EVOLUTION_DEMO_WAIT_FADE_OV287_END;
             GFL_FadeSet(2, 0, 16, 0);
         }
         break;
-    case SHINKA_DEMO_WAIT_FADE_OV287_END:
+    case EVOLUTION_DEMO_WAIT_FADE_OV287_END:
         if (GFL_FadeIsRunning() == FALSE) {
-            wk->state = SHINKA_DEMO_OV287_END;
+            wk->state = EVOLUTION_DEMO_OV287_END;
             GFL_OvlUnload(OVERLAY_OV285);
             GFL_OvlUnload(OVERLAY_OV287);
             PaletteFade_FreeBuffer(wk->paletteFade, PALFADE_BUFFER_SUB_BG);
@@ -652,160 +653,160 @@ static BOOL ShinkaDemo_Main(GameProc *proc, u32 *state, void *param, void *work)
             wk->tcbManager = NULL;
             wk->tcbBuffer = NULL;
             wk->paletteFade = NULL;
-            ShinkaDemoGraphic_InitSubBG(wk->graphic);
-            wk->menu = TwoChoiceMenu_Create(wk->heapId, 5, 0, 1, 0, ShinkaDemoGraphic_GetClActUnit(wk->graphic),
+            EvolutionDemoGraphic_InitSubBG(wk->graphic);
+            wk->menu = TwoChoiceMenu_Create(wk->heapId, 5, 0, 1, 0, EvolutionDemoGraphic_GetClActUnit(wk->graphic),
                                             wk->font, wk->printQueue, 0);
             GFL_NetSetIconScreen(0, wk->heapId);
             GFL_FadeSet(2, 16, 0, 0);
         }
         break;
-    case SHINKA_DEMO_OV287_END:
+    case EVOLUTION_DEMO_OV287_END:
         if (GFL_FadeIsRunning() == FALSE) {
             wk->slot = wk->ov287Param.slot;
             if (wk->slot == 4) {
-                wk->state = SHINKA_DEMO_GIVE_UP;
+                wk->state = EVOLUTION_DEMO_GIVE_UP;
             } else {
                 wk->forgetMove = PokeParty_GetParam(wk->pkm, PKM_PARAM_MOVE1 + wk->slot, NULL);
-                wk->state = SHINKA_DEMO_FORGET;
+                wk->state = EVOLUTION_DEMO_FORGET;
             }
             GCTX_HIDSetUsingTouch(wk->usingKeys ? FALSE : TRUE);
         }
         break;
-    case SHINKA_DEMO_FORGET:
+    case EVOLUTION_DEMO_FORGET:
         if (wk->windowShown) {
-            wk->state = SHINKA_DEMO_PRINT_FORGOT;
+            wk->state = EVOLUTION_DEMO_PRINT_FORGOT;
         } else {
-            wk->state = SHINKA_DEMO_SHOW_WINDOW_FORGET;
-            ShinkaDemo_ShowWindow(param, wk, TRUE);
+            wk->state = EVOLUTION_DEMO_SHOW_WINDOW_FORGET;
+            EvolutionDemo_ShowWindow(param, wk, TRUE);
         }
         break;
-    case SHINKA_DEMO_SHOW_WINDOW_FORGET:
+    case EVOLUTION_DEMO_SHOW_WINDOW_FORGET:
         wk->bg1Request = BG1_SHOW;
-        wk->state = SHINKA_DEMO_PRINT_FORGOT;
+        wk->state = EVOLUTION_DEMO_PRINT_FORGOT;
         break;
-    case SHINKA_DEMO_PRINT_FORGOT:
-        ShinkaDemo_Print(wk, wk->moveMsgData, 5, ShinkaDemo_OnPrintEvent, WORD_NICKNAME, wk->pkm, WORD_MOVE,
-                         &wk->forgetMove);
-        wk->state = SHINKA_DEMO_WAIT_FORGOT;
+    case EVOLUTION_DEMO_PRINT_FORGOT:
+        EvolutionDemo_Print(wk, wk->moveMsgData, 5, EvolutionDemo_OnPrintEvent, WORD_NICKNAME, wk->pkm, WORD_MOVE,
+                            &wk->forgetMove);
+        wk->state = EVOLUTION_DEMO_WAIT_FORGOT;
         break;
-    case SHINKA_DEMO_WAIT_FORGOT:
-        if (ShinkaDemo_IsPrintDone(wk)) {
+    case EVOLUTION_DEMO_WAIT_FORGOT:
+        if (EvolutionDemo_IsPrintDone(wk)) {
             PokeParty_SetMove(wk->pkm, wk->move, wk->slot);
-            wk->state = SHINKA_DEMO_WAIT_LEARNED_NEW;
-            ShinkaDemo_Print(wk, wk->moveMsgData, 6, NULL, WORD_NICKNAME, wk->pkm, WORD_MOVE, &wk->move);
-            ShinkaDemo_PlayLevelUp(param, wk);
+            wk->state = EVOLUTION_DEMO_WAIT_LEARNED_NEW;
+            EvolutionDemo_Print(wk, wk->moveMsgData, 6, NULL, WORD_NICKNAME, wk->pkm, WORD_MOVE, &wk->move);
+            EvolutionDemo_PlayLevelUp(param, wk);
         }
         break;
-    case SHINKA_DEMO_WAIT_LEARNED_NEW:
-        if (ShinkaDemo_IsPrintDone(wk)) {
-            wk->state = SHINKA_DEMO_LEARN_MOVE;
+    case EVOLUTION_DEMO_WAIT_LEARNED_NEW:
+        if (EvolutionDemo_IsPrintDone(wk)) {
+            wk->state = EVOLUTION_DEMO_LEARN_MOVE;
         }
         break;
-    case SHINKA_DEMO_GIVE_UP:
+    case EVOLUTION_DEMO_GIVE_UP:
         if (wk->windowShown) {
-            wk->state = SHINKA_DEMO_PRINT_GIVE_UP;
+            wk->state = EVOLUTION_DEMO_PRINT_GIVE_UP;
         } else {
-            wk->state = SHINKA_DEMO_SHOW_WINDOW_GIVE_UP;
-            ShinkaDemo_ShowWindow(param, wk, TRUE);
+            wk->state = EVOLUTION_DEMO_SHOW_WINDOW_GIVE_UP;
+            EvolutionDemo_ShowWindow(param, wk, TRUE);
         }
         break;
-    case SHINKA_DEMO_SHOW_WINDOW_GIVE_UP:
+    case EVOLUTION_DEMO_SHOW_WINDOW_GIVE_UP:
         wk->bg1Request = BG1_SHOW;
-        wk->state = SHINKA_DEMO_PRINT_GIVE_UP;
+        wk->state = EVOLUTION_DEMO_PRINT_GIVE_UP;
         break;
-    case SHINKA_DEMO_PRINT_GIVE_UP:
-        ShinkaDemo_Print(wk, wk->moveMsgData, 7, NULL, WORD_NONE, NULL, WORD_MOVE, &wk->move);
-        wk->state = SHINKA_DEMO_WAIT_GIVE_UP;
+    case EVOLUTION_DEMO_PRINT_GIVE_UP:
+        EvolutionDemo_Print(wk, wk->moveMsgData, 7, NULL, WORD_NONE, NULL, WORD_MOVE, &wk->move);
+        wk->state = EVOLUTION_DEMO_WAIT_GIVE_UP;
         break;
-    case SHINKA_DEMO_WAIT_GIVE_UP:
-        if (ShinkaDemo_IsPrintDone(wk)) {
-            wk->state = SHINKA_DEMO_WAIT_GIVE_UP_ANSWER;
-            ShinkaDemo_SetMenuChoices(wk, wk->menuMsgData, 4, WORD_MOVE, &wk->move, WORD_NONE, NULL, wk->menuMsgData, 5,
-                                      WORD_MOVE, &wk->move, WORD_NONE, NULL);
+    case EVOLUTION_DEMO_WAIT_GIVE_UP:
+        if (EvolutionDemo_IsPrintDone(wk)) {
+            wk->state = EVOLUTION_DEMO_WAIT_GIVE_UP_ANSWER;
+            EvolutionDemo_SetMenuChoices(wk, wk->menuMsgData, 4, WORD_MOVE, &wk->move, WORD_NONE, NULL, wk->menuMsgData,
+                                         5, WORD_MOVE, &wk->move, WORD_NONE, NULL);
             TwoChoiceMenu_Open(wk->menu, wk->choices[0], wk->choices[1]);
         }
         break;
-    case SHINKA_DEMO_WAIT_GIVE_UP_ANSWER:
+    case EVOLUTION_DEMO_WAIT_GIVE_UP_ANSWER:
         result = TwoChoiceMenu_GetResult(wk->menu);
         if (result == TWO_CHOICE_MENU_NONE) {
             break;
         }
         if (result == TWO_CHOICE_MENU_FIRST) {
-            wk->state = SHINKA_DEMO_WAIT_NOT_LEARNED;
-            ShinkaDemo_Print(wk, wk->moveMsgData, 8, NULL, WORD_NICKNAME, wk->pkm, WORD_MOVE, &wk->move);
+            wk->state = EVOLUTION_DEMO_WAIT_NOT_LEARNED;
+            EvolutionDemo_Print(wk, wk->moveMsgData, 8, NULL, WORD_NICKNAME, wk->pkm, WORD_MOVE, &wk->move);
         } else if (result == TWO_CHOICE_MENU_SECOND) {
-            wk->state = SHINKA_DEMO_PRINT_WANTS_MOVE;
+            wk->state = EVOLUTION_DEMO_PRINT_WANTS_MOVE;
         }
         TwoChoiceMenu_Close(wk->menu);
         break;
-    case SHINKA_DEMO_WAIT_NOT_LEARNED:
-        if (ShinkaDemo_IsPrintDone(wk)) {
-            wk->state = SHINKA_DEMO_LEARN_MOVE;
+    case EVOLUTION_DEMO_WAIT_NOT_LEARNED:
+        if (EvolutionDemo_IsPrintDone(wk)) {
+            wk->state = EVOLUTION_DEMO_LEARN_MOVE;
         }
         break;
-    case SHINKA_DEMO_END:
+    case EVOLUTION_DEMO_END:
         if (wk->cancelled) {
             GFL_FadeSet(3, 0, 16, 2);
-            wk->state = SHINKA_DEMO_WAIT_BGM_END;
-        } else if (ShinkaDemo_IsKoukanPlaying(param, wk)) {
-            ShinkaDemo_FadeOutBGM(param, wk);
+            wk->state = EVOLUTION_DEMO_WAIT_BGM_END;
+        } else if (EvolutionDemo_IsTradePlaying(param, wk)) {
+            EvolutionDemo_FadeOutBGM(param, wk);
             GFL_FadeSet(3, 0, 16, 2);
-            wk->state = SHINKA_DEMO_WAIT_BGM_END;
+            wk->state = EVOLUTION_DEMO_WAIT_BGM_END;
         }
         break;
-    case SHINKA_DEMO_WAIT_BGM_END:
-        if (ShinkaDemo_IsBGMFadingOutEnd(param, wk) == FALSE) {
-            wk->state = SHINKA_DEMO_WAIT_FADE_END;
-            ShinkaDemo_RestoreBGM(param, wk);
+    case EVOLUTION_DEMO_WAIT_BGM_END:
+        if (EvolutionDemo_IsBGMFadingOutEnd(param, wk) == FALSE) {
+            wk->state = EVOLUTION_DEMO_WAIT_FADE_END;
+            EvolutionDemo_RestoreBGM(param, wk);
         }
         break;
-    case SHINKA_DEMO_WAIT_FADE_END:
+    case EVOLUTION_DEMO_WAIT_FADE_END:
         if (GFL_FadeIsRunning() == FALSE) {
-            wk->state = SHINKA_DEMO_DONE;
+            wk->state = EVOLUTION_DEMO_DONE;
             return TRUE;
         }
         break;
-    case SHINKA_DEMO_DONE:
+    case EVOLUTION_DEMO_DONE:
         return TRUE;
     }
-    ShinkaDemo_UpdateBGM(param, wk);
-    if (wk->state != SHINKA_DEMO_OV207 && wk->state != SHINKA_DEMO_OV207_END) {
+    EvolutionDemo_UpdateBGM(param, wk);
+    if (wk->state != EVOLUTION_DEMO_OV207 && wk->state != EVOLUTION_DEMO_OV207_END) {
         if (wk->menu != NULL) {
             TwoChoiceMenu_Main(wk->menu);
         }
-        ShinkaDemo_UpdateMsg(param, wk);
+        EvolutionDemo_UpdateMsg(param, wk);
         PrintQueue_Main(wk->printQueue);
-        ShinkaDemoView_Update(wk->view);
-        ShinkaDemoEffect_Update(wk->effect);
-        ShinkaDemoGraphic_Update(wk->graphic);
-        ShinkaDemoGraphic_Begin3D(wk->graphic);
-        ShinkaDemoEffect_Draw(wk->effect);
-        ShinkaDemoView_Draw(wk->view);
-        ShinkaDemoGraphic_End3D(wk->graphic);
+        EvolutionDemoView_Update(wk->view);
+        EvolutionDemoEffect_Update(wk->effect);
+        EvolutionDemoGraphic_Update(wk->graphic);
+        EvolutionDemoGraphic_Begin3D(wk->graphic);
+        EvolutionDemoEffect_Draw(wk->effect);
+        EvolutionDemoView_Draw(wk->view);
+        EvolutionDemoGraphic_End3D(wk->graphic);
     }
     return FALSE;
 }
 
-static void ShinkaDemo_InitGraphics(ShinkaDemoParam *param, ShinkaDemoWork *wk) {
+static void EvolutionDemo_InitGraphics(EvolutionDemoParam *param, EvolutionDemoWork *wk) {
     u8 i;
 
-    GFL_HeapCreateChild(HEAPID_USER, HEAPID_SHINKA_DEMO_GRAPHIC, 0x70000);
-    wk->graphicHeapId = HEAPID_SHINKA_DEMO_GRAPHIC;
+    GFL_HeapCreateChild(HEAPID_USER, HEAPID_EVOLUTION_DEMO_GRAPHIC, 0x70000);
+    wk->graphicHeapId = HEAPID_EVOLUTION_DEMO_GRAPHIC;
     GFL_OvlLoad(OVERLAY_APP_UI);
     for (i = 0; i <= 7; i++) {
         GFL_BGSysSetBGEnabled(i, FALSE);
     }
-    wk->graphic = ShinkaDemoGraphic_Create(1, wk->graphicHeapId);
-    ShinkaDemoGraphic_InitSubBG(wk->graphic);
+    wk->graphic = EvolutionDemoGraphic_Create(1, wk->graphicHeapId);
+    EvolutionDemoGraphic_InitSubBG(wk->graphic);
     wk->font = GFL_FontCreate(ARCID_FONT, 0, 0, 0, wk->graphicHeapId);
     wk->printQueue = PrintQueue_CreateDefault(wk->graphicHeapId);
-    ShinkaDemo_InitMsg(param, wk);
+    EvolutionDemo_InitMsg(param, wk);
     wk->menu = NULL;
-    ShinkaDemo_InitMenu(param, wk);
-    ShinkaDemo_InitBG(param, wk);
+    EvolutionDemo_InitMenu(param, wk);
+    EvolutionDemo_InitBG(param, wk);
     wk->actorsCreated = FALSE;
-    if (wk->state == SHINKA_DEMO_WAIT) {
-        ShinkaDemo_InitActors(param, wk);
+    if (wk->state == EVOLUTION_DEMO_WAIT) {
+        EvolutionDemo_InitActors(param, wk);
     }
     GFL_BGSysSetBGPriority(0, 2);
     GFL_BGSysSetBGPriority(2, 1);
@@ -816,21 +817,21 @@ static void ShinkaDemo_InitGraphics(ShinkaDemoParam *param, ShinkaDemoWork *wk) 
     GFL_BGSysSetBGEnabled(4, TRUE);
     GFL_BGSysResetStdPalette(0, GX_RGB(0, 0, 0));
     GFL_BGSysResetStdPalette(4, GX_RGB(0, 0, 0));
-    if (wk->state == SHINKA_DEMO_WAIT) {
+    if (wk->state == EVOLUTION_DEMO_WAIT) {
         if (param->method == EVO_METHOD_ITEM || param->method == EVO_METHOD_ITEM_MALE ||
             param->method == EVO_METHOD_ITEM_FEMALE) {
             param->canCancel = FALSE;
         }
     }
-    if (wk->state == SHINKA_DEMO_WAIT) {
-        wk->view = ShinkaDemoView_Create(wk->graphicHeapId, FALSE, wk->pkm, param->species);
+    if (wk->state == EVOLUTION_DEMO_WAIT) {
+        wk->view = EvolutionDemoView_Create(wk->graphicHeapId, FALSE, wk->pkm, param->species);
     } else {
-        wk->view = ShinkaDemoView_Create(wk->graphicHeapId, TRUE, wk->pkm, param->species);
+        wk->view = EvolutionDemoView_Create(wk->graphicHeapId, TRUE, wk->pkm, param->species);
     }
-    if (wk->state == SHINKA_DEMO_WAIT) {
-        wk->effect = ShinkaDemoEffect_Create(wk->graphicHeapId, FALSE);
+    if (wk->state == EVOLUTION_DEMO_WAIT) {
+        wk->effect = EvolutionDemoEffect_Create(wk->graphicHeapId, FALSE);
     } else {
-        wk->effect = ShinkaDemoEffect_Create(wk->graphicHeapId, TRUE);
+        wk->effect = EvolutionDemoEffect_Create(wk->graphicHeapId, TRUE);
     }
     G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG0,
                        GX_BLEND_PLANEMASK_BG1 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_BG3 |
@@ -838,34 +839,34 @@ static void ShinkaDemo_InitGraphics(ShinkaDemoParam *param, ShinkaDemoWork *wk) 
                        0, 0);
 }
 
-static void ShinkaDemo_FreeGraphics(ShinkaDemoParam *param, ShinkaDemoWork *wk) {
-    ShinkaDemoEffect_Free(wk->effect);
-    ShinkaDemoView_Free(wk->view);
-    ShinkaDemo_FreeActors(param, wk);
-    ShinkaDemo_FreeBG(param, wk);
-    ShinkaDemo_FreeMenu(param, wk);
-    ShinkaDemo_FreeMsg(param, wk);
+static void EvolutionDemo_FreeGraphics(EvolutionDemoParam *param, EvolutionDemoWork *wk) {
+    EvolutionDemoEffect_Free(wk->effect);
+    EvolutionDemoView_Free(wk->view);
+    EvolutionDemo_FreeActors(param, wk);
+    EvolutionDemo_FreeBG(param, wk);
+    EvolutionDemo_FreeMenu(param, wk);
+    EvolutionDemo_FreeMsg(param, wk);
     PrintQueue_Clear(wk->printQueue);
     PrintQueue_Free(wk->printQueue);
     GFL_FontFree(wk->font);
-    ShinkaDemoGraphic_FreeSubBG(wk->graphic);
-    ShinkaDemoGraphic_Free(wk->graphic);
+    EvolutionDemoGraphic_FreeSubBG(wk->graphic);
+    EvolutionDemoGraphic_Free(wk->graphic);
     GFL_OvlUnload(OVERLAY_APP_UI);
-    GFL_HeapDelete(HEAPID_SHINKA_DEMO_GRAPHIC);
+    GFL_HeapDelete(HEAPID_EVOLUTION_DEMO_GRAPHIC);
 }
 
 // Fades out the music that was playing, to push it once it is quiet
-static void ShinkaDemo_InitBGM(ShinkaDemoParam *param, ShinkaDemoWork *wk) {
+static void EvolutionDemo_InitBGM(EvolutionDemoParam *param, EvolutionDemoWork *wk) {
     if (param->unkC) {
         GFL_SndBGMFadeOut(30);
     }
     wk->bgm = BGM_FADE_OUT;
 }
 
-static void ShinkaDemo_FreeBGM(ShinkaDemoParam *param, ShinkaDemoWork *wk) {
+static void EvolutionDemo_FreeBGM(EvolutionDemoParam *param, EvolutionDemoWork *wk) {
 }
 
-static void ShinkaDemo_UpdateBGM(ShinkaDemoParam *param, ShinkaDemoWork *wk) {
+static void EvolutionDemo_UpdateBGM(EvolutionDemoParam *param, EvolutionDemoWork *wk) {
     switch (wk->bgm) {
     case BGM_FADE_OUT:
         if (GFL_SndBGMIsFading() == FALSE) {
@@ -881,9 +882,9 @@ static void ShinkaDemo_UpdateBGM(ShinkaDemoParam *param, ShinkaDemoWork *wk) {
             wk->bgm = BGM_IDLE;
         }
         break;
-    case BGM_LOAD_KOUKAN:
+    case BGM_LOAD_TRADE:
         if (GFL_SndBGMLoadStep(SEQ_BGM_KOUKAN, &wk->bgmStep, FALSE)) {
-            wk->bgm = BGM_KOUKAN;
+            wk->bgm = BGM_TRADE;
         }
         break;
     case BGM_FADE_OUT_END:
@@ -899,23 +900,23 @@ static void ShinkaDemo_UpdateBGM(ShinkaDemoParam *param, ShinkaDemoWork *wk) {
         break;
     case BGM_FANFARE:
         if (GFL_SndBGMIsPlaying() == FALSE) {
-            ShinkaDemo_PopBGM(param, wk);
+            EvolutionDemo_PopBGM(param, wk);
         }
         break;
     case BGM_LEVEL_UP:
         if (GFL_SndBGMIsPlaying() == FALSE) {
-            ShinkaDemo_PopBGM(param, wk);
+            EvolutionDemo_PopBGM(param, wk);
         }
         break;
     }
 }
 
-static BOOL ShinkaDemo_IsBGMFadingOut(ShinkaDemoParam *param, ShinkaDemoWork *wk) {
+static BOOL EvolutionDemo_IsBGMFadingOut(EvolutionDemoParam *param, EvolutionDemoWork *wk) {
     return wk->bgm == BGM_FADE_OUT;
 }
 
 // Brings back the music that was playing
-static void ShinkaDemo_RestoreBGM(ShinkaDemoParam *param, ShinkaDemoWork *wk) {
+static void EvolutionDemo_RestoreBGM(EvolutionDemoParam *param, EvolutionDemoWork *wk) {
     if (wk->bgm == BGM_IDLE && param->unkC) {
         GFL_SndBGMPop();
         GFL_SndBGMSetPaused(FALSE);
@@ -923,58 +924,58 @@ static void ShinkaDemo_RestoreBGM(ShinkaDemoParam *param, ShinkaDemoWork *wk) {
     }
 }
 
-static void ShinkaDemo_PlayBGM(ShinkaDemoParam *param, ShinkaDemoWork *wk) {
+static void EvolutionDemo_PlayBGM(EvolutionDemoParam *param, EvolutionDemoWork *wk) {
     if (wk->bgm == BGM_IDLE) {
         GFL_SndBGMPlay(SEQ_BGM_SHINKA, SND_CHANNEL_MASK_ALL);
         wk->bgm = BGM_PLAY;
     }
 }
 
-static BOOL ShinkaDemo_IsBGMPlaying(ShinkaDemoParam *param, ShinkaDemoWork *wk) {
+static BOOL EvolutionDemo_IsBGMPlaying(EvolutionDemoParam *param, EvolutionDemoWork *wk) {
     return wk->bgm == BGM_PLAY;
 }
 
-static void ShinkaDemo_PlayKoukan(ShinkaDemoParam *param, ShinkaDemoWork *wk) {
+static void EvolutionDemo_PlayTrade(EvolutionDemoParam *param, EvolutionDemoWork *wk) {
     if (wk->bgm == BGM_IDLE) {
         wk->bgmStep = 0;
         GFL_SndBGMLoadStep(SEQ_BGM_KOUKAN, &wk->bgmStep, TRUE);
-        wk->bgm = BGM_LOAD_KOUKAN;
+        wk->bgm = BGM_LOAD_TRADE;
     }
 }
 
-static void ShinkaDemo_PushBGM(ShinkaDemoParam *param, ShinkaDemoWork *wk) {
-    if (wk->bgm == BGM_KOUKAN) {
+static void EvolutionDemo_PushBGM(EvolutionDemoParam *param, EvolutionDemoWork *wk) {
+    if (wk->bgm == BGM_TRADE) {
         GFL_SndBGMSetPaused(TRUE);
         GFL_SndBGMPush();
         wk->bgm = BGM_PUSHED;
     }
 }
 
-static void ShinkaDemo_PopBGM(ShinkaDemoParam *param, ShinkaDemoWork *wk) {
+static void EvolutionDemo_PopBGM(EvolutionDemoParam *param, EvolutionDemoWork *wk) {
     if (wk->bgm == BGM_PUSHED || wk->bgm == BGM_FANFARE || wk->bgm == BGM_LEVEL_UP) {
         GFL_SndBGMPop();
         GFL_SndBGMSetPaused(FALSE);
         GFL_SndBGMFadeIn(6);
-        wk->bgm = BGM_KOUKAN;
+        wk->bgm = BGM_TRADE;
     }
 }
 
-static BOOL ShinkaDemo_IsKoukanPlaying(ShinkaDemoParam *param, ShinkaDemoWork *wk) {
-    return wk->bgm == BGM_KOUKAN;
+static BOOL EvolutionDemo_IsTradePlaying(EvolutionDemoParam *param, EvolutionDemoWork *wk) {
+    return wk->bgm == BGM_TRADE;
 }
 
-static void ShinkaDemo_FadeOutBGM(ShinkaDemoParam *param, ShinkaDemoWork *wk) {
-    if (wk->bgm == BGM_KOUKAN) {
+static void EvolutionDemo_FadeOutBGM(EvolutionDemoParam *param, EvolutionDemoWork *wk) {
+    if (wk->bgm == BGM_TRADE) {
         GFL_SndBGMFadeOut(60);
         wk->bgm = BGM_FADE_OUT_END;
     }
 }
 
-static BOOL ShinkaDemo_IsBGMFadingOutEnd(ShinkaDemoParam *param, ShinkaDemoWork *wk) {
+static BOOL EvolutionDemo_IsBGMFadingOutEnd(EvolutionDemoParam *param, EvolutionDemoWork *wk) {
     return wk->bgm == BGM_FADE_OUT_END;
 }
 
-static void ShinkaDemo_PlayFanfare(ShinkaDemoParam *param, ShinkaDemoWork *wk) {
+static void EvolutionDemo_PlayFanfare(EvolutionDemoParam *param, EvolutionDemoWork *wk) {
     if (wk->bgm == BGM_PUSHED) {
         wk->bgmStep = 0;
         GFL_SndBGMLoadStep(SEQ_ME_SHINKAOME, &wk->bgmStep, TRUE);
@@ -982,20 +983,20 @@ static void ShinkaDemo_PlayFanfare(ShinkaDemoParam *param, ShinkaDemoWork *wk) {
     }
 }
 
-static BOOL ShinkaDemo_IsFanfarePlaying(ShinkaDemoParam *param, ShinkaDemoWork *wk) {
+static BOOL EvolutionDemo_IsFanfarePlaying(EvolutionDemoParam *param, EvolutionDemoWork *wk) {
     return wk->bgm == BGM_LOAD_FANFARE || wk->bgm == BGM_FANFARE;
 }
 
-static void ShinkaDemo_PlayLevelUp(ShinkaDemoParam *param, ShinkaDemoWork *wk) {
-    if (wk->bgm == BGM_KOUKAN) {
-        ShinkaDemo_PushBGM(param, wk);
+static void EvolutionDemo_PlayLevelUp(EvolutionDemoParam *param, EvolutionDemoWork *wk) {
+    if (wk->bgm == BGM_TRADE) {
+        EvolutionDemo_PushBGM(param, wk);
         GFL_SndBGMPlay(SEQ_ME_LVUP, SND_CHANNEL_MASK_ALL);
         wk->bgm = BGM_LEVEL_UP;
     }
 }
 
 // Drops the pushed music, when the evolution has been stopped
-static void ShinkaDemo_DiscardBGM(ShinkaDemoParam *param, ShinkaDemoWork *wk) {
+static void EvolutionDemo_DiscardBGM(EvolutionDemoParam *param, EvolutionDemoWork *wk) {
     if (wk->bgm == BGM_PUSHED) {
         GFL_SndBGMPop();
         GFL_SndBGMStopImmediate();
@@ -1003,7 +1004,7 @@ static void ShinkaDemo_DiscardBGM(ShinkaDemoParam *param, ShinkaDemoWork *wk) {
     }
 }
 
-static void ShinkaDemo_InitBG(ShinkaDemoParam *param, ShinkaDemoWork *wk) {
+static void EvolutionDemo_InitBG(EvolutionDemoParam *param, EvolutionDemoWork *wk) {
     ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_SHINKA_DEMO, wk->graphicHeapId);
 
     GFL_G2DIOLoadArcNCLRDefault(arc, 3, 0, 0, 0x20, wk->graphicHeapId);
@@ -1013,10 +1014,10 @@ static void ShinkaDemo_InitBG(ShinkaDemoParam *param, ShinkaDemoWork *wk) {
     GFL_BGSysLoadScr(2);
 }
 
-static void ShinkaDemo_FreeBG(ShinkaDemoParam *param, ShinkaDemoWork *wk) {
+static void EvolutionDemo_FreeBG(EvolutionDemoParam *param, EvolutionDemoWork *wk) {
 }
 
-static void ShinkaDemo_InitActors(ShinkaDemoParam *param, ShinkaDemoWork *wk) {
+static void EvolutionDemo_InitActors(EvolutionDemoParam *param, EvolutionDemoWork *wk) {
     ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_SHINKA_DEMO, wk->graphicHeapId);
     u8 i;
 
@@ -1025,14 +1026,14 @@ static void ShinkaDemo_InitActors(ShinkaDemoParam *param, ShinkaDemoWork *wk) {
     wk->cellAnims = ClActSys_LoadCellAnims(arc, 1, 0, wk->graphicHeapId);
     GFL_ArcToolFree(arc);
     for (i = 0; i < ACTOR_COUNT; i++) {
-        wk->actors[i] = ClActor_Create(ShinkaDemoGraphic_GetClActUnit(wk->graphic), wk->chars, wk->palette,
+        wk->actors[i] = ClActor_Create(EvolutionDemoGraphic_GetClActUnit(wk->graphic), wk->chars, wk->palette,
                                        wk->cellAnims, &sActorSetups[i], 0, wk->graphicHeapId);
         ClActor_SetAutoAnim(wk->actors[i], FALSE);
     }
     wk->actorsCreated = TRUE;
 }
 
-static void ShinkaDemo_FreeActors(ShinkaDemoParam *param, ShinkaDemoWork *wk) {
+static void EvolutionDemo_FreeActors(EvolutionDemoParam *param, EvolutionDemoWork *wk) {
     u8 i;
 
     if (wk->actorsCreated) {
@@ -1046,7 +1047,7 @@ static void ShinkaDemo_FreeActors(ShinkaDemoParam *param, ShinkaDemoWork *wk) {
     }
 }
 
-static void ShinkaDemo_StartActors(ShinkaDemoParam *param, ShinkaDemoWork *wk) {
+static void EvolutionDemo_StartActors(EvolutionDemoParam *param, EvolutionDemoWork *wk) {
     u8 i;
 
     if (wk->actorsCreated) {
@@ -1058,7 +1059,7 @@ static void ShinkaDemo_StartActors(ShinkaDemoParam *param, ShinkaDemoWork *wk) {
 }
 
 // Frees the actors once they are done
-static BOOL ShinkaDemo_AreActorsDone(ShinkaDemoParam *param, ShinkaDemoWork *wk) {
+static BOOL EvolutionDemo_AreActorsDone(EvolutionDemoParam *param, EvolutionDemoWork *wk) {
     BOOL done;
     u8 i;
 
@@ -1071,15 +1072,15 @@ static BOOL ShinkaDemo_AreActorsDone(ShinkaDemoParam *param, ShinkaDemoWork *wk)
             }
         }
         if (done) {
-            ShinkaDemo_FreeActors(param, wk);
+            EvolutionDemo_FreeActors(param, wk);
         }
         return done;
     }
     return TRUE;
 }
 
-static void ShinkaDemo_VBlank(TCB *tcb, void *data) {
-    ShinkaDemoWork *wk = data;
+static void EvolutionDemo_VBlank(TCB *tcb, void *data) {
+    EvolutionDemoWork *wk = data;
 
     switch (wk->bg1Request) {
     case BG1_SHOW:
@@ -1098,7 +1099,7 @@ static void ShinkaDemo_VBlank(TCB *tcb, void *data) {
     }
 }
 
-static void ShinkaDemo_InitMsg(ShinkaDemoParam *param, ShinkaDemoWork *wk) {
+static void EvolutionDemo_InitMsg(EvolutionDemoParam *param, EvolutionDemoWork *wk) {
     BmpWin *window;
 
     GFL_BGSysLoadNCLRDefault(ARCID_FONT, 5, 0, 0x20, 0x20, wk->graphicHeapId);
@@ -1125,7 +1126,7 @@ static void ShinkaDemo_InitMsg(ShinkaDemoParam *param, ShinkaDemoWork *wk) {
     wk->windowShown = FALSE;
 }
 
-static void ShinkaDemo_FreeMsg(ShinkaDemoParam *param, ShinkaDemoWork *wk) {
+static void EvolutionDemo_FreeMsg(EvolutionDemoParam *param, EvolutionDemoWork *wk) {
     KeyCursor_Free(wk->keyCursor);
     if (wk->printStream != NULL) {
         PrintStream_Delete(wk->printStream);
@@ -1141,12 +1142,12 @@ static void ShinkaDemo_FreeMsg(ShinkaDemoParam *param, ShinkaDemoWork *wk) {
     BmpWin_Free(wk->blankWindow);
 }
 
-static void ShinkaDemo_UpdateMsg(ShinkaDemoParam *param, ShinkaDemoWork *wk) {
+static void EvolutionDemo_UpdateMsg(EvolutionDemoParam *param, EvolutionDemoWork *wk) {
     GFL_TCBExMgrUpdate(wk->tcbExManager);
 }
 
 // Plays the sounds of the message that the Pokémon forgot a move
-static BOOL ShinkaDemo_OnPrintEvent(u32 event) {
+static BOOL EvolutionDemo_OnPrintEvent(u32 event) {
     switch (event) {
     case 3:
         GFL_SndSEPlay(SEQ_SE_KON);
@@ -1158,16 +1159,16 @@ static BOOL ShinkaDemo_OnPrintEvent(u32 event) {
 }
 
 // Prints a message with up to two words, WORD_*
-static void ShinkaDemo_Print(ShinkaDemoWork *wk, MsgData *msgData, u32 messageId, PrintStreamCallback callback,
-                             u32 type0, void *word0, u32 type1, void *word1) {
-    ShinkaDemo_ClearWindow(wk, 15);
-    wk->message = ShinkaDemo_FormatMessage(wk->graphicHeapId, msgData, messageId, type0, word0, type1, word1);
+static void EvolutionDemo_Print(EvolutionDemoWork *wk, MsgData *msgData, u32 messageId, PrintStreamCallback callback,
+                                u32 type0, void *word0, u32 type1, void *word1) {
+    EvolutionDemo_ClearWindow(wk, 15);
+    wk->message = EvolutionDemo_FormatMessage(wk->graphicHeapId, msgData, messageId, type0, word0, type1, word1);
     wk->printStream =
         PrintStream_CreateWithCallback(wk->window, 0, 0, wk->message, wk->font, TextSpeed_GetCurrentWait(),
                                        wk->tcbExManager, 2, wk->graphicHeapId, 15, callback);
 }
 
-static BOOL ShinkaDemo_IsPrintDone(ShinkaDemoWork *wk) {
+static BOOL EvolutionDemo_IsPrintDone(EvolutionDemoWork *wk) {
     BOOL done = FALSE;
 
     switch (PrintStream_GetState(wk->printStream)) {
@@ -1200,7 +1201,7 @@ static BOOL ShinkaDemo_IsPrintDone(ShinkaDemoWork *wk) {
 }
 
 // Whether A or B was pressed or the touch screen touched
-static BOOL ShinkaDemo_WaitButton(ShinkaDemoWork *wk) {
+static BOOL EvolutionDemo_WaitButton(EvolutionDemoWork *wk) {
     if ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || GFL_HIDIsTouchPressed()) {
         if (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) {
             GCTX_HIDSetUsingTouch(FALSE);
@@ -1212,7 +1213,7 @@ static BOOL ShinkaDemo_WaitButton(ShinkaDemoWork *wk) {
     return FALSE;
 }
 
-static void ShinkaDemo_ClearWindow(ShinkaDemoWork *wk, u8 color) {
+static void EvolutionDemo_ClearWindow(EvolutionDemoWork *wk, u8 color) {
     BmpWin *window;
 
     GFL_BitmapFill(BmpWin_GetBitmap(wk->window), color);
@@ -1231,7 +1232,7 @@ static void ShinkaDemo_ClearWindow(ShinkaDemoWork *wk, u8 color) {
 }
 
 // Draws the message window, or hides it at the next VBlank
-static void ShinkaDemo_ShowWindow(ShinkaDemoParam *param, ShinkaDemoWork *wk, BOOL show) {
+static void EvolutionDemo_ShowWindow(EvolutionDemoParam *param, EvolutionDemoWork *wk, BOOL show) {
     BmpWin *window;
 
     if (show) {
@@ -1246,15 +1247,15 @@ static void ShinkaDemo_ShowWindow(ShinkaDemoParam *param, ShinkaDemoWork *wk, BO
     }
 }
 
-static void ShinkaDemo_InitMenu(ShinkaDemoParam *param, ShinkaDemoWork *wk) {
+static void EvolutionDemo_InitMenu(EvolutionDemoParam *param, EvolutionDemoWork *wk) {
     wk->menuMsgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_YES_NO, wk->graphicHeapId);
-    wk->menu = TwoChoiceMenu_Create(wk->graphicHeapId, 5, 0, 1, 0, ShinkaDemoGraphic_GetClActUnit(wk->graphic),
+    wk->menu = TwoChoiceMenu_Create(wk->graphicHeapId, 5, 0, 1, 0, EvolutionDemoGraphic_GetClActUnit(wk->graphic),
                                     wk->font, wk->printQueue, 0);
     wk->choices[0] = NULL;
     wk->choices[1] = NULL;
 }
 
-static void ShinkaDemo_FreeMenu(ShinkaDemoParam *param, ShinkaDemoWork *wk) {
+static void EvolutionDemo_FreeMenu(EvolutionDemoParam *param, EvolutionDemoWork *wk) {
     TwoChoiceMenu_Free(wk->menu);
     wk->menu = NULL;
     if (wk->choices[0] != NULL) {
@@ -1266,21 +1267,23 @@ static void ShinkaDemo_FreeMenu(ShinkaDemoParam *param, ShinkaDemoWork *wk) {
     GFL_MsgDataFree(wk->menuMsgData);
 }
 
-static void ShinkaDemo_SetMenuChoices(ShinkaDemoWork *wk, MsgData *msgData0, u32 messageId0, u32 type00, void *word00,
-                                      u32 type10, void *word10, MsgData *msgData1, u32 messageId1, u32 type01,
-                                      void *word01, u32 type11, void *word11) {
+static void EvolutionDemo_SetMenuChoices(EvolutionDemoWork *wk, MsgData *msgData0, u32 messageId0, u32 type00,
+                                         void *word00, u32 type10, void *word10, MsgData *msgData1, u32 messageId1,
+                                         u32 type01, void *word01, u32 type11, void *word11) {
     if (wk->choices[0] != NULL) {
         GFL_StrBufFree(wk->choices[0]);
     }
     if (wk->choices[1] != NULL) {
         GFL_StrBufFree(wk->choices[1]);
     }
-    wk->choices[0] = ShinkaDemo_FormatMessage(wk->graphicHeapId, msgData0, messageId0, type00, word00, type10, word10);
-    wk->choices[1] = ShinkaDemo_FormatMessage(wk->graphicHeapId, msgData1, messageId1, type01, word01, type11, word11);
+    wk->choices[0] =
+        EvolutionDemo_FormatMessage(wk->graphicHeapId, msgData0, messageId0, type00, word00, type10, word10);
+    wk->choices[1] =
+        EvolutionDemo_FormatMessage(wk->graphicHeapId, msgData1, messageId1, type01, word01, type11, word11);
 }
 
-static StrBuf *ShinkaDemo_FormatMessage(HeapID heapId, MsgData *msgData, u32 messageId, u32 type0, void *word0,
-                                        u32 type1, void *word1) {
+static StrBuf *EvolutionDemo_FormatMessage(HeapID heapId, MsgData *msgData, u32 messageId, u32 type0, void *word0,
+                                           u32 type1, void *word1) {
     StrBuf *message;
     StrBuf *format;
     WordSet *wordSet;
@@ -1321,7 +1324,7 @@ static StrBuf *ShinkaDemo_FormatMessage(HeapID heapId, MsgData *msgData, u32 mes
 }
 
 // Adds a Shedinja to the party, using up a Poké Ball, if there is room in the party and a Poké Ball in the bag
-static void ShinkaDemo_MakeShedinja(ShinkaDemoParam *param, ShinkaDemoWork *wk) {
+static void EvolutionDemo_MakeShedinja(EvolutionDemoParam *param, EvolutionDemoWork *wk) {
     BagSave *bag = GameData_GetBag(param->gameData);
     PartyPkm *shedinja;
     StrBuf *name;
@@ -1371,6 +1374,6 @@ static void ShinkaDemo_MakeShedinja(ShinkaDemoParam *param, ShinkaDemoWork *wk) 
 }
 
 // The held item that the Pokémon evolved with is used up
-static void ShinkaDemo_RemoveHeldItem(ShinkaDemoParam *param, ShinkaDemoWork *wk) {
+static void EvolutionDemo_RemoveHeldItem(EvolutionDemoParam *param, EvolutionDemoWork *wk) {
     PokeParty_SetParam(wk->pkm, PKM_PARAM_ITEM, ITEM_NONE);
 }
