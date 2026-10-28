@@ -41,7 +41,8 @@ typedef struct {
     // A second item, or 0
     u32 unkC_22 : 10;
     u16 unk10_0 : 6;
-    u16 unk10_6 : 3;
+    // What the mission's target counts, which picks its goal's message, its "Target:" line and its icon
+    u16 targetKind : 3;
     // Which of FestMission_ExtraSeconds a gain of time counts
     u16 extraSecondsIndex : 2;
     u16 unk10_11 : 5;

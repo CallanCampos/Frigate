@@ -81,7 +81,7 @@ void FestMission_Load(ArcTool *arc, u8 index, u32 level, FestMissionConfig *miss
     mission->info.seconds = params->levels[level].unk0;
     mission->info.unkC_22 = params->unk08;
     mission->info.unk10_0 = params->unk04;
-    mission->info.unk10_6 = params->unk05;
+    mission->info.targetKind = params->unk05;
     mission->info.extraSecondsIndex = params->unk02;
     mission->info.messageId = params->messageId;
     mission->info.resultMessageId = params->resultMessageId;

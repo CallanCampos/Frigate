@@ -29,7 +29,7 @@ enum {
     FMISSION_FILE_ANIMS,
 };
 
-// The cells' animation sequences. The mission icons follow the last, one for each value of the mission's unk10_6
+// The cells' animation sequences. The mission icons follow the last, one for each of the mission's target kinds
 enum {
     FMISSION_SEQ_GROUP_DIGIT,
     FMISSION_SEQ_DIGIT,
@@ -131,7 +131,7 @@ static void FieldFMissionInfo_SetNumber(FieldFMissionInfo *info, u32 value, int 
 static void FieldFMissionInfo_UpdateTime(FieldFMissionInfo *info, BOOL force);
 static void FieldFMissionInfo_UpdateGroupCount(FieldFMissionInfo *info);
 static void FieldFMissionInfo_SetActorX(FieldFMissionInfo *info, u8 actor, u16 x);
-static void FieldFMissionInfo_GetScoreLayout(int mode, int score, u16 *iconX, u16 *scoreX);
+static void FieldFMissionInfo_GetScoreLayout(int targetKind, int score, u16 *iconX, u16 *scoreX);
 static void FieldFMissionInfo_UpdateScore(FieldFMissionInfo *info);
 static void FieldFMissionInfo_Show(FieldFMissionInfo *info);
 static void FieldFMissionInfo_StartSlide(FieldFMissionInfo *info, u8 first, u8 count, int yOffset);
@@ -356,22 +356,22 @@ static void FieldFMissionInfo_SetActorX(FieldFMissionInfo *info, u8 actor, u16 x
 }
 
 // Where the mission's icon and the player's score go, the same whatever the mission and the score
-static void FieldFMissionInfo_GetScoreLayout(int mode, int score, u16 *iconX, u16 *scoreX) {
+static void FieldFMissionInfo_GetScoreLayout(int targetKind, int score, u16 *iconX, u16 *scoreX) {
     *iconX = 80;
     *scoreX = 44;
 }
 
 static void FieldFMissionInfo_UpdateScore(FieldFMissionInfo *info) {
     int i;
-    int mode = info->config->info.unk10_6;
+    int targetKind = info->config->info.targetKind;
     int score = LinkFestival_GetShownTotal(info->festival);
     u16 iconX;
     u16 scoreX;
 
     FieldFMissionInfo_SetNumber(info, score, FMISSION_COUNT_DIGITS, FMISSION_ACTOR_SCORE_DIGITS, FALSE);
-    ClActor_SetSequence(info->actors[FMISSION_ACTOR_ICON], mode + FMISSION_SEQ_ICONS);
+    ClActor_SetSequence(info->actors[FMISSION_ACTOR_ICON], targetKind + FMISSION_SEQ_ICONS);
     ClActor_RestartAnim(info->actors[FMISSION_ACTOR_ICON]);
-    FieldFMissionInfo_GetScoreLayout(mode, score, &iconX, &scoreX);
+    FieldFMissionInfo_GetScoreLayout(targetKind, score, &iconX, &scoreX);
     FieldFMissionInfo_SetActorX(info, FMISSION_ACTOR_ICON, iconX);
     for (i = 0; i < FMISSION_COUNT_DIGITS; i++) {
         FieldFMissionInfo_SetActorX(info, i + FMISSION_ACTOR_SCORE_DIGITS, scoreX + i * 8);

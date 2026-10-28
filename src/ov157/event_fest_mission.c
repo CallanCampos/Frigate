@@ -468,7 +468,7 @@ static void FestMission_Print(FestMissionEventWork *work) {
         GFL_MsgDataLoadStrbuf(work->msgData, EventFestMission_Text_TimeRemainingMinSec, work->strbuf);
     }
     FestMission_PrintLine(work, work->strbuf, 8, 7);
-    GFL_MsgDataLoadStrbuf(work->msgData, work->mission.info.unk10_6 + 13, work->strbuf);
+    GFL_MsgDataLoadStrbuf(work->msgData, work->mission.info.targetKind + 13, work->strbuf);
     FestMission_PrintLine(work, work->strbuf, 8, 8);
 }
 
